@@ -171,6 +171,7 @@ none → req → create → work → review → close → done
 | `GH_AUTH_ERROR` | gh認証エラー | `gh auth login` 手順を案内 |
 | `GH_NOT_FOUND` | Issue/PR存在しない | 対象が存在することを確認 |
 | `PERMISSION_DENIED` | 権限エラー | リポジトリ権限を確認 |
+| `ISSUE_NUMBER_REQUIRED` | Issue番号が必要 | セッションコンテキストに番号がない。明示的な番号指定または `/issue-create` 実行を促す |
 | `WORKTREE_CREATE_FAILED` | worktree作成失敗 | 既存worktree削除またはパス確認 |
 | `WORKTREE_EXISTS` | 同一worktree存在 | 既存削除またはスキップの選択肢提示 |
 | `BRANCH_NAME_CONFLICT` | ブランチ名競合 | 既存ブランチ削除またはスキップ |

@@ -287,7 +287,9 @@ git push --force-with-lease
 - `<Issue番号>` — 対象のIssue番号
   - 単一: `101`
   - 複数: `101,102,103`（カンマ区切りで並列実行）
-  - 省略時は直前のissue-createで作成したIssueを使用
+  - 省略時: 同一セッション内で `/issue-create` により作成された Issue 番号を使用
+
+**【禁止事項】** `.worktrees`、`git branch`、`gh issue list` 等からの推測は禁止。セッションコンテキストに番号がない場合はエラー停止。
 
 **内部フロー:**
 
@@ -336,7 +338,8 @@ git push --force-with-lease
 
 **引数:**
 
-- `<Issue番号>` — 対象のIssue番号（省略時は直前のissue-workで使用したIssueを使用）
+- `<Issue番号>` — 対象のIssue番号（省略時: 同一セッション内で `/issue-create` により作成された Issue 番号を使用）
+  - **【禁止事項】** `.worktrees`、`git branch`、`gh issue list` 等からの推測は禁止
 
 **内部フロー:**
 
