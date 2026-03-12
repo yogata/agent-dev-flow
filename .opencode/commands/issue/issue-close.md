@@ -56,24 +56,11 @@ Issue番号省略が可能なのは以下の場合のみ：
 
 ### 1. 前提確認
 
-- **チェックボックス完了確認（二重防御）**: チェックボックスが存在する場合 → **エラー停止**
-  - マージ: `gh pr merge $PR_NUMBER --squash --delete-branch`
-- Issueクローズ: `gh issue close $ISSUE_NUMBER --reason completed`
-- Worktree削除: `git worktree remove --force .worktrees/$ISSUE_NUMBER-<type>`
-- ローカルブランチ削除: `git branch -d <type>/issue-$ISSUE_NUMBER`
-- リモートブランチ削除: `git fetch --prune`
-```- **チェックボックス完了確認**: Issue本文に `- [ ]` が存在する場合 → エラー停止
-  ```bash
-  body=$(gh issue view $ISSUE_NUMBER --json body -q .body)
-  incomplete=$(echo "$body" | grep -c '- \[ \]' || true)
-  if [ "$incomplete" -gt 0 ]; then
-    echo "[ERROR:CHECKBOX_INCOMPLETE] $incomplete unchecked items found in issue #$ISSUE_NUMBER"
-    exit 1
-  fi
-  ```
-- PR存在確認: `gh pr list --head $(git branch --show-current) --state open`
-- DRAFT → Ready: `gh pr ready $PR_NUMBER`
-- MERGED → ブランチ削除のみ実行
+- **チェックボックス完了確認**: Issue本文に未完了の `- [ ]` が存在する場合 → `CHECKBOX_INCOMPLETE` エラーで停止
+- **PR存在確認**: `gh pr list --head $(git branch --show-current) --state open`
+- **PR状態遷移**:
+  - DRAFT → Ready: `gh pr ready $PR_NUMBER`
+  - MERGED → 手順3（PRマージ）をスキップ
 
 ### 2. docs/コミット（パターンBのみ）
 
