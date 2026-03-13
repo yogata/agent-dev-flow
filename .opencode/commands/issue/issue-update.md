@@ -47,6 +47,14 @@ description: 既存Issueの本文更新またはコメント追加を行う
    - テンプレートから作成し、`temp/comment-body.md` に保存
    - コメント追加: `gh issue comment $ISSUE_NUMBER --body-file "temp/comment-body.md"`
 
+## 完了検証
+
+以下を確認し、すべて完了していることを確認する:
+
+- **検証失敗時**: 複数の手順を詳細に記録し、原因を特定して再実行する
+
+---
+
 ## 完了時
 
 `@issue-workflow` スキルの「完了報告生成」と「次のステップ提案」を実行してください。

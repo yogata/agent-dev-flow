@@ -51,6 +51,14 @@ description: /issue-req の結果をもとにGitHub Issueを作成する
 
 5. **docs/紐付け**: `docs/requirements.md` と `docs/adr/NNN-xxx.md` にIssue番号を追記
 
+## 完了検証
+
+以下を確認し、すべて完了していることをを確認する:
+
+- **検証失敗時**: 複数の手順を詳細に記録し、原因を特定して再実行する
+
+---
+
 ## 完了時
 
 `@issue-workflow` スキルの「完了報告生成」と「次のステップ提案」を実行してください。
@@ -58,6 +66,7 @@ description: /issue-req の結果をもとにGitHub Issueを作成する
 現在のコンテキスト:
 
 - コマンド: issue-create
+- パターン: {判定結果}
 - Issue番号: {N}
 - パターン: {判定結果}
 
