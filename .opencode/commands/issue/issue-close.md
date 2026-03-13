@@ -11,7 +11,7 @@ PRをマージし、GitHub Issueに記録を追記し、クローズ後にworktr
 ## 入力（SSoT）
 
 - **GitHub Issue** — open状態
-- **GitHub PR** — merged状態
+- **GitHub PR** — open状態
 
 ## 出力（SSoT）
 

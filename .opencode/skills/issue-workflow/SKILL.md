@@ -112,6 +112,7 @@ done                 SSoT: なし（完了）
 4. **created**: Issue open + worktreeなし + PRなし
 5. **analyzed**: `temp/bug_analysis.md` または `temp/feature_technical.md` 存在 + Issueなし
 6. **requirement**: 上記以外 + ユーザー要望あり
+7. **unknown**: 上記に該当しない — エラーまたは手動判定
 
 ---
 
@@ -123,9 +124,9 @@ done                 SSoT: なし（完了）
 |---|---|---|---|---|
 | `/issue-req` | 要件定義・分析 | セッション会話 | `temp/*.md` | `analyzed` |
 | `/issue-create` | Issue作成 | `temp/*.md` | GitHub Issue | `created` |
-| `/issue-work` | 実装・PR作成 | GitHub Issue | GitHub PR | `review` |
+| `/issue-work` | 実装・PR作成 | GitHub Issue | GitHub PR + worktree + ブランチ | `review` |
 | `/issue-update` | Issue更新 | GitHub Issue | GitHub Issue | 変更なし |
-| `/issue-close` | 完了処理 | GitHub Issue | なし | `done` |
+| `/issue-close` | 完了処理 | GitHub Issue + GitHub PR (open) | なし | `done` |
 | `/issue-next` | 指揮者（自動判定） | 複数 | 適切なコマンド実行 | - |
 
 ### コマンドフロー
@@ -254,6 +255,7 @@ done                 SSoT: なし（完了）
   - クローズ: Issue #{N}
   - マージ: PR #{PR_N}
   - 削除: worktree `.worktrees/{N}-{type}`, ブランチ `{type}/issue-{N}`
+  - Planファイルアーカイブ完了
   {パターンBの場合: - docs/コミット済み}
 ```
 

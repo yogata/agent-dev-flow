@@ -30,7 +30,7 @@ in_progress          SSoT: GitHub Issue + worktree + ブランチ
     │
     │ 全チェックボックス完了 + PR作成
     ▼
-review               SSoT: GitHub PR
+review               SSoT: GitHub PR (open)
     │
     │ PR merged + /issue-close 完了
     ▼
