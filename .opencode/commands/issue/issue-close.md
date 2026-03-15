@@ -25,7 +25,7 @@ PRをマージし、GitHub Issueに記録を追記し、クローズ後にworktr
 
 ## 前提
 
-`@issue-workflow` スキルを実行し、以下を取得してください：
+`@issue-guide` スキルを実行し、以下を取得してください：
 
 - パターン（A/B）判定
 - 現在のフェーズ確認
@@ -118,7 +118,7 @@ Issueクローズ: `gh issue close $ISSUE_NUMBER --reason completed`
 
 ## 完了時
 
-`@issue-workflow` スキルの「完了報告生成」を実行してください。
+`@issue-guide` スキルの「完了報告生成」を実行してください。
 
 現在のコンテキスト:
 

@@ -4,7 +4,7 @@ description: /issue/issue-req の結果をもとにGitHub Issueを作成する
 
 # Issue登録
 
-`@issue-workflow` スキルで判定したパターンに基づき、GitHub Issueを作成します。
+`@issue-guide` スキルで判定したパターンに基づき、GitHub Issueを作成します。
 
 ---
 
@@ -25,7 +25,7 @@ description: /issue/issue-req の結果をもとにGitHub Issueを作成する
 
 ## 前提
 
-`@issue-workflow` スキルを実行し、以下を取得してください：
+`@issue-guide` スキルを実行し、以下を取得してください：
 
 - パターン（A/B）判定
 - ラベル選定
@@ -61,7 +61,7 @@ description: /issue/issue-req の結果をもとにGitHub Issueを作成する
 
 ## 完了時
 
-`@issue-workflow` スキルの「完了報告生成」と「次のステップ提案」を実行してください。
+`@issue-guide` スキルの「完了報告生成」と「次のステップ提案」を実行してください。
 
 現在のコンテキスト:
 
@@ -72,4 +72,4 @@ description: /issue/issue-req の結果をもとにGitHub Issueを作成する
 
 ## エラーハンドリング
 
-`@issue-workflow` スキルのエラーハンドリングを参照してください。
+`@issue-guide` スキルのエラーハンドリングを参照してください。

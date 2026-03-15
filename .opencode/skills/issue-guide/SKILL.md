@@ -1,9 +1,9 @@
 ---
-name: issue-workflow
+name: issue-guide
 description: 開発ワークフローの知識ベース。フェーズ定義、SSoT遷移、パターン判定基準、コマンド関連を提供。issue-*コマンドおよびissue-nextから参照される。
 ---
 
-# Issue Workflow スキル
+# Issue Guide スキル
 
 開発ワークフローの**知識ベース**として機能する。
 
