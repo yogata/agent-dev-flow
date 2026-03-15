@@ -101,6 +101,9 @@ workflow-state:
 ## ガードレール
 
 - **セッションコンテキストのみ使用**: `gh`、`git` コマンドは使用禁止
+  - **例外**: Issue番号特定不能時のみ `gh issue list --state open` を許可
+    - **目的**: ユーザーへの情報提供のみ
+    - **禁止**: 取得したIssue番号での自動ワークフロー実行
 - **フェーズ推論不可時はエラー**: 明確な推論ができない場合は停止し、ユーザーに確認を要求
 
 ---
@@ -108,7 +111,18 @@ workflow-state:
 ## エラーハンドリング
 
 - **フェーズ判定不能** — ユーザーに現在の状態を確認
-- **Issue番号特定不能** — ユーザーにIssue番号の入力を要求
+- **Issue番号特定不能** — open状態のIssue一覧を表示:
+  ```bash
+  gh issue list --state open --limit 10 --json number,title,labels --jq '.[] | "| \(.number) | \(.title) | \(.labels | map(.name) | join(", ")) |"'
+  ```
+  出力形式:
+  ```
+  | Number | Title | Labels |
+  |--------|-------|--------|
+  | 15     | fix: ... | enhancement, documentation |
+  | 16     | feat: ... | enhancement |
+  ```
+  ユーザーにIssue番号の指定を促す
 - **複数のPR存在** — どちらを対象にするか確認
 - **コンテキスト不足** — ユーザーに追加情報を要求
 
