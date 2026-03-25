@@ -344,7 +344,83 @@ done                 SSoT: なし（完了）
 
 ---
 
-## 7. 検証原則
+## 7. 依存関係変更時のチェックリスト
+
+`package.json`を変更した場合、以下を**必ず**実施する。
+
+### 必須手順
+
+1. **lockfile更新**: `bun install`を実行し、lockfileを最新化
+2. **lockfileコミット**: `bun.lock`の変更をコミット
+3. **検証**: `bun install --frozen-lockfile`が成功することを確認
+
+### 変更パターン別の対応
+
+| 変更内容 | 必要なアクション |
+|----------|------------------|
+| 依存関係追加 | `bun add <package>` → lockfile自動更新 → コミット |
+| 依存関係削除 | `bun remove <package>` → lockfile自動更新 → コミット |
+| 依存関係更新 | `bun update <package>` → lockfile自動更新 → コミット |
+| package.json直接編集 | `bun install` → lockfile更新 → コミット |
+
+### よくあるミス
+
+- ❌ `package.json`のみ編集してlockfile更新忘れ
+- ❌ サブディレクトリで`bun install`実行（monorepoではルートで実行）
+- ❌ lockfile変更を`.gitignore`している
+- ❌ CIでのみ`--frozen-lockfile`エラーに気づく
+
+### pre-commit/pre-push検証推奨
+
+```bash
+# package.json変更時にlockfile整合性を確認
+if git diff --cached --name-only | grep -q "package.json"; then
+  bun install --frozen-lockfile || exit 1
+fi
+```
+
+---
+
+## 8. monorepo/ワークスペースでのCI設定ガイドライン
+
+bun workspaces/turborepo構成の場合、以下のルールに従う。
+
+### 基本原則
+
+- **`bun install`はルートで実行**: サブディレクトリで実行しない
+- **lockfileはルートに存在**: `bun.lock`はリポジトリルートにのみ存在
+- **working-directoryは実行ステップのみ**: インストールには使用しない
+
+### 正しいCI設定例
+
+```yaml
+# ✅ 正しい: ルートでインストール
+- name: Install dependencies
+  run: bun install --frozen-lockfile
+
+- name: Build
+  run: npx turbo run build --filter='@app/workflow^...'
+
+- name: Run app
+  working-directory: apps/workflow  # 実行時のみworking-directory指定
+  run: bun run scraper
+```
+
+```yaml
+# ❌ 誤り: サブディレクトリでインストール
+- name: Install dependencies
+  working-directory: apps/workflow  # 禁止
+  run: bun install --frozen-lockfile
+```
+
+### エラーコード追加
+
+- `LOCKFILE_OUT_OF_SYNC`: lockfileとpackage.jsonの不整合 → `bun install`を実行してlockfile更新
+- `WORKSPACE_INSTALL_IN_SUBDIR`: サブディレクトリでのインストール → ルートで実行するよう修正
+
+---
+
+## 9. 検証原則
 
 各コマンド完了時は、出力SSoTが正しく作成されているか検証する。
 
@@ -358,3 +434,12 @@ done                 SSoT: なし（完了）
 
 - 客観的に確認可能な状態に限定（Issue closed/PR merged等）
 - 曖昧な項目は避ける
+
+### 依存関係変更時の追加検証
+
+`package.json`を変更した場合、PR作成前に以下を検証：
+
+```bash
+# CI環境と同じ条件で検証
+bun install --frozen-lockfile
+```
