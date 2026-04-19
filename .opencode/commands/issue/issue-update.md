@@ -43,7 +43,7 @@ description: 既存Issueの本文更新またはコメント追加を行う
 
 1. Issue確認: `gh issue view $ISSUE_NUMBER`
 2. コメント内容の整理: 問題点、期待される動作、修正方針
-3. コメント追加 — テンプレート: `@.opencode/commands/issue/templates/pr_comment_fix.md`
+3. コメント追加 — テンプレート: `@templates/pr_comment_fix.md`
    - テンプレートから作成し、`temp/comment-body.md` に保存
    - コメント追加: `gh issue comment $ISSUE_NUMBER --body-file "temp/comment-body.md"`
 
@@ -57,7 +57,7 @@ description: 既存Issueの本文更新またはコメント追加を行う
 
 ## 完了時
 
-`@issue-guide` スキルの「完了報告生成」と「次のステップ提案」を実行してください。
+`issue-guide` スキルの「完了報告生成」と「次のステップ提案」を実行してください。
 
 現在のコンテキスト:
 
@@ -67,4 +67,4 @@ description: 既存Issueの本文更新またはコメント追加を行う
 
 ## エラーハンドリング
 
-`@issue-guide` スキルのエラーハンドリングを参照してください。
+`issue-guide` スキルのエラーハンドリングを参照してください。
