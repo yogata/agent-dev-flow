@@ -40,13 +40,13 @@ description: /issue/issue-req の結果をもとにGitHub Issueを作成する
 
 1. **ディレクトリ作成** — `$1` が存在しない場合のみ作成
 2. **Issue本文作成**: テンプレートから作成し、`$1/issue-body.md` に保存
-   - パターンA: `@templates/issue_desc_bug.md`
-    - パターンB: `@templates/issue_desc_feature.md`
+   - パターンA: `@.opencode/commands/issue/templates/issue_desc_bug.md`
+   - パターンB: `@.opencode/commands/issue/templates/issue_desc_feature.md`
 3. **Issue作成**: `gh issue create --title "<タイトル>" --body-file "$1/issue-body.md" --label "<ラベル>"`
 4. **コメント追加**: テンプレートから作成し、`$1/comment-body.md` に保存後、`gh issue comment $ISSUE_NUMBER --body-file "$1/comment-body.md"`
 5. **一時ファイル削除**: Issue作成成功後、`$1/issue-body.md` と `$1/comment-body.md` を個別に削除
-   - パターンA: `@templates/issue_comment_bug_analysis.md`
-    - パターンB: `@templates/issue_comment_feature_technical.md`
+   - パターンA: `@.opencode/commands/issue/templates/issue_comment_bug_analysis.md`
+   - パターンB: `@.opencode/commands/issue/templates/issue_comment_feature_technical.md`
 
 ### パターンBのみ
 

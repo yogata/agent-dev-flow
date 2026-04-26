@@ -74,8 +74,8 @@ PRマージ: `gh pr merge $PR_NUMBER --merge`
 
 ### 4. 記録追記
 
-- **パターンA（小）** — `@templates/issue_comment_bug_record.md`
-- **パターンB（中）** — `@templates/issue_comment_feature_implementation.md`
+- **パターンA（小）** — `@.opencode/commands/issue/templates/issue_comment_bug_record.md`
+- **パターンB（中）** — `@.opencode/commands/issue/templates/issue_comment_feature_implementation.md`
 
 - テンプレートから記録を作成し、`temp/comment-body.md` に保存（日付等の変数を置換）
 - コメント追加: `gh issue comment $ISSUE_NUMBER --body-file "temp/comment-body.md"`

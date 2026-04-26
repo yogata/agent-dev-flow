@@ -133,9 +133,9 @@ Issue確認: `gh issue view $ISSUE_NUMBER`
 #### 6. docs/更新
 
 - HLD更新: `docs/specifications.md`
-   — テンプレート: `@templates/doc_hld.md`
+  — テンプレート: `@.opencode/commands/issue/templates/doc_hld.md`
 - LLD作成: `docs/implementation-guide.md`
-   — テンプレート: `@templates/doc_lld.md`
+  — テンプレート: `@.opencode/commands/issue/templates/doc_lld.md`
 - ADR更新: `docs/adr/NNN-xxx.md` の status を `proposed` → `accepted`
 
 ### フェーズ4: 検証・完了
@@ -162,7 +162,7 @@ Issue確認: `gh issue view $ISSUE_NUMBER`
 
 #### 9. PR作成
 
-**テンプレート**: `@templates/pr_desc.md`
+**テンプレート**: `@.opencode/commands/issue/templates/pr_desc.md`
 
 - テンプレートからPR本文を生成し、`temp/pr-body.md` に保存
 - PR作成: `gh pr create --base main --title "feat/fix: {要約} (#$ISSUE_NUMBER)" --body-file "temp/pr-body.md"`
