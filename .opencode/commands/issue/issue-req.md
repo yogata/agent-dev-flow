@@ -1,97 +1,38 @@
 ---
 description: 要件を整理・定義する（機能追加・バグ修正共通）
+load_skills:
+  - req-analysis
+  - decision-log
+  - adr-guidelines
+  - issue-guide
 ---
 
 # 要件定義
 
-機能追加またはバグ修正の要件を整理・定義します。
+機能追加またはバグ修正の要件を整理・定義します。①バイブス壁打ちフェーズで使用。
 
----
+## Input
 
-## 入力（SSoT）
+- ユーザーの自然言語による機能追加/バグ修正の説明
+- GitHub Issue URL（既存Issueの場合）
+- エラーログ（バグ修正の場合）
 
-- **セッション会話** — ユーザーとの対話内容
-- **エラーログ** — バグ修正の場合
+## Output
 
-## 引数
+- Issue本文（要件doc埋め込み、チェックボックス付き受け入れ基準）
+- `decisions/DEC-XXX-*.md`（壁打ちで決定した技術判断、発生した場合のみ）
 
-- `$1` — 出力先ディレクトリ（必須・デフォルトなし）。呼び出し側は書き込み権限を確認した上で適切なパスを自律的に決定し、明示的に渡すこと。
+## Steps
 
-## 出力（SSoT）
+1. ユーザーとの壁打ち対話を開始 → `req-analysis` の壁打ちメソドロジーに従って深掘り
+2. 機能要件/非機能要件を展開 → `req-analysis` の分析観点に従って網羅
+3. 技術判断が発生した場合 → `decision-log` に従って決定エントリを作成（ADR閾値以上なら `adr-guidelines` にブリッジ）
+4. Issue本文を要件doc形式で生成 → テンプレート: `templates/doc_requirement.md`
+5. 完了報告 → `issue-guide` の完了報告フォーマットに従って出力
 
-- **`$1/bug_analysis.md`** — パターンA（バグ修正）
-  - 分析結果
-  - Issue本文（チェックボックス含むタスク一覧）
-- **`$1/feature_technical.md`** — パターンB（機能追加）
-  - 技術的仕様
-  - Issue本文（チェックボックス含むタスク一覧）
+## Guardrails
 
-## 完了後のフェーズ
-
-`analyzed` — 分析完了・Issue未作成
-
----
-
-## 前提
-
-`@issue-guide` スキルを実行し、パターン（A/B）を判定してください。
-
-## オプション
-
-- `--feature` — 機能追加モード（自動判定）
-- `--bug` — バグ修正モード（自動判定）
-
-## 手順
-
-### パターンA（バグ修正）
-
-1. 事象の確認（エラーメッセージ、ログ等）
-2. 関連コードの特定（`grep_search`、`codebase_search`）
-3. 根本原因の分析
-4. 影響範囲の評価
-
-### パターンB（機能追加）
-
-1. 機能の概要と目的を整理
-2. 要件の洗い出し（機能/非機能）
-3. スコープの定義（対象/対象外）
-4. ADR作成要否の判定（`adr-guidelines` スキル使用）
-5. 仕様書更新（承認後）
-   - 要件追加: `docs/requirements/REQ-NNNN.md`（テンプレート使用: `@.opencode/commands/issue/templates/doc_requirement.md`）
-     - 連番は既存REQファイルの最大番号+1とする
-     - classification/category は要件内容から判定
-   - 目次更新: `docs/requirements.md` のサマリーテーブルに新規エントリを追加
-   - HLD追加: `docs/specifications.md`
-   - ADR作成: `docs/adr/NNN-xxx.md`（スキル判定で「推奨」の場合のみ）
-
-**テンプレート**:
-
-- 要件: `@.opencode/commands/issue/templates/doc_requirement.md`
-- HLD: `@.opencode/commands/issue/templates/doc_hld.md`
-- ADR: `@.opencode/commands/issue/templates/doc_adr.md`
-
-## 出力形式
-
-- パターンA: `@.opencode/commands/issue/templates/issue_comment_bug_analysis.md`
-- パターンB: `@.opencode/commands/issue/templates/issue_comment_feature_technical.md`
-
-## 完了検証
-
-以下を確認し、すべて完了していることを確認する:
-
-- **検証失敗時**: 褲当の手順を詳細に記録し、原因を特定して再実行
-
----
-
-## 完了時
-
-`issue-guide` スキルの「完了報告生成」と「次のステップ提案」を実行してください。
-
-現在のコンテキスト:
-
-- コマンド: issue-req
-- パターン: {判定結果}
-
-## エラーハンドリング
-
-`issue-guide` スキルのエラーハンドリングを参照してください。
+- バイブスフェーズのみ（実装コード禁止）
+- チェックボックスは測定可能で一意であること → `req-analysis` のチェックボックス品質基準
+- ADR閾値以上の判断は `adr-guidelines` へ
+- 出力先: `$1` 引数で指定（デフォルトなし）

@@ -1,131 +1,41 @@
 ---
 description: PRをマージし、対応記録を追記し、Issueをクローズしてブランチを削除する
+load_skills:
+  - decision-log
+  - issue-guide
+  - gh-cli-best-practices
 ---
 
 # 完了処理
 
-PRをマージし、GitHub Issueに記録を追記し、クローズ後にworktreeとブランチを削除します。
+PRをマージし、Issueに記録を追記し、クローズ後にworktreeとブランチを削除する。③レビュー完了フェーズ。
 
----
+## Input
 
-## 入力（SSoT）
+- Issue番号
+- PR番号（または自動検出）
 
-- **GitHub Issue** — open状態
-- **GitHub PR** — open状態
+## Output
 
-## 出力（SSoT）
+- マージ済みPR
+- クローズ済みIssue
+- 削除済みブランチ・worktree
+- `decisions/` の `implemented_by` 更新
 
-- なし（完了）
+## Steps
 
-## 完了後のフェーズ
+1. 前提確認: チェックボックス全完了確認、PR存在確認
+2. PRマージ（`gh pr merge`）→ 対応記録をIssueにコメント追記 → テンプレート: `templates/issue_comment_feature_implementation.md` or `templates/issue_comment_bug_record.md`
+3. 決定エントリのstatusを `implemented` に更新 → `decision-log` のライフサイクルに従って `implemented_by` にPR番号を記録
+4. Issueクローズ（`gh issue close --reason completed`）→ ブランチ・worktree削除
+5. `decisions/index.md` を更新
+6. 完了報告 → `issue-guide` の完了報告フォーマット
 
-`done` — 完了
+## Guardrails
 
----
-
-## 前提
-
-`issue-guide` スキルを実行し、以下を取得してください：
-
-- パターン（A/B）判定
-- 現在のフェーズ確認
-
-## 引数
-
-- `<Issue番号>` — 単一:`101` / 複数:`101,102,103` / 省略時は[省略可能条件]を参照
-
-**【省略可能条件】**
-
-Issue番号省略が可能なのは以下の場合のみ：
-
-- 同一セッション内で `/issue/issue-create` により Issue が作成されている
-- かつ、その Issue 番号がセッションコンテキストに保持されている
-
-**【禁止事項】**
-
-以下の推測方法は明示的に禁止：
-
-- `.worktrees` ディレクトリからの Issue 番号推測
-- `git branch` からの Issue 番号推測
-- `gh issue list` からの最新 Issue 取得
-- その他、セッションコンテキスト以外からの推測
-
-省略時かつ条件を満たさない場合、`ISSUE_NUMBER_REQUIRED` エラーで停止する。
-
-## 手順
-
-### 1. 前提確認
-
-- **チェックボックス完了確認**: Issue本文に未完了の `- [ ]` が存在する場合 → `CHECKBOX_INCOMPLETE` エラーで停止
-- **PR存在確認**: `gh pr list --head $(git branch --show-current) --state open`
-- **PR状態遷移**:
-  - DRAFT → Ready: `gh pr ready $PR_NUMBER`
-  - MERGED → 手順3（PRマージ）をスキップ
-
-### 2. docs/コミット（パターンBのみ）
-
-- ステージング: `git add docs/requirements.md docs/specifications.md docs/implementation-guide.md docs/adr/`
-- コミット: `git commit -m "docs(docs): update docs for #$ISSUE_NUMBER"`
-- プッシュ: `git push origin HEAD`
-
-### 3. PRマージ
-
-PRマージ: `gh pr merge $PR_NUMBER --merge`
-
-### 4. 記録追記
-
-- **パターンA（小）** — `@.opencode/commands/issue/templates/issue_comment_bug_record.md`
-- **パターンB（中）** — `@.opencode/commands/issue/templates/issue_comment_feature_implementation.md`
-
-- ※ $1 は issue-req で指定された出力先ディレクトリ（セッションコンテキスト経由で参照）
-- テンプレートから記録を作成し、`$1/comment-body.md` に保存（日付等の変数を置換）
-- コメント追加: `gh issue comment $ISSUE_NUMBER --body-file "$1/comment-body.md"`
-
-### 5. Issueクローズ
-
-Issueクローズ: `gh issue close $ISSUE_NUMBER --reason completed`
-
-### 6. クリーンアップ
-
-1. mainに切り替え: `git checkout main`
-2. 最新を取得: `git pull`
-3. worktree削除: `git worktree remove --force .worktrees/$ISSUE_NUMBER-<type>`
-4. ローカルブランチ削除: `git branch -D <type>/issue-$ISSUE_NUMBER`
-5. リモートブランチ削除: `git push origin --delete <type>/issue-$ISSUE_NUMBER`
-6. prune: `git fetch --prune`
-
-### 7. Planファイルのアーカイブ
-
-`.sisyphus/archives` に plan、notepadsを含むファイル一式をアーカイブ
-
-## 複数Issueの場合
-
-各Issueに対して手順1〜5を実行後、まとめてクリーンアップ（手順6）を行います。
-
-## 完了検証
-
-以下を確認し、すべて完了していることを確認する:
-
-- Issue がクローズされている
-- PR がマージされている
-- worktree が削除されている
-- ローカルブランチが削除されている
-- リモートブランチが削除されている
-- （パターンB）docs/ のコミットが push されている
-
-**検証失敗時**: 該当手順を詳細に記録し、原因を特定して再実行する
-
----
-
-## 完了時
-
-`issue-guide` スキルの「完了報告生成」を実行してください。
-
-現在のコンテキスト:
-
-- コマンド: issue-close
-- Issue番号: {N}
-- PR番号: {PR_N}
-- パターン: {判定結果}
-- 削除したworktree: {worktree名}
-- 削除したブランチ: {ブランチ名}
+- PRのCIが通っていることを確認（`gh pr checks`）
+- 未完了チェックボックスがある場合はエラー停止
+- 未マージPRはクローズしない
+- 決定エントリの最終更新（implemented）を忘れない
+- `gh-cli-best-practices` に従って `--body-file` 使用
+- Issue番号省略は同一セッション内で作成済みの場合のみ
