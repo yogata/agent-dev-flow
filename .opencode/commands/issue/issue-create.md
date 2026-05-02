@@ -26,7 +26,8 @@ load_skills:
 2. ラベル付与 → `issue-guide` のラベル体系に従って選定
 3. 決定エントリのstatus を proposed → accepted に更新 → `decision-log` のライフサイクル参照
 4. GitHub Issueを作成（`gh issue create`） → `gh-cli-best-practices` に従って `--body-file` 使用
-5. 完了報告 → `issue-guide` の完了報告フォーマットで結果出力
+5. Issue作成後にコメント追加 → テンプレート: `templates/issue_comment_bug_analysis.md` (パターンA) or `templates/issue_comment_feature_technical.md` (パターンB)
+6. 完了報告 → `issue-guide` の完了報告フォーマットで結果出力
 
 ## Guardrails
 

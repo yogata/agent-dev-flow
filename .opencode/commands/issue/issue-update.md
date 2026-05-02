@@ -24,7 +24,7 @@ load_skills:
 1. 現在のIssue状態を取得 → `issue-guide` のフェーズ体系で現在フェーズを判定
 2. 更新内容に応じて本文更新 or コメント追加:
    - 本文更新: テンプレートに従って更新 → `gh issue edit`
-   - コメント追加: テンプレート `templates/pr_comment_fix.md` → `gh issue comment`
+   - コメント追加: テンプレート `templates/issue_comment_update.md` → `gh issue comment`
 3. 完了報告 → `issue-guide` の完了報告フォーマットで結果出力
 
 ## Guardrails

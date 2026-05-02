@@ -28,12 +28,13 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 1. Issue本文から要件docと受け入れ基準を抽出 → `req-analysis` のチェックボックス品質基準で検証
 2. Worktree作成・ブランチ準備（`feature/issue-N` or `fix/issue-N`）
 3. work planを生成（@plan）→ 実行（/start-work）→ TDD実装
-4. 実行中に技術判断が発生 → `decision-log` に従って決定エントリ作成
-5. 各タスク完了時にIssue本文のチェックボックスを `[ ]` → `[x]` に更新
-6. 実装完了後、乖離検出 → `deviation-check` の検出観点に従ってチェック
-7. 乖離があれば報告 → `deviation-check` の報告フォーマットに従ってユーザーに提示
-8. ローカル検証（型チェック・Lint・ビルド・テスト）→ PR作成
-9. 完了報告 → `issue-guide` の完了報告フォーマットで結果出力
+4. パターンB（機能追加）の場合、HLD/LLD ドキュメントを生成 → テンプレート: `templates/doc_hld.md`, `templates/doc_lld.md`
+5. 実行中に技術判断が発生 → `decision-log` に従って決定エントリ作成
+6. 各タスク完了時にIssue本文のチェックボックスを `[ ]` → `[x]` に更新
+7. 実装完了後、乖離検出 → `deviation-check` の検出観点に従ってチェック
+8. 乖離があれば報告 → `deviation-check` の報告フォーマットに従ってユーザーに提示
+9. ローカル検証（型チェック・Lint・ビルド・テスト）→ PR作成
+10. 完了報告 → `issue-guide` の完了報告フォーマットで結果出力
 
 ## Guardrails
 
