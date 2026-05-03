@@ -116,7 +116,7 @@ Issueラベルの定義と自動付与ルールを定義する。
 
 ```
 ✅ Issue #{N} を作成しました（パターン{X}）。
-  {パターンBの場合: docs/にIssue番号を紐付けました。}
+  {パターンBの場合: docs/requirements/REQ-{NNNN}.md を作成しました。}
   次のステップ: /issue/issue-work {N}
 ```
 
@@ -155,8 +155,22 @@ Issueラベルの定義と自動付与ルールを定義する。
   - マージ: PR #{PR_N}
   - 削除: worktree `.worktrees/{N}-{type}`, ブランチ `{type}/issue-{N}`
   - Planファイルアーカイブ完了
-  {パターンBの場合: - docs/コミット済み}
+  {パターンBの場合: - docs/requirements/REQ-{NNNN}.md 作成済み, docs/design/{N}/ 更新済み}
 ```
+
+---
+
+## docs/ 構造（5区分）
+
+issue-*ワークフローで操作する docs/ の5区分構造。
+
+| 区分 | パス | 役割 | 自動操作コマンド |
+|------|------|------|----------------|
+| guides/ | 開発ガイド（参照のみ） | setup.md, api-reference.md, testing-and-debugging.md | — |
+| requirements/ | 要件管理 | README.md + REQ-NNNN.md | issue-req(CREATE), issue-create(READ) |
+| adr/ | ADR | README.md + NNN-*.md | adr-guidelines(CREATE) |
+| design/ | 設計 | specifications.md, implementation-guide.md, {issue}/ | issue-work(CREATE, UPDATE) |
+| tips/ | 学び | inbox.md + *.md | tips-add(UPDATE), tips-refactor(CREATE) |
 
 ---
 

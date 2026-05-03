@@ -22,7 +22,10 @@ load_skills:
 
 ## Steps
 
-1. 要件docからIssue本文を生成 → テンプレート: `templates/issue_desc_feature.md` or `templates/issue_desc_bug.md`
+1. 要件docからIssue本文を生成:
+   - `docs/requirements/REQ-{NNNN}-{slug}.md` が存在する場合: REQ内容を読み取り、Issue本文に反映
+   - 存在しない場合: セッション内の要件docから直接生成
+   - テンプレート: `templates/issue_desc_feature.md` or `templates/issue_desc_bug.md`
 2. ラベル付与 → `issue-guide` のラベル体系に従って選定
 3. 決定エントリのstatus を proposed → accepted に更新 → `decision-log` のライフサイクル参照
 4. GitHub Issueを作成（`gh issue create`） → `gh-cli-best-practices` に従って `--body-file` 使用
@@ -33,3 +36,4 @@ load_skills:
 
 - issue-req未実行の場合は警告
 - 要件docのチェックボックスが空の場合は警告
+- パターンBの場合、対応するREQファイルが存在することを確認
