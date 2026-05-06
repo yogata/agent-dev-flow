@@ -25,7 +25,7 @@ load_skills:
 1. 現在のIssue状態を取得 → `issue-guide` のフェーズ体系で現在フェーズを判定
 2. 更新内容に応じて分岐:
    - 本文更新: テンプレートに従って更新 → `gh issue edit`
-   - コメント追加: テンプレート `templates/issue_comment_update.md` → `gh issue comment`
+   - コメント追加: テンプレート @.opencode/commands/issue/templates/issue_comment_update.md → `gh issue comment`
    - REQファイル更新: `req-file-manager` スキルの判定ロジックでAPPEND/UPDATEを実行:
      - **APPEND**: 既存REQファイルに要件追記、frontmatter updated更新
      - **UPDATE**: 既存REQファイルの該当セクション更新、frontmatter updated更新
