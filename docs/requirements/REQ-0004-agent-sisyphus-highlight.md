@@ -4,7 +4,6 @@ title: "issue-*コマンドのagent変更と壁打ち結論ハイライト追加
 classification: FR
 category: maintainability
 status: planned
-issue: 36
 adr: null
 created: "2026-05-06"
 updated: "2026-05-06"
