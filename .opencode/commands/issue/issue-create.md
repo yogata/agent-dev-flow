@@ -1,5 +1,6 @@
 ---
 description: 要件定義をもとにGitHub Issueを作成する
+agent: build
 load_skills:
   - issue-guide
   - gh-cli-best-practices

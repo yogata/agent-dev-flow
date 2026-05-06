@@ -1,5 +1,6 @@
 ---
 description: 要件を整理・定義する（機能追加・バグ修正共通）
+agent: build
 load_skills:
   - req-analysis
   - adr-guidelines

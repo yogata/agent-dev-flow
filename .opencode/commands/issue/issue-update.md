@@ -1,5 +1,6 @@
 ---
 description: 既存Issueの本文更新、コメント追加、またはREQファイル更新を行う
+agent: build
 load_skills:
   - issue-guide
   - gh-cli-best-practices
