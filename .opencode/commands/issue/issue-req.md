@@ -27,7 +27,7 @@ load_skills:
 1. ユーザーとの壁打ち対話を開始 → `req-analysis` の壁打ちメソッドロジーに従って深掘り
 2. 機能要件/非機能要件を展開 → `req-analysis` の分析観点に従って網羅
 3. ADR閾値以上の技術判断が発生した場合 → `adr-guidelines` に従ってADRを作成
-4. Issue本文を要件doc形式で生成 → テンプレート: `templates/doc_requirement.md`
+4. Issue本文を要件doc形式で生成 → テンプレート: @.opencode/commands/issue/templates/doc_requirement.md
 5. `req-file-manager` スキルの判定ロジックでREQファイル保存モードを決定:
    - **新規要件 → CREATE**: テンプレート適用、最大REQ番号+1で採番、`docs/requirements/REQ-{NNNN}.md` に保存、`README.md` インデックス更新
    - **既存要件への追加 → APPEND**: 既存REQファイルに追記、frontmatter updated更新

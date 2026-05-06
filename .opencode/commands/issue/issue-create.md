@@ -22,10 +22,10 @@ load_skills:
 1. 要件docからIssue本文を生成:
    - `docs/requirements/REQ-{NNNN}-{slug}.md` が存在する場合: REQ内容を読み取り、Issue本文に反映
    - 存在しない場合: セッション内の要件docから直接生成
-   - テンプレート: `templates/issue_desc_feature.md` or `templates/issue_desc_bug.md`
+   - テンプレート: @.opencode/commands/issue/templates/issue_desc_feature.md or @.opencode/commands/issue/templates/issue_desc_bug.md
 2. ラベル付与 → `issue-guide` のラベル体系に従って選定
 3. GitHub Issueを作成（`gh issue create`） → `gh-cli-best-practices` に従って `--body-file` 使用
-4. Issue作成後にコメント追加 → テンプレート: `templates/issue_comment_bug_analysis.md` (パターンA) or `templates/issue_comment_feature_technical.md` (パターンB)
+4. Issue作成後にコメント追加 → テンプレート: @.opencode/commands/issue/templates/issue_comment_bug_analysis.md (パターンA) or @.opencode/commands/issue/templates/issue_comment_feature_technical.md (パターンB)
 5. 完了報告 → `issue-guide` の完了報告フォーマットで結果出力
 
 ## Guardrails
