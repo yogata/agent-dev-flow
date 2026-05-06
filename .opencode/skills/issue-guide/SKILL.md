@@ -30,7 +30,7 @@ issue-*系コマンドの統括ハブ。3マクロフェーズワークフロー
 | ②構造的実行          | Issue作成後の実装・PR作成・進捗管理      | created + in_progress |
 | ③レビュー完了        | PR作成後のレビュー・マージ・完了処理     | review + done |
 
-### マイクロフェーズ一覧（旧定義）
+### マイクロフェーズ一覧
 
 | フェーズ      | 状態                   | マクロフェーズ     |
 | ------------- | ---------------------- | ------------------ |
@@ -50,8 +50,37 @@ issue-*系コマンドの統括ハブ。3マクロフェーズワークフロー
 | マクロフェーズ       | SSoT                           | 説明                                 |
 | -------------------- | ------------------------------ | ------------------------------------ |
 | ①バイブス壁打ち      | Issue本文                      | 壁打ちで合意形成された要件・分析     |
-| ②構造的実行          | Issue本文 + work plan          | 要件doc（HLLD/LLD）+ 実行計画        |
+| ②構造的実行          | Issue本文 + Work Plan          | 要件doc + 実行計画                   |
 | ③レビュー完了        | PR + レビュー結果              | コードレビュー結果とマージ状態       |
+
+---
+
+## Anchored Development モデル
+
+issue-*ワークフローはAnchored Developmentモデルに基づく。4つの相互接続アーティファクトで構成される。
+
+| アーティファクト | 役割 | 格納先 |
+| ---------------- | ---- | ------ |
+| REQ（要件doc） | ユーザー視点の機能要件 | `docs/requirements/REQ-NNNN.md` |
+| コード | 実装そのもの | ソースコード |
+| テスト | 振る舞い仕様 | テストファイル |
+| ADR | アーキテクチャ判断 | `docs/adr/NNN-*.md` |
+
+これに加えて、システムの現在の姿を表す2つの「生きた仕様」を維持する。
+
+| 仕様 | 役割 | 格納先 |
+| ---- | ---- | ------ |
+| system.md | システム全体の現在の仕様 | `docs/specs/system.md` |
+| patterns.md | 実装パターン・規約 | `docs/specs/patterns.md` |
+
+### ワークフロー
+
+```
+REQ → Issue → Work Plan（動的）→ TDD実装 → specs更新
+```
+
+- **Work Plan**: issue-work で生成・実行。Issue単位で動的に変化する。
+- **specs更新**: issue-close で実装完了後に system.md/patterns.md を更新。
 
 ---
 
@@ -72,7 +101,7 @@ issue-*系コマンドの統括ハブ。3マクロフェーズワークフロー
 | `issue-req`           | セッション会話         | 要件doc                           | ①バイブス壁打ち     |
 | `issue-create`        | 要件doc                | GitHub Issue                      | ②構造的実行         |
 | `issue-work`          | GitHub Issue           | GitHub PR + worktree + ブランチ   | ③レビュー完了       |
-| `issue-update`        | GitHub Issue           | GitHub Issue                      | 変更なし            |
+| `issue-update`        | GitHub Issue           | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし            |
 | `issue-close`         | GitHub Issue + PR      | なし                              | ③レビュー完了       |
 | `issue-next`          | 複数                   | 適切なコマンド実行                 | 依存                |
 
@@ -109,6 +138,7 @@ Issueラベルの定義と自動付与ルールを定義する。
 ```
 ✅ パターン{X}（{規模}）と判定しました。
   Issue状態: {フェーズ}
+  REQファイル: {CREATE/APPEND/UPDATE}: REQ-{NNNN}
   次のステップ: /issue/issue-create
 ```
 
@@ -147,6 +177,13 @@ Issueラベルの定義と自動付与ルールを定義する。
   次のステップ: /issue/issue-work {N}
 ```
 
+または
+
+```
+✅ Issue #{N} のREQファイルを更新しました（{APPEND/UPDATE}: REQ-{NNNN}）。
+  次のステップ: /issue/issue-work {N}
+```
+
 ### issue-close 完了時
 
 ```
@@ -155,7 +192,7 @@ Issueラベルの定義と自動付与ルールを定義する。
   - マージ: PR #{PR_N}
   - 削除: worktree `.worktrees/{N}-{type}`, ブランチ `{type}/issue-{N}`
   - Planファイルアーカイブ完了
-  {パターンBの場合: - docs/requirements/REQ-{NNNN}.md 作成済み, docs/design/{N}/ 更新済み}
+  {パターンBの場合: - docs/requirements/REQ-{NNNN}.md 作成済み, docs/specs/ 更新済み}
 ```
 
 ---
@@ -167,21 +204,20 @@ issue-*ワークフローで操作する docs/ の5区分構造。
 | 区分 | パス | 役割 | 自動操作コマンド |
 |------|------|------|----------------|
 | guides/ | 開発ガイド（参照のみ） | setup.md, api-reference.md, testing-and-debugging.md | — |
-| requirements/ | 要件管理 | README.md + REQ-NNNN.md | issue-req(CREATE), issue-create(READ) |
+| requirements/ | 要件管理 | README.md + REQ-NNNN.md | issue-req(CREATE), issue-create(READ), issue-update(UPDATE) |
 | adr/ | ADR | README.md + NNN-*.md | adr-guidelines(CREATE) |
-| design/ | 設計 | specifications.md, implementation-guide.md, {issue}/ | issue-work(CREATE, UPDATE) |
+| specs/ | システム仕様 | system.md, patterns.md | issue-close(UPDATE) |
 | tips/ | 学び | inbox.md + *.md | tips-add(UPDATE), tips-refactor(CREATE) |
 
 ---
 
 ## スキル間依存関係
 
-issue-guideはハブスキルとして、他の3つの専門スキルが提供する知識を統合する。
+issue-guideはハブスキルとして、他の専門スキルが提供する知識を統合する。
 
 | スキル名           | 提供する知識                                                   |
 | ------------------ | -------------------------------------------------------------- |
-| `req-analysis`     | 要件分析手法（機能/非機能要件の展開観点、壁打ちメソドロジー）   |
-| `decision-log`     | 決定事項トレーサビリティ（ADR閾値未満の技術判断管理）          |
+| `req-analysis`     | 要件分析手法（機能/非機能要件の展開観点、壁打ちメソッドロジー）   |
 | `deviation-check`  | 乖離検出（実装と要件の乖離基準、ループバック判定）              |
 
 **注意**: issue-guideはハブとして他スキルを参照するが、他スキルからissue-guideを参照しない（一方向依存）。
