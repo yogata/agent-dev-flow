@@ -1,22 +1,14 @@
 ---
 name: req-analysis
-description: 要件分析手法の知識ベース。機能要件・非機能要件の観点、壁打ちメソドロジー、チェックボックス品質基準、ADR閾値判定を提供。
+description: Provides requirement analysis methods with quality criteria and ADR threshold judgment. Use when analyzing requirements, defining acceptance criteria, or evaluating requirement completeness.
 ---
 
 # 要件分析スキル
 
-このスキルは要件分析のための**知識ベース**として機能する。
+要件分析のための**知識ベース**。分析観点・品質基準・定義を提供し、①バイブス壁打ちフェーズでの壁打ち品質を担保する。
 
 - **このスキル（知識）**: 分析観点・品質基準・定義
 - **適用先**: 要件定義プロセス全般（壁打ち・Issue作成・実装検証）
-
----
-
-## 概要
-
-このスキルの役割は要件分析手法の提供である。①バイブス壁打ちフェーズでの壁打ち品質を担保する。
-
-要件を明確化・体系化するための観点を提供し、実装可能なレベルまで言語化を支援する。
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: git-worktree
-description: GitHub Issue 番号に基づいた git worktree の作成・管理・削除を標準化するスキル。issue-work/issue-close コマンドから使用される。
+description: Manages git worktree creation, switching, and cleanup based on Issue numbers. Use when creating worktrees, switching between branches, or cleaning up completed worktrees.
 ---
 
 # git-worktree
@@ -117,7 +117,7 @@ git branch -d "{type}/issue-{N}"
 
 ```bash
 # 正しい例
-bash(command="git status", workdir="C:\path\to\repo\.worktrees\516-fix")
+bash(command="git status", workdir="C:/path/to/repo/.worktrees/516-fix")
 
 # 禁止例
 bash(command="cd .worktrees/516-fix && git status")

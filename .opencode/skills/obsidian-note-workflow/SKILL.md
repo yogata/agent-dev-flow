@@ -1,6 +1,6 @@
 ---
 name: obsidian-note-workflow
-description: Obsidian Vaultのノートライフサイクル（収集→整理→定着→アーカイブ）を管理します。タグ付け・リンク付け・Zettelkasten原則に基づくワークフローを提供します。
+description: Manages Obsidian Vault note lifecycle (capture, organize, solidify, archive) with tagging and Zettelkasten principles. Use when creating notes, organizing inbox, adding tags, or archiving notes.
 ---
 
 # Obsidian Note Workflow

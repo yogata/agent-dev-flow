@@ -1,6 +1,6 @@
 ---
 name: deviation-check
-description: 実装と要件の乖離検出・品質ゲート。②構造的実行フェーズの完了時と③レビュー完了フェーズで使用します。
+description: Detects deviations between implementation and requirements as a quality gate. Use when completing implementation, before creating PRs, or during post-implementation review.
 ---
 
 # Deviation Check スキル

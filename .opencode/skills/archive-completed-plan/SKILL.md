@@ -18,7 +18,7 @@ Moves all files related to a specific plan (plans, drafts, evidence, execution, 
 Run the helper script with the plan name.
 
 ```bash
-python "C:/Users/ogatay/.config/opencode/skills/archive-completed-plan/archive_plan.py" <plan_name>
+python ".opencode/skills/archive-completed-plan/archive_plan.py" <plan_name>
 ```
 
 ## Behavior
