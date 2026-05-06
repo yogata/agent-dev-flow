@@ -62,3 +62,4 @@ load_skills:
 - フェーズは変更なし（現在のフェーズを維持）
 - `--review-ng` 時は必ず deviation-check 結果を引用すること
 - `--req` のステータス変更時は `req-file-manager` の遷移ルールに従うこと
+- サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
