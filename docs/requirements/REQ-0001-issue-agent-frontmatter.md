@@ -4,7 +4,6 @@ title: "issue-*コマンドのfrontmatterにエージェント型指定を追加
 classification: FR
 category: maintainability
 status: implemented
-issue: 30
 adr: null
 created: "2026-05-06"
 updated: "2026-05-06"

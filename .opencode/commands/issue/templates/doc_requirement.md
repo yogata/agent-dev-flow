@@ -4,7 +4,6 @@ title: ""
 classification: FR|NFR
 category: scraping|ui|api|performance|reliability|maintainability
 status: planned|in-progress|implemented|deprecated
-issue: null
 adr: null
 created: "YYYY-MM-DD"
 updated: "YYYY-MM-DD"

@@ -4,7 +4,6 @@ title: "全14スキルのSkill Authoring Best Practices準拠改善"
 classification: NFR
 category: maintainability
 status: created
-issue: 32
 adr: null
 created: "2026-05-06"
 updated: "2026-05-06"

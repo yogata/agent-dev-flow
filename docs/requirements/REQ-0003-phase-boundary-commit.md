@@ -4,7 +4,6 @@ title: "①→②フェーズ境界でのdocsコミット義務化"
 classification: FR
 category: maintainability
 status: deprecated
-issue: null
 adr: null
 created: "2026-05-06"
 updated: "2026-05-06"
