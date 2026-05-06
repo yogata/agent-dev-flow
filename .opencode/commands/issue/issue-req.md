@@ -1,6 +1,6 @@
 ---
 description: 要件を整理・定義する（機能追加・バグ修正共通）
-agent: build
+agent: sisyphus
 load_skills:
   - req-analysis
   - adr-guidelines
@@ -35,7 +35,7 @@ load_skills:
    - **既存要件の修正 → UPDATE**: 既存REQファイルの該当セクション更新、frontmatter updated更新
 6. docs変更の整合性検証 → REQ番号の連続性確認、frontmatterの`id`とファイル名の一致を確認
 7. docs変更をコミット・プッシュ → `conventional-commits` に従ってコミットメッセージを生成し、mainブランチにpush
-8. 完了報告 → `issue-guide` の完了報告フォーマットに従って出力
+8. 完了報告 → `issue-guide` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）
 
 ## Guardrails
 

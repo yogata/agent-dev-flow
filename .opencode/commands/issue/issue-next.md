@@ -1,6 +1,6 @@
 ---
 description: 次のコマンドを推論・実行する。セッションコンテキストのみ使用（gh/gitコマンド禁止）。
-agent: build
+agent: sisyphus
 load_skills:
   - issue-guide
   - deviation-check

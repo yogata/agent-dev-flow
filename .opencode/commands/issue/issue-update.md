@@ -1,6 +1,6 @@
 ---
 description: 既存Issueの本文更新、コメント追加、またはREQファイル更新を行う
-agent: build
+agent: sisyphus
 load_skills:
   - issue-guide
   - gh-cli-best-practices
