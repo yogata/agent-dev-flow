@@ -1,5 +1,6 @@
 ---
 description: 計画立案からコミットまでを一気通貫で実行する（@plan + /start-work + commit統合）
+agent: build
 load_skills:
   - req-analysis
   - deviation-check

@@ -1,5 +1,6 @@
 ---
 description: PRをマージし、対応記録を追記し、Issueをクローズしてブランチを削除する
+agent: build
 load_skills:
   - issue-guide
   - gh-cli-best-practices
