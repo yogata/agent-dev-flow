@@ -4,12 +4,23 @@
 
 ### エージェント指定
 
-全てのissue-*コマンドはfrontmatterに `agent: build` を明記する。
+コマンドのfrontmatterでagentを指定。対話系コマンド（issue-req）は `agent: prometheus`、ファイル操作系コマンド（issue-save-req, issue-create等）は `agent: sisyphus` を使用。
 
+**対話系コマンド（issue-req）:**
 ```yaml
 ---
 description: ...
-agent: build
+agent: prometheus
+load_skills:
+  - ...
+---
+```
+
+**ファイル操作系コマンド（issue-save-req, issue-create等）:**
+```yaml
+---
+description: ...
+agent: sisyphus
 load_skills:
   - ...
 ---

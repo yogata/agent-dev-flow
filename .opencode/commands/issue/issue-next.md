@@ -24,11 +24,13 @@ load_skills:
 1. セッションコンテキストから現在のマクロフェーズを推論 → `issue-guide` のフェーズ体系とSSoT遷移ルールに従って判定
 2. 乖離がある場合は乖離検出結果を確認 → `deviation-check` のループバック判定に従って次アクションを決定
 3. 次のコマンドを提示または実行 → `issue-guide` のコマンド関連マップに従って適切なコマンドを選択:
-   - ①バイブス壁打ち → `/issue/issue-req`
-   - ①→②境界 → `/issue/issue-create`
-   - ②構造的実行 → `/issue/issue-work`
-   - ②→③境界 → レビュー待ち
-   - ③レビュー完了 → `/issue/issue-close`
+    - ①バイブス壁打ち → `/issue/issue-req`
+    - ①→②準備（パターンB） → `/issue/issue-save-req`
+    - ①→②境界（パターンB） → `/issue/issue-save-req`
+    - ①→②境界（パターンA） → `/issue/issue-create`
+    - ②構造的実行 → `/issue/issue-work`
+    - ②→③境界 → レビュー待ち
+    - ③レビュー完了 → `/issue/issue-close`
 
 ## Guardrails
 

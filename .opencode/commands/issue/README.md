@@ -10,7 +10,7 @@ description: issue コマンドセットの使用ガイド
 
 | フェーズ | 内容 | コマンド |
 |---|---|---|
-| ①バイブス壁打ち | 要件定義・技術判断を壁打ちで決定 | `/issue/issue-req` → `/issue/issue-create` |
+| ①バイブス壁打ち | 要件定義・技術判断を壁打ちで決定 | `/issue/issue-req` → `/issue/issue-save-req` → `/issue/issue-create` |
 | ②構造的実行 | TDD・コーディング・デバッグを実行 | `/issue/issue-work` |
 | ③レビュー完了 | PR・マージ・決定事項クローズ | `/issue/issue-close` |
 
@@ -34,6 +34,7 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 | コマンド | 役割 | スキル参照 |
 |---|---|---|
 | `/issue/issue-req` | 要件定義（壁打ち） | req-analysis, adr-guidelines |
+| `/issue/issue-save-req` | REQ/ADR保存 | req-file-manager, adr-file-manager |
 | `/issue/issue-create` | Issue登録 | issue-guide |
 | `/issue/issue-work` | 実装パイプライン | req-analysis, deviation-check |
 | `/issue/issue-update` | Issue更新 | issue-guide |
@@ -43,7 +44,7 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 ## 基本フロー
 
 ```
-/issue/issue-req → /issue/issue-create → /issue/issue-work → /issue/issue-close
+/issue/issue-req → /issue/issue-save-req → /issue/issue-create → /issue/issue-work → /issue/issue-close
 ```
 
 ループバック: `/issue/issue-next` が乖離検出時に `/issue/issue-req` へ戻すことを提案。
@@ -51,6 +52,7 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 ## 各コマンドの詳細
 
 - `/issue/issue-req` — [issue-req.md](./issue-req.md)
+- `/issue/issue-save-req` — [issue-save-req.md](./issue-save-req.md)
 - `/issue/issue-create` — [issue-create.md](./issue-create.md)
 - `/issue/issue-work` — [issue-work.md](./issue-work.md)
 - `/issue/issue-update` — [issue-update.md](./issue-update.md)
