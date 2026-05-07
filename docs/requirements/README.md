@@ -8,3 +8,6 @@
 | REQ-0004 | issue-reqワークフローの再設計（承認ゲート・パターン分離・命名統一） | implemented |
 | REQ-0005 | issue-*コマンドのサブエージェント最終出力のverbatim出力            | implemented |
 | REQ-0006 | issue-*コマンド完了報告フォーマットのシンプル化                   | planned     |
+| REQ-0007 | issue-*コマンドのテンプレート参照解決修正                         | planned     |
+| REQ-0008 | issue-update要件更新機能の包括的ブラッシュアップ                 | planned     |
+| REQ-0009 | REQフォーマットの簡素化（分類・カテゴリ・関連情報フィールドの除去） | planned     |
