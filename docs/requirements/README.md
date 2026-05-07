@@ -11,3 +11,4 @@
 | REQ-0007 | issue-*コマンドのテンプレート参照解決修正                         | planned     |
 | REQ-0008 | issue-update要件更新機能の包括的ブラッシュアップ                 | planned     |
 | REQ-0009 | REQフォーマットの簡素化（分類・カテゴリ・関連情報フィールドの除去） | planned     |
+| REQ-0010 | Issue/ADR/REQスキル群連携性改善（load_skills補完・See Also追加・テンプレート拡張） | planned     |
