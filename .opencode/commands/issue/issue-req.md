@@ -31,7 +31,7 @@ load_skills:
 4. Issue本文を要件doc形式で生成 → テンプレート: `.opencode/commands/issue/templates/doc_requirement.md` を Read tool で読み込む
 5. パターンに応じたREQファイル処理:
    - **パターンB（機能追加）**: `req-file-manager` スキルの判定ロジックでREQファイル保存モードを決定:
-      - **新規要件 → CREATE**: テンプレート適用、最大REQ番号+1で採番、`docs/requirements/REQ-{NNNN}.md` に保存、`README.md` インデックス更新
+      - **新規要件 → CREATE**: テンプレート適用、最大REQ番号+1で採番、`docs/requirements/REQ-{NNNN}.md` に保存、`docs/requirements/README.md` インデックス更新、`docs/README.md` ドキュメントハブに新規REQエントリへのリンクを追加
      - **既存要件への追加 → APPEND**: 既存REQファイルに追記、frontmatter updated更新
      - **既存要件の修正 → UPDATE**: 既存REQファイルの該当セクション更新、frontmatter updated更新
    - **パターンA（バグ修正・軽微変更）**: REQファイルを作成せず、Issue本文のみで要件を管理する
