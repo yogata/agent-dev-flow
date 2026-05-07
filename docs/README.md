@@ -11,6 +11,7 @@
   - [REQ-0004: issue-reqワークフローの再設計](requirements/REQ-0004.md)
   - [REQ-0005: issue-*コマンドのサブエージェント最終出力のverbatim出力](requirements/REQ-0005.md)
   - [REQ-0006: issue-*コマンド完了報告フォーマットのシンプル化](requirements/REQ-0006.md)
+  - [REQ-0010: Issue/ADR/REQスキル群連携性改善](requirements/REQ-0010.md)
 
 ## Specifications
 
