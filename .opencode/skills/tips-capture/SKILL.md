@@ -21,6 +21,9 @@ description: Extracts and captures learnings when problems are solved. Use when 
 
 学びの保存先：
 - `docs/tips/inbox.md` — 最新の学び（常にここに追加）
+- `docs/tips/archive.md` — 過去の学び（/tips-refactor実行時に移動）
+
+> **注意**: inbox.md、archive.mdが存在しない場合、/tips-add が自動で作成する。
 
 ## How to Use This Skill
 
@@ -46,6 +49,8 @@ description: Extracts and captures learnings when problems are solved. Use when 
 **タグ**: #バグ修正 #調査 #実装 など
 ```
 
+> **注意**: `**タグ**` フィールドは人間の可読性のため保持している。セマンティック分析（/tips-refactor）ではタグに依存せず、LLMが内容からテーマを判定する。
+
 ### Step 3: ユーザー確認
 
 学びを追加する前に、必ずユーザーに確認する：
@@ -66,6 +71,13 @@ description: Extracts and captures learnings when problems are solved. Use when 
 
 または、直接 `docs/tips/inbox.md` に追記する。
 
+### Step 5: 閾値チェック
+
+inbox.mdのエントリ数（`## ` で始まる行）をカウントする。
+15件以上の場合、以下を提案する：
+
+> inbox.mdが{N}件になっています。`/tips-refactor` で分析することを推奨します。
+
 ---
 
 ## Example Workflow
@@ -80,7 +92,7 @@ See [references/example.md](references/example.md) for a complete workflow examp
 2. **簡潔に** — 長すぎる学びは読まれない。要点を絞る
 3. **タグを活用** — 後で検索しやすいようにタグを付ける
 4. **ユーザー確認は必須** — 自動的に追加せず、必ず確認を取る
-5. **inbox.mdが溜まったら** — 10件以上で `/tips-refactor` を提案
+5. **inbox.mdが溜まったら** — 15件以上で `/tips-refactor` を提案
 
 ---
 
