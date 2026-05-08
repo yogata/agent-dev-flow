@@ -1,11 +1,11 @@
 ---
-name: issue-guide
-description: 開発ワークフローの知識ベース。フェーズ定義、SSoT遷移、パターン判定基準、コマンド関連を提供。issue-*コマンドおよびissue-nextから参照される。
+name: issue-guide-phases
+description: 開発ワークフローのフェーズ定義・SSoT遷移・パターン判定基準・コマンド関連・docs構造を提供。issue-*コマンドのフェーズ判定フェーズで参照される知識ベース。
 ---
 
-# Issue Guide スキル
+# Issue Guide Phases スキル
 
-issue-*系コマンドの統括ハブ。3マクロフェーズワークフローの全体像を提供する。
+issue-*系コマンドのフェーズ定義・SSoT遷移・コマンド関連を提供する。
 
 - **知識ベース**: フェーズ定義、SSoT遷移、パターン判定基準、コマンド関連
 - **参照先**: issue-*コマンドおよびissue-nextから参照される
@@ -166,133 +166,6 @@ Issueラベルの定義と自動付与ルールを定義する。
 
 ---
 
-## 完了報告フォーマット
-
-各コマンド完了時の報告フォーマットを定義する。
-
-### issue-req 完了時
-
-```
-✅ 要件定義が完了しました（パターン{X}：{規模}）。
-  {パターンBの場合: 壁打ちドラフトを .sisyphus/drafts/ に保存しました。}
-  次のステップ: {パターンBの場合: /issue/issue-save-req / パターンAの場合: /issue/issue-create}
-```
-
-#### 壁打ち結論ハイライト
-
-issue-req完了時は以下のハイライトを報告に続けて出力する。
-
-```
-📋 壁打ち結論ハイライト
-  背景: {課題の1行サマリ}
-  目標: {達成すべきゴール}
-  要件数: {機能要件の数}
-   主要な判断: {壁打ちで合意した技術判断}
-```
-
-### issue-save-req 完了時
-
-```
-✅ 要件をdocs/に保存しました（REQ-{NNNN} を{CREATE/APPEND/UPDATE}）。
-  {ADR作成がある場合: ADR-{NNNN} を作成しました。}
-  次のステップ: /issue/issue-create
-```
-
-### issue-create 完了時
-
-```
-✅ Issue #{N} を作成しました（パターン{X}）。
-  {パターンBの場合: REQ-{NNNN} をIssue本文に反映しました。}
-  次のステップ: /issue/issue-work
-```
-
-### issue-work 完了時
-
-```
-✅ PRを作成しました: {PR_URL}
-  Issue: #{N}（パターン{X}）
-  現在の状態: レビュー待ち
-
-  レビューが通ったら: /issue/issue-close
-  レビューで差し戻されたら: フィードバックを反映して /issue/issue-work を再実行してください
-```
-
-### issue-update 完了時
-
-```
-✅ Issue #{N} を更新しました。
-  次のステップ: /issue/issue-work {N}
-```
-
-または
-
-```
-✅ Issue #{N} にコメントを追加しました。
-  次のステップ: /issue/issue-work {N}
-```
-
-または
-
-```
-✅ Issue #{N} のREQファイルを更新しました（{APPEND/UPDATE}: REQ-{NNNN}）。
-  次のステップ: /issue/issue-work {N}
-```
-
-### issue-close 完了時
-
-```
-🎉 フロー完了しました。
-  - Issue #{N} をクローズ
-  - PR #{PR_N} をマージ
-  - 関連リソースをクリーンアップ
-  {パターンBの場合: - ドキュメント（REQ・specs）を更新済み}
-```
-
----
-
-## レビューNG時の対応フロー
-
-レビュー結果がNGの場合、乖離の種類に応じて対応フローを切り替える。
-
-### NG理由の定義と対応フロー
-
-| NG理由 | 定義 | 対応フロー |
-| ------ | ---- | ---------- |
-| 仕様バグ | 要件定義と実装の間に論理的矛盾がある | `deviation-check` 結果確認 → `/issue/issue-update {N} --req --review-ng`（該当REQのUPDATE）→ `/issue/issue-work {N}` |
-| 実装バグ | 要件定義は正しいが実装が仕様を満たさない | `deviation-check` 結果確認 → `/issue/issue-update {N} --comment --review-ng`（レビューNGテンプレート使用）→ `/issue/issue-work {N}` |
-| スコープ外逸脱 | 実装が要件定義の範囲を超えている | `/issue/issue-update {N} --req --review-ng`（REQの該当セクションUPDATE）→ 不要な実装を削除 → `/issue/issue-work {N}` |
-
-### `--review-ng` フラグ
-
-`issue-update` に `--review-ng` を付与すると、レビューNG専用テンプレート（`issue_comment_review_ng.md`）を使用してコメントを投稿する。`deviation-check` の報告内容（影響度、対象、内容、推奨アクション、理由）をテンプレートに反映する。
-
----
-
-## チェックボックス更新ルール
-
-Issue本文のタスクリスト（チェックボックス）は以下のルールで更新する。
-
-| タイミング | 更新内容 |
-| ---------- | -------- |
-| issue-work 完了時 | 完了したタスクのチェックボックスを入れる（`[ ]` → `[x]`） |
-| レビューNG差し戻し時 | 差し戻されたタスクのチェックボックスを外す（`[x]` → `[ ]`） |
-| issue-update（--req）時 | 要件変更に伴い不要になったタスクを削除、新規タスクを追加 |
-
----
-
-## issue-next レビューNG時推論ルール
-
-`issue-next` コマンドは、レビュー結果から適切な次アクションを推論する。
-
-| 条件 | 推論結果 |
-| ---- | -------- |
-| レビュー結果に「仕様バグ」が含まれる | `/issue/issue-update {N} --req --review-ng` → `/issue/issue-work {N}` |
-| レビュー結果に「実装バグ」が含まれる | `/issue/issue-update {N} --comment --review-ng` → `/issue/issue-work {N}` |
-| レビュー結果に「スコープ外逸脱」が含まれる | `/issue/issue-update {N} --req --review-ng` → 不要実装削除 → `/issue/issue-work {N}` |
-| レビュー結果がOK | `/issue/issue-close {N}` |
-
----
-
 ## docs/ 構造（5区分）
 
 issue-*ワークフローで操作する docs/ の5区分構造。
@@ -307,40 +180,9 @@ issue-*ワークフローで操作する docs/ の5区分構造。
 
 ---
 
-## サブエージェント出力ポリシー
-
-issue-*コマンドが利用するサブエージェント（`call_omo_agent`、バックグラウンドタスク、`/start-work`、`@plan`等）の最終出力は、親エージェントによる再フォーマット・要約・再構成なしにそのまま（verbatim）ユーザーに表示すること。
-
-### 義務
-
-- サブエージェントの最終出力をverbatimで出力する（再フォーマット禁止）
-- Markdownテーブル・強調表示・リスト等のフォーマットを保持する
-
-### verbatim出力の対象
-
-サブエージェントが生成する以下の最終出力を対象とする。
-
-| 出力種別 | 生成元 | 説明 |
-|----------|--------|------|
-| 完了報告 | 各issue-*コマンド | `issue-guide`の完了報告フォーマットに従った出力 |
-| 実装サマリ | `/start-work`、`@plan` | 実装内容の要約・変更ファイル一覧 |
-| 乖離検出レポート | `deviation-check` | 要件と実装の乖離内容・影響度・推奨アクション |
-| review-work結果 | `review-work`スキル | レビュー判定・指摘事項 |
-| 壁打ち結論ハイライト | `issue-req` | 背景・目標・要件数・主要な判断 |
-
-### 非対象
-
-以下はverbatim出力の対象外（親エージェントが適宜整形してよい）。
-
-- ユーザーとの対話中の中間メッセージ（進捗報告・質問等）
-- エラーメッセージ（ツール呼び出し失敗等の通知）
-- 確認プロンプト（ユーザーへの選択肢提示等）
-
----
-
 ## スキル間依存関係
 
-issue-guideはハブスキルとして、他の専門スキルが提供する知識を統合する。
+issue-guide-skills（phases/reports/review）は他の専門スキルが提供する知識を参照する。
 
 | スキル名           | 提供する知識                                                   |
 | ------------------ | -------------------------------------------------------------- |
@@ -350,12 +192,14 @@ issue-guideはハブスキルとして、他の専門スキルが提供する知
 | `adr-guidelines`   | ADR作成の必要性判定基準・ライフサイクル定義                     |
 | `req-file-manager` | REQファイルの作成・追記・更新操作とバリデーション               |
 
-**注意**: issue-guideはハブとして他スキルを参照するが、他スキルからissue-guideを参照しない（一方向依存）。
+**注意**: issue-guide-phases/reports/reviewは一方向依存であり、他スキルからは参照されない。
 
 ---
 
 ## See Also
 
+- **issue-guide-reports**: 完了報告フォーマット・チェックボックス更新ルール・サブエージェント出力ポリシー
+- **issue-guide-review**: レビューNG時の対応フロー・issue-next推論ルール
 - **adr-file-manager**: ADRファイルの作成・追記・更新操作とバリデーション
 - **adr-guidelines**: ADR作成の必要性判定基準・ライフサイクル定義
 - **req-file-manager**: REQファイルの作成・追記・更新操作とバリデーション

@@ -2,7 +2,9 @@
 description: 既存Issueの本文更新、コメント追加、またはREQファイル更新を行う
 agent: sisyphus
 load_skills:
-  - issue-guide
+  - issue-guide-phases
+  - issue-guide-reports
+  - issue-guide-review
   - gh-cli-best-practices
   - req-file-manager
   - req-analysis
@@ -30,7 +32,7 @@ load_skills:
    - 番号が省略された場合、セッション内会話から直近のIssue番号を検索（直前のIssue参照履歴等から抽出）
    - 複数のIssue番号が存在する場合は直近のものを優先し、ユーザーに確認（例: 「Issue #Nを更新します。よろしいですか？」）
    - 検出できない場合はユーザーに番号の指定を求めて停止
-2. 現在のIssue状態を取得 → `issue-guide` のフェーズ体系で現在フェーズを判定
+2. 現在のIssue状態を取得 → `issue-guide-phases` のフェーズ体系で現在フェーズを判定
 3. 更新内容に応じて分岐:
    - **`--body`**: テンプレートに従って更新 → `gh issue edit`
    - **`--comment`**: テンプレート `.opencode/commands/issue/templates/issue_comment_update.md` を Read tool で読み込み → `gh issue comment`
@@ -53,7 +55,7 @@ load_skills:
       4. deviation-check結果をテンプレートの「Deviation Check 結果」セクションに展開
       5. NG理由分類のチェックボックスを自動選択
       6. `gh-cli-best-practices` に従い `--body-file` 経由でコメント投稿
-4. 完了報告 → `issue-guide` の完了報告フォーマットで結果出力
+4. 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力
 
 ## APPEND vs UPDATE 判定基準
 

@@ -250,4 +250,3 @@ ADRテンプレートは以下のパスで参照可能:
 - **adr-guidelines**: ADR作成の必要性判定基準・ライフサイクル定義
 - **req-analysis**: 要件分析におけるADR閾値判定ブリッジ
 - **req-file-manager**: REQファイル管理（ADR ↔ REQ整合性チェック）
-- **issue-guide**: issue-*ワークフロー統括ハブ（コマンドからのADR READ参照）

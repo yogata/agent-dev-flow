@@ -4,7 +4,9 @@ agent: sisyphus
 load_skills:
   - req-analysis
   - deviation-check
-  - issue-guide
+  - issue-guide-phases
+  - issue-guide-reports
+  - issue-guide-review
   - git-worktree
   - req-file-manager
   - adr-file-manager
@@ -42,7 +44,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 9. 乖離があれば報告 → `deviation-check` の報告フォーマットに従ってユーザーに提示
 10. パターンBの場合、`docs/specs/system.md` または `docs/specs/patterns.md` を更新する。実装によって仕様が変化した部分を反映する。パターンA（バグ修正）の場合はspecs更新をスキップする
 11. ローカル検証（型チェック・Lint・ビルド・テスト）→ PR作成
-12. 完了報告 → `issue-guide` の完了報告フォーマットで結果出力
+12. 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力
 
 ## Guardrails
 

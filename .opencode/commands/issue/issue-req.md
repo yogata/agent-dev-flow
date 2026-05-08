@@ -4,7 +4,8 @@ agent: prometheus
 load_skills:
   - req-analysis
   - adr-guidelines
-  - issue-guide
+  - issue-guide-phases
+  - issue-guide-reports
 ---
 
 # 要件定義
@@ -44,7 +45,7 @@ load_skills:
 6. 承認ゲート: 生成した要件doc（パターンB: ドラフト内容、パターンA: セッション内要件doc）をユーザーに提示し、承認を求める
     - **承認**: 次のステップへ進む
     - **差し戻し**: 壁打ちを継続（Step 1に戻る）
-7. 完了報告 → `issue-guide` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
+7. 完了報告 → `issue-guide-reports` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
     - パターンB: `次のステップ: /issue/issue-save-req`
     - パターンA: `次のステップ: /issue/issue-create`
 

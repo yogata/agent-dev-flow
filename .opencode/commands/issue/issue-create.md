@@ -2,7 +2,8 @@
 description: 要件定義をもとにGitHub Issueを作成する
 agent: sisyphus
 load_skills:
-  - issue-guide
+  - issue-guide-phases
+  - issue-guide-reports
   - gh-cli-best-practices
   - req-file-manager
   - req-analysis
@@ -29,10 +30,10 @@ load_skills:
    - 存在しない場合: セッション内の要件docから直接生成
    - テンプレート: `.opencode/commands/issue/templates/issue_desc_feature.md` または `.opencode/commands/issue/templates/issue_desc_bug.md` を Read tool で読み込む
 3. `docs/adr/README.md` を読み込み、要件と関連するADRを「対象領域」と「決定内容」でマッチングして特定する。関連ADRがあれば個別に読み込む
-4. ラベル付与 → `issue-guide` のラベル体系に従って選定
+4. ラベル付与 → `issue-guide-phases` のラベル体系に従って選定
 5. GitHub Issueを作成（`gh issue create`） → `gh-cli-best-practices` に従って `--body-file` 使用
 6. Issue作成後にコメント追加 → テンプレート: `.opencode/commands/issue/templates/issue_comment_bug_analysis.md`（パターンA）または `.opencode/commands/issue/templates/issue_comment_feature_technical.md`（パターンB）を Read tool で読み込む
-7. 完了報告 → `issue-guide` の完了報告フォーマットで結果出力
+7. 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力
 
 ## Guardrails
 

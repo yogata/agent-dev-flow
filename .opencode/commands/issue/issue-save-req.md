@@ -5,7 +5,8 @@ load_skills:
   - req-file-manager
   - adr-file-manager
   - adr-guidelines
-  - issue-guide
+  - issue-guide-phases
+  - issue-guide-reports
   - conventional-commits
 ---
 
@@ -39,7 +40,7 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
 8. 変更範囲検証: `git diff --name-only` で変更ファイル一覧を取得し、`docs/` 以外の変更が含まれていれば即座に取り消し（`git checkout -- <file>`）、ユーザーに警告
 9. コミット・プッシュ → `conventional-commits` に従ってコミットメッセージを生成し、mainブランチに push
 10. ドラフト削除: 処理完了後、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
-11. 完了報告 → `issue-guide` の完了報告フォーマットに従って出力:
+11. 完了報告 → `issue-guide-reports` の完了報告フォーマットに従って出力:
     ```
     ✅ 要件をdocs/に保存しました（REQ-{NNNN} を{CREATE/APPEND/UPDATE}）。
       {ADR作成がある場合: ADR-{NNNN} を作成しました。}

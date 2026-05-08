@@ -15,7 +15,7 @@ description: Detects deviations between implementation and requirements as a qua
 
 - **役割**: 要件ドキュメント（REQ）と実際の実装を比較し、乖離を検出
 - **タイミング**: ②構造的実行フェーズの完了時（PR作成前）と③レビュー完了フェーズ（マージ前）
-- **依存**: issue-guide スキルから参照される専門スキル
+- **依存**: issue-*コマンドから参照される専門スキル
 
 ---
 
@@ -180,4 +180,3 @@ description: Detects deviations between implementation and requirements as a qua
 
 - **req-analysis**: 要件分析手法（乖離検出の基準となる品質基準）
 - **req-file-manager**: REQファイル管理（乖離対象の要件doc参照）
-- **issue-guide**: issue-*ワークフロー統括ハブ（レビューNG対応フロー）

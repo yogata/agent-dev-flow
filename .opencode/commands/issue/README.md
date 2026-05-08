@@ -22,7 +22,9 @@ description: issue コマンドセットの使用ガイド
 
 | スキル | 役割 |
 |---|---|
-| `issue-guide` | ワークフロー統括ハブ（フェーズ・パターン・検証） |
+| `issue-guide-phases` | フェーズ定義・SSoT遷移・パターン判定・コマンド関連・docs構造 |
+| `issue-guide-reports` | 完了報告フォーマット・チェックボックス更新・サブエージェント出力ポリシー |
+| `issue-guide-review` | レビューNG対応フロー・issue-next推論ルール |
 | `req-analysis` | 要件分析手法（機能・非機能の分析・品質基準） |
 | `req-file-manager` | REQファイル管理（作成・追記・更新・バリデーション） |
 | `deviation-check` | 乖離検出（要件とのズレ検知・ループバック判定） |
@@ -35,13 +37,13 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 
 | コマンド | 役割 | スキル参照 |
 |---|---|---|
-| `/issue/issue-req` | 要件定義（壁打ち） | req-analysis, adr-guidelines, issue-guide |
-| `/issue/issue-save-req` | REQ/ADR保存 | req-file-manager, adr-file-manager, adr-guidelines, issue-guide, conventional-commits |
-| `/issue/issue-create` | Issue登録 | issue-guide, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager |
-| `/issue/issue-work` | 実装パイプライン | req-analysis, deviation-check, issue-guide, git-worktree, req-file-manager, adr-file-manager |
-| `/issue/issue-update` | Issue更新 | issue-guide, gh-cli-best-practices, req-file-manager, req-analysis, deviation-check |
-| `/issue/issue-close` | 完了処理 | issue-guide, gh-cli-best-practices, git-worktree, req-file-manager |
-| `/issue/issue-next` | 次コマンド推論 | issue-guide, deviation-check, req-analysis |
+| `/issue/issue-req` | 要件定義（壁打ち） | req-analysis, adr-guidelines, issue-guide-phases, issue-guide-reports |
+| `/issue/issue-save-req` | REQ/ADR保存 | req-file-manager, adr-file-manager, adr-guidelines, issue-guide-phases, issue-guide-reports, conventional-commits |
+| `/issue/issue-create` | Issue登録 | issue-guide-phases, issue-guide-reports, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager |
+| `/issue/issue-work` | 実装パイプライン | req-analysis, deviation-check, issue-guide-phases, issue-guide-reports, issue-guide-review, git-worktree, req-file-manager, adr-file-manager |
+| `/issue/issue-update` | Issue更新 | issue-guide-phases, issue-guide-reports, issue-guide-review, gh-cli-best-practices, req-file-manager, req-analysis, deviation-check |
+| `/issue/issue-close` | 完了処理 | issue-guide-phases, issue-guide-reports, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager |
+| `/issue/issue-next` | 次コマンド推論 | issue-guide-phases, issue-guide-review, deviation-check, req-analysis |
 
 ## 基本フロー
 
@@ -63,4 +65,4 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 
 ## テンプレート
 
-`templates/` ディレクトリに配置。詳細は `issue-guide` スキルを参照。
+`templates/` ディレクトリに配置。詳細は `issue-guide-phases` スキルを参照。
