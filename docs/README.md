@@ -12,6 +12,7 @@
   - [REQ-0005: issue-*コマンドのサブエージェント最終出力のverbatim出力](requirements/REQ-0005.md)
   - [REQ-0006: issue-*コマンド完了報告フォーマットのシンプル化](requirements/REQ-0006.md)
   - [REQ-0010: Issue/ADR/REQスキル群連携性改善](requirements/REQ-0010.md)
+  - [REQ-0011: issue-guide スキルの3-way分割と依存関係リファクタリング](requirements/REQ-0011.md)
 
 ## Specifications
 
