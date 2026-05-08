@@ -13,6 +13,7 @@
   - [REQ-0006: issue-*コマンド完了報告フォーマットのシンプル化](requirements/REQ-0006.md)
   - [REQ-0010: Issue/ADR/REQスキル群連携性改善](requirements/REQ-0010.md)
   - [REQ-0011: issue-guide スキルの3-way分割と依存関係リファクタリング](requirements/REQ-0011.md)
+  - [REQ-0012: Tips-Capture運用パイプライン再設計](requirements/REQ-0012.md)
 
 ## Specifications
 
