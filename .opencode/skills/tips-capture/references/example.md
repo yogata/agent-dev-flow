@@ -60,37 +60,43 @@
 ```
 
 → 実行内容:
-  - inbox.md のエントリをセマンティック分析で自動分類
-  - evaluation-report.md に品質評価と分類結果を生成
-  - archive.md にトピック別に整理して保存
-  - inbox.md はクリア
+  - inbox.md のエントリをセマンティック分析でクラスタリング
+  - evaluation-report.md にクラスタごとの重みとエントリを記録
+  - ユーザー承認後、inbox.md の全エントリを archive.md に追記（append-only）
+  - inbox.md をクリア
 
 → 出力例 (evaluation-report.md):
-  - **トピック: Supabase/RLS** (3エントリ) - 品質評価: 高
-  - **トピック: Next.js/キャッシュ** (2エントリ) - 品質評価: 中
-  - **トピック: TypeScript/型システム** (4エントリ) - 品質評価: 高
+  - **クラスタ1**: テーマ「Supabase/RLS」 (3エントリ) - 重み: 高
+  - **クラスタ2**: テーマ「Next.js/キャッシュ」 (2エントリ) - 重み: 中
+  - **クラスタ3**: テーマ「TypeScript/型システム」 (4エントリ) - 重み: 高
 
-### Layer 3: Elevation Phase (ステージング候補の判定)
+### Layer 3: Elevation Phase (昇華判定とスタブ生成)
 
 ```
 /tips-elevate
 ```
 
 → 実行内容:
-  - evaluation-report.md を分析
-  - 高品質で十分な量のトピックを判定
-  - ステージング用のスタブファイルを作成
+  - evaluation-report.md のクラスタを分析
+  - 各クラスタをスキル化/コマンド化/ワークフロー組み込み/保留の4段階で判定
+  - ユーザー承認後、staging領域にスタブファイルを生成
 
-→ 出力例 (staging/Supabase-RLS.md):
+→ 出力例 (elevation-staging/supabase-rls-skill-stub.md):
   ```markdown
-  # Supabase RLSポリシーに関する学び
+  # Supabase RLS スキルスタブ
 
-  エントリ数: 3
-  品質評価: 高
+  ## 動機
+  以下の学びから昇華:
+  - 2026-05-08: Supabase RLSポリシーのauth.uid()比較
+  - 2026-05-07: RLSポリシーのデバッグ方法
+  - 2026-05-06: RLSポリシーのパフォーマンス影響
 
-  ## 概要
-  ...
+  ## Description（草案）
+  SupabaseのRLSポリシー設計・実装・デバッグに関するナレッジ
 
-  ## 詳細
-  ...
+  ## TODO
+  - [ ] 完全なSKILL.mdの作成
+  - [ ] トリガー条件の定義
+  - [ ] ステップの具体化
+  - [ ] Guardrailsの定義
   ```
