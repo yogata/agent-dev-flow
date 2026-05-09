@@ -236,6 +236,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 - 乖離の自動修正禁止（ユーザー決定）
 - 全ファイル操作はworktree内で実行
 - Issue番号省略は同一セッション内で作成済みの場合のみ
+- Issue番号の解決に gh issue list / gh issue status 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 - 実装結果をspecsに反映すること（パターンBの場合）— Step 10で `system.md` / `patterns.md` を更新
 - gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）

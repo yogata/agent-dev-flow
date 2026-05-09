@@ -71,6 +71,7 @@ load_skills:
 
 - SSoTの整合性を維持（Issue本文と要件docの不整合を防ぐ）
 - `gh-cli-best-practices` に従って `--body-file` 使用
+- Issue番号の解決に gh issue list / gh issue status 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
 - フェーズは変更なし（現在のフェーズを維持）
 - `--review-ng` 時は必ず deviation-check 結果を引用すること
 - `--req` のステータス変更時は `req-file-manager` の遷移ルールに従うこと
