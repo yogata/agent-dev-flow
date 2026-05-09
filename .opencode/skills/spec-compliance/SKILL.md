@@ -1,19 +1,19 @@
 ---
-name: deviation-check
-description: Detects deviations between implementation and requirements as a quality gate. Use when completing implementation, before creating PRs, or during post-implementation review.
+name: spec-compliance
+description: Detects deviations between implementation and requirements (REQ), work plan, and architecture decisions (ADR) as a quality gate. Use when completing implementation, before creating PRs, or during post-implementation review.
 ---
 
 # Deviation Check スキル
 
-このスキルは、実装と要件の乖離を検出し、品質ゲートとして機能する。
+このスキルは、実装と要件・work plan・ADRの乖離を検出し、品質ゲートとして機能する。
 
 ---
 
 ## 概要
 
-実装と要件の乖離検出・品質ゲート。②構造的実行フェーズの完了時と③レビュー完了フェーズで使用。
+実装と要件・work plan・ADRの乖離検出・品質ゲート。②構造的実行フェーズの完了時と③レビュー完了フェーズで使用。
 
-- **役割**: 要件ドキュメント（REQ）と実際の実装を比較し、乖離を検出
+- **役割**: 要件（REQ）・work plan・ADRと実際の実装を比較し、乖離を検出
 - **タイミング**: ②構造的実行フェーズの完了時（PR作成前）と③レビュー完了フェーズ（マージ前）
 - **依存**: issue-*コマンドから参照される専門スキル
 
@@ -25,18 +25,20 @@ description: Detects deviations between implementation and requirements as a qua
 
 ### 重大乖離
 
-要件docに記載された受け入れ基準を満たさない実装。
+要件（REQ）・work plan・ADRのいずれかの記載内容を満たさない実装。
 
 - **例**: チェックボックスが未実装
 - **例**: 受け入れ基準のGiven-When-Thenを満たさない
 - **例**: 要件に明記された機能が欠落している
+- **例**: work planに記載されたタスクが未実装
+- **例**: ADRで決定したアーキテクチャが実装されていない
 
 ### 軽微乖離
 
 実装は受け入れ基準を満たすが、意図しない追加変更を含む。
 
 - **例**: スコープ外ファイルの変更
-- **例**: 要件にないリファクタリング
+- **例**: 要件・work planにないリファクタリング
 - **例**: 追加された設定変更
 
 ---
@@ -103,7 +105,7 @@ description: Detects deviations between implementation and requirements as a qua
 
 - **影響度**: 重大 / 軽微
 - **乖離タイプ**: `spec-bug` | `impl-bug` | `scope-creep`
-- **対象**: 要件docの該当セクション / 変更ファイル
+- **対象**: 要件docの該当セクション / work planの該当タスク / ADRの該当決定 / 変更ファイル
 - **内容**: 乖離の具体的な説明
 - **影響REQ番号**: REQ番号の配列（例: `[REQ-3.2, REQ-3.3]`）
 - **修正方針**: `req-update(APPEND)` | `req-update(UPDATE)` | `code-fix` | `scope-reduction`
@@ -183,7 +185,7 @@ description: Detects deviations between implementation and requirements as a qua
 ### 乖離1
 - **影響度**: [重大 / 軽微]
 - **乖離タイプ**: [spec-bug / impl-bug / scope-creep]
-- **対象**: [要件docの該当セクション / 変更ファイル]
+- **対象**: [要件docの該当セクション / work planの該当タスク / ADRの該当決定 / 変更ファイル]
 - **内容**: [乖離の具体的な説明]
 - **影響REQ番号**: [REQ番号の配列]
 - **修正方針**: [req-update(APPEND) / req-update(UPDATE) / code-fix / scope-reduction]
@@ -200,7 +202,7 @@ description: Detects deviations between implementation and requirements as a qua
 ### 差し戻し基準
 
 - **重大乖離が2件以上** → ①バイブス壁打ちフェーズ全体を差し戻し
-- **重大乖離1件** → 該当する要件docのセクションのみ再壁打ち
+- **重大乖離1件** → 該当する要件docのセクション / work planタスク / ADR決定のみ再壁打ち
 - **軽微乖離のみ** → そのまま進行（乖離内容を実装記録に併記）
 
 ### 重要事項

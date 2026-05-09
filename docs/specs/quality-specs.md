@@ -12,7 +12,7 @@
 ## 収集タイミング
 
 - issue-work Phase C Step 8（乖離検出時）に併せて収集
-- 各メトリクスは deviation-check スキルの報告フォーマットに統合して出力
+- 各メトリクスは spec-compliance スキルの報告フォーマットに統合して出力
 
 ## 報告フォーマット
 

@@ -4,7 +4,7 @@ agent: sisyphus
 load_skills:
   - issue-guide-phases
   - issue-guide-review
-  - deviation-check
+  - spec-compliance
   - req-analysis
   - gh-cli-best-practices
 ---
@@ -25,7 +25,7 @@ load_skills:
 ## Steps
 
 1. セッションコンテキストから現在のマクロフェーズを推論 → `issue-guide-phases` のフェーズ体系とSSoT遷移ルールに従って判定
-2. 乖離がある場合は乖離検出結果を確認 → `deviation-check` のループバック判定に従って次アクションを決定
+2. 乖離がある場合は乖離検出結果を確認 → `spec-compliance` のループバック判定に従って次アクションを決定
 3. 次のコマンドを提示または実行 → `issue-guide-phases` のコマンド関連マップに従って適切なコマンドを選択:
     - ①バイブス壁打ち → `/issue/issue-req`
     - ①→②準備（パターンB） → `/issue/issue-save-req`

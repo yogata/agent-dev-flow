@@ -32,9 +32,9 @@
 関連REQ番号:
 - `docs/requirements.md#xxx`
 
-## Deviation Check 結果
+## Spec Compliance 結果
 
-以下にdeviation-checkの乖離報告を引用:
+以下にspec-complianceの乖離報告を引用:
 
 ```
 ## 乖離検出報告

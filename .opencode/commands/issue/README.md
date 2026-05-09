@@ -29,7 +29,7 @@ description: issue コマンドセットの使用ガイド
 | `issue-guide-review` | レビューNG対応フロー・issue-next推論ルール |
 | `req-analysis` | 要件分析手法（機能・非機能の分析・品質基準） |
 | `req-file-manager` | REQファイル管理（作成・追記・更新・バリデーション） |
-| `deviation-check` | 乖離検出（要件とのズレ検知・ループバック判定） |
+| `spec-compliance` | 乖離検出（要件とのズレ検知・ループバック判定） |
 | `adr-guidelines` | ADR閾値判定（アーキテクチャ級の決定） |
 | `adr-file-manager` | ADRファイル管理（作成・追記・更新・バリデーション） |
 
@@ -42,10 +42,10 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 | `/issue/issue-req` | 要件定義（壁打ち） | req-analysis, adr-guidelines, issue-guide-phases, issue-guide-reports |
 | `/issue/issue-save-req` | REQ/ADR保存 | req-file-manager, adr-file-manager, adr-guidelines, issue-guide-phases, issue-guide-reports, conventional-commits |
 | `/issue/issue-create` | Issue登録 | issue-guide-phases, issue-guide-reports, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager |
-| `/issue/issue-work` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | req-analysis, deviation-check, issue-guide-phases, issue-guide-reports, issue-guide-review, git-worktree, req-file-manager, adr-file-manager, conventional-commits |
-| `/issue/issue-update` | Issue更新 | issue-guide-phases, issue-guide-reports, issue-guide-review, gh-cli-best-practices, req-file-manager, req-analysis, deviation-check |
+| `/issue/issue-work` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | req-analysis, spec-compliance, issue-guide-phases, issue-guide-reports, issue-guide-review, git-worktree, req-file-manager, adr-file-manager, conventional-commits |
+| `/issue/issue-update` | Issue更新 | issue-guide-phases, issue-guide-reports, issue-guide-review, gh-cli-best-practices, req-file-manager, req-analysis, spec-compliance |
 | `/issue/issue-close` | 完了処理 | issue-guide-phases, issue-guide-reports, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager |
-| `/issue/issue-next` | 次コマンド推論 | issue-guide-phases, issue-guide-review, deviation-check, req-analysis |
+| `/issue/issue-next` | 次コマンド推論 | issue-guide-phases, issue-guide-review, spec-compliance, req-analysis |
 | `/issue/issue-backlog` | バックログ抽出（ショートカット経路） | issue-guide-phases, issue-guide-reports, gh-cli-best-practices |
 
 ## 基本フロー

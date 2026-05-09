@@ -8,7 +8,7 @@ load_skills:
   - gh-cli-best-practices
   - req-file-manager
   - req-analysis
-  - deviation-check
+  - spec-compliance
 ---
 
 # Issue更新
@@ -45,14 +45,14 @@ load_skills:
       4. ステータス変更時は `req-file-manager` の遷移ルールを検証
       5. ファイル書き出し → `gh issue edit` でIssue本文の該当箇所も同期
    - **`--review-ng`**: レビューNG時の専用フロー:
-      1. `deviation-check` の乖離報告をパース（影響度・対象・内容・推奨アクション・理由を抽出）
+      1. `spec-compliance` の乖離報告をパース（影響度・対象・内容・推奨アクション・理由を抽出）
       2. 乖離タイプに基づく自動分岐:
          - `spec-bug`（仕様バグ）→ REQ UPDATE + レビューNGコメント投稿
          - `impl-bug`（実装バグ）→ レビューNGコメント投稿のみ（REQ変更不要）
          - `scope-creep`（スコープ外逸脱）→ REQ UPDATE（スコープ明確化）+ レビューNGコメント投稿
          - テスト不足・品質基準未達 → レビューNGコメント投稿のみ
       3. テンプレート `.opencode/commands/issue/templates/issue_comment_review_ng.md` を Read tool で読み込み・適用
-      4. deviation-check結果をテンプレートの「Deviation Check 結果」セクションに展開
+      4. spec-compliance結果をテンプレートの「Deviation Check 結果」セクションに展開
       5. NG理由分類のチェックボックスを自動選択
       6. `gh-cli-best-practices` に従い `--body-file` 経由でコメント投稿
 4. 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力
@@ -73,7 +73,7 @@ load_skills:
 - `gh-cli-best-practices` に従って `--body-file` 使用
 - Issue番号の解決に gh issue list / gh issue status 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
 - フェーズは変更なし（現在のフェーズを維持）
-- `--review-ng` 時は必ず deviation-check 結果を引用すること
+- `--review-ng` 時は必ず spec-compliance 結果を引用すること
 - `--req` のステータス変更時は `req-file-manager` の遷移ルールに従うこと
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 - gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）

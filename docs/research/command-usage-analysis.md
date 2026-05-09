@@ -193,15 +193,15 @@
 | Issue番号未検出 | セッション内にIssue番号なし | ユーザーに指定を求めて停止 |
 | パターンB | 機能追加 | specs更新（system.md / patterns.md） |
 | パターンA | バグ修正 | specs更新スキップ |
-| 乖離あり | deviation-checkで乖離検出 | ユーザーに報告（自動修正禁止） |
-| 乖離なし | deviation-checkで乖離なし | そのまま進行 |
+| 乖離あり | spec-complianceで乖離検出 | ユーザーに報告（自動修正禁止） |
+| 乖離なし | spec-complianceで乖離なし | そのまま進行 |
 
 #### 使用スキル一覧
 
 | スキル | 用途 | 活用内容 |
 |--------|------|----------|
 | `req-analysis` | 要件検証 | チェックボックス品質基準による受け入れ基準検証 |
-| `deviation-check` | 乖離検出 | 要件と実装の乖離検出・報告 |
+| `spec-compliance` | 乖離検出 | 要件と実装の乖離検出・報告 |
 | `issue-guide-phases` | パターン判定・フェーズ管理 | パターンA/Bの判定、specs更新要否 |
 | `issue-guide-reports` | 完了報告フォーマット | PR作成結果の報告 |
 | `issue-guide-review` | レビューNG対応 | レビューNG時の対応フロー知識（参照のみ） |
@@ -215,7 +215,7 @@
 | テンプレート | 用途 |
 |-------------|------|
 | `pr_desc.md` | PR本文テンプレート（issue-work Step 11でPR作成時に使用） |
-| `report_deviation.md` | 乖離検出報告フォーマット（乖離ありの場合） |
+| `report_spec_compliance.md` | 乖離検出報告フォーマット（乖離ありの場合） |
 
 #### 外部コマンド呼び出し
 
@@ -276,7 +276,7 @@
 | `gh-cli-best-practices` | gh CLI安全実行 | `--body-file` 使用の強制 |
 | `req-file-manager` | REQ操作 | APPEND/UPDATE判定、frontmatter更新、ステータス遷移検証 |
 | `req-analysis` | 要件品質確認 | チェックボックス品質基準 |
-| `deviation-check` | 乖離解析 | `--review-ng` 時の乖離報告パース |
+| `spec-compliance` | 乖離解析 | `--review-ng` 時の乖離報告パース |
 
 #### テンプレート使用状況
 
@@ -407,7 +407,7 @@
 |--------|------|----------|
 | `issue-guide-phases` | フェーズ推論・コマンド選択 | フェーズ体系、SSoT遷移、コマンド関連マップ |
 | `issue-guide-review` | レビューNG時推論 | レビューNG時の対応フロー・次アクション判定 |
-| `deviation-check` | 乖離判定 | ループバック判定基準（重大/軽微の閾値） |
+| `spec-compliance` | 乖離判定 | ループバック判定基準（重大/軽微の閾値） |
 | `req-analysis` | 要件品質確認 | 分析観点の参照 |
 
 #### テンプレート使用状況
@@ -439,7 +439,7 @@
 | `issue_comment_feature_implementation.md` | 実装記録コメント | issue-close | Bのみ |
 | `issue_comment_bug_record.md` | 対応記録コメント | issue-close | Aのみ |
 | `pr_desc.md` | PR本文 | issue-work | A/B共通 |
-| `report_deviation.md` | 乖離検出報告 | issue-work（乖離あり時） | A/B共通 |
+| `report_spec_compliance.md` | 乖離検出報告 | issue-work（乖離あり時） | A/B共通 |
 
 ---
 
@@ -616,7 +616,7 @@ docs/ 検証（パターンBの場合）:
 | conventional-commits | | ● | | ● | | | |
 | gh-cli-best-practices | | | ● | | ● | ● | |
 | git-worktree | | | | ● | | ● | |
-| deviation-check | | | | ● | ● | | ● |
+| spec-compliance | | | | ● | ● | | ● |
 | issue-guide-review | | | | ● | ● | | ● |
 | tips-capture | | | | | | ● | |
 | archive-completed-plan | | | | | | ● | |
