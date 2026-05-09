@@ -14,6 +14,7 @@
   - [REQ-0010: Issue/ADR/REQスキル群連携性改善](requirements/REQ-0010.md)
   - [REQ-0011: issue-guide スキルの3-way分割と依存関係リファクタリング](requirements/REQ-0011.md)
   - [REQ-0012: Tips-Capture運用パイプライン再設計](requirements/REQ-0012.md)
+  - [REQ-0013: archive-completed-plan の命名規則統一](requirements/REQ-0013.md)
 
 ## Specifications
 

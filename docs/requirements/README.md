@@ -14,3 +14,4 @@
 | REQ-0010 | Issue/ADR/REQスキル群連携性改善（load_skills補完・See Also追加・テンプレート拡張） | planned     |
 | REQ-0011 | issue-guide スキルの3-way分割と依存関係リファクタリング                               | planned     |
 | REQ-0012 | Tips-Capture運用パイプライン再設計                                                   | planned     |
+| REQ-0013 | archive-completed-plan の命名規則統一                                                 | planned     |
