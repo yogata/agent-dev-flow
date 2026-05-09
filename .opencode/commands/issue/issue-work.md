@@ -8,6 +8,7 @@ load_skills:
   - issue-guide-reports
   - issue-guide-review
   - git-worktree
+  - gh-cli-best-practices
   - req-file-manager
   - adr-file-manager
   - conventional-commits
@@ -130,6 +131,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 - Issue番号省略は同一セッション内で作成済みの場合のみ
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 - 実装結果をspecsに反映すること（パターンBの場合）— Step 10で `system.md` / `patterns.md` を更新
+- gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）
 - Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
 - 各フェーズのべき等チェックは必ず実行する（再実行時の重複作業を防ぐ）
 - フェーズ境界でエラーが発生した場合、Step 0から再開することで安全に復旧できる
