@@ -56,6 +56,9 @@ load_skills:
       5. NG理由分類のチェックボックスを自動選択
       6. `gh-cli-best-practices` に従い `--body-file` 経由でコメント投稿
 4. 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力
+   - 更新種別（`--body` / `--comment` / `--req` / `--review-ng`）に対応するフォーマットを使用
+   - `--req` の場合: APPEND/UPDATEの区別と対象REQ番号・更新セクション名を報告に含める
+   - `--review-ng` の場合: 乖離タイプ・影響REQ番号・推奨アクションを報告に含める
 
 ## APPEND vs UPDATE 判定基準
 
