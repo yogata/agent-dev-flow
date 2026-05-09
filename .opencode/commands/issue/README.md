@@ -40,7 +40,7 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 | `/issue/issue-req` | 要件定義（壁打ち） | req-analysis, adr-guidelines, issue-guide-phases, issue-guide-reports |
 | `/issue/issue-save-req` | REQ/ADR保存 | req-file-manager, adr-file-manager, adr-guidelines, issue-guide-phases, issue-guide-reports, conventional-commits |
 | `/issue/issue-create` | Issue登録 | issue-guide-phases, issue-guide-reports, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager |
-| `/issue/issue-work` | 実装パイプライン | req-analysis, deviation-check, issue-guide-phases, issue-guide-reports, issue-guide-review, git-worktree, req-file-manager, adr-file-manager |
+| `/issue/issue-work` | 実装パイプライン | req-analysis, deviation-check, issue-guide-phases, issue-guide-reports, issue-guide-review, git-worktree, req-file-manager, adr-file-manager, conventional-commits |
 | `/issue/issue-update` | Issue更新 | issue-guide-phases, issue-guide-reports, issue-guide-review, gh-cli-best-practices, req-file-manager, req-analysis, deviation-check |
 | `/issue/issue-close` | 完了処理 | issue-guide-phases, issue-guide-reports, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager |
 | `/issue/issue-next` | 次コマンド推論 | issue-guide-phases, issue-guide-review, deviation-check, req-analysis |
