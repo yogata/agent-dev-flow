@@ -5,15 +5,21 @@
 ### 乖離1
 
 - **影響度**: 重大 / 軽微
+- **乖離タイプ**: `spec-bug` | `impl-bug` | `scope-creep`
 - **対象**: {要件docの該当セクション / 変更ファイル}
 - **内容**: {乖離の具体的な説明}
+- **影響REQ番号**: {REQ番号の配列（例: `[REQ-3.2, REQ-3.3]`）}
+- **修正方針**: `req-update(APPEND)` | `req-update(UPDATE)` | `code-fix` | `scope-reduction`
 - **推奨アクション**: 修正 / 承認 / 差し戻し
 - **理由**: {推奨アクションの根拠}
 
 ### 乖離2
 
 - **影響度**: 重大 / 軽微
+- **乖離タイプ**: `spec-bug` | `impl-bug` | `scope-creep`
 - **対象**: {要件docの該当セクション / 変更ファイル}
 - **内容**: {乖離の具体的な説明}
+- **影響REQ番号**: {REQ番号の配列（例: `[REQ-3.2, REQ-3.3]`）}
+- **修正方針**: `req-update(APPEND)` | `req-update(UPDATE)` | `code-fix` | `scope-reduction`
 - **推奨アクション**: 修正 / 承認 / 差し戻し
 - **理由**: {推奨アクションの根拠}
