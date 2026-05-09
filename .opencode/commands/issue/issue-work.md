@@ -10,6 +10,7 @@ load_skills:
   - git-worktree
   - req-file-manager
   - adr-file-manager
+  - conventional-commits
 ---
 
 # 実装パイプライン
