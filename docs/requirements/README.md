@@ -15,3 +15,4 @@
 | REQ-0011 | issue-guide スキルの3-way分割と依存関係リファクタリング                               | planned     |
 | REQ-0012 | Tips-Capture運用パイプライン再設計                                                   | planned     |
 | REQ-0013 | archive-completed-plan の命名規則統一                                                 | planned     |
+| REQ-0014 | issue-close コマンドの学び抽出ステップ修正（tips-capture 整合性）                     | planned     |
