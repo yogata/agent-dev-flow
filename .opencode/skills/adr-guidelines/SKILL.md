@@ -58,4 +58,4 @@ ADRの状態は以下のいずれかをとります。一度 Accepted された 
 
 - **adr-file-manager**: ADRファイルの作成・追記・更新操作とバリデーション
 - **req-analysis**: 要件分析におけるADR閾値判定ブリッジ
-- **issue-guide**: issue-*ワークフロー統括ハブ
+- **issue-guide-phases**: issue-*ワークフロー統括ハブ（フェーズ定義・SSoT遷移・パターン判定）
