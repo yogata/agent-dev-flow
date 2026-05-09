@@ -58,3 +58,4 @@ load_skills:
 - チェックボックスは測定可能で一意であること → `req-analysis` のチェックボックス品質基準
 - ADR閾値以上の判断は `adr-guidelines` へ（判断の記録のみ、ファイル作成は不可）
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照

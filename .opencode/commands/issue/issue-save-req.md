@@ -59,3 +59,4 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
 - ドラフトファイルが存在しない場合は実行不可（エラーで中止）
 - REQ番号は連番・一意であること（空き番号の再利用禁止）→ `req-file-manager` に従う
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照

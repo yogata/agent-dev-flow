@@ -56,3 +56,4 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 - Issue番号省略は同一セッション内で作成済みの場合のみ
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 - 実装結果をspecsに反映すること（パターンBの場合）— Step 10で `system.md` / `patterns.md` を更新
+- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照

@@ -72,3 +72,4 @@ load_skills:
 - `--review-ng` 時は必ず deviation-check 結果を引用すること
 - `--req` のステータス変更時は `req-file-manager` の遷移ルールに従うこと
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照

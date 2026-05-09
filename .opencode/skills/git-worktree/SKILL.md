@@ -24,6 +24,7 @@ worktree とブランチの命名規則を統一する。
 | --------- | -------------------------- |
 | `feature` | 機能追加・enhancement      |
 | `fix`     | バグ修正・bug              |
+- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
 
 ### `{N}` の定義
 

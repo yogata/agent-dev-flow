@@ -42,3 +42,4 @@ load_skills:
 - パターンBの場合、対応するREQファイルが存在することを確認
 - ADR・specsの内容はIssue本文の生成に反映すること
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
