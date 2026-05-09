@@ -36,3 +36,7 @@ tips-*コマンドは3つのコマンドで構成され、学びの3層パイプ
 ### 安全性スキル
 
 `gh-cli-best-practices`: Windows PowerShell環境でのgh CLI使用時の安全性を確保する。WRITE操作（`--body-file`経由）とREAD操作（一時ファイル経由でRead tool使用）の両方をカバーし、文字化けを防止する。
+
+### Epic自動クローズ
+
+`issue-close` Step 8 で親Epic本文更新後、Epic内の全子Issue状態を確認し、全完了時にEpicを自動クローズする。子Issue残存時はスキップし完了報告に状況を表示する。
