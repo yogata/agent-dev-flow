@@ -6,6 +6,7 @@ load_skills:
   - issue-guide-review
   - deviation-check
   - req-analysis
+  - gh-cli-best-practices
 ---
 
 # issue-next
@@ -41,3 +42,4 @@ load_skills:
 - フェーズ推論不可時はエラー停止し、ユーザーに確認
 - Issue番号特定不能時はユーザーに確認（`.worktrees`、`git branch`等からの推測は禁止）
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）

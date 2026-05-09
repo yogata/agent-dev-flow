@@ -72,4 +72,5 @@ load_skills:
 - `--review-ng` 時は必ず deviation-check 結果を引用すること
 - `--req` のステータス変更時は `req-file-manager` の遷移ルールに従うこと
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）
 - Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照

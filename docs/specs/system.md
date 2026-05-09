@@ -32,3 +32,7 @@ tips-*コマンドは3つのコマンドで構成され、学びの3層パイプ
 データフロー: `inbox.md` →（tips-refactor）→ `archive.md` + `evaluation-report.md` →（tips-elevate）→ `elevation-staging/`
 
 補助スキル: `tips-capture`（学び検知・追加提案、issue-closeに統合）
+
+### 安全性スキル
+
+`gh-cli-best-practices`: Windows PowerShell環境でのgh CLI使用時の安全性を確保する。WRITE操作（`--body-file`経由）とREAD操作（一時ファイル経由でRead tool使用）の両方をカバーし、文字化けを防止する。

@@ -42,4 +42,5 @@ load_skills:
 - パターンBの場合、対応するREQファイルが存在することを確認
 - ADR・specsの内容はIssue本文の生成に反映すること
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）
 - Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
