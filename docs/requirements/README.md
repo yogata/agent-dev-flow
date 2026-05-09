@@ -16,4 +16,4 @@
 | REQ-0012 | Tips-Capture運用パイプライン再設計                                                   | planned     |
 | REQ-0013 | archive-completed-plan の命名規則統一                                                 | planned     |
 | REQ-0014 | issue-close コマンドの学び抽出ステップ修正（tips-capture 整合性）                     | planned     |
-| REQ-0015 | 定期的残課題トリアージワークフローの策定（issue-triage コマンド）                       | planned     |
+| REQ-0015 | 定期的残課題バックログ抽出ワークフローの策定（issue-backlog コマンド）                         | planned     |

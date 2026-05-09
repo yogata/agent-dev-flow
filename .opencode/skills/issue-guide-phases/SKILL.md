@@ -105,7 +105,8 @@ REQ → Issue → Work Plan（動的）→ TDD実装 → specs更新
 | `issue-work` | READ+WRITE | READ | READ |
 | `issue-close` | — | — | READ |
 | `issue-update` | — | — | READ+WRITE |
-| `issue-next` | READ | READ | READ |
+| `issue-backlog` | — | — | — |
+| `issue-next`          | READ | READ | READ |
 
 #### データフロー図
 
@@ -114,6 +115,7 @@ issue-req(draft WRITE) → issue-save-req(REQ WRITE, ADR WRITE) → issue-create
 ```
 
 - **issue-req**: 要件docを壁打ちで構築し、パターンBの場合はドラフトを保存する（draft WRITE）
+- **issue-backlog**: クローズ済みissue/PRから残課題を抽出し、Epic + 子Issueを作成する（ショートカット経路、specs/ADR/REQアクセスなし）
 - **issue-create**: specs・ADRを読み込んでIssue本文に反映する（READ）
 - **issue-work**: specs・ADRを読み込んで実装計画を立て、実装後にspecsを更新する（READ+WRITE）
 - **issue-close**: REQを参照して完了確認・クリーンアップを行う（READ）
@@ -126,7 +128,7 @@ issue-req(draft WRITE) → issue-save-req(REQ WRITE, ADR WRITE) → issue-create
 
 | マクロフェーズ       | 使用可能なコマンド                                      | 役割                         |
 | -------------------- | ------------------------------------------------------- | ---------------------------- |
-| ①バイブス壁打ち      | `issue-req`, `issue-save-req`                        | 要件壁打ち・分析・docs保存     |
+| ①バイブス壁打ち      | `issue-req`, `issue-save-req`, `issue-backlog`        | 要件壁打ち・分析・docs保存・バックログ抽出 |
 | ②構造的実行          | `issue-create`, `issue-work`, `issue-update`            | Issue作成・実装・進捗記録    |
 | ③レビュー完了        | `issue-next`, `issue-close`                             | 次アクション推論・完了処理   |
 
@@ -140,6 +142,7 @@ issue-req(draft WRITE) → issue-save-req(REQ WRITE, ADR WRITE) → issue-create
 | `issue-work`          | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ   | ③レビュー完了       |
 | `issue-update`        | GitHub Issue           | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし            |
 | `issue-close`         | GitHub Issue + PR      | なし                              | ③レビュー完了       |
+| `issue-backlog`       | ユーザー期間指定       | Epic + 子Issue                     | ①バイブス壁打ち     |
 | `issue-next`          | 複数                   | 適切なコマンド実行                 | 依存                |
 
 ---

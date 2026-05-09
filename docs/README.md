@@ -16,7 +16,7 @@
   - [REQ-0012: Tips-Capture運用パイプライン再設計](requirements/REQ-0012.md)
   - [REQ-0013: archive-completed-plan の命名規則統一](requirements/REQ-0013.md)
   - [REQ-0014: issue-close コマンドの学び抽出ステップ修正](requirements/REQ-0014.md)
-  - [REQ-0015: 定期的残課題トリアージワークフローの策定](requirements/REQ-0015.md)
+  - [REQ-0015: 定期的残課題バックログ抽出ワークフローの策定](requirements/REQ-0015.md)
 
 ## Specifications
 

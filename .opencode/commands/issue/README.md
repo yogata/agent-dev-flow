@@ -16,6 +16,8 @@ description: issue コマンドセットの使用ガイド
 
 **イメージ違ったら**: 要件定義に立ち戻り①からやり直し（`/issue/issue-req`）
 
+**ショートカット経路**: `/issue/issue-backlog` — ①バイブス壁打ちから直接バックログ抽出を実行
+
 ## スキル一覧
 
 ロジックと知識ベースを提供するスキル群。コマンドはこれらの薄いdispatcher。
@@ -44,6 +46,7 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 | `/issue/issue-update` | Issue更新 | issue-guide-phases, issue-guide-reports, issue-guide-review, gh-cli-best-practices, req-file-manager, req-analysis, deviation-check |
 | `/issue/issue-close` | 完了処理 | issue-guide-phases, issue-guide-reports, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager |
 | `/issue/issue-next` | 次コマンド推論 | issue-guide-phases, issue-guide-review, deviation-check, req-analysis |
+| `/issue/issue-backlog` | バックログ抽出（ショートカット経路） | issue-guide-phases, issue-guide-reports, gh-cli-best-practices |
 
 ## 基本フロー
 
@@ -62,6 +65,7 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 - `/issue/issue-update` — [issue-update.md](./issue-update.md)
 - `/issue/issue-close` — [issue-close.md](./issue-close.md)
 - `/issue/issue-next` — [issue-next.md](./issue-next.md)
+- `/issue/issue-backlog` — [issue-backlog.md](./issue-backlog.md)
 
 ## テンプレート
 
