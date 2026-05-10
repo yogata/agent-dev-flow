@@ -41,29 +41,34 @@ REQ文書のfrontmatterには以下のフィールドを定義する:
 ```yaml
 ---
 id: REQ-{NNNN}
-title: {要件タイトル}
-status: draft | active | implemented | deprecated
+title: {領域タイトル}
 created: {YYYY-MM-DD}
 updated: {YYYY-MM-DD}
 tags: [{tag1}, {tag2}]
-scale: standard | large
 ---
 ```
 
-### scale フィールド
+- フィールドは `id`, `title`, `created`, `updated`, `tags` のみ。`status` および `scale` フィールドは持たない
+- `id` と `tags` 内の要件IDは `REQ-{NNNN}-{NNN}` 形式（例: `REQ-0028-001`）
 
-- `standard`: 通常のPattern B（デフォルト）。1 REQ → 1 Issue
-- `large`: Epic規模。1 REQ → Epic + N子Issue
-- 省略時は `standard` として扱う
-
-### draft-meta（issue-req → issue-save-req 引き継ぎ）
-
-issue-req で生成されるドラフトの `draft-meta` セクションに以下を記録する:
+### REQセクション構成
 
 ```markdown
-## draft-meta（issue-save-req 用）
+## 目的
 
-- **pattern**: B
-- **scale**: standard | large
-- **decomposition**: [{scope, modules, description}]（scale が large の場合のみ）
+{この領域の要件が存在する理由}
+
+## 要件
+
+| ID | 要件 |
+|---|---|
+| REQ-{NNNN}-001 | {RFC 2119言語で記述} |
+
+## 適用範囲
+
+- **対象**: ...
+- **対象外**: ...
 ```
+
+- セクションは 目的 / 要件 / 適用範囲 のみ。FR/NFRの区別を持たない
+- 要件はRFC 2119言語（SHALL/SHOULD/MAY）で記述する
