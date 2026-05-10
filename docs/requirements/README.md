@@ -23,4 +23,4 @@
 | REQ-0019 | issue-backlog: バックログ抽出済みマーキングによる再抽出防止                              | implemented |
 | REQ-0020 | Epic Issueステータス追跡の自動化                                                        | implemented     |
 | REQ-0021 | skill-authoring-best-practices 再構成 — Waza品質概念マージ                              | implemented     |
-| REQ-0022 | Epic Issueテンプレートのepic-status-tracker互換化とバックログ専用テンプレート新設         | planned         |
+| REQ-0022 | Epic Issueテンプレートのepic-status-tracker互換化とバックログ専用テンプレート新設         | implemented     |
