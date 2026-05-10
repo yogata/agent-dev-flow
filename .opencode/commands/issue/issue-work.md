@@ -12,6 +12,7 @@ load_skills:
   - req-file-manager
   - adr-file-manager
   - conventional-commits
+  - epic-status-tracker
 ---
 
 # 実装パイプライン
@@ -123,6 +124,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
   - worktreeパス（`.worktrees/{N}-{type}`）
   - `workdir` パラメータでworktree絶対パスを指定
   - specs更新（Step 10）は実行禁止の明示
+- **Wave開始前のEpicステータス一括更新**: 親エージェントが各Wave開始前に、該当Wave内の全子Issueの親Epicステータスを一括更新（`epic-status-tracker` スキル参照）。サブエージェントによる同時更新の競合を回避するため、親エージェントが一括処理する
 - 全サブエージェント完了を待機（`background_output`）
 - **失敗Issue処理**: 失敗したIssueはスキップし、成功Issueのみ次フェーズへ進める
 - **フォールバック**: サブエージェントが使用できない場合、Sequential Wave（親エージェントがWave内でIssueを1件ずつ順次処理）に切り替え
@@ -142,6 +144,13 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 **Step 5**: Worktree作成・ブランチ準備 → `git-worktree` スキルに従って実行
 - **べき等チェック**: worktreeが既に存在する場合（`git worktree list` で確認）、作成をスキップして既存worktreeを使用
 - ブランチも既に存在する場合はcheckoutのみ実行
+
+**Step 5b**: 親Epicステータス更新（`epic-status-tracker` スキル参照）
+- 子Issue本文から `Parent: #{N}` パターンを検出
+- 親Epicが存在しない場合 → スキップ（エラーにしない）
+- 親Epic本文を取得（`gh-cli-best-practices` 準拠）し、ステータス追跡テーブルの該当行を `☐ 未着手` → `🔄 進行中` に更新
+- 既に `🔄 進行中` または `✅ 完了` の場合 → スキップ（べき等性）
+- 更新失敗時 → 警告表示してPhase Bへ継続（フォールバック）
 
 ### Phase B: 実装（Steps 6-7）
 
