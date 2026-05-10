@@ -1,6 +1,6 @@
 ---
 name: adr-file-manager
-description: Manages ADR numbering and architecture decision record file operations (CREATE/APPEND/UPDATE). Use when creating ADR files, appending sections, or updating existing ADRs.
+description: Manages ADR numbering and architecture decision record file operations (CREATE/APPEND/UPDATE). USE FOR: creating ADR files, appending sections, or updating existing ADRs. DO NOT USE FOR: evaluating whether an ADR is needed, analyzing requirement quality, or general document management.
 ---
 
 # ADRファイル管理

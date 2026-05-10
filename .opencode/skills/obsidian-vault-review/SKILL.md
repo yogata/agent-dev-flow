@@ -1,17 +1,13 @@
 ---
 name: obsidian-vault-review
-description: Supports periodic Obsidian Vault reviews (daily, weekly, monthly, quarterly, yearly) with Dataview queries. Use when performing vault reviews, analyzing note statistics, or organizing periodic reflections.
+description: Supports periodic Obsidian Vault reviews (daily, weekly, monthly, quarterly, yearly) with Dataview queries. USE FOR: performing vault reviews, analyzing note statistics, or organizing periodic reflections. DO NOT USE FOR: creating individual notes, modifying note content, general vault configuration, or one-time setup tasks.
 ---
 
 # Obsidian Vault定期レビュー
 
 ## Overview
 
-このスキルはObsidian Vaultの定期レビュープロセスを支援します。日次・週次・月次・四半期・年次の各レビューにおいて、目的、範囲、手順を明確にし、Dataviewクエリを使用した効率的な分析と整理を可能にします。
-
-## When to Use
-
-Obsidian Vaultの定期レビューを行う際に使用：
+このスキルはObsidian Vaultの定期レビュープロセスを支援します。日次・週次・月次・四半期・年次の各レビューにおいて、目的、範囲、手順を明確にし、Dataviewクエリを使用した効率的な分析と整理を可能にします。定期レビューの対象:
 - 日次レビュー（Inboxの整理、今日の成果確認）
 - 週次レビュー（週間の振り返り、来週の計画）
 - 月次レビュー（月間の成果、プロジェクト進捗）

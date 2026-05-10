@@ -1,6 +1,6 @@
 ---
 name: req-analysis
-description: Provides requirement analysis methods with quality criteria and ADR threshold judgment. Use when analyzing requirements, defining acceptance criteria, or evaluating requirement completeness.
+description: Provides requirement analysis methods with quality criteria and ADR threshold judgment. USE FOR: analyzing requirements, defining acceptance criteria, or evaluating requirement completeness. DO NOT USE FOR: creating requirement files, managing file operations, architecture decision evaluation, or implementation planning.
 ---
 
 # 要件分析スキル

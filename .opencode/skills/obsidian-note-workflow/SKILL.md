@@ -1,6 +1,6 @@
 ---
 name: obsidian-note-workflow
-description: Manages Obsidian Vault note lifecycle (capture, organize, solidify, archive) with tagging and Zettelkasten principles. Use when creating notes, organizing inbox, adding tags, or archiving notes.
+description: Manages Obsidian Vault note lifecycle (capture, organize, solidify, archive) with tagging and Zettelkasten principles. USE FOR: creating notes, organizing inbox, adding tags, or archiving notes. DO NOT USE FOR: vault configuration, plugin setup, periodic review processes, or general file management outside the note lifecycle.
 ---
 
 # Obsidian Note Workflow
@@ -24,17 +24,17 @@ Obsidian Vaultでノートを作成・管理・整理する場合
 
 ## Stages
 
-### Capture (収集)
-Capture ideas, bookmarks, and fleeting notes into `00_inbox` with `type/inbox` tag. No formatting required — raw capture is the priority. Process later during organizing stage.
+### Capture（収集）
+アイデア、ブックマーク、一時ノートを `00_inbox` に `type/inbox` タグ付きでキャプチャする。フォーマット不要 — 生のキャプチャが最優先。後で整理ステージで処理する。
 
-### Organize (整理)
-Move notes from `00_inbox` to `40_resources/41_inbox`, apply appropriate tags (`type/note`, domain tags), and assign a descriptive title. Each note should have one clear purpose.
+### Organize（整理）
+`00_inbox` から `40_resources/41_inbox` にノートを移動し、適切なタグ（`type/note`、ドメインタグ）を適用して説明的なタイトルを割り当てる。各ノートは1つの明確な目的を持つこと。
 
-### Solidify (定着)
-Transform organized notes into permanent notes in `40_resources/42_notes` with `type/permanent` tag. Add bidirectional links to related notes, refine content for long-term value, and ensure atomicity (one idea per note).
+### Solidify（定着）
+整理済みノートを `40_resources/42_notes` の `type/permanent` タグ付き恒久ノートに変換する。関連ノートへの双方向リンクを追加し、長期的価値のために内容を洗練させ、原子性（1ノート1アイデア）を確保する。
 
-### Archive (アーカイブ)
-Move completed or inactive notes to `50_archives` with `status/archived` tag. Notes remain searchable but out of active workspace. Review periodically for reactivation.
+### Archive（アーカイブ）
+完了または非アクティブなノートを `status/archived` タグ付きで `50_archives` に移動する。ノートは検索可能だがアクティブなワークスペースから外れる。定期的にレビューして再活性化を検討する。
 
 ## Implementation
 各ステージの詳細手順と具体例は、references/ ディレクトリの各ファイルを参照:

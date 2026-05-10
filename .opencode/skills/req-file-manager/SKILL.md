@@ -1,6 +1,6 @@
 ---
 name: req-file-manager
-description: Manages REQ numbering and requirement file operations (CREATE/APPEND/UPDATE). Use when creating requirement files, appending sections, or updating existing requirements.
+description: Manages REQ numbering and requirement file operations (CREATE/APPEND/UPDATE). USE FOR: creating requirement files, appending sections, or updating existing requirements. DO NOT USE FOR: analyzing requirement quality, creating ADR files, general document management, or requirement gathering.
 ---
 
 # REQファイル管理

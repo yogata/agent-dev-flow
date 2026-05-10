@@ -1,6 +1,6 @@
 ---
 name: tips-capture
-description: Extracts and captures learnings when problems are solved. Use when fixing bugs, completing investigations, finishing implementations, or discovering technical insights.
+description: Extracts and captures learnings when problems are solved. USE FOR: fixing bugs, completing investigations, finishing implementations, or discovering technical insights. DO NOT USE FOR: general note-taking, documentation generation, or knowledge base management beyond the tips workflow.
 ---
 
 # tips-capture

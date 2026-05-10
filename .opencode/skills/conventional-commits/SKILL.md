@@ -1,6 +1,6 @@
 ---
 name: conventional-commits
-description: Generates commit messages following Conventional Commits v1.0.0 spec. Use when creating commits, writing commit messages, or formatting commit history.
+description: Generates commit messages following Conventional Commits v1.0.0 spec. USE FOR: creating commits, writing commit messages, or formatting commit history. DO NOT USE FOR: git operations beyond commit messages, branch naming conventions, or changelog generation.
 ---
 
 # conventional-commits

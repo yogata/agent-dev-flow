@@ -1,6 +1,6 @@
 ---
 name: spec-compliance
-description: Detects deviations between implementation and requirements (REQ), work plan, and architecture decisions (ADR) as a quality gate. Use when completing implementation, before creating PRs, or during post-implementation review.
+description: Detects deviations between implementation and requirements (REQ), work plan, and architecture decisions (ADR) as a quality gate. USE FOR: completing implementation, before creating PRs, or during post-implementation review. DO NOT USE FOR: requirement analysis, test execution, code quality reviews without requirement comparison, or general code review.
 ---
 
 # Deviation Check スキル

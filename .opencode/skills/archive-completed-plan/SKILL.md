@@ -1,6 +1,6 @@
 ---
 name: archive-completed-plan
-description: Use when a development plan is completed and you want to clean up the workspace by moving related files to the archive.
+description: Cleans up workspace by moving completed plan files to archive. USE FOR: archiving completed plans and cleaning up workspace. DO NOT USE FOR: creating new plans, starting work on plans, or general file management unrelated to plan archival.
 ---
 
 # Archive Completed Plan
