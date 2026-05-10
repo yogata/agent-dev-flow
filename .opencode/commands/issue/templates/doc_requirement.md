@@ -5,6 +5,7 @@ status: planned
 created: "YYYY-MM-DD"
 updated: "YYYY-MM-DD"
 tags: []
+scale: standard
 ---
 
 ## 背景・課題
