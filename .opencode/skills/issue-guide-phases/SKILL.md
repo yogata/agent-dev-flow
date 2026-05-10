@@ -159,6 +159,43 @@ Issueラベルの定義、パターン判定、およびパターン固有の動
 | A | バグ修正・軽微変更 | `bug`, `critical` | 小 | なし | issue-req → issue-create → issue-work → issue-close |
 | B | 機能追加 | `enhancement`, `feature` | 中 | あり | issue-req → issue-save-req → issue-create → issue-work → issue-close |
 
+### 規模判定 (Pattern Bのみ)
+
+Pattern B（機能追加）の規模を判定し、Epic分割の要否を決定する。
+
+#### 規模判定基準
+
+以下の3つの条件のいずれか1つでも満たす場合、`scale: large`（Epic）と判定する：
+
+1. **複数モジュールにまたがる機能追加** (e.g., UI + API + DB)
+2. **1 Issue (1 issue-work) で実装しきれない規模** (PR肥大化リスク)
+3. **段階的リリースが必要** (フェーズ分け・マイルストーン分割)
+
+いずれの条件も満たさない場合、`scale: standard`（デフォルト）とする。
+
+#### 規模値
+
+| 値 | 説明 | 動作 |
+|----|------|------|
+| `standard` | 通常規模の機能追加（デフォルト） | 単一Issueとして作成・実行 |
+| `large` | 大規模機能追加（Epic） | Epic + 子Issueとして分割・作成 |
+
+#### Epic振る舞いルール (Pattern B - large)
+
+| コマンド | 振る舞い |
+|----------|----------|
+| `issue-req` | 規模判定を実行し、draft-metaに `scale: standard/large` を記録 |
+| `issue-create` | `scale: large` の場合、Epic + 子Issueを一括作成 |
+| `issue-work` | 子Issue群を既存並列機能で一括実行 |
+| `issue-close` | 既存のEpic自動クローズ機能を利用（変更なし） |
+
+#### Epicラベル
+
+| 側面 | 付与ラベル |
+|------|-----------|
+| Epic側 | `enhancement`, `feature`, `epic` |
+| 子Issue側 | `enhancement`, `feature` |
+
 ### Pattern 判定ルール
 
 - `bug`, `critical` → Pattern A
@@ -180,6 +217,19 @@ Issueラベルの定義、パターン判定、およびパターン固有の動
 | close テンプレート | `issue_comment_bug_record.md` | `issue_comment_feature_implementation.md` |
 | docs 検証 (close) | スキップ | 実行する |
 
+#### Pattern B 固有ルール: Epic (large)
+
+| 項目 | Epic (large) |
+|------|-------------|
+| Issue作成単位 | Epic + 子Issue一括作成 |
+| 子Issueラベル | `enhancement`, `feature` |
+| Epicラベル | `enhancement`, `feature`, `epic` |
+| 実行方法 | 子Issue群を並列実行（既存並列機能を利用） |
+| ドラフト保存 | `.sisyphus/drafts/` に保存（Epic + 子Issue構成） |
+| 親子関係 | 子Issue本文に `Parent: #{EPI-C_ISSUE番号}` を記載 |
+| 進捗追跡 | Epic本文にステータス追跡テーブル（☐/🔄/✅）を配置 |
+| Epicクローズ | 全子Issue完了時に自動クローズ（既存機能を利用） |
+
 ### ラベルマッピング
 
 | 変更種別           | 付与ラベル                                                |
@@ -188,6 +238,7 @@ Issueラベルの定義、パターン判定、およびパターン固有の動
 | バグ修正（緊急）   | `bug`, `critical`                                         |
 | 機能追加           | `enhancement`, `feature`                                  |
 | 機能追加（要検討） | `enhancement`, `feature`, `needs-discussion`              |
+| 機能追加（大規模/Epic） | `enhancement`, `feature`, `epic`                         |
 
 ---
 
