@@ -22,3 +22,4 @@
 | REQ-0018 | issue-close Epic自動クローズ機能                                                          | implemented     |
 | REQ-0019 | issue-backlog: バックログ抽出済みマーキングによる再抽出防止                              | implemented |
 | REQ-0020 | Epic Issueステータス追跡の自動化                                                        | implemented     |
+| REQ-0021 | skill-authoring-best-practices 再構成 — Waza品質概念マージ                              | planned         |
