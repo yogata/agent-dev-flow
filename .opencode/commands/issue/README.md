@@ -75,3 +75,17 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 |---|---|---|
 | `issue_desc_feature.md` | 機能追加 | `enhancement`, `feature` |
 | `issue_desc_bug.md` | バグ修正 | `bug` |
+| `issue_desc_epic.md` | Epic Issue本文テンプレート | issue-create (Epic flow) |
+| `issue_desc_child.md` | 子Issue本文テンプレート | issue-create (Epic flow) |
+
+## 使用例
+
+### Epic（大規模機能追加）の例
+
+複数モジュールにまたがる大規模機能追加の場合:
+
+1. `/issue/issue-req` — 要件壁打ち（規模判定: Epic）
+2. `/issue/issue-save-req` — REQ保存
+3. `/issue/issue-create` — Epic + 子Issue一括作成
+4. `/issue/issue-work 101 102 103` — 子Issue並列実行（最大5件）
+5. 各子Issueの `/issue/issue-close` 完了後、Epic自動クローズ
