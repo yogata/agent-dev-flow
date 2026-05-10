@@ -78,17 +78,21 @@ load_skills:
    - **承認**: 次のステップへ進む
    - **差し戻し**: 調整後に再提示
 
-8. **Epic Issue作成**: 承認された結果をもとに、Epic Issueを作成する:
+8. **Epic Issue作成**: 承認された結果をもとに、`issue_desc_backlog_epic.md` テンプレートを適用してEpic Issueを作成する:
+   - テンプレート: `.opencode/commands/issue/templates/issue_desc_backlog_epic.md`
+   - テンプレート変数を分類結果で置換して本文を生成
    - タイトル: `バックログ: {期間} の残課題（{N}件）`
-   - 本文: サマリー + カテゴリ別テーブル + 子Issueへのリンク
    - ラベル: `enhancement`, `epic`
    - `gh-cli-best-practices` に従って `--body-file` で作成
 
 9. **子Issue作成**: 各残課題をEpic配下の子Issueとして作成する:
-   - 各子Issueの本文に元issue/PRへのリンクを記載
-   - Epic Issue番号を本文に記載して関連付け
+   - テンプレート: `.opencode/commands/issue/templates/issue_desc_backlog_child.md`
+   - テンプレート変数を各残課題の内容で置換して本文を生成
+   - `Parent: #{epic_number}` でEpicとの親子関係を記載
+   - 出典セクションに元issue/PRへのリンクを記載
+   - ラベル: `enhancement`
    - `gh-cli-best-practices` に従って `--body-file` で作成
-   - 全子Issue作成後、Epic Issue本文の子Issueリンクを更新
+   - 全子Issue作成後、Epic Issue本文の子Issueリンク（Issue番号）を更新
 
 9a. **抽出済みマーク**: Epic + 子Issue作成完了後、抽出元の各issue/PRに「バックログ抽出済み」コメントを投稿する:
    - コメントフォーマット:

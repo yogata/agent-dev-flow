@@ -22,10 +22,10 @@ REQ-{req_number}
 
 ## 分解（Decomposition）
 
-| # | 子Issue | スコープ | 状態 |
-|---|---------|---------|------|
-| 1 | {child_1_title} | {child_1_scope} | ☐ 未着手 |
-| 2 | {child_2_title} | {child_2_scope} | ☐ 未着手 |
+| Issue | ステータス | 内容 |
+|-------|-----------|------|
+| #{child_issue} | ☐ 未着手 | {child_1_title} |
+| #{child_issue} | ☐ 未着手 | {child_2_title} |
 
 ## ステータス追跡
 
