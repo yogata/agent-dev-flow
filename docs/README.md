@@ -30,6 +30,7 @@
   - [REQ-0023: epic-status-tracker ステータス追跡テーブルフォーマット改善](requirements/REQ-0023.md)
   - [REQ-0024: 全スキル品質改善: skill-authoring-best-practices 準拠](requirements/REQ-0024.md)
   - [REQ-0025: スキル品質改善: skill-authoring-best-practices準拠のトリガー・一貫性修正](requirements/REQ-0025.md)
+  - [REQ-0026: epic-status-tracker 未着手ステータスの表記統一（アイコン＋テキスト）](requirements/REQ-0026.md)
 
 ## Specifications
 
