@@ -28,6 +28,7 @@
   - [REQ-0021: skill-authoring-best-practices 再構成 — Waza品質概念マージ](requirements/REQ-0021.md)
   - [REQ-0022: Epic Issueテンプレートのepic-status-tracker互換化とバックログ専用テンプレート新設](requirements/REQ-0022.md)
   - [REQ-0023: epic-status-tracker ステータス追跡テーブルフォーマット改善](requirements/REQ-0023.md)
+  - [REQ-0024: 全スキル品質改善: skill-authoring-best-practices 準拠](requirements/REQ-0024.md)
 
 ## Specifications
 
