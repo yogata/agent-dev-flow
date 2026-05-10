@@ -55,3 +55,7 @@ tips-*コマンドは3つのコマンドで構成され、学びの3層パイプ
 ### Epic自動クローズ
 
 `issue-close` Step 8 で親Epic本文更新後、Epic内の全子Issue状態を確認し、全完了時にEpicを自動クローズする。子Issue残存時はスキップし完了報告に状況を表示する。
+
+### Epicステータス追跡
+
+`epic-status-tracker`: 親Epic Issueのステータス追跡テーブル（☐ 未着手 / 🔄 進行中 / ✅ 完了）を更新する知識ベース。`issue-work` Phase A で `🔄 進行中` に更新し、`issue-close` Step 8 で `✅ 完了` に更新する。多重Issueモードでは親エージェントがWave開始前に一括更新する。
