@@ -1,38 +1,22 @@
 ---
-id: REQ-NNNN
+id: REQ-{NNNN}
 title: ""
-status: planned
-created: "YYYY-MM-DD"
-updated: "YYYY-MM-DD"
+created: ""
+updated: ""
 tags: []
-scale: standard
 ---
 
-## 背景・課題
+## 目的
 
-{背景・制約}
+{この領域の要件が存在する理由}
 
-## 目標
-
-{達成すべき目標}
-
-## 機能要件
+## 要件
 
 | ID | 要件 |
 |---|---|
-| REQ-NNNN-01 | {要件内容} |
+| REQ-{NNNN}-001 | {RFC 2119言語で記述} |
 
-## 非機能要件
+## 適用範囲
 
-{非機能要件}
-
-## スコープ
-
-- **対象**: {機能領域レベルの記述}
-- **対象外**: {機能領域レベルの記述}
-
-<!-- ステータス正規化ルール:
-  planned → in-progress → implemented → deprecated
-  open → planned
-  done → implemented
--->
+- **対象**: ...
+- **対象外**: ...
