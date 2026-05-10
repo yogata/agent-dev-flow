@@ -161,7 +161,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 
 ### Phase C: 提出（Steps 8-12）
 
-**べき等性**: PRが既に存在する場合、Steps 8-11をスキップしてStep 12のみ実行（完了報告）。
+**べき等性**: PRが既に存在する場合、Steps 8-10をスキップし、Step 11のデプロイ検証（11c）のみ再実行後にStep 12（完了報告）を実行。ただしPRのCIが既に通過済みの場合はデプロイ検証もスキップしてStep 12のみ実行。
 
 **Step 8**: 実装完了後、乖離検出 → `spec-compliance` の検出観点に従ってチェック。品質メトリクス収集も併せて実行（`docs/specs/quality-specs.md` 参照）。報告時は `.opencode/commands/issue/templates/report_spec_compliance.md` テンプレートを使用
 - 乖離検出でエラーが発生した場合、検出済みの結果を保持し、ユーザーに再試行またはスキップの選択を提示
@@ -179,12 +179,30 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 - 順序: Issue番号の昇順（小さい番号から先に更新）
 - 同一セクションの競合がある場合はマージ（既存内容を保持しつつ新規内容を追加）
 
-**Step 11**: ローカル検証（型チェック・Lint・ビルド・テスト）→ PR作成
-- **検証失敗時**: エラー内容を報告し、Phase Bへ戻ることを提案（ユーザー判断）
-- 検証成功時のみPR作成 → `gh pr create` を `gh-cli-best-practices` に従って `--body-file` で実行。PR本文は `.opencode/commands/issue/templates/pr_desc.md` テンプレートに従って生成
-- **べき等チェック**: PRが既に存在する場合、作成をスキップ
+**Step 11**: ローカル検証 → PR作成 → デプロイ検証（3サブステップ構成）
 
-**Step 11（多重Issueモード）**: 各Issueについて親エージェントがworktree内で `gh pr create` を実行
+- **11a: ローカル検証**（型チェック・Lint・ビルド・テスト）
+  - 検証失敗時: エラー内容を報告し、Phase B（Step 6）へ戻ることを提案（ユーザー判断）
+  - 検証成功時のみ11bへ進む
+
+- **11b: PR作成**
+  - `gh pr create` を `gh-cli-best-practices` に従って `--body-file` で実行。PR本文は `.opencode/commands/issue/templates/pr_desc.md` テンプレートに従って生成
+  - **べき等チェック**: PRが既に存在する場合、作成をスキップして11cへ進む
+  - PR番号を記録（以降の11cで使用）
+
+- **11c: デプロイ検証**（`gh pr checks` によるCI/CDステータス確認）
+  - `gh pr checks $PR_NUMBER` を `gh-cli-best-practices` の一時ファイル経由で実行・読み取り
+  - **ポーリング動作**:
+    - Pending / In-progress チェックが存在する場合: 60秒間隔で再確認、最大10分間待機
+    - 全チェック success → デプロイ検証成功、Step 12へ進む
+    - ビルド失敗（failed）: エラー原因を特定し、Phase B（Step 6）へループバック
+      - ループバック回数をカウント（最大3回、3回超過でハードストップ・ユーザーに確認）
+    - Cancelled チェック: Failure扱い（Phase Bへループバック）
+    - No CI configured（checks返却なし）: Warning付きでpass（Step 12へ進む）
+  - **ループバック時の動作**: Phase B（Step 6）に戻り、CI失敗原因に基づく修正を実施後、再度11a〜11cを実行
+  - **べき等チェック**: PR既存時は11cのみ再実行（CI通過済みの場合はスキップ）
+
+**Step 11（多重Issueモード）**: 各サブエージェントがworktree内で11a〜11c（ローカル検証→PR作成→デプロイ検証）を個別に実行。親エージェントは全サブエージェントのデプロイ検証完了を待機
 
 **Step 12**: 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力
 
@@ -211,6 +229,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 |---|---|---|
 | Phase A（Step 1-5） | Phase Aの先頭 | Step 0から再判定 |
 | Phase B（Step 6-7） | Phase BのStep 6 | planファイルが残っていれば未完了タスクから再開 |
+| Phase C Step 11c デプロイ検証失敗 | Phase BのStep 6 | CI失敗原因に基づく修正後、11a〜11cを再実行（最大3回） |
 | Phase C（Step 8-12） | Phase CのStep 8 | 乖離検出から再実行 |
 
 **多重Issueモード固有エラー**:
