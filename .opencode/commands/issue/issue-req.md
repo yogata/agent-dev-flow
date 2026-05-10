@@ -29,7 +29,21 @@ load_skills:
 2. 機能要件/非機能要件を展開 → `req-analysis` の分析観点に従って網羅
 3. ADR閾値以上の技術判断が発生した場合 → `adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は issue-save-req で実行）
 4. 要件doc形式で生成 → テンプレート: `.opencode/commands/issue/templates/doc_requirement.md` を Read tool で読み込み、内容を構造化
-5. パターン判定とドラフト保存:
+5. パターン判定:
+    - ラベルに基づいて Pattern 判定: `bug`, `critical` → Pattern A, `enhancement`, `feature` → Pattern B
+6. スケール判断（Pattern B のみ実行）:
+    - Pattern B であっても、`issue-guide-phases` の並列実行パターンにおけるスケール判断条件を用いて `standard` または `large` を判定:
+      - **large**: 以下のいずれか1つ以上の条件を満たす場合
+        - 複数モジュールにまたがる (e.g., UI + API + DB)
+        - 1 Issueで実装しきれない (PR肥大化リスク)
+        - 段階的リリースが必要 (フェーズ分け・マイルストーン分割)
+      - **standard**: 上記の条件を満たさない場合（デフォルト）
+    - **large と判定された場合のみ**:
+      - ユーザーと分解計画を協議: どのモジュールをどの子Issueに分割するか
+      - 分解計画を次の形式で整理: `decomposition: [{scope, modules, description}]`
+      - スケール判断結果と分解計画をユーザーに提示し、承認を求める
+    - **standard と判定された場合**: 分解不要、そのまま単一Issueで進むことを提示し承認を求める
+7. ドラフト保存:
     - **パターンB（機能追加）**: `.sisyphus/drafts/req-draft-{topic-slug}.md` にドラフトを保存。ドラフトは doc_requirement.md テンプレート構造に以下のメタデータセクションを追加:
       ```markdown
       ## draft-meta（issue-save-req 用）
@@ -40,12 +54,14 @@ load_skills:
       - **adr-required**: true | false
       - **adr-decisions**: [{title, context, decision, status}]（adr-required が true の場合）
       - **topic-slug**: {ファイル名に使用するスラッグ}
+      - **scale**: standard | large
+      - **decomposition**: [{scope, modules, description}]（scale が large の場合のみ）
       ```
     - **パターンA（バグ修正・軽微変更）**: ドラフト保存不要。セッション内で要件docを完結させる
-6. 承認ゲート: 生成した要件doc（パターンB: ドラフト内容、パターンA: セッション内要件doc）をユーザーに提示し、承認を求める
+8. 承認ゲート: 生成した要件doc（パターンB: ドラフト内容、パターンA: セッション内要件doc）をユーザーに提示し、承認を求める
     - **承認**: 次のステップへ進む
     - **差し戻し**: 壁打ちを継続（Step 1に戻る）
-7. 完了報告 → `issue-guide-reports` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
+9. 完了報告 → `issue-guide-reports` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
     - パターンB: `次のステップ: /issue/issue-save-req`
     - パターンA: `次のステップ: /issue/issue-create`
 
