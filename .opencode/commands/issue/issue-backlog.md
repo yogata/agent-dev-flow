@@ -31,6 +31,11 @@ load_skills:
    - `gh-cli-best-practices` に従ってコマンドを実行する
    - コメントも取得: `gh issue view {N} --json comments` / `gh pr view {N} --json comments`
 
+2a. **既抽出スキップ**: 取得した各issue/PRのコメント（本文・コメント欄の両方）にマーカーキーワード `backlog-extracted` が含まれているか確認する:
+   - 含まれている → 当該issue/PRを抽出対象からスキップする（レポートにも表示しない）
+   - 含まれていない → 抽出対象として次Stepへ進む
+   - マーカーキーワードは1箇所で定義: `backlog-extracted`
+
 3. **Phase1 — 構造的検出**: 取得したissue/PRの本文およびコメントから、未チェックのチェックボックス（`- [ ]` または `* [ ]`）を構造的に抽出する:
    - 各未チェックチェックボックスのテキスト内容
    - 出現元（issue/PR番号、本文/コメントの区別）
@@ -85,12 +90,24 @@ load_skills:
    - `gh-cli-best-practices` に従って `--body-file` で作成
    - 全子Issue作成後、Epic Issue本文の子Issueリンクを更新
 
+9a. **抽出済みマーク**: Epic + 子Issue作成完了後、抽出元の各issue/PRに「バックログ抽出済み」コメントを投稿する:
+   - コメントフォーマット:
+     ```
+     📋 **バックログ抽出済み**（backlog-extracted）
+     - 抽出日: {YYYY-MM-DD}
+     - Epic: #{Epic番号}
+     - 子Issue: #{子1}, #{子2}, ...
+     ```
+   - `gh-cli-best-practices` に従って `--body-file` で投稿: `gh issue comment {N} --body-file ...` / `gh pr comment {N} --body-file ...`
+   - コメント投稿に失敗した場合でもEpic + 子Issue作成は成功扱いとし、失敗したissue/PR番号を完了報告に含める
+
 10. **完了報告** → `issue-guide-reports` の完了報告フォーマットに従って出力:
     ```
     ✅ バックログ抽出が完了しました。
       対象期間: {since} 〜 {until}
       Epic Issue: #{N}
       子Issue数: {M}件
+      ⚠️ コメント投稿失敗: #{失敗1}, #{失敗2}, ...（失敗がない場合はこの行は表示しない）
     ```
 
 ## Guardrails
@@ -99,7 +116,8 @@ load_skills:
 - データ取得は `gh` CLIのみ使用（GitHub API直接呼び出し不可）
 - `gh-cli-best-practices` に従い `--body` 直接指定を禁止し `--body-file` を使用
 - 対象はクローズ済みissue/PRのみ（オープン中は対象外）
-- 同一期間への再実行時は新規Epicを作成（既存Epicの更新はしない）
+- 同一期間への再実行時は、既に `backlog-extracted` コメントが付与されたissue/PRをスキップする（重複抽出防止）
+- コメント投稿失敗時もEpic + 子Issue作成は成功扱いとし、失敗番号を完了報告に含める
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 - レポートはMarkdownテーブル形式で構造化して提示する
 - Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
