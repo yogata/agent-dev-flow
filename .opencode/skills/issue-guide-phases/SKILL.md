@@ -99,10 +99,10 @@ REQ → Issue → Work Plan（動的）→ TDD実装 → specs更新
 
 | コマンド | specs | ADR | REQ |
 |----------|-------|-----|-----|
-| `issue-req` | — | — | — |
+| `issue-req` | — | — | READ |
 | `issue-save-req` | — | WRITE | WRITE |
 | `issue-create` | READ | READ | READ |
-| `issue-work` | READ+WRITE | READ | READ |
+| `issue-work` | READ+WRITE | READ+WRITE | READ |
 | `issue-close` | — | — | READ |
 | `issue-update` | — | — | READ+WRITE |
 | `issue-backlog` | — | — | — |

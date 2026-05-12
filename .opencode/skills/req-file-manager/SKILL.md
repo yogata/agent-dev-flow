@@ -8,7 +8,7 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 このスキルは要件ファイル（REQ）の管理に関する**知識ベース**として機能する。
 
 - **このスキル（知識）**: REQ番号採番ルール、ファイル操作モード、判定基準
-- **適用先**: `issue-req`（要件定義時）、`issue-update`（要件更新時）
+- **適用先**: `issue-req`（要件定義時）、`issue-save-req`（REQ保存時）、`issue-create`（Issue作成時のREQ参照）、`issue-work`（実行時のREQ参照）、`issue-update`（要件更新時）、`issue-close`（完了時のREQ参照）
 
 ---
 
