@@ -85,7 +85,6 @@ Epic Issueを作成した場合は以下の報告を出力する。
   現在の状態: レビュー待ち
 
   レビューが通ったら: /issue/issue-close
-  レビューで差し戻されたら: フィードバックを反映して /issue/issue-work を再実行してください
 ```
 
 ### issue-update 完了時
