@@ -29,7 +29,7 @@ load_skills:
     - ①バイブス壁打ち → `/issue/issue-req`
     - ①→②準備（パターンB） → `/issue/issue-save-req`
     - ①→②境界（パターンB） → `/issue/issue-save-req`
-    - ①→②境界（パターンA） → `/issue/issue-create`
+    - ①→②境界（パターンA/C/D） → `/issue/issue-create`
     - ②構造的実行 → `/issue/issue-work`
     - ②→③境界 → レビュー待ち
     - ③レビュー完了 → `/issue/issue-close`

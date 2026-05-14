@@ -41,7 +41,7 @@ tips-*コマンドは3つのコマンドで構成され、学びの3層パイプ
 
 `gh-cli-best-practices`: Windows PowerShell環境でのgh CLI使用時の安全性を確保する。WRITE操作（`--body-file`経由）、READ操作（一時ファイル経由でRead tool使用）、VERIFY操作（書き込み後の読み戻し検証）の3つをカバーし、文字化け防止と内容品質を担保する。VERIFY操作は3観点（エンコーディング・Markdown構造・テンプレート必須セクション）で検証し、最大3回の自動リトライを行う。issue-create、issue-work、issue-closeの各書き込み操作後に適用する。
 
-### Epic（大規模Pattern B）
+### Epic（大規模Issue分割フロー）
 
 規模判定条件（3条件のいずれか1つ）を満たす場合、`scale: large`（Epic）として扱う:
 1. 複数モジュール跨ぎ（UI + API + DB等）

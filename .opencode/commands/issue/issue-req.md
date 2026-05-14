@@ -32,7 +32,7 @@ load_skills:
     a) **コンテキストスキャン**: 現在のセッションの会話履歴を分析し、以下の6項目の推論を試みる:
        - 推論順序（依存関係に従う）:
          1. 要件内容（何をやりたいか）→ セッション内で機能追加/バグ修正の説明が存在するか
-         2. Pattern判定（A or B）→ 要件内容の性質から bug/critical=A, feature/enhancement=B を推論
+         2. Pattern判定（A or B or C or D）→ 要件内容の性質から bug/critical=A, feature/enhancement=B, refactor/maintenance=C, docs/chore=D を推論
          3. Scale判定（Pattern B のみ）→ 複数モジュール跨ぎ、PR肥大化リスク、段階的リリースの有無から standard/large を推論
             ※ Pattern A の場合、Scale は推論不要（undefined）
          4. ADR判断（必要/不要）→ 技術判断の複雑さ・影響範囲から adr-required を推論
@@ -48,7 +48,9 @@ load_skills:
     b) **draft ファイル確認**: `glob` で `.sisyphus/drafts/req-draft-*.md` の存在を確認
        - 存在する場合: ファイル名の topic-slug とセッションの要件内容の一致を確認
        - トピック不一致 → draft を無視（セッションコンテキスト優先）
-       - トピック一致 → draft を「Step 7 完了」のシグナルとして扱う
+       - トピック一致 → draft の `status` 値でルーティング:
+         - `saved` → issue-save-req 完了状態。issue-create 待ち
+         - `draft` → issue-save-req 未実行。issue-save-req 待ち
     
     c) **推論サマリー表示**: ルーティング前に以下の形式で推論結果をユーザーに表示（**陈述形式、質問ではない**）:
        ```
@@ -89,7 +91,8 @@ load_skills:
 5. 要件doc形式で生成 → テンプレート: `.opencode/commands/issue/templates/doc_requirement.md` を Read tool で読み込み、目的/要件/適用範囲の構造に従って内容を構造化
    **テンプレート準拠要件**: テンプレートの【必須】セクション（目的、要件、適用範囲）が全て要件docに含まれること。必須セクションが欠落している場合、生成をやり直すこと。
 6. パターン判定:
-    - ラベルに基づいて Pattern 判定: `bug`, `critical` → Pattern A, `enhancement`, `feature` → Pattern B
+    - ラベルに基づいて Pattern 判定: `bug`, `critical` → Pattern A, `enhancement`, `feature` → Pattern B, `refactor`, `maintenance` → Pattern C, `docs`, `chore` → Pattern D
+    - **Pattern A + ADR必要時の Pattern B 昇格**: Pattern A で ADR閾値以上の技術判断が発生した場合、Pattern B に昇格する（REQファイル・ADRファイルの作成が必要となるため）
 7. スケール判断（Pattern B のみ実行）:
     - Pattern B であっても、`issue-guide-phases` の並列実行パターンにおけるスケール判断条件を用いて `standard` または `large` を判定:
       - **large**: 以下のいずれか1つ以上の条件を満たす場合
@@ -115,15 +118,16 @@ load_skills:
       - **topic-slug**: {ファイル名に使用するスラッグ}
       - **scale**: standard | large
       - **decomposition**: [{scope, modules, description}]（scale が large の場合のみ）
-      - **status**: draft（初期値。issue-save-req → saved, issue-create → issued, issue-close → closed）
+       - **status**: draft（初期値。issue-save-req → saved, issue-create → issued + 削除）
       ```
     - **パターンA（バグ修正・軽微変更）**: ドラフト保存不要。セッション内で要件docを完結させる
-9. 承認ゲート: 生成した要件doc（パターンB: ドラフト内容、パターンA: セッション内要件doc）をユーザーに提示し、承認を求める
+    - **パターンC（リファクタリング・保守作業）/ パターンD（ドキュメント・雑務）**: ドラフト保存不要。セッション内で要件docを完結させる（Pattern Aと同等のlightweight workflow）
+9. 承認ゲート: 生成した要件doc（パターンB: ドラフト内容、パターンA/C/D: セッション内要件doc）をユーザーに提示し、承認を求める
     - **承認**: 次のステップへ進む
     - **差し戻し**: 壁打ちを継続（Step 1に戻る）
 10. 完了報告 → `issue-guide-reports` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
     - パターンB: `次のステップ: /issue/issue-save-req`
-    - パターンA: `次のステップ: /issue/issue-create`
+    - パターンA/C/D: `次のステップ: /issue/issue-create`
 
 ## Guardrails
 

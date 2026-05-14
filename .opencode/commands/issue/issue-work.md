@@ -141,7 +141,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 
 **Step 3**: `docs/adr/README.md` を読み込み、要件と関連するADRを「対象領域」と「決定内容」でマッチングして特定する。関連ADRがあれば個別に読み込み、実装がADRの決定事項に矛盾しないことを確認する
 
-**Step 4**: Pattern判定 → `issue-guide-phases` の Pattern Registry に従って Pattern A/B を判定し、以降のStepの分岐を決定
+**Step 4**: Pattern判定 → `issue-guide-phases` の Pattern Registry に従って Pattern A/B/C/D を判定し、以降のStepの分岐を決定
 
 **Step 5**: Worktree作成・ブランチ準備 → `git-worktree` スキルに従って実行
 - worktree作成時は `origin/main` をベースとして明示的に指定し、ローカルmainの古さに引きずられないこと
@@ -185,7 +185,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 - ユーザーが「継続」を選択した場合のみ次Stepへ進む
 - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全て報告に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
 
-**Step 10**: パターンBの場合、`docs/specs/system.md` または `docs/specs/patterns.md` を更新する。実装によって仕様が変化した部分を反映する。パターンA（バグ修正）の場合はspecs更新をスキップする
+**Step 10**: パターンBの場合、`docs/specs/system.md` または `docs/specs/patterns.md` を更新する。実装によって仕様が変化した部分を反映する。パターンA/C/D（バグ修正・リファクタリング・ドキュメント等）の場合はspecs更新をスキップする
 
 **Step 10（多重Issueモード）**: specs更新の直列化
 - **親エージェントのみ**が実行。サブエージェントはspecs更新を行わない

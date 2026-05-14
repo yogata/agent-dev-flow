@@ -64,10 +64,10 @@ load_skills:
 10. **[Standard flow]** ラベル付与 → `issue-guide-phases` のラベル体系に従って選定
 11. **[Standard flow]** GitHub Issueを作成（`gh issue create`） → `gh-cli-best-practices` に従って `--body-file` 使用
     - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
-12. Issue作成後にコメント追加 → テンプレート: `.opencode/commands/issue/templates/issue_comment_bug_analysis.md`（パターンA）または `.opencode/commands/issue/templates/issue_comment_feature_technical.md`（パターンB）を Read tool で読み込む（Epic flowではEpic Issueにコメント追加）
+12. Issue作成後にコメント追加 → テンプレート: `.opencode/commands/issue/templates/issue_comment_bug_analysis.md`（パターンA/C/D）または `.opencode/commands/issue/templates/issue_comment_feature_technical.md`（パターンB）を Read tool で読み込む（Epic flowではEpic Issueにコメント追加）
     - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
    **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-13. ドラフトの `## draft-meta` セクションの `status` を `issued` に更新する（ドラフトが存在する場合のみ）
+13. ドラフトの `## draft-meta` セクションの `status` を `issued` に更新する（ドラフトが存在する場合のみ） → 更新後、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
 14. 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力:
     - **Standard flow**: 作成したIssue番号を報告、次ステップ: `/issue/issue-work {issue_number}`
     - **Epic flow**: Epic # + 全子Issue番号を報告、次ステップ: `/issue/issue-work {child1} {child2} ...`（子Issue番号をスペース区切りで列挙）
