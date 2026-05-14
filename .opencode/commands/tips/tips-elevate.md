@@ -1,5 +1,8 @@
 ---
 description: evaluation-report.mdとarchive.mdから昇華判定を行い、staging領域にスタブを生成する
+agent: sisyphus
+load_skills:
+  - tips-capture
 ---
 
 # 学びの昇華判定とスタブ生成

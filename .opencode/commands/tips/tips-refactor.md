@@ -1,5 +1,8 @@
 ---
 description: inbox.mdとarchive.mdをセマンティック分析し、evaluation-report.mdを出力後inbox→archive移動を行う
+agent: sisyphus
+load_skills:
+  - tips-capture
 ---
 
 # 学びのセマンティック分析とアーカイブ

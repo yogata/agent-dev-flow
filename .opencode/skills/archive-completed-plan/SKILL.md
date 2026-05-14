@@ -35,3 +35,12 @@ Moves found files to `.sisyphus/archives/<plan_name>/<category>/`.
 
 ### Special Note on notepads
 For the `notepads` category, the script moves the **contents** of `.sisyphus/notepads/<plan_name>/` directly to `.sisyphus/archives/<plan_name>/notepads/` (without creating an extra subdirectory).
+
+## 終了コード
+
+| コード | 意味 | 備考 |
+|--------|------|------|
+| 0 | 成功 | 全ファイル正常移動 |
+| 0 | 移動対象0件 | 警告付きで正常終了 |
+| 1 | 部分失敗 | 一部ファイル移動失敗 |
+| 2 | 全体失敗 | 移動処理全体が失敗 |

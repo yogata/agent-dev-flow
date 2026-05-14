@@ -1,5 +1,8 @@
 ---
 description: 学びをinbox.mdに追記する
+agent: sisyphus
+load_skills:
+  - tips-capture
 ---
 
 # 学びの追記
