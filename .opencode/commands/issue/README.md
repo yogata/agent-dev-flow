@@ -45,7 +45,7 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 | `/issue/issue-work` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | req-analysis, spec-compliance, issue-guide-phases, issue-guide-reports, issue-guide-review, git-worktree, gh-cli-best-practices, req-file-manager, adr-file-manager, conventional-commits, epic-status-tracker |
 | `/issue/issue-update` | Issue更新 | issue-guide-phases, issue-guide-reports, issue-guide-review, gh-cli-best-practices, req-file-manager, req-analysis, spec-compliance |
 | `/issue/issue-close` | 完了処理 | issue-guide-phases, issue-guide-reports, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager, epic-status-tracker |
-| `/issue/issue-next` | 次コマンド推論 | issue-guide-phases, issue-guide-review, spec-compliance, req-analysis |
+| `/issue/issue-next` | 次コマンド推論（セッションコンテキストのみ参照） | issue-guide-phases, issue-guide-review |
 | `/issue/issue-backlog` | バックログ抽出（ショートカット経路） | issue-guide-phases, issue-guide-reports, gh-cli-best-practices |
 
 ## 基本フロー
