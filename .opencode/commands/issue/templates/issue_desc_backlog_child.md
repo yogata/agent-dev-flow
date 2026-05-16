@@ -22,7 +22,12 @@ Parent: #{epic_number}
 
 {approach}
 
-## Additional Context
+## 受け入れ条件
+
+<!-- 【必須】 -->
+- Given: [前提条件] / When: [アクション] / Then: [期待される結果]
+
+## 補足情報
 <!-- 【任意】 -->
 
 {additional_context}

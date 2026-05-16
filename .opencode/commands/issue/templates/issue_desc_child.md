@@ -7,32 +7,37 @@ labels: enhancement, feature
 <!-- 【必須】 -->
 Parent: #{epic_number}
 
-## Proposal Summary
+## 概要
 
 <!-- 【必須】 -->
 {summary}
 
-## Scope
+## 対象範囲
 
 <!-- 【必須】 -->
 {scope}
 
-## REQ Reference
+## REQ参照
 
 <!-- 【必須】 -->
 REQ-{req_number}
 
-## Proposed Solution
+## 提案内容
 
 <!-- 【必須】 -->
 {solution}
+
+## 受け入れ条件
+
+<!-- 【必須】 -->
+- Given: [前提条件] / When: [アクション] / Then: [期待される結果]
 
 ## テスト戦略
 
 <!-- 【必須】 -->
 {test_strategy}
 
-## Additional Context
+## 補足情報
 
 <!-- 【任意】 -->
 {additional_context}

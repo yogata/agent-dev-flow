@@ -4,22 +4,22 @@ about: 大規模Pattern B用Epic Issue本文テンプレート
 labels: enhancement, feature, epic
 ---
 
-## Proposal Summary
+## 概要
 
 <!-- 【必須】 -->
 {summary}
 
-## Problem Statement
+## 課題
 
 <!-- 【必須】 -->
 {problem}
 
-## Proposed Solution
+## 提案内容
 
 <!-- 【必須】 -->
 {solution}
 
-## REQ Reference
+## REQ参照
 
 <!-- 【必須】 -->
 REQ-{req_number}
@@ -42,12 +42,12 @@ REQ-{req_number}
 | ✅ 完了 | 0 |
 | ❌ 対処不要 | 0 |
 
-## Completion Criteria
+## 受け入れ条件
 
 <!-- 【必須】 -->
 {completion_criteria}
 
-## Additional Context
+## 補足情報
 
 <!-- 【任意】 -->
 {additional_context}

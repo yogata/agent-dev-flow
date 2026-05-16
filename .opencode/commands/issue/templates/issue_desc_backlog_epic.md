@@ -46,7 +46,12 @@ labels: enhancement, epic
 | 🔄 進行中 | 0 |
 | ✅ 完了 | 0 |
 
-## Additional Context
+## 受け入れ条件
+
+<!-- 【必須】 -->
+- Given: [前提条件] / When: [アクション] / Then: [期待される結果]
+
+## 補足情報
 <!-- 【任意】 -->
 
 {additional_context}
