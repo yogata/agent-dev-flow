@@ -48,6 +48,7 @@ labels: enhancement, epic
 
 ## 受け入れ条件
 
+<!-- 受け入れ条件: Epic全体の完了判定条件 -->
 <!-- 【必須】 -->
 - Given: [前提条件] / When: [アクション] / Then: [期待される結果]
 

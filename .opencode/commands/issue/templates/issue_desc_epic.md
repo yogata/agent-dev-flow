@@ -44,6 +44,7 @@ REQ-{req_number}
 
 ## 受け入れ条件
 
+<!-- 受け入れ条件: Epic全体の完了判定条件 -->
 <!-- 【必須】 -->
 {completion_criteria}
 
