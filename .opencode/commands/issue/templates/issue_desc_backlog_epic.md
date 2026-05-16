@@ -14,13 +14,6 @@ labels: enhancement, epic
 
 {period}
 
-## 抽出元
-<!-- 【必須】 -->
-
-| 出典 | タイプ | 概要 |
-|------|--------|------|
-| {source_1_ref} | {source_1_type} | {source_1_summary} |
-
 ## 分類別残課題
 <!-- 【必須】 -->
 

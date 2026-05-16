@@ -12,11 +12,6 @@ Parent: #{epic_number}
 
 {summary}
 
-## 出典
-<!-- 【必須】 -->
-
-{source_ref}
-
 ## 対応方針
 <!-- 【必須】 -->
 
