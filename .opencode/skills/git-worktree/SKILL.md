@@ -48,7 +48,13 @@ git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/main
 
 ### 3. 重要事項
 
-- **絶対パス指定の義務付け**: `workdir` パラメータには絶対パスを使用すること（相対パスはメインリポジトリの誤編集リスクあり）
+- **worktreeプレフィクス必須**: ファイルパスには `.worktrees/{N}-{type}/` を含めること。絶対パス・相対パスどちらも許容されるが、worktreeディレクトリを経由する必要がある
+  - 正しいパス例:
+    - 絶対パス: `C:/path/to/repo/.worktrees/516-fix/src/components/App.tsx`
+    - 相対パス: `.worktrees/516-fix/src/components/App.tsx`
+  - 誤ったパス例（worktreeプレフィクスなし）:
+    - `src/components/App.tsx` （メインリポジトリのファイルを誤編集するリスクあり）
+    - `./src/components/App.tsx` （同上）
 - Windows環境: パスにスペースが含まれる可能性があるためダブルクォート必須
 - 作成後の確認: `git worktree list` で正しく追加されたことを検証する
 
@@ -120,19 +126,40 @@ git push origin --delete "{type}/issue-{N}"
 
 ## 禁止事項
 
-- 相対パスでのworktreeファイル操作禁止（絶対パス必須）
+- worktreeプレフィクスを含まないパスでのファイル操作禁止（`.worktrees/{N}-{type}/` がパスに含まれていること）
 - `--force` によるダーティworktreeの強制削除禁止
 - メインリポジトリ（非worktree）内でのファイル編集禁止（issue-work中）
 
 ## 重要: git worktreeコマンドの実行方法
 
-- worktree 内で作業する場合、`workdir` パラメータに worktree の絶対パスを指定して Bash ツールを実行する
+- worktree 内で作業する場合、`workdir` パラメータに worktree のパスを指定して Bash ツールを実行する（絶対パス・相対パスどちらも可、ただし `.worktrees/{N}-{type}/` を含めること）
 - 絶対に `cd` によるディレクトリ移動は行わない
 
 ```bash
-# 正しい例
+# 正しい例（絶対パス）
 bash(command="git status", workdir="C:/path/to/repo/.worktrees/516-fix")
+
+# 正しい例（相対パス）
+bash(command="git status", workdir=".worktrees/516-fix")
 
 # 禁止例
 bash(command="cd .worktrees/516-fix && git status")
+```
+
+### Edit/Write ツールでのファイルパス指定
+
+Edit・Write ツールでworktree内のファイルを操作する場合も、パスに `.worktrees/{N}-{type}/` を含めること。
+
+```text
+# Edit ツールの例（絶対パス）
+edit(filePath="C:/path/to/repo/.worktrees/516-fix/src/components/App.tsx", oldString="...", newString="...")
+
+# Edit ツールの例（相対パス・プロジェクトルートから）
+edit(filePath=".worktrees/516-fix/src/components/App.tsx", oldString="...", newString="...")
+
+# Write ツールの例（絶対パス）
+write(filePath="C:/path/to/repo/.worktrees/516-fix/src/components/App.tsx", content="...")
+
+# 禁止例（worktreeプレフィクスなし）
+edit(filePath="src/components/App.tsx", oldString="...", newString="...")  # メインリポジトリのファイルを誤編集
 ```
