@@ -2,9 +2,9 @@
 description: 既存Issueの本文更新、コメント追加、またはREQファイル更新を行う
 agent: sisyphus
 load_skills:
-  - issue-guide-phases
-  - issue-guide-reports
-  - issue-guide-review
+  - issue-lifecycle
+  - issue-reporting
+  - issue-review-routing
   - gh-cli-best-practices
   - req-file-manager
   - req-analysis
@@ -32,7 +32,7 @@ load_skills:
    - 番号が省略された場合、セッション内会話から直近のIssue番号を検索（直前のIssue参照履歴等から抽出）
    - 複数のIssue番号が存在する場合は直近のものを優先し、ユーザーに確認（例: 「Issue #Nを更新します。よろしいですか？」）
    - 検出できない場合はユーザーに番号の指定を求めて停止
-2. 現在のIssue状態を取得 → `issue-guide-phases` のフェーズ体系で現在フェーズを判定
+2. 現在のIssue状態を取得 → `issue-lifecycle` のフェーズ体系で現在フェーズを判定
 3. 更新内容に応じて分岐:
    - **`--body`**: Issue作成時に使用されたテンプレート（`issue_desc_bug.md` / `issue_desc_feature.md` / `issue_desc_epic.md` / `issue_desc_child.md` / `issue_desc_backlog_*.md`）に従って更新。該当テンプレートの【必須】セクションが全て本文に含まれること → `gh issue edit`
    - **`--comment`**: テンプレート `.opencode/commands/issue/templates/issue_comment_update.md` を Read tool で読み込み → `gh issue comment`
@@ -56,7 +56,7 @@ load_skills:
       4. spec-compliance結果をテンプレートの「Deviation Check 結果」セクションに展開
       5. NG理由分類のチェックボックスを自動選択
       6. `gh-cli-best-practices` に従い `--body-file` 経由でコメント投稿
-4. 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力
+4. 完了報告 → `issue-reporting` の完了報告フォーマットで結果出力
    - 更新種別（`--body` / `--comment` / `--req` / `--review-ng`）に対応するフォーマットを使用
    - `--req` の場合: APPEND/UPDATEの区別と対象REQ番号・更新セクション名を報告に含める
     - `--review-ng` の場合: 乖離タイプ・対象要件番号・推奨アクションを報告に含める
@@ -77,6 +77,6 @@ load_skills:
 - `--review-ng` 時は必ず spec-compliance 結果を引用すること
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 - gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）
- - Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
+ - Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
  - `--body` 更新時はIssue作成時と同じテンプレート構造を維持すること。【必須】セクションが欠落しないよう確認すること
  - コメント/レビューNGコメントのテンプレート【必須】セクションが全て含まれていることを確認してから投稿すること

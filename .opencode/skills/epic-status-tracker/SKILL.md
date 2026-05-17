@@ -129,4 +129,4 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 ## See Also
 
 - **gh-cli-best-practices**: `--body-file` 使用、安全な読み取り手順
-- **issue-guide-phases**: Epic振る舞いルール、進捗追跡テーブル定義
+- **issue-lifecycle**: Epic振る舞いルール、進捗追跡テーブル定義

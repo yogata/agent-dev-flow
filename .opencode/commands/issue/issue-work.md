@@ -4,9 +4,9 @@ agent: sisyphus
 load_skills:
   - req-analysis
   - spec-compliance
-  - issue-guide-phases
-  - issue-guide-reports
-  - issue-guide-review
+  - issue-lifecycle
+  - issue-reporting
+  - issue-review-routing
   - git-worktree
   - gh-cli-best-practices
   - req-file-manager
@@ -141,7 +141,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 
 **Step 3**: `docs/adr/README.md` を読み込み、要件と関連するADRを「対象領域」と「決定内容」でマッチングして特定する。関連ADRがあれば個別に読み込み、実装がADRの決定事項に矛盾しないことを確認する
 
-**Step 4**: Pattern判定 → `issue-guide-phases` の Pattern Registry に従って Pattern A/B/C/D を判定し、以降のStepの分岐を決定
+**Step 4**: Pattern判定 → `issue-lifecycle` の Pattern Registry に従って Pattern A/B/C/D を判定し、以降のStepの分岐を決定
 
 **Step 5**: Worktree作成・ブランチ準備 → `git-worktree` スキルに従って実行
 - worktree作成時は `origin/main` をベースとして明示的に指定し、ローカルmainの古さに引きずられないこと
@@ -227,7 +227,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 
 **Step 11（多重Issueモード）**: 各サブエージェントがworktree内で11a〜11c（ローカル検証→PR作成→デプロイ検証）を個別に実行。親エージェントは全サブエージェントのデプロイ検証完了を待機
 
-**Step 12**: 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力
+**Step 12**: 完了報告 → `issue-reporting` の完了報告フォーマットで結果出力
 
 **Step 12（多重Issueモード）**: 集約完了報告フォーマットで結果出力:
 
@@ -281,7 +281,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 - Issue番号の解決に gh issue list / gh issue status 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
 - 実装結果をspecsに反映すること（パターンBの場合）— Step 10で `system.md` / `patterns.md` を更新
 - gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）
-- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
+- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
 - 各フェーズのべき等チェックは必ず実行する（再実行時の重複作業を防ぐ）
 - フェーズ境界でエラーが発生した場合、Step 0から再開することで安全に復旧できる
 - G11: 最大5 Issues/呼び出し（超過時は拒否メッセージを表示）

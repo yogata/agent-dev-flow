@@ -36,8 +36,8 @@
 |--------|------|----------|
 | `req-analysis` | 壁打ちメソッドロジー・深掘り | 機能/非機能要件展開、Given-When-Then形式の受け入れ基準、チェックボックス品質基準 |
 | `adr-guidelines` | ADR閾値判定 | 技術判断がADR閾値以上かの判定。判断の記録のみ（ファイル作成は不可） |
-| `issue-guide-phases` | パターン判定 | Pattern Registry（パターンA/Bの判定基準、固有ルール） |
-| `issue-guide-reports` | 完了報告フォーマット | 壁打ち結論ハイライト付きの完了報告 |
+| `issue-lifecycle` | パターン判定 | Pattern Registry（パターンA/Bの判定基準、固有ルール） |
+| `issue-reporting` | 完了報告フォーマット | 壁打ち結論ハイライト付きの完了報告 |
 
 #### テンプレート使用状況
 
@@ -89,8 +89,8 @@
 | `req-file-manager` | REQ操作 | 採番ルール（最大番号+1）、CREATE/APPEND/UPDATE判定、frontmatterバリデーション |
 | `adr-file-manager` | ADR作成 | ADR番号採番、テンプレート適用、ファイル配置 |
 | `adr-guidelines` | ADR必要性確認 | ADR作成の必要性判定基準・ライフサイクル |
-| `issue-guide-phases` | パターン判定 | パターンB以外の実行禁止ガード |
-| `issue-guide-reports` | 完了報告フォーマット | 保存結果の報告 |
+| `issue-lifecycle` | パターン判定 | パターンB以外の実行禁止ガード |
+| `issue-reporting` | 完了報告フォーマット | 保存結果の報告 |
 | `conventional-commits` | コミットメッセージ | Conventional Commits v1.0.0準拠のコミットメッセージ生成 |
 
 #### テンプレート使用状況
@@ -143,8 +143,8 @@
 
 | スキル | 用途 | 活用内容 |
 |--------|------|----------|
-| `issue-guide-phases` | フェーズ管理・ラベル付与 | ラベル体系に基づくラベル選定 |
-| `issue-guide-reports` | 完了報告フォーマット | Issue作成結果の報告 |
+| `issue-lifecycle` | フェーズ管理・ラベル付与 | ラベル体系に基づくラベル選定 |
+| `issue-reporting` | 完了報告フォーマット | Issue作成結果の報告 |
 | `gh-cli-best-practices` | gh CLI安全実行 | `--body-file` 使用の強制 |
 | `req-file-manager` | REQ参照 | REQファイルの読み取り・バリデーション |
 | `req-analysis` | 要件品質確認 | チェックボックス品質基準の検証 |
@@ -202,9 +202,9 @@
 |--------|------|----------|
 | `req-analysis` | 要件検証 | チェックボックス品質基準による受け入れ基準検証 |
 | `spec-compliance` | 乖離検出 | 要件と実装の乖離検出・報告 |
-| `issue-guide-phases` | パターン判定・フェーズ管理 | パターンA/Bの判定、specs更新要否 |
-| `issue-guide-reports` | 完了報告フォーマット | PR作成結果の報告 |
-| `issue-guide-review` | レビューNG対応 | レビューNG時の対応フロー知識（参照のみ） |
+| `issue-lifecycle` | パターン判定・フェーズ管理 | パターンA/Bの判定、specs更新要否 |
+| `issue-reporting` | 完了報告フォーマット | PR作成結果の報告 |
+| `issue-review-routing` | レビューNG対応 | レビューNG時の対応フロー知識（参照のみ） |
 | `git-worktree` | worktree管理 | worktree作成・ブランチ準備 |
 | `req-file-manager` | REQ参照 | REQファイルの読み取り |
 | `adr-file-manager` | ADR参照 | ADRファイルの読み取り |
@@ -270,9 +270,9 @@
 
 | スキル | 用途 | 活用内容 |
 |--------|------|----------|
-| `issue-guide-phases` | フェーズ判定 | 現在のフェーズを判定（フェーズ変更はしない） |
-| `issue-guide-reports` | 完了報告フォーマット | 更新結果の報告 |
-| `issue-guide-review` | レビューNG対応 | NG理由分類と対応フロー |
+| `issue-lifecycle` | フェーズ判定 | 現在のフェーズを判定（フェーズ変更はしない） |
+| `issue-reporting` | 完了報告フォーマット | 更新結果の報告 |
+| `issue-review-routing` | レビューNG対応 | NG理由分類と対応フロー |
 | `gh-cli-best-practices` | gh CLI安全実行 | `--body-file` 使用の強制 |
 | `req-file-manager` | REQ操作 | APPEND/UPDATE判定、frontmatter更新、ステータス遷移検証 |
 | `req-analysis` | 要件品質確認 | チェックボックス品質基準 |
@@ -333,8 +333,8 @@
 
 | スキル | 用途 | 活用内容 |
 |--------|------|----------|
-| `issue-guide-phases` | パターン判定 | パターンA/Bでdocs/検証要否を判定 |
-| `issue-guide-reports` | 完了報告フォーマット | フロー完了報告 |
+| `issue-lifecycle` | パターン判定 | パターンA/Bでdocs/検証要否を判定 |
+| `issue-reporting` | 完了報告フォーマット | フロー完了報告 |
 | `tips-capture` | 学び検知・抽出 | エージェント主体で学び有無を判断・生成 |
 | `archive-completed-plan` | planアーカイブ | `.sisyphus/` 配下の関連ファイル一括アーカイブ |
 | `gh-cli-best-practices` | gh CLI安全実行 | `--body-file` 使用の強制 |
@@ -405,8 +405,8 @@
 
 | スキル | 用途 | 活用内容 |
 |--------|------|----------|
-| `issue-guide-phases` | フェーズ推論・コマンド選択 | フェーズ体系、SSoT遷移、コマンド関連マップ |
-| `issue-guide-review` | レビューNG時推論 | レビューNG時の対応フロー・次アクション判定 |
+| `issue-lifecycle` | フェーズ推論・コマンド選択 | フェーズ体系、SSoT遷移、コマンド関連マップ |
+| `issue-review-routing` | レビューNG時推論 | レビューNG時の対応フロー・次アクション判定 |
 | `spec-compliance` | 乖離判定 | ループバック判定基準（重大/軽微の閾値） |
 | `req-analysis` | 要件品質確認 | 分析観点の参照 |
 
@@ -597,7 +597,7 @@ docs/ 検証（パターンBの場合）:
 | `issue-save-req.md` Guardrails | ファイル編集スコープに`docs/adr/README.md`を追加（ADR初回作成時） | 中 |
 | `issue-update.md` --req | REQ更新時にdocs/requirements/README.mdとdocs/README.mdの該当エントリ更新を明記 | 中 |
 | `issue-close.md` Step 3 | docs/検証項目に「ADRエントリがdocs/README.mdに含まれていること」を追加 | 低 |
-| `issue-guide-phases` スキル | docs構造の5区分にADR関連のハブ更新ルールを追記 | 低 |
+| `issue-lifecycle` スキル | docs構造の5区分にADR関連のハブ更新ルールを追記 | 低 |
 
 ---
 
@@ -609,15 +609,15 @@ docs/ 検証（パターンBの場合）:
 |--------|-----------|----------------|--------------|------------|--------------|-------------|------------|
 | req-analysis | ● | | ● | ● | ● | | ● |
 | adr-guidelines | ● | ● | | | | | |
-| issue-guide-phases | ● | ● | ● | ● | ● | ● | ● |
-| issue-guide-reports | ● | ● | ● | ● | ● | ● | |
+| issue-lifecycle | ● | ● | ● | ● | ● | ● | ● |
+| issue-reporting | ● | ● | ● | ● | ● | ● | |
 | req-file-manager | | ● | ● | ● | ● | ● | |
 | adr-file-manager | | ● | ● | ● | | | |
 | conventional-commits | | ● | | ● | | | |
 | gh-cli-best-practices | | | ● | | ● | ● | |
 | git-worktree | | | | ● | | ● | |
 | spec-compliance | | | | ● | ● | | ● |
-| issue-guide-review | | | | ● | ● | | ● |
+| issue-review-routing | | | | ● | ● | | ● |
 | tips-capture | | | | | | ● | |
 | archive-completed-plan | | | | | | ● | |
 

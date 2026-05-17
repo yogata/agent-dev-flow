@@ -2,8 +2,8 @@
 description: 要件定義をもとにGitHub Issueを作成する
 agent: sisyphus
 load_skills:
-  - issue-guide-phases
-  - issue-guide-reports
+  - issue-lifecycle
+  - issue-reporting
   - gh-cli-best-practices
   - req-file-manager
   - req-analysis
@@ -61,14 +61,14 @@ load_skills:
    - `gh issue edit` でEpic本文を更新（`--body-file` 使用）
     - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 9. **[Standard flow]** `docs/adr/README.md` を読み込み、要件と関連するADRを「対象領域」と「決定内容」でマッチングして特定する。関連ADRがあれば個別に読み込む（Epic flowでもStep 3bの内容反映に活用）
-10. **[Standard flow]** ラベル付与 → `issue-guide-phases` のラベル体系に従って選定
+10. **[Standard flow]** ラベル付与 → `issue-lifecycle` のラベル体系に従って選定
 11. **[Standard flow]** GitHub Issueを作成（`gh issue create`） → `gh-cli-best-practices` に従って `--body-file` 使用
     - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 12. Issue作成後にコメント追加 → テンプレート: `.opencode/commands/issue/templates/issue_comment_bug_analysis.md`（パターンA/C/D）または `.opencode/commands/issue/templates/issue_comment_feature_technical.md`（パターンB）を Read tool で読み込む（Epic flowではEpic Issueにコメント追加）
     - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
    **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
 13. ドラフトの `## draft-meta` セクションの `status` を `issued` に更新する（ドラフトが存在する場合のみ） → 更新後、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
-14. 完了報告 → `issue-guide-reports` の完了報告フォーマットで結果出力:
+14. 完了報告 → `issue-reporting` の完了報告フォーマットで結果出力:
     - **Standard flow**: 作成したIssue番号を報告、次ステップ: `/issue/issue-work {issue_number}`
     - **Epic flow**: Epic # + 全子Issue番号を報告、次ステップ: `/issue/issue-work {child1} {child2} ...`（子Issue番号をスペース区切りで列挙）
 
@@ -80,7 +80,7 @@ load_skills:
 - ADR・specsの内容はIssue本文の生成に反映すること
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 - gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）
-- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
+- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
 - **Epic flow 追加ガードレール**:
   - Epic flowは draft-metaの `scale: large` が明示的に設定されている場合のみ実行
   - 子Issue本文の先頭行に `Parent: #{epic_number}` を必ず含める（親子関係の追跡用）

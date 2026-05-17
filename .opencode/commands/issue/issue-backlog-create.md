@@ -2,8 +2,8 @@
 description: 承認済みバックログdraftからEpic+子Issueを作成し、抽出元にマークコメントを投稿する
 agent: sisyphus
 load_skills:
-  - issue-guide-phases
-  - issue-guide-reports
+  - issue-lifecycle
+  - issue-reporting
   - gh-cli-best-practices
 ---
 
@@ -77,7 +77,7 @@ load_skills:
 
 9. **Draft状態更新**: draftファイルの `status` を `approved` から `issued` に更新する。
 
-10. **完了報告** → `issue-guide-reports` の完了報告フォーマットに従って出力:
+10. **完了報告** → `issue-reporting` の完了報告フォーマットに従って出力:
     ```
     ✅ バックログIssue作成が完了しました。
       対象期間: {since} 〜 {until}
@@ -95,5 +95,5 @@ load_skills:
 - コメント投稿失敗時もEpic + 子Issue作成は成功扱いとし、失敗番号を完了報告に含める
 - テンプレートの【必須】セクションが全てIssue本文に含まれていることを確認してからgh issue createを実行すること。欠落セクションがある場合は再生成すること
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
+- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
 - vibe禁止: ユーザーへの確認なくIssue作成を実行しない（draft承認が前提）

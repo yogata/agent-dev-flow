@@ -2,8 +2,8 @@
 description: 次のコマンドを推論・実行する。セッションコンテキストのみ使用（gh/gitコマンド禁止）。
 agent: sisyphus
 load_skills:
-  - issue-guide-phases
-  - issue-guide-review
+  - issue-lifecycle
+  - issue-review-routing
   - spec-compliance
   - req-analysis
 ---
@@ -23,9 +23,9 @@ load_skills:
 
 ## Steps
 
-1. セッションコンテキストから現在のマクロフェーズを推論 → `issue-guide-phases` のフェーズ体系とSSoT遷移ルールに従って判定
+1. セッションコンテキストから現在のマクロフェーズを推論 → `issue-lifecycle` のフェーズ体系とSSoT遷移ルールに従って判定
 2. 乖離がある場合は乖離検出結果を確認 → `spec-compliance` のループバック判定に従って次アクションを決定
-3. 次のコマンドを提示または実行 → `issue-guide-phases` のコマンド関連マップに従って適切なコマンドを選択:
+3. 次のコマンドを提示または実行 → `issue-lifecycle` のコマンド関連マップに従って適切なコマンドを選択:
     - ①バイブス壁打ち → `/issue/issue-req`
     - ①→②準備（パターンB） → `/issue/issue-save-req`
     - ①→②境界（パターンB） → `/issue/issue-save-req`

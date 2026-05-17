@@ -131,7 +131,7 @@ docs/requirements/
 ```
 
 **パターンA除外**: パターンA（バグ修正・軽微変更）ではREQファイルを作成しない。Issue本文のみで要件を管理する。REQファイルの修正が必要なバグ修正は、パターンB（機能追加）に昇格して扱う。
-- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
+- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
 
 各REQファイルのfrontmatter:
 

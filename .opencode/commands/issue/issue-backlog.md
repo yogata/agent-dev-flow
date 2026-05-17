@@ -2,8 +2,8 @@
 description: クローズ済みissue/PRから残課題を抽出・分類し、解消チェック後にdraftとして保存する
 agent: sisyphus
 load_skills:
-  - issue-guide-phases
-  - issue-guide-reports
+  - issue-lifecycle
+  - issue-reporting
   - gh-cli-best-practices
 ---
 
@@ -121,7 +121,7 @@ Issue作成は `issue-backlog-create` コマンドで行う。
    - **承認**: ドラフトの `status` を `approved` に更新する
    - **差し戻し**: 調整内容をドラフトに反映してレポートを再提示（`status` は `draft` のまま維持）
 
-10. **完了報告** → `issue-guide-reports` の完了報告フォーマットに従って出力:
+10. **完了報告** → `issue-reporting` の完了報告フォーマットに従って出力:
     ```
     ✅ バックログ抽出が完了しました。
       対象期間: {since} 〜 {until}
@@ -141,5 +141,5 @@ Issue作成は `issue-backlog-create` コマンドで行う。
 - **Issue/PRの作成・コメント投稿は行わない**（`issue-backlog-create` が担当）
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 - レポートはMarkdownテーブル形式で構造化して提示する
-- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
+- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
 - 解消チェックのマッチング範囲は title + body + comments のみ（commitsは対象外）

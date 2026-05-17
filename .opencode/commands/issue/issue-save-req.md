@@ -5,8 +5,8 @@ load_skills:
   - req-file-manager
   - adr-file-manager
   - adr-guidelines
-  - issue-guide-phases
-  - issue-guide-reports
+  - issue-lifecycle
+  - issue-reporting
   - conventional-commits
 ---
 
@@ -45,7 +45,7 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
 8. 変更範囲検証: `git diff --name-only` で変更ファイル一覧を取得し、`docs/` 以外の変更が含まれていればエラー内容をユーザーに報告して指示を待つ（変更の自動破棄は行わない）
 9. コミット・プッシュ → `conventional-commits` に従ってコミットメッセージを生成し、mainブランチに push
 10. ドラフトの `## draft-meta` セクションの `status` を `saved` に更新する
-11. 完了報告 → `issue-guide-reports` の完了報告フォーマットに従って出力:
+11. 完了報告 → `issue-reporting` の完了報告フォーマットに従って出力:
     ```
     ✅ 要件をdocs/に保存しました（REQ-{NNNN} を{CREATE/APPEND/UPDATE}）。
       {ADR作成がある場合: ADR-{NNNN} を作成しました。}
@@ -64,5 +64,5 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
 - ドラフトファイルが存在しない場合は実行不可（エラーで中止）
 - REQ番号は連番・一意であること（空き番号の再利用禁止）→ `req-file-manager` に従う
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
+- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
 - 要件doc構造は `doc_requirement.md` テンプレートに厳密に従うこと。【必須】セクションの欠落は禁止

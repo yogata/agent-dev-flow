@@ -26,7 +26,7 @@ worktree とブランチの命名規則を統一する。
 | `fix`      | バグ修正・bug              |
 | `refactor` | リファクタリング・Pattern C |
 | `chore`    | ドキュメント・雑務・Pattern D |
-- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
+- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
 
 ### `{N}` の定義
 

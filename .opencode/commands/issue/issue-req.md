@@ -5,8 +5,8 @@ load_skills:
   - req-analysis
   - req-file-manager
   - adr-guidelines
-  - issue-guide-phases
-  - issue-guide-reports
+  - issue-lifecycle
+  - issue-reporting
 ---
 
 # 要件定義
@@ -94,7 +94,7 @@ load_skills:
     - ラベルに基づいて Pattern 判定: `bug`, `critical` → Pattern A, `enhancement`, `feature` → Pattern B, `refactor`, `maintenance` → Pattern C, `docs`, `chore` → Pattern D
     - **Pattern A + ADR必要時の Pattern B 昇格**: Pattern A で ADR閾値以上の技術判断が発生した場合、Pattern B に昇格する（REQファイル・ADRファイルの作成が必要となるため）
 7. スケール判断（Pattern B のみ実行）:
-    - Pattern B であっても、`issue-guide-phases` の並列実行パターンにおけるスケール判断条件を用いて `standard` または `large` を判定:
+    - Pattern B であっても、`issue-lifecycle` の並列実行パターンにおけるスケール判断条件を用いて `standard` または `large` を判定:
       - **large**: 以下のいずれか1つ以上の条件を満たす場合
         - 複数モジュールにまたがる (e.g., UI + API + DB)
         - 1 Issueで実装しきれない (PR肥大化リスク)
@@ -125,7 +125,7 @@ load_skills:
 9. 承認ゲート: 生成した要件doc（パターンB: ドラフト内容、パターンA/C/D: セッション内要件doc）をユーザーに提示し、承認を求める
     - **承認**: 次のステップへ進む
     - **差し戻し**: 壁打ちを継続（Step 1に戻る）
-10. 完了報告 → `issue-guide-reports` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
+10. 完了報告 → `issue-reporting` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
     - パターンB: `次のステップ: /issue/issue-save-req`
     - パターンA/C/D: `次のステップ: /issue/issue-create`
 
@@ -138,5 +138,5 @@ load_skills:
 - チェックボックスは測定可能で一意であること → `req-analysis` のチェックボックス品質基準
 - ADR閾値以上の判断は `adr-guidelines` へ（判断の記録のみ、ファイル作成は不可）
 - サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- Pattern分岐の判定基準と固有ルールは `issue-guide-phases` → Pattern Registry を参照
+- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
 - 要件doc構造は `doc_requirement.md` テンプレートに厳密に従うこと。【必須】セクションの欠落は禁止
