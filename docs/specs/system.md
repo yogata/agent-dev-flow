@@ -26,7 +26,7 @@ tips-*コマンドは3つのコマンド + 1つの補助スキルで構成され
 
 | コマンド/スキル | 役割 | 層 | 特徴 |
 |---|---|---|---|
-| `tips-capture`（スキル） | エージェント主体で学びを検知・抽出・提案 | キャプチャ層 | 13項目形式、入口を緩く（false positive恐れない） |
+| `tips-capture`（スキル） | エージェント主体で学びを検知・抽出・自律蓄積 | キャプチャ層 | 13項目形式、入口を緩く（false positive恐れない）、ユーザー承認なしで直接inbox.mdに蓄積 |
 | `/tips/tips-add` | 確定済み学びをinbox.mdに保存 | キャプチャ層 | ダムセーブ専用（情報収集・昇華判定なし） |
 | `/tips/tips-refactor` | 問題クラス分類→8軸評価→archive移動 | 分析層 | evaluation-report.md生成、refactor時prune（任意）、旧5項目形式互換 |
 | `/tips/tips-elevate` | 昇華判定→stagingスタブ生成 | 昇華層 | 11処分区分+duplicate、既存対策照合、elevate時prune（必須） |
