@@ -8,22 +8,22 @@
 
 | マクロフェーズ       | 使用可能なコマンド                                      | 役割                         |
 | -------------------- | ------------------------------------------------------- | ---------------------------- |
-| ①バイブス壁打ち      | `/issue/issue-req`, `/issue/issue-save-req`, `/issue/issue-backlog`, `/issue/issue-backlog-create`, `/issue/issue-next`        | 要件壁打ち・分析・docs保存・バックログ抽出 |
-| ②構造的実行          | `/issue/issue-create`, `/issue/issue-work`（並列対応）, `/issue/issue-update`, `/issue/issue-next`            | Issue作成・実装・進捗記録    |
-| ③レビュー完了        | `/issue/issue-next`, `/issue/issue-close`                             | 次アクション推論・完了処理   |
+| 壁打ち      | `/issue/issue-req`, `/issue/issue-save-req`, `/issue/issue-backlog`, `/issue/issue-backlog-create`, `/issue/issue-next`        | 要件壁打ち・分析・docs保存・バックログ抽出 |
+| 構造的実行          | `/issue/issue-create`, `/issue/issue-work`（並列対応）, `/issue/issue-update`, `/issue/issue-next`            | Issue作成・実装・進捗記録    |
+| レビュー完了        | `/issue/issue-next`, `/issue/issue-close`                             | 次アクション推論・完了処理   |
 
 ## コマンド詳細
 
 | コマンド              | 入力SSoT               | 出力SSoT                          | 完了後マクロフェーズ |
 | --------------------- | ---------------------- | --------------------------------- | -------------------- |
-| `/issue/issue-req`           | セッション会話         | 要件doc                           | ①バイブス壁打ち     |
-| `/issue/issue-save-req`      | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR, docs index | ①バイブス壁打ち     |
-| `/issue/issue-create`        | 要件doc, specs READ, ADR READ | GitHub Issue                      | ②構造的実行         |
-| `/issue/issue-work`          | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ   | ③レビュー完了       |
+| `/issue/issue-req`           | セッション会話         | 要件doc                           | 壁打ち     |
+| `/issue/issue-save-req`      | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR, docs index | 壁打ち     |
+| `/issue/issue-create`        | 要件doc, specs READ, ADR READ | GitHub Issue                      | 構造的実行         |
+| `/issue/issue-work`          | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ   | レビュー完了       |
 | `/issue/issue-update`        | GitHub Issue           | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし            |
-| `/issue/issue-close`         | GitHub Issue + PR      | なし                              | ③レビュー完了       |
-| `/issue/issue-backlog`       | ユーザー期間指定       | バックログdraft（.sisyphus/drafts/） | ①バイブス壁打ち     |
-| `/issue/issue-backlog-create` | backlog draft (approved) | Epic + 子Issue（backlog template）+ backlog-extracted コメント | ①バイブス壁打ち     |
+| `/issue/issue-close`         | GitHub Issue + PR      | なし                              | レビュー完了       |
+| `/issue/issue-backlog`       | ユーザー期間指定       | バックログdraft（.sisyphus/drafts/） | 壁打ち     |
+| `/issue/issue-backlog-create` | backlog draft (approved) | Epic + 子Issue（backlog template）+ backlog-extracted コメント | 壁打ち     |
 | `/issue/issue-next`          | 複数                   | 適切なコマンド実行                 | 依存                |
 
 ## 参照フロー

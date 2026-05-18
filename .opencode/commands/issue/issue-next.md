@@ -26,13 +26,13 @@ load_skills:
 1. セッションコンテキストから現在のマクロフェーズを推論 → `issue-lifecycle` のフェーズ体系とSSoT遷移ルールに従って判定
 2. 乖離がある場合は乖離検出結果を確認 → `spec-compliance` のループバック判定に従って次アクションを決定
 3. 次のコマンドを提示または実行 → `issue-lifecycle` のコマンド関連マップに従って適切なコマンドを選択:
-    - ①バイブス壁打ち → `/issue/issue-req`
-    - ①→②準備（パターンB） → `/issue/issue-save-req`
-    - ①→②境界（パターンB） → `/issue/issue-save-req`
-    - ①→②境界（パターンA/C/D） → `/issue/issue-create`
-    - ②構造的実行 → `/issue/issue-work`
-    - ②→③境界 → レビュー待ち
-    - ③レビュー完了 → `/issue/issue-close`
+    - 壁打ち → `/issue/issue-req`
+    - 壁打ち→構造的実行の準備（パターンB） → `/issue/issue-save-req`
+    - 壁打ち→構造的実行の境界（パターンB） → `/issue/issue-save-req`
+    - 壁打ち→構造的実行の境界（パターンA/C/D） → `/issue/issue-create`
+    - 構造的実行 → `/issue/issue-work`
+    - 構造的実行→レビュー完了の境界 → レビュー待ち
+    - レビュー完了 → `/issue/issue-close`
 
 ## Guardrails
 

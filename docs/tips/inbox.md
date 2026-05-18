@@ -10,7 +10,7 @@
 - **問題事象**: issue-backlogで抽出した子Issue（例: staff-schedule#739）が、元issue/PRの「対象外」1行文のみを出典とするため、概要がタイトルの再述に過ぎず極めて不明確になった
 - **発生局面**: 実装
 - **検知方法**: Issue着手時の要件確認
-- **根本原因**: issue-backlogはバイブス壁打ちフェーズのショートカット経路であり、構造的抽出のみを行う設計。元ソースに情報が少ない場合、深掘り能力がない（設計上の制約）
+- **根本原因**: issue-backlogは壁打ちフェーズのショートカット経路であり、構造的抽出のみを行う設計。元ソースに情報が少ない場合、深掘り能力がない（設計上の制約）
 - **自律対応内容**: 方針Cを採用 — backlog Issueは「まだらな未整理リスト（プレースホルダー）」として許容し、着手時にissue-reqで壁打ち深掘りするフローを確立。フロー: issue-backlog（粗いIssue作成）→ 着手時にissue-req（壁打ち）→ issue-save-req（docs保存）→ issue-update（既存Issue更新）→ issue-work（実装）。既存Issue更新はissue-createではなくissue-updateを使用する点に注意
 - **ユーザー確認有無**: あり
 - **ADR/REQ/spec影響**: なし

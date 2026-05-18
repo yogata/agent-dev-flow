@@ -10,13 +10,13 @@ description: issue コマンドセットの使用ガイド
 
 | フェーズ | 内容 | コマンド |
 |---|---|---|
-| ①バイブス壁打ち | 要件定義・技術判断を壁打ちで決定 | `/issue/issue-req` → `/issue/issue-save-req` → `/issue/issue-create` |
-| ②構造的実行 | TDD・コーディング・デバッグを実行 | `/issue/issue-work` |
-| ③レビュー完了 | PR・マージ・決定事項クローズ | `/issue/issue-close` |
+| 壁打ち | 要件定義・技術判断を壁打ちで決定 | `/issue/issue-req` → `/issue/issue-save-req` → `/issue/issue-create` |
+| 構造的実行 | TDD・コーディング・デバッグを実行 | `/issue/issue-work` |
+| レビュー完了 | PR・マージ・決定事項クローズ | `/issue/issue-close` |
 
-**イメージ違ったら**: 要件定義に立ち戻り①からやり直し（`/issue/issue-req`）
+**イメージ違ったら**: 要件定義に立ち戻り壁打ちからやり直し（`/issue/issue-req`）
 
-**ショートカット経路**: `/issue/issue-backlog` — ①バイブス壁打ちから直接バックログ抽出を実行
+**ショートカット経路**: `/issue/issue-backlog` — 壁打ちから直接バックログ抽出を実行
 
 ## 主要スキル
 
