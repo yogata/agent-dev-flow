@@ -121,7 +121,7 @@ Issue作成は `issue-backlog-create` コマンドで行う。
    - **承認**: ドラフトの `status` を `approved` に更新する
    - **差し戻し**: 調整内容をドラフトに反映してレポートを再提示（`status` は `draft` のまま維持）
 
-10. **完了報告** → `issue-reporting` の完了報告フォーマットに従って出力:
+10. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
     ```
     ✅ バックログ抽出が完了しました。
       対象期間: {since} 〜 {until}

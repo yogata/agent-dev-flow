@@ -119,7 +119,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
 
 **Step 11（多重Issueモード）**: 各サブエージェントがworktree内で11a〜11cを個別に実行。親エージェントは全サブエージェントのデプロイ検証完了を待機
 
-**Step 12**: 完了報告 → `issue-completion-reporting` の完了報告フォーマットで結果出力
+**Step 12**: 完了報告 → `issue-completion-reporting` の完了報告フォーマット（`reference/completion-reports.md` → issue-work 完了時）で結果出力
 
 **Step 12（多重Issueモード）**: `issue-work-orchestration` の集約完了報告フォーマットで結果出力
 

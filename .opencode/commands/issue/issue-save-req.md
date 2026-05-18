@@ -45,7 +45,7 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
 8. 変更範囲検証: `git diff --name-only` で変更ファイル一覧を取得し、`docs/` 以外の変更が含まれていればエラー内容をユーザーに報告して指示を待つ（変更の自動破棄は行わない）
 9. コミット・プッシュ → `conventional-commits` に従ってコミットメッセージを生成し、mainブランチに push
 10. ドラフトの `## draft-meta` セクションの `status` を `saved` に更新する
-11. 完了報告 → `issue-reporting` の完了報告フォーマットに従って出力:
+11. 完了報告 → `issue-completion-reporting` の完了報告フォーマットに従って出力:
     ```
     ✅ 要件をdocs/に保存しました（REQ-{NNNN} を{CREATE/APPEND/UPDATE}）。
       {ADR作成がある場合: ADR-{NNNN} を作成しました。}
