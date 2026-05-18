@@ -53,3 +53,19 @@
 **gh CLI安全性**: Windows PowerShell環境での文字化け問題（UTF-8出力をShift-JISとして解釈）に対し、WRITE操作は`--body-file`経由、READ操作は一時ファイル経由でRead toolを使用する安全手順を強制する。これは環境固有の制約に対する実用的な回避策である。
 
 **git worktree**: 並列開発の基盤として採用。Issue番号ベースの命名規則（`.worktrees/{N}-{type}`）により、複数Issueの同時進行を安全に管理する。worktreeにより作業ディレクトリを分離し、メインリポジトリへの誤操作を防止する。
+
+---
+
+## 5. Command / Skill / Template / Script の責任分界
+
+アーティファクトの責務を4種に明確に分けることで、各要素の役割を曖昧さのないものにする。
+
+**Command** は公開APIと高レベル実行骨格を担う。Input/Output/Guardrails/Stepsを定義し、詳細な判断はSkillへ、決定的処理はScriptへ委譲する。原則100行以内、Steps 5〜12個に抑える。150行超は分割検討、200行超はorchestration skill/reference/scriptへの切り出しを必須検討する。
+
+**Skill** は再利用可能な判断基準と大きな状態機械を担う。宣言的定義（判定基準・フォーマット・ポリシー・状態遷移）を提供し、Commandから一方向に参照される。`1 command = 1 orchestration skill` は原則とせず、大きな状態機械・再開ポイント・CI loop・Wave scheduling・サブエージェント protocol を持つ場合にのみ orchestration skill 化を認める。
+
+**Template** は出力構造とプレースホルダーを担う。変数置換で使用し、ロジックは含まない。責任範囲に基づいて分散配置する。
+
+**Script** は決定的でテスト可能な処理を担う。validation・transformation・generation・formatting等の純粋関数・決定的処理に限定し、非決定的な処理（API呼び出し・ユーザー対話）は含めない。
+
+この分離の意図は、**Commandの肥大化防止**と**再利用性の最大化**にある。Commandが薄いdispatcherに徹することで、新しいCommandの追加・既存Commandの変更コストを最小化する。詳細は `artifact-boundaries.md`（REQ-0016-001〜007）を参照。
