@@ -142,15 +142,28 @@ load_skills:
 
 ## Guardrails
 
-- 壁打ちフェーズのみ（実装コード禁止）
-- **ファイル編集スコープ**: `.sisyphus/drafts/**` のみ作成・編集を許可
-- **ユーザーが明示した入力ファイルは read-only で参照可能**（要件ソースとして扱うが、内容を変更・上書きしない）
-- **docs/ 配下の広範な探索は禁止**（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用）
-- **inbox.md / archive.md を直接ロードしない**（raw tips は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
-- 関連ドキュメントの個別ファイル列挙をユーザーに求めない。責務は要件の壁打ち・構造化に専念する
-- **git コマンドは実行しない**
-- チェックボックスは測定可能で一意であること → `req-analysis` のチェックボックス品質基準
-- ADR閾値以上の判断は `adr-guidelines` へ（判断の記録のみ、ファイル作成は不可）
-- サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
-- 要件doc構造は `doc_requirement.md` テンプレートに厳密に従うこと。【必須】セクションの欠落は禁止
+### フェーズ制約
+- G01: 壁打ちフェーズのみ（実装コード禁止）
+- G02: 関連ドキュメントの個別ファイル列挙をユーザーに求めない。責務は要件の壁打ち・構造化に専念する
+
+### ファイル操作制約
+- G03: ファイル編集スコープ: `.sisyphus/drafts/**` のみ作成・編集を許可
+- G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）
+- G05: `docs/` 配下の広範な探索は禁止（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用）
+- G06: `inbox.md` / `archive.md` を直接ロードしない（raw tips は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
+
+### 実行制約
+- G07: `git` コマンドは実行しない
+
+### 品質ゲート
+- G08: チェックボックスは測定可能で一意であること → `req-analysis` のチェックボックス品質基準
+- G09: 要件doc構造は `doc_requirement.md` テンプレートに厳密に従うこと。【必須】セクションの欠落は禁止
+
+### 判断・承認制約
+- G10: ADR閾値以上の判断は `adr-guidelines` へ（判断の記録のみ、ファイル作成は不可）
+
+### 委譲・参照制約
+- G11: Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
+
+### 出力制約
+- G12: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）

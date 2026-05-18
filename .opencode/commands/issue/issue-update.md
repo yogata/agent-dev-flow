@@ -71,14 +71,23 @@ load_skills:
 
 ## Guardrails
 
-- SSoTの整合性を維持（Issue本文と要件docの不整合を防ぐ）
-- `gh-cli-best-practices` に従って `--body-file` 使用
-- Issue番号の解決に gh issue list / gh issue status 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
-- フェーズは変更なし（現在のフェーズを維持）
-- `--review-ng` 時は必ず spec-compliance 結果を引用すること
-- サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）
- - Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
- - `--body` 更新時はIssue作成時と同じテンプレート構造を維持すること。【必須】セクションが欠落しないよう確認すること
-  - コメント/レビューNGコメントのテンプレート【必須】セクションが全て含まれていることを確認してから投稿すること
-  - CI/CD修正・自律修正ループは issue-update の管轄外とする（issue-work の責務）。issue-update はREQ更新・レビューNG時のコメント追加・Issue本文更新のみを責務とする
+### フェーズ制約
+- G01: フェーズは変更なし（現在のフェーズを維持）
+- G02: CI/CD修正・自律修正ループは issue-update の管轄外とする（issue-work の責務）。issue-update はREQ更新・レビューNG時のコメント追加・Issue本文更新のみを責務とする
+
+### 実行制約
+- G03: Issue番号の解決に `gh issue list` / `gh issue status` 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
+
+### 品質ゲート
+- G04: SSoTの整合性を維持（Issue本文と要件docの不整合を防ぐ）
+- G05: `--review-ng` 時は必ず spec-compliance 結果を引用すること
+- G06: `--body` 更新時はIssue作成時と同じテンプレート構造を維持すること。【必須】セクションが欠落しないよう確認すること
+- G07: コメント/レビューNGコメントのテンプレート【必須】セクションが全て含まれていることを確認してから投稿すること
+
+### 委譲・参照制約
+- G08: `gh-cli-best-practices` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
+- G09: gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと
+- G10: Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
+
+### 出力制約
+- G11: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）

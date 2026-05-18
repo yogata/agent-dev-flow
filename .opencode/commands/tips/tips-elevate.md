@@ -97,13 +97,22 @@ load_skills:
 
 ## Guardrails
 
-- **`.opencode/` 直接反映禁止**: stub は `docs/tips/elevation-staging/` のみに生成。`.opencode/commands/` や `.opencode/skills/` への直接書込は禁止
-- **`issue-work` への直接受け渡し禁止**: stub は `issue-req` の明示入力ファイルとして扱う
-- **evaluation-report.md は読込専用**: 変更・削除は禁止
-- **主入力は evaluation-report.md**: raw tips の再分類は禁止
-- **既存対策を優先**: 「新規X化」より「既存Xへ反映」を優先
-- **ユーザー承認必須**: 判定・prune ともに承認なしに実行しない
-- **elevation-ledger.md は生成しない**: 管理用ファイルは作成しない
+### ファイル操作制約
+- G01: `.opencode/` 直接反映禁止: stub は `docs/tips/elevation-staging/` のみに生成。`.opencode/commands/` や `.opencode/skills/` への直接書込は禁止
+- G02: `evaluation-report.md` は読込専用: 変更・削除は禁止
+
+### 実行制約
+- G03: `issue-work` への直接受け渡し禁止: stub は `issue-req` の明示入力ファイルとして扱う
+
+### 品質ゲート
+- G04: 主入力は `evaluation-report.md`: raw tips の再分類は禁止
+
+### 判断・承認制約
+- G05: 既存対策を優先: 「新規X化」より「既存Xへ反映」を優先
+- G06: ユーザー承認必須: 判定・prune ともに承認なしに実行しない
+
+### 出力制約
+- G07: `elevation-ledger.md` は生成しない: 管理用ファイルは作成しない
 
 ## ユーザー確認ポイント
 

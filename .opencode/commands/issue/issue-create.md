@@ -75,18 +75,28 @@ load_skills:
 
 ## Guardrails
 
-- issue-req未実行の場合は警告
-- 要件docのチェックボックスが空の場合は警告
-- パターンBの場合、対応するREQファイルが存在することを確認
-- ADR・specsの内容はIssue本文の生成に反映すること
-- サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと（一時ファイル経由でRead tool使用）
-- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
-- **Epic flow 追加ガードレール**:
-  - Epic flowは draft-metaの `scale: large` が明示的に設定されている場合のみ実行
-  - 子Issue本文の先頭行に `Parent: #{epic_number}` を必ず含める（親子関係の追跡用）
-  - 全子Issueの作成完了後にEpic本文のステータス追跡テーブルを更新する（部分更新は禁止）
-  - 子Issueは最大10件まで（Epic 1件あたり）
-  - Standard flowの動作・出力形式はEpic flow追加による影響を受けない
-- テンプレートの【必須】セクションが全てIssue本文に含まれていることを確認してからgh issue createを実行すること。欠落セクションがある場合は再生成すること
-- `完了条件` セクションはIssue本文テンプレートの【必須】セクションである。テンプレート準拠検証で必ず含まれていることを確認すること
+### フェーズ制約
+- G01: ADR・specsの内容はIssue本文の生成に反映すること
+- G02: Standard flowの動作・出力形式はEpic flow追加による影響を受けない
+
+### 実行制約
+- G03: 子Issue本文の先頭行に `Parent: #{epic_number}` を必ず含める（親子関係の追跡用）
+- G04: 全子Issueの作成完了後にEpic本文のステータス追跡テーブルを更新する（部分更新は禁止）
+- G05: 子Issueは最大10件まで（Epic 1件あたり）
+
+### 品質ゲート
+- G06: issue-req未実行の場合は警告
+- G07: 要件docのチェックボックスが空の場合は警告
+- G08: パターンBの場合、対応するREQファイルが存在することを確認
+- G09: テンプレートの【必須】セクションが全てIssue本文に含まれていることを確認してからgh issue createを実行すること。欠落セクションがある場合は再生成すること
+- G10: `完了条件` セクションはIssue本文テンプレートの【必須】セクションである。テンプレート準拠検証で必ず含まれていることを確認すること
+
+### 判断・承認制約
+- G11: Epic flowは draft-metaの `scale: large` が明示的に設定されている場合のみ実行
+
+### 委譲・参照制約
+- G12: gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと
+- G13: Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
+
+### 出力制約
+- G14: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）

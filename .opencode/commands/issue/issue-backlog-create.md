@@ -92,11 +92,22 @@ load_skills:
 
 ## Guardrails
 
-- 壁打ちフェーズのショートカット経路（実装コード禁止）
-- `gh-cli-best-practices` に従って `--body-file` 使用（`--body` 直接指定禁止）
-- データ取得は `gh` CLIのみ使用（GitHub API直接呼び出し不可）
-- コメント投稿失敗時もEpic + 子Issue作成は成功扱いとし、失敗番号を完了報告に含める
-- テンプレートの【必須】セクションが全てIssue本文に含まれていることを確認してからgh issue createを実行すること。欠落セクションがある場合は再生成すること
-- サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
-- vibe禁止: ユーザーへの確認なくIssue作成を実行しない（draft承認が前提）
+### フェーズ制約
+- G01: 壁打ちフェーズのショートカット経路（実装コード禁止）
+
+### 実行制約
+- G02: データ取得は `gh` CLIのみ使用（GitHub API直接呼び出し不可）
+- G03: コメント投稿失敗時もEpic + 子Issue作成は成功扱いとし、失敗番号を完了報告に含める
+
+### 品質ゲート
+- G04: テンプレートの【必須】セクションが全てIssue本文に含まれていることを確認してからgh issue createを実行すること。欠落セクションがある場合は再生成すること
+
+### 判断・承認制約
+- G05: ユーザーへの確認なくIssue作成を実行しない（draft承認が前提）
+
+### 委譲・参照制約
+- G06: `gh-cli-best-practices` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
+- G07: Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
+
+### 出力制約
+- G08: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）

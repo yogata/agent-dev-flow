@@ -135,13 +135,22 @@ Issue作成は `issue-backlog-create` コマンドで行う。
 
 ## Guardrails
 
-- 壁打ちフェーズのショートカット経路（実装コード禁止）
-- データ取得は `gh` CLIのみ使用（GitHub API直接呼び出し不可）
-- `gh-cli-best-practices` に従い `--body` 直接指定を禁止し `--body-file` を使用
-- 対象はクローズ済みissue/PRのみ（オープン中は対象外）
-- 同一期間への再実行時は、既に `backlog-extracted` コメントが付与されたissue/PRをスキップする（重複抽出防止）
-- **Issue/PRの作成・コメント投稿は行わない**（`issue-backlog-create` が担当）
-- サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- レポートはMarkdownテーブル形式で構造化して提示する
-- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
-- 解消チェックのマッチング範囲は title + body + comments のみ（commitsは対象外）
+### フェーズ制約
+- G01: 壁打ちフェーズのショートカット経路（実装コード禁止）
+- G02: Issue/PRの作成・コメント投稿は行わない（`issue-backlog-create` が担当）
+
+### 実行制約
+- G03: データ取得は `gh` CLIのみ使用（GitHub API直接呼び出し不可）
+- G04: 対象はクローズ済みissue/PRのみ（オープン中は対象外）
+- G05: 同一期間への再実行時は、既に `backlog-extracted` コメントが付与されたissue/PRをスキップする（重複抽出防止）
+
+### 品質ゲート
+- G06: 解消チェックのマッチング範囲は title + body + comments のみ（commitsは対象外）
+
+### 委譲・参照制約
+- G07: `gh-cli-best-practices` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
+- G08: Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
+
+### 出力制約
+- G09: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- G10: レポートはMarkdownテーブル形式で構造化して提示する
