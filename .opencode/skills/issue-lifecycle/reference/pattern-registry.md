@@ -6,10 +6,10 @@ Issueラベルの定義、パターン判定、およびパターン固有の動
 
 | Pattern | 名称 | 付与ラベル | 規模 | docs/更新 | ワークフロー経路 |
 |---------|------|-----------|------|-----------|----------------|
-| A | バグ修正・軽微変更 | `bug`, `critical` | 小 | なし | issue-req → issue-create → issue-work → issue-close |
-| B | 機能追加 | `enhancement`, `feature` | 中 | あり | issue-req → issue-save-req → issue-create → issue-work → issue-close |
-| C | リファクタリング・保守作業 | `refactor`, `maintenance` | 小 | なし | issue-req → issue-create → issue-work → issue-close |
-| D | ドキュメント・雑務 | `docs`, `chore` | 小 | なし | issue-req → issue-create → issue-work → issue-close |
+| A | バグ修正・軽微変更 | `bug`, `critical` | 小 | 関連docs（矛盾時のみ） | issue-req → issue-create → issue-work → issue-close |
+| B | 機能追加 | `enhancement`, `feature` | 中 | あり（REQ/specs/ADR + 関連docs） | issue-req → issue-save-req → issue-create → issue-work → issue-close |
+| C | リファクタリング・保守作業 | `refactor`, `maintenance` | 小 | 関連docs（矛盾時のみ） | issue-req → issue-create → issue-work → issue-close |
+| D | ドキュメント・雑務 | `docs`, `chore` | 小 | 関連docs（矛盾時のみ） | issue-req → issue-create → issue-work → issue-close |
 
 ## 規模判定 (Pattern Bのみ)
 
@@ -69,13 +69,14 @@ Pattern A で ADR が必要な場合（`adr-guidelines` の閾値判定で「必
 | REQ ファイル | 作成しない | `issue-save-req` で作成 | 作成しない | 作成しない |
 | ADR ファイル | 必要に応じて | `issue-save-req` で作成 | 必要に応じて | 必要に応じて |
 | specs 更新 | スキップ | `issue-work` で更新 | スキップ | スキップ |
+| 関連ドキュメント更新 | `issue-work` で更新（矛盾する場合） | `issue-work` で更新（矛盾する場合） | `issue-work` で更新（矛盾する場合） | `issue-work` で更新（矛盾する場合） |
 | ドラフト保存 | しない | `.sisyphus/drafts/` に保存 | しない | しない |
 | issue-save-req | 実行不可 | 実行する | 実行不可 | 実行不可 |
 | ブランチ type | `fix` | `feature` | `refactor` | `chore` |
 | Issue テンプレート | `issue_desc_bug.md` | `issue_desc_feature.md` | `issue_desc_bug.md` ※ | `issue_desc_bug.md` ※ |
 | コメントテンプレート | `issue_comment_bug_analysis.md` | `issue_comment_feature_technical.md` | `issue_comment_bug_analysis.md` ※ | `issue_comment_bug_analysis.md` ※ |
 | close テンプレート | `issue_comment_bug_record.md` | `issue_comment_feature_implementation.md` | `issue_comment_bug_record.md` ※ | `issue_comment_bug_record.md` ※ |
-| docs 検証 (close) | スキップ | 実行する | スキップ | スキップ |
+| docs 検証 (close) | 関連ドキュメント整合性確認 | REQ/specs/ADR確認 + 関連ドキュメント整合性確認 | 関連ドキュメント整合性確認 | 関連ドキュメント整合性確認 |
 
 ### Pattern B 固有ルール: Epic (large)
 
