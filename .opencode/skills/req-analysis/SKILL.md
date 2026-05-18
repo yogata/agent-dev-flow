@@ -24,7 +24,7 @@ description: Provides requirement analysis methods with quality criteria and ADR
 - 具体的なアクション
 - ビジネス価値・目的
 
-### 受け入れ基準
+### 完了条件
 
 Given-When-Then形式で記述し、測定可能であること。
 

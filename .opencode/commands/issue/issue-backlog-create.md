@@ -79,14 +79,16 @@ load_skills:
 9. **Draft状態更新**: draftファイルの `status` を `approved` から `issued` に更新する。
 
 10. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
-    ```
-    ✅ バックログIssue作成が完了しました。
-      対象期間: {since} 〜 {until}
-      Epic Issue: #{N}
-      子Issue数: {M}件
-      ⚠️ コメント投稿失敗: #{失敗1}, #{失敗2}, ...（失敗がない場合はこの行は表示しない）
-      Draft状態: issued
-    ```
+     ```
+     ✅ バックログIssue作成が完了しました。
+       対象期間: {since} 〜 {until}
+       Epic: #{epic_N}
+       子Issue: #{child1}, #{child2}, ...（{count}件）
+       ステータス追跡: ☐ 未着手 {count}件
+       Draft状態: issued
+       ⚠️ コメント投稿失敗: #{失敗1}, #{失敗2}, ...（失敗がない場合はこの行は表示しない）
+       次のステップ: /issue/issue-work {child1} {child2} ...
+     ```
 
 ## Guardrails
 

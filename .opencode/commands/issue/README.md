@@ -18,6 +18,8 @@ description: issue コマンドセットの使用ガイド
 
 **ショートカット経路**: `/issue/issue-backlog` — 壁打ちから直接バックログ抽出を実行
 
+> **補足**: `/issue/issue-create` は壁打ち(①)と構造的実行(②)の境界に位置するコマンド（①→②境界）。要件docを入力としてGitHub Issueを出力する。
+
 ## 主要スキル
 
 ※ 各コマンドの load_skills が SSoT（Single Source of Truth）。以下は主要スキルの抜粋。
@@ -44,10 +46,10 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 | `/issue/issue-req` | 要件定義（壁打ち） | req-analysis, req-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting |
 | `/issue/issue-save-req` | REQ/ADR保存 | req-file-manager, adr-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting, conventional-commits |
 | `/issue/issue-create` | Issue登録 | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager, issue-template-manager |
-| `/issue/issue-work` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | req-analysis, spec-compliance, issue-lifecycle, issue-completion-reporting, issue-post-review-routing, git-worktree, gh-cli-best-practices, req-file-manager, adr-file-manager, conventional-commits, epic-status-tracker |
+| `/issue/issue-work` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | req-analysis, spec-compliance, issue-lifecycle, issue-completion-reporting, issue-post-review-routing, issue-work-orchestration, git-worktree, gh-cli-best-practices, req-file-manager, adr-file-manager, conventional-commits, epic-status-tracker |
 | `/issue/issue-update` | Issue更新 | issue-lifecycle, issue-completion-reporting, issue-post-review-routing, gh-cli-best-practices, req-file-manager, req-analysis, spec-compliance, issue-template-manager |
 | `/issue/issue-close` | 完了処理 | issue-lifecycle, issue-completion-reporting, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager, epic-status-tracker, issue-template-manager |
-| `/issue/issue-next` | 次コマンド推論（セッションコンテキストのみ参照） | issue-lifecycle, issue-post-review-routing |
+| `/issue/issue-next` | 次コマンド推論（セッションコンテキストのみ参照） | issue-lifecycle, issue-post-review-routing, spec-compliance, req-analysis |
 | `/issue/issue-backlog` | バックログ抽出（ショートカット経路） | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices |
 | `/issue/issue-backlog-create` | バックログIssue作成（Epic+子Issue作成、backlog-extractedコメント投稿） | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, issue-template-manager |
 
@@ -73,7 +75,8 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 
 ## テンプレート
 
-`templates/` ディレクトリに配置。詳細は `issue-template-manager` スキルを参照。
+- **Issue/PR description テンプレート**: `.opencode/skills/issue-template-manager/templates/` に配置。詳細は `issue-template-manager` スキルを参照。
+- **PR body テンプレート**: `.opencode/commands/issue/templates/pr_desc.md` に配置。
 
 | テンプレート | 用途 | ラベル |
 |---|---|---|
