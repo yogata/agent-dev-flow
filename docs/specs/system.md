@@ -40,7 +40,7 @@ tips-*コマンドは3つのコマンド + 2つの補助スキルで構成され
 - `inbox.md`: 未処理の学び（tips-add/tips-captureで追加）
 - `archive.md`: 生きている tips プール（未処分・保留中・再評価対象）。prune・elevate時pruneで動的に変化
 - `evaluation-report.md`: 評価済み中間レポート（毎回上書き、長期履歴ではない）
-- `elevation-staging/`: Requirement Source形式スタブファイル（背景/問題/望ましい変更/対象範囲/反映先候補テーブル/既存対策確認/制約/受け入れ条件/元tips/推奨Issue分類）。issue-req明示入力ファイル経由で実装に移行
+- `elevation-staging/`: Requirement Source形式スタブファイル（背景/問題/望ましい変更/対象範囲/反映先候補テーブル/既存対策確認/制約/完了条件/元tips/推奨Issue分類）。issue-req明示入力ファイル経由で実装に移行
 
 **反映ルート**: stagingスタブ（Requirement Source形式）→ `issue-req`（明示入力ファイル指定）→ `issue-save-req` → `issue-create` → `issue-work`
 
@@ -65,11 +65,11 @@ tips-*コマンドは3つのコマンド + 2つの補助スキルで構成され
 
 ### Issueテンプレートの完了条件セクション
 
-Issueテンプレート（`issue_desc_*.md`）に`完了条件`セクションを【必須】項目として配置する。位置は`受け入れ条件`セクションの直前とする。
+Issueテンプレート（`issue_desc_*.md`）に`完了条件`セクションを【必須】項目として配置する。
 
 **適用テンプレート**: `issue_desc_feature.md`, `issue_desc_bug.md`, `issue_desc_child.md`, `issue_desc_backlog_child.md`
 
-**Epicテンプレートの扱い**: `issue_desc_epic.md`, `issue_desc_backlog_epic.md`には`完了条件`セクションを追加せず、既存の`受け入れ条件`にEpic全体の完了判定条件としての明確化コメントを付与する。
+**Epicテンプレートの扱い**: `issue_desc_epic.md`, `issue_desc_backlog_epic.md`には`完了条件`セクションを追加せず、既存の`完了条件`にEpic全体の完了判定条件としての明確化コメントを付与する。
 
 **コマンドへの反映**: `issue-create`のguardrailで`完了条件`を必須セクションとして確認する。`issue-work`のStep 7で完了条件品質ゲートを実施し、完了判定はPlanではなく`完了条件`を参照する。
 

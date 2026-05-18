@@ -109,7 +109,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 学びの追加は Step 3 で通知前に実行される。ユーザー承認を待たずに直接追記する。
 
-> **注意**: `/tips-add` コマンドは旧形式（4フィールド）のインターフェースである。13フィールド形式のエントリを追加する場合は、直接 `docs/tips/inbox.md` に追記すること。
+> **注意**: `/tips-add` コマンドは旧形式（4フィールド）のインターフェースである。13フィールド形式のエントリは本スキル（`tips-capture`）が直接 `docs/tips/inbox.md` に追記する。`/tips-add` を経由しないこと。
 
 ### Step 5: 閾値チェック
 

@@ -123,7 +123,7 @@ Epic Issueを作成した場合は以下の報告を出力する。
 ## issue-close 完了時
 
 ```
-🎉 フロー完了しました。
+✅ issue-close 完了
   - Issue #{N} をクローズ
   - PR #{PR_N} をマージ
   - 関連リソースをクリーンアップ
@@ -136,10 +136,12 @@ Epic Issueを作成した場合は以下の報告を出力する。
 
 ```
 ✅ バックログ抽出が完了しました。
-  対象期間: {period}
+  対象期間: {since} 〜 {until}
   抽出件数: {N}件
   分類結果: {category_1}: {N1}件, {category_2}: {N2}件
-  ドラフト: .sisyphus/drafts/{draft_file}
+  バックログ作成対象: {Y}件（解消済み除外: {X}件）
+  ドラフト: .sisyphus/drafts/backlog-draft-{period-slug}.md
+  ステータス: approved
   次のステップ: /issue/issue-backlog-create
 ```
 
@@ -148,10 +150,13 @@ Epic Issueを作成した場合は以下の報告を出力する。
 ## issue-backlog-create 完了時
 
 ```
-✅ バックログIssueを作成しました。
-  Epic: {epic_URL}
+✅ バックログIssue作成が完了しました。
+  対象期間: {since} 〜 {until}
+  Epic: #{epic_N}
   子Issue: #{child1}, #{child2}, ...（{count}件）
   ステータス追跡: ☐ 未着手 {count}件
+  Draft状態: issued
+  ⚠️ コメント投稿失敗: #{失敗1}, #{失敗2}, ...（失敗がない場合はこの行は表示しない）
   次のステップ: /issue/issue-work {child1} {child2} ...
 ```
 

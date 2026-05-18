@@ -13,7 +13,7 @@ load_skills:
 
 # Issue登録
 
-要件定義（issue-req）の結果をもとにGitHub Issueを作成する。壁打ち→構造的実行フェーズの境界。
+要件定義（issue-req）の結果をもとにGitHub Issueを作成する。①バイブス壁打ち→②構造的実行フェーズの境界。
 
 ## Input
 
@@ -33,21 +33,21 @@ load_skills:
    **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てIssue本文に含まれること。`【任意】` セクションは内容がある場合のみ含める。必須セクションが欠落している場合、生成をやり直すこと。
 3. **規模判定によるフロー分岐**（Step 2の直後に実行）:
    - draft-metaの `scale` フィールドを確認
-   - `scale: large` の場合 → **Epic flow**（Step 3a〜3e）へ進む
+   - `scale: large` の場合 → **Epic flow**（Step 4〜8）へ進む
    - `scale: standard` または `scale` フィールドなしの場合 → **Standard flow**（Step 4〜）へ進む
-4. **[Epic flow] Step 3a**: テンプレート `issue_desc_epic.md` を Read tool で読み込む
+4. **[Epic flow]**: テンプレート `issue_desc_epic.md` を Read tool で読み込む
    **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てEpic Issue本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-5. **[Epic flow] Step 3b**: Epic Issue本文を生成:
+5. **[Epic flow]**: Epic Issue本文を生成:
    - REQ内容から `{summary}`, `{problem}`, `{solution}` を埋める
    - draft-metaの `decomposition` から分解テーブルを生成（子Issue番号は後で更新するためプレースホルダー `#{TBD}`）
    - ステータス追跡テーブル: 全子件数を `{total}` に設定、進行中/完了は0
    - `{completion_criteria}` は要件docから抽出
-6. **[Epic flow] Step 3c**: Epic Issueを作成:
+6. **[Epic flow]**: Epic Issueを作成:
    - ラベル: `enhancement`, `feature`, `epic`
    - `gh-cli-best-practices` に従って `--body-file` 使用
    - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
    - 作成されたIssue番号を `{epic_number}` として記録
-  7. **[Epic flow] Step 3d**: 各子Issueを作成（decompositionの順に処理）:
+7. **[Epic flow]**: 各子Issueを作成（decompositionの順に処理）:
    - テンプレート `issue_desc_child.md` を Read tool で読み込む
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全て子Issue本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
    - 子Issue本文を生成: `Parent: #{epic_number}` を先頭行に配置
@@ -56,7 +56,7 @@ load_skills:
    - `gh-cli-best-practices` に従って `--body-file` 使用
     - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
     - 作成されたIssue番号を記録
-8. **[Epic flow] Step 3e**: Epic Issue本文を更新:
+8. **[Epic flow]**: Epic Issue本文を更新:
    - 分解テーブルの `#{TBD}` を実際の子Issue番号に置換
    - ステータス追跡テーブルの件数を更新
    - `gh issue edit` でEpic本文を更新（`--body-file` 使用）

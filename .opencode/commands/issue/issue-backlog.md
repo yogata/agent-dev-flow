@@ -122,14 +122,16 @@ Issue作成は `issue-backlog-create` コマンドで行う。
    - **差し戻し**: 調整内容をドラフトに反映してレポートを再提示（`status` は `draft` のまま維持）
 
 10. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
-    ```
-    ✅ バックログ抽出が完了しました。
-      対象期間: {since} 〜 {until}
-      ドラフト保存先: .sisyphus/drafts/backlog-draft-{period-slug}.md
-      ステータス: approved
-      バックログ作成対象: {Y}件（解消済み除外: {X}件）
-      次のステップ: `/issue/issue-backlog-create` でIssueを作成してください
-    ```
+     ```
+     ✅ バックログ抽出が完了しました。
+       対象期間: {since} 〜 {until}
+       抽出件数: {N}件
+       分類結果: {category_1}: {N1}件, {category_2}: {N2}件
+       バックログ作成対象: {Y}件（解消済み除外: {X}件）
+       ドラフト: .sisyphus/drafts/backlog-draft-{period-slug}.md
+       ステータス: approved
+       次のステップ: /issue/issue-backlog-create
+     ```
 
 ## Guardrails
 

@@ -18,7 +18,7 @@
 | --------------------- | ---------------------- | --------------------------------- | -------------------- |
 | `/issue/issue-req`           | セッション会話         | 要件doc                           | 壁打ち     |
 | `/issue/issue-save-req`      | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR, docs index | 壁打ち     |
-| `/issue/issue-create`        | 要件doc, specs READ, ADR READ | GitHub Issue                      | 構造的実行         |
+| `/issue/issue-create`        | 要件doc, specs READ, ADR READ | GitHub Issue                      | ①→②境界         |
 | `/issue/issue-work`          | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ   | レビュー完了       |
 | `/issue/issue-update`        | GitHub Issue           | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし            |
 | `/issue/issue-close`         | GitHub Issue + PR      | なし                              | レビュー完了       |
