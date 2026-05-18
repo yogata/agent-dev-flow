@@ -20,6 +20,7 @@
   - [REQ-0013: issue-backlog 承認フロー分割と解消済み確認機能](requirements/REQ-0013.md)
   - [REQ-0014: issue-work 自律修正ループと責務分離の明確化](requirements/REQ-0014.md)
   - [REQ-0015: 関連ドキュメントの要件達成対象化](requirements/REQ-0015.md)
+  - [REQ-0016: Command/Skill/Template/Script責任分界とtips要件ソース化](requirements/REQ-0016.md)
 
 ## Specifications
 
@@ -34,6 +35,9 @@
 アーキテクチャ決定記録。
 
 - [ADR Index](adr/README.md) — 設計判断の記録一覧
+  - [ADR-0001: Command/Skill/Template/Script責任分界の正式定義](adr/ADR-0001.md)
+  - [ADR-0002: Orchestration skill作成基準の導入](adr/ADR-0002.md)
+  - [ADR-0003: issue-req入力の抽象化](adr/ADR-0003.md)
 
 ## Tips
 
