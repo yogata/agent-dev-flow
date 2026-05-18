@@ -5,6 +5,7 @@ load_skills:
   - issue-lifecycle
   - issue-completion-reporting
   - gh-cli-best-practices
+  - issue-template-manager
 ---
 
 # バックログIssue作成
@@ -77,7 +78,7 @@ load_skills:
 
 9. **Draft状態更新**: draftファイルの `status` を `approved` から `issued` に更新する。
 
-10. **完了報告** → `issue-reporting` の完了報告フォーマットに従って出力:
+10. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
     ```
     ✅ バックログIssue作成が完了しました。
       対象期間: {since} 〜 {until}

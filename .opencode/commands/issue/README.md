@@ -43,12 +43,13 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 |---|---|---|
 | `/issue/issue-req` | 要件定義（壁打ち） | req-analysis, req-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting |
 | `/issue/issue-save-req` | REQ/ADR保存 | req-file-manager, adr-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting, conventional-commits |
-| `/issue/issue-create` | Issue登録 | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager |
+| `/issue/issue-create` | Issue登録 | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager, issue-template-manager |
 | `/issue/issue-work` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | req-analysis, spec-compliance, issue-lifecycle, issue-completion-reporting, issue-post-review-routing, git-worktree, gh-cli-best-practices, req-file-manager, adr-file-manager, conventional-commits, epic-status-tracker |
-| `/issue/issue-update` | Issue更新 | issue-lifecycle, issue-completion-reporting, issue-post-review-routing, gh-cli-best-practices, req-file-manager, req-analysis, spec-compliance |
-| `/issue/issue-close` | 完了処理 | issue-lifecycle, issue-completion-reporting, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager, epic-status-tracker |
+| `/issue/issue-update` | Issue更新 | issue-lifecycle, issue-completion-reporting, issue-post-review-routing, gh-cli-best-practices, req-file-manager, req-analysis, spec-compliance, issue-template-manager |
+| `/issue/issue-close` | 完了処理 | issue-lifecycle, issue-completion-reporting, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager, epic-status-tracker, issue-template-manager |
 | `/issue/issue-next` | 次コマンド推論（セッションコンテキストのみ参照） | issue-lifecycle, issue-post-review-routing |
 | `/issue/issue-backlog` | バックログ抽出（ショートカット経路） | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices |
+| `/issue/issue-backlog-create` | バックログIssue作成（Epic+子Issue作成、backlog-extractedコメント投稿） | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, issue-template-manager |
 
 ## 基本フロー
 
@@ -68,6 +69,7 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 - `/issue/issue-close` — [issue-close.md](./issue-close.md)
 - `/issue/issue-next` — [issue-next.md](./issue-next.md)
 - `/issue/issue-backlog` — [issue-backlog.md](./issue-backlog.md)
+- `/issue/issue-backlog-create` — [issue-backlog-create.md](./issue-backlog-create.md)
 
 ## テンプレート
 
