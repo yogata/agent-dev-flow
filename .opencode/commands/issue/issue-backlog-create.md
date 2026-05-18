@@ -90,7 +90,7 @@ load_skills:
 
 ## Guardrails
 
-- ①バイブス壁打ちフェーズのショートカット経路（実装コード禁止）
+- 壁打ちフェーズのショートカット経路（実装コード禁止）
 - `gh-cli-best-practices` に従って `--body-file` 使用（`--body` 直接指定禁止）
 - データ取得は `gh` CLIのみ使用（GitHub API直接呼び出し不可）
 - コメント投稿失敗時もEpic + 子Issue作成は成功扱いとし、失敗番号を完了報告に含める

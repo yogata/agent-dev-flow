@@ -12,7 +12,7 @@ load_skills:
 
 # 要件保存（壁打ち→docs永続化）
 
-issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとしてdocs/に保存し、コミット・プッシュする。①バイブス壁打ちフェーズで使用（パターンBのみ）。
+issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとしてdocs/に保存し、コミット・プッシュする。壁打ちフェーズで使用（パターンBのみ）。
 
 ## Input
 
