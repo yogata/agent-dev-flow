@@ -8,23 +8,23 @@
 
 | マクロフェーズ       | 使用可能なコマンド                                      | 役割                         |
 | -------------------- | ------------------------------------------------------- | ---------------------------- |
-| ①バイブス壁打ち      | `issue-req`, `issue-save-req`, `issue-backlog`, `issue-backlog-create`, `issue-next`        | 要件壁打ち・分析・docs保存・バックログ抽出 |
-| ②構造的実行          | `issue-create`, `issue-work`（並列対応）, `issue-update`, `issue-next`            | Issue作成・実装・進捗記録    |
-| ③レビュー完了        | `issue-next`, `issue-close`                             | 次アクション推論・完了処理   |
+| ①バイブス壁打ち      | `/issue/issue-req`, `/issue/issue-save-req`, `/issue/issue-backlog`, `/issue/issue-backlog-create`, `/issue/issue-next`        | 要件壁打ち・分析・docs保存・バックログ抽出 |
+| ②構造的実行          | `/issue/issue-create`, `/issue/issue-work`（並列対応）, `/issue/issue-update`, `/issue/issue-next`            | Issue作成・実装・進捗記録    |
+| ③レビュー完了        | `/issue/issue-next`, `/issue/issue-close`                             | 次アクション推論・完了処理   |
 
 ## コマンド詳細
 
 | コマンド              | 入力SSoT               | 出力SSoT                          | 完了後マクロフェーズ |
 | --------------------- | ---------------------- | --------------------------------- | -------------------- |
-| `issue-req`           | セッション会話         | 要件doc                           | ①バイブス壁打ち     |
-| `issue-save-req`      | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR, docs index | ①バイブス壁打ち     |
-| `issue-create`        | 要件doc, specs READ, ADR READ | GitHub Issue                      | ②構造的実行         |
-| `issue-work`          | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ   | ③レビュー完了       |
-| `issue-update`        | GitHub Issue           | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし            |
-| `issue-close`         | GitHub Issue + PR      | なし                              | ③レビュー完了       |
-| `issue-backlog`       | ユーザー期間指定       | バックログdraft（.sisyphus/drafts/） | ①バイブス壁打ち     |
-| `issue-backlog-create` | backlog draft (approved) | Epic + 子Issue（backlog template）+ backlog-extracted コメント | ①バイブス壁打ち     |
-| `issue-next`          | 複数                   | 適切なコマンド実行                 | 依存                |
+| `/issue/issue-req`           | セッション会話         | 要件doc                           | ①バイブス壁打ち     |
+| `/issue/issue-save-req`      | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR, docs index | ①バイブス壁打ち     |
+| `/issue/issue-create`        | 要件doc, specs READ, ADR READ | GitHub Issue                      | ②構造的実行         |
+| `/issue/issue-work`          | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ   | ③レビュー完了       |
+| `/issue/issue-update`        | GitHub Issue           | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし            |
+| `/issue/issue-close`         | GitHub Issue + PR      | なし                              | ③レビュー完了       |
+| `/issue/issue-backlog`       | ユーザー期間指定       | バックログdraft（.sisyphus/drafts/） | ①バイブス壁打ち     |
+| `/issue/issue-backlog-create` | backlog draft (approved) | Epic + 子Issue（backlog template）+ backlog-extracted コメント | ①バイブス壁打ち     |
+| `/issue/issue-next`          | 複数                   | 適切なコマンド実行                 | 依存                |
 
 ## 参照フロー
 
@@ -32,34 +32,34 @@
 
 | コマンド | specs | ADR | REQ |
 |----------|-------|-----|-----|
-| `issue-req` | — | — | READ |
-| `issue-save-req` | — | WRITE | WRITE |
-| `issue-create` | READ | READ | READ |
-| `issue-work` | READ+WRITE | READ | READ |
-| `issue-close` | — | — | READ |
-| `issue-update` | — | — | READ+WRITE |
-| `issue-backlog` | — | — | — |
-| `issue-backlog-create` | — | — | — |
-| `issue-next`          | — | — | — |
+| `/issue/issue-req` | — | — | READ |
+| `/issue/issue-save-req` | — | WRITE | WRITE |
+| `/issue/issue-create` | READ | READ | READ |
+| `/issue/issue-work` | READ+WRITE | READ | READ |
+| `/issue/issue-close` | — | — | READ |
+| `/issue/issue-update` | — | — | READ+WRITE |
+| `/issue/issue-backlog` | — | — | — |
+| `/issue/issue-backlog-create` | — | — | — |
+| `/issue/issue-next`          | — | — | — |
 
 ## データフロー図
 
 ```
-issue-req(draft WRITE) → issue-save-req(REQ WRITE, ADR WRITE) → issue-create(specs READ, ADR READ) → issue-work(specs READ+WRITE, ADR READ) → TDD実装 → specs更新 → issue-close(VERIFY)
-issue-backlog(draft WRITE) → issue-backlog-create(Epic + 子Issue作成, backlog-extracted コメント投稿)
-issue-work(並列: 複数Issue → Wave実行 → specs直列更新) → 各PR作成
+/issue/issue-req(draft WRITE) → /issue/issue-save-req(REQ WRITE, ADR WRITE) → /issue/issue-create(specs READ, ADR READ) → /issue/issue-work(specs READ+WRITE, ADR READ) → TDD実装 → specs更新 → /issue/issue-close(VERIFY)
+/issue/issue-backlog(draft WRITE) → /issue/issue-backlog-create(Epic + 子Issue作成, backlog-extracted コメント投稿)
+/issue/issue-work(並列: 複数Issue → Wave実行 → specs直列更新) → 各PR作成
 ```
 
-- **issue-req**: 要件docを壁打ちで構築し、パターンBの場合はドラフトを保存する（draft WRITE）
-- **issue-backlog**: クローズ済みissue/PRから残課題を抽出・分類し、解消チェック後にdraftとして保存する（ショートカット経路、specs/ADR/REQアクセスなし）
-- **issue-backlog-create**: 承認済みバックログdraftを読み込み、`issue_desc_backlog_epic.md` / `issue_desc_backlog_child.md` テンプレートでEpic + 子Issueを作成し、`backlog-extracted` コメントを投稿する（specs/ADR/REQアクセスなし）
-- **issue-create**: specs・ADRを読み込んでIssue本文に反映する（READ）
-- **issue-work**: specs・ADRを読み込んで実装計画を立て、実装後にspecsを更新する（READ+WRITE）
-- **issue-close**: REQを参照して完了確認・クリーンアップを行う（READ）
+- **/issue/issue-req**: 要件docを壁打ちで構築し、パターンBの場合はドラフトを保存する（draft WRITE）
+- **/issue/issue-backlog**: クローズ済みissue/PRから残課題を抽出・分類し、解消チェック後にdraftとして保存する（ショートカット経路、specs/ADR/REQアクセスなし）
+- **/issue/issue-backlog-create**: 承認済みバックログdraftを読み込み、`issue_desc_backlog_epic.md` / `issue_desc_backlog_child.md` テンプレートでEpic + 子Issueを作成し、`backlog-extracted` コメントを投稿する（specs/ADR/REQアクセスなし）
+- **/issue/issue-create**: specs・ADRを読み込んでIssue本文に反映する（READ）
+- **/issue/issue-work**: specs・ADRを読み込んで実装計画を立て、実装後にspecsを更新する（READ+WRITE）
+- **/issue/issue-close**: REQを参照して完了確認・クリーンアップを行う（READ）
 
 ## 並列実行パターン
 
-`issue-work` は複数Issueの並列実行をサポートする。依存関係に基づくWave実行モデルを採用。
+`/issue/issue-work` は複数Issueの並列実行をサポートする。依存関係に基づくWave実行モデルを採用。
 
 ### 実行モデル
 
@@ -100,8 +100,8 @@ L2（ファイル衝突）を検知した場合、以下の措置を講じる。
 ## 参照フロー図（更新）
 
 ```
-issue-work(単一: specs READ+WRITE, ADR READ) → TDD実装 → specs更新
-issue-work(並列: 複数Issue → Wave実行 → specs直列更新) → 各PR作成
+/issue/issue-work(単一: specs READ+WRITE, ADR READ) → TDD実装 → specs更新
+/issue/issue-work(並列: 複数Issue → Wave実行 → specs直列更新) → 各PR作成
 ```
 
 ## 参照
