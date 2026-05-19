@@ -132,7 +132,7 @@ issue-*ワークフローで操作する docs/ の5区分構造。
 | 区分 | パス | 役割 | 自動操作コマンド |
 |------|------|------|----------------|
 | guides/ | 開発ガイド（参照のみ） | setup.md, api-reference.md, testing-and-debugging.md | — |
-| requirements/ | 要件管理（目的/要件/適用範囲） | README.md + REQ-{NNNN}.md | issue-save-req(CREATE), issue-create(READ), issue-update(UPDATE) |
+| requirements/ | 要件管理（目的/要件/適用範囲） | README.md + INDEX.md（generated）+ core.md（暫定area）+ {area}.md + REQ-{NNNN}.md（移行対象） | issue-save-req(CREATE), issue-create(READ), issue-update(UPDATE) |
 | adr/ | ADR | README.md + ADR-{NNNN}.md | adr-guidelines(CREATE) |
 | specs/ | システム仕様 | system.md, patterns.md | issue-work(READ+WRITE), issue-close(VERIFY) |
 | tips/ | 学び | inbox.md + *.md | tips-add(UPDATE), tips-refactor(CREATE) |

@@ -96,7 +96,8 @@ load_skills:
    - 関連REQがある場合: 該当REQの内容（目的・要件・適用範囲）を壁打ちコンテキストに即時反映し、ユーザーとともに変更点を深掘り
    - 操作分類を確定: `CREATE`（該当REQなし）、`APPEND`（既存REQへの要件行追加）、`UPDATE`（既存REQの内容修正）
    - 複数REQが該当する場合、それぞれに対する操作を個別に指定
-   - 分類結果は `draft-meta` の `req-operation` と `target-req` に記録
+    - 分類結果は `draft-meta` の `req-operation` と `target-req` に記録
+    ※ area-based構造では、REQは area file 内に配置される。現在は per-file（REQ-{NNNN}.md）構造で照合を実施する
  4. 要件を展開 → `req-analysis` の分析観点に従って網羅（照合で取得した関連REQの内容を反映）
  5. ADR閾値以上の技術判断が発生した場合 → `adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は issue-save-req で実行）
  6. 要件doc形式で生成 → テンプレート: `.opencode/skills/req-file-manager/templates/doc_requirement.md` を Read tool で読み込み、目的/要件/適用範囲の構造に従って内容を構造化

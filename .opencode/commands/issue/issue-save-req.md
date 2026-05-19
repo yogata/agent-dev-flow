@@ -32,6 +32,7 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
 3. ドラフト検証: `draft-meta` セクションの必須フィールド（pattern, req-operation, topic-slug）が存在することを確認。欠損時はエラーで中止
 4. REQ ファイル操作 → `req-file-manager` の判定ロジックと採番ルールに従って実行。ドラフトに複数の `req-operation` + `target-req` ペアが含まれる場合は、各ペアを順次処理する（バルクUPDATE対応）:
     - **CREATE**: テンプレート適用（目的/要件/適用範囲構造）、最大REQ番号+1で採番、`docs/requirements/REQ-{NNNN}.md` に保存
+      ※ area-based構造の将来標準に対応するため、REQファイルは area file（{area}.md）内のセクションとしても管理される予定。現在は per-file（REQ-{NNNN}.md）構造で運用する
       **テンプレート準拠検証**: 生成されたREQファイルに `doc_requirement.md` の【必須】セクション（目的、要件、適用範囲）が全て含まれていることを確認すること。frontmatterの必須フィールド（id, title, created）の存在も確認すること。
     - **APPEND**: 既存REQファイルの要件テーブルに行を追加、frontmatter updated 更新
     - **UPDATE**: 既存REQファイルの該当セクション（目的/要件/適用範囲）を更新、frontmatter updated 更新
