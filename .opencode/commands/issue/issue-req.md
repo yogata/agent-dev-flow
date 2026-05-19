@@ -95,7 +95,8 @@ load_skills:
    - `docs/requirements/REQ-*.md` をスキャンし、ユーザーの要件と既存REQの関連性を推論（タイトル・タグ・目的・要件内容の重み付けによる総合判定）
    - 関連REQがある場合: 該当REQの内容（目的・要件・適用範囲）を壁打ちコンテキストに即時反映し、ユーザーとともに変更点を深掘り
    - 操作分類を確定: `CREATE`（該当REQなし）、`APPEND`（既存REQへの要件行追加）、`UPDATE`（既存REQの内容修正）
-   - 複数REQが該当する場合、それぞれに対する操作を個別に指定
+    - 複数REQが該当する場合、それぞれに対する操作を個別に指定
+    - SPLIT（要件の分割）が検出された場合: SPLIT は保存操作ではなく requirements review / follow-up 候補として扱う。保存可能範囲（CREATE/APPEND/UPDATE）は通常通り実行する
     - 分類結果は `draft-meta` の `req-operation` と `target-req` に記録
     ※ area-based構造では、REQは area file 内に配置される。現在は per-file（REQ-{NNNN}.md）構造で照合を実施する
  4. 要件を展開 → `req-analysis` の分析観点に従って網羅（照合で取得した関連REQの内容を反映）
