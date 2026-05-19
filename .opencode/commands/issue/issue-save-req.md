@@ -54,15 +54,20 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
 
 ## Guardrails
 
-- **ファイル編集スコープ**: 以下のパスのみ作成・編集を許可:
-  - `docs/requirements/**`（REQファイル）
-  - `docs/adr/**`（ADR）
-  - `docs/README.md`（ドキュメントハブ）
-  - `.sisyphus/drafts/**`（ドラフトstatus更新用）
-- **上記以外のファイル作成・編集は禁止**
-- パターンAの場合は実行不可（エラーで中止）
-- ドラフトファイルが存在しない場合は実行不可（エラーで中止）
-- REQ番号は連番・一意であること（空き番号の再利用禁止）→ `req-file-manager` に従う
-- サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
-- 要件doc構造は `doc_requirement.md` テンプレートに厳密に従うこと。【必須】セクションの欠落は禁止
+### フェーズ制約
+- G01: パターンAの場合は実行不可（エラーで中止）
+
+### ファイル操作制約
+- G02: ファイル編集スコープ: 以下のパスのみ作成・編集を許可: `docs/requirements/**`（REQファイル）、`docs/adr/**`（ADR）、`docs/README.md`（ドキュメントハブ）、`.sisyphus/drafts/**`（ドラフトstatus更新用）
+- G03: 上記以外のファイル作成・編集は禁止
+
+### 品質ゲート
+- G04: ドラフトファイルが存在しない場合は実行不可（エラーで中止）
+- G05: REQ番号は連番・一意であること（空き番号の再利用禁止）→ `req-file-manager` に従う
+- G06: 要件doc構造は `doc_requirement.md` テンプレートに厳密に従うこと。【必須】セクションの欠落は禁止
+
+### 委譲・参照制約
+- G07: Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
+
+### 出力制約
+- G08: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
