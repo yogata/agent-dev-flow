@@ -68,4 +68,62 @@
 
 **Script** は決定的でテスト可能な処理を担う。validation・transformation・generation・formatting等の純粋関数・決定的処理に限定し、非決定的な処理（API呼び出し・ユーザー対話）は含めない。
 
-この分離の意図は、**Commandの肥大化防止**と**再利用性の最大化**にある。Commandが薄いdispatcherに徹することで、新しいCommandの追加・既存Commandの変更コストを最小化する。詳細は `artifact-boundaries.md`（REQ-0016-001〜007）を参照。
+この分離の意図は、**Commandの肥大化防止**と**再利用性の最大化**にある。Commandが薄いdispatcherに徹することで、新しいCommandの追加・既存Commandの変更コストを最小化する。
+
+### Command
+
+**置くもの**:
+- ユーザー向け入口
+- Input / Output
+- 高レベル Steps（5〜12個）
+- 使用する Skill（frontmatter load_skills + Steps 内参照）
+- 成果物の読み書き対象
+- command 固有 Guardrails
+
+**置かないもの**:
+- 大きな状態機械
+- 詳細な判定表
+- schema
+- template
+- script
+- 共通安全手順
+- 複数 command で使う workflow protocol
+
+### Skill
+
+**置くもの**:
+- 再利用可能な判断基準
+- domain knowledge
+- workflow protocol
+- safety protocol
+- テンプレート選定ルール
+- owner artifact の構造定義
+
+### Template
+
+**置くもの**:
+- 出力構造
+- 見出し
+- 必須/任意マーカー
+- プレースホルダー
+
+### Script
+
+**置くもの**:
+- 採番
+- validation
+- INDEX 生成
+- Markdown 更新
+- 整合性チェック
+
+### Orchestration skill 作成判断基準
+
+`1 command = 1 orchestration skill` は原則としない。以下のいずれかを満たす場合にのみ orchestration skill 化を認める:
+
+- 大きな状態機械を持つ
+- 再開ポイント検出が必要
+- CI loop を含む
+- Wave scheduling を含む
+- サブエージェント protocol を含む
+
+詳細は `artifact-boundaries.md`（REQ-0016-001〜007）を参照。
