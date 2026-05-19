@@ -38,6 +38,7 @@
   - [ADR-0001: Command/Skill/Template/Script責任分界の正式定義](adr/ADR-0001.md)
   - [ADR-0002: Orchestration skill作成基準の導入](adr/ADR-0002.md)
   - [ADR-0003: issue-req入力の抽象化](adr/ADR-0003.md)
+  - [ADR-0004: 要件管理構造のarea-based移行方針](adr/ADR-0004.md)
 
 ## Tips
 
