@@ -14,6 +14,7 @@ load_skills:
   - adr-file-manager
   - conventional-commits
   - epic-status-tracker
+  - issue-template-manager
 ---
 
 # 実装パイプライン
@@ -113,7 +114,7 @@ Issueに対して計画立案から実装・コミットまでを一気通貫で
   - 検証成功時のみ11bへ進む
   - 検証失敗時: `issue-work-orchestration` のSelf-Healing Loopに従い自律修正（最大3回、停止条件に該当時は即座に停止・ユーザー報告）
 
-- **11b: PR作成**: `gh pr create` を `gh-cli-best-practices` に従って `--body-file` で実行。PR本文は `.opencode/commands/issue/templates/pr_desc.md` テンプレートに従い、【必須】セクション（概要・実装内容・テスト結果・品質メトリクス・Closes）が全て含まれることを確認。書き込み後にVERIFY操作で内容検証。べき等チェック: PR既存時は作成スキップして11cへ
+- **11b: PR作成**: `gh pr create` を `gh-cli-best-practices` に従って `--body-file` で実行。PR本文は `.opencode/skills/issue-template-manager/templates/pr_desc.md` テンプレートに従い、【必須】セクション（概要・実装内容・テスト結果・品質メトリクス・Closes）が全て含まれることを確認。書き込み後にVERIFY操作で内容検証。べき等チェック: PR既存時は作成スキップして11cへ
 
 - **11c: デプロイ検証**: `issue-work-orchestration` のCI / Review 対応 Loopに従いデプロイ検証を実行。CI失敗時はSelf-Healing Loopに従い自律修正（最大3回）
 
