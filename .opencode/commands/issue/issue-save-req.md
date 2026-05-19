@@ -25,6 +25,8 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
 - `docs/README.md`（ドキュメントハブ更新）
 - `docs/adr/ADR-{NNNN}.md`（ADR判断がある場合のみ）
 
+**注記**: area-based構造は将来標準であり、現時点の `issue-save-req` は per-file 構造（`REQ-{NNNN}.md`）へ保存する。`{area}.md` への直接保存および `INDEX.md` の生成・更新は行わない。
+
 ## Steps
 
 1. 事前チェック: `draft-meta` セクションの `pattern` を確認 → パターンA（バグ修正・軽微変更）の場合は即座に中止し、エラーメッセージを表示: `パターンAでは issue-save-req は不要です。直接 /issue/issue-create を実行してください。`
@@ -37,6 +39,7 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
     - **APPEND**: 既存REQファイルの要件テーブルに行を追加、frontmatter updated 更新
     - **UPDATE**: 既存REQファイルの該当セクション（目的/要件/適用範囲）を更新、frontmatter updated 更新
     - **バルク処理**: 複数REQファイルのUPDATEが指示されている場合、各REQファイルに対して上記UPDATE手順を順次実行する。全UPDATEの整合性（REQ番号の重複なし、frontmatterの一貫性）を最後に一括で検証する
+    - **SPLIT検出時**: 要件の膨張・関心分離により SPLIT が必要と判定された場合でも、CREATE/APPEND/UPDATE の保存可能範囲を実行し、保存全体を中止しない。SPLIT 対象は完了報告で follow-up として明示する
 5. インデックス・ハブ更新:
    - **docs/requirements/README.md**: CREATE時は新規行を追加、APPEND/UPDATE時は該当REQのtitle列をfrontmatter値に合わせて更新
    - **docs/README.md**: CREATE時は新規リンクをREQ番号順の正しい位置に挿入、APPEND/UPDATE時は該当REQのリンクテキスト（タイトル変更時のみ）を更新
@@ -51,6 +54,10 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
     ✅ 要件をdocs/に保存しました（REQ-{NNNN} を{CREATE/APPEND/UPDATE}）。
       {ADR作成がある場合: ADR-{NNNN} を作成しました。}
       次のステップ: /issue/issue-create
+    ```
+    SPLIT が必要な場合、完了報告に以下を追加:
+    ```
+    ⚠️ SPLIT候補: REQ-{NNNN} の要件が膨張・関心分離の基準に該当。別Issueでの review/follow-up を推奨。
     ```
 
 ## Guardrails
