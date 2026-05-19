@@ -75,8 +75,7 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 
 ## テンプレート
 
-- **Issue/PR description テンプレート**: `.opencode/skills/issue-template-manager/templates/` に配置。詳細は `issue-template-manager` スキルを参照。
-- **PR body テンプレート**: `.opencode/commands/issue/templates/pr_desc.md` に配置。
+- **Issue/PR description テンプレート**: `.opencode/skills/issue-template-manager/templates/` に配置（PR本文テンプレート含む）。詳細は `issue-template-manager` スキルを参照。
 
 | テンプレート | 用途 | ラベル |
 |---|---|---|
