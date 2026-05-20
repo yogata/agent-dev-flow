@@ -1,68 +1,93 @@
 # コマンド関連マップ
 
-各マクロフェーズで使用可能なコマンドと入出力SSoT、並列実行パターンを定義する。
+AgentDevFlow の代表的な次ステップ参照情報。状態遷移エンジンとして扱わず、各フェーズで使用可能なコマンドのガイドとして利用する（REQ-0017-043）。
 
-## コマンド関連マップ
+## ワークフロールート
 
-各マクロフェーズで使用可能なコマンドを定義する。
+### req/case パイプライン（開発ワークフロー）
 
-| マクロフェーズ       | 使用可能なコマンド                                      | 役割                         |
-| -------------------- | ------------------------------------------------------- | ---------------------------- |
-| 壁打ち      | `/issue/issue-req`, `/issue/issue-save-req`, `/issue/issue-backlog`, `/issue/issue-backlog-create`, `/issue/issue-next`        | 要件壁打ち・分析・docs保存・バックログ抽出 |
-| 構造的実行          | `/issue/issue-create`, `/issue/issue-work`（並列対応）, `/issue/issue-update`, `/issue/issue-next`            | Issue作成・実装・進捗記録    |
-| レビュー完了        | `/issue/issue-next`, `/issue/issue-close`                             | 次アクション推論・完了処理   |
+**Pattern A（バグ修正）**: `req-define` → `case-open` → `case-run` → `case-close`
+**Pattern B（機能追加）**: `req-define` → `req-save` → `case-open` → `case-run` → `case-close`
+
+| マクロフェーズ | コマンド | 役割 |
+|---|---|---|
+| 壁打ち | `/agentdev/req-define` | 要件壁打ち・分析 |
+| 壁打ち | `/agentdev/req-save` | 要件doc保存（Pattern B のみ） |
+| 壁打ち→構造的実行境界 | `/agentdev/case-open` | Issue登録（Epic + 子Issue一括作成対応） |
+| 構造的実行 | `/agentdev/case-run` | 実装パイプライン（3フェーズ構成: 準備→実装→提出） |
+| 構造的実行・レビュー完了 | `/agentdev/case-update` | Issue更新（REQ/コメント/レビューNG対応） |
+| レビュー完了 | `/agentdev/case-close` | 完了処理（PRマージ・記録追記・ブランチ削除） |
+
+### learning パイプライン（学びの蓄積・分析・昇華）
+
+**基本フロー**: 学び発生 → `learning-capture`（スキル）→ `learning-refine` → `learning-promote` → `req-define`（明示入力ファイル）
+
+| コマンド | 役割 |
+|---|---|
+| `/agentdev/learning-refine` | 問題クラス分類→8軸評価→archive移動 |
+| `/agentdev/learning-promote` | 昇華判定→Requirement Source staging stub生成 |
+
+**反映ルート**: stagingスタブ → `req-define`（明示入力ファイル指定）→ `req-save` → `case-open` → `case-run`
+
+### intake ワークフロー（気づき・課題の収集）
+
+**基本フロー**: 気づき発生 → `intake-capture` / `intake-from-github` → `intake-review` → `intake-promote` → learning パイプライン
+
+| コマンド | 役割 |
+|---|---|
+| `/agentdev/intake-capture` | 手動で気づき・課題を inbox.md に記録 |
+| `/agentdev/intake-from-github` | GitHub Issue/PR/コメントから改善候補を自動抽出 |
+| `/agentdev/intake-review` | inbox の未処理エントリを一括レビューし処分判定 |
+| `/agentdev/intake-promote` | 昇華候補を learning パイプラインの入力に変換 |
+
+### integrity ワークフロー
+
+| コマンド | 役割 |
+|---|---|
+| `/agentdev/integrity-check` | ドキュメント・スキル・コマンドの整合性を検証 |
 
 ## コマンド詳細
 
-| コマンド              | 入力SSoT               | 出力SSoT                          | 完了後マクロフェーズ |
-| --------------------- | ---------------------- | --------------------------------- | -------------------- |
-| `/issue/issue-req`           | セッション会話         | 要件doc                           | 壁打ち     |
-| `/issue/issue-save-req`      | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR, docs index | 壁打ち     |
-| `/issue/issue-create`        | 要件doc, specs READ, ADR READ | GitHub Issue                      | ①→②境界         |
-| `/issue/issue-work`          | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ   | レビュー完了       |
-| `/issue/issue-update`        | GitHub Issue           | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし            |
-| `/issue/issue-close`         | GitHub Issue + PR      | なし                              | レビュー完了       |
-| `/issue/issue-backlog`       | ユーザー期間指定       | バックログdraft（.sisyphus/drafts/） | 壁打ち     |
-| `/issue/issue-backlog-create` | backlog draft (approved) | Epic + 子Issue（backlog template）+ backlog-extracted コメント | 壁打ち     |
-| `/issue/issue-next`          | 複数                   | 適切なコマンド実行                 | 依存                |
+| コマンド | 入力SSoT | 出力SSoT | 完了後マクロフェーズ |
+|---|---|---|---|
+| `/agentdev/req-define` | セッション会話 | 要件doc | 壁打ち |
+| `/agentdev/req-save` | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR, docs index | 壁打ち |
+| `/agentdev/case-open` | 要件doc, specs READ, ADR READ | GitHub Issue | ①→②境界 |
+| `/agentdev/case-run` | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ | レビュー完了 |
+| `/agentdev/case-update` | GitHub Issue | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし |
+| `/agentdev/case-close` | GitHub Issue + PR | なし | レビュー完了 |
 
 ## 参照フロー
 
-各コマンドがどのアーティファクトをREAD/WRITEするかの明示的なマトリクス。
+各コマンドがどのアーティファクトをREAD/WRITEするかのマトリクス。
 
 | コマンド | specs | ADR | REQ | finding |
-|----------|-------|-----|-----|---------|
-| `/issue/issue-req` | — | — | READ | READ（明示入力時） |
-| `/issue/issue-save-req` | — | WRITE | WRITE | WRITE（SPLIT検出時） |
-| `/issue/issue-create` | READ | READ | READ | — |
-| `/issue/issue-work` | READ+WRITE | READ | READ | — |
-| `/issue/issue-close` | — | — | READ | — |
-| `/issue/issue-update` | — | — | READ+WRITE | — |
-| `/issue/issue-backlog` | — | — | — | — |
-| `/issue/issue-backlog-create` | — | — | — | — |
-| `/issue/issue-next`          | — | — | — | — |
+|---|---|---|---|---|
+| `/agentdev/req-define` | — | — | READ | READ（明示入力時） |
+| `/agentdev/req-save` | — | WRITE | WRITE | WRITE（SPLIT検出時） |
+| `/agentdev/case-open` | READ | READ | READ | — |
+| `/agentdev/case-run` | READ+WRITE | READ | READ | — |
+| `/agentdev/case-close` | — | — | READ | — |
+| `/agentdev/case-update` | — | — | READ+WRITE | — |
 
 ## データフロー図
 
 ```
-/issue/issue-req(draft WRITE) → /issue/issue-save-req(REQ WRITE, ADR WRITE) → /issue/issue-create(specs READ, ADR READ) → /issue/issue-work(specs READ+WRITE, ADR READ) → TDD実装 → specs更新 → /issue/issue-close(VERIFY)
-/issue/issue-backlog(draft WRITE) → /issue/issue-backlog-create(Epic + 子Issue作成, backlog-extracted コメント投稿)
-/issue/issue-work(並列: 複数Issue → Wave実行 → specs直列更新) → 各PR作成
-/issue/issue-save-req(SPLIT検出 → finding WRITE) → /issue/issue-req(finding READ → 要件変更)
+/agentdev/req-define(draft WRITE) → /agentdev/req-save(REQ WRITE, ADR WRITE) → /agentdev/case-open(specs READ, ADR READ) → /agentdev/case-run(specs READ+WRITE, ADR READ) → TDD実装 → specs更新 → /agentdev/case-close(VERIFY)
+/agentdev/case-run(並列: 複数Issue → Wave実行 → specs直列更新) → 各PR作成
+/agentdev/req-save(SPLIT検出 → finding WRITE) → /agentdev/req-define(finding READ → 要件変更)
 ```
 
-- **/issue/issue-req**: 要件docを壁打ちで構築し、パターンBの場合はドラフトを保存する（draft WRITE）
-- **/issue/issue-save-req（SPLIT検出時）**: requirements review finding を `.sisyphus/drafts/` に保存する（finding WRITE）
-- **/issue/issue-req（finding 入力時）**: finding ファイルを明示入力として読み込み、正式な要件変更に変換する（finding READ）
-- **/issue/issue-backlog**: クローズ済みissue/PRから残課題を抽出・分類し、解消チェック後にdraftとして保存する（ショートカット経路、specs/ADR/REQアクセスなし）
-- **/issue/issue-backlog-create**: 承認済みバックログdraftを読み込み、`issue_desc_backlog_epic.md` / `issue_desc_backlog_child.md` テンプレートでEpic + 子Issueを作成し、`backlog-extracted` コメントを投稿する（specs/ADR/REQアクセスなし）
-- **/issue/issue-create**: specs・ADRを読み込んでIssue本文に反映する（READ）
-- **/issue/issue-work**: specs・ADRを読み込んで実装計画を立て、実装後にspecsを更新する（READ+WRITE）
-- **/issue/issue-close**: REQを参照して完了確認・クリーンアップを行う（READ）
+- **req-define**: 要件docを壁打ちで構築し、パターンBの場合はドラフトを保存する（draft WRITE）
+- **req-save（SPLIT検出時）**: requirements review finding を `.sisyphus/drafts/` に保存する（finding WRITE）
+- **req-define（finding 入力時）**: finding ファイルを明示入力として読み込み、正式な要件変更に変換する（finding READ）
+- **case-open**: specs・ADRを読み込んでIssue本文に反映する（READ）
+- **case-run**: specs・ADRを読み込んで実装計画を立て、実装後にspecsを更新する（READ+WRITE）
+- **case-close**: REQを参照して完了確認・クリーンアップを行う（READ）
 
 ## 並列実行パターン
 
-`/issue/issue-work` は複数Issueの並列実行をサポートする。依存関係に基づくWave実行モデルを採用。
+`case-run` は複数Issueの並列実行をサポートする。依存関係に基づくWave実行モデルを採用。
 
 ### 実行モデル
 
@@ -72,13 +97,13 @@
 ### 依存関係レベル
 
 | レベル | 名称 | 実行方法 |
-|--------|------|----------|
+|---|---|---|
 | L0 | 完全独立 | 並列実行 |
 | L1 | Specs共有 | 並列実行（specs更新は直列） |
 | L2 | ファイル衝突 | Wave分離（同一Wave並列不可） |
 | L3 | 明示的依存 | 順次実行 |
 
-詳細な判定基準と手順は `agentdev-workflow-orchestration` スキルを参照。
+詳細な判定基準と手順は `agentdev-case-orchestration` スキルを参照。
 
 ## L2 マージ順序と共通ファイル方針
 
@@ -99,13 +124,6 @@ L2（ファイル衝突）を検知した場合、以下の措置を講じる。
 - 最大5 Issues / 呼び出し
 - 依存関係分析結果は実行前に表示するが、ユーザー承認待ちで停止しない（自律実行）
 - specs更新は親エージェントのみ（直列・Issue番号昇順）
-
-## 参照フロー図（更新）
-
-```
-/issue/issue-work(単一: specs READ+WRITE, ADR READ) → TDD実装 → specs更新
-/issue/issue-work(並列: 複数Issue → Wave実行 → specs直列更新) → 各PR作成
-```
 
 ## 参照
 
