@@ -22,8 +22,9 @@ load_skills:
   - 要件化前の設計メモ、調査メモ、反映指示書
   - tips-elevate が生成した staging stub（Requirement Source 形式）
   - その他変更内容・背景・制約・完了条件を含む source file
-  - issue-save-req が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
-  - source file の種類に依存しない汎用的な入力扱いとする（elevation-staging 専用分岐は追加しない）
+- issue-save-req が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
+- finding ファイルを含め全てのユーザー明示入力ファイルは read-only の Requirement Source である（G04）。status や frontmatter の更新・上書きは行わない
+- source file の種類に依存しない汎用的な入力扱いとする（elevation-staging 専用分岐は追加しない）
 
 ## Output
 
