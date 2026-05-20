@@ -17,6 +17,16 @@ AgentDevFlow の req/case パイプラインを提供するコマンドセット
 | `/agentdev/case-update` | Issue本文の更新やコメント追加 | 構造的実行・レビュー完了 |
 | `/agentdev/case-close` | PRマージ・記録追記・Issueクローズ・ブランチ削除 | レビュー完了フェーズ |
 
+### intake コマンド（未回収課題の回収）
+
+| コマンド | 役割 |
+|----------|------|
+| `intake-capture` | 変更候補を intake item として保存 |
+| `intake-from-github` | クローズ済み issue/PR から残課題を intake item として保存 |
+| `intake-review` | intake item の review・採用可否判断 |
+| `intake-promote` | review 済み item を後続コマンド用 artifact に整形 |
+| `intake-open` | intake-promote 生成 artifact から GitHub Issue を作成 |
+
 ## 基本フロー
 
 ```
@@ -37,3 +47,4 @@ AgentDevFlow の req/case パイプラインを提供するコマンドセット
 - `/agentdev/case-run` — [case-run.md](./case-run.md)
 - `/agentdev/case-update` — [case-update.md](./case-update.md)
 - `/agentdev/case-close` — [case-close.md](./case-close.md)
+- `/agentdev/intake-open` — [intake-open.md](./intake-open.md)
