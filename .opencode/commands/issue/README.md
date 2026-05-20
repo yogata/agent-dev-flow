@@ -59,7 +59,7 @@ description: issue コマンドセットの使用ガイド
 |---|---|---|
 | `/issue/issue-next` | 次コマンド推論（セッションコンテキストのみ参照） | issue-lifecycle, issue-post-review-routing, spec-compliance, req-analysis |
 | `/issue/issue-backlog` | バックログ抽出（ショートカット経路） | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices |
-| `/issue/issue-backlog-create` | バックログIssue作成（Epic+子Issue作成、backlog-extractedコメント投稿） | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, issue-template-manager |
+| `/agentdev/intake-open` | Intake Issue作成（intake-promote 生成 artifact から GitHub Issue 作成） | agentdev-gh-cli-best-practices, agentdev-epic-status-tracker, agentdev-case-templates |
 
 ## 基本フロー
 
@@ -79,7 +79,6 @@ description: issue コマンドセットの使用ガイド
 - `/agentdev/case-close` — [case-close.md](../agentdev/case-close.md)
 - `/issue/issue-next` — [issue-next.md](./issue-next.md)
 - `/issue/issue-backlog` — [issue-backlog.md](./issue-backlog.md)
-- `/issue/issue-backlog-create` — [issue-backlog-create.md](./issue-backlog-create.md)
 
 ## テンプレート
 

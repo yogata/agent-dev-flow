@@ -11,7 +11,7 @@ load_skills:
 
 クローズ済みissue/PRの本文・コメントから残課題を抽出・分類し、解消チェック後にユーザー確認を行い、承認された内容をdraftとして保存する。壁打ちフェーズのショートカット経路。
 
-Issue作成は `issue-backlog-create` コマンドで行う。
+Issue作成は `/agentdev/intake-open` コマンドで行う（旧 `issue-backlog-create` から移行）。
 
 ## Input
 
@@ -130,14 +130,14 @@ Issue作成は `issue-backlog-create` コマンドで行う。
        バックログ作成対象: {Y}件（解消済み除外: {X}件）
        ドラフト: .sisyphus/drafts/backlog-draft-{period-slug}.md
        ステータス: approved
-       次のステップ: /issue/issue-backlog-create
+       次のステップ: /agentdev/intake-open
      ```
 
 ## Guardrails
 
 ### フェーズ制約
 - G01: 壁打ちフェーズのショートカット経路（実装コード禁止）
-- G02: Issue/PRの作成・コメント投稿は行わない（`issue-backlog-create` が担当）
+- G02: Issue/PRの作成・コメント投稿は行わない（`/agentdev/intake-open` が担当）
 
 ### 実行制約
 - G03: データ取得は `gh` CLIのみ使用（GitHub API直接呼び出し不可）
