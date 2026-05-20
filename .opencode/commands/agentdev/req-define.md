@@ -2,11 +2,11 @@
 description: 要件を整理・定義する（機能追加・バグ修正共通）
 agent: prometheus
 load_skills:
-  - req-analysis
-  - req-file-manager
-  - adr-guidelines
-  - issue-lifecycle
-  - issue-completion-reporting
+  - agentdev-req-analysis
+  - agentdev-req-file-manager
+  - agentdev-adr-guidelines
+  - agentdev-workflow-lifecycle
+  - agentdev-workflow-reporting
 ---
 
 # 要件定義
@@ -92,9 +92,9 @@ load_skills:
     - 読み込んだ内容を壁打ちの初期コンテキストとして扱う（source file の種類による分岐は行わない）
      - 複数ファイルが指定された場合は全て読み込む
     - **Finding ファイルの例**: `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md` が指定された場合、finding の内容（検出概要・影響範囲・推奨アクション）を壁打ちの初期コンテキストとして扱い、正式な要件変更への変換を案内する
- 2. ユーザーとの壁打ち対話を開始 → `req-analysis` の壁打ちメソドロジーに従って深掘り
+ 2. ユーザーとの壁打ち対話を開始 → `agentdev-req-analysis` の壁打ちメソドロジーに従って深掘り
     - 明示入力ファイルが読み込まれている場合、その内容を壁打ちの開始点として活用（ファイル内容から要件の構造化を先行して進める）
- 3. 既存REQ照合 → `req-file-manager` の照合方法論に従って実行（REQ-0002-009〜011）:
+ 3. 既存REQ照合 → `agentdev-req-file-manager` の照合方法論に従って実行（REQ-0002-009〜011）:
    - `docs/requirements/REQ-*.md` をスキャンし、ユーザーの要件と既存REQの関連性を推論（タイトル・タグ・目的・要件内容の重み付けによる総合判定）
    - 関連REQがある場合: 該当REQの内容（目的・要件・適用範囲）を壁打ちコンテキストに即時反映し、ユーザーとともに変更点を深掘り
    - 操作分類を確定: `CREATE`（該当REQなし）、`APPEND`（既存REQへの要件行追加）、`UPDATE`（既存REQの内容修正）
@@ -102,15 +102,15 @@ load_skills:
     - SPLIT（要件の分割）が検出された場合: SPLIT は保存操作ではなく requirements review / follow-up 候補として扱う。保存可能範囲（CREATE/APPEND/UPDATE）は通常通り実行する
     - 分類結果は `draft-meta` の `req-operation` と `target-req` に記録
     ※ area-based構造では、REQは area file 内に配置される。現在は per-file（REQ-{NNNN}.md）構造で照合を実施する
- 4. 要件を展開 → `req-analysis` の分析観点に従って網羅（照合で取得した関連REQの内容を反映）
- 5. ADR閾値以上の技術判断が発生した場合 → `adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は req-save で実行）
- 6. 要件doc形式で生成 → テンプレート: `.opencode/skills/req-file-manager/templates/doc_requirement.md` を Read tool で読み込み、目的/要件/適用範囲の構造に従って内容を構造化
+ 4. 要件を展開 → `agentdev-req-analysis` の分析観点に従って網羅（照合で取得した関連REQの内容を反映）
+ 5. ADR閾値以上の技術判断が発生した場合 → `agentdev-adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は req-save で実行）
+ 6. 要件doc形式で生成 → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read tool で読み込み、目的/要件/適用範囲の構造に従って内容を構造化
     **テンプレート準拠要件**: テンプレートの【必須】セクション（目的、要件、適用範囲）が全て要件docに含まれること。必須セクションが欠落している場合、生成をやり直すこと。
  7. パターン判定:
     - ラベルに基づいて Pattern 判定: `bug`, `critical` → Pattern A, `enhancement`, `feature` → Pattern B, `refactor`, `maintenance` → Pattern C, `docs`, `chore` → Pattern D
     - **Pattern A + ADR必要時の Pattern B 昇格**: Pattern A で ADR閾値以上の技術判断が発生した場合、Pattern B に昇格する（REQファイル・ADRファイルの作成が必要となるため）
  8. スケール判断（Pattern B のみ実行）:
-    - Pattern B であっても、`issue-lifecycle` の並列実行パターンにおけるスケール判断条件を用いて `standard` または `large` を判定:
+    - Pattern B であっても、`agentdev-workflow-lifecycle` の並列実行パターンにおけるスケール判断条件を用いて `standard` または `large` を判定:
       - **large**: 以下のいずれか1つ以上の条件を満たす場合
         - 複数モジュールにまたがる (e.g., UI + API + DB)
         - 1 Issueで実装しきれない (PR肥大化リスク)
@@ -141,7 +141,7 @@ load_skills:
 10. 要件doc確認: 生成した要件doc（パターンB: ドラフト内容、パターンA/C/D: セッション内要件doc）をユーザーに提示する。明示的な承認は求めず、提示のみを行う
     - **差し戻し**: ユーザーが修正・差し戻しを指示した場合、壁打ちを継続（Step 1に戻る）
     - **要件doc確定**: ユーザーが次のコマンド（`/agentdev/req-save` または `/agentdev/case-open`）を実行したことを要件doc確定の意思表示として扱う
-11. 完了報告 → `issue-completion-reporting` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
+11. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
     - パターンB: `次のステップ: /agentdev/req-save`
     - パターンA/C/D: `次のステップ: /agentdev/case-open`
 
@@ -161,14 +161,14 @@ load_skills:
 - G07: `git` コマンドは実行しない
 
 ### 品質ゲート
-- G08: チェックボックスは測定可能で一意であること → `req-analysis` のチェックボックス品質基準
+- G08: チェックボックスは測定可能で一意であること → `agentdev-req-analysis` のチェックボックス品質基準
 - G09: 要件doc構造は `doc_requirement.md` テンプレートに厳密に従うこと。【必須】セクションの欠落は禁止
 
 ### 判断・承認制約
-- G10: ADR閾値以上の判断は `adr-guidelines` へ（判断の記録のみ、ファイル作成は不可）
+- G10: ADR閾値以上の判断は `agentdev-adr-guidelines` へ（判断の記録のみ、ファイル作成は不可）
 
 ### 委譲・参照制約
-- G11: Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
+- G11: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
 
 ### 出力制約
 - G12: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）

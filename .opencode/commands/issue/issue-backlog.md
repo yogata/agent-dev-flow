@@ -2,9 +2,9 @@
 description: クローズ済みissue/PRから残課題を抽出・分類し、解消チェック後にdraftとして保存する
 agent: sisyphus
 load_skills:
-  - issue-lifecycle
-  - issue-completion-reporting
-  - gh-cli-best-practices
+  - agentdev-workflow-lifecycle
+  - agentdev-workflow-reporting
+  - agentdev-gh-cli
 ---
 
 # バックログ抽出
@@ -29,7 +29,7 @@ Issue作成は `/agentdev/intake-open` コマンドで行う（旧 `issue-backlo
 2. **データ取得**: `gh` CLIを使用して、指定期間内にクローズされたissueとPRを取得する:
    - Issues: `gh issue list --state closed --search "closed:>=YYYY-MM-DD" --limit 100 --json number,title,body,state,closedAt,labels,comments`
    - PRs: `gh pr list --state closed --search "closed:>=YYYY-MM-DD" --limit 100 --json number,title,body,state,closedAt,labels,comments`
-   - `gh-cli-best-practices` に従ってコマンドを実行する
+   - `agentdev-gh-cli` に従ってコマンドを実行する
    - コメントも取得: `gh issue view {N} --json comments` / `gh pr view {N} --json comments`
 
 2a. **既抽出スキップ**: 取得した各issue/PRのコメント（本文・コメント欄の両方）にマーカーキーワード `backlog-extracted` が含まれているか確認する:
@@ -121,7 +121,7 @@ Issue作成は `/agentdev/intake-open` コマンドで行う（旧 `issue-backlo
    - **承認**: ドラフトの `status` を `approved` に更新する
    - **差し戻し**: 調整内容をドラフトに反映してレポートを再提示（`status` は `draft` のまま維持）
 
-10. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
+10. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
      ```
      ✅ バックログ抽出が完了しました。
        対象期間: {since} 〜 {until}
@@ -148,8 +148,8 @@ Issue作成は `/agentdev/intake-open` コマンドで行う（旧 `issue-backlo
 - G06: 解消チェックのマッチング範囲は title + body + comments のみ（commitsは対象外）
 
 ### 委譲・参照制約
-- G07: `gh-cli-best-practices` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
-- G08: Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
+- G07: `agentdev-gh-cli` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
+- G08: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
 
 ### 出力制約
 - G09: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）

@@ -3,7 +3,7 @@ description: inbox.mdとarchive.mdをセマンティック分析し、evaluation
 agent: sisyphus
 load_skills:
   - agentdev-learning-capture
-  - tips-pipeline-orchestration
+  - agentdev-learning-pipeline
 ---
 
 # 学びの問題クラス分類・8軸評価とアーカイブ
@@ -40,29 +40,29 @@ evaluation-report.md は評価済み中間レポートであり、learning-promo
 ### 3. 全エントリの読込と旧フォーマット正規化
 
 - inbox.md + archive.md から全エントリをパース
-- **旧フォーマット正規化**を必ず実施。スキーマとマッピングは `tips-pipeline-orchestration` skill の「Inbox Entry Schema」を参照
+- **旧フォーマット正規化**を必ず実施。スキーマとマッピングは `agentdev-learning-pipeline` skill の「Inbox Entry Schema」を参照
 - 正規化は解析時のみ適用し、元ファイル（inbox.md / archive.md）の内容は書き換えない
 
 ### 4. 問題クラス分類
 
-- 分類基準は `tips-pipeline-orchestration` skill の「問題クラス分類基準」を参照
+- 分類基準は `agentdev-learning-pipeline` skill の「問題クラス分類基準」を参照
 - テーマクラスタリングではなく、**問題クラス**（根本原因 + 再発条件 + 予防策が同じ単位）で分類する
 
 ### 5. 8軸評価スコアリング
 
-- 評価ディメンションとスコア基準は `tips-pipeline-orchestration` skill の「8軸評価ディメンション」を参照
+- 評価ディメンションとスコア基準は `agentdev-learning-pipeline` skill の「8軸評価ディメンション」を参照
 - 各問題クラスに対して8軸で評価（各1-5スケール）し、加重合計スコア（満点40）を算出
 
 ### 6. evaluation-report.md の生成
 
 - パス: `docs/tips/evaluation-report.md`（毎回上書き、追記しない）
-- スキーマは `tips-pipeline-orchestration` skill の「Evaluation-Report Schema」に従う
+- スキーマは `agentdev-learning-pipeline` skill の「Evaluation-Report Schema」に従う
 
 ### 7. refine 時 prune（MAY、任意）
 
 archive.md 内の古い単発レアケースを削除候補として特定する。**必須ではない。** inboxエントリ数が15件未満の場合やユーザーが明示的にスキップを指定した場合は実施しない。
 
-- prune 対象の特定基準、削除禁止エントリ、実施フローは `tips-pipeline-orchestration` skill の「Prune 方針 → refine 時 prune」を参照
+- prune 対象の特定基準、削除禁止エントリ、実施フローは `agentdev-learning-pipeline` skill の「Prune 方針 → refine 時 prune」を参照
 
 ### 8. ユーザーに分析結果提示
 

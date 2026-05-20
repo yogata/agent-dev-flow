@@ -3,7 +3,7 @@ description: evaluation-report.mdとarchive.mdから昇華判定を行い、Requ
 agent: sisyphus
 load_skills:
   - agentdev-learning-capture
-  - tips-pipeline-orchestration
+  - agentdev-learning-pipeline
 ---
 
 # 学びの昇華判定と Requirement Source stub 生成
@@ -33,12 +33,12 @@ load_skills:
 
 3. **廃棄判定**（11カテゴリ + duplicate）:
    - **主入力**: evaluation-report.md の問題クラスラスタ（raw learning item の再分類は禁止）
-   - 廃棄カテゴリ一覧、反映先マッピングは `tips-pipeline-orchestration` skill の「処分区分」を参照
+   - 廃棄カテゴリ一覧、反映先マッピングは `agentdev-learning-pipeline` skill の「処分区分」を参照
    - 各クラスタに対し最適な廃棄先を判定
 
 4. **既存対策確認**:
    - 各クラスタの内容に対し、既存の command/skill/template/docs に類似対策が存在するか確認
-   - 確認対象とギャップ分類は `tips-pipeline-orchestration` skill の「処分区分 → 既存対策照合」を参照
+   - 確認対象とギャップ分類は `agentdev-learning-pipeline` skill の「処分区分 → 既存対策照合」を参照
    - 「新規X化」より「既存Xへ反映」を優先
 
 5. **ユーザーへの判定結果提示**:
@@ -50,7 +50,7 @@ load_skills:
    |---------|--------|---------|---------|------|
    | 1 | Windows環境エスケープ問題 | 既存 command へ反映 | case-run に部分的に対策あり（fix gap） | ガードレールが不十分、3回出現 |
    | 2 | Supabase RLS落とし穴 | 新規 skill 化 | なし | 汎用的パターン、独立した判断手順あり |
-   | 3 | コミットメッセージ形式 | duplicate | conventional-commits skill で十分カバー | 既存skillで対応済み |
+   | 3 | コミットメッセージ形式 | duplicate | agentdev-conventional-commits skill で十分カバー | 既存skillで対応済み |
    | 4 | 環境変数管理の注意点 | deferred | なし | 情報が断片的、出現1回のみ |
    ```
 
@@ -70,14 +70,14 @@ load_skills:
    - ファイル名: `{disposal-category}-{name}.md`
    - **`.opencode/` への直接書込は禁止**
    - **`case-run` への直接受け渡しは禁止**（`req-define` を経由すること）
-   - stub フォーマットは `tips-pipeline-orchestration` skill の「Requirement Source Staging Stub Schema」に従う
-   - カテゴリ別の反映先パス例は `tips-pipeline-orchestration` skill を参照
+   - stub フォーマットは `agentdev-learning-pipeline` skill の「Requirement Source Staging Stub Schema」に従う
+   - カテゴリ別の反映先パス例は `agentdev-learning-pipeline` skill を参照
 
 8. **昇華時 prune**（archive.md からの除去）:
    - **prune 対象**: staged（stub 生成済み）/ rejected / duplicate のエントリのみ
    - **prune 非対象**: deferred / 未処理のエントリは archive.md に残す
    - **証拠保存**: staged エントリを除去する際、stub の「元tips / 根拠」セクションに保存してから除去
-   - 詳細は `tips-pipeline-orchestration` skill の「Prune 方針 → promote 時 prune」を参照
+   - 詳細は `agentdev-learning-pipeline` skill の「Prune 方針 → promote 時 prune」を参照
    - **実行手順**:
       1. prune 対象エントリの特定（staged/rejected/duplicate のクラスタに属するエントリ）
       2. ユーザーに prune 計画を提示

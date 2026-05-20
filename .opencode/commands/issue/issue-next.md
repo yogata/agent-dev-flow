@@ -2,10 +2,10 @@
 description: 次のコマンドを推論・実行する。セッションコンテキストのみ使用（gh/gitコマンド禁止）。
 agent: sisyphus
 load_skills:
-  - issue-lifecycle
-  - issue-post-review-routing
-  - spec-compliance
-  - req-analysis
+  - agentdev-workflow-lifecycle
+  - agentdev-workflow-routing
+  - agentdev-spec-compliance
+  - agentdev-req-analysis
 ---
 
 # issue-next
@@ -23,9 +23,9 @@ load_skills:
 
 ## Steps
 
-1. セッションコンテキストから現在のマクロフェーズを推論 → `issue-lifecycle` のフェーズ体系とSSoT遷移ルールに従って判定
-2. 乖離がある場合は乖離検出結果を確認 → `spec-compliance` のループバック判定に従って次アクションを決定
-3. 次のコマンドを提示または実行 → `issue-lifecycle` のコマンド関連マップに従って適切なコマンドを選択:
+1. セッションコンテキストから現在のマクロフェーズを推論 → `agentdev-workflow-lifecycle` のフェーズ体系とSSoT遷移ルールに従って判定
+2. 乖離がある場合は乖離検出結果を確認 → `agentdev-spec-compliance` のループバック判定に従って次アクションを決定
+3. 次のコマンドを提示または実行 → `agentdev-workflow-lifecycle` のコマンド関連マップに従って適切なコマンドを選択:
     - 壁打ち → `/issue/issue-req`
     - 壁打ち→構造的実行の準備（パターンB） → `/issue/issue-save-req`
     - 壁打ち→構造的実行の境界（パターンB） → `/issue/issue-save-req`
