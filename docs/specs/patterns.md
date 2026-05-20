@@ -4,9 +4,9 @@
 
 ### エージェント指定
 
-コマンドのfrontmatterでagentを指定。対話系コマンド（issue-req）は `agent: prometheus`、ファイル操作系コマンド（issue-save-req, issue-create等）は `agent: sisyphus` を使用。
+コマンドのfrontmatterでagentを指定。対話系コマンド（req-define）は `agent: prometheus`、ファイル操作系コマンド（req-save, case-open等）は `agent: sisyphus` を使用。
 
-**対話系コマンド（issue-req）:**
+**対話系コマンド（req-define）:**
 ```yaml
 ---
 description: ...
@@ -16,7 +16,7 @@ load_skills:
 ---
 ```
 
-**ファイル操作系コマンド（issue-save-req, issue-create等）:**
+**ファイル操作系コマンド（req-save, case-open等）:**
 ```yaml
 ---
 description: ...
