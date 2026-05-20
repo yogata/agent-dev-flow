@@ -2,7 +2,7 @@
 description: evaluation-report.mdとarchive.mdから昇華判定を行い、Requirement Source stubを生成する
 agent: sisyphus
 load_skills:
-  - tips-capture
+  - agentdev-learning-capture
   - tips-pipeline-orchestration
 ---
 
@@ -10,11 +10,11 @@ load_skills:
 
 `docs/tips/evaluation-report.md` の問題クラスを主入力とし、`docs/tips/archive.md` の過去エントリを参照して廃棄判定を行う。ユーザー承認後に `docs/tips/elevation-staging/` に Requirement Source 形式の stub を生成し、処理済みエントリを archive.md から pruning する。
 
-**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `issue-req` の明示入力ファイルとして扱い、`issue-req → issue-save-req → issue-create → issue-work` のルートで実装に移行する。
+**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `req-define` の明示入力ファイルとして扱い、`req-define → req-save → case-open → case-run` のルートで実装に移行する。
 
 ## Input
 
-- `docs/tips/evaluation-report.md`（必須）— tips-refactor が生成した評価レポート
+- `docs/tips/evaluation-report.md`（必須）— learning-refine が生成した評価レポート
 - `docs/tips/archive.md`（任意）— 過去エントリ参照用
 
 ## Output
@@ -25,14 +25,14 @@ load_skills:
 
 1. **evaluation-report.mdの存在確認**:
    - `docs/tips/evaluation-report.md` を確認
-   - 存在しない → エラー終了。「先に `/tips-refactor` を実行して分析レポートを生成してください」
+   - 存在しない → エラー終了。「先に `/agentdev/learning-refine` を実行して分析レポートを生成してください」
 
 2. **データ読込**:
    - evaluation-report.md を読込（クラスタ一覧・テーマ概要・重み・エントリ数を把握）
    - archive.md を読込（該当クラスタの過去エントリの日付・タイトル・内容を確認）
 
 3. **廃棄判定**（11カテゴリ + duplicate）:
-   - **主入力**: evaluation-report.md の問題クラスラスタ（raw tips の再分類は禁止）
+   - **主入力**: evaluation-report.md の問題クラスラスタ（raw learning item の再分類は禁止）
    - 廃棄カテゴリ一覧、反映先マッピングは `tips-pipeline-orchestration` skill の「処分区分」を参照
    - 各クラスタに対し最適な廃棄先を判定
 
@@ -48,7 +48,7 @@ load_skills:
 
    | クラスタ | テーマ | 廃棄判定 | 既存対策 | 理由 |
    |---------|--------|---------|---------|------|
-   | 1 | Windows環境エスケープ問題 | 既存 command へ反映 | issue-work に部分的に対策あり（fix gap） | ガードレールが不十分、3回出現 |
+   | 1 | Windows環境エスケープ問題 | 既存 command へ反映 | case-run に部分的に対策あり（fix gap） | ガードレールが不十分、3回出現 |
    | 2 | Supabase RLS落とし穴 | 新規 skill 化 | なし | 汎用的パターン、独立した判断手順あり |
    | 3 | コミットメッセージ形式 | duplicate | conventional-commits skill で十分カバー | 既存skillで対応済み |
    | 4 | 環境変数管理の注意点 | deferred | なし | 情報が断片的、出現1回のみ |
@@ -69,7 +69,7 @@ load_skills:
    - 出力先: `docs/tips/elevation-staging/`
    - ファイル名: `{disposal-category}-{name}.md`
    - **`.opencode/` への直接書込は禁止**
-   - **`issue-work` への直接受け渡しは禁止**（`issue-req` を経由すること）
+   - **`case-run` への直接受け渡しは禁止**（`req-define` を経由すること）
    - stub フォーマットは `tips-pipeline-orchestration` skill の「Requirement Source Staging Stub Schema」に従う
    - カテゴリ別の反映先パス例は `tips-pipeline-orchestration` skill を参照
 
@@ -77,7 +77,7 @@ load_skills:
    - **prune 対象**: staged（stub 生成済み）/ rejected / duplicate のエントリのみ
    - **prune 非対象**: deferred / 未処理のエントリは archive.md に残す
    - **証拠保存**: staged エントリを除去する際、stub の「元tips / 根拠」セクションに保存してから除去
-   - 詳細は `tips-pipeline-orchestration` skill の「Prune 方針 → elevate 時 prune」を参照
+   - 詳細は `tips-pipeline-orchestration` skill の「Prune 方針 → promote 時 prune」を参照
    - **実行手順**:
       1. prune 対象エントリの特定（staged/rejected/duplicate のクラスタに属するエントリ）
       2. ユーザーに prune 計画を提示
@@ -88,12 +88,12 @@ load_skills:
    - 生成した stub ファイル一覧（パス・カテゴリ・内容要約）
    - prune 結果（除去したエントリ数・残存エントリ数）
    - **次ステップの案内**:
-      - 「生成した stub は `issue-req` の明示入力ファイルとして要件化してください」
-      - 「`/issue/issue-req` に対象の stub ファイルパスを指定して開始できます」
-      - 例: `/issue/issue-req docs/tips/elevation-staging/existing-command-windows-escape.md`
+      - 「生成した stub は `req-define` の明示入力ファイルとして要件化してください」
+      - 「`/agentdev/req-define` に対象の stub ファイルパスを指定して開始できます」
+      - 例: `/agentdev/req-define docs/tips/elevation-staging/existing-command-windows-escape.md`
    - **注意事項**:
       - `.opencode/` への直接配置・直接反映は行わないこと
-      - stub は必ず `issue-req` を経由すること（`issue-work` に直接渡さないこと）
+      - stub は必ず `req-define` を経由すること（`case-run` に直接渡さないこと）
 
 ## Guardrails
 
@@ -102,10 +102,10 @@ load_skills:
 - G02: `evaluation-report.md` は読込専用: 変更・削除は禁止
 
 ### 実行制約
-- G03: `issue-work` への直接受け渡し禁止: stub は `issue-req` の明示入力ファイルとして扱う
+- G03: `case-run` への直接受け渡し禁止: stub は `req-define` の明示入力ファイルとして扱う
 
 ### 品質ゲート
-- G04: 主入力は `evaluation-report.md`: raw tips の再分類は禁止
+- G04: 主入力は `evaluation-report.md`: raw learning item の再分類は禁止（REQ-0017-021）
 
 ### 判断・承認制約
 - G05: 既存対策を優先: 「新規X化」より「既存Xへ反映」を優先
@@ -123,7 +123,7 @@ load_skills:
 
 | エラー | 対処 |
 |--------|------|
-| evaluation-report.mdが存在しない | エラー終了。「先に `/tips-refactor` を実行して分析レポートを生成してください」 |
+| evaluation-report.mdが存在しない | エラー終了。「先に `/agentdev/learning-refine` を実行して分析レポートを生成してください」 |
 | クラスタが0件 | 「昇華対象のクラスタがありません」と報告して終了 |
 | ユーザーが承認しない | 「昇華をキャンセルしました」と報告して終了 |
 | staging領域の書込失敗 | エラー内容を報告 |
@@ -133,5 +133,5 @@ load_skills:
 
 - **staging領域のみに生成**: `.opencode/` への直接配置は禁止
 - **stub のみ生成**: 完全なSKILL.mdやコマンドファイルは生成しない
-- **archive.md は living tips pool**: prune は staged/rejected/duplicate のみ。deferred・未処理は保持
-- **反射ルート**: staging stub → `issue-req`（明示入力ファイル）→ `issue-save-req` → `issue-create` → `issue-work`
+- **archive.md は living learning pool**: prune は staged/rejected/duplicate のみ。deferred・未処理は保持
+- **反映ルート**: staging stub → `req-define`（明示入力ファイル）→ `req-save` → `case-open` → `case-run`
