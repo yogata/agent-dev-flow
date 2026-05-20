@@ -1,163 +1,171 @@
 ---
-description: artifact integrity の read-only 棚卸し検査を実行する
+description: AgentDevFlow artifact 整合性検査
 agent: sisyphus
 load_skills:
-  - issue-lifecycle
-  - issue-completion-reporting
+  - agentdev-req-analysis
+  - agentdev-adr-guidelines
+  - agentdev-gh-cli-best-practices
 ---
 
-# Integrity Check
+# Artifact 整合性検査
 
-プロジェクト全体の artifact integrity を read-only で棚卸し検査する。検査対象の artifact（REQ、ADR、skill、command 等）は一切変更しない。検出結果のレポート生成と intake item の新規作成のみ許容する（REQ-0017-029）。
+AgentDevFlow 管理下の artifact（REQ、ADR、skill、command）の整合性を検査し、結果をレポートとして出力する read-only コマンド。
+
+## 基本原則: Read-Only 制約
+
+**検査対象 artifact を一切変更しない。** 以下のみ許容する:
+
+- ✅ 検出結果レポートの生成（`.agentdev/integrity/reports/`）
+- ✅ intake item の新規作成（`.agentdev/intake/inbox/`）
+- ❌ 検査対象ファイル（REQ、ADR、skill、command、specs 等）の変更
 
 ## Input
 
-なし。プロジェクト全体の artifact を自動的に検査する。
+- なし（コマンド実行時に全 artifact を自動スキャン）
 
 ## Output
 
-- Integrity check report（`.sisyphus/reports/integrity-report-{timestamp}.md`）
-- Optional: intake items（ユーザー確認後に作成、REQ-0017-030 MAY）
-
-## Read-only 制約（MUST）
-
-以下の制約は本コマンドの実行中ずっと維持されなければならない:
-
-- **MUST NOT**: 検査対象 artifact（REQ、ADR、skill、command、README 等）の内容を変更する
-- **MUST NOT**: REQ、ADR、skill ファイルを修正・追記・削除する
-- **MUST NOT**: command ファイルを修正・追記・削除する
-- **ALLOWED**: Integrity check report の新規生成（`.sisyphus/reports/` 配下）
-- **ALLOWED**: Intake item の新規作成（ユーザー確認後、`.agentdev/intake/` 配下）
-
-## Detection Targets
-
-検査対象と検証内容を以下に定義する。
-
-### T1: REQ frontmatter ↔ filename 一致
-
-- 各 `docs/requirements/REQ-{NNNN}.md` の frontmatter `id` がファイル名と一致するか
-  - 例: `REQ-0001.md` → `id: REQ-0001` でなければ ERROR
-- frontmatter `updated` 日付が `created` 日付以降であるか（`updated < created` は ERROR）
-
-### T2: ADR status 整合性
-
-- 各 `docs/adr/ADR-{NNNN}.md` の frontmatter `status` が有効な値（`proposed`, `accepted`, `deprecated`, `superseded`）であるか
-- `status: superseded` の場合、`superseded-by` フィールドが存在し、該当 ADR ファイルが存在するか
-- `superseded-by` で参照されている ADR が存在しない場合は ERROR
-
-### T3: Skill ↔ load_skills 参照整合性
-
-- 全 command ファイル（`.opencode/commands/**/*.md`）の `load_skills` に記載された skill 名に対応する skill ディレクトリまたは skill ファイルが `.opencode/skills/` に存在するか
-- 存在しない skill を参照している場合は ERROR
-- `.opencode/skills/` に存在する skill のうち、どの command からも参照されていない場合は WARN（orphan skill）
-
-### T4: Command-map ↔ actual files 整合性
-
-- `docs/specs/system.md` の command-map（または README.md のコマンド一覧）に記載されたコマンドに対応するファイルが `.opencode/commands/` 配下に存在するか
-- 存在しないコマンドが記載されている場合は ERROR
-- `.opencode/commands/` に存在するコマンドのうち、command-map に記載されていないものは WARN
-
-### T5: README index tables ↔ actual files 整合性
-
-- `docs/requirements/README.md` の REQ インデックステーブルに記載された REQ ID に対応するファイルが `docs/requirements/` に存在するか
-- 実際に存在する REQ ファイルがインデックステーブルに記載されているか
-- `docs/adr/README.md` の ADR インデックステーブルに対しても同様に検証
-- 不一致は ERROR
+- `.agentdev/integrity/reports/YYYY-MM-DD-integrity-report.md` — 検出結果レポート
+- `.agentdev/intake/inbox/YYYY-MM-DD-integrity-{issue-slug}.md` — 検出問題の intake item（MAY、ユーザー承認時のみ）
 
 ## Steps
 
-1. **REQ frontmatter scan**: `docs/requirements/REQ-*.md` を全件走査し、T1 の検証を実行
-    - 各ファイルの frontmatter（`id`, `created`, `updated`）を読み取る
-    - ファイル名との一致、日付の妥当性を確認
-    - 検出結果を内部バッファに蓄積
-2. **ADR status scan**: `docs/adr/ADR-*.md` を全件走査し、T2 の検証を実行
-    - 各ファイルの frontmatter（`status`, `superseded-by`）を読み取る
-    - status 値の妥当性、superseded-by 参照の存在を確認
-    - 検出結果を内部バッファに蓄積
-3. **Skill existence scan**: `.opencode/skills/` を走査し、T3 の検証を実行
-    - 存在する skill 一覧を取得
-    - 全 command ファイルの `load_skills` を収集
-    - 参照先の存在確認、orphan skill の検出
-    - 検出結果を内部バッファに蓄積
-4. **Command-map cross-reference scan**: T4 の検証を実行
-    - `docs/specs/system.md` または `README.md` からコマンド一覧を抽出
-    - `.opencode/commands/` の実際のファイルと照合
-    - 検出結果を内部バッファに蓄積
-5. **README index cross-reference scan**: T5 の検証を実行
-    - `docs/requirements/README.md` と実際の REQ ファイルを照合
-    - `docs/adr/README.md` と実際の ADR ファイルを照合
-    - 検出結果を内部バッファに蓄積
-6. **Report generation**: 検出結果を集約し、integrity check report を生成
-    - 出力先: `.sisyphus/reports/integrity-report-{timestamp}.md`（timestamp は `yyyyMMdd-HHmmss` 形式）
-    - report フォーマット:
-      ```markdown
-      # Integrity Check Report
+### 1. スキャン対象の収集
 
-      **実行日時**: {timestamp}
-      **検査対象数**: {対象ファイル/項目の総数}
-      **結果サマリ**: ERROR {N}件 / WARN {N}件 / OK {N}件
+以下の artifact を収集する:
 
-      ## 検出結果
+| カテゴリ | 対象パス | 収集方法 |
+|----------|----------|----------|
+| REQ ファイル | `docs/requirements/REQ-*.md` | `glob` |
+| ADR ファイル | `docs/adr/ADR-*.md` | `glob` |
+| Skill ディレクトリ | `.opencode/skills/*/SKILL.md` | `glob` |
+| Command ファイル | `.opencode/commands/agentdev/*.md`（`README.md` 除く） | `glob` |
+| Specs ファイル | `docs/specs/*.md` | `glob` |
 
-      ### ERROR
+各ファイルの内容を `Read` tool で読み込む。ファイルが存在しないカテゴリは空として扱い、警告を出力する。
 
-      | 検出対象 | ファイル | 詳細 |
-      |----------|----------|------|
-      | ... | ... | ... |
+### 2. REQ frontmatter↔ファイル名整合性検査
 
-      ### WARN
+各 REQ ファイルについて以下を検査する:
 
-      | 検出対象 | ファイル | 詳細 |
-      |----------|----------|------|
-      | ... | ... | ... |
+- **(a) frontmatter `id` ↔ ファイル名**: ファイル名 `REQ-{NNNN}.md` の `{NNNN}` と frontmatter の `id` 値（例: `REQ-0017`）が一致するか
+- **(b) frontmatter 必須フィールド**: `id`、`title`、`status` が存在するか
+- **(c) README インデックス整合性**: `docs/requirements/README.md`（存在する場合）に該当 REQ がリストされているか。逆に README にリストされている REQ のファイルが実在するか
 
-      ### OK（概要のみ）
+検出結果を不一致エントリとして記録する。
 
-      - T1: REQ frontmatter — {N}件検査、問題なし
-      - T2: ADR status — {N}件検査、問題なし
-      - ...
-      ```
-    - ERROR が 0 件の場合: サマリに「✅ 整合性に問題は検出されませんでした」と表示
-    - ERROR が 1 件以上の場合: サマリに「⚠️ 整合性の問題が検出されました」と表示
-7. **Optional intake item creation**: ユーザーに確認し、必要に応じて intake item を作成
-    - ERROR が検出された場合、ユーザーに intake item 作成の可否を確認:
-      - 「{N}件の整合性問題が検出されました。intake item として登録しますか？」
-    - ユーザーが承認した場合: 各 ERROR 項目について intake item を `.agentdev/intake/` 配下に作成
-    - ユーザーが拒否した場合、または ERROR が 0 件の場合: スキップ
-    - intake item のフォーマット:
-      ```markdown
-      ---
-      source: integrity-check
-      detected_at: {timestamp}
-      type: integrity-error
-      target: {対象ファイルまたは参照}
-      ---
-      ## 検出内容
-      {検出詳細}
-      ## 捕捉元
-      integrity-check (T{N}: {検出対象名})
-      ## 後で判断すべき点
-      修正方針の決定（REQ/ADR/skill のどれを正とするか）
-      ```
-8. **Report results**: 検査結果をユーザーに報告
-    - レポートファイルのパスを表示
-    - ERROR / WARN 件数の概要を表示
-    - intake item を作成した場合は作成件数を表示
+### 3. ADR↔REQ 相互参照整合性検査
+
+各 ADR ファイルについて以下を検査する:
+
+- **(a) ADR 内の REQ 参照**: ADR 本文内で参照している REQ（`REQ-{NNNN}` パターン）が実在するか
+- **(b) REQ 内の ADR 参照**: REQ ファイル（frontmatter または本文）で参照している ADR（`ADR-{NNNN}` パターン）が実在するか
+- **(c) ステータス整合性**: ADR が `accepted` かつ参照元 REQ が `superseded` でないか等の不自然な組み合わせを検出する（SHOULD — 厳密な判定は不要、疑わしいものを報告）
+
+### 4. Skill↔load_skills 参照整合性検査
+
+各 command ファイルについて以下を検査する:
+
+- **(a) load_skills 参照先の存在**: frontmatter `load_skills` に列挙されたスキル名に対応する `SKILL.md` が存在するか（`.opencode/skills/{name}/SKILL.md`）
+- **(b) agentdev プレフィクス規約**: `load_skills` 内のスキル名が `agentdev-` プレフィクスを持つか（AgentDevFlow namespace のコマンドの場合）
+- **(c) 未使用スキル**: 存在するスキルのうち、どの command からも `load_skills` で参照されていないスキルを検出する（SHOULD）
+
+### 5. Command-map↔実体整合性検査
+
+README（`.opencode/commands/agentdev/README.md`）のコマンド一覧と実際の command ファイルの整合性を検査する:
+
+- **(a) README にリストされているコマンドのファイルが実在するか**
+- **(b) 実在するコマンドが README にリストされているか**
+- **(c) README の description と各コマンド frontmatter の `description` が一致するか（SHOULD）**
+
+### 6. 検出結果レポートの生成
+
+検出結果を以下の形式でレポートとして出力する:
+
+- 保存先: `.agentdev/integrity/reports/YYYY-MM-DD-integrity-report.md`
+- ディレクトリが存在しない場合は作成する
+
+#### レポート形式
+
+```markdown
+# Integrity Check Report
+
+- **実行日時**: YYYY-MM-DD HH:MM
+- **スキャン対象**: REQ N件、ADR N件、Skill N件、Command N件
+
+## サマリ
+
+| 検査カテゴリ | OK | NG | 備考 |
+|-------------|----|----|------|
+| REQ frontmatter↔ファイル名 | N | N | — |
+| ADR↔REQ 相互参照 | N | N | — |
+| Skill↔load_skills 参照 | N | N | — |
+| Command-map↔実体 | N | N | — |
+
+## 詳細
+
+### REQ frontmatter↔ファイル名
+{検出結果の詳細。OK の場合は「問題なし」、NG の場合は具体的な不一致内容}
+
+### ADR↔REQ 相互参照
+{検出結果の詳細}
+
+### Skill↔load_skills 参照
+{検出結果の詳細}
+
+### Command-map↔実体
+{検出結果の詳細}
+```
+
+### 7. Intake Item 作成（MAY）
+
+検出された問題のうち、ユーザーが intake item 化を指示したものについて intake item を作成する。
+
+- **ユーザーに結果を提示**: Step 6 のレポート内容を表示
+- **ユーザーに intake item 化を問う**: 「検出された問題のうち、intake item として登録するものがありますか？」
+- **ユーザーが指定した問題のみ**: `.agentdev/intake/inbox/YYYY-MM-DD-integrity-{issue-slug}.md` に intake item 形式で保存
+- **保存形式**: `/agentdev/intake-capture` の Intake Item 形式に従う
+- **ユーザーが intake item 化をスキップ**: レポートのみで終了
+
+### 8. 完了報告
+
+```
+✅ integrity-check 完了
+  レポート: .agentdev/integrity/reports/YYYY-MM-DD-integrity-report.md
+  検出件数: NG N件 / OK N件
+  intake item: N件作成（または「なし」）
+```
 
 ## Guardrails
 
+### Read-Only 制約（REQ-0017-029）
+- G01: 検査対象ファイル（REQ、ADR、skill、command、specs、README）の内容を変更しない
+- G02: レポート・intake item の新規作成のみ許容
+- G03: `git` コマンドは実行しない（コミット・プッシュ禁止）
+
+### 検査対象制約
+- G04: 検査は存在性・整合性の確認に限定し、内容の妥当性評価は行わない
+- G05: ステータス整合性（Step 3-c, 5-c）は SHOULD であり、厳密な判定を求めない
+
 ### 実行制約
-- G01: 検査対象 artifact（REQ、ADR、skill、command、README）の内容を変更してはならない（MUST NOT）
-- G02: レポート生成と intake item 作成以外のファイル書き込みを行ってはならない
-- G03: 検査対象ファイルが存在しない場合は WARN として扱い、実行は継続する
+- G06: `gh` コマンドは使用しない（GitHub Issue の作成・更新は行わない）
+- G07: ユーザーの承認なしに intake item を作成しない（REQ-0017-030 MAY）
 
-### 品質ゲート
-- G04: 全 5 検出対象（T1-T5）の検査を必ず実行すること。一部のみの実行は不可
-- G05: Report は必ず `.sisyphus/reports/` 配下に生成すること
+### 委譲・参照制約
+- G08: `agentdev-req-analysis` skill の要件分析手法を参照して REQ フィールドの検査を実施
+- G09: `agentdev-adr-guidelines` skill の ADR 構造定義を参照して ADR フィールドの検査を実施
 
-### 判断・承認制約
-- G06: Intake item の作成はユーザーの明示的な承認が必要。自動作成は禁止
-- G07: ユーザーが intake item 作成を拒否した場合、レポートの内容に影響を与えてはならない
+## Error Handling
 
-### 出力制約
-- G08: サブエージェントの最終出力は verbatim で出力する（再フォーマット禁止）
+| エラー | 対処 |
+|--------|------|
+| スキャン対象ディレクトリが存在しない | 該当カテゴリを空として扱い、警告を出力 |
+| ファイル読込失敗 | 該当ファイルをスキップし、警告を出力 |
+| README が存在しない | Step 2-c, Step 5 をスキップし、警告を出力 |
+| レポート書込失敗 | エラー内容を報告し、コンソールに結果を表示 |
+
+## 注意事項
+
+- **実行の都度レポートを生成**: 過去レポートは上書きしない（日付ベースのファイル名で毎回新規作成）
+- **intake item 作成は任意**: ユーザーが指示した場合のみ実行（REQ-0017-030 MAY）
+- **false negative より false positive を優先**: 整合性検査は「見逃し」より「過検出」を許容する
