@@ -17,12 +17,12 @@ AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-ass
 
 ## クイックスタート
 
-機能追加（Pattern B）の最小フローを示します。バグ修正（Pattern A）は `/issue/issue-req` 後に `/issue/issue-create` へ進みます。
+機能追加（Pattern B）の最小フローを示します。バグ修正（Pattern A）は `/agentdev/req-define` 後に `/agentdev/case-open` へ進みます。
 
 ### 1. 要件を壁打ちする（壁打ちフェーズ）
 
 ```
-/issue/issue-req
+/agentdev/req-define
 ```
 
 AIと対話しながら要件を整理します。完了すると壁打ち成果物が生成されます。
@@ -30,7 +30,7 @@ AIと対話しながら要件を整理します。完了すると壁打ち成果
 ### 2. 要件を保存する（Pattern B のみ）
 
 ```
-/issue/issue-save-req
+/agentdev/req-save
 ```
 
 壁打ち成果物を `docs/requirements/REQ-*.md` と `docs/adr/ADR-*.md` に保存し、コミット・プッシュします。
@@ -38,7 +38,7 @@ AIと対話しながら要件を整理します。完了すると壁打ち成果
 ### 3. Issue を作成する
 
 ```
-/issue/issue-create
+/agentdev/case-open
 ```
 
 REQファイルの内容からGitHub Issueを自動生成します。
@@ -46,7 +46,7 @@ REQファイルの内容からGitHub Issueを自動生成します。
 ### 4. 実装する（構造的実行フェーズ）
 
 ```
-/issue/issue-work
+/agentdev/case-run
 ```
 
 Plan策定から実装、コミットまで一気通貫で実行します。worktreeで作業し、PRも作成されます。
@@ -54,23 +54,28 @@ Plan策定から実装、コミットまで一気通貫で実行します。work
 ### 5. レビューしてクローズする（レビュー完了フェーズ）
 
 ```
-/issue/issue-close
+/agentdev/case-close
 ```
 
 PRをマージし、対応記録をIssueに追記してクローズ、ブランチを削除します。
 
 ## コマンド一覧
 
-### issue コマンド（開発ワークフロー）
+### agentdev コマンド（開発ワークフロー）
 
 | コマンド | 役割 | 対象フェーズ |
 |----------|------|-------------|
-| `issue-req` | 要件の壁打ち・整理 | 壁打ちフェーズ |
-| `issue-save-req` | 壁打ち成果物をREQ/ADRファイルとして保存 | 壁打ちフェーズ |
-| `issue-create` | REQファイルからGitHub Issue作成 | 壁打ちフェーズ |
-| `issue-work` | 計画立案から実装・コミット・PR作成まで一括実行 | 構造的実行フェーズ |
-| `issue-update` | Issue本文の更新やコメント追加 | 構造的実行・レビュー完了 |
-| `issue-close` | PRマージ・記録追記・Issueクローズ・ブランチ削除 | レビュー完了フェーズ |
+| `req-define` | 要件の壁打ち・整理 | 壁打ちフェーズ |
+| `req-save` | 壁打ち成果物をREQ/ADRファイルとして保存 | 壁打ちフェーズ |
+| `case-open` | REQファイルからGitHub Issue作成 | 壁打ちフェーズ |
+| `case-run` | 計画立案から実装・コミット・PR作成まで一括実行 | 構造的実行フェーズ |
+| `case-update` | Issue本文の更新やコメント追加 | 構造的実行・レビュー完了 |
+| `case-close` | PRマージ・記録追記・Issueクローズ・ブランチ削除 | レビュー完了フェーズ |
+
+### issue コマンド（補助ワークフロー）
+
+| コマンド | 役割 | 対象フェーズ |
+|----------|------|-------------|
 | `issue-backlog` | クローズ済みissue/PRから残課題を抽出・分類しdraftとして保存 | 壁打ちフェーズ |
 | `issue-backlog-create` | 承認済みバックログdraftからEpic+子Issueを作成 | 壁打ちフェーズ |
 | `issue-next` | 現在の状態から次に実行すべきコマンドを推論 | 全フェーズ |

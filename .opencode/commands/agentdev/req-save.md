@@ -12,11 +12,11 @@ load_skills:
 
 # 要件保存（壁打ち→docs永続化）
 
-issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとしてdocs/に保存し、コミット・プッシュする。壁打ちフェーズで使用（パターンBのみ）。
+req-define（Prometheus）で壁打ちした成果物をREQ/ADRファイルとしてdocs/に保存し、コミット・プッシュする。壁打ちフェーズで使用（パターンBのみ）。
 
 ## Input
 
-- `.sisyphus/drafts/req-draft-{topic-slug}.md`（issue-req で生成されたドラフト）
+- `.sisyphus/drafts/req-draft-{topic-slug}.md`（req-define で生成されたドラフト）
 
 ## Output
 
@@ -25,12 +25,12 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
 - `docs/README.md`（ドキュメントハブ更新）
 - `docs/adr/ADR-{NNNN}.md`（ADR判断がある場合のみ）
 
-**注記**: area-based構造は将来標準であり、現時点の `issue-save-req` は per-file 構造（`REQ-{NNNN}.md`）へ保存する。`{area}.md` への直接保存および `INDEX.md` の生成・更新は行わない。
+**注記**: area-based構造は将来標準であり、現時点の `req-save` は per-file 構造（`REQ-{NNNN}.md`）へ保存する。`{area}.md` への直接保存および `INDEX.md` の生成・更新は行わない。
 
 ## Steps
 
-1. 事前チェック: `draft-meta` セクションの `pattern` を確認 → パターンA（バグ修正・軽微変更）の場合は即座に中止し、エラーメッセージを表示: `パターンAでは issue-save-req は不要です。直接 /issue/issue-create を実行してください。`
-2. ドラフト読込: `.sisyphus/drafts/req-draft-*.md` を読み込む → 最新の1件を対象とする。見つからない場合はエラーで中止: `壁打ちドラフトが見つかりません。先に /issue/issue-req を実行してください。`
+1. 事前チェック: `draft-meta` セクションの `pattern` を確認 → パターンA（バグ修正・軽微変更）の場合は即座に中止し、エラーメッセージを表示: `パターンAでは req-save は不要です。直接 /agentdev/case-open を実行してください。`
+2. ドラフト読込: `.sisyphus/drafts/req-draft-*.md` を読み込む → 最新の1件を対象とする。見つからない場合はエラーで中止: `壁打ちドラフトが見つかりません。先に /agentdev/req-define を実行してください。`
 3. ドラフト検証: `draft-meta` セクションの必須フィールド（pattern, req-operation, topic-slug）が存在することを確認。欠損時はエラーで中止
 4. REQ ファイル操作 → `req-file-manager` の判定ロジックと採番ルールに従って実行。ドラフトに複数の `req-operation` + `target-req` ペアが含まれる場合は、各ペアを順次処理する（バルクUPDATE対応）:
     - **CREATE**: テンプレート適用（目的/要件/適用範囲構造）、最大REQ番号+1で採番、`docs/requirements/REQ-{NNNN}.md` に保存
@@ -54,13 +54,13 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
     ```
     ✅ 要件をdocs/に保存しました（REQ-{NNNN} を{CREATE/APPEND/UPDATE}）。
       {ADR作成がある場合: ADR-{NNNN} を作成しました。}
-      次のステップ: /issue/issue-create
+      次のステップ: /agentdev/case-open
     ```
     SPLIT が必要な場合、完了報告に以下を追加:
     ```
     ⚠️ SPLIT候補: REQ-{NNNN} の要件が膨張・関心分離の基準に該当。別Issueでの review/follow-up を推奨。
     Finding を作成しました: `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`
-    次のステップ: finding ファイルを入力として /issue/issue-req を実行してください
+    次のステップ: finding ファイルを入力として /agentdev/req-define を実行してください
     ```
 
 ## Guardrails

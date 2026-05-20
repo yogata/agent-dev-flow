@@ -22,7 +22,7 @@ load_skills:
   - 要件化前の設計メモ、調査メモ、反映指示書
   - tips-elevate が生成した staging stub（Requirement Source 形式）
   - その他変更内容・背景・制約・完了条件を含む source file
-- issue-save-req が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
+- req-save が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
 - finding ファイルを含め全てのユーザー明示入力ファイルは read-only の Requirement Source である（G04）。status や frontmatter の更新・上書きは行わない
 - source file の種類に依存しない汎用的な入力扱いとする（elevation-staging 専用分岐は追加しない）
 
@@ -34,7 +34,7 @@ load_skills:
 ## Steps
 
 0. セッションコンテキスト検知（単体実行時のみ）:
-    **前提**: ユーザーが引数なしで `/issue/issue-req` を実行した場合にのみ実行。引数ありの場合は Step 1 から開始。
+    **前提**: ユーザーが引数なしで `/agentdev/req-define` を実行した場合にのみ実行。引数ありの場合は Step 1 から開始。
     
     a) **コンテキストスキャン**: 現在のセッションの会話履歴を分析し、以下の6項目の推論を試みる:
        - 推論順序（依存関係に従う）:
@@ -56,8 +56,8 @@ load_skills:
        - 存在する場合: ファイル名の topic-slug とセッションの要件内容の一致を確認
        - トピック不一致 → draft を無視（セッションコンテキスト優先）
        - トピック一致 → draft の `status` 値でルーティング:
-         - `saved` → issue-save-req 完了状態。issue-create 待ち
-         - `draft` → issue-save-req 未実行。issue-save-req 待ち
+         - `saved` → req-save 完了状態。case-open 待ち
+         - `draft` → req-save 未実行。req-save 待ち
     
     c) **推論サマリー表示**: ルーティング前に以下の形式で推論結果をユーザーに表示（**陈述形式、質問ではない**）:
        ```
@@ -80,11 +80,11 @@ load_skills:
         - **全項目 高信頼度で推論済み（draft なし）**:
           - Pattern B → Step 9（ドラフト保存）へスキップ
           - Pattern A → Step 10（要件doc確認）へスキップ
-       - **一部項目が低信頼度または未推論**:
-         - 推論済み項目（高信頼度）を継承し、不足項目のみを対象に Step 1（壁打ち）を開始
-         - 壁打ちでは不足項目のみを深掘り（既に推論済みの項目は再確認しない）
-       - **推論結果なし（セッションに要件情報が存在しない）**:
-         - 通常の Step 1 から開始（既存動作と同じ）
+        - **一部項目が低信頼度または未推論**:
+          - 推論済み項目（高信頼度）を継承し、不足項目のみを対象に Step 1（壁打ち）を開始
+          - 壁打ちでは不足項目のみを深掘り（既に推論済みの項目は再確認しない）
+        - **推論結果なし（セッションに要件情報が存在しない）**:
+          - 通常の Step 1 から開始（既存動作と同じ）
 
  1. 明示入力ファイルの読み込み（指定された場合）:
     - ユーザーがファイルパスを指定した場合、Read tool で該当ファイルを読み込む
@@ -103,9 +103,9 @@ load_skills:
     - 分類結果は `draft-meta` の `req-operation` と `target-req` に記録
     ※ area-based構造では、REQは area file 内に配置される。現在は per-file（REQ-{NNNN}.md）構造で照合を実施する
  4. 要件を展開 → `req-analysis` の分析観点に従って網羅（照合で取得した関連REQの内容を反映）
- 5. ADR閾値以上の技術判断が発生した場合 → `adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は issue-save-req で実行）
+ 5. ADR閾値以上の技術判断が発生した場合 → `adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は req-save で実行）
  6. 要件doc形式で生成 → テンプレート: `.opencode/skills/req-file-manager/templates/doc_requirement.md` を Read tool で読み込み、目的/要件/適用範囲の構造に従って内容を構造化
-   **テンプレート準拠要件**: テンプレートの【必須】セクション（目的、要件、適用範囲）が全て要件docに含まれること。必須セクションが欠落している場合、生成をやり直すこと。
+    **テンプレート準拠要件**: テンプレートの【必須】セクション（目的、要件、適用範囲）が全て要件docに含まれること。必須セクションが欠落している場合、生成をやり直すこと。
  7. パターン判定:
     - ラベルに基づいて Pattern 判定: `bug`, `critical` → Pattern A, `enhancement`, `feature` → Pattern B, `refactor`, `maintenance` → Pattern C, `docs`, `chore` → Pattern D
     - **Pattern A + ADR必要時の Pattern B 昇格**: Pattern A で ADR閾値以上の技術判断が発生した場合、Pattern B に昇格する（REQファイル・ADRファイルの作成が必要となるため）
@@ -124,7 +124,7 @@ load_skills:
  9. ドラフト保存:
     - **パターンB（機能追加）**: `.sisyphus/drafts/req-draft-{topic-slug}.md` にドラフトを保存。ドラフトは doc_requirement.md テンプレート構造（目的/要件/適用範囲）に以下のメタデータセクションを追加:
       ```markdown
-      ## draft-meta（issue-save-req 用）
+      ## draft-meta（req-save 用）
 
       - **pattern**: B
       - **req-operation**: CREATE | APPEND | UPDATE
@@ -134,16 +134,16 @@ load_skills:
       - **topic-slug**: {ファイル名に使用するスラッグ}
       - **scale**: standard | large
       - **decomposition**: [{scope, modules, description}]（scale が large の場合のみ）
-       - **status**: draft（初期値。issue-save-req → saved, issue-create → issued + 削除）
+       - **status**: draft（初期値。req-save → saved, case-open → issued + 削除）
       ```
     - **パターンA（バグ修正・軽微変更）**: ドラフト保存不要。セッション内で要件docを完結させる
     - **パターンC（リファクタリング・保守作業）/ パターンD（ドキュメント・雑務）**: ドラフト保存不要。セッション内で要件docを完結させる（Pattern Aと同等のlightweight workflow）
 10. 要件doc確認: 生成した要件doc（パターンB: ドラフト内容、パターンA/C/D: セッション内要件doc）をユーザーに提示する。明示的な承認は求めず、提示のみを行う
     - **差し戻し**: ユーザーが修正・差し戻しを指示した場合、壁打ちを継続（Step 1に戻る）
-    - **要件doc確定**: ユーザーが次のコマンド（`/issue/issue-save-req` または `/issue/issue-create`）を実行したことを要件doc確定の意思表示として扱う
+    - **要件doc確定**: ユーザーが次のコマンド（`/agentdev/req-save` または `/agentdev/case-open`）を実行したことを要件doc確定の意思表示として扱う
 11. 完了報告 → `issue-completion-reporting` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
-    - パターンB: `次のステップ: /issue/issue-save-req`
-    - パターンA/C/D: `次のステップ: /issue/issue-create`
+    - パターンB: `次のステップ: /agentdev/req-save`
+    - パターンA/C/D: `次のステップ: /agentdev/case-open`
 
 ## Guardrails
 

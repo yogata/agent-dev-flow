@@ -6,19 +6,22 @@ description: issue コマンドセットの使用ガイド
 
 機能追加とバグ修正を統一された `issue` コマンドセットでサポートします。
 
+> **注意**: req/case パイプラインコマンド（`issue-req`, `issue-save-req`, `issue-create`, `issue-work`, `issue-update`, `issue-close`）は `/agentdev/*` に移行しました。
+> 詳細は [agentdev コマンドガイド](../agentdev/README.md) を参照。
+
 ## 3マクロフェーズ
 
 | フェーズ | 内容 | コマンド |
 |---|---|---|
-| 壁打ち | 要件定義・技術判断を壁打ちで決定 | `/issue/issue-req` → `/issue/issue-save-req` → `/issue/issue-create` |
-| 構造的実行 | TDD・コーディング・デバッグを実行 | `/issue/issue-work` |
-| レビュー完了 | PR・マージ・決定事項クローズ | `/issue/issue-close` |
+| 壁打ち | 要件定義・技術判断を壁打ちで決定 | `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` |
+| 構造的実行 | TDD・コーディング・デバッグを実行 | `/agentdev/case-run` |
+| レビュー完了 | PR・マージ・決定事項クローズ | `/agentdev/case-close` |
 
-**イメージ違ったら**: 要件定義に立ち戻り壁打ちからやり直し（`/issue/issue-req`）
+**イメージ違ったら**: 要件定義に立ち戻り壁打ちからやり直し（`/agentdev/req-define`）
 
 **ショートカット経路**: `/issue/issue-backlog` — 壁打ちから直接バックログ抽出を実行
 
-> **補足**: `/issue/issue-create` は壁打ち(①)と構造的実行(②)の境界に位置するコマンド（①→②境界）。要件docを入力としてGitHub Issueを出力する。
+> **補足**: `/agentdev/case-open` は壁打ち(①)と構造的実行(②)の境界に位置するコマンド（①→②境界）。要件docを入力としてGitHub Issueを出力する。
 
 ## 主要スキル
 
@@ -39,16 +42,21 @@ description: issue コマンドセットの使用ガイド
 
 ## コマンド一覧
 
-L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各コマンドファイルを参照。
+### agentdev コマンド（メインパイプライン）
 
 | コマンド | 役割 | スキル参照 |
 |---|---|---|
-| `/issue/issue-req` | 要件定義（壁打ち） | req-analysis, req-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting |
-| `/issue/issue-save-req` | REQ/ADR保存 | req-file-manager, adr-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting, conventional-commits |
-| `/issue/issue-create` | Issue登録 | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager, issue-template-manager |
-| `/issue/issue-work` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | req-analysis, spec-compliance, issue-lifecycle, issue-completion-reporting, issue-post-review-routing, issue-work-orchestration, git-worktree, gh-cli-best-practices, req-file-manager, adr-file-manager, conventional-commits, epic-status-tracker |
-| `/issue/issue-update` | Issue更新 | issue-lifecycle, issue-completion-reporting, issue-post-review-routing, gh-cli-best-practices, req-file-manager, req-analysis, spec-compliance, issue-template-manager |
-| `/issue/issue-close` | 完了処理 | issue-lifecycle, issue-completion-reporting, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager, epic-status-tracker, issue-template-manager |
+| `/agentdev/req-define` | 要件定義（壁打ち） | req-analysis, req-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting |
+| `/agentdev/req-save` | REQ/ADR保存 | req-file-manager, adr-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting, conventional-commits |
+| `/agentdev/case-open` | Case登録 | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager, issue-template-manager |
+| `/agentdev/case-run` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | req-analysis, spec-compliance, issue-lifecycle, issue-completion-reporting, issue-post-review-routing, issue-work-orchestration, git-worktree, gh-cli-best-practices, req-file-manager, adr-file-manager, conventional-commits, epic-status-tracker, issue-template-manager |
+| `/agentdev/case-update` | Case更新 | issue-lifecycle, issue-completion-reporting, issue-post-review-routing, gh-cli-best-practices, req-file-manager, req-analysis, spec-compliance, issue-template-manager |
+| `/agentdev/case-close` | 完了処理 | issue-lifecycle, issue-completion-reporting, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager, epic-status-tracker, issue-template-manager |
+
+### issue コマンド（補助）
+
+| コマンド | 役割 | スキル参照 |
+|---|---|---|
 | `/issue/issue-next` | 次コマンド推論（セッションコンテキストのみ参照） | issue-lifecycle, issue-post-review-routing, spec-compliance, req-analysis |
 | `/issue/issue-backlog` | バックログ抽出（ショートカット経路） | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices |
 | `/issue/issue-backlog-create` | バックログIssue作成（Epic+子Issue作成、backlog-extractedコメント投稿） | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, issue-template-manager |
@@ -56,19 +64,19 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 ## 基本フロー
 
 ```
-/issue/issue-req → /issue/issue-save-req → /issue/issue-create → /issue/issue-work → /issue/issue-close
+/agentdev/req-define → /agentdev/req-save → /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
 
-ループバック: `/issue/issue-next` が乖離検出時に `/issue/issue-req` へ戻すことを提案。
+ループバック: `/issue/issue-next` が乖離検出時に `/agentdev/req-define` へ戻すことを提案。
 
 ## 各コマンドの詳細
 
-- `/issue/issue-req` — [issue-req.md](./issue-req.md)
-- `/issue/issue-save-req` — [issue-save-req.md](./issue-save-req.md)
-- `/issue/issue-create` — [issue-create.md](./issue-create.md)
-- `/issue/issue-work` — [issue-work.md](./issue-work.md)
-- `/issue/issue-update` — [issue-update.md](./issue-update.md)
-- `/issue/issue-close` — [issue-close.md](./issue-close.md)
+- `/agentdev/req-define` — [req-define.md](../agentdev/req-define.md)
+- `/agentdev/req-save` — [req-save.md](../agentdev/req-save.md)
+- `/agentdev/case-open` — [case-open.md](../agentdev/case-open.md)
+- `/agentdev/case-run` — [case-run.md](../agentdev/case-run.md)
+- `/agentdev/case-update` — [case-update.md](../agentdev/case-update.md)
+- `/agentdev/case-close` — [case-close.md](../agentdev/case-close.md)
 - `/issue/issue-next` — [issue-next.md](./issue-next.md)
 - `/issue/issue-backlog` — [issue-backlog.md](./issue-backlog.md)
 - `/issue/issue-backlog-create` — [issue-backlog-create.md](./issue-backlog-create.md)
@@ -81,8 +89,8 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 |---|---|---|
 | `issue_desc_feature.md` | 機能追加 | `enhancement`, `feature` |
 | `issue_desc_bug.md` | バグ修正 | `bug` |
-| `issue_desc_epic.md` | Epic Issue本文テンプレート | issue-create (Epic flow) |
-| `issue_desc_child.md` | 子Issue本文テンプレート | issue-create (Epic flow) |
+| `issue_desc_epic.md` | Epic Issue本文テンプレート | case-open (Epic flow) |
+| `issue_desc_child.md` | 子Issue本文テンプレート | case-open (Epic flow) |
 
 ## 使用例
 
@@ -90,8 +98,8 @@ L2薄化形式（Input/Output/Steps+スキル参照/Guardrails）。詳細は各
 
 複数モジュールにまたがる大規模機能追加の場合:
 
-1. `/issue/issue-req` — 要件壁打ち（規模判定: Epic）
-2. `/issue/issue-save-req` — REQ保存
-3. `/issue/issue-create` — Epic + 子Issue一括作成
-4. `/issue/issue-work 101 102 103` — 子Issue並列実行（最大5件）
-5. 各子Issueの `/issue/issue-close` 完了後、Epic自動クローズ
+1. `/agentdev/req-define` — 要件壁打ち（規模判定: Epic）
+2. `/agentdev/req-save` — REQ保存
+3. `/agentdev/case-open` — Epic + 子Issue一括作成
+4. `/agentdev/case-run 101 102 103` — 子Issue並列実行（最大5件）
+5. 各子Issueの `/agentdev/case-close` 完了後、Epic自動クローズ

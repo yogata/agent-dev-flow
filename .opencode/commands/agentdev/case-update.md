@@ -1,5 +1,5 @@
 ---
-description: 既存Issueの本文更新、コメント追加、またはREQファイル更新を行う
+description: 既存Caseの本文更新、コメント追加、またはREQファイル更新を行う
 agent: sisyphus
 load_skills:
   - issue-lifecycle
@@ -12,9 +12,9 @@ load_skills:
   - issue-template-manager
 ---
 
-# Issue更新
+# Case更新
 
-既存Issueの本文更新、コメント追加、またはREQファイル更新を行う。主にレビューNG時の対応に使用。
+既存Caseの本文更新、コメント追加、またはREQファイル更新を行う。主にレビューNG時の対応に使用。
 
 ## Input
 
@@ -73,7 +73,7 @@ load_skills:
 
 ### フェーズ制約
 - G01: フェーズは変更なし（現在のフェーズを維持）
-- G02: CI/CD修正・自律修正ループは issue-update の管轄外とする（issue-work の責務）。issue-update はREQ更新・レビューNG時のコメント追加・Issue本文更新のみを責務とする
+- G02: CI/CD修正・自律修正ループは case-update の管轄外とする（case-run の責務）。case-update はREQ更新・レビューNG時のコメント追加・Issue本文更新のみを責務とする
 
 ### 実行制約
 - G03: Issue番号の解決に `gh issue list` / `gh issue status` 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
