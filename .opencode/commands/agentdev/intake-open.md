@@ -2,9 +2,9 @@
 description: intake-promote が生成した artifact から GitHub Issue を作成
 agent: sisyphus
 load_skills:
-  - agentdev-gh-cli-best-practices
-  - agentdev-epic-status-tracker
-  - agentdev-case-templates
+  - agentdev-gh-cli
+  - agentdev-epic-tracker
+  - agentdev-workflow-templates
 ---
 
 # Intake Open
@@ -43,40 +43,40 @@ load_skills:
    - 複数 item または Epic 構成指定あり → **Epic flow**（Step 7〜12）
 
 4. **[Single Issue] テンプレート選択**: item の内容に応じてテンプレートを選択する:
-   - テンプレート: `.opencode/skills/issue-template-manager/templates/issue_desc_feature.md` または `issue_desc_bug.md`
+   - テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_feature.md` または `issue_desc_bug.md`
    - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全て Issue 本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
 
 5. **[Single Issue] Issue 作成**:
    - artifact の内容から Issue 本文を生成
    - ラベル: item 内容に応じて選定（`enhancement` または `bug` 等）
-   - `agentdev-gh-cli-best-practices` に従って `--body-file` で作成
-   - `agentdev-gh-cli-best-practices` の VERIFY操作（書き込み内容検証）を実行すること
+   - `agentdev-gh-cli` に従って `--body-file` で作成
+   - `agentdev-gh-cli` の VERIFY操作（書き込み内容検証）を実行すること
 
 6. **[Single Issue] 完了報告** → Step 13 へ
 
 7. **[Epic flow] Epic Issue 作成**:
-   - テンプレート: `.opencode/skills/issue-template-manager/templates/issue_desc_epic.md`
+   - テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_epic.md`
    - artifact のサマリー情報から Epic Issue 本文を生成
    - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全て Epic Issue 本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
    - タイトル: artifact のサマリーから生成
    - ラベル: `enhancement`, `epic`
-   - `agentdev-gh-cli-best-practices` に従って `--body-file` で作成
-   - `agentdev-gh-cli-best-practices` の VERIFY操作（書き込み内容検証）を実行すること
+   - `agentdev-gh-cli` に従って `--body-file` で作成
+   - `agentdev-gh-cli` の VERIFY操作（書き込み内容検証）を実行すること
    - 作成された Issue 番号を `{epic_number}` として記録
 
 8. **[Epic flow] 子Issue 作成**: 各 item を Epic 配下の子Issue として作成する:
-   - テンプレート: `.opencode/skills/issue-template-manager/templates/issue_desc_child.md`
+   - テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_child.md`
    - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全て子Issue 本文に含まれること。
    - `Parent: #{epic_number}` を先頭行に配置
    - ラベル: `enhancement`
-   - `agentdev-gh-cli-best-practices` に従って `--body-file` で作成
-   - `agentdev-gh-cli-best-practices` の VERIFY操作（書き込み内容検証）を実行すること
+   - `agentdev-gh-cli` に従って `--body-file` で作成
+   - `agentdev-gh-cli` の VERIFY操作（書き込み内容検証）を実行すること
 
 9. **[Epic flow] Epic 更新**: 全子Issue 作成後、Epic Issue 本文の子Issue リンクを実際の Issue 番号で更新する:
-   - `agentdev-gh-cli-best-practices` に従って `--body-file` で更新
+   - `agentdev-gh-cli` に従って `--body-file` で更新
    - テンプレートの `【必須】` セクションが維持されていることを確認
 
-10. **[Epic flow] ステータス追跡更新**: `agentdev-epic-status-tracker` に従って Epic のステータスを初期化する。
+10. **[Epic flow] ステータス追跡更新**: `agentdev-epic-tracker` に従って Epic のステータスを初期化する。
 
 11. **[Epic flow] 完了報告** → Step 13 へ
 
@@ -84,7 +84,7 @@ load_skills:
 
 13. **Artifact ステータス更新**: 処理済みの promoted artifact に `issued` マークを付与する。artifact の frontmatter またはファイル名で処理済みであることを示す。
 
-14. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
+14. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
 
     **Single Issue flow**:
     ```
@@ -120,8 +120,8 @@ load_skills:
 - G09: 全子Issue の作成完了後に Epic 本文を更新する（部分更新は禁止）
 
 ### 委譲・参照制約
-- G10: `agentdev-gh-cli-best-practices` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
-- G11: `agentdev-case-templates` のテンプレートを使用すること
+- G10: `agentdev-gh-cli` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
+- G11: `agentdev-workflow-templates` のテンプレートを使用すること
 
 ### 出力制約
 - G12: サブエージェントの最終出力は verbatim で出力する（再フォーマット禁止）

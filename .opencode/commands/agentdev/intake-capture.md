@@ -2,8 +2,8 @@
 description: 未分類の変更候補を手動入力から intake item として保存する
 agent: sisyphus
 load_skills:
-  - issue-lifecycle
-  - issue-completion-reporting
+  - agentdev-workflow-lifecycle
+  - agentdev-workflow-reporting
 ---
 
 # Intake Capture（手動入力）
@@ -65,7 +65,7 @@ intake item は以下の Markdown artifact とする（REQ-0017-032）。workflo
    - ディレクトリが存在しない場合は作成する
    - 同名ファイルが存在する場合は `{topic-slug}-2`, `{topic-slug}-3` のように連番を付与する
 
-5. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
+5. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
    ```
    ✅ intake item を保存しました。
      タイトル: {タイトル}

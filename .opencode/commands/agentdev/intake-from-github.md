@@ -2,9 +2,9 @@
 description: クローズ済み GitHub Issue/PR から未回収の変更候補を intake item として保存する
 agent: sisyphus
 load_skills:
-  - issue-lifecycle
-  - issue-completion-reporting
-  - gh-cli-best-practices
+  - agentdev-workflow-lifecycle
+  - agentdev-workflow-reporting
+  - agentdev-gh-cli
 ---
 
 # Intake from GitHub
@@ -55,7 +55,7 @@ load_skills:
 2. **データ取得**: `gh` CLI を使用して、指定期間内にクローズされた Issue と PR を取得する:
    - Issues: `gh issue list --state closed --search "closed:>=YYYY-MM-DD" --limit 100 --json number,title,body,state,closedAt,labels,comments`
    - PRs: `gh pr list --state closed --search "closed:>=YYYY-MM-DD" --limit 100 --json number,title,body,state,closedAt,labels,comments`
-   - `gh-cli-best-practices` に従ってコマンドを実行する（読み取り操作は READ 操作手順に従う）
+   - `agentdev-gh-cli` に従ってコマンドを実行する（読み取り操作は READ 操作手順に従う）
    - コメントも取得: `gh issue view {N} --json comments` / `gh pr view {N} --json comments`
 
 2a. **既抽出スキップ**: 取得した各 Issue/PR のコメントにマーカーキーワード `backlog-extracted` が含まれているか確認する:
@@ -94,7 +94,7 @@ load_skills:
    | 1 | ... | #XX | YYYY-MM-DD-xxx.md |
    ```
 
-8. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
+8. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
    ```
    ✅ intake item の抽出・保存が完了しました。
      対象期間: {since} 〜 {until}
@@ -120,6 +120,6 @@ load_skills:
 ### 実行制約
 - G09: データ取得は `gh` CLI のみ使用（GitHub API 直接呼び出し不可）
 - G10: 対象はクローズ済み Issue/PR のみ（オープン中は対象外）
-- G11: `gh-cli-best-practices` に従って読み取り操作を実行する
+- G11: `agentdev-gh-cli` に従って読み取り操作を実行する
 - G12: 保存先は `.agentdev/intake/inbox/` のみ
 - G13: サブエージェントの最終出力は verbatim で出力する（再フォーマット禁止）

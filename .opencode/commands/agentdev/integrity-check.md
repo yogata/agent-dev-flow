@@ -4,7 +4,7 @@ agent: sisyphus
 load_skills:
   - agentdev-req-analysis
   - agentdev-adr-guidelines
-  - agentdev-gh-cli-best-practices
+  - agentdev-gh-cli
 ---
 
 # Artifact 整合性検査

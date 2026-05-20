@@ -2,8 +2,8 @@
 description: レビュー済み intake item を後続コマンド（req-define / intake-open）に渡せる入力 artifact に整形する
 agent: sisyphus
 load_skills:
-  - issue-lifecycle
-  - issue-completion-reporting
+  - agentdev-workflow-lifecycle
+  - agentdev-workflow-reporting
 ---
 
 # Intake Promote
@@ -68,7 +68,7 @@ load_skills:
    - ディレクトリが存在しない場合は作成する
    - ファイル名: `YYYY-MM-DD-{topic-slug}.md`（元 item 名を維持、または束ねた内容に応じた名前）
 
-7. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
+7. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
    ```
    ✅ intake item の整形が完了しました。
      整形対象: {N}件

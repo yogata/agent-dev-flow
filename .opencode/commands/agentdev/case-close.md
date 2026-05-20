@@ -2,15 +2,15 @@
 description: PRをマージし、対応記録を追記し、Caseをクローズしてブランチを削除する
 agent: sisyphus
 load_skills:
-  - issue-lifecycle
-  - issue-completion-reporting
-  - tips-capture
-  - archive-completed-plan
-  - gh-cli-best-practices
-  - git-worktree
-  - req-file-manager
-  - epic-status-tracker
-  - issue-template-manager
+  - agentdev-workflow-lifecycle
+  - agentdev-workflow-reporting
+  - agentdev-learning-capture
+  - agentdev-archive-plan
+  - agentdev-gh-cli
+  - agentdev-git-worktree
+  - agentdev-req-file-manager
+  - agentdev-epic-tracker
+  - agentdev-workflow-templates
 ---
 
 # 完了処理
@@ -49,56 +49,56 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 実装コード・設定・関連ドキュメントが要件と矛盾していないことを確認する（SHALL）
     - 旧仕様の記述が残っている場合、その記述が変更後仕様と矛盾しないことを確認する（SHALL）
     - 変更後仕様と矛盾するドキュメント更新漏れがある場合、完了不可とする（SHALL）
-4. PRマージ（`gh pr merge`）→ 対応記録をIssueにコメント追記 → テンプレート: `.opencode/skills/issue-template-manager/templates/issue_comment_feature_implementation.md`（パターンB）または `.opencode/skills/issue-template-manager/templates/issue_comment_bug_record.md`（パターンA/C/D）を Read tool で読み込む
+4. PRマージ（`gh pr merge`）→ 対応記録をIssueにコメント追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_implementation.md`（パターンB）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_record.md`（パターンA/C/D）を Read tool で読み込む
     - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-    - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
+    - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 5. Issue本文のテスト戦略チェックボックス更新:
     - Issue本文を取得し、未チェックのチェックボックス（`- [ ]`）を全て特定
     - 各未チェック項目について、PRの検証結果・実装内容に基づき達成判定:
         - PRまたは実装コメントに検証証拠がある → `[x]` に更新
         - 「手動確認」項目のうち、実動作で証明済みのもの（例: CI通過＝動作証明、マージ成功＝機能動作） → `[x]` に更新（理由を記録）
         - 検証証拠がない → `[ ]` のまま
-    - `gh-cli-best-practices` に従い `--body-file` で `gh issue edit` を実行してIssue本文を更新
-    - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
+    - `agentdev-gh-cli` に従い `--body-file` で `gh issue edit` を実行してIssue本文を更新
+    - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 6. Issueクローズ（`gh issue close --reason completed`）
-7. ブランチ・worktree削除 → `git-worktree` スキルの「worktree削除手順」に従って以下を実行:
+7. ブランチ・worktree削除 → `agentdev-git-worktree` スキルの「worktree削除手順」に従って以下を実行:
     - worktree削除（`git worktree remove`）
     - worktree prune
     - ローカルブランチ削除（`git branch -d`）
-    - **リモートブランチ削除**（`git push origin --delete`）— `git-worktree` スキル Step 4 参照
+    - **リモートブランチ削除**（`git push origin --delete`）— `agentdev-git-worktree` スキル Step 4 参照
     - 削除の成否を確認し、失敗した場合は警告表示してユーザーの判断を仰ぐ
     - ローカルmainブランチ同期:
         - メインリポジトリのルートディレクトリで `git pull` を実行
         - `Already up to date.` または Fast-forward であることを確認
         - `git pull` が失敗した場合（コンフリクト等）: エラー内容を報告して停止する。自動的なコンフリスト解決は行わない
-8. 親Epic Issue更新（`epic-status-tracker` スキル参照）:
+8. 親Epic Issue更新（`agentdev-epic-tracker` スキル参照）:
     - Issue本文からParent Issue番号を特定（`Parent: #{N}` パターンを検索）
     - Parent Issueが存在しない場合 → スキップ
     - Parent Issueの本文を取得
     - ステータストラッキング表から該当Issue番号（#{N}）の行を特定
     - 該当行のステータス列を更新（例: `☐ 未着手` → `✅ 完了 ([PR#{N}](URL))`、`🔄 進行中` → `✅ 完了 ([PR#{N}](URL))`）
     - 該当Issue番号の詳細セクションがある場合、ステータスとPR情報を更新（例: `✅ 完了 ([PR#{N}](URL))`）
-    - `gh-cli-best-practices` に従い `--body-file` で `gh issue edit` を実行してParent Issue本文を更新
-    - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
+    - `agentdev-gh-cli` に従い `--body-file` で `gh issue edit` を実行してParent Issue本文を更新
+    - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
     - **Epic自動クローズ判定**（Parent Issue更新後）:
         - 更新後のParent Issue本文から全子Issue番号を抽出（`#{N}` パターンを検索）
         - 各子Issueの状態を `gh issue view {N} --json state` で確認
         - 状態取得に失敗した場合 → 警告表示してスキップ（Epicクローズしない）
         - 全子Issueが "CLOSED" またはステータス追跡テーブルで `❌ 対処不要` の場合:
             - Epicに完了コメントを追記（「全子Issue完了のため自動クローズ」+ 子Issue一覧）
-            - `gh-cli-best-practices` に従い `--body-file` でコメント追記
-            - 書き込み完了後、`gh-cli-best-practices` の VERIFY操作（Section 5-8）に従って内容を検証すること。
+            - `agentdev-gh-cli` に従い `--body-file` でコメント追記
+            - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
             - `gh issue close {epic_number} --reason completed` でEpicをクローズ
             - 完了報告に「Epic #{N} を自動クローズ」と表示
         - 1件以上 "OPEN" の子Issueがある場合 → スキップ（完了報告に「Epic #{N}: N件未完了のためスキップ」と表示）
-9. 学びの検知・抽出: `tips-capture` スキルに従い、エージェントが自ら学びの有無を判断する
+9. 学びの検知・抽出: `agentdev-learning-capture` スキルに従い、エージェントが自ら学びの有無を判断する
     - **禁止**: ユーザーに学びの有無を問うこと（「学びはありますか？」等）は禁止。エージェントが判断する
     - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `docs/tips/inbox.md` に直接追記する（パイプライン内のためlearning-addは使用しない）。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
     - エージェントが学びなしと判断 → ユーザーに何も問わず次のステップへ進む
 10. Plan アーカイブ: `.sisyphus/plans/` から該当Issue番号に関連するplanファイルを検索
-    - planファイルが見つかった場合 → `archive-completed-plan` スキルに従ってアーカイブ実行
+    - planファイルが見つかった場合 → `agentdev-archive-plan` スキルに従ってアーカイブ実行
     - planファイルが見つからない場合 → スキップ（注記付き）
-11. 完了報告 → `issue-completion-reporting` の完了報告フォーマット
+11. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット
 
 ## Guardrails
 
@@ -118,13 +118,13 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G11: コメントテンプレートの【必須】セクションが全てコメント本文に含まれていることを確認してからコメント投稿すること
 
 ### 判断・承認制約
-- G12: `archive-completed-plan` はplan_nameが特定できない場合はスキップ可
+- G12: `agentdev-archive-plan` はplan_nameが特定できない場合はスキップ可
 
 ### 委譲・参照制約
-- G13: `gh-cli-best-practices` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
-- G14: `tips-capture` スキルのフロー（エージェントが検知・抽出・自律蓄積・内容通知。承認可否を問わない）に従う。ユーザーに学びの有無や内容の入力を求めることは禁止
-- G15: gh CLI出力を読み取る際は `gh-cli-best-practices` の安全な読み取り手順に従うこと
-- G16: Pattern分岐の判定基準と固有ルールは `issue-lifecycle` → Pattern Registry を参照
+- G13: `agentdev-gh-cli` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
+- G14: `agentdev-learning-capture` スキルのフロー（エージェントが検知・抽出・自律蓄積・内容通知。承認可否を問わない）に従う。ユーザーに学びの有無や内容の入力を求めることは禁止
+- G15: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
+- G16: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
 
 ### 出力制約
 - G17: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）

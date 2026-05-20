@@ -2,8 +2,8 @@
 description: inbox 内の intake item をレビューし、採用・却下・保留の判定を行う
 agent: sisyphus
 load_skills:
-  - issue-lifecycle
-  - issue-completion-reporting
+  - agentdev-workflow-lifecycle
+  - agentdev-workflow-reporting
 ---
 
 # Intake Review
@@ -71,7 +71,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
    - `保留` → `.agentdev/intake/inbox/` に残す（移動しない）
    - `却下` → `.agentdev/intake/rejected/` に移動
 
-7. **完了報告** → `issue-completion-reporting` の完了報告フォーマットに従って出力:
+7. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
    ```
    ✅ intake review が完了しました。
      レビュー対象: {N}件

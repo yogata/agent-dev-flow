@@ -26,11 +26,11 @@
 - **自律対応内容**: `git commit --amend` でメッセージを規約準拠形式に修正し、CI再実行で通過を確認
 - **ユーザー確認有無**: なし
 - **ADR/REQ/spec影響**: なし
-- **横展開観点**: コミットメッセージ生成時は常に conventional-commits スキルを参照すべき。他のコマンドでもコミット生成箇所があるため同様のリスクあり
-- **再発条件**: `conventional-commits` スキルをロードせずにコミットメッセージを生成する場合
-- **予防策候補**: issue-work や issue-close のコミット生成ステップに conventional-commits スキルのロードを必須化する
-- **想定反映先**: `conventional-commits` スキル、`issue-work` コマンド
-- **関連**: `.opencode/skills/conventional-commits/SKILL.md`, `.opencode/commands/issue/issue-work.md`
+- **横展開観点**: コミットメッセージ生成時は常に agentdev-conventional-commits スキルを参照すべき。他のコマンドでもコミット生成箇所があるため同様のリスクあり
+- **再発条件**: `agentdev-conventional-commits` スキルをロードせずにコミットメッセージを生成する場合
+- **予防策候補**: issue-work や issue-close のコミット生成ステップに agentdev-conventional-commits スキルのロードを必須化する
+- **想定反映先**: `agentdev-conventional-commits` スキル、`issue-work` コマンド
+- **関連**: `.opencode/skills/agentdev-conventional-commits/SKILL.md`, `.opencode/commands/issue/issue-work.md`
 - **タグ**: `#ci` `#コミットメッセージ` `#テンプレート逸脱`
 ```
 
@@ -103,7 +103,7 @@
 
 - **問題事象**: Issue #150 の実装中、REQ-0005とspecs/design-principles.mdで定義されているエラー処理方針が矛盾していることを発見した
 - **発生局面**: 実装
-- **検知方法**: spec-compliance スキルによる実装前チェック
+- **検知方法**: agentdev-spec-compliance スキルによる実装前チェック
 - **根本原因**: REQ-0005作成時に design-principles.md の既存方針との整合性確認が漏れていた
 - **自律対応内容**: 矛盾点を整理し、ユーザーに確認してREQ-0005の該当セクションを修正
 - **ユーザー確認有無**: あり
@@ -111,7 +111,7 @@
 - **横展開観点**: REQ作成時は常に既存specs/ADRとの整合性確認を必須とすべき
 - **再発条件**: 新規REQ作成時に既存ドキュメントとの整合性チェックをスキップする場合
 - **予防策候補**: issue-save-req の実行ステップに specs/ADR 整合性チェックを追加する
-- **想定反映先**: `issue-save-req` コマンド、`req-analysis` スキル
+- **想定反映先**: `issue-save-req` コマンド、`agentdev-req-analysis` スキル
 - **関連**: `docs/requirements/REQ-0005.md`, `docs/specs/design-principles.md`, Issue #150
 - **タグ**: `#仕様矛盾` `#REQ更新` `#ADR影響`
 ```

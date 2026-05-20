@@ -31,14 +31,14 @@ description: issue コマンドセットの使用ガイド
 
 | スキル | 役割 |
 |---|---|
-| `issue-lifecycle` | フェーズ定義・SSoT遷移・パターン判定・コマンド関連・docs構造 |
-| `issue-completion-reporting` | 完了報告フォーマット・チェックボックス更新・サブエージェント出力ポリシー |
-| `issue-post-review-routing` | レビューNG対応フロー・issue-next推論ルール |
-| `req-analysis` | 要件分析手法（機能・非機能の分析・品質基準） |
-| `req-file-manager` | REQファイル管理（作成・追記・更新・バリデーション） |
-| `spec-compliance` | 乖離検出（要件とのズレ検知・ループバック判定） |
-| `adr-guidelines` | ADR閾値判定（アーキテクチャ級の決定） |
-| `adr-file-manager` | ADRファイル管理（作成・追記・更新・バリデーション） |
+| `agentdev-workflow-lifecycle` | フェーズ定義・SSoT遷移・パターン判定・コマンド関連・docs構造 |
+| `agentdev-workflow-reporting` | 完了報告フォーマット・チェックボックス更新・サブエージェント出力ポリシー |
+| `agentdev-workflow-routing` | レビューNG対応フロー・issue-next推論ルール |
+| `agentdev-req-analysis` | 要件分析手法（機能・非機能の分析・品質基準） |
+| `agentdev-req-file-manager` | REQファイル管理（作成・追記・更新・バリデーション） |
+| `agentdev-spec-compliance` | 乖離検出（要件とのズレ検知・ループバック判定） |
+| `agentdev-adr-guidelines` | ADR閾値判定（アーキテクチャ級の決定） |
+| `agentdev-adr-file-manager` | ADRファイル管理（作成・追記・更新・バリデーション） |
 
 ## コマンド一覧
 
@@ -46,20 +46,20 @@ description: issue コマンドセットの使用ガイド
 
 | コマンド | 役割 | スキル参照 |
 |---|---|---|
-| `/agentdev/req-define` | 要件定義（壁打ち） | req-analysis, req-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting |
-| `/agentdev/req-save` | REQ/ADR保存 | req-file-manager, adr-file-manager, adr-guidelines, issue-lifecycle, issue-completion-reporting, conventional-commits |
-| `/agentdev/case-open` | Case登録 | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices, req-file-manager, req-analysis, adr-file-manager, issue-template-manager |
-| `/agentdev/case-run` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | req-analysis, spec-compliance, issue-lifecycle, issue-completion-reporting, issue-post-review-routing, issue-work-orchestration, git-worktree, gh-cli-best-practices, req-file-manager, adr-file-manager, conventional-commits, epic-status-tracker, issue-template-manager |
-| `/agentdev/case-update` | Case更新 | issue-lifecycle, issue-completion-reporting, issue-post-review-routing, gh-cli-best-practices, req-file-manager, req-analysis, spec-compliance, issue-template-manager |
-| `/agentdev/case-close` | 完了処理 | issue-lifecycle, issue-completion-reporting, tips-capture, archive-completed-plan, gh-cli-best-practices, git-worktree, req-file-manager, epic-status-tracker, issue-template-manager |
+| `/agentdev/req-define` | 要件定義（壁打ち） | agentdev-req-analysis, agentdev-req-file-manager, agentdev-adr-guidelines, agentdev-workflow-lifecycle, agentdev-workflow-reporting |
+| `/agentdev/req-save` | REQ/ADR保存 | agentdev-req-file-manager, agentdev-adr-file-manager, agentdev-adr-guidelines, agentdev-workflow-lifecycle, agentdev-workflow-reporting, agentdev-conventional-commits |
+| `/agentdev/case-open` | Case登録 | agentdev-workflow-lifecycle, agentdev-workflow-reporting, agentdev-gh-cli, agentdev-req-file-manager, agentdev-req-analysis, agentdev-adr-file-manager, agentdev-workflow-templates |
+| `/agentdev/case-run` | 実装パイプライン（3フェーズ構成: 準備→実装→提出）。複数Issueの並列実行に対応 | agentdev-req-analysis, agentdev-spec-compliance, agentdev-workflow-lifecycle, agentdev-workflow-reporting, agentdev-workflow-routing, agentdev-workflow-orchestration, agentdev-git-worktree, agentdev-gh-cli, agentdev-req-file-manager, agentdev-adr-file-manager, agentdev-conventional-commits, agentdev-epic-tracker, agentdev-workflow-templates |
+| `/agentdev/case-update` | Case更新 | agentdev-workflow-lifecycle, agentdev-workflow-reporting, agentdev-workflow-routing, agentdev-gh-cli, agentdev-req-file-manager, agentdev-req-analysis, agentdev-spec-compliance, agentdev-workflow-templates |
+| `/agentdev/case-close` | 完了処理 | agentdev-workflow-lifecycle, agentdev-workflow-reporting, agentdev-learning-capture, agentdev-archive-plan, agentdev-gh-cli, agentdev-git-worktree, agentdev-req-file-manager, agentdev-epic-tracker, agentdev-workflow-templates |
 
 ### issue コマンド（補助）
 
 | コマンド | 役割 | スキル参照 |
 |---|---|---|
-| `/issue/issue-next` | 次コマンド推論（セッションコンテキストのみ参照） | issue-lifecycle, issue-post-review-routing, spec-compliance, req-analysis |
-| `/issue/issue-backlog` | バックログ抽出（ショートカット経路） | issue-lifecycle, issue-completion-reporting, gh-cli-best-practices |
-| `/agentdev/intake-open` | Intake Issue作成（intake-promote 生成 artifact から GitHub Issue 作成） | agentdev-gh-cli-best-practices, agentdev-epic-status-tracker, agentdev-case-templates |
+| `/issue/issue-next` | 次コマンド推論（セッションコンテキストのみ参照） | agentdev-workflow-lifecycle, agentdev-workflow-routing, agentdev-spec-compliance, agentdev-req-analysis |
+| `/issue/issue-backlog` | バックログ抽出（ショートカット経路） | agentdev-workflow-lifecycle, agentdev-workflow-reporting, agentdev-gh-cli |
+| `/agentdev/intake-open` | Intake Issue作成（intake-promote 生成 artifact から GitHub Issue 作成） | agentdev-agentdev-gh-cli, agentdev-agentdev-epic-tracker, agentdev-case-templates |
 
 ## 基本フロー
 
@@ -82,7 +82,7 @@ description: issue コマンドセットの使用ガイド
 
 ## テンプレート
 
-- **Issue/PR description テンプレート**: `.opencode/skills/issue-template-manager/templates/` に配置（PR本文テンプレート含む）。詳細は `issue-template-manager` スキルを参照。
+- **Issue/PR description テンプレート**: `.opencode/skills/agentdev-workflow-templates/templates/` に配置（PR本文テンプレート含む）。詳細は `agentdev-workflow-templates` スキルを参照。
 
 | テンプレート | 用途 | ラベル |
 |---|---|---|
