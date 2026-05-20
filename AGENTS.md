@@ -1,3 +1,11 @@
+## AgentDevFlow Canonical Namespace
+
+- Plugin 表示名: `AgentDevFlow`
+- Canonical namespace: `agentdev`
+- Public command prefix: `/agentdev/*`
+- Domain state directory: `.agentdev/`
+- 詳細: ADR-0005, REQ-0017
+
 ## 開発環境
 
 - OS: Windows

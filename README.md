@@ -1,6 +1,19 @@
 # opencode-config
 
-OpenCodeの設定を管理するリポジトリです。Issue駆動開発ワークフローを支えるコマンド・スキル・ドキュメントを一元管理しています。
+AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-assisted development workflow を支えるコマンド・スキル・ドキュメントを一元管理しています。
+
+## AgentDevFlow Plugin
+
+| 項目 | 値 |
+|------|------|
+| Plugin 表示名 | `AgentDevFlow` |
+| Canonical namespace | `agentdev` |
+| Public command prefix | `/agentdev/*` |
+| Domain state directory | `.agentdev/` |
+| Skill prefix | `agentdev-*` |
+| Domains | req, case, learning, intake, integrity |
+
+詳細は [ADR-0005](docs/adr/ADR-0005.md) および [REQ-0017](docs/requirements/REQ-0017.md) を参照。
 
 ## クイックスタート
 
