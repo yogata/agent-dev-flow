@@ -40,6 +40,7 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
     - **UPDATE**: 既存REQファイルの該当セクション（目的/要件/適用範囲）を更新、frontmatter updated 更新
     - **バルク処理**: 複数REQファイルのUPDATEが指示されている場合、各REQファイルに対して上記UPDATE手順を順次実行する。全UPDATEの整合性（REQ番号の重複なし、frontmatterの一貫性）を最後に一括で検証する
     - **SPLIT検出時**: 要件の膨張・関心分離により SPLIT が必要と判定された場合でも、CREATE/APPEND/UPDATE の保存可能範囲を実行し、保存全体を中止しない。SPLIT 対象は完了報告で follow-up として明示する
+    - **Finding 作成**: SPLIT が検出された場合、requirements review finding を `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md` に作成する。finding の形式は `issue-lifecycle` reference の `requirements-review-finding-protocol.md` に従う
 5. インデックス・ハブ更新:
    - **docs/requirements/README.md**: CREATE時は新規行を追加、APPEND/UPDATE時は該当REQのtitle列をfrontmatter値に合わせて更新
    - **docs/README.md**: CREATE時は新規リンクをREQ番号順の正しい位置に挿入、APPEND/UPDATE時は該当REQのリンクテキスト（タイトル変更時のみ）を更新
@@ -58,6 +59,8 @@ issue-req（Prometheus）で壁打ちした成果物をREQ/ADRファイルとし
     SPLIT が必要な場合、完了報告に以下を追加:
     ```
     ⚠️ SPLIT候補: REQ-{NNNN} の要件が膨張・関心分離の基準に該当。別Issueでの review/follow-up を推奨。
+    Finding を作成しました: `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`
+    次のステップ: finding ファイルを入力として /issue/issue-req を実行してください
     ```
 
 ## Guardrails

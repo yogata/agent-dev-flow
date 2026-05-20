@@ -30,17 +30,17 @@
 
 各コマンドがどのアーティファクトをREAD/WRITEするかの明示的なマトリクス。
 
-| コマンド | specs | ADR | REQ |
-|----------|-------|-----|-----|
-| `/issue/issue-req` | — | — | READ |
-| `/issue/issue-save-req` | — | WRITE | WRITE |
-| `/issue/issue-create` | READ | READ | READ |
-| `/issue/issue-work` | READ+WRITE | READ | READ |
-| `/issue/issue-close` | — | — | READ |
-| `/issue/issue-update` | — | — | READ+WRITE |
-| `/issue/issue-backlog` | — | — | — |
-| `/issue/issue-backlog-create` | — | — | — |
-| `/issue/issue-next`          | — | — | — |
+| コマンド | specs | ADR | REQ | finding |
+|----------|-------|-----|-----|---------|
+| `/issue/issue-req` | — | — | READ | READ（明示入力時） |
+| `/issue/issue-save-req` | — | WRITE | WRITE | WRITE（SPLIT検出時） |
+| `/issue/issue-create` | READ | READ | READ | — |
+| `/issue/issue-work` | READ+WRITE | READ | READ | — |
+| `/issue/issue-close` | — | — | READ | — |
+| `/issue/issue-update` | — | — | READ+WRITE | — |
+| `/issue/issue-backlog` | — | — | — | — |
+| `/issue/issue-backlog-create` | — | — | — | — |
+| `/issue/issue-next`          | — | — | — | — |
 
 ## データフロー図
 
@@ -48,9 +48,12 @@
 /issue/issue-req(draft WRITE) → /issue/issue-save-req(REQ WRITE, ADR WRITE) → /issue/issue-create(specs READ, ADR READ) → /issue/issue-work(specs READ+WRITE, ADR READ) → TDD実装 → specs更新 → /issue/issue-close(VERIFY)
 /issue/issue-backlog(draft WRITE) → /issue/issue-backlog-create(Epic + 子Issue作成, backlog-extracted コメント投稿)
 /issue/issue-work(並列: 複数Issue → Wave実行 → specs直列更新) → 各PR作成
+/issue/issue-save-req(SPLIT検出 → finding WRITE) → /issue/issue-req(finding READ → 要件変更)
 ```
 
 - **/issue/issue-req**: 要件docを壁打ちで構築し、パターンBの場合はドラフトを保存する（draft WRITE）
+- **/issue/issue-save-req（SPLIT検出時）**: requirements review finding を `.sisyphus/drafts/` に保存する（finding WRITE）
+- **/issue/issue-req（finding 入力時）**: finding ファイルを明示入力として読み込み、正式な要件変更に変換する（finding READ）
 - **/issue/issue-backlog**: クローズ済みissue/PRから残課題を抽出・分類し、解消チェック後にdraftとして保存する（ショートカット経路、specs/ADR/REQアクセスなし）
 - **/issue/issue-backlog-create**: 承認済みバックログdraftを読み込み、`issue_desc_backlog_epic.md` / `issue_desc_backlog_child.md` テンプレートでEpic + 子Issueを作成し、`backlog-extracted` コメントを投稿する（specs/ADR/REQアクセスなし）
 - **/issue/issue-create**: specs・ADRを読み込んでIssue本文に反映する（READ）

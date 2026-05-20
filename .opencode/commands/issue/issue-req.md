@@ -22,6 +22,7 @@ load_skills:
   - 要件化前の設計メモ、調査メモ、反映指示書
   - tips-elevate が生成した staging stub（Requirement Source 形式）
   - その他変更内容・背景・制約・完了条件を含む source file
+  - issue-save-req が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
   - source file の種類に依存しない汎用的な入力扱いとする（elevation-staging 専用分岐は追加しない）
 
 ## Output
@@ -88,7 +89,8 @@ load_skills:
     - ユーザーがファイルパスを指定した場合、Read tool で該当ファイルを読み込む
     - Requirement Source 形式（背景・問題・望ましい変更・対象範囲・反映先候補・既存対策確認・制約・完了条件を含む構造）を想定するが、任意のテキスト形式も受け入れる
     - 読み込んだ内容を壁打ちの初期コンテキストとして扱う（source file の種類による分岐は行わない）
-    - 複数ファイルが指定された場合は全て読み込む
+     - 複数ファイルが指定された場合は全て読み込む
+    - **Finding ファイルの例**: `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md` が指定された場合、finding の内容（検出概要・影響範囲・推奨アクション）を壁打ちの初期コンテキストとして扱い、正式な要件変更への変換を案内する
  2. ユーザーとの壁打ち対話を開始 → `req-analysis` の壁打ちメソドロジーに従って深掘り
     - 明示入力ファイルが読み込まれている場合、その内容を壁打ちの開始点として活用（ファイル内容から要件の構造化を先行して進める）
  3. 既存REQ照合 → `req-file-manager` の照合方法論に従って実行（REQ-0002-009〜011）:
