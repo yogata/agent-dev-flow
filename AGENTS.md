@@ -6,6 +6,23 @@
 - Domain state directory: `.agentdev/`
 - 詳細: ADR-0005, REQ-0017
 
+## ディレクトリ責任分離（REQ-0017-008）
+
+### .sisyphus/ — Sisyphus Runtime Workspace
+
+Sisyphus が管理する実行時の一時作業領域。plan、evidence、tasks、execution state、drafts、reports、archives を格納する。
+
+- plans, drafts, evidence, execution, notepads, tasks, reports, archives
+- **例外**: `.sisyphus/drafts/req-draft-*.md` は Prometheus runtime working draft であり、AgentDevFlow の canonical domain state ではない（REQ-0017-046）
+
+### .agentdev/ — AgentDevFlow Domain State
+
+AgentDevFlow の canonical domain artifact を格納する永続領域。intake items、learning pipeline data、integrity reports 等の domain state を保持する。
+
+- intake items, learning data, integrity reports
+- サブディレクトリ構成は各子issueで定義（REQ-0017-009）
+- `.sisyphus/drafts/req-draft-*.md` を `.agentdev/` に移行する要件はない（REQ-0017-046）
+
 ## 開発環境
 
 - OS: Windows
