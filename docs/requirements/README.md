@@ -20,6 +20,7 @@
 | REQ-0014 | issue-work 自律修正ループと責務分離の明確化 | workflow/self-healing/ci-cd |
 | REQ-0015 | 関連ドキュメントの要件達成対象化 | workflow/issue-commands/documentation/scope/verification |
 | REQ-0016 | Command/Skill/Template/Script責任分界とtips要件ソース化 | commands/skills/templates/scripts/knowledge |
+| REQ-0017 | AgentDevFlow plugin namespace 統一と learning / intake / integrity の正式化 | agentdev/namespace/plugin/learning/intake/integrity/migration |
 
 ## ディレクトリ構造の方針
 

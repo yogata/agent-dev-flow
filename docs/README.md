@@ -21,6 +21,7 @@
   - [REQ-0014: issue-work 自律修正ループと責務分離の明確化](requirements/REQ-0014.md)
   - [REQ-0015: 関連ドキュメントの要件達成対象化](requirements/REQ-0015.md)
   - [REQ-0016: Command/Skill/Template/Script責任分界とtips要件ソース化](requirements/REQ-0016.md)
+  - [REQ-0017: AgentDevFlow plugin namespace 統一と learning / intake / integrity の正式化](requirements/REQ-0017.md)
 
 ## Specifications
 
@@ -38,7 +39,8 @@
   - [ADR-0001: Command/Skill/Template/Script責任分界の正式定義](adr/ADR-0001.md)
   - [ADR-0002: Orchestration skill作成基準の導入](adr/ADR-0002.md)
   - [ADR-0003: issue-req入力の抽象化](adr/ADR-0003.md)
-  - [ADR-0004: 要件管理構造のarea-based移行方針](adr/ADR-0004.md)
+   - [ADR-0004: 要件管理構造のarea-based移行方針](adr/ADR-0004.md)
+   - [ADR-0005: AgentDevFlow plugin namespace 統一](adr/ADR-0005.md)
 
 ## Tips
 
