@@ -23,6 +23,7 @@
   - [REQ-0016: Command/Skill/Template/Script責任分界とtips要件ソース化](requirements/REQ-0016.md)
   - [REQ-0017: AgentDevFlow plugin namespace 統一と learning / intake / integrity の正式化](requirements/REQ-0017.md)
   - [REQ-0018: agentdev-req-analysis 未決分岐解消メソドロジー](requirements/REQ-0018.md)
+  - [REQ-0019: intake / learning の責任境界明確化と workflow 組み込み](requirements/REQ-0019.md)
 
 ## Specifications
 
