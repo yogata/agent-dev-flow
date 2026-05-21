@@ -354,3 +354,39 @@
 - **想定反映先**: `gh-cli-best-practices` スキル（Section 3-4）
 - **関連**: Issue #283, PR #303, `.opencode/skills/gh-cli-best-practices/SKILL.md`
 - **タグ**: `#gh-cli` `#encoding` `#日本語化け` `#workaround` `#pwsh`
+
+---
+
+## 2026-05-22: Sub-agent background_output の Task not found エラーと代替検証
+
+- **問題事象**: `task(category="unspecified-high", run_in_background=true)` で起動した4つのサブエージェントの task_id を `background_output()` で取得しようとしたところ、全て "Task not found" エラーになった。タスク自体は実際に実行されてファイル変更が行われていた
+- **発生局面**: 実装（case-run Step 6 のサブエージェント並列委譲）
+- **検知方法**: `background_output(task_id="bg_...")` のエラー出力
+- **根本原因**: サブエージェントの task_id がセッション間で引き継がれない、または background task の登録と取得の間にタイミングのズレがある可能性。正確な原因は特定できていない
+- **自律対応内容**: `git status` と `git diff --stat` で worktree 内の実際のファイル変更を確認し、サブエージェントの成果物を間接的に検証。コミット前に全変更の差分を目視確認
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: サブエージェント並列委譲後の成果物確認は、`background_output` に依存せず `git diff` による代替検証を併用する方が安全。並列委譲パターン全般で適用可能
+- **再発条件**: `task(run_in_background=true)` で複数エージェントを並列起動し、`background_output` で結果を取得しようとする場合
+- **予防策候補**: 並列委譲後は `background_output` を試行しつつ、失敗時は `git diff` による代替検証にフォールバックする手順を標準化する
+- **想定反映先**: `agentdev-workflow-orchestration` スキル（サブエージェント実行プロトコル）
+- **関連**: Issue #306, PR #307
+- **タグ**: `#サブエージェント` `#並列実行` `#代替検証` `#background_output`
+
+---
+
+## 2026-05-22: Namespace移行後の historical vs active context 区別
+
+- **問題事象**: 旧 command/skill 名（`/issue/issue-*`, `agentdev-template-manager` 等）の残存確認を grep で実施した際、integrity-check.md の検出説明文や ADR-0001/0002 の背景説明にも旧名がヒットし、これらを「残存エラー」と誤判定するリスクがあった
+- **発生局面**: 実装（case-close Step 3 docs/ 検証）
+- **検知方法**: grep 検証結果の個別確認
+- **根本原因**: Namespace移行の検証では「旧名が出現すること自体」ではなく「旧名が active guidance（操作手順・次ステップ・USE FOR・command map）として使用されているか」が基準。historical context（ADR背景、migration table、検出ルールの説明）の旧名は正当。この区別を自動化するのは文脈理解が必要なため困難
+- **自律対応内容**: grep ヒット箇所を1件ずつ確認し、historical context か active guidance かを判定。integrity-check.md と ADR-0001/0002/research/ の旧名は historical として許容
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり — integrity-check の旧 namespace 検出ルールも「historical context を除外する」設計になっているべき
+- **横展開観点**: 大規模rename/migrationの検証では、grep一致数だけでなく「どの文脈で使用されているか」の判断が必要。完全自動化は難しいため、integrity-check は「要確認」としてフラグを立て、最終判定は人間が行う設計が現実的
+- **再発条件**: 大規模な namespace 移行・rename 後に残存確認を実施する場合
+- **予防策候補**: integrity-check の旧 namespace 検出を「除外パス/パターン」（docs/adr/, docs/research/, integrity-check.md 自身）を設定できる仕様にする
+- **想定反映先**: `agentdev-integrity-check` コマンド
+- **関連**: Issue #306, PR #307, CONS-002/CONS-003
+- **タグ**: `#namespace移行` `#historical-context` `#検証` `#grep`
