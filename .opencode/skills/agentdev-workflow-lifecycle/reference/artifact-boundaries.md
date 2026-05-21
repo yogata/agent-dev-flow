@@ -135,11 +135,11 @@ agentdev系ワークフローで操作する docs/ の5区分構造。
 | requirements/ | 要件管理（目的/要件/適用範囲） | README.md + INDEX.md（generated）+ core.md（暫定area）+ {area}.md + REQ-{NNNN}.md（移行対象） | req-save(CREATE), case-open(READ), case-update(UPDATE) |
 | adr/ | ADR | README.md + ADR-{NNNN}.md | agentdev-adr-guidelines(CREATE) |
 | specs/ | システム仕様 | system.md, patterns.md | case-run(READ+WRITE), case-close(VERIFY) |
-| tips/ | 学び | inbox.md + *.md | learning-capture(UPDATE), learning-refine(CREATE) |
+| learning/ | 再発防止知見の保存・分類・昇華 | inbox.md + archive.md + evaluation-report.md + elevation-staging/ | learning-capture(UPDATE), learning-refine(READ+WRITE), learning-promote(READ+WRITE) |
 
 ## スキル間依存関係
 
-agentdev-workflow-lifecycle（旧issue-guide-phases）は他の専門スキルが提供する知識を概念的に参照する。
+agentdev-workflow-lifecycle は他の専門スキルが提供する知識を概念的に参照する。
 
 | スキル名           | 提供する知識                                                   |
 | ------------------ | -------------------------------------------------------------- |
