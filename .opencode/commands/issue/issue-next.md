@@ -27,9 +27,9 @@ load_skills:
 2. 乖離がある場合は乖離検出結果を確認 → `agentdev-spec-compliance` のループバック判定に従って次アクションを決定
 3. 次のコマンドを提示または実行 → `agentdev-workflow-lifecycle` のコマンド関連マップに従って適切なコマンドを選択:
     - 壁打ち → `/issue/issue-req`
-    - 壁打ち→構造的実行の準備（パターンB） → `/issue/issue-save-req`
-    - 壁打ち→構造的実行の境界（パターンB） → `/issue/issue-save-req`
-    - 壁打ち→構造的実行の境界（パターンA/C/D） → `/issue/issue-create`
+    - 壁打ち→構造的実行の準備（機能追加） → `/issue/issue-save-req`
+    - 壁打ち→構造的実行の境界（機能追加） → `/issue/issue-save-req`
+    - 壁打ち→構造的実行の境界（バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務） → `/issue/issue-create`
     - 構造的実行 → `/issue/issue-work`
     - 構造的実行→レビュー完了の境界 → レビュー待ち
     - レビュー完了 → `/issue/issue-close`

@@ -1,6 +1,6 @@
 ---
 name: Epic Issue Description
-about: 大規模Pattern B用Epic Issue本文テンプレート
+about: 大規模機能追加用Epic Issue本文テンプレート
 labels: enhancement, feature, epic
 ---
 

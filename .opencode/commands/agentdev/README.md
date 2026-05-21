@@ -33,7 +33,7 @@ AgentDevFlow の req/case パイプラインを提供するコマンドセット
 /agentdev/req-define → /agentdev/req-save → /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
 
-パターンA（バグ修正・軽微変更）の場合、`req-save` をスキップ:
+バグ修正・軽微変更の場合、`req-save` をスキップ:
 
 ```
 /agentdev/req-define → /agentdev/case-open → /agentdev/case-run → /agentdev/case-close

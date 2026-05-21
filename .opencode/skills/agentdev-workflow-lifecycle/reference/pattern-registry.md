@@ -2,6 +2,21 @@
 
 Issueラベルの定義、パターン判定、およびパターン固有の動作ルールを定義する。
 
+## 内部分類コード宣言
+
+`Pattern A/B/C/D` は内部処理用の分類コードである。ユーザー向け文書（README、コマンド説明、完了報告、Issue本文、テンプレート）では、各Patternに対応する日本語名称を主表記とする。
+
+| 内部分類コード | 日本語名称 |
+|---------------|-----------|
+| Pattern A | バグ修正・軽微変更 |
+| Pattern B | 機能追加 |
+| Pattern C | リファクタリング・保守作業 |
+| Pattern D | ドキュメント・雑務 |
+
+**適用範囲**:
+- **日本語名称を主表記**: README、コマンド説明（description, USE FOR, Steps, Output）、完了報告フォーマット、Issue本文、テンプレート見出し
+- **内部分類コードを維持**: 分類キー、draft-meta.pattern 値（A/B/C/D）、command内のフラグメント識別子、template selection、Guardrails、テスト
+
 ## Pattern 定義
 
 | Pattern | 名称 | 付与ラベル | 規模 | docs/更新 | ワークフロー経路 |

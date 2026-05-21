@@ -136,7 +136,7 @@ docs/requirements/
 
 詳細は「area-based 構造（将来標準）」セクションを参照。
 
-**パターンA除外**: パターンA（バグ修正・軽微変更）ではREQファイルを作成しない。Issue本文のみで要件を管理する。REQファイルの修正が必要なバグ修正は、パターンB（機能追加）に昇格して扱う。
+**バグ修正・軽微変更除外**: バグ修正・軽微変更（Pattern A）ではREQファイルを作成しない。Issue本文のみで要件を管理する。REQファイルの修正が必要なバグ修正は、機能追加（Pattern B）に昇格して扱う。
 - Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
 
 各REQファイルのfrontmatter:

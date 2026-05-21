@@ -65,7 +65,7 @@ load_skills:
 10. **[Standard flow]** ラベル付与 → `agentdev-workflow-lifecycle` のラベル体系に従って選定
 11. **[Standard flow]** GitHub Issueを作成（`gh issue create`） → `agentdev-gh-cli` に従って `--body-file` 使用
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
-12. Issue作成後にコメント追加 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_analysis.md`（パターンA/C/D）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_technical.md`（パターンB）を Read tool で読み込む（Epic flowではEpic Issueにコメント追加）
+12. Issue作成後にコメント追加 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_analysis.md`（バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_technical.md`（機能追加）を Read tool で読み込む（Epic flowではEpic Issueにコメント追加）
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
 13. ドラフトの `## draft-meta` セクションの `status` を `issued` に更新する（ドラフトが存在する場合のみ） → 更新後、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
@@ -87,7 +87,7 @@ load_skills:
 ### 品質ゲート
 - G06: req-define未実行の場合は警告
 - G07: 要件docのチェックボックスが空の場合は警告
-- G08: パターンBの場合、対応するREQファイルが存在することを確認
+- G08: 機能追加（Pattern B）の場合、対応するREQファイルが存在することを確認
 - G09: テンプレートの【必須】セクションが全てIssue本文に含まれていることを確認してからgh issue createを実行すること。欠落セクションがある場合は再生成すること
 - G10: `完了条件` セクションはIssue本文テンプレートの【必須】セクションである。テンプレート準拠検証で必ず含まれていることを確認すること
 
