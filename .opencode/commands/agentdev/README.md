@@ -17,6 +17,13 @@ AgentDevFlow の req/case パイプラインを提供するコマンドセット
 | `/agentdev/case-update` | Issue本文の更新やコメント追加 | 構造的実行・レビュー完了 |
 | `/agentdev/case-close` | PRマージ・記録追記・Issueクローズ・ブランチ削除 | レビュー完了フェーズ |
 
+### learning コマンド（学びの蓄積・分析・昇華）
+
+| コマンド | 役割 | 対象フェーズ |
+|----------|------|-------------|
+| `/agentdev/learning-refine` | inbox を問題クラス分類→8軸評価→archive移動 | 学びパイプライン |
+| `/agentdev/learning-promote` | 評価レポートから昇華判定→staging stub生成 | 学びパイプライン |
+
 ### intake コマンド（未回収課題の回収）
 
 | コマンド | 役割 |
@@ -26,6 +33,12 @@ AgentDevFlow の req/case パイプラインを提供するコマンドセット
 | `intake-review` | intake item の review・採用可否判断 |
 | `intake-promote` | review 済み item を後続コマンド用 artifact に整形 |
 | `intake-open` | intake-promote 生成 artifact から GitHub Issue を作成 |
+
+### integrity コマンド（整合性検証）
+
+| コマンド | 役割 |
+|----------|------|
+| `integrity-check` | ドキュメント・スキル・コマンドの整合性を検証 |
 
 ## 基本フロー
 
