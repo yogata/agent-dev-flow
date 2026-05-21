@@ -95,6 +95,15 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - **禁止**: ユーザーに学びの有無を問うこと（「学びはありますか？」等）は禁止。エージェントが判断する
     - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `docs/tips/inbox.md` に直接追記する（パイプライン内のためlearning-addは使用しない）。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
     - エージェントが学びなしと判断 → ユーザーに何も問わず次のステップへ進む
+9b. Post-run intake capture: 完了処理中に発見した本筋外の変更候補のうち、具体的な修正対象が特定できるものを intake item として保存する。`agentdev-workflow-lifecycle` → `reference/capture-boundaries.md` の Split Rule を SSoT とする
+    - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）
+    - **曖昧な候補は自律保存しない**: 修正対象が特定できない候補・単なる違和感・改善案・曖昧な変更候補は自律保存せず、完了報告に候補としてのみ提示（SHALL）
+    - **保存先の限定**: intake item の保存先は `.agentdev/intake/inbox/` のみ（SHALL）
+    - **採用判断の禁止**: intake item の採用可否判断、GitHub Issue 作成、後続対応の優先度判断を行わない（SHALL）
+    - **未対応事項の逃避禁止**: 今回の Issue / PR の完了条件に含まれる未対応事項を intake item に逃がして完了扱いにしてはならない（SHALL）
+    - **別々の成果物**: intake item と learning item を別々に件数・保存先・次ステップを表示する（SHALL）。混合した単一成果物にしない
+    - **既存 learning capture 原則の維持**: Step 9 の learning capture の原則（ユーザーに学びを問わない、承認なしで蓄積し通知する）は維持する（SHALL）
+    - **Split Rule の適用**: 観測が intake と learning の両方に該当する場合、`capture-boundaries.md` の Split Rule（具体的修正対象 → intake item、再発防止知見 → learning item、両方 → 分割）に従い、別々の成果物として作成
 10. Plan アーカイブ: `.sisyphus/plans/` から該当Issue番号に関連するplanファイルを検索
     - planファイルが見つかった場合 → `agentdev-archive-plan` スキルに従ってアーカイブ実行
     - planファイルが見つからない場合 → スキップ（注記付き）
@@ -125,6 +134,9 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G14: `agentdev-learning-capture` スキルのフロー（エージェントが検知・抽出・自律蓄積・内容通知。承認可否を問わない）に従う。ユーザーに学びの有無や内容の入力を求めることは禁止
 - G15: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
 - G16: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
+- G17: intake item と learning item を混合した単一成果物にしないこと。`capture-boundaries.md` の Split Rule に従い別々の成果物とすること
+- G18: 今回の Issue / PR の完了条件に含まれる未対応事項を intake item に逃がして完了扱いにしないこと
+- G19: intake item の採用可否判断・GitHub Issue 作成・優先度判断を行わないこと
 
 ### 出力制約
-- G17: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- G20: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
