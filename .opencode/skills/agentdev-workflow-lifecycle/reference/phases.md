@@ -21,7 +21,7 @@ agentdev系コマンドのマクロフェーズとマイクロフェーズ定義
 | `created`     | Issue作成済み・作業前  | 構造的実行       |
 | `in_progress` | 実装中                 | 構造的実行       |
 | `review`      | PR作成済み・レビュー中 | レビュー完了     |
-| `done`        | 完了                   | レビュー完了     |
+| `done`        | 完了（post-run capture 含む: learning capture + intake capture） | レビュー完了     |
 
 ## 参照
 
