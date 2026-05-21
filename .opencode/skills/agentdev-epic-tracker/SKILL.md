@@ -1,13 +1,13 @@
 ---
 name: agentdev-epic-tracker
-description: Updates parent Epic Issue status tracking tables across issue-work and issue-close workflows. USE FOR: updating Epic status to in-progress or completed, tracking child Issue progress in parent Epics, detecting parent-child relationships via Parent: #N patterns. DO NOT USE FOR: creating Epics, managing non-Epic Issues, or general Issue operations.
+description: Updates parent Epic Issue status tracking tables across case-run and case-close workflows. USE FOR: updating Epic status to in-progress or completed, tracking child Issue progress in parent Epics, detecting parent-child relationships via Parent: #N patterns. DO NOT USE FOR: creating Epics, managing non-Epic Issues, or general Issue operations.
 ---
 
 # Epic Status Tracker
 
 親Epic Issueのステータス追跡テーブル（☐ 未着手 / 🔄 進行中 / ✅ 完了 / ❌ 対処不要）を更新する知識ベース。
 
-- **参照元**: `issue-work`（Phase A: 進行中更新）、`issue-close`（Step 8: 完了更新）
+- **参照元**: `case-run`（Phase A: 進行中更新）、`case-close`（Step 8: 完了更新）
 - **特性**: 宣言的定義のみ提供。手順・手続きは各コマンド定義に委ねる
 
 ## ステータス値定義
@@ -15,8 +15,8 @@ description: Updates parent Epic Issue status tracking tables across issue-work 
 | 値 | 意味 | 設定タイミング | 終了状態 |
 |---|---|---|---|
 | `☐ 未着手` | 子Issue未着手 | Epic作成時（初期値） | いいえ |
-| `🔄 進行中` | 子Issue作業中 | `issue-work` Phase A | いいえ |
-| `✅ 完了 ([PR#N](URL))` | 子Issue完了 | `issue-close` Step 8 | はい |
+| `🔄 進行中` | 子Issue作業中 | `case-run` Phase A | いいえ |
+| `✅ 完了 ([PR#N](URL))` | 子Issue完了 | `case-close` Step 8 | はい |
 | `❌ 対処不要` | 対処不要（手動設定） | ユーザー手動 | はい |
 
 ## 親Epic検出
@@ -28,7 +28,7 @@ description: Updates parent Epic Issue status tracking tables across issue-work 
 
 ## ステータス更新プロトコル
 
-### issue-work: 進行中更新（Phase A）
+### case-run: 進行中更新（Phase A）
 
 **単一Issueモード**:
 1. 子Issue本文から `Parent: #{N}` を検出
@@ -39,16 +39,16 @@ description: Updates parent Epic Issue status tracking tables across issue-work 
    - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
 5. 既に `🔄 進行中`、`✅ 完了`、または `❌ 対処不要` の場合 → スキップ（べき等性）
 6. `gh issue edit {N} --body-file {temp}` でEpic本文を更新
-7. 更新失敗時 → 警告表示して `issue-work` 自体は継続（フォールバック）
+7. 更新失敗時 → 警告表示して `case-run` 自体は継続（フォールバック）
 
 **多重Issueモード**:
 - 親エージェントが各Wave開始前に、該当Wave内の全子IssueのEpicステータスを一括更新
 - サブエージェントによる同時更新の競合を回避
 - 一括更新順序: 子Issue番号の昇順
 
-### issue-close: 完了更新（Step 8）
+### case-close: 完了更新（Step 8）
 
-`issue-close` Step 8 の既存実装を変更しない:
+`case-close` Step 8 の既存実装を変更しない:
 - `✅ 完了` への更新・Epic自動クローズ判定は既存手順のまま
 - 本スキルは知識ベースとして参照されるのみ
 

@@ -15,7 +15,7 @@ description: Detects deviations between implementation and requirements (REQ), w
 
 - **役割**: 要件（REQ）・work plan・ADRと実際の実装を比較し、乖離を検出
 - **タイミング**: 構造的実行フェーズの完了時（PR作成前）とレビュー完了フェーズ（マージ前）
-- **依存**: issue-*コマンドから参照される専門スキル
+- **依存**: agentdevコマンドから参照される専門スキル
 
 ---
 
@@ -97,7 +97,7 @@ description: Detects deviations between implementation and requirements (REQ), w
 
 ### 連携
 
-- issue-work Phase C Step 8（乖離検出）でメトリクス収集を実行
+- case-run Phase C Step 8（乖離検出）でメトリクス収集を実行
 - 収集結果は PR 本文（pr_desc.md テンプレートの「テスト結果」セクション）に含める
 - メトリクス基準値は `docs/specs/quality-specs.md` で管理
 
@@ -171,15 +171,15 @@ description: Detects deviations between implementation and requirements (REQ), w
 
 ---
 
-## issue-update連携
+## case-update連携
 
-### 乖離タイプ→issue-updateフラグ マッピング
+### 乖離タイプ→case-updateフラグ マッピング
 
-| 乖離タイプ | issue-updateコマンド | 説明 |
+| 乖離タイプ | case-updateコマンド | 説明 |
 |---|---|---|
-| `spec-bug` | `/issue/issue-update {N} --req --review-ng` | 要件定義の修正が必要 |
-| `impl-bug` | `/issue/issue-update {N} --comment --review-ng` | 実装の修正が必要（要件は不変） |
-| `scope-creep` | `/issue/issue-update {N} --req --review-ng` | 要件スコープの再定義が必要 |
+| `spec-bug` | `/agentdev/case-update {N} --req --review-ng` | 要件定義の修正が必要 |
+| `impl-bug` | `/agentdev/case-update {N} --comment --review-ng` | 実装の修正が必要（要件は不変） |
+| `scope-creep` | `/agentdev/case-update {N} --req --review-ng` | 要件スコープの再定義が必要 |
 
 ### 出力テンプレート
 

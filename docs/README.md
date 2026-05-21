@@ -43,11 +43,11 @@
    - [ADR-0004: 要件管理構造のarea-based移行方針](adr/ADR-0004.md)
    - [ADR-0005: AgentDevFlow plugin namespace 統一](adr/ADR-0005.md)
 
-## Tips
+## Learning
 
-学び・ナレッジの蓄積。
+学び・ナレッジの蓄積（`.agentdev/learning/` に移行済み）。
 
-- [Tips](tips/inbox.md) — 学びの収集・分析・昇華
+- [Learning inbox](../.agentdev/learning/inbox.md) — 学びの収集・分析・昇華
 
 ## Quality Specs
 

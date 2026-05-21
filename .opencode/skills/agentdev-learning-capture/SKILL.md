@@ -5,7 +5,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 # agentdev-learning-capture
 
-会話中にエージェントが自律的に検知・回避・修正した問題から学びを抽出し、ユーザー承認なしで自律的に `docs/tips/inbox.md` に蓄積するスキル。
+会話中にエージェントが自律的に検知・回避・修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/learning/inbox.md` に蓄積するスキル。
 
 ## ⚠ 基本原則
 
@@ -31,7 +31,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 | **テンプレート逸脱の修正** | テンプレート・仕様からの逸脱を検知・修正した事例 | Issue本文フォーマットのずれ、コミットメッセージ規約違反 |
 | **gh/gitワークアラウンド** | gh CLIやgit操作で標準手順外の対処が必要だった事例 | worktree削除時のforce指定、PR作成時のドラフトフラグ |
 | **リオープン原因** | Issue/PRの再オープンを招いた原因 | レビューNG時の対応漏れ、マージ後のデグレ |
-| **実装エラーによるissue-update** | 実装中のエラーが原因でIssue更新が必要になった事例 | 仕様変更の発生、スコープ変更の必要 |
+| **実装エラーによるcase-update** | 実装中のエラーが原因でIssue更新が必要になった事例 | 仕様変更の発生、スコープ変更の必要 |
 | **自律回避・自律修正** | エージェントが自ら問題を回避・修正した事例 | 依存関係の事前検知、設定ミスの自動修正 |
 
 ユーザー確認を伴う問題が発生した場合、SHALL は ADR/REQ/spec への影響可能性を記録する（フィールド7参照）。
@@ -40,7 +40,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 以下のタイミングでこのスキルを検討する：
 
-- `/issue/issue-close` または `/agentdev/case-close` の実行中（REQ-0007-003）
+- `/agentdev/case-close` の実行中（REQ-0007-003）
 - バグを修正したとき
 - 調査が完了し、原因が判明したとき
 - CI/CDパイプラインが失敗したとき
@@ -52,8 +52,8 @@ description: Agent-first extraction and capture of learnings from problems auton
 ## Prerequisites
 
 学びの保存先：
-- `docs/tips/inbox.md` — 最新の学び（常にここに追加）
-- `docs/tips/archive.md` — 過去の学び（`/agentdev/learning-refine` 実行時に移動）
+- `.agentdev/learning/inbox.md` — 最新の学び（常にここに追加）
+- `.agentdev/learning/archive.md` — 過去の学び（`/agentdev/learning-refine` 実行時に移動）
 
 > **注意**: inbox.md、archive.mdが存在しない場合、エージェント SHALL は当該ファイルを作成してから追記する。
 
@@ -99,9 +99,9 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 ### Step 3: 学びの通知
 
-**エージェントが**抽出した学びを `docs/tips/inbox.md` に追記した後、追記内容をユーザーに通知する。承認や却下は求めない：
+**エージェントが**抽出した学びを `.agentdev/learning/inbox.md` に追記した後、追記内容をユーザーに通知する。承認や却下は求めない：
 
-> 以下の学びを `docs/tips/inbox.md` に追加しました：
+> 以下の学びを `.agentdev/learning/inbox.md` に追加しました：
 >
 > [13フィールド形式の学びエントリを表示]
 

@@ -16,9 +16,9 @@
 
 draft（`.sisyphus/drafts/req-draft-*.md`）は**壁打ちフェーズ内の一時ハンドオフ**であり、構造的実行以降のSSoTはIssue本文とWork Planである。
 
-- **ライフサイクル**: `draft` → `saved`（issue-save-req完了）→ `issued` + 削除（issue-create完了）
-- **壁打ちフェーズの役割**: issue-req → issue-save-req 間の要件引き継ぎ
-- **構造的実行フェーズ以降**: draftは存在しない（issue-create完了時に削除）。SSoTはIssue本文 + Work Planに完全移行
+- **ライフサイクル**: `draft` → `saved`（req-save完了）→ `issued` + 削除（case-open完了）
+- **壁打ちフェーズの役割**: req-define → req-save 間の要件引き継ぎ
+- **構造的実行フェーズ以降**: draftは存在しない（case-open完了時に削除）。SSoTはIssue本文 + Work Planに完全移行
 
 ## フェーズ境界ルール
 

@@ -1,15 +1,15 @@
 ---
 name: agentdev-workflow-orchestration
-description: issue-work の状態機械・Wave scheduling・サブエージェント protocol・self-healing loop・CI 対応 loop の知識ベース。USE FOR: issue-work の多重Issue依存関係分析、Wave構成、再開ポイント判定、自律修正ループ判定、集約完了報告。DO NOT USE FOR: 単一Issue の基本的な Step 実行手順（issue-work.md を参照）、Pattern 判定（agentdev-workflow-lifecycle を参照）、乖離検出（agentdev-spec-compliance を参照）、完了報告フォーマット（agentdev-workflow-reporting を参照）
+description: case-run の状態機械・Wave scheduling・サブエージェント protocol・self-healing loop・CI 対応 loop の知識ベース。USE FOR: case-run の多重Issue依存関係分析、Wave構成、再開ポイント判定、自律修正ループ判定、集約完了報告。DO NOT USE FOR: 単一Issue の基本的な Step 実行手順（case-run コマンド定義を参照）、Pattern 判定（agentdev-workflow-lifecycle を参照）、乖離検出（agentdev-spec-compliance を参照）、完了報告フォーマット（agentdev-workflow-reporting を参照）
 ---
 
-# issue-work Orchestration Knowledge Base
+# case-run Orchestration Knowledge Base
 
-issue-work コマンドのオーケストレーション知識ベース。状態機械・依存関係分析・Wave scheduling・サブエージェント protocol・self-healing loop・CI loop・エラー回復・集約完了報告の判定基準と詳細構造を提供する。
+case-run コマンドのオーケストレーション知識ベース。状態機械・依存関係分析・Wave scheduling・サブエージェント protocol・self-healing loop・CI loop・エラー回復・集約完了報告の判定基準と詳細構造を提供する。
 
 ## 状態機械
 
-issue-work は単一Issueモードと多重Issueモードの2つの実行モードを持つ。
+case-run は単一Issueモードと多重Issueモードの2つの実行モードを持つ。
 
 ### モード分岐
 
@@ -234,7 +234,7 @@ L2（ファイル衝突）を検知した場合:
 
 ## 参照
 
-- **issue-work コマンド**: `.opencode/commands/issue/issue-work.md`（実行手順）
+- **case-run コマンド**: `.opencode/commands/agentdev/case-run.md`（実行手順）
 - **agentdev-workflow-lifecycle**: Pattern判定基準・フェーズ定義
 - **agentdev-workflow-reporting**: 単一Issue完了報告フォーマット
 - **agentdev-spec-compliance**: 乖離検出

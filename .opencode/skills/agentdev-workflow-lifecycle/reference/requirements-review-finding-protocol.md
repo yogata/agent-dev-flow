@@ -1,8 +1,8 @@
 # Requirements Review Finding プロトコル
 
-`issue-save-req` と `issue-req` 間の requirements review finding のスキーマと扱いを定義する。finding は要件レビューで検出された問題（SPLIT・重複・廃止・乖離等）を構造的に記録し、`issue-req` の明示入力ファイルとして次工程に渡すための中間アーティファクトである。
+`req-save` と `req-define` 間の requirements review finding のスキーマと扱いを定義する。finding は要件レビューで検出された問題（SPLIT・重複・廃止・乖離等）を構造的に記録し、`req-define` の明示入力ファイルとして次工程に渡すための中間アーティファクトである。
 
-finding は state管理対象ではなく、issue-req の入力として read-only で参照される Requirement Source である。作成以降の status 更新や state遷移は行わない。
+finding は state管理対象ではなく、req-define の入力として read-only で参照される Requirement Source である。作成以降の status 更新や state遷移は行わない。
 
 ## Finding の保存先
 
@@ -16,7 +16,7 @@ finding は state管理対象ではなく、issue-req の入力として read-on
 ---
 finding_type: SPLIT | MOVE | RETIRE | DUPLICATE | OBSOLETE | DRIFT
 source_req: REQ-{NNNN} | null
-source_command: issue-save-req
+source_command: req-save
 topic_slug: {topic-slug}
 created: "{YYYY-MM-DD}"
 ---
@@ -39,7 +39,7 @@ created: "{YYYY-MM-DD}"
 {何が検出され、なぜ重要か}
 
 ## 検出コンテキスト
-{いつ・どのコマンドで・どのような処理中に検出されたか（例: issue-save-req の SPLIT 検出時）}
+{いつ・どのコマンドで・どのような処理中に検出されたか（例: req-save の SPLIT 検出時）}
 
 ## 影響範囲
 {どのREQ・要件が影響を受けるか}
@@ -55,7 +55,7 @@ created: "{YYYY-MM-DD}"
 
 | 種別 | 説明 | 検出タイミング |
 |------|------|---------------|
-| `SPLIT` | 要件が膨張・関心分離の基準に該当し、複数REQへの分割が必要 | `issue-save-req` で SPLIT 検出時 |
+| `SPLIT` | 要件が膨張・関心分離の基準に該当し、複数REQへの分割が必要 | `req-save` で SPLIT 検出時 |
 | `MOVE` | 要件が別のREQに移動すべき | requirements review 時 |
 | `RETIRE` | 要件が不要になり廃止すべき | requirements review 時 |
 | `DUPLICATE` | 複数REQ間で要件が重複 | requirements review 時 |
@@ -64,18 +64,18 @@ created: "{YYYY-MM-DD}"
 
 ## 次工程
 
-Finding は `issue-req` の明示入力ファイルとして渡される（ADR-0003 パターン）。
+Finding は `req-define` の明示入力ファイルとして渡される（ADR-0003 パターン）。
 
-1. `issue-req` が finding ファイルを読み込む（明示入力ファイルとしての読み込み）
-2. `issue-req` が finding の内容を解析し、正式な要件変更（CREATE / APPEND / UPDATE）に変換する
+1. `req-define` が finding ファイルを読み込む（明示入力ファイルとしての読み込み）
+2. `req-define` が finding の内容を解析し、正式な要件変更（CREATE / APPEND / UPDATE）に変換する
 
 ## コマンド間の責務分離
 
 | 責務 | コマンド | 説明 |
 |------|----------|------|
-| Finding 作成 | `issue-save-req` | SPLIT検出時に finding ファイルを作成 |
-| Finding 消費 | `issue-req` | 明示入力ファイルとして読み込み、要件変更に変換 |
-| Finding 保存 | `issue-save-req` | `.sisyphus/drafts/` に保存 |
+| Finding 作成 | `req-save` | SPLIT検出時に finding ファイルを作成 |
+| Finding 消費 | `req-define` | 明示入力ファイルとして読み込み、要件変更に変換 |
+| Finding 保存 | `req-save` | `.sisyphus/drafts/` に保存 |
 
 ## backlog-draft-protocol との分離
 
@@ -83,7 +83,7 @@ Finding は backlog-draft-protocol とは独立した中間アーティファク
 
 | 項目 | backlog-draft | finding |
 |------|---------------|---------|
-| 経路 | `issue-backlog` → `issue-backlog-create` | `issue-save-req` → `issue-req` |
+| 経路 | `intake-from-github` → `intake-open` | `req-save` → `req-define` |
 | ステータス値 | `draft` / `approved` / `issued` | なし（state管理外） |
 | frontmatter 構造 | period / sources 等を含む | finding_type / source_req 等を含む |
 | 作成トリガー | クローズ済みissue/PRからの残課題抽出 | SPLIT検出・要件レビュー時の問題検出 |
@@ -91,7 +91,7 @@ Finding は backlog-draft-protocol とは独立した中間アーティファク
 
 ## 参照
 
-- **コマンド定義**: `issue-save-req.md`, `issue-req.md`
-- **ADR**: `ADR-0003`（issue-req入力の抽象化）
+- **コマンド定義**: `req-save.md`, `req-define.md`
+- **ADR**: `ADR-0003`（req-define入力の抽象化）
 - **REQ**: `REQ-0004-023` 〜 `REQ-0004-027`（finding protocol 要件）
 - **関連プロトコル**: `backlog-draft-protocol.md`

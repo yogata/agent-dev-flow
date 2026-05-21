@@ -8,23 +8,23 @@ load_skills:
 
 # 学びの昇華判定と Requirement Source stub 生成
 
-`docs/tips/evaluation-report.md` の問題クラスを主入力とし、`docs/tips/archive.md` の過去エントリを参照して廃棄判定を行う。ユーザー承認後に `docs/tips/elevation-staging/` に Requirement Source 形式の stub を生成し、処理済みエントリを archive.md から pruning する。
+`.agentdev/learning/evaluation-report.md` の問題クラスを主入力とし、`.agentdev/learning/archive.md` の過去エントリを参照して廃棄判定を行う。ユーザー承認後に `.agentdev/learning/elevation-staging/` に Requirement Source 形式の stub を生成し、処理済みエントリを archive.md から pruning する。
 
 **重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `req-define` の明示入力ファイルとして扱い、`req-define → req-save → case-open → case-run` のルートで実装に移行する。
 
 ## Input
 
-- `docs/tips/evaluation-report.md`（必須）— learning-refine が生成した評価レポート
-- `docs/tips/archive.md`（任意）— 過去エントリ参照用
+- `.agentdev/learning/evaluation-report.md`（必須）— learning-refine が生成した評価レポート
+- `.agentdev/learning/archive.md`（任意）— 過去エントリ参照用
 
 ## Output
 
-- `docs/tips/elevation-staging/{category}-{name}.md` — Requirement Source 形式の stub
+- `.agentdev/learning/elevation-staging/{category}-{name}.md` — Requirement Source 形式の stub
 
 ## Steps
 
 1. **evaluation-report.mdの存在確認**:
-   - `docs/tips/evaluation-report.md` を確認
+   - `.agentdev/learning/evaluation-report.md` を確認
    - 存在しない → エラー終了。「先に `/agentdev/learning-refine` を実行して分析レポートを生成してください」
 
 2. **データ読込**:
@@ -66,7 +66,7 @@ load_skills:
    - 承認しない → 「昇華をキャンセルしました」と報告して終了
 
 7. **Requirement Source stub 生成**（staging領域のみ）:
-   - 出力先: `docs/tips/elevation-staging/`
+   - 出力先: `.agentdev/learning/elevation-staging/`
    - ファイル名: `{disposal-category}-{name}.md`
    - **`.opencode/` への直接書込は禁止**
    - **`case-run` への直接受け渡しは禁止**（`req-define` を経由すること）
@@ -90,7 +90,7 @@ load_skills:
    - **次ステップの案内**:
       - 「生成した stub は `req-define` の明示入力ファイルとして要件化してください」
       - 「`/agentdev/req-define` に対象の stub ファイルパスを指定して開始できます」
-      - 例: `/agentdev/req-define docs/tips/elevation-staging/existing-command-windows-escape.md`
+       - 例: `/agentdev/req-define .agentdev/learning/elevation-staging/existing-command-windows-escape.md`
    - **注意事項**:
       - `.opencode/` への直接配置・直接反映は行わないこと
       - stub は必ず `req-define` を経由すること（`case-run` に直接渡さないこと）
@@ -98,7 +98,7 @@ load_skills:
 ## Guardrails
 
 ### ファイル操作制約
-- G01: `.opencode/` 直接反映禁止: stub は `docs/tips/elevation-staging/` のみに生成。`.opencode/commands/` や `.opencode/skills/` への直接書込は禁止
+- G01: `.opencode/` 直接反映禁止: stub は `.agentdev/learning/elevation-staging/` のみに生成。`.opencode/commands/` や `.opencode/skills/` への直接書込は禁止
 - G02: `evaluation-report.md` は読込専用: 変更・削除は禁止
 
 ### 実行制約

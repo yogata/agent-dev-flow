@@ -128,7 +128,7 @@ git push origin --delete "{type}/issue-{N}"
 
 - worktreeプレフィクスを含まないパスでのファイル操作禁止（`.worktrees/{N}-{type}/` がパスに含まれていること）
 - `--force` によるダーティworktreeの強制削除禁止
-- メインリポジトリ（非worktree）内でのファイル編集禁止（issue-work中）
+- メインリポジトリ（非worktree）内でのファイル編集禁止（case-run中）
 
 ## 重要: git worktreeコマンドの実行方法
 

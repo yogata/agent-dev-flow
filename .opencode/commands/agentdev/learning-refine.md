@@ -8,33 +8,33 @@ load_skills:
 
 # 学びの問題クラス分類・8軸評価とアーカイブ
 
-`docs/tips/inbox.md` の学びエントリと `docs/tips/archive.md` の過去エントリを正規化・問題クラス分類し、8軸評価スコアを算出して `docs/tips/evaluation-report.md` に出力。refine 時 prune（任意）を実施後、ユーザー承認を経て inbox → archive へ原子的に移動する。
+`.agentdev/learning/inbox.md` の学びエントリと `.agentdev/learning/archive.md` の過去エントリを正規化・問題クラス分類し、8軸評価スコアを算出して `.agentdev/learning/evaluation-report.md` に出力。refine 時 prune（任意）を実施後、ユーザー承認を経て inbox → archive へ原子的に移動する。
 
 evaluation-report.md は評価済み中間レポートであり、learning-promote が昇格・保留・破棄を判断するための境界成果物である。毎回上書きし、長期履歴にはしない。
 
 ## Input
 
-- `docs/tips/inbox.md`（必須）— 未処理の学びエントリ
-- `docs/tips/archive.md`（任意）— 過去エントリ
+- `.agentdev/learning/inbox.md`（必須）— 未処理の学びエントリ
+- `.agentdev/learning/archive.md`（任意）— 過去エントリ
 
 ## Output
 
-- `docs/tips/evaluation-report.md`（毎回上書き）
-- `docs/tips/archive.md`（inbox からの移動分を追記）
-- `docs/tips/inbox.md`（ヘッダーのみにクリア）
+- `.agentdev/learning/evaluation-report.md`（毎回上書き）
+- `.agentdev/learning/archive.md`（inbox からの移動分を追記）
+- `.agentdev/learning/inbox.md`（ヘッダーのみにクリア）
 
 ## Steps
 
 ### 1. inbox.md の内容確認
 
-- `docs/tips/inbox.md` を読み込む
+- `.agentdev/learning/inbox.md` を読み込む
 - ファイルが存在しない → エラー終了。「先に `agentdev-learning-capture` skill で学びを追加してください」
 - `---` 区切りのエントリをカウント（ヘッダー除く）
 - 0件 → 「分析対象の学びがありません」と報告して終了
 
 ### 2. archive.md の読込
 
-- `docs/tips/archive.md` が存在すれば読み込む
+- `.agentdev/learning/archive.md` が存在すれば読み込む
 - 存在しない場合は空として扱う
 
 ### 3. 全エントリの読込と旧フォーマット正規化
@@ -55,7 +55,7 @@ evaluation-report.md は評価済み中間レポートであり、learning-promo
 
 ### 6. evaluation-report.md の生成
 
-- パス: `docs/tips/evaluation-report.md`（毎回上書き、追記しない）
+- パス: `.agentdev/learning/evaluation-report.md`（毎回上書き、追記しない）
 - スキーマは `agentdev-learning-pipeline` skill の「Evaluation-Report Schema」に従う
 
 ### 7. refine 時 prune（MAY、任意）

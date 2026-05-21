@@ -28,15 +28,15 @@
 - **ADR/REQ/spec影響**: なし
 - **横展開観点**: コミットメッセージ生成時は常に agentdev-conventional-commits スキルを参照すべき。他のコマンドでもコミット生成箇所があるため同様のリスクあり
 - **再発条件**: `agentdev-conventional-commits` スキルをロードせずにコミットメッセージを生成する場合
-- **予防策候補**: issue-work や issue-close のコミット生成ステップに agentdev-conventional-commits スキルのロードを必須化する
-- **想定反映先**: `agentdev-conventional-commits` スキル、`issue-work` コマンド
-- **関連**: `.opencode/skills/agentdev-conventional-commits/SKILL.md`, `.opencode/commands/issue/issue-work.md`
+- **予防策候補**: case-run や case-close のコミット生成ステップに agentdev-conventional-commits スキルのロードを必須化する
+- **想定反映先**: `agentdev-conventional-commits` スキル、`case-run` コマンド
+- **関連**: `.opencode/skills/agentdev-conventional-commits/SKILL.md`, `.opencode/commands/agentdev/case-run.md`
 - **タグ**: `#ci` `#コミットメッセージ` `#テンプレート逸脱`
 ```
 
 ### Step 3: ユーザー通知
 
-> 以下の学びを `docs/tips/inbox.md` に追加しました：
+> 以下の学びを `.agentdev/learning/inbox.md` に追加しました：
 >
 > ## CI lint失敗: コミットメッセージのConventional Commits規約違反
 >
@@ -45,7 +45,7 @@
 
 ### Step 4: 学びの追加
 
-エージェントが直接 `docs/tips/inbox.md` に13フィールド形式で追記する（ユーザー承認不要）。
+エージェントが直接 `.agentdev/learning/inbox.md` に13フィールド形式で追記する（ユーザー承認不要）。
 
 ---
 
@@ -63,7 +63,7 @@
 ## Windows環境でのgit worktree削除時にforceフラグが必要
 
 - **問題事象**: `git worktree remove` 実行時にファイルロックエラーが発生した
-- **発生局面**: 実装（issue-closeのブランチ削除ステップ）
+- **発生局面**: 実装（case-closeのブランチ削除ステップ）
 - **検知方法**: git コマンドの終了コードとエラーメッセージ
 - **根本原因**: Windowsのファイルシステムロックにより、worktreeディレクトリが完全に解放される前に削除を試行した
 - **自律対応内容**: `git worktree remove -f` で強制削除し、成功を確認
@@ -71,15 +71,15 @@
 - **ADR/REQ/spec影響**: なし
 - **横展開観点**: Windows環境でのすべてのファイルシステム操作（rm、mv含む）で同様のリスクあり
 - **再発条件**: Windows環境で worktree を削除する場合
-- **予防策候補**: issue-close の worktree 削除ステップで最初から `-f` フラグを使用するようテンプレートを更新
-- **想定反映先**: `issue-close` コマンドテンプレート
-- **関連**: `.opencode/commands/issue/issue-close.md`, Issue #89
+- **予防策候補**: case-close の worktree 削除ステップで最初から `-f` フラグを使用するようテンプレートを更新
+- **想定反映先**: `case-close` コマンドテンプレート
+- **関連**: `.opencode/commands/agentdev/case-close.md`, Issue #89
 - **タグ**: `#git` `#windows` `#ワークアラウンド`
 ```
 
 ### Step 3: ユーザー通知
 
-> 以下の学びを `docs/tips/inbox.md` に追加しました：
+> 以下の学びを `.agentdev/learning/inbox.md` に追加しました：
 >
 > ## Windows環境でのgit worktree削除時にforceフラグが必要
 >
@@ -110,15 +110,15 @@
 - **ADR/REQ/spec影響**: REQ-0005 セクション3の更新が必要。ADR-0003（エラー処理方針）への追記も検討すべき
 - **横展開観点**: REQ作成時は常に既存specs/ADRとの整合性確認を必須とすべき
 - **再発条件**: 新規REQ作成時に既存ドキュメントとの整合性チェックをスキップする場合
-- **予防策候補**: issue-save-req の実行ステップに specs/ADR 整合性チェックを追加する
-- **想定反映先**: `issue-save-req` コマンド、`agentdev-req-analysis` スキル
+- **予防策候補**: req-save の実行ステップに specs/ADR 整合性チェックを追加する
+- **想定反映先**: `req-save` コマンド、`agentdev-req-analysis` スキル
 - **関連**: `docs/requirements/REQ-0005.md`, `docs/specs/design-principles.md`, Issue #150
 - **タグ**: `#仕様矛盾` `#REQ更新` `#ADR影響`
 ```
 
 ### Step 3: ユーザー通知
 
-> 実装中に仕様矛盾を発見し、学びを `docs/tips/inbox.md` に追加しました：
+> 実装中に仕様矛盾を発見し、学びを `.agentdev/learning/inbox.md` に追加しました：
 >
 > （全13フィールド表示）
 
@@ -128,7 +128,7 @@
 
 ### Layer 1: Capture Phase (学びの記録)
 
-エージェントが13フィールド形式で `docs/tips/inbox.md` に直接追記：
+エージェントが13フィールド形式で `.agentdev/learning/inbox.md` に直接追記：
 
 ```markdown
 ## CI lint失敗: コミットメッセージのConventional Commits規約違反
