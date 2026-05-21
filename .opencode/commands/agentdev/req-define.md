@@ -28,8 +28,8 @@ load_skills:
 
 ## Output
 
-- `.sisyphus/drafts/req-draft-{topic-slug}.md`（パターンBの場合のみ）
-- セッション内要件doc（パターンAの場合）
+- `.sisyphus/drafts/req-draft-{topic-slug}.md`（機能追加の場合のみ）
+- セッション内要件doc（バグ修正・軽微変更の場合）
 
 ## Steps
 
@@ -122,7 +122,7 @@ load_skills:
       - スケール判断結果と分解計画をユーザーに提示し、分解方針の確認を求める
     - **standard と判定された場合**: 分解不要、そのまま単一Issueで進む方針を提示する（確認停止しない）
  9. ドラフト保存:
-    - **パターンB（機能追加）**: `.sisyphus/drafts/req-draft-{topic-slug}.md` にドラフトを保存。ドラフトは doc_requirement.md テンプレート構造（目的/要件/適用範囲）に以下のメタデータセクションを追加:
+    - **機能追加**: `.sisyphus/drafts/req-draft-{topic-slug}.md` にドラフトを保存。ドラフトは doc_requirement.md テンプレート構造（目的/要件/適用範囲）に以下のメタデータセクションを追加:
       ```markdown
       ## draft-meta（req-save 用）
 
@@ -136,14 +136,14 @@ load_skills:
       - **decomposition**: [{scope, modules, description}]（scale が large の場合のみ）
        - **status**: draft（初期値。req-save → saved, case-open → issued + 削除）
       ```
-    - **パターンA（バグ修正・軽微変更）**: ドラフト保存不要。セッション内で要件docを完結させる
-    - **パターンC（リファクタリング・保守作業）/ パターンD（ドキュメント・雑務）**: ドラフト保存不要。セッション内で要件docを完結させる（Pattern Aと同等のlightweight workflow）
-10. 要件doc確認: 生成した要件doc（パターンB: ドラフト内容、パターンA/C/D: セッション内要件doc）をユーザーに提示する。明示的な承認は求めず、提示のみを行う
+    - **バグ修正・軽微変更**: ドラフト保存不要。セッション内で要件docを完結させる
+    - **リファクタリング・保守作業 / ドキュメント・雑務**: ドラフト保存不要。セッション内で要件docを完結させる（バグ修正・軽微変更と同等のlightweight workflow）
+10. 要件doc確認: 生成した要件doc（機能追加: ドラフト内容、バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務: セッション内要件doc）をユーザーに提示する。明示的な承認は求めず、提示のみを行う
     - **差し戻し**: ユーザーが修正・差し戻しを指示した場合、壁打ちを継続（Step 1に戻る）
     - **要件doc確定**: ユーザーが次のコマンド（`/agentdev/req-save` または `/agentdev/case-open`）を実行したことを要件doc確定の意思表示として扱う
 11. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
-    - パターンB: `次のステップ: /agentdev/req-save`
-    - パターンA/C/D: `次のステップ: /agentdev/case-open`
+    - 機能追加: `次のステップ: /agentdev/req-save`
+    - バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務: `次のステップ: /agentdev/case-open`
 
 ## Guardrails
 

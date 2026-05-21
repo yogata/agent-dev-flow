@@ -37,7 +37,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 検出できない場合はユーザーに番号の指定を求めて停止
 2. 前提確認: チェックボックス全完了確認、PR存在確認
 3. docs/ 検証:
-    **パターンB固有の検証**:
+    **機能追加固有の検証**:
     - `docs/requirements/REQ-{NNNN}.md` が作成済みであることを確認
     - `docs/requirements/README.md` のインデックスに該当REQが記載されていることを確認。未記載の場合は警告
     - `docs/README.md` ドキュメントハブに該当REQのリンクが記載されていることを確認。未記載の場合は警告
@@ -49,7 +49,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 実装コード・設定・関連ドキュメントが要件と矛盾していないことを確認する（SHALL）
     - 旧仕様の記述が残っている場合、その記述が変更後仕様と矛盾しないことを確認する（SHALL）
     - 変更後仕様と矛盾するドキュメント更新漏れがある場合、完了不可とする（SHALL）
-4. PRマージ（`gh pr merge`）→ 対応記録をIssueにコメント追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_implementation.md`（パターンB）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_record.md`（パターンA/C/D）を Read tool で読み込む
+4. PRマージ（`gh pr merge`）→ 対応記録をIssueにコメント追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_implementation.md`（機能追加）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_record.md`（バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務）を Read tool で読み込む
     - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 5. Issue本文のテスト戦略チェックボックス更新:
@@ -113,7 +113,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 ### 品質ゲート
 - G07: PRのCIが通っていることを確認（`gh pr checks`）。CI/CDが失敗している場合は case-run に差し戻す（case-close は修正を行わない）
 - G08: 未完了チェックボックスがある場合はエラー停止
-- G09: パターンBで docs/ 更新がない場合、警告を表示して停止確認。変更後仕様と矛盾するドキュメント更新漏れがある場合、完了不可とする
+- G09: 機能追加で docs/ 更新がない場合、警告を表示して停止確認。変更後仕様と矛盾するドキュメント更新漏れがある場合、完了不可とする
 - G10: Issue本文のテスト戦略チェックボックスを必ず更新すること（PR検証結果を反映）
 - G11: コメントテンプレートの【必須】セクションが全てコメント本文に含まれていることを確認してからコメント投稿すること
 

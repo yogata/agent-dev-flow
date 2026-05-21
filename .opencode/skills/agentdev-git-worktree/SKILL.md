@@ -24,8 +24,8 @@ worktree とブランチの命名規則を統一する。
 | ---------- | -------------------------- |
 | `feature`  | 機能追加・enhancement      |
 | `fix`      | バグ修正・bug              |
-| `refactor` | リファクタリング・Pattern C |
-| `chore`    | ドキュメント・雑務・Pattern D |
+| `refactor` | リファクタリング・保守作業 |
+| `chore`    | ドキュメント・雑務 |
 - Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
 
 ### `{N}` の定義

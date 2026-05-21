@@ -17,7 +17,7 @@ AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-ass
 
 ## クイックスタート
 
-機能追加（Pattern B）の最小フローを示します。バグ修正（Pattern A）は `/agentdev/req-define` 後に `/agentdev/case-open` へ進みます。
+機能追加の最小フローを示します。バグ修正は `/agentdev/req-define` 後に `/agentdev/case-open` へ進みます。
 
 ### 1. 要件を壁打ちする（壁打ちフェーズ）
 
@@ -27,7 +27,7 @@ AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-ass
 
 AIと対話しながら要件を整理します。完了すると壁打ち成果物が生成されます。
 
-### 2. 要件を保存する（Pattern B のみ）
+### 2. 要件を保存する（機能追加のみ）
 
 ```
 /agentdev/req-save
