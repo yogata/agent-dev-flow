@@ -91,6 +91,19 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
             - `gh issue close {epic_number} --reason completed` でEpicをクローズ
             - 完了報告に「Epic #{N} を自動クローズ」と表示
         - 1件以上 "OPEN" の子Issueがある場合 → スキップ（完了報告に「Epic #{N}: N件未完了のためスキップ」と表示）
+8b. 実行前同期（git pull）:
+    - カレントディレクトリで `git pull --ff-only` を実行する
+    - **失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
+      ```
+      ## Git 同期エラー
+
+      **エラー種別**: pull --ff-only 失敗
+      **停止理由**: リモートに未取り込みの変更があり、fast-forward マージできない
+      **対象ブランチ**: {current_branch}
+      **ユーザーアクション**: 手動で `git pull --rebase` または `git stash && git pull --ff-only && git stash pop` を実行してください
+      **raw git output**:
+      {git_error_output}
+      ```
 9. 学びの検知・抽出: `agentdev-learning-capture` スキルに従い、エージェントが自ら学びの有無を判断する
     - **禁止**: ユーザーに学びの有無を問うこと（「学びはありますか？」等）は禁止。エージェントが判断する
     - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `.agentdev/learning/inbox.md` に直接追記する。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
@@ -104,10 +117,35 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - **別々の成果物**: intake item と learning item を別々に件数・保存先・次ステップを表示する（SHALL）。混合した単一成果物にしない
     - **既存 learning capture 原則の維持**: Step 9 の learning capture の原則（ユーザーに学びを問わない、承認なしで蓄積し通知する）は維持する（SHALL）
     - **Split Rule の適用**: 観測が intake と learning の両方に該当する場合、`capture-boundaries.md` の Split Rule（具体的修正対象 → intake item、再発防止知見 → learning item、両方 → 分割）に従い、別々の成果物として作成
+9c. .agentdev 変更の commit と push（learning + intake 同一 commit）:
+    - `git diff --name-only` で `.agentdev/` 配下の変更ファイルを確認する
+    - **変更なし時**: commit/push せず、Step 11 の完了報告で「変更なし」と報告
+    - **変更あり時**:
+        1. `git add` は `.agentdev/` 配下の変更ファイルのみを対象とする（SHALL）。他のパスを巻き込まない
+        2. commit message: `chore(agentdev): close case #N and capture domain state`（Conventional Commits 形式）（SHALL）
+           - `#N` は対象Issue番号に置換
+        3. learning capture (Step 9) と intake capture (Step 9b) の成果物を**同一 commit** に含める（SHALL）
+        4. `git push` を実行する
+        5. **push 失敗時**: 以下の構造化エラーメッセージを表示し、完了扱いにしない（SHALL）:
+           ```
+           ## Git Push エラー
+
+           **エラー種別**: push 失敗
+           **停止理由**: リモートへのプッシュに失敗
+           **対象ブランチ**: {current_branch}
+           **変更ファイル**: {changed_files}
+           **ユーザーアクション**: 手動で `git push` を実行してください
+           **raw git output**:
+           {git_error_output}
+           ```
 10. Plan アーカイブ: `.sisyphus/plans/` から該当Issue番号に関連するplanファイルを検索
     - planファイルが見つかった場合 → `agentdev-archive-plan` スキルに従ってアーカイブ実行
     - planファイルが見つからない場合 → スキップ（注記付き）
 11. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット
+    - **git 永続化結果**（完了報告に追加）:
+        - 変更の有無（あり/なし）
+        - 変更ありの場合: commit されたファイル一覧、commit hash、push 成否
+        - 変更なしの場合: 「変更なし（commit/push スキップ）」
 
 ## Guardrails
 
@@ -140,3 +178,8 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 ### 出力制約
 - G20: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- G21: Step 8b の `git pull --ff-only` 失敗時は自動解消せず、構造化エラーメッセージを表示して停止すること
+- G22: Step 9c の commit は `.agentdev/` 配下のみを対象とすること。他のパスを巻き込まないこと
+- G23: Step 9c で learning capture と intake capture の成果物を同一 commit に含めること
+- G24: Step 9c の push 失敗時は完了扱いにせず、構造化エラーメッセージを表示して停止すること
+- G25: `.agentdev/` 配下に変更がない場合は commit/push をスキップすること

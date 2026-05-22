@@ -70,6 +70,21 @@ archive.md 内の古い単発レアケースを削除候補として特定する
 - アーカイブ移動の承認を求める
 - ユーザーが承認しない → 「アーカイブをキャンセルしました。evaluation-report.mdは保存済みです」と報告して終了
 
+### 8b. 実行前同期（git pull）
+
+- `git pull --ff-only` を実行する
+- **失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
+  ```
+  ## Git 同期エラー
+  
+  **エラー種別**: pull --ff-only 失敗
+  **停止理由**: リモートに未取り込みの変更があり、fast-forward マージできない
+  **対象ブランチ**: {current_branch}
+  **ユーザーアクション**: 手動で `git pull --rebase` または `git stash && git pull --ff-only && git stash pop` を実行してください
+  **raw git output**:
+  {git_error_output}
+  ```
+
 ### 9. アーカイブ移動（原子的操作 — 最重要）
 
 - **Step A**: inbox.md の全エントリを archive.md に追記。各エントリに `**移動日**: YYYY-MM-DD` フィールドを追加
@@ -85,12 +100,37 @@ archive.md 内の古い単発レアケースを削除候補として特定する
   ```
 - Step B が失敗 → inbox.md は変更しない。エラー内容を報告
 
+### 9b. .agentdev 変更の commit と push
+
+- `git diff --name-only` で `.agentdev/` 配下の変更ファイルを確認する
+- **変更なし時**: commit/push せず、Step 10 の完了報告で「変更なし」と報告
+- **変更あり時**:
+  1. `git add` は `.agentdev/` 配下の変更ファイルのみを対象とする（SHALL）。他のパスを巻き込まない
+  2. commit message: `chore(agentdev): refine learning entries`（Conventional Commits 形式）（SHALL）
+  3. `git push` を実行する
+  4. **push 失敗時**: 以下の構造化エラーメッセージを表示し、完了扱いにしない（SHALL）:
+     ```
+     ## Git Push エラー
+     
+     **エラー種別**: push 失敗
+     **停止理由**: リモートへのプッシュに失敗
+     **対象ブランチ**: {current_branch}
+     **変更ファイル**: {changed_files}
+     **ユーザーアクション**: 手動で `git push` を実行してください
+     **raw git output**:
+     {git_error_output}
+     ```
+
 ### 10. 完了報告
 
 - 問題クラス数（未分類含む）
 - 処理したエントリ数（inbox → archive）
 - prune したエントリ数（実施した場合）
 - evaluation-report.md のパス
+- **git 永続化結果**:
+  - 変更の有無（あり/なし）
+  - 変更ありの場合: commit されたファイル一覧、commit hash、push 成否
+  - 変更なしの場合: 「変更なし（commit/push スキップ）」
 
 ### 11. learning-promote 提案
 
@@ -113,6 +153,8 @@ archive.md 内の古い単発レアケースを削除候補として特定する
 | archive.md 書込失敗 | inbox.md は変更しない。エラー内容を報告 |
 | 旧フォーマットパース失敗 | 当該エントリをスキップし、警告を出力。処理は継続 |
 | prune候補抽出エラー | prune をスキップし、分類・評価・アーカイブ移動は継続 |
+| git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
+| git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
 ## 注意事項
 
