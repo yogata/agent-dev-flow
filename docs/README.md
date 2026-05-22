@@ -26,6 +26,7 @@
   - [REQ-0019: intake / learning の責任境界明確化と workflow 組み込み](requirements/REQ-0019.md)
   - [REQ-0020: Epic Issue 実行順序 SSoT と case-run Epic Orchestrator 化](requirements/REQ-0020.md)
   - [REQ-0021: AgentDevFlow ガードレールのスクリプト化と skill-local scripts 配置方針](requirements/REQ-0021.md)
+  - [REQ-0022: .agentdev domain state 更新後の git 永続化](requirements/REQ-0022.md)
 
 ## Specifications
 
