@@ -24,6 +24,7 @@
   - [REQ-0017: AgentDevFlow plugin namespace 統一と learning / intake / integrity の正式化](requirements/REQ-0017.md)
   - [REQ-0018: agentdev-req-analysis 未決分岐解消メソドロジー](requirements/REQ-0018.md)
   - [REQ-0019: intake / learning の責任境界明確化と workflow 組み込み](requirements/REQ-0019.md)
+  - [REQ-0020: Epic Issue 実行順序 SSoT と case-run Epic Orchestrator 化](requirements/REQ-0020.md)
 
 ## Specifications
 
@@ -43,6 +44,7 @@
   - [ADR-0003: req-define入力の抽象化](adr/ADR-0003.md)
    - [ADR-0004: 要件管理構造のarea-based移行方針](adr/ADR-0004.md)
    - [ADR-0005: AgentDevFlow plugin namespace 統一](adr/ADR-0005.md)
+   - [ADR-0006: Epic Issue 本文を実行順序 SSoT とする設計](adr/ADR-0006.md)
 
 ## Learning
 

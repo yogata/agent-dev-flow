@@ -11,3 +11,4 @@
 | ADR-0003 | req-define入力の抽象化 | proposed | 2026-05-18 |
 | ADR-0004 | 要件管理構造の area-based 移行方針 | proposed | 2026-05-19 |
 | ADR-0005 | AgentDevFlow plugin namespace 統一 | accepted | 2026-05-21 |
+| ADR-0006 | Epic Issue 本文を実行順序 SSoT とする設計 | proposed | 2026-05-22 |
