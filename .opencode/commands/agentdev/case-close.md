@@ -126,20 +126,19 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
         3. learning capture (Step 9) と intake capture (Step 9b) の成果物を**同一 commit** に含める（SHALL）
         4. `git push` を実行する
         5. **push 失敗時**: 以下の構造化エラーメッセージを表示し、完了扱いにしない（SHALL）:
-           ```
-           ## Git Push エラー
+            ```
+            ## Git Push エラー（domain state 永続化失敗）
 
-           **エラー種別**: push 失敗
-           **停止理由**: リモートへのプッシュに失敗
-           **対象ブランチ**: {current_branch}
-           **変更ファイル**: {changed_files}
-           **ユーザーアクション**: 手動で `git push` を実行してください
-           **raw git output**:
-           {git_error_output}
-           ```
-10. Plan アーカイブ: `.sisyphus/plans/` から該当Issue番号に関連するplanファイルを検索し、`.sisyphus/archives/` に移動する
-    - planファイルが見つからない場合 → スキップ（注記付き）
-11. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット
+            **PR/Issue 状態**: PRマージ済み・Issueクローズ済み（完了状態）
+            **失敗対象**: .agentdev/ 配下の domain state 永続化（learning/intake の保存）
+            **エラー種別**: push 失敗
+            **対象ブランチ**: {current_branch}
+            **変更ファイル**: {changed_files}
+            **ユーザーアクション**: 手動で `git push` を実行してください
+            **raw git output**:
+            {git_error_output}
+            ```
+10. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット
     - **git 永続化結果**（完了報告に追加）:
         - 変更の有無（あり/なし）
         - 変更ありの場合: commit されたファイル一覧、commit hash、push 成否
