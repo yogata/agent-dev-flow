@@ -11,6 +11,7 @@ load_skills:
   - agentdev-req-file-manager
   - agentdev-epic-tracker
   - agentdev-workflow-templates
+  - agentdev-learning-pipeline
 ---
 
 # 完了処理
@@ -104,10 +105,39 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
       **raw git output**:
       {git_error_output}
       ```
-9. 学びの検知・抽出: `agentdev-learning-capture` スキルに従い、エージェントが自ら学びの有無を判断する
-    - **禁止**: ユーザーに学びの有無を問うこと（「学びはありますか？」等）は禁止。エージェントが判断する
-    - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `.agentdev/learning/inbox.md` に直接追記する。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
-    - エージェントが学びなしと判断 → ユーザーに何も問わず次のステップへ進む
+ 9. 学びの検知・抽出: `agentdev-learning-capture` スキルに従い、エージェントが自ら学びの有無を判断する
+     - **禁止**: ユーザーに学びの有無を問うこと（「学びはありますか？」等）は禁止。エージェントが判断する
+     - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `.agentdev/learning/inbox.md` に直接追記する。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
+     - エージェントが学びなしと判断 → ユーザーに何も問わず次のステップへ進む
+ 9a. Staging stub consumed 判定と archive（REQ-0023-005〜018）:
+     - **consumed 判定**（REQ-0023-005〜010）:
+        1. Issue本文から staging stub パスを抽出（`## Requirement Source` セクションのリストから `.agentdev/learning/elevation-staging/*.md` にマッチするパスを特定）
+        2. stub パスが存在しない場合 → archive 処理をスキップし Step 9b へ移行（REQ-0023-009）
+        3. stub パスが存在する場合、ファイルが存在することを確認（REQ-0023-006）
+        4. 機械的4条件で consumed 判定（REQ-0023-007）:
+           - (a) Issue に stub パスが記録されている（上記1で確認済み）
+           - (b) 対応 PR がマージ済み（Step 4 でマージ完了済み）
+           - (c) Issue が completed としてクローズされる（Step 6 で実行予定）
+           - (d) case-close が正常完了（現在実行中）
+           - 4条件全充足 → consumed と判定
+           - **注意**: 意味的一致検証は実行しない（REQ-0023-008）。機械的条件のみで判定する
+        5. consumed 判定結果を Step 11 の完了報告に含める（REQ-0023-010）
+     - **staging stub archive**（REQ-0023-011〜018）:
+        1. consumed と判定された stub のみを対象とする（REQ-0023-015, REQ-0023-016）。不採用 stub は対象外
+        2. 各 consumed stub について以下を実行:
+           a. stub 本文の末尾に `## 消費記録` セクションを追記（REQ-0023-012）:
+              ```markdown
+              ## 消費記録
+
+              - **Issue**: #{N}
+              - **PR**: #{M}
+              - **消費日**: YYYY-MM-DD
+              - **処理**: case-close
+              ```
+           b. `elevation-staging/archive/` ディレクトリの存在確認、なければ作成
+           c. stub を `elevation-staging/archive/` に移動（REQ-0023-011）
+           d. 同名ファイルが archive/ 内に既に存在する場合は上書きせず、警告をログに記録してスキップ（REQ-0023-013, REQ-0023-014）
+        3. archive 処理は Step 9c の前に実行する（REQ-0023-017）。archive 済みファイルを Step 9c の `git add` 対象に含める（REQ-0023-018）
 9b. Post-run intake capture: 完了処理中に発見した本筋外の変更候補のうち、具体的な修正対象が特定できるものを intake item として保存する。`agentdev-workflow-lifecycle` → `reference/capture-boundaries.md` の Split Rule を SSoT とする
     - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）
     - **曖昧な候補は自律保存しない**: 修正対象が特定できない候補・単なる違和感・改善案・曖昧な変更候補は自律保存せず、完了報告に候補としてのみ提示（SHALL）
