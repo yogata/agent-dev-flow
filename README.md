@@ -1,4 +1,4 @@
-# opencode-config
+# agent-dev-flow
 
 AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-assisted development workflow を支えるコマンド・スキル・ドキュメントを一元管理しています。
 
