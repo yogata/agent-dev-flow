@@ -94,14 +94,7 @@ load_skills:
    | 1 | ... | #XX | YYYY-MM-DD-xxx.md |
    ```
 
-8. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
-   ```
-   ✅ intake item の抽出・保存が完了しました。
-     対象期間: {since} 〜 {until}
-     抽出件数: {N}件
-     保存先: .agentdev/intake/inbox/
-     次のステップ: /agentdev/intake-review
-   ```
+8. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（`completion-reports.md` → intake-from-github 完了時）に従って出力
 
 ## Guardrails
 
