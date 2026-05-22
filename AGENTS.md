@@ -1,62 +1,70 @@
-## AgentDevFlow Canonical Namespace
+# AGENTS.md
 
-- Plugin 表示名: `AgentDevFlow`
-- Canonical namespace: `agentdev`
-- Public command prefix: `/agentdev/*`
-- Domain state directory: `.agentdev/`
-- 詳細: ADR-0005, REQ-0017
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
-## ディレクトリ責任分離（REQ-0017-008）
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
-### .sisyphus/ — Sisyphus Runtime Workspace
+## 1. Think Before Coding
 
-Sisyphus が管理する実行時の一時作業領域。plan、evidence、tasks、execution state、drafts、reports、archives を格納する。
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
 
-- plans, drafts, evidence, execution, notepads, tasks, reports, archives
-- **例外**: `.sisyphus/drafts/req-draft-*.md` は Prometheus runtime working draft であり、AgentDevFlow の canonical domain state ではない（REQ-0017-046）
+Before implementing:
 
-### .agentdev/ — AgentDevFlow Domain State
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 
-AgentDevFlow の canonical domain artifact を格納する永続領域。intake items、learning pipeline data、integrity reports 等の domain state を保持する。
+## 2. Simplicity First
 
-- intake items, learning data, integrity reports
-- サブディレクトリ構成は各子issueで定義（REQ-0017-009）
-- `.sisyphus/drafts/req-draft-*.md` を `.agentdev/` に移行する要件はない（REQ-0017-046）
+**Minimum code that solves the problem. Nothing speculative.**
 
-## 開発環境
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
 
-- OS: Windows
-- shell: powershell
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
-## Sisyphus 命名規則
+## 3. Surgical Changes
 
-`.sisyphus/` 配下のファイル・ディレクトリの命名は plan 名を基準とする。これにより `archive-completed-plan` で確実にアーカイブされる。
+**Touch only what you must. Clean up only your own mess.**
 
-### 基本ルール
+When editing existing code:
 
-| カテゴリ | パス | 命名規則 | マッチング方式 |
-|----------|------|----------|----------------|
-| plans | `.sisyphus/plans/` | `<plan_name>.md` | 完全一致 |
-| drafts | `.sisyphus/drafts/` | `<plan_name>.md` または `<plan_name>-*.md` | プレフィクス |
-| evidence | `.sisyphus/evidence/` | `<plan_name>.*` または `<plan_name>-*` | プレフィクス |
-| execution | `.sisyphus/execution/` | `<plan_name>.*` または `<plan_name>-*` | プレフィクス |
-| notepads | `.sisyphus/notepads/` | `<plan_name>/` （ディレクトリ名 = plan 名） | **完全一致** |
-| tasks | `.sisyphus/tasks/` | `<plan_name>.*` または `<plan_name>-*` | プレフィクス |
-| reports | `.sisyphus/reports/` | `<plan_name>.*` または `<plan_name>-*` | プレフィクス |
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
 
-### 例
+When your changes create orphans:
 
-**plan 名**: `install-v2-windows`
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
 
-| カテゴリ | ✅ 正しい | ❌ 間違い |
-|----------|-----------|-----------|
-| notepads | `.sisyphus/notepads/install-v2-windows/` | `.sisyphus/notepads/install-v2/` |
-| evidence | `.sisyphus/evidence/install-v2-windows-result.txt` | `.sisyphus/evidence/result.txt` |
-| drafts | `.sisyphus/drafts/install-v2-windows-draft.md` | `.sisyphus/drafts/draft.md` |
+The test: Every changed line should trace directly to the user's request.
 
-### 注意事項
+## 4. Goal-Driven Execution
 
-- notepads は**完全一致**のみ対応（プレフィクスマッチングではない）
-- plan 名にサフィックス（`-windows`, `-wsl` 等）がある場合、notepad ディレクトリ名にも同一サフィックスが必要
-- 空の notepad ディレクトリは作成しない
-- notepad ディレクトリ内に隠しファイル（`.` で始まるファイル）を配置しない（アーカイブ時にスキップされる）
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
