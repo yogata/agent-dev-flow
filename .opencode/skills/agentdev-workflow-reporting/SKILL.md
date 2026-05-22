@@ -50,6 +50,21 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 | checkbox-updates.md | チェックボックス更新ルール |
 | subagent-output.md | サブエージェント出力ポリシー |
 
+## レビュー観点: 完了報告フォーマット適合性
+
+完了報告フォーマットの違反を検出するためのレビュー観点。レビュー時（`/review-work`）や乖離検出（`agentdev-spec-compliance`）時に参照する。
+
+### 検出項目
+
+| 観点 | 違反条件 |
+|------|----------|
+| フォーマット適合 | `completion-reports.md` の該当セクションと一致しない完了報告を出力している |
+| インラインコードブロック残存 | コマンド定義ファイル内に完了報告のインラインコードブロックが残存している |
+| 次工程の欠落 | `completion-reports.md` に次工程が定義されているコマンドで `次のステップ` が出力されていない |
+| 汎用締め文の使用 | 禁止された汎用締め文（「次にやるべきことがあれば…」等）を使用している |
+| 終端コマンドの次工程 | `case-close` 等の終端コマンドで次工程や汎用締め文を出力している |
+| load_skills 欠落 | 完了報告を参照するコマンドの `load_skills` に `agentdev-workflow-reporting` が含まれていない |
+
 ## See Also
 
 - [agentdev-workflow-lifecycle](../agentdev-workflow-lifecycle/SKILL.md) — フェーズ定義・パターン判定基準

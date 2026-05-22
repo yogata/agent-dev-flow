@@ -5,6 +5,7 @@ load_skills:
   - agentdev-gh-cli
   - agentdev-epic-tracker
   - agentdev-workflow-templates
+  - agentdev-workflow-reporting
 ---
 
 # Intake Open
@@ -84,25 +85,7 @@ load_skills:
 
 13. **Artifact ステータス更新**: 処理済みの promoted artifact に `issued` マークを付与する。artifact の frontmatter またはファイル名で処理済みであることを示す。
 
-14. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
-
-    **Single Issue flow**:
-    ```
-    ✅ Intake Issue 作成が完了しました。
-      Artifact: {filename}
-      Issue: #{issue_N}
-      次のステップ: /agentdev/case-run {issue_N}
-    ```
-
-    **Epic flow**:
-    ```
-    ✅ Intake Issue 作成が完了しました。
-      Artifact: {filename}
-      Epic: #{epic_N}
-      子Issue: #{child1}, #{child2}, ...（{count}件）
-      ステータス追跡: ☐ 未着手 {count}件
-      次のステップ: /agentdev/case-run {child1} {child2} ...
-    ```
+14. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（`completion-reports.md` → intake-open 完了時）に従って出力
 
 ## Guardrails
 
