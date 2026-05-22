@@ -31,6 +31,7 @@ load_skills:
    - 存在しない場合: セッション内の要件docから直接生成
    - テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_feature.md` または `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_bug.md` を Read tool で読み込む
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てIssue本文に含まれること。`【任意】` セクションは内容がある場合のみ含める。必須セクションが欠落している場合、生成をやり直すこと。
+    **Requirement Source 転記**（REQ-0023-004）: REQ文書（またはセッション内要件doc）に `## Requirement Source` セクションが存在する場合、その内容をIssue本文に転記する。転記先はIssue本文の補足情報セクションの後に `## Requirement Source` セクションとして配置する
 3. **規模判定によるフロー分岐**（Step 2の直後に実行）:
    - draft-metaの `scale` フィールドを確認
    - `scale: large` の場合 → **Epic flow**（Step 4〜8）へ進む

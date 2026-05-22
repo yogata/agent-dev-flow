@@ -337,3 +337,45 @@ elevation-staging/ → /agentdev/req-define（明示入力ファイル）→ /ag
 - staging stub の形式要件は本ドキュメント内「Requirement Source Staging Stub Schema」セクションを参照
 
 - `case-run` への直接受け渡しは禁止（`req-define` を経由すること）
+
+## Staging Stub Archive Rules
+
+消費済み staging stub の archive ルール。`case-close` が本 skill を load して実行する。
+
+### 対象
+
+- `.agentdev/learning/elevation-staging/*.md`（learning-promote が生成した staging stub）
+- consumed と判定された stub のみ（機械的4条件全充足）。不採用 stub は対象外
+
+### consumed 判定基準
+
+以下の4条件が全て充足された場合に consumed と判定する。意味的一致検証は実行しない。
+
+1. Issue に stub パスが記録されている
+2. 対応 PR がマージ済み
+3. Issue が completed としてクローズされる
+4. case-close が正常完了
+
+### Archive 先
+
+- `.agentdev/learning/elevation-staging/archive/`
+
+### Archive 処理手順
+
+1. stub 本文の末尾に `## 消費記録` セクションを追記:
+   ```markdown
+   ## 消費記録
+
+   - **Issue**: #{N}
+   - **PR**: #{M}
+   - **消費日**: YYYY-MM-DD
+   - **処理**: case-close
+   ```
+2. `elevation-staging/archive/` ディレクトリに移動
+3. 同名ファイル既存時は上書きしない（警告のみ）
+
+### 対象外
+
+- 不採用 stub（rejected / duplicate 処分の stub）
+- consumed と判定されなかった stub
+- stub パスが Issue に記録されていない場合
