@@ -47,6 +47,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
    - 対応の緊急度・優先度
    - 既存要件・仕様との関連
    - 対応方針の方向性（要件定義が必要か、既に Issue 化可能か）
+   - **learning 分岐判断**: この item は intake ではなく learning に分けるべきものではないか（capture-boundaries.md の split rule 参照）。具体的な修正対象がなく再発防止知見のみの場合は learning に委ねることを推奨
 
 4. **ユーザーとの対話的レビュー**: 評価結果を提示し、ユーザーと対話しながら判定を確定する:
    - 各 item の評価を提示
@@ -85,11 +86,13 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
 
 ## Guardrails
 
-### 責務境界（REQ-0017-025）
+### 責務境界（REQ-0017-025, REQ-0019-025）
 - G01: GitHub Issue の作成を行わない（`intake-open` が担当）
 - G02: 直接 `case-run` を起動しない（REQ-0017-025）
 - G03: item の内容を変更・更新しない（判定に基づく振り分けのみ）
 - G04: `intake-promote` や `req-define` を自動起動しない（次ステップの提示のみ）
+- G05: learning item を作成しない（REQ-0019-025）。learning に分けるべきと判断した item は learning pipeline への委ねを推奨するにとどめる
+- G06: learning item の保存・分類・昇華を担当しない（REQ-0019-023）
 
 ### 形式制約（REQ-0017-032〜039）
 - G05: workflow 管理 artifact として扱わない（REQ-0017-033）

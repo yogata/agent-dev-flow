@@ -106,12 +106,13 @@ load_skills:
 
 ## Guardrails
 
-### 責務境界（REQ-0017-026a/026b）
+### 責務境界（REQ-0017-026a/026b, REQ-0019-026）
 - G01: 候補抽出を行わない（`intake-capture` / `intake-from-github` が担当）
 - G02: 解消チェックを行わない（`intake-review` 等が担当）
 - G03: 採否判断を行わない（`intake-review` が担当）
 - G04: review を行わない（`intake-review` が担当）
 - G05: Issue 作成のみを担当する
+- G06: intake item 群から learning item を作成しない（MUST NOT）（REQ-0019-026）
 
 ### 実行制約
 - G06: データ取得は `gh` CLI のみ使用（GitHub API 直接呼び出し不可）
