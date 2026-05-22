@@ -2,6 +2,7 @@
 description: AgentDevFlow artifact 整合性検査
 agent: sisyphus
 load_skills:
+  - agentdev-integrity
   - agentdev-req-analysis
   - agentdev-adr-guidelines
 ---
