@@ -40,6 +40,7 @@ load_skills:
 5. **[Epic flow]**: Epic Issue本文を生成:
    - REQ内容から `{summary}`, `{problem}`, `{solution}` を埋める
    - draft-metaの `decomposition` から分解テーブルを生成（子Issue番号は後で更新するためプレースホルダー `#{TBD}`）
+   - Wave テーブル生成: `agentdev-workflow-orchestration` の Wave scheduling ロジックに従い依存関係から Wave 番号を決定し、`## 実行順序` セクションの Wave テーブルを生成する。列形式: `Wave / Issue / 実行方法 / 前提`。子Issue番号はプレースホルダー `#{TBD_Wn}`（n は行番号）とする
    - ステータス追跡テーブル: 全子件数を `{total}` に設定、進行中/完了は0
    - `{completion_criteria}` は要件docから抽出
 6. **[Epic flow]**: Epic Issueを作成:
@@ -58,6 +59,7 @@ load_skills:
     - 作成されたIssue番号を記録
 8. **[Epic flow]**: Epic Issue本文を更新:
    - 分解テーブルの `#{TBD}` を実際の子Issue番号に置換
+   - Wave テーブルの `#{TBD_Wn}` を実際の子Issue番号に置換（`n` は行番号に対応）
    - ステータス追跡テーブルの件数を更新
    - `gh issue edit` でEpic本文を更新（`--body-file` 使用）
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
@@ -71,7 +73,7 @@ load_skills:
 13. ドラフトの `## draft-meta` セクションの `status` を `issued` に更新する（ドラフトが存在する場合のみ） → 更新後、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
 14. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマットで結果出力:
     - **Standard flow**: 作成したIssue番号を報告、次ステップ: `/agentdev/case-run {issue_number}`
-    - **Epic flow**: Epic # + 全子Issue番号を報告、次ステップ: `/agentdev/case-run {child1} {child2} ...`（子Issue番号をスペース区切りで列挙）
+    - **Epic flow**: Epic # + 全子Issue番号を報告、次ステップ: `/agentdev/case-run {epic_N}`（Epic Issue番号を指定）
 
 ## Guardrails
 
