@@ -26,6 +26,7 @@
 | REQ-0020 | Epic Issue 実行順序 SSoT と case-run Epic Orchestrator 化 | epic/orchestration/ssot/wave |
 | REQ-0021 | AgentDevFlow ガードレールのスクリプト化と skill-local scripts 配置方針 | integrity/scripts/skill-structure/guardrails |
 | REQ-0022 | .agentdev domain state 更新後の git 永続化 | agentdev/git/persistence/domain-state |
+| REQ-0023 | learning staging stub の消費追跡と消費後アーカイブ | learning/staging-stub/archive/consumption-tracking |
 
 ## ディレクトリ構造の方針
 
