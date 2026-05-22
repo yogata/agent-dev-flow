@@ -14,7 +14,7 @@
 2. **完了報告テキスト（後）**: 本スキルの完了報告フォーマットに従ったテキストを出力する
 3. **中間出力の禁止**: TodoWrite更新と完了報告テキストの間に、他の中間出力（ログ・進捗報告・確認メッセージ等）を挟まない
 
-**適用対象**: req-define, req-save, case-open, case-run, case-close, case-update, intake-from-github, intake-open の全完了報告ステップ
+**適用対象**: req-define, req-save, case-open, case-run, case-run (Epic Orchestrator), case-close, case-update, intake-from-github, intake-open の全完了報告ステップ
 
 **理由**: 完了報告テキストがユーザーに最後に表示されることで、最終結果の視認性が向上する
 
@@ -74,7 +74,8 @@ Epic Issueを作成した場合は以下の報告を出力する。
 ✅ Epic Issue #{epic_N} を作成しました（機能追加 Epic）。
   REQ-{NNNN} をEpic本文に反映しました。
   子Issue: #{child1}, #{child2}, #{child3}（{count}件）
-  次のステップ: /agentdev/case-run {child1} {child2} {child3}
+  Wave構成: {wave_count} Wave（{wave_summary}）
+  次のステップ: /agentdev/case-run {epic_N}
 ```
 
 ## case-run 完了時
@@ -161,3 +162,56 @@ Epic Issueを作成した場合は以下の報告を出力する。
 ```
 
 **注意**: intake-openはバックログからのIssue作成コマンドであり、品質メトリクス収集・乖離検出レポートの自動生成は行わない。
+
+## case-run Epic Orchestrator 集約完了報告
+
+Epic Orchestrator モード（`/agentdev/case-run {epic_N}`）で全 Wave 完了後に出力する集約報告フォーマット。各子 Issue の subagent が個別の case-run 完了報告を出力した後に、親エージェントが本フォーマットで集約結果を報告する。
+
+### 全件成功時
+
+```
+✅ Epic Orchestrator 実行結果（Epic #{epic_N}）
+
+| Wave | Issue | 状態 | PR | 備考 |
+|------|-------|------|----|----|
+| 1 | #{child1_N} | ✅ 完了 | #{pr1_N} | — |
+| 2 | #{child2_N} | ✅ 完了 | #{pr2_N} | — |
+| 3 | #{child3_N} | ✅ 完了 | #{pr3_N} | — |
+
+**成功**: {success_count}件 / **失敗**: 0件 / **スキップ**: 0件
+```
+
+### 部分失敗・スキップあり
+
+```
+⚠️ Epic Orchestrator 実行結果（Epic #{epic_N}）
+
+| Wave | Issue | 状態 | PR | 備考 |
+|------|-------|------|----|----|
+| 1 | #{child1_N} | ✅ 完了 | #{pr1_N} | — |
+| 2 | #{child2_N} | ❌ 失敗 | — | 実装フェーズでエラー |
+| 3 | #{child3_N} | ⏭ スキップ | — | Wave 2 失敗依存 |
+
+**成功**: {success_count}件 / **失敗**: {fail_count}件 / **スキップ**: {skip_count}件
+```
+
+### 全件失敗時
+
+```
+❌ Epic Orchestrator 実行結果（Epic #{epic_N}）
+
+| Wave | Issue | 状態 | PR | 備考 |
+|------|-------|------|----|----|
+| 1 | #{child1_N} | ❌ 失敗 | — | {error_summary_1} |
+| 2 | #{child2_N} | ❌ 失敗 | — | {error_summary_2} |
+
+**成功**: 0件 / **失敗**: {fail_count}件 / **スキップ**: 0件
+```
+
+### フォーマット共通ルール
+
+- 状態値: `✅ 完了` / `❌ 失敗` / `⏭ スキップ` の3種類
+- PR列: 成功時はPR番号リンク、失敗・スキップ時は `—`
+- 備考列: 成功時は `—`、失敗時はエラー概要、スキップ時は依存先Wave番号
+- Wave列: Wave番号（Epic本文の実行順序テーブルに対応）
+- 集約行: 成功・失敗・スキップ件数のサマリー

@@ -41,10 +41,25 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 6. `gh issue edit {N} --body-file {temp}` でEpic本文を更新
 7. 更新失敗時 → 警告表示して `case-run` 自体は継続（フォールバック）
 
-**多重Issueモード**:
-- 親エージェントが各Wave開始前に、該当Wave内の全子IssueのEpicステータスを一括更新
-- サブエージェントによる同時更新の競合を回避
-- 一括更新順序: 子Issue番号の昇順
+**Epic Orchestratorモード（Wave一括更新）**:
+
+Epic Orchestrator は各 Wave 開始時に対象子 Issue の Epic ステータスを一括更新する（REQ-0020-013）。サブエージェントによる同時更新の競合を回避するため、親エージェントが一括処理を担う。
+
+Wave開始時一括更新（`☐ 未着手` → `🔄 進行中`）:
+1. Wave テーブルから該当 Wave の子 Issue 番号を抽出
+2. 親Epic本文を取得（`gh issue view {epic_N}`）
+3. 子Issue番号の昇順で、各子Issue行を一括置換:
+   - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
+   - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
+4. 既に `🔄 進行中`、`✅ 完了`、または `❌ 対処不要` の場合 → スキップ（べき等性）
+5. `gh issue edit {epic_N} --body-file {temp}` でEpic本文を一括更新
+
+Wave完了時ステータス更新:
+- 成功した子Issue: `🔄 進行中` → `✅ 完了 ([PR#{pr_number}]({pr_url}))` （`case-close` で実行）
+- 失敗した子Issue: `🔄 進行中` を維持（再実行可能にするため）
+- スキップされた子Issue: `🔄 進行中` → `⏭ スキップ` （Orchestratorが設定）
+
+一括更新順序: 子Issue番号の昇順
 
 ### case-close: 完了更新（Step 8）
 

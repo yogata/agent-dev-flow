@@ -36,6 +36,7 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 | req-save | 壁打ち成果物をREQ/ADRファイルとして保存 | `completion-reports.md` → req-save 完了時 |
 | case-open | REQファイルからGitHub Issue作成 | `completion-reports.md` → case-open 完了時 |
 | case-run | 計画立案から実装・コミット・PR作成まで一括実行 | `completion-reports.md` → case-run 完了時 |
+| case-run (Epic Orchestrator) | Epic Issueを入力としたWave順次実行 | `completion-reports.md` → Epic Orchestrator 集約完了報告 |
 | case-update | Issue本文の更新やコメント追加 | `completion-reports.md` → case-update 完了時 |
 | case-close | PRマージ・記録追記・Issueクローズ・ブランチ削除 | `completion-reports.md` → case-close 完了時 |
 | intake-from-github | クローズ済みissue/PRから残課題を抽出・分類しdraftとして保存 | `completion-reports.md` → intake-from-github 完了時 |
@@ -45,7 +46,7 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 
 | ファイル | 内容 |
 |----------|------|
-| completion-reports.md | 各コマンドの完了報告フォーマット |
+| completion-reports.md | 各コマンドの完了報告フォーマット（Epic Orchestrator 集約完了報告含む） |
 | checkbox-updates.md | チェックボックス更新ルール |
 | subagent-output.md | サブエージェント出力ポリシー |
 
@@ -53,6 +54,7 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 
 - [agentdev-workflow-lifecycle](../agentdev-workflow-lifecycle/SKILL.md) — フェーズ定義・パターン判定基準
 - [agentdev-workflow-routing](../agentdev-workflow-routing/SKILL.md) — レビューNG時の対応フロー
+- [agentdev-workflow-orchestration](../agentdev-workflow-orchestration/SKILL.md) — Epic Orchestrator モード定義・Wave実行フロー
 - [agentdev-req-analysis](../agentdev-req-analysis/SKILL.md) — 要件分析手法と品質基準
 - [agentdev-adr-guidelines](../agentdev-adr-guidelines/SKILL.md) — ADR要否評価基準
 - [agentdev-spec-compliance](../agentdev-spec-compliance/SKILL.md) — 実装と要件の乖離検出
