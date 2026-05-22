@@ -35,7 +35,7 @@ load_skills:
    artifact の検索方法: `.agentdev/intake/promoted/*.md` のファイル一覧を取得し、各ファイルの frontmatter を確認する。
 
 2. **Artifact 読み込み**: promoted artifact の内容をパースする:
-   - frontmatter: 対象 item のメタデータ
+   - frontmatter: `route`（後続ルート）と `status`（`promoted`）の最小構成
    - 整形済み item 群: タイトル、概要、対象範囲、完了条件等
    - 後続ルート情報: 単一 Issue または Epic + 子Issue 構成
 
@@ -83,7 +83,7 @@ load_skills:
 
 12. *(reserved for future expansion)*
 
-13. **Artifact ステータス更新**: 処理済みの promoted artifact に `issued` マークを付与する。artifact の frontmatter またはファイル名で処理済みであることを示す。
+13. **Artifact ステータス更新**: 処理済みの promoted artifact の frontmatter の `status` を `issued` に更新する。
 
 14. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（`completion-reports.md` → intake-open 完了時）に従って出力
 
@@ -98,14 +98,14 @@ load_skills:
 - G06: intake item 群から learning item を作成しない（MUST NOT）（REQ-0019-026）
 
 ### 実行制約
-- G06: データ取得は `gh` CLI のみ使用（GitHub API 直接呼び出し不可）
-- G07: テンプレートの【必須】セクションが全て Issue 本文に含まれていることを確認してから `gh issue create` を実行すること。欠落セクションがある場合は再生成すること
-- G08: 子Issue 本文の先頭行に `Parent: #{epic_number}` を必ず含める（Epic flow のみ）
-- G09: 全子Issue の作成完了後に Epic 本文を更新する（部分更新は禁止）
+- G07: データ取得は `gh` CLI のみ使用（GitHub API 直接呼び出し不可）
+- G08: テンプレートの【必須】セクションが全て Issue 本文に含まれていることを確認してから `gh issue create` を実行すること。欠落セクションがある場合は再生成すること
+- G09: 子Issue 本文の先頭行に `Parent: #{epic_number}` を必ず含める（Epic flow のみ）
+- G10: 全子Issue の作成完了後に Epic 本文を更新する（部分更新は禁止）
 
 ### 委譲・参照制約
-- G10: `agentdev-gh-cli` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
-- G11: `agentdev-workflow-templates` のテンプレートを使用すること
+- G11: `agentdev-gh-cli` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
+- G12: `agentdev-workflow-templates` のテンプレートを使用すること
 
 ### 出力制約
-- G12: サブエージェントの最終出力は verbatim で出力する（再フォーマット禁止）
+- G13: サブエージェントの最終出力は verbatim で出力する（再フォーマット禁止）

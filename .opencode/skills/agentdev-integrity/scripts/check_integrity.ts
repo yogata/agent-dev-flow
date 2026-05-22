@@ -20,7 +20,7 @@ import {
 
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
-const USAGE = "bun run check_integrity.ts [--help] [--json] [--dry-run] [path...]";
+const USAGE = "bun run check_integrity.ts [--help] [--json] [--dry-run]";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -156,6 +156,35 @@ const LEGACY_PATTERNS = [
   { pattern: /\bcase_run\b/g, name: "case_run (snake_case)" },
   { pattern: /\bcase_open\b/g, name: "case_open (snake_case)" },
   { pattern: /\bcase_close\b/g, name: "case_close (snake_case)" },
+  // R1: old bare command names
+  { pattern: /\bissue-req\b/g, name: "issue-req (old bare command)" },
+  { pattern: /\bissue-work\b/g, name: "issue-work (old bare command)" },
+  { pattern: /\bissue-close\b/g, name: "issue-close (old bare command)" },
+  { pattern: /\bissue-create\b/g, name: "issue-create (old bare command)" },
+  { pattern: /\bissue-update\b/g, name: "issue-update (old bare command)" },
+  { pattern: /\bissue-save-req\b/g, name: "issue-save-req (old bare command)" },
+  { pattern: /\bissue-backlog-create\b/g, name: "issue-backlog-create (old bare command)" },
+  { pattern: /\btips-elevate\b/g, name: "tips-elevate (old bare command)" },
+  { pattern: /\btips-refactor\b/g, name: "tips-refactor (old bare command)" },
+  // R1: bare slash forms without agentdev prefix (should not appear outside command definition files)
+  { pattern: /(?<!agentdev)\/case-open\b/g, name: "/case-open (bare slash form)" },
+  { pattern: /(?<!agentdev)\/case-run\b/g, name: "/case-run (bare slash form)" },
+  { pattern: /(?<!agentdev)\/case-close\b/g, name: "/case-close (bare slash form)" },
+  { pattern: /(?<!agentdev)\/case-update\b/g, name: "/case-update (bare slash form)" },
+  { pattern: /(?<!agentdev)\/req-define\b/g, name: "/req-define (bare slash form)" },
+  { pattern: /(?<!agentdev)\/req-save\b/g, name: "/req-save (bare slash form)" },
+  // R2: old command paths
+  { pattern: /\.opencode\/commands\/issue\//g, name: ".opencode/commands/issue/ (old command path)" },
+  { pattern: /\.opencode\/commands\/tips\//g, name: ".opencode/commands/tips/ (old command path)" },
+  { pattern: /commands\/issue\//g, name: "commands/issue/ (old relative path)" },
+  { pattern: /commands\/tips\//g, name: "commands/tips/ (old relative path)" },
+  // R3: old hyphenated skill names
+  { pattern: /\bissue-lifecycle\b/g, name: "issue-lifecycle (old skill name)" },
+  { pattern: /\bissue-template-manager\b/g, name: "issue-template-manager (old skill name)" },
+  { pattern: /\btips-pipeline-orchestration\b/g, name: "tips-pipeline-orchestration (old skill name)" },
+  { pattern: /\bissue-completion-reporting\b/g, name: "issue-completion-reporting (old skill name)" },
+  { pattern: /\bissue-post-review-routing\b/g, name: "issue-post-review-routing (old skill name)" },
+  { pattern: /\bissue-work-orchestration\b/g, name: "issue-work-orchestration (old skill name)" },
 ];
 
 function checkReqFrontmatterFilename(reqDir: string, root: string): CheckResult[] {
@@ -386,6 +415,37 @@ function checkCommandReadmeSync(cmdDir: string, root: string): CheckResult[] {
   return results;
 }
 
+function checkExpandedReadmeSync(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  const cmdFileNames = new Set(cmdFiles.map((f) => f.replace(".md", "")));
+
+  const targets: { label: string; absPath: string }[] = [
+    { label: "root README", absPath: path.join(root, "README.md") },
+    { label: "system.md", absPath: path.join(root, "docs", "specs", "system.md") },
+  ];
+
+  for (const { label, absPath } of targets) {
+    const content = readText(absPath);
+    if (!content) {
+      results.push(info("Command", "expanded-readme-sync", `${label} not found at ${resolveRelative(absPath, root)}`));
+      continue;
+    }
+
+    const missingInDoc = [...cmdFileNames].filter((name) => !content.includes(name));
+
+    if (missingInDoc.length > 0) {
+      for (const name of missingInDoc) {
+        results.push(ng("Command", "expanded-readme-sync", `${name} exists in agentdev/ but not found in ${label}`));
+      }
+    }
+    if (missingInDoc.length === 0) {
+      results.push(ok("Command", "expanded-readme-sync", `All commands in agentdev/ are referenced in ${label}`));
+    }
+  }
+  return results;
+}
+
 function checkCommandInventory(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
@@ -422,7 +482,7 @@ function checkLegacyNamespace(skillsDir: string, cmdDir: string, root: string): 
     if (fs.existsSync(skillMd)) filesToCheck.push(skillMd);
   }
 
-  const cmdFiles = listFiles(cmdDir);
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md" && f !== "integrity-check.md");
   for (const file of cmdFiles) {
     filesToCheck.push(path.join(cmdDir, file));
   }
@@ -530,6 +590,7 @@ async function main(): Promise<void> {
     ...checkSkillAgentdevPrefix(skillsDir, root),
     ...checkUnusedSkills(cmdDir, skillsDir, root),
     ...checkCommandReadmeSync(cmdDir, root),
+    ...checkExpandedReadmeSync(cmdDir, root),
     ...checkCommandInventory(cmdDir, root),
     ...checkLegacyNamespace(skillsDir, cmdDir, root),
     ...checkNameCollision(skillsDir, root),

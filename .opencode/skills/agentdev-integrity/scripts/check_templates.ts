@@ -94,6 +94,8 @@ function main(): void {
     }
   }
 
+  checkSkillTemplateReferences(templatesDir, repoRoot, results);
+
   const report = buildReport(scanned, results);
   outputReport(report, options.json);
   process.exit(determineExitCode(report.summary));
@@ -407,6 +409,86 @@ function countColumns(row: string): number {
     return parts.length - 2;
   }
   return parts.length - 1;
+}
+
+function checkSkillTemplateReferences(
+  templatesDir: string,
+  repoRoot: string,
+  results: CheckResult[],
+): void {
+  const skillMdPath = path.join(
+    repoRoot,
+    ".opencode",
+    "skills",
+    "agentdev-workflow-templates",
+    "SKILL.md",
+  );
+
+  if (!fs.existsSync(skillMdPath)) {
+    results.push(
+      warn(
+        "SkillRef",
+        "SKILL.md template references",
+        "agentdev-workflow-templates/SKILL.md not found",
+      ),
+    );
+    return;
+  }
+
+  const skillContent = fs.readFileSync(skillMdPath, "utf-8");
+  const templateNamePattern = /`(issue_desc_[a-z0-9_]+\.md|issue_comment_[a-z0-9_]+\.md|pr_desc[a-z0-9_]*\.md)`/g;
+  const mentionedTemplates = new Set<string>();
+  let match: RegExpExecArray | null;
+  while ((match = templateNamePattern.exec(skillContent)) !== null) {
+    mentionedTemplates.add(match[1]);
+  }
+
+  const actualFiles = new Set(
+    fs.readdirSync(templatesDir).filter((f: string) => f.endsWith(".md")),
+  );
+
+  const inSkillButMissing = [...mentionedTemplates].filter(
+    (t) => !actualFiles.has(t),
+  );
+  const onDiskButNotInSkill = [...actualFiles].filter(
+    (t) => !mentionedTemplates.has(t),
+  );
+
+  if (inSkillButMissing.length > 0) {
+    for (const t of inSkillButMissing) {
+      results.push(
+        ng(
+          "SkillRef",
+          "SKILL.md template references",
+          `${t} mentioned in SKILL.md but missing from templates/ directory`,
+          t,
+        ),
+      );
+    }
+  }
+
+  if (onDiskButNotInSkill.length > 0) {
+    for (const t of onDiskButNotInSkill) {
+      results.push(
+        warn(
+          "SkillRef",
+          "SKILL.md template references",
+          `${t} exists in templates/ but not mentioned in SKILL.md`,
+          t,
+        ),
+      );
+    }
+  }
+
+  if (inSkillButMissing.length === 0 && onDiskButNotInSkill.length === 0) {
+    results.push(
+      ok(
+        "SkillRef",
+        "SKILL.md template references",
+        `All ${mentionedTemplates.size} templates in SKILL.md match filesystem`,
+      ),
+    );
+  }
 }
 
 function checkSectionOrder(

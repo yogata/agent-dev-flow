@@ -82,7 +82,13 @@ function extractSeeAlsoReferences(content: string): string[] {
   while ((match = boldPattern.exec(section)) !== null) {
     refs.push(match[1]);
   }
-  return refs;
+
+  const linkPattern = /\[(agentdev-[a-z0-9-]+)\]\([^)]*\)/g;
+  while ((match = linkPattern.exec(section)) !== null) {
+    refs.push(match[1]);
+  }
+
+  return [...new Set(refs)];
 }
 
 function hasSection(content: string, heading: string): boolean {

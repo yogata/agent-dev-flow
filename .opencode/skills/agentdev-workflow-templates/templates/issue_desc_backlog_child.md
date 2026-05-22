@@ -1,6 +1,6 @@
 ---
 name: Backlog Child Issue Description
-about: バックログ抽出用Epic配下の子Issue本文テンプレート
+about: intake-open 用 Epic 配下子Issue 本文テンプレート
 labels: enhancement
 ---
 

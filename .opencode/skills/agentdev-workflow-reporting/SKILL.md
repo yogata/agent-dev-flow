@@ -41,6 +41,12 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 | case-close | PRマージ・記録追記・Issueクローズ・ブランチ削除 | `completion-reports.md` → case-close 完了時 |
 | intake-from-github | クローズ済みissue/PRから残課題を抽出・分類しdraftとして保存 | `completion-reports.md` → intake-from-github 完了時 |
 | intake-open | 承認済みバックログdraftからEpic+子Issueを作成 | `completion-reports.md` → intake-open 完了時 |
+| learning-refine | 問題クラス分類→8軸評価→archive移動 | `completion-reports.md` → learning-refine 完了時 |
+| learning-promote | 昇華判定→Requirement Source staging stub生成 | `completion-reports.md` → learning-promote 完了時 |
+| intake-capture | 手動で気づき・課題を inbox.md に記録 | `completion-reports.md` → intake-capture 完了時 |
+| intake-review | inbox の未処理エントリを一括レビューし処分判定 | `completion-reports.md` → intake-review 完了時 |
+| intake-promote | review 済み intake item を後続コマンド用 artifact に整形 | `completion-reports.md` → intake-promote 完了時 |
+| integrity-check | ドキュメント・スキル・コマンドの整合性を検証 | `completion-reports.md` → integrity-check 完了時 |
 
 ## reference/ 構成一覧
 

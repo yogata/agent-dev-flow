@@ -84,11 +84,11 @@ intake item は以下の Markdown artifact とする（REQ-0017-032）。workflo
 - G06: learning item の保存・分類・昇華を担当しない（REQ-0019-023）。再発防止知見のみの観測は `/agentdev/learning-capture` に委ねる
 
 ### 形式制約（REQ-0017-032〜039）
-- G05: workflow 管理 artifact として扱わない（REQ-0017-033）
-- G06: frontmatter・状態値・重複排除キー・後続 artifact 参照を必須にしない（REQ-0017-035, REQ-0017-039）
-- G07: 特定セクションを必須セクションとして扱わない（REQ-0017-037）
-- G08: review 結果を item に書き込まない（REQ-0017-038）
+- G07: workflow 管理 artifact として扱わない（REQ-0017-033）
+- G08: frontmatter・状態値・重複排除キー・後続 artifact 参照を必須にしない（REQ-0017-035, REQ-0017-039）
+- G09: 特定セクションを必須セクションとして扱わない（REQ-0017-037）
+- G10: review 結果を item に書き込まない（REQ-0017-038）
 
 ### 実行制約
-- G09: ユーザーの入力内容を過度に解釈・変形しない（元の意図を保ったまま整理する）
-- G10: 保存先は `.agentdev/intake/inbox/` のみ（他ディレクトリへの保存は禁止）
+- G11: ユーザーの入力内容を過度に解釈・変形しない（元の意図を保ったまま整理する）
+- G12: 保存先は `.agentdev/intake/inbox/` のみ（他ディレクトリへの保存は禁止）

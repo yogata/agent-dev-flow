@@ -1,6 +1,6 @@
 ---
 name: Backlog Epic Issue Description
-about: バックログ抽出用Epic Issue本文テンプレート
+about: intake-open 用 Epic Issue 本文テンプレート
 labels: enhancement, epic
 ---
 
