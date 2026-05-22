@@ -11,6 +11,7 @@ import {
   formatJsonReport,
   formatMarkdownReport,
   determineExitCode,
+  findRepoRoot,
 } from "../../agentdev-integrity/scripts/cli_utils";
 
 const SCRIPT_NAME = "verify_body.ts";
@@ -179,18 +180,22 @@ function checkCheckboxSyntax(expected: string, actual: string, results: CheckRes
     return;
   }
 
-  const actualSet = new Set(actualCheckboxes);
-  const missing: string[] = [];
-  for (const cb of expectedCheckboxes) {
-    if (!actualSet.has(cb)) {
-      missing.push(cb);
+  if (expectedCheckboxes.length !== actualCheckboxes.length) {
+    results.push(ng("Markdown", "Checkbox syntax", `Checkbox count mismatch: expected ${expectedCheckboxes.length}, actual ${actualCheckboxes.length}`));
+    return;
+  }
+
+  const diffs: string[] = [];
+  for (let i = 0; i < expectedCheckboxes.length; i++) {
+    if (expectedCheckboxes[i] !== actualCheckboxes[i]) {
+      diffs.push(`#${i + 1}: expected '${expectedCheckboxes[i]}', actual '${actualCheckboxes[i]}'`);
     }
   }
 
-  if (missing.length === 0) {
-    results.push(ok("Markdown", "Checkbox syntax", `All ${expectedCheckboxes.length} checkbox(es) preserved`));
+  if (diffs.length === 0) {
+    results.push(ok("Markdown", "Checkbox syntax", `All ${expectedCheckboxes.length} checkbox(es) preserved in order`));
   } else {
-    results.push(ng("Markdown", "Checkbox syntax", `${missing.length} checkbox(es) missing from actual: ${missing.join(", ")}`));
+    results.push(ng("Markdown", "Checkbox syntax", `${diffs.length} checkbox(es) differ: ${diffs.join("; ")}`));
   }
 }
 
@@ -324,10 +329,10 @@ async function main(): Promise<void> {
     process.exit(EXIT_ERROR);
   }
 
-  const scriptDir = import.meta.dir;
+  const root = findRepoRoot(import.meta.dir);
 
-  const expectedPath = require("path").resolve(scriptDir, opts.expected);
-  const actualPath = require("path").resolve(scriptDir, opts.actual);
+  const expectedPath = require("path").resolve(root, opts.expected);
+  const actualPath = require("path").resolve(root, opts.actual);
 
   const expectedFile = Bun.file(expectedPath);
   const actualFile = Bun.file(actualPath);

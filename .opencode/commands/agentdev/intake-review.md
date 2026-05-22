@@ -1,6 +1,6 @@
 ---
 description: inbox 内の intake item をレビューし、採用・却下・保留の判定を行う
-agent: sisyphus
+agent: prometheus
 load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting
@@ -95,13 +95,13 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
 - G06: learning item の保存・分類・昇華を担当しない（REQ-0019-023）
 
 ### 形式制約（REQ-0017-032〜039）
-- G05: workflow 管理 artifact として扱わない（REQ-0017-033）
-- G06: review 結果を item の本文に書き込まない（REQ-0017-038）
-- G07: 状態遷移を item 内に記録しない（ディレクトリ移動のみで表現）
-- G08: 後続 artifact への参照を item に追記しない（REQ-0017-039）
+- G07: workflow 管理 artifact として扱わない（REQ-0017-033）
+- G08: review 結果を item の本文に書き込まない（REQ-0017-038）
+- G09: 状態遷移を item 内に記録しない（ディレクトリ移動のみで表現）
+- G10: 後続 artifact への参照を item に追記しない（REQ-0017-039）
 
 ### 実行制約
-- G09: レビューはユーザーとの対話を通じて行う（AI のみでの自動判定はしない）
-- G10: 判定は item ごとに個別に行う（一括判定はユーザーが明示的に指示した場合のみ）
-- G11: item の移動先は `.agentdev/intake/` 配下のみ（REQ-0017-035）
-- G12: ディレクトリ移動を必須の状態表現として扱わない（REQ-0017-036）
+- G11: レビューはユーザーとの対話を通じて行う（AI のみでの自動判定はしない）
+- G12: 判定は item ごとに個別に行う（一括判定はユーザーが明示的に指示した場合のみ）
+- G13: item の移動先は `.agentdev/intake/` 配下のみ（REQ-0017-035）
+- G14: ディレクトリ移動を必須の状態表現として扱わない（REQ-0017-036）

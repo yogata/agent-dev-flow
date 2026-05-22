@@ -24,7 +24,7 @@
 2. **完了報告テキスト（後）**: 本スキルの完了報告フォーマットに従ったテキストを出力する
 3. **中間出力の禁止**: TodoWrite更新と完了報告テキストの間に、他の中間出力（ログ・進捗報告・確認メッセージ等）を挟まない
 
-**適用対象**: req-define, req-save, case-open, case-run, case-run (Epic Orchestrator), case-close, case-update, intake-from-github, intake-open の全完了報告ステップ
+**適用対象**: req-define, req-save, case-open, case-run, case-run (Epic Orchestrator), case-close, case-update, intake-from-github, intake-open, learning-refine, learning-promote, intake-capture, intake-review, intake-promote, integrity-check の全完了報告ステップ
 
 **理由**: 完了報告テキストがユーザーに最後に表示されることで、最終結果の視認性が向上する
 
@@ -177,32 +177,37 @@ Epic Issueを作成した場合は以下の報告を出力する。
 ## intake-from-github 完了時
 
 ```
-✅ バックログ抽出が完了しました。
-  対象期間: {since} 〜 {until}
-  抽出件数: {N}件
-  分類結果: {category_1}: {N1}件, {category_2}: {N2}件
-  バックログ作成対象: {Y}件（解消済み除外: {X}件）
-  ドラフト: .sisyphus/drafts/backlog-draft-{period-slug}.md
-  ステータス: approved
-  次のステップ: /agentdev/intake-open
+✅ intake-from-github 抽出完了
+  - 対象期間: {since} 〜 {until}
+  - 対象 Issue/PR 数: {N}
+  - 抽出候補数: {M}
+  - 保存先: .agentdev/intake/inbox/（{file_count}件）
+  - 次のステップ: /agentdev/intake-review
 ```
-
-**注意**: intake-from-githubはバックログ抽出コマンドであり、品質メトリクス収集・乖離検出レポートの自動生成は行わない。
 
 ## intake-open 完了時
 
 ```
-✅ バックログIssue作成が完了しました。
-  対象期間: {since} 〜 {until}
-  Epic: #{epic_N}
-  子Issue: #{child1}, #{child2}, ...（{count}件）
-  ステータス追跡: ☐ 未着手 {count}件
-  Draft状態: issued
-  ⚠️ コメント投稿失敗: #{失敗1}, #{失敗2}, ...（失敗がない場合はこの行は表示しない）
-  次のステップ: /agentdev/case-run {child1} {child2} ...
+✅ intake-open 完了
+  - Issue: #{N}
+  - promoted artifact: {artifact_path}（issued）
+  - 検証結果: ✅ OK（N件の書き込み操作を検証済み）
+  - 次のステップ: /agentdev/case-run {N}
 ```
 
-**注意**: intake-openはバックログからのIssue作成コマンドであり、品質メトリクス収集・乖離検出レポートの自動生成は行わない。
+### Epic作成時
+
+Epic + 子Issue を作成した場合は以下の報告を出力する。
+
+```
+✅ intake-open 完了（Epic）
+  - Epic: #{epic_N}
+  - 子Issue: #{child1}, #{child2}, ...（{count}件）
+  - ステータス追跡: ☐ 未着手 {count}件
+  - promoted artifact: {artifact_path}（issued）
+  - 検証結果: ✅ OK（N件の書き込み操作を検証済み）
+  - 次のステップ: /agentdev/case-run {epic_N}
+```
 
 ## case-run Epic Orchestrator 集約完了報告
 

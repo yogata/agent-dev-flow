@@ -7,6 +7,7 @@ load_skills:
   - agentdev-gh-cli
   - agentdev-req-file-manager
   - agentdev-req-analysis
+  - agentdev-workflow-orchestration
   - agentdev-adr-file-manager
   - agentdev-workflow-templates
 ---

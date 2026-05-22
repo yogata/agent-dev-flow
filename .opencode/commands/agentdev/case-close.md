@@ -5,7 +5,6 @@ load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting
   - agentdev-learning-capture
-  - agentdev-archive-plan
   - agentdev-gh-cli
   - agentdev-git-worktree
   - agentdev-req-file-manager
@@ -68,11 +67,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - ローカルブランチ削除（`git branch -d`）
     - **リモートブランチ削除**（`git push origin --delete`）— `agentdev-git-worktree` スキル Step 4 参照
     - 削除の成否を確認し、失敗した場合は警告表示してユーザーの判断を仰ぐ
-    - ローカルmainブランチ同期:
-        - メインリポジトリのルートディレクトリで `git pull` を実行
-        - `Already up to date.` または Fast-forward であることを確認
-        - `git pull` が失敗した場合（コンフリクト等）: エラー内容を報告して停止する。自動的なコンフリスト解決は行わない
-8. 親Epic Issue更新（`agentdev-epic-tracker` スキル参照）:
+ 8. 親Epic Issue更新（`agentdev-epic-tracker` スキル参照）:
     - Issue本文からParent Issue番号を特定（`Parent: #{N}` パターンを検索）
     - Parent Issueが存在しない場合 → スキップ
     - Parent Issueの本文を取得
@@ -109,35 +104,9 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - **禁止**: ユーザーに学びの有無を問うこと（「学びはありますか？」等）は禁止。エージェントが判断する
      - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `.agentdev/learning/inbox.md` に直接追記する。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
      - エージェントが学びなしと判断 → ユーザーに何も問わず次のステップへ進む
- 9a. Staging stub consumed 判定と archive（REQ-0023-005〜018）:
-     - **consumed 判定**（REQ-0023-005〜010）:
-        1. Issue本文から staging stub パスを抽出（`## Requirement Source` セクションのリストから `.agentdev/learning/elevation-staging/*.md` にマッチするパスを特定）
-        2. stub パスが存在しない場合 → archive 処理をスキップし Step 9b へ移行（REQ-0023-009）
-        3. stub パスが存在する場合、ファイルが存在することを確認（REQ-0023-006）
-        4. 機械的4条件で consumed 判定（REQ-0023-007）:
-           - (a) Issue に stub パスが記録されている（上記1で確認済み）
-           - (b) 対応 PR がマージ済み（Step 4 でマージ完了済み）
-           - (c) Issue が completed としてクローズされる（Step 6 で実行予定）
-           - (d) case-close が正常完了（現在実行中）
-           - 4条件全充足 → consumed と判定
-           - **注意**: 意味的一致検証は実行しない（REQ-0023-008）。機械的条件のみで判定する
-        5. consumed 判定結果を Step 11 の完了報告に含める（REQ-0023-010）
-     - **staging stub archive**（REQ-0023-011〜018）:
-        1. consumed と判定された stub のみを対象とする（REQ-0023-015, REQ-0023-016）。不採用 stub は対象外
-        2. 各 consumed stub について以下を実行:
-           a. stub 本文の末尾に `## 消費記録` セクションを追記（REQ-0023-012）:
-              ```markdown
-              ## 消費記録
-
-              - **Issue**: #{N}
-              - **PR**: #{M}
-              - **消費日**: YYYY-MM-DD
-              - **処理**: case-close
-              ```
-           b. `elevation-staging/archive/` ディレクトリの存在確認、なければ作成
-           c. stub を `elevation-staging/archive/` に移動（REQ-0023-011）
-           d. 同名ファイルが archive/ 内に既に存在する場合は上書きせず、警告をログに記録してスキップ（REQ-0023-013, REQ-0023-014）
-        3. archive 処理は Step 9c の前に実行する（REQ-0023-017）。archive 済みファイルを Step 9c の `git add` 対象に含める（REQ-0023-018）
+ 9a. Staging stub consumed 判定と archive:
+     - staging stub archive 処理は `agentdev-learning-pipeline` skill の archive ルールに従う（SSoT）
+     - consumed 判定結果を Step 11 の完了報告に含める
 9b. Post-run intake capture: 完了処理中に発見した本筋外の変更候補のうち、具体的な修正対象が特定できるものを intake item として保存する。`agentdev-workflow-lifecycle` → `reference/capture-boundaries.md` の Split Rule を SSoT とする
     - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）
     - **曖昧な候補は自律保存しない**: 修正対象が特定できない候補・単なる違和感・改善案・曖昧な変更候補は自律保存せず、完了報告に候補としてのみ提示（SHALL）
@@ -168,8 +137,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
            **raw git output**:
            {git_error_output}
            ```
-10. Plan アーカイブ: `.sisyphus/plans/` から該当Issue番号に関連するplanファイルを検索
-    - planファイルが見つかった場合 → `agentdev-archive-plan` スキルに従ってアーカイブ実行
+10. Plan アーカイブ: `.sisyphus/plans/` から該当Issue番号に関連するplanファイルを検索し、`.sisyphus/archives/` に移動する
     - planファイルが見つからない場合 → スキップ（注記付き）
 11. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット
     - **git 永続化結果**（完了報告に追加）:
@@ -185,7 +153,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G03: Issue番号の解決に `gh issue list` / `gh issue status` 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
 - G04: Epic自動クローズは全子IssueがCLOSEDの場合のみ実行。子Issue状態取得失敗時はEpicクローズしない
 - G05: Step 7 のブランチ・worktree削除（ローカル+リモート）は必ず実行し、成否を確認すること。削除失敗時は警告表示して停止
-- G06: Step 7 の `git pull` は必ず実行すること。pull失敗時は自動解決せずエラー報告して停止
+- G06: Step 8b の `git pull --ff-only` は必ず実行すること。pull失敗時は自動解決せずエラー報告して停止
 
 ### 品質ゲート
 - G07: PRのCIが通っていることを確認（`gh pr checks`）。CI/CDが失敗している場合は case-run に差し戻す（case-close は修正を行わない）
@@ -194,22 +162,19 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G10: Issue本文のテスト戦略チェックボックスを必ず更新すること（PR検証結果を反映）
 - G11: コメントテンプレートの【必須】セクションが全てコメント本文に含まれていることを確認してからコメント投稿すること
 
-### 判断・承認制約
-- G12: `agentdev-archive-plan` はplan_nameが特定できない場合はスキップ可
-
 ### 委譲・参照制約
-- G13: `agentdev-gh-cli` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
-- G14: `agentdev-learning-capture` スキルのフロー（エージェントが検知・抽出・自律蓄積・内容通知。承認可否を問わない）に従う。ユーザーに学びの有無や内容の入力を求めることは禁止
-- G15: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
-- G16: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
-- G17: intake item と learning item を混合した単一成果物にしないこと。`capture-boundaries.md` の Split Rule に従い別々の成果物とすること
-- G18: 今回の Issue / PR の完了条件に含まれる未対応事項を intake item に逃がして完了扱いにしないこと
-- G19: intake item の採用可否判断・GitHub Issue 作成・優先度判断を行わないこと
+- G12: `agentdev-gh-cli` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
+- G13: `agentdev-learning-capture` スキルのフロー（エージェントが検知・抽出・自律蓄積・内容通知。承認可否を問わない）に従う。ユーザーに学びの有無や内容の入力を求めることは禁止
+- G14: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
+- G15: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
+- G16: intake item と learning item を混合した単一成果物にしないこと。`capture-boundaries.md` の Split Rule に従い別々の成果物とすること
+- G17: 今回の Issue / PR の完了条件に含まれる未対応事項を intake item に逃がして完了扱いにしないこと
+- G18: intake item の採用可否判断・GitHub Issue 作成・優先度判断を行わないこと
 
 ### 出力制約
-- G20: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- G21: Step 8b の `git pull --ff-only` 失敗時は自動解消せず、構造化エラーメッセージを表示して停止すること
-- G22: Step 9c の commit は `.agentdev/` 配下のみを対象とすること。他のパスを巻き込まないこと
-- G23: Step 9c で learning capture と intake capture の成果物を同一 commit に含めること
-- G24: Step 9c の push 失敗時は完了扱いにせず、構造化エラーメッセージを表示して停止すること
-- G25: `.agentdev/` 配下に変更がない場合は commit/push をスキップすること
+- G19: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- G20: Step 8b の `git pull --ff-only` 失敗時は自動解消せず、構造化エラーメッセージを表示して停止すること
+- G21: Step 9c の commit は `.agentdev/` 配下のみを対象とすること。他のパスを巻き込まないこと
+- G22: Step 9c で learning capture と intake capture の成果物を同一 commit に含めること
+- G23: Step 9c の push 失敗時は PR/Issue完了済み、domain state永続化失敗として構造化エラーメッセージを表示して停止すること
+- G24: `.agentdev/` 配下に変更がない場合は commit/push をスキップすること

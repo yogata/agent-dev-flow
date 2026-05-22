@@ -44,6 +44,7 @@ load_skills:
    - `req-define` ルート: 要件定義が必要（新規機能・仕様変更等）
    - `intake-open` ルート: Issue 化可能（バグ修正・小規模改善等）
    - 複数 item を束ねて1つの artifact にすることも可能（ユーザーの指示による）
+   - **ユーザーが確認したルートを promoted artifact の frontmatter `route` フィールドに記録する**
 
 4. **整形**: 後続ルートに応じて item を整形する:
 
@@ -67,6 +68,13 @@ load_skills:
    - 保存先: `.agentdev/intake/promoted/`
    - ディレクトリが存在しない場合は作成する
    - ファイル名: `YYYY-MM-DD-{topic-slug}.md`（元 item 名を維持、または束ねた内容に応じた名前）
+   - frontmatter に後続ルートとステータスを記録する（Step 3 でユーザーが確認したルートを使用）:
+     ```yaml
+     ---
+     route: {route_value}
+     status: promoted
+     ---
+     ```
 
 7. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
    ```
@@ -90,12 +98,12 @@ load_skills:
 - G05: learning item の保存・分類・昇華を担当しない（REQ-0019-023）
 
 ### 形式制約（REQ-0017-032〜039）
-- G04: workflow 管理 artifact として扱わない（REQ-0017-033）
-- G05: 整形結果に frontmatter・状態値を必須にしない（REQ-0017-035）
-- G06: 整形結果に重複排除キー・後続 artifact 参照を含めない（REQ-0017-039）
-- G07: 元 item の本文に整形結果を書き込まない（REQ-0017-038）
+- G06: workflow 管理 artifact として扱わない（REQ-0017-033）
+- G07: 整形結果に frontmatter・状態値を必須にしない（REQ-0017-035）
+- G08: 整形結果に重複排除キー・後続 artifact 参照を含めない（REQ-0017-039）
+- G09: 元 item の本文に整形結果を書き込まない（REQ-0017-038）
 
 ### 実行制約
-- G08: 整形はユーザーとの対話を通じて行う
-- G09: 保存先は `.agentdev/intake/promoted/` のみ
-- G10: 整形後の item を accepted ディレクトリから移動・削除しない（intake-open 側で管理）
+- G10: 整形はユーザーとの対話を通じて行う
+- G11: 保存先は `.agentdev/intake/promoted/` のみ
+- G12: 整形後の item を accepted ディレクトリから移動・削除しない（intake-open 側で管理）
