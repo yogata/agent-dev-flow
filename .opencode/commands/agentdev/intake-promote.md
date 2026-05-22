@@ -82,10 +82,12 @@ load_skills:
 
 ## Guardrails
 
-### 責務境界（REQ-0017-026）
+### 責務境界（REQ-0017-026, REQ-0019-004）
 - G01: GitHub Issue の作成を行わない（`intake-open` が担当）
 - G02: intake item の元の内容を改変しない（整理・構造化のみ）
 - G03: `req-define` や `intake-open` を自動起動しない（次ステップの提示のみ）
+- G04: learning pipeline の入力を生成しない（MUST NOT）。review 済み intake item の後続ルートは `req-define` または `intake-open` のみ（REQ-0019-003, REQ-0019-004）
+- G05: learning item の保存・分類・昇華を担当しない（REQ-0019-023）
 
 ### 形式制約（REQ-0017-032〜039）
 - G04: workflow 管理 artifact として扱わない（REQ-0017-033）

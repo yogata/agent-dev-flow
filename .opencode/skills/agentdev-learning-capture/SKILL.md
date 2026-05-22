@@ -143,3 +143,8 @@ inbox.mdのエントリ数（`## ` で始まる行）をカウントする。
 - **ADR/REQ/spec反映判断を行わない** — 影響の記録まで。実際のADR/REQ/spec更新は別スキルの責務
 - **昇格判断を行わない** — 学びをスキルやコマンドに昇格すべきかの判断は `/agentdev/learning-promote` の責務
 - **複雑なロジックを使わない** — シンプルなテキスト追記のみ
+- **intake item を作成しない** — 学びの抽出過程で具体的な修正対象が残る場合は、intake workflow（`/agentdev/intake-capture`）に委ねる（REQ-0019-027）。learning capture は intake item を作成しない
+
+## Learning の位置づけ（REQ-0019-028）
+
+learning は「改善提案そのもの」ではなく「改善提案へ昇華されうる再発防止知見」である。具体的な修正対象（積み残し作業候補）は intake workflow が担当し、learning は再発防止に向けた知見の蓄積・分類・昇華を担当する。両者が同じ観測から得られる場合は、intake item と learning item を別々に作成する（capture-boundaries.md の split rule 参照）。
