@@ -24,6 +24,7 @@
 | REQ-0018 | agentdev-req-analysis 未決分岐解消メソドロジー | req-analysis/wall-discussion/methodology |
 | REQ-0019 | intake / learning の責任境界明確化と workflow 組み込み | agentdev/intake/learning/workflow/boundary |
 | REQ-0020 | Epic Issue 実行順序 SSoT と case-run Epic Orchestrator 化 | epic/orchestration/ssot/wave |
+| REQ-0021 | AgentDevFlow ガードレールのスクリプト化と skill-local scripts 配置方針 | integrity/scripts/skill-structure/guardrails |
 
 ## ディレクトリ構造の方針
 
