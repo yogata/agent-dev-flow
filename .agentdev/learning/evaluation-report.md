@@ -49,14 +49,14 @@
 | 発生件数 | 3/5 | 4エントリ（#1, #7, #10, #18）が該当 |
 | 影響度 | 3/5 | ブランチ削除失敗は手動でリカバリ可能だが、Oracle誤検知は無駄な調査コストを生む |
 | 横展開性 | 4/5 | worktreeを使用する全てのプロジェクトで発生し得る |
-| 反映先明確度 | 4/5 | `issue-close` Step 7、`git-worktree`スキル、`case-close`コマンドに特定済み |
+| 反映先明確度 | 4/5 | `case-close.md` Step 7、`agentdev-git-worktree`スキル、`case-close`コマンドに特定済み |
 | 自動化適性 | 4/5 | 操作順序の固定と検証前の`git rev-parse`比較は容易に自動化可能 |
 | プロジェクト固有知識再利用性 | 3/5 | worktree自体は汎用的だが、具体的な順序はコマンド設計に依存 |
 | 再発可能性 | 4/5 | worktreeを使用し続ける限り、操作順序のミスは再発しやすい |
 | 費用対効果 | 4/5 | issue-closeのStep 7を修正するだけで防止可能。低コスト・高効果 |
 | **加重合計** | **29/40** | |
 
-- **推奨処分案**: 既存command/skillへの反映。issue-close.md Step 7の順序固定、git-worktreeスキルの操作順序明文化、case-close/case-runに検証前`git pull`チェック追加
+- **推奨処分案**: 既存command/skillへの反映。case-close.md Step 7の順序固定、agentdev-git-worktreeスキルの操作順序明文化、case-close/case-runに検証前`git pull`チェック追加
 
 #### エントリ一覧
 - (日付なし): issue-close Step 7 で git pull を branch -d より前に実行する必要がある [inbox]
@@ -77,7 +77,7 @@
 | 発生件数 | 2/5 | 2エントリ（#6, #11） |
 | 影響度 | 3/5 | コンフリクト解消に手間がかかるが、データ損失はない |
 | 横展開性 | 4/5 | 並列実行する全てのプロジェクトで発生し得る |
-| 反映先明確度 | 3/5 | `issue-work-orchestration`スキルが候補だが、具体的な反映箇所は要検討 |
+| 反映先明確度 | 3/5 | `agentdev-workflow-orchestration`スキルが候補だが、具体的な反映箇所は要検討 |
 | 自動化適性 | 3/5 | ファイル所有権マトリクスの自動生成は可能だが、運用ルールの徹底が必要 |
 | プロジェクト固有知識再利用性 | 3/5 | 並列実行パターンは汎用的だが、具体的な分割戦略はコンテキスト依存 |
 | 再発可能性 | 4/5 | 並列実行する限り再発の可能性が高い |
@@ -103,14 +103,14 @@
 | 発生件数 | 3/5 | 3エントリ（#12, #14, #15） |
 | 影響度 | 3/5 | 整合性エラーは発見が遅れると修正コストが増大するが、致命的ではない |
 | 横展開性 | 4/5 | ドキュメント管理を行う全プロジェクトで発生し得る |
-| 反映先明確度 | 4/5 | spec-complianceスキル、adr-file-managerスキル、issue-work検証手順に特定済み |
+| 反映先明確度 | 4/5 | agentdev-spec-complianceスキル、agentdev-adr-file-managerスキル、case-run検証手順に特定済み |
 | 自動化適性 | 4/5 | 旧パス全文検索・キーワードgrep検索は容易に自動化可能 |
 | プロジェクト固有知識再利用性 | 3/5 | スキル参照ファイル・docs構造はプロジェクト固有だが、パターン自体は汎用 |
 | 再発可能性 | 4/5 | ファイル移動・概念変更は継続的に発生する操作 |
 | 費用対効果 | 4/5 | grep検索ステップの追加だけで効果が大きい |
 | **加重合計** | **29/40** | |
 
-- **推奨処分案**: 既存command/skillへの反映。(1) spec-complianceスキルに「スキル参照ファイルの旧パス残存」検出観点を追加、(2) adr-file-managerスキルのCREATE手順にdocs/README.md更新を明記、(3) issue-work検証手順にキーワードgrep検索を追加
+- **推奨処分案**: 既存command/skillへの反映。(1) agentdev-spec-complianceスキルに「スキル参照ファイルの旧パス残存」検出観点を追加、(2) agentdev-adr-file-managerスキルのCREATE手順にdocs/README.md更新を明記、(3) case-run検証手順にキーワードgrep検索を追加
 
 #### エントリ一覧
 - 2026-05-19: ファイル移動時のスキル参照ファイルの見落し検知 [inbox]
@@ -127,7 +127,7 @@
 - 2026-05-17: テンプレート準拠の3層防御パターン [inbox]
 - (日付なし): skill rename 後の delegate で旧 skill 名を参照すると task() が失敗する [inbox]
 
-## refactor時prune結果
+## refine時prune結果
 
 - **対象エントリ数**: 0件（archive.md にエントリなし）
 - **prune実施**: なし（inboxエントリ数が21件で15件以上のためprune実施対象だが、archive.mdが空のためprune対象なし）

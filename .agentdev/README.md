@@ -37,9 +37,9 @@ AgentDevFlow の永続化すべき domain artifact（intake items、learning dat
 | `learning/` | #288 | learning pipeline data |
 | `integrity/` | #291 | integrity reports |
 
-## learning pipeline の canonical storage 位置づけ（REQ-0019-032）
+## learning pipeline の canonical storage（.agentdev/learning/）
 
-当面の learning pipeline の canonical storage は既存互換のため `docs/tips/` とする。`.agentdev/learning/` への移行は別 Requirement / 別 Case とする。
+`.agentdev/learning/` は learning pipeline の canonical storage である（REQ-0017-007, REQ-0017-009）。inbox.md、archive.md、evaluation-report.md、elevation-staging/ が格納される。
 
 ## 参照
 

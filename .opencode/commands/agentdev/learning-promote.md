@@ -10,7 +10,7 @@ load_skills:
 
 `.agentdev/learning/evaluation-report.md` の問題クラスを主入力とし、`.agentdev/learning/archive.md` の過去エントリを参照して廃棄判定を行う。ユーザー承認後に `.agentdev/learning/elevation-staging/` に Requirement Source 形式の stub を生成し、処理済みエントリを archive.md から pruning する。
 
-**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `req-define` の明示入力ファイルとして扱い、`req-define → req-save → case-open → case-run` のルートで実装に移行する。
+**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `/agentdev/req-define` の明示入力ファイルとして扱い、`/agentdev/req-define → /agentdev/req-save → /agentdev/case-open → /agentdev/case-run` のルートで実装に移行する。
 
 ## Input
 
@@ -76,7 +76,7 @@ load_skills:
 8. **昇華時 prune**（archive.md からの除去）:
    - **prune 対象**: staged（stub 生成済み）/ rejected / duplicate のエントリのみ
    - **prune 非対象**: deferred / 未処理のエントリは archive.md に残す
-   - **証拠保存**: staged エントリを除去する際、stub の「元tips / 根拠」セクションに保存してから除去
+   - **証拠保存**: staged エントリを除去する際、stub の「元learning item / 根拠」セクションに保存してから除去
    - 詳細は `agentdev-learning-pipeline` skill の「Prune 方針 → promote 時 prune」を参照
    - **実行手順**:
       1. prune 対象エントリの特定（staged/rejected/duplicate のクラスタに属するエントリ）
@@ -134,4 +134,4 @@ load_skills:
 - **staging領域のみに生成**: `.opencode/` への直接配置は禁止
 - **stub のみ生成**: 完全なSKILL.mdやコマンドファイルは生成しない
 - **archive.md は living learning pool**: prune は staged/rejected/duplicate のみ。deferred・未処理は保持
-- **反映ルート**: staging stub → `req-define`（明示入力ファイル）→ `req-save` → `case-open` → `case-run`
+- **反映ルート**: staging stub → `/agentdev/req-define`（明示入力ファイル）→ `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`

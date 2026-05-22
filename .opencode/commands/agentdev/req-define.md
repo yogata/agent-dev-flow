@@ -20,7 +20,7 @@ load_skills:
 - エラーログ（バグ修正の場合）
 - **ユーザーが明示した入力ファイル**（要件ソース — Requirement Source）:
   - 要件化前の設計メモ、調査メモ、反映指示書
-  - tips-elevate が生成した staging stub（Requirement Source 形式）
+  - learning-promote が生成した staging stub（Requirement Source 形式）
   - その他変更内容・背景・制約・完了条件を含む source file
 - req-save が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
 - finding ファイルを含め全てのユーザー明示入力ファイルは read-only の Requirement Source である（G04）。status や frontmatter の更新・上書きは行わない
@@ -155,7 +155,7 @@ load_skills:
 - G03: ファイル編集スコープ: `.sisyphus/drafts/**` のみ作成・編集を許可
 - G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）
 - G05: `docs/` 配下の広範な探索は禁止（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用）
-- G06: `inbox.md` / `archive.md` を直接ロードしない（raw tips は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
+- G06: `inbox.md` / `archive.md` を直接ロードしない（raw learning item は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
 
 ### 実行制約
 - G07: `git` コマンドは実行しない
