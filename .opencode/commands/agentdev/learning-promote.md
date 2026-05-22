@@ -65,6 +65,20 @@ load_skills:
    - 承認したクラスタのみ処理
    - 承認しない → 「昇華をキャンセルしました」と報告して終了
 
+   **6b. 実行前同期（git pull）**:
+   - `git pull --ff-only` を実行する
+   - **失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
+     ```
+     ## Git 同期エラー
+     
+     **エラー種別**: pull --ff-only 失敗
+     **停止理由**: リモートに未取り込みの変更があり、fast-forward マージできない
+     **対象ブランチ**: {current_branch}
+     **ユーザーアクション**: 手動で `git pull --rebase` または `git stash && git pull --ff-only && git stash pop` を実行してください
+     **raw git output**:
+     {git_error_output}
+     ```
+
 7. **Requirement Source stub 生成**（staging領域のみ）:
    - 出力先: `.agentdev/learning/elevation-staging/`
    - ファイル名: `{disposal-category}-{name}.md`
@@ -84,6 +98,26 @@ load_skills:
       3. ユーザーが prune を承認した場合のみ実行
       4. archive.md から該当エントリを除去（deferred・未処理は保持）
 
+   **8b. .agentdev 変更の commit と push**:
+   - `git diff --name-only` で `.agentdev/` 配下の変更ファイルを確認する
+   - **変更なし時**: commit/push せず、Step 9 の完了報告で「変更なし」と報告
+   - **変更あり時**:
+      1. `git add` は `.agentdev/` 配下の変更ファイルのみを対象とする（SHALL）。他のパスを巻き込まない
+      2. commit message: `chore(agentdev): promote learning findings`（Conventional Commits 形式）（SHALL）
+      3. `git push` を実行する
+      4. **push 失敗時**: 以下の構造化エラーメッセージを表示し、完了扱いにしない（SHALL）:
+         ```
+         ## Git Push エラー
+         
+         **エラー種別**: push 失敗
+         **停止理由**: リモートへのプッシュに失敗
+         **対象ブランチ**: {current_branch}
+         **変更ファイル**: {changed_files}
+         **ユーザーアクション**: 手動で `git push` を実行してください
+         **raw git output**:
+         {git_error_output}
+         ```
+
 9. **完了報告**:
    - 生成した stub ファイル一覧（パス・カテゴリ・内容要約）
    - prune 結果（除去したエントリ数・残存エントリ数）
@@ -94,6 +128,10 @@ load_skills:
    - **注意事項**:
       - `.opencode/` への直接配置・直接反映は行わないこと
       - stub は必ず `req-define` を経由すること（`case-run` に直接渡さないこと）
+   - **git 永続化結果**:
+      - 変更の有無（あり/なし）
+      - 変更ありの場合: commit されたファイル一覧、commit hash、push 成否
+      - 変更なしの場合: 「変更なし（commit/push スキップ）」
 
 ## Guardrails
 
@@ -128,6 +166,8 @@ load_skills:
 | ユーザーが承認しない | 「昇華をキャンセルしました」と報告して終了 |
 | staging領域の書込失敗 | エラー内容を報告 |
 | archive.mdの prune 失敗 | stub 生成は保持。prune エラー内容を報告し、手動での prune を案内 |
+| git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
+| git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
 ## 注意事項
 

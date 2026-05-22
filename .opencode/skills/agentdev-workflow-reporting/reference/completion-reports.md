@@ -78,6 +78,33 @@ Epic Issueを作成した場合は以下の報告を出力する。
   次のステップ: /agentdev/case-run {epic_N}
 ```
 
+## learning-refine 完了時
+
+```
+✅ learning-refine 完了
+  - 問題クラス数: {N}（未分類含む）
+  - 処理したエントリ数: {N}（inbox → archive）
+  - prune したエントリ数: {N}
+  - evaluation-report.md: {path}
+  - git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
+```
+
+## learning-promote 完了時
+
+```
+✅ learning-promote 完了
+  - 生成 stub: {N}件（{file_list}）
+  - prune 結果: 除去 {N}件 / 残存 {N}件
+  - git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
+  - 次のステップ: /agentdev/req-define {stub_path}
+```
+
 ## case-run 完了時
 
 ```
@@ -131,6 +158,10 @@ Epic Issueを作成した場合は以下の報告を出力する。
   {機能追加の場合: - ドキュメント（REQ・specs）を更新済み}
   {Epic自動クローズの場合: - Epic #{epic_N} を自動クローズ（全子Issue完了）}
   {Epicスキップの場合: - Epic #{epic_N}: N件未完了のためスキップ}
+  - git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
 ```
 
 ## intake-from-github 完了時
@@ -215,3 +246,9 @@ Epic Orchestrator モード（`/agentdev/case-run {epic_N}`）で全 Wave 完了
 - 備考列: 成功時は `—`、失敗時はエラー概要、スキップ時は依存先Wave番号
 - Wave列: Wave番号（Epic本文の実行順序テーブルに対応）
 - 集約行: 成功・失敗・スキップ件数のサマリー
+
+### git 永続化セクションのルール
+
+- learning-refine, learning-promote, case-close の完了報告にのみ git 永続化セクションを含める
+- 変更なしの場合は「commit/push スキップ」とだけ表示する
+- push 失敗時は「push: 失敗」と表示し、完了報告全体を ⚠️ に変更する
