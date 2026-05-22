@@ -93,7 +93,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
         - 1件以上 "OPEN" の子Issueがある場合 → スキップ（完了報告に「Epic #{N}: N件未完了のためスキップ」と表示）
 9. 学びの検知・抽出: `agentdev-learning-capture` スキルに従い、エージェントが自ら学びの有無を判断する
     - **禁止**: ユーザーに学びの有無を問うこと（「学びはありますか？」等）は禁止。エージェントが判断する
-    - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `docs/tips/inbox.md` に直接追記する（パイプライン内のためlearning-addは使用しない）。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
+    - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `.agentdev/learning/inbox.md` に直接追記する。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
     - エージェントが学びなしと判断 → ユーザーに何も問わず次のステップへ進む
 9b. Post-run intake capture: 完了処理中に発見した本筋外の変更候補のうち、具体的な修正対象が特定できるものを intake item として保存する。`agentdev-workflow-lifecycle` → `reference/capture-boundaries.md` の Split Rule を SSoT とする
     - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）

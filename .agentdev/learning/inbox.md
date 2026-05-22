@@ -15,7 +15,7 @@
 - **横展開観点**: 他のワークフローでPRマージ後にローカルブランチを削除する場面でも同様に発生する
 - **再発条件**: GitHub上でPRマージ後、ローカルmainをpullせずに `git branch -d` を実行した場合
 - **予防策候補**: issue-close Step 7 の手順順序を worktree remove → prune → **git pull** → branch -d → remote delete に変更する
-- **想定反映先**: `.opencode/commands/issue/issue-close.md` Step 7
+- **想定反映先**: `.opencode/commands/agentdev/case-close.md` Step 7
 - **関連**: Issue #266, PR #267
 - **タグ**: `#git` `#issue-close` `#ワークアラウンド`
 
@@ -33,7 +33,7 @@
 - **横展開観点**: 自動抽出によるIssue作成では、元ソースの情報量がそのままIssue品質の上限になる。情報量が少ないソースからの抽出では「粗いIssue + 後段での壁打ち」パターンが適用可能
 - **再発条件**: issue-backlogで情報量の少ないソースからIssueを抽出する場合
 - **予防策候補**: issue-backlog実行時に情報量の少ないIssueには「要壁打ち」ラベルを付与する
-- **想定反映先**: `issue-backlog` コマンド
+- **想定反映先**: `intake-open` コマンド
 - **関連**: `.opencode/commands/issue/issue-backlog.md`
 - **タグ**: `#ワークフロー` `#issue-backlog` `#要件定義` `#プロセス設計`
 
@@ -69,7 +69,7 @@
 - **横展開観点**: 既存Stepの内容不変 + 分岐点でのみ新規パスを注入するパターンは、他のコマンドでも後方互換性を保つ拡張に適用可能
 - **再発条件**: 既存コマンドに新機能を追加する場合
 - **予防策候補**: 拡張時は分岐点のみの変更とし、既存パスのロジックは不改変とする設計原則を明文化する
-- **想定反映先**: コマンド設計ガイドライン、`issue-work` コマンド
+- **想定反映先**: コマンド設計ガイドライン、`case-run` コマンド
 - **関連**: `.opencode/commands/issue/issue-work.md`
 - **タグ**: `#コマンド設計` `#後方互換性` `#段階的拡張`
 
@@ -105,7 +105,7 @@
 - **横展開観点**: 並列Issueで同じファイルを修正する場合、マージ順序を意識して最も変更の大きいPRを最後にするか、コンフリクト解消手順を事前に準備する
 - **再発条件**: 並列Issueで同一ファイルを修正し順次マージする場合
 - **予防策候補**: 並列実行時はファイル変更範囲の重複を事前チェックし、重複時はマージ順序を工夫する
-- **想定反映先**: `issue-work` コマンド
+- **想定反映先**: `case-run` コマンド
 - **関連**: Issue #85, #86, #87
 - **タグ**: `#並列実行` `#コンフリクト` `#issue-work`
 
@@ -123,7 +123,7 @@
 - **横展開観点**: worktree使用中の操作では削除順序が重要。リモート→worktree→ローカルの順が安全
 - **再発条件**: worktreeを使用した作業後にブランチを削除する場合
 - **予防策候補**: issue-close のブランチ削除手順にworktree削除を先に行うことを明記
-- **想定反映先**: `issue-close` コマンド、`git-worktree` スキル
+- **想定反映先**: `case-close` コマンド、`agentdev-git-worktree` スキル
 - **関連**: `.opencode/commands/issue/issue-close.md`
 - **タグ**: `#git-worktree` `#ブランチ管理`
 
@@ -141,7 +141,7 @@
 - **横展開観点**: PR本文に `Closes #NN` を含めればマージ時の自動クローズを活用できる。手動クローズはフォールバックにする方針は他のIssueクローズワークフローでも適用可能
 - **再発条件**: PR本文に `Closes`/`Fixes`/`Resolves` キーワードを含め、かつ手動クローズも試行する場合
 - **予防策候補**: issue-close では自動クローズを前提とし、手動クローズはフォールバックにする
-- **想定反映先**: `issue-close` コマンド
+- **想定反映先**: `case-close` コマンド
 - **関連**: `.opencode/commands/issue/issue-close.md`
 - **タグ**: `#GitHub` `#自動化` `#issue-close`
 
@@ -177,7 +177,7 @@
 - **横展開観点**: worktree使用中のファイル編集は常に worktree 内で行い、メインリポジトリ側で編集しない方針が安全。メイン側の編集は pull 時の衝突リスクを生む
 - **再発条件**: worktreeが存在する状態で、メインリポジトリ側でworktreeと共通のファイルを編集し、その後リモート変更をpullする場合
 - **予防策候補**: worktree作業中のファイル編集は必ず worktree 内で行う。メインリポジトリは pull 専用とし編集しない
-- **想定反映先**: `git-worktree` スキル、`issue-close` コマンド
+- **想定反映先**: `agentdev-git-worktree` スキル、`case-close` コマンド
 - **関連**: `.opencode/skills/git-worktree/SKILL.md`, Issue #246
 - **タグ**: `#git-worktree` `#コンフリクト回避` `#操作順序`
 
@@ -195,7 +195,7 @@
 - **横展開観点**: 複数ファイルのドキュメント修正やリファクタリングをエージェント並列実行する場合、ファイル所有権によるグループ分けが有効。同じファイルを複数エージェントが触らないことが前提
 - **再発条件**: 10+ファイルにまたがる修正をissue-workで実行する場合
 - **予防策候補**: work plan生成時にファイル所有権マトリクスを作成し、各エージェントの担当ファイルを明示的に定義する
-- **想定反映先**: `issue-work-orchestration` スキル
+- **想定反映先**: `agentdev-workflow-orchestration` スキル
 - **関連**: Issue #256, PR #257
 - **タグ**: `#並列実行` `#エージェント分割` `#コンフリクト回避` `#ドキュメント修正`
 
@@ -213,7 +213,7 @@
 - **横展開観点**: ファイルの移動・リネーム・削除を行う際、コマンドやREQファイルだけでなく、スキルの reference/ ディレクトリ配下の知識ベースファイルにも移動対象への参照が含まれる可能性がある
 - **再発条件**: スキル参照ファイルに配置先・パスを記載している状態で、そのパスが変更されるファイル移動を実行する場合
 - **予防策候補**: issue-work の乖離検出（Step 8）で、変更ファイルの旧パスを全文検索し参照ファイルの漏れを検出する手順を追加する
-- **想定反映先**: `spec-compliance` スキル（乖離検出の観点に「スキル参照ファイルの旧パス残存」を追加）
+- **想定反映先**: `agentdev-spec-compliance` スキル（乖離検出の観点に「スキル参照ファイルの旧パス残存」を追加）
 - **関連**: Issue #260, PR #261, `.opencode/skills/issue-lifecycle/reference/artifact-boundaries.md`
 - **タグ**: `#ファイル移動` `#参照整合性` `#スキル参照` `#docs検証`
 
@@ -231,7 +231,7 @@
 - **横展開観点**: Windows環境で `--body-file` / `--comment-file` 等のgh系ファイル入力を使う場合、ファイルのエンコーディングに注意が必要。Write tool に頼らず `[System.IO.File]::WriteAllText` で BOMなしUTF-8 を明示する方が安全
 - **再発条件**: Windows環境でWrite tool で生成したファイルをgh --body-fileに渡す場合
 - **予防策候補**: gh-cli-best-practices スキルの標準手順を Write tool から `[System.IO.File]::WriteAllText` + UTF8Encoding($false) に変更する。ただし gh-cli-best-practices は「OpenCodeのWrite toolを使用」と明記しているため、スキル側の更新が必要
-- **想定反映先**: `gh-cli-best-practices` スキル
+- **想定反映先**: `agentdev-gh-cli` スキル
 - **関連**: PR #265, `.opencode/skills/gh-cli-best-practices/SKILL.md`
 - **タグ**: `#Windows` `#エンコーディング` `#gh-cli` `#文字化け`
 
@@ -249,7 +249,7 @@
 - **横展開観点**: ADR新規作成時は `docs/adr/README.md`（Index）と `docs/README.md`（ドキュメントハブ）の両方の更新が必要。対象ファイルリストの自動生成ロジックがない場合、チェックリスト化が有効
 - **再発条件**: ADRを新規作成する際、対象ファイルリストに `docs/README.md` を含めない場合
 - **予防策候補**: adr-file-manager スキルのCREATE手順に「docs/README.md の個別ADRリストにも追記する」を明記する
-- **想定反映先**: `adr-file-manager` スキル、`issue-work` の対象ファイルリスト生成ロジック
+- **想定反映先**: `agentdev-adr-file-manager` スキル、`case-run` の対象ファイルリスト生成ロジック
 - **関連**: Issue #264, PR #265, `docs/README.md`, `.opencode/skills/adr-file-manager/SKILL.md`
 - **タグ**: `#ADR` `#ドキュメント整合性` `#docs検証` `#見落とし防止`
 
@@ -267,7 +267,7 @@
 - **横展開観点**: ドキュメントの概念削除・変更をサブエージェントに委譲する際、対象セクションの変更だけでなく、ファイル全体（特に冒頭の要約・説明文、セクション間の相互参照）に旧概念が残存していないか検証が必要。これは複数ファイルにまたがる変更でも同様
 - **再発条件**: ドキュメントの特定概念を削除・変更する編集をサブエージェントに委譲する場合
 - **予防策候補**: 委譲後にファイル全体で削除対象キーワード（例: 削除した概念名、旧ステータス値）をgrep検索し、残存参照がないか確認する手順を検証ステップに組み込む
-- **想定反映先**: issue-work の検証手順（Step 6 後の検証フェーズ）
+- **想定反映先**: `case-run` の検証手順（Step 6 後の検証フェーズ）
 - **関連**: Issue #270, PR #271, `.opencode/skills/issue-lifecycle/reference/requirements-review-finding-protocol.md`
 - **タグ**: `#サブエージェント委譲` `#ドキュメント整合性` `#検証` `#概念削除`
 
@@ -285,7 +285,7 @@
 - **横展開観点**: gh CLIに限らず、PowerShell経由でUTF-8出力を伴う外部コマンドの読み取り全般で発生する可能性がある
 - **再発条件**: Windows環境（PowerShell 7）でgh CLIのJSON出力をPowerShellパイプラインで受け取る場合
 - **予防策候補**: (1) gh CLI読み取りをNode.js `execSync` 経由に変更、(2) gh-cli-best-practices の読み取り手順をNode.js方式に更新、(3) PowerShell経由の読み取りを禁止するルールの追加
-- **想定反映先**: `.opencode/skills/gh-cli-best-practices/SKILL.md`
+- **想定反映先**: `.opencode/skills/agentdev-gh-cli/SKILL.md`
 - **関連**: Issue #274, PR #275
 - **タグ**: `#gh-cli` `#文字化け` `#Windows` `#UTF-8` `#ワークアラウンド未解決`
 
@@ -303,7 +303,7 @@
 - **横展開観点**: gh CLIの全サブコマンド（issue create/edit/comment、pr create/edit）で `--body-file` が共通。他のフラグも含め、gh CLIのフラグ名は `gh <cmd> --help` で確認する癖をつけるべき
 - **再発条件**: gh CLIのファイル入力フラグを推測で記述する場合
 - **予防策候補**: gh-cli-best-practices スキルに「gh系コマンドのファイル入力は全て `--body-file` または `-F`」を明記する
-- **想定反映先**: `gh-cli-best-practices` スキル
+- **想定反映先**: `agentdev-gh-cli` スキル
 - **関連**: Issue #194, PR #282
 - **タグ**: `#gh-cli` `#フラグ誤認` `#自浄作用`
 
@@ -351,7 +351,7 @@
 - **横展開観点**: 全てのissue-close/issue-work/issue-updateフローでgh出力を読み取る箇所に影響。Python subprocessワークアラウンドは汎用的に適用可能。
 - **再発条件**: pwsh環境で `gh ... > file` を使用して日本語を含むJSON出力をファイルに保存する全てのケース
 - **予防策候補**: gh-cli-best-practices の読み取り手順を「pwsh `>` ではなく Python subprocess を使用」に変更する。またはgh出力の読み取りに `gh ... --jq '.'` ではなくPython経由を標準とする。
-- **想定反映先**: `gh-cli-best-practices` スキル（Section 3-4）
+- **想定反映先**: `agentdev-gh-cli` スキル（Section 3-4）
 - **関連**: Issue #283, PR #303, `.opencode/skills/gh-cli-best-practices/SKILL.md`
 - **タグ**: `#gh-cli` `#encoding` `#日本語化け` `#workaround` `#pwsh`
 
