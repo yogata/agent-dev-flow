@@ -20,3 +20,21 @@
 - **想定反映先**: スキル（agentdev-gh-cli SKILL.md Section 3 の補足として）
 - **関連**: Issue #332, PR #333, `.opencode/skills/agentdev-gh-cli/SKILL.md` Section 3
 - **タグ**: `#gh-cli` `#encoding` `#nodejs` `#workaround`
+
+---
+
+## squash merge 後のローカルブランチ削除が -d で失敗する（-D は禁止）
+
+- **問題事象**: case-close Step 7 で squash merge 後に `git branch -d refactor/issue-342` を実行したところ「not fully merged」エラーで失敗した。`agentdev-git-worktree` スキルは `-D`（強制削除）を禁止しているため、ローカルブランチが残存した
+- **発生局面**: 完了処理（case-close Step 7 ブランチ・worktree削除）
+- **検知方法**: `git branch -d` の exit code 非0 と stderr メッセージを直接確認
+- **根本原因**: squash merge はマージコミットを作成しないため、git は当該ブランチを「未マージ」と判定する。`git branch -d` はマージ済みブランチのみ削除可能。一方 `-D`（強制削除）はスキルで禁止されている
+- **自律対応内容**: 警告を表示して次のステップへ進んだ。リモートブランチは `git push origin --delete` で正常に削除済み
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（現在のスキル定義は正しい。squash merge 自体は問題ない）
+- **横展開観点**: 全 case-close で squash merge を使用する場合に同様に発生する。merge commit を使用する場合は発生しない
+- **再発条件**: `gh pr merge --squash` でマージした後に `git branch -d` を実行する場合
+- **予防策候補**: `agentdev-git-worktree` スキルに squash merge 後のローカルブランチ削除に関するガイダンスを追加する（例: squash merge 検出時は `-d` 失敗を予期し、警告付きでスキップする）
+- **想定反映先**: スキル（agentdev-git-worktree SKILL.md の worktree削除手順）
+- **関連**: Issue #342, PR #343, `.opencode/skills/agentdev-git-worktree/SKILL.md`
+- **タグ**: `#git` `#worktree` `#squash-merge` `#case-close`
