@@ -75,10 +75,11 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 6. Issueクローズ（`gh issue close --reason completed`）
 7. ブランチ・worktree削除 → `agentdev-git-worktree` スキルの「worktree削除手順」に従って以下を実行:
+    - **.sisyphus/ クリーンアップ**: worktree 内の `.sisyphus/` ディレクトリを削除（`Remove-Item -Recurse -Force .sisyphus/`）。未追跡ファイルによる worktree remove エラーを防止
     - worktree削除（`git worktree remove`）
     - worktree prune
     - ローカルブランチ削除（`git branch -d`）
-    - **リモートブランチ削除**（`git push origin --delete`）— `agentdev-git-worktree` スキル Step 4 参照
+    - **リモートブランチ削除**（`git push origin --delete`）— `agentdev-git-worktree` スキル Step 5 参照
     - 削除の成否を確認し、失敗した場合は警告表示してユーザーの判断を仰ぐ
  8. 親Epic Issue更新（`agentdev-epic-tracker` スキル参照）:
     - Issue本文からParent Issue番号を特定（`Parent: #{N}` パターンを検索）
