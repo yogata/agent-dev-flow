@@ -93,29 +93,39 @@ git worktree add ".worktrees/{N}-{type}" "{type}/issue-{N}"
 
 ## worktree削除手順
 
-### 1. worktreeの削除
+### 1. .sisyphus/ クリーンアップ
+
+worktree 内に case-run が作成した `.sisyphus/` 一時ファイル（実行計画・証跡等）が未追跡ファイルとして残存している場合、`git worktree remove` がエラーになる。削除前にクリーンアップすること。
+
+```powershell
+Remove-Item -Recurse -Force ".worktrees/{N}-{type}/.sisyphus/"
+```
+
+- `.sisyphus/` ディレクトリが存在しない場合はエラーにせず続行する（`-ErrorAction SilentlyContinue` は不要。事前に `Test-Path` で確認するか、エラーを無視して次ステップへ進む）
+
+### 2. worktreeの削除
 
 ```bash
 git worktree remove ".worktrees/{N}-{type}"
 ```
 
-### 2. クリーンアップ
+### 3. クリーンアップ
 
 ```bash
 # 手動削除されたディレクトリの残存参照を消去
 git worktree prune
 ```
 
-### 3. ローカルブランチの削除
+### 4. ローカルブランチの削除
 
 ```bash
 # マージ済みの場合のみ削除
 git branch -d "{type}/issue-{N}"
 ```
 
-**注意**: 未マージブランチの強制削除（`-D`）は禁止。未マージの場合はエラー停止し、ユーザーに判断を委ねる。
+**注意**: 未マージブランチの強制削除（`-D`）は禁止。未マージの場合はエラー停止し、ユーザーの判断を委ねる。
 
-### 4. リモートブランチの削除
+### 5. リモートブランチの削除
 
 ```bash
 git push origin --delete "{type}/issue-{N}"
