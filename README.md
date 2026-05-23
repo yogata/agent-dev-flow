@@ -15,6 +15,18 @@ AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-ass
 
 詳細は [ADR-0005](docs/adr/ADR-0005.md) および [REQ-0017](docs/requirements/REQ-0017.md) を参照。
 
+## ワークフローの入口
+
+AgentDevFlow には3つの系統があり、それぞれ目的と入口コマンドが異なります。
+
+| 系統 | 目的 | 入口コマンド | 流れ |
+|------|------|-------------|------|
+| 通常開発 | 機能追加・バグ修正 | `/agentdev/req-define` | req-define → req-save → case-open → case-run → case-close |
+| Learning 起点 | 再発防止知見の蓄積・昇華 | `/agentdev/learning-refine` | learning-capture（スキル）→ learning-refine → learning-promote → req-define に合流 |
+| Intake 起点 | 具体的な作業候補の収集・促進 | `/agentdev/intake-capture` | intake-capture → intake-review → intake-promote → req-define または intake-open |
+
+各系統の domain state（ファイル・ディレクトリ）がどの状態を表すかは [domain state lifecycle](docs/guides/domain-state-lifecycle.md) を参照。
+
 ## クイックスタート
 
 機能追加の最小フローを示します。バグ修正は `/agentdev/req-define` 後に `/agentdev/case-open` へ進みます。
