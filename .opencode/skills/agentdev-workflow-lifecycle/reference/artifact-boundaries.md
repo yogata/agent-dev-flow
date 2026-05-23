@@ -13,7 +13,7 @@ agentdev系ワークフローはAnchored Developmentモデルに基づく。4つ
 | テスト | 振る舞い仕様 | テストファイル |
 | ADR | アーキテクチャ判断 | `docs/adr/ADR-*.md` |
 
-これに加えて、システムの現在の姿を表す2つの「生きた仕様」を維持する。
+これに加えて、システムの現在の姿を表す4つの「生きた仕様」を維持する。
 
 | 仕様 | 役割 | 格納先 |
 | ---- | ---- | ------ |
@@ -131,12 +131,12 @@ agentdev系ワークフローで操作する docs/ の4区分構造。
 
 | 区分 | パス | 役割 | 自動操作コマンド |
 |------|------|------|----------------|
-| guides/ | 開発ガイド（参照のみ） | setup.md, api-reference.md, testing-and-debugging.md | — |
-| requirements/ | 要件管理（目的/要件/適用範囲） | README.md + INDEX.md（generated）+ core.md（暫定area）+ {area}.md + REQ-{NNNN}.md（移行対象） | req-save(CREATE), case-open(READ), case-update(UPDATE) |
-| adr/ | ADR | README.md + ADR-{NNNN}.md | agentdev-adr-guidelines(CREATE) |
-| specs/ | システム仕様 | system.md, patterns.md | case-run(READ+WRITE), case-close(VERIFY) |
+| guides/ | docs/guides/ | 開発ガイド（参照のみ） | — |
+| requirements/ | docs/requirements/ | 要件管理（目的/要件/適用範囲） | req-save(CREATE), case-open(READ), case-update(UPDATE) |
+| adr/ | docs/adr/ | アーキテクチャ決定記録 | agentdev-adr-guidelines(CREATE) |
+| specs/ | docs/specs/ | システム仕様 | case-run(READ+WRITE), case-close(VERIFY) |
 
-learning（`.agentdev/learning/`）と integrity（`.agentdev/integrity/`）の domain state は [domain-state-lifecycle](../../../docs/guides/domain-state-lifecycle.md) を参照。
+learning（`.agentdev/learning/`）、integrity（`.agentdev/integrity/`）、intake（`.agentdev/intake/`）の domain state は [domain-state-lifecycle](../../../docs/guides/domain-state-lifecycle.md) を参照。
 
 ## スキル間依存関係
 

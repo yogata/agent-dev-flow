@@ -71,82 +71,12 @@ Plan策定から実装、コミットまで一気通貫で実行します。work
 
 PRをマージし、対応記録をIssueに追記してクローズ、ブランチを削除します。
 
-## コマンド一覧
+## コマンド・スキル・用語
 
-### agentdev コマンド（開発ワークフロー）
-
-| コマンド | 役割 | 対象フェーズ |
-|----------|------|-------------|
-| `req-define` | 要件の壁打ち・整理 | 壁打ちフェーズ |
-| `req-save` | 壁打ち成果物をREQ/ADRファイルとして保存 | 壁打ちフェーズ |
-| `case-open` | REQファイルからGitHub Issue作成 | 壁打ちフェーズ |
-| `case-run` | 計画立案から実装・コミット・PR作成まで一括実行 | 構造的実行フェーズ |
-| `case-update` | Issue本文の更新やコメント追加 | 構造的実行・レビュー完了 |
-| `case-close` | PRマージ・記録追記・Issueクローズ・ブランチ削除 | レビュー完了フェーズ |
-
-### learning コマンド（学びの蓄積・分析・昇華）
-
-**基本フロー**: 学び発生 → `learning-capture`（スキル）→ `learning-refine` → `learning-promote` → Requirement Source staging stub → `req-define`
-
-| コマンド | 役割 | 対象フェーズ |
-|----------|------|-------------|
-| `learning-refine` | inbox を問題クラス分類→8軸評価→archive移動 | 学びパイプライン |
-| `learning-promote` | 評価レポートから昇華判定→staging stub生成 | 学びパイプライン |
-
-### intake コマンド（気づき・課題の収集・レビュー・昇華）
-
-| コマンド | 役割 | 対象フェーズ |
-|----------|------|-------------|
-| `intake-capture` | 手動で気づき・課題を inbox.md に記録 | 収集 |
-| `intake-from-github` | GitHub Issue/PR/コメントから改善候補を自動抽出 | 収集 |
-| `intake-review` | inbox の未処理エントリを一括レビューし処分判定 | レビュー |
-| `intake-promote` | review 済み intake item を req-define / intake-open 用入力 artifact に整形 | 昇華 |
-| `intake-open` | intake-promote 生成 artifact から GitHub Issue を作成 | 昇華 |
-
-### integrity コマンド（整合性検証）
-
-| コマンド | 役割 |
-|----------|------|
-| `integrity-check` | ドキュメント・スキル・コマンドの整合性を検証 |
-
-## スキル一覧
-
-| スキル | 役割 |
-|--------|------|
-| `agentdev-workflow-lifecycle` | フェーズ定義・SSoT遷移・パターン判定基準を提供 |
-| `agentdev-workflow-reporting` | 完了報告フォーマットとチェックボックス更新ルールを提供 |
-| `agentdev-workflow-routing` | レビューNG時の対応フローと次コマンド推論ルールを提供 |
-| `agentdev-req-analysis` | 要件分析手法と品質基準、ADR閾値判定を提供 |
-| `agentdev-req-file-manager` | REQファイルの作成・追記・更新を管理 |
-| `agentdev-adr-guidelines` | アーキテクチャ決定のADR要否を評価 |
-| `agentdev-adr-file-manager` | ADRファイルの作成・追記・更新を管理 |
-| `agentdev-spec-compliance` | 実装と要件の乖離を検出する品質ゲート |
-| `agentdev-workflow-templates` | Issue/PR/REQ/ADRテンプレートを管理 |
-| `agentdev-workflow-orchestration` | case-run の状態機械・Wave scheduling・サブエージェント実行プロトコルを提供 |
-| `agentdev-learning-capture` | エージェント主体で学びを検知・抽出・自律蓄積 |
-| `agentdev-learning-pipeline` | learning pipeline の schema・評価・処分区分・prune 方針を提供 |
-| `agentdev-gh-cli` | Windows環境でのgh CLI安全性を確保（書き込み・読み取り・検証） |
-| `agentdev-git-worktree` | Issue番号ベースのgit worktree作成・管理・削除 |
-| `agentdev-conventional-commits` | Conventional Commits v1.0.0準拠のコミットメッセージ形式 |
-| `agentdev-epic-tracker` | 親Epic Issueのステータス追跡テーブル更新 |
-| `agentdev-integrity` | 横断的整合性検査のorchestration（REQ/ADR/Skill/Command/Template検査） |
-
-## 用語集
-
-| 用語 | 定義 |
-|------|------|
-| 壁打ちフェーズ | AIと対話し要件・設計を固めるフェーズ |
-| 構造的実行フェーズ | Planに沿って実装しコミットするフェーズ |
-| レビュー完了フェーズ | PRマージ・Issueクローズ・事後処理を行うフェーズ |
-| REQ | Requirement。要件定義書。`docs/requirements/REQ-*.md` に格納 |
-| ADR | Architecture Decision Record。設計判断の記録。`docs/adr/ADR-*.md` に格納 |
-| SSoT | Single Source of Truth。情報の唯一の正しい源。フェーズごとに遷移: 壁打ちフェーズ=セッション会話+draft、構造的実行フェーズ=Issue本文+Work Plan、レビュー完了フェーズ=PR+レビュー結果 |
-| Worktree | git worktree。メインワーキングツリーとは別の作業ディレクトリで並行開発に使用 |
-| agentdev-spec-compliance | 実装と要件の乖離を検出する品質ゲート手法 |
-| agentdev-conventional-commits | Conventional Commits v1.0.0 に準拠したコミットメッセージ形式 |
-| specs | 仕様書。`docs/specs/` に格納されるシステム仕様と実装パターン |
-| drafts | Planの下書き。`.sisyphus/drafts/` に格納 |
-| archives | 完了したPlanのアーカイブ。`.sisyphus/archives/` に移動 |
+コマンド・スキルの詳細は以下を参照:
+- コマンド一覧・基本フロー: [commands/agentdev/README.md](.opencode/commands/agentdev/README.md)
+- コマンド関連マップ・データフロー: [command-map.md](.opencode/skills/agentdev-workflow-lifecycle/reference/command-map.md)
+- システム仕様: [system.md](docs/specs/system.md)
 
 ## ドキュメント構造
 
@@ -161,7 +91,7 @@ docs/
   adr/             # アーキテクチャ決定記録（ADR-*.md）
 .agentdev/         # AgentDevFlow domain state
   intake/          # 気づき・課題の収集・レビュー・促進（inbox/, accepted/, promoted/, archive/）
-  learning/        # 学びの蓄積・昇華（inbox.md, archive.md, evaluation-report.md）
+  learning/        # 学びの蓄積・昇華（inbox.md, archive.md, evaluation-report.md, elevation-staging/）
   integrity/       # 整合性検証レポート
 .sisyphus/         # Sisyphus 作業領域（詳細は system.md 参照）
 .opencode/
