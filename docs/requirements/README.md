@@ -31,6 +31,7 @@
 | REQ-0025 | intake 系コマンドの .agentdev/intake 更新後の git 永続化 | agentdev/git/persistence/intake |
 | REQ-0026 | intake lifecycle の queue/archive 再定義 | agentdev/intake/lifecycle/queue/archive/refactor |
 | REQ-0027 | learning artifact lifecycle の責任範囲明確化 | learning/lifecycle/artifact/documentation/command/skill |
+| REQ-0028 | Documentation granularity and responsibility restructuring | documentation/granularity/responsibility |
 
 ## ディレクトリ構造の方針
 
