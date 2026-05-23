@@ -1,8 +1,3 @@
----
-route: req-define
-status: promoted
----
-
 # learning pipeline 高度化 — 既存仕様との差分に基づく要件定義
 
 ## 観測内容

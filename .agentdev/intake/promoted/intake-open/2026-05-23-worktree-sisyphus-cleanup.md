@@ -1,8 +1,3 @@
----
-route: intake-open
-status: promoted
----
-
 # case-close Step 7 に worktree 削除前の .sisyphus/ クリーンアップを追加
 
 ## 概要
