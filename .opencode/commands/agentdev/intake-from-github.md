@@ -66,15 +66,49 @@ load_skills:
    - 各抽出結果に元テキストのコンテキスト（前後文）を付与
 
 5. **intake item 生成**: 抽出した各候補を intake item 形式に整理する:
-   - 1 候補につき 1 ファイル
-   - ファイル名: `YYYY-MM-DD-{topic-slug}.md`
-   - 観測元（Issue/PR 番号）は「根拠」セクションに記載
-   - 元テキストのコンテキストも「根拠」セクションに含める
+    - 1 候補につき 1 ファイル
+    - ファイル名: `YYYY-MM-DD-{topic-slug}.md`
+    - 観測元（Issue/PR 番号）は「根拠」セクションに記載
+    - 元テキストのコンテキストも「根拠」セクションに含める
+
+5b. **実行前同期（git pull）**:
+    - `git pull --ff-only` を実行する
+    - **失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
+      ```
+      ## Git 同期エラー
+
+      **エラー種別**: pull --ff-only 失敗
+      **停止理由**: リモートに未取り込みの変更があり、fast-forward マージできない
+      **対象ブランチ**: {current_branch}
+      **ユーザーアクション**: 手動で `git pull --rebase` または `git stash && git pull --ff-only && git stash pop` を実行してください
+      **raw git output**:
+      {git_error_output}
+      ```
 
 6. **保存**:
-   - 保存先: `.agentdev/intake/inbox/`
-   - ディレクトリが存在しない場合は作成する
-   - 同名ファイルが存在する場合は連番を付与する
+    - 保存先: `.agentdev/intake/inbox/`
+    - ディレクトリが存在しない場合は作成する
+    - 同名ファイルが存在する場合は連番を付与する
+
+6b. **.agentdev/intake 変更の commit と push**:
+    - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
+    - **変更なし時**: commit/push せず、Step 8 の完了報告で「変更なし」と報告
+    - **変更あり時**:
+      1. `git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする（SHALL）。他のパスを巻き込まない
+      2. commit message: `chore(agentdev): capture intake items from github`（Conventional Commits 形式）（SHALL）
+      3. `git push` を実行する
+      4. **push 失敗時**: 以下の構造化エラーメッセージを表示し、完了扱いにしない（SHALL）:
+         ```
+         ## Git Push エラー
+
+         **エラー種別**: push 失敗
+         **停止理由**: リモートへのプッシュに失敗
+         **対象ブランチ**: {current_branch}
+         **変更ファイル**: {changed_files}
+         **ユーザーアクション**: 手動で `git push` を実行してください
+         **raw git output**:
+         {git_error_output}
+         ```
 
 7. **サマリーレポート提示**: 抽出結果をサマリーとしてユーザーに提示する:
    ```
@@ -90,7 +124,14 @@ load_skills:
    | 1 | ... | #XX | YYYY-MM-DD-xxx.md |
    ```
 
-8. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（`completion-reports.md` → intake-from-github 完了時）に従って出力
+8. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（`completion-reports.md` → intake-from-github 完了時）に従って出力。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+
+## Error Handling
+
+| エラー | 対処 |
+|--------|------|
+| git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
+| git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
 ## Guardrails
 

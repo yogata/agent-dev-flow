@@ -56,33 +56,64 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
    - 全 item の判定が確定するまで対話を継続
 
 5. **レビュー結果の整理**: 確定した判定を整理し、結果レポートを生成する:
-   ```markdown
-   ## Intake Review 結果
+    ```markdown
+    ## Intake Review 結果
 
-   | # | タイトル | 判定 | 後続 | 備考 |
-   |---|----------|------|------|------|
-   | 1 | ... | 採用 | req-define | ... |
-   | 2 | ... | 採用 | intake-promote | ... |
-   | 3 | ... | 保留 | - | ... |
-   | 4 | ... | 却下 | - | ... |
-   ```
+    | # | タイトル | 判定 | 後続 | 備考 |
+    |---|----------|------|------|------|
+    | 1 | ... | 採用 | req-define | ... |
+    | 2 | ... | 採用 | intake-promote | ... |
+    | 3 | ... | 保留 | - | ... |
+    | 4 | ... | 却下 | - | ... |
+    ```
+
+5b. **実行前同期（git pull）**:
+    - `git pull --ff-only` を実行する
+    - **失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
+      ```
+      ## Git 同期エラー
+      
+      **エラー種別**: pull --ff-only 失敗
+      **停止理由**: リモートに未取り込みの変更があり、fast-forward マージできない
+      **対象ブランチ**: {current_branch}
+      **ユーザーアクション**: 手動で `git pull --rebase` または `git stash && git pull --ff-only && git stash pop` を実行してください
+      **raw git output**:
+      {git_error_output}
+      ```
 
 6. **item の振り分け**: 判定に基づいて item を振り分ける:
-   - `採用` → `.agentdev/intake/accepted/` に移動
-   - `保留` → `.agentdev/intake/inbox/` に残す（移動しない）
-   - `却下` → `.agentdev/intake/rejected/` に移動
+    - `採用` → `.agentdev/intake/accepted/` に移動
+    - `保留` → `.agentdev/intake/inbox/` に残す（移動しない）
+    - `却下` → `.agentdev/intake/rejected/` に移動
 
-7. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマットに従って出力:
-   ```
-   ✅ intake review が完了しました。
-     レビュー対象: {N}件
-     採用: {A}件（req-define: {R}件, intake-promote: {P}件）
-     保留: {H}件
-     却下: {D}件
-     次のステップ:
-       - 採用（要件定義が必要）: /agentdev/req-define
-       - 採用（Issue 化可能）: /agentdev/intake-promote
-   ```
+6b. **.agentdev/intake 変更の commit と push**:
+    - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
+    - **変更なし時**: commit/push せず、Step 7 の完了報告で「変更なし」と報告
+    - **変更あり時**:
+      1. `git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする（SHALL）。他のパスを巻き込まない
+      2. commit message: `chore(agentdev): review and classify intake items`（Conventional Commits 形式）（SHALL）
+      3. `git push` を実行する
+      4. **push 失敗時**: 以下の構造化エラーメッセージを表示し、完了扱いにしない（SHALL）:
+         ```
+         ## Git Push エラー
+         
+         **エラー種別**: push 失敗
+         **停止理由**: リモートへのプッシュに失敗
+         **対象ブランチ**: {current_branch}
+         **変更ファイル**: {changed_files}
+         **ユーザーアクション**: 手動で `git push` を実行してください
+         **raw git output**:
+         {git_error_output}
+         ```
+
+7. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（`completion-reports.md` → intake-review 完了時）に従って出力。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+
+## Error Handling
+
+| エラー | 対処 |
+|--------|------|
+| git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
+| git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
 ## Guardrails
 
