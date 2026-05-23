@@ -459,3 +459,114 @@ describe("invalid fixture detects violations", () => {
     expect(badCmd.level).toBe("ng");
   });
 });
+
+describe("legacy data path and terminology detection (6j/6k)", () => {
+  const LEGACY_ROOT = join(TEMP_ROOT, "legacy");
+
+  beforeAll(() => {
+    mkdirp(LEGACY_ROOT);
+    buildValidFixture(LEGACY_ROOT);
+    copyScripts(LEGACY_ROOT);
+  });
+
+  it("detects docs/tips/ (old data path)", () => {
+    const skillDir = join(LEGACY_ROOT, ".opencode", "skills", "agentdev-test-skill");
+    writeFileSync(
+      join(skillDir, "SKILL.md"),
+      "# agentdev-test-skill\n\nSee docs/tips/ for reference.\n",
+      "utf-8"
+    );
+    const r = runScript(LEGACY_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "legacy-namespace" &&
+        res.message.includes("docs/tips/")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+
+  it("detects tips プール (old terminology)", () => {
+    const skillDir = join(LEGACY_ROOT, ".opencode", "skills", "agentdev-test-skill");
+    writeFileSync(
+      join(skillDir, "SKILL.md"),
+      "# agentdev-test-skill\n\n生きている tips プール\n",
+      "utf-8"
+    );
+    const r = runScript(LEGACY_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "legacy-namespace" &&
+        res.message.includes("tips プール")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+
+  it("detects refactor時prune (old terminology)", () => {
+    const skillDir = join(LEGACY_ROOT, ".opencode", "skills", "agentdev-test-skill");
+    writeFileSync(
+      join(skillDir, "SKILL.md"),
+      "# agentdev-test-skill\n\nrefactor時prune（任意）\n",
+      "utf-8"
+    );
+    const r = runScript(LEGACY_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "legacy-namespace" &&
+        res.message.includes("refactor時prune")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+
+  it("detects elevate時prune (old terminology)", () => {
+    const skillDir = join(LEGACY_ROOT, ".opencode", "skills", "agentdev-test-skill");
+    writeFileSync(
+      join(skillDir, "SKILL.md"),
+      "# agentdev-test-skill\n\nelevate時prune（必須）\n",
+      "utf-8"
+    );
+    const r = runScript(LEGACY_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "legacy-namespace" &&
+        res.message.includes("elevate時prune")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+
+  it("does NOT false-positive on legitimate refactor in conventional commits table", () => {
+    const skillDir = join(LEGACY_ROOT, ".opencode", "skills", "agentdev-test-skill");
+    writeFileSync(
+      join(skillDir, "SKILL.md"),
+      "# agentdev-test-skill\n\n| refactor | PATCH | refactor: 関数整理 |\n\nNo legacy terms here.\n",
+      "utf-8"
+    );
+    const r = runScript(LEGACY_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const falseHit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "legacy-namespace" &&
+        res.message.includes("old terminology")
+    );
+    expect(falseHit).toBeUndefined();
+  });
+
+  it("does NOT false-positive on docs/tips/ mentioned in integrity-check.md", () => {
+    const r = runScript(LEGACY_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const integrityHit = parsed.results.find(
+      (res: { check: string; message: string; file?: string }) =>
+        res.check === "legacy-namespace" &&
+        res.message.includes("docs/tips/") &&
+        (res.file ?? "").includes("integrity-check")
+    );
+    expect(integrityHit).toBeUndefined();
+  });
+});
