@@ -4,7 +4,7 @@ description: agentdev コマンドセットの使用ガイド
 
 # agentdev コマンド使用ガイド
 
-AgentDevFlow の req/case パイプラインを提供するコマンドセット。
+AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプラインを提供するコマンドセット。
 
 ## コマンド一覧
 
@@ -42,6 +42,8 @@ AgentDevFlow の req/case パイプラインを提供するコマンドセット
 
 ## 基本フロー
 
+### req/case パイプライン（開発ワークフロー）
+
 ```
 /agentdev/req-define → /agentdev/req-save → /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
@@ -50,6 +52,24 @@ AgentDevFlow の req/case パイプラインを提供するコマンドセット
 
 ```
 /agentdev/req-define → /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
+```
+
+### learning パイプライン（学びの蓄積・分析・昇華）
+
+```
+学び発生 → learning-capture（スキル）→ /agentdev/learning-refine → /agentdev/learning-promote → /agentdev/req-define（明示入力ファイル）
+```
+
+### intake ワークフロー（気づき・課題の収集・レビュー・昇華）
+
+```
+/agentdev/intake-capture / /agentdev/intake-from-github → /agentdev/intake-review → /agentdev/intake-promote → /agentdev/req-define または /agentdev/intake-open
+```
+
+### integrity ワークフロー（整合性検証）
+
+```
+/agentdev/integrity-check
 ```
 
 ## 各コマンドの詳細
