@@ -67,7 +67,13 @@ function printBodyHelp(): void {
   console.log(lines.join("\n"));
 }
 
-function checkEncoding(actual: string, results: CheckResult[]): void {
+function checkBOMFromBytes(buffer: ArrayBuffer): boolean {
+  if (buffer.byteLength < 3) return false;
+  const bytes = new Uint8Array(buffer);
+  return bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf;
+}
+
+function checkEncoding(actual: string, hasBOM: boolean, results: CheckResult[]): void {
   if (actual.includes("\r\n")) {
     const crlfCount = (actual.match(/\r\n/g) || []).length;
     results.push(ng("Encoding", "UTF-8 / LF", `Actual text contains ${crlfCount} CRLF line ending(s)`));
@@ -75,8 +81,8 @@ function checkEncoding(actual: string, results: CheckResult[]): void {
     results.push(ok("Encoding", "UTF-8 / LF", "No CRLF line endings detected"));
   }
 
-  if (actual.charCodeAt(0) === 0xfeff) {
-    results.push(ng("Encoding", "UTF-8 / LF", "Actual text starts with BOM marker"));
+  if (hasBOM) {
+    results.push(ng("Encoding", "UTF-8 / LF", "Actual file starts with UTF-8 BOM (EF BB BF)"));
   } else {
     results.push(ok("Encoding", "UTF-8 / LF", "No BOM marker detected"));
   }
@@ -348,6 +354,8 @@ async function main(): Promise<void> {
 
   const expected = await expectedFile.text();
   const actual = await actualFile.text();
+  const actualBytes = await actualFile.arrayBuffer();
+  const actualHasBOM = checkBOMFromBytes(actualBytes);
 
   if (opts.dryRun) {
     console.log(`Would verify ${expectedPath} against ${actualPath}`);
@@ -357,7 +365,7 @@ async function main(): Promise<void> {
 
   const results: CheckResult[] = [];
 
-  checkEncoding(actual, results);
+  checkEncoding(actual, actualHasBOM, results);
   checkJapanesePreservation(expected, actual, results);
   checkTableConsistency(actual, results, "actual");
   checkCheckboxSyntax(expected, actual, results);

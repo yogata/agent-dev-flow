@@ -89,6 +89,10 @@ beforeAll(() => {
     "utf-8",
   );
   writeFileSync(join(TEMP_DIR, "actual_control_chars.md"), VALID_BODY + "\n\x01\x02\x03", "utf-8");
+
+  const bomPrefix = Buffer.from([0xef, 0xbb, 0xbf]);
+  const bomContent = Buffer.concat([bomPrefix, Buffer.from(VALID_BODY, "utf-8")]);
+  writeFileSync(join(TEMP_DIR, "actual_bom.md"), bomContent);
 });
 
 afterAll(() => {
@@ -184,5 +188,33 @@ describe("verify_body.ts", () => {
       (r) => r.category === "Encoding" && r.check === "Control characters" && r.level === "ng",
     );
     expect(hasControlNg).toBe(true);
+  });
+
+  it("BOM detection: exit 1, NG when actual file has BOM", () => {
+    const result = runScript([
+      "--expected", join(TEMP_DIR, "expected.md"),
+      "--actual", join(TEMP_DIR, "actual_bom.md"),
+      "--json",
+    ]);
+    expect(result.exitCode).toBe(1);
+    const parsed: ReportJson = JSON.parse(result.stdout);
+    const hasBomNg = parsed.results.some(
+      (r) => r.category === "Encoding" && r.check === "UTF-8 / LF" && r.level === "ng" && r.message.includes("BOM"),
+    );
+    expect(hasBomNg).toBe(true);
+  });
+
+  it("No BOM: existing actual.md passes BOM check", () => {
+    const result = runScript([
+      "--expected", join(TEMP_DIR, "expected.md"),
+      "--actual", join(TEMP_DIR, "actual.md"),
+      "--json",
+    ]);
+    expect(result.exitCode).toBe(0);
+    const parsed: ReportJson = JSON.parse(result.stdout);
+    const hasBomOk = parsed.results.some(
+      (r) => r.category === "Encoding" && r.check === "UTF-8 / LF" && r.level === "ok" && r.message.includes("No BOM"),
+    );
+    expect(hasBomOk).toBe(true);
   });
 });
