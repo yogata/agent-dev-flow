@@ -24,7 +24,7 @@
 2. **完了報告テキスト（後）**: 本スキルの完了報告フォーマットに従ったテキストを出力する
 3. **中間出力の禁止**: TodoWrite更新と完了報告テキストの間に、他の中間出力（ログ・進捗報告・確認メッセージ等）を挟まない
 
-**適用対象**: req-define, req-save, case-open, case-run, case-run (Epic Orchestrator), case-close, case-update, intake-from-github, intake-open, learning-refine, learning-promote, intake-capture, intake-review, intake-promote, integrity-check の全完了報告ステップ
+**適用対象**: req-define, req-save, case-open, case-run, case-run (Epic Orchestrator), case-close, case-update, intake-capture, intake-from-github, intake-review, intake-promote, intake-open, learning-refine, learning-promote, integrity-check の全完了報告ステップ
 
 **理由**: 完了報告テキストがユーザーに最後に表示されることで、最終結果の視認性が向上する
 
@@ -182,7 +182,58 @@ Epic Issueを作成した場合は以下の報告を出力する。
   - 対象 Issue/PR 数: {N}
   - 抽出候補数: {M}
   - 保存先: .agentdev/intake/inbox/（{file_count}件）
+  - git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
   - 次のステップ: /agentdev/intake-review
+```
+
+## intake-capture 完了時
+
+```
+✅ intake item を保存しました。
+  タイトル: {タイトル}
+  ファイル: .agentdev/intake/inbox/YYYY-MM-DD-{topic-slug}.md
+  git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
+  次のステップ: /agentdev/intake-review
+```
+
+## intake-review 完了時
+
+```
+✅ intake review が完了しました。
+  レビュー対象: {N}件
+  採用: {A}件（req-define: {R}件, intake-promote: {P}件）
+  保留: {H}件
+  却下: {D}件
+  git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
+  次のステップ:
+    - 採用（要件定義が必要）: /agentdev/req-define
+    - 採用（Issue 化可能）: /agentdev/intake-promote
+```
+
+## intake-promote 完了時
+
+```
+✅ intake item の整形が完了しました。
+  整形対象: {N}件
+  req-define 用: {R}件
+  intake-open 用: {P}件
+  保存先: .agentdev/intake/promoted/
+  git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
+  次のステップ:
+    - /agentdev/req-define（要件定義が必要な場合）
+    - /agentdev/intake-open（Issue 化する場合）
 ```
 
 ## intake-open 完了時
@@ -192,6 +243,10 @@ Epic Issueを作成した場合は以下の報告を出力する。
   - Issue: #{N}
   - promoted artifact: {artifact_path}（issued）
   - 検証結果: ✅ OK（N件の書き込み操作を検証済み）
+  - git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
   - 次のステップ: /agentdev/case-run {N}
 ```
 
@@ -206,6 +261,10 @@ Epic + 子Issue を作成した場合は以下の報告を出力する。
   - ステータス追跡: ☐ 未着手 {count}件
   - promoted artifact: {artifact_path}（issued）
   - 検証結果: ✅ OK（N件の書き込み操作を検証済み）
+  - git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
   - 次のステップ: /agentdev/case-run {epic_N}
 ```
 
@@ -264,6 +323,6 @@ Epic Orchestrator モード（`/agentdev/case-run {epic_N}`）で全 Wave 完了
 
 ### git 永続化セクションのルール
 
-- learning-refine, learning-promote, case-close の完了報告にのみ git 永続化セクションを含める
+- learning-refine, learning-promote, case-close, intake-capture, intake-from-github, intake-review, intake-promote, intake-open の完了報告に git 永続化セクションを含める
 - 変更なしの場合は「commit/push スキップ」とだけ表示する
 - push 失敗時は「push: 失敗」と表示し、完了報告全体を ⚠️ に変更する
