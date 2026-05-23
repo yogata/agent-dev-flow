@@ -34,6 +34,7 @@
   - [REQ-0027: learning artifact lifecycle の責任範囲明確化](requirements/REQ-0027.md)
   - [REQ-0028: Documentation granularity and responsibility restructuring](requirements/REQ-0028.md)
   - [REQ-0029: intake-open promoted artifact 一括処理](requirements/REQ-0029.md)
+  - [REQ-0030: agentdev コマンド群の体系的テスト実装](requirements/REQ-0030.md)
 
 ## Specifications
 
