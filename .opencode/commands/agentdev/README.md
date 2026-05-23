@@ -28,17 +28,17 @@ AgentDevFlow の req/case パイプラインを提供するコマンドセット
 
 | コマンド | 役割 |
 |----------|------|
-| `intake-capture` | 変更候補を intake item として保存 |
-| `intake-from-github` | クローズ済み issue/PR から残課題を intake item として保存 |
-| `intake-review` | intake item の review・採用可否判断 |
-| `intake-promote` | review 済み item を後続コマンド用 artifact に整形 |
-| `intake-open` | intake-promote 生成 artifact から GitHub Issue を作成 |
+| `/agentdev/intake-capture` | 変更候補を intake item として保存 |
+| `/agentdev/intake-from-github` | クローズ済み issue/PR から残課題を intake item として保存 |
+| `/agentdev/intake-review` | intake item の review・採用可否判断 |
+| `/agentdev/intake-promote` | review 済み item を後続コマンド用 artifact に整形 |
+| `/agentdev/intake-open` | intake-promote 生成 artifact から GitHub Issue を作成 |
 
 ### integrity コマンド（整合性検証）
 
 | コマンド | 役割 |
 |----------|------|
-| `integrity-check` | ドキュメント・スキル・コマンドの整合性を検証 |
+| `/agentdev/integrity-check` | ドキュメント・スキル・コマンドの整合性を検証 |
 
 ## 基本フロー
 
@@ -61,3 +61,10 @@ AgentDevFlow の req/case パイプラインを提供するコマンドセット
 - `/agentdev/case-update` — [case-update.md](./case-update.md)
 - `/agentdev/case-close` — [case-close.md](./case-close.md)
 - `/agentdev/intake-open` — [intake-open.md](./intake-open.md)
+- `/agentdev/intake-capture` — [intake-capture.md](./intake-capture.md)
+- `/agentdev/intake-from-github` — [intake-from-github.md](./intake-from-github.md)
+- `/agentdev/intake-review` — [intake-review.md](./intake-review.md)
+- `/agentdev/intake-promote` — [intake-promote.md](./intake-promote.md)
+- `/agentdev/learning-refine` — [learning-refine.md](./learning-refine.md)
+- `/agentdev/learning-promote` — [learning-promote.md](./learning-promote.md)
+- `/agentdev/integrity-check` — [integrity-check.md](./integrity-check.md)
