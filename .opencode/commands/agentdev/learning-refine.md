@@ -156,9 +156,20 @@ archive.md 内の古い単発レアケースを削除候補として特定する
 | git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
 | git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
+## Artifact Lifecycle 責務
+
+learning-refine が扱う3つの成果物の役割・性格・ライフサイクル振る舞いを以下に定義する。各 artifact の性質を誤解しないことが、パイプライン全体の正しい運用において必須である（REQ-0027-001, REQ-0027-003, REQ-0027-008, REQ-0027-009, REQ-0027-014, REQ-0027-016）。
+
+| Artifact | 役割 | 性格 | Lifecycle 振る舞い |
+|----------|------|------|--------------------|
+| **inbox.md** | 未整理 learning entry の active queue | 一時的。永続ストレージではない | capture で蓄積し、refine 成功後にヘッダーのみにクリアされる。エントリは archive へ移動した後に残らない |
+| **archive.md** | refine 済み learning entry の保持プール | Living pool（終端保管ではない）。`archive` は終端保管を意味しない | refine で inbox から移動した entry を保持し、promote の入力として参照される。refine 時 prune（任意）および promote 時 prune により動的に変化する |
+| **evaluation-report.md** | refine/promote 間の境界 artifact | 中間生成物。長期履歴として扱わない | 毎回上書きされる。promote はこの report を主入力とする。過去レポートは保持しない |
+
+**learning-refine の責務**: normalize → classify → evaluate → move（正規化→分類→評価→移動）。昇格判定自体は `/agentdev/learning-promote` の役割である。
+
 ## 注意事項
 
-- **evaluation-report.md は毎回上書き**: 過去のレポートは保持しない
-- **evaluation-report.md は境界成果物**: learning-refine と learning-promote 間の受け渡し物
-- **archive.md は生きている learning プール**: 永久保存先ではなく、prune・promote 時 prune で動的に変化する
+- **evaluation-report.md の取り扱い** → **Artifact Lifecycle 責務** 参照（毎回上書き・境界成果物）
+- **archive.md の取り扱い** → **Artifact Lifecycle 責務** 参照（living pool、prune で動的に変化）
 - **昇格判定は別コマンド**: evaluation-report.md に基づく昇格推奨は `/agentdev/learning-promote` の役割
