@@ -38,3 +38,21 @@
 - **想定反映先**: スキル（agentdev-git-worktree SKILL.md の worktree削除手順）
 - **関連**: Issue #342, PR #343, `.opencode/skills/agentdev-git-worktree/SKILL.md`
 - **タグ**: `#git` `#worktree` `#squash-merge` `#case-close`
+
+---
+
+## case-run が worktree 内に残した .sisyphus/ 一時ファイルが git worktree remove を失敗させる
+
+- **問題事象**: case-close Step 7 で `git worktree remove ".worktrees/344-feature"` を実行したところ「contains modified or untracked files」エラーで失敗した。原因は case-run が worktree 内に作成した `.sisyphus/` ディレクトリ（実行計画・証跡等の一時ファイル）が未追跡ファイルとして残存していたため
+- **発生局面**: 完了処理（case-close Step 7 ブランチ・worktree削除）
+- **検知方法**: `git worktree remove` の stderr エラーメッセージを直接確認。事前に `git -C ".worktrees/344-feature" status --short` で `?? .sisyphus/` のみであることを確認
+- **根本原因**: case-run は worktree 内で作業する際 `.sisyphus/` を作成するが、case-close の worktree 削除前にこれらをクリーンアップする Step が存在しない。`.sisyphus/` は Sisyphus runtime の一時領域でありコミット対象外だが、git worktree は未追跡ファイルがあると削除を拒否する
+- **自律対応内容**: `.sisyphus/` のみの残存でありコミット済みコードには影響しないため、`--force` フラグで強制削除した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（現在のスキル定義にクリーンアップ手順がないことが根本原因だが、対応は別途判断）
+- **横展開観点**: 全 case-close で case-run 経由で worktree を使用した場合に発生する。case-run を使用しない場合は発生しない
+- **再発条件**: case-run で worktree を使用し、case-close で worktree を削除する全ケース
+- **予防策候補**: case-close の Step 7（worktree削除）で、削除前に `.sisyphus/` のクリーンアップを追加する。または case-run の完了Step で `.sisyphus/` をクリーンアップする
+- **想定反映先**: コマンド（case-close.md Step 7 または case-run の完了Step）
+- **関連**: Issue #344, PR #346, `.opencode/commands/agentdev/case-close.md`
+- **タグ**: `#git` `#worktree` `#case-close` `#cleanup`
