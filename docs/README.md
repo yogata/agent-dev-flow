@@ -33,6 +33,7 @@
   - [REQ-0026: intake lifecycle の queue/archive 再定義](requirements/REQ-0026.md)
   - [REQ-0027: learning artifact lifecycle の責任範囲明確化](requirements/REQ-0027.md)
   - [REQ-0028: Documentation granularity and responsibility restructuring](requirements/REQ-0028.md)
+  - [REQ-0029: intake-open promoted artifact 一括処理](requirements/REQ-0029.md)
 
 ## Specifications
 
