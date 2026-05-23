@@ -17,17 +17,30 @@ capture → inbox.md → refine → archive.md + evaluation-report.md → promot
 - **refine**（learning-refine command）: 問題クラス分類・8軸評価・evaluation-report 生成・inbox→archive 移動
 - **promote**（learning-promote command）: 昇華判定・Requirement Source stub 生成・prune
 
+## Artifact Lifecycle
+
+pipeline 各層を構成する 4 artifact の役割・性格・command 間の振る舞いを定義する。
+
+| Artifact | 役割 | 性格 | Command 間の振る舞い |
+|----------|------|------|---------------------|
+| inbox.md | 未整理 learning entry の active queue。capture で蓄積し、refine 成功後にクリアされる。永続ストレージではない | 一時キュー。refine の入力として消費され、処理完了後に空になる | capture が書き込む（append）。refine が読み取り・移動後にクリアする。promote は参照しない |
+| archive.md | living pool（終端保管ではない）。refine で inbox から移動した entry を保持。promote の入力として参照され、promote 時の prune により動的に変化する。`archive` は終端保管を意味しない | 動的プール。promote のたびに内容が変化し、未処理 entry は次回 promote の対象として残る | refine が inbox から移動して書き込む。promote が読み取り・prune する。capture は参照しない |
+| evaluation-report.md | refine/promote 間の境界 artifact。毎回上書きされ長期履歴ではない。refine が生成し、promote が主入力として消費する | 境界 artifact。refine→promote 間の受け渡し専用。履歴蓄積は行わない | refine が生成（上書き）。promote が主入力として読み取り・消費。capture は参照しない |
+| elevation-staging/ | Requirement Source stub の staging 領域。生成された stub は `/agentdev/req-define` の明示入力ファイルとして扱う。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止 | staging 専用。promote が生成し、req-define が消費する。pipeline 外への直接反映は不可 | promote が stub を生成する。req-define が明示的に読み取る。refine は参照しない |
+
+**制約（REQ-0027-013）**: raw learning item を runtime command / skill の直接参照対象にしない。学びは昇華（promote → staging stub → req-define）を経て初めて command / skill / template / AGENTS.md / docs へ組み込まれる。
+
 ## 責任分界
 
 | 層 | command | 責務 |
 |---|---------|------|
 | capture | agentdev-learning-capture（skill） | 検知・抽出・自律蓄積。昇格判断・品質評価は行わない |
-| refine | learning-refine（command） | 正規化・問題クラス分類・8軸評価・evaluation-report 生成・archive 移動 |
-| promote | learning-promote（command） | 廃棄判定・Requirement Source stub 生成・prune |
+| refine | learning-refine（command） | 正規化・問題クラス分類・8軸評価・evaluation-report 生成。inbox の entry を archive に移動し、inbox をクリア |
+| promote | learning-promote（command） | 廃棄判定・Requirement Source stub 生成。archive から staged / rejected / duplicate を prune し、deferred / 未処理を保持 |
 
 - learning-refine と learning-promote は本 skill を参照して schema・基準を取得する
 - agentdev-learning-capture は独立 skill であり本 skill を参照しない
-- raw learning item を runtime で直接読ませない。学びは昇華後に command / skill / template / AGENTS.md / docs へ組み込んで利用する
+- raw learning item を runtime で直接読ませない。学びは昇華後に command / skill / template / AGENTS.md / docs へ組み込んで利用する（REQ-0027-013）
 
 ## Inbox Entry Schema
 

@@ -169,9 +169,23 @@ load_skills:
 | git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
 | git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
+## Artifact Lifecycle 責務
+
+promote が扱う3つの主要 artifact の役割・性格・lifecycle 振る舞いを定義する。
+
+| Artifact | 役割 | 性格 | Lifecycle 振る舞い |
+|----------|------|------|-------------------|
+| `archive.md` | 過去エントリの living pool（終端保管ではない） | living | promote の主入力の一つとして参照される。promote 時の prune により staged/rejected/duplicate は除去され、deferred/未処理は保持される。`archive` は終端保管を意味しない。（REQ-0027-003/004/005/016） |
+| `evaluation-report.md` | refine/promote 間の境界 artifact | 読込専用 | 毎回上書きされるため長期履歴ではない。promote はこれを主入力とする。（REQ-0027-008/009） |
+| `elevation-staging/` | Requirement Source stub の staging 領域 | staging | 生成された stub は `/agentdev/req-define` の明示入力ファイルとして扱う。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止。（REQ-0027-010/011/012） |
+
+### learning-promote の責務
+
+廃棄判定 → stub 生成 → prune の一連の処理が learning-promote の責務範囲（REQ-0027-015）。各処理の詳細は Steps 1-9 を参照。
+
 ## 注意事項
 
-- **staging領域のみに生成**: `.opencode/` への直接配置は禁止
+- **staging領域のみに生成**: → **Artifact Lifecycle 責務** の `elevation-staging/` 参照
 - **stub のみ生成**: 完全なSKILL.mdやコマンドファイルは生成しない
-- **archive.md は living learning pool**: prune は staged/rejected/duplicate のみ。deferred・未処理は保持
-- **反映ルート**: staging stub → `/agentdev/req-define`（明示入力ファイル）→ `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`
+- **archive.md は living learning pool**: → **Artifact Lifecycle 責務** の `archive.md` 参照
+- **反映ルート**: → **Artifact Lifecycle 責務** の `elevation-staging/` 参照
