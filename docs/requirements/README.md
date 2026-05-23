@@ -29,6 +29,7 @@
 | REQ-0023 | learning staging stub の消費追跡と消費後アーカイブ | learning/staging-stub/archive/consumption-tracking |
 | REQ-0024 | 完了報告フォーマットの次工程提示を全コマンドで強制する | enhancement/workflow-reporting/command-system |
 | REQ-0025 | intake 系コマンドの .agentdev/intake 更新後の git 永続化 | agentdev/git/persistence/intake |
+| REQ-0026 | intake lifecycle の queue/archive 再定義 | agentdev/intake/lifecycle/queue/archive/refactor |
 
 ## ディレクトリ構造の方針
 
