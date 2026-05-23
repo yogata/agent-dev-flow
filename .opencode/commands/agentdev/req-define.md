@@ -22,6 +22,7 @@ load_skills:
   - 要件化前の設計メモ、調査メモ、反映指示書
   - learning-promote が生成した staging stub（Requirement Source 形式）
   - その他変更内容・背景・制約・完了条件を含む source file
+  - intake-promote が生成した promoted artifact（`.agentdev/intake/promoted/req-define/` 内の Markdown ファイル）
 - req-save が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
 - finding ファイルを含め全てのユーザー明示入力ファイルは read-only の Requirement Source である（G04）。status や frontmatter の更新・上書きは行わない
 - source file の種類に依存しない汎用的な入力扱いとする（elevation-staging 専用分岐は追加しない）
@@ -91,6 +92,7 @@ load_skills:
     - Requirement Source 形式（背景・問題・望ましい変更・対象範囲・反映先候補・既存対策確認・制約・完了条件を含む構造）を想定するが、任意のテキスト形式も受け入れる
     - 読み込んだ内容を壁打ちの初期コンテキストとして扱う（source file の種類による分岐は行わない）
      - 複数ファイルが指定された場合は全て読み込む
+    - 引数なしの場合、`.agentdev/intake/promoted/req-define/*.md` の存在を確認し、1件なら自動検出して読み込む。0件なら通常の Step 2 へ。2件以上なら候補一覧を表示して指定を求める
     - **Finding ファイルの例**: `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md` が指定された場合、finding の内容（検出概要・影響範囲・推奨アクション）を壁打ちの初期コンテキストとして扱い、正式な要件変更への変換を案内する
  2. ユーザーとの壁打ち対話を開始 → `agentdev-req-analysis` の壁打ちメソドロジーに従って深掘り
     - 明示入力ファイルが読み込まれている場合、その内容を壁打ちの開始点として活用（ファイル内容から要件の構造化を先行して進める）
@@ -146,6 +148,11 @@ load_skills:
     - 機能追加: `次のステップ: /agentdev/req-save`
     - バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務: `次のステップ: /agentdev/case-open`
 
+12. **consumed artifact の削除**: Step 1 で `.agentdev/intake/promoted/req-define/` から読み込んだ artifact がある場合、要件docの確定後に当該 artifact を削除する:
+    - **削除条件**: 要件docが確定した場合のみ（差し戻し時は削除しない）
+    - 削除対象は Step 1 で読み込んだ `.agentdev/intake/promoted/req-define/{filename}` のみ
+    - **git 操作は行わない**（G07）。削除はローカルファイルシステムのみ。後続の req-save 等での commit 対象となる
+
 ## Guardrails
 
 ### フェーズ制約
@@ -153,8 +160,8 @@ load_skills:
 - G02: 関連ドキュメントの個別ファイル列挙をユーザーに求めない。責務は要件の壁打ち・構造化に専念する
 
 ### ファイル操作制約
-- G03: ファイル編集スコープ: `.sisyphus/drafts/**` のみ作成・編集を許可
-- G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）
+- G03: ファイル編集スコープ: `.sisyphus/drafts/**` のみ作成・編集を許可。ただし Step 12 での `.agentdev/intake/promoted/req-define/` 内の artifact 削除は許可する
+- G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）。例外: `.agentdev/intake/promoted/req-define/` の artifact は消費後（Step 12）に削除する
 - G05: `docs/` 配下の広範な探索は禁止（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用）
 - G06: `inbox.md` / `archive.md` を直接ロードしない（raw learning item は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
 

@@ -20,7 +20,7 @@ load_skills:
 ## Output
 
 - 整形済み入力 artifact（`req-define` 用 または `intake-open` 用）
-- 整形済み item は `.agentdev/intake/promoted/` に保存
+- 整形済み item は `.agentdev/intake/promoted/{route}/` に保存（{route} は `req-define` または `intake-open`）
 
 ## 整形の方向性
 
@@ -44,7 +44,7 @@ load_skills:
    - `req-define` ルート: 要件定義が必要（新規機能・仕様変更等）
    - `intake-open` ルート: Issue 化可能（バグ修正・小規模改善等）
    - 複数 item を束ねて1つの artifact にすることも可能（ユーザーの指示による）
-   - **ユーザーが確認したルートを promoted artifact の frontmatter `route` フィールドに記録する**
+   - **ユーザーが確認したルートを promoted artifact の保存先サブディレクトリ（`promoted/req-define/` または `promoted/intake-open/`）で表現する。artifact の frontmatter には route/status を記録しない**
 
 4. **整形**: 後続ルートに応じて item を整形する:
 
@@ -79,16 +79,14 @@ load_skills:
       ```
 
 6. **保存**:
-    - 保存先: `.agentdev/intake/promoted/`
-    - ディレクトリが存在しない場合は作成する
+    - 保存先: `.agentdev/intake/promoted/{route}/`（{route} は Step 3 で確定した後続ルート: `req-define` または `intake-open`）
+    - サブディレクトリ（`promoted/req-define/` または `promoted/intake-open/`）が存在しない場合は作成する
     - ファイル名: `YYYY-MM-DD-{topic-slug}.md`（元 item 名を維持、または束ねた内容に応じた名前）
-    - frontmatter に後続ルートとステータスを記録する（Step 3 でユーザーが確認したルートを使用）:
-      ```yaml
-      ---
-      route: {route_value}
-      status: promoted
-      ---
-      ```
+    - artifact の frontmatter に route や status を記録しない（ディレクトリ配置が一次状態）
+
+6a. **accepted item の archive/promoted 移動**:
+    - Step 6 で保存元とした accepted item（`.agentdev/intake/accepted/{item}.md`）を `.agentdev/intake/archive/promoted/` に移動する
+    - `archive/promoted/` ディレクトリが存在しない場合は作成する
 
 6b. **.agentdev/intake 変更の commit と push**:
     - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
@@ -130,11 +128,11 @@ load_skills:
 
 ### 形式制約（REQ-0017-032〜039）
 - G06: workflow 管理 artifact として扱わない（REQ-0017-033）
-- G07: 整形結果に frontmatter・状態値を必須にしない（REQ-0017-035）
+- G07: 整形結果に frontmatter（route/status 等）を含めてはならない（MUST NOT）（REQ-0017-035, REQ-0026-008）
 - G08: 整形結果に重複排除キー・後続 artifact 参照を含めない（REQ-0017-039）
 - G09: 元 item の本文に整形結果を書き込まない（REQ-0017-038）
 
 ### 実行制約
 - G10: 整形はユーザーとの対話を通じて行う
-- G11: 保存先は `.agentdev/intake/promoted/` のみ
-- G12: 整形後の item を accepted ディレクトリから移動・削除しない（intake-open 側で管理）
+- G11: 保存先は `.agentdev/intake/promoted/req-define/` または `.agentdev/intake/promoted/intake-open/` のみ
+- G12: 整形元の accepted item は artifact 保存後に `.agentdev/intake/archive/promoted/` に移動する
