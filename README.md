@@ -156,6 +156,7 @@ docs/
     system.md      # コマンドシステムの構成定義
     patterns.md    # コード規約と実装パターン
     design-principles.md # 設計原則
+  guides/          # 利用者向けガイド
   requirements/    # 要件定義書（REQ-*.md）
   adr/             # アーキテクチャ決定記録（ADR-*.md）
 .agentdev/         # AgentDevFlow domain state（intake, learning, integrity）
