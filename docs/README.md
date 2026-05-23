@@ -31,6 +31,7 @@
   - [REQ-0024: 完了報告フォーマットの次工程提示を全コマンドで強制する](requirements/REQ-0024.md)
   - [REQ-0025: intake 系コマンドの .agentdev/intake 更新後の git 永続化](requirements/REQ-0025.md)
   - [REQ-0026: intake lifecycle の queue/archive 再定義](requirements/REQ-0026.md)
+  - [REQ-0027: learning artifact lifecycle の責任範囲明確化](requirements/REQ-0027.md)
 
 ## Specifications
 
