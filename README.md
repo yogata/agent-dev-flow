@@ -159,16 +159,11 @@ docs/
   guides/          # 利用者向けガイド
   requirements/    # 要件定義書（REQ-*.md）
   adr/             # アーキテクチャ決定記録（ADR-*.md）
-.agentdev/         # AgentDevFlow domain state（intake, learning, integrity）
-.sisyphus/
-  plans/           # 開発計画（plan名.md）
-  drafts/          # 計画の下書き（req-draft: 要件定義ドラフト、requirements-review-finding: 要件レビュー所見）
-  evidence/        # 実行の証跡
-  execution/       # 実行状態
-  notepads/        # 作業メモ（plan名/）
-  tasks/           # タスク定義
-  reports/         # レポート出力
-  archives/         # 完了済みPlanのアーカイブ
+.agentdev/         # AgentDevFlow domain state
+  intake/          # 気づき・課題の収集・レビュー・促進（inbox/, accepted/, promoted/, archive/）
+  learning/        # 学びの蓄積・昇華（inbox.md, archive.md, evaluation-report.md）
+  integrity/       # 整合性検証レポート
+.sisyphus/         # Sisyphus 作業領域（詳細は system.md 参照）
 .opencode/
   commands/agentdev/  # AgentDevFlow コマンド定義
   skills/            # スキル定義（SKILL.md）

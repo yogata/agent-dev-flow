@@ -55,9 +55,21 @@
 
 ## Learning
 
-学び・ナレッジの蓄積（`.agentdev/learning/` に移行済み）。
+学び・ナレッジの蓄積と昇華。
 
-- [Learning inbox](../.agentdev/learning/inbox.md) — 学びの収集・分析・昇華
+- [Domain State Lifecycle](guides/domain-state-lifecycle.md) — Learning・Intake・Integrity の状態遷移
+
+## Intake
+
+気づき・課題の収集・レビュー・促進。
+
+- [Domain State Lifecycle](guides/domain-state-lifecycle.md) — Intake パイプラインの状態遷移
+
+## Integrity
+
+ドキュメント・スキル・コマンドの横断的整合性検証。
+
+- [Domain State Lifecycle](guides/domain-state-lifecycle.md) — Integrity パイプラインの状態遷移
 
 ## Quality Specs
 
