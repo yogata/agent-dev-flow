@@ -185,6 +185,12 @@ const LEGACY_PATTERNS = [
   { pattern: /\bissue-completion-reporting\b/g, name: "issue-completion-reporting (old skill name)" },
   { pattern: /\bissue-post-review-routing\b/g, name: "issue-post-review-routing (old skill name)" },
   { pattern: /\bissue-work-orchestration\b/g, name: "issue-work-orchestration (old skill name)" },
+  // 6j: old data path (docs/tips/ → docs/ migration)
+  { pattern: /\bdocs\/tips\//g, name: "docs/tips/ (old data path)" },
+  // 6k: old terminology in active guidance
+  { pattern: /\btips[- ]プール/g, name: "tips プール (old terminology: should be learning プール)" },
+  { pattern: /\brefactor時prune\b/g, name: "refactor時prune (old terminology: should be refine時prune)" },
+  { pattern: /\belevate時prune\b/g, name: "elevate時prune (old terminology: should be promote時prune)" },
 ];
 
 function checkReqFrontmatterFilename(reqDir: string, root: string): CheckResult[] {
