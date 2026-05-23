@@ -268,6 +268,76 @@ Epic + 子Issue を作成した場合は以下の報告を出力する。
   - 次のステップ: /agentdev/case-run {epic_N}
 ```
 
+## intake-open 一括処理完了時
+
+引数なし実行で複数 promoted artifact を一括処理した場合の報告フォーマット。
+
+### 全件成功時
+
+```
+✅ intake-open 完了（一括処理）
+  - 処理結果:
+      - 成功: {success_count}件
+      - 失敗: 0件
+  - 作成 Issue: #{N1}, #{N2}, ...（{count}件）
+  - 削除済み artifact: {deleted_artifact_list}
+  - 残存 artifact: なし
+  - 検証結果: ✅ OK（{N}件の書き込み操作を検証済み）
+  - git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
+  - 次のステップ: /agentdev/case-run {N1}（最初の成功Issue）
+```
+
+### 部分失敗あり
+
+```
+⚠️ intake-open 完了（一括処理 — 部分失敗）
+  - 処理結果:
+      - 成功: {success_count}件
+      - 失敗: {failure_count}件
+  - 作成 Issue: #{N1}, #{N2}, ...（{count}件）
+  - 削除済み artifact: {deleted_artifact_list}
+  - 残存 artifact: {remaining_artifact_list}
+  - 検証結果: ✅ OK（{N}件の書き込み操作を検証済み）
+  - 失敗詳細:
+      - {artifact_name}: {error_summary}
+  - git 永続化:
+      - 変更: {あり/なし}
+      - {変更ありの場合: commit: {hash}, files: {file_list}, push: {成功/失敗}}
+      - {変更なしの場合: commit/push スキップ}
+  - 次のステップ:
+    - 成功したIssue: /agentdev/case-run {N1}
+    - 残存artifactの再実行: /agentdev/intake-open {remaining_artifact}
+```
+
+### 全件失敗時
+
+```
+❌ intake-open 完了（一括処理 — 全件失敗）
+  - 処理結果:
+      - 成功: 0件
+      - 失敗: {failure_count}件
+  - 作成 Issue: なし
+  - 削除済み artifact: なし
+  - 残存 artifact: {remaining_artifact_list}
+  - 失敗詳細:
+      - {artifact_name}: {error_summary}
+      - ...
+  - git 永続化:
+      - 変更: なし
+      - commit/push スキップ
+```
+
+### フォーマット共通ルール
+
+- 処理結果の 成功/失敗 カウントは必須
+- Issue 番号は作成順（ファイル名昇順と同一）で列挙
+- artifact 名はファイル名（パス含まない）で列挙
+- 失敗詳細は artifact ごとのエラー概要（1行）
+- git 永続化セクションのルールは他の intake 系コマンドと同一
+
 ## case-run Epic Orchestrator 集約完了報告
 
 Epic Orchestrator モード（`/agentdev/case-run {epic_N}`）で全 Wave 完了後に出力する集約報告フォーマット。各子 Issue の subagent が個別の case-run 完了報告を出力した後に、親エージェントが本フォーマットで集約結果を報告する。
