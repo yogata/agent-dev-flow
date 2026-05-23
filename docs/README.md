@@ -29,6 +29,7 @@
   - [REQ-0022: .agentdev domain state 更新後の git 永続化](requirements/REQ-0022.md)
   - [REQ-0023: learning staging stub の消費追跡と消費後アーカイブ](requirements/REQ-0023.md)
   - [REQ-0024: 完了報告フォーマットの次工程提示を全コマンドで強制する](requirements/REQ-0024.md)
+  - [REQ-0025: intake 系コマンドの .agentdev/intake 更新後の git 永続化](requirements/REQ-0025.md)
 
 ## Specifications
 

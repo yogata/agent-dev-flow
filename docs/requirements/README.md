@@ -28,6 +28,7 @@
 | REQ-0022 | .agentdev domain state 更新後の git 永続化 | agentdev/git/persistence/domain-state |
 | REQ-0023 | learning staging stub の消費追跡と消費後アーカイブ | learning/staging-stub/archive/consumption-tracking |
 | REQ-0024 | 完了報告フォーマットの次工程提示を全コマンドで強制する | enhancement/workflow-reporting/command-system |
+| REQ-0025 | intake 系コマンドの .agentdev/intake 更新後の git 永続化 | agentdev/git/persistence/intake |
 
 ## ディレクトリ構造の方針
 
