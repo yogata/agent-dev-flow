@@ -1,8 +1,3 @@
----
-route: intake-open
-status: promoted
----
-
 # integrity-check に旧 data path / 旧 terminology 検出パターンを追加 (6j/6k)
 
 ## 概要

@@ -1,8 +1,3 @@
----
-route: intake-open
-status: promoted
----
-
 # case-close の完了ゲート適用漏れ調査 — AC チェックボックス未チェックのままクローズされる問題
 
 ## 概要

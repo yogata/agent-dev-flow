@@ -1,8 +1,3 @@
----
-route: req-define
-status: promoted
----
-
 # agentdev コマンド群のテスト体系的実装
 
 ## 観測内容

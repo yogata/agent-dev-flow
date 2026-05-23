@@ -1,8 +1,3 @@
----
-route: intake-open
-status: promoted
----
-
 # verify_body.ts の BOM 検出を raw bytes 読み取りに変更
 
 ## 概要
