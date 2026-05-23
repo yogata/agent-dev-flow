@@ -107,8 +107,15 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  9a. Staging stub consumed 判定と archive:
      - staging stub archive 処理は `agentdev-learning-pipeline` skill の archive ルールに従う（SSoT）
      - consumed 判定結果を Step 11 の完了報告に含める
-9b. Post-run intake capture: 完了処理中に発見した本筋外の変更候補のうち、具体的な修正対象が特定できるものを intake item として保存する。`agentdev-workflow-lifecycle` → `reference/capture-boundaries.md` の Split Rule を SSoT とする
-    - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）
+ 9b. Post-run intake capture: 完了処理中に発見した本筋外の変更候補のうち、具体的な修正対象が特定できるものを intake item として保存する。`agentdev-workflow-lifecycle` → `reference/capture-boundaries.md` の Split Rule を SSoT とする
+     - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）
+     - **Intake item の形式**: 他の intake 系コマンド（intake-capture / intake-from-github）と同一の推奨標準形に従う:
+       - ファイル名: `YYYY-MM-DD-{topic-slug}.md`（生成元コマンド名をファイル名に含めない）
+       - 同名ファイル既存時: `-2`, `-3` の連番を付与する
+       - 推奨見出し: 観測、今回扱わない理由、影響、レビューで決めること、根拠（任意）。見出し名は固定せず、内容に応じて変更・省略を許容する
+       - 内容がないセクションを形式維持のためだけに作成しない
+       - frontmatter・状態フィールド・重複排除キーを持たせない
+       - case-close 由来であることは `根拠（任意）` 見出しに記録する（ファイル名や独自 frontmatter には記録しない）
     - **曖昧な候補は自律保存しない**: 修正対象が特定できない候補・単なる違和感・改善案・曖昧な変更候補は自律保存せず、完了報告に候補としてのみ提示（SHALL）
     - **保存先の限定**: intake item の保存先は `.agentdev/intake/inbox/` のみ（SHALL）
     - **採用判断の禁止**: intake item の採用可否判断、GitHub Issue 作成、後続対応の優先度判断を行わない（SHALL）
