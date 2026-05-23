@@ -84,7 +84,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
 6. **item の振り分け**: 判定に基づいて item を振り分ける:
     - `採用` → `.agentdev/intake/accepted/` に移動
     - `保留` → `.agentdev/intake/inbox/` に残す（移動しない）
-    - `却下` → `.agentdev/intake/rejected/` に移動
+    - `却下` → `.agentdev/intake/archive/rejected/` に移動
 
 6b. **.agentdev/intake 変更の commit と push**:
     - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する

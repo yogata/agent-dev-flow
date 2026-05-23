@@ -10,19 +10,19 @@ load_skills:
 
 # Intake Open
 
-`intake-promote` が生成した Issue 化入力 artifact（`.agentdev/intake/promoted/`）を読み込み、GitHub Issue または Epic + 子Issue を作成する（REQ-0017-026a）。
+`intake-promote` が生成した Issue 化入力 artifact（`.agentdev/intake/promoted/intake-open/`）を読み込み、GitHub Issue または Epic + 子Issue を作成する（REQ-0017-026a）。
 
 **このコマンドは Issue 作成のみを行う。** 候補抽出・解消チェック・採否判断・review は含めない（REQ-0017-026b）。
 
 ## Input
 
-- `intake-promote` が生成した promoted artifact（`.agentdev/intake/promoted/` 内の Markdown ファイル）
+- `intake-promote` が生成した promoted artifact（`.agentdev/intake/promoted/intake-open/` 内の Markdown ファイル）
 - 省略可能な artifact ファイル名引数（明示的な指定用）
 
 ## Output
 
 - GitHub Issue（単一）、または Epic + 子Issue 群
-- promoted artifact のステータス更新（`issued` マーク）
+- promoted artifact の削除（Issue 作成成功時のみ）
 
 ## Steps
 
@@ -30,12 +30,12 @@ load_skills:
    - 引数なし + promoted artifact が1件 → 自動検出して次 Step へ進む
    - 引数なし + promoted artifact が0件 → エラー停止: `promoted artifact が存在しません。/agentdev/intake-promote で整形してください。`
    - 引数なし + promoted artifact が2件以上 → 候補一覧を表示して停止: `promoted artifact が複数あります。対象を指定してください: {候補一覧}`
-   - 引数あり → 指定されたファイル名に対応する `.agentdev/intake/promoted/{filename}` を読み込む
+   - 引数あり → 指定されたファイル名に対応する `.agentdev/intake/promoted/intake-open/{filename}` を読み込む
 
-   artifact の検索方法: `.agentdev/intake/promoted/*.md` のファイル一覧を取得し、各ファイルの frontmatter を確認する。
+   artifact の検索方法: `.agentdev/intake/promoted/intake-open/*.md` のファイル一覧を取得する。
 
 2. **Artifact 読み込み**: promoted artifact の内容をパースする:
-   - frontmatter: `route`（後続ルート）と `status`（`promoted`）の最小構成
+   - frontmatter は持たない（ディレクトリ配置が一次状態）
    - 整形済み item 群: タイトル、概要、対象範囲、完了条件等
    - 後続ルート情報: 単一 Issue または Epic + 子Issue 構成
 
@@ -97,7 +97,9 @@ load_skills:
        {git_error_output}
        ```
 
-13. **Artifact ステータス更新**: 処理済みの promoted artifact の frontmatter の `status` を `issued` に更新する。
+13. **Artifact 削除**: Issue 作成が成功した（VERIFY で検証済みの）promoted artifact を `.agentdev/intake/promoted/intake-open/` から削除する。
+    - **削除条件**: Issue 作成 + VERIFY が正常完了した場合のみ
+    - **削除しない場合**: Issue 作成失敗・VERIFY 失敗・エラー発生時は artifact を残す（リトライ可能にするため）
 
 13b. **.agentdev/intake 変更の commit と push**:
      - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
