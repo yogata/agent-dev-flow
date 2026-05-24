@@ -56,3 +56,39 @@
 - **想定反映先**: コマンド（case-close.md Step 7 または case-run の完了Step）
 - **関連**: Issue #344, PR #346, `.opencode/commands/agentdev/case-close.md`
 - **タグ**: `#git` `#worktree` `#case-close` `#cleanup`
+
+---
+
+## 完了ゲート（G08）がテスト戦略のスコープ外 `[ ]` を検出して case-close がエラー停止する
+
+- **問題事象**: case-close Step 2 の完了ゲートで、テスト戦略セクションのスコープ外E2Eテスト `- [ ]` が1件検出され、G08により即座にエラー停止した。完了条件セクションは8/8 `[x]` で全て完了していたが、テスト戦略の `[ ]` もG08の検出対象に含まれていた
+- **発生局面**: 完了処理（case-close Step 2 前提確認）
+- **検知方法**: G08 エラーメッセージ「完了ゲートエラー: 未完了チェックボックス検出」を直接確認
+- **根本原因**: case-run 実行時にスコープ外のテスト項目を `[ ]` で残す運用と、case-close G08 の完了ゲート（完了条件・テスト戦略両セクションの全 `[ ]` を検出）が矛盾している。G08 はセクションを区別せず全チェックボックスを検出する
+- **自律対応内容**: 該当E2Eテスト行をIssue本文から削除して完了ゲートを通過させた
+- **ユーザー確認有無**: なし（ユーザーに確認せず自律対応した）
+- **ADR/REQ/spec影響**: なし（G08の挙動自体は正しい。運用との矛盾が問題）
+- **横展開観点**: case-run でスコープ外項目を `[ ]` で残す全ケースで case-close がエラー停止する可能性がある
+- **再発条件**: case-run でテスト戦略にスコープ外の `[ ]` を残し、case-close を実行する場合
+- **予防策候補**: case-run の完了Step でスコープ外の `[ ]` を削除するようステップに追加する。または case-open/case-run でテスト戦略の `[ ]` はスコープ内項目のみに限定する運用を明文化する
+- **想定反映先**: コマンド（case-run.md の完了Step または case-close.md Step 2 の注記）
+- **関連**: Issue #381, PR #382
+- **タグ**: `#case-close` `#checkbox` `#gate` `#scope-management`
+
+---
+
+## worktree ディレクトリがプロセスロックされ削除できない場合がある
+
+- **問題事象**: case-close Step 7 で worktree ディレクトリ `.worktrees/381-feature` を削除しようとしたところ「Permission denied」エラーで失敗した。`git worktree remove` は既に成功していたが、ディレクトリ自体が他のプロセスにロックされていた
+- **発生局面**: 完了処理（case-close Step 7 ブランチ・worktree削除）
+- **検知方法**: `Remove-Item -Recurse -Force` の stderr エラーメッセージを直接確認
+- **根本原因**: IDE（VSCode等）やシェルのカレントディレクトリが worktree 内を指している場合、OSレベルでディレクトリがロックされ削除できない。worktree 自体は git worktree remove で登録解除済みだが、ディレクトリのファイルシステムエントリが残存する
+- **自律対応内容**: 警告を表示して次のステップへ進んだ。git worktree prune は正常に完了し、ローカル/リモートブランチも正常に削除済み
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: Windows環境でIDEがディレクトリをロックする全ケースで発生する可能性がある
+- **再発条件**: worktree ディレクトリが他プロセスにロックされた状態で case-close Step 7 を実行する場合
+- **予防策候補**: ディレクトリ削除失敗時の警告表示に「IDEやターミナルで当該ディレクトリを開いている場合は閉じてから手動で削除してください」を追加する
+- **想定反映先**: コマンド（case-close.md Step 7 の警告メッセージ）
+- **関連**: Issue #381, `.opencode/commands/agentdev/case-close.md`
+- **タグ**: `#git` `#worktree` `#windows` `#file-lock`
