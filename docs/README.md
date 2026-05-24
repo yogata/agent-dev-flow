@@ -37,6 +37,7 @@
   - [REQ-0030: agentdev コマンド群の体系的テスト実装](requirements/REQ-0030.md)
   - [REQ-0031: GitHub本文内リポジトリ参照リンクの正規化](requirements/REQ-0031.md)
   - [REQ-0032: case-close 未チェック項目達成判定](requirements/REQ-0032.md)
+  - [REQ-0033: AgentDevFlow command / skill 定義の二次整合性是正](requirements/REQ-0033.md)
 
 ## Specifications
 
