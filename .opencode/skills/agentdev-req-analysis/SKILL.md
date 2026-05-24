@@ -233,7 +233,7 @@ Issue本文のチェックボックスが満たすべき品質条件。
 
 ### ADR参照
 
-ADRが必要と判定された場合 → `agentdev-adr-guidelines` スキルを参照し、ADRを作成する。
+ADRが必要と判定された場合 → `agentdev-adr-guidelines` スキルを参照する。ADR候補記録までを責務とし、ADRファイル作成は req-save + agentdev-adr-file-manager に委譲する。
 
 ---
 

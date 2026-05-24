@@ -1,6 +1,6 @@
 ---
 name: agentdev-git-worktree
-description: Manages git worktree creation, switching, and cleanup based on Issue numbers. USE FOR: creating worktrees, switching between branches, or cleaning up completed worktrees. DO NOT USE FOR: basic git operations like commit/push/pull, branch management without worktrees, or merge conflict resolution.
+description: Manages git worktree creation, switching, and cleanup based on Issue numbers. USE FOR: creating worktrees, switching between branches, or cleaning up completed worktrees. DO NOT USE FOR: basic git operations like commit/push/pull, branch management without worktrees, or merge conflict resolution. Exception: branch cleanup as part of worktree lifecycle (removing worktree → deleting associated branch) is expected behavior.
 ---
 
 # agentdev-git-worktree
@@ -38,12 +38,19 @@ worktree とブランチの命名規則を統一する。
 
 `main` または `master` ブランチを自動検出し、ベースとして使用する。
 
+```bash
+# ベースブランチの自動検出
+git remote show origin | grep 'HEAD branch' | sed 's/.*: //'
+```
+
+検出結果を `origin/{base_branch}` として使用する。デフォルトは `main`。
+
 ### 2. worktree作成コマンド
 
-`origin/main` を明示的に指定してブランチを作成する。ローカルの `main` は他のworktree作業等で古くなっている可能性があるため、常にリモートの最新状態を起点とする。
+検出したベースブランチを `origin/{base_branch}` として明示的に指定し、ブランチを作成する。ローカルのベースブランチは他のworktree作業等で古くなっている可能性があるため、常にリモートの最新状態を起点とする。
 
 ```bash
-git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/main
+git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/{base_branch}
 ```
 
 ### 3. 重要事項
@@ -61,8 +68,8 @@ git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/main
 ### 4. 作成例
 
 ```bash
-# issue-516 を fix パターンで処理（origin/main を明示的に指定）
-git worktree add ".worktrees/516-fix" -b "fix/issue-516" origin/main
+# issue-516 を fix パターンで処理（検出したベースブランチを明示的に指定）
+git worktree add ".worktrees/516-fix" -b "fix/issue-516" origin/{base_branch}
 
 # 確認
 git worktree list
@@ -97,8 +104,18 @@ git worktree add ".worktrees/{N}-{type}" "{type}/issue-{N}"
 
 worktree 内に case-run が作成した `.sisyphus/` 一時ファイル（実行計画・証跡等）が未追跡ファイルとして残存している場合、`git worktree remove` がエラーになる。削除前にクリーンアップすること。
 
+#### Windows（PowerShell）
+
 ```powershell
-Remove-Item -Recurse -Force ".worktrees/{N}-{type}/.sisyphus/"
+if (Test-Path ".worktrees/{N}-{type}/.sisyphus/") {
+    Remove-Item -Recurse -Force ".worktrees/{N}-{type}/.sisyphus/"
+}
+```
+
+#### POSIX（bash）
+
+```bash
+rm -rf ".worktrees/{N}-{type}/.sisyphus/"
 ```
 
 - `.sisyphus/` ディレクトリが存在しない場合はエラーにせず続行する（`-ErrorAction SilentlyContinue` は不要。事前に `Test-Path` で確認するか、エラーを無視して次ステップへ進む）
@@ -139,6 +156,7 @@ git push origin --delete "{type}/issue-{N}"
 - worktreeプレフィクスを含まないパスでのファイル操作禁止（`.worktrees/{N}-{type}/` がパスに含まれていること）
 - `--force` によるダーティworktreeの強制削除禁止
 - メインリポジトリ（非worktree）内でのファイル編集禁止（case-run中）
+- worktree ライフサイクルに伴うブランチクリーンアップ（Step 4, 5）は禁止事項の対象外
 
 ## 重要: git worktreeコマンドの実行方法
 

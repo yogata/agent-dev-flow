@@ -36,16 +36,17 @@ load_skills:
 3. **規模判定によるフロー分岐**（Step 2の直後に実行）:
    - draft-metaの `scale` フィールドを確認
    - `scale: large` の場合 → **Epic flow**（Step 4〜8）へ進む
-   - `scale: standard` または `scale` フィールドなしの場合 → **Standard flow**（Step 4〜）へ進む
+   - `scale: standard` または `scale` フィールドなしの場合 → **Standard flow**（Step 9〜）へ進む
 4. **[Epic flow]**: テンプレート `issue_desc_epic.md` を Read tool で読み込む
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てEpic Issue本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-5. **[Epic flow]**: Epic Issue本文を生成:
-   - REQ内容から `{summary}`, `{problem}`, `{solution}` を埋める
-   - draft-metaの `decomposition` から分解テーブルを生成（子Issue番号は後で更新するためプレースホルダー `#{TBD}`）
-   - Wave テーブル生成: `agentdev-workflow-orchestration` の Wave scheduling ロジックに従い依存関係から Wave 番号を決定し、`## 実行順序` セクションの Wave テーブルを生成する。列形式: `Wave / Issue / 実行方法 / 前提`。子Issue番号はプレースホルダー `#{TBD_Wn}`（n は行番号）とする
-   - ステータス追跡テーブル: 全子件数を `{total}` に設定、進行中/完了は0
-   - `{completion_criteria}` は要件docから抽出
-6. **[Epic flow]**: Epic Issueを作成:
+ 5. **[Epic flow]**: Epic Issue本文を生成:
+    - REQ内容から `{summary}`, `{problem}`, `{solution}` を埋める
+    - draft-metaの `decomposition` から分解テーブルを生成（子Issue番号は後で更新するためプレースホルダー `#{TBD}`）
+    - Wave テーブル生成: `agentdev-workflow-orchestration` の Wave scheduling ロジックに従い依存関係から Wave 番号を決定し、`## 実行順序` セクションの Wave テーブルを生成する。列形式: `Wave / Issue / 実行方法 / 前提`。子Issue番号はプレースホルダー `#{TBD_Wn}`（n は行番号）とする
+    - ステータス追跡テーブル: 全子件数を `{total}` に設定、進行中/完了は0
+    - `{completion_criteria}` は要件docから抽出
+    - **子Issue数事前チェック**: decomposition の子Issue数を確認。G05（最大10件）を超過する場合、Epic Issue・子Issueのいずれも作成せずエラーを報告して停止する
+ 6. **[Epic flow]**: Epic Issueを作成:
    - ラベル: `enhancement`, `feature`, `epic`
    - `agentdev-gh-cli` に従って `--body-file` 使用
    - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
@@ -72,7 +73,7 @@ load_skills:
 12. Issue作成後にコメント追加 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_analysis.md`（バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_technical.md`（機能追加）を Read tool で読み込む（Epic flowではEpic Issueにコメント追加）
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-13. ドラフトの `## draft-meta` セクションの `status` を `issued` に更新する（ドラフトが存在する場合のみ） → 更新後、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
+13. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除する
 14. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → case-open 完了時）に従って出力
 
 ## Guardrails
@@ -84,7 +85,7 @@ load_skills:
 ### 実行制約
 - G03: 子Issue本文の先頭行に `Parent: #{epic_number}` を必ず含める（親子関係の追跡用）
 - G04: 全子Issueの作成完了後にEpic本文のステータス追跡テーブルを更新する（部分更新は禁止）
-- G05: 子Issueは最大10件まで（Epic 1件あたり）
+- G05: 子Issueは最大10件まで（Epic 1件あたり）。Step 5 で子Issue数を確認し、超過時はEpic・子Issueのいずれも作成せずエラーで停止する
 
 ### 品質ゲート
 - G06: req-define未実行の場合は警告

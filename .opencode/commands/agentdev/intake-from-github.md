@@ -153,7 +153,7 @@ load_skills:
 - G08: review 結果を item に書き込まない（REQ-0017-038）
 
 ### 実行制約
-- G09: データ取得は `gh` CLI のみ使用（GitHub API 直接呼び出し不可）
+- G09: GitHub Issue/PR のデータ取得は `gh` CLI のみ使用（GitHub API 直接呼び出し不可）
 - G10: 対象はクローズ済み Issue/PR のみ（オープン中は対象外）
 - G11: `agentdev-gh-cli` に従って読み取り操作を実行する
 - G12: 保存先は `.agentdev/intake/inbox/` のみ

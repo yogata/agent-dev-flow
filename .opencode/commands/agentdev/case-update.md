@@ -38,14 +38,15 @@ load_skills:
    - **`--body`**: Issue作成時に使用されたテンプレート（`issue_desc_bug.md` / `issue_desc_feature.md` / `issue_desc_epic.md` / `issue_desc_child.md` / `issue_desc_backlog_*.md`）に従って更新。該当テンプレートの【必須】セクションが全て本文に含まれること → `gh issue edit`
    - **`--comment`**: テンプレート `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_update.md` を Read tool で読み込み → `gh issue comment`
      - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-   - **`--req`**: REQファイル更新（詳細フロー以下）:
+    - **`--req`**: REQファイル更新（詳細フロー以下）。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）:
       1. Issue番号から関連REQファイルを特定（Issue本文のREQ番号参照 or `docs/requirements/` から該当ファイル検索）
-       2. 更新タイプの判定（APPEND vs UPDATE）:
-          - **APPEND**: 要件テーブルへの行追加、適用範囲の拡張
-          - **UPDATE**: 既存セクション（目的/要件/適用範囲）の内容修正
-       3. frontmatter `updated` フィールドを現在日時に更新
-       4. ファイル書き出し → `gh issue edit` でIssue本文の該当箇所も同期
-   - **`--review-ng`**: レビューNG時の専用フロー:
+        2. 更新タイプの判定（APPEND vs UPDATE）:
+           - **APPEND**: 要件テーブルへの行追加、適用範囲の拡張
+           - **UPDATE**: 既存セクション（目的/要件/適用範囲）の内容修正
+        3. frontmatter `updated` フィールドを現在日時に更新
+        4. ファイル書き出し → `gh issue edit` でIssue本文の該当箇所も同期
+        5. **commit / push**: REQファイルおよび影響を受ける docs ファイル（`docs/requirements/README.md`, `docs/README.md`）を commit + push する（SHALL）
+    - **`--review-ng`**: レビューNG時の専用フロー（入力条件: `agentdev-spec-compliance` の乖離報告とユーザー承認済み判断が存在すること）:
       1. `agentdev-spec-compliance` の乖離報告をパース（影響度・対象・内容・推奨アクション・理由を抽出）
       2. 乖離タイプに基づく自動分岐:
          - `spec-bug`（仕様バグ）→ REQ UPDATE + レビューNGコメント投稿
