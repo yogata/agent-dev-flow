@@ -34,6 +34,7 @@
 | REQ-0028 | Documentation granularity and responsibility restructuring | documentation/granularity/responsibility |
 | REQ-0029 | intake-open promoted artifact 一括処理 | agentdev/intake/batch-processing/enhancement |
 | REQ-0030 | agentdev コマンド群の体系的テスト実装 | testing/quality/commands/skills/templates/epic |
+| REQ-0031 | GitHub本文内リポジトリ参照リンクの正規化 | github/link-normalization/url/templates/verification/commands |
 
 ## ディレクトリ構造の方針
 
