@@ -117,7 +117,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  9. 学びの検知・抽出: `agentdev-learning-capture` スキルに従い、エージェントが自ら学びの有無を判断する
      - **禁止**: ユーザーに学びの有無を問うこと（「学びはありますか？」等）は禁止。エージェントが判断する
      - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `.agentdev/learning/inbox.md` に直接追記する。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
-     - エージェントが学びなしと判断 → ユーザーに何も問わず次のステップへ進む
+     - エージェントが学びなしと判断 → ユーザーに何も問わず次の Step へ進む
  9a. Staging stub consumed 判定と archive:
      - staging stub archive 処理は `agentdev-learning-pipeline` skill の archive ルールに従う（SSoT）
      - consumed 判定結果を Step 11 の完了報告に含める
@@ -159,7 +159,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
             **raw git output**:
             {git_error_output}
             ```
-10. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット
+10. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → case-close 完了時）に従って出力
     - **git 永続化結果**（完了報告に追加）:
         - 変更の有無（あり/なし）
         - 変更ありの場合: commit されたファイル一覧、commit hash、push 成否

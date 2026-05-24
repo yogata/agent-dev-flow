@@ -57,7 +57,7 @@ load_skills:
       4. agentdev-spec-compliance結果をテンプレートの「Deviation Check 結果」セクションに展開
       5. NG理由分類のチェックボックスを自動選択
       6. `agentdev-gh-cli` に従い `--body-file` 経由でコメント投稿
-4. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマットで結果出力
+4. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → case-update 完了時）に従って出力
    - 更新種別（`--body` / `--comment` / `--req` / `--review-ng`）に対応するフォーマットを使用
    - `--req` の場合: APPEND/UPDATEの区別と対象REQ番号・更新セクション名を報告に含める
     - `--review-ng` の場合: 乖離タイプ・対象要件番号・推奨アクションを報告に含める

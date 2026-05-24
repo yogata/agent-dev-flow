@@ -98,6 +98,21 @@ function buildValidFixture(root: string): void {
   mkdirp(skillDir);
   writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-test-skill\n", "utf-8");
 
+  const reportingSkillDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting");
+  const reportingRefDir = join(reportingSkillDir, "reference");
+  mkdirp(reportingRefDir);
+  writeFileSync(join(reportingSkillDir, "SKILL.md"), "# agentdev-workflow-reporting\n", "utf-8");
+  writeFileSync(join(reportingRefDir, "completion-reports.md"), [
+    "# 完了報告フォーマット",
+    "",
+    "## test-cmd 完了時",
+    "",
+    "```",
+    "✅ test-cmd 完了",
+    "```",
+    "",
+  ].join("\n"), "utf-8");
+
   const cmdDir = join(root, ".opencode", "commands", "agentdev");
   mkdirp(cmdDir);
 
@@ -107,6 +122,7 @@ function buildValidFixture(root: string): void {
     "agent: test-agent",
     "load_skills:",
     "  - agentdev-test-skill",
+    "  - agentdev-workflow-reporting",
     "---",
     "",
     "Test command body.",
