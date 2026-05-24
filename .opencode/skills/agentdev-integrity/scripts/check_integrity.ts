@@ -536,6 +536,220 @@ function checkNameCollision(skillsDir: string, root: string): CheckResult[] {
   return results;
 }
 
+// ─── Completion report format validation (REQ-0024-017, REQ-0024-018) ──────
+
+function buildCompletionReportSections(completionReportsPath: string): Map<string, string> {
+  const content = readText(completionReportsPath);
+  const sections = new Map<string, string>();
+  if (!content) return sections;
+
+  const lines = content.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const match = trimmed.match(/^##\s+(.+)$/);
+    if (match) {
+      const header = match[1];
+      const cmdMatch = header.match(/^([a-z]+-[a-z]+(?:-[a-z]+)*)\s+完了時/);
+      if (cmdMatch) {
+        sections.set(cmdMatch[1], header);
+      }
+    }
+  }
+  return sections;
+}
+
+function checkCompletionReportSkills(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  let allOk = true;
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    const loadSkills = extractLoadSkills(fm);
+    if (!loadSkills.includes("agentdev-workflow-reporting")) {
+      allOk = false;
+      results.push(
+        ng(
+          "CompletionReport",
+          "load-skills-reporting",
+          `Missing 'agentdev-workflow-reporting' in load_skills`,
+          resolveRelative(fullPath, root)
+        )
+      );
+    }
+  }
+
+  if (allOk && cmdFiles.length > 0) {
+    results.push(ok("CompletionReport", "load-skills-reporting", "All commands reference agentdev-workflow-reporting in load_skills"));
+  }
+  return results;
+}
+
+function checkCompletionReportTemplates(cmdDir: string, completionReportsPath: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const sections = buildCompletionReportSections(completionReportsPath);
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+
+  for (const file of cmdFiles) {
+    const cmdName = file.replace(".md", "");
+    if (cmdName === "integrity-check") continue;
+
+    if (!sections.has(cmdName)) {
+      results.push(
+        ng(
+          "CompletionReport",
+          "template-section-existence",
+          `No completion report section found for command '${cmdName}' in completion-reports.md`
+        )
+      );
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("CompletionReport", "template-section-existence", "All commands have corresponding sections in completion-reports.md"));
+  }
+  return results;
+}
+
+function checkInlineCompletionReports(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  let foundViolation = false;
+
+  const completionPatterns = [
+    /✅/,
+    /完了/,
+    /次のステップ/,
+    /次のコマンド/,
+  ];
+
+  const errorPatterns = [
+    /エラー/,
+    /Error/i,
+    /失敗/,
+    /リトライ/,
+    /Retry/i,
+  ];
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+
+    const lines = content.split("\n");
+    let inCodeBlock = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim();
+      if (trimmed.startsWith("```")) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+      if (!inCodeBlock) continue;
+
+      const hasCompletionPattern = completionPatterns.some((p) => p.test(trimmed));
+      if (!hasCompletionPattern) continue;
+
+      const isErrorContext = errorPatterns.some((p) => p.test(trimmed));
+      if (isErrorContext) continue;
+
+      foundViolation = true;
+      results.push(
+        ng(
+          "CompletionReport",
+          "inline-completion-report",
+          `Inline completion report code block detected`,
+          resolveRelative(fullPath, root),
+          i + 1
+        )
+      );
+      break;
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(ok("CompletionReport", "inline-completion-report", "No inline completion report code blocks detected"));
+  }
+  return results;
+}
+
+function checkPostCompletionOutput(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  let foundIssue = false;
+
+  const postCompletionPatterns = [
+    /完了報告.*後.*Todo/i,
+    /Todo.*一覧.*出力/,
+    /TodoWrite.*最終/,
+    /最終.*Todo/,
+    /次にやるべきことがあれば/,
+    /他にご要望があれば/,
+    /何かあればお気軽に/,
+  ];
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+
+    for (const pattern of postCompletionPatterns) {
+      if (pattern.test(content)) {
+        foundIssue = true;
+        results.push(
+          warn(
+            "CompletionReport",
+            "post-completion-output",
+            `Post-completion output instruction detected (${pattern.source})`,
+            resolveRelative(fullPath, root)
+          )
+        );
+      }
+    }
+  }
+
+  if (!foundIssue) {
+    results.push(ok("CompletionReport", "post-completion-output", "No post-completion output instructions detected"));
+  }
+  return results;
+}
+
+function checkTerminology(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  let foundOld = false;
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      if (/次のステップ/.test(lines[i])) {
+        foundOld = true;
+        results.push(
+          warn(
+            "CompletionReport",
+            "old-terminology",
+            `Old terminology '次のステップ' found (should be '次のコマンド')`,
+            resolveRelative(fullPath, root),
+            i + 1
+          )
+        );
+      }
+    }
+  }
+
+  if (!foundOld) {
+    results.push(ok("CompletionReport", "old-terminology", "No old terminology ('次のステップ') detected in command definitions"));
+  }
+  return results;
+}
+
 function checkSpecsExistence(specsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const requiredSpecs = ["system.md", "patterns.md"];
@@ -566,6 +780,7 @@ async function main(): Promise<void> {
   const specsDir = path.join(root, "docs", "specs");
   const skillsDir = path.join(root, ".opencode", "skills");
   const cmdDir = path.join(root, ".opencode", "commands", "agentdev");
+  const completionReportsPath = path.join(root, ".opencode", "skills", "agentdev-workflow-reporting", "reference", "completion-reports.md");
 
   const scanned: Record<string, number> = {
     REQ: listFiles(reqDir).filter((f) => f.startsWith("REQ-")).length,
@@ -601,6 +816,11 @@ async function main(): Promise<void> {
     ...checkLegacyNamespace(skillsDir, cmdDir, root),
     ...checkNameCollision(skillsDir, root),
     ...checkSpecsExistence(specsDir, root),
+    ...checkCompletionReportSkills(cmdDir, root),
+    ...checkCompletionReportTemplates(cmdDir, completionReportsPath, root),
+    ...checkInlineCompletionReports(cmdDir, root),
+    ...checkPostCompletionOutput(cmdDir, root),
+    ...checkTerminology(cmdDir, root),
   ];
 
   const summary = computeSummary(results);

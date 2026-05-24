@@ -4,6 +4,7 @@ agent: sisyphus
 load_skills:
   - agentdev-learning-capture
   - agentdev-learning-pipeline
+  - agentdev-workflow-reporting
 ---
 
 # 学びの昇華判定と Requirement Source stub 生成
@@ -118,20 +119,7 @@ load_skills:
          {git_error_output}
          ```
 
-9. **完了報告**:
-   - 生成した stub ファイル一覧（パス・カテゴリ・内容要約）
-   - prune 結果（除去したエントリ数・残存エントリ数）
-   - **次ステップの案内**:
-      - 「生成した stub は `req-define` の明示入力ファイルとして要件化してください」
-      - 「`/agentdev/req-define` に対象の stub ファイルパスを指定して開始できます」
-       - 例: `/agentdev/req-define .agentdev/learning/elevation-staging/existing-command-windows-escape.md`
-   - **注意事項**:
-      - `.opencode/` への直接配置・直接反映は行わないこと
-      - stub は必ず `req-define` を経由すること（`case-run` に直接渡さないこと）
-   - **git 永続化結果**:
-      - 変更の有無（あり/なし）
-      - 変更ありの場合: commit されたファイル一覧、commit hash、push 成否
-      - 変更なしの場合: 「変更なし（commit/push スキップ）」
+ 9. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → learning-promote 完了時）に従って出力。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## Guardrails
 

@@ -4,6 +4,7 @@ agent: sisyphus
 load_skills:
   - agentdev-learning-capture
   - agentdev-learning-pipeline
+  - agentdev-workflow-reporting
 ---
 
 # 学びの問題クラス分類・8軸評価とアーカイブ
@@ -123,20 +124,7 @@ archive.md 内の古い単発レアケースを削除候補として特定する
 
 ### 10. 完了報告
 
-- 問題クラス数（未分類含む）
-- 処理したエントリ数（inbox → archive）
-- prune したエントリ数（実施した場合）
-- evaluation-report.md のパス
-- **git 永続化結果**:
-  - 変更の有無（あり/なし）
-  - 変更ありの場合: commit されたファイル一覧、commit hash、push 成否
-  - 変更なしの場合: 「変更なし（commit/push スキップ）」
-
-### 11. learning-promote 提案
-
-- evaluation-report.md に問題クラスが検出された場合:
-  「問題クラスが検出されました。`/agentdev/learning-promote` で昇華判定を行うことを推奨します」
-- 未分類エントリのみの場合でも、evaluation-report.md は保存済み
+完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → learning-refine 完了時）に従って出力。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## ユーザー確認ポイント
 
