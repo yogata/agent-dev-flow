@@ -38,26 +38,20 @@
 
 ## ディレクトリ構造の方針
 
-### 現在の構造（per-file）
+### 正本構造（per-file）
 
-現在は `REQ-{NNNN}.md` の per-file 構造で運用している。各要件が1ファイルに対応するシンプルな構成である。
+`REQ-{NNNN}.md` を要件の永続正本とする。各要件が1ファイルに対応する。
 
-### 将来の標準構造（area-based）
+### views（観点別体系化ビュー）
 
-将来の標準構造として、area（領域）単位での要件管理に移行する予定である:
+`views/*.md` は正本REQを観点別に体系化した非正本文書である。正本と views が矛盾する場合、`REQ-{NNNN}.md` を正とする。
 
-```
-docs/requirements/
-├── README.md          # 運用説明（本ファイル）
-├── INDEX.md           # generated artifact（手動編集禁止）
-├── core.md            # 初期・暫定area
-├── {area}.md          # 安定area
-└── REQ-{NNNN}.md      # 移行対象（将来廃止予定）
-```
+- `views/*.md` は generated artifact である必要はない（手動で体系化・編集してよい）
+- `INDEX.md` は補助インデックスとする（generated か手動かは未確定）
+- `areas/`、`sources/` は作成しない
+- `views/` が未作成の領域は更新不要
 
-- **INDEX.md** は generated artifact であり、手動での編集は行わない。INDEX.md の生成は `req-file-manager` スキルが管轄する
-- **core.md** は初期・暫定area として全要件を配置する。area の分割は自然な凝集度が確認できた段階で実施する
-- `unclassified.md`、`sources/`、`areas/` は作成しない
-- 既存 `REQ-{NNNN}.md` ファイルの一括移行は行わず、別 Issue で段階的に実施する
+### 関連
 
-詳細は ADR-0004（要件管理構造の area-based 移行方針）を参照。
+- ADR-0004: 要件管理構造の area-based 移行方針（superseded by ADR-0007）
+- ADR-0007: REQ/ADR正本構造と分類ビュー運用の再定義
