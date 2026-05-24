@@ -92,3 +92,21 @@
 - **想定反映先**: コマンド（case-close.md Step 7 の警告メッセージ）
 - **関連**: Issue #381, `.opencode/commands/agentdev/case-close.md`
 - **タグ**: `#git` `#worktree` `#windows` `#file-lock`
+
+---
+
+## case-run サブエージェントがソースファイルに未コミット変更を残して終了し worktree remove が失敗する
+
+- **問題事象**: case-close Step 7 で `git worktree remove ".worktrees/389-feature"` が「contains modified or untracked files」エラーで失敗。原因は case-run Wave 1 のサブエージェントが `.opencode/commands/agentdev/integrity-check.md` に未コミット変更を残したまま終了したため。当該変更は既に squash merge 済みの PR #390 に含まれている内容と同一であり、エージェントが worktree 内のファイルを編集後にコミットせず終了した
+- **発生局面**: 完了処理（case-close Step 7 ブランチ・worktree削除）
+- **検知方法**: `git worktree remove` の stderr エラーメッセージ、`git status --short` で ` M .opencode/commands/agentdev/integrity-check.md` を確認
+- **根本原因**: case-run のサブエージェント（general agent）がタスク完了後に変更を git add/commit せず、変更が worktree に残存した。サブエージェントのプロンプトに「変更をコミットすること」の指示がなかった、またはエージェントが指示を遵守しなかった
+- **自律対応内容**: 変更内容が既にマージ済みPRと同一であることを確認し、`--force` で worktree を強制削除した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: case-run でサブエージェントを並列実行する全ケースで発生する可能性がある。特に複数ファイルを同時に修正するWave実行時
+- **再発条件**: case-run Wave のサブエージェントがファイルを編集し、コミット前に終了する場合
+- **予防策候補**: case-run の Step 7 で、Wave完了後に worktree 内の `git status --short` で未コミット変更を検出し、適切にコミットまたは破棄する確認ステップを追加する
+- **想定反映先**: コマンド（case-run.md Step 7 のWave完了後確認）
+- **関連**: Issue #389, PR #390, `.opencode/commands/agentdev/case-run.md`
+- **タグ**: `#case-run` `#subagent` `#git` `#worktree` `#uncommitted-changes`
