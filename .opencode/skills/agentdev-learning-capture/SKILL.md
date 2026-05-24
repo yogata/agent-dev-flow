@@ -57,6 +57,12 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 > **注意**: inbox.md、archive.mdが存在しない場合、エージェント SHALL は当該ファイルを作成してから追記する。
 
+### ファイル操作とgit永続化の分離
+
+本スキルは**ファイルの作成・追記**を行うが、**git永続化（commit/push）は呼出元コマンドの責務**である。本スキル内で `git add` / `git commit` / `git push` を実行してはならない。
+
+> **責務分界**: 本スキルはファイルの作成・追記のみを行う。git永続化（commit/push）は呼び出し元コマンド（例: `case-close`）の責務であり、本スキルは git 操作を行わない。
+
 ## How to Use This Skill
 
 ### Step 1: 学びの検知（エージェント主体）
@@ -145,6 +151,20 @@ inbox.mdのエントリ数（`## ` で始まる行）をカウントする。
 - **複雑なロジックを使わない** — シンプルなテキスト追記のみ
 - **intake item を作成しない** — 学びの抽出過程で具体的な修正対象が残る場合は、intake workflow（`/agentdev/intake-capture`）に委ねる（REQ-0019-027）。learning capture は intake item を作成しない
 
+## 観測の分割ルール
+
+単一の観測から learning 内容と intake 内容の両方が得られる場合、以下の split rule に従い別々の artifact に分離する:
+
+| 内容の性質 | 向け先 | 理由 |
+|---|---|---|
+| 具体的な修正対象（積み残し作業候補・バグ・設定不備等） | intake item（`/agentdev/intake-capture`） | 具体的作業は intake workflow が管理 |
+| 再発防止知見（予防策・判断基準・運用ルール等） | learning item（`inbox.md`） | 知見の蓄積・昇華は learning pipeline が管理 |
+| 両方含まれる | 両方に分割してそれぞれ出力 | 1観測 = 最大1 learning item + 1 intake item |
+
 ## Learning の位置づけ（REQ-0019-028）
 
 learning は「改善提案そのもの」ではなく「改善提案へ昇華されうる再発防止知見」である。具体的な修正対象（積み残し作業候補）は intake workflow が担当し、learning は再発防止に向けた知見の蓄積・分類・昇華を担当する。両者が同じ観測から得られる場合は、intake item と learning item を別々に作成する（capture-boundaries.md の split rule 参照）。
+
+### split rule 準拠要件
+
+単一の観測が同時に learning item と intake item の両方を生み出す場合、本スキルは learning item のみを生成し、intake item の生成は `/agentdev/intake-capture` に委ねる。1つの観測から得られた知見を単一エントリに混在させてはならない（capture-boundaries.md の split rule に準拠）。

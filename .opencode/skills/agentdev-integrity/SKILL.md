@@ -18,7 +18,7 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 - 完了報告フォーマットの整合性検証（REQ-0024-017, REQ-0024-018）
 - ワークフローテンプレートの構造検証
 - Skill 構造（SKILL.md）の lint
-- 検出結果の JSON / Markdown レポート生成
+- 検出結果の Markdown レポート生成
 
 ## DO NOT USE FOR
 
@@ -71,57 +71,60 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 
 ## レポート Schema
 
-### JSON 出力
-
-```typescript
-interface IntegrityReport {
-  timestamp: string;          // ISO 8601
-  scanned: {
-    reqs: number;
-    adrs: number;
-    skills: number;
-    commands: number;
-    templates: number;
-  };
-  summary: {
-    ok: number;
-    ng: number;
-    warning: number;
-    info: number;
-  };
-  results: CheckResult[];
-}
-
-interface CheckResult {
-  category: string;
-  check: string;
-  level: "ok" | "ng" | "warning" | "info";
-  message: string;
-  file?: string;
-  line?: number;
-}
-```
-
 ### Markdown 出力
 
 `/agentdev/integrity-check` command の Step 7 レポート形式に準拠。
 
+```markdown
+# Integrity Check Report
+
+- **実行日時**: YYYY-MM-DD HH:MM
+- **スキャン対象**: REQ N件、ADR N件、Skill N件、Command N件
+
+## サマリ
+
+| 検査カテゴリ | OK | NG | 備考 |
+|-------------|----|----|------|
+| REQ frontmatter↔ファイル名 | N | N | — |
+| ADR↔REQ 相互参照 | N | N | — |
+| Skill↔load_skills 参照 | N | N | — |
+| Command-map↔実体 | N | N | — |
+| 旧 namespace 残存 | N | N | — |
+| 完了報告フォーマット | N | N | — |
+
+## 詳細
+
+### REQ frontmatter↔ファイル名
+{検出結果の詳細}
+
+### ADR↔REQ 相互参照
+{検出結果の詳細}
+
+### Skill↔load_skills 参照
+{検出結果の詳細}
+
+### Command-map↔実体
+{検出結果の詳細}
+
+### 旧 namespace 残存
+{検出結果の詳細}
+
+### 完了報告フォーマット
+{検出結果の詳細}
+```
+
 ## 出力規約
 
 - **レポート出力先**: `.agentdev/integrity/reports/`
-- **ファイル名**: `YYYY-MM-DD-integrity-report.{json,md}`
+- **ファイル名**: `YYYY-MM-DD-integrity-report.md`
 - **ディレクトリが存在しない場合**: 作成する
 - **過去レポート**: 上書きしない（日付ベースで毎回新規作成）
 
-## Intake Item 化候補ルール
+## スキルの責務範囲
 
-- NG レベルの検出結果は intake item 化候補とする
-- warning レベルはユーザー判断に委ねる
-- 検出 → intake item 化の最終判断は `/agentdev/integrity-check` command（ユーザー承認時のみ）
+本スキルは検査・レポートschema定義のみを提供する。intake item の作成（`.agentdev/intake/inbox/` へのファイル生成）は `/agentdev/integrity-check` コマンドの責務であり、本スキルは intake item 作成の判定基準や手順を定義しない。
 
 ## Validator 呼び出し規約
-
-各 validator script は 共通 CLI 契約（REQ-0021-021~027）に従う:
 
 - `--help`: 使用方法を表示
 - `--json`: JSON 形式で出力

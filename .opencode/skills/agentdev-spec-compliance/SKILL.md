@@ -171,7 +171,16 @@ description: Detects deviations between implementation and requirements (REQ), w
 
 ---
 
+## 責務範囲
+
+本スキルは**乖離の分類と推奨アクションの提示**に限定する。REQ ファイルの更新判断・更新実行は行わない。REQ 更新の最終判断は `/agentdev/case-update` がユーザー承認済み入力をもって行う。
+
+- **本スキルが行うこと**: 乖離の分類（spec-bug / impl-bug / scope-creep）、影響度判定、修正方針の提示、推奨アクションの提示
+- **本スキルが行わないこと**: REQ ファイルの更新判断、REQ ファイルの変更、仕様変更の承認
+
 ## case-update連携
+
+本スキルは乖離の分類と推奨アクションの提示までを責務とし、REQ更新の最終判断は case-update（ユーザー承認入力）に委譲する。
 
 ### 乖離タイプ→case-updateフラグ マッピング
 

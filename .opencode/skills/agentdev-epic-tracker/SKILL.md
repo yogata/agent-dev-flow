@@ -5,7 +5,7 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 
 # Epic Status Tracker
 
-親Epic Issueのステータス追跡テーブル（☐ 未着手 / 🔄 進行中 / ✅ 完了 / ❌ 対処不要）を更新する知識ベース。
+親Epic Issueのステータス追跡テーブル（☐ 未着手 / 🔄 進行中 / ✅ 完了 / ❌ 対処不要 / ⏭ スキップ）を更新する知識ベース。
 
 - **参照元**: `case-run`（Phase A: 進行中更新）、`case-close`（Step 8: 完了更新）
 - **特性**: 宣言的定義のみ提供。手順・手続きは各コマンド定義に委ねる
@@ -18,6 +18,8 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 | `🔄 進行中` | 子Issue作業中 | `case-run` Phase A | いいえ |
 | `✅ 完了 ([PR#N](URL))` | 子Issue完了 | `case-close` Step 8 | はい |
 | `❌ 対処不要` | 対処不要（手動設定） | ユーザー手動 | はい |
+| `⏭ スキップ` | Epic Orchestrator が後続Wave制御でスキップした子Issue。手動操作では使用不可（Orchestratorのみ設定可能） | Epic Orchestrator Wave完了時 | はい |
+| `⏭ スキップ` | Orchestratorによるスキップ（手動設定不可） | Epic Orchestrator（Wave完了時） | はい |
 
 ## 親Epic検出
 
@@ -37,7 +39,7 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 4. 正規表現で該当子Issue行を特定・置換（後述「正規表現パターン」の新4列/旧4列形式に対応）:
    - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
    - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
-5. 既に `🔄 進行中`、`✅ 完了`、または `❌ 対処不要` の場合 → スキップ（べき等性）
+5. 既に `🔄 進行中`、`✅ 完了`、`❌ 対処不要`、または `⏭ スキップ` の場合 → スキップ（べき等性）
 6. `gh issue edit {N} --body-file {temp}` でEpic本文を更新
 7. 更新失敗時 → 警告表示して `case-run` 自体は継続（フォールバック）
 
@@ -51,13 +53,13 @@ Wave開始時一括更新（`☐ 未着手` → `🔄 進行中`）:
 3. 子Issue番号の昇順で、各子Issue行を一括置換:
    - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
    - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
-4. 既に `🔄 進行中`、`✅ 完了`、または `❌ 対処不要` の場合 → スキップ（べき等性）
+4. 既に `🔄 進行中`、`✅ 完了`、`❌ 対処不要`、または `⏭ スキップ` の場合 → スキップ（べき等性）
 5. `gh issue edit {epic_N} --body-file {temp}` でEpic本文を一括更新
 
 Wave完了時ステータス更新:
 - 成功した子Issue: `🔄 進行中` → `✅ 完了 ([PR#{pr_number}]({pr_url}))` （`case-close` で実行）
 - 失敗した子Issue: `🔄 進行中` を維持（再実行可能にするため）
-- スキップされた子Issue: `🔄 進行中` → `⏭ スキップ` （Orchestratorが設定）
+- スキップされた子Issue: `🔄 進行中` → `⏭ スキップ` （Orchestratorのみ設定、手動操作では使用不可）
 
 一括更新順序: 子Issue番号の昇順
 
@@ -140,6 +142,7 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 - 対象行が既に目標ステータス → スキップ
 - 対象行が不存在 → 警告表示してスキップ
 - `❌ 対処不要` の行 → 更新対象外（スキップ）
+- `⏭ スキップ` の行 → 更新対象外（スキップ）
 
 ## See Also
 

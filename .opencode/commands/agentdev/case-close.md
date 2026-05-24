@@ -99,7 +99,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - worktree prune
     - ローカルブランチ削除（`git branch -d`）
     - **リモートブランチ削除**（`git push origin --delete`）— `agentdev-git-worktree` スキル Step 5 参照
-    - 削除の成否を確認し、失敗した場合は警告表示してユーザーの判断を仰ぐ
+    - 削除の成否を確認し、失敗した場合は警告表示して停止する（SHALL。「警告して継続」ではなく「警告して停止」に統一）
  8. 親Epic Issue更新（`agentdev-epic-tracker` スキル参照）:
     - Issue本文からParent Issue番号を特定（`Parent: #{N}` パターンを検索）
     - Parent Issueが存在しない場合 → スキップ
@@ -120,9 +120,20 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
             - `gh issue close {epic_number} --reason completed` でEpicをクローズ
             - 完了報告に「Epic #{N} を自動クローズ」と表示
         - 1件以上 "OPEN" の子Issueがある場合 → スキップ（完了報告に「Epic #{N}: N件未完了のためスキップ」と表示）
-8b. 実行前同期（git pull）:
+ 8b. 実行前同期（git pull）:
+    - pull前のHEAD commit hash を記録する（`git rev-parse HEAD`）
     - カレントディレクトリで `git pull --ff-only` を実行する
-    - **失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
+    - pull後のHEAD commit hash を取得し、pull前のhashと一致することを確認する（hash一致 = リモートに新規コミットなし）
+    - **hash不一致時**: リモートの新規コミットが取り込まれたため、Step 2-8の評価・承認をやり直す必要がある。以下の構造化エラーメッセージを表示して停止する:
+      ```
+      ## Git 同期エラー（hash 不一致）
+
+      **事前hash**: {pre_pull_hash}
+      **事後hash**: {post_pull_hash}
+      **停止理由**: pull により新規コミットが取り込まれた。Step 2-8 の評価・承認をやり直すこと
+      **ユーザーアクション**: `case-close` を最初から再実行してください
+      ```
+    - **pull自体の失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
       ```
       ## Git 同期エラー
 
@@ -179,10 +190,11 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
             {git_error_output}
             ```
 10. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → case-close 完了時）に従って出力
-    - **git 永続化結果**（完了報告に追加）:
-        - 変更の有無（あり/なし）
-        - 変更ありの場合: commit されたファイル一覧、commit hash、push 成否
-        - 変更なしの場合: 「変更なし（commit/push スキップ）」
+    - **結果状態の分離報告**（SHALL）— 以下の3系統を独立して報告し、部分失敗を明示する:
+        1. **GitHub側完了状態**: PRマージ成否、Issueクローズ成否、Parent Epic更新成否
+        2. **`.agentdev` 永続化状態**: 変更の有無（あり/なし）、commit されたファイル一覧、commit hash、push 成否
+        3. **ブランチ・worktree削除状態**: 削除成否（ローカル/リモート別）
+    - GitHub側が完了しているにもかかわらず `.agentdev` push が失敗した場合は「GitHub完了 / domain state永続化失敗」として報告し、完了扱いにしない
 
 ## Guardrails
 
@@ -192,7 +204,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G03: Issue番号の解決に `gh issue list` / `gh issue status` 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
 - G04: Epic自動クローズは全子IssueがCLOSEDの場合のみ実行。子Issue状態取得失敗時はEpicクローズしない
 - G05: Step 7 のブランチ・worktree削除（ローカル+リモート）は必ず実行し、成否を確認すること。削除失敗時は警告表示して停止
-- G06: Step 8b の `git pull --ff-only` は必ず実行すること。pull失敗時は自動解決せずエラー報告して停止
+- G06: Step 8b の `git pull --ff-only` は必ず実行すること。pull前後のhash検証を行い、不一致時は評価・承認のやり直しが必要。pull自体の失敗時は自動解決せずエラー報告して停止
 
 ### 品質ゲート
 - G07: PRのCIが通っていることを確認（`gh pr checks`）。CI/CDが失敗している場合は case-run に差し戻す（case-close は修正を行わない）
@@ -212,8 +224,10 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 ### 出力制約
 - G19: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
-- G20: Step 8b の `git pull --ff-only` 失敗時は自動解消せず、構造化エラーメッセージを表示して停止すること
+- G20: Step 8b で pull 前後の hash が不一致の場合、および pull 自体が失敗した場合、構造化エラーメッセージを表示して停止すること
 - G21: Step 9c の commit は `.agentdev/` 配下のみを対象とすること。他のパスを巻き込まないこと
 - G22: Step 9c で learning capture と intake capture の成果物を同一 commit に含めること
 - G23: Step 9c の push 失敗時は PR/Issue完了済み、domain state永続化失敗として構造化エラーメッセージを表示して停止すること
 - G24: `.agentdev/` 配下に変更がない場合は commit/push をスキップすること
+- G25: Step 10 の完了報告は PRマージ/Issueクローズ/`.agentdev`永続化/ブランチ削除の結果状態を分離して報告すること（SHALL）。GitHub側完了後に `.agentdev` push が失敗した場合は「GitHub完了 / domain state永続化失敗」として扱い、完了扱いにしないこと
+- G26: Step 7 のブランチ・worktree削除失敗時は「警告して停止」に統一すること（SHALL）。「警告して継続」「ユーザーの判断を仰ぐ」は不可

@@ -20,7 +20,7 @@ load_skills:
 - エラーログ（バグ修正の場合）
 - **ユーザーが明示した入力ファイル**（要件ソース — Requirement Source）:
   - 要件化前の設計メモ、調査メモ、反映指示書
-  - learning-promote が生成した staging stub（Requirement Source 形式）
+  - learning-promote が生成した staging stub
   - その他変更内容・背景・制約・完了条件を含む source file
   - intake-promote が生成した promoted artifact（`.agentdev/intake/promoted/req-define/` 内の Markdown ファイル）
 - req-save が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
@@ -114,7 +114,7 @@ load_skills:
  5. ADR閾値以上の技術判断が発生した場合 → `agentdev-adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は req-save で実行）
  6. 要件doc形式で生成 → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read tool で読み込み、目的/要件/適用範囲の構造に従って内容を構造化
      **テンプレート準拠要件**: テンプレートの【必須】セクション（目的、要件、適用範囲）が全て要件docに含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-     **Requirement Source セクション**（REQ-0023-001, REQ-0023-002）: 入力ファイルのパスに `.agentdev/learning/elevation-staging/*.md` が含まれる場合、要件docの `## 適用範囲` の後に `## Requirement Source` セクションを追加する。セクションには入力ファイルのパスをリスト形式（`- {filepath}`）で記録する。汎用的な機構であり、elevation-staging 専用の分岐は追加しない。staging stub 以外のソースファイルも同セクションに含める
+      **Requirement Source セクション**（REQ-0023-001, REQ-0023-002）: ユーザーが明示した入力ファイル（Requirement Source）が1件以上存在する場合、要件docの `## 適用範囲` の後に `## Requirement Source` セクションを追加する。セクションには全ての入力ファイルのパスをリスト形式（`- {filepath}`）で記録する。source file の種類（staging stub, promoted artifact, finding file 等）による条件分岐は行わず、全ての明示入力ファイルを統一的に扱う
  7. パターン判定:
     - ラベルに基づいて Pattern 判定: `bug`, `critical` → Pattern A, `enhancement`, `feature` → Pattern B, `refactor`, `maintenance` → Pattern C, `docs`, `chore` → Pattern D
     - **Pattern A + ADR必要時の Pattern B 昇格**: Pattern A で ADR閾値以上の技術判断が発生した場合、Pattern B に昇格する（REQファイル・ADRファイルの作成が必要となるため）
@@ -144,7 +144,7 @@ load_skills:
        - **scale**: standard | large
        - **decomposition**: [{scope, modules, description}]（scale が large の場合のみ）
        - **create-rationale**: {CREATEを選択した理由}（req-operation が CREATE の場合に必須。APPEND/UPDATE候補があった場合はその理由も含む）
-        - **status**: draft（初期値。req-save → saved, case-open → issued + 削除）
+        - **status**: draft（初期値。req-save → saved, case-open → 削除）
       ```
     - **バグ修正・軽微変更**: ドラフト保存不要。セッション内で要件docを完結させる
     - **リファクタリング・保守作業 / ドキュメント・雑務**: ドラフト保存不要。セッション内で要件docを完結させる（バグ修正・軽微変更と同等のlightweight workflow）
@@ -152,13 +152,8 @@ load_skills:
     - **差し戻し**: ユーザーが修正・差し戻しを指示した場合、壁打ちを継続（Step 1に戻る）
     - **要件doc確定**: ユーザーが次のコマンド（`/agentdev/req-save` または `/agentdev/case-open`）を実行したことを要件doc確定の意思表示として扱う
  11. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → req-define 完了時）に従って出力（壁打ち結論ハイライトの表示を必ず含めること）:
-      - 機能追加: `次のコマンド: /agentdev/req-save`
-      - バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務: `次のコマンド: /agentdev/case-open`
-
-12. **consumed artifact の削除**: Step 1 で `.agentdev/intake/promoted/req-define/` から読み込んだ artifact がある場合、要件docの確定後に当該 artifact を削除する:
-    - **削除条件**: 要件docが確定した場合のみ（差し戻し時は削除しない）
-    - 削除対象は Step 1 で読み込んだ `.agentdev/intake/promoted/req-define/{filename}` のみ
-    - **git 操作は行わない**（G07）。削除はローカルファイルシステムのみ。後続の req-save 等での commit 対象となる
+       - 機能追加: `次のコマンド: /agentdev/req-save`
+       - バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務: `次のコマンド: /agentdev/case-open`
 
 ## Guardrails
 
@@ -167,8 +162,8 @@ load_skills:
 - G02: 関連ドキュメントの個別ファイル列挙をユーザーに求めない。責務は要件の壁打ち・構造化に専念する
 
 ### ファイル操作制約
-- G03: ファイル編集スコープ: `.sisyphus/drafts/**` のみ作成・編集を許可。ただし Step 12 での `.agentdev/intake/promoted/req-define/` 内の artifact 削除は許可する
-- G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）。例外: `.agentdev/intake/promoted/req-define/` の artifact は消費後（Step 12）に削除する
+- G03: ファイル編集スコープ: `.sisyphus/drafts/**` のみ作成・編集を許可
+- G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）。`.agentdev/intake/promoted/req-define/` の artifact の削除は req-define では行わず、後続の req-save または case-open の成功後に実行する
 - G05: `docs/` 配下の広範な探索は禁止（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用）
 - G06: `inbox.md` / `archive.md` を直接ロードしない（raw learning item は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
 

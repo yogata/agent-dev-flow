@@ -9,6 +9,28 @@ description: Enforces safe GitHub CLI usage on Windows (PowerShell/cmd) by routi
 
 Windows上の標準シェル（PowerShell/cmd.exe）の制約を回避するため、以下の手順を強制する。
 
+## 共通制約（全環境共通）
+
+- `--body-file` / `-F` によるファイル指定を全環境で使用する（`--body` 直接指定は禁止）
+- 書き込み後の VERIFY 操作（Section 5-8）を全環境で実行する
+- 保存形式は **UTF-8 (BOMなし)**、改行コード **LF** とする
+
+## Windows 固有の制約
+
+### PowerShell エンコーディング問題
+
+- PowerShell はネイティブコマンド（gh CLI）の UTF-8 出力をパイプライン経由でエンコーディング変換する。Windows PowerShell 5.x では Shift-JIS に変換、pwsh 7 でも日本語が破損する場合がある
+- Windows PowerShell 5.x の `Out-File -Encoding utf8` は BOM 付き UTF-8 を生成し、要件に違反する
+
+### BOM 問題
+
+- PowerShell のファイル書き込みコマンド（`Out-File`, `Set-Content`, `>` リダイレクト, `>>` 追記リダイレクト, `New-Item`（コンテンツ付き）, `[IO.File]::WriteAllLines`）は BOM 付きまたは Shift-JIS になる可能性があるため使用禁止
+- **例外**: `[System.IO.File]::WriteAllText` に `UTF8Encoding($false)` を指定する場合は許可する
+
+### execSync バイパス
+
+- `gh` コマンドの出力取得には Node.js `child_process.execSync` を使用する（pwsh パイプラインをバイパスして gh CLI の生の UTF-8 出力を直接取得するため）
+
 ## WRITE操作（書き込み安全性）
 
 ### 1. 禁止事項
