@@ -36,6 +36,7 @@
   - [REQ-0029: intake-open promoted artifact 一括処理](requirements/REQ-0029.md)
   - [REQ-0030: agentdev コマンド群の体系的テスト実装](requirements/REQ-0030.md)
   - [REQ-0031: GitHub本文内リポジトリ参照リンクの正規化](requirements/REQ-0031.md)
+  - [REQ-0032: case-close 未チェック項目達成判定](requirements/REQ-0032.md)
 
 ## Specifications
 
