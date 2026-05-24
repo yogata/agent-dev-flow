@@ -109,6 +109,40 @@ intake-open は intake-promote が生成した promoted artifact（最小 frontm
 - `<!-- 【必須】 -->` が見出し行の直後にある場合、その見出しが必須セクション
 - 検証対象は見出し行（`## ...`）の文字列一致
 
+## リポジトリ参照リンク規約
+
+Issue/PR/コメント本文にリポジトリ内ファイル・ディレクトリへの参照を含める場合、正しいGitHub URLを使用すること（SHALL）。
+
+### URL形式
+
+| 種別 | URL形式 |
+|------|---------|
+| ファイル参照 | `https://github.com/{owner}/{repo}/blob/{branch}/{path}` |
+| ディレクトリ参照 | `https://github.com/{owner}/{repo}/tree/{branch}/{path}` |
+
+### パス規則
+
+| 参照対象 | パス例 |
+|----------|--------|
+| REQファイル | `docs/requirements/REQ-0031.md` |
+| ADRファイル | `docs/adr/ADR-0001.md` |
+| .opencode配下ファイル | `.opencode/skills/agentdev-gh-cli/SKILL.md` |
+| .opencode配下ディレクトリ | `.opencode/skills/` |
+
+### 変換ルール
+
+- `docs/requirements/REQ-0031.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/requirements/REQ-0031.md`
+- `docs/adr/ADR-0001.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/adr/ADR-0001.md`
+- `.opencode/skills/agentdev-gh-cli/SKILL.md` → `https://github.com/yogata/agent-dev-flow/blob/main/.opencode/skills/agentdev-gh-cli/SKILL.md`
+- `.opencode/skills/` → `https://github.com/yogata/agent-dev-flow/tree/main/.opencode/skills/`
+
+### 対象外
+
+- テンプレート変数プレースホルダー（`{xxx}` 形式）
+- コードブロック内のパス参照
+- `http://` `https://` で始まる既存URL
+- リポジトリ内Markdownファイル間の相対リンク
+
 ## テンプレート追加・更新規約
 
 ### 命名規則

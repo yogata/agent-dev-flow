@@ -88,6 +88,7 @@ function main(): void {
     checkSectionMarkers(fileName, lines, results);
     checkPlaceholders(fileName, lines, results);
     checkTableStructure(fileName, lines, results);
+    checkBarePathReferences(fileName, content, results);
 
     if (fileName.includes("feature")) {
       checkSectionOrder(fileName, lines, results);
@@ -550,6 +551,50 @@ function checkSectionOrder(
         "Completeness",
         "Section order",
         `Sections appear in expected order: ${found.map((s) => s.name).join(" → ")}`,
+        fileName,
+      ),
+    );
+  }
+}
+
+function checkBarePathReferences(
+  fileName: string,
+  content: string,
+  results: CheckResult[],
+): void {
+  const lines = content.split("\n");
+  const barePathPattern = /\(docs\/requirements\/[^)]+\)|\(docs\/adr\/[^)]+\)|\(\.opencode\/[^)]+\)|\(\.\.\/docs\/[^)]+\)/;
+  let inCodeBlock = false;
+  let foundIssue = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trim().startsWith("```")) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
+
+    if (barePathPattern.test(line)) {
+      results.push(
+        warn(
+          "LinkNormalization",
+          "Bare path references",
+          `Non-normalized repository path found: ${line.trim()}`,
+          fileName,
+          i + 1,
+        ),
+      );
+      foundIssue = true;
+    }
+  }
+
+  if (!foundIssue) {
+    results.push(
+      ok(
+        "LinkNormalization",
+        "Bare path references",
+        "No bare path references found",
         fileName,
       ),
     );
