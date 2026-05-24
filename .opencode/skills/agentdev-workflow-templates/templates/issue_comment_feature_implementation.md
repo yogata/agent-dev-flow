@@ -27,7 +27,7 @@ YYYY-MM-DD
 ### 関連docs
 <!-- 【任意】 -->
 
-- Requirements: `docs/requirements.md#xxx`
-- Specifications: `docs/specifications.md#xxx`
-- Implementation Guide: `docs/implementation-guide.md#xxx`
-- ADR: `docs/adr/NNN-xxx.md`
+- Requirements: {req_url}
+- Specifications: {spec_url}
+- Implementation Guide: {impl_guide_url}
+- ADR: {adr_url}

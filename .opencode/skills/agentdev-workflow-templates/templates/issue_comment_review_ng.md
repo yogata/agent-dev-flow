@@ -34,7 +34,7 @@
 <!-- 【必須】 -->
 
 関連REQ番号:
-- `docs/requirements.md#xxx`
+- {related_req_url}
 
 ## Spec Compliance 結果
 <!-- 【任意】 -->

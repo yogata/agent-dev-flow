@@ -291,6 +291,77 @@ function checkRequiredSections(expected: string, actual: string, results: CheckR
   }
 }
 
+function checkLinkNormalization(actual: string, results: CheckResult[]): void {
+  const lines = actual.split("\n");
+  const violations: { line: number; path: string }[] = [];
+  
+  // Track code blocks to exclude
+  let inCodeBlock = false;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    // Toggle code block state
+    if (line.trimStart().startsWith("```")) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    
+    if (inCodeBlock) continue;
+    
+    // Check inline code spans - skip content inside backticks
+    // We need to check only the parts outside inline code
+    const outsideCode = removeInlineCode(line);
+    
+    // Find Markdown link targets: [text](url)
+    const linkPattern = /\[([^\]]*)\]\(([^)]+)\)/g;
+    let match: RegExpExecArray | null;
+    while ((match = linkPattern.exec(outsideCode)) !== null) {
+      const url = match[2];
+      // Skip already-correct URLs, anchors only, and template variables
+      if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("#") || url.startsWith("{")) {
+        continue;
+      }
+      // Detect relative/bare paths that look like repo paths
+      if (url.startsWith("docs/") || url.startsWith(".opencode/") || url.startsWith("../docs/") || url.startsWith("../.opencode/")) {
+        violations.push({ line: i + 1, path: url });
+      }
+    }
+    
+    // Also detect bare backtick-wrapped paths that are NOT inside Markdown links
+    // e.g., `docs/requirements/REQ-0031.md` without a link wrapper
+    const backtickPathPattern = /`([^`]*\.(md|ts|js|json|yaml|yml)[^`]*)`/g;
+    let btMatch: RegExpExecArray | null;
+    while ((btMatch = backtickPathPattern.exec(line)) !== null) {
+      const pathContent = btMatch[1];
+      // Skip if this backtick content is already inside a link on the same line
+      if (line.includes(`](${btMatch[0]}`) || line.includes(`](${pathContent})`)) {
+        continue;
+      }
+      // Skip template variables
+      if (pathContent.includes("{") || pathContent.includes("xxx") || pathContent.includes("NNN")) {
+        continue;
+      }
+      if (pathContent.startsWith("docs/") || pathContent.startsWith(".opencode/") || pathContent.startsWith("../docs/") || pathContent.startsWith("../.opencode/")) {
+        violations.push({ line: i + 1, path: pathContent });
+      }
+    }
+  }
+  
+  if (violations.length === 0) {
+    results.push(ok("LinkNormalization", "Repository reference links", "No relative/bare path references found in actual text"));
+  } else {
+    for (const v of violations) {
+      results.push(ng("LinkNormalization", "Repository reference links", `Non-normalized repository path found: "${v.path}" (line ${v.line})`));
+    }
+  }
+}
+
+function removeInlineCode(line: string): string {
+  // Remove content within backticks (inline code) to avoid false positives
+  return line.replace(/`[^`]+`/g, "");
+}
+
 function generateDiff(expected: string, actual: string, results: CheckResult[]): void {
   const expectedLines = expected.split("\n");
   const actualLines = actual.split("\n");
@@ -359,7 +430,7 @@ async function main(): Promise<void> {
 
   if (opts.dryRun) {
     console.log(`Would verify ${expectedPath} against ${actualPath}`);
-    console.log("Checks: Encoding (UTF-8/LF, BOM, control chars, Japanese), Markdown (tables, checkboxes, code blocks, lists), RequiredSections");
+    console.log("Checks: Encoding (UTF-8/LF, BOM, control chars, Japanese), Markdown (tables, checkboxes, code blocks, lists), RequiredSections, LinkNormalization");
     process.exit(EXIT_OK);
   }
 
@@ -372,6 +443,7 @@ async function main(): Promise<void> {
   checkCodeBlockPairing(actual, results, "actual");
   checkListIndentation(expected, actual, results);
   checkRequiredSections(expected, actual, results);
+  checkLinkNormalization(actual, results);
 
   const summary = computeSummary(results);
   if (summary.ng > 0) {

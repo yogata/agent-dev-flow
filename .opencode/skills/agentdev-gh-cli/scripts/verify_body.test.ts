@@ -93,6 +93,23 @@ beforeAll(() => {
   const bomPrefix = Buffer.from([0xef, 0xbb, 0xbf]);
   const bomContent = Buffer.concat([bomPrefix, Buffer.from(VALID_BODY, "utf-8")]);
   writeFileSync(join(TEMP_DIR, "actual_bom.md"), bomContent);
+
+  // Link normalization fixtures
+  writeFileSync(
+    join(TEMP_DIR, "actual_relative_link.md"),
+    VALID_BODY + "\n\n## References\n\n- [REQ-0031](docs/requirements/REQ-0031.md)\n- [ADR-0001](../docs/adr/ADR-0001.md)\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(TEMP_DIR, "actual_github_url.md"),
+    VALID_BODY + "\n\n## References\n\n- [REQ-0031](https://github.com/yogata/agent-dev-flow/blob/main/docs/requirements/REQ-0031.md)\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(TEMP_DIR, "actual_code_block_link.md"),
+    VALID_BODY + "\n\n```\n- [REQ-0031](docs/requirements/REQ-0031.md)\n```\n",
+    "utf-8",
+  );
 });
 
 afterAll(() => {
@@ -216,5 +233,45 @@ describe("verify_body.ts", () => {
       (r) => r.category === "Encoding" && r.check === "UTF-8 / LF" && r.level === "ok" && r.message.includes("No BOM"),
     );
     expect(hasBomOk).toBe(true);
+  });
+
+  it("Relative path link: exit 1, NG for LinkNormalization", () => {
+    const result = runScript([
+      "--expected", join(TEMP_DIR, "expected.md"),
+      "--actual", join(TEMP_DIR, "actual_relative_link.md"),
+      "--json",
+    ]);
+    expect(result.exitCode).toBe(1);
+    const parsed: ReportJson = JSON.parse(result.stdout);
+    const hasLinkNg = parsed.results.some(
+      (r) => r.category === "LinkNormalization" && r.level === "ng",
+    );
+    expect(hasLinkNg).toBe(true);
+  });
+
+  it("GitHub URL: exit 0, no NG for LinkNormalization", () => {
+    const result = runScript([
+      "--expected", join(TEMP_DIR, "expected.md"),
+      "--actual", join(TEMP_DIR, "actual_github_url.md"),
+      "--json",
+    ]);
+    const parsed: ReportJson = JSON.parse(result.stdout);
+    const hasLinkNg = parsed.results.some(
+      (r) => r.category === "LinkNormalization" && r.level === "ng",
+    );
+    expect(hasLinkNg).toBe(false);
+  });
+
+  it("Code block path excluded: exit 0", () => {
+    const result = runScript([
+      "--expected", join(TEMP_DIR, "expected.md"),
+      "--actual", join(TEMP_DIR, "actual_code_block_link.md"),
+      "--json",
+    ]);
+    const parsed: ReportJson = JSON.parse(result.stdout);
+    const hasLinkNg = parsed.results.some(
+      (r) => r.category === "LinkNormalization" && r.level === "ng",
+    );
+    expect(hasLinkNg).toBe(false);
   });
 });
