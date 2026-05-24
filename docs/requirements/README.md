@@ -49,7 +49,7 @@
 `views/*.md` は正本REQを観点別に体系化した非正本文書である。正本と views が矛盾する場合、`REQ-{NNNN}.md` を正とする。
 
 - `views/*.md` は generated artifact である必要はない（手動で体系化・編集してよい）
-- `INDEX.md` は補助インデックスとする（generated か手動かは未確定）
+- `INDEX.md` は作成しない（ADR-0007 で README.md 分類ビューに統一方針）
 - `areas/`、`sources/` は作成しない
 - `views/` が未作成の領域は更新不要
 
