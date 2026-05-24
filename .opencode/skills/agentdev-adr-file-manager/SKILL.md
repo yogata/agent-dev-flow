@@ -108,9 +108,10 @@ updated: YYYY-MM-DD
 ```
 
 **README.md の役割**:
-- 全ADRの一覧表示
-- ステータス別の分類
+- 全ADRの一覧表示（ADR一覧テーブル）
+- 分類ビュー（Status View / Topic View / Decision Map / Related REQ）による探索性向上
 - ADR間の相互参照マップ
+- **注意**: README.md は分類ビューであり、ADR本文のSSoTではない（REQ-0004-066）
 
 ---
 
@@ -200,7 +201,28 @@ proposed → deprecated
 ### Issue ↔ ADR
 
 - ADRファイルはIssueから一方向参照（Issue本文にADR番号を記載）
-- ADRファイルからIssueへの逆参照は行わない
+- ADRファイルからIssueへの逆参照は原則禁止する（REQ-0004-064）。ADRを実装履歴に引きずらせないため
+- **例外**: ADR作成の経緯としてIssue番号を背景（Context）に記載することは許可する。ただし、ADR本文の決定内容が特定Issueの実装詳細に依存しないこと
+
+### README 分類ビューの運用
+
+`docs/adr/README.md` に以下の分類ビューを設ける（REQ-0004-053）:
+
+- **ADR一覧**: 全ADRの基本情報テーブル（番号、タイトル、ステータス、作成日）
+- **Status View**: ステータス別の分類（proposed / accepted / superseded）
+- **Topic View**: 対象領域別の分類
+- **Decision Map**: ADR間の関係性（supersedes / relates-to）
+- **Related REQ**: 各ADRが関連するREQ番号
+
+**Related REQ / Decision Map の構成ルール**:
+- REQ本文に記載された Related ADRs などの正本情報から構成する（REQ-0004-067）
+- README.md の情報は分類ビューであり、ADR本文のSSoTではない（REQ-0004-066）
+- ADR本文を更新した場合は README.md の該当箇所も更新する
+
+**README.md の更新タイミング**:
+- ADR CREATE 時: 全ビューに反映
+- ADR UPDATE（ステータス変更）時: Status View を更新
+- ADR APPEND（関連情報追加）時: Decision Map / Related REQ を更新
 
 ---
 
