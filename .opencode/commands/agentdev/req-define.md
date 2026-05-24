@@ -97,13 +97,19 @@ load_skills:
  2. ユーザーとの壁打ち対話を開始 → `agentdev-req-analysis` の壁打ちメソドロジーに従って深掘り
     - 明示入力ファイルが読み込まれている場合、その内容を壁打ちの開始点として活用（ファイル内容から要件の構造化を先行して進める）
  3. 既存REQ照合 → `agentdev-req-file-manager` の照合方法論に従って実行（REQ-0002-009〜011）:
-   - `docs/requirements/REQ-*.md` をスキャンし、ユーザーの要件と既存REQの関連性を推論（タイトル・タグ・目的・要件内容の重み付けによる総合判定）
-   - 関連REQがある場合: 該当REQの内容（目的・要件・適用範囲）を壁打ちコンテキストに即時反映し、ユーザーとともに変更点を深掘り
-   - 操作分類を確定: `CREATE`（該当REQなし）、`APPEND`（既存REQへの要件行追加）、`UPDATE`（既存REQの内容修正）
-    - 複数REQが該当する場合、それぞれに対する操作を個別に指定
-    - SPLIT（要件の分割）が検出された場合: SPLIT は保存操作ではなく requirements review / follow-up 候補として扱う。保存可能範囲（CREATE/APPEND/UPDATE）は通常通り実行する
-    - 分類結果は `draft-meta` の `req-operation` と `target-req` に記録
-    ※ area-based構造では、REQは area file 内に配置される。現在は per-file（REQ-{NNNN}.md）構造で照合を実施する
+    - `docs/requirements/REQ-*.md` をスキャンし、ユーザーの要件と既存REQの関連性を推論（タイトル・タグ・目的・要件内容の重み付けによる総合判定）
+    - 関連REQがある場合: 該当REQの内容（目的・要件・適用範囲）を壁打ちコンテキストに即時反映し、ユーザーとともに変更点を深掘り
+    - **APPEND-first ルール**（REQ-0002-024〜028）:
+      - CREATE を選択する前に、APPEND/UPDATE 候補を必ず評価する（REQ-0002-024）
+      - 同一コンポーネント・同一スコープの既存REQが存在する場合、APPEND をデフォルトの操作とする（REQ-0002-025）。判定は `agentdev-req-file-manager` の「操作分類の判定軸」に従う
+      - 既存REQの要件行・目的・適用範囲の内容を修正する変更は UPDATE と判定する（REQ-0002-026）
+      - CREATE を選択する場合、APPEND/UPDATE ではない理由を `draft-meta` の `create-rationale` フィールドに記録する（REQ-0002-027）
+      - APPEND/UPDATE 候補があるにもかかわらず CREATE と判断する場合、ユーザーに判断根拠を提示する（REQ-0002-028）
+    - 操作分類を確定: `CREATE`（該当REQなし）、`APPEND`（既存REQへの要件行追加）、`UPDATE`（既存REQの内容修正）
+     - 複数REQが該当する場合、それぞれに対する操作を個別に指定
+     - SPLIT（要件の分割）が検出された場合: SPLIT は保存操作ではなく requirements review / follow-up 候補として扱う。保存可能範囲（CREATE/APPEND/UPDATE）は通常通り実行する
+     - 分類結果は `draft-meta` の `req-operation` と `target-req` に記録
+     ※ area-based構造では、REQは area file 内に配置される。現在は per-file（REQ-{NNNN}.md）構造で照合を実施する
  4. 要件を展開 → `agentdev-req-analysis` の分析観点に従って網羅（照合で取得した関連REQの内容を反映）
  5. ADR閾値以上の技術判断が発生した場合 → `agentdev-adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は req-save で実行）
  6. 要件doc形式で生成 → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read tool で読み込み、目的/要件/適用範囲の構造に従って内容を構造化
@@ -134,10 +140,11 @@ load_skills:
       - **target-req**: REQ-{NNNN}（APPEND/UPDATE の場合）
       - **adr-required**: true | false
       - **adr-decisions**: [{title, context, decision, status}]（adr-required が true の場合）
-      - **topic-slug**: {ファイル名に使用するスラッグ}
-      - **scale**: standard | large
-      - **decomposition**: [{scope, modules, description}]（scale が large の場合のみ）
-       - **status**: draft（初期値。req-save → saved, case-open → issued + 削除）
+       - **topic-slug**: {ファイル名に使用するスラッグ}
+       - **scale**: standard | large
+       - **decomposition**: [{scope, modules, description}]（scale が large の場合のみ）
+       - **create-rationale**: {CREATEを選択した理由}（req-operation が CREATE の場合に必須。APPEND/UPDATE候補があった場合はその理由も含む）
+        - **status**: draft（初期値。req-save → saved, case-open → issued + 削除）
       ```
     - **バグ修正・軽微変更**: ドラフト保存不要。セッション内で要件docを完結させる
     - **リファクタリング・保守作業 / ドキュメント・雑務**: ドラフト保存不要。セッション内で要件docを完結させる（バグ修正・軽微変更と同等のlightweight workflow）
