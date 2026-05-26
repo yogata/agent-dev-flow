@@ -111,10 +111,30 @@ load_skills:
      - 分類結果は `draft-meta` の `req-operation` と `target-req` に記録
 
  4. 要件を展開 → `agentdev-req-analysis` の分析観点に従って網羅（照合で取得した関連REQの内容を反映）
+ 4b. **関連ドキュメント更新候補抽出**（Step 4 の直後に実行）:
+     - **変更種別判定**: Step 4 で展開済みの要件から、DBカラム、状態フラグ、判定条件、API仕様、画面表示、既存REQ/ADR/仕様の意味変更に該当する変更種別を自律的に判定する（REQ-0034-001）
+     - **キーワード抽出**: 変更種別に該当する場合、要件本文・既存REQ照合結果・対象コンポーネント・API名・DBカラム名・状態名・表示文言から関連キーワードを抽出する（REQ-0034-002）
+     - **限定探索**: 抽出キーワードを用いて、以下の範囲を read-only で限定探索する（REQ-0034-003, REQ-0034-004）:
+       - `docs/specs/**`
+       - `docs/requirements/REQ-*.md`
+       - `docs/requirements/views/*.md`
+       - `docs/adr/**`
+       - `docs/README.md`
+       - `docs/requirements/README.md`
+     - **分類**: 検出した候補ごとに、対象パス・検出語句・判定・必要対応を出力する（REQ-0034-006）。判定は以下に分類する（REQ-0034-007）:
+       - `直接矛盾`: 既存記述が新要件と明示的に反対の内容を持つ
+       - `更新候補`: 新要件の影響を受ける可能性が高いが、直接矛盾までは確認できない
+       - `影響なし`: 検索ヒットしたが、更新不要と判断できる
+     - **停止判断**（REQ-0034-008, REQ-0034-009）:
+       - 既存REQ・ADR・仕様の記述を更新対象として扱えば新要件が成立する場合 → 停止せず、関連ドキュメント更新候補として後続工程へ引き渡す
+       - 既存REQ・ADR・仕様のどれを正とするかの判断が必要な場合 → ユーザー判断を求める
+       - ADRの決定と新要件が根本衝突する場合 → ユーザー判断を求める
+     - **ドラフト保持**: 関連ドキュメント更新候補をドラフトまたはセッション内要件docに保持する（REQ-0034-010）。Step 6 の要件doc生成で `## 関連ドキュメント更新候補` セクションとして反映する
  5. ADR閾値以上の技術判断が発生した場合 → `agentdev-adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は req-save で実行）
  6. 要件doc形式で生成 → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read tool で読み込み、目的/要件/適用範囲の構造に従って内容を構造化
      **テンプレート準拠要件**: テンプレートの【必須】セクション（目的、要件、適用範囲）が全て要件docに含まれること。必須セクションが欠落している場合、生成をやり直すこと。
       **Requirement Source セクション**（REQ-0023-001, REQ-0023-002）: ユーザーが明示した入力ファイル（Requirement Source）が1件以上存在する場合、要件docの `## 適用範囲` の後に `## Requirement Source` セクションを追加する。セクションには全ての入力ファイルのパスをリスト形式（`- {filepath}`）で記録する。source file の種類（staging stub, promoted artifact, finding file 等）による条件分岐は行わず、全ての明示入力ファイルを統一的に扱う
+      **関連ドキュメント更新候補セクション**（REQ-0034-010）: Step 4b で関連ドキュメント更新候補が検出された場合、`## 適用範囲`（または `## Requirement Source` が存在する場合はその後）に `## 関連ドキュメント更新候補` セクションを追加する。セクションには候補テーブル（パス/検出語句/判定/必要対応）を記録する
  7. パターン判定:
     - ラベルに基づいて Pattern 判定: `bug`, `critical` → Pattern A, `enhancement`, `feature` → Pattern B, `refactor`, `maintenance` → Pattern C, `docs`, `chore` → Pattern D
     - **Pattern A + ADR必要時の Pattern B 昇格**: Pattern A で ADR閾値以上の技術判断が発生した場合、Pattern B に昇格する（REQファイル・ADRファイルの作成が必要となるため）
@@ -164,7 +184,7 @@ load_skills:
 ### ファイル操作制約
 - G03: ファイル編集スコープ: `.sisyphus/drafts/**` のみ作成・編集を許可
 - G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）。`.agentdev/intake/promoted/req-define/` の artifact の削除は req-define では行わず、後続の req-save または case-open の成功後に実行する
-- G05: `docs/` 配下の広範な探索は禁止（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用）
+- G05: `docs/` 配下の広範な探索は禁止（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用。Step 4b の抽出キーワードベース限定探索も許可）
 - G06: `inbox.md` / `archive.md` を直接ロードしない（raw learning item は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
 
 ### 実行制約
