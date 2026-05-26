@@ -38,6 +38,7 @@
   - [REQ-0031: GitHub本文内リポジトリ参照リンクの正規化](requirements/REQ-0031.md)
   - [REQ-0032: case-close 未チェック項目達成判定](requirements/REQ-0032.md)
   - [REQ-0033: AgentDevFlow command / skill 定義の二次整合性是正](requirements/REQ-0033.md)
+  - [REQ-0034: req-define 関連ドキュメント更新候補抽出と後続工程への伝播](requirements/REQ-0034.md)
 
 ## Specifications
 

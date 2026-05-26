@@ -10,3 +10,4 @@
 | [REQ-0014](../REQ-0014.md) | case-run 自律修正ループと責務分離の明確化 | Self-healing loop とCI/CD検証 |
 | [REQ-0015](../REQ-0015.md) | 関連ドキュメントの要件達成対象化 | ドキュメント更新の要件管理 |
 | [REQ-0020](../REQ-0020.md) | Epic Issue 実行順序 SSoT と case-run Epic Orchestrator 化 | Epic Orchestration設計 |
+| [REQ-0034](../REQ-0034.md) | req-define 関連ドキュメント更新候補抽出と後続工程への伝播 | 要件変更に伴う関連ドキュメント更新候補の検出・伝播 |
