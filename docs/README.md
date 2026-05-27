@@ -39,6 +39,7 @@
   - [REQ-0032: case-close 未チェック項目達成判定](requirements/REQ-0032.md)
   - [REQ-0033: AgentDevFlow command / skill 定義の二次整合性是正](requirements/REQ-0033.md)
   - [REQ-0034: req-define 関連ドキュメント更新候補抽出と後続工程への伝播](requirements/REQ-0034.md)
+  - [REQ-0035: DOC-MAP導入と requirements/views 廃止による文書探索・維持管理再設計](requirements/REQ-0035.md)
 
 ## Specifications
 
@@ -60,6 +61,7 @@
    - [ADR-0005: AgentDevFlow plugin namespace 統一](adr/ADR-0005.md)
    - [ADR-0006: Epic Issue 本文を実行順序 SSoT とする設計](adr/ADR-0006.md)
    - [ADR-0007: REQ/ADR正本構造と分類ビュー運用の再定義](adr/ADR-0007.md)
+   - [ADR-0008: DOC-MAP導入と requirements/views 廃止](adr/ADR-0008.md)
 
 ## Learning
 

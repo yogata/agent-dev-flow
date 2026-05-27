@@ -38,6 +38,7 @@
 | REQ-0032 | case-close 未チェック項目達成判定 | enhancement/case-close/checkbox/completion-gate/achievement-check/autonomous-resolution |
 | REQ-0033 | AgentDevFlow command / skill 定義の二次整合性是正 | agentdev/consistency/guardrails/command-definitions/skill-definitions |
 | REQ-0034 | req-define 関連ドキュメント更新候補抽出と後続工程への伝播 | enhancement/req-define/document-update/impact-detection |
+| REQ-0035 | DOC-MAP導入と requirements/views 廃止による文書探索・維持管理再設計 | doc-map/views-abolition/document-structure |
 
 ## ディレクトリ構造の方針
 
@@ -45,16 +46,16 @@
 
 `REQ-{NNNN}.md` を要件の永続正本とする。各要件が1ファイルに対応する。
 
-### views（観点別体系化ビュー）
+### DOC-MAP（文書探索入口）
 
-`views/*.md` は正本REQを観点別に体系化した非正本文書である。正本と views が矛盾する場合、`REQ-{NNNN}.md` を正とする。
+`docs/DOC-MAP.md` は文書探索・参照経路の入口として機能する非正本文書である（REQ-0035 / ADR-0008）。正本は各 `REQ-{NNNN}.md` ファイルである。
 
-- `views/*.md` は generated artifact である必要はない（手動で体系化・編集してよい）
 - `INDEX.md` は作成しない（ADR-0007 で README.md 分類ビューに統一方針）
 - `areas/`、`sources/` は作成しない
-- `views/` が未作成の領域は更新不要
+- 現在仕様の正本は `docs/specs/*.md` に、文書探索の入口は `docs/DOC-MAP.md` に集約
 
 ### 関連
 
 - ADR-0004: 要件管理構造の area-based 移行方針（superseded by ADR-0007）
-- ADR-0007: REQ/ADR正本構造と分類ビュー運用の再定義
+- ADR-0007: REQ/ADR正本構造と分類ビュー運用の再定義（superseded by ADR-0008）
+- ADR-0008: DOC-MAP導入と requirements/views 廃止
