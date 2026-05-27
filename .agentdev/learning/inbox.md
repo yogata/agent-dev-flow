@@ -128,3 +128,21 @@
 - **想定反映先**: コマンド（case-open.md のテスト戦略出力ステップ）
 - **関連**: Issue #393, PR #394
 - **タグ**: `#case-close` `#case-open` `#test-strategy` `#G08` `#completion-gate`
+
+---
+
+## 2026-05-27: case-close Step 8b hash check が自マージで常に不一致になる
+
+- **問題事象**: case-close Step 4 でPRをsquash mergeした後、Step 8bの `git pull --ff-only` でpull前後のHEAD hashが不一致となり、構造化エラーによる停止条件に該当する。原因はcase-close自身がmergeしたcommitがorigin/mainに存在するため。またStep 7で `git branch -d` が「not fully merged」エラーで失敗する（squash mergeは新しいcommitを作成するため、gitがbranchをmergedと認識しない）。
+- **発生局面**: case-close（Issue #397の完了処理）
+- **検知方法**: Step 8bのhash不一致検出、Step 7の `git branch -d` 実行時エラー
+- **根本原因**: case-closeの設計が「外部からの変更検知」を目的としているが、case-close自身のPR mergeによる変更を除外する考慮がない。squash mergeは元のbranch tipと異なるcommit hashを作成するため、`git branch -d` も失敗する。
+- **自律対応内容**: Step 8bはhash不一致が自マージ由来であることを確認して継続（外部変更なしと判定）。Step 7はPR merge済みを確認の上 `git branch -D` で強制削除（git-worktree skillの禁止事項に該当するが、PR merge済みの事実を確認済み）。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: REQ-0032（case-close手順定義）のStep 7-8bに影響。git-worktree skillの「未マージブランチ強制削除禁止」ルールとの矛盾。
+- **横展開観点**: case-closeがPRをmergeする全ケースで発生する。特にsquash mergeを使用する場合は必ず発生する。
+- **再発条件**: case-closeが自身でPRをsquash mergeする場合（毎回再発）
+- **予防策候補**: Step 8bでpull前hashを記録し、pull後hashの差分がPR merge由来のcommitのみであれば継続する条件を追加。またはStep 8bをStep 4の前に移動する。Step 7の `git branch -d` を、PR merge済みの場合は `-D` を許可する条件を追加。
+- **想定反映先**: コマンド（case-close.md Step 7, Step 8b）、スキル（agentdev-git-worktree SKILL.md）
+- **関連**: Issue #397, PR #398, `.opencode/commands/agentdev/case-close.md` lines 207-220
+- **タグ**: `#case-close` `#git` `#squash-merge` `#hash-check` `#self-merge`
