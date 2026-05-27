@@ -35,7 +35,7 @@
 | REQ-0029 | intake-open promoted artifact 一括処理 | agentdev/intake/batch-processing/enhancement |
 | REQ-0030 | agentdev コマンド群の体系的テスト実装 | testing/quality/commands/skills/templates/epic |
 | REQ-0031 | GitHub本文内リポジトリ参照リンクの正規化 | github/link-normalization/url/templates/verification/commands |
-| REQ-0032 | case-close 未チェック項目達成判定 | enhancement/case-close/checkbox/completion-gate/achievement-check |
+| REQ-0032 | case-close 未チェック項目達成判定 | enhancement/case-close/checkbox/completion-gate/achievement-check/autonomous-resolution |
 | REQ-0033 | AgentDevFlow command / skill 定義の二次整合性是正 | agentdev/consistency/guardrails/command-definitions/skill-definitions |
 | REQ-0034 | req-define 関連ドキュメント更新候補抽出と後続工程への伝播 | enhancement/req-define/document-update/impact-detection |
 
