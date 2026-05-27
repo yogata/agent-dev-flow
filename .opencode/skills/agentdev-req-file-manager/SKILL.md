@@ -159,7 +159,7 @@ docs/requirements/
 └── REQ-{NNNN}.md
 ```
 
-`views/*.md`（観点別体系化ビュー）は `docs/requirements/views/` に配置する。正本は `REQ-{NNNN}.md` であり、views は非正本（REQ-0004-032）。
+`docs/DOC-MAP.md`（ドキュメント探索経路インデックス）は `docs/` 直下に配置する。DOC-MAP は非正本であり、正本は `REQ-{NNNN}.md` である（REQ-0035-012）。
 
 **バグ修正・軽微変更除外**: バグ修正・軽微変更（Pattern A）ではREQファイルを作成しない。Issue本文のみで要件を管理する。REQファイルの修正が必要なバグ修正は、機能追加（Pattern B）に昇格して扱う。
 - Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
@@ -255,26 +255,33 @@ REQファイル・docs/requirements/README.md・docs/README.md間の整合性を
 
 ---
 
-## views 影響確認ルール
+## DOC-MAP 影響確認ルール
 
-REQ CREATE / APPEND / UPDATE 時に `docs/requirements/views/*.md` への影響を確認するルール（REQ-0004-042 ~ 046, 085）。
+REQ CREATE / APPEND / UPDATE 時に `docs/DOC-MAP.md` への影響を確認するルール（REQ-0035-034 ~ 037）。
 
 ### 影響確認フロー
 
-1. REQ操作（CREATE/APPEND/UPDATE）実行時、関連する `views/*.md` が存在するか確認する
-2. 影響がある場合は、同一変更内で `views/*.md` を更新する
-3. 影響がない場合は更新不要。完了報告で「views更新なし」と明示する
+1. REQ操作（CREATE/APPEND/UPDATE）実行時、`docs/DOC-MAP.md` に該当領域のセクションが存在するか確認する
+2. 影響がある場合は、同一変更内で `docs/DOC-MAP.md` を更新する
+3. 影響がない場合は更新不要。完了報告で「DOC-MAP更新なし」と明示する
 4. 更新が必要だが作業範囲を超える場合、REQ保存は中止せず follow-up として明示する
+
+### 影響確認対象
+
+| 操作 | 確認対象 | 説明 |
+|------|---------|------|
+| REQ追加時 | `docs/requirements/README.md`, `docs/DOC-MAP.md` | 新規REQがDOC-MAPの対象領域に含まれるか確認 |
+| ADR追加時 | `docs/adr/README.md`, `docs/DOC-MAP.md` | 新規ADRがDOC-MAPの対象領域に含まれるか確認 |
+| SPEC追加/分割/削除時 | `docs/specs/README.md`, `docs/DOC-MAP.md` | SPEC構成変更がDOC-MAPに影響するか確認 |
 
 ### 矛盾時の優先順位
 
-- `views/*.md` と `REQ-{NNNN}.md` が矛盾する場合、`REQ-{NNNN}.md` を正とする（REQ-0004-034）
-- `views/*.md` を修正対象とする
+- `docs/DOC-MAP.md` と正本（REQ/ADR/SPEC）が矛盾する場合、正本を優先する
+- `docs/DOC-MAP.md` を修正対象とする
 
-### views未作成の扱い
+### DOC-MAP更新の位置づけ
 
-- `views/` が未作成の領域は更新不要
-- 必要と判断される場合は follow-up にする
+- DOC-MAPの更新は探索経路の更新であり、要件・判断・仕様の更新ではない（REQ-0035-037）
 
 ---
 

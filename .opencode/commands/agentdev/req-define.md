@@ -114,13 +114,13 @@ load_skills:
  4b. **関連ドキュメント更新候補抽出**（Step 4 の直後に実行）:
      - **変更種別判定**: Step 4 で展開済みの要件から、DBカラム、状態フラグ、判定条件、API仕様、画面表示、既存REQ/ADR/仕様の意味変更に該当する変更種別を自律的に判定する（REQ-0034-001）
      - **キーワード抽出**: 変更種別に該当する場合、要件本文・既存REQ照合結果・対象コンポーネント・API名・DBカラム名・状態名・表示文言から関連キーワードを抽出する（REQ-0034-002）
-     - **限定探索**: 抽出キーワードを用いて、以下の範囲を read-only で限定探索する（REQ-0034-003, REQ-0034-004）:
-       - `docs/specs/**`
-       - `docs/requirements/REQ-*.md`
-       - `docs/requirements/views/*.md`
-       - `docs/adr/**`
-       - `docs/README.md`
-       - `docs/requirements/README.md`
+      - **限定探索**: 抽出キーワードを用いて、以下の範囲を read-only で限定探索する（REQ-0034-003, REQ-0034-004, REQ-0035-016）:
+        - `docs/specs/**`
+        - `docs/requirements/REQ-*.md`
+        - `docs/DOC-MAP.md`
+        - `docs/adr/**`
+        - `docs/README.md`
+        - `docs/requirements/README.md`
      - **分類**: 検出した候補ごとに、対象パス・検出語句・判定・必要対応を出力する（REQ-0034-006）。判定は以下に分類する（REQ-0034-007）:
        - `直接矛盾`: 既存記述が新要件と明示的に反対の内容を持つ
        - `更新候補`: 新要件の影響を受ける可能性が高いが、直接矛盾までは確認できない
