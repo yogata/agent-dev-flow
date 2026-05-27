@@ -1,0 +1,98 @@
+---
+name: agentdev-doc-map
+description: DOC-MAP reading guide and document exploration order. USE FOR: understanding document structure, finding related documents, determining exploration order. DO NOT USE FOR: creating REQ/ADR/SPEC files, implementing changes, or replacing canonical document content.
+---
+
+# DOC-MAP ガイド
+
+DOC-MAP（`docs/DOC-MAP.md`）は、AgentDevFlow ドキュメント体系の探索経路インデックスである。このスキルは DOC-MAP の位置づけ、読み方、および関連ドキュメント探索順序を定義する。
+
+---
+
+## 正本と非正本の境界
+
+| ドキュメント種別 | パス | 正本/非正本 | 役割 |
+|-----------------|------|------------|------|
+| REQ | `docs/requirements/REQ-{NNNN}.md` | 正本 | 要件定義の唯一の情報源 |
+| ADR | `docs/adr/ADR-{NNNN}.md` | 正本 | アーキテクチャ決定記録の唯一の情報源 |
+| SPEC | `docs/specs/*.md` | 正本 | システム仕様・実装パターンの唯一の情報源 |
+| DOC-MAP | `docs/DOC-MAP.md` | 非正本 | ドキュメント探索経路のインデックス（REQ-0035-012） |
+| README | `docs/README.md`, 各サブディレクトリ README | 非正本 | ドキュメントハブ・エントリポイント |
+
+### DOC-MAP の位置づけ（REQ-0035-012）
+
+- DOC-MAP は正本文書ではない。REQ/ADR/SPEC の内容を置き換え・複製しない
+- DOC-MAP にのみ記載されている情報は、正本（REQ/ADR/SPEC）に根拠を持たなければならない
+- DOC-MAP と正本が矛盾する場合、正本を優先する
+
+---
+
+## ドキュメント探索順序（REQ-0035-013, 016）
+
+要件定義・実装・検証の各フェーズで、関連ドキュメントを探索する際の順序:
+
+1. **明示入力ファイル** -- ユーザーが指定した source file（要件ソース）
+2. **DOC-MAP.md** -- `docs/DOC-MAP.md` で対象領域の関連ドキュメント構造を把握
+3. **各 README / SPEC 入口** -- `docs/README.md`, `docs/requirements/README.md`, `docs/specs/system.md` 等
+4. **正本 REQ/ADR/SPEC** -- 具体的な要件・判断・仕様の確認
+5. **Step 4b 限定探索** -- req-define Step 4b の抽出キーワードベース限定探索
+
+### 廃止: requirements/views
+
+- `docs/requirements/views/` は廃止済みである。views を参照・作成・更新してはならない
+- views が提供していた観点別体系化機能は DOC-MAP に統合されている
+
+---
+
+## DOC-MAP 読み方ガイド
+
+### 目的
+
+DOC-MAP は「どのドキュメントが何を扱っているか」を俯瞰し、対象領域に関連する正本を迅速に特定するための索引である。
+
+### 読み方
+
+1. DOC-MAP の対象領域セクションを特定する
+2. 該当セクションに列挙されている正本（REQ/ADR/SPEC）のパスを確認する
+3. 必要に応じて正本を直接読み込む（DOC-MAP の要約のみで判断しない）
+4. 正本に記載がない情報は DOC-MAP からも取得できない
+
+### 探索での利用
+
+- req-define Step 4b の限定探索前に、DOC-MAP を参照して探索範囲を絞り込む
+- case-run の関連ドキュメント影響範囲探索で、DOC-MAP を起点に対象ドキュメントを特定する
+- case-close の docs 検証で、DOC-MAP の記載と実際の正本の整合性を確認する
+
+---
+
+## 影響確認ルール（REQ-0035-034 ~ 037）
+
+正本の追加・変更・削除時に DOC-MAP への影響を確認するルール。
+
+### 影響確認フロー
+
+| 操作 | DOC-MAP 影響確認対象 | 説明 |
+|------|---------------------|------|
+| REQ 追加 | `docs/requirements/README.md`, `docs/DOC-MAP.md` | 新規REQがDOC-MAPの対象領域セクションに含まれるか確認し、必要に応じて更新 |
+| ADR 追加 | `docs/adr/README.md`, `docs/DOC-MAP.md` | 新規ADRがDOC-MAPの対象領域セクションに含まれるか確認し、必要に応じて更新 |
+| SPEC 追加/分割/削除 | `docs/specs/README.md`, `docs/DOC-MAP.md` | SPEC構成変更がDOC-MAPの記載に影響するか確認し、必要に応じて更新 |
+| DOC-MAP 更新 | -- | DOC-MAPの更新は探索経路の更新であり、要件/判断/仕様の更新ではない（REQ-0035-037） |
+
+### 優先順位
+
+- DOC-MAP と正本が矛盾する場合、正本を優先する
+- DOC-MAP の更新は正本の更新に付随する作業であり、独立した要件変更としては扱わない
+
+### 更新タイミング
+
+- `req-save`: REQ/ADR 保存時に DOC-MAP への影響を確認（REQ-0035-034, 035）
+- `case-run` Step 10: SPEC 更新時に DOC-MAP への影響を確認（REQ-0035-036）
+- `case-close` Step 3: DOC-MAP と正本の整合性を検証
+
+---
+
+## See Also
+
+- **agentdev-req-file-manager**: REQ ファイル管理・採番・整合性チェック
+- **agentdev-adr-file-manager**: ADR ファイル管理
+- **agentdev-spec-compliance**: 仕様適合性検証
