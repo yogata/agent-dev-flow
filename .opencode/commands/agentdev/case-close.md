@@ -96,7 +96,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 実装コード・設定・関連ドキュメントが要件と矛盾していないことを確認する（SHALL）
     - 旧仕様の記述が残っている場合、その記述が変更後仕様と矛盾しないことを確認する（SHALL）
     - 変更後仕様と矛盾するドキュメント更新漏れがある場合、完了不可とする（SHALL）
-    - `docs/DOC-MAP.md` が存在すること、およびDOC-MAPに記載された正本（REQ/ADR/SPEC）への参照が実際のファイルと整合していることを確認する（REQ-0035-020）
+    - `docs/DOC-MAP.md` が存在すること、およびDOC-MAPに記載された基準文書（REQ/ADR/SPEC）への参照が実際のファイルと整合していることを確認する（REQ-0035-020）
 4. PRマージ（`gh pr merge`）→ 対応記録をIssueにコメント追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_implementation.md`（機能追加）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_record.md`（バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務）を Read tool で読み込む
     - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。

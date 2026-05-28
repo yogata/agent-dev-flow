@@ -79,9 +79,9 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 ### Step 2: 学びの抽出（エージェント主体）
 
-学びがあると**エージェントが判断**した場合、**エージェントが**テンプレート正本に従って13フィールド形式でエントリを生成する。全13フィールド SHALL を含めること：
+学びがあると**エージェントが判断**した場合、**エージェントが**基準テンプレートに従って13フィールド形式でエントリを生成する。全13フィールド SHALL を含めること：
 
-> **テンプレート正本**: [references/capture-entry-template.md](references/capture-entry-template.md) — エージェント SHALL は推論でフォーマットを組み立てず、このテンプレート正本から取得すること。
+> **基準テンプレート**: [references/capture-entry-template.md](references/capture-entry-template.md) — エージェント SHALL は推論でフォーマットを組み立てず、この基準テンプレートから取得すること。
 
 > **注意**: `**タグ**` フィールドは人間の可読性のため保持している。セマンティック分析（`/agentdev/learning-refine`）ではタグに依存せず、LLMが内容からテーマを判定する。
 
@@ -126,7 +126,7 @@ inbox.mdのエントリ数（`## ` で始まる行）をカウントする。
 
 ## Example Workflow
 
-- **テンプレート正本（一次参照）**: [references/capture-entry-template.md](references/capture-entry-template.md) — 13フィールド形式の空テンプレート。フォーマット取得は必ずこちらから行うこと。
+- **基準テンプレート（一次参照）**: [references/capture-entry-template.md](references/capture-entry-template.md) — 13フィールド形式の空テンプレート。フォーマット取得は必ずこちらから行うこと。
 - **実例集（二次参照）**: [references/example.md](references/example.md) — 複数シナリオでの記入例。テンプレートの適用イメージを確認する際に参照すること。
 
 ---
