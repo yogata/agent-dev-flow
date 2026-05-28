@@ -60,7 +60,7 @@
    - [ADR-0004: 要件管理構造のarea-based移行方針](adr/ADR-0004.md)
    - [ADR-0005: AgentDevFlow plugin namespace 統一](adr/ADR-0005.md)
    - [ADR-0006: Epic Issue 本文を実行順序 SSoT とする設計](adr/ADR-0006.md)
-   - [ADR-0007: REQ/ADR正本構造と分類ビュー運用の再定義](adr/ADR-0007.md)
+   - [ADR-0007: REQ/ADR基準構造と分類ビュー運用の再定義](adr/ADR-0007.md)
    - [ADR-0008: DOC-MAP導入と requirements/views 廃止](adr/ADR-0008.md)
 
 ## Learning

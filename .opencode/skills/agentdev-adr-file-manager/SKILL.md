@@ -215,7 +215,7 @@ proposed → deprecated
 - **Related REQ**: 各ADRが関連するREQ番号
 
 **Related REQ / Decision Map の構成ルール**:
-- REQ本文に記載された Related ADRs などの正本情報から構成する（REQ-0004-067）
+- REQ本文に記載された Related ADRs などの基準情報から構成する（REQ-0004-067）
 - README.md の情報は分類ビューであり、ADR本文のSSoTではない（REQ-0004-066）
 - ADR本文を更新した場合は README.md の該当箇所も更新する
 

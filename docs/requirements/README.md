@@ -42,20 +42,20 @@
 
 ## ディレクトリ構造の方針
 
-### 正本構造（per-file）
+### 基準構造（per-file）
 
-`REQ-{NNNN}.md` を要件の永続正本とする。各要件が1ファイルに対応する。
+`REQ-{NNNN}.md` を要件の永続基準とする。各要件が1ファイルに対応する。
 
 ### DOC-MAP（文書探索入口）
 
-`docs/DOC-MAP.md` は文書探索・参照経路の入口として機能する非正本文書である（REQ-0035 / ADR-0008）。正本は各 `REQ-{NNNN}.md` ファイルである。
+`docs/DOC-MAP.md` は文書探索・参照経路の入口として機能する参照用文書である（REQ-0035 / ADR-0008）。基準は各 `REQ-{NNNN}.md` ファイルである。
 
 - `INDEX.md` は作成しない（ADR-0007 で README.md 分類ビューに統一方針）
 - `areas/`、`sources/` は作成しない
-- 現在仕様の正本は `docs/specs/*.md` に、文書探索の入口は `docs/DOC-MAP.md` に集約
+- 現在仕様の基準は `docs/specs/*.md` に、文書探索の入口は `docs/DOC-MAP.md` に集約
 
 ### 関連
 
 - ADR-0004: 要件管理構造の area-based 移行方針（superseded by ADR-0007）
-- ADR-0007: REQ/ADR正本構造と分類ビュー運用の再定義（superseded by ADR-0008）
+- ADR-0007: REQ/ADR基準構造と分類ビュー運用の再定義（superseded by ADR-0008）
 - ADR-0008: DOC-MAP導入と requirements/views 廃止
