@@ -52,6 +52,7 @@
 | [REQ-0021](requirements/REQ-0021.md) | AgentDevFlow ガードレールのスクリプト化と skill-local scripts 配置方針 | ガードレールスクリプト化 |
 | [REQ-0030](requirements/REQ-0030.md) | agentdev コマンド群の体系的テスト実装 | テスト体系実装 |
 | [REQ-0031](requirements/REQ-0031.md) | GitHub本文内リポジトリ参照リンクの正規化 | リンク正規化 |
+| [REQ-0036](requirements/REQ-0036.md) | agentdev-no-ai-slop-writing Skill 追加 | 自然言語成果物の文章品質ゲート |
 
 ## ナレッジパイプライン
 
