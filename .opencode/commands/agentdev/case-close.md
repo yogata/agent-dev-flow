@@ -150,6 +150,9 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
             - 完了報告に「Epic #{N} を自動クローズ」と表示
         - 1件以上 "OPEN" の子Issueがある場合 → スキップ（完了報告に「Epic #{N}: N件未完了のためスキップ」と表示）
  8b. 実行前同期（git pull）:
+    - `git pull --ff-only` 実行前に `git status --porcelain` でローカル変更の有無を確認すること（SHALL — REQ-0038-004）
+    - ローカル変更が検出された場合、当該ファイルを `git checkout --` でリセットしてから pull を実行すること（SHALL — REQ-0038-005）
+    - ローカル変更リセットはPRで削除されたファイルに限定して実行すること（SHALL — REQ-0038-006）
     - pull前のHEAD commit hash を記録する（`git rev-parse HEAD`）
     - カレントディレクトリで `git pull --ff-only` を実行する
     - pull後のHEAD commit hash を取得し、pull前のhashと一致することを確認する（hash一致 = リモートに新規コミットなし）
@@ -238,7 +241,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G03: Issue番号の解決に `gh issue list` / `gh issue status` 等、gh/gitコマンドでopen issue一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
 - G04: Epic自動クローズは全子IssueがCLOSEDの場合のみ実行。子Issue状態取得失敗時はEpicクローズしない
 - G05: Step 7 のブランチ・worktree削除（ローカル+リモート）は必ず実行し、成否を確認すること。削除失敗時は警告表示して停止
-- G06: Step 8b の `git pull --ff-only` は必ず実行すること。pull前後のhash検証を行い、不一致時は評価・承認のやり直しが必要。pull自体の失敗時は自動解決せずエラー報告して停止
+- G06: Step 8b の `git pull --ff-only` は必ず実行すること。pull前のローカル変更事前チェック（`git status --porcelain`）を行い、pull前後のhash検証を行い、不一致時は評価・承認のやり直しが必要。pull自体の失敗時は自動解決せずエラー報告して停止
 
 ### 品質ゲート
 - G07: PRのCIが通っていることを確認（`gh pr checks`）。CI/CDが失敗している場合は case-run に差し戻す（case-close は修正を行わない）
