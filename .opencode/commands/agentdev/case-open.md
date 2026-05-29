@@ -78,6 +78,10 @@ load_skills:
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
 13. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除する
+13a. RU ファイル削除（SHALL — REQ-0039-016, 0039-017）:
+    - Issue 本文の `## Requirement Source` セクションに記録されたパスのうち、`.agentdev/backlog/req-units/RU-*.md` に一致するファイルを削除する（REQ ファイルの Requirement Source セクション、またはセッション内要件docの Requirement Source セクションから抽出）
+    - **削除条件**: Issue 作成 + VERIFY が正常完了した場合のみ（SHALL）。Issue 作成失敗・VERIFY 失敗時は RU を残置する
+    - **削除対象外**: RU パターンに一致しない Requirement Source は削除しない
 14. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → case-open 完了時）に従って出力
 
 ## Guardrails
