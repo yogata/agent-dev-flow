@@ -42,6 +42,7 @@
 | [REQ-0013](requirements/REQ-0013.md) | intake 承認フロー分割と解消済み確認機能 | intake承認フロー改善 |
 | [REQ-0024](requirements/REQ-0024.md) | 全 agentdev コマンドの完了報告フォーマット統一 | 完了報告フォーマット標準化 |
 | [REQ-0029](requirements/REQ-0029.md) | intake-open promoted artifact 一括処理 | intake一括処理機能 |
+| [REQ-0038](requirements/REQ-0038.md) | case実行信頼性向上（チェックボックス確認・pull前チェック・docs整合性grep） | case実行プロセスの信頼性強化 |
 
 ## 品質・整合性
 

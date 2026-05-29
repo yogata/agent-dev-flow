@@ -41,6 +41,7 @@
 | REQ-0035 | DOC-MAP導入と requirements/views 廃止による文書探索・維持管理再設計 | doc-map/views-abolition/document-structure |
 | REQ-0036 | agentdev-no-ai-slop-writing Skill 追加 | skill/writing-quality/ai-slop/natural-language |
 | REQ-0037 | worktree 削除時の残存ファイル対策強化 | case-close/case-run/worktree/error-handling |
+| REQ-0038 | case実行信頼性向上（チェックボックス確認・pull前チェック・docs整合性grep） | enhancement/reliability/case-run/case-close |
 
 ## ディレクトリ構造の方針
 
