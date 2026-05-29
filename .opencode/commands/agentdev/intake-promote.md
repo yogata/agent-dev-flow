@@ -1,5 +1,5 @@
 ---
-description: レビュー済み intake item を後続コマンド（req-define / intake-open）に渡せる入力 artifact に整形する
+description: レビュー済み intake item を後続コマンド（req-backlog）に渡せる入力 artifact に整形する
 agent: sisyphus
 load_skills:
   - agentdev-workflow-lifecycle
@@ -9,7 +9,7 @@ load_skills:
 
 # Intake Promote
 
-`.agentdev/intake/accepted/` 内のレビュー済み intake item を、`req-define` または `intake-open` に渡せる入力 artifact に整形する。
+`.agentdev/intake/accepted/` 内のレビュー済み intake item を、`req-backlog` に渡せる入力 artifact に整形する。
 
 **このコマンドは整形のみを行う。** GitHub Issue の作成は行わない（REQ-0017-026）。
 
@@ -20,7 +20,7 @@ load_skills:
 
 ## Output
 
-- 整形済み入力 artifact（`req-define` 用 または `intake-open` 用）
+- 整形済み入力 artifact（`req-backlog` 用）
 - 整形済み item は `.agentdev/intake/promoted/*.md` に保存（フラット構造）
 
 ## 整形の方向性
@@ -29,8 +29,7 @@ load_skills:
 
 | 後続ルート | 条件 | 整形内容 |
 |------------|------|----------|
-| `req-define` | 要件定義が必要な item | req-define への入力に適した形式に整理 |
-| `intake-open` | Issue 化可能な item | intake-open への入力 artifact 形式に整形 |
+| `req-backlog` | 全 item | req-backlog が RU 化しやすい形式に整理（観測内容・影響・課題・既存要件との関連を構造化） |
 
 ## Steps
 
@@ -41,24 +40,15 @@ load_skills:
 
 2. **item の読み込み**: 各 intake item を読み込み、内容と review 時の判定を把握する。
 
-3. **後続ルートの確認**: 各 item について、ユーザーに後続ルートを確認する:
-   - `req-define` ルート: 要件定義が必要（新規機能・仕様変更等）
-   - `intake-open` ルート: Issue 化可能（バグ修正・小規模改善等）
+3. **後続ルートの確認**: 全 item を `req-backlog` が処理するため、後続ルートの確認は不要:
    - 複数 item を束ねて1つの artifact にすることも可能（ユーザーの指示による）
-   - **ユーザーが確認したルートを promoted artifact に記録しない。全 artifact を `.agentdev/intake/promoted/` 直下にフラット配置する。artifact の frontmatter には route/status を記録しない（REQ-0039-011）**
+   - **artifact を `.agentdev/intake/promoted/` 直下にフラット配置する。artifact の frontmatter には route/status を記録しない（REQ-0039-011）**
 
-4. **整形**: 後続ルートに応じて item を整形する:
-
-   **req-define 用**:
+4. **整形**: item を req-backlog 向けに整形する:
    - 観測内容・影響・課題を整理
-   - req-define で壁打ちしやすい形式に構造化
+   - req-backlog が RU 化しやすい形式に構造化
    - 既存要件との関連・差分を明記
-
-   **intake-open 用**:
-   - Issue 本文として使用可能な形式に整形
-    - タイトル・概要・対象範囲・完了条件・Issue 構成（単一/Epic+子Issue）を整理
-    - 複数 item を束ねる場合は Epic + 子 Issue 構成を提示
-   - intake-open がそのまま入力として使用できる形式（REQ-0017-026a）
+   - 複数 item を束ねる場合は統合内容を整理
 
 5. **ユーザー確認**: 整形結果を提示し、ユーザーの確認を得る:
     - 内容の修正指示
@@ -121,10 +111,10 @@ load_skills:
 ## Guardrails
 
 ### 責務境界（REQ-0017-026, REQ-0019-004）
-- G01: GitHub Issue の作成を行わない（`intake-open` が担当）
+- G01: GitHub Issue の作成を行わない（`req-backlog` / `case-open` が担当）
 - G02: intake item の元の内容を改変しない（整理・構造化のみ）
-- G03: `req-define` や `intake-open` を自動起動しない（次ステップの提示のみ）
-- G04: learning pipeline の入力を生成しない（MUST NOT）。review 済み intake item の後続ルートは `req-define` または `intake-open` のみ（REQ-0019-003, REQ-0019-004）
+- G03: `req-backlog` を自動起動しない（次ステップの提示のみ）
+- G04: learning pipeline の入力を生成しない（MUST NOT）。review 済み intake item の後続ルートは `req-backlog` のみ（REQ-0019-003, REQ-0019-004, REQ-0039-001）
 - G05: learning item の保存・分類・昇華を担当しない（REQ-0019-023）
 
 ### 形式制約（REQ-0017-032〜039）
