@@ -123,7 +123,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - worktree prune
     - ローカルブランチ削除:
         - `git branch -d "{type}/issue-{N}"` を実行する
-        - **`git branch -d` 失敗時（"not fully merged"）**（SHALL, REQ-0038-002）: squash merge 済みの場合は条件付きで `-D` を許可する:
+        - **`git branch -d` 失敗時（"not fully merged"）**（SHALL, REQ-0037-008〜010）: squash merge 済みの場合は条件付きで `-D` を許可する:
             1. `gh pr view {PR番号} --json state,mergedAt -q '.state + " " + .mergedAt'` で PR がマージ済みであることを確認する
             2. PR がマージ済み（`state: MERGED`）と確認できた場合 → `git branch -D "{type}/issue-{N}"` を実行して強制削除する
             3. PR がマージ済みと確認できない場合 → 警告を表示して停止する（REQ-0001-007）
