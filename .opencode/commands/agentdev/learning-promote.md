@@ -5,6 +5,7 @@ load_skills:
   - agentdev-learning-capture
   - agentdev-learning-pipeline
   - agentdev-workflow-reporting
+  - agentdev-no-ai-slop-writing
 ---
 
 # 学びの昇華判定と Requirement Source stub 生成

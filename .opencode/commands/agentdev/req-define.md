@@ -7,6 +7,7 @@ load_skills:
   - agentdev-adr-guidelines
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting
+  - agentdev-no-ai-slop-writing
 ---
 
 # 要件定義

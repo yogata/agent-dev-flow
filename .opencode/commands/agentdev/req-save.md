@@ -8,6 +8,7 @@ load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting
   - agentdev-conventional-commits
+  - agentdev-no-ai-slop-writing
 ---
 
 # 要件保存（壁打ち→docs永続化）

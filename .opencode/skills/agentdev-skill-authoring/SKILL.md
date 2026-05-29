@@ -485,3 +485,7 @@ This endpoint is no longer supported.
 ## 8. Command / Skill 境界
 
 Skill の品質基準は本スキルの範囲とする。Command に何を置き、何を置かないかの境界定義は `artifact-boundaries.md`（`.opencode/skills/agentdev-workflow-lifecycle/reference/artifact-boundaries.md`）を参照。Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
+
+## See Also
+
+- **agentdev-no-ai-slop-writing**: 自然言語成果物の文章品質ゲート（AI-slop 検出・修正）

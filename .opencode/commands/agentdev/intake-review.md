@@ -4,6 +4,7 @@ agent: prometheus
 load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting
+  - agentdev-no-ai-slop-writing
 ---
 
 # Intake Review

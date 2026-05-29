@@ -15,6 +15,7 @@ load_skills:
   - agentdev-conventional-commits
   - agentdev-epic-tracker
   - agentdev-workflow-templates
+  - agentdev-no-ai-slop-writing
 ---
 
 # 実装パイプライン

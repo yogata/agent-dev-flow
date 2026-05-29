@@ -6,6 +6,7 @@ load_skills:
   - agentdev-epic-tracker
   - agentdev-workflow-templates
   - agentdev-workflow-reporting
+  - agentdev-no-ai-slop-writing
 ---
 
 # Intake Open
