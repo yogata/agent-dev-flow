@@ -71,6 +71,7 @@
 | [REQ-0019](requirements/REQ-0019.md) | intake / learning の責任境界明確化と workflow 組み込み | intake/learning境界定義 |
 | [REQ-0025](requirements/REQ-0025.md) | intake 系コマンドの .agentdev/intake 更新後の git 永続化 | intake git永続化 |
 | [REQ-0026](requirements/REQ-0026.md) | intake lifecycle の queue/archive 再定義 | intake lifecycle再設計 |
+| [REQ-0040](requirements/REQ-0040.md) | 子Issue PRに Findings / Intake候補を永続化し、case-closeで回収する | PR本文永続チャネル・case-run/case-close回収 |
 
 ## 設定・名前空間・基盤
 
