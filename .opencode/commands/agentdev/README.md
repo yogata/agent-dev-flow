@@ -31,8 +31,8 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 | `/agentdev/intake-capture` | 変更候補を intake item として保存 |
 | `/agentdev/intake-from-github` | クローズ済み issue/PR から残課題を intake item として保存 |
 | `/agentdev/intake-review` | intake item の review・採用可否判断 |
-| `/agentdev/intake-promote` | review 済み item を後続コマンド用 artifact に整形 |
-| `/agentdev/intake-open` | intake-promote 生成 artifact から GitHub Issue を作成 |
+| `/agentdev/intake-promote` | review 済み item を promoted artifact に整形 |
+| `/agentdev/req-backlog` | promoted artifact から RU（Requirement Unit）を生成 |
 
 ### integrity コマンド（整合性検証）
 
@@ -63,7 +63,7 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 ### intake ワークフロー（気づき・課題の収集・レビュー・昇華）
 
 ```
-/agentdev/intake-capture / /agentdev/intake-from-github → /agentdev/intake-review → /agentdev/intake-promote → /agentdev/req-define または /agentdev/intake-open
+/agentdev/intake-capture / /agentdev/intake-from-github → /agentdev/intake-review → /agentdev/intake-promote → /agentdev/req-backlog → /agentdev/req-define
 ```
 
 ### integrity ワークフロー（整合性検証）
@@ -80,7 +80,7 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 - `/agentdev/case-run` — [case-run.md](./case-run.md)
 - `/agentdev/case-update` — [case-update.md](./case-update.md)
 - `/agentdev/case-close` — [case-close.md](./case-close.md)
-- `/agentdev/intake-open` — [intake-open.md](./intake-open.md)
+- `/agentdev/req-backlog` — [req-backlog.md](./req-backlog.md)
 - `/agentdev/intake-capture` — [intake-capture.md](./intake-capture.md)
 - `/agentdev/intake-from-github` — [intake-from-github.md](./intake-from-github.md)
 - `/agentdev/intake-review` — [intake-review.md](./intake-review.md)

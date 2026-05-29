@@ -22,8 +22,8 @@ AgentDevFlow には3つの系統があり、それぞれ目的と入口コマン
 | 系統 | 目的 | 入口コマンド | 流れ |
 |------|------|-------------|------|
 | 通常開発 | 機能追加・バグ修正 | `/agentdev/req-define` | req-define → req-save → case-open → case-run → case-close |
-| Learning 起点 | 再発防止知見の蓄積・昇華 | `/agentdev/learning-refine` | learning-capture（スキル）→ learning-refine → learning-promote → req-define に合流 |
-| Intake 起点 | 具体的な作業候補の収集・促進 | `/agentdev/intake-capture` | intake-capture → intake-review → intake-promote → req-define または intake-open |
+| Learning 起点 | 再発防止知見の蓄積・昇華 | `/agentdev/learning-refine` | learning-capture（スキル）→ learning-refine → learning-promote → req-backlog → req-define に合流 |
+| Intake 起点 | 具体的な作業候補の収集・促進 | `/agentdev/intake-capture` | intake-capture → intake-review → intake-promote → req-backlog → req-define に合流 |
 
 各系統の domain state（ファイル・ディレクトリ）がどの状態を表すかは [domain state lifecycle](docs/guides/domain-state-lifecycle.md) を参照。
 
@@ -91,7 +91,7 @@ docs/
   adr/             # アーキテクチャ決定記録（ADR-*.md）
 .agentdev/         # AgentDevFlow domain state
   intake/          # 気づき・課題の収集・レビュー・促進（inbox/, accepted/, promoted/, archive/）
-  learning/        # 学びの蓄積・昇華（inbox.md, archive.md, evaluation-report.md, elevation-staging/）
+  learning/        # 学びの蓄積・昇華（inbox.md, archive.md, evaluation-report.md, promoted/）
   integrity/       # 整合性検証レポート
 .sisyphus/         # Sisyphus 作業領域（詳細は system.md 参照）
 .opencode/

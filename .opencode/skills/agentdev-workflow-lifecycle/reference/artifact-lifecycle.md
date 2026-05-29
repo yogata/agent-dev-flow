@@ -1,74 +1,114 @@
 # 成果物ライフサイクル
 
-RU・promoted artifact・REQ ファイル等の成果物ライフサイクルの宣言的ルールを定義する（REQ-0039-021）。
+AgentDevFlow の主要成果物（promoted artifact、RU、REQ ファイル）の生成・消費・削除の宣言的ルールを定義する。
 
-## 成果物一覧
-
-| 成果物 | 格納先 | 生成コマンド | 消費コマンド | 削除トリガー |
-|--------|--------|-------------|-------------|-------------|
-| intake promoted artifact | `.agentdev/intake/promoted/*.md` | `intake-promote` | `req-backlog` | RU 化成功時（REQ-0039-006） |
-| learning promoted artifact | `.agentdev/learning/promoted/*.md` | `learning-promote` | `req-backlog` | RU 化成功時（REQ-0039-006） |
-| Requirement Unit（RU） | `.agentdev/backlog/req-units/RU-*.md` | `req-backlog` | `req-define`, `req-save`, `case-open` | REQ ファイル永続化完了時（REQ-0039-015）または Issue 作成完了時（REQ-0039-016） |
-| REQ ファイル | `docs/requirements/REQ-{NNNN}.md` | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
-| ADR ファイル | `docs/adr/ADR-*.md` | `req-save` | 参照のみ | なし（永続、superseded で管理） |
-
-## RU ライフサイクル
-
-### 生成
-
-- **生成コマンド**: `req-backlog`
-- **入力**: intake promoted artifact + learning promoted artifact
-- **出力**: `.agentdev/backlog/req-units/RU-*.md`
-- **フォーマット**: frontmatter（source_type, generated_by, generated_at, status, sources）+ Sources + Source Summary + 統合理由 + 要件化の方向（REQ-0039-002）
-
-### 消費
-
-RU は以下の2つのルートで消費される:
-
-1. **req-define ルート**: `req-backlog` → `req-define`（RU を明示入力ファイルとして読み込み）→ `req-save` → `case-open` → `case-run`
-2. **直接 Issue 化ルート**: `req-backlog` → `req-define` → `case-open`（バグ修正・軽微変更の場合）
-
-### 削除
-
-RU の削除トリガーは以下のいずれか（REQ-0039-015, 016, 017）:
-
-| トリガー | コマンド | 条件 |
-|----------|---------|------|
-| REQ ファイル永続化完了 | `req-save` | RU の内容が REQ ファイルに正常保存された後 |
-| Issue 作成完了 | `case-open` | RU の内容が GitHub Issue に正常作成された後 |
-
-- **削除条件**: Requirement Source の永続化完了（REQ ファイル保存成功 または Issue 作成成功）に限定
-- **残置条件**: 永続化が未完了の場合は RU を残置する
-
-## Promoted Artifact ライフサイクル
-
-### Intake Promoted
-
-- **生成**: `intake-promote` が `.agentdev/intake/promoted/*.md`（フラット）に出力
-- **消費**: `req-backlog` が読み込み
-- **削除**: RU 化成功時に `req-backlog` が削除（REQ-0039-006）
-- **残置**: RU 化失敗・矛盾検出時は `promoted/` に残置
-
-### Learning Promoted
-
-- **生成**: `learning-promote` が `.agentdev/learning/promoted/*.md`（フラット）に出力
-- **消費**: `req-backlog` が読み込み
-- **削除**: RU 化成功時に `req-backlog` が削除（REQ-0039-006）
-- **残置**: RU 化失敗・矛盾検出時は `promoted/` に残置
-
-## データフロー
+## ライフサイクル概観
 
 ```
-intake-promote → .agentdev/intake/promoted/*.md ──┐
-                                                    ├→ req-backlog → .agentdev/backlog/req-units/RU-*.md
-learning-promote → .agentdev/learning/promoted/*.md ┘                     │
-                                                                          ├→ req-define → req-save → REQ ファイル（RU 削除）
-                                                                          └→ req-define → case-open → Issue（RU 削除）
+promoted artifact → RU → REQ / Issue → RU 削除
 ```
 
-## 制約
+| 成果物 | 生成コマンド | 消費コマンド | 削除トリガー |
+|--------|-------------|-------------|-------------|
+| promoted artifact（intake） | `intake-promote` | `req-backlog` | RU 化成功時 |
+| promoted artifact（learning） | `learning-promote` | `req-backlog` | RU 化成功時 |
+| RU（Requirement Unit） | `req-backlog` | `req-define`, `req-save`, `case-open` | 永続化完了時 |
+| REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
+| Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
 
-- promoted artifact はフラット構造（サブディレクトリなし）からのみ読み込む（REQ-0039-011, 012）
-- `req-define` は promoted artifact を直接読み込まない（REQ-0039-019）。RU 経由が必須
-- `req-define` はユーザーの直接入力及び一般 source file を引き続き受け入れる（REQ-0039-020）
-- raw item（inbox.md, archive.md, entries/）は req-backlog の更新対象外（REQ-0039-009）
+## Promoted Artifact
+
+### 定義
+
+promoted artifact は intake/learning パイプラインの最終出力であり、req-backlog コマンドの入力となる。
+
+### 配置先
+
+| パイプライン | 配置先 | 構造 |
+|-------------|--------|------|
+| intake | `.agentdev/intake/promoted/` | フラット（`*.md`） |
+| learning | `.agentdev/learning/promoted/` | フラット（`*.md`） |
+
+### 生成ルール
+
+- `intake-promote`: レビュー済み intake item を `.agentdev/intake/promoted/*.md` に出力（REQ-0039-011）
+- `learning-promote`: 昇華判定済み staging stub を `.agentdev/learning/promoted/*.md` に出力（REQ-0039-012）
+- サブディレクトリへのルーティングは行わない（フラット構造）
+
+### 消費・削除ルール
+
+- `req-backlog` が promoted artifact を読み込み、RU を生成する
+- RU 生成に成功した promoted artifact は `req-backlog` が削除する（REQ-0039-006）
+- 失敗・矛盾の promoted artifact は `promoted/` に残置する
+- promoted artifact が 0 件の場合、`req-backlog` は正常終了する（REQ-0039-007）
+
+## RU（Requirement Unit）
+
+### 定義
+
+RU は promoted artifact を分析・統合した構造化成果物であり、req-define の Requirement Source として機能する。
+
+### 配置先
+
+- `.agentdev/backlog/req-units/RU-*.md`
+
+### 構造
+
+```yaml
+---
+source_type: intake | learning | mixed
+generated_by: req-backlog
+generated_at: "{YYYY-MM-DDTHH:mm:ss}"
+status: active
+sources:
+  - path: "{promoted artifact path}"
+    type: intake | learning
+---
+```
+
+frontmatter 以降に Sources セクション、Source Summary セクション、統合理由セクション、要件化の方向セクションを含む。
+
+### 粒度ルール
+
+- N:1（複数 artifact → 1 RU 統合）を許可（REQ-0039-004）
+- 1:N（1 artifact → 複数 RU 分割）を許可（REQ-0039-004）
+- promoted artifact の単純コピー（パススルー）は禁止（REQ-0039-003）
+
+### 矛盾検出
+
+- promoted artifact 間に矛盾が検出された場合、矛盾する artifact を RU 化せずユーザーに確認する（REQ-0039-005）
+- 矛盾しない artifact は通常通り RU 化を継続する（partial success）
+
+### 消費・削除ルール
+
+- `req-define` は RU を Requirement Source として受け入れる（REQ-0039-018）
+- `req-define` は promoted artifact を直接読み込んではならない（REQ-0039-019）
+- `req-save` は RU の内容が REQ ファイルに永続化された後、該当 RU を削除する（REQ-0039-015）
+- `case-open` は RU の内容が Issue に永続化された後、該当 RU を削除する（REQ-0039-016）
+- RU 削除のトリガーは永続化完了に限定する（REQ-0039-017）。永続化未完了の場合は RU を残置する
+
+## REQ ファイル
+
+### 定義
+
+REQ ファイルは要件定義書の永続基準（SSoT）である。詳細は `artifact-boundaries.md` の Anchored Development モデルを参照。
+
+### ライフサイクル
+
+- 生成: `req-save` が `docs/requirements/REQ-{NNNN}.md` に保存
+- 更新: `case-update` が APPEND/UPDATE 対応
+- 参照: `case-open`, `case-run`, `case-close` が READ
+- 削除: なし（永続ドキュメント）
+
+## 禁止事項
+
+- `req-backlog` は intake/learning の raw item を更新してはならない（REQ-0039-009）
+- `req-define` は promoted artifact を直接読み込んではならない（REQ-0039-019）
+- promoted artifact のサブディレクトリルーティング（`promoted/req-define/`, `promoted/intake-open/`）は廃止
+- `elevation-staging/` への出力は廃止（`promoted/` に統一）
+
+## 参照
+
+- **アーティファクト責務境界**: [`reference/artifact-boundaries.md`](./artifact-boundaries.md)
+- **コマンド関連マップ**: [`reference/command-map.md`](./command-map.md)
+- **SSoT遷移ルール**: [`reference/ssot-transitions.md`](./ssot-transitions.md)

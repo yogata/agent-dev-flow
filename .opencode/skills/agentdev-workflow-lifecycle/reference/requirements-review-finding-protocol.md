@@ -83,7 +83,7 @@ Finding は backlog-draft-protocol とは独立した中間アーティファク
 
 | 項目 | backlog-draft | finding |
 |------|---------------|---------|
-| 経路 | `intake-from-github` → `intake-open` | `req-save` → `req-define` |
+| 経路 | `intake-from-github` → `req-backlog` | `req-save` → `req-define` |
 | ステータス値 | `draft` / `approved` / `issued` | なし（state管理外） |
 | frontmatter 構造 | period / sources 等を含む | finding_type / source_req 等を含む |
 | 作成トリガー | クローズ済みissue/PRからの残課題抽出 | SPLIT検出・要件レビュー時の問題検出 |

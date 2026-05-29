@@ -119,7 +119,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
 ## Guardrails
 
 ### 責務境界（REQ-0017-025, REQ-0019-025）
-- G01: GitHub Issue の作成を行わない（`intake-open` が担当）
+- G01: GitHub Issue の作成を行わない（`case-open` が担当）
 - G02: 直接 `case-run` を起動しない（REQ-0017-025）
 - G03: item の内容を変更・更新しない（判定に基づく振り分けのみ）
 - G04: `intake-promote` や `req-define` を自動起動しない（次ステップの提示のみ）

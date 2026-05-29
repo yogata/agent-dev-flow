@@ -40,7 +40,7 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 | case-update | Issue本文の更新やコメント追加 | `completion-reports.md` → case-update 完了時 |
 | case-close | PRマージ・記録追記・Issueクローズ・ブランチ削除 | `completion-reports.md` → case-close 完了時 |
 | intake-from-github | クローズ済みissue/PRから残課題を抽出・分類しdraftとして保存 | `completion-reports.md` → intake-from-github 完了時 |
-| intake-open | promoted artifactからEpic+子Issueを作成 | `completion-reports.md` → intake-open 完了時 |
+| req-backlog | promoted artifact から RU（Requirement Unit）を生成 | `completion-reports.md` → req-backlog 完了時 |
 | learning-refine | 問題クラス分類→8軸評価→archive移動 | `completion-reports.md` → learning-refine 完了時 |
 | learning-promote | 昇華判定→Requirement Source staging stub生成 | `completion-reports.md` → learning-promote 完了時 |
 | intake-capture | 手動で気づき・課題を inbox.md に記録 | `completion-reports.md` → intake-capture 完了時 |
