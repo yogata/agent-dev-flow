@@ -10,7 +10,7 @@ learning pipeline（capture → refine → promote）の共通知識ベース。
 ## Pipeline Overview
 
 ```
-capture → inbox.md → refine → archive.md + evaluation-report.md → promote → elevation-staging/
+capture → inbox.md → refine → archive.md + evaluation-report.md → promote → promoted/
 ```
 
 - **capture**（agentdev-learning-capture skill）: エージェント主体で学びを検知・抽出・inbox.md に自律蓄積
@@ -26,7 +26,7 @@ pipeline 各層を構成する 4 artifact の役割・性格・command 間の振
 | inbox.md | 未整理 learning entry の active queue。capture で蓄積し、refine 成功後にクリアされる。永続ストレージではない | 一時キュー。refine の入力として取り込みされ、処理完了後に空になる | capture が書き込む（append）。refine が読み取り・移動後にクリアする。promote は参照しない |
 | archive.md | living pool（終端保管ではない）。refine で inbox から移動した entry を保持。promote の入力として参照され、promote 時の prune により動的に変化する。`archive` は終端保管を意味しない | 動的プール。promote のたびに内容が変化し、未処理 entry は次回 promote の対象として残る | refine が inbox から移動して書き込む。promote が読み取り・prune する。capture は参照しない |
 | evaluation-report.md | refine/promote 間の境界 artifact。毎回上書きされ長期履歴ではない。refine が生成し、promote が主入力として取り込みする | 境界 artifact。refine→promote 間の受け渡し専用。履歴蓄積は行わない | refine が生成（上書き）。promote が主入力として読み取り・取り込み。capture は参照しない |
-| elevation-staging/ | Requirement Source stub の staging 領域。生成された stub は `/agentdev/req-define` の明示入力ファイルとして扱う。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止 | staging 専用。promote が生成し、req-define が取り込みする。pipeline 外への直接反映は不可 | promote が stub を生成する。req-define が明示的に読み取る。refine は参照しない |
+| promoted/ | Requirement Source stub の staging 領域。生成された stub は `/agentdev/req-define` の明示入力ファイルとして扱う。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止 | staging 専用。promote が生成し、req-define が取り込みする。pipeline 外への直接反映は不可 | promote が stub を生成する。req-define が明示的に読み取る。refine は参照しない |
 
 **制約（REQ-0027-013）**: raw learning item を runtime command / skill の直接参照対象にしない。学びは昇華（promote → staging stub → req-define）を経て初めて command / skill / template / AGENTS.md / docs へ組み込まれる。
 
@@ -343,7 +343,7 @@ archive.md 内の古い単発レアケースを削除候補として特定する
 ## 反映ルート
 
 ```
-elevation-staging/ → /agentdev/req-define（明示入力ファイル）→ /agentdev/req-save → /agentdev/case-open → /agentdev/case-run
+promoted/ → /agentdev/req-define（明示入力ファイル）→ /agentdev/req-save → /agentdev/case-open → /agentdev/case-run
 ```
 
 - staging stub は `req-define` の「明示入力ファイル」として扱われる
@@ -357,7 +357,7 @@ elevation-staging/ → /agentdev/req-define（明示入力ファイル）→ /ag
 
 ### 対象
 
-- `.agentdev/learning/elevation-staging/*.md`（learning-promote が生成した staging stub）
+- `.agentdev/learning/promoted/*.md`（learning-promote が生成した staging stub）
 - imported と判定された stub のみ（機械的4条件全充足）。不採用 stub は対象外
 
 ### imported 判定基準
@@ -371,7 +371,7 @@ elevation-staging/ → /agentdev/req-define（明示入力ファイル）→ /ag
 
 ### Archive 先
 
-- `.agentdev/learning/elevation-staging/archive/`
+- `.agentdev/learning/promoted/archive/`
 
 ### Archive 処理手順
 
@@ -384,7 +384,7 @@ elevation-staging/ → /agentdev/req-define（明示入力ファイル）→ /ag
    - **取り込み日**: YYYY-MM-DD
    - **処理**: case-close
    ```
-2. `elevation-staging/archive/` ディレクトリに移動
+2. `promoted/archive/` ディレクトリに移動
 3. 同名ファイル既存時は上書きしない（警告のみ）
 
 ### 対象外

@@ -21,7 +21,7 @@ load_skills:
 ## Output
 
 - 整形済み入力 artifact（`req-define` 用 または `intake-open` 用）
-- 整形済み item は `.agentdev/intake/promoted/{route}/` に保存（{route} は `req-define` または `intake-open`）
+- 整形済み item は `.agentdev/intake/promoted/*.md` に保存（フラット構造）
 
 ## 整形の方向性
 
@@ -45,7 +45,7 @@ load_skills:
    - `req-define` ルート: 要件定義が必要（新規機能・仕様変更等）
    - `intake-open` ルート: Issue 化可能（バグ修正・小規模改善等）
    - 複数 item を束ねて1つの artifact にすることも可能（ユーザーの指示による）
-   - **ユーザーが確認したルートを promoted artifact の保存先サブディレクトリ（`promoted/req-define/` または `promoted/intake-open/`）で表現する。artifact の frontmatter には route/status を記録しない**
+   - **ユーザーが確認したルートを promoted artifact に記録しない。全 artifact を `.agentdev/intake/promoted/` 直下にフラット配置する。artifact の frontmatter には route/status を記録しない（REQ-0039-011）**
 
 4. **整形**: 後続ルートに応じて item を整形する:
 
@@ -80,10 +80,10 @@ load_skills:
       ```
 
 6. **保存**:
-    - 保存先: `.agentdev/intake/promoted/{route}/`（{route} は Step 3 で確定した後続ルート: `req-define` または `intake-open`）
-    - サブディレクトリ（`promoted/req-define/` または `promoted/intake-open/`）が存在しない場合は作成する
+    - 保存先: `.agentdev/intake/promoted/`（フラット構造）
+    - `promoted/` ディレクトリが存在しない場合は作成する
     - ファイル名: `YYYY-MM-DD-{topic-slug}.md`（元 item 名を維持、または束ねた内容に応じた名前）
-    - artifact の frontmatter に route や status を記録しない（ディレクトリ配置が一次状態）
+    - artifact の frontmatter に route や status を記録しない（REQ-0039-011）
 
 6a. **accepted item の archive/promoted 移動**:
     - Step 6 で保存元とした accepted item（`.agentdev/intake/accepted/{item}.md`）を `.agentdev/intake/archive/promoted/` に移動する
@@ -135,5 +135,5 @@ load_skills:
 
 ### 実行制約
 - G10: 整形はユーザーとの対話を通じて行う
-- G11: 保存先は `.agentdev/intake/promoted/req-define/` または `.agentdev/intake/promoted/intake-open/` のみ
+- G11: 保存先は `.agentdev/intake/promoted/` 直下のみ（フラット構造）
 - G12: 整形元の accepted item は artifact 保存後に `.agentdev/intake/archive/promoted/` に移動する
