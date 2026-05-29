@@ -226,12 +226,14 @@ task(category="unspecified-high", load_skills=[], run_in_background=true, prompt
 - worktreeパス（`.worktrees/{N}-{type}`）
 - `workdir` パラメータでworktree絶対パスを指定
 - specs更新（Step 10）は実行禁止の明示
+- **Finding 記録指示**（REQ-0040-006）: 本筋外 Finding（intake 候補・learning 候補）を必ず PR 本文の `## Findings / Intake候補` セクションに記録すること。各項目に発見元・内容・分類（intake/learning）を含めること。`.agentdev/intake/inbox/` の直接変更は禁止。Finding がない場合は「該当なし」とすること
 
 ### 親エージェント責務
 
 - **Wave開始前のEpicステータス一括更新**: 各Wave開始前に、該当Wave内の全子Issueの親Epicステータスを一括更新（`agentdev-epic-tracker` スキル参照）。サブエージェントによる同時更新の競合を回避するため親エージェントが一括処理
 - **全サブエージェント完了待機**: `background_output` で待機
 - **specs直列更新**: Step 10 のspecs更新は親エージェントのみ実行（サブエージェントはspecs更新禁止）
+- **Findings / Intake候補件数の集約**（REQ-0040-012, SHOULD）: 全サブエージェント完了後、各子Issue PRの `## Findings / Intake候補` セクションから記録された Finding 件数を集約し、集約完了報告に含めること
 
 ### フォールバック
 
