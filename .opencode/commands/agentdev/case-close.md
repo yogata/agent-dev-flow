@@ -111,8 +111,14 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 6. Issueクローズ（`gh issue close --reason completed`）
 7. ブランチ・worktree削除 → `agentdev-git-worktree` スキルの「worktree削除手順」に従って以下を実行:
+    - **未コミット変更検出**（SHALL, REQ-0037-001）: worktree 内で `git status --short` を実行し、未コミット変更の有無を確認する
+        - **未コミット変更あり**の場合:
+            - squash merge 済み（Step 4 で `gh pr merge --squash` 成功）→ `git checkout .` で未コミット変更を破棄する（SHALL, REQ-0037-002）。.sisyphus/plans/ 配下に保持が必要なファイルがある場合は、破棄前にユーザーに確認する
+            - squash merge 未確認 → 警告を表示して停止する（SHALL, REQ-0037-003）。自動破棄は禁止（REQ-0001-007）
+        - **未コミット変更なし**: そのまま次の手順へ進む
     - **.sisyphus/ クリーンアップ**: worktree 内の `.sisyphus/` ディレクトリを削除（`Remove-Item -Recurse -Force .sisyphus/`）。未追跡ファイルによる worktree remove エラーを防止
     - worktree削除（`git worktree remove`）
+        - **Permission denied エラー時**（SHALL, REQ-0037-004）: プロセスを特定する案内を表示して停止する（例: 「worktree 内のファイルをロックしているプロセスがあります。エクスプローラーやエディタを閉じてから再実行してください」）。自動的なプロセス終了は行わない
     - worktree prune
     - ローカルブランチ削除（`git branch -d`）
     - **リモートブランチ削除**（`git push origin --delete`）— `agentdev-git-worktree` スキル Step 5 参照
