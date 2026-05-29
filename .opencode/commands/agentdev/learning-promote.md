@@ -10,7 +10,7 @@ load_skills:
 
 # 学びの昇華判定と Requirement Source stub 生成
 
-`.agentdev/learning/evaluation-report.md` の問題クラスを主入力とし、`.agentdev/learning/archive.md` の過去エントリを参照して廃棄判定を行う。ユーザー承認後に `.agentdev/learning/elevation-staging/` に Requirement Source 形式の stub を生成し、処理済みエントリを archive.md から pruning する。
+`.agentdev/learning/evaluation-report.md` の問題クラスを主入力とし、`.agentdev/learning/archive.md` の過去エントリを参照して廃棄判定を行う。ユーザー承認後に `.agentdev/learning/promoted/` に Requirement Source 形式の stub を生成し、処理済みエントリを archive.md から pruning する。
 
 **重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `/agentdev/req-define` の明示入力ファイルとして扱い、`/agentdev/req-define → /agentdev/req-save → /agentdev/case-open → /agentdev/case-run` のルートで実装に移行する。
 
@@ -21,7 +21,7 @@ load_skills:
 
 ## Output
 
-- `.agentdev/learning/elevation-staging/{category}-{name}.md` — Requirement Source 形式の stub
+- `.agentdev/learning/promoted/{category}-{name}.md` — Requirement Source 形式の stub
 
 ## Steps
 
@@ -82,7 +82,7 @@ load_skills:
      ```
 
 7. **Requirement Source stub 生成**（staging領域のみ）:
-   - 出力先: `.agentdev/learning/elevation-staging/`
+   - 出力先: `.agentdev/learning/promoted/`（REQ-0039-012）
    - ファイル名: `{disposal-category}-{name}.md`
    - **`.opencode/` への直接書込は禁止**
    - **`case-run` への直接受け渡しは禁止**（`req-define` を経由すること）
@@ -125,7 +125,7 @@ load_skills:
 ## Guardrails
 
 ### ファイル操作制約
-- G01: `.opencode/` 直接反映禁止: stub は `.agentdev/learning/elevation-staging/` のみに生成。`.opencode/commands/` や `.opencode/skills/` への直接書込は禁止
+- G01: `.opencode/` 直接反映禁止: stub は `.agentdev/learning/promoted/` のみに生成。`.opencode/commands/` や `.opencode/skills/` への直接書込は禁止
 - G02: `evaluation-report.md` は読込専用: 変更・削除は禁止
 
 ### 実行制約
@@ -166,7 +166,7 @@ promote が扱う3つの主要 artifact の役割・性格・lifecycle 振る舞
 |----------|------|------|-------------------|
 | `archive.md` | 過去エントリの living pool（終端保管ではない） | living | promote の主入力の一つとして参照される。promote 時の prune により staged/rejected/duplicate は除去され、deferred/未処理は保持される。`archive` は終端保管を意味しない。（REQ-0027-003/004/005/016） |
 | `evaluation-report.md` | refine/promote 間の境界 artifact | 読込専用 | 毎回上書きされるため長期履歴ではない。promote はこれを主入力とする。（REQ-0027-008/009） |
-| `elevation-staging/` | Requirement Source stub の staging 領域 | staging | 生成された stub は `/agentdev/req-define` の明示入力ファイルとして扱う。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止。（REQ-0027-010/011/012） |
+| `promoted/` | Requirement Source stub の staging 領域 | staging | 生成された stub は `/agentdev/req-define` の明示入力ファイルとして扱う。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止。（REQ-0027-010/011/012, REQ-0039-012） |
 
 ### learning-promote の責務
 
@@ -174,7 +174,7 @@ promote が扱う3つの主要 artifact の役割・性格・lifecycle 振る舞
 
 ## 注意事項
 
-- **staging領域のみに生成**: → **Artifact Lifecycle 責務** の `elevation-staging/` 参照
+- **promoted領域のみに生成**: → **Artifact Lifecycle 責務** の `promoted/` 参照
 - **stub のみ生成**: 完全なSKILL.mdやコマンドファイルは生成しない
 - **archive.md は living learning pool**: → **Artifact Lifecycle 責務** の `archive.md` 参照
-- **反映ルート**: → **Artifact Lifecycle 責務** の `elevation-staging/` 参照
+- **反映ルート**: → **Artifact Lifecycle 責務** の `promoted/` 参照
