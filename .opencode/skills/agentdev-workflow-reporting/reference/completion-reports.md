@@ -24,7 +24,7 @@
 2. **完了報告テキスト（後）**: 本スキルの完了報告フォーマットに従ったテキストを出力する
 3. **中間出力の禁止**: TodoWrite更新と完了報告テキストの間に、他の中間出力（ログ・進捗報告・確認メッセージ等）を挟まない
 
-**適用対象**: req-define, req-save, case-open, case-run, case-run (Epic Orchestrator), case-close, case-update, intake-capture, intake-from-github, intake-review, intake-promote, intake-open, learning-refine, learning-promote, integrity-check の全完了報告ステップ
+**適用対象**: req-define, req-save, case-open, case-run, case-run (Epic Orchestrator), case-close, case-update, intake-capture, intake-from-github, intake-review, intake-promote, intake-open, req-backlog, learning-refine, learning-promote, integrity-check の全完了報告ステップ
 
 **理由**: 完了報告テキストがユーザーに最後に表示されることで、最終結果の視認性が向上する
 
@@ -463,6 +463,83 @@ git 永続化: 変更なし（commit/push スキップ）
 - 失敗詳細は artifact ごとのエラー概要（1行）
 - git 永続化セクションのルールは他の intake 系コマンドと同一
 
+## req-backlog 完了時
+
+### 全件成功時
+
+```
+✅ req-backlog 完了
+
+完了コマンド: /agentdev/req-backlog
+対象: promoted artifact {count}件（intake: {I}件 / learning: {L}件）
+結果:
+  - 生成 RU: {N}件（{ru_file_list}）
+  - 削除済み artifact: {deleted_artifact_list}
+  - 残存 artifact: なし
+検証結果: ✅ OK
+git 永続化: commit: {hash}, push: {成功/失敗}
+次のコマンド: /agentdev/req-define {ru_path}
+```
+
+### 対象なし（0件）
+
+```
+✅ req-backlog 完了
+
+完了コマンド: /agentdev/req-backlog
+対象: promoted artifact 0件
+結果:
+  - 対象なし（promoted artifact が存在しない）
+  - 生成 RU: 0件
+検証結果: ✅ OK
+git 永続化: 該当なし
+次のコマンド: なし
+```
+
+### 部分失敗あり（矛盾・エラー）
+
+```
+⚠️ req-backlog 完了
+
+完了コマンド: /agentdev/req-backlog
+対象: promoted artifact {count}件（intake: {I}件 / learning: {L}件）
+結果:
+  - 生成 RU: {success_count}件（{ru_file_list}）
+  - 削除済み artifact: {deleted_artifact_list}
+  - 残存 artifact: {remaining_artifact_list}
+  - 失敗詳細: {artifact_name}: {reason}（矛盾/エラー）
+検証結果: ⚠️ 部分成功
+git 永続化: commit: {hash}, push: {成功/失敗}
+次のコマンド:
+  - 成功したRU: /agentdev/req-define {ru_path}
+  - 残存artifactの確認後、再実行: /agentdev/req-backlog
+```
+
+### 全件失敗時
+
+```
+❌ req-backlog 完了
+
+完了コマンド: /agentdev/req-backlog
+対象: promoted artifact {count}件
+結果:
+  - 生成 RU: 0件
+  - 削除済み artifact: なし
+  - 残存 artifact: {remaining_artifact_list}
+  - 失敗詳細: {artifact_name}: {reason}
+検証結果: ❌ NG
+git 永続化: 変更なし（commit/push スキップ）
+次のコマンド: 失敗原因を確認後、再実行: /agentdev/req-backlog
+```
+
+### フォーマット共通ルール
+
+- 処理結果の 成功/失敗 カウントは必須
+- RU ファイル名は生成順で列挙
+- artifact 名はファイル名（パス含まない）で列挙
+- 失敗詳細は artifact ごとの理由概要（1行）
+- 0件時はエラー扱いとしない（REQ-0039-007）
+
 ## learning-refine 完了時
 
 ```
@@ -516,6 +593,6 @@ git 永続化: 該当なし
 
 ### git 永続化セクションのルール
 
-- learning-refine, learning-promote, case-close, intake-capture, intake-from-github, intake-review, intake-promote, intake-open の完了報告に git 永続化セクションを含める
+- learning-refine, learning-promote, case-close, intake-capture, intake-from-github, intake-review, intake-promote, intake-open, req-backlog の完了報告に git 永続化セクションを含める
 - 変更なしの場合は「変更なし（commit/push スキップ）」と表示する
 - push 失敗時は「push: 失敗」と表示し、完了報告全体を ⚠️ に変更する
