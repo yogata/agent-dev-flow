@@ -41,6 +41,7 @@
   - [REQ-0034: req-define 関連ドキュメント更新候補抽出と後続工程への伝播](requirements/REQ-0034.md)
   - [REQ-0035: DOC-MAP導入と requirements/views 廃止による文書探索・維持管理再設計](requirements/REQ-0035.md)
   - [REQ-0036: agentdev-no-ai-slop-writing Skill 追加](requirements/REQ-0036.md)
+  - [REQ-0037: worktree 削除時の残存ファイル対策強化](requirements/REQ-0037.md)
 
 ## Specifications
 
