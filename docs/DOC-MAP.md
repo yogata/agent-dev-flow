@@ -32,6 +32,7 @@
 | [REQ-0015](requirements/REQ-0015.md) | 関連ドキュメントの要件達成対象化 | ドキュメント更新の要件管理 |
 | [REQ-0020](requirements/REQ-0020.md) | Epic Issue 実行順序 SSoT と case-run Epic Orchestrator 化 | Epic Orchestration設計 |
 | [REQ-0034](requirements/REQ-0034.md) | req-define 関連ドキュメント更新候補抽出と後続工程への伝播 | 要件変更に伴う関連ドキュメント更新候補の検出・伝播 |
+| [REQ-0039](requirements/REQ-0039.md) | ワークフロー再設計 — RU lifecycle / flat promoted / intake-open 削除 | intake/learning promoted 構造簡素化、RU lifecycle、req-backlog 新設 |
 
 ## コマンドプロトコル・品質
 

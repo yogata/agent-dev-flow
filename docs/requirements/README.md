@@ -42,6 +42,7 @@
 | REQ-0036 | agentdev-no-ai-slop-writing Skill 追加 | skill/writing-quality/ai-slop/natural-language |
 | REQ-0037 | worktree 削除時の残存ファイル対策強化 | case-close/case-run/worktree/error-handling |
 | REQ-0038 | case実行信頼性向上（チェックボックス確認・pull前チェック・docs整合性grep） | enhancement/reliability/case-run/case-close |
+| REQ-0039 | ワークフロー再設計 — RU lifecycle / flat promoted / intake-open 削除 | workflow/intake/learning/req-backlog/ru-lifecycle/promoted |
 
 ## ディレクトリ構造の方針
 
