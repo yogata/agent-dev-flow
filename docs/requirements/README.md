@@ -16,7 +16,6 @@
 | REQ-0010 | AgentDevFlow Command実装改善：安全性・品質・状態管理 | workflow/safety/quality |
 | REQ-0011 | Issue/PR書き込み後の内容品質自動検証 | quality-assurance/encoding |
 | REQ-0012 | 自然言語ポリシー | language/japanese |
-| REQ-0013 | intake 承認フロー分割と解消済み確認機能 | commands/intake/workflow |
 | REQ-0014 | case-run 自律修正ループと責務分離の明確化 | workflow/self-healing/ci-cd |
 | REQ-0015 | 関連ドキュメントの要件達成対象化 | workflow/issue-commands/documentation/scope/verification |
 | REQ-0016 | Command/Skill/Template/Script責任分界とtips要件ソース化 | commands/skills/templates/scripts/knowledge |
@@ -32,7 +31,6 @@
 | REQ-0026 | intake lifecycle の queue/archive 再定義 | agentdev/intake/lifecycle/queue/archive/refactor |
 | REQ-0027 | learning artifact lifecycle の責任範囲明確化 | learning/lifecycle/artifact/documentation/command/skill |
 | REQ-0028 | Documentation granularity and responsibility restructuring | documentation/granularity/responsibility |
-| REQ-0029 | intake-open promoted artifact 一括処理 | agentdev/intake/batch-processing/enhancement |
 | REQ-0030 | agentdev コマンド群の体系的テスト実装 | testing/quality/commands/skills/templates/epic |
 | REQ-0031 | GitHub本文内リポジトリ参照リンクの正規化 | github/link-normalization/url/templates/verification/commands |
 | REQ-0032 | case-close 未チェック項目達成判定 | enhancement/case-close/checkbox/completion-gate/achievement-check/autonomous-resolution |
@@ -43,6 +41,13 @@
 | REQ-0037 | worktree 削除時の残存ファイル対策強化 | case-close/case-run/worktree/error-handling |
 | REQ-0038 | case実行信頼性向上（チェックボックス確認・pull前チェック・docs整合性grep） | enhancement/reliability/case-run/case-close |
 | REQ-0039 | ワークフロー再設計 — RU lifecycle / flat promoted / intake-open 削除 | workflow/intake/learning/req-backlog/ru-lifecycle/promoted |
+
+## Superseded
+
+| REQ ID | Title | Superseded by |
+| ------ | ----- | ------------- |
+| REQ-0013 | intake 承認フロー分割と解消済み確認機能 | REQ-0039 |
+| REQ-0029 | intake-open promoted artifact 一括処理 | REQ-0039 |
 
 ## ディレクトリ構造の方針
 

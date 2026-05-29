@@ -17,7 +17,7 @@
   - [REQ-0010: AgentDevFlow Command実装改善：安全性・品質・状態管理](requirements/REQ-0010.md)
   - [REQ-0011: Issue/PR書き込み後の内容品質自動検証](requirements/REQ-0011.md)
   - [REQ-0012: 自然言語ポリシー](requirements/REQ-0012.md)
-  - [REQ-0013: intake 承認フロー分割と解消済み確認機能](requirements/REQ-0013.md)
+  - [REQ-0013: intake 承認フロー分割と解消済み確認機能](requirements/REQ-0013.md) *(superseded by REQ-0039)*
   - [REQ-0014: case-run 自律修正ループと責務分離の明確化](requirements/REQ-0014.md)
   - [REQ-0015: 関連ドキュメントの要件達成対象化](requirements/REQ-0015.md)
   - [REQ-0016: Command/Skill/Template/Script責任分界とtips要件ソース化](requirements/REQ-0016.md)
@@ -33,7 +33,7 @@
   - [REQ-0026: intake lifecycle の queue/archive 再定義](requirements/REQ-0026.md)
   - [REQ-0027: learning artifact lifecycle の責任範囲明確化](requirements/REQ-0027.md)
   - [REQ-0028: Documentation granularity and responsibility restructuring](requirements/REQ-0028.md)
-  - [REQ-0029: intake-open promoted artifact 一括処理](requirements/REQ-0029.md)
+  - [REQ-0029: intake-open promoted artifact 一括処理](requirements/REQ-0029.md) *(superseded by REQ-0039)*
   - [REQ-0030: agentdev コマンド群の体系的テスト実装](requirements/REQ-0030.md)
   - [REQ-0031: GitHub本文内リポジトリ参照リンクの正規化](requirements/REQ-0031.md)
   - [REQ-0032: case-close 未チェック項目達成判定](requirements/REQ-0032.md)
