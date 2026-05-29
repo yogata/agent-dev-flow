@@ -99,6 +99,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 変更後仕様と矛盾するドキュメント更新漏れがある場合、完了不可とする（SHALL）
     - `docs/DOC-MAP.md` が存在すること、およびDOC-MAPに記載された基準文書（REQ/ADR/SPEC）への参照が実際のファイルと整合していることを確認する（REQ-0035-020）
 4. PRマージ（`gh pr merge`）→ 対応記録をIssueにコメント追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_implementation.md`（機能追加）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_record.md`（バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務）を Read tool で読み込む
+    - **PR merge 前の HEAD commit hash 記録**（SHALL, REQ-0038-001）: `gh pr merge` 実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する。Step 8b の自マージ検出で使用する
     - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 5. Post-merge テスト戦略検証・反映（Step 4 PRマージ後）:
@@ -120,7 +121,12 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - worktree削除（`git worktree remove`）
         - **Permission denied エラー時**（SHALL, REQ-0037-004）: プロセスを特定する案内を表示して停止する（例: 「worktree 内のファイルをロックしているプロセスがあります。エクスプローラーやエディタを閉じてから再実行してください」）。自動的なプロセス終了は行わない
     - worktree prune
-    - ローカルブランチ削除（`git branch -d`）
+    - ローカルブランチ削除:
+        - `git branch -d "{type}/issue-{N}"` を実行する
+        - **`git branch -d` 失敗時（"not fully merged"）**（SHALL, REQ-0038-002）: squash merge 済みの場合は条件付きで `-D` を許可する:
+            1. `gh pr view {PR番号} --json state,mergedAt -q '.state + " " + .mergedAt'` で PR がマージ済みであることを確認する
+            2. PR がマージ済み（`state: MERGED`）と確認できた場合 → `git branch -D "{type}/issue-{N}"` を実行して強制削除する
+            3. PR がマージ済みと確認できない場合 → 警告を表示して停止する（REQ-0001-007）
     - **リモートブランチ削除**（`git push origin --delete`）— `agentdev-git-worktree` スキル Step 5 参照
     - 削除の成否を確認し、失敗した場合は警告表示して停止する（SHALL。「警告して継続」ではなく「警告して停止」に統一）
  8. 親Epic Issue更新（`agentdev-epic-tracker` スキル参照）:
@@ -147,15 +153,20 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - pull前のHEAD commit hash を記録する（`git rev-parse HEAD`）
     - カレントディレクトリで `git pull --ff-only` を実行する
     - pull後のHEAD commit hash を取得し、pull前のhashと一致することを確認する（hash一致 = リモートに新規コミットなし）
-    - **hash不一致時**: リモートの新規コミットが取り込まれたため、Step 2-8の評価・承認をやり直す必要がある。以下の構造化エラーメッセージを表示して停止する:
-      ```
-      ## Git 同期エラー（hash 不一致）
+    - **hash不一致時**: 自マージのみに起因するか判定する（SHALL, REQ-0038-003）:
+        1. `git log --oneline {pre_pull_hash}..{post_pull_hash}` で pull により取り込まれたコミットを確認する
+        2. 取り込まれたコミットが全て自マージコミット（`Merge branch 'fix/issue-{N}'` 等のマージコミット）のみの場合 → 自マージ由来として継続する（Step 9以降に進む）
+        3. 自マージ以外のコミットが含まれる場合 → リモートの新規コミットが取り込まれたため、Step 2-8の評価・承認をやり直す必要がある。以下の構造化エラーメッセージを表示して停止する:
+          ```
+          ## Git 同期エラー（hash 不一致 — 自マージ以外の新規コミット検出）
 
-      **事前hash**: {pre_pull_hash}
-      **事後hash**: {post_pull_hash}
-      **停止理由**: pull により新規コミットが取り込まれた。Step 2-8 の評価・承認をやり直すこと
-      **ユーザーアクション**: `case-close` を最初から再実行してください
-      ```
+          **事前hash**: {pre_pull_hash}
+          **事後hash**: {post_pull_hash}
+          **取り込まれたコミット**:
+          {git log output}
+          **停止理由**: pull により自マージ以外の新規コミットが取り込まれた。Step 2-8 の評価・承認をやり直すこと
+          **ユーザーアクション**: `case-close` を最初から再実行してください
+          ```
     - **pull自体の失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
       ```
       ## Git 同期エラー
