@@ -185,9 +185,9 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - **禁止**: ユーザーに学びの有無を問うこと（「学びはありますか？」等）は禁止。エージェントが判断する
      - エージェントが学びありと判断 → 13フィールド形式でエントリを生成し、ユーザー承認を求めず `.agentdev/learning/inbox.md` に直接追記する。追記後、追記内容をユーザーに通知する（承認や却下は求めない）
      - エージェントが学びなしと判断 → ユーザーに何も問わず次の Step へ進む
- 9a. Staging stub consumed 判定と archive:
+ 9a. Staging stub imported 判定と archive:
      - staging stub archive 処理は `agentdev-learning-pipeline` skill の archive ルールに従う（SSoT）
-     - consumed 判定結果を Step 11 の完了報告に含める
+     - imported 判定結果を Step 11 の完了報告に含める
  9b. Post-run intake capture: 完了処理中に発見した本筋外の変更候補のうち、具体的な修正対象が特定できるものを intake item として保存する。`agentdev-workflow-lifecycle` → `reference/capture-boundaries.md` の Split Rule を SSoT とする
      - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）
      - **Intake item の形式**: 他の intake 系コマンド（intake-capture / intake-from-github）と同一の推奨標準形に従う:

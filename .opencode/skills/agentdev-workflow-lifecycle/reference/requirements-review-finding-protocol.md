@@ -74,7 +74,7 @@ Finding は `req-define` の明示入力ファイルとして渡される（ADR-
 | 責務 | コマンド | 説明 |
 |------|----------|------|
 | Finding 作成 | `req-save` | SPLIT検出時に finding ファイルを作成 |
-| Finding 消費 | `req-define` | 明示入力ファイルとして読み込み、要件変更に変換 |
+| Finding 取り込み | `req-define` | 明示入力ファイルとして読み込み、要件変更に変換 |
 | Finding 保存 | `req-save` | `.sisyphus/drafts/` に保存 |
 
 ## backlog-draft-protocol との分離

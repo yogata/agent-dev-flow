@@ -27,7 +27,7 @@
   - [REQ-0020: Epic Issue 実行順序 SSoT と case-run Epic Orchestrator 化](requirements/REQ-0020.md)
   - [REQ-0021: AgentDevFlow ガードレールのスクリプト化と skill-local scripts 配置方針](requirements/REQ-0021.md)
   - [REQ-0022: .agentdev domain state 更新後の git 永続化](requirements/REQ-0022.md)
-  - [REQ-0023: learning staging stub の消費追跡と消費後アーカイブ](requirements/REQ-0023.md)
+  - [REQ-0023: learning staging stub の取り込み追跡と取り込み後アーカイブ](requirements/REQ-0023.md)
   - [REQ-0024: 全 agentdev コマンドの完了報告フォーマット統一](requirements/REQ-0024.md)
   - [REQ-0025: intake 系コマンドの .agentdev/intake 更新後の git 永続化](requirements/REQ-0025.md)
   - [REQ-0026: intake lifecycle の queue/archive 再定義](requirements/REQ-0026.md)
