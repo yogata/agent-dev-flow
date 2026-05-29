@@ -141,10 +141,10 @@ load_skills:
 ## Guardrails
 
 ### 責務境界（REQ-0017-024）
-- G01: GitHub Issue の作成を行わない（`intake-open` が担当）
+- G01: GitHub Issue の作成を行わない（`case-open` が担当）
 - G02: 採用可否の判断を行わない（`intake-review` が担当）
 - G03: review・整形・分類の判断を行わない（後続コマンドの責務）
-- G04: Issue/PR へのコメント投稿・マーカー付与は行わない（`intake-open` が担当）
+- G04: Issue/PR へのコメント投稿・マーカー付与は行わない（`req-backlog` が担当）
 
 ### 形式制約（REQ-0017-032〜039）
 - G05: workflow 管理 artifact として扱わない（REQ-0017-033）

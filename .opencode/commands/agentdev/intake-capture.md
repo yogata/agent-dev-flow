@@ -112,7 +112,7 @@ intake item は以下の推奨標準形に従う Markdown artifact とする（R
 ## Guardrails
 
 ### 責務境界（REQ-0017-024, REQ-0019-024）
-- G01: GitHub Issue の作成を行わない（`intake-open` が担当）
+- G01: GitHub Issue の作成を行わない（`case-open` が担当）
 - G02: 採用可否の判断を行わない（`intake-review` が担当）
 - G03: intake item の変更・更新を行わない（保存のみ）
 - G04: review・整形・分類を行わない（後続コマンドの責務）
