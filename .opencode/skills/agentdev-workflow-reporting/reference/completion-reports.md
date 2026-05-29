@@ -135,6 +135,7 @@ git 永続化: 該当なし
 結果:
   - PR作成完了（head: {branch_name} → base: {base_branch}）
   - 現在の状態: レビュー待ち
+  - Findings / Intake候補: {count}件（{該当なしの場合は「該当なし」}）
 検証結果: ✅ OK
 git 永続化: 該当なし
 次のコマンド: レビュー通過後: /agentdev/case-close
@@ -289,6 +290,7 @@ git 永続化: 該当なし
   - {機能追加の場合: ドキュメント（REQ・specs）を更新済み}
   - {Epic自動クローズの場合: Epic #{epic_N} を自動クローズ（全子Issue完了）}
   - {Epicスキップの場合: Epic #{epic_N}: N件未完了のためスキップ}
+  - Findings回収: {回収済みN件 / 保存済みN件}（{該当なしの場合は「該当なし」}）
 検証結果: ✅ OK（{N}件の書き込み操作を検証済み）
 git 永続化: 変更なし（commit/push スキップ）
 次のコマンド: なし

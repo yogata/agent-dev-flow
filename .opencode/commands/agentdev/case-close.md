@@ -189,7 +189,13 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - staging stub archive 処理は `agentdev-learning-pipeline` skill の archive ルールに従う（SSoT）
      - imported 判定結果を Step 11 の完了報告に含める
  9b. Post-run intake capture: 完了処理中に発見した本筋外の変更候補のうち、具体的な修正対象が特定できるものを intake item として保存する。`agentdev-workflow-lifecycle` → `reference/capture-boundaries.md` の Split Rule を SSoT とする
-     - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）
+      - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）
+      - **PR 本文からの回収**（REQ-0040-007）: マージ済み PR 本文の `## Findings / Intake候補` セクションから Finding を取得し、intake 候補を intake item 形式で `.agentdev/intake/inbox/` に保存する（SHALL）。「該当なし」の場合はスキップ
+      - **Epic 横断回収**（REQ-0040-008）: Epic モード（Parent Issue が存在する場合）では、対象 PR 以外にも関連する子 Issue PR 群の本文を横断走査し、`## Findings / Intake候補` セクションから Finding を回収する（SHALL）。回収対象は以下の通り:
+        - Parent Issue 本文から子 Issue 番号一覧を取得
+        - 各子 Issue に紐づくマージ済み PR を `gh pr list --search "fixes #N --merged"` 等で特定
+        - 各 PR 本文から `## Findings / Intake候補` セクションを取得して回収
+      - **推測補完禁止**（REQ-0040-009）: PR 本文に記録された情報のみを保存し、推測で補完してはならない（SHALL）。記録が曖昧な場合は intake item として保存せず、完了報告に候補として提示する
      - **Intake item の形式**: 他の intake 系コマンド（intake-capture / intake-from-github）と同一の推奨標準形に従う:
        - ファイル名: `YYYY-MM-DD-{topic-slug}.md`（生成元コマンド名をファイル名に含めない）
        - 同名ファイル既存時: `-2`, `-3` の連番を付与する
