@@ -10,6 +10,7 @@ load_skills:
   - agentdev-workflow-orchestration
   - agentdev-adr-file-manager
   - agentdev-workflow-templates
+  - agentdev-no-ai-slop-writing
 ---
 
 # Case登録

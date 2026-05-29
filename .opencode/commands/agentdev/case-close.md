@@ -11,6 +11,7 @@ load_skills:
   - agentdev-epic-tracker
   - agentdev-workflow-templates
   - agentdev-learning-pipeline
+  - agentdev-no-ai-slop-writing
 ---
 
 # 完了処理

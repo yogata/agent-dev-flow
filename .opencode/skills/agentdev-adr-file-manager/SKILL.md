@@ -272,3 +272,4 @@ ADRテンプレートは以下のパスで参照可能:
 - **agentdev-adr-guidelines**: ADR作成の必要性判定基準・ライフサイクル定義
 - **agentdev-req-analysis**: 要件分析におけるADR閾値判定ブリッジ
 - **agentdev-req-file-manager**: REQファイル管理（ADR ↔ REQ整合性チェック）
+- **agentdev-no-ai-slop-writing**: 自然言語成果物の文章品質ゲート（AI-slop 検出・修正）
