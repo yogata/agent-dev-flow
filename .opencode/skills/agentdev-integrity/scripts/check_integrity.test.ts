@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
-import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync } from "fs";
+import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync } from "fs";
 import { join } from "path";
 
 const SCRIPT_DIR = import.meta.dir;
@@ -91,7 +91,7 @@ function buildValidFixture(root: string): void {
 
   const specsDir = join(root, "docs", "specs");
   mkdirp(specsDir);
-  writeFileSync(join(specsDir, "system.md"), "# System\n", "utf-8");
+  writeFileSync(join(specsDir, "system.md"), "# System\n\ntest-cmd\n", "utf-8");
   writeFileSync(join(specsDir, "patterns.md"), "# Patterns\n", "utf-8");
 
   const skillDir = join(root, ".opencode", "skills", "agentdev-test-skill");
@@ -584,5 +584,543 @@ describe("legacy data path and terminology detection (6j/6k)", () => {
         (res.file ?? "").includes("integrity-check")
     );
     expect(integrityHit).toBeUndefined();
+  });
+});
+
+// ─── New tests for REQ-0108 checks ────────────────────────────────────────
+
+describe("checkLinkIntegrity: broken file links", () => {
+  const LINK_ROOT = join(TEMP_ROOT, "link");
+
+  beforeAll(() => {
+    mkdirp(LINK_ROOT);
+    buildValidFixture(LINK_ROOT);
+
+    const reqDir = join(LINK_ROOT, "docs", "requirements");
+    writeFileSync(
+      join(reqDir, "REQ-0001.md"),
+      [
+        "---",
+        "id: REQ-0001",
+        "title: Link test",
+        "created: 2025-01-01",
+        "updated: 2025-01-02",
+        "tags:",
+        "  - test",
+        "---",
+        "",
+        "## Body",
+        "",
+        "See [guide](../guides/nonexistent.md) for details.",
+        "See ADR-0001 for context.",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(LINK_ROOT);
+  });
+
+  it("detects broken file link", () => {
+    const r = runScript(LINK_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "broken-file-link" &&
+        res.message.includes("nonexistent.md")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+    expect(hit.evidence).toContain("nonexistent.md");
+    expect(hit.expected).toContain("must exist");
+  });
+});
+
+describe("checkLinkIntegrity: broken section anchor", () => {
+  const ANCHOR_ROOT = join(TEMP_ROOT, "anchor");
+
+  beforeAll(() => {
+    mkdirp(ANCHOR_ROOT);
+    buildValidFixture(ANCHOR_ROOT);
+
+    const specsDir = join(ANCHOR_ROOT, "docs", "specs");
+    writeFileSync(
+      join(specsDir, "system.md"),
+      "# System\n\ntest-cmd\n\n## Overview\n",
+      "utf-8"
+    );
+
+    const reqDir = join(ANCHOR_ROOT, "docs", "requirements");
+    writeFileSync(
+      join(reqDir, "REQ-0001.md"),
+      [
+        "---",
+        "id: REQ-0001",
+        "title: Anchor test",
+        "created: 2025-01-01",
+        "updated: 2025-01-02",
+        "tags:",
+        "  - test",
+        "---",
+        "",
+        "## Body",
+        "",
+        "See [system](../specs/system.md#missing-section) for details.",
+        "See ADR-0001 for context.",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(ANCHOR_ROOT);
+  });
+
+  it("detects broken section anchor", () => {
+    const r = runScript(ANCHOR_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "broken-section-anchor"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("checkLinkIntegrity: missing REQ/ADR references", () => {
+  const REF_ROOT = join(TEMP_ROOT, "ref");
+
+  beforeAll(() => {
+    mkdirp(REF_ROOT);
+    buildValidFixture(REF_ROOT);
+
+    const reqDir = join(REF_ROOT, "docs", "requirements");
+    writeFileSync(
+      join(reqDir, "REQ-0001.md"),
+      [
+        "---",
+        "id: REQ-0001",
+        "title: Ref test",
+        "created: 2025-01-01",
+        "updated: 2025-01-02",
+        "tags:",
+        "  - test",
+        "---",
+        "",
+        "## Body",
+        "",
+        "See REQ-0099 and ADR-0099 for details.",
+        "See ADR-0001 for context.",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(REF_ROOT);
+  });
+
+  it("detects missing REQ reference", () => {
+    const r = runScript(REF_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "broken-req-ref" &&
+        res.message.includes("REQ-0099")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+
+  it("detects missing ADR reference", () => {
+    const r = runScript(REF_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "broken-adr-ref" &&
+        res.message.includes("ADR-0099")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("checkLifecycleBoundary: active/retired ID duplication", () => {
+  const LIFECYCLE_ROOT = join(TEMP_ROOT, "lifecycle");
+
+  beforeAll(() => {
+    mkdirp(LIFECYCLE_ROOT);
+    buildValidFixture(LIFECYCLE_ROOT);
+
+    const retiredDir = join(LIFECYCLE_ROOT, "docs", "requirements", "retired");
+    mkdirp(retiredDir);
+    writeFileSync(
+      join(retiredDir, "REQ-0001.md"),
+      "---\nid: REQ-0001\ntitle: Retired duplicate\n---\n\nRetired content.\n",
+      "utf-8"
+    );
+
+    copyScripts(LIFECYCLE_ROOT);
+  });
+
+  it("detects active/retired ID duplication", () => {
+    const r = runScript(LIFECYCLE_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "active-retired-duplication" &&
+        res.message.includes("REQ-0001")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+    expect(hit.route).toBe("intake");
+  });
+});
+
+describe("checkLifecycleBoundary: retired in active index", () => {
+  const RETIRED_INDEX_ROOT = join(TEMP_ROOT, "retired-index");
+
+  beforeAll(() => {
+    mkdirp(RETIRED_INDEX_ROOT);
+    buildValidFixture(RETIRED_INDEX_ROOT);
+
+    const retiredDir = join(RETIRED_INDEX_ROOT, "docs", "requirements", "retired");
+    mkdirp(retiredDir);
+    writeFileSync(
+      join(retiredDir, "REQ-0050.md"),
+      "---\nid: REQ-0050\ntitle: Retired only\n---\n\nRetired content.\n",
+      "utf-8"
+    );
+
+    const reqDir = join(RETIRED_INDEX_ROOT, "docs", "requirements");
+    writeFileSync(
+      join(reqDir, "README.md"),
+      [
+        "# Requirements",
+        "",
+        "Retired: [retired](retired/)",
+        "",
+        "| ID | Title |",
+        "|----|-------|",
+        "| REQ-0001 | Valid requirement |",
+        "| REQ-0050 | Retired only |",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(RETIRED_INDEX_ROOT);
+  });
+
+  it("detects retired ID in active README index", () => {
+    const r = runScript(RETIRED_INDEX_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "retired-in-active-index" &&
+        res.message.includes("REQ-0050")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("checkCanonicalBoundary: DOC-MAP with excessive requirements", () => {
+  const CANONICAL_ROOT = join(TEMP_ROOT, "canonical");
+
+  beforeAll(() => {
+    mkdirp(CANONICAL_ROOT);
+    buildValidFixture(CANONICAL_ROOT);
+
+    writeFileSync(
+      join(CANONICAL_ROOT, "docs", "DOC-MAP.md"),
+      [
+        "# DOC-MAP",
+        "",
+        "The system SHALL do X. The system MUST do Y.",
+        "Component A SHALL handle Z. Component B MUST provide W.",
+        "The gateway SHALL route traffic. The database MUST persist data.",
+        "Additional requirement here.",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(CANONICAL_ROOT);
+  });
+
+  it("detects DOC-MAP with too many requirement keywords", () => {
+    const r = runScript(CANONICAL_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "docmap-requirements"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("warning");
+    expect(hit.route).toBe("req-define");
+  });
+});
+
+describe("checkCanonicalBoundary: guide with requirement tables", () => {
+  const GUIDE_REQ_ROOT = join(TEMP_ROOT, "guide-req");
+
+  beforeAll(() => {
+    mkdirp(GUIDE_REQ_ROOT);
+    buildValidFixture(GUIDE_REQ_ROOT);
+
+    const guidesDir = join(GUIDE_REQ_ROOT, "docs", "guides");
+    mkdirp(guidesDir);
+    writeFileSync(
+      join(guidesDir, "workflow-overview.md"),
+      [
+        "# Workflow Overview",
+        "",
+        "This guide describes the workflow.",
+        "",
+        "| ID | 要件 | Status |",
+        "|----|------|--------|",
+        "| REQ-0001 | Something | Done |",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(GUIDE_REQ_ROOT);
+  });
+
+  it("detects guide with requirement-like table", () => {
+    const r = runScript(GUIDE_REQ_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "guide-req-table"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("warning");
+    expect(hit.route).toBe("req-define");
+  });
+});
+
+describe("checkExpandedLegacyNamespace: docs/* files", () => {
+  const EXPANDED_NS_ROOT = join(TEMP_ROOT, "expanded-ns");
+
+  beforeAll(() => {
+    mkdirp(EXPANDED_NS_ROOT);
+    buildValidFixture(EXPANDED_NS_ROOT);
+
+    writeFileSync(
+      join(EXPANDED_NS_ROOT, "docs", "DOC-MAP.md"),
+      "# DOC-MAP\n\nSee .opencode/commands/issue/ for details.\n",
+      "utf-8"
+    );
+
+    copyScripts(EXPANDED_NS_ROOT);
+  });
+
+  it("detects legacy pattern in DOC-MAP.md", () => {
+    const r = runScript(EXPANDED_NS_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "expanded-legacy-namespace" &&
+        res.message.includes("commands/issue/")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("determineRoute: route determination logic", () => {
+  it("routes single broken-reference to intake", () => {
+    const { determineRoute: dr } = require("./cli_utils.ts") as typeof import("./cli_utils.ts");
+    expect(dr("broken-reference", 1)).toBe("intake");
+  });
+
+  it("routes 3+ broken-reference to intake+learning", () => {
+    const { determineRoute: dr } = require("./cli_utils.ts") as typeof import("./cli_utils.ts");
+    expect(dr("broken-reference", 3)).toBe("intake+learning");
+    expect(dr("broken-reference", 10)).toBe("intake+learning");
+  });
+
+  it("routes obsolete-structure to intake", () => {
+    const { determineRoute: dr } = require("./cli_utils.ts") as typeof import("./cli_utils.ts");
+    expect(dr("obsolete-structure", 1)).toBe("intake");
+  });
+
+  it("routes canonical-conflict to req-define", () => {
+    const { determineRoute: dr } = require("./cli_utils.ts") as typeof import("./cli_utils.ts");
+    expect(dr("canonical-conflict", 1)).toBe("req-define");
+  });
+
+  it("routes single document-drift to intake", () => {
+    const { determineRoute: dr } = require("./cli_utils.ts") as typeof import("./cli_utils.ts");
+    expect(dr("document-drift", 1)).toBe("intake");
+  });
+
+  it("routes 3+ document-drift to intake+learning", () => {
+    const { determineRoute: dr } = require("./cli_utils.ts") as typeof import("./cli_utils.ts");
+    expect(dr("document-drift", 3)).toBe("intake+learning");
+  });
+
+  it("routes workflow-gap to req-define", () => {
+    const { determineRoute: dr } = require("./cli_utils.ts") as typeof import("./cli_utils.ts");
+    expect(dr("workflow-gap", 1)).toBe("req-define");
+  });
+
+  it("routes integrity-rule-gap to req-define", () => {
+    const { determineRoute: dr } = require("./cli_utils.ts") as typeof import("./cli_utils.ts");
+    expect(dr("integrity-rule-gap", 1)).toBe("req-define");
+  });
+});
+
+describe("report file output", () => {
+  const REPORT_ROOT = join(TEMP_ROOT, "report");
+
+  beforeAll(() => {
+    mkdirp(REPORT_ROOT);
+    buildValidFixture(REPORT_ROOT);
+    copyScripts(REPORT_ROOT);
+  });
+
+  it("writes report file to .agentdev/integrity/reports/", () => {
+    const r = runScript(REPORT_ROOT, ["--json"]);
+    expect(r.exitCode).toBe(0);
+    const reportsDir = join(REPORT_ROOT, ".agentdev", "integrity", "reports");
+    expect(existsSync(reportsDir)).toBe(true);
+    const reportFiles = require("fs").readdirSync(reportsDir) as string[];
+    const mdReport = reportFiles.find((f: string) => f.endsWith("-integrity-report.md"));
+    expect(mdReport).toBeDefined();
+    const content = readFileSync(join(reportsDir, mdReport), "utf-8");
+    expect(content).toContain("check_integrity.ts Report");
+    expect(content).toContain("サマリ");
+  });
+
+  it("avoids overwriting existing report files", () => {
+    const r1 = runScript(REPORT_ROOT, ["--json"]);
+    expect(r1.exitCode).toBe(0);
+    const reportsDir = join(REPORT_ROOT, ".agentdev", "integrity", "reports");
+    const filesAfterFirst = (require("fs").readdirSync(reportsDir) as string[]).filter(
+      (f: string) => f.endsWith("-integrity-report.md") || f.includes("-integrity-report-")
+    );
+    expect(filesAfterFirst.length).toBeGreaterThanOrEqual(1);
+
+    const r2 = runScript(REPORT_ROOT, ["--json"]);
+    const filesAfterSecond = (require("fs").readdirSync(reportsDir) as string[]).filter(
+      (f: string) => f.endsWith("-integrity-report.md") || f.includes("-integrity-report-")
+    );
+    expect(filesAfterSecond.length).toBeGreaterThan(filesAfterFirst.length);
+  });
+});
+
+describe("JSON output with new fields", () => {
+  const JSON_ROOT = join(TEMP_ROOT, "json-new");
+
+  beforeAll(() => {
+    mkdirp(JSON_ROOT);
+    buildValidFixture(JSON_ROOT);
+
+    const reqDir = join(JSON_ROOT, "docs", "requirements");
+    writeFileSync(
+      join(reqDir, "REQ-0001.md"),
+      [
+        "---",
+        "id: REQ-0001",
+        "title: JSON test",
+        "created: 2025-01-01",
+        "updated: 2025-01-02",
+        "tags:",
+        "  - test",
+        "---",
+        "",
+        "## Body",
+        "",
+        "See REQ-0099 for details.",
+        "See ADR-0001 for context.",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(JSON_ROOT);
+  });
+
+  it("includes evidence and route in JSON results", () => {
+    const r = runScript(JSON_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const evidenceResults = parsed.results.filter(
+      (res: { evidence?: string }) => res.evidence !== undefined
+    );
+    expect(evidenceResults.length).toBeGreaterThan(0);
+    for (const res of evidenceResults) {
+      expect(typeof res.evidence).toBe("string");
+      if (res.route) {
+        expect(["intake", "intake+learning", "req-define", "learning", "none"]).toContain(res.route);
+      }
+    }
+  });
+});
+
+describe("inventory sync: ADR README index", () => {
+  const ADR_SYNC_ROOT = join(TEMP_ROOT, "adr-sync");
+
+  beforeAll(() => {
+    mkdirp(ADR_SYNC_ROOT);
+    buildValidFixture(ADR_SYNC_ROOT);
+
+    const adrDir = join(ADR_SYNC_ROOT, "docs", "adr");
+    writeFileSync(
+      join(adrDir, "README.md"),
+      [
+        "# ADRs",
+        "",
+        "| ADR | Title |",
+        "|-----|-------|",
+        "| ADR-0001 | Valid ADR |",
+        "| ADR-0099 | Phantom |",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(ADR_SYNC_ROOT);
+  });
+
+  it("detects phantom ADR in README index", () => {
+    const r = runScript(ADR_SYNC_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "adr-readme-index" &&
+        res.message.includes("ADR-0099")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("inventory sync: DOC-MAP REQ sync", () => {
+  const DOCMAP_REQ_ROOT = join(TEMP_ROOT, "docmap-req");
+
+  beforeAll(() => {
+    mkdirp(DOCMAP_REQ_ROOT);
+    buildValidFixture(DOCMAP_REQ_ROOT);
+
+    writeFileSync(
+      join(DOCMAP_REQ_ROOT, "docs", "DOC-MAP.md"),
+      "# DOC-MAP\n\nSee REQ-0099 for non-existent reference.\n",
+      "utf-8"
+    );
+
+    copyScripts(DOCMAP_REQ_ROOT);
+  });
+
+  it("detects DOC-MAP referencing non-existent REQ", () => {
+    const r = runScript(DOCMAP_REQ_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "docmap-req-sync" &&
+        res.message.includes("REQ-0099")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
   });
 });

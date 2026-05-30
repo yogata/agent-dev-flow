@@ -17,6 +17,21 @@ export const EXIT_ERROR = 2;
 
 export type CheckLevel = "ok" | "ng" | "warning" | "info";
 
+export type FindingCategory =
+  | "document-drift"
+  | "broken-reference"
+  | "obsolete-structure"
+  | "canonical-conflict"
+  | "workflow-gap"
+  | "integrity-rule-gap";
+
+export type FindingRoute =
+  | "intake"
+  | "intake+learning"
+  | "req-define"
+  | "learning"
+  | "none";
+
 export interface CheckResult {
   category: string;
   check: string;
@@ -24,6 +39,9 @@ export interface CheckResult {
   message: string;
   file?: string;
   line?: number;
+  evidence?: string;
+  expected?: string;
+  route?: FindingRoute;
 }
 
 export interface ScanSummary {
@@ -90,20 +108,35 @@ EXIT CODES:
   console.log(helpText);
 }
 
-export function ok(category: string, check: string, message: string): CheckResult {
-  return { category, check, level: "ok", message };
+export interface CheckResultOptions {
+  evidence?: string;
+  expected?: string;
+  route?: FindingRoute;
 }
 
-export function ng(category: string, check: string, message: string, file?: string, line?: number): CheckResult {
-  return { category, check, level: "ng", message, file, line };
+export function ok(category: string, check: string, message: string, opts?: CheckResultOptions): CheckResult {
+  return { category, check, level: "ok", message, ...opts };
 }
 
-export function warn(category: string, check: string, message: string, file?: string, line?: number): CheckResult {
-  return { category, check, level: "warning", message, file, line };
+export function ng(category: string, check: string, message: string, file?: string | CheckResultOptions, line?: number, opts?: CheckResultOptions): CheckResult {
+  if (typeof file === "object") {
+    return { category, check, level: "ng", message, ...file };
+  }
+  return { category, check, level: "ng", message, file, line, ...opts };
 }
 
-export function info(category: string, check: string, message: string, file?: string, line?: number): CheckResult {
-  return { category, check, level: "info", message, file, line };
+export function warn(category: string, check: string, message: string, file?: string | CheckResultOptions, line?: number, opts?: CheckResultOptions): CheckResult {
+  if (typeof file === "object") {
+    return { category, check, level: "warning", message, ...file };
+  }
+  return { category, check, level: "warning", message, file, line, ...opts };
+}
+
+export function info(category: string, check: string, message: string, file?: string | CheckResultOptions, line?: number, opts?: CheckResultOptions): CheckResult {
+  if (typeof file === "object") {
+    return { category, check, level: "info", message, ...file };
+  }
+  return { category, check, level: "info", message, file, line, ...opts };
 }
 
 export function computeSummary(results: CheckResult[]): ScanSummary {
@@ -152,7 +185,17 @@ export function formatMarkdownReport(report: IntegrityReport): string {
       lines.push(`### ${cat}`);
       for (const r of results) {
         const loc = r.file ? ` (${r.file}${r.line ? `:${r.line}` : ""})` : "";
-        lines.push(`- **[${r.level.toUpperCase()}]** ${r.check}: ${r.message}${loc}`);
+        let detail = `- **[${r.level.toUpperCase()}]** ${r.check}: ${r.message}${loc}`;
+        if (r.route && r.route !== "none") {
+          detail += ` → route: ${r.route}`;
+        }
+        lines.push(detail);
+        if (r.evidence) {
+          lines.push(`  - evidence: \`${r.evidence}\``);
+        }
+        if (r.expected) {
+          lines.push(`  - expected: \`${r.expected}\``);
+        }
       }
       lines.push("");
     }
@@ -167,6 +210,55 @@ export function formatMarkdownReport(report: IntegrityReport): string {
 export function determineExitCode(summary: ScanSummary): number {
   if (summary.ng > 0 || summary.warning > 0) return EXIT_NG;
   return EXIT_OK;
+}
+
+/**
+ * Determine the routing for a finding based on its category and frequency.
+ */
+export function determineRoute(category: FindingCategory, occurrences: number): FindingRoute {
+  switch (category) {
+    case "broken-reference":
+      return occurrences >= 3 ? "intake+learning" : "intake";
+    case "obsolete-structure":
+      return "intake";
+    case "canonical-conflict":
+      return "req-define";
+    case "document-drift":
+      return occurrences >= 3 ? "intake+learning" : "intake";
+    case "workflow-gap":
+      return "req-define";
+    case "integrity-rule-gap":
+      return "req-define";
+    default:
+      return "none";
+  }
+}
+
+/**
+ * Write the integrity report as a Markdown file.
+ * Returns the path of the written file.
+ */
+export function writeReportFile(root: string, report: IntegrityReport): string {
+  const { join } = require("path");
+  const fs = require("fs") as typeof import("fs");
+
+  const reportsDir = join(root, ".agentdev", "integrity", "reports");
+  fs.mkdirSync(reportsDir, { recursive: true });
+
+  const dateStr = new Date().toISOString().slice(0, 10);
+  let fileName = `${dateStr}-integrity-report.md`;
+  let filePath = join(reportsDir, fileName);
+
+  let seq = 2;
+  while (fs.existsSync(filePath)) {
+    fileName = `${dateStr}-integrity-report-${seq}.md`;
+    filePath = join(reportsDir, fileName);
+    seq++;
+  }
+
+  const content = formatMarkdownReport(report);
+  fs.writeFileSync(filePath, content, "utf-8");
+  return filePath;
 }
 
 /**

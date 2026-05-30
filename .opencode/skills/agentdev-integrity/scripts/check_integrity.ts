@@ -13,9 +13,14 @@ import {
   formatMarkdownReport,
   determineExitCode,
   findRepoRoot,
+  determineRoute,
+  writeReportFile,
   type CheckResult,
+  type CheckResultOptions,
   type IntegrityReport,
   type ScanSummary,
+  type FindingCategory,
+  type FindingRoute,
 } from "./cli_utils.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
@@ -765,6 +770,643 @@ function checkSpecsExistence(specsDir: string, root: string): CheckResult[] {
   return results;
 }
 
+// ─── Link integrity checks (REQ-0108-013) ────────────────────────────────
+
+function collectAllArtifactPaths(root: string): string[] {
+  const paths: string[] = [];
+  const globs: string[] = [
+    path.join(root, "docs", "requirements", "*.md"),
+    path.join(root, "docs", "adr", "*.md"),
+    path.join(root, "docs", "specs", "*.md"),
+    path.join(root, "docs", "guides", "*.md"),
+    path.join(root, "docs", "README.md"),
+    path.join(root, "docs", "DOC-MAP.md"),
+    path.join(root, "README.md"),
+  ];
+  for (const g of globs) {
+    const dir = path.dirname(g);
+    if (!fs.existsSync(dir)) continue;
+    for (const f of listFiles(dir)) {
+      const full = path.join(dir, f);
+      if (!paths.includes(full)) paths.push(full);
+    }
+  }
+  return paths;
+}
+
+function parseMarkdownLinks(content: string): { text: string; href: string }[] {
+  const links: { text: string; href: string }[] = [];
+  const regex = /\[([^\]]*)\]\(([^)]+)\)/g;
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    const href = match[2].trim();
+    if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("#") || href.startsWith("mailto:")) continue;
+    links.push({ text: match[1], href });
+  }
+  return links;
+}
+
+function parseHeadings(content: string): Set<string> {
+  const headings = new Set<string>();
+  for (const line of content.split("\n")) {
+    const match = line.match(/^#{1,6}\s+(.+)$/);
+    if (match) {
+      const slug = match[1].trim().toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
+      headings.add(slug);
+    }
+  }
+  return headings;
+}
+
+function resolveLinkTarget(linkHref: string, sourceFilePath: string, root: string): { filePath: string; anchor?: string } | null {
+  const parts = linkHref.split("#");
+  const linkPath = parts[0];
+  const anchor = parts.length > 1 ? parts[1] : undefined;
+
+  if (!linkPath) {
+    return { filePath: sourceFilePath, anchor };
+  }
+
+  const sourceDir = path.dirname(sourceFilePath);
+  const resolved = path.resolve(sourceDir, linkPath);
+  return { filePath: resolved, anchor };
+}
+
+function checkLinkIntegrity(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const allFiles = collectAllArtifactPaths(root);
+  const brokenRefCount = new Map<string, number>();
+
+  for (const filePath of allFiles) {
+    const content = readText(filePath);
+    if (!content) continue;
+    const relPath = resolveRelative(filePath, root);
+
+    const links = parseMarkdownLinks(content);
+    for (const link of links) {
+      const target = resolveLinkTarget(link.href, filePath, root);
+      if (!target) continue;
+
+      if (!fs.existsSync(target.filePath)) {
+        const count = (brokenRefCount.get("broken-file-link") ?? 0) + 1;
+        brokenRefCount.set("broken-file-link", count);
+        const route: FindingRoute = count >= 3 ? "intake+learning" : "intake";
+        results.push(ng(
+          "LinkIntegrity", "broken-file-link",
+          `Link target does not exist: ${link.href}`,
+          relPath,
+          undefined,
+          { evidence: link.href, expected: "file must exist", route }
+        ));
+        continue;
+      }
+
+      if (target.anchor) {
+        const targetContent = readText(target.filePath);
+        if (targetContent) {
+          const headings = parseHeadings(targetContent);
+          const normalizedAnchor = target.anchor.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
+          if (!headings.has(normalizedAnchor)) {
+            const count = (brokenRefCount.get("broken-section-anchor") ?? 0) + 1;
+            brokenRefCount.set("broken-section-anchor", count);
+            const route: FindingRoute = count >= 3 ? "intake+learning" : "intake";
+            results.push(ng(
+              "LinkIntegrity", "broken-section-anchor",
+              `Section anchor '#${target.anchor}' not found in ${resolveRelative(target.filePath, root)}`,
+              relPath,
+              undefined,
+              { evidence: `#${target.anchor}`, expected: "heading must exist", route }
+            ));
+          }
+        }
+      }
+    }
+
+    // Check REQ-/ADR- text references
+    const reqRefs = content.match(/\bREQ-\d{4}\b/g) || [];
+    const uniqueReqRefs = [...new Set(reqRefs)];
+    for (const ref of uniqueReqRefs) {
+      const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
+      const retiredPath = path.join(root, "docs", "requirements", "retired", `${ref}.md`);
+      if (!fs.existsSync(activePath) && !fs.existsSync(retiredPath)) {
+        const count = (brokenRefCount.get("broken-req-ref") ?? 0) + 1;
+        brokenRefCount.set("broken-req-ref", count);
+        const route: FindingRoute = count >= 3 ? "intake+learning" : "intake";
+        results.push(ng(
+          "LinkIntegrity", "broken-req-ref",
+          `${ref} referenced but REQ file does not exist`,
+          relPath,
+          undefined,
+          { evidence: ref, expected: `${ref}.md must exist in docs/requirements/`, route }
+        ));
+      }
+    }
+
+    const adrRefs = content.match(/\bADR-\d{4}\b/g) || [];
+    const uniqueAdrRefs = [...new Set(adrRefs)];
+    for (const ref of uniqueAdrRefs) {
+      const adrPath = path.join(root, "docs", "adr", `${ref}.md`);
+      if (!fs.existsSync(adrPath)) {
+        const count = (brokenRefCount.get("broken-adr-ref") ?? 0) + 1;
+        brokenRefCount.set("broken-adr-ref", count);
+        const route: FindingRoute = count >= 3 ? "intake+learning" : "intake";
+        results.push(ng(
+          "LinkIntegrity", "broken-adr-ref",
+          `${ref} referenced but ADR file does not exist`,
+          relPath,
+          undefined,
+          { evidence: ref, expected: `${ref}.md must exist in docs/adr/`, route }
+        ));
+      }
+    }
+
+    // Check retired REQ referenced as current requirement
+    for (const ref of uniqueReqRefs) {
+      const retiredPath = path.join(root, "docs", "requirements", "retired", `${ref}.md`);
+      const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
+      if (fs.existsSync(retiredPath) && !fs.existsSync(activePath) && !relPath.startsWith("docs/requirements/retired/")) {
+        results.push(warn(
+          "LinkIntegrity", "retired-req-as-current",
+          `${ref} is retired but referenced in non-retired file`,
+          relPath,
+          undefined,
+          { evidence: ref, expected: "retired REQs should not be referenced as current requirements", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("LinkIntegrity", "link-integrity", "All links and references are valid"));
+  }
+  return results;
+}
+
+// ─── Canonical boundary checks (REQ-0108-014) ────────────────────────────
+
+function checkCanonicalBoundary(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const SHALL_MUST_PATTERN = /\b(SHALL|MUST|必須)\b/g;
+  const REQ_TABLE_PATTERN = /\|\s*ID\s*\|\s*要件\s*\|/g;
+  const THRESHOLD = 5;
+
+  // Check DOC-MAP
+  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
+  const docMapContent = readText(docMapPath);
+  if (docMapContent) {
+    const matches = docMapContent.match(SHALL_MUST_PATTERN);
+    const count = matches ? matches.length : 0;
+    if (count > THRESHOLD) {
+      results.push(warn(
+        "CanonicalBoundary", "docmap-requirements",
+        `DOC-MAP contains ${count} requirement keywords (SHALL/MUST), threshold is ${THRESHOLD}`,
+        resolveRelative(docMapPath, root),
+        undefined,
+        { evidence: `${count} SHALL/MUST keywords`, expected: `at most ${THRESHOLD}`, route: "req-define" }
+      ));
+    }
+  }
+
+  // Check guides
+  const guidesDir = path.join(root, "docs", "guides");
+  if (fs.existsSync(guidesDir)) {
+    for (const file of listFiles(guidesDir)) {
+      const guidePath = path.join(guidesDir, file);
+      const content = readText(guidePath);
+      if (!content) continue;
+      const tableMatches = content.match(REQ_TABLE_PATTERN);
+      const tableCount = tableMatches ? tableMatches.length : 0;
+      if (tableCount > 0) {
+        results.push(warn(
+          "CanonicalBoundary", "guide-req-table",
+          `Guide contains requirement-like table pattern (${tableCount} matches)`,
+          resolveRelative(guidePath, root),
+          undefined,
+          { evidence: `| ID | 要件 | pattern x${tableCount}`, expected: "no requirement tables in guides", route: "req-define" }
+        ));
+      }
+    }
+  }
+
+  // Check README
+  const readmePath = path.join(root, "README.md");
+  const readmeContent = readText(readmePath);
+  if (readmeContent) {
+    const matches = readmeContent.match(SHALL_MUST_PATTERN);
+    const count = matches ? matches.length : 0;
+    if (count > THRESHOLD) {
+      results.push(warn(
+        "CanonicalBoundary", "readme-specifications",
+        `Root README contains ${count} specification keywords (SHALL/MUST), threshold is ${THRESHOLD}`,
+        resolveRelative(readmePath, root),
+        undefined,
+        { evidence: `${count} SHALL/MUST keywords`, expected: `at most ${THRESHOLD}`, route: "req-define" }
+      ));
+    }
+  }
+
+  if (results.length === 0) {
+    results.push(ok("CanonicalBoundary", "canonical-boundary", "No canonical boundary violations detected"));
+  }
+  return results;
+}
+
+// ─── Lifecycle boundary checks (REQ-0108-015) ───────────────────────────
+
+function checkLifecycleBoundary(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqDir = path.join(root, "docs", "requirements");
+  const retiredDir = path.join(reqDir, "retired");
+
+  const activeFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-") && f !== "README.md");
+  const activeIds = new Set(activeFiles.map((f) => f.replace(".md", "")));
+
+  const retiredFiles = fs.existsSync(retiredDir) ? listFiles(retiredDir).filter((f) => f.startsWith("REQ-")) : [];
+  const retiredIds = new Set(retiredFiles.map((f) => f.replace(".md", "")));
+
+  // (a) Active/retired ID duplication
+  for (const id of activeIds) {
+    if (retiredIds.has(id)) {
+      results.push(ng(
+        "LifecycleBoundary", "active-retired-duplication",
+        `${id} exists in both active and retired directories`,
+        undefined,
+        undefined,
+        { evidence: `${id}.md in both dirs`, expected: "unique IDs across active and retired", route: "intake" }
+      ));
+    }
+  }
+
+  // (b) Retired IDs in active README index
+  const readmePath = path.join(reqDir, "README.md");
+  const readmeContent = readText(readmePath);
+  if (readmeContent) {
+    const indexedIds = extractReadmeTableReqIds(readmeContent);
+    for (const id of indexedIds) {
+      if (retiredIds.has(id) && !activeIds.has(id)) {
+        results.push(ng(
+          "LifecycleBoundary", "retired-in-active-index",
+          `${id} is retired but still listed in active README index`,
+          resolveRelative(readmePath, root),
+          undefined,
+          { evidence: id, expected: "retired IDs should not appear in active index", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  // (c) Retired REQ referenced as primary reference in non-retired docs
+  const allDocFiles = collectAllArtifactPaths(root);
+  for (const filePath of allDocFiles) {
+    const relPath = resolveRelative(filePath, root);
+    if (relPath.startsWith("docs/requirements/retired/")) continue;
+    const content = readText(filePath);
+    if (!content) continue;
+    const refs = content.match(/\bREQ-\d{4}\b/g) || [];
+    const uniqueRefs = [...new Set(refs)];
+    for (const ref of uniqueRefs) {
+      if (retiredIds.has(ref) && !activeIds.has(ref)) {
+        results.push(warn(
+          "LifecycleBoundary", "retired-req-primary-ref",
+          `${ref} is retired but referenced in ${relPath}`,
+          relPath,
+          undefined,
+          { evidence: ref, expected: "retired REQs should not be primary references", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  // (d) mapping-table.md referencing non-existent old REQ IDs
+  const mappingTablePath = path.join(root, "docs", "requirements", "retired", "mapping-table.md");
+  const mappingContent = readText(mappingTablePath);
+  if (mappingContent) {
+    const allReqIds = new Set([...activeIds, ...retiredIds]);
+    const refs = mappingContent.match(/\bREQ-\d{4}\b/g) || [];
+    const uniqueRefs = [...new Set(refs)];
+    for (const ref of uniqueRefs) {
+      if (!allReqIds.has(ref)) {
+        results.push(ng(
+          "LifecycleBoundary", "mapping-table-nonexistent",
+          `${ref} referenced in mapping-table.md does not exist`,
+          resolveRelative(mappingTablePath, root),
+          undefined,
+          { evidence: ref, expected: "all REQ references in mapping table must exist", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  // (e) Retired REQ missing from mapping table
+  if (mappingContent && retiredIds.size > 0) {
+    const mappingRefs = new Set((mappingContent.match(/\bREQ-\d{4}\b/g) || []));
+    for (const id of retiredIds) {
+      if (!mappingRefs.has(id)) {
+        results.push(warn(
+          "LifecycleBoundary", "retired-missing-from-mapping",
+          `${id} is retired but not listed in mapping-table.md`,
+          undefined,
+          undefined,
+          { evidence: id, expected: "all retired REQs should be in mapping table", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0 && results.filter((r) => r.level === "warning").length === 0) {
+    results.push(ok("LifecycleBoundary", "lifecycle-boundary", "No lifecycle boundary issues detected"));
+  }
+  return results;
+}
+
+// ─── Expanded legacy namespace check (REQ-0108-016) ──────────────────────
+
+function checkExpandedLegacyNamespace(skillsDir: string, cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const filesToCheck: string[] = [];
+
+  // Existing: skill SKILL.md files
+  const skillDirs = listDirs(skillsDir);
+  for (const dir of skillDirs) {
+    const skillMd = path.join(skillsDir, dir, "SKILL.md");
+    if (fs.existsSync(skillMd)) filesToCheck.push(skillMd);
+  }
+
+  // Existing: command .md files
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md" && f !== "integrity-check.md");
+  for (const file of cmdFiles) {
+    filesToCheck.push(path.join(cmdDir, file));
+  }
+
+  // NEW: docs/DOC-MAP.md
+  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
+  if (fs.existsSync(docMapPath)) filesToCheck.push(docMapPath);
+
+  // NEW: docs/README.md
+  const docsReadme = path.join(root, "docs", "README.md");
+  if (fs.existsSync(docsReadme)) filesToCheck.push(docsReadme);
+
+  // NEW: docs/guides/*.md
+  const guidesDir = path.join(root, "docs", "guides");
+  if (fs.existsSync(guidesDir)) {
+    for (const f of listFiles(guidesDir)) filesToCheck.push(path.join(guidesDir, f));
+  }
+
+  // NEW: docs/specs/*.md
+  const specsDir = path.join(root, "docs", "specs");
+  if (fs.existsSync(specsDir)) {
+    for (const f of listFiles(specsDir)) filesToCheck.push(path.join(specsDir, f));
+  }
+
+  // NEW: skills reference/*.md and references/*.md
+  for (const dir of skillDirs) {
+    const refDir = path.join(skillsDir, dir, "reference");
+    const refsDir = path.join(skillsDir, dir, "references");
+    if (fs.existsSync(refDir)) {
+      for (const f of listFiles(refDir)) filesToCheck.push(path.join(refDir, f));
+    }
+    if (fs.existsSync(refsDir)) {
+      for (const f of listFiles(refsDir)) filesToCheck.push(path.join(refsDir, f));
+    }
+  }
+
+  let foundLegacy = false;
+  for (const filePath of filesToCheck) {
+    const content = readText(filePath);
+    if (!content) continue;
+    const relPath = resolveRelative(filePath, root);
+    for (const { pattern, name } of LEGACY_PATTERNS) {
+      pattern.lastIndex = 0;
+      if (pattern.test(content)) {
+        foundLegacy = true;
+        results.push(ng("Namespace", "expanded-legacy-namespace", `Legacy pattern '${name}' found`, relPath));
+      }
+    }
+  }
+
+  if (!foundLegacy) {
+    results.push(ok("Namespace", "expanded-legacy-namespace", "No legacy namespace patterns detected in expanded file set"));
+  }
+  return results;
+}
+
+// ─── Inventory sync checks (REQ-0108-003) ────────────────────────────────
+
+function checkReqRetiredIndexSync(reqDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const retiredDir = path.join(reqDir, "retired");
+  const readmePath = path.join(reqDir, "README.md");
+  const readmeContent = readText(readmePath);
+
+  if (!fs.existsSync(retiredDir)) {
+    results.push(info("Inventory", "req-retired-index", "No retired directory found"));
+    return results;
+  }
+
+  if (!readmeContent) {
+    results.push(ng("Inventory", "req-retired-index", "README.md not found in requirements dir"));
+    return results;
+  }
+
+  // Check README has guidance/link to retired section
+  if (!readmeContent.includes("retired") && !readmeContent.includes("Retired")) {
+    results.push(ng(
+      "Inventory", "req-retired-index",
+      "README.md does not mention or link to retired REQs section",
+      resolveRelative(readmePath, root),
+      undefined,
+      { evidence: "no 'retired' mention in README", expected: "README should link to retired section", route: "intake" }
+    ));
+  } else {
+    results.push(ok("Inventory", "req-retired-index", "README links to retired REQs section"));
+  }
+  return results;
+}
+
+function checkDocMapReqSync(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
+  const docMapContent = readText(docMapPath);
+
+  if (!docMapContent) {
+    results.push(info("Inventory", "docmap-req-sync", "DOC-MAP.md not found"));
+    return results;
+  }
+
+  const reqDir = path.join(root, "docs", "requirements");
+  const reqFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-") && f !== "README.md");
+  const reqIds = new Set(reqFiles.map((f) => f.replace(".md", "")));
+
+  // Check REQ references in DOC-MAP
+  const docMapReqRefs = docMapContent.match(/\bREQ-\d{4}\b/g) || [];
+  const uniqueRefs = [...new Set(docMapReqRefs)];
+
+  for (const ref of uniqueRefs) {
+    if (!reqIds.has(ref)) {
+      results.push(ng(
+        "Inventory", "docmap-req-sync",
+        `${ref} referenced in DOC-MAP but REQ file does not exist`,
+        resolveRelative(docMapPath, root),
+        undefined,
+        { evidence: ref, expected: "DOC-MAP REQ references must match existing files", route: "intake" }
+      ));
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("Inventory", "docmap-req-sync", "All DOC-MAP REQ references match existing files"));
+  }
+  return results;
+}
+
+function checkDocMapSpecSync(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
+  const docMapContent = readText(docMapPath);
+
+  if (!docMapContent) {
+    results.push(info("Inventory", "docmap-spec-sync", "DOC-MAP.md not found"));
+    return results;
+  }
+
+  const specsDir = path.join(root, "docs", "specs");
+  const specFiles = listFiles(specsDir);
+  const specNames = new Set(specFiles);
+
+  // Check file links to specs in DOC-MAP
+  const links = parseMarkdownLinks(docMapContent);
+  for (const link of links) {
+    const target = resolveLinkTarget(link.href, docMapPath, root);
+    if (!target) continue;
+    const rel = path.relative(root, target.filePath).replace(/\\/g, "/");
+    if (rel.startsWith("docs/specs/")) {
+      const specFileName = path.basename(target.filePath);
+      if (!specNames.has(specFileName) && !fs.existsSync(target.filePath)) {
+        results.push(ng(
+          "Inventory", "docmap-spec-sync",
+          `DOC-MAP links to spec '${specFileName}' which does not exist`,
+          resolveRelative(docMapPath, root),
+          undefined,
+          { evidence: link.href, expected: "linked spec must exist", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("Inventory", "docmap-spec-sync", "All DOC-MAP spec references are valid"));
+  }
+  return results;
+}
+
+function checkDocMapGuideSync(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
+  const docMapContent = readText(docMapPath);
+
+  if (!docMapContent) {
+    results.push(info("Inventory", "docmap-guide-sync", "DOC-MAP.md not found"));
+    return results;
+  }
+
+  const guidesDir = path.join(root, "docs", "guides");
+  const guideFiles = fs.existsSync(guidesDir) ? listFiles(guidesDir) : [];
+  const guideNames = new Set(guideFiles);
+
+  const links = parseMarkdownLinks(docMapContent);
+  for (const link of links) {
+    const target = resolveLinkTarget(link.href, docMapPath, root);
+    if (!target) continue;
+    const rel = path.relative(root, target.filePath).replace(/\\/g, "/");
+    if (rel.startsWith("docs/guides/")) {
+      const guideFileName = path.basename(target.filePath);
+      if (!guideNames.has(guideFileName) && !fs.existsSync(target.filePath)) {
+        results.push(ng(
+          "Inventory", "docmap-guide-sync",
+          `DOC-MAP links to guide '${guideFileName}' which does not exist`,
+          resolveRelative(docMapPath, root),
+          undefined,
+          { evidence: link.href, expected: "linked guide must exist", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("Inventory", "docmap-guide-sync", "All DOC-MAP guide references are valid"));
+  }
+  return results;
+}
+
+function checkAdrReadmeIndexSync(adrDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const adrFiles = listFiles(adrDir).filter((f) => f.startsWith("ADR-") && f !== "README.md");
+  const adrIds = new Set(adrFiles.map((f) => f.replace(".md", "")));
+
+  const readmePath = path.join(adrDir, "README.md");
+  const readmeContent = readText(readmePath);
+  if (!readmeContent) {
+    results.push(info("Inventory", "adr-readme-index", "ADR README.md not found"));
+    return results;
+  }
+
+  const indexedIds = new Set<string>();
+  for (const line of readmeContent.split("\n")) {
+    const match = line.match(/\b(ADR-\d{4})\b/);
+    if (match) indexedIds.add(match[1]);
+  }
+
+  const missingFromIndex = [...adrIds].filter((id) => !indexedIds.has(id));
+  const phantomEntries = [...indexedIds].filter((id) => !adrIds.has(id));
+
+  for (const id of missingFromIndex) {
+    results.push(ng("Inventory", "adr-readme-index", `${id} exists as file but missing from ADR README index`));
+  }
+  for (const id of phantomEntries) {
+    results.push(ng("Inventory", "adr-readme-index", `${id} listed in ADR README index but no corresponding file`));
+  }
+
+  if (missingFromIndex.length === 0 && phantomEntries.length === 0) {
+    results.push(ok("Inventory", "adr-readme-index", `All ${adrIds.size} ADR files match README index`));
+  }
+  return results;
+}
+
+function checkSpecReadmeIndexSync(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const specsDir = path.join(root, "docs", "specs");
+  const specFiles = listFiles(specsDir).filter((f) => f !== "README.md");
+  const specNames = new Set(specFiles);
+
+  const readmePath = path.join(specsDir, "README.md");
+  const readmeContent = readText(readmePath);
+  if (!readmeContent) {
+    results.push(info("Inventory", "spec-readme-index", "Specs README.md not found"));
+    return results;
+  }
+
+  const readmeFileRefs = new Set<string>();
+  const links = parseMarkdownLinks(readmeContent);
+  for (const link of links) {
+    readmeFileRefs.add(path.basename(link.href));
+  }
+  // Also check bare filenames in tables
+  for (const line of readmeContent.split("\n")) {
+    const match = line.match(/\b(\w+\.md)\b/);
+    if (match && match[1] !== "README.md") readmeFileRefs.add(match[1]);
+  }
+
+  const missingFromIndex = [...specNames].filter((n) => !readmeFileRefs.has(n));
+  for (const name of missingFromIndex) {
+    results.push(ng("Inventory", "spec-readme-index", `${name} exists but not referenced in specs README`));
+  }
+
+  if (missingFromIndex.length === 0) {
+    results.push(ok("Inventory", "spec-readme-index", "All spec files referenced in specs README"));
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -787,6 +1429,10 @@ async function main(): Promise<void> {
     ADR: listFiles(adrDir).filter((f) => f.startsWith("ADR-")).length,
     Skill: listDirs(skillsDir).length,
     Command: listFiles(cmdDir).filter((f) => f !== "README.md").length,
+    Guides: fs.existsSync(path.join(root, "docs", "guides")) ? listFiles(path.join(root, "docs", "guides")).length : 0,
+    Specs: listFiles(specsDir).length,
+    RetiredREQ: fs.existsSync(path.join(reqDir, "retired")) ? listFiles(path.join(reqDir, "retired")).filter((f: string) => f.startsWith("REQ-")).length : 0,
+    DocMap: fs.existsSync(path.join(root, "docs", "DOC-MAP.md")) ? 1 : 0,
   };
 
   if (options.dryRun) {
@@ -821,6 +1467,16 @@ async function main(): Promise<void> {
     ...checkInlineCompletionReports(cmdDir, root),
     ...checkPostCompletionOutput(cmdDir, root),
     ...checkTerminology(cmdDir, root),
+    ...checkLinkIntegrity(root),
+    ...checkCanonicalBoundary(root),
+    ...checkLifecycleBoundary(root),
+    ...checkExpandedLegacyNamespace(skillsDir, cmdDir, root),
+    ...checkReqRetiredIndexSync(reqDir, root),
+    ...checkDocMapReqSync(root),
+    ...checkDocMapSpecSync(root),
+    ...checkDocMapGuideSync(root),
+    ...checkAdrReadmeIndexSync(adrDir, root),
+    ...checkSpecReadmeIndexSync(root),
   ];
 
   const summary = computeSummary(results);
@@ -838,6 +1494,9 @@ async function main(): Promise<void> {
   } else {
     console.log(formatMarkdownReport(report));
   }
+
+  const reportPath = writeReportFile(root, report);
+  console.error(`Report written to: ${reportPath}`);
 
   process.exit(determineExitCode(summary));
 }
