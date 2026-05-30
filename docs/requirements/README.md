@@ -14,7 +14,7 @@
 | [REQ-0106](REQ-0106.md) | Case実行・完了 | case-run、case-close、Epic/Wave、完了ゲート |
 | [REQ-0107](REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、AI-slop抑止 |
 | [REQ-0108](REQ-0108.md) | Integrity / Validation / Tests | 整合性検査、finding分類・route、レポート出力、ガードレール、体系的テスト |
-| [REQ-0109](REQ-0109.md) | REQ再構成運用 | retired archive、移行表、REQ再構成intake |
+| [REQ-0109](REQ-0109.md) | REQ再構成運用 | retired archive、移行表、REQ再構成intake、REQ再構成レビューコマンド、100番台採番 |
 
 ## Retired Requirements
 
