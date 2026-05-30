@@ -13,7 +13,7 @@ AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-ass
 | Skill prefix | `agentdev-*` |
 | Domains | req, case, learning, intake, integrity |
 
-詳細は [ADR-0005](docs/adr/ADR-0005.md) および [REQ-0017](docs/requirements/REQ-0017.md) を参照。
+詳細は [ADR-0005](docs/adr/ADR-0005.md) および [REQ-0103](docs/requirements/REQ-0103.md) を参照。
 
 ## ワークフローの入口
 

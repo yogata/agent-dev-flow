@@ -45,7 +45,7 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 
 **Epic Orchestratorモード（Wave一括更新）**:
 
-Epic Orchestrator は各 Wave 開始時に対象子 Issue の Epic ステータスを一括更新する（REQ-0020-013）。サブエージェントによる同時更新の競合を回避するため、親エージェントが一括処理を担う。
+Epic Orchestrator は各 Wave 開始時に対象子 Issue の Epic ステータスを一括更新する（REQ-0106）。サブエージェントによる同時更新の競合を回避するため、親エージェントが一括処理を担う。
 
 Wave開始時一括更新（`☐ 未着手` → `🔄 進行中`）:
 1. Wave テーブルから該当 Wave の子 Issue 番号を抽出

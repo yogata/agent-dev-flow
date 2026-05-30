@@ -148,7 +148,7 @@ learning（`.agentdev/learning/`）、integrity（`.agentdev/integrity/`）、in
 | 生成 | `req-backlog` が promoted artifact を分析・統合して生成 |
 | 読取り | `req-define` が Requirement Source として読み込み |
 | 削除 | `req-save` / `case-open` での永続化完了後に削除 |
-| 禁止 | promoted artifact の直接読み込み（REQ-0039-019）、単純コピー（REQ-0039-003） |
+| 禁止 | promoted artifact の直接読み込み（REQ-0105）、単純コピー（REQ-0105） |
 
 ### Promoted Artifact（フラット構造）
 
@@ -157,13 +157,13 @@ learning（`.agentdev/learning/`）、integrity（`.agentdev/integrity/`）、in
 | intake | `.agentdev/intake/promoted/` | `*.md`（フラット） |
 | learning | `.agentdev/learning/promoted/` | `*.md`（フラット） |
 
-- サブディレクトリルーティング（`promoted/req-define/`, `promoted/intake-open/`）は廃止（REQ-0039-011）
-- `elevation-staging/` への出力は廃止（`promoted/` に統一、REQ-0039-012）
+- サブディレクトリルーティング（`promoted/req-define/`, `promoted/intake-open/`）は廃止（REQ-0105）
+- `elevation-staging/` への出力は廃止（`promoted/` に統一、REQ-0105）
 - 成果物の詳細なライフサイクルは [`reference/artifact-lifecycle.md`](./artifact-lifecycle.md) を参照
 
-### REQ再構成intake（REQ-0050）
+### REQ再構成intake（REQ-0109）
 
-通常intakeとは独立した配置規約。inbox/accepted/archive配下に`req-restructure/`サブディレクトリを使用する（REQ-0050）。req-backlogへのpromote対象外。
+通常intakeとは独立した配置規約。inbox/accepted/archive配下に`req-restructure/`サブディレクトリを使用する（REQ-0109）。req-backlogへのpromote対象外。
 
 ## スキル間依存関係
 

@@ -33,10 +33,10 @@ load_skills:
    - 存在しない場合: セッション内の要件docから直接生成
    - テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_feature.md` または `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_bug.md` を Read tool で読み込む
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てIssue本文に含まれること。`【任意】` セクションは内容がある場合のみ含める。必須セクションが欠落している場合、生成をやり直すこと。
-     **Requirement Source 転記**（REQ-0023-004）: REQ文書（またはセッション内要件doc）に `## Requirement Source` セクションが存在する場合、その内容をIssue本文に転記する。転記先はIssue本文の補足情報セクションの後に `## Requirement Source` セクションとして配置する
-    - **関連ドキュメント更新候補 転記**（REQ-0034-011）: REQ文書（またはセッション内要件doc）に `## 関連ドキュメント更新候補` セクションが存在する場合、その内容をIssue本文に転記する
-    - **直接矛盾の完了条件反映**（REQ-0034-012）: 関連ドキュメント更新候補のうち `直接矛盾` に分類された候補を、Issue本文の完了条件セクションにチェックボックスとして反映する
-    - **テスト戦略スコープ管理**（REQ-0039-001〜003）: テスト戦略セクションの各テスト項目について、単一実装PR内で完結する検証かどうかを判定すること（SHALL）。単一PR内で完結しない検証（E2Eテスト、手動確認等）はチェックボックス形式（`- [ ]`）で出力してはならない（MUST NOT）。達成不可能項目のうち情報保持が必要なものは `> ℹ️ 別途確認: {項目名}` 形式で出力すること（SHALL）
+     **Requirement Source 転記**（REQ-0105）: REQ文書（またはセッション内要件doc）に `## Requirement Source` セクションが存在する場合、その内容をIssue本文に転記する。転記先はIssue本文の補足情報セクションの後に `## Requirement Source` セクションとして配置する
+    - **関連ドキュメント更新候補 転記**（REQ-0102）: REQ文書（またはセッション内要件doc）に `## 関連ドキュメント更新候補` セクションが存在する場合、その内容をIssue本文に転記する
+    - **直接矛盾の完了条件反映**（REQ-0102）: 関連ドキュメント更新候補のうち `直接矛盾` に分類された候補を、Issue本文の完了条件セクションにチェックボックスとして反映する
+    - **テスト戦略スコープ管理**（REQ-0105〜003）: テスト戦略セクションの各テスト項目について、単一実装PR内で完結する検証かどうかを判定すること（SHALL）。単一PR内で完結しない検証（E2Eテスト、手動確認等）はチェックボックス形式（`- [ ]`）で出力してはならない（MUST NOT）。達成不可能項目のうち情報保持が必要なものは `> ℹ️ 別途確認: {項目名}` 形式で出力すること（SHALL）
 3. **規模判定によるフロー分岐**（Step 2の直後に実行）:
    - draft-metaの `scale` フィールドを確認
    - `scale: large` の場合 → **Epic flow**（Step 4〜8）へ進む
@@ -78,7 +78,7 @@ load_skills:
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
 13. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除する
-13a. RU ファイル削除（SHALL — REQ-0039-016, 0039-017）:
+13a. RU ファイル削除（SHALL — REQ-0105, 0039-017）:
     - Issue 本文の `## Requirement Source` セクションに記録されたパスのうち、`.agentdev/backlog/req-units/RU-*.md` に一致するファイルを削除する（REQ ファイルの Requirement Source セクション、またはセッション内要件docの Requirement Source セクションから抽出）
     - **削除条件**: Issue 作成 + VERIFY が正常完了した場合のみ（SHALL）。Issue 作成失敗・VERIFY 失敗時は RU を残置する
     - **削除対象外**: RU パターンに一致しない Requirement Source は削除しない

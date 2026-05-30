@@ -126,4 +126,4 @@
 - Wave scheduling を含む
 - サブエージェント protocol を含む
 
-詳細は `artifact-boundaries.md`（REQ-0016-001〜007）を参照。
+詳細は `artifact-boundaries.md`（REQ-0103〜007）を参照。

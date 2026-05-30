@@ -82,7 +82,7 @@ load_skills:
      ```
 
 7. **Requirement Source stub 生成**（staging領域のみ）:
-   - 出力先: `.agentdev/learning/promoted/`（REQ-0039-012）
+   - 出力先: `.agentdev/learning/promoted/`（REQ-0105）
    - ファイル名: `{disposal-category}-{name}.md`
    - **`.opencode/` への直接書込は禁止**
    - **`case-run` への直接受け渡しは禁止**（`req-define` を経由すること）
@@ -132,7 +132,7 @@ load_skills:
 - G03: `case-run` への直接受け渡し禁止: stub は `req-define` の明示入力ファイルとして扱う
 
 ### 品質ゲート
-- G04: 主入力は `evaluation-report.md`: raw learning item の再分類は禁止（REQ-0017-021）
+- G04: 主入力は `evaluation-report.md`: raw learning item の再分類は禁止（REQ-0103）
 
 ### 判断・承認制約
 - G05: 既存対策を優先: 「新規X化」より「既存Xへ反映」を優先
@@ -164,13 +164,13 @@ promote が扱う3つの主要 artifact の役割・性格・lifecycle 振る舞
 
 | Artifact | 役割 | 性格 | Lifecycle 振る舞い |
 |----------|------|------|-------------------|
-| `archive.md` | 過去エントリの living pool（終端保管ではない） | living | promote の主入力の一つとして参照される。promote 時の prune により staged/rejected/duplicate は除去され、deferred/未処理は保持される。`archive` は終端保管を意味しない。（REQ-0027-003/004/005/016） |
-| `evaluation-report.md` | refine/promote 間の境界 artifact | 読込専用 | 毎回上書きされるため長期履歴ではない。promote はこれを主入力とする。（REQ-0027-008/009） |
-| `promoted/` | Requirement Source stub の staging 領域 | staging | 生成された stub は `/agentdev/req-define` の明示入力ファイルとして扱う。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止。（REQ-0027-010/011/012, REQ-0039-012） |
+| `archive.md` | 過去エントリの living pool（終端保管ではない） | living | promote の主入力の一つとして参照される。promote 時の prune により staged/rejected/duplicate は除去され、deferred/未処理は保持される。`archive` は終端保管を意味しない。（REQ-0105/004/005/016） |
+| `evaluation-report.md` | refine/promote 間の境界 artifact | 読込専用 | 毎回上書きされるため長期履歴ではない。promote はこれを主入力とする。（REQ-0105/009） |
+| `promoted/` | Requirement Source stub の staging 領域 | staging | 生成された stub は `/agentdev/req-define` の明示入力ファイルとして扱う。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止。（REQ-0105/011/012, REQ-0105） |
 
 ### learning-promote の責務
 
-廃棄判定 → stub 生成 → prune の一連の処理が learning-promote の責務範囲（REQ-0027-015）。各処理の詳細は Steps 1-9 を参照。
+廃棄判定 → stub 生成 → prune の一連の処理が learning-promote の責務範囲（REQ-0105）。各処理の詳細は Steps 1-9 を参照。
 
 ## 注意事項
 

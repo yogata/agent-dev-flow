@@ -8,9 +8,9 @@ load_skills:
 
 # Intake Capture（手動入力）
 
-ユーザーの手動入力から、未分類の作業候補・不整合・規約違反・未回収課題を intake item として作成し、`.agentdev/intake/inbox/` に保存する（REQ-0019-024）。
+ユーザーの手動入力から、未分類の作業候補・不整合・規約違反・未回収課題を intake item として作成し、`.agentdev/intake/inbox/` に保存する（REQ-0105）。
 
-**このコマンドは保存専用である。** GitHub Issue の作成・採用可否の判断は行わない（REQ-0017-024）。作業知見だけの内容は対象外である（capture-boundaries.md 参照）。
+**このコマンドは保存専用である。** GitHub Issue の作成・採用可否の判断は行わない（REQ-0103）。作業知見だけの内容は対象外である（capture-boundaries.md 参照）。
 
 ## Input
 
@@ -23,7 +23,7 @@ load_skills:
 
 ## Intake Item 形式
 
-intake item は以下の推奨標準形に従う Markdown artifact とする（REQ-0017-032）。workflow 管理用の frontmatter・状態フィールド・重複排除キーは持たない（REQ-0017-033, REQ-0017-035, REQ-0017-039）。
+intake item は以下の推奨標準形に従う Markdown artifact とする（REQ-0103）。workflow 管理用の frontmatter・状態フィールド・重複排除キーは持たない（REQ-0103, REQ-0103, REQ-0103）。
 
 ```markdown
 # {タイトル}
@@ -46,9 +46,9 @@ intake item は以下の推奨標準形に従う Markdown artifact とする（R
 
 **セクションに関する制約**:
 - 各セクションの見出し名は固定しない。ユーザーの入力に合わせて適切に整理する
-- 必須セクション・省略不可セクションを設けない（REQ-0017-037）
+- 必須セクション・省略不可セクションを設けない（REQ-0103）
 - 内容がないセクションを形式維持のためだけに作成しない
-- frontmatter・状態値・メタデータフィールドを必須にしない（REQ-0017-038, REQ-0017-039）
+- frontmatter・状態値・メタデータフィールドを必須にしない（REQ-0103, REQ-0103）
 
 ## Steps
 
@@ -111,19 +111,19 @@ intake item は以下の推奨標準形に従う Markdown artifact とする（R
 
 ## Guardrails
 
-### 責務境界（REQ-0017-024, REQ-0019-024）
+### 責務境界（REQ-0103, REQ-0105）
 - G01: GitHub Issue の作成を行わない（`case-open` が担当）
 - G02: 採用可否の判断を行わない（`intake-review` が担当）
 - G03: intake item の変更・更新を行わない（保存のみ）
 - G04: review・整形・分類を行わない（後続コマンドの責務）
-- G05: 対象は「未分類の作業候補・不整合・規約違反・未回収課題」に限定する（REQ-0019-024）。作業知見だけの内容（再発防止知見のみで具体的修正対象がないもの）は対象外
-- G06: learning item の保存・分類・昇華を担当しない（REQ-0019-023）。再発防止知見のみの観測は `/agentdev/learning-capture` に委ねる
+- G05: 対象は「未分類の作業候補・不整合・規約違反・未回収課題」に限定する（REQ-0105）。作業知見だけの内容（再発防止知見のみで具体的修正対象がないもの）は対象外
+- G06: learning item の保存・分類・昇華を担当しない（REQ-0105）。再発防止知見のみの観測は `/agentdev/learning-capture` に委ねる
 
-### 形式制約（REQ-0017-032〜039）
-- G07: workflow 管理 artifact として扱わない（REQ-0017-033）
-- G08: frontmatter・状態値・重複排除キー・後続 artifact 参照を必須にしない（REQ-0017-035, REQ-0017-039）
-- G09: 特定セクションを必須セクションとして扱わない（REQ-0017-037）
-- G10: review 結果を item に書き込まない（REQ-0017-038）
+### 形式制約（REQ-0103〜039）
+- G07: workflow 管理 artifact として扱わない（REQ-0103）
+- G08: frontmatter・状態値・重複排除キー・後続 artifact 参照を必須にしない（REQ-0103, REQ-0103）
+- G09: 特定セクションを必須セクションとして扱わない（REQ-0103）
+- G10: review 結果を item に書き込まない（REQ-0103）
 
 ### 実行制約
 - G11: ユーザーの入力内容を過度に解釈・変形しない（元の意図を保ったまま整理する）

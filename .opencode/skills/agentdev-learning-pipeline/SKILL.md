@@ -28,7 +28,7 @@ pipeline 各層を構成する 4 artifact の役割・性格・command 間の振
 | evaluation-report.md | refine/promote 間の境界 artifact。毎回上書きされ長期履歴ではない。refine が生成し、promote が主入力として取り込みする | 境界 artifact。refine→promote 間の受け渡し専用。履歴蓄積は行わない | refine が生成（上書き）。promote が主入力として読み取り・取り込み。capture は参照しない |
 | promoted/ | Requirement Source stub の staging 領域。生成された stub は `/agentdev/req-define` の明示入力ファイルとして扱う。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止 | staging 専用。promote が生成し、req-define が取り込みする。pipeline 外への直接反映は不可 | promote が stub を生成する。req-define が明示的に読み取る。refine は参照しない |
 
-**制約（REQ-0027-013）**: raw learning item を runtime command / skill の直接参照対象にしない。学びは昇華（promote → staging stub → req-define）を経て初めて command / skill / template / AGENTS.md / docs へ組み込まれる。
+**制約（REQ-0105）**: raw learning item を runtime command / skill の直接参照対象にしない。学びは昇華（promote → staging stub → req-define）を経て初めて command / skill / template / AGENTS.md / docs へ組み込まれる。
 
 ## 責任分界
 
@@ -40,7 +40,7 @@ pipeline 各層を構成する 4 artifact の役割・性格・command 間の振
 
 - learning-refine と learning-promote は本 skill を参照して schema・基準を取得する
 - agentdev-learning-capture は独立 skill であり本 skill を参照しない
-- raw learning item を runtime で直接読ませない。学びは昇華後に command / skill / template / AGENTS.md / docs へ組み込んで利用する（REQ-0027-013）
+- raw learning item を runtime で直接読ませない。学びは昇華後に command / skill / template / AGENTS.md / docs へ組み込んで利用する（REQ-0105）
 
 ## Inbox Entry Schema
 

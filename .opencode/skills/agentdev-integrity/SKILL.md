@@ -15,7 +15,7 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 - Skill ↔ load_skills 参照整合性の確認
 - Command-map ↔ 実体の整合性確認
 - 旧 namespace 残存の検出
-- 完了報告フォーマットの整合性検証（REQ-0024-017, REQ-0024-018）
+- 完了報告フォーマットの整合性検証（REQ-0107, REQ-0107）
 - ワークフローテンプレートの構造検証
 - Skill 構造（SKILL.md）の lint
 - 検出結果の Markdown レポート生成
@@ -55,7 +55,7 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 | Skill ↔ load_skills 参照 | `check_integrity.ts` | load_skills 先存在、agentdev- prefix、未使用 skill |
 | Command-map ↔ 実体 | `check_integrity.ts` | README ↔ 実ファイル、command inventory |
 | 旧 namespace 残存 | `check_integrity.ts` | 旧コマンド名、旧パス、二重 prefix |
-| 完了報告フォーマット | `check_integrity.ts` | load_skills 参照、completion-reports.md テンプレート存在、インライン完了報告、完了後追加出力、旧 terminology（REQ-0024-017, REQ-0024-018） |
+| 完了報告フォーマット | `check_integrity.ts` | load_skills 参照、completion-reports.md テンプレート存在、インライン完了報告、完了後追加出力、旧 terminology（REQ-0107, REQ-0107） |
 | Workflow template 構造 | `check_templates.ts` | frontmatter、必須セクション、placeholder、命名規則 |
 | Skill 構造 | `lint_skills.ts` | frontmatter name ↔ dir、USE FOR / DO NOT USE FOR、See Also |
 

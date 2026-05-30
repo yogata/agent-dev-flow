@@ -93,5 +93,5 @@ Finding は backlog-draft-protocol とは独立した中間アーティファク
 
 - **コマンド定義**: `req-save.md`, `req-define.md`
 - **ADR**: `ADR-0003`（req-define入力の抽象化）
-- **REQ**: `REQ-0004-023` 〜 `REQ-0004-027`（finding protocol 要件）
+- **REQ**: `REQ-0101` 〜 `REQ-0101`（finding protocol 要件）
 - **関連プロトコル**: `backlog-draft-protocol.md`

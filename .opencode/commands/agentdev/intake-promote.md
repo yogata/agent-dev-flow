@@ -11,7 +11,7 @@ load_skills:
 
 `.agentdev/intake/accepted/` 内のレビュー済み intake item を、`req-backlog` に渡せる入力 artifact に整形する。
 
-**このコマンドは整形のみを行う。** GitHub Issue の作成は行わない（REQ-0017-026）。
+**このコマンドは整形のみを行う。** GitHub Issue の作成は行わない（REQ-0103）。
 
 ## Input
 
@@ -25,7 +25,7 @@ load_skills:
 
 ## 整形の方向性
 
-レビュー済み item の後続ルートに応じて整形内容が異なる（REQ-0017-027）:
+レビュー済み item の後続ルートに応じて整形内容が異なる（REQ-0103）:
 
 | 後続ルート | 条件 | 整形内容 |
 |------------|------|----------|
@@ -42,7 +42,7 @@ load_skills:
 
 3. **後続ルートの確認**: 全 item を `req-backlog` が処理するため、後続ルートの確認は不要:
    - 複数 item を束ねて1つの artifact にすることも可能（ユーザーの指示による）
-   - **artifact を `.agentdev/intake/promoted/` 直下にフラット配置する。artifact の frontmatter には route/status を記録しない（REQ-0039-011）**
+   - **artifact を `.agentdev/intake/promoted/` 直下にフラット配置する。artifact の frontmatter には route/status を記録しない（REQ-0105）**
 
 4. **整形**: item を req-backlog 向けに整形する:
    - 観測内容・影響・課題を整理
@@ -73,7 +73,7 @@ load_skills:
     - 保存先: `.agentdev/intake/promoted/`（フラット構造）
     - `promoted/` ディレクトリが存在しない場合は作成する
     - ファイル名: `YYYY-MM-DD-{topic-slug}.md`（元 item 名を維持、または束ねた内容に応じた名前）
-    - artifact の frontmatter に route や status を記録しない（REQ-0039-011）
+    - artifact の frontmatter に route や status を記録しない（REQ-0105）
 
 6a. **accepted item の archive/promoted 移動**:
     - Step 6 で保存元とした accepted item（`.agentdev/intake/accepted/{item}.md`）を `.agentdev/intake/archive/promoted/` に移動する
@@ -110,19 +110,19 @@ load_skills:
 
 ## Guardrails
 
-### 責務境界（REQ-0017-026, REQ-0019-004）
+### 責務境界（REQ-0103, REQ-0105）
 - G01: GitHub Issue の作成を行わない（`req-backlog` / `case-open` が担当）
 - G02: intake item の元の内容を改変しない（整理・構造化のみ）
 - G03: `req-backlog` を自動起動しない（次ステップの提示のみ）
- - G04: learning pipeline の入力を生成しない（MUST NOT）。review 済み intake item の後続ルートは `req-backlog` のみ（REQ-0019-003, REQ-0019-004, REQ-0039-001）
- - G04a: REQ再構成intake（`.agentdev/intake/accepted/req-restructure/` 配下）を通常の `req-backlog` 向け短期作業候補として処理してはならない（REQ-0050-010）。REQ再構成intakeの promote 先は req-backlog ではなく、将来のREQ再構成レビューの入力として扱う
-- G05: learning item の保存・分類・昇華を担当しない（REQ-0019-023）
+ - G04: learning pipeline の入力を生成しない（MUST NOT）。review 済み intake item の後続ルートは `req-backlog` のみ（REQ-0105, REQ-0105, REQ-0105）
+ - G04a: REQ再構成intake（`.agentdev/intake/accepted/req-restructure/` 配下）を通常の `req-backlog` 向け短期作業候補として処理してはならない（REQ-0109）。REQ再構成intakeの promote 先は req-backlog ではなく、将来のREQ再構成レビューの入力として扱う
+- G05: learning item の保存・分類・昇華を担当しない（REQ-0105）
 
-### 形式制約（REQ-0017-032〜039）
-- G06: workflow 管理 artifact として扱わない（REQ-0017-033）
-- G07: 整形結果に frontmatter（route/status 等）を含めてはならない（MUST NOT）（REQ-0017-035, REQ-0026-008）
-- G08: 整形結果に重複排除キー・後続 artifact 参照を含めない（REQ-0017-039）
-- G09: 元 item の本文に整形結果を書き込まない（REQ-0017-038）
+### 形式制約（REQ-0103〜039）
+- G06: workflow 管理 artifact として扱わない（REQ-0103）
+- G07: 整形結果に frontmatter（route/status 等）を含めてはならない（MUST NOT）（REQ-0103, REQ-0105）
+- G08: 整形結果に重複排除キー・後続 artifact 参照を含めない（REQ-0103）
+- G09: 元 item の本文に整形結果を書き込まない（REQ-0103）
 
 ### 実行制約
 - G10: 整形はユーザーとの対話を通じて行う
