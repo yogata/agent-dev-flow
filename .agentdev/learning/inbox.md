@@ -68,3 +68,21 @@
 - **タグ**: `#subagent-trust` `#delegation-quality` `#spec-compliance`
 
 ---
+
+## Case #470: Windows環境でのworktree削除時Permission deniedとリトライ
+
+- **問題事象**: `git worktree remove` 実行時に Permission denied エラーが発生した。`.worktrees/470-feature/.sisyphus/` をクリーンアップした直後でも、プロセスがディレクトリをロックしている可能性があり、1回目の remove が失敗した
+- **発生局面**: 実装（case-close Step 7 worktree削除）
+- **検知方法**: `git worktree remove` のstderr出力で Permission denied を検知
+- **根本原因**: Windows環境ではファイルハンドルが即座に解放されない場合があり、`Remove-Item` 直後のディレクトリ削除でロックが残る。VS Codeのファイルウォッチャーやアンチウイルススキャンが原因の可能性
+- **自律対応内容**: クリーンアップ後に `git worktree remove` を再試行し、2回目で成功を確認。`git worktree list` でmainのみ残っていることを検証
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。Windows環境の実行時挙動
+- **横展開観点**: Windows環境での全worktree削除操作で発生する可能性あり。agentdev-git-worktreeスキルの削除手順にリトライの言及なし
+- **再発条件**: Windows環境で `.sisyphus/` クリーンアップ直後に `git worktree remove` を実行する場合
+- **予防策候補**: (a) worktree削除手順に「Permission denied時は短い間隔でリトライ（最大2回）」を追加、(b) クリーンップ後に1秒程度待機してから remove を実行
+- **想定反映先**: `agentdev-git-worktree` スキル（worktree削除手順のリトライ記述）
+- **関連**: Issue #470, PR #471, `.worktrees/470-feature/`
+- **タグ**: `#windows` `#worktree` `#permission-denied` `#retry`
+
+---
