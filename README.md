@@ -17,13 +17,14 @@ AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-ass
 
 ## ワークフローの入口
 
-AgentDevFlow には3つの系統があり、それぞれ目的と入口コマンドが異なります。
+AgentDevFlow には4つの系統があり、それぞれ目的と入口コマンドが異なります。
 
 | 系統 | 目的 | 入口コマンド | 流れ |
 |------|------|-------------|------|
 | 通常開発 | 機能追加・バグ修正 | `/agentdev/req-define` | req-define → req-save → case-open → case-run → case-close |
 | Learning 起点 | 再発防止知見の蓄積・昇華 | `/agentdev/learning-refine` | learning-capture（スキル）→ learning-refine → learning-promote → req-backlog → req-define に合流 |
 | Intake 起点 | 具体的な作業候補の収集・促進 | `/agentdev/intake-capture` | intake-capture → intake-review → intake-promote → req-backlog → req-define に合流 |
+| REQ再構成レビュー | REQ体系の健全性診断 | `/agentdev/req-restructure-review` | 診断のみ（副作用なし）→ 必要に応じて req-define に合流 |
 
 各系統の domain state（ファイル・ディレクトリ）がどの状態を表すかは [domain state lifecycle](docs/guides/domain-state-lifecycle.md) を参照。ワークフローの全体像は [ワークフロー概要](docs/guides/workflow-overview.md)、成果物の構造は [成果物モデル](docs/guides/artifact-model.md) を参照。
 
