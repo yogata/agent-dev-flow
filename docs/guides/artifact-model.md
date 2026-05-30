@@ -107,7 +107,7 @@ graph LR
 
 ## 成果物ライフサイクル概要
 
-| 成果物 | 生成 | 消費 | 削除トリガー |
+| 成果物 | 生成 | 読取り | 削除トリガー |
 |--------|------|------|-------------|
 | promoted artifact（intake） | `intake-promote` | `req-backlog` | RU化成功時 |
 | promoted artifact（learning） | `learning-promote` | `req-backlog` | RU化成功時 |

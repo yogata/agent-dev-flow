@@ -146,7 +146,7 @@ learning（`.agentdev/learning/`）、integrity（`.agentdev/integrity/`）、in
 |------|------|
 | 格納先 | `.agentdev/backlog/req-units/RU-*.md` |
 | 生成 | `req-backlog` が promoted artifact を分析・統合して生成 |
-| 消費 | `req-define` が Requirement Source として読み込み |
+| 読取り | `req-define` が Requirement Source として読み込み |
 | 削除 | `req-save` / `case-open` での永続化完了後に削除 |
 | 禁止 | promoted artifact の直接読み込み（REQ-0039-019）、単純コピー（REQ-0039-003） |
 
