@@ -34,6 +34,12 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 | `/agentdev/intake-promote` | review 済み item を promoted artifact に整形 |
 | `/agentdev/req-backlog` | promoted artifact から RU（Requirement Unit）を生成 |
 
+### REQ再構成レビューコマンド
+
+| コマンド | 役割 |
+|----------|------|
+| `/agentdev/req-restructure-review` | REQ体系の健全性を診断し、再構成の推奨アクションを提示 |
+
 ### integrity コマンド（整合性検証）
 
 | コマンド | 役割 |
@@ -66,6 +72,12 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 /agentdev/intake-capture / /agentdev/intake-from-github → /agentdev/intake-review → /agentdev/intake-promote → /agentdev/req-backlog → /agentdev/req-define
 ```
 
+### REQ再構成レビューワークフロー
+
+```
+/agentdev/req-restructure-review（診断のみ、副作用なし）
+```
+
 ### integrity ワークフロー（整合性検証）
 
 ```
@@ -88,3 +100,4 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 - `/agentdev/learning-refine` — [learning-refine.md](./learning-refine.md)
 - `/agentdev/learning-promote` — [learning-promote.md](./learning-promote.md)
 - `/agentdev/integrity-check` — [integrity-check.md](./integrity-check.md)
+- `/agentdev/req-restructure-review` — [req-restructure-review.md](./req-restructure-review.md)
