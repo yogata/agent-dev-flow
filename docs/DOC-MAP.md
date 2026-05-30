@@ -14,7 +14,7 @@
 
 ## 新基準REQ群（現行基準）
 
-REQ体系再基準化（REQ-0041 / ADR-0009）により整理統合された8件。仕様参照の第一参照先。
+REQ体系再基準化（REQ-0041 / ADR-0009）により整理統合された9件。仕様参照の第一参照先。
 
 | REQ | タイトル | 概要 |
 |-----|---------|------|
@@ -26,6 +26,7 @@ REQ体系再基準化（REQ-0041 / ADR-0009）により整理統合された8件
 | [REQ-0047](requirements/REQ-0047.md) | case-run / case-close / post-run capture | 実行プロセス・信頼性・Findings回収・完了ゲート |
 | [REQ-0048](requirements/REQ-0048.md) | reporting / GitHub body / link / writing quality | 完了報告・本文品質検証・リンク正規化・AI-slop抑止 |
 | [REQ-0049](requirements/REQ-0049.md) | integrity / validation / tests | 横断的整合性検証・バリデーション・テスト体系 |
+| [REQ-0050](requirements/REQ-0050.md) | REQ再構成intakeの分離保存と回収導線 | REQ再構成候補の分離保存・回収サイクル・検知観点 |
 
 ## Retained（現行有効な旧REQ）
 
