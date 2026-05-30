@@ -9,6 +9,7 @@ They describe what the system *is* now, as opposed to REQ files that define what
 |------|---------|------|
 | [system.md](system.md) | システム仕様 | コマンドシステムの構成定義・運用モデル |
 | [patterns.md](patterns.md) | 実装パターン | コード規約と実装パターン |
+| [design-principles.md](design-principles.md) | 設計原則 | アーキテクチャ設計原則 |
 | [quality-specs.md](quality-specs.md) | 品質仕様 | 品質基準・検証ルール |
 
 ## Document Relationships (REQ-0101)
