@@ -91,3 +91,13 @@ REQ体系再基準化（REQ-0041 / ADR-0009）により整理統合された8件
 | REQ | タイトル | 概要 |
 |-----|---------|------|
 | [REQ-0041](requirements/REQ-0041.md) | REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート | 分類ゲート・対応表（mapping-table.md） |
+
+## Guides（参照用読み物層）
+
+基準文書の内容を代替しない利用者向けの読み物（REQ-0042-031〜036）。
+
+| ガイド | 内容 |
+|--------|------|
+| [ワークフロー概要](guides/workflow-overview.md) | コマンドパイプライン・フェーズ体系・Pattern分類の全体像 |
+| [成果物モデル](guides/artifact-model.md) | 文書種別・コマンド・スキル・成果物ライフサイクル |
+| [ドメイン状態ライフサイクル](guides/domain-state-lifecycle.md) | Learning・Intake・RU・Case・Integrity の状態遷移 |

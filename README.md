@@ -25,7 +25,7 @@ AgentDevFlow には3つの系統があり、それぞれ目的と入口コマン
 | Learning 起点 | 再発防止知見の蓄積・昇華 | `/agentdev/learning-refine` | learning-capture（スキル）→ learning-refine → learning-promote → req-backlog → req-define に合流 |
 | Intake 起点 | 具体的な作業候補の収集・促進 | `/agentdev/intake-capture` | intake-capture → intake-review → intake-promote → req-backlog → req-define に合流 |
 
-各系統の domain state（ファイル・ディレクトリ）がどの状態を表すかは [domain state lifecycle](docs/guides/domain-state-lifecycle.md) を参照。
+各系統の domain state（ファイル・ディレクトリ）がどの状態を表すかは [domain state lifecycle](docs/guides/domain-state-lifecycle.md) を参照。ワークフローの全体像は [ワークフロー概要](docs/guides/workflow-overview.md)、成果物の構造は [成果物モデル](docs/guides/artifact-model.md) を参照。
 
 ## クイックスタート
 
