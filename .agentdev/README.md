@@ -37,9 +37,33 @@ AgentDevFlow の永続化すべき domain artifact（intake items、learning dat
 | `learning/` | #288 | learning pipeline data |
 | `integrity/` | #291 | integrity reports |
 
-## learning pipeline の canonical storage（.agentdev/learning/）
+## ディレクトリ構成（REQ-0039 準拠）
 
-`.agentdev/learning/` は learning pipeline の canonical storage である（REQ-0017-007, REQ-0017-009）。inbox.md、archive.md、evaluation-report.md、elevation-staging/ が格納される。
+.agentdev/
+├── intake/
+│   ├── inbox/           ← intake-capture / intake-from-github が raw item を保存
+│   │   └── *.md
+│   ├── accepted/        ← intake-review が採用 item を移動
+│   │   └── *.md
+│   ├── promoted/        ← intake-promote が派生 artifact を出力（フラット）
+│   │   └── *.md
+│   └── archive/         ← intake-promote 成功後に raw item を移動（フラット）
+│       └── *.md
+│
+├── learning/
+│   ├── inbox.md         ← learning-capture が生学びを追記
+│   ├── evaluation-report.md ← learning-refine が評価レポートを生成
+│   ├── archive/         ← learning-refine が entry を移動（living pool）
+│   │   ├── active.md    ← 現在有効な learning entry
+│   │   └── YYYY-MM.md  ← 月次 prune 済み archive（将来用）
+│   └── promoted/        ← learning-promote が staging stub を出力（フラット）
+│       └── *.md
+│
+├── backlog/
+│   └── req-units/       ← req-backlog が RU を生成
+│       └── RU-*.md
+│
+└── integrity/           ← integrity-check が検証結果を保存
 
 ## 参照
 
