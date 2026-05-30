@@ -86,3 +86,21 @@
 - **タグ**: `#windows` `#worktree` `#permission-denied` `#retry`
 
 ---
+
+## Issue #474: RU作成時の実在確認不足による誤検出項目の混入
+
+- **問題事象**: RU-0001（REQ-0039移行後の整合性ドリフト9項目）のうち3項目（D-01: REQ-0033旧パス参照、D-02: テストファイルstale参照、D-06: ADR-0009 status二重記載）が、case-run の Explore 調査で実際のファイル内容と照合した結果、修正不要（誤検出）と判明した。D-01は対象ファイルが既にretired/に移動済みで該当参照なし、D-02はテストファイル自体が存在しない、D-06は正常な構造であった
+- **発生局面**: 実装（case-run の Step 6 Explore 調査フェーズ）
+- **検知方法**: case-run での Explore エージェントによる実際のファイル内容確認。RUの記述内容と実際のファイル状態の不一致を発見
+- **根本原因**: RU作成（intake → promote → req-backlog）の段階で、ドリフト候補の実際のファイル内容確認が行われず、想定・推測に基づいて項目がリストアップされていた。特にD-02はファイルの存在確認すら抜けていた
+- **自律対応内容**: case-run の Explore 調査で実際のファイル状態を確認し、3項目を修正不要と判定してIssue本文に反映。残り6項目のみを実装対象とした
+- **ユーザー確認有無**: なし（エージェントが自律的に判定）
+- **ADR/REQ/spec影響**: なし。ワークフロー改善の知見
+- **横展開観点**: 全RU作成時に同様の実在確認不足が発生する可能性あり。intake-promote や req-backlog での検証強化が考えられる
+- **再発条件**: 大規模移行・リファクタリング後のドリフト一括修正で、想定に基づいて変更候補をリストアップする場合
+- **予防策候補**: (a) req-backlog でRU生成時に、各ドリフト項目の実際のファイル存在・内容確認を必須ステップとする、(b) intake-promote で promoted artifact に「未検証」フラグを付与し、case-run での検証を明示化する
+- **想定反映先**: `agentdev-workflow-lifecycle` スキル（RU生成時の品質ゲート）、または `agentdev-req-file-manager` スキル（intake-promote 段階での検証強化）
+- **関連**: Issue #474, PR #475, `.agentdev/backlog/req-units/RU-0001.md`（削除済み）
+- **タグ**: `#ru-quality` `#false-positive` `#intake-pipeline` `#drift-detection`
+
+---
