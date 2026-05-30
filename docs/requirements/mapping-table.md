@@ -24,7 +24,7 @@ REQ体系再基準化（REQ-0041 / ADR-0009）に伴い、旧REQ全40件（REQ-0
 | REQ-0009 | partially superseded | REQ-0044 | テンプレートの命名・配置・変数規約の基本概念 | テンプレート選択ルール（→REQ-0044）・テンプレート構造詳細（→REQ-0044） | 関連ドキュメント更新候補 | テンプレートシステムはREQ-0044に再定義済み |
 | REQ-0010 | partially superseded | REQ-0045 | Pattern拡張・SSoT明確化・エラー回復の基本方針 | draft状態遷移・Guardrails整理・旧issue-*コマンド参照 | 関連ドキュメント更新候補 | Command実装改善の基本方針はREQ-0045に統合済み |
 | REQ-0011 | partially superseded | REQ-0048 | Issue/PR書き込み後の品質検証（3観点・リトライ） | 個別コマンド手順・テンプレート参照 | 関連ドキュメント更新候補 | 内容品質自動検証はREQ-0048に再定義済み |
-| REQ-0012 | retained | —（現行有効） | 全文現行仕様 | — | — | 自然言語ポリシー（日本語統一） |
+| REQ-0012 | retained | —（現行有効） | 全文現行仕様 | — | — | AI-slop 執筆品質基準 |
 | REQ-0013 | superseded | REQ-0046 | —（全面置き換え） | 全面置き換え | — | intake承認フロー分割はREQ-0039→REQ-0046に統合。旧intake-from-github手順は全面置き換え |
 | REQ-0014 | partially superseded | REQ-0047 | case-run自律修正ループの基本方針 | Step番号依存の詳細手順・旧issue-work参照・CI/CD具体手順 | follow-up | 自律修正ループはREQ-0047に再定義済み |
 | REQ-0015 | partially superseded | REQ-0047 | 関連ドキュメントの要件達成対象化の基本方針 | 個別ドキュメント更新指示 | 関連ドキュメント更新候補 | 要件達成対象化はREQ-0047に再定義済み |
