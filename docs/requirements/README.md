@@ -40,7 +40,7 @@
 | REQ-0036 | agentdev-no-ai-slop-writing Skill 追加 | skill/writing-quality/ai-slop/natural-language |
 | REQ-0037 | worktree 削除時の残存ファイル対策強化 | case-close/case-run/worktree/error-handling |
 | REQ-0038 | case実行信頼性向上（チェックボックス確認・pull前チェック・docs整合性grep） | enhancement/reliability/case-run/case-close |
-| REQ-0039 | ワークフロー再設計 — RU lifecycle / flat promoted / intake-open 削除 | workflow/intake/learning/req-backlog/ru-lifecycle/promoted |
+| REQ-0039 | req-backlog コマンドと Requirement Unit パイプライン | workflow/req-backlog/ru-lifecycle/promoted |
 | REQ-0040 | 子Issue PRに Findings / Intake候補を永続化し、case-closeで回収する | intake/pr-template/case-run/case-close/epic-orchestrator |
 
 ## Superseded

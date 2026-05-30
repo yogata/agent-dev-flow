@@ -43,7 +43,7 @@
   - [REQ-0036: agentdev-no-ai-slop-writing Skill 追加](requirements/REQ-0036.md)
   - [REQ-0037: worktree 削除時の残存ファイル対策強化](requirements/REQ-0037.md)
   - [REQ-0038: case実行信頼性向上（チェックボックス確認・pull前チェック・docs整合性grep）](requirements/REQ-0038.md)
-  - [REQ-0039: ワークフロー再設計 — RU lifecycle / flat promoted / intake-open 削除](requirements/REQ-0039.md)
+  - [REQ-0039: req-backlog コマンドと Requirement Unit パイプライン](requirements/REQ-0039.md)
   - [REQ-0040: 子Issue PRに Findings / Intake候補を永続化し、case-closeで回収する](requirements/REQ-0040.md)
 
 ## Specifications
