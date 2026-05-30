@@ -24,7 +24,7 @@ REQ体系再基準化（REQ-0041 / ADR-0009）により整理統合された8件
 - [REQ-0005: Epic Issue 管理](requirements/REQ-0005.md)
 - [REQ-0006: Sisyphus プラン基盤](requirements/REQ-0006.md)
 - [REQ-0008: スキル品質フレームワーク](requirements/REQ-0008.md)
-- [REQ-0012: 自然言語ポリシー](requirements/REQ-0012.md)
+- [REQ-0012: AI-slop 執筆品質基準](requirements/REQ-0012.md)
 - [REQ-0018: agentdev-req-analysis 未決分岐解消メソドロジー](requirements/REQ-0018.md)
 - [REQ-0020: Epic Issue 実行順序 SSoT と case-run Epic Orchestrator 化](requirements/REQ-0020.md)
 - [REQ-0021: AgentDevFlow ガードレールのスクリプト化と skill-local scripts 配置方針](requirements/REQ-0021.md)

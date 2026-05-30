@@ -38,7 +38,7 @@ REQ体系再基準化（REQ-0041 / ADR-0009）により整理統合された8件
 | [REQ-0005](requirements/REQ-0005.md) | Epic Issue 管理 | Epic管理基盤 |
 | [REQ-0006](requirements/REQ-0006.md) | Sisyphus プラン基盤 | プラン管理・実行基盤 |
 | [REQ-0008](requirements/REQ-0008.md) | スキル品質フレームワーク | スキル品質基準 |
-| [REQ-0012](requirements/REQ-0012.md) | 自然言語ポリシー | 日本語表記規約 |
+| [REQ-0012](requirements/REQ-0012.md) | AI-slop 執筆品質基準 | AI-slop検出基準・出力構造・品質ゲート |
 | [REQ-0018](requirements/REQ-0018.md) | agentdev-req-analysis 未決分岐解消メソドロジー | 未決分岐解消手法 |
 | [REQ-0020](requirements/REQ-0020.md) | Epic Issue 実行順序 SSoT と case-run Epic Orchestrator 化 | Epic Orchestration設計 |
 | [REQ-0021](requirements/REQ-0021.md) | AgentDevFlow ガードレールのスクリプト化と skill-local scripts 配置方針 | ガードレールスクリプト化 |
