@@ -2,7 +2,7 @@
 
 AgentDevFlow の各ドメイン（Learning・Intake・RU・Case・Integrity）におけるファイル・ディレクトリの状態遷移を説明します。
 
-基準となる要件: REQ-0105（intake/learning/RU lifecycle）、REQ-0106（case-run/case-close）、REQ-0101~036（guides 規約）。
+基準となる要件: REQ-0105（intake/learning/RU lifecycle）、REQ-0106（case-run/case-close）、REQ-0101-036（guides 規約）。
 
 ## 全体概観
 
@@ -38,7 +38,7 @@ flowchart TD
 
 ## Learning Lifecycle
 
-Learning パイプラインは、再発防止に使う知見の蓄積・分類・昇華を目的とします（REQ-0105~011）。
+Learning パイプラインは、再発防止に使う知見の蓄積・分類・昇華を目的とします（REQ-0105-011）。
 
 ### 状態遷移図
 
@@ -73,7 +73,7 @@ stateDiagram-v2
 
 ## Intake Lifecycle
 
-Intake パイプラインは、具体的な作業候補・不整合・未回収課題の収集・レビュー・促進を目的とします（REQ-0105~006）。
+Intake パイプラインは、具体的な作業候補・不整合・未回収課題の収集・レビュー・促進を目的とします（REQ-0105-006）。
 
 ### 状態遷移図
 
@@ -107,7 +107,7 @@ stateDiagram-v2
 
 ## RU（Requirement Unit）Lifecycle
 
-RU は intake/learning の promoted artifact を分析・統合した構造化成果物で、req-define の Requirement Source として機能する（REQ-0105~023）。
+RU は intake/learning の promoted artifact を分析・統合した構造化成果物で、req-define の Requirement Source として機能する（REQ-0105-023）。
 
 ### 状態遷移図
 
