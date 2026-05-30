@@ -116,6 +116,14 @@ REQ体系再基準化（REQ-0041 / ADR-0009）により整理統合された8件
 
 - [Domain State Lifecycle](guides/domain-state-lifecycle.md) — Integrity パイプラインの状態遷移
 
+## Guides
+
+利用者向けの参照用読み物（基準文書の内容を代替しない）。
+
+- [ワークフロー概要](guides/workflow-overview.md) — コマンドパイプライン・フェーズ体系・Pattern分類
+- [成果物モデル](guides/artifact-model.md) — 文書種別・コマンド・スキル・成果物ライフサイクル
+- [ドメイン状態ライフサイクル](guides/domain-state-lifecycle.md) — 状態遷移の全体像
+
 ## Quality Specs
 
 品質仕様。
