@@ -91,6 +91,30 @@ git 永続化: commit: {hash}, push: {成功/失敗}
 次のコマンド: /agentdev/case-open
 ```
 
+### SPLIT検出時
+
+req-save完了時、SPLIT検出した場合は完了報告に以下を追加する。
+
+```
+⚠️ SPLIT候補: REQ-{NNNN} の要件が膨張・関心分離の基準に該当。別Issueでの review/follow-up を推奨。
+Finding を作成しました: `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`
+ 次のコマンド: finding ファイルを入力として `/agentdev/req-define` を実行してください
+ ```
+
+### DOC-MAP更新時
+
+req-save完了時、DOC-MAP更新の有無により以下のいずれかを完了報告に追加する。
+
+DOC-MAP更新が不要だった場合:
+```
+DOC-MAP更新: なし（該当する DOC-MAP エントリがないため）
+```
+
+DOC-MAP更新が必要だった場合:
+```
+DOC-MAP更新: あり（{what was updated}）
+```
+
 ## case-open 完了時
 
 ```
