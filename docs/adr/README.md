@@ -27,11 +27,11 @@
 - [ADR-0003](ADR-0003.md) — req-define入力の抽象化
 - [ADR-0006](ADR-0006.md) — Epic Issue 本文を実行順序 SSoT とする設計
 - [ADR-0008](ADR-0008.md) — DOC-MAP導入と requirements/views 廃止
-- [ADR-0009](ADR-0009.md) — REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入
 
 ### accepted
 
 - [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 統一
+- [ADR-0009](ADR-0009.md) — REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入
 
 ### superseded
 
