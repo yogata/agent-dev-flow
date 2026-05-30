@@ -1,6 +1,7 @@
 ---
 description: 既存Caseの本文更新、コメント追加、またはREQファイル更新を行う
 agent: sisyphus
+implementation_pattern: file-pipeline
 load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting

@@ -2,6 +2,10 @@
 
 Issueラベルの定義、パターン判定、およびパターン固有の動作ルールを定義する。
 
+## Implementation Pattern との区別
+
+Pattern A/B/C/D は Issue 種別分類（REQ-0104）であり、implementation pattern は command 内部構造分類（REQ-0103）である。両者は直交する概念である（REQ-0103-016）。Implementation pattern の定義は [`reference/command-map.md`](./command-map.md) の「Implementation Pattern Taxonomy」セクションを参照。
+
 ## 内部分類コード宣言
 
 `Pattern A/B/C/D` は内部処理用の分類コードである。ユーザー向け文書（README、コマンド説明、完了報告、Issue本文、テンプレート）では、各Patternに対応する日本語名称を主表記とする。

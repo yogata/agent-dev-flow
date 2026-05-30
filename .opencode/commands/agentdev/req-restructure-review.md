@@ -1,6 +1,8 @@
 ---
 description: REQ体系の健全性を診断し、再構成の推奨アクションを提示する
 agent: prometheus
+implementation_pattern: read-only-diagnostic
+secondary_pattern: wall-session
 load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting

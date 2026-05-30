@@ -1,6 +1,7 @@
 ---
 description: クローズ済み GitHub Issue/PR から未回収の変更候補を intake item として保存する
 agent: sisyphus
+implementation_pattern: capture-only
 load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting

@@ -28,6 +28,22 @@ load_skills:
 
 **理由**: デフォルトエージェント（Plan/Prometheus）の誤用を防止するため。PlanエージェントはRead-only権限であり、ファイル書込やコマンド実行ができない。
 
+### Implementation Pattern 指定
+
+各コマンドのfrontmatterに `implementation_pattern` を指定する（REQ-0103-015）。定義と対応表は [`reference/command-map.md`](../../.opencode/skills/agentdev-workflow-lifecycle/reference/command-map.md) の「Implementation Pattern Taxonomy」セクションが SSoT である。
+
+```yaml
+---
+description: ...
+agent: sisyphus
+implementation_pattern: file-pipeline
+load_skills:
+  - ...
+---
+```
+
+5パターン（wall-session, file-pipeline, manager-orchestrator, capture-only, read-only-diagnostic）は REQ-0103-016 において Pattern A/B/C/D（Issue 種別分類）と直交する。integrity-check が `implementation_pattern` の有無・妥当性（REQ-0108-022）、禁止 skill の検査（REQ-0108-023）、load_skills 整合性（REQ-0108-024）を自動検証する。
+
 ## .sisyphus/ 命名規則
 
 `.sisyphus/` 配下の7カテゴリ（plans, drafts, evidence, execution, notepads, tasks, reports）のファイル・ディレクトリ命名は plan 名を基準とする。詳細なルール・例は `AGENTS.md` の「Sisyphus 命名規則」セクションを参照。

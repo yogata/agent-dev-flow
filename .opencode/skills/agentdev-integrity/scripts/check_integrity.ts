@@ -198,6 +198,48 @@ const LEGACY_PATTERNS = [
   { pattern: /\belevate時prune\b/g, name: "elevate時prune (old terminology: should be promote時prune)" },
 ];
 
+const IMPLEMENTATION_PATTERNS = [
+  "wall-session",
+  "file-pipeline",
+  "manager-orchestrator",
+  "capture-only",
+  "read-only-diagnostic",
+] as const;
+
+const PATTERN_PROHIBITED_SKILLS: Record<string, string[]> = {
+  "capture-only": [
+    "agentdev-workflow-orchestration",
+    "agentdev-workflow-routing",
+    "agentdev-req-file-manager",
+    "agentdev-adr-file-manager",
+    "agentdev-workflow-templates",
+    "agentdev-spec-compliance",
+    "agentdev-epic-tracker",
+    "agentdev-learning-pipeline",
+  ],
+  "read-only-diagnostic": [
+    "agentdev-workflow-orchestration",
+    "agentdev-workflow-routing",
+    "agentdev-req-file-manager",
+    "agentdev-adr-file-manager",
+    "agentdev-workflow-templates",
+    "agentdev-spec-compliance",
+    "agentdev-epic-tracker",
+    "agentdev-learning-pipeline",
+    "agentdev-git-worktree",
+    "agentdev-gh-cli",
+    "agentdev-conventional-commits",
+    "agentdev-learning-capture",
+  ],
+  "wall-session": [
+    "agentdev-workflow-orchestration",
+    "agentdev-workflow-routing",
+    "agentdev-gh-cli",
+    "agentdev-git-worktree",
+    "agentdev-conventional-commits",
+  ],
+};
+
 function checkReqFrontmatterFilename(reqDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const files = listFiles(reqDir).filter((f) => f.startsWith("REQ-") && f !== "README.md");
@@ -1608,6 +1650,120 @@ function checkAdrReadmeIndexSync(adrDir: string, root: string): CheckResult[] {
   return results;
 }
 
+// ─── Implementation pattern checks (REQ-0108-022~024) ─────────────────────
+
+function checkImplementationPattern(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+
+    const pattern = fm["implementation_pattern"];
+    if (!pattern || (typeof pattern === "string" && pattern.trim() === "")) {
+      results.push(
+        ng("Implementation Pattern", "implementation-pattern", `command ${file} に implementation_pattern が定義されていない`, resolveRelative(fullPath, root), undefined, { evidence: "implementation_pattern field missing", route: "req-define" })
+      );
+      continue;
+    }
+
+    if (typeof pattern !== "string" || !IMPLEMENTATION_PATTERNS.includes(pattern as any)) {
+      results.push(
+        ng("Implementation Pattern", "implementation-pattern", `command ${file} の implementation_pattern '${pattern}' は未知のパターン`, resolveRelative(fullPath, root), undefined, { evidence: String(pattern), expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" })
+      );
+    }
+
+    const secondaryPattern = fm["secondary_pattern"];
+    if (secondaryPattern && typeof secondaryPattern === "string" && secondaryPattern.trim() !== "") {
+      if (!IMPLEMENTATION_PATTERNS.includes(secondaryPattern as any)) {
+        results.push(
+          ng("Implementation Pattern", "implementation-pattern", `command ${file} の secondary_pattern '${secondaryPattern}' は未知のパターン`, resolveRelative(fullPath, root), undefined, { evidence: String(secondaryPattern), expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" })
+        );
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("Implementation Pattern", "implementation-pattern", "All commands have valid implementation patterns"));
+  }
+  return results;
+}
+
+function checkPatternProhibitions(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+
+    const pattern = fm["implementation_pattern"];
+    if (typeof pattern !== "string") continue;
+
+    const prohibited = PATTERN_PROHIBITED_SKILLS[pattern];
+    if (prohibited) {
+      const loadSkills = extractLoadSkills(fm);
+      const violations = loadSkills.filter((s) => prohibited.includes(s));
+      for (const violating of violations) {
+        results.push(
+          ng("Implementation Pattern", "pattern-prohibitions", `${pattern} command '${file}' が禁止 skill '${violating}' を load_skills に含んでいる`, resolveRelative(fullPath, root), undefined, { evidence: violating, route: "req-define" })
+        );
+      }
+    }
+
+    if (pattern === "manager-orchestrator" && file !== "case-run.md") {
+      results.push(
+        ng("Implementation Pattern", "pattern-prohibitions", `command '${file}' に manager-orchestrator が設定されているが、manager-orchestrator は case-run.md のみ使用可能`, resolveRelative(fullPath, root), undefined, { evidence: file, expected: "case-run.md", route: "req-define" })
+      );
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("Implementation Pattern", "pattern-prohibitions", "No pattern prohibition violations"));
+  }
+  return results;
+}
+
+function checkLoadSkillsConsistency(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+
+    const loadSkills = extractLoadSkills(fm);
+
+    if (!loadSkills.includes("agentdev-workflow-reporting")) {
+      results.push(
+        warn("Implementation Pattern", "load-skills-consistency", `command '${file}' に agentdev-workflow-reporting が load_skills に含まれていない`, resolveRelative(fullPath, root))
+      );
+    }
+
+    const pattern = fm["implementation_pattern"];
+    if (pattern === "manager-orchestrator" && !loadSkills.includes("agentdev-workflow-orchestration")) {
+      results.push(
+        warn("Implementation Pattern", "load-skills-consistency", `command '${file}' は manager-orchestrator パターンだが agentdev-workflow-orchestration が load_skills に含まれていない`, resolveRelative(fullPath, root))
+      );
+    }
+  }
+
+  if (results.filter((r) => r.level === "warning").length === 0) {
+    results.push(ok("Implementation Pattern", "load-skills-consistency", "All commands have consistent load_skills"));
+  }
+  return results;
+}
+
 function checkSpecReadmeIndexSync(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const specsDir = path.join(root, "docs", "specs");
@@ -1717,6 +1873,9 @@ async function main(): Promise<void> {
     ...checkDocMapGuideSync(root),
     ...checkAdrReadmeIndexSync(adrDir, root),
     ...checkSpecReadmeIndexSync(root),
+    ...checkImplementationPattern(cmdDir, root),
+    ...checkPatternProhibitions(cmdDir, root),
+    ...checkLoadSkillsConsistency(cmdDir, root),
   ];
 
   const summary = computeSummary(results);

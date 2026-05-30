@@ -1,6 +1,7 @@
 ---
 description: AgentDevFlow artifact 整合性検査
 agent: sisyphus
+implementation_pattern: read-only-diagnostic
 load_skills:
   - agentdev-integrity
   - agentdev-req-analysis

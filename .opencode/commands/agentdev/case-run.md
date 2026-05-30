@@ -1,6 +1,7 @@
 ---
 description: 計画立案からコミットまでを一気通貫で実行する。3フェーズ構成でべき等性・再開ポイントを提供。複数Issueの並列実行に対応
 agent: sisyphus
+implementation_pattern: manager-orchestrator
 load_skills:
   - agentdev-req-analysis
   - agentdev-spec-compliance

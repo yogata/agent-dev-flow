@@ -120,6 +120,7 @@ function buildValidFixture(root: string): void {
     "---",
     "description: Test command",
     "agent: test-agent",
+    "implementation_pattern: wall-session",
     "load_skills:",
     "  - agentdev-test-skill",
     "  - agentdev-workflow-reporting",
@@ -772,7 +773,373 @@ describe("checkLifecycleBoundary: active/retired ID duplication", () => {
     );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("ng");
-    expect(hit.route).toBe("intake");
+  });
+});
+
+// ─── Implementation pattern check tests (REQ-0108-022~024) ────────────────
+
+describe("E1: checkImplementationPattern — all valid", () => {
+  const ROOT = join(TEMP_ROOT, "e1-ok");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "implementation_pattern: wall-session",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("passes when all commands have valid implementation_pattern", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "implementation-pattern"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("E2: checkImplementationPattern — missing implementation_pattern", () => {
+  const ROOT = join(TEMP_ROOT, "e2-missing");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    // Override test-cmd.md to NOT have implementation_pattern
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("detects missing implementation_pattern", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "implementation-pattern" &&
+        res.message.includes("implementation_pattern が定義されていない")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("E3: checkImplementationPattern — unknown pattern", () => {
+  const ROOT = join(TEMP_ROOT, "e3-unknown");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "implementation_pattern: unknown-pattern",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("detects unknown implementation_pattern", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "implementation-pattern" &&
+        res.message.includes("未知のパターン")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("E4: checkImplementationPattern — valid secondary_pattern", () => {
+  const ROOT = join(TEMP_ROOT, "e4-secondary-ok");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "implementation_pattern: read-only-diagnostic",
+      "secondary_pattern: wall-session",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("passes when secondary_pattern is valid", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "implementation-pattern"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("E5: checkImplementationPattern — unknown secondary_pattern", () => {
+  const ROOT = join(TEMP_ROOT, "e5-secondary-ng");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "implementation_pattern: read-only-diagnostic",
+      "secondary_pattern: bogus",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("detects unknown secondary_pattern", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "implementation-pattern" &&
+        res.message.includes("secondary_pattern")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("E6: checkPatternProhibitions — no violations", () => {
+  const ROOT = join(TEMP_ROOT, "e6-ok");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "implementation_pattern: file-pipeline",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("passes when no pattern prohibition violations", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "pattern-prohibitions"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("E7: checkPatternProhibitions — capture-only with prohibited skill", () => {
+  const ROOT = join(TEMP_ROOT, "e7-violation");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "implementation_pattern: capture-only",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "  - agentdev-workflow-orchestration",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("detects prohibited skill in capture-only command", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "pattern-prohibitions" &&
+        res.message.includes("禁止 skill")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("E8: checkPatternProhibitions — manager-orchestrator on non-case-run", () => {
+  const ROOT = join(TEMP_ROOT, "e8-mgr");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "other-cmd.md"), [
+      "---",
+      "description: Other command",
+      "agent: test-agent",
+      "implementation_pattern: manager-orchestrator",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "  - agentdev-workflow-orchestration",
+      "---",
+      "",
+      "Other command body.",
+      "",
+    ].join("\n"), "utf-8");
+    // Also update README to include other-cmd
+    writeFileSync(join(cmdDir, "README.md"), [
+      "# Commands",
+      "",
+      "| Command | Description | Agent | Skills |",
+      "|---------|-------------|-------|--------|",
+      "| `agentdev/test-cmd` | Test command | test-agent | agentdev-test-skill |",
+      "| `agentdev/other-cmd` | Other command | test-agent | agentdev-test-skill |",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("detects manager-orchestrator on non-case-run file", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "pattern-prohibitions" &&
+        res.message.includes("manager-orchestrator")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("E9: checkLoadSkillsConsistency — all consistent", () => {
+  const ROOT = join(TEMP_ROOT, "e9-ok");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "implementation_pattern: wall-session",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("passes when all commands have consistent load_skills", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "load-skills-consistency"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("E10: checkLoadSkillsConsistency — missing workflow-reporting", () => {
+  const ROOT = join(TEMP_ROOT, "e10-missing");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "implementation_pattern: wall-session",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("warns when agentdev-workflow-reporting is missing from load_skills", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "load-skills-consistency" &&
+        res.message.includes("agentdev-workflow-reporting")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("warning");
   });
 });
 

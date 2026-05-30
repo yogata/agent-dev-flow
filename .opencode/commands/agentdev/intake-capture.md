@@ -1,6 +1,7 @@
 ---
 description: 未分類の変更候補を手動入力から intake item として保存する
 agent: sisyphus
+implementation_pattern: capture-only
 load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting
