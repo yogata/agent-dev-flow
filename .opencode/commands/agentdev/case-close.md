@@ -233,7 +233,11 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
             **raw git output**:
             {git_error_output}
             ```
-10. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → case-close 完了時）に従って出力
+10. 完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。結果状態に応じたvariantを選択:
+    - 全系統成功 → completion-reports/case-close/standard.md
+    - .agentdev push失敗 → completion-reports/case-close/agentdev-push-failed.md
+    - ブランチ・worktree削除失敗 → completion-reports/case-close/worktree-cleanup-failed.md
+    - GitHub完了後に .agentdev push失敗の場合は standard variant を使用してはならない（MUST NOT, REQ-0107-034）
     - **結果状態の分離報告**（SHALL）— 以下の3系統を独立して報告し、部分失敗を明示する:
         1. **GitHub側完了状態**: PRマージ成否、Issueクローズ成否、Parent Epic更新成否
         2. **`.agentdev` 永続化状態**: 変更の有無（あり/なし）、commit されたファイル一覧、commit hash、push 成否

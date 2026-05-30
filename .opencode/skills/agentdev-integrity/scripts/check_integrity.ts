@@ -543,23 +543,42 @@ function checkNameCollision(skillsDir: string, root: string): CheckResult[] {
 
 // ─── Completion report format validation (REQ-0024-017, REQ-0024-018) ──────
 
-function buildCompletionReportSections(completionReportsPath: string): Map<string, string> {
+function buildCompletionReportSections(completionReportsPath: string): Map<string, string[]> {
   const content = readText(completionReportsPath);
-  const sections = new Map<string, string>();
+  const sections = new Map<string, string[]>();
   if (!content) return sections;
 
-  const lines = content.split("\n");
-  for (const line of lines) {
-    const trimmed = line.trim();
-    const match = trimmed.match(/^##\s+(.+)$/);
-    if (match) {
-      const header = match[1];
-      const cmdMatch = header.match(/^([a-z]+-[a-z]+(?:-[a-z]+)*)\s+完了時/);
-      if (cmdMatch) {
-        sections.set(cmdMatch[1], header);
+  // Try new format: variant registry table with paths like completion-reports/{cmd}/{variant}.md
+  const variantPathRegex = /completion-reports\/([a-z][a-z0-9-]*)\/([a-z][a-z0-9-]*\.md)/g;
+  let hasRegistry = false;
+  let match;
+  while ((match = variantPathRegex.exec(content)) !== null) {
+    hasRegistry = true;
+    const cmd = match[1];
+    const variant = match[2];
+    const existing = sections.get(cmd) || [];
+    if (!existing.includes(variant)) {
+      existing.push(variant);
+    }
+    sections.set(cmd, existing);
+  }
+
+  // Fall back to old format: ## {cmd} 完了時 headers
+  if (!hasRegistry) {
+    const lines = content.split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      const headerMatch = trimmed.match(/^##\s+(.+)$/);
+      if (headerMatch) {
+        const header = headerMatch[1];
+        const cmdMatch = header.match(/^([a-z]+-[a-z]+(?:-[a-z]+)*)\s+完了時/);
+        if (cmdMatch) {
+          sections.set(cmdMatch[1], ["完了時"]);
+        }
       }
     }
   }
+
   return sections;
 }
 
@@ -680,6 +699,223 @@ function checkInlineCompletionReports(cmdDir: string, root: string): CheckResult
   }
   return results;
 }
+
+// ─── Variant structure checks (REQ-0107-024~027) ──────────────────────────
+
+function getCompletionReportsDir(completionReportsPath: string): string {
+  return path.join(path.dirname(completionReportsPath), "completion-reports");
+}
+
+function hasVariantRegistry(completionReportsPath: string): boolean {
+  const content = readText(completionReportsPath);
+  if (!content) return false;
+  return /completion-reports\/[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*\.md/.test(content);
+}
+
+function checkVariantExistence(completionReportsPath: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  if (!hasVariantRegistry(completionReportsPath)) return results;
+
+  const variants = buildCompletionReportSections(completionReportsPath);
+  const baseDir = getCompletionReportsDir(completionReportsPath);
+
+  if (variants.size === 0) {
+    results.push(info("VariantReport", "variant-existence", "No variant registry found in completion-reports.md"));
+    return results;
+  }
+
+  let foundViolation = false;
+  for (const [cmd, expectedVariants] of variants) {
+    const cmdDir = path.join(baseDir, cmd);
+    if (!fs.existsSync(cmdDir)) {
+      foundViolation = true;
+      results.push(
+        ng("VariantReport", "variant-existence", `Variant directory not found for command '${cmd}'`, resolveRelative(cmdDir, root))
+      );
+      continue;
+    }
+    for (const variant of expectedVariants) {
+      const variantPath = path.join(cmdDir, variant);
+      if (!fs.existsSync(variantPath)) {
+        foundViolation = true;
+        results.push(
+          ng("VariantReport", "variant-existence", `Variant file '${variant}' not found for command '${cmd}'`, resolveRelative(variantPath, root))
+        );
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(ok("VariantReport", "variant-existence", "All expected variant files exist"));
+  }
+  return results;
+}
+
+function checkInlineCompletionBodyInCommands(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  let foundViolation = false;
+
+  const bodyPatterns = [
+    /✅/,
+    /完了コマンド/,
+    /次のコマンド/,
+  ];
+
+  const errorPatterns = [
+    /エラー/,
+    /Error/i,
+    /失敗/,
+    /リトライ/,
+    /Retry/i,
+  ];
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+
+    const lines = content.split("\n");
+    let inCodeBlock = false;
+    let inGuardrailSection = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim();
+
+      if (/^#{1,4}\s+/.test(trimmed)) {
+        inGuardrailSection = /Guardrail/i.test(trimmed) || /制約/.test(trimmed);
+        continue;
+      }
+
+      if (trimmed.startsWith("```")) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+      if (!inCodeBlock || inGuardrailSection) continue;
+
+      const hasBody = bodyPatterns.some((p) => p.test(trimmed));
+      if (!hasBody) continue;
+
+      const isErrorTemplate = errorPatterns.some((p) => p.test(trimmed));
+      if (isErrorTemplate) continue;
+
+      foundViolation = true;
+      results.push(
+        ng(
+          "VariantReport", "inline-completion-body",
+          `Inline completion report body text detected (should be in variant file)`,
+          resolveRelative(fullPath, root),
+          i + 1
+        )
+      );
+      break;
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(ok("VariantReport", "inline-completion-body", "No inline completion report body text detected in command definitions"));
+  }
+  return results;
+}
+
+const VARIANT_REQUIRED_FIELDS = [
+  "完了コマンド",
+  "対象",
+  "結果",
+  "検証結果",
+  "git 永続化",
+  "次のコマンド",
+];
+
+function checkVariantRequiredFields(completionReportsPath: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  if (!hasVariantRegistry(completionReportsPath)) return results;
+
+  const variants = buildCompletionReportSections(completionReportsPath);
+  const baseDir = getCompletionReportsDir(completionReportsPath);
+
+  if (variants.size === 0) return results;
+
+  let checked = false;
+  for (const [cmd, expectedVariants] of variants) {
+    const cmdDir = path.join(baseDir, cmd);
+    if (!fs.existsSync(cmdDir)) continue;
+
+    for (const variant of expectedVariants) {
+      const variantPath = path.join(cmdDir, variant);
+      const content = readText(variantPath);
+      if (!content) continue;
+
+      checked = true;
+      const missing = VARIANT_REQUIRED_FIELDS.filter((field) => !content.includes(field));
+      if (missing.length > 0) {
+        results.push(
+          ng("VariantReport", "variant-required-fields", `Missing required fields: ${missing.join(", ")}`, resolveRelative(variantPath, root))
+        );
+      }
+    }
+  }
+
+  if (checked && results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("VariantReport", "variant-required-fields", "All variant files contain all 6 required fields"));
+  }
+  return results;
+}
+
+const FRAGMENT_PATTERNS = [
+  { pattern: /完了報告に以下を追加/, name: "完了報告に以下を追加" },
+  { pattern: /完了報告に追加/, name: "完了報告に追加" },
+  { pattern: /追加報告/, name: "追加報告" },
+  { pattern: /DOC-MAP更新時/, name: "DOC-MAP更新時" },
+  { pattern: /壁打ち結論ハイライト/, name: "壁打ち結論ハイライト" },
+];
+
+function checkFragmentPatterns(completionReportsPath: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  if (!hasVariantRegistry(completionReportsPath)) return results;
+
+  const variants = buildCompletionReportSections(completionReportsPath);
+  const baseDir = getCompletionReportsDir(completionReportsPath);
+
+  if (variants.size === 0) return results;
+
+  let foundViolation = false;
+  for (const [cmd, expectedVariants] of variants) {
+    const cmdDir = path.join(baseDir, cmd);
+    if (!fs.existsSync(cmdDir)) continue;
+
+    for (const variant of expectedVariants) {
+      const variantPath = path.join(cmdDir, variant);
+      const content = readText(variantPath);
+      if (!content) continue;
+
+      for (const { pattern, name } of FRAGMENT_PATTERNS) {
+        if (pattern.test(content)) {
+          foundViolation = true;
+          results.push(
+            ng(
+              "VariantReport", "fragment-patterns",
+              `Fragment composition pattern '${name}' found (variants must be self-contained)`,
+              resolveRelative(variantPath, root)
+            )
+          );
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    const hasVariantsOnDisk = [...variants.entries()].some(([cmd]) =>
+      fs.existsSync(path.join(baseDir, cmd))
+    );
+    if (hasVariantsOnDisk) {
+      results.push(ok("VariantReport", "fragment-patterns", "No fragment composition patterns detected in variant files"));
+    }
+  }
+  return results;
+}
+
+// ─── Post-completion output checks (REQ-0024-017, REQ-0024-018) ──────
 
 function checkPostCompletionOutput(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -1465,6 +1701,10 @@ async function main(): Promise<void> {
     ...checkCompletionReportSkills(cmdDir, root),
     ...checkCompletionReportTemplates(cmdDir, completionReportsPath, root),
     ...checkInlineCompletionReports(cmdDir, root),
+    ...checkVariantExistence(completionReportsPath, root),
+    ...checkInlineCompletionBodyInCommands(cmdDir, root),
+    ...checkVariantRequiredFields(completionReportsPath, root),
+    ...checkFragmentPatterns(completionReportsPath, root),
     ...checkPostCompletionOutput(cmdDir, root),
     ...checkTerminology(cmdDir, root),
     ...checkLinkIntegrity(root),

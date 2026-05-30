@@ -123,7 +123,7 @@ REQ の active/retired/世代境界の整合性を確認する:
 
 ### 8. 完了報告
 
-完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → req-restructure-review 完了時）に従って出力
+完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。variant: completion-reports/req-restructure-review/standard.md
 
 ## Guardrails
 

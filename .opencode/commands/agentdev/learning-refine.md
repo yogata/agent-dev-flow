@@ -125,7 +125,7 @@ archive.md 内の古い単発レアケースを削除候補として特定する
 
 ### 10. 完了報告
 
-完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → learning-refine 完了時）に従って出力。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。variant: completion-reports/learning-refine/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## ユーザー確認ポイント
 

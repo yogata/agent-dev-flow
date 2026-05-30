@@ -129,7 +129,7 @@ load_skills:
    | 1 | ... | #XX | YYYY-MM-DD-xxx.md |
    ```
 
-8. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → intake-from-github 完了時）に従って出力。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+8. **完了報告** → `agentdev-workflow-reporting` の完了報告variantに従って出力。variant: completion-reports/intake-from-github/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## Error Handling
 

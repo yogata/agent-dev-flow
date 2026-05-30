@@ -120,7 +120,7 @@ load_skills:
          {git_error_output}
          ```
 
- 9. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → learning-promote 完了時）に従って出力。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+ 9. **完了報告** → `agentdev-workflow-reporting` の完了報告variantに従って出力。variant: completion-reports/learning-promote/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## Guardrails
 

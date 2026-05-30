@@ -100,7 +100,7 @@ intake item は以下の推奨標準形に従う Markdown artifact とする（R
          {git_error_output}
          ```
 
-5. **完了報告** → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → intake-capture 完了時）に従って出力。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+5. **完了報告** → `agentdev-workflow-reporting` の完了報告variantに従って出力。variant: completion-reports/intake-capture/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## Error Handling
 
