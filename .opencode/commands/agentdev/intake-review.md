@@ -35,10 +35,10 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
 
 ## Steps
 
-1. **inbox の確認**: `.agentdev/intake/inbox/` 内の intake item を一覧表示する:
-   - ファイル一覧の取得
-   - item 数のカウント
-   - inbox が空の場合はその旨を報告して終了
+1. **inbox の確認**: `.agentdev/intake/inbox/` および `.agentdev/intake/inbox/req-restructure/` 内の intake item を一覧表示する:
+   - ファイル一覧の取得（両ディレクトリをスキャン）
+   - item 数のカウント（通常intakeとREQ再構成intakeを区別して表示）
+   - 両ディレクトリが空の場合はその旨を報告して終了
 
 2. **item の読み込み**: 各 intake item を読み込み、内容を把握する。
 
@@ -49,6 +49,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
    - 既存要件・仕様との関連
    - 対応方針の方向性（要件定義が必要か、既に Issue 化可能か）
    - **learning 分岐判断**: この item は intake ではなく learning に分けるべきものではないか（capture-boundaries.md の split rule 参照）。具体的な修正対象がなく再発防止知見のみの場合は learning に委ねることを推奨
+   - **REQ再構成intakeの判定基準**: REQ再構成intakeは通常のIssue化可否ではなく、REQ再構成レビューへの入力適性で判定する（REQ-0050-012）。通常intakeとは独立した判定基準を適用する
 
 4. **ユーザーとの対話的レビュー**: 評価結果を提示し、ユーザーと対話しながら判定を確定する:
    - 各 item の評価を提示
@@ -82,10 +83,14 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
       {git_error_output}
       ```
 
-6. **item の振り分け**: 判定に基づいて item を振り分ける:
-    - `採用` → `.agentdev/intake/accepted/` に移動
-    - `保留` → `.agentdev/intake/inbox/` に残す（移動しない）
-    - `却下` → `.agentdev/intake/archive/rejected/` に移動
+ 6. **item の振り分け**: 判定に基づいて item を振り分ける:
+     - `採用` → `.agentdev/intake/accepted/` に移動
+     - `保留` → `.agentdev/intake/inbox/` に残す（移動しない）
+     - `却下` → `.agentdev/intake/archive/rejected/` に移動
+     - **REQ再構成intakeの振り分け**（REQ-0050-012）:
+       - `採用` → `.agentdev/intake/accepted/req-restructure/` に移動
+       - `却下` → `.agentdev/intake/archive/rejected/req-restructure/` に移動
+       - `保留` → `.agentdev/intake/inbox/req-restructure/` に残す（移動しない）
 
 6b. **.agentdev/intake 変更の commit と push**:
     - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する

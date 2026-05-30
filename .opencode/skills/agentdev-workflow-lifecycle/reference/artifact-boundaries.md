@@ -161,6 +161,10 @@ learning（`.agentdev/learning/`）、integrity（`.agentdev/integrity/`）、in
 - `elevation-staging/` への出力は廃止（`promoted/` に統一、REQ-0039-012）
 - 成果物の詳細なライフサイクルは [`reference/artifact-lifecycle.md`](./artifact-lifecycle.md) を参照
 
+### REQ再構成intake（REQ-0050）
+
+通常intakeとは独立した配置規約。inbox/accepted/archive配下に`req-restructure/`サブディレクトリを使用する（REQ-0050）。req-backlogへのpromote対象外。
+
 ## スキル間依存関係
 
 agentdev-workflow-lifecycle は他の専門スキルが提供する知識を概念的に参照する。

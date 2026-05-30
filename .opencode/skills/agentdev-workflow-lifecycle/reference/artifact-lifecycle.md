@@ -100,6 +100,10 @@ REQ ファイルは要件定義書の永続基準（SSoT）である。詳細は
 - 参照: `case-open`, `case-run`, `case-close` が READ
 - 削除: なし（永続ドキュメント）
 
+## REQ再構成intake（REQ-0050）
+
+REQ再構成intake lifecycle: `inbox/req-restructure/` → intake-review（独立判定基準）→ `accepted/req-restructure/` または `archive/rejected/req-restructure/`。req-backlogへの移行はしない（REQ-0050-010）。将来のREQ再構成レビューの入力として蓄積する。
+
 ## 禁止事項
 
 - `req-backlog` は intake/learning の raw item を更新してはならない（REQ-0039-009）
