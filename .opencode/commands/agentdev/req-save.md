@@ -1,6 +1,7 @@
 ---
 description: 壁打ち成果物をREQ/ADRファイルとしてdocs/に保存し、コミット・プッシュする
 agent: sisyphus
+implementation_pattern: file-pipeline
 load_skills:
   - agentdev-req-file-manager
   - agentdev-adr-file-manager

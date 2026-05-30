@@ -1,6 +1,7 @@
 ---
 description: promoted artifact を分析・統合し、Requirement Unit（RU）を生成する
 agent: sisyphus
+implementation_pattern: file-pipeline
 load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting
