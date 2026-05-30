@@ -83,7 +83,7 @@ docs/
 ## 成果物間の参照関係
 
 ```mermaid
-graph LR
+graph TD
     subgraph intake/learning パイプライン
         IC["intake-capture"] -->|inbox| IR["intake-review"]
         IR -->|accepted| IP["intake-promote"]
