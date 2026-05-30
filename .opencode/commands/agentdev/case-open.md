@@ -82,7 +82,9 @@ load_skills:
     - Issue 本文の `## Requirement Source` セクションに記録されたパスのうち、`.agentdev/backlog/req-units/RU-*.md` に一致するファイルを削除する（REQ ファイルの Requirement Source セクション、またはセッション内要件docの Requirement Source セクションから抽出）
     - **削除条件**: Issue 作成 + VERIFY が正常完了した場合のみ（SHALL）。Issue 作成失敗・VERIFY 失敗時は RU を残置する
     - **削除対象外**: RU パターンに一致しない Requirement Source は削除しない
-14. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → case-open 完了時）に従って出力
+14. 完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。実行フローに応じたvariantを選択:
+    - Standard flow → completion-reports/case-open/standard.md
+    - Epic flow → completion-reports/case-open/epic.md
 
 ## Guardrails
 

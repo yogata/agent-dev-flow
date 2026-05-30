@@ -212,7 +212,11 @@ RU 生成が成功した promoted artifact を削除する（REQ-0105, 010）:
 
 ### Step 8: 完了報告
 
-完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → req-backlog 完了時）に従って出力。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。実行結果に応じたvariantを選択:
+    - 全て成功 → completion-reports/req-backlog/standard.md
+    - partial success → completion-reports/req-backlog/partial.md
+    - promoted artifactなし（RU生成なし）→ completion-reports/req-backlog/zero-promoted.md
+    git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## Error Handling
 

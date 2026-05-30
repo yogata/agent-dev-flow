@@ -1091,34 +1091,385 @@ describe("inventory sync: ADR README index", () => {
         res.check === "adr-readme-index" &&
         res.message.includes("ADR-0099")
     );
+    expect(hit.level).toBe("ng");
+  });
+});
+
+// ─── Variant structure check tests (REQ-0107-024~027) ─────────────────────
+
+const VARIANT_VALID_FIELDS = [
+  "完了コマンド: /agentdev/test-cmd",
+  "対象: {対象}",
+  "結果: {結果}",
+  "検証結果: {検証結果}",
+  "git 永続化: commit: {hash}, push: {status}",
+  "次のコマンド: /agentdev/case-open",
+];
+
+function buildVariantFixture(root: string): void {
+  buildValidFixture(root);
+
+  const reportingRefDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting", "reference");
+
+  writeFileSync(
+    join(reportingRefDir, "completion-reports.md"),
+    [
+      "# 完了報告フォーマット",
+      "",
+      "## Variant Registry",
+      "",
+      "| Command | Variant | File | Condition |",
+      "|---------|---------|------|-----------|",
+      "| test-cmd | standard | completion-reports/test-cmd/standard.md | Default |",
+      "| test-cmd | epic | completion-reports/test-cmd/epic.md | Epic |",
+      "",
+      "## 必須フィールド定義",
+      "",
+      "完了コマンド, 対象, 結果, 検証結果, git 永続化, 次のコマンド",
+      "",
+    ].join("\n"),
+    "utf-8"
+  );
+
+  const variantDir = join(reportingRefDir, "completion-reports", "test-cmd");
+  mkdirp(variantDir);
+
+  writeFileSync(
+    join(variantDir, "standard.md"),
+    ["✅ test-cmd 完了", "", ...VARIANT_VALID_FIELDS, ""].join("\n"),
+    "utf-8"
+  );
+
+  writeFileSync(
+    join(variantDir, "epic.md"),
+    ["✅ test-cmd 完了 (Epic)", "", ...VARIANT_VALID_FIELDS, ""].join("\n"),
+    "utf-8"
+  );
+}
+
+describe("D1: checkVariantExistence — all variants present", () => {
+  const D1_OK_ROOT = join(TEMP_ROOT, "d1-ok");
+
+  beforeAll(() => {
+    mkdirp(D1_OK_ROOT);
+    buildVariantFixture(D1_OK_ROOT);
+    copyScripts(D1_OK_ROOT);
+  });
+
+  it("exits with code 0 when all variants exist", () => {
+    const r = runScript(D1_OK_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; level: string }) =>
+        res.check === "variant-existence" && res.level === "ok"
+    );
+    expect(hit).toBeDefined();
+  });
+});
+
+describe("D1: checkVariantExistence — missing variant file", () => {
+  const D1_MISS_ROOT = join(TEMP_ROOT, "d1-miss");
+
+  beforeAll(() => {
+    mkdirp(D1_MISS_ROOT);
+    buildVariantFixture(D1_MISS_ROOT);
+
+    const variantDir = join(
+      D1_MISS_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
+      "reference", "completion-reports", "test-cmd"
+    );
+    rmSync(join(variantDir, "epic.md"), { force: true });
+
+    copyScripts(D1_MISS_ROOT);
+  });
+
+  it("detects missing variant file", () => {
+    const r = runScript(D1_MISS_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "variant-existence" &&
+        res.message.includes("epic.md")
+    );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("ng");
   });
 });
 
-describe("inventory sync: DOC-MAP REQ sync", () => {
-  const DOCMAP_REQ_ROOT = join(TEMP_ROOT, "docmap-req");
+describe("D1: checkVariantExistence — missing command directory", () => {
+  const D1_NODIR_ROOT = join(TEMP_ROOT, "d1-nodir");
 
   beforeAll(() => {
-    mkdirp(DOCMAP_REQ_ROOT);
-    buildValidFixture(DOCMAP_REQ_ROOT);
+    mkdirp(D1_NODIR_ROOT);
+    buildVariantFixture(D1_NODIR_ROOT);
 
-    writeFileSync(
-      join(DOCMAP_REQ_ROOT, "docs", "DOC-MAP.md"),
-      "# DOC-MAP\n\nSee REQ-0099 for non-existent reference.\n",
-      "utf-8"
+    const variantDir = join(
+      D1_NODIR_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
+      "reference", "completion-reports", "test-cmd"
     );
+    rmSync(variantDir, { recursive: true, force: true });
 
-    copyScripts(DOCMAP_REQ_ROOT);
+    copyScripts(D1_NODIR_ROOT);
   });
 
-  it("detects DOC-MAP referencing non-existent REQ", () => {
-    const r = runScript(DOCMAP_REQ_ROOT, ["--json"]);
+  it("detects missing command directory", () => {
+    const r = runScript(D1_NODIR_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const hit = parsed.results.find(
       (res: { check: string; message: string }) =>
-        res.check === "docmap-req-sync" &&
-        res.message.includes("REQ-0099")
+        res.check === "variant-existence" &&
+        res.message.includes("test-cmd") &&
+        res.message.includes("directory")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("D2: checkInlineCompletionBodyInCommands — no violations", () => {
+  const D2_OK_ROOT = join(TEMP_ROOT, "d2-ok");
+
+  beforeAll(() => {
+    mkdirp(D2_OK_ROOT);
+    buildVariantFixture(D2_OK_ROOT);
+
+    writeFileSync(
+      join(D2_OK_ROOT, ".opencode", "commands", "agentdev", "test-cmd.md"),
+      [
+        "---",
+        "description: Test command",
+        "agent: test-agent",
+        "load_skills:",
+        "  - agentdev-test-skill",
+        "  - agentdev-workflow-reporting",
+        "---",
+        "",
+        "完了報告 → agentdev-workflow-reporting の完了報告variantに従って出力",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(D2_OK_ROOT);
+  });
+
+  it("passes when command only references variant", () => {
+    const r = runScript(D2_OK_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "inline-completion-body"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("D2: checkInlineCompletionBodyInCommands — detects inline body", () => {
+  const D2_NG_ROOT = join(TEMP_ROOT, "d2-ng");
+
+  beforeAll(() => {
+    mkdirp(D2_NG_ROOT);
+    buildVariantFixture(D2_NG_ROOT);
+
+    writeFileSync(
+      join(D2_NG_ROOT, ".opencode", "commands", "agentdev", "test-cmd.md"),
+      [
+        "---",
+        "description: Test command",
+        "agent: test-agent",
+        "load_skills:",
+        "  - agentdev-test-skill",
+        "  - agentdev-workflow-reporting",
+        "---",
+        "",
+        "## 完了報告",
+        "",
+        "```",
+        "✅ test-cmd 完了",
+        "完了コマンド: /agentdev/test-cmd",
+        "```",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(D2_NG_ROOT);
+  });
+
+  it("detects inline completion report body text", () => {
+    const r = runScript(D2_NG_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "inline-completion-body"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("D2: checkInlineCompletionBodyInCommands — error template allowed", () => {
+  const D2_ERR_ROOT = join(TEMP_ROOT, "d2-err");
+
+  beforeAll(() => {
+    mkdirp(D2_ERR_ROOT);
+    buildVariantFixture(D2_ERR_ROOT);
+
+    writeFileSync(
+      join(D2_ERR_ROOT, ".opencode", "commands", "agentdev", "test-cmd.md"),
+      [
+        "---",
+        "description: Test command",
+        "agent: test-agent",
+        "load_skills:",
+        "  - agentdev-test-skill",
+        "  - agentdev-workflow-reporting",
+        "---",
+        "",
+        "## Error Handling",
+        "",
+        "```",
+        "❌ エラー: 処理に失敗しました",
+        "```",
+        "",
+        "## 完了報告",
+        "",
+        "```",
+        "エラー発生時の✅出力内容（Error テンプレート）",
+        "```",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(D2_ERR_ROOT);
+  });
+
+  it("allows error format templates in command definitions", () => {
+    const r = runScript(D2_ERR_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; level: string }) =>
+        res.check === "inline-completion-body" && res.level === "ng"
+    );
+    expect(hits.length).toBe(0);
+  });
+});
+
+describe("D3: checkVariantRequiredFields — all 6 fields present", () => {
+  const D3_OK_ROOT = join(TEMP_ROOT, "d3-ok");
+
+  beforeAll(() => {
+    mkdirp(D3_OK_ROOT);
+    buildVariantFixture(D3_OK_ROOT);
+    copyScripts(D3_OK_ROOT);
+  });
+
+  it("passes when all 6 required fields are present", () => {
+    const r = runScript(D3_OK_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "variant-required-fields"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("D3: checkVariantRequiredFields — missing field", () => {
+  const D3_NG_ROOT = join(TEMP_ROOT, "d3-ng");
+
+  beforeAll(() => {
+    mkdirp(D3_NG_ROOT);
+    buildVariantFixture(D3_NG_ROOT);
+
+    const variantDir = join(
+      D3_NG_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
+      "reference", "completion-reports", "test-cmd"
+    );
+    writeFileSync(
+      join(variantDir, "standard.md"),
+      [
+        "✅ test-cmd 完了",
+        "",
+        "完了コマンド: /agentdev/test-cmd",
+        "対象: {対象}",
+        "結果: {結果}",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(D3_NG_ROOT);
+  });
+
+  it("detects missing required fields", () => {
+    const r = runScript(D3_NG_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "variant-required-fields" &&
+        res.message.includes("検証結果")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("D4: checkFragmentPatterns — self-contained variant", () => {
+  const D4_OK_ROOT = join(TEMP_ROOT, "d4-ok");
+
+  beforeAll(() => {
+    mkdirp(D4_OK_ROOT);
+    buildVariantFixture(D4_OK_ROOT);
+    copyScripts(D4_OK_ROOT);
+  });
+
+  it("passes for self-contained variants", () => {
+    const r = runScript(D4_OK_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "fragment-patterns"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("D4: checkFragmentPatterns — fragment pattern detected", () => {
+  const D4_NG_ROOT = join(TEMP_ROOT, "d4-ng");
+
+  beforeAll(() => {
+    mkdirp(D4_NG_ROOT);
+    buildVariantFixture(D4_NG_ROOT);
+
+    const variantDir = join(
+      D4_NG_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
+      "reference", "completion-reports", "test-cmd"
+    );
+    writeFileSync(
+      join(variantDir, "standard.md"),
+      [
+        "✅ test-cmd 完了",
+        "",
+        ...VARIANT_VALID_FIELDS,
+        "",
+        "完了報告に以下を追加:",
+        "- 追加情報",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(D4_NG_ROOT);
+  });
+
+  it("detects fragment composition pattern", () => {
+    const r = runScript(D4_NG_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "fragment-patterns" &&
+        res.message.includes("完了報告に以下を追加")
     );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("ng");

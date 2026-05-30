@@ -183,7 +183,13 @@ load_skills:
 10. 要件doc確認: 生成した要件doc（機能追加: ドラフト内容、バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務: セッション内要件doc）をユーザーに提示する。明示的な承認は求めず、提示のみを行う
     - **差し戻し**: ユーザーが修正・差し戻しを指示した場合、壁打ちを継続（Step 1に戻る）
     - **要件doc確定**: ユーザーが次のコマンド（`/agentdev/req-save` または `/agentdev/case-open`）を実行したことを要件doc確定の意思表示として扱う
- 11. 完了報告 → `agentdev-workflow-reporting` の完了報告フォーマット（completion-reports.md → req-define 完了時）に従って出力（壁打ち結論ハイライトの表示を必ず含めること）
+ 11. 完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。Pattern判定結果に応じたvariantを選択:
+    - Pattern B standard → completion-reports/req-define/feature.md
+    - Pattern B Epic規模 → completion-reports/req-define/feature-epic.md
+    - Pattern A（バグ修正・軽微変更）→ completion-reports/req-define/bug-or-lightweight.md
+    - Pattern C（リファクタリング・保守）→ completion-reports/req-define/maintenance.md
+    - Pattern D（ドキュメント・雑務）→ completion-reports/req-define/docs-or-chore.md
+    - 各variantに壁打ち結論ハイライトが含まれている（追加出力不要）
 
 ## Guardrails
 
