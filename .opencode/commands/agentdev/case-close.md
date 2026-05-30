@@ -62,7 +62,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
         - **表現規範**: 「不要」とは書かない。書くべきなのは「このチェックボックスが要求する検証は、この PR diff の変更対象に対して直接証拠にならない」である
         - **記録**: 自律解決結果（検証適用不能 / 代替検証実施 / 自律解決不能）を達成判定の根拠と同じ出力チャネルに記録する。自律解決した項目は Issue 完了コメントに項目単位で記録する（対象チェックボックス文言・5条件未充足理由・自律解決タイプ・判断根拠・最終判定）
     - **Issue本文更新**: `agentdev-gh-cli` に従い `--body-file` で `gh issue edit` を実行してIssue本文を更新
-    - **再取得・再検証**: Issue本文を再取得し、unchecked項目が残っていないことを確認（REQ-0032-012）
+    - **再取得・再検証**: Issue本文を再取得し、unchecked項目が残っていないことを確認（REQ-0106）
     - **未達項目が残る場合**（達成判定・自律解決判定後） → 構造化エラーを出力して停止する（G08）。Step 3以降に進まない:
       ```
       ## 完了ゲートエラー: 未達チェックボックス検出
@@ -83,7 +83,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
       ```
     - **全項目達成済みの場合** → Step 3へ進む
     - PRの存在を確認（`gh pr view` でPR番号を特定、またはセッション内会話から取得）
-    - **責任境界**: case-runのチェックボックス更新責任は維持される。case-closeは最終セーフティネットとして機能する（REQ-0032-013, 014）
+    - **責任境界**: case-runのチェックボックス更新責任は維持される。case-closeは最終セーフティネットとして機能する（REQ-0106, 014）
 3. docs/ 検証:
     **機能追加固有の検証**:
     - `docs/requirements/REQ-{NNNN}.md` が作成済みであることを確認
@@ -97,9 +97,9 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 実装コード・設定・関連ドキュメントが要件と矛盾していないことを確認する（SHALL）
     - 旧仕様の記述が残っている場合、その記述が変更後仕様と矛盾しないことを確認する（SHALL）
     - 変更後仕様と矛盾するドキュメント更新漏れがある場合、完了不可とする（SHALL）
-    - `docs/DOC-MAP.md` が存在すること、およびDOC-MAPに記載された基準文書（REQ/ADR/SPEC）への参照が実際のファイルと整合していることを確認する（REQ-0035-020）
+    - `docs/DOC-MAP.md` が存在すること、およびDOC-MAPに記載された基準文書（REQ/ADR/SPEC）への参照が実際のファイルと整合していることを確認する（REQ-0101）
 4. PRマージ（`gh pr merge`）→ 対応記録をIssueにコメント追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_implementation.md`（機能追加）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_record.md`（バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務）を Read tool で読み込む
-    - **PR merge 前の HEAD commit hash 記録**（SHALL, REQ-0038-001）: `gh pr merge` 実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する。Step 8b の自マージ検出で使用する
+    - **PR merge 前の HEAD commit hash 記録**（SHALL, REQ-0106）: `gh pr merge` 実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する。Step 8b の自マージ検出で使用する
     - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 5. Post-merge テスト戦略検証・反映（Step 4 PRマージ後）:
@@ -112,21 +112,21 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
 6. Issueクローズ（`gh issue close --reason completed`）
 7. ブランチ・worktree削除 → `agentdev-git-worktree` スキルの「worktree削除手順」に従って以下を実行:
-    - **未コミット変更検出**（SHALL, REQ-0037-001）: worktree 内で `git status --short` を実行し、未コミット変更の有無を確認する
+    - **未コミット変更検出**（SHALL, REQ-0106）: worktree 内で `git status --short` を実行し、未コミット変更の有無を確認する
         - **未コミット変更あり**の場合:
-            - squash merge 済み（Step 4 で `gh pr merge --squash` 成功）→ `git checkout .` で未コミット変更を破棄する（SHALL, REQ-0037-002）。.sisyphus/plans/ 配下に保持が必要なファイルがある場合は、破棄前にユーザーに確認する
-            - squash merge 未確認 → 警告を表示して停止する（SHALL, REQ-0037-003）。自動破棄は禁止（REQ-0001-007）
+            - squash merge 済み（Step 4 で `gh pr merge --squash` 成功）→ `git checkout .` で未コミット変更を破棄する（SHALL, REQ-0106）。.sisyphus/plans/ 配下に保持が必要なファイルがある場合は、破棄前にユーザーに確認する
+            - squash merge 未確認 → 警告を表示して停止する（SHALL, REQ-0106）。自動破棄は禁止（REQ-0104）
         - **未コミット変更なし**: そのまま次の手順へ進む
     - **.sisyphus/ クリーンアップ**: worktree 内の `.sisyphus/` ディレクトリを削除（`Remove-Item -Recurse -Force .sisyphus/`）。未追跡ファイルによる worktree remove エラーを防止
     - worktree削除（`git worktree remove`）
-        - **Permission denied エラー時**（SHALL, REQ-0037-004）: プロセスを特定する案内を表示して停止する（例: 「worktree 内のファイルをロックしているプロセスがあります。エクスプローラーやエディタを閉じてから再実行してください」）。自動的なプロセス終了は行わない
+        - **Permission denied エラー時**（SHALL, REQ-0106）: プロセスを特定する案内を表示して停止する（例: 「worktree 内のファイルをロックしているプロセスがあります。エクスプローラーやエディタを閉じてから再実行してください」）。自動的なプロセス終了は行わない
     - worktree prune
     - ローカルブランチ削除:
         - `git branch -d "{type}/issue-{N}"` を実行する
-        - **`git branch -d` 失敗時（"not fully merged"）**（SHALL, REQ-0037-008〜010）: squash merge 済みの場合は条件付きで `-D` を許可する:
+        - **`git branch -d` 失敗時（"not fully merged"）**（SHALL, REQ-0106〜010）: squash merge 済みの場合は条件付きで `-D` を許可する:
             1. `gh pr view {PR番号} --json state,mergedAt -q '.state + " " + .mergedAt'` で PR がマージ済みであることを確認する
             2. PR がマージ済み（`state: MERGED`）と確認できた場合 → `git branch -D "{type}/issue-{N}"` を実行して強制削除する
-            3. PR がマージ済みと確認できない場合 → 警告を表示して停止する（REQ-0001-007）
+            3. PR がマージ済みと確認できない場合 → 警告を表示して停止する（REQ-0104）
     - **リモートブランチ削除**（`git push origin --delete`）— `agentdev-git-worktree` スキル Step 5 参照
     - 削除の成否を確認し、失敗した場合は警告表示して停止する（SHALL。「警告して継続」ではなく「警告して停止」に統一）
  8. 親Epic Issue更新（`agentdev-epic-tracker` スキル参照）:
@@ -150,13 +150,13 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
             - 完了報告に「Epic #{N} を自動クローズ」と表示
         - 1件以上 "OPEN" の子Issueがある場合 → スキップ（完了報告に「Epic #{N}: N件未完了のためスキップ」と表示）
  8b. 実行前同期（git pull）:
-    - `git pull --ff-only` 実行前に `git status --porcelain` でローカル変更の有無を確認すること（SHALL — REQ-0038-004）
-    - ローカル変更が検出された場合、当該ファイルを `git checkout --` でリセットしてから pull を実行すること（SHALL — REQ-0038-005）
-    - ローカル変更リセットはPRで削除されたファイルに限定して実行すること（SHALL — REQ-0038-006）
+    - `git pull --ff-only` 実行前に `git status --porcelain` でローカル変更の有無を確認すること（SHALL — REQ-0106）
+    - ローカル変更が検出された場合、当該ファイルを `git checkout --` でリセットしてから pull を実行すること（SHALL — REQ-0106）
+    - ローカル変更リセットはPRで削除されたファイルに限定して実行すること（SHALL — REQ-0106）
     - pull前のHEAD commit hash を記録する（`git rev-parse HEAD`）
     - カレントディレクトリで `git pull --ff-only` を実行する
     - pull後のHEAD commit hash を取得し、pull前のhashと一致することを確認する（hash一致 = リモートに新規コミットなし）
-    - **hash不一致時**: 自マージのみに起因するか判定する（SHALL, REQ-0038-003）:
+    - **hash不一致時**: 自マージのみに起因するか判定する（SHALL, REQ-0106）:
         1. `git log --oneline {pre_pull_hash}..{post_pull_hash}` で pull により取り込まれたコミットを確認する
         2. 取り込まれたコミットが全て自マージコミット（`Merge branch 'fix/issue-{N}'` 等のマージコミット）のみの場合 → 自マージ由来として継続する（Step 9以降に進む）
         3. 自マージ以外のコミットが含まれる場合 → リモートの新規コミットが取り込まれたため、Step 2-8の評価・承認をやり直す必要がある。以下の構造化エラーメッセージを表示して停止する:
@@ -190,12 +190,12 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - imported 判定結果を Step 11 の完了報告に含める
  9b. Post-run intake capture: 完了処理中に発見した本筋外の変更候補のうち、具体的な修正対象が特定できるものを intake item として保存する。`agentdev-workflow-lifecycle` → `reference/capture-boundaries.md` の Split Rule を SSoT とする
       - **Intake item の保存**: 具体的な修正対象が特定できるもの（不整合・規約違反・未回収課題等）を `.agentdev/intake/inbox/` に intake item として保存（SHALL）
-      - **PR 本文からの回収**（REQ-0040-007）: マージ済み PR 本文の `## Findings / Intake候補` セクションから Finding を取得し、intake 候補を intake item 形式で `.agentdev/intake/inbox/` に保存する（SHALL）。「該当なし」の場合はスキップ
-      - **Epic 横断回収**（REQ-0040-008）: Epic モード（Parent Issue が存在する場合）では、対象 PR 以外にも関連する子 Issue PR 群の本文を横断走査し、`## Findings / Intake候補` セクションから Finding を回収する（SHALL）。回収対象は以下の通り:
+      - **PR 本文からの回収**（REQ-0106）: マージ済み PR 本文の `## Findings / Intake候補` セクションから Finding を取得し、intake 候補を intake item 形式で `.agentdev/intake/inbox/` に保存する（SHALL）。「該当なし」の場合はスキップ
+      - **Epic 横断回収**（REQ-0106）: Epic モード（Parent Issue が存在する場合）では、対象 PR 以外にも関連する子 Issue PR 群の本文を横断走査し、`## Findings / Intake候補` セクションから Finding を回収する（SHALL）。回収対象は以下の通り:
         - Parent Issue 本文から子 Issue 番号一覧を取得
         - 各子 Issue に紐づくマージ済み PR を `gh pr list --search "fixes #N --merged"` 等で特定
         - 各 PR 本文から `## Findings / Intake候補` セクションを取得して回収
-      - **推測補完禁止**（REQ-0040-009）: PR 本文に記録された情報のみを保存し、推測で補完してはならない（SHALL）。記録が曖昧な場合は intake item として保存せず、完了報告に候補として提示する
+      - **推測補完禁止**（REQ-0106）: PR 本文に記録された情報のみを保存し、推測で補完してはならない（SHALL）。記録が曖昧な場合は intake item として保存せず、完了報告に候補として提示する
      - **Intake item の形式**: 他の intake 系コマンド（intake-capture / intake-from-github）と同一の推奨標準形に従う:
        - ファイル名: `YYYY-MM-DD-{topic-slug}.md`（生成元コマンド名をファイル名に含めない）
        - 同名ファイル既存時: `-2`, `-3` の連番を付与する
@@ -205,7 +205,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
        - case-close 由来であることは `根拠（任意）` 見出しに記録する（ファイル名や独自 frontmatter には記録しない）
     - **曖昧な候補は自律保存しない**: 修正対象が特定できない候補・単なる違和感・改善案・曖昧な変更候補は自律保存せず、完了報告に候補としてのみ提示（SHALL）
      - **保存先の限定**: intake item の保存先は `.agentdev/intake/inbox/` のみ（SHALL）
-     - **REQ再構成候補の保存**（SHOULD）: 完了処理中にREQ再構成候補（REQの分散・肥大化・不要化・ドリフト等）を検知した場合、REQ再構成intakeを `.agentdev/intake/inbox/req-restructure/` に保存する（REQ-0050-005）
+     - **REQ再構成候補の保存**（SHOULD）: 完了処理中にREQ再構成候補（REQの分散・肥大化・不要化・ドリフト等）を検知した場合、REQ再構成intakeを `.agentdev/intake/inbox/req-restructure/` に保存する（REQ-0109）
     - **採用判断の禁止**: intake item の採用可否判断、GitHub Issue 作成、後続対応の優先度判断を行わない（SHALL）
     - **未対応事項の逃避禁止**: 今回の Issue / PR の完了条件に含まれる未対応事項を intake item に逃がして完了扱いにしてはならない（SHALL）
     - **別々の成果物**: intake item と learning item を別々に件数・保存先・次ステップを表示する（SHALL）。混合した単一成果物にしない
@@ -252,7 +252,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 ### 品質ゲート
 - G07: PRのCIが通っていることを確認（`gh pr checks`）。CI/CDが失敗している場合は case-run に差し戻す（case-close は修正を行わない）
-- G08: 達成判定・自律解決判定後も未達チェックボックスが残る場合、Step 2で構造化エラーを出して停止する。達成判定は5条件プロトコルに従い、自律解決判定は変更対象分類×検証種別分類に基づく（REQ-0032-015〜022）
+- G08: 達成判定・自律解決判定後も未達チェックボックスが残る場合、Step 2で構造化エラーを出して停止する。達成判定は5条件プロトコルに従い、自律解決判定は変更対象分類×検証種別分類に基づく（REQ-0106〜022）
 - G09: 機能追加で docs/ 更新がない場合、警告を表示して停止確認。変更後仕様と矛盾するドキュメント更新漏れがある場合、完了不可とする
 - G10: Issue本文のテスト戦略チェックボックスを必ず更新すること（PR検証結果を反映）
 - G11: コメントテンプレートの【必須】セクションが全てコメント本文に含まれていることを確認してからコメント投稿すること

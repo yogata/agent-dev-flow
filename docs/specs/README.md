@@ -1,6 +1,6 @@
 # Specifications Index
 
-SPEC files are canonical documents for the current architecture (REQ-0035-006).
+SPEC files are canonical documents for the current architecture (REQ-0101).
 They describe what the system *is* now, as opposed to REQ files that define what it *should be*.
 
 ## SPEC Files
@@ -11,7 +11,7 @@ They describe what the system *is* now, as opposed to REQ files that define what
 | [patterns.md](patterns.md) | 実装パターン | コード規約と実装パターン |
 | [quality-specs.md](quality-specs.md) | 品質仕様 | 品質基準・検証ルール |
 
-## Document Relationships (REQ-0035-007)
+## Document Relationships (REQ-0101)
 
 ```
 REQ (requirements/REQ-*.md)    -- 要件定義（what should be）

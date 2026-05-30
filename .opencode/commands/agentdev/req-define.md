@@ -27,7 +27,7 @@ load_skills:
 - req-save が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
 - finding ファイルを含め全てのユーザー明示入力ファイルは read-only の Requirement Source である（G04）。status や frontmatter の更新・上書きは行わない
 - source file の種類に依存しない汎用的な入力扱いとする（elevation-staging 専用分岐は追加しない）
-- **promoted 直読み禁止**（REQ-0039-019）: `.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` を直接読み込んではならない（MUST NOT）。promoted artifact は req-backlog による RU 化を経由しなければならない
+- **promoted 直読み禁止**（REQ-0105）: `.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` を直接読み込んではならない（MUST NOT）。promoted artifact は req-backlog による RU 化を経由しなければならない
 
 ## Output
 
@@ -98,15 +98,15 @@ load_skills:
     - **Finding ファイルの例**: `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md` が指定された場合、finding の内容（検出概要・影響範囲・推奨アクション）を壁打ちの初期コンテキストとして扱い、正式な要件変更への変換を案内する
  2. ユーザーとの壁打ち対話を開始 → `agentdev-req-analysis` の壁打ちメソドロジーに従って深掘り
     - 明示入力ファイルが読み込まれている場合、その内容を壁打ちの開始点として活用（ファイル内容から要件の構造化を先行して進める）
- 3. 既存REQ照合 → `agentdev-req-file-manager` の照合方法論に従って実行（REQ-0002-009〜011）:
+ 3. 既存REQ照合 → `agentdev-req-file-manager` の照合方法論に従って実行（REQ-0104〜011）:
     - `docs/requirements/REQ-*.md` をスキャンし、ユーザーの要件と既存REQの関連性を推論（タイトル・タグ・目的・要件内容の重み付けによる総合判定）
     - 関連REQがある場合: 該当REQの内容（目的・要件・適用範囲）を壁打ちコンテキストに即時反映し、ユーザーとともに変更点を深掘り
-    - **APPEND-first ルール**（REQ-0002-024〜028）:
-      - CREATE を選択する前に、APPEND/UPDATE 候補を必ず評価する（REQ-0002-024）
-      - 同一コンポーネント・同一スコープの既存REQが存在する場合、APPEND をデフォルトの操作とする（REQ-0002-025）。判定は `agentdev-req-file-manager` の「操作分類の判定軸」に従う
-      - 既存REQの要件行・目的・適用範囲の内容を修正する変更は UPDATE と判定する（REQ-0002-026）
-      - CREATE を選択する場合、APPEND/UPDATE ではない理由を `draft-meta` の `create-rationale` フィールドに記録する（REQ-0002-027）
-      - APPEND/UPDATE 候補があるにもかかわらず CREATE と判断する場合、ユーザーに判断根拠を提示する（REQ-0002-028）
+    - **APPEND-first ルール**（REQ-0104〜028）:
+      - CREATE を選択する前に、APPEND/UPDATE 候補を必ず評価する（REQ-0104）
+      - 同一コンポーネント・同一スコープの既存REQが存在する場合、APPEND をデフォルトの操作とする（REQ-0104）。判定は `agentdev-req-file-manager` の「操作分類の判定軸」に従う
+      - 既存REQの要件行・目的・適用範囲の内容を修正する変更は UPDATE と判定する（REQ-0104）
+      - CREATE を選択する場合、APPEND/UPDATE ではない理由を `draft-meta` の `create-rationale` フィールドに記録する（REQ-0104）
+      - APPEND/UPDATE 候補があるにもかかわらず CREATE と判断する場合、ユーザーに判断根拠を提示する（REQ-0104）
     - 操作分類を確定: `CREATE`（該当REQなし）、`APPEND`（既存REQへの要件行追加）、`UPDATE`（既存REQの内容修正）
      - 複数REQが該当する場合、それぞれに対する操作を個別に指定
      - SPLIT（要件の分割）が検出された場合: SPLIT は保存操作ではなく requirements review / follow-up 候補として扱う。保存可能範囲（CREATE/APPEND/UPDATE）は通常通り実行する
@@ -114,25 +114,25 @@ load_skills:
 
  4. 要件を展開 → `agentdev-req-analysis` の分析観点に従って網羅（照合で取得した関連REQの内容を反映）
  4b. **関連ドキュメント更新候補抽出**（Step 4 の直後に実行）:
-     - **変更種別判定**: Step 4 で展開済みの要件から、DBカラム、状態フラグ、判定条件、API仕様、画面表示、既存REQ/ADR/仕様の意味変更に該当する変更種別を自律的に判定する（REQ-0034-001）
-     - **キーワード抽出**: 変更種別に該当する場合、要件本文・既存REQ照合結果・対象コンポーネント・API名・DBカラム名・状態名・表示文言から関連キーワードを抽出する（REQ-0034-002）
-      - **限定探索**: 抽出キーワードを用いて、以下の範囲を read-only で限定探索する（REQ-0034-003, REQ-0034-004, REQ-0035-016）:
+     - **変更種別判定**: Step 4 で展開済みの要件から、DBカラム、状態フラグ、判定条件、API仕様、画面表示、既存REQ/ADR/仕様の意味変更に該当する変更種別を自律的に判定する（REQ-0102）
+     - **キーワード抽出**: 変更種別に該当する場合、要件本文・既存REQ照合結果・対象コンポーネント・API名・DBカラム名・状態名・表示文言から関連キーワードを抽出する（REQ-0102）
+      - **限定探索**: 抽出キーワードを用いて、以下の範囲を read-only で限定探索する（REQ-0102, REQ-0102, REQ-0101）:
         - `docs/specs/**`
         - `docs/requirements/REQ-*.md`
         - `docs/DOC-MAP.md`
         - `docs/adr/**`
         - `docs/README.md`
         - `docs/requirements/README.md`
-     - **分類**: 検出した候補ごとに、対象パス・検出語句・判定・必要対応を出力する（REQ-0034-006）。判定は以下に分類する（REQ-0034-007）:
+     - **分類**: 検出した候補ごとに、対象パス・検出語句・判定・必要対応を出力する（REQ-0102）。判定は以下に分類する（REQ-0102）:
        - `直接矛盾`: 既存記述が新要件と明示的に反対の内容を持つ
        - `更新候補`: 新要件の影響を受ける可能性が高いが、直接矛盾までは確認できない
        - `影響なし`: 検索ヒットしたが、更新不要と判断できる
-     - **停止判断**（REQ-0034-008, REQ-0034-009）:
+     - **停止判断**（REQ-0102, REQ-0102）:
        - 既存REQ・ADR・仕様の記述を更新対象として扱えば新要件が成立する場合 → 停止せず、関連ドキュメント更新候補として後続工程へ引き渡す
         - 既存REQ・ADR・仕様のどれを優先するかの判断が必要な場合 → ユーザー判断を求める
        - ADRの決定と新要件が根本衝突する場合 → ユーザー判断を求める
-     - **ドラフト保持**: 関連ドキュメント更新候補をドラフトまたはセッション内要件docに保持する（REQ-0034-010）。Step 6 の要件doc生成で `## 関連ドキュメント更新候補` セクションとして反映する
- 4c. **分類ゲート**（Step 4b の直後に実行）（REQ-0041-013, REQ-0041-014）:
+     - **ドラフト保持**: 関連ドキュメント更新候補をドラフトまたはセッション内要件docに保持する（REQ-0102）。Step 6 の要件doc生成で `## 関連ドキュメント更新候補` セクションとして反映する
+ 4c. **分類ゲート**（Step 4b の直後に実行）（REQ-0109, REQ-0109）:
      - **分類対象**: Step 4 で展開した各要件行候補について、以下の2分類のいずれかに分類する:
        - **変更後仕様**: 変更後に満たすべき振る舞い・制約・状態を記述する要件行
        - **反映作業**: 既存成果物への更新・削除・移動・名称変更・廃止・置換・参照修正・インデックス修正・整合性修正そのものを記述する候補
@@ -145,8 +145,8 @@ load_skills:
  5. ADR閾値以上の技術判断が発生した場合 → `agentdev-adr-guidelines` に従ってADR判断を記録（ADRファイルの作成は req-save で実行）
  6. 要件doc形式で生成 → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read tool で読み込み、目的/要件/適用範囲の構造に従って内容を構造化
      **テンプレート準拠要件**: テンプレートの【必須】セクション（目的、要件、適用範囲）が全て要件docに含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-      **Requirement Source セクション**（REQ-0023-001, REQ-0023-002）: ユーザーが明示した入力ファイル（Requirement Source）が1件以上存在する場合、要件docの `## 適用範囲` の後に `## Requirement Source` セクションを追加する。セクションには全ての入力ファイルのパスをリスト形式（`- {filepath}`）で記録する。source file の種類（staging stub, promoted artifact, finding file 等）による条件分岐は行わず、全ての明示入力ファイルを統一的に扱う
-      **関連ドキュメント更新候補セクション**（REQ-0034-010）: Step 4b で関連ドキュメント更新候補が検出された場合、`## 適用範囲`（または `## Requirement Source` が存在する場合はその後）に `## 関連ドキュメント更新候補` セクションを追加する。セクションには候補テーブル（パス/検出語句/判定/必要対応）を記録する
+      **Requirement Source セクション**（REQ-0105, REQ-0105）: ユーザーが明示した入力ファイル（Requirement Source）が1件以上存在する場合、要件docの `## 適用範囲` の後に `## Requirement Source` セクションを追加する。セクションには全ての入力ファイルのパスをリスト形式（`- {filepath}`）で記録する。source file の種類（staging stub, promoted artifact, finding file 等）による条件分岐は行わず、全ての明示入力ファイルを統一的に扱う
+      **関連ドキュメント更新候補セクション**（REQ-0102）: Step 4b で関連ドキュメント更新候補が検出された場合、`## 適用範囲`（または `## Requirement Source` が存在する場合はその後）に `## 関連ドキュメント更新候補` セクションを追加する。セクションには候補テーブル（パス/検出語句/判定/必要対応）を記録する
  7. パターン判定:
     - ラベルに基づいて Pattern 判定: `bug`, `critical` → Pattern A, `enhancement`, `feature` → Pattern B, `refactor`, `maintenance` → Pattern C, `docs`, `chore` → Pattern D
     - **Pattern A + ADR必要時の Pattern B 昇格**: Pattern A で ADR閾値以上の技術判断が発生した場合、Pattern B に昇格する（REQファイル・ADRファイルの作成が必要となるため）
@@ -198,7 +198,7 @@ load_skills:
 - G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）。`.agentdev/backlog/req-units/RU-*.md` の削除は req-define では行わず、後続の req-save または case-open の成功後に実行する
 - G05: `docs/` 配下の広範な探索は禁止（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用。Step 4b の抽出キーワードベース限定探索も許可）
 - G06: `inbox.md` / `archive.md` を直接ロードしない（raw learning item は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
-- G07: `.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` を直接読み込んではならない（REQ-0039-019）。promoted artifact は req-backlog による RU 化を経由しなければならない
+- G07: `.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` を直接読み込んではならない（REQ-0105）。promoted artifact は req-backlog による RU 化を経由しなければならない
 
 ### 実行制約
 - G08: `git` コマンドは実行しない

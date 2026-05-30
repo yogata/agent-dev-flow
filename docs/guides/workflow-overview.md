@@ -1,6 +1,6 @@
 # AgentDevFlow ワークフロー概要
 
-本ガイドは AgentDevFlow のコマンドパイプライン・フェーズ体系・Pattern分類を俯瞰的に説明する。基準は各 REQ/ADR/SPEC ファイルであり、本ガイドは参照用読み物である（REQ-0042-031）。基準文書と矛盾する記述がある場合、基準を優先する（REQ-0042-034）。
+本ガイドは AgentDevFlow のコマンドパイプライン・フェーズ体系・Pattern分類を俯瞰的に説明する。基準は各 REQ/ADR/SPEC ファイルであり、本ガイドは参照用読み物である（REQ-0101）。基準文書と矛盾する記述がある場合、基準を優先する（REQ-0101）。
 
 ## 全体パイプライン
 
@@ -51,7 +51,7 @@ AIとの対話を通じて要件を整理する。入力はセッション会話
 3. Pattern と Scale を判定し、要件doc構造を出力
 4. 関連ドキュメント更新候補を抽出（直接矛盾 / 更新候補 / 影響なし）
 
-**分類ゲート**: 既存成果物への反映作業のみを表す候補は、新規REQの独立要件行として扱わない（REQ-0043-012）。
+**分類ゲート**: 既存成果物への反映作業のみを表す候補は、新規REQの独立要件行として扱わない（REQ-0102）。
 
 ### req-save
 
@@ -70,7 +70,7 @@ AIとの対話を通じて要件を整理する。入力はセッション会話
 
 ### case-run
 
-GitHub Issue を読み取り、worktree 上で実装し、PR を作成する。3フェーズ構成でべき等な再開ポイントを提供する（REQ-0047-001）。
+GitHub Issue を読み取り、worktree 上で実装し、PR を作成する。3フェーズ構成でべき等な再開ポイントを提供する（REQ-0106）。
 
 | フェーズ | 内容 |
 |----------|------|
@@ -184,8 +184,8 @@ Issueのラベルに基づき4つのPatternに分類する。Patternにより経
 
 | 対象 | 基準 |
 |------|------|
-| 文書構造・guides位置づけ | [REQ-0042](../requirements/REQ-0042.md) |
-| req-define / req-save / 分類ゲート | [REQ-0043](../requirements/REQ-0043.md) |
-| コマンドプロトコル・Pattern体系・SSoT | [REQ-0045](../requirements/REQ-0045.md) |
-| intake / learning / req-backlog / RU lifecycle | [REQ-0046](../requirements/REQ-0046.md) |
-| case-run / case-close / post-run capture | [REQ-0047](../requirements/REQ-0047.md) |
+| 文書構造・guides位置づけ | [REQ-0101](../requirements/REQ-0101.md) |
+| req-define / req-save / 分類ゲート | [REQ-0102](../requirements/REQ-0102.md) |
+| コマンドプロトコル・Pattern体系・SSoT | [REQ-0104](../requirements/REQ-0104.md) |
+| intake / learning / req-backlog / RU lifecycle | [REQ-0105](../requirements/REQ-0105.md) |
+| case-run / case-close / post-run capture | [REQ-0106](../requirements/REQ-0106.md) |

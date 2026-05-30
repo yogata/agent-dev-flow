@@ -101,18 +101,18 @@
 ```markdown
 ## 実装中の仕様矛盾発見によるREQ更新の必要
 
-- **問題事象**: Issue #150 の実装中、REQ-0005とspecs/design-principles.mdで定義されているエラー処理方針が矛盾していることを発見した
+- **問題事象**: Issue #150 の実装中、REQ-0106とspecs/design-principles.mdで定義されているエラー処理方針が矛盾していることを発見した
 - **発生局面**: 実装
 - **検知方法**: agentdev-spec-compliance スキルによる実装前チェック
-- **根本原因**: REQ-0005作成時に design-principles.md の既存方針との整合性確認が漏れていた
-- **自律対応内容**: 矛盾点を整理し、ユーザーに確認してREQ-0005の該当セクションを修正
+- **根本原因**: REQ-0106作成時に design-principles.md の既存方針との整合性確認が漏れていた
+- **自律対応内容**: 矛盾点を整理し、ユーザーに確認してREQ-0106の該当セクションを修正
 - **ユーザー確認有無**: あり
-- **ADR/REQ/spec影響**: REQ-0005 セクション3の更新が必要。ADR-0003（エラー処理方針）への追記も検討すべき
+- **ADR/REQ/spec影響**: REQ-0106 セクション3の更新が必要。ADR-0003（エラー処理方針）への追記も検討すべき
 - **横展開観点**: REQ作成時は常に既存specs/ADRとの整合性確認を必須とすべき
 - **再発条件**: 新規REQ作成時に既存ドキュメントとの整合性チェックをスキップする場合
 - **予防策候補**: req-save の実行ステップに specs/ADR 整合性チェックを追加する
 - **想定反映先**: `req-save` コマンド、`agentdev-req-analysis` スキル
-- **関連**: `docs/requirements/REQ-0005.md`, `docs/specs/design-principles.md`, Issue #150
+- **関連**: `docs/requirements/REQ-0106.md`, `docs/specs/design-principles.md`, Issue #150
 - **タグ**: `#仕様矛盾` `#REQ更新` `#ADR影響`
 ```
 

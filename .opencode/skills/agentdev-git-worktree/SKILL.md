@@ -142,7 +142,7 @@ git branch -d "{type}/issue-{N}"
 
 **注意**: 未マージブランチの強制削除（`-D`）は禁止。未マージの場合はエラー停止し、ユーザーの判断を委ねる。
 
-**例外: squash merge 後の条件付き `-D` 許可**（REQ-0038-004）: squash merge は fast-forward マージではないため `git branch -d` が "not fully merged" エラーになる。以下の条件を全て満たす場合のみ `-D` を許可する:
+**例外: squash merge 後の条件付き `-D` 許可**（REQ-0106）: squash merge は fast-forward マージではないため `git branch -d` が "not fully merged" エラーになる。以下の条件を全て満たす場合のみ `-D` を許可する:
 1. 当該ブランチの PR が `gh pr view` で `state: MERGED` と確認できること
 2. 呼び出し元（`case-close` 等）が squash merge 済みを明示的に判定していること
 3. 上記2条件を満たさない場合は `-D` を実行せず、警告を表示して停止すること

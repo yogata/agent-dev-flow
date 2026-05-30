@@ -11,7 +11,7 @@ load_skills:
 
 `.agentdev/intake/inbox/` 内の intake item をレビューし、各 item について採用可否の判断を行う。
 
-**このコマンドは review・採用可否判断のみを行う。** GitHub Issue の作成・item の変更・後続コマンドの起動は行わない（REQ-0017-025）。
+**このコマンドは review・採用可否判断のみを行う。** GitHub Issue の作成・item の変更・後続コマンドの起動は行わない（REQ-0103）。
 
 ## Input
 
@@ -25,7 +25,7 @@ load_skills:
 
 ## 判定値
 
-intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
+intake-review の判定値は以下の 3 値とする（REQ-0103）:
 
 | 判定 | 意味 | 後続 |
 |------|------|------|
@@ -49,7 +49,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
    - 既存要件・仕様との関連
    - 対応方針の方向性（要件定義が必要か、既に Issue 化可能か）
    - **learning 分岐判断**: この item は intake ではなく learning に分けるべきものではないか（capture-boundaries.md の split rule 参照）。具体的な修正対象がなく再発防止知見のみの場合は learning に委ねることを推奨
-   - **REQ再構成intakeの判定基準**: REQ再構成intakeは通常のIssue化可否ではなく、REQ再構成レビューへの入力適性で判定する（REQ-0050-012）。通常intakeとは独立した判定基準を適用する
+   - **REQ再構成intakeの判定基準**: REQ再構成intakeは通常のIssue化可否ではなく、REQ再構成レビューへの入力適性で判定する（REQ-0109）。通常intakeとは独立した判定基準を適用する
 
 4. **ユーザーとの対話的レビュー**: 評価結果を提示し、ユーザーと対話しながら判定を確定する:
    - 各 item の評価を提示
@@ -87,7 +87,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
      - `採用` → `.agentdev/intake/accepted/` に移動
      - `保留` → `.agentdev/intake/inbox/` に残す（移動しない）
      - `却下` → `.agentdev/intake/archive/rejected/` に移動
-     - **REQ再構成intakeの振り分け**（REQ-0050-012）:
+     - **REQ再構成intakeの振り分け**（REQ-0109）:
        - `採用` → `.agentdev/intake/accepted/req-restructure/` に移動
        - `却下` → `.agentdev/intake/archive/rejected/req-restructure/` に移動
        - `保留` → `.agentdev/intake/inbox/req-restructure/` に残す（移動しない）
@@ -123,22 +123,22 @@ intake-review の判定値は以下の 3 値とする（REQ-0017-028）:
 
 ## Guardrails
 
-### 責務境界（REQ-0017-025, REQ-0019-025）
+### 責務境界（REQ-0103, REQ-0105）
 - G01: GitHub Issue の作成を行わない（`case-open` が担当）
-- G02: 直接 `case-run` を起動しない（REQ-0017-025）
+- G02: 直接 `case-run` を起動しない（REQ-0103）
 - G03: item の内容を変更・更新しない（判定に基づく振り分けのみ）
 - G04: `intake-promote` や `req-define` を自動起動しない（次ステップの提示のみ）
-- G05: learning item を作成しない（REQ-0019-025）。learning に分けるべきと判断した item は learning pipeline への委ねを推奨するにとどめる
-- G06: learning item の保存・分類・昇華を担当しない（REQ-0019-023）
+- G05: learning item を作成しない（REQ-0105）。learning に分けるべきと判断した item は learning pipeline への委ねを推奨するにとどめる
+- G06: learning item の保存・分類・昇華を担当しない（REQ-0105）
 
-### 形式制約（REQ-0017-032〜039）
-- G07: workflow 管理 artifact として扱わない（REQ-0017-033）
-- G08: review 結果を item の本文に書き込まない（REQ-0017-038）
+### 形式制約（REQ-0103〜039）
+- G07: workflow 管理 artifact として扱わない（REQ-0103）
+- G08: review 結果を item の本文に書き込まない（REQ-0103）
 - G09: 状態遷移を item 内に記録しない（ディレクトリ移動のみで表現）
-- G10: 後続 artifact への参照を item に追記しない（REQ-0017-039）
+- G10: 後続 artifact への参照を item に追記しない（REQ-0103）
 
 ### 実行制約
 - G11: レビューはユーザーとの対話を通じて行う（AI のみでの自動判定はしない）
 - G12: 判定は item ごとに個別に行う（一括判定はユーザーが明示的に指示した場合のみ）
-- G13: item の移動先は `.agentdev/intake/` 配下のみ（REQ-0017-035）
-- G14: ディレクトリ移動は判定結果の表現である（採用→accepted/、却下→archive/rejected/）。item 内部に状態を記録せず、ディレクトリ配置で表現する（REQ-0017-036）
+- G13: item の移動先は `.agentdev/intake/` 配下のみ（REQ-0103）
+- G14: ディレクトリ移動は判定結果の表現である（採用→accepted/、却下→archive/rejected/）。item 内部に状態を記録せず、ディレクトリ配置で表現する（REQ-0103）
