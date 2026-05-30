@@ -46,6 +46,14 @@
   - [REQ-0039: req-backlog コマンドと Requirement Unit パイプライン](requirements/REQ-0039.md)
   - [REQ-0040: 子Issue PRに Findings / Intake候補を永続化し、case-closeで回収する](requirements/REQ-0040.md)
   - [REQ-0041: REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート](requirements/REQ-0041.md)
+  - [REQ-0042: REQ/ADR/SPEC/DOC-MAP 基準構造](requirements/REQ-0042.md)
+  - [REQ-0043: req-define / req-save / REQ分類ゲート](requirements/REQ-0043.md)
+  - [REQ-0044: Command / Skill / Template / Script 責任分界](requirements/REQ-0044.md)
+  - [REQ-0045: AgentDevFlow command protocol](requirements/REQ-0045.md)
+  - [REQ-0046: intake / learning / req-backlog / RU lifecycle](requirements/REQ-0046.md)
+  - [REQ-0047: case-run / case-close / post-run capture](requirements/REQ-0047.md)
+  - [REQ-0048: reporting / GitHub body / link / writing quality](requirements/REQ-0048.md)
+  - [REQ-0049: integrity / validation / tests](requirements/REQ-0049.md)
 
 ## Specifications
 

@@ -43,6 +43,14 @@
 | REQ-0039 | req-backlog コマンドと Requirement Unit パイプライン | workflow/req-backlog/ru-lifecycle/promoted |
 | REQ-0040 | 子Issue PRに Findings / Intake候補を永続化し、case-closeで回収する | intake/pr-template/case-run/case-close/epic-orchestrator |
 | REQ-0041 | REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート | req-rebaselining/classification/correspondence-table/quality-gate |
+| REQ-0042 | REQ/ADR/SPEC/DOC-MAP 基準構造 | req-structure/adr-structure/spec-structure/doc-map/canonical-boundary |
+| REQ-0043 | req-define / req-save / REQ分類ゲート | req-define/req-save/classification-gate/create-append-update |
+| REQ-0044 | Command / Skill / Template / Script 責任分界 | commands/skills/templates/scripts/responsibility-boundary |
+| REQ-0045 | AgentDevFlow command protocol | commands/protocol/workflow-patterns/ssot |
+| REQ-0046 | intake / learning / req-backlog / RU lifecycle | intake/learning/req-backlog/ru-lifecycle/domain-state |
+| REQ-0047 | case-run / case-close / post-run capture | case-run/case-close/findings/epic-orchestrator/reliability |
+| REQ-0048 | reporting / GitHub body / link / writing quality | reporting/github-body/link-normalization/writing-quality/gh-cli |
+| REQ-0049 | integrity / validation / tests | integrity/validation/tests/guardrails/consistency |
 
 ## Superseded
 
