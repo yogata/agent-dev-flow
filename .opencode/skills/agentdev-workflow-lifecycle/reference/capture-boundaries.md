@@ -106,3 +106,39 @@ Epic モード時、case-close は対象 PR だけでなく、関連する子 Is
 - **REQ-0017-032a**: intake-promote の後続制約（learning pipeline 入力生成禁止）
 - **REQ-0007**: ナレッジパイプライン高度化
 - **REQ-0013**: intake 承認フロー分割
+- **REQ-0050**: REQ再構成intakeの分離保存と回収導線
+
+## REQ再構成intake（REQ-0050）
+
+REQ再構成intakeは、REQファイルの運用に伴う中長期的な構造上の歪み（分散・肥大化・不要化・ドリフト等）を蓄積するintake。通常の短期intakeとは異なる回収サイクルで管理する。
+
+### 保存先
+
+| 状態 | パス |
+|------|------|
+| inbox | `.agentdev/intake/inbox/req-restructure/` |
+| 採用 | `.agentdev/intake/accepted/req-restructure/` |
+| 却下 | `.agentdev/intake/archive/rejected/req-restructure/` |
+
+### フォーマット
+
+通常intakeと同じraw intake itemフォーマット。frontmatter・状態値・重複排除キーなし。
+
+### promote対象外
+
+REQ再構成intakeはreq-backlogへのpromote対象外（REQ-0050-010）。
+
+### レビュー
+
+REQ再構成レビューの入力候補として扱い、通常intakeのIssue化可否とは独立した判定基準を適用（REQ-0050-012）。
+
+### 検知カテゴリ
+
+| 観点 | 説明 |
+|------|------|
+| SPLIT | 単一REQの責務が肥大化しており、複数REQへの分割が適切な候補 |
+| MERGE | 複数REQが同じ興味対象を重複して cover しており、統合が適切な候補 |
+| MOVE | REQの要件行やセクションが別のREQにより適切に配置される候補 |
+| DUPLICATE | 異なるREQ間で要件内容が重複している候補 |
+| RETIRE | 対象REQが不要化しており、廃止が適切な候補 |
+| DRIFT | REQの記述が現在の実装や仕様から乖離（ドリフト）している候補 |

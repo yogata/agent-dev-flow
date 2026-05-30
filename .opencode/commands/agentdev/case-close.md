@@ -204,7 +204,8 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
        - frontmatter・状態フィールド・重複排除キーを持たせない
        - case-close 由来であることは `根拠（任意）` 見出しに記録する（ファイル名や独自 frontmatter には記録しない）
     - **曖昧な候補は自律保存しない**: 修正対象が特定できない候補・単なる違和感・改善案・曖昧な変更候補は自律保存せず、完了報告に候補としてのみ提示（SHALL）
-    - **保存先の限定**: intake item の保存先は `.agentdev/intake/inbox/` のみ（SHALL）
+     - **保存先の限定**: intake item の保存先は `.agentdev/intake/inbox/` のみ（SHALL）
+     - **REQ再構成候補の保存**（SHOULD）: 完了処理中にREQ再構成候補（REQの分散・肥大化・不要化・ドリフト等）を検知した場合、REQ再構成intakeを `.agentdev/intake/inbox/req-restructure/` に保存する（REQ-0050-005）
     - **採用判断の禁止**: intake item の採用可否判断、GitHub Issue 作成、後続対応の優先度判断を行わない（SHALL）
     - **未対応事項の逃避禁止**: 今回の Issue / PR の完了条件に含まれる未対応事項を intake item に逃がして完了扱いにしてはならない（SHALL）
     - **別々の成果物**: intake item と learning item を別々に件数・保存先・次ステップを表示する（SHALL）。混合した単一成果物にしない

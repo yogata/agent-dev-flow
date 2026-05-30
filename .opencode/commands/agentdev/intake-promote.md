@@ -114,7 +114,8 @@ load_skills:
 - G01: GitHub Issue の作成を行わない（`req-backlog` / `case-open` が担当）
 - G02: intake item の元の内容を改変しない（整理・構造化のみ）
 - G03: `req-backlog` を自動起動しない（次ステップの提示のみ）
-- G04: learning pipeline の入力を生成しない（MUST NOT）。review 済み intake item の後続ルートは `req-backlog` のみ（REQ-0019-003, REQ-0019-004, REQ-0039-001）
+ - G04: learning pipeline の入力を生成しない（MUST NOT）。review 済み intake item の後続ルートは `req-backlog` のみ（REQ-0019-003, REQ-0019-004, REQ-0039-001）
+ - G04a: REQ再構成intake（`.agentdev/intake/accepted/req-restructure/` 配下）を通常の `req-backlog` 向け短期作業候補として処理してはならない（REQ-0050-010）。REQ再構成intakeの promote 先は req-backlog ではなく、将来のREQ再構成レビューの入力として扱う
 - G05: learning item の保存・分類・昇華を担当しない（REQ-0019-023）
 
 ### 形式制約（REQ-0017-032〜039）
