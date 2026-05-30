@@ -45,6 +45,7 @@
   - [REQ-0038: case実行信頼性向上（チェックボックス確認・pull前チェック・docs整合性grep）](requirements/REQ-0038.md)
   - [REQ-0039: req-backlog コマンドと Requirement Unit パイプライン](requirements/REQ-0039.md)
   - [REQ-0040: 子Issue PRに Findings / Intake候補を永続化し、case-closeで回収する](requirements/REQ-0040.md)
+  - [REQ-0041: REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート](requirements/REQ-0041.md)
 
 ## Specifications
 
@@ -67,6 +68,7 @@
    - [ADR-0006: Epic Issue 本文を実行順序 SSoT とする設計](adr/ADR-0006.md)
    - [ADR-0007: REQ/ADR基準構造と分類ビュー運用の再定義](adr/ADR-0007.md)
    - [ADR-0008: DOC-MAP導入と requirements/views 廃止](adr/ADR-0008.md)
+   - [ADR-0009: REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入](adr/ADR-0009.md)
 
 ## Learning
 

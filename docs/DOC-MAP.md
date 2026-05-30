@@ -20,6 +20,7 @@
 | [REQ-0009](requirements/REQ-0009.md) | テンプレートシステム | テンプレート管理 |
 | [REQ-0016](requirements/REQ-0016.md) | Command/Skill/Template/Script責任分界とtips要件ソース化 | 責務分界定義 |
 | [REQ-0028](requirements/REQ-0028.md) | Documentation granularity and responsibility restructuring | ドキュメント粒度・責務再構築 |
+| [REQ-0041](requirements/REQ-0041.md) | REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート | 旧REQ分類・新基準REQ群・対応表・分類ゲート |
 
 ## ワークフロー・実行基盤
 

@@ -42,6 +42,7 @@
 | REQ-0038 | case実行信頼性向上（チェックボックス確認・pull前チェック・docs整合性grep） | enhancement/reliability/case-run/case-close |
 | REQ-0039 | req-backlog コマンドと Requirement Unit パイプライン | workflow/req-backlog/ru-lifecycle/promoted |
 | REQ-0040 | 子Issue PRに Findings / Intake候補を永続化し、case-closeで回収する | intake/pr-template/case-run/case-close/epic-orchestrator |
+| REQ-0041 | REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート | req-rebaselining/classification/correspondence-table/quality-gate |
 
 ## Superseded
 
