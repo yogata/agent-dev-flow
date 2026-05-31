@@ -2,7 +2,7 @@
 
 ## Active Requirements
 
-現在の要件判断では、以下9件を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
+現在の要件判断では、以下11件を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
 
 | REQ ID | タイトル | 関心対象 |
 |---|---|---|
@@ -15,6 +15,8 @@
 | [REQ-0107](REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、AI-slop抑止 |
 | [REQ-0108](REQ-0108.md) | Integrity / Validation / Tests | 整合性検査、finding分類・route、レポート出力、ガードレール、体系的テスト、implementation pattern 検査 |
 | [REQ-0109](REQ-0109.md) | REQ再構成運用 | retired archive、移行表、REQ再構成intake、REQ再構成レビューコマンド、100番台採番 |
+| [REQ-0110](REQ-0110.md) | Git worktree 削除リトライ | git-worktree、リトライ、信頼性 |
+| [REQ-0111](REQ-0111.md) | Command authoring 後方互換性維持原則 | command-authoring、後方互換性、設計原則 |
 
 ## Retired Requirements
 

@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は9件の active REQ である。旧REQ（REQ-0104〜REQ-0109）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。
+現行要件の第一参照先は11件の active REQ である。旧REQ（REQ-0104〜REQ-0109）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。
 
 | REQ | タイトル |
 |---|---|
@@ -15,6 +15,8 @@
 | [REQ-0107](requirements/REQ-0107.md) | Reporting / Writing Quality |
 | [REQ-0108](requirements/REQ-0108.md) | Integrity / Validation / Tests |
 | [REQ-0109](requirements/REQ-0109.md) | REQ再構成運用 |
+| [REQ-0110](requirements/REQ-0110.md) | Git worktree 削除リトライ |
+| [REQ-0111](requirements/REQ-0111.md) | Command authoring 後方互換性維持原則 |
 
 - [Requirements Index](requirements/README.md)
 - [Migration Table](requirements/mapping-table.md)
