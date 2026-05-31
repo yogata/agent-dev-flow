@@ -104,3 +104,39 @@
 - **タグ**: `#ru-quality` `#false-positive` `#intake-pipeline` `#drift-detection`
 
 ---
+
+## Issue #480: case-close Step 8b での旧仕様による不要な git checkout 実行
+
+- **問題事象**: case-close Step 8b でローカル変更（RU-0001/RU-0005 の欠落）を検出し、旧仕様に従い `git checkout --` でHEADから復元してしまった。これは今回修正したバグ（REQ-0106-015）そのものの事例であり、新しい case-close.md では自動リセットが禁止されている
+- **発生局面**: 完了処理（case-close Step 8b 実行前同期）
+- **検知方法**: Step 8b の pull 前チェックでローカル変更を検出。旧仕様の自動リセットが実行された
+- **根本原因**: Issue #480 の修正内容（case-close.md の Step 8b 自動リセット廃止）がまだ main にマージされる前のタイミングで case-close を実行したため、旧仕様の case-close.md に従ってしまった。自 Issue の修正が自 Issue の close 処理に適用されていない
+- **自律対応内容**: pull 後に hash 不一致を検出し、自マージコミット + 外部コミット（PR #484）を分離判定して継続
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。すでに REQ-0106-015〜017 で要件化済み
+- **横展開観点**: 自 Issue でコマンド定義を変更する場合、その変更が case-close に適用されるのはマージ後。マージ前の case-close は旧仕様で動作する
+- **再発条件**: コマンド定義ファイル自体を変更する Issue の case-close で、変更内容が case-close の動作に影響する場合
+- **予防策候補**: (a) コマンド定義を変更する Issue の case-close では、Step 8b の動作を最新の main ではなく PR ブランチの内容で判定する、(b) case-close 実行前に「自 Issue が case-close の動作に影響するコマンド定義を含むか」をチェックし、含む場合は注意喚起する
+- **想定反映先**: `agentdev-learning-capture` スキル（再発防止知見として記録済み）
+- **関連**: Issue #480, PR #482, REQ-0106-015〜017
+- **タグ**: `#self-referential-change` `#case-close` `#git-checkout` `#timing-issue`
+
+---
+
+## Issue #480: post-pull hash 不一致時の自マージ + 外部コミット分離判定
+
+- **問題事象**: case-close Step 8b で pull 後に pre-pull HEAD と post-pull HEAD が不一致。`git log --oneline` で2コミット（自マージ PR #482 + 外部 PR #484）が取り込まれた。自マージのみであれば Step 2-8 の評価はそのまま有効だが、外部コミットが含まれると厳密には再評価が必要
+- **発生局面**: 完了処理（case-close Step 8b post-pull 検証）
+- **検知方法**: pre-pull HEAD と post-pull HEAD の比較で不一致を検出
+- **根本原因**: case-close の pull タイミングと他 PR のマージが競合。自 Issue の PR 以外に別 PR が main にマージされていた
+- **自律対応内容**: 外部コミット（PR #484）の内容を確認し、integrity-check の用語是正であり本 case-close の評価対象に影響なしと判定して継続
+- **ユーザー確認有無**: なし（実質影響なしと判定して継続）
+- **ADR/REQ/spec影響**: なし。case-close の運用上のエッジケース
+- **横展開観点**: 複数 PR が同時にオープンされている環境では常に発生する可能性あり
+- **再発条件**: case-close の pull タイミングで他 PR がマージされている場合
+- **予防策候補**: (a) post-pull hash 不一致時に自マージ以外のコミットが含まれていれば、そのコミットが Step 2-8 の評価に影響するかを確認するステップを明示化する、(b) 影響する場合は Step 2 から再評価する
+- **想定反映先**: case-close コマンド定義（Step 8b の hash 不一致時の分離判定フロー）
+- **関連**: Issue #480, PR #482, PR #484
+- **タグ**: `#case-close` `#hash-mismatch` `#concurrent-merge` `#multi-pr`
+
+---
