@@ -30,7 +30,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0103）:
 
 | 判定 | 意味 | 後続 |
 |------|------|------|
-| `採用` | 対応すべきと判断。req-define または intake-promote に進む | `/agentdev/req-define` または `/agentdev/intake-promote` |
+| `採用` | 対応すべきと判断。intake-promote に進む | `/agentdev/intake-promote` |
 | `保留` | 判断を保留。再度 review 対象として inbox に残す | 再度 `/agentdev/intake-review` |
 | `却下` | 対応不要と判断 | アーカイブ |
 
@@ -64,7 +64,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0103）:
 
     | # | タイトル | 判定 | 後続 | 備考 |
     |---|----------|------|------|------|
-    | 1 | ... | 採用 | req-define | ... |
+    | 1 | ... | 採用 | intake-promote | ... |
     | 2 | ... | 採用 | intake-promote | ... |
     | 3 | ... | 保留 | - | ... |
     | 4 | ... | 却下 | - | ... |
@@ -128,7 +128,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0103）:
 - G01: GitHub Issue の作成を行わない（`case-open` が担当）
 - G02: 直接 `case-run` を起動しない（REQ-0103）
 - G03: item の内容を変更・更新しない（判定に基づく振り分けのみ）
-- G04: `intake-promote` や `req-define` を自動起動しない（次ステップの提示のみ）
+- G04: `intake-promote` を自動起動しない（次ステップの提示のみ）
 - G05: learning item を作成しない（REQ-0105）。learning に分けるべきと判断した item は learning pipeline への委ねを推奨するにとどめる
 - G06: learning item の保存・分類・昇華を担当しない（REQ-0105）
 
