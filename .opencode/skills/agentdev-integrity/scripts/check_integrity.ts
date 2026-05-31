@@ -1874,7 +1874,7 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
   const { commandPatterns } = parseCommandMap(commandMapPath);
 
   if (commandPatterns.size === 0) {
-    results.push(info("Implementation Pattern", "command-map-consistency", "[phase3: no-action] No command patterns parsed from command-map.md"));
+    results.push(info("Implementation Pattern", "command-map-consistency", "[recommendation: no-action] No command patterns parsed from command-map.md"));
     return results;
   }
 
@@ -1884,7 +1884,7 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
     if (!validPatterns.has(entry.primary)) {
       results.push(ng(
         "Implementation Pattern", "command-map-consistency",
-        `[phase3: integrity-check-gap] command-map.md: command '${cmdName}' has unknown primary pattern '${entry.primary}'`,
+        `[recommendation: integrity-check-gap] command-map.md: command '${cmdName}' has unknown primary pattern '${entry.primary}'`,
         resolveRelative(commandMapPath, root),
         undefined,
         { evidence: entry.primary, expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" }
@@ -1894,7 +1894,7 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
     if (entry.secondary && !validPatterns.has(entry.secondary)) {
       results.push(ng(
         "Implementation Pattern", "command-map-consistency",
-        `[phase3: integrity-check-gap] command-map.md: command '${cmdName}' has unknown secondary pattern '${entry.secondary}'`,
+        `[recommendation: integrity-check-gap] command-map.md: command '${cmdName}' has unknown secondary pattern '${entry.secondary}'`,
         resolveRelative(commandMapPath, root),
         undefined,
         { evidence: entry.secondary, expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" }
@@ -1905,7 +1905,7 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
     if (!fs.existsSync(cmdFile)) {
       results.push(ng(
         "Implementation Pattern", "command-map-consistency",
-        `[phase3: integrity-check-gap] command-map.md references '${cmdName}' but no corresponding command file exists`,
+        `[recommendation: integrity-check-gap] command-map.md references '${cmdName}' but no corresponding command file exists`,
         resolveRelative(commandMapPath, root),
         undefined,
         { evidence: cmdName, expected: `${cmdName}.md must exist`, route: "req-define" }
@@ -1922,7 +1922,7 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
     if (typeof fmPattern === "string" && fmPattern !== entry.primary) {
       results.push(ng(
         "Implementation Pattern", "command-map-consistency",
-        `[phase3: integrity-check-gap] '${cmdName}' frontmatter has '${fmPattern}' but command-map.md says '${entry.primary}'`,
+        `[recommendation: integrity-check-gap] '${cmdName}' frontmatter has '${fmPattern}' but command-map.md says '${entry.primary}'`,
         resolveRelative(cmdFile, root),
         undefined,
         { evidence: `frontmatter: ${fmPattern}, command-map: ${entry.primary}`, expected: "must match", route: "req-define" }
@@ -1936,7 +1936,7 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
     if (fmSecondaryStr && !mapSecondary) {
       results.push(ng(
         "Implementation Pattern", "command-map-consistency",
-        `[phase3: integrity-check-gap] '${cmdName}' frontmatter has secondary_pattern '${fmSecondaryStr}' but command-map.md has none`,
+        `[recommendation: integrity-check-gap] '${cmdName}' frontmatter has secondary_pattern '${fmSecondaryStr}' but command-map.md has none`,
         resolveRelative(cmdFile, root),
         undefined,
         { evidence: `frontmatter: ${fmSecondaryStr}, command-map: (none)`, expected: "must match", route: "req-define" }
@@ -1944,7 +1944,7 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
     } else if (!fmSecondaryStr && mapSecondary) {
       results.push(ng(
         "Implementation Pattern", "command-map-consistency",
-        `[phase3: integrity-check-gap] '${cmdName}' command-map.md has secondary '${mapSecondary}' but frontmatter has none`,
+        `[recommendation: integrity-check-gap] '${cmdName}' command-map.md has secondary '${mapSecondary}' but frontmatter has none`,
         resolveRelative(cmdFile, root),
         undefined,
         { evidence: `command-map: ${mapSecondary}, frontmatter: (none)`, expected: "must match", route: "req-define" }
@@ -1952,7 +1952,7 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
     } else if (fmSecondaryStr && mapSecondary && fmSecondaryStr !== mapSecondary) {
       results.push(ng(
         "Implementation Pattern", "command-map-consistency",
-        `[phase3: integrity-check-gap] '${cmdName}' secondary_pattern mismatch: frontmatter '${fmSecondaryStr}' vs command-map '${mapSecondary}'`,
+        `[recommendation: integrity-check-gap] '${cmdName}' secondary_pattern mismatch: frontmatter '${fmSecondaryStr}' vs command-map '${mapSecondary}'`,
         resolveRelative(cmdFile, root),
         undefined,
         { evidence: `frontmatter: ${fmSecondaryStr}, command-map: ${mapSecondary}`, expected: "must match", route: "req-define" }
@@ -1991,7 +1991,7 @@ function checkExcessLoadSkills(cmdDir: string, root: string): CheckResult[] {
       if (!skillMatchesConcern) {
         results.push(warn(
           "Implementation Pattern", "excess-load-skills",
-          `[phase3: load_skills-remove-candidate] command '${file}' (pattern: ${pattern}) has skill '${skill}' which doesn't match any expected concern`,
+          `[recommendation: load_skills-remove-candidate] command '${file}' (pattern: ${pattern}) has skill '${skill}' which doesn't match any expected concern`,
           resolveRelative(fullPath, root),
           undefined,
           { evidence: skill, expected: `one of: ${expectedConcerns.join(", ")}`, route: "req-define" }
@@ -2031,7 +2031,7 @@ function checkMissingLoadSkills(cmdDir: string, root: string): CheckResult[] {
       if (!concernCovered) {
         results.push(warn(
           "Implementation Pattern", "missing-load-skills",
-          `[phase3: load_skills-add-candidate] command '${file}' (pattern: ${pattern}) missing skill for expected concern '${concern}'`,
+          `[recommendation: load_skills-add-candidate] command '${file}' (pattern: ${pattern}) missing skill for expected concern '${concern}'`,
           resolveRelative(fullPath, root),
           undefined,
           { evidence: `no skill matching '${concern}'`, expected: `a skill containing '${concern}'`, route: "req-define" }
@@ -2071,7 +2071,7 @@ function checkUseForConsistency(cmdDir: string, skillsDir: string, root: string)
     if (cmd === "learning-promote" || cmd === "learning-refine") {
       results.push(warn(
         "Implementation Pattern", "use-for-consistency",
-        `[phase3: skill-use-for-update-candidate] agentdev-learning-capture referenced by '${cmd}' but its DO NOT USE FOR includes elevation/judgment`,
+        `[recommendation: skill-use-for-update-candidate] agentdev-learning-capture referenced by '${cmd}' but its DO NOT USE FOR includes elevation/judgment`,
         undefined,
         undefined,
         { evidence: `agentdev-learning-capture → ${cmd}`, route: "req-define" }
@@ -2084,7 +2084,7 @@ function checkUseForConsistency(cmdDir: string, skillsDir: string, root: string)
     if (cmd === "case-close") {
       results.push(warn(
         "Implementation Pattern", "use-for-consistency",
-        `[phase3: skill-use-for-update-candidate] agentdev-learning-pipeline referenced by '${cmd}' but its USE FOR is limited to learning-refine/learning-promote`,
+        `[recommendation: skill-use-for-update-candidate] agentdev-learning-pipeline referenced by '${cmd}' but its USE FOR is limited to learning-refine/learning-promote`,
         undefined,
         undefined,
         { evidence: `agentdev-learning-pipeline → ${cmd}`, route: "req-define" }
@@ -2096,7 +2096,7 @@ function checkUseForConsistency(cmdDir: string, skillsDir: string, root: string)
   if (docMapCmds.length === 0 && listDirs(skillsDir).includes("agentdev-doc-map")) {
     results.push(info(
       "Implementation Pattern", "use-for-consistency",
-      "[phase3: no-action] agentdev-doc-map is not referenced by any runtime command's load_skills"
+      "[recommendation: no-action] agentdev-doc-map is not referenced by any runtime command's load_skills"
     ));
   }
 
@@ -2113,7 +2113,7 @@ function checkUseForConsistency(cmdDir: string, skillsDir: string, root: string)
         if (doNotUseForSection.includes(cmd)) {
           results.push(warn(
             "Implementation Pattern", "use-for-consistency",
-            `[phase3: skill-use-for-update-candidate] skill '${skillDir}' DO NOT USE FOR mentions '${cmd}' but command references it in load_skills`,
+            `[recommendation: skill-use-for-update-candidate] skill '${skillDir}' DO NOT USE FOR mentions '${cmd}' but command references it in load_skills`,
             undefined,
             undefined,
             { evidence: `${skillDir} DO NOT USE FOR → ${cmd}`, route: "req-define" }
@@ -2164,7 +2164,7 @@ function checkUnusedSkillsCategorized(cmdDir: string, skillsDir: string, root: s
     for (const s of unused) {
       const category = classifyUnusedSkill(s, skillsDir);
       results.push(info("Skill", "unused-skills-categorized",
-        `[phase3: no-action] ${s}: not referenced by any command's load_skills (category: ${category})`));
+        `[recommendation: no-action] ${s}: not referenced by any command's load_skills (category: ${category})`));
     }
   }
   if (unused.length === 0) {

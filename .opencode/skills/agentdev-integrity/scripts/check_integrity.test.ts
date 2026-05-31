@@ -2156,7 +2156,7 @@ describe("G3: checkExcessLoadSkills — excess skill detected", () => {
     );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("warning");
-    expect(hit.message).toContain("[phase3: load_skills-remove-candidate]");
+    expect(hit.message).toContain("[recommendation: load_skills-remove-candidate]");
   });
 });
 
@@ -2218,7 +2218,7 @@ describe("G3: checkMissingLoadSkills — missing concern", () => {
     );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("warning");
-    expect(hit.message).toContain("[phase3: load_skills-add-candidate]");
+    expect(hit.message).toContain("[recommendation: load_skills-add-candidate]");
   });
 });
 
@@ -2273,7 +2273,7 @@ describe("G4: checkUseForConsistency — DO NOT USE FOR violation", () => {
     );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("warning");
-    expect(hit.message).toContain("[phase3: skill-use-for-update-candidate]");
+    expect(hit.message).toContain("[recommendation: skill-use-for-update-candidate]");
   });
 });
 
@@ -2301,7 +2301,7 @@ describe("G4: checkUseForConsistency — doc-map not referenced", () => {
     );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("info");
-    expect(hit.message).toContain("[phase3: no-action]");
+    expect(hit.message).toContain("[recommendation: no-action]");
   });
 });
 
@@ -2330,7 +2330,7 @@ describe("G5: checkUnusedSkillsCategorized — authoring-only", () => {
     );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("info");
-    expect(hit.message).toContain("[phase3: no-action]");
+    expect(hit.message).toContain("[recommendation: no-action]");
   });
 });
 
@@ -2424,7 +2424,7 @@ describe("G6: Phase 3 candidate in messages", () => {
         res.message.includes("load_skills-remove-candidate")
     );
     expect(hit).toBeDefined();
-    expect(hit.message).toMatch(/\[phase3: .+\]/);
+    expect(hit.message).toMatch(/\[recommendation: .+\]/);
   });
 
   it("missing-load-skills includes phase3 candidate type in message", () => {
@@ -2436,6 +2436,6 @@ describe("G6: Phase 3 candidate in messages", () => {
         res.message.includes("load_skills-add-candidate")
     );
     expect(hit).toBeDefined();
-    expect(hit.message).toMatch(/\[phase3: .+\]/);
+    expect(hit.message).toMatch(/\[recommendation: .+\]/);
   });
 });
