@@ -92,7 +92,7 @@ docs/
   adr/             # アーキテクチャ決定記録（ADR-*.md）
 .agentdev/         # AgentDevFlow domain state
   intake/          # 気づき・課題の収集・レビュー・促進（inbox/, accepted/, promoted/, archive/）
-  learning/        # 学びの蓄積・昇華（inbox.md, archive.md, evaluation-report.md, promoted/）
+  learning/        # 学びの蓄積・昇華（inbox.md, archive/active.md, evaluation-report.md, promoted/）
   integrity/       # 整合性検証レポート
 .sisyphus/         # Sisyphus 作業領域（詳細は system.md 参照）
 .opencode/

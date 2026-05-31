@@ -131,7 +131,7 @@ flowchart TD
 | コマンド | 入力 | 出力 |
 |----------|------|------|
 | learning-capture（skill） | 観測 | `.agentdev/learning/inbox.md` |
-| learning-refine | inbox.md + archive.md | `evaluation-report.md` |
+| learning-refine | inbox.md + archive/active.md | `evaluation-report.md` |
 | learning-promote | evaluation-report + archive | `.agentdev/learning/promoted/`（Requirement Source stub） |
 
 ### req-backlog と RU lifecycle
