@@ -103,4 +103,20 @@
 - **関連**: Issue #474, PR #475, `.agentdev/backlog/req-units/RU-0001.md`（削除済み）
 - **タグ**: `#ru-quality` `#false-positive` `#intake-pipeline` `#drift-detection`
 
+## Issue #474: case-close Step 8b の git checkout -- が .agentdev/ 配下の意図的削除を復元
+
+- **問題事象**: case-close の Step 8b（git pull --ff-only 実行前のローカル変更リセット）で `git checkout -- .agentdev/backlog/req-units/RU-0001.md` を実行した結果、case-open で意図的に削除済みの RU ファイルが git HEAD から復元された。ユーザー指摘で発覚し、手動で再削除が必要だった
+- **発生局面**: 実装（case-close Step 8b の git pull 前処理）
+- **検知方法**: ユーザー確認（「RU-0001は実施完了？そうであればファイル削除して」）
+- **根本原因**: case-close コマンド定義の Step 8b は「ローカル変更リセットはPRで削除されたファイルに限定して実行する」と規定しているが、実際の実装では `git status --porcelain` で検出された全ローカル変更（`.agentdev/` 配下を含む）を無差別に `git checkout --` でリセットしていた。`.agentdev/` 配下の変更は PR 外の操作（case-open での RU 削除、learning/intake 追記）であり、pull 前リセットの対象ではない
+- **自律対応内容**: ユーザー指摘後に `Remove-Item` で再削除し、`git commit` + `git push` で永続化
+- **ユーザー確認有無**: あり
+- **ADR/REQ/spec影響**: case-close コマンド定義の Step 8b に影響可能性あり。現在の規定「ローカル変更リセットはPRで削除されたファイルに限定」は正しいが、実行時の判定ロジックがそれに準拠していなかった
+- **横展開観点**: 全 case-close 実行で `.agentdev/` 配下に未コミット変更がある場合に同様の問題が発生する
+- **再発条件**: case-close 実行時に `.agentdev/` 配下に未コミット変更が存在する場合
+- **予防策候補**: (a) Step 8b のリセット対象を `.agentdev/` 配下以外に限定する、(b) Step 9 を Step 8b の前に実行して commit 済みにする
+- **想定反映先**: `case-close` コマンド定義（Step 8b のリセット判定ロジック修正）
+- **関連**: Issue #474, commit `d9084cb`
+- **タグ**: `#git-workaround` `#case-close` `#local-change-reset` `#agentdev-lifecycle`
+
 ---
