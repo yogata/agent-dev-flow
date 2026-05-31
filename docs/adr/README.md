@@ -14,9 +14,9 @@
 | ADR-0006 | Epic Issue 本文を実行順序 SSoT とする設計 | proposed | 2026-05-22 |
 | ADR-0007 | REQ/ADR基準構造と分類ビュー運用の再定義 | superseded-by:[ADR-0008] | 2026-05-24 |
 | ADR-0008 | DOC-MAP導入と requirements/views 廃止 | proposed | 2026-05-28 |
-| ADR-0009 | REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入 | proposed | 2026-05-30 |
+| ADR-0009 | REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入 | accepted | 2026-05-30 |
 
-> この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0004-066）。
+> この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
 ## Status View
 
