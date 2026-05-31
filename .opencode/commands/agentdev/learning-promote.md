@@ -13,7 +13,7 @@ load_skills:
 
 `.agentdev/learning/evaluation-report.md` の問題クラスを主入力とし、`.agentdev/learning/archive/active.md` の過去エントリを参照して廃棄判定を行う。ユーザー承認後に `.agentdev/learning/promoted/` に Requirement Source 形式の stub を生成し、処理済みエントリを archive/active.md から pruning する。
 
-**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `/agentdev/req-backlog` が読み込み、RU 生成後に `/agentdev/req-define` に合流する。反映ルート: promoted → `/agentdev/req-backlog`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
+**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `/agentdev/backlog-review` が読み込み、RU 生成後に `/agentdev/req-define` に合流する。反映ルート: promoted → `/agentdev/backlog-review`（分析・承認）→ `/agentdev/backlog-save`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
 
 ## Input
 
@@ -86,7 +86,7 @@ load_skills:
    - 出力先: `.agentdev/learning/promoted/`（REQ-0105）
    - ファイル名: `{disposal-category}-{name}.md`
    - **`.opencode/` への直接書込は禁止**
-   - **`case-run` への直接受け渡しは禁止**（`req-backlog` を経由して RU 化すること）
+   - **`case-run` への直接受け渡しは禁止**（`backlog-review` → `backlog-save` を経由して RU 化すること）
    - stub フォーマットは `agentdev-learning-pipeline` skill の「Requirement Source Staging Stub Schema」に従う
    - カテゴリ別の反映先パス例は `agentdev-learning-pipeline` skill を参照
 
@@ -130,7 +130,7 @@ load_skills:
 - G02: `evaluation-report.md` は読込専用: 変更・削除は禁止
 
 ### 実行制約
-- G03: `case-run` への直接受け渡し禁止: stub は `/agentdev/req-backlog` が読み込み、RU 生成を経て `/agentdev/req-define` に合流する
+- G03: `case-run` への直接受け渡し禁止: stub は `/agentdev/backlog-review` が読み込み、RU 生成を経て `/agentdev/req-define` に合流する
 
 ### 品質ゲート
 - G04: 主入力は `evaluation-report.md`: raw learning item の再分類は禁止（REQ-0103）
@@ -167,7 +167,7 @@ promote が扱う3つの主要 artifact の役割・性格・lifecycle 振る舞
 |----------|------|------|-------------------|
 | `archive/active.md` | 過去エントリの living pool（終端保管ではない） | living | promote の主入力の一つとして参照される。promote 時の prune により staged/rejected/duplicate は除去され、deferred/未処理は保持される。`archive` は終端保管を意味しない。（REQ-0105/004/005/016） |
 | `evaluation-report.md` | refine/promote 間の境界 artifact | 読込専用 | 毎回上書きされるため長期履歴ではない。promote はこれを主入力とする。（REQ-0105/009） |
-| `promoted/` | Requirement Source stub の staging 領域 | staging | 生成された stub は `/agentdev/req-backlog` が読み込み、RU 生成を経て `/agentdev/req-define` に合流する。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止。（REQ-0105/011/012, REQ-0105） |
+| `promoted/` | Requirement Source stub の staging 領域 | staging | 生成された stub は `/agentdev/backlog-review` が読み込み、RU 生成を経て `/agentdev/req-define` に合流する。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止。（REQ-0105/011/012, REQ-0105） |
 
 ### learning-promote の責務
 

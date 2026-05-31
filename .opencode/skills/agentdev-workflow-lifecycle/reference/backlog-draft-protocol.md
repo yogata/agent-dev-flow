@@ -1,6 +1,6 @@
 # バックログdraftプロトコル
 
-`intake-from-github` と `req-backlog` 間のバックログdraftのライフサイクルとスキーマを定義する。
+`intake-from-github` と `backlog-review`/`backlog-save` 間のバックログdraftのライフサイクルとスキーマを定義する。
 
 ## draftライフサイクル
 
@@ -12,7 +12,7 @@ draft → approved → RU化 + 削除
 |------|-------------|------|
 | `draft` | `intake-from-github` Step 8（ドラフト保存） | 抽出・分類・解消チェック結果を保存した初期状態 |
 | `approved` | `intake-from-github` Step 9（ユーザー承認） | ユーザーが内容を確認・承認した状態 |
-| `RU化` | `req-backlog`（RU 生成 + draft 削除） | promoted artifact が RU に変換済み |
+| `RU化` | `backlog-save`（RU 生成 + draft 削除） | review draft が RU に変換済み |
 
 ## draftスキーマ
 
@@ -59,15 +59,15 @@ sources:
 | ユーザー確認・承認 | `intake-from-github` | レポート提示、ユーザーによる削除・カテゴリ変更指示 |
 | ドラフト保存 | `intake-from-github` | `status: draft` → `approved` で保存 |
 | promoted artifact 生成 | `intake-promote` | レビュー済み item を promoted artifact に整形 |
-| RU 生成 | `req-backlog` | promoted artifact から RU を生成・統合 |
-| backlog-extractedコメント投稿 | `req-backlog` | 抽出元issue/PRにマーカーコメント投稿 |
-| draft状態更新 | `req-backlog` | `approved` → RU化（削除） |
+| RU 生成 | `backlog-save` | review draft から RU を生成・統合 |
+| backlog-extractedコメント投稿 | `backlog-save` | 抽出元issue/PRにマーカーコメント投稿 |
+| draft状態更新 | `backlog-save` | `approved` → RU化（削除） |
 
 ## 既抽出スキップ
 
-`intake-from-github` は `req-backlog` が投稿した `backlog-extracted` マーカーコメントを検知し、既に抽出済みのissue/PRをスキップする。これにより同一期間への再実行時の重複抽出を防止する。
+`intake-from-github` は `backlog-save` が投稿した `backlog-extracted` マーカーコメントを検知し、既に抽出済みのissue/PRをスキップする。これにより同一期間への再実行時の重複抽出を防止する。
 
 ## 参照
 
-- **コマンド定義**: `intake-from-github.md`, `req-backlog.md`
+- **コマンド定義**: `intake-from-github.md`, `backlog-review.md`, `backlog-save.md`
 - **テンプレート**: `issue_desc_backlog_epic.md`, `issue_desc_backlog_child.md`

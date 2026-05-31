@@ -1,5 +1,5 @@
 ---
-description: レビュー済み intake item を後続コマンド（req-backlog）に渡せる入力 artifact に整形する
+description: レビュー済み intake item を後続コマンド（backlog-review）に渡せる入力 artifact に整形する
 agent: sisyphus
 implementation_pattern: file-pipeline
 load_skills:
@@ -10,7 +10,7 @@ load_skills:
 
 # Intake Promote
 
-`.agentdev/intake/accepted/` 内のレビュー済み intake item を、`req-backlog` に渡せる入力 artifact に整形する。
+`.agentdev/intake/accepted/` 内のレビュー済み intake item を、`backlog-review` に渡せる入力 artifact に整形する。
 
 **このコマンドは整形のみを行う。** GitHub Issue の作成は行わない（REQ-0103）。
 
@@ -21,7 +21,7 @@ load_skills:
 
 ## Output
 
-- 整形済み入力 artifact（`req-backlog` 用）
+- 整形済み入力 artifact（`backlog-review` 用）
 - 整形済み item は `.agentdev/intake/promoted/*.md` に保存（フラット構造）
 
 ## 整形の方向性
@@ -30,7 +30,7 @@ load_skills:
 
 | 後続ルート | 条件 | 整形内容 |
 |------------|------|----------|
-| `req-backlog` | 全 item | req-backlog が RU 化しやすい形式に整理（観測内容・影響・課題・既存要件との関連を構造化） |
+| `backlog-review` | 全 item | backlog-review が分析しやすい形式に整理（観測内容・影響・課題・既存要件との関連を構造化） |
 
 ## Steps
 
@@ -41,13 +41,13 @@ load_skills:
 
 2. **item の読み込み**: 各 intake item を読み込み、内容と review 時の判定を把握する。
 
-3. **後続ルートの確認**: 全 item を `req-backlog` が処理するため、後続ルートの確認は不要:
+3. **後続ルートの確認**: 全 item を `backlog-review` が処理するため、後続ルートの確認は不要:
    - 複数 item を束ねて1つの artifact にすることも可能（ユーザーの指示による）
    - **artifact を `.agentdev/intake/promoted/` 直下にフラット配置する。artifact の frontmatter には route/status を記録しない（REQ-0105）**
 
-4. **整形**: item を req-backlog 向けに整形する:
+4. **整形**: item を backlog-review 向けに整形する:
    - 観測内容・影響・課題を整理
-   - req-backlog が RU 化しやすい形式に構造化
+   - backlog-review が分析しやすい形式に構造化
    - 既存要件との関連・差分を明記
    - 複数 item を束ねる場合は統合内容を整理
 
@@ -112,11 +112,11 @@ load_skills:
 ## Guardrails
 
 ### 責務境界（REQ-0103, REQ-0105）
-- G01: GitHub Issue の作成を行わない（`req-backlog` / `case-open` が担当）
+- G01: GitHub Issue の作成を行わない（`backlog-save` / `case-open` が担当）
 - G02: intake item の元の内容を改変しない（整理・構造化のみ）
-- G03: `req-backlog` を自動起動しない（次ステップの提示のみ）
- - G04: learning pipeline の入力を生成しない（MUST NOT）。review 済み intake item の後続ルートは `req-backlog` のみ（REQ-0105, REQ-0105, REQ-0105）
- - G04a: REQ再構成intake（`.agentdev/intake/accepted/req-restructure/` 配下）を通常の `req-backlog` 向け短期作業候補として処理してはならない（REQ-0109）。REQ再構成intakeの promote 先は req-backlog ではなく、将来のREQ再構成レビューの入力として扱う
+- G03: `backlog-review` を自動起動しない（次ステップの提示のみ）
+ - G04: learning pipeline の入力を生成しない（MUST NOT）。review 済み intake item の後続ルートは `backlog-review` のみ（REQ-0105, REQ-0105, REQ-0105）
+ - G04a: REQ再構成intake（`.agentdev/intake/accepted/req-restructure/` 配下）を通常の `backlog-review` 向け短期作業候補として処理してはならない（REQ-0109）。REQ再構成intakeの promote 先は backlog-review ではなく、将来のREQ再構成レビューの入力として扱う
 - G05: learning item の保存・分類・昇華を担当しない（REQ-0105）
 
 ### 形式制約（REQ-0103〜039）

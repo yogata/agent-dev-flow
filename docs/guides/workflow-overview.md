@@ -17,16 +17,17 @@ flowchart TD
         LR[learning-refine]
         LP[learning-promote]
     end
-    RB[req-backlog]
+    BR[backlog-review]
+    BS[backlog-save]
     RD[req-define]
     RS[req-save]
     CO[case-open]
     CR[case-run]
     CC[case-close]
 
-    IC --> IR --> IP --> RB
-    LR --> LP --> RB
-    RB -->|"RU を Requirement Source として渡す"| RD
+    IC --> IR --> IP --> BR
+    LR --> LP --> BR
+    BR --> BS -->|"RU を Requirement Source として渡す"| RD
     RD -->|"Pattern B のみ"| RS
     RS --> CO
     RD -->|"Pattern A/C/D"| CO
@@ -106,11 +107,12 @@ flowchart TD
     IC -->|".agentdev/intake/inbox/"| IR
     IR -->|採用→ accepted/"| IP
     IR -->|却下→ archive/|
-    IP -->|"promoted/"| RB[req-backlog]
+    IP -->|"promoted/"| BR[backlog-review]
     LC -->|inbox.md| LRef
     LRef -->|evaluation-report.md| LProm
-    LProm -->|"promoted/"| RB
-    RB -->|"RU-*.md"| RD[req-define]
+    LProm -->|"promoted/"| BR
+    BR --> BS[backlog-save]
+    BS -->|"RU-*.md"| RD[req-define]
 ```
 
 ### Intake パイプライン
@@ -134,13 +136,13 @@ flowchart TD
 | learning-refine | inbox.md + archive/active.md | `evaluation-report.md` |
 | learning-promote | evaluation-report + archive | `.agentdev/learning/promoted/`（Requirement Source stub） |
 
-### req-backlog と RU lifecycle
+### backlog-review / backlog-save と RU lifecycle
 
-`req-backlog` は intake/learning 両方の promoted artifact を読み込み、分析・統合して Requirement Unit（RU）を生成する。
+`backlog-review` は intake/learning 両方の promoted artifact を読み込み、分析・統合の結果をユーザーに確認（HITL）する。`backlog-save` は確認済みの内容をもとに Requirement Unit（RU）を生成・永続化する。
 
 - RU の粒度: N:1（複数artifact → 1RU統合）および 1:N（1artifact → 複数RU分割）
-- promoted artifact 間の矛盾はユーザーに確認
-- RU 生成成功後、元の promoted artifact を削除
+- promoted artifact 間の矛盾は backlog-review でユーザーに確認
+- RU 生成成功後、backlog-save が元の promoted artifact を削除
 - `req-define` は RU を Requirement Source として受け入れる
 - `case-open`（Issue作成）の成功後、該当RUファイルを削除（REQ-0105-015）
 
@@ -187,5 +189,5 @@ Issueのラベルに基づき4つのPatternに分類する。Patternにより経
 | 文書構造・guides位置づけ | [REQ-0101](../requirements/REQ-0101.md) |
 | req-define / req-save / 分類ゲート | [REQ-0102](../requirements/REQ-0102.md) |
 | コマンドプロトコル・Pattern体系・SSoT | [REQ-0104](../requirements/REQ-0104.md) |
-| intake / learning / req-backlog / RU lifecycle | [REQ-0105](../requirements/REQ-0105.md) |
+| intake / learning / backlog-review / backlog-save / RU lifecycle | [REQ-0105](../requirements/REQ-0105.md) |
 | case-run / case-close / post-run capture | [REQ-0106](../requirements/REQ-0106.md) |

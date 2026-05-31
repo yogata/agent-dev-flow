@@ -10,9 +10,9 @@ promoted artifact → RU → REQ / Issue → RU 削除
 
 | 成果物 | 生成コマンド | 読取りコマンド | 削除トリガー |
 |--------|-------------|-------------|-------------|
-| promoted artifact（intake） | `intake-promote` | `req-backlog` | RU 化成功時 |
-| promoted artifact（learning） | `learning-promote` | `req-backlog` | RU 化成功時 |
-| RU（Requirement Unit） | `req-backlog` | `req-define`, `req-save`, `case-open` | 永続化完了時 |
+| promoted artifact（intake） | `intake-promote` | `backlog-review` | RU 化成功時 |
+| promoted artifact（learning） | `learning-promote` | `backlog-review` | RU 化成功時 |
+| RU（Requirement Unit） | `backlog-save` | `req-define`, `req-save`, `case-open` | 永続化完了時 |
 | REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
 | Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
 
@@ -20,7 +20,7 @@ promoted artifact → RU → REQ / Issue → RU 削除
 
 ### 定義
 
-promoted artifact は intake/learning パイプラインの最終出力であり、req-backlog コマンドの入力となる。
+promoted artifact は intake/learning パイプラインの最終出力であり、backlog-review コマンドの入力となる。
 
 ### 配置先
 
@@ -37,10 +37,11 @@ promoted artifact は intake/learning パイプラインの最終出力であり
 
 ### 読取り・削除ルール
 
-- `req-backlog` が promoted artifact を読み込み、RU を生成する
-- RU 生成に成功した promoted artifact は `req-backlog` が削除する（REQ-0105）
+- `backlog-review` が promoted artifact を読み込み、分析・HITLを経て review draft を保存する
+- `backlog-save` が review draft から RU を生成する
+- RU 生成に成功した promoted artifact は `backlog-save` が削除する（REQ-0105）
 - 失敗・矛盾の promoted artifact は `promoted/` に残置する
-- promoted artifact が 0 件の場合、`req-backlog` は正常終了する（REQ-0105）
+- promoted artifact が 0 件の場合、`backlog-review` は正常終了する（REQ-0105）
 
 ## RU（Requirement Unit）
 
@@ -57,7 +58,7 @@ RU は promoted artifact を分析・統合した構造化成果物であり、r
 ```yaml
 ---
 source_type: intake | learning | mixed
-generated_by: req-backlog
+generated_by: backlog-save
 generated_at: "{YYYY-MM-DDTHH:mm:ss}"
 status: active
 sources:
@@ -102,11 +103,11 @@ REQ ファイルは要件定義書の永続基準（SSoT）である。詳細は
 
 ## REQ再構成intake（REQ-0109）
 
-REQ再構成intake lifecycle: `inbox/req-restructure/` → intake-review（独立判定基準）→ `accepted/req-restructure/` または `archive/rejected/req-restructure/`。req-backlogへの移行はしない（REQ-0109）。将来のREQ再構成レビューの入力として蓄積する。
+REQ再構成intake lifecycle: `inbox/req-restructure/` → intake-review（独立判定基準）→ `accepted/req-restructure/` または `archive/rejected/req-restructure/`。backlog-review/backlog-saveへの移行はしない（REQ-0109）。将来のREQ再構成レビューの入力として蓄積する。
 
 ## 禁止事項
 
-- `req-backlog` は intake/learning の raw item を更新してはならない（REQ-0105）
+- `backlog-review` / `backlog-save` は intake/learning の raw item を更新してはならない（REQ-0105）
 - `req-define` は promoted artifact を直接読み込んではならない（REQ-0105）
 - promoted artifact のサブディレクトリルーティング（`promoted/req-define/`, `promoted/intake-open/`）は廃止
 - `elevation-staging/` への出力は廃止（`promoted/` に統一）
