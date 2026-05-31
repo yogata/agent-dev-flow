@@ -94,14 +94,23 @@ function buildValidFixture(root: string): void {
   writeFileSync(join(specsDir, "system.md"), "# System\n\ntest-cmd\n", "utf-8");
   writeFileSync(join(specsDir, "patterns.md"), "# Patterns\n", "utf-8");
 
-  const skillDir = join(root, ".opencode", "skills", "agentdev-test-skill");
-  mkdirp(skillDir);
-  writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-test-skill\n", "utf-8");
+  const allSkills = [
+    "agentdev-test-skill",
+    "agentdev-workflow-reporting",
+    "agentdev-conventional-commits",
+    "agentdev-req-file-manager",
+    "agentdev-adr-file-manager",
+    "agentdev-no-ai-slop-writing",
+    "agentdev-gh-cli",
+  ];
+  for (const name of allSkills) {
+    const dir = join(root, ".opencode", "skills", name);
+    mkdirp(dir);
+    writeFileSync(join(dir, "SKILL.md"), `# ${name}\n`, "utf-8");
+  }
 
-  const reportingSkillDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting");
-  const reportingRefDir = join(reportingSkillDir, "reference");
+  const reportingRefDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting", "reference");
   mkdirp(reportingRefDir);
-  writeFileSync(join(reportingSkillDir, "SKILL.md"), "# agentdev-workflow-reporting\n", "utf-8");
   writeFileSync(join(reportingRefDir, "completion-reports.md"), [
     "# 完了報告フォーマット",
     "",
@@ -120,10 +129,14 @@ function buildValidFixture(root: string): void {
     "---",
     "description: Test command",
     "agent: test-agent",
-    "implementation_pattern: wall-session",
+    "implementation_pattern: file-pipeline",
     "load_skills:",
-    "  - agentdev-test-skill",
     "  - agentdev-workflow-reporting",
+    "  - agentdev-conventional-commits",
+    "  - agentdev-req-file-manager",
+    "  - agentdev-adr-file-manager",
+    "  - agentdev-no-ai-slop-writing",
+    "  - agentdev-gh-cli",
     "---",
     "",
     "Test command body.",
@@ -135,7 +148,7 @@ function buildValidFixture(root: string): void {
     "",
     "| Command | Description | Agent | Skills |",
     "|---------|-------------|-------|--------|",
-    "| `agentdev/test-cmd` | Test command | test-agent | agentdev-test-skill |",
+    "| `agentdev/test-cmd` | Test command | test-agent | agentdev-workflow-reporting |",
     "",
   ].join("\n"), "utf-8");
 }
@@ -1840,5 +1853,589 @@ describe("D4: checkFragmentPatterns — fragment pattern detected", () => {
     );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("ng");
+  });
+});
+
+// ─── Implementation Pattern Diagnostics (REQ-0108-026~038) ────────────────
+
+function buildCommandMapFixture(root: string, commands: { name: string; pattern: string; secondary?: string; loadSkills?: string[] }[]): void {
+  buildValidFixture(root);
+
+  const cmdDir = join(root, ".opencode", "commands", "agentdev");
+
+  const rows: string[] = [];
+  for (const cmd of commands) {
+    const ls = cmd.loadSkills || ["agentdev-workflow-reporting"];
+    writeFileSync(join(cmdDir, `${cmd.name}.md`), [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      `implementation_pattern: ${cmd.pattern}`,
+      ...(cmd.secondary ? [`secondary_pattern: ${cmd.secondary}`] : []),
+      "load_skills:",
+      ...ls.map((s) => `  - ${s}`),
+      "---",
+      "",
+      `${cmd.name} body.`,
+      "",
+    ].join("\n"), "utf-8");
+
+    const secondary = cmd.secondary ? cmd.secondary : "—";
+    rows.push(`| \`/agentdev/${cmd.name}\` | ${cmd.pattern} | ${secondary} |`);
+  }
+
+  writeFileSync(join(cmdDir, "README.md"), [
+    "# Commands",
+    "",
+    "| Command | Description | Agent | Skills |",
+    "|---------|-------------|-------|--------|",
+    ...commands.map((cmd) => `| \`agentdev/${cmd.name}\` | Test | test-agent | agentdev-workflow-reporting |`),
+    "",
+  ].join("\n"), "utf-8");
+
+  const refDir = join(root, ".opencode", "skills", "agentdev-workflow-lifecycle", "reference");
+  mkdirp(refDir);
+
+  writeFileSync(join(refDir, "command-map.md"), [
+    "# コマンド関連マップ",
+    "",
+    "## Implementation Pattern Taxonomy",
+    "",
+    "### Command ↔ Pattern Correspondence",
+    "",
+    "| コマンド | Primary Pattern | Secondary Pattern |",
+    "|---------|----------------|-------------------|",
+    ...rows,
+    "",
+    "### Pattern ごとの禁止 load_skills",
+    "",
+    "| Pattern | 禁止される load_skills |",
+    "|---------|---------------------|",
+    "| capture-only | `agentdev-workflow-orchestration`, `agentdev-workflow-routing` |",
+    "| read-only-diagnostic | `agentdev-workflow-orchestration`, `agentdev-git-worktree` |",
+    "| wall-session | `agentdev-workflow-orchestration`, `agentdev-workflow-routing`, `agentdev-gh-cli`, `agentdev-git-worktree`, `agentdev-conventional-commits` |",
+    "| file-pipeline | （なし） |",
+    "| manager-orchestrator | （なし） |",
+    "",
+  ].join("\n"), "utf-8");
+}
+
+describe("G1: checkCommandMapConsistency — valid", () => {
+  const ROOT = join(TEMP_ROOT, "g1-ok");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildCommandMapFixture(ROOT, [
+      { name: "test-cmd", pattern: "file-pipeline", loadSkills: ["agentdev-workflow-reporting", "agentdev-conventional-commits", "agentdev-req-file-manager", "agentdev-adr-file-manager", "agentdev-no-ai-slop-writing", "agentdev-gh-cli"] },
+    ]);
+    copyScripts(ROOT);
+  });
+
+  it("passes when command-map matches frontmatter", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "command-map-consistency"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("G1: checkCommandMapConsistency — pattern mismatch", () => {
+  const ROOT = join(TEMP_ROOT, "g1-mismatch");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildCommandMapFixture(ROOT, [
+      { name: "test-cmd", pattern: "file-pipeline", loadSkills: ["agentdev-workflow-reporting", "agentdev-conventional-commits", "agentdev-req-file-manager", "agentdev-adr-file-manager", "agentdev-no-ai-slop-writing", "agentdev-gh-cli"] },
+    ]);
+
+    const cmdFile = join(ROOT, ".opencode", "commands", "agentdev", "test-cmd.md");
+    writeFileSync(cmdFile, [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      "implementation_pattern: wall-session",
+      "load_skills:",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "test-cmd body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("detects frontmatter vs command-map primary pattern mismatch", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "command-map-consistency" &&
+        res.message.includes("frontmatter has") &&
+        res.message.includes("command-map.md says")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("G1: checkCommandMapConsistency — missing command file", () => {
+  const ROOT = join(TEMP_ROOT, "g1-missing");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildCommandMapFixture(ROOT, [
+      { name: "test-cmd", pattern: "file-pipeline", loadSkills: ["agentdev-workflow-reporting", "agentdev-conventional-commits", "agentdev-req-file-manager", "agentdev-adr-file-manager", "agentdev-no-ai-slop-writing", "agentdev-gh-cli"] },
+      { name: "ghost-cmd", pattern: "wall-session" },
+    ]);
+
+    const ghostFile = join(ROOT, ".opencode", "commands", "agentdev", "ghost-cmd.md");
+    if (existsSync(ghostFile)) rmSync(ghostFile, { force: true });
+
+    copyScripts(ROOT);
+  });
+
+  it("detects command in command-map but no file", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "command-map-consistency" &&
+        res.message.includes("ghost-cmd") &&
+        res.message.includes("no corresponding command file")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("G2: secondary pattern consistency", () => {
+  const ROOT = join(TEMP_ROOT, "g2-secondary");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildCommandMapFixture(ROOT, [
+      { name: "test-cmd", pattern: "read-only-diagnostic", secondary: "wall-session", loadSkills: ["agentdev-workflow-reporting", "agentdev-integrity"] },
+    ]);
+
+    const cmdFile = join(ROOT, ".opencode", "commands", "agentdev", "test-cmd.md");
+    writeFileSync(cmdFile, [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      "implementation_pattern: read-only-diagnostic",
+      "load_skills:",
+      "  - agentdev-workflow-reporting",
+      "  - agentdev-integrity",
+      "---",
+      "",
+      "test-cmd body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("detects missing secondary_pattern in frontmatter when command-map has one", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "command-map-consistency" &&
+        res.message.includes("secondary") &&
+        res.message.includes("frontmatter has none")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("G2: secondary pattern prohibition union", () => {
+  const ROOT = join(TEMP_ROOT, "g2-union");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      "implementation_pattern: file-pipeline",
+      "secondary_pattern: read-only-diagnostic",
+      "load_skills:",
+      "  - agentdev-workflow-reporting",
+      "  - agentdev-conventional-commits",
+      "  - agentdev-req-file-manager",
+      "  - agentdev-adr-file-manager",
+      "  - agentdev-no-ai-slop-writing",
+      "  - agentdev-gh-cli",
+      "  - agentdev-git-worktree",
+      "---",
+      "",
+      "test-cmd body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-git-worktree");
+    mkdirp(skillDir);
+    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-git-worktree\n", "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("detects skill prohibited by secondary pattern", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "pattern-prohibitions" &&
+        res.message.includes("agentdev-git-worktree")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("G3: checkExcessLoadSkills — no excess", () => {
+  const ROOT = join(TEMP_ROOT, "g3-excess-ok");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    copyScripts(ROOT);
+  });
+
+  it("passes when all skills match expected concerns", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "excess-load-skills"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("G3: checkExcessLoadSkills — excess skill detected", () => {
+  const ROOT = join(TEMP_ROOT, "g3-excess-ng");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      "implementation_pattern: wall-session",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "test-cmd body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("warns about skill not matching any expected concern", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "excess-load-skills" &&
+        res.message.includes("agentdev-test-skill")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("warning");
+    expect(hit.message).toContain("[phase3: load_skills-remove-candidate]");
+  });
+});
+
+describe("G3: checkMissingLoadSkills — no missing", () => {
+  const ROOT = join(TEMP_ROOT, "g3-missing-ok");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    copyScripts(ROOT);
+  });
+
+  it("passes when all expected concerns are covered", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "missing-load-skills"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("G3: checkMissingLoadSkills — missing concern", () => {
+  const ROOT = join(TEMP_ROOT, "g3-missing-ng");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      "implementation_pattern: read-only-diagnostic",
+      "load_skills:",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "test-cmd body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-integrity");
+    mkdirp(skillDir);
+    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-integrity\n", "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("warns about missing expected concern", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "missing-load-skills" &&
+        res.message.includes("integrity")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("warning");
+    expect(hit.message).toContain("[phase3: load_skills-add-candidate]");
+  });
+});
+
+describe("G4: checkUseForConsistency — no violations", () => {
+  const ROOT = join(TEMP_ROOT, "g4-ok");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    copyScripts(ROOT);
+  });
+
+  it("passes when no USE FOR inconsistencies", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) => res.check === "use-for-consistency"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+  });
+});
+
+describe("G4: checkUseForConsistency — DO NOT USE FOR violation", () => {
+  const ROOT = join(TEMP_ROOT, "g4-donotuse");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-workflow-reporting");
+    writeFileSync(join(skillDir, "SKILL.md"), [
+      "# agentdev-workflow-reporting",
+      "",
+      "## DO NOT USE FOR",
+      "",
+      "- test-cmd",
+      "",
+    ].join("\n"), "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("warns when command referenced in DO NOT USE FOR", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "use-for-consistency" &&
+        res.message.includes("DO NOT USE FOR") &&
+        res.message.includes("test-cmd")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("warning");
+    expect(hit.message).toContain("[phase3: skill-use-for-update-candidate]");
+  });
+});
+
+describe("G4: checkUseForConsistency — doc-map not referenced", () => {
+  const ROOT = join(TEMP_ROOT, "g4-docmap");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-doc-map");
+    mkdirp(skillDir);
+    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-doc-map\n", "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("reports info when agentdev-doc-map is not referenced", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "use-for-consistency" &&
+        res.message.includes("agentdev-doc-map")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("info");
+    expect(hit.message).toContain("[phase3: no-action]");
+  });
+});
+
+describe("G5: checkUnusedSkillsCategorized — authoring-only", () => {
+  const ROOT = join(TEMP_ROOT, "g5-authoring");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-command-authoring");
+    mkdirp(skillDir);
+    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-command-authoring\n", "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("classifies agentdev-command-authoring as authoring-only", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "unused-skills-categorized" &&
+        res.message.includes("agentdev-command-authoring") &&
+        res.message.includes("authoring-only")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("info");
+    expect(hit.message).toContain("[phase3: no-action]");
+  });
+});
+
+describe("G5: checkUnusedSkillsCategorized — deprecated-candidate", () => {
+  const ROOT = join(TEMP_ROOT, "g5-deprecated");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-old-skill");
+    mkdirp(skillDir);
+    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-old-skill\n\nDeprecated skill.\n", "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("classifies skill with 'deprecated' in SKILL.md as deprecated-candidate", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "unused-skills-categorized" &&
+        res.message.includes("agentdev-old-skill") &&
+        res.message.includes("deprecated-candidate")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("info");
+  });
+});
+
+describe("G5: checkUnusedSkillsCategorized — runtime-unused default", () => {
+  const ROOT = join(TEMP_ROOT, "g5-runtime");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-mystery-skill");
+    mkdirp(skillDir);
+    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-mystery-skill\n", "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("classifies unknown unused skill as runtime-unused", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "unused-skills-categorized" &&
+        res.message.includes("agentdev-mystery-skill") &&
+        res.message.includes("runtime-unused")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("info");
+  });
+});
+
+describe("G6: Phase 3 candidate in messages", () => {
+  const ROOT = join(TEMP_ROOT, "g6-phase3");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      "implementation_pattern: wall-session",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "test-cmd body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("excess-load-skills includes phase3 candidate type in message", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "excess-load-skills" &&
+        res.message.includes("load_skills-remove-candidate")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.message).toMatch(/\[phase3: .+\]/);
+  });
+
+  it("missing-load-skills includes phase3 candidate type in message", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "missing-load-skills" &&
+        res.message.includes("load_skills-add-candidate")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.message).toMatch(/\[phase3: .+\]/);
   });
 });

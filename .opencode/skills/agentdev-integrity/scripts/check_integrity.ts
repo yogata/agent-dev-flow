@@ -1707,10 +1707,14 @@ function checkPatternProhibitions(cmdDir: string, root: string): CheckResult[] {
     const pattern = fm["implementation_pattern"];
     if (typeof pattern !== "string") continue;
 
-    const prohibited = PATTERN_PROHIBITED_SKILLS[pattern];
-    if (prohibited) {
+    const primaryProhibited = PATTERN_PROHIBITED_SKILLS[pattern] || [];
+    const secondaryPattern = fm["secondary_pattern"];
+    const secondaryStr = typeof secondaryPattern === "string" && secondaryPattern.trim() !== "" ? secondaryPattern.trim() : undefined;
+    const secondaryProhibited = secondaryStr ? (PATTERN_PROHIBITED_SKILLS[secondaryStr] || []) : [];
+    const allProhibited = [...new Set([...primaryProhibited, ...secondaryProhibited])];
+    if (allProhibited.length > 0) {
       const loadSkills = extractLoadSkills(fm);
-      const violations = loadSkills.filter((s) => prohibited.includes(s));
+      const violations = loadSkills.filter((s) => allProhibited.includes(s));
       for (const violating of violations) {
         results.push(
           ng("Implementation Pattern", "pattern-prohibitions", `${pattern} command '${file}' が禁止 skill '${violating}' を load_skills に含んでいる`, resolveRelative(fullPath, root), undefined, { evidence: violating, route: "req-define" })
@@ -1760,6 +1764,411 @@ function checkLoadSkillsConsistency(cmdDir: string, root: string): CheckResult[]
 
   if (results.filter((r) => r.level === "warning").length === 0) {
     results.push(ok("Implementation Pattern", "load-skills-consistency", "All commands have consistent load_skills"));
+  }
+  return results;
+}
+
+// ─── Implementation pattern diagnostics (REQ-0108-026~038) ─────────────────
+
+interface CommandPatternEntry {
+  primary: string;
+  secondary?: string;
+}
+
+const PATTERN_EXPECTED_CONCERNS: Record<string, string[]> = {
+  "wall-session": ["workflow-reporting", "req-analysis", "no-ai-slop-writing", "workflow-lifecycle"],
+  "file-pipeline": ["workflow-reporting", "conventional-commits", "req-file-manager", "adr-file-manager", "no-ai-slop-writing", "gh-cli"],
+  "manager-orchestrator": [],
+  "capture-only": ["workflow-reporting", "workflow-lifecycle"],
+  "read-only-diagnostic": ["workflow-reporting", "integrity"],
+};
+
+function parseCommandMap(commandMapPath: string): {
+  commandPatterns: Map<string, CommandPatternEntry>;
+  patternProhibitions: Map<string, string[]>;
+} {
+  const content = readText(commandMapPath);
+  const commandPatterns = new Map<string, CommandPatternEntry>();
+  const patternProhibitions = new Map<string, string[]>();
+
+  if (!content) return { commandPatterns, patternProhibitions };
+
+  let currentSection: "correspondence" | "prohibitions" | null = null;
+
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+
+    if (/^###\s/.test(trimmed)) {
+      if (trimmed.includes("Command") && trimmed.includes("Pattern Correspondence")) {
+        currentSection = "correspondence";
+      } else if (trimmed.includes("禁止")) {
+        currentSection = "prohibitions";
+      } else {
+        currentSection = null;
+      }
+      continue;
+    }
+
+    if (/^##\s/.test(trimmed) && currentSection !== null) {
+      currentSection = null;
+      continue;
+    }
+
+    if (!trimmed.startsWith("|") || /^[\s|:-]+$/.test(trimmed)) continue;
+
+    if (currentSection === "correspondence") {
+      const cells = trimmed.split("|").map((c) => c.trim()).filter((c) => c.length > 0);
+      if (cells.length >= 2) {
+        const cmdMatch = cells[0].match(/agentdev\/([a-z][a-z0-9-]*)/);
+        if (cmdMatch) {
+          const cmdName = cmdMatch[1];
+          const primary = cells[1].replace(/`/g, "").trim();
+          const secondaryRaw = cells.length >= 3 ? cells[2].replace(/`/g, "").trim() : undefined;
+          const secondary = secondaryRaw && secondaryRaw !== "—" ? secondaryRaw : undefined;
+          commandPatterns.set(cmdName, { primary, secondary });
+        }
+      }
+    } else if (currentSection === "prohibitions") {
+      const cells = trimmed.split("|").map((c) => c.trim()).filter((c) => c.length > 0);
+      if (cells.length >= 2) {
+        const patternName = cells[0].replace(/\*\*/g, "").trim();
+        const skillsRaw = cells[1];
+        if (patternName && !skillsRaw.includes("なし")) {
+          const skills = [...skillsRaw.matchAll(/`([^`]+)`/g)].map((m) => m[1].trim());
+          if (skills.length > 0) {
+            patternProhibitions.set(patternName, skills);
+          }
+        }
+      }
+    }
+  }
+
+  return { commandPatterns, patternProhibitions };
+}
+
+function extractSection(content: string, heading: string): string | null {
+  const lines = content.split("\n");
+  let inSection = false;
+  const sectionLines: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (/^##\s+/.test(trimmed)) {
+      if (trimmed.includes(heading)) {
+        inSection = true;
+      } else if (inSection) {
+        break;
+      }
+      continue;
+    }
+    if (inSection) {
+      sectionLines.push(line);
+    }
+  }
+
+  return sectionLines.length > 0 ? sectionLines.join("\n") : null;
+}
+
+function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const { commandPatterns } = parseCommandMap(commandMapPath);
+
+  if (commandPatterns.size === 0) {
+    results.push(info("Implementation Pattern", "command-map-consistency", "[phase3: no-action] No command patterns parsed from command-map.md"));
+    return results;
+  }
+
+  const validPatterns = new Set<string>(IMPLEMENTATION_PATTERNS);
+
+  for (const [cmdName, entry] of commandPatterns) {
+    if (!validPatterns.has(entry.primary)) {
+      results.push(ng(
+        "Implementation Pattern", "command-map-consistency",
+        `[phase3: integrity-check-gap] command-map.md: command '${cmdName}' has unknown primary pattern '${entry.primary}'`,
+        resolveRelative(commandMapPath, root),
+        undefined,
+        { evidence: entry.primary, expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" }
+      ));
+    }
+
+    if (entry.secondary && !validPatterns.has(entry.secondary)) {
+      results.push(ng(
+        "Implementation Pattern", "command-map-consistency",
+        `[phase3: integrity-check-gap] command-map.md: command '${cmdName}' has unknown secondary pattern '${entry.secondary}'`,
+        resolveRelative(commandMapPath, root),
+        undefined,
+        { evidence: entry.secondary, expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" }
+      ));
+    }
+
+    const cmdFile = path.join(cmdDir, `${cmdName}.md`);
+    if (!fs.existsSync(cmdFile)) {
+      results.push(ng(
+        "Implementation Pattern", "command-map-consistency",
+        `[phase3: integrity-check-gap] command-map.md references '${cmdName}' but no corresponding command file exists`,
+        resolveRelative(commandMapPath, root),
+        undefined,
+        { evidence: cmdName, expected: `${cmdName}.md must exist`, route: "req-define" }
+      ));
+      continue;
+    }
+
+    const content = readText(cmdFile);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+
+    const fmPattern = fm["implementation_pattern"];
+    if (typeof fmPattern === "string" && fmPattern !== entry.primary) {
+      results.push(ng(
+        "Implementation Pattern", "command-map-consistency",
+        `[phase3: integrity-check-gap] '${cmdName}' frontmatter has '${fmPattern}' but command-map.md says '${entry.primary}'`,
+        resolveRelative(cmdFile, root),
+        undefined,
+        { evidence: `frontmatter: ${fmPattern}, command-map: ${entry.primary}`, expected: "must match", route: "req-define" }
+      ));
+    }
+
+    const fmSecondary = fm["secondary_pattern"];
+    const fmSecondaryStr = typeof fmSecondary === "string" && fmSecondary.trim() !== "" ? fmSecondary.trim() : undefined;
+    const mapSecondary = entry.secondary;
+
+    if (fmSecondaryStr && !mapSecondary) {
+      results.push(ng(
+        "Implementation Pattern", "command-map-consistency",
+        `[phase3: integrity-check-gap] '${cmdName}' frontmatter has secondary_pattern '${fmSecondaryStr}' but command-map.md has none`,
+        resolveRelative(cmdFile, root),
+        undefined,
+        { evidence: `frontmatter: ${fmSecondaryStr}, command-map: (none)`, expected: "must match", route: "req-define" }
+      ));
+    } else if (!fmSecondaryStr && mapSecondary) {
+      results.push(ng(
+        "Implementation Pattern", "command-map-consistency",
+        `[phase3: integrity-check-gap] '${cmdName}' command-map.md has secondary '${mapSecondary}' but frontmatter has none`,
+        resolveRelative(cmdFile, root),
+        undefined,
+        { evidence: `command-map: ${mapSecondary}, frontmatter: (none)`, expected: "must match", route: "req-define" }
+      ));
+    } else if (fmSecondaryStr && mapSecondary && fmSecondaryStr !== mapSecondary) {
+      results.push(ng(
+        "Implementation Pattern", "command-map-consistency",
+        `[phase3: integrity-check-gap] '${cmdName}' secondary_pattern mismatch: frontmatter '${fmSecondaryStr}' vs command-map '${mapSecondary}'`,
+        resolveRelative(cmdFile, root),
+        undefined,
+        { evidence: `frontmatter: ${fmSecondaryStr}, command-map: ${mapSecondary}`, expected: "must match", route: "req-define" }
+      ));
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("Implementation Pattern", "command-map-consistency", "Command-map patterns are consistent with command files"));
+  }
+
+  return results;
+}
+
+function checkExcessLoadSkills(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+
+    const pattern = fm["implementation_pattern"];
+    if (typeof pattern !== "string") continue;
+
+    const expectedConcerns = PATTERN_EXPECTED_CONCERNS[pattern];
+    if (!expectedConcerns || expectedConcerns.length === 0) continue;
+
+    const loadSkills = extractLoadSkills(fm);
+
+    for (const skill of loadSkills) {
+      const skillMatchesConcern = expectedConcerns.some((concern) => skill.includes(concern));
+      if (!skillMatchesConcern) {
+        results.push(warn(
+          "Implementation Pattern", "excess-load-skills",
+          `[phase3: load_skills-remove-candidate] command '${file}' (pattern: ${pattern}) has skill '${skill}' which doesn't match any expected concern`,
+          resolveRelative(fullPath, root),
+          undefined,
+          { evidence: skill, expected: `one of: ${expectedConcerns.join(", ")}`, route: "req-define" }
+        ));
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "warning").length === 0) {
+    results.push(ok("Implementation Pattern", "excess-load-skills", "No excess load_skills detected"));
+  }
+
+  return results;
+}
+
+function checkMissingLoadSkills(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+
+    const pattern = fm["implementation_pattern"];
+    if (typeof pattern !== "string") continue;
+
+    const expectedConcerns = PATTERN_EXPECTED_CONCERNS[pattern];
+    if (!expectedConcerns) continue;
+
+    const loadSkills = extractLoadSkills(fm);
+
+    for (const concern of expectedConcerns) {
+      const concernCovered = loadSkills.some((skill) => skill.includes(concern));
+      if (!concernCovered) {
+        results.push(warn(
+          "Implementation Pattern", "missing-load-skills",
+          `[phase3: load_skills-add-candidate] command '${file}' (pattern: ${pattern}) missing skill for expected concern '${concern}'`,
+          resolveRelative(fullPath, root),
+          undefined,
+          { evidence: `no skill matching '${concern}'`, expected: `a skill containing '${concern}'`, route: "req-define" }
+        ));
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "warning").length === 0) {
+    results.push(ok("Implementation Pattern", "missing-load-skills", "No missing load_skills concerns detected"));
+  }
+
+  return results;
+}
+
+function checkUseForConsistency(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+
+  const skillToCommands = new Map<string, string[]>();
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    const loadSkills = extractLoadSkills(fm);
+    const cmdName = file.replace(".md", "");
+    for (const skill of loadSkills) {
+      const cmds = skillToCommands.get(skill) || [];
+      cmds.push(cmdName);
+      skillToCommands.set(skill, cmds);
+    }
+  }
+
+  const captureCmds = skillToCommands.get("agentdev-learning-capture") || [];
+  for (const cmd of captureCmds) {
+    if (cmd === "learning-promote" || cmd === "learning-refine") {
+      results.push(warn(
+        "Implementation Pattern", "use-for-consistency",
+        `[phase3: skill-use-for-update-candidate] agentdev-learning-capture referenced by '${cmd}' but its DO NOT USE FOR includes elevation/judgment`,
+        undefined,
+        undefined,
+        { evidence: `agentdev-learning-capture → ${cmd}`, route: "req-define" }
+      ));
+    }
+  }
+
+  const pipelineCmds = skillToCommands.get("agentdev-learning-pipeline") || [];
+  for (const cmd of pipelineCmds) {
+    if (cmd === "case-close") {
+      results.push(warn(
+        "Implementation Pattern", "use-for-consistency",
+        `[phase3: skill-use-for-update-candidate] agentdev-learning-pipeline referenced by '${cmd}' but its USE FOR is limited to learning-refine/learning-promote`,
+        undefined,
+        undefined,
+        { evidence: `agentdev-learning-pipeline → ${cmd}`, route: "req-define" }
+      ));
+    }
+  }
+
+  const docMapCmds = skillToCommands.get("agentdev-doc-map") || [];
+  if (docMapCmds.length === 0 && listDirs(skillsDir).includes("agentdev-doc-map")) {
+    results.push(info(
+      "Implementation Pattern", "use-for-consistency",
+      "[phase3: no-action] agentdev-doc-map is not referenced by any runtime command's load_skills"
+    ));
+  }
+
+  const skillDirs = listDirs(skillsDir);
+  for (const skillDir of skillDirs) {
+    const skillMdPath = path.join(skillsDir, skillDir, "SKILL.md");
+    const content = readText(skillMdPath);
+    if (!content) continue;
+
+    const doNotUseForSection = extractSection(content, "DO NOT USE FOR");
+    if (doNotUseForSection) {
+      const cmds = skillToCommands.get(skillDir) || [];
+      for (const cmd of cmds) {
+        if (doNotUseForSection.includes(cmd)) {
+          results.push(warn(
+            "Implementation Pattern", "use-for-consistency",
+            `[phase3: skill-use-for-update-candidate] skill '${skillDir}' DO NOT USE FOR mentions '${cmd}' but command references it in load_skills`,
+            undefined,
+            undefined,
+            { evidence: `${skillDir} DO NOT USE FOR → ${cmd}`, route: "req-define" }
+          ));
+        }
+      }
+    }
+  }
+
+  if (results.length === 0) {
+    results.push(ok("Implementation Pattern", "use-for-consistency", "No USE FOR / DO NOT USE FOR inconsistencies detected"));
+  }
+
+  return results;
+}
+
+function classifyUnusedSkill(skillName: string, skillsDir: string): string {
+  if (["agentdev-command-creator", "agentdev-command-authoring", "agentdev-skill-authoring"].includes(skillName)) {
+    return "authoring-only";
+  }
+  const skillMdPath = path.join(skillsDir, skillName, "SKILL.md");
+  const content = readText(skillMdPath);
+  if (content) {
+    if (/deprecated|非推奨/i.test(content)) return "deprecated-candidate";
+    if (/not loaded via load_skills/i.test(content)) return "manual-reference";
+    if (/intentionally.*excluded|意図的.*除外/i.test(content)) return "intentional-unused";
+  }
+  return "runtime-unused";
+}
+
+function checkUnusedSkillsCategorized(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const allSkillDirs = new Set(listDirs(skillsDir));
+  const referencedSkills = new Set<string>();
+
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    const loadSkills = extractLoadSkills(fm);
+    for (const s of loadSkills) referencedSkills.add(s);
+  }
+
+  const unused = [...allSkillDirs].filter((s) => !referencedSkills.has(s));
+  if (unused.length > 0) {
+    for (const s of unused) {
+      const category = classifyUnusedSkill(s, skillsDir);
+      results.push(info("Skill", "unused-skills-categorized",
+        `[phase3: no-action] ${s}: not referenced by any command's load_skills (category: ${category})`));
+    }
+  }
+  if (unused.length === 0) {
+    results.push(ok("Skill", "unused-skills-categorized", "All skills are referenced by at least one command"));
   }
   return results;
 }
@@ -1815,6 +2224,7 @@ async function main(): Promise<void> {
   const skillsDir = path.join(root, ".opencode", "skills");
   const cmdDir = path.join(root, ".opencode", "commands", "agentdev");
   const completionReportsPath = path.join(root, ".opencode", "skills", "agentdev-workflow-reporting", "reference", "completion-reports.md");
+  const commandMapPath = path.join(root, ".opencode", "skills", "agentdev-workflow-lifecycle", "reference", "command-map.md");
 
   const scanned: Record<string, number> = {
     REQ: listFiles(reqDir).filter((f) => f.startsWith("REQ-")).length,
@@ -1847,7 +2257,7 @@ async function main(): Promise<void> {
     ...checkAdrReqCrossReference(reqDir, adrDir, root),
     ...checkLoadSkillsExistence(cmdDir, skillsDir, root),
     ...checkSkillAgentdevPrefix(skillsDir, root),
-    ...checkUnusedSkills(cmdDir, skillsDir, root),
+    ...checkUnusedSkillsCategorized(cmdDir, skillsDir, root),
     ...checkCommandReadmeSync(cmdDir, root),
     ...checkExpandedReadmeSync(cmdDir, root),
     ...checkCommandInventory(cmdDir, root),
@@ -1876,6 +2286,10 @@ async function main(): Promise<void> {
     ...checkImplementationPattern(cmdDir, root),
     ...checkPatternProhibitions(cmdDir, root),
     ...checkLoadSkillsConsistency(cmdDir, root),
+    ...checkCommandMapConsistency(cmdDir, root, commandMapPath),
+    ...checkExcessLoadSkills(cmdDir, root),
+    ...checkMissingLoadSkills(cmdDir, root),
+    ...checkUseForConsistency(cmdDir, skillsDir, root),
   ];
 
   const summary = computeSummary(results);
