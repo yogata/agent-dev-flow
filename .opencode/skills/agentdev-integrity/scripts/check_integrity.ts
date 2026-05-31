@@ -1450,13 +1450,9 @@ function checkExpandedLegacyNamespace(skillsDir: string, cmdDir: string, root: s
     for (const f of listFiles(specsDir)) filesToCheck.push(path.join(specsDir, f));
   }
 
-  // NEW: skills reference/*.md and references/*.md
+  // NEW: skills references/*.md (canonical)
   for (const dir of skillDirs) {
-    const refDir = path.join(skillsDir, dir, "reference");
     const refsDir = path.join(skillsDir, dir, "references");
-    if (fs.existsSync(refDir)) {
-      for (const f of listFiles(refDir)) filesToCheck.push(path.join(refDir, f));
-    }
     if (fs.existsSync(refsDir)) {
       for (const f of listFiles(refsDir)) filesToCheck.push(path.join(refsDir, f));
     }
@@ -2222,6 +2218,34 @@ function checkSpecReadmeIndexSync(root: string): CheckResult[] {
   return results;
 }
 
+// ─── Obsolete reference/ directory detection (REQ-0108-039, 040) ──────────
+
+function checkObsoleteReferenceDirs(skillsDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const skillDirs = listDirs(skillsDir);
+  let foundObsolete = false;
+
+  for (const dir of skillDirs) {
+    const obsoleteDir = path.join(skillsDir, dir, "reference");
+    if (fs.existsSync(obsoleteDir)) {
+      foundObsolete = true;
+      const relDir = resolveRelative(obsoleteDir, root);
+      results.push(ng(
+        "Canonical", "obsolete-reference-dir",
+        `Obsolete 'reference/' directory found (should be 'references/')`,
+        relDir,
+        undefined,
+        { evidence: relDir, expected: "directory should be named 'references/' (canonical)", route: "intake" }
+      ));
+    }
+  }
+
+  if (!foundObsolete) {
+    results.push(ok("Canonical", "obsolete-reference-dir", "No obsolete 'reference/' directories found (all use canonical 'references/')"));
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -2237,8 +2261,8 @@ async function main(): Promise<void> {
   const specsDir = path.join(root, "docs", "specs");
   const skillsDir = path.join(root, ".opencode", "skills");
   const cmdDir = path.join(root, ".opencode", "commands", "agentdev");
-  const completionReportsPath = path.join(root, ".opencode", "skills", "agentdev-workflow-reporting", "reference", "completion-reports.md");
-  const commandMapPath = path.join(root, ".opencode", "skills", "agentdev-workflow-lifecycle", "reference", "command-map.md");
+  const completionReportsPath = path.join(root, ".opencode", "skills", "agentdev-workflow-reporting", "references", "completion-reports.md");
+  const commandMapPath = path.join(root, ".opencode", "skills", "agentdev-workflow-lifecycle", "references", "command-map.md");
 
   const scanned: Record<string, number> = {
     REQ: listFiles(reqDir).filter((f) => f.startsWith("REQ-")).length,
@@ -2304,6 +2328,7 @@ async function main(): Promise<void> {
     ...checkExcessLoadSkills(cmdDir, root),
     ...checkMissingLoadSkills(cmdDir, root),
     ...checkUseForConsistency(cmdDir, skillsDir, root),
+    ...checkObsoleteReferenceDirs(skillsDir, root),
   ];
 
   const summary = computeSummary(results);

@@ -63,7 +63,7 @@ description: Detects and fixes AI-slop in natural language artifacts to produce 
 
 ## 参照先
 
-- [reference/forbidden-phrases.md](reference/forbidden-phrases.md) — 9 分類の検出・置換ルールセット
+- [references/forbidden-phrases.md](references/forbidden-phrases.md) — 9 分類の検出・置換ルールセット
 
 ### See Also
 
