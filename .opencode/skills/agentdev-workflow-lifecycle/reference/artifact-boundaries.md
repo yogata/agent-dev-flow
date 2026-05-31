@@ -145,7 +145,7 @@ learning（`.agentdev/learning/`）、integrity（`.agentdev/integrity/`）、in
 | 項目 | 内容 |
 |------|------|
 | 格納先 | `.agentdev/backlog/req-units/RU-*.md` |
-| 生成 | `req-backlog` が promoted artifact を分析・統合して生成 |
+| 生成 | `backlog-save` が `backlog-review` の review draft を基に promoted artifact を分析・統合して生成 |
 | 読取り | `req-define` が Requirement Source として読み込み |
 | 削除 | `req-save` / `case-open` での永続化完了後に削除 |
 | 禁止 | promoted artifact の直接読み込み（REQ-0105）、単純コピー（REQ-0105） |
@@ -163,7 +163,7 @@ learning（`.agentdev/learning/`）、integrity（`.agentdev/integrity/`）、in
 
 ### REQ再構成intake（REQ-0109）
 
-通常intakeとは独立した配置規約。inbox/accepted/archive配下に`req-restructure/`サブディレクトリを使用する（REQ-0109）。req-backlogへのpromote対象外。
+通常intakeとは独立した配置規約。inbox/accepted/archive配下に`req-restructure/`サブディレクトリを使用する（REQ-0109）。backlog-review/backlog-saveへのpromote対象外。
 
 ## スキル間依存関係
 

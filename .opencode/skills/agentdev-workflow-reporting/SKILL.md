@@ -43,7 +43,8 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 | intake-from-github | クローズ済みissue/PRから残課題を抽出・分類しdraftとして保存 | `completion-reports/intake-from-github/`（1 variant） |
 | intake-review | inbox の未処理エントリを一括レビューし処分判定 | `completion-reports/intake-review/`（1 variant） |
 | intake-promote | review 済み intake item を後続コマンド用 artifact に整形 | `completion-reports/intake-promote/`（1 variant） |
-| req-backlog | promoted artifact から RU（Requirement Unit）を生成 | `completion-reports/req-backlog/`（3 variants） |
+| backlog-review | promoted artifact の分析・HITL・review draft保存 | `completion-reports/backlog-review/`（1 variant） |
+| backlog-save | review draft から RU を生成・git永続化 | `completion-reports/backlog-save/`（1 variant） |
 | learning-refine | 問題クラス分類→8軸評価→archive移動 | `completion-reports/learning-refine/`（1 variant） |
 | learning-promote | 昇華判定→Requirement Source staging stub生成 | `completion-reports/learning-promote/`（1 variant） |
 | integrity-check | ドキュメント・スキル・コマンドの整合性を検証 | `completion-reports/integrity-check/`（1 variant） |

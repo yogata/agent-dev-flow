@@ -24,11 +24,11 @@ load_skills:
   - 要件化前の設計メモ、調査メモ、反映指示書
   - learning-promote が生成した staging stub
   - その他変更内容・背景・制約・完了条件を含む source file
-  - RU（`.agentdev/backlog/req-units/RU-*.md`）— req-backlog が生成した Requirement Unit
+  - RU（`.agentdev/backlog/req-units/RU-*.md`）— backlog-save が生成した Requirement Unit
 - req-save が SPLIT 検出時に作成した requirements review finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
 - finding ファイルを含め全てのユーザー明示入力ファイルは read-only の Requirement Source である（G04）。status や frontmatter の更新・上書きは行わない
 - source file の種類に依存しない汎用的な入力扱いとする（elevation-staging 専用分岐は追加しない）
-- **promoted 直読み禁止**（REQ-0105）: `.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` を直接読み込んではならない（MUST NOT）。promoted artifact は req-backlog による RU 化を経由しなければならない
+- **promoted 直読み禁止**（REQ-0105）: `.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` を直接読み込んではならない（MUST NOT）。promoted artifact は backlog-review → backlog-save による RU 化を経由しなければならない
 
 ## Output
 
@@ -204,7 +204,7 @@ load_skills:
 - G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）。`.agentdev/backlog/req-units/RU-*.md` の削除は req-define では行わず、後続の `case-open` の成功後に実行する（REQ-0105-015）
 - G05: `docs/` 配下の広範な探索は禁止（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用。Step 4b の抽出キーワードベース限定探索も許可）
 - G06: `inbox.md` / `archive/active.md` を直接ロードしない（raw learning item は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
-- G07: `.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` を直接読み込んではならない（REQ-0105）。promoted artifact は req-backlog による RU 化を経由しなければならない
+- G07: `.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` を直接読み込んではならない（REQ-0105）。promoted artifact は backlog-review → backlog-save による RU 化を経由しなければならない
 
 ### 実行制約
 - G08: `git` コマンドは実行しない

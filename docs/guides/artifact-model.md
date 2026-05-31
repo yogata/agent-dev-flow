@@ -87,12 +87,13 @@ graph TD
     subgraph intake/learning パイプライン
         IC["intake-capture"] -->|inbox| IR["intake-review"]
         IR -->|accepted| IP["intake-promote"]
-        IP -->|promoted artifact| RB["req-backlog"]
+        IP -->|promoted artifact| BR["backlog-review"]
         LR2["learning-refine"] -->|evaluation-report| LP["learning-promote"]
-        LP -->|promoted artifact| RB
+        LP -->|promoted artifact| BR
     end
     subgraph req/case パイプライン
-        RB -->|"RU<br/>.agentdev/backlog/"| RD["req-define"]
+        BR --> BS["backlog-save"]
+        BS -->|"RU<br/>.agentdev/backlog/"| RD["req-define"]
         RD -->|draft| RS["req-save"]
         RS -->|"REQ/ADR<br/>docs/"| CO["case-open"]
         CO -->|Issue| CR["case-run"]
@@ -101,7 +102,7 @@ graph TD
 ```
 
 **パイプライン境界**:
-- Intake/Learning の promoted artifact を `req-backlog` が RU に統合（REQ-0105）
+- Intake/Learning の promoted artifact を `backlog-review` → `backlog-save` が RU に統合（REQ-0105）
 - `req-define` は RU のみを Requirement Source として受け入れ、promoted artifact を直接読み込まない（REQ-0105, 020）
 - RU は `case-open` の Issue作成 + VERIFY 成功後にのみ削除（REQ-0105, 012, 015）。`req-save` は RU を削除せず、REQファイルの Requirement Source に RU パスを記録する（REQ-0105, 014）
 
@@ -109,9 +110,9 @@ graph TD
 
 | 成果物 | 生成 | 読取り | 削除トリガー |
 |--------|------|------|-------------|
-| promoted artifact（intake） | `intake-promote` | `req-backlog` | RU化成功時 |
-| promoted artifact（learning） | `learning-promote` | `req-backlog` | RU化成功時 |
-| RU | `req-backlog`, session-sourced | `req-define`, `req-save`, `case-open` | `case-open` の Issue作成 + VERIFY 成功時 |
+| promoted artifact（intake） | `intake-promote` | `backlog-review` | RU化成功時 |
+| promoted artifact（learning） | `learning-promote` | `backlog-review` | RU化成功時 |
+| RU | `backlog-save`, session-sourced | `req-define`, `req-save`, `case-open` | `case-open` の Issue作成 + VERIFY 成功時 |
 | REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
 | Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
 
@@ -123,5 +124,5 @@ graph TD
 
 - REQ-0101: 文書種別の責務・基準境界・参照関係
 - REQ-0103: Command/Skill/Template/Script 責任分界
-- REQ-0105: intake/learning/req-backlog/RU lifecycle
+- REQ-0105: intake/learning/backlog-review/backlog-save/RU lifecycle
 - REQ-0108: integrity/validation/tests

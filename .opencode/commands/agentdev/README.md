@@ -32,7 +32,8 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 | `/agentdev/intake-from-github` | クローズ済み issue/PR から残課題を intake item として保存 |
 | `/agentdev/intake-review` | intake item の review・採用可否判断 |
 | `/agentdev/intake-promote` | review 済み item を promoted artifact に整形 |
-| `/agentdev/req-backlog` | promoted artifact から RU（Requirement Unit）を生成 |
+| `/agentdev/backlog-review` | promoted artifact を分析・統合しユーザー承認を得る |
+| `/agentdev/backlog-save` | 承認済み review 結果から RU を生成・永続化する |
 
 ### REQ再構成レビューコマンド
 
@@ -63,13 +64,13 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 ### learning パイプライン（学びの蓄積・分析・昇華）
 
 ```
-学び発生 → learning-capture（スキル）→ /agentdev/learning-refine → /agentdev/learning-promote → /agentdev/req-backlog → /agentdev/req-define
+学び発生 → learning-capture（スキル）→ /agentdev/learning-refine → /agentdev/learning-promote → /agentdev/backlog-review → /agentdev/backlog-save → /agentdev/req-define
 ```
 
 ### intake ワークフロー（気づき・課題の収集・レビュー・昇華）
 
 ```
-/agentdev/intake-capture / /agentdev/intake-from-github → /agentdev/intake-review → /agentdev/intake-promote → /agentdev/req-backlog → /agentdev/req-define
+/agentdev/intake-capture / /agentdev/intake-from-github → /agentdev/intake-review → /agentdev/intake-promote → /agentdev/backlog-review → /agentdev/backlog-save → /agentdev/req-define
 ```
 
 ### REQ再構成レビューワークフロー
@@ -92,7 +93,9 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 - `/agentdev/case-run` — [case-run.md](./case-run.md)
 - `/agentdev/case-update` — [case-update.md](./case-update.md)
 - `/agentdev/case-close` — [case-close.md](./case-close.md)
-- `/agentdev/req-backlog` — [req-backlog.md](./req-backlog.md)
+- `/agentdev/req-backlog` — [req-backlog.md](./req-backlog.md)（非推奨）
+- `/agentdev/backlog-review` — [backlog-review.md](./backlog-review.md)
+- `/agentdev/backlog-save` — [backlog-save.md](./backlog-save.md)
 - `/agentdev/intake-capture` — [intake-capture.md](./intake-capture.md)
 - `/agentdev/intake-from-github` — [intake-from-github.md](./intake-from-github.md)
 - `/agentdev/intake-review` — [intake-review.md](./intake-review.md)
