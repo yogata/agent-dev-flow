@@ -42,7 +42,7 @@ load_skills:
 ---
 ```
 
-5パターン（wall-session, file-pipeline, manager-orchestrator, capture-only, read-only-diagnostic）は REQ-0103-016 において Pattern A/B/C/D（Issue 種別分類）と直交する。integrity-check が `implementation_pattern` の有無・妥当性（REQ-0108-022）、禁止 skill の検査（REQ-0108-023）、load_skills 整合性（REQ-0108-024）を自動検証する。
+5パターン（wall-session, file-pipeline, manager-orchestrator, capture-only, read-only-diagnostic）は REQ-0103-016 において Pattern A/B/C/D（Issue 種別分類）と直交する。integrity-check が `implementation_pattern` の有無・妥当性（REQ-0108-022）、禁止 skill の検査（REQ-0108-023）、load_skills 整合性（REQ-0108-024）に加え、pattern 定義妥当性・command-map整合性（REQ-0108-026~027）、secondary pattern 検証（REQ-0108-028~030）、load_skills 過剰/不足診断（REQ-0108-031~032）、skill USE FOR/DO NOT USE FOR 整合性（REQ-0108-033~034）、未使用 skill 5カテゴリ分類（REQ-0108-035~036）、Phase 3候補分類（REQ-0108-037~038）を自動検証する。
 
 ## .sisyphus/ 命名規則
 
