@@ -152,8 +152,15 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
         - 1件以上 "OPEN" の子Issueがある場合 → スキップ（完了報告に「Epic #{N}: N件未完了のためスキップ」と表示）
  8b. 実行前同期（git pull）:
     - `git pull --ff-only` 実行前に `git status --porcelain` でローカル変更の有無を確認すること（SHALL — REQ-0106）
-    - ローカル変更が検出された場合、当該ファイルを `git checkout --` でリセットしてから pull を実行すること（SHALL — REQ-0106）
-    - ローカル変更リセットはPRで削除されたファイルに限定して実行すること（SHALL — REQ-0106）
+    - ローカル変更が検出された場合、対象ファイル一覧と `git status --porcelain` の出力を表示し、以下の構造化エラーで停止すること（SHALL — REQ-0106）:
+      ```
+      ## ローカル変更検出エラー（pull 前同期不可）
+
+      **対象ファイル**:
+      {git status --porcelain output}
+      **停止理由**: pull 前にローカル変更が存在するため、安全に pull できない
+      **ユーザーアクション**: ローカル変更を確認し、`git stash` / `git checkout -- <file>` 等で対応後に case-close を再実行してください
+      ```
     - pull前のHEAD commit hash を記録する（`git rev-parse HEAD`）
     - カレントディレクトリで `git pull --ff-only` を実行する
     - pull後のHEAD commit hash を取得し、pull前のhashと一致することを確認する（hash一致 = リモートに新規コミットなし）
