@@ -8,5 +8,8 @@
   - {違反なしの場合: 全 command 定義が completion-reports.md を参照}
   - {違反ありの場合: 違反内容のサマリ}
 検証結果: {✅ OK / ⚠️ 注意（違反あり）}
-git 永続化: 該当なし
+git 永続化:
+  - {intake item 作成あり・成功時: commit {hash}、push 済み（.agentdev/intake/ 配下）}
+  - {intake item 未作成時: 変更なし（intake item 未作成のため）}
+  - {intake item 作成あり・失敗時: 失敗Step（{Step名}）+ エラー内容}
 次のコマンド: なし
