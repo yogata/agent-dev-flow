@@ -86,12 +86,12 @@
 
 | ADR | 関連REQ | 説明 |
 |-----|---------|------|
-| [ADR-0001](ADR-0001.md) | [REQ-0016](../requirements/retired/REQ-0016.md) | Command/Skill/Template/Script責任分界の要件定義 |
-| [ADR-0002](ADR-0002.md) | [REQ-0016](../requirements/retired/REQ-0016.md) | Orchestration skill化基準の要件定義（REQ-0016-004） |
-| [ADR-0003](ADR-0003.md) | [REQ-0016](../requirements/retired/REQ-0016.md), [REQ-0007](../requirements/retired/REQ-0007.md) | REQ-0016: learning要件ソース化、REQ-0007: ナレッジパイプライン高度化（ADR-0003本文に明示参照） |
-| [ADR-0004](ADR-0004.md) | [REQ-0004](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0004本文に明示参照） |
-| [ADR-0005](ADR-0005.md) | [REQ-0017](../requirements/retired/REQ-0017.md) | AgentDevFlow plugin namespace統一（ADR-0005本文に明示参照） |
-| [ADR-0006](ADR-0006.md) | [REQ-0020](../requirements/retired/REQ-0020.md) | Epic Issue実行順序SSoT（ADR-0006本文に明示参照） |
-| [ADR-0007](ADR-0007.md) | [REQ-0004](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0007本文に明示参照） |
-| [ADR-0008](ADR-0008.md) | [REQ-0004](../requirements/retired/REQ-0004.md), [REQ-0035](../requirements/retired/REQ-0035.md) | REQ-0004: views関連要件のsupersede、REQ-0035: DOC-MAP導入とviews廃止 |
-| [ADR-0009](ADR-0009.md) | [REQ-0041](../requirements/retired/REQ-0041.md) | REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート（ADR-0009本文に明示参照） |
+| [ADR-0001](ADR-0001.md) | [REQ-0016 (retired)](../requirements/retired/REQ-0016.md) | Command/Skill/Template/Script責任分界の要件定義 |
+| [ADR-0002](ADR-0002.md) | [REQ-0016 (retired)](../requirements/retired/REQ-0016.md) | Orchestration skill化基準の要件定義（REQ-0016-004） |
+| [ADR-0003](ADR-0003.md) | [REQ-0016 (retired)](../requirements/retired/REQ-0016.md), [REQ-0007 (retired)](../requirements/retired/REQ-0007.md) | REQ-0016: learning要件ソース化、REQ-0007: ナレッジパイプライン高度化（ADR-0003本文に明示参照） |
+| [ADR-0004](ADR-0004.md) | [REQ-0004 (retired)](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0004本文に明示参照） |
+| [ADR-0005](ADR-0005.md) | [REQ-0017 (retired)](../requirements/retired/REQ-0017.md) | AgentDevFlow plugin namespace統一（ADR-0005本文に明示参照） |
+| [ADR-0006](ADR-0006.md) | [REQ-0020 (retired)](../requirements/retired/REQ-0020.md) | Epic Issue実行順序SSoT（ADR-0006本文に明示参照） |
+| [ADR-0007](ADR-0007.md) | [REQ-0004 (retired)](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0007本文に明示参照） |
+| [ADR-0008](ADR-0008.md) | [REQ-0004 (retired)](../requirements/retired/REQ-0004.md), [REQ-0035 (retired)](../requirements/retired/REQ-0035.md) | REQ-0004: views関連要件のsupersede、REQ-0035: DOC-MAP導入とviews廃止 |
+| [ADR-0009](ADR-0009.md) | [REQ-0041 (retired)](../requirements/retired/REQ-0041.md) | REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート（ADR-0009本文に明示参照） |
