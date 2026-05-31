@@ -126,6 +126,15 @@ rm -rf ".worktrees/{N}-{type}/.sisyphus/"
 git worktree remove ".worktrees/{N}-{type}"
 ```
 
+#### Permission denied 時のリトライ
+
+`git worktree remove` が Permission denied で失敗した場合、ファイルハンドル解放待ちのため短い待機を挟んでリトライする。
+
+- **最大リトライ回数**: 2回
+- **待機間隔**: 短い間隔（数秒程度）
+- **リトライ条件**: `git worktree remove` の終了コードが非ゼロで、エラーメッセージに "Permission denied" が含まれる場合のみ。それ以外のエラーはリトライしない
+- **リトライ上限到達時**: 警告を表示して停止する。ユーザーの判断を待つ
+
 ### 3. クリーンアップ
 
 ```bash
