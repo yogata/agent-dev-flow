@@ -130,7 +130,7 @@ description: Helps with documents
 |--------|------|-------------|------|-------------|
 | **simple** | 単一関心、<200行 | <200行 | SKILL.mdのみ | <2,000 tokens |
 | **moderate** | 複数関心、参照ファイル必要 | 200-400行 | SKILL.md + 1-2参照ファイル | 2,000-4,000 tokens |
-| **detailed** | 複雑なワークフロー、ドメイン別モジュール | 400-500行 | SKILL.md + reference/ ディレクトリ | 4,000-5,000 tokens |
+| **detailed** | 複雑なワークフロー、ドメイン別モジュール | 400-500行 | SKILL.md + references/ ディレクトリ | 4,000-5,000 tokens |
 
 どの段階を狙うか: デフォルトは **simple**（200行以内が最善）。複数の独立した関心事があれば **moderate**。ドメイン横断で複数モジュールが必要な場合のみ **detailed**。
 
@@ -175,7 +175,7 @@ with pdfplumber.open("file.pdf") as pdf:
 ```
 bigquery-skill/
 ├── SKILL.md (概要とナビゲーション)
-└── reference/
+└── references/
     ├── finance.md (revenue, billing)
     ├── sales.md (opportunities, pipeline)
     └── product.md (API usage, features)
@@ -484,7 +484,7 @@ This endpoint is no longer supported.
 
 ## 8. Command / Skill 境界
 
-Skill の品質基準は本スキルの範囲とする。Command に何を置き、何を置かないかの境界定義は `artifact-boundaries.md`（`.opencode/skills/agentdev-workflow-lifecycle/reference/artifact-boundaries.md`）を参照。Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
+Skill の品質基準は本スキルの範囲とする。Command に何を置き、何を置かないかの境界定義は `artifact-boundaries.md`（`.opencode/skills/agentdev-workflow-lifecycle/references/artifact-boundaries.md`）を参照。Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
 
 ## See Also
 

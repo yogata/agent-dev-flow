@@ -41,8 +41,8 @@ AgentDevFlow 管理下の artifact（REQ、ADR、skill、command、spec）の整
 | REQ ファイル | `docs/requirements/REQ-*.md` | `glob` |
 | ADR ファイル | `docs/adr/ADR-*.md` | `glob` |
 | Skill 定義 | `.opencode/skills/*/SKILL.md` | `glob` |
-| Skill reference | `.opencode/skills/**/reference/*.md` | `glob` |
-| Skill references | `.opencode/skills/**/references/*.md` | `glob` |
+| Skill reference (obsolete) | `.opencode/skills/**/reference/*.md` | `glob` (obsolete-structure if present) |
+| Skill references (canonical) | `.opencode/skills/**/references/*.md` | `glob` |
 | Command ファイル | `.opencode/commands/**/*.md`（`README.md` を含む） | `glob` |
 | Command README | `.opencode/commands/agentdev/README.md` | `glob` |
 | Root README | `README.md` | `Read` |

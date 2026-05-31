@@ -50,7 +50,7 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 | integrity-check | ドキュメント・スキル・コマンドの整合性を検証 | `completion-reports/integrity-check/`（1 variant） |
 | req-restructure-review | REQ体系の健全性を診断し再構成アクションを提示 | `completion-reports/req-restructure-review/`（1 variant） |
 
-## reference/ 構成一覧
+## references/ 構成一覧
 
 | ファイル | 内容 |
 |----------|------|

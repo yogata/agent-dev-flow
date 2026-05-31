@@ -109,7 +109,7 @@ function buildValidFixture(root: string): void {
     writeFileSync(join(dir, "SKILL.md"), `# ${name}\n`, "utf-8");
   }
 
-  const reportingRefDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting", "reference");
+  const reportingRefDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting", "references");
   mkdirp(reportingRefDir);
   writeFileSync(join(reportingRefDir, "completion-reports.md"), [
     "# 完了報告フォーマット",
@@ -1489,7 +1489,7 @@ const VARIANT_VALID_FIELDS = [
 function buildVariantFixture(root: string): void {
   buildValidFixture(root);
 
-  const reportingRefDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting", "reference");
+  const reportingRefDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting", "references");
 
   writeFileSync(
     join(reportingRefDir, "completion-reports.md"),
@@ -1556,7 +1556,7 @@ describe("D1: checkVariantExistence — missing variant file", () => {
 
     const variantDir = join(
       D1_MISS_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
-      "reference", "completion-reports", "test-cmd"
+      "references", "completion-reports", "test-cmd"
     );
     rmSync(join(variantDir, "epic.md"), { force: true });
 
@@ -1585,7 +1585,7 @@ describe("D1: checkVariantExistence — missing command directory", () => {
 
     const variantDir = join(
       D1_NODIR_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
-      "reference", "completion-reports", "test-cmd"
+      "references", "completion-reports", "test-cmd"
     );
     rmSync(variantDir, { recursive: true, force: true });
 
@@ -1764,7 +1764,7 @@ describe("D3: checkVariantRequiredFields — missing field", () => {
 
     const variantDir = join(
       D3_NG_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
-      "reference", "completion-reports", "test-cmd"
+      "references", "completion-reports", "test-cmd"
     );
     writeFileSync(
       join(variantDir, "standard.md"),
@@ -1824,7 +1824,7 @@ describe("D4: checkFragmentPatterns — fragment pattern detected", () => {
 
     const variantDir = join(
       D4_NG_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
-      "reference", "completion-reports", "test-cmd"
+      "references", "completion-reports", "test-cmd"
     );
     writeFileSync(
       join(variantDir, "standard.md"),
@@ -1893,7 +1893,7 @@ function buildCommandMapFixture(root: string, commands: { name: string; pattern:
     "",
   ].join("\n"), "utf-8");
 
-  const refDir = join(root, ".opencode", "skills", "agentdev-workflow-lifecycle", "reference");
+  const refDir = join(root, ".opencode", "skills", "agentdev-workflow-lifecycle", "references");
   mkdirp(refDir);
 
   writeFileSync(join(refDir, "command-map.md"), [
@@ -2716,5 +2716,109 @@ describe("F4: parseMarkdownLinks — [URL] placeholder excluded", () => {
     expect(urlHit).toBeUndefined();
     expect(realHit).toBeDefined();
     expect(realHit.level).toBe("ng");
+  });
+});
+
+// ─── Obsolete reference/ directory regression tests (REQ-0108-039, 040) ──
+
+describe("obsolete reference/ directory detection", () => {
+  const OBSOLETE_ROOT = join(TEMP_BASE, `${RUN_ID}-obsolete-ref`);
+
+  beforeAll(() => {
+    buildValidFixture(OBSOLETE_ROOT);
+    const skillsDir = join(OBSOLETE_ROOT, ".opencode", "skills");
+    const skillDir = join(skillsDir, "agentdev-test-skill");
+    mkdirp(join(skillDir, "reference"));
+    writeFileSync(join(skillDir, "reference", "old-file.md"), "# Old reference\n", "utf-8");
+    copyScripts(OBSOLETE_ROOT);
+  });
+
+  afterAll(() => {
+    rmSync(OBSOLETE_ROOT, { recursive: true, force: true });
+  });
+
+  it("detects obsolete reference/ directory and reports NG", () => {
+    const r = runScript(OBSOLETE_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "obsolete-reference-dir" &&
+        res.level === "ng"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.message).toContain("reference/");
+    expect(hit.message).toContain("references/");
+  });
+});
+
+describe("canonical references/ directory is not flagged", () => {
+  const CANONICAL_ROOT = join(TEMP_BASE, `${RUN_ID}-canonical-refs`);
+
+  beforeAll(() => {
+    buildValidFixture(CANONICAL_ROOT);
+    const skillsDir = join(CANONICAL_ROOT, ".opencode", "skills");
+
+    const reportingRefDir = join(skillsDir, "agentdev-workflow-reporting", "reference");
+    if (existsSync(reportingRefDir)) rmSync(reportingRefDir, { recursive: true, force: true });
+    const reportingRefsDir = join(skillsDir, "agentdev-workflow-reporting", "references");
+    mkdirp(reportingRefsDir);
+    writeFileSync(join(reportingRefsDir, "completion-reports.md"), "# 完了報告\n", "utf-8");
+
+    const skillDir = join(skillsDir, "agentdev-test-skill");
+    mkdirp(join(skillDir, "references"));
+    writeFileSync(join(skillDir, "references", "valid-file.md"), "# Valid reference\n", "utf-8");
+    copyScripts(CANONICAL_ROOT);
+  });
+
+  afterAll(() => {
+    rmSync(CANONICAL_ROOT, { recursive: true, force: true });
+  });
+
+  it("reports OK when only canonical references/ exists", () => {
+    const r = runScript(CANONICAL_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string }) =>
+        res.check === "obsolete-reference-dir"
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ok");
+    expect(hit.message).toContain("references/");
+  });
+});
+
+describe("mixed reference/ and references/ reports obsolete only", () => {
+  const MIXED_ROOT = join(TEMP_BASE, `${RUN_ID}-mixed-refs`);
+
+  beforeAll(() => {
+    buildValidFixture(MIXED_ROOT);
+    const skillsDir = join(MIXED_ROOT, ".opencode", "skills");
+
+    const skillA = join(skillsDir, "agentdev-test-skill");
+    mkdirp(join(skillA, "reference"));
+    writeFileSync(join(skillA, "reference", "old.md"), "# old\n", "utf-8");
+
+    const skillB = join(skillsDir, "agentdev-workflow-reporting");
+    mkdirp(join(skillB, "references"));
+    writeFileSync(join(skillB, "references", "new.md"), "# new\n", "utf-8");
+
+    copyScripts(MIXED_ROOT);
+  });
+
+  afterAll(() => {
+    rmSync(MIXED_ROOT, { recursive: true, force: true });
+  });
+
+  it("flags reference/ as NG and references/ does not cause NG", () => {
+    const r = runScript(MIXED_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const obsoleteHits = parsed.results.filter(
+      (res: { check: string; level: string }) =>
+        res.check === "obsolete-reference-dir" && res.level === "ng"
+    );
+    expect(obsoleteHits.length).toBeGreaterThanOrEqual(1);
+    for (const hit of obsoleteHits) {
+      expect(hit.message).toContain("reference/");
+    }
   });
 });
