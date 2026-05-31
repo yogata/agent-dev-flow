@@ -2121,7 +2121,7 @@ describe("G3: checkExcessLoadSkills — no excess", () => {
   });
 });
 
-describe("G3: checkExcessLoadSkills — excess skill detected", () => {
+describe("G3: checkExcessLoadSkills — excess skill detected via USE FOR mismatch", () => {
   const ROOT = join(TEMP_ROOT, "g3-excess-ng");
 
   beforeAll(() => {
@@ -2143,10 +2143,24 @@ describe("G3: checkExcessLoadSkills — excess skill detected", () => {
       "",
     ].join("\n"), "utf-8");
 
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-test-skill");
+    writeFileSync(join(skillDir, "SKILL.md"), [
+      "# agentdev-test-skill",
+      "",
+      "## USE FOR",
+      "",
+      "database migration and schema management",
+      "",
+      "## DO NOT USE FOR",
+      "",
+      "anything related to requirements or sessions",
+      "",
+    ].join("\n"), "utf-8");
+
     copyScripts(ROOT);
   });
 
-  it("warns about skill not matching any expected concern", () => {
+  it("reports info about skill with USE FOR not matching command", () => {
     const r = runScript(ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const hit = parsed.results.find(
@@ -2155,7 +2169,7 @@ describe("G3: checkExcessLoadSkills — excess skill detected", () => {
         res.message.includes("agentdev-test-skill")
     );
     expect(hit).toBeDefined();
-    expect(hit.level).toBe("warning");
+    expect(hit.level).toBe("info");
     expect(hit.message).toContain("[recommendation: load_skills-remove-candidate]");
   });
 });
@@ -2180,7 +2194,7 @@ describe("G3: checkMissingLoadSkills — no missing", () => {
   });
 });
 
-describe("G3: checkMissingLoadSkills — missing concern", () => {
+describe("G3: checkMissingLoadSkills — missing capability", () => {
   const ROOT = join(TEMP_ROOT, "g3-missing-ng");
 
   beforeAll(() => {
@@ -2201,6 +2215,16 @@ describe("G3: checkMissingLoadSkills — missing concern", () => {
       "",
     ].join("\n"), "utf-8");
 
+    const reportingDir = join(ROOT, ".opencode", "skills", "agentdev-workflow-reporting");
+    writeFileSync(join(reportingDir, "SKILL.md"), [
+      "# agentdev-workflow-reporting",
+      "",
+      "## USE FOR",
+      "",
+      "完了報告フォーマットの提供",
+      "",
+    ].join("\n"), "utf-8");
+
     const skillDir = join(ROOT, ".opencode", "skills", "agentdev-integrity");
     mkdirp(skillDir);
     writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-integrity\n", "utf-8");
@@ -2208,7 +2232,7 @@ describe("G3: checkMissingLoadSkills — missing concern", () => {
     copyScripts(ROOT);
   });
 
-  it("warns about missing expected concern", () => {
+  it("reports info about missing diagnostic capability", () => {
     const r = runScript(ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const hit = parsed.results.find(
@@ -2217,7 +2241,7 @@ describe("G3: checkMissingLoadSkills — missing concern", () => {
         res.message.includes("integrity")
     );
     expect(hit).toBeDefined();
-    expect(hit.level).toBe("warning");
+    expect(hit.level).toBe("info");
     expect(hit.message).toContain("[recommendation: load_skills-add-candidate]");
   });
 });
@@ -2412,6 +2436,16 @@ describe("G6: Phase 3 candidate in messages", () => {
       "",
     ].join("\n"), "utf-8");
 
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-test-skill");
+    writeFileSync(join(skillDir, "SKILL.md"), [
+      "# agentdev-test-skill",
+      "",
+      "## USE FOR",
+      "",
+      "database migration and schema management",
+      "",
+    ].join("\n"), "utf-8");
+
     copyScripts(ROOT);
   });
 
@@ -2437,6 +2471,235 @@ describe("G6: Phase 3 candidate in messages", () => {
     );
     expect(hit).toBeDefined();
     expect(hit.message).toMatch(/\[recommendation: .+\]/);
+  });
+});
+
+// ─── Issue #506 regression tests (REQ-0108-047,048) ────────────────────────
+
+describe("H1: read-only-diagnostic command — analysis/guideline skill NOT reported as excess", () => {
+  const ROOT = join(TEMP_ROOT, "h1-ro-diag-allowed");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-req-analysis");
+    mkdirp(skillDir);
+    writeFileSync(join(skillDir, "SKILL.md"), [
+      "# agentdev-req-analysis",
+      "",
+      "## USE FOR",
+      "",
+      "要件分析手法と品質基準の提供",
+      "",
+      "## DO NOT USE FOR",
+      "",
+      "特定コマンドの実行ロジック・手順記述",
+      "",
+    ].join("\n"), "utf-8");
+
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Diagnostic command",
+      "agent: test-agent",
+      "implementation_pattern: read-only-diagnostic",
+      "load_skills:",
+      "  - agentdev-workflow-reporting",
+      "  - agentdev-req-analysis",
+      "---",
+      "",
+      "Diagnostic command that analyzes requirements.",
+      "",
+    ].join("\n"), "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("does NOT report analysis skill as excess for read-only-diagnostic", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const excessHit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "excess-load-skills" &&
+        res.message.includes("agentdev-req-analysis")
+    );
+    expect(excessHit).toBeUndefined();
+  });
+});
+
+describe("H2: DO NOT USE FOR violation detected as excess", () => {
+  const ROOT = join(TEMP_ROOT, "h2-donotuse-excess");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-test-skill");
+    writeFileSync(join(skillDir, "SKILL.md"), [
+      "# agentdev-test-skill",
+      "",
+      "## USE FOR",
+      "",
+      "テスト用スキル",
+      "",
+      "## DO NOT USE FOR",
+      "",
+      "test-cmd",
+      "",
+    ].join("\n"), "utf-8");
+
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      "implementation_pattern: wall-session",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "  - agentdev-workflow-reporting",
+      "---",
+      "",
+      "test-cmd body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("warns about skill whose DO NOT USE FOR mentions the command", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string; level: string }) =>
+        res.check === "excess-load-skills" &&
+        res.message.includes("agentdev-test-skill") &&
+        res.message.includes("DO NOT USE FOR")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("warning");
+    expect(hit.message).toContain("[recommendation: load_skills-remove-candidate]");
+  });
+});
+
+describe("H3: pattern prohibition still detects prohibited skill (unchanged)", () => {
+  const ROOT = join(TEMP_ROOT, "h3-prohibition");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      "implementation_pattern: capture-only",
+      "load_skills:",
+      "  - agentdev-workflow-reporting",
+      "  - agentdev-workflow-orchestration",
+      "---",
+      "",
+      "test-cmd body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-workflow-orchestration");
+    mkdirp(skillDir);
+    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-workflow-orchestration\n", "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("still detects prohibited skill in capture-only command", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string; level: string }) =>
+        res.check === "pattern-prohibitions" &&
+        res.message.includes("禁止 skill")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
+
+describe("H4: skills without USE FOR are not flagged as excess", () => {
+  const ROOT = join(TEMP_ROOT, "h4-no-usefor");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    copyScripts(ROOT);
+  });
+
+  it("does not report skills without USE FOR as excess", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const excessHit = parsed.results.find(
+      (res: { check: string; level: string }) =>
+        res.check === "excess-load-skills" && res.level !== "ok"
+    );
+    expect(excessHit).toBeUndefined();
+  });
+
+  it("reports OK for excess-load-skills", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; level: string }) =>
+        res.check === "excess-load-skills" && res.level === "ok"
+    );
+    expect(hit).toBeDefined();
+  });
+});
+
+describe("H5: recommendation candidates in all load_skills diagnostic messages", () => {
+  const ROOT = join(TEMP_ROOT, "h5-recommendations");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-test-skill");
+    writeFileSync(join(skillDir, "SKILL.md"), [
+      "# agentdev-test-skill",
+      "",
+      "## USE FOR",
+      "",
+      "database migration",
+      "",
+    ].join("\n"), "utf-8");
+
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: test-agent",
+      "implementation_pattern: read-only-diagnostic",
+      "load_skills:",
+      "  - agentdev-workflow-reporting",
+      "  - agentdev-test-skill",
+      "---",
+      "",
+      "test-cmd body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    copyScripts(ROOT);
+  });
+
+  it("all diagnostic results include recommendation candidate", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const diagResults = parsed.results.filter(
+      (res: { check: string }) =>
+        (res.check === "excess-load-skills" || res.check === "missing-load-skills") &&
+        res.level !== "ok"
+    );
+    for (const res of diagResults) {
+      expect(res.message).toMatch(/\[recommendation: .+\]/);
+    }
   });
 });
 

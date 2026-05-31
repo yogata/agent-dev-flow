@@ -1785,13 +1785,49 @@ interface CommandPatternEntry {
   secondary?: string;
 }
 
-const PATTERN_EXPECTED_CONCERNS: Record<string, string[]> = {
-  "wall-session": ["workflow-reporting", "req-analysis", "no-ai-slop-writing", "workflow-lifecycle"],
-  "file-pipeline": ["workflow-reporting", "conventional-commits", "req-file-manager", "adr-file-manager", "no-ai-slop-writing", "gh-cli"],
-  "manager-orchestrator": [],
-  "capture-only": ["workflow-reporting", "workflow-lifecycle"],
-  "read-only-diagnostic": ["workflow-reporting", "integrity"],
-};
+// PATTERN_EXPECTED_CONCERNS removed (REQ-0108-047):
+// Responsibility-based load_skills checks now read skill USE FOR / DO NOT USE FOR
+// instead of relying on fixed concern substrings + name matching.
+
+interface SkillResponsibility {
+  useFor: string;
+  doNotUseFor: string;
+}
+
+const STOP_WORDS = new Set([
+  "also", "from", "this", "that", "with", "for", "not", "the", "and", "but",
+  "are", "has", "can", "use", "used", "when", "which", "their", "these",
+  "those", "other", "should", "would", "could", "does", "specific", "determine",
+  "include", "using", "based", "command", "skill", "について", "すること", "する場合",
+  "しない", "こと", "ため", "おく", "また", "よい", " where", "whose",
+]);
+
+function buildSkillResponsibilityCache(skillsDir: string): Map<string, SkillResponsibility> {
+  const cache = new Map<string, SkillResponsibility>();
+  for (const dir of listDirs(skillsDir)) {
+    const skillMdPath = path.join(skillsDir, dir, "SKILL.md");
+    const content = readText(skillMdPath);
+    if (!content) continue;
+    const useFor = extractSection(content, "USE FOR") || "";
+    const doNotUseFor = extractSection(content, "DO NOT USE FOR") || "";
+    cache.set(dir, { useFor, doNotUseFor });
+  }
+  return cache;
+}
+
+function isAnalysisOrGuidelineSkill(useFor: string): boolean {
+  return /分析|analysis|guideline|ガイドライン|診断|diagnostic|検査|inspection|整合性|integrity|validation|検証|compliance|適合|評価|assessment|基準|品質|quality/.test(useFor);
+}
+
+function extractSignificantWords(text: string): Set<string> {
+  return new Set(
+    text.toLowerCase()
+      .replace(/[|\-`#*>]/g, " ")
+      .split(/[\s,.;:!?(){}\[\]\/\\]+/)
+      .filter(w => w.length > 2)
+      .filter(w => !STOP_WORDS.has(w))
+  );
+}
 
 function parseCommandMap(commandMapPath: string): {
   commandPatterns: Map<string, CommandPatternEntry>;
@@ -1977,9 +2013,10 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
   return results;
 }
 
-function checkExcessLoadSkills(cmdDir: string, root: string): CheckResult[] {
+function checkExcessLoadSkills(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  const skillCache = buildSkillResponsibilityCache(skillsDir);
 
   for (const file of cmdFiles) {
     const fullPath = path.join(cmdDir, file);
@@ -1990,36 +2027,72 @@ function checkExcessLoadSkills(cmdDir: string, root: string): CheckResult[] {
 
     const pattern = fm["implementation_pattern"];
     if (typeof pattern !== "string") continue;
-
-    const expectedConcerns = PATTERN_EXPECTED_CONCERNS[pattern];
-    if (!expectedConcerns || expectedConcerns.length === 0) continue;
+    const secondaryPattern = fm["secondary_pattern"];
+    const secondaryStr = typeof secondaryPattern === "string" && secondaryPattern.trim() !== "" ? secondaryPattern.trim() : undefined;
 
     const loadSkills = extractLoadSkills(fm);
+    const cmdName = file.replace(".md", "");
+    const cmdContentLower = content.toLowerCase();
 
     for (const skill of loadSkills) {
-      const skillMatchesConcern = expectedConcerns.some((concern) => skill.includes(concern));
-      if (!skillMatchesConcern) {
-        results.push(warn(
+      const skillResp = skillCache.get(skill);
+
+      if (!skillResp) continue;
+
+      if (!skillResp.useFor && !skillResp.doNotUseFor) continue;
+
+      if (skillResp.doNotUseFor) {
+        if (skillResp.doNotUseFor.includes(cmdName)) {
+          results.push(warn(
+            "Implementation Pattern", "excess-load-skills",
+            `[recommendation: load_skills-remove-candidate] command '${file}' references skill '${skill}' but its DO NOT USE FOR mentions '${cmdName}'`,
+            resolveRelative(fullPath, root),
+            undefined,
+            { evidence: `${skill} DO NOT USE FOR → ${cmdName}`, route: "req-define" }
+          ));
+          continue;
+        }
+      }
+
+      if (skillResp.useFor) {
+        const useForLower = skillResp.useFor.toLowerCase();
+
+        const isReadOnlyDiag = pattern === "read-only-diagnostic" || secondaryStr === "read-only-diagnostic";
+        if (isReadOnlyDiag && isAnalysisOrGuidelineSkill(useForLower)) {
+          continue;
+        }
+
+        const useForWords = extractSignificantWords(useForLower);
+        const cmdWords = extractSignificantWords(cmdContentLower);
+        const overlap = [...useForWords].filter(w => cmdWords.has(w));
+        if (overlap.length >= 3) continue;
+
+        results.push(info(
           "Implementation Pattern", "excess-load-skills",
-          `[recommendation: load_skills-remove-candidate] command '${file}' (pattern: ${pattern}) has skill '${skill}' which doesn't match any expected concern`,
-          resolveRelative(fullPath, root),
-          undefined,
-          { evidence: skill, expected: `one of: ${expectedConcerns.join(", ")}`, route: "req-define" }
+          `[recommendation: load_skills-remove-candidate] command '${file}' (pattern: ${pattern}) loads skill '${skill}' — relevance not confirmed from USE FOR, manual review recommended`
         ));
       }
     }
   }
 
-  if (results.filter((r) => r.level === "warning").length === 0) {
+  if (results.length === 0) {
     results.push(ok("Implementation Pattern", "excess-load-skills", "No excess load_skills detected"));
   }
 
   return results;
 }
 
-function checkMissingLoadSkills(cmdDir: string, root: string): CheckResult[] {
+function checkMissingLoadSkills(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  const skillCache = buildSkillResponsibilityCache(skillsDir);
+
+  const PATTERN_CAPABILITY_KEYWORDS: Record<string, string[]> = {
+    "wall-session": ["session", "壁打ち", "要件", "requirement"],
+    "file-pipeline": ["file", "save", "保存", "pipeline", "template", "テンプレート"],
+    "capture-only": ["capture", "入力", "inbox", "capture"],
+    "read-only-diagnostic": ["integrity", "整合性", "validation", "検査", "diagnostic"],
+  };
 
   for (const file of cmdFiles) {
     const fullPath = path.join(cmdDir, file);
@@ -2031,26 +2104,40 @@ function checkMissingLoadSkills(cmdDir: string, root: string): CheckResult[] {
     const pattern = fm["implementation_pattern"];
     if (typeof pattern !== "string") continue;
 
-    const expectedConcerns = PATTERN_EXPECTED_CONCERNS[pattern];
-    if (!expectedConcerns) continue;
+    const capabilityKeywords = PATTERN_CAPABILITY_KEYWORDS[pattern];
+    if (!capabilityKeywords) continue;
 
     const loadSkills = extractLoadSkills(fm);
 
-    for (const concern of expectedConcerns) {
-      const concernCovered = loadSkills.some((skill) => skill.includes(concern));
-      if (!concernCovered) {
-        results.push(warn(
+    const hasAnyUseFor = loadSkills.some((s) => {
+      const resp = skillCache.get(s);
+      return resp && resp.useFor;
+    });
+    if (!hasAnyUseFor) continue;
+
+    const coveredCapabilities = new Set<string>();
+    for (const skill of loadSkills) {
+      const skillResp = skillCache.get(skill);
+      if (!skillResp || !skillResp.useFor) continue;
+      const useForLower = skillResp.useFor.toLowerCase();
+      for (const kw of capabilityKeywords) {
+        if (useForLower.includes(kw.toLowerCase())) {
+          coveredCapabilities.add(kw);
+        }
+      }
+    }
+
+    for (const kw of capabilityKeywords) {
+      if (!coveredCapabilities.has(kw)) {
+        results.push(info(
           "Implementation Pattern", "missing-load-skills",
-          `[recommendation: load_skills-add-candidate] command '${file}' (pattern: ${pattern}) missing skill for expected concern '${concern}'`,
-          resolveRelative(fullPath, root),
-          undefined,
-          { evidence: `no skill matching '${concern}'`, expected: `a skill containing '${concern}'`, route: "req-define" }
+          `[recommendation: load_skills-add-candidate] command '${file}' (pattern: ${pattern}) — no loaded skill covers capability '${kw}', manual review recommended`
         ));
       }
     }
   }
 
-  if (results.filter((r) => r.level === "warning").length === 0) {
+  if (results.length === 0) {
     results.push(ok("Implementation Pattern", "missing-load-skills", "No missing load_skills concerns detected"));
   }
 
@@ -2325,8 +2412,8 @@ async function main(): Promise<void> {
     ...checkPatternProhibitions(cmdDir, root),
     ...checkLoadSkillsConsistency(cmdDir, root),
     ...checkCommandMapConsistency(cmdDir, root, commandMapPath),
-    ...checkExcessLoadSkills(cmdDir, root),
-    ...checkMissingLoadSkills(cmdDir, root),
+    ...checkExcessLoadSkills(cmdDir, skillsDir, root),
+    ...checkMissingLoadSkills(cmdDir, skillsDir, root),
     ...checkUseForConsistency(cmdDir, skillsDir, root),
     ...checkObsoleteReferenceDirs(skillsDir, root),
   ];
