@@ -53,9 +53,9 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 学びの保存先：
 - `.agentdev/learning/inbox.md` — 最新の学び（常にここに追加）
-- `.agentdev/learning/archive.md` — 過去の学び（`/agentdev/learning-refine` 実行時に移動）
+- `.agentdev/learning/archive/active.md` — 過去の学び（`/agentdev/learning-refine` 実行時に移動）
 
-> **注意**: inbox.md、archive.mdが存在しない場合、エージェント SHALL は当該ファイルを作成してから追記する。
+> **注意**: inbox.md、archive/active.mdが存在しない場合、エージェント SHALL は当該ファイルを作成してから追記する。
 
 ### ファイル操作とgit永続化の分離
 

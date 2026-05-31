@@ -1,5 +1,5 @@
 ---
-description: evaluation-report.mdとarchive.mdから昇華判定を行い、Requirement Source stubを生成する
+description: evaluation-report.mdとarchive/active.mdから昇華判定を行い、Requirement Source stubを生成する
 agent: sisyphus
 implementation_pattern: file-pipeline
 load_skills:
@@ -11,14 +11,14 @@ load_skills:
 
 # 学びの昇華判定と Requirement Source stub 生成
 
-`.agentdev/learning/evaluation-report.md` の問題クラスを主入力とし、`.agentdev/learning/archive.md` の過去エントリを参照して廃棄判定を行う。ユーザー承認後に `.agentdev/learning/promoted/` に Requirement Source 形式の stub を生成し、処理済みエントリを archive.md から pruning する。
+`.agentdev/learning/evaluation-report.md` の問題クラスを主入力とし、`.agentdev/learning/archive/active.md` の過去エントリを参照して廃棄判定を行う。ユーザー承認後に `.agentdev/learning/promoted/` に Requirement Source 形式の stub を生成し、処理済みエントリを archive/active.md から pruning する。
 
 **重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `/agentdev/req-backlog` が読み込み、RU 生成後に `/agentdev/req-define` に合流する。反映ルート: promoted → `/agentdev/req-backlog`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
 
 ## Input
 
 - `.agentdev/learning/evaluation-report.md`（必須）— learning-refine が生成した評価レポート
-- `.agentdev/learning/archive.md`（任意）— 過去エントリ参照用
+- `.agentdev/learning/archive/active.md`（任意）— 過去エントリ参照用
 
 ## Output
 
@@ -32,7 +32,7 @@ load_skills:
 
 2. **データ読込**:
    - evaluation-report.md を読込（クラスタ一覧・テーマ概要・重み・エントリ数を把握）
-   - archive.md を読込（該当クラスタの過去エントリの日付・タイトル・内容を確認）
+   - archive/active.md を読込（該当クラスタの過去エントリの日付・タイトル・内容を確認）
 
 3. **廃棄判定**（11カテゴリ + duplicate）:
    - **主入力**: evaluation-report.md の問題クラスラスタ（raw learning item の再分類は禁止）
@@ -90,16 +90,16 @@ load_skills:
    - stub フォーマットは `agentdev-learning-pipeline` skill の「Requirement Source Staging Stub Schema」に従う
    - カテゴリ別の反映先パス例は `agentdev-learning-pipeline` skill を参照
 
-8. **昇華時 prune**（archive.md からの除去）:
+8. **昇華時 prune**（archive/active.md からの除去）:
    - **prune 対象**: staged（stub 生成済み）/ rejected / duplicate のエントリのみ
-   - **prune 非対象**: deferred / 未処理のエントリは archive.md に残す
+   - **prune 非対象**: deferred / 未処理のエントリは archive/active.md に残す
    - **証拠保存**: staged エントリを除去する際、stub の「元learning item / 根拠」セクションに保存してから除去
    - 詳細は `agentdev-learning-pipeline` skill の「Prune 方針 → promote 時 prune」を参照
    - **実行手順**:
       1. prune 対象エントリの特定（staged/rejected/duplicate のクラスタに属するエントリ）
       2. ユーザーに prune 計画を提示
       3. ユーザーが prune を承認した場合のみ実行
-      4. archive.md から該当エントリを除去（deferred・未処理は保持）
+      4. archive/active.md から該当エントリを除去（deferred・未処理は保持）
 
    **8b. .agentdev 変更の commit と push**:
    - `git diff --name-only` で `.agentdev/` 配下の変更ファイルを確認する
@@ -155,7 +155,7 @@ load_skills:
 | クラスタが0件 | 「昇華対象のクラスタがありません」と報告して終了 |
 | ユーザーが承認しない | 「昇華をキャンセルしました」と報告して終了 |
 | staging領域の書込失敗 | エラー内容を報告 |
-| archive.mdの prune 失敗 | stub 生成は保持。prune エラー内容を報告し、手動での prune を案内 |
+| archive/active.mdの prune 失敗 | stub 生成は保持。prune エラー内容を報告し、手動での prune を案内 |
 | git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
 | git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
@@ -165,7 +165,7 @@ promote が扱う3つの主要 artifact の役割・性格・lifecycle 振る舞
 
 | Artifact | 役割 | 性格 | Lifecycle 振る舞い |
 |----------|------|------|-------------------|
-| `archive.md` | 過去エントリの living pool（終端保管ではない） | living | promote の主入力の一つとして参照される。promote 時の prune により staged/rejected/duplicate は除去され、deferred/未処理は保持される。`archive` は終端保管を意味しない。（REQ-0105/004/005/016） |
+| `archive/active.md` | 過去エントリの living pool（終端保管ではない） | living | promote の主入力の一つとして参照される。promote 時の prune により staged/rejected/duplicate は除去され、deferred/未処理は保持される。`archive` は終端保管を意味しない。（REQ-0105/004/005/016） |
 | `evaluation-report.md` | refine/promote 間の境界 artifact | 読込専用 | 毎回上書きされるため長期履歴ではない。promote はこれを主入力とする。（REQ-0105/009） |
 | `promoted/` | Requirement Source stub の staging 領域 | staging | 生成された stub は `/agentdev/req-backlog` が読み込み、RU 生成を経て `/agentdev/req-define` に合流する。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止。（REQ-0105/011/012, REQ-0105） |
 
@@ -177,5 +177,5 @@ promote が扱う3つの主要 artifact の役割・性格・lifecycle 振る舞
 
 - **promoted領域のみに生成**: → **Artifact Lifecycle 責務** の `promoted/` 参照
 - **stub のみ生成**: 完全なSKILL.mdやコマンドファイルは生成しない
-- **archive.md は living learning pool**: → **Artifact Lifecycle 責務** の `archive.md` 参照
+- **archive/active.md は living learning pool**: → **Artifact Lifecycle 責務** の `archive/active.md` 参照
 - **反映ルート**: → **Artifact Lifecycle 責務** の `promoted/` 参照

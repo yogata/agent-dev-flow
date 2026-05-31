@@ -68,8 +68,8 @@ REQ再構成intake: req-save / case-close で検知 → `inbox/req-restructure/`
 | `/agentdev/case-run` | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ | レビュー完了 |
 | `/agentdev/case-update` | GitHub Issue | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし |
 | `/agentdev/case-close` | GitHub Issue + PR | なし | レビュー完了 |
-| `/agentdev/learning-refine` | `.agentdev/learning/inbox.md` | `.agentdev/learning/archive.md` + `evaluation-report.md` | 学びパイプライン |
-| `/agentdev/learning-promote` | `evaluation-report.md` + `.agentdev/learning/archive.md` | `.agentdev/learning/promoted/` | 学びパイプライン |
+| `/agentdev/learning-refine` | `.agentdev/learning/inbox.md` | `.agentdev/learning/archive/active.md` + `evaluation-report.md` | 学びパイプライン |
+| `/agentdev/learning-promote` | `evaluation-report.md` + `.agentdev/learning/archive/active.md` | `.agentdev/learning/promoted/` | 学びパイプライン |
 | `/agentdev/req-backlog` | `.agentdev/intake/promoted/` + `.agentdev/learning/promoted/` | `.agentdev/backlog/req-units/RU-*.md` | RU 生成 |
 | `/agentdev/intake-capture` | ユーザー入力 | `.agentdev/intake/inbox/` | 収集 |
 | `/agentdev/intake-from-github` | GitHub Issue/PR | `.agentdev/intake/inbox/` | 収集 |

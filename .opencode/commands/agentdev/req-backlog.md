@@ -241,7 +241,7 @@ RU 生成が成功した promoted artifact を削除する（REQ-0105, 010）:
 - G05: `.agentdev/intake/inbox/` の intake raw item を更新しない（MUST NOT）
 - G06: `.agentdev/intake/archive/` の intake raw item を更新しない（MUST NOT）
 - G07: `.agentdev/learning/inbox.md` を更新しない（MUST NOT）
-- G08: `.agentdev/learning/archive.md` を更新しない（MUST NOT）
+- G08: `.agentdev/learning/archive/active.md` を更新しない（MUST NOT）
 - G09: raw item の更新は各パイプラインのコマンド（intake-promote, learning-promote）の責務である
 
 ### 実行制約

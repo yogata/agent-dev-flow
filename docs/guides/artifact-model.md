@@ -71,7 +71,7 @@ docs/
   intake/                        # Intake パイプライン domain state
     inbox/ accepted/ promoted/ archive/
   learning/                      # Learning パイプライン domain state
-    inbox.md archive.md evaluation-report.md promoted/
+    inbox.md archive/active.md evaluation-report.md promoted/
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート
 .opencode/
