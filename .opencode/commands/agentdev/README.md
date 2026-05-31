@@ -63,7 +63,7 @@ AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプ
 ### learning パイプライン（学びの蓄積・分析・昇華）
 
 ```
-学び発生 → learning-capture（スキル）→ /agentdev/learning-refine → /agentdev/learning-promote → /agentdev/req-define（明示入力ファイル）
+学び発生 → learning-capture（スキル）→ /agentdev/learning-refine → /agentdev/learning-promote → /agentdev/req-backlog → /agentdev/req-define
 ```
 
 ### intake ワークフロー（気づき・課題の収集・レビュー・昇華）
