@@ -245,7 +245,19 @@ Views 廃止後の残存構造を検出する:
 - **保存形式**: `/agentdev/intake-capture` の Intake Item 形式に従う
 - **ユーザーが intake item 化をスキップ**: レポートのみで終了
 
-### 10. 完了報告
+### 10. Git 永続化（条件付き）
+
+Step 9 で intake item を作成した場合、`.agentdev/intake/` 配下の変更を git 永続化する（SHALL）:
+
+1. `git status --porcelain -- .agentdev/intake/` で変更を検知
+2. **変更なし**（intake item 未作成）→ 完了報告へ（「変更なし」パターン）
+3. **変更あり**:
+   a. `git add .agentdev/intake/`（`.agentdev/intake/` 配下のみ。integrity report は commit 対象外）（SHALL）
+   b. `git commit -m "chore: add intake items from integrity-check"`
+   c. `git push`
+   d. **失敗時** → エラー報告・後続中止（SHALL）
+
+### 11. 完了報告
 
 完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。variant: completion-reports/integrity-check/standard.md
 
@@ -254,7 +266,7 @@ Views 廃止後の残存構造を検出する:
 ### Read-Only 制約
 - G01: 検査対象 artifact（REQ、ADR、skill、command、specs、README、DOC-MAP）を変更しない。レポート生成（`.agentdev/integrity/reports/`）および intake item の新規作成（`.agentdev/intake/inbox/`）はこの制約の例外として許容する（REQ-0101）
 - G02: レポート・intake item の新規作成のみ許容
-- G03: `git` コマンドは実行しない（コミット・プッシュ禁止）。git永続化なし。必要なら別途 commit
+- G03: `git` コマンドは intake item 作成時にのみ `.agentdev/intake/` 配下に限定して実行する（SHALL）。それ以外の git操作（コミット・プッシュ）は禁止する。検査対象の git変更は一切行わない
 
 ### Finding 分類制約（REQ-0105, REQ-0105, REQ-0101）
 - G10: finding（検出された不整合）は原則 intake 対象である（REQ-0105）

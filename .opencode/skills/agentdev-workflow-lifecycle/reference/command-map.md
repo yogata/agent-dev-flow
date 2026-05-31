@@ -174,7 +174,7 @@ Implementation pattern は command の内部構造に基づく分類軸であり
 | **file-pipeline** | 定義されたステップに従いファイルを変換・生成するパイプライン処理 | 指定ディレクトリへのファイル作成・更新、git操作 (commit, push)、外部API呼び出し (Issue更新, PR操作)、テンプレート適用 | 大規模な状態機械の実行、サブエージェントの起動、再開ポイント検出 | ファイル管理・バリデーション・テンプレート系 skill、完了報告 skill、git/gh系 skill (外部API操作時) | 入力→出力マッピング、作成・更新ファイル一覧、git操作結果（ある場合） |
 | **manager-orchestrator** | 複数フェーズ構成の状態機械・自己修復ループ・サブエージェントプロトコルによる複雑な実行管理 | すべてのファイル操作、git操作 (worktree, commit, push, merge)、外部API呼び出し (Issue, PR, CI)、サブエージェントの起動・管理、Wave scheduling | （制限なし — 最も広いスコープを持つ） | オーケストレーション系 skill、worktree/git系 skill、仕様適合性 skill、完了報告 skill | 実行フェーズ完了状況、作成・更新アーティファクト一覧、検証結果、サブエージェント実行結果（並列実行時） |
 | **capture-only** | データを収集・記録し、指定 inbox に保存する（変換なし） | inbox ディレクトリへの新規ファイル作成のみ、外部APIからの読み取り | レビュー・プロモート・Issue作成、既存ファイルの変更・削除、git操作 (commit, push)、分析・評価・判定 | ライフサイクル文脈 skill、完了報告 skill | キャプチャ項目数、inbox保存パス |
-| **read-only-diagnostic** | アーティファクトを分析し、結果をレポートとして出力する（一切の変更なし） | レポートファイルの新規作成 (`.agentdev/integrity/reports/` 等)、intake item の新規作成（ユーザー承認時のみ） | 検査対象アーティファクトの変更 (REQ, ADR, specs, command, skill等)、git操作 (commit, push)、外部API呼び出しによるリソース変更 | 分析・診断系 skill、完了報告 skill | 検査結果サマリ (OK/NG/Warning/Info)、検出問題一覧、レポートファイルパス |
+| **read-only-diagnostic** | アーティファットを分析し、結果をレポートとして出力する（一切の変更なし） | レポートファイルの新規作成 (`.agentdev/integrity/reports/` 等)、intake item の新規作成（ユーザー承認時のみ）、intake item 作成後の `.agentdev/intake/` 配下に限定した git 永続化（ユーザー承認時のみ） | 検査対象アーティファクトの変更 (REQ, ADR, specs, command, skill等)、無条件の git操作 (commit, push)、外部API呼び出しによるリソース変更 | 分析・診断系 skill、完了報告 skill | 検査結果サマリ (OK/NG/Warning/Info)、検出問題一覧、レポートファイルパス |
 
 ### Command ↔ Pattern Correspondence
 
