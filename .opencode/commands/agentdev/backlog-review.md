@@ -1,11 +1,10 @@
 ---
 description: promoted artifact を分析・統合し、ユーザー承認を得て review 結果を保存する
 agent: sisyphus
-implementation_pattern: file-pipeline
+implementation_pattern: wall-session
 load_skills:
   - agentdev-workflow-lifecycle
   - agentdev-workflow-reporting
-  - agentdev-gh-cli
 ---
 
 # Backlog Review
