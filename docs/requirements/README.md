@@ -10,7 +10,7 @@
 | [REQ-0102](REQ-0102.md) | 要件定義・保存 | req-define / req-save / Requirement Source / 分類ゲート |
 | [REQ-0103](REQ-0103.md) | Artifact責任分界 | command / skill / template / script / namespace / implementation pattern 分類 |
 | [REQ-0104](REQ-0104.md) | Workflow / Command Protocol | ワークフロー、Pattern、SSoT、case-open/run/close基本契約 |
-| [REQ-0105](REQ-0105.md) | Intake / Learning / Backlog | intake、learning、req-backlog、RU lifecycle |
+| [REQ-0105](REQ-0105.md) | Intake / Learning / Backlog | intake、learning、backlog-review、backlog-save、RU lifecycle |
 | [REQ-0106](REQ-0106.md) | Case実行・完了 | case-run、case-close、Epic/Wave、完了ゲート |
 | [REQ-0107](REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、AI-slop抑止 |
 | [REQ-0108](REQ-0108.md) | Integrity / Validation / Tests | 整合性検査、finding分類・route、レポート出力、ガードレール、体系的テスト、implementation pattern 検査 |
