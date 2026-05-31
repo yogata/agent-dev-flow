@@ -31,7 +31,7 @@ RU-*.md は以下の構造に従う（REQ-0105, 003）:
 
 ```markdown
 ---
-source_type: {intake | learning | mixed}
+source_type: {intake | learning | mixed | chat}
 generated_by: req-backlog
 generated_at: {ISO 8601 timestamp}
 status: draft

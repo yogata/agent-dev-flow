@@ -103,7 +103,7 @@ graph TD
 **パイプライン境界**:
 - Intake/Learning の promoted artifact を `req-backlog` が RU に統合（REQ-0105）
 - `req-define` は RU のみを Requirement Source として受け入れ、promoted artifact を直接読み込まない（REQ-0105, 020）
-- RU は永続化完了（REQ保存成功 or Issue作成成功）後に削除（REQ-0105, 022, 023）
+- RU は `case-open` の Issue作成 + VERIFY 成功後にのみ削除（REQ-0105, 012, 015）。`req-save` は RU を削除せず、REQファイルの Requirement Source に RU パスを記録する（REQ-0105, 014）
 
 ## 成果物ライフサイクル概要
 
@@ -111,11 +111,11 @@ graph TD
 |--------|------|------|-------------|
 | promoted artifact（intake） | `intake-promote` | `req-backlog` | RU化成功時 |
 | promoted artifact（learning） | `learning-promote` | `req-backlog` | RU化成功時 |
-| RU | `req-backlog` | `req-define`, `req-save`, `case-open` | REQ/Issue永続化完了時 |
+| RU | `req-backlog`, session-sourced | `req-define`, `req-save`, `case-open` | `case-open` の Issue作成 + VERIFY 成功時 |
 | REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
 | Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
 
-**流れ**: promoted artifact → RU → REQ ファイル / Issue → マージ → クローズ。RU 削除は永続化成功に限定し、失敗時は残置する。
+**流れ**: promoted artifact / session-sourced → RU → REQ ファイル / Issue → マージ → クローズ。RU 削除は `case-open` の永続化成功に限定し、`req-save` では削除しない（REQ-0105-014）。失敗時は残置する（REQ-0105-016）。
 
 **整合性担保**: `integrity-check` が REQ/ADR/SPEC/DOC-MAP の横断的整合性を検査する（REQ-0108）。検査結果は finding として分類し、未修正事項は intake へ、再発防止知見は learning へ送る候補として扱う（REQ-0108, 013）。
 

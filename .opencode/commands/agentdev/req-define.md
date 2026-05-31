@@ -178,6 +178,7 @@ load_skills:
        - **decomposition**: [{scope, modules, description}]（scale が large の場合のみ）
        - **create-rationale**: {CREATEを選択した理由}（req-operation が CREATE の場合に必須。APPEND/UPDATE候補があった場合はその理由も含む）
         - **status**: draft（初期値。req-save → saved, case-open → 削除）
+       - **session-sourced RU の場合**（REQ-0105-017〜022）: `source_type: chat`, `generated_by: session`, `sources[].type: chat`, `sources[].path: session:YYYY-MM-DD-{topic}` を frontmatter に設定。本文は自足的で整理済みの内容に限定する
       ```
     - **バグ修正・軽微変更**: ドラフト保存不要。セッション内で要件docを完結させる
     - **リファクタリング・保守作業 / ドキュメント・雑務**: ドラフト保存不要。セッション内で要件docを完結させる（バグ修正・軽微変更と同等のlightweight workflow）
@@ -200,7 +201,7 @@ load_skills:
 
 ### ファイル操作制約
 - G03: ファイル編集スコープ: `.sisyphus/drafts/**` のみ作成・編集を許可
-- G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）。`.agentdev/backlog/req-units/RU-*.md` の削除は req-define では行わず、後続の req-save または case-open の成功後に実行する
+- G04: ユーザーが明示した入力ファイルは read-only で参照可能（要件ソースとして扱うが、内容を変更・上書きしない）。`.agentdev/backlog/req-units/RU-*.md` の削除は req-define では行わず、後続の `case-open` の成功後に実行する（REQ-0105-015）
 - G05: `docs/` 配下の広範な探索は禁止（例外: 明示入力ファイルと `docs/requirements/**` の read-only 参照は許可。既存REQ照合のため Step 3 で使用。Step 4b の抽出キーワードベース限定探索も許可）
 - G06: `inbox.md` / `archive.md` を直接ロードしない（raw learning item は要件ソースとして扱わない。ただし昇華済みの staging stub や evaluation-report は明示入力ファイルとして read-only 参照を許可）
 - G07: `.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` を直接読み込んではならない（REQ-0105）。promoted artifact は req-backlog による RU 化を経由しなければならない

@@ -142,7 +142,7 @@ flowchart TD
 - promoted artifact 間の矛盾はユーザーに確認
 - RU 生成成功後、元の promoted artifact を削除
 - `req-define` は RU を Requirement Source として受け入れる
-- `req-save`（REQ保存）または `case-open`（Issue作成）の成功後、該当RUファイルを削除
+- `case-open`（Issue作成）の成功後、該当RUファイルを削除（REQ-0105-015）
 
 ## フェーズ体系
 
