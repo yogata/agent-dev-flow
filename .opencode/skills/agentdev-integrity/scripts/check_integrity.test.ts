@@ -2439,3 +2439,282 @@ describe("G6: Phase 3 candidate in messages", () => {
     expect(hit.message).toMatch(/\[recommendation: .+\]/);
   });
 });
+
+// ─── False-positive regression tests (Issue #504 / REQ-0108-041,042,043,045) ─
+
+describe("F1: extractReadmeTableReqIds — markdown link format [REQ-NNNN](REQ-NNNN.md)", () => {
+  const F1_ROOT = join(TEMP_ROOT, "f1-link-req");
+
+  beforeAll(() => {
+    mkdirp(F1_ROOT);
+    buildValidFixture(F1_ROOT);
+
+    const reqDir = join(F1_ROOT, "docs", "requirements");
+    writeFileSync(
+      join(reqDir, "README.md"),
+      [
+        "# Requirements",
+        "",
+        "| REQ ID | Title |",
+        "|--------|-------|",
+        "| [REQ-0001](REQ-0001.md) | Valid requirement |",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(F1_ROOT);
+  });
+
+  it("extracts REQ IDs from [REQ-NNNN](...) link format and does not report missing", () => {
+    const r = runScript(F1_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const missingHit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "readme-index-sync" &&
+        res.message.includes("REQ-0001") &&
+        res.message.includes("missing from README")
+    );
+    expect(missingHit).toBeUndefined();
+  });
+
+  it("reports OK for readme-index-sync", () => {
+    const r = runScript(F1_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const okHit = parsed.results.find(
+      (res: { check: string; level: string }) =>
+        res.check === "readme-index-sync" && res.level === "ok"
+    );
+    expect(okHit).toBeDefined();
+  });
+});
+
+describe("F2: checkCompletionReportTemplates — variant directory on disk accepted", () => {
+  const F2_ROOT = join(TEMP_ROOT, "f2-variant-dir");
+
+  beforeAll(() => {
+    mkdirp(F2_ROOT);
+    buildValidFixture(F2_ROOT);
+
+    const reportingRefDir = join(F2_ROOT, ".opencode", "skills", "agentdev-workflow-reporting", "reference");
+    mkdirp(reportingRefDir);
+
+    writeFileSync(
+      join(reportingRefDir, "completion-reports.md"),
+      [
+        "# 完了報告フォーマット",
+        "",
+        "## Variant Registry",
+        "",
+        "| Command | Variant | File |",
+        "|---------|---------|------|",
+        "| other-cmd | standard | completion-reports/other-cmd/standard.md |",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    const variantDir = join(reportingRefDir, "completion-reports", "other-cmd");
+    mkdirp(variantDir);
+    writeFileSync(join(variantDir, "standard.md"), "✅ other-cmd 完了\n", "utf-8");
+
+    const testCmdVariantDir = join(reportingRefDir, "completion-reports", "test-cmd");
+    mkdirp(testCmdVariantDir);
+    writeFileSync(join(testCmdVariantDir, "standard.md"), "✅ test-cmd 完了\n", "utf-8");
+
+    const cmdDir = join(F2_ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "other-cmd.md"), [
+      "---",
+      "description: Other command",
+      "agent: test-agent",
+      "implementation_pattern: file-pipeline",
+      "load_skills:",
+      "  - agentdev-workflow-reporting",
+      "  - agentdev-conventional-commits",
+      "  - agentdev-req-file-manager",
+      "  - agentdev-adr-file-manager",
+      "  - agentdev-no-ai-slop-writing",
+      "  - agentdev-gh-cli",
+      "---",
+      "",
+      "Other command body.",
+      "",
+    ].join("\n"), "utf-8");
+
+    writeFileSync(join(cmdDir, "README.md"), [
+      "# Commands",
+      "",
+      "| Command | Description | Agent | Skills |",
+      "|---------|-------------|-------|--------|",
+      "| `agentdev/test-cmd` | Test | test-agent | agentdev-workflow-reporting |",
+      "| `agentdev/other-cmd` | Other | test-agent | agentdev-workflow-reporting |",
+      "",
+    ].join("\n"), "utf-8");
+
+    copyScripts(F2_ROOT);
+  });
+
+  it("accepts command with variant directory on disk even without registry entry for test-cmd", () => {
+    const r = runScript(F2_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const templateHit = parsed.results.find(
+      (res: { check: string; level: string }) =>
+        res.check === "template-section-existence" && res.level === "ok"
+    );
+    expect(templateHit).toBeDefined();
+  });
+
+  it("does not report NG for test-cmd missing from registry", () => {
+    const r = runScript(F2_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngHit = parsed.results.find(
+      (res: { check: string; message: string; level: string }) =>
+        res.check === "template-section-existence" &&
+        res.message.includes("test-cmd") &&
+        res.level === "ng"
+    );
+    expect(ngHit).toBeUndefined();
+  });
+});
+
+describe("F3: retired-req-as-current — mapping-table.md excluded", () => {
+  const F3_ROOT = join(TEMP_ROOT, "f3-mapping-table");
+
+  beforeAll(() => {
+    mkdirp(F3_ROOT);
+    buildValidFixture(F3_ROOT);
+
+    const reqDir = join(F3_ROOT, "docs", "requirements");
+    const retiredDir = join(reqDir, "retired");
+    mkdirp(retiredDir);
+
+    writeFileSync(
+      join(retiredDir, "REQ-0050.md"),
+      "---\nid: REQ-0050\ntitle: Retired REQ\n---\n\nRetired content.\n",
+      "utf-8"
+    );
+
+    writeFileSync(
+      join(reqDir, "mapping-table.md"),
+      [
+        "# Migration Table",
+        "",
+        "| Old REQ | Status |",
+        "|---------|--------|",
+        "| REQ-0050 | retired-no-successor |",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(F3_ROOT);
+  });
+
+  it("does not warn about retired REQ in mapping-table.md (LinkIntegrity)", () => {
+    const r = runScript(F3_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string; file?: string }) =>
+        res.check === "retired-req-as-current" &&
+        (res.file ?? "").includes("mapping-table")
+    );
+    expect(hit).toBeUndefined();
+  });
+
+  it("does not warn about retired REQ in mapping-table.md (LifecycleBoundary)", () => {
+    const r = runScript(F3_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string; file?: string }) =>
+        res.check === "retired-req-primary-ref" &&
+        (res.file ?? "").includes("mapping-table")
+    );
+    expect(hit).toBeUndefined();
+  });
+});
+
+describe("F4: parseMarkdownLinks — [URL] placeholder excluded", () => {
+  const F4_ROOT = join(TEMP_ROOT, "f4-url-placeholder");
+
+  beforeAll(() => {
+    mkdirp(F4_ROOT);
+    buildValidFixture(F4_ROOT);
+
+    const reqDir = join(F4_ROOT, "docs", "requirements");
+    writeFileSync(
+      join(reqDir, "REQ-0001.md"),
+      [
+        "---",
+        "id: REQ-0001",
+        "title: Placeholder test",
+        "created: 2025-01-01",
+        "updated: 2025-01-02",
+        "tags:",
+        "  - test",
+        "---",
+        "",
+        "## Body",
+        "",
+        "Status: ✅ 完了 ([PR#N](URL))",
+        "See ADR-0001 for context.",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+
+    copyScripts(F4_ROOT);
+  });
+
+  it("does not report [text](URL) as broken file link", () => {
+    const r = runScript(F4_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "broken-file-link" &&
+        res.message.includes("URL")
+    );
+    expect(hit).toBeUndefined();
+  });
+
+  it("still detects real broken links", () => {
+    const reqDir = join(F4_ROOT, "docs", "requirements");
+    writeFileSync(
+      join(reqDir, "REQ-0001.md"),
+      [
+        "---",
+        "id: REQ-0001",
+        "title: Real broken link test",
+        "created: 2025-01-01",
+        "updated: 2025-01-02",
+        "tags:",
+        "  - test",
+        "---",
+        "",
+        "## Body",
+        "",
+        "Status: ✅ 完了 ([PR#N](URL))",
+        "See [guide](../guides/nonexistent.md) for details.",
+        "See ADR-0001 for context.",
+        "",
+      ].join("\n"),
+      "utf-8"
+    );
+    copyScripts(F4_ROOT);
+
+    const r = runScript(F4_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const urlHit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "broken-file-link" &&
+        res.message.includes("URL")
+    );
+    const realHit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "broken-file-link" &&
+        res.message.includes("nonexistent.md")
+    );
+    expect(urlHit).toBeUndefined();
+    expect(realHit).toBeDefined();
+    expect(realHit.level).toBe("ng");
+  });
+});

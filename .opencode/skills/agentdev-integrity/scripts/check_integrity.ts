@@ -121,8 +121,14 @@ function extractReadmeTableReqIds(content: string): Set<string> {
   for (const line of content.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed.startsWith("|")) continue;
-    const match = trimmed.match(/\|\s*(REQ-\d+)\s*\|/);
-    if (match) ids.add(match[1]);
+    // Extract from plain text in table cell: | REQ-NNNN | ...
+    const plainMatch = trimmed.match(/\|\s*(REQ-\d+)\s*\|/);
+    if (plainMatch) { ids.add(plainMatch[1]); continue; }
+    // Extract from markdown link in table cell: | [REQ-NNNN](...) | ...
+    const linkMatches = trimmed.matchAll(/\[(REQ-\d+)\]\([^)]+\)/g);
+    for (const m of linkMatches) {
+      ids.add(m[1]);
+    }
   }
   return ids;
 }
@@ -658,12 +664,18 @@ function checkCompletionReportTemplates(cmdDir: string, completionReportsPath: s
   const results: CheckResult[] = [];
   const sections = buildCompletionReportSections(completionReportsPath);
   const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  const usesVariantRegistry = hasVariantRegistry(completionReportsPath);
+  const variantBaseDir = getCompletionReportsDir(completionReportsPath);
 
   for (const file of cmdFiles) {
     const cmdName = file.replace(".md", "");
     if (cmdName === "integrity-check") continue;
 
-    if (!sections.has(cmdName)) {
+    const hasRegistryEntry = sections.has(cmdName);
+    // When variant registry is used, also accept on-disk variant files as valid
+    const hasVariantDir = usesVariantRegistry && fs.existsSync(path.join(variantBaseDir, cmdName));
+
+    if (!hasRegistryEntry && !hasVariantDir) {
       results.push(
         ng(
           "CompletionReport",
@@ -1079,6 +1091,8 @@ function parseMarkdownLinks(content: string): { text: string; href: string }[] {
   while ((match = regex.exec(content)) !== null) {
     const href = match[2].trim();
     if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("#") || href.startsWith("mailto:")) continue;
+    // Skip placeholder hrefs like [text](URL) where href is an uppercase word with no path separators
+    if (/^[A-Z_]+$/.test(href)) continue;
     links.push({ text: match[1], href });
   }
   return links;
@@ -1202,7 +1216,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     for (const ref of uniqueReqRefs) {
       const retiredPath = path.join(root, "docs", "requirements", "retired", `${ref}.md`);
       const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
-      if (fs.existsSync(retiredPath) && !fs.existsSync(activePath) && !relPath.startsWith("docs/requirements/retired/")) {
+      if (fs.existsSync(retiredPath) && !fs.existsSync(activePath) && !relPath.startsWith("docs/requirements/retired/") && !relPath.endsWith("mapping-table.md")) {
         results.push(warn(
           "LinkIntegrity", "retired-req-as-current",
           `${ref} is retired but referenced in non-retired file`,
@@ -1338,7 +1352,7 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
   for (const filePath of allDocFiles) {
     const relPath = resolveRelative(filePath, root);
     if (relPath.startsWith("docs/requirements/retired/")) continue;
-    const content = readText(filePath);
+    if (relPath.endsWith("mapping-table.md")) continue;    const content = readText(filePath);
     if (!content) continue;
     const refs = content.match(/\bREQ-\d{4}\b/g) || [];
     const uniqueRefs = [...new Set(refs)];
