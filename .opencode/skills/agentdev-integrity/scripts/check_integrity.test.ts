@@ -2759,8 +2759,7 @@ describe("F2: checkCompletionReportTemplates — variant directory on disk accep
     mkdirp(F2_ROOT);
     buildValidFixture(F2_ROOT);
 
-    const reportingRefDir = join(F2_ROOT, ".opencode", "skills", "agentdev-workflow-reporting", "reference");
-    mkdirp(reportingRefDir);
+    const reportingRefDir = join(F2_ROOT, ".opencode", "skills", "agentdev-workflow-reporting", "references");
 
     writeFileSync(
       join(reportingRefDir, "completion-reports.md"),
