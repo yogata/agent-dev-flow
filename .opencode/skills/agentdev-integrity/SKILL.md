@@ -51,23 +51,37 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 | 検査カテゴリ | スクリプト | 内容 |
 |-------------|-----------|------|
 | REQ frontmatter ↔ ファイル名 | `check_integrity.ts` | frontmatter id ↔ ファイル名、必須フィールド、README インデックス |
-| ADR ↔ REQ 相互参照 | `check_integrity.ts` | 双方向参照の存在確認 |
-| Skill ↔ load_skills 参照 | `check_integrity.ts` | load_skills 先存在、agentdev- prefix、未使用 skill |
+| Retired REQ frontmatter | `check_integrity.ts` | retired REQ filename ↔ id、必須フィールド、active/retired ID 重複 (REQ-0108-080~082) |
+| ADR ↔ REQ 相互参照 | `check_integrity.ts` | 双方向参照の存在確認、retired 区別 |
+| Skill ↔ load_skills 参照 | `check_integrity.ts` | load_skills 先存在、agentdev- prefix、未使用 skill (categorized) |
+| Skill frontmatter | `check_integrity.ts` | name ↔ dir 一致、USE FOR 境界、reference/ 残存 (REQ-0108-092~094) |
 | Command-map ↔ 実体 | `check_integrity.ts` | README ↔ 実ファイル、command inventory |
-| 旧 namespace 残存 | `check_integrity.ts` | 旧コマンド名、旧パス、二重 prefix |
+| Command frontmatter | `check_integrity.ts` | implementation_pattern、secondary_pattern、load_skills 配列、agent 名、deprecated 混入 (REQ-0108-095~099) |
+| 旧 namespace 残存 | `check_integrity.ts` | 旧コマンド名、旧パス、二重 prefix、bare slash (scoped) |
 | 完了報告フォーマット | `check_integrity.ts` | load_skills 参照、completion-reports.md テンプレート存在、インライン完了報告、完了後追加出力、旧 terminology（REQ-0107, REQ-0107） |
+| Variant report | `check_integrity.ts` | variant 実在確認、registry 登録確認、必須フィールド、fragment 合成パターン (REQ-0108-089~091) |
+| Mapping table | `check_integrity.ts` | 全件記録・存在確認・移行先確認・status enum 検査 (REQ-0108-083~088) |
+| Implementation pattern | `check_integrity.ts` | pattern 定義妥当性、禁止 skill、command-map 一致性、load_skills 意味判断 |
 | Workflow template 構造 | `check_templates.ts` | frontmatter、必須セクション、placeholder、命名規則 |
 | Skill 構造 | `lint_skills.ts` | frontmatter name ↔ dir、USE FOR / DO NOT USE FOR、See Also |
+
+### Finding レベル（REQ-0108-100~105）
+
+| レベル | 意味 | 取扱い |
+|--------|------|--------|
+| strict | 存在、参照、frontmatter、index、registry など再現可能な検査 | 標準 NG/OK 判定 |
+| heuristic | 意味判断を含むが明確な根拠を持つ warning | 確認推奨 |
+| observation | 参考情報。標準レポートの主 finding や NG カウントに含めない | 報告のみ |
 
 ## 検出結果分類基準
 
 | レベル | 意味 | 取扱い |
 |--------|------|--------|
-| NG | 不整合が検出された | 修正必須 |
-| warning | 疑わしいが確定ではない | 確認推奨 |
-| info | 参考情報 | 報告のみ |
+| NG | 不整合が検出された（strict/heuristic） | 修正必須 / 確認推奨 |
+| warning | 疑わしいが確定ではない（heuristic） | 確認推奨 |
+| info | 参考情報（observation） | 報告のみ |
 
-**方針**: false positive（過検出）を許容し、false negative（見逃し）を減らす。
+**方針**: false positive（過検出）を許容し、false negative（見逃し）を減らす。observation レベルの finding は標準レポートの主 finding や NG カウントに含めない（REQ-0108-103）。
 
 ## レポート Schema
 

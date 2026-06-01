@@ -32,6 +32,8 @@ export type FindingRoute =
   | "learning"
   | "none";
 
+export type FindingLevel = "strict" | "heuristic" | "observation";
+
 export interface CheckResult {
   category: string;
   check: string;
@@ -42,6 +44,7 @@ export interface CheckResult {
   evidence?: string;
   expected?: string;
   route?: FindingRoute;
+  finding_level?: FindingLevel;
 }
 
 export interface ScanSummary {
@@ -142,10 +145,47 @@ export function info(category: string, check: string, message: string, file?: st
 export function computeSummary(results: CheckResult[]): ScanSummary {
   return {
     ok: results.filter((r) => r.level === "ok").length,
-    ng: results.filter((r) => r.level === "ng").length,
-    warning: results.filter((r) => r.level === "warning").length,
+    ng: results.filter((r) => r.level === "ng" && r.finding_level !== "observation").length,
+    warning: results.filter((r) => r.level === "warning" && r.finding_level !== "observation").length,
     info: results.filter((r) => r.level === "info").length,
   };
+}
+
+/**
+ * Finding level classification (REQ-0108-100~105):
+ * - strict: deterministic, reproducible checks (existence, frontmatter, registry)
+ * - heuristic: semantic judgment with clear evidence
+ * - observation: informational, not counted in NG/summary
+ */
+export function classifyFindingLevel(
+  level: CheckLevel,
+  checkType: string,
+): FindingLevel {
+  // Strict checks: existence, reference, frontmatter, index, registry, path
+  const STRICT_CHECKS = new Set([
+    "frontmatter-filename", "required-fields", "readme-index-sync",
+    "adr-req-crossref", "load-skills-existence", "command-readme-sync",
+    "command-inventory", "legacy-namespace", "name-collision",
+    "specs-existence", "broken-file-link", "broken-section-anchor",
+    "broken-req-ref", "broken-adr-ref", "active-retired-duplication",
+    "retired-in-active-index", "mapping-table-nonexistent",
+    "implementation-pattern", "pattern-prohibitions", "command-map-consistency",
+    "obsolete-reference-dir", "variant-existence", "variant-required-fields",
+    "fragment-patterns", "retired-frontmatter-filename", "retired-required-fields",
+    "mapping-table-completeness", "mapping-table-migration-target",
+    "mapping-table-status-enum", "variant-path-existence", "variant-registry-registered",
+    "skill-name-dir-match", "skill-use-for-boundary",
+    "cmd-implementation-pattern", "cmd-secondary-pattern", "cmd-load-skills-array",
+    "cmd-agent-name", "cmd-deprecated-in-inventory",
+  ]);
+
+  if (STRICT_CHECKS.has(checkType)) return "strict";
+
+  // Heuristic: semantic judgment with clear evidence
+  if (level === "ng" || level === "warning") return "heuristic";
+
+  // Observation: informational
+  return "observation";
 }
 
 export function formatJsonReport(report: IntegrityReport): string {

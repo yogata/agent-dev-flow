@@ -1,8 +1,8 @@
 # Domain State Lifecycle
 
-AgentDevFlow の各ドメイン（Learning・Intake・RU・Case・Integrity）におけるファイル・ディレクトリの状態遷移を説明します。
+AgentDevFlow の各ドメイン（Learning・Intake・RU・Case・Integrity）におけるファイル・ディレクトリの状態遷移を説明する。`.agentdev/README.md` の早見表の詳細版であり、状態遷移・producer/consumer/retention/failure handling に集中する（REQ-0101-025）。
 
-基準となる要件: REQ-0105（intake/learning/RU lifecycle）、REQ-0106（case-run/case-close）、REQ-0101-036（guides 規約）。
+基準となる要件: REQ-0105（intake/learning/RU lifecycle）、REQ-0106（case-run/case-close）。
 
 ## 全体概観
 
@@ -56,7 +56,7 @@ stateDiagram-v2
 
 ### 基本フロー
 
-学び発生 → `learning-capture`（スキル）→ `/agentdev/learning-refine` → `/agentdev/learning-promote` → `/agentdev/backlog-review` → `/agentdev/backlog-save` → `/agentdev/req-define` に合流
+学び発生 → `learning-capture`（スキル）→ `/agentdev/learning-refine` → `/agentdev/learning-promote` → `/agentdev/backlog-review` → `/agentdev/backlog-save` → `/agentdev/req-define` に結合
 
 ### 主要 artifact
 

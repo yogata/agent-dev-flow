@@ -1,6 +1,6 @@
 # AgentDevFlow 成果物モデル
 
-AgentDevFlow を構成する成果物の種別・責務・配置・関係・ライフサイクルを説明する。本ガイドは参照用読み物であり、基準は各 REQ/ADR/SPEC ファイルである（REQ-0101）。基準文書と矛盾する記述がある場合は基準を優先する（REQ-0101）。
+AgentDevFlow を構成する成果物の種別・責務・配置・関係・ライフサイクルを説明する。本ガイドは保守者向けの内部モデルであり、利用者入口ではない（REQ-0101-024）。利用者は [README](../../README.md) の入口表または [ワークフロー概要](workflow-overview.md) を参照。基準は各 REQ/ADR/SPEC ファイルであり、本ガイドは参照用読み物である（REQ-0101）。基準文書と矛盾する記述がある場合は基準を優先する（REQ-0101）。
 
 ## 文書種別モデル
 
@@ -76,7 +76,7 @@ docs/
   integrity/                     # 整合性検証レポート
 .opencode/
   commands/agentdev/             # Command 定義
-  skills/agentdev-*/             # skill 定義（SKILL.md + references/ + templates/ + scripts/）
+  skills/agentdev-*/             # Skill 定義（SKILL.md + references/ + templates/ + scripts/）
 .sisyphus/                       # Sisyphus 作業領域（drafts 等）
 ```
 
