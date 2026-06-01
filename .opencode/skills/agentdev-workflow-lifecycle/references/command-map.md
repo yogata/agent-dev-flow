@@ -216,6 +216,6 @@ integrity-check による検証で使用する、各 pattern が禁止する ski
 
 ## 参照
 
-- **フェーズ体系**: [`reference/phases.md`](./phases.md)
-- **アーティファクト責務境界**: [`reference/artifact-boundaries.md`](./artifact-boundaries.md)
-- **SSoT遷移ルール**: [`reference/ssot-transitions.md`](./ssot-transitions.md)
+- **フェーズ体系**: [`references/phases.md`](./phases.md)
+- **アーティファクト責務境界**: [`references/artifact-boundaries.md`](./artifact-boundaries.md)
+- **SSoT遷移ルール**: [`references/ssot-transitions.md`](./ssot-transitions.md)

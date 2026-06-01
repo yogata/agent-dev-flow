@@ -25,5 +25,5 @@ agentdev系コマンドのマクロフェーズとマイクロフェーズ定義
 
 ## 参照
 
-- **SSoT遷移ルール**: [`reference/ssot-transitions.md`](./ssot-transitions.md)
-- **コマンド関連マップ**: [`reference/command-map.md`](./command-map.md)
+- **SSoT遷移ルール**: [`references/ssot-transitions.md`](./ssot-transitions.md)
+- **コマンド関連マップ**: [`references/command-map.md`](./command-map.md)

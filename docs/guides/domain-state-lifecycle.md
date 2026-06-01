@@ -35,7 +35,7 @@ flowchart TD
 - **再発防止の知見・判断ミス・手順漏れ** → learning
 - **両方の性質を持つ** → intake item と learning item に分割
 
-詳細な境界定義は [capture-boundaries](../../.opencode/skills/agentdev-workflow-lifecycle/reference/capture-boundaries.md) を参照。
+詳細な境界定義は [capture-boundaries](../../.opencode/skills/agentdev-workflow-lifecycle/references/capture-boundaries.md) を参照。
 
 ## Learning Lifecycle
 

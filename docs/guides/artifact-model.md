@@ -76,7 +76,7 @@ docs/
   integrity/                     # 整合性検証レポート
 .opencode/
   commands/agentdev/             # Command 定義
-  skills/agentdev-*/             # Skill 定義（SKILL.md + reference/ + templates/ + scripts/）
+  skills/agentdev-*/             # skill 定義（SKILL.md + references/ + templates/ + scripts/）
 .sisyphus/                       # Sisyphus 作業領域（drafts 等）
 ```
 
