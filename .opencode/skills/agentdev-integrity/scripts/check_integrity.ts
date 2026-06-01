@@ -2303,8 +2303,6 @@ const BARE_SLASH_COMMAND_PATTERNS = [
 ];
 
 function isBareSlashExemption(relPath: string, line: string): boolean {
-  // REQ-0108-076: exempt path fragments, completion-reports paths, reference paths,
-  // historical descriptions, detection target lists, test fixtures
   const pathExemptions = [
     /completion-reports\//,
     /reference\//,
@@ -2315,7 +2313,6 @@ function isBareSlashExemption(relPath: string, line: string): boolean {
   ];
   if (pathExemptions.some((re) => re.test(relPath))) return true;
 
-  // Exempt lines that are detection target lists or path references
   const lineExemptions = [
     /旧\s*bare\s*command/i,
     /旧.*コマンド名/i,
@@ -2323,6 +2320,20 @@ function isBareSlashExemption(relPath: string, line: string): boolean {
     /bare\s*slash/i,
     /pattern.*:/,
     /\|.*\|.*\|/,
+    /completion-reports\//,
+    /variant:\s/,
+    /^\s*[-*]\s.*completion-reports/,
+    /^\s*\d+\.\s/,
+    /^description:/,
+    /^---$/,
+    /^[a-z_]+:/,
+    /[-\w]+\/[-\w]+-\w/,
+    /\.md[`"'s]/,
+    /\{.*\}.*\.md/,
+    /\*\.(md|ts)/,
+    /drafts\//,
+    /\.sisyphus\//,
+    /status:/,
   ];
   if (lineExemptions.some((re) => re.test(line))) return true;
 
@@ -2454,14 +2465,18 @@ function parseMappingTable(mappingPath: string): {
   if (!content) return { entries, allOldRefs };
 
   const lines = content.split("\n");
-  let inTable = false;
+  let inMigrationSection = false;
   for (const line of lines) {
     const trimmed = line.trim();
-    if (!trimmed.startsWith("|")) { inTable = false; continue; }
+    if (/^##\s/.test(trimmed)) {
+      inMigrationSection = /^##\s+対応表/.test(trimmed);
+      continue;
+    }
+    if (!inMigrationSection) continue;
+    if (!trimmed.startsWith("|")) continue;
     if (/^[\s|:-]+$/.test(trimmed)) continue;
     const cells = trimmed.split("|").map((c) => c.trim()).filter((c) => c.length > 0);
     if (cells.length >= 2 && /REQ-\d{4}/.test(cells[0])) {
-      inTable = true;
       const oldReqMatch = cells[0].match(/(REQ-\d{4})/);
       const statusMatch = cells[1]?.trim();
       const successorText = cells.length >= 3 ? cells[2]?.trim() : "";
