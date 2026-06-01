@@ -4,7 +4,7 @@ Issueラベルの定義、パターン判定、およびパターン固有の動
 
 ## Implementation Pattern との区別
 
-Pattern A/B/C/D は Issue 種別分類（REQ-0104）であり、implementation pattern は command 内部構造分類（REQ-0103）である。両者は直交する概念である（REQ-0103-016）。Implementation pattern の定義は [`reference/command-map.md`](./command-map.md) の「Implementation Pattern Taxonomy」セクションを参照。
+Pattern A/B/C/D は Issue 種別分類（REQ-0104）であり、implementation pattern は command 内部構造分類（REQ-0103）である。両者は直交する概念である（REQ-0103-016）。Implementation pattern の定義は [`references/command-map.md`](./command-map.md) の「Implementation Pattern Taxonomy」セクションを参照。
 
 ## 内部分類コード宣言
 
@@ -183,5 +183,5 @@ BacklogはPattern A〜Dとは独立した専用分類である。`intake-from-gi
 
 ## 参照
 
-- **アーティファクト責務境界**: [`reference/artifact-boundaries.md`](./artifact-boundaries.md)
-- **コマンド関連マップ**: [`reference/command-map.md`](./command-map.md)
+- **アーティファクト責務境界**: [`references/artifact-boundaries.md`](./artifact-boundaries.md)
+- **コマンド関連マップ**: [`references/command-map.md`](./command-map.md)

@@ -5,203 +5,36 @@ description: Manages git worktree creation, switching, and cleanup based on Issu
 
 # agentdev-git-worktree
 
-## 動作指針
-
 GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git worktree を作成・管理・削除する。
 
 ## 命名規則
 
-worktree とブランチの命名規則を統一する。
-
-| 項目             | 命名パターン            | 例                          |
-| ---------------- | ----------------------- | --------------------------- |
-| worktreeディレクトリ | `.worktrees/{N}-{type}` | `.worktrees/516-fix`        |
-| ブランチ名         | `{type}/issue-{N}`      | `fix/issue-516`             |
+| 項目 | 命名パターン | 例 |
+|------|-------------|-----|
+| worktreeディレクトリ | `.worktrees/{N}-{type}` | `.worktrees/516-fix` |
+| ブランチ名 | `{type}/issue-{N}` | `fix/issue-516` |
 
 ### `{type}` の定義
 
-| 値         | 使用条件                   |
-| ---------- | -------------------------- |
-| `feature`  | 機能追加・enhancement      |
-| `fix`      | バグ修正・bug              |
+| 値 | 使用条件 |
+|----|----------|
+| `feature` | 機能追加・enhancement |
+| `fix` | バグ修正・bug |
 | `refactor` | リファクタリング・保守作業 |
-| `chore`    | ドキュメント・雑務 |
-- Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
+| `chore` | ドキュメント・雑務 |
 
-### `{N}` の定義
+Pattern判定は `agentdev-workflow-lifecycle` → Pattern Registry を参照。
 
-- GitHub Issue 番号（数値）
+## 参照先
 
-## worktree作成手順
-
-### 1. ベースブランチの特定
-
-`main` または `master` ブランチを自動検出し、ベースとして使用する。
-
-```bash
-# ベースブランチの自動検出
-git remote show origin | grep 'HEAD branch' | sed 's/.*: //'
-```
-
-検出結果を `origin/{base_branch}` として使用する。デフォルトは `main`。
-
-### 2. worktree作成コマンド
-
-検出したベースブランチを `origin/{base_branch}` として明示的に指定し、ブランチを作成する。ローカルのベースブランチは他のworktree作業等で古くなっている可能性があるため、常にリモートの最新状態を起点とする。
-
-```bash
-git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/{base_branch}
-```
-
-### 3. 重要事項
-
-- **worktreeプレフィクス必須**: ファイルパスには `.worktrees/{N}-{type}/` を含めること。絶対パス・相対パスどちらも許容されるが、worktreeディレクトリを経由する必要がある
-  - 正しいパス例:
-    - 絶対パス: `C:/path/to/repo/.worktrees/516-fix/src/components/App.tsx`
-    - 相対パス: `.worktrees/516-fix/src/components/App.tsx`
-  - 誤ったパス例（worktreeプレフィクスなし）:
-    - `src/components/App.tsx` （メインリポジトリのファイルを誤編集するリスクあり）
-    - `./src/components/App.tsx` （同上）
-- Windows環境: パスにスペースが含まれる可能性があるためダブルクォート必須
-- 作成後の確認: `git worktree list` で正しく追加されたことを検証する
-
-### 4. 作成例
-
-```bash
-# issue-516 を fix パターンで処理（検出したベースブランチを明示的に指定）
-git worktree add ".worktrees/516-fix" -b "fix/issue-516" origin/{base_branch}
-
-# 確認
-git worktree list
-```
-
-## 既存worktree衝突時の対応
-
-### 1. 同名worktreeが既に存在する場合
-
-```bash
-# 既存worktreeを確認
-git worktree list
-
-# 既存worktreeを再利用（作成コマンドは実行しない）
-```
-
-### 2. ブランチのみ既存でworktreeがない場合
-
-```bash
-# 既存ブランチをworktreeとしてcheckout
-git worktree add ".worktrees/{N}-{type}" "{type}/issue-{N}"
-```
-
-### 3. ダーティなworktreeの扱い
-
-- ダーティなworktreeの削除は禁止
-- 未コミット変更がある場合はエラー停止し、ユーザーに判断を委ねる
-
-## worktree削除手順
-
-### 1. .sisyphus/ クリーンアップ
-
-worktree 内に case-run が作成した `.sisyphus/` 一時ファイル（実行計画・証跡等）が未追跡ファイルとして残存している場合、`git worktree remove` がエラーになる。削除前にクリーンアップすること。
-
-#### Windows（PowerShell）
-
-```powershell
-if (Test-Path ".worktrees/{N}-{type}/.sisyphus/") {
-    Remove-Item -Recurse -Force ".worktrees/{N}-{type}/.sisyphus/"
-}
-```
-
-#### POSIX（bash）
-
-```bash
-rm -rf ".worktrees/{N}-{type}/.sisyphus/"
-```
-
-- `.sisyphus/` ディレクトリが存在しない場合はエラーにせず続行する（`-ErrorAction SilentlyContinue` は不要。事前に `Test-Path` で確認するか、エラーを無視して次ステップへ進む）
-
-### 2. worktreeの削除
-
-```bash
-git worktree remove ".worktrees/{N}-{type}"
-```
-
-#### Permission denied 時のリトライ
-
-`git worktree remove` が Permission denied で失敗した場合、ファイルハンドル解放待ちのため短い待機を挟んでリトライする。
-
-- **最大リトライ回数**: 2回
-- **待機間隔**: 短い間隔（数秒程度）
-- **リトライ条件**: `git worktree remove` の終了コードが非ゼロで、エラーメッセージに "Permission denied" が含まれる場合のみ。それ以外のエラーはリトライしない
-- **リトライ上限到達時**: 警告を表示して停止する。ユーザーの判断を待つ
-
-### 3. クリーンアップ
-
-```bash
-# 手動削除されたディレクトリの残存参照を消去
-git worktree prune
-```
-
-### 4. ローカルブランチの削除
-
-```bash
-# マージ済みの場合のみ削除
-git branch -d "{type}/issue-{N}"
-```
-
-**注意**: 未マージブランチの強制削除（`-D`）は禁止。未マージの場合はエラー停止し、ユーザーの判断を委ねる。
-
-**例外: squash merge 後の条件付き `-D` 許可**（REQ-0106）: squash merge は fast-forward マージではないため `git branch -d` が "not fully merged" エラーになる。以下の条件を全て満たす場合のみ `-D` を許可する:
-1. 当該ブランチの PR が `gh pr view` で `state: MERGED` と確認できること
-2. 呼び出し元（`case-close` 等）が squash merge 済みを明示的に判定していること
-3. 上記2条件を満たさない場合は `-D` を実行せず、警告を表示して停止すること
-
-### 5. リモートブランチの削除
-
-```bash
-git push origin --delete "{type}/issue-{N}"
-```
-
-- リモートにブランチが存在しない場合（既に削除済み等）はエラーを無視して続行
-- **削除成否の確認必須**: リモートにブランチが存在した場合、削除が成功したことを確認すること。失敗した場合は警告表示して停止
+| トピック | 参照先 |
+|----------|--------|
+| 作成・削除・ブランチ操作の詳細 | `references/worktree-operations.md` |
+| git pull/push/hash検証の共通手順 | `references/git-common-procedures.md` |
 
 ## 禁止事項
 
-- worktreeプレフィクスを含まないパスでのファイル操作禁止（`.worktrees/{N}-{type}/` がパスに含まれていること）
+- worktreeプレフィクスを含まないパスでのファイル操作禁止
 - `--force` によるダーティworktreeの強制削除禁止
-- メインリポジトリ（非worktree）内でのファイル編集禁止（case-run中）
-- worktree ライフサイクルに伴うブランチクリーンアップ（Step 4, 5）は禁止事項の対象外
-
-## 重要: git worktreeコマンドの実行方法
-
-- worktree 内で作業する場合、`workdir` パラメータに worktree のパスを指定して Bash ツールを実行する（絶対パス・相対パスどちらも可、ただし `.worktrees/{N}-{type}/` を含めること）
-- 絶対に `cd` によるディレクトリ移動は行わない
-
-```bash
-# 正しい例（絶対パス）
-bash(command="git status", workdir="C:/path/to/repo/.worktrees/516-fix")
-
-# 正しい例（相対パス）
-bash(command="git status", workdir=".worktrees/516-fix")
-
-# 禁止例
-bash(command="cd .worktrees/516-fix && git status")
-```
-
-### Edit/Write ツールでのファイルパス指定
-
-Edit・Write ツールでworktree内のファイルを操作する場合も、パスに `.worktrees/{N}-{type}/` を含めること。
-
-```text
-# Edit ツールの例（絶対パス）
-edit(filePath="C:/path/to/repo/.worktrees/516-fix/src/components/App.tsx", oldString="...", newString="...")
-
-# Edit ツールの例（相対パス・プロジェクトルートから）
-edit(filePath=".worktrees/516-fix/src/components/App.tsx", oldString="...", newString="...")
-
-# Write ツールの例（絶対パス）
-write(filePath="C:/path/to/repo/.worktrees/516-fix/src/components/App.tsx", content="...")
-
-# 禁止例（worktreeプレフィクスなし）
-edit(filePath="src/components/App.tsx", oldString="...", newString="...")  # メインリポジトリのファイルを誤編集
-```
+- メインリポジトリ内でのファイル編集禁止（case-run中）
+- worktree ライフサイクルに伴うブランチクリーンアップは禁止事項の対象外

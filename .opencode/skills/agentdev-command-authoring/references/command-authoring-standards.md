@@ -205,6 +205,37 @@ Command作成・改定時に確認する項目:
 - [ ] Skill配下のテンプレートを参照する場合、当該Skillが`load_skills`に含まれているか
 - [ ] Skill配下のreferenceを参照する場合、当該Skillが`load_skills`に含まれているか
 
+### load_skills Prompt Budget（REQ-0103-027~034, REQ-0108-060~061）
+
+- [ ] `load_skills` が即時必要 skill のみに限定されているか（REQ-0103-027）
+- [ ] `load_skills` 数が implementation pattern 別目安上限を超えていないか:
+  - capture-only: ≤2
+  - wall-session: ≤4
+  - file-pipeline: ≤5
+  - read-only-diagnostic: ≤3
+  - manager-orchestrator: ≤8
+- [ ] 上限を超える場合、超過理由が明示されているか（REQ-0103-031）
+- [ ] `agentdev-no-ai-slop-writing` が常時 load されていないか（REQ-0103-032）
+- [ ] 必要時にのみ参照すれば足りる skill が manual reference として扱われているか（REQ-0103-028）
+- [ ] 各 skill の USE FOR / DO NOT USE FOR と command の責務が矛盾していないか（REQ-0103-034）
+
+### 共通処理重複確認（REQ-0103-040~043, REQ-0108-064）
+
+- [ ] 複数 command で使う共通処理（git 同期、push、hash 照合等）が共通 skill reference / script に集約されているか
+- [ ] command 側には共通処理名・入出力・停止条件のみが保持されているか
+- [ ] 同種の重複記述が複数箇所に現れていないか（現れた場合は共通化または検査ルール追加を検討）
+
+### Canonical Path 確認（REQ-0103-039, REQ-0108-052）
+
+- [ ] skill reference パスに `reference/`（単数形）が残っていないか（`references/` が canonical）
+- [ ] 削除した過検出が再発しないよう regression test が追加されているか
+
+### 完了報告 Variant 確認（REQ-0107-019~020, REQ-0107-042~043）
+
+- [ ] command 定義に完了報告本文・追加ブロック・次コマンド文面が直接保持されていないか
+- [ ] 完了報告 variant file path、選択条件、置換変数のみが保持されているか
+- [ ] 各 variant に共通必須フィールド（完了コマンド・対象・結果・検証結果・git永続化・次のコマンド）が含まれているか
+
 ### 品質確認
 
 - [ ] 各Stepが1つの明確な操作単位か
@@ -212,6 +243,11 @@ Command作成・改定時に確認する項目:
 - [ ] Guardrailsに実行前の前提条件が記載されているか
 - [ ] 完了報告フォーマットが指定されているか（Skill参照も可）
 - [ ] 既存の良い分離（agentdev-req-analysis/agentdev-req-file-manager等）を維持しているか
+
+### 追加時の判定（REQ-0108-062~063）
+
+- [ ] 新しい command / skill / reference を追加する場合、既存 artifact への APPEND / UPDATE で足りるかを確認したか
+- [ ] 長い説明を追加する場合、command / SKILL.md へ直接追加する前に reference / template / script のいずれに置くべきかを判定したか
 
 ## 参照
 
