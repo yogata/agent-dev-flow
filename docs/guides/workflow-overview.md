@@ -1,77 +1,89 @@
 # AgentDevFlow ワークフロー概要
 
-本ガイドは AgentDevFlow のコマンドパイプライン・フェーズ体系・Pattern分類を俯瞰的に説明する。基準は各 REQ/ADR/SPEC ファイルであり、本ガイドは参照用読み物である（REQ-0101）。基準文書と矛盾する記述がある場合、基準を優先する（REQ-0101）。
+本ガイドは AgentDevFlow の生成物の流れを中心に説明する。各コマンドが前工程の生成物を入力とし、次工程の生成物を出力する関係を示す。基準は各 REQ/ADR/SPEC ファイルであり、本ガイドは参照用読み物である（REQ-0101）。基準文書と矛盾する記述がある場合、基準を優先する（REQ-0101）。
 
-## 全体パイプライン
-
-AgentDevFlow は3つの系統を持つ。いずれも `req-define` に合流し、以降は共通のCase実行パイプラインを通る。
+## 生成物の流れ
 
 ```mermaid
 flowchart TD
-    subgraph Intake["Intake 系統"]
-        IC[intake-capture]
-        IR[intake-review]
-        IP[intake-promote]
+    subgraph Intake["Intake パイプライン"]
+        IC["ユーザー手動入力 / クローズ済み Issue"] -->|intake-capture / intake-from-github| INBOX["inbox/"]
+        INBOX -->|intake-review| ACC["accepted/"]
+        ACC -->|intake-promote| IP["promoted/"]
     end
-    subgraph Learning["Learning 系統"]
-        LR[learning-refine]
-        LP[learning-promote]
+    subgraph Learning["Learning パイプライン"]
+        LC["観測（case-run 中等）"] -->|learning-capture（skill）| LRB["inbox.md"]
+        LRB -->|learning-refine| ER["evaluation-report.md"]
+        ER -->|learning-promote| LP["promoted/"]
     end
-    BR[backlog-review]
-    BS[backlog-save]
-    RD[req-define]
-    RS[req-save]
-    CO[case-open]
-    CR[case-run]
-    CC[case-close]
-
-    IC --> IR --> IP --> BR
-    LR --> LP --> BR
-    BR --> BS -->|"RU を Requirement Source として渡す"| RD
-    RD -->|"Pattern B のみ"| RS
-    RS --> CO
+    IP --> BR
+    LP --> BR
+    BR["backlog-review"] -->|HITL 確認| BS["backlog-save"]
+    BS -->|"RU-*.md"| RD["req-define"]
+    RD -->|"要件doc（draft）"| RS["req-save"]
+    RS -->|"REQ/ADR ファイル"| CO["case-open"]
     RD -->|"Pattern A/C/D"| CO
-    CO --> CR --> CC
+    CO -->|"GitHub Issue"| CR["case-run"]
+    CR -->|"PR"| CC["case-close"]
+    CC -->|"マージ済み + クローズ済み"| DONE["完了"]
 ```
 
-| 系統 | 入口コマンド | 目的 |
-|------|-------------|------|
-| 通常開発 | `req-define` | 機能追加・バグ修正の要件定義から実装まで |
-| Intake | `intake-capture` | 作業候補の収集・分類・要件化 |
-| Learning | `learning-refine` | 再発防止知見の蓄積・要件化 |
+## Intake パイプライン
+
+具体的な作業候補を収集し、要件化への入力に変換する。
+
+| 前工程の生成物 | コマンド | 出力 | 備考 |
+|----------|------|------|------|
+| ユーザー手動入力 | `intake-capture` | `inbox/` | 推測不能な項目は省略 |
+| クローズ済み Issue/PR | `intake-from-github` | `inbox/` | 残課題を抽出 |
+| `inbox/` | `intake-review` | `accepted/` / `archive/` | 採用・却下・保留に判定 |
+| `accepted/` | `intake-promote` | `promoted/` | Issue化に必要な最小情報を含む |
+
+## Learning パイプライン
+
+再発防止知見を蓄積し、要件定義への入力に変換する。
+
+| 前工程の生成物 | コマンド | 出力 |
+|----------|------|------|
+| 観測（case-run 中等） | `learning-capture`（skill） | `inbox.md` |
+| `inbox.md` + `archive/active.md` | `learning-refine` | `evaluation-report.md` |
+| `evaluation-report.md` + `archive/` | `learning-promote` | `promoted/`（Requirement Source stub） |
+
+## Backlog パイプライン
+
+intake/learning 両方の promoted artifact を RU に統合する。
+
+| 前工程の生成物 | コマンド | 出力 | 備考 |
+|----------|------|------|------|
+| `promoted/`（intake/learning） | `backlog-review` | review draft | 分析・統合結果をユーザーに確認（HITL） |
+| review draft | `backlog-save` | `RU-*.md` | RU 生成成功後に元の promoted artifact を削除 |
+
+RU の粒度: N:1（複数 artifact を 1 RU に統合）、1:N（1 artifact を複数 RU に分割）。
 
 ## 要件定義パイプライン
 
-### req-define
+| 前工程の生成物 | コマンド | 出力 | 備考 |
+|----------|------|------|------|
+| セッション会話 / RU | `req-define` | 要件doc（draft） | AI と対話して要件を整理 |
+| 要件doc（Pattern B のみ） | `req-save` | REQ/ADR ファイル | commit/push まで実行 |
 
-AIとの対話を通じて要件を整理する。入力はセッション会話、出力は要件doc。
-
-処理の流れ:
-1. 既存 `REQ-*.md` をスキャンし、ユーザーの要件と関連する既存REQを特定
-2. 操作分類（CREATE / APPEND / UPDATE）を決定 — CREATEの前に必ずAPPEND/UPDATE候補を評価
+`req-define` の処理:
+1. 既存 `REQ-*.md` をスキャンし、関連する既存REQを特定
+2. 操作分類（CREATE / APPEND / UPDATE）を決定。CREATE の前に必ず APPEND/UPDATE 候補を評価
 3. Pattern と Scale を判定し、要件doc構造を出力
-4. 関連ドキュメント更新候補を抽出（直接矛盾 / 更新候補 / 影響なし）
+4. 関連ドキュメント更新候補を抽出
 
 **分類ゲート**: 既存成果物への反映作業のみを表す候補は、新規REQの独立要件行として扱わない（REQ-0102）。
 
-### req-save
-
-壁打ち成果物（`.sisyphus/drafts/`）を基準文書として保存する。Pattern B（機能追加）のみ実行する。
-
-- REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）を CREATE
-- `adr-required: true` の場合、ADR ファイル（`docs/adr/ADR-{NNNN}.md`）を CREATE
-- 保存後に `requirements/README.md` と `docs/README.md` の整合性を検証
-- commit / push まで実行
-
 ## Case実行パイプライン
 
-### case-open
+| 前工程の生成物 | コマンド | 出力 | 備考 |
+|----------|------|------|------|
+| REQ ファイル / 要件doc | `case-open` | GitHub Issue | Pattern B で `scale: large` の場合は Epic + 子Issue |
+| Issue | `case-run` | 実装済みブランチ + PR | 3フェーズ構成（準備・実装・提出） |
+| PR | `case-close` | マージ済み + クローズ済み | Findings/Intake候補を回収 |
 
-要件docと specs・ADR を読み取り、GitHub Issue を出力する。Pattern B で `scale: large` の場合、Epic + 子Issue を一括作成する。
-
-### case-run
-
-GitHub Issue を読み取り、worktree 上で実装し、PR を作成する。3フェーズ構成でべき等な再開ポイントを提供する（REQ-0106）。
+### case-run の3フェーズ
 
 | フェーズ | 内容 |
 |----------|------|
@@ -79,72 +91,12 @@ GitHub Issue を読み取り、worktree 上で実装し、PR を作成する。3
 | 実装 | Planに沿った実装・コミット・関連docs整合性確認 |
 | 提出 | PR作成・チェックボックス更新・Findings記録 |
 
-実装完了後、ローカルdiffからキーワードを抽出し `docs/specs/` で矛盾がないか自動確認する。本筋外の発見はPR本文の「Findings / Intake候補」セクションに記録する。
+### case-close の完了前検証
 
-### case-close
-
-PRマージ・Issueクローズ・ブランチ削除を実行する。完了前に以下を検証する:
 - 未チェック項目の達成判定（達成済みなら自動 `[x]` 更新）
 - 要件・SPEC・DOC-MAP の整合性
 - ADR 作成済みかの確認
 - マージ済みPR本文から Findings/Intake候補を回収し、intake item として保存
-
-## Intake / Learning パイプライン
-
-```mermaid
-flowchart TD
-    subgraph Intake["Intake pipeline"]
-        IC[intake-capture<br/>intake-from-github]
-        IR[intake-review]
-        IP[intake-promote]
-    end
-    subgraph Learning["Learning pipeline"]
-        LC[learning-capture<br/>（skill）]
-        LRef[learning-refine]
-        LProm[learning-promote]
-    end
-
-    IC -->|".agentdev/intake/inbox/"| IR
-    IR -->|採用→ accepted/"| IP
-    IR -->|却下→ archive/|
-    IP -->|"promoted/"| BR[backlog-review]
-    LC -->|inbox.md| LRef
-    LRef -->|evaluation-report.md| LProm
-    LProm -->|"promoted/"| BR
-    BR --> BS[backlog-save]
-    BS -->|"RU-*.md"| RD[req-define]
-```
-
-### Intake パイプライン
-
-具体的な作業候補を収集し、要件化への入力に変換する。
-
-| コマンド | 入力 | 出力 | 備考 |
-|----------|------|------|------|
-| intake-capture | ユーザー手動入力 | `.agentdev/intake/inbox/` | 推測不能な項目は省略 |
-| intake-from-github | クローズ済み Issue/PR | `.agentdev/intake/inbox/` | 残課題を抽出 |
-| intake-review | inbox の item | accepted / archive | 採用・却下・保留に判定 |
-| intake-promote | accepted の item | `.agentdev/intake/promoted/` | Issue化に必要な最小情報を含む |
-
-### Learning パイプライン
-
-再発防止知見を蓄積し、要件定義への入力に昇華する。
-
-| コマンド | 入力 | 出力 |
-|----------|------|------|
-| learning-capture（skill） | 観測 | `.agentdev/learning/inbox.md` |
-| learning-refine | inbox.md + archive/active.md | `evaluation-report.md` |
-| learning-promote | evaluation-report + archive | `.agentdev/learning/promoted/`（Requirement Source stub） |
-
-### backlog-review / backlog-save と RU lifecycle
-
-`backlog-review` は intake/learning 両方の promoted artifact を読み込み、分析・統合の結果をユーザーに確認（HITL）する。`backlog-save` は確認済みの内容をもとに Requirement Unit（RU）を生成・永続化する。
-
-- RU の粒度: N:1（複数artifact → 1RU統合）および 1:N（1artifact → 複数RU分割）
-- promoted artifact 間の矛盾は backlog-review でユーザーに確認
-- RU 生成成功後、backlog-save が元の promoted artifact を削除
-- `req-define` は RU を Requirement Source として受け入れる
-- `case-open`（Issue作成）の成功後、該当RUファイルを削除（REQ-0105-015）
 
 ## フェーズ体系
 
