@@ -94,14 +94,22 @@ REQ の active/retired/世代境界の整合性を確認する:
 
 収集した artifact を以下の6観点で診断する:
 
-| 観点 | 診断内容 |
-|------|----------|
-| **SPLIT** | 単一REQが複数の独立した関心事を含んでおり、分割が適切か |
-| **MERGE** | 複数のREQが密接に関連しており、統合が適切か |
-| **MOVE** | REQの内容が別の文書種（specs/guides/ADR）に移動すべきか |
-| **DUPLICATE** | REQ間またはREQと他文書で内容が重複しているか |
-| **RETIRE** | active REQのうち、retire すべき（現行仕様として不要な）ものがないか |
-| **DRIFT** | REQ本文と実体（specs/実装/コマンド）の間に乖離がないか |
+| 観点 | 診断内容 | 検出シグナル |
+|------|----------|-------------|
+| **SPLIT** | 単一REQが複数の独立した関心事を含んでおり、分割が適切か | (a) 1つのREQに複数の関心対象、(b) 複数 artifact 種別の混在、(c) 複数 command family の混在、(d) 複数 lifecycle 段階の混在 |
+| **MERGE** | 複数のREQが密接に関連しており、統合が適切か | (a) 複数REQが同じ目的、(b) 同じ対象 artifact、(c) 同じ command、(d) 同じ責務を扱っている |
+| **MOVE** | REQの内容が別の文書種（specs/guides/ADR）に移動すべきか | (a) REQ行が変更後仕様ではなく反映作業そのものになっている |
+| **DUPLICATE** | REQ間またはREQと他文書で内容が重複しているか | (a) active REQ 間または REQ と spec/guide/command の間で同じ SHALL/MUST 相当の責務が重複 |
+| **RETIRE** | active REQのうち、retire すべき（現行仕様として不要な）ものがないか | (a) active REQ が現行案内から参照されない、(b) 関心対象が既存 active REQ に吸収済み |
+| **DRIFT** | REQ本文と実体（specs/実装/コマンド）の間に乖離がないか | (a) REQ が要求する対象と実体ファイルまたは command 定義が矛盾している |
+
+#### シグナル閾値（REQ-0109-029~031）
+
+| シグナル数 | 扱い |
+|-----------|------|
+| 1シグナルのみ | 観察メモに留め、問題候補 finding としては出さない |
+| 2シグナル以上 | 問題候補 finding として出す |
+| 3シグナル以上、または active/retired 判断に影響 | 高優先度候補として出す |
 
 ### 6. 未処理artifact確認
 
@@ -122,6 +130,20 @@ REQ の active/retired/世代境界の整合性を確認する:
 2. **問題候補**: 各観点で検出された問題候補（REQ ID、観点、問題の概要）
 3. **推奨アクション**: 問題に対する推奨対応（req-define での再壁打ち、retire、MERGE 等）
 4. **req-define入力案**: 再構成が必要な場合、req-define で壁打ちすべき内容のドラフト（REQ ID 単位）
+
+#### 問題候補出力スキーマ（REQ-0109-034~037）
+
+各問題候補は以下の7フィールドを含めること:
+
+| フィールド | 内容 |
+|-----------|------|
+| 観点 | SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT のいずれか |
+| 対象 | REQ ID または対象 artifact |
+| 根拠 | 検出されたシグナルの具体的内容 |
+| シグナル数 | 検出されたシグナル数（2以上で finding 化） |
+| 確信度 | high / medium / low のいずれか |
+| 推奨アクション | SPLIT / MERGE / MOVE / RETIRE / UPDATE / APPEND / no-action のいずれか |
+| req-define入力案 | req-define での壁打ち内容のドラフト（不要な場合は「—」） |
 
 ### 8. 完了報告
 

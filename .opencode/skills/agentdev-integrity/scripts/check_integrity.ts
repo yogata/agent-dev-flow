@@ -15,6 +15,7 @@ import {
   findRepoRoot,
   determineRoute,
   writeReportFile,
+  classifyFindingLevel,
   type CheckResult,
   type CheckResultOptions,
   type IntegrityReport,
@@ -340,6 +341,11 @@ function checkAdrReqCrossReference(reqDir: string, adrDir: string, root: string)
   const adrFiles = listFiles(adrDir).filter((f) => f.startsWith("ADR-"));
   const existingAdrIds = new Set(adrFiles.map((f) => f.replace(".md", "")));
   const existingReqIds = new Set(reqFiles.map((f) => f.replace(".md", "")));
+  // REQ-0108-074: include retired REQ IDs as valid references
+  const retiredDir = path.join(reqDir, "retired");
+  const retiredFiles = fs.existsSync(retiredDir) ? listFiles(retiredDir).filter((f) => f.startsWith("REQ-")) : [];
+  const retiredReqIds = new Set(retiredFiles.map((f) => f.replace(".md", "")));
+  const allReqIds = new Set([...existingReqIds, ...retiredReqIds]);
 
   for (const file of reqFiles) {
     const fullPath = path.join(reqDir, file);
@@ -361,7 +367,8 @@ function checkAdrReqCrossReference(reqDir: string, adrDir: string, root: string)
     const references = content.match(/\bREQ-\d{4}\b/g) || [];
     const uniqueRefs = [...new Set(references)];
     for (const ref of uniqueRefs) {
-      if (!existingReqIds.has(ref)) {
+      // REQ-0108-074: active or retired existence check
+      if (!allReqIds.has(ref)) {
         results.push(ng("ADR", "adr-req-crossref", `${ref} referenced in ${file} but REQ file does not exist`));
       }
     }
@@ -688,68 +695,6 @@ function checkCompletionReportTemplates(cmdDir: string, completionReportsPath: s
 
   if (results.filter((r) => r.level === "ng").length === 0) {
     results.push(ok("CompletionReport", "template-section-existence", "All commands have corresponding sections in completion-reports.md"));
-  }
-  return results;
-}
-
-function checkInlineCompletionReports(cmdDir: string, root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-  let foundViolation = false;
-
-  const completionPatterns = [
-    /✅/,
-    /完了/,
-    /次のステップ/,
-    /次のコマンド/,
-  ];
-
-  const errorPatterns = [
-    /エラー/,
-    /Error/i,
-    /失敗/,
-    /リトライ/,
-    /Retry/i,
-  ];
-
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-
-    const lines = content.split("\n");
-    let inCodeBlock = false;
-
-    for (let i = 0; i < lines.length; i++) {
-      const trimmed = lines[i].trim();
-      if (trimmed.startsWith("```")) {
-        inCodeBlock = !inCodeBlock;
-        continue;
-      }
-      if (!inCodeBlock) continue;
-
-      const hasCompletionPattern = completionPatterns.some((p) => p.test(trimmed));
-      if (!hasCompletionPattern) continue;
-
-      const isErrorContext = errorPatterns.some((p) => p.test(trimmed));
-      if (isErrorContext) continue;
-
-      foundViolation = true;
-      results.push(
-        ng(
-          "CompletionReport",
-          "inline-completion-report",
-          `Inline completion report code block detected`,
-          resolveRelative(fullPath, root),
-          i + 1
-        )
-      );
-      break;
-    }
-  }
-
-  if (!foundViolation) {
-    results.push(ok("CompletionReport", "inline-completion-report", "No inline completion report code blocks detected"));
   }
   return results;
 }
@@ -2083,6 +2028,7 @@ function checkExcessLoadSkills(cmdDir: string, skillsDir: string, root: string):
 }
 
 function checkMissingLoadSkills(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
+  // REQ-0108-066: missing-load-skills is observation / opt-in diagnostic, not standard finding
   const results: CheckResult[] = [];
   const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
   const skillCache = buildSkillResponsibilityCache(skillsDir);
@@ -2129,16 +2075,19 @@ function checkMissingLoadSkills(cmdDir: string, skillsDir: string, root: string)
 
     for (const kw of capabilityKeywords) {
       if (!coveredCapabilities.has(kw)) {
-        results.push(info(
-          "Implementation Pattern", "missing-load-skills",
-          `[recommendation: load_skills-add-candidate] command '${file}' (pattern: ${pattern}) — no loaded skill covers capability '${kw}', manual review recommended`
-        ));
+        results.push({
+          category: "Implementation Pattern",
+          check: "missing-load-skills",
+          level: "info",
+          message: `[recommendation: load_skills-add-candidate] command '${file}' (pattern: ${pattern}) — no loaded skill covers capability '${kw}', manual review recommended`,
+          finding_level: "observation" as any,
+        });
       }
     }
   }
 
   if (results.length === 0) {
-    results.push(ok("Implementation Pattern", "missing-load-skills", "No missing load_skills concerns detected"));
+    results.push(ok("Implementation Pattern", "missing-load-skills", "No missing load_skills concerns detected (observation-level check)"));
   }
 
   return results;
@@ -2333,6 +2282,582 @@ function checkObsoleteReferenceDirs(skillsDir: string, root: string): CheckResul
   return results;
 }
 
+// ─── Bare slash check scoped to public command invocation (REQ-0108-076) ────
+
+const BARE_SLASH_COMMAND_PATTERNS = [
+  { pattern: /(?<!agentdev)\/case-open\b/g, name: "/case-open" },
+  { pattern: /(?<!agentdev)\/case-run\b/g, name: "/case-run" },
+  { pattern: /(?<!agentdev)\/case-close\b/g, name: "/case-close" },
+  { pattern: /(?<!agentdev)\/case-update\b/g, name: "/case-update" },
+  { pattern: /(?<!agentdev)\/req-define\b/g, name: "/req-define" },
+  { pattern: /(?<!agentdev)\/req-save\b/g, name: "/req-save" },
+  { pattern: /(?<!agentdev)\/integrity-check\b/g, name: "/integrity-check" },
+  { pattern: /(?<!agentdev)\/req-restructure-review\b/g, name: "/req-restructure-review" },
+  { pattern: /(?<!agentdev)\/intake-capture\b/g, name: "/intake-capture" },
+  { pattern: /(?<!agentdev)\/intake-review\b/g, name: "/intake-review" },
+  { pattern: /(?<!agentdev)\/intake-promote\b/g, name: "/intake-promote" },
+  { pattern: /(?<!agentdev)\/backlog-review\b/g, name: "/backlog-review" },
+  { pattern: /(?<!agentdev)\/backlog-save\b/g, name: "/backlog-save" },
+  { pattern: /(?<!agentdev)\/learning-refine\b/g, name: "/learning-refine" },
+  { pattern: /(?<!agentdev)\/learning-promote\b/g, name: "/learning-promote" },
+];
+
+function isBareSlashExemption(relPath: string, line: string): boolean {
+  // REQ-0108-076: exempt path fragments, completion-reports paths, reference paths,
+  // historical descriptions, detection target lists, test fixtures
+  const pathExemptions = [
+    /completion-reports\//,
+    /reference\//,
+    /references\//,
+    /\.test\./,
+    /_test\./,
+    /spec\//,
+  ];
+  if (pathExemptions.some((re) => re.test(relPath))) return true;
+
+  // Exempt lines that are detection target lists or path references
+  const lineExemptions = [
+    /旧\s*bare\s*command/i,
+    /旧.*コマンド名/i,
+    /検出対象/,
+    /bare\s*slash/i,
+    /pattern.*:/,
+    /\|.*\|.*\|/,
+  ];
+  if (lineExemptions.some((re) => re.test(line))) return true;
+
+  return false;
+}
+
+function checkBareSlashScoped(skillsDir: string, cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const filesToCheck: string[] = [];
+
+  for (const dir of listDirs(skillsDir)) {
+    const skillMd = path.join(skillsDir, dir, "SKILL.md");
+    if (fs.existsSync(skillMd)) filesToCheck.push(skillMd);
+    const refsDir = path.join(skillsDir, dir, "references");
+    if (fs.existsSync(refsDir)) {
+      for (const f of listFiles(refsDir)) filesToCheck.push(path.join(refsDir, f));
+    }
+  }
+  for (const file of listFiles(cmdDir)) {
+    if (file !== "README.md" && file !== "integrity-check.md") {
+      filesToCheck.push(path.join(cmdDir, file));
+    }
+  }
+
+  let foundViolation = false;
+  for (const filePath of filesToCheck) {
+    const content = readText(filePath);
+    if (!content) continue;
+    const relPath = resolveRelative(filePath, root);
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (isBareSlashExemption(relPath, line)) continue;
+      for (const { pattern, name } of BARE_SLASH_COMMAND_PATTERNS) {
+        pattern.lastIndex = 0;
+        if (pattern.test(line)) {
+          foundViolation = true;
+          results.push(ng(
+            "Namespace", "bare-slash-scoped",
+            `Bare slash command '${name}' in public command invocation context`,
+            relPath, i + 1,
+            { evidence: line.trim(), expected: "use /agentdev/{cmd} form", route: "intake" }
+          ));
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(ok("Namespace", "bare-slash-scoped", "No bare slash command invocations outside exempt contexts"));
+  }
+  return results;
+}
+
+// ─── Retired REQ frontmatter/id checks (REQ-0108-080~082) ─────────────────
+
+function checkRetiredFrontmatter(reqDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const retiredDir = path.join(reqDir, "retired");
+  if (!fs.existsSync(retiredDir)) {
+    results.push(info("REQ", "retired-frontmatter", "No retired directory found"));
+    return results;
+  }
+
+  const activeFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-") && f !== "README.md");
+  const activeIds = new Set(activeFiles.map((f) => f.replace(".md", "")));
+
+  const retiredFiles = listFiles(retiredDir).filter((f) => f.startsWith("REQ-"));
+  const required = ["id", "title", "created", "updated", "tags"];
+
+  for (const file of retiredFiles) {
+    const fullPath = path.join(retiredDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    const relPath = resolveRelative(fullPath, root);
+
+    if (!fm) {
+      results.push(ng("REQ", "retired-frontmatter-filename", `No valid frontmatter`, relPath));
+      continue;
+    }
+
+    // REQ-0108-080: filename ↔ frontmatter id match
+    const expectedId = file.replace(".md", "");
+    const actualId = fm["id"];
+    if (typeof actualId !== "string") {
+      results.push(ng("REQ", "retired-frontmatter-filename", `Missing or invalid 'id' field`, relPath));
+    } else if (actualId !== expectedId) {
+      results.push(ng("REQ", "retired-frontmatter-filename", `id '${actualId}' does not match filename '${expectedId}'`, relPath));
+    }
+
+    // REQ-0108-081: required frontmatter fields
+    const missing = required.filter((k) => fm[k] === undefined || fm[k] === "");
+    if (missing.length > 0) {
+      results.push(ng("REQ", "retired-required-fields", `Missing required fields: ${missing.join(", ")}`, relPath));
+    }
+  }
+
+  // REQ-0108-082: active/retired cross-boundary ID duplication
+  const retiredIds = new Set(retiredFiles.map((f) => f.replace(".md", "")));
+  for (const id of activeIds) {
+    if (retiredIds.has(id)) {
+      results.push(ng(
+        "REQ", "retired-frontmatter-filename",
+        `${id} exists in both active and retired directories (ID duplication)`,
+        undefined, undefined,
+        { evidence: `${id}.md in both dirs`, expected: "unique IDs across active and retired", route: "intake" }
+      ));
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("REQ", "retired-frontmatter-filename", "All retired REQ frontmatter and IDs are valid"));
+  }
+  return results;
+}
+
+// ─── Mapping-table checks (REQ-0108-083~088) ──────────────────────────────
+
+const VALID_MAPPING_STATUSES = new Set(["migrated", "retired-no-successor", "historical-only"]);
+
+function parseMappingTable(mappingPath: string): {
+  entries: Array<{ oldReq: string; status: string; successor: string | null }>;
+  allOldRefs: Set<string>;
+} {
+  const entries: Array<{ oldReq: string; status: string; successor: string | null }> = [];
+  const allOldRefs = new Set<string>();
+  const content = readText(mappingPath);
+  if (!content) return { entries, allOldRefs };
+
+  const lines = content.split("\n");
+  let inTable = false;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("|")) { inTable = false; continue; }
+    if (/^[\s|:-]+$/.test(trimmed)) continue;
+    const cells = trimmed.split("|").map((c) => c.trim()).filter((c) => c.length > 0);
+    if (cells.length >= 2 && /REQ-\d{4}/.test(cells[0])) {
+      inTable = true;
+      const oldReqMatch = cells[0].match(/(REQ-\d{4})/);
+      const statusMatch = cells[1]?.trim();
+      const successorText = cells.length >= 3 ? cells[2]?.trim() : "";
+      if (oldReqMatch) {
+        allOldRefs.add(oldReqMatch[1]);
+        let successor: string | null = null;
+        if (successorText && successorText !== "なし" && successorText !== "—") {
+          const successorMatches = successorText.match(/REQ-\d{4}/g);
+          if (successorMatches && successorMatches.length === 1) {
+            successor = successorMatches[0];
+          }
+        }
+        entries.push({ oldReq: oldReqMatch[1], status: statusMatch || "", successor });
+      }
+    }
+  }
+
+  return { entries, allOldRefs };
+}
+
+function checkMappingTable(reqDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const mappingPath = path.join(reqDir, "mapping-table.md");
+  const mappingContent = readText(mappingPath);
+
+  if (!mappingContent) {
+    results.push(info("MappingTable", "mapping-table-checks", "mapping-table.md not found"));
+    return results;
+  }
+
+  const retiredDir = path.join(reqDir, "retired");
+  const activeFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-") && f !== "README.md");
+  const activeIds = new Set(activeFiles.map((f) => f.replace(".md", "")));
+  const retiredFiles = fs.existsSync(retiredDir) ? listFiles(retiredDir).filter((f) => f.startsWith("REQ-")) : [];
+  const retiredIds = new Set(retiredFiles.map((f) => f.replace(".md", "")));
+  const allReqIds = new Set([...activeIds, ...retiredIds]);
+
+  const { entries, allOldRefs } = parseMappingTable(mappingPath);
+
+  // REQ-0108-084: all retired REQs recorded in mapping-table
+  for (const id of retiredIds) {
+    if (!allOldRefs.has(id)) {
+      results.push(ng(
+        "MappingTable", "mapping-table-completeness",
+        `Retired REQ ${id} not found in mapping-table`,
+        resolveRelative(mappingPath, root),
+        undefined,
+        { evidence: id, expected: "all retired REQs must be in mapping table", route: "intake" }
+      ));
+    }
+  }
+
+  // REQ-0108-085: mapping-table references non-existent old REQ IDs
+  for (const oldRef of allOldRefs) {
+    if (!allReqIds.has(oldRef)) {
+      results.push(ng(
+        "MappingTable", "mapping-table-completeness",
+        `mapping-table references ${oldRef} but REQ does not exist in active or retired`,
+        resolveRelative(mappingPath, root),
+        undefined,
+        { evidence: oldRef, expected: "all old REQ refs must exist", route: "intake" }
+      ));
+    }
+  }
+
+  // REQ-0108-086: migrated successor must exist as active REQ
+  for (const entry of entries) {
+    if (entry.status === "migrated" && entry.successor) {
+      if (!activeIds.has(entry.successor)) {
+        results.push(ng(
+          "MappingTable", "mapping-table-migration-target",
+          `${entry.oldReq} migrated to ${entry.successor} but target is not an active REQ`,
+          resolveRelative(mappingPath, root),
+          undefined,
+          { evidence: entry.successor, expected: "migration target must be active REQ", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  // REQ-0108-087: status enum validation
+  for (const entry of entries) {
+    if (!VALID_MAPPING_STATUSES.has(entry.status)) {
+      results.push(ng(
+        "MappingTable", "mapping-table-status-enum",
+        `${entry.oldReq} has unknown status '${entry.status}'`,
+        resolveRelative(mappingPath, root),
+        undefined,
+        { evidence: entry.status, expected: `one of: ${[...VALID_MAPPING_STATUSES].join(", ")}`, route: "intake" }
+      ));
+    }
+  }
+
+  // REQ-0108-088: retired-no-successor / historical-only should not have migration target
+  for (const entry of entries) {
+    if ((entry.status === "retired-no-successor" || entry.status === "historical-only") && entry.successor) {
+      results.push(warn(
+        "MappingTable", "mapping-table-status-enum",
+        `${entry.oldReq} has status '${entry.status}' but migration target '${entry.successor}' is set`,
+        resolveRelative(mappingPath, root),
+        undefined,
+        { evidence: `${entry.status} → ${entry.successor}`, expected: "no migration target for this status", route: "intake" }
+      ));
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("MappingTable", "mapping-table-checks", "Mapping-table is consistent"));
+  }
+  return results;
+}
+
+// ─── Variant path existence & registry checks (REQ-0108-089~091) ──────────
+
+function checkVariantPathExistence(cmdDir: string, completionReportsPath: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  const baseDir = getCompletionReportsDir(completionReportsPath);
+
+  for (const file of cmdFiles) {
+    const cmdName = file.replace(".md", "");
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+
+    const variantRefs = content.match(/completion-reports\/[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*\.md/g) || [];
+    const uniqueRefs = [...new Set(variantRefs)];
+
+    for (const ref of uniqueRefs) {
+      const variantPath = path.join(path.dirname(completionReportsPath), ref);
+      if (!fs.existsSync(variantPath)) {
+        results.push(ng(
+          "VariantReport", "variant-path-existence",
+          `Command '${cmdName}' references '${ref}' but file does not exist`,
+          resolveRelative(fullPath, root),
+          undefined,
+          { evidence: ref, expected: "referenced variant file must exist", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("VariantReport", "variant-path-existence", "All referenced variant paths exist"));
+  }
+  return results;
+}
+
+function checkVariantRegistryRegistered(cmdDir: string, completionReportsPath: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  if (!hasVariantRegistry(completionReportsPath)) return results;
+
+  const sections = buildCompletionReportSections(completionReportsPath);
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+
+  for (const file of cmdFiles) {
+    const cmdName = file.replace(".md", "");
+    if (cmdName === "integrity-check") continue;
+    if (!sections.has(cmdName)) {
+      const cmdPath = path.join(cmdDir, file);
+      results.push(ng(
+        "VariantReport", "variant-registry-registered",
+        `Command '${cmdName}' has no entry in completion-reports registry`,
+        resolveRelative(cmdPath, root),
+        undefined,
+        { evidence: cmdName, expected: "each command must have a registry entry", route: "intake" }
+      ));
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("VariantReport", "variant-registry-registered", "All commands have registry entries"));
+  }
+  return results;
+}
+
+// ─── Skill frontmatter checks (REQ-0108-092~094) ──────────────────────────
+
+function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const skillDirs = listDirs(skillsDir);
+
+  for (const dir of skillDirs) {
+    const skillMdPath = path.join(skillsDir, dir, "SKILL.md");
+    const content = readText(skillMdPath);
+    if (!content) continue;
+    const relPath = resolveRelative(skillMdPath, root);
+
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+
+    // REQ-0108-092: name ↔ dir match
+    const fmName = fm["name"];
+    if (typeof fmName === "string" && fmName !== dir) {
+      results.push(ng(
+        "Skill", "skill-name-dir-match",
+        `SKILL.md name '${fmName}' does not match directory '${dir}'`,
+        relPath,
+        undefined,
+        { evidence: `name: ${fmName}, dir: ${dir}`, expected: "name must match directory name", route: "intake" }
+      ));
+    }
+
+    // REQ-0108-093: USE FOR / DO NOT USE FOR boundary
+    if (!content.includes("USE FOR") && !content.includes("use for")) {
+      results.push(warn(
+        "Skill", "skill-use-for-boundary",
+        `Skill '${dir}' has no USE FOR section — boundary unclear`,
+        relPath,
+        undefined,
+        { evidence: dir, expected: "USE FOR section should exist", route: "intake" }
+      ));
+    }
+    if (!content.includes("DO NOT USE FOR") && !content.includes("do not use for")) {
+      results.push(info(
+        "Skill", "skill-use-for-boundary",
+        `Skill '${dir}' has no DO NOT USE FOR section`,
+        relPath
+      ));
+    }
+
+    // REQ-0108-094: reference/ vs references/ (also covered by checkObsoleteReferenceDirs,
+    // but check per SKILL.md reference)
+    const obsoleteRefDir = path.join(skillsDir, dir, "reference");
+    if (fs.existsSync(obsoleteRefDir)) {
+      results.push(ng(
+        "Skill", "skill-use-for-boundary",
+        `Skill '${dir}' has obsolete 'reference/' directory (should be 'references/')`,
+        resolveRelative(obsoleteRefDir, root),
+        undefined,
+        { evidence: `reference/`, expected: `references/`, route: "intake" }
+      ));
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("Skill", "skill-frontmatter", "All skill frontmatter and directories are consistent"));
+  }
+  return results;
+}
+
+// ─── Command frontmatter checks (REQ-0108-095~099) ────────────────────────
+
+const KNOWN_AGENTS = new Set(["sisyphus", "prometheus", "oracle", "metis", "hephaestus", "momus", "test-agent"]);
+
+function checkCommandFrontmatterDetailed(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+    const relPath = resolveRelative(fullPath, root);
+    const cmdName = file.replace(".md", "");
+
+    // REQ-0108-095: implementation_pattern required
+    const implPattern = fm["implementation_pattern"];
+    if (!implPattern || (typeof implPattern === "string" && implPattern.trim() === "")) {
+      results.push(ng(
+        "Command", "cmd-implementation-pattern",
+        `Command '${cmdName}' missing implementation_pattern`,
+        relPath, undefined,
+        { evidence: "missing", expected: "must have implementation_pattern", route: "req-define" }
+      ));
+    } else if (typeof implPattern === "string" && !IMPLEMENTATION_PATTERNS.includes(implPattern as any)) {
+      results.push(ng(
+        "Command", "cmd-implementation-pattern",
+        `Command '${cmdName}' has unknown implementation_pattern '${implPattern}'`,
+        relPath, undefined,
+        { evidence: implPattern, expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" }
+      ));
+    }
+
+    // REQ-0108-096: secondary_pattern must be known
+    const secPattern = fm["secondary_pattern"];
+    if (secPattern && typeof secPattern === "string" && secPattern.trim() !== "") {
+      if (!IMPLEMENTATION_PATTERNS.includes(secPattern as any)) {
+        results.push(ng(
+          "Command", "cmd-secondary-pattern",
+          `Command '${cmdName}' has unknown secondary_pattern '${secPattern}'`,
+          relPath, undefined,
+          { evidence: secPattern, expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" }
+        ));
+      }
+    }
+
+    // REQ-0108-097: load_skills must be array
+    const ls = fm["load_skills"];
+    if (ls !== undefined && !Array.isArray(ls)) {
+      results.push(ng(
+        "Command", "cmd-load-skills-array",
+        `Command '${cmdName}' load_skills is not array format`,
+        relPath, undefined,
+        { evidence: typeof ls, expected: "array", route: "req-define" }
+      ));
+    }
+
+    // REQ-0108-098: agent must be known
+    const agent = fm["agent"];
+    if (typeof agent === "string" && !KNOWN_AGENTS.has(agent)) {
+      results.push(warn(
+        "Command", "cmd-agent-name",
+        `Command '${cmdName}' has unknown agent '${agent}'`,
+        relPath, undefined,
+        { evidence: agent, expected: `one of: ${[...KNOWN_AGENTS].join(", ")}`, route: "req-define" }
+      ));
+    }
+
+    // REQ-0108-099: deprecated command in inventory
+    if (content.includes("非推奨") || content.includes("deprecated")) {
+      const readmePath = path.join(cmdDir, "README.md");
+      const readmeContent = readText(readmePath);
+      if (readmeContent && readmeContent.includes(cmdName)) {
+        results.push(warn(
+          "Command", "cmd-deprecated-in-inventory",
+          `Command '${cmdName}' is marked deprecated but listed in command README inventory`,
+          relPath, undefined,
+          { evidence: `${cmdName} deprecated but in README`, expected: "deprecated commands should be removed from active inventory", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(ok("Command", "cmd-frontmatter-detailed", "All command frontmatter fields are valid"));
+  }
+  return results;
+}
+
+// ─── Inline completion report detection tightened (REQ-0108-079) ──────────
+
+function checkInlineCompletionReportsStrict(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
+  let foundViolation = false;
+
+  // REQ-0108-079: detect only when multiple common required fields appear in same code block
+  const REQUIRED_FIELD_INDICATORS = [
+    /完了コマンド/,
+    /次のコマンド/,
+    /検証結果/,
+    /git 永続化/,
+  ];
+
+  for (const file of cmdFiles) {
+    const fullPath = path.join(cmdDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+
+    const lines = content.split("\n");
+    let inCodeBlock = false;
+    let blockStart = -1;
+    let blockMatches = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim();
+      if (trimmed.startsWith("```")) {
+        if (inCodeBlock) {
+          // Block ended
+          if (blockMatches >= 2) {
+            foundViolation = true;
+            results.push(ng(
+              "CompletionReport", "inline-completion-report",
+              `Inline completion report body detected (${blockMatches} required fields in code block)`,
+              resolveRelative(fullPath, root),
+              blockStart + 1
+            ));
+          }
+          blockMatches = 0;
+          blockStart = -1;
+        } else {
+          blockStart = i;
+          blockMatches = 0;
+        }
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+      if (!inCodeBlock) continue;
+
+      for (const indicator of REQUIRED_FIELD_INDICATORS) {
+        if (indicator.test(trimmed)) {
+          blockMatches++;
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(ok("CompletionReport", "inline-completion-report", "No inline completion report code blocks with required fields detected"));
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -2379,6 +2904,7 @@ async function main(): Promise<void> {
     ...checkReqFrontmatterFilename(reqDir, root),
     ...checkReqRequiredFields(reqDir, root),
     ...checkReqReadmeIndexSync(reqDir, root),
+    ...checkRetiredFrontmatter(reqDir, root),
     ...checkAdrReqCrossReference(reqDir, adrDir, root),
     ...checkLoadSkillsExistence(cmdDir, skillsDir, root),
     ...checkSkillAgentdevPrefix(skillsDir, root),
@@ -2387,15 +2913,18 @@ async function main(): Promise<void> {
     ...checkExpandedReadmeSync(cmdDir, root),
     ...checkCommandInventory(cmdDir, root),
     ...checkLegacyNamespace(skillsDir, cmdDir, root),
+    ...checkBareSlashScoped(skillsDir, cmdDir, root),
     ...checkNameCollision(skillsDir, root),
     ...checkSpecsExistence(specsDir, root),
     ...checkCompletionReportSkills(cmdDir, root),
     ...checkCompletionReportTemplates(cmdDir, completionReportsPath, root),
-    ...checkInlineCompletionReports(cmdDir, root),
+    ...checkInlineCompletionReportsStrict(cmdDir, root),
     ...checkVariantExistence(completionReportsPath, root),
     ...checkInlineCompletionBodyInCommands(cmdDir, root),
     ...checkVariantRequiredFields(completionReportsPath, root),
     ...checkFragmentPatterns(completionReportsPath, root),
+    ...checkVariantPathExistence(cmdDir, completionReportsPath, root),
+    ...checkVariantRegistryRegistered(cmdDir, completionReportsPath, root),
     ...checkPostCompletionOutput(cmdDir, root),
     ...checkTerminology(cmdDir, root),
     ...checkLinkIntegrity(root),
@@ -2416,7 +2945,16 @@ async function main(): Promise<void> {
     ...checkMissingLoadSkills(cmdDir, skillsDir, root),
     ...checkUseForConsistency(cmdDir, skillsDir, root),
     ...checkObsoleteReferenceDirs(skillsDir, root),
+    ...checkMappingTable(reqDir, root),
+    ...checkSkillFrontmatter(skillsDir, root),
+    ...checkCommandFrontmatterDetailed(cmdDir, root),
   ];
+
+  for (const r of results) {
+    if (!r.finding_level) {
+      r.finding_level = classifyFindingLevel(r.level, r.check);
+    }
+  }
 
   const summary = computeSummary(results);
 
