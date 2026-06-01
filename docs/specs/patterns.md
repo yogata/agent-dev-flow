@@ -30,7 +30,7 @@ load_skills:
 
 ### Implementation Pattern 指定
 
-各コマンドのfrontmatterに `implementation_pattern` を指定する（REQ-0103-015）。定義と対応表は [`reference/command-map.md`](../../.opencode/skills/agentdev-workflow-lifecycle/reference/command-map.md) の「Implementation Pattern Taxonomy」セクションが SSoT である。
+各コマンドのfrontmatterに `implementation_pattern` を指定する（REQ-0103-015）。定義と対応表は [`references/command-map.md`](../../.opencode/skills/agentdev-workflow-lifecycle/references/command-map.md) の「Implementation Pattern Taxonomy」セクションが SSoT である。
 
 ```yaml
 ---

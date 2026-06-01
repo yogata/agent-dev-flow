@@ -1,75 +1,60 @@
 # .agentdev/ — AgentDevFlow Domain State Directory
 
-AgentDevFlow plugin の canonical domain state を格納するディレクトリ。
+AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101-022, 023）。
 
-## 目的
+`.agentdev/` は canonical domain state であり、コマンド間で受け渡される永続的な成果物を保持する。`.sisyphus/` は runtime workspace であり、実行時の一時作業領域である。`.sisyphus/drafts/` の working draft は canonical domain state ではない。
 
-AgentDevFlow の永続化すべき domain artifact（intake items、learning data、integrity reports 等）を格納する。各サブディレクトリの構成は、実装を担当する子issueで定義される（REQ-0017-009）。
+## 状態表
 
-## .sisyphus/ との責任分離
+| Path | 状態 | Producer | Consumer / Next command | Retention / Removal |
+|------|------|----------|------------------------|---------------------|
+| `intake/inbox/*.md` | raw item | `intake-capture`, `intake-from-github` | `intake-review` | `intake-promote` 成功後に `archive/` へ移動 |
+| `intake/accepted/*.md` | 採用済み | `intake-review` | `intake-promote` | `intake-promote` 成功後に `archive/promoted/` へ移動 |
+| `intake/promoted/*.md` | promoted artifact | `intake-promote` | `backlog-review` | `backlog-save` による RU 化成功後に削除 |
+| `intake/archive/rejected/*.md` | 却下（終端） | `intake-review` | なし | 永続（履歴参照） |
+| `intake/archive/promoted/*.md` | promote 済み（終端） | `intake-promote` | なし | 永続（履歴参照） |
+| `learning/inbox.md` | 未整理エントリ | `learning-capture`（skill） | `learning-refine` | `learning-refine` 成功後にクリア |
+| `learning/archive/active.md` | 分類済み living pool | `learning-refine` | `learning-refine`, `learning-promote` | living pool。prune 対象は削除可 |
+| `learning/evaluation-report.md` | 境界 artifact | `learning-refine` | `learning-promote` | 毎回上書き |
+| `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-save` による RU 化成功後に削除 |
+| `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-save`, session-sourced | `req-define`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
+| `integrity/reports/*.md` | 検証レポート | `integrity-check` | ユーザー参照 | 永続（履歴参照） |
 
-| ディレクトリ | 役割 | 内容 |
+## .agentdev/ と .sisyphus/ の境界
+
+| ディレクトリ | 性質 | 内容 |
 |---|---|---|
-| `.sisyphus/` | Sisyphus runtime workspace | 実行計画 (plans)、証跡 (evidence)、タスク (tasks)、実行状態 (execution)、下書き (drafts)、レポート (reports)、アーカイブ (archives) |
-| `.agentdev/` | AgentDevFlow domain state | intake items、learning pipeline data、integrity reports 等の canonical domain artifact |
+| `.agentdev/` | 永続 domain state | intake items、learning data、RU、integrity reports |
+| `.sisyphus/` | Runtime workspace | 実行計画、証跡、タスク、実行状態、下書き、レポート |
 
-### 原則
+**原則**: `.sisyphus/` の成果物は canonical domain state ではない。`req-define` が生成する working draft（`.sisyphus/drafts/req-draft-*.md`）は canonical ではなく、`req-save` の出力（REQ/ADR ファイル）が canonical である。
 
-- `.sisyphus/` は Sisyphus runtime が管理する一時的な作業領域
-- `.agentdev/` は AgentDevFlow の domain として永続化すべき状態
-- 両者は明確に分離され、互いに依存しない
+## ディレクトリ構成
 
-### 例外: .sisyphus/drafts/req-draft-*.md (REQ-0017-046)
-
-`/agentdev/req-define` が生成する draft は、Prometheus runtime constraint により `.sisyphus/drafts/` に保存される。これらの working draft は **AgentDevFlow の canonical domain state ではない**。
-
-- `.sisyphus/drafts/req-draft-*.md` = Prometheus working draft（canonical domain state ではない）
-- `/agentdev/req-save` の出力（REQ / ADR / requirements index）= AgentDevFlow domain artifact（canonical）
-- 既存の `.sisyphus/drafts/req-draft-*.md` を `.agentdev/` 配下へ移行する要件はない
-
-## サブディレクトリ構成
-
-初期状態では `.agentdev/` 直下にファイルを配置しない。各サブディレクトリは対応する子issueで作成される:
-
-| サブディレクトリ | 対象 Issue | 内容 |
-|---|---|---|
-| `intake/` | #286 | intake items |
-| `learning/` | #288 | learning pipeline data |
-| `integrity/` | #291 | integrity reports |
-
-## ディレクトリ構成（REQ-0039 準拠）
-
+```
 .agentdev/
 ├── intake/
 │   ├── inbox/           ← intake-capture / intake-from-github が raw item を保存
-│   │   └── *.md
 │   ├── accepted/        ← intake-review が採用 item を移動
-│   │   └── *.md
 │   ├── promoted/        ← intake-promote が派生 artifact を出力（フラット）
-│   │   └── *.md
-│   └── archive/         ← intake-promote 成功後に raw item を移動（フラット）
-│       └── *.md
-│
+│   └── archive/
+│       ├── promoted/    ← promote 済み item の記録
+│       └── rejected/    ← 却下 item の記録
 ├── learning/
 │   ├── inbox.md         ← learning-capture が生学びを追記
 │   ├── evaluation-report.md ← learning-refine が評価レポートを生成
-│   ├── archive/         ← learning-refine が entry を移動（living pool）
-│   │   ├── active.md    ← 現在有効な learning entry
-│   │   └── YYYY-MM.md  ← 月次 prune 済み archive（将来用）
+│   ├── archive/
+│   │   └── active.md    ← 分類済み learning entry の living pool
 │   └── promoted/        ← learning-promote が staging stub を出力（フラット）
-│       └── *.md
-│
 ├── backlog/
-│   └── req-units/       ← req-backlog が RU を生成
+│   └── req-units/       ← backlog-save が RU を生成
 │       └── RU-*.md
-│
-└── integrity/           ← integrity-check が検証結果を保存
+└── integrity/
+    └── reports/         ← integrity-check が検証結果を保存
+```
 
 ## 参照
 
-- REQ-0017: AgentDevFlow plugin namespace 統一と learning / intake / integrity の正式化
-- REQ-0017-007: `.agentdev/` SHALL be the domain state directory
-- REQ-0017-008: `.sisyphus/` = runtime workspace, `.agentdev/` = domain state
-- REQ-0017-009: Sub-directory structure defined by child issues
-- REQ-0017-046: `.sisyphus/drafts/req-draft-*.md` exception
-- ADR-0005: AgentDevFlow plugin namespace 採用
+- [REQ-0101](../docs/requirements/REQ-0101.md): 文書・REQ管理基準（017-026）
+- [REQ-0105](../docs/requirements/REQ-0105.md): Intake / Learning / Backlog lifecycle
+- [ADR-0005](../docs/adr/ADR-0005.md): AgentDevFlow plugin namespace

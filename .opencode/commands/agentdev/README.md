@@ -1,106 +1,47 @@
 ---
-description: agentdev コマンドセットの使用ガイド
+description: agentdev コマンドリファレンス
 ---
 
-# agentdev コマンド使用ガイド
+# agentdev コマンドリファレンス
 
-AgentDevFlow の全ドメイン（req/case/learning/intake/integrity）パイプラインを提供するコマンドセット。
+AgentDevFlow の各コマンドの入力・出力・次アクションを一覧化する（REQ-0101-026）。
 
 ## コマンド一覧
 
-| コマンド | 役割 | 対象フェーズ |
-|----------|------|-------------|
-| `/agentdev/req-define` | 要件の壁打ち・整理 | 壁打ちフェーズ |
-| `/agentdev/req-save` | 壁打ち成果物をREQ/ADRファイルとして保存 | 壁打ちフェーズ |
-| `/agentdev/case-open` | REQファイルからGitHub Issue作成 | 壁打ちフェーズ |
-| `/agentdev/case-run` | 計画立案から実装・コミット・PR作成まで一括実行 | 構造的実行フェーズ |
-| `/agentdev/case-update` | Issue本文の更新やコメント追加 | 構造的実行・レビュー完了 |
-| `/agentdev/case-close` | PRマージ・記録追記・Issueクローズ・ブランチ削除 | レビュー完了フェーズ |
+| Command | Primary Input | Primary Output | Next |
+|---------|--------------|----------------|------|
+| `/agentdev/req-define` | セッション会話 / RU | 要件doc（draft） | Pattern B: `/agentdev/req-save`、A/C/D: `/agentdev/case-open` |
+| `/agentdev/req-save` | 要件doc（Pattern B のみ） | REQ/ADR ファイル | `/agentdev/case-open` |
+| `/agentdev/case-open` | REQ ファイル / 要件doc | GitHub Issue | `/agentdev/case-run` |
+| `/agentdev/case-run` | Issue | 実装済みブランチ + PR | レビュー後: `/agentdev/case-close` |
+| `/agentdev/case-update` | Issue | 更新済み Issue | 継続または `/agentdev/case-close` |
+| `/agentdev/case-close` | PR + Issue | マージ済み + クローズ済み | 完了 |
+| `/agentdev/intake-capture` | ユーザー手動入力 | `inbox/` item | `/agentdev/intake-review` |
+| `/agentdev/intake-from-github` | クローズ済み Issue/PR | `inbox/` item | `/agentdev/intake-review` |
+| `/agentdev/intake-review` | `inbox/` item | `accepted/` / `archive/` | `/agentdev/intake-promote` |
+| `/agentdev/intake-promote` | `accepted/` item | `promoted/` artifact | `/agentdev/backlog-review` |
+| `/agentdev/learning-refine` | `inbox.md` + `archive/active.md` | `evaluation-report.md` | `/agentdev/learning-promote` |
+| `/agentdev/learning-promote` | `evaluation-report.md` + `archive/` | `promoted/` artifact | `/agentdev/backlog-review` |
+| `/agentdev/backlog-review` | `promoted/` artifact（intake/learning） | review draft | `/agentdev/backlog-save` |
+| `/agentdev/backlog-save` | review draft | `RU-*.md` | `/agentdev/req-define` |
+| `/agentdev/req-restructure-review` | REQ 体系 | 診断レポート | 必要に応じて `/agentdev/req-define` |
+| `/agentdev/integrity-check` | ドキュメント・スキル・コマンド | 検証レポート | 乖離検出時: 該当コマンドで修正 |
 
-### learning コマンド（学びの蓄積・分析・昇華）
+## 各コマンドの定義ファイル
 
-| コマンド | 役割 | 対象フェーズ |
-|----------|------|-------------|
-| `/agentdev/learning-refine` | inbox を問題クラス分類→8軸評価→archive移動 | 学びパイプライン |
-| `/agentdev/learning-promote` | 評価レポートから昇華判定→staging stub生成 | 学びパイプライン |
-
-### intake コマンド（未回収課題の回収）
-
-| コマンド | 役割 |
-|----------|------|
-| `/agentdev/intake-capture` | 変更候補を intake item として保存 |
-| `/agentdev/intake-from-github` | クローズ済み issue/PR から残課題を intake item として保存 |
-| `/agentdev/intake-review` | intake item の review・採用可否判断 |
-| `/agentdev/intake-promote` | review 済み item を promoted artifact に整形 |
-| `/agentdev/backlog-review` | promoted artifact を分析・統合しユーザー承認を得る |
-| `/agentdev/backlog-save` | 承認済み review 結果から RU を生成・永続化する |
-
-### REQ再構成レビューコマンド
-
-| コマンド | 役割 |
-|----------|------|
-| `/agentdev/req-restructure-review` | REQ体系の健全性を診断し、再構成の推奨アクションを提示 |
-
-### integrity コマンド（整合性検証）
-
-| コマンド | 役割 |
-|----------|------|
-| `/agentdev/integrity-check` | ドキュメント・スキル・コマンドの整合性を検証 |
-
-## 基本フロー
-
-### req/case パイプライン（開発ワークフロー）
-
-```
-/agentdev/req-define → /agentdev/req-save → /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
-```
-
-バグ修正・軽微変更の場合、`req-save` をスキップ:
-
-```
-/agentdev/req-define → /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
-```
-
-### learning パイプライン（学びの蓄積・分析・昇華）
-
-```
-学び発生 → learning-capture（スキル）→ /agentdev/learning-refine → /agentdev/learning-promote → /agentdev/backlog-review → /agentdev/backlog-save → /agentdev/req-define
-```
-
-### intake ワークフロー（気づき・課題の収集・レビュー・昇華）
-
-```
-/agentdev/intake-capture / /agentdev/intake-from-github → /agentdev/intake-review → /agentdev/intake-promote → /agentdev/backlog-review → /agentdev/backlog-save → /agentdev/req-define
-```
-
-### REQ再構成レビューワークフロー
-
-```
-/agentdev/req-restructure-review（診断のみ、副作用なし）
-```
-
-### integrity ワークフロー（整合性検証）
-
-```
-/agentdev/integrity-check
-```
-
-## 各コマンドの詳細
-
-- `/agentdev/req-define` — [req-define.md](./req-define.md)
-- `/agentdev/req-save` — [req-save.md](./req-save.md)
-- `/agentdev/case-open` — [case-open.md](./case-open.md)
-- `/agentdev/case-run` — [case-run.md](./case-run.md)
-- `/agentdev/case-update` — [case-update.md](./case-update.md)
-- `/agentdev/case-close` — [case-close.md](./case-close.md)
-- `/agentdev/req-backlog` — [req-backlog.md](./req-backlog.md)（非推奨）
-- `/agentdev/backlog-review` — [backlog-review.md](./backlog-review.md)
-- `/agentdev/backlog-save` — [backlog-save.md](./backlog-save.md)
-- `/agentdev/intake-capture` — [intake-capture.md](./intake-capture.md)
-- `/agentdev/intake-from-github` — [intake-from-github.md](./intake-from-github.md)
-- `/agentdev/intake-review` — [intake-review.md](./intake-review.md)
-- `/agentdev/intake-promote` — [intake-promote.md](./intake-promote.md)
-- `/agentdev/learning-refine` — [learning-refine.md](./learning-refine.md)
-- `/agentdev/learning-promote` — [learning-promote.md](./learning-promote.md)
-- `/agentdev/integrity-check` — [integrity-check.md](./integrity-check.md)
-- `/agentdev/req-restructure-review` — [req-restructure-review.md](./req-restructure-review.md)
+- [req-define.md](./req-define.md)
+- [req-save.md](./req-save.md)
+- [case-open.md](./case-open.md)
+- [case-run.md](./case-run.md)
+- [case-update.md](./case-update.md)
+- [case-close.md](./case-close.md)
+- [backlog-review.md](./backlog-review.md)
+- [backlog-save.md](./backlog-save.md)
+- [intake-capture.md](./intake-capture.md)
+- [intake-from-github.md](./intake-from-github.md)
+- [intake-review.md](./intake-review.md)
+- [intake-promote.md](./intake-promote.md)
+- [learning-refine.md](./learning-refine.md)
+- [learning-promote.md](./learning-promote.md)
+- [integrity-check.md](./integrity-check.md)
+- [req-restructure-review.md](./req-restructure-review.md)

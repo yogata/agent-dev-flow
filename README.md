@@ -1,8 +1,8 @@
 # agent-dev-flow
 
-AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-assisted development workflow を支えるコマンド・スキル・ドキュメントを一元管理しています。
+AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted development workflow を支えるコマンド・スキル・ドキュメントを一元管理する。
 
-## AgentDevFlow Plugin
+## Plugin identity
 
 | 項目 | 値 |
 |------|------|
@@ -13,89 +13,49 @@ AgentDevFlow plugin の設定を管理するリポジトリです。AI agent-ass
 | Skill prefix | `agentdev-*` |
 | Domains | req, case, learning, intake, integrity |
 
-詳細は [ADR-0005](docs/adr/ADR-0005.md) および [REQ-0103](docs/requirements/REQ-0103.md) を参照。
+## 入口表
 
-## ワークフローの入口
+現在の状態から次に実行すべきコマンドを選ぶ。
 
-AgentDevFlow には4つの系統があり、それぞれ目的と入口コマンドが異なります。
+| 現在の状態 | 次のコマンド | 出力 |
+|-----------|-------------|------|
+| 要件を整理したい | `/agentdev/req-define` | 要件doc（draft） |
+| 要件docがあり、機能追加の場合 | `/agentdev/req-save` | REQ/ADR ファイル |
+| REQ ファイルまたは要件docがある | `/agentdev/case-open` | GitHub Issue |
+| Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
+| PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
+| Issue の更新・コメント追加が必要 | `/agentdev/case-update` | 更新済み Issue |
+| 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox item |
+| クローズ済み Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox item |
+| inbox に item がある | `/agentdev/intake-review` | accepted / archive |
+| accepted item がある | `/agentdev/intake-promote` | promoted artifact |
+| 再発防止知見を蓄積したい | `learning-capture`（スキル） | inbox.md エントリ |
+| inbox.md にエントリがある | `/agentdev/learning-refine` | evaluation-report.md |
+| evaluation-report がある | `/agentdev/learning-promote` | promoted artifact |
+| promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | review draft |
+| review draft がある | `/agentdev/backlog-save` | RU（Requirement Unit） |
+| RU がある | `/agentdev/req-define` | 要件doc（draft） |
+| REQ 体系の健全性を診断したい | `/agentdev/req-restructure-review` | 診断レポート |
+| ドキュメント整合性を検証したい | `/agentdev/integrity-check` | 検証レポート |
 
-| 系統 | 目的 | 入口コマンド | 流れ |
-|------|------|-------------|------|
-| 通常開発 | 機能追加・バグ修正 | `/agentdev/req-define` | req-define → req-save → case-open → case-run → case-close |
-| Learning 起点 | 再発防止知見の蓄積・昇華 | `/agentdev/learning-refine` | learning-capture（スキル）→ learning-refine → learning-promote → backlog-review → backlog-save → req-define に合流 |
-| Intake 起点 | 具体的な作業候補の収集・促進 | `/agentdev/intake-capture` | intake-capture → intake-review → intake-promote → backlog-review → backlog-save → req-define に合流 |
-| REQ再構成レビュー | REQ体系の健全性診断 | `/agentdev/req-restructure-review` | 診断のみ（副作用なし）→ 必要に応じて req-define に合流 |
+## 参照先
 
-各系統の domain state（ファイル・ディレクトリ）がどの状態を表すかは [domain state lifecycle](docs/guides/domain-state-lifecycle.md) を参照。ワークフローの全体像は [ワークフロー概要](docs/guides/workflow-overview.md)、成果物の構造は [成果物モデル](docs/guides/artifact-model.md) を参照。
+| 対象 | リンク |
+|------|--------|
+| コマンド一覧・入出力リファレンス | [commands/agentdev/README.md](.opencode/commands/agentdev/README.md) |
+| ワークフロー概要（生成物中心） | [ワークフロー概要](docs/guides/workflow-overview.md) |
+| ドメイン状態の詳細 | [ドメイン状態ライフサイクル](docs/guides/domain-state-lifecycle.md) |
+| 成果物の内部構造（保守者向け） | [成果物モデル](docs/guides/artifact-model.md) |
+| システム仕様 | [system.md](docs/specs/system.md) |
 
 ## クイックスタート
 
-機能追加の最小フローを示します。バグ修正は `/agentdev/req-define` 後に `/agentdev/case-open` へ進みます。
-
-### 1. 要件を壁打ちする（壁打ちフェーズ）
+機能追加の最小フロー。バグ修正は `/agentdev/req-define` 後に `/agentdev/case-open` に進む。
 
 ```
-/agentdev/req-define
-```
-
-AIと対話しながら要件を整理します。完了すると壁打ち成果物が生成されます。
-
-### 2. 要件を保存する（機能追加のみ）
-
-```
-/agentdev/req-save
-```
-
-壁打ち成果物を `docs/requirements/REQ-*.md` と `docs/adr/ADR-*.md` に保存し、コミット・プッシュします。
-
-### 3. Issue を作成する
-
-```
-/agentdev/case-open
-```
-
-REQファイルの内容からGitHub Issueを自動生成します。
-
-### 4. 実装する（構造的実行フェーズ）
-
-```
-/agentdev/case-run
-```
-
-Plan策定から実装、コミットまで一気通貫で実行します。worktreeで作業し、PRも作成されます。
-
-### 5. レビューしてクローズする（レビュー完了フェーズ）
-
-```
-/agentdev/case-close
-```
-
-PRをマージし、対応記録をIssueに追記してクローズ、ブランチを削除します。
-
-## コマンド・スキル・用語
-
-コマンド・スキルの詳細は以下を参照:
-- コマンド一覧・基本フロー: [commands/agentdev/README.md](.opencode/commands/agentdev/README.md)
-- コマンド関連マップ・データフロー: [command-map.md](.opencode/skills/agentdev-workflow-lifecycle/reference/command-map.md)
-- システム仕様: [system.md](docs/specs/system.md)
-
-## ドキュメント構造
-
-```
-docs/
-  specs/           # システム仕様・実装パターン
-    system.md      # コマンドシステムの構成定義
-    patterns.md    # コード規約と実装パターン
-    design-principles.md # 設計原則
-  guides/          # 利用者向けガイド
-  requirements/    # 要件定義書（REQ-*.md）
-  adr/             # アーキテクチャ決定記録（ADR-*.md）
-.agentdev/         # AgentDevFlow domain state
-  intake/          # 気づき・課題の収集・レビュー・促進（inbox/, accepted/, promoted/, archive/）
-  learning/        # 学びの蓄積・昇華（inbox.md, archive/active.md, evaluation-report.md, promoted/）
-  integrity/       # 整合性検証レポート
-.sisyphus/         # Sisyphus 作業領域（詳細は system.md 参照）
-.opencode/
-  commands/agentdev/  # AgentDevFlow コマンド定義
-  skills/            # スキル定義（SKILL.md）
+/agentdev/req-define    # 要件を壁打ちする
+/agentdev/req-save      # REQ/ADR ファイルとして保存（機能追加のみ）
+/agentdev/case-open     # Issue を作成
+/agentdev/case-run      # 実装して PR を作成
+/agentdev/case-close    # PR をマージして Issue をクローズ
 ```
