@@ -11,6 +11,10 @@ They describe what the system *is* now, as opposed to REQ files that define what
 | [patterns.md](patterns.md) | 実装パターン | コード規約と実装パターン |
 | [design-principles.md](design-principles.md) | 設計原則 | アーキテクチャ設計原則 |
 | [quality-specs.md](quality-specs.md) | 品質仕様 | 品質基準・検証ルール |
+| [document-model.md](document-model.md) | 文書モデル | REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックス |
+| [artifact-contracts.md](artifact-contracts.md) | アーティファクト契約 | Command/Skill/Template/Script の入出力・依存方向 |
+| [integrity-contracts.md](integrity-contracts.md) | 整合性契約 | strict/warning/observation 分類と検査カテゴリ |
+| [workflow-contracts.md](workflow-contracts.md) | ワークフロー契約 | コマンドパイプラインの入出力・前提条件 |
 
 ## Document Relationships (REQ-0101)
 

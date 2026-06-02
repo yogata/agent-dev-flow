@@ -28,6 +28,10 @@
 - [Implementation Patterns](specs/patterns.md)
 - [Design Principles](specs/design-principles.md)
 - [Quality Specifications](specs/quality-specs.md)
+- [Document Model](specs/document-model.md)
+- [Artifact Contracts](specs/artifact-contracts.md)
+- [Integrity Contracts](specs/integrity-contracts.md)
+- [Workflow Contracts](specs/workflow-contracts.md)
 
 ## ADR
 
