@@ -1,11 +1,6 @@
 ---
 description: promoted artifact を分析・統合し、Requirement Unit（RU）を生成する
 agent: sisyphus
-implementation_pattern: file-pipeline
-load_skills:
-  - agentdev-workflow-lifecycle
-  - agentdev-workflow-reporting
-  - agentdev-gh-cli
 ---
 
 > **Deprecated**: このコマンドは `/agentdev/backlog-review` + `/agentdev/backlog-save` に分割されました（REQ-0105-038, 039）。

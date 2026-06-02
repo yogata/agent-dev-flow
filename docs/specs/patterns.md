@@ -11,8 +11,6 @@
 ---
 description: ...
 agent: prometheus
-load_skills:
-  - ...
 ---
 ```
 
@@ -21,28 +19,16 @@ load_skills:
 ---
 description: ...
 agent: sisyphus
-load_skills:
-  - ...
 ---
 ```
 
 **理由**: デフォルトエージェント（Plan/Prometheus）の誤用を防止するため。PlanエージェントはRead-only権限であり、ファイル書込やコマンド実行ができない。
 
-### Implementation Pattern 指定
+### Frontmatter 許可フィールド
 
-各コマンドのfrontmatterに `implementation_pattern` を指定する（REQ-0103-015）。定義と対応表は [`references/command-map.md`](../../.opencode/skills/agentdev-workflow-lifecycle/references/command-map.md) の「Implementation Pattern Taxonomy」セクションが SSoT である。
+command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044）。`implementation_pattern`、`secondary_pattern`、`load_skills` 等の dev メタデータは frontmatter に含めない（ADR-0013）。
 
-```yaml
----
-description: ...
-agent: sisyphus
-implementation_pattern: file-pipeline
-load_skills:
-  - ...
----
-```
-
-5パターン（wall-session, file-pipeline, manager-orchestrator, capture-only, read-only-diagnostic）は REQ-0103-016 において Pattern A/B/C/D（Issue 種別分類）と直交する。integrity-check が `implementation_pattern` の有無・妥当性（REQ-0108-022）、禁止 skill の検査（REQ-0108-023）、load_skills 整合性（REQ-0108-024）に加え、pattern 定義妥当性・command-map整合性（REQ-0108-026~027）、secondary pattern 検証（REQ-0108-028~030）、load_skills 過剰/不足診断（REQ-0108-031~032）、skill USE FOR/DO NOT USE FOR 整合性（REQ-0108-033~034）、未使用 skill 5カテゴリ分類（REQ-0108-035~036）、recommendation candidate 分類（REQ-0108-037~038）を自動検証する。
+分類定義は `design-principles.md` を参照。
 
 ## .sisyphus/ 命名規則
 

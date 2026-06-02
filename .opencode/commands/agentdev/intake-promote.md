@@ -1,11 +1,6 @@
 ---
 description: レビュー済み intake item を後続コマンド（backlog-review）に渡せる入力 artifact に整形する
 agent: sisyphus
-implementation_pattern: file-pipeline
-load_skills:
-  - agentdev-workflow-lifecycle
-  - agentdev-workflow-reporting
-  - agentdev-no-ai-slop-writing
 ---
 
 # Intake Promote

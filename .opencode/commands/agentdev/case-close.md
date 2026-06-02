@@ -1,13 +1,6 @@
 ---
 description: PRをマージし、対応記録を追記し、Caseをクローズしてブランチを削除する
 agent: sisyphus
-implementation_pattern: file-pipeline
-load_skills:
-  - agentdev-workflow-lifecycle
-  - agentdev-workflow-reporting
-  - agentdev-gh-cli
-  - agentdev-git-worktree
-  - agentdev-workflow-templates
 ---
 
 # 完了処理

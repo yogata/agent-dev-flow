@@ -1,12 +1,6 @@
 ---
 description: evaluation-report.mdとarchive/active.mdから昇華判定を行い、Requirement Source stubを生成する
 agent: sisyphus
-implementation_pattern: file-pipeline
-load_skills:
-  - agentdev-learning-capture
-  - agentdev-learning-pipeline
-  - agentdev-workflow-reporting
-  - agentdev-no-ai-slop-writing
 ---
 
 # 学びの昇華判定と Requirement Source stub 生成

@@ -1,17 +1,6 @@
 ---
 description: 要件定義をもとにGitHub Issueを作成する
 agent: sisyphus
-implementation_pattern: file-pipeline
-load_skills:
-  - agentdev-workflow-lifecycle
-  - agentdev-workflow-reporting
-  - agentdev-gh-cli
-  - agentdev-req-file-manager
-  - agentdev-req-analysis
-  - agentdev-workflow-orchestration
-  - agentdev-adr-file-manager
-  - agentdev-workflow-templates
-  - agentdev-no-ai-slop-writing
 ---
 
 # Case登録

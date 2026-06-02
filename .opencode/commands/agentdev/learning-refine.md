@@ -1,12 +1,6 @@
 ---
 description: inbox.mdとarchive/active.mdをセマンティック分析し、evaluation-report.mdを出力後inbox→archive移動を行う
 agent: sisyphus
-implementation_pattern: file-pipeline
-load_skills:
-  - agentdev-learning-capture
-  - agentdev-learning-pipeline
-  - agentdev-workflow-reporting
-  - agentdev-no-ai-slop-writing
 ---
 
 # 学びの問題クラス分類・8軸評価とアーカイブ
