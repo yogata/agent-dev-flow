@@ -32,7 +32,7 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 
 | コマンド | 用途 | 完了報告variant |
 |----------|------|----------------|
-| req-define | 要件の壁打ち・整理 | `completion-reports/req-define/`（5 variants） |
+| req-define | 要件の壁打ち・整理 | `completion-reports/req-define/`（3 variants） |
 | req-save | 壁打ち成果物をREQ/ADRファイルとして保存 | `completion-reports/req-save/`（5 variants） |
 | case-open | REQファイルからGitHub Issue作成 | `completion-reports/case-open/`（2 variants） |
 | case-run | 計画立案から実装・コミット・PR作成まで一括実行 | `completion-reports/case-run/`（1 variant） |
@@ -43,8 +43,8 @@ agentdev系コマンドの完了報告フォーマット・チェックボック
 | intake-from-github | クローズ済みissue/PRから残課題を抽出・分類しdraftとして保存 | `completion-reports/intake-from-github/`（1 variant） |
 | intake-review | inbox の未処理エントリを一括レビューし処分判定 | `completion-reports/intake-review/`（1 variant） |
 | intake-promote | review 済み intake item を後続コマンド用 artifact に整形 | `completion-reports/intake-promote/`（1 variant） |
-| backlog-review | promoted artifact の分析・HITL・review draft保存 | `completion-reports/backlog-review/`（1 variant） |
-| backlog-save | review draft から RU を生成・git永続化 | `completion-reports/backlog-save/`（1 variant） |
+| backlog-review | promoted artifact の分析・HITL・review draft保存 | `completion-reports/backlog-review/`（3 variants） |
+| backlog-save | review draft から RU を生成・git永続化 | `completion-reports/backlog-save/`（3 variants） |
 | learning-refine | 問題クラス分類→8軸評価→archive移動 | `completion-reports/learning-refine/`（1 variant） |
 | learning-promote | 昇華判定→Requirement Source staging stub生成 | `completion-reports/learning-promote/`（1 variant） |
 | integrity-check | ドキュメント・スキル・コマンドの整合性を検証 | `completion-reports/integrity-check/`（1 variant） |

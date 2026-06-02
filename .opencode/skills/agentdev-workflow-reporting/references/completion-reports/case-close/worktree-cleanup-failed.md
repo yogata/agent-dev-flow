@@ -8,7 +8,6 @@
     - Issue #{N} をクローズ: ✅ 成功
   .agentdev 永続化:
     - {変更あり/なし}
-    - commit: {hash}, push: {成功/失敗}
   ブランチ・worktree:
     - worktree削除: ❌ 失敗（{reason}）
     - ローカルブランチ削除: {成否}
