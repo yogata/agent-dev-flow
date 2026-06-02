@@ -18,10 +18,10 @@
 | ADR-0010 | HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則 | proposed | 2026-06-02 |
 | ADR-0011 | Manager/orchestrator パターンの限定採用 — 標準構造とはしない | proposed | 2026-06-02 |
 | ADR-0012 | Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流 | proposed | 2026-06-02 |
-| ADR-0013 | runtime / authoring 関心分離 | proposed | 2026-06-02 |
-| ADR-0014 | ADR / SPEC 再分類基準 | proposed | 2026-06-02 |
-| ADR-0015 | docs/specs 非runtime依存宣言 | proposed | 2026-06-02 |
-| ADR-0016 | skill references runtime-only 制約 | proposed | 2026-06-02 |
+| ADR-0013 | runtime / authoring 関心分離 | accepted | 2026-06-02 |
+| ADR-0014 | ADR / SPEC 再分類基準 | accepted | 2026-06-02 |
+| ADR-0015 | docs/specs 非runtime依存宣言 | accepted | 2026-06-02 |
+| ADR-0016 | skill references runtime-only 制約 | accepted | 2026-06-02 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -37,15 +37,15 @@
 - [ADR-0010](ADR-0010.md) — HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則
 - [ADR-0011](ADR-0011.md) — Manager/orchestrator パターンの限定採用 — 標準構造とはしない
 - [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
-- [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
-- [ADR-0014](ADR-0014.md) — ADR / SPEC 再分類基準
-- [ADR-0015](ADR-0015.md) — docs/specs 非runtime依存宣言
-- [ADR-0016](ADR-0016.md) — skill references runtime-only 制約
 
 ### accepted
 
 - [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 統一
 - [ADR-0009](ADR-0009.md) — REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入
+- [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
+- [ADR-0014](ADR-0014.md) — ADR / SPEC 再分類基準
+- [ADR-0015](ADR-0015.md) — docs/specs 非runtime依存宣言
+- [ADR-0016](ADR-0016.md) — skill references runtime-only 制約
 
 ### superseded
 
