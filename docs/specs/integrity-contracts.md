@@ -89,3 +89,51 @@
 ## Scope Declaration
 
 `docs/specs/` は agent-dev-flow レポジトリ専用である。他プロジェクトへの適用を意図しない。
+
+## Guardrails Classification
+
+command guardrails を以下の6カテゴリに分類する:
+
+| カテゴリ | 意味 | 例 |
+|---|---|---|
+| **KEEP_AS_GUARDRAIL** | ユーザー安全性に関わる制約。command 定義に残置 | ファイル操作制限、ユーザー承認必須、破壊的操作禁止 |
+| **STATIC_CHECK** | 機械的検証可能な検査。integrity-check に移行 | frontmatter 規約、必須セクション存在、行数上限 |
+| **POSTFLIGHT_DIFF** | 実行後の diff 検証。postflight スクリプトで検査 | 意図しないファイル変更、スコープ外の編集 |
+| **HELPER_SCRIPT** | 補助的処理。script に移行 | 検査・変換・フォーマット処理 |
+| **MOVE_TO_SPEC** | SPEC へ移譲すべき内容。SPEC 定義に委譲 | アーティファクト構造定義、命名規則の詳細 |
+| **DELETE_AS_OBVIOUS** | 自明な制約。削除可能 | LLM 既知の常識的内容 |
+
+## Allowed Changes Profiles
+
+各 command の allowed changes（許可されるファイル変更範囲）:
+
+| Command | Allowed Changes | Forbidden |
+|---|---|---|
+| `req-define` | なし（read-only 対話） | 全ファイル書込 |
+| `req-save` | `docs/requirements/`, `docs/adr/`, `docs/DOC-MAP.md` | `.agentdev/`, `.opencode/` |
+| `case-open` | GitHub Issue/PR のみ | ローカルファイル |
+| `case-run` | worktree 内の全ファイル | worktree 外、`.agentdev/` |
+| `case-close` | GitHub Issue/PR, worktree 削除 | `.agentdev/intake/inbox/` 直接書込 |
+| `case-update` | GitHub Issue のみ | ローカルファイル |
+| `integrity-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（承認時） | 検査対象 artifact |
+| `intake-capture` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
+| `intake-from-github` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
+| `intake-review` | `.agentdev/intake/inbox/`, `archive/` | 他パス |
+| `intake-promote` | `.agentdev/intake/promoted/` | 他パス |
+| `learning-refine` | `.agentdev/learning/` | 他パス |
+| `learning-promote` | `.agentdev/learning/promoted/` | 他パス |
+| `backlog-review` | なし（read-only 対話） | 全ファイル書込 |
+| `backlog-save` | `docs/requirements/` | `.opencode/` |
+| `req-restructure-review` | なし（read-only 診断） | 全ファイル書込 |
+
+## Postflight Diff Checking
+
+postflight diff checking は read-only command から段階導入する:
+
+**Phase 1 — read-only command 検証**:
+- `integrity-check`, `req-restructure-review`, `backlog-review` は実行後にローカルファイル変更がないことを確認
+- 変更が検出された場合は warning として報告
+
+**Phase 2 — 拡張適用**（将来）:
+- `case-run` の実行後、意図しないスコープ外ファイル変更を検出
+- allowed changes profile に基づく diff フィルタリング
