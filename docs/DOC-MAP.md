@@ -55,6 +55,13 @@
 
 | Guide | 内容 |
 |---|---|
-| [ワークフロー概要](guides/workflow-overview.md) | コマンドパイプライン・フェーズ体系・Pattern分類 |
-| [成果物モデル](guides/artifact-model.md) | 文書種別・コマンド・スキル・成果物ライフサイクル |
-| [ドメイン状態ライフサイクル](guides/domain-state-lifecycle.md) | Learning・Intake・RU・Case・Integrity の状態遷移 |
+| [ガイド入口](guides/README.md) | ガイド一覧・案内 |
+| [クイックスタート](guides/quickstart.md) | 5コマンドで機能追加を完了する最小フロー |
+| [コマンド選択](guides/command-selection.md) | 現在の状態から次のコマンドを選ぶ入口表 |
+| [要件定義 → Case実行フロー](guides/req-case-flow.md) | req-define から case-close までの流れ |
+| [Intake / Learning / Backlog フロー](guides/intake-learning-backlog-flow.md) | 作業候補・学びの収集から RU 生成まで |
+| [診断・メンテナンス](guides/diagnostics-and-maintenance.md) | integrity-check / req-restructure-review |
+| [成果物・状態モデル](guides/artifacts-and-state.md) | 成果物の種別・配置・ライフサイクル |
+| [プロジェクトドキュメントと SPEC](guides/project-docs-and-specs.md) | REQ / ADR / SPEC / DOC-MAP の関係 |
+| [トラブルシューティング](guides/troubleshooting.md) | よくある問題と対処法 |
+| [用語集](guides/glossary.md) | AgentDevFlow の用語定義 |

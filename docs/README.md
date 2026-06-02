@@ -39,9 +39,16 @@
 
 ## Guides
 
-- [ワークフロー概要](guides/workflow-overview.md)
-- [成果物モデル](guides/artifact-model.md)
-- [ドメイン状態ライフサイクル](guides/domain-state-lifecycle.md)
+- [ガイド入口](guides/README.md)
+- [クイックスタート](guides/quickstart.md)
+- [コマンド選択](guides/command-selection.md)
+- [要件定義 → Case実行フロー](guides/req-case-flow.md)
+- [Intake / Learning / Backlog フロー](guides/intake-learning-backlog-flow.md)
+- [診断・メンテナンス](guides/diagnostics-and-maintenance.md)
+- [成果物・状態モデル](guides/artifacts-and-state.md)
+- [プロジェクトドキュメントと SPEC](guides/project-docs-and-specs.md)
+- [トラブルシューティング](guides/troubleshooting.md)
+- [用語集](guides/glossary.md)
 
 ## DOC-MAP
 
