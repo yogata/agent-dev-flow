@@ -64,6 +64,7 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 | Implementation pattern | `check_integrity.ts` | pattern 定義妥当性、禁止 skill、command-map 一致性、load_skills 意味判断 |
 | Workflow template 構造 | `check_templates.ts` | frontmatter、必須セクション、placeholder、命名規則 |
 | Skill 構造 | `lint_skills.ts` | frontmatter name ↔ dir、USE FOR / DO NOT USE FOR、See Also |
+| Postflight diff | `check_postflight.ts` | read-only command 実行後のファイル変更検知、allowed-changes profile 検証 |
 
 ### Finding レベル（REQ-0108-100~105）
 
