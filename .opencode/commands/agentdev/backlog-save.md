@@ -1,11 +1,6 @@
 ---
 description: 承認済み review 結果から RU（Requirement Unit）を生成・永続化する
 agent: sisyphus
-implementation_pattern: file-pipeline
-load_skills:
-  - agentdev-workflow-lifecycle
-  - agentdev-workflow-reporting
-  - agentdev-gh-cli
 ---
 
 # Backlog Save

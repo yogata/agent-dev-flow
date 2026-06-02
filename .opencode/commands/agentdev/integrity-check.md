@@ -1,10 +1,6 @@
 ---
 description: AgentDevFlow artifact 整合性検査
 agent: sisyphus
-implementation_pattern: read-only-diagnostic
-load_skills:
-  - agentdev-integrity
-  - agentdev-workflow-reporting
 ---
 
 # Artifact 整合性検査
@@ -27,7 +23,7 @@ AgentDevFlow 管理下の artifact（REQ、ADR、skill、command、spec）の整
 ## Steps
 
 1. **スクリプト実行**: `agentdev-integrity` の検査スクリプト（`scripts/check_integrity.ts`）を実行。検査カテゴリ・対象パス・検出結果の分類は `agentdev-integrity` SKILL.md の検査カテゴリ定義に準拠
-   - 検査カテゴリ: REQ frontmatter ↔ ファイル名、ADR ↔ REQ 相互参照、Skill ↔ load_skills 参照、Command-map ↔ 実体、旧 namespace 残存、完了報告フォーマット、DOC-MAP 存在性・参照整合性、Views 残存、README ↔ ファイル整合性
+   - 検査カテゴリ: REQ frontmatter ↔ ファイル名、ADR ↔ REQ 相互参照、Skill ↔ command 参照、frontmatter 許可フィールド（description + agent のみ）、旧 namespace 残存、完了報告フォーマット、DOC-MAP 存在性・参照整合性、Views 残存、README ↔ ファイル整合性
    - Finding 分類: `document-drift` / `broken-reference` / `obsolete-structure` / `canonical-conflict` / `workflow-gap` / `integrity-rule-gap`（`agentdev-integrity` SKILL.md 参照）
    - Finding ルート: `intake` / `learning` / `intake+learning` / `req-define` / `none`
 

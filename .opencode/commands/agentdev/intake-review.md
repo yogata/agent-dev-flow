@@ -1,11 +1,6 @@
 ---
 description: inbox 内の intake item をレビューし、採用・却下・保留の判定を行う
 agent: prometheus
-implementation_pattern: wall-session
-load_skills:
-  - agentdev-workflow-lifecycle
-  - agentdev-workflow-reporting
-  - agentdev-no-ai-slop-writing
 ---
 
 # Intake Review

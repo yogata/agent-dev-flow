@@ -1,12 +1,6 @@
 ---
 description: 要件を整理・定義する（機能追加・バグ修正共通）
 agent: prometheus
-implementation_pattern: wall-session
-load_skills:
-  - agentdev-req-analysis
-  - agentdev-req-file-manager
-  - agentdev-workflow-lifecycle
-  - agentdev-workflow-reporting
 ---
 
 # 要件定義
