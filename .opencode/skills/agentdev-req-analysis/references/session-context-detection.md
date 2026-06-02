@@ -7,8 +7,8 @@
 依存関係に従い以下の順序で推論:
 
 1. **要件内容**（何をやりたいか）→ セッション内で機能追加/バグ修正の説明が存在するか
-2. **Pattern判定**（A or B or C or D）→ 要件内容の性質から bug/critical=A, feature/enhancement=B, refactor/maintenance=C, docs/chore=D を推論
-3. **Scale判定**（Pattern B のみ）→ 複数モジュール跨ぎ、PR肥大化リスク、段階的リリースの有無から standard/large を推論。Pattern A の場合 Scale は推論不要（undefined）
+2. **work_type 判定**（A or B or C or D）→ 要件内容の性質から bug/critical=A, feature/enhancement=B, refactor/maintenance=C, docs/chore=D を推論
+3. **Scale判定**（feature のみ）→ 複数モジュール跨ぎ、PR肥大化リスク、段階的リリースの有無から standard/large を推論。bugfix の場合 Scale は推論不要（undefined）
 4. **ADR判断**（必要/不要）→ 技術判断の複雑さ・影響範囲から adr-required を推論
 5. **要件docの構造化** → セッション内でテーブル形式の要件が展開済みか
 6. **適用範囲**（対象/対象外）→ セッション内で明示的に議論されているか
@@ -40,7 +40,7 @@
 📋 セッションコンテキスト検知結果:
   要件内容: {推論結果} [信頼度: 高/低]
   Pattern: {A/B} [信頼度: 高/低]
-  {Pattern Bの場合} Scale: {standard/large} [信頼度: 高/低]
+  {featureの場合} Scale: {standard/large} [信頼度: 高/低]
   ADR: {必要/不要} [信頼度: 高/低]
   要件構造化: {完了/未完了} [信頼度: 高/低]
   適用範囲: {確定/未確定} [信頼度: 高/低]
@@ -55,11 +55,11 @@
 推論サマリー表示後、ユーザーの同意を確認した後に実行:
 
 - **全項目 高信頼度で推論済み（+ draft 存在）**:
-  - Pattern B → Step 10 へスキップ
-  - Pattern A → Step 10 へスキップ
+  - feature → Step 10 へスキップ
+  - bugfix → Step 10 へスキップ
 - **全項目 高信頼度で推論済み（draft なし）**:
-  - Pattern B → Step 9 へスキップ
-  - Pattern A → Step 10 へスキップ
+  - feature → Step 9 へスキップ
+  - bugfix → Step 10 へスキップ
 - **一部項目が低信頼度または未推論**:
   - 推論済み項目（高信頼度）を継承し、不足項目のみを対象に Step 1（壁打ち）を開始
 - **推論結果なし（セッションに要件情報が存在しない）**:
