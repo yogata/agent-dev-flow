@@ -18,6 +18,10 @@
 | ADR-0010 | HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則 | proposed | 2026-06-02 |
 | ADR-0011 | Manager/orchestrator パターンの限定採用 — 標準構造とはしない | proposed | 2026-06-02 |
 | ADR-0012 | Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流 | proposed | 2026-06-02 |
+| ADR-0013 | runtime / authoring 関心分離 | proposed | 2026-06-02 |
+| ADR-0014 | ADR / SPEC 再分類基準 | proposed | 2026-06-02 |
+| ADR-0015 | docs/specs 非runtime依存宣言 | proposed | 2026-06-02 |
+| ADR-0016 | skill references runtime-only 制約 | proposed | 2026-06-02 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -33,6 +37,10 @@
 - [ADR-0010](ADR-0010.md) — HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則
 - [ADR-0011](ADR-0011.md) — Manager/orchestrator パターンの限定採用 — 標準構造とはしない
 - [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
+- [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
+- [ADR-0014](ADR-0014.md) — ADR / SPEC 再分類基準
+- [ADR-0015](ADR-0015.md) — docs/specs 非runtime依存宣言
+- [ADR-0016](ADR-0016.md) — skill references runtime-only 制約
 
 ### accepted
 
@@ -76,6 +84,13 @@
 - [ADR-0011](ADR-0011.md) — Manager/orchestrator パターンの限定採用 — 標準構造とはしない
 - [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
 
+### 文書体系
+
+- [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
+- [ADR-0014](ADR-0014.md) — ADR / SPEC 再分類基準
+- [ADR-0015](ADR-0015.md) — docs/specs 非runtime依存宣言
+- [ADR-0016](ADR-0016.md) — skill references runtime-only 制約
+
 ## Decision Map
 
 | ADR | 関係 | 対象 | 説明 |
@@ -102,6 +117,16 @@
 | [ADR-0011](ADR-0011.md) | relates-to | [ADR-0006](ADR-0006.md) | Epic Orchestrator の SSoT 基盤 |
 | [ADR-0012](ADR-0012.md) | relates-to | [ADR-0010](ADR-0010.md) | pipeline 内の HITL境界 |
 | [ADR-0012](ADR-0012.md) | relates-to | [ADR-0011](ADR-0011.md) | pipeline 各段階の pattern 適用可否 |
+| [ADR-0013](ADR-0013.md) | relates-to | [ADR-0001](ADR-0001.md) | 責務分界の具体化 |
+| [ADR-0013](ADR-0013.md) | relates-to | [ADR-0014](ADR-0014.md) | 文書体系の再分類 |
+| [ADR-0013](ADR-0013.md) | relates-to | [ADR-0015](ADR-0015.md) | SPEC 配布範囲 |
+| [ADR-0013](ADR-0013.md) | relates-to | [ADR-0016](ADR-0016.md) | references 内容制約 |
+| [ADR-0014](ADR-0014.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring 分離の基盤 |
+| [ADR-0014](ADR-0014.md) | relates-to | [ADR-0015](ADR-0015.md) | SPEC 配布範囲の補完 |
+| [ADR-0015](ADR-0015.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring 分離の具体化 |
+| [ADR-0015](ADR-0015.md) | relates-to | [ADR-0014](ADR-0014.md) | SPEC 責務定義 |
+| [ADR-0016](ADR-0016.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring 分離の具体化 |
+| [ADR-0016](ADR-0016.md) | relates-to | [ADR-0014](ADR-0014.md) | 文書種別の責務定義 |
 
 ## Related REQ
 
@@ -119,3 +144,7 @@
 | [ADR-0010](ADR-0010.md) | [REQ-0104](../requirements/REQ-0104.md) | Workflow/Command Protocol（HITL境界の観点で補完） |
 | [ADR-0011](ADR-0011.md) | — | 対応REQなし（architecture principle として新規定義） |
 | [ADR-0012](ADR-0012.md) | [REQ-0105](../requirements/REQ-0105.md) | Intake/Learning/Backlog（pipeline の動作仕様を architecture principle で裏付け） |
+| [ADR-0013](ADR-0013.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | frontmatter 規約 reversal・integrity 検査 reversal |
+| [ADR-0014](ADR-0014.md) | [REQ-0101](../requirements/REQ-0101.md), [REQ-0103](../requirements/REQ-0103.md) | 文書責務マトリックス・SPEC 責務定義 |
+| [ADR-0015](ADR-0015.md) | [REQ-0103](../requirements/REQ-0103.md) | SPEC 配布範囲宣言 |
+| [ADR-0016](ADR-0016.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | references runtime-only 制約・存在確認検査 |
