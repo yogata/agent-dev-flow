@@ -36,10 +36,14 @@
 |---|-----------|------|
 | 1 | 完了コマンド | 実行したコマンドのフルパス（例: `/agentdev/case-close`） |
 | 2 | 対象 | 操作対象の識別子（Issue番号、PR番号、ファイルパス等） |
-| 3 | 結果 | 実行結果の詳細。コマンド固有の項目を含む |
+| 3 | 結果 | ユーザー視点・ドメイン視点の成果（Issue作成、PR作成、REQ/ADR保存、RU生成/削除、コメント追加、worktree削除、Findings回収等）。commit hash、push成否、HEAD同期確認、git status、git diff は含めない |
 | 4 | 検証結果 | `✅ OK` / `⚠️ 注意` / `❌ NG` のいずれか |
-| 5 | git 永続化 | commit hash, push成否、または「該当なし」 |
+| 5 | git 永続化 | git操作結果のみ。記載形式: `該当なし` / `変更なし（commit/push スキップ）` / `✅ OK（commit {hash}, push 済み）` / `✅ OK（commit {hash}, push 済み, HEAD = origin/main 同期確認OK）` / `⚠️ 注意（commit {hash}, push 失敗）` / `❌ NG（commit失敗: {reason}）` |
 | 6 | 次のコマンド | 後続コマンドのフルパス、または「なし」（終端コマンドの場合） |
+
+### 結果欄とgit永続化欄の重複禁止
+
+`結果` 欄と `git 永続化` 欄で同一事実を重複記載してはならない（MUST NOT）。commit hash、push成否、HEAD同期確認等のgit操作結果は `git 永続化` 欄にのみ記載し、`結果` 欄には含めない。
 
 ## Variant Registry
 

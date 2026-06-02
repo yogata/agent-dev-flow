@@ -6,5 +6,5 @@
   - Issue #{N} を作成
   - {機能追加の場合: REQ-{NNNN} をIssue本文に反映}
 検証結果: ✅ OK
-git 永続化: 該当なし
+git 永続化: {該当なし / ✅ OK（commit {hash}, push 済み, HEAD = origin/main 同期確認OK）}
 次のコマンド: /agentdev/case-run {N}

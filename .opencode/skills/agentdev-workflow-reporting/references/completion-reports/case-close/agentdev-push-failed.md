@@ -9,8 +9,6 @@
     - {Epic自動クローズの場合: Epic #{epic_N} を自動クローズ: ✅ 成功}
   .agentdev 永続化:
     - 変更あり: {changed_files}
-    - commit: {hash}
-    - push: ❌ 失敗
   ブランチ・worktree:
     - 削除: ✅ 成功
   Findings回収: {回収済みN件 / 保存済みN件}（{該当なしの場合は「該当なし」}）
