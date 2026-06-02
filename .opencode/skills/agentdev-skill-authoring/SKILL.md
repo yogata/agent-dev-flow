@@ -484,7 +484,57 @@ This endpoint is no longer supported.
 
 ## 8. Command / Skill 境界
 
-Skill の品質基準は本スキルの範囲とする。Command に何を置き、何を置かないかの境界定義は `artifact-boundaries.md`（`.opencode/skills/agentdev-workflow-lifecycle/references/artifact-boundaries.md`）を参照。Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
+Skill の品質基準は本スキルの範囲とする。Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（`docs/specs/artifact-contracts.md`）を参照。Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
+
+## 9. 配置判断フロー
+
+新規コンテンツをどこに配置するかの判断フロー（REQ-0103, ADR-0013）:
+
+```
+配置すべきコンテンツを特定
+  ↓
+Q1: runtime 配布物で個別プロジェクトで実行されるか？
+  → Yes: Q2 へ
+  → No: Q5 へ（authoring-only）
+
+Q2: 宣言的ルール・判断基準・domain knowledge か？
+  → Yes: Skill（SKILL.md または references/）に配置
+  → No: Q3 へ
+
+Q3: 決定的でテスト可能な処理ロジックか？
+  → Yes: Script（scripts/）に配置
+  → No: Q4 へ
+
+Q4: 出力構造・プレースホルダーか？
+  → Yes: Template（templates/）に配置
+  → No: 再評価。runtime で本当に必要か確認
+
+Q5: 現在仕様の記述か？
+  → Yes: SPEC（docs/specs/）に配置
+  → No: Q6 へ
+
+Q6: 取り返しのつかない技術判断の記録か？
+  → Yes: ADR（docs/adr/）に配置
+  → No: Q7 へ
+
+Q7: 人間向けナビゲーション・案内か？
+  → Yes: Guide（docs/guides/）に配置
+  → No: DOC-MAP または適切な分類先を再検討
+```
+
+各分岐の判定基準:
+
+| 分岐 | 判定基準 | 例 |
+|---|---|---|
+| runtime 配布物 | 個別プロジェクトで command/skill 実行時に必要 | 判断基準、テンプレート、検査スクリプト |
+| Skill | 再利用可能、宣言的、複数 command から参照可能 | フェーズ体系、命名規則、状態遷移 |
+| Script | 入力が同じなら出力も同じ。テスト可能 | 採番、validation、INDEX 生成 |
+| Template | 変数置換で使用。ロジックなし | Issue/PR 本文、コメント |
+| SPEC | 現在の構造・契約・ルールの記述 | system.md、patterns.md |
+| ADR | 「なぜその決定をしたか」の記録 | 技術選定、方針変更 |
+| Guide | 人間向けの案内・説明 | ワークフロー概要、クイックスタート |
+
+**注意**: skill `references/` は runtime 配布物のみを含める（ADR-0016）。authoring-only 資料は `references/` に含めない。
 
 ## See Also
 
