@@ -56,3 +56,21 @@
 - **想定反映先**: agentdev-git-worktreeのworktree削除手順（SKILL.mdまたはreferences/worktree-operations.md）
 - **関連**: Issue #511, `.sisyphus/plans/plan-513.md`, `agentdev-git-worktree/references/worktree-operations.md`
 - **タグ**: `#worktree` `#cleanup` `#case-close` `#git`
+
+---
+
+## 2026-06-03: Epic Orchestrator完了後の子Issue未クローズ残存パターン
+
+- **問題事象**: Epic #519 の case-run (Orchestratorモード) で全10子IssueのPR作成・MERGEDまで完了したが、子Issue #520-#527の8件がOPENのまま残存。Epic #519のcase-close時にG04（Epic自動クローズは全子Issue CLOSEDの場合のみ）に抵触し、先に8件の子Issueを個別にcase-closeする必要が生じた
+- **発生局面**: 完了処理（case-close Epic Issue）
+- **検知方法**: G04 guardrail判定によるEpicクローズ不可の検出
+- **根本原因**: Epic Orchestratorモードのcase-runはPR作成までを担当し、Issueクローズはcase-closeの責務。しかしEpic Orchestratorで連続実行した場合、各Waveの完了 = PR MERGED ≠ Issue CLOSED という状態が暗黙に蓄積する。子Issueのcase-closeを個別に実行する運用フローが確立されていなかった
+- **自律対応内容**: (1) #520-#527の8件に対して対応記録コメント投稿＋gh issue close --reason completedを一括実行、(2) 全子Issue CLOSEDを確認後、Epic #519をクローズ
+- **ユーザー確認有無**: あり（G04制約を説明し、子Issue先closeを推奨→ユーザー承認）
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: Epic Orchestratorで10+子Issueを処理する全パターンに適用。特にWave数が多い大規模Epicで顕著
+- **再発条件**: (1) Epic Orchestratorモードでcase-runを実行、(2) 子IssueのPRがMERGEDされる、(3) 子Issueのcase-closeを個別に実行せずにEpicのcase-closeを試みる
+- **予防策候補**: (1) Epic Orchestrator完了後に「未クローズ子Issueのcase-close」を自動プロンプトする、(2) case-closeのEpic検出時に子IssueのOPEN/CLOSED状態を事前チェックする手順を追加、(3) Orchestrator完了報告に「N件の子IssueがOPEN（要case-close）」を明記する
+- **想定反映先**: case-closeコマンドのEpic Issue検出時の事前チェック、またはcase-runのOrchestrator完了報告フォーマット
+- **関連**: Epic #519, 子Issue #520-#529, case-run Orchestratorモード, G04 guardrail
+- **タグ**: `#epic-orchestrator` `#case-close` `#issue-lifecycle` `#guardrail`
