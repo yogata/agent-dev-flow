@@ -24,7 +24,7 @@
 2. **完了報告テキスト（後）**: 本スキルの完了報告フォーマットに従ったテキストを出力する
 3. **中間出力の禁止**: TodoWrite更新と完了報告テキストの間に、他の中間出力（ログ・進捗報告・確認メッセージ等）を挟まない
 
-**適用対象**: req-define, req-save, case-open, case-run, case-run (Epic Orchestrator), case-close, case-update, intake-capture, intake-from-github, intake-review, intake-promote, backlog-review, backlog-save, req-backlog, learning-refine, learning-promote, integrity-check の全完了報告ステップ
+**適用対象**: req-define, req-save, case-open, case-run, case-run (Epic Orchestrator), case-close, case-update, intake-capture, intake-from-github, intake-review, intake-promote, backlog-review, backlog-save, learning-refine, learning-promote, integrity-check の全完了報告ステップ
 
 **理由**: 完了報告テキストがユーザーに最後に表示されることで、最終結果の視認性が向上する
 
@@ -80,9 +80,6 @@
 | backlog-save | standard | `backlog-save/standard.md` | 全RU生成成功 |
 | backlog-save | partial | `backlog-save/partial.md` | 部分成功（RU生成失敗あり） |
 | backlog-save | zero-draft | `backlog-save/zero-draft.md` | status: reviewed の draft 0件 |
-| req-backlog | standard | `req-backlog/standard.md` | （非推奨）全RU生成成功 |
-| req-backlog | partial | `req-backlog/partial.md` | （非推奨）部分成功 |
-| req-backlog | zero-promoted | `req-backlog/zero-promoted.md` | （非推奨）promoted artifact 0件 |
 | learning-refine | standard | `learning-refine/standard.md` | 常にこのvariant |
 | learning-promote | standard | `learning-promote/standard.md` | 常にこのvariant |
 | integrity-check | standard | `integrity-check/standard.md` | 常にこのvariant |
