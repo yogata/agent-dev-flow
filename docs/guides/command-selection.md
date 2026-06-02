@@ -1,21 +1,8 @@
-# agent-dev-flow
+# コマンド選択
 
-AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted development workflow を支えるコマンド・スキル・ドキュメントを一元管理する。
-
-## Plugin identity
-
-| 項目 | 値 |
-|------|------|
-| Plugin 表示名 | `AgentDevFlow` |
-| Canonical namespace | `agentdev` |
-| Public command prefix | `/agentdev/*` |
-| Domain state directory | `.agentdev/` |
-| Skill prefix | `agentdev-*` |
-| Domains | req, case, learning, intake, integrity |
+現在の状態から、次に実行すべきコマンドを選ぶための入口表。
 
 ## 入口表
-
-現在の状態から次に実行すべきコマンドを選ぶ。
 
 | 現在の状態 | 次のコマンド | 出力 |
 |-----------|-------------|------|
@@ -38,24 +25,15 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 | REQ 体系の健全性を診断したい | `/agentdev/req-restructure-review` | 診断レポート |
 | ドキュメント整合性を検証したい | `/agentdev/integrity-check` | 検証レポート |
 
-## 参照先
+## 使い方
 
-| 対象 | リンク |
-|------|--------|
-| コマンド一覧・入出力リファレンス | [commands/agentdev/README.md](.opencode/commands/agentdev/README.md) |
-| ガイド入口 | [ガイド](docs/guides/README.md) |
-| コマンド選択表 | [コマンド選択](docs/guides/command-selection.md) |
-| 成果物・状態モデル | [成果物・状態モデル](docs/guides/artifacts-and-state.md) |
-| システム仕様 | [system.md](docs/specs/system.md) |
+1. 「現在の状態」の列から今の状況に合う行を探す
+2. 「次のコマンド」を実行する
+3. 出力された成果物を使って、次の行に進む
 
-## クイックスタート
+## 補足
 
-機能追加の最小フロー。バグ修正は `/agentdev/req-define` 後に `/agentdev/case-open` に進む。
-
-```
-/agentdev/req-define    # 要件を壁打ちする
-/agentdev/req-save      # REQ/ADR ファイルとして保存（機能追加のみ）
-/agentdev/case-open     # Issue を作成
-/agentdev/case-run      # 実装して PR を作成
-/agentdev/case-close    # PR をマージして Issue をクローズ
-```
+- 機能追加は `req-define` → `req-save` → `case-open` → `case-run` → `case-close` の5ステップが基本
+- バグ修正・保守作業・ドキュメント作業は `req-save` をスキップする
+- Intake / Learning パイプラインの詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) を参照
+- 各コマンドの入出力の詳細は [要件定義 → Case実行フロー](req-case-flow.md) を参照
