@@ -76,7 +76,7 @@
 - ユーザー向け入口
 - Input / Output
 - 高レベル Steps（5〜12個）
-- 使用する Skill（frontmatter load_skills + Steps 内参照）
+- 使用する Skill（Steps 内参照）
 - 成果物の読み書き対象
 - command 固有 Guardrails
 
@@ -88,6 +88,7 @@
 - script
 - 共通安全手順
 - 複数 command で使う workflow protocol
+- frontmatter の dev メタデータ（implementation_pattern, secondary_pattern, load_skills 等）
 
 ### Skill
 
@@ -126,4 +127,22 @@
 - Wave scheduling を含む
 - サブエージェント protocol を含む
 
-詳細は `artifact-boundaries.md`（REQ-0103〜007）を参照。
+詳細は `artifact-contracts.md`（REQ-0103）を参照。
+
+---
+
+## 6. Runtime / Authoring 関心分離
+
+AgentDevFlow の配布物は runtime（個別プロジェクトで実行可能）と authoring（agent-dev-flow レポジトリ開発用）に明確に分離する（ADR-0013）。
+
+**Runtime 配布物**は自己完結し、agent-dev-flow レポジトリの dev メタデータに依存しないことを保証する:
+- Command frontmatter は `description` と `agent` のみ（REQ-0103-015, ADR-0013）
+- Skill `references/` は runtime 配布物のみを含める（ADR-0016）
+- `docs/specs/` は agent-dev-flow レポジトリ専用の管理文書であり、runtime 配布物の依存先ではない（ADR-0015）
+
+**Authoring 専用物**は agent-dev-flow レポジトリ内でのみ参照される:
+- implementation_pattern 分類定義（design-principles.md）
+- command-authoring / skill-authoring ガイド
+- integrity-check の検査ルール定義
+
+この分離の意図は、**runtime 配布物の移植性と安定性の確保**にある。個別プロジェクトが agent-dev-flow レポジトリの内部構造や開発用メタデータに依存することを防ぐ。
