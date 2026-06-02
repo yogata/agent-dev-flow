@@ -34,7 +34,7 @@ Do not cite retired REQ as current authority. If a retired REQ is mentioned in n
 
 - Keep commands thin: public API, inputs, outputs, guardrails, and high-level steps only.
 - Put reusable judgment in skills, long detail in skill `references/`, fixed wording in templates, and deterministic checks in scripts.
-- When editing commands, keep frontmatter such as `agent`, `implementation_pattern`, and `load_skills` aligned with the command's responsibility.
+- When editing commands, keep frontmatter fields (`description` and `agent` only) aligned with the command's responsibility.
 - When adding or moving canonical documents, update the relevant index, DOC-MAP, links, and cross-references in the same change.
 - After documentation edits, check for broken relative links, stale REQ ranges, legacy command names, and `reference/` vs `references/` drift.
 - Prefer existing lifecycle states, directory names, and terminology. Do not invent new workflow states unless the change is backed by a new or updated requirement.
