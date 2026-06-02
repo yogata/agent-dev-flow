@@ -1,7 +1,7 @@
 ✅ req-define 完了
 
 完了コマンド: /agentdev/req-define
-対象: 壁打ちドラフト（機能追加 Epic：大規模機能追加）
+対象: 壁打ちドラフト（機能追加：large / Epic）
 結果:
   - 要件定義の壁打ちが完了（Epic規模）
   - 壁打ちドラフトを .sisyphus/drafts/ に保存

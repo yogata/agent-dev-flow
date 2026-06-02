@@ -47,11 +47,9 @@
 
 | コマンド | Variant | ファイルパス | 選択条件 |
 |----------|---------|-------------|----------|
-| req-define | feature | `req-define/feature.md` | feature standard（機能追加） |
-| req-define | feature-epic | `req-define/feature-epic.md` | feature large (Epic)（大規模機能追加） |
-| req-define | bug-or-lightweight | `req-define/bug-or-lightweight.md` | work_type: bugfix（旧 bugfix） |
-| req-define | maintenance | `req-define/maintenance.md` | maintenance（保守作業） |
-| req-define | docs-or-chore | `req-define/docs-or-chore.md` | work_type: docs_chore（旧 docs_chore） |
+| req-define | feature | `req-define/feature.md` | work_type: feature, scale: standard |
+| req-define | feature-epic | `req-define/feature-epic.md` | work_type: feature, scale: large (Epic) |
+| req-define | lightweight | `req-define/lightweight.md` | work_type: bugfix / maintenance / docs_chore |
 | req-save | standard | `req-save/standard.md` | SPLITなし、DOC-MAP更新なし |
 | req-save | split-detected | `req-save/split-detected.md` | SPLIT検出時 |
 | req-save | docmap-updated | `req-save/docmap-updated.md` | DOC-MAP更新あり |
