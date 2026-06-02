@@ -6,6 +6,19 @@
 
 整合性検査の分類フレームワークを定義し、検査結果の深刻度と対応フローを規定する（REQ-0108）。
 
+## Premise Reversal Record
+
+以下の検査は前提の reversal を反映している（ADR-0013, Case 5 / RU-0020）:
+
+| 検査 | 旧前提 | 新前提 | 根拠 REQ |
+|---|---|---|---|
+| implementation_pattern | frontmatter に必須 | frontmatter への混入を禁止 | REQ-0108-022, 095 |
+| secondary_pattern | frontmatter に検証 | frontmatter への混入を禁止 | REQ-0108-028, 096 |
+| load_skills | frontmatter に必須・整合性検査 | frontmatter への混入を禁止 | REQ-0108-024, 097 |
+| frontmatter allowed fields | 複数フィールド許可 | description + agent のみ | REQ-0108-046, 098 |
+| dev メタデータ混入 | 検査対象外 | error として検出 | REQ-0108-109 |
+| skill references 存在 | 検査対象外 | runtime パスのみ確認 | REQ-0108-110 |
+
 ## Severity Classification
 
 | 分類 | 意味 | 判定時の動作 | 例 |
