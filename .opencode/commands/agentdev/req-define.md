@@ -39,9 +39,9 @@ agent: prometheus
 
 6. **要件doc生成** → テンプレート: `agentdev-req-file-manager` templates/doc_requirement.md を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
 
-7. **Pattern判定**: ラベルに基づき判定（bug/critical→A, enhancement/feature→B, refactor/maintenance→C, docs/chore→D）。Pattern A + ADR必要時は Pattern B に昇格
+7. **work_type 判定**: ラベルに基づき判定（bug/critical→A, enhancement/feature→B, refactor/maintenance→C, docs/chore→D）。bugfix + ADR必要時は feature に昇格
 
-8. **Scale判断**（Pattern B のみ）: `agentdev-workflow-lifecycle` の並列実行パターン条件で standard/large を判定。large 時はユーザーと分解計画を協議
+8. **Scale判断**（feature のみ）: `agentdev-workflow-lifecycle` の並列実行パターン条件で standard/large を判定。large 時はユーザーと分解計画を協議
 
 9. **ドラフト保存**:
    - 機能追加: `.sisyphus/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（pattern/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加
@@ -50,11 +50,11 @@ agent: prometheus
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
 
 11. **完了報告**: `agentdev-workflow-reporting` の完了報告variantに従って出力。Pattern に応じたvariantを選択:
-    - Pattern B standard → completion-reports/req-define/feature.md
-    - Pattern B Epic規模 → completion-reports/req-define/feature-epic.md
-    - Pattern A → completion-reports/req-define/bug-or-lightweight.md
-    - Pattern C → completion-reports/req-define/maintenance.md
-    - Pattern D → completion-reports/req-define/docs-or-chore.md
+    - feature standard → completion-reports/req-define/feature.md
+    - feature large (Epic)規模 → completion-reports/req-define/feature-epic.md
+    - bugfix → completion-reports/req-define/bug-or-lightweight.md
+    - maintenance → completion-reports/req-define/maintenance.md
+    - docs_chore → completion-reports/req-define/docs-or-chore.md
 
 ## Guardrails
 
@@ -69,4 +69,4 @@ agent: prometheus
 - G09: チェックボックスは測定可能で一意（`agentdev-req-analysis` 品質基準）
 - G10: 要件doc構造は doc_requirement.md テンプレートに厳密に従う
 - G11: ADR閾値以上の判断は `agentdev-adr-guidelines` へ
-- G12: Pattern判定基準は `agentdev-workflow-lifecycle` → Pattern Registry を参照
+- G12: work_type 判定基準は `agentdev-workflow-lifecycle` → workflow classification を参照

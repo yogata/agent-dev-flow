@@ -94,7 +94,7 @@ agent: sisyphus
 ### 品質ゲート
 - G06: req-define未実行の場合は警告
 - G07: 要件docのチェックボックスが空の場合は警告
-- G08: 機能追加（Pattern B）の場合、対応するREQファイルが存在することを確認
+- G08: featureの場合、対応するREQファイルが存在することを確認
 - G09: テンプレートの【必須】セクションが全てIssue本文に含まれていることを確認してからgh issue createを実行すること。欠落セクションがある場合は再生成すること
 - G10: `完了条件` セクションはIssue本文テンプレートの【必須】セクションである。テンプレート準拠検証で必ず含まれていることを確認すること
 
@@ -103,7 +103,7 @@ agent: sisyphus
 
 ### 委譲・参照制約
 - G12: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
-- G13: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
+- G13: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
 
 ### 出力制約
 - G14: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）

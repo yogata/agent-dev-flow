@@ -161,8 +161,8 @@ docs/requirements/
 
 `docs/DOC-MAP.md`（ドキュメント探索経路インデックス）は `docs/` 直下に配置する。DOC-MAP は補助文書であり、基準は `REQ-{NNNN}.md` である（REQ-0101）。
 
-**バグ修正・軽微変更除外**: バグ修正・軽微変更（Pattern A）ではREQファイルを作成しない。Issue本文のみで要件を管理する。REQファイルの修正が必要なバグ修正は、機能追加（Pattern B）に昇格して扱う。
-- Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
+**バグ修正・軽微変更除外**: bugfixではREQファイルを作成しない。Issue本文のみで要件を管理する。REQファイルの修正が必要なバグ修正は、featureに昇格して扱う。
+- Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
 
 各REQファイルのfrontmatter:
 

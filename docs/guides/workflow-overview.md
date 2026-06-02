@@ -22,7 +22,7 @@ flowchart TD
     BS -->|"RU-*.md"| RD["req-define"]
     RD -->|"要件doc（draft）"| RS["req-save"]
     RS -->|"REQ/ADR ファイル"| CO["case-open"]
-    RD -->|"Pattern A/C/D"| CO
+    RD -->|"non-feature (bugfix/maintenance/docs_chore)"| CO
     CO -->|"GitHub Issue"| CR["case-run"]
     CR -->|"PR"| CC["case-close"]
     CC -->|"マージ済み + クローズ済み"| DONE["完了"]
@@ -65,7 +65,7 @@ RU の粒度: N:1（複数 artifact を 1 RU に統合）、1:N（1 artifact を
 | 前工程の生成物 | コマンド | 出力 | 備考 |
 |----------|------|------|------|
 | セッション会話 / RU | `req-define` | 要件doc（draft） | AI と対話して要件を整理 |
-| 要件doc（Pattern B のみ） | `req-save` | REQ/ADR ファイル | commit/push まで実行 |
+| 要件doc（feature のみ） | `req-save` | REQ/ADR ファイル | commit/push まで実行 |
 
 `req-define` の処理:
 1. 既存 `REQ-*.md` をスキャンし、関連する既存REQを特定
@@ -79,7 +79,7 @@ RU の粒度: N:1（複数 artifact を 1 RU に統合）、1:N（1 artifact を
 
 | 前工程の生成物 | コマンド | 出力 | 備考 |
 |----------|------|------|------|
-| REQ ファイル / 要件doc | `case-open` | GitHub Issue | Pattern B で `scale: large` の場合は Epic + 子Issue |
+| REQ ファイル / 要件doc | `case-open` | GitHub Issue | feature で `scale: large` の場合は Epic + 子Issue |
 | Issue | `case-run` | 実装済みブランチ + PR | 3フェーズ構成（準備・実装・提出） |
 | PR | `case-close` | マージ済み + クローズ済み | Findings/Intake候補を回収 |
 
@@ -128,9 +128,9 @@ Issueのラベルに基づき4つのPatternに分類する。Patternにより経
 | C | リファクタリング・保守作業 | `refactor`, `maintenance` | 不要 | 必要に応じて | 不要 | `refactor` |
 | D | ドキュメント・雑務 | `docs`, `chore` | 不要 | 必要に応じて | 不要 | `chore` |
 
-**Pattern B の規模判定**: 複数モジュール跨ぎ・PR肥大化リスク・段階的リリースのいずれかを満たす場合、Epic規模（`scale: large`）として扱い、Epic + 子Issue構成で実行する。
+**feature の規模判定**: 複数モジュール跨ぎ・PR肥大化リスク・段階的リリースのいずれかを満たす場合、Epic規模（`scale: large`）として扱い、Epic + 子Issue構成で実行する。
 
-**昇格ルール**: Pattern A で ADR が必要と判定された場合、Pattern B に昇格し req-save を実行する。
+**昇格ルール**: bugfix で ADR が必要と判定された場合、feature に昇格し req-save を実行する。
 
 ## 参照基準
 
