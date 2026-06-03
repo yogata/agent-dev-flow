@@ -68,4 +68,4 @@ agent: prometheus | sisyphus
 
 ## Scope Declaration
 
-`docs/specs/` は agent-dev-flow レポジトリ専用である。他プロジェクトへの適用を意図しない。
+`docs/specs/` は agent-dev-flow レポジトリ専用の repo-internal 設計文書である（ADR-0017）。他プロジェクトへの適用を意図しない。runtime command は SPEC ファイルに依存しない（ADR-0018）。
