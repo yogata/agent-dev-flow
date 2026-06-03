@@ -92,3 +92,23 @@ docs/
 | `in_progress` | 実装中 | 構造的実行 |
 | `review` | PR 作成済み・レビュー中 | レビュー完了 |
 | `done` | 完了（post-run capture 含む） | レビュー完了 |
+
+> **注意**: 6 マイクロフェーズは説明用ラベルであり、AgentDevFlow の状態管理モデルではない（REQ-0112-023）。AgentDevFlow は全体横断の状態遷移モデルを持たない。各コマンドの入出力契約とディレクトリ配置が実際の状態表現である。
+
+## 状態モデル制約（REQ-0112）
+
+以下の制約が AgentDevFlow の状態モデルに適用される:
+
+- REQ / SPEC に workflow status を追加しない（REQ-0112-027）
+- intake promoted に route / status を追加しない（REQ-0112-028）
+- Issue / PR の状態を docs に複製しない（REQ-0112-029）
+- command-map を状態遷移エンジン化しない（REQ-0112-030）
+
+## .agentdev/ の位置づけ
+
+`.agentdev/` は AgentDevFlow の canonical domain state（永続的領域状態）である（REQ-0112-024）:
+
+- **domain state**: intake / learning / backlog / integrity のパイプライン状態を保持する
+- **配布物ではない**: runtime 配布物の一部ではなく、agent-dev-flow レポジトリ内の作業領域である
+- **git 管理対象**: コマンド実行時に scoped commit で永続化される
+- `.sisyphus/` は runtime 作業領域であり、domain state ではない

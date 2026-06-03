@@ -123,3 +123,16 @@ intake/learning 両方の promoted artifact を RU に統合する。
 ## 矛盾検出
 
 promoted artifact 間に矛盾が検出された場合、矛盾する artifact を RU 化せずユーザーに確認する。矛盾しない artifact は通常通り RU 化を継続する（partial success）。
+
+## 状態モデル制約
+
+AgentDevFlow は全体横断の状態遷移モデルを持たない。パイプラインの各段階はディレクトリ配置とファイルの存在で表現し、frontmatter や status フィールドによる状態管理を行わない（REQ-0112-023）。
+
+- **promoted artifact は状態を持たない**: frontmatter に route / status を記録しない（REQ-0112-028）。ディレクトリ配置（`inbox/` → `accepted/` → `promoted/`）が状態の表現である
+- **docs に GitHub 状態を複製しない**: Issue / PR の open / closed / merged 状態を REQ / SPEC / guides に記録しない（REQ-0112-029）
+- **command-map は状態遷移エンジンではない**: 入口表は次に実行すべきコマンドの案内であり、状態機械の遷移表ではない（REQ-0112-030）
+- **6 マイクロフェーズは説明用ラベル**: workflow の進行状況を人間が理解するための呼称であり、システムが管理する状態値ではない（REQ-0112-023）
+
+## .agentdev/ の位置づけ
+
+`.agentdev/` は AgentDevFlow の canonical domain state である（REQ-0112-024）。パイプラインの状態（intake / learning / backlog / integrity）を保持する永続領域であり、runtime 配布物の一部ではない。各コマンドは `.agentdev/` 配下の変更を scoped commit で git に永続化する。
