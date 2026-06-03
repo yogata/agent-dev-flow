@@ -118,7 +118,7 @@ intake/learning 両方の promoted artifact を RU に統合する。
 | RU の内容が Issue に永続化完了（Issue作成 + VERIFY 成功） | `case-open` | 該当 RU ファイル |
 | promoted artifact の RU 化成功 | `backlog-save` | 該当 promoted artifact |
 
-`req-save` は RU を削除せず、REQ ファイルの Requirement Source に RU パスを記録する。永続化未完了の場合は RU を残置する。
+`req-save` は RU を削除せず、RU パスを docs 永続文書に記録しない。RU は一時成果物であり、永続化未完了の場合は残置する。
 
 ## 矛盾検出
 

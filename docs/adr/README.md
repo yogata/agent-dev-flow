@@ -9,19 +9,19 @@
 | ADR-0001 | Command/Skill/Template/Script責任分界の正式定義 | proposed | 2026-05-18 |
 | ADR-0002 | Orchestration skill作成基準の導入 | proposed | 2026-05-18 |
 | ADR-0003 | req-define入力の抽象化 | proposed | 2026-05-18 |
-| ADR-0004 | 要件管理構造の area-based 移行方針 | superseded-by:[ADR-0007] | 2026-05-19 |
+| ADR-0004 | 要件管理構造の area-based 移行方針 | superseded | 2026-05-19 |
 | ADR-0005 | AgentDevFlow plugin namespace 統一 | accepted | 2026-05-21 |
 | ADR-0006 | Epic Issue 本文を実行順序 SSoT とする設計 | proposed | 2026-05-22 |
-| ADR-0007 | REQ/ADR基準構造と分類ビュー運用の再定義 | superseded-by:[ADR-0008] | 2026-05-24 |
+| ADR-0007 | REQ/ADR基準構造と分類ビュー運用の再定義 | superseded | 2026-05-24 |
 | ADR-0008 | DOC-MAP導入と requirements/views 廃止 | proposed | 2026-05-28 |
-| ADR-0009 | REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入 | accepted | 2026-05-30 |
+| ADR-0009 | REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入 | deprecated | 2026-05-30 |
 | ADR-0010 | HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則 | proposed | 2026-06-02 |
 | ADR-0011 | Manager/orchestrator パターンの限定採用 — 標準構造とはしない | proposed | 2026-06-02 |
 | ADR-0012 | Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流 | proposed | 2026-06-02 |
 | ADR-0013 | runtime / authoring 関心分離 | accepted | 2026-06-02 |
-| ADR-0014 | ADR / SPEC 再分類基準 | accepted | 2026-06-02 |
-| ADR-0015 | docs/specs 非runtime依存宣言 | accepted | 2026-06-02 |
-| ADR-0016 | skill references runtime-only 制約 | accepted | 2026-06-02 |
+| ADR-0014 | ADR / SPEC 再分類基準 | superseded | 2026-06-02 |
+| ADR-0015 | docs/specs 非runtime依存宣言 | superseded | 2026-06-02 |
+| ADR-0016 | skill references runtime-only 制約 | superseded | 2026-06-02 |
 | ADR-0017 | 文書種別責務境界 | accepted | 2026-06-03 |
 | ADR-0018 | runtime 独立性 | accepted | 2026-06-03 |
 
@@ -42,17 +42,20 @@
 
 ### accepted
 
-- [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 統一
-- [ADR-0009](ADR-0009.md) — REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入
+- [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 瑧一
 - [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
-- [ADR-0014](ADR-0014.md) — ADR / SPEC 再分類基準
-- [ADR-0015](ADR-0015.md) — docs/specs 非runtime依存宣言
-- [ADR-0016](ADR-0016.md) — skill references runtime-only 制約
+
+### deprecated
+
+- [ADR-0009](ADR-0009.md) — REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入
 
 ### superseded
 
 - [ADR-0004](ADR-0004.md) — 要件管理構造の area-based 移行方針 （superseded by [ADR-0007](ADR-0007.md)）
 - [ADR-0007](ADR-0007.md) — REQ/ADR基準構造と分類ビュー運用の再定義 （superseded by [ADR-0008](ADR-0008.md)）
+- [ADR-0014](ADR-0014.md) — ADR / SPEC 再分類基準 （superseded by [ADR-0017](ADR-0017.md)）
+- [ADR-0015](ADR-0015.md) — docs/specs 非runtime依存宣言 （superseded by [ADR-0018](ADR-0018.md)）
+- [ADR-0016](ADR-0016.md) — skill references runtime-only 制約 （superseded by [ADR-0018](ADR-0018.md)）
 
 ## Topic View
 
