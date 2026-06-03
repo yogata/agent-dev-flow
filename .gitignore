@@ -1,2 +1,3 @@
-# Runtime workspace (ADR-0018)
 .sisyphus/
+backup/
+.worktrees
