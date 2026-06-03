@@ -3014,7 +3014,8 @@ async function main(): Promise<void> {
     process.exit(EXIT_OK);
   }
 
-  const root = findRepoRoot(import.meta.dir);
+  const scriptDir = (typeof import.meta !== "undefined" && (import.meta as any).dir) || __dirname || process.cwd();
+  const root = findRepoRoot(scriptDir);
   const reqDir = path.join(root, "docs", "requirements");
   const adrDir = path.join(root, "docs", "adr");
   const specsDir = path.join(root, "docs", "specs");
