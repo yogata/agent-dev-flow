@@ -9,7 +9,8 @@
 | active REQ | `requirements/REQ-{NNNN}.md` | 現行要件の永続基準 |
 | retired REQ | `requirements/retired/REQ-{NNNN}.md` | 履歴参照。現行要件判断には使わない |
 | ADR | `adr/ADR-{NNNN}.md` | アーキテクチャ決定記録 |
-| SPEC | `specs/*.md` | 現在仕様 |
+| SPEC | `specs/*.md` | repo-internal 設計文書（現在仕様）。runtime 配布物の依存先ではない（ADR-0017, ADR-0018） |
+| Guides | `guides/*.md` | 人間向け navigation 層。規範的権限を持たない（ADR-0017） |
 | DOC-MAP | このファイル | 文書探索入口 |
 
 ## Active REQ

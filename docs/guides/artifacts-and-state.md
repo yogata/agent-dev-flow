@@ -46,9 +46,9 @@ Command は判定ロジックを直接記述せず Skill を参照する。Skill
 docs/
   requirements/REQ-{NNNN}.md    # 要件定義（基準）
   adr/ADR-{NNNN}.md             # アーキテクチャ判断（基準）
-  specs/*.md                     # 現在仕様（基準）
+  specs/*.md                     # 現在仕様（repo-internal 設計文書、基準）
   DOC-MAP.md                     # 文書探索入口（非基準）
-  guides/*.md                    # 参照用読み物（非基準）
+  guides/*.md                    # 参照用読み物（navigation 層、非基準）
 .agentdev/
   intake/                        # Intake パイプライン domain state
     inbox/ accepted/ promoted/ archive/
@@ -59,8 +59,15 @@ docs/
 .opencode/
   commands/agentdev/             # Command 定義
   skills/agentdev-*/             # Skill 定義（SKILL.md + references/ + templates/ + scripts/）
-.sisyphus/                       # 作業領域（runtime 用。永続的な domain state ではない）
+.sisyphus/                       # 一時的 runtime 作業領域（domain state ではない、ADR-0018）
+  drafts/                        # command workflow の作業用一時領域（明示的 handoff のみ使用）
 ```
+
+### ディレクトリ責務の補足
+
+- `.agentdev/`: AgentDevFlow の canonical domain state。intake / learning / backlog / integrity の永続データを管理する。配布物ではなく、レポジトリの動作状態を保持する（ADR-0017）。
+- `.sisyphus/`: runtime 一時作業領域。domain state ではなく、`.gitignore` で管理対象外とする（ADR-0018）。
+- `.sisyphus/drafts/`: command workflow でのみ明示的に定義された working draft handoff に使用する一時領域。
 
 ## 成果物ライフサイクル
 

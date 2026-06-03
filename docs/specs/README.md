@@ -3,6 +3,8 @@
 SPEC files are canonical documents for the current architecture (REQ-0101).
 They describe what the system *is* now, as opposed to REQ files that define what it *should be*.
 
+> **Repo-internal 設計文書**: SPEC files are repo-internal design documents for the agent-dev-flow repository. They are not runtime distribution targets and runtime commands do not depend on them (ADR-0017, ADR-0018).
+
 ## SPEC Files
 
 | SPEC | タイトル | 責務 |
