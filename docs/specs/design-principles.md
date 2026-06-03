@@ -8,11 +8,11 @@
 
 Issue の種別に応じて異なるワークフローを適用する。work_type と scale の組み合わせで workflow_route を導出する（REQ-0104）。
 
-**bugfix**（旧 Pattern A）は既存機能の不具合修正であり、要件定義書（REQ）の作成を不要とする。バグ修正は観察可能な事実（再現手順・期待動作・実際動作）に基づいて完結するため、壁打ちによる要件形成が不要である。docs更新もスキップし、最小限の経路（req-define → case-open → case-run → case-close）で処理する。
+**bugfix** は既存機能の不具合修正であり、要件定義書（REQ）の作成を不要とする。バグ修正は観察可能な事実（再現手順・期待動作・実際動作）に基づいて完結するため、壁打ちによる要件形成が不要である。docs更新もスキップし、最小限の経路（req-define → case-open → case-run → case-close）で処理する。
 
-**feature**（旧 Pattern B）は新しい振る舞いをシステムに導入するため、WHAT（要件）とHOW（実装）の分離が不可欠である。壁打ちフェーズでの要件形成、REQ/ADRファイルの保存、specs更新など、複数の確認ポイントを経由する経路（req-define → req-save → case-open → case-run → case-close）を辿る。
+**feature** は新しい振る舞いをシステムに導入するため、WHAT（要件）とHOW（実装）の分離が不可欠である。壁打ちフェーズでの要件形成、REQ/ADRファイルの保存、specs更新など、複数の確認ポイントを経由する経路（req-define → req-save → case-open → case-run → case-close）を辿る。
 
-**maintenance**（旧 Pattern C）はリファクタリング・保守作業向けの軽量経路である。**docs_chore**（旧 Pattern D）はドキュメント・雑務向けの軽量経路である。
+**maintenance** はリファクタリング・保守作業向けの軽量経路である。**docs_chore** はドキュメント・雑務向けの軽量経路である。
 
 この分離の意図は、バグ修正のオーバーヘッドを最小化しつつ、機能追加の品質ゲートを確保することにある。
 
@@ -26,7 +26,7 @@ Issue の種別に応じて異なるワークフローを適用する。work_typ
 | maintenance | — | direct_case | req-define → case-open → case-run → case-close |
 | docs_chore | — | direct_case | req-define → case-open → case-run → case-close |
 
-> **歴史的参照**: `Pattern A/B/C/D` は旧分類コード。新体系では `work_type` + `scale` + `workflow_route` を使用する（REQ-0104）。
+> **歴史的参照**: `Pattern A/B/C/D` は旧分類コード。新体系では `work_type`（bugfix/feature/maintenance/docs_chore）+ `scale` + `workflow_route` を使用する（REQ-0104, REQ-0112）。
 
 ---
 

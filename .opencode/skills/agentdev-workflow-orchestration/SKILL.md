@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-orchestration
-description: case-run の状態機械・Wave scheduling・サブエージェント protocol・self-healing loop・CI 対応 loop・Epic Orchestrator モードの知識ベース。USE FOR: case-run の多重Issue依存関係分析、Wave構成、再開ポイント判定、自律修正ループ判定、集約完了報告、Epic検出・Wave解析・subagent起動・障害伝播。DO NOT USE FOR: 単一Issue の基本的な Step 実行手順（case-run コマンド定義を参照）、Pattern 判定（agentdev-workflow-lifecycle を参照）、乖離検出（agentdev-spec-compliance を参照）、完了報告フォーマット（agentdev-workflow-reporting を参照）
+description: case-run の状態機械・Wave scheduling・サブエージェント protocol・self-healing loop・CI 対応 loop・Epic Orchestrator モードの知識ベース。USE FOR: case-run の多重Issue依存関係分析、Wave構成、再開ポイント判定、自律修正ループ判定、集約完了報告、Epic検出・Wave解析・subagent起動・障害伝播。DO NOT USE FOR: 単一Issue の基本的な Step 実行手順（case-run コマンド定義を参照）、work_type 判定（agentdev-workflow-lifecycle を参照）、乖離検出（agentdev-spec-compliance を参照）、完了報告フォーマット（agentdev-workflow-reporting を参照）
 ---
 
 # case-run Orchestration Knowledge Base
@@ -39,7 +39,7 @@ case-run は3つの実行モードを持つ:
 ## See Also
 
 - **case-run コマンド**: `.opencode/commands/agentdev/case-run.md`
-- **agentdev-workflow-lifecycle**: Pattern判定基準・フェーズ定義
+- **agentdev-workflow-lifecycle**: work_type 判定基準・フェーズ定義
 - **agentdev-workflow-reporting**: 単一Issue完了報告フォーマット
 - **agentdev-spec-compliance**: 乖離検出
 - **ADR-0002**: Orchestration skill作成基準
