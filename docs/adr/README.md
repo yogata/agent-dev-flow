@@ -22,6 +22,8 @@
 | ADR-0014 | ADR / SPEC 再分類基準 | accepted | 2026-06-02 |
 | ADR-0015 | docs/specs 非runtime依存宣言 | accepted | 2026-06-02 |
 | ADR-0016 | skill references runtime-only 制約 | accepted | 2026-06-02 |
+| ADR-0017 | 文書種別責務境界 | accepted | 2026-06-03 |
+| ADR-0018 | runtime 独立性 | accepted | 2026-06-03 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -90,6 +92,13 @@
 - [ADR-0014](ADR-0014.md) — ADR / SPEC 再分類基準
 - [ADR-0015](ADR-0015.md) — docs/specs 非runtime依存宣言
 - [ADR-0016](ADR-0016.md) — skill references runtime-only 制約
+- [ADR-0017](ADR-0017.md) — 文書種別責務境界
+- [ADR-0018](ADR-0018.md) — runtime 独立性
+
+### 文書責務・runtime独立性
+
+- [ADR-0017](ADR-0017.md) — 文書種別責務境界
+- [ADR-0018](ADR-0018.md) — runtime 独立性
 
 ## Decision Map
 
@@ -127,6 +136,13 @@
 | [ADR-0015](ADR-0015.md) | relates-to | [ADR-0014](ADR-0014.md) | SPEC 責務定義 |
 | [ADR-0016](ADR-0016.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring 分離の具体化 |
 | [ADR-0016](ADR-0016.md) | relates-to | [ADR-0014](ADR-0014.md) | 文書種別の責務定義 |
+| [ADR-0017](ADR-0017.md) | supersedes | [ADR-0014](ADR-0014.md) | ADR/SPEC再分類基準を文書種別責務境界に再定義 |
+| [ADR-0017](ADR-0017.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring分離の文書体系への適用 |
+| [ADR-0017](ADR-0017.md) | relates-to | [ADR-0018](ADR-0018.md) | 文書責務とruntime独立性の補完関係 |
+| [ADR-0018](ADR-0018.md) | supersedes | [ADR-0016](ADR-0016.md) | skill references runtime-only制約をruntime全体に拡張 |
+| [ADR-0018](ADR-0018.md) | relates-to | [ADR-0015](ADR-0015.md) | docs/specs非runtime依存宣言を統合 |
+| [ADR-0018](ADR-0018.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring分離の具体化 |
+| [ADR-0018](ADR-0018.md) | relates-to | [ADR-0017](ADR-0017.md) | 文書責務とruntime独立性の補完関係 |
 
 ## Related REQ
 
@@ -148,3 +164,5 @@
 | [ADR-0014](ADR-0014.md) | [REQ-0101](../requirements/REQ-0101.md), [REQ-0103](../requirements/REQ-0103.md) | 文書責務マトリックス・SPEC 責務定義 |
 | [ADR-0015](ADR-0015.md) | [REQ-0103](../requirements/REQ-0103.md) | SPEC 配布範囲宣言 |
 | [ADR-0016](ADR-0016.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | references runtime-only 制約・存在確認検査 |
+| [ADR-0017](ADR-0017.md) | [REQ-0101](../requirements/REQ-0101.md), [REQ-0103](../requirements/REQ-0103.md) | 文書種別責務境界の宣言 |
+| [ADR-0018](ADR-0018.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | runtime独立性・SPEC非依存の宣言 |
