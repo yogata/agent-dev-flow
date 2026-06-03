@@ -38,23 +38,7 @@ agent: sisyphus
    - 確認対象とギャップ分類は `agentdev-learning-pipeline` skill の「処分区分 → 既存対策照合」を参照
    - 「新規X化」より「既存Xへ反映」を優先
 
-5. **ユーザーへの判定結果提示**:
-
-   ```
-   ## 昇華判定結果
-
-   | クラスタ | テーマ | 廃棄判定 | 既存対策 | 理由 |
-   |---------|--------|---------|---------|------|
-   | 1 | Windows環境エスケープ問題 | 既存 command へ反映 | case-run に部分的に対策あり（fix gap） | ガードレールが不十分、3回出現 |
-   | 2 | Supabase RLS落とし穴 | 新規 skill 化 | なし | 汎用的パターン、独立した判断手順あり |
-   | 3 | コミットメッセージ形式 | duplicate | agentdev-conventional-commits skill で十分カバー | 既存skillで対応済み |
-   | 4 | 環境変数管理の注意点 | deferred | なし | 情報が断片的、出現1回のみ |
-   ```
-
-   統計サマリ:
-   - 昇華対象: N件（staged）
-   - 保留: N件（deferred）
-   - 却下・重複: N件（rejected/duplicate）
+ 5. **ユーザーへの判定結果提示**: 判定結果を表形式で提示（クラスタ / テーマ / 廃棄判定 / 既存対策 / 理由）。統計サマリ（昇華対象・保留・却下・重複の件数）を併記。
 
 6. **ユーザー承認**:
    - ユーザーが各クラスタの廃棄判定を確認・修正
@@ -119,22 +103,13 @@ agent: sisyphus
 
 ## Guardrails
 
-### ファイル操作制約
-- G01: `.opencode/` 直接反映禁止: stub は `.agentdev/learning/promoted/` のみに生成。`.opencode/commands/` や `.opencode/skills/` への直接書込は禁止
+- G01: `.opencode/` 直接反映禁止: stub は `.agentdev/learning/promoted/` のみに生成
 - G02: `evaluation-report.md` は読込専用: 変更・削除は禁止
-
-### 実行制約
-- G03: `case-run` への直接受け渡し禁止: stub は `/agentdev/backlog-review` が読み込み、RU 生成を経て `/agentdev/req-define` に合流する
-
-### 品質ゲート
+- G03: `case-run` への直接受け渡し禁止: `/agentdev/backlog-review` 経由のみ
 - G04: 主入力は `evaluation-report.md`: raw learning item の再分類は禁止（REQ-0103）
-
-### 判断・承認制約
 - G05: 既存対策を優先: 「新規X化」より「既存Xへ反映」を優先
 - G06: ユーザー承認必須: 判定・prune ともに承認なしに実行しない
-
-### 出力制約
-- G07: `elevation-ledger.md` は生成しない: 管理用ファイルは作成しない
+- G07: 管理用ファイル（`elevation-ledger.md` 等）は生成しない
 
 ## ユーザー確認ポイント
 
@@ -153,23 +128,8 @@ agent: sisyphus
 | git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
 | git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
-## Artifact Lifecycle 責務
+## Artifact Lifecycle
 
-promote が扱う3つの主要 artifact の役割・性格・lifecycle 振る舞いを定義する。
+各成果物（archive/active.md, evaluation-report.md, promoted/）の役割・性格・lifecycle 詳細は `agentdev-learning-pipeline` skill の「Artifact Lifecycle」を参照。
 
-| Artifact | 役割 | 性格 | Lifecycle 振る舞い |
-|----------|------|------|-------------------|
-| `archive/active.md` | 過去エントリの living pool（終端保管ではない） | living | promote の主入力の一つとして参照される。promote 時の prune により staged/rejected/duplicate は除去され、deferred/未処理は保持される。`archive` は終端保管を意味しない。（REQ-0105/004/005/016） |
-| `evaluation-report.md` | refine/promote 間の境界 artifact | 読込専用 | 毎回上書きされるため長期履歴ではない。promote はこれを主入力とする。（REQ-0105/009） |
-| `promoted/` | Requirement Source stub の staging 領域 | staging | 生成された stub は `/agentdev/backlog-review` が読み込み、RU 生成を経て `/agentdev/req-define` に合流する。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止。（REQ-0105/011/012, REQ-0105） |
-
-### learning-promote の責務
-
-廃棄判定 → stub 生成 → prune の一連の処理が learning-promote の責務範囲（REQ-0105）。各処理の詳細は Steps 1-9 を参照。
-
-## 注意事項
-
-- **promoted領域のみに生成**: → **Artifact Lifecycle 責務** の `promoted/` 参照
-- **stub のみ生成**: 完全なSKILL.mdやコマンドファイルは生成しない
-- **archive/active.md は living learning pool**: → **Artifact Lifecycle 責務** の `archive/active.md` 参照
-- **反映ルート**: → **Artifact Lifecycle 責務** の `promoted/` 参照
+**learning-promote の責務**: 廃棄判定 → stub 生成 → prune（REQ-0105）。stub は `.opencode/` に直接反映せず、`/agentdev/backlog-review` が読み込み RU 化後に `/agentdev/req-define` に合流する。
