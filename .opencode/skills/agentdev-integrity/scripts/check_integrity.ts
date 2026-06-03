@@ -2992,20 +2992,49 @@ export function checkScriptTemplateReferencePaths(
             results.push(ok(
               "ReferencePath", "reference-path-existence",
               `Referenced path exists: ${rawRef}`,
+              { file: relPath, line: i + 1, evidence: rawRef },
             ));
           } else {
-            foundViolation = true;
-            results.push(ng(
-              "ReferencePath", "reference-path-existence",
-              `Referenced path does not exist: ${rawRef}`,
-              relPath,
-              i + 1,
-              {
-                evidence: rawRef,
-                expected: `file must exist at ${resolveRelative(resolvedPath, root)}`,
-                route: "intake",
-              },
-            ));
+            // Cross-skill bare reference detection (REQ-0108-119)
+            let crossSkillFound = false;
+            if (skillDir && !rawRef.startsWith(".opencode/")) {
+              const otherSkills = listDirs(skillsDir).filter(d => d !== skillDir);
+              for (const otherSkill of otherSkills) {
+                const crossSkillPath = path.join(skillsDir, otherSkill, rawRef);
+                if (fs.existsSync(crossSkillPath)) {
+                  crossSkillFound = true;
+                  foundViolation = true;
+                  results.push(ng(
+                    "ReferencePath", "reference-path-existence",
+                    `Referenced path does not exist in current skill but found in ${otherSkill}: ${rawRef}`,
+                    relPath,
+                    i + 1,
+                    {
+                      evidence: rawRef,
+                      expected: `use explicit path: ${resolveRelative(path.join(skillsDir, otherSkill, rawRef), root)} or move file to current skill`,
+                      route: "intake",
+                    },
+                  ));
+                  break;
+                }
+              }
+            }
+
+            // Generic NG (not cross-skill)
+            if (!crossSkillFound) {
+              foundViolation = true;
+              results.push(ng(
+                "ReferencePath", "reference-path-existence",
+                `Referenced path does not exist: ${rawRef}`,
+                relPath,
+                i + 1,
+                {
+                  evidence: rawRef,
+                  expected: `file must exist at ${resolveRelative(resolvedPath, root)}`,
+                  route: "intake",
+                },
+              ));
+            }
           }
         }
       }
