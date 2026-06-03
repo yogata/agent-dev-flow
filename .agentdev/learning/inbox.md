@@ -74,3 +74,39 @@
 - **想定反映先**: case-closeコマンドのEpic Issue検出時の事前チェック、またはcase-runのOrchestrator完了報告フォーマット
 - **関連**: Epic #519, 子Issue #520-#529, case-run Orchestratorモード, G04 guardrail
 - **タグ**: `#epic-orchestrator` `#case-close` `#issue-lifecycle` `#guardrail`
+
+---
+
+## cross-skill 参照の false positive: path 存在検査の精度限界
+
+- **問題事象**: `checkScriptTemplateReferencePaths()` が cross-skill の相対パス参照を false positive として8件検出。skill 内からの参照は skill-relative だが、他の skill から参照されるパスはリポジトリルート相対として解釈されるため、実在するファイルが "missing" と判定される
+- **発生局面**: 実装（case-run Step 6 の integrity-check 拡張）
+- **検知方法**: integrity-check 実行時の 35 ReferencePath results（27 ok, 8 ng）
+- **根本原因**: path 存在検査が参照元ファイルのディレクトリを基準に相対パスを解決するが、cross-skill 参照では参照元 skill のディレクトリではなくリポジトリルートが意図されるケースがある。Markdown 内の相対パス解決ルールとファイルシステムの相対パス解決ルールの差
+- **自律対応内容**: false positive を既知の制約として受け入れ、完了報告に明記。修正はスコープ外
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（REQ-0108-115/116 の要件は充足）
+- **横展開観点**: integrity-check の path 存在検査全般に適用。Markdown 内リンクとファイルシステムパスの解決ルール差異に起因する false positive パターン
+- **再発条件**: (1) skill A が skill B のファイルを相対パスで参照、(2) 参照元を基準にパス解決すると実在しないパスになる、(3) リポジトリルート基準なら実在する
+- **予防策候補**: (1) 参照元の種別（command/skill）に応じたベースディレクトリ切替、(2) Markdown link 解決ルールの明文化、(3) false positive を抑制する除外パターンの導入
+- **想定反映先**: agentdev-integrity の checkScriptTemplateReferencePaths() 改善、または REQ-0108 の path 解決ルール明文化
+- **関連**: Issue #544, PR #545, REQ-0108-115/116, check_integrity.ts
+- **タグ**: `#integrity-check` `#false-positive` `#path-resolution` `#cross-skill`
+
+---
+
+## worktree ディレクトリのプロセスロックによる削除失敗
+
+- **問題事象**: case-close の Step 7 で `git worktree remove` が "Permission denied" で失敗。ローカルブランチとリモートブランチは削除成功したが、.worktrees/544-feature ディレクトリがプロセスにロックされ物理削除不可
+- **発生局面**: case-close Step 7（ブランチ・worktree削除）
+- **検知方法**: `git worktree remove` の non-zero exit と "Permission denied" エラー
+- **根本原因**: LSP server（TypeScript Language Server）やエディタが worktree 内のファイルを監視・インデックスしており、ディレクトリハンドルを解放していない。`git worktree prune` 後もファイルシステムレベルでロックが継続
+- **自律対応内容**: (1) `git worktree prune` で git 管理からは除外、(2) ローカル/リモートブランチ削除は完了、(3) ディレクトリ物理削除は警告として完了報告に記載
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 全 case-close で worktree 削除時に発生する可能性。特に TypeScript/Node.js プロジェクトで LSP が動作している環境
+- **再発条件**: (1) LSP が worktree 内のファイルを監視中、(2) worktree を削除しようとした場合
+- **予防策候補**: (1) worktree 削除前に LSP を停止する手順の追加、(2) 削除失敗時の遅延リトライ（5-10秒後に再試行）、(3) 削除失敗を警告として扱いユーザーに手動削除を促す（現状の対応）
+- **想定反映先**: agentdev-git-worktree の worktree 削除手順、または case-close のエラー回復手順
+- **関連**: Issue #544, case-close Step 7, .worktrees/544-feature
+- **タグ**: `#worktree` `#permission-denied` `#lsp` `#case-close`
