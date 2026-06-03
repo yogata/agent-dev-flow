@@ -56,12 +56,15 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 | Skill ↔ load_skills 参照 | `check_integrity.ts` | load_skills 先存在、agentdev- prefix、未使用 skill (categorized) |
 | Skill frontmatter | `check_integrity.ts` | name ↔ dir 一致、USE FOR 境界、reference/ 残存 (REQ-0108-092~094) |
 | Command-map ↔ 実体 | `check_integrity.ts` | README ↔ 実ファイル、command inventory |
-| Command frontmatter | `check_integrity.ts` | implementation_pattern、secondary_pattern、load_skills 配列、agent 名、deprecated 混入 (REQ-0108-095~099) |
+| Command frontmatter | `check_integrity.ts` | implementation_pattern / secondary_pattern / load_skills 禁止検出、pattern / workflow_route / branch_type / labels 禁止、agent 名、deprecated 混入 (REQ-0108-095~099, 124, Case 5 / RU-0020) |
 | 旧 namespace 残存 | `check_integrity.ts` | 旧コマンド名、旧パス、二重 prefix、bare slash (scoped) |
 | 完了報告フォーマット | `check_integrity.ts` | load_skills 参照、completion-reports.md テンプレート存在、インライン完了報告、完了後追加出力、旧 terminology（REQ-0107, REQ-0107） |
 | Variant report | `check_integrity.ts` | variant 実在確認、registry 登録確認、必須フィールド、fragment 合成パターン (REQ-0108-089~091) |
 | Mapping table | `check_integrity.ts` | 全件記録・存在確認・移行先確認・status enum 検査 (REQ-0108-083~088) |
-| Implementation pattern | `check_integrity.ts` | pattern 定義妥当性、禁止 skill、command-map 一致性、load_skills 意味判断 |
+| ADR status 正規化 | `check_integrity.ts` | 旧形式 `superseded-by:[ADR-XXXX]` 検出 (REQ-0108-121) |
+| RU-ID 根拠参照 | `check_integrity.ts` | docs 永続文書内の RU-ID パターン検出 (REQ-0108-122) |
+| Workflow status 禁止 | `check_integrity.ts` | REQ/SPEC 内の workflow status / 6 マイクロフェーズ検出 (REQ-0108-123) |
+| Accepted ADR 引用 | `check_integrity.ts` | accepted 以外の ADR 引用検出 (SHOULD, REQ-0108-125) |
 | Workflow template 構造 | `check_templates.ts` | frontmatter、必須セクション、placeholder、命名規則 |
 | Skill 構造 | `lint_skills.ts` | frontmatter name ↔ dir、USE FOR / DO NOT USE FOR、See Also |
 
@@ -105,6 +108,10 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 | Command-map↔実体 | N | N | — |
 | 旧 namespace 残存 | N | N | — |
 | 完了報告フォーマット | N | N | — |
+| ADR status 正規化 | N | N | — |
+| RU-ID 根拠参照 | N | N | — |
+| Workflow status 禁止 | N | N | — |
+| Accepted ADR 引用 | N | N | — |
 
 ## 詳細
 

@@ -7,7 +7,7 @@ description: Provides quality criteria and best practices for authoring OpenCode
 
 OpenCodeのCommand定義（`.opencode/commands/`）を書く際の実践ガイド。Command / Skill / Template / Script の責任分界に基づき、Commandを薄く保つ基準を提供する。
 
-## Frontmatter 規約（ADR-0013, REQ-0103-044）
+## Frontmatter 規約（ADR-0013, REQ-0103-044, Case 5 / RU-0020）
 
 command frontmatter の許可フィールドは `description` と `agent` のみ:
 
@@ -18,7 +18,16 @@ agent: prometheus | sisyphus
 ---
 ```
 
-**禁止フィールド**: `implementation_pattern`、`secondary_pattern`、`load_skills` 等の dev メタデータ（REQ-0103-015, REQ-0103-044）。
+**禁止フィールド**（frontmatter への記述は error として検出される）:
+- `implementation_pattern` — dev メタデータ（REQ-0103-015, REQ-0103-044, REQ-0108-095）
+- `secondary_pattern` — dev メタデータ（REQ-0108-096）
+- `load_skills` — dev メタデータ（REQ-0103-027, REQ-0108-097）
+- `pattern` — 追加禁止フィールド（REQ-0108-124）
+- `workflow_route` — 追加禁止フィールド（REQ-0108-124）
+- `branch_type` — 追加禁止フィールド（REQ-0108-124）
+- `labels` — 追加禁止フィールド（REQ-0108-124）
+
+これらの情報は command-map.md 等の参照用文書で管理し、frontmatter には混入させない。
 
 ## 責任分界の原則
 
