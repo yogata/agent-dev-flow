@@ -17,8 +17,7 @@ agent: sisyphus
 
 ## Steps
 
-1. `docs/specs/system.md` と `docs/specs/patterns.md` を読み込み、現在のシステム仕様と実装パターンを把握する
-2. 要件docからIssue本文を生成:
+1. 要件docからIssue本文を生成:
    - `docs/requirements/REQ-{NNNN}.md` が存在する場合: REQ内容（目的/要件/適用範囲）を読み取り、Issue本文に反映
    - 存在しない場合: セッション内の要件docから直接生成
    - テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_feature.md` または `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_bug.md` を Read tool で読み込む
@@ -27,25 +26,25 @@ agent: sisyphus
     - **関連ドキュメント更新候補 転記**（REQ-0102）: REQ文書（またはセッション内要件doc）に `## 関連ドキュメント更新候補` セクションが存在する場合、その内容をIssue本文に転記する
     - **直接矛盾の完了条件反映**（REQ-0102）: 関連ドキュメント更新候補のうち `直接矛盾` に分類された候補を、Issue本文の完了条件セクションにチェックボックスとして反映する
     - **テスト戦略スコープ管理**（REQ-0105〜003）: テスト戦略セクションの各テスト項目について、単一実装PR内で完結する検証かどうかを判定すること（SHALL）。単一PR内で完結しない検証（E2Eテスト、手動確認等）はチェックボックス形式（`- [ ]`）で出力してはならない（MUST NOT）。達成不可能項目のうち情報保持が必要なものは `> ℹ️ 別途確認: {項目名}` 形式で出力すること（SHALL）
-3. **規模判定によるフロー分岐**（Step 2の直後に実行）:
+2. **規模判定によるフロー分岐**（Step 1の直後に実行）:
    - draft-metaの `scale` フィールドを確認
    - `scale: large` の場合 → **Epic flow**（Step 4〜8）へ進む
-   - `scale: standard` または `scale` フィールドなしの場合 → **Standard flow**（Step 9〜）へ進む
-4. **[Epic flow]**: テンプレート `issue_desc_epic.md` を Read tool で読み込む
-    **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てEpic Issue本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
- 5. **[Epic flow]**: Epic Issue本文を生成:
+   - `scale: standard` または `scale` フィールドなしの場合 → **Standard flow**（Step 8〜）へ進む
+3. **[Epic flow]**: テンプレート `issue_desc_epic.md` を Read tool で読み込む
+     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てEpic Issue本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
+ 4. **[Epic flow]**: Epic Issue本文を生成:
     - REQ内容から `{summary}`, `{problem}`, `{solution}` を埋める
     - draft-metaの `decomposition` から分解テーブルを生成（子Issue番号は後で更新するためプレースホルダー `#{TBD}`）
     - Wave テーブル生成: `agentdev-workflow-orchestration` の Wave scheduling ロジックに従い依存関係から Wave 番号を決定し、`## 実行順序` セクションの Wave テーブルを生成する。列形式: `Wave / Issue / 実行方法 / 前提`。子Issue番号はプレースホルダー `#{TBD_Wn}`（n は行番号）とする
     - ステータス追跡テーブル: 全子件数を `{total}` に設定、進行中/完了は0
     - `{completion_criteria}` は要件docから抽出
     - **子Issue数事前チェック**: decomposition の子Issue数を確認。G05（最大10件）を超過する場合、Epic Issue・子Issueのいずれも作成せずエラーを報告して停止する
- 6. **[Epic flow]**: Epic Issueを作成:
+ 5. **[Epic flow]**: Epic Issueを作成:
    - ラベル: `enhancement`, `feature`, `epic`
    - `agentdev-gh-cli` に従って `--body-file` 使用
    - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
    - 作成されたIssue番号を `{epic_number}` として記録
-7. **[Epic flow]**: 各子Issueを作成（decompositionの順に処理）:
+ 6. **[Epic flow]**: 各子Issueを作成（decompositionの順に処理）:
    - テンプレート `issue_desc_child.md` を Read tool で読み込む
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全て子Issue本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
    - 子Issue本文を生成: `Parent: #{epic_number}` を先頭行に配置
@@ -54,17 +53,17 @@ agent: sisyphus
    - `agentdev-gh-cli` に従って `--body-file` 使用
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
     - 作成されたIssue番号を記録
-8. **[Epic flow]**: Epic Issue本文を更新:
+ 7. **[Epic flow]**: Epic Issue本文を更新:
    - 分解テーブルの `#{TBD}` を実際の子Issue番号に置換
    - Wave テーブルの `#{TBD_Wn}` を実際の子Issue番号に置換（`n` は行番号に対応）
    - ステータス追跡テーブルの件数を更新
    - `gh issue edit` でEpic本文を更新（`--body-file` 使用）
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
-9. **[Standard flow]** `docs/adr/README.md` を読み込み、要件と関連するADRを「対象領域」と「決定内容」でマッチングして特定する。関連ADRがあれば個別に読み込む（Epic flowでもStep 3bの内容反映に活用）
-10. **[Standard flow]** ラベル付与 → `agentdev-workflow-lifecycle` のラベル体系に従って選定
-11. **[Standard flow]** GitHub Issueを作成（`gh issue create`） → `agentdev-gh-cli` に従って `--body-file` 使用
-    - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
-12. Issue作成後にコメント追加 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_analysis.md`（バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_technical.md`（機能追加）を Read tool で読み込む（Epic flowではEpic Issueにコメント追加）
+8. **[Standard flow]** `docs/adr/README.md` を読み込み、要件と関連するADRを「対象領域」と「決定内容」でマッチングして特定する。関連ADRがあれば個別に読み込む（Epic flowでもStep 2bの内容反映に活用）
+9. **[Standard flow]** ラベル付与 → `agentdev-workflow-lifecycle` のラベル体系に従って選定
+10. **[Standard flow]** GitHub Issueを作成（`gh issue create`） → `agentdev-gh-cli` に従って `--body-file` 使用
+     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
+11. Issue作成後にコメント追加 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_bug_analysis.md`（バグ修正・軽微変更/リファクタリング・保守作業/ドキュメント・雑務）または `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_feature_technical.md`（機能追加）を Read tool で読み込む（Epic flowではEpic Issueにコメント追加）
     - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
 13. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除する
@@ -76,7 +75,7 @@ agent: sisyphus
         1. main 作業ディレクトリの HEAD と `origin/main` が一致していること（`git rev-parse HEAD` と `git rev-parse origin/main` を比較）
         2. `git status --porcelain` に削除済み RU ファイルが残っていないこと
         - 同期確認に失敗した場合、対象ファイル・現在の HEAD・`origin/main` を表示して完了扱いにせず停止すること（SHALL — REQ-0105）
-14. 完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。実行フローに応じたvariantを選択:
+13. 完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。実行フローに応じたvariantを選択:
     - Standard flow → completion-reports/case-open/standard.md
     - Epic flow → completion-reports/case-open/epic.md
 
@@ -103,7 +102,7 @@ agent: sisyphus
 
 ### 委譲・参照制約
 - G12: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
-- G13: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
+- G13: work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
 
 ### 出力制約
 - G14: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
