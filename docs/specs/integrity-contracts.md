@@ -8,7 +8,7 @@
 
 ## Premise Reversal Record
 
-以下の検査は前提の reversal を反映している（ADR-0013, Case 5 / RU-0020）:
+以下の検査は前提の reversal を反映している（ADR-0013）:
 
 | 検査 | 旧前提 | 新前提 | 根拠 REQ |
 |---|---|---|---|
