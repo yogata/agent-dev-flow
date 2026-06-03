@@ -2873,6 +2873,151 @@ function checkInlineCompletionReportsStrict(cmdDir: string, root: string): Check
   return results;
 }
 
+// ─── Script / Template / Reference path existence (REQ-0108-115, REQ-0108-116) ─
+
+/**
+ * Regex patterns for file path references in command and skill markdown files.
+ * Captures paths that reference scripts (.ts), templates (.md), or references (.md).
+ */
+const SCRIPT_TEMPLATE_REF_PATTERNS = [
+  // Repo-root-relative: .opencode/skills/agentdev-*/scripts/*.ts
+  /\.opencode\/skills\/(agentdev-[^/\s"')\]]+\/(?:scripts\/[^/\s"')\]]+\.ts|templates\/[^/\s"')\]]+\.md|references\/[^/\s"')\]]+\.md))/g,
+  // Skill-relative: scripts/*.ts, templates/*.md, references/*.md
+  /(?<![.\w/])(scripts\/[^/\s"')\]]+\.ts|templates\/[^/\s"')\]]+\.md|references\/[^/\s"')\]]+\.md)/g,
+];
+
+/**
+ * Check if a line is inside a code block.
+ * Returns true if the cumulative ``` count at that line position is odd.
+ */
+function isInsideCodeBlock(lines: string[], lineIndex: number): boolean {
+  let count = 0;
+  for (let i = 0; i < lineIndex; i++) {
+    if (lines[i].trimStart().startsWith("```")) count++;
+  }
+  // If the current line opens a block, it's not yet inside
+  if (lines[lineIndex].trimStart().startsWith("```")) return count % 2 === 1;
+  return count % 2 === 1;
+}
+
+/**
+ * Check if a matched path is a template placeholder like {xxx} or REQ-{NNNN}.
+ */
+function isTemplatePlaceholder(refPath: string): boolean {
+  if (/\{[^}]*\}/.test(refPath)) return true;
+  return false;
+}
+
+/**
+ * Resolve a referenced path to an absolute filesystem path.
+ * - Repo-root-relative paths start with `.opencode/`
+ * - Skill-relative paths (scripts/..., templates/..., references/...) are resolved
+ *   relative to the skill directory containing the source file.
+ */
+function resolveReferencePath(
+  refPath: string,
+  sourceFilePath: string,
+  root: string,
+  skillsDir: string,
+): string {
+  if (refPath.startsWith(".opencode/")) {
+    return path.join(root, refPath);
+  }
+  if (refPath.startsWith("agentdev-")) {
+    return path.join(skillsDir, refPath);
+  }
+  const relSource = resolveRelative(sourceFilePath, root);
+  const skillsPrefix = ".opencode/skills/";
+  if (relSource.startsWith(skillsPrefix)) {
+    const afterSkills = relSource.slice(skillsPrefix.length);
+    const slashIdx = afterSkills.indexOf("/");
+    if (slashIdx >= 0) {
+      const skillDir = afterSkills.slice(0, slashIdx);
+      return path.join(skillsDir, skillDir, refPath);
+    }
+  }
+  return path.join(root, refPath);
+}
+
+export function checkScriptTemplateReferencePaths(
+  cmdDir: string,
+  skillsDir: string,
+  root: string,
+): CheckResult[] {
+  const results: CheckResult[] = [];
+  const filesToCheck: { absPath: string; skillDir?: string }[] = [];
+
+  // Collect command files
+  for (const file of listFiles(cmdDir).filter((f) => f !== "README.md")) {
+    filesToCheck.push({ absPath: path.join(cmdDir, file) });
+  }
+
+  // Collect skill SKILL.md files and reference files
+  for (const dir of listDirs(skillsDir)) {
+    const skillMd = path.join(skillsDir, dir, "SKILL.md");
+    if (fs.existsSync(skillMd)) {
+      filesToCheck.push({ absPath: skillMd, skillDir: dir });
+    }
+  }
+
+  let foundViolation = false;
+
+  for (const { absPath, skillDir } of filesToCheck) {
+    const content = readText(absPath);
+    if (!content) continue;
+    const relPath = resolveRelative(absPath, root);
+    const lines = content.split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Skip lines inside code blocks
+      if (isInsideCodeBlock(lines, i)) continue;
+
+      for (const regex of SCRIPT_TEMPLATE_REF_PATTERNS) {
+        regex.lastIndex = 0;
+        let match;
+        while ((match = regex.exec(line)) !== null) {
+          const rawRef = match[1];
+
+          // Skip template placeholders
+          if (isTemplatePlaceholder(rawRef)) continue;
+
+          // Skip paths that are clearly glob patterns
+          if (rawRef.includes("*")) continue;
+
+          const resolvedPath = resolveReferencePath(rawRef, absPath, root, skillsDir);
+
+          if (fs.existsSync(resolvedPath)) {
+            results.push(ok(
+              "ReferencePath", "reference-path-existence",
+              `Referenced path exists: ${rawRef}`,
+            ));
+          } else {
+            foundViolation = true;
+            results.push(ng(
+              "ReferencePath", "reference-path-existence",
+              `Referenced path does not exist: ${rawRef}`,
+              relPath,
+              i + 1,
+              {
+                evidence: rawRef,
+                expected: `file must exist at ${resolveRelative(resolvedPath, root)}`,
+                route: "intake",
+              },
+            ));
+          }
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(ok("ReferencePath", "reference-path-existence", "All script/template/reference paths exist"));
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -2963,6 +3108,7 @@ async function main(): Promise<void> {
     ...checkMappingTable(reqDir, root),
     ...checkSkillFrontmatter(skillsDir, root),
     ...checkCommandFrontmatterDetailed(cmdDir, root),
+    ...checkScriptTemplateReferencePaths(cmdDir, skillsDir, root),
   ];
 
   for (const r of results) {

@@ -52,9 +52,7 @@ agent: prometheus
 11. **完了報告**: `agentdev-workflow-reporting` の完了報告variantに従って出力。Pattern に応じたvariantを選択:
     - feature standard → completion-reports/req-define/feature.md
     - feature large (Epic)規模 → completion-reports/req-define/feature-epic.md
-    - bugfix → completion-reports/req-define/bug-or-lightweight.md
-    - maintenance → completion-reports/req-define/maintenance.md
-    - docs_chore → completion-reports/req-define/docs-or-chore.md
+    - bugfix / maintenance / docs_chore → completion-reports/req-define/lightweight.md
 
 ## Guardrails
 

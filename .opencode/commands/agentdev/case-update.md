@@ -26,7 +26,7 @@ agent: sisyphus
    - 検出できない場合はユーザーに番号の指定を求めて停止
 2. 現在のIssue状態を取得 → `agentdev-workflow-lifecycle` のフェーズ体系で現在フェーズを判定
 3. 更新内容に応じて分岐:
-   - **`--body`**: Issue作成時に使用されたテンプレート（`issue_desc_bug.md` / `issue_desc_feature.md` / `issue_desc_epic.md` / `issue_desc_child.md` / `issue_desc_backlog_*.md`）に従って更新。該当テンプレートの【必須】セクションが全て本文に含まれること → `gh issue edit`
+    - **`--body`**: Issue作成時に使用されたテンプレート（`issue_desc_bug.md` / `issue_desc_feature.md` / `issue_desc_epic.md` / `issue_desc_child.md`）に従って更新。該当テンプレートの【必須】セクションが全て本文に含まれること → `gh issue edit`
    - **`--comment`**: テンプレート `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_update.md` を Read tool で読み込み → `gh issue comment`
      - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
     - **`--req`**: REQファイル更新（詳細フロー以下）。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）:

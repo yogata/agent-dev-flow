@@ -177,6 +177,7 @@ export function classifyFindingLevel(
     "skill-name-dir-match", "skill-use-for-boundary",
     "cmd-implementation-pattern", "cmd-secondary-pattern", "cmd-load-skills-array",
     "cmd-agent-name", "cmd-deprecated-in-inventory",
+    "reference-path-existence",
   ]);
 
   if (STRICT_CHECKS.has(checkType)) return "strict";

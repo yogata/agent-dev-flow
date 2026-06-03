@@ -23,7 +23,7 @@ agent: sisyphus
 
 ### Step 0: 実行前同期
 
-`git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（`req-backlog` と同一のエラー形式）。
+`git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（`agentdev-git-worktree` の git-common-procedures.md Section 2 と同一のエラー形式）。
 
 ### Step 1: Artifact 検出
 
