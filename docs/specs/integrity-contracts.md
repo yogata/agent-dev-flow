@@ -18,6 +18,8 @@
 | frontmatter allowed fields | 複数フィールド許可 | description + agent のみ | REQ-0108-046, 098 |
 | dev メタデータ混入 | 検査対象外 | error として検出 | REQ-0108-109 |
 | skill references 存在 | 検査対象外 | runtime パスのみ確認 | REQ-0108-110 |
+| reference-path OK診断 | OK結果にfile/line/evidenceなし | per-reference OKにfile/line/evidenceを出力 | REQ-0108-117 |
+| cross-skill裸参照 | 裸参照のcross-skill誤検知なし | 同一skill内になく別skillにある裸参照をstrict NG検出 | REQ-0108-119 |
 
 ## Severity Classification
 
