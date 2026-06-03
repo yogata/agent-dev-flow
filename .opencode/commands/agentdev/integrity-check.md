@@ -23,9 +23,9 @@ AgentDevFlow 管理下の artifact（REQ、ADR、skill、command、spec）の整
 ## Steps
 
 1. **スクリプト実行**: `agentdev-integrity` の検査スクリプト（`.opencode/skills/agentdev-integrity/scripts/check_integrity.ts`）を実行。検査カテゴリ・対象パス・検出結果の分類は `agentdev-integrity` SKILL.md の検査カテゴリ定義に準拠
-   - 検査カテゴリ: REQ frontmatter ↔ ファイル名、ADR ↔ REQ 相互参照、Skill ↔ command 参照、frontmatter 許可フィールド（description + agent のみ）、旧 namespace 残存、完了報告フォーマット（結果欄の責務混在検出・git永続化欄の限定確認・同一事実の重複検出・固定`該当なし`variantの誤用検出・SKILL.md variant数とregistryの一致確認・存在しないvariant参照の検出）、DOC-MAP 存在性・参照整合性、Views 残存、README ↔ ファイル整合性
-   - Finding 分類: `document-drift` / `broken-reference` / `obsolete-structure` / `canonical-conflict` / `workflow-gap` / `integrity-rule-gap`（`agentdev-integrity` SKILL.md 参照）
-   - Finding ルート: `intake` / `learning` / `intake+learning` / `req-define` / `none`
+    - 検査カテゴリ: REQ frontmatter ↔ ファイル名、ADR ↔ REQ 相互参照、Skill ↔ command 参照、frontmatter 禁止フィールド（dev メタデータの混入を検出: implementation_pattern / secondary_pattern / load_skills / pattern / workflow_route / branch_type / labels）、旧 namespace 残存、完了報告フォーマット（結果欄の責務混在検出・git永続化欄の限定確認・同一事実の重複検出・固定`該当なし`variantの誤用検出・SKILL.md variant数とregistryの一致確認・存在しないvariant参照の検出）、DOC-MAP 存在性・参照整合性、Views 残存、README ↔ ファイル整合性、ADR status 正規化（旧形式 superseded-by:[ADR-XXXX] 検出）、RU-ID 根拠参照（docs 永続文書内の RU-ID パターン検出）、workflow status / 6 マイクロフェーズ検出禁止（REQ/SPEC 内の状態管理モデル記述検出）、accepted ADR のみ現行根拠引用（SHOULD: proposed/superseded/deprecated ADR 引用を検出）
+    - Finding 分類: `document-drift` / `broken-reference` / `obsolete-structure` / `canonical-conflict` / `workflow-gap` / `integrity-rule-gap`（`agentdev-integrity` SKILL.md 参照）
+    - Finding ルート: `intake` / `learning` / `intake+learning` / `req-define` / `none`
 
 2. **レポート確認**: スクリプト出力のレポート（`.agentdev/integrity/reports/YYYY-MM-DD-integrity-report.md`）をユーザーに提示。レポート形式は `agentdev-integrity` SKILL.md のレポート Schema に準拠
 

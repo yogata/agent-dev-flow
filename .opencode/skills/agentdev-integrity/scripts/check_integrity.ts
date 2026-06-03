@@ -1605,7 +1605,7 @@ function checkAdrReadmeIndexSync(adrDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// ─── Implementation pattern checks (REQ-0108-022~024) ─────────────────────
+// ─── Implementation pattern checks (REQ-0108-022~024, inverted: Case 5 / RU-0020) ─
 
 function checkImplementationPattern(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -1619,107 +1619,42 @@ function checkImplementationPattern(cmdDir: string, root: string): CheckResult[]
     if (!fm) continue;
 
     const pattern = fm["implementation_pattern"];
-    if (!pattern || (typeof pattern === "string" && pattern.trim() === "")) {
+    if (pattern !== undefined) {
       results.push(
-        ng("Implementation Pattern", "implementation-pattern", `command ${file} に implementation_pattern が定義されていない`, resolveRelative(fullPath, root), undefined, { evidence: "implementation_pattern field missing", route: "req-define" })
-      );
-      continue;
-    }
-
-    if (typeof pattern !== "string" || !IMPLEMENTATION_PATTERNS.includes(pattern as any)) {
-      results.push(
-        ng("Implementation Pattern", "implementation-pattern", `command ${file} の implementation_pattern '${pattern}' は未知のパターン`, resolveRelative(fullPath, root), undefined, { evidence: String(pattern), expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" })
+        ng("Implementation Pattern", "implementation-pattern", `command ${file} has prohibited implementation_pattern in frontmatter (Case 5 / RU-0020)`, resolveRelative(fullPath, root), undefined, { evidence: String(pattern), expected: "implementation_pattern must not exist in frontmatter", route: "req-define" })
       );
     }
 
     const secondaryPattern = fm["secondary_pattern"];
-    if (secondaryPattern && typeof secondaryPattern === "string" && secondaryPattern.trim() !== "") {
-      if (!IMPLEMENTATION_PATTERNS.includes(secondaryPattern as any)) {
-        results.push(
-          ng("Implementation Pattern", "implementation-pattern", `command ${file} の secondary_pattern '${secondaryPattern}' は未知のパターン`, resolveRelative(fullPath, root), undefined, { evidence: String(secondaryPattern), expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" })
-        );
-      }
+    if (secondaryPattern !== undefined) {
+      results.push(
+        ng("Implementation Pattern", "secondary-pattern", `command ${file} has prohibited secondary_pattern in frontmatter (Case 5 / RU-0020)`, resolveRelative(fullPath, root), undefined, { evidence: String(secondaryPattern), expected: "secondary_pattern must not exist in frontmatter", route: "req-define" })
+      );
+    }
+
+    const ls = fm["load_skills"];
+    if (ls !== undefined) {
+      results.push(
+        ng("Implementation Pattern", "load-skills-frontmatter", `command ${file} has prohibited load_skills in frontmatter (Case 5 / RU-0020)`, resolveRelative(fullPath, root), undefined, { evidence: Array.isArray(ls) ? ls.join(", ") : String(ls), expected: "load_skills must not exist in frontmatter", route: "req-define" })
+      );
     }
   }
 
   if (results.filter((r) => r.level === "ng").length === 0) {
-    results.push(ok("Implementation Pattern", "implementation-pattern", "All commands have valid implementation patterns"));
+    results.push(ok("Implementation Pattern", "implementation-pattern", "No commands have prohibited dev metadata in frontmatter"));
   }
   return results;
 }
 
 function checkPatternProhibitions(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
-
-    const pattern = fm["implementation_pattern"];
-    if (typeof pattern !== "string") continue;
-
-    const primaryProhibited = PATTERN_PROHIBITED_SKILLS[pattern] || [];
-    const secondaryPattern = fm["secondary_pattern"];
-    const secondaryStr = typeof secondaryPattern === "string" && secondaryPattern.trim() !== "" ? secondaryPattern.trim() : undefined;
-    const secondaryProhibited = secondaryStr ? (PATTERN_PROHIBITED_SKILLS[secondaryStr] || []) : [];
-    const allProhibited = [...new Set([...primaryProhibited, ...secondaryProhibited])];
-    if (allProhibited.length > 0) {
-      const loadSkills = extractLoadSkills(fm);
-      const violations = loadSkills.filter((s) => allProhibited.includes(s));
-      for (const violating of violations) {
-        results.push(
-          ng("Implementation Pattern", "pattern-prohibitions", `${pattern} command '${file}' が禁止 skill '${violating}' を load_skills に含んでいる`, resolveRelative(fullPath, root), undefined, { evidence: violating, route: "req-define" })
-        );
-      }
-    }
-
-    if (pattern === "manager-orchestrator" && file !== "case-run.md") {
-      results.push(
-        ng("Implementation Pattern", "pattern-prohibitions", `command '${file}' に manager-orchestrator が設定されているが、manager-orchestrator は case-run.md のみ使用可能`, resolveRelative(fullPath, root), undefined, { evidence: file, expected: "case-run.md", route: "req-define" })
-      );
-    }
-  }
-
-  if (results.filter((r) => r.level === "ng").length === 0) {
-    results.push(ok("Implementation Pattern", "pattern-prohibitions", "No pattern prohibition violations"));
-  }
+  results.push(ok("Implementation Pattern", "pattern-prohibitions", "Pattern prohibition checks skipped — implementation_pattern no longer in frontmatter (Case 5 / RU-0020)"));
   return results;
 }
 
 function checkLoadSkillsConsistency(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
-
-    const loadSkills = extractLoadSkills(fm);
-
-    if (!loadSkills.includes("agentdev-workflow-reporting")) {
-      results.push(
-        warn("Implementation Pattern", "load-skills-consistency", `command '${file}' に agentdev-workflow-reporting が load_skills に含まれていない`, resolveRelative(fullPath, root))
-      );
-    }
-
-    const pattern = fm["implementation_pattern"];
-    if (pattern === "manager-orchestrator" && !loadSkills.includes("agentdev-workflow-orchestration")) {
-      results.push(
-        warn("Implementation Pattern", "load-skills-consistency", `command '${file}' は manager-orchestrator パターンだが agentdev-workflow-orchestration が load_skills に含まれていない`, resolveRelative(fullPath, root))
-      );
-    }
-  }
-
-  if (results.filter((r) => r.level === "warning").length === 0) {
-    results.push(ok("Implementation Pattern", "load-skills-consistency", "All commands have consistent load_skills"));
-  }
+  results.push(ok("Implementation Pattern", "load-skills-consistency", "Load skills consistency checks skipped — load_skills no longer in frontmatter (Case 5 / RU-0020)"));
   return results;
 }
 
@@ -1960,219 +1895,19 @@ function checkCommandMapConsistency(cmdDir: string, root: string, commandMapPath
 
 function checkExcessLoadSkills(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-  const skillCache = buildSkillResponsibilityCache(skillsDir);
-
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
-
-    const pattern = fm["implementation_pattern"];
-    if (typeof pattern !== "string") continue;
-    const secondaryPattern = fm["secondary_pattern"];
-    const secondaryStr = typeof secondaryPattern === "string" && secondaryPattern.trim() !== "" ? secondaryPattern.trim() : undefined;
-
-    const loadSkills = extractLoadSkills(fm);
-    const cmdName = file.replace(".md", "");
-    const cmdContentLower = content.toLowerCase();
-
-    for (const skill of loadSkills) {
-      const skillResp = skillCache.get(skill);
-
-      if (!skillResp) continue;
-
-      if (!skillResp.useFor && !skillResp.doNotUseFor) continue;
-
-      if (skillResp.doNotUseFor) {
-        if (skillResp.doNotUseFor.includes(cmdName)) {
-          results.push(warn(
-            "Implementation Pattern", "excess-load-skills",
-            `[recommendation: load_skills-remove-candidate] command '${file}' references skill '${skill}' but its DO NOT USE FOR mentions '${cmdName}'`,
-            resolveRelative(fullPath, root),
-            undefined,
-            { evidence: `${skill} DO NOT USE FOR → ${cmdName}`, route: "req-define" }
-          ));
-          continue;
-        }
-      }
-
-      if (skillResp.useFor) {
-        const useForLower = skillResp.useFor.toLowerCase();
-
-        const isReadOnlyDiag = pattern === "read-only-diagnostic" || secondaryStr === "read-only-diagnostic";
-        if (isReadOnlyDiag && isAnalysisOrGuidelineSkill(useForLower)) {
-          continue;
-        }
-
-        const useForWords = extractSignificantWords(useForLower);
-        const cmdWords = extractSignificantWords(cmdContentLower);
-        const overlap = [...useForWords].filter(w => cmdWords.has(w));
-        if (overlap.length >= 3) continue;
-
-        results.push(info(
-          "Implementation Pattern", "excess-load-skills",
-          `[recommendation: load_skills-remove-candidate] command '${file}' (pattern: ${pattern}) loads skill '${skill}' — relevance not confirmed from USE FOR, manual review recommended`
-        ));
-      }
-    }
-  }
-
-  if (results.length === 0) {
-    results.push(ok("Implementation Pattern", "excess-load-skills", "No excess load_skills detected"));
-  }
-
+  results.push(ok("Implementation Pattern", "excess-load-skills", "Excess load_skills check skipped — load_skills no longer in frontmatter (Case 5 / RU-0020)"));
   return results;
 }
 
 function checkMissingLoadSkills(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
-  // REQ-0108-066: missing-load-skills is observation / opt-in diagnostic, not standard finding
   const results: CheckResult[] = [];
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-  const skillCache = buildSkillResponsibilityCache(skillsDir);
-
-  const PATTERN_CAPABILITY_KEYWORDS: Record<string, string[]> = {
-    "wall-session": ["session", "壁打ち", "要件", "requirement"],
-    "file-pipeline": ["file", "save", "保存", "pipeline", "template", "テンプレート"],
-    "capture-only": ["capture", "入力", "inbox", "capture"],
-    "read-only-diagnostic": ["integrity", "整合性", "validation", "検査", "diagnostic"],
-  };
-
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
-
-    const pattern = fm["implementation_pattern"];
-    if (typeof pattern !== "string") continue;
-
-    const capabilityKeywords = PATTERN_CAPABILITY_KEYWORDS[pattern];
-    if (!capabilityKeywords) continue;
-
-    const loadSkills = extractLoadSkills(fm);
-
-    const hasAnyUseFor = loadSkills.some((s) => {
-      const resp = skillCache.get(s);
-      return resp && resp.useFor;
-    });
-    if (!hasAnyUseFor) continue;
-
-    const coveredCapabilities = new Set<string>();
-    for (const skill of loadSkills) {
-      const skillResp = skillCache.get(skill);
-      if (!skillResp || !skillResp.useFor) continue;
-      const useForLower = skillResp.useFor.toLowerCase();
-      for (const kw of capabilityKeywords) {
-        if (useForLower.includes(kw.toLowerCase())) {
-          coveredCapabilities.add(kw);
-        }
-      }
-    }
-
-    for (const kw of capabilityKeywords) {
-      if (!coveredCapabilities.has(kw)) {
-        results.push({
-          category: "Implementation Pattern",
-          check: "missing-load-skills",
-          level: "info",
-          message: `[recommendation: load_skills-add-candidate] command '${file}' (pattern: ${pattern}) — no loaded skill covers capability '${kw}', manual review recommended`,
-          finding_level: "observation" as any,
-        });
-      }
-    }
-  }
-
-  if (results.length === 0) {
-    results.push(ok("Implementation Pattern", "missing-load-skills", "No missing load_skills concerns detected (observation-level check)"));
-  }
-
+  results.push(ok("Implementation Pattern", "missing-load-skills", "Missing load_skills check skipped — load_skills no longer in frontmatter (Case 5 / RU-0020)"));
   return results;
 }
 
 function checkUseForConsistency(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-
-  const skillToCommands = new Map<string, string[]>();
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    const loadSkills = extractLoadSkills(fm);
-    const cmdName = file.replace(".md", "");
-    for (const skill of loadSkills) {
-      const cmds = skillToCommands.get(skill) || [];
-      cmds.push(cmdName);
-      skillToCommands.set(skill, cmds);
-    }
-  }
-
-  const captureCmds = skillToCommands.get("agentdev-learning-capture") || [];
-  for (const cmd of captureCmds) {
-    if (cmd === "learning-promote" || cmd === "learning-refine") {
-      results.push(warn(
-        "Implementation Pattern", "use-for-consistency",
-        `[recommendation: skill-use-for-update-candidate] agentdev-learning-capture referenced by '${cmd}' but its DO NOT USE FOR includes elevation/judgment`,
-        undefined,
-        undefined,
-        { evidence: `agentdev-learning-capture → ${cmd}`, route: "req-define" }
-      ));
-    }
-  }
-
-  const pipelineCmds = skillToCommands.get("agentdev-learning-pipeline") || [];
-  for (const cmd of pipelineCmds) {
-    if (cmd === "case-close") {
-      results.push(warn(
-        "Implementation Pattern", "use-for-consistency",
-        `[recommendation: skill-use-for-update-candidate] agentdev-learning-pipeline referenced by '${cmd}' but its USE FOR is limited to learning-refine/learning-promote`,
-        undefined,
-        undefined,
-        { evidence: `agentdev-learning-pipeline → ${cmd}`, route: "req-define" }
-      ));
-    }
-  }
-
-  const docMapCmds = skillToCommands.get("agentdev-doc-map") || [];
-  if (docMapCmds.length === 0 && listDirs(skillsDir).includes("agentdev-doc-map")) {
-    results.push(info(
-      "Implementation Pattern", "use-for-consistency",
-      "[recommendation: no-action] agentdev-doc-map is not referenced by any runtime command's load_skills"
-    ));
-  }
-
-  const skillDirs = listDirs(skillsDir);
-  for (const skillDir of skillDirs) {
-    const skillMdPath = path.join(skillsDir, skillDir, "SKILL.md");
-    const content = readText(skillMdPath);
-    if (!content) continue;
-
-    const doNotUseForSection = extractSection(content, "DO NOT USE FOR");
-    if (doNotUseForSection) {
-      const cmds = skillToCommands.get(skillDir) || [];
-      for (const cmd of cmds) {
-        if (doNotUseForSection.includes(cmd)) {
-          results.push(warn(
-            "Implementation Pattern", "use-for-consistency",
-            `[recommendation: skill-use-for-update-candidate] skill '${skillDir}' DO NOT USE FOR mentions '${cmd}' but command references it in load_skills`,
-            undefined,
-            undefined,
-            { evidence: `${skillDir} DO NOT USE FOR → ${cmd}`, route: "req-define" }
-          ));
-        }
-      }
-    }
-  }
-
-  if (results.length === 0) {
-    results.push(ok("Implementation Pattern", "use-for-consistency", "No USE FOR / DO NOT USE FOR inconsistencies detected"));
-  }
-
+  results.push(ok("Implementation Pattern", "use-for-consistency", "USE FOR consistency check skipped — load_skills no longer in frontmatter (Case 5 / RU-0020)"));
   return results;
 }
 
@@ -2718,9 +2453,27 @@ function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// ─── Command frontmatter checks (REQ-0108-095~099) ────────────────────────
+// ─── Command frontmatter checks (REQ-0108-095~099, inverted: Case 5 / RU-0020) ─
 
 const KNOWN_AGENTS = new Set(["sisyphus", "prometheus", "oracle", "metis", "hephaestus", "momus", "test-agent"]);
+
+/** Dev metadata fields that must NOT appear in command frontmatter (REQ-0108-022~024, 095~097, 109) */
+const PROHIBITED_FRONTMATTER_FIELDS = [
+  "implementation_pattern",
+  "secondary_pattern",
+  "load_skills",
+] as const;
+
+/** Additional prohibited fields (REQ-0108-124) */
+const EXTRA_PROHIBITED_FIELDS = [
+  "pattern",
+  "workflow_route",
+  "branch_type",
+  "labels",
+] as const;
+
+/** Allowed frontmatter fields for commands (REQ-0108-046, 098) */
+const ALLOWED_FRONTMATTER_FIELDS = new Set(["description", "agent"]);
 
 function checkCommandFrontmatterDetailed(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -2735,46 +2488,49 @@ function checkCommandFrontmatterDetailed(cmdDir: string, root: string): CheckRes
     const relPath = resolveRelative(fullPath, root);
     const cmdName = file.replace(".md", "");
 
-    // REQ-0108-095: implementation_pattern required
+    // REQ-0108-095: implementation_pattern PROHIBITED (inverted from required → forbidden)
     const implPattern = fm["implementation_pattern"];
-    if (!implPattern || (typeof implPattern === "string" && implPattern.trim() === "")) {
+    if (implPattern !== undefined) {
       results.push(ng(
         "Command", "cmd-implementation-pattern",
-        `Command '${cmdName}' missing implementation_pattern`,
+        `Command '${cmdName}' has prohibited 'implementation_pattern' in frontmatter (dev metadata — Case 5 / RU-0020)`,
         relPath, undefined,
-        { evidence: "missing", expected: "must have implementation_pattern", route: "req-define" }
-      ));
-    } else if (typeof implPattern === "string" && !IMPLEMENTATION_PATTERNS.includes(implPattern as any)) {
-      results.push(ng(
-        "Command", "cmd-implementation-pattern",
-        `Command '${cmdName}' has unknown implementation_pattern '${implPattern}'`,
-        relPath, undefined,
-        { evidence: implPattern, expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" }
+        { evidence: `implementation_pattern: ${String(implPattern)}`, expected: "field must not exist in frontmatter", route: "req-define" }
       ));
     }
 
-    // REQ-0108-096: secondary_pattern must be known
+    // REQ-0108-096: secondary_pattern PROHIBITED (inverted from allowed → forbidden)
     const secPattern = fm["secondary_pattern"];
-    if (secPattern && typeof secPattern === "string" && secPattern.trim() !== "") {
-      if (!IMPLEMENTATION_PATTERNS.includes(secPattern as any)) {
+    if (secPattern !== undefined) {
+      results.push(ng(
+        "Command", "cmd-secondary-pattern",
+        `Command '${cmdName}' has prohibited 'secondary_pattern' in frontmatter (dev metadata — Case 5 / RU-0020)`,
+        relPath, undefined,
+        { evidence: `secondary_pattern: ${String(secPattern)}`, expected: "field must not exist in frontmatter", route: "req-define" }
+      ));
+    }
+
+    // REQ-0108-097: load_skills PROHIBITED in frontmatter (inverted from required → forbidden)
+    const ls = fm["load_skills"];
+    if (ls !== undefined) {
+      results.push(ng(
+        "Command", "cmd-load-skills",
+        `Command '${cmdName}' has prohibited 'load_skills' in frontmatter (dev metadata — Case 5 / RU-0020)`,
+        relPath, undefined,
+        { evidence: `load_skills: ${Array.isArray(ls) ? ls.join(", ") : String(ls)}`, expected: "field must not exist in frontmatter", route: "req-define" }
+      ));
+    }
+
+    // REQ-0108-124: additional prohibited fields (pattern, workflow_route, branch_type, labels)
+    for (const field of EXTRA_PROHIBITED_FIELDS) {
+      if (fm[field] !== undefined) {
         results.push(ng(
-          "Command", "cmd-secondary-pattern",
-          `Command '${cmdName}' has unknown secondary_pattern '${secPattern}'`,
+          "Command", "cmd-extra-prohibited-field",
+          `Command '${cmdName}' has prohibited '${field}' in frontmatter (REQ-0108-124)`,
           relPath, undefined,
-          { evidence: secPattern, expected: `one of: ${IMPLEMENTATION_PATTERNS.join(", ")}`, route: "req-define" }
+          { evidence: `${field}: ${String(fm[field])}`, expected: "field must not exist in frontmatter", route: "req-define" }
         ));
       }
-    }
-
-    // REQ-0108-097: load_skills must be array
-    const ls = fm["load_skills"];
-    if (ls !== undefined && !Array.isArray(ls)) {
-      results.push(ng(
-        "Command", "cmd-load-skills-array",
-        `Command '${cmdName}' load_skills is not array format`,
-        relPath, undefined,
-        { evidence: typeof ls, expected: "array", route: "req-define" }
-      ));
     }
 
     // REQ-0108-098: agent must be known
@@ -2804,7 +2560,7 @@ function checkCommandFrontmatterDetailed(cmdDir: string, root: string): CheckRes
   }
 
   if (results.filter((r) => r.level === "ng").length === 0) {
-    results.push(ok("Command", "cmd-frontmatter-detailed", "All command frontmatter fields are valid"));
+    results.push(ok("Command", "cmd-frontmatter-detailed", "All command frontmatter fields are valid (no prohibited dev metadata)"));
   }
   return results;
 }
@@ -3047,6 +2803,208 @@ export function checkScriptTemplateReferencePaths(
   return results;
 }
 
+// ─── ADR status normalization check (REQ-0108-121) ──────────────────────────
+
+function checkAdrStatusNormalization(adrDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const adrFiles = listFiles(adrDir).filter((f) => f.startsWith("ADR-") && f !== "README.md");
+  let foundViolation = false;
+
+  const oldStatusPattern = /superseded-by:\s*\[ADR-\d{4}\]/gi;
+
+  for (const file of adrFiles) {
+    const fullPath = path.join(adrDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const relPath = resolveRelative(fullPath, root);
+
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      oldStatusPattern.lastIndex = 0;
+      if (oldStatusPattern.test(lines[i])) {
+        foundViolation = true;
+        results.push(ng(
+          "ADR", "adr-status-normalization",
+          `ADR status uses old 'superseded-by:[ADR-XXXX]' format (should be normalized)`,
+          relPath, i + 1,
+          { evidence: lines[i].trim(), expected: "normalized ADR status format", route: "intake" }
+        ));
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(ok("ADR", "adr-status-normalization", "All ADR status fields use normalized format"));
+  }
+  return results;
+}
+
+// ─── RU-ID ground reference detection (REQ-0108-122) ─────────────────────────
+
+function checkRuidGroundReference(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const dirsToScan = [
+    path.join(root, "docs", "requirements"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+    path.join(root, "docs", "adr"),
+  ];
+
+  const ruidPattern = /\.agentdev\/backlog\/req-units\/RU-\d{8}-\d{2,}/g;
+  let foundViolation = false;
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      const fullPath = path.join(dir, file);
+      const content = readText(fullPath);
+      if (!content) continue;
+      const relPath = resolveRelative(fullPath, root);
+
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        ruidPattern.lastIndex = 0;
+        if (ruidPattern.test(lines[i])) {
+          foundViolation = true;
+          results.push(ng(
+            "Canonical", "ruid-ground-reference",
+            `RU-ID ground reference detected in persistent docs`,
+            relPath, i + 1,
+            { evidence: lines[i].trim(), expected: "RU-ID references should not appear in persistent docs", route: "intake" }
+          ));
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(ok("Canonical", "ruid-ground-reference", "No RU-ID ground references in persistent docs"));
+  }
+  return results;
+}
+
+// ─── Workflow status / 6 micro-phase detection prohibition (REQ-0108-123) ────
+
+function checkWorkflowStatusProhibition(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const dirsToScan = [
+    path.join(root, "docs", "requirements"),
+    path.join(root, "docs", "specs"),
+  ];
+
+  const sixPhasePattern = /\b(requirement|analyzed|created|in_progress|review|done)\b.*\b(status|状態|ステータス|マイクロフェーズ|micro.phase|state)\b|\b(status|状態|ステータス|マイクロフェーズ|micro.phase|state)\b.*\b(requirement|analyzed|created|in_progress|review|done)\b/gi;
+  let foundViolation = false;
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      if (!file.startsWith("REQ-") && !file.endsWith(".md")) continue;
+      const fullPath = path.join(dir, file);
+      const content = readText(fullPath);
+      if (!content) continue;
+      const relPath = resolveRelative(fullPath, root);
+
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        sixPhasePattern.lastIndex = 0;
+        if (sixPhasePattern.test(lines[i])) {
+          foundViolation = true;
+          results.push(ng(
+            "LifecycleBoundary", "workflow-status-prohibition",
+            `Workflow status / 6 micro-phase state management pattern detected in REQ/SPEC`,
+            relPath, i + 1,
+            { evidence: lines[i].trim(), expected: "REQ/SPEC must not define workflow status state management", route: "intake" }
+          ));
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(ok("LifecycleBoundary", "workflow-status-prohibition", "No workflow status / 6 micro-phase patterns in REQ/SPEC"));
+  }
+  return results;
+}
+
+// ─── Accepted ADR only citation check (REQ-0108-125, SHOULD) ─────────────────
+
+function checkAcceptedAdrOnlyCitation(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const adrDir = path.join(root, "docs", "adr");
+  const adrFiles = listFiles(adrDir).filter((f) => f.startsWith("ADR-") && f !== "README.md");
+
+  const nonAcceptedAdrs = new Map<string, string>();
+  for (const file of adrFiles) {
+    const fullPath = path.join(adrDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+    const status = typeof fm["status"] === "string" ? fm["status"].toLowerCase() : "";
+    if (status && status !== "accepted") {
+      nonAcceptedAdrs.set(file.replace(".md", ""), status);
+    }
+  }
+
+  if (nonAcceptedAdrs.size === 0) {
+    results.push(ok("ADR", "accepted-adr-only-citation", "All ADRs are accepted or no non-accepted ADRs exist"));
+    return results;
+  }
+
+  const filesToScan = [
+    path.join(root, "docs", "requirements"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+    path.join(root, "README.md"),
+    path.join(root, "docs", "DOC-MAP.md"),
+  ];
+
+  for (const scanTarget of filesToScan) {
+    if (!fs.existsSync(scanTarget)) continue;
+
+    const stat = fs.statSync(scanTarget);
+    if (stat.isDirectory()) {
+      for (const file of listFiles(scanTarget)) {
+        const fullPath = path.join(scanTarget, file);
+        checkNonAcceptedAdrRefsInFile(fullPath, root, nonAcceptedAdrs, results);
+      }
+    } else {
+      checkNonAcceptedAdrRefsInFile(scanTarget, root, nonAcceptedAdrs, results);
+    }
+  }
+
+  if (results.filter((r) => r.level === "warning").length === 0) {
+    results.push(ok("ADR", "accepted-adr-only-citation", "Only accepted ADRs are cited as current basis"));
+  }
+  return results;
+}
+
+function checkNonAcceptedAdrRefsInFile(
+  filePath: string,
+  root: string,
+  nonAcceptedAdrs: Map<string, string>,
+  results: CheckResult[],
+): void {
+  const content = readText(filePath);
+  if (!content) return;
+  const relPath = resolveRelative(filePath, root);
+
+  const adrRefs = content.match(/\bADR-\d{4}\b/g) || [];
+  const uniqueRefs = [...new Set(adrRefs)];
+
+  for (const ref of uniqueRefs) {
+    const status = nonAcceptedAdrs.get(ref);
+    if (status) {
+      results.push(warn(
+        "ADR", "accepted-adr-only-citation",
+        `Non-accepted ADR ${ref} (status: ${status}) cited in ${relPath}`,
+        relPath, undefined,
+        { evidence: ref, expected: "only accepted ADRs should be cited as current basis", route: "intake" }
+      ));
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -3138,6 +3096,10 @@ async function main(): Promise<void> {
     ...checkSkillFrontmatter(skillsDir, root),
     ...checkCommandFrontmatterDetailed(cmdDir, root),
     ...checkScriptTemplateReferencePaths(cmdDir, skillsDir, root),
+    ...checkAdrStatusNormalization(adrDir, root),
+    ...checkRuidGroundReference(root),
+    ...checkWorkflowStatusProhibition(root),
+    ...checkAcceptedAdrOnlyCitation(root),
   ];
 
   for (const r of results) {

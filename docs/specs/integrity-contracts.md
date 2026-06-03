@@ -18,6 +18,11 @@
 | frontmatter allowed fields | 複数フィールド許可 | description + agent のみ | REQ-0108-046, 098 |
 | dev メタデータ混入 | 検査対象外 | error として検出 | REQ-0108-109 |
 | skill references 存在 | 検査対象外 | runtime パスのみ確認 | REQ-0108-110 |
+| ADR status 正規化 | 検査対象外 | 旧形式 superseded-by:[ADR-XXXX] を検出 | REQ-0108-121 |
+| RU-ID 根拠参照 | 検査対象外 | docs 永続文書内の RU-ID パターンを検出 | REQ-0108-122 |
+| workflow status 禁止 | 検査対象外 | REQ/SPEC 内の workflow status / 6 マイクロフェーズを検出 | REQ-0108-123 |
+| command 追加フィールド禁止 | 検査対象外 | pattern / workflow_route / branch_type / labels を検出 | REQ-0108-124 |
+| accepted ADR のみ引用 | 検査対象外 | proposed / superseded / deprecated ADR 引用を warning として検出 | REQ-0108-125 |
 | reference-path OK診断 | OK結果にfile/line/evidenceなし | per-reference OKにfile/line/evidenceを出力 | REQ-0108-117 |
 | cross-skill裸参照 | 裸参照のcross-skill誤検知なし | 同一skill内になく別skillにある裸参照をstrict NG検出 | REQ-0108-119 |
 
@@ -69,7 +74,11 @@
 | Canonical | canonical 境界の遵守 |
 | Lifecycle | 状態遷移の妥当性 |
 | Namespace | 旧 namespace 残存確認 |
-| ImplementationPattern | pattern 定義妥当性（REQ-0108-026〜038） |
+| ImplementationPattern | pattern 定義妥当性（REQ-0108-026〜038, 反転済） |
+| ADRStatusNormalization | ADR status 旧形式検出（REQ-0108-121） |
+| RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-0108-122） |
+| WorkflowStatusProhibition | workflow status / 6 マイクロフェーズ検出（REQ-0108-123） |
+| AcceptedAdrCitation | accepted 以外の ADR 引用検出（REQ-0108-125, SHOULD） |
 
 ## Report Format
 
