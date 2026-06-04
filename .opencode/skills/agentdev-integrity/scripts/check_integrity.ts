@@ -153,13 +153,6 @@ function extractReadmeTableCommands(content: string): Set<string> {
   return commands;
 }
 
-function extractLoadSkills(frontmatter: Record<string, string | string[]> | null): string[] {
-  if (!frontmatter) return [];
-  const ls = frontmatter["load_skills"];
-  if (Array.isArray(ls)) return ls;
-  if (typeof ls === "string" && ls.length > 0) return [ls];
-  return [];
-}
 
 const LEGACY_PATTERNS = [
   { pattern: /\bintegrity_check\b/g, name: "integrity_check (snake_case)" },
@@ -383,27 +376,7 @@ function checkAdrReqCrossReference(reqDir: string, adrDir: string, root: string)
 
 function checkLoadSkillsExistence(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const skillDirs = new Set(listDirs(skillsDir));
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    const loadSkills = extractLoadSkills(fm);
-    for (const skill of loadSkills) {
-      if (!skillDirs.has(skill)) {
-        results.push(
-          ng("Skill", "load-skills-existence", `Skill '${skill}' referenced in ${file} does not exist under .opencode/skills/`)
-        );
-      }
-    }
-  }
-
-  if (results.filter((r) => r.level === "ng").length === 0) {
-    results.push(ok("Skill", "load-skills-existence", "All load_skills references point to existing skill directories"));
-  }
+  results.push(ok("Skill ↔ load_skills 参照", "load-skills-existence", "Load skills existence checks skipped — load_skills no longer in frontmatter (REQ-0108-130)"));
   return results;
 }
 
@@ -423,28 +396,7 @@ function checkSkillAgentdevPrefix(skillsDir: string, root: string): CheckResult[
 
 function checkUnusedSkills(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const allSkillDirs = new Set(listDirs(skillsDir));
-  const referencedSkills = new Set<string>();
-
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    const loadSkills = extractLoadSkills(fm);
-    for (const s of loadSkills) referencedSkills.add(s);
-  }
-
-  const unused = [...allSkillDirs].filter((s) => !referencedSkills.has(s));
-  if (unused.length > 0) {
-    for (const s of unused) {
-      results.push(info("Skill", "unused-skills", `${s}: not referenced by any command's load_skills`));
-    }
-  }
-  if (unused.length === 0) {
-    results.push(ok("Skill", "unused-skills", "All skills are referenced by at least one command"));
-  }
+  results.push(ok("Skill ↔ load_skills 参照", "unused-skills", "Unused skills detection via load_skills skipped — load_skills no longer in frontmatter (REQ-0108-132)"));
   return results;
 }
 
@@ -515,7 +467,7 @@ function checkExpandedReadmeSync(cmdDir: string, root: string): CheckResult[] {
 function checkCommandInventory(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-  const required = ["description", "agent", "load_skills"];
+  const required = ["description", "agent"];
 
   for (const file of cmdFiles) {
     const fullPath = path.join(cmdDir, file);
@@ -1897,30 +1849,7 @@ function classifyUnusedSkill(skillName: string, skillsDir: string): string {
 
 function checkUnusedSkillsCategorized(cmdDir: string, skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const allSkillDirs = new Set(listDirs(skillsDir));
-  const referencedSkills = new Set<string>();
-
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    const loadSkills = extractLoadSkills(fm);
-    for (const s of loadSkills) referencedSkills.add(s);
-  }
-
-  const unused = [...allSkillDirs].filter((s) => !referencedSkills.has(s));
-  if (unused.length > 0) {
-    for (const s of unused) {
-      const category = classifyUnusedSkill(s, skillsDir);
-      results.push(info("Skill", "unused-skills-categorized",
-        `[recommendation: no-action] ${s}: not referenced by any command's load_skills (category: ${category})`));
-    }
-  }
-  if (unused.length === 0) {
-    results.push(ok("Skill", "unused-skills-categorized", "All skills are referenced by at least one command"));
-  }
+  results.push(ok("Skill ↔ load_skills 参照", "unused-skills-categorized", "Unused skills detection via load_skills skipped — load_skills no longer in frontmatter (REQ-0108-132)"));
   return results;
 }
 
