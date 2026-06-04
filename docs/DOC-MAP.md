@@ -30,6 +30,7 @@
 | [REQ-0111](requirements/REQ-0111.md) | Command authoring 後方互換性維持原則 | command-authoring、後方互換性、設計原則 |
 | [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル・文書責務・runtime独立性・状態モデル統合是正 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、integrity検査追加 |
 | [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 | skill references 内 SPEC 相当記述の分離、runtime 自己完束制約 |
+| [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件 |
 
 ## Retired REQ
 

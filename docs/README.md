@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は13件の active REQ である。旧REQ（REQ-0104〜REQ-0109）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。
+現行要件の第一参照先は14件の active REQ である。旧REQ（REQ-0104〜REQ-0109）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。
 
 | REQ | タイトル |
 |---|---|
@@ -19,6 +19,7 @@
 | [REQ-0111](requirements/REQ-0111.md) | Command authoring 後方互換性維持原則 |
 | [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル・文書責務・runtime独立性・状態モデル統合是正 |
 | [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 |
+| [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード |
 
 - [Requirements Index](requirements/README.md)
 - [Migration Table](requirements/mapping-table.md)
