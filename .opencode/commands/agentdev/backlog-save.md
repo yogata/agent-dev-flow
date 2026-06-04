@@ -105,10 +105,10 @@ RU 生成、artifact 削除、git commit/push が全て成功した後、当該 
 
 ### Step 6: 完了報告
 
-完了報告 → `agentdev-workflow-reporting` の variant に従って出力:
-- 全て成功 → `completion-reports/backlog-save/standard.md`
-- partial success → `completion-reports/backlog-save/partial.md`
-- 対象 draft なし → `completion-reports/backlog-save/zero-draft.md`
+完了報告 → 完了報告templateに従って出力:
+- 全て成功 → `templates/backlog-save/standard.md`
+- partial success → `templates/backlog-save/partial.md`
+- 対象 draft なし → `templates/backlog-save/zero-draft.md`
 
 git 永続化結果を含める。次のコマンド: `/agentdev/req-define`
 

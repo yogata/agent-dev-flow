@@ -90,10 +90,10 @@ Draft の内容:
 
 ### Step 6: 完了報告
 
-完了報告 → `agentdev-workflow-reporting` の variant に従って出力:
-- 全て成功 → `completion-reports/backlog-review/standard.md`
-- partial success（矛盾あり）→ `completion-reports/backlog-review/partial.md`
-- promoted artifact なし → `completion-reports/backlog-review/zero-promoted.md`
+完了報告 → 完了報告templateに従って出力:
+- 全て成功 → `templates/backlog-review/standard.md`
+- partial success（矛盾あり）→ `templates/backlog-review/partial.md`
+- promoted artifact なし → `templates/backlog-review/zero-promoted.md`
 
 git 永続化結果を含める。次のコマンド: `/agentdev/backlog-save`
 

@@ -49,10 +49,10 @@ agent: prometheus
 
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
 
-11. **完了報告**: `agentdev-workflow-reporting` の完了報告variantに従って出力。Pattern に応じたvariantを選択:
-    - feature standard → completion-reports/req-define/feature.md
-    - feature large (Epic)規模 → completion-reports/req-define/feature-epic.md
-    - bugfix / maintenance / docs_chore → completion-reports/req-define/lightweight.md
+11. **完了報告**: 完了報告templateに従って出力。Pattern に応じたvariantを選択:
+     - feature standard → templates/req-define/feature.md
+     - feature large (Epic)規模 → templates/req-define/feature-epic.md
+     - bugfix / maintenance / docs_chore → templates/req-define/lightweight.md
 
 ## Guardrails
 

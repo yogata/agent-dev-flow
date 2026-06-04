@@ -63,10 +63,10 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 11. **Domain state 永続化**: `agentdev-git-worktree` の domain state 永続化（references/git-common-procedures.md Section 2）に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める（SHALL）
 
-12. **完了報告**: `agentdev-workflow-reporting` の完了報告variantに従って出力。結果状態に応じたvariantを選択:
-    - 全系統成功 → completion-reports/case-close/standard.md
-    - .agentdev push失敗 → completion-reports/case-close/agentdev-push-failed.md
-    - ブランチ・worktree削除失敗 → completion-reports/case-close/worktree-cleanup-failed.md
+12. **完了報告**: 完了報告templateに従って出力。結果状態に応じたvariantを選択:
+    - 全系統成功 → templates/case-close/standard.md
+    - .agentdev push失敗 → templates/case-close/agentdev-push-failed.md
+    - ブランチ・worktree削除失敗 → templates/case-close/worktree-cleanup-failed.md
     - GitHub完了後に .agentdev push失敗の場合は standard variant を使用してはならない（MUST NOT, REQ-0107-034）
     - **結果状態の分離報告**（SHALL）: GitHub側完了状態・`.agentdev` 永続化状態・ブランチ削除状態を独立して報告
 
