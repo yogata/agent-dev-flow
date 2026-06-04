@@ -25,6 +25,9 @@
 | accepted ADR のみ引用 | 検査対象外 | proposed / superseded / deprecated ADR 引用を warning として検出 | REQ-0108-125 |
 | reference-path OK診断 | OK結果にfile/line/evidenceなし | per-reference OKにfile/line/evidenceを出力 | REQ-0108-117 |
 | cross-skill裸参照 | 裸参照のcross-skill誤検知なし | 同一skill内になく別skillにある裸参照をstrict NG検出 | REQ-0108-119 |
+| abolished-skill-reference | N/A (検査対象外) | 廃止済み skill (agentdev-workflow-reporting) への参照を strict として検出 | REQ-0108-126 |
+| command-local-template-existence | completion report templates in skill directory | completion report templates in `.opencode/commands/agentdev/templates/{command}/{variant}.md` | REQ-0108-127 |
+| skill-spec-dependency | N/A (検査対象外) | runtime skill から docs/specs/ への直接依存を warning として検出 | REQ-0108-128 |
 
 ## Severity Classification
 
@@ -79,6 +82,9 @@
 | RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-0108-122） |
 | WorkflowStatusProhibition | workflow status / 6 マイクロフェーズ検出（REQ-0108-123） |
 | AcceptedAdrCitation | accepted 以外の ADR 引用検出（REQ-0108-125, SHOULD） |
+| AbolishedSkillReference | 廃止済み skill への参照検知（REQ-0108-126） |
+| CommandLocalTemplate | command-local template 存在・整合性検査（REQ-0108-127） |
+| SkillSpecDependency | runtime skill から docs/specs/ への直接依存検出（REQ-0108-128） |
 
 ## Report Format
 
