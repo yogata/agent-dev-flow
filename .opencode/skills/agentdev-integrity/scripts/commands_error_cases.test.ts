@@ -4,7 +4,6 @@
  * Validates detection of:
  * - Missing frontmatter in command definitions
  * - Missing required frontmatter fields
- * - Non-existent skill references in load_skills
  * - Non-existent template references
  * - Invalid agent type values
  * - Missing Input/Output/Steps sections
@@ -98,9 +97,6 @@ function validateCommand(content: string): { valid: boolean; errors: string[] } 
   if (!fm["agent"] || (typeof fm["agent"] === "string" && !["sisyphus", "prometheus"].includes(fm["agent"]))) {
     errors.push(`Invalid 'agent' field: ${fm["agent"]}`);
   }
-  if (!fm["load_skills"]) {
-    errors.push("Missing 'load_skills' field");
-  }
 
   const body = content.split("---").slice(2).join("---").trim();
   if (!body) {
@@ -170,58 +166,52 @@ describe("REQ-0030-011: Error case detection (synthetic fixtures)", () => {
 
   describe("Missing required frontmatter fields", () => {
     it("detects missing description field", () => {
-      const content = "---\nagent: sisyphus\nload_skills:\n  - test\n---\n\n## Input\n\nX\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
+      const content = "---\nagent: sisyphus\n---\n\n## Input\n\nX\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
       const result = validateCommand(content);
       expect(result.valid).toBe(false);
       expect(result.errors.some((e) => e.includes("description"))).toBe(true);
     });
 
     it("detects missing agent field", () => {
-      const content = "---\ndescription: test\nload_skills:\n  - test\n---\n\n## Input\n\nX\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
+      const content = "---\ndescription: test\n---\n\n## Input\n\nX\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
       const result = validateCommand(content);
       expect(result.valid).toBe(false);
       expect(result.errors.some((e) => e.includes("agent"))).toBe(true);
     });
 
     it("detects invalid agent type", () => {
-      const content = "---\ndescription: test\nagent: hermes\nload_skills:\n  - test\n---\n\n## Input\n\nX\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
+      const content = "---\ndescription: test\nagent: hermes\n---\n\n## Input\n\nX\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
       const result = validateCommand(content);
       expect(result.valid).toBe(false);
       expect(result.errors.some((e) => e.includes("Invalid 'agent'"))).toBe(true);
     });
 
-    it("detects missing load_skills field", () => {
-      const content = "---\ndescription: test\nagent: sisyphus\n---\n\n## Input\n\nX\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
-      const result = validateCommand(content);
-      expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("load_skills"))).toBe(true);
-    });
   });
 
   describe("Missing body sections", () => {
     it("detects missing Input section", () => {
-      const content = "---\ndescription: test\nagent: sisyphus\nload_skills:\n  - test\n---\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
+      const content = "---\ndescription: test\nagent: sisyphus\n---\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
       const result = validateCommand(content);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain("Missing ## Input section");
     });
 
     it("detects missing Output section", () => {
-      const content = "---\ndescription: test\nagent: sisyphus\nload_skills:\n  - test\n---\n\n## Input\n\nX\n\n## Steps\n\n1. S\n";
+      const content = "---\ndescription: test\nagent: sisyphus\n---\n\n## Input\n\nX\n\n## Steps\n\n1. S\n";
       const result = validateCommand(content);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain("Missing ## Output section");
     });
 
     it("detects missing Steps section", () => {
-      const content = "---\ndescription: test\nagent: sisyphus\nload_skills:\n  - test\n---\n\n## Input\n\nX\n\n## Output\n\nY\n";
+      const content = "---\ndescription: test\nagent: sisyphus\n---\n\n## Input\n\nX\n\n## Output\n\nY\n";
       const result = validateCommand(content);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain("Missing Steps section");
     });
 
     it("detects empty body", () => {
-      const content = "---\ndescription: test\nagent: sisyphus\nload_skills:\n  - test\n---\n\n";
+      const content = "---\ndescription: test\nagent: sisyphus\n---\n\n";
       const result = validateCommand(content);
       expect(result.valid).toBe(false);
       expect(result.errors).toContain("Empty body after frontmatter");
@@ -246,8 +236,6 @@ describe("REQ-0030-011: Error case detection (synthetic fixtures)", () => {
 ---
 description: テストコマンド
 agent: sisyphus
-load_skills:
-  - agentdev-workflow-lifecycle
 ---
 
 # テスト
@@ -289,28 +277,6 @@ describe("REQ-0030-011: Real repo error case validation", () => {
         expect(result.valid).toBe(true);
         if (!result.valid) {
           console.error(`${file} validation errors:`, result.errors);
-        }
-      });
-    }
-  });
-
-  describe("All load_skills in real commands reference existing skills", () => {
-    const cmdFiles = fs.existsSync(CMD_DIR)
-      ? fs.readdirSync(CMD_DIR).filter((f) => f.endsWith(".md") && f !== "README.md").sort()
-      : [];
-
-    for (const file of cmdFiles) {
-      describe(`${file}`, () => {
-        const content = fs.readFileSync(path.join(CMD_DIR, file), "utf-8");
-        const fm = parseCommandFrontmatter(content);
-        const loadSkills = fm && Array.isArray(fm["load_skills"])
-          ? (fm["load_skills"] as string[])
-          : [];
-
-        for (const skill of loadSkills) {
-          it(`skill "${skill}" exists`, () => {
-            expect(skillDirs.has(skill)).toBe(true);
-          });
         }
       });
     }
