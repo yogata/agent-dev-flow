@@ -146,3 +146,21 @@
 - **想定反映先**: agentdev-gh-cli skill のWindows回避策セクション、またはcase-close/case-runの一時スクリプト作成ガイド
 - **関連**: case-close Step 4a, `.sisyphus/tmp/post-comments.js`
 - **タグ**: `#nodejs` `#template-literal` `#script` `#workaround`
+
+---
+
+## 2026-06-04: 大規模テストファイル(2700+行)の修正委譲でタイムアウト発生
+
+- **問題事象**: check_integrity.test.ts (2771行、52箇所のload_skills参照) の修正をdeep categoryのsubagentに委譲したところ、30分のタイムアウトでタスク失敗。変更自体は適用されていたが、タスク管理上は失敗扱いとなり結果回収ができなかった
+- **発生局面**: 実装（case-run Step 5 の委譲）
+- **検知方法**: background_output(task_id) の "Task not found" エラー。git status で変更が適用済みであることを確認
+- **根本原因**: (1) 2771行のテストファイル全体の修正を単一タスクに詰め込んだ、(2) load_skills参照のコンテキスト理解に時間を要した、(3) deep categoryのタイムアウト(30分)を超過した
+- **自律対応内容**: (1) git statusで変更が適用済みであることを確認、(2) bun test でテストパスを検証、(3) タイムアウトしたが変更は正しく適用されていたことを確認して次ステップに進んだ
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 大規模ファイル(1000行超)の修正を委譲する全パターンに適用。特にテストファイルのfixture書き換えは行数が多くても変更パターンが機械的
+- **再発条件**: (1) 1000行超のファイル修正を単一タスクに委譲する、(2) 変更箇所がファイル全体に散在する、(3) subagentがコンテキスト理解に時間を要する
+- **予防策候補**: (1) 大規模ファイルは修正箇所ごとに分割して並列委譲する（例: fixture修正用とテスト削除用）、(2) 機械的な置換パターンの場合はAST-grepやedit toolで直接実行する方が高速、(3) quick categoryで検証のみを別タスクにする
+- **想定反映先**: case-runの委譲分割ガイドライン、またはSisyphusの実装委譲ベストプラクティス
+- **関連**: Issue #572, PR #573, check_integrity.test.ts
+- **タグ**: `#delegation` `#timeout` `#large-file` `#test-fix`
