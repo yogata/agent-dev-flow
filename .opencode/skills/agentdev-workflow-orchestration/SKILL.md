@@ -31,10 +31,7 @@ case-run は3つの実行モードを持つ:
 
 | トピック | 参照先 |
 |----------|--------|
-| Epic Orchestrator モード | `references/epic-orchestrator.md` — Epic検出・Wave解析・実行フロー・失敗制御・集約報告 |
-| 再開ポイント・依存分析・Wave | `references/restart-and-wave-scheduling.md` — 成果物チェック・依存レベル分類・Wave構成・Specs直列化・集約報告 |
 | Self-Healing・CI Loop・エラー | `references/self-healing-and-errors.md` — 自律修正ループ・CI対応・エラー回復マップ |
-| サブエージェント protocol | `references/subagent-protocol.md` — 起動仕様・プロンプト構成・親エージェント責務 |
 
 ## See Also
 

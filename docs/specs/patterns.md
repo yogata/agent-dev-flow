@@ -90,3 +90,51 @@ tags: [{tag1}, {tag2}]
 **要件行の記述規約**（REQ-0109, 004）:
 - 要件行には振る舞い・制約・状態のみを記述する（SHALL）
 - 反映作業（更新・削除・移動・名称変更等）を要件行に記述しない（SHALL NOT）
+
+## テンプレート命名規則
+
+ファイル種別に応じたプレフィクスで命名する:
+
+| プレフィクス | 用途 |
+|---|---|
+| `issue_desc_` | Issue本文テンプレート |
+| `issue_comment_` | コメントテンプレート |
+| `pr_desc_` | PR本文テンプレート |
+
+### テンプレート本体に含めるもの
+
+- frontmatter（name, about, labels）
+- セクション見出し（日本語）
+- `<!-- 【必須】 -->` / `<!-- 【任意】 -->` マーカー
+- 変数プレースホルダー（`{variable}` 形式）
+
+### テンプレート本体に含めないもの
+
+- gh操作のコマンド（`gh issue create` 等）
+- 実行手順・分岐ロジック
+- テンプレート選定ルール
+
+## リポジトリ参照リンク規約
+
+Issue/PR/コメント本文にリポジトリ内ファイル・ディレクトリへの参照を含める場合のURL形式。
+
+### URL形式
+
+| 種別 | URL形式 |
+|---|---|
+| ファイル参照 | `https://github.com/{owner}/{repo}/blob/{branch}/{path}` |
+| ディレクトリ参照 | `https://github.com/{owner}/{repo}/tree/{branch}/{path}` |
+
+### 変換ルール
+
+- `docs/requirements/REQ-0107.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/requirements/REQ-0107.md`
+- `docs/adr/ADR-0001.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/adr/ADR-0001.md`
+- `.opencode/skills/agentdev-gh-cli/SKILL.md` → `https://github.com/yogata/agent-dev-flow/blob/main/.opencode/skills/agentdev-gh-cli/SKILL.md`
+- `.opencode/skills/` → `https://github.com/yogata/agent-dev-flow/tree/main/.opencode/skills/`
+
+### 対象外
+
+- テンプレート変数プレースホルダー（`{xxx}` 形式）
+- コードブロック内のパス参照
+- `http://` `https://` で始まる既存URL
+- リポジトリ内Markdownファイル間の相対リンク
