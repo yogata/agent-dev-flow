@@ -244,18 +244,6 @@ describe("REQ-0030-009: E2E workflow tests for all 14 commands", () => {
           });
         }
 
-        it("load_skills includes agentdev-workflow-reporting (for reporting commands)", () => {
-          const commandsWithReporting = [
-            "case-open", "case-run", "case-update", "case-close",
-            "intake-capture", "intake-from-github", "intake-review",
-            "intake-promote", "intake-open", "req-define", "req-save",
-          ];
-          if (commandsWithReporting.includes(cmdName)) {
-            expect(loadSkills.includes("agentdev-workflow-reporting")).toBe(true);
-          }
-        });
-      }
-
       // --- Template reference validity ---
 
       const templateRefs = extractTemplateRefs(content);

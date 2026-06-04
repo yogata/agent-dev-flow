@@ -88,25 +88,11 @@ function buildMinimalFixture(root: string): void {
   writeFileSync(join(specsDir, "patterns.md"), "# Patterns\n", "utf-8");
 
   const skillsDir = join(root, ".opencode", "skills");
-  const minimalSkills = ["agentdev-test-skill", "agentdev-workflow-reporting"];
+  const minimalSkills = ["agentdev-test-skill"];
   for (const name of minimalSkills) {
     mkdirp(join(skillsDir, name));
   }
   writeFileSync(join(skillsDir, "agentdev-test-skill", "SKILL.md"), "# agentdev-test-skill\n", "utf-8");
-  writeFileSync(join(skillsDir, "agentdev-workflow-reporting", "SKILL.md"), "# agentdev-workflow-reporting\n", "utf-8");
-
-  const reportingRefDir = join(skillsDir, "agentdev-workflow-reporting", "references");
-  mkdirp(reportingRefDir);
-  writeFileSync(join(reportingRefDir, "completion-reports.md"), [
-    "# 完了報告フォーマット",
-    "",
-    "## test-cmd 完了時",
-    "",
-    "```",
-    "✅ test-cmd 完了",
-    "```",
-    "",
-  ].join("\n"), "utf-8");
 
   const cmdDir = join(root, ".opencode", "commands", "agentdev");
   mkdirp(cmdDir);

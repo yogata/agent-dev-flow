@@ -96,7 +96,6 @@ function buildValidFixture(root: string): void {
 
   const allSkills = [
     "agentdev-test-skill",
-    "agentdev-workflow-reporting",
     "agentdev-conventional-commits",
     "agentdev-req-file-manager",
     "agentdev-adr-file-manager",
@@ -109,19 +108,6 @@ function buildValidFixture(root: string): void {
     writeFileSync(join(dir, "SKILL.md"), `# ${name}\n`, "utf-8");
   }
 
-  const reportingRefDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting", "references");
-  mkdirp(reportingRefDir);
-  writeFileSync(join(reportingRefDir, "completion-reports.md"), [
-    "# 完了報告フォーマット",
-    "",
-    "## test-cmd 完了時",
-    "",
-    "```",
-    "✅ test-cmd 完了",
-    "```",
-    "",
-  ].join("\n"), "utf-8");
-
   const cmdDir = join(root, ".opencode", "commands", "agentdev");
   mkdirp(cmdDir);
 
@@ -131,7 +117,6 @@ function buildValidFixture(root: string): void {
     "agent: test-agent",
     "implementation_pattern: file-pipeline",
     "load_skills:",
-    "  - agentdev-workflow-reporting",
     "  - agentdev-conventional-commits",
     "  - agentdev-req-file-manager",
     "  - agentdev-adr-file-manager",
@@ -148,7 +133,7 @@ function buildValidFixture(root: string): void {
     "",
     "| Command | Description | Agent | Skills |",
     "|---------|-------------|-------|--------|",
-    "| `agentdev/test-cmd` | Test command | test-agent | agentdev-workflow-reporting |",
+    "| `agentdev/test-cmd` | Test command | test-agent | agentdev-conventional-commits |",
     "",
   ].join("\n"), "utf-8");
 }
@@ -805,7 +790,8 @@ describe("E1: checkImplementationPattern — all valid", () => {
       "implementation_pattern: wall-session",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "Test command body.",
@@ -839,7 +825,8 @@ describe("E2: checkImplementationPattern — missing implementation_pattern", ()
       "agent: test-agent",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "Test command body.",
@@ -875,7 +862,8 @@ describe("E3: checkImplementationPattern — unknown pattern", () => {
       "implementation_pattern: unknown-pattern",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "Test command body.",
@@ -912,7 +900,8 @@ describe("E4: checkImplementationPattern — valid secondary_pattern", () => {
       "secondary_pattern: wall-session",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "Test command body.",
@@ -947,7 +936,8 @@ describe("E5: checkImplementationPattern — unknown secondary_pattern", () => {
       "secondary_pattern: bogus",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "Test command body.",
@@ -983,7 +973,8 @@ describe("E6: checkPatternProhibitions — no violations", () => {
       "implementation_pattern: file-pipeline",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "Test command body.",
@@ -1017,7 +1008,8 @@ describe("E7: checkPatternProhibitions — capture-only with prohibited skill", 
       "implementation_pattern: capture-only",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "  - agentdev-workflow-orchestration",
       "---",
       "",
@@ -1054,7 +1046,8 @@ describe("E8: checkPatternProhibitions — manager-orchestrator on non-case-run"
       "implementation_pattern: manager-orchestrator",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "  - agentdev-workflow-orchestration",
       "---",
       "",
@@ -1101,7 +1094,8 @@ describe("E9: checkLoadSkillsConsistency — all consistent", () => {
       "implementation_pattern: wall-session",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "Test command body.",
@@ -1118,41 +1112,6 @@ describe("E9: checkLoadSkillsConsistency — all consistent", () => {
     );
     expect(hit).toBeDefined();
     expect(hit.level).toBe("ok");
-  });
-});
-
-describe("E10: checkLoadSkillsConsistency — missing workflow-reporting", () => {
-  const ROOT = join(TEMP_ROOT, "e10-missing");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test command",
-      "agent: test-agent",
-      "implementation_pattern: wall-session",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "---",
-      "",
-      "Test command body.",
-      "",
-    ].join("\n"), "utf-8");
-    copyScripts(ROOT);
-  });
-
-  it("warns when agentdev-workflow-reporting is missing from load_skills", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "load-skills-consistency" &&
-        res.message.includes("agentdev-workflow-reporting")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("warning");
   });
 });
 
@@ -1489,10 +1448,10 @@ const VARIANT_VALID_FIELDS = [
 function buildVariantFixture(root: string): void {
   buildValidFixture(root);
 
-  const reportingRefDir = join(root, ".opencode", "skills", "agentdev-workflow-reporting", "references");
+  const testSkillRefDir = join(root, ".opencode", "skills", "agentdev-test-skill", "references");
 
   writeFileSync(
-    join(reportingRefDir, "completion-reports.md"),
+    join(testSkillRefDir, "completion-reports.md"),
     [
       "# 完了報告フォーマット",
       "",
@@ -1511,7 +1470,7 @@ function buildVariantFixture(root: string): void {
     "utf-8"
   );
 
-  const variantDir = join(reportingRefDir, "completion-reports", "test-cmd");
+  const variantDir = join(testSkillRefDir, "completion-reports", "test-cmd");
   mkdirp(variantDir);
 
   writeFileSync(
@@ -1526,85 +1485,6 @@ function buildVariantFixture(root: string): void {
     "utf-8"
   );
 }
-
-describe("D1: checkVariantExistence — all variants present", () => {
-  const D1_OK_ROOT = join(TEMP_ROOT, "d1-ok");
-
-  beforeAll(() => {
-    mkdirp(D1_OK_ROOT);
-    buildVariantFixture(D1_OK_ROOT);
-    copyScripts(D1_OK_ROOT);
-  });
-
-  it("exits with code 0 when all variants exist", () => {
-    const r = runScript(D1_OK_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; level: string }) =>
-        res.check === "variant-existence" && res.level === "ok"
-    );
-    expect(hit).toBeDefined();
-  });
-});
-
-describe("D1: checkVariantExistence — missing variant file", () => {
-  const D1_MISS_ROOT = join(TEMP_ROOT, "d1-miss");
-
-  beforeAll(() => {
-    mkdirp(D1_MISS_ROOT);
-    buildVariantFixture(D1_MISS_ROOT);
-
-    const variantDir = join(
-      D1_MISS_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
-      "references", "completion-reports", "test-cmd"
-    );
-    rmSync(join(variantDir, "epic.md"), { force: true });
-
-    copyScripts(D1_MISS_ROOT);
-  });
-
-  it("detects missing variant file", () => {
-    const r = runScript(D1_MISS_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "variant-existence" &&
-        res.message.includes("epic.md")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
-describe("D1: checkVariantExistence — missing command directory", () => {
-  const D1_NODIR_ROOT = join(TEMP_ROOT, "d1-nodir");
-
-  beforeAll(() => {
-    mkdirp(D1_NODIR_ROOT);
-    buildVariantFixture(D1_NODIR_ROOT);
-
-    const variantDir = join(
-      D1_NODIR_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
-      "references", "completion-reports", "test-cmd"
-    );
-    rmSync(variantDir, { recursive: true, force: true });
-
-    copyScripts(D1_NODIR_ROOT);
-  });
-
-  it("detects missing command directory", () => {
-    const r = runScript(D1_NODIR_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "variant-existence" &&
-        res.message.includes("test-cmd") &&
-        res.message.includes("directory")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
 
 describe("D2: checkInlineCompletionBodyInCommands — no violations", () => {
   const D2_OK_ROOT = join(TEMP_ROOT, "d2-ok");
@@ -1621,10 +1501,11 @@ describe("D2: checkInlineCompletionBodyInCommands — no violations", () => {
         "agent: test-agent",
         "load_skills:",
         "  - agentdev-test-skill",
-        "  - agentdev-workflow-reporting",
+        "    - agentdev-conventional-commits
+",
         "---",
         "",
-        "完了報告 → agentdev-workflow-reporting の完了報告variantに従って出力",
+        "完了報告 → 完了報告variantに従って出力",
         "",
       ].join("\n"),
       "utf-8"
@@ -1659,7 +1540,8 @@ describe("D2: checkInlineCompletionBodyInCommands — detects inline body", () =
         "agent: test-agent",
         "load_skills:",
         "  - agentdev-test-skill",
-        "  - agentdev-workflow-reporting",
+        "    - agentdev-conventional-commits
+",
         "---",
         "",
         "## 完了報告",
@@ -1702,7 +1584,8 @@ describe("D2: checkInlineCompletionBodyInCommands — error template allowed", (
         "agent: test-agent",
         "load_skills:",
         "  - agentdev-test-skill",
-        "  - agentdev-workflow-reporting",
+        "    - agentdev-conventional-commits
+",
         "---",
         "",
         "## Error Handling",
@@ -1735,127 +1618,6 @@ describe("D2: checkInlineCompletionBodyInCommands — error template allowed", (
   });
 });
 
-describe("D3: checkVariantRequiredFields — all 6 fields present", () => {
-  const D3_OK_ROOT = join(TEMP_ROOT, "d3-ok");
-
-  beforeAll(() => {
-    mkdirp(D3_OK_ROOT);
-    buildVariantFixture(D3_OK_ROOT);
-    copyScripts(D3_OK_ROOT);
-  });
-
-  it("passes when all 6 required fields are present", () => {
-    const r = runScript(D3_OK_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string }) => res.check === "variant-required-fields"
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ok");
-  });
-});
-
-describe("D3: checkVariantRequiredFields — missing field", () => {
-  const D3_NG_ROOT = join(TEMP_ROOT, "d3-ng");
-
-  beforeAll(() => {
-    mkdirp(D3_NG_ROOT);
-    buildVariantFixture(D3_NG_ROOT);
-
-    const variantDir = join(
-      D3_NG_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
-      "references", "completion-reports", "test-cmd"
-    );
-    writeFileSync(
-      join(variantDir, "standard.md"),
-      [
-        "✅ test-cmd 完了",
-        "",
-        "完了コマンド: /agentdev/test-cmd",
-        "対象: {対象}",
-        "結果: {結果}",
-        "",
-      ].join("\n"),
-      "utf-8"
-    );
-
-    copyScripts(D3_NG_ROOT);
-  });
-
-  it("detects missing required fields", () => {
-    const r = runScript(D3_NG_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "variant-required-fields" &&
-        res.message.includes("検証結果")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
-describe("D4: checkFragmentPatterns — self-contained variant", () => {
-  const D4_OK_ROOT = join(TEMP_ROOT, "d4-ok");
-
-  beforeAll(() => {
-    mkdirp(D4_OK_ROOT);
-    buildVariantFixture(D4_OK_ROOT);
-    copyScripts(D4_OK_ROOT);
-  });
-
-  it("passes for self-contained variants", () => {
-    const r = runScript(D4_OK_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string }) => res.check === "fragment-patterns"
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ok");
-  });
-});
-
-describe("D4: checkFragmentPatterns — fragment pattern detected", () => {
-  const D4_NG_ROOT = join(TEMP_ROOT, "d4-ng");
-
-  beforeAll(() => {
-    mkdirp(D4_NG_ROOT);
-    buildVariantFixture(D4_NG_ROOT);
-
-    const variantDir = join(
-      D4_NG_ROOT, ".opencode", "skills", "agentdev-workflow-reporting",
-      "references", "completion-reports", "test-cmd"
-    );
-    writeFileSync(
-      join(variantDir, "standard.md"),
-      [
-        "✅ test-cmd 完了",
-        "",
-        ...VARIANT_VALID_FIELDS,
-        "",
-        "完了報告に以下を追加:",
-        "- 追加情報",
-        "",
-      ].join("\n"),
-      "utf-8"
-    );
-
-    copyScripts(D4_NG_ROOT);
-  });
-
-  it("detects fragment composition pattern", () => {
-    const r = runScript(D4_NG_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "fragment-patterns" &&
-        res.message.includes("完了報告に以下を追加")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
 // ─── Implementation Pattern Diagnostics (REQ-0108-026~038) ────────────────
 
 function buildCommandMapFixture(root: string, commands: { name: string; pattern: string; secondary?: string; loadSkills?: string[] }[]): void {
@@ -1865,7 +1627,7 @@ function buildCommandMapFixture(root: string, commands: { name: string; pattern:
 
   const rows: string[] = [];
   for (const cmd of commands) {
-    const ls = cmd.loadSkills || ["agentdev-workflow-reporting"];
+    const ls = cmd.loadSkills || ["agentdev-conventional-commits"];
     writeFileSync(join(cmdDir, `${cmd.name}.md`), [
       "---",
       "description: Test",
@@ -1889,7 +1651,7 @@ function buildCommandMapFixture(root: string, commands: { name: string; pattern:
     "",
     "| Command | Description | Agent | Skills |",
     "|---------|-------------|-------|--------|",
-    ...commands.map((cmd) => `| \`agentdev/${cmd.name}\` | Test | test-agent | agentdev-workflow-reporting |`),
+    ...commands.map((cmd) => `| \`agentdev/${cmd.name}\` | Test | test-agent | agentdev-conventional-commits |`),
     "",
   ].join("\n"), "utf-8");
 
@@ -1926,7 +1688,7 @@ describe("G1: checkCommandMapConsistency — valid", () => {
   beforeAll(() => {
     mkdirp(ROOT);
     buildCommandMapFixture(ROOT, [
-      { name: "test-cmd", pattern: "file-pipeline", loadSkills: ["agentdev-workflow-reporting", "agentdev-conventional-commits", "agentdev-req-file-manager", "agentdev-adr-file-manager", "agentdev-no-ai-slop-writing", "agentdev-gh-cli"] },
+      { name: "test-cmd", pattern: "file-pipeline", loadSkills: ["agentdev-conventional-commits", "agentdev-req-file-manager", "agentdev-adr-file-manager", "agentdev-no-ai-slop-writing", "agentdev-gh-cli"] },
     ]);
     copyScripts(ROOT);
   });
@@ -1948,7 +1710,7 @@ describe("G1: checkCommandMapConsistency — pattern mismatch", () => {
   beforeAll(() => {
     mkdirp(ROOT);
     buildCommandMapFixture(ROOT, [
-      { name: "test-cmd", pattern: "file-pipeline", loadSkills: ["agentdev-workflow-reporting", "agentdev-conventional-commits", "agentdev-req-file-manager", "agentdev-adr-file-manager", "agentdev-no-ai-slop-writing", "agentdev-gh-cli"] },
+      { name: "test-cmd", pattern: "file-pipeline", loadSkills: ["agentdev-conventional-commits", "agentdev-req-file-manager", "agentdev-adr-file-manager", "agentdev-no-ai-slop-writing", "agentdev-gh-cli"] },
     ]);
 
     const cmdFile = join(ROOT, ".opencode", "commands", "agentdev", "test-cmd.md");
@@ -1958,7 +1720,8 @@ describe("G1: checkCommandMapConsistency — pattern mismatch", () => {
       "agent: test-agent",
       "implementation_pattern: wall-session",
       "load_skills:",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "test-cmd body.",
@@ -1988,7 +1751,7 @@ describe("G1: checkCommandMapConsistency — missing command file", () => {
   beforeAll(() => {
     mkdirp(ROOT);
     buildCommandMapFixture(ROOT, [
-      { name: "test-cmd", pattern: "file-pipeline", loadSkills: ["agentdev-workflow-reporting", "agentdev-conventional-commits", "agentdev-req-file-manager", "agentdev-adr-file-manager", "agentdev-no-ai-slop-writing", "agentdev-gh-cli"] },
+      { name: "test-cmd", pattern: "file-pipeline", loadSkills: ["agentdev-conventional-commits", "agentdev-req-file-manager", "agentdev-adr-file-manager", "agentdev-no-ai-slop-writing", "agentdev-gh-cli"] },
       { name: "ghost-cmd", pattern: "wall-session" },
     ]);
 
@@ -2018,7 +1781,7 @@ describe("G2: secondary pattern consistency", () => {
   beforeAll(() => {
     mkdirp(ROOT);
     buildCommandMapFixture(ROOT, [
-      { name: "test-cmd", pattern: "read-only-diagnostic", secondary: "wall-session", loadSkills: ["agentdev-workflow-reporting", "agentdev-integrity"] },
+      { name: "test-cmd", pattern: "read-only-diagnostic", secondary: "wall-session", loadSkills: ["agentdev-conventional-commits", "agentdev-integrity"] },
     ]);
 
     const cmdFile = join(ROOT, ".opencode", "commands", "agentdev", "test-cmd.md");
@@ -2028,7 +1791,8 @@ describe("G2: secondary pattern consistency", () => {
       "agent: test-agent",
       "implementation_pattern: read-only-diagnostic",
       "load_skills:",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "  - agentdev-integrity",
       "---",
       "",
@@ -2068,7 +1832,8 @@ describe("G2: secondary pattern prohibition union", () => {
       "implementation_pattern: file-pipeline",
       "secondary_pattern: read-only-diagnostic",
       "load_skills:",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "  - agentdev-conventional-commits",
       "  - agentdev-req-file-manager",
       "  - agentdev-adr-file-manager",
@@ -2136,7 +1901,8 @@ describe("G3: checkExcessLoadSkills — excess skill detected via USE FOR mismat
       "implementation_pattern: wall-session",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "test-cmd body.",
@@ -2208,20 +1974,21 @@ describe("G3: checkMissingLoadSkills — missing capability", () => {
       "agent: test-agent",
       "implementation_pattern: read-only-diagnostic",
       "load_skills:",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "test-cmd body.",
       "",
     ].join("\n"), "utf-8");
 
-    const reportingDir = join(ROOT, ".opencode", "skills", "agentdev-workflow-reporting");
-    writeFileSync(join(reportingDir, "SKILL.md"), [
-      "# agentdev-workflow-reporting",
+    const useForDir = join(ROOT, ".opencode", "skills", "agentdev-conventional-commits");
+    writeFileSync(join(useForDir, "SKILL.md"), [
+      "# agentdev-conventional-commits",
       "",
       "## USE FOR",
       "",
-      "完了報告フォーマットの提供",
+      "コミットメッセージの品質保証",
       "",
     ].join("\n"), "utf-8");
 
@@ -2273,9 +2040,9 @@ describe("G4: checkUseForConsistency — DO NOT USE FOR violation", () => {
     mkdirp(ROOT);
     buildValidFixture(ROOT);
 
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-workflow-reporting");
+    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-conventional-commits");
     writeFileSync(join(skillDir, "SKILL.md"), [
-      "# agentdev-workflow-reporting",
+      "# agentdev-conventional-commits",
       "",
       "## DO NOT USE FOR",
       "",
@@ -2429,7 +2196,8 @@ describe("G6: Phase 3 candidate in messages", () => {
       "implementation_pattern: wall-session",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "test-cmd body.",
@@ -2505,7 +2273,8 @@ describe("H1: read-only-diagnostic command — analysis/guideline skill NOT repo
       "agent: test-agent",
       "implementation_pattern: read-only-diagnostic",
       "load_skills:",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "  - agentdev-req-analysis",
       "---",
       "",
@@ -2557,7 +2326,8 @@ describe("H2: DO NOT USE FOR violation detected as excess", () => {
       "implementation_pattern: wall-session",
       "load_skills:",
       "  - agentdev-test-skill",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "---",
       "",
       "test-cmd body.",
@@ -2596,7 +2366,8 @@ describe("H3: pattern prohibition still detects prohibited skill (unchanged)", (
       "agent: test-agent",
       "implementation_pattern: capture-only",
       "load_skills:",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "  - agentdev-workflow-orchestration",
       "---",
       "",
@@ -2678,7 +2449,8 @@ describe("H5: recommendation candidates in all load_skills diagnostic messages",
       "agent: test-agent",
       "implementation_pattern: read-only-diagnostic",
       "load_skills:",
-      "  - agentdev-workflow-reporting",
+      "    - agentdev-conventional-commits
+",
       "  - agentdev-test-skill",
       "---",
       "",
@@ -2749,93 +2521,6 @@ describe("F1: extractReadmeTableReqIds — markdown link format [REQ-NNNN](REQ-N
         res.check === "readme-index-sync" && res.level === "ok"
     );
     expect(okHit).toBeDefined();
-  });
-});
-
-describe("F2: checkCompletionReportTemplates — variant directory on disk accepted", () => {
-  const F2_ROOT = join(TEMP_ROOT, "f2-variant-dir");
-
-  beforeAll(() => {
-    mkdirp(F2_ROOT);
-    buildValidFixture(F2_ROOT);
-
-    const reportingRefDir = join(F2_ROOT, ".opencode", "skills", "agentdev-workflow-reporting", "references");
-
-    writeFileSync(
-      join(reportingRefDir, "completion-reports.md"),
-      [
-        "# 完了報告フォーマット",
-        "",
-        "## Variant Registry",
-        "",
-        "| Command | Variant | File |",
-        "|---------|---------|------|",
-        "| other-cmd | standard | completion-reports/other-cmd/standard.md |",
-        "",
-      ].join("\n"),
-      "utf-8"
-    );
-
-    const variantDir = join(reportingRefDir, "completion-reports", "other-cmd");
-    mkdirp(variantDir);
-    writeFileSync(join(variantDir, "standard.md"), "✅ other-cmd 完了\n", "utf-8");
-
-    const testCmdVariantDir = join(reportingRefDir, "completion-reports", "test-cmd");
-    mkdirp(testCmdVariantDir);
-    writeFileSync(join(testCmdVariantDir, "standard.md"), "✅ test-cmd 完了\n", "utf-8");
-
-    const cmdDir = join(F2_ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "other-cmd.md"), [
-      "---",
-      "description: Other command",
-      "agent: test-agent",
-      "implementation_pattern: file-pipeline",
-      "load_skills:",
-      "  - agentdev-workflow-reporting",
-      "  - agentdev-conventional-commits",
-      "  - agentdev-req-file-manager",
-      "  - agentdev-adr-file-manager",
-      "  - agentdev-no-ai-slop-writing",
-      "  - agentdev-gh-cli",
-      "---",
-      "",
-      "Other command body.",
-      "",
-    ].join("\n"), "utf-8");
-
-    writeFileSync(join(cmdDir, "README.md"), [
-      "# Commands",
-      "",
-      "| Command | Description | Agent | Skills |",
-      "|---------|-------------|-------|--------|",
-      "| `agentdev/test-cmd` | Test | test-agent | agentdev-workflow-reporting |",
-      "| `agentdev/other-cmd` | Other | test-agent | agentdev-workflow-reporting |",
-      "",
-    ].join("\n"), "utf-8");
-
-    copyScripts(F2_ROOT);
-  });
-
-  it("accepts command with variant directory on disk even without registry entry for test-cmd", () => {
-    const r = runScript(F2_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const templateHit = parsed.results.find(
-      (res: { check: string; level: string }) =>
-        res.check === "template-section-existence" && res.level === "ok"
-    );
-    expect(templateHit).toBeDefined();
-  });
-
-  it("does not report NG for test-cmd missing from registry", () => {
-    const r = runScript(F2_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const ngHit = parsed.results.find(
-      (res: { check: string; message: string; level: string }) =>
-        res.check === "template-section-existence" &&
-        res.message.includes("test-cmd") &&
-        res.level === "ng"
-    );
-    expect(ngHit).toBeUndefined();
   });
 });
 
@@ -3020,11 +2705,11 @@ describe("canonical references/ directory is not flagged", () => {
     buildValidFixture(CANONICAL_ROOT);
     const skillsDir = join(CANONICAL_ROOT, ".opencode", "skills");
 
-    const reportingRefDir = join(skillsDir, "agentdev-workflow-reporting", "reference");
-    if (existsSync(reportingRefDir)) rmSync(reportingRefDir, { recursive: true, force: true });
-    const reportingRefsDir = join(skillsDir, "agentdev-workflow-reporting", "references");
-    mkdirp(reportingRefsDir);
-    writeFileSync(join(reportingRefsDir, "completion-reports.md"), "# 完了報告\n", "utf-8");
+    const testSkillRefDir = join(skillsDir, "agentdev-test-skill", "reference");
+    if (existsSync(testSkillRefDir)) rmSync(testSkillRefDir, { recursive: true, force: true });
+    const testSkillRefsDir = join(skillsDir, "agentdev-test-skill", "references");
+    mkdirp(testSkillRefsDir);
+    writeFileSync(join(testSkillRefsDir, "valid-file.md"), "# Valid reference\n", "utf-8");
 
     const skillDir = join(skillsDir, "agentdev-test-skill");
     mkdirp(join(skillDir, "references"));
@@ -3060,7 +2745,7 @@ describe("mixed reference/ and references/ reports obsolete only", () => {
     mkdirp(join(skillA, "reference"));
     writeFileSync(join(skillA, "reference", "old.md"), "# old\n", "utf-8");
 
-    const skillB = join(skillsDir, "agentdev-workflow-reporting");
+    const skillB = join(skillsDir, "agentdev-conventional-commits");
     mkdirp(join(skillB, "references"));
     writeFileSync(join(skillB, "references", "new.md"), "# new\n", "utf-8");
 

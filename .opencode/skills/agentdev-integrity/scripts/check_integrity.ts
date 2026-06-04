@@ -637,36 +637,6 @@ function buildCompletionReportSections(completionReportsPath: string): Map<strin
   return sections;
 }
 
-function checkCompletionReportSkills(cmdDir: string, root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-  let allOk = true;
-
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    const loadSkills = extractLoadSkills(fm);
-    if (!loadSkills.includes("agentdev-workflow-reporting")) {
-      allOk = false;
-      results.push(
-        ng(
-          "CompletionReport",
-          "load-skills-reporting",
-          `Missing 'agentdev-workflow-reporting' in load_skills`,
-          resolveRelative(fullPath, root)
-        )
-      );
-    }
-  }
-
-  if (allOk && cmdFiles.length > 0) {
-    results.push(ok("CompletionReport", "load-skills-reporting", "All commands reference agentdev-workflow-reporting in load_skills"));
-  }
-  return results;
-}
-
 function checkCompletionReportTemplates(cmdDir: string, completionReportsPath: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const sections = buildCompletionReportSections(completionReportsPath);
@@ -3021,7 +2991,6 @@ async function main(): Promise<void> {
   const specsDir = path.join(root, "docs", "specs");
   const skillsDir = path.join(root, ".opencode", "skills");
   const cmdDir = path.join(root, ".opencode", "commands", "agentdev");
-  const completionReportsPath = path.join(root, ".opencode", "skills", "agentdev-workflow-reporting", "references", "completion-reports.md");
   const commandMapPath = path.join(root, ".opencode", "skills", "agentdev-workflow-lifecycle", "references", "command-map.md");
 
   const scanned: Record<string, number> = {
@@ -3064,15 +3033,8 @@ async function main(): Promise<void> {
     ...checkBareSlashScoped(skillsDir, cmdDir, root),
     ...checkNameCollision(skillsDir, root),
     ...checkSpecsExistence(specsDir, root),
-    ...checkCompletionReportSkills(cmdDir, root),
-    ...checkCompletionReportTemplates(cmdDir, completionReportsPath, root),
     ...checkInlineCompletionReportsStrict(cmdDir, root),
-    ...checkVariantExistence(completionReportsPath, root),
     ...checkInlineCompletionBodyInCommands(cmdDir, root),
-    ...checkVariantRequiredFields(completionReportsPath, root),
-    ...checkFragmentPatterns(completionReportsPath, root),
-    ...checkVariantPathExistence(cmdDir, completionReportsPath, root),
-    ...checkVariantRegistryRegistered(cmdDir, completionReportsPath, root),
     ...checkPostCompletionOutput(cmdDir, root),
     ...checkTerminology(cmdDir, root),
     ...checkLinkIntegrity(root),

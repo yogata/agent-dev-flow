@@ -67,7 +67,6 @@ description: Detects and fixes AI-slop in natural language artifacts to produce 
 
 ### See Also
 
-- agentdev-workflow-reporting
 - agentdev-workflow-templates
 - agentdev-req-file-manager
 - agentdev-adr-file-manager
