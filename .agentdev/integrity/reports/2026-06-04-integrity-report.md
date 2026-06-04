@@ -1,84 +1,27 @@
 # check_integrity.ts Report
 
-- **実行日時**: 2026-06-03 23:14
-- **スキャン対象**: REQ 12件、ADR 18件、Skill 22件、Command 16件、Guides 10件、Specs 9件、RetiredREQ 50件、DocMap 1件
+- **実行日時**: 2026-06-04 14:13
+- **スキャン対象**: REQ 13件、ADR 18件、Skill 21件、Command 16件、Guides 10件、Specs 9件、RetiredREQ 50件、DocMap 1件
 
 ## サマリ
 
 | レベル | 件数 |
 |--------|------|
-| OK | 108 |
-| NG | 93 |
-| Warning | 46 |
-| Info | 22 |
+| OK | 122 |
+| NG | 32 |
+| Warning | 47 |
+| Info | 1 |
 
 ## 詳細
 
-### Skill
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-adr-file-manager: not referenced by any command's load_skills (category: deprecated-candidate)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-adr-guidelines: not referenced by any command's load_skills (category: deprecated-candidate)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-command-authoring: not referenced by any command's load_skills (category: authoring-only)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-command-creator: not referenced by any command's load_skills (category: authoring-only)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-conventional-commits: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-doc-map: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-epic-tracker: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-gh-cli: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-git-worktree: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-integrity: not referenced by any command's load_skills (category: deprecated-candidate)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-learning-capture: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-learning-pipeline: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-no-ai-slop-writing: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-req-analysis: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-req-file-manager: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-skill-authoring: not referenced by any command's load_skills (category: authoring-only)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-spec-compliance: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-workflow-lifecycle: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-workflow-orchestration: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-workflow-reporting: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-workflow-routing: not referenced by any command's load_skills (category: runtime-unused)
-- **[INFO]** unused-skills-categorized: [recommendation: no-action] agentdev-workflow-templates: not referenced by any command's load_skills (category: runtime-unused)
-
-### Command
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/backlog-review.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/backlog-save.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/case-close.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/case-open.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/case-run.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/case-update.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/intake-capture.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/intake-from-github.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/intake-promote.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/intake-review.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/integrity-check.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/learning-promote.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/learning-refine.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/req-define.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/req-restructure-review.md)
-- **[NG]** command-inventory: Missing frontmatter fields: load_skills (.opencode/commands/agentdev/req-save.md)
-- **[WARNING]** cmd-deprecated-in-inventory: Command 'integrity-check' is marked deprecated but listed in command README inventory (.opencode/commands/agentdev/integrity-check.md) → route: intake
-  - evidence: `integrity-check deprecated but in README`
-  - expected: `deprecated commands should be removed from active inventory`
-
 ### Namespace
 - **[NG]** legacy-namespace: Legacy pattern '/case-run (bare slash form)' found (.opencode/skills/agentdev-workflow-orchestration/SKILL.md)
-- **[NG]** legacy-namespace: Legacy pattern '/case-open (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** legacy-namespace: Legacy pattern '/case-run (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** legacy-namespace: Legacy pattern '/case-close (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** legacy-namespace: Legacy pattern '/case-update (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** legacy-namespace: Legacy pattern '/req-define (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** legacy-namespace: Legacy pattern '/req-save (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
 - **[NG]** legacy-namespace: Legacy pattern '/case-close (bare slash form)' found (.opencode/commands/agentdev/case-close.md)
 - **[NG]** legacy-namespace: Legacy pattern '/case-open (bare slash form)' found (.opencode/commands/agentdev/case-open.md)
 - **[NG]** legacy-namespace: Legacy pattern '/case-update (bare slash form)' found (.opencode/commands/agentdev/case-update.md)
 - **[NG]** legacy-namespace: Legacy pattern '/req-define (bare slash form)' found (.opencode/commands/agentdev/req-define.md)
 - **[NG]** legacy-namespace: Legacy pattern '/req-save (bare slash form)' found (.opencode/commands/agentdev/req-save.md)
 - **[NG]** expanded-legacy-namespace: Legacy pattern '/case-run (bare slash form)' found (.opencode/skills/agentdev-workflow-orchestration/SKILL.md)
-- **[NG]** expanded-legacy-namespace: Legacy pattern '/case-open (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** expanded-legacy-namespace: Legacy pattern '/case-run (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** expanded-legacy-namespace: Legacy pattern '/case-close (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** expanded-legacy-namespace: Legacy pattern '/case-update (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** expanded-legacy-namespace: Legacy pattern '/req-define (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
-- **[NG]** expanded-legacy-namespace: Legacy pattern '/req-save (bare slash form)' found (.opencode/skills/agentdev-workflow-reporting/SKILL.md)
 - **[NG]** expanded-legacy-namespace: Legacy pattern '/case-close (bare slash form)' found (.opencode/commands/agentdev/case-close.md)
 - **[NG]** expanded-legacy-namespace: Legacy pattern '/case-open (bare slash form)' found (.opencode/commands/agentdev/case-open.md)
 - **[NG]** expanded-legacy-namespace: Legacy pattern '/case-update (bare slash form)' found (.opencode/commands/agentdev/case-update.md)
@@ -86,41 +29,6 @@
 - **[NG]** expanded-legacy-namespace: Legacy pattern '/req-save (bare slash form)' found (.opencode/commands/agentdev/req-save.md)
 - **[NG]** expanded-legacy-namespace: Legacy pattern '/case-close (bare slash form)' found (docs/specs/system.md)
 - **[NG]** expanded-legacy-namespace: Legacy pattern '/req-define (bare slash form)' found (docs/specs/system.md)
-- **[NG]** expanded-legacy-namespace: Legacy pattern '/req-define (bare slash form)' found (.opencode/skills/agentdev-workflow-lifecycle/references/artifact-boundaries.md)
-- **[NG]** expanded-legacy-namespace: Legacy pattern '/req-define (bare slash form)' found (.opencode/skills/agentdev-workflow-lifecycle/references/artifact-lifecycle.md)
-
-### CompletionReport
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/backlog-review.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/backlog-save.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/case-close.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/case-open.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/case-run.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/case-update.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/intake-capture.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/intake-from-github.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/intake-promote.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/intake-review.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/integrity-check.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/learning-promote.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/learning-refine.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/req-define.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/req-restructure-review.md)
-- **[NG]** load-skills-reporting: Missing 'agentdev-workflow-reporting' in load_skills (.opencode/commands/agentdev/req-save.md)
-- **[NG]** template-section-existence: No completion report section found for command 'backlog-review' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'backlog-save' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'case-close' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'case-open' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'case-run' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'case-update' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'intake-capture' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'intake-from-github' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'intake-promote' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'intake-review' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'learning-promote' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'learning-refine' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'req-define' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'req-restructure-review' in completion-reports.md
-- **[NG]** template-section-existence: No completion report section found for command 'req-save' in completion-reports.md
 
 ### LinkIntegrity
 - **[NG]** broken-file-link: Link target does not exist: REQ-NNNN.md (docs/requirements/REQ-0108.md) → route: intake
@@ -183,6 +91,9 @@
 - **[WARNING]** retired-req-as-current: REQ-0001 is retired but referenced in non-retired file (docs/specs/patterns.md) → route: intake
   - evidence: `REQ-0001`
   - expected: `retired REQs should not be referenced as current requirements`
+- **[NG]** broken-file-link: Link target does not exist: ../../.opencode/skills/agentdev-workflow-lifecycle/references/capture-boundaries.md (docs/specs/system.md) → route: intake
+  - evidence: `../../.opencode/skills/agentdev-workflow-lifecycle/references/capture-boundaries.md`
+  - expected: `file must exist`
 - **[WARNING]** retired-req-as-current: REQ-0001 is retired but referenced in non-retired file (docs/specs/system.md) → route: intake
   - evidence: `REQ-0001`
   - expected: `retired REQs should not be referenced as current requirements`
@@ -280,9 +191,12 @@
   - expected: `REQ/SPEC must not define workflow status state management`
 
 ### Implementation Pattern
-- **[NG]** command-map-consistency: [recommendation: integrity-check-gap] 'req-restructure-review' command-map.md has secondary 'wall-session' but frontmatter has none (.opencode/commands/agentdev/req-restructure-review.md) → route: req-define
-  - evidence: `command-map: wall-session, frontmatter: (none)`
-  - expected: `must match`
+- **[INFO]** command-map-consistency: [recommendation: no-action] No command patterns parsed from command-map.md
+
+### Command
+- **[WARNING]** cmd-deprecated-in-inventory: Command 'integrity-check' is marked deprecated but listed in command README inventory (.opencode/commands/agentdev/integrity-check.md) → route: intake
+  - evidence: `integrity-check deprecated but in README`
+  - expected: `deprecated commands should be removed from active inventory`
 
 ### ReferencePath
 - **[NG]** reference-path-existence: Referenced path does not exist: references/git-common-procedures.md (.opencode/commands/agentdev/case-close.md:34) → route: intake
@@ -319,4 +233,7 @@
   - expected: `only accepted ADRs should be cited as current basis`
 - **[WARNING]** accepted-adr-only-citation: Non-accepted ADR ADR-0014 (status: superseded) cited in docs/requirements/REQ-0112.md (docs/requirements/REQ-0112.md) → route: intake
   - evidence: `ADR-0014`
+  - expected: `only accepted ADRs should be cited as current basis`
+- **[WARNING]** accepted-adr-only-citation: Non-accepted ADR ADR-0001 (status: proposed) cited in docs/specs/patterns.md (docs/specs/patterns.md) → route: intake
+  - evidence: `ADR-0001`
   - expected: `only accepted ADRs should be cited as current basis`
