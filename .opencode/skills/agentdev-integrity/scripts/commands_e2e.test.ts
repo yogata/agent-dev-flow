@@ -231,19 +231,6 @@ describe("REQ-0030-009: E2E workflow tests for all 14 commands", () => {
         }
       });
 
-      // --- load_skills reference validity ---
-
-      if (fm) {
-        const loadSkills = Array.isArray(fm["load_skills"])
-          ? (fm["load_skills"] as string[])
-          : [];
-
-        for (const skill of loadSkills) {
-          it(`load_skills "${skill}" references existing skill directory`, () => {
-            expect(skillDirs.has(skill)).toBe(true);
-          });
-        }
-
       // --- Template reference validity ---
 
       const templateRefs = extractTemplateRefs(content);
@@ -474,24 +461,6 @@ describe("REQ-0030-009: E2E workflow tests for all 14 commands", () => {
         if (content) {
           const fm = parseFrontmatter(content);
           expect(fm?.["agent"]).toBe("sisyphus");
-        }
-      }
-    });
-  });
-
-  // ─── Workflow-lifecycle skill coverage ──────────────────────────────────
-
-  describe("Workflow lifecycle skill coverage", () => {
-    it("all workflow commands load agentdev-workflow-lifecycle", () => {
-      const workflowCommands = [
-        "case-open", "case-run", "case-update", "case-close",
-        "intake-capture", "intake-from-github", "intake-review", "intake-promote",
-      ];
-      for (const cmd of workflowCommands) {
-        const content = commands.get(cmd);
-        expect(content).toBeDefined();
-        if (content) {
-          expect(content).toContain("agentdev-workflow-lifecycle");
         }
       }
     });

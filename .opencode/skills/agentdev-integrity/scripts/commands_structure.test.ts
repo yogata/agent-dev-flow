@@ -1,7 +1,7 @@
 /**
  * Structure validation tests for command definition files.
  * REQ-0030-001: Command frontmatter required fields existence
- * REQ-0030-002: Steps section structure and load_skills reference existence
+ * REQ-0030-002: Steps section structure
  *
  * Tests the ACTUAL command files in .opencode/commands/agentdev/*.md (not fixtures).
  * Gap analysis: existing check_integrity.test.ts tests the script via subprocess
@@ -97,7 +97,7 @@ function getSkillDirs(): Set<string> {
 
 describe("REQ-0030-001: Command frontmatter required fields", () => {
   const cmdFiles = getCommandFiles();
-  const REQUIRED_FIELDS = ["description", "agent", "load_skills"];
+  const REQUIRED_FIELDS = ["description", "agent"];
 
   it("command files exist under .opencode/commands/agentdev/", () => {
     expect(cmdFiles.length).toBeGreaterThan(0);
@@ -128,11 +128,10 @@ describe("REQ-0030-001: Command frontmatter required fields", () => {
   }
 });
 
-// ─── REQ-0030-002: Steps section structure and load_skills references ───────
+// ─── REQ-0030-002: Steps section structure ──────────────────────────────────
 
-describe("REQ-0030-002: Steps section structure and load_skills references", () => {
+describe("REQ-0030-002: Steps section structure", () => {
   const cmdFiles = getCommandFiles();
-  const skillDirs = getSkillDirs();
 
   for (const file of cmdFiles) {
     describe(`command file: ${file}`, () => {
@@ -142,18 +141,6 @@ describe("REQ-0030-002: Steps section structure and load_skills references", () 
         const hasStructure = /(^##\s+(Step|Phase|Input|準備|実装|提出))/m.test(content);
         expect(hasStructure).toBe(true);
       });
-
-      // load_skills references must point to existing skill directories
-      const fm = parseFrontmatter(content);
-      const loadSkills = fm
-        ? (Array.isArray(fm["load_skills"]) ? fm["load_skills"] as string[] : [])
-        : [];
-
-      for (const skill of loadSkills) {
-        it(`load_skills "${skill}" references an existing skill directory`, () => {
-          expect(skillDirs.has(skill)).toBe(true);
-        });
-      }
     });
   }
 });

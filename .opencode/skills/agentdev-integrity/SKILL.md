@@ -12,7 +12,6 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 - AgentDevFlow artifact（REQ、ADR、skill、command、template）の整合性検査
 - REQ frontmatter ↔ ファイル名整合性の確認
 - ADR ↔ REQ 相互参照の確認
-- Skill ↔ load_skills 参照整合性の確認
 - Command-map ↔ 実体の整合性確認
 - 旧 namespace 残存の検出
 - 完了報告フォーマットの整合性検証（REQ-0107, REQ-0107）
@@ -53,7 +52,6 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 | REQ frontmatter ↔ ファイル名 | `check_integrity.ts` | frontmatter id ↔ ファイル名、必須フィールド、README インデックス |
 | Retired REQ frontmatter | `check_integrity.ts` | retired REQ filename ↔ id、必須フィールド、active/retired ID 重複 (REQ-0108-080~082) |
 | ADR ↔ REQ 相互参照 | `check_integrity.ts` | 双方向参照の存在確認、retired 区別 |
-| Skill ↔ load_skills 参照 | `check_integrity.ts` | load_skills 先存在、agentdev- prefix、未使用 skill (categorized) |
 | Skill frontmatter | `check_integrity.ts` | name ↔ dir 一致、USE FOR 境界、reference/ 残存 (REQ-0108-092~094) |
 | Command-map ↔ 実体 | `check_integrity.ts` | README ↔ 実ファイル、command inventory |
 | Command frontmatter | `check_integrity.ts` | implementation_pattern / secondary_pattern / load_skills 禁止検出、pattern / workflow_route / branch_type / labels 禁止、agent 名、deprecated 混入 (REQ-0108-095~099, 124, Case 5 / RU-0020) |
@@ -104,7 +102,6 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 |-------------|----|----|------|
 | REQ frontmatter↔ファイル名 | N | N | — |
 | ADR↔REQ 相互参照 | N | N | — |
-| Skill↔load_skills 参照 | N | N | — |
 | Command-map↔実体 | N | N | — |
 | 旧 namespace 残存 | N | N | — |
 | 完了報告フォーマット | N | N | — |
@@ -119,9 +116,6 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 {検出結果の詳細}
 
 ### ADR↔REQ 相互参照
-{検出結果の詳細}
-
-### Skill↔load_skills 参照
 {検出結果の詳細}
 
 ### Command-map↔実体

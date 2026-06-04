@@ -115,13 +115,6 @@ function buildValidFixture(root: string): void {
     "---",
     "description: Test command",
     "agent: test-agent",
-    "implementation_pattern: file-pipeline",
-    "load_skills:",
-    "  - agentdev-conventional-commits",
-    "  - agentdev-req-file-manager",
-    "  - agentdev-adr-file-manager",
-    "  - agentdev-no-ai-slop-writing",
-    "  - agentdev-gh-cli",
     "---",
     "",
     "Test command body.",
@@ -222,7 +215,7 @@ function buildInvalidFixture(root: string): void {
     "description: Bad command",
     "---",
     "",
-    "Missing agent and load_skills.",
+    "Missing agent.",
     "",
   ].join("\n"), "utf-8");
 
@@ -448,18 +441,6 @@ describe("invalid fixture detects violations", () => {
         res.category === "Specs" && res.level === "ng"
     );
     expect(specNg.length).toBeGreaterThan(0);
-  });
-
-  it("detects load_skills referencing non-existent skill", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const badSkill = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "load-skills-existence" &&
-        res.message.includes("agentdev-nonexistent")
-    );
-    expect(badSkill).toBeDefined();
-    expect(badSkill.level).toBe("ng");
   });
 
   it("detects command missing required frontmatter fields", () => {
@@ -774,33 +755,18 @@ describe("checkLifecycleBoundary: active/retired ID duplication", () => {
   });
 });
 
-// ─── Implementation pattern check tests (REQ-0108-022~024) ────────────────
+// ─── Implementation pattern / prohibited field check tests ──────────────────
 
-describe("E1: checkImplementationPattern — all valid", () => {
+describe("E1: checkImplementationPattern — no prohibited dev metadata", () => {
   const ROOT = join(TEMP_ROOT, "e1-ok");
 
   beforeAll(() => {
     mkdirp(ROOT);
     buildValidFixture(ROOT);
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test command",
-      "agent: test-agent",
-      "implementation_pattern: wall-session",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "Test command body.",
-      "",
-    ].join("\n"), "utf-8");
     copyScripts(ROOT);
   });
 
-  it("passes when all commands have valid implementation_pattern", () => {
+  it("passes when no prohibited dev metadata in frontmatter", () => {
     const r = runScript(ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const hit = parsed.results.find(
@@ -811,277 +777,8 @@ describe("E1: checkImplementationPattern — all valid", () => {
   });
 });
 
-describe("E2: checkImplementationPattern — missing implementation_pattern", () => {
-  const ROOT = join(TEMP_ROOT, "e2-missing");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    // Override test-cmd.md to NOT have implementation_pattern
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test command",
-      "agent: test-agent",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "Test command body.",
-      "",
-    ].join("\n"), "utf-8");
-    copyScripts(ROOT);
-  });
-
-  it("detects missing implementation_pattern", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "implementation-pattern" &&
-        res.message.includes("implementation_pattern が定義されていない")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
-describe("E3: checkImplementationPattern — unknown pattern", () => {
-  const ROOT = join(TEMP_ROOT, "e3-unknown");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test command",
-      "agent: test-agent",
-      "implementation_pattern: unknown-pattern",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "Test command body.",
-      "",
-    ].join("\n"), "utf-8");
-    copyScripts(ROOT);
-  });
-
-  it("detects unknown implementation_pattern", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "implementation-pattern" &&
-        res.message.includes("未知のパターン")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
-describe("E4: checkImplementationPattern — valid secondary_pattern", () => {
-  const ROOT = join(TEMP_ROOT, "e4-secondary-ok");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test command",
-      "agent: test-agent",
-      "implementation_pattern: read-only-diagnostic",
-      "secondary_pattern: wall-session",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "Test command body.",
-      "",
-    ].join("\n"), "utf-8");
-    copyScripts(ROOT);
-  });
-
-  it("passes when secondary_pattern is valid", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string }) => res.check === "implementation-pattern"
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ok");
-  });
-});
-
-describe("E5: checkImplementationPattern — unknown secondary_pattern", () => {
-  const ROOT = join(TEMP_ROOT, "e5-secondary-ng");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test command",
-      "agent: test-agent",
-      "implementation_pattern: read-only-diagnostic",
-      "secondary_pattern: bogus",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "Test command body.",
-      "",
-    ].join("\n"), "utf-8");
-    copyScripts(ROOT);
-  });
-
-  it("detects unknown secondary_pattern", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "implementation-pattern" &&
-        res.message.includes("secondary_pattern")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
-describe("E6: checkPatternProhibitions — no violations", () => {
-  const ROOT = join(TEMP_ROOT, "e6-ok");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test command",
-      "agent: test-agent",
-      "implementation_pattern: file-pipeline",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "Test command body.",
-      "",
-    ].join("\n"), "utf-8");
-    copyScripts(ROOT);
-  });
-
-  it("passes when no pattern prohibition violations", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string }) => res.check === "pattern-prohibitions"
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ok");
-  });
-});
-
-describe("E7: checkPatternProhibitions — capture-only with prohibited skill", () => {
-  const ROOT = join(TEMP_ROOT, "e7-violation");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test command",
-      "agent: test-agent",
-      "implementation_pattern: capture-only",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "  - agentdev-workflow-orchestration",
-      "---",
-      "",
-      "Test command body.",
-      "",
-    ].join("\n"), "utf-8");
-    copyScripts(ROOT);
-  });
-
-  it("detects prohibited skill in capture-only command", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "pattern-prohibitions" &&
-        res.message.includes("禁止 skill")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
-describe("E8: checkPatternProhibitions — manager-orchestrator on non-case-run", () => {
-  const ROOT = join(TEMP_ROOT, "e8-mgr");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "other-cmd.md"), [
-      "---",
-      "description: Other command",
-      "agent: test-agent",
-      "implementation_pattern: manager-orchestrator",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "  - agentdev-workflow-orchestration",
-      "---",
-      "",
-      "Other command body.",
-      "",
-    ].join("\n"), "utf-8");
-    // Also update README to include other-cmd
-    writeFileSync(join(cmdDir, "README.md"), [
-      "# Commands",
-      "",
-      "| Command | Description | Agent | Skills |",
-      "|---------|-------------|-------|--------|",
-      "| `agentdev/test-cmd` | Test command | test-agent | agentdev-test-skill |",
-      "| `agentdev/other-cmd` | Other command | test-agent | agentdev-test-skill |",
-      "",
-    ].join("\n"), "utf-8");
-    copyScripts(ROOT);
-  });
-
-  it("detects manager-orchestrator on non-case-run file", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "pattern-prohibitions" &&
-        res.message.includes("manager-orchestrator")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
-describe("E9: checkLoadSkillsConsistency — all consistent", () => {
-  const ROOT = join(TEMP_ROOT, "e9-ok");
+describe("E1b: checkImplementationPattern — prohibited implementation_pattern", () => {
+  const ROOT = join(TEMP_ROOT, "e1b-impl-ng");
 
   beforeAll(() => {
     mkdirp(ROOT);
@@ -1092,10 +789,6 @@ describe("E9: checkLoadSkillsConsistency — all consistent", () => {
       "description: Test command",
       "agent: test-agent",
       "implementation_pattern: wall-session",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
       "---",
       "",
       "Test command body.",
@@ -1104,17 +797,52 @@ describe("E9: checkLoadSkillsConsistency — all consistent", () => {
     copyScripts(ROOT);
   });
 
-  it("passes when all commands have consistent load_skills", () => {
+  it("detects prohibited implementation_pattern in frontmatter", () => {
     const r = runScript(ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const hit = parsed.results.find(
-      (res: { check: string }) => res.check === "load-skills-consistency"
+      (res: { check: string; message: string }) =>
+        res.check === "implementation-pattern" &&
+        res.message.includes("prohibited")
     );
     expect(hit).toBeDefined();
-    expect(hit.level).toBe("ok");
+    expect(hit.level).toBe("ng");
   });
 });
 
+describe("E1c: checkImplementationPattern — prohibited load_skills", () => {
+  const ROOT = join(TEMP_ROOT, "e1c-ls-ng");
+
+  beforeAll(() => {
+    mkdirp(ROOT);
+    buildValidFixture(ROOT);
+    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test command",
+      "agent: test-agent",
+      "load_skills:",
+      "  - agentdev-test-skill",
+      "---",
+      "",
+      "Test command body.",
+      "",
+    ].join("\n"), "utf-8");
+    copyScripts(ROOT);
+  });
+
+  it("detects prohibited load_skills in frontmatter", () => {
+    const r = runScript(ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hit = parsed.results.find(
+      (res: { check: string; message: string }) =>
+        res.check === "load-skills-frontmatter" &&
+        res.message.includes("prohibited")
+    );
+    expect(hit).toBeDefined();
+    expect(hit.level).toBe("ng");
+  });
+});
 describe("checkLifecycleBoundary: retired in active index", () => {
   const RETIRED_INDEX_ROOT = join(TEMP_ROOT, "retired-index");
 
@@ -1449,6 +1177,7 @@ function buildVariantFixture(root: string): void {
   buildValidFixture(root);
 
   const testSkillRefDir = join(root, ".opencode", "skills", "agentdev-test-skill", "references");
+  mkdirp(testSkillRefDir);
 
   writeFileSync(
     join(testSkillRefDir, "completion-reports.md"),
@@ -1499,10 +1228,6 @@ describe("D2: checkInlineCompletionBodyInCommands — no violations", () => {
         "---",
         "description: Test command",
         "agent: test-agent",
-        "load_skills:",
-        "  - agentdev-test-skill",
-        "    - agentdev-conventional-commits
-",
         "---",
         "",
         "完了報告 → 完了報告variantに従って出力",
@@ -1538,10 +1263,6 @@ describe("D2: checkInlineCompletionBodyInCommands — detects inline body", () =
         "---",
         "description: Test command",
         "agent: test-agent",
-        "load_skills:",
-        "  - agentdev-test-skill",
-        "    - agentdev-conventional-commits
-",
         "---",
         "",
         "## 完了報告",
@@ -1582,10 +1303,6 @@ describe("D2: checkInlineCompletionBodyInCommands — error template allowed", (
         "---",
         "description: Test command",
         "agent: test-agent",
-        "load_skills:",
-        "  - agentdev-test-skill",
-        "    - agentdev-conventional-commits
-",
         "---",
         "",
         "## Error Handling",
@@ -1720,8 +1437,7 @@ describe("G1: checkCommandMapConsistency — pattern mismatch", () => {
       "agent: test-agent",
       "implementation_pattern: wall-session",
       "load_skills:",
-      "    - agentdev-conventional-commits
-",
+      "    - agentdev-conventional-commits\n",
       "---",
       "",
       "test-cmd body.",
@@ -1791,8 +1507,7 @@ describe("G2: secondary pattern consistency", () => {
       "agent: test-agent",
       "implementation_pattern: read-only-diagnostic",
       "load_skills:",
-      "    - agentdev-conventional-commits
-",
+      "    - agentdev-conventional-commits\n",
       "  - agentdev-integrity",
       "---",
       "",
@@ -1817,663 +1532,6 @@ describe("G2: secondary pattern consistency", () => {
   });
 });
 
-describe("G2: secondary pattern prohibition union", () => {
-  const ROOT = join(TEMP_ROOT, "g2-union");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test",
-      "agent: test-agent",
-      "implementation_pattern: file-pipeline",
-      "secondary_pattern: read-only-diagnostic",
-      "load_skills:",
-      "    - agentdev-conventional-commits
-",
-      "  - agentdev-conventional-commits",
-      "  - agentdev-req-file-manager",
-      "  - agentdev-adr-file-manager",
-      "  - agentdev-no-ai-slop-writing",
-      "  - agentdev-gh-cli",
-      "  - agentdev-git-worktree",
-      "---",
-      "",
-      "test-cmd body.",
-      "",
-    ].join("\n"), "utf-8");
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-git-worktree");
-    mkdirp(skillDir);
-    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-git-worktree\n", "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("detects skill prohibited by secondary pattern", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "pattern-prohibitions" &&
-        res.message.includes("agentdev-git-worktree")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
-describe("G3: checkExcessLoadSkills — no excess", () => {
-  const ROOT = join(TEMP_ROOT, "g3-excess-ok");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    copyScripts(ROOT);
-  });
-
-  it("passes when all skills match expected concerns", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string }) => res.check === "excess-load-skills"
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ok");
-  });
-});
-
-describe("G3: checkExcessLoadSkills — excess skill detected via USE FOR mismatch", () => {
-  const ROOT = join(TEMP_ROOT, "g3-excess-ng");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test",
-      "agent: test-agent",
-      "implementation_pattern: wall-session",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "test-cmd body.",
-      "",
-    ].join("\n"), "utf-8");
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-test-skill");
-    writeFileSync(join(skillDir, "SKILL.md"), [
-      "# agentdev-test-skill",
-      "",
-      "## USE FOR",
-      "",
-      "database migration and schema management",
-      "",
-      "## DO NOT USE FOR",
-      "",
-      "anything related to requirements or sessions",
-      "",
-    ].join("\n"), "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("reports info about skill with USE FOR not matching command", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "excess-load-skills" &&
-        res.message.includes("agentdev-test-skill")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("info");
-    expect(hit.message).toContain("[recommendation: load_skills-remove-candidate]");
-  });
-});
-
-describe("G3: checkMissingLoadSkills — no missing", () => {
-  const ROOT = join(TEMP_ROOT, "g3-missing-ok");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    copyScripts(ROOT);
-  });
-
-  it("passes when all expected concerns are covered", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string }) => res.check === "missing-load-skills"
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ok");
-  });
-});
-
-describe("G3: checkMissingLoadSkills — missing capability", () => {
-  const ROOT = join(TEMP_ROOT, "g3-missing-ng");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test",
-      "agent: test-agent",
-      "implementation_pattern: read-only-diagnostic",
-      "load_skills:",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "test-cmd body.",
-      "",
-    ].join("\n"), "utf-8");
-
-    const useForDir = join(ROOT, ".opencode", "skills", "agentdev-conventional-commits");
-    writeFileSync(join(useForDir, "SKILL.md"), [
-      "# agentdev-conventional-commits",
-      "",
-      "## USE FOR",
-      "",
-      "コミットメッセージの品質保証",
-      "",
-    ].join("\n"), "utf-8");
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-integrity");
-    mkdirp(skillDir);
-    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-integrity\n", "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("reports info about missing diagnostic capability", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "missing-load-skills" &&
-        res.message.includes("integrity")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("info");
-    expect(hit.message).toContain("[recommendation: load_skills-add-candidate]");
-  });
-});
-
-describe("G4: checkUseForConsistency — no violations", () => {
-  const ROOT = join(TEMP_ROOT, "g4-ok");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    copyScripts(ROOT);
-  });
-
-  it("passes when no USE FOR inconsistencies", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string }) => res.check === "use-for-consistency"
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ok");
-  });
-});
-
-describe("G4: checkUseForConsistency — DO NOT USE FOR violation", () => {
-  const ROOT = join(TEMP_ROOT, "g4-donotuse");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-conventional-commits");
-    writeFileSync(join(skillDir, "SKILL.md"), [
-      "# agentdev-conventional-commits",
-      "",
-      "## DO NOT USE FOR",
-      "",
-      "- test-cmd",
-      "",
-    ].join("\n"), "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("warns when command referenced in DO NOT USE FOR", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "use-for-consistency" &&
-        res.message.includes("DO NOT USE FOR") &&
-        res.message.includes("test-cmd")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("warning");
-    expect(hit.message).toContain("[recommendation: skill-use-for-update-candidate]");
-  });
-});
-
-describe("G4: checkUseForConsistency — doc-map not referenced", () => {
-  const ROOT = join(TEMP_ROOT, "g4-docmap");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-doc-map");
-    mkdirp(skillDir);
-    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-doc-map\n", "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("reports info when agentdev-doc-map is not referenced", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "use-for-consistency" &&
-        res.message.includes("agentdev-doc-map")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("info");
-    expect(hit.message).toContain("[recommendation: no-action]");
-  });
-});
-
-describe("G5: checkUnusedSkillsCategorized — authoring-only", () => {
-  const ROOT = join(TEMP_ROOT, "g5-authoring");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-command-authoring");
-    mkdirp(skillDir);
-    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-command-authoring\n", "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("classifies agentdev-command-authoring as authoring-only", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "unused-skills-categorized" &&
-        res.message.includes("agentdev-command-authoring") &&
-        res.message.includes("authoring-only")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("info");
-    expect(hit.message).toContain("[recommendation: no-action]");
-  });
-});
-
-describe("G5: checkUnusedSkillsCategorized — deprecated-candidate", () => {
-  const ROOT = join(TEMP_ROOT, "g5-deprecated");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-old-skill");
-    mkdirp(skillDir);
-    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-old-skill\n\nDeprecated skill.\n", "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("classifies skill with 'deprecated' in SKILL.md as deprecated-candidate", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "unused-skills-categorized" &&
-        res.message.includes("agentdev-old-skill") &&
-        res.message.includes("deprecated-candidate")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("info");
-  });
-});
-
-describe("G5: checkUnusedSkillsCategorized — runtime-unused default", () => {
-  const ROOT = join(TEMP_ROOT, "g5-runtime");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-mystery-skill");
-    mkdirp(skillDir);
-    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-mystery-skill\n", "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("classifies unknown unused skill as runtime-unused", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "unused-skills-categorized" &&
-        res.message.includes("agentdev-mystery-skill") &&
-        res.message.includes("runtime-unused")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("info");
-  });
-});
-
-describe("G6: Phase 3 candidate in messages", () => {
-  const ROOT = join(TEMP_ROOT, "g6-phase3");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test",
-      "agent: test-agent",
-      "implementation_pattern: wall-session",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "test-cmd body.",
-      "",
-    ].join("\n"), "utf-8");
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-test-skill");
-    writeFileSync(join(skillDir, "SKILL.md"), [
-      "# agentdev-test-skill",
-      "",
-      "## USE FOR",
-      "",
-      "database migration and schema management",
-      "",
-    ].join("\n"), "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("excess-load-skills includes phase3 candidate type in message", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "excess-load-skills" &&
-        res.message.includes("load_skills-remove-candidate")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.message).toMatch(/\[recommendation: .+\]/);
-  });
-
-  it("missing-load-skills includes phase3 candidate type in message", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "missing-load-skills" &&
-        res.message.includes("load_skills-add-candidate")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.message).toMatch(/\[recommendation: .+\]/);
-  });
-});
-
-// ─── Issue #506 regression tests (REQ-0108-047,048) ────────────────────────
-
-describe("H1: read-only-diagnostic command — analysis/guideline skill NOT reported as excess", () => {
-  const ROOT = join(TEMP_ROOT, "h1-ro-diag-allowed");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-req-analysis");
-    mkdirp(skillDir);
-    writeFileSync(join(skillDir, "SKILL.md"), [
-      "# agentdev-req-analysis",
-      "",
-      "## USE FOR",
-      "",
-      "要件分析手法と品質基準の提供",
-      "",
-      "## DO NOT USE FOR",
-      "",
-      "特定コマンドの実行ロジック・手順記述",
-      "",
-    ].join("\n"), "utf-8");
-
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Diagnostic command",
-      "agent: test-agent",
-      "implementation_pattern: read-only-diagnostic",
-      "load_skills:",
-      "    - agentdev-conventional-commits
-",
-      "  - agentdev-req-analysis",
-      "---",
-      "",
-      "Diagnostic command that analyzes requirements.",
-      "",
-    ].join("\n"), "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("does NOT report analysis skill as excess for read-only-diagnostic", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const excessHit = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        res.check === "excess-load-skills" &&
-        res.message.includes("agentdev-req-analysis")
-    );
-    expect(excessHit).toBeUndefined();
-  });
-});
-
-describe("H2: DO NOT USE FOR violation detected as excess", () => {
-  const ROOT = join(TEMP_ROOT, "h2-donotuse-excess");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-test-skill");
-    writeFileSync(join(skillDir, "SKILL.md"), [
-      "# agentdev-test-skill",
-      "",
-      "## USE FOR",
-      "",
-      "テスト用スキル",
-      "",
-      "## DO NOT USE FOR",
-      "",
-      "test-cmd",
-      "",
-    ].join("\n"), "utf-8");
-
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test",
-      "agent: test-agent",
-      "implementation_pattern: wall-session",
-      "load_skills:",
-      "  - agentdev-test-skill",
-      "    - agentdev-conventional-commits
-",
-      "---",
-      "",
-      "test-cmd body.",
-      "",
-    ].join("\n"), "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("warns about skill whose DO NOT USE FOR mentions the command", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string; level: string }) =>
-        res.check === "excess-load-skills" &&
-        res.message.includes("agentdev-test-skill") &&
-        res.message.includes("DO NOT USE FOR")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("warning");
-    expect(hit.message).toContain("[recommendation: load_skills-remove-candidate]");
-  });
-});
-
-describe("H3: pattern prohibition still detects prohibited skill (unchanged)", () => {
-  const ROOT = join(TEMP_ROOT, "h3-prohibition");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test",
-      "agent: test-agent",
-      "implementation_pattern: capture-only",
-      "load_skills:",
-      "    - agentdev-conventional-commits
-",
-      "  - agentdev-workflow-orchestration",
-      "---",
-      "",
-      "test-cmd body.",
-      "",
-    ].join("\n"), "utf-8");
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-workflow-orchestration");
-    mkdirp(skillDir);
-    writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-workflow-orchestration\n", "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("still detects prohibited skill in capture-only command", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; message: string; level: string }) =>
-        res.check === "pattern-prohibitions" &&
-        res.message.includes("禁止 skill")
-    );
-    expect(hit).toBeDefined();
-    expect(hit.level).toBe("ng");
-  });
-});
-
-describe("H4: skills without USE FOR are not flagged as excess", () => {
-  const ROOT = join(TEMP_ROOT, "h4-no-usefor");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-    copyScripts(ROOT);
-  });
-
-  it("does not report skills without USE FOR as excess", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const excessHit = parsed.results.find(
-      (res: { check: string; level: string }) =>
-        res.check === "excess-load-skills" && res.level !== "ok"
-    );
-    expect(excessHit).toBeUndefined();
-  });
-
-  it("reports OK for excess-load-skills", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const hit = parsed.results.find(
-      (res: { check: string; level: string }) =>
-        res.check === "excess-load-skills" && res.level === "ok"
-    );
-    expect(hit).toBeDefined();
-  });
-});
-
-describe("H5: recommendation candidates in all load_skills diagnostic messages", () => {
-  const ROOT = join(TEMP_ROOT, "h5-recommendations");
-
-  beforeAll(() => {
-    mkdirp(ROOT);
-    buildValidFixture(ROOT);
-
-    const skillDir = join(ROOT, ".opencode", "skills", "agentdev-test-skill");
-    writeFileSync(join(skillDir, "SKILL.md"), [
-      "# agentdev-test-skill",
-      "",
-      "## USE FOR",
-      "",
-      "database migration",
-      "",
-    ].join("\n"), "utf-8");
-
-    const cmdDir = join(ROOT, ".opencode", "commands", "agentdev");
-    writeFileSync(join(cmdDir, "test-cmd.md"), [
-      "---",
-      "description: Test",
-      "agent: test-agent",
-      "implementation_pattern: read-only-diagnostic",
-      "load_skills:",
-      "    - agentdev-conventional-commits
-",
-      "  - agentdev-test-skill",
-      "---",
-      "",
-      "test-cmd body.",
-      "",
-    ].join("\n"), "utf-8");
-
-    copyScripts(ROOT);
-  });
-
-  it("all diagnostic results include recommendation candidate", () => {
-    const r = runScript(ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const diagResults = parsed.results.filter(
-      (res: { check: string }) =>
-        (res.check === "excess-load-skills" || res.check === "missing-load-skills") &&
-        res.level !== "ok"
-    );
-    for (const res of diagResults) {
-      expect(res.message).toMatch(/\[recommendation: .+\]/);
-    }
-  });
-});
 
 // ─── False-positive regression tests (Issue #504 / REQ-0108-041,042,043,045) ─
 

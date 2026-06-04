@@ -139,8 +139,7 @@ describe("checkScriptTemplateReferencePaths", () => {
       "description: Test",
       "agent: oracle",
       "implementation_pattern: file-pipeline",
-      "load_skills:",
-      "  - agentdev-test-skill",
+
       "---",
       "",
       "Invoke .opencode/skills/agentdev-test-skill/scripts/run.ts.",
@@ -171,8 +170,7 @@ describe("checkScriptTemplateReferencePaths", () => {
       "description: Test",
       "agent: oracle",
       "implementation_pattern: file-pipeline",
-      "load_skills:",
-      "  - agentdev-test-skill",
+
       "---",
       "",
       "Run scripts/missing.ts to validate.",
@@ -204,8 +202,7 @@ describe("checkScriptTemplateReferencePaths", () => {
       "description: Test",
       "agent: oracle",
       "implementation_pattern: file-pipeline",
-      "load_skills:",
-      "  - agentdev-test-skill",
+
       "---",
       "",
       "Invoke .opencode/skills/agentdev-test-skill/scripts/run.ts.",
@@ -234,8 +231,7 @@ describe("checkScriptTemplateReferencePaths", () => {
       "description: Test",
       "agent: oracle",
       "implementation_pattern: file-pipeline",
-      "load_skills:",
-      "  - agentdev-test-skill",
+
       "---",
       "",
       "Example:",
@@ -264,8 +260,7 @@ describe("checkScriptTemplateReferencePaths", () => {
       "description: Test",
       "agent: oracle",
       "implementation_pattern: file-pipeline",
-      "load_skills:",
-      "  - agentdev-test-skill",
+
       "---",
       "",
       "Run scripts/{script_name}.ts to validate.",
@@ -292,8 +287,7 @@ describe("checkScriptTemplateReferencePaths", () => {
       "description: Test",
       "agent: oracle",
       "implementation_pattern: file-pipeline",
-      "load_skills:",
-      "  - agentdev-test-skill",
+
       "---",
       "",
       "See .opencode/skills/agentdev-test-skill/scripts/absent.ts for logic.",
@@ -485,8 +479,7 @@ describe("checkScriptTemplateReferencePaths", () => {
       "description: Test",
       "agent: oracle",
       "implementation_pattern: file-pipeline",
-      "load_skills:",
-      "  - agentdev-test-skill",
+
       "---",
       "",
       "See references/guide.md for details.",
