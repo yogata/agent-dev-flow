@@ -72,7 +72,7 @@ description: Detects deviations between implementation and requirements (REQ), w
 
 ## 品質メトリクス収集
 
-乖離検出時に併せて品質メトリクスを自動収集する。メトリクス定義は `docs/specs/quality-specs.md` を参照。
+乖離検出時に併せて品質メトリクスを自動収集する。
 
 ### 収集対象
 
@@ -99,7 +99,6 @@ description: Detects deviations between implementation and requirements (REQ), w
 
 - case-run Phase C Step 8（乖離検出）でメトリクス収集を実行
 - 収集結果は PR 本文（pr_desc.md テンプレートの「テスト結果」セクション）に含める
-- メトリクス基準値は `docs/specs/quality-specs.md` で管理
 
 ---
 
