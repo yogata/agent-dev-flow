@@ -110,3 +110,39 @@
 - **想定反映先**: agentdev-git-worktree の worktree 削除手順、または case-close のエラー回復手順
 - **関連**: Issue #544, case-close Step 7, .worktrees/544-feature
 - **タグ**: `#worktree` `#permission-denied` `#lsp` `#case-close`
+
+---
+
+## 2026-06-04: Epic子Issueの逐次squash merge時のbase branch modification失敗
+
+- **問題事象**: Epic #559 の6PRを逐次squash mergeする際、PR #566 (#561) のマージが4回連続で失敗。エラーは「base branch was modified」。先行PR (#567, #569, #571, #568, #570) のマージが毎回mainを更新するため、GitHub APIがbase branch modificationを検出した
+- **発生局面**: 完了処理（case-closeのPRマージステップ）
+- **検知方法**: `gh pr merge --squash` の非ゼロ終了コードとエラーメッセージ
+- **根本原因**: Epicの子Issue PRを逐次squash mergeすると、各マージがbase branch (main) を更新する。GitHubはsquash merge時にbase branchの最新stateを検証し、マージ実行直前にbaseが更新された場合（直前のPRマージによる）は操作を拒否する。6PRのマージで最大5回のbase更新が発生し、後続PRほど失敗確率が上がる
+- **自律対応内容**: (1) 失敗するたびに同一内容でリトライ、(2) 4回目のリトライで成功。base branch更新のタイミングとマージ実行のタイミングがズレることで最終的に成功する
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 3件以上のPRを逐次squash mergeする全パターンに適用。特にEpicの子Issue一括マージで顕著
+- **再発条件**: (1) 同一base branchに対する複数PRを逐次squash mergeする、(2) マージ間隔が短い（秒単位）、(3) GitHub APIがbase branch modificationを検出する
+- **予防策候補**: (1) squash merge間に短い待機（5-10秒）を挟む、(2) マージ失敗時の自動リトライ回数を増やす（現状2回→5回程度）、(3) case-closeで複数PRを処理する際のリトライロジックを強化
+- **想定反映先**: case-closeコマンドのStep 4（PRマージ）のリトライロジック、またはagentdev-gh-cliのVERIFY操作リトライ
+- **関連**: Epic #559, PR #566/#567/#568/#569/#570/#571, case-close Step 4
+- **タグ**: `#squash-merge` `#base-branch` `#retry` `#case-close` `#epic`
+
+---
+
+## 2026-06-04: Node.js -e内のテンプレートリテラルでバックティックと中括弧が競合
+
+- **問題事象**: gh CLI出力をNode.js `node -e` で処理する一時スクリプトで、テンプレートリテラル内にバックティックを含むパス（例: `.opencode/commands/agentdev/templates/{command}/{variant}.md`）を記述したところ、Node.jsが中括弧を式補間と解釈し`ReferenceError: commands is not defined`が発生
+- **発生局面**: 実装（case-closeのコメント投稿スクリプト）
+- **検知方法**: `node script.js` 実行時のSyntaxError/ReferenceError
+- **根本原因**: JavaScriptテンプレートリテラル（バックティック）内の`${...}`は式補間として評価される。中括弧 `{command}` を含むパス文字列をテンプレートリテラル内に記述すると、`${command}` とは限らずともパーサが混乱し、エスケープされていない中括弧パターンでエラーになる。特に `node -e "..."` のインライン実行ではクォート階層が複雑になり回避困難
+- **自律対応内容**: (1) テンプレートリテラルの使用を中止、(2) 配列の `join("\n")` による文字列構築に切り替え、(3) 外部.jsファイルに退避して実行
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: Node.jsで一時スクリプトを書く全パターンに適用。特にgh CLI出力の後処理スクリプト
+- **再発条件**: (1) Node.jsスクリプト内でテンプレートリテラルを使う、(2) 文字列内にバックティックや`${...}`パターンを含む、(3) `node -e` のインライン実行でクォート階層が競合する
+- **予防策候補**: (1) 一時スクリプトではテンプレートリテラルを使わず配列joinまたは文字列結合を使用、(2) `node -e` は単純な式のみに制限、(3) 複雑な文字列処理は外部.jsファイルに退避（agentdev-gh-cli skill の推奨に従う）
+- **想定反映先**: agentdev-gh-cli skill のWindows回避策セクション、またはcase-close/case-runの一時スクリプト作成ガイド
+- **関連**: case-close Step 4a, `.sisyphus/tmp/post-comments.js`
+- **タグ**: `#nodejs` `#template-literal` `#script` `#workaround`
