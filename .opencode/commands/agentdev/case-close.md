@@ -31,7 +31,17 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全パターン共通の関連ドキュメント整合性確認。DOC-MAP整合性確認（REQ-0101）。不足時は警告表示してユーザー判断を仰ぐ
 
-4. **PRマージ**: `gh pr merge` → HEAD commit hash 記録（`agentdev-git-worktree` references/git-common-procedures.md Section 3）。対応記録コメントをIssueに追記 → テンプレート: `agentdev-workflow-templates` から Read → `agentdev-gh-cli` の VERIFY 操作に従って内容検証
+4. **PRマージ**:
+   - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`agentdev-git-worktree` references/git-common-procedures.md Section 3）
+   - **Squash merge失敗時の自動リトライ**:
+     - 失敗時は5秒待機して再試行
+     - 最大5回リトライ（初期試行 + 5回リトライ）
+     - 各リトライ試行をログ記録
+   - **全リトライ失敗時のフォールバック**:
+     - Rebase workflow をユーザーに提示（承認が必要）:
+       - `git rebase origin/main` → コンフリクト解決（あれば）→ `git push --force-with-lease`
+     - `--force` は禁止（`--force-with-lease` のみ許可）
+   - 対応記録コメントをIssueに追記 → テンプレート: `agentdev-workflow-templates` から Read → `agentdev-gh-cli` の VERIFY 操作に従って内容検証
 
 5. **Post-merge テスト戦略検証**: マージ後のみ確認可能な項目（CI通過等）を反映。`agentdev-gh-cli` に従い `--body-file` で更新 → VERIFY
 
@@ -50,6 +60,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
    - Issue本文から Parent Issue番号を特定（`Parent: #{N}` パターン）
    - Parent なし → スキップ
    - ステータストラッキング表を更新 → `agentdev-gh-cli` VERIFY
+   - 子Issue状態事前取得: `gh issue view --json comments` 等で全子Issueの OPEN/CLOSED 状態を一覧取得しログ出力（例: `子Issue状態一覧: #N1 (OPEN), #N2 (CLOSED), ...`）
    - Epic自動クローズ判定: 全子Issue CLOSED → 自動クローズ。1件以上 OPEN → スキップ
 
 9. **実行前同期**: `agentdev-git-worktree` の 実行前同期（references/git-common-procedures.md Section 1）に従い `git pull --ff-only` を実行。ローカル変更事前チェック・hash検証・不一致時は評価・承認のやり直し
