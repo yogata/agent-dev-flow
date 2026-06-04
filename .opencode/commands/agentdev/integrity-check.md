@@ -33,7 +33,7 @@ AgentDevFlow 管理下の artifact（REQ、ADR、skill、command、spec）の整
 
 4. **Git 永続化（条件付き）**: intake item 作成時のみ `agentdev-git-worktree` の domain state 永続化（references/git-common-procedures.md Section 2）に従い commit/push。`git add` は `.agentdev/intake/` 配下のみ。integrity report は commit 対象外
 
-5. **完了報告**: `agentdev-workflow-reporting` の完了報告variantに従って出力。variant: completion-reports/integrity-check/standard.md
+5. **完了報告**: 完了報告templateに従って出力。template: templates/integrity-check/standard.md
 
 ## Guardrails
 

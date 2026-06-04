@@ -141,7 +141,7 @@ REQ の active/retired/世代境界の整合性を確認する:
 
 ### 8. 完了報告
 
-完了報告 → `agentdev-workflow-reporting` の完了報告variantに従って出力。variant: completion-reports/req-restructure-review/standard.md
+完了報告 → 完了報告templateに従って出力。template: templates/req-restructure-review/standard.md
 
 ## Guardrails
 
