@@ -22,8 +22,8 @@ DOC-MAP（文書探索入口: 索引）
 
 要件定義の永続基準。システムが満たすべき要件を記述する。
 
-- 現行の active REQ は REQ-0101 から REQ-0111 までの 11 件
-- 旧 REQ（REQ-0001〜0040）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
+- 現行の active REQ は REQ-0101 から REQ-0114 までの 14 件
+- 旧 REQ（REQ-0001〜0040、retired）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
 ### Active REQ 一覧
@@ -41,6 +41,9 @@ DOC-MAP（文書探索入口: 索引）
 | REQ-0109 | REQ 再構成運用 |
 | REQ-0110 | Git worktree 削除リトライ |
 | REQ-0111 | Command authoring 後方互換性維持原則 |
+| REQ-0112 | ADRライフサイクル・文書責務・runtime独立性・状態モデル統合是正 |
+| REQ-0113 | Skill References SPEC分離基準 |
+| REQ-0114 | /agentdev/case-auto 最大自走モード |
 
 ## ADR（アーキテクチャ決定記録）
 
@@ -77,7 +80,7 @@ DOC-MAP（文書探索入口: 索引）
 
 ## このガイドの位置づけ
 
-本ファイルを含む `docs/guides/` は人間向け navigation 層である。規範的権限を持たず、MUST/SHALL 表現を含まない（ADR-0017）。REQ/ADR/SPEC と矛盾する記述がある場合は基準文書を優先する。
+本ファイルを含む `docs/guides/` は人間向け navigation 層である。規範的権限を持たず、規範的表現を含まない（ADR-0017）。REQ/ADR/SPEC と矛盾する記述がある場合は基準文書を優先する。
 
 ## 参照関係のルール
 
