@@ -23,8 +23,8 @@ agent: sisyphus
 3. **工程分岐**（REQ-0114-008〜009）:
    - feature: req-save → case-open → case-run → case-close
    - bugfix / maintenance / docs_chore: case-open → case-run → case-close（req-save をスキップ）
-4. **各工程の実行**（REQ-0114-006〜007）: 既存コマンド定義（req-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない
-5. **工程間の状態引き継ぎ**（REQ-0114-020）: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す
+4. **各工程の実行**（REQ-0114-006〜007）: 既存コマンド定義（req-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）も含めて既存コマンド定義に従うこと
+5. **工程間の状態引き継ぎ**（REQ-0114-020）: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) 要件docの Requirement Source セクション内容（RU 削除判定に使用） (2) RU ファイルパス（case-open 相当処理の RU 削除で使用） (3) capture 対象情報（case-close 相当処理の learning/intake capture で使用）
 6. **停止条件の検出**（REQ-0114-016）: 以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:
    - (1) req-define合意要件からの逸脱
    - (2) 要件未合意のscope拡大

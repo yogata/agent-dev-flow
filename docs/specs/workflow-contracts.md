@@ -129,7 +129,7 @@ draft（`.sisyphus/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 | `/agentdev/case-open` | READ | READ | READ | — | — | — | — |
 | `/agentdev/case-run` | READ+WRITE | READ | READ | — | — | — | — |
 | `/agentdev/case-close` | — | — | READ | — | WRITE（capture） | WRITE（capture） | — |
-| `/agentdev/case-auto` | READ+WRITE | READ+WRITE | READ+WRITE | — | WRITE（capture） | — | — |
+| `/agentdev/case-auto` | READ+WRITE | READ+WRITE | READ+WRITE | — | WRITE（capture） | WRITE（capture） | — |
 | `/agentdev/case-update` | — | — | READ+WRITE | — | — | — | — |
 
 ## Workflow Routing
