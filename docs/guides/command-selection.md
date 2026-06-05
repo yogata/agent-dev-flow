@@ -24,6 +24,7 @@
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | REQ 体系の健全性を診断したい | `/agentdev/req-restructure-review` | 診断レポート |
 | ドキュメント整合性を検証したい | `/agentdev/integrity-check` | 検証レポート |
+| 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
 ## 使い方
 
@@ -37,3 +38,4 @@
 - バグ修正・保守作業・ドキュメント作業は `req-save` をスキップする
 - Intake / Learning パイプラインの詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) を参照
 - 各コマンドの入出力の詳細は [要件定義 → Case実行フロー](req-case-flow.md) を参照
+- `case-auto` は明示指定時のみ使用する追加入口。標準ワークフローを置き換えない

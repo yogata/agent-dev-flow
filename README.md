@@ -37,6 +37,7 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | REQ 体系の健全性を診断したい | `/agentdev/req-restructure-review` | 診断レポート |
 | ドキュメント整合性を検証したい | `/agentdev/integrity-check` | 検証レポート |
+| 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
 ## 参照先
 
@@ -58,4 +59,10 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 /agentdev/case-open     # Issue を作成
 /agentdev/case-run      # 実装して PR を作成
 /agentdev/case-close    # PR をマージして Issue をクローズ
+```
+
+最大自走モード。req-define 完了後、後続工程を一括実行する。
+
+```
+/agentdev/case-auto     # req-save → case-open → case-run → case-close を自走（明示指定時のみ）
 ```
