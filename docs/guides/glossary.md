@@ -70,7 +70,7 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| Command | 実行手順の一次参照。`.opencode/commands/agentdev/` に配置 |
-| Skill | 判定基準・共通知識・宣言的ルールの一次参照。`.opencode/skills/agentdev-*` に配置 |
+| Command | 実行手順の一次参照。source は `src/opencode/commands/agentdev/`、runtime projection は `.opencode/commands/agentdev/` に配置 |
+| Skill | 判定基準・共通知識・宣言的ルールの一次参照。source は `src/opencode/skills/agentdev-*`、runtime projection は `.opencode/skills/agentdev-*` に配置 |
 | Template | Issue/PR 本文の出力構造。Skill 配下 `templates/` に配置 |
 | Script | ガードレール・検査・補助処理の実行可能ロジック。Skill 配下 `scripts/` に配置 |

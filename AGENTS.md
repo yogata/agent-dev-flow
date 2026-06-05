@@ -5,8 +5,8 @@ Repository guardrails for agents editing AgentDevFlow. Keep this file short: it 
 ## Project identity
 
 - This repository manages the AgentDevFlow plugin.
-- Public commands use the `/agentdev/*` namespace and live under `.opencode/commands/agentdev/`.
-- AgentDevFlow skills use the `agentdev-*` prefix and live under `.opencode/skills/`.
+- Public commands use the `/agentdev/*` namespace; source lives under `src/opencode/commands/agentdev/`, runtime projection at `.opencode/commands/agentdev/`.
+- AgentDevFlow skills use the `agentdev-*` prefix; source lives under `src/opencode/skills/`, runtime projection at `.opencode/skills/`.
 - Persistent AgentDevFlow domain state lives under `.agentdev/`.
 - Do not reintroduce legacy `/issue/*`, `/tips/*`, `issue-*`, or `tips-*` names unless an active REQ or ADR explicitly requires a compatibility note.
 
