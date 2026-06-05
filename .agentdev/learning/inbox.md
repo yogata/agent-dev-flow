@@ -39,3 +39,21 @@
 - **関連**: Epic #580, PR #588, #589
 - **タグ**: `#epic` `#merge-conflict` `#parallel-execution` `#wave-scheduling`
 
+---
+
+## サブエージェントの連続editによる関数定義破損（Wave 3 #586）
+
+- **問題事象**: Wave 3 (#586) のサブエージェントが `check_integrity.ts` の `checkReqBacklogResidual` 関数に対し、exempt パターン追加の連続editを2回実行した際、いずれも内側の `scanDir` 関数定義を oldString に含めてしまい関数ボディ全体を削除。2回目も同一ミスを繰り返し、最終的に `checkPatternResidual` と `checkReqBacklogResidual` が融合する破壊的状態になった。3回目の手動修復で復旧。
+- **発生局面**: case-run Wave 3 → サブエージェントのedit操作
+- **検知方法**: スクリプト実行時のJSON出力空、および関数定義の目視確認
+- **根本原因**: edit ツールの oldString マッチングが意図より広範囲にマッチし、内側関数定義を含む範囲を置換。複数行 oldString で内側スコープ境界（function定義行）を含むと、意図しない削除が発生しやすい。
+- **自律対応内容**: 関数全体を正しく再構築してeditで修復。3回目で成功。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: サブエージェントが入れ子関数を持つファイルを連続editする場面で一般的なリスク
+- **再発条件**: oldString に内側関数の定義行を含む置換を連続実行
+- **予防策候補**: (1) edit後に Read tool で該当関数の全体を確認する手順を徹底、(2) 大きな関数の部分editでは oldString を最小限に限定、(3) 連続edit前に全体構造を把握してから実行
+- **想定反映先**: agentdev-workflow-orchestration のサブエージェント protocol
+- **関連**: PR #592, Issue #586
+- **タグ**: `#edit-tool` `#subagent` `#function-corruption` `#typescript`
+
