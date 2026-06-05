@@ -236,6 +236,15 @@ Command作成・改定時に確認する項目:
 - [ ] 完了報告フォーマットが指定されているか（Skill参照も可）
 - [ ] 既存の良い分離（agentdev-req-analysis/agentdev-req-file-manager等）を維持しているか
 
+### 語彙・境界確認（#586 予防ゲート）
+
+- [ ] 旧コマンド名（`issue-*`, `tips-*`, bare slash form）を使用していないか（語彙レジストリ参照）
+- [ ] 廃止済み概念（`req-backlog`, `reference/` 単数形, Pattern A/B/C/D）を参照していないか
+- [ ] 旧スキル名（`issue-lifecycle`, `issue-template-manager` 等）を使用していないか
+- [ ] 廃止済みスキル（`agentdev-workflow-reporting`）を参照していないか（REQ-0108-126）
+- [ ] 完了報告フィールド名が正規名称（完了コマンド・対象・結果・検証結果・git永続化・次のコマンド）と一致しているか
+- [ ] REQ範囲表記が実際のactive REQファイル数と一致しているか
+
 ### 追加時の判定（REQ-0108-062~063）
 
 - [ ] 新しい command / skill / reference を追加する場合、既存 artifact への APPEND / UPDATE で足りるかを確認したか
