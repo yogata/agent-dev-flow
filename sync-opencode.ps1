@@ -131,10 +131,10 @@ if ($Mode -eq 'check') {
             # Verify junction target points to correct source
             $expectedSource = Join-Path $SourceDir $relPath
             $actualTarget = Get-JunctionTarget -Path $targetPath
-            if ($actualTarget -and (Test-Path -LiteralPath $actualTarget)) {
+            if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $expectedSource).Path)) {
                 Write-Host "[OK] Junction: $relPath"
             } else {
-                Write-Host "[DIVERGENCE] Broken junction: $relPath"
+                Write-Host "[DIVERGENCE] Broken junction: $relPath (expected: $expectedSource, actual: $actualTarget)"
                 $divergences++
             }
         } else {
@@ -290,9 +290,9 @@ if ($Mode -eq 'apply') {
     $isWholeJunction = Test-Junction -Path $ProjectionDir
     if ($isWholeJunction) {
         Write-Host '[ACTION] Migrating: removing whole-directory junction .opencode/'
-        cmd /c "rmdir `"$ProjectionDir`"" 2>&1
+        $rmResult = cmd /c "rmdir `"$ProjectionDir`"" 2>&1
         if ($LASTEXITCODE -ne 0) {
-            Write-Error '[ERROR] Failed to remove whole-directory junction'
+            Write-Error "[ERROR] Failed to remove whole-directory junction: $rmResult"
             exit 1
         }
         Write-Host '[ACTION] Creating .opencode/ as real directory'
@@ -374,9 +374,9 @@ if ($Mode -eq 'apply') {
                 $junctionRel = "$parentRel\$($_.Name)"
                 if ($junctionRel -notin $targets) {
                     Write-Host "[ACTION] Removing orphan junction: $junctionRel"
-                    cmd /c "rmdir `"$($_.FullName)`"" 2>&1
+                    $rmResult = cmd /c "rmdir `"$($_.FullName)`"" 2>&1
                     if ($LASTEXITCODE -ne 0) {
-                        Write-Error "[ERROR] Failed to remove orphan junction: $junctionRel"
+                        Write-Error "[ERROR] Failed to remove orphan junction: $junctionRel ($rmResult)"
                         exit 1
                     }
                 }
