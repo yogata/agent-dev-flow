@@ -57,3 +57,57 @@
 - **関連**: PR #592, Issue #586
 - **タグ**: `#edit-tool` `#subagent` `#function-corruption` `#typescript`
 
+
+---
+
+## Windows環境でのsymlink代替としてjunctionを使用
+
+- **問題事象**: Windows環境で`.opencode/`ディレクトリをソースからプロジェクト構造内へリンクする際、標準の`mklink`（symlink）コマンドが管理者権限を要求し失敗した
+- **発生局面**: 実装（PR #602 feature/issue-596）
+- **検知方法**: 自律検出（実装中に`mklink`実行時に権限エラーを検知）
+- **根本原因**: Windowsのsymlink作成には管理者権限が必要だが、開発環境では必ずしも権限が与えられない
+- **自律対応内容**: `mklink /J`（junction）を使用した。junctionはdirectoryのみ対応だが管理者権限不要。`.opencode/`を`.gitignore`に追加し、clone後は`sync-opencode.ps1 -Mode apply`でjunctionを再作成する設計とした
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: Windows環境での開発セットアップ手順でsymlink/junctionの使い分けが必要な場面に適用可能
+- **再発条件**: 今後もWindows環境でのsymlink/junction選択が必要な場合に再発可能
+- **予防策候補**: プラットフォーム固有のシェルスクリプトを用意する、開発環境セットアップガイドに明記する
+- **想定反映先**: 開発環境構築手順（README等）、`sync-opencode.ps1`
+- **関連**: PR #602, Issue #596, `.gitignore`, `sync-opencode.ps1`
+- **タグ**: `#windows` `#symlink` `#junction` `#platform-specific` `#workaround`
+
+---
+
+## baseline分類の乖離と解決
+
+- **問題事象**: integrity audit実行時に使用したpractical finding分類（7種）が、先行REQ-0108-148で規定されていた分類（4種）と乖離していた
+- **発生局面**: 実装（PR #603 #598）→ 解決（PR #606 #600）
+- **検知方法**: 自律検出（REQ-0108-148と実装のbaseline分類を比較して発見）
+- **根本原因**: baseline作成時の分類が先行REQより細かく設計され、個別実装が先行したため
+- **自律対応内容**: Wave 3（PR #606）のrule catalogで分類を拡張・統合し、REQ-0108-148に合致する形式へ調整した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（仕様内での整合性調整）
+- **横展開観点**: baselineや個別ルール実装前に先行REQ定義を確認するプロセスが必要
+- **再発条件**: baseline作成とREQ定義のタイミングずれ、実装先行による仕様逸脱
+- **予防策候補**: baseline作成時にREQ定義との整合性チェックを実施、rule catalog化で分類を固定化
+- **想定反映先**: agentdev-workflow-orchestrationのintegrity audit手順、baseline作成プロトコル
+- **関連**: PR #603, PR #606, Issue #598, Issue #600, REQ-0108-148
+- **タグ**: `#integrity` `#baseline` `#spec-drift` `#rule-catalog` `#self-corrected`
+
+---
+
+## Wave内ファイル変更非重複設計パターン
+
+- **問題事象**: なし（成功パターン）
+- **発生局面**: 設計・実装（Epic #595全体）成功事例
+- **検知方法**: 対比分析（前Epic #580の並列Wave 2でのコンフリクトとの比較）
+- **根本原因**: 前Epic #580では並列Wave 2のPRが同じファイルを編集してmerge conflictが発生したが、Epic #595ではRU設計時にファイル変更範囲の非重複を事前設計したため
+- **自律対応内容**: RU間のファイル変更範囲を明示分離し、Wave順序で依存関係を正しく反映した設計を行った。結果として全6 PRがconflict-freeでmergeできた
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: Epic並列実行で同一ファイルを変更する可能性がある場合、事前のファイル変更範囲設計が有効
+- **再発条件**: N/A（成功パターンであり再利用すべき）
+- **予防策候補**: Epic計画段階でWaveごとの変更対象ファイルを整理し、前後Waveとの依存関係を明確に記載する
+- **想定反映先**: agentdev-workflow-orchestrationのEpic Orchestrator protocol、wave設計ガイドライン
+- **関連**: Epic #595, PR #602-#607, Epic #580（対比事例）
+- **タグ**: `#epic` `#merge-conflict` `#wave-planning` `#parallel-execution` `#positive-lesson`
