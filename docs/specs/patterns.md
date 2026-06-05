@@ -26,7 +26,7 @@ agent: sisyphus
 
 ### Frontmatter 許可フィールド
 
-command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044）。`implementation_pattern`、`secondary_pattern`、`load_skills` 等の dev メタデータは frontmatter に含めない（ADR-0013）。
+command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044）。`implementation_pattern`、`secondary_pattern`、`load_skills` 等の dev メタデータは frontmatter に含めない（ADR-0013; ADR-0001 は proposed であり現行根拠ではない）。
 
 分類定義は `design-principles.md` を参照。
 
@@ -77,7 +77,7 @@ tags: [{tag1}, {tag2}]
 
 ## REQ分類規約
 
-旧REQ（REQ-0001〜0040）は3分類で管理する（REQ-0109）:
+旧REQ（REQ-0001〜0040、retired）は3分類で管理する（REQ-0109）:
 
 | 分類 | 意味 | 取扱い |
 |------|------|--------|
