@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "timestamp": "2026-06-06",
+  "repository_head": "13a33a9",
+  "description": "Initial integrity baseline for AgentDevFlow. Snapshot of artifact state before source/projection separation and integrity infrastructure improvements.",
+  "artifact_inventory": {
+    "active_req": {
+      "count": 14,
+      "range": "REQ-0101 through REQ-0114",
+      "path": "docs/requirements/REQ-*.md",
+      "verified": true
+    },
+    "retired_req": {
+      "count": 50,
+      "range": "REQ-0001 through REQ-0050",
+      "path": "docs/requirements/retired/REQ-*.md",
+      "verified": true
+    },
+    "adr": {
+      "count": 19,
+      "range": "ADR-0001 through ADR-0019",
+      "path": "docs/adr/ADR-*.md",
+      "verified": true
+    },
+    "spec": {
+      "count": 9,
+      "path": "docs/specs/*.md",
+      "verified": true
+    },
+    "guide": {
+      "count": 10,
+      "path": "docs/guides/*.md",
+      "verified": true
+    },
+    "command": {
+      "count": 18,
+      "path": ".opencode/commands/agentdev/*.md (excl. README.md)",
+      "verified": true
+    },
+    "skill": {
+      "count": 21,
+      "path": ".opencode/skills/*/SKILL.md",
+      "verified": true
+    },
+    "command_template": {
+      "count": 35,
+      "path": ".opencode/commands/agentdev/templates/**/*.md",
+      "verified": true
+    },
+    "skill_template": {
+      "count": 11,
+      "path": ".opencode/skills/*/templates/*.md",
+      "verified": true
+    },
+    "integrity_script": {
+      "count": 14,
+      "path": ".opencode/skills/agentdev-integrity/scripts/*.ts",
+      "verified": true
+    }
+  },
+  "known_findings": [
+    {
+      "id": "BL-001",
+      "category": "document-drift",
+      "level": "info",
+      "classification": "historical-acceptable",
+      "description": "AGENTS.md references `.opencode/` as canonical path. Will be updated by Issue #596 (source/projection separation).",
+      "affected_files": ["AGENTS.md"],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Pending #596 merge"
+    },
+    {
+      "id": "BL-002",
+      "category": "document-drift",
+      "level": "info",
+      "classification": "historical-acceptable",
+      "description": "README.md references `.opencode/commands/agentdev/README.md` as relative link. Will be updated by Issue #597 (docs source/projection update).",
+      "affected_files": ["README.md"],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Pending #597"
+    },
+    {
+      "id": "BL-003",
+      "category": "obsolete-structure",
+      "level": "info",
+      "classification": "retired-doc-preservation",
+      "description": "50 retired REQ files in docs/requirements/retired/ are preserved for historical reference. Not subject to current requirements.",
+      "affected_files": ["docs/requirements/retired/REQ-*.md"],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Permanent baseline — no action needed"
+    },
+    {
+      "id": "BL-004",
+      "category": "canonical-conflict",
+      "level": "info",
+      "classification": "ssot-candidates",
+      "description": "Rule text for frontmatter validation appears in both REQ-0103 (044, 015) and REQ-0108 (046, 047, 098). Candidate for SSOT consolidation (Issue #599).",
+      "affected_files": ["docs/requirements/REQ-0103.md", "docs/requirements/REQ-0108.md"],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Pending #599"
+    },
+    {
+      "id": "BL-005",
+      "category": "canonical-conflict",
+      "level": "info",
+      "classification": "ssot-candidates",
+      "description": "Skill references/ vs reference/ canonicalization rules duplicated across REQ-0103 (013, 039) and REQ-0108 (039, 040, 094). Candidate for SSOT consolidation.",
+      "affected_files": ["docs/requirements/REQ-0103.md", "docs/requirements/REQ-0108.md"],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Pending #599"
+    },
+    {
+      "id": "BL-006",
+      "category": "integrity-rule-gap",
+      "level": "info",
+      "classification": "continuous-rule-candidates",
+      "description": "No integrity rule catalog exists yet. REQ-0108-150/151 define requirement for 20+ rules with 15+ fields each. To be created by Issue #600.",
+      "affected_files": [],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Pending #600"
+    },
+    {
+      "id": "BL-007",
+      "category": "integrity-rule-gap",
+      "level": "info",
+      "classification": "continuous-rule-candidates",
+      "description": "No REQ impact map exists yet. REQ-0108-152 requires coverage of 10+ active REQs. To be created by Issue #600.",
+      "affected_files": [],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Pending #600"
+    },
+    {
+      "id": "BL-008",
+      "category": "obsolete-structure",
+      "level": "info",
+      "classification": "old-spec-remnant",
+      "description": "Several REQ entries are stricken through (~~del~~) indicating past reversals. These are retained as historical record per REQ-0101.",
+      "affected_files": ["docs/requirements/REQ-0103.md", "docs/requirements/REQ-0108.md"],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Historical baseline — retained intentionally"
+    },
+    {
+      "id": "BL-009",
+      "category": "workflow-gap",
+      "level": "info",
+      "classification": "clarification-needed",
+      "description": "REQ-0108 references '.opencode/' paths in scan target definitions (001). After source/projection separation, these paths become runtime projections. Integrity scripts need source scan vs projection scan distinction.",
+      "affected_files": ["docs/requirements/REQ-0108.md", ".opencode/skills/agentdev-integrity/SKILL.md"],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Pending #600 (continuous integrity)"
+    },
+    {
+      "id": "BL-010",
+      "category": "canonical-conflict",
+      "level": "info",
+      "classification": "ssot-candidates",
+      "description": "Command/skill/template inventories in command README.md are manually maintained. REQ-0103-059 requires generation-based inventories. To be addressed by Issue #599.",
+      "affected_files": [".opencode/commands/agentdev/README.md"],
+      "route": "none",
+      "known_since": "2026-06-06",
+      "resolution": "Pending #599"
+    }
+  ],
+  "finding_classification_summary": {
+    "old-spec-remnant": 1,
+    "historical-acceptable": 2,
+    "retired-doc-preservation": 1,
+    "negative-fixture": 0,
+    "clarification-needed": 1,
+    "ssot-candidates": 3,
+    "continuous-rule-candidates": 2
+  },
+  "req_internal_consistency": {
+    "verified": true,
+    "notes": "All 14 active REQs have valid frontmatter (id, title, created, updated, tags). No ID collisions between active and retired REQs. REQ index (docs/requirements/README.md) lists all 14 active REQs with correct links."
+  },
+  "req_derivative_drift": {
+    "assessed": true,
+    "notes": "Key drift areas: (1) source/projection path references pending update (#596/#597), (2) command/skill inventories manually maintained (#599), (3) integrity infrastructure gaps (#600), (4) consumer model undefined (#601). All tracked in Epic #595 child Issues."
+  },
+  "source_projection_status": {
+    "separated": false,
+    "notes": "Source/projection separation not yet applied at baseline time. .opencode/ contains both source and runtime. Separation planned in Issue #596 (Wave 1)."
+  }
+}
