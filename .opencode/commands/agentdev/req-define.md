@@ -37,7 +37,7 @@ agent: prometheus
 
 5. **ADR判断** → `agentdev-adr-guidelines`（manual reference）に従ってADR判断を記録（ADRファイル作成は req-save で実行）
 
-6. **要件doc生成** → テンプレート: `agentdev-req-file-manager` templates/doc_requirement.md を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
+6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
 
 7. **work_type 判定**: ラベルに基づき判定（bug/critical→A, enhancement/feature→B, refactor/maintenance→C, docs/chore→D）。bugfix + ADR必要時は feature に昇格
 

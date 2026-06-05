@@ -31,7 +31,7 @@ AgentDevFlow 管理下の artifact（REQ、ADR、skill、command、spec）の整
 
 3. **Intake Item 作成（MAY）**: ユーザーが intake item 化を指示した問題のみ、`.agentdev/intake/inbox/YYYY-MM-DD-integrity-{issue-slug}.md` に保存。形式は `/agentdev/intake-capture` に従う。同名衝突時は連番付与。ユーザーがスキップ → レポートのみで終了
 
-4. **Git 永続化（条件付き）**: intake item 作成時のみ `agentdev-git-worktree` の domain state 永続化（references/git-common-procedures.md Section 2）に従い commit/push。`git add` は `.agentdev/intake/` 配下のみ。integrity report は commit 対象外
+4. **Git 永続化（条件付き）**: intake item 作成時のみ `agentdev-git-worktree` の domain state 永続化（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 2）に従い commit/push。`git add` は `.agentdev/intake/` 配下のみ。integrity report は commit 対象外
 
 5. **完了報告**: 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/integrity-check/standard.md
 
