@@ -350,7 +350,9 @@
 | id | INC-0019 |
 | category | boundary_violation |
 | severity | high |
-| status | open |
+| status | resolved_annotated |
+| resolved_by | #582 |
+| resolution | Clarifying annotation added to REQ-0105 (Design Notes section): `status: reviewed` / `status: saved` are lightweight document lifecycle annotations for backlog-review drafts, not a workflow state management model. The integrity check false positives are caused by regex matching "backlog-review" (contains "review") alongside "status", and "requirement-unit" + "domain-state" in tags. The actual 6 NG hits are all false positives from the detection pattern |
 | evidence | Integrity check reports 6 NG for `workflow-status-prohibition`: `docs/requirements/REQ-0105.md:6,57,58,59,60,65` — tags include workflow phases, requirements reference `status: reviewed`, `status: saved`, and 6 micro-phase state management |
 | current_text_or_behavior | REQ-0105 defines `status: reviewed`, `status: saved` workflow states and references 6 micro-phase state management (requirement/analyzed/created/in_progress/review/done) |
 | expected_source_of_truth | REQ/SPEC must not define workflow status state management per REQ-0108-123. Workflow states are implementation concerns, not requirements-level specifications (REQ-0103, ADR-0013) |
@@ -367,7 +369,9 @@
 | id | INC-0020 |
 | category | boundary_violation |
 | severity | medium |
-| status | open |
+| status | resolved_fixed |
+| resolved_by | #582 |
+| resolution | Added self-exemption clause to REQ-0108-123: replaced literal 6 micro-phase terms with abstracted reference "本要件（REQ-0108-123）が列挙する 6 種のマイクロフェーズ" and added explicit self-exemption "本要件自体（REQ-0108-123）は検出対象から除外する（自己参照免除）" |
 | evidence | `docs/requirements/REQ-0108.md:139` (REQ-0108-123) — `integrity-check は REQ/SPEC に workflow status が追加されている記述、または 6 マイクロフェーズ（requirement/analyzed/created/in_progress/review/done）を状態管理モデルとして扱う記述の検出を禁止すること（SHALL）` |
 | current_text_or_behavior | REQ-0108 itself contains the forbidden 6 micro-phase terms in the detection requirement. The integrity check correctly flags this as NG |
 | expected_source_of_truth | REQ should define what to detect without containing the forbidden terms itself, or should self-exempt (REQ-0108 self-consistency) |
@@ -384,7 +388,9 @@
 | id | INC-0021 |
 | category | boundary_violation |
 | severity | medium |
-| status | open |
+| status | resolved_false_positive |
+| resolved_by | #582 |
+| resolution | False positive confirmed. patterns.md:53 PROHIBITS status fields (`status および scale フィールドは持たない`). The integrity check regex matches because "created" (a REQ frontmatter field name listed in the prohibition) is also a 6-micro-phase term. The SPEC text is correct — no change needed. integrity-check detection needs refinement to distinguish prohibition statements (e.g., "持たない", "のみ") from usage statements. Recommend adding negative context matching for prohibition keywords |
 | evidence | `docs/specs/patterns.md:53` — `フィールドは id, title, created, updated, tags のみ。status および scale フィールドは持たない` |
 | current_text_or_behavior | SPEC correctly prohibits status fields, but integrity check detects this as workflow-status-prohibition NG because the detection pattern matches the prohibition text itself |
 | expected_source_of_truth | SPEC should describe format rules. The detection may need refinement to distinguish "prohibiting status" from "using status" (REQ-0108-123) |
@@ -401,7 +407,9 @@
 | id | INC-0022 |
 | category | boundary_violation |
 | severity | medium |
-| status | open |
+| status | documented |
+| resolved_by | #582 |
+| resolution | Documented in #582 PR description with specific line ranges and extraction recommendations. Full extraction deferred to a separate issue — too invasive for this PR. See PR description for detailed analysis |
 | evidence | `case-open.md:29-78` (Epic vs Standard flow branching with Wave scheduling); `case-run.md:33-114` (state machine with multi-issue/Epic/single-issue branches, self-healing loop logic); `req-save.md:31-47` (APPEND/UPDATE/SPLIT classification gate with user interaction handling); `case-close.md:25-29` (達成判定プロトコル with 5-condition evaluation and self-resolution classification) |
 | current_text_or_behavior | Multiple commands contain complex conditional logic, multi-step decision trees, and detailed judgment protocols that should be in skills per "commands thin" principle |
 | expected_source_of_truth | REQ-0103: commands should be thin (public API, inputs, outputs, guardrails, high-level steps). Reusable judgment belongs in skills (ADR-0013, AGENTS.md editing guardrails) |
@@ -418,7 +426,9 @@
 | id | INC-0023 |
 | category | boundary_violation |
 | severity | low |
-| status | open |
+| status | documented |
+| resolved_by | #582 |
+| resolution | Documented in #582 PR description with scope analysis. ~39 skill/command files hardcode 6 completion report field names. Full centralization deferred to a separate issue. Recommend creating a completion report template in `.opencode/skills/agentdev-workflow-templates/templates/` and having skills reference it |
 | evidence | Multiple skill files hardcode the 6 completion report field names (完了コマンド, 対象, 結果, 検証結果, git 永続化, 次のコマンド). Found in ~39 skill/command files. `agentdev-gh-cli/SKILL.md:180-189` hardcodes "検証結果" field format |
 | current_text_or_behavior | Completion report field names and formats are duplicated across skills instead of being centralized in templates or vocabulary registry |
 | expected_source_of_truth | REQ-0103: "fixed wording in templates". REQ-0107 defines completion report format. Should be single-sourced from template (REQ-0103, ADR-0013) |
