@@ -99,7 +99,7 @@ agent: sisyphus
          {git_error_output}
          ```
 
- 9. **完了報告** → 完了報告templateに従って出力。template: templates/learning-promote/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+ 9. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/learning-promote/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## Guardrails
 

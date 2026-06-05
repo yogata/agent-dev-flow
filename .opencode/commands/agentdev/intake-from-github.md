@@ -101,7 +101,7 @@ agent: sisyphus
    | 1 | ... | #XX | YYYY-MM-DD-xxx.md |
    ```
 
-8. **完了報告** → 完了報告templateに従って出力。template: templates/intake-from-github/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+8. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-from-github/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## Error Handling
 

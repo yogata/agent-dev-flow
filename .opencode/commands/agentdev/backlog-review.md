@@ -91,9 +91,9 @@ Draft の内容:
 ### Step 6: 完了報告
 
 完了報告 → 完了報告templateに従って出力:
-- 全て成功 → `templates/backlog-review/standard.md`
-- partial success（矛盾あり）→ `templates/backlog-review/partial.md`
-- promoted artifact なし → `templates/backlog-review/zero-promoted.md`
+- 全て成功 → `.opencode/commands/agentdev/templates/backlog-review/standard.md`
+- partial success（矛盾あり）→ `.opencode/commands/agentdev/templates/backlog-review/partial.md`
+- promoted artifact なし → `.opencode/commands/agentdev/templates/backlog-review/zero-promoted.md`
 
 git 永続化結果を含める。次のコマンド: `/agentdev/backlog-save`
 

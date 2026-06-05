@@ -76,8 +76,8 @@ agent: sisyphus
         2. `git status --porcelain` に削除済み RU ファイルが残っていないこと
         - 同期確認に失敗した場合、対象ファイル・現在の HEAD・`origin/main` を表示して完了扱いにせず停止すること（SHALL — REQ-0105）
 13. 完了報告 → 完了報告templateに従って出力。実行フローに応じたvariantを選択:
-    - Standard flow → templates/case-open/standard.md
-    - Epic flow → templates/case-open/epic.md
+    - Standard flow → .opencode/commands/agentdev/templates/case-open/standard.md
+    - Epic flow → .opencode/commands/agentdev/templates/case-open/epic.md
 
 ## Guardrails
 

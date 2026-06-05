@@ -97,7 +97,7 @@ intake item は以下の推奨標準形に従う Markdown artifact とする（R
          {git_error_output}
          ```
 
-5. **完了報告** → 完了報告templateに従って出力。template: templates/intake-capture/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+5. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-capture/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## Error Handling
 

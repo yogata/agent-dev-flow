@@ -2537,6 +2537,8 @@ function checkInlineCompletionReportsStrict(cmdDir: string, root: string): Check
 const SCRIPT_TEMPLATE_REF_PATTERNS = [
   // Repo-root-relative: .opencode/skills/agentdev-*/scripts/*.ts
   /\.opencode\/skills\/(agentdev-[^/\s"')\]]+\/(?:scripts\/[^/\s"')\]]+\.ts|templates\/[^/\s"')\]]+\.md|references\/[^/\s"')\]]+\.md))/g,
+  // Command-local template: .opencode/commands/agentdev/templates/**/*.md
+  /(\.opencode\/commands\/agentdev\/templates\/[^/\s"')\]]+\/[^/\s"')\]]+\.md)/g,
   // Skill-relative: scripts/*.ts, templates/*.md, references/*.md
   /(?<![.\w/])(scripts\/[^/\s"')\]]+\.ts|templates\/[^/\s"')\]]+\.md|references\/[^/\s"')\]]+\.md)/g,
 ];
@@ -2640,6 +2642,21 @@ export function checkScriptTemplateReferencePaths(
 
           // Skip paths that are clearly glob patterns
           if (rawRef.includes("*")) continue;
+
+          // Skip runtime-generated paths (check parent dir only)
+          if (rawRef.startsWith(".agentdev/") || rawRef.startsWith(".sisyphus/")) {
+            const parentDir = path.dirname(resolveReferencePath(rawRef, absPath, root, skillsDir));
+            if (!fs.existsSync(parentDir)) {
+              foundViolation = true;
+              results.push(ng(
+                "ReferencePath", "reference-path-existence",
+                `Parent directory does not exist for runtime-generated path: ${rawRef}`,
+                relPath, i + 1,
+                { evidence: rawRef, expected: `parent directory must exist at ${resolveRelative(parentDir, root)}`, route: "intake" },
+              ));
+            }
+            continue;
+          }
 
           const resolvedPath = resolveReferencePath(rawRef, absPath, root, skillsDir);
 

@@ -50,10 +50,10 @@ agent: sisyphus
       5. NG理由分類のチェックボックスを自動選択
       6. `agentdev-gh-cli` に従い `--body-file` 経由でコメント投稿
 4. 完了報告 → 完了報告templateに従って出力。更新種別に応じたvariantを選択:
-    - --body → templates/case-update/body.md
-    - --comment → templates/case-update/comment.md
-    - --req → templates/case-update/req.md（変数: {APPEND/UPDATE}, {REQ番号}, {セクション名}）
-    - --review-ng → templates/case-update/review-ng.md（変数: {乖離タイプ}, {REQ番号}, {推奨アクション}）
+    - --body → .opencode/commands/agentdev/templates/case-update/body.md
+    - --comment → .opencode/commands/agentdev/templates/case-update/comment.md
+    - --req → .opencode/commands/agentdev/templates/case-update/req.md（変数: {APPEND/UPDATE}, {REQ番号}, {セクション名}）
+    - --review-ng → .opencode/commands/agentdev/templates/case-update/review-ng.md（変数: {乖離タイプ}, {REQ番号}, {推奨アクション}）
    - 更新種別の推論: ユーザー入力、直前のレビュー結果、対象Issue/REQ、会話文脈から推論（REQ-0107-037）。推論不能時のみユーザーに指定を求めて停止（REQ-0107-038）
 
 ## APPEND vs UPDATE 判定基準

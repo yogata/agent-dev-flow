@@ -529,4 +529,138 @@ describe("checkScriptTemplateReferencePaths", () => {
     const okResults = refResults.filter((r) => r.level === "ok");
     expect(okResults.length).toBeGreaterThanOrEqual(1);
   });
+
+  it("command-local template ok when file exists", () => {
+    const root = join(TEMP_ROOT, "cmd-local-template-ok");
+    buildMinimalFixture(root);
+    copyScripts(root);
+
+    const cmdDir = join(root, ".opencode", "commands", "agentdev");
+    mkdirp(join(cmdDir, "templates", "test-cmd"));
+    writeFileSync(join(cmdDir, "templates", "test-cmd", "standard.md"), "# Standard\n", "utf-8");
+
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: oracle",
+      "---",
+      "",
+      "template: .opencode/commands/agentdev/templates/test-cmd/standard.md",
+      "",
+    ].join("\n"), "utf-8");
+
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) => r.category === "ReferencePath" && r.check === "reference-path-existence",
+    );
+    const ngResults = refResults.filter((r) => r.level === "ng");
+    const cmdNg = ngResults.filter((r) => r.evidence?.includes("test-cmd/standard.md"));
+    expect(cmdNg.length).toBe(0);
+    const okResults = refResults.filter(
+      (r) => r.level === "ok" && r.evidence?.includes("test-cmd/standard.md"),
+    );
+    expect(okResults.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("command-local template ng when file missing", () => {
+    const root = join(TEMP_ROOT, "cmd-local-template-ng");
+    buildMinimalFixture(root);
+    copyScripts(root);
+
+    const cmdDir = join(root, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: oracle",
+      "---",
+      "",
+      "template: .opencode/commands/agentdev/templates/test-cmd/standard.md",
+      "",
+    ].join("\n"), "utf-8");
+
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refNg = (result.report!.results || []).filter(
+      (r) => r.category === "ReferencePath" && r.level === "ng",
+    );
+    expect(refNg.some((r) => r.evidence?.includes("test-cmd/standard.md"))).toBe(true);
+  });
+
+  it("runtime-generated .agentdev/ reference in command is not flagged", () => {
+    const root = join(TEMP_ROOT, "runtime-gen-not-flagged");
+    buildMinimalFixture(root);
+    copyScripts(root);
+
+    mkdirp(join(root, ".agentdev", "intake", "inbox"));
+
+    const cmdDir = join(root, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: oracle",
+      "---",
+      "",
+      "Save to .agentdev/intake/inbox/item.md.",
+      "",
+    ].join("\n"), "utf-8");
+
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refNg = (result.report!.results || []).filter(
+      (r) => r.category === "ReferencePath" && r.level === "ng",
+    );
+    const agentNg = refNg.filter((r) => r.evidence?.includes(".agentdev/"));
+    expect(agentNg.length).toBe(0);
+  });
+
+  it("runtime-generated .sisyphus/ reference in command is not flagged", () => {
+    const root = join(TEMP_ROOT, "runtime-gen-sisyphus");
+    buildMinimalFixture(root);
+    copyScripts(root);
+
+    const cmdDir = join(root, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: oracle",
+      "---",
+      "",
+      "Save to .sisyphus/drafts/draft.md.",
+      "",
+    ].join("\n"), "utf-8");
+
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refNg = (result.report!.results || []).filter(
+      (r) => r.category === "ReferencePath" && r.level === "ng",
+    );
+    const sisyphusNg = refNg.filter((r) => r.evidence?.includes(".sisyphus/"));
+    expect(sisyphusNg.length).toBe(0);
+  });
+
+  it("glob pattern in command source is skipped", () => {
+    const root = join(TEMP_ROOT, "cmd-glob-skip");
+    buildMinimalFixture(root);
+    copyScripts(root);
+
+    const cmdDir = join(root, ".opencode", "commands", "agentdev");
+    writeFileSync(join(cmdDir, "test-cmd.md"), [
+      "---",
+      "description: Test",
+      "agent: oracle",
+      "---",
+      "",
+      "Run scripts/*.ts to validate.",
+      "",
+    ].join("\n"), "utf-8");
+
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) => r.category === "ReferencePath" && r.check === "reference-path-existence",
+    );
+    const ngResults = refResults.filter((r) => r.level === "ng");
+    expect(ngResults.length).toBe(0);
+  });
 });

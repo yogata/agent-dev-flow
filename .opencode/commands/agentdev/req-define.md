@@ -50,9 +50,9 @@ agent: prometheus
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
 
 11. **完了報告**: 完了報告templateに従って出力。Pattern に応じたvariantを選択:
-     - feature standard → templates/req-define/feature.md
-     - feature large (Epic)規模 → templates/req-define/feature-epic.md
-     - bugfix / maintenance / docs_chore → templates/req-define/lightweight.md
+     - feature standard → .opencode/commands/agentdev/templates/req-define/feature.md
+     - feature large (Epic)規模 → .opencode/commands/agentdev/templates/req-define/feature-epic.md
+     - bugfix / maintenance / docs_chore → .opencode/commands/agentdev/templates/req-define/lightweight.md
 
 ## Guardrails
 
