@@ -74,7 +74,7 @@ Issue の種別に応じて異なるワークフローを適用する。work_typ
 
 アーティファクトの責務を4種に明確に分けることで、各要素の役割を曖昧さのないものにする。
 
-**Command** は公開APIと高レベル実行骨格を担う。Input/Output/Guardrails/Stepsを定義し、詳細な判断はSkillへ、決定的処理はScriptへ委譲する。原則100行以内、Steps 5〜12個に抑える。150行超は分割検討、200行超はorchestration skill/reference/scriptへの切り出しを必須検討する。
+**Command** は公開APIと高レベル実行骨格を担う。Input/Output/Guardrails/Stepsを定義し、詳細な判断はSkillへ、決定的処理はScriptへ委譲する。原則100行以内、Steps 5〜12個に抑える。150行超は分割検討、200行超はorchestration skill/references/scriptへの切り出しを必須検討する。
 
 **Skill** は再利用可能な判断基準と大きな状態機械を担う。宣言的定義（判定基準・フォーマット・ポリシー・状態遷移）を提供し、Commandから一方向に参照される。`1 command = 1 orchestration skill` は原則とせず、大きな状態機械・再開ポイント・CI loop・Wave scheduling・サブエージェント protocol を持つ場合にのみ orchestration skill 化を認める。
 

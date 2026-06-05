@@ -183,8 +183,8 @@ function lintSkill(
     results.push(ok("Content", "See Also references", `${dirName} has no See Also references to check`));
   }
 
-  // Check 7: Resource references (scripts/, reference/, templates/)
-  const resourcePatterns = ["scripts/", "reference/", "templates/"];
+  // Check 7: Resource references (scripts/, references/, templates/)
+  const resourcePatterns = ["scripts/", "references/", "templates/"];
   const mentionedResources: string[] = [];
   for (const res of resourcePatterns) {
     if (content.includes(res)) {

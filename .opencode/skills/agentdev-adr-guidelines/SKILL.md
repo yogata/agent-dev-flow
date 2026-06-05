@@ -53,4 +53,4 @@ ADRの状態は以下のいずれかをとります。一度 Accepted された 
 
 - **agentdev-adr-file-manager**: ADRファイルの作成・追記・更新操作とバリデーション
 - **agentdev-req-analysis**: 要件分析におけるADR閾値判定ブリッジ
-- **agentdev-workflow-lifecycle**: issue-*ワークフロー統括ハブ（フェーズ定義・SSoT遷移・パターン判定）
+- **agentdev-workflow-lifecycle**: agentdev-*ワークフロー統括ハブ（フェーズ定義・SSoT遷移・パターン判定）
