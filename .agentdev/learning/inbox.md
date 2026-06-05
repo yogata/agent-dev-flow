@@ -21,3 +21,21 @@
 - **関連**: Issue #576, PR #578
 - **タグ**: `#encoding` `#gh-cli` `#windows` `#case-open`
 
+---
+
+## Epic Wave 2 並列PRの同一ファイル変更によるマージコンフリクト
+
+- **問題事象**: Epic #580 Wave 2 で4本のPR (#590, #591, #588, #589) を並列作成後、順次 squash merge した際、#588 (Semantic Conflicts) と #589 (Runtime Boundary) で system.md および integrity report のマージコンフリクトが発生。手動で rebase + コンフリクト解決が必要だった。
+- **発生局面**: case-run Epic Orchestrator → Wave 2 並列実行 → squash merge 順序処理
+- **検知方法**: `gh pr merge` が `GraphQL: Pull Request has merge conflicts` エラーを返却
+- **根本原因**: 並列Wave内の複数PRが同一ファイル (docs/specs/system.md) を変更。#584 が REQ range を修正、#585 が flow separators を修正、#583 が REQ range + table + classification を修正。#583 は #584/#585 の変更を取り込んでいなかった。
+- **自律対応内容**: ローカルで `git fetch origin pull/{N}/head` → `git rebase origin/main` → コンフリクト解決 → `git push origin pr-{N}:{original_branch} --force-with-lease` → `gh pr merge {N} --squash` の手順で解決。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（運用上の知見）
+- **横展開観点**: Wave 内並列実行で同一ファイルを変更する可能性がある場合、サブエージェントへのプロンプトで「他のPRと重複する変更は最小限にする」または「変更対象ファイルの重複を避ける」ガイダンスが必要。
+- **再発条件**: Wave内並列実行で複数のサブエージェントが同一ファイルを変更する場合。特に system.md, AGENTS.md などの共通設定ファイル。
+- **予防策候補**: (1) Wave内でファイル変更対象を事前に分割しサブエージェントに指示、(2) Merge順序を考慮したファイル分割、(3) 最初のPRマージ後に残りのPRをrebaseする運用を標準化
+- **想定反映先**: agentdev-workflow-orchestration スキルの Epic Orchestrator protocol
+- **関連**: Epic #580, PR #588, #589
+- **タグ**: `#epic` `#merge-conflict` `#parallel-execution` `#wave-scheduling`
+
