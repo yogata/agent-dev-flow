@@ -111,3 +111,21 @@
 - **想定反映先**: agentdev-workflow-orchestrationのEpic Orchestrator protocol、wave設計ガイドライン
 - **関連**: Epic #595, PR #602-#607, Epic #580（対比事例）
 - **タグ**: `#epic` `#merge-conflict` `#wave-planning` `#parallel-execution` `#positive-lesson`
+
+---
+
+## PowerShell バッククォートが gh CLI 引数で BEL 文字に展開される
+
+- **問題事象**: `gh pr create` の `--body` 引数に PowerShell バッククォート `` `a `` を含むテキスト（例: `` `apply` ``）を渡すと、バッククォート `` `a `` が BEL 文字 (0x07) に展開され、テキストが破損（例: `Apply` → `^Gpply`）。GitHub 上の PR 本文が文字化けした状態で作成された
+- **発生局面**: case-run（PR作成）— PR #609
+- **検知方法**: `gh pr view` で読み戻し時に PR 本文の `Apply` が `^Gpply` になっていることを検知
+- **根本原因**: PowerShell はバッククォートをエスケーププレフィックスとして扱い、`` `a `` を BEL 文字に展開する。`--body` に直接渡すと PowerShell が先に文字展開してから gh CLI に渡すため、制御文字が混入する
+- **自律対応内容**: Write tool で一時ファイルを作成し、`--body-file` で指定する方式に切替えて解決（agentdev-gh-cli スキルの標準手順に合致）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（agentdev-gh-cli スキルですでに `--body` 直接指定が禁止されているため）
+- **横展開観点**: 全ての gh CLI 書き込み操作で `--body` 直接指定が禁止されているが、サブエージェントがこの制約を遵守しない場合に同様の問題が発生する
+- **再発条件**: PowerShell 環境で `--body` にバッククォートを含むテキストを直接渡す場合
+- **予防策候補**: agentdev-gh-cli スキルの `--body` 禁止ルールの厳格化、またはサブエージェントへのプロンプトでの再確認
+- **想定反映先**: agentdev-gh-cli スキル（参考事例追加）
+- **関連**: PR #609, Issue #608
+- **タグ**: `#powershell` `#encoding` `#gh-cli` `#backtick` `#windows`
