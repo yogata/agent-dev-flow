@@ -5,7 +5,7 @@ agent: sisyphus
 
 # 最大自走モード
 
-要件docからreq-save/case-open/case-run/case-closeを順次実行し、repo内変更に限りマージまで自走する。標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
+要件docから req-save → case-open → case-run → case-close を順次実行し、repo内変更に限りマージまで自走する。標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
 
 ## Input
 

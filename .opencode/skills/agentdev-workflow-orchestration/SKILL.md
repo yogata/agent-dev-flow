@@ -15,7 +15,7 @@ case-run は3つの実行モードを持つ:
 |------|--------|
 | 有効Issue = 1件、Epic 非検出 | 単一Issueパス（Steps 1-12 を順次実行） |
 | 有効Issue = 1件、Epic 検出（`epic` ラベル OR `## 実行順序` + Wave テーブル） | Epic Orchestrator モード |
-| 有効Issue 2〜5件 | 多重Issueモード。入力上限 = 5件/case-run呼出 |
+| 有効Issue 2〜5件 | 多重Issueモード。入力上限 = 5件（case-run 呼出あたり） |
 
 ### フェーズ構成
 
