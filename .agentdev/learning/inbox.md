@@ -4,3 +4,20 @@
 まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類・整理して永続的なドキュメントに移動する。
 
 ---
+
+## case-open での Issue 本文エンコーディング破損が case-run/case-close に波及
+
+- **問題事象**: case-open が作成した Issue #576 の本文が日本語文字化け（EUC-JP 的な文字単位破損）し、全テキストが読取不能になった。case-run は一部チェックボックスを更新したが、文字化けにより正確な位置特定が困難で 13/17 チェックボックスが未更新のまま残った。case-close で本文全体を正しい日本語で再構築し解決。
+- **発生局面**: case-open（Issue作成）→ case-run（実装）→ case-close（完了処理）の3フェーズにまたがる波及
+- **検知方法**: case-close Step 2 で Issue 本文を `gh issue view --json body` で読み取り時、全セクションが文字化けしていることを検知
+- **根本原因**: Windows 環境の gh CLI で `--body-file` 経由で UTF-8 本文を書き込んだ際、PowerShell のエンコーディング変換が介入して文字化けが発生。case-open のサブエージェントが agentdev-gh-cli スキルの書き込み手順（`[System.IO.File]::WriteAllText` + UTF8Encoding($false)）を正しく適用しなかった可能性が高い
+- **自律対応内容**: case-close で Issue 本文を正しい日本語で再構築し、`--body-file` 経由で更新。17/17 チェックボックスを完了に設定
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（運用上の知見であり、仕様変更は不要）
+- **横展開観点**: case-open 以外のサブエージェント（case-run、case-close 等）が `gh issue create` / `gh pr create` を実行する場面でも同一リスクが存在する
+- **再発条件**: Windows 環境でサブエージェントが `--body-file` 書き込み手順を正しく適用しない場合に再発。特に agentdev-gh-cli スキルが load されていない、または `[System.IO.File]::WriteAllText` の代わりに PowerShell ネイティブ書き込みを使用した場合
+- **予防策候補**: case-open/case-run/case-close コマンド定義で agentdev-gh-cli スキルの load を強制する。または integrity-check に「Issue 本文の文字化け検出」チェックを追加する
+- **想定反映先**: agentdev-gh-cli スキル（強化）、agentdev-learning-capture スキル（参考事例）、または case-open/case-run/case-close の guardrails
+- **関連**: Issue #576, PR #578
+- **タグ**: `#encoding` `#gh-cli` `#windows` `#case-open`
+
