@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は14件の active REQ である。旧REQ（REQ-0104〜REQ-0109）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。
+現行要件の第一参照先は14件の active REQ である。旧REQ（REQ-0104〜REQ-0109）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0019 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
