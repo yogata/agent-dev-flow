@@ -1,0 +1,115 @@
+# Vocabulary Registry
+
+AgentDevFlow 管理下の文書で使用する正規語彙と旧語彙の対照表。integrity-check は本レジストリに基づき旧語彙の残存を検出する。
+
+## 目的
+
+- Wave 1-2 で修正した不整合の再発を防止する
+- 新規文書作成時に正規語彙を参照可能にする
+- integrity-check の旧語彙検出の根拠を一元管理する
+
+## 除外コンテキスト
+
+以下の文脈では旧語彙の言及が許容される（検出対象外）:
+
+- `docs/requirements/retired/` 配下の retired REQ
+- `docs/requirements/mapping-table.md` の移行表
+- `docs/adr/` 内の ADR 履歴記述（廃止経緯の説明を含む）
+- code block（` ``` ` で囲まれた領域）内の例示
+- 検出ルール自体の記述（正規表現パターンの説明等）
+- integrity-check テスト fixture
+
+## コマンド名
+
+| 旧語彙 | 現行語彙 | 備考 |
+|--------|----------|------|
+| `/case-open` | `/agentdev/case-open` | bare slash form（REQ-0108-016, ADR-0005） |
+| `/case-run` | `/agentdev/case-run` | bare slash form |
+| `/case-close` | `/agentdev/case-close` | bare slash form |
+| `/case-update` | `/agentdev/case-update` | bare slash form |
+| `/req-define` | `/agentdev/req-define` | bare slash form |
+| `/req-save` | `/agentdev/req-save` | bare slash form |
+| `/integrity-check` | `/agentdev/integrity-check` | bare slash form |
+| `/intake-capture` | `/agentdev/intake-capture` | bare slash form |
+| `/intake-review` | `/agentdev/intake-review` | bare slash form |
+| `/intake-promote` | `/agentdev/intake-promote` | bare slash form |
+| `/backlog-review` | `/agentdev/backlog-review` | bare slash form |
+| `/backlog-save` | `/agentdev/backlog-save` | bare slash form |
+| `/learning-refine` | `/agentdev/learning-refine` | bare slash form |
+| `/learning-promote` | `/agentdev/learning-promote` | bare slash form |
+| `/req-restructure-review` | `/agentdev/req-restructure-review` | bare slash form |
+| `issue-req` | （廃止） | 旧 bare command → `/agentdev/req-save` |
+| `issue-work` | （廃止） | 旧 bare command → `/agentdev/case-run` |
+| `issue-close` | （廃止） | 旧 bare command → `/agentdev/case-close` |
+| `issue-create` | （廃止） | 旧 bare command → `/agentdev/case-open` |
+| `issue-update` | （廃止） | 旧 bare command → `/agentdev/case-update` |
+| `issue-save-req` | （廃止） | 旧 bare command → `/agentdev/req-save` |
+| `issue-backlog-create` | （廃止） | 旧 bare command → `/agentdev/backlog-save` |
+| `tips-elevate` | （廃止） | 旧 bare command → `/agentdev/learning-promote` |
+| `tips-refactor` | （廃止） | 旧 bare command → `/agentdev/req-restructure-review` |
+
+## コマンドパス
+
+| 旧語彙 | 現行語彙 | 備考 |
+|--------|----------|------|
+| `.opencode/commands/issue/` | `.opencode/commands/agentdev/` | 旧 command path（ADR-0005） |
+| `.opencode/commands/tips/` | `.opencode/commands/agentdev/` | 旧 command path |
+| `commands/issue/` | `commands/agentdev/` | 旧 relative path |
+| `commands/tips/` | `commands/agentdev/` | 旧 relative path |
+
+## スキル名
+
+| 旧語彙 | 現行語彙 | 備考 |
+|--------|----------|------|
+| `issue-lifecycle` | `agentdev-workflow-lifecycle` | 旧 skill name |
+| `issue-template-manager` | `agentdev-workflow-templates` | 旧 skill name |
+| `tips-pipeline-orchestration` | `agentdev-workflow-orchestration` | 旧 skill name |
+| `issue-completion-reporting` | `agentdev-workflow-reporting` | 廃止済み skill（REQ-0108-126） |
+| `issue-post-review-routing` | `agentdev-workflow-routing` | 旧 skill name |
+| `issue-work-orchestration` | `agentdev-workflow-orchestration` | 旧 skill name |
+
+## 廃止済み概念
+
+| 旧語彙 | 現行状態 | 備考 |
+|--------|----------|------|
+| `req-backlog` | 廃止（REQ-0105-038） | backlog-review / backlog-save フローに統合 |
+| `docs/tips/` | 廃止 | docs/ に統合済み |
+| `reference/` | `references/` | canonical は複数形（REQ-0103-013, REQ-0108-039） |
+| `tips プール` | `learning プール` | learning セクションに統合 |
+| `refactor時prune` | `refine時prune` | learning-refine コマンド |
+| `elevate時prune` | `promote時prune` | learning-promote コマンド |
+
+## 完了報告フィールド
+
+| フィールド名 | 備考 |
+|-------------|------|
+| `完了コマンド` | 必須（REQ-0107） |
+| `対象` | 必須 |
+| `結果` | 必須 |
+| `検証結果` | 必須 |
+| `git 永続化` | 必須 |
+| `次のコマンド` | 必須 |
+
+旧フィールド名 `次のステップ` は使用禁止（`次のコマンド` が正規）。
+
+## REQ 範囲表記
+
+| 正規値 | 備考 |
+|--------|------|
+| `REQ-0101` 〜 `REQ-0114` | 2026-06-05 時点の active REQ 範囲（14件） |
+
+AGENTS.md、system.md、ガイド内の REQ 範囲表記は実際の active REQ ファイル数と一致させること。
+
+## 旧分類用語
+
+| 旧語彙 | 現行語彙 | 備考 |
+|--------|----------|------|
+| `retained` | `migrated` / `retired-no-successor` / `historical-only` | 旧 REQ 分類（mapping-table.md の status） |
+| `partially superseded` | `migrated` | mapping-table.md の正規 status |
+| `superseded` | `migrated` / `retired-no-successor` | 旧分類 |
+
+## メンテナンス
+
+- 新規語彙の追加・旧語彙の変更は integrity-check の検出パターンと同期すること
+- REQ-0108-055 に基づき、検査ルール変更時は regression fixture を追加すること
+- 本レジストリは `.agentdev/` 配下に配置し、canonical domain state として扱う

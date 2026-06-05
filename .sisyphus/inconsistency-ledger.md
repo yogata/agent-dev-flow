@@ -24,6 +24,7 @@
 | boundary_violation | 5 |
 | prevention_gap | 4 |
 | **Total** | **29** |
+| **Resolved** | **4** (INC-0024~0027 by #586) |
 
 ## Integrity Check Baseline
 
@@ -445,7 +446,9 @@
 | id | INC-0024 |
 | category | prevention_gap |
 | severity | high |
-| status | open |
+| status | resolved_fixed |
+| resolved_by | #586 |
+| resolution | check_integrity.ts に checkPatternResidual (Pattern A/B/C/D), checkReqBacklogResidual (req-backlog), checkAbolishedSkillReference (agentdev-workflow-reporting) を実装。regression test 10件追加 |
 | evidence | `check_integrity.ts` — REQ-0108-111 (Pattern A/B/C/D residual detection) not implemented; REQ-0108-112 (req-backlog residual detection) not implemented; REQ-0108-126/127 (abolished skill reference detection for agentdev-workflow-reporting) not implemented |
 | current_text_or_behavior | Three REQ-mandated integrity check categories are not implemented in the integrity check script |
 | expected_source_of_truth | REQ-0108-111, REQ-0108-112, REQ-0108-126~127 mandate these checks (SHALL) |
@@ -462,7 +465,9 @@
 | id | INC-0025 |
 | category | prevention_gap |
 | severity | high |
-| status | open |
+| status | resolved_fixed |
+| resolved_by | #586 |
+| resolution | `.agentdev/vocabulary-registry.md` を作成。コマンド名・パス・スキル名・廃止概念・完了報告フィールド・REQ範囲表記・旧分類用語の対照表を含む。checkVocabularyCompliance チェックを追加 |
 | evidence | No dedicated vocabulary registry file exists in the repository. Terminology (work_type values, completion report field names, namespace conventions, artifact path patterns) is scattered across REQ, SPEC, skills, and commands |
 | current_text_or_behavior | No single source of truth for valid terms, names, and field labels. Each file hardcodes its own copy |
 | expected_source_of_truth | REQ-0103 (canonical paths and names), REQ-0107 (completion report fields), ADR-0005 (namespace) define terminology but it is not centrally registered |
@@ -479,7 +484,9 @@
 | id | INC-0026 |
 | category | prevention_gap |
 | severity | medium |
-| status | open |
+| status | resolved_fixed |
+| resolved_by | #586 |
+| resolution | `prevention_gates.test.ts` に10件の regression test を追加。Pattern residual, req-backlog residual, abolished skill reference, REQ range staleness, vocabulary compliance の各パターンについて positive/negative テストを実装 |
 | evidence | 12 test files exist for integrity scripts, but no regression tests for: Pattern A/B/C/D residual, req-backlog residual, abolished skill references, SPEC REQ range staleness, guide count mismatch, AGENTS.md REQ range |
 | current_text_or_behavior | Regression test coverage exists for reference paths, command structure, template structure, skill structure, and legacy namespace detection — but not for several REQ-mandated check categories |
 | expected_source_of_truth | REQ-0108-049: "integrity-check の検査ルール変更には regression fixture / test を含めること（SHALL）" |
@@ -496,7 +503,9 @@
 | id | INC-0027 |
 | category | prevention_gap |
 | severity | medium |
-| status | open |
+| status | resolved_fixed |
+| resolved_by | #586 |
+| resolution | check_integrity.ts に checkReqRangeStaleness を実装。AGENTS.md, system.md, project-docs-and-specs.md, DOC-MAP.md の REQ 範囲表記を actual REQ file inventory と照合。REQ-0108-140 として要件化 |
 | evidence | AGENTS.md:17 states "REQ-0101 through REQ-0111" but actual is REQ-0101~0114. system.md:213 states "REQ-0101〜0109" but actual is REQ-0101~0114. No integrity check category validates that textual REQ ranges match actual REQ file inventory |
 | current_text_or_behavior | Documents containing stale REQ ranges are not detected by integrity check |
 | expected_source_of_truth | REQ-0108 mandates comprehensive integrity checking. Stale ranges in AGENTS.md and SPEC are a form of canonical drift that should be detected (REQ-0108-001 scan targets include AGENTS.md, SPEC) |

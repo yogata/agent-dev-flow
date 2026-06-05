@@ -2921,6 +2921,353 @@ function checkNonAcceptedAdrRefsInFile(
   }
 }
 
+// ─── Pattern A/B/C/D residual detection (REQ-0108-111) ────────────────────
+
+const PATTERN_RESIDUAL_PATTERNS = [
+  { pattern: /\bPattern\s+[ABCD]\b/g, name: "Pattern A/B/C/D label" },
+  { pattern: /\bwork_type\s*[:=]\s*["']?(bugfix|feature|maintenance|docs_chore)["']?/gi, name: "work_type explicit value" },
+];
+
+function checkPatternResidual(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const dirsToScan = [
+    path.join(root, "docs", "requirements"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+    path.join(root, ".opencode", "commands"),
+    path.join(root, ".opencode", "skills"),
+  ];
+
+  let foundViolation = false;
+
+  const exemptPatterns = [
+    /retired\//,
+    /mapping-table/,
+    /\.test\./,
+    /_test\./,
+    /integrity-check\.md$/,
+    /gate-levels\.md$/,
+    /vocabulary-registry\.md$/,
+    /REQ-0108\.md$/,
+    /REQ-0112\.md$/,
+    /design-principles\.md$/,
+    /command-authoring-standards\.md$/,
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+
+    function scanDir(scanPath: string): void {
+      const entries = fs.readdirSync(scanPath, { withFileTypes: true }) as import("fs").Dirent[];
+      for (const entry of entries) {
+        const fullPath = path.join(scanPath, entry.name);
+        const relPath = resolveRelative(fullPath, root);
+
+        if (entry.isDirectory()) {
+          scanDir(fullPath);
+          continue;
+        }
+
+        if (!entry.name.endsWith(".md")) continue;
+        if (exemptPatterns.some((p) => p.test(relPath))) continue;
+
+        const content = readText(fullPath);
+        if (!content) continue;
+
+        for (const { pattern, name } of PATTERN_RESIDUAL_PATTERNS) {
+          pattern.lastIndex = 0;
+          if (pattern.test(content)) {
+            foundViolation = true;
+            results.push(warn(
+              "Canonical", "pattern-residual",
+              `Pattern label '${name}' detected in ${relPath} — Pattern A/B/C/D classification is deprecated (REQ-0108-111)`,
+              relPath,
+              undefined,
+              { evidence: name, expected: "Pattern labels should not appear in active documents", route: "intake" }
+            ));
+          }
+        }
+      }
+    }
+
+    scanDir(dir);
+  }
+
+  if (!foundViolation) {
+    results.push(ok("Canonical", "pattern-residual", "No Pattern A/B/C/D residual labels detected in active documents"));
+  }
+  return results;
+}
+
+// ─── req-backlog residual detection (REQ-0108-112) ────────────────────────
+
+function checkReqBacklogResidual(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqBacklogPattern = /\breq-backlog\b/gi;
+  let foundViolation = false;
+
+  const exemptPatterns = [
+    /retired\//,
+    /mapping-table/,
+    /\.test\./,
+    /_test\./,
+    /integrity-check\.md$/,
+    /gate-levels\.md$/,
+    /vocabulary-registry\.md$/,
+    /REQ-0105\.md$/,
+    /ADR-\d{4}\.md$/,
+  ];
+
+  const dirsToScan = [
+    path.join(root, ".opencode", "commands"),
+    path.join(root, ".opencode", "skills"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+    path.join(root, "docs", "requirements"),
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+
+    function scanDir(scanPath: string): void {
+      const entries = fs.readdirSync(scanPath, { withFileTypes: true }) as import("fs").Dirent[];
+      for (const entry of entries) {
+        const fullPath = path.join(scanPath, entry.name);
+        const relPath = resolveRelative(fullPath, root);
+
+        if (entry.isDirectory()) {
+          scanDir(fullPath);
+          continue;
+        }
+
+        if (!entry.name.endsWith(".md")) continue;
+        if (exemptPatterns.some((p) => p.test(relPath))) continue;
+
+        const content = readText(fullPath);
+        if (!content) continue;
+
+        const lines = content.split("\n");
+        for (let i = 0; i < lines.length; i++) {
+          reqBacklogPattern.lastIndex = 0;
+          if (reqBacklogPattern.test(lines[i])) {
+            foundViolation = true;
+            results.push(ng(
+              "Canonical", "req-backlog-residual",
+              "req-backlog reference detected (abolished per REQ-0105-038)",
+              relPath, i + 1,
+              { evidence: lines[i].trim(), expected: "req-backlog is abolished; use backlog-review / backlog-save flow", route: "intake" }
+            ));
+          }
+        }
+      }
+    }
+
+    scanDir(dir);
+  }
+
+  if (!foundViolation) {
+    results.push(ok("Canonical", "req-backlog-residual", "No req-backlog residual references detected"));
+  }
+  return results;
+}
+
+// ─── Abolished skill reference detection (REQ-0108-126, 127) ──────────────
+
+const ABOLISHED_SKILLS = [
+  "agentdev-workflow-reporting",
+];
+
+function checkAbolishedSkillReference(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  const dirsToScan = [
+    path.join(root, ".opencode", "commands"),
+    path.join(root, ".opencode", "skills"),
+    path.join(root, "docs", "specs"),
+  ];
+
+  const exemptPatterns = [
+    /\.test\./,
+    /_test\./,
+    /integrity-check\.md$/,
+    /vocabulary-registry\.md$/,
+    /gate-levels\.md$/,
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+
+    function scanDir(scanPath: string): void {
+      const entries = fs.readdirSync(scanPath, { withFileTypes: true }) as import("fs").Dirent[];
+      for (const entry of entries) {
+        const fullPath = path.join(scanPath, entry.name);
+        const relPath = resolveRelative(fullPath, root);
+
+        if (entry.isDirectory()) {
+          // Check if the directory itself is an abolished skill
+          for (const abolished of ABOLISHED_SKILLS) {
+            if (entry.name === abolished) {
+              foundViolation = true;
+              results.push(ng(
+                "Canonical", "abolished-skill-reference",
+                `Abolished skill directory '${abolished}' still exists`,
+                relPath,
+                undefined,
+                { evidence: abolished, expected: "abolished skill directory should be removed", route: "intake" }
+              ));
+            }
+          }
+          scanDir(fullPath);
+          continue;
+        }
+
+        if (!entry.name.endsWith(".md")) continue;
+        if (exemptPatterns.some((p) => p.test(relPath))) continue;
+
+        const content = readText(fullPath);
+        if (!content) continue;
+
+        for (const abolished of ABOLISHED_SKILLS) {
+          const pattern = new RegExp(abolished.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+          if (pattern.test(content)) {
+            foundViolation = true;
+            results.push(ng(
+              "Canonical", "abolished-skill-reference",
+              `Reference to abolished skill '${abolished}' detected`,
+              relPath,
+              undefined,
+              { evidence: abolished, expected: `skill '${abolished}' is abolished; remove references`, route: "intake" }
+            ));
+          }
+        }
+      }
+    }
+
+    scanDir(dir);
+  }
+
+  if (!foundViolation) {
+    results.push(ok("Canonical", "abolished-skill-reference", "No references to abolished skills detected"));
+  }
+  return results;
+}
+
+// ─── REQ range staleness check (INC-0027) ─────────────────────────────────
+
+function checkReqRangeStaleness(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqDir = path.join(root, "docs", "requirements");
+  const reqFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-") && f !== "README.md");
+  const actualCount = reqFiles.length;
+
+  if (actualCount === 0) {
+    results.push(info("Canonical", "req-range-staleness", "No active REQ files found"));
+    return results;
+  }
+
+  const actualIds = reqFiles.map((f) => f.replace(".md", "")).sort();
+  const firstId = actualIds[0];
+  const lastId = actualIds[actualIds.length - 1];
+
+  // Extract range from text: patterns like "REQ-0101 through REQ-0114", "REQ-0101〜REQ-0114", "REQ-0101~REQ-0114"
+  const rangePattern = /REQ-\d{4}\s*(?:through|〜|~|から|through)\s*REQ-\d{4}/gi;
+
+  const filesToCheck: { absPath: string; label: string }[] = [
+    { absPath: path.join(root, "AGENTS.md"), label: "AGENTS.md" },
+    { absPath: path.join(root, "docs", "specs", "system.md"), label: "system.md" },
+    { absPath: path.join(root, "docs", "guides", "project-docs-and-specs.md"), label: "project-docs-and-specs.md" },
+    { absPath: path.join(root, "docs", "DOC-MAP.md"), label: "DOC-MAP.md" },
+  ];
+
+  let foundStale = false;
+
+  for (const { absPath, label } of filesToCheck) {
+    const content = readText(absPath);
+    if (!content) continue;
+
+    // Check range expressions
+    rangePattern.lastIndex = 0;
+    const rangeMatches = content.match(rangePattern);
+    if (rangeMatches) {
+      for (const match of rangeMatches) {
+        const ids = match.match(/REQ-\d{4}/g);
+        if (ids && ids.length === 2) {
+          const rangeEnd = ids[1];
+          if (rangeEnd !== lastId) {
+            foundStale = true;
+            results.push(ng(
+              "Canonical", "req-range-staleness",
+              `${label} states REQ range ending at ${rangeEnd} but actual last active REQ is ${lastId} (${actualCount} files)`,
+              resolveRelative(absPath, root),
+              undefined,
+              { evidence: match, expected: `REQ range should end at ${lastId}`, route: "intake" }
+            ));
+          }
+        }
+      }
+    }
+
+    // Check count expressions: "11件", "14件", "11 件" etc.
+    const countPattern = /(?:active\s*REQ|現行.*REQ|REQ.*件)\s*(?:は\s*)?(\d+)\s*件/gi;
+    let countMatch;
+    while ((countMatch = countPattern.exec(content)) !== null) {
+      const statedCount = parseInt(countMatch[1], 10);
+      if (statedCount !== actualCount) {
+        foundStale = true;
+        results.push(ng(
+          "Canonical", "req-range-staleness",
+          `${label} states ${statedCount} active REQs but actual count is ${actualCount}`,
+          resolveRelative(absPath, root),
+          undefined,
+          { evidence: countMatch[0], expected: `${actualCount} active REQs`, route: "intake" }
+        ));
+      }
+    }
+  }
+
+  if (!foundStale) {
+    results.push(ok("Canonical", "req-range-staleness", `REQ range and count consistent across all documents (${actualCount} active REQs, ${firstId}~${lastId})`));
+  }
+  return results;
+}
+
+// ─── Vocabulary registry compliance check ─────────────────────────────────
+
+function checkVocabularyCompliance(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const registryPath = path.join(root, ".agentdev", "vocabulary-registry.md");
+  const registryContent = readText(registryPath);
+
+  if (!registryContent) {
+    results.push(info("Canonical", "vocabulary-compliance", "Vocabulary registry not found at .agentdev/vocabulary-registry.md"));
+    return results;
+  }
+
+  // Extract deprecated terms from registry (旧語彙 column)
+  const deprecatedTerms: { term: string; current: string }[] = [];
+  const tableRowPattern = /\|\s*`?([^`|\n]+)`?\s*\|\s*`?([^`|\n]+)`?\s*\|\s*([^|\n]*)\s*\|/g;
+  let rowMatch;
+  while ((rowMatch = tableRowPattern.exec(registryContent)) !== null) {
+    const deprecated = rowMatch[1].trim();
+    const current = rowMatch[2].trim();
+    if (deprecated && current && deprecated !== "旧語彙" && deprecated !== "---") {
+      deprecatedTerms.push({ term: deprecated, current });
+    }
+  }
+
+  if (deprecatedTerms.length === 0) {
+    results.push(ok("Canonical", "vocabulary-compliance", "Vocabulary registry parsed but no deprecated terms found"));
+    return results;
+  }
+
+  // The vocabulary compliance is already covered by checkLegacyNamespace, checkExpandedLegacyNamespace,
+  // checkBareSlashScoped, checkReqBacklogResidual, checkPatternResidual, and checkAbolishedSkillReference.
+  // This check serves as a cross-verification that the registry exists and is parseable.
+  results.push(ok("Canonical", "vocabulary-compliance", `Vocabulary registry loaded with ${deprecatedTerms.length} deprecated term entries`));
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -3009,6 +3356,11 @@ async function main(): Promise<void> {
     ...checkRuidGroundReference(root),
     ...checkWorkflowStatusProhibition(root),
     ...checkAcceptedAdrOnlyCitation(root),
+    ...checkPatternResidual(root),
+    ...checkReqBacklogResidual(root),
+    ...checkAbolishedSkillReference(root),
+    ...checkReqRangeStaleness(root),
+    ...checkVocabularyCompliance(root),
   ];
 
   for (const r of results) {
