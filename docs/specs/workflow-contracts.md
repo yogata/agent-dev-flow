@@ -71,6 +71,7 @@ draft（`.sisyphus/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 | `/agentdev/case-open` | REQ ファイルまたは要件 doc | GitHub Issue | req-save または req-define 完了 |
 | `/agentdev/case-run` | GitHub Issue | 実装済みブランチ + PR | case-open 完了 |
 | `/agentdev/case-close` | PR | マージ済み + クローズ済み | case-run 完了 |
+| `/agentdev/case-auto` | 要件 doc | マージ済み + クローズ済み | req-define 完了（明示指定時のみ） |
 | `/agentdev/case-update` | Issue 番号 | 更新済み Issue | Issue 存在 |
 
 ### learning Pipeline
@@ -105,6 +106,7 @@ draft（`.sisyphus/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 | `/agentdev/req-save` | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR, docs index | 壁打ち |
 | `/agentdev/case-open` | 要件doc, specs READ, ADR READ | GitHub Issue | 定義→実行境界 |
 | `/agentdev/case-run` | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ | レビュー完了 |
+| `/agentdev/case-auto` | 要件doc（明示/draft/セッション） | req-save〜case-close の各出力 | 自走完了 |
 | `/agentdev/case-update` | GitHub Issue | GitHub Issue + REQファイル（APPEND/UPDATE対応） | 変更なし |
 | `/agentdev/case-close` | GitHub Issue + PR | なし | レビュー完了 |
 | `/agentdev/learning-refine` | `.agentdev/learning/inbox.md` | `.agentdev/learning/archive/active.md` + `evaluation-report.md` | 学びパイプライン |
@@ -127,6 +129,7 @@ draft（`.sisyphus/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 | `/agentdev/case-open` | READ | READ | READ | — | — | — | — |
 | `/agentdev/case-run` | READ+WRITE | READ | READ | — | — | — | — |
 | `/agentdev/case-close` | — | — | READ | — | WRITE（capture） | WRITE（capture） | — |
+| `/agentdev/case-auto` | READ+WRITE | READ+WRITE | READ+WRITE | — | WRITE（capture） | — | — |
 | `/agentdev/case-update` | — | — | READ+WRITE | — | — | — | — |
 
 ## Workflow Routing
