@@ -32,7 +32,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全パターン共通の関連ドキュメント整合性確認。DOC-MAP整合性確認（REQ-0101）。不足時は警告表示してユーザー判断を仰ぐ
 
 4. **PRマージ**:
-   - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`agentdev-git-worktree` references/git-common-procedures.md Section 3）
+   - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 3）
    - **Squash merge失敗時の自動リトライ**:
      - 失敗時は5秒待機して再試行
      - 最大5回リトライ（初期試行 + 5回リトライ）
@@ -48,7 +48,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 6. **Issueクローズ**: `gh issue close --reason completed`
 
 7. **ブランチ・worktree削除**: `agentdev-git-worktree` の worktree削除手順に従う:
-   - 未コミット変更検出（`agentdev-git-worktree` references/git-common-procedures.md Section 4）
+   - 未コミット変更検出（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 4）
    - squash merge 済みの場合 → `git checkout .` で破棄可（SHALL）
    - .sisyphus/ クリーンアップ
    - worktree remove → Permission denied 時は停止（リトライは skill 定義に従う）
@@ -63,16 +63,16 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
    - 子Issue状態事前取得: `gh issue view --json comments` 等で全子Issueの OPEN/CLOSED 状態を一覧取得しログ出力（例: `子Issue状態一覧: #N1 (OPEN), #N2 (CLOSED), ...`）
    - Epic自動クローズ判定: 全子Issue CLOSED → 自動クローズ。1件以上 OPEN → スキップ
 
-9. **実行前同期**: `agentdev-git-worktree` の 実行前同期（references/git-common-procedures.md Section 1）に従い `git pull --ff-only` を実行。ローカル変更事前チェック・hash検証・不一致時は評価・承認のやり直し
+9. **実行前同期**: `agentdev-git-worktree` の 実行前同期（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 1）に従い `git pull --ff-only` を実行。ローカル変更事前チェック・hash検証・不一致時は評価・承認のやり直し
 
 10. **学びの検知・抽出**: `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断:
     - ユーザーに学びの有無を問うことは禁止
     - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
     - staging stub imported 判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
-    - Post-run intake capture: 本筋外の変更候補を intake item として `.agentdev/intake/inbox/` に保存。PR本文の `## Findings / Intake候補` セクションから回収。Epic横断回収。Split Rule は `agentdev-workflow-lifecycle` → `references/capture-boundaries.md` を SSoT とする
+    - Post-run intake capture: 本筋外の変更候補を intake item として `.agentdev/intake/inbox/` に保存。PR本文の `## Findings / Intake候補` セクションから回収。Epic横断回収。Split Rule（intake / learning 境界）は `docs/specs/workflow-contracts.md` Split Rule セクションを SSoT とする
     - intake と learning を別々の成果物として扱う（SHALL）
 
-11. **Domain state 永続化**: `agentdev-git-worktree` の domain state 永続化（references/git-common-procedures.md Section 2）に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める（SHALL）
+11. **Domain state 永続化**: `agentdev-git-worktree` の domain state 永続化（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 2）に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める（SHALL）
 
 12. **完了報告**: 完了報告templateに従って出力。結果状態に応じたvariantを選択:
     - 全系統成功 → .opencode/commands/agentdev/templates/case-close/standard.md

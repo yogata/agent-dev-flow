@@ -44,7 +44,7 @@ intake-review の判定値は以下の 3 値とする（REQ-0103）:
    - 対応の緊急度・優先度
    - 既存要件・仕様との関連
    - 対応方針の方向性（要件定義が必要か、既に Issue 化可能か）
-   - **learning 分岐判断**: この item は intake ではなく learning に分けるべきものではないか（capture-boundaries.md の split rule 参照）。具体的な修正対象がなく再発防止知見のみの場合は learning に委ねることを推奨
+   - **learning 分岐判断**: この item は intake ではなく learning に分けるべきものではないか（`docs/specs/workflow-contracts.md` Split Rule セクション参照）。具体的な修正対象がなく再発防止知見のみの場合は learning に委ねることを推奨
    - **REQ再構成intakeの判定基準**: REQ再構成intakeは通常のIssue化可否ではなく、REQ再構成レビューへの入力適性で判定する（REQ-0109）。通常intakeとは独立した判定基準を適用する
 
 4. **ユーザーとの対話的レビュー**: 評価結果を提示し、ユーザーと対話しながら判定を確定する:
