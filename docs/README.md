@@ -35,6 +35,7 @@
 - [Artifact Contracts](specs/artifact-contracts.md)
 - [Integrity Contracts](specs/integrity-contracts.md)
 - [Workflow Contracts](specs/workflow-contracts.md)
+- [Runtime Package Boundary](specs/runtime-package-boundary.md)
 
 ## ADR
 
@@ -50,6 +51,7 @@
 - [診断・メンテナンス](guides/diagnostics-and-maintenance.md)
 - [成果物・状態モデル](guides/artifacts-and-state.md)
 - [プロジェクトドキュメントと SPEC](guides/project-docs-and-specs.md)
+- [Consumer Project 導入](guides/consumer-project-setup.md)
 - [トラブルシューティング](guides/troubleshooting.md)
 - [用語集](guides/glossary.md)
 

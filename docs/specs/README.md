@@ -17,6 +17,7 @@ They describe what the system *is* now, as opposed to REQ files that define what
 | [artifact-contracts.md](artifact-contracts.md) | アーティファクト契約 | Command/Skill/Template/Script の入出力・依存方向 |
 | [integrity-contracts.md](integrity-contracts.md) | 整合性契約 | strict/warning/observation 分類と検査カテゴリ |
 | [workflow-contracts.md](workflow-contracts.md) | ワークフロー契約 | コマンドパイプラインの入出力・前提条件 |
+| [runtime-package-boundary.md](runtime-package-boundary.md) | Runtime Package 境界 | Repo type 別 `.opencode/` 定義・命名規約・導入方式・sync 範囲 |
 
 ## Document Relationships (REQ-0101)
 
