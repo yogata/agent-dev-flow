@@ -43,7 +43,7 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 
 | 対象 | リンク |
 |------|--------|
-| コマンド一覧・入出力リファレンス | [commands/agentdev/README.md](.opencode/commands/agentdev/README.md) |
+| コマンド一覧・入出力リファレンス | [commands/agentdev/README.md](src/opencode/commands/agentdev/README.md) |
 | ガイド入口 | [ガイド](docs/guides/README.md) |
 | コマンド選択表 | [コマンド選択](docs/guides/command-selection.md) |
 | 成果物・状態モデル | [成果物・状態モデル](docs/guides/artifacts-and-state.md) |

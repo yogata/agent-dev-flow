@@ -8,7 +8,7 @@ AgentDevFlow の利用でよくある問題と対処法をまとめる。
 
 **症状**: `/agentdev/xxx` を実行してもコマンドが認識されない。
 
-**確認**: `.opencode/commands/agentdev/` に該当コマンドファイルが存在するか確認する。
+**確認**: `.opencode/commands/agentdev/`（runtime projection; source は `src/opencode/commands/agentdev/`）に該当コマンドファイルが存在するか確認する。
 
 **対処**: コマンドファイルが欠落している場合は、リポジトリの最新状態を取得する。
 
