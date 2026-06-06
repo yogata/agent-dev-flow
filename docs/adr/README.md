@@ -27,7 +27,7 @@
 | ADR-0019 | OpenCode Source / Projection 分離 | accepted | 2026-06-06 |
 | ADR-0020 | Adopt /repo/* Namespace for Repo-Local Tooling | accepted | 2026-06-06 |
 | ADR-0021 | Upstream Handoff Metadata Convention | accepted | 2026-06-06 |
-| ADR-0022 | review/refine 系中間コマンドを promote 内フェーズへ統合 | proposed | 2026-06-06 |
+| ADR-0022 | review/refine 系中間コマンドを promote 内フェーズへ統合 | accepted | 2026-06-06 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -43,7 +43,6 @@
 - [ADR-0010](ADR-0010.md) — HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則
 - [ADR-0011](ADR-0011.md) — Manager/orchestrator パターンの限定採用 — 標準構造とはしない
 - [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
-- [ADR-0022](ADR-0022.md) — review/refine 系中間コマンドを promote 内フェーズへ統合
 
 ### accepted
 
@@ -54,6 +53,7 @@
 - [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
 - [ADR-0020](ADR-0020.md) — Adopt /repo/* Namespace for Repo-Local Tooling
 - [ADR-0021](ADR-0021.md) — Upstream Handoff Metadata Convention
+- [ADR-0022](ADR-0022.md) — review/refine 系中間コマンドを promote 内フェーズへ統合
 
 ### deprecated
 
