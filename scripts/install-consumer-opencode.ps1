@@ -1,46 +1,63 @@
 #Requires -Version 7.0
 <#
 .SYNOPSIS
-    Sync .opencode/ projection with selective junctions from src/opencode/.
+    Install AgentDevFlow runtime artifacts into a consumer repository.
 
 .DESCRIPTION
     Three modes:
     - dry-run : Show what would change without making changes
-    - check   : Report divergence between source and projection
-    - apply   : Sync projection to match source
+    - check   : Report divergence between expected and actual state
+    - apply   : Clone/update agent-dev-flow and create selective junctions
 
-    Uses selective junctions instead of whole-directory junction:
-    - .opencode/             = real directory (not a junction)
-    - .opencode/commands/agentdev/  = junction -> src/opencode/commands/agentdev/
-    - .opencode/skills/agentdev-*/  = individual junctions -> src/opencode/skills/agentdev-*/
+    Creates junctions for public runtime artifacts ONLY:
+    - .opencode/commands/agentdev/  = junction -> .agentdev-plugin/src/opencode/commands/agentdev/
+    - .opencode/skills/agentdev-*/  = individual junctions -> .agentdev-plugin/src/opencode/skills/agentdev-*/
 
-    Repo-local artifacts are excluded from junction management (ADR-0020):
-    - .opencode/commands/repo/      = real directory (not a junction, repo-local only)
-    - .opencode/skills/repo-*/      = real directories (not junctions, repo-local only)
+    Does NOT touch repo-local commands/skills:
+    - .opencode/commands/repo/      = real directory (repo-local only)
+    - .opencode/skills/repo-*/      = real directories (repo-local only)
 
 .PARAMETER Mode
     One of: dry-run, check, apply
 
+.PARAMETER PluginDir
+    Directory name for the agent-dev-flow checkout (default: .agentdev-plugin).
+    This directory is created relative to the consumer repo root.
+
+.PARAMETER RepoUrl
+    Git remote URL for agent-dev-flow (default: https://github.com/yogata/agent-dev-flow.git)
+
+.PARAMETER Branch
+    Branch to checkout from agent-dev-flow (default: main)
+
 .EXAMPLE
-    ./sync-opencode.ps1 -Mode dry-run
-    ./sync-opencode.ps1 -Mode check
-    ./sync-opencode.ps1 -Mode apply
+    ./scripts/install-consumer-opencode.ps1 -Mode dry-run
+    ./scripts/install-consumer-opencode.ps1 -Mode check
+    ./scripts/install-consumer-opencode.ps1 -Mode apply
+    ./scripts/install-consumer-opencode.ps1 -Mode apply -PluginDir .agentdev-plugin
 #>
 
 param(
     [Parameter(Mandatory)]
     [ValidateSet('dry-run', 'check', 'apply')]
-    [string]$Mode
+    [string]$Mode,
+
+    [string]$PluginDir = '.agentdev-plugin',
+
+    [string]$RepoUrl = 'https://github.com/yogata/agent-dev-flow.git',
+
+    [string]$Branch = 'main'
 )
 
 $ErrorActionPreference = 'Stop'
-$RepoRoot = $PSScriptRoot
-$SourceDir = Join-Path $RepoRoot 'src\opencode'
+$RepoRoot = $PWD.Path
+$PluginPath = Join-Path $RepoRoot $PluginDir
+$SourceDir = Join-Path $PluginPath 'src\opencode'
 $ProjectionDir = Join-Path $RepoRoot '.opencode'
 $CommandsDir = Join-Path $ProjectionDir 'commands'
 $SkillsDir = Join-Path $ProjectionDir 'skills'
 
-# Repo-local patterns excluded from junction management (ADR-0020)
+# Repo-local patterns excluded from junction management
 $RepoLocalCommandNames = @('repo')
 $RepoLocalSkillPrefix = 'repo-'
 
@@ -61,10 +78,10 @@ function Get-JunctionTarget {
     return $item.Target
 }
 
-function Get-SelectiveJunctionTargets {
+function Get-ConsumerJunctionTargets {
     <#
     .SYNOPSIS
-        Enumerate all selective junction targets dynamically from src/opencode/.
+        Enumerate all junction targets from .agentdev-plugin/src/opencode/.
         Returns sorted array of relative paths (relative to .opencode/) that should be junctioned.
     #>
     $targets = [System.Collections.Generic.List[string]]::new()
@@ -85,26 +102,79 @@ function Get-SelectiveJunctionTargets {
     return ($targets | Sort-Object)
 }
 
+# --- Clone / Update ---
+
+function Initialize-PluginCheckout {
+    <#
+    .SYNOPSIS
+        Clone or update the agent-dev-flow repo into $PluginPath.
+    #>
+    if (Test-Path -LiteralPath (Join-Path $PluginPath '.git')) {
+        Write-Host "[ACTION] Updating existing checkout: $PluginDir"
+        Push-Location -LiteralPath $PluginPath
+        try {
+            git fetch origin
+            git checkout $Branch
+            git reset --hard "origin/$Branch"
+        }
+        finally {
+            Pop-Location
+        }
+    } else {
+        if (Test-Path -LiteralPath $PluginPath) {
+            Write-Error "[ERROR] $PluginDir exists but is not a git repository. Remove it manually and retry."
+            exit 1
+        }
+        Write-Host "[ACTION] Cloning agent-dev-flow into $PluginDir"
+        git clone --branch $Branch --depth 1 $RepoUrl $PluginPath
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "[ERROR] Failed to clone agent-dev-flow"
+            exit 1
+        }
+    }
+}
+
 # --- Main ---
 
+# Clone/update first for all modes (need source to enumerate targets)
+if ($Mode -ne 'check') {
+    Initialize-PluginCheckout
+}
+
 if (-not (Test-Path -LiteralPath $SourceDir)) {
-    Write-Error "[ERROR] Source directory not found: $SourceDir"
+    Write-Error "[ERROR] Source directory not found: $SourceDir. Ensure $PluginDir contains agent-dev-flow checkout."
     exit 1
 }
 
-$targets = Get-SelectiveJunctionTargets
+$targets = Get-ConsumerJunctionTargets
 
 # ============================================================
 # CHECK MODE
 # ============================================================
 
 if ($Mode -eq 'check') {
-    Write-Host '=== Sync Check: selective junctions ==='
+    Write-Host '=== Consumer Install Check ==='
     $divergences = 0
 
-    # 1. .opencode/ must be a real directory (not junction)
+    # 1. Plugin checkout
+    if (-not (Test-Path -LiteralPath (Join-Path $PluginPath '.git'))) {
+        Write-Host "[DIVERGENCE] $PluginDir is not a git repository (clone required)"
+        $divergences++
+    } else {
+        Write-Host "[OK] $PluginDir is a git repository"
+    }
+
+    # 2. Source directory
+    if (-not (Test-Path -LiteralPath $SourceDir)) {
+        Write-Host "[DIVERGENCE] Source directory not found: $SourceDir"
+        $divergences++
+    } else {
+        Write-Host "[OK] Source directory exists: $PluginDir/src/opencode/"
+    }
+
+    # 3. .opencode/ must be a real directory
     if (Test-Junction -Path $ProjectionDir) {
-        Write-Host '[DIVERGENCE] .opencode/ is a whole-directory junction (needs migration to selective)'
+        Write-Host '[DIVERGENCE] .opencode/ is a junction (must be real directory)'
         $divergences++
     } elseif (-not (Test-Path -LiteralPath $ProjectionDir)) {
         Write-Host '[DIVERGENCE] .opencode/ does not exist'
@@ -113,7 +183,7 @@ if ($Mode -eq 'check') {
         Write-Host '[OK] .opencode/ is a real directory'
     }
 
-    # 2. Parent directories must be real directories
+    # 4. Parent directories
     foreach ($parentDir in @($CommandsDir, $SkillsDir)) {
         $parentRel = $parentDir.Substring($ProjectionDir.Length).TrimStart('\', '/')
         if (Test-Junction -Path $parentDir) {
@@ -127,14 +197,13 @@ if ($Mode -eq 'check') {
         }
     }
 
-    # 3. Check each expected junction
+    # 5. Check each expected junction
     foreach ($relPath in $targets) {
         $targetPath = Join-Path $ProjectionDir $relPath
         if (-not (Test-Path -LiteralPath $targetPath)) {
             Write-Host "[DIVERGENCE] Missing junction: $relPath"
             $divergences++
         } elseif (Test-Junction -Path $targetPath) {
-            # Verify junction target points to correct source
             $expectedSource = Join-Path $SourceDir $relPath
             $actualTarget = Get-JunctionTarget -Path $targetPath
             if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $expectedSource).Path)) {
@@ -149,22 +218,7 @@ if ($Mode -eq 'check') {
         }
     }
 
-    # 4. Orphan detection in commands/ and skills/ (skip repo-local artifacts)
-    foreach ($parentRel in @('commands', 'skills')) {
-        $parentPath = Join-Path $ProjectionDir $parentRel
-        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
-        Get-ChildItem -LiteralPath $parentPath -Directory -Force |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            ForEach-Object {
-                $junctionRel = "$parentRel\$($_.Name)"
-                if ($junctionRel -notin $targets) {
-                    Write-Host "[DIVERGENCE] Orphaned junction: $junctionRel"
-                    $divergences++
-                }
-            }
-    }
-
-    # 5. Repo-local directory existence check (informational, not a divergence)
+    # 6. Repo-local directories (informational)
     foreach ($cmdName in $RepoLocalCommandNames) {
         $repoLocalPath = Join-Path $CommandsDir $cmdName
         if (Test-Path -LiteralPath $repoLocalPath) {
@@ -181,7 +235,7 @@ if ($Mode -eq 'check') {
 
     Write-Host ''
     if ($divergences -eq 0) {
-        Write-Host 'No divergence detected. Selective junctions are in sync.'
+        Write-Host 'No divergence detected. Consumer install is in sync.'
     } else {
         Write-Host "$divergences divergence(s) detected."
     }
@@ -193,12 +247,11 @@ if ($Mode -eq 'check') {
 # ============================================================
 
 if ($Mode -eq 'dry-run') {
-    Write-Host '=== Dry Run: selective junction sync ==='
+    Write-Host '=== Consumer Install Dry Run ==='
 
-    # Migration status
-    $isWholeJunction = Test-Junction -Path $ProjectionDir
-    if ($isWholeJunction) {
-        Write-Host '[INFO] Migration required: .opencode/ is a whole-directory junction'
+    # .opencode/ status
+    if (Test-Junction -Path $ProjectionDir) {
+        Write-Host '[INFO] Migration required: .opencode/ is a junction'
     } elseif (-not (Test-Path -LiteralPath $ProjectionDir)) {
         Write-Host '[INFO] .opencode/ does not exist, would create as real directory'
     } else {
@@ -238,50 +291,6 @@ if ($Mode -eq 'dry-run') {
         }
     }
 
-    # Orphan detection (skip repo-local artifacts)
-    Write-Host ''
-    Write-Host '--- Orphan junctions ---'
-    $orphansFound = $false
-    foreach ($parentRel in @('commands', 'skills')) {
-        $parentPath = Join-Path $ProjectionDir $parentRel
-        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
-        Get-ChildItem -LiteralPath $parentPath -Directory -Force |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            ForEach-Object {
-                $junctionRel = "$parentRel\$($_.Name)"
-                if ($junctionRel -notin $targets) {
-                    Write-Host "[WOULD REMOVE] Orphaned junction: $junctionRel"
-                    $orphansFound = $true
-                }
-            }
-    }
-    if (-not $orphansFound) {
-        Write-Host '[OK] No orphan junctions detected'
-    }
-
-    # Repo-local directory status (informational)
-    Write-Host ''
-    Write-Host '--- Repo-local artifacts (not junction-managed, ADR-0020) ---'
-    $repoLocalFound = $false
-    foreach ($cmdName in $RepoLocalCommandNames) {
-        $repoLocalPath = Join-Path $CommandsDir $cmdName
-        if (Test-Path -LiteralPath $repoLocalPath) {
-            Write-Host "[OK] Repo-local command: commands\$cmdName"
-            $repoLocalFound = $true
-        }
-    }
-    if (Test-Path -LiteralPath $SkillsDir) {
-        Get-ChildItem -LiteralPath $SkillsDir -Directory -Force |
-            Where-Object { $_.Name -like "$RepoLocalSkillPrefix*" } |
-            ForEach-Object {
-                Write-Host "[OK] Repo-local skill: skills\$($_.Name)"
-                $repoLocalFound = $true
-            }
-    }
-    if (-not $repoLocalFound) {
-        Write-Host '[INFO] No repo-local artifacts found'
-    }
-
     Write-Host ''
     Write-Host 'Dry run complete. No changes made.'
     exit 0
@@ -292,15 +301,14 @@ if ($Mode -eq 'dry-run') {
 # ============================================================
 
 if ($Mode -eq 'apply') {
-    Write-Host '=== Apply: syncing .opencode/ selective junctions ==='
+    Write-Host '=== Consumer Install: applying junctions ==='
 
-    # Step 1: Migration Detection
-    $isWholeJunction = Test-Junction -Path $ProjectionDir
-    if ($isWholeJunction) {
-        Write-Host '[ACTION] Migrating: removing whole-directory junction .opencode/'
+    # Step 1: Ensure .opencode/ is a real directory
+    if (Test-Junction -Path $ProjectionDir) {
+        Write-Host '[ACTION] Removing whole-directory junction .opencode/'
         $rmResult = cmd /c "rmdir `"$ProjectionDir`"" 2>&1
         if ($LASTEXITCODE -ne 0) {
-            Write-Error "[ERROR] Failed to remove whole-directory junction: $rmResult"
+            Write-Error "[ERROR] Failed to remove junction: $rmResult"
             exit 1
         }
         Write-Host '[ACTION] Creating .opencode/ as real directory'
@@ -312,12 +320,7 @@ if ($Mode -eq 'apply') {
         Write-Host '[OK] .opencode/ exists as real directory'
     }
 
-    # Step 2: Parent Directories
-    if (Test-Junction -Path $ProjectionDir) {
-        Write-Error '[ERROR] .opencode/ is a junction (must be real directory)'
-        exit 1
-    }
-
+    # Step 2: Parent directories
     foreach ($parentRel in @('commands', 'skills')) {
         $parentPath = Join-Path $ProjectionDir $parentRel
         if (Test-Junction -Path $parentPath) {
@@ -362,7 +365,6 @@ if ($Mode -eq 'apply') {
         }
 
         Write-Host "[ACTION] Creating junction: $relPath"
-        # Use absolute source path for mklink (robust regardless of $PWD)
         $result = cmd /c "mklink /J `"$targetPath`" `"$sourcePath`" 2>&1"
         if ($LASTEXITCODE -ne 0) {
             Write-Error "[ERROR] Failed to create junction ${relPath}: $result"
@@ -370,30 +372,9 @@ if ($Mode -eq 'apply') {
         }
     }
 
-    # Step 4: Orphan Junction Cleanup (skip repo-local artifacts)
+    # Step 4: Repo-local directories (informational)
     Write-Host ''
-    Write-Host '--- Orphan cleanup ---'
-    foreach ($parentRel in @('commands', 'skills')) {
-        $parentPath = Join-Path $ProjectionDir $parentRel
-        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
-        Get-ChildItem -LiteralPath $parentPath -Directory -Force |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            ForEach-Object {
-                $junctionRel = "$parentRel\$($_.Name)"
-                if ($junctionRel -notin $targets) {
-                    Write-Host "[ACTION] Removing orphan junction: $junctionRel"
-                    $rmResult = cmd /c "rmdir `"$($_.FullName)`"" 2>&1
-                    if ($LASTEXITCODE -ne 0) {
-                        Write-Error "[ERROR] Failed to remove orphan junction: $junctionRel ($rmResult)"
-                        exit 1
-                    }
-                }
-            }
-    }
-
-    # Step 5: Report repo-local artifacts (informational)
-    Write-Host ''
-    Write-Host '--- Repo-local artifacts (skipped, ADR-0020) ---'
+    Write-Host '--- Repo-local artifacts (not junction-managed) ---'
     foreach ($cmdName in $RepoLocalCommandNames) {
         $repoLocalPath = Join-Path $CommandsDir $cmdName
         if (Test-Path -LiteralPath $repoLocalPath) {
@@ -409,6 +390,12 @@ if ($Mode -eq 'apply') {
     }
 
     Write-Host ''
-    Write-Host 'Sync complete.'
+    Write-Host 'Consumer install complete.'
+    Write-Host ''
+    Write-Host 'Recommended .gitignore entries:'
+    Write-Host "  $PluginDir/"
+    Write-Host '  .sisyphus/'
+    Write-Host '  .opencode/commands/agentdev/'
+    Write-Host '  .opencode/skills/agentdev-*/'
     exit 0
 }

@@ -66,3 +66,41 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 ```
 /agentdev/case-auto     # req-save → case-open → case-run → case-close を自走（明示指定時のみ）
 ```
+
+## Consumer Repository Installation
+
+AgentDevFlow を外部プロジェクトに導入する手順。
+
+### Install
+
+```powershell
+# 1. scripts/ を consumer リポジトリにコピー
+# 2. インストール実行（clone + junction 作成）
+./scripts/install-consumer-opencode.ps1 -Mode apply
+```
+
+### Check
+
+```powershell
+# インストール状態を確認
+./scripts/check-consumer-opencode.ps1
+```
+
+### Update
+
+```powershell
+# agent-dev-flow の最新を取得して再同期
+cd .agentdev-plugin && git pull && cd ..
+./scripts/install-consumer-opencode.ps1 -Mode apply
+```
+
+### Recommended .gitignore
+
+```gitignore
+.agentdev-plugin/
+.sisyphus/
+.opencode/commands/agentdev/
+.opencode/skills/agentdev-*/
+```
+
+> `.agentdev/` は gitignore に**含めない**こと（domain state として git 管理対象）。

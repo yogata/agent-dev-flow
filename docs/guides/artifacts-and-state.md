@@ -44,6 +44,8 @@ Command は判定ロジックを直接記述せず Skill を参照する。Skill
 
 ## ディレクトリ構造
 
+### Self-hosting (agent-dev-flow 本体)
+
 ```
 docs/
   requirements/REQ-{NNNN}.md    # 要件定義（基準）
@@ -66,13 +68,42 @@ docs/
 src/opencode/                     # Canonical source
   commands/agentdev/             # Command source
   skills/agentdev-*/             # Skill source
+scripts/
+  sync-self-opencode.ps1         # self-hosting 用同期スクリプト
+  install-consumer-opencode.ps1  # consumer 用インストールスクリプト
+  check-consumer-opencode.ps1    # consumer 用状態確認スクリプト
 .sisyphus/                       # 一時的 runtime 作業領域（domain state ではない、ADR-0018）
   drafts/                        # command workflow の作業用一時領域（明示的 handoff のみ使用）
 ```
 
+### Consumer-with-agentdev (適用プロジェクト)
+
+```
+.agentdev-plugin/                # agent-dev-flow の git clone 先（consumer 専用）
+  src/opencode/                  # canonical source（clone 内）
+    commands/agentdev/           # Command source
+    skills/agentdev-*/           # Skill source
+.agentdev/
+  intake/                        # Intake パイプライン domain state
+    inbox/ accepted/ promoted/ archive/
+  learning/                      # Learning パイプライン domain state
+  backlog/req-units/RU-*.md      # Requirement Unit
+  integrity/                     # 整合性検証レポート
+.opencode/                       # Runtime projection (junction → .agentdev-plugin/src/opencode/)
+  commands/agentdev/             # junction → .agentdev-plugin/src/opencode/commands/agentdev/
+  commands/{local}/              # project-local command（real directory）
+  skills/agentdev-*/             # junction → .agentdev-plugin/src/opencode/skills/agentdev-*/
+  skills/{local}-*/              # project-local skill（real directory）
+scripts/
+  install-consumer-opencode.ps1  # consumer 用インストールスクリプト
+  check-consumer-opencode.ps1    # consumer 用状態確認スクリプト
+.sisyphus/                       # 一時的 runtime 作業領域
+```
+
 ### ディレクトリ責務の補足
 
-- `.agentdev/`: AgentDevFlow の canonical domain state。intake / learning / backlog / integrity の永続データを管理する。配布物ではなく、レポジトリの動作状態を保持する（ADR-0017）。
+- `.agentdev/`: AgentDevFlow の canonical domain state。intake / learning / backlog / integrity の永続データを管理する。配布物ではなく、レポジトリの動作状態を保持する（ADR-0017）。self-hosting / consumer 共に使用される。
+- `.agentdev-plugin/`: consumer リポジトリにおける agent-dev-flow の git clone 先（REQ-0103-072~077）。self-hosting repo では使用しない。`.gitignore` で管理対象外とする。
 - `.sisyphus/`: runtime 一時作業領域。domain state ではなく、`.gitignore` で管理対象外とする（ADR-0018）。
 - `.sisyphus/drafts/`: command workflow でのみ明示的に定義された working draft handoff に使用する一時領域。
 
