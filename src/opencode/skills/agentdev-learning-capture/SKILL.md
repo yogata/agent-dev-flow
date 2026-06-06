@@ -15,11 +15,11 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 ## 実観測ベース原則
 
-**実観測に基づき、下流に委ねる。** エージェント SHALL は実際に観測した事象に基づいて学び候補を抽出する。取捨選択・昇格判断は下流の `/agentdev/learning-refine`・`/agentdev/learning-promote`・prune で行うため、capture 段階では以下の方針をとる：
+**実観測に基づき、下流に委ねる。** エージェント SHALL は実際に観測した事象に基づいて学び候補を抽出する。取捨選択・昇格判断は下流の `/agentdev/learning-promote`・prune で行うため、capture 段階では以下の方針をとる：
 
 - **実観測ベースの抽出** — エージェントが実際に検知・回避・修正した問題のみを対象とする。推測のみのエントリは保存しない（SHALL）
-- **品質評価を保留する** — 「これは本当に学びか？」の判断は refine に任せる。ただし観測事実がないエントリはそもそも抽出の対象外である
-- **重複を気にしない** — 類似エントリの統合は refine が行う
+- **品質評価を保留する** — 「これは本当に学びか？」の判断は promote に任せる。ただし観測事実がないエントリはそもそも抽出の対象外である
+- **重複を気にしない** — 類似エントリの統合は promote が行う
 
 ## 主な捕捉対象
 
@@ -53,7 +53,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 学びの保存先：
 - `.agentdev/learning/inbox.md` — 最新の学び（常にここに追加）
-- `.agentdev/learning/archive/active.md` — 過去の学び（`/agentdev/learning-refine` 実行時に移動）
+- `.agentdev/learning/archive/active.md` — 過去の学び（`/agentdev/learning-promote` 実行時に移動）
 
 > **注意**: inbox.md、archive/active.mdが存在しない場合、エージェント SHALL は当該ファイルを作成してから追記する。
 
@@ -83,7 +83,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 > **基準テンプレート**: [references/capture-entry-template.md](references/capture-entry-template.md) — エージェント SHALL は推論でフォーマットを組み立てず、この基準テンプレートから取得すること。
 
-> **注意**: `**タグ**` フィールドは人間の可読性のため保持している。セマンティック分析（`/agentdev/learning-refine`）ではタグに依存せず、LLMが内容からテーマを判定する。
+> **注意**: `**タグ**` フィールドは人間の可読性のため保持している。セマンティック分析（`/agentdev/learning-promote` 内部フェーズ）ではタグに依存せず、LLMが内容からテーマを判定する。
 
 #### フィールド記述ガイドライン
 
@@ -120,7 +120,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 inbox.mdのエントリ数（`## ` で始まる行）をカウントする。
 15件以上の場合、以下を提案する：
 
-> inbox.mdが{N}件になっています。`/agentdev/learning-refine` で分析することを推奨します。
+> inbox.mdが{N}件になっています。`/agentdev/learning-promote` で分析することを推奨します。
 
 ---
 
@@ -138,7 +138,7 @@ inbox.mdのエントリ数（`## ` で始まる行）をカウントする。
 3. **13フィールドを完備** — 全フィールドを埋めることで下流の分析精度が向上する
 4. **ADR/REQ/spec影響を見逃さない** — ユーザー確認「あり」の場合は特に注意深く評価
 5. **ユーザーへの通知は行うが承認は求めない** — 学びの内容は通知するが、承認や却下は求めない
-6. **inbox.mdが溜まったら** — 15件以上で `/agentdev/learning-refine` を提案
+6. **inbox.mdが溜まったら** — 15件以上で `/agentdev/learning-promote` を提案
 
 ---
 

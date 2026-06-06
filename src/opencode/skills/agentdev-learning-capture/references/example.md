@@ -153,23 +153,19 @@
 ### Layer 2: Analysis Phase (セマンティック分析と整理)
 
 ```
-/agentdev/learning-refine
+/agentdev/learning-promote
 ```
 
-→ 実行内容:
+→ 実行内容（内部分析フェーズ）:
   - inbox.md + archive/active.md のエントリを問題クラス分類（根本原因+再発条件+予防策が同じ単位）
   - 8軸評価スコアを算出し evaluation-report.md を生成
-  - （任意）archive/active.md の古い単発レアケースを refine 時 prune
+  - （任意）archive/active.md の古い単発レアケースを prune
   - ユーザー承認後、inbox.md の全エントリを archive/active.md（生きている learning プール）に移動
   - inbox.md をクリア
 
 ### Layer 3: Promotion Phase (昇華判定とスタブ生成)
 
-```
-/agentdev/learning-promote
-```
-
-→ 実行内容:
+→ 実行内容（昇華判定フェーズ、引き続き learning-promote 内）:
   - evaluation-report.md の問題クラスを主入力として分析
   - 各クラスタを11処分区分 + duplicate で判定
   - 既存 command/skill/template/docs に同種対策が存在するか照合

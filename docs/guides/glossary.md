@@ -14,10 +14,8 @@ AgentDevFlow で使う用語の定義。
 | case-update | ケース・アップデート | Issue の本文更新・コメント追加を行うコマンド |
 | intake-capture | インテイク・キャプチャ | 手動で気づき・課題を inbox に記録するコマンド |
 | intake-from-github | インテイク・フロム・ギットハブ | クローズ済み Issue/PR から改善候補を抽出するコマンド |
-| intake-review | インテイク・レビュー | inbox の item を採用・保留・却下に振り分けるコマンド |
-| intake-promote | インテイク・プロモート | accepted item を promoted artifact に整形するコマンド |
-| learning-refine | ラーニング・リファイン | learning entry を分析・分類するコマンド |
-| learning-promote | ラーニング・プロモート | 昇華判定済み artifact を生成するコマンド |
+| intake-promote | インテイク・プロモート | inbox の item をレビュー・採用・却下・保留判定し、promoted artifact に整形するコマンド |
+| learning-promote | ラーニング・プロモート | learning entry を分析・分類・昇華判定し、Requirement Source stub を生成するコマンド |
 | backlog-review | バックログ・レビュー | promoted artifact を分析・統合するコマンド |
 | backlog-save | バックログ・セーブ | RU を生成・永続化するコマンド |
 | integrity-check | インテグリティ・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド |
@@ -35,7 +33,7 @@ AgentDevFlow で使う用語の定義。
 | RU（Requirement Unit） | intake/learning の promoted artifact を統合した構造化成果物。`.agentdev/backlog/req-units/RU-*.md` に配置 |
 | promoted artifact | backlog-review の入力となる整形済み成果物。intake/learning それぞれの `promoted/` に配置 |
 | session-sourced RU | チャット内で合意形成済みの内容を直接保存した RU |
-| evaluation-report | learning-refine と learning-promote の間に位置する境界 artifact |
+| evaluation-report | learning-promote 内部で生成される分析レポート。同コマンドの昇華判定フェーズの入力として使用される |
 
 ## パイプライン
 
