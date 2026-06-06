@@ -17,6 +17,8 @@ agent: sisyphus
 
 ## Steps
 
+0. **upstream handoff 停止判定**（REQ-0104-025）: 要件docまたは RU に `apply_in_current_project: false` が含まれる場合、Issue を作成せず停止する。agent-dev-flow repository への手動取り込み対象として報告する。判定は `agentdev-workflow-lifecycle/references/upstream-handoff.md` に従う
+
 1. 要件docからIssue本文を生成:
    - `docs/requirements/REQ-{NNNN}.md` が存在する場合: REQ内容（目的/要件/適用範囲）を読み取り、Issue本文に反映
    - 存在しない場合: セッション内の要件docから直接生成

@@ -71,8 +71,9 @@ sources:
 
 1. `.agentdev/backlog/req-units/` が存在しない場合は作成
 2. 各 RU について:
-   - frontmatter 生成（source_type, generated_by: backlog-save, generated_at, status: draft, sources）
-   - Sources セクション: 各 source の要点（パススルー禁止）
+    - frontmatter 生成（source_type, generated_by: backlog-save, generated_at, status: draft, sources）
+    - **upstream handoff metadata 転記**（REQ-0104-024）: review draft に `handoff_target` と `apply_in_current_project: false` が存在する場合、RU frontmatter に転記する。RU 本文に現在プロジェクトでは実装しない upstream handoff 用 RU であることを記載する
+    - Sources セクション: 各 source の要点（パススルー禁止）
    - Source Summary セクション: 統合サマリ
    - 統合理由セクション: N:1/1:N の理由
    - 要件化の方向セクション: req-define への推奨方向

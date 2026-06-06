@@ -29,6 +29,8 @@ agent: prometheus
 
 2. **壁打ち対話** → `agentdev-req-analysis` の壁打ちメソドロジーに従って深掘り。明示入力ファイルがある場合、その内容を開始点として活用
 
+   **2a. upstream handoff 判定**（REQ-0104-022）: 入力が AgentDevFlow 本体・配布 command・配布 skill・配布 template・配布 script の不具合または改善点を対象とする場合、`agentdev-workflow-lifecycle/references/upstream-handoff.md` に従い upstream handoff 用 RU 入力として整理する。現在プロジェクトの通常要件docとして定義せず、出力に `handoff_target: agent-dev-flow` と `apply_in_current_project: false` を含める
+
 3. **既存REQ照合** → `agentdev-req-file-manager` の照合方法論に従って実行（REQ-0104）。APPEND-first ルール（REQ-0104〜028）: CREATE 前に APPEND/UPDATE 候補を必ず評価。SPLIT 検出時は保存操作ではなく requirements review 候補として扱う。操作分類結果は `draft-meta` に記録
 
 4. **要件展開** → `agentdev-req-analysis` の分析観点に従って網羅
