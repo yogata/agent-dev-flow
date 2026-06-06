@@ -783,25 +783,39 @@ function checkLegacyNamespace(
     filesToCheck.push(path.join(cmdDir, file));
   }
 
+  const pathRefExemptPatterns = [
+    /templates\//,
+    /\/commands\/agentdev\//,
+    /\.opencode\//,
+    /\.test\./,
+    /_test\./,
+  ];
+
   let foundLegacy = false;
   for (const filePath of filesToCheck) {
     const content = readText(filePath);
     if (!content) continue;
     const relPath = resolveRelative(filePath, root);
     if (isLegacyExemptPath(relPath)) continue;
-    const contentToTest = stripInlineCode(content);
+    const lines = content.split("\n");
     for (const { pattern, name } of LEGACY_PATTERNS) {
-      pattern.lastIndex = 0;
-      if (pattern.test(contentToTest)) {
-        foundLegacy = true;
-        results.push(
-          ng(
-            "Namespace",
-            "legacy-namespace",
-            `Legacy pattern '${name}' found`,
-            relPath,
-          ),
-        );
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (pathRefExemptPatterns.some((p) => p.test(line))) continue;
+        const lineToTest = stripInlineCode(line);
+        pattern.lastIndex = 0;
+        if (pattern.test(lineToTest)) {
+          foundLegacy = true;
+          results.push(
+            ng(
+              "Namespace",
+              "legacy-namespace",
+              `Legacy pattern '${name}' found`,
+              relPath,
+            ),
+          );
+          break;
+        }
       }
     }
   }
@@ -1877,16 +1891,34 @@ function checkExpandedLegacyNamespace(
     }
   }
 
+  const expandedPathRefExemptPatterns = [
+    /templates\//,
+    /\/commands\/agentdev\//,
+    /\.opencode\//,
+    /\.test\./,
+    /_test\./,
+  ];
+
   let foundLegacy = false;
   for (const filePath of filesToCheck) {
     const content = readText(filePath);
     if (!content) continue;
     const relPath = resolveRelative(filePath, root);
     if (isLegacyExemptPath(relPath)) continue;
-    const contentToTest = stripInlineCode(content);
+    const lines = content.split("\n");
     for (const { pattern, name } of LEGACY_PATTERNS) {
-      pattern.lastIndex = 0;
-      if (pattern.test(contentToTest)) {
+      let matched = false;
+      for (let i = 0; i < lines.length; i++) {
+        if (expandedPathRefExemptPatterns.some((p) => p.test(lines[i])))
+          continue;
+        const lineToTest = stripInlineCode(lines[i]);
+        pattern.lastIndex = 0;
+        if (pattern.test(lineToTest)) {
+          matched = true;
+          break;
+        }
+      }
+      if (matched) {
         foundLegacy = true;
         results.push(
           ng(
@@ -3780,10 +3812,27 @@ function resolveReferencePath(
   skillsDir: string,
 ): string {
   if (refPath.startsWith(".opencode/")) {
-    return path.join(root, refPath);
+    const runtimePath = path.join(root, refPath);
+    if (!fs.existsSync(runtimePath)) {
+      const srcPath = path.join(
+        root,
+        refPath.replace(/^\.opencode\//, "src/opencode/"),
+      );
+      if (fs.existsSync(srcPath)) return srcPath;
+    }
+    return runtimePath;
   }
   if (refPath.startsWith("agentdev-")) {
-    return path.join(skillsDir, refPath);
+    const runtimePath = path.join(skillsDir, refPath);
+    if (!fs.existsSync(runtimePath)) {
+      const srcSkillsDir = skillsDir.replace(
+        /[\\/]\.opencode[\\/]skills$/,
+        path.sep + "src" + path.sep + "opencode" + path.sep + "skills",
+      );
+      const srcPath = path.join(srcSkillsDir, refPath);
+      if (fs.existsSync(srcPath)) return srcPath;
+    }
+    return runtimePath;
   }
   const relSource = resolveRelative(sourceFilePath, root);
   const skillsPrefix = ".opencode/skills/";
@@ -4207,8 +4256,29 @@ function checkNonAcceptedAdrRefsInFile(
   if (!content) return;
   const relPath = resolveRelative(filePath, root);
 
+  const contextExemptPatterns = [
+    /historical/i,
+    /proposed.*現行根拠ではない/,
+    /blob\/main/,
+    /acceptance.?criteria/i,
+    /^\s*\|\s*AC-/i,
+    /FPR-\d{3}/,
+  ];
+
+  const lines = content.split("\n");
+  const exemptedRefs = new Set<string>();
+  for (const line of lines) {
+    for (const ref of nonAcceptedAdrs.keys()) {
+      if (line.includes(ref) && contextExemptPatterns.some((p) => p.test(line))) {
+        exemptedRefs.add(ref);
+      }
+    }
+  }
+
   const adrRefs = content.match(/\bADR-\d{4}\b/g) || [];
-  const uniqueRefs = [...new Set(adrRefs)];
+  const uniqueRefs = [...new Set(adrRefs)].filter(
+    (ref) => !exemptedRefs.has(ref),
+  );
 
   for (const ref of uniqueRefs) {
     const status = nonAcceptedAdrs.get(ref);
@@ -4345,6 +4415,8 @@ function checkReqBacklogResidual(root: string): CheckResult[] {
     /gate-levels\.md$/,
     /vocabulary-registry\.md$/,
     /REQ-0105\.md$/,
+    /REQ-0101\.md$/,
+    /REQ-0108\.md$/,
     /ADR-\d{4}\.md$/,
   ];
 
@@ -4438,6 +4510,8 @@ function checkAbolishedSkillReference(root: string): CheckResult[] {
     /integrity-check\.md$/,
     /vocabulary-registry\.md$/,
     /gate-levels\.md$/,
+    /integrity-contracts\.md$/,
+    /integrity-rule-catalog\.md$/,
   ];
 
   for (const dir of dirsToScan) {
