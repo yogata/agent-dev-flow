@@ -1,13 +1,13 @@
 ---
-description: promoted artifact を分析・統合し、ユーザー承認を得て review 結果を保存する
+description: promoted artifact を分析・統合し、ユーザー承認後に RU（Requirement Unit）を生成する
 agent: sisyphus
 ---
 
 # Backlog Review
 
-`.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` の promoted artifact を読み込み、分析・統合してユーザーに判定を提示し、承認結果を draft として保存する。
+`.agentdev/intake/promoted/*.md` 及び `.agentdev/learning/promoted/*.md` の promoted artifact を読み込み、分析・統合してユーザーに判定を提示し、承認後に直接 RU を生成する（REQ-0105-058, 059）。
 
-**このコマンドは RU ファイルを生成しない（MUST NOT）（REQ-0105-033）。** 承認済み review 結果の保存のみを行う。RU 生成は `/agentdev/backlog-save` が担当する。
+**このコマンドはユーザー承認後に RU を生成する。ユーザー承認は RU 作成承認を兼ねる（REQ-0105-059）。**
 
 ## Input
 
@@ -17,7 +17,41 @@ agent: sisyphus
 
 ## Output
 
-- `.sisyphus/drafts/backlog-review-{topic-slug}.md`（status: reviewed）
+- `.agentdev/backlog/req-units/RU-*.md`（Requirement Unit）
+- 成功した promoted artifact の削除
+
+## RU フォーマット
+
+RU-*.md は以下の構造に従う（REQ-0105）:
+
+```markdown
+---
+source_type: {intake | learning | mixed | chat}
+generated_by: backlog-review
+generated_at: {ISO 8601 timestamp}
+status: draft
+depends_on: [RU-{NNNN}] (optional, REQ-0105-066)
+sources:
+  - path: {.agentdev/intake/promoted/xxx.md | .agentdev/learning/promoted/xxx.md}
+    type: {intake | learning}
+---
+
+## Sources
+
+{各 source artifact の要点抽出。パススルー禁止（REQ-0105-061）}
+
+## Source Summary
+
+{全 source の共通テーマ・論点の統合サマリ}
+
+## 統合理由
+
+{N:1 統合または 1:N 分割の理由}
+
+## 要件化の方向
+
+{req-define に渡す要件化の方向性}
+```
 
 ## Steps
 
@@ -50,15 +84,22 @@ agent: sisyphus
 | 主要テーマ | 抽出された主論点 |
 | 関連 artifact 群 | 同一趣旨の可能性がある他 artifact |
 
-**upstream handoff metadata 付与**（REQ-0104-023）: artifact が AgentDevFlow 本体の不具合・改善点を扱う場合、review 結果に `handoff_target: agent-dev-flow` と `apply_in_current_project: false` を記録する。判定は `agentdev-workflow-lifecycle/references/upstream-handoff.md` に従う
+**upstream handoff metadata 付与**（REQ-0104-023）: artifact が AgentDevFlow 本体の不具合・改善点を扱う場合、分析結果に `handoff_target: agent-dev-flow` と `apply_in_current_project: false` を記録する。判定は `agentdev-workflow-lifecycle/references/upstream-handoff.md` に従う
 
-### Step 3: 統合・分割判定 + ユーザー承認
+### Step 3: 統合・分割判定 + depends_on 依存解決 + ユーザー承認
 
 分析結果に基づき、RU への統合・分割を判定し、ユーザーに提示して承認を得る（REQ-0105-031）:
 
 - **N:1 統合**: 同一関心領域の複数 artifact → 1 RU
 - **1:N 分割**: 1 artifact 内の複数独立論点 → 複数 RU
 - **1:1**: 特別な統合・分割不要
+
+**depends_on 依存解決**（REQ-0105-066〜069）:
+- RU 間に依存関係がある場合、`depends_on` に RU-ID を指定する
+- 依存先 RU が同一バッチ内または既存 RU（`.agentdev/backlog/req-units/`）として存在することを確認
+- 循環依存が存在しないことを確認
+- 依存順に並べ替え可能であることを確認
+- 未解決・循環・同時処理対象外の依存がある場合、当該 RU を処理せず理由を提示
 
 ユーザーの調整指示があれば反映する。
 
@@ -75,35 +116,60 @@ agent: sisyphus
 
 矛盾する artifact は RU 化対象から除外し `promoted/` に残置する。矛盾しない artifact は通常通り処理継続（partial success）。
 
-### Step 5: Review 結果の保存
+### Step 5: RU 生成
 
-ユーザー承認済みの判定結果を draft として保存する（REQ-0105-040, 041）:
+ユーザー承認済みの判定結果に基づいて RU を生成する（REQ-0105-058）:
 
-```
-.sisyphus/drafts/backlog-review-{topic-slug}.md
-```
+1. `.agentdev/backlog/req-units/` が存在しない場合は作成
+2. 各 RU について:
+    - frontmatter 生成（source_type, generated_by: backlog-review, generated_at, status: draft, depends_on（任意）, sources）
+    - **upstream handoff metadata 転記**（REQ-0104-024）: 分析結果に `handoff_target` と `apply_in_current_project: false` が存在する場合、RU frontmatter に転記する。RU 本文に現在プロジェクトでは実装しない upstream handoff 用 RU であることを記載する
+    - Sources セクション: 各 source の要点（パススルー禁止）（REQ-0105-061）
+    - Source Summary セクション: 統合サマリ
+    - 統合理由セクション: N:1/1:N の理由
+    - 要件化の方向セクション: req-define への推奨方向
+3. ファイル名: `RU-{NNNN}.md`（既存ファイルの最大番号 +1 から採番）
+4. **depends_on 検証**（REQ-0105-066〜069）:
+    - depends_on 値は RU-ID に限定（promoted artifact path 不可）
+    - 依存先 RU が存在することを確認
+    - 循環依存がないことを確認
+    - 依存順に並べ替え可能であることを確認
+    - 検証失敗時は当該 RU を生成せず理由を提示
 
-Draft の内容:
-- **draft-meta**: topic-slug, status: reviewed, source artifacts, integration/split plan
-- **判定結果**: 統合・分割の grouping と承認状況
-- **矛盾検出結果**: 検出された矛盾とユーザーの判断
-- **RU 生成方針**: 各 RU の source, source_type, 要件化の方向
-- **失敗・残置**: 矛盾等で除外された artifact のリストと理由
+### Step 6: 成功 artifact の削除
 
-### Step 6: 完了報告
+RU 生成が成功した promoted artifact のみを削除する（REQ-0105-060）:
+
+- **削除条件**: 当該 artifact が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ
+- **残置対象**: RU 化に失敗した artifact、矛盾により除外された artifact
+- 削除結果を記録する
+
+### Step 7: Git 永続化
+
+`.agentdev/` 配下の変更を commit / push する（REQ-0105-065）:
+
+- `git diff --name-only` で `.agentdev/` 配下の変更を確認
+- **変更なし時**: commit/push せず完了報告で「変更なし」と報告
+- **変更あり時**:
+  1. `.agentdev/` 配下のみ `git add`
+  2. commit message: `chore(agentdev): generate requirement units via backlog-review`
+  3. `git push` を実行。失敗時は構造化エラーメッセージを表示して停止
+
+### Step 8: 完了報告
 
 完了報告 → 完了報告templateに従って出力:
 - 全て成功 → `.opencode/commands/agentdev/templates/backlog-review/standard.md`
 - partial success（矛盾あり）→ `.opencode/commands/agentdev/templates/backlog-review/partial.md`
 - promoted artifact なし → `.opencode/commands/agentdev/templates/backlog-review/zero-promoted.md`
 
-git 永続化結果を含める。次のコマンド: `/agentdev/backlog-save`
+RU 生成結果・git 永続化結果を含める。次のコマンド: `/agentdev/req-define`（REQ-0105-063）
 
 ## Guardrails
 
-- G01: RU ファイルを生成しない（MUST NOT）（REQ-0105-033）。RU 生成は `backlog-save` の責務
-- G02: REQ ファイルの保存を行わない（`req-save` が担当）
-- G03: GitHub Issue の作成を行わない（`case-open` が担当）
-- G04: promoted artifact の単純コピー（パススルー）を生成しない（MUST NOT）
-- G05: `.agentdev/intake/inbox/`、`.agentdev/intake/archive/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/archive/active.md` を更新しない（MUST NOT）
-- G06: 矛盾検出時はユーザーの指示を待ち、自動的に解決しない
+- G01: REQ ファイルの保存を行わない（`req-save` が担当）
+- G02: GitHub Issue の作成を行わない（`case-open` が担当）
+- G03: promoted artifact の単純コピー（パススルー）を生成しない（MUST NOT）（REQ-0105-061）
+- G04: `.agentdev/intake/inbox/`、`.agentdev/intake/archive/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/archive/active.md` を更新しない（MUST NOT）
+- G05: 矛盾検出時はユーザーの指示を待ち、自動的に解決しない
+- G06: RU 生成に失敗した artifact は削除しない（REQ-0105-060）
+- G07: depends_on に promoted artifact path を指定しない（MUST NOT）（REQ-0105-066）。RU-ID のみ許容

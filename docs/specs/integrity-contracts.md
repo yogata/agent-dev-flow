@@ -139,7 +139,7 @@ command guardrails を以下の6カテゴリに分類する:
 | `intake-promote` | `.agentdev/intake/promoted/` | 他パス |
 | `learning-promote` | `.agentdev/learning/promoted/` | 他パス |
 | `backlog-review` | なし（read-only 対話） | 全ファイル書込 |
-| `backlog-save` | `docs/requirements/` | `.opencode/` |
+| `backlog-review` | `.agentdev/backlog/req-units/`, `.agentdev/intake/promoted/`, `.agentdev/learning/promoted/` | `.opencode/` |
 | `req-restructure-review` | なし（read-only 診断） | 全ファイル書込 |
 
 ## Postflight Diff Checking

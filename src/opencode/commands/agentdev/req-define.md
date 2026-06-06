@@ -14,7 +14,7 @@ agent: prometheus
 - エラーログ（バグ修正の場合）
 - **ユーザーが明示した入力ファイル**（Requirement Source）: 設計メモ、調査メモ、staging stub、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
 - req-save SPLIT 検出時の finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
-- **promoted 直読み禁止**（REQ-0105）: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない（MUST NOT）。backlog-review → backlog-save による RU 化を経由すること
+- **promoted 直読み禁止**（REQ-0105）: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない（MUST NOT）。backlog-review による RU 化を経由すること
 
 ## Output
 

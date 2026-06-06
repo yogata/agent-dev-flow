@@ -150,7 +150,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 ## Guardrails
 
 ### 責務境界（REQ-0103, REQ-0105）
-- G01: GitHub Issue の作成を行わない（`backlog-save` / `case-open` が担当）
+- G01: GitHub Issue の作成を行わない（`backlog-review` / `case-open` が担当）
 - G02: intake item の元の内容を改変しない（整理・構造化のみ）
 - G03: `backlog-review` を自動起動しない（次ステップの提示のみ）
 - G04: learning pipeline の入力を生成しない（MUST NOT）。採用 item の後続ルートは `backlog-review` のみ（REQ-0105）

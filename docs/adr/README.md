@@ -28,7 +28,7 @@
 | ADR-0020 | Adopt /repo/* Namespace for Repo-Local Tooling | accepted | 2026-06-06 |
 | ADR-0021 | Upstream Handoff Metadata Convention | accepted | 2026-06-06 |
 | ADR-0022 | review/refine 系中間コマンドを promote 内フェーズへ統合 | accepted | 2026-06-06 |
-| ADR-0023 | backlog-save 廃止とパイプライン再構築 | proposed | 2026-06-07 |
+| ADR-0023 | backlog-save 廃止とパイプライン再構築 | accepted | 2026-06-07 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -47,8 +47,6 @@
 - [ADR-0023](ADR-0023.md) — backlog-save 廃止とパイプライン再構築
 
 ### accepted
-
-- [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 統一
 - [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
 - [ADR-0017](ADR-0017.md) — 文書種別責務境界
 - [ADR-0018](ADR-0018.md) — runtime 独立性

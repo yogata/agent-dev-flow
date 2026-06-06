@@ -113,7 +113,7 @@ scripts/
 |--------|------|------|-------------|
 | promoted artifact（intake） | `intake-promote` | `backlog-review` | RU 化成功時 |
 | promoted artifact（learning） | `learning-promote` | `backlog-review` | RU 化成功時 |
-| RU | `backlog-save`, session-sourced | `req-define`, `req-save`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功時 |
+| RU | `backlog-review`, session-sourced | `req-define`, `req-save`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功時 |
 | REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
 | Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
 
