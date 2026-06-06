@@ -55,7 +55,7 @@ docs/
   guides/*.md                    # 参照用読み物（navigation 層、非基準）
 .agentdev/
   intake/                        # Intake パイプライン domain state
-    inbox/ accepted/ promoted/ archive/
+    inbox/ promoted/ archive/
   learning/                      # Learning パイプライン domain state
     inbox.md archive/active.md evaluation-report.md promoted/
   backlog/req-units/RU-*.md      # Requirement Unit
@@ -85,7 +85,7 @@ scripts/
     skills/agentdev-*/           # Skill source
 .agentdev/
   intake/                        # Intake パイプライン domain state
-    inbox/ accepted/ promoted/ archive/
+    inbox/ promoted/ archive/
   learning/                      # Learning パイプライン domain state
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート

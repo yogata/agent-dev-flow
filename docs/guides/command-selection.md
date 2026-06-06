@@ -14,11 +14,9 @@
 | Issue の更新・コメント追加が必要 | `/agentdev/case-update` | 更新済み Issue |
 | 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox item |
 | クローズ済み Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox item |
-| inbox に item がある | `/agentdev/intake-review` | accepted / archive |
-| accepted item がある | `/agentdev/intake-promote` | promoted artifact |
+| inbox に item がある | `/agentdev/intake-promote` | promoted / archive |
 | 再発防止知見を蓄積したい | `learning-capture`（スキル） | inbox.md エントリ |
-| inbox.md にエントリがある | `/agentdev/learning-refine` | evaluation-report.md |
-| evaluation-report がある | `/agentdev/learning-promote` | promoted artifact |
+| inbox.md にエントリがある | `/agentdev/learning-promote` | promoted artifact |
 | promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | review draft |
 | review draft がある | `/agentdev/backlog-save` | RU（Requirement Unit） |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |

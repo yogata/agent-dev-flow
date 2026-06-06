@@ -114,7 +114,7 @@ agent: sisyphus
 
 ### 責務境界（REQ-0103）
 - G01: GitHub Issue の作成を行わない（`case-open` が担当）
-- G02: 採用可否の判断を行わない（`intake-review` が担当）
+- G02: 採用可否の判断を行わない（`intake-promote` が担当）
 - G03: review・整形・分類の判断を行わない（後続コマンドの責務）
 - G04: Issue/PR へのコメント投稿・マーカー付与は行わない（`backlog-save` が担当）
 

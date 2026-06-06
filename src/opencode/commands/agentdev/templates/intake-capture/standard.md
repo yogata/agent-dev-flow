@@ -6,4 +6,4 @@
   - intake item を保存（タイトル: {タイトル}）
 検証結果: ✅ OK
 git 永続化: commit: {hash}, push: {成功/失敗}
-次のコマンド: /agentdev/intake-review
+次のコマンド: /agentdev/intake-promote
