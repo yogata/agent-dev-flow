@@ -22,3 +22,21 @@
 - **タグ**: `#epic-orchestrator` `#wave` `#残存参照` `#横断検証`
 
 ---
+
+## runtime template path の暗黙参照が誤用を招くパターン
+
+- **問題事象**: case-close が Issueコメントテンプレートの参照先を skill 名だけで記述し、runtime path が不明確だったため、command-local templates 側に誤探索するバグが発生。また case-auto が委譲先コマンド定義を読み込む際、`src/opencode/...` を runtime path に読み替えていた
+- **発生局面**: 実行（case-auto / case-close）
+- **検知方法**: コードレビュー（ユーザー指摘）
+- **根本原因**: command定義内のテンプレート参照が skill 名のみの暗黙参照であり、runtime path が明示されていなかった。ADR-0013/0018でruntime/authoring分離は規定されていたが、command定義でのパス記述粒度が不足していた
+- **自律対応内容**: case-close Step 4にruntime path（`.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md`）を明示。case-autoにG11/G12 guardrail追加。artifact-contracts.mdにテンプレート種別別参照先テーブルを新設。REQ-0108に誤参照検出ルール（169-170）をAPPEND
+- **ユーザー確認有無**: あり（Issue #625起票者が指摘）
+- **ADR/REQ/spec影響**: artifact-contracts.md SPEC更新、REQ-0108 APPEND
+- **横展開観点**: 他のcommand定義でもテンプレート参照が暗黙的になっていないか確認が必要
+- **再発条件**: command定義がテンプレート参照をskill名のみで記述し、runtime pathを明示しない場合
+- **予防策候補**: command定義のテンプレート参照は必ずruntime path（`.opencode/...`）を明示する。integrity-check（REQ-0108-169/170）でruntime path誤参照を検出
+- **想定反映先**: agentdev-command-authoring の品質基準
+- **関連**: Issue #625, PR #626
+- **タグ**: `#runtime-path` `#template-resolution` `#command-definition` `#暗黙参照`
+
+---
