@@ -41,7 +41,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - Rebase workflow をユーザーに提示（承認が必要）:
        - `git rebase origin/main` → コンフリクト解決（あれば）→ `git push --force-with-lease`
      - `--force` は禁止（`--force-with-lease` のみ許可）
-   - 対応記録コメントをIssueに追記 → テンプレート: `agentdev-workflow-templates` から Read → `agentdev-gh-cli` の VERIFY 操作に従って内容検証
+   - 対応記録コメントをIssueに追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read（SHALL, runtime path） → `agentdev-gh-cli` の VERIFY 操作に従って内容検証
 
 5. **Post-merge テスト戦略検証**: マージ後のみ確認可能な項目（CI通過等）を反映。`agentdev-gh-cli` に従い `--body-file` で更新 → VERIFY
 
