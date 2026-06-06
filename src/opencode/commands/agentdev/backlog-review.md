@@ -50,6 +50,8 @@ agent: sisyphus
 | 主要テーマ | 抽出された主論点 |
 | 関連 artifact 群 | 同一趣旨の可能性がある他 artifact |
 
+**upstream handoff metadata 付与**（REQ-0104-023）: artifact が AgentDevFlow 本体の不具合・改善点を扱う場合、review 結果に `handoff_target: agent-dev-flow` と `apply_in_current_project: false` を記録する。判定は `agentdev-workflow-lifecycle/references/upstream-handoff.md` に従う
+
 ### Step 3: 統合・分割判定 + ユーザー承認
 
 分析結果に基づき、RU への統合・分割を判定し、ユーザーに提示して承認を得る（REQ-0105-031）:
