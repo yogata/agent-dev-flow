@@ -129,3 +129,21 @@
 - **想定反映先**: agentdev-gh-cli スキル（参考事例追加）
 - **関連**: PR #609, Issue #608
 - **タグ**: `#powershell` `#encoding` `#gh-cli` `#backtick` `#windows`
+
+---
+
+## spec compliance sweep で直接矛盾リスト外の古い参照を検出
+
+- **問題事象**: Issue #610 の「直接矛盾9件」リストに含まれていなかった `docs/specs/workflow-contracts.md` に `/agentdev/integrity-check` の古い参照が残存していた。case-run の spec compliance check で検出・修正した。
+- **発生局面**: 実装（case-run）→ spec compliance check → 追加修正
+- **検知方法**: case-run 中の spec compliance sweep（grep ベースの残存参照検査）で自律検出
+- **根本原因**: Issue 作成時の直接矛盾リストが手動整理であり、`workflow-contracts.md` が見落とされていた。コマンド名変更の影響範囲を完全に網羅する機械的検証が実行前には存在しなかった
+- **自律対応内容**: spec compliance check で検出後、`workflow-contracts.md` を追加更新（10件目の docs 更新として）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（運用上の知見）
+- **横展開観点**: コマンド名変更・namespace移動を伴う実装では、Issue の直接矛盾リストだけでなく、機械的な全文検索（grep/ripgrep）を必ず実行すべき
+- **再発条件**: 手動整理の影響範囲リストに依存し、機械的検証を省略した場合
+- **予防策候補**: (1) case-run の spec compliance check を標準ステップとして位置づけ、(2) コマンド名変更・namespace移動の PR では必ず全文 grep を実行する guardrail を case-run に追加
+- **想定反映先**: case-run コマンドの guardrails、agentdev-spec-compliance スキル
+- **関連**: Issue #610, PR #611, `docs/specs/workflow-contracts.md`
+- **タグ**: `#spec-compliance` `#grep-sweep` `#namespace-migration` `#self-corrected`
