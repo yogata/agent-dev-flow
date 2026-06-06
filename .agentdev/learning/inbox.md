@@ -40,3 +40,21 @@
 - **タグ**: `#runtime-path` `#template-resolution` `#command-definition` `#暗黙参照`
 
 ---
+
+## Squash merge conflict resolution: W1→W2 間の check_integrity.ts 統合パターン
+
+- **問題事象**: W1 PR #635（isLegacyExemptPath + stripInlineCode）と W2 PR #637（vocabulary-registry exempt + line-by-line + pathRefExemptPatterns）が共に check_integrity.ts を変更し、rebase 時に2箇所の競合が発生
+- **発生局面**: case-close（PRマージ）
+- **検知方法**: `gh pr merge --squash` 失敗 → rebase で競合検出
+- **根本原因**: W1 と W2 が同じ関数（checkLegacyNamespace, checkExpandedLegacyNamespace）を異なるアプローチで改善。W1はモジュールレベル関数（isLegacyExemptPath, stripInlineCode）で全体を処理、W2は行単位（line-by-line + per-line exemption patterns）で処理
+- **自律対応内容**: 両方の改善を統合する解決。isLegacyExemptPath で全体 exempt → line-by-line で行単位 → stripInlineCode で各行のインラインコード除外 → pathRefExemptPatterns/expandedPathRefExemptPatterns で行レベル exempt の多層防御構成
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 同一ファイルを複数Waveで変更する場合、先行Waveの改善パターンと後続Waveの改善パターンが直交することがある。統合時は「全体→行単位→除外」のレイヤー構造で両方を保持できる
+- **再発条件**: 複数PRが同じ関数を異なる抽象レベル（全体処理 vs 行単位処理）で改善する場合
+- **予防策候補**: Wave設計時にファイル変更の重複を検出し、重複がある場合は後続Waveの branch を先行Waveの branch に基づかせる
+- **想定反映先**: workflow-orchestration のWave設計ガイダンス
+- **関連**: Issue #628, #629, PR #635, #637, Epic #627
+- **タグ**: `#squash-merge` `#conflict-resolution` `#wave-design` `#check_integrity`
+
+---
