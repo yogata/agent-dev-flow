@@ -1,6 +1,8 @@
 ---
 description: 要件定義をもとにGitHub Issueを作成する
 agent: sisyphus
+load_skills:
+  - agentdev-gh-cli
 ---
 
 # Case登録

@@ -1,6 +1,8 @@
 ---
 description: 計画立案からコミットまでを一気通貫で実行する。3フェーズ構成でべき等性・再開ポイントを提供。複数Issueの並列実行に対応
 agent: sisyphus
+load_skills:
+  - agentdev-gh-cli
 ---
 
 # 実装パイプライン

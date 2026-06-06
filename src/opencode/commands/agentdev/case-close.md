@@ -1,6 +1,8 @@
 ---
 description: PRをマージし、対応記録を追記し、Caseをクローズしてブランチを削除する
 agent: sisyphus
+load_skills:
+  - agentdev-gh-cli
 ---
 
 # 完了処理
