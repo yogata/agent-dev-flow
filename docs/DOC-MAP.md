@@ -21,7 +21,7 @@
 | [REQ-0102](requirements/REQ-0102.md) | 要件定義・保存 | req-define / req-save / Requirement Source / 分類ゲート |
 | [REQ-0103](requirements/REQ-0103.md) | Artifact責任分界 | command / skill / template / script / namespace / frontmatter 規約 / runtime-only 配布制約 / source-projection分離 / sync・migration / namespace予約 / SSOT化 / registry化 / consumer導入モデル / consumer plugin checkout・install script分離 |
 | [REQ-0104](requirements/REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type + scale 分類、workflow_route、SSoT、case-open/run/close、upstream handoff protocol |
-| [REQ-0105](requirements/REQ-0105.md) | Intake / Learning / Backlog | intake、learning、backlog-review、backlog-save、RU lifecycle、session-sourced RU |
+| [REQ-0105](requirements/REQ-0105.md) | Intake / Learning / Backlog | intake-promote（review統合）、learning-promote（refine統合）、backlog-review、backlog-save、RU lifecycle |
 | [REQ-0106](requirements/REQ-0106.md) | Case実行・完了 | case-run、case-close、Epic/Wave、完了ゲート |
 | [REQ-0107](requirements/REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、AI-slop抑止 |
 | [REQ-0108](requirements/REQ-0108.md) | Integrity / Validation / Tests | 整合性検査、finding分類・route、レポート出力、ガードレール、体系的テスト、frontmatter 規約検査、artifact collection registry、source/projection scan分離、baseline管理、rule catalog、REQ impact map、3層gate、meta-integrity、repo-local自己監査（/repo/integrity-check）・配布対象外 |
