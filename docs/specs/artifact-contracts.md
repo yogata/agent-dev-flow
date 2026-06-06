@@ -100,10 +100,6 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 - runtime command は上記 runtime path（`.opencode/...`）からテンプレートを参照すること（SHALL）
 - `src/opencode/...` は source 配置・install-sync 入力・authoring context に限定し、runtime 実行時の参照先として使用しない（SHALL）
 
-### 移行メモ
-
-完了報告テンプレートは Skill-local（`.opencode/skills/agentdev-workflow-reporting/templates/`）から Command-local（`.opencode/commands/agentdev/templates/`）へ移行する。移行完了後、Skill-local の完了報告テンプレートは削除する。
-
 ## Completion Report Contract
 
 全 agentdev コマンドの完了報告に適用する共通契約を定義する（REQ-0107-012, REQ-0107-013）。
