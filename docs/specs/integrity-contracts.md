@@ -136,9 +136,7 @@ command guardrails を以下の6カテゴリに分類する:
 
 > **Note**: `integrity-check` は `/repo/integrity-check` として実行される repo-local コマンドである（ADR-0020）。AgentDevFlow の consumer 配布対象外。| `intake-capture` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
 | `intake-from-github` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
-| `intake-review` | `.agentdev/intake/inbox/`, `archive/` | 他パス |
 | `intake-promote` | `.agentdev/intake/promoted/` | 他パス |
-| `learning-refine` | `.agentdev/learning/` | 他パス |
 | `learning-promote` | `.agentdev/learning/promoted/` | 他パス |
 | `backlog-review` | なし（read-only 対話） | 全ファイル書込 |
 | `backlog-save` | `docs/requirements/` | `.opencode/` |
