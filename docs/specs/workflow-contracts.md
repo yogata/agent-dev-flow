@@ -39,6 +39,10 @@ AgentDevFlow は3つのパイプラインで構成される:
 | `review` | PR作成済み・レビュー中 | レビュー完了 |
 | `done` | 完了（post-run capture 含む: learning capture + intake capture） | レビュー完了 |
 
+### workflow status 禁止
+
+REQ ファイル・SPEC ファイル内に workflow status（例: "要件定義", "実装", "テスト" 等の6マイクロフェーズ）を記述してはならない（REQ-0108-123、REQ-0101-037）。workflow status は Issue ラベル・GitHub Project で管理し、REQ/SPEC 文書内には含めない。
+
 ## SSoT Transition Rules
 
 各マクロフェーズにおけるSingle Source of Truth（SSoT）を定義する。
