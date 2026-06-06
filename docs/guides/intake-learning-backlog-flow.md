@@ -92,10 +92,9 @@ intake/learning 両方の promoted artifact を RU に統合する。
 
 | 前工程の生成物 | コマンド | 出力 |
 |----------|------|------|
-| `promoted/`（intake/learning） | `backlog-review` | review draft |
-| review draft | `backlog-save` | `RU-*.md` |
+| `promoted/`（intake/learning） | `backlog-review` | `RU-*.md` |
 
-`backlog-review` は分析・統合結果をユーザーに確認（HITL）する。`backlog-save` は RU を生成し、元の promoted artifact を削除する。
+`backlog-review` は分析・統合結果をユーザーに確認（HITL）し、承認後に直接 RU を生成する。
 
 ### RU の粒度
 
@@ -112,7 +111,7 @@ intake/learning 両方の promoted artifact を RU に統合する。
 | トリガー | 実行コマンド | 対象 |
 |----------|-------------|------|
 | RU の内容が Issue に永続化完了（Issue作成 + VERIFY 成功） | `case-open` | 該当 RU ファイル |
-| promoted artifact の RU 化成功 | `backlog-save` | 該当 promoted artifact |
+| promoted artifact の RU 化成功 | `backlog-review` | 該当 promoted artifact |
 
 `req-save` は RU を削除せず、RU パスを docs 永続文書に記録しない。RU は一時成果物であり、永続化未完了の場合は残置する。
 

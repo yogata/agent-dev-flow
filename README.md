@@ -30,8 +30,7 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 | inbox に item がある | `/agentdev/intake-promote` | promoted / archive |
 | 再発防止知見を蓄積したい | `learning-capture`（スキル） | inbox.md エントリ |
 | inbox.md にエントリがある | `/agentdev/learning-promote` | promoted artifact |
-| promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | review draft |
-| review draft がある | `/agentdev/backlog-save` | RU（Requirement Unit） |
+| promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | REQ 体系の健全性を診断したい | `/agentdev/req-restructure-review` | 診断レポート |
 | ドキュメント整合性を検証したい | `/repo/integrity-check` | 検証レポート（self-hosting repo 専用） |

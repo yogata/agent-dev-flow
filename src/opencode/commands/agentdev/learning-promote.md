@@ -8,7 +8,7 @@ implementation_pattern: file-pipeline
 
 `.agentdev/learning/inbox.md` の学びエントリを直接読み込み、内部フェーズとして正規化・問題クラス分類・8軸評価を実行する（REQ-0105-052, 053）。評価結果を evaluation-report.md として生成・更新した後（REQ-0105-054）、廃棄判定・既存対策確認を経てユーザーの HITL 承認により昇格・保留・却下を確定する（REQ-0105-055）。確定後、`.agentdev/learning/promoted/` に Requirement Source 形式の stub を生成する。
 
-**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `/agentdev/backlog-review` が読み込み、RU 生成後に `/agentdev/req-define` に合流する。反映ルート: promoted → `/agentdev/backlog-review`（分析・承認）→ `/agentdev/backlog-save`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
+**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `/agentdev/backlog-review` が読み込み、RU 生成後に `/agentdev/req-define` に合流する。反映ルート: promoted → `/agentdev/backlog-review`（分析・承認・RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
 
 本コマンドは旧 `learning-refine` の全機能を吸収しており、`learning-refine` を事前実行する必要はない（REQ-0105-051, 056）。
 
@@ -107,7 +107,7 @@ implementation_pattern: file-pipeline
     - 出力先: `.agentdev/learning/promoted/`（REQ-0105）
     - ファイル名: `{disposal-category}-{name}.md`
     - **`.opencode/` への直接書込は禁止**
-    - **`case-run` への直接受け渡しは禁止**（`backlog-review` → `backlog-save` を経由して RU 化すること）
+    - **`case-run` への直接受け渡しは禁止**（`backlog-review` を経由して RU 化すること）
     - stub フォーマットは `agentdev-learning-pipeline` skill の「Requirement Source Staging Stub Schema」に従う
     - カテゴリ別の反映先パス例は `agentdev-learning-pipeline` skill を参照
 
