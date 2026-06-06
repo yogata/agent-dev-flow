@@ -1,6 +1,3 @@
-.sisyphus/
-backup/
-.worktrees
-# .opencode/ is a runtime projection (junction to src/opencode/)
-# Run sync-opencode.ps1 -Mode apply after clone to create the junction
 .opencode/
+.sisyphus/
+.worktrees/
