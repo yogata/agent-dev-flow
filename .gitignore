@@ -1,3 +1,10 @@
-.opencode/
+# .opencode/ contents are junctioned from src/opencode/ except repo-local artifacts
+.opencode/*
+!.opencode/commands/
+!.opencode/skills/
+.opencode/commands/*
+!.opencode/commands/repo/
+.opencode/skills/*
+!.opencode/skills/repo-*/
 .sisyphus/
 .worktrees/

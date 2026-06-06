@@ -18,6 +18,9 @@
 | DOC-MAP | `docs/DOC-MAP.md` | — | — | 文書探索入口（非基準） |
 | Guide | `docs/guides/*.md` | — | — | 参照用読み物（navigation 層） |
 | Domain State | `.agentdev/` | — | — | Intake / Learning / Backlog / Integrity 永続状態 |
+| Repo-local Command | `.opencode/commands/repo/` | — | — | Self-hosting repo 専用コマンド（ADR-0020）。AgentDevFlow 配布対象外。source/projection 同期対象外 |
+| Repo-local Skill | `.opencode/skills/repo-*/` | — | — | Self-hosting repo 専用スキル（ADR-0020）。AgentDevFlow 配布対象外。source/projection 同期対象外 |
+| Repo-local Registry | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | — | — | Repo-local 語彙レジストリ。`.agentdev/` には配置しない（ADR-0020） |
 
 ## 責務境界原則
 

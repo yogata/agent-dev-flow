@@ -14,6 +14,10 @@
     - .opencode/commands/agentdev/  = junction -> src/opencode/commands/agentdev/
     - .opencode/skills/agentdev-*/  = individual junctions -> src/opencode/skills/agentdev-*/
 
+    Repo-local artifacts are excluded from junction management (ADR-0020):
+    - .opencode/commands/repo/      = real directory (not a junction, repo-local only)
+    - .opencode/skills/repo-*/      = real directories (not junctions, repo-local only)
+
 .PARAMETER Mode
     One of: dry-run, check, apply
 
@@ -35,6 +39,10 @@ $SourceDir = Join-Path $RepoRoot 'src\opencode'
 $ProjectionDir = Join-Path $RepoRoot '.opencode'
 $CommandsDir = Join-Path $ProjectionDir 'commands'
 $SkillsDir = Join-Path $ProjectionDir 'skills'
+
+# Repo-local patterns excluded from junction management (ADR-0020)
+$RepoLocalCommandNames = @('repo')
+$RepoLocalSkillPrefix = 'repo-'
 
 # --- Helper Functions ---
 
@@ -141,7 +149,7 @@ if ($Mode -eq 'check') {
         }
     }
 
-    # 4. Orphan detection in commands/ and skills/
+    # 4. Orphan detection in commands/ and skills/ (skip repo-local artifacts)
     foreach ($parentRel in @('commands', 'skills')) {
         $parentPath = Join-Path $ProjectionDir $parentRel
         if (-not (Test-Path -LiteralPath $parentPath)) { continue }
@@ -153,6 +161,21 @@ if ($Mode -eq 'check') {
                     Write-Host "[DIVERGENCE] Orphaned junction: $junctionRel"
                     $divergences++
                 }
+            }
+    }
+
+    # 5. Repo-local directory existence check (informational, not a divergence)
+    foreach ($cmdName in $RepoLocalCommandNames) {
+        $repoLocalPath = Join-Path $CommandsDir $cmdName
+        if (Test-Path -LiteralPath $repoLocalPath) {
+            Write-Host "[INFO] Repo-local command directory exists: commands\$cmdName (not junction-managed)"
+        }
+    }
+    if (Test-Path -LiteralPath $SkillsDir) {
+        Get-ChildItem -LiteralPath $SkillsDir -Directory -Force |
+            Where-Object { $_.Name -like "$RepoLocalSkillPrefix*" -and -not ($_.Attributes -band [System.IO.FileAttributes]::ReparsePoint) } |
+            ForEach-Object {
+                Write-Host "[INFO] Repo-local skill directory exists: skills\$($_.Name) (not junction-managed)"
             }
     }
 
@@ -215,7 +238,7 @@ if ($Mode -eq 'dry-run') {
         }
     }
 
-    # Orphan detection
+    # Orphan detection (skip repo-local artifacts)
     Write-Host ''
     Write-Host '--- Orphan junctions ---'
     $orphansFound = $false
@@ -234,6 +257,29 @@ if ($Mode -eq 'dry-run') {
     }
     if (-not $orphansFound) {
         Write-Host '[OK] No orphan junctions detected'
+    }
+
+    # Repo-local directory status (informational)
+    Write-Host ''
+    Write-Host '--- Repo-local artifacts (not junction-managed, ADR-0020) ---'
+    $repoLocalFound = $false
+    foreach ($cmdName in $RepoLocalCommandNames) {
+        $repoLocalPath = Join-Path $CommandsDir $cmdName
+        if (Test-Path -LiteralPath $repoLocalPath) {
+            Write-Host "[OK] Repo-local command: commands\$cmdName"
+            $repoLocalFound = $true
+        }
+    }
+    if (Test-Path -LiteralPath $SkillsDir) {
+        Get-ChildItem -LiteralPath $SkillsDir -Directory -Force |
+            Where-Object { $_.Name -like "$RepoLocalSkillPrefix*" } |
+            ForEach-Object {
+                Write-Host "[OK] Repo-local skill: skills\$($_.Name)"
+                $repoLocalFound = $true
+            }
+    }
+    if (-not $repoLocalFound) {
+        Write-Host '[INFO] No repo-local artifacts found'
     }
 
     Write-Host ''
@@ -324,7 +370,7 @@ if ($Mode -eq 'apply') {
         }
     }
 
-    # Step 4: Orphan Junction Cleanup
+    # Step 4: Orphan Junction Cleanup (skip repo-local artifacts)
     Write-Host ''
     Write-Host '--- Orphan cleanup ---'
     foreach ($parentRel in @('commands', 'skills')) {
@@ -342,6 +388,23 @@ if ($Mode -eq 'apply') {
                         exit 1
                     }
                 }
+            }
+    }
+
+    # Step 5: Report repo-local artifacts (informational)
+    Write-Host ''
+    Write-Host '--- Repo-local artifacts (skipped, ADR-0020) ---'
+    foreach ($cmdName in $RepoLocalCommandNames) {
+        $repoLocalPath = Join-Path $CommandsDir $cmdName
+        if (Test-Path -LiteralPath $repoLocalPath) {
+            Write-Host "[INFO] Skipping repo-local command: commands\$cmdName"
+        }
+    }
+    if (Test-Path -LiteralPath $SkillsDir) {
+        Get-ChildItem -LiteralPath $SkillsDir -Directory -Force |
+            Where-Object { $_.Name -like "$RepoLocalSkillPrefix*" } |
+            ForEach-Object {
+                Write-Host "[INFO] Skipping repo-local skill: skills\$($_.Name)"
             }
     }
 

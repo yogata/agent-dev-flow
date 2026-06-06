@@ -36,7 +36,7 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 | review draft がある | `/agentdev/backlog-save` | RU（Requirement Unit） |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | REQ 体系の健全性を診断したい | `/agentdev/req-restructure-review` | 診断レポート |
-| ドキュメント整合性を検証したい | `/agentdev/integrity-check` | 検証レポート |
+| ドキュメント整合性を検証したい | `/repo/integrity-check` | 検証レポート（self-hosting repo 専用） |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
 ## 参照先

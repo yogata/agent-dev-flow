@@ -133,7 +133,8 @@ command guardrails を以下の6カテゴリに分類する:
 | `case-close` | GitHub Issue/PR, worktree 削除 | `.agentdev/intake/inbox/` 直接書込 |
 | `case-update` | GitHub Issue のみ | ローカルファイル |
 | `integrity-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（承認時） | 検査対象 artifact |
-| `intake-capture` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
+
+> **Note**: `integrity-check` は `/repo/integrity-check` として実行される repo-local コマンドである（ADR-0020）。AgentDevFlow の consumer 配布対象外。| `intake-capture` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
 | `intake-from-github` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
 | `intake-review` | `.agentdev/intake/inbox/`, `archive/` | 他パス |
 | `intake-promote` | `.agentdev/intake/promoted/` | 他パス |
@@ -148,7 +149,7 @@ command guardrails を以下の6カテゴリに分類する:
 postflight diff checking は read-only command から段階導入する:
 
 **Phase 1 — read-only command 検証**:
-- `integrity-check`, `req-restructure-review`, `backlog-review` は実行後にローカルファイル変更がないことを確認
+- `integrity-check`（repo-local `/repo/integrity-check`）, `req-restructure-review`, `backlog-review` は実行後にローカルファイル変更がないことを確認
 - 変更が検出された場合は warning として報告
 
 **Phase 2 — 拡張適用**（将来）:
