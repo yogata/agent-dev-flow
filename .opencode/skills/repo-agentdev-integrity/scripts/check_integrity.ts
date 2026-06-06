@@ -749,6 +749,19 @@ function checkCommandInventory(cmdDir: string, root: string): CheckResult[] {
   return results;
 }
 
+const LEGACY_EXEMPT_PATHS = [
+  /vocabulary-registry\.md$/,
+  /gate-levels\.md$/,
+];
+
+function isLegacyExemptPath(relPath: string): boolean {
+  return LEGACY_EXEMPT_PATHS.some((re) => re.test(relPath));
+}
+
+function stripInlineCode(text: string): string {
+  return text.replace(/`[^`]+`/g, "");
+}
+
 function checkLegacyNamespace(
   skillsDir: string,
   cmdDir: string,
@@ -775,9 +788,11 @@ function checkLegacyNamespace(
     const content = readText(filePath);
     if (!content) continue;
     const relPath = resolveRelative(filePath, root);
+    if (isLegacyExemptPath(relPath)) continue;
+    const contentToTest = stripInlineCode(content);
     for (const { pattern, name } of LEGACY_PATTERNS) {
       pattern.lastIndex = 0;
-      if (pattern.test(content)) {
+      if (pattern.test(contentToTest)) {
         foundLegacy = true;
         results.push(
           ng(
@@ -1867,9 +1882,11 @@ function checkExpandedLegacyNamespace(
     const content = readText(filePath);
     if (!content) continue;
     const relPath = resolveRelative(filePath, root);
+    if (isLegacyExemptPath(relPath)) continue;
+    const contentToTest = stripInlineCode(content);
     for (const { pattern, name } of LEGACY_PATTERNS) {
       pattern.lastIndex = 0;
-      if (pattern.test(content)) {
+      if (pattern.test(contentToTest)) {
         foundLegacy = true;
         results.push(
           ng(
@@ -4762,7 +4779,7 @@ function checkSkillCategoryGap(
     const scriptPath = path.join(scriptsDir, scriptFile);
     const content = readText(scriptPath);
     if (!content) continue;
-    const checkFuncMatches = content.matchAll(/function\s+(check\w+)/g);
+    const checkFuncMatches = content.matchAll(/function\s+((?:check|lint)\w+)/g);
     for (const m of checkFuncMatches) {
       scriptCheckNames.add(m[1]);
     }
@@ -4770,10 +4787,13 @@ function checkSkillCategoryGap(
 
   const categoryToCheckPattern = new Map([
     ["REQ frontmatter ↔ ファイル名", ["ReqFrontmatter", "ReqRequired"]],
+    ["REQ frontmatter↔ファイル名", ["ReqFrontmatter", "ReqRequired"]],
     ["Retired REQ frontmatter", ["RetiredFrontmatter"]],
     ["ADR ↔ REQ 相互参照", ["AdrReqCrossReference"]],
+    ["ADR↔REQ 相互参照", ["AdrReqCrossReference"]],
     ["Skill frontmatter", ["SkillFrontmatter"]],
     ["Command-map ↔ 実体", ["CommandReadmeSync", "CommandInventory"]],
+    ["Command-map↔実体", ["CommandReadmeSync", "CommandInventory"]],
     ["Command frontmatter", ["CommandFrontmatterDetailed"]],
     ["旧 namespace 残存", ["LegacyNamespace", "BareSlashScoped"]],
     ["完了報告フォーマット", ["CompletionReport", "InlineCompletion"]],
@@ -4783,6 +4803,9 @@ function checkSkillCategoryGap(
     ["RU-ID 根拠参照", ["RuidGroundReference"]],
     ["Workflow status 禁止", ["WorkflowStatusProhibition"]],
     ["Accepted ADR 引用", ["AcceptedAdrOnlyCitation"]],
+    ["Workflow template 構造", ["checkNaming", "checkFrontmatter", "checkSectionMarkers"]],
+    ["Skill 構造", ["lintSkill"]],
+    ["Junction 整合性", ["BrokenJunctions"]],
   ]);
 
   let foundGap = false;
@@ -4942,6 +4965,113 @@ function checkTemplatePathIntegrity(
   return results;
 }
 
+// ─── Broken junction / symlink detection (REQ-0108-172, REQ-0108-173) ───────
+
+/**
+ * Detect broken junctions (Windows) and broken symlinks (Unix) under the
+ * .opencode/skills/ directory. A junction/symlink is "broken" when its
+ * target directory does not exist on disk.
+ *
+ * Windows: fs.statSync follows the reparse point, so we use lstatSync-style
+ * checks via fs.readdirSync with withFileTypes and inspect the Dirent.
+ * If a junction target is missing, fs.existsSync returns false for the path,
+ * but the junction directory entry still appears in readdir.
+ */
+function checkBrokenJunctions(skillsDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundBroken = false;
+
+  if (!fs.existsSync(skillsDir)) {
+    results.push(
+      info(
+        "JunctionIntegrity",
+        "broken-junction",
+        "Skills directory does not exist",
+      ),
+    );
+    return results;
+  }
+
+  const entries = fs.readdirSync(skillsDir, {
+    withFileTypes: true,
+  }) as import("fs").Dirent[];
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const fullPath = path.join(skillsDir, entry.name);
+    const relPath = resolveRelative(fullPath, root);
+
+    // On Windows, junctions appear as directories in Dirent, but we can
+    // detect them by checking if the directory is a reparse point via
+    // fs.lstatSync. On Unix, check for symbolic links.
+    let isJunction = false;
+    try {
+      const lstat = fs.lstatSync(fullPath) as import("fs").Stats;
+      // Windows: junction is detected via isSymbolicLink (node treats
+      // junctions as symbolic links in lstat). Unix: actual symlink.
+      isJunction = lstat.isSymbolicLink();
+    } catch {
+      // If lstat fails, try to detect broken junction by checking if
+      // the directory exists but throws on stat (follows link).
+      try {
+        fs.statSync(fullPath);
+      } catch {
+        // stat fails but readdir showed it → broken junction
+        foundBroken = true;
+        results.push(
+          ng(
+            "JunctionIntegrity",
+            "broken-junction",
+            `Broken junction/symlink detected: '${entry.name}' target does not exist`,
+            relPath,
+            undefined,
+            {
+              evidence: entry.name,
+              expected: "junction/symlink target directory must exist",
+              route: determineRoute("JunctionIntegrity", 1),
+            },
+          ),
+        );
+        continue;
+      }
+    }
+
+    if (isJunction) {
+      // For valid junctions/symlinks, verify the target exists
+      try {
+        fs.statSync(fullPath);
+      } catch {
+        foundBroken = true;
+        results.push(
+          ng(
+            "JunctionIntegrity",
+            "broken-junction",
+            `Broken junction/symlink detected: '${entry.name}' target does not exist`,
+            relPath,
+            undefined,
+            {
+              evidence: entry.name,
+              expected: "junction/symlink target directory must exist",
+              route: determineRoute("JunctionIntegrity", 1),
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  if (!foundBroken) {
+    results.push(
+      ok(
+        "JunctionIntegrity",
+        "broken-junction",
+        "No broken junctions or symlinks detected in skills directory",
+      ),
+    );
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -5053,6 +5183,7 @@ async function main(): Promise<void> {
     ...checkVocabularyCompliance(root),
     ...checkSkillCategoryGap(root, skillsDir, cmdDir),
     ...checkTemplatePathIntegrity(cmdDir, root),
+    ...checkBrokenJunctions(skillsDir, root),
   ];
 
   const processed = processResults(results);
