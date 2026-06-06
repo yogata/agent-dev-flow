@@ -25,6 +25,7 @@
 | ADR-0017 | 文書種別責務境界 | accepted | 2026-06-03 |
 | ADR-0018 | runtime 独立性 | accepted | 2026-06-03 |
 | ADR-0019 | OpenCode Source / Projection 分離 | accepted | 2026-06-06 |
+| ADR-0020 | Adopt /repo/* Namespace for Repo-Local Tooling | accepted | 2026-06-06 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -43,9 +44,12 @@
 
 ### accepted
 
-- [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 瑧一
+- [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 統一
 - [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
+- [ADR-0017](ADR-0017.md) — 文書種別責務境界
+- [ADR-0018](ADR-0018.md) — runtime 独立性
 - [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
+- [ADR-0020](ADR-0020.md) — Adopt /repo/* Namespace for Repo-Local Tooling
 
 ### deprecated
 
@@ -81,6 +85,7 @@
 
 - [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 統一
 - [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
+- [ADR-0020](ADR-0020.md) — Adopt /repo/* Namespace for Repo-Local Tooling
 
 ### Epic管理
 
@@ -101,6 +106,7 @@
 - [ADR-0017](ADR-0017.md) — 文書種別責務境界
 - [ADR-0018](ADR-0018.md) — runtime 独立性
 - [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
+- [ADR-0020](ADR-0020.md) — Adopt /repo/* Namespace for Repo-Local Tooling
 
 ### 文書責務・runtime独立性
 
@@ -154,6 +160,8 @@
 | [ADR-0019](ADR-0019.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring分離の具体化（source/projection物理分離） |
 | [ADR-0019](ADR-0019.md) | relates-to | [ADR-0017](ADR-0017.md) | 文書種別責務境界の物理層での裏付け |
 | [ADR-0019](ADR-0019.md) | relates-to | [ADR-0018](ADR-0018.md) | runtime独立性のsource/projection分離による実現 |
+| [ADR-0020](ADR-0020.md) | relates-to | [ADR-0005](ADR-0005.md) | repo-local namespaceとAgentDevFlow canonical namespaceの境界定義 |
+| [ADR-0020](ADR-0020.md) | relates-to | [ADR-0019](ADR-0019.md) | repo-local artifactをsource/projection同期対象外にする根拠 |
 
 ## Related REQ
 
@@ -178,3 +186,4 @@
 | [ADR-0017](ADR-0017.md) | [REQ-0101](../requirements/REQ-0101.md), [REQ-0103](../requirements/REQ-0103.md) | 文書種別責務境界の宣言 |
 | [ADR-0018](ADR-0018.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | runtime独立性・SPEC非依存の宣言 |
 | [ADR-0019](ADR-0019.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | source/projection分離・sync script・namespace予約・integrity scan分離 |
+| [ADR-0020](ADR-0020.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | repo-local namespace定義・integrity-check移管・vocabulary registry移動・配布対象外制約 |
