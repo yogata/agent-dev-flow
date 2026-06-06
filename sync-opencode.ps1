@@ -13,7 +13,6 @@
     - .opencode/             = real directory (not a junction)
     - .opencode/commands/agentdev/  = junction -> src/opencode/commands/agentdev/
     - .opencode/skills/agentdev-*/  = individual junctions -> src/opencode/skills/agentdev-*/
-    - .opencode/.gitignore   = copied as real file from src/opencode/.gitignore
 
 .PARAMETER Mode
     One of: dry-run, check, apply
@@ -86,7 +85,6 @@ if (-not (Test-Path -LiteralPath $SourceDir)) {
 }
 
 $targets = Get-SelectiveJunctionTargets
-$gitignoreSource = Join-Path $SourceDir '.gitignore'
 
 # ============================================================
 # CHECK MODE
@@ -156,24 +154,6 @@ if ($Mode -eq 'check') {
                     $divergences++
                 }
             }
-    }
-
-    # 5. .gitignore consistency
-    $gitignoreProj = Join-Path $ProjectionDir '.gitignore'
-    if (Test-Path -LiteralPath $gitignoreSource) {
-        if (-not (Test-Path -LiteralPath $gitignoreProj)) {
-            Write-Host '[DIVERGENCE] .opencode/.gitignore is missing'
-            $divergences++
-        } else {
-            $srcHash = (Get-FileHash -LiteralPath $gitignoreSource -Algorithm SHA256).Hash
-            $projHash = (Get-FileHash -LiteralPath $gitignoreProj -Algorithm SHA256).Hash
-            if ($srcHash -eq $projHash) {
-                Write-Host '[OK] .opencode/.gitignore is up to date'
-            } else {
-                Write-Host '[DIVERGENCE] .opencode/.gitignore is stale'
-                $divergences++
-            }
-        }
     }
 
     Write-Host ''
@@ -254,24 +234,6 @@ if ($Mode -eq 'dry-run') {
     }
     if (-not $orphansFound) {
         Write-Host '[OK] No orphan junctions detected'
-    }
-
-    # .gitignore plan
-    Write-Host ''
-    Write-Host '--- .gitignore ---'
-    $gitignoreProj = Join-Path $ProjectionDir '.gitignore'
-    if (Test-Path -LiteralPath $gitignoreSource) {
-        if (-not (Test-Path -LiteralPath $gitignoreProj)) {
-            Write-Host '[WOULD ADD] Copy .gitignore -> .opencode/.gitignore'
-        } else {
-            $srcHash = (Get-FileHash -LiteralPath $gitignoreSource -Algorithm SHA256).Hash
-            $projHash = (Get-FileHash -LiteralPath $gitignoreProj -Algorithm SHA256).Hash
-            if ($srcHash -ne $projHash) {
-                Write-Host '[WOULD ADD] Update .opencode/.gitignore (source changed)'
-            } else {
-                Write-Host '[OK] .opencode/.gitignore is up to date'
-            }
-        }
     }
 
     Write-Host ''
@@ -381,25 +343,6 @@ if ($Mode -eq 'apply') {
                     }
                 }
             }
-    }
-
-    # Step 5: .gitignore Copy
-    if (Test-Path -LiteralPath $gitignoreSource) {
-        $gitignoreProj = Join-Path $ProjectionDir '.gitignore'
-        $needsCopy = $false
-        if (-not (Test-Path -LiteralPath $gitignoreProj)) {
-            $needsCopy = $true
-        } else {
-            $srcHash = (Get-FileHash -LiteralPath $gitignoreSource -Algorithm SHA256).Hash
-            $projHash = (Get-FileHash -LiteralPath $gitignoreProj -Algorithm SHA256).Hash
-            if ($srcHash -ne $projHash) { $needsCopy = $true }
-        }
-        if ($needsCopy) {
-            Copy-Item -LiteralPath $gitignoreSource -Destination $gitignoreProj -Force
-            Write-Host '[ACTION] Copied .gitignore'
-        } else {
-            Write-Host '[OK] .opencode/.gitignore is up to date'
-        }
     }
 
     Write-Host ''
