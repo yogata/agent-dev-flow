@@ -88,6 +88,18 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 - **参照元**: 当該 Command が直接参照
 - **命名規則**: `{command}` はコマンド名（`case-close`, `case-run` 等）、`{variant}` はバリアント名（`standard`, `epic` 等）
 
+### テンプレート種別別参照先
+
+| テンプレート種別 | 参照先（runtime path） | 参照元 |
+|---|---|---|
+| Issue 説明文 | `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_*.md` | case-open |
+| Issue コメント | `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` | case-close, case-update |
+| PR 説明文 | `.opencode/skills/agentdev-workflow-templates/templates/pr_desc.md` | case-run |
+| 完了報告 | `.opencode/commands/agentdev/templates/{command}/{variant}.md` | 各コマンド |
+
+- runtime command は上記 runtime path（`.opencode/...`）からテンプレートを参照すること（SHALL）
+- `src/opencode/...` は source 配置・install-sync 入力・authoring context に限定し、runtime 実行時の参照先として使用しない（SHALL）
+
 ### 移行メモ
 
 完了報告テンプレートは Skill-local（`.opencode/skills/agentdev-workflow-reporting/templates/`）から Command-local（`.opencode/commands/agentdev/templates/`）へ移行する。移行完了後、Skill-local の完了報告テンプレートは削除する。

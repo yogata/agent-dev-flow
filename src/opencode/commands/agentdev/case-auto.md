@@ -55,3 +55,7 @@ agent: sisyphus
 
 ### 出力制約
 - G10: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+
+### Runtime path 制約
+- G11: 既存コマンド定義を読み込む際、`src/opencode/...` を runtime path に読み替えてはならない（SHALL）。コマンド定義内のパス参照は記述された通りに解釈し、`src/opencode/` を runtime 参照先として使用しない
+- G12: 委譲先コマンドの実行時 Read / Glob に `src/opencode/...` 固定参照を含めない（SHALL）
