@@ -26,6 +26,7 @@
 | ADR-0018 | runtime 独立性 | accepted | 2026-06-03 |
 | ADR-0019 | OpenCode Source / Projection 分離 | accepted | 2026-06-06 |
 | ADR-0020 | Adopt /repo/* Namespace for Repo-Local Tooling | accepted | 2026-06-06 |
+| ADR-0021 | Upstream Handoff Metadata Convention | accepted | 2026-06-06 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -50,6 +51,7 @@
 - [ADR-0018](ADR-0018.md) — runtime 独立性
 - [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
 - [ADR-0020](ADR-0020.md) — Adopt /repo/* Namespace for Repo-Local Tooling
+- [ADR-0021](ADR-0021.md) — Upstream Handoff Metadata Convention
 
 ### deprecated
 
@@ -96,6 +98,7 @@
 - [ADR-0010](ADR-0010.md) — HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則
 - [ADR-0011](ADR-0011.md) — Manager/orchestrator パターンの限定採用 — 標準構造とはしない
 - [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
+- [ADR-0021](ADR-0021.md) — Upstream Handoff Metadata Convention
 
 ### 文書体系
 
@@ -162,6 +165,8 @@
 | [ADR-0019](ADR-0019.md) | relates-to | [ADR-0018](ADR-0018.md) | runtime独立性のsource/projection分離による実現 |
 | [ADR-0020](ADR-0020.md) | relates-to | [ADR-0005](ADR-0005.md) | repo-local namespaceとAgentDevFlow canonical namespaceの境界定義 |
 | [ADR-0020](ADR-0020.md) | relates-to | [ADR-0019](ADR-0019.md) | repo-local artifactをsource/projection同期対象外にする根拠 |
+| [ADR-0021](ADR-0021.md) | relates-to | [ADR-0010](ADR-0010.md) | upstream handoff停止はHITL境界の具体化 |
+| [ADR-0021](ADR-0021.md) | relates-to | [ADR-0005](ADR-0005.md) | AgentDevFlow namespace統一とconsumer改修防止の補完 |
 
 ## Related REQ
 
@@ -187,3 +192,4 @@
 | [ADR-0018](ADR-0018.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | runtime独立性・SPEC非依存の宣言 |
 | [ADR-0019](ADR-0019.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | source/projection分離・sync script・namespace予約・integrity scan分離 |
 | [ADR-0020](ADR-0020.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | repo-local namespace定義・integrity-check移管・vocabulary registry移動・配布対象外制約 |
+| [ADR-0021](ADR-0021.md) | [REQ-0104](../requirements/REQ-0104.md) | upstream handoff metadata convention・handoff停止条件・共通方針集約 |
