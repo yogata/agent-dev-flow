@@ -28,6 +28,7 @@
 | ADR-0020 | Adopt /repo/* Namespace for Repo-Local Tooling | accepted | 2026-06-06 |
 | ADR-0021 | Upstream Handoff Metadata Convention | accepted | 2026-06-06 |
 | ADR-0022 | review/refine 系中間コマンドを promote 内フェーズへ統合 | accepted | 2026-06-06 |
+| ADR-0023 | backlog-save 廃止とパイプライン再構築 | proposed | 2026-06-07 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -43,6 +44,7 @@
 - [ADR-0010](ADR-0010.md) — HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則
 - [ADR-0011](ADR-0011.md) — Manager/orchestrator パターンの限定採用 — 標準構造とはしない
 - [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
+- [ADR-0023](ADR-0023.md) — backlog-save 廃止とパイプライン再構築
 
 ### accepted
 
@@ -102,6 +104,7 @@
 - [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
 - [ADR-0021](ADR-0021.md) — Upstream Handoff Metadata Convention
 - [ADR-0022](ADR-0022.md) — review/refine 系中間コマンドを promote 内フェーズへ統合
+- [ADR-0023](ADR-0023.md) — backlog-save 廃止とパイプライン再構築
 
 ### 文書体系
 
@@ -172,6 +175,8 @@
 | [ADR-0021](ADR-0021.md) | relates-to | [ADR-0005](ADR-0005.md) | AgentDevFlow namespace統一とconsumer改修防止の補完 |
 | [ADR-0022](ADR-0022.md) | relates-to | [ADR-0010](ADR-0010.md) | promote コマンドへの HITL 確定ステップ統合 |
 | [ADR-0022](ADR-0022.md) | relates-to | [ADR-0012](ADR-0012.md) | pipeline 構成変更（review/refine 廃止・promote 統合） |
+| [ADR-0023](ADR-0023.md) | relates-to | [ADR-0012](ADR-0012.md) | pipeline 構成変更（backlog-save 廃止・backlog-review RU 生成統合） |
+| [ADR-0023](ADR-0023.md) | relates-to | [ADR-0022](ADR-0022.md) | review/refine 統合に続くパイプライン再構築 |
 
 ## Related REQ
 
@@ -199,3 +204,4 @@
 | [ADR-0020](ADR-0020.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | repo-local namespace定義・integrity-check移管・vocabulary registry移動・配布対象外制約 |
 | [ADR-0021](ADR-0021.md) | [REQ-0104](../requirements/REQ-0104.md) | upstream handoff metadata convention・handoff停止条件・共通方針集約 |
 | [ADR-0022](ADR-0022.md) | [REQ-0105](../requirements/REQ-0105.md) | intake-promote / learning-promote 統合・review/refine 廃止・HITL 集約 |
+| [ADR-0023](ADR-0023.md) | [REQ-0105](../requirements/REQ-0105.md) | backlog-save 廃止・backlog-review RU 生成統合・depends_on・パイプライン再構築 |
