@@ -1,20 +1,20 @@
 ---
-name: agentdev-integrity
-description: Centralized integrity validation for AgentDevFlow artifacts. Provides validator scripts for REQ/ADR/skill/command consistency, template validation, and skill structure linting. USE FOR: running integrity checks on AgentDevFlow artifacts, validating REQ frontmatter and cross-references, detecting legacy namespace remnants, verifying workflow templates, linting skill structures. DO NOT USE FOR: semantic content evaluation, user approval decisions, requirement analysis, or ADR necessity judgment.
+name: repo-agentdev-integrity
+description: Repo-local integrity validation for agent-dev-flow self-hosting artifacts. Provides validator scripts for REQ/ADR/skill/command consistency, template validation, and skill structure linting. USE FOR: running integrity checks on agent-dev-flow repo artifacts, validating REQ frontmatter and cross-references, detecting legacy namespace remnants, verifying workflow templates, linting skill structures. DO NOT USE FOR: semantic content evaluation, user approval decisions, requirement analysis, or ADR necessity judgment.
 ---
 
-# agentdev-integrity
+# repo-agentdev-integrity
 
-AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機械的検査をスクリプトとして提供し、検査の再現性と信頼性を担保する。
+agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検査を集約する repo-local skill。AgentDevFlow の配布対象外であり、consumer project では利用しない（ADR-0020）。機械的検査をスクリプトとして提供し、検査の再現性と信頼性を担保する。
 
 ## USE FOR
 
-- AgentDevFlow artifact（REQ、ADR、skill、command、template）の整合性検査
+- agent-dev-flow repo artifact（REQ、ADR、skill、command、template）の整合性検査
 - REQ frontmatter ↔ ファイル名整合性の確認
 - ADR ↔ REQ 相互参照の確認
 - Command-map ↔ 実体の整合性確認
 - 旧 namespace 残存の検出
-- 完了報告フォーマットの整合性検証（REQ-0107, REQ-0107）
+- 完了報告フォーマットの整合性検証（REQ-0107）
 - ワークフローテンプレートの構造検証
 - Skill 構造（SKILL.md）の lint
 - 検出結果の Markdown レポート生成
@@ -28,6 +28,7 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 - `spec-bug` / `impl-bug` / `scope-creep` の最終分類（→ `agentdev-spec-compliance`）
 - `gh` 書き込み検証の orchestration（→ `agentdev-gh-cli`）
 - 実装の自動修正（read-only 原則）
+- Consumer project での整合性検査（本 skill は self-hosting repo のみ対象）
 
 ## 検査対象定義
 
@@ -54,9 +55,9 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 | ADR ↔ REQ 相互参照 | `check_integrity.ts` | 双方向参照の存在確認、retired 区別 |
 | Skill frontmatter | `check_integrity.ts` | name ↔ dir 一致、USE FOR 境界、reference/ 残存 (REQ-0108-092~094) |
 | Command-map ↔ 実体 | `check_integrity.ts` | README ↔ 実ファイル、command inventory |
-| Command frontmatter | `check_integrity.ts` | implementation_pattern / secondary_pattern / load_skills 禁止検出、pattern / workflow_route / branch_type / labels 禁止、agent 名、deprecated 混入 (REQ-0108-095~099, 124, Case 5 / RU-0020) |
+| Command frontmatter | `check_integrity.ts` | implementation_pattern / secondary_pattern / load_skills 禁止検出、pattern / workflow_route / branch_type / labels 禁止、agent 名、deprecated 混入 (REQ-0108-095~099, 124) |
 | 旧 namespace 残存 | `check_integrity.ts` | 旧コマンド名、旧パス、二重 prefix、bare slash (scoped) |
-| 完了報告フォーマット | `check_integrity.ts` | load_skills 参照、completion-reports.md テンプレート存在、インライン完了報告、完了後追加出力、旧 terminology（REQ-0107, REQ-0107） |
+| 完了報告フォーマット | `check_integrity.ts` | load_skills 参照、completion-reports.md テンプレート存在、インライン完了報告、完了後追加出力、旧 terminology（REQ-0107） |
 | Variant report | `check_integrity.ts` | variant 実在確認、registry 登録確認、必須フィールド、fragment 合成パターン (REQ-0108-089~091) |
 | Mapping table | `check_integrity.ts` | 全件記録・存在確認・移行先確認・status enum 検査 (REQ-0108-083~088) |
 | ADR status 正規化 | `check_integrity.ts` | 旧形式 `superseded-by:[ADR-XXXX]` 検出 (REQ-0108-121) |
@@ -88,7 +89,7 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 
 ### Markdown 出力
 
-`/agentdev/integrity-check` command の Step 7 レポート形式に準拠。
+`/repo/integrity-check` command の Step 2 レポート形式に準拠。
 
 ```markdown
 # Integrity Check Report
@@ -114,18 +115,6 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 
 ### REQ frontmatter↔ファイル名
 {検出結果の詳細}
-
-### ADR↔REQ 相互参照
-{検出結果の詳細}
-
-### Command-map↔実体
-{検出結果の詳細}
-
-### 旧 namespace 残存
-{検出結果の詳細}
-
-### 完了報告フォーマット
-{検出結果の詳細}
 ```
 
 ## 出力規約
@@ -137,7 +126,7 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 
 ## スキルの責務範囲
 
-本スキルは検査・レポートschema定義のみを提供する。intake item の作成（`.agentdev/intake/inbox/` へのファイル生成）は `/agentdev/integrity-check` コマンドの責務であり、本スキルは intake item 作成の判定基準や手順を定義しない。
+本スキルは検査・レポートschema定義のみを提供する。intake item の作成（`.agentdev/intake/inbox/` へのファイル生成）は `/repo/integrity-check` コマンドの責務であり、本スキルは intake item 作成の判定基準や手順を定義しない。
 
 ## Validator 呼び出し規約
 
@@ -151,6 +140,10 @@ AgentDevFlow 管理下の artifact の整合性検査を集約する skill。機
 ## 共通 CLI 契約ユーティリティ
 
 `scripts/cli_utils.ts` に共通パーサー・フォーマッタを提供する。各 validator script はこれを import して使用する。
+
+## 語彙レジストリ
+
+旧語彙検出の根拠として `references/vocabulary-registry.md` を参照する。
 
 ## See Also
 

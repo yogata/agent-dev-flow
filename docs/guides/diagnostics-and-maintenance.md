@@ -2,14 +2,14 @@
 
 AgentDevFlow の整合性検査と REQ 体系の健全性診断について説明する。
 
-## integrity-check
+## integrity-check（repo-local 自己監査）
 
-ドキュメント・スキル・コマンドの横断的整合性を検証するコマンド。
+agent-dev-flow リポジトリの自己監査コマンド。ドキュメント・スキル・コマンドの横断的整合性を検証する。AgentDevFlow の consumer 配布対象外であり、self-hosting repo のみで利用する（ADR-0020）。
 
 ### 基本フロー
 
 ```
-検査契機発生 → /agentdev/integrity-check → 検証レポート生成 → 乖離があれば対応コマンドへ
+検査契機発生 → /repo/integrity-check → 検証レポート生成 → 乖離があれば対応コマンドへ
 ```
 
 ### 検査対象
@@ -78,4 +78,4 @@ AgentDevFlow では以下の整合性レイヤーを意識する。
 2. **実装整合性**: 実装コード・設定が SPEC と一致していること
 3. **ドメイン状態整合性**: `.agentdev/` 内の成果物がパイプライン境界を守っていること
 
-整合性に問題が見つかったら、まず `integrity-check` を実行して全体像を把握し、Finding の route に沿って対応する。
+整合性に問題が見つかったら、まず `/repo/integrity-check` を実行して全体像を把握し、Finding の route に沿って対応する。

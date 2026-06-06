@@ -23,8 +23,15 @@
 | review draft がある | `/agentdev/backlog-save` | RU（Requirement Unit） |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | REQ 体系の健全性を診断したい | `/agentdev/req-restructure-review` | 診断レポート |
-| ドキュメント整合性を検証したい | `/agentdev/integrity-check` | 検証レポート |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
+
+## Repository maintenance（self-hosting repo のみ）
+
+| 現在の状態 | 次のコマンド | 出力 |
+|-----------|-------------|------|
+| ドキュメント整合性を検証したい | `/repo/integrity-check` | 検証レポート |
+
+> これらのコマンドは repo-local（ADR-0020）であり、AgentDevFlow の consumer 配布対象外。
 
 ## 使い方
 

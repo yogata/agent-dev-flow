@@ -58,11 +58,12 @@ src/opencode/
 | `agentdev` | command namespace | self-hosting, consumer-with-agentdev |
 | `agentdev-*` | skill prefix | self-hosting, consumer-with-agentdev |
 | `.agentdev/` | domain state directory | self-hosting, consumer-with-agentdev |
-| `agentdev-integrity` | integrity skill | self-hosting, consumer-with-agentdev |
 
 **禁止事項**:
 - consumer-local での `agentdev` namespace 使用（REQ-0103-056）
 - consumer-with-agentdev での AgentDevFlow 提供 file の直接編集（上書きされる可能性）
+
+> **Note**: `agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-0020）。integrity-check は `repo-agentdev-integrity`（repo-local skill）として self-hosting repo のみで実行される。Consumer project には配布されない。
 
 ## Installation Method Policy
 
