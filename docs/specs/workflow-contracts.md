@@ -117,7 +117,7 @@ draft（`.sisyphus/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 | `/agentdev/intake-from-github` | GitHub Issue/PR | `.agentdev/intake/inbox/` | 収集 |
 | `/agentdev/intake-review` | `.agentdev/intake/inbox/` | inbox → accepted / archive/rejected ディレクトリ移動 | レビュー |
 | `/agentdev/intake-promote` | review済み intake items | `.agentdev/intake/promoted/` | 昇華 |
-| `/agentdev/integrity-check` | ドキュメント・スキル・コマンド | `.agentdev/integrity/reports/` | 整合性検査 |
+| `/repo/integrity-check` | ドキュメント・スキル・コマンド | `.agentdev/integrity/reports/` | 整合性検査（repo-local、ADR-0020） |
 | `/agentdev/req-restructure-review` | ドキュメント・REQ体系 | なし（診断結果出力のみ） | REQ再構成 |
 
 ### 参照フロー
@@ -304,7 +304,7 @@ promoted artifact → RU → REQ / Issue → RU 削除
 | `/agentdev/intake-promote` | file-pipeline |
 | `/agentdev/backlog-review` | wall-session |
 | `/agentdev/backlog-save` | file-pipeline |
-| `/agentdev/integrity-check` | read-only-diagnostic |
+| `/repo/integrity-check` | read-only-diagnostic |
 | `/agentdev/req-restructure-review` | read-only-diagnostic |
 
 ## Epic Orchestrator Contract
