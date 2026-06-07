@@ -8,16 +8,16 @@
 |---------|---------|-----------|--------|
 | ADR-0001 | Command/Skill/Template/Script責任分界の正式定義 | proposed | 2026-05-18 |
 | ADR-0002 | Orchestration skill作成基準の導入 | proposed | 2026-05-18 |
-| ADR-0003 | req-define入力の抽象化 | proposed | 2026-05-18 |
+| ADR-0003 | req-define入力の抽象化 | deprecated | 2026-05-18 |
 | ADR-0004 | 要件管理構造の area-based 移行方針 | superseded | 2026-05-19 |
 | ADR-0005 | AgentDevFlow plugin namespace 統一 | accepted | 2026-05-21 |
 | ADR-0006 | Epic Issue 本文を実行順序 SSoT とする設計 | proposed | 2026-05-22 |
 | ADR-0007 | REQ/ADR基準構造と分類ビュー運用の再定義 | superseded | 2026-05-24 |
 | ADR-0008 | DOC-MAP導入と requirements/views 廃止 | proposed | 2026-05-28 |
 | ADR-0009 | REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入 | deprecated | 2026-05-30 |
-| ADR-0010 | HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則 | proposed | 2026-06-02 |
+| ADR-0010 | HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則 | deprecated | 2026-06-02 |
 | ADR-0011 | Manager/orchestrator パターンの限定採用 — 標準構造とはしない | proposed | 2026-06-02 |
-| ADR-0012 | Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流 | proposed | 2026-06-02 |
+| ADR-0012 | Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流 | deprecated | 2026-06-02 |
 | ADR-0013 | runtime / authoring 関心分離 | accepted | 2026-06-02 |
 | ADR-0014 | ADR / SPEC 再分類基準 | superseded | 2026-06-02 |
 | ADR-0015 | docs/specs 非runtime依存宣言 | superseded | 2026-06-02 |
@@ -26,9 +26,9 @@
 | ADR-0018 | runtime 独立性 | accepted | 2026-06-03 |
 | ADR-0019 | OpenCode Source / Projection 分離 | accepted | 2026-06-06 |
 | ADR-0020 | Adopt /repo/* Namespace for Repo-Local Tooling | accepted | 2026-06-06 |
-| ADR-0021 | Upstream Handoff Metadata Convention | accepted | 2026-06-06 |
-| ADR-0022 | review/refine 系中間コマンドを promote 内フェーズへ統合 | accepted | 2026-06-06 |
-| ADR-0023 | backlog-save 廃止とパイプライン再構築 | accepted | 2026-06-07 |
+| ADR-0021 | Upstream Handoff Metadata Convention | deprecated | 2026-06-06 |
+| ADR-0022 | review/refine 系中間コマンドを promote 内フェーズへ統合 | deprecated | 2026-06-06 |
+| ADR-0023 | backlog-save 廃止とパイプライン再構築 | deprecated | 2026-06-07 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -38,26 +38,27 @@
 
 - [ADR-0001](ADR-0001.md) — Command/Skill/Template/Script責務分界の正式定義
 - [ADR-0002](ADR-0002.md) — Orchestration skill作成基準の導入
-- [ADR-0003](ADR-0003.md) — req-define入力の抽象化
 - [ADR-0006](ADR-0006.md) — Epic Issue 本文を実行順序 SSoT とする設計
 - [ADR-0008](ADR-0008.md) — DOC-MAP導入と requirements/views 廃止
-- [ADR-0010](ADR-0010.md) — HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則
 - [ADR-0011](ADR-0011.md) — Manager/orchestrator パターンの限定採用 — 標準構造とはしない
-- [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
-- [ADR-0023](ADR-0023.md) — backlog-save 廃止とパイプライン再構築
 
 ### accepted
+- [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 統一
 - [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
 - [ADR-0017](ADR-0017.md) — 文書種別責務境界
 - [ADR-0018](ADR-0018.md) — runtime 独立性
 - [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
 - [ADR-0020](ADR-0020.md) — Adopt /repo/* Namespace for Repo-Local Tooling
-- [ADR-0021](ADR-0021.md) — Upstream Handoff Metadata Convention
-- [ADR-0022](ADR-0022.md) — review/refine 系中間コマンドを promote 内フェーズへ統合
 
 ### deprecated
 
+- [ADR-0003](ADR-0003.md) — req-define入力の抽象化
 - [ADR-0009](ADR-0009.md) — REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入
+- [ADR-0010](ADR-0010.md) — HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則
+- [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
+- [ADR-0021](ADR-0021.md) — Upstream Handoff Metadata Convention
+- [ADR-0022](ADR-0022.md) — review/refine 系中間コマンドを promote 内フェーズへ統合
+- [ADR-0023](ADR-0023.md) — backlog-save 廃止とパイプライン再構築
 
 ### superseded
 
