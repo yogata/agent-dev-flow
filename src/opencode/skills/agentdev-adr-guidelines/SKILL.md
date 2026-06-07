@@ -46,6 +46,18 @@ description: Evaluates whether architectural decisions require an ADR. USE FOR: 
 
 上記に該当する場合は、ADRではなくREQ/SPEC/guideの更新として扱う。
 
+### False Negative 防止基準（REQ-0112-043関連）
+
+ADR要否判定において、以下の兆候が検出された場合は、たとえ上記「ADRを作成してはならない条件」に該当しそうであっても、再度技術判断の有無を確認すること:
+
+| 兆候 | 確認内容 |
+|------|---------|
+| 文書種別が境界上 | REQ/SPEC と ADR の境界付近にある場合、技術判断を含むか再確認 |
+| 既存ADRの内容が SPEC 相当 | 既存ADRに振る舞い・schema記述が含まれる場合、SPEC への移管を検討 |
+| 新規ADRの必要性が微妙 | 「ADRを作成してはならない条件」に該当するが、取り返しがつかない技術決定を含む場合は例外としてADRを認める |
+
+**方針**: false negative（ADRが必要なのに見逃し）を防止する。false positive（不要なADRの作成）は後に整理できるため、微妙な場合はADR側に寄せる。
+
 ## ADRのライフサイクル
 ADRの状態は以下のいずれかをとります。一度 Accepted された ADR は**直接書き換えず**、変更が必要な場合は新しい ADR を作成して古いものを Superseded/Deprecated にします。
 

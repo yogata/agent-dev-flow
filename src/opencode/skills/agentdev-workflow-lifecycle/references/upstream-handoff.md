@@ -42,4 +42,4 @@ Issue 本文、要件doc、Requirement Source に `apply_in_current_project: fal
 ## 参照
 
 - REQ-0104-017〜027（Workflow / Command Protocol — upstream handoff workflow protocol）
-- ADR-0021（Upstream Handoff Metadata Convention）
+- retired ADR-0021（Upstream Handoff Metadata Convention、現在は SPEC workflow-contracts.md で規定）
