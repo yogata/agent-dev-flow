@@ -8,7 +8,7 @@
 
 ## Premise Reversal Record
 
-以下の検査は前提の reversal を反映している（ADR-0013）:
+以下の検査は前提の reversal を反映している（ADR-0102）:
 
 | 検査 | 旧前提 | 新前提 | 根拠 REQ |
 |---|---|---|---|
@@ -28,6 +28,7 @@
 | abolished-skill-reference | N/A (検査対象外) | 廃止済み skill (agentdev-workflow-reporting) への参照を strict として検出 | REQ-0108-126 |
 | command-local-template-existence | completion report templates in skill directory | completion report templates in `.opencode/commands/agentdev/templates/{command}/{variant}.md` | REQ-0108-127 |
 | skill-spec-dependency | N/A (検査対象外) | runtime skill から docs/specs/ への直接依存を warning として検出 | REQ-0108-128 |
+| ADR current/retired collection | 検査対象外 | current ADR collection（`docs/adr/ADR-01XX.md`）と retired ADR collection（`docs/adr/retired/ADR-00XX.md`）を区別して検査 | REQ-0112-050 |
 
 ## Severity Classification
 
@@ -68,7 +69,7 @@
 | カテゴリ | 検査対象 |
 |---|---|
 | REQ | frontmatter 整合性、ID 一意性、タグ妥当性 |
-| ADR | status 遷移妥当性、参照 REQ 存在確認 |
+| ADR | status 遷移妥当性、参照 REQ 存在確認、current/retired collection 区別（REQ-0112-050） |
 | Skill | USE FOR / DO NOT USE FOR 整合性、references/ 存在確認 |
 | Command | frontmatter 許可フィールド、Steps 構造 |
 | Template | 必須セクション存在、プレースホルダー妥当性 |
@@ -81,10 +82,11 @@
 | ADRStatusNormalization | ADR status 旧形式検出（REQ-0108-121） |
 | RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-0108-122） |
 | WorkflowStatusProhibition | workflow status / 6 マイクロフェーズ検出（REQ-0108-123） |
-| AcceptedAdrCitation | accepted 以外の ADR 引用検出（REQ-0108-125, SHOULD） |
+| AcceptedAdrCitation | accepted 以外の ADR 引用検出（REQ-0108-125, SHOULD）。retired ADR への履歴参照は現行根拠引用 warning と区別する（REQ-0112-050） |
 | AbolishedSkillReference | 廃止済み skill への参照検知（REQ-0108-126） |
 | CommandLocalTemplate | command-local template 存在・整合性検査（REQ-0108-127） |
 | SkillSpecDependency | runtime skill から docs/specs/ への直接依存検出（REQ-0108-128） |
+| RetiredAdrCitation | retired ADR への現行根拠引用検出（REQ-0112-048, warning/observation） |
 
 ## Report Format
 
@@ -105,7 +107,7 @@
 
 ## Scope Declaration
 
-`docs/specs/` は agent-dev-flow レポジトリ専用の repo-internal 設計文書である（ADR-0017）。他プロジェクトへの適用を意図しない。runtime command は SPEC ファイルに依存しない（ADR-0018）。
+`docs/specs/` は agent-dev-flow レポジトリ専用の repo-internal 設計文書である（ADR-0103）。他プロジェクトへの適用を意図しない。runtime command は SPEC ファイルに依存しない（ADR-0104）。
 
 ## Guardrails Classification
 
@@ -134,7 +136,7 @@ command guardrails を以下の6カテゴリに分類する:
 | `case-update` | GitHub Issue のみ | ローカルファイル |
 | `integrity-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（承認時） | 検査対象 artifact |
 
-> **Note**: `integrity-check` は `/repo/integrity-check` として実行される repo-local コマンドである（ADR-0020）。AgentDevFlow の consumer 配布対象外。
+> **Note**: `integrity-check` は `/repo/integrity-check` として実行される repo-local コマンドである（ADR-0106）。AgentDevFlow の consumer 配布対象外。
 
 | Command | Allowed Changes | Forbidden |
 |---|---|---|
