@@ -48,7 +48,14 @@ integrity-check の検出結果を3水準に分類し、それぞれの意味と
 
 ## heuristic（推奨修正）
 
-意味判断を含むが明確な根拠を持つ検査。
+意味判断を含むが明確な根拠を持つ検査。意味的レビューが必要な場合は `/agentdev/docs-review` へ route する。
+
+### Finding route
+
+| finding レベル | 代表例 | route 先 |
+|---------------|--------|---------|
+| heuristic | retired REQ 現行参照、語彙レジストリ違反 | → `/agentdev/docs-review`（意味レビュー） |
+| observation | ADR 技術判断不在、文書種別不一致 | → `/agentdev/docs-review`（意味レビュー） |
 
 ### 対象カテゴリ
 

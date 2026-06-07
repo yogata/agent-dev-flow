@@ -1,7 +1,7 @@
-✅ integrity-check 完了
+✅ docs-check 完了
 
-完了コマンド: /repo/integrity-check
-対象: 全 command 定義 / completion-reports.md
+完了コマンド: /repo/docs-check
+対象: 全 command 定義 / completion-reports.md / integrity artifacts
 結果:
   - 検証対象: {N} command 定義
   - 違反検出: {N}件
@@ -14,4 +14,4 @@ git 永続化:
   - {intake item 作成あり・失敗時: 失敗Step（{Step名}）+ エラー内容}
 次のコマンド: なし
 
-> Note: repo-local 版は `.opencode/commands/repo/templates/integrity-check/standard.md` にある
+> Note: repo-local 版は `.opencode/commands/repo/templates/docs-check/standard.md` にある
