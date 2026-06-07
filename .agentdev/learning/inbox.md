@@ -40,3 +40,19 @@
 - **文脈**: Issue #656 (workflow品質)。Wave 境界をまたぐ変更時に残存参照を検出するチェック手順を追加
 - **学び**: 複数 Wave にまたがる変更（namespace 変更、command deprecation、large rename）では、docs/ 内だけでなく .opencode/skills/ や references/ などの runtime 投影先にも旧名称の残存参照が残りやすい。Wave 境界横断をトリガーに grep sweep を拡張する条件付きチェックが効果的
 - **適用範囲**: 今後の namespace 変更・command deprecation・large rename を含む Wave 設計
+
+### L-20260608-01: Junction worktree の git worktree remove 失敗パターン
+
+- **問題事象**: Windows 環境で junction ベースの worktree（.worktrees/683-feature）に対して `git worktree remove` を実行したところ、"Not a directory" エラーで失敗した
+- **発生局面**: 実装（case-close Step 7: worktree 削除）
+- **検知方法**: コマンド実行時のエラー出力
+- **根本原因**: Windows の junction（ディレクトリシンボリックリンク）が git worktree remove の内部実装で通常ディレクトリとして扱われない。git worktree list では既に表示されない状態（prune 対象）になっていた
+- **自律対応内容**: `git worktree prune` で管理情報をクリーンアップし、その後ローカルブランチ削除とリモートブランチ削除は正常に完了
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: Windows 環境で junction を使用する全 worktree で同様に発生する可能性がある。worktree 作成時に junction を使う install-consumer-opencode.ps1 でも同問題が想定される
+- **再発条件**: Windows + junction worktree + git worktree remove の組み合わせ
+- **予防策候補**: worktree 削除手順に「junction 環境では git worktree remove が失敗する可能性があるため、失敗時は prune + 手動ディレクトリ削除にフォールバック」を明記
+- **想定反映先**: agentdev-git-worktree/references/worktree-operations.md の削除手順セクション
+- **関連**: .worktrees/683-feature, PR #687, Issue #683
+- **タグ**: `#worktree` `#windows` `#junction` `#cleanup`
