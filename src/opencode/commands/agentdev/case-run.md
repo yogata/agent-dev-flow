@@ -152,3 +152,4 @@ Split Rule（intake / learning 境界）は `docs/specs/workflow-contracts.md` S
 - G17: intake/learning 候補を混ぜた単一成果物にしない（SHALL）。Split Rule に従い別々の成果物とする
 - G18: Epic Orchestrator モードは追加モードであり既存パスを置き換えない（REQ-0106）
 - G19: 1Wave内同時実行上限5件。超過時はWave自動分割（REQ-0106）
+- G20: 実装に名前空間変更・コマンド廃止・大規模リネームを含む場合、Step 7 の grep sweep 対象を `docs/` から worktree 全体に拡張する（`agentdev-workflow-orchestration` の Wave 境界横断残存参照チェックを参照）
