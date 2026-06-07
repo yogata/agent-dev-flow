@@ -72,8 +72,7 @@ Commandに記述してよい内容:
 - **Guardrails**: 実行前の前提条件チェック・禁止事項
 - **Steps**: 高レベルな実行手順（5〜12個）
 - **ユーザー確認ポイント**: 実行中の確認・選択の提示
-- **load_skills**: 参照するSkillの宣言
-- **使用するSkill一覧**: Steps内で参照するSkill名
+- **使用するSkill一覧**: Steps内で参照するSkill名（frontmatterの`load_skills`には記述禁止。本文内の宣言としてのみ記載）
 - **成果物の読み書き対象**: ファイルパス・Issue/PR番号
 - **Command固有の制約**: 特定Commandにのみ適用される前提・制限
 - **完了報告フォーマット**: 出力の構造定義（Skill参照も可）

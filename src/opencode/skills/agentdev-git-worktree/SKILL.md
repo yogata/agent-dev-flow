@@ -23,7 +23,7 @@ GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git
 | `refactor` | リファクタリング・保守作業 |
 | `chore` | ドキュメント・雑務 |
 
-Pattern判定は `agentdev-workflow-lifecycle` → Pattern Registry を参照。
+work_type判定は `agentdev-workflow-lifecycle` → workflow classification を参照。
 
 ## 参照先
 
