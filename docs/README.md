@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は14件の active REQ である。旧REQ（REQ-0104〜REQ-0109）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0019 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0114 までの 14 件（active REQ）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0019 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -28,14 +28,19 @@
 ## Specifications
 
 - [System Specification](specs/system.md)
-- [Implementation Patterns](specs/patterns.md)
+- [Document Format Patterns](specs/patterns.md)
 - [Design Principles](specs/design-principles.md)
 - [Quality Specifications](specs/quality-specs.md)
 - [Document Model](specs/document-model.md)
 - [Artifact Contracts](specs/artifact-contracts.md)
+- [Artifact Responsibility Table](specs/artifact-responsibilities.md)
 - [Integrity Contracts](specs/integrity-contracts.md)
+- [Integrity Rule Catalog](specs/integrity-rule-catalog.md)
+- [Integrity Audit Report](specs/integrity-audit-report.md)
 - [Workflow Contracts](specs/workflow-contracts.md)
 - [Runtime Package Boundary](specs/runtime-package-boundary.md)
+- [Rule Ownership Matrix](specs/rule-ownership.md)
+- [REQ Impact Map](specs/req-impact-map.md)
 
 ## ADR
 
