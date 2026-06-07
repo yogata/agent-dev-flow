@@ -1,8 +1,6 @@
 ---
 description: 既存Caseの本文更新、コメント追加、またはREQファイル更新を行う
 agent: sisyphus
-load_skills:
-  - agentdev-gh-cli
 ---
 
 # Case更新
