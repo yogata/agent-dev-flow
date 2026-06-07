@@ -2,7 +2,9 @@
 
 アーキテクチャ決定記録（ADR）のインデックス。
 
-## ADR一覧
+## Current Baseline View
+
+ADR-01XX（accepted）の11件が、現在のアーキテクチャ判断の基盤である。各 ADR は baseline 再編により旧 ADR の内容を統合・再定義している。
 
 | ADR番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|
@@ -116,8 +118,32 @@
 | ADR-0110 | [REQ-0101](../requirements/REQ-0101.md) | DOC-MAP導入・views廃止 |
 | ADR-0111 | — | 対応REQなし（architecture principleとして定義） |
 
-## Retired ADRs
+## Retired / Historical View
 
-ADR-0001 から ADR-0023 までの23件は、ADR-01XX baseline導入に伴い `retired/` ディレクトリに移動された。各ファイルに引き継ぎ先が記載されている。
+ADR-0001 から ADR-0023 までの23件は、ADR-01XX baseline導入に伴い `retired/` ディレクトリに移動された歴史的決定記録である。これらは再編前の判断を保持しており、現行アーキテクチャの基盤は上記 Current Baseline View の ADR-01XX にある。
 
-- [retired/](retired/) — ADR-0001〜ADR-0023
+| ADR番号 | タイトル | retired時ステータス | 引き継ぎ先 |
+|---------|---------|-------------------|-----------|
+| [ADR-0001](retired/ADR-0001.md) | Command/Skill/Template/Script責任分界の正式定義 | proposed | ADR-0107 |
+| [ADR-0002](retired/ADR-0002.md) | Orchestration skill作成基準の導入 | proposed | ADR-0108 |
+| [ADR-0003](retired/ADR-0003.md) | issue-req入力の抽象化 | deprecated | なし（再編前から非現行） |
+| [ADR-0004](retired/ADR-0004.md) | 要件管理構造の area-based 移行方針 | superseded | なし（再編前から非現行） |
+| [ADR-0005](retired/ADR-0005.md) | AgentDevFlow を配布 plugin 名として採用し、公開 command namespace を /agentdev/*、domain state を .agentdev/、skill prefix を agentdev-* に統一する | accepted | ADR-0101 |
+| [ADR-0006](retired/ADR-0006.md) | Epic Issue 本文を実行順序 SSoT とする設計 | proposed | ADR-0109 |
+| [ADR-0007](retired/ADR-0007.md) | REQ/ADR基準構造と分類ビュー運用の再定義 | superseded | なし（再編前から非現行） |
+| [ADR-0008](retired/ADR-0008.md) | DOC-MAP導入と requirements/views 廃止 | proposed | ADR-0110 |
+| [ADR-0009](retired/ADR-0009.md) | REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入 | deprecated | なし（再編前から非現行） |
+| [ADR-0010](retired/ADR-0010.md) | HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則 | deprecated | なし（再編前から非現行） |
+| [ADR-0011](retired/ADR-0011.md) | Manager/orchestrator パターンの限定採用 — 標準構造とはしない | proposed | ADR-0111 |
+| [ADR-0012](retired/ADR-0012.md) | Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流 | deprecated | なし（再編前から非現行） |
+| [ADR-0013](retired/ADR-0013.md) | runtime / authoring 関心分離 | accepted | ADR-0102 |
+| [ADR-0014](retired/ADR-0014.md) | ADR / SPEC 再分類基準 | superseded | なし（再編前から非現行） |
+| [ADR-0015](retired/ADR-0015.md) | docs/specs 非runtime依存宣言 | superseded | なし（再編前から非現行） |
+| [ADR-0016](retired/ADR-0016.md) | skill references runtime-only 制約 | superseded | なし（再編前から非現行） |
+| [ADR-0017](retired/ADR-0017.md) | 文書種別責務境界 | accepted | ADR-0103 |
+| [ADR-0018](retired/ADR-0018.md) | runtime 独立性 | accepted | ADR-0104 |
+| [ADR-0019](retired/ADR-0019.md) | OpenCode Source / Projection 分離 | accepted | ADR-0105 |
+| [ADR-0020](retired/ADR-0020.md) | Adopt /repo/* Namespace for Repo-Local Tooling | accepted | ADR-0106 |
+| [ADR-0021](retired/ADR-0021.md) | Upstream Handoff Metadata Convention | deprecated | なし（再編前から非現行） |
+| [ADR-0022](retired/ADR-0022.md) | review/refine 系中間コマンドを promote 内フェーズへ統合 | deprecated | なし（再編前から非現行） |
+| [ADR-0023](retired/ADR-0023.md) | backlog-save 廃止とパイプライン再構築 | deprecated | なし（再編前から非現行） |
