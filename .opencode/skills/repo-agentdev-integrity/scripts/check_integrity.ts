@@ -476,6 +476,13 @@ function checkAdrReqCrossReference(
   const reqFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-"));
   const adrFiles = listFiles(adrDir).filter((f) => f.startsWith("ADR-"));
   const existingAdrIds = new Set(adrFiles.map((f) => f.replace(".md", "")));
+  // REQ-0112-050: include retired ADR IDs as valid references
+  const retiredAdrDir = path.join(adrDir, "retired");
+  const retiredAdrFiles = fs.existsSync(retiredAdrDir)
+    ? listFiles(retiredAdrDir).filter((f) => f.startsWith("ADR-"))
+    : [];
+  const retiredAdrIds = new Set(retiredAdrFiles.map((f) => f.replace(".md", "")));
+  const allAdrIds = new Set([...existingAdrIds, ...retiredAdrIds]);
   const existingReqIds = new Set(reqFiles.map((f) => f.replace(".md", "")));
   // REQ-0108-074: include retired REQ IDs as valid references
   const retiredDir = path.join(reqDir, "retired");
@@ -492,7 +499,7 @@ function checkAdrReqCrossReference(
     const references = content.match(/\bADR-\d{4}\b/g) || [];
     const uniqueRefs = [...new Set(references)];
     for (const ref of uniqueRefs) {
-      if (!existingAdrIds.has(ref)) {
+      if (!allAdrIds.has(ref)) {
         results.push(
           ng(
             "ADR",
@@ -1508,7 +1515,8 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     const uniqueAdrRefs = [...new Set(adrRefs)];
     for (const ref of uniqueAdrRefs) {
       const adrPath = path.join(root, "docs", "adr", `${ref}.md`);
-      if (!fs.existsSync(adrPath)) {
+      const retiredAdrPath = path.join(root, "docs", "adr", "retired", `${ref}.md`);
+      if (!fs.existsSync(adrPath) && !fs.existsSync(retiredAdrPath)) {
         const count = (brokenRefCount.get("broken-adr-ref") ?? 0) + 1;
         brokenRefCount.set("broken-adr-ref", count);
         const route: FindingRoute = count >= 3 ? "intake+learning" : "intake";
@@ -1521,8 +1529,36 @@ function checkLinkIntegrity(root: string): CheckResult[] {
             undefined,
             {
               evidence: ref,
-              expected: `${ref}.md must exist in docs/adr/`,
+              expected: `${ref}.md must exist in docs/adr/ or docs/adr/retired/`,
               route,
+            },
+          ),
+        );
+      }
+    }
+
+    // REQ-0112-048/050: retired ADR referenced as current baseline
+    for (const ref of uniqueAdrRefs) {
+      const retiredAdrPath = path.join(root, "docs", "adr", "retired", `${ref}.md`);
+      const activeAdrPath = path.join(root, "docs", "adr", `${ref}.md`);
+      if (
+        fs.existsSync(retiredAdrPath) &&
+        !fs.existsSync(activeAdrPath) &&
+        !relPath.startsWith("docs/adr/retired/") &&
+        !relPath.startsWith("docs/adr/README.md")
+      ) {
+        results.push(
+          warn(
+            "LinkIntegrity",
+            "retired-adr-as-current",
+            `${ref} is retired ADR but referenced in non-retired file`,
+            relPath,
+            undefined,
+            {
+              evidence: ref,
+              expected:
+                "retired ADRs should not be referenced as current architecture decisions",
+              route: "intake",
             },
           ),
         );
