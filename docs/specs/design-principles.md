@@ -26,8 +26,6 @@ Issue の種別に応じて異なるワークフローを適用する。work_typ
 | maintenance | — | direct_case | req-define → case-open → case-run → case-close |
 | docs_chore | — | direct_case | req-define → case-open → case-run → case-close |
 
-> **歴史的参照**: `Pattern A/B/C/D` は旧分類コード。新体系では `work_type`（bugfix/feature/maintenance/docs_chore）+ `scale` + `workflow_route` を使用する（REQ-0104, REQ-0112）。
-
 ---
 
 ## 2. 要件と仕様の分離理由
