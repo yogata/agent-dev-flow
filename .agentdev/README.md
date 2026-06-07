@@ -9,14 +9,14 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 | Path | 状態 | Producer | Consumer / Next command | Retention / Removal |
 |------|------|----------|------------------------|---------------------|
 | `intake/inbox/*.md` | raw item | `intake-capture`, `intake-from-github` | `intake-promote` | `intake-promote` 成功後に `archive/` へ移動 |
-| `intake/promoted/*.md` | promoted artifact | `intake-promote` | `backlog-review` | `backlog-save` による RU 化成功後に削除 |
-| `intake/archive/rejected/*.md` | 却下（終端） | `intake-review` | なし | 永続（履歴参照） |
+| `intake/promoted/*.md` | promoted artifact | `intake-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
+| `intake/archive/rejected/*.md` | 却下（終端） | `intake-promote` | なし | 永続（履歴参照） |
 | `intake/archive/promoted/*.md` | promote 済み（終端） | `intake-promote` | なし | 永続（履歴参照） |
 | `learning/inbox.md` | 未整理エントリ | `learning-capture`（skill） | `learning-promote` | `learning-promote` 成功後にクリア |
 | `learning/archive/active.md` | 分類済み living pool | `learning-promote` | `learning-promote` | living pool。prune 対象は削除可 |
 | `learning/evaluation-report.md` | 境界 artifact | `learning-promote` | `learning-promote` | 毎回上書き |
-| `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-save` による RU 化成功後に削除 |
-| `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-save`, session-sourced | `req-define`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
+| `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
+| `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
 | `integrity/reports/*.md` | 検証レポート | `integrity-check` | ユーザー参照 | 永続（履歴参照） |
 
 ## .agentdev/ と .sisyphus/ の境界
@@ -43,9 +43,9 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 │   ├── evaluation-report.md ← learning-promote が評価レポートを生成
 │   ├── archive/
 │   │   └── active.md    ← 分類済み learning entry の living pool
-│   └── promoted/        ← learning-promote が staging stub を出力（フラット）
+│   └── promoted/        ← learning-promote が promoted artifact を出力（フラット）
 ├── backlog/
-│   └── req-units/       ← backlog-save が RU を生成
+│   └── req-units/       ← backlog-review が RU を生成
 │       └── RU-*.md
 └── integrity/
     └── reports/         ← integrity-check が検証結果を保存

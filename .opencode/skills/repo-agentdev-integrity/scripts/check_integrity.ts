@@ -5362,6 +5362,64 @@ function checkTemplatePathIntegrity(
   return results;
 }
 
+// ─── Source vs Projection consistency check ─────────────────────────────────
+
+function checkSourceProjectionConsistency(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const projectionCmdDir = path.join(root, ".opencode", "commands", "agentdev");
+  const sourceCmdDir = path.join(root, "src", "opencode", "commands", "agentdev");
+
+  if (!fs.existsSync(sourceCmdDir)) return results;
+  if (!fs.existsSync(projectionCmdDir)) return results;
+
+  const sourceFiles = new Set(
+    listFiles(sourceCmdDir).filter((f) => f !== "README.md"),
+  );
+  const projectionFiles = new Set(
+    listFiles(projectionCmdDir).filter((f) => f !== "README.md"),
+  );
+
+  const missingFromProjection = [...sourceFiles].filter(
+    (f) => !projectionFiles.has(f),
+  );
+  const extraInProjection = [...projectionFiles].filter(
+    (f) => !sourceFiles.has(f),
+  );
+
+  for (const f of missingFromProjection) {
+    results.push(
+      ng(
+        "Inventory",
+        "source-projection-sync",
+        `${f} exists in source but missing from projection`,
+      ),
+    );
+  }
+  for (const f of extraInProjection) {
+    results.push(
+      ng(
+        "Inventory",
+        "source-projection-sync",
+        `${f} exists in projection but missing from source`,
+      ),
+    );
+  }
+
+  if (
+    missingFromProjection.length === 0 &&
+    extraInProjection.length === 0
+  ) {
+    results.push(
+      ok(
+        "Inventory",
+        "source-projection-sync",
+        "Source and projection command directories are in sync",
+      ),
+    );
+  }
+  return results;
+}
+
 // ─── Broken junction / symlink detection (REQ-0108-172, REQ-0108-173) ───────
 
 /**
@@ -5487,7 +5545,12 @@ async function main(): Promise<void> {
   const adrDir = path.join(root, "docs", "adr");
   const specsDir = path.join(root, "docs", "specs");
   const skillsDir = path.join(root, ".opencode", "skills");
-  const cmdDir = path.join(root, ".opencode", "commands", "agentdev");
+  // Resolve cmdDir: prefer runtime projection, fall back to source/authoring
+  const projectionCmdDir = path.join(root, ".opencode", "commands", "agentdev");
+  const sourceCmdDir = path.join(root, "src", "opencode", "commands", "agentdev");
+  const cmdDir = fs.existsSync(projectionCmdDir)
+    ? projectionCmdDir
+    : sourceCmdDir;
   const commandMapPath = path.join(
     root,
     ".opencode",
@@ -5583,6 +5646,7 @@ async function main(): Promise<void> {
     ...checkVocabularyCompliance(root),
     ...checkSkillCategoryGap(root, skillsDir, cmdDir),
     ...checkTemplatePathIntegrity(cmdDir, root),
+    ...checkSourceProjectionConsistency(root),
     ...checkBrokenJunctions(skillsDir, root),
   ];
 

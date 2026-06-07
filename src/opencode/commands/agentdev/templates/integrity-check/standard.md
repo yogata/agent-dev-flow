@@ -1,6 +1,6 @@
 ✅ integrity-check 完了
 
-完了コマンド: /agentdev/integrity-check
+完了コマンド: /repo/integrity-check
 対象: 全 command 定義 / completion-reports.md
 結果:
   - 検証対象: {N} command 定義

@@ -1,7 +1,7 @@
 # 学びアーカイブ（生きている learning プール）
 
 未処分・保留中・再評価対象の learning item を保持する生きている learning プール（SHALL）。
-/agentdev/learning-refine の実行時に inbox.md から移動されたエントリが格納され、/agentdev/learning-promote の処分判定や /agentdev/learning-refine の prune によって動的に変化する。
+learning-capture によって inbox.md に追記されたエントリが、learning-promote の処分判定や prune によって動的に変化する。
 
 永久保存先ではなく、処分済みの learning item は削除される。昇格対象の根拠は staging スタブに残す。
 
@@ -23,14 +23,14 @@
 - **想定反映先**: 反映先。例: コマンド/スキル/テンプレート/docs
 - **関連**: 関連ファイルパス、Issue番号等
 - **タグ**: `#タグ1` `#タグ2`
-- **移動日**: YYYY-MM-DD（/agentdev/learning-refine実行日）
+- **移動日**: YYYY-MM-DD（learning-promote 実行日）
 
 ---
 ```
 
 ## 旧フォーマット互換
 
-過去のエントリ（5項目形式: 事象/原因/対策/関連/タグ）は /agentdev/learning-refine 実行時に正規化される。
+過去のエントリ（5項目形式: 事象/原因/対策/関連/タグ）は learning-promote 実行時に正規化される。
 
 正規化マッピング:
 - 状況/事象 → 問題事象
@@ -42,6 +42,8 @@
 archive.md は append-only ではなく、以下のタイミングでエントリが削除される:
 - **refine 時 prune**（MAY）: 長期間再発していない単発レアケース。ただし判断基準・技術知識・プロジェクト固有知識を含む learning item は削除不可
 - **promote 時 prune**（SHALL）: staged / rejected / duplicate の learning item。deferred・未処分の learning item は削除不可
+
+**注意**: learning-refine は廃止済み（REQ-0105-051）。refine 機能は learning-promote に統合されている。
 
 ---
 
