@@ -2,7 +2,7 @@
 
 - **実行日時**: 2026-06-06
 - **対象コミット**: 13a33a9
-- **スキャン対象**: 14 active REQ, 50 retired REQ, 19 ADR, 9 SPEC, 10 guides, 18 commands, 21 skills, 35+11 templates, 14 integrity scripts
+- **スキャン対象**: active REQ (`docs/requirements/REQ-*.md`, retired/ 除外), retired REQ (`docs/requirements/retired/REQ-*.md`), ADR (`docs/adr/ADR-*.md`), SPEC (`docs/specs/*.md`, README.md 除外), guides (`docs/guides/*.md`), command definitions (`.opencode/commands/agentdev/*.md`), agentdev skills (`.opencode/skills/agentdev-*/`), templates (`**/templates/*.md`), integrity scripts (`repo-agentdev-integrity/scripts/*.ts`)
 - **スコープ**: REQ-0108-143~149 (source/projection scan分離, baseline管理, REQ-first verification)
 
 ## サマリ

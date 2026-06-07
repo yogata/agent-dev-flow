@@ -30,6 +30,8 @@ AgentDevFlow は3つのパイプラインで構成される:
 
 ### マイクロフェーズ
 
+> **注意**: 以下の6マイクロフェーズは説明用ラベルであり、状態管理モデルではない（REQ-0112-023）。REQ/SPEC 文書内にこれらの状態を記述することは禁止されている。実際の状態管理は Issue ラベル・GitHub Project で行う。
+
 | フェーズ | 状態 | マクロフェーズ |
 |---|---|---|
 | `requirement` | 要件定義中 | 壁打ち |
@@ -41,7 +43,7 @@ AgentDevFlow は3つのパイプラインで構成される:
 
 ### workflow status 禁止
 
-REQ ファイル・SPEC ファイル内に workflow status（例: "要件定義", "実装", "テスト" 等の6マイクロフェーズ）を記述してはならない（REQ-0108-123、REQ-0101-037）。workflow status は Issue ラベル・GitHub Project で管理し、REQ/SPEC 文書内には含めない。
+REQ ファイル・SPEC ファイル内に workflow status（例: "要件定義", "実装", "テスト" 等の6マイクロフェーズに対応する状態語）を記述してはならない（REQ-0108-123、REQ-0101-037）。上記のマイクロフェーズはワークフローの説明目的でのみ使用し、REQ/SPEC 文書内に状態として埋め込まない。workflow status は Issue ラベル・GitHub Project で管理する。
 
 ## SSoT Transition Rules
 

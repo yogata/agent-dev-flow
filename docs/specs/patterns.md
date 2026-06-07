@@ -1,4 +1,4 @@
-# Implementation Patterns
+# Document Format Patterns
 
 ## コマンドfrontmatter規約
 
@@ -85,7 +85,7 @@ tags: [{tag1}, {tag2}]
 | `partially superseded` | 一部が新基準REQに移行 | 本文冒頭に移行範囲・後継REQ・履歴理由を記載 |
 | `superseded` | 全面置き換え済み | 本文冒頭に置き換え理由を記載 |
 
-**新基準REQ群**（REQ-0101〜0109）を現行仕様の主参照とする。README.md は新基準REQ群を先頭に配置し、旧REQ群をカテゴリ別セクションに分離する。
+**新基準REQ群**（REQ-0101〜0114）を現行仕様の主参照とする。README.md は新基準REQ群を先頭に配置し、旧REQ群をカテゴリ別セクションに分離する。
 
 **要件行の記述規約**（REQ-0109, 004）:
 - 要件行には振る舞い・制約・状態のみを記述する（SHALL）

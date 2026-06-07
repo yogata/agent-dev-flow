@@ -77,7 +77,7 @@
 | Canonical | canonical 境界の遵守 |
 | Lifecycle | 状態遷移の妥当性 |
 | Namespace | 旧 namespace 残存確認 |
-| ImplementationPattern | pattern 定義妥当性（REQ-0108-026〜038, 反転済） |
+| ImplementationPattern | ~~pattern 定義妥当性（REQ-0108-026〜038, 反転済）~~ → frontmatter 禁止フィールド検査に統合済 |
 | ADRStatusNormalization | ADR status 旧形式検出（REQ-0108-121） |
 | RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-0108-122） |
 | WorkflowStatusProhibition | workflow status / 6 マイクロフェーズ検出（REQ-0108-123） |
@@ -134,12 +134,15 @@ command guardrails を以下の6カテゴリに分類する:
 | `case-update` | GitHub Issue のみ | ローカルファイル |
 | `integrity-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（承認時） | 検査対象 artifact |
 
-> **Note**: `integrity-check` は `/repo/integrity-check` として実行される repo-local コマンドである（ADR-0020）。AgentDevFlow の consumer 配布対象外。| `intake-capture` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
+> **Note**: `integrity-check` は `/repo/integrity-check` として実行される repo-local コマンドである（ADR-0020）。AgentDevFlow の consumer 配布対象外。
+
+| Command | Allowed Changes | Forbidden |
+|---|---|---|
+| `intake-capture` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
 | `intake-from-github` | `.agentdev/intake/inbox/` | 他 `.agentdev/` パス |
 | `intake-promote` | `.agentdev/intake/promoted/` | 他パス |
 | `learning-promote` | `.agentdev/learning/promoted/` | 他パス |
-| `backlog-review` | なし（read-only 対話） | 全ファイル書込 |
-| `backlog-review` | `.agentdev/backlog/req-units/`, `.agentdev/intake/promoted/`, `.agentdev/learning/promoted/` | `.opencode/` |
+| `backlog-review` | `.agentdev/backlog/req-units/`, `.agentdev/intake/promoted/`, `.agentdev/learning/promoted/` | `.opencode/`, 検査対象外artifact |
 | `req-restructure-review` | なし（read-only 診断） | 全ファイル書込 |
 
 ## Postflight Diff Checking
