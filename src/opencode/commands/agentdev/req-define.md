@@ -51,10 +51,20 @@ agent: prometheus
 
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
 
+   **10a. 複数RU同時入力受付**（REQ-0102-014）: Step 1 で 2 件以上の RU が検出・指定された場合、全ての RU を同時入力として扱う。単一の壁打ちセッションで複数 RU を一括処理対象とする
+
+   **10b. 統合/分離判定**（REQ-0102-015）: 入力 RU 群の統合・分離を判定。同一トピック + 同一対象 REQ + 同一理由 → 1 つの req-save 操作に統合。上記のいずれかが異なる → 個別の req-save 操作に分離。判定結果は draft-meta に記録
+
+   **10c. 操作単位ごとの出力生成**（REQ-0102-016）: 統合/分離判定後の各操作単位について、以下を req-save が消費可能な形式で出力: 対象 REQ、操作種別（CREATE/APPEND/UPDATE/SPLIT）、要件候補一覧、依存関係。ドラフト内に操作単位セクションとして保持
+
+   **10d. Epic 規模検出時の記録**（REQ-0102-017）: Step 8 で scale:large かつ Epic 規模と判定された場合、`scale:large` と分解計画（decomposition）を draft-meta に記録。複数 RU にまたがる Epic の場合は、関係する RU 群を関連付けて記録
+
+   **10e. Wave 候補・依存関係の記録**（REQ-0102-018）: 操作間に逐次制約（先行要件が必要など）が存在する場合、wave 候補および依存関係を draft-meta に記録。順序依存があれば明示
+
 11. **完了報告**: 完了報告templateに従って出力。Pattern に応じたvariantを選択:
-     - feature standard → .opencode/commands/agentdev/templates/req-define/feature.md
-     - feature large (Epic)規模 → .opencode/commands/agentdev/templates/req-define/feature-epic.md
-     - bugfix / maintenance / docs_chore → .opencode/commands/agentdev/templates/req-define/lightweight.md
+      - feature standard → .opencode/commands/agentdev/templates/req-define/feature.md
+      - feature large (Epic)規模 → .opencode/commands/agentdev/templates/req-define/feature-epic.md
+      - bugfix / maintenance / docs_chore → .opencode/commands/agentdev/templates/req-define/lightweight.md
 
 ## Guardrails
 
@@ -70,3 +80,4 @@ agent: prometheus
 - G10: 要件doc構造は doc_requirement.md テンプレートに厳密に従う
 - G11: ADR閾値以上の判断は `agentdev-adr-guidelines` へ
 - G12: work_type 判定基準は `agentdev-workflow-lifecycle` → workflow classification を参照
+- G13: req-define は Issue 階層を決定しない（REQ-0102-019）。Issue 階層の決定は case-open の責務範囲
