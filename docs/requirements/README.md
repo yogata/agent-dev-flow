@@ -17,7 +17,7 @@
 | [REQ-0109](REQ-0109.md) | REQ再構成運用 | retired archive、移行表、REQ再構成intake、REQ再構成レビューコマンド、100番台採番 |
 | [REQ-0110](REQ-0110.md) | Git worktree 削除リトライ | git-worktree、リトライ、信頼性 |
 | [REQ-0111](REQ-0111.md) | Command authoring 後方互換性維持原則 | command-authoring、後方互換性、設計原則 |
-| [REQ-0112](REQ-0112.md) | ADRライフサイクル・文書責務・runtime独立性・状態モデル統合是正 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、6状態否定、integrity検査追加 |
+| [REQ-0112](REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・runtime独立性 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、6状態否定、integrity検査追加、ADR全面改定例外・01XX baseline・retired移動 |
 | [REQ-0113](REQ-0113.md) | Skill References SPEC分離基準 | skill / skill references 内 SPEC 相当記述の分離基準、移管先 SPEC 選択、runtime 自己完束制約 |
 | [REQ-0114](REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件 |
 
