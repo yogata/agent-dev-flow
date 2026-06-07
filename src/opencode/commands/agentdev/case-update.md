@@ -49,6 +49,12 @@ agent: sisyphus
       4. agentdev-spec-compliance結果をテンプレートの「Deviation Check 結果」セクションに展開
       5. NG理由分類のチェックボックスを自動選択
       6. `agentdev-gh-cli` に従い `--body-file` 経由でコメント投稿
+    - **`--review-ng` 時の SPEC / commands / skills 更新漏れ局所確認**（REQ-0115-022）: レビュー NG コメント投稿後、乖離内容に基づき以下の更新漏れを局所的に確認する:
+      - SPEC 本文と実装の矛盾に起因する更新必要性
+      - 乖離修正に伴う command 定義の更新必要性
+      - 乖離修正に伴う skill 責務境界の変更必要性
+      - 更新漏れを検出した場合はコメントに併記する
+      - **局所予防の範囲**: この確認はレビュー NG 時の局所的な漏れ検出であり、`/agentdev/docs-review` の全体意味レビューの代替ではない（REQ-0115-023）
 4. 完了報告 → 完了報告templateに従って出力。更新種別に応じたvariantを選択:
     - --body → .opencode/commands/agentdev/templates/case-update/body.md
     - --comment → .opencode/commands/agentdev/templates/case-update/comment.md

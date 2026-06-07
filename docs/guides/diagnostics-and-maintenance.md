@@ -2,14 +2,14 @@
 
 AgentDevFlow の整合性検査と REQ 体系の健全性診断について説明する。
 
-## integrity-check（repo-local 自己監査）
+## docs-check（repo-local 自己監査）
 
-agent-dev-flow リポジトリの自己監査コマンド。ドキュメント・スキル・コマンドの横断的整合性を検証する。AgentDevFlow の consumer 配布対象外であり、self-hosting repo のみで利用する（ADR-0020）。
+agent-dev-flow リポジトリの自己監査コマンド。ドキュメント・スキル・コマンドの横断的整合性を検証する。AgentDevFlow の consumer 配布対象外であり、self-hosting repo のみで利用する（ADR-0020、REQ-0115-001）。
 
 ### 基本フロー
 
 ```
-検査契機発生 → /repo/integrity-check → 検証レポート生成 → 乖離があれば対応コマンドへ
+検査契機発生 → /repo/docs-check → 検証レポート生成 → 乖離があれば対応コマンドへ
 ```
 
 ### 検査対象
@@ -41,7 +41,7 @@ REQ/ADR/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/Imple
 
 ### ADR 関連検査
 
-integrity-check は ADR を current collection と retired collection に区別して検査する（REQ-0112-050）:
+docs-check は ADR を current collection と retired collection に区別して検査する（REQ-0112-050）:
 
 - **current ADR collection**（`docs/adr/ADR-01XX.md`）: status 遷移妥当性、参照 REQ 存在確認、誤分類兆候検出を検査
 - **retired ADR collection**（`docs/adr/retired/ADR-00XX.md`）: 配置確認。現行根拠としての引用を警告
@@ -63,14 +63,14 @@ Finding ごとに以下の route で後続処理に送る。
 
 結果は `.agentdev/integrity/reports/` に JSON または Markdown 形式で出力する。結果分類は NG / warning / info の3段階。
 
-## req-restructure-review
+## docs-review
 
-REQ 体系の健全性を診断し、再構成の推奨アクションを提示するコマンド。
+docs 全体の意味整合レビューと REQ 体系の健全性診断を行うコマンド（REQ-0115）。旧 `req-restructure-review` を統合し、REQ 再構成観点を含む全体意味レビューを担う。
 
 ### 基本フロー
 
 ```
-REQ 体系の健全性を確認したい → /agentdev/req-restructure-review → 診断レポート生成
+docs 全体の整合性を確認したい → /agentdev/docs-review → 診断レポート生成
 ```
 
 ### 診断対象
@@ -87,4 +87,4 @@ AgentDevFlow では以下の整合性レイヤーを意識する。
 2. **実装整合性**: 実装コード・設定が SPEC と一致していること
 3. **ドメイン状態整合性**: `.agentdev/` 内の成果物がパイプライン境界を守っていること
 
-整合性に問題が見つかったら、まず `/repo/integrity-check` を実行して全体像を把握し、Finding の route に沿って対応する。
+整合性に問題が見つかったら、まず `/repo/docs-check` を実行して全体像を把握し、Finding の route に沿って対応する。

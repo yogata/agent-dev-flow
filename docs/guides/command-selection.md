@@ -19,14 +19,14 @@
 | inbox.md にエントリがある | `/agentdev/learning-promote` | promoted artifact |
 | promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
-| REQ 体系の健全性を診断したい | `/agentdev/req-restructure-review` | 診断レポート |
+| REQ 体系の健全性を診断したい | `/agentdev/docs-review` | 診断レポート |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
 ## Repository maintenance（self-hosting repo のみ）
 
 | 現在の状態 | 次のコマンド | 出力 |
 |-----------|-------------|------|
-| ドキュメント整合性を検証したい | `/repo/integrity-check` | 検証レポート |
+| ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート |
 
 > これらのコマンドは repo-local（ADR-0020）であり、AgentDevFlow の consumer 配布対象外。
 

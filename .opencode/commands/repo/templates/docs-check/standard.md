@@ -1,6 +1,6 @@
-✅ integrity-check 完了
+✅ docs-check 完了
 
-完了コマンド: /repo/integrity-check
+完了コマンド: /repo/docs-check
 対象: 全 command 定義 / completion-reports.md / integrity artifacts
 結果:
   - 検証対象: {N} command 定義
