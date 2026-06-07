@@ -148,3 +148,95 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 
 - **agentdev-gh-cli**: `--body-file` 使用、安全な読み取り手順
 - **agentdev-workflow-lifecycle**: Epic振る舞いルール、進捗追跡テーブル定義
+
+## Merge Conflict 対応パターン
+
+### Epicステータス更新時のmerge関連考慮事項
+
+#### 1. PR merge前後のEpic状態遷移
+
+Epicステータス更新はPRのmerge前後で一貫性を保つ必要がある:
+
+**merge前（case-run Phase A）**:
+- 子Issueを `☐ 未着手` → `🔄 進行中` に更新
+- 親Epic本文を取得し、該当子Issue行を更新
+
+**merge後（case-close Step 8）**:
+- 子Issueを `🔄 進行中` → `✅ 完了 ([PR#N](URL))` に更新
+- PR番号とURLを含める
+
+**状態遷移の一貫性チェック**:
+```markdown
+## Epicステータス更新チェック
+
+**子Issue**: #{child_issue}
+**更新前ステータス**: {previous_status}
+**更新後ステータス**: {new_status}
+**PR番号**: #{pr_number}
+**更新タイミング**: {timing（前/後）}
+**一貫性**: ✅ OK / ❌ NG
+```
+
+#### 2. merge失敗がEpic進捗に与える影響
+
+PR mergeに失敗した場合、Epicステータスの整合性を保つ:
+
+**merge失敗時の対応**:
+
+| 失敗タイミング | Epicステータス | 対応 |
+|--------------|----------------|------|
+| PR作成前（conflict検出） | 変更なし | PR作成を停止 |
+| PR作成後、merge前 | `🔄 進行中` | status維持（完了しない） |
+| merge時（conflict発生） | `🔄 進行中` | status維持、解決後に再試行 |
+| merge時（CI失敗等） | `🔄 進行中` | status維持、問題修正後に再試行 |
+
+**重要**: merge失敗時はステータスを `✅ 完了` にしない。`🔄 進行中` を維持し、再実行可能にする。
+
+**失敗報告フォーマット**:
+```markdown
+## PR Merge 失敗時の Epic ステータス対応
+
+**PR番号**: #{pr_number}
+**Epic番号**: #{epic_number}
+**子Issue**: #{child_issue}
+**現在ステータス**: 🔄 進行中
+**失敗理由**: {failure_reason}
+**対応**: ステータスを維持（🔄 進行中）、問題解決後に再実行
+```
+
+#### 3. Epic本文のconflictリスク
+
+Epic本文は複数の子Issueから並行して更新される可能性があるため、conflictリスクが高い:
+
+**conflictリスク**:
+- 複数の子Issueが同時にEpicステータスを更新
+- 同じEpic内の複数のWaveが並列実行される場合
+- 手動でのEpic編集と自動更新が競合
+
+**conflict予防**:
+1. **Wave単位の一括更新**（Epic Orchestratorモード）:
+   - Wave開始時にEpicステータスを一括更新
+   - Wave完了時にステータスを一括更新
+   - サブエージェントによる同時更新を回避
+
+2. **更新順序の制御**:
+   - 子Issue番号の昇順で更新
+   - 同一Wave内の更新は親エージェントが一括処理
+
+3. **更新失敗時のフォールバック**:
+   ```markdown
+   ## Epic 更新失敗フォールバック
+
+   **Epic番号**: #{epic_number}
+   **更新対象**: #{child_issue}
+   **失敗理由**: {failure_reason}
+   **対応**: 警告表示して継続（フォールバック）
+   **注意**: Epicステータスが古い可能性があります
+   ```
+
+**conflict解決手順**:
+1. `gh issue view {epic_number}` で最新のEpic本文を取得
+2. 正規表現で該当子Issue行を特定
+3. ステータス値を更新（べき等性を確認）
+4. `gh issue edit {epic_number} --body-file {temp}` で更新
+5. 更新失敗時は警告表示して継続

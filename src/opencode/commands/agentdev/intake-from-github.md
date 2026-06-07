@@ -27,26 +27,15 @@ agent: sisyphus
 
 ## Steps
 
-1. **期間解釈**: ユーザーの自然言語による期間指定を解釈し、GitHub CLI の検索クエリ用日付範囲（`since` / `until`）に変換する。現在日付は実行時のシステム日付を使用する。
+1. **期間解釈**: 抽出アルゴリズムは `agentdev-workflow-lifecycle` skill の `references/intake-from-github-judgment-logic.md` の「Step 1: 期間解釈」を参照
 
-2. **データ取得**: `gh` CLI を使用して、指定期間内にクローズされた Issue と PR を取得する:
-   - Issues: `gh issue list --state closed --search "closed:>=YYYY-MM-DD" --limit 100 --json number,title,body,state,closedAt,labels,comments`
-   - PRs: `gh pr list --state closed --search "closed:>=YYYY-MM-DD" --limit 100 --json number,title,body,state,closedAt,labels,comments`
-   - `agentdev-gh-cli` に従ってコマンドを実行する（読み取り操作は READ 操作手順に従う）
-   - コメントも取得: `gh issue view {N} --json comments` / `gh pr view {N} --json comments`
+2. **データ取得**: 取得方法・CLI コマンドは `agentdev-workflow-lifecycle` skill の `references/intake-from-github-judgment-logic.md` の「Step 2: データ取得」を参照
 
-3. **構造的検出**: 取得した Issue/PR の本文およびコメントから、未チェックのチェックボックス（`- [ ]` または `* [ ]`）を構造的に抽出する。チェック済み（`- [x]`）は除外。
+3. **構造的検出**: 抽出ルールは `agentdev-workflow-lifecycle` skill の `references/intake-from-github-judgment-logic.md` の「Step 3: 構造的検出」を参照
 
-4. **LLM 全文解析**: 構造的検出で捕捉できなかった残課題を LLM による全文解析で抽出する:
-   - 対象キーワード: 「対象外」「先送り」「別途対応」「後で」「TODO」「FIXME」「今後の課題」「残課題」「要検討」等
-   - 暗黙的な残課題（否定表現等）も検出
-   - 各抽出結果に元テキストのコンテキスト（前後文）を付与
+4. **LLM 全文解析**: キーワードリスト・コンテキスト付与ルールは `agentdev-workflow-lifecycle` skill の `references/intake-from-github-judgment-logic.md` の「Step 4: LLM 全文解析」を参照
 
-5. **intake item 生成**: 抽出した各候補を intake item 形式に整理する:
-    - 1 候補につき 1 ファイル
-    - ファイル名: `YYYY-MM-DD-{topic-slug}.md`
-    - 観測元（Issue/PR 番号）は「根拠」セクションに記載
-    - 元テキストのコンテキストも「根拠」セクションに含める
+5. **intake item 生成**: item 生成ルール・ファイル名規則は `agentdev-workflow-lifecycle` skill の `references/intake-from-github-judgment-logic.md` の「Step 5: intake item 生成」を参照
 
 5b. **実行前同期（git pull）**:
     - `git pull --ff-only` を実行する

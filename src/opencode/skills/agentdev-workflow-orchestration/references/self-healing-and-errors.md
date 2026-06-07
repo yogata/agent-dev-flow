@@ -90,3 +90,72 @@ Wave 並列実行時のマージコンフリクトを予防するガイダンス
 - 自動的な force push は禁止
 - コンフリクト解消で要件や仕様の意図を変えてはならない
 - 解消後は検証（Step 11a）を再実行する
+
+## Merge Conflict 対応パターン
+
+### Wave並列実行時のmerge conflict事前防止・事後対応
+
+#### 1. Wave間でのファイル重複リスク評価
+
+Wave並列実行を開始する前に、各Wave内のIssueが変更するファイルの重複を評価する:
+
+**評価手順**:
+1. 各Wave内のIssueの変更予定ファイルをリスト化（specs、コード、テスト等）
+2. Wave間のファイル重複をチェック
+3. 重複がある場合のリスクを判定
+
+**リスク判定基準**:
+
+| 重複状況 | リスクレベル | 対応 |
+|----------|-------------|------|
+| 同一ファイルの異なる行範囲 | 低 | Wave並列可（conflict発生可能性低） |
+| 同一ファイルの同一行範囲 | 高 | Wave直列化（同一Waveに統合） |
+| frontmatter共通の設定ファイル | 中 | Wave並列可だが、frontmatter競合リスクを通知 |
+| 依存関係のあるファイル（例: モデルとテスト） | 中 | Wave並列可だが、整合性チェックを強化 |
+
+#### 2. conflict発生時のWave再スケジューリング方針
+
+PR作成時やmerge時にconflictが検出された場合:
+
+**即時対応**:
+1. 該当Waveの全Issueを停止
+2. conflictの詳細を報告
+3. ユーザーに解決方法を提示
+
+**再スケジューリングパターン**:
+
+| パターン | 条件 | 再スケジュール方針 |
+|----------|------|-------------------|
+| 前のWaveのPRがマージ済み | conflictの原因が前のWaveの変更 | 該当Issueをrebaseして再実行 |
+| 同一Wave内のconflict | Wave内のIssue間で競合 | Waveを分割して直列化 |
+| 他のWaveのPR未マージ | 他のWaveの変更と競合 | 先行するWaveの完了を待ってから再実行 |
+| 解決不能なconflict | 要件や仕様の意図が矛盾 | Wave実行を停止して要件調整 |
+
+**報告フォーマット**:
+```markdown
+## Wave Conflict 検出エラー
+
+**Wave番号**: {wave_number}
+**影響Issue**: {affected_issues}
+**conflictファイル**: {conflicted_files}
+**conflict原因**: {conflict_cause}
+**再スケジュール方針**: {reschedule_plan}
+**ユーザーアクション**: {user_action}
+```
+
+#### 3. self-healing対象外としての明示
+
+Merge conflictはself-healingループ（Section 1）の対象外とする:
+
+**対象外の理由**:
+- conflict解決には要件・仕様の意図判断が必要
+- 自動的なforce pushはリスクが高い
+- 手動でのconflict解決が推奨される
+
+**対応**:
+- conflict検出時は即座に停止
+- ユーザーに手動解決を依頼
+- 解決後にself-healingループを再開可能（Step 11aから）
+
+**停止条件への追加**:
+conflict発生時は、self-healingループの停止条件（Section 1）に該当するため、即座に停止してユーザーに報告する。

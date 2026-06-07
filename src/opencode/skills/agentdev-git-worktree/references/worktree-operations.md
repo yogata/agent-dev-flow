@@ -91,3 +91,71 @@ git push origin --delete "{type}/issue-{N}"
 - worktree 内で作業する場合、`workdir` パラメータに worktree パスを指定する
 - `cd` によるディレクトリ移動は行わない
 - Edit/Write ツールでもパスに `.worktrees/{N}-{type}/` を含める
+
+## Merge Conflict 対応パターン
+
+### worktree内でmerge conflictが発生した場合の対応手順
+
+#### 1. conflict検出時の即座停止ルール
+
+worktree内で以下のいずれかの操作でconflictが検出された場合、即座に処理を停止しユーザーに報告する:
+- `git pull --ff-only` 実行時
+- `git merge` 実行時
+- `git rebase` 実行時
+
+停止時は以下の情報を報告:
+- 発生した操作（例: `git pull --ff-only`）
+- conflictが発生したファイル一覧
+- worktreeパス
+
+```markdown
+## Merge Conflict 検出エラー
+
+**操作**: {operation}
+**worktree**: {worktree_path}
+**停止理由**: merge conflictが発生したため、安全に操作を継続できません
+**対象ファイル**: {conflicted_files}
+**ユーザーアクション**: 手動でconflictを解決してください
+```
+
+#### 2. conflict markersの確認手順
+
+conflict markers（`<<<<<<<`, `=======`, `>>>>>>>`）が含まれるファイルを確認:
+
+```bash
+git diff --name-only --diff-filter=U
+```
+
+または
+
+```bash
+git status --short | grep '^UU'
+```
+
+#### 3. 手動解決またはabort手順
+
+**オプションA: 手動解決**
+1. conflictファイルを手動で編集し、conflict markersを削除
+2. 解決したファイルをstage: `git add {resolved_file}`
+3. commit: `git commit -m "Resolve merge conflicts"`
+4. 解決確認: `git status` でclean状態を確認
+
+**オプションB: 操作の中止（abort）**
+- mergeの場合: `git merge --abort`
+- rebaseの場合: `git rebase --abort`
+
+abort後、worktreeを元の状態に復元し、ユーザーに対応を依頼する。
+
+#### 4. 解決後のcommit手順
+
+conflictを手動解決した場合:
+1. 変更をstage: `git add -u`
+2. commit: `git commit -m "Resolve merge conflicts"`
+3. 必要に応じてpush: `git push`
+
+rebase中にconflictを解決した場合:
+1. 変更をstage: `git add -u`
+2. rebase継続: `git rebase --continue`
+3. rebase完了後push: `git push --force-with-lease`（必要に応じて）
+
+**重要**: force pushは慎重に実行すること。リモートの変更を上書きするリスクがあるため、事前に確認が必要。

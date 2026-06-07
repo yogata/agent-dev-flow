@@ -4597,6 +4597,329 @@ function checkAbolishedSkillReference(root: string): CheckResult[] {
   return results;
 }
 
+// ─── Pattern A/B/C/D residual detection (REQ-0108-111) ────────────────────
+
+function checkPatternResidualDetection(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+  const patternLabelRe = /Pattern [A-D]/gi;
+  const validWorkTypes = new Set([
+    "bugfix",
+    "feature",
+    "maintenance",
+    "docs_chore",
+  ]);
+
+  const exemptPatterns = [
+    /retired\//,
+    /mapping-table/,
+    /\.test\./,
+    /_test\./,
+    /integrity-check\.md$/,
+    /gate-levels\.md$/,
+    /vocabulary-registry\.md$/,
+    /REQ-0108\.md$/,
+    /REQ-0112\.md$/,
+    /design-principles\.md$/,
+    /command-authoring-standards\.md$/,
+  ];
+
+  const dirsToScan = [
+    path.join(root, ".opencode", "commands"),
+    path.join(root, ".opencode", "skills"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+    function scanDir(scanPath: string): void {
+      const entries = fs.readdirSync(scanPath, {
+        withFileTypes: true,
+      }) as import("fs").Dirent[];
+      for (const entry of entries) {
+        const fullPath = path.join(scanPath, entry.name);
+        const relPath = resolveRelative(fullPath, root);
+        if (entry.isDirectory()) {
+          scanDir(fullPath);
+          continue;
+        }
+        if (!entry.name.endsWith(".md")) continue;
+        if (exemptPatterns.some((p) => p.test(relPath))) continue;
+        const content = readText(fullPath);
+        if (!content) continue;
+
+        patternLabelRe.lastIndex = 0;
+        if (patternLabelRe.test(content)) {
+          foundViolation = true;
+          results.push(
+            warn(
+              "Canonical",
+              "pattern-residual-detection",
+              "Pattern A/B/C/D label detected in " +
+                relPath +
+                " — classification is deprecated (REQ-0108-111)",
+              relPath,
+              undefined,
+              {
+                evidence: "Pattern A/B/C/D",
+                expected:
+                  "Pattern labels should not appear in active documents",
+                route: "intake",
+                finding_category: "obsolete-structure",
+              },
+            ),
+          );
+        }
+
+        const fm = parseFrontmatter(content);
+        if (fm && fm.work_type && typeof fm.work_type === "string") {
+          if (!validWorkTypes.has(fm.work_type)) {
+            foundViolation = true;
+            results.push(
+              warn(
+                "Canonical",
+                "pattern-residual-detection",
+                "Invalid work_type '" +
+                  fm.work_type +
+                  "' in " +
+                  relPath +
+                  " — must be one of: bugfix, feature, maintenance, docs_chore",
+                relPath,
+                undefined,
+                {
+                  evidence: "work_type: " + fm.work_type,
+                  expected:
+                    "work_type must be one of: bugfix, feature, maintenance, docs_chore",
+                  route: "intake",
+                  finding_category: "obsolete-structure",
+                },
+              ),
+            );
+          }
+        }
+      }
+    }
+    scanDir(dir);
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "Canonical",
+        "pattern-residual-detection",
+        "No Pattern A/B/C/D residual labels or invalid work_type values detected",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── req-backlog residual detection (REQ-0108-112) ────────────────────────
+
+function checkReqBacklogResidualDetection(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqBacklogPattern = /\breq-backlog\b/gi;
+  let foundViolation = false;
+
+  const exemptPatterns = [
+    /retired\//,
+    /mapping-table/,
+    /\.test\./,
+    /_test\./,
+    /integrity-check\.md$/,
+    /gate-levels\.md$/,
+    /vocabulary-registry\.md$/,
+    /REQ-0105\.md$/,
+    /REQ-0101\.md$/,
+    /REQ-0108\.md$/,
+    /ADR-\d{4}\.md$/,
+  ];
+
+  const dirsToScan = [
+    path.join(root, ".opencode", "commands"),
+    path.join(root, ".opencode", "skills"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+    function scanDir(scanPath: string): void {
+      const entries = fs.readdirSync(scanPath, {
+        withFileTypes: true,
+      }) as import("fs").Dirent[];
+      for (const entry of entries) {
+        const fullPath = path.join(scanPath, entry.name);
+        const relPath = resolveRelative(fullPath, root);
+        if (entry.isDirectory()) {
+          scanDir(fullPath);
+          continue;
+        }
+        if (!entry.name.endsWith(".md")) continue;
+        if (exemptPatterns.some((p) => p.test(relPath))) continue;
+        const content = readText(fullPath);
+        if (!content) continue;
+        reqBacklogPattern.lastIndex = 0;
+        if (reqBacklogPattern.test(content)) {
+          foundViolation = true;
+          results.push(
+            warn(
+              "Canonical",
+              "req-backlog-residual-detection",
+              "req-backlog reference detected in " +
+                relPath +
+                " — abolished per REQ-0105-038 (REQ-0108-112)",
+              relPath,
+              undefined,
+              {
+                evidence: "req-backlog",
+                expected:
+                  "req-backlog is abolished; use backlog-review / backlog-save flow",
+                route: "intake",
+                finding_category: "obsolete-structure",
+              },
+            ),
+          );
+        }
+      }
+    }
+    scanDir(dir);
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "Canonical",
+        "req-backlog-residual-detection",
+        "No req-backlog residual references detected",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── Abolished skill references detection (REQ-0108-126, 127) ──────────────
+
+const ABOLISHED_SKILLS_DETECTION_LIST = ["agentdev-workflow-reporting"];
+
+function checkAbolishedSkillReferences(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  const exemptPatterns = [
+    /\.test\./,
+    /_test\./,
+    /integrity-check\.md$/,
+    /vocabulary-registry\.md$/,
+    /gate-levels\.md$/,
+    /integrity-contracts\.md$/,
+    /integrity-rule-catalog\.md$/,
+  ];
+
+  const filesToScan: string[] = [];
+
+  // Scope: .opencode/commands/**/*.md (REQ-0108-127)
+  const cmdDir = path.join(root, ".opencode", "commands");
+  if (fs.existsSync(cmdDir)) {
+    function collectCmdFiles(dir: string): void {
+      const entries = fs.readdirSync(dir, {
+        withFileTypes: true,
+      }) as import("fs").Dirent[];
+      for (const entry of entries) {
+        const fp = path.join(dir, entry.name);
+        if (entry.isDirectory()) collectCmdFiles(fp);
+        else if (entry.name.endsWith(".md")) filesToScan.push(fp);
+      }
+    }
+    collectCmdFiles(cmdDir);
+  }
+
+  // Scope: .opencode/skills/*/SKILL.md and references/**/*.md
+  const skillsDir = path.join(root, ".opencode", "skills");
+  if (fs.existsSync(skillsDir)) {
+    for (const skillDir of listDirs(skillsDir)) {
+      const skillMd = path.join(skillsDir, skillDir, "SKILL.md");
+      if (fs.existsSync(skillMd)) filesToScan.push(skillMd);
+      const refsDir = path.join(skillsDir, skillDir, "references");
+      if (fs.existsSync(refsDir)) {
+        function collectRefFiles(dir: string): void {
+          const entries = fs.readdirSync(dir, {
+            withFileTypes: true,
+          }) as import("fs").Dirent[];
+          for (const entry of entries) {
+            const fp = path.join(dir, entry.name);
+            if (entry.isDirectory()) collectRefFiles(fp);
+            else if (entry.name.endsWith(".md")) filesToScan.push(fp);
+          }
+        }
+        collectRefFiles(refsDir);
+      }
+    }
+  }
+
+  // Scope: docs/specs/*.md (runtime guidance)
+  const specsDir = path.join(root, "docs", "specs");
+  if (fs.existsSync(specsDir)) {
+    for (const f of listFiles(specsDir)) {
+      filesToScan.push(path.join(specsDir, f));
+    }
+  }
+
+  // Scope: docs/DOC-MAP.md
+  const docMap = path.join(root, "docs", "DOC-MAP.md");
+  if (fs.existsSync(docMap)) filesToScan.push(docMap);
+
+  for (const fullPath of filesToScan) {
+    const relPath = resolveRelative(fullPath, root);
+    if (exemptPatterns.some((p) => p.test(relPath))) continue;
+    const content = readText(fullPath);
+    if (!content) continue;
+
+    for (const abolished of ABOLISHED_SKILLS_DETECTION_LIST) {
+      const re = new RegExp(
+        "\\b" +
+          abolished.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
+          "\\b",
+        "g",
+      );
+      if (re.test(content)) {
+        foundViolation = true;
+        const result = ng(
+          "Canonical",
+          "abolished-skill-references",
+          "Reference to abolished skill '" +
+            abolished +
+            "' detected in " +
+            relPath +
+            " (REQ-0108-126)",
+          relPath,
+          undefined,
+          {
+            evidence: abolished,
+            expected: "skill '" + abolished + "' is abolished; remove references",
+            route: "intake",
+            finding_category: "obsolete-structure",
+          },
+        );
+        result.finding_level = "strict";
+        results.push(result);
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "Canonical",
+        "abolished-skill-references",
+        "No references to abolished skills detected",
+      ),
+    );
+  }
+  return results;
+}
+
 // ─── REQ range staleness check (INC-0027) ─────────────────────────────────
 
 function checkReqRangeStaleness(root: string): CheckResult[] {
@@ -5253,6 +5576,9 @@ async function main(): Promise<void> {
     ...checkPatternResidual(root),
     ...checkReqBacklogResidual(root),
     ...checkAbolishedSkillReference(root),
+    ...checkPatternResidualDetection(root),
+    ...checkReqBacklogResidualDetection(root),
+    ...checkAbolishedSkillReferences(root),
     ...checkReqRangeStaleness(root),
     ...checkVocabularyCompliance(root),
     ...checkSkillCategoryGap(root, skillsDir, cmdDir),
