@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は REQ-0101 から REQ-0114 までの 14 件（active REQ）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0019 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0115 までの 15 件（active REQ）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0019 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -13,13 +13,14 @@
 | [REQ-0105](requirements/REQ-0105.md) | Intake / Learning / Backlog |
 | [REQ-0106](requirements/REQ-0106.md) | Case実行・完了 |
 | [REQ-0107](requirements/REQ-0107.md) | Reporting / Writing Quality |
-| [REQ-0108](requirements/REQ-0108.md) | Integrity / Validation / Tests |
-| [REQ-0109](requirements/REQ-0109.md) | REQ再構成運用 |
+| [REQ-0108](requirements/REQ-0108.md) | docs-check / Validation / Tests |
+| [REQ-0109](requirements/REQ-0109.md) | docs-review / REQ再構成運用 |
 | [REQ-0110](requirements/REQ-0110.md) | Git worktree 削除リトライ |
 | [REQ-0111](requirements/REQ-0111.md) | Command authoring 後方互換性維持原則 |
 | [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・runtime独立性 |
 | [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 |
 | [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード |
+| [REQ-0115](requirements/REQ-0115.md) | docs-* command suite 定義 |
 
 - [Requirements Index](requirements/README.md)
 - [Migration Table](requirements/mapping-table.md)
