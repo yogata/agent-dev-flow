@@ -39,6 +39,22 @@ agent: prometheus
 
 5. **ADR判断** → `agentdev-adr-guidelines`（manual reference）に従ってADR判断を記録（ADRファイル作成は req-save で実行）
 
+   **5a. ADR禁止ゲート**（REQ-0112-038, 039）: ADR候補を提示する前に、以下のREQ/SPEC相当判定を行うこと:
+
+   **除外基準（該当する場合、ADR候補から除外しREQ/SPEC更新候補として整理）**:
+   1. 仕様変更のみを含む（技術的決定なし）
+   2. command動作仕様の定義
+   3. workflow定義・状態遷移の記述
+   4. 命名規約・directory規約の変更
+   5. 運用ルールの変更
+   6. template形式・入出力形式の変更
+   7. 非技術的合意事項の記録
+
+   **分類基準**:
+   - 振る舞い・制約・状態 → REQ更新候補
+   - schema・path・lifecycle → SPEC更新候補
+   - 方針・ガイドライン → guide更新候補
+
 6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
 
 7. **work_type 判定**: ラベルに基づき判定（bug/critical→A, enhancement/feature→B, refactor/maintenance→C, docs/chore→D）。bugfix + ADR必要時は feature に昇格
