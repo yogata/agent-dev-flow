@@ -24,6 +24,7 @@ REQ/ADR/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/Imple
 - lifecycle 境界
 - 旧 namespace 残存
 - implementation pattern 診断
+- ADR current/retired collection 区別（REQ-0112-050）
 
 ### Finding 分類
 
@@ -37,6 +38,14 @@ REQ/ADR/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/Imple
 | `canonical-conflict` | 基準境界の衝突 |
 | `workflow-gap` | ワークフロー定義の欠落 |
 | `integrity-rule-gap` | 整合性ルール自体の欠落 |
+
+### ADR 関連検査
+
+integrity-check は ADR を current collection と retired collection に区別して検査する（REQ-0112-050）:
+
+- **current ADR collection**（`docs/adr/ADR-01XX.md`）: status 遷移妥当性、参照 REQ 存在確認、誤分類兆候検出を検査
+- **retired ADR collection**（`docs/adr/retired/ADR-00XX.md`）: 配置確認。現行根拠としての引用を警告
+- retired ADR への履歴参照は、現行根拠引用の warning と区別される
 
 ### Route 判定
 

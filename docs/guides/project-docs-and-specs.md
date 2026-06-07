@@ -47,13 +47,19 @@ DOC-MAP（文書探索入口: 索引）
 
 ## ADR（アーキテクチャ決定記録）
 
-**格納先**: `docs/adr/ADR-{NNNN}.md`
+**格納先**:
+- 現行 baseline: `docs/adr/ADR-01XX.md`（current ADR collection）
+- 履歴: `docs/adr/retired/ADR-00XX.md`（retired ADR collection）
 
 取り返しのつかない技術判断とその背景を記録する。
 
+- 現行 baseline は ADR-0101 以降の番号帯を使用する（REQ-0112-047）
+- ADR-0001〜0099 は再編前の履歴番号帯であり、`docs/adr/retired/` に配置されている（REQ-0112-048）
+- accepted ADR の決定内容を意味変更してはならない（REQ-0112-045）。変更が必要な場合は新規 ADR を作成する
+- ADR 体系の全面改定時は例外として、ユーザー承認済み範囲で最小限を超える編集を許可する（REQ-0112-044）
 - REQ → ADR、ADR → ADR、Issue → ADR の参照を許可
 - ADR → Issue の逆参照は不可
-- 一覧は `docs/adr/README.md` にインデックスがある
+- 一覧は `docs/adr/README.md` にインデックスがある（Current Baseline View / Retired Historical View）
 
 ## SPEC（現在仕様）
 
