@@ -2,7 +2,7 @@
 
 Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各 rule は 15 以上の field を持つ。
 
-> **Repo-local context**: integrity 検査は `/repo/integrity-check` コマンドと `repo-agentdev-integrity` skill により実行される repo-local 自己監査である（ADR-0106）。AgentDevFlow の consumer 配布対象外。語彙レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` に配置する。
+> **Repo-local context**: integrity 検査は `/repo/docs-check` コマンドと `repo-agentdev-integrity` skill により実行される repo-local 自己監査である（ADR-0106）。AgentDevFlow の consumer 配布対象外。語彙レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` に配置する。
 
 ## Schema
 

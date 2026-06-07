@@ -34,7 +34,8 @@ agent: prometheus
 3. **既存REQ照合** → `agentdev-req-file-manager` の照合方法論に従って実行（REQ-0104）。APPEND-first ルール（REQ-0104〜028）: CREATE 前に APPEND/UPDATE 候補を必ず評価。SPLIT 検出時は保存操作ではなく requirements review 候補として扱う。操作分類結果は `draft-meta` に記録
 
 4. **要件展開** → `agentdev-req-analysis` の分析観点に従って網羅
-   - **4b. 関連ドキュメント更新候補抽出**（REQ-0102）: 変更種別判定 → キーワード抽出 → 限定探索（docs/specs/**, docs/requirements/**, docs/DOC-MAP.md, docs/adr/**, docs/README.md）→ 分類（直接矛盾/更新候補/影響なし）。ドラフトに保持
+   - **4b. 関連ドキュメント更新候補抽出**（REQ-0102, REQ-0115-019）: 変更種別判定 → キーワード抽出 → 限定探索（docs/specs/**, docs/requirements/**, docs/DOC-MAP.md, docs/adr/**, docs/README.md, src/opencode/commands/**, src/opencode/skills/**）→ 分類（直接矛盾/更新候補/影響なし）。REQだけでなく ADR/SPEC/guides/DOC-MAP/commands/skills への影響候補を明示する。ドラフトに保持
+     - **局所予防の範囲**: この step は要求定義時の局所的な影響候補抽出であり、`/agentdev/docs-review` の全体意味レビューの代替ではない（REQ-0115-023）
    - **4c. 分類ゲート**（REQ-0109）: 各要件行候補を「変更後仕様」or「反映作業」に分類。反映作業のみの候補は移送候補としてマーク
 
 5. **ADR判断** → `agentdev-adr-guidelines`（manual reference）に従ってADR判断を記録（ADRファイル作成は req-save で実行）

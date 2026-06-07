@@ -70,10 +70,10 @@ AgentDevFlow の利用でよくある問題と対処法をまとめる。
 
 ## 整合性関連
 
-### integrity-check で大量の finding が出る
+### docs-check で大量の finding が出る
 
 **対処**: まず finding の分類と route を確認する。`document-drift` や `broken-reference` は intake に回して段階的に対応できる。一度に全てを修正する必要はない。
 
 ### REQ 体系が複雑になりすぎている
 
-**対処**: `/agentdev/req-restructure-review` を実行して健全性を診断する。推奨アクションに従って REQ の統合・分割を検討する。
+**対処**: `/agentdev/docs-review` を実行して健全性を診断する。推奨アクションに従って REQ の統合・分割を検討する。

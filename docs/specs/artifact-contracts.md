@@ -68,7 +68,7 @@ agent: prometheus | sisyphus
 | 種別 | 推奨上限 | 実運用上限 | 例外状態 |
 |---|---|---|---|
 | Command | 100 行 | 150 行 | 200 行超 |
-| SKILL.md | 200 行 | — | integrity-check で報告 |
+| SKILL.md | 200 行 | — | docs-check で報告 |
 | Steps 数 | 5〜12 個 | — | — |
 
 ## Template Placement Contract

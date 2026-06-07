@@ -17,8 +17,8 @@ AgentDevFlow で使う用語の定義。
 | intake-promote | インテイク・プロモート | inbox の item をレビュー・採用・却下・保留判定し、promoted artifact に整形するコマンド |
 | learning-promote | ラーニング・プロモート | learning entry を分析・分類・昇華判定し、Requirement Source stub を生成するコマンド |
 | backlog-review | バックログ・レビュー | promoted artifact を分析・統合し、ユーザー承認後に RU を生成するコマンド |
-| integrity-check | インテグリティ・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド |
-| req-restructure-review | レキ・リストラクチャ・レビュー | REQ 体系の健全性を診断するコマンド |
+| docs-check | ドックス・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド（旧称: integrity-check） |
+| docs-review | ドックス・レビュー | docs 全体の意味整合レビューと REQ 体系の健全性を診断するコマンド（旧称: req-restructure-review） |
 
 ## 成果物
 
@@ -52,7 +52,7 @@ AgentDevFlow で使う用語の定義。
 | HITL（Human-in-the-loop） | ユーザーの確認を挟む判断ポイント |
 | マクロフェーズ | 壁打ち・構造的実行・レビュー完了の3段階 |
 | マイクロフェーズ | requirement / analyzed / created / in_progress / review / done の6状態（説明用ラベルであり、状態管理モデルではない。REQ-0112-023） |
-| Finding | integrity-check や case-run で検出された乖離・発見事項 |
+| Finding | docs-check や case-run で検出された乖離・発見事項 |
 
 ## Epic 関連
 

@@ -31,6 +31,13 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認（REQ-0101）。不足時は警告表示してユーザー判断を仰ぐ
 
+3b. **close 時 SPEC / commands / skills 更新漏れの局所確認**（REQ-0115-022）: 実装完了・PRマージ前に、今回の変更に伴う以下の更新漏れを局所的に確認する:
+    - SPEC 本文と実装の最終矛盾確認
+    - 変更に伴う command 定義の更新漏れ
+    - 変更に伴う skill 責務境界の変更漏れ
+    - 更新漏れを検出した場合は警告表示してユーザー判断を仰ぐ
+    - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/docs-review` の全体意味レビューの代替ではない（REQ-0115-023）
+
 4. **PRマージ**:
    - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 3）
    - **Squash merge失敗時の自動リトライ**:

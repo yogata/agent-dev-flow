@@ -98,7 +98,7 @@ Consumer project で独自 command/skill を追加する際の命名規約（REQ
 
 ### 衝突検出
 
-`consumer-local` repo で `agentdev` namespace が検出された場合、integrity-check（IR-016）が NG として報告する。
+`consumer-local` repo で `agentdev` namespace が検出された場合、docs-check（IR-016）が NG として報告する。
 
 ## Installation Method Policy
 
@@ -119,7 +119,7 @@ Consumer project で独自 command/skill を追加する際の命名規約（REQ
 
 ### Copy の drift 検出
 
-Copy-based installation では AgentDevFlow 更新時に drift が発生する。integrity-check（IR-016）が divergence を検出・報告する。
+Copy-based installation では AgentDevFlow 更新時に drift が発生する。docs-check（IR-016）が divergence を検出・報告する。
 
 ## Sync Script Scope by Repo Type
 
