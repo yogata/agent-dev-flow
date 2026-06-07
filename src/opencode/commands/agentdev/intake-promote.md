@@ -57,7 +57,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
    - 対応の緊急度・優先度
    - 既存要件・仕様との関連
    - 対応方針の方向性（要件定義が必要か、既に Issue 化可能か）
-   - **learning 分岐判断**: item は intake ではなく learning に分けるべきものではないか（`docs/specs/workflow-contracts.md` Split Rule セクション参照）。具体的な修正対象がなく再発防止知見のみの場合は learning に委ねることを推奨
+   - **learning 分岐判断**: item は intake ではなく learning に分けるべきものではないか（`agentdev-workflow-orchestration` skill の Split Rule を参照）。具体的な修正対象がなく再発防止知見のみの場合は learning に委ねることを推奨
 
 4. **分類の提示**: 各 item の評価結果を分類（採用 / 保留 / 却下）と共に提示する:
    ```markdown

@@ -1,13 +1,13 @@
 ---
-description: inbox.mdから正規化・分類・8軸評価・HITL確定を経てRequirement Source stubを生成する
+description: inbox.mdから正規化・分類・8軸評価・HITL確定を経てpromoted artifactを生成する
 agent: sisyphus
 ---
 
-# 学びの正規化・評価・昇華判定と Requirement Source stub 生成
+# 学びの正規化・評価・昇華判定と promoted artifact 生成
 
-`.agentdev/learning/inbox.md` の学びエントリを直接読み込み、内部フェーズとして正規化・問題クラス分類・8軸評価を実行する（REQ-0105-052, 053）。評価結果を evaluation-report.md として生成・更新した後（REQ-0105-054）、廃棄判定・既存対策確認を経てユーザーの HITL 承認により昇格・保留・却下を確定する（REQ-0105-055）。確定後、`.agentdev/learning/promoted/` に Requirement Source 形式の stub を生成する。
+`.agentdev/learning/inbox.md` の学びエントリを直接読み込み、内部フェーズとして正規化・問題クラス分類・8軸評価を実行する（REQ-0105-052, 053）。評価結果を evaluation-report.md として生成・更新した後（REQ-0105-054）、廃棄判定・既存対策確認を経てユーザーの HITL 承認により昇格・保留・却下を確定する（REQ-0105-055）。確定後、`.agentdev/learning/promoted/` に promoted artifact（backlog-review を経て RU となる形式）を生成する。
 
-**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した stub は `/agentdev/backlog-review` が読み込み、RU 生成後に `/agentdev/req-define` に合流する。反映ルート: promoted → `/agentdev/backlog-review`（分析・承認・RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
+**重要**: `.opencode/` への直接配置・直接反映は行わない。生成した promoted artifact は `/agentdev/backlog-review` が読み込み、RU 生成後に `/agentdev/req-define` に合流する。反映ルート: promoted → `/agentdev/backlog-review`（分析・承認・RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
 
 本コマンドは旧 `learning-refine` の全機能を吸収しており、`learning-refine` を事前実行する必要はない（REQ-0105-051, 056）。
 
@@ -19,7 +19,7 @@ agent: sisyphus
 ## Output
 
 - `.agentdev/learning/evaluation-report.md` — 8軸評価レポート（評価根拠中間成果物）（REQ-0105-054）
-- `.agentdev/learning/promoted/{category}-{name}.md` — Requirement Source 形式の stub
+- `.agentdev/learning/promoted/{category}-{name}.md` — promoted artifact（backlog-review 経由で RU となる形式）
 - `.agentdev/learning/archive/active.md` — inbox からの移動分を追記
 - `.agentdev/learning/inbox.md` — ヘッダーのみにクリア
 
@@ -77,13 +77,13 @@ agent: sisyphus
       {git_error_output}
       ```
 
-12. **Requirement Source stub 生成**（staging領域のみ）:
-    - 出力先: `.agentdev/learning/promoted/`（REQ-0105）
-    - ファイル名: `{disposal-category}-{name}.md`
-    - **`.opencode/` への直接書込は禁止**
-    - **`case-run` への直接受け渡しは禁止**（`backlog-review` を経由して RU 化すること）
-    - stub フォーマットは `agentdev-learning-pipeline` skill の「Requirement Source Staging Stub Schema」に従う
-    - カテゴリ別の反映先パス例は `agentdev-learning-pipeline` skill を参照
+12. **promoted artifact 生成**（staging領域のみ）:
+     - 出力先: `.agentdev/learning/promoted/`（REQ-0105）
+     - ファイル名: `{disposal-category}-{name}.md`
+     - **`.opencode/` への直接書込は禁止**
+     - **`case-run` への直接受け渡しは禁止**（`backlog-review` を経由して RU 化すること）
+     - artifact フォーマットは `agentdev-learning-pipeline` skill の「Requirement Source Staging Stub Schema」に従う
+     - カテゴリ別の反映先パス例は `agentdev-learning-pipeline` skill を参照
 
 13. **アーカイブ移動**（原子的操作 — 最重要）:
     - **Step A**: inbox.md の全エントリを archive/active.md に追記。各エントリに `**移動日**: YYYY-MM-DD` フィールドを追加
@@ -100,9 +100,9 @@ agent: sisyphus
     - Step B が失敗 → inbox.md は変更しない。エラー内容を報告
 
 14. **昇華時 prune**（archive/active.md からの除去）:
-    - **prune 対象**: staged（stub 生成済み）/ rejected / duplicate のエントリのみ
+    - **prune 対象**: staged（promoted artifact 生成済み）/ rejected / duplicate のエントリのみ
     - **prune 非対象**: deferred / 未処理のエントリは archive/active.md に残す
-    - **証拠保存**: staged エントリを除去する際、stub の「元learning item / 根拠」セクションに保存してから除去
+    - **証拠保存**: staged エントリを除去する際、promoted artifact の「元learning item / 根拠」セクションに保存してから除去
     - 詳細は `agentdev-learning-pipeline` skill の「Prune 方針 → promote 時 prune」を参照
     - **実行手順**:
        1. prune 対象エントリの特定（staged/rejected/duplicate のクラスタに属するエントリ）
@@ -139,7 +139,7 @@ agent: sisyphus
 
 ## Guardrails
 
-- G01: `.opencode/` 直接反映禁止: stub は `.agentdev/learning/promoted/` のみに生成
+- G01: `.opencode/` 直接反映禁止: promoted artifact は `.agentdev/learning/promoted/` のみに生成
 - G02: `evaluation-report.md` は本コマンドが生成・管理: 外部コマンドの事前生成に依存しない（REQ-0105-051, 056）
 - G03: `case-run` への直接受け渡し禁止: `/agentdev/backlog-review` 経由のみ
 - G04: 主入力は `inbox.md`: raw learning item の再分類は禁止（REQ-0103）
@@ -163,7 +163,7 @@ agent: sisyphus
 | ユーザーが承認しない | 「昇華をキャンセルしました」と報告して終了 |
 | 旧フォーマットパース失敗 | 当該エントリをスキップし、警告を出力。処理は継続 |
 | staging領域の書込失敗 | エラー内容を報告 |
-| archive/active.md の prune 失敗 | stub 生成は保持。prune エラー内容を報告し、手動での prune を案内 |
+| archive/active.md の prune 失敗 | promoted artifact 生成は保持。prune エラー内容を報告し、手動での prune を案内 |
 | archive/active.md 書込失敗 | inbox.md は変更しない。エラー内容を報告 |
 | git pull --rebase 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
 | git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
@@ -172,4 +172,4 @@ agent: sisyphus
 
 各成果物（inbox.md, archive/active.md, evaluation-report.md, promoted/）の役割・性格・lifecycle 詳細は `agentdev-learning-pipeline` skill の「Artifact Lifecycle」を参照。
 
-**learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → stub 生成 → archive move → prune（REQ-0105-052）。stub は `.opencode/` に直接反映せず、`/agentdev/backlog-review` が読み込み RU 化後に `/agentdev/req-define` に合流する。
+**learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → promoted artifact 生成 → archive move → prune（REQ-0105-052）。promoted artifact は `.opencode/` に直接反映せず、`/agentdev/backlog-review` が読み込み RU 化後に `/agentdev/req-define` に合流する。

@@ -29,7 +29,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
    - 未達項目が残る場合 → 構造化エラーで停止（G08）
    - PR存在確認
 
-3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全パターン共通の関連ドキュメント整合性確認。DOC-MAP整合性確認（REQ-0101）。不足時は警告表示してユーザー判断を仰ぐ
+3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認（REQ-0101）。不足時は警告表示してユーザー判断を仰ぐ
 
 4. **PRマージ**:
    - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 3）
@@ -68,8 +68,8 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 10. **学びの検知・抽出**: `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断:
     - ユーザーに学びの有無を問うことは禁止
     - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
-    - staging stub imported 判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
-    - Post-run intake capture: 本筋外の変更候補を intake item として `.agentdev/intake/inbox/` に保存。PR本文の `## Findings / Intake候補` セクションから回収。Epic横断回収。Split Rule（intake / learning 境界）は `docs/specs/workflow-contracts.md` Split Rule セクションを SSoT とする
+    - promoted artifact imported 判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
+     - Post-run intake capture: 本筋外の変更候補を intake item として `.agentdev/intake/inbox/` に保存。PR本文の `## Findings / Intake候補` セクションから回収。Epic横断回収。Split Rule（intake / learning 境界）は `agentdev-workflow-orchestration` skill を参照
     - intake と learning を別々の成果物として扱う（SHALL）
 
 11. **Domain state 永続化**: `agentdev-git-worktree` の domain state 永続化（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 2）に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める（SHALL）

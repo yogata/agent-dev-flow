@@ -81,7 +81,7 @@ agent: sisyphus
 ### 委譲・参照制約
 - G08: `agentdev-gh-cli` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
 - G09: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
-- G10: Pattern分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → Pattern Registry を参照
+- G10: work_type分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
 
 ### 出力制約
 - G11: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）

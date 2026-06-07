@@ -7,7 +7,7 @@ agent: sisyphus
 
 ユーザーの手動入力から、未分類の作業候補・不整合・規約違反・未回収課題を intake item として作成し、`.agentdev/intake/inbox/` に保存する（REQ-0105）。
 
-**このコマンドは保存専用である。** GitHub Issue の作成・採用可否の判断は行わない（REQ-0103）。作業知見だけの内容は対象外である（`docs/specs/workflow-contracts.md` Split Rule セクション参照）。
+**このコマンドは保存専用である。** GitHub Issue の作成・採用可否の判断は行わない（REQ-0103）。作業知見だけの内容は対象外である（`agentdev-workflow-orchestration` skill の Split Rule を参照）。
 
 ## Input
 
