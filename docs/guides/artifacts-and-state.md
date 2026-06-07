@@ -111,13 +111,13 @@ scripts/
 
 | 成果物 | 生成 | 読取り | 削除トリガー |
 |--------|------|------|-------------|
-| promoted artifact（intake） | `intake-promote` | `backlog-review` | RU 化成功時 |
-| promoted artifact（learning） | `learning-promote` | `backlog-review` | RU 化成功時 |
-| RU | `backlog-review`, session-sourced | `req-define`, `req-save`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功時 |
-| REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
-| Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
+| promoted artifact（intake） | `/agentdev/intake-promote` | `/agentdev/backlog-review` | RU 化成功時 |
+| promoted artifact（learning） | `/agentdev/learning-promote` | `/agentdev/backlog-review` | RU 化成功時 |
+| RU | `/agentdev/backlog-review`, session-sourced | `/agentdev/req-define`, `/agentdev/req-save`, `/agentdev/case-open` | `/agentdev/case-open` の Issue 作成 + VERIFY 成功時 |
+| REQ ファイル | `/agentdev/req-save` | `/agentdev/case-open`, `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
+| Issue | `/agentdev/case-open` | `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
 
-流れ: promoted artifact / session-sourced → RU → REQ ファイル / Issue → マージ → クローズ。RU 削除は `case-open` の永続化成功に限定する。
+流れ: promoted artifact / session-sourced → RU → REQ ファイル / Issue → マージ → クローズ。RU 削除は `/agentdev/case-open` の永続化成功に限定する。
 
 ## フェーズ体系
 

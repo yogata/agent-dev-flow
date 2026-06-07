@@ -7,7 +7,7 @@ updated: "2026-05-30"
 
 ## 目的
 
-REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0109 を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口を9件に限定する。
+REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0114 を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口を14件に限定する。
 
 ## 判定
 
@@ -85,3 +85,8 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0109 を active
 | REQ-0107 | Reporting / Writing Quality |
 | REQ-0108 | Integrity / Validation / Tests |
 | REQ-0109 | REQ再構成運用 |
+| REQ-0110 | Git worktree 削除リトライ |
+| REQ-0111 | Command authoring 後方互換性維持原則 |
+| REQ-0112 | ADRライフサイクル・文書責務・runtime独立性・状態モデル統合是正 |
+| REQ-0113 | Skill References SPEC分離基準 |
+| REQ-0114 | /agentdev/case-auto 最大自走モード |

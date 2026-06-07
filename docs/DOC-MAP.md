@@ -48,6 +48,12 @@
 | [artifact-contracts.md](specs/artifact-contracts.md) | アーティファクト間契約 |
 | [integrity-contracts.md](specs/integrity-contracts.md) | 整合性検査分類フレームワーク |
 | [workflow-contracts.md](specs/workflow-contracts.md) | ワークフロー契約の雛形 |
+| [runtime-package-boundary.md](specs/runtime-package-boundary.md) | runtime 配布物の境界と依存制約 |
+| [integrity-rule-catalog.md](specs/integrity-rule-catalog.md) | 整合性検査ルールのカタログ |
+| [artifact-responsibilities.md](specs/artifact-responsibilities.md) | アーティファクト責務マトリックス |
+| [req-impact-map.md](specs/req-impact-map.md) | REQ 影響マッピング |
+| [rule-ownership.md](specs/rule-ownership.md) | ルール所有権マトリックス |
+| [integrity-audit-report.md](specs/integrity-audit-report.md) | 整合性監査レポート |
 
 ## ADR
 
@@ -67,5 +73,6 @@
 | [診断・メンテナンス](guides/diagnostics-and-maintenance.md) | integrity-check（/repo/integrity-check: self-hosting repo専用自己監査） / req-restructure-review |
 | [成果物・状態モデル](guides/artifacts-and-state.md) | 成果物の種別・配置・ライフサイクル |
 | [プロジェクトドキュメントと SPEC](guides/project-docs-and-specs.md) | REQ / ADR / SPEC / DOC-MAP の関係 |
+| [Consumer Project 導入](guides/consumer-project-setup.md) | 外部プロジェクトへの AgentDevFlow 導入手順 |
 | [トラブルシューティング](guides/troubleshooting.md) | よくある問題と対処法 |
 | [用語集](guides/glossary.md) | AgentDevFlow の用語定義 |

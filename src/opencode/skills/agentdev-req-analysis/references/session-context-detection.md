@@ -7,7 +7,7 @@
 依存関係に従い以下の順序で推論:
 
 1. **要件内容**（何をやりたいか）→ セッション内で機能追加/バグ修正の説明が存在するか
-2. **work_type 判定**（A or B or C or D）→ 要件内容の性質から bug/critical=A, feature/enhancement=B, refactor/maintenance=C, docs/chore=D を推論
+2. **work_type 判定**（bugfix/feature/maintenance/docs_chore）→ 要件内容の性質から bugfix/critical=bugfix, feature/enhancement=feature, refactor/maintenance=maintenance, docs/chore=docs_chore を推論
 3. **Scale判定**（feature のみ）→ 複数モジュール跨ぎ、PR肥大化リスク、段階的リリースの有無から standard/large を推論。bugfix の場合 Scale は推論不要（undefined）
 4. **ADR判断**（必要/不要）→ 技術判断の複雑さ・影響範囲から adr-required を推論
 5. **要件docの構造化** → セッション内でテーブル形式の要件が展開済みか
@@ -39,7 +39,7 @@
 ```
 📋 セッションコンテキスト検知結果:
   要件内容: {推論結果} [信頼度: 高/低]
-  Pattern: {A/B} [信頼度: 高/低]
+  work_type: {bugfix/feature/maintenance/docs_chore} [信頼度: 高/低]
   {featureの場合} Scale: {standard/large} [信頼度: 高/低]
   ADR: {必要/不要} [信頼度: 高/低]
   要件構造化: {完了/未完了} [信頼度: 高/低]

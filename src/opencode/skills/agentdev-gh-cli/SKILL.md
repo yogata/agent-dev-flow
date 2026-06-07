@@ -1,6 +1,6 @@
 ---
 name: agentdev-gh-cli
-description: Enforces safe GitHub CLI usage on Windows (PowerShell/cmd) by routing all multi-line body content through temporary files to prevent encoding and escaping errors. Also provides post-write verification to detect encoding corruption, Markdown structure loss, and missing template sections. USE FOR: running gh issue/pr/release commands with --body or --body-file, reading gh command output safely on Windows, writing Issue/PR content, verifying Issue/PR content after writing. DO NOT USE FOR: basic gh commands without body content, non-Windows environments, or general git operations.
+description: Enforces safe GitHub CLI usage on Windows (PowerShell/cmd) by routing all multi-line body content through temporary files to prevent encoding and escaping errors. Also provides post-write verification to detect encoding corruption, Markdown structure loss, and missing template sections. USE FOR: running gh issue/pr/release commands with --body-file or -F, reading gh command output safely on Windows, writing Issue/PR content, verifying Issue/PR content after writing. DO NOT USE FOR: basic gh commands without body content, non-Windows environments, or general git operations.
 ---
 
 # agentdev-gh-cli

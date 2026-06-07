@@ -23,7 +23,7 @@ agent: prometheus
 
 ## Steps
 
-0. **セッションコンテキスト検知**（引数なし単体実行時のみ）: `agentdev-req-analysis` の session-context-detection.md に従い、セッション履歴から6項目（要件内容・Pattern・Scale・ADR・構造化・適用範囲）を推論し、信頼度付きで表示。推論結果に応じて Step 1/9/10 へルーティング。引数ありの場合は Step 1 から開始
+0. **セッションコンテキスト検知**（引数なし単体実行時のみ）: `agentdev-req-analysis` の session-context-detection.md に従い、セッション履歴から6項目（要件内容・work_type・scale・ADR・構造化・適用範囲）を推論し、信頼度付きで表示。推論結果に応じて Step 1/9/10 へルーティング。引数ありの場合は Step 1 から開始
 
 1. **明示入力ファイルの読み込み**（指定時）: Read tool で読み込み、壁打ちの初期コンテキストとして扱う。複数ファイル指定時は全て読み込む。引数なしの場合、`.agentdev/backlog/req-units/RU-*.md` の存在を確認し1件なら自動検出。0件なら Step 2 へ。2件以上なら候補一覧を表示
 
@@ -57,12 +57,12 @@ agent: prometheus
 
 6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
 
-7. **work_type 判定**: ラベルに基づき判定（bug/critical→A, enhancement/feature→B, refactor/maintenance→C, docs/chore→D）。bugfix + ADR必要時は feature に昇格
+7. **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）。bugfix + ADR必要時は feature に昇格
 
 8. **Scale判断**（feature のみ）: `agentdev-workflow-lifecycle` の並列実行パターン条件で standard/large を判定。large 時はユーザーと分解計画を協議
 
 9. **ドラフト保存**:
-   - 機能追加: `.sisyphus/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（pattern/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加
+   - 機能追加: `.sisyphus/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加
    - バグ修正・軽微変更/リファクタリング・保守/ドキュメント・雑務: ドラフト保存不要。セッション内で完結
 
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
@@ -77,7 +77,7 @@ agent: prometheus
 
    **10e. Wave 候補・依存関係の記録**（REQ-0102-018）: 操作間に逐次制約（先行要件が必要など）が存在する場合、wave 候補および依存関係を draft-meta に記録。順序依存があれば明示
 
-11. **完了報告**: 完了報告templateに従って出力。Pattern に応じたvariantを選択:
+11. **完了報告**: 完了報告templateに従って出力。work_type に応じたvariantを選択:
       - feature standard → .opencode/commands/agentdev/templates/req-define/feature.md
       - feature large (Epic)規模 → .opencode/commands/agentdev/templates/req-define/feature-epic.md
       - bugfix / maintenance / docs_chore → .opencode/commands/agentdev/templates/req-define/lightweight.md

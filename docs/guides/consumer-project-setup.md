@@ -18,8 +18,8 @@ AgentDevFlow を適用プロジェクトに導入する際の model を定義す
 ```
 .opencode/           → junction → src/opencode/ (runtime projection)
 src/opencode/
-  commands/agentdev/  → canonical source (18 commands)
-  skills/agentdev-*/  → canonical source (21 skills)
+  commands/agentdev/  → canonical source（public command definitions 13件、README除外）
+  skills/agentdev-*/  → canonical source（agentdev skill 20件）
 scripts/
   sync-self-opencode.ps1  → self-hosting 用同期スクリプト
 ```
