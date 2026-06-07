@@ -25,7 +25,8 @@ agent: sisyphus
    - bugfix / maintenance / docs_chore: case-open → case-run → case-close（req-save をスキップ）
 4. **各工程の実行**（REQ-0114-006〜007）: 既存コマンド定義（req-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）も含めて既存コマンド定義に従うこと
 5. **工程間の状態引き継ぎ**（REQ-0114-020）: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) 要件docの Requirement Source セクション内容（RU 削除判定に使用） (2) RU ファイルパス（case-open 相当処理の RU 削除で使用） (3) capture 対象情報（case-close 相当処理の learning/intake capture で使用）
-6. **停止条件の検出**（REQ-0114-016）: 以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:
+6. **複数REQ対応**（REQ-0114-036〜037）: req-save 相当処理の出力から複数 REQ doc または scale:large を検出した場合、case-auto は REQ-0104-029〜033 で定義される case-open の Issue 構造ルールをそのまま使用する。case-auto 自体に Issue 階層決定ロジックを持ってはならない（REQ-0114-036）。req-save 相当処理から case-open 相当処理へ状態を引き継ぐ際、case-auto は複数 REQ doc の保存結果をフィルタリングや再評価なしでそのまま渡す（REQ-0114-037）
+7. **停止条件の検出**（REQ-0114-016）: 以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:
    - (1) req-define合意要件からの逸脱
    - (2) 要件未合意のscope拡大
    - (3) repo外実体変更の必要性
@@ -52,6 +53,8 @@ agent: sisyphus
 - G07: 既存コマンドの手順をcase-auto定義内に再実装しない（REQ-0114-007）
 - G08: 工程固有の詳細手順とcase-auto定義が矛盾する場合、工程固有処理は既存コマンド定義を優先し、自走境界・入力解決・工程間制御はcase-auto定義を優先する（REQ-0114-019）
 - G09: 既存のreq-save / case-open / case-run / case-closeの責務を変更しない（REQ-0114-018）
+- G13: case-auto は Issue 階層決定ロジックを持ってはならない。複数 REQ doc または scale:large の場合は REQ-0104-029〜033 で定義される case-open の Issue 構造ルールに委譲する（REQ-0114-036）
+- G14: case-auto は req-save 相当処理から case-open 相当処理への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価してはならない。保存結果をそのまま渡す（REQ-0114-037）
 
 ### 出力制約
 - G10: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
