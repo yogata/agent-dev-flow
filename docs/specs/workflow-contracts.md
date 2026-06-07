@@ -117,7 +117,7 @@ draft（`.sisyphus/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 | `/agentdev/intake-capture` | ユーザー入力 | `.agentdev/intake/inbox/` | 収集 |
 | `/agentdev/intake-from-github` | GitHub Issue/PR | `.agentdev/intake/inbox/` | 収集 |
 | `/agentdev/intake-promote` | inbox items | `.agentdev/intake/promoted/` | 昇華 |
-| `/repo/integrity-check` | ドキュメント・スキル・コマンド | `.agentdev/integrity/reports/` | 整合性検査（repo-local、ADR-0020） |
+| `/repo/integrity-check` | ドキュメント・スキル・コマンド | `.agentdev/integrity/reports/` | 整合性検査（repo-local、ADR-0106） |
 | `/agentdev/req-restructure-review` | ドキュメント・REQ体系 | なし（診断結果出力のみ） | REQ再構成 |
 
 ### 参照フロー
@@ -585,4 +585,4 @@ REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成in
 
 ## Scope Declaration
 
-`docs/specs/` は agent-dev-flow レポジトリ専用の repo-internal 設計文書である（ADR-0017）。他プロジェクトへの適用を意図しない。runtime command は SPEC ファイルに依存しない（ADR-0018）。
+`docs/specs/` は agent-dev-flow レポジトリ専用の repo-internal 設計文書である（ADR-0103）。他プロジェクトへの適用を意図しない。runtime command は SPEC ファイルに依存しない（ADR-0104）。

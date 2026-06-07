@@ -2,7 +2,7 @@
 
 Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各 rule は 15 以上の field を持つ。
 
-> **Repo-local context**: integrity 検査は `/repo/integrity-check` コマンドと `repo-agentdev-integrity` skill により実行される repo-local 自己監査である（ADR-0020）。AgentDevFlow の consumer 配布対象外。語彙レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` に配置する。
+> **Repo-local context**: integrity 検査は `/repo/integrity-check` コマンドと `repo-agentdev-integrity` skill により実行される repo-local 自己監査である（ADR-0106）。AgentDevFlow の consumer 配布対象外。語彙レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` に配置する。
 
 ## Schema
 
@@ -505,6 +505,66 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | finding_route | intake |
 | triage_action | README にコマンド追加/削除 |
 | last_verified | 2026-06-06 |
+
+### IR-025: Retired ADR path 規則
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-025 |
+| description | 旧番号帯 ADR（ADR-0001〜0099）が `docs/adr/retired/` に配置されていること。`docs/adr/` 直下に旧番号帯 ADR が残存していないこと（REQ-0112-047, 048） |
+| severity | strict |
+| category | obsolete-structure |
+| detection_method | `docs/adr/ADR-0*.md`（ADR-0000〜ADR-0099）の存在確認 |
+| affected_artifacts | [ADR] |
+| related_req | [REQ-0112-047, REQ-0112-048] |
+| related_spec | [integrity-contracts.md, document-model.md] |
+| gate_level | full-audit |
+| false_positive_risk | なし。番号帯マッチングは確実 |
+| regression_test | (追加予定) |
+| baseline_status | known |
+| finding_route | intake |
+| triage_action | 旧番号帯 ADR を `docs/adr/retired/` に移動 |
+| last_verified | 2026-06-08 |
+
+### IR-026: ADR 誤分類兆候検出
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-026 |
+| description | current ADR に技術判断不在・REQ/SPEC 相当内容の混入・ADR-0103 適合外・文書種別不一致の兆候がないこと（REQ-0112-043） |
+| severity | heuristic |
+| category | canonical-conflict |
+| detection_method | ADR 本文の内容分析（技術判断の有無、REQ/SPEC 相当キーワード検出） |
+| affected_artifacts | [current ADR] |
+| related_req | [REQ-0112-043, REQ-0112-031, REQ-0112-032, REQ-0112-033] |
+| related_spec | [integrity-contracts.md, document-model.md] |
+| gate_level | full-audit |
+| false_positive_risk | 高。意味判断が必要なため observation として報告 |
+| regression_test | (手動確認) |
+| baseline_status | known |
+| finding_route | req-define |
+| triage_action | ADR 誤分類兆候を確認し、必要に応じて REQ/SPEC 移管を検討 |
+| last_verified | 2026-06-08 |
+
+### IR-027: Retired ADR 現行根拠引用検出
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-027 |
+| description | 現行 docs 内で retired ADR（`docs/adr/retired/`）が現行根拠として引用されていないこと。履歴参照には retired path と [retired] 注記を必須とする（REQ-0112-048） |
+| severity | heuristic |
+| category | canonical-conflict |
+| detection_method | 現行 docs 内の retired ADR 参照検出・コンテキスト判定 |
+| affected_artifacts | [REQ, SPEC, guides] |
+| related_req | [REQ-0112-048, REQ-0112-050] |
+| related_spec | [integrity-contracts.md, document-model.md] |
+| gate_level | full-audit |
+| false_positive_risk | 中。履歴参照の文脈判定に注意 |
+| regression_test | (手動確認) |
+| baseline_status | known |
+| finding_route | intake |
+| triage_action | 参照に [retired] 注記を追加、または current ADR へ更新 |
+| last_verified | 2026-06-08 |
 
 ## Gate Levels
 
