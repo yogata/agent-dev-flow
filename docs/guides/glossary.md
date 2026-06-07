@@ -47,11 +47,11 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| Pattern | Issue ラベルに基づく4分類（A: バグ修正、B: 機能追加、C: リファクタリング、D: ドキュメント・雑務） |
+| work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。経路と docs 更新範囲を決定する。旧称 Pattern（A/B/C/D）は非推奨 |
 | SSoT（Single Source of Truth） | 各フェーズでの信頼できる唯一の情報源 |
 | HITL（Human-in-the-loop） | ユーザーの確認を挟む判断ポイント |
 | マクロフェーズ | 壁打ち・構造的実行・レビュー完了の3段階 |
-| マイクロフェーズ | requirement / analyzed / created / in_progress / review / done の6状態 |
+| マイクロフェーズ | requirement / analyzed / created / in_progress / review / done の6状態（説明用ラベルであり、状態管理モデルではない。REQ-0112-023） |
 | Finding | integrity-check や case-run で検出された乖離・発見事項 |
 
 ## Epic 関連

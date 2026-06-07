@@ -12,7 +12,7 @@
 
 ## バグ修正・軽作業の場合
 
-バグ修正・保守作業・ドキュメント作業は `req-save` をスキップし、`req-define` の直後に `case-open` に進む。
+バグ修正・保守作業・ドキュメント作業は `/agentdev/req-save` をスキップし、`/agentdev/req-define` の直後に `/agentdev/case-open` に進む。
 
 ```
 /agentdev/req-define    # 再現手順・修正方針を整理する
@@ -25,8 +25,8 @@
 
 | コマンド | やること | 入力 | 出力 |
 |----------|---------|------|------|
-| `req-define` | AI と対話して要件を整理 | セッション会話 / RU | 要件doc（draft） |
-| `req-save` | REQ/ADR ファイルを docs/ に保存 | 要件doc（feature のみ） | REQ/ADR ファイル |
-| `case-open` | GitHub Issue を作成 | REQ ファイル / 要件doc | Issue |
-| `case-run` | 実装して PR を作成 | Issue | 実装済みブランチ + PR |
-| `case-close` | PR をマージして Issue をクローズ | PR | マージ済み + クローズ済み |
+| `/agentdev/req-define` | AI と対話して要件を整理 | セッション会話 / RU | 要件doc（draft） |
+| `/agentdev/req-save` | REQ/ADR ファイルを docs/ に保存 | 要件doc（feature のみ） | REQ/ADR ファイル |
+| `/agentdev/case-open` | GitHub Issue を作成 | REQ ファイル / 要件doc | Issue |
+| `/agentdev/case-run` | 実装して PR を作成 | Issue | 実装済みブランチ + PR |
+| `/agentdev/case-close` | PR をマージして Issue をクローズ | PR | マージ済み + クローズ済み |

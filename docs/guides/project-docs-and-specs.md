@@ -23,7 +23,7 @@ DOC-MAP（文書探索入口: 索引）
 要件定義の永続基準。システムが満たすべき要件を記述する。
 
 - 現行の active REQ は REQ-0101 から REQ-0114 までの 14 件
-- 旧 REQ（REQ-0001〜0040 [全てretired]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
+- 旧 REQ（REQ-0001〜REQ-0050 [全てretired]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
 ### Active REQ 一覧
@@ -69,8 +69,14 @@ DOC-MAP（文書探索入口: 索引）
 | quality-specs.md | 品質基準・検証ルール |
 | document-model.md | 文書種別の責務マトリックス |
 | artifact-contracts.md | アーティファクト間契約 |
+| artifact-responsibilities.md | アーティファクト責務定義 |
 | integrity-contracts.md | 整合性検査分類フレームワーク |
+| integrity-rule-catalog.md | 整合性ルールカタログ |
+| integrity-audit-report.md | 整合性監査レポート |
 | workflow-contracts.md | ワークフロー契約の雛形 |
+| runtime-package-boundary.md | Runtime package 境界 |
+| rule-ownership.md | ルール所有権 |
+| req-impact-map.md | REQ 影響マップ |
 
 ## DOC-MAP（文書探索入口）
 

@@ -39,9 +39,9 @@ promoted/ → archive/promoted/
 
 | 前工程の生成物 | コマンド | 出力 |
 |----------|------|------|
-| ユーザー手動入力 | `intake-capture` | `inbox/` |
-| クローズ済み Issue/PR | `intake-from-github` | `inbox/` |
-| `inbox/` | `intake-promote` | `promoted/` / `archive/` |
+| ユーザー手動入力 | `/agentdev/intake-capture` | `inbox/` |
+| クローズ済み Issue/PR | `/agentdev/intake-from-github` | `inbox/` |
+| `inbox/` | `/agentdev/intake-promote` | `promoted/` / `archive/` |
 
 ### 各ディレクトリの役割
 
@@ -69,7 +69,7 @@ inbox.md + archive/active.md → promoted/
 | 前工程の生成物 | コマンド | 出力 |
 |----------|------|------|
 | 観測（case-run 中等） | `learning-capture`（スキル） | `inbox.md` |
-| `inbox.md` + `archive/active.md` | `learning-promote` | `promoted/` |
+| `inbox.md` + `archive/active.md` | `/agentdev/learning-promote` | `promoted/` |
 
 ### 各成果物の役割
 
@@ -92,9 +92,9 @@ intake/learning 両方の promoted artifact を RU に統合する。
 
 | 前工程の生成物 | コマンド | 出力 |
 |----------|------|------|
-| `promoted/`（intake/learning） | `backlog-review` | `RU-*.md` |
+| `promoted/`（intake/learning） | `/agentdev/backlog-review` | `RU-*.md` |
 
-`backlog-review` は分析・統合結果をユーザーに確認（HITL）し、承認後に直接 RU を生成する。
+`/agentdev/backlog-review` は分析・統合結果をユーザーに確認（HITL）し、承認後に直接 RU を生成する。
 
 ### RU の粒度
 
@@ -110,10 +110,10 @@ intake/learning 両方の promoted artifact を RU に統合する。
 
 | トリガー | 実行コマンド | 対象 |
 |----------|-------------|------|
-| RU の内容が Issue に永続化完了（Issue作成 + VERIFY 成功） | `case-open` | 該当 RU ファイル |
-| promoted artifact の RU 化成功 | `backlog-review` | 該当 promoted artifact |
+| RU の内容が Issue に永続化完了（Issue作成 + VERIFY 成功） | `/agentdev/case-open` | 該当 RU ファイル |
+| promoted artifact の RU 化成功 | `/agentdev/backlog-review` | 該当 promoted artifact |
 
-`req-save` は RU を削除せず、RU パスを docs 永続文書に記録しない。RU は一時成果物であり、永続化未完了の場合は残置する。
+`/agentdev/req-save` は RU を削除せず、RU パスを docs 永続文書に記録しない。RU は一時成果物であり、永続化未完了の場合は残置する。
 
 ## 矛盾検出
 

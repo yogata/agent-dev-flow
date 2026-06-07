@@ -1,11 +1,11 @@
 # 要件定義 → Case実行フロー
 
-`req-define` から `case-close` までの流れを説明する。機能追加・バグ修正ともにこの経路を通る。
+`/agentdev/req-define` から `/agentdev/case-close` までの流れを説明する。機能追加・バグ修正ともにこの経路を通る。
 
 ## 全体の流れ
 
 ```
-req-define → req-save（機能追加のみ）→ case-open → case-run → case-close
+/agentdev/req-define → /agentdev/req-save（機能追加のみ）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
 
 ## req-define
@@ -89,29 +89,29 @@ PR をマージし、Issue をクローズするコマンド。
 
 親 Epic 内の全子 Issue が完了している場合、Epic を自動的にクローズする。子 Issue が残存する場合はスキップし、完了報告に状況を表示する。
 
-## Pattern 分類
+## work_type 分類
 
-Issue のラベルに基づき、4つの Pattern に分類する。Pattern により経路（req-save の要否）と docs 更新範囲が変わる。
+Issue の work_type に基づき、経路（`/agentdev/req-save` の要否）と docs 更新範囲が変わる。
 
-| Pattern | 名称 | ラベル | REQ | ブランチ種別 |
-|---------|------|--------|-----|-------------|
-| A | バグ修正・軽微変更 | `bug`, `critical` | 不要 | `fix` |
-| B | 機能追加 | `enhancement`, `feature` | 必要 | `feature` |
-| C | リファクタリング・保守作業 | `refactor`, `maintenance` | 不要 | `refactor` |
-| D | ドキュメント・雑務 | `docs`, `chore` | 不要 | `chore` |
+| work_type | 名称 | ラベル | REQ | ブランチ種別 |
+|-----------|------|--------|-----|-------------|
+| bugfix | バグ修正・軽微変更 | `bug`, `critical` | 不要 | `fix` |
+| feature | 機能追加 | `enhancement`, `feature` | 必要 | `feature` |
+| maintenance | リファクタリング・保守作業 | `refactor`, `maintenance` | 不要 | `refactor` |
+| docs_chore | ドキュメント・雑務 | `docs`, `chore` | 不要 | `chore` |
 
-**昇格ルール**: bugfix で ADR が必要と判定された場合、feature に昇格し req-save を実行する。
+**昇格ルール**: bugfix で ADR が必要と判定された場合、feature に昇格し `/agentdev/req-save` を実行する。
 
 ## 最大自走モード
 
-`/agentdev/case-auto` は、req-define 完了後の後続工程を一括実行する追加入口である。標準ワークフロー（個別コマンドの順次実行）を置き換えるものではない。ユーザーが明示的に指定した場合のみ使用する。
+`/agentdev/case-auto` は、`/agentdev/req-define` 完了後の後続工程を一括実行する追加入口である。標準ワークフロー（個別コマンドの順次実行）を置き換えるものではない。ユーザーが明示的に指定した場合のみ使用する。
 
 ### 実行内容
 
 入力要件docの draft-meta から work_type を読み取り、工程を分岐する:
 
-- **feature**: req-save → case-open → case-run → case-close
-- **bugfix / maintenance / docs_chore**: case-open → case-run → case-close（req-save をスキップ）
+- **feature**: `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
+- **bugfix / maintenance / docs_chore**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` をスキップ）
 
 ### 自走対象
 
@@ -136,4 +136,4 @@ DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS
 9. 作成元不明branch / user-owned branch / 他作業branchの削除検出
 10. 未コミット変更の帰属不明
 
-停止時は個別コマンド（case-open / case-run / case-close）から再開できる。
+停止時は個別コマンド（`/agentdev/case-open` / `/agentdev/case-run` / `/agentdev/case-close`）から再開できる。
