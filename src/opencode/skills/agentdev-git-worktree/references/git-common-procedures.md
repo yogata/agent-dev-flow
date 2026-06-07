@@ -121,3 +121,99 @@ command 側には共通処理の詳細本文ではなく、使用する手順名
 - 「`agentdev-git-worktree` の 実行前同期（Section 1）に従い `git pull --ff-only` を実行」
 - 「`agentdev-git-worktree` の domain state 永続化（Section 2）に従い commit/push を実行」
 - 「push 失敗時は構造化エラーで停止（`git-common-procedures.md` Section 2 のエラー形式）」
+
+## Merge Conflict 対応パターン
+
+### git pull/push時のmerge conflict対応
+
+#### 1. pull --rebase失敗時のrebase --abort手順
+
+`git pull --rebase` 実行時にconflictが発生した場合:
+
+1. **即座にrebaseを中止**:
+   ```bash
+   git rebase --abort
+   ```
+
+2. **ローカル変更を確認**:
+   ```bash
+   git status --short
+   ```
+
+3. **状況報告**:
+   ```markdown
+   ## Pull Rebase Conflict エラー
+
+   **対象ブランチ**: {current_branch}
+   **停止理由**: rebase中にmerge conflictが発生したため、rebaseを中止しました
+   **ユーザーアクション**: 以下のいずれかを選択してください
+   - 手動でrebaseを実行しconflictを解決: `git pull --rebase` → 手動解決 → `git rebase --continue`
+   - ローカル変更をstashしてpull: `git stash && git pull --ff-only && git stash pop`
+   ```
+
+**重要**: 自動的なrebase継続は禁止。必ずabortしてユーザーに判断を委ねる。
+
+#### 2. pull --ff-only失敗時の対処
+
+`git pull --ff-only` 実行時にfast-forwardマージできない場合:
+
+1. **詳細状況の確認**:
+   ```bash
+   git fetch origin
+   git log HEAD..origin/{branch} --oneline
+   ```
+
+2. **ローカル変更の有無を確認**:
+   ```bash
+   git status --porcelain
+   ```
+
+3. **状況に応じた対応**:
+
+   - **ローカル変更なし、リモートに新規コミットあり**:
+     ```markdown
+     ## Pull FF-Only 失敗エラー（リモート先行）
+
+     **対象ブランチ**: {current_branch}
+     **リモートの新規コミット**: {new_commits}
+     **ユーザーアクション**: 手動で `git pull --rebase` を実行してください
+     ```
+
+   - **ローカル変更あり、リモートと分岐**:
+     ```markdown
+     ## Pull FF-Only 失敗エラー（分岐検出）
+
+     **対象ブランチ**: {current_branch}
+     **ローカル変更**: {local_changes}
+     **ユーザーアクション**: 以下のいずれかを選択してください
+     - ローカル変更をコミットしてからpull
+     - ローカル変更をstash: `git stash && git pull --ff-only && git stash pop`
+     ```
+
+#### 3. push拒否（remote hash不一致）時の対処
+
+`git push` 実行時にremoteのhashが不一致の場合（非fast-forward）:
+
+1. **詳細状況の確認**:
+   ```bash
+   git fetch origin
+   git log HEAD..origin/{branch} --oneline
+   git log origin/{branch}..HEAD --oneline
+   ```
+
+2. **状況報告**:
+   ```markdown
+   ## Push 拒否エラー（Remote Hash 不一致）
+
+   **対象ブランチ**: {current_branch}
+   **リモート先行コミット**: {remote_ahead_commits}
+   **ローカル先行コミット**: {local_ahead_commits}
+   **停止理由**: リモートとローカルで分岐しているため、安全にpushできません
+   **ユーザーアクション**: 以下のいずれかを選択してください
+   - リモートの変更を取り込んでからpush: `git pull --rebase` → `git push`
+   - ローカルの変更をforce push（慎重に）: `git push --force-with-lease`
+   ```
+
+**重要**: `--force` ではなく `--force-with-lease` を推奨。リモートの変更を上書きするリスクを低減するため。
+
+3. **push失敗時の構造化エラー**（Section 2に定義済み）を適用

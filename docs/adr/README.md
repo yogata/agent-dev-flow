@@ -180,15 +180,15 @@
 
 | ADR | 関連REQ | 説明 |
 |-----|---------|------|
-| [ADR-0001](ADR-0001.md) | [REQ-0016 (retired)](../requirements/retired/REQ-0016.md) | Command/Skill/Template/Script責任分界の要件定義 |
-| [ADR-0002](ADR-0002.md) | [REQ-0016 (retired)](../requirements/retired/REQ-0016.md) | Orchestration skill化基準の要件定義（REQ-0016-004） |
-| [ADR-0003](ADR-0003.md) | [REQ-0016 (retired)](../requirements/retired/REQ-0016.md), [REQ-0007 (retired)](../requirements/retired/REQ-0007.md) | REQ-0016: learning要件ソース化、REQ-0007: ナレッジパイプライン高度化（ADR-0003本文に明示参照） |
-| [ADR-0004](ADR-0004.md) | [REQ-0004 (retired)](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0004本文に明示参照） |
-| [ADR-0005](ADR-0005.md) | [REQ-0017 (retired)](../requirements/retired/REQ-0017.md) | AgentDevFlow plugin namespace統一（ADR-0005本文に明示参照） |
-| [ADR-0006](ADR-0006.md) | [REQ-0020 (retired)](../requirements/retired/REQ-0020.md) | Epic Issue実行順序SSoT（ADR-0006本文に明示参照） |
-| [ADR-0007](ADR-0007.md) | [REQ-0004 (retired)](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0007本文に明示参照） |
-| [ADR-0008](ADR-0008.md) | [REQ-0004 (retired)](../requirements/retired/REQ-0004.md), [REQ-0035 (retired)](../requirements/retired/REQ-0035.md) | REQ-0004: views関連要件のsupersede、REQ-0035: DOC-MAP導入とviews廃止 |
-| [ADR-0009](ADR-0009.md) | [REQ-0041 (retired)](../requirements/retired/REQ-0041.md) | REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート（ADR-0009本文に明示参照） |
+| [ADR-0001](ADR-0001.md) | [REQ-0016 [retired]](../requirements/retired/REQ-0016.md) | Command/Skill/Template/Script責任分界の要件定義（要件内容は REQ-0103 へ移行） |
+| [ADR-0002](ADR-0002.md) | [REQ-0016 [retired]](../requirements/retired/REQ-0016.md) | Orchestration skill化基準の要件定義（要件内容は REQ-0103 へ移行） |
+| [ADR-0003](ADR-0003.md) | [REQ-0016 [retired]](../requirements/retired/REQ-0016.md), [REQ-0007 [retired]](../requirements/retired/REQ-0007.md) | REQ-0016: learning要件ソース化（要件内容は REQ-0103 へ移行）、REQ-0007: ナレッジパイプライン高度化（要件内容は REQ-0105 へ移行）（ADR-0003本文に明示参照） |
+| [ADR-0004](ADR-0004.md) | [REQ-0004 [retired]](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0004本文に明示参照。要件内容は REQ-0101 へ移行） |
+| [ADR-0005](ADR-0005.md) | [REQ-0017 [retired]](../requirements/retired/REQ-0017.md) | AgentDevFlow plugin namespace統一（ADR-0005本文に明示参照。要件内容は REQ-0103, REQ-0105 へ移行） |
+| [ADR-0006](ADR-0006.md) | [REQ-0020 [retired]](../requirements/retired/REQ-0020.md) | Epic Issue実行順序SSoT（ADR-0006本文に明示参照。要件内容は REQ-0104, REQ-0106 へ移行） |
+| [ADR-0007](ADR-0007.md) | [REQ-0004 [retired]](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0007本文に明示参照。要件内容は REQ-0101 へ移行） |
+| [ADR-0008](ADR-0008.md) | [REQ-0004 [retired]](../requirements/retired/REQ-0004.md), [REQ-0035 [retired]](../requirements/retired/REQ-0035.md) | REQ-0004: views関連要件のsupersede（要件内容は REQ-0101 へ移行）、REQ-0035: DOC-MAP導入とviews廃止（要件内容は REQ-0101 へ移行） |
+| [ADR-0009](ADR-0009.md) | [REQ-0041 [retired]](../requirements/retired/REQ-0041.md) | REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート（ADR-0009本文に明示参照。要件内容は REQ-0101, REQ-0109 へ移行） |
 | [ADR-0010](ADR-0010.md) | [REQ-0104](../requirements/REQ-0104.md) | Workflow/Command Protocol（HITL境界の観点で補完） |
 | [ADR-0011](ADR-0011.md) | — | 対応REQなし（architecture principle として新規定義） |
 | [ADR-0012](ADR-0012.md) | [REQ-0105](../requirements/REQ-0105.md) | Intake/Learning/Backlog（pipeline の動作仕様を architecture principle で裏付け） |
