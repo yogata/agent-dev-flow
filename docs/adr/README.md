@@ -6,201 +6,118 @@
 
 | ADR番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|
-| ADR-0001 | Command/Skill/Template/Script責任分界の正式定義 | proposed | 2026-05-18 |
-| ADR-0002 | Orchestration skill作成基準の導入 | proposed | 2026-05-18 |
-| ADR-0003 | req-define入力の抽象化 | deprecated | 2026-05-18 |
-| ADR-0004 | 要件管理構造の area-based 移行方針 | superseded | 2026-05-19 |
-| ADR-0005 | AgentDevFlow plugin namespace 統一 | accepted | 2026-05-21 |
-| ADR-0006 | Epic Issue 本文を実行順序 SSoT とする設計 | proposed | 2026-05-22 |
-| ADR-0007 | REQ/ADR基準構造と分類ビュー運用の再定義 | superseded | 2026-05-24 |
-| ADR-0008 | DOC-MAP導入と requirements/views 廃止 | proposed | 2026-05-28 |
-| ADR-0009 | REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入 | deprecated | 2026-05-30 |
-| ADR-0010 | HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則 | deprecated | 2026-06-02 |
-| ADR-0011 | Manager/orchestrator パターンの限定採用 — 標準構造とはしない | proposed | 2026-06-02 |
-| ADR-0012 | Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流 | deprecated | 2026-06-02 |
-| ADR-0013 | runtime / authoring 関心分離 | accepted | 2026-06-02 |
-| ADR-0014 | ADR / SPEC 再分類基準 | superseded | 2026-06-02 |
-| ADR-0015 | docs/specs 非runtime依存宣言 | superseded | 2026-06-02 |
-| ADR-0016 | skill references runtime-only 制約 | superseded | 2026-06-02 |
-| ADR-0017 | 文書種別責務境界 | accepted | 2026-06-03 |
-| ADR-0018 | runtime 独立性 | accepted | 2026-06-03 |
-| ADR-0019 | OpenCode Source / Projection 分離 | accepted | 2026-06-06 |
-| ADR-0020 | Adopt /repo/* Namespace for Repo-Local Tooling | accepted | 2026-06-06 |
-| ADR-0021 | Upstream Handoff Metadata Convention | deprecated | 2026-06-06 |
-| ADR-0022 | review/refine 系中間コマンドを promote 内フェーズへ統合 | deprecated | 2026-06-06 |
-| ADR-0023 | backlog-save 廃止とパイプライン再構築 | deprecated | 2026-06-07 |
+| ADR-0101 | AgentDevFlow plugin namespace 統一 | accepted | 2026-06-08 |
+| ADR-0102 | runtime / authoring 関心分離 | accepted | 2026-06-08 |
+| ADR-0103 | 文書種別責務境界 | accepted | 2026-06-08 |
+| ADR-0104 | runtime 独立性 | accepted | 2026-06-08 |
+| ADR-0105 | OpenCode Source / Projection 分離 | accepted | 2026-06-08 |
+| ADR-0106 | /repo/* Namespace for Repo-Local Tooling | accepted | 2026-06-08 |
+| ADR-0107 | Command/Skill/Template/Script 責任分界の正式定義 | accepted | 2026-06-08 |
+| ADR-0108 | Orchestration skill 作成基準の導入 | accepted | 2026-06-08 |
+| ADR-0109 | Epic Issue 本文を実行順序 SSoT とする設計 | accepted | 2026-06-08 |
+| ADR-0110 | DOC-MAP 導入と requirements/views 廃止 | accepted | 2026-06-08 |
+| ADR-0111 | Manager/orchestrator パターンの限定採用 | accepted | 2026-06-08 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
 ## Status View
 
-### proposed
-
-- [ADR-0001](ADR-0001.md) — Command/Skill/Template/Script責務分界の正式定義
-- [ADR-0002](ADR-0002.md) — Orchestration skill作成基準の導入
-- [ADR-0006](ADR-0006.md) — Epic Issue 本文を実行順序 SSoT とする設計
-- [ADR-0008](ADR-0008.md) — DOC-MAP導入と requirements/views 廃止
-- [ADR-0011](ADR-0011.md) — Manager/orchestrator パターンの限定採用 — 標準構造とはしない
-
 ### accepted
-- [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 統一
-- [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
-- [ADR-0017](ADR-0017.md) — 文書種別責務境界
-- [ADR-0018](ADR-0018.md) — runtime 独立性
-- [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
-- [ADR-0020](ADR-0020.md) — Adopt /repo/* Namespace for Repo-Local Tooling
 
-### deprecated
-
-- [ADR-0003](ADR-0003.md) — req-define入力の抽象化
-- [ADR-0009](ADR-0009.md) — REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入
-- [ADR-0010](ADR-0010.md) — HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則
-- [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
-- [ADR-0021](ADR-0021.md) — Upstream Handoff Metadata Convention
-- [ADR-0022](ADR-0022.md) — review/refine 系中間コマンドを promote 内フェーズへ統合
-- [ADR-0023](ADR-0023.md) — backlog-save 廃止とパイプライン再構築
-
-### superseded
-
-- [ADR-0004](ADR-0004.md) — 要件管理構造の area-based 移行方針 （superseded by [ADR-0007](ADR-0007.md)）
-- [ADR-0007](ADR-0007.md) — REQ/ADR基準構造と分類ビュー運用の再定義 （superseded by [ADR-0008](ADR-0008.md)）
-- [ADR-0014](ADR-0014.md) — ADR / SPEC 再分類基準 （superseded by [ADR-0017](ADR-0017.md)）
-- [ADR-0015](ADR-0015.md) — docs/specs 非runtime依存宣言 （superseded by [ADR-0018](ADR-0018.md)）
-- [ADR-0016](ADR-0016.md) — skill references runtime-only 制約 （superseded by [ADR-0018](ADR-0018.md)）
+- [ADR-0101](ADR-0101.md) — AgentDevFlow plugin namespace 統一
+- [ADR-0102](ADR-0102.md) — runtime / authoring 関心分離
+- [ADR-0103](ADR-0103.md) — 文書種別責務境界
+- [ADR-0104](ADR-0104.md) — runtime 独立性
+- [ADR-0105](ADR-0105.md) — OpenCode Source / Projection 分離
+- [ADR-0106](ADR-0106.md) — /repo/* Namespace for Repo-Local Tooling
+- [ADR-0107](ADR-0107.md) — Command/Skill/Template/Script 責任分界の正式定義
+- [ADR-0108](ADR-0108.md) — Orchestration skill 作成基準の導入
+- [ADR-0109](ADR-0109.md) — Epic Issue 本文を実行順序 SSoT とする設計
+- [ADR-0110](ADR-0110.md) — DOC-MAP 導入と requirements/views 廃止
+- [ADR-0111](ADR-0111.md) — Manager/orchestrator パターンの限定採用
 
 ## Topic View
 
-### 責務分界
+### Namespace/Plugin
 
-- [ADR-0001](ADR-0001.md) — Command/Skill/Template/Script責任分界の正式定義
-- [ADR-0002](ADR-0002.md) — Orchestration skill作成基準の導入
+- [ADR-0101](ADR-0101.md) — AgentDevFlow plugin namespace 統一
+- [ADR-0106](ADR-0106.md) — /repo/* Namespace for Repo-Local Tooling
 
-### 入力抽象化
+### Architecture
 
-- [ADR-0003](ADR-0003.md) — req-define入力の抽象化
+- [ADR-0102](ADR-0102.md) — runtime / authoring 関心分離
+- [ADR-0103](ADR-0103.md) — 文書種別責務境界
+- [ADR-0104](ADR-0104.md) — runtime 独立性
+- [ADR-0105](ADR-0105.md) — OpenCode Source / Projection 分離
 
-### 要件管理構造
+### Command/Skill Design
 
-- [ADR-0004](ADR-0004.md) — 要件管理構造の area-based 移行方針
-- [ADR-0007](ADR-0007.md) — REQ/ADR基準構造と分類ビュー運用の再定義
-- [ADR-0008](ADR-0008.md) — DOC-MAP導入と requirements/views 廃止
-- [ADR-0009](ADR-0009.md) — REQ体系再基準化 — 旧REQ分類モデル・対応表・分類ゲート導入
+- [ADR-0107](ADR-0107.md) — Command/Skill/Template/Script 責任分界の正式定義
+- [ADR-0108](ADR-0108.md) — Orchestration skill 作成基準の導入
+- [ADR-0111](ADR-0111.md) — Manager/orchestrator パターンの限定採用
 
-### Plugin構成
+### Workflow
 
-- [ADR-0005](ADR-0005.md) — AgentDevFlow plugin namespace 統一
-- [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
-- [ADR-0020](ADR-0020.md) — Adopt /repo/* Namespace for Repo-Local Tooling
+- [ADR-0109](ADR-0109.md) — Epic Issue 本文を実行順序 SSoT とする設計
 
-### Epic管理
+### Documentation
 
-- [ADR-0006](ADR-0006.md) — Epic Issue 本文を実行順序 SSoT とする設計
-
-### アーキテクチャ方針
-
-- [ADR-0010](ADR-0010.md) — HITL boundary — 全 agentdev command の Human-in-the-Loop 境界原則
-- [ADR-0011](ADR-0011.md) — Manager/orchestrator パターンの限定採用 — 標準構造とはしない
-- [ADR-0012](ADR-0012.md) — Requirement Source pipeline の正式定義 — promoted→RU→req-define の一貫流
-- [ADR-0021](ADR-0021.md) — Upstream Handoff Metadata Convention
-- [ADR-0022](ADR-0022.md) — review/refine 系中間コマンドを promote 内フェーズへ統合
-- [ADR-0023](ADR-0023.md) — backlog-save 廃止とパイプライン再構築
-
-### 文書体系
-
-- [ADR-0013](ADR-0013.md) — runtime / authoring 関心分離
-- [ADR-0014](ADR-0014.md) — ADR / SPEC 再分類基準
-- [ADR-0015](ADR-0015.md) — docs/specs 非runtime依存宣言
-- [ADR-0016](ADR-0016.md) — skill references runtime-only 制約
-- [ADR-0017](ADR-0017.md) — 文書種別責務境界
-- [ADR-0018](ADR-0018.md) — runtime 独立性
-- [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
-- [ADR-0020](ADR-0020.md) — Adopt /repo/* Namespace for Repo-Local Tooling
-
-### 文書責務・runtime独立性
-
-- [ADR-0017](ADR-0017.md) — 文書種別責務境界
-- [ADR-0018](ADR-0018.md) — runtime 独立性
-- [ADR-0019](ADR-0019.md) — OpenCode Source / Projection 分離
+- [ADR-0110](ADR-0110.md) — DOC-MAP 導入と requirements/views 廃止
 
 ## Decision Map
 
 | ADR | 関係 | 対象 | 説明 |
 |-----|------|------|------|
-| [ADR-0001](ADR-0001.md) | relates-to | [ADR-0002](ADR-0002.md) | Orchestration skill作成基準の導入 |
-| [ADR-0001](ADR-0001.md) | relates-to | [ADR-0003](ADR-0003.md) | issue-req入力の抽象化 |
-| [ADR-0002](ADR-0002.md) | relates-to | [ADR-0001](ADR-0001.md) | Command/Skill/Template/Script責任分界の正式定義 |
-| [ADR-0003](ADR-0003.md) | relates-to | [ADR-0001](ADR-0001.md) | Command/Skill/Template/Script責任分界の正式定義 |
-| [ADR-0004](ADR-0004.md) | relates-to | [ADR-0001](ADR-0001.md) | req-file-manager責務拡張に関連 |
-| [ADR-0005](ADR-0005.md) | relates-to | [ADR-0004](ADR-0004.md) | 並行して進行する別移行 |
-| [ADR-0006](ADR-0006.md) | relates-to | [ADR-0005](ADR-0005.md) | case-open/case-runのコマンド体系 |
-| [ADR-0007](ADR-0007.md) | supersedes | [ADR-0004](ADR-0004.md) | area-based移行方針を撤回 |
-| [ADR-0007](ADR-0007.md) | relates-to | [ADR-0001](ADR-0001.md) | req-file-manager/adr-file-manager責務に関連 |
-| [ADR-0008](ADR-0008.md) | supersedes | [ADR-0007](ADR-0007.md) | views導入決定を撤回、DOC-MAP導入 |
-| [ADR-0008](ADR-0008.md) | relates-to | [ADR-0004](ADR-0004.md) | area-based移行方針の最終撤回（ADR-0007経由） |
-| [ADR-0009](ADR-0009.md) | relates-to | [ADR-0008](ADR-0008.md) | DOC-MAP再構成の基盤 |
-| [ADR-0009](ADR-0009.md) | relates-to | [ADR-0007](ADR-0007.md) | REQ基準構造の前段（ADR-0007→0008→0009の系譜） |
-| [ADR-0010](ADR-0010.md) | relates-to | [ADR-0001](ADR-0001.md) | 責務分界 → HITL境界の補完関係 |
-| [ADR-0010](ADR-0010.md) | relates-to | [ADR-0002](ADR-0002.md) | HITL境界が orchestration skill 化の判断に影響 |
-| [ADR-0010](ADR-0010.md) | relates-to | [ADR-0011](ADR-0011.md) | manager pattern と HITL境界の相互作用 |
-| [ADR-0010](ADR-0010.md) | relates-to | [ADR-0012](ADR-0012.md) | pipeline 各段階の HITL境界 |
-| [ADR-0011](ADR-0011.md) | relates-to | [ADR-0002](ADR-0002.md) | skill化基準と pattern採用基準の区別 |
-| [ADR-0011](ADR-0011.md) | relates-to | [ADR-0010](ADR-0010.md) | HITL境界 |
-| [ADR-0011](ADR-0011.md) | relates-to | [ADR-0006](ADR-0006.md) | Epic Orchestrator の SSoT 基盤 |
-| [ADR-0012](ADR-0012.md) | relates-to | [ADR-0010](ADR-0010.md) | pipeline 内の HITL境界 |
-| [ADR-0012](ADR-0012.md) | relates-to | [ADR-0011](ADR-0011.md) | pipeline 各段階の pattern 適用可否 |
-| [ADR-0013](ADR-0013.md) | relates-to | [ADR-0001](ADR-0001.md) | 責務分界の具体化 |
-| [ADR-0013](ADR-0013.md) | relates-to | [ADR-0014](ADR-0014.md) | 文書体系の再分類 |
-| [ADR-0013](ADR-0013.md) | relates-to | [ADR-0015](ADR-0015.md) | SPEC 配布範囲 |
-| [ADR-0013](ADR-0013.md) | relates-to | [ADR-0016](ADR-0016.md) | references 内容制約 |
-| [ADR-0014](ADR-0014.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring 分離の基盤 |
-| [ADR-0014](ADR-0014.md) | relates-to | [ADR-0015](ADR-0015.md) | SPEC 配布範囲の補完 |
-| [ADR-0015](ADR-0015.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring 分離の具体化 |
-| [ADR-0015](ADR-0015.md) | relates-to | [ADR-0014](ADR-0014.md) | SPEC 責務定義 |
-| [ADR-0016](ADR-0016.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring 分離の具体化 |
-| [ADR-0016](ADR-0016.md) | relates-to | [ADR-0014](ADR-0014.md) | 文書種別の責務定義 |
-| [ADR-0017](ADR-0017.md) | supersedes | [ADR-0014](ADR-0014.md) | ADR/SPEC再分類基準を文書種別責務境界に再定義 |
-| [ADR-0017](ADR-0017.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring分離の文書体系への適用 |
-| [ADR-0017](ADR-0017.md) | relates-to | [ADR-0018](ADR-0018.md) | 文書責務とruntime独立性の補完関係 |
-| [ADR-0018](ADR-0018.md) | supersedes | [ADR-0016](ADR-0016.md) | skill references runtime-only制約をruntime全体に拡張 |
-| [ADR-0018](ADR-0018.md) | relates-to | [ADR-0015](ADR-0015.md) | docs/specs非runtime依存宣言を統合 |
-| [ADR-0018](ADR-0018.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring分離の具体化 |
-| [ADR-0018](ADR-0018.md) | relates-to | [ADR-0017](ADR-0017.md) | 文書責務とruntime独立性の補完関係 |
-| [ADR-0019](ADR-0019.md) | relates-to | [ADR-0013](ADR-0013.md) | runtime/authoring分離の具体化（source/projection物理分離） |
-| [ADR-0019](ADR-0019.md) | relates-to | [ADR-0017](ADR-0017.md) | 文書種別責務境界の物理層での裏付け |
-| [ADR-0019](ADR-0019.md) | relates-to | [ADR-0018](ADR-0018.md) | runtime独立性のsource/projection分離による実現 |
-| [ADR-0020](ADR-0020.md) | relates-to | [ADR-0005](ADR-0005.md) | repo-local namespaceとAgentDevFlow canonical namespaceの境界定義 |
-| [ADR-0020](ADR-0020.md) | relates-to | [ADR-0019](ADR-0019.md) | repo-local artifactをsource/projection同期対象外にする根拠 |
-| [ADR-0021](ADR-0021.md) | relates-to | [ADR-0010](ADR-0010.md) | upstream handoff停止はHITL境界の具体化 |
-| [ADR-0021](ADR-0021.md) | relates-to | [ADR-0005](ADR-0005.md) | AgentDevFlow namespace統一とconsumer改修防止の補完 |
-| [ADR-0022](ADR-0022.md) | relates-to | [ADR-0010](ADR-0010.md) | promote コマンドへの HITL 確定ステップ統合 |
-| [ADR-0022](ADR-0022.md) | relates-to | [ADR-0012](ADR-0012.md) | pipeline 構成変更（review/refine 廃止・promote 統合） |
-| [ADR-0023](ADR-0023.md) | relates-to | [ADR-0012](ADR-0012.md) | pipeline 構成変更（backlog-save 廃止・backlog-review RU 生成統合） |
-| [ADR-0023](ADR-0023.md) | relates-to | [ADR-0022](ADR-0022.md) | review/refine 統合に続くパイプライン再構築 |
+| ADR-0101 | supersedes | ADR-0005 (retired) | namespace統一をbaselineとして再定義 |
+| ADR-0102 | supersedes | ADR-0013 (retired) | runtime/authoring分離をbaselineとして再定義 |
+| ADR-0102 | relates-to | ADR-0101 | 責務分界の具体化 |
+| ADR-0102 | relates-to | ADR-0103 | 文書体系への適用 |
+| ADR-0103 | supersedes | ADR-0017 (retired) | 文書種別責務境界をbaselineとして再定義 |
+| ADR-0103 | relates-to | ADR-0102 | 本判断の基盤 |
+| ADR-0103 | relates-to | ADR-0104 | 補完関係 |
+| ADR-0104 | supersedes | ADR-0018 (retired) | runtime独立性をbaselineとして再定義 |
+| ADR-0104 | supersedes | ADR-0016 (retired) | skill references runtime-only制約を統合 |
+| ADR-0104 | supersedes | ADR-0015 (retired) | docs/specs非runtime依存宣言を統合 |
+| ADR-0104 | relates-to | ADR-0102 | 本判断の基盤 |
+| ADR-0104 | relates-to | ADR-0103 | 補完関係 |
+| ADR-0105 | supersedes | ADR-0019 (retired) | source/projection分離をbaselineとして再定義 |
+| ADR-0105 | relates-to | ADR-0102 | runtime/authoring分離の具体化 |
+| ADR-0105 | relates-to | ADR-0103 | 文書種別責務境界の物理層での裏付け |
+| ADR-0105 | relates-to | ADR-0104 | runtime独立性のsource/projection分離による実現 |
+| ADR-0106 | supersedes | ADR-0020 (retired) | repo-local namespaceをbaselineとして再定義 |
+| ADR-0106 | relates-to | ADR-0101 | canonical namespaceとrepo-local namespaceの境界定義 |
+| ADR-0106 | relates-to | ADR-0105 | repo-local artifactをsource/projection同期対象外にする根拠 |
+| ADR-0107 | supersedes | ADR-0001 (retired) | 責任分界をbaselineとして再定義 |
+| ADR-0107 | relates-to | ADR-0108 | 補完関係 |
+| ADR-0108 | supersedes | ADR-0002 (retired) | orchestration skill作成基準をbaselineとして再定義 |
+| ADR-0108 | relates-to | ADR-0107 | 補完関係 |
+| ADR-0109 | supersedes | ADR-0006 (retired) | Epic Issue SSoTをbaselineとして再定義 |
+| ADR-0109 | relates-to | ADR-0101 | case-open/case-runのコマンド体系 |
+| ADR-0110 | supersedes | ADR-0008 (retired) | DOC-MAP導入をbaselineとして再定義 |
+| ADR-0110 | supersedes | ADR-0007 (retired) | views導入決定をsupersede |
+| ADR-0110 | relates-to | ADR-0004 (retired) | area-based移行方針の最終撤回 |
+| ADR-0111 | supersedes | ADR-0011 (retired) | manager/orchestratorパターンをbaselineとして再定義 |
+| ADR-0111 | relates-to | ADR-0108 | skill化基準とpattern採用基準の区別 |
+| ADR-0111 | relates-to | ADR-0109 | Epic OrchestratorのSSoT基盤 |
 
 ## Related REQ
 
 | ADR | 関連REQ | 説明 |
 |-----|---------|------|
-| [ADR-0001](ADR-0001.md) | [REQ-0016 [retired]](../requirements/retired/REQ-0016.md) | Command/Skill/Template/Script責任分界の要件定義（要件内容は REQ-0103 へ移行） |
-| [ADR-0002](ADR-0002.md) | [REQ-0016 [retired]](../requirements/retired/REQ-0016.md) | Orchestration skill化基準の要件定義（要件内容は REQ-0103 へ移行） |
-| [ADR-0003](ADR-0003.md) | [REQ-0016 [retired]](../requirements/retired/REQ-0016.md), [REQ-0007 [retired]](../requirements/retired/REQ-0007.md) | REQ-0016: learning要件ソース化（要件内容は REQ-0103 へ移行）、REQ-0007: ナレッジパイプライン高度化（要件内容は REQ-0105 へ移行）（ADR-0003本文に明示参照） |
-| [ADR-0004](ADR-0004.md) | [REQ-0004 [retired]](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0004本文に明示参照。要件内容は REQ-0101 へ移行） |
-| [ADR-0005](ADR-0005.md) | [REQ-0017 [retired]](../requirements/retired/REQ-0017.md) | AgentDevFlow plugin namespace統一（ADR-0005本文に明示参照。要件内容は REQ-0103, REQ-0105 へ移行） |
-| [ADR-0006](ADR-0006.md) | [REQ-0020 [retired]](../requirements/retired/REQ-0020.md) | Epic Issue実行順序SSoT（ADR-0006本文に明示参照。要件内容は REQ-0104, REQ-0106 へ移行） |
-| [ADR-0007](ADR-0007.md) | [REQ-0004 [retired]](../requirements/retired/REQ-0004.md) | 要件・ADRドキュメントシステム（ADR-0007本文に明示参照。要件内容は REQ-0101 へ移行） |
-| [ADR-0008](ADR-0008.md) | [REQ-0004 [retired]](../requirements/retired/REQ-0004.md), [REQ-0035 [retired]](../requirements/retired/REQ-0035.md) | REQ-0004: views関連要件のsupersede（要件内容は REQ-0101 へ移行）、REQ-0035: DOC-MAP導入とviews廃止（要件内容は REQ-0101 へ移行） |
-| [ADR-0009](ADR-0009.md) | [REQ-0041 [retired]](../requirements/retired/REQ-0041.md) | REQ体系再基準化 — 旧REQ分類・新基準REQ群・分類ゲート（ADR-0009本文に明示参照。要件内容は REQ-0101, REQ-0109 へ移行） |
-| [ADR-0010](ADR-0010.md) | [REQ-0104](../requirements/REQ-0104.md) | Workflow/Command Protocol（HITL境界の観点で補完） |
-| [ADR-0011](ADR-0011.md) | — | 対応REQなし（architecture principle として新規定義） |
-| [ADR-0012](ADR-0012.md) | [REQ-0105](../requirements/REQ-0105.md) | Intake/Learning/Backlog（pipeline の動作仕様を architecture principle で裏付け） |
-| [ADR-0013](ADR-0013.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | frontmatter 規約 reversal・integrity 検査 reversal |
-| [ADR-0014](ADR-0014.md) | [REQ-0101](../requirements/REQ-0101.md), [REQ-0103](../requirements/REQ-0103.md) | 文書責務マトリックス・SPEC 責務定義 |
-| [ADR-0015](ADR-0015.md) | [REQ-0103](../requirements/REQ-0103.md) | SPEC 配布範囲宣言 |
-| [ADR-0016](ADR-0016.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | references runtime-only 制約・存在確認検査 |
-| [ADR-0017](ADR-0017.md) | [REQ-0101](../requirements/REQ-0101.md), [REQ-0103](../requirements/REQ-0103.md) | 文書種別責務境界の宣言 |
-| [ADR-0018](ADR-0018.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | runtime独立性・SPEC非依存の宣言 |
-| [ADR-0019](ADR-0019.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | source/projection分離・sync script・namespace予約・integrity scan分離 |
-| [ADR-0020](ADR-0020.md) | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | repo-local namespace定義・integrity-check移管・vocabulary registry移動・配布対象外制約 |
-| [ADR-0021](ADR-0021.md) | [REQ-0104](../requirements/REQ-0104.md) | upstream handoff metadata convention・handoff停止条件・共通方針集約 |
-| [ADR-0022](ADR-0022.md) | [REQ-0105](../requirements/REQ-0105.md) | intake-promote / learning-promote 統合・review/refine 廃止・HITL 集約 |
-| [ADR-0023](ADR-0023.md) | [REQ-0105](../requirements/REQ-0105.md) | backlog-save 廃止・backlog-review RU 生成統合・depends_on・パイプライン再構築 |
+| ADR-0101 | [REQ-0103](../requirements/REQ-0103.md), [REQ-0105](../requirements/REQ-0105.md) | namespace統一・command migration・domain state定義 |
+| ADR-0102 | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | frontmatter規約reversal・integrity検査reversal |
+| ADR-0103 | [REQ-0101](../requirements/REQ-0101.md), [REQ-0103](../requirements/REQ-0103.md) | 文書種別責務境界の宣言 |
+| ADR-0104 | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | runtime独立性・SPEC非依存の宣言 |
+| ADR-0105 | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | source/projection分離・sync script・integrity scan分離 |
+| ADR-0106 | [REQ-0103](../requirements/REQ-0103.md), [REQ-0108](../requirements/REQ-0108.md) | repo-local namespace定義・integrity-check移管・配布対象外制約 |
+| ADR-0107 | [REQ-0103](../requirements/REQ-0103.md) | Command/Skill/Template/Script責務分界の要件定義 |
+| ADR-0108 | [REQ-0103](../requirements/REQ-0103.md) | orchestration skill化基準の要件定義 |
+| ADR-0109 | [REQ-0104](../requirements/REQ-0104.md), [REQ-0106](../requirements/REQ-0106.md) | Epic Issue実行順序SSoT・case-run Epic Orchestrator |
+| ADR-0110 | [REQ-0101](../requirements/REQ-0101.md) | DOC-MAP導入・views廃止 |
+| ADR-0111 | — | 対応REQなし（architecture principleとして定義） |
+
+## Retired ADRs
+
+ADR-0001 から ADR-0023 までの23件は、ADR-01XX baseline導入に伴い `retired/` ディレクトリに移動された。各ファイルに引き継ぎ先が記載されている。
+
+- [retired/](retired/) — ADR-0001〜ADR-0023
