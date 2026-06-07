@@ -1,7 +1,6 @@
 ---
 description: inbox 内の intake item をレビュー・分類し、採用 item を backlog-review 向け promoted artifact に整形する
 agent: sisyphus
-implementation_pattern: file-pipeline
 ---
 
 # Intake Promote

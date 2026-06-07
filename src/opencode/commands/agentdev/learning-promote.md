@@ -1,7 +1,6 @@
 ---
 description: inbox.mdから正規化・分類・8軸評価・HITL確定を経てRequirement Source stubを生成する
 agent: sisyphus
-implementation_pattern: file-pipeline
 ---
 
 # 学びの正規化・評価・昇華判定と Requirement Source stub 生成
