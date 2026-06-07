@@ -81,7 +81,32 @@ Do not modify the command or add additional flags.
 | **参照ファイル** | 無制限（渐进的読み込み） | 必要時のみ読み込まれるため影響は限定的 |
 
 トークン数の見積もり: 英語は約4文字≈1 token、日本語は約1.5文字≈1 token。実測推奨。
-予算超過の兆候: 400行超で分割検討、同セクション反復参照は統合、未アクセスファイルは削除検討。
+予算超過の兆候: 400行超で分割検討、同センション反復参照は統合、未アクセスファイルは削除検討。
+
+### Line Count Governance
+
+SKILL.md の行数が **500行を超過** した場合、`references/` サブディレクトリへの抽出が **必須** となる。
+
+| 行数 | 判定 | アクション |
+|------|------|-----------|
+| ≤400行 | ✅ 適正 | なし |
+| 401〜500行 | ⚠️ 抽出検討 | 独立した関心事を `references/` に移動する計画を立案 |
+| >500行 | ❌ 必須抽出 | SKILL.md を概要・ナビゲーションに絞り、詳細を `references/` に切り出し |
+
+**抽出ルール**:
+
+1. SKILL.md は概要・判断基準・ナビゲーションのみを保持する
+2. 詳細な手順・判定表・具体例は `references/` に移動する
+3. SKILL.md から `references/` への参照深度は **1階層** まで（Avoid Deep Nesting の原則に従う）
+4. 抽出後の SKILL.md は 400行以下を目標とする
+5. `references/` に抽出したファイルが 100行を超える場合は目次を付ける
+
+**抽出対象の優先順位**:
+
+1. 大きなコード例・テンプレート例 → `references/examples.md`
+2. 詳細な判定表・分類表 → `references/{topic}-standards.md`
+3. ワークフローの詳細手順 → `references/{topic}-workflow.md`
+4. 開発プロセスの詳細 → `references/development-workflow.md`
 
 ## 2. スキル仕様
 
@@ -119,6 +144,36 @@ description: Helps with documents
 - **Positive triggers** (`USE FOR:`): エージェントがこのスキルを選ぶべき場面を列挙
 - **Negative triggers** (`DO NOT USE FOR:`): 誤選択を防ぐ除外条件を明記
 - トリガーはdescriptionテキスト内に記述（frontmatterの別フィールドにはしない）
+
+### Trigger Convention（USE FOR / DO NOT USE FOR 表記規約）
+
+`USE FOR:` / `DO NOT USE FOR:` は skill description 内に **必須** で記述する。スキル選択精度を担保するため、以下の規約に従う。
+
+**配置場所**: frontmatter の `description` フィールド内（別フィールド・本文内には記述しない）。
+
+**フォーマット**:
+- `USE FOR:` の後にカンマ区切りで適用場面を列挙（箇条書きではなくインライン）
+- `DO NOT USE FOR:` の後にカンマ区切りで除外場面を列挙
+- 両方とも記述することが推奨。`WHEN:` 形式も可（Microsoft sensei形式）
+- description 全体は3人称・事実ベースで記述する
+
+**スコープ境界の明確化**:
+- Positive trigger は **具体的な操作・場面** を示す（抽象概念は避ける）
+- Negative trigger は **隣接スキルの領域** を除外する（誤選択を防ぐ）
+- trigger 数は 3〜7個が適正（少なすぎると偽陽性、多すぎると冗長）
+
+**具体例**:
+
+```yaml
+# ✅ Good — 具体的、スコープ境界が明確
+description: Manages git worktree creation, switching, and cleanup. USE FOR: creating worktrees, switching between branches, cleaning up completed worktrees. DO NOT USE FOR: basic git operations like commit/push/pull.
+
+# ❌ Bad — 抽象的、除外なし
+description: Helps with git operations. USE FOR: git-related tasks.
+
+# ❌ Bad — トリガーなし（選択精度が低い）
+description: Provides utility functions for development.
+```
 
 ## 3. 構造設計
 
@@ -273,7 +328,7 @@ SKILL.md → reference.md (complete info here)
 
 ### 5.2 Budget Check
 
-- [ ] 行数 ≤500行
+- [ ] 行数 ≤500行（超過時は `references/` への抽出が必須 — Section 1 Line Count Governance 参照）
 - [ ] 推定トークン数が複雑度の予算内（simple: <2K、moderate: <4K、detailed: <5K）
 - [ ] 複雑度に対してSKILL.mdが大きすぎない（simpleなのに300行等）
 
