@@ -71,7 +71,7 @@
 | [コマンド選択](guides/command-selection.md) | 現在の状態から次のコマンドを選ぶ入口表 |
 | [要件定義 → Case実行フロー](guides/req-case-flow.md) | req-define から case-close までの流れ |
 | [Intake / Learning / Backlog フロー](guides/intake-learning-backlog-flow.md) | 作業候補・学びの収集から RU 生成まで |
-| [診断・メンテナンス](guides/diagnostics-and-maintenance.md) | integrity-check（/repo/integrity-check: self-hosting repo専用自己監査） / req-restructure-review |
+| [診断・メンテナンス](guides/diagnostics-and-maintenance.md) | integrity-check（/repo/integrity-check: self-hosting repo専用自己監査） / docs-review |
 | [成果物・状態モデル](guides/artifacts-and-state.md) | 成果物の種別・配置・ライフサイクル |
 | [プロジェクトドキュメントと SPEC](guides/project-docs-and-specs.md) | REQ / ADR / SPEC / DOC-MAP の関係 |
 | [Consumer Project 導入](guides/consumer-project-setup.md) | 外部プロジェクトへの AgentDevFlow 導入手順 |

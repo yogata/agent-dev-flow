@@ -32,7 +32,7 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 | inbox.md にエントリがある | `/agentdev/learning-promote` | promoted artifact |
 | promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
-| REQ 体系の健全性を診断したい | `/agentdev/req-restructure-review` | 診断レポート |
+| docs 全体の意味整合性をレビューしたい | `/agentdev/docs-review` | 診断レポート |
 | ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート（self-hosting repo 専用） |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
