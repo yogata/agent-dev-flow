@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は REQ-0101 から REQ-0116 までの 16 件（active REQ）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0019 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0116 までの 16 件（active REQ）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -38,7 +38,6 @@
 - [Artifact Responsibility Table](specs/artifact-responsibilities.md)
 - [Integrity Contracts](specs/integrity-contracts.md)
 - [Integrity Rule Catalog](specs/integrity-rule-catalog.md)
-- [Integrity Audit Report](specs/integrity-audit-report.md)
 - [Workflow Contracts](specs/workflow-contracts.md)
 - [Runtime Package Boundary](specs/runtime-package-boundary.md)
 - [Rule Ownership Matrix](specs/rule-ownership.md)

@@ -74,7 +74,7 @@ scripts/
 - consumer-with-agentdev での AgentDevFlow 提供 file の直接編集（上書きされる可能性）
 - `.agentdev-plugin/` を `.agentdev/` として使用すること（domain state と競合）
 
-> **Note**: `agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-0020）。docs-check は `repo-agentdev-integrity`（repo-local skill）として self-hosting repo のみで実行される。Consumer project には配布されない。
+> **Note**: `agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-0106）。docs-check は `repo-agentdev-integrity`（repo-local skill）として self-hosting repo のみで実行される。Consumer project には配布されない。
 
 ## Installation Method Policy
 
