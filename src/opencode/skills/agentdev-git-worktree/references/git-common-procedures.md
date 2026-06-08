@@ -1,6 +1,6 @@
 # Git 共通処理プロシージャ
 
-複数 command で使う git 操作の共通手順・構造化エラーメッセージを定義する。各 command は詳細本文ではなく、ここで定義する手順名・入出力・停止条件を参照する（REQ-0103-040~043）。
+複数 command で使う git 操作の共通手順・構造化エラーメッセージを定義する。各 command は詳細本文ではなく、ここで定義する手順名・入出力・停止条件を参照する。
 
 ---
 
@@ -95,7 +95,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 
 ## 3. PR merge 前 HEAD hash 記録
 
-`gh pr merge` 実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する（SHALL, REQ-0106）。自マージ検出で使用する。
+`gh pr merge` 実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する（SHALL）。自マージ検出で使用する。
 
 ---
 

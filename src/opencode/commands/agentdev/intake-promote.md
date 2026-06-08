@@ -5,13 +5,13 @@ agent: sisyphus
 
 # Intake Promote
 
-`.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる promoted artifact に整形する（REQ-0105-046, REQ-0105-047）。
+`.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる promoted artifact に整形する。
 
-**このコマンドは review・分類・整形を行う。** GitHub Issue の作成は行わない（REQ-0103）。`intake-review` は廃止済みであり、本コマンドが review 機能を吸収している。
+**このコマンドは review・分類・整形を行う。** GitHub Issue の作成は行わない。`intake-review` は廃止済みであり、本コマンドが review 機能を吸収している。
 
 ## Input
 
-- intake item 群（`.agentdev/intake/inbox/` 内の Markdown ファイル）（REQ-0105-046）
+- intake item 群（`.agentdev/intake/inbox/` 内の Markdown ファイル）
 - ユーザーによる追加コンテキスト・分類修正指示（対話的に）
 
 ## Output
@@ -22,7 +22,7 @@ agent: sisyphus
 
 ## 分類値
 
-intake-promote の内部 review フェーズにおける分類値は以下の 3 値とする（REQ-0105-047）:
+intake-promote の内部 review フェーズにおける分類値は以下の 3 値とする:
 
 | 分類 | 意味 | 後続 |
 |------|------|------|
@@ -32,7 +32,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ## 整形の方向性
 
-採用 item の後続ルートに応じて整形内容が異なる（REQ-0103）:
+採用 item の後続ルートに応じて整形内容が異なる:
 
 | 後続ルート | 条件 | 整形内容 |
 |------------|------|----------|
@@ -42,7 +42,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### Phase 1: Inbox Scan
 
-1. **inbox の確認**: `.agentdev/intake/inbox/` 内の intake item を一覧表示する（REQ-0105-046）:
+1. **inbox の確認**: `.agentdev/intake/inbox/` 内の intake item を一覧表示する:
    - ファイル一覧の取得
    - item 数のカウント
    - inbox が空の場合はその旨を報告して終了
@@ -51,7 +51,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### Phase 2: Internal Review
 
-3. **レビュー・評価**: 各 item について以下の観点で評価する（REQ-0105-047）:
+3. **レビュー・評価**: 各 item について以下の観点で評価する:
    - 観測内容の妥当性・重要性
    - 影響の程度
    - 対応の緊急度・優先度
@@ -73,7 +73,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### Phase 3: HITL Confirmation
 
-5. **ユーザー確認**: 評価・分類結果をユーザーに提示し、明示的な承認を得る（REQ-0105-048）:
+5. **ユーザー確認**: 評価・分類結果をユーザーに提示し、明示的な承認を得る:
    - 各 item の分類と理由を提示
    - ユーザーの追加コンテキストを受け付ける
    - 分類の修正指示を受け付ける
@@ -87,13 +87,13 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
    - backlog-review が分析しやすい形式に構造化
    - 既存要件との関連・差分を明記
    - 複数 item を束ねる場合は統合内容を整理
-   - **artifact を `.agentdev/intake/promoted/` 直下にフラット配置する。artifact の frontmatter には route/status を記録しない（REQ-0105）**
+   - **artifact を `.agentdev/intake/promoted/` 直下にフラット配置する。artifact の frontmatter には route/status を記録しない**
 
 7. **保存**:
    - 保存先: `.agentdev/intake/promoted/`（フラット構造）
    - `promoted/` ディレクトリが存在しない場合は作成する
    - ファイル名: `YYYY-MM-DD-{topic-slug}.md`（元 item 名を維持、または束ねた内容に応じた名前）
-   - artifact の frontmatter に route や status を記録しない（REQ-0105）
+   - artifact の frontmatter に route や status を記録しない
 
 8. **振り分け**: 確定した分類に基づいて item を振り分ける:
    - `採用` → promoted artifact を `.agentdev/intake/promoted/` に保存済み（Step 7）。元の inbox item は `.agentdev/intake/archive/promoted/` に移動
@@ -137,7 +137,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
          {git_error_output}
          ```
 
-11. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-promote/standard.md。分類結果（採用・保留・却下の件数・一覧）と git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める（REQ-0105-049）
+11. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-promote/standard.md。分類結果（採用・保留・却下の件数・一覧）と git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## Error Handling
 
@@ -148,25 +148,25 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ## Guardrails
 
-### 責務境界（REQ-0103, REQ-0105）
+### 責務境界
 - G01: GitHub Issue の作成を行わない（`backlog-review` / `case-open` が担当）
 - G02: intake item の元の内容を改変しない（整理・構造化のみ）
 - G03: `backlog-review` を自動起動しない（次ステップの提示のみ）
-- G04: learning pipeline の入力を生成しない（MUST NOT）。採用 item の後続ルートは `backlog-review` のみ（REQ-0105）
-- G05: learning item の保存・分類・昇華を担当しない（REQ-0105）
+- G04: learning pipeline の入力を生成しない（MUST NOT）。採用 item の後続ルートは `backlog-review` のみ
+- G05: learning item の保存・分類・昇華を担当しない
 
-### HITL 制約（REQ-0105-048）
+### HITL 制約
 - G06: ユーザーの明示的な承認なしに promoted artifact を生成してはならない（MUST NOT）
 - G07: 分類結果は必ずユーザーに提示し、確認・修正の機会を与えること（SHALL）
 - G08: 自動確定・自動進行は行わない。ユーザーが「確定」を明示的に指示してから次フェーズに進む
 
-### 形式制約（REQ-0103〜039）
-- G09: workflow 管理 artifact として扱わない（REQ-0103）
-- G10: 整形結果に frontmatter（route/status 等）を含めてはならない（MUST NOT）（REQ-0103, REQ-0105）
-- G11: 整形結果に重複排除キー・後続 artifact 参照を含めない（REQ-0103）
-- G12: 元 item の本文に整形結果を書き込まない（REQ-0103）
+### 形式制約
+- G09: workflow 管理 artifact として扱わない
+- G10: 整形結果に frontmatter（route/status 等）を含めてはならない（MUST NOT）
+- G11: 整形結果に重複排除キー・後続 artifact 参照を含めない
+- G12: 元 item の本文に整形結果を書き込まない
 
-### accepted/ 廃止（REQ-0105-050）
+### accepted/ 廃止
 - G13: `.agentdev/intake/accepted/` を参照・使用してはならない（MUST NOT）
 - G14: `accepted/` への移動・読み込み・存在確認を行わない
 

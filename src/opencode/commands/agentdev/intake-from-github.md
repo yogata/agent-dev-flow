@@ -7,9 +7,9 @@ agent: sisyphus
 
 クローズ済みの GitHub Issue / PR の本文・コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存する。
 
-旧 `issue-backlog` の抽出機能を intake workflow に再定義したコマンド（REQ-0103）。
+旧 `issue-backlog` の抽出機能を intake workflow に再定義したコマンド。
 
-**このコマンドは保存専用である。** GitHub Issue の作成・採用可否の判断は行わない（REQ-0103）。
+**このコマンドは保存専用である。** GitHub Issue の作成・採用可否の判断は行わない。
 
 ## Input
 
@@ -23,7 +23,7 @@ agent: sisyphus
 
 ## Intake Item 形式
 
-`intake-capture` と同一の推奨標準形を使用する（REQ-0103）。frontmatter・状態フィールド・重複排除キーは持たない。各セクションの見出し名は固定せず、抽出内容に合わせて整理する。内容がないセクションを作成しない。
+`intake-capture` と同一の推奨標準形を使用する。frontmatter・状態フィールド・重複排除キーは持たない。各セクションの見出し名は固定せず、抽出内容に合わせて整理する。内容がないセクションを作成しない。
 
 ## Steps
 
@@ -101,17 +101,17 @@ agent: sisyphus
 
 ## Guardrails
 
-### 責務境界（REQ-0103）
+### 責務境界
 - G01: GitHub Issue の作成を行わない（`case-open` が担当）
 - G02: 採用可否の判断を行わない（`intake-promote` が担当）
 - G03: review・整形・分類の判断を行わない（後続コマンドの責務）
 - G04: Issue/PR へのコメント投稿・マーカー付与は行わない（`backlog-review` が担当）
 
-### 形式制約（REQ-0103〜039）
-- G05: workflow 管理 artifact として扱わない（REQ-0103）
-- G06: frontmatter・状態値・重複排除キー・後続 artifact 参照を必須にしない（REQ-0103, REQ-0103）
-- G07: 特定セクションを必須セクションとして扱わない（REQ-0103）
-- G08: review 結果を item に書き込まない（REQ-0103）
+### 形式制約
+- G05: workflow 管理 artifact として扱わない
+- G06: frontmatter・状態値・重複排除キー・後続 artifact 参照を必須にしない
+- G07: 特定セクションを必須セクションとして扱わない
+- G08: review 結果を item に書き込まない
 
 ### 実行制約
 - G09: GitHub Issue/PR のデータ取得は `gh` CLI のみ使用（GitHub API 直接呼び出し不可）

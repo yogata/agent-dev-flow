@@ -543,7 +543,7 @@ Skill の品質基準は本スキルの範囲とする。Command に何を置き
 
 ## 9. 配置判断フロー
 
-新規コンテンツをどこに配置するかの判断フロー（REQ-0103, ADR-0102）:
+新規コンテンツをどこに配置するかの判断フロー:
 
 ```
 配置すべきコンテンツを特定
@@ -589,7 +589,7 @@ Q7: 人間向けナビゲーション・案内か？
 | ADR | 「なぜその決定をしたか」の記録 | 技術選定、方針変更 |
 | Guide | 人間向けの案内・説明 | ワークフロー概要、クイックスタート |
 
-**注意**: skill `references/` は runtime 配布物のみを含める（retired ADR-0016、現在は SPEC system.md で規定）。authoring-only 資料は `references/` に含めない。
+**注意**: skill `references/` は runtime 配布物のみを含める（現在は SPEC system.md で規定）。authoring-only 資料は `references/` に含めない。
 
 ## See Also
 

@@ -29,15 +29,15 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
    - 未達項目が残る場合 → 構造化エラーで停止（G08）
    - PR存在確認
 
-3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認（REQ-0101）。不足時は警告表示してユーザー判断を仰ぐ
-    - **文書分類ポリシー適合確認**（REQ-0108-186）: `docs/specs/document-model.md` の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する
+3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認。不足時は警告表示してユーザー判断を仰ぐ
+    - **文書分類ポリシー適合確認**: `docs/specs/document-model.md` の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する
 
-3b. **close 時 SPEC / commands / skills 更新漏れの局所確認**（REQ-0115-022）: 実装完了・PRマージ前に、今回の変更に伴う以下の更新漏れを局所的に確認する:
+3b. **close 時 SPEC / commands / skills 更新漏れの局所確認**: 実装完了・PRマージ前に、今回の変更に伴う以下の更新漏れを局所的に確認する:
     - SPEC 本文と実装の最終矛盾確認
     - 変更に伴う command 定義の更新漏れ
     - 変更に伴う skill 責務境界の変更漏れ
     - 更新漏れを検出した場合は警告表示してユーザー判断を仰ぐ
-    - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/docs-review` の全体意味レビューの代替ではない（REQ-0115-023）
+    - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/docs-review` の全体意味レビューの代替ではない
 
 4. **PRマージ**:
    - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 3）
@@ -86,7 +86,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 全系統成功 → .opencode/commands/agentdev/templates/case-close/standard.md
     - .agentdev push失敗 → .opencode/commands/agentdev/templates/case-close/agentdev-push-failed.md
     - ブランチ・worktree削除失敗 → .opencode/commands/agentdev/templates/case-close/worktree-cleanup-failed.md
-    - GitHub完了後に .agentdev push失敗の場合は standard variant を使用してはならない（MUST NOT, REQ-0107-034）
+    - GitHub完了後に .agentdev push失敗の場合は standard variant を使用してはならない（MUST NOT）
     - **結果状態の分離報告**（SHALL）: GitHub側完了状態・`.agentdev` 永続化状態・ブランチ削除状態を独立して報告
 
 ## Guardrails
@@ -98,7 +98,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G05: ブランチ・worktree削除は必ず実行。失敗時は警告表示して停止
 - G06: `git pull --ff-only` は必ず実行。pull前ローカル変更チェック・hash検証必須
 - G07: PRのCI通過確認。CI失敗時は case-run に差し戻す
-- G08: 未達チェックボックスが残る場合、構造化エラーで停止（REQ-0106）
+- G08: 未達チェックボックスが残る場合、構造化エラーで停止
 - G09: 機能追加で docs/ 更新がない場合、警告表示して停止確認
 - G10: テスト戦略チェックボックスを必ず更新
 - G11: コメントテンプレートの【必須】セクション確認

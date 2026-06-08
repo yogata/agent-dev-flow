@@ -46,7 +46,7 @@ description: Evaluates whether architectural decisions require an ADR. USE FOR: 
 
 上記に該当する場合は、ADRではなくREQ/SPEC/guideの更新として扱う。
 
-### False Negative 防止基準（REQ-0112-043関連）
+### False Negative 防止基準
 
 ADR要否判定において、以下の兆候が検出された場合は、たとえ上記「ADRを作成してはならない条件」に該当しそうであっても、再度技術判断の有無を確認すること:
 
