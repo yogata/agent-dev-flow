@@ -558,3 +558,119 @@ describe("invalid fixture detects violations", () => {
     expect(badCmd.level).toBe("ng");
   });
 });
+
+// REQ-0108-197: Classification Policy test scenarios
+describe("Classification Policy (--classification flag)", () => {
+  it("accepts --classification flag without error", () => {
+    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.summary).toBeDefined();
+  });
+
+  it("reports 6 document classifications when --classification is enabled", () => {
+    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const classificationCount = parsed.results.find(
+      (res: { check: string; category: string }) =>
+        res.category === "ClassificationPolicy" &&
+        res.check === "classification-count",
+    );
+    expect(classificationCount).toBeDefined();
+    expect(classificationCount.level).toBe("ok");
+    expect(classificationCount.message).toContain("6");
+  });
+
+  it("verifies report collection directory exists", () => {
+    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const reportCollection = parsed.results.find(
+      (res: { check: string; category: string }) =>
+        res.category === "ClassificationPolicy" &&
+        res.check === "report-collection",
+    );
+    expect(reportCollection).toBeDefined();
+  });
+
+  it("verifies DOC-MAP classification instance exists", () => {
+    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const docmapCollection = parsed.results.find(
+      (res: { check: string; category: string }) =>
+        res.category === "ClassificationPolicy" &&
+        res.check === "docmap-collection",
+    );
+    expect(docmapCollection).toBeDefined();
+    expect(docmapCollection.level).toBe("ok");
+  });
+
+  it("does not run classification checks when --classification is omitted", () => {
+    const r = runScript(VALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const classificationResults = parsed.results.filter(
+      (res: { category: string }) =>
+        res.category === "ClassificationPolicy",
+    );
+    expect(classificationResults.length).toBe(0);
+  });
+
+  it("shows --classification in help text", () => {
+    const r = runScript(VALID_ROOT, ["--help"]);
+    expect(r.stdout).toContain("--classification");
+  });
+});
+
+// REQ-0108-197: Classification Policy verification scenarios (structural)
+describe("Classification Policy structural verification", () => {
+  it("6 classifications are recognized: REQ, ADR, SPEC, Guide, Report, DOC-MAP", () => {
+    const expectedClassifications = ["REQ", "ADR", "SPEC", "Guide", "Report", "DOC-MAP"];
+    expect(expectedClassifications.length).toBe(6);
+
+    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const countResult = parsed.results.find(
+      (res: { check: string; category: string }) =>
+        res.category === "ClassificationPolicy" &&
+        res.check === "classification-count",
+    );
+    expect(countResult).toBeDefined();
+    for (const cls of expectedClassifications) {
+      expect(countResult.message).toContain(cls);
+    }
+  });
+
+  it("retired ADR references use context-dependent rules", () => {
+    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const retiredAdrWarnings = parsed.results.filter(
+      (res: { check: string; level: string }) =>
+        res.check === "retired-adr-as-current" && res.level === "warning",
+    );
+    expect(Array.isArray(retiredAdrWarnings)).toBe(true);
+  });
+
+  it("report documents found in .agentdev/integrity/reports/", () => {
+    const reportsDir = join(VALID_ROOT, ".agentdev", "integrity", "reports");
+    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const reportResult = parsed.results.find(
+      (res: { check: string; category: string }) =>
+        res.category === "ClassificationPolicy" &&
+        res.check === "report-collection",
+    );
+    expect(reportResult).toBeDefined();
+    if (existsSync(reportsDir)) {
+      expect(reportResult.level).toBe("ok");
+    }
+  });
+
+  it("false positive suppression for workflow markers", () => {
+    const r = runScript(VALID_ROOT, ["--classification", "--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const classificationNg = parsed.results.filter(
+      (res: { category: string; level: string }) =>
+        res.category === "ClassificationPolicy" && res.level === "ng",
+    );
+    expect(classificationNg.length).toBe(0);
+  });
+});

@@ -36,7 +36,8 @@ agent: prometheus
 4. **要件展開** → `agentdev-req-analysis` の分析観点に従って網羅
    - **4b. 関連ドキュメント更新候補抽出**（REQ-0102, REQ-0115-019）: 変更種別判定 → キーワード抽出 → 限定探索（docs/specs/**, docs/requirements/**, docs/DOC-MAP.md, docs/adr/**, docs/README.md, src/opencode/commands/**, src/opencode/skills/**）→ 分類（直接矛盾/更新候補/影響なし）。REQだけでなく ADR/SPEC/guides/DOC-MAP/commands/skills への影響候補を明示する。ドラフトに保持
      - **局所予防の範囲**: この step は要求定義時の局所的な影響候補抽出であり、`/agentdev/docs-review` の全体意味レビューの代替ではない（REQ-0115-023）
-   - **4c. 分類ゲート**（REQ-0109）: 各要件行候補を「変更後仕様」or「反映作業」に分類。反映作業のみの候補は移送候補としてマーク
+       - **4c. 分類ゲート**（REQ-0109）: 各要件行候補を「変更後仕様」or「反映作業」に分類。反映作業のみの候補は移送候補としてマーク
+    - **4d. 文書分類妥当性検証**（REQ-0108-183）: 各要件の対象ドキュメント種別が `docs/specs/document-model.md` の Document Classification Policy（REQ/ADR/SPEC/Guide/Report/DOC-MAP）に適合しているか検証する。不適合な文書種別を持つ要件は flag としてマークする。4c の反映作業分類（変更の種別）とは独立した文書種別の妥当性確認である
 
 5. **ADR判断** → `agentdev-adr-guidelines`（manual reference）に従ってADR判断を記録（ADRファイル作成は req-save で実行）
 

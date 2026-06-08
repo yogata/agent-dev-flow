@@ -98,18 +98,27 @@ DOC-MAP が索引の範囲を超えていないか確認する:
 
 観点: SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT
 
-### 10. docs-check route判定
+### 10. 文書分類一貫性検査（REQ-0108-185）
+
+全ドキュメントが `docs/specs/document-model.md` の Document Classification Policy（REQ/ADR/SPEC/Guide/Report/DOC-MAP）に正しく分類されているか検査する:
+- 各ドキュメントの宣言分類が classification policy に適合しているか
+- ドキュメント内容が宣言分類に一致しているか
+- ドキュメント間の相互参照が分類階層を尊重しているか
+
+read-only 診断ステップであり、ファイルの変更は行わない。
+
+### 11. docs-check route判定
 
 意味的疑いのうち機械的検査に落とせるものを `/repo/docs-check` rule/fixture 候補として提示する:
 - 反復的に発生する finding パターンを特定
 - 機械的検査可能なルールとして表現できるか評価
 - 候補として提示（実装はしない）
 
-### 11. 未処理artifact確認
+### 12. 未処理artifact確認
 
 診断ロジックは `agentdev-workflow-lifecycle` skill の `references/restructure-judgment-logic.md` の「Step 6: 未処理artifact確認」を参照
 
-### 12. 診断結果の出力
+### 13. 診断結果の出力
 
 source-of-truth priority:
 1. active REQ
@@ -124,7 +133,7 @@ source-of-truth priority:
 
 問題候補出力スキーマは `agentdev-workflow-lifecycle` skill の `references/restructure-judgment-logic.md` の「Step 7: 診断結果の出力」を参照
 
-### 13. 完了報告
+### 14. 完了報告
 
 完了報告 → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/docs-review/standard.md
 
@@ -150,4 +159,4 @@ source-of-truth priority:
 | ファイル読込失敗 | 該当ファイルをスキップし、警告を出力 |
 | mapping-table が存在しない | Step 4 をスキップし、警告を出力 |
 | DOC-MAP が存在しない | Step 3, 8 をスキップし、警告を出力 |
-| .agentdev/ 配下が存在しない | Step 11 をスキップし、「未処理artifact確認: 対象なし」と報告 |
+| .agentdev/ 配下が存在しない | Step 12 をスキップし、「未処理artifact確認: 対象なし」と報告 |
