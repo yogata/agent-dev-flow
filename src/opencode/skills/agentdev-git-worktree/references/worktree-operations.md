@@ -72,7 +72,7 @@ git worktree prune
 git branch -d "{type}/issue-{N}"
 ```
 
-**squash merge 後の条件付き `-D` 許可**（REQ-0106）:
+**squash merge 後の条件付き `-D` 許可**:
 1. PR が `state: MERGED` と確認できること
 2. 呼び出し元が squash merge 済みを明示的に判定していること
 3. 条件を満たさない場合は `-D` 実行せず警告表示して停止

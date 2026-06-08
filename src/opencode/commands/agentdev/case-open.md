@@ -17,18 +17,18 @@ agent: sisyphus
 
 ## Steps
 
-0. **upstream handoff 停止判定**（REQ-0104-025）: 要件docまたは RU に `apply_in_current_project: false` が含まれる場合、Issue を作成せず停止する。agent-dev-flow repository への手動取り込み対象として報告する。判定は `agentdev-workflow-lifecycle/references/upstream-handoff.md` に従う
+0. **upstream handoff 停止判定**: 要件docまたは RU に `apply_in_current_project: false` が含まれる場合、Issue を作成せず停止する。agent-dev-flow repository への手動取り込み対象として報告する。判定は `agentdev-workflow-lifecycle/references/upstream-handoff.md` に従う
 
 1. 要件docからIssue本文を生成:
    - `docs/requirements/REQ-{NNNN}.md` が存在する場合: REQ内容（目的/要件/適用範囲）を読み取り、Issue本文に反映
    - 存在しない場合: セッション内の要件docから直接生成
    - テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_feature.md` または `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_bug.md` を Read tool で読み込む
     **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てIssue本文に含まれること。`【任意】` セクションは内容がある場合のみ含める。必須セクションが欠落している場合、生成をやり直すこと。
-     **Requirement Source 転記**（REQ-0105）: REQ文書（またはセッション内要件doc）に `## Requirement Source` セクションが存在する場合、その内容をIssue本文に転記する。転記先はIssue本文の補足情報セクションの後に `## Requirement Source` セクションとして配置する
-    - **関連ドキュメント更新候補 転記**（REQ-0102）: REQ文書（またはセッション内要件doc）に `## 関連ドキュメント更新候補` セクションが存在する場合、その内容をIssue本文に転記する
-    - **直接矛盾の完了条件反映**（REQ-0102）: 関連ドキュメント更新候補のうち `直接矛盾` に分類された候補を、Issue本文の完了条件セクションにチェックボックスとして反映する
-    - **テスト戦略スコープ管理**（REQ-0105〜003）: テスト戦略セクションの各テスト項目について、単一実装PR内で完結する検証かどうかを判定すること（SHALL）。単一PR内で完結しない検証（E2Eテスト、手動確認等）はチェックボックス形式（`- [ ]`）で出力してはならない（MUST NOT）。達成不可能項目のうち情報保持が必要なものは `> ℹ️ 別途確認: {項目名}` 形式で出力すること（SHALL）
- 2. **マルチREQ入力判定**（REQ-0104-028）:
+     **Requirement Source 転記**: REQ文書（またはセッション内要件doc）に `## Requirement Source` セクションが存在する場合、その内容をIssue本文に転記する。転記先はIssue本文の補足情報セクションの後に `## Requirement Source` セクションとして配置する
+    - **関連ドキュメント更新候補 転記**: REQ文書（またはセッション内要件doc）に `## 関連ドキュメント更新候補` セクションが存在する場合、その内容をIssue本文に転記する
+    - **直接矛盾の完了条件反映**: 関連ドキュメント更新候補のうち `直接矛盾` に分類された候補を、Issue本文の完了条件セクションにチェックボックスとして反映する
+    - **テスト戦略スコープ管理**: テスト戦略セクションの各テスト項目について、単一実装PR内で完結する検証かどうかを判定すること（SHALL）。単一PR内で完結しない検証（E2Eテスト、手動確認等）はチェックボックス形式（`- [ ]`）で出力してはならない（MUST NOT）。達成不可能項目のうち情報保持が必要なものは `> ℹ️ 別途確認: {項目名}` 形式で出力すること（SHALL）
+  2. **マルチREQ入力判定**:
     - 入力要件docの数を確認
     - **単一REQドキュメント**の場合 → 既存の規模判定（Step 3）へ進む
     - **複数REQドキュメント**またはdraft-metaに`scale: large`が設定されている場合 → **マルチREQ Epic flow**（Step 4〜）へ進む
@@ -40,8 +40,8 @@ agent: sisyphus
      **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てEpic Issue本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
  5. **[マルチREQ Epic flow]**: Epic Issue本文を生成:
      - 各REQドキュメントから要約を抽出し、Epicの`{summary}`, `{problem}`, `{solution}`を統合して生成
-     - **分解テーブル生成**（REQ-0104-029）: 入力REQドキュメント単位で分解テーブルを生成。各REQドキュメントを個別の作業単位として扱う。子Issue番号は後で更新するためプレースホルダー `#{TBD}`
-     - **Waveテーブル生成**（REQ-0104-032）: 各REQドキュメントの依存関係情報を解析し、Wave番号を決定して`## 実行順序`セクションのWaveテーブルを生成する。列形式: `Wave / Issue / 実行方法 / 前提 / 対象REQ`。子Issue番号はプレースホルダー `#{TBD_Wn}`（nは行番号）とする。対象REQ列には各子Issueに対応するREQドキュメント番号を記載
+      - **分解テーブル生成**: 入力REQドキュメント単位で分解テーブルを生成。各REQドキュメントを個別の作業単位として扱う。子Issue番号は後で更新するためプレースホルダー `#{TBD}`
+      - **Waveテーブル生成**: 各REQドキュメントの依存関係情報を解析し、Wave番号を決定して`## 実行順序`セクションのWaveテーブルを生成する。列形式: `Wave / Issue / 実行方法 / 前提 / 対象REQ`。子Issue番号はプレースホルダー `#{TBD_Wn}`（nは行番号）とする。対象REQ列には各子Issueに対応するREQドキュメント番号を記載
      - ステータス追跡テーブル: 全子Issue数（=入力REQドキュメント数）を`{total}`に設定、進行中/完了は0
      - `{completion_criteria}`は各REQドキュメントの完了条件を統合して抽出
      - **子Issue数事前チェック**: 入力REQドキュメント数（子Issue数）を確認。G15（最大10件）を超過する場合、Epic Issue・子Issueのいずれも作成せずエラーを報告して停止する
@@ -56,13 +56,13 @@ agent: sisyphus
     - 子Issue本文を生成:
       - `Parent: #{epic_number}` を先頭行に配置
       - 対象REQドキュメントの内容から`{summary}`, `{scope}`, `{solution}`, `{test_strategy}`を生成
-      - **Wave情報反映**（REQ-0104-032）: 対象REQドキュメントが属するWave番号と依存関係をIssue本文の補足情報セクションに記載
-      - **REQ traceability保持**（REQ-0104-033）: 対象REQドキュメント番号をIssue本文に明示的に記載し、要件ドキュメントとの追跡可能性を維持する
+      - **Wave情報反映**: 対象REQドキュメントが属するWave番号と依存関係をIssue本文の補足情報セクションに記載
+      - **REQ traceability保持**: 対象REQドキュメント番号をIssue本文に明示的に記載し、要件ドキュメントとの追跡可能性を維持する
     - ラベル: `enhancement`, `feature`（`epic` は付与しない）
     - `agentdev-gh-cli` に従って `--body-file` 使用
      - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
      - 作成されたIssue番号を記録
-     - **孫Issue判定**（REQ-0104-031）: 子Issue作成時に対象REQドキュメントの規模・複雑度を判定し、必要に応じて追加分解による孫Issue作成を検討する（SHOULD）
+      - **孫Issue判定**: 子Issue作成時に対象REQドキュメントの規模・複雑度を判定し、必要に応じて追加分解による孫Issue作成を検討する（SHOULD）
  8. **[マルチREQ Epic flow]**: Epic Issue本文を更新:
     - 分解テーブルの `#{TBD}` を実際の子Issue番号に置換
     - Wave テーブルの `#{TBD_Wn}` を実際の子Issue番号に置換（`n` は行番号に対応）
@@ -107,14 +107,14 @@ agent: sisyphus
      - 書き込み完了後、`agentdev-gh-cli` の VERIFY操作（Section 5-8）に従って内容を検証すること。
      **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
  18. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除する
- 18a. RU ファイル削除（SHALL — REQ-0105, REQ-0112-009）:
+  18a. RU ファイル削除（SHALL）:
     - Issue 作成時に使用した一時メタ情報（要件docの Requirement Source セクション、またはセッション内要件docの Requirement Source セクション）から抽出した `.agentdev/backlog/req-units/RU-*.md` に一致するファイルを削除する
     - **削除条件**: Issue 作成 + VERIFY が正常完了した場合のみ（SHALL）。Issue 作成失敗・VERIFY 失敗時は RU を残置する
     - **削除対象外**: RU パターンに一致しない Requirement Source は削除しない
-    - **RU削除後の同期確認**（SHALL — REQ-0105）: RU ファイル削除を commit/push した場合、以下を確認すること:
+    - **RU削除後の同期確認**（SHALL）: RU ファイル削除を commit/push した場合、以下を確認すること:
         1. main 作業ディレクトリの HEAD と `origin/main` が一致していること（`git rev-parse HEAD` と `git rev-parse origin/main` を比較）
         2. `git status --porcelain` に削除済み RU ファイルが残っていないこと
-     - 同期確認に失敗した場合、対象ファイル・現在の HEAD・`origin/main` を表示して完了扱いにせず停止すること（SHALL — REQ-0105）
+     - 同期確認に失敗した場合、対象ファイル・現在の HEAD・`origin/main` を表示して完了扱いにせず停止すること（SHALL）
  18b. 完了報告 → 完了報告templateに従って出力。実行フローに応じたvariantを選択:
      - Standard flow → .opencode/commands/agentdev/templates/case-open/standard.md
      - 単一REQ Epic flow → .opencode/commands/agentdev/templates/case-open/epic.md
@@ -130,8 +130,8 @@ agent: sisyphus
 - G03: 子Issue本文の先頭行に `Parent: #{epic_number}` を必ず含める（親子関係の追跡用）
 - G04: 全子Issueの作成完了後にEpic本文のステータス追跡テーブルを更新する（部分更新は禁止）
 - G05: 子Issueは最大10件まで（Epic 1件あたり）。Step 5（マルチREQ Epic flow）またはStep 10（単一REQ Epic flow）で子Issue数を確認し、超過時はEpic・子Issueのいずれも作成せずエラーで停止する
-- G14: REQドキュメントの追跡可能性を破壊するような、Wave単位のみの子Issue構造を作成してはならない（REQ-0104-033）。子Issueは必ずREQドキュメントと対応付けること
-- G15: マルチREQ Epic flowは、複数REQドキュメント入力時またはdraft-metaに`scale: large`が設定されている場合にのみ実行する（REQ-0104-028）
+- G14: REQドキュメントの追跡可能性を破壊するような、Wave単位のみの子Issue構造を作成してはならない。子Issueは必ずREQドキュメントと対応付けること
+- G15: マルチREQ Epic flowは、複数REQドキュメント入力時またはdraft-metaに`scale: large`が設定されている場合にのみ実行する
 
 ### 品質ゲート
 - G06: req-define未実行の場合は警告
@@ -142,7 +142,7 @@ agent: sisyphus
 
 ### 判断・承認制約
 - G11: 単一REQ Epic flowは draft-metaの `scale: large` が明示的に設定されている場合のみ実行
-- G16: マルチREQ Epic flowは複数REQドキュメント入力時またはdraft-metaに`scale: large`が設定されている場合のみ実行（REQ-0104-028）
+- G16: マルチREQ Epic flowは複数REQドキュメント入力時またはdraft-metaに`scale: large`が設定されている場合のみ実行
 
 ### 委譲・参照制約
 - G12: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと

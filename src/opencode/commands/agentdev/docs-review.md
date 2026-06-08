@@ -98,7 +98,7 @@ DOC-MAP が索引の範囲を超えていないか確認する:
 
 観点: SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT
 
-### 10. 文書分類一貫性検査（REQ-0108-185）
+### 10. 文書分類一貫性検査
 
 全ドキュメントが `docs/specs/document-model.md` の Document Classification Policy（REQ/ADR/SPEC/Guide/Report/DOC-MAP）に正しく分類されているか検査する:
 - 各ドキュメントの宣言分類が classification policy に適合しているか
@@ -109,7 +109,7 @@ read-only 診断ステップであり、ファイルの変更は行わない。
 
 ### 11. docs-check route判定
 
-意味的疑いのうち機械的検査に落とせるものを `/repo/docs-check` rule/fixture 候補として提示する:
+意味的疑いのうち機械的検査に落とせるものを docs-check rule/fixture 候補として提示する:
 - 反復的に発生する finding パターンを特定
 - 機械的検査可能なルールとして表現できるか評価
 - 候補として提示（実装はしない）

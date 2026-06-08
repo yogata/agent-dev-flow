@@ -177,7 +177,7 @@ description: Detects deviations between implementation and requirements (REQ), w
 - **本スキルが行うこと**: 乖離の分類（spec-bug / impl-bug / scope-creep）、影響度判定、修正方針の提示、推奨アクションの提示
 - **本スキルが行わないこと**: REQ ファイルの更新判断、REQ ファイルの変更、仕様変更の承認
 
-### docs 全体の意味レビューとの関係（REQ-0115-040）
+### docs 全体の意味レビューとの関係
 
 `agentdev-spec-compliance` は実装と REQ / work plan / ADR の乖離検出ゲートであり、docs 全体の意味レビューの代替ではない。docs 全体の意味レビュー（SPEC・guides・DOC-MAP・commands・skills を横断する整合性確認）は `/agentdev/docs-review` が担う。
 

@@ -4,7 +4,7 @@ description: agentdev コマンドリファレンス
 
 # agentdev コマンドリファレンス
 
-AgentDevFlow の各コマンドの入力・出力・次アクションを一覧化する（REQ-0101-026）。
+AgentDevFlow の各コマンドの入力・出力・次アクションを一覧化する。
 
 ## コマンド一覧
 
