@@ -1,12 +1,12 @@
 {
-  "version": 1,
-  "timestamp": "2026-06-06",
-  "repository_head": "13a33a9",
-  "description": "Initial integrity baseline for AgentDevFlow. Snapshot of artifact state before source/projection separation and integrity infrastructure improvements.",
+  "version": 2,
+  "timestamp": "2026-06-08",
+  "repository_head": "dd764d3",
+  "description": "Integrity baseline for AgentDevFlow after Document Classification Policy (REQ-0116) introduction, source/projection separation (PR #692), and integrity infrastructure improvements (PR #693). 6/8 structure: 6 document classifications, 8 scan target collections.",
   "artifact_inventory": {
     "active_req": {
-      "count": 14,
-      "range": "REQ-0101 through REQ-0114",
+      "count": 16,
+      "range": "REQ-0101 through REQ-0116",
       "path": "docs/requirements/REQ-*.md",
       "verified": true
     },
@@ -23,7 +23,7 @@
       "verified": true
     },
     "spec": {
-      "count": 9,
+      "count": 8,
       "path": "docs/specs/*.md",
       "verified": true
     },
@@ -32,31 +32,30 @@
       "path": "docs/guides/*.md",
       "verified": true
     },
-    "command": {
-      "count": 18,
-      "path": ".opencode/commands/agentdev/*.md (excl. README.md)",
+    "doc_map": {
+      "count": 1,
+      "path": "docs/DOC-MAP.md",
       "verified": true
     },
-    "skill": {
-      "count": 21,
-      "path": ".opencode/skills/*/SKILL.md",
+    "report": {
+      "count": 1,
+      "path": ".agentdev/integrity/reports/*.md",
       "verified": true
     },
-    "command_template": {
-      "count": 35,
-      "path": ".opencode/commands/agentdev/templates/**/*.md",
-      "verified": true
-    },
-    "skill_template": {
-      "count": 11,
-      "path": ".opencode/skills/*/templates/*.md",
-      "verified": true
-    },
-    "integrity_script": {
-      "count": 14,
-      "path": ".opencode/skills/agentdev-integrity/scripts/*.ts",
+    "runtime": {
+      "command": 18,
+      "skill": 21,
+      "command_template": 35,
+      "skill_template": 11,
+      "integrity_script": 14,
       "verified": true
     }
+  },
+  "document_classification": {
+    "version": 1,
+    "classifications": ["REQ", "ADR", "SPEC", "Guide", "Report", "DOC-MAP"],
+    "authority_model_source": "docs/specs/document-model.md",
+    "notes": "6 classifications per Document Classification Policy (REQ-0116)"
   },
   "known_findings": [
     {
@@ -168,6 +167,28 @@
       "route": "none",
       "known_since": "2026-06-06",
       "resolution": "Pending #599"
+    },
+    {
+      "id": "BL-011",
+      "category": "document-drift",
+      "level": "info",
+      "classification": "classification-policy-migration",
+      "description": "Document Classification Policy (REQ-0116) introduces 6 classifications and 8 collections. Integrity scripts updated for --classification flag (REQ-0108-196). Spec count reduced from 9 to 8 (integrity-audit-report moved to Report classification).",
+      "affected_files": ["docs/specs/*.md", ".agentdev/integrity/reports/*.md"],
+      "route": "none",
+      "known_since": "2026-06-08",
+      "resolution": "Baseline update — no action needed"
+    },
+    {
+      "id": "BL-012",
+      "category": "obsolete-structure",
+      "level": "info",
+      "classification": "classification-policy-migration",
+      "description": "ADR-0017 through ADR-0020 are retired but coexist in the same directory as active ADRs. Classification policy treats all ADR files as a single collection; retired ADR references use context-dependent rules (REQ-0112-048/050).",
+      "affected_files": ["docs/adr/ADR-*.md"],
+      "route": "none",
+      "known_since": "2026-06-08",
+      "resolution": "Baseline update — no action needed"
     }
   ],
   "finding_classification_summary": {
@@ -177,18 +198,19 @@
     "negative-fixture": 0,
     "clarification-needed": 1,
     "ssot-candidates": 3,
-    "continuous-rule-candidates": 2
+    "continuous-rule-candidates": 2,
+    "classification-policy-migration": 2
   },
   "req_internal_consistency": {
     "verified": true,
-    "notes": "All 14 active REQs have valid frontmatter (id, title, created, updated, tags). No ID collisions between active and retired REQs. REQ index (docs/requirements/README.md) lists all 14 active REQs with correct links."
+    "notes": "All 16 active REQs (REQ-0101 through REQ-0116) have valid frontmatter (id, title, created, updated, tags). No ID collisions between active and retired REQs. REQ index (docs/requirements/README.md) lists all 16 active REQs with correct links. REQ-0115 and REQ-0116 added for Document Classification Policy."
   },
   "req_derivative_drift": {
     "assessed": true,
     "notes": "Key drift areas: (1) source/projection path references pending update (#596/#597), (2) command/skill inventories manually maintained (#599), (3) integrity infrastructure gaps (#600), (4) consumer model undefined (#601). All tracked in Epic #595 child Issues."
   },
   "source_projection_status": {
-    "separated": false,
-    "notes": "Source/projection separation not yet applied at baseline time. .opencode/ contains both source and runtime. Separation planned in Issue #596 (Wave 1)."
+    "separated": true,
+    "notes": "Source/projection separation in effect per Wave 1 PR #692. Source files live under src/opencode/ with runtime projections at .opencode/. check_integrity.ts resolves cmdDir preferring projection, falling back to source."
   }
 }

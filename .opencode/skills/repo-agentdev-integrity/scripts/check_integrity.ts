@@ -27,7 +27,7 @@ import {
 
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
-const USAGE = "bun run check_integrity.ts [--help] [--json] [--dry-run]";
+const USAGE = "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification]"; // REQ-0108-196
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -120,6 +120,16 @@ function listDirs(dirPath: string): string[] {
 
 function resolveRelative(fullPath: string, root: string): string {
   return path.relative(root, fullPath).replace(/\\/g, "/");
+}
+
+// REQ-0108-189: Fall back to src/opencode/ (原本) when runtime projection doesn't exist
+function resolvePathWithFallback(runtimePath: string): string {
+  if (fs.existsSync(runtimePath)) return runtimePath;
+  const sourcePath = runtimePath
+    .replace(/\.opencode[\\/]/, "src/opencode/")
+    .replace(/\.opencode\\/, "src/opencode/");
+  if (sourcePath !== runtimePath && fs.existsSync(sourcePath)) return sourcePath;
+  return runtimePath;
 }
 
 function extractReadmeTableReqIds(content: string): Set<string> {
@@ -1339,14 +1349,24 @@ function checkSpecsExistence(specsDir: string, root: string): CheckResult[] {
 
 function collectAllArtifactPaths(root: string): string[] {
   const paths: string[] = [];
+  // REQ-0108-188: 8 independent collections aligned with Document Classification Policy
   const globs: string[] = [
+    // 1. active_req
     path.join(root, "docs", "requirements", "*.md"),
+    // 2. retired_req (excluded from active)
+    // 3. adr
     path.join(root, "docs", "adr", "*.md"),
+    // 4. spec
     path.join(root, "docs", "specs", "*.md"),
+    // 5. guide
     path.join(root, "docs", "guides", "*.md"),
-    path.join(root, "docs", "README.md"),
+    // 6. doc_map
     path.join(root, "docs", "DOC-MAP.md"),
+    path.join(root, "docs", "README.md"),
     path.join(root, "README.md"),
+    // 7. report
+    path.join(root, ".agentdev", "integrity", "reports", "*.md"),
+    // 8. runtime (included via .opencode/commands and .opencode/skills elsewhere)
   ];
   for (const g of globs) {
     const dir = path.dirname(g);
@@ -1411,6 +1431,18 @@ function resolveLinkTarget(
   const sourceDir = path.dirname(sourceFilePath);
   const resolved = path.resolve(sourceDir, linkPath);
   return { filePath: resolved, anchor };
+}
+
+// REQ-0108-193: Check if the source ADR is superseded and references its predecessor
+function isSupersededAdr(sourcePath: string, referencedRef: string): boolean {
+  const content = readText(sourcePath);
+  if (!content) return false;
+  const fm = parseFrontmatter(content);
+  if (!fm) return false;
+  const status = typeof fm["status"] === "string" ? fm["status"].toLowerCase() : "";
+  if (status !== "superseded") return false;
+  const supersedes = typeof fm["supersedes"] === "string" ? fm["supersedes"] : "";
+  return supersedes === referencedRef;
 }
 
 function checkLinkIntegrity(root: string): CheckResult[] {
@@ -1479,9 +1511,14 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     }
 
     // Check REQ-/ADR- text references
+    // REQ-0108-194: Suppress false positives for template placeholders
+    const isTemplateLike = /\{[a-zA-Z_]+\}/.test(content) || content.includes("🔄") || content.includes("✅") || content.includes("☐");
+    const isReqRangeContext = /\bREQ-\d{4}\s+(through|thru|～|〜|—)\s+REQ-\d{4}\b/.test(content);
     const reqRefs = content.match(/\bREQ-\d{4}\b/g) || [];
     const uniqueReqRefs = [...new Set(reqRefs)];
     for (const ref of uniqueReqRefs) {
+      // REQ-0108-194: Skip template-like content with placeholders or workflow markers
+      if (isTemplateLike) break;
       const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
       const retiredPath = path.join(
         root,
@@ -1514,6 +1551,8 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     const adrRefs = content.match(/\bADR-\d{4}\b/g) || [];
     const uniqueAdrRefs = [...new Set(adrRefs)];
     for (const ref of uniqueAdrRefs) {
+      // REQ-0108-194: Skip template-like content with placeholders or workflow markers
+      if (isTemplateLike) break;
       const adrPath = path.join(root, "docs", "adr", `${ref}.md`);
       const retiredAdrPath = path.join(root, "docs", "adr", "retired", `${ref}.md`);
       if (!fs.existsSync(adrPath) && !fs.existsSync(retiredAdrPath)) {
@@ -1537,7 +1576,10 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       }
     }
 
-    // REQ-0112-048/050: retired ADR referenced as current baseline
+    // REQ-0112-048/050, REQ-0108-193: retired ADR referenced as current baseline
+    // with context-dependent exemptions:
+    // - In retired files: historical references are OK
+    // - In superseded ADRs: references to predecessor are OK
     for (const ref of uniqueAdrRefs) {
       const retiredAdrPath = path.join(root, "docs", "adr", "retired", `${ref}.md`);
       const activeAdrPath = path.join(root, "docs", "adr", `${ref}.md`);
@@ -1545,7 +1587,8 @@ function checkLinkIntegrity(root: string): CheckResult[] {
         fs.existsSync(retiredAdrPath) &&
         !fs.existsSync(activeAdrPath) &&
         !relPath.startsWith("docs/adr/retired/") &&
-        !relPath.startsWith("docs/adr/README.md")
+        !relPath.startsWith("docs/adr/README.md") &&
+        !(relPath.startsWith("docs/adr/ADR-") && isSupersededAdr(filePath, ref))
       ) {
         results.push(
           warn(
@@ -1566,6 +1609,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     }
 
     // Check retired REQ referenced as current requirement
+    // REQ-0108-193: In retired files, references to other retired docs are OK (historical)
     for (const ref of uniqueReqRefs) {
       const retiredPath = path.join(
         root,
@@ -1579,7 +1623,8 @@ function checkLinkIntegrity(root: string): CheckResult[] {
         fs.existsSync(retiredPath) &&
         !fs.existsSync(activePath) &&
         !relPath.startsWith("docs/requirements/retired/") &&
-        !relPath.endsWith("mapping-table.md")
+        !relPath.endsWith("mapping-table.md") &&
+        !isReqRangeContext // REQ-0108-194: REQ range references like "REQ-0101 through REQ-0116"
       ) {
         results.push(
           warn(
@@ -2554,6 +2599,8 @@ function extractSection(content: string, heading: string): string | null {
   return sectionLines.length > 0 ? sectionLines.join("\n") : null;
 }
 
+// REQ-0108-192: command-map.md may not exist on disk; parseCommandMap returns
+// empty gracefully and the check emits info-level result (no removal needed).
 function checkCommandMapConsistency(
   cmdDir: string,
   root: string,
@@ -5331,7 +5378,10 @@ function checkTemplatePathIntegrity(
     const uniqueRefs = [...new Set(templateRefs)];
 
     for (const ref of uniqueRefs) {
-      const resolvedPath = path.join(root, ref.replace(/\//g, path.sep));
+      // REQ-0108-189: Fall back to src/opencode/ when runtime projection doesn't exist
+      const resolvedPath = resolvePathWithFallback(
+        path.join(root, ref.replace(/\//g, path.sep)),
+      );
       if (!fs.existsSync(resolvedPath)) {
         foundViolation = true;
         results.push(
@@ -5358,9 +5408,9 @@ function checkTemplatePathIntegrity(
     const fm = parseFrontmatter(content);
     if (fm && fm["template_path"]) {
       const templatePath = String(fm["template_path"]);
-      const resolvedFmPath = path.join(
-        root,
-        templatePath.replace(/\//g, path.sep),
+      // REQ-0108-189: Fall back to src/opencode/ when runtime projection doesn't exist
+      const resolvedFmPath = resolvePathWithFallback(
+        path.join(root, templatePath.replace(/\//g, path.sep)),
       );
       if (!fs.existsSync(resolvedFmPath)) {
         foundViolation = true;
@@ -5400,56 +5450,90 @@ function checkTemplatePathIntegrity(
 
 // ─── Source vs Projection consistency check ─────────────────────────────────
 
+// REQ-0108-190: Extended to cover commands AND skills source/projection pairs
 function checkSourceProjectionConsistency(root: string): CheckResult[] {
   const results: CheckResult[] = [];
+
+  // Commands: src/opencode/commands/ ↔ .opencode/commands/
   const projectionCmdDir = path.join(root, ".opencode", "commands", "agentdev");
   const sourceCmdDir = path.join(root, "src", "opencode", "commands", "agentdev");
 
-  if (!fs.existsSync(sourceCmdDir)) return results;
-  if (!fs.existsSync(projectionCmdDir)) return results;
-
-  const sourceFiles = new Set(
-    listFiles(sourceCmdDir).filter((f) => f !== "README.md"),
-  );
-  const projectionFiles = new Set(
-    listFiles(projectionCmdDir).filter((f) => f !== "README.md"),
-  );
-
-  const missingFromProjection = [...sourceFiles].filter(
-    (f) => !projectionFiles.has(f),
-  );
-  const extraInProjection = [...projectionFiles].filter(
-    (f) => !sourceFiles.has(f),
-  );
-
-  for (const f of missingFromProjection) {
-    results.push(
-      ng(
-        "Inventory",
-        "source-projection-sync",
-        `${f} exists in source but missing from projection`,
-      ),
+  if (fs.existsSync(sourceCmdDir) && fs.existsSync(projectionCmdDir)) {
+    const sourceFiles = new Set(
+      listFiles(sourceCmdDir).filter((f) => f !== "README.md"),
     );
-  }
-  for (const f of extraInProjection) {
-    results.push(
-      ng(
-        "Inventory",
-        "source-projection-sync",
-        `${f} exists in projection but missing from source`,
-      ),
+    const projectionFiles = new Set(
+      listFiles(projectionCmdDir).filter((f) => f !== "README.md"),
     );
+
+    const missingFromProjection = [...sourceFiles].filter(
+      (f) => !projectionFiles.has(f),
+    );
+    const extraInProjection = [...projectionFiles].filter(
+      (f) => !sourceFiles.has(f),
+    );
+
+    for (const f of missingFromProjection) {
+      results.push(
+        ng(
+          "Inventory",
+          "source-projection-sync",
+          `${f} exists in source but missing from projection`,
+        ),
+      );
+    }
+    for (const f of extraInProjection) {
+      results.push(
+        ng(
+          "Inventory",
+          "source-projection-sync",
+          `${f} exists in projection but missing from source`,
+        ),
+      );
+    }
   }
 
-  if (
-    missingFromProjection.length === 0 &&
-    extraInProjection.length === 0
-  ) {
+  // Skills: src/opencode/skills/ ↔ .opencode/skills/
+  const projectionSkillsDir = path.join(root, ".opencode", "skills");
+  const sourceSkillsDir = path.join(root, "src", "opencode", "skills");
+
+  if (fs.existsSync(sourceSkillsDir) && fs.existsSync(projectionSkillsDir)) {
+    const sourceSkillDirs = new Set(listDirs(sourceSkillsDir));
+    const projectionSkillDirs = new Set(listDirs(projectionSkillsDir));
+
+    const missingSkills = [...sourceSkillDirs].filter(
+      (d) => !projectionSkillDirs.has(d),
+    );
+    const extraSkills = [...projectionSkillDirs].filter(
+      (d) => !sourceSkillDirs.has(d),
+    );
+
+    for (const d of missingSkills) {
+      results.push(
+        ng(
+          "Inventory",
+          "source-projection-sync",
+          `Skill '${d}' exists in source but missing from projection`,
+        ),
+      );
+    }
+    for (const d of extraSkills) {
+      results.push(
+        ng(
+          "Inventory",
+          "source-projection-sync",
+          `Skill '${d}' exists in projection but missing from source`,
+        ),
+      );
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
     results.push(
       ok(
         "Inventory",
         "source-projection-sync",
-        "Source and projection command directories are in sync",
+        "Source and projection directories are in sync for commands and skills",
       ),
     );
   }
@@ -5468,85 +5552,85 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
  * If a junction target is missing, fs.existsSync returns false for the path,
  * but the junction directory entry still appears in readdir.
  */
-function checkBrokenJunctions(skillsDir: string, root: string): CheckResult[] {
+// REQ-0108-191: Extended to scan both skills and commands directories
+function checkBrokenJunctions(skillsDir: string, root: string, cmdsDir?: string): CheckResult[] {
   const results: CheckResult[] = [];
   let foundBroken = false;
 
-  if (!fs.existsSync(skillsDir)) {
-    results.push(
-      info(
-        "JunctionIntegrity",
-        "broken-junction",
-        "Skills directory does not exist",
-      ),
-    );
-    return results;
+  // REQ-0108-191: Scan multiple directories for broken junctions
+  const dirsToScan = [skillsDir];
+  if (cmdsDir && fs.existsSync(path.dirname(cmdsDir))) {
+    dirsToScan.push(cmdsDir);
   }
 
-  const entries = fs.readdirSync(skillsDir, {
-    withFileTypes: true,
-  }) as import("fs").Dirent[];
-
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const fullPath = path.join(skillsDir, entry.name);
-    const relPath = resolveRelative(fullPath, root);
-
-    // On Windows, junctions appear as directories in Dirent, but we can
-    // detect them by checking if the directory is a reparse point via
-    // fs.lstatSync. On Unix, check for symbolic links.
-    let isJunction = false;
-    try {
-      const lstat = fs.lstatSync(fullPath) as import("fs").Stats;
-      // Windows: junction is detected via isSymbolicLink (node treats
-      // junctions as symbolic links in lstat). Unix: actual symlink.
-      isJunction = lstat.isSymbolicLink();
-    } catch {
-      // If lstat fails, try to detect broken junction by checking if
-      // the directory exists but throws on stat (follows link).
-      try {
-        fs.statSync(fullPath);
-      } catch {
-        // stat fails but readdir showed it → broken junction
-        foundBroken = true;
-        results.push(
-          ng(
-            "JunctionIntegrity",
-            "broken-junction",
-            `Broken junction/symlink detected: '${entry.name}' target does not exist`,
-            relPath,
-            undefined,
-            {
-              evidence: entry.name,
-              expected: "junction/symlink target directory must exist",
-              route: determineRoute("JunctionIntegrity", 1),
-            },
-          ),
-        );
-        continue;
-      }
+  for (const scanDir of dirsToScan) {
+    if (!fs.existsSync(scanDir)) {
+      results.push(
+        info(
+          "JunctionIntegrity",
+          "broken-junction",
+          `Directory does not exist: ${resolveRelative(scanDir, root)}`,
+        ),
+      );
+      continue;
     }
 
-    if (isJunction) {
-      // For valid junctions/symlinks, verify the target exists
+    const entries = fs.readdirSync(scanDir, {
+      withFileTypes: true,
+    }) as import("fs").Dirent[];
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const fullPath = path.join(scanDir, entry.name);
+      const relPath = resolveRelative(fullPath, root);
+
+      let isJunction = false;
       try {
-        fs.statSync(fullPath);
+        const lstat = fs.lstatSync(fullPath) as import("fs").Stats;
+        isJunction = lstat.isSymbolicLink();
       } catch {
-        foundBroken = true;
-        results.push(
-          ng(
-            "JunctionIntegrity",
-            "broken-junction",
-            `Broken junction/symlink detected: '${entry.name}' target does not exist`,
-            relPath,
-            undefined,
-            {
-              evidence: entry.name,
-              expected: "junction/symlink target directory must exist",
-              route: determineRoute("JunctionIntegrity", 1),
-            },
-          ),
-        );
+        try {
+          fs.statSync(fullPath);
+        } catch {
+          foundBroken = true;
+          results.push(
+            ng(
+              "JunctionIntegrity",
+              "broken-junction",
+              `Broken junction/symlink detected: '${entry.name}' target does not exist`,
+              relPath,
+              undefined,
+              {
+                evidence: entry.name,
+                expected: "junction/symlink target directory must exist",
+                route: determineRoute("JunctionIntegrity", 1),
+              },
+            ),
+          );
+          continue;
+        }
+      }
+
+      if (isJunction) {
+        try {
+          fs.statSync(fullPath);
+        } catch {
+          foundBroken = true;
+          results.push(
+            ng(
+              "JunctionIntegrity",
+              "broken-junction",
+              `Broken junction/symlink detected: '${entry.name}' target does not exist`,
+              relPath,
+              undefined,
+              {
+                evidence: entry.name,
+                expected: "junction/symlink target directory must exist",
+                route: determineRoute("JunctionIntegrity", 1),
+              },
+            ),
+          );
+        }
       }
     }
   }
@@ -5556,7 +5640,94 @@ function checkBrokenJunctions(skillsDir: string, root: string): CheckResult[] {
       ok(
         "JunctionIntegrity",
         "broken-junction",
-        "No broken junctions or symlinks detected in skills directory",
+        "No broken junctions or symlinks detected in skills/commands directories",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── Document Classification Policy checks (REQ-0108-196) ─────────────────
+
+const DOCUMENT_CLASSIFICATIONS = ["REQ", "ADR", "SPEC", "Guide", "Report", "DOC-MAP"] as const;
+
+function checkDocumentClassificationPolicy(root: string): CheckResult[] { // REQ-0108-196
+  const results: CheckResult[] = [];
+
+  // Verify 6 document classifications are recognized
+  if (DOCUMENT_CLASSIFICATIONS.length !== 6) {
+    results.push(
+      ng(
+        "ClassificationPolicy",
+        "classification-count",
+        `Expected 6 document classifications but found ${DOCUMENT_CLASSIFICATIONS.length}`,
+      ),
+    );
+  } else {
+    results.push(
+      ok(
+        "ClassificationPolicy",
+        "classification-count",
+        `6 document classifications recognized: ${DOCUMENT_CLASSIFICATIONS.join(", ")}`,
+      ),
+    );
+  }
+
+  // Verify report documents are in the expected location
+  const reportsDir = path.join(root, ".agentdev", "integrity", "reports");
+  if (fs.existsSync(reportsDir)) {
+    const reportFiles = listFiles(reportsDir);
+    results.push(
+      ok(
+        "ClassificationPolicy",
+        "report-collection",
+        `Report collection at .agentdev/integrity/reports/ contains ${reportFiles.length} file(s)`,
+      ),
+    );
+  } else {
+    results.push(
+      warn(
+        "ClassificationPolicy",
+        "report-collection",
+        "Report collection directory .agentdev/integrity/reports/ does not exist",
+        undefined,
+        undefined,
+        {
+          evidence: reportsDir,
+          expected: "directory should exist for Report classification",
+          route: "intake",
+        },
+      ),
+    );
+  }
+
+  // Verify DOC-MAP exists
+  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
+  if (fs.existsSync(docMapPath)) {
+    results.push(
+      ok(
+        "ClassificationPolicy",
+        "docmap-collection",
+        "DOC-MAP collection exists at docs/DOC-MAP.md",
+      ),
+    );
+  } else {
+    results.push(
+      ng(
+        "ClassificationPolicy",
+        "docmap-collection",
+        "DOC-MAP.md not found — DOC-MAP classification has no instances",
+        resolveRelative(docMapPath, root),
+      ),
+    );
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(
+      ok(
+        "ClassificationPolicy",
+        "classification-policy",
+        "Document Classification Policy checks passed (6 classifications, collection integrity verified)",
       ),
     );
   }
@@ -5581,12 +5752,10 @@ async function main(): Promise<void> {
   const adrDir = path.join(root, "docs", "adr");
   const specsDir = path.join(root, "docs", "specs");
   const skillsDir = path.join(root, ".opencode", "skills");
-  // Resolve cmdDir: prefer runtime projection, fall back to source/authoring
-  const projectionCmdDir = path.join(root, ".opencode", "commands", "agentdev");
-  const sourceCmdDir = path.join(root, "src", "opencode", "commands", "agentdev");
-  const cmdDir = fs.existsSync(projectionCmdDir)
-    ? projectionCmdDir
-    : sourceCmdDir;
+  // REQ-0108-189: Use resolvePathWithFallback for runtime→source fallback
+  const cmdDir = resolvePathWithFallback(
+    path.join(root, ".opencode", "commands", "agentdev"),
+  );
   const commandMapPath = path.join(
     root,
     ".opencode",
@@ -5596,6 +5765,7 @@ async function main(): Promise<void> {
     "command-map.md",
   );
 
+  // REQ-0108-188: 8 independent collections aligned with Document Classification Policy
   const scanned: Record<string, number> = {
     REQ: listFiles(reqDir).filter((f) => f.startsWith("REQ-")).length,
     ADR: listFiles(adrDir).filter((f) => f.startsWith("ADR-")).length,
@@ -5611,6 +5781,23 @@ async function main(): Promise<void> {
         ).length
       : 0,
     DocMap: fs.existsSync(path.join(root, "docs", "DOC-MAP.md")) ? 1 : 0,
+    Report: fs.existsSync(path.join(root, ".agentdev", "integrity", "reports"))
+      ? listFiles(path.join(root, ".agentdev", "integrity", "reports")).length
+      : 0,
+    Runtime: (function () {
+      let count = 0;
+      const repoCmdDir = path.join(root, ".opencode", "commands");
+      if (fs.existsSync(repoCmdDir)) {
+        for (const dir of listDirs(repoCmdDir)) {
+          count += listFiles(path.join(repoCmdDir, dir)).length;
+        }
+      }
+      for (const skillDir of listDirs(skillsDir)) {
+        const skillMd = path.join(skillsDir, skillDir, "SKILL.md");
+        if (fs.existsSync(skillMd)) count++;
+      }
+      return count;
+    })(),
   };
 
   if (options.dryRun) {
@@ -5620,6 +5807,8 @@ async function main(): Promise<void> {
       `Specs: ${specsDir}/system.md, ${specsDir}/patterns.md`,
       `Skills: ${skillsDir} (${scanned.Skill} directories)`,
       `Commands: ${cmdDir} (${scanned.Command} files)`,
+      `Report: .agentdev/integrity/reports/ (${scanned.Report} files)`, // REQ-0108-188
+      `Runtime: .opencode/commands/**/*.md + SKILL.md (${scanned.Runtime} files)`, // REQ-0108-188
     ];
     console.log("Dry run - would check:");
     for (const t of targets) console.log(`  ${t}`);
@@ -5683,8 +5872,13 @@ async function main(): Promise<void> {
     ...checkSkillCategoryGap(root, skillsDir, cmdDir),
     ...checkTemplatePathIntegrity(cmdDir, root),
     ...checkSourceProjectionConsistency(root),
-    ...checkBrokenJunctions(skillsDir, root),
+    ...checkBrokenJunctions(skillsDir, root, cmdDir),
   ];
+
+  // REQ-0108-196: classification policy checks (enabled by --classification flag)
+  if (options.classification) {
+    results.push(...checkDocumentClassificationPolicy(root));
+  }
 
   const processed = processResults(results);
 

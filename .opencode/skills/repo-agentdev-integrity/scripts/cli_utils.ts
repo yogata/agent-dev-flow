@@ -64,10 +64,12 @@ export interface IntegrityReport {
   results: CheckResult[];
 }
 
+// REQ-0108-196: classification policy support
 export interface CliOptions {
   help: boolean;
   json: boolean;
   dryRun: boolean;
+  classification: boolean; // REQ-0108-196: enable classification policy checks
   paths: string[];
 }
 
@@ -76,6 +78,7 @@ export function parseArgs(args: string[]): CliOptions {
     help: false,
     json: false,
     dryRun: false,
+    classification: false, // REQ-0108-196
     paths: [],
   };
   for (const arg of args) {
@@ -85,6 +88,8 @@ export function parseArgs(args: string[]): CliOptions {
       options.json = true;
     } else if (arg === "--dry-run") {
       options.dryRun = true;
+    } else if (arg === "--classification") { // REQ-0108-196
+      options.classification = true;
     } else if (!arg.startsWith("-")) {
       options.paths.push(arg);
     }
@@ -103,9 +108,10 @@ USAGE:
   ${usage}
 
 OPTIONS:
-  --help      Show this help message
-  --json      Output results in JSON format
-  --dry-run   Show what would be checked without running checks
+  --help            Show this help message
+  --json            Output results in JSON format
+  --dry-run         Show what would be checked without running checks
+  --classification  Enable document classification policy checks (REQ-0108-196)
 
 EXIT CODES:
   0  No issues found
@@ -454,6 +460,7 @@ function classifyArtifactType(category: string): string {
   if (lower.includes("guide")) return "guide";
   if (lower.includes("docmap")) return "docmap";
   if (lower.includes("retired")) return "retired";
+  if (lower.includes("report")) return "report"; // REQ-0108-188
   if (lower.includes("mapping")) return "mapping-table";
   if (lower.includes("legacy") || lower.includes("namespace")) return "command";
   if (lower.includes("terminology")) return "command";

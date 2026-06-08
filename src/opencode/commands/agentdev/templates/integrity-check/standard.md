@@ -15,3 +15,4 @@ git 永続化:
 次のコマンド: なし
 
 > Note: repo-local 版は `.opencode/commands/repo/templates/docs-check/standard.md` にある
+> Boundary: integrity-check は repo-local コマンド (`/repo/docs-check`) のため、原本テンプレートは `.opencode/commands/repo/templates/docs-check/` にある。このファイルは agentdev 公開 namespace 内の残存（REQ-0108-187）。
