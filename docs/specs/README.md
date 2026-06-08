@@ -3,7 +3,7 @@
 SPEC files are canonical documents for the current architecture (REQ-0101).
 They describe what the system *is* now, as opposed to REQ files that define what it *should be*.
 
-> **Repo-internal 設計文書**: SPEC files are repo-internal design documents for the agent-dev-flow repository. They are not runtime distribution targets and runtime commands do not depend on them (ADR-0017, ADR-0018).
+> **Repo-internal 設計文書**: SPEC files are repo-internal design documents for the agent-dev-flow repository. They are not runtime distribution targets and runtime commands do not depend on them (ADR-0103, ADR-0104).
 
 ## SPEC Files
 
@@ -18,7 +18,6 @@ They describe what the system *is* now, as opposed to REQ files that define what
 | [artifact-responsibilities.md](artifact-responsibilities.md) | 成果物責任表 | 各 artifact 種別の canonical owner と責務（REQ-0103-057） |
 | [integrity-contracts.md](integrity-contracts.md) | 整合性契約 | strict/warning/observation 分類と検査カテゴリ |
 | [integrity-rule-catalog.md](integrity-rule-catalog.md) | Integrity Rule Catalog | integrity 検査の全 rule 定義（REQ-0108-150, 151） |
-| [integrity-audit-report.md](integrity-audit-report.md) | Integrity Audit Report | 初回監査結果・baseline・drift 記録（REQ-0108-143~149） |
 | [workflow-contracts.md](workflow-contracts.md) | ワークフロー契約 | コマンドパイプラインの入出力・前提条件 |
 | [runtime-package-boundary.md](runtime-package-boundary.md) | Runtime Package 境界 | Repo type 別 `.opencode/` 定義・命名規約・導入方式・sync 範囲 |
 | [rule-ownership.md](rule-ownership.md) | Rule 所有権マトリックス | rule domain と責任 REQ/SPEC の対応（REQ-0103-058） |

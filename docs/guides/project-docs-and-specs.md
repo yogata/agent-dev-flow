@@ -65,7 +65,7 @@ DOC-MAP（文書探索入口: 索引）
 
 **格納先**: `docs/specs/*.md`
 
-実装者が参照する現在のシステム仕様。「今どう動いているか」を記述する。repo-internal 設計文書であり、runtime 配布物の依存先ではない（ADR-0017, ADR-0018）。
+実装者が参照する現在のシステム仕様。「今どう動いているか」を記述する。repo-internal 設計文書であり、runtime 配布物の依存先ではない（ADR-0103, ADR-0104）。
 
 | SPEC | 内容 |
 |------|------|
@@ -78,7 +78,6 @@ DOC-MAP（文書探索入口: 索引）
 | artifact-responsibilities.md | アーティファクト責務定義 |
 | integrity-contracts.md | 整合性検査分類フレームワーク |
 | integrity-rule-catalog.md | 整合性ルールカタログ |
-| integrity-audit-report.md | 整合性監査レポート |
 | workflow-contracts.md | ワークフロー契約の雛形 |
 | runtime-package-boundary.md | Runtime package 境界 |
 | rule-ownership.md | ルール所有権 |
@@ -92,7 +91,7 @@ DOC-MAP（文書探索入口: 索引）
 
 ## このガイドの位置づけ
 
-本ファイルを含む `docs/guides/` は人間向け navigation 層である。規範的権限を持たず、規範的表現を含まない（ADR-0017）。REQ/ADR/SPEC と矛盾する記述がある場合は基準文書を優先する。
+本ファイルを含む `docs/guides/` は人間向け navigation 層である。規範的権限を持たず、規範的表現を含まない（ADR-0103）。REQ/ADR/SPEC と矛盾する記述がある場合は基準文書を優先する。
 
 ## 参照関係のルール
 

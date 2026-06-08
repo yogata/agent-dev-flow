@@ -71,3 +71,5 @@ AgentDevFlow で使う用語の定義。
 | Skill | 判定基準・共通知識・宣言的ルールの一次参照。source は `src/opencode/skills/agentdev-*`、runtime projection は `.opencode/skills/agentdev-*` に配置 |
 | Template | Issue/PR 本文の出力構造。Skill 配下 `templates/` に配置 |
 | Script | ガードレール・検査・補助処理の実行可能ロジック。Skill 配下 `scripts/` に配置 |
+| 原本（source） | `src/opencode/` 配下の canonical な定義ファイル。AgentDevFlow 本体の command/skill/template はここに配置される |
+| 配置先（projection） | `.opencode/` 配下の runtime 配布先。self-hosting repo では junction/symlink による投影先、consumer では install script による配置先 |

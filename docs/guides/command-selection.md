@@ -28,7 +28,7 @@
 |-----------|-------------|------|
 | ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート |
 
-> これらのコマンドは repo-local（ADR-0020）であり、AgentDevFlow の consumer 配布対象外。
+> これらのコマンドは repo-local（ADR-0106）であり、AgentDevFlow の consumer 配布対象外。
 
 ## 使い方
 

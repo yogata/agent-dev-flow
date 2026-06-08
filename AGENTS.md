@@ -14,7 +14,7 @@ Repository guardrails for agents editing AgentDevFlow. Keep this file short: it 
 
 When documents disagree, prefer sources in this order:
 
-1. Active REQ: `docs/requirements/REQ-0101.md` through `docs/requirements/REQ-0114.md`.
+1. Active REQ: `docs/requirements/REQ-0101.md` through `docs/requirements/REQ-0116.md`.
 2. ADR: `docs/adr/ADR-*.md` for accepted architecture decisions.
 3. Specs: `docs/specs/*.md` for current system behavior and format rules.
 4. Guides and indexes: `docs/guides/*.md`, `docs/DOC-MAP.md`, and README files for navigation and operator-facing explanation.
