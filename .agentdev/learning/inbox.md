@@ -56,3 +56,9 @@
 - **想定反映先**: agentdev-git-worktree/references/worktree-operations.md の削除手順セクション
 - **関連**: .worktrees/683-feature, PR #687, Issue #683
 - **タグ**: `#worktree` `#windows` `#junction` `#cleanup`
+
+### L-20260608-02: 配布境界品質の固定参照除去パターン
+
+- **文脈**: Issue #695 (配布境界品質改善)。37ファイルから REQ-ID/ADR-ID/src/opencode/repo-local 参照を除去
+- **学び**: 配布物からの固定参照除去では3つの除外カテゴリを明確に区別する必要がある: (a) code block 内の検出パターン例示 (b) 検査ルール自体の記述（NG例・チェックリスト・教育用対照表） (c) frontmatter tags。(b) の判定が最も難しく、command-authoring の source/projection 対応表は教育目的で src/opencode/ を含むが、これは検出ルールの除外対象として扱うのが適切。形式例示（ADR-0111の次→ADR-0112 等）は汎用プレースホルダー（ADR-NNNN）に置換することで、教育価値を維持しつつ固定参照を除去できる
+- **適用範囲**: 今後の配布物クリーンアップ、docs-check 検出ルールの設計、教育コンテンツと固定参照の境界判断
