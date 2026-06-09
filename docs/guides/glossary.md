@@ -61,7 +61,7 @@ AgentDevFlow で使う用語の定義。
 | Epic | 大規模 Issue を複数の子 Issue に分割した親 Issue |
 | Wave | Epic Orchestrator が子 Issue を並列実行する単位 |
 | Epic 自動クローズ | 全子 Issue 完了時に親 Epic を自動的にクローズする仕組み |
-| ステータス追跡テーブル | Epic 本文内の子 Issue 進捗管理表（未着手/進行中/完了/対処不要/スキップ） |
+| ステータス追跡テーブル | Epic 本文内の子 Issue 進捗管理表（未着手/進行中/完了/対処不要/スキップ）。⏭スキップ は前提条件未達等で Orchestrator が設定する終了状態（REQ-0106-030） |
 
 ## ツール・スキル
 

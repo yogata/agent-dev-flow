@@ -91,7 +91,7 @@ PR をマージし、Issue をクローズするコマンド。
 
 ## work_type 分類
 
-Issue の work_type に基づき、経路（`/agentdev/req-save` の要否）と docs 更新範囲が変わる。
+Issue の work_type に基づき、経路（`/agentdev/req-save` の要否）が変わる。docs 更新責務は全 work_type 共通である（bugfix も含む。REQ-0104-034）。
 
 | work_type | 名称 | ラベル | REQ | ブランチ種別 |
 |-----------|------|--------|-----|-------------|

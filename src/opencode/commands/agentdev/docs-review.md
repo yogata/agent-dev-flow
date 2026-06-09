@@ -85,12 +85,15 @@ guides が navigation layer の範囲を超えていないか確認する:
 - MUST/SHALL 相当の規範を持っていないか
 - guides が REQ/SPEC の基準を代替していないか
 - 規範的内容は REQ または SPEC に委譲すべきか
+- 履歴混入（historical content mixed into current sections）を検出した場合、該当セクションの route を追加して修正を誘導する（REQ-0115-041）
 
 ### 8. DOC-MAP意味レビュー
 
 DOC-MAP が索引の範囲を超えていないか確認する:
 - 索引を超えて基準内容を代替していないか
 - 基準の実体は REQ/ADR/SPEC にあり、DOC-MAP は探索導線に徹しているか
+- summary/index 文書の内容過多（summary 本体が 100 行を超える等）を検出した場合、該当セクションの route を追加して分割を誘導する（REQ-0115-042）
+- 各エントリは 1 行（リンク + 1 行説明）に制限することが推奨される（REQ-0115-043）
 
 ### 9. REQ structure review（6観点）
 

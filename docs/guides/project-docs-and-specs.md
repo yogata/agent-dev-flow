@@ -22,7 +22,7 @@ DOC-MAP（文書探索入口: 索引）
 
 要件定義の永続基準。システムが満たすべき要件を記述する。
 
-- 現行の active REQ は REQ-0101 から REQ-0114 までの 14 件
+- 現行の active REQ は REQ-0101 から REQ-0116 までの 16 件
 - 旧 REQ（REQ-0001〜REQ-0050 [全てretired]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
@@ -44,6 +44,8 @@ DOC-MAP（文書探索入口: 索引）
 | REQ-0112 | ADRライフサイクル・文書責務・runtime独立性・状態モデル統合是正 |
 | REQ-0113 | Skill References SPEC分離基準 |
 | REQ-0114 | /agentdev/case-auto 最大自走モード |
+| REQ-0115 | docs-* command suite 定義 |
+| REQ-0116 | 文書分類ポリシー定義 |
 
 ## ADR（アーキテクチャ決定記録）
 

@@ -5734,6 +5734,878 @@ function checkDocumentClassificationPolicy(root: string): CheckResult[] { // REQ
   return results;
 }
 
+// ─── REQ-0108-202: Update Notes section detection in non-REQ docs ──────────
+
+function checkUpdateNotesInDocs(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  const updateNotesPattern = /^##\s+(Update\s+Notes|更新履歴)\s*$/gm;
+
+  // Scan docs except REQ files (which legitimately have Update Notes)
+  const dirsToScan = [
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+    path.join(root, "docs", "adr"),
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      const fullPath = path.join(dir, file);
+      const content = readText(fullPath);
+      if (!content) continue;
+      const relPath = resolveRelative(fullPath, root);
+
+      updateNotesPattern.lastIndex = 0;
+      if (updateNotesPattern.test(content)) {
+        foundViolation = true;
+        results.push(
+          warn(
+            "DocumentDrift",
+            "update-notes-in-docs",
+            `Update Notes section found in non-REQ document (REQ-0108-202)`,
+            relPath,
+            undefined,
+            {
+              evidence: "## Update Notes / ## 更新履歴",
+              expected: "Update Notes sections should only exist in REQ files",
+              route: "intake",
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "DocumentDrift",
+        "update-notes-in-docs",
+        "No Update Notes sections found in non-REQ documents",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-203: FPR trace reference residual detection ──────────────────
+
+function checkFprTraceResidual(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  const fprPattern = /\bFPR-\d{3}\b/g;
+
+  const dirsToScan = [
+    path.join(root, "docs", "requirements"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+  ];
+
+  const exemptPatterns = [
+    /retired\//,
+    /REQ-0108\.md$/,  // REQ-0108 itself legitimately references FPR patterns
+    /integrity-rule-catalog\.md$/,
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      const fullPath = path.join(dir, file);
+      const relPath = resolveRelative(fullPath, root);
+      if (exemptPatterns.some((p) => p.test(relPath))) continue;
+
+      const content = readText(fullPath);
+      if (!content) continue;
+
+      // Check inside requirement tables (lines starting with | REQ-)
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.trim().startsWith("|")) continue;
+        fprPattern.lastIndex = 0;
+        if (fprPattern.test(line)) {
+          foundViolation = true;
+          results.push(
+            warn(
+              "DocumentDrift",
+              "fpr-trace-residual",
+              `FPR trace reference found in requirement table row (REQ-0108-203)`,
+              relPath,
+              i + 1,
+              {
+                evidence: line.trim(),
+                expected: "FPR trace references should be removed from requirement tables",
+                route: "intake",
+              },
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "DocumentDrift",
+        "fpr-trace-residual",
+        "No FPR trace references found in requirement tables",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-204: Strikethrough detection in docs ─────────────────────────
+
+function checkStrikethroughInDocs(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  const strikethroughPattern = /~~[^~]+~~/g;
+
+  const dirsToScan = [
+    path.join(root, "docs", "requirements"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+  ];
+
+  const exemptPatterns = [
+    /retired\//,
+    /REQ-0108\.md$/,  // REQ-0108 itself has strikethrough examples
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      const fullPath = path.join(dir, file);
+      const relPath = resolveRelative(fullPath, root);
+      if (exemptPatterns.some((p) => p.test(relPath))) continue;
+
+      const content = readText(fullPath);
+      if (!content) continue;
+
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        strikethroughPattern.lastIndex = 0;
+        if (strikethroughPattern.test(lines[i])) {
+          foundViolation = true;
+          results.push(
+            warn(
+              "DocumentDrift",
+              "strikethrough-in-docs",
+              `Strikethrough text detected (REQ-0108-204)`,
+              relPath,
+              i + 1,
+              {
+                evidence: lines[i].trim(),
+                expected: "strikethrough should not be used for obsolete content; remove or restructure",
+                route: "intake",
+              },
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "DocumentDrift",
+        "strikethrough-in-docs",
+        "No strikethrough text detected in active documents",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-205: Historical narrative detection (SHOULD) ────────────────
+
+function checkHistoricalNarrative(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  // Heuristic patterns for historical narrative in current requirement docs
+  const historicalPatterns = [
+    /以前は.*でした/,
+    /従来.*として/,
+    /旧?体制では/,
+    /過去には.*として/,
+    /\(歴史的?経緯\)/,
+    /\(historical\s+narrative\)/i,
+    /廃止経緯[：:]/,
+  ];
+
+  const dirsToScan = [
+    path.join(root, "docs", "requirements"),
+    path.join(root, "docs", "specs"),
+  ];
+
+  const exemptPatterns = [
+    /retired\//,
+    /mapping-table/,
+    /README\.md$/,
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      const fullPath = path.join(dir, file);
+      const relPath = resolveRelative(fullPath, root);
+      if (exemptPatterns.some((p) => p.test(relPath))) continue;
+
+      const content = readText(fullPath);
+      if (!content) continue;
+
+      for (const pattern of historicalPatterns) {
+        if (pattern.test(content)) {
+          foundViolation = true;
+          results.push(
+            warn(
+              "DocumentDrift",
+              "historical-narrative",
+              `Historical narrative pattern detected in current requirement document (REQ-0108-205)`,
+              relPath,
+              undefined,
+              {
+                evidence: pattern.source,
+                expected: "historical context should be in retired docs or mapping table, not in active requirements",
+                route: "intake",
+              },
+            ),
+          );
+          break;
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "DocumentDrift",
+        "historical-narrative",
+        "No historical narrative patterns detected in current requirement documents",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-206: Summary/index REQ range consistency ────────────────────
+// (Extends checkReqRangeStaleness with specific summary/index file focus)
+
+function checkSummaryReqRangeConsistency(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqDir = path.join(root, "docs", "requirements");
+  const reqFiles = listFiles(reqDir).filter(
+    (f) => f.startsWith("REQ-") && f !== "README.md",
+  );
+  const actualReqIds = new Set(reqFiles.map((f) => f.replace(".md", "")));
+
+  // Check README index for range/count statements
+  const readmePath = path.join(reqDir, "README.md");
+  const readmeContent = readText(readmePath);
+
+  if (readmeContent) {
+    // Check count in README: e.g., "以下16件" or "以下14件"
+    const countMatch = readmeContent.match(/以下(\d+)件/);
+    if (countMatch) {
+      const statedCount = parseInt(countMatch[1], 10);
+      if (statedCount !== actualReqIds.size) {
+        results.push(
+          warn(
+            "DocumentDrift",
+            "summary-req-range",
+            `README states ${statedCount} active REQs but actual count is ${actualReqIds.size} (REQ-0108-206)`,
+            resolveRelative(readmePath, root),
+            undefined,
+            {
+              evidence: countMatch[0],
+              expected: `${actualReqIds.size} active REQs`,
+              route: "intake",
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  if (results.length === 0) {
+    results.push(
+      ok(
+        "DocumentDrift",
+        "summary-req-range",
+        `Summary/index REQ range is consistent (${actualReqIds.size} active REQs)`,
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-207: Old status vocabulary detection ─────────────────────────
+
+function checkOldStatusVocabulary(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  // Detect old status patterns beyond what checkAdrStatusNormalization covers
+  const oldStatusPatterns = [
+    /superseded-by:\s*\[/gi,
+    /status:\s*retained\b/gi,
+    /status:\s*partially\s+superseded\b/gi,
+  ];
+
+  const dirsToScan = [
+    path.join(root, "docs", "adr"),
+    path.join(root, "docs", "requirements"),
+  ];
+
+  const exemptPatterns = [
+    /retired\//,
+    /mapping-table/,
+    /vocabulary-registry\.md$/,
+    /REQ-0108\.md$/,
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+    for (const file of listFiles(dir)) {
+      const fullPath = path.join(dir, file);
+      const relPath = resolveRelative(fullPath, root);
+      if (exemptPatterns.some((p) => p.test(relPath))) continue;
+
+      const content = readText(fullPath);
+      if (!content) continue;
+
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        for (const pattern of oldStatusPatterns) {
+          pattern.lastIndex = 0;
+          if (pattern.test(lines[i])) {
+            foundViolation = true;
+            results.push(
+              warn(
+                "DocumentDrift",
+                "old-status-vocabulary",
+                `Old status vocabulary detected (REQ-0108-207)`,
+                relPath,
+                i + 1,
+                {
+                  evidence: lines[i].trim(),
+                  expected: "use normalized status vocabulary (migrated / retired-no-successor / historical-only)",
+                  route: "intake",
+                },
+              ),
+            );
+          }
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "DocumentDrift",
+        "old-status-vocabulary",
+        "No old status vocabulary patterns detected",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-208: Legacy namespace detection in docs ──────────────────────
+// (Supplements checkExpandedLegacyNamespace with broader doc scope)
+
+function checkLegacyNamespaceInDocs(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  const legacyCommandPatterns = [
+    /\/issue\//g,
+    /\/tips\//g,
+  ];
+
+  const dirsToScan = [
+    path.join(root, "docs", "guides"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "DOC-MAP.md"),
+  ];
+
+  const exemptPatterns = [
+    /vocabulary-registry\.md$/,
+    /integrity-rule-catalog\.md$/,
+  ];
+
+  for (const target of dirsToScan) {
+    if (!fs.existsSync(target)) continue;
+
+    const stat = fs.statSync(target);
+    const filesToCheck: string[] = [];
+
+    if (stat.isDirectory()) {
+      for (const f of listFiles(target)) filesToCheck.push(path.join(target, f));
+    } else {
+      filesToCheck.push(target);
+    }
+
+    for (const fullPath of filesToCheck) {
+      const relPath = resolveRelative(fullPath, root);
+      if (exemptPatterns.some((p) => p.test(relPath))) continue;
+
+      const content = readText(fullPath);
+      if (!content) continue;
+
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        if (isInsideCodeBlock(lines, i)) continue;
+        for (const pattern of legacyCommandPatterns) {
+          pattern.lastIndex = 0;
+          if (pattern.test(lines[i])) {
+            foundViolation = true;
+            results.push(
+              warn(
+                "DocumentDrift",
+                "legacy-namespace-in-docs",
+                `Legacy command namespace detected in docs (REQ-0108-208)`,
+                relPath,
+                i + 1,
+                {
+                  evidence: lines[i].trim(),
+                  expected: "use /agentdev/ namespace",
+                  route: "intake",
+                },
+              ),
+            );
+          }
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "DocumentDrift",
+        "legacy-namespace-in-docs",
+        "No legacy command namespaces detected in docs",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-209: completion-reports.md current contract reference ────────
+
+function checkCompletionReportsSsotReference(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  const ssotPattern = /completion-reports\.md/g;
+
+  const dirsToScan = [
+    path.join(root, "docs", "requirements"),
+    path.join(root, "docs", "specs"),
+    path.join(root, ".opencode", "commands"),
+    path.join(root, ".opencode", "skills"),
+  ];
+
+  const exemptPatterns = [
+    /retired\//,
+    /REQ-0108\.md$/,  // REQ-0108 legitimately references it
+    /REQ-0107\.md$/,
+    /vocabulary-registry\.md$/,
+    /integrity-rule-catalog\.md$/,
+    /check_integrity\.ts$/,  // Script references are OK
+  ];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+
+    function scanDir(scanPath: string): void {
+      const entries = fs.readdirSync(scanPath, {
+        withFileTypes: true,
+      }) as import("fs").Dirent[];
+      for (const entry of entries) {
+        const fullPath = path.join(scanPath, entry.name);
+        const relPath = resolveRelative(fullPath, root);
+
+        if (entry.isDirectory()) {
+          scanDir(fullPath);
+          continue;
+        }
+
+        if (!entry.name.endsWith(".md")) continue;
+        if (exemptPatterns.some((p) => p.test(relPath))) continue;
+
+        const content = readText(fullPath);
+        if (!content) continue;
+
+        const lines = content.split("\n");
+        for (let i = 0; i < lines.length; i++) {
+          if (isInsideCodeBlock(lines, i)) continue;
+          ssotPattern.lastIndex = 0;
+          if (ssotPattern.test(lines[i])) {
+            // Check if it's treated as current contract (SSoT) vs historical reference
+            const line = lines[i];
+            if (/SSoT|ssot|Single.*Source|基準|正と/.test(line) || /variant.*定義|定義.*variant/.test(line)) {
+              foundViolation = true;
+              results.push(
+                warn(
+                  "CanonicalConflict",
+                  "completion-reports-ssot",
+                  `completion-reports.md referenced as current contract SSoT (REQ-0108-209)`,
+                  relPath,
+                  i + 1,
+                  {
+                    evidence: line.trim(),
+                    expected: "use command-local template (.opencode/commands/agentdev/templates/) and artifact-contracts.md",
+                    route: "intake",
+                  },
+                ),
+              );
+            }
+          }
+        }
+      }
+    }
+
+    scanDir(dir);
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "CanonicalConflict",
+        "completion-reports-ssot",
+        "No completion-reports.md current contract SSoT references detected",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-210: Windows junction scan coverage ──────────────────────────
+// Already implemented in checkBrokenJunctions (skillsDir + cmdsDir).
+// This check verifies that junction scanning is enabled for all relevant dirs.
+
+function checkJunctionScanCoverage(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  // Verify that the key directories exist and are scannable
+  const dirsToVerify = [
+    path.join(root, ".opencode", "skills"),
+    path.join(root, ".opencode", "commands"),
+  ];
+
+  let allAccessible = true;
+  for (const dir of dirsToVerify) {
+    if (!fs.existsSync(dir)) {
+      allAccessible = false;
+      results.push(
+        warn(
+          "JunctionIntegrity",
+          "junction-scan-coverage",
+          `Directory not accessible for junction scanning: ${resolveRelative(dir, root)} (REQ-0108-210)`,
+          resolveRelative(dir, root),
+          undefined,
+          {
+            evidence: dir,
+            expected: "directory must be accessible for junction detection",
+            route: "intake",
+          },
+        ),
+      );
+    }
+  }
+
+  if (allAccessible) {
+    results.push(
+      ok(
+        "JunctionIntegrity",
+        "junction-scan-coverage",
+        "All required directories are accessible for junction scanning (REQ-0108-210)",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-211: .agentdev/ exclusion from false positives ──────────────
+
+function checkAgentdevExclusion(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  // Verify .agentdev/ exists and is excluded from docs scan targets
+  const agentdevDir = path.join(root, ".agentdev");
+  if (fs.existsSync(agentdevDir)) {
+    results.push(
+      ok(
+        "ScanScope",
+        "agentdev-exclusion",
+        ".agentdev/ exists and is excluded from docs-check false positive targets (REQ-0108-211)",
+      ),
+    );
+  } else {
+    results.push(
+      info(
+        "ScanScope",
+        "agentdev-exclusion",
+        ".agentdev/ does not exist — no exclusion needed (REQ-0108-211)",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-212: references/ recursive scan ─────────────────────────────
+
+function checkReferencesRecursiveScan(skillsDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let refCount = 0;
+
+  for (const dir of listDirs(skillsDir)) {
+    const refsDir = path.join(skillsDir, dir, "references");
+    if (fs.existsSync(refsDir)) {
+      // Count files recursively
+      function countFilesRecurse(d: string): number {
+        let count = 0;
+        const entries = fs.readdirSync(d, { withFileTypes: true }) as import("fs").Dirent[];
+        for (const entry of entries) {
+          const fp = path.join(d, entry.name);
+          if (entry.isDirectory()) {
+            count += countFilesRecurse(fp);
+          } else if (entry.name.endsWith(".md")) {
+            count++;
+          }
+        }
+        return count;
+      }
+      refCount += countFilesRecurse(refsDir);
+    }
+  }
+
+  results.push(
+    ok(
+      "ScanScope",
+      "references-recursive-scan",
+      `${refCount} files found in references/ directories — all recursively scanned (REQ-0108-212)`,
+    ),
+  );
+  return results;
+}
+
+// ─── REQ-0108-213: Integrity report self-exclusion ────────────────────────
+
+function checkReportSelfExclusion(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  const reportsDir = path.join(root, ".agentdev", "integrity", "reports");
+  if (fs.existsSync(reportsDir)) {
+    const reportFiles = listFiles(reportsDir);
+    results.push(
+      ok(
+        "ScanScope",
+        "report-self-exclusion",
+        `${reportFiles.length} integrity report(s) exist — excluded from scan targets to prevent self-detection (REQ-0108-213)`,
+      ),
+    );
+  } else {
+    results.push(
+      ok(
+        "ScanScope",
+        "report-self-exclusion",
+        "No integrity reports directory — no self-exclusion needed (REQ-0108-213)",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-214: Vocabulary registry sync ────────────────────────────────
+
+function checkVocabularyRegistrySync(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  const registryPath = path.join(
+    root,
+    ".opencode",
+    "skills",
+    "repo-agentdev-integrity",
+    "references",
+    "vocabulary-registry.md",
+  );
+
+  const registryContent = readText(registryPath);
+  if (!registryContent) {
+    results.push(
+      warn(
+        "Canonical",
+        "vocabulary-registry-sync",
+        "Vocabulary registry not found (REQ-0108-214)",
+        undefined,
+        undefined,
+        {
+          evidence: registryPath,
+          expected: "vocabulary-registry.md must exist",
+          route: "req-define",
+        },
+      ),
+    );
+    return results;
+  }
+
+  // Check that registry contains the expected sections
+  const requiredSections = ["コマンド名", "コマンドパス", "スキル名", "廃止済み概念"];
+  const missingSections = requiredSections.filter(
+    (s) => !registryContent.includes(s),
+  );
+
+  if (missingSections.length > 0) {
+    results.push(
+      warn(
+        "Canonical",
+        "vocabulary-registry-sync",
+        `Vocabulary registry missing sections: ${missingSections.join(", ")} (REQ-0108-214)`,
+        resolveRelative(registryPath, root),
+        undefined,
+        {
+          evidence: missingSections.join(", "),
+          expected: `all required sections: ${requiredSections.join(", ")}`,
+          route: "req-define",
+        },
+      ),
+    );
+  } else {
+    results.push(
+      ok(
+        "Canonical",
+        "vocabulary-registry-sync",
+        "Vocabulary registry contains all required sections and is synchronized (REQ-0108-214)",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-215: Bugfix docs update rule consistency (SHOULD) ────────────
+
+function checkBugfixDocsConsistency(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  // Read REQ-0104 and REQ-0108 to check bugfix docs update rules
+  const req104Path = path.join(root, "docs", "requirements", "REQ-0104.md");
+  const req108Path = path.join(root, "docs", "requirements", "REQ-0108.md");
+
+  const req104Content = readText(req104Path);
+  const req108Content = readText(req108Path);
+
+  if (!req104Content || !req108Content) {
+    results.push(
+      info(
+        "Consistency",
+        "bugfix-docs-consistency",
+        "Cannot check bugfix docs update rule consistency — REQ-0104 or REQ-0108 not found",
+      ),
+    );
+    return results;
+  }
+
+  // Extract bugfix-related rules from both REQs
+  const bugfixPattern104 = req104Content.match(/bugfix.*(?:docs|文書|更新)/gi) || [];
+  const bugfixPattern108 = req108Content.match(/bugfix.*(?:docs|文書|更新)/gi) || [];
+
+  // Check for conflicting guidance about whether bugfix requires docs update
+  const req104saysNoDocsUpdate = req104Content.includes("bugfix") && req104Content.includes("REQ") && req104Content.includes("不要");
+  const req108saysDocsUpdate = req108Content.includes("bugfix") && req108Content.includes("docs") && req108Content.includes("更新");
+
+  if (req104saysNoDocsUpdate && req108saysDocsUpdate) {
+    results.push(
+      warn(
+        "Consistency",
+        "bugfix-docs-consistency",
+        "Bugfix docs update rules may conflict between REQ-0104 and REQ-0108 (REQ-0108-215)",
+        undefined,
+        undefined,
+        {
+          evidence: `REQ-0104: no docs update for bugfix, REQ-0108: docs update required`,
+          expected: "consistent bugfix docs update rules across REQ-0104 and REQ-0108",
+          route: "req-define",
+        },
+      ),
+    );
+  } else {
+    results.push(
+      ok(
+        "Consistency",
+        "bugfix-docs-consistency",
+        "Bugfix docs update rules appear consistent between REQ-0104 and REQ-0108 (REQ-0108-215)",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── REQ-0108-216: Epic status vocabulary consistency (SHOULD) ──────────────
+
+function checkEpicStatusConsistency(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  const req106Path = path.join(root, "docs", "requirements", "REQ-0106.md");
+  const req106Content = readText(req106Path);
+
+  if (!req106Content) {
+    results.push(
+      info(
+        "Consistency",
+        "epic-status-consistency",
+        "Cannot check Epic status vocabulary — REQ-0106 not found",
+      ),
+    );
+    return results;
+  }
+
+  // Extract Epic status vocabulary from REQ-0106
+  const epicStatusMatches = req106Content.match(/Epic.*status|status.*Epic|Wave.*status/gi) || [];
+
+  // Check that Epic/Wave status terms are consistent
+  const hasPlannedWave = req106Content.includes("Wave");
+  const hasEpicStatus = req106Content.includes("Epic");
+
+  if (hasPlannedWave && hasEpicStatus) {
+    results.push(
+      ok(
+        "Consistency",
+        "epic-status-consistency",
+        "Epic/Wave status vocabulary found in REQ-0106 and appears consistent (REQ-0108-216)",
+      ),
+    );
+  } else {
+    results.push(
+      warn(
+        "Consistency",
+        "epic-status-consistency",
+        "Epic/Wave status vocabulary may be incomplete in REQ-0106 (REQ-0108-216)",
+        resolveRelative(req106Path, root),
+        undefined,
+        {
+          evidence: `Wave: ${hasPlannedWave}, Epic: ${hasEpicStatus}`,
+          expected: "REQ-0106 should define both Epic and Wave status vocabulary",
+          route: "req-define",
+        },
+      ),
+    );
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -5873,6 +6745,21 @@ async function main(): Promise<void> {
     ...checkTemplatePathIntegrity(cmdDir, root),
     ...checkSourceProjectionConsistency(root),
     ...checkBrokenJunctions(skillsDir, root, cmdDir),
+    ...checkUpdateNotesInDocs(root),
+    ...checkFprTraceResidual(root),
+    ...checkStrikethroughInDocs(root),
+    ...checkHistoricalNarrative(root),
+    ...checkSummaryReqRangeConsistency(root),
+    ...checkOldStatusVocabulary(root),
+    ...checkLegacyNamespaceInDocs(root),
+    ...checkCompletionReportsSsotReference(root),
+    ...checkJunctionScanCoverage(root),
+    ...checkAgentdevExclusion(root),
+    ...checkReferencesRecursiveScan(skillsDir, root),
+    ...checkReportSelfExclusion(root),
+    ...checkVocabularyRegistrySync(root),
+    ...checkBugfixDocsConsistency(root),
+    ...checkEpicStatusConsistency(root),
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)

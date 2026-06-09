@@ -8,7 +8,7 @@
 
 Issue の種別に応じて異なるワークフローを適用する。work_type と scale の組み合わせで workflow_route を導出する（REQ-0104）。
 
-**bugfix** は既存機能の不具合修正であり、要件定義書（REQ）の作成を不要とする。バグ修正は観察可能な事実（再現手順・期待動作・実際動作）に基づいて完結するため、壁打ちによる要件形成が不要である。docs更新もスキップし、最小限の経路（req-define → case-open → case-run → case-close）で処理する。
+**bugfix** は既存機能の不具合修正であり、要件定義書（REQ）の作成を不要とする。バグ修正は観察可能な事実（再現手順・期待動作・実際動作）に基づいて完結するため、壁打ちによる要件形成が不要である。ただし影響を受ける docs（REQ/ADR/SPEC/guide）の更新は完了条件に含まれる（REQ-0104-034）。最小限の経路（req-define → case-open → case-run → case-close）で処理する。
 
 **feature** は新しい振る舞いをシステムに導入するため、WHAT（要件）とHOW（実装）の分離が不可欠である。壁打ちフェーズでの要件形成、REQ/ADRファイルの保存、specs更新など、複数の確認ポイントを経由する経路（req-define → req-save → case-open → case-run → case-close）を辿る。
 
