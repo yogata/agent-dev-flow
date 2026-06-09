@@ -18,8 +18,7 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 | `🔄 進行中` | 子Issue作業中 | `case-run` Phase A | いいえ |
 | `✅ 完了 ([PR#N](URL))` | 子Issue完了 | `case-close` Step 8 | はい |
 | `❌ 対処不要` | 対処不要（手動設定） | ユーザー手動 | はい |
-| `⏭ スキップ` | Epic Orchestrator が後続Wave制御でスキップした子Issue。手動操作では使用不可（Orchestratorのみ設定可能） | Epic Orchestrator Wave完了時 | はい |
-| `⏭ スキップ` | Orchestratorによるスキップ（手動設定不可） | Epic Orchestrator（Wave完了時） | はい |
+| `⏭ スキップ` | 前提条件未達・依存関係未充足等で Orchestrator がスキップした子Issue。手動操作では使用不可（Orchestratorのみ設定可能） | Epic Orchestrator（Wave完了時） | はい |
 
 ## 親Epic検出
 
