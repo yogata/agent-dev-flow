@@ -1,48 +1,48 @@
 # AGENTS.md
 
-Repository guardrails for agents editing AgentDevFlow. Keep this file short: it should contain only rules that are useful on nearly every change. Put detailed workflows in active REQ, ADR, specs, guides, skills, templates, or scripts.
+AgentDevFlow を編集するエージェント向けのリポジトリガードレール。このファイルは簡潔に保つこと。ほぼすべての変更で有用なルールのみを記載する。詳細なワークフローはアクティブな REQ、ADR、スペック、ガイド、スキル、テンプレート、またはスクリプトに置くこと。
 
-## Project identity
+## プロジェクト識別
 
-- This repository manages the AgentDevFlow plugin.
-- Public commands use the `/agentdev/*` namespace; source lives under `src/opencode/commands/agentdev/`, runtime projection at `.opencode/commands/agentdev/`.
-- AgentDevFlow skills use the `agentdev-*` prefix; source lives under `src/opencode/skills/`, runtime projection at `.opencode/skills/`.
-- Persistent AgentDevFlow domain state lives under `.agentdev/`.
-- Do not reintroduce legacy `/issue/*`, `/tips/*`, `issue-*`, or `tips-*` names unless an active REQ or ADR explicitly requires a compatibility note.
+- 本リポジトリは AgentDevFlow プラグインを管理する。
+- 公開コマンドは `/agentdev/*` 名前空間を使用する。ソースは `src/opencode/commands/agentdev/`、ランタイム投射先は `.opencode/commands/agentdev/`。
+- AgentDevFlow スキルは `agentdev-*` プレフィックスを使用する。ソースは `src/opencode/skills/`、ランタイム投射先は `.opencode/skills/`。
+- 永続的な AgentDevFlow ドメイン状態は `.agentdev/` に格納する。
+- アクティブな REQ または ADR が互換性ノートを明示的に要求する場合を除き、レガシーの `/issue/*`、`/tips/*`、`issue-*`、`tips-*` という名前を再導入しないこと。
 
-## Source-of-truth priority
+## 信頼できる情報源の優先順位
 
-When documents disagree, prefer sources in this order:
+文書間で矛盾がある場合、以下の順序で優先する:
 
-1. Active REQ: `docs/requirements/REQ-0101.md` through `docs/requirements/REQ-0116.md`.
-2. ADR: `docs/adr/ADR-*.md` for accepted architecture decisions.
-3. Specs: `docs/specs/*.md` for current system behavior and format rules.
-4. Guides and indexes: `docs/guides/*.md`, `docs/DOC-MAP.md`, and README files for navigation and operator-facing explanation.
-5. Retired REQ: `docs/requirements/retired/REQ-*.md` and `docs/requirements/mapping-table.md` for history only.
+1. アクティブな REQ: `docs/requirements/REQ-0101.md` ～ `docs/requirements/REQ-0116.md`。
+2. ADR: 承認済みのアーキテクチャ決定については `docs/adr/ADR-*.md`。
+3. スペック: 現在のシステム動作とフォーマットルールについては `docs/specs/*.md`。
+4. ガイドとインデックス: ナビゲーションとオペレーター向け説明については `docs/guides/*.md`、`docs/DOC-MAP.md`、および README ファイル。
+5. リタイア済み REQ: 履歴目的のみで `docs/requirements/retired/REQ-*.md` および `docs/requirements/mapping-table.md`。
 
-Do not cite retired REQ as current authority. If a retired REQ is mentioned in non-retired material, mark it clearly as historical or point to the active successor.
+リタイア済み REQ を現在の権威として引用しないこと。リタイア済み REQ が非リタイア資料で言及されている場合、履歴であることを明記するか、アクティブな後継者を指すこと。
 
-## Artifact boundaries
+## アーティファクトの境界
 
-- `.agentdev/` is canonical persistent domain state for intake, learning, backlog RU, and integrity artifacts.
-- `.sisyphus/` is runtime workspace. Do not treat it as current AgentDevFlow domain state or a current REQ source of truth.
-- `.sisyphus/drafts/` may be used only where an active command workflow explicitly defines a working draft handoff.
-- Skill support material uses `references/` as the canonical directory. Treat `reference/` as obsolete unless documenting migration history.
-- Do not move artifacts across `.agentdev/`, `.sisyphus/`, `docs/`, commands, or skills unless the relevant active REQ, ADR, or command workflow requires it.
+- `.agentdev/` はインテーク、ラーニング、バックログ RU、インテグリティアーティファクトの正となる永続ドメイン状態である。
+- `.sisyphus/` はランタイムワークスペースである。現在の AgentDevFlow ドメイン状態や現在の REQ の信頼できる情報源として扱わないこと。
+- `.sisyphus/drafts/` は、アクティブなコマンドワークフローが明示的に作業ドラフトの引き渡しを定義している場合にのみ使用する。
+- スキルのサポート資料は `references/` を正となるディレクトリとする。`reference/` は移行履歴の文書化を除き、廃止扱いとする。
+- 関連するアクティブな REQ、ADR、またはコマンドワークフローが要求する場合を除き、`.agentdev/`、`.sisyphus/`、`docs/`、コマンド、スキル間でアーティファクトを移動させないこと。
 
-## Editing guardrails
+## 編集ガードレール
 
-- Keep commands thin: public API, inputs, outputs, guardrails, and high-level steps only.
-- Put reusable judgment in skills, long detail in skill `references/`, fixed wording in templates, and deterministic checks in scripts.
-- When editing commands, keep frontmatter such as `agent`, `implementation_pattern`, and `load_skills` aligned with the command's responsibility.
-- When adding or moving canonical documents, update the relevant index, DOC-MAP, links, and cross-references in the same change.
-- After documentation edits, check for broken relative links, stale REQ ranges, legacy command names, and `reference/` vs `references/` drift.
-- Prefer existing lifecycle states, directory names, and terminology. Do not invent new workflow states unless the change is backed by a new or updated requirement.
+- コマンドは薄く保つこと: 公開 API、入力、出力、ガードレール、高レベルのステップのみ。
+- 再利用可能な判断はスキルに、長い詳細はスキルの `references/` に、固定文言はテンプレートに、決定的なチェックはスクリプトに置くこと。
+- コマンドを編集する際、`agent`、`implementation_pattern`、`load_skills` などのフロントマターをコマンドの責務に合わせて維持すること。
+- 正となる文書を追加または移動する際、同じ変更で関連するインデックス、DOC-MAP、リンク、相互参照を更新すること。
+- ドキュメント編集後、壊れた相対リンク、古い REQ 範囲、レガシーコマンド名、`reference/` と `references/` の drift をチェックすること。
+- 既存のライフサイクル状態、ディレクトリ名、用語を優先すること。新しい要件または更新された要件に裏付けられた場合を除き、新しいワークフロー状態を発明しないこと。
 
-## Working style
+## ワーキングスタイル
 
-- Make surgical changes that directly trace to the requested task.
-- Match existing style before introducing new structure.
-- Avoid adjacent refactors and speculative cleanup.
-- State important assumptions when the task is ambiguous.
-- For multi-step changes, use a brief plan and verify the result with the narrowest useful check.
+- 要求されたタスクに直接トレース可能な外科的な変更を行うこと。
+- 新しい構造を導入する前に既存のスタイルに合わせること。
+- 隣接するリファクタリングや推測によるクリーンアップを避けること。
+- タスクが曖昧な場合、重要な仮定を明記すること。
+- マルチステップの変更では、簡潔な計画を立て、最も狭い有用なチェックで結果を検証すること。
