@@ -6606,6 +6606,187 @@ function checkEpicStatusConsistency(root: string): CheckResult[] {
   return results;
 }
 
+// ─── Capture boundary checks (REQ-0105) ─────────────────────────────────
+
+function checkCaptureBoundaryReference(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const runtimePath = path.join(
+    root,
+    "src",
+    "opencode",
+    "skills",
+    "agentdev-workflow-orchestration",
+    "references",
+    "capture-boundaries.md",
+  );
+  const resolved = resolvePathWithFallback(runtimePath);
+
+  if (fs.existsSync(resolved)) {
+    results.push(
+      ok(
+        "CaptureBoundary",
+        "capture-boundaries-existence",
+        "capture-boundaries.md exists at canonical location",
+      ),
+    );
+  } else {
+    results.push(
+      ng(
+        "CaptureBoundary",
+        "capture-boundaries-existence",
+        `capture-boundaries.md not found (resolved: ${resolveRelative(resolved, root)})`,
+      ),
+    );
+  }
+  return results;
+}
+
+function checkPrTemplateCaptureSection(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const runtimePath = path.join(
+    root,
+    ".opencode",
+    "skills",
+    "agentdev-workflow-templates",
+    "templates",
+    "pr_desc.md",
+  );
+  const resolved = resolvePathWithFallback(runtimePath);
+  const content = readText(resolved);
+
+  if (!content) {
+    results.push(
+      ng(
+        "CaptureBoundary",
+        "pr-template-capture-section",
+        `pr_desc.md not found (resolved: ${resolveRelative(resolved, root)})`,
+      ),
+    );
+    return results;
+  }
+
+  if (content.includes("## Findings / Intake候補")) {
+    results.push(
+      ng(
+        "CaptureBoundary",
+        "pr-template-capture-section",
+        `pr_desc.md contains old section name '## Findings / Intake候補' (should be '## Findings / Capture候補')`,
+        resolveRelative(resolved, root),
+      ),
+    );
+    return results;
+  }
+
+  if (!content.includes("## Findings / Capture候選") && !content.includes("## Findings / Capture候補")) {
+    results.push(
+      ng(
+        "CaptureBoundary",
+        "pr-template-capture-section",
+        `pr_desc.md missing required section '## Findings / Capture候補'`,
+        resolveRelative(resolved, root),
+      ),
+    );
+    return results;
+  }
+
+  const missingSubsections: string[] = [];
+  if (!content.includes("### intake")) {
+    missingSubsections.push("### intake");
+  }
+  if (!content.includes("### learning")) {
+    missingSubsections.push("### learning");
+  }
+
+  if (missingSubsections.length > 0) {
+    results.push(
+      ng(
+        "CaptureBoundary",
+        "pr-template-capture-section",
+        `pr_desc.md missing subsections: ${missingSubsections.join(", ")}`,
+        resolveRelative(resolved, root),
+      ),
+    );
+  } else {
+    results.push(
+      ok(
+        "CaptureBoundary",
+        "pr-template-capture-section",
+        "pr_desc.md has correct capture section structure (## Findings / Capture候補, ### intake, ### learning)",
+      ),
+    );
+  }
+  return results;
+}
+
+function checkCommandCaptureDuties(cmdDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const duties: Record<string, { dutyKeyword: string; dutyLabel: string }> = {
+    "case-run.md": { dutyKeyword: "記録のみ", dutyLabel: "record only" },
+    "case-close.md": { dutyKeyword: "回収・保存", dutyLabel: "recover and save" },
+    "req-save.md": { dutyKeyword: "原則非関与", dutyLabel: "principle: non-involvement" },
+    "case-open.md": { dutyKeyword: "非関与", dutyLabel: "non-involvement" },
+    "case-auto.md": { dutyKeyword: "委譲", dutyLabel: "delegation" },
+  };
+
+  for (const [filename, { dutyKeyword, dutyLabel }] of Object.entries(duties)) {
+    const fullPath = path.join(cmdDir, filename);
+    const content = readText(fullPath);
+
+    if (!content) {
+      results.push(
+        ng(
+          "CaptureBoundary",
+          "command-capture-duty",
+          `${filename} not found in command directory`,
+          resolveRelative(fullPath, root),
+        ),
+      );
+      continue;
+    }
+
+    const hasCaptureRef = content.includes("capture-boundaries");
+    const hasDutyKeyword = content.includes(dutyKeyword);
+
+    if (!hasCaptureRef && !hasDutyKeyword) {
+      results.push(
+        ng(
+          "CaptureBoundary",
+          "command-capture-duty",
+          `${filename} missing both 'capture-boundaries' reference and duty keyword '${dutyKeyword}' (${dutyLabel})`,
+          resolveRelative(fullPath, root),
+        ),
+      );
+    } else if (!hasCaptureRef) {
+      results.push(
+        ng(
+          "CaptureBoundary",
+          "command-capture-duty",
+          `${filename} missing 'capture-boundaries' reference`,
+          resolveRelative(fullPath, root),
+        ),
+      );
+    } else if (!hasDutyKeyword) {
+      results.push(
+        ng(
+          "CaptureBoundary",
+          "command-capture-duty",
+          `${filename} missing duty keyword '${dutyKeyword}' (${dutyLabel})`,
+          resolveRelative(fullPath, root),
+        ),
+      );
+    } else {
+      results.push(
+        ok(
+          "CaptureBoundary",
+          "command-capture-duty",
+          `${filename} has capture-boundaries reference and duty keyword '${dutyKeyword}'`,
+        ),
+      );
+    }
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -6760,6 +6941,9 @@ async function main(): Promise<void> {
     ...checkVocabularyRegistrySync(root),
     ...checkBugfixDocsConsistency(root),
     ...checkEpicStatusConsistency(root),
+    ...checkCaptureBoundaryReference(root),
+    ...checkPrTemplateCaptureSection(root),
+    ...checkCommandCaptureDuties(cmdDir, root),
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)
