@@ -129,7 +129,7 @@ command guardrails を以下の6カテゴリに分類する:
 | Command | Allowed Changes | Forbidden |
 |---|---|---|
 | `req-define` | なし（read-only 対話） | 全ファイル書込 |
-| `req-save` | `docs/requirements/`, `docs/adr/`, `docs/DOC-MAP.md` | `.agentdev/`, `.opencode/` |
+| `req-save` | `docs/requirements/`, `docs/adr/`, `docs/DOC-MAP.md`, `.agentdev/intake/inbox/req-restructure/`（REQ再構成intakeのみ） | `.agentdev/`（req-restructure 除く）, `.opencode/` |
 | `case-open` | GitHub Issue/PR のみ | ローカルファイル |
 | `case-run` | worktree 内の全ファイル | worktree 外、`.agentdev/` |
 | `case-close` | GitHub Issue/PR, worktree 削除 | `.agentdev/intake/inbox/` 直接書込 |

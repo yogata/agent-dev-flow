@@ -72,6 +72,9 @@ agent: sisyphus
 ### 出力制約
 - G10: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 
+### Capture 整合制約
+- G17: case-auto は構成コマンド（case-run / case-close）の capture 責務境界に従う（SHALL）。case-auto 固有の capture 振る舞いは持たない。capture 境界の詳細は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照
+
 ### Runtime path 制約
 - G11: 既存コマンド定義を読み込む際、source path を runtime path に読み替えてはならない（SHALL）。コマンド定義内のパス参照は記述された通りに解釈し、source path を runtime 参照先として使用しない
 - G12: 委譲先コマンドの実行時 Read / Glob に source path 固定参照を含めない（SHALL）

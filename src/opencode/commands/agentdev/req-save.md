@@ -121,5 +121,8 @@ ADR保存の直前に、以下の妥当性を再検証すること:
 ### 出力制約
 - G10: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
 
+### Capture 非関与制約
+- G12: req-save は intake / learning capture を行わない（SHALL）。例外: REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能。capture 境界の詳細は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照
+
 ### Issue作成制約
 - G11: req-saveはIssueを作成してはならない。Issue作成はcase-openの責任範囲である

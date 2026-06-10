@@ -127,3 +127,6 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 ### 出力制約
 - G17: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+
+### Capture 非関与制約
+- G18: case-open は intake / learning capture を行わない（SHALL）。capture 境界の詳細は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照

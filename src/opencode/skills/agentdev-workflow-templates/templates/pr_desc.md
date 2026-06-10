@@ -29,8 +29,14 @@ Pull Request作成時の本文テンプレート。
 |---|---|---|---|
 | {メトリクス名} | {値} | {基準値} | ✅/❌ |
 
-## Findings / Intake候補
+## Findings / Capture候補
 <!-- 【必須】 -->
+
+### intake
+
+該当なし
+
+### learning
 
 該当なし
 

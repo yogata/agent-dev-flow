@@ -74,11 +74,13 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 9. **実行前同期**: `agentdev-git-worktree` の 実行前同期（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 1）に従い `git pull --ff-only` を実行。ローカル変更事前チェック・hash検証・不一致時は評価・承認のやり直し
 
 10. **学びの検知・抽出**: `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断:
-    - ユーザーに学びの有無を問うことは禁止
-    - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
-    - promoted artifact imported 判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
-     - Post-run intake capture: 本筋外の変更候補を intake item として `.agentdev/intake/inbox/` に保存。PR本文の `## Findings / Intake候補` セクションから回収。Epic横断回収。Split Rule（intake / learning 境界）は `agentdev-workflow-orchestration` skill を参照
-    - intake と learning を別々の成果物として扱う（SHALL）
+     - ユーザーに学びの有無を問うことは禁止（SHALL）
+     - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
+     - promoted artifact imported 判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
+     - **Capture 回収責務**: PR 本文の `## Findings / Capture候補` セクションから intake / learning を分離回収する（SHALL）。intake 候補は `.agentdev/intake/inbox/` に保存し、learning 候補は `.agentdev/learning/inbox.md` に保存する。Epic 横断回収
+     - **Capture 境界**: Split Rule（intake / learning 境界）は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照
+     - intake と learning を別々の成果物として扱う（SHALL）
+     - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数・中間ファイル等）を capture の入力として使用しない（SHALL）。capture 情報の入力源は PR 本文のみ
 
 11. **Domain state 永続化**: `agentdev-git-worktree` の domain state 永続化（`.opencode/skills/agentdev-git-worktree/references/git-common-procedures.md` Section 2）に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める（SHALL）
 

@@ -83,7 +83,7 @@ PR をマージし、Issue をクローズするコマンド。
 1. 未チェック項目の達成判定（達成済みなら `[x]` 更新）
 2. 要件・SPEC・DOC-MAP の整合性確認
 3. ADR 作成済みかの確認
-4. マージ済み PR 本文から Findings/Intake候補を回収し、intake item として保存
+4. マージ済み PR 本文から Findings/Capture候補を回収し、intake / learning に分離して保存
 
 ### Epic 自動クローズ
 
