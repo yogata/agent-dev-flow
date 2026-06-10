@@ -110,6 +110,13 @@ AGENTS.md、system.md、ガイド内の REQ 範囲表記は実際の active REQ 
 | `partially superseded` | `migrated` | mapping-table.md の正規 status |
 | `superseded` | `migrated` / `retired-no-successor` | 旧分類 |
 
+## Capture 語彙
+
+| 旧語彙 | 現行語彙 | 備考 |
+|--------|----------|------|
+| `Intake候補` | `Capture候補` | PR template セクション名変更（REQ-0105-077） |
+| `Findings / Intake候補` | `Findings / Capture候補` | PR セクション見出し（REQ-0105-077） |
+
 ## メンテナンス
 
 - 新規語彙の追加・旧語彙の変更は integrity-check の検出パターンと同期すること

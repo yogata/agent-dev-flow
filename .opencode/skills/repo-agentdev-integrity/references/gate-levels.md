@@ -45,6 +45,9 @@ integrity-check の検出結果を3水準に分類し、それぞれの意味と
 | `broken-junction` | broken junction / symlink の検出 | REQ-0108-173 |
 | `skill-category-gap` | SKILL.md カテゴリとスクリプト実装の不一致 | REQ-0108-171 |
 | `template-path-integrity` | コマンドの template 参照先不存在 | REQ-0108-165 |
+| `capture-boundaries-existence` | capture-boundaries.md 不在 | REQ-0105-075 |
+| `pr-template-capture-section` | PR template セクション名不備・旧名称残存 | REQ-0105-077 |
+| `command-capture-duty` | コマンド capture 責務記述欠落 | REQ-0105-078~082 |
 
 ## heuristic（推奨修正）
 

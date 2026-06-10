@@ -189,6 +189,64 @@ function buildValidFixture(root: string): void {
     ].join("\n"),
     "utf-8",
   );
+
+  const captureBoundaryDir = join(
+    root,
+    "src",
+    "opencode",
+    "skills",
+    "agentdev-workflow-orchestration",
+    "references",
+  );
+  mkdirp(captureBoundaryDir);
+  writeFileSync(
+    join(captureBoundaryDir, "capture-boundaries.md"),
+    "# Capture Boundaries\n\nSplit rule and command duty boundaries.\n",
+    "utf-8",
+  );
+
+  const prTemplateDir = join(
+    root,
+    ".opencode",
+    "skills",
+    "agentdev-workflow-templates",
+    "templates",
+  );
+  mkdirp(prTemplateDir);
+  writeFileSync(
+    join(prTemplateDir, "pr_desc.md"),
+    [
+      "# PR Description Template",
+      "",
+      "## Findings / Capture\u5019\u88dc",
+      "",
+      "### intake",
+      "",
+      "Intake capture items.",
+      "",
+      "### learning",
+      "",
+      "Learning capture items.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  const captureCmdDuties: Record<string, string> = {
+    "case-run.md":
+      "---\ndescription: case-run\nagent: sisyphus\n---\n\nSee capture-boundaries for duty. 記録のみ.\n",
+    "case-close.md":
+      "---\ndescription: case-close\nagent: sisyphus\n---\n\nSee capture-boundaries for duty. 回収・保存.\n",
+    "req-save.md":
+      "---\ndescription: req-save\nagent: prometheus\n---\n\nSee capture-boundaries for duty. 原則非関与.\n",
+    "case-open.md":
+      "---\ndescription: case-open\nagent: prometheus\n---\n\nSee capture-boundaries for duty. 非関与.\n",
+    "case-auto.md":
+      "---\ndescription: case-auto\nagent: sisyphus\n---\n\nSee capture-boundaries for duty. 委譲.\n",
+  };
+  for (const [fname, content] of Object.entries(captureCmdDuties)) {
+    writeFileSync(join(cmdDir, fname), content, "utf-8");
+  }
 }
 
 function buildInvalidFixture(root: string): void {
@@ -316,8 +374,42 @@ function buildInvalidFixture(root: string): void {
     ].join("\n"),
     "utf-8",
   );
-}
 
+  const prTemplateDir = join(
+    root,
+    ".opencode",
+    "skills",
+    "agentdev-workflow-templates",
+    "templates",
+  );
+  mkdirp(prTemplateDir);
+  writeFileSync(
+    join(prTemplateDir, "pr_desc.md"),
+    [
+      "# PR Description Template",
+      "",
+      "## Findings / Intake\u5019\u88dc",
+      "",
+      "Old section name.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  writeFileSync(
+    join(cmdDir, "case-run.md"),
+    [
+      "---",
+      "description: case-run",
+      "agent: sisyphus",
+      "---",
+      "",
+      "Missing capture-boundaries reference and duty keyword.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
 const VALID_ROOT = join(TEMP_ROOT, "valid");
 const INVALID_ROOT = join(TEMP_ROOT, "invalid");
 
@@ -672,5 +764,81 @@ describe("Classification Policy structural verification", () => {
         res.category === "ClassificationPolicy" && res.level === "ng",
     );
     expect(classificationNg.length).toBe(0);
+  });
+});
+
+describe("Capture boundary checks", () => {
+  it("valid fixture: capture-boundaries-existence check passes", () => {
+    const r = runScript(VALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const check = parsed.results.find(
+      (res: { check: string; category: string }) =>
+        res.category === "CaptureBoundary" &&
+        res.check === "capture-boundaries-existence",
+    );
+    expect(check).toBeDefined();
+    expect(check.level).toBe("ok");
+  });
+
+  it("valid fixture: pr-template-capture-section check passes", () => {
+    const r = runScript(VALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const check = parsed.results.find(
+      (res: { check: string; category: string }) =>
+        res.category === "CaptureBoundary" &&
+        res.check === "pr-template-capture-section",
+    );
+    expect(check).toBeDefined();
+    expect(check.level).toBe("ok");
+  });
+
+  it("valid fixture: command-capture-duty checks pass for all 5 commands", () => {
+    const r = runScript(VALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const dutyOk = parsed.results.filter(
+      (res: { check: string; category: string; level: string }) =>
+        res.category === "CaptureBoundary" &&
+        res.check === "command-capture-duty" &&
+        res.level === "ok",
+    );
+    expect(dutyOk.length).toBe(5);
+  });
+
+  it("invalid fixture: capture-boundaries-existence detects missing file", () => {
+    const r = runScript(INVALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const check = parsed.results.find(
+      (res: { check: string; category: string }) =>
+        res.category === "CaptureBoundary" &&
+        res.check === "capture-boundaries-existence",
+    );
+    expect(check).toBeDefined();
+    expect(check.level).toBe("ng");
+  });
+
+  it("invalid fixture: pr-template-capture-section detects old section name", () => {
+    const r = runScript(INVALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const check = parsed.results.find(
+      (res: { check: string; category: string }) =>
+        res.category === "CaptureBoundary" &&
+        res.check === "pr-template-capture-section",
+    );
+    expect(check).toBeDefined();
+    expect(check.level).toBe("ng");
+    expect(check.message).toContain("Intake候補");
+  });
+
+  it("invalid fixture: command-capture-duty detects missing reference", () => {
+    const r = runScript(INVALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const dutyNg = parsed.results.filter(
+      (res: { check: string; category: string; level: string; message: string }) =>
+        res.category === "CaptureBoundary" &&
+        res.check === "command-capture-duty" &&
+        res.level === "ng" &&
+        res.message.includes("case-run.md"),
+    );
+    expect(dutyNg.length).toBeGreaterThanOrEqual(1);
   });
 });
