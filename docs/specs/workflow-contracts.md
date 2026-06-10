@@ -283,28 +283,93 @@ promoted artifact → RU → REQ / Issue → RU 削除
 | Pattern | 主責務 | 許可される副作用 | 禁止される副作用 |
 |---|---|---|---|
 | **wall-session** | ユーザーとの対話セッションを通じて構造化成果物を生成 | ドラフトファイル作成、任意のアーティファクト読み取り | 既存アーティファクトの変更、git操作、外部API呼び出しによるリソース作成 |
-| **file-pipeline** | 定義されたステップに従いファイルを変換・生成 | 指定ディレクトリへのファイル作成・更新、git操作、外部API呼び出し | 大規模な状態機械の実行、サブエージェントの起動 |
+| **file-pipeline** | 定義されたステップに従いファイルを変換・生成 | 指定ディレクトリへのファイル作成・更新、git操作、外部API呼び出し、**読み取り専用サブエージェント委譲**（ADR-0112 §3） | 大規模な状態機械の実行 |
 | **manager-orchestrator** | 複数フェーズ構成の状態機械・自己修復ループ・サブエージェント | すべてのファイル操作、git操作、外部API呼び出し、サブエージェント起動 | （制限なし） |
+| **lightweight-delegation** | 読み取り専用委譲による軽量なタスク実行（ADR-0112 §2） | 読み取り専用サブエージェント起動、レポートファイルの新規作成 | 書き込み操作、git操作、外部API呼び出しによるリソース作成 |
 | **capture-only** | データを収集・記録しinboxに保存 | inboxディレクトリへの新規ファイル作成のみ、外部APIからの読み取り | レビュー・プロモート・既存ファイルの変更・削除、git操作 |
-| **read-only-diagnostic** | アーティファクトを分析しレポートを出力 | レポートファイルの新規作成、intake itemの新規作成（承認時） | 検査対象アーティファクトの変更 |
+| **read-only-diagnostic** | アーティファクトを分析しレポートを出力 | レポートファイルの新規作成、intake itemの新規作成（承認時）、**読み取り専用サブエージェント委譲**（ADR-0112 §3） | 検査対象アーティファクトの変更 |
 
 ### Command ↔ Pattern 対応
 
 | コマンド | Primary Pattern |
 |---|---|
-| `/agentdev/req-define` | wall-session |
+| `/agentdev/req-define` | wall-session + lightweight-delegation |
 | `/agentdev/req-save` | file-pipeline |
 | `/agentdev/case-open` | file-pipeline |
 | `/agentdev/case-run` | manager-orchestrator |
 | `/agentdev/case-update` | file-pipeline |
 | `/agentdev/case-close` | file-pipeline |
-| `/agentdev/learning-promote` | file-pipeline |
+| `/agentdev/learning-promote` | file-pipeline + lightweight-delegation |
 | `/agentdev/intake-capture` | capture-only |
 | `/agentdev/intake-from-github` | capture-only |
-| `/agentdev/intake-promote` | file-pipeline |
-| `/agentdev/backlog-review` | wall-session |
+| `/agentdev/intake-promote` | file-pipeline + lightweight-delegation |
+| `/agentdev/backlog-review` | wall-session + lightweight-delegation |
 | `/repo/docs-check` | read-only-diagnostic |
-| `/agentdev/docs-review` | read-only-diagnostic |
+| `/agentdev/docs-review` | read-only-diagnostic + lightweight-delegation |
+
+## General Subagent Delegation Contract
+
+ADR-0112 で定義されたサブエージェント委譲の一般概念に基づく共通契約。manager-orchestrator 以外のコマンドパターンから読み取り専用委譲を行う際のインタフェースと制約を定める。
+
+### 委譲種別（delegation_type taxonomy）
+
+ADR-0112 §5 の taxonomy に従う:
+
+| delegation_type | 用途 | 書き込み | 書き込み許可条件 |
+|---|---|---:|---|
+| `gate_check` | 完了判定・ガードレール充足確認・保存前/close前検査 | 禁止 | — |
+| `semantic_review` | 文書・差分・REQ/ADR/SPECの意味レビュー | 禁止 | — |
+| `log_analysis` | テストログ・CIログ・review結果解析 | 禁止 | — |
+| `classification` | artifact / finding / intake / learning の分類 | 禁止 | — |
+| `extraction` | 候補・論点・未回収事項の抽出 | 禁止 | — |
+| `draft_generation` | Issue本文・PR本文・report案などの草案生成 | 禁止 | — |
+| `controlled_case_execution` | case-run Epic / 複数Issue実行 | 条件付き | case-run のみ |
+
+### 委譲インタフェース
+
+共通エンベロープ + 委譲種別 typed payload + コマンド別 reference（ADR-0112 §5）:
+
+```yaml
+delegation_type: gate_check | semantic_review | log_analysis | classification | extraction | draft_generation | controlled_case_execution
+skill: agentdev-xxx          # 委譲先 skill
+reference: skill-ref-path    # 委譲先が参照する skill reference / SPEC section
+inputs:
+  - name: target_files
+    description: "検査対象ファイルパス"
+  - name: criteria_ref
+    description: "判定基準の参照先（SPEC section / REQ / ADR）"
+on_result: adopt | reject | adopt_partial  # 親コマンドの採否方針
+```
+
+### 委譲制約
+
+| 制約 | 説明 |
+|---|---|
+| 読み取り専用（書き込み禁止型） | gate_check / semantic_review / log_analysis / classification / extraction / draft_generation は対象アーティファクトを変更しない |
+| 親コマンド最終判断 | サブエージェントは判断の入力を提供し、最終決定は親コマンドが行う（ADR-0112 §4） |
+| 中間成果扱い | サブエージェント出力は中間成果であり、親コマンドは一部を採用・修正・却下できる（ADR-0112 §6） |
+| Script 優先 | 単純な決定的検査は Script 優先。非決定的処理（意味レビュー・分類・抽出等）にサブエージェント委譲を適用 |
+
+### manager-orchestrator と lightweight-delegation の分離
+
+| 項目 | manager-orchestrator | lightweight-delegation |
+|---|---|---|
+| 適用コマンド | case-run | 上記初期適用対象6コマンド（ADR-0112） |
+| 委譲規模 | 複数サブエージェント統制・Wave scheduling・障害伝播 | 単一タスク委譲 |
+| 状態管理 | 大規模な状態機械・自己修復ループ | なし（一方向の入出力） |
+| プロトコル | case-run 専用 Subagent Protocol（後述） | 本 General Subagent Delegation Contract |
+| 書き込み | すべて許可 | 原則禁止（controlled_case_execution のみ条件付き） |
+
+### 初期適用対象
+
+| コマンド | 委譲種別 | 委譲内容 |
+|---|---|---|
+| req-define | extraction / classification | 入力整理、既存文書照合、関連文書候補抽出 |
+| case-run | gate_check / semantic_review / log_analysis | 検査・解析系ステップ |
+| docs-review | semantic_review / classification | 意味レビュー、分類一貫性確認 |
+| backlog-review | classification / semantic_review / extraction | artifact分析、統合/分割、矛盾検出 |
+| learning-promote | classification / gate_check | 分類、評価、既存対策確認 |
+| intake-promote | semantic_review / classification / draft_generation | itemレビュー、分類案生成 |
 
 ## Epic Orchestrator Contract
 
@@ -382,7 +447,9 @@ scale: large の場合、Epic Orchestrator モードで実行する:
 3. PR既存 → 提出フェーズ完了
 4. 上記いずれも該当しない → 準備フェーズから開始
 
-## Subagent Protocol
+## Subagent Protocol（case-run 専用）
+
+> **注意**: 本プロトコルは case-run の manager-orchestrator パターンにおけるサブエージェント起動仕様である。一般委譲（lightweight-delegation）は前述の「General Subagent Delegation Contract」を参照。subagent-protocol.md（Skill reference）に編集安全手順・大規模ファイル分割委譲・AST-grep 運用を定める。
 
 ### 起動仕様
 
@@ -410,6 +477,21 @@ task(category="unspecified-high", load_skills=[], run_in_background=true, prompt
 ### フォールバック
 
 サブエージェントが使用できない場合、Sequential Wave（親エージェントがWave内でIssueを1件ずつ順次処理）に切り替え。
+
+## 責務分界表
+
+Command・Skill・Script・サブエージェント委譲の責務境界（ADR-0107, ADR-0112）。
+
+| 責務 | 定義場所 | 説明 |
+|---|---|---|
+| 公開API・入力・出力・ガードレール・高レベルStep | Command定義（`.opencode/commands/agentdev/*.md`） | 利用者向けのインタフェース定義 |
+| 再利用可能な判断基準・検査観点の詳細 | Skill references（`references/*.md`） | 宣言的知識。Skill本体（SKILL.md）は原則と概要のみ |
+| 委譲インタフェース（共通エンベロープ・delegation_type taxonomy・制約） | 本 SPEC（workflow-contracts.md） | 委譲の共通契約 |
+| 委譲のアーキテクチャ判断（一般概念・manager-orchestrator位置づけ・読取専用委譲許容） | ADR-0112 | 意思決定の記録 |
+| case-run 専用プロトコル（起動仕様・プロンプト構成・フォールバック） | subagent-protocol.md（Skill reference） | case-run manager-orchestrator の運用詳細 |
+| 編集安全手順・AST-grep運用・大規模ファイル分割 | subagent-protocol.md（Skill reference） | サブエージェント共通の安全手順 |
+| 委譲定義の最小構成・delegated_check・中間成果基準 | command-authoring-standards.md（Skill reference） | Command 作者向けの委譲記述標準 |
+| 決定的な変換・検証・生成 | Script（`scripts/*.js`） | テスト可能な処理 |
 
 ## Self-Healing Contract
 
