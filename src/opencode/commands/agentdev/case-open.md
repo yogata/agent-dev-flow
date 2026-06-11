@@ -19,13 +19,7 @@ agent: sisyphus
 
 0. **upstream handoff 停止判定**: 要件docまたは RU に `apply_in_current_project: false` が含まれる場合、Issue を作成せず停止。agent-dev-flow repository への手動取り込み対象として報告。判定は `agentdev-workflow-lifecycle/references/upstream-handoff.md` に従う
 
-1. 要件docからIssue本文を生成:
-   - `docs/requirements/REQ-{NNNN}.md` が存在: REQ内容（目的/要件/適用範囲）を読み取り反映。存在しない: セッション内要件docから直接生成
-   - テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_desc_feature.md` または `issue_desc_bug.md` を Read tool で読み込む
-   - **Requirement Source 転記**: REQ/要件docの `## Requirement Source` を補足情報セクション後に配置
-   - **関連ドキュメント更新候補 転記**: 同セクションを転記
-   - **直接矛盾の完了条件反映**: 関連ドキュメント更新候補の `直接矛盾` を完了条件にチェックボックス反映
-   - **テスト戦略スコープ管理**: 各テスト項目について単一PR内完結か判定（SHALL）。完結不可項目は `- [ ]` 出力禁止（MUST NOT）。情報保持が必要な達成不可項目は `> ℹ️ 別途確認: {項目名}` 形式（SHALL）
+1. 要件docからIssue本文を生成。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う
 
 2. **マルチREQ入力判定**: 入力要件doc数を確認
    - 単一REQ → Step 3
@@ -51,31 +45,17 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 | 子Issue内容ソース | 各REQ docから生成 | decomposition内容から生成 |
 | 子Issue追加要素 | Wave番号+依存記載、REQ doc番号明示（traceability）、孫Issue判定（SHOULD） | なし |
 
-4. テンプレート `issue_desc_epic.md` を Read tool で読み込む
+4. テンプレート `issue_desc_epic.md` を Read tool で読み込む。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照
 
-5. Epic Issue本文を生成:
-   - `{summary}`, `{problem}`, `{solution}` を埋める
-   - 分解テーブル生成（子Issue番号はプレースホルダー `#{TBD}`）
-   - Waveテーブル生成: 依存関係からWave番号を決定（プレースホルダー `#{TBD_Wn}`、nは行番号）。マルチREQ: 各REQ docの依存関係を解析、対象REQ列にREQ番号記載。単一REQ: `agentdev-workflow-orchestration` のWave schedulingロジックに従う
-   - ステータス追跡テーブル: `{total}` = 子Issue数、進行中/完了 = 0
-   - `{completion_criteria}` 抽出
-   - 子Issue数事前チェック: 上限超過時はEpic・子Issueいずれも作成せずエラーで停止
+5. Epic Issue本文を生成。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
 
 6. Epic Issueを作成:
    - ラベル: `enhancement`, `feature`, `epic`
    - `--body-file` 使用 → VERIFY。Issue番号を `{epic_number}` として記録
 
-7. 子Issueを作成（順次処理）:
-   - テンプレート `issue_desc_child.md` 読込
-   - 本文: `Parent: #{epic_number}` 先頭行。{summary}, {scope}, {solution}, {test_strategy} 生成
-   - マルチREQ差分: Wave番号+依存を補足情報に記載、REQ doc番号を明示記載、孫Issue判定（SHOULD）
-   - ラベル: `enhancement`, `feature`（`epic` 除外）
-   - `--body-file` 使用 → VERIFY。Issue番号を記録
+7. 子Issueを作成（順次処理）。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: サブエージェントは子Issue本文候補とテンプレート充足検査のみを返し、親エージェントが `gh` 実行とVERIFYを行う
 
-8. Epic Issue本文を更新:
-   - `#{TBD}` → 実番号、`#{TBD_Wn}` → 実番号（n=行番号対応）
-   - ステータス追跡テーブル更新
-   - `gh issue edit`（`--body-file`）→ VERIFY
+8. Epic Issue本文を更新。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: サブエージェントは置換漏れ検査のみを返し、親エージェントが本文更新とVERIFYを行う
 
 ### Standard flow + 共通終了（Step 14〜）
 
@@ -87,12 +67,9 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 18. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
 
-18a. **RU ファイル削除**（SHALL）:
-   - Issue作成 + VERIFY 正常完了時のみ削除。失敗時は残置
-   - 対象: 要件docの Requirement Source から抽出した `RU-*.md` に一致するファイル。RU パターンに一致しないものは削除しない
-   - **削除後同期確認**（SHALL）: commit/push 後、`git rev-parse HEAD` == `origin/main` であること、`git status --porcelain` に削除RUが残っていないこと。失敗時はファイル・HEAD・origin/main を表示し停止
+18-1. **RU ファイル削除**（SHALL）。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
 
-18b. 完了報告 → template variant:
+18-2. 完了報告 → template variant:
    - Standard → `templates/case-open/standard.md`
    - 単一REQ Epic → `templates/case-open/epic.md`
    - マルチREQ Epic → `templates/case-open/multi-req-epic.md`
@@ -126,7 +103,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 - G13: work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
 
 ### 出力制約
-- G17: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- G17: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す
 
 ### Capture 非関与制約
 - G18: case-open は intake / learning capture を行わない（SHALL）。capture 境界の詳細は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照

@@ -37,7 +37,7 @@ agent: sisyphus
 
 5. **intake item 生成**: item 生成ルール・ファイル名規則は `agentdev-workflow-lifecycle` skill の `references/intake-from-github-judgment-logic.md` の「Step 5: intake item 生成」を参照
 
-5b. **実行前同期（git pull）**:
+5-1. **実行前同期（git pull）**:
     - `git pull --ff-only` を実行する
     - **失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
       ```
@@ -56,7 +56,7 @@ agent: sisyphus
     - ディレクトリが存在しない場合は作成する
     - 同名ファイルが存在する場合は連番を付与する
 
-6b. **.agentdev/intake 変更の commit と push**:
+6-1. **.agentdev/intake 変更の commit と push**:
     - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
     - **変更なし時**: commit/push せず、Step 8 の完了報告で「変更なし」と報告
     - **変更あり時**:
@@ -118,4 +118,4 @@ agent: sisyphus
 - G10: 対象はクローズ済み Issue/PR のみ（オープン中は対象外）
 - G11: `agentdev-gh-cli` に従って読み取り操作を実行する
 - G12: 保存先は `.agentdev/intake/inbox/` のみ
-- G13: サブエージェントの最終出力は verbatim で出力する（再フォーマット禁止）
+- G13: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す

@@ -33,7 +33,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認。不足時は警告表示してユーザー判断を仰ぐ
     - **文書分類ポリシー適合確認**: `docs/specs/document-model.md` の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する
 
-3b. **close 時 SPEC / commands / skills 更新漏れの局所確認**: 実装完了・PRマージ前に、今回の変更に伴う以下の更新漏れを局所的に確認する:
+3-1. **close 時 SPEC / commands / skills 更新漏れの局所確認**: 実装完了・PRマージ前に、今回の変更に伴う以下の更新漏れを局所的に確認する:
     - SPEC 本文と実装の最終矛盾確認
     - 変更に伴う command 定義の更新漏れ
     - 変更に伴う skill 責務境界の変更漏れ

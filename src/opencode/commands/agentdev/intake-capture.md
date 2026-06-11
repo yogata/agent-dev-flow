@@ -58,7 +58,7 @@ intake item は以下の推奨標準形に従う Markdown artifact とする。w
     - topic-slug: タイトルから生成（小文字英数字・ハイフン区切り、30文字以内）
     - 形式: `YYYY-MM-DD-{topic-slug}.md`
 
-3b. **実行前同期**:
+3-1. **実行前同期**:
     - `git pull --ff-only` を実行する
     - **失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
       ```
@@ -77,7 +77,7 @@ intake item は以下の推奨標準形に従う Markdown artifact とする。w
     - ディレクトリが存在しない場合は作成する
     - 同名ファイルが存在する場合は `{topic-slug}-2`, `{topic-slug}-3` のように連番を付与する
 
-4b. **.agentdev/intake 変更の commit と push**:
+4-1. **.agentdev/intake 変更の commit と push**:
     - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
     - **変更なし時**: commit/push せず、Step 5 の完了報告で「変更なし」と報告
     - **変更あり時**:

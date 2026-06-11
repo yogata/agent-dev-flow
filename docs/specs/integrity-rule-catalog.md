@@ -566,6 +566,126 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | 参照に [retired] 注記を追加、または current ADR へ更新 |
 | last_verified | 2026-06-08 |
 
+### IR-028: Command トップレベル Step 整数化
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-028 |
+| description | Command のトップレベル Step 見出し・参照が整数のみであり、`Step N.M` 形式の小数 Step が残存していないこと |
+| severity | strict |
+| category | obsolete-structure |
+| detection_method | `src/opencode/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側または integrity rule 内の旧語検出用文字列は REQ-0119-021 により除外 |
+| affected_artifacts | [commands, command projection, integrity rules] |
+| related_req | [REQ-0119-005, REQ-0119-007, REQ-0119-021] |
+| related_spec | [artifact-contracts.md, workflow-contracts.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 中。旧語検出用の正規表現文字列と projection 側の残存確認文は除外が必要 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 小数 Step を整数 Step または N-M 形式のサブステップへ置換 |
+| last_verified | 2026-06-12 |
+
+### IR-029: Command 英字サブステップ禁止
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-029 |
+| description | Command の Step 見出し・参照に `10a` / `11c` などの英字サブステップが残存せず、必要なサブステップは `N-M` 形式で表記されていること |
+| severity | strict |
+| category | obsolete-structure |
+| detection_method | `src/opencode/commands/agentdev/*.md` を対象に Step 文脈の `[0-9][a-z]` を検出し、N-M 形式への統一を確認 |
+| affected_artifacts | [commands, command projection, integrity rules] |
+| related_req | [REQ-0119-006, REQ-0119-021] |
+| related_spec | [artifact-contracts.md, workflow-contracts.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 中。一般語・旧語検出用文字列・projection 側の確認文は除外が必要 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 英字サブステップを N-M 形式へ置換 |
+| last_verified | 2026-06-12 |
+
+### IR-030: Subagent verbatim 条件付き返却
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-030 |
+| description | Subagent 返却契約で、成果物本文のみ verbatim とし、判定結果・調査過程・中間ログ・読解メモへ一律 verbatim を要求していないこと |
+| severity | strict |
+| category | canonical-conflict |
+| detection_method | Command/SPEC/skill references 内の `verbatim` 周辺文脈を確認し、成果物本文条件付き表現か、一律 verbatim 禁止の検出用文字列かを判定 |
+| affected_artifacts | [commands, skills, SPEC, integrity rules] |
+| related_req | [REQ-0119-013, REQ-0119-021] |
+| related_spec | [workflow-contracts.md, artifact-contracts.md, artifact-responsibilities.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 高。検出用文字列、REQ本文、旧語説明、成果物本文の正当な verbatim 指示を文脈判定する必要がある |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake+learning |
+| triage_action | 一律 verbatim 指示を、成果物本文のみ verbatim・その他は要約/根拠/capture候補へ圧縮する表現に更新 |
+| last_verified | 2026-06-12 |
+
+### IR-031: Findings / Capture候補 見出し統一
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-031 |
+| description | current docs/source の Findings/Intake 系見出しが `Findings / Capture候補` に統一され、旧語は projection 側または integrity rule の検出目的に限って残存していること |
+| severity | heuristic |
+| category | obsolete-structure |
+| detection_method | `Findings`, `Capture候補`, `Intake` 周辺の見出しを検出し、current/source の見出し統一と REQ-0119-021 の検出目的例外を判定 |
+| affected_artifacts | [commands, command projection, SPEC, integrity rules] |
+| related_req | [REQ-0119-014, REQ-0119-020, REQ-0119-021] |
+| related_spec | [workflow-contracts.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 高。通常語としての findings、旧語検出パターン、projection 側の比較対象を除外する必要がある |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 見出しを `Findings / Capture候補` に統一し、保存判断は親エージェントへ保持する |
+| last_verified | 2026-06-12 |
+
+### IR-032: delegation_type/on_result 必須 envelope 禁止
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-032 |
+| description | `delegation_type` / `on_result` がサブエージェント委譲の必須 envelope として扱われず、必要な場合のみ参考ラベルまたは親側の扱いとして記述されていること |
+| severity | strict |
+| category | canonical-conflict |
+| detection_method | `delegation_type` / `on_result` 周辺文脈を検出し、必須 envelope 表現ではなく任意・参考分類の表現であることを確認 |
+| affected_artifacts | [commands, SPEC, skills] |
+| related_req | [REQ-0119-017, REQ-0119-018] |
+| related_spec | [workflow-contracts.md, artifact-contracts.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 中。taxonomy 定義・任意ラベル説明・旧語検出用文字列は許容 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 必須 envelope 表現を削除し、inputs / side_effect_boundary / output_contract / capture_handoff 中心の契約に更新 |
+| last_verified | 2026-06-12 |
+
+### IR-033: lightweight-delegation primary pattern 禁止
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-033 |
+| description | `lightweight-delegation` が primary pattern として扱われず、主要な実装分類に重ねる委譲の扱いとして記述されていること |
+| severity | strict |
+| category | canonical-conflict |
+| detection_method | `lightweight-delegation` 周辺文脈を検出し、primary pattern 宣言・frontmatter pattern・実装分類としての扱いがないことを確認 |
+| affected_artifacts | [commands, SPEC, skills] |
+| related_req | [REQ-0119-015, REQ-0119-016] |
+| related_spec | [workflow-contracts.md, artifact-contracts.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 中。`primary pattern ではない` という否定表現と検出用文字列は許容 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | primary pattern としての記述を削除し、重ねる委譲・manager-orchestrator との差分として説明する |
+| last_verified | 2026-06-12 |
+
 ## Gate Levels
 
 | Level | Description | Trigger |

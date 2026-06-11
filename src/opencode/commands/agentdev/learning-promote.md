@@ -61,9 +61,9 @@ agent: sisyphus
      - フォーマット: `agentdev-learning-pipeline` skill の「Requirement Source Staging Stub Schema」に従う
 
 13. **アーカイブ移動**（原子的操作）:
-    - **Step A**: inbox.md 全エントリを archive/active.md に追記（`**移動日**: YYYY-MM-DD` フィールド追加）
-    - **Step B**: archive/active.md 書込検証（追記エントリ数をカウント照合）
-    - **Step C**: Step B 成功時のみ inbox.md をヘッダーのみにクリア:
+    - **Step 13-1**: inbox.md 全エントリを archive/active.md に追記（`**移動日**: YYYY-MM-DD` フィールド追加）
+    - **Step 13-2**: archive/active.md 書込検証（追記エントリ数をカウント照合）
+    - **Step 13-3**: Step 13-2 成功時のみ inbox.md をヘッダーのみにクリア:
       ```markdown
       # 学び・教訓
 
@@ -72,7 +72,7 @@ agent: sisyphus
 
       ---
       ```
-    - Step B 失敗 → inbox.md 変更せず、エラー内容を報告
+    - Step 13-2 失敗 → inbox.md 変更せず、エラー内容を報告
 
 14. **昇華時 prune**（archive/active.md からの除去）:
     - **prune 対象**: staged（promoted artifact 生成済み）/ rejected / duplicate のエントリのみ

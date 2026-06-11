@@ -71,6 +71,39 @@ agent: prometheus | sisyphus
 | SKILL.md | 200 行 | — | docs-check で報告 |
 | Steps 数 | 5〜12 個 | — | — |
 
+## Subagent Delegation Contract
+
+サブエージェント委譲は、Command の詳細手順を増やさず、探索・検査・分類・候補抽出を独立した文脈へ分離するために使用する。親エージェントは最終判断と副作用を保持し、サブエージェントは判断材料だけを返す（ADR-0112, REQ-0119）。
+
+### 委譲時最小契約
+
+委譲定義は以下の4要素を中心に記述する。
+
+| 要素 | 説明 |
+|---|---|
+| `inputs` | 委譲先に渡す限定された入力範囲。対象ファイル、Issue/PR、ログ、参照基準、除外対象を含む |
+| `side_effect_boundary` | 委譲先の副作用境界。原則は読み取り専用、保存・Issue/PR更新・commit・push・ユーザー確認は禁止 |
+| `output_contract` | 返却形式。`pass` / `warn` / `fail` / `partial` を基本とし、要約、根拠、成果物パス、親判断事項、副作用なしの明示を含む |
+| `capture_handoff` | intake / learning 候補を保存せず、capture 候補として親エージェントへ返す形式 |
+
+成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）は verbatim で返す。判定結果、調査過程、中間ログ、読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す。
+
+### delegation_type 参考分類
+
+`delegation_type` は必須 envelope ではない。必要な場合のみ、委譲の意図を短く示す参考ラベルとして使用する。
+
+| delegation_type | 用途 | 副作用 |
+|---|---|---|
+| `gate_check` | 完了判定・ガードレール充足確認・保存前/close前検査 | 禁止 |
+| `semantic_review` | 文書・差分・REQ/ADR/SPEC の意味レビュー | 禁止 |
+| `log_analysis` | テストログ・CIログ・review結果解析 | 禁止 |
+| `classification` | artifact / finding / intake / learning の分類 | 禁止 |
+| `extraction` | 候補・論点・未回収事項の抽出 | 禁止 |
+| `draft_generation` | Issue本文・PR本文・report案などの草案生成 | 禁止 |
+| `controlled_case_execution` | case-run Epic / 複数Issue実行 | case-run のみ条件付きで許可 |
+
+Command 本文では分類ラベルより、実際の `inputs`、`side_effect_boundary`、`output_contract`、`capture_handoff` を優先する。
+
 ## Template Placement Contract
 
 Template の配置先は以下の2種類を定義する（REQ-0103-046）。

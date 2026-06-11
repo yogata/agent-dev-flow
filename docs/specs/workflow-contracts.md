@@ -285,7 +285,6 @@ promoted artifact → RU → REQ / Issue → RU 削除
 | **wall-session** | ユーザーとの対話セッションを通じて構造化成果物を生成 | ドラフトファイル作成、任意のアーティファクト読み取り | 既存アーティファクトの変更、git操作、外部API呼び出しによるリソース作成 |
 | **file-pipeline** | 定義されたステップに従いファイルを変換・生成 | 指定ディレクトリへのファイル作成・更新、git操作、外部API呼び出し、**読み取り専用サブエージェント委譲**（ADR-0112 §3） | 大規模な状態機械の実行 |
 | **manager-orchestrator** | 複数フェーズ構成の状態機械・自己修復ループ・サブエージェント | すべてのファイル操作、git操作、外部API呼び出し、サブエージェント起動 | （制限なし） |
-| **lightweight-delegation** | 読み取り専用委譲による軽量なタスク実行（ADR-0112 §2） | 読み取り専用サブエージェント起動、レポートファイルの新規作成 | 書き込み操作、git操作、外部API呼び出しによるリソース作成 |
 | **capture-only** | データを収集・記録しinboxに保存 | inboxディレクトリへの新規ファイル作成のみ、外部APIからの読み取り | レビュー・プロモート・既存ファイルの変更・削除、git操作 |
 | **read-only-diagnostic** | アーティファクトを分析しレポートを出力 | レポートファイルの新規作成、intake itemの新規作成（実行時）、**読み取り専用サブエージェント委譲**（ADR-0112 §3） | 検査対象アーティファクトの変更 |
 
@@ -293,27 +292,62 @@ promoted artifact → RU → REQ / Issue → RU 削除
 
 | コマンド | Primary Pattern |
 |---|---|
-| `/agentdev/req-define` | wall-session + lightweight-delegation |
+| `/agentdev/req-define` | wall-session |
 | `/agentdev/req-save` | file-pipeline |
 | `/agentdev/case-open` | file-pipeline |
 | `/agentdev/case-run` | manager-orchestrator |
 | `/agentdev/case-update` | file-pipeline |
 | `/agentdev/case-close` | file-pipeline |
-| `/agentdev/learning-promote` | file-pipeline + lightweight-delegation |
+| `/agentdev/learning-promote` | file-pipeline |
 | `/agentdev/intake-capture` | capture-only |
 | `/agentdev/intake-from-github` | capture-only |
-| `/agentdev/intake-promote` | file-pipeline + lightweight-delegation |
-| `/agentdev/backlog-review` | wall-session + lightweight-delegation |
+| `/agentdev/intake-promote` | file-pipeline |
+| `/agentdev/backlog-review` | wall-session |
 | `/repo/docs-check` | read-only-diagnostic |
-| `/agentdev/docs-review` | read-only-diagnostic + lightweight-delegation |
+| `/agentdev/docs-review` | read-only-diagnostic |
 
 ## General Subagent Delegation Contract
 
-ADR-0112 で定義されたサブエージェント委譲の一般概念に基づく共通契約。manager-orchestrator 以外のコマンドパターンから読み取り専用委譲を行う際のインタフェースと制約を定める。
+ADR-0112 で定義されたサブエージェント委譲の一般概念に基づく共通契約。manager-orchestrator 以外のコマンドパターンから読み取り専用委譲を行う際の最小契約と制約を定める。`lightweight-delegation` は primary pattern ではなく、主要な実装分類に重ねる委譲の扱いである。
 
-### 委譲種別（delegation_type taxonomy）
+### 委譲時最小契約
 
-ADR-0112 §5 の taxonomy に従う:
+委譲時の最小契約は、ADR-0112 §5 に従い以下の4要素を中心に記述する。`delegation_type` と `on_result` は必須 envelope ではなく、必要な場合のみ参考ラベルまたは親側の扱いとして記述する。
+
+```yaml
+inputs:
+  scope:
+    - {対象ファイル、Issue、PR、ログ、成果物パスなど}
+  constraints:
+    - {参照してよい基準、読んでよい範囲、除外対象}
+side_effect_boundary:
+  allowed:
+    - read_only
+  forbidden:
+    - file_write
+    - issue_pr_update
+    - commit
+    - push
+    - user_confirmation
+output_contract:
+  status: pass | warn | fail | partial
+  summary: {判定結果の要約}
+  evidence:
+    - {根拠ファイル、行、ログ、観測事実}
+  artifact_body: {成果物本文がある場合のみverbatimで返す}
+  parent_decision_required:
+    - {親エージェントが判断・保存・確認すべき事項}
+  side_effects: none
+capture_handoff:
+  intake_candidates:
+    - {具体的な修正候補。保存は親エージェントが判断する}
+  learning_candidates:
+    - {再発防止知見候補。保存は親エージェントが判断する}
+```
+
+### 委譲種別（delegation_type 参考分類）
+
+delegation_type は参考分類であり、Command 本文での使用は任意である。分類ラベルより、実際の入力範囲・副作用境界・返却内容を優先する。
 
 | delegation_type | 用途 | 書き込み | 書き込み許可条件 |
 |---|---|---:|---|
@@ -325,22 +359,6 @@ ADR-0112 §5 の taxonomy に従う:
 | `draft_generation` | Issue本文・PR本文・report案などの草案生成 | 禁止 | — |
 | `controlled_case_execution` | case-run Epic / 複数Issue実行 | 条件付き | case-run のみ |
 
-### 委譲インタフェース
-
-共通エンベロープ + 委譲種別 typed payload + コマンド別 reference（ADR-0112 §5）:
-
-```yaml
-delegation_type: gate_check | semantic_review | log_analysis | classification | extraction | draft_generation | controlled_case_execution
-skill: agentdev-xxx          # 委譲先 skill
-reference: skill-ref-path    # 委譲先が参照する skill reference / SPEC section
-inputs:
-  - name: target_files
-    description: "検査対象ファイルパス"
-  - name: criteria_ref
-    description: "判定基準の参照先（SPEC section / REQ / ADR）"
-on_result: adopt | reject | adopt_partial  # 親コマンドの採否方針
-```
-
 ### 委譲制約
 
 | 制約 | 説明 |
@@ -348,11 +366,13 @@ on_result: adopt | reject | adopt_partial  # 親コマンドの採否方針
 | 読み取り専用（書き込み禁止型） | gate_check / semantic_review / log_analysis / classification / extraction / draft_generation は対象アーティファクトを変更しない |
 | 親コマンド最終判断 | サブエージェントは判断の入力を提供し、最終決定は親コマンドが行う（ADR-0112 §4） |
 | 中間成果扱い | サブエージェント出力は中間成果であり、親コマンドは一部を採用・修正・却下できる（ADR-0112 §6） |
+| 成果物本文の verbatim | Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物は verbatim で返す |
+| 判定結果の圧縮 | 判定結果・調査過程・中間ログ・読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す |
 | Script 優先 | 単純な決定的検査は Script 優先。非決定的処理（意味レビュー・分類・抽出等）にサブエージェント委譲を適用 |
 
-### manager-orchestrator と lightweight-delegation の分離
+### manager-orchestrator と軽量委譲の分離
 
-| 項目 | manager-orchestrator | lightweight-delegation |
+| 項目 | manager-orchestrator | 軽量委譲 |
 |---|---|---|
 | 適用コマンド | case-run | 上記初期適用対象6コマンド（ADR-0112） |
 | 委譲規模 | 複数サブエージェント統制・Wave scheduling・障害伝播 | 単一タスク委譲 |
@@ -449,7 +469,7 @@ scale: large の場合、Epic Orchestrator モードで実行する:
 
 ## Subagent Protocol（case-run 専用）
 
-> **注意**: 本プロトコルは case-run の manager-orchestrator パターンにおけるサブエージェント起動仕様である。一般委譲（lightweight-delegation）は前述の「General Subagent Delegation Contract」を参照。subagent-protocol.md（Skill reference）に編集安全手順・大規模ファイル分割委譲・AST-grep 運用を定める。
+> **注意**: 本プロトコルは case-run の manager-orchestrator パターンにおけるサブエージェント起動仕様である。軽量な一般委譲は前述の「General Subagent Delegation Contract」を参照。subagent-protocol.md（Skill reference）に編集安全手順・大規模ファイル分割委譲・AST-grep 運用を定める。
 
 ### 起動仕様
 
@@ -464,7 +484,7 @@ task(category="unspecified-high", load_skills=[], run_in_background=true, prompt
 - 実行指示（準備→実装→提出フェーズ）
 - worktreeパス
 - specs更新禁止の明示
-- Finding 記録指示（PR本文の `## Findings / Intake候補` セクション）
+- Finding 記録指示（PR本文の `## Findings / Capture候補` セクション）
 - 書き込み事後検証の要求
 
 ### 親エージェント責務
@@ -472,7 +492,7 @@ task(category="unspecified-high", load_skills=[], run_in_background=true, prompt
 - Wave開始前のEpicステータス一括更新
 - 全サブエージェント完了待機
 - specs直列更新
-- Findings / Intake候補件数の集約
+- Findings / Capture候補件数の集約
 
 ### フォールバック
 
@@ -523,10 +543,10 @@ Command・Skill・Script・サブエージェント委譲の責務境界（ADR-0
 
 case-run で発見した本筋外 Finding の永続化チャネルとして PR 本文を使用する（REQ-0106）。
 
-- 書込み元: case-run（Step 10.5）
-- 読取り元: case-close（Step 9b）
+- 書込み元: case-run（Step 10-5）
+- 読取り元: case-close（Step 9-2）
 - 各 case-run は自身の PR にのみ書込み。`.agentdev/intake/inbox/` は直接変更しない
-- intake 候補と learning 候補を別々の成果物として扱う（Split Rule に準拠）
+- capture 候補を intake 候補と learning 候補に分け、別々の成果物として扱う（Split Rule に準拠）
 - Epic 横断回収: Epic モード時、case-close は関連子 Issue PR 群の本文を横断走査して Finding を回収
 
 ### REQ再構成intake

@@ -26,13 +26,13 @@ agent: sisyphus
 4. **各工程の実行**: 既存コマンド定義（req-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）も含めて既存コマンド定義に従うこと
    - case-open 相当処理の完了後、出力を確認して以下のいずれかに分岐する:
      - **Standard flow（単一 Issue）**: 既存の直列フロー（case-run → case-close）をそのまま実行
-      - **Epic Issue（マルチREQ または 単一REQ Epic flow）**: **操作単位キュープロセス**（Step 4a〜4c）に進む
-    - **Step 4a キュー開始**: Epic Issue 番号を記録する。Epic Issue の子Issue一覧（Wave 構成含む）を読み取る。case-run 相当処理に Epic Issue 番号を渡す。case-run の Epic Orchestrator モードが全 Wave の子Issue実行を処理する。case-auto は Wave スケジューリング・依存関係分析を実装しない
-    - **Step 4b case-close ループ**: case-run 相当処理の完了後、その出力（成功/失敗/スキップされた子Issue一覧）から case-close 対象を決定する:
+      - **Epic Issue（マルチREQ または 単一REQ Epic flow）**: **操作単位キュープロセス**（Step 4-1〜4-3）に進む
+     - **Step 4-1 キュー開始**: Epic Issue 番号を記録する。Epic Issue の子Issue一覧（Wave 構成含む）を読み取る。case-run 相当処理に Epic Issue 番号を渡す。case-run の Epic Orchestrator モードが全 Wave の子Issue実行を処理する。case-auto は Wave スケジューリング・依存関係分析を実装しない
+     - **Step 4-2 case-close ループ**: case-run 相当処理の完了後、その出力（成功/失敗/スキップされた子Issue一覧）から case-close 対象を決定する:
       - 正常完了した子Issue: case-close 相当処理を実行
       - 失敗・スキップされた子Issue: case-close を試みない
       - 各子Issue の case-close は既存の case-close.md 定義に従う（learning/intake capture、`.agentdev/` commit/push を含む）。各子Issue ごとに独立して実行し、キュー全体での一括 capture は行わない
-    - **Step 4c 全体完了判定**: 全子Issue の case-close 処理完了後:
+     - **Step 4-3 全体完了判定**: 全子Issue の case-close 処理完了後:
      - Epic Issue の子Issue全ステータスが CLOSED の場合 → Epic 自動クローズ確認（case-close Step 8 相当） → 全体完了報告
       - 未クローズの子Issue が残る場合（失敗/スキップ） → 部分完了報告
 5. **工程間の状態引き継ぎ**: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) 要件docの Requirement Source セクション内容（RU 削除判定に使用） (2) RU ファイルパス（case-open 相当処理の RU 削除で使用） (3) capture 対象情報（case-close 相当処理の learning/intake capture で使用）
@@ -48,7 +48,7 @@ agent: sisyphus
    - (8) merge conflict / remote hash不一致
    - (9) 作成元不明branch / user-owned branch / 他作業branchの削除検出
    - (10) 未コミット変更の帰属不明
-7. **完了報告**: 最終工程（case-close）の完了報告をそのまま出力する。Epic Issue を伴うキュー実行時は、完了・失敗・スキップ子Issue一覧を含める
+8. **完了報告**: 最終工程（case-close）の完了報告をそのまま出力する。Epic Issue を伴うキュー実行時は、完了・失敗・スキップ子Issue一覧を含める
 
 ## Guardrails
 
@@ -70,7 +70,7 @@ agent: sisyphus
 - G16: case-auto は独自の操作単位ステータス追跡を持ってはならない。Epic Issue のステータス追跡テーブルを使用する
 
 ### 出力制約
-- G10: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- G10: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す
 
 ### Capture 整合制約
 - G17: case-auto は構成コマンド（case-run / case-close）の capture 責務境界に従う（SHALL）。case-auto 固有の capture 振る舞いは持たない。capture 境界の詳細は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照

@@ -19,42 +19,13 @@ agent: sisyphus
 
 ## Steps
 
-1. Issue番号解決:
-   - ユーザー入力からIssue番号を取得（指定されている場合はそれを使用）
-   - 番号が省略された場合、セッション内会話から直近のIssue番号を検索（直前のIssue参照履歴等から抽出）
-   - 複数のIssue番号が存在する場合は直近のものを優先し、ユーザーに確認（例: 「Issue #Nを更新します。よろしいですか？」）
-   - 検出できない場合はユーザーに番号の指定を求めて停止
+1. Issue番号解決。詳細は `agentdev-workflow-routing` skill の `references/case-update-procedure.md` を参照。委譲接続点: サブエージェントは候補番号抽出のみを返し、親エージェントが確認・停止を判断する
 2. 現在のIssue状態を取得 → `agentdev-workflow-lifecycle` のフェーズ体系で現在フェーズを判定
 3. 更新内容に応じて分岐:
-    - **`--body`**: Issue作成時に使用されたテンプレート（`issue_desc_bug.md` / `issue_desc_feature.md` / `issue_desc_epic.md` / `issue_desc_child.md`）に従って更新。該当テンプレートの【必須】セクションが全て本文に含まれること → `gh issue edit`
-   - **`--comment`**: テンプレート `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_update.md` を Read tool で読み込み → `gh issue comment`
-     - **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-    - **`--req`**: REQファイル更新（詳細フロー以下）。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）:
-      1. Issue番号から関連REQファイルを特定（Issue本文のREQ番号参照 or `docs/requirements/` から該当ファイル検索）
-        2. 更新タイプの判定（APPEND vs UPDATE）:
-           - **APPEND**: 要件テーブルへの行追加、適用範囲の拡張
-           - **UPDATE**: 既存セクション（目的/要件/適用範囲）の内容修正
-        3. frontmatter `updated` フィールドを現在日時に更新
-        4. ファイル書き出し → `gh issue edit` でIssue本文の該当箇所も同期
-        5. **commit / push**: REQファイルおよび影響を受ける docs ファイル（`docs/requirements/README.md`, `docs/README.md`）を commit + push する（SHALL）
-    - **`--review-ng`**: レビューNG時の専用フロー（入力条件: `agentdev-spec-compliance` の乖離報告とユーザー承認済み判断が存在すること）:
-      1. `agentdev-spec-compliance` の乖離報告をパース（影響度・対象・内容・推奨アクション・理由を抽出）
-      2. 乖離タイプに基づく自動分岐:
-         - `spec-bug`（仕様バグ）→ REQ UPDATE + レビューNGコメント投稿
-         - `impl-bug`（実装バグ）→ レビューNGコメント投稿のみ（REQ変更不要）
-         - `scope-creep`（スコープ外逸脱）→ REQ UPDATE（スコープ明確化）+ レビューNGコメント投稿
-         - テスト不足・品質基準未達 → レビューNGコメント投稿のみ
-      3. テンプレート `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_review_ng.md` を Read tool で読み込み・適用
-         **テンプレート準拠要件**: テンプレートの `【必須】` セクションが全てコメント本文に含まれること。必須セクションが欠落している場合、生成をやり直すこと。
-      4. agentdev-spec-compliance結果をテンプレートの「Deviation Check 結果」セクションに展開
-      5. NG理由分類のチェックボックスを自動選択
-      6. `agentdev-gh-cli` に従い `--body-file` 経由でコメント投稿
-    - **`--review-ng` 時の SPEC / commands / skills 更新漏れ局所確認**: レビュー NG コメント投稿後、乖離内容に基づき以下の更新漏れを局所的に確認する:
-      - SPEC 本文と実装の矛盾に起因する更新必要性
-      - 乖離修正に伴う command 定義の更新必要性
-      - 乖離修正に伴う skill 責務境界の変更必要性
-      - 更新漏れを検出した場合はコメントに併記する
-      - **局所予防の範囲**: この確認はレビュー NG 時の局所的な漏れ検出であり、`/agentdev/docs-review` の全体意味レビューの代替ではない
+   - **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing` skill の `references/case-update-procedure.md` を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが `gh issue edit` を行う
+   - **`--comment`**: 更新コメントを追加する。詳細は `agentdev-workflow-routing` skill の `references/case-update-procedure.md` を参照。委譲接続点: サブエージェントはコメント案と必須セクション検査のみを返し、親エージェントが投稿する
+   - **`--req`**: REQファイル更新を行う。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）。詳細は `agentdev-workflow-routing` skill の `references/case-update-procedure.md` を参照。委譲接続点: サブエージェントは関連REQ候補・APPEND/UPDATE候補・根拠のみを返し、親エージェントがファイル更新とcommit/pushを行う
+   - **`--review-ng`**: レビューNG時の専用フローを実行する。詳細は `agentdev-workflow-routing` skill の `references/case-update-procedure.md` を参照。委譲接続点: サブエージェントは乖離タイプ候補・推奨アクション・更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
 4. 完了報告 → 完了報告templateに従って出力。更新種別に応じたvariantを選択:
     - --body → .opencode/commands/agentdev/templates/case-update/body.md
     - --comment → .opencode/commands/agentdev/templates/case-update/comment.md
@@ -90,4 +61,4 @@ agent: sisyphus
 - G10: work_type分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
 
 ### 出力制約
-- G11: サブエージェントの最終出力はverbatimで出力する（再フォーマット禁止）
+- G11: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す
