@@ -237,6 +237,16 @@ skill/
 - [ ] 手続き的コンテンツがワークフローセクションに配置されている
 - [ ] 用語が一貫している
 
+### 5.5 Subagent Edit Safety
+
+Subagent に編集を委譲する場合、REQ-0118-001 / REQ-0118-002 および Issue #653/#655/#656 の再発防止として、以下を満たすこと:
+
+- **Worktree 内制約**: Subagent は worktree root 外のファイルを編集してはならない。編集対象は worktree root からの相対パスで指定し、worktree 外へのパス遷移を防止しなければならない
+- **パスプレフィクス確認**: 編集操作の前に、対象パスが worktree root からの相対パスであることを検証しなければならない。絶対パスや worktree 外パスを使用してはならない
+- **ファイル存在確認**: 編集対象ファイルの存在を事前に確認しなければならない。存在しないファイルへの edit 操作を行ってはならない
+
+Source path と runtime path の混同を防止するため、`src/opencode/...`（source path）と `.opencode/...`（runtime path）を明確に区別すること。Command / skill 定義内のパス参照は記述された通りに解釈し、source path を runtime 参照先として使用してはならない。
+
 ## 6. 開発ワークフロー
 
 ### Iterative Development（最も効果的なプロセス）
