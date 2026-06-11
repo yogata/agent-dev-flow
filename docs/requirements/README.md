@@ -2,7 +2,7 @@
 
 ## Active Requirements
 
-現在の要件判断では、以下18件を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
+現在の要件判断では、以下19件を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
 
 | REQ ID | タイトル | 関心対象 |
 |---|---|---|
@@ -24,6 +24,7 @@
 | [REQ-0116](REQ-0116.md) | 文書分類ポリシー定義 | REQ/ADR/SPEC/Guide/Report/DOC-MAP/Retired 分類ルール・Document Authority Model・Classification Decision Tree・Cross-document Projection Rules・Re-baseline Rules・Synchronization Rules・Report分類・ADR定義拡張・SPEC SHALL/MUST限定 |
 | [REQ-0117](REQ-0117.md) | Git worktree junction 削除フォールバック手順 | git-worktree、junction、Windows、フォールバック手順 |
 | [REQ-0118](REQ-0118.md) | Subagent edit safety ガイドライン | subagent、edit safety、command-authoring、skill-authoring、パス参照 |
+| [REQ-0119](REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 | command 薄型化 / skill 詳細移管 / sub-agent 委譲境界 / Step 整数化 / verbatim 条件付き / delegation_type SPEC降格 / ADR-0112 accepted化 |
 
 ## Retired Requirements
 
