@@ -66,6 +66,22 @@ git worktree prune
 
 失敗時: `git worktree remove` がすべてのリトライ後に失敗した場合のフォールバッククリーンアップ。`prune` は無効な worktree 管理情報のみを削除し、worktree ディレクトリ自体は削除しない。
 
+#### Windows + junction 環境の削除フォールバック
+
+**エラーパターン**: Windows + junction 環境で `git worktree remove` が `Not a directory` を含むエラーで失敗する場合。
+
+**原因**: junction の reparse point により、git 内部の削除処理がディレクトリを正しく辿れないことがある。
+
+**適用条件**: `git worktree remove` が上記エラーで失敗した場合のみ。通常の削除成功時は実行しない。
+
+**手順**:
+1. worktree 管理情報を更新: `git worktree prune`
+2. junction ディレクトリを手動削除: `Remove-Item -LiteralPath "{worktree_path}" -Recurse -Force` または `rmdir /s /q "{worktree_path}"`
+3. ローカルブランチを削除: `git branch -d {branch_name}`（必要時のみ `-D`）
+4. リモートブランチがある場合のみ削除: `git push origin --delete {branch_name}`
+
+**注意**: `install-consumer-opencode.ps1` が作成する junction link 経由の worktree で発生する Windows 固有の挙動。背景: REQ-0117-001、Issue #683、PR #687。
+
 ### 4. ローカルブランチの削除
 
 ```bash
