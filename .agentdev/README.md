@@ -2,7 +2,7 @@
 
 AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101-022, 023）。
 
-`.agentdev/` は canonical domain state であり、コマンド間で受け渡される永続的な成果物を保持する。`.sisyphus/` は runtime workspace であり、実行時の一時作業領域である。`.sisyphus/drafts/` の working draft は canonical domain state ではない。
+`.agentdev/` は canonical domain state であり、コマンド間で受け渡される永続的な成果物を保持する（`integrity/reports/` は例外: 非永続・git管理対象外）。`.sisyphus/` は runtime workspace であり、実行時の一時作業領域である。`.sisyphus/drafts/` の working draft は canonical domain state ではない。
 
 ## 状態表
 
@@ -17,13 +17,13 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 | `learning/evaluation-report.md` | 境界 artifact | `learning-promote` | `learning-promote` | 毎回上書き |
 | `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
-| `integrity/reports/*.md` | 検証レポート | `integrity-check` | ユーザー参照 | 永続（履歴参照） |
+| `integrity/reports/*.md` | 検証レポート（非永続） | `docs-check` | `docs-check`（intake化）・ユーザー参照 | 非永続・git管理対象外（`.gitignore` で除外） |
 
 ## .agentdev/ と .sisyphus/ の境界
 
 | ディレクトリ | 性質 | 内容 |
 |---|---|---|
-| `.agentdev/` | 永続 domain state | intake items、learning data、RU、integrity reports |
+| `.agentdev/` | 永続 domain state（`integrity/reports/` は例外: 非永続・git管理対象外） | intake items、learning data、RU |
 | `.sisyphus/` | Runtime workspace | 実行計画、証跡、タスク、実行状態、下書き、レポート |
 
 **原則**: `.sisyphus/` の成果物は canonical domain state ではない。`req-define` が生成する working draft（`.sisyphus/drafts/req-draft-*.md`）は canonical ではなく、`req-save` の出力（REQ/ADR ファイル）が canonical である。
@@ -48,7 +48,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 │   └── req-units/       ← backlog-review が RU を生成
 │       └── RU-*.md
 └── integrity/
-    └── reports/         ← integrity-check が検証結果を保存
+    └── reports/         ← docs-check が検証結果を保存（非永続・git管理対象外）
 ```
 
 ## 参照
