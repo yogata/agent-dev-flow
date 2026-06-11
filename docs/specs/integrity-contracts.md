@@ -134,7 +134,7 @@ command guardrails を以下の6カテゴリに分類する:
 | `case-run` | worktree 内の全ファイル | worktree 外、`.agentdev/` |
 | `case-close` | GitHub Issue/PR, worktree 削除 | `.agentdev/intake/inbox/` 直接書込 |
 | `case-update` | GitHub Issue のみ | ローカルファイル |
-| `docs-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（承認時） | 検査対象 artifact |
+| `docs-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（実行時。実行自体を承認として扱い、追加のユーザー承認は不要。REQ-0108-225, REQ-0112-059） | 検査対象 artifact |
 
 > **Note**: `docs-check` は `/repo/docs-check` として実行される repo-local コマンドである（ADR-0106）。AgentDevFlow の consumer 配布対象外。
 
