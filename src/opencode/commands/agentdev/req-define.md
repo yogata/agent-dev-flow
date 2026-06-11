@@ -57,6 +57,11 @@ agent: prometheus
    - schema・path・lifecycle → SPEC更新候補
    - 方針・ガイドライン → guide更新候補
 
+   **5b. ADR判断根拠の記録**: ADR判断後、判断根拠をドラフトに保存すること（SHALL, REQ-0112-055）。記録項目は以下を含める:
+   - 判断結果: ADR必要 / ADR不要
+   - 適用基準: ADR閾値に達した理由、または除外基準に該当した理由
+   - 根拠事実: 該当 / 非該当を判断した具体的な事実
+
 6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
 
 7. **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）。bugfix + ADR必要時は feature に昇格

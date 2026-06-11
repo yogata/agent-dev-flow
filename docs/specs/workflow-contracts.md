@@ -106,7 +106,7 @@ draft（`.sisyphus/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 | コマンド | 入力SSoT | 出力SSoT | 完了後マクロフェーズ |
 |---|---|---|---|
 | `/agentdev/req-define` | セッション会話 | 機能追加: `.sisyphus/drafts/req-draft-*.md`、その他: セッション内要件doc | 壁打ち |
-| `/agentdev/req-save` | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR, docs index | 壁打ち |
+| `/agentdev/req-save` | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR-01XX, docs index | 壁打ち |
 | `/agentdev/case-open` | 要件doc, specs READ, ADR READ | GitHub Issue | 定義→実行境界 |
 | `/agentdev/case-run` | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ | レビュー完了 |
 | `/agentdev/case-auto` | 要件doc（明示/draft/セッション） | req-save〜case-close の各出力 | 自走完了 |
@@ -210,7 +210,7 @@ agentdev系ワークフローはAnchored Developmentモデルに基づく。4つ
 | REQ（要件doc） | ユーザー視点の要件（目的/要件/適用範囲） | `docs/requirements/REQ-{NNNN}.md` |
 | コード | 実装そのもの | ソースコード |
 | テスト | 振る舞い仕様 | テストファイル |
-| ADR | アーキテクチャ判断 | `docs/adr/ADR-*.md` |
+| ADR | アーキテクチャ判断 | current baseline: `docs/adr/ADR-01XX.md`; retired: `docs/adr/retired/ADR-00XX.md` |
 
 生きた仕様（Living Specs）:
 
@@ -227,7 +227,7 @@ agentdev系ワークフローはAnchored Developmentモデルに基づく。4つ
 |---|---|---|---|
 | guides/ | docs/guides/ | 開発ガイド（参照のみ） | — |
 | requirements/ | docs/requirements/ | 要件管理（目的/要件/適用範囲） | req-save(CREATE), case-open(READ), case-update(UPDATE) |
-| adr/ | docs/adr/ | アーキテクチャ決定記録 | agentdev-adr-guidelines(CREATE) |
+| adr/ | docs/adr/ | current baseline ADR（`docs/adr/ADR-01XX.md`）と retired ADR（`docs/adr/retired/ADR-00XX.md`）を区別するアーキテクチャ決定記録（REQ-0112-050, REQ-0112-057） | agentdev-adr-guidelines(CREATE) |
 | specs/ | docs/specs/ | システム仕様 | case-run(READ+WRITE), case-close(VERIFY) |
 
 ### テンプレート配置
@@ -287,7 +287,7 @@ promoted artifact → RU → REQ / Issue → RU 削除
 | **manager-orchestrator** | 複数フェーズ構成の状態機械・自己修復ループ・サブエージェント | すべてのファイル操作、git操作、外部API呼び出し、サブエージェント起動 | （制限なし） |
 | **lightweight-delegation** | 読み取り専用委譲による軽量なタスク実行（ADR-0112 §2） | 読み取り専用サブエージェント起動、レポートファイルの新規作成 | 書き込み操作、git操作、外部API呼び出しによるリソース作成 |
 | **capture-only** | データを収集・記録しinboxに保存 | inboxディレクトリへの新規ファイル作成のみ、外部APIからの読み取り | レビュー・プロモート・既存ファイルの変更・削除、git操作 |
-| **read-only-diagnostic** | アーティファクトを分析しレポートを出力 | レポートファイルの新規作成、intake itemの新規作成（承認時）、**読み取り専用サブエージェント委譲**（ADR-0112 §3） | 検査対象アーティファクトの変更 |
+| **read-only-diagnostic** | アーティファクトを分析しレポートを出力 | レポートファイルの新規作成、intake itemの新規作成（実行時）、**読み取り専用サブエージェント委譲**（ADR-0112 §3） | 検査対象アーティファクトの変更 |
 
 ### Command ↔ Pattern 対応
 
