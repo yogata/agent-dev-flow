@@ -81,8 +81,8 @@ ADR の status に基づく権限境界を確認する:
 
 ### 7. guides意味レビュー
 
-guides が navigation layer の範囲を超えていないか確認する:
-- MUST/SHALL 相当の規範を持っていないか
+ guides が navigation layer の範囲を超えていないか確認する:
+- 強制条件に相当する規範を持っていないか
 - guides が REQ/SPEC の基準を代替していないか
 - 規範的内容は REQ または SPEC に委譲すべきか
 - 履歴混入（historical content mixed into current sections）を検出した場合、該当セクションの route を追加して修正を誘導する（REQ-0115-041）

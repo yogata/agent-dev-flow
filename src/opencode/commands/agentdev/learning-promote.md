@@ -81,14 +81,14 @@ agent: sisyphus
     - 詳細は `agentdev-learning-pipeline` skill の「Prune 方針 → promote 時 prune」を参照
     - **実行手順**: 1) prune 対象特定 → 2) ユーザーに prune 計画提示 → 3) 承認時のみ実行 → 4) 該当エントリ除去
 
-15. **.agentdev 変更の commit と push**:
-    - `git diff --name-only` で `.agentdev/` 配下の変更を確認
-    - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
-    - **変更あり時**:
-       1. `git add` は `.agentdev/` のみ対象（SHALL）
-       2. commit message: `chore(agentdev): promote learning findings`（SHALL）
-       3. `git push` 実行
-       4. **push 失敗時**: 構造化エラーを表示し完了扱いにしない（SHALL）:
+ 15. **.agentdev 変更の commit と push**:
+     - `git diff --name-only` で `.agentdev/` 配下の変更を確認
+     - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
+     - **変更あり時**:
+        1. `git add` は `.agentdev/` のみ対象
+        2. commit message: `chore(agentdev): promote learning findings`
+        3. `git push` 実行
+        4. **push 失敗時**: 構造化エラーを表示し完了扱いにしない:
           ```
           ## Git Push エラー
           **エラー種別**: push 失敗

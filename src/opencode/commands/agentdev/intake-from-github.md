@@ -56,14 +56,14 @@ agent: sisyphus
     - ディレクトリが存在しない場合は作成する
     - 同名ファイルが存在する場合は連番を付与する
 
-6-1. **.agentdev/intake 変更の commit と push**:
-    - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
-    - **変更なし時**: commit/push せず、Step 8 の完了報告で「変更なし」と報告
-    - **変更あり時**:
-      1. `git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする（SHALL）。他のパスを巻き込まない
-      2. commit message: `chore(agentdev): capture intake items from github`（Conventional Commits 形式）（SHALL）
-      3. `git push` を実行する
-      4. **push 失敗時**: 以下の構造化エラーメッセージを表示し、完了扱いにしない（SHALL）:
+ 6-1. **.agentdev/intake 変更の commit と push**:
+     - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
+     - **変更なし時**: commit/push せず、Step 8 の完了報告で「変更なし」と報告
+     - **変更あり時**:
+       1. `git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする。他のパスを巻き込まない
+       2. commit message: `chore(agentdev): capture intake items from github`（Conventional Commits 形式）
+       3. `git push` を実行する
+       4. **push 失敗時**: 以下の構造化エラーメッセージを表示し、完了扱いにしない:
          ```
          ## Git Push エラー
 

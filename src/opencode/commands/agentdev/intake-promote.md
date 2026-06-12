@@ -85,22 +85,22 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 - G01: GitHub Issue の作成を行わない（`backlog-review` / `case-open` が担当）
 - G02: intake item の元の内容を改変しない（整理・構造化のみ）
 - G03: `backlog-review` を自動起動しない（次ステップの提示のみ）
-- G04: learning pipeline の入力を生成しない（MUST NOT）。採用 item の後続ルートは `backlog-review` のみ
+- G04: learning pipeline の入力を生成しない。採用 item の後続ルートは `backlog-review` のみ
 - G05: learning item の保存・分類・昇華を担当しない
 
 ### HITL 制約
-- G06: ユーザーの明示的な承認なしに promoted artifact を生成してはならない（MUST NOT）
-- G07: 分類結果は必ずユーザーに提示し、確認・修正の機会を与えること（SHALL）
+- G06: ユーザーの明示的な承認なしに promoted artifact を生成してはならない
+- G07: 分類結果は必ずユーザーに提示し、確認・修正の機会を与えること
 - G08: 自動確定・自動進行は行わない。ユーザーが「確定」を明示的に指示してから次フェーズに進む
 
 ### 形式制約
 - G09: workflow 管理 artifact として扱わない
-- G10: 整形結果に frontmatter（route/status 等）を含めてはならない（MUST NOT）
+- G10: 整形結果に frontmatter（route/status 等）を含めてはならない
 - G11: 整形結果に重複排除キー・後続 artifact 参照を含めない
 - G12: 元 item の本文に整形結果を書き込まない
 
 ### accepted/ 廃止
-- G13: `.agentdev/intake/accepted/` を参照・使用してはならない（MUST NOT）
+- G13: `.agentdev/intake/accepted/` を参照・使用してはならない
 - G14: `accepted/` への移動・読み込み・存在確認を行わない
 
 ### 実行制約

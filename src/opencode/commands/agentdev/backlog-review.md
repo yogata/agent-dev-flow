@@ -121,8 +121,8 @@ RU 生成結果・git 永続化結果を含める。次のコマンド: `/agentd
 
 - G01: REQ ファイルの保存を行わない（`req-save` が担当）
 - G02: GitHub Issue の作成を行わない（`case-open` が担当）
-- G03: promoted artifact の単純コピー（パススルー）を生成しない（MUST NOT）
-- G04: `.agentdev/intake/inbox/`、`.agentdev/intake/archive/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/archive/active.md` を更新しない（MUST NOT）
+- G03: promoted artifact の単純コピー（パススルー）を生成しない
+- G04: `.agentdev/intake/inbox/`、`.agentdev/intake/archive/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/archive/active.md` を更新しない
 - G05: 矛盾検出時はユーザーの指示を待ち、自動的に解決しない
 - G06: RU 生成に失敗した artifact は削除しない
-- G07: depends_on に promoted artifact path を指定しない（MUST NOT）。RU-ID のみ許容
+- G07: depends_on に promoted artifact path を指定しない。RU-ID のみ許容

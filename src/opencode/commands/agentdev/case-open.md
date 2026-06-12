@@ -30,7 +30,7 @@ agent: sisyphus
    - `scale: standard` / フィールドなし → **Standard flow**（Step 14〜）
 
 **共通ルール**（全Step適用）:
-- **VERIFY**: gh CLI書込後は毎回 `agentdev-gh-cli` の VERIFY操作（Section 5-8）に従い検証（SHALL）
+- **VERIFY**: gh CLI書込後は毎回 `agentdev-gh-cli` の VERIFY操作（Section 5-8）に従い検証
 - **テンプレート準拠**: テンプレート読込後は毎回【必須】セクションの完備を確認（【任意】は内容がある場合のみ含める）、欠落時は再生成
 
 ### Epic flow（Step 4〜8）
@@ -42,8 +42,8 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 | 分解ソース | 各REQ doc単位 | draft-meta `decomposition` |
 | Waveテーブル列 | Wave/Issue/実行方法/前提/対象REQ | Wave/Issue/実行方法/前提 |
 | 子Issue数上限 | G15（最大10） | G05（最大10） |
-| 子Issue内容ソース | 各REQ docから生成 | decomposition内容から生成 |
-| 子Issue追加要素 | Wave番号+依存記載、REQ doc番号明示（traceability）、孫Issue判定（SHOULD） | なし |
+ | 子Issue内容ソース | 各REQ docから生成 | decomposition内容から生成 |
+| 子Issue追加要素 | Wave番号+依存記載、REQ doc番号明示（traceability）、孫Issue判定 | なし |
 
 4. テンプレート `issue_desc_epic.md` を Read tool で読み込む。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照
 
@@ -65,9 +65,9 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 17. コメント追加: テンプレート `issue_comment_bug_analysis.md`（バグ・軽微変更等）または `issue_comment_feature_technical.md`（機能追加）読込（Epic flowではEpic Issueにコメント追加）→ VERIFY
 
-18. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
+ 18. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
 
-18-1. **RU ファイル削除**（SHALL）。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
+ 18-1. **RU ファイル削除**。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
 
 18-2. 完了報告 → template variant:
    - Standard → `templates/case-open/standard.md`
@@ -105,5 +105,5 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 ### 出力制約
 - G17: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す
 
-### Capture 非関与制約
-- G18: case-open は intake / learning capture を行わない（SHALL）。capture 境界の詳細は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照
+ ### Capture 非関与制約
+- G18: case-open は intake / learning capture を行わない。capture 境界の詳細は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照
