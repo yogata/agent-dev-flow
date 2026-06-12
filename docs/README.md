@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は REQ-0101 から REQ-0119 までの 19 件（active REQ）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0121 までの 21 件（active REQ）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -25,6 +25,10 @@
 | [REQ-0117](requirements/REQ-0117.md) | Git worktree junction 削除フォールバック手順 |
 | [REQ-0118](requirements/REQ-0118.md) | Subagent edit safety ガイドライン |
 | [REQ-0119](requirements/REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 |
+| [REQ-0120](requirements/REQ-0120.md) | Runtime Command 非必須参照除去 |
+| [REQ-0121](requirements/REQ-0121.md) | Runtime Command RFC 2119 見直し + Integrity 検査再定義 |
+| [REQ-0120](requirements/REQ-0120.md) | Runtime Command 非必須参照除去 |
+| [REQ-0121](requirements/REQ-0121.md) | Runtime Command RFC 2119 見直し + Integrity 検査再定義 |
 
 - [Requirements Index](requirements/README.md)
 - [Migration Table](requirements/mapping-table.md)
