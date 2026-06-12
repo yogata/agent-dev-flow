@@ -571,6 +571,10 @@ capture_handoff:
 2. **意味の保持**: 元の意図を変えない範囲での表現調整
 3. **必須セクションの欠落防止**: テンプレートの必須セクションが欠落しないことを確認
 
+## 他 Skill 参照境界（REQ-0103-090〜092, REQ-0113-009）
+
+command は他 skill の内部 reference path（`references/*.md`）を直接指定しない。他 skill の詳細手順・判定表を参照する場合、skill 名と責務名までを記述し、必要な references 読込判断は対象 skill に委ねる。skill 自身が自分の references/ を案内する progressive disclosure は維持する（制限対象外とする）。
+
 ## 参照
 
 - **artifact-boundaries.md**: Command / Skill / Template / Script の責務境界定義

@@ -17,9 +17,9 @@ agent: sisyphus
 
 ## Steps
 
-0. **upstream handoff 停止判定**: 要件docまたは RU に `apply_in_current_project: false` が含まれる場合、Issue を作成せず停止。agent-dev-flow repository への手動取り込み対象として報告。判定は `agentdev-workflow-lifecycle/references/upstream-handoff.md` に従う
+0. **upstream handoff 停止判定**: 要件docまたは RU に `apply_in_current_project: false` が含まれる場合、Issue を作成せず停止。agent-dev-flow repository への手動取り込み対象として報告。判定は `agentdev-workflow-lifecycle` skill の upstream handoff protocol に従う
 
-1. 要件docからIssue本文を生成。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う
+1. 要件docからIssue本文を生成。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う
 
 2. **マルチREQ入力判定**: 入力要件doc数を確認
    - 単一REQ → Step 3
@@ -45,17 +45,17 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 | 子Issue内容ソース | 各REQ docから生成 | decomposition内容から生成 |
 | 子Issue追加要素 | Wave番号+依存記載、REQ doc番号明示（traceability）、孫Issue判定（SHOULD） | なし |
 
-4. テンプレート `issue_desc_epic.md` を Read tool で読み込む。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照
+4. テンプレート `issue_desc_epic.md` を Read tool で読み込む。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照
 
-5. Epic Issue本文を生成。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
+5. Epic Issue本文を生成。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
 
 6. Epic Issueを作成:
    - ラベル: `enhancement`, `feature`, `epic`
    - `--body-file` 使用 → VERIFY。Issue番号を `{epic_number}` として記録
 
-7. 子Issueを作成（順次処理）。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: サブエージェントは子Issue本文候補とテンプレート充足検査のみを返し、親エージェントが `gh` 実行とVERIFYを行う
+7. 子Issueを作成（順次処理）。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: サブエージェントは子Issue本文候補とテンプレート充足検査のみを返し、親エージェントが `gh` 実行とVERIFYを行う
 
-8. Epic Issue本文を更新。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: サブエージェントは置換漏れ検査のみを返し、親エージェントが本文更新とVERIFYを行う
+8. Epic Issue本文を更新。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: サブエージェントは置換漏れ検査のみを返し、親エージェントが本文更新とVERIFYを行う
 
 ### Standard flow + 共通終了（Step 14〜）
 
@@ -67,7 +67,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 18. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
 
-18-1. **RU ファイル削除**（SHALL）。詳細は `agentdev-workflow-lifecycle` skill の `references/case-open-issue-creation.md` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
+18-1. **RU ファイル削除**（SHALL）。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
 
 18-2. 完了報告 → template variant:
    - Standard → `templates/case-open/standard.md`
