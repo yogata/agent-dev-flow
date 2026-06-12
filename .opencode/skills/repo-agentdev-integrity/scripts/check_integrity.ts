@@ -270,6 +270,11 @@ const LEGACY_PATTERNS = [
     pattern: /\belevate時prune\b/g,
     name: "elevate時prune (old terminology: should be promote時prune)",
   },
+  // R4: RFC 2119 keyword markers in active documents (REQ-0102-024~028, REQ-0108-236)
+  {
+    pattern: /（SHALL）|（SHOULD）|（MAY）|（MUST）/g,
+    name: "bracketed RFC 2119 marker (REQ-0102-028)",
+  },
 ];
 
 const IMPLEMENTATION_PATTERNS = [
@@ -6787,6 +6792,243 @@ function checkCommandCaptureDuties(cmdDir: string, root: string): CheckResult[] 
   return results;
 }
 
+// REQ-0108-236~241, REQ-0115-044
+
+const RFC2119_PATTERNS = [
+  { pattern: /（SHALL）/g, name: "（SHALL）" },
+  { pattern: /（SHOULD）/g, name: "（SHOULD）" },
+  { pattern: /（MAY）/g, name: "（MAY）" },
+  { pattern: /（MUST）/g, name: "（MUST）" },
+];
+
+const RFC2119_EXEMPT_PATHS: RegExp[] = [
+  /vocabulary-registry\.md$/,
+  /retired\/REQ-/,
+  /mapping-table\.md$/,
+  /integrity-rule-catalog\.md$/,
+  /\.test\.ts$/,
+  /check_integrity\.ts$/,
+];
+
+function isRfc2119Exempt(relPath: string): boolean {
+  return RFC2119_EXEMPT_PATHS.some((re) => re.test(relPath));
+}
+
+function checkRfc2119Markers(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const scanDirs = [
+    path.join(root, "docs", "requirements"),
+    path.join(root, "docs", "specs"),
+    path.join(root, "docs", "guides"),
+    path.join(root, ".opencode", "skills"),
+    path.join(root, ".opencode", "commands"),
+    path.join(root, "src", "opencode", "skills"),
+    path.join(root, "src", "opencode", "commands"),
+  ];
+
+  const mdFiles: string[] = [];
+  for (const dir of scanDirs) {
+    if (!fs.existsSync(dir)) continue;
+    if (fs.statSync(dir).isDirectory()) {
+      const entries = fs.readdirSync(dir, { recursive: true }) as string[];
+      for (const entry of entries) {
+        if (typeof entry === "string" && entry.endsWith(".md")) {
+          mdFiles.push(path.join(dir, entry));
+        }
+      }
+    }
+  }
+
+  let found = false;
+  for (const filePath of mdFiles) {
+    const content = readText(filePath);
+    if (!content) continue;
+    const relPath = resolveRelative(filePath, root);
+    if (isRfc2119Exempt(relPath)) continue;
+    const inCodeBlock = content.split("```");
+    const nonCodeParts = inCodeBlock.filter((_, i) => i % 2 === 0).join(" ");
+    for (const { pattern, name } of RFC2119_PATTERNS) {
+      pattern.lastIndex = 0;
+      if (pattern.test(nonCodeParts)) {
+        found = true;
+        results.push(
+          ng(
+            "Vocabulary",
+            "rfc2119-marker",
+            `RFC 2119 bracketed marker '${name}' found in active document (REQ-0102-028)`,
+            relPath,
+          ),
+        );
+      }
+    }
+  }
+
+  if (!found) {
+    results.push(
+      ok(
+        "Vocabulary",
+        "rfc2119-marker",
+        "No RFC 2119 bracketed markers detected in active documents (REQ-0108-236)",
+      ),
+    );
+  }
+  return results;
+}
+
+const CROSS_REQ_VOCAB_PATTERNS: Array<{
+  current: string;
+  deprecated: string[];
+  label: string;
+}> = [
+  { current: "learning", deprecated: ["tips プール", "tipsプール"], label: "learning pool" },
+  { current: "promote時prune", deprecated: ["refactor時prune", "elevate時prune", "refine時prune"], label: "promote-time prune" },
+  { current: "migrated", deprecated: ["retained", "partially superseded"], label: "REQ migration status" },
+];
+
+function checkCrossReqVocabularyConsistency(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqDir = path.join(root, "docs", "requirements");
+  if (!fs.existsSync(reqDir)) {
+    results.push(ok("Vocabulary", "cross-req-vocab", "REQ directory not found, skip"));
+    return results;
+  }
+
+  const reqFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-") && f.endsWith(".md"));
+  const allReqContent: Map<string, string> = new Map();
+  for (const file of reqFiles) {
+    const content = readText(path.join(reqDir, file));
+    if (content) allReqContent.set(file, content);
+  }
+
+  let found = false;
+  for (const { current, deprecated, label } of CROSS_REQ_VOCAB_PATTERNS) {
+    let hasCurrent = false;
+    let hasDeprecated = false;
+    for (const [, content] of allReqContent) {
+      if (content.includes(current)) hasCurrent = true;
+      for (const dep of deprecated) {
+        if (content.includes(dep)) hasDeprecated = true;
+      }
+    }
+    if (hasCurrent && hasDeprecated) {
+      found = true;
+      results.push(
+        ng(
+          "Vocabulary",
+          "cross-req-vocab",
+          `Active REQs contain both '${current}' and deprecated terms ${JSON.stringify(deprecated)} (${label})`,
+        ),
+      );
+    }
+  }
+
+  if (!found) {
+    results.push(
+      ok("Vocabulary", "cross-req-vocab", "No cross-REQ vocabulary contradictions detected (REQ-0108-239)"),
+    );
+  }
+  return results;
+}
+
+function checkMappingTableHistoryLabels(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const mappingTablePath = path.join(root, "docs", "requirements", "mapping-table.md");
+  if (!fs.existsSync(mappingTablePath)) {
+    results.push(ok("Vocabulary", "mapping-table-history", "mapping-table.md not found, skip"));
+    return results;
+  }
+
+  const content = readText(mappingTablePath);
+  if (!content) {
+    results.push(ok("Vocabulary", "mapping-table-history", "mapping-table.md empty, skip"));
+    return results;
+  }
+
+  const oldVocabPatterns = [
+    /retained/g,
+    /partially superseded/g,
+  ];
+
+  let unlabeledCount = 0;
+  const lines = content.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith("|") && line.includes("status")) continue;
+    if (!line.startsWith("|")) continue;
+    for (const pat of oldVocabPatterns) {
+      pat.lastIndex = 0;
+      if (pat.test(line)) {
+        const hasHistoryLabel = line.includes("履歴") || line.includes("historical") || line.includes("旧");
+        if (!hasHistoryLabel) {
+          unlabeledCount++;
+        }
+      }
+    }
+  }
+
+  if (unlabeledCount > 0) {
+    results.push(
+      ng(
+        "Vocabulary",
+        "mapping-table-history",
+        `mapping-table.md has ${unlabeledCount} old vocabulary entries without history label (REQ-0108-240)`,
+      ),
+    );
+  } else {
+    results.push(
+      ok("Vocabulary", "mapping-table-history", "Old vocabulary in mapping-table.md properly labeled as historical (REQ-0108-240)"),
+    );
+  }
+  return results;
+}
+
+function checkReqVerificationBasis(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqDir = path.join(root, "docs", "requirements");
+  if (!fs.existsSync(reqDir)) {
+    results.push(ok("DocsCheck", "req-verification-basis", "REQ directory not found, skip"));
+    return results;
+  }
+
+  const reqFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-") && f.endsWith(".md"));
+  let totalReqRows = 0;
+  let rfc2119BasedRows = 0;
+
+  for (const file of reqFiles) {
+    const content = readText(path.join(reqDir, file));
+    if (!content) continue;
+    const lines = content.split("\n");
+    for (const line of lines) {
+      if (!line.startsWith("|") || line.includes("---")) continue;
+      if (line.includes("REQ-") && /\d{3}/.test(line)) {
+        totalReqRows++;
+        if (/（SHALL|SHOULD|MAY|MUST）/ .test(line)) {
+          rfc2119BasedRows++;
+        }
+      }
+    }
+  }
+
+  if (rfc2119BasedRows > 0) {
+    results.push(
+      ng(
+        "DocsCheck",
+        "req-verification-basis",
+        `${rfc2119BasedRows}/${totalReqRows} REQ rows still use RFC 2119 markers instead of 必達要件 (REQ-0115-044)`,
+      ),
+    );
+  } else {
+    results.push(
+      ok(
+        "DocsCheck",
+        "req-verification-basis",
+        `All ${totalReqRows} REQ rows use 必達要件-based verification (REQ-0115-044)`,
+      ),
+    );
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const options = parseArgs(args);
@@ -6944,6 +7186,10 @@ async function main(): Promise<void> {
     ...checkCaptureBoundaryReference(root),
     ...checkPrTemplateCaptureSection(root),
     ...checkCommandCaptureDuties(cmdDir, root),
+    ...checkRfc2119Markers(root),
+    ...checkCrossReqVocabularyConsistency(root),
+    ...checkMappingTableHistoryLabels(root),
+    ...checkReqVerificationBasis(root),
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)

@@ -29,6 +29,10 @@
 | command-local-template-existence | completion report templates in skill directory | completion report templates in `.opencode/commands/agentdev/templates/{command}/{variant}.md` | REQ-0108-127 |
 | skill-spec-dependency | N/A (検査対象外) | runtime skill から docs/specs/ への直接依存を warning として検出 | REQ-0108-128 |
 | ADR current/retired collection | 検査対象外 | current ADR collection（`docs/adr/ADR-01XX.md`）と retired ADR collection（`docs/adr/retired/ADR-00XX.md`）を区別して検査 | REQ-0112-050 |
+| RFC 2119 marker 横断検出 | command 本体のみ対象 | active REQ / SPEC / guide / source skill / template / repo-local projection を含む横断検出（retired 文書・検出用文字列・negative example は除外） | REQ-0108-236, 237 |
+| Cross-REQ 語彙矛盾 | 検査対象外 | active REQ 間の後継語彙と旧語彙の矛盾を検出 | REQ-0108-239 |
+| mapping-table 履歴名 | 旧語彙のまま許容 | 旧語彙に履歴名であることを明示 | REQ-0108-240 |
+| REQ 検証基準 | RFC 2119 語の有無で検証 | 検証可能な必達要件の判定に基づいて検証 | REQ-0115-044 |
 
 ## Severity Classification
 
