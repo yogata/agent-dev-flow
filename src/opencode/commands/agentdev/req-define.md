@@ -11,10 +11,10 @@ agent: prometheus
 
 - ユーザーの自然言語による機能追加/バグ修正の説明
 - GitHub Issue URL（既存Issueの場合）
-- エラーログ（バグ修正の場合）
-- **ユーザーが明示した入力ファイル**（Requirement Source）: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
-- req-save SPLIT 検出時の finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
-- **promoted 直読み禁止**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない（MUST NOT）。backlog-review による RU 化を経由すること
+ - エラーログ（バグ修正の場合）
+ - **ユーザーが明示した入力ファイル**（Requirement Source）: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
+ - req-save SPLIT 検出時の finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
+ - **promoted 直読み禁止**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない。backlog-review による RU 化を経由すること
 
 ## Output
 

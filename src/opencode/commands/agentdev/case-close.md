@@ -26,7 +26,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
    - unchecked項目を達成判定（証拠ソース・5条件プロトコル）
    - 達成不可項目を自律解決判定（変更対象分類×検証種別分類）
    - `agentdev-gh-cli` に従い `--body-file` で Issue本文更新 → VERIFY
-   - **事後確認（SHALL）**: 更新後にIssue本文を再読込し、完了条件セクションの全 `- [ ]` が `[x]` に反映されていることを確認。未反映の場合は再更新（最大2回）し、それでも失敗する場合は構造化エラーで停止
+   - **事後確認**: 更新後にIssue本文を再読込し、完了条件セクションの全 `- [ ]` が `[x]` に反映されていることを確認。未反映の場合は再更新（最大2回）し、それでも失敗する場合は構造化エラーで停止
    - 未達項目が残る場合 → 構造化エラーで停止（G08）
    - PR存在確認
 
@@ -50,7 +50,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - Rebase workflow をユーザーに提示（承認が必要）:
        - `git rebase origin/main` → コンフリクト解決（あれば）→ `git push --force-with-lease`
      - `--force` は禁止（`--force-with-lease` のみ許可）
-   - 対応記録コメントをIssueに追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read（SHALL, runtime path） → `agentdev-gh-cli` の VERIFY 操作に従って内容検証
+   - 対応記録コメントをIssueに追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Readして `agentdev-gh-cli` の VERIFY 操作に従って内容検証
 
 5. **Post-merge テスト戦略検証**: マージ後のみ確認可能な項目（CI通過等）を反映。`agentdev-gh-cli` に従い `--body-file` で更新 → VERIFY
 
@@ -58,12 +58,12 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 7. **ブランチ・worktree削除**: `agentdev-git-worktree` の worktree削除手順に従う:
    - 未コミット変更検出（`agentdev-git-worktree` skill の git 共通手順（Section 4））
-   - squash merge 済みの場合 → `git checkout .` で破棄可（SHALL）
+   - squash merge 済みの場合 → `git checkout .` で破棄可
    - .sisyphus/ クリーンアップ
    - worktree remove → Permission denied 時は停止（リトライは skill 定義に従う）
    - ローカルブランチ削除（squash merge 後の条件付き `-D` は skill 定義に従う）
    - リモートブランチ削除
-   - 削除失敗時は警告表示して停止（SHALL）
+   - 削除失敗時は警告表示して停止すること
 
 8. **親Epic Issue更新**: `agentdev-epic-tracker` スキル参照:
    - Issue本文から Parent Issue番号を特定（`Parent: #{N}` パターン）
@@ -75,22 +75,22 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 9. **実行前同期**: `agentdev-git-worktree` の 実行前同期（`agentdev-git-worktree` skill の git 共通手順（Section 1））に従い `git pull --ff-only` を実行。ローカル変更事前チェック・hash検証・不一致時は評価・承認のやり直し
 
 10. **学びの検知・抽出**: `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断:
-     - ユーザーに学びの有無を問うことは禁止（SHALL）
+      - ユーザーに学びの有無を問うことは禁止
      - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
      - promoted artifact imported 判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
-     - **Capture 回収責務**: PR 本文の `## Findings / Capture候補` セクションから intake / learning を分離回収する（SHALL）。intake 候補は `.agentdev/intake/inbox/` に保存し、learning 候補は `.agentdev/learning/inbox.md` に保存する。Epic 横断回収
+      - **Capture 回収責務**: PR 本文の `## Findings / Capture候補` セクションから intake / learning を分離回収する。intake 候補は `.agentdev/intake/inbox/` に保存し、learning 候補は `.agentdev/learning/inbox.md` に保存する。Epic 横断回収
      - **Capture 境界**: Split Rule（intake / learning 境界）は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照
-     - intake と learning を別々の成果物として扱う（SHALL）
-     - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数・中間ファイル等）を capture の入力として使用しない（SHALL）。capture 情報の入力源は PR 本文のみ
+      - intake と learning を別々の成果物として扱う
+      - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数・中間ファイル等）を capture の入力として使用しない。capture 情報の入力源は PR 本文のみ
 
-11. **Domain state 永続化**: `agentdev-git-worktree` の domain state 永続化（`agentdev-git-worktree` skill の git 共通手順（Section 2））に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める（SHALL）
+ 11. **Domain state 永続化**: `agentdev-git-worktree` の domain state 永続化（`agentdev-git-worktree` skill の git 共通手順（Section 2））に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める
 
 12. **完了報告**: 完了報告templateに従って出力。結果状態に応じたvariantを選択:
     - 全系統成功 → .opencode/commands/agentdev/templates/case-close/standard.md
     - .agentdev push失敗 → .opencode/commands/agentdev/templates/case-close/agentdev-push-failed.md
     - ブランチ・worktree削除失敗 → .opencode/commands/agentdev/templates/case-close/worktree-cleanup-failed.md
-    - GitHub完了後に .agentdev push失敗の場合は standard variant を使用してはならない（MUST NOT）
-    - **結果状態の分離報告**（SHALL）: GitHub側完了状態・`.agentdev` 永続化状態・ブランチ削除状態を独立して報告
+     - GitHub完了後に .agentdev push失敗の場合は standard variant を使用してはならない
+     - **結果状態の分離報告**: GitHub側完了状態・`.agentdev` 永続化状態・ブランチ削除状態を独立して報告
 
 ## Guardrails
 
@@ -101,7 +101,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G05: ブランチ・worktree削除は必ず実行。失敗時は警告表示して停止
 - G06: `git pull --ff-only` は必ず実行。pull前ローカル変更チェック・hash検証必須
 - G07: PRのCI通過確認。CI失敗時は case-run に差し戻す
-- G08: 未達チェックボックスが残る場合、構造化エラーで停止。チェックボックス更新後は必ず再読込して反映を確認（SHALL）
+   - G08: 未達チェックボックスが残る場合、構造化エラーで停止。チェックボックス更新後は必ず再読込して反映を確認
 - G09: 機能追加で docs/ 更新がない場合、警告表示して停止確認
 - G10: テスト戦略チェックボックスを必ず更新
 - G11: コメントテンプレートの【必須】セクション確認

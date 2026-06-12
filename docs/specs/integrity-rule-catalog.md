@@ -386,7 +386,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | 表記を実際の REQ 数に更新 |
 | last_verified | 2026-06-06 |
 
-### IR-019: Guide MUST/SHALL 検出
+### IR-019: Guide 要件定義・契約記述検出
 
 | Field | Value |
 |-------|-------|
@@ -394,7 +394,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | description | Guide ファイルが要件本文または契約本文を保持していないこと（REQ-0116-017）。語彙ベースの検出ではなく、guide が REQ/ADR/SPEC の責務を侵害する内容を保持していないかを検査する |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | Guide 内の要件定義表・契約記述・REQ 相当の振る舞い定義の検出。MUST/SHALL 語彙は補助シグナル |
+| detection_method | Guide 内の要件定義表・契約記述・REQ 相当の振る舞い定義の検出。語彙ベースの判定ではなく構造的判定を主とし、強制条件表現は補助シグナル |
 | affected_artifacts | [guides] |
 | related_req | [REQ-0108-138, REQ-0116-017] |
 | related_spec | [document-model.md] |
@@ -454,7 +454,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | description | 同一 REQ 内で同一実体が一方で要求され他方で禁止されていないこと |
 | severity | strict |
 | category | canonical-conflict |
-| detection_method | REQ 内の SHALL/MUST/SHALL NOT 抽出 → 矛盾検出 |
+| detection_method | REQ 内の強制条件・禁止事項の抽出 → 矛盾検出 |
 | affected_artifacts | [active REQ] |
 | related_req | [REQ-0108-139, 149] |
 | related_spec | [integrity-contracts.md] |
