@@ -391,19 +391,19 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-019 |
-| description | Guide ファイル内に MUST/SHALL 表現が含まれていないこと（非規範性宣言のメタ文を除く） |
+| description | Guide ファイルが要件本文または契約本文を保持していないこと（REQ-0116-017）。語彙ベースの検出ではなく、guide が REQ/ADR/SPEC の責務を侵害する内容を保持していないかを検査する |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | 正規表現で MUST/SHALL パターン検出 |
+| detection_method | Guide 内の要件定義表・契約記述・REQ 相当の振る舞い定義の検出。MUST/SHALL 語彙は補助シグナル |
 | affected_artifacts | [guides] |
-| related_req | [REQ-0108-138] |
+| related_req | [REQ-0108-138, REQ-0116-017] |
 | related_spec | [document-model.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。引用・メタ文の除外に注意 |
 | regression_test | (手動確認) |
 | baseline_status | resolved |
 | finding_route | intake+learning |
-| triage_action | guide から MUST/SHALL を削除、SPEC へ誘導 |
+| triage_action | guide から要件本文・契約本文を削除し、REQ/ADR/SPEC への参照に置き換える |
 | last_verified | 2026-06-06 |
 
 ### IR-020: Baseline-known vs new finding 区別
