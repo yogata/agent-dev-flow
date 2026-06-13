@@ -17,7 +17,14 @@
 | REQ-0112 | ADR status正規化 | IR-005, IR-010 | ADR, ADR index |
 | REQ-0113 | Skill References SPEC分離 | IR-008, IR-014 | skills, skill references |
 | REQ-0114 | case-auto最大自走モード | IR-006, IR-016 | commands |
-| REQ-0111 | Command authoring後方互換 | IR-006, IR-024 | commands |
+| REQ-0115 | docs-* command suite 定義 | IR-006, IR-024 | commands |
+| REQ-0116 | 文書分類ポリシー定義 | IR-001, IR-002, IR-017, IR-022 | REQ, SPEC, DOC-MAP |
+| REQ-0117 | Git worktree junction 削除フォールバック | — (infrastructure) | — |
+| REQ-0118 | Subagent edit safety ガイドライン | IR-006, IR-008, IR-014 | commands, skills |
+| REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化 | IR-006, IR-008, IR-014, IR-024 | commands, skills |
+| REQ-0120 | Runtime Command 非必須参照除去 | IR-006 | commands |
+| REQ-0121 | Runtime Command 規範語見直し + Integrity 検査再定義 | IR-006, IR-016 | commands, integrity |
+| REQ-0122 | 規範語ルールおよび記載の完全削除 | IR-001, IR-004, IR-017 | REQ, SPEC, ADR |
 | REQ-0110 | Git worktree削除リトライ | — (infrastructure) | — |
 | REQ-0102 | 要件定義・保存 | IR-001, IR-002 | REQ |
 
@@ -35,10 +42,11 @@
 - **REQ-0107**: Reporting (2 rules)
 
 ### Low Impact (1-2 rules)
-- **REQ-0102**, **REQ-0105**, **REQ-0111**, **REQ-0112**, **REQ-0113**, **REQ-0114**
+- **REQ-0102**, **REQ-0105**, **REQ-0112**, **REQ-0113**, **REQ-0114**, **REQ-0115**, **REQ-0118**, **REQ-0120**, **REQ-0121**, **REQ-0122**
 
 ### No Direct Impact
 - **REQ-0110**: Git worktree 削除リトライ（infrastructure 層）
+- **REQ-0117**: Git worktree junction 削除フォールバック（infrastructure 層）
 
 ## 3-Layer Gate Structure
 

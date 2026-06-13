@@ -1,6 +1,6 @@
 # Runtime Package Boundary Specification
 
-> **Scope**: This SPEC applies to the agent-dev-flow repository and its consumer projects.
+> **Scope**: This SPEC is a repo-internal design document for the agent-dev-flow repository (ADR-0103). It describes the runtime package boundary model between repo types from the repo's perspective; it does not prescribe consumer project behavior. Consumer projects follow their own conventions, and this SPEC only defines how the agent-dev-flow repo structures and distributes its runtime package.
 
 ## Purpose
 

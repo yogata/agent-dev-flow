@@ -22,12 +22,12 @@
 | RU-ID 根拠参照 | 検査対象外 | docs 永続文書内の RU-ID パターンを検出 | REQ-0108-122 |
 | workflow status 禁止 | 検査対象外 | REQ/SPEC 内の workflow status / 6 マイクロフェーズを検出 | REQ-0108-123 |
 | command 追加フィールド禁止 | 検査対象外 | pattern / workflow_route / branch_type / labels を検出 | REQ-0108-124 |
-| accepted ADR のみ引用 | 検査対象外 | proposed / superseded / deprecated ADR 引用を warning として検出 | REQ-0108-125 |
+| accepted ADR のみ引用 | 検査対象外 | proposed / superseded / deprecated ADR 引用を heuristic として検出 | REQ-0108-125 |
 | reference-path OK診断 | OK結果にfile/line/evidenceなし | per-reference OKにfile/line/evidenceを出力 | REQ-0108-117 |
 | cross-skill裸参照 | 裸参照のcross-skill誤検知なし | 同一skill内になく別skillにある裸参照をstrict NG検出 | REQ-0108-119 |
 | abolished-skill-reference | N/A (検査対象外) | 廃止済み skill (agentdev-workflow-reporting) への参照を strict として検出 | REQ-0108-126 |
 | command-local-template-existence | completion report templates in skill directory | completion report templates in `.opencode/commands/agentdev/templates/{command}/{variant}.md` | REQ-0108-127 |
-| skill-spec-dependency | N/A (検査対象外) | runtime skill から docs/specs/ への直接依存を warning として検出 | REQ-0108-128 |
+| skill-spec-dependency | N/A (検査対象外) | runtime skill から docs/specs/ への直接依存を heuristic として検出 | REQ-0108-128 |
 | ADR current/retired collection | 検査対象外 | current ADR collection（`docs/adr/ADR-01XX.md`）と retired ADR collection（`docs/adr/retired/ADR-00XX.md`）を区別して検査 | REQ-0112-050 |
 | 語彙ポリシー横断検出 | command 本体のみ対象 | active REQ / SPEC / guide / source skill / template / repo-local projection を含む語彙ポリシー違反検出（retired 文書・検出用文字列・negative example は除外） | REQ-0108-236, 237 |
 | Cross-REQ 語彙矛盾 | 検査対象外 | active REQ 間の後継語彙と旧語彙の矛盾を検出 | REQ-0108-239 |
@@ -39,7 +39,7 @@
 | 分類 | 意味 | 判定時の動作 | 例 |
 |---|---|---|---|
 | **strict** | 基準違反。即座に修正が必要 | NG として報告し、当該コマンドの完了をブロックする | frontmatter 禁止フィールド混入、必須セクション欠落、broken reference |
-| **warning** | 推奨からの逸脱。修正を推奨 | warning として報告し、完了はブロックしない | 行数超過、旧 namespace 残存、旧 terminology 使用 |
+| **heuristic** | ヒューリスティック検出（パターンベース・誤検知リスクあり）。修正を推奨 | warning として報告し、完了はブロックしない | 行数超過、旧 namespace 残存、旧 terminology 使用 |
 | **observation** | 情報提供。改善の参考 | info として報告し、対応は任意 | 未使用 skill の発見、改善候補の提示、潜在的 drift |
 
 ## Finding Classification
@@ -48,11 +48,11 @@
 
 | Finding 種別 | 説明 | 既定 severity |
 |---|---|---|
-| document-drift | 文書内容と実装の乖離 | warning |
+| document-drift | 文書内容と実装の乖離 | heuristic |
 | broken-reference | リンク切れ・参照先不存在 | strict |
-| obsolete-structure | 廃止済み構造の残存 | warning |
+| obsolete-structure | 廃止済み構造の残存 | heuristic |
 | canonical-conflict | 基準文書間の矛盾 | strict |
-| workflow-gap | workflow 定義の欠落 | warning |
+| workflow-gap | workflow 定義の欠落 | heuristic |
 | integrity-rule-gap | 検査ルール自体の欠落 | observation |
 
 ## Finding Route Map
@@ -86,11 +86,11 @@
 | ADRStatusNormalization | ADR status 旧形式検出（REQ-0108-121） |
 | RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-0108-122） |
 | WorkflowStatusProhibition | workflow status / 6 マイクロフェーズ検出（REQ-0108-123） |
-| AcceptedAdrCitation | accepted 以外の ADR 引用検出（REQ-0108-125, 推奨）。retired ADR への履歴参照は現行根拠引用 warning と区別する（REQ-0112-050） |
+| AcceptedAdrCitation | accepted 以外の ADR 引用検出（REQ-0108-125, 推奨）。retired ADR への履歴参照は現行根拠引用 heuristic と区別する（REQ-0112-050） |
 | AbolishedSkillReference | 廃止済み skill への参照検知（REQ-0108-126） |
 | CommandLocalTemplate | command-local template 存在・整合性検査（REQ-0108-127） |
 | SkillSpecDependency | runtime skill から docs/specs/ への直接依存検出（REQ-0108-128） |
-| RetiredAdrCitation | retired ADR への現行根拠引用検出（REQ-0112-048, warning/observation） |
+| RetiredAdrCitation | retired ADR への現行根拠引用検出（REQ-0112-048, heuristic/observation） |
 
 ## Report Format
 
@@ -156,7 +156,9 @@ command guardrails を以下の6カテゴリに分類する:
 postflight diff checking は read-only command から段階導入する:
 
 **Phase 1 — read-only command 検証**:
-- `docs-check`（repo-local `/repo/docs-check`）, `docs-review`, `backlog-review` は実行後にローカルファイル変更がないことを確認
+- `docs-review` は実行後にローカルファイル変更がないことを確認（真の read-only 診断）
+- `docs-check`（repo-local `/repo/docs-check`）は検査対象 artifact を変更しないが、許可された出力（`.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`）を生成する。postflight は「検査対象 artifact への変更がないこと」を確認し、許可出力範囲外の変更を warning として報告する
+- `backlog-review` も検査対象外 artifact を変更せず、許可された `.agentdev/` 配下の出力のみを行う
 - 変更が検出された場合は warning として報告
 
 **Phase 2 — 拡張適用**（将来）:

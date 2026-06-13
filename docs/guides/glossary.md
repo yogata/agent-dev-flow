@@ -15,10 +15,11 @@ AgentDevFlow で使う用語の定義。
 | intake-capture | インテイク・キャプチャ | 手動で気づき・課題を inbox に記録するコマンド |
 | intake-from-github | インテイク・フロム・ギットハブ | クローズ済み Issue/PR から改善候補を抽出するコマンド |
 | intake-promote | インテイク・プロモート | inbox の item をレビュー・採用・却下・保留判定し、promoted artifact に整形するコマンド |
-| learning-promote | ラーニング・プロモート | learning entry を分析・分類・昇華判定し、Requirement Source stub を生成するコマンド |
+| learning-promote | ラーニング・プロモート | learning entry を分析・分類・昇華判定し、promoted artifact を生成するコマンド |
 | backlog-review | バックログ・レビュー | promoted artifact を分析・統合し、ユーザー承認後に RU を生成するコマンド |
-| docs-check | ドックス・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド（旧称: integrity-check） |
+| docs-check | ドックス・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド（旧称: integrity-check）。repo-local 名前空間 `/repo/docs-check` に配置し、`/agentdev/*` 配下とは区別する（ADR-0106, REQ-0115） |
 | docs-review | ドックス・レビュー | docs 全体の意味整合レビューと REQ 体系の健全性を診断するコマンド（旧称: req-restructure-review） |
+| case-auto | ケース・オート | 最大自走モード。req-save → case-open → case-run → case-close を順次実行するコマンド |
 
 ## 成果物
 
@@ -47,7 +48,8 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。経路と docs 更新範囲を決定する。旧称 Pattern（A/B/C/D）は非推奨 |
+| work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。経路と docs 更新範囲を決定する。旧称 Pattern（A/B/C/D）は非推奨・廃止済み |
+| Implementation Pattern | コマンド内部構造の分類軸（wall-session / file-pipeline / manager-orchestrator / capture-only / read-only-diagnostic）。旧称 Pattern（A/B/C/D）= work_type とは別概念（REQ-0103-016, workflow-contracts.md） |
 | SSoT（Single Source of Truth） | 各フェーズでの信頼できる唯一の情報源 |
 | HITL（Human-in-the-loop） | ユーザーの確認を挟む判断ポイント |
 | マクロフェーズ | 壁打ち・構造的実行・レビュー完了の3段階 |

@@ -10,7 +10,7 @@
 | Skill 定義 | `src/opencode/skills/` | Source first | `.opencode/skills/` | 再利用可能な判断基準、domain knowledge |
 | Skill References | `src/opencode/skills/*/references/` | Source first | `.opencode/skills/*/references/` | Progressive disclosure の詳細 |
 | Skill Scripts | `src/opencode/skills/*/scripts/` | Source first | `.opencode/skills/*/scripts/` | 決定的でテスト可能な実行ロジック |
-| Command Template | `src/opencode/commands/agentdev/templates/` | Source first | `.opencode/commands/agentdev/templates/` | 完了報告・Issue/PR 本文の出力構造 |
+| Command Template | `src/opencode/commands/agentdev/templates/` | Source first | `.opencode/commands/agentdev/templates/` | 完了報告の出力構造。Issue/PR 本文の出力構造は `agentdev-workflow-templates` skill 配下（artifact-contracts.md 参照） |
 | Skill Template | `src/opencode/skills/*/templates/` | Source first | `.opencode/skills/*/templates/` | ドキュメント生成テンプレート |
 | REQ | `docs/requirements/REQ-*.md` | — | — | 要件定義（基準） |
 | ADR | `docs/adr/ADR-*.md` | — | — | アーキテクチャ決定記録（基準） |
