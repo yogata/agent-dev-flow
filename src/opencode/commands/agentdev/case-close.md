@@ -22,7 +22,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 1. **Issue番号解決**: ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
 
-2. **前提確認**: 達成判定・完了ゲート → `agentdev-workflow-lifecycle` の達成判定プロトコル（5条件判定・自律解決判定）に従い、Issue本文の完了条件チェックボックスを検証:
+2. **前提確認**: 達成判定・完了ゲート → `agentdev-workflow-lifecycle` に従い、Issue本文の完了条件チェックボックスを検証:
    - unchecked項目を達成判定（証拠ソース・5条件プロトコル）
    - 達成不可項目を自律解決判定（変更対象分類×検証種別分類）
    - `agentdev-gh-cli` に従い `--body-file` で Issue本文更新 → VERIFY
@@ -41,7 +41,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/docs-review` の全体意味レビューの代替ではない
 
 4. **PRマージ**:
-   - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill の git 共通手順（Section 3））
+   - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）
    - **Squash merge失敗時の自動リトライ**:
      - 失敗時は5秒待機して再試行
      - 最大5回リトライ（初期試行 + 5回リトライ）
@@ -57,7 +57,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 6. **Issueクローズ**: `gh issue close --reason completed`
 
 7. **ブランチ・worktree削除**: `agentdev-git-worktree` の worktree削除手順に従う:
-   - 未コミット変更検出（`agentdev-git-worktree` skill の git 共通手順（Section 4））
+   - 未コミット変更検出（`agentdev-git-worktree` skill に従い）
    - squash merge 済みの場合 → `git checkout .` で破棄可
    - .sisyphus/ クリーンアップ
    - worktree remove → Permission denied 時は停止（リトライは skill 定義に従う）
@@ -72,7 +72,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
    - 子Issue状態事前取得: `gh issue view --json comments` 等で全子Issueの OPEN/CLOSED 状態を一覧取得しログ出力（例: `子Issue状態一覧: #N1 (OPEN), #N2 (CLOSED), ...`）
    - Epic自動クローズ判定: 全子Issue CLOSED → 自動クローズ。1件以上 OPEN → スキップ
 
-9. **実行前同期**: `agentdev-git-worktree` の 実行前同期（`agentdev-git-worktree` skill の git 共通手順（Section 1））に従い `git pull --ff-only` を実行。ローカル変更事前チェック・hash検証・不一致時は評価・承認のやり直し
+9. **実行前同期**: `agentdev-git-worktree` に従い `git pull --ff-only` を実行。ローカル変更事前チェック・hash検証・不一致時は評価・承認のやり直し
 
 10. **学びの検知・抽出**: `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断:
       - ユーザーに学びの有無を問うことは禁止
@@ -83,7 +83,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
       - intake と learning を別々の成果物として扱う
       - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数・中間ファイル等）を capture の入力として使用しない。capture 情報の入力源は PR 本文のみ
 
- 11. **Domain state 永続化**: `agentdev-git-worktree` の domain state 永続化（`agentdev-git-worktree` skill の git 共通手順（Section 2））に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める
+ 11. **Domain state 永続化**: `agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める
 
 12. **完了報告**: 完了報告templateに従って出力。結果状態に応じたvariantを選択:
     - 全系統成功 → .opencode/commands/agentdev/templates/case-close/standard.md

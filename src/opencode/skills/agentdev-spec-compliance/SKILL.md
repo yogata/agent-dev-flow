@@ -97,7 +97,7 @@ description: Detects deviations between implementation and requirements (REQ), w
 
 ### 連携
 
-- case-run Phase C Step 8（乖離検出）でメトリクス収集を実行
+- 乖離検出時にメトリクス収集を実行
 - 収集結果は PR 本文（pr_desc.md テンプレートの「テスト結果」セクション）に含める
 
 ---

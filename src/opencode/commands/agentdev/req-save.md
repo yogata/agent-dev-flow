@@ -84,7 +84,7 @@ ADR保存の直前に、以下の妥当性を再検証すること:
 - adr-guidelinesの判定結果を前提として検証する
 
 ### 委譲・参照制約
-- G09: work_type分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
+- G09: work_type分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照
 
 ### 出力制約
 - G10: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す

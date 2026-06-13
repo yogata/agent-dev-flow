@@ -57,7 +57,7 @@ status: draft
 
 ### Step 0: 実行前同期
 
-`git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（`agentdev-git-worktree` の git-common-procedures.md Section 2 と同一のエラー形式）。
+`git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（`agentdev-git-worktree` と同一のエラー形式）。
 
 ### Step 1: Artifact 検出
 
@@ -75,19 +75,19 @@ status: draft
 
 ### Step 2: Artifact 読み込み・分析
 
-分析基準・upstream handoff metadata 付与ルールは `agentdev-workflow-lifecycle の「Step 2: Artifact 読み込み・分析」を参照
+分析基準・upstream handoff metadata 付与ルールは `agentdev-workflow-lifecycle` を参照
 
 ### Step 3: 統合・分割判定 + depends_on 依存解決 + ユーザー承認
 
-統合・分割判定基準・depends_on 依存解決ルールは `agentdev-workflow-lifecycle の「Step 3: 統合・分割判定 + depends_on 依存解決 + ユーザー承認」を参照
+統合・分割判定基準・depends_on 依存解決ルールは `agentdev-workflow-lifecycle` を参照
 
 ### Step 4: 矛盾検出 + ユーザー承認
 
-矛盾検出ロジック・出力形式は `agentdev-workflow-lifecycle の「Step 4: 矛盾検出 + ユーザー承認」を参照
+矛盾検出ロジック・出力形式は `agentdev-workflow-lifecycle` を参照
 
 ### Step 5: RU 生成
 
-RU 生成ルール・frontmatter スキーマ・depends_on 検証は `agentdev-workflow-lifecycle の「Step 5: RU 生成」を参照
+RU 生成ルール・frontmatter スキーマ・depends_on 検証は `agentdev-workflow-lifecycle` を参照
 
 ### Step 6: 成功 artifact の削除
 

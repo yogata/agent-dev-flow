@@ -29,7 +29,7 @@ agent: prometheus
 
 2. **壁打ち対話** → `agentdev-req-analysis` の壁打ちメソドロジーに従って深掘り。明示入力ファイルがある場合、その内容を開始点として活用
 
-   **2-1. upstream handoff 判定**: 入力が AgentDevFlow 本体・配布 command・配布 skill・配布 template・配布 script の不具合または改善点を対象とする場合、`agentdev-workflow-lifecycle` skill の upstream handoff protocol に従い upstream handoff 用 RU 入力として整理する。現在プロジェクトの通常要件docとして定義せず、出力に `handoff_target: agent-dev-flow` と `apply_in_current_project: false` を含める
+   **2-1. upstream handoff 判定**: 入力が AgentDevFlow 本体・配布 command・配布 skill・配布 template・配布 script の不具合または改善点を対象とする場合、`agentdev-workflow-lifecycle` に従い upstream handoff 用 RU 入力として整理する。現在プロジェクトの通常要件docとして定義せず、出力に `handoff_target: agent-dev-flow` と `apply_in_current_project: false` を含める
 
 3. **既存REQ照合** → `agentdev-req-file-manager` の照合方法論に従って実行。APPEND-first ルール: CREATE 前に APPEND/UPDATE 候補を必ず評価。SPLIT 検出時は保存操作ではなく requirements review 候補として扱う。操作分類結果は `draft-meta` に記録
 
@@ -50,7 +50,7 @@ agent: prometheus
 
 7. **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）。bugfix + ADR必要時は feature に昇格
 
-8. **Scale判断**（feature のみ）: `agentdev-workflow-lifecycle` の並列実行パターン条件で standard/large を判定。large 時はユーザーと分解計画を協議
+8. **Scale判断**（feature のみ）: `agentdev-workflow-lifecycle` で standard/large を判定。large 時はユーザーと分解計画を協議
 
 9. **ドラフト保存**:
    - 機能追加: `.sisyphus/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加。Step 6-1 で生成した `operation_units` セクションと Step 6-2 で生成した `execution_groups` セクションを含める
@@ -88,6 +88,6 @@ agent: prometheus
 - G09: チェックボックスは測定可能で一意（`agentdev-req-analysis` 品質基準）
 - G10: 要件doc構造は doc_requirement.md テンプレートに厳密に従う
 - G11: ADR閾値以上の判断は `agentdev-adr-guidelines` へ
-- G12: work_type 判定基準は `agentdev-workflow-lifecycle` → workflow classification を参照
+- G12: work_type 判定基準は `agentdev-workflow-lifecycle` を参照
 - G13: req-define は Issue 階層を決定しない。Issue 階層の決定は case-open の責務範囲
 - G14: req-define は draft に `operation_units` と `execution_groups` セクションを出力すること（REQ-0102-033, 036）。単一REQ操作の場合も 1 件の OU として出力する
