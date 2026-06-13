@@ -42,33 +42,33 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### Phase 1: Inbox Scan
 
-1. **inbox の確認**: `.agentdev/intake/inbox/` 内の intake item を一覧表示する。詳細は `agentdev-workflow-lifecycle を参照
+1. **inbox の確認**: `.agentdev/intake/inbox/` 内の intake item を一覧表示する。詳細は `agentdev-workflow-lifecycle` を参照
 
 2. **item の読み込み**: 各 intake item を読み込み、内容を把握する。委譲接続点: サブエージェントは読解メモ・分類候補・根拠・capture候補のみを返し、親エージェントが分類提示と保存判断を行う
 
 ### Phase 2: Internal Review
 
-3. **レビュー・評価**: 各 item を評価する。詳細は `agentdev-workflow-lifecycle を参照。委譲接続点: サブエージェントは採用 / 保留 / 却下の候補と根拠を pass/warn/fail/partial で返し、親エージェントが最終分類を決める
+3. **レビュー・評価**: 各 item を評価する。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントは採用 / 保留 / 却下の候補と根拠を pass/warn/fail/partial で返し、親エージェントが最終分類を決める
 
-4. **分類の提示**: 各 item の評価結果を分類（採用 / 保留 / 却下）と共に提示する。見出しは `## Findings / Capture候補` とする。詳細は `agentdev-workflow-lifecycle を参照
+4. **分類の提示**: 各 item の評価結果を分類（採用 / 保留 / 却下）と共に提示する。見出しは `## Findings / Capture候補` とする。詳細は `agentdev-workflow-lifecycle` を参照
 
 ### Phase 3: HITL Confirmation
 
-5. **ユーザー確認**: 評価・分類結果をユーザーに提示し、明示的な承認を得る。詳細は `agentdev-workflow-lifecycle を参照。委譲接続点: 親エージェントのみが承認確認と次フェーズ進行判断を行う
+5. **ユーザー確認**: 評価・分類結果をユーザーに提示し、明示的な承認を得る。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: 親エージェントのみが承認確認と次フェーズ進行判断を行う
 
 ### Phase 4: Distribution
 
-6. **採用 item の整形**: 採用と判定された item を backlog-review 向けに整形する。詳細は `agentdev-workflow-lifecycle を参照。委譲接続点: サブエージェントは整形案のみを返し、親エージェントが保存対象本文を確定する
+6. **採用 item の整形**: 採用と判定された item を backlog-review 向けに整形する。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントは整形案のみを返し、親エージェントが保存対象本文を確定する
 
-7. **保存**: `.agentdev/intake/promoted/` に保存する。詳細は `agentdev-workflow-lifecycle を参照。委譲接続点: 親エージェントのみが保存する
+7. **保存**: `.agentdev/intake/promoted/` に保存する。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: 親エージェントのみが保存する
 
-8. **振り分け**: 確定した分類に基づいて item を振り分ける。詳細は `agentdev-workflow-lifecycle を参照。委譲接続点: 親エージェントのみが移動を行う
+8. **振り分け**: 確定した分類に基づいて item を振り分ける。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: 親エージェントのみが移動を行う
 
 ### Phase 5: Git & Completion
 
-9. **実行前同期（git pull）**: `git pull --ff-only` を実行する。失敗時の扱いは `agentdev-workflow-lifecycle を参照。委譲接続点: 親エージェントのみが git 操作を行う
+9. **実行前同期（git pull）**: `git pull --ff-only` を実行する。失敗時の扱いは `agentdev-workflow-lifecycle` を参照。委譲接続点: 親エージェントのみが git 操作を行う
 
-10. **.agentdev/intake 変更の commit と push**: `.agentdev/intake/` 配下の変更のみを commit/push する。詳細は `agentdev-workflow-lifecycle を参照。委譲接続点: 親エージェントのみが commit/push を行う
+10. **.agentdev/intake 変更の commit と push**: `.agentdev/intake/` 配下の変更のみを commit/push する。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: 親エージェントのみが commit/push を行う
 
 11. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-promote/standard.md。分類結果（採用・保留・却下の件数・一覧）と git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 

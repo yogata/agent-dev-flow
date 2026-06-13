@@ -353,6 +353,20 @@ Adapt sections as needed.
 
 Skill の品質基準は本スキルの範囲とする。Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（`docs/specs/artifact-contracts.md`）を参照。Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
 
+## 参照記述ルール
+
+### command → skill 参照の原則
+
+1. **実在パス明記**: command から template / reference / script を参照する場合、実在する repo-root-relative path を明記すること
+2. **自然言語ラベル参照禁止**: `workflow classification`、`Issue 生成プロトコル` 等の自然言語ラベルだけでファイルを推測させる参照を禁止する。参照先が必要な場合は skill 名、`SKILL.md`、または実在する path を明記すること
+3. **skill 内部構造参照禁止**: command は他 skill 内部の protocol 名、Step 名、Section 名、見出し名を参照しないこと。skill を参照する場合は skill 名（`agentdev-*`）までとすること
+4. **command 固有 Step 番号の skill 側保持禁止**: skill は command 固有の Step 番号・Phase 名を一次情報として保持しないこと。概念名を使用すること
+
+### skill → command 参照の原則
+
+1. **概念名使用**: skill は command の Step 番号・Phase 名を参照せず、概念名（処理名）を使用すること
+2. **例**: `case-run Step 10` → `SPEC 更新時`、`case-close Step 8` → `完了時`
+
 ## 9. 配置判断フロー
 
 新規コンテンツをどこに配置するかの判断フロー:

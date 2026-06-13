@@ -7,7 +7,7 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 
 親Epic Issueのステータス追跡テーブル（☐ 未着手 / 🔄 進行中 / ✅ 完了 / ❌ 対処不要 / ⏭ スキップ）を更新する知識ベース。
 
-- **参照元**: `case-run`（Phase A: 進行中更新）、`case-close`（Step 8: 完了更新）
+- **参照元**: `case-run`（進行中更新）、`case-close`（完了更新）
 - **特性**: 宣言的定義のみ提供。手順・手続きは各コマンド定義に委ねる
 
 ## ステータス値定義
@@ -15,8 +15,8 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 | 値 | 意味 | 設定タイミング | 終了状態 |
 |---|---|---|---|
 | `☐ 未着手` | 子Issue未着手 | Epic作成時（初期値） | いいえ |
-| `🔄 進行中` | 子Issue作業中 | `case-run` Phase A | いいえ |
-| `✅ 完了 ([PR#N](URL))` | 子Issue完了 | `case-close` Step 8 | はい |
+| `🔄 進行中` | 子Issue作業中 | `case-run` 実行中 | いいえ |
+| `✅ 完了 ([PR#N](URL))` | 子Issue完了 | `case-close` 完了時 | はい |
 | `❌ 対処不要` | 対処不要（手動設定） | ユーザー手動 | はい |
 | `⏭ スキップ` | 前提条件未達・依存関係未充足等で Orchestrator がスキップした子Issue。手動操作では使用不可（Orchestratorのみ設定可能） | Epic Orchestrator（Wave完了時） | はい |
 
@@ -29,7 +29,7 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 
 ## ステータス更新プロトコル
 
-### case-run: 進行中更新（Phase A）
+### case-run: 進行中更新
 
 **単一Issueモード**:
 1. 子Issue本文から `Parent: #{N}` を検出
@@ -62,9 +62,9 @@ Wave完了時ステータス更新:
 
 一括更新順序: 子Issue番号の昇順
 
-### case-close: 完了更新（Step 8）
+### case-close: 完了更新
 
-`case-close` Step 8 の既存実装を変更しない:
+`case-close` の既存実装を変更しない:
 - `✅ 完了` への更新・Epic自動クローズ判定は既存手順のまま
 - 本スキルは知識ベースとして参照されるのみ
 
@@ -156,11 +156,11 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 
 Epicステータス更新はPRのmerge前後で一貫性を保つ必要がある:
 
-**merge前（case-run Phase A）**:
+**merge前（case-run 実行中）**:
 - 子Issueを `☐ 未着手` → `🔄 進行中` に更新
 - 親Epic本文を取得し、該当子Issue行を更新
 
-**merge後（case-close Step 8）**:
+**merge後（case-close 完了時）**:
 - 子Issueを `🔄 進行中` → `✅ 完了 ([PR#N](URL))` に更新
 - PR番号とURLを含める
 

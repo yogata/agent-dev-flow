@@ -19,13 +19,13 @@ agent: sisyphus
 
 ## Steps
 
-1. Issue番号解決。詳細は `agentdev-workflow-routing を参照。委譲接続点: サブエージェントは候補番号抽出のみを返し、親エージェントが確認・停止を判断する
-2. 現在のIssue状態を取得 → `agentdev-workflow-lifecycle` のフェーズ体系で現在フェーズを判定
+1. Issue番号解決。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは候補番号抽出のみを返し、親エージェントが確認・停止を判断する
+2. 現在のIssue状態を取得 → `agentdev-workflow-lifecycle` で現在フェーズを判定
 3. 更新内容に応じて分岐:
-   - **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが `gh issue edit` を行う
-   - **`--comment`**: 更新コメントを追加する。詳細は `agentdev-workflow-routing を参照。委譲接続点: サブエージェントはコメント案と必須セクション検査のみを返し、親エージェントが投稿する
-   - **`--req`**: REQファイル更新を行う。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）。詳細は `agentdev-workflow-routing を参照。委譲接続点: サブエージェントは関連REQ候補・APPEND/UPDATE候補・根拠のみを返し、親エージェントがファイル更新とcommit/pushを行う
-   - **`--review-ng`**: レビューNG時の専用フローを実行する。詳細は `agentdev-workflow-routing を参照。委譲接続点: サブエージェントは乖離タイプ候補・推奨アクション・更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
+   - **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが `gh issue edit` を行う
+   - **`--comment`**: 更新コメントを追加する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントはコメント案と必須セクション検査のみを返し、親エージェントが投稿する
+   - **`--req`**: REQファイル更新を行う。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは関連REQ候補・APPEND/UPDATE候補・根拠のみを返し、親エージェントがファイル更新とcommit/pushを行う
+   - **`--review-ng`**: レビューNG時の専用フローを実行する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは乖離タイプ候補・推奨アクション・更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
 4. 完了報告 → 完了報告templateに従って出力。更新種別に応じたvariantを選択:
     - --body → .opencode/commands/agentdev/templates/case-update/body.md
     - --comment → .opencode/commands/agentdev/templates/case-update/comment.md
@@ -58,7 +58,7 @@ agent: sisyphus
 ### 委譲・参照制約
 - G08: `agentdev-gh-cli` に従って `--body-file` を使用すること（`--body` 直接指定は禁止）
 - G09: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
-- G10: work_type分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
+- G10: work_type分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照
 
 ### 出力制約
 - G11: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す

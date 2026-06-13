@@ -17,7 +17,7 @@ agent: sisyphus
 
 ## Steps
 
-0. **upstream handoff 停止判定**: 要件docまたは RU に `apply_in_current_project: false` が含まれる場合、Issue を作成せず停止。agent-dev-flow repository への手動取り込み対象として報告。判定は `agentdev-workflow-lifecycle` skill の upstream handoff protocol に従う
+0. **upstream handoff 停止判定**: 要件docまたは RU に `apply_in_current_project: false` が含まれる場合、Issue を作成せず停止。agent-dev-flow repository への手動取り込み対象として報告。判定は `agentdev-workflow-lifecycle` に従う
 
 0-1. **OU 選択ゲート**: ドラフトに `operation_units` セクションがある場合、処理対象 OU を決定する（REQ-0104-035〜037）:
      - OU ID が指定されている場合 → 指定された OU の req-save result を読み取り、その OU だけを Issue 化する
@@ -25,7 +25,7 @@ agent: sisyphus
      - OU ID 指定なし・OU 2 件以上 → OU 一覧（`ou_id`, `target_req`, `operation`, `result`）を表示して停止する。ユーザーに OU ID の指定を求める
      - `operation_units` セクションがない場合 → 従来どおり全要件docを処理する（後方互換）
 
-1. 要件docからIssue本文を生成。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う
+1. 要件docからIssue本文を生成。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う
 
 2. **マルチREQ入力判定**: 入力要件doc数を確認
    - 単一REQ → Step 3
@@ -43,7 +43,7 @@ agent: sisyphus
    - 複数 OU であることだけを理由に Epic Issue を作成しない（REQ-0104-041）
 
 **共通ルール**（全Step適用）:
-- **VERIFY**: gh CLI書込後は毎回 `agentdev-gh-cli` の VERIFY操作（Section 5-8）に従い検証
+- **VERIFY**: gh CLI書込後は毎回 `agentdev-gh-cli` の VERIFY操作に従い検証
 - **テンプレート準拠**: テンプレート読込後は毎回【必須】セクションの完備を確認（【任意】は内容がある場合のみ含める）、欠落時は再生成
 
 ### Epic flow（Step 4〜8）
@@ -58,24 +58,24 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
  | 子Issue内容ソース | 各REQ docから生成 | decomposition内容から生成 |
 | 子Issue追加要素 | Wave番号+依存記載、REQ doc番号明示（traceability）、孫Issue判定 | なし |
 
-4. テンプレート `issue_desc_epic.md` を Read tool で読み込む。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照
+4. テンプレート `issue_desc_epic.md` を Read tool で読み込む。詳細は `agentdev-workflow-lifecycle` を参照
 
-5. Epic Issue本文を生成。`execution_groups` セクションから Epic 候補グループの根拠を読み取る（REQ-0104-039）。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
+5. Epic Issue本文を生成。`execution_groups` セクションから Epic 候補グループの根拠を読み取る（REQ-0104-039）。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
 
 6. Epic Issueを作成:
    - ラベル: `enhancement`, `feature`, `epic`
    - `--body-file` 使用 → VERIFY。Issue番号を `{epic_number}` として記録
 
-7. 子Issueを作成（OU 単位・順次処理）。Issue 化単位は REQ doc 単位ではなく OU 単位とする（REQ-0104-042）。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: サブエージェントは子Issue本文候補とテンプレート充足検査のみを返し、親エージェントが `gh` 実行とVERIFYを行う
+7. 子Issueを作成（OU 単位・順次処理）。Issue 化単位は REQ doc 単位ではなく OU 単位とする（REQ-0104-042）。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントは子Issue本文候補とテンプレート充足検査のみを返し、親エージェントが `gh` 実行とVERIFYを行う
 
-8. Epic Issue本文を更新。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: サブエージェントは置換漏れ検査のみを返し、親エージェントが本文更新とVERIFYを行う
+8. Epic Issue本文を更新。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントは置換漏れ検査のみを返し、親エージェントが本文更新とVERIFYを行う
 
 8-1. **OU 結果の書き戻し**: ドラフトに `operation_units` セクションがある場合、作成した Issue / Epic 番号を当該 OU の `result` に書き戻す（REQ-0104-038）
 
 ### Standard flow + 共通終了（Step 14〜）
 
 14. **[Standard]** `docs/adr/README.md` から関連ADRを特定（単一REQ Epic flowの内容反映にも活用）
-15. **[Standard]** ラベル付与 → `agentdev-workflow-lifecycle` ラベル体系に従う
+15. **[Standard]** ラベル付与 → `agentdev-workflow-lifecycle` に従う
 16. **[Standard]** GitHub Issue作成（`gh issue create`）→ `--body-file` → VERIFY
 
 16-1. **[Standard] OU 結果の書き戻し**: ドラフトに `operation_units` セクションがある場合、作成した Issue 番号を当該 OU の `result` に書き戻す（REQ-0104-038）
@@ -84,7 +84,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
  18. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
 
- 18-1. **RU ファイル削除**。詳細は `agentdev-workflow-lifecycle` skill の Issue 生成プロトコル を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
+ 18-1. **RU ファイル削除**。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
 
 18-2. 完了報告 → template variant:
    - Standard → `templates/case-open/standard.md`
@@ -117,7 +117,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 ### 委譲・参照制約
 - G12: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
-- G13: work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` → workflow classification を参照
+- G13: work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照
 
 ### 出力制約
 - G17: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す
