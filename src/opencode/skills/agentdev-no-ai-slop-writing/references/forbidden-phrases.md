@@ -7,8 +7,8 @@
 
 | 優先度 | 対象 | 適用 |
 |--------|------|------|
-| 主対象（SHALL） | 日本語の AI-slop 表現 | すべての検出・置換ルールを適用 |
-| 補助対象（SHOULD） | 英語 AI-slop | frontmatter description, Conventional Commits, 固有名詞, 技術仕様名, 引用, 外部テンプレートに限定して適用 |
+| 主対象 | 日本語の AI-slop 表現 | すべての検出・置換ルールを適用 |
+| 補助対象 | 英語 AI-slop | frontmatter description, Conventional Commits, 固有名詞, 技術仕様名, 引用, 外部テンプレートに限定して適用 |
 
 ## 適用除外
 

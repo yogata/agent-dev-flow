@@ -1,7 +1,7 @@
 # Specifications Index
 
 SPEC files are canonical documents for the current architecture (REQ-0101).
-They describe what the system *is* now, as opposed to REQ files that define what it *should be*.
+They describe what the system *is* now, as opposed to REQ files that define required outcomes.
 
 > **Repo-internal 設計文書**: SPEC files are repo-internal design documents for the agent-dev-flow repository. They are not runtime distribution targets and runtime commands do not depend on them (ADR-0103, ADR-0104).
 
@@ -26,7 +26,7 @@ They describe what the system *is* now, as opposed to REQ files that define what
 ## Document Relationships (REQ-0101)
 
 ```
-REQ (requirements/REQ-*.md)    -- 要件定義（what should be）
+REQ (requirements/REQ-*.md)    -- 要件定義（required outcomes）
   |
   v
 ADR (adr/ADR-*.md)            -- アーキテクチャ決定記録（why）
@@ -38,7 +38,7 @@ SPEC (specs/*.md)              -- 現在アーキテクチャ基準（what is）
 DOC-MAP (DOC-MAP.md)           -- 文書探索入口（参照用・分類索引）
 ```
 
-- **REQ** files define requirements. They are the source of truth for what the system must satisfy.
+- **REQ** files define requirements. They are the source of truth for required system outcomes.
 - **ADR** files record architectural decisions and their rationale.
 - **SPEC** files describe the current architecture as implemented. They are canonical for "how it works now."
 - **DOC-MAP** is a non-canonical navigation index. It does not replace any REQ, ADR, or SPEC.

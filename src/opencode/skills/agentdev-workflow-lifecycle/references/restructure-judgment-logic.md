@@ -38,7 +38,7 @@ REQ の active/retired/世代境界の整合性を確認する:
 | **SPLIT** | 単一REQが複数の独立した関心事を含んでおり、分割が適切か | (a) 1つのREQに複数の関心対象、(b) 複数 artifact 種別の混在、(c) 複数 command family の混在、(d) 複数 lifecycle 段階の混在 |
 | **MERGE** | 複数のREQが密接に関連しており、統合が適切か | (a) 複数REQが同じ目的、(b) 同じ対象 artifact、(c) 同じ command、(d) 同じ責務を扱っている |
 | **MOVE** | REQの内容が別の文書種（specs/guides/ADR）に移動すべきか | (a) REQ行が変更後仕様ではなく反映作業そのものになっている |
-| **DUPLICATE** | REQ間またはREQと他文書で内容が重複しているか | (a) active REQ 間または REQ と spec/guide/command の間で同じ SHALL/MUST 相当の責務が重複 |
+| **DUPLICATE** | REQ間またはREQと他文書で内容が重複しているか | (a) active REQ 間または REQ と spec/guide/command の間で同じ 必達要件 相当の責務が重複 |
 | **RETIRE** | active REQのうち、retire すべき（現行仕様として不要な）ものがないか | (a) active REQ が現行案内から参照されない、(b) 関心対象が既存 active REQ に吸収済み |
 | **DRIFT** | REQ本文と実体（specs/実装/コマンド）の間に乖離がないか | (a) REQ が要求する対象と実体ファイルまたは command 定義が矛盾している |
 
