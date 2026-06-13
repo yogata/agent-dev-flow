@@ -130,8 +130,8 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 | PR 説明文 | `.opencode/skills/agentdev-workflow-templates/templates/pr_desc.md` | case-run |
 | 完了報告 | `.opencode/commands/agentdev/templates/{command}/{variant}.md` | 各コマンド |
 
-- runtime command は上記 runtime path（`.opencode/...`）からテンプレートを参照すること（SHALL）
-- `src/opencode/...` は source 配置・install-sync 入力・authoring context に限定し、runtime 実行時の参照先として使用しない（SHALL）
+- runtime command は上記 runtime path（`.opencode/...`）からテンプレートを参照すること
+- `src/opencode/...` は source 配置・install-sync 入力・authoring context に限定し、runtime 実行時の参照先として使用しない
 
 ## Completion Report Contract
 
@@ -139,7 +139,7 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 
 ### 共通必須フィールド
 
-各完了報告テンプレートは以下の6フィールドをすべて含むこと（MUST）。
+各完了報告テンプレートは以下の6フィールドをすべて含むこと。
 
 | # | フィールド | 説明 |
 |---|-----------|------|
@@ -154,11 +154,11 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 
 - **`結果` フィールド**: ドメイン成果（Issue作成、PR作成、RU生成等）に限定。git 操作結果は含めない。
 - **`git 永続化` フィールド**: git 操作結果（commit、push、HEAD同期等）に限定。ドメイン成果は含めない。
-- **重複禁止**: `結果` 欄と `git 永続化` 欄で同一事実を重複記載してはならない（MUST NOT）。
+- **重複禁止**: `結果` 欄と `git 永続化` 欄で同一事実を重複記載してはならない。
 
 ### 出力順序ルール
 
-完了報告ステップにおいて以下の順序を守ること（MUST）。
+完了報告ステップにおいて以下の順序を守ること。
 
 1. **TodoWrite 更新（先）**: TodoWrite の「完了報告」項目を `completed` に更新する
 2. **完了報告テキスト（後）**: 完了報告フォーマットに従ったテキストを出力する
@@ -166,7 +166,7 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 
 ### 汎用締め文の禁止
 
-完了報告では以下の汎用締め文を禁止する（MUST NOT）。
+完了報告では以下の汎用締め文を禁止する。
 
 - 「次にやるべきことがあれば指示してください」
 - 「他にご要望があればお知らせください」
@@ -177,7 +177,7 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 
 ### 完了報告後の追加出力禁止
 
-完了報告テキストを出力した後、追加のテキスト・説明・サマリーを出力してはならない（MUST NOT）。完了報告がコマンドの最終出力である。
+完了報告テキストを出力した後、追加のテキスト・説明・サマリーを出力してはならない。完了報告がコマンドの最終出力である。
 
 ## Scope Declaration
 

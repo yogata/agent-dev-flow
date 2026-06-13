@@ -32,10 +32,10 @@
 | 24 | Findings / Capture候補 見出し | REQ-0119 (014, 020, 021) | workflow-contracts.md | current/source は新見出しへ統一。旧語検出用文字列は許容 |
 | 25 | Delegation envelope 最小契約 | REQ-0119 (017, 018) | workflow-contracts.md | delegation_type/on_result は必須 envelope ではないことを確認 |
 | 26 | lightweight-delegation 位置付け | REQ-0119 (015, 016) | workflow-contracts.md | primary pattern ではなく重ねる委譲として扱う |
-| 27 | RFC 2119 marker 横断検出 | REQ-0102 (024-028), REQ-0108 (236, 237) | integrity-contracts.md | （SHALL）/（SHOULD）/（MAY）/（MUST）括弧付き marker の横断検出 |
+| 27 | 語彙ポリシー横断検出 | REQ-0102 (024-028), REQ-0108 (236, 237) | integrity-contracts.md | active 対象範囲の語彙ポリシー違反検出 |
 | 28 | Cross-REQ 語彙矛盾 | REQ-0108 (239) | integrity-contracts.md | active REQ 間の語彙矛盾検出 |
 | 29 | mapping-table 履歴名明示 | REQ-0108 (240) | integrity-contracts.md | 旧語彙に履歴名を明示 |
-| 30 | REQ 検証基準（必達要件） | REQ-0115 (044) | integrity-contracts.md | RFC 2119 語ではなく必達要件判定に基づく検証 |
+| 30 | REQ 検証基準（必達要件） | REQ-0115 (044) | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証 |
 
 ## 重複ルールの解消状況
 

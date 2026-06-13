@@ -40,13 +40,13 @@ Issue の種別に応じて異なるワークフローを適用する。work_typ
 
 ### ADR false negative 基準
 
-ADR-worthy な判断を REQ/SPEC/guide のみとして扱う false negative を防ぐため、以下のリスク指標に該当する内容は ADR 必要性を再評価すること（SHOULD, REQ-0112-058）。
+ADR-worthy な判断を REQ/SPEC/guide のみとして扱う false negative を防ぐため、以下のリスク指標に該当する内容は ADR 必要性を再評価すること（推奨, REQ-0112-058）。
 
 - REQ/SPEC境界の曖昧な内容: WHAT と HOW の分離だけでは判断理由が保存されず、後続変更で根拠が失われる可能性がある
 - 複数モジュールにまたがる判断: command / skill / script / docs など複数の責務境界に影響し、局所仕様だけではトレードオフを説明できない
 - 長期間有効な技術選定: 一時的な仕様ではなく、将来の実装・運用判断を拘束する選定である
 
-予防策として、req-define / req-save は ADR 不要と判断した場合でも除外基準と根拠事実を記録すること（SHALL）。上記リスク指標のいずれかに該当する場合、`agentdev-adr-guidelines` の閾値と除外基準を再適用し、ADR不要の理由が技術判断不在・仕様変更のみ等に明確に該当することを確認すること（SHOULD）。
+予防策として、req-define / req-save は ADR 不要と判断した場合でも除外基準と根拠事実を記録すること。上記リスク指標のいずれかに該当する場合、`agentdev-adr-guidelines` の閾値と除外基準を再適用し、ADR不要の理由が技術判断不在・仕様変更のみ等に明確に該当することを確認すること。
 
 ---
 

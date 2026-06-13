@@ -2,7 +2,7 @@
 
 ## Active Requirements
 
-現在の要件判断では、以下21件を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
+現在の要件判断では、以下22件を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
 
 | REQ ID | タイトル | 関心対象 |
 |---|---|---|
@@ -21,14 +21,13 @@
 | [REQ-0113](REQ-0113.md) | Skill References SPEC分離基準 | skill / skill references 内 SPEC 相当記述の分離基準、移管先 SPEC 選択、runtime 自己完束制約 |
 | [REQ-0114](REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件 |
 | [REQ-0115](REQ-0115.md) | docs-* command suite 定義 | /repo/docs-check 改名、/agentdev/docs-review 新設、docs-review 統合、req-*/case-* workflow 補強、是正ルーティング |
-| [REQ-0116](REQ-0116.md) | 文書分類ポリシー定義 | REQ/ADR/SPEC/Guide/Report/DOC-MAP/Retired 分類ルール・Document Authority Model・Classification Decision Tree・Cross-document Projection Rules・Re-baseline Rules・Synchronization Rules・Report分類・ADR定義拡張・SPEC SHALL/MUST限定 |
+| [REQ-0116](REQ-0116.md) | 文書分類ポリシー定義 | REQ/ADR/SPEC/Guide/Report/DOC-MAP/Retired 分類ルール・Document Authority Model・Classification Decision Tree・Cross-document Projection Rules・Re-baseline Rules・Synchronization Rules・Report分類・ADR定義拡張・SPEC責務境界 |
 | [REQ-0117](REQ-0117.md) | Git worktree junction 削除フォールバック手順 | git-worktree、junction、Windows、フォールバック手順 |
 | [REQ-0118](REQ-0118.md) | Subagent edit safety ガイドライン | subagent、edit safety、command-authoring、skill-authoring、パス参照 |
 | [REQ-0119](REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 | command 薄型化 / skill 詳細移管 / sub-agent 委譲境界 / Step 整数化 / verbatim 条件付き / delegation_type SPEC降格 / ADR-0112 accepted化 |
 | [REQ-0120](REQ-0120.md) | Runtime Command 非必須参照除去 | command / token 最適化 / 非必須参照節削除 / 高頻度 command 優先 |
-| [REQ-0121](REQ-0121.md) | Runtime Command RFC 2119 見直し + Integrity 検査再定義 | command / token 最適化 / RFC 2119 規範語 / 自然文置換 / integrity 検査再定義 / 語彙ポリシー整合 |
-| [REQ-0120](REQ-0120.md) | Runtime Command 非必須参照除去 | command / token最適化 / 非必須参照節 / 実行骨格 / command-authoring |
-| [REQ-0121](REQ-0121.md) | Runtime Command RFC 2119 見直し + Integrity 検査再定義 | command / token最適化 / RFC2119 / integrity / 語彙ポリシー |
+| [REQ-0121](REQ-0121.md) | Runtime Command 規範語見直し + Integrity 検査再定義 | command / token 最適化 / 規範語 / 自然文置換 / integrity 検査再定義 / 語彙ポリシー整合 |
+| [REQ-0122](REQ-0122.md) | 規範語ルールおよび記載の完全削除 | active REQ / SPEC / ADR / integrity / runtime / 語彙ポリシー |
 
 ## Retired Requirements
 

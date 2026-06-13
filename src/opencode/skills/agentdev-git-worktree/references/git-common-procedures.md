@@ -8,7 +8,7 @@
 
 ### 前提確認
 
-`git status --porcelain` でローカル変更の有無を確認する（SHALL）。ローカル変更が検出された場合、構造化エラーで停止する。
+`git status --porcelain` でローカル変更の有無を確認する。ローカル変更が検出された場合、構造化エラーで停止する。
 
 ### 手順
 
@@ -72,7 +72,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 1. `git diff --name-only` で `.agentdev/` 配下の変更ファイルを確認
 2. **変更なし時**: commit/push せず、完了報告で「変更なし」と報告
 3. **変更あり時**:
-   a. `git add` は `.agentdev/` 配下のみを対象とする（SHALL）。他のパスを巻き込まない
+   a. `git add` は `.agentdev/` 配下のみを対象とする。他のパスを巻き込まない
    b. commit message: Conventional Commits 形式（各 command 固有の message を使用）
    c. `git push` を実行
    d. **push 失敗時** → 構造化エラーで停止（下記）
@@ -95,7 +95,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 
 ## 3. PR merge 前 HEAD hash 記録
 
-`gh pr merge` 実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する（SHALL）。自マージ検出で使用する。
+`gh pr merge` 実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する。自マージ検出で使用する。
 
 ---
 
@@ -103,7 +103,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 
 worktree 内で `git status --short` を実行し、未コミット変更の有無を確認する。
 
-- **未コミット変更あり**: 検出内容を報告し、ユーザーの指示に従う（SHALL）。自動的な破棄・コミットは行わない
+- **未コミット変更あり**: 検出内容を報告し、ユーザーの指示に従う。自動的な破棄・コミットは行わない
 - **未コミット変更なし**: そのまま次の手順へ進む
 
 ---

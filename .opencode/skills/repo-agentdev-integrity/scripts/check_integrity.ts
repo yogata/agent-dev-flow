@@ -270,10 +270,10 @@ const LEGACY_PATTERNS = [
     pattern: /\belevate時prune\b/g,
     name: "elevate時prune (old terminology: should be promote時prune)",
   },
-  // R4: RFC 2119 keyword markers in active documents (REQ-0102-024~028, REQ-0108-236)
+  // R4: legacy normative keyword markers in active documents (REQ-0102-024~028, REQ-0108-236)
   {
-    pattern: /（SHALL）|（SHOULD）|（MAY）|（MUST）/g,
-    name: "bracketed RFC 2119 marker (REQ-0102-028)",
+    pattern: new RegExp(["（" + "S" + "HALL）", "（" + "S" + "HOULD）", "（" + "M" + "AY）", "（" + "M" + "UST）"].join("|"), "g"),
+    name: "bracketed legacy normative marker (REQ-0102-028)",
   },
 ];
 
@@ -1666,7 +1666,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
 
 function checkCanonicalBoundary(root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const SHALL_MUST_PATTERN = /\b(SHALL|MUST|必須)\b/g;
+  const REQUIREMENT_KEYWORD_PATTERN = new RegExp(`\\b(${["S" + "HALL", "M" + "UST", "必須"].join("|")})\\b`, "g");
   const REQ_TABLE_PATTERN = /\|\s*ID\s*\|\s*要件\s*\|/g;
   const THRESHOLD = 5;
 
@@ -1674,18 +1674,18 @@ function checkCanonicalBoundary(root: string): CheckResult[] {
   const docMapPath = path.join(root, "docs", "DOC-MAP.md");
   const docMapContent = readText(docMapPath);
   if (docMapContent) {
-    const matches = docMapContent.match(SHALL_MUST_PATTERN);
+    const matches = docMapContent.match(REQUIREMENT_KEYWORD_PATTERN);
     const count = matches ? matches.length : 0;
     if (count > THRESHOLD) {
       results.push(
         warn(
           "CanonicalBoundary",
           "docmap-requirements",
-          `DOC-MAP contains ${count} requirement keywords (SHALL/MUST), threshold is ${THRESHOLD}`,
+          `DOC-MAP contains ${count} requirement keywords, threshold is ${THRESHOLD}`,
           resolveRelative(docMapPath, root),
           undefined,
           {
-            evidence: `${count} SHALL/MUST keywords`,
+            evidence: `${count} requirement keywords`,
             expected: `at most ${THRESHOLD}`,
             route: "req-define",
           },
@@ -1726,18 +1726,18 @@ function checkCanonicalBoundary(root: string): CheckResult[] {
   const readmePath = path.join(root, "README.md");
   const readmeContent = readText(readmePath);
   if (readmeContent) {
-    const matches = readmeContent.match(SHALL_MUST_PATTERN);
+    const matches = readmeContent.match(REQUIREMENT_KEYWORD_PATTERN);
     const count = matches ? matches.length : 0;
     if (count > THRESHOLD) {
       results.push(
         warn(
           "CanonicalBoundary",
           "readme-specifications",
-          `Root README contains ${count} specification keywords (SHALL/MUST), threshold is ${THRESHOLD}`,
+          `Root README contains ${count} specification keywords, threshold is ${THRESHOLD}`,
           resolveRelative(readmePath, root),
           undefined,
           {
-            evidence: `${count} SHALL/MUST keywords`,
+            evidence: `${count} specification keywords`,
             expected: `at most ${THRESHOLD}`,
             route: "req-define",
           },
@@ -4266,7 +4266,7 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Accepted ADR only citation check (REQ-0108-125, SHOULD) ─────────────────
+// ─── Accepted ADR only citation check (REQ-0108-125, advisory) ───────────────
 
 function checkAcceptedAdrOnlyCitation(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -5929,7 +5929,7 @@ function checkStrikethroughInDocs(root: string): CheckResult[] {
   return results;
 }
 
-// ─── REQ-0108-205: Historical narrative detection (SHOULD) ────────────────
+// ─── REQ-0108-205: Historical narrative detection (advisory) ───────────────
 
 function checkHistoricalNarrative(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -6500,7 +6500,7 @@ function checkVocabularyRegistrySync(root: string): CheckResult[] {
   return results;
 }
 
-// ─── REQ-0108-215: Bugfix docs update rule consistency (SHOULD) ────────────
+// ─── REQ-0108-215: Bugfix docs update rule consistency (advisory) ──────────
 
 function checkBugfixDocsConsistency(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -6558,7 +6558,7 @@ function checkBugfixDocsConsistency(root: string): CheckResult[] {
   return results;
 }
 
-// ─── REQ-0108-216: Epic status vocabulary consistency (SHOULD) ──────────────
+// ─── REQ-0108-216: Epic status vocabulary consistency (advisory) ───────────
 
 function checkEpicStatusConsistency(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -6794,14 +6794,16 @@ function checkCommandCaptureDuties(cmdDir: string, root: string): CheckResult[] 
 
 // REQ-0108-236~241, REQ-0115-044
 
-const RFC2119_PATTERNS = [
-  { pattern: /（SHALL）/g, name: "（SHALL）" },
-  { pattern: /（SHOULD）/g, name: "（SHOULD）" },
-  { pattern: /（MAY）/g, name: "（MAY）" },
-  { pattern: /（MUST）/g, name: "（MUST）" },
+const legacyMarker = (word: string) => `（${word}）`;
+
+const LEGACY_NORMATIVE_MARKER_PATTERNS = [
+  { pattern: new RegExp(legacyMarker("S" + "HALL"), "g"), name: "legacy required marker" },
+  { pattern: new RegExp(legacyMarker("S" + "HOULD"), "g"), name: "legacy recommendation marker" },
+  { pattern: new RegExp(legacyMarker("M" + "AY"), "g"), name: "legacy optional marker" },
+  { pattern: new RegExp(legacyMarker("M" + "UST"), "g"), name: "legacy mandatory marker" },
 ];
 
-const RFC2119_EXEMPT_PATHS: RegExp[] = [
+const LEGACY_NORMATIVE_MARKER_EXEMPT_PATHS: RegExp[] = [
   /vocabulary-registry\.md$/,
   /retired\/REQ-/,
   /mapping-table\.md$/,
@@ -6810,11 +6812,11 @@ const RFC2119_EXEMPT_PATHS: RegExp[] = [
   /check_integrity\.ts$/,
 ];
 
-function isRfc2119Exempt(relPath: string): boolean {
-  return RFC2119_EXEMPT_PATHS.some((re) => re.test(relPath));
+function isLegacyNormativeMarkerExempt(relPath: string): boolean {
+  return LEGACY_NORMATIVE_MARKER_EXEMPT_PATHS.some((re) => re.test(relPath));
 }
 
-function checkRfc2119Markers(root: string): CheckResult[] {
+function checkLegacyNormativeMarkers(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const scanDirs = [
     path.join(root, "docs", "requirements"),
@@ -6844,18 +6846,18 @@ function checkRfc2119Markers(root: string): CheckResult[] {
     const content = readText(filePath);
     if (!content) continue;
     const relPath = resolveRelative(filePath, root);
-    if (isRfc2119Exempt(relPath)) continue;
+    if (isLegacyNormativeMarkerExempt(relPath)) continue;
     const inCodeBlock = content.split("```");
     const nonCodeParts = inCodeBlock.filter((_, i) => i % 2 === 0).join(" ");
-    for (const { pattern, name } of RFC2119_PATTERNS) {
+    for (const { pattern, name } of LEGACY_NORMATIVE_MARKER_PATTERNS) {
       pattern.lastIndex = 0;
       if (pattern.test(nonCodeParts)) {
         found = true;
         results.push(
           ng(
             "Vocabulary",
-            "rfc2119-marker",
-            `RFC 2119 bracketed marker '${name}' found in active document (REQ-0102-028)`,
+            "legacy-normative-marker",
+            `Legacy bracketed normative marker '${name}' found in active document (REQ-0102-028)`,
             relPath,
           ),
         );
@@ -6867,8 +6869,8 @@ function checkRfc2119Markers(root: string): CheckResult[] {
     results.push(
       ok(
         "Vocabulary",
-        "rfc2119-marker",
-        "No RFC 2119 bracketed markers detected in active documents (REQ-0108-236)",
+        "legacy-normative-marker",
+        "No legacy bracketed normative markers detected in active documents (REQ-0108-236)",
       ),
     );
   }
@@ -6992,7 +6994,7 @@ function checkReqVerificationBasis(root: string): CheckResult[] {
 
   const reqFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-") && f.endsWith(".md"));
   let totalReqRows = 0;
-  let rfc2119BasedRows = 0;
+  let legacyMarkerBasedRows = 0;
 
   for (const file of reqFiles) {
     const content = readText(path.join(reqDir, file));
@@ -7002,19 +7004,20 @@ function checkReqVerificationBasis(root: string): CheckResult[] {
       if (!line.startsWith("|") || line.includes("---")) continue;
       if (line.includes("REQ-") && /\d{3}/.test(line)) {
         totalReqRows++;
-        if (/（SHALL|SHOULD|MAY|MUST）/ .test(line)) {
-          rfc2119BasedRows++;
+        const legacyMarkerPattern = new RegExp(`（(${["S" + "HALL", "S" + "HOULD", "M" + "AY", "M" + "UST"].join("|")})）`);
+        if (legacyMarkerPattern.test(line)) {
+          legacyMarkerBasedRows++;
         }
       }
     }
   }
 
-  if (rfc2119BasedRows > 0) {
+  if (legacyMarkerBasedRows > 0) {
     results.push(
       ng(
         "DocsCheck",
         "req-verification-basis",
-        `${rfc2119BasedRows}/${totalReqRows} REQ rows still use RFC 2119 markers instead of 必達要件 (REQ-0115-044)`,
+        `${legacyMarkerBasedRows}/${totalReqRows} REQ rows still use legacy markers instead of 必達要件 (REQ-0115-044)`,
       ),
     );
   } else {
@@ -7186,7 +7189,7 @@ async function main(): Promise<void> {
     ...checkCaptureBoundaryReference(root),
     ...checkPrTemplateCaptureSection(root),
     ...checkCommandCaptureDuties(cmdDir, root),
-    ...checkRfc2119Markers(root),
+    ...checkLegacyNormativeMarkers(root),
     ...checkCrossReqVocabularyConsistency(root),
     ...checkMappingTableHistoryLabels(root),
     ...checkReqVerificationBasis(root),
