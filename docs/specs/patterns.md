@@ -46,12 +46,11 @@ id: REQ-{NNNN}
 title: {領域タイトル}
 created: {YYYY-MM-DD}
 updated: {YYYY-MM-DD}
-tags: [{tag1}, {tag2}]
 ---
 ```
 
-- フィールドは `id`, `title`, `created`, `updated`, `tags` のみ。`status` および `scale` フィールドは持たない
-- `id` と `tags` 内の要件IDは `REQ-{NNNN}-{NNN}` 形式（例: `REQ-0104`）
+- フィールドは `id`, `title`, `created`, `updated` のみ。`status` および `scale` フィールドは持たない
+- `id` の要件IDは `REQ-{NNNN}-{NNN}` 形式（例: `REQ-0104`）
 
 ### REQセクション構成
 

@@ -3,7 +3,6 @@ id: REQ-{NNNN}
 title: ""
 created: ""
 updated: ""
-tags: []
 ---
 
 ## 目的
