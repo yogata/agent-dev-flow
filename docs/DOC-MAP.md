@@ -28,7 +28,6 @@
 | [REQ-0108](requirements/REQ-0108.md) | docs-check / Validation / Tests | 整合性検査、finding分類・route、レポート出力、ガードレール、体系的テスト、frontmatter 規約検査、artifact collection registry、source/projection scan分離、baseline管理、rule catalog、REQ impact map、3層gate、meta-integrity、repo-local自己監査（/repo/docs-check）・配布対象外 |
 | [REQ-0109](requirements/REQ-0109.md) | REQ再構成運用 | retired archive、移行表、REQ再構成intake |
 | [REQ-0110](requirements/REQ-0110.md) | Git worktree 削除リトライ | git-worktree、リトライ、信頼性 |
-| [REQ-0111](requirements/REQ-0111.md) | Command authoring 後方互換性維持原則 | command-authoring、後方互換性、設計原則 |
 | [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・runtime独立性 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、integrity検査追加、ADR全面改定例外・01XX baseline・retired移動 |
 | [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 | skill references 内 SPEC 相当記述の分離、runtime 自己完束制約 |
 | [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件、OU queue処理 |
@@ -37,6 +36,9 @@
 | [REQ-0117](requirements/REQ-0117.md) | Git worktree junction 削除フォールバック手順 | git-worktree、junction、Windows、フォールバック手順 |
 | [REQ-0118](requirements/REQ-0118.md) | Subagent edit safety ガイドライン | subagent、edit safety、command-authoring、skill-authoring、パス参照 |
 | [REQ-0119](requirements/REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 | command 薄型化 / skill 詳細移管 / sub-agent 委譲境界 / Step 整数化 / verbatim 条件付き / delegation_type SPEC降格 / ADR-0112 accepted化 |
+| [REQ-0120](requirements/REQ-0120.md) | Runtime Command 非必須参照除去 | command / token 最適化 / 非必須参照節削除 / 高頻度 command 優先 |
+| [REQ-0121](requirements/REQ-0121.md) | Runtime Command 規範語見直し + Integrity 検査再定義 | command / token 最適化 / 規範語 / 自然文置換 / integrity 検査再定義 / 語彙ポリシー整合 |
+| [REQ-0122](requirements/REQ-0122.md) | 規範語ルールおよび記載の完全削除 | active REQ / SPEC / ADR / integrity / runtime / 語彙ポリシー |
 
 ## Retired REQ
 

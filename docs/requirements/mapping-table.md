@@ -71,6 +71,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0116 を active
 | REQ-0048 | migrated | REQ-0107 | reporting / writing qualityを移行 |
 | REQ-0049 | migrated | REQ-0108 | integrity / validation / testsを移行 |
 | REQ-0050 | migrated | REQ-0105, REQ-0109 | REQ再構成intake保存導線を移行 |
+| REQ-0111 | retired-no-successor | なし | REQ-0119-025 により retire（2026-06-14）。条項は他REQへの吸収なしで廃止。REQ-0119 の破壊的再基準化が REQ-0111 の中核原則（既存Step変更禁止）と矛盾したため。retired 文書は `retired/REQ-0111.md` を参照 |
 
 ## Active Set
 
