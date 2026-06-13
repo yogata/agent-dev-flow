@@ -7,7 +7,7 @@ updated: "2026-05-30"
 
 ## 目的
 
-REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0116 を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口を16件に限定する。
+REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0122（REQ-0111 は retired）を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口は21件（REQ-0111 を除く）である。
 
 ## 判定
 
@@ -85,11 +85,16 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0116 を active
 | REQ-0106 | Case実行・完了 |
 | REQ-0107 | Reporting / Writing Quality |
 | REQ-0108 | Integrity / Validation / Tests |
-| REQ-0109 | REQ再構成運用 |
+| REQ-0109 | docs-review / REQ再構成運用 |
 | REQ-0110 | Git worktree 削除リトライ |
-| REQ-0111 | Command authoring 後方互換性維持原則 |
-| REQ-0112 | ADRライフサイクル・文書責務・runtime独立性・状態モデル統合是正 |
+| REQ-0112 | ADRライフサイクル標準化・文書体系正規化・runtime独立性 |
 | REQ-0113 | Skill References SPEC分離基準 |
 | REQ-0114 | /agentdev/case-auto 最大自走モード |
 | REQ-0115 | docs-* command suite 定義（新規、旧REQ移行なし） |
 | REQ-0116 | 文書分類ポリシー定義（新規、旧REQ移行なし） |
+| REQ-0117 | Git worktree junction 削除フォールバック手順（新規、旧REQ移行なし） |
+| REQ-0118 | Subagent edit safety ガイドライン（新規、旧REQ移行なし） |
+| REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化（新規、旧REQ移行なし） |
+| REQ-0120 | Runtime Command 非必須参照除去（新規、旧REQ移行なし） |
+| REQ-0121 | Runtime Command 規範語見直し + Integrity 検査再定義（新規、旧REQ移行なし） |
+| REQ-0122 | 規範語ルールおよび記載の完全削除（新規、旧REQ移行なし） |

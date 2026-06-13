@@ -26,7 +26,7 @@ agent: sisyphus
 
 ### Frontmatter 許可フィールド
 
-command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044）。`implementation_pattern`、`secondary_pattern`、`load_skills` 等の dev メタデータは frontmatter に含めない（ADR-0013; ADR-0001 は proposed であり現行根拠ではない）。
+command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044）。`implementation_pattern`、`secondary_pattern`、`load_skills` 等の dev メタデータは frontmatter に含めない（ADR-0102）。
 
 分類定義は `design-principles.md` を参照。
 
@@ -50,7 +50,7 @@ updated: {YYYY-MM-DD}
 ```
 
 - フィールドは `id`, `title`, `created`, `updated` のみ。`status` および `scale` フィールドは持たない
-- `id` の要件IDは `REQ-{NNNN}-{NNN}` 形式（例: `REQ-0104`）
+- `id` は `REQ-{NNNN}` 形式（例: `REQ-0104`）。要件行のIDは `REQ-{NNNN}-{MMM}` 形式（例: `REQ-0104-001`）
 
 ### REQセクション構成
 
@@ -71,20 +71,20 @@ updated: {YYYY-MM-DD}
 - **対象外**: ...
 ```
 
-- セクションは 目的 / 要件 / 適用範囲 のみ。FR/NFRの区別を持たない
+- セクションは 目的 / 要件 / 適用範囲 を基本とし、関連情報（関連 SPEC・ADR・REQ 等）、Requirement Source、Update Notes、関連ドキュメント更新候補 等の補助セクションを含む。FR/NFRの区別を持たない
 - 要件は検証可能な必達要件（満たす必要がある要件）として記述する。推奨・任意・将来候補は要件行に含めない
 
 ## REQ分類規約
 
-旧REQ（REQ-0001〜0040 [全てretired]）は3分類で管理する（REQ-0109）:
+旧REQ（REQ-0001〜0050 [全てretired]）は3分類で管理する（REQ-0109）:
 
 | 分類 | 意味 | 取扱い |
 |------|------|--------|
-| `retained` | 現行仕様としてそのまま有効 | 変更なし |
-| `partially superseded` | 一部が新基準REQに移行 | 本文冒頭に移行範囲・後継REQ・履歴理由を記載 |
-| `superseded` | 全面置き換え済み | 本文冒頭に置き換え理由を記載 |
+| `migrated` | 新active REQへ要件内容を移行した | 履歴参照として保持。後継REQは mapping-table.md で追跡 |
+| `retired-no-successor` | 最新方針では不要なため新active REQへ移行しない | 履歴参照として保持 |
+| `historical-only` | 当時の判断・経緯として残すが現行要件ではない | 履歴参照として保持 |
 
-**新基準REQ群**（REQ-0101〜0114）を現行仕様の主参照とする。README.md は新基準REQ群を先頭に配置し、旧REQ群をカテゴリ別セクションに分離する。
+**新基準REQ群**（REQ-0101〜0122、21件、REQ-0111 は retired）を現行仕様の主参照とする。active REQ の一覧・範囲は `docs/requirements/README.md` を正とし、本SPECでは複製しない。
 
 **要件行の記述規約**（REQ-0109, 004）:
 - 要件行には振る舞い・制約・状態のみを記述する

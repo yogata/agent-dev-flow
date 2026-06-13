@@ -22,7 +22,7 @@ DOC-MAP（文書探索入口: 索引）
 
 要件定義の永続基準。システムが満たすべき要件を記述する。
 
-- 現行の active REQ は REQ-0101 から REQ-0116 までの 16 件
+- 現行の active REQ は REQ-0101 から REQ-0122 までの 21 件（REQ-0111 は retired）
 - 旧 REQ（REQ-0001〜REQ-0050 [全てretired]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
@@ -37,15 +37,20 @@ DOC-MAP（文書探索入口: 索引）
 | REQ-0105 | Intake / Learning / Backlog |
 | REQ-0106 | Case 実行・完了 |
 | REQ-0107 | Reporting / Writing Quality |
-| REQ-0108 | Integrity / Validation / Tests |
-| REQ-0109 | REQ 再構成運用 |
+| REQ-0108 | docs-check / Validation / Tests |
+| REQ-0109 | docs-review / REQ再構成運用 |
 | REQ-0110 | Git worktree 削除リトライ |
-| REQ-0111 | Command authoring 後方互換性維持原則 |
-| REQ-0112 | ADRライフサイクル・文書責務・runtime独立性・状態モデル統合是正 |
+| REQ-0112 | ADRライフサイクル標準化・文書体系正規化・runtime独立性 |
 | REQ-0113 | Skill References SPEC分離基準 |
 | REQ-0114 | /agentdev/case-auto 最大自走モード |
 | REQ-0115 | docs-* command suite 定義 |
 | REQ-0116 | 文書分類ポリシー定義 |
+| REQ-0117 | Git worktree junction 削除フォールバック手順 |
+| REQ-0118 | Subagent edit safety ガイドライン |
+| REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化 |
+| REQ-0120 | Runtime Command 非必須参照除去 |
+| REQ-0121 | Runtime Command 規範語見直し + Integrity 検査再定義 |
+| REQ-0122 | 規範語ルールおよび記載の完全削除 |
 
 ## ADR（アーキテクチャ決定記録）
 

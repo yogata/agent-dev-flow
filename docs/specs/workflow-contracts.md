@@ -45,6 +45,8 @@ AgentDevFlow は3つのパイプラインで構成される:
 
 REQ ファイル・SPEC ファイル内に workflow status（例: "要件定義", "実装", "テスト" 等の6マイクロフェーズに対応する状態語）を記述してはならない（REQ-0108-123、REQ-0101-037）。上記のマイクロフェーズはワークフローの説明目的でのみ使用し、REQ/SPEC 文書内に状態として埋め込まない。workflow status は Issue ラベル・GitHub Project で管理する。
 
+> **スコープ注記**: 本ルールは REQ/ADR/SPEC の各文書にワークフロー状態ラベル（例: 当該文書が「実装中」「レビュー中」等の状態にあると示す標識）を埋め込むことを禁止する。SPEC がマイクロフェーズ分類体系そのものを定義・説明すること（本節の記述など）は禁止対象外である。
+
 ## SSoT Transition Rules
 
 各マクロフェーズにおけるSingle Source of Truth（SSoT）を定義する。
@@ -212,14 +214,23 @@ agentdev系ワークフローはAnchored Developmentモデルに基づく。4つ
 | テスト | 振る舞い仕様 | テストファイル |
 | ADR | アーキテクチャ判断 | current baseline: `docs/adr/ADR-01XX.md`; retired: `docs/adr/retired/ADR-00XX.md` |
 
-生きた仕様（Living Specs）:
+生きた仕様（Living Specs）: 現行の SPEC 一覧は `docs/specs/README.md` の SPEC index を正とする（REQ-0101）。主な SPEC を以下に示す。
 
 | 仕様 | 格納先 | 役割 |
 |---|---|---|
 | system.md | `docs/specs/system.md` | システム全体の現在の仕様 |
-| patterns.md | `docs/specs/patterns.md` | 実装パターン・規約 |
+| patterns.md | `docs/specs/patterns.md` | 文書フォーマット規約・テンプレート命名規則・リポジトリ参照リンク規約 |
 | design-principles.md | `docs/specs/design-principles.md` | 設計判断の根拠・指針 |
 | quality-specs.md | `docs/specs/quality-specs.md` | 品質基準・検証ルール |
+| document-model.md | `docs/specs/document-model.md` | REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックス |
+| artifact-contracts.md | `docs/specs/artifact-contracts.md` | Command/Skill/Template/Script の入出力・依存方向 |
+| artifact-responsibilities.md | `docs/specs/artifact-responsibilities.md` | 各 artifact 種別の canonical owner と責務 |
+| integrity-contracts.md | `docs/specs/integrity-contracts.md` | strict/heuristic/observation 分類と検査カテゴリ |
+| integrity-rule-catalog.md | `docs/specs/integrity-rule-catalog.md` | integrity 検査の全 rule 定義 |
+| workflow-contracts.md | `docs/specs/workflow-contracts.md` | コマンドパイプラインの入出力・前提条件 |
+| runtime-package-boundary.md | `docs/specs/runtime-package-boundary.md` | Repo type 別 `.opencode/` 定義・命名規約・導入方式・sync 範囲 |
+| rule-ownership.md | `docs/specs/rule-ownership.md` | rule domain と責任 REQ/SPEC の対応 |
+| req-impact-map.md | `docs/specs/req-impact-map.md` | 各 active REQ が影響する integrity rule と artifact |
 
 ### docs/ 構造
 
@@ -252,7 +263,7 @@ promoted artifact → RU → REQ / Issue → RU 削除
 |---|---|---|---|
 | promoted artifact（intake） | `intake-promote` | `backlog-review` | RU 化成功時 |
 | promoted artifact（learning） | `learning-promote` | `backlog-review` | RU 化成功時 |
-| RU（Requirement Unit） | `backlog-review` | `req-define`, `req-save`, `case-open` | 永続化完了時 |
+| RU（Requirement Unit） | `backlog-review` | `req-define`, `req-save`, `case-open` | case-open の Issue作成 + VERIFY 成功時（REQ-0105-012, REQ-0105-015） |
 | REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
 | Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
 
@@ -262,7 +273,7 @@ promoted artifact → RU → REQ / Issue → RU 削除
 - 粒度: N:1（複数 artifact → 1 RU 統合）および 1:N（1 artifact → 複数 RU 分割）を許可（REQ-0105）
 - promoted artifact の単純コピー（パススルー）は禁止（REQ-0105）
 - 矛盾検出時: 矛盾する artifact を RU 化せずユーザーに確認。矛盾しない artifact は通常通り RU 化（partial success）
-- `req-save` / `case-open` での永続化完了後に該当 RU を削除
+- `case-open` での Issue作成 + VERIFY 成功後に該当 RU を削除（REQ-0105-012, REQ-0105-015）。`req-save` は RU を削除せず、RU 削除を行う唯一のコマンドは `case-open` である
 
 ### Promoted Artifact
 

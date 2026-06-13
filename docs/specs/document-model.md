@@ -142,7 +142,7 @@ DOC-MAP（索引）/ Guides（案内）
 | 文書種別 | 状態遷移 | 備考 |
 |---|---|---|
 | REQ | created → active → superseded / partially superseded | APPEND/UPDATE で拡張。個別要件の supersede は mapping-table で追跡 |
-| ADR | proposed → accepted → superseded / deprecated | accepted のみ現行根拠。全面改訂時は新世代を創設（ADR-0001〜0023 → ADR-0101〜0111） |
+| ADR | proposed → accepted → superseded / deprecated | accepted のみ現行根拠。全面改訂時は新世代を創設（ADR-0001〜0023 → ADR-0101〜0112） |
 | SPEC | active（実装とともに進化） | SPEC は「現在仕様」の記録であり、REQ や ADR の意味での「retired」状態を持たない |
 | Guide | active → outdated → removed | 内容陳腐化時に移行。規範的権限なし |
 | Report | published → archived | 作成後の修正は事実確認の範囲に限定 |
@@ -153,7 +153,7 @@ DOC-MAP（索引）/ Guides（案内）
 文書体系の全面改訂時の取り扱いを定義する。
 
 - **全面改訂は世代交代であり、上書きではない**
-- 世代交代の例: ADR baseline 再編（ADR-0001〜0023 → ADR-0101〜0111）。旧番号帯は `docs/adr/retired/` に配置し、現行判断の基盤は新番号帯にある
+- 世代交代の例: ADR baseline 再編（ADR-0001〜0023 → ADR-0101〜0112）。旧番号帯は `docs/adr/retired/` に配置し、現行判断の基盤は新番号帯にある
 - 新世代の創設時は、旧世代から引き継ぐ判断内容・移管先・移管しない判断を明示する
 - 旧世代は履歴参照専用とし、現行判断の根拠として引用しない
 
