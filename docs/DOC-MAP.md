@@ -19,9 +19,9 @@
 | REQ | タイトル | 概要 |
 |---|---|---|
 | [REQ-0101](requirements/REQ-0101.md) | 文書・REQ管理基準 | REQ/retired REQ/ADR/SPEC/DOC-MAP/guides の基準境界 |
-| [REQ-0102](requirements/REQ-0102.md) | 要件定義・保存 | req-define / req-save / Requirement Source / 分類ゲート |
+| [REQ-0102](requirements/REQ-0102.md) | 要件定義・保存 | req-define / req-save / Requirement Source / 分類ゲート / operation unit / execution_groups |
 | [REQ-0103](requirements/REQ-0103.md) | Artifact責任分界 | command / skill / template / script / namespace / frontmatter 規約 / runtime-only 配布制約 / source-projection分離 / sync・migration / namespace予約 / SSOT化 / registry化 / consumer導入モデル / consumer plugin checkout・install script分離 |
-| [REQ-0104](requirements/REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type + scale 分類、workflow_route、SSoT、case-open/run/close、upstream handoff protocol |
+| [REQ-0104](requirements/REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type + scale 分類、workflow_route、SSoT、case-open/run/close、upstream handoff protocol、OU処理モード、Epic候補グループ |
 | [REQ-0105](requirements/REQ-0105.md) | Intake / Learning / Backlog | intake-promote（review統合）、learning-promote（refine統合）、backlog-review、RU lifecycle |
 | [REQ-0106](requirements/REQ-0106.md) | Case実行・完了 | case-run、case-close、Epic/Wave、完了ゲート |
 | [REQ-0107](requirements/REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、AI-slop抑止 |
@@ -31,7 +31,7 @@
 | [REQ-0111](requirements/REQ-0111.md) | Command authoring 後方互換性維持原則 | command-authoring、後方互換性、設計原則 |
 | [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・runtime独立性 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、integrity検査追加、ADR全面改定例外・01XX baseline・retired移動 |
 | [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 | skill references 内 SPEC 相当記述の分離、runtime 自己完束制約 |
-| [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件 |
+| [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件、OU queue処理 |
 | [REQ-0115](requirements/REQ-0115.md) | docs-* command suite 定義 | /repo/docs-check 改名、/agentdev/docs-review 新設、docs-review 統合、是正ルーティング |
 | [REQ-0116](requirements/REQ-0116.md) | 文書分類ポリシー定義 | REQ/ADR/SPEC/Guide/Report/DOC-MAP/Retired 分類ルール・Document Authority Model・Report分類 |
 | [REQ-0117](requirements/REQ-0117.md) | Git worktree junction 削除フォールバック手順 | git-worktree、junction、Windows、フォールバック手順 |
