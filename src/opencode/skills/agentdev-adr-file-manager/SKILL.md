@@ -10,7 +10,7 @@ description: Manages ADR numbering and architecture decision record file operati
 - **このスキル（知識）**: ADR番号採番ルール、ファイル操作モード、判定基準、ステータス遷移、整合性チェック
 - **適用先**: `req-save`（ADRファイル保存時）、`case-open`（Issue作成時のADR参照）、`case-run`（実行時のADR参照）
 
-**注意**: このスキルはADRの**管理・運用**（採番、ステータス遷移、整合性チェック）を担当する。ADRの**作成ガイドライン**（評価基準、ADR必要かどうかの判定）については、See Also の `agentdev-adr-guidelines` を参照。
+**注意**: このスキルはADRの**管理・運用**（採番、ステータス遷移、整合性チェック）を担当する。ADRの**作成ガイドライン**（評価基準、ADR必要かどうかの判定）については、`agentdev-adr-guidelines` を参照。
 
 ---
 

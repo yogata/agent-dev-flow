@@ -154,6 +154,21 @@ description: Helps with documents
 - Negative trigger は **隣接スキルの領域** を除外する
 - trigger 数は 3〜7個が適正
 
+### See Also 記述規約
+
+`See Also` セクションは関連 skill の**補助的な発見導線**として機能する（REQ-0103-096）。
+
+**配置場所**: SKILL.md 末尾。
+
+**記述ルール**:
+- 関連 skill 名と簡潔な説明（発見導線としての文脈）を記述
+- **実行判断材料を含めない**: 委譲先の条件、責務境界、禁止条件、停止条件は See Also ではなく本文（`USE FOR`、`DO NOT USE FOR`、責務境界セクション、該当ルール本文）に記述する（REQ-0103-097）
+- **DO NOT USE FOR との重複を避ける**: DO NOT USE FOR に既に記載されている委譲先・禁止条件を See Also に重複して記述しない（REQ-0103-097）
+- **別 SSoT 管理対象を含めない**: 全コマンド一覧等は skill 内に保持せず、該当する README 等を参照する（REQ-0103-098）
+
+**OK**: `- **agentdev-req-analysis**: 要件分析手法`（発見導線）
+**NG**: `- **agentdev-gh-cli**: --body-file 使用、安全な読み取り手順`（実行判断材料）
+
 ## 3. 構造設計
 
 ### Complexity Classification

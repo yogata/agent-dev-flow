@@ -145,8 +145,8 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 
 ## See Also
 
-- **agentdev-gh-cli**: `--body-file` 使用、安全な読み取り手順
-- **agentdev-workflow-lifecycle**: Epic振る舞いルール、進捗追跡テーブル定義
+- **agentdev-gh-cli**
+- **agentdev-workflow-lifecycle**: Epic振る舞いルール・進捗追跡テーブル定義
 
 ## Merge Conflict 対応パターン
 
