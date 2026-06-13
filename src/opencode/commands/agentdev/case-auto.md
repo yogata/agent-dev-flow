@@ -73,7 +73,7 @@ agent: sisyphus
 - G10: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す
 
 ### Capture 整合制約
-- G17: case-auto は構成コマンド（case-run / case-close）の capture 責務境界に従う。case-auto 固有の capture 振る舞いは持たない。capture 境界の詳細は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照
+- G17: case-auto は構成コマンド（case-run / case-close）の capture 責務境界に従う。case-auto 固有の capture 振る舞いは持たない。capture 境界の詳細は `agentdev-workflow-orchestration` を参照
 
 ### Runtime path 制約
 - G11: 既存コマンド定義を読み込む際、source path を runtime path に読み替えてはならない。コマンド定義内のパス参照は記述された通りに解釈し、source path を runtime 参照先として使用しない

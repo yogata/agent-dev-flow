@@ -30,7 +30,7 @@ agent: sisyphus
 
 ### Phase 2-5: Normalize → Classify → Evaluate → Dispose → HITL
 
-**判定基準参照**: Step 3〜10 の判定基準・スコアリングルール・提示形式・承認フローは、全て `agentdev-learning-pipeline` skill の `references/promote-judgment-logic.md` の該当 Phase を参照。
+**判定基準参照**: Step 3〜10 の判定基準・スコアリングルール・提示形式・承認フローは、全て `agentdev-learning-pipeline` の該当 Phase を参照。
 
 3. **全エントリの読込と旧フォーマット正規化**（→ promote-judgment-logic.md Phase 2）
 4. **問題クラス分類**（→ Phase 3: 問題クラス分類）

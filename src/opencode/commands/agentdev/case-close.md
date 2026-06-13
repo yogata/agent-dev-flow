@@ -79,7 +79,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
      - promoted artifact imported 判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
       - **Capture 回収責務**: PR 本文の `## Findings / Capture候補` セクションから intake / learning を分離回収する。intake 候補は `.agentdev/intake/inbox/` に保存し、learning 候補は `.agentdev/learning/inbox.md` に保存する。Epic 横断回収
-     - **Capture 境界**: Split Rule（intake / learning 境界）は `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md` を参照
+      - **Capture 境界**: Split Rule（intake / learning 境界）は `agentdev-workflow-orchestration` を参照
       - intake と learning を別々の成果物として扱う
       - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数・中間ファイル等）を capture の入力として使用しない。capture 情報の入力源は PR 本文のみ
 
