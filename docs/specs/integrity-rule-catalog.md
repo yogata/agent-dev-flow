@@ -51,7 +51,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-002 |
-| description | Active REQ に id, title, created, updated, tags が存在すること |
+| description | Active REQ に id, title, created, updated が存在すること |
 | severity | strict |
 | category | document-drift |
 | detection_method | frontmatter field 存在確認 |
