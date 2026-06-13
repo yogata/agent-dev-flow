@@ -45,13 +45,15 @@ agent: prometheus
    **5-2. ADR判断根拠の記録**: ADR判断後、判断根拠をドラフトに保存する。詳細は `agentdev-req-analysis` を参照。委譲接続点: 親エージェントのみがドラフトへ記録する
 
 6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
+   - **6-1. operation_units セクション生成**: 複数RU入力時の統合/分離結果（Step 10-2）を基に `operation_units` セクションを生成する。各 OU は `ou_id`, `source_ru`, `target_req`, `operation`, `scale`, `depends_on`, `recommended_order`, `issue_policy`, `result` フィールドを持つ（REQ-0102-033〜035）。単一REQ操作の場合も 1 件の OU として出力する
+   - **6-2. execution_groups セクション生成**: OU 群を分析し、Epic 候補グループを `execution_groups` セクションに記録する。各 execution_group は `id`, `type`, `purpose`, `included_ou`, `rationale` を持つ（REQ-0102-036）。記録は提案であり、Issue 発行は行わない（REQ-0102-038）
 
 7. **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）。bugfix + ADR必要時は feature に昇格
 
 8. **Scale判断**（feature のみ）: `agentdev-workflow-lifecycle` の並列実行パターン条件で standard/large を判定。large 時はユーザーと分解計画を協議
 
 9. **ドラフト保存**:
-   - 機能追加: `.sisyphus/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加
+   - 機能追加: `.sisyphus/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加。Step 6-1 で生成した `operation_units` セクションと Step 6-2 で生成した `execution_groups` セクションを含める
    - バグ修正・軽微変更/リファクタリング・保守/ドキュメント・雑務: ドラフト保存不要。セッション内で完結
 
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
@@ -64,7 +66,9 @@ agent: prometheus
 
    **10-4. Epic 規模検出時の記録**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは分解候補のみを返し、親エージェントがdraft-metaへ記録する
 
-   **10-5. Wave 候補・依存関係の記録**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは依存候補のみを返し、親エージェントが順序依存を確定する
+    **10-5. Wave 候補・依存関係の記録**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは依存候補のみを返し、親エージェントが順序依存を確定する
+
+    **10-6. OU 構造検証**: 生成した `operation_units` セクションについて以下を確認する: (a) 各 OU に `ou_id`, `target_req`, `operation` が設定されている (b) `execution_groups` の `included_ou` が実在する `ou_id` を参照している (c) `depends_on` が実在する `ou_id` を参照している (d) `result` セクションが空である（req-save/case-open が書き戻すため）
 
 11. **完了報告**: 完了報告templateに従って出力。work_type に応じたvariantを選択:
       - feature standard → .opencode/commands/agentdev/templates/req-define/feature.md
@@ -86,3 +90,4 @@ agent: prometheus
 - G11: ADR閾値以上の判断は `agentdev-adr-guidelines` へ
 - G12: work_type 判定基準は `agentdev-workflow-lifecycle` → workflow classification を参照
 - G13: req-define は Issue 階層を決定しない。Issue 階層の決定は case-open の責務範囲
+- G14: req-define は draft に `operation_units` と `execution_groups` セクションを出力すること（REQ-0102-033, 036）。単一REQ操作の場合も 1 件の OU として出力する
