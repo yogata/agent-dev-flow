@@ -14,6 +14,7 @@ agent: prometheus
  - エラーログ（バグ修正の場合）
  - **ユーザーが明示した入力ファイル**（Requirement Source）: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
  - req-save SPLIT 検出時の finding（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
+  - skill-review 診断結果の finding draft（`.agentdev/drafts/skill-review-finding-{topic-slug}.md`）。read-only input として扱い、未確認事項・採否未確定事項を要件本文に混入させない（REQ-0103-138）
  - **promoted 直読み禁止**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない。backlog-review による RU 化を経由すること
 
 ## Output
