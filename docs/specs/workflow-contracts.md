@@ -59,7 +59,7 @@ REQ ファイル・SPEC ファイル内に workflow status（例: "要件定義"
 
 ### draft の定位
 
-draft（`.sisyphus/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時ハンドオフであり、構造的実行以降のSSoTはIssue本文とWork Planである。
+draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時ハンドオフであり、構造的実行以降のSSoTはIssue本文とWork Planである。
 
 - ライフサイクル: `draft` → `saved`（req-save完了）→ `issued` + 削除（case-open完了）
 - 構造的実行フェーズ以降: draftは存在しない（case-open完了時に削除）。SSoTはIssue本文 + Work Planに完全移行
@@ -107,8 +107,8 @@ draft（`.sisyphus/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 
 | コマンド | 入力SSoT | 出力SSoT | 完了後マクロフェーズ |
 |---|---|---|---|
-| `/agentdev/req-define` | セッション会話 | 機能追加: `.sisyphus/drafts/req-draft-*.md`、その他: セッション内要件doc | 壁打ち |
-| `/agentdev/req-save` | `.sisyphus/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR-01XX, docs index | 壁打ち |
+| `/agentdev/req-define` | セッション会話 | 機能追加: `.agentdev/drafts/req-draft-*.md`、その他: セッション内要件doc | 壁打ち |
+| `/agentdev/req-save` | `.agentdev/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR-01XX, docs index | 壁打ち |
 | `/agentdev/case-open` | 要件doc, specs READ, ADR READ | GitHub Issue | 定義→実行境界 |
 | `/agentdev/case-run` | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ | レビュー完了 |
 | `/agentdev/case-auto` | 要件doc（明示/draft/セッション） | req-save〜case-close の各出力 | 自走完了 |
@@ -612,7 +612,7 @@ sources:
 
 requirements review finding は REQ ファイルへの保存操作ではなく、要件体系の再構成候補を一時的に保持する中間アーティファクト。
 
-- 保存先: `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`
+- 保存先: `.agentdev/drafts/requirements-review-finding-{topic-slug}.md`
 - 次工程: req-define の明示入力ファイルとして渡される
 
 ### Finding frontmatter

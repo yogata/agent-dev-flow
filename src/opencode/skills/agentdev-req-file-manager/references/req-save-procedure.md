@@ -27,7 +27,7 @@ REQ / ADR 保存前に、対象ドキュメントの種別が `docs/specs/docume
 - UPDATE: 既存 REQ ファイルの目的・要件・適用範囲の該当セクションを更新し、frontmatter `updated` を更新する。
 - バルク UPDATE: 各 REQ ファイルに UPDATE を順次実行し、全 UPDATE 後に REQ 番号重複と frontmatter 一貫性を一括検証する。
 - SPLIT 検出時: 保存可能範囲を実行し、SPLIT 対象は完了報告で follow-up として明示する。
-- Finding 作成: requirements review finding を `.sisyphus/drafts/requirements-review-finding-{topic-slug}.md` に作成する。形式は `agentdev-workflow-lifecycle` reference の `requirements-review-finding-protocol.md` に従う。
+- Finding 作成: requirements review finding を `.agentdev/drafts/requirements-review-finding-{topic-slug}.md` に作成する。形式は `agentdev-workflow-lifecycle` reference の `requirements-review-finding-protocol.md` に従う。
 - REQ 再構成候補: REQ 体系上の歪みを検知した場合、REQ 再構成 intake を `.agentdev/intake/inbox/req-restructure/` に保存する。
 
 ## 局所矛盾防止

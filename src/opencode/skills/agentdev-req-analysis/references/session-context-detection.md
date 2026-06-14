@@ -25,7 +25,7 @@
 
 ## draft ファイル確認
 
-`glob` で `.sisyphus/drafts/req-draft-*.md` の存在を確認:
+`glob` で `.agentdev/drafts/req-draft-*.md` の存在を確認:
 - 存在する場合: ファイル名の topic-slug とセッションの要件内容の一致を確認
 - トピック不一致 → draft を無視（セッションコンテキスト優先）
 - トピック一致 → draft の `status` 値でルーティング:

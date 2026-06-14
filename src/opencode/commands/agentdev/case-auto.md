@@ -9,7 +9,7 @@ agent: sisyphus
 
 ## Input
 
-- 要件doc: 明示パス指定 / `.sisyphus/drafts/req-draft-*.md` 単一自動検出 / セッション内要件doc（3段階優先順位）
+- 要件doc: 明示パス指定 / `.agentdev/drafts/req-draft-*.md` 単一自動検出 / セッション内要件doc（3段階優先順位）
 
 ## Output
 

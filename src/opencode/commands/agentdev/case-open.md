@@ -82,7 +82,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 17. コメント追加: `agentdev-workflow-templates` の選定ルールに従いコメント用テンプレートを読み込む（Epic flowではEpic Issueにコメント追加）→ VERIFY
 
- 18. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
+ 18. ドラフトが存在する場合、`.agentdev/drafts/req-draft-{topic-slug}.md` を削除
 
  18-1. **RU ファイル削除**。詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
 
