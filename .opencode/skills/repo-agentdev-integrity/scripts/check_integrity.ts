@@ -834,7 +834,12 @@ function checkLegacyNamespace(
         if (pathRefExemptPatterns.some((p) => p.test(line))) continue;
         const lineToTest = stripInlineCode(line);
         pattern.lastIndex = 0;
-        if (pattern.test(lineToTest)) {
+        const slashMatch = pattern.exec(lineToTest);
+        if (slashMatch) {
+          const ctxStart = Math.max(0, slashMatch.index - 1);
+          if (isPathFragment(lineToTest.substring(ctxStart, slashMatch.index + slashMatch[0].length))) {
+            continue;
+          }
           foundLegacy = true;
           results.push(
             ng(
@@ -1467,6 +1472,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     const content = readText(filePath);
     if (!content) continue;
     const relPath = resolveRelative(filePath, root);
+    const contentLines = content.split("\n");
 
     const links = parseMarkdownLinks(content);
     for (const link of links) {
@@ -1474,6 +1480,23 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       if (!target) continue;
 
       if (!fs.existsSync(target.filePath)) {
+        const linkStr = `[${link.text}](${link.href})`;
+        let inCode = false;
+        for (let li = 0; li < contentLines.length; li++) {
+          if (isInsideCodeBlock(contentLines, li)) {
+            if (contentLines[li].includes(linkStr)) {
+              inCode = true;
+              break;
+            }
+            continue;
+          }
+          const charIdx = contentLines[li].indexOf(linkStr);
+          if (charIdx >= 0 && isInsideCodeSpan(contentLines[li], charIdx)) {
+            inCode = true;
+            break;
+          }
+        }
+        if (inCode) continue;
         const count = (brokenRefCount.get("broken-file-link") ?? 0) + 1;
         brokenRefCount.set("broken-file-link", count);
         const route: FindingRoute = count >= 3 ? "intake+learning" : "intake";
@@ -1526,7 +1549,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     // Check REQ-/ADR- text references
     // REQ-0108-194: Suppress false positives for template placeholders
     const isTemplateLike = /\{[a-zA-Z_]+\}/.test(content) || content.includes("🔄") || content.includes("✅") || content.includes("☐");
-    const isReqRangeContext = /\bREQ-\d{4}\s+(through|thru|～|〜|—)\s+REQ-\d{4}\b/.test(content);
+    const isReqRangeContext = isRangeExpression(content);
     const reqRefs = content.match(/\bREQ-\d{4}\b/g) || [];
     const uniqueReqRefs = [...new Set(reqRefs)];
     for (const ref of uniqueReqRefs) {
@@ -1596,11 +1619,16 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     for (const ref of uniqueAdrRefs) {
       const retiredAdrPath = path.join(root, "docs", "adr", "retired", `${ref}.md`);
       const activeAdrPath = path.join(root, "docs", "adr", `${ref}.md`);
+      const appearsOutsideRetired = contentLines.some(
+        (line, idx) =>
+          line.includes(ref) && !isRetiredSectionInLines(contentLines, idx),
+      );
       if (
         fs.existsSync(retiredAdrPath) &&
         !fs.existsSync(activeAdrPath) &&
         !relPath.startsWith("docs/adr/retired/") &&
         !relPath.startsWith("docs/adr/README.md") &&
+        appearsOutsideRetired &&
         !(relPath.startsWith("docs/adr/ADR-") && isSupersededAdr(filePath, ref))
       ) {
         results.push(
@@ -1632,11 +1660,16 @@ function checkLinkIntegrity(root: string): CheckResult[] {
         `${ref}.md`,
       );
       const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
+      const appearsOutsideRetired = contentLines.some(
+        (line, idx) =>
+          line.includes(ref) && !isRetiredSectionInLines(contentLines, idx),
+      );
       if (
         fs.existsSync(retiredPath) &&
         !fs.existsSync(activePath) &&
         !relPath.startsWith("docs/requirements/retired/") &&
         !relPath.endsWith("mapping-table.md") &&
+        appearsOutsideRetired &&
         !isReqRangeContext // REQ-0108-194: REQ range references like "REQ-0101 through REQ-0116"
       ) {
         results.push(
@@ -2007,7 +2040,12 @@ function checkExpandedLegacyNamespace(
           continue;
         const lineToTest = stripInlineCode(lines[i]);
         pattern.lastIndex = 0;
-        if (pattern.test(lineToTest)) {
+        const slashMatch = pattern.exec(lineToTest);
+        if (slashMatch) {
+          const ctxStart = Math.max(0, slashMatch.index - 1);
+          if (isPathFragment(lineToTest.substring(ctxStart, slashMatch.index + slashMatch[0].length))) {
+            continue;
+          }
           matched = true;
           break;
         }
@@ -2270,8 +2308,10 @@ function checkAdrReadmeIndexSync(adrDir: string, root: string): CheckResult[] {
   }
 
   const indexedIds = new Set<string>();
-  for (const line of readmeContent.split("\n")) {
-    const match = line.match(/\b(ADR-\d{4})\b/);
+  const readmeLines = readmeContent.split("\n");
+  for (let i = 0; i < readmeLines.length; i++) {
+    if (isRetiredSectionInLines(readmeLines, i)) continue;
+    const match = readmeLines[i].match(/\b(ADR-\d{4})\b/);
     if (match) indexedIds.add(match[1]);
   }
 
@@ -3747,7 +3787,8 @@ function checkCommandFrontmatterDetailed(
     }
 
     // REQ-0108-099: deprecated command in inventory
-    if (content.includes("非推奨") || content.includes("deprecated")) {
+    const desc = typeof fm["description"] === "string" ? fm["description"] : "";
+    if (strictVocabMatch(desc, "非推奨") || strictVocabMatch(desc, "deprecated")) {
       const readmePath = path.join(cmdDir, "README.md");
       const readmeContent = readText(readmePath);
       if (readmeContent && readmeContent.includes(cmdName)) {
@@ -3893,6 +3934,70 @@ function isInsideCodeBlock(lines: string[], lineIndex: number): boolean {
 function isTemplatePlaceholder(refPath: string): boolean {
   if (/\{[^}]*\}/.test(refPath)) return true;
   return false;
+}
+
+// ─── Context identification helpers (REQ-0108-246~248) ─────────────────────
+
+function isInsideCodeSpan(line: string, charIndex: number): boolean {
+  let backtickCount = 0;
+  for (let i = 0; i < charIndex && i < line.length; i++) {
+    if (line[i] === "`") backtickCount++;
+  }
+  return backtickCount % 2 === 1;
+}
+
+function isRetiredSectionInLines(lines: string[], lineIndex: number): boolean {
+  let currentHeading = "";
+  for (let i = 0; i <= lineIndex && i < lines.length; i++) {
+    const m = lines[i].match(/^#{1,6}\s+(.+)$/);
+    if (m) currentHeading = m[1];
+  }
+  return /\b(retired|historical)\b|履歴|過去経緯|retired-no-successor|historical-only/i.test(
+    currentHeading,
+  );
+}
+
+function isRetiredSection(filePath: string, lineNum: number): boolean {
+  const content = readText(filePath);
+  if (!content) return false;
+  return isRetiredSectionInLines(content.split("\n"), lineNum - 1);
+}
+
+function isNegativeExample(line: string): boolean {
+  const hasOldFormMarker =
+    /旧形式|旧語彙|廃止済み|旧\s*(command|コマンド|status|形式)/i.test(line);
+  const hasProhibitionMarker =
+    /使用しない|べきではない|禁止|しないこと|do not use|must not use/i.test(line);
+  return hasOldFormMarker && hasProhibitionMarker;
+}
+
+function isGlobPattern(token: string): boolean {
+  return /[*?[\]{}]/.test(token);
+}
+
+function isPathFragment(token: string): boolean {
+  return /[a-zA-Z0-9_]\/[a-zA-Z0-9_-]/.test(token);
+}
+
+function isRangeExpression(token: string): boolean {
+  return /[\w-]+\s*(?:から|〜|~|through|thru|–|—)\s*[\w-]+/i.test(token);
+}
+
+function isNegationContext(line: string): boolean {
+  return /廃止|不要|禁止|使用しない|べきではない|持たない|含まない|除く|abolish|deprecated|obsolete|superseded|prohibit|do not use|must not/i.test(
+    line,
+  );
+}
+
+function strictVocabMatch(line: string, term: string): boolean {
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (/^[a-zA-Z][a-zA-Z0-9-]*$/.test(term) && !term.startsWith("-")) {
+    return new RegExp(
+      `(?<![a-zA-Z0-9-])${escaped}(?![a-zA-Z0-9-])`,
+      "i",
+    ).test(line);
+  }
+  return line.includes(term);
 }
 
 /**
@@ -4239,6 +4344,7 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
 
       const lines = content.split("\n");
       for (let i = 0; i < lines.length; i++) {
+        if (isNegationContext(lines[i])) continue;
         sixPhasePattern.lastIndex = 0;
         if (sixPhasePattern.test(lines[i])) {
           foundViolation = true;
@@ -5059,6 +5165,7 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
   for (const { absPath, label } of filesToCheck) {
     const content = readText(absPath);
     if (!content) continue;
+    const scanLines = content.split("\n");
 
     // Check range expressions
     rangePattern.lastIndex = 0;
@@ -5068,6 +5175,14 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
         const ids = match.match(/REQ-\d{4}/g);
         if (ids && ids.length === 2) {
           const rangeEnd = ids[1];
+          const matchLineIdx = scanLines.findIndex((l) => l.includes(match));
+          if (
+            matchLineIdx >= 0 &&
+            (isRetiredSectionInLines(scanLines, matchLineIdx) ||
+              /旧\s*REQ|retired|historical/i.test(scanLines[matchLineIdx]))
+          ) {
+            continue;
+          }
           if (rangeEnd !== lastId) {
             foundStale = true;
             results.push(
@@ -5397,6 +5512,7 @@ function checkTemplatePathIntegrity(
     const uniqueRefs = [...new Set(templateRefs)];
 
     for (const ref of uniqueRefs) {
+      if (isGlobPattern(ref)) continue;
       // REQ-0108-189: Fall back to src/opencode/ when runtime projection doesn't exist
       const resolvedPath = resolvePathWithFallback(
         path.join(root, ref.replace(/\//g, path.sep)),
@@ -6104,6 +6220,7 @@ function checkOldStatusVocabulary(root: string): CheckResult[] {
 
       const lines = content.split("\n");
       for (let i = 0; i < lines.length; i++) {
+        if (isNegativeExample(lines[i])) continue;
         for (const pattern of oldStatusPatterns) {
           pattern.lastIndex = 0;
           if (pattern.test(lines[i])) {
@@ -6542,8 +6659,14 @@ function checkBugfixDocsConsistency(root: string): CheckResult[] {
   const bugfixPattern108 = req108Content.match(/bugfix.*(?:docs|文書|更新)/gi) || [];
 
   // Check for conflicting guidance about whether bugfix requires docs update
-  const req104saysNoDocsUpdate = req104Content.includes("bugfix") && req104Content.includes("REQ") && req104Content.includes("不要");
-  const req108saysDocsUpdate = req108Content.includes("bugfix") && req108Content.includes("docs") && req108Content.includes("更新");
+  const req104saysNoDocsUpdate = req104Content.split("\n").some((line) =>
+    strictVocabMatch(line, "bugfix") &&
+    /(?:docs|文書|更新)[^。]*?(?:不要|免除)(?!されない|ない|ぬ)/.test(line),
+  );
+  const req108saysDocsUpdate = req108Content.split("\n").some((line) =>
+    strictVocabMatch(line, "bugfix") && /docs|文書|更新/.test(line) &&
+    /完了条件|必須|含める|更新/i.test(line),
+  );
 
   if (req104saysNoDocsUpdate && req108saysDocsUpdate) {
     results.push(
@@ -6921,9 +7044,9 @@ function checkCrossReqVocabularyConsistency(root: string): CheckResult[] {
     let hasCurrent = false;
     let hasDeprecated = false;
     for (const [, content] of allReqContent) {
-      if (content.includes(current)) hasCurrent = true;
+      if (strictVocabMatch(content, current)) hasCurrent = true;
       for (const dep of deprecated) {
-        if (content.includes(dep)) hasDeprecated = true;
+        if (strictVocabMatch(content, dep)) hasDeprecated = true;
       }
     }
     if (hasCurrent && hasDeprecated) {
