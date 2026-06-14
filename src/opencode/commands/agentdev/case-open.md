@@ -25,7 +25,7 @@ agent: sisyphus
      - OU ID 指定なし・OU 2 件以上 → OU 一覧（`ou_id`, `target_req`, `operation`, `result`）を表示して停止する。ユーザーに OU ID の指定を求める
      - `operation_units` セクションがない場合 → 従来どおり全要件docを処理する（後方互換）
 
-1. 要件docからIssue本文を生成。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う
+1. 要件docからIssue本文を生成。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う
 
 2. **マルチREQ入力判定**: 入力要件doc数を確認
    - 単一REQ → Step 3
@@ -58,17 +58,17 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
  | 子Issue内容ソース | 各REQ docから生成 | decomposition内容から生成 |
 | 子Issue追加要素 | Wave番号+依存記載、REQ doc番号明示（traceability）、孫Issue判定 | なし |
 
-4. テンプレート `issue_desc_epic.md` を Read tool で読み込む。詳細は `agentdev-workflow-lifecycle` を参照
+4. テンプレート `issue_desc_epic.md` を Read tool で読み込む。詳細は `agentdev-issue-management` を参照
 
-5. Epic Issue本文を生成。`execution_groups` セクションから Epic 候補グループの根拠を読み取る（REQ-0104-039）。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
+5. Epic Issue本文を生成。`execution_groups` セクションから Epic 候補グループの根拠を読み取る（REQ-0104-039）。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
 
 6. Epic Issueを作成:
    - ラベル: `enhancement`, `feature`, `epic`
    - `--body-file` 使用 → VERIFY。Issue番号を `{epic_number}` として記録
 
-7. 子Issueを作成（OU 単位・順次処理）。Issue 化単位は REQ doc 単位ではなく OU 単位とする（REQ-0104-042）。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントは子Issue本文候補とテンプレート充足検査のみを返し、親エージェントが `gh` 実行とVERIFYを行う
+7. 子Issueを作成（OU 単位・順次処理）。Issue 化単位は REQ doc 単位ではなく OU 単位とする（REQ-0104-042）。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントは子Issue本文候補とテンプレート充足検査のみを返し、親エージェントが `gh` 実行とVERIFYを行う
 
-8. Epic Issue本文を更新。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: サブエージェントは置換漏れ検査のみを返し、親エージェントが本文更新とVERIFYを行う
+8. Epic Issue本文を更新。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントは置換漏れ検査のみを返し、親エージェントが本文更新とVERIFYを行う
 
 8-1. **OU 結果の書き戻し**: ドラフトに `operation_units` セクションがある場合、作成した Issue / Epic 番号を当該 OU の `result` に書き戻す（REQ-0104-038）
 
@@ -84,7 +84,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
  18. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
 
- 18-1. **RU ファイル削除**。詳細は `agentdev-workflow-lifecycle` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
+ 18-1. **RU ファイル削除**。詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
 
 18-2. 完了報告 → template variant:
    - Standard → `templates/case-open/standard.md`

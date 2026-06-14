@@ -27,15 +27,15 @@ agent: sisyphus
 
 ## Steps
 
-1. **期間解釈**: 抽出アルゴリズムは `agentdev-workflow-lifecycle` を参照
+1. **期間解釈**: 抽出アルゴリズムは `agentdev-intake-pipeline` を参照
 
-2. **データ取得**: 取得方法・CLI コマンドは `agentdev-workflow-lifecycle` を参照
+2. **データ取得**: 取得方法・CLI コマンドは `agentdev-intake-pipeline` を参照
 
-3. **構造的検出**: 抽出ルールは `agentdev-workflow-lifecycle` を参照
+3. **構造的検出**: 抽出ルールは `agentdev-intake-pipeline` を参照
 
-4. **LLM 全文解析**: キーワードリスト・コンテキスト付与ルールは `agentdev-workflow-lifecycle` を参照
+4. **LLM 全文解析**: キーワードリスト・コンテキスト付与ルールは `agentdev-intake-pipeline` を参照
 
-5. **intake item 生成**: item 生成ルール・ファイル名規則は `agentdev-workflow-lifecycle` を参照
+5. **intake item 生成**: item 生成ルール・ファイル名規則は `agentdev-intake-pipeline` を参照
 
 5-1. **実行前同期（git pull）**:
     - `git pull --ff-only` を実行する

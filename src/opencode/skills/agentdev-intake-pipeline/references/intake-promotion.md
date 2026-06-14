@@ -1,4 +1,4 @@
-# intake-promote 詳細手順
+# Intake Promote 詳細手順
 
 intake-promote が `.agentdev/intake/inbox/` 内の item を review・分類・整形・振り分けする際の詳細手順を定義する。親エージェントは分類確定、保存、移動、commit、push、完了報告を担当する。サブエージェントへ委譲する場合は item 読解、分類候補、根拠、capture 候補の抽出のみを依頼する。
 
