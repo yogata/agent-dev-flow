@@ -63,6 +63,37 @@ agent: prometheus | sisyphus
 - `references/`（複数形）が canonical。`reference/`（単数形）は obsolete 扱い。
 - `references/` は runtime 配布物のみを含める。authoring-only 資料は含めない（REQ-0103-045）。
 
+## Skill Granularity Contract
+
+Skill は以下の条件を全て満たす単位とする（REQ-0103-100）。
+
+| 条件 | 説明 |
+|------|------|
+| 同一関心 | 解決対象の問題領域が同一 |
+| 同一責任境界 | 担う責任の範囲が同一 |
+| 同一判断モデル | 判断の仕組み・基準が同一 |
+| 矛盾しない `USE FOR` / `DO NOT USE FOR` | 全ての `USE FOR` が同一判断モデルに属し、`DO NOT USE FOR` と矛盾しない |
+
+- 複数の `USE FOR` があっても、同一判断モデル・同一責任境界に属する場合は同一 Skill として扱う（REQ-0103-101）。
+- 複数の `USE FOR` が異なる判断モデル・入力・出力・責任境界を持つ場合は、`DO NOT USE FOR` が同じであっても Skill 分割候補とする（REQ-0103-102）。
+
+## Skill Reference Validity Contract
+
+`references/*` は同一 Skill 内の段階的開示であり、小さい Skill ではない（REQ-0103-103）。
+
+- `references/*` は SKILL.md の入口カードから必要に応じて読み込まれる詳細参照ファイル。
+- `references/*` ごとに独自の `USE FOR` / `DO NOT USE FOR` が必要になる場合は Skill 分割候補とする（REQ-0103-104）。
+- `references/*` に抽出するのは runtime 配布物のみ（REQ-0103-045）。
+
+Command 固有の実行順序・Issue作成・保存・更新・削除・完了報告は Skill 化せず、以下に配置する（REQ-0103-105）。
+
+| 配置先 | 対象 |
+|--------|------|
+| Command | 実行順序、高レベル Steps、ガードレール |
+| Template | 出力本文構造（Issue/PR description、コメント） |
+| Script | 決定的でテスト可能な検査・処理 |
+| 操作用 Skill | GitHub 操作等の横断的操作の安全手順 |
+
 ## Size Constraints
 
 | 種別 | 推奨上限 | 実運用上限 | 例外状態 |

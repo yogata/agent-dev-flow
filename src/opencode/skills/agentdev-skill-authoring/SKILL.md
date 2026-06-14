@@ -423,6 +423,43 @@ Q7: 人間向けナビゲーション・案内か？
 
 **注意**: skill `references/` は runtime 配布物のみを含める（現在は SPEC system.md で規定）。authoring-only 資料は `references/` に含めない。
 
+配置判断の補強:
+- Command 固有の実行手順（Issue 作成・保存・削除・完了報告）は Skill 化せず Command に置く
+- 出力本文や固定文言は Template、決定的でテスト可能な検査は Script に置く
+- 操作安全手順は、複数 Command から再利用される場合のみ操作用 Skill として切り出す
+
+## 10. Skill 粒度と参照妥当性
+
+Skill は、同一関心・同一責任境界・同一判断モデルを共有し、矛盾しない `USE FOR` / `DO NOT USE FOR` で説明できる単位とする。
+
+### 粒度判断
+
+同一 Skill にまとめる条件:
+- 複数の `USE FOR` が同じ判断モデルに属する
+- 入力・出力・責任境界が同じ利用文脈で説明できる
+- `DO NOT USE FOR` が各用途で矛盾せず、隣接 Skill との境界を一貫して示せる
+
+Skill 分割候補:
+- 同じ関心に見えても、`USE FOR` / `DO NOT USE FOR` が用途ごとに分岐する
+- 入力、出力、判断モデル、責任境界のいずれかが用途ごとに異なる
+- 片方の用途で必要な禁止条件が、別用途では正当な実行条件になる
+
+### references/* 分割基準
+
+`references/*` は同一 Skill 内の段階的開示であり、小さい Skill ではない。詳細手順、判定表、例、長いチェックリストを遅延読み込みするために使う。
+
+`references/*` に切り出してよい条件:
+- SKILL.md の判断モデルは単一のまま、詳細だけが長い
+- 参照ファイルを読まなくても Skill の適用可否を判断できる
+- 参照ファイルが SKILL.md の `USE FOR` / `DO NOT USE FOR` を変更しない
+
+Skill 分割を検討する条件:
+- `references/*` ごとに独自の `USE FOR` / `DO NOT USE FOR` が必要になる
+- 参照ファイルごとに入力、出力、責任境界、判断モデルが異なる
+- 参照ファイルを選ぶこと自体が別 Skill の選択判断になっている
+
+配置判断は 9 章を優先し、Skill 粒度の最終確認として本章を使う。
+
 ## See Also
 
 - **agentdev-no-ai-slop-writing**: 自然言語成果物の文章品質ゲート（AI-slop 検出・修正）
