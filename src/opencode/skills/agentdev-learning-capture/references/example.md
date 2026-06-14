@@ -1,7 +1,7 @@
 # Example Workflow
 
 **シナリオ1**: CI で lint エラーが発生し、テンプレート逸脱を修正した
-**シナリオ2**: git worktree 削除時の force 指定が必要だった
+**シナリオ2**: git worktree 削除時に Permission denied リトライが必要だった
 
 ---
 
@@ -53,27 +53,27 @@
 
 ### Step 1: 学びの検知
 
-- `git worktree remove` で権限エラーが発生
-- Windows環境では `-f` (force) フラグが必要
-- エージェントが自動的に force 指定で再実行し成功
+- `git worktree remove` で権限エラー（Permission denied）が発生
+- Windows環境ではファイルハンドル解放待ちのリトライが必要
+- エージェントが短い待機を挟んでリトライし成功（force フラグは使用しない）
 
 ### Step 2: 学びの抽出（13フィールド形式）
 
 ```markdown
-## Windows環境でのgit worktree削除時にforceフラグが必要
+## Windows環境でのgit worktree削除時のPermission deniedリトライ
 
-- **問題事象**: `git worktree remove` 実行時にファイルロックエラーが発生した
+- **問題事象**: `git worktree remove` 実行時にファイルロックエラー（Permission denied）が発生した
 - **発生局面**: 実装（case-closeのブランチ削除ステップ）
 - **検知方法**: git コマンドの終了コードとエラーメッセージ
 - **根本原因**: Windowsのファイルシステムロックにより、worktreeディレクトリが完全に解放される前に削除を試行した
-- **自律対応内容**: `git worktree remove -f` で強制削除し、成功を確認
+- **自律対応内容**: 短い待機を挟んでリトライ（最大3回）。force フラグ（`-f`）は使用せず、ファイルハンドル解放後に通常削除で成功を確認
 - **ユーザー確認有無**: なし
 - **ADR/REQ/spec影響**: なし
-- **横展開観点**: Windows環境でのすべてのファイルシステム操作（rm、mv含む）で同様のリスクあり
+- **横展開観点**: Windows環境でのファイルシステム操作で同様のハンドル解放待ちリトライパターンが適用可能
 - **再発条件**: Windows環境で worktree を削除する場合
-- **予防策候補**: case-close の worktree 削除ステップで最初から `-f` フラグを使用するようテンプレートを更新
-- **想定反映先**: `case-close` コマンドテンプレート
-- **関連**: `.opencode/commands/agentdev/case-close.md`, Issue #89
+- **予防策候補**: worktree 削除プロシージャに Permission denied 時の待機リトライ（最大3回）を組み込む。junction 環境では junction 削除フォールバック手順を適用
+- **想定反映先**: worktree 削除プロシージャ
+- **関連**: worktree-operations プロシージャ, Issue #{issue_number}
 - **タグ**: `#git` `#windows` `#ワークアラウンド`
 ```
 
@@ -81,7 +81,7 @@
 
 > 以下の学びを `.agentdev/learning/inbox.md` に追加しました：
 >
-> ## Windows環境でのgit worktree削除時にforceフラグが必要
+> ## Windows環境でのgit worktree削除時のPermission deniedリトライ
 >
 > - **問題事象**: ...
 > （全13フィールド表示）
@@ -101,18 +101,18 @@
 ```markdown
 ## 実装中の仕様矛盾発見によるREQ更新の必要
 
-- **問題事象**: Issue #150 の実装中、REQ-0106とspecs/design-principles.mdで定義されているエラー処理方針が矛盾していることを発見した
+- **問題事象**: Issue #{issue_number} の実装中、{REQ-ID} と specs/design-principles.md で定義されているエラー処理方針が矛盾していることを発見した
 - **発生局面**: 実装
 - **検知方法**: agentdev-spec-compliance スキルによる実装前チェック
-- **根本原因**: REQ-0106作成時に design-principles.md の既存方針との整合性確認が漏れていた
-- **自律対応内容**: 矛盾点を整理し、ユーザーに確認してREQ-0106の該当セクションを修正
+- **根本原因**: {REQ-ID} 作成時に design-principles.md の既存方針との整合性確認が漏れていた
+- **自律対応内容**: 矛盾点を整理し、ユーザーに確認して{REQ-ID} の該当セクションを修正
 - **ユーザー確認有無**: あり
-- **ADR/REQ/spec影響**: REQ-0106 セクション3の更新が必要。retired ADR-0003（エラー処理方針、現在は SPEC patterns.md で規定）の内容についても検討すべき
+- **ADR/REQ/spec影響**: {REQ-ID} 該当セクションの更新が必要。retired {ADR-ID}（現在は SPEC で規定済みの内容）の内容についても検討すべき
 - **横展開観点**: REQ作成時は常に既存specs/ADRとの整合性確認を必須とすべき
 - **再発条件**: 新規REQ作成時に既存ドキュメントとの整合性チェックをスキップする場合
 - **予防策候補**: req-save の実行ステップに specs/ADR 整合性チェックを追加する
 - **想定反映先**: `req-save` コマンド、`agentdev-req-analysis` スキル
-- **関連**: `docs/requirements/REQ-0106.md`, `docs/specs/design-principles.md`, Issue #150
+- **関連**: `docs/requirements/{REQ-ID}.md`, `docs/specs/design-principles.md`, Issue #{issue_number}
 - **タグ**: `#仕様矛盾` `#REQ更新` `#ADR影響`
 ```
 
@@ -137,7 +137,7 @@
 - **発生局面**: CI
 （全13フィールド）
 
-## Windows環境でのgit worktree削除時にforceフラグが必要
+## Windows環境でのgit worktree削除時のPermission deniedリトライ
 
 - **問題事象**: ...
 - **発生局面**: 実装
