@@ -9,11 +9,12 @@ Command→Skill 参照妥当性と Skill 構造を read-only で診断し、find
 
 ## 基本原則: 診断専用（Read-Only）
 
-**診断のみを実行し、一切の副作用を伴わない。**
+**診断を基本とし、許可される side effect は `.agentdev/drafts/skill-review-finding-*.md` の生成のみとする（REQ-0103-107, REQ-0103-139）。**
 
 - 診断結果の提示
 - 根拠と推奨 route の提示
-- ファイル変更・Issue作成・PR作成・RU保存・commit・push の禁止
+- 必要に応じて `.agentdev/drafts/skill-review-finding-{topic}.md` への finding draft 書き出し
+- canonical docs 変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・Issue作成・PR作成・RU保存・commit・push の禁止
 
 ## Input
 
@@ -23,9 +24,10 @@ Command→Skill 参照妥当性と Skill 構造を read-only で診断し、find
 
 ## Output
 
-- 診断レポート（セッション内テキスト出力のみ、ファイル出力なし）
+- 診断レポート（セッション内テキスト出力）
 - finding リスト（対象、観点、分類、根拠、推奨 route）
-- 必要に応じた追加確認候補
+- 必要に応じて追加確認候補
+- 必要に応じて `.agentdev/drafts/skill-review-finding-{topic}.md`（finding draft export）
 
 ## Steps
 
@@ -37,7 +39,7 @@ Command→Skill 参照妥当性と Skill 構造を read-only で診断し、find
 
 ## Guardrails
 
-- G01: ファイルを変更・作成・削除しない。診断結果はセッション内テキスト出力のみ
+- G01: ファイルを変更・作成・削除しない。ただし `.agentdev/drafts/skill-review-finding-*.md` の生成は例外として許可する（REQ-0103-107, REQ-0103-139）。診断結果はセッション内テキスト出力を基本とする
 - G02: GitHub Issue/PR を作成・更新しない
 - G03: RU、intake、learning、backlog artifact を保存しない
 - G04: commit / push / branch / worktree 操作を行わない

@@ -220,3 +220,60 @@ Repo-local command/skill は AgentDevFlow の consumer 配布対象外である:
 - `.opencode/commands/repo/` — self-hosting repo 専用コマンド。`src/opencode/` に source を持たず、sync-opencode.ps1 の junction 管理対象外
 - `.opencode/skills/repo-*/` — self-hosting repo 専用スキル。同上
 - `repo-*` prefix は AgentDevFlow distributed namespace（`agentdev-*`）とは独立に管理される
+
+## Draft Artifact Contract（REQ-0103-129〜139）
+
+`.agentdev/drafts/` 配下の中間成果物（draft file）の契約を定義する。draft file は canonical artifact（REQ/ADR/SPEC/RU）ではなく、command 間で受け渡す中間成果物である（REQ-0103-126-128）。
+
+### Draft Type Registry
+
+各 draft type は registry 側で以下を定義する（REQ-0103-130）。producer / allowed consumers は個別 draft file の frontmatter ではなく、registry 側でのみ定義する（REQ-0103-136）。
+
+| draft_type | file pattern | producer | allowed consumers | 位置づけ | lifecycle |
+|---|---|---|---|---|---|
+| `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `req-save`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
+| `skill_review_finding` | `.agentdev/drafts/skill-review-finding-{topic}.md` | `skill-review` | `req-define` | Skill/Command 診断結果の要件化入力 | req-define の消化後に削除 |
+
+標準 draft type は上記2種のみとする（REQ-0103-132）。`requirements-review-finding` は標準 draft type に含めない。
+
+### Draft File Frontmatter
+
+`.agentdev/drafts/` 配下の draft file は、以下の frontmatter を基本とする（REQ-0103-135）:
+
+```yaml
+---
+draft_type: req_draft
+topic: example-topic
+status: draft
+created_at: 2026-06-14T19:36:47+09:00
+---
+```
+
+frontmatter に `producer`・`consumer`・`next` を必須化しない（REQ-0103-136）。これらは `draft_type` から導出可能であり、registry 側で定義される。
+
+### Command-Side draft_type 検証
+
+各 command は、入力 draft の `draft_type` が自 command の allowed input に該当するかを確認する（REQ-0103-131）。producer / consumer / next を個別 file frontmatter から読んで整合性判定する必要はない。
+
+| command | 受け付ける draft_type |
+|---|---|
+| `req-save` | `req_draft` |
+| `case-open` | `req_draft` |
+| `req-define` | `skill_review_finding`（明示入力） |
+
+### skill_review_finding Draft の内容要件
+
+`skill_review_finding` draft は RU ではなく、以下を含む req-define への read-only 中間成果物とする（REQ-0103-137）:
+
+- Summary
+- Scope
+- Findings（id, target, classification, evidence, recommended_route, confidence, unresolved_questions）
+- Initial Remediation Direction
+- Out of Scope
+- Suggested req-define Input
+
+`req-define` は `skill_review_finding` を read-only input として読み、未確認事項や採否未確定事項を要件本文に混入させない（REQ-0103-138）。
+
+### skill-review Side Effect 境界
+
+`skill-review` は diagnostic-only command とする。許可される side effect は `.agentdev/drafts/skill-review-finding-*.md` の生成のみとし、それ以外のファイル変更・canonical docs 変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・RU 保存・Issue 作成・PR 作成・commit・push を行わない（REQ-0103-107, REQ-0103-139）。

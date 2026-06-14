@@ -18,6 +18,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 | `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
 | `drafts/req-draft-*.md` | working draft | `req-define` | `req-save` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
+| `drafts/skill-review-finding-*.md` | finding draft | `skill-review` | `req-define` | `req-define` の消化後に削除 |
 | `drafts/requirements-review-finding-*.md` | review finding | `req-save`（SPLIT 検出時） | `req-define` | `req-define` の消化後に削除 |
 | `integrity/reports/*.md` | 検証レポート（非永続） | `docs-check` | `docs-check`（intake化）・ユーザー参照 | 非永続・git管理対象外（`.gitignore` で除外） |
 
@@ -49,7 +50,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 ├── backlog/
 │   └── req-units/       ← backlog-review が RU を生成
 │       └── RU-*.md
-├── drafts/              ← req-define が作業ドラフトを保存（req-save/case-open で消費・削除）
+├── drafts/              ← req-define が要件ドラフト、skill-review が診断 finding を保存（req-save/case-open/req-define で消費・削除）
 └── integrity/
     └── reports/         ← docs-check が検証結果を保存（非永続・git管理対象外）
 ```
