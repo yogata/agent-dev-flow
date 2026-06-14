@@ -11,11 +11,11 @@ agent: sisyphus
 
 - ユーザーの自然言語による機能追加/バグ修正の説明
 - GitHub Issue URL（既存Issueの場合）
- - エラーログ（バグ修正の場合）
- - **ユーザーが明示した入力ファイル**（Requirement Source）: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
- - req-save SPLIT 検出時の finding（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
-  - skill-review 診断結果の finding draft（`.agentdev/drafts/skill-review-finding-{topic-slug}.md`）。read-only input として扱い、未確認事項・採否未確定事項を要件本文に混入させない（REQ-0103-138）
- - **promoted 直読み禁止**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない。backlog-review による RU 化を経由すること
+- エラーログ（バグ修正の場合）
+- **ユーザーが明示した入力ファイル**（Requirement Source）: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
+- req-save SPLIT 検出時の finding（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
+- skill-review 診断結果の finding draft（`.agentdev/drafts/skill-review-finding-{topic-slug}.md`）。read-only input として扱い、未確認事項・採否未確定事項を要件本文に混入させない（REQ-0103-138）
+- **promoted 直読み禁止**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない。backlog-review による RU 化を経由すること
 
 ## Output
 
@@ -59,22 +59,22 @@ agent: sisyphus
 
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
 
-   **10-1. 複数RU同時入力受付**: 詳細は `agentdev-req-analysis` を参照
+    **10-1. 複数RU同時入力受付**: 詳細は `agentdev-req-analysis` を参照
 
-   **10-2. 統合/分離判定**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは統合/分離候補と根拠のみを返し、親エージェントがdraft-metaへ記録する
+    **10-2. 統合/分離判定**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは統合/分離候補と根拠のみを返し、親エージェントがdraft-metaへ記録する
 
-   **10-3. 操作単位ごとの出力生成**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: 親エージェントがreq-save消費形式を確定する
+    **10-3. 操作単位ごとの出力生成**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: 親エージェントがreq-save消費形式を確定する
 
-   **10-4. Epic 規模検出時の記録**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは分解候補のみを返し、親エージェントがdraft-metaへ記録する
+    **10-4. Epic 規模検出時の記録**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは分解候補のみを返し、親エージェントがdraft-metaへ記録する
 
     **10-5. Wave 候補・依存関係の記録**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは依存候補のみを返し、親エージェントが順序依存を確定する
 
     **10-6. OU 構造検証**: 生成した `operation_units` セクションについて以下を確認する: (a) 各 OU に `ou_id`, `target_req`, `operation` が設定されている (b) `execution_groups` の `included_ou` が実在する `ou_id` を参照している (c) `depends_on` が実在する `ou_id` を参照している (d) `result` セクションが空である（req-save/case-open が書き戻すため）
 
 11. **完了報告**: 完了報告templateに従って出力。work_type に応じたvariantを選択:
-      - feature standard → .opencode/commands/agentdev/templates/req-define/feature.md
-      - feature large (Epic)規模 → .opencode/commands/agentdev/templates/req-define/feature-epic.md
-      - bugfix / maintenance / docs_chore → .opencode/commands/agentdev/templates/req-define/lightweight.md
+    - feature standard → .opencode/commands/agentdev/templates/req-define/feature.md
+    - feature large (Epic)規模 → .opencode/commands/agentdev/templates/req-define/feature-epic.md
+    - bugfix / maintenance / docs_chore → .opencode/commands/agentdev/templates/req-define/lightweight.md
 
 ## Guardrails
 
@@ -82,7 +82,7 @@ agent: sisyphus
 - G02: 関連ドキュメントの個別ファイル列挙をユーザーに求めない
 - G03: ファイル編集スコープ: `.agentdev/drafts/**` のみ作成・編集を許可
 - G04: ユーザーが明示した入力ファイルは read-only。`.agentdev/backlog/req-units/RU-*.md` の削除は行わない（後続の case-open 成功後に実行）
-- G05: `docs/` 配下の広範な探索禁止（例外: 明示入力ファイルと docs/requirements/** の read-only 参照、Step 4-1 の限定探索は許可）
+- G05: `docs/` 配下の広範な探索禁止（例外: 明示入力ファイルと docs/requirements/\*\* の read-only 参照、Step 4-1 の限定探索は許可）
 - G06: inbox.md / archive/active.md を直接ロードしない
 - G07: promoted artifact の直読み禁止
 - G08: `git` コマンドは実行しない
