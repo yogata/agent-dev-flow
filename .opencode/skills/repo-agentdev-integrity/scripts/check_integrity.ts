@@ -110,7 +110,15 @@ function listDirs(dirPath: string): string[] {
     return (
       fs.readdirSync(dirPath, { withFileTypes: true }) as import("fs").Dirent[]
     )
-      .filter((d) => d.isDirectory())
+      .filter((d) => {
+        if (d.isDirectory()) return true;
+        // Windows junctions: isDirectory() returns false (libuv reparse point behavior)
+        try {
+          return fs.statSync(path.join(dirPath, d.name)).isDirectory();
+        } catch {
+          return false;
+        }
+      })
       .map((d) => d.name)
       .sort();
   } catch {
