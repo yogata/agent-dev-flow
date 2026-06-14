@@ -17,7 +17,7 @@ agent: sisyphus
 
 ## Steps
 
-0. **upstream handoff 停止判定**: 要件docまたは RU に `apply_in_current_project: false` が含まれる場合、Issue を作成せず停止。agent-dev-flow repository への手動取り込み対象として報告。判定は `agentdev-workflow-lifecycle` に従う
+0. **upstream handoff 停止判定**: 要件docまたは RU に `agentdev_handoff: true` が含まれる場合、Issue を作成せず停止。agent-dev-flow repository への手動取り込み対象として報告。判定は `agentdev-workflow-lifecycle` に従う
 
 0-1. **OU 選択ゲート**: ドラフトに `operation_units` セクションがある場合、処理対象 OU を決定する（REQ-0104-035〜037）:
      - OU ID が指定されている場合 → 指定された OU の req-save result を読み取り、その OU だけを Issue 化する
