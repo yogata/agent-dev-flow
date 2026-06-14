@@ -35,16 +35,16 @@ git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/{base_bran
 
 ## 削除手順
 
-**追跡済みファイル削除禁止**: クリーンアップ操作中は追跡済みファイルを削除してはならない。削除対象は未追跡ファイルのみ（`.sisyphus/tmp/`、ビルド成果物等）。
+**追跡済みファイル削除禁止**: クリーンアップ操作中は追跡済みファイルを削除してはならない。削除対象は未追跡ファイルのみ（ランタイムワークスペース配下の一時ファイル、ビルド成果物等）。
 
-### 1. .sisyphus/ クリーンアップ
+### 1. 未追跡ファイルのクリーンアップ
 
-worktree 内の `.sisyphus/` 未追跡ファイルが `git worktree remove` エラーの原因になるため削除:
+worktree 内の未追跡ファイル（ランタイムワークスペース配下の一時ファイル、ビルド成果物等）が `git worktree remove` エラーの原因になるため削除:
 
-**Windows**: `if (Test-Path ".worktrees/{N}-{type}/.sisyphus/") { git -C ".worktrees/{N}-{type}" clean -fd .sisyphus/ }`
-**POSIX**: `git -C ".worktrees/{N}-{type}" clean -fd .sisyphus/`
+**Windows**: `git -C ".worktrees/{N}-{type}" clean -fd`
+**POSIX**: `git -C ".worktrees/{N}-{type}" clean -fd`
 
-**重要**: `.sisyphus/` 内の追跡済みファイル（ドメイン状態を含む可能性あり）は削除禁止。未追跡ファイルのみを削除対象とする。`.sisyphus/` が存在しない場合はエラーにせず続行。
+**重要**: 追跡済みファイル（ドメイン状態を含む可能性あり）は削除禁止。未追跡ファイルのみを削除対象とする。未追跡ファイルが存在しない場合はエラーにせず続行。
 
 ### 2. worktreeの削除
 
@@ -80,7 +80,7 @@ git worktree prune
 3. ローカルブランチを削除: `git branch -d {branch_name}`（必要時のみ `-D`）
 4. リモートブランチがある場合のみ削除: `git push origin --delete {branch_name}`
 
-**注意**: `install-consumer-opencode.ps1` が作成する junction link 経由の worktree で発生する Windows 固有の挙動。背景: REQ-0117-001、Issue #683、PR #687。
+**注意**: `install-consumer-opencode.ps1` が作成する junction link 経由の worktree で発生する Windows 固有の挙動。背景: worktree junction 削除フォールバック要件（関連Issue/PRは履歴参照）。
 
 ### 4. ローカルブランチの削除
 
