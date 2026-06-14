@@ -384,7 +384,7 @@ function checkReqFrontmatterFilename(
 
 function checkReqRequiredFields(reqDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const required = ["id", "title", "created", "updated", "tags"];
+  const required = ["id", "title", "created", "updated"];
   const files = listFiles(reqDir).filter(
     (f) => f.startsWith("REQ-") && f !== "README.md",
   );
@@ -3102,7 +3102,7 @@ function checkRetiredFrontmatter(reqDir: string, root: string): CheckResult[] {
   const retiredFiles = listFiles(retiredDir).filter((f) =>
     f.startsWith("REQ-"),
   );
-  const required = ["id", "title", "created", "updated", "tags"];
+  const required = ["id", "title", "created", "updated"];
 
   for (const file of retiredFiles) {
     const fullPath = path.join(retiredDir, file);
