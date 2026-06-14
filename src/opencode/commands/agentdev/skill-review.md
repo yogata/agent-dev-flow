@@ -1,6 +1,6 @@
 ---
 description: Command→Skill 参照妥当性と Skill 構造を read-only で診断する
-agent: prometheus
+agent: sisyphus
 ---
 
 # skill-review

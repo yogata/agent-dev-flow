@@ -1,6 +1,6 @@
 ---
 description: docs全体の意味整合性をレビューし、是正の推奨アクションを提示する
-agent: prometheus
+agent: sisyphus
 ---
 
 # docs-review
