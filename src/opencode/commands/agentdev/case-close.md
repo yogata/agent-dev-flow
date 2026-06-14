@@ -23,7 +23,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 1. **Issue番号解決**: ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
 
 2. **前提確認**: 達成判定・完了ゲート → `agentdev-workflow-lifecycle` に従い、Issue本文の完了条件チェックボックスを検証:
-   - unchecked項目を達成判定（証拠ソース・5条件プロトコル）
+   - unchecked項目を達成判定（証拠ソース・`agentdev-workflow-orchestration` のプロトコルに従い）
    - 達成不可項目を自律解決判定（変更対象分類×検証種別分類）
    - `agentdev-gh-cli` に従い `--body-file` で Issue本文更新 → VERIFY
    - **事後確認**: 更新後にIssue本文を再読込し、完了条件セクションの全 `- [ ]` が `[x]` に反映されていることを確認。未反映の場合は再更新（最大2回）し、それでも失敗する場合は構造化エラーで停止
@@ -46,10 +46,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - 失敗時は5秒待機して再試行
      - 最大5回リトライ（初期試行 + 5回リトライ）
      - 各リトライ試行をログ記録
-   - **全リトライ失敗時のフォールバック**:
-     - Rebase workflow をユーザーに提示（承認が必要）:
-       - `git rebase origin/main` → コンフリクト解決（あれば）→ `git push --force-with-lease`
-     - `--force` は禁止（`--force-with-lease` のみ許可）
+    - **全リトライ失敗時のフォールバック**: フォールバック手順は template (`.opencode/commands/agentdev/templates/case-close/standard.md`) を参照
    - 対応記録コメントをIssueに追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Readして `agentdev-gh-cli` の VERIFY 操作に従って内容検証
 
 5. **Post-merge テスト戦略検証**: マージ後のみ確認可能な項目（CI通過等）を反映。`agentdev-gh-cli` に従い `--body-file` で更新 → VERIFY
@@ -79,7 +76,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
      - promoted artifact imported 判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
       - **Capture 回収責務**: PR 本文の `## Findings / Capture候補` セクションから intake / learning を分離回収する。intake 候補は `.agentdev/intake/inbox/` に保存し、learning 候補は `.agentdev/learning/inbox.md` に保存する。Epic 横断回収
-      - **Capture 境界**: Split Rule（intake / learning 境界）は `agentdev-workflow-orchestration` を参照
+       - **Capture 境界**: intake / learning 境界は `agentdev-workflow-orchestration` を参照
       - intake と learning を別々の成果物として扱う
       - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数・中間ファイル等）を capture の入力として使用しない。capture 情報の入力源は PR 本文のみ
 
@@ -108,7 +105,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G12: `agentdev-gh-cli` に従い `--body-file` を使用（`--body` 直接指定禁止）
 - G13: 学びの検知はエージェント自律。ユーザーに問わない
 - G14: gh CLI出力読み取りは `agentdev-gh-cli` の安全な手順に従う
-- G15: intake と learning を混合した単一成果物にしない（Split Rule 準拠）
+- G15: intake と learning を混合した単一成果物にしない（`agentdev-workflow-orchestration` の capture 境界に準拠）
 - G16: 今回の完了条件に含まれる未対応事項を intake に逃がして完了扱いにしない
 - G17: Step 11 の commit は `.agentdev/` 配下のみ。他パスを巻き込まない
 - G18: learning と intake を同一 commit に含める

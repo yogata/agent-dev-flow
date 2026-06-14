@@ -28,8 +28,8 @@ agent: sisyphus
    - case-auto は OU の統合・分割、REQ 操作分類、Issue 階層判定を再評価しないこと（REQ-0114-054）
    - case-open 相当処理の完了後、出力を確認して以下のいずれかに分岐する:
      - **Standard flow（単一 Issue）**: 既存の直列フロー（case-run → case-close）をそのまま実行
-      - **Epic Issue（マルチREQ または 単一REQ Epic flow）**: **OU queue プロセス**（Step 4-1〜4-3）に進む
-     - **Step 4-1 キュー開始**: ドラフトの `operation_units` セクションから OU 構造を読み取り、処理順序を決定する（`recommended_order`, `depends_on` に基づく）。Epic Issue 番号を記録する。Epic Issue の子Issue一覧（Wave 構成含む）を読み取る。case-run 相当処理に Epic Issue 番号を渡す。case-run の Epic Orchestrator モードが全 Wave の子Issue実行を処理する。case-auto は Wave スケジューリング・依存関係分析を実装しない
+     - **Epic Issue（マルチREQ または 単一REQ Epic flow）**: Step 4-1〜4-3 のキュー処理に進む
+     - **Step 4-1 キュー開始**: ドラフトの `operation_units` セクションから OU 構造を読み取り、処理順序を決定する（`recommended_order`, `depends_on` に基づく）。Epic Issue 番号を記録する。Epic Issue の子Issue一覧（Wave 構成含む）を読み取る。case-run 相当処理に Epic Issue 番号を渡す。case-run の Epic Orchestrator モードが全 Wave の子Issue実行を処理する。case-auto は Wave 実行プロトコルを実装しない（`agentdev-workflow-orchestration` を参照）
      - **Step 4-2 case-close ループ**: case-run 相当処理の完了後、その出力（成功/失敗/スキップされた子Issue一覧）から case-close 対象を決定する:
       - 正常完了した子Issue: case-close 相当処理を実行
       - 失敗・スキップされた子Issue: case-close を試みない
@@ -70,9 +70,9 @@ agent: sisyphus
 - G09: 既存のreq-save / case-open / case-run / case-closeの責務を変更しない
 - G13: case-auto は Issue 階層決定ロジックを持ってはならない。複数 REQ doc または scale:large の場合は case-open の Issue 構造ルールに委譲する
 - G14: case-auto は req-save 相当処理から case-open 相当処理への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価してはならない。保存結果をそのまま渡す
-- G15: case-auto は Wave スケジューリング・依存関係分析・並列実行制御を実装してはならない。これらは case-run Epic Orchestrator に委譲する
+- G15: case-auto は Wave 実行プロトコル（`agentdev-workflow-orchestration` 参照）を実装してはならない。これらは case-run Epic Orchestrator に委譲する
 - G16: case-auto は独自の操作単位ステータス追跡を持ってはならない。Epic Issue のステータス追跡テーブルを使用する
-- G18: case-auto は OU queue の管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わないこと（REQ-0114-051）
+- G18: case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わないこと（REQ-0114-051）
 - G19: case-auto は draft を OU 情報の SSoT として扱い、独自の OU 状態管理を持たないこと（REQ-0114-058）
 - G20: OU 間依存は queue dependency として扱い、依存関係があるだけでは Epic Issue 化しないこと（REQ-0114-055）
 - G21: case-auto は Epic Issue 化の判定に関与しないこと。case-open の判定結果に従うこと（REQ-0114-057）

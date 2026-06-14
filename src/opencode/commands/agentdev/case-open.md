@@ -58,7 +58,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
  | 子Issue内容ソース | 各REQ docから生成 | decomposition内容から生成 |
 | 子Issue追加要素 | Wave番号+依存記載、REQ doc番号明示（traceability）、孫Issue判定 | なし |
 
-4. テンプレート `issue_desc_epic.md` を Read tool で読み込む。詳細は `agentdev-issue-management` を参照
+4. `agentdev-workflow-templates` の選定ルールに従いテンプレートを読み込む。詳細は `agentdev-issue-management` を参照
 
 5. Epic Issue本文を生成。`execution_groups` セクションから Epic 候補グループの根拠を読み取る（REQ-0104-039）。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
 
@@ -80,7 +80,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 16-1. **[Standard] OU 結果の書き戻し**: ドラフトに `operation_units` セクションがある場合、作成した Issue 番号を当該 OU の `result` に書き戻す（REQ-0104-038）
 
-17. コメント追加: テンプレート `issue_comment_bug_analysis.md`（バグ・軽微変更等）または `issue_comment_feature_technical.md`（機能追加）読込（Epic flowではEpic Issueにコメント追加）→ VERIFY
+17. コメント追加: `agentdev-workflow-templates` の選定ルールに従いコメント用テンプレートを読み込む（Epic flowではEpic Issueにコメント追加）→ VERIFY
 
  18. ドラフトが存在する場合、`.sisyphus/drafts/req-draft-{topic-slug}.md` を削除
 

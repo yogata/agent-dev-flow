@@ -23,15 +23,15 @@ agent: prometheus
 
 ## Steps
 
-0. **セッションコンテキスト検知**（引数なし単体実行時のみ）: `agentdev-req-analysis` の session-context-detection.md に従い、セッション履歴から6項目（要件内容・work_type・scale・ADR・構造化・適用範囲）を推論し、信頼度付きで表示。推論結果に応じて Step 1/9/10 へルーティング。引数ありの場合は Step 1 から開始
+0. **セッションコンテキスト検知**（引数なし単体実行時のみ）: `agentdev-req-analysis` に従い、セッション履歴から6項目（要件内容・work_type・scale・ADR・構造化・適用範囲）を推論し、信頼度付きで表示。推論結果に応じて Step 1/9/10 へルーティング。引数ありの場合は Step 1 から開始
 
 1. **明示入力ファイルの読み込み**（指定時）: Read tool で読み込み、壁打ちの初期コンテキストとして扱う。複数ファイル指定時は全て読み込む。引数なしの場合、`.agentdev/backlog/req-units/RU-*.md` の存在を確認し1件なら自動検出。0件なら Step 2 へ。2件以上なら候補一覧を表示
 
-2. **壁打ち対話** → `agentdev-req-analysis` の壁打ちメソドロジーに従って深掘り。明示入力ファイルがある場合、その内容を開始点として活用
+2. **壁打ち対話** → `agentdev-req-analysis` に従って深掘り。明示入力ファイルがある場合、その内容を開始点として活用
 
    **2-1. upstream handoff 判定**: 入力が AgentDevFlow 本体・配布 command・配布 skill・配布 template・配布 script の不具合または改善点を対象とする場合、`agentdev-workflow-lifecycle` に従い upstream handoff 用 RU 入力として整理する。現在プロジェクトの通常要件docとして定義せず、出力に `handoff_target: agent-dev-flow` と `apply_in_current_project: false` を含める
 
-3. **既存REQ照合** → `agentdev-req-file-manager` の照合方法論に従って実行。APPEND-first ルール: CREATE 前に APPEND/UPDATE 候補を必ず評価。SPLIT 検出時は保存操作ではなく requirements review 候補として扱う。操作分類結果は `draft-meta` に記録
+3. **既存REQ照合** → `agentdev-req-file-manager` の照合方法論に従って実行。CREATE 前に APPEND/UPDATE 候補を必ず評価すること。要件の分割が必要な場合は保存操作ではなく requirements review 候補として扱うこと。操作分類結果は `draft-meta` に記録
 
 4. **要件展開** → `agentdev-req-analysis` の分析観点に従って網羅。詳細ゲートは `agentdev-req-analysis` を参照
    - **4-1. 関連ドキュメント更新候補抽出**: 変更影響候補を抽出し、ドラフトに保持する。委譲接続点: サブエージェントは探索結果・分類候補・根拠のみを返し、親エージェントがドラフト反映を判断する
