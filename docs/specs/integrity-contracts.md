@@ -82,7 +82,7 @@
 | Canonical | canonical 境界の遵守 |
 | Lifecycle | 状態遷移の妥当性 |
 | Namespace | 旧 namespace 残存確認 |
-| ImplementationPattern | ~~pattern 定義妥当性（REQ-0108-026〜038, 反転済）~~ → frontmatter 禁止フィールド検査に統合済 |
+| ImplementationPattern | frontmatter 禁止フィールド検査（REQ-0108-026〜038 から反転、REQ-0108-109/124 に統合済） |
 | ADRStatusNormalization | ADR status 旧形式検出（REQ-0108-121） |
 | RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-0108-122） |
 | WorkflowStatusProhibition | workflow status / 6 マイクロフェーズ検出（REQ-0108-123） |
