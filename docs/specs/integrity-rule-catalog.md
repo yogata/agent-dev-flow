@@ -686,6 +686,46 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | primary pattern としての記述を削除し、重ねる委譲・manager-orchestrator との差分として説明する |
 | last_verified | 2026-06-12 |
 
+### IR-034: Skill 内部 section / protocol / Step 参照検出
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-034 |
+| description | command から skill 内部の protocol 名・Step 名・Section 名・見出し名への参照、自然言語ラベルから存在しないファイル名を推測させる参照、skill 側に command 固有 Step 番号を一次情報として保持する記述を検出すること |
+| severity | heuristic |
+| category | canonical-conflict |
+| detection_method | command 定義本文・SKILL.md 本文から skill 内部 section 名・protocol 名・Step 名への直接参照パターンを検出 |
+| affected_artifacts | [commands, skills] |
+| related_req | [REQ-0108-244] |
+| related_spec | [integrity-contracts.md] |
+| gate_level | full-audit |
+| false_positive_risk | 中。検出パターン例示・検査ルール自体の記述は対象外 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | req-define |
+| triage_action | 参照先を正規の公開 API（SKILL.md description / USE FOR）に置き換える |
+| last_verified | 2026-06-14 |
+
+### IR-035: Skill See Also 検出観点
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-035 |
+| description | skill の `See Also` に実行判断材料（委譲先・責務境界・禁止条件・停止条件）が含まれている、`DO NOT USE FOR` と `See Also` の重複、skill が全コマンド一覧等の別 SSoT 管理対象を保持していることを検出すること |
+| severity | heuristic |
+| category | canonical-conflict |
+| detection_method | SKILL.md の `See Also` セクションから実行判断材料・DO NOT USE FOR 重複・別 SSoT 一覧を検出 |
+| affected_artifacts | [skills] |
+| related_req | [REQ-0108-245] |
+| related_spec | [integrity-contracts.md] |
+| gate_level | full-audit |
+| false_positive_risk | 中。補助導線として必要な参照は許容 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | req-define |
+| triage_action | 実行判断材料を SKILL.md 本文に移動、See Also を関連スキルへの導線のみに整理する |
+| last_verified | 2026-06-14 |
+
 ## Gate Levels
 
 | Level | Description | Trigger |
