@@ -48,7 +48,7 @@ DOC-MAP（索引）/ Guides（案内）
 |---|---|---|
 | `.agentdev/` | AgentDevFlow の canonical domain state（intake / learning / backlog / integrity） | 永続的 domain state。配布物ではない |
 | `.sisyphus/` | runtime 作業領域 | 一時的ワークスペース。domain state ではない |
-| `.sisyphus/drafts/` | command workflow での作業用一時領域 | active command の明示的な working draft handoff でのみ使用 |
+| `.agentdev/drafts/` | command workflow での作業用一時領域 | active command の明示的な working draft handoff でのみ使用 |
 
 ## Source-of-Truth Priority
 

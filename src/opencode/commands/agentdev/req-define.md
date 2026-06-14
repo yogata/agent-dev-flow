@@ -13,12 +13,12 @@ agent: prometheus
 - GitHub Issue URL（既存Issueの場合）
  - エラーログ（バグ修正の場合）
  - **ユーザーが明示した入力ファイル**（Requirement Source）: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
- - req-save SPLIT 検出時の finding（`.sisyphus/drafts/requirements-review-finding-{topic-slug}.md`）
+ - req-save SPLIT 検出時の finding（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
  - **promoted 直読み禁止**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない。backlog-review による RU 化を経由すること
 
 ## Output
 
-- `.sisyphus/drafts/req-draft-{topic-slug}.md`（機能追加の場合のみ）
+- `.agentdev/drafts/req-draft-{topic-slug}.md`（機能追加の場合のみ）
 - セッション内要件doc（バグ修正・軽微変更の場合）
 
 ## Steps
@@ -53,7 +53,7 @@ agent: prometheus
 8. **Scale判断**（feature のみ）: `agentdev-workflow-lifecycle` で standard/large を判定。large 時はユーザーと分解計画を協議
 
 9. **ドラフト保存**:
-   - 機能追加: `.sisyphus/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加。Step 6-1 で生成した `operation_units` セクションと Step 6-2 で生成した `execution_groups` セクションを含める
+   - 機能追加: `.agentdev/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加。Step 6-1 で生成した `operation_units` セクションと Step 6-2 で生成した `execution_groups` セクションを含める
    - バグ修正・軽微変更/リファクタリング・保守/ドキュメント・雑務: ドラフト保存不要。セッション内で完結
 
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
@@ -79,7 +79,7 @@ agent: prometheus
 
 - G01: 壁打ちフェーズのみ（実装コード禁止）
 - G02: 関連ドキュメントの個別ファイル列挙をユーザーに求めない
-- G03: ファイル編集スコープ: `.sisyphus/drafts/**` のみ作成・編集を許可
+- G03: ファイル編集スコープ: `.agentdev/drafts/**` のみ作成・編集を許可
 - G04: ユーザーが明示した入力ファイルは read-only。`.agentdev/backlog/req-units/RU-*.md` の削除は行わない（後続の case-open 成功後に実行）
 - G05: `docs/` 配下の広範な探索禁止（例外: 明示入力ファイルと docs/requirements/** の read-only 参照、Step 4-1 の限定探索は許可）
 - G06: inbox.md / archive/active.md を直接ロードしない

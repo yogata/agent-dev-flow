@@ -110,7 +110,7 @@ scripts/
 - `.agentdev/`: AgentDevFlow の canonical domain state。intake / learning / backlog / integrity の永続データを管理する。配布物ではなく、レポジトリの動作状態を保持する（ADR-0103）。self-hosting / consumer 共に使用される。
 - `.agentdev-plugin/`: consumer リポジトリにおける agent-dev-flow の git clone 先（REQ-0103-072~077）。self-hosting repo では使用しない。`.gitignore` で管理対象外とする。
 - `.sisyphus/`: runtime 一時作業領域。domain state ではなく、`.gitignore` で管理対象外とする（ADR-0104）。
-- `.sisyphus/drafts/`: command workflow でのみ明示的に定義された working draft handoff に使用する一時領域。
+- `.agentdev/drafts/`: command workflow でのみ明示的に定義された working draft handoff に使用する一時領域。
 
 ## 成果物ライフサイクル
 

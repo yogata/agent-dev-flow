@@ -4,7 +4,7 @@
 対象: 壁打ちドラフト（{日本語名称}：{規模}）
 結果:
   - 要件定義の壁打ちが完了
-  - 壁打ちドラフトを .sisyphus/drafts/ に保存
+  - 壁打ちドラフトを .agentdev/drafts/ に保存
 検証結果: ✅ OK
 git 永続化: 該当なし
 次のコマンド: /agentdev/req-save
