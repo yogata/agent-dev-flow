@@ -5299,6 +5299,12 @@ function checkSkillCategoryGap(
     ["Workflow template 構造", ["checkNaming", "checkFrontmatter", "checkSectionMarkers"]],
     ["Skill 構造", ["lintSkill"]],
     ["Junction 整合性", ["BrokenJunctions"]],
+    ["Capture boundary", ["CaptureBoundaryReference", "PrTemplateCaptureSection", "CommandCaptureDuties"]],
+    ["語彙ポリシー", ["VocabularyCompliance", "OldStatusVocabulary", "VocabularyRegistrySync"]],
+    ["Cross-REQ vocab", ["CrossReqVocabularyConsistency"]],
+    ["Mapping table history", ["MappingTableHistoryLabels"]],
+    ["REQ verification basis", ["ReqVerificationBasis"]],
+    ["Skill-internal section ref", ["SkillInternalSectionRef"]],
   ]);
 
   let foundGap = false;
