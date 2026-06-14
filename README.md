@@ -30,9 +30,11 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 | inbox に item がある | `/agentdev/intake-promote` | promoted / archive |
 | 再発防止知見を蓄積したい | `learning-capture`（スキル） | inbox.md エントリ |
 | inbox.md にエントリがある | `/agentdev/learning-promote` | promoted artifact |
-| promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
+| promoted artifact（intake/learning/diagnostics）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
-| docs 全体の意味整合性をレビューしたい | `/agentdev/docs-review` | 診断レポート |
+| docs 全体の意味整合性を診断したい | `/agentdev/diagnostics-docs` | diagnostics finding |
+| Command/Skill 参照妥当性を診断したい | `/agentdev/diagnostics-skills` | diagnostics finding |
+| diagnostic finding を分類したい | `/agentdev/diagnostics-promote` | promoted artifact |
 | ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート（self-hosting repo 専用） |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
