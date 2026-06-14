@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は REQ-0101 から REQ-0122 までの 21 件（active REQ、REQ-0111 は retired）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0123 までの 22 件（active REQ、REQ-0111 は retired）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -27,6 +27,7 @@
 | [REQ-0120](requirements/REQ-0120.md) | Runtime Command 非必須参照除去 |
 | [REQ-0121](requirements/REQ-0121.md) | Runtime Command 規範語見直し + Integrity 検査再定義 |
 | [REQ-0122](requirements/REQ-0122.md) | 規範語ルールおよび記載の完全削除 |
+| [REQ-0123](requirements/REQ-0123.md) | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 |
 
 - [Requirements Index](requirements/README.md)
 - [Migration Table](requirements/mapping-table.md)
