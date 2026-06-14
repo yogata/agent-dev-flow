@@ -32,33 +32,25 @@ agent: sisyphus
 
 **判定基準参照**: Step 3〜10 の判定基準・スコアリングルール・提示形式・承認フローは、全て `agentdev-learning-pipeline` の該当 Phase を参照。
 
-3. **全エントリの読込と旧フォーマット正規化**（→ promote-judgment-logic.md Phase 2）
-4. **問題クラス分類**（→ Phase 3: 問題クラス分類）
-5. **8軸評価スコアリング**（→ Phase 3: 8軸評価スコアリング）
-6. **evaluation-report.md 生成・更新**（→ Phase 3: evaluation-report.md の生成・更新）
-7. **廃棄判定**（11カテゴリ + duplicate）（→ Phase 4: 廃棄判定）
-8. **既存対策確認**（→ Phase 4: 既存対策確認）
-9. **ユーザーへの判定結果提示**（→ Phase 5: ユーザーへの判定結果提示）
-10. **ユーザー承認**（→ Phase 5: ユーザー承認）
+3. **全エントリの読込と旧フォーマット正規化**（→ agentdev-learning-pipeline を参照）
+4. **問題クラス分類**（→ agentdev-learning-pipeline を参照）
+5. **8軸評価スコアリング**（→ agentdev-learning-pipeline を参照）
+6. **evaluation-report.md 生成・更新**（→ agentdev-learning-pipeline を参照）
+7. **廃棄判定**（11カテゴリ + duplicate）（→ agentdev-learning-pipeline を参照）
+8. **既存対策確認**（→ agentdev-learning-pipeline を参照）
+9. **ユーザーへの判定結果提示**（→ agentdev-learning-pipeline を参照）
+10. **ユーザー承認**（→ agentdev-learning-pipeline を参照）
 
 ### Phase 6: Execute + Git
 
 11. **実行前同期（git pull）**:
     - `git pull --rebase` を実行
-    - **失敗時**: 構造化エラーを表示して停止（自動解消しない）:
-      ```
-      ## Git 同期エラー
-      **エラー種別**: pull --rebase 失敗
-      **停止理由**: リモートに未取り込みの変更があり、rebase マージできない
-      **対象ブランチ**: {current_branch}
-      **ユーザーアクション**: 手動で rebase のコンフリクトを解決してください
-      **raw git output**: {git_error_output}
-      ```
+    - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
 
 12. **promoted artifact 生成**（staging領域のみ）:
      - 出力先: `.agentdev/learning/promoted/{disposal-category}-{name}.md`
      - **`.opencode/` 直接書込禁止** / **`case-run` への直接受け渡し禁止**（`backlog-review` 経由で RU 化）
-     - フォーマット: `agentdev-learning-pipeline` skill の「Requirement Source Staging Stub Schema」に従う
+     - フォーマット: `agentdev-learning-pipeline` を参照
 
 13. **アーカイブ移動**（原子的操作）:
     - **Step 13-1**: inbox.md 全エントリを archive/active.md に追記（`**移動日**: YYYY-MM-DD` フィールド追加）
@@ -78,7 +70,7 @@ agent: sisyphus
     - **prune 対象**: staged（promoted artifact 生成済み）/ rejected / duplicate のエントリのみ
     - **prune 非対象**: deferred / 未処理のエントリは残す
     - **証拠保存**: staged エントリ除去時に promoted artifact の「元learning item / 根拠」セクションに保存
-    - 詳細は `agentdev-learning-pipeline` skill の「Prune 方針 → promote 時 prune」を参照
+    - 詳細は `agentdev-learning-pipeline` を参照
     - **実行手順**: 1) prune 対象特定 → 2) ユーザーに prune 計画提示 → 3) 承認時のみ実行 → 4) 該当エントリ除去
 
  15. **.agentdev 変更の commit と push**:
@@ -88,16 +80,7 @@ agent: sisyphus
         1. `git add` は `.agentdev/` のみ対象
         2. commit message: `chore(agentdev): promote learning findings`
         3. `git push` 実行
-        4. **push 失敗時**: 構造化エラーを表示し完了扱いにしない:
-          ```
-          ## Git Push エラー
-          **エラー種別**: push 失敗
-          **停止理由**: リモートへのプッシュに失敗
-          **対象ブランチ**: {current_branch}
-          **変更ファイル**: {changed_files}
-          **ユーザーアクション**: 手動で `git push` を実行してください
-          **raw git output**: {git_error_output}
-          ```
+        4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
 
 16. **完了報告** → template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`。以下を含める:
     - 8軸評価サマリ（加重合計スコア分布）
@@ -138,6 +121,6 @@ agent: sisyphus
 
 ## Artifact Lifecycle
 
-各成果物の役割・性格・lifecycle 詳細は `agentdev-learning-pipeline` skill の「Artifact Lifecycle」を参照。
+各成果物の役割・性格・lifecycle 詳細は `agentdev-learning-pipeline` を参照。
 
 **learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → promoted artifact 生成 → archive move → prune。promoted artifact は `/agentdev/backlog-review` 経由で RU 化後に `/agentdev/req-define` に合流する。

@@ -39,17 +39,7 @@ agent: sisyphus
 
 5-1. **実行前同期（git pull）**:
     - `git pull --ff-only` を実行する
-    - **失敗時**: 以下の構造化エラーメッセージを表示して停止する（自動解消しない）:
-      ```
-      ## Git 同期エラー
-
-      **エラー種別**: pull --ff-only 失敗
-      **停止理由**: リモートに未取り込みの変更があり、fast-forward マージできない
-      **対象ブランチ**: {current_branch}
-      **ユーザーアクション**: 手動で `git pull --rebase` または `git stash && git pull --ff-only && git stash pop` を実行してください
-      **raw git output**:
-      {git_error_output}
-      ```
+    - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git 同期エラー」形式で表示して停止する（自動解消しない）
 
 6. **保存**:
     - 保存先: `.agentdev/intake/inbox/`
@@ -63,18 +53,7 @@ agent: sisyphus
        1. `git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする。他のパスを巻き込まない
        2. commit message: `chore(agentdev): capture intake items from github`（Conventional Commits 形式）
        3. `git push` を実行する
-       4. **push 失敗時**: 以下の構造化エラーメッセージを表示し、完了扱いにしない:
-         ```
-         ## Git Push エラー
-
-         **エラー種別**: push 失敗
-         **停止理由**: リモートへのプッシュに失敗
-         **対象ブランチ**: {current_branch}
-         **変更ファイル**: {changed_files}
-         **ユーザーアクション**: 手動で `git push` を実行してください
-         **raw git output**:
-         {git_error_output}
-         ```
+        4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git Push エラー」形式で表示し、完了扱いにしない
 
 7. **サマリーレポート提示**: 抽出結果をサマリーとしてユーザーに提示する:
    ```
