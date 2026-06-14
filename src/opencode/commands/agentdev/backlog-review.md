@@ -75,19 +75,19 @@ status: draft
 
 ### Step 2: Artifact 読み込み・分析
 
-分析基準・upstream handoff metadata 付与ルールは `agentdev-workflow-lifecycle` を参照
+分析基準・upstream handoff metadata 付与ルールは `agentdev-backlog-integration` を参照
 
 ### Step 3: 統合・分割判定 + depends_on 依存解決 + ユーザー承認
 
-統合・分割判定基準・depends_on 依存解決ルールは `agentdev-workflow-lifecycle` を参照
+統合・分割判定基準・depends_on 依存解決ルールは `agentdev-backlog-integration` を参照
 
 ### Step 4: 矛盾検出 + ユーザー承認
 
-矛盾検出ロジック・出力形式は `agentdev-workflow-lifecycle` を参照
+矛盾検出ロジック・出力形式は `agentdev-backlog-integration` を参照
 
 ### Step 5: RU 生成
 
-RU 生成ルール・frontmatter スキーマ・depends_on 検証は `agentdev-workflow-lifecycle` を参照
+RU 生成ルール・frontmatter スキーマ・depends_on 検証は `agentdev-backlog-integration` を参照
 
 ### Step 6: 成功 artifact の削除
 
