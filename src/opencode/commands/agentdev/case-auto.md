@@ -18,7 +18,7 @@ agent: sisyphus
 
 ## Steps
 
-1. **入力解決**: 明示パス→draft単一検出→セッション内要件docの順で入力を特定する。不明時は停止しreq-define実行またはパス指定を求める
+1. **入力解決**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
 2. **work_type 読取**: 入力要件docの draft-meta セクションから work_type を取得する
 3. **工程分岐**:
    - feature: req-save → case-open → case-run → case-close
@@ -60,6 +60,12 @@ agent: sisyphus
    - (9) 作成元不明branch / user-owned branch / 他作業branchの削除検出
    - (10) 未コミット変更の帰属不明
 8. **完了報告**: 最終工程（case-close）の完了報告をそのまま出力する。Epic Issue を伴うキュー実行時は、完了・失敗・スキップ子Issue一覧を含める。停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する（REQ-0114-056）
+8-1. **Standard flow 逐次OU処理ループ**: Standard flow の case-close 完了後、未処理 OU が残存する場合は次 OU の処理を自動的に開始する（REQ-0114-065〜067）:
+   - 処理対象の全 OU から次の未処理 OU を特定する（`recommended_order`, `depends_on` に基づく）
+   - 次 OU が存在する場合: 当該 OU の work_type に応じた工程分岐で Step 2 に戻る（feature: req-save → case-open → …、bugfix/maintenance/docs_chore: case-open → …）
+   - 全 OU の処理が完了した場合のみ全体完了報告を出力する（REQ-0114-067）
+   - 次 OU の draft ファイルが存在しない場合: 停止し完了済み OU・未実行 OU・再開コマンドを報告する（REQ-0114-066）
+   - 逐次OU処理中に停止条件（Step 7）を検出した場合: 完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する
 
 ## Guardrails
 
