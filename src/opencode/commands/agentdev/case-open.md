@@ -46,7 +46,7 @@ agent: sisyphus
 - **VERIFY**: gh CLI書込後は毎回 `agentdev-gh-cli` の VERIFY操作に従い検証
 - **テンプレート準拠**: テンプレート読込後は毎回【必須】セクションの完備を確認（【任意】は内容がある場合のみ含める）、欠落時は再生成
 
-### Epic flow（Step 4〜8）
+### Epic flow（Step 4〜8-1）
 
 Epic flow は Step 2 または Step 3 のルーティングにより開始。マルチREQ / 単一REQ の差分:
 
@@ -72,7 +72,9 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 8-1. **OU 結果の書き戻し**: ドラフトに `operation_units` セクションがある場合、作成した Issue / Epic 番号を当該 OU の `result` に書き戻す（REQ-0104-038）
 
-### Standard flow + 共通終了（Step 14〜）
+**Epic flow 完了後、共通終了処理（Step 17〜18-2）を必ず実行すること。**
+
+### Standard flow（Step 14〜16-1）
 
 14. **[Standard]** `docs/adr/README.md` から関連ADRを特定（単一REQ Epic flowの内容反映にも活用）
 15. **[Standard]** ラベル付与 → `agentdev-workflow-lifecycle` に従う
@@ -80,11 +82,13 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 16-1. **[Standard] OU 結果の書き戻し**: ドラフトに `operation_units` セクションがある場合、作成した Issue 番号を当該 OU の `result` に書き戻す（REQ-0104-038）
 
+### 共通終了処理（全フロー共通・Step 17〜18-2）
+
 17. コメント追加: `agentdev-workflow-templates` の選定ルールに従いコメント用テンプレートを読み込む（Epic flowではEpic Issueにコメント追加）→ VERIFY
 
- 18. ドラフトが存在する場合、`.agentdev/drafts/req-draft-{topic-slug}.md` を削除
+ 18. ドラフトが存在する場合、`.agentdev/drafts/req-draft-{topic-slug}.md` を削除（Standard / Epic 全フロー共通）
 
- 18-1. **RU ファイル削除**。詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
+ 18-1. **RU ファイル削除**（Standard / Epic 全フロー共通）。詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
 
 18-2. 完了報告 → template variant:
    - Standard → `templates/case-open/standard.md`

@@ -28,7 +28,10 @@ agent: sisyphus
    - case-auto は OU の統合・分割、REQ 操作分類、Issue 階層判定を再評価しないこと（REQ-0114-054）
    - case-open 相当処理の完了後、出力を確認して以下のいずれかに分岐する:
      - **Standard flow（単一 Issue）**: 既存の直列フロー（case-run → case-close）をそのまま実行
-     - **Epic Issue（マルチREQ または 単一REQ Epic flow）**: Step 4-1〜4-3 のキュー処理に進む
+     - **Epic Issue（マルチREQ または 単一REQ Epic flow）**:
+       1. case-open の共通終了処理（Step 17〜18-2: コメント追加・ドラフト削除・RU削除・完了報告）の完了を確認すること（REQ-0104-045〜047）
+       2. **クリーンアップ検証ゲート**を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0114-060〜062）。残存時は停止すること
+       3. Step 4-1〜4-3 のキュー処理に進む
      - **Step 4-1 キュー開始**: ドラフトの `operation_units` セクションから OU 構造を読み取り、処理順序を決定する（`recommended_order`, `depends_on` に基づく）。Epic Issue 番号を記録する。Epic Issue の子Issue一覧（Wave 構成含む）を読み取る。case-run 相当処理に Epic Issue 番号を渡す。case-run の Epic Orchestrator モードが全 Wave の子Issue実行を処理する。case-auto は Wave 実行プロトコルを実装しない（`agentdev-workflow-orchestration` を参照）
      - **Step 4-2 case-close ループ**: case-run 相当処理の完了後、その出力（成功/失敗/スキップされた子Issue一覧）から case-close 対象を決定する:
       - 正常完了した子Issue: case-close 相当処理を実行
@@ -39,6 +42,10 @@ agent: sisyphus
      - Epic Issue の子Issue全ステータスが CLOSED の場合 → Epic 自動クローズ確認（case-close Step 8 相当） → 全体完了報告
       - 未クローズの子Issue が残る場合（失敗/スキップ） → 部分完了報告
      - 停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告すること（REQ-0114-056）
+   - **クリーンアップ検証ゲート**: Epic Issue の Step 4-1 キュー処理開始前に、以下を検証する（REQ-0114-060〜063）:
+     - ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
+     - 当該ケースで消費した RU ファイル（`.agentdev/backlog/req-units/RU-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
+     - 検証結果（成功・残存ファイル一覧）を case-auto 完了報告（Step 8）に含めること
 5. **工程間の状態引き継ぎ**: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) 要件docの Requirement Source セクション内容（RU 削除判定に使用） (2) RU ファイルパス（case-open 相当処理の RU 削除で使用） (3) capture 対象情報（case-close 相当処理の learning/intake capture で使用）
 6. **複数REQ対応**: req-save 相当処理の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールをそのまま使用する。case-auto 自体に Issue 階層決定ロジックを持ってはならない。req-save 相当処理から case-open 相当処理へ状態を引き継ぐ際、case-auto は複数 REQ doc の保存結果をフィルタリングや再評価なしでそのまま渡す。case-auto は Epic Issue 化の判定に関与しないこと（REQ-0114-057）。case-open の判定結果に従うこと
 7. **停止条件の検出**: 以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:
