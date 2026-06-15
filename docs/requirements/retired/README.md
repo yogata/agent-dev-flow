@@ -8,7 +8,8 @@ active REQ は `docs/requirements/REQ-{NNNN}.md` 直下の21件である。旧RE
 
 REQ-0001〜REQ-0050 は、2026-05-30 のREQ体系再構成により retired となった。
 
-- 移行済みの内容は REQ-0101〜REQ-0122 に再構成されている。
+- 移行済みの内容は REQ-0101〜REQ-0123 に再構成されている。
 - 移行しない内容は `retired-no-successor` または `historical-only` として migration table に記録する。
 - REQ-0006 は `.sisyphus/` 非関与方針により `retired-no-successor` とする。
 - REQ-0111 は REQ-0119-025 により retired となった（2026-06-14）。条項は他REQへの吸収なしで廃止。
+- REQ-0122 は RFC2119 完全廃止の目的達成（PR #743, commit 90064c2）により retired となった（2026-06-15）。条項は他REQへの吸収なしで廃止。

@@ -38,7 +38,6 @@
 | [REQ-0119](requirements/REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 | command 薄型化 / skill 詳細移管 / sub-agent 委譲境界 / Step 整数化 / verbatim 条件付き / delegation_type SPEC降格 / ADR-0112 accepted化 |
 | [REQ-0120](requirements/REQ-0120.md) | Runtime Command 非必須参照除去 | command / token 最適化 / 非必須参照節削除 / 高頻度 command 優先 |
 | [REQ-0121](requirements/REQ-0121.md) | Runtime Command 規範語見直し + Integrity 検査再定義 | command / token 最適化 / 規範語 / 自然文置換 / integrity 検査再定義 / 語彙ポリシー整合 |
-| [REQ-0122](requirements/REQ-0122.md) | 規範語ルールおよび記載の完全削除 | active REQ / SPEC / ADR / integrity / runtime / 語彙ポリシー |
 | [REQ-0123](requirements/REQ-0123.md) | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 | workflow-lifecycle 責務限定実装 / 4新規スキル移管 / Skill粒度基準 / DO NOT USE FOR整合 |
 
 ## Retired REQ

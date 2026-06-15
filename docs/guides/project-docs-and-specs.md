@@ -22,7 +22,7 @@ DOC-MAP（文書探索入口: 索引）
 
 要件定義の永続基準。システムが満たすべき要件を記述する。
 
-- 現行の active REQ は REQ-0101 から REQ-0122 までの 21 件（REQ-0111 は retired）
+- 現行の active REQ は REQ-0101 から REQ-0123 までの 21 件（REQ-0111, REQ-0122 は retired）
 - 旧 REQ（REQ-0001〜REQ-0050 [全てretired]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
@@ -50,7 +50,6 @@ DOC-MAP（文書探索入口: 索引）
 | REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化 |
 | REQ-0120 | Runtime Command 非必須参照除去 |
 | REQ-0121 | Runtime Command 規範語見直し + Integrity 検査再定義 |
-| REQ-0122 | 規範語ルールおよび記載の完全削除 |
 
 ## ADR（アーキテクチャ決定記録）
 
