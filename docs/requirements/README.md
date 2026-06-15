@@ -18,7 +18,7 @@
 | [REQ-0110](REQ-0110.md) | Git worktree 削除リトライ | git-worktree、リトライ、信頼性 |
 | [REQ-0112](REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・runtime独立性 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、6状態否定、integrity検査追加、ADR全面改定例外・01XX baseline・retired移動 |
 | [REQ-0113](REQ-0113.md) | Skill References SPEC分離基準 | skill / skill references 内 SPEC 相当記述の分離基準、移管先 SPEC 選択、runtime 自己完束制約 |
-| [REQ-0114](REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件、Epic flowクリーンアップ検証ゲート |
+| [REQ-0114](REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件、Epic flowクリーンアップ検証ゲート、Standard flow複数draft一括処理 |
 | [REQ-0115](REQ-0115.md) | docs-* command suite 定義 | /repo/docs-check 改名、/agentdev/inspect-docs 新設、inspect-docs 統合、req-*/case-* workflow 補強、是正ルーティング |
 | [REQ-0116](REQ-0116.md) | 文書分類ポリシー定義 | REQ/ADR/SPEC/Guide/Report/DOC-MAP/Retired 分類ルール・Document Authority Model・Classification Decision Tree・Cross-document Projection Rules・Re-baseline Rules・Synchronization Rules・Report分類・ADR定義拡張・SPEC責務境界 |
 | [REQ-0117](REQ-0117.md) | Git worktree junction 削除フォールバック手順 | git-worktree、junction、Windows、フォールバック手順 |
