@@ -19,7 +19,7 @@
 | inbox.md にエントリがある | `/agentdev/learning-promote` | promoted artifact |
 | promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
-| REQ 体系の健全性を診断したい | `/agentdev/docs-review` | 診断レポート |
+| REQ 体系の健全性を検出したい | `/agentdev/inspect-docs` | 検出レポート |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
 ## Repository maintenance（self-hosting repo のみ）

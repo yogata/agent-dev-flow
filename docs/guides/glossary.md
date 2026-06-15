@@ -18,7 +18,7 @@ AgentDevFlow で使う用語の定義。
 | learning-promote | ラーニング・プロモート | learning entry を分析・分類・昇華判定し、promoted artifact を生成するコマンド |
 | backlog-review | バックログ・レビュー | promoted artifact を分析・統合し、ユーザー承認後に RU を生成するコマンド |
 | docs-check | ドックス・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド（旧称: integrity-check）。repo-local 名前空間 `/repo/docs-check` に配置し、`/agentdev/*` 配下とは区別する（ADR-0106, REQ-0115） |
-| docs-review | ドックス・レビュー | docs 全体の意味整合レビューと REQ 体系の健全性を診断するコマンド（旧称: req-restructure-review） |
+| inspect-docs | インスペクト・ドックス | docs 全体の意味整合性を検出し、inspect finding を出力するコマンド（旧称: req-restructure-review, docs-review, diagnostics-docs） |
 | case-auto | ケース・オート | 最大自走モード。req-save → case-open → case-run → case-close を順次実行するコマンド |
 
 ## 成果物
