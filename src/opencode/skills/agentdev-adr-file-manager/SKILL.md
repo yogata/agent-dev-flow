@@ -191,6 +191,10 @@ proposed → deprecated
 - **deprecated**: 廃止された決定。使用しない。
 - **superseded**: 他のADRに置き換えられた決定。`superseded_by` フィールドに後継ADR番号を記載。`accepted` status の ADR のみ現行根拠として使用する。`proposed`/`deprecated`/`superseded` の ADR を現行要件判断の根拠として引用しない
 
+### 単なる廃止・削除・移行は新規ADRではなくretire/supersedeで扱う基準
+
+過去の判断を現行基盤から外すだけの場合（削除・廃止・移行・統合・再構築・完全削除）は、新規ADRを作成せず、対象ADRのstatus遷移（retire/supersede）で処理する（REQ-0101-045, REQ-0101-049）。新規ADRは「あるべき状態」の意思決定が存在する場合のみ作成する（REQ-0101-046）。削除・廃止・移行そのものを主題にした新規ADR作成は `agentdev-adr-guidelines` の作成不可条件に該当する。
+
 ---
 
 ## 整合性チェック
