@@ -7,7 +7,7 @@ updated: "2026-05-30"
 
 ## 目的
 
-REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0122（REQ-0111 は retired）を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口は21件（REQ-0111 を除く）である。
+REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0123（REQ-0111, REQ-0122 は retired）を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口は21件（REQ-0111, REQ-0122 を除く）である。
 
 ## 判定
 
@@ -72,6 +72,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0122（REQ-0111
 | REQ-0049 | migrated | REQ-0108 | integrity / validation / testsを移行 |
 | REQ-0050 | migrated | REQ-0105, REQ-0109 | REQ再構成intake保存導線を移行 |
 | REQ-0111 | retired-no-successor | なし | REQ-0119-025 により retire（2026-06-14）。条項は他REQへの吸収なしで廃止。REQ-0119 の破壊的再基準化が REQ-0111 の中核原則（既存Step変更禁止）と矛盾したため。retired 文書は `retired/REQ-0111.md` を参照 |
+| REQ-0122 | retired-no-successor | なし | 実装完了（PR #743, commit 90064c2）により RFC2119 完全廃止の目的達成、自己矛盾解消のため retire（2026-06-15）。条項は他REQへの吸収なしで廃止。retired 文書は `retired/REQ-0122.md` を参照 |
 
 ## Active Set
 
@@ -97,4 +98,3 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0122（REQ-0111
 | REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化（新規、旧REQ移行なし） |
 | REQ-0120 | Runtime Command 非必須参照除去（新規、旧REQ移行なし） |
 | REQ-0121 | Runtime Command 規範語見直し + Integrity 検査再定義（新規、旧REQ移行なし） |
-| REQ-0122 | 規範語ルールおよび記載の完全削除（新規、旧REQ移行なし） |

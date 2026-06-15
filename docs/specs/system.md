@@ -209,11 +209,11 @@ Capture 境界の一次参照は `agentdev-workflow-orchestration` skill の `re
 
 ### REQ体系基準構造
 
-旧REQ群（REQ-0001〜0050 [全てretired]）を現行仕様基準として再構成した新基準REQ群（REQ-0101〜0122、REQ-0111 は retired）を主参照とする。旧REQは履歴として保持し、移行分類（migrated / retired-no-successor / historical-only）に基づき扱う（REQ-0109）。
+旧REQ群（REQ-0001〜0050 [全てretired]）を現行仕様基準として再構成した新基準REQ群（REQ-0101〜0123、REQ-0111, REQ-0122 は retired）を主参照とする。旧REQは履歴として保持し、移行分類（migrated / retired-no-successor / historical-only）に基づき扱う（REQ-0109）。
 
 **新基準REQ群構成**（REQ-0109 に基づく）:
 
-active REQ の一覧・範囲は `docs/requirements/README.md` を正とする（REQ-0101〜0122、21件、REQ-0111 は retired）。本SPECではREQ一覧を複製せず、README.md を参照する。
+active REQ の一覧・範囲は `docs/requirements/README.md` を正とする（REQ-0101〜0123、21件、REQ-0111, REQ-0122 は retired）。本SPECではREQ一覧を複製せず、README.md を参照する。
 
 **旧REQ移行分類**（REQ-0109, mapping-table.md）:
 - `migrated`: 新active REQへ要件内容を移行した
