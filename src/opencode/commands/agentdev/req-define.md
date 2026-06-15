@@ -41,9 +41,13 @@ agent: sisyphus
 
 5. **ADR判断** → `agentdev-adr-guidelines`（manual reference）に従ってADR判断を記録（ADRファイル作成は req-save で実行）
 
+   **5-0. 既存ADR重複確認**: ADR候補を提示する前に、`docs/adr/README.md` の accepted ADR一覧と意味的重複を確認する。重複時は新規ADR作成ではなく既存ADRのUPDATEを推奨する（REQ-0101-051）。委譲接続点: サブエージェントは重複候補と根拠のみを返し、親エージェントがCREATE vs UPDATEを判断する
+
    **5-1. ADR禁止ゲート**: ADR候補を提示する前に、REQ/SPEC相当判定を行う。詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは除外候補と根拠のみを返し、親エージェントがADR候補提示可否を判断する
 
    **5-2. ADR判断根拠の記録**: ADR判断後、判断根拠をドラフトに保存する。詳細は `agentdev-req-analysis` を参照。委譲接続点: 親エージェントのみがドラフトへ記録する
+
+   **5-3. 作業手段ADR拒否ゲート**: ADR候補が削除・廃止・移行・統合・再構築・完全削除そのものを主題にしている場合、ADR候補から除外する（REQ-0101-044）。過去判断の除去は新規ADRではなくretire/supersedeで処理する（REQ-0101-045）。委譲接続点: サブエージェントは除外候補と根拠のみを返し、親エージェントがADR候補提示可否を判断する
 
 6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
    - **6-1. operation_units セクション生成**: 複数RU入力時の統合/分離結果（Step 10-2）を基に `operation_units` セクションを生成する。各 OU は `ou_id`, `source_ru`, `target_req`, `operation`, `scale`, `depends_on`, `recommended_order`, `issue_policy`, `result` フィールドを持つ（REQ-0102-033〜035）。単一REQ操作の場合も 1 件の OU として出力する

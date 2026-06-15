@@ -726,6 +726,66 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | 実行判断材料を SKILL.md 本文に移動、See Also を関連スキルへの導線のみに整理する |
 | last_verified | 2026-06-14 |
 
+### IR-036: ADR-work-means-detection
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-036 |
+| description | accepted ADR のタイトル・本文に作業手段（削除・廃止・移行・完全削除・統合・再構築）の混入を検出すること（REQ-0108-249）。作業手段を主題とする ADR は作成不可であるため、accepted ADR にこれらが主題として含まれていないかを検査する |
+| severity | heuristic |
+| category | canonical-conflict |
+| detection_method | accepted ADR のタイトル・Decision セクションから作業手段キーワード（削除・廃止・移行・完全削除・統合・再構築）を検出し、主題か背景記述かを判定 |
+| affected_artifacts | [current ADR] |
+| related_req | [REQ-0108-249, REQ-0101-044, REQ-0101-045] |
+| related_spec | [integrity-contracts.md, document-model.md] |
+| gate_level | full-audit |
+| false_positive_risk | 高。Context（背景）セクションでの作業手段言及は許容されるため、Decision セクションの主題判定に注意 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | req-define |
+| triage_action | 作業手段を主題とする ADR を retire/supersede または REQ/case へ移管 |
+| last_verified | 2026-06-16 |
+
+### IR-037: retired-ADR-current-baseline-ref
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-037 |
+| description | retired ADR（`docs/adr/retired/`）が現行基盤（current baseline）として参照・案内されていないこと（REQ-0108-250）。Current Baseline View・後継ADRの Related Decisions・REQ/SPEC の現行根拠において retired ADR が現行扱いされていないかを検査する |
+| severity | strict |
+| category | canonical-conflict |
+| detection_method | retired ADR 番号が current baseline 文脈（Current Baseline View・現行根拠引用・後継指定なしの参照）に出現していないかを検出 |
+| affected_artifacts | [ADR, ADR index, REQ, SPEC] |
+| related_req | [REQ-0108-250, REQ-0112-048] |
+| related_spec | [integrity-contracts.md, document-model.md] |
+| gate_level | full-audit |
+| false_positive_risk | 中。履歴参照 `(retired)` 注記付きの言及は除外 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | retired ADR への現行参照を後継 ADR へ更新、または `(retired)` 注記を付与 |
+| last_verified | 2026-06-16 |
+
+### IR-038: ADR-index-consistency
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-038 |
+| description | accepted ADR（`docs/adr/ADR-*.md`）と retired ADR（`docs/adr/retired/ADR-*.md`）の index（`docs/adr/README.md`）整合性を検査すること（REQ-0108-251）。Current Baseline View に accepted ADR が過不足なく記載され、Retired View に retired ADR が過不足なく記載されていること |
+| severity | strict |
+| category | document-drift |
+| detection_method | `docs/adr/README.md` の Current Baseline View / Retired View と実 ADR ファイル一覧の双方向差分を検出 |
+| affected_artifacts | [ADR, ADR index] |
+| related_req | [REQ-0108-251, REQ-0112-047, REQ-0112-048] |
+| related_spec | [integrity-contracts.md, document-model.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 低。ファイル一覧と index の差分は確実 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | README.md の該当 View に ADR を追加/削除 |
+| last_verified | 2026-06-16 |
+
 ## Gate Levels
 
 | Level | Description | Trigger |
