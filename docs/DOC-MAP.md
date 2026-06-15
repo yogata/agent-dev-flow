@@ -39,6 +39,7 @@
 | [REQ-0120](requirements/REQ-0120.md) | Runtime Command 非必須参照除去 | command / token 最適化 / 非必須参照節削除 / 高頻度 command 優先 |
 | [REQ-0121](requirements/REQ-0121.md) | Runtime Command 規範語見直し + Integrity 検査再定義 | command / token 最適化 / 規範語 / 自然文置換 / integrity 検査再定義 / 語彙ポリシー整合 |
 | [REQ-0123](requirements/REQ-0123.md) | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 | workflow-lifecycle 責務限定実装 / 4新規スキル移管 / Skill粒度基準 / DO NOT USE FOR整合 |
+| [REQ-0124](requirements/REQ-0124.md) | docs-review/skill-review/diagnostics-* → inspect-* 完全直接移行 | docs-review/skill-review/diagnostics-* 廃止・inspect-* 統一・draft type 廃止 |
 
 ## Retired REQ
 
