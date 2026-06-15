@@ -14,7 +14,7 @@
 | [REQ-0106](requirements/REQ-0106.md) | Case実行・完了 |
 | [REQ-0107](requirements/REQ-0107.md) | Reporting / Writing Quality |
 | [REQ-0108](requirements/REQ-0108.md) | docs-check / Validation / Tests |
-| [REQ-0109](requirements/REQ-0109.md) | docs-review / REQ再構成運用 |
+| [REQ-0109](requirements/REQ-0109.md) | inspect-docs / REQ再構成運用 |
 | [REQ-0110](requirements/REQ-0110.md) | Git worktree 削除リトライ |
 | [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・runtime独立性 |
 | [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 |
