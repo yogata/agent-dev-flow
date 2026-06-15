@@ -1,6 +1,6 @@
-✅ docs-review 完了
+✅ inspect-docs 完了
 
-完了コマンド: /agentdev/docs-review
+完了コマンド: /agentdev/inspect-docs
 対象: docs全体（REQ {active_count}件 / ADR {adr_count}件 / SPEC {spec_count}件 / guides {guide_count}件）
 結果:
   - レビュー観点: {観点リスト}

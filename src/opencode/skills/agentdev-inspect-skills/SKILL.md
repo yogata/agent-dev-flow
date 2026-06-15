@@ -1,30 +1,30 @@
 ---
-name: agentdev-skill-review
+name: agentdev-inspect-skills
 description: Diagnoses Command to Skill reference validity and Skill structure without changing files. USE FOR: diagnosing Command→Skill reference validity, evaluating skill granularity, reviewing skill structure. DO NOT USE FOR: modifying files, creating issues, executing fixes.
 ---
 
-# Skill Review
+# Inspect Skills
 
-Command→Skill 参照妥当性、Skill 粒度、Skill 構造を read-only で診断する。修正は実行せず、finding、分類、根拠、推奨 route を提示する。
+Command→Skill 参照妥当性、Skill 粒度、Skill 構造を read-only で診断する。修正は実行せず、inspect finding、分類、根拠、推奨 route を提示する。
 
 ## Read-Only 制約
 
 - ファイル変更、Issue 作成、PR 作成、RU 保存、commit、push を行わない
 - 診断結果はセッション内テキストで提示する
 - 修正案は route として提示し、実装・保存・自動整形は行わない
-- 例外として、`.agentdev/drafts/skill-review-finding-{topic}.md` の生成のみを許可する（REQ-0103-107, REQ-0103-139）
+- 例外として、`.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` の生成のみを許可する（inspect lifecycle、REQ-0103-140-151 相当）
 
-## Finding Draft Export
+## Inspect Finding Export
 
-診断結果を `req-define` に引き継ぐ必要がある場合、`.agentdev/drafts/skill-review-finding-{topic}.md` に finding draft を書き出すことができる。この draft は RU ではなく、req-define への read-only 中間成果物である（REQ-0103-134, REQ-0103-137）。
+診断結果を `inspect-promote` に引き継ぐ必要がある場合、`.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` に inspect finding を書き出すことができる。この finding は inspect lifecycle（`.agentdev/inspect/` inbox/promoted/archive）の対象であり、`inspect-promote` への read-only 中間成果物である。
 
-draft には以下を含める:
+finding には以下を含める:
 - Summary
 - Scope
 - Findings（id, target, classification, evidence, recommended_route, confidence, unresolved_questions）
 - Initial Remediation Direction
 - Out of Scope
-- Suggested req-define Input
+- Suggested intake / learning route
 
 ## 診断観点
 
@@ -84,7 +84,7 @@ draft には以下を含める:
 
 ## 出力形式
 
-各 finding は次の形で報告する。
+各 inspect finding は次の形で報告する。
 
 ```markdown
 - Finding: [短い説明]

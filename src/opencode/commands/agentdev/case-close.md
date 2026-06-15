@@ -38,7 +38,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 変更に伴う command 定義の更新漏れ
     - 変更に伴う skill 責務境界の変更漏れ
     - 更新漏れを検出した場合は警告表示してユーザー判断を仰ぐ
-    - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/docs-review` の全体意味レビューの代替ではない
+    - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない
 
 4. **PRマージ**:
    - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）

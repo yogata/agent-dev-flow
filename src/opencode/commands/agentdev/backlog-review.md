@@ -5,7 +5,7 @@ agent: sisyphus
 
 # Backlog Review
 
-`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/diagnostics/promoted/*.md` の promoted artifact を読み込み、分析・統合してユーザーに判定を提示し、承認後に直接 RU を生成する。
+`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の promoted artifact を読み込み、分析・統合してユーザーに判定を提示し、承認後に直接 RU を生成する。
 
 **このコマンドはユーザー承認後に RU を生成する。ユーザー承認は RU 作成承認を兼ねる。**
 
@@ -13,7 +13,7 @@ agent: sisyphus
 
 - `.agentdev/intake/promoted/*.md`（intake パイプラインからの promoted artifact）
 - `.agentdev/learning/promoted/*.md`（learning パイプラインからの promoted artifact）
-- `.agentdev/diagnostics/promoted/*.md`（diagnostics パイプラインからの promoted artifact）
+- `.agentdev/inspect/promoted/*.md`（inspect パイプラインからの promoted artifact）
 - **引数指定**: ユーザーがファイルパスを引数として指定した場合、指定されたファイルのみを対象とする。引数なしの場合、全ディレクトリの promoted artifact を対象とする
 
 ## Output
@@ -27,14 +27,14 @@ RU-*.md は以下の構造に従う:
 
 ```markdown
 ---
-source_type: {intake | learning | diagnostics | mixed | chat}
+source_type: {intake | learning | inspect | mixed | chat}
 generated_by: backlog-review
 generated_at: {ISO 8601 timestamp}
 status: draft
   depends_on: [RU-{NNNN}] (optional)
   sources:
-  - path: {.agentdev/intake/promoted/xxx.md | .agentdev/learning/promoted/xxx.md | .agentdev/diagnostics/promoted/xxx.md}
-    type: {intake | learning | diagnostics}
+  - path: {.agentdev/intake/promoted/xxx.md | .agentdev/learning/promoted/xxx.md | .agentdev/inspect/promoted/xxx.md}
+    type: {intake | learning | inspect}
 ---
 
 ## Sources
