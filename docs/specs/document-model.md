@@ -90,7 +90,7 @@ DOC-MAP（索引）/ Guides（案内）
 | REQ | req-define / req-save コマンド経由 | ユーザー承認（req-save） | agent（draft 作成）、user（最終承認） |
 | ADR | req-save / 手動作成 | ユーザー承認 | agent（draft 作成）、user（最終承認） |
 | SPEC | 実装に伴う更新 | SPEC は「現在仕様」の記録のため、実装完了に伴い更新 | agent（実装後の SPEC 更新） |
-| Guide | docs-review / 手動更新 | 規範的権限なし。情報正確性の確認のみ | agent / user |
+| Guide | inspect-docs / 手動更新 | 規範的権限なし。情報正確性の確認のみ | agent / user |
 | Report | integrity コマンド等の自動生成、または手動作成 | 公開時の事実確認 | agent（自動生成）、user（手動作成） |
 | DOC-MAP | 文書追加・移動に伴う更新 | 非正規索引のため、承認不要 | agent / user |
 | Retired | 編集不可（履歴参照専用） | なし | なし |
@@ -165,7 +165,7 @@ DOC-MAP（索引）/ Guides（案内）
 - REQ の変更は APPEND（要件追加）または UPDATE（既存要件の修正）で行う。既存 REQ を新規 REQ で上書きしない
 - ADR の変更は新規 ADR の作成により行い、旧 ADR を superseded/deprecated とする
 - SPEC の更新は実装完了後に反映し、REQ と SPEC 間の同期ズレを放置しない
-- docs-check / docs-review が同期不足を検出可能であること
+- docs-check / inspect-docs が同期不足を検出可能であること
 
 ### Report Classification <!-- REQ-0116-009 -->
 
@@ -209,9 +209,9 @@ SPEC の記述範囲を責務境界として定義する。
 
 ### Review/Check Mapping <!-- REQ-0116-013 -->
 
-分類ルールと docs-check / docs-review の検査項目の対応を定義する。
+分類ルールと docs-check / inspect-docs の検査項目の対応を定義する。
 
-| 分類ルール | docs-check 検査 | docs-review 検査 | 検査内容 |
+| 分類ルール | docs-check 検査 | inspect-docs 検査 | 検査内容 |
 |---|---|---|---|
 | 責務境界（SPEC に要件混入） | SPEC-REQ-mix 検査 | 意味整合性レビュー | SPEC 内の 必達要件 が現在仕様の記述か判定 |
 | 責務境界（Guide の要件本文混入） | Guide-intrusion 検査 | 要件本文検出 | Guide が要件本文・契約本文を保持していないか検出 |
@@ -228,7 +228,7 @@ Retired ADR の参照更新ルールを定義する。
 - Retired ADR が現行判断の根拠として引用されている場合、active な後継 ADR または REQ に参照を更新する
 - 履歴参照として retired ADR 番号を保持する場合は、`(retired)` 注記を付与する
 - 例: `ADR-0017` → `ADR-0103 (後継)`。`ADR-0017 (retired)` は履歴参照として許容
-- docs-check / docs-review が retired ADR の現行引用を検出した場合は警告を出力する
+- docs-check / inspect-docs が retired ADR の現行引用を検出した場合は警告を出力する
 
 ### Terminology: 原本/配置先 <!-- REQ-0116-015 -->
 

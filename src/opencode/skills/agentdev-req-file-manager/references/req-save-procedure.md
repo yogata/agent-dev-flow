@@ -38,7 +38,7 @@ REQ / ADR 保存前に、対象ドキュメントの種別が `docs/specs/docume
 - 責務の重複・欠落
 - runtime 境界の矛盾
 
-SPLIT や REQ 再構成候補を検出した場合は、`/agentdev/docs-review` の REQ structure review finding として扱う。本コマンド内では保存可能範囲を実行し、完了報告の follow-up として明示する。この検査は保存時の局所的な矛盾防止であり、`/agentdev/docs-review` の全体意味レビューの代替ではない。
+SPLIT や REQ 再構成候補を検出した場合は、`/agentdev/inspect-docs` の REQ structure review finding として扱う。本コマンド内では保存可能範囲を実行し、完了報告の follow-up として明示する。この検査は保存時の局所的な矛盾防止であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない。
 
 ## インデックス・ハブ更新
 
