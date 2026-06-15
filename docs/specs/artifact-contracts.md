@@ -232,9 +232,8 @@ Repo-local command/skill は AgentDevFlow の consumer 配布対象外である:
 | draft_type | file pattern | producer | allowed consumers | 位置づけ | lifecycle |
 |---|---|---|---|---|---|
 | `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `req-save`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
-| `skill_review_finding` | `.agentdev/drafts/skill-review-finding-{topic}.md` | `skill-review` | `req-define` | Skill/Command 診断結果の要件化入力 | req-define の消化後に削除 |
 
-標準 draft type は上記2種のみとする（REQ-0103-132）。`requirements-review-finding` は標準 draft type に含めない。
+標準 draft type は `req_draft` の1種のみとする（REQ-0103-132）。`requirements-review-finding` および旧 `skill_review_finding` は標準 draft type に含めない。Skill/Command 参照妥当性の検出結果は inspect lifecycle（`.agentdev/inspect/inbox/`、REQ-0103-140-151）へ出力する。
 
 ### Draft File Frontmatter
 
@@ -259,21 +258,7 @@ frontmatter に `producer`・`consumer`・`next` を必須化しない（REQ-010
 |---|---|
 | `req-save` | `req_draft` |
 | `case-open` | `req_draft` |
-| `req-define` | `skill_review_finding`（明示入力） |
 
-### skill_review_finding Draft の内容要件
+### inspect-skills Side Effect 境界
 
-`skill_review_finding` draft は RU ではなく、以下を含む req-define への read-only 中間成果物とする（REQ-0103-137）:
-
-- Summary
-- Scope
-- Findings（id, target, classification, evidence, recommended_route, confidence, unresolved_questions）
-- Initial Remediation Direction
-- Out of Scope
-- Suggested req-define Input
-
-`req-define` は `skill_review_finding` を read-only input として読み、未確認事項や採否未確定事項を要件本文に混入させない（REQ-0103-138）。
-
-### skill-review Side Effect 境界
-
-`skill-review` は diagnostic-only command とする。許可される side effect は `.agentdev/drafts/skill-review-finding-*.md` の生成のみとし、それ以外のファイル変更・canonical docs 変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・RU 保存・Issue 作成・PR 作成・commit・push を行わない（REQ-0103-107, REQ-0103-139）。
+`inspect-skills` は read-only 診断 command とする。許可される side effect は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成のみとし、それ以外のファイル変更・canonical docs 変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・RU 保存・Issue 作成・PR 作成・commit・push を行わない（inspect lifecycle、REQ-0103-140-151）。inspect finding は `inspect-promote` による promote/defer/reject lifecycle の対象となる。

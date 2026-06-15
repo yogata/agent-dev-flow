@@ -38,7 +38,7 @@ DOC-MAP（文書探索入口: 索引）
 | REQ-0106 | Case 実行・完了 |
 | REQ-0107 | Reporting / Writing Quality |
 | REQ-0108 | docs-check / Validation / Tests |
-| REQ-0109 | docs-review / REQ再構成運用 |
+| REQ-0109 | inspect-docs / REQ再構成運用 |
 | REQ-0110 | Git worktree 削除リトライ |
 | REQ-0112 | ADRライフサイクル標準化・文書体系正規化・runtime独立性 |
 | REQ-0113 | Skill References SPEC分離基準 |

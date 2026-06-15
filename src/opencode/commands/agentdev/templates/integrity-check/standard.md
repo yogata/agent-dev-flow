@@ -1,6 +1,6 @@
 ✅ docs-check 完了
 
-完了コマンド: /agentdev/docs-review
+完了コマンド: /agentdev/inspect-docs
 対象: 全 command 定義 / completion-reports.md / integrity artifacts
 結果:
   - 検証対象: {N} command 定義

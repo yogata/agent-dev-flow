@@ -18,12 +18,11 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 | `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
 | `drafts/req-draft-*.md` | working draft | `req-define` | `req-save` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
-| `drafts/skill-review-finding-*.md` | finding draft | `skill-review` | `req-define` | `req-define` の消化後に削除 |
 | `drafts/requirements-review-finding-*.md` | review finding | `req-save`（SPLIT 検出時） | `req-define` | `req-define` の消化後に削除 |
 | `integrity/reports/*.md` | 検証レポート（非永続） | `docs-check` | `docs-check`（intake化）・ユーザー参照 | 非永続・git管理対象外（`.gitignore` で除外） |
-| `diagnostics/inbox/*.md` | 未分類 diagnostic finding | `diagnostics-docs`, `diagnostics-skills` | `diagnostics-promote` | `diagnostics-promote` 成功後に `promoted/` または `archive/` へ移動 |
-| `diagnostics/promoted/*.md` | promoted artifact（採用済み・RU化対象） | `diagnostics-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
-| `diagnostics/archive/rejected/*.md` | 却下（終端） | `diagnostics-promote` | なし | 永続（履歴参照） |
+| `inspect/inbox/*.md` | 未分類 inspect finding | `inspect-docs`, `inspect-skills` | `inspect-promote` | `inspect-promote` 成功後に `promoted/` または `archive/` へ移動 |
+| `inspect/promoted/*.md` | promoted artifact（採用済み・RU化対象） | `inspect-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
+| `inspect/archive/rejected/*.md` | 却下（終端） | `inspect-promote` | なし | 永続（履歴参照） |
 
 ## .agentdev/ と .sisyphus/ の境界
 
@@ -53,12 +52,12 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 ├── backlog/
 │   └── req-units/       ← backlog-review が RU を生成
 │       └── RU-*.md
-├── drafts/              ← req-define が要件ドラフト、diagnostics-skills が診断 finding を保存（req-save/case-open/req-define で消費・削除）
-├── diagnostics/
-│   ├── inbox/           ← diagnostics-docs / diagnostics-skills が未分類 finding を保存
-│   ├── promoted/        ← diagnostics-promote が採用済み artifact を出力（フラット）
+├── drafts/              ← req-define が要件ドラフトを保存（req-save/case-open で消費・削除）
+├── inspect/
+│   ├── inbox/           ← inspect-docs / inspect-skills が未分類 finding を保存
+│   ├── promoted/        ← inspect-promote が採用済み artifact を出力（フラット）
 │   └── archive/
-│       └── rejected/    ← diagnostics-promote が却下 finding を移動
+│       └── rejected/    ← inspect-promote が却下 finding を移動
 └── integrity/
     └── reports/         ← docs-check が検証結果を保存（非永続・git管理対象外）
 ```

@@ -179,7 +179,7 @@ description: Detects deviations between implementation and requirements (REQ), w
 
 ### docs 全体の意味レビューとの関係
 
-`agentdev-spec-compliance` は実装と REQ / work plan / ADR の乖離検出ゲートであり、docs 全体の意味レビューの代替ではない。docs 全体の意味レビュー（SPEC・guides・DOC-MAP・commands・skills を横断する整合性確認）は `/agentdev/docs-review` が担う。
+`agentdev-spec-compliance` は実装と REQ / work plan / ADR の乖離検出ゲートであり、docs 全体の意味レビューの代替ではない。docs 全体の意味レビュー（SPEC・guides・DOC-MAP・commands・skills を横断する整合性確認）は `/agentdev/inspect-docs` が担う。
 
 ## case-update連携
 

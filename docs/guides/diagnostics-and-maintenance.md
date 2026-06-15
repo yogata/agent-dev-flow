@@ -63,14 +63,14 @@ Finding ごとに以下の route で後続処理に送る。
 
 結果は `.agentdev/integrity/reports/` に JSON または Markdown 形式で出力する。結果分類は NG / warning / info の3段階。
 
-## docs-review
+## inspect-docs
 
-docs 全体の意味整合レビューと REQ 体系の健全性診断を行うコマンド（REQ-0115）。旧 `req-restructure-review` を統合し、REQ 再構成観点を含む全体意味レビューを担う。
+docs 全体の意味整合検出と REQ 体系の健全性検出を行うコマンド（REQ-0115）。旧 `req-restructure-review` を統合し、REQ 再構成観点を含む全体意味検出を担う。
 
 ### 基本フロー
 
 ```
-docs 全体の整合性を確認したい → /agentdev/docs-review → 診断レポート生成
+docs 全体の整合性を確認したい → /agentdev/inspect-docs → 検出レポート生成
 ```
 
 ### 診断対象

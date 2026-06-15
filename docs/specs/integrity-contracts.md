@@ -149,14 +149,14 @@ command guardrails を以下の6カテゴリに分類する:
 | `intake-promote` | `.agentdev/intake/promoted/` | 他パス |
 | `learning-promote` | `.agentdev/learning/promoted/` | 他パス |
 | `backlog-review` | `.agentdev/backlog/req-units/`, `.agentdev/intake/promoted/`, `.agentdev/learning/promoted/` | `.opencode/`, 検査対象外artifact |
-| `docs-review` | なし（read-only 診断） | 全ファイル書込 |
+| `inspect-docs` | なし（read-only 診断） | 全ファイル書込 |
 
 ## Postflight Diff Checking
 
 postflight diff checking は read-only command から段階導入する:
 
 **Phase 1 — read-only command 検証**:
-- `docs-review` は実行後にローカルファイル変更がないことを確認（真の read-only 診断）
+- `inspect-docs` は実行後にローカルファイル変更がないことを確認（真の read-only 診断）
 - `docs-check`（repo-local `/repo/docs-check`）は検査対象 artifact を変更しないが、許可された出力（`.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`）を生成する。postflight は「検査対象 artifact への変更がないこと」を確認し、許可出力範囲外の変更を warning として報告する
 - `backlog-review` も検査対象外 artifact を変更せず、許可された `.agentdev/` 配下の出力のみを行う
 - 変更が検出された場合は warning として報告
