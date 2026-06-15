@@ -17,7 +17,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 | `learning/evaluation-report.md` | 境界 artifact | `learning-promote` | `learning-promote` | 毎回上書き |
 | `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
-| `drafts/req-draft-*.md` | working draft | `req-define` | `req-save` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
+| `drafts/req-draft-*.md` | working draft | `req-define` | `req-save`（feature） / `case-open`（bugfix/maintenance/docs_chore） | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
 | `drafts/requirements-review-finding-*.md` | review finding | `req-save`（SPLIT 検出時） | `req-define` | `req-define` の消化後に削除 |
 | `integrity/reports/*.md` | 検証レポート（非永続） | `docs-check` | `docs-check`（intake化）・ユーザー参照 | 非永続・git管理対象外（`.gitignore` で除外） |
 | `inspect/inbox/*.md` | 未分類 inspect finding | `inspect-docs`, `inspect-skills` | `inspect-promote` | `inspect-promote` 成功後に `promoted/` または `archive/` へ移動 |

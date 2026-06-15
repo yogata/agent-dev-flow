@@ -19,8 +19,7 @@ agent: sisyphus
 
 ## Output
 
-- `.agentdev/drafts/req-draft-{topic-slug}.md`（機能追加の場合のみ）
-- セッション内要件doc（バグ修正・軽微変更の場合）
+- `.agentdev/drafts/req-draft-{topic-slug}.md`（全 work_type 共通）
 
 ## Steps
 
@@ -58,8 +57,7 @@ agent: sisyphus
 8. **Scale判断**（feature のみ）: `agentdev-workflow-lifecycle` で standard/large を判定。large 時はユーザーと分解計画を協議
 
 9. **ドラフト保存**:
-   - 機能追加: `.agentdev/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加。Step 6-1 で生成した `operation_units` セクションと Step 6-2 で生成した `execution_groups` セクションを含める
-   - バグ修正・軽微変更/リファクタリング・保守/ドキュメント・雑務: ドラフト保存不要。セッション内で完結
+   全 work_type（feature / bugfix / maintenance / docs_chore）で `.agentdev/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加。Step 6-1 で生成した `operation_units` セクションと Step 6-2 で生成した `execution_groups` セクションを含める。draft-meta の work_type が後続コマンドの消費パターンを決定する（feature: req-save が消費、bugfix/maintenance/docs_chore: req-save をスキップして case-open が消費）
 
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
 
