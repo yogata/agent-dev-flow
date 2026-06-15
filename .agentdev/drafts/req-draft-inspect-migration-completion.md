@@ -158,7 +158,7 @@ ADR-0113 で決定された `docs-review`/`skill-review` → `diagnostics-*` へ
 
 | ou_id | source_ru | target_req | operation | scale | depends_on | recommended_order | issue_policy | result |
 |---|---|---|---|---|---|---|---|---|
-| OU-01 | RU-20260615-01 + session-context | REQ-0124 | CREATE | large | - | 1 | single-issue | REQ-0124 created at docs/requirements/REQ-0124.md; scale=large; decomposition セクション参照（5 Wave・5子Issue） |
+| OU-01 | RU-20260615-01 + session-context | REQ-0124 | CREATE | large | - | 1 | single-issue | REQ-0124 created at docs/requirements/REQ-0124.md; Epic Issue #805 + Child Issues #806-#810 created (Wave 1-4 + FINAL); scale=large; decomposition セクション参照（5 Wave・5子Issue） |
 
 - **OU-01**: REQ-0124 新規 CREATE。本要件は単一 REQ の新規作成であり、REQ 操作単位では1 OU。実装は scale=large で、decomposition セクションの5 Wave 構成で実行する。case-open で Epic Issue + 5 子Issue（Wave 単位）を作成する。
 
