@@ -70,7 +70,7 @@ adr-subject: 文書種別の記述対象境界
 adr-shared-with: [OU-2]
 topic-slug: req-authoring-policy
 scale: standard
-status: draft
+status: saved
 source-ru: RU-20260615-05
 ```
 
@@ -186,6 +186,15 @@ ADR候補: 「文書種別の記述対象境界」（OU-2と共有）
 - recommended_order: 2
 - issue_policy: single
 - result:
+    saved_req: [REQ-0102]
+    operations:
+      - UPDATE REQ-0102-006: active REQ全体の状態要件化スコープ拡張
+      - UPDATE REQ-0102-007: 作業手段語拡張（移行・再定義・改名・移管・除去追加）
+      - APPEND REQ-0102-049: 作業手段の移送先（case/Issue/作業記録）
+      - APPEND REQ-0102-050: skill分離基準
+    adr: ADR-0103（既存ADR重複確認により新規作成不要、REQ-0101-051準拠）
+    source_ru_mapping: { RU-20260615-05: [UPDATE 006, 007, APPEND 049, 050] }
+    skipped_new: [NEW-4(008と重複), NEW-5(009/010と重複), NEW-6〜11(他システム対象・関連doc更新候補)]
 
 ## execution_groups
 
