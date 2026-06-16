@@ -24,6 +24,7 @@ REQ / ADR 保存前に、対象ドキュメントの種別が `docs/specs/docume
 
 - CREATE: テンプレートを適用し、最大 REQ 番号 + 1 で `docs/requirements/REQ-{NNNN}.md` に保存する。生成後、`doc_requirement.md` の必須セクションと frontmatter 必須フィールドを確認する。
 - APPEND: 既存 REQ ファイルの要件テーブルに行を追加し、frontmatter `updated` を更新する。
+  - 廃止宣言（retire 宣言）の APPEND を行う場合は、既存 REQ ファイルから同種の宣言行を検索し、precedent として書式（理由・移行先・吸収有無）を機械的に再利用する。対象 REQ 番号と理由のみ差し替え、REQ 間で宣言表記を統一する。推奨運用（必須ではない）。
 - UPDATE: 既存 REQ ファイルの目的・要件・適用範囲の該当セクションを更新し、frontmatter `updated` を更新する。
 - バルク UPDATE: 各 REQ ファイルに UPDATE を順次実行し、全 UPDATE 後に REQ 番号重複と frontmatter 一貫性を一括検証する。
 - SPLIT 検出時: 保存可能範囲を実行し、SPLIT 対象は完了報告で follow-up として明示する。
