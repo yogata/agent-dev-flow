@@ -24,6 +24,14 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 1. **Issue番号解決**: ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
 
+1-1. **重複ファイルチェック**: merge/pull 実行前に、ローカル未コミット変更ファイルと対象 PR 変更ファイルの重複を検出する:
+     - `git status --short` でローカル未コミット変更ファイル一覧を取得
+     - `gh pr view {pr_number} --json files` で対象 PR 変更ファイル一覧を取得
+     - 両者の重複ファイルを特定
+     - 重複ファイルが存在する場合: 構造化警告を提示し、ユーザーによる対応（`git stash` / commit / `git checkout -- <file>` / worktree利用）を促して停止する
+     - 重複なしの場合: 後続ステップへ進む
+     - `gh pr view` 実行不可時: 後方互換性として Step 9（実行前同期）でフォールバック検出を維持
+
 2. **前提確認**: 達成判定・完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価・更新する。判定基準・検査観点は同スキルの `references/qg-4-final-acceptance.md` を参照:
    - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run・driver subagent・外部実行バックエンドは完了条件チェックボックスを更新しない（ADR-0114）。case-close は case-run / driver とは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
    - unchecked項目を達成判定（証拠ソース・`agentdev-workflow-orchestration` のプロトコルに従い）し `[x]` に更新
