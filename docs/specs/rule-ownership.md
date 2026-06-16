@@ -20,7 +20,7 @@
 | 12 | Source/projection 分離 | REQ-0103 (048-055) | system.md | src/opencode/ source + .opencode/ projection |
 | 13 | Integrity 検査カテゴリ | REQ-0108 (001-021) | integrity-contracts.md | 18 集合・strict/heuristic/observation |
 | 14 | Finding 分類 | REQ-0108 (017, 018) | integrity-contracts.md | 6 category + route |
-| 15 | Frontmatter dev metadata 禁止 | REQ-0108 (022-024, 095-098) | integrity-contracts.md | implementation_pattern/load_skills 等禁止 |
+| 15 | Frontmatter dev metadata 禁止 | REQ-0108 (022-024, 095-098) | integrity-contracts.md | dev メタデータ禁止 |
 | 16 | Retired REQ 管理 | REQ-0108 (070-088) | integrity-contracts.md | mapping-table・注記・参照区別 |
 | 17 | Link 整合性 | REQ-0108 (013) | integrity-contracts.md | Markdown link 先存在確認 |
 | 18 | Namespace legacy 残存 | REQ-0108 (016) | integrity-contracts.md | 旧コマンド名・旧パス検出 |
