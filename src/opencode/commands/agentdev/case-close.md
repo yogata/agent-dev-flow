@@ -22,8 +22,8 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 1. **Issue番号解決**: ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
 
-2. **前提確認**: 達成判定・完了ゲート → `agentdev-workflow-lifecycle` に従い、Issue本文の完了条件チェックボックスを検証:
-   - unchecked項目を達成判定（証拠ソース・`agentdev-workflow-orchestration` のプロトコルに従い）
+2. **前提確認**: 達成判定・完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価・更新する。判定基準・検査観点は同スキルの `references/qg-4-final-acceptance.md` を参照:
+   - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。unchecked項目を達成判定（証拠ソース・`agentdev-workflow-orchestration` のプロトコルに従い）し `[x]` に更新
    - 達成不可項目を自律解決判定（変更対象分類×検証種別分類）
    - `agentdev-gh-cli` に従い `--body-file` で Issue本文更新 → VERIFY
    - **事後確認**: 更新後にIssue本文を再読込し、完了条件セクションの全 `- [ ]` が `[x]` に反映されていることを確認。未反映の場合は再更新（最大2回）し、それでも失敗する場合は構造化エラーで停止

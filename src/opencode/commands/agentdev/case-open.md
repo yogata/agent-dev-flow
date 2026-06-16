@@ -27,6 +27,8 @@ agent: sisyphus
 
 1. 要件docからIssue本文を生成。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う
 
+   **1-1. 完了条件網羅性検証（QG-2）**: Issue本文生成後・Issue作成前に、`agentdev-quality-gates` の QG-2（Acceptance Criteria Coverage Gate）に従い、完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する。判定基準・検査観点は同スキルの `references/qg-2-acceptance-criteria-coverage.md` を参照。fail 時は Issue 作成前に req-define 差し戻しを推奨
+
 2. **マルチREQ入力判定**: 入力要件doc数を確認
    - 単一REQ → Step 3
    - 複数REQ または draft-meta `scale: large` → **マルチREQ Epic flow**（Step 4〜）

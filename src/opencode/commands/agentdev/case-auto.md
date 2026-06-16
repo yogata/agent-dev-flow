@@ -24,6 +24,7 @@ agent: sisyphus
    - feature: req-save → case-open → case-run → case-close
    - bugfix / maintenance / docs_chore: case-open → case-run → case-close（req-save をスキップ）
 4. **各工程の実行**: 既存コマンド定義（req-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）も含めて既存コマンド定義に従うこと
+   - **品質ゲート（QG-1〜QG-4）の継承**: case-auto は QG を独自実装しない。構成コマンド（req-save: QG-1, case-open: QG-2, case-run: QG-3, case-close: QG-4）がそれぞれ `agentdev-quality-gates` スキルを参照して Gate を適用する。case-auto は工程間制御のみを担い、Gate 判定を再評価・差し替えしない（G07, G09）
    - case-auto は req-save / case-open に draft path と OU ID のみを渡すこと（REQ-0114-052）。OU 本文の切り出しは行わない
    - case-auto は OU の統合・分割、REQ 操作分類、Issue 階層判定を再評価しないこと（REQ-0114-054）
    - case-open 相当処理の完了後、出力を確認して以下のいずれかに分岐する:

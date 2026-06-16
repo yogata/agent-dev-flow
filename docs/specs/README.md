@@ -13,6 +13,7 @@ They describe what the system *is* now, as opposed to REQ files that define requ
 | [patterns.md](patterns.md) | 文書フォーマット規約 | frontmatter規約、REQ/SPEC/guidesの記述形式、テンプレート命名規則、リポジトリ参照リンク規約 |
 | [design-principles.md](design-principles.md) | 設計原則 | アーキテクチャ設計原則 |
 | [quality-specs.md](quality-specs.md) | 品質仕様 | 品質基準・検証ルール |
+| [quality-gates.md](quality-gates.md) | 品質ゲート | QG-1〜QG-4 定義・機械化境界・実装マッピング |
 | [document-model.md](document-model.md) | 文書モデル | REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックス |
 | [artifact-contracts.md](artifact-contracts.md) | アーティファクト契約 | Command/Skill/Template/Script の入出力・依存方向 |
 | [artifact-responsibilities.md](artifact-responsibilities.md) | 成果物責任表 | 各 artifact 種別の canonical owner と責務（REQ-0103-057） |

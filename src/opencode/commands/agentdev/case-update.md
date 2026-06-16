@@ -51,7 +51,7 @@ agent: sisyphus
 
 ### 品質ゲート
 - G04: SSoTの整合性を維持（Issue本文と要件docの不整合を防ぐ）
-- G05: `--review-ng` 時は必ず agentdev-spec-compliance 結果を引用すること
+- G05: `--review-ng` 時は必ず QG-3（`agentdev-quality-gates`）の乖離検出結果を引用すること
 - G06: `--body` 更新時はIssue作成時と同じテンプレート構造を維持すること。【必須】セクションが欠落しないよう確認すること
 - G07: コメント/レビューNGコメントのテンプレート【必須】セクションが全て含まれていることを確認してから投稿すること
 
