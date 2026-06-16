@@ -84,7 +84,7 @@ updated: {YYYY-MM-DD}
 | `retired-no-successor` | 最新方針では不要なため新active REQへ移行しない | 履歴参照として保持 |
 | `historical-only` | 当時の判断・経緯として残すが現行要件ではない | 履歴参照として保持 |
 
-**新基準REQ群**（REQ-0101〜0123、21件、REQ-0111, REQ-0122 は retired）を現行仕様の主参照とする。active REQ の一覧・範囲は `docs/requirements/README.md` を正とし、本SPECでは複製しない。
+**新基準REQ群**（REQ-0101〜0133、25件、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を現行仕様の主参照とする。active REQ の一覧・範囲は `docs/requirements/README.md` を正とし、本SPECでは複製しない。
 
 **要件行の記述規約**（REQ-0109, 004）:
 - 要件行には振る舞い・制約・状態のみを記述する
