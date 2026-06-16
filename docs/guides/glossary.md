@@ -17,7 +17,7 @@ AgentDevFlow で使う用語の定義。
 | intake-promote | インテイク・プロモート | inbox の item をレビュー・採用・却下・保留判定し、promoted artifact に整形するコマンド |
 | learning-promote | ラーニング・プロモート | learning entry を分析・分類・昇華判定し、promoted artifact を生成するコマンド |
 | backlog-review | バックログ・レビュー | promoted artifact を分析・統合し、ユーザー承認後に RU を生成するコマンド |
-| docs-check | ドックス・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド（旧称: integrity-check）。repo-local 名前空間 `/repo/docs-check` に配置し、`/agentdev/*` 配下とは区別する（ADR-0106, REQ-0115） |
+| docs-check | ドックス・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド（旧称: integrity-check）。配布対象外コマンド `/repo/docs-check` に配置し、`/agentdev/*` コマンド体系とは区別する（ADR-0106, REQ-0108-156） |
 | inspect-docs | インスペクト・ドックス | docs 全体の意味整合性を検出し、inspect finding を出力するコマンド（旧称: req-restructure-review, docs-review, diagnostics-docs） |
 | case-auto | ケース・オート | 最大自走モード。req-save → case-open → case-run → case-close を順次実行するコマンド |
 
@@ -69,9 +69,9 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| Command | 実行手順の一次参照。source は `src/opencode/commands/agentdev/`、runtime projection は `.opencode/commands/agentdev/` に配置 |
-| Skill | 判定基準・共通知識・宣言的ルールの一次参照。source は `src/opencode/skills/agentdev-*`、runtime projection は `.opencode/skills/agentdev-*` に配置 |
+| Command | 実行手順の一次参照。原本は `src/opencode/commands/agentdev/`、配置先は `.opencode/commands/agentdev/` に配置 |
+| Skill | 判定基準・共通知識・宣言的ルールの一次参照。原本は `src/opencode/skills/agentdev-*`、配置先は `.opencode/skills/agentdev-*` に配置 |
 | Template | Issue/PR 本文の出力構造。Skill 配下 `templates/` に配置 |
 | Script | ガードレール・検査・補助処理の実行可能ロジック。Skill 配下 `scripts/` に配置 |
 | 原本（source） | `src/opencode/` 配下の canonical な定義ファイル。AgentDevFlow 本体の command/skill/template はここに配置される |
-| 配置先（projection） | `.opencode/` 配下の runtime 配布先。self-hosting repo では junction/symlink による投影先、consumer では install script による配置先 |
+| 配置先（projection） | `.opencode/` 配下の runtime 配布先。AgentDevFlow本体リポジトリでは junction/symlink による投影先、適用プロジェクトでは install script による配置先 |

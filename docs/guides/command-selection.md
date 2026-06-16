@@ -22,13 +22,13 @@
 | REQ 体系の健全性を検出したい | `/agentdev/inspect-docs` | 検出レポート |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
-## Repository maintenance（self-hosting repo のみ）
+## Repository maintenance（AgentDevFlow本体リポジトリのみ）
 
 | 現在の状態 | 次のコマンド | 出力 |
 |-----------|-------------|------|
 | ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート |
 
-> これらのコマンドは repo-local（ADR-0106）であり、AgentDevFlow の consumer 配布対象外。
+> これらのコマンドは配布対象外（ADR-0106）であり、AgentDevFlow の配布対象外。
 
 ## 使い方
 
