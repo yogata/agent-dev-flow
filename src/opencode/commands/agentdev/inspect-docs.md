@@ -9,11 +9,11 @@ docs全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、find
 
 ## 基本原則: 診断専用（Read-Only）
 
-診断のみを実行する。許可される side effect は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成のみ。
+診断のみを実行する。許可される side effect は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ。
 
 - 診断結果の提示（finding、根拠、source-of-truth判定、推奨route）
 - `.agentdev/inspect/inbox/` への finding 出力
-- ファイル変更・Issue/PR作成・worktree作成・intake/learning/RU処理の禁止
+- Issue/PR作成・worktree作成・intake/learning/RU処理の禁止
 
 ## Input
 
@@ -39,7 +39,18 @@ docs全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、find
 11. **docs-check route判定**: 意味的疑いのうち機械的検査に落とせるものを docs-check rule/fixture 候補として提示
 12. **未処理artifact確認**: `agentdev-req-structure-diagnostics` 参照
 13. **finding 出力**: finding を `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md` へ出力。source-of-truth priority: active REQ > accepted ADR > SPEC > DOC-MAP/guides
-14. **完了報告**: 完了報告 template に従って出力
+14. **実行前同期（git pull --ff-only）**:
+    - `git pull --ff-only` を実行
+    - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
+15. **.agentdev/inspect/ 変更の commit と push**:
+    - `git diff --name-only` で `.agentdev/inspect/` 配下の変更を確認
+    - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
+    - **変更あり時**:
+       1. `git add` は `.agentdev/inspect/` のみ対象
+       2. commit message: `chore(agentdev): capture inspect-docs finding`
+       3. `git push` 実行
+       4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
+16. **完了報告**: 完了報告 template に従って出力
 
 ## Guardrails
 
