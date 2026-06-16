@@ -1,3 +1,8 @@
+---
+name: Progress Update Comment
+about: Issueの進捗を記録するコメントのテンプレート。
+---
+
 # 進捗更新コメント
 
 Issueの進捗を記録するコメントのテンプレート。

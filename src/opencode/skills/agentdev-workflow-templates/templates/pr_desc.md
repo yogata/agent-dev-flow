@@ -1,3 +1,8 @@
+---
+name: Pull Request Description
+about: Pull Request作成時の本文テンプレート
+---
+
 # PR本文テンプレート
 
 Pull Request作成時の本文テンプレート。
@@ -13,8 +18,8 @@ Pull Request作成時の本文テンプレート。
 [実装内容の概要]
 
 ## 完了条件
-
 <!-- 【必須】 -->
+
 - [ ] {completion_criteria}
 
 ## テスト結果
@@ -45,5 +50,7 @@ Pull Request作成時の本文テンプレート。
 
 - [PRで実現した決定事項のリンク（該当する場合）]
 
+## 関連Issue
 <!-- 【必須】 -->
+
 Closes #$ISSUE_NUMBER

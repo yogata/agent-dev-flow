@@ -32,7 +32,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - 重複なしの場合: 後続ステップへ進む
      - `gh pr view` 実行不可時: 後方互換性として Step 9（実行前同期）でフォールバック検出を維持
 
-2. **前提確認**: 達成判定・完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価・更新する。判定基準・検査観点は同スキルの `references/qg-4-final-acceptance.md` を参照:
+2. **前提確認**: 達成判定・完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価・更新する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md` を参照:
    - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run・driver subagent・外部実行バックエンドは完了条件チェックボックスを更新しない（ADR-0114）。case-close は case-run / driver とは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
    - unchecked項目を達成判定（証拠ソース・`agentdev-workflow-orchestration` のプロトコルに従い）し `[x]` に更新
    - 達成不可項目を自律解決判定（変更対象分類×検証種別分類）
@@ -122,3 +122,4 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G18: learning と intake を同一 commit に含める
 - G19: Step 12 は結果状態を分離して報告。`.agentdev` push失敗時は完了扱いにしない
 - G20: 完了条件チェックボックスの評価・更新は case-close の専任責務（ADR-0114）。case-run / driver / 外部実行バックエンドは更新しない。case-close は別コンテキストで Issue 本文を再読込して最終完了判定し、更新後に再読込 VERIFY を必ず実施する
+- G21: case-close の capture 責務は回収・保存。PR 本文から intake / learning を分離回収し domain state に保存する。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照

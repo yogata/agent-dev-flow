@@ -107,7 +107,7 @@ async function runScript(
 const VALID_SKILL_MD = `\
 ---
 name: agentdev-test-valid
-description: A valid test skill
+description: A valid test skill. USE FOR: testing the lint script. DO NOT USE FOR: production use.
 ---
 
 ## USE FOR
@@ -124,7 +124,7 @@ description: A valid test skill
 const MISMATCH_SKILL_MD = `\
 ---
 name: agentdev-wrong-name
-description: A skill with mismatched name
+description: A skill with mismatched name. USE FOR: testing name mismatches. DO NOT USE FOR: production use.
 ---
 
 ## USE FOR
@@ -153,7 +153,7 @@ function makeBloatedMd(): string {
   const lines: string[] = [
     "---",
     "name: agentdev-test-bloated",
-    "description: A bloated skill for testing",
+    "description: A bloated skill for testing. USE FOR: bloat detection. DO NOT USE FOR: production.",
     "---",
     "",
     "## USE FOR",
@@ -176,7 +176,7 @@ function makeBloatedMd(): string {
 const NO_PREFIX_SKILL_MD = `\
 ---
 name: test-no-prefix
-description: A skill without agentdev prefix
+description: A skill without agentdev prefix. USE FOR: testing prefix detection. DO NOT USE FOR: production use.
 ---
 
 ## USE FOR
@@ -323,26 +323,26 @@ describe("lint_skills.ts", () => {
   });
 
   describe("missing required sections", () => {
-    it("detects warning for missing USE FOR section", async () => {
+    it("detects warning for missing USE FOR trigger", async () => {
       const result = await runScript(issueEnv.scriptPath, ["--json"]);
       const report: JsonReport = JSON.parse(result.stdout);
 
       const found = report.results.filter(
         (r) =>
-          r.check === "USE FOR section" &&
+          r.check === "USE FOR trigger" &&
           r.file === "agentdev-test-nosections",
       );
       expect(found.length).toBe(1);
       expect(found[0].level).toBe("warning");
     });
 
-    it("detects warning for missing DO NOT USE FOR section", async () => {
+    it("detects warning for missing DO NOT USE FOR trigger", async () => {
       const result = await runScript(issueEnv.scriptPath, ["--json"]);
       const report: JsonReport = JSON.parse(result.stdout);
 
       const found = report.results.filter(
         (r) =>
-          r.check === "DO NOT USE FOR section" &&
+          r.check === "DO NOT USE FOR trigger" &&
           r.file === "agentdev-test-nosections",
       );
       expect(found.length).toBe(1);

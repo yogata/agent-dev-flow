@@ -79,15 +79,6 @@ function extractSeeAlsoReferences(content: string): string[] {
   return [...new Set(refs)];
 }
 
-function hasSection(content: string, heading: string): boolean {
-  const pattern = new RegExp(`^## .*${escapeRegex(heading)}`, "m");
-  return pattern.test(content);
-}
-
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 function lintSkill(
   skillDir: string,
   dirName: string,
@@ -161,35 +152,40 @@ function lintSkill(
     );
   }
 
-  if (hasSection(content, "USE FOR")) {
+  // Trigger Convention (REQ-0103-097, agentdev-skill-authoring): USE FOR /
+  // DO NOT USE FOR are declared in the frontmatter `description` field, not as
+  // markdown sections. Validate the frontmatter block accordingly.
+  const fmBlock = content.split("---")[1] || "";
+
+  if (/USE FOR/i.test(fmBlock)) {
     results.push(
-      ok("Content", "USE FOR section", `${dirName} has USE FOR section`),
+      ok("Content", "USE FOR trigger", `${dirName} declares USE FOR`),
     );
   } else {
     results.push(
       warn(
         "Content",
-        "USE FOR section",
-        `Missing USE FOR section in ${dirName}/SKILL.md`,
+        "USE FOR trigger",
+        `Missing USE FOR trigger in ${dirName}/SKILL.md frontmatter description`,
         dirName,
       ),
     );
   }
 
-  if (hasSection(content, "DO NOT USE FOR")) {
+  if (/DO NOT USE FOR/i.test(fmBlock)) {
     results.push(
       ok(
         "Content",
-        "DO NOT USE FOR section",
-        `${dirName} has DO NOT USE FOR section`,
+        "DO NOT USE FOR trigger",
+        `${dirName} declares DO NOT USE FOR`,
       ),
     );
   } else {
     results.push(
       warn(
         "Content",
-        "DO NOT USE FOR section",
-        `Missing DO NOT USE FOR section in ${dirName}/SKILL.md`,
+        "DO NOT USE FOR trigger",
+        `Missing DO NOT USE FOR trigger in ${dirName}/SKILL.md frontmatter description`,
         dirName,
       ),
     );
@@ -228,13 +224,22 @@ function lintSkill(
     );
   }
 
-  const resourcePatterns = ["scripts/", "references/", "templates/"];
-  const mentionedResources: string[] = [];
-  for (const res of resourcePatterns) {
-    if (content.includes(res)) {
-      mentionedResources.push(res);
-    }
+  // Detect self-referential resource file paths (the skill referencing a file in
+  // its OWN scripts/references/templates subdir). The leading negative
+  // lookbehind excludes cross-skill paths (.opencode/skills/agentdev-X/... or
+  // .../agentdev-X/templates/) and bare concept mentions, so only genuine
+  // self-claims are validated. Placeholder paths with {...} are skipped.
+  // Mirrors SCRIPT_TEMPLATE_REF_PATTERNS in check_integrity.ts.
+  const selfResourceRe =
+    /(?<![.\w/-])(scripts\/[^\s"')\]}]+\.ts|references\/[^\s"')\]}]+\.md|templates\/[^\s"')\]}]+\.md)/g;
+  const resourceSubdirs = new Set<string>();
+  let resMatch: RegExpExecArray | null;
+  selfResourceRe.lastIndex = 0;
+  while ((resMatch = selfResourceRe.exec(content)) !== null) {
+    if (resMatch[0].includes("{")) continue;
+    resourceSubdirs.add(resMatch[0].split("/")[0] + "/");
   }
+  const mentionedResources = [...resourceSubdirs];
 
   if (mentionedResources.length > 0) {
     let allExist = true;
@@ -328,9 +333,19 @@ function main(): void {
   const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
   const skillDirs = entries
     .filter(
-      (e: { isDirectory: () => boolean; name: string }) =>
-        e.isDirectory() && e.name !== "README.md",
+      (e: { isDirectory: () => boolean; name: string }) => {
+        if (e.isDirectory()) return true;
+        // Windows junctions: isDirectory() returns false (libuv reparse point
+        // behavior). statSync follows the link so junctioned agentdev-* skills
+        // are seen. Mirrors listDirs() in check_integrity.ts (#779).
+        try {
+          return fs.statSync(path.join(skillsDir, e.name)).isDirectory();
+        } catch {
+          return false;
+        }
+      },
     )
+    .filter((e: { name: string }) => e.name !== "README.md")
     .map((e: { name: string }) => ({
       name: e.name,
       fullPath: path.join(skillsDir, e.name),

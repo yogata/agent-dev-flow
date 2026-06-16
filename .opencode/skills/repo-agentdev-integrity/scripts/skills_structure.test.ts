@@ -18,7 +18,15 @@ function getSkillDirs(): string[] {
   if (!fs.existsSync(SKILLS_DIR)) return [];
   return fs
     .readdirSync(SKILLS_DIR, { withFileTypes: true })
-    .filter((d) => d.isDirectory())
+    .filter((d) => {
+      if (d.isDirectory()) return true;
+      // Windows junctions report isDirectory()=false; follow the link.
+      try {
+        return fs.statSync(path.join(SKILLS_DIR, d.name)).isDirectory();
+      } catch {
+        return false;
+      }
+    })
     .map((d) => d.name)
     .sort();
 }

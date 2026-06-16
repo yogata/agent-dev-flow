@@ -95,4 +95,3 @@ DOC-MAP は「どのドキュメントが何を扱っているか」を俯瞰し
 
 - **agentdev-req-file-manager**: REQ ファイル管理・採番・整合性チェック
 - **agentdev-adr-file-manager**: ADR ファイル管理
-- **agentdev-spec-compliance**: 仕様適合性検証

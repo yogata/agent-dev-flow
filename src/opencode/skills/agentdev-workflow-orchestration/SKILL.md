@@ -60,5 +60,4 @@ case-run コマンドの runtime projection path は `commands/agentdev/case-run
 ## See Also
 
 - **agentdev-workflow-lifecycle**: work_type 判定基準・フェーズ定義
-- **agentdev-spec-compliance**: 乖離検出
 - **agentdev-epic-tracker**: Epic ステータス追跡プロトコル

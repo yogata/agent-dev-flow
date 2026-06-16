@@ -142,7 +142,19 @@ function resolvePathWithFallback(runtimePath: string): string {
 
 function extractReadmeTableReqIds(content: string): Set<string> {
   const ids = new Set<string>();
+  // Track the current heading so REQ IDs listed under a Retired / historical
+  // section (docs/requirements/README.md "## Retired Requirements") are not
+  // treated as part of the active index.
+  let underRetiredHeading = false;
   for (const line of content.split("\n")) {
+    const headingMatch = line.match(/^#{1,6}\s+(.+)$/);
+    if (headingMatch) {
+      underRetiredHeading = /\b(retired|historical)\b|履歴|過去経緯|retired-no-successor|historical-only/i.test(
+        headingMatch[1],
+      );
+      continue;
+    }
+    if (underRetiredHeading) continue;
     const trimmed = line.trim();
     if (!trimmed.startsWith("|")) continue;
     // Extract from plain text in table cell: | REQ-NNNN | ...
@@ -1350,8 +1362,8 @@ function collectAllArtifactPaths(root: string): string[] {
     path.join(root, "docs", "DOC-MAP.md"),
     path.join(root, "docs", "README.md"),
     path.join(root, "README.md"),
-    // 7. report
-    path.join(root, ".agentdev", "integrity", "reports", "*.md"),
+    // 7. report: deliberately omitted — generated artifacts; scanning them
+    //    re-detects their own error text (feedback loop, REQ-0108-213).
     // 8. runtime (included via .opencode/commands and .opencode/skills elsewhere)
   ];
   for (const g of globs) {
@@ -1589,13 +1601,14 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       const activeAdrPath = path.join(root, "docs", "adr", `${ref}.md`);
       const appearsOutsideRetired = contentLines.some(
         (line, idx) =>
-          line.includes(ref) && !isRetiredSectionInLines(contentLines, idx),
+          line.includes(ref) && !isHistoricalReferenceContext(contentLines, idx),
       );
       if (
         fs.existsSync(retiredAdrPath) &&
         !fs.existsSync(activeAdrPath) &&
         !relPath.startsWith("docs/adr/retired/") &&
         !relPath.startsWith("docs/adr/README.md") &&
+        !relPath.startsWith("docs/adr/ADR-") && // ADRs discuss retired predecessors historically
         appearsOutsideRetired &&
         !(relPath.startsWith("docs/adr/ADR-") && isSupersededAdr(filePath, ref))
       ) {
@@ -1630,13 +1643,14 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
       const appearsOutsideRetired = contentLines.some(
         (line, idx) =>
-          line.includes(ref) && !isRetiredSectionInLines(contentLines, idx),
+          line.includes(ref) && !isHistoricalReferenceContext(contentLines, idx),
       );
       if (
         fs.existsSync(retiredPath) &&
         !fs.existsSync(activePath) &&
         !relPath.startsWith("docs/requirements/retired/") &&
         !relPath.endsWith("mapping-table.md") &&
+        !relPath.startsWith("docs/adr/ADR-") && // ADRs discuss REQ reorganization historically
         appearsOutsideRetired &&
         !isReqRangeContext // REQ-0108-194: REQ range references like "REQ-0101 through REQ-0116"
       ) {
@@ -1835,12 +1849,22 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
     const relPath = resolveRelative(filePath, root);
     if (relPath.startsWith("docs/requirements/retired/")) continue;
     if (relPath.endsWith("mapping-table.md")) continue;
+    if (relPath.startsWith("docs/adr/ADR-")) continue; // ADRs discuss REQ reorganization historically
     const content = readText(filePath);
     if (!content) continue;
+    const contentLines = content.split("\n");
     const refs = content.match(/\bREQ-\d{4}\b/g) || [];
     const uniqueRefs = [...new Set(refs)];
     for (const ref of uniqueRefs) {
       if (retiredIds.has(ref) && !activeIds.has(ref)) {
+        // REQ-0108-193/AGENTS.md: a retired REQ may be mentioned as historical
+        // (retirement identification, changelog, related-info section). Only
+        // flag when it appears outside any historical reference context.
+        const appearsOutsideHistorical = contentLines.some(
+          (line, idx) =>
+            line.includes(ref) && !isHistoricalReferenceContext(contentLines, idx),
+        );
+        if (!appearsOutsideHistorical) continue;
         results.push(
           warn(
             "LifecycleBoundary",
@@ -3587,6 +3611,29 @@ function isRetiredSection(filePath: string, lineNum: number): boolean {
   return isRetiredSectionInLines(content.split("\n"), lineNum - 1);
 }
 
+// REQ-0108-193/AGENTS.md policy: a retired REQ/ADR mentioned in a non-retired
+// document is acceptable when the reference is explicitly marked historical or
+// points at retirement. This returns true when either (a) the line itself
+// carries retirement-identification vocabulary next to the reference, or (b) the
+// reference sits under a historical / changelog / related-information heading.
+const RETIREMENT_CONTEXT_RE =
+  /retired|migrated|retired-no-successor|historical-only|historical|履歴|過去経緯|廃止|移行|移管|再配置|再編|統合|吸収|changelog|superseded|deprecated|後継|前身|predecessor|successor|旧REQ|旧ADR|は\s*retired|is\s*retired/i;
+const HISTORICAL_HEADING_RE =
+  /\b(retired|historical)\b|履歴|過去経緯|retired-no-successor|historical-only|Update\s+Notes|Changelog|変更履歴|関連情報|関連\s*ADR|Related|Migration|移行表|適用範囲/i;
+
+function isHistoricalReferenceContext(
+  lines: string[],
+  lineIndex: number,
+): boolean {
+  if (RETIREMENT_CONTEXT_RE.test(lines[lineIndex])) return true;
+  let currentHeading = "";
+  for (let i = 0; i <= lineIndex && i < lines.length; i++) {
+    const m = lines[i].match(/^#{1,6}\s+(.+)$/);
+    if (m) currentHeading = m[1];
+  }
+  return HISTORICAL_HEADING_RE.test(currentHeading);
+}
+
 function isNegativeExample(line: string): boolean {
   const hasOldFormMarker =
     /旧形式|旧語彙|廃止済み|旧\s*(command|コマンド|status|形式)/i.test(line);
@@ -3908,7 +3955,28 @@ function checkRuidGroundReference(root: string): CheckResult[] {
       const relPath = resolveRelative(fullPath, root);
 
       const lines = content.split("\n");
+      // A RU path listed in an out-of-scope / exclusion context (e.g. REQ-0124
+      // 適用範囲 "- **対象外**:" naming RU-20260615-01 as edit-exempt) is a scope
+      // boundary statement, not a ground reference. Skip such contexts. This
+      // covers both "## 対象外" headings and "- **対象外**:" list markers.
+      let underExclusion = false;
       for (let i = 0; i < lines.length; i++) {
+        const headingMatch = lines[i].match(/^#{1,6}\s+(.+)$/);
+        if (headingMatch) {
+          underExclusion = /対象外|out.of.scope|excluded|スコープ外/i.test(
+            headingMatch[1],
+          );
+          continue;
+        }
+        if (/^\s*-\s*\*\*対象外/.test(lines[i])) {
+          underExclusion = true;
+          continue;
+        }
+        if (/^\s*-\s*\*\*対象\*\*:?\s*$/.test(lines[i])) {
+          underExclusion = false;
+          continue;
+        }
+        if (underExclusion) continue;
         ruidPattern.lastIndex = 0;
         if (ruidPattern.test(lines[i])) {
           foundViolation = true;
@@ -3953,8 +4021,19 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
     path.join(root, "docs", "specs"),
   ];
 
-  const sixPhasePattern =
-    /\b(requirement|analyzed|created|in_progress|review|done)\b.*\b(status|状態|ステータス|マイクロフェーズ|micro.phase|state)\b|\b(status|状態|ステータス|マイクロフェーズ|micro.phase|state)\b.*\b(requirement|analyzed|created|in_progress|review|done)\b/gi;
+  // "domain state" / "ドメイン状態" denote .agentdev persistent state
+  // (ADR-0105), not workflow status. Exclude them so the 6-micro-phase
+  // detector does not fire on REQ/SPEC lines merely mentioning persistent state.
+  const stateWord =
+    "status|ステータス|マイクロフェーズ|micro.phase|(?<!domain )state|(?<!ドメイン)状態";
+  const sixPhasePattern = new RegExp(
+    "\\b(requirement|analyzed|created|in_progress|review|done)\\b.*\\b(" +
+      stateWord +
+      ")\\b|\\b(" +
+      stateWord +
+      ")\\b.*\\b(requirement|analyzed|created|in_progress|review|done)\\b",
+    "gi",
+  );
   let foundViolation = false;
 
   for (const dir of dirsToScan) {
@@ -4093,9 +4172,13 @@ function checkNonAcceptedAdrRefsInFile(
 
   const lines = content.split("\n");
   const exemptedRefs = new Set<string>();
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
     for (const ref of nonAcceptedAdrs.keys()) {
-      if (line.includes(ref) && contextExemptPatterns.some((p) => p.test(line))) {
+      if (
+        lines[i].includes(ref) &&
+        (contextExemptPatterns.some((p) => p.test(lines[i])) ||
+          isHistoricalReferenceContext(lines, i))
+      ) {
         exemptedRefs.add(ref);
       }
     }
@@ -5263,8 +5346,11 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
     const missingSkills = [...sourceSkillDirs].filter(
       (d) => !projectionSkillDirs.has(d),
     );
+    // repo-* skills are repo-local and projection-only (ADR-0020): they
+    // intentionally have no src/opencode/skills/ counterpart and are excluded
+    // from selective-junction sync (sync-self-opencode.ps1 RepoLocalSkillPrefix).
     const extraSkills = [...projectionSkillDirs].filter(
-      (d) => !sourceSkillDirs.has(d),
+      (d) => !sourceSkillDirs.has(d) && !d.startsWith("repo-"),
     );
 
     for (const d of missingSkills) {

@@ -98,10 +98,10 @@ SKILL.md の行数が **500行を超過** した場合、`references/` サブデ
 
 **抽出対象の優先順位**:
 
-1. 大きなコード例・テンプレート例 → `references/examples.md`
+1. 大きなコード例・テンプレート例 → `references/{topic}-examples.md`
 2. 詳細な判定表・分類表 → `references/{topic}-standards.md`
 3. ワークフローの詳細手順 → `references/{topic}-workflow.md`
-4. 開発プロセスの詳細 → `references/development-workflow.md`
+4. 開発プロセスの詳細 → `references/{topic}-process.md`
 
 ## 2. スキル仕様
 
