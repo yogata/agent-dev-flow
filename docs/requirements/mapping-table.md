@@ -2,12 +2,12 @@
 id: mapping-table
 title: "旧REQから新active REQへの移行表"
 created: "2026-05-30"
-updated: "2026-05-30"
+updated: "2026-06-16"
 ---
 
 ## 目的
 
-REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0123（REQ-0111, REQ-0122 は retired）を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口は21件（REQ-0111, REQ-0122 を除く）である。
+REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0124（REQ-0111, REQ-0116, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口は18件（retired 6件を除く）である。
 
 ## 判定
 
@@ -73,6 +73,10 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0123（REQ-0111
 | REQ-0050 | migrated | REQ-0105, REQ-0109 | REQ再構成intake保存導線を移行 |
 | REQ-0111 | retired-no-successor | なし | REQ-0119-025 により retire（2026-06-14）。条項は他REQへの吸収なしで廃止。REQ-0119 の破壊的再基準化が REQ-0111 の中核原則（既存Step変更禁止）と矛盾したため。retired 文書は `retired/REQ-0111.md` を参照 |
 | REQ-0122 | retired-no-successor | なし | 実装完了（PR #743, commit 90064c2）により RFC2119 完全廃止の目的達成、自己矛盾解消のため retire（2026-06-15）。条項は他REQへの吸収なしで廃止。retired 文書は `retired/REQ-0122.md` を参照 |
+| REQ-0116 | migrated | REQ-0101 | 文書分類ポリシー定義の恒久内容を REQ-0101 に吸収（REQ-0101-057: 分類ポリシー恒久内容のREQ-0101帰属、REQ-0101-058: 分類定義の一次所有先を REQ-0101 + document-model.md に統一）。文書分類ポリシー SPEC 配置先は document-model.md に正規化し、独立REQは不要と判断（agentdev-system-reorganization OU-04）。retired 文書は `retired/REQ-0116.md` を参照 |
+| REQ-0118 | migrated | REQ-0119 | Subagent edit safety 制約を REQ-0119 に吸収（REQ-0119-027: edit safety 制約の REQ-0119/REQ-0103 吸収）。責務分界REQとして一元管理するため独立REQは不要と判断（agentdev-system-reorganization OU-04）。retired 文書は `retired/REQ-0118.md` を参照 |
+| REQ-0120 | migrated | REQ-0103 | Runtime Command Authoring 制約（非必須参照除去）を REQ-0103 に吸収（REQ-0103-152: Runtime Command Authoring 制約の統合先）。独立REQは不要と判断（agentdev-system-reorganization OU-04）。retired 文書は `retired/REQ-0120.md` を参照 |
+| REQ-0121 | migrated | REQ-0103, REQ-0108 | Runtime Command 規範語構成を REQ-0103 に吸収（REQ-0103-152）、Integrity 検査定義（規範語検査の責務境界違反検査への再定義・規範語残存前提の除去）を REQ-0108 に吸収（REQ-0108-242, REQ-0108-243）。語彙ポリシー整合は REQ-0103/REQ-0108/REQ-0119 で一貫管理するため独立REQは不要と判断（agentdev-system-reorganization OU-04）。retired 文書は `retired/REQ-0121.md` を参照 |
 
 ## Active Set
 
@@ -92,9 +96,5 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0123（REQ-0111
 | REQ-0113 | Skill References SPEC分離基準 |
 | REQ-0114 | /agentdev/case-auto 最大自走モード |
 | REQ-0115 | docs-* command suite 定義（新規、旧REQ移行なし） |
-| REQ-0116 | 文書分類ポリシー定義（新規、旧REQ移行なし） |
 | REQ-0117 | Git worktree junction 削除フォールバック手順（新規、旧REQ移行なし） |
-| REQ-0118 | Subagent edit safety ガイドライン（新規、旧REQ移行なし） |
 | REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化（新規、旧REQ移行なし） |
-| REQ-0120 | Runtime Command 非必須参照除去（新規、旧REQ移行なし） |
-| REQ-0121 | Runtime Command 規範語見直し + Integrity 検査再定義（新規、旧REQ移行なし） |

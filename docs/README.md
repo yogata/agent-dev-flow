@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は REQ-0101 から REQ-0124 までの 22 件（active REQ、REQ-0111, REQ-0122 は retired）である。retired REQ（REQ-0001〜REQ-0050）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0124 までの 18 件（active REQ、REQ-0111, REQ-0116, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）である。retired REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0116, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -20,12 +20,8 @@
 | [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 |
 | [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード |
 | [REQ-0115](requirements/REQ-0115.md) | docs-* command suite 定義 |
-| [REQ-0116](requirements/REQ-0116.md) | 文書分類ポリシー定義 |
 | [REQ-0117](requirements/REQ-0117.md) | Git worktree junction 削除フォールバック手順 |
-| [REQ-0118](requirements/REQ-0118.md) | Subagent edit safety ガイドライン |
 | [REQ-0119](requirements/REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 |
-| [REQ-0120](requirements/REQ-0120.md) | Runtime Command 非必須参照除去 |
-| [REQ-0121](requirements/REQ-0121.md) | Runtime Command 規範語見直し + Integrity 検査再定義 |
 | [REQ-0123](requirements/REQ-0123.md) | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 |
 | [REQ-0124](requirements/REQ-0124.md) | docs-review/skill-review/diagnostics-* → inspect-* 完全直接移行 |
 
