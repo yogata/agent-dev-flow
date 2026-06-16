@@ -39,6 +39,7 @@
 - [Document Format Patterns](specs/patterns.md)
 - [Design Principles](specs/design-principles.md)
 - [Quality Specifications](specs/quality-specs.md)
+- [Quality Gates](specs/quality-gates.md)
 - [Document Model](specs/document-model.md)
 - [Artifact Contracts](specs/artifact-contracts.md)
 - [Artifact Responsibility Table](specs/artifact-responsibilities.md)
