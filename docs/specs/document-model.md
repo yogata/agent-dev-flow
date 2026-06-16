@@ -33,6 +33,50 @@ REQ 文書の各セクションが保持すべき内容の契約（REQ-0102-006,
 
 作業手段（移行・変更・再定義・削除・改名・移管・除去等）は case / Issue / 受け入れ条件 / 作業記録で扱い、active REQ の要件行に混入させない（REQ-0102-049）。
 
+## REQ Classification Layers
+
+active REQ は以下の6分類のいずれかに属する（REQ-0101-052）。各 REQ ファイルは関心対象の総体として説明できること。
+
+| 分類 | 説明 | 代表例 |
+|---|---|---|
+| 文書統治REQ | REQ/ADR/SPEC/guides/DOC-MAP の基準境界、文書分類ポリシー、ID規約 | REQ-0101 |
+| ワークフロー全体REQ | 開発ワークフロー、コマンド間データフロー、work_type 分類、SSoT遷移 | REQ-0104 |
+| command-level REQ | 公開commandの入力・出力・副作用境界・停止条件・他commandとの接続 | REQ-0102, REQ-0105, REQ-0106 |
+| artifact/runtime/skill責務REQ | Command/Skill/Template/Script の責務境界、配布制約、source/projection分離 | REQ-0103, REQ-0119 |
+| validation/inspection REQ | 整合性検査、finding分類、docs-check、inspect-docs の検査責務 | REQ-0108, REQ-0109 |
+| ADR lifecycle REQ | ADR status正規化、ADR運用品質維持 | REQ-0112 |
+
+### command-level REQ Definition
+
+command-level REQ は、公開commandの入力・出力・副作用境界・停止条件・他commandとの接続を持つ単位として定義する（REQ-0101-054）。1 command につき 1 command-level REQ を原則とする。
+
+### SPEC Separation Criteria
+
+SPEC に置くべき内容を active REQ から切り出す基準（REQ-0101-055）:
+
+| SPEC に置くもの | REQ に置くもの |
+|---|---|
+| schema、lifecycle、command topology、rule catalog、fixture detail | 満たすべき振る舞い・制約・状態の宣言 |
+
+### New REQ Creation Criteria
+
+新規 REQ は、既存 active REQ に吸収できない独立関心対象がある場合のみ作成する（REQ-0101-007, 053）。既存 REQ への APPEND / UPDATE を優先する。
+
+### Retire Candidate Criteria
+
+retire 候補の判定基準（REQ-0101-056）:
+
+| 類型 | 説明 |
+|---|---|
+| バグ修正由来 | 単発のバグ修正に起因し、恒常的な状態要件としての維持必要性がない |
+| 移行完了状態 | 移行・改名・廃止の完了記録が主題であり、現行の状態要件ではない |
+| 他REQ吸収済み | 恒久内容が他の active REQ に吸収され、単独維持の必要性がない |
+| 作業手段主題 | 作業手順・運用プロセスが主題であり、満たすべき状態要件ではない |
+
+### REQ Quality Maintenance Criteria
+
+SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT は、inspect-docs の診断観点に加え、REQ運用品質維持の恒常的基準として参照する（REQ-0109-039）。REQ体系の健全性を維持するため、これらの観点で定期的にREQ体系を評価する。
+
 ## Document Lifecycle
 
 ```
