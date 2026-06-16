@@ -45,4 +45,4 @@ Issue 本文、要件doc、Requirement Source に `agentdev_handoff: true` が�
 ## 参照
 
 - upstream handoff workflow protocol（Workflow / Command Protocol で規定）
-- Upstream Handoff Metadata Convention（REQ-0104-021 で規定）
+- Upstream Handoff Metadata Convention
