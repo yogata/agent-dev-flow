@@ -35,8 +35,8 @@
 | 27 | 語彙ポリシー横断検出 | REQ-0102 (024-028), REQ-0108 (236, 237) | integrity-contracts.md | active 対象範囲の語彙ポリシー違反検出 |
 | 28 | Cross-REQ 語彙矛盾 | REQ-0108 (239) | integrity-contracts.md | active REQ 間の語彙矛盾検出 |
 | 29 | mapping-table 履歴名明示 | REQ-0108 (240) | integrity-contracts.md | 旧語彙に履歴名を明示 |
-| 30 | REQ 検証基準（必達要件） | REQ-0115 (044) | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証 |
-| 31 | Quality Gates | REQ-0115 | quality-gates.md | QG-1〜QG-4 定義・機械化境界・実装マッピング |
+| 30 | REQ 検証基準（必達要件） | REQ-0108 | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証（REQ-0115-044 から REQ-0108 に移管） |
+| 31 | Quality Gates | REQ-0108 | quality-gates.md | QG-1〜QG-4 定義・機械化境界・実装マッピング（REQ-0115 から REQ-0108 に移管） |
 
 ## 重複ルールの解消状況
 

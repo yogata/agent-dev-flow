@@ -7,7 +7,7 @@ updated: "2026-06-16"
 
 ## 目的
 
-REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0126（REQ-0111, REQ-0115, REQ-0116, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口は19件（retired 7件を除く）である。
+REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口は25件（retired 8件を除く）である。
 
 ## 判定
 
@@ -78,6 +78,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0126（REQ-0111
 | REQ-0120 | migrated | REQ-0103 | Runtime Command Authoring 制約（非必須参照除去）を REQ-0103 に吸収（REQ-0103-152: Runtime Command Authoring 制約の統合先）。独立REQは不要と判断（agentdev-system-reorganization OU-04）。retired 文書は `retired/REQ-0120.md` を参照 |
 | REQ-0121 | migrated | REQ-0103, REQ-0108 | Runtime Command 規範語構成を REQ-0103 に吸収（REQ-0103-152）、Integrity 検査定義（規範語検査の責務境界違反検査への再定義・規範語残存前提の除去）を REQ-0108 に吸収（REQ-0108-242, REQ-0108-243）。語彙ポリシー整合は REQ-0103/REQ-0108/REQ-0119 で一貫管理するため独立REQは不要と判断（agentdev-system-reorganization OU-04）。retired 文書は `retired/REQ-0121.md` を参照 |
 | REQ-0115 | migrated | REQ-0108, REQ-0109, REQ-0124 | 恒久要件を REQ-0108（docs-check 検査責務）、REQ-0109（inspect-docs）、REQ-0124（inspect 命名恒久制約）へ移行し retire（2026-06-16）。タイトル「docs-* command suite」が移行主題であり REQ-0124-021 に抵触。retired 文書は `retired/REQ-0115.md` を参照 |
+| REQ-0117 | migrated | REQ-0110 | Git worktree junction cleanup フォールバック手順を REQ-0110 に統合（REQ-0110-008: Windows + junction 環境の "Not a directory" エラーフォールバック）。worktree 削除信頼性を一元管理するため独立REQは不要と判断（agentdev-system-reorganization OU-06）。retired 文書は `retired/REQ-0117.md` を参照 |
 
 ## Active Set
 
@@ -87,18 +88,24 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0126（REQ-0111
 | REQ-0102 | 要件定義・保存 |
 | REQ-0103 | Artifact責任分界 |
 | REQ-0104 | Workflow / Command Protocol |
-| REQ-0105 | Intake / Learning / Backlog |
-| REQ-0106 | Case実行・完了 |
+| REQ-0105 | RU lifecycle / Requirement Unit 管理 |
+| REQ-0106 | Case実行オーケストレーション / Epic・Wave |
 | REQ-0107 | Reporting / Writing Quality |
 | REQ-0108 | Integrity / Validation / Tests |
-| REQ-0109 | docs-review / REQ再構成運用 |
-| REQ-0110 | Git worktree 削除リトライ |
+| REQ-0109 | inspect-docs / REQ再構成運用 |
+| REQ-0110 | Git worktree cleanup 信頼性 |
 | REQ-0112 | ADRライフサイクル標準化・文書体系正規化・runtime独立性 |
 | REQ-0113 | Skill References SPEC分離基準 |
 | REQ-0114 | /agentdev/case-auto 最大自走モード |
-| REQ-0117 | Git worktree junction 削除フォールバック手順（新規、旧REQ移行なし） |
 | REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化（新規、旧REQ移行なし） |
 | REQ-0123 | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管（新規、旧REQ移行なし） |
 | REQ-0124 | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle（新規、旧REQ移行なし） |
 | REQ-0125 | inspect-skills / Command/Skill参照妥当性検出（新規、旧REQ移行なし） |
 | REQ-0126 | inspect-promote / 検出finding分類・昇格（新規、旧REQ移行なし） |
+| REQ-0127 | Intake command群 (capture / from-github / promote)（新規、REQ-0105 から分割） |
+| REQ-0128 | Learning-promote（新規、REQ-0105 から分割） |
+| REQ-0129 | Backlog-review（新規、REQ-0105 から分割） |
+| REQ-0130 | case-run / 実装パイプライン（新規、REQ-0106 から分割） |
+| REQ-0131 | case-close / 完了処理（新規、REQ-0106 から分割） |
+| REQ-0132 | case-open / Issue作成（新規、REQ-0105 から分割） |
+| REQ-0133 | case-update / Issue更新（新規、旧REQ移行なし） |

@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は REQ-0101 から REQ-0126 までの 19 件（active REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）である。retired REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0133 までの 25 件（active REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）である。retired REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -10,21 +10,27 @@
 | [REQ-0102](requirements/REQ-0102.md) | 要件定義・保存 |
 | [REQ-0103](requirements/REQ-0103.md) | Artifact責任分界 |
 | [REQ-0104](requirements/REQ-0104.md) | Workflow / Command Protocol |
-| [REQ-0105](requirements/REQ-0105.md) | Intake / Learning / Backlog |
-| [REQ-0106](requirements/REQ-0106.md) | Case実行・完了 |
+| [REQ-0105](requirements/REQ-0105.md) | RU lifecycle / Requirement Unit 管理 |
+| [REQ-0106](requirements/REQ-0106.md) | Case実行オーケストレーション / Epic・Wave |
 | [REQ-0107](requirements/REQ-0107.md) | Reporting / Writing Quality |
 | [REQ-0108](requirements/REQ-0108.md) | docs-check / Validation / Tests |
 | [REQ-0109](requirements/REQ-0109.md) | inspect-docs / REQ再構成運用 |
-| [REQ-0110](requirements/REQ-0110.md) | Git worktree 削除リトライ |
+| [REQ-0110](requirements/REQ-0110.md) | Git worktree cleanup 信頼性 |
 | [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・runtime独立性 |
 | [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 |
 | [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード |
-| [REQ-0117](requirements/REQ-0117.md) | Git worktree junction 削除フォールバック手順 |
 | [REQ-0119](requirements/REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 |
 | [REQ-0123](requirements/REQ-0123.md) | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 |
-| [REQ-0124](requirements/REQ-0124.md) | docs-review/skill-review/diagnostics-* → inspect-* 完全直接移行 |
+| [REQ-0124](requirements/REQ-0124.md) | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle |
 | [REQ-0125](requirements/REQ-0125.md) | inspect-skills / Command/Skill参照妥当性検出 |
 | [REQ-0126](requirements/REQ-0126.md) | inspect-promote / 検出finding分類・昇格 |
+| [REQ-0127](requirements/REQ-0127.md) | Intake command群 (capture / from-github / promote) |
+| [REQ-0128](requirements/REQ-0128.md) | Learning-promote |
+| [REQ-0129](requirements/REQ-0129.md) | Backlog-review |
+| [REQ-0130](requirements/REQ-0130.md) | case-run / 実装パイプライン |
+| [REQ-0131](requirements/REQ-0131.md) | case-close / 完了処理 |
+| [REQ-0132](requirements/REQ-0132.md) | case-open / Issue作成 |
+| [REQ-0133](requirements/REQ-0133.md) | case-update / Issue更新 |
 
 - [Requirements Index](requirements/README.md)
 - [Migration Table](requirements/mapping-table.md)
