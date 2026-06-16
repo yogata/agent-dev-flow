@@ -5,7 +5,7 @@ agent: sisyphus
 
 # Case登録
 
-要件定義（req-define）の結果をもとにGitHub Issueを作成する。①バイブス壁打ち→②構造的実行フェーズの境界。
+要件定義（req-define）の結果をもとにGitHub Issueを作成する。①壁打ち→②構造的実行フェーズの境界。
 
 ## Input
 

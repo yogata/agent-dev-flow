@@ -19,9 +19,6 @@ agent: prometheus | sisyphus
 ```
 
 **禁止フィールド**（frontmatter への記述は error として検出される）:
-- `implementation_pattern` — dev メタデータ
-- `secondary_pattern` — dev メタデータ
-- `load_skills` — dev メタデータ
 - `pattern` — 追加禁止フィールド
 - `workflow_route` — 追加禁止フィールド
 - `branch_type` — 追加禁止フィールド

@@ -338,9 +338,6 @@ function buildInvalidFixture(root: string): void {
       "---",
       "description: Test command",
       "agent: test-agent",
-      "implementation_pattern: single_agent",
-      "load_skills:",
-      "  - agentdev-nonexistent",
       "---",
       "",
       "Test command body.",
@@ -356,7 +353,7 @@ function buildInvalidFixture(root: string): void {
       "description: Bad command",
       "---",
       "",
-      "Missing agent and load_skills.",
+      "Missing agent.",
       "",
     ].join("\n"),
     "utf-8",
@@ -369,7 +366,7 @@ function buildInvalidFixture(root: string): void {
       "",
       "| Command | Description | Agent | Skills |",
       "|---------|-------------|-------|--------|",
-      "| `agentdev/test-cmd` | Test command | test-agent | agentdev-nonexistent |",
+      "| `agentdev/test-cmd` | Test command | test-agent |  |",
       "",
     ].join("\n"),
     "utf-8",
@@ -621,20 +618,6 @@ describe("invalid fixture detects violations", () => {
         res.category === "Specs" && res.level === "ng",
     );
     expect(specNg.length).toBeGreaterThan(0);
-  });
-
-  it("detects load_skills referencing non-existent skill", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const badSkill = parsed.results.find(
-      (res: { check: string; message: string }) =>
-        (res.check === "cmd-load-skills" ||
-          res.check === "load-skills-frontmatter") &&
-        (res.message.includes("agentdev-nonexistent") ||
-          (res.evidence ?? "").includes("agentdev-nonexistent")),
-    );
-    expect(badSkill).toBeDefined();
-    expect(badSkill.level).toBe("ng");
   });
 
   it("detects command missing required frontmatter fields", () => {

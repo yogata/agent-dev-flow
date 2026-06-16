@@ -26,7 +26,7 @@ agent: sisyphus
 
 ### Frontmatter 許可フィールド
 
-command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044）。`implementation_pattern`、`secondary_pattern`、`load_skills` 等の dev メタデータは frontmatter に含めない（ADR-0102）。
+command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044）。dev メタデータは frontmatter に含めない（ADR-0102）。
 
 分類定義は `design-principles.md` を参照。
 

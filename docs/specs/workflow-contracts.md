@@ -500,7 +500,7 @@ scale: large の場合、Epic Orchestrator モードで実行する:
 ### 起動仕様
 
 ```
-task(category="unspecified-high", load_skills=[], run_in_background=true, prompt="...")
+task(category="unspecified-high", run_in_background=true, prompt="...")
 ```
 
 ### プロンプト構成

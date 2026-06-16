@@ -47,7 +47,7 @@ agent: prometheus | sisyphus
 ---
 ```
 
-許可フィールドは `description` と `agent` のみ。`implementation_pattern`、`secondary_pattern`、`load_skills` 等の dev メタデータは含めない（REQ-0103-015, REQ-0103-044）。
+許可フィールドは `description` と `agent` のみ。dev メタデータは含めない（REQ-0103-015, REQ-0103-044）。
 
 ## Skill Structure Contract
 

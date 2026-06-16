@@ -563,22 +563,6 @@ function checkAdrReqCrossReference(
   return results;
 }
 
-function checkLoadSkillsExistence(
-  cmdDir: string,
-  skillsDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  results.push(
-    ok(
-      "Skill ↔ load_skills 参照",
-      "load-skills-existence",
-      "Load skills existence checks skipped — load_skills no longer in frontmatter (REQ-0108-130)",
-    ),
-  );
-  return results;
-}
-
 function checkSkillAgentdevPrefix(
   skillsDir: string,
   root: string,
@@ -605,22 +589,6 @@ function checkSkillAgentdevPrefix(
       );
     }
   }
-  return results;
-}
-
-function checkUnusedSkills(
-  cmdDir: string,
-  skillsDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  results.push(
-    ok(
-      "Skill ↔ load_skills 参照",
-      "unused-skills",
-      "Unused skills detection via load_skills skipped — load_skills no longer in frontmatter (REQ-0108-132)",
-    ),
-  );
   return results;
 }
 
@@ -2349,126 +2317,12 @@ function checkAdrReadmeIndexSync(adrDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// ─── Implementation pattern checks (REQ-0108-022~024, inverted: Case 5 / RU-0020) ─
-
-function checkImplementationPattern(
-  cmdDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-
-  for (const file of cmdFiles) {
-    const fullPath = path.join(cmdDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
-
-    const pattern = fm["implementation_pattern"];
-    if (pattern !== undefined) {
-      results.push(
-        ng(
-          "Implementation Pattern",
-          "implementation-pattern",
-          `command ${file} has prohibited implementation_pattern in frontmatter (Case 5 / RU-0020)`,
-          resolveRelative(fullPath, root),
-          undefined,
-          {
-            evidence: String(pattern),
-            expected: "implementation_pattern must not exist in frontmatter",
-            route: "req-define",
-          },
-        ),
-      );
-    }
-
-    const secondaryPattern = fm["secondary_pattern"];
-    if (secondaryPattern !== undefined) {
-      results.push(
-        ng(
-          "Implementation Pattern",
-          "secondary-pattern",
-          `command ${file} has prohibited secondary_pattern in frontmatter (Case 5 / RU-0020)`,
-          resolveRelative(fullPath, root),
-          undefined,
-          {
-            evidence: String(secondaryPattern),
-            expected: "secondary_pattern must not exist in frontmatter",
-            route: "req-define",
-          },
-        ),
-      );
-    }
-
-    const ls = fm["load_skills"];
-    if (ls !== undefined) {
-      results.push(
-        ng(
-          "Implementation Pattern",
-          "load-skills-frontmatter",
-          `command ${file} has prohibited load_skills in frontmatter (Case 5 / RU-0020)`,
-          resolveRelative(fullPath, root),
-          undefined,
-          {
-            evidence: Array.isArray(ls) ? ls.join(", ") : String(ls),
-            expected: "load_skills must not exist in frontmatter",
-            route: "req-define",
-          },
-        ),
-      );
-    }
-  }
-
-  if (results.filter((r) => r.level === "ng").length === 0) {
-    results.push(
-      ok(
-        "Implementation Pattern",
-        "implementation-pattern",
-        "No commands have prohibited dev metadata in frontmatter",
-      ),
-    );
-  }
-  return results;
-}
-
-function checkPatternProhibitions(cmdDir: string, root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  results.push(
-    ok(
-      "Implementation Pattern",
-      "pattern-prohibitions",
-      "Pattern prohibition checks skipped — implementation_pattern no longer in frontmatter (Case 5 / RU-0020)",
-    ),
-  );
-  return results;
-}
-
-function checkLoadSkillsConsistency(
-  cmdDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  results.push(
-    ok(
-      "Implementation Pattern",
-      "load-skills-consistency",
-      "Load skills consistency checks skipped — load_skills no longer in frontmatter (Case 5 / RU-0020)",
-    ),
-  );
-  return results;
-}
-
 // ─── Implementation pattern diagnostics (REQ-0108-026~038) ─────────────────
 
 interface CommandPatternEntry {
   primary: string;
   secondary?: string;
 }
-
-// PATTERN_EXPECTED_CONCERNS removed (REQ-0108-047):
-// Responsibility-based load_skills checks now read skill USE FOR / DO NOT USE FOR
-// instead of relying on fixed concern substrings + name matching.
 
 interface SkillResponsibility {
   useFor: string;
@@ -2728,87 +2582,6 @@ function checkCommandMapConsistency(
       );
       continue;
     }
-
-    const content = readText(cmdFile);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
-
-    const fmPattern = fm["implementation_pattern"];
-    if (typeof fmPattern === "string" && fmPattern !== entry.primary) {
-      results.push(
-        ng(
-          "Implementation Pattern",
-          "command-map-consistency",
-          `[recommendation: integrity-check-gap] '${cmdName}' frontmatter has '${fmPattern}' but command-map.md says '${entry.primary}'`,
-          resolveRelative(cmdFile, root),
-          undefined,
-          {
-            evidence: `frontmatter: ${fmPattern}, command-map: ${entry.primary}`,
-            expected: "must match",
-            route: "req-define",
-          },
-        ),
-      );
-    }
-
-    const fmSecondary = fm["secondary_pattern"];
-    const fmSecondaryStr =
-      typeof fmSecondary === "string" && fmSecondary.trim() !== ""
-        ? fmSecondary.trim()
-        : undefined;
-    const mapSecondary = entry.secondary;
-
-    if (fmSecondaryStr && !mapSecondary) {
-      results.push(
-        ng(
-          "Implementation Pattern",
-          "command-map-consistency",
-          `[recommendation: integrity-check-gap] '${cmdName}' frontmatter has secondary_pattern '${fmSecondaryStr}' but command-map.md has none`,
-          resolveRelative(cmdFile, root),
-          undefined,
-          {
-            evidence: `frontmatter: ${fmSecondaryStr}, command-map: (none)`,
-            expected: "must match",
-            route: "req-define",
-          },
-        ),
-      );
-    } else if (!fmSecondaryStr && mapSecondary) {
-      results.push(
-        ng(
-          "Implementation Pattern",
-          "command-map-consistency",
-          `[recommendation: integrity-check-gap] '${cmdName}' command-map.md has secondary '${mapSecondary}' but frontmatter has none`,
-          resolveRelative(cmdFile, root),
-          undefined,
-          {
-            evidence: `command-map: ${mapSecondary}, frontmatter: (none)`,
-            expected: "must match",
-            route: "req-define",
-          },
-        ),
-      );
-    } else if (
-      fmSecondaryStr &&
-      mapSecondary &&
-      fmSecondaryStr !== mapSecondary
-    ) {
-      results.push(
-        ng(
-          "Implementation Pattern",
-          "command-map-consistency",
-          `[recommendation: integrity-check-gap] '${cmdName}' secondary_pattern mismatch: frontmatter '${fmSecondaryStr}' vs command-map '${mapSecondary}'`,
-          resolveRelative(cmdFile, root),
-          undefined,
-          {
-            evidence: `frontmatter: ${fmSecondaryStr}, command-map: ${mapSecondary}`,
-            expected: "must match",
-            route: "req-define",
-          },
-        ),
-      );
-    }
   }
 
   if (results.filter((r) => r.level === "ng").length === 0) {
@@ -2821,91 +2594,6 @@ function checkCommandMapConsistency(
     );
   }
 
-  return results;
-}
-
-function checkExcessLoadSkills(
-  cmdDir: string,
-  skillsDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  results.push(
-    ok(
-      "Implementation Pattern",
-      "excess-load-skills",
-      "Excess load_skills check skipped — load_skills no longer in frontmatter (Case 5 / RU-0020)",
-    ),
-  );
-  return results;
-}
-
-function checkMissingLoadSkills(
-  cmdDir: string,
-  skillsDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  results.push(
-    ok(
-      "Implementation Pattern",
-      "missing-load-skills",
-      "Missing load_skills check skipped — load_skills no longer in frontmatter (Case 5 / RU-0020)",
-    ),
-  );
-  return results;
-}
-
-function checkUseForConsistency(
-  cmdDir: string,
-  skillsDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  results.push(
-    ok(
-      "Implementation Pattern",
-      "use-for-consistency",
-      "USE FOR consistency check skipped — load_skills no longer in frontmatter (Case 5 / RU-0020)",
-    ),
-  );
-  return results;
-}
-
-function classifyUnusedSkill(skillName: string, skillsDir: string): string {
-  if (
-    [
-      "agentdev-command-creator",
-      "agentdev-command-authoring",
-      "agentdev-skill-authoring",
-    ].includes(skillName)
-  ) {
-    return "authoring-only";
-  }
-  const skillMdPath = path.join(skillsDir, skillName, "SKILL.md");
-  const content = readText(skillMdPath);
-  if (content) {
-    if (/deprecated|非推奭/i.test(content)) return "deprecated-candidate";
-    if (/not loaded via load_skills/i.test(content)) return "manual-reference";
-    if (/intentionally.*excluded|意図的.*除外/i.test(content))
-      return "intentional-unused";
-  }
-  return "runtime-unused";
-}
-
-function checkUnusedSkillsCategorized(
-  cmdDir: string,
-  skillsDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  results.push(
-    ok(
-      "Skill → load_skills 系",
-      "unused-skills-categorized",
-      "Unused skills detection via load_skills skipped - load_skills no longer in frontmatter (REQ-0108-132)",
-    ),
-  );
   return results;
 }
 
@@ -3656,13 +3344,6 @@ const KNOWN_AGENTS = new Set([
   "test-agent",
 ]);
 
-/** Dev metadata fields that must NOT appear in command frontmatter (REQ-0108-022~024, 095~097, 109) */
-const PROHIBITED_FRONTMATTER_FIELDS = [
-  "implementation_pattern",
-  "secondary_pattern",
-  "load_skills",
-] as const;
-
 /** Additional prohibited fields (REQ-0108-124) */
 const EXTRA_PROHIBITED_FIELDS = [
   "pattern",
@@ -3689,63 +3370,6 @@ function checkCommandFrontmatterDetailed(
     if (!fm) continue;
     const relPath = resolveRelative(fullPath, root);
     const cmdName = file.replace(".md", "");
-
-    // REQ-0108-095: implementation_pattern PROHIBITED (inverted from required → forbidden)
-    const implPattern = fm["implementation_pattern"];
-    if (implPattern !== undefined) {
-      results.push(
-        ng(
-          "Command",
-          "cmd-implementation-pattern",
-          `Command '${cmdName}' has prohibited 'implementation_pattern' in frontmatter (dev metadata — Case 5 / RU-0020)`,
-          relPath,
-          undefined,
-          {
-            evidence: `implementation_pattern: ${String(implPattern)}`,
-            expected: "field must not exist in frontmatter",
-            route: "req-define",
-          },
-        ),
-      );
-    }
-
-    // REQ-0108-096: secondary_pattern PROHIBITED (inverted from allowed → forbidden)
-    const secPattern = fm["secondary_pattern"];
-    if (secPattern !== undefined) {
-      results.push(
-        ng(
-          "Command",
-          "cmd-secondary-pattern",
-          `Command '${cmdName}' has prohibited 'secondary_pattern' in frontmatter (dev metadata — Case 5 / RU-0020)`,
-          relPath,
-          undefined,
-          {
-            evidence: `secondary_pattern: ${String(secPattern)}`,
-            expected: "field must not exist in frontmatter",
-            route: "req-define",
-          },
-        ),
-      );
-    }
-
-    // REQ-0108-097: load_skills PROHIBITED in frontmatter (inverted from required → forbidden)
-    const ls = fm["load_skills"];
-    if (ls !== undefined) {
-      results.push(
-        ng(
-          "Command",
-          "cmd-load-skills",
-          `Command '${cmdName}' has prohibited 'load_skills' in frontmatter (dev metadata — Case 5 / RU-0020)`,
-          relPath,
-          undefined,
-          {
-            evidence: `load_skills: ${Array.isArray(ls) ? ls.join(", ") : String(ls)}`,
-            expected: "field must not exist in frontmatter",
-            route: "req-define",
-          },
-        ),
-      );
-    }
 
     // REQ-0108-124: additional prohibited fields (pattern, workflow_route, branch_type, labels)
     for (const field of EXTRA_PROHIBITED_FIELDS) {
@@ -7256,9 +6880,7 @@ async function main(): Promise<void> {
     ...checkReqReadmeIndexSync(reqDir, root),
     ...checkRetiredFrontmatter(reqDir, root),
     ...checkAdrReqCrossReference(reqDir, adrDir, root),
-    ...checkLoadSkillsExistence(cmdDir, skillsDir, root),
     ...checkSkillAgentdevPrefix(skillsDir, root),
-    ...checkUnusedSkillsCategorized(cmdDir, skillsDir, root),
     ...checkCommandReadmeSync(cmdDir, root),
     ...checkExpandedReadmeSync(cmdDir, root),
     ...checkCommandInventory(cmdDir, root),
@@ -7280,13 +6902,7 @@ async function main(): Promise<void> {
     ...checkDocMapGuideSync(root),
     ...checkAdrReadmeIndexSync(adrDir, root),
     ...checkSpecReadmeIndexSync(root),
-    ...checkImplementationPattern(cmdDir, root),
-    ...checkPatternProhibitions(cmdDir, root),
-    ...checkLoadSkillsConsistency(cmdDir, root),
     ...checkCommandMapConsistency(cmdDir, root, commandMapPath),
-    ...checkExcessLoadSkills(cmdDir, skillsDir, root),
-    ...checkMissingLoadSkills(cmdDir, skillsDir, root),
-    ...checkUseForConsistency(cmdDir, skillsDir, root),
     ...checkObsoleteReferenceDirs(skillsDir, root),
     ...checkMappingTable(reqDir, root),
     ...checkSkillFrontmatter(skillsDir, root),

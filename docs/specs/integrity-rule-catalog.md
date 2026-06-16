@@ -131,7 +131,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-006 |
-| description | Command frontmatter に description と agent のみが存在すること。implementation_pattern, secondary_pattern, load_skills, pattern, workflow_route, branch_type, labels は禁止 |
+| description | Command frontmatter に description と agent のみが存在すること。pattern, workflow_route, branch_type, labels は禁止 |
 | severity | strict |
 | category | document-drift |
 | detection_method | frontmatter field 列挙 → 許可リストと照合 |
