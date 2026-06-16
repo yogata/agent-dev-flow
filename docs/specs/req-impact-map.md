@@ -11,20 +11,25 @@
 | REQ-0108 | Integrity/Validation/Tests | IR-001~IR-024 (全件) | 全 artifact |
 | REQ-0107 | Reporting/Writing Quality | IR-013, IR-019 | templates, guides |
 | REQ-0104 | Workflow/Command Protocol | IR-006, IR-024 | commands |
-| REQ-0105 | Intake/Learning/Backlog | IR-016 | domain state |
-| REQ-0106 | Case実行・完了 | IR-013, IR-016 | commands, templates |
+| REQ-0105 | RU lifecycle / Requirement Unit 管理 | IR-016 | domain state |
+| REQ-0106 | Case実行オーケストレーション / Epic・Wave | IR-006, IR-013, IR-016 | commands, templates |
 | REQ-0109 | REQ再構成運用 | IR-004, IR-011, IR-015 | REQ, mapping-table, retired REQ |
 | REQ-0112 | ADR status正規化 | IR-005, IR-010 | ADR, ADR index |
 | REQ-0113 | Skill References SPEC分離 | IR-008, IR-014 | skills, skill references |
 | REQ-0114 | case-auto最大自走モード | IR-006, IR-016 | commands |
-| REQ-0115 | docs-* command suite 定義 | IR-006, IR-024 | commands |
-| REQ-0116 | 文書分類ポリシー定義 | IR-001, IR-002, IR-017, IR-022 | REQ, SPEC, DOC-MAP |
-| REQ-0117 | Git worktree junction 削除フォールバック | — (infrastructure) | — |
-| REQ-0118 | Subagent edit safety ガイドライン | IR-006, IR-008, IR-014 | commands, skills |
 | REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化 | IR-006, IR-008, IR-014, IR-024 | commands, skills |
-| REQ-0120 | Runtime Command 非必須参照除去 | IR-006 | commands |
-| REQ-0121 | Runtime Command 規範語見直し + Integrity 検査再定義 | IR-006, IR-016 | commands, integrity |
-| REQ-0110 | Git worktree削除リトライ | — (infrastructure) | — |
+| REQ-0123 | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 | IR-006, IR-008, IR-014 | commands, skills |
+| REQ-0124 | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle | IR-006, IR-024 | commands |
+| REQ-0125 | inspect-skills / Command/Skill参照妥当性検出 | IR-008, IR-014 | commands, skills |
+| REQ-0126 | inspect-promote / 検出finding分類・昇格 | IR-016 | domain state |
+| REQ-0127 | Intake command群 (capture / from-github / promote) | IR-016 | domain state |
+| REQ-0128 | Learning-promote | IR-016 | domain state |
+| REQ-0129 | Backlog-review | IR-016 | domain state |
+| REQ-0130 | case-run / 実装パイプライン | IR-006, IR-013, IR-016 | commands, templates |
+| REQ-0131 | case-close / 完了処理 | IR-006, IR-013, IR-016 | commands, templates |
+| REQ-0132 | case-open / Issue作成 | IR-006 | commands |
+| REQ-0133 | case-update / Issue更新 | IR-006 | commands |
+| REQ-0110 | Git worktree cleanup 信頼性 | — (infrastructure) | — |
 | REQ-0102 | 要件定義・保存 | IR-001, IR-002 | REQ |
 
 ## Impact Categories
@@ -36,16 +41,16 @@
 
 ### Medium Impact (3-4 rules)
 - **REQ-0109**: REQ 再構成運用 (3 rules)
+- **REQ-0119**: コマンド・スキル・サブエージェント責務分界 (4 rules)
 - **REQ-0104**: Command protocol (2 rules)
-- **REQ-0106**: Case 実行 (2 rules)
+- **REQ-0106**: Case 実行オーケストレーション (3 rules)
 - **REQ-0107**: Reporting (2 rules)
 
 ### Low Impact (1-2 rules)
-- **REQ-0102**, **REQ-0105**, **REQ-0112**, **REQ-0113**, **REQ-0114**, **REQ-0115**, **REQ-0118**, **REQ-0120**, **REQ-0121**
+- **REQ-0102**, **REQ-0105**, **REQ-0112**, **REQ-0113**, **REQ-0114**, **REQ-0123**, **REQ-0124**, **REQ-0125**, **REQ-0126**, **REQ-0127**, **REQ-0128**, **REQ-0129**, **REQ-0130**, **REQ-0131**, **REQ-0132**, **REQ-0133**
 
 ### No Direct Impact
-- **REQ-0110**: Git worktree 削除リトライ（infrastructure 層）
-- **REQ-0117**: Git worktree junction 削除フォールバック（infrastructure 層）
+- **REQ-0110**: Git worktree cleanup 信頼性（infrastructure 層）
 
 ## 3-Layer Gate Structure
 
