@@ -45,6 +45,6 @@
 
 | 名前 | 種別 | 予約先 |
 |------|------|--------|
-| `agentdev` | Command namespace | AgentDevFlow 本体 |
+| `agentdev` | コマンド体系 | AgentDevFlow 本体 |
 | `agentdev-*` | Skill prefix | AgentDevFlow 本体 |
 | `.agentdev/` | Domain state directory | AgentDevFlow 永続状態 |

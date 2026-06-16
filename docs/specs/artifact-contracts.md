@@ -216,10 +216,10 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 
 ## Repo-Local Artifacts（ADR-0106）
 
-Repo-local command/skill は AgentDevFlow の consumer 配布対象外である:
-- `.opencode/commands/repo/` — self-hosting repo 専用コマンド。`src/opencode/` に source を持たず、sync-opencode.ps1 の junction 管理対象外
-- `.opencode/skills/repo-*/` — self-hosting repo 専用スキル。同上
-- `repo-*` prefix は AgentDevFlow distributed namespace（`agentdev-*`）とは独立に管理される
+配布対象外コマンド/スキルは AgentDevFlow の配布対象外である:
+- `.opencode/commands/repo/` — AgentDevFlow本体リポジトリ専用コマンド。`src/opencode/` に原本を持たず、sync-opencode.ps1 の junction 管理対象外
+- `.opencode/skills/repo-*/` — AgentDevFlow本体リポジトリ専用スキル。同上
+- `repo-*` prefix は AgentDevFlow 配布コマンド体系（`agentdev-*`）とは独立に管理される
 
 ## Draft Artifact Contract（REQ-0103-129〜139）
 

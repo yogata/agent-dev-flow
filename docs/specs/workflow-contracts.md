@@ -264,7 +264,6 @@ agentdev系ワークフローはAnchored Developmentモデルに基づく。4つ
 | Issue/コメント系 | `.opencode/skills/agentdev-workflow-templates/templates/` | `agentdev-workflow-templates` |
 | REQ（`doc_requirement.md`） | `.opencode/skills/agentdev-req-file-manager/templates/` | `agentdev-req-file-manager` |
 | ADR（`doc_adr.md`） | `.opencode/skills/agentdev-adr-file-manager/templates/` | `agentdev-adr-file-manager` |
-| 乖離検出（`report_spec_compliance.md`） | `.opencode/skills/agentdev-spec-compliance/templates/` | `agentdev-spec-compliance` |
 | PR説明（`pr_desc.md`） | `.opencode/skills/agentdev-workflow-templates/templates/` | `agentdev-workflow-templates` |
 
 ## Artifact Lifecycle

@@ -35,8 +35,8 @@ AgentDevFlow の runtime package 境界を定義し、self-hosting repo と cons
   .gitignore                     → copy from src/opencode/.gitignore (real file)
   (opencode runtime files)       → sessions, config, etc. managed by opencode itself
 src/opencode/
-  commands/agentdev/             → canonical source
-  skills/agentdev-*/             → canonical source
+commands/agentdev/             → 原本
+skills/agentdev-*/             → 原本
 ```
 
 - Source 編集は `src/opencode/` で実施

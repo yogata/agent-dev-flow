@@ -2,9 +2,9 @@
 
 AgentDevFlow の整合性検査と REQ 体系の健全性診断について説明する。
 
-## docs-check（repo-local 自己監査）
+## docs-check（AgentDevFlow本体リポジトリ自己監査）
 
-agent-dev-flow リポジトリの自己監査コマンド。ドキュメント・スキル・コマンドの横断的整合性を検証する。AgentDevFlow の consumer 配布対象外であり、self-hosting repo のみで利用する（ADR-0106、REQ-0115-001）。
+agent-dev-flow リポジトリの自己監査コマンド。ドキュメント・スキル・コマンドの横断的整合性を検証する。AgentDevFlow の配布対象外であり、AgentDevFlow本体リポジトリでのみ利用する（ADR-0106、REQ-0108-156）。
 
 ### 基本フロー
 
@@ -65,7 +65,7 @@ Finding ごとに以下の route で後続処理に送る。
 
 ## inspect-docs
 
-docs 全体の意味整合検出と REQ 体系の健全性検出を行うコマンド（REQ-0115）。旧 `req-restructure-review` を統合し、REQ 再構成観点を含む全体意味検出を担う。
+docs 全体の意味整合検出と REQ 体系の健全性検出を行うコマンド（REQ-0109）。旧 `req-restructure-review` を統合し、REQ 再構成観点を含む全体意味検出を担う。
 
 ### 基本フロー
 

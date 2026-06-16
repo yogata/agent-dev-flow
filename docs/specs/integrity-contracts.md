@@ -6,34 +6,6 @@
 
 整合性検査の分類フレームワークを定義し、検査結果の深刻度と対応フローを規定する（REQ-0108）。
 
-## Premise Reversal Record
-
-以下の検査は前提の reversal を反映している（ADR-0102）:
-
-| 検査 | 旧前提 | 新前提 | 根拠 REQ |
-|---|---|---|---|
-| implementation_pattern | frontmatter に必須 | frontmatter への混入を禁止 | REQ-0108-022, 095 |
-| secondary_pattern | frontmatter に検証 | frontmatter への混入を禁止 | REQ-0108-028, 096 |
-| load_skills | frontmatter に必須・整合性検査 | frontmatter への混入を禁止 | REQ-0108-024, 097 |
-| frontmatter allowed fields | 複数フィールド許可 | description + agent のみ | REQ-0108-046, 098 |
-| dev メタデータ混入 | 検査対象外 | error として検出 | REQ-0108-109 |
-| skill references 存在 | 検査対象外 | runtime パスのみ確認 | REQ-0108-110 |
-| ADR status 正規化 | 検査対象外 | 旧形式 superseded-by:[ADR-XXXX] を検出 | REQ-0108-121 |
-| RU-ID 根拠参照 | 検査対象外 | docs 永続文書内の RU-ID パターンを検出 | REQ-0108-122 |
-| workflow status 禁止 | 検査対象外 | REQ/SPEC 内の workflow status / 6 マイクロフェーズを検出 | REQ-0108-123 |
-| command 追加フィールド禁止 | 検査対象外 | pattern / workflow_route / branch_type / labels を検出 | REQ-0108-124 |
-| accepted ADR のみ引用 | 検査対象外 | proposed / superseded / deprecated ADR 引用を heuristic として検出 | REQ-0108-125 |
-| reference-path OK診断 | OK結果にfile/line/evidenceなし | per-reference OKにfile/line/evidenceを出力 | REQ-0108-117 |
-| cross-skill裸参照 | 裸参照のcross-skill誤検知なし | 同一skill内になく別skillにある裸参照をstrict NG検出 | REQ-0108-119 |
-| abolished-skill-reference | N/A (検査対象外) | 廃止済み skill (agentdev-workflow-reporting) への参照を strict として検出 | REQ-0108-126 |
-| command-local-template-existence | completion report templates in skill directory | completion report templates in `.opencode/commands/agentdev/templates/{command}/{variant}.md` | REQ-0108-127 |
-| skill-spec-dependency | N/A (検査対象外) | runtime skill から docs/specs/ への直接依存を heuristic として検出 | REQ-0108-128 |
-| ADR current/retired collection | 検査対象外 | current ADR collection（`docs/adr/ADR-01XX.md`）と retired ADR collection（`docs/adr/retired/ADR-00XX.md`）を区別して検査 | REQ-0112-050 |
-| 語彙ポリシー横断検出 | command 本体のみ対象 | active REQ / SPEC / guide / source skill / template / repo-local projection を含む語彙ポリシー違反検出（retired 文書・検出用文字列・negative example は除外） | REQ-0108-236, 237 |
-| Cross-REQ 語彙矛盾 | 検査対象外 | active REQ 間の後継語彙と旧語彙の矛盾を検出 | REQ-0108-239 |
-| mapping-table 履歴名 | 旧語彙のまま許容 | 旧語彙に履歴名であることを明示 | REQ-0108-240 |
-| REQ 検証基準 | 規範語の有無で検証 | 検証可能な必達要件の判定に基づいて検証 | REQ-0115-044 |
-
 ## Severity Classification
 
 | 分類 | 意味 | 判定時の動作 | 例 |
@@ -140,7 +112,7 @@ command guardrails を以下の6カテゴリに分類する:
 | `case-update` | GitHub Issue のみ | ローカルファイル |
 | `docs-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（実行時。実行自体を承認として扱い、追加のユーザー承認は不要。REQ-0108-225, REQ-0112-059） | 検査対象 artifact |
 
-> **Note**: `docs-check` は `/repo/docs-check` として実行される repo-local コマンドである（ADR-0106）。AgentDevFlow の consumer 配布対象外。
+> **Note**: `docs-check` は `/repo/docs-check` として実行される配布対象外コマンドである（ADR-0106）。AgentDevFlow の配布対象外。
 
 | Command | Allowed Changes | Forbidden |
 |---|---|---|
@@ -155,12 +127,8 @@ command guardrails を以下の6カテゴリに分類する:
 
 postflight diff checking は read-only command から段階導入する:
 
-**Phase 1 — read-only command 検証**:
+**read-only command 検証**:
 - `inspect-docs` は実行後にローカルファイル変更がないことを確認（真の read-only 診断）
-- `docs-check`（repo-local `/repo/docs-check`）は検査対象 artifact を変更しないが、許可された出力（`.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`）を生成する。postflight は「検査対象 artifact への変更がないこと」を確認し、許可出力範囲外の変更を warning として報告する
+- `docs-check`（配布対象外 `/repo/docs-check`）は検査対象 artifact を変更しないが、許可された出力（`.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`）を生成する。postflight は「検査対象 artifact への変更がないこと」を確認し、許可出力範囲外の変更を warning として報告する
 - `backlog-review` も検査対象外 artifact を変更せず、許可された `.agentdev/` 配下の出力のみを行う
 - 変更が検出された場合は warning として報告
-
-**Phase 2 — 拡張適用**（将来）:
-- `case-run` の実行後、意図しないスコープ外ファイル変更を検出
-- allowed changes profile に基づく diff フィルタリング
