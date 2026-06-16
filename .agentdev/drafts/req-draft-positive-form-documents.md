@@ -332,74 +332,89 @@ ACCEPTABLE-BOUNDARY: REQ-0114-012（自走対象外の列挙）, REQ-0114-013（
 | REQ-0124-016 | 存在しないこと | agentdev-diagnostics-skills は存在しないこと | 「スキルディレクトリは agentdev-inspect-skills であること」へ |
 | REQ-0124-018 | しないこと | inspect に改名しないこと | 「別コマンド・別スキルとして維持すること」へ（スコープ境界） |
 
-#### REQ-0125.md（inspect-skills）— 約3件
+#### REQ-0125.md（inspect-skills）— 3件（OU-8 書き換え対象: 006, 007, 008）
 
 | REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
 |---|---|---|---|---|
-| REQ-0125-002 | CLEAR-VIOLATION | 行わない | 診断は修正を行わず | 「診断は read-only とし、推奨 route の提示と finding file 生成に限定すること」へ |
-| REQ-0125-005 | CLEAR-VIOLATION | しないこと | Skill 分割の実行を行わないこと | 「Skill 分割候補の提示に限定すること」へ |
-| REQ-0125-006 | CLEAR-VIOLATION | しないこと | Command 修正の実行を行わないこと | 同上 |
+| REQ-0125-006 | CLEAR-VIOLATION | 使用しないこと | `.agentdev/inspect/` 以外のドメインディレクトリを出力先に使用しないこと | 「finding file の出力先は `.agentdev/inspect/inbox/` 配下に限定すること」へ |
+| REQ-0125-007 | CLEAR-VIOLATION | 行わないこと | 許可される side effect は…のみであり、…を行わないこと | 「許可される side effect は…のみに限定すること（canonical docs 変更等は対象外）」へ |
+| REQ-0125-008 | CLEAR-VIOLATION | 実行せず | 修正を実行せず、推奨 route の提示に留めること | 「推奨 route の提示のみを行うこと（修正の実行は対象外）」へ |
 
-#### REQ-0126.md（inspect-promote）— 約3件
+ACCEPTABLE-BOUNDARY（境界条件・修正対象外）: REQ-0125-005（出力は…に限定すること・主文肯定）
+
+#### REQ-0126.md（inspect-promote）— 2件（OU-8 書き換え対象: 003, 007）
 
 | REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
 |---|---|---|---|---|
-| REQ-0126-003 | CLEAR-VIOLATION | しないこと | promoted artifact を生成しないこと | 「ユーザーの明示的承認後に promoted artifact を生成すること」へ |
-| REQ-0126-007 | CLEAR-VIOLATION | せず | 独立 route とせず | 「promoted artifact の要件化方向または受け入れ条件に含めること」へ |
+| REQ-0126-003 | CLEAR-VIOLATION | 生成しないこと | 承認なしに promoted artifact を生成しないこと | 「promoted artifact はユーザーの明示的承認を得た後に生成すること」へ |
+| REQ-0126-007 | CLEAR-VIOLATION | せず | docs-check rule/fixture 追加候補は独立 route とせず | 「promoted artifact の要件化方向または受け入れ条件に含めること」へ |
 
 ACCEPTABLE-BOUNDARY: REQ-0126-002（分類基準の定義、否定表現は境界条件）
 
-#### REQ-0127.md（Intake command群）— 約4件
+#### REQ-0127.md（Intake command群）— 5件（OU-8 書き換え対象: 006, 008, 012, 020, 021）
 
-主な CLEAR-VIOLATION: intake/learning capture の境界定義に否定文。「inbox を直接変更しない」「accept/reject を行わない」等。肯定文（「inbox は読み取り専用とする」「分類は intake-promote に委ねる」等）へ書き換え可能。
-
-#### REQ-0128.md（Learning-promote）— 1件
+intake/learning capture 責務境界・accepted/ 不使用の否定主文を肯定文へ。
 
 | REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
 |---|---|---|---|---|
-| REQ-0128-006 | CLEAR-VIOLATION | ならない | AI 単独で promote/prune の最終確定を行ってはならない | 「HITL 確定ステップを経て確定すること」へ |
+| REQ-0127-006 | CLEAR-VIOLATION | ならない | 承認なしに promoted artifact を生成してはならない | 「promoted artifact はユーザーの明示的承認を得た後に生成すること」へ |
+| REQ-0127-008 | CLEAR-VIOLATION | 使用しないこと | `.agentdev/intake/accepted/` は使用しないこと | 「成果物配置先は inbox/ または promoted/ に限定すること（accepted/ は対象外）」へ |
+| REQ-0127-012 | CLEAR-VIOLATION | 禁止する | intake/learning を混ぜた単一成果物の作成を禁止する | 「別々の成果物に分離すること（混ぜた単一成果物は対象外）」へ |
+| REQ-0127-020 | CLEAR-VIOLATION | 行わないこと | req-save は intake/learning capture を行わないこと | 「req-save の capture 生成対象は REQ再構成intake のみとすること（通常 capture は対象外）」へ |
+| REQ-0127-021 | CLEAR-VIOLATION | 持たないこと | case-auto 固有の capture 振る舞いを持たないこと | 「case-auto は構成コマンドの capture 責務境界に従うこと（固有 capture 振る舞いは対象外）」へ |
 
-#### REQ-0129.md（Backlog-review）— 約4件
+ACCEPTABLE-BOUNDARY: REQ-0127-004（直接処理すること・主文肯定）
 
-| REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
-|---|---|---|---|---|
-| REQ-0129-003 | CLEAR-VIOLATION | しないこと | 通常の短期Issue化候補として処理しないこと | 「REQ再構成intake は専用ルートで処理すること」へ |
-| REQ-0129-008 | ACCEPTABLE-BOUNDARY | 扱わないこと | promoted artifact path を依存先として扱わないこと | 境界条件として許容 |
-| REQ-0129-011 | CLEAR-VIOLATION | 処理せず | 当該RUを処理せず | 「当該RUを保留し理由を提示すること」へ |
-
-#### REQ-0130.md（case-run）— 約3件
+#### REQ-0128.md（Learning-promote）— 1件（OU-8 書き換え対象: 006）
 
 | REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
 |---|---|---|---|---|
-| REQ-0130-008 | CLEAR-VIOLATION | ならないこと | inbox を直接変更してはならないこと | 「inbox は読み取り専用とすること」へ |
-| REQ-0130-009 | CLEAR-VIOLATION | 禁止する | 中間ファイル経由の引き継ぎは禁止する | 「capture 情報の引き継ぎは PR 本文のみを経由すること」へ |
+| REQ-0128-006 | CLEAR-VIOLATION | ならない | AI 単独で promote/prune の最終確定を行ってはならない | 「promote/prune の最終確定は HITL 確定ステップを経て行うこと（AI 単独は対象外）」へ |
 
-#### REQ-0131.md（case-close）— 約6件
-
-| REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
-|---|---|---|---|---|
-| REQ-0131-006 | CLEAR-VIOLATION | しないこと | 危険な自動削除を行わないこと | 「削除失敗時は警告して停止すること」へ |
-| REQ-0131-007 | CLEAR-VIOLATION | ならないこと | 自動で git checkout -- により変更をリセットしてはならないこと | 「ローカル変更を保持したまま停止すること」へ |
-| REQ-0131-012 | ACCEPTABLE-BOUNDARY | しないこと | ロジック自体は変更しないこと | 境界条件として許容 |
-| REQ-0131-015 | CLEAR-VIOLATION | 禁止し | --force を禁止し | 「--force-with-lease のみを許可すること」へ |
-| REQ-0131-018 | CLEAR-VIOLATION | しないこと | case-run の一時会話コンテキストを使用しないこと | 「capture 情報の入力源は PR 本文のみとすること」へ |
-| REQ-0131-019 | CLEAR-VIOLATION | ならないこと | 学びの有無を問うてはならないこと | 「学びの検知はエージェント自律とすること」へ |
-
-#### REQ-0132.md（case-open）— 2件
+#### REQ-0129.md（Backlog-review）— 2件（OU-8 書き換え対象: 003, 011）
 
 | REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
 |---|---|---|---|---|
-| REQ-0132-005 | CLEAR-VIOLATION | せず | 完了扱いにせず | 「停止して対象ファイル・HEAD・origin/main を表示すること」へ |
-| REQ-0132-006 | CLEAR-VIOLATION | しないこと | intake/learning capture を行わないこと | 「capture は case-close 責務とすること」へ |
+| REQ-0129-003 | CLEAR-VIOLATION | 処理しないこと | `backlog-review` 向け短期候補として処理しないこと | 「REQ再構成intake は専用ルートで処理すること（短期候補は対象外）」へ |
+| REQ-0129-011 | CLEAR-VIOLATION | 処理せず | 当該RUを処理せず理由を提示すること | 「当該RUを保留し理由を提示すること」へ |
 
-#### REQ-0133.md（case-update）— 約4件
+ACCEPTABLE-BOUNDARY: REQ-0129-008（promoted artifact path を依存先として扱わないこと・境界条件）
+
+#### REQ-0130.md（case-run）— 2件（OU-8 書き換え対象: 008, 009）
 
 | REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
 |---|---|---|---|---|
-| REQ-0133-002 | CLEAR-VIOLATION | しないこと | フェーズを変更しないこと | 「現在のフェーズを維持すること」へ |
-| REQ-0133-004 | CLEAR-VIOLATION | 欠落しないこと | 【必須】セクションが欠落しないこと | 「【必須】セクションを維持すること」へ |
-| REQ-0133-006 | CLEAR-VIOLATION | 禁止する | gh issue list 等の取得を禁止する | 「番号はユーザー入力またはセッション内会話から取得すること」へ |
-| REQ-0133-007 | CLEAR-VIOLATION | ないこと | req-save への委譲を行わないこと | 「直接 commit + push を行うこと」へ |
+| REQ-0130-008 | CLEAR-VIOLATION | ならないこと | inbox を直接変更してはならないこと | 「inbox の扱いは読み取り専用とすること」へ |
+| REQ-0130-009 | CLEAR-VIOLATION | 禁止する | 中間ファイル経由の引き継ぎは禁止する | 「capture 情報の引き継ぎは PR 本文のみを経由すること（中間ファイル等は対象外）」へ |
+
+#### REQ-0131.md（case-close）— 5件（OU-8 書き換え対象: 006, 007, 015, 018, 019）
+
+| REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
+|---|---|---|---|---|
+| REQ-0131-006 | CLEAR-VIOLATION | 行わないこと | 危険な自動削除を行わないこと | 「警告して停止すること（危険な自動削除は対象外）」へ |
+| REQ-0131-007 | CLEAR-VIOLATION | ならないこと | 自動で git checkout -- により変更をリセットしてはならないこと | 「変更を保持したまま停止すること（自動リセットは対象外）」へ |
+| REQ-0131-015 | CLEAR-VIOLATION | 禁止し | --force を禁止し | 「許可するのは --force-with-lease のみとすること（--force は対象外）」へ |
+| REQ-0131-018 | CLEAR-VIOLATION | 使用しないこと | case-run の一時会話コンテキストを使用しないこと | 「capture 情報の入力源は PR 本文のみとすること（一時会話コンテキストは対象外）」へ |
+| REQ-0131-019 | CLEAR-VIOLATION | ならないこと | 学びの有無を問うてはならないこと | 「学びの検知はエージェント自律とすること（ユーザーへの問い合わせは対象外）」へ |
+
+ACCEPTABLE-BOUNDARY: REQ-0131-012（ロジック自体は変更しないこと・境界条件）
+
+#### REQ-0132.md（case-open）— 2件（OU-8 書き換え対象: 005, 006）
+
+| REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
+|---|---|---|---|---|
+| REQ-0132-005 | CLEAR-VIOLATION | せず | 完了扱いにせず停止すること | 「対象ファイル・HEAD・origin/main を表示して停止すること（完了扱いは対象外）」へ |
+| REQ-0132-006 | CLEAR-VIOLATION | 行わないこと | intake/learning capture を行わないこと | 「intake/learning capture は case-close 責務とすること（case-open は対象外）」へ |
+
+#### REQ-0133.md（case-update）— 3件（OU-8 書き換え対象: 002, 006, 007）
+
+| REQ-ID | 分類 | 否定表現 | 現状 | 修正方向 |
+|---|---|---|---|---|
+| REQ-0133-002 | CLEAR-VIOLATION | 変更しないこと | フェーズを変更しないこと | 「現在のフェーズを維持すること」へ |
+| REQ-0133-006 | CLEAR-VIOLATION | 禁止する | gh issue list 等での取得を禁止する | 「番号はユーザー入力またはセッション内会話からのみ取得すること（gh issue list 等は対象外）」へ |
+| REQ-0133-007 | CLEAR-VIOLATION | ないこと | req-save への委譲を行わないこと | 「直接 commit + push を行うこと（req-save への委譲は対象外）」へ |
+
+ACCEPTABLE-BOUNDARY: REQ-0133-004（【必須】セクションが欠落しないこと・主文肯定「維持し」）
 
 ### ADR findings（0101〜0114）— Decision本文の肯定化（P1）
 

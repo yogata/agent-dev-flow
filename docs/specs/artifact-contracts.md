@@ -60,7 +60,7 @@ agent: prometheus | sisyphus
 ```
 
 - `SKILL.md` は progressive disclosure の入口。200 行超で分割を検討。
-- `references/`（複数形）が canonical。`reference/`（単数形）は obsolete 扱い。
+- `references/`（複数形）を canonical なディレクトリ名として使用する。
 - `references/` は runtime 配布物のみを含める。authoring-only 資料は含めない（REQ-0103-045）。
 
 ## Skill Granularity Contract
@@ -195,9 +195,9 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 2. **完了報告テキスト（後）**: 完了報告フォーマットに従ったテキストを出力する
 3. **中間出力の禁止**: TodoWrite 更新と完了報告テキストの間に、他の中間出力を挟まない
 
-### 汎用締め文の禁止
+### 汎用締め文の取り扱い
 
-完了報告では以下の汎用締め文を禁止する。
+完了報告には `次のコマンド` フィールドまたは終端として明示的な完了宣言を含める。明示的な完了宣言があるため、以下の汎用締め文に頼る必要はない。
 
 - 「次にやるべきことがあれば指示してください」
 - 「他にご要望があればお知らせください」
@@ -206,9 +206,9 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 
 各コマンドの完了報告には `次のコマンド` フィールドまたは終端として明示的な完了宣言が含まれるため、汎用締め文は不要である。
 
-### 完了報告後の追加出力禁止
+### 完了報告の最終性
 
-完了報告テキストを出力した後、追加のテキスト・説明・サマリーを出力してはならない。完了報告がコマンドの最終出力である。
+完了報告がコマンドの最終出力である。完了報告テキストを出力した後は、追加のテキスト・説明・サマリーを出力しない。
 
 ## Scope Declaration
 
@@ -227,7 +227,7 @@ Template の配置先は以下の2種類を定義する（REQ-0103-046）。
 
 ### Draft Type Registry
 
-各 draft type は registry 側で以下を定義する（REQ-0103-130）。producer / allowed consumers は個別 draft file の frontmatter ではなく、registry 側でのみ定義する（REQ-0103-136）。
+各 draft type は registry 側で producer・allowed consumers・lifecycle を定義する（REQ-0103-130, REQ-0103-136）。個別 draft file の frontmatter にはこれらを記述せず、registry を唯一の定義源とする。
 
 | draft_type | file pattern | producer | allowed consumers | 位置づけ | lifecycle |
 |---|---|---|---|---|---|
@@ -248,11 +248,11 @@ created_at: 2026-06-14T19:36:47+09:00
 ---
 ```
 
-frontmatter に `producer`・`consumer`・`next` を必須化しない（REQ-0103-136）。これらは `draft_type` から導出可能であり、registry 側で定義される。
+frontmatter の基本フィールドは `draft_type`・`topic`・`status`・`created_at` とし、producer・allowed consumers・lifecycle は registry 側で `draft_type` ごとに定義する（REQ-0103-135, REQ-0103-136）。
 
 ### Command-Side draft_type 検証
 
-各 command は、入力 draft の `draft_type` が自 command の allowed input に該当するかを確認する（REQ-0103-131）。producer / consumer / next を個別 file frontmatter から読んで整合性判定する必要はない。
+各 command は、入力 draft の `draft_type` と registry 上の allowed consumers を照合して受理可否を判定する（REQ-0103-131, REQ-0103-136）。
 
 | command | 受け付ける draft_type |
 |---|---|

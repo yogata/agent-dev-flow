@@ -26,7 +26,7 @@ agent: sisyphus
 
 ### Frontmatter 許可フィールド
 
-command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044）。dev メタデータは frontmatter に含めない（ADR-0102）。
+command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044, ADR-0102）。
 
 分類定義は `design-principles.md` を参照。
 
@@ -49,7 +49,7 @@ updated: {YYYY-MM-DD}
 ---
 ```
 
-- フィールドは `id`, `title`, `created`, `updated` のみ。`status` および `scale` フィールドは持たない
+- フィールドは `id`, `title`, `created`, `updated` のみ（`status`・`scale` は REQ frontmatter には含まない）
 - `id` は `REQ-{NNNN}` 形式（例: `REQ-0104`）。要件行のIDは `REQ-{NNNN}-{MMM}` 形式（例: `REQ-0104-001`）
 
 ### REQセクション構成

@@ -68,7 +68,7 @@ skills/agentdev-*/             → 原本
   skills/{local}-*/   → project-local skill のみ
 ```
 
-- `agentdev` namespace を使用しない（REQ-0103-056）
+- project-local namespace（`agentdev` 以外）を使用する（REQ-0103-056）
 - 自由に `.opencode/` を管理
 
 ### Plugin-future（将来）
@@ -91,7 +91,7 @@ Consumer project で独自 command/skill を追加する際の命名規約（REQ
 
 | Rule | 説明 | 根拠 |
 |------|------|------|
-| Namespace 衝突回避 | `agentdev` / `agentdev-*` / `.agentdev/` は使用不可 | REQ-0103-056 |
+| Namespace 衝突回避 | `agentdev` / `agentdev-*` / `.agentdev/` 以外の名前を使用 | REQ-0103-056 |
 | kebab-case | skill 名は小文字・数字・ハイフンのみ | REQ-0103-011 |
 | 意味的命名 | project 名や domain 名を prefix に含めることを推奨 | 運用規約 |
 | 独自 directory | 独自 skill は `.opencode/skills/{project}-*/` に配置 | 運用規約 |

@@ -8,7 +8,7 @@
 |---|--------|--------------|----------------|------|
 | 1 | Command frontmatter | REQ-0103 (015, 044) | artifact-contracts.md | description + agent のみ |
 | 2 | Skill frontmatter | REQ-0103 (012, 013) | artifact-contracts.md | name + description |
-| 3 | Command 行数上限 | REQ-0103 (022-024) | quality-specs.md | 100行目標・150行上限・200行超禁止 |
+| 3 | Command 行数上限 | REQ-0103 (022-024) | quality-specs.md | 100行目標・150行上限・200行以内 |
 | 4 | Skill 行数上限 | REQ-0103 (037) | quality-specs.md | 200行超で分割候補報告 |
 | 5 | Template 配置 | REQ-0103 (005, 046) | artifact-contracts.md | command-local template 配置規約 |
 | 6 | Script 配置 | REQ-0103 (006, 014) | artifact-contracts.md | skill scripts/ 配下 |
