@@ -7,6 +7,8 @@ agent: sisyphus
 
 PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブランチを削除する。レビュー完了フェーズ。
 
+**完了条件チェックボックスの評価・更新は case-close の専任責務**（ADR-0114）。case-run / driver / 外部実行バックエンドが完了条件チェックボックスを更新しない。case-close は PR 作成後に別コンテキストで Issue 本文の完了条件を再読込し、PR 本文を capture 入力源として最終完了判定する。
+
 ## Input
 
 - Issue番号
@@ -23,10 +25,11 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 1. **Issue番号解決**: ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
 
 2. **前提確認**: 達成判定・完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価・更新する。判定基準・検査観点は同スキルの `references/qg-4-final-acceptance.md` を参照:
-   - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。unchecked項目を達成判定（証拠ソース・`agentdev-workflow-orchestration` のプロトコルに従い）し `[x]` に更新
+   - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run・driver subagent・外部実行バックエンドは完了条件チェックボックスを更新しない（ADR-0114）。case-close は case-run / driver とは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
+   - unchecked項目を達成判定（証拠ソース・`agentdev-workflow-orchestration` のプロトコルに従い）し `[x]` に更新
    - 達成不可項目を自律解決判定（変更対象分類×検証種別分類）
    - `agentdev-gh-cli` に従い `--body-file` で Issue本文更新 → VERIFY
-   - **事後確認**: 更新後にIssue本文を再読込し、完了条件セクションの全 `- [ ]` が `[x]` に反映されていることを確認。未反映の場合は再更新（最大2回）し、それでも失敗する場合は構造化エラーで停止
+   - **事後確認（再読込 VERIFY）**: 更新後にIssue本文を再読込し、完了条件セクションの全 `- [ ]` が `[x]` に反映されていることを確認。未反映の場合は再更新（最大2回）し、それでも失敗する場合は構造化エラーで停止
    - 未達項目が残る場合 → 構造化エラーで停止（G08）
    - PR存在確認
 
@@ -110,3 +113,4 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G17: Step 11 の commit は `.agentdev/` 配下のみ。他パスを巻き込まない
 - G18: learning と intake を同一 commit に含める
 - G19: Step 12 は結果状態を分離して報告。`.agentdev` push失敗時は完了扱いにしない
+- G20: 完了条件チェックボックスの評価・更新は case-close の専任責務（ADR-0114）。case-run / driver / 外部実行バックエンドは更新しない。case-close は別コンテキストで Issue 本文を再読込して最終完了判定し、更新後に再読込 VERIFY を必ず実施する
