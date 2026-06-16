@@ -72,6 +72,19 @@ CI/CD失敗を検出した場合、実装フェーズへループバックし自
 | specs更新競合 | 昇順で処理、マージで解決 |
 | 全Wave失敗 | 集約レポートで全件失敗を報告 |
 
+### worktree 環境での `source-projection-sync` 失敗（Windows + junction 環境固有）
+
+整合性検査（`check_integrity.ts`）を worktree（`.worktrees/{N}`）内で実行した際、`source-projection-sync`（IR-016）が失敗する既知のパターン。
+
+| 項目 | 内容 |
+|------|------|
+| 発生条件 | worktree 内で整合性検査を実行し、`source-projection-sync` が「projection 側不存在」で失敗 |
+| 原因 | メインリポジトリで作成された `.opencode/` 配下の junction link が worktree へ伝播していない。worktree は独立した作業ディレクトリであり、reparse point は複製されない |
+| 対処 | junction を再作成してから整合性検査を再実行する。再作成手順は README の Install/Update 手順（self-hosting repo: `scripts/sync-self-opencode.ps1 -Mode apply`、consumer repo: `scripts/install-consumer-opencode.ps1 -Mode apply`）に準拠。本スキルで新規手順は定義しない |
+| 環境 | Windows + junction 環境固有。Unix symlink 環境では発生しない |
+| フォールバックの限界 | `resolvePathWithFallback`（REQ-0108-189）は runtime projection 不在時に `src/opencode/` 原本へ読み取りをフォールバックするが、source/projection 双方向の存在比較を要する `source-projection-sync` までは解決しない。broken junction 検出ゲート（REQ-0108-173）も同様に worktree 内の junction 状態に依存する |
+| Self-Healing 対象外 | junction 再作成は環境固有の作業であり要件・仕様の修正ではないため、Self-Healing Loop の対象外。ユーザーへ状況と再作成手順への誘導を報告する |
+
 ## マージコンフリクト予防
 
 Wave 並列実行時のマージコンフリクトを予防するガイダンス。

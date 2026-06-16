@@ -25,6 +25,13 @@ case-run は3つの実行モードを持つ:
 | 実装フェーズ | 5-6 | work planが未完了 または チェックボックス未完了 |
 | 提出フェーズ | 7-11 | PRが未作成 |
 
+### 準備フェーズの既知の制約（Windows + junction 環境）
+
+- メインリポジトリで `sync-self-opencode.ps1` / `install-consumer-opencode.ps1` が作成する `.opencode/` 配下の junction link は、git worktree（`.worktrees/{N}`）へ伝播しない。worktree 作成後に個別に再作成が必要になる場合がある。
+- worktree 内で junction 依存の整合性検査（`source-projection-sync` 等）を実行すると、projection 側が存在せず失敗することがある。提出フェーズのローカル検証で整合性検査を含む場合は注意。
+- junction 再作成は既存手順に準拠し、本スキルで新規手順は定義しない。詳細・復旧手順は `references/self-healing-and-errors.md` の該当セクションを参照。
+- この制約は Windows + junction 環境固有。`resolvePathWithFallback`（REQ-0108-189）による runtime→source の部分フォールバックはあるが、source/projection 双方向比較を要する検査までは補完しない。
+
 ## Wave Scheduling
 
 Epic Orchestrator モードでの Wave 構成・依存関係・並列実行の管理。
