@@ -2,7 +2,7 @@
 
 ## Active Requirements
 
-現在の要件判断では、以下18件（REQ-0111, REQ-0116, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
+現在の要件判断では、以下19件（REQ-0111, REQ-0115, REQ-0116, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
 
 | REQ ID | タイトル | 関心対象 |
 |---|---|---|
@@ -19,11 +19,12 @@
 | [REQ-0112](REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・runtime独立性 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、6状態否定、integrity検査追加、ADR全面改定例外・01XX baseline・retired移動 |
 | [REQ-0113](REQ-0113.md) | Skill References SPEC分離基準 | skill / skill references 内 SPEC 相当記述の分離基準、移管先 SPEC 選択、runtime 自己完束制約 |
 | [REQ-0114](REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件、Epic flowクリーンアップ検証ゲート、Standard flow複数draft一括処理 |
-| [REQ-0115](REQ-0115.md) | docs-* command suite 定義 | /repo/docs-check 改名、/agentdev/inspect-docs 新設、inspect-docs 統合、req-*/case-* workflow 補強、是正ルーティング |
 | [REQ-0117](REQ-0117.md) | Git worktree junction 削除フォールバック手順 | git-worktree、junction、Windows、フォールバック |
 | [REQ-0119](REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 | command 薄型化 / skill 詳細移管 / sub-agent 委譲境界 / Step 整数化 / verbatim 条件付き / delegation_type SPEC降格 / ADR-0112 accepted化 |
 | [REQ-0123](REQ-0123.md) | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 | workflow-lifecycle 責務限定実装 / 4新規スキル移管 / Skill粒度基準 / DO NOT USE FOR整合 |
 | [REQ-0124](REQ-0124.md) | docs-review/skill-review/diagnostics-* → inspect-* 完全直接移行 | docs-review/skill-review/diagnostics-* 廃止・inspect-* 統一・draft type 廃止 |
+| [REQ-0125](REQ-0125.md) | inspect-skills / Command/Skill参照妥当性検出 | Command→Skill参照妥当性、Skill構造、read-only診断、finding出力、推奨route提示 |
+| [REQ-0126](REQ-0126.md) | inspect-promote / 検出finding分類・昇格 | inspect finding分類（promote/defer/reject）、HITL承認、promoted artifact生成 |
 
 ## Retired Requirements
 
@@ -38,6 +39,7 @@
 | REQ-0118 | migrated→retired | Subagent edit safety 制約を REQ-0119 に吸収（REQ-0119-027）。OU-04 再編成で retired（2026-06-16）。`retired/REQ-0118.md` 参照 |
 | REQ-0120 | migrated→retired | Runtime Command 非必須参照除去を REQ-0103 に吸収（REQ-0103-152）。OU-04 再編成で retired（2026-06-16）。`retired/REQ-0120.md` 参照 |
 | REQ-0121 | migrated→retired | Runtime Command 規範語を REQ-0103（REQ-0103-152）、Integrity 検査を REQ-0108（REQ-0108-242/243）に吸収。OU-04 再編成で retired（2026-06-16）。`retired/REQ-0121.md` 参照 |
+| REQ-0115 | migrated→retired | docs-* command suite の恒久要件を REQ-0108（docs-check 検査責務）、REQ-0109（inspect-docs）、REQ-0124（inspect 命名恒久制約）へ移行。タイトルが移行主題であり REQ-0124-021 に抵触。OU-05 再編成で retired（2026-06-16）。`retired/REQ-0115.md` 参照 |
 
 ## Migration Table
 
