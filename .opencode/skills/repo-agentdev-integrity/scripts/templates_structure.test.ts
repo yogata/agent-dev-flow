@@ -56,7 +56,7 @@ function extractFrontmatterKeys(content: string): Set<string> | null {
   return keys;
 }
 function countRequiredMarkers(content: string): number {
-  const markerRe = /<!--\s*縲仙ｿ・医曾s*-->/g;
+  const markerRe = /<!--\s*【必須】\s*-->/g;
   return (content.match(markerRe) || []).length;
 }
 const templateFiles = getTemplateFiles();

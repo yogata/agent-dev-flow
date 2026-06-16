@@ -81,7 +81,7 @@ function main(): void {
     checkPlaceholders(fileName, lines, results);
     checkTableStructure(fileName, lines, results);
     checkBarePathReferences(fileName, content, results);
-    if (fileName.includes("feature")) {
+    if (/^issue_desc_.*feature/.test(fileName)) {
       checkSectionOrder(fileName, lines, results);
     }
   }

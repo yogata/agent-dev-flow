@@ -27,7 +27,7 @@ agent: sisyphus
 
 1. 要件docからIssue本文を生成。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う
 
-   **1-1. 完了条件網羅性検証（QG-2）**: Issue本文生成後・Issue作成前に、`agentdev-quality-gates` の QG-2（Acceptance Criteria Coverage Gate）に従い、完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する。判定基準・検査観点は同スキルの `references/qg-2-acceptance-criteria-coverage.md` を参照。fail 時は Issue 作成前に req-define 差し戻しを推奨
+   **1-1. 完了条件網羅性検証（QG-2）**: Issue本文生成後・Issue作成前に、`agentdev-quality-gates` の QG-2（Acceptance Criteria Coverage Gate）に従い、完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md` を参照。fail 時は Issue 作成前に req-define 差し戻しを推奨
 
 2. **マルチREQ入力判定**: 入力要件doc数を確認
    - 単一REQ → Step 3
@@ -135,3 +135,4 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 - G19: case-open は `execution_groups` の提案に基づかない独自推論で Epic Issue を作成しないこと（REQ-0104-040）
 - G20: case-open は複数 OU であることだけを理由に Epic Issue を作成しないこと（REQ-0104-041）。REQ-0104-029（複数REQ doc → Epic）は本要件により狭義化される
 - G21: case-open の Issue 化単位は REQ doc 単位ではなく OU 単位とすること（REQ-0104-042）
+- G22: case-open の capture 責務は非関与。intake / learning capture を行わない。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照

@@ -101,3 +101,4 @@ agent: sisyphus
 ### Runtime path 制約
 - G11: 既存コマンド定義を読み込む際、source path を runtime path に読み替えてはならない。コマンド定義内のパス参照は記述された通りに解釈し、source path を runtime 参照先として使用しない
 - G12: 委譲先コマンドの実行時 Read / Glob に source path 固定参照を含めない
+- G13: case-auto の capture 責務は委譲。構成コマンド（case-run / case-close）の capture 責務境界に従い、case-auto 固有の capture 振る舞いは持たない。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照

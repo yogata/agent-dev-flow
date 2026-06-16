@@ -51,7 +51,7 @@ agent: sisyphus
    **5-3. 作業手段ADR拒否ゲート**: ADR候補が削除・廃止・移行・統合・再構築・完全削除そのものを主題にしている場合、ADR候補から除外する（REQ-0101-044）。過去判断の除去は新規ADRではなくretire/supersedeで処理する（REQ-0101-045）。委譲接続点: サブエージェントは除外候補と根拠のみを返し、親エージェントがADR候補提示可否を判断する
 
 6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
-   - **6-0. 定義完全性ゲート（QG-1）**: 要件doc生成後、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、REQ/SPEC 分類・ADR ゲート・チェックボックス測可能性・必須セクション完全性を検証する。判定基準・検査観点は同スキルの `references/qg-1-definition-integrity.md` を参照。fail 時は壁打ち（Step 2）へ差し戻し
+   - **6-0. 定義完全性ゲート（QG-1）**: 要件doc生成後、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、REQ/SPEC 分類・ADR ゲート・チェックボックス測可能性・必須セクション完全性を検証する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は壁打ち（Step 2）へ差し戻し
    - **6-1. operation_units セクション生成**: 複数RU入力時の統合/分離結果（Step 10-2）を基に `operation_units` セクションを生成する。各 OU は `ou_id`, `source_ru`, `target_req`, `operation`, `scale`, `depends_on`, `recommended_order`, `issue_policy`, `result` フィールドを持つ（REQ-0102-033〜035）。単一REQ操作の場合も 1 件の OU として出力する
    - **6-2. execution_groups セクション生成**: OU 群を分析し、Epic 候補グループを `execution_groups` セクションに記録する。各 execution_group は `id`, `type`, `purpose`, `included_ou`, `rationale` を持つ（REQ-0102-036）。記録は提案であり、Issue 発行は行わない（REQ-0102-038）
 

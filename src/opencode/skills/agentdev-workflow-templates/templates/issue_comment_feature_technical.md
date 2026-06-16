@@ -1,3 +1,8 @@
+---
+name: Feature Technical Discussion Comment
+about: Issue作成時に追加する技術検討コメントのテンプレート。
+---
+
 # 技術検討コメント（機能追加用）
 
 Issue作成時に追加する技術検討コメントのテンプレート。

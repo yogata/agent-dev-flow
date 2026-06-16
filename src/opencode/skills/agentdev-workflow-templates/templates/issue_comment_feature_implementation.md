@@ -1,3 +1,8 @@
+---
+name: Feature Implementation Record Comment
+about: Issueクローズ時に追記する実装記録のテンプレート。
+---
+
 # 実装記録コメント（機能追加用）
 
 Issueクローズ時に追記する実装記録のテンプレート。
