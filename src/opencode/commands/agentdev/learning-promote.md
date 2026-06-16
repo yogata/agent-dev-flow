@@ -44,7 +44,7 @@ agent: sisyphus
 ### Phase 6: Execute + Git
 
 11. **実行前同期（git pull）**:
-    - `git pull --rebase` を実行
+    - `git pull --ff-only` を実行
     - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
 
 12. **promoted artifact 生成**（staging領域のみ）:
@@ -116,7 +116,7 @@ agent: sisyphus
 | staging領域書込失敗 | エラー内容を報告 |
 | archive/active.md prune 失敗 | promoted artifact は保持。prune エラー報告し手動 prune 案内 |
 | archive/active.md 書込失敗 | inbox.md は変更しない。エラー内容を報告 |
-| git pull --rebase 失敗 | 構造化エラー表示して停止。自動解消しない |
+| git pull --ff-only 失敗 | 構造化エラー表示して停止。自動解消しない |
 | git push 失敗 | 構造化エラー表示。完了扱いにしない |
 
 ## Artifact Lifecycle

@@ -9,11 +9,11 @@ Command→Skill 参照妥当性と Skill 構造を read-only で診断し、find
 
 ## 基本原則: 診断専用（Read-Only）
 
-診断を基本とし、許可される side effect は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成のみ。
+診断を基本とし、許可される side effect は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ。
 
 - 診断結果の提示
 - 根拠と推奨 route の提示
-- canonical docs 変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・Issue作成・PR作成・RU保存・commit・push の禁止
+- canonical docs 変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・Issue作成・PR作成・RU保存・branch・worktree 操作の禁止
 
 ## Input
 
@@ -34,14 +34,25 @@ Command→Skill 参照妥当性と Skill 構造を read-only で診断し、find
 3. **分類**: finding ごとに診断分類ラベルを付与する
 4. **route 提示**: 修正は実行せず、推奨 route を提示する
 5. **finding 出力**: finding を `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` へ出力
-6. **完了報告**: 完了報告 template に従って出力
+6. **実行前同期（git pull --ff-only）**:
+    - `git pull --ff-only` を実行
+    - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
+7. **.agentdev/inspect/ 変更の commit と push**:
+    - `git diff --name-only` で `.agentdev/inspect/` 配下の変更を確認
+    - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
+    - **変更あり時**:
+       1. `git add` は `.agentdev/inspect/` のみ対象
+       2. commit message: `chore(agentdev): capture inspect-skills finding`
+       3. `git push` 実行
+       4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
+8. **完了報告**: 完了報告 template に従って出力
 
 ## Guardrails
 
 - G01: ファイルを変更・作成・削除しない。ただし `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成は例外として許可する
 - G02: GitHub Issue/PR を作成・更新しない
 - G03: RU、intake、learning、backlog artifact を保存しない
-- G04: commit / push / branch / worktree 操作を行わない
+- G04: commit / push は `.agentdev/inspect/` 配下の永続化のみ許可。branch / worktree 操作は禁止
 - G05: 自動修正せず、推奨 route の提示に留める
 
 ## Error Handling
