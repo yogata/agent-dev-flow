@@ -33,6 +33,8 @@ agent: sisyphus
 
 3. **既存REQ照合** → `agentdev-req-file-manager` の照合方法論に従って実行。CREATE 前に APPEND/UPDATE 候補を必ず評価すること。要件の分割が必要な場合は保存操作ではなく requirements review 候補として扱うこと。操作分類結果は `draft-meta` に記録
 
+   **3-1. 定量的データ検証**: `glob docs/requirements/REQ-*.md`（および副次的に `glob docs/adr/ADR-*.md`）で実ファイルを列挙し、AGENTS.md 等の文書記載レンジ（例: "REQ-0101〜REQ-0133"）と照合すること。乖離を発見した場合は文書修正または実ファイル確認により解消すること（REQ-0102-002）。詳細手順は `agentdev-req-analysis` を参照
+
 4. **要件展開** → `agentdev-req-analysis` の分析観点に従って網羅。詳細ゲートは `agentdev-req-analysis` を参照
    - **4-1. 関連ドキュメント更新候補抽出**: 変更影響候補を抽出し、ドラフトに保持する。委譲接続点: サブエージェントは探索結果・分類候補・根拠のみを返し、親エージェントがドラフト反映を判断する
    - **4-2. 分類ゲート**: 各要件行候補を「変更後仕様」or「反映作業」に分類する。委譲接続点: サブエージェントは分類候補のみを返し、親エージェントが要件doc混入可否を判断する
