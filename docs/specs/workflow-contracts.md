@@ -16,6 +16,22 @@ AgentDevFlow は3つのパイプラインで構成される:
 | learning | learning-capture → learning-promote | 学びの蓄積・昇華 |
 | intake | intake-capture / intake-from-github → intake-promote | 改善候補の収集・昇華 |
 
+## Command Classification
+
+AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する（REQ-0104-048）。全公開コマンドがいずれかの分類に属すること。
+
+| 分類 | コマンド | 目的 |
+|---|---|---|
+| 主フロー | req-define → req-save → case-open → case-run → case-close → case-update | 要件定義から実装完了までの標準ワークフロー |
+| 最大自走入口 | case-auto | req-define 完了後の後続工程を一括自走する追加入口。標準フローを置換しない（REQ-0104-049） |
+| 補助フロー | intake-capture, intake-from-github, intake-promote, learning-promote, backlog-review | 改善候補収集・学び蓄積・RU化。主フローを補完 |
+| 検出フロー | inspect-docs, inspect-skills, inspect-promote | 文書・スキルの意味検出・分類・昇格 |
+| repo-local検査 | /repo/docs-check | AgentDevFlow 本体リポジトリ内の機械的整合性検査 |
+
+- case-auto は標準フロー（req-save → case-open → case-run → case-close）を内部的に呼び出す追加入口であり、標準フローを置換・廃止しない（REQ-0114-017）。
+- 補助フロー・検出フロー・repo-local検査は、主フロー・最大自走入口とは独立して実行可能である。
+- 検出フローの出力（inspect finding）は、inspect-promote → backlog-review を経て RU 化され、req-define の入力となる。
+
 ## Phase Definitions
 
 ### マクロフェーズ
