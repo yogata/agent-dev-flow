@@ -22,18 +22,18 @@
 | [REQ-0102](requirements/REQ-0102.md) | 要件定義・保存 | req-define / req-save / Requirement Source / 分類ゲート / operation unit / execution_groups |
 | [REQ-0103](requirements/REQ-0103.md) | Artifact責任分界 | command / skill / template / script / namespace / frontmatter 規約 / runtime-only 配布制約 / source-projection分離 / sync・migration / namespace予約 / SSOT化 / registry化 / consumer導入モデル / consumer plugin checkout・install script分離 |
 | [REQ-0104](requirements/REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type + scale 分類、workflow_route、SSoT、case-open/run/close、upstream handoff protocol、OU処理モード、Epic候補グループ |
-| [REQ-0105](requirements/REQ-0105.md) | Intake / Learning / Backlog | intake-promote（review統合）、learning-promote（refine統合）、backlog-review、RU lifecycle |
-| [REQ-0106](requirements/REQ-0106.md) | Case実行・完了 | case-run、case-close、Epic/Wave、完了ゲート |
+| [REQ-0105](requirements/REQ-0105.md) | RU lifecycle / Requirement Unit 管理 | intake-promote（review統合）、learning-promote（refine統合）、backlog-review、RU lifecycle |
+| [REQ-0106](requirements/REQ-0106.md) | Case実行オーケストレーション / Epic・Wave | case-run、case-close、Epic/Wave、完了ゲート |
 | [REQ-0107](requirements/REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、AI-slop抑止 |
 | [REQ-0108](requirements/REQ-0108.md) | docs-check / Validation / Tests | 整合性検査、finding分類・route、レポート出力、ガードレール、体系的テスト、frontmatter 規約検査、artifact collection registry、source/projection scan分離、baseline管理、rule catalog、REQ impact map、3層gate、meta-integrity、配布対象外自己監査（/repo/docs-check） |
-| [REQ-0109](requirements/REQ-0109.md) | inspect-docs / REQ再構成運用 | retired archive、移行表、REQ再構成intake |
-| [REQ-0110](requirements/REQ-0110.md) | Git worktree 削除リトライ | git-worktree、リトライ、信頼性 |
-| [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・runtime独立性 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、integrity検査追加、ADR全面改定例外・01XX baseline・retired移動 |
-| [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 | skill references 内 SPEC 相当記述の分離、runtime 自己完束制約 |
+| [REQ-0109](requirements/REQ-0109.md) | inspect-docs / REQ体系整合性 | retired archive、移行表、REQ再構成intake |
+| [REQ-0110](requirements/REQ-0110.md) | Git worktree cleanup 信頼性 | git-worktree、リトライ、信頼性 |
+| [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル・文書体系基盤・runtime独立性 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、integrity検査追加、ADR全面改定例外・01XX baseline・retired移動 |
+| [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離 | skill references 内 SPEC 相当記述の分離、runtime 自己完束制約 |
 | [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件、OU queue処理 |
-| [REQ-0119](requirements/REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 | command 薄型化 / skill 詳細移管 / sub-agent 委譲境界 / Step 整数化 / verbatim 条件付き / delegation_type SPEC降格 / ADR-0112 accepted化 |
-| [REQ-0123](requirements/REQ-0123.md) | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 | workflow-lifecycle 責務限定実装 / 4新規スキル移管 / Skill粒度基準 / DO NOT USE FOR整合 |
-| [REQ-0124](requirements/REQ-0124.md) | inspect-* 統一 | docs-review/skill-review/diagnostics-* 廃止・inspect-* 統一・draft type 廃止 |
+| [REQ-0119](requirements/REQ-0119.md) | コマンド・スキル・サブエージェント責務分界 | command 薄型化 / skill 詳細移管 / sub-agent 委譲境界 / Step 整数化 / verbatim 条件付き / delegation_type SPEC降格 / ADR-0112 accepted化 |
+| [REQ-0123](requirements/REQ-0123.md) | workflow-lifecycle 宣言的定義責務とコマンド固有手順のスキル分担 | workflow-lifecycle 責務限定実装 / 4新規スキル移管 / Skill粒度基準 / DO NOT USE FOR整合 |
+| [REQ-0124](requirements/REQ-0124.md) | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle | docs-review/skill-review/diagnostics-* 廃止・inspect-* 統一・draft type 廃止 |
 | [REQ-0125](requirements/REQ-0125.md) | inspect-skills / Command/Skill参照妥当性検出 | inspect-skills 検出コマンド定義 |
 | [REQ-0126](requirements/REQ-0126.md) | inspect-promote / 検出finding分類・昇格 | inspect-promote 昇格コマンド定義 |
 | [REQ-0127](requirements/REQ-0127.md) | Intake command群 (capture / from-github / promote) | intake-capture / intake-from-github / intake-promote 定義 |

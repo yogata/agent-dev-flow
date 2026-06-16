@@ -34,7 +34,7 @@ DOC-MAP（文書探索入口: 索引）
 - 現行 baseline: `docs/adr/ADR-01XX.md`（current ADR collection）
 - 履歴: `docs/adr/retired/ADR-00XX.md`（retired ADR collection）
 
-取り返しのつかない技術判断とその背景を記録する。
+将来の設計・運用・文書システムを制約する決定とその背景を記録する（REQ-0101-008）。
 
 - 現行 baseline は ADR-0101 以降の番号帯を使用する（REQ-0112-047）
 - ADR-0001〜0099 は再編前の履歴番号帯であり、`docs/adr/retired/` に配置されている（REQ-0112-048）

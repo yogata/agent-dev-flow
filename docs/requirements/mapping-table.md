@@ -91,14 +91,14 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0105 | RU lifecycle / Requirement Unit 管理 |
 | REQ-0106 | Case実行オーケストレーション / Epic・Wave |
 | REQ-0107 | Reporting / Writing Quality |
-| REQ-0108 | Integrity / Validation / Tests |
-| REQ-0109 | inspect-docs / REQ再構成運用 |
+| REQ-0108 | docs-check / Validation / Tests |
+| REQ-0109 | inspect-docs / REQ体系整合性 |
 | REQ-0110 | Git worktree cleanup 信頼性 |
-| REQ-0112 | ADRライフサイクル標準化・文書体系正規化・runtime独立性 |
-| REQ-0113 | Skill References SPEC分離基準 |
+| REQ-0112 | ADRライフサイクル・文書体系基盤・runtime独立性 |
+| REQ-0113 | Skill References SPEC分離 |
 | REQ-0114 | /agentdev/case-auto 最大自走モード |
-| REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化（新規、旧REQ移行なし） |
-| REQ-0123 | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管（新規、旧REQ移行なし） |
+| REQ-0119 | コマンド・スキル・サブエージェント責務分界（新規、旧REQ移行なし） |
+| REQ-0123 | workflow-lifecycle 宣言的定義責務とコマンド固有手順のスキル分担（新規、旧REQ移行なし） |
 | REQ-0124 | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle（新規、旧REQ移行なし） |
 | REQ-0125 | inspect-skills / Command/Skill参照妥当性検出（新規、旧REQ移行なし） |
 | REQ-0126 | inspect-promote / 検出finding分類・昇格（新規、旧REQ移行なし） |

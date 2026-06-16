@@ -391,12 +391,12 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-019 |
-| description | Guide ファイルが要件本文または契約本文を保持していないこと（REQ-0116-017）。語彙ベースの検出ではなく、guide が REQ/ADR/SPEC の責務を侵害する内容を保持していないかを検査する |
+| description | Guide ファイルが要件本文または契約本文を保持していないこと（REQ-0101）。語彙ベースの検出ではなく、guide が REQ/ADR/SPEC の責務を侵害する内容を保持していないかを検査する |
 | severity | heuristic |
 | category | canonical-conflict |
 | detection_method | Guide 内の要件定義表・契約記述・REQ 相当の振る舞い定義の検出。語彙ベースの判定ではなく構造的判定を主とし、強制条件表現は補助シグナル |
 | affected_artifacts | [guides] |
-| related_req | [REQ-0108-138, REQ-0116-017] |
+| related_req | [REQ-0108-138, REQ-0101] |
 | related_spec | [document-model.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。引用・メタ文の除外に注意 |
@@ -785,6 +785,106 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | finding_route | intake |
 | triage_action | README.md の該当 View に ADR を追加/削除 |
 | last_verified | 2026-06-16 |
+
+### IR-039: index-req-title-consistency
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-039 |
+| description | 索引文書（DOC-MAP、requirements/README、mapping-table）の REQ タイトルが各 REQ ファイル frontmatter title と一致すること |
+| severity | strict |
+| category | document-drift |
+| detection_method | 各索引から REQ タイトル抽出 → 対応 REQ ファイル frontmatter title と文字列照合 |
+| affected_artifacts | [DOC-MAP, REQ index, mapping-table, active REQ] |
+| related_req | [REQ-0108-003, REQ-0101-063, REQ-0101] |
+| related_spec | [integrity-contracts.md] |
+| gate_level | full-audit |
+| false_positive_risk | 低。title 文字列の直接比較 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 索引の REQ タイトルを frontmatter title に一致させる |
+| last_verified | 2026-06-17 |
+
+### IR-040: retired-req-authority-comment
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-040 |
+| description | active docs の HTMLコメント（provenance marker 含む）が retired REQ ID を単独参照しないこと。検出範囲は HTMLコメントのみに限定し、本文の意味解析は対象外（REQ-0101-063） |
+| severity | strict |
+| category | canonical-conflict |
+| detection_method | `<!-- ... REQ-0NNN ... -->` 形式の HTMLコメントから retired REQ ID を抽出し、後継 active REQ への併記がないか検出 |
+| affected_artifacts | [REQ, SPEC, guides, ADR] |
+| related_req | [REQ-0101-063, REQ-0108-070] |
+| related_spec | [integrity-contracts.md, document-model.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 低。HTMLコメント構文に限定した機械的検出 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | retired REQ の HTMLコメント参照を後継 active REQ へ置換 |
+| last_verified | 2026-06-17 |
+
+### IR-041: retired-req-broken-link
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-041 |
+| description | retired REQ ファイルへのリンクが `retired/` パス接頭辞を使用すること |
+| severity | strict |
+| category | broken-reference |
+| detection_method | Markdown リンク `[REQ-0NNN](../requirements/REQ-0NNN.md)` から retired REQ への直接パス（retired/ なし）を検出 |
+| affected_artifacts | [REQ, SPEC, guides, ADR] |
+| related_req | [REQ-0108-070, REQ-0101-063] |
+| related_spec | [integrity-contracts.md] |
+| gate_level | full-audit |
+| false_positive_risk | 低。retired REQ ID 集合とリンク先パスの照合 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | retired REQ へのリンク先を `retired/` パスに修正 |
+| last_verified | 2026-06-17 |
+
+### IR-042: hardcoded-req-count
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-042 |
+| description | docs 内の REQ 件数・範囲の固定表記が実際の active REQ ファイル数と一致すること |
+| severity | heuristic |
+| category | document-drift |
+| detection_method | N件・範囲表記（REQ-0101〜0NNN 等）抽出 → glob による実際の active REQ ファイル数と照合 |
+| affected_artifacts | [SPEC, guides, AGENTS.md] |
+| related_req | [REQ-0108-140, REQ-0101] |
+| related_spec | [integrity-contracts.md] |
+| gate_level | full-audit |
+| false_positive_risk | 中。表記揺れ・retired 除外の判定に注意 |
+| regression_test | (手動確認) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 固定表記を実際の REQ ファイル数・範囲に更新 |
+| last_verified | 2026-06-17 |
+
+### IR-043: retired-readme-coverage
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-043 |
+| description | retired/README.md が全 retired REQ のエントリを含むこと |
+| severity | strict |
+| category | document-drift |
+| detection_method | retired REQ ファイル一覧と retired/README.md のエントリを双方向差分で照合 |
+| affected_artifacts | [retired REQ, retired README] |
+| related_req | [REQ-0108-083, REQ-0101] |
+| related_spec | [integrity-contracts.md] |
+| gate_level | full-audit |
+| false_positive_risk | 低。ファイル一覧とエントリの差分 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | retired/README.md に欠落する retired REQ エントリを追加 |
+| last_verified | 2026-06-17 |
 
 ## Gate Levels
 
