@@ -705,6 +705,9 @@ operation_units:
       ou_operation: "APPEND REQ-0101-064, REQ-0101-065, REQ-0101-066"
       target_req: "REQ-0101"
       case_open_input: "REQ-0101 (REQ-0101-064〜066 added)"
+      issue_number: 866
+      issue_url: "https://github.com/yogata/agent-dev-flow/issues/866"
+      commit: "13f41cb"
   - ou_id: OU-2
     source_ru: session-directive
     target_req: REQ-0101
