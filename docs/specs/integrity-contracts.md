@@ -27,6 +27,8 @@
 | workflow-gap | workflow 定義の欠落 | heuristic |
 | integrity-rule-gap | 検査ルール自体の欠落 | observation |
 
+> **REQ/SPEC boundary violation**（REQ-0108-260）: Active REQ 要件行の主たる文意が SPEC detail（schema field・enum 値一覧・fixture detail・checker 個別ルール・false positive 抑制方式・Step 番号・Phase 番号・内部アルゴリズム・作業履歴）である場合は canonical-conflict の subcategory として扱い、IR-044 で heuristic 検出する。REQ-0101-069 の安定契約例外（公開 command 名・公開入口・domain state 位置づけ・他 command 接続契約・利用者可視分類体系・安全境界・停止条件の大枠・後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外とする。
+
 ## Finding Route Map
 
 検出された Finding の対応先:
@@ -63,6 +65,7 @@
 | CommandLocalTemplate | command-local template 存在・整合性検査（REQ-0108-127） |
 | SkillSpecDependency | runtime skill から docs/specs/ への直接依存検出（REQ-0108-128） |
 | RetiredAdrCitation | retired ADR への現行根拠引用検出（REQ-0112-048, heuristic/observation） |
+| ReqSpecBoundary | Active REQ 要件行への SPEC detail 混入検出（REQ-0108-260, REQ-0101-067〜069。IR-044 として catalog 定義。REQ-0101-069 安定契約例外は対象外） |
 
 ## Report Format
 

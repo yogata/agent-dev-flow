@@ -56,7 +56,54 @@ SPEC に置くべき内容を active REQ から切り出す基準（REQ-0101-055
 
 | SPEC に置くもの | REQ に置くもの |
 |---|---|
-| schema、lifecycle、command topology、rule catalog、fixture detail | 満たすべき振る舞い・制約・状態の宣言 |
+| schema、lifecycle、command topology、rule catalog、fixture detail に加え、以下の移管候補一覧 | 満たすべき振る舞い・制約・状態の宣言 |
+
+<!-- REQ-0101-068 -->
+REQ 要件行が以下のいずれかのみを主たる文意とする場合、当該内容を SPEC・rule catalog・command reference・skill reference・test docs のいずれかに配置する:
+
+| 移管候補 | 主たる移管先 |
+|---|---|
+| schema field | SPEC |
+| enum 値一覧 | SPEC / rule catalog |
+| route/category/status 詳細判定表 | SPEC / rule catalog |
+| file pattern | SPEC / command reference |
+| template variant | SPEC / command reference |
+| report format | SPEC |
+| fixture detail | SPEC / test docs |
+| regression test 条件 | test docs / rule catalog |
+| checker 個別ルール | rule catalog |
+| false positive 抑制方式 | rule catalog |
+| retry 回数 | SPEC / command reference |
+| token 目安 | SPEC / command reference |
+| 行数上限 | SPEC |
+| Step 番号 | SPEC / command reference |
+| Phase 番号 | SPEC / command reference |
+| 内部アルゴリズム | SPEC |
+| 作業履歴 | test docs / 作業記録 |
+| Case/RU/Issue/PR/OU 由来の作業記録 | test docs / 作業記録 |
+
+### Stable Contract Exception <!-- REQ-0101-069 -->
+
+REQ 要件行候補がパラメータ・分類・値の形式をとる場合であっても、以下のいずれかに該当する場合は REQ に要約として記述する。詳細な値一覧・判定表・内部処理条件は SPEC 等に配置する:
+
+| REQ に要約として残す安定契約 | 説明 |
+|---|---|
+| 公開 command 名 | 利用者および後続工程が参照する command の名称 |
+| 公開入口 | command の起動点・引数受付 |
+| domain state の位置づけ | `.agentdev/` 等の永続状態の役割 |
+| 他 command との接続契約 | command 間の入出力・依存関係 |
+| 利用者に見える分類体系 | work_type 等のユーザー可視分類 |
+| 安全境界 | 実行許可範囲・破壊的操作の境界 |
+| 停止条件の大枠 | いつ終了するかの概要レベル条件 |
+| 後続工程が依存する安定した外部契約 | 後段 command が前提とする安定契約 |
+
+### REQ Granularity Judgment Test <!-- REQ-0102-054 -->
+
+REQ 要件行の粒度を判定するテスト:
+
+> 当該要件行が存在しない場合、対象 REQ が何を満たすべきか不明になるか？
+
+判定結果が YES の場合は当該行を REQ に残す。判定結果が NO の場合は当該行を SPEC・rule catalog・command reference・skill reference・test docs のいずれかに移管する。
 
 ### New REQ Creation Criteria
 

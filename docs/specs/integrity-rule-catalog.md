@@ -886,6 +886,26 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | retired/README.md に欠落する retired REQ エントリを追加 |
 | last_verified | 2026-06-17 |
 
+### IR-044: REQ/SPEC 境界違反検出
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-044 |
+| description | Active REQ 要件行の主たる文意が schema field・enum 値一覧・fixture detail・checker 個別ルール・false positive 抑制方式・Step 番号・Phase 番号・内部アルゴリズム・具体的な作業履歴のいずれかである場合、当該 SPEC detail の混入を検出すること（REQ-0108-260, REQ-0101-067〜069） |
+| severity | heuristic |
+| category | canonical-conflict |
+| detection_method | Active REQ 要件行の主たる文意から schema/enum/fixture/checker 個別ルール/FP 抑制/Step 番号/Phase 番号/内部アルゴリズム/作業履歴キーワードをパターンマッチで検出 |
+| affected_artifacts | [active REQ] |
+| related_req | [REQ-0108-260, REQ-0101-067, REQ-0101-068, REQ-0101-069] |
+| related_spec | [integrity-contracts.md, document-model.md] |
+| gate_level | full-audit |
+| false_positive_risk | 高。REQ-0101-069 安定契約例外（公開 command 名・公開入口・domain state 位置づけ・他 command 接続契約・利用者可視分類体系・安全境界・停止条件の大枠・後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | req-define |
+| triage_action | 該当要件行の詳細を SPEC・rule catalog・command reference・skill reference・test docs のいずれかに移管し、REQ 側は外部契約・状態要件の要約に置き換える |
+| last_verified | 2026-06-17 |
+
 ## Gate Levels
 
 | Level | Description | Trigger |
