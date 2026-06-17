@@ -38,10 +38,10 @@ DOC-MAP（文書探索入口: 索引）
 
 - 現行 baseline は ADR-0101 以降の番号帯を使用する（REQ-0112-047）
 - ADR-0001〜0099 は再編前の履歴番号帯であり、`docs/adr/retired/` に配置されている（REQ-0112-048）
-- accepted ADR の決定内容を意味変更してはならない（REQ-0112-045）。変更が必要な場合は新規 ADR を作成する
+- accepted ADR の決定内容は安定して維持する（REQ-0112-045）。変更が必要な場合は新規 ADR を作成する
 - ADR 体系の全面改定時は例外として、ユーザー承認済み範囲で最小限を超える編集を許可する（REQ-0112-044）
 - REQ → ADR、ADR → ADR、Issue → ADR の参照を許可
-- ADR → Issue の逆参照は不可
+- REQ → Issue の一方向参照である（Issue から REQ への逆参照は行わない）
 - 一覧は `docs/adr/README.md` にインデックスがある（Current Baseline View / Retired Historical View）
 
 ## SPEC（現在仕様）
@@ -75,7 +75,7 @@ DOC-MAP（文書探索入口: 索引）
 
 ## このガイドの位置づけ
 
-本ファイルを含む `docs/guides/` は人間向け navigation 層である。規範的権限を持たず、規範的表現を含まない（ADR-0103）。REQ/ADR/SPEC と矛盾する記述がある場合は基準文書を優先する。
+本ファイルを含む `docs/guides/` は人間向け navigation 層である（REQ-0101-014, 027、ADR-0103）。REQ/ADR/SPEC と矛盾する記述がある場合は基準文書を優先する。
 
 ## 参照関係のルール
 
@@ -84,6 +84,6 @@ DOC-MAP（文書探索入口: 索引）
 1. REQ（最優先）
 2. ADR
 3. SPEC
-4. DOC-MAP / guides（基準を代替しない）
+4. DOC-MAP / guides（基準への導線を提供する）
 
-guides（本ファイルを含む）は参照用読み物であり、いかなる基準文書も代替しない。
+guides（本ファイルを含む）は参照用読み物であり、基準文書への導線を提供する。
