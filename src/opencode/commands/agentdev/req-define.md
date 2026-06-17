@@ -58,9 +58,11 @@ agent: sisyphus
 7. **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）。bugfix + ADR必要時は feature に昇格
 
 8. **Scale判断**（feature のみ）: `agentdev-workflow-lifecycle` で standard/large を判定。large 時はユーザーと分解計画を協議
+   - **8-1. 実装スコープシグナル確認**（REQ-0102-056）: ドラフト内に実装詳細セクション（修正候補リスト・findings catalog・影響ファイル一覧等）が存在する場合、`agentdev-workflow-lifecycle` の実装スコープシグナル基準に基づき scale: large への昇格を判定すること。昇格時は昇格理由をユーザーに提示し、Step 8 の分解計画協議を実施すること
 
 9. **ドラフト保存**:
    全 work_type（feature / bugfix / maintenance / docs_chore）で `.agentdev/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加。Step 6-1 で生成した `operation_units` セクションと Step 6-2 で生成した `execution_groups` セクションを含める。draft-meta の work_type が後続コマンドの消費パターンを決定する（feature: req-save が消費、bugfix/maintenance/docs_chore: req-save をスキップして case-open が消費）
+   - **9-1. 実装詳細の分離**（REQ-0102-057）: ドラフトに実装詳細（個別ファイルの編集指示・修正候補リスト・findings catalog 等）が含まれる場合、当該内容を要件定義部分（要件行・acceptance criteria・適用範囲）とは分離されたセクションに配置し、要件定義部分の判読性を確保すること。実装詳細がドラフト全体の過半を占める場合は、完了条件チェックボックスへの要約をユーザーに提案すること
 
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
 
