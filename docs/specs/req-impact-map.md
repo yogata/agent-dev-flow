@@ -32,6 +32,17 @@
 | REQ-0110 | Git worktree cleanup 信頼性 | — (infrastructure) | — |
 | REQ-0102 | 要件定義・保存 | IR-001, IR-002 | REQ |
 
+## Requirement-Line Impact
+
+特定要件行が影響する artifact・skill・command（REQ-0109-047）。REQ 全体ではなく要件行粒度で境界基準・検出観点の影響を追跡する必要がある場合に使用する。これらの要件行はすべて IR-044（REQ/SPEC 境界違反検出）を通じて catalog に紐づく。
+
+| 要件行 | 影響する Artifact / Skill / Command | 経由 |
+|--------|-------------------------------------|------|
+| REQ-0101-067〜069 | document-model.md, agentdev-req-analysis skill, agentdev-quality-gates skill, docs-check command (REQ-0108-260 経由), inspect-docs command (REQ-0109-047 経由) | IR-044 |
+| REQ-0102-053〜055 | agentdev-req-analysis skill, agentdev-quality-gates skill | IR-044 |
+| REQ-0108-260 | integrity-rule-catalog.md (IR-044 定義), integrity-contracts.md (ReqSpecBoundary category, canonical-conflict subcategory 注記) | IR-044 |
+| REQ-0109-047 | req-impact-map.md (本節), agentdev-req-structure-diagnostics skill | IR-044 |
+
 ## Impact Categories
 
 ### High Impact (5+ rules)

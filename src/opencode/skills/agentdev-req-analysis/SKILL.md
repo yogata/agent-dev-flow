@@ -73,6 +73,35 @@ Given-When-Then形式で記述し、測定可能であること。
 - 反映作業は case / Issue / 受け入れ条件 / 作業記録で扱う（REQ-0102-049）
 - active REQ の title / 目的 / 要件行 / 適用範囲に作業手段語を混入させない（REQ-0102-006, 007）
 
+### REQ/SPEC 境界判定基準
+
+状態要件と判定された要件行候補を、REQ に記述する内容と SPEC 等に配置する内容に振り分ける判断基準（REQ-0101-067-069, REQ-0102-053-055）。「状態要件と反映作業の分離基準」と併用する。
+
+**REQ に記述する内容（外部契約・状態要件）**:
+- システム・コマンドが満たすべき状態・振る舞い・制約の宣言
+- 外部から見える責務・公開 command 名・公開入口
+- domain state の位置づけ・他 command との接続契約
+- 安全境界・停止条件の大枠・利用者に見える分類体系
+- 恒久的な文書体系制約
+
+**SPEC 等（SPEC / rule catalog / command reference / skill reference / test docs）に配置する内容（詳細・内部パラメータ）**:
+- schema field・enum 値一覧・route/category/status 詳細判定表・file pattern・template variant・report format
+- fixture detail・regression test 条件・checker 個別ルール・false positive 抑制方式
+- retry 回数・token 目安・行数上限・Step 番号・Phase 番号・内部アルゴリズム
+- 作業履歴・Case/RU/Issue/PR/OU 由来の作業記録
+
+**安定契約例外（REQ-0101-069）**:
+要件行候補がパラメータ・分類・値の形式をとる場合であっても、公開 command 名・公開入口・domain state の位置づけ・他 command との接続契約・利用者に見える分類体系・安全境界・停止条件の大枠・後続工程が依存する安定した外部契約のいずれかに該当する場合は、REQ に要約として記述する。詳細な値一覧・判定表・内部処理条件は SPEC 等に配置する。
+
+**必要性テスト（REQ-0102-054）**:
+「当該行が存在しない場合、対象 REQ が何を満たすべきか不明になるか？」を問う。不明になる場合は REQ 行として残し、対象 REQ の必達要件の理解に寄与しない場合は SPEC 等へ移送する。
+
+**記述形式**:
+主たる文意は肯定文で記述する（REQ-0101-064-066 準拠）。否定文は境界条件・例外・補足として併記する場合に限る。
+
+**判定タイミング**:
+req-define / req-save は保存前に REQ/SPEC 配置判定を行う（REQ-0102-055）。QG-1 の観点 6（REQ/SPEC 配置判定）がこれを担保する。
+
 ### 用語定義
 
 要件内の専門用語を明確化する。
