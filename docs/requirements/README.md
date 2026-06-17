@@ -2,13 +2,13 @@
 
 ## Active Requirements
 
-現在の要件判断では、以下25件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
+現在の要件判断では、以下27件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
 
 | REQ ID | タイトル | 関心対象 |
 |---|---|---|
 | [REQ-0101](REQ-0101.md) | 文書・REQ管理基準 | REQ/retired REQ/ADR/SPEC/DOC-MAP/guides の基準境界、ADR記述対象境界（意思決定のみ・作業手段除外・既存ADR重複確認） |
 | [REQ-0102](REQ-0102.md) | 要件定義・保存 | req-define / req-save / Requirement Source / 分類ゲート |
-| [REQ-0103](REQ-0103.md) | Artifact責任分界 | command / skill / template / script / namespace / frontmatter 規約 / runtime-only 配布制約 / source-projection分離 / sync・migration / namespace予約 / SSOT化 / registry化 / consumer導入モデル / repo-local namespace・配布対象外制約 / .agentdev domain state / drafts配置 / sync除外 / consumer plugin checkout・install script分離 |
+| [REQ-0103](REQ-0103.md) | Artifact責任分界 | command / skill / template / script の責務境界、namespace、frontmatter 規約、runtime-only 配布制約、repo-local namespace・配布対象外制約、Skill 粒度・参照妥当性 |
 | [REQ-0104](REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type + scale 分類、workflow_route、SSoT、case-open/run/close基本契約、case-open共通終了の全フロー共通化、upstream handoff protocol |
 | [REQ-0105](REQ-0105.md) | RU lifecycle / Requirement Unit 管理 | RU lifecycle（生成・削除タイミング・一時成果物位置づけ）、session-sourced RU、RU frontmatter メタデータ、promoted/ の RU 化対象統一 |
 | [REQ-0106](REQ-0106.md) | Case実行オーケストレーション / Epic・Wave | Epic/Wave 並列実行、親Issue SSoT・子Issue実行状態整合、Wave rebase・コンフリクト時停止、委譲プロンプト事後検証、子Issue ⏭スキップ終了状態 |
@@ -31,6 +31,8 @@
 | [REQ-0131](REQ-0131.md) | case-close / 完了処理 | case-close、完了ゲート、PR merge（squash・リトライ・フォールバック）、Issue close、capture 回収（PR本文→domain state）、branch/worktree cleanup、ローカル変更検出時の安全停止、force-with-lease制約 |
 | [REQ-0132](REQ-0132.md) | case-open / Issue作成 | case-open、Issue本文生成（REQ番号埋め込み）、Standard/Epic flow ルーティング、RU削除責務（Issue作成+VERIFY成功後）、capture 非関与 |
 | [REQ-0133](REQ-0133.md) | case-update / Issue更新 | case-update、Issue本文更新（テンプレート構造維持）、コメント追加、REQ ファイル更新（直接commit+push）、レビューNG対応、フェーズ維持 |
+| [REQ-0134](REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install | source/projection layout、sync/migration script、repo type、consumer install |
+| [REQ-0135](REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry、`.sisyphus/` 除外 |
 
 ## Retired Requirements
 

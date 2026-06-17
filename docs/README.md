@@ -2,7 +2,7 @@
 
 ## Requirements
 
-現行要件の第一参照先は REQ-0101 から REQ-0133 までの 25 件（active REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）である。retired REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0103 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0135 までの 27 件（active REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）である。retired REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -31,6 +31,8 @@
 | [REQ-0131](requirements/REQ-0131.md) | case-close / 完了処理 |
 | [REQ-0132](requirements/REQ-0132.md) | case-open / Issue作成 |
 | [REQ-0133](requirements/REQ-0133.md) | case-update / Issue更新 |
+| [REQ-0134](requirements/REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install |
+| [REQ-0135](requirements/REQ-0135.md) | Drafts配置・Draft Type Registry |
 
 - [Requirements Index](requirements/README.md)
 - [Migration Table](requirements/mapping-table.md)
