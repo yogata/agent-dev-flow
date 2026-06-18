@@ -43,6 +43,7 @@
 | [REQ-0131](requirements/REQ-0131.md) | case-close / 完了処理 | case-close 完了ゲート・QG-4・達成判定 |
 | [REQ-0132](requirements/REQ-0132.md) | case-open / Issue作成 | case-open Epic・子Issue作成 |
 | [REQ-0133](requirements/REQ-0133.md) | case-update / Issue更新 | case-update Issue本文更新・コメント追加 |
+| [REQ-0136](requirements/REQ-0136.md) | REQ/SPEC/ADR 適正運用の自動化（3層ゲート + 新ワークフロー） | 3層ゲート自動化、spec-save 新設、req-define SPEC分離強化、IR-044、REQ健全性メトリクス、SPEC lifecycle（draft/accepted） |
 
 ## Retired REQ
 

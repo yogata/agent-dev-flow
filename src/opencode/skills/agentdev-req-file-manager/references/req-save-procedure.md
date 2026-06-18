@@ -20,7 +20,7 @@ REQ / ADR 保存前に、対象ドキュメントの種別が `docs/specs/docume
 
 ## REQ ファイル操作
 
-ドラフトに複数の `req-operation` と `target-req` のペアが含まれる場合は、各ペアを順次処理する。
+ドラフトに複数の `req-operation` と `target-req` のペアが含まれる場合は、各ペアを順次処理する。req-save が扱う operation type は REQ 操作（`create` / `append` / `update`）のみとする（REQ-0136-013）。SPEC 操作（`spec-create` / `spec-update`）は `target_spec` フィールドで識別され、spec-save コマンドが消費するため req-save の対象外とする。
 
 - CREATE: テンプレートを適用し、最大 REQ 番号 + 1 で `docs/requirements/REQ-{NNNN}.md` に保存する。生成後、`doc_requirement.md` の必須セクションと frontmatter 必須フィールドを確認する。
 - APPEND: 既存 REQ ファイルの要件テーブルに行を追加し、frontmatter `updated` を更新する。

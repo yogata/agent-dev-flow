@@ -142,6 +142,20 @@ DOC-MAP（索引）/ Guides（案内）
 - DOC-MAP は非正規索引であり、REQ/ADR/SPEC の内容を代替しない。
 - Guides はナビゲーション層であり、規範文書ではない。
 
+### SPEC lifecycle（ADR-0123）
+
+SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`）で成熟度を管理する。`status` は「現在仕様の基準」という SPEC の位置づけ（ADR-0103）を変更せず、その確定度合いを表す追加的なメタデータである。
+
+| status | 意味 | 検査対象 | 遷移契機 |
+|---|---|---|---|
+| `draft` | spec-save で保存された直後の未確定状態 | IR-044（REQ/SPEC 境界違反検出）等の対象外 | spec-save が新規 SPEC 作成時に付与（既定値） |
+| `accepted` | case-close で SPEC 確定チェック通過済み | すべての integrity rule の検査対象 | case-close Step 3 で実装が SPEC 内容を検証したことを確認時 |
+
+- 新規 SPEC 作成（spec-save）時は `status: draft` を付与する
+- 既存 SPEC へ追記時は当該 SPEC の `status` を変更しない
+- `draft` → `accepted` の昇格は case-close の責務（spec-save は accepted を付与しない）
+- `status` フィールドがない既存 SPEC は `accepted` と同等に扱う（後方互換）
+
 ## Scope Declaration
 
 `docs/specs/` は agent-dev-flow レポジトリ専用の repo-internal 設計文書である（ADR-0103）。他プロジェクトへの適用を意図しない。runtime command は SPEC ファイルに依存しない（ADR-0104）。
@@ -170,6 +184,7 @@ DOC-MAP（索引）/ Guides（案内）
 | REQ ID | 4桁ゼロ埋めの安定ID。active/retired を問わず再利用しない |
 | ADR ID | 4桁ゼロ埋め。現行 baseline は ADR-0101 以降（current collection）。旧番号帯 ADR-0001〜0099 は retired（`docs/adr/retired/`）。状態は frontmatter で管理（REQ-0112-047, 048） |
 | SPEC 配置 | `docs/specs/*.md` 直下 |
+| SPEC status | frontmatter `status`（`draft` / `accepted`）。既定は `draft`（spec-save 新規作成時）。`status` なしは `accepted` 相当（ADR-0123） |
 | Guides 配置 | `docs/guides/*.md` 直下 |
 | Retired REQ | `docs/requirements/retired/` に配置。現行要件判断に使用しない |
 | Retired ADR | `docs/adr/retired/` に配置。現行根拠として使用しない。履歴参照時は retired path を明示（REQ-0112-048） |

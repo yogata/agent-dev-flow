@@ -5,7 +5,7 @@
 ## 全体の流れ
 
 ```
-/agentdev/req-define → /agentdev/req-save（機能追加のみ）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
+/agentdev/req-define → /agentdev/req-save（機能追加のみ）→ /agentdev/spec-save（SPEC候補がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
 
 ## req-define
@@ -30,6 +30,18 @@ AI と対話して要件を整理するコマンド。
 **入力**: 要件doc（feature のみ）
 
 **出力**: REQ/ADR ファイル（commit/push まで実行）
+
+## spec-save
+
+req-define で分離された SPEC 候補（`draft-meta.spec-candidates`）を SPEC ファイルとして `docs/specs/` に保存・確定するコマンド。機能追加（feature）かつ SPEC候補がある場合のみ実行する。req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す（ADR-0123）。
+
+**入力**: 要件doc（feature のみ・SPEC候補あり）
+
+**出力**: SPEC ファイル（`docs/specs/*.md`）。新規作成時は `status: draft` を付与
+
+**SPEC lifecycle**: SPEC は frontmatter `status`（`draft` / `accepted`）で成熟度を管理する。`draft`（spec-save で保存直後）→ `accepted`（case-close で実装が SPEC 内容を検証した旨を確認）の順で昇格する。
+
+**スキップ条件**: `spec-candidates` が空、または旧形式 draft（`spec-candidates` フィールドなし）の場合はスキップし従来ワークフローで実行（後方互換）。
 
 ## case-open
 
@@ -86,6 +98,7 @@ PR をマージし、Issue をクローズするコマンド。
 2. 要件・SPEC・DOC-MAP の整合性確認
 3. ADR 作成済みかの確認
 4. マージ済み PR 本文から Findings/Capture候補を回収し、intake / learning に分離して保存
+5. PR 本文の `## SPEC確定候補` から SPEC 確定フローを実行（SPEC status の draft → accepted 昇格、または spec-save 再起動の提案）
 
 ### Epic 自動クローズ
 
@@ -112,8 +125,8 @@ Issue の work_type に基づき、経路（`/agentdev/req-save` の要否）が
 
 入力要件docの draft-meta から work_type を読み取り、工程を分岐する:
 
-- **feature**: `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
-- **bugfix / maintenance / docs_chore**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` をスキップ）
+- **feature**: `/agentdev/req-save` → `/agentdev/spec-save`（SPEC候補がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
+- **bugfix / maintenance / docs_chore**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` ・ `/agentdev/spec-save` をスキップ）
 
 ### 自走対象
 
