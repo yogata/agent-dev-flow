@@ -40,7 +40,7 @@ upstream handoff metadata（`agentdev_handoff: true`）を RU frontmatter に転
 
 ### case-run
 
-Issue 本文、要件doc、Requirement Source に `agentdev_handoff: true` がある場合、実装を開始せず停止する。agent-dev-flow repository への手動取り込み対象として報告する。
+Issue 本文、要件doc本文に `agentdev_handoff: true` がある場合、実装を開始せず停止する。agent-dev-flow repository への手動取り込み対象として報告する。
 
 ## 参照
 

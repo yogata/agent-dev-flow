@@ -48,7 +48,7 @@ agent: sisyphus
      - ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
      - 当該ケースで消費した RU ファイル（`.agentdev/backlog/req-units/RU-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
      - 検証結果（成功・残存ファイル一覧）を case-auto 完了報告（Step 8）に含めること
-5. **工程間の状態引き継ぎ**: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) 要件docの Requirement Source セクション内容（RU 削除判定に使用） (2) RU ファイルパス（case-open 相当処理の RU 削除で使用） (3) capture 対象情報（case-close 相当処理の learning/intake capture で使用）
+5. **工程間の状態引き継ぎ**: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) RU ファイルパス（case-open 相当処理の RU 削除で使用） (2) capture 対象情報（case-close 相当処理の learning/intake capture で使用）
 6. **複数REQ対応**: req-save 相当処理の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールをそのまま使用する。case-auto 自体に Issue 階層決定ロジックを持ってはならない。req-save 相当処理から case-open 相当処理へ状態を引き継ぐ際、case-auto は複数 REQ doc の保存結果をフィルタリングや再評価なしでそのまま渡す。case-auto は Epic Issue 化の判定に関与しないこと（REQ-0114-057）。case-open の判定結果に従うこと
 7. **停止条件の検出**: 以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:
    - (1) req-define合意要件からの逸脱
