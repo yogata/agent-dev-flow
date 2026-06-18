@@ -9,7 +9,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 | Path | 状態 | Producer | Consumer / Next command | Retention / Removal |
 |------|------|----------|------------------------|---------------------|
 | `intake/inbox/*.md` | raw item | `intake-capture`, `intake-from-github` | `intake-promote` | `intake-promote` 成功後に `archive/` へ移動 |
-| `intake/promoted/*.md` | promoted artifact | `intake-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
+| `intake/promoted/*.md` | promoted artifact | `intake-promote`, `inspect-promote`(--auto) | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `intake/archive/rejected/*.md` | 却下（終端） | `intake-promote` | なし | 永続（履歴参照） |
 | `intake/archive/promoted/*.md` | promote 済み（終端） | `intake-promote` | なし | 永続（履歴参照） |
 | `learning/inbox.md` | 未整理エントリ | `learning-capture`（skill） | `learning-promote` | `learning-promote` 成功後にクリア |
@@ -22,6 +22,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 | `integrity/reports/*.md` | 検証レポート（非永続） | `docs-check` | `docs-check`（intake化）・ユーザー参照 | 非永続・git管理対象外（`.gitignore` で除外） |
 | `inspect/inbox/*.md` | 未分類 inspect finding | `inspect-docs`, `inspect-skills` | `inspect-promote` | `inspect-promote` 成功後に `promoted/` または `archive/` へ移動 |
 | `inspect/promoted/*.md` | promoted artifact（採用済み・RU化対象） | `inspect-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
+| `inspect/promoted/auto-promote-log.md` | `--auto` 実行ログ（append-only） | `inspect-promote`(--auto) | ユーザー参照・revoke 手順 | 永続（トレーサビリティ） |
 | `inspect/archive/rejected/*.md` | 却下（終端） | `inspect-promote` | なし | 永続（履歴参照） |
 
 ## .agentdev/ と .sisyphus/ の境界
