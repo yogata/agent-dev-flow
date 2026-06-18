@@ -11,15 +11,13 @@
  * Uses child_process.execSync to run the CLI script (CLI execution result verification).
  */
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
-import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync } from "fs";
+import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readdirSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
 
 const SCRIPT_DIR = import.meta.dir;
 const FIXTURES_DIR = join(SCRIPT_DIR, "fixtures");
 const PARENT_SCRIPTS_DIR = join(SCRIPT_DIR, "..");
-const CHECK_INTEGRITY_SCRIPT = join(PARENT_SCRIPTS_DIR, "check_integrity.ts");
-const CLI_UTILS_SCRIPT = join(PARENT_SCRIPTS_DIR, "cli_utils.ts");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `issue657-regression-${crypto.randomUUID().slice(0, 8)}`;
 const TEMP_ROOT = join(TEMP_BASE, RUN_ID);
@@ -70,8 +68,11 @@ function copyScripts(fixtureRoot: string): void {
     "scripts",
   );
   mkdirp(dest);
-  copyFileSync(CHECK_INTEGRITY_SCRIPT, join(dest, "check_integrity.ts"));
-  copyFileSync(CLI_UTILS_SCRIPT, join(dest, "cli_utils.ts"));
+  for (const f of readdirSync(PARENT_SCRIPTS_DIR)) {
+    if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+      copyFileSync(join(PARENT_SCRIPTS_DIR, f), join(dest, f));
+    }
+  }
 }
 
 /**

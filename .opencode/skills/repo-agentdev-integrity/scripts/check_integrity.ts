@@ -24,10 +24,18 @@ import {
   type FindingCategory,
   type FindingRoute,
 } from "./cli_utils.ts";
+import { parseIntegrityRuleCatalog } from "./integrity_catalog_parser.ts";
+import { parseReqImpactMap } from "./req_impact_map_parser.ts";
+import {
+  selectApplicableRuleIds,
+  applicableCheckCategories,
+} from "./gate_filter.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
-const USAGE = "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification]"; // REQ-0108-196
+const USAGE =
+  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] " +
+  "[--gate <full-audit|delta-guard|impact-guard>] [--paths <csv>] [--reqs <csv>]";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -6881,7 +6889,13 @@ function checkReqVerificationBasis(root: string): CheckResult[] {
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  const options = parseArgs(args);
+  let options;
+  try {
+    options = parseArgs(args);
+  } catch (e) {
+    console.error(`[integrity] ${e instanceof Error ? e.message : String(e)}`);
+    process.exit(EXIT_ERROR);
+  }
 
   if (options.help) {
     printHelp(SCRIPT_NAME, DESCRIPTION, USAGE);
@@ -7039,7 +7053,40 @@ async function main(): Promise<void> {
     results.push(...checkDocumentClassificationPolicy(root));
   }
 
-  const processed = processResults(results);
+  // REQ-0136-040 (Issue #898 Task 1.1): 3-layer gate filtering.
+  // full-audit (default) leaves `results` untouched → byte-identical behavior.
+  let filtered = results;
+  if (options.gate !== "full-audit") {
+    const catalogPath = path.join(specsDir, "integrity-rule-catalog.md");
+    const impactMapPath = path.join(specsDir, "req-impact-map.md");
+    let catalog, impactMap;
+    try {
+      catalog = parseIntegrityRuleCatalog(
+        fs.readFileSync(catalogPath, "utf-8"),
+      );
+      impactMap = parseReqImpactMap(
+        fs.readFileSync(impactMapPath, "utf-8"),
+      );
+    } catch (e) {
+      console.error(
+        `[integrity] gate "${options.gate}" requires catalog/impact-map parse: ${
+          e instanceof Error ? e.message : String(e)
+        }`,
+      );
+      process.exit(EXIT_ERROR);
+    }
+    const selection = selectApplicableRuleIds(catalog, impactMap, options);
+    for (const note of selection.notes) {
+      console.error(`[integrity] gate: ${note}`);
+    }
+    const cats = applicableCheckCategories(selection.ruleIds);
+    filtered = results.filter((r) => cats.has(r.check));
+    console.error(
+      `[integrity] gate=${options.gate} applicable_rules=${selection.ruleIds.size} check_categories=${cats.size} results=${filtered.length}/${results.length}`,
+    );
+  }
+
+  const processed = processResults(filtered);
 
   const summary = computeSummary(processed);
 
