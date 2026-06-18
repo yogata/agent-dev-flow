@@ -12,7 +12,7 @@ agent: sisyphus
 - ユーザーの自然言語による機能追加/バグ修正の説明
 - GitHub Issue URL（既存Issueの場合）
 - エラーログ（バグ修正の場合）
-- **ユーザーが明示した入力ファイル**（Requirement Source）: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
+- **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
 - req-save SPLIT 検出時の finding（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
 - inspect-skills 診断結果の finding（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。read-only input として扱い、未確認事項・採否未確定事項を要件本文に混入させない（inspect lifecycle、REQ-0103-140-151 相当）
 - **promoted 直読み禁止**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない。backlog-review による RU 化を経由すること
@@ -36,7 +36,7 @@ agent: sisyphus
    **3-1. 定量的データ検証**: `glob docs/requirements/REQ-*.md`（および副次的に `glob docs/adr/ADR-*.md`）で実ファイルを列挙し、AGENTS.md 等の文書記載レンジ（例: "REQ-0101〜REQ-0133"）と照合すること。乖離を発見した場合は文書修正または実ファイル確認により解消すること（REQ-0102-002）。詳細手順は `agentdev-req-analysis` を参照
 
 4. **要件展開** → `agentdev-req-analysis` の分析観点に従って網羅。詳細ゲートは `agentdev-req-analysis` を参照
-   - **4-1. 関連ドキュメント更新候補抽出**: 変更影響候補を抽出し、ドラフトに保持する。委譲接続点: サブエージェントは探索結果・分類候補・根拠のみを返し、親エージェントがドラフト反映を判断する
+   - **4-1. 変更影響候補抽出**: 変更影響候補を抽出し、ドラフトに保持する。委譲接続点: サブエージェントは探索結果・分類候補・根拠のみを返し、親エージェントがドラフト反映を判断する
    - **4-2. 分類ゲート**: 各要件行候補を「変更後仕様」or「反映作業」に分類する。委譲接続点: サブエージェントは分類候補のみを返し、親エージェントが要件doc混入可否を判断する
    - **4-3. 文書分類妥当性検証**: 各要件の対象ドキュメント種別を検証する。委譲接続点: サブエージェントは不適合候補と根拠のみを返し、親エージェントがflag記録を判断する
 
@@ -50,7 +50,7 @@ agent: sisyphus
 
    **5-3. 作業手段ADR拒否ゲート**: ADR候補が削除・廃止・移行・統合・再構築・完全削除そのものを主題にしている場合、ADR候補から除外する（REQ-0101-044）。過去判断の除去は新規ADRではなくretire/supersedeで処理する（REQ-0101-045）。委譲接続点: サブエージェントは除外候補と根拠のみを返し、親エージェントがADR候補提示可否を判断する
 
-6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。Requirement Source セクション・関連ドキュメント更新候補セクションを適宜追加
+6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。
    - **6-0. 定義完全性ゲート（QG-1）**: 要件doc生成後、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、REQ/SPEC 分類・ADR ゲート・チェックボックス測可能性・必須セクション完全性を検証する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は壁打ち（Step 2）へ差し戻し
    - **6-1. operation_units セクション生成**: 複数RU入力時の統合/分離結果（Step 10-2）を基に `operation_units` セクションを生成する。各 OU は `ou_id`, `source_ru`, `target_req`, `operation`, `scale`, `depends_on`, `recommended_order`, `issue_policy`, `result` フィールドを持つ（REQ-0102-033〜035）。単一REQ操作の場合も 1 件の OU として出力する
    - **6-2. execution_groups セクション生成**: OU 群を分析し、Epic 候補グループを `execution_groups` セクションに記録する。各 execution_group は `id`, `type`, `purpose`, `included_ou`, `rationale` を持つ（REQ-0102-036）。記録は提案であり、Issue 発行は行わない（REQ-0102-038）
