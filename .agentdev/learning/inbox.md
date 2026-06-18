@@ -37,3 +37,11 @@
 
 **再発防止**: case-run から driver subagent を起動する際、プロンプトの CONTEXT に「worktree 内 `.opencode/` は空・source/projection は手動両辺編集・同期スクリプト非依存」を必ず明記する。提出フェーズのローカル検証で source-projection 系整合性検査を含む場合は worktree 内で失敗することを前提に扱う。
 
+## 2026-06-18: REQ に command の Step 番号を固定すると drift する — 振る舞いで書き command reference 参照に
+
+**状況**: Issue #903 (RU-5) の IR-044 クリーンアップで、REQ-0131-010 が「`case-close` Step 8 乖離検出において…」と記載していたが、現行 `case-close.md` では乖離検出（docs/検証）は Step 3 に該当し、REQ の Step 番号が実装と drift していた。REQ-0104-047 / REQ-0114-060/063 / REQ-0136-010 でも同様に command の Step 番号が REQ に固定されていた。IR-044 はこれらを SPEC 詳細（Step 番号）混入として検出した。
+
+**学び**: REQ 要件行に特定 command の Step 番号を書くと、command のリファクタ（Step 番号変更）で即座に REQ が陳腐化する。REQ には振る舞い（何をするか・なぜ）を書き、具体的ステップ番号は command reference（`.md`）側にのみ保持し、REQ からは「対象ステップの詳細は command reference 参照」と抽象化する。これが REQ/SPEC 責務分離（REQ-0101-068）の Step 番号項目の実践的意味でもある。
+
+**再発防止**: REQ を新規作成・更新する際、要件行に command の Step 番号を直接書かない。振る舞いで記述し、ステップ詳細は command reference へ委ねる。IR-044 が Step 番号混入を検出したら移行（番号除去 + 振る舞い残留）で是正する。
+
