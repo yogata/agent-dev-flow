@@ -36,9 +36,12 @@ agent: sisyphus
    - **case-run の driver 委譲モデル**: case-run は実装実行を driver subagent（`agentdev-execution-backend`）経由で外部実行バックエンドへ委譲し、自身は orchestration に専念する（ADR-0114）。case-auto は case-run の driver 委譲モデルを変更せず、実装実行・PR作成を自ら行わない。driver result（completed(pr)/blocked/failed）の処理は case-run 定義に従う
    - case-auto は req-save / case-open に draft path と OU ID のみを渡すこと（REQ-0114-052）。OU 本文の切り出しは行わない
    - case-auto は OU の統合・分割、REQ 操作分類、Issue 階層判定を再評価しないこと（REQ-0114-054）
-   - case-open 相当処理の完了後、出力を確認して以下のいずれかに分岐する:
-     - **Standard flow（単一 Issue）**: 既存の直列フロー（case-run → case-close）をそのまま実行
-     - **Epic Issue（マルチREQ または 単一REQ Epic flow）**:
+    - case-open 相当処理の完了後、出力を確認して以下のいずれかに分岐する:
+      - **Standard flow（単一 Issue）**:
+        1. case-open の共通終了処理（Step 17〜18-2: コメント追加・ドラフト削除・RU削除・完了報告）の完了を確認すること（REQ-0104-045〜047）
+        2. **クリーンアップ検証ゲート**（後述）を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0137-007）。残存時は停止すること
+        3. 既存の直列フロー（case-run → case-close）を実行
+      - **Epic Issue（マルチREQ または 単一REQ Epic flow）**:
        1. case-open の共通終了処理（Step 17〜18-2: コメント追加・ドラフト削除・RU削除・完了報告）の完了を確認すること（REQ-0104-045〜047）
        2. **クリーンアップ検証ゲート**を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0114-060〜062）。残存時は停止すること
        3. Step 4-1〜4-3 のキュー処理に進む
@@ -58,10 +61,10 @@ agent: sisyphus
      - Epic Issue の子Issue全ステータスが CLOSED の場合 → Epic 自動クローズ確認（case-close Step 8 相当） → 全体完了報告
       - 未クローズの子Issue が残る場合（blocked / failed） → 部分完了報告
      - 停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告すること（REQ-0114-056）
-   - **クリーンアップ検証ゲート**: Epic Issue の Step 4-1 キュー処理開始前に、以下を検証する（REQ-0114-060〜063）:
-     - ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
-     - 当該ケースで消費した RU ファイル（`.agentdev/backlog/req-units/RU-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
-     - 検証結果（成功・残存ファイル一覧）を case-auto 完了報告（Step 8）に含めること
+    - **クリーンアップ検証ゲート**: Standard flow の case-run 移行前・Epic Issue の Step 4-1 キュー処理開始前の双方で、以下を検証する（REQ-0114-060〜063, REQ-0137-007）:
+      - ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
+      - 当該ケースで消費した RU ファイル（`.agentdev/backlog/req-units/RU-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
+      - 検証結果（成功・残存ファイル一覧）を case-auto 完了報告（Step 8）に含めること
 5. **工程間の状態引き継ぎ**: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) RU ファイルパス（case-open 相当処理の RU 削除で使用） (2) capture 対象情報（case-close 相当処理の learning/intake capture で使用）
 6. **複数REQ対応**: req-save 相当処理の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールをそのまま使用する。case-auto 自体に Issue 階層決定ロジックを持ってはならない。req-save 相当処理から case-open 相当処理へ状態を引き継ぐ際、case-auto は複数 REQ doc の保存結果をフィルタリングや再評価なしでそのまま渡す。case-auto は Epic Issue 化の判定に関与しないこと（REQ-0114-057）。case-open の判定結果に従うこと
 7. **停止条件の検出**: 以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:

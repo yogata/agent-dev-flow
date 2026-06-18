@@ -76,11 +76,11 @@ agent: sisyphus
  15. **.agentdev 変更の commit と push**:
      - `git diff --name-only` で `.agentdev/` 配下の変更を確認
      - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
-     - **変更あり時**:
-        1. `git add` は `.agentdev/` のみ対象
-        2. commit message: `chore(agentdev): promote learning findings`
-        3. `git push` 実行
-        4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
+      - **変更あり時**:
+         1. `git add` は `.agentdev/learning/` 配下のみを対象とする（REQ-0137-005）。並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする（REQ-0137-002）。`.agentdev/` 全体の一括スコープは禁止し、スイープ操作（`git add -A` / `git add .` 等）も禁止
+         2. commit message: `chore(agentdev): promote learning findings`
+         3. `git push` 実行
+         4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
 
 16. **完了報告** → template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`。以下を含める:
     - 8軸評価サマリ（加重合計スコア分布）

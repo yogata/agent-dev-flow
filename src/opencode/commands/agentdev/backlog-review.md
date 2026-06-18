@@ -105,9 +105,9 @@ RU 生成が成功した promoted artifact のみを削除する:
 - `git diff --name-only` で `.agentdev/` 配下の変更を確認
 - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
 - **変更あり時**:
-  1. `.agentdev/` 配下のみ `git add`
+  1. 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする（REQ-0137-002/005）。生成した RU は `.agentdev/backlog/req-units/` 配下、削除した promoted artifact は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>` / `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止
   2. commit message: `chore(agentdev): generate requirement units via backlog-review`
-  3. `git push` を実行。失敗時は構造化エラーメッセージを表示して停止
+  3. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止
 
 ### Step 8: 完了報告
 
