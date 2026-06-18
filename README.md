@@ -21,6 +21,7 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 |-----------|-------------|------|
 | 要件を整理したい | `/agentdev/req-define` | 要件doc（draft） |
 | 要件docがあり、機能追加の場合 | `/agentdev/req-save` | REQ/ADR ファイル |
+| REQ/ADR ファイルがあり、SPEC候補がある場合 | `/agentdev/spec-save` | SPEC ファイル（`docs/specs/`） |
 | REQ ファイルまたは要件docがある | `/agentdev/case-open` | GitHub Issue |
 | Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
@@ -55,6 +56,7 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 ```
 /agentdev/req-define    # 要件を壁打ちする
 /agentdev/req-save      # REQ/ADR ファイルとして保存（機能追加のみ）
+/agentdev/spec-save     # SPEC候補を docs/specs/ に保存（SPEC候補がある場合・機能追加のみ）
 /agentdev/case-open     # Issue を作成
 /agentdev/case-run      # 実装して PR を作成
 /agentdev/case-close    # PR をマージして Issue をクローズ
@@ -63,7 +65,7 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 最大自走モード。req-define 完了後、後続工程を一括実行する。
 
 ```
-/agentdev/case-auto     # req-save → case-open → case-run → case-close を自走（明示指定時のみ）
+/agentdev/case-auto     # req-save → spec-save → case-open → case-run → case-close を自走（明示指定時のみ）
 ```
 
 ## Consumer Repository Installation

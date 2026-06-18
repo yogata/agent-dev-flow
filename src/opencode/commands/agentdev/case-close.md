@@ -41,7 +41,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
    - 未達項目が残る場合 → 構造化エラーで停止（G08）
    - PR存在確認
 
-3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認。不足時は警告表示してユーザー判断を仰ぐ
+3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認。不足時は警告表示してユーザー判断を仰ぐ。PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（Step 3-2）を実行する
     - **文書分類ポリシー適合確認**: `docs/specs/document-model.md` の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する
 
 3-1. **close 時 SPEC / commands / skills 更新漏れの局所確認**: 実装完了・PRマージ前に、今回の変更に伴う以下の更新漏れを局所的に確認する:
@@ -50,6 +50,17 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
     - 変更に伴う skill 責務境界の変更漏れ
     - 更新漏れを検出した場合は警告表示してユーザー判断を仰ぐ
     - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない
+
+3-2. **SPEC 確定フロー（ADR-0123 Decision #4, REQ-0136-015）**: PR 本文の `## SPEC確定候補` セクション（case-run / driver が記録）を読み取り、SPEC の確定・昇格を処理する。セクションが存在しない・空の場合はスキップする:
+    - **SPEC確定候補の提示**: SPEC確定候補一覧（対象 SPEC・内容・分類）をユーザーに提示する
+    - **確定判断**: 各候補について以下のいずれかをユーザー承認のもと選択する:
+      - (a) **case-close 内で SPEC 昇格**: 対象 SPEC の `status` を `draft` → `accepted` に昇格する（編集スコープ: `docs/specs/**`）。実装が SPEC 内容を検証済みであることを確認できた場合
+      - (b) **spec-save 再起動の提案**: SPEC確定候補が SPEC ファイル未保存（新規 SPEC 候補・追記候補）の場合、`/agentdev/spec-save` の再実行を提案し case-close は完了させる
+      - (c) **見送り**: 確定不要と判断した場合、候補を Findings / Capture候補 に準じて記録し後続へ委ねる
+    - **SPEC status 昇格タイミング（draft → accepted）**: 以下の両方を満たした場合に昇格させる:
+      - 対象 SPEC が `status: draft` であること
+      - 今回の実装（PR）が当該 SPEC の内容を検証（実装と整合）したことを case-close Step 3 の docs/検証で確認できたこと
+    - 昇格時は SPEC frontmatter `status` を `accepted` に更新し、`updated` 日付を更新する
 
 4. **PRマージ**:
    - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）
@@ -123,3 +134,5 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G19: Step 12 は結果状態を分離して報告。`.agentdev` push失敗時は完了扱いにしない
 - G20: 完了条件チェックボックスの評価・更新は case-close の専任責務（ADR-0114）。case-run / driver / 外部実行バックエンドは更新しない。case-close は別コンテキストで Issue 本文を再読込して最終完了判定し、更新後に再読込 VERIFY を必ず実施する
 - G21: case-close の capture 責務は回収・保存。PR 本文から intake / learning を分離回収し domain state に保存する。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照
+- G22: SPEC status 昇格（draft → accepted）は case-close の責務（ADR-0123）。昇格は対象 SPEC が `draft` かつ今回の実装が SPEC 内容を検証済みの場合のみ実施する。spec-save は accepted を付与しない
+- G23: SPEC確定候補の処理（Step 3-2）は PR 本文の `## SPEC確定候補` セクションを入力とし、`## Findings / Capture候補` とは区別して扱う

@@ -1,11 +1,11 @@
 ---
-description: req-save→case-open→case-run→case-closeを順次自走実行する（明示指定時のみ）
+description: req-save→spec-save→case-open→case-run→case-closeを順次自走実行する（明示指定時のみ）
 agent: sisyphus
 ---
 
 # 最大自走モード
 
-要件docから req-save → case-open → case-run → case-close を順次実行し、repo内変更に限りマージまで自走する。標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
+要件docから req-save → spec-save → case-open → case-run → case-close を順次実行し、repo内変更に限りマージまで自走する。標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
 
 ## Input
 
@@ -24,10 +24,14 @@ agent: sisyphus
    - **要件doc入力モード**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
 2. **work_type 読取**: 入力要件docの draft-meta セクションから work_type を取得する
 3. **工程分岐**:
-   - **Issue番号/URL入力**: case-run → case-close（req-save・case-open・work_type読取をスキップ）。Step 1 で解決した Issue番号/URL を case-run 相当処理にそのまま渡す。draft-meta の読み取りを行わない
-   - feature: req-save → case-open → case-run → case-close
-   - bugfix / maintenance / docs_chore: case-open → case-run → case-close（req-save をスキップ）
-4. **各工程の実行**: 既存コマンド定義（req-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）も含めて既存コマンド定義に従うこと
+   - **Issue番号/URL入力**: case-run → case-close（req-save・spec-save・case-open・work_type読取をスキップ）。Step 1 で解決した Issue番号/URL を case-run 相当処理にそのまま渡す。draft-meta の読み取りを行わない
+   - feature: req-save → spec-save → case-open → case-run → case-close
+     - **spec-save 実行判定（ADR-0123 Decision #3, REQ-0136-014）**: req-save 完了後に draft-meta の `spec-candidates` を確認する:
+       - `spec-candidates` が存在し空でない場合 → spec-save を実行（SPEC候補を `docs/specs/` へ保存）
+       - `spec-candidates` が空配列の場合 → spec-save をスキップし case-open へ進む
+       - `spec-candidates` フィールドが存在しない（旧形式 draft）場合 → **後方互換**: spec-save をスキップし従来ワークフロー（req-save → case-open → …）で実行
+   - bugfix / maintenance / docs_chore: case-open → case-run → case-close（req-save・spec-save をスキップ）
+4. **各工程の実行**: 既存コマンド定義（req-save.md / spec-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）も含めて既存コマンド定義に従うこと
    - **品質ゲート（QG-1〜QG-4）の継承**: case-auto は QG を独自実装しない。構成コマンド（req-save: QG-1, case-open: QG-2, case-run: QG-3, case-close: QG-4）がそれぞれ `agentdev-quality-gates` スキルを参照して Gate を適用する。case-auto は工程間制御のみを担い、Gate 判定を再評価・差し替えしない（G07, G09）
    - **case-run の driver 委譲モデル**: case-run は実装実行を driver subagent（`agentdev-execution-backend`）経由で外部実行バックエンドへ委譲し、自身は orchestration に専念する（ADR-0114）。case-auto は case-run の driver 委譲モデルを変更せず、実装実行・PR作成を自ら行わない。driver result（completed(pr)/blocked/failed）の処理は case-run 定義に従う
    - case-auto は req-save / case-open に draft path と OU ID のみを渡すこと（REQ-0114-052）。OU 本文の切り出しは行わない
@@ -68,7 +72,7 @@ agent: sisyphus
 8. **完了報告**: 最終工程（case-close）の完了報告をそのまま出力する。Epic Issue を伴うキュー実行時は、完了・失敗・スキップ子Issue一覧を含める。停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する（REQ-0114-056）
 8-1. **Standard flow 逐次OU処理ループ**: Standard flow の case-close 完了後、未処理 OU が残存する場合は次 OU の処理を自動的に開始する（REQ-0114-065〜067）:
    - 処理対象の全 OU から次の未処理 OU を特定する（`recommended_order`, `depends_on` に基づく）
-   - 次 OU が存在する場合: 当該 OU の work_type に応じた工程分岐で Step 2 に戻る（feature: req-save → case-open → …、bugfix/maintenance/docs_chore: case-open → …）
+    - 次 OU が存在する場合: 当該 OU の work_type に応じた工程分岐で Step 2 に戻る（feature: req-save → spec-save → case-open → …、bugfix/maintenance/docs_chore: case-open → …）。feature の場合の spec-save 実行判定は Step 3 に従う
    - 全 OU の処理が完了した場合のみ全体完了報告を出力する（REQ-0114-067）
    - 次 OU の draft ファイルが存在しない場合: 停止し完了済み OU・未実行 OU・再開コマンドを報告する（REQ-0114-066）
    - 逐次OU処理中に停止条件（Step 7）を検出した場合: 完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する
@@ -86,7 +90,7 @@ agent: sisyphus
 ### 委譲・参照制約
 - G07: 既存コマンドの手順をcase-auto定義内に再実装しない
 - G08: 工程固有の詳細手順とcase-auto定義が矛盾する場合、工程固有処理は既存コマンド定義を優先し、自走境界・入力解決・工程間制御はcase-auto定義を優先する
-- G09: 既存のreq-save / case-open / case-run / case-closeの責務を変更しない
+- G09: 既存のreq-save / spec-save / case-open / case-run / case-closeの責務を変更しない
 - G13: case-auto は Issue 階層決定ロジックを持ってはならない。複数 REQ doc または scale:large の場合は case-open の Issue 構造ルールに委譲する
 - G14: case-auto は req-save 相当処理から case-open 相当処理への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価してはならない。保存結果をそのまま渡す
 - G15: case-auto は Wave 実行プロトコル（`agentdev-workflow-orchestration` 参照）を実装してはならない。これらは case-run Epic Orchestrator に委譲する

@@ -19,7 +19,7 @@ AgentDevFlow で使う用語の定義。
 | backlog-review | バックログ・レビュー | promoted artifact を分析・統合し、ユーザー承認後に RU を生成するコマンド |
 | docs-check | ドックス・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド（旧称: integrity-check）。配布対象外コマンド `/repo/docs-check` に配置し、`/agentdev/*` コマンド体系とは区別する（ADR-0106, REQ-0108-156） |
 | inspect-docs | インスペクト・ドックス | docs 全体の意味整合性を検出し、inspect finding を出力するコマンド（旧称: req-restructure-review, docs-review, diagnostics-docs） |
-| case-auto | ケース・オート | 最大自走モード。req-save → case-open → case-run → case-close を順次実行するコマンド |
+| case-auto | ケース・オート | 最大自走モード。req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close を順次実行するコマンド |
 
 ## 成果物
 

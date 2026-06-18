@@ -22,7 +22,7 @@ agent: sisyphus
 0-1. **OU 選択ゲート**: ドラフトに `operation_units` セクションがある場合、処理対象 OU を決定する（REQ-0104-035〜037）:
      - OU ID が指定されている場合 → 指定された OU の req-save result を読み取り、その OU だけを Issue 化する
      - OU ID 指定なし・OU 1 件 → その OU を自動選択して処理する
-     - OU ID 指定なし・OU 2 件以上 → OU 一覧（`ou_id`, `target_req`, `operation`, `result`）を表示して停止する。ユーザーに OU ID の指定を求める
+     - OU ID 指定なし・OU 2 件以上 → OU 一覧（`ou_id`, `target_req`, `target_spec`, `operation`, `result`）を表示して停止する。ユーザーに OU ID の指定を求める
      - `operation_units` セクションがない場合 → 従来どおり全要件docを処理する（後方互換）
 
 1. 要件docからIssue本文を生成。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントはREQ読解・テンプレート充足検査・完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う

@@ -12,7 +12,7 @@ AgentDevFlow は3つのパイプラインで構成される:
 
 | パイプライン | コマンド | 目的 |
 |---|---|---|
-| req/case | req-define → req-save → case-open → case-run → case-close → case-update | 要件定義から実装完了まで |
+| req/case | req-define → req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close → case-update | 要件定義から実装完了まで |
 | learning | learning-capture → learning-promote | 学びの蓄積・昇華 |
 | intake | intake-capture / intake-from-github → intake-promote | 改善候補の収集・昇華 |
 
@@ -22,13 +22,13 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 
 | 分類 | コマンド | 目的 |
 |---|---|---|
-| 主フロー | req-define → req-save → case-open → case-run → case-close → case-update | 要件定義から実装完了までの標準ワークフロー |
+| 主フロー | req-define → req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close → case-update | 要件定義から実装完了までの標準ワークフロー |
 | 最大自走入口 | case-auto | req-define 完了後の後続工程を一括自走する追加入口。標準フローを置換しない（REQ-0104-049） |
 | 補助フロー | intake-capture, intake-from-github, intake-promote, learning-promote, backlog-review | 改善候補収集・学び蓄積・RU化。主フローを補完 |
 | 検出フロー | inspect-docs, inspect-skills, inspect-promote | 文書・スキルの意味検出・分類・昇格 |
 | repo-local検査 | /repo/docs-check | AgentDevFlow 本体リポジトリ内の機械的整合性検査 |
 
-- case-auto は標準フロー（req-save → case-open → case-run → case-close）を内部的に呼び出す追加入口であり、標準フローを置換・廃止しない（REQ-0114-017）。
+- case-auto は標準フロー（req-save → spec-save → case-open → case-run → case-close）を内部的に呼び出す追加入口であり、標準フローを置換・廃止しない（REQ-0114-017）。spec-save は draft-meta.spec-candidates が空の場合スキップし、旧形式 draft（spec-candidates フィールドなし）は後方互換で従来順序で実行する（ADR-0123, REQ-0136-014）。
 - 補助フロー・検出フロー・repo-local検査は、主フロー・最大自走入口とは独立して実行可能である。
 - 検出フローの出力（inspect finding）は、inspect-promote → backlog-review を経て RU 化され、req-define の入力となる。
 
@@ -125,6 +125,7 @@ draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 |---|---|---|---|
 | `/agentdev/req-define` | セッション会話 | 機能追加: `.agentdev/drafts/req-draft-*.md`、その他: セッション内要件doc | 壁打ち |
 | `/agentdev/req-save` | `.agentdev/drafts/req-draft-*.md` | docs/requirements/REQ, docs/adr/ADR-01XX, docs index | 壁打ち |
+| `/agentdev/spec-save` | `.agentdev/drafts/req-draft-*.md`（SPEC候補: draft-meta.spec-candidates） | docs/specs/SPEC, docs/specs index, DOC-MAP | 壁打ち |
 | `/agentdev/case-open` | 要件doc, specs READ, ADR READ | GitHub Issue | 定義→実行境界 |
 | `/agentdev/case-run` | GitHub Issue, specs READ+WRITE, ADR READ | GitHub PR + worktree + ブランチ | レビュー完了 |
 | `/agentdev/case-auto` | 要件doc（明示/draft/セッション） | req-save〜case-close の各出力 | 自走完了 |
@@ -144,6 +145,7 @@ draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 |---|---|---|---|---|---|---|---|
 | `/agentdev/req-define` | — | — | READ | READ（明示入力時） | — | — | — |
 | `/agentdev/req-save` | — | WRITE | WRITE | WRITE（SPLIT検出時） | — | — | — |
+| `/agentdev/spec-save` | WRITE | — | — | — | — | — | — |
 | `/agentdev/case-open` | READ | READ | READ | — | — | — | — |
 | `/agentdev/case-run` | READ+WRITE | READ | READ | — | — | — | — |
 | `/agentdev/case-close` | — | — | READ | — | WRITE（capture） | WRITE（capture） | — |
@@ -170,7 +172,7 @@ work_type は bugfix / feature / maintenance / docs_chore の 4 値である（R
 | work_type | 付与ラベル | 規模 | docs/更新 | ワークフロー経路 |
 |---|---|---|---|---|
 | bugfix | `bug`, `critical` | 小 | 関連docs（矛盾時のみ） | req-define → case-open → case-run → case-close |
-| feature | `enhancement`, `feature` | 中 | あり（REQ/specs/ADR + 関連docs） | req-define → req-save → case-open → case-run → case-close |
+| feature | `enhancement`, `feature` | 中 | あり（REQ/specs/ADR + 関連docs） | req-define → req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close |
 | maintenance | `refactor`, `maintenance` | 小 | 関連docs（矛盾時のみ） | req-define → case-open → case-run → case-close |
 | docs_chore | `docs`, `chore` | 小 | 関連docs（矛盾時のみ） | req-define → case-open → case-run → case-close |
 
