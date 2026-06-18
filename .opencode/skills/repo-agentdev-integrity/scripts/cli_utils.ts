@@ -83,6 +83,7 @@ export interface CliOptions {
   gate: GateLevel; // REQ-0136-040
   gatePaths: string[]; // REQ-0136-040
   reqs: string[]; // REQ-0136-040
+  strictOnly: boolean; // REQ-0136-004/005: hooks fail only on strict findings
 }
 
 /**
@@ -122,6 +123,7 @@ export function parseArgs(args: string[]): CliOptions {
     gate: "full-audit", // REQ-0136-040: backward-compatible default
     gatePaths: [],
     reqs: [],
+    strictOnly: false, // REQ-0136-004/005
   };
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -133,6 +135,8 @@ export function parseArgs(args: string[]): CliOptions {
       options.dryRun = true;
     } else if (arg === "--classification") { // REQ-0108-196
       options.classification = true;
+    } else if (arg === "--strict-only") { // REQ-0136-004/005
+      options.strictOnly = true;
     } else if (arg === "--gate" || arg.startsWith("--gate=")) {
       const { value, advanced } = resolveFlagValue("--gate", arg, args[i + 1]);
       if (advanced) i++;
@@ -180,6 +184,8 @@ OPTIONS:
                     (e.g. --paths docs/requirements/REQ-0101.md)
   --reqs <csv>      Impact-guard REQ scoping, comma-separated REQ IDs
                     (e.g. --reqs REQ-0101,REQ-0108)
+  --strict-only     Exit non-zero only on strict findings; heuristic/observation
+                    findings do not cause failure (used by git hooks)
 
 EXIT CODES:
   0  No issues found
@@ -421,6 +427,16 @@ export function determineExitCode(summary: ScanSummary): number {
   return EXIT_OK;
 }
 
+export function determineExitCodeStrict(
+  results: CheckResult[],
+): number {
+  const hasStrict = results.some(
+    (r) =>
+      r.finding_level === "strict" && r.level !== "ok" && r.level !== "info",
+  );
+  return hasStrict ? EXIT_NG : EXIT_OK;
+}
+
 export function determineRoute(
   category: FindingCategory,
   occurrences: number,
@@ -461,6 +477,7 @@ const CHECK_TO_FINDING_CATEGORY: Record<string, FindingCategory> = {
   "adr-status-normalization": "canonical-conflict",
   "workflow-status-prohibition": "canonical-conflict",
   "lifecycle-boundary": "canonical-conflict",
+  "req-spec-boundary-violation": "canonical-conflict",
   "readme-index-sync": "broken-reference",
   "adr-readme-index-sync": "broken-reference",
   "spec-readme-index-sync": "broken-reference",
@@ -545,6 +562,9 @@ export function classifyResult(r: CheckResult): CheckResult {
   }
   if (!r.finding_category && r.level !== "ok" && r.level !== "info") {
     r.finding_category = classifyFindingCategory(r.check);
+  }
+  if (!r.finding_level) {
+    r.finding_level = classifyFindingLevel(r.level, r.check);
   }
   if (!r.route && r.finding_category) {
     r.route = determineRoute(r.finding_category, 1);

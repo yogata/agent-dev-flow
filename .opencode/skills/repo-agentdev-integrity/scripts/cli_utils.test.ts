@@ -85,6 +85,7 @@ describe("parseArgs", () => {
       gate: "full-audit",
       gatePaths: [],
       reqs: [],
+      strictOnly: false,
     });
   });
 

@@ -12,6 +12,7 @@ import {
   formatJsonReport,
   formatMarkdownReport,
   determineExitCode,
+  determineExitCodeStrict,
   findRepoRoot,
   determineRoute,
   writeReportFile,
@@ -35,7 +36,7 @@ const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
 const USAGE =
   "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] " +
-  "[--gate <full-audit|delta-guard|impact-guard>] [--paths <csv>] [--reqs <csv>]";
+  "[--gate <full-audit|delta-guard|impact-guard>] [--paths <csv>] [--reqs <csv>] [--strict-only]";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -6887,6 +6888,145 @@ function checkReqVerificationBasis(root: string): CheckResult[] {
   return results;
 }
 
+// ─── IR-044: REQ/SPEC boundary violation detection (REQ-0136-006) ──────────
+// Detects SPEC detail contamination in active REQ requirement lines.
+// 9 SPEC separation criteria violation signals (REQ-0101-068, REQ-0136-006):
+//   1. schema field   2. enum value list      3. fixture detail
+//   4. checker individual rule   5. false positive suppression
+//   6. Step number    7. Phase number         8. internal algorithm
+//   9. specific work history
+// Stable contract exception (REQ-0101-069) is exempt from detection.
+
+// 9 SPEC separation criteria violation signals with conservative keyword patterns.
+// Patterns target the *primary intent* of a requirement line; heuristic severity.
+const IR044_SIGNAL_PATTERNS: ReadonlyArray<{ signal: string; pattern: RegExp }> = [
+  // 1. schema field — detailed schema/field type definitions belong in SPEC
+  {
+    signal: "schema field",
+    pattern:
+      /schema\s*field|スキーマ\s*フィールド|frontmatter\s*フィールド\s*の\s*型|field\s*の\s*型\s*は\s*["'`]|必須\s*フィールド\s*.*型\s*[=:]/i,
+  },
+  // 2. enum value list — enumerated value inventories belong in SPEC
+  {
+    signal: "enum value list",
+    pattern: /\benum\s*(値|リスト|一覧)?|\b列挙値?\s*(一覧|リスト)?|値\s*一覧\s*[:：]/i,
+  },
+  // 3. fixture detail — test fixture content belongs in SPEC/test docs
+  { signal: "fixture detail", pattern: /\bfixtures?\b|フィクスチャ|テスト\s*データ\s*詳細/i },
+  // 4. checker individual rule — detection logic detail belongs in rule catalog
+  {
+    signal: "checker individual rule",
+    pattern:
+      /checker\s*(個別\s*)?ルール|検出\s*(ルール|パターン)\s*[:：]|detection\s*pattern\s*[:：]/i,
+  },
+  // 5. false positive suppression — FP handling detail belongs in rule catalog
+  {
+    signal: "false positive suppression",
+    pattern:
+      /false\s*positive\s*(抑制|除外)|偽陽性\s*(抑制|除外)|\bFP\s*抑制|除外\s*(パス|ルール)\s*[:：]|\bexempt\s*(path|file)/i,
+  },
+  // 6. Step number — workflow step references belong in command/skill reference
+  {
+    signal: "Step number",
+    pattern: /\bStep\s*\d+(?:\s*[-‐-]\s*\d+)?\b|ステップ\s*\d+(?:\s*[-‐-]\s*\d+)?/,
+  },
+  // 7. Phase number — phase numbering belongs in command/skill reference
+  {
+    signal: "Phase number",
+    pattern: /\bPhase\s*\d+\b|フェーズ\s*\d+/,
+  },
+  // 8. internal algorithm — implementation algorithm belongs in SPEC
+  {
+    signal: "internal algorithm",
+    pattern: /内部\s*アルゴリズム|internal\s*algorithm|実装\s*アルゴリズム/i,
+  },
+  // 9. specific work history — past work records belong in PR/Issue history
+  {
+    signal: "work history",
+    pattern:
+      /作業履歴\s*[:：]|PR\s*#\d+|commit\s+[0-9a-f]{7,40}|\bINC-\d{4,}\b|Issue\s*#\d+\s*で\s*(実装|追加|修正)/i,
+  },
+];
+
+// REQ-0101-069 stable contract exception — these topics may be summarized in REQ
+// even when phrased as parameters/classifications. Lines matching these are exempt.
+const IR044_STABLE_CONTRACT_PATTERN =
+  /公開\s*command\s*名|公開入口|domain\s*state\s*の\s*位置づけ|接続\s*契約|利用者.*分類\s*体系|安全\s*境界|停止条件\s*の\s*大枠|安定した\s*外部\s*契約|安定する\s*外部\s*契約/;
+
+function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqDir = path.join(root, "docs", "requirements");
+  if (!fs.existsSync(reqDir)) return results;
+  let foundViolation = false;
+
+  for (const file of listFiles(reqDir)) {
+    // listFiles only returns top-level .md files; retired/ subdirectory excluded.
+    if (!file.startsWith("REQ-") || !file.endsWith(".md")) continue;
+    const fullPath = path.join(reqDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const relPath = resolveRelative(fullPath, root);
+
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      // Only inspect requirement table rows: | REQ-NNNN-NNN | description |
+      const rowMatch = line.match(
+        /^\|\s*(REQ-\d{4}-\d{3})\s*\|\s*([\s\S]*?)\s*\|\s*$/,
+      );
+      if (!rowMatch) continue;
+      const reqItemId = rowMatch[1];
+      const description = rowMatch[2];
+
+      // Skip header / separator artifacts
+      if (/^-+$/.test(description) || /^要\s*件$/.test(description.trim())) {
+        continue;
+      }
+
+      // Strip inline code spans so code-only tokens don't trigger keyword match
+      const stripped = stripInlineCode(description);
+
+      // Exempt stable contract exception (REQ-0101-069)
+      if (IR044_STABLE_CONTRACT_PATTERN.test(stripped)) continue;
+      // Exempt negation context (e.g. "must not contain schema field")
+      if (isNegationContext(line)) continue;
+
+      for (const { signal, pattern } of IR044_SIGNAL_PATTERNS) {
+        if (pattern.test(stripped)) {
+          foundViolation = true;
+          results.push(
+            warn(
+              "CanonicalConflict",
+              "req-spec-boundary-violation",
+              `REQ requirement line may contain SPEC detail ("${signal}") — consider moving to SPEC/rule catalog/command reference (IR-044, REQ-0136-006)`,
+              relPath,
+              i + 1,
+              {
+                evidence: `${reqItemId}: ${description.trim()}`,
+                expected:
+                  "REQ should describe external contract / state / behavior; SPEC detail belongs in SPEC docs",
+                route: "req-define",
+              },
+            ),
+          );
+          break; // one finding per requirement line
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "CanonicalConflict",
+        "req-spec-boundary-violation",
+        "No REQ/SPEC boundary violations detected in active REQs (IR-044, REQ-0136-006)",
+      ),
+    );
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -7046,6 +7186,7 @@ async function main(): Promise<void> {
     ...checkCrossReqVocabularyConsistency(root),
     ...checkMappingTableHistoryLabels(root),
     ...checkReqVerificationBasis(root),
+    ...checkReqSpecBoundaryViolation(root), // IR-044 (REQ-0136-006)
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)
@@ -7107,7 +7248,11 @@ async function main(): Promise<void> {
   const reportPath = writeReportFile(root, report);
   console.error(`Report written to: ${reportPath}`);
 
-  process.exit(determineExitCode(summary));
+  // REQ-0136-004/005: git hooks fail only on strict findings.
+  const exitCode = options.strictOnly
+    ? determineExitCodeStrict(processed)
+    : determineExitCode(summary);
+  process.exit(exitCode);
 }
 
 main();
