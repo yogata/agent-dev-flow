@@ -29,3 +29,11 @@
 
 **再発防止**: exit code の strict/heuristic 区別が必要な場面では、呼び出し元が flag で挙動を切り替えられるようにする。global な関数の挙動を変更すると影響範囲が予測不能なため、flag-based の opt-in アプローチを優先する。
 
+## 2026-06-18: Windows+junction worktree では .opencode/ が空になり source/projection 手動同期が必要 — driver 引き継ぎに明記
+
+**状況**: Issue #900 (RU-3) の driver 委譲で、git worktree（`.worktrees/{N}-*`）内の `.opencode/commands/agentdev/`・`.opencode/skills/agentdev-*/` が junction 未伝播で空ディレクトリになった。本 repo では `.opencode/agentdev-*` が `.gitignore` で track 対象外のため worktree 作成時に内容が伝播せず、同期スクリプトに頼ると worktree 内で source-projection 系整合性検査が失敗する。
+
+**学び**: Windows+junction 環境の worktree では plugin skill/command の projection 側が空になる。source（`src/opencode/**`）と projection（`.opencode/**`）の両辺を手動編集で同期し、同期スクリプトではなく手動コピーで担保する。この制約自体は `agentdev-workflow-orchestration` SKILL に既記載だが、driver subagent への引き継ぎプロンプトに毎回明記する必要がある。
+
+**再発防止**: case-run から driver subagent を起動する際、プロンプトの CONTEXT に「worktree 内 `.opencode/` は空・source/projection は手動両辺編集・同期スクリプト非依存」を必ず明記する。提出フェーズのローカル検証で source-projection 系整合性検査を含む場合は worktree 内で失敗することを前提に扱う。
+
