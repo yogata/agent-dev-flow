@@ -43,6 +43,8 @@
 | [REQ-0131](requirements/REQ-0131.md) | case-close / 完了処理 | case-close 完了ゲート・QG-4・達成判定 |
 | [REQ-0132](requirements/REQ-0132.md) | case-open / Issue作成 | case-open Epic・子Issue作成 |
 | [REQ-0133](requirements/REQ-0133.md) | case-update / Issue更新 | case-update Issue本文更新・コメント追加 |
+| [REQ-0134](requirements/REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install | source/projection layout、sync/migration script、repo type、consumer install |
+| [REQ-0135](requirements/REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry、`.sisyphus/` 除外 |
 | [REQ-0136](requirements/REQ-0136.md) | REQ/SPEC/ADR 適正運用の自動化（3層ゲート + 新ワークフロー） | 3層ゲート自動化、spec-save 新設、req-define SPEC分離強化、IR-044、REQ健全性メトリクス、SPEC lifecycle（draft/accepted） |
 
 ## Retired REQ

@@ -10,7 +10,7 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 ## 概要
 
 - **役割**: QG-1〜QG-4 の判定基準・検査観点・乖離分類基準を提供する
-- **対象**: AgentDevFlow **主ワークフローのみ**（req-define / req-save / case-open / case-run / case-close）
+- **対象**: AgentDevFlow **主ワークフローのみ**（req-define / req-save / spec-save / case-open / case-run / case-close）。spec-save は主ワークフローの一工程だが、独自の QG を持たず QG-1（req-save）と QG-4（case-close）の SPEC lifecycle 確定で担保される
 - **特性**: knowledge base。コマンドから参照され、判定結果を返すが成果物を直接編集しない
 - **依存**: agentdev コマンドから参照される専門スキル
 
