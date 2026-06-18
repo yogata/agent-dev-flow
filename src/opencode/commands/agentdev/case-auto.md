@@ -9,6 +9,7 @@ agent: sisyphus
 
 ## Input
 
+- Issue番号（数値）または Issue URL: 既存Issue から case-run → case-close を自走する場合
 - 要件doc: 明示パス指定 / `.agentdev/drafts/req-draft-*.md` 単一自動検出 / セッション内要件doc（3段階優先順位）
 
 ## Output
@@ -18,9 +19,12 @@ agent: sisyphus
 
 ## Steps
 
-1. **入力解決**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
+1. **入力解決**:
+   - **Issue番号/URL入力モード**: 引数が数値のみ（`^\d+$`）または GitHub Issue URL の場合、Issue番号として解決し case-run移行モードへ分岐する（Step 3 の Issue番号/URL入力分岐へ）。この場合、要件docの入力解決・work_type読取はスキップする
+   - **要件doc入力モード**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
 2. **work_type 読取**: 入力要件docの draft-meta セクションから work_type を取得する
 3. **工程分岐**:
+   - **Issue番号/URL入力**: case-run → case-close（req-save・case-open・work_type読取をスキップ）。Step 1 で解決した Issue番号/URL を case-run 相当処理にそのまま渡す。draft-meta の読み取りを行わない
    - feature: req-save → case-open → case-run → case-close
    - bugfix / maintenance / docs_chore: case-open → case-run → case-close（req-save をスキップ）
 4. **各工程の実行**: 既存コマンド定義（req-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）も含めて既存コマンド定義に従うこと
