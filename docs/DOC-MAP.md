@@ -19,7 +19,7 @@
 | REQ | タイトル | 概要 |
 |---|---|---|
 | [REQ-0101](requirements/REQ-0101.md) | 文書・REQ管理基準 | REQ/retired REQ/ADR/SPEC/DOC-MAP/guides の基準境界 |
-| [REQ-0102](requirements/REQ-0102.md) | 要件定義・保存 | req-define / req-save / 分類ゲート / operation unit / execution_groups |
+| [REQ-0102](requirements/REQ-0102.md) | 要件定義・保存 | req-define / req-save / 分類ゲート / operation unit / execution_groups / SPEC候補分離（draft-meta.spec-candidates） / SPLIT予兆検知（draft-meta.split-forecast） |
 | [REQ-0103](requirements/REQ-0103.md) | Artifact責任分界 | command / skill / template / script / namespace / frontmatter 規約 / runtime-only 配布制約 / source-projection分離 / sync・migration / namespace予約 / SSOT化 / registry化 / consumer導入モデル / consumer plugin checkout・install script分離 |
 | [REQ-0104](requirements/REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type + scale 分類、workflow_route、SSoT、case-open/run/close、upstream handoff protocol、OU処理モード、Epic候補グループ |
 | [REQ-0105](requirements/REQ-0105.md) | RU lifecycle / Requirement Unit 管理 | intake-promote（review統合）、learning-promote（refine統合）、backlog-review、RU lifecycle |

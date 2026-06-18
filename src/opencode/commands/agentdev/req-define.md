@@ -39,10 +39,12 @@ agent: sisyphus
 
    **3-1. 定量的データ検証**: `glob docs/requirements/REQ-*.md`（および副次的に `glob docs/adr/ADR-*.md`）で実ファイルを列挙し、AGENTS.md 等の文書記載レンジ（例: "REQ-0101〜REQ-0133"）と照合すること。乖離を発見した場合は文書修正または実ファイル確認により解消すること（REQ-0102-002）。詳細手順は `agentdev-req-analysis` を参照
 
+   **3-2. SPLIT 予兆計測（既存REQ）**: APPEND/UPDATE 対象の既存 REQ が特定された場合、当該 REQ の健全性メトリクス（要件行数・関心分類数・artifact 種別数）を計測し、`docs/specs/req-health-metrics.md` の定量閾値に基づき SPLIT シグナルを算出して `draft-meta.split-forecast` に記録すること（REQ-0136-011）。計測対象は当該 REQ の要件テーブル行（`^| REQ-NNNN-MMM |`）とする。SPLIT シグナル合計が 2 以上の場合、APPEND 実施前にユーザーへ SPLIT 要否を提案すること。閾値・計算式の詳細は `agentdev-req-analysis` を参照
+
 4. **要件展開** → `agentdev-req-analysis` の分析観点に従って網羅。詳細ゲートは `agentdev-req-analysis` を参照
    - **4-1. 変更影響候補抽出**: 変更影響候補を抽出し、ドラフトに保持する。委譲接続点: サブエージェントは探索結果・分類候補・根拠のみを返し、親エージェントがドラフト反映を判断する
-   - **4-2. 分類ゲート**: 各要件行候補を「変更後仕様」or「反映作業」に分類する。委譲接続点: サブエージェントは分類候補のみを返し、親エージェントが要件doc混入可否を判断する
-   - **4-3. 文書分類妥当性検証**: 各要件の対象ドキュメント種別を検証する。委譲接続点: サブエージェントは不適合候補と根拠のみを返し、親エージェントがflag記録を判断する
+   - **4-2. 分類ゲート**: 各要件行候補を「変更後仕様」or「反映作業」に分類する。併せて REQ/SPEC 境界判定（REQ-0101-067〜069）を行い、SPEC 等に配置すべき要件行候補を SPEC 候補として分離し、`draft-meta.spec-candidates`（想定配置先 SPEC・分離根拠・元候補）に記録すること（REQ-0136-010）。委譲接続点: サブエージェントは分類候補・SPEC 候補と根拠のみを返し、親エージェントが要件doc混入可否を判断する
+   - **4-3. 文書分類妥当性検証**: 各要件の対象ドキュメント種別を検証する。REQ 要件行として残った行に SPEC 分離基準（REQ-0101-068）違反の残留がないか検出し、検出時は当該行を SPEC 候補へ移送して `draft-meta.spec-candidates` に追加すること（安定契約例外 REQ-0101-069 は検出対象外）。委譲接続点: サブエージェントは不適合候補・SPEC 残留候補と根拠のみを返し、親エージェントがflag記録を判断する
 
 5. **ADR判断** → `agentdev-adr-guidelines`（manual reference）に従ってADR判断を記録（ADRファイル作成は req-save で実行）
 
@@ -54,8 +56,8 @@ agent: sisyphus
 
    **5-3. 作業手段ADR拒否ゲート**: ADR候補が削除・廃止・移行・統合・再構築・完全削除そのものを主題にしている場合、ADR候補から除外する（REQ-0101-044）。過去判断の除去は新規ADRではなくretire/supersedeで処理する（REQ-0101-045）。委譲接続点: サブエージェントは除外候補と根拠のみを返し、親エージェントがADR候補提示可否を判断する
 
-6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の構造に従って生成。【必須】セクションの欠落禁止。
-   - **6-0. 定義完全性ゲート（QG-1）**: 要件doc生成後、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、REQ/SPEC 分類・ADR ゲート・チェックボックス測可能性・必須セクション完全性を検証する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は壁打ち（Step 2）へ差し戻し
+6. **要件doc生成** → テンプレート: `.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md` を Read → 目的/要件/適用範囲の【必須】構造に従って生成。【必須】セクションの欠落禁止。Step 4-2/4-3 で分離した SPEC 候補がある場合、テンプレートの補助セクション `## SPEC候補` を生成し、`draft-meta.spec-candidates` の内容（SC-ID・想定配置先SPEC・分離根拠・元候補）を人間可読な一覧として記載すること（REQ-0136-009, 010）。SPEC 候補がない場合は同セクションを省略する
+   - **6-0. 定義完全性ゲート（QG-1）**: 要件doc生成後、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、REQ/SPEC 分類・ADR ゲート・チェックボックス測可能性・必須セクション完全性・SPEC 候補分離の妥当性を検証する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は壁打ち（Step 2）へ差し戻し
    - **6-1. operation_units セクション生成**: 複数RU入力時の統合/分離結果（Step 10-2）を基に `operation_units` セクションを生成する。各 OU は `ou_id`, `source_ru`, `target_req`, `operation`, `scale`, `depends_on`, `recommended_order`, `issue_policy`, `result` フィールドを持つ（REQ-0102-033〜035）。単一REQ操作の場合も 1 件の OU として出力する
    - **6-2. execution_groups セクション生成**: OU 群を分析し、Epic 候補グループを `execution_groups` セクションに記録する。各 execution_group は `id`, `type`, `purpose`, `included_ou`, `rationale` を持つ（REQ-0102-036）。記録は提案であり、Issue 発行は行わない（REQ-0102-038）
 
@@ -65,14 +67,14 @@ agent: sisyphus
    - **8-1. 実装スコープシグナル確認**（REQ-0102-056）: ドラフト内に実装詳細セクション（修正候補リスト・findings catalog・影響ファイル一覧等）が存在する場合、`agentdev-workflow-lifecycle` の実装スコープシグナル基準に基づき scale: large への昇格を判定すること。昇格時は昇格理由をユーザーに提示し、Step 8 の分解計画協議を実施すること
 
 9. **ドラフト保存**:
-   全 work_type（feature / bugfix / maintenance / docs_chore）で `.agentdev/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加。Step 6-1 で生成した `operation_units` セクションと Step 6-2 で生成した `execution_groups` セクションを含める。draft-meta の work_type が後続コマンドの消費パターンを決定する（feature: req-save が消費、bugfix/maintenance/docs_chore: req-save をスキップして case-open が消費）
+   全 work_type（feature / bugfix / maintenance / docs_chore）で `.agentdev/drafts/req-draft-{topic-slug}.md` に保存。draft-meta セクション（work_type/req-operation/target-req/adr-required/topic-slug/scale/status 等）を追加。Step 6-1 で生成した `operation_units` セクションと Step 6-2 で生成した `execution_groups` セクションを含める。Step 4-2/4-3 で分離した SPEC 候補は `draft-meta.spec-candidates`（SC-ID・content・intended_spec・classification・source）に、Step 3-2/10-2 で計測した SPLIT 予兆は `draft-meta.split-forecast`（target・metrics・signals・total・recommended_action・thresholds_ref）に記録すること（REQ-0136-010, 011）。draft-meta の work_type が後続コマンドの消費パターンを決定する（feature: req-save が消費、bugfix/maintenance/docs_chore: req-save をスキップして case-open が消費）。`spec-candidates` / `split-forecast` は省略可能だが、spec-save・case-auto はこれらの有無で spec-save スキップ判定を行う（ADR-0123）
    - **9-1. 実装詳細の分離**（REQ-0102-057）: ドラフトに実装詳細（個別ファイルの編集指示・修正候補リスト・findings catalog 等）が含まれる場合、当該内容を要件定義部分（要件行・acceptance criteria・適用範囲）とは分離されたセクションに配置し、要件定義部分の判読性を確保すること。実装詳細がドラフト全体の過半を占める場合は、完了条件チェックボックスへの要約をユーザーに提案すること
 
 10. **要件doc確認**: 生成した要件docをユーザーに提示（承認は求めず提示のみ）。差し戻し時は壁打ち継続（Step 1 へ）。次コマンド実行を確定の意思表示として扱う
 
     **10-1. 複数RU同時入力受付**: 詳細は `agentdev-req-analysis` を参照
 
-    **10-2. 統合/分離判定**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは統合/分離候補と根拠のみを返し、親エージェントがdraft-metaへ記録する
+    **10-2. 統合/分離判定**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: サブエージェントは統合/分離候補と根拠のみを返し、親エージェントがdraft-metaへ記録する。併せて生成ドラフト自身の健全性メトリクス（要件行数・関心分類数・artifact 種別数）を計測し、`docs/specs/req-health-metrics.md` の閾値で SPLIT シグナルを算出して `draft-meta.split-forecast` に記録すること（REQ-0136-011）。新規 CREATE のドラフトであっても、要件行数が 51 行を超える場合は肥大化傾向としてユーザーへ SPLIT 要否を提案すること
 
     **10-3. 操作単位ごとの出力生成**: 詳細は `agentdev-req-analysis` を参照。委譲接続点: 親エージェントがreq-save消費形式を確定する
 
@@ -103,3 +105,4 @@ agent: sisyphus
 - G12: work_type 判定基準は `agentdev-workflow-lifecycle` を参照
 - G13: req-define は Issue 階層を決定しない。Issue 階層の決定は case-open の責務範囲
 - G14: req-define は draft に `operation_units` と `execution_groups` セクションを出力すること（REQ-0102-033, 036）。単一REQ操作の場合も 1 件の OU として出力する
+- G15: SPEC 分離基準（REQ-0101-068）に該当する要件行候補は REQ 要件行に残留させず、`draft-meta.spec-candidates` と `## SPEC候補` 補助セクションへ分離すること（REQ-0136-010）。安定契約例外（REQ-0101-069）は分離対象外。最終 REQ ファイルに SPEC候補セクションは残さない（spec-save が消費）
