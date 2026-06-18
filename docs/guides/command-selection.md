@@ -20,7 +20,7 @@
 | promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | REQ 体系の健全性を検出したい | `/agentdev/inspect-docs` | 検出レポート |
-| 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
+| 要件docがあり req-saveからcase-closeまで自走させたい / Issue番号・URL があり case-run〜case-close を自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
 ## Repository maintenance（AgentDevFlow本体リポジトリのみ）
 
