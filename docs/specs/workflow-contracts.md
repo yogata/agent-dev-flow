@@ -655,6 +655,55 @@ created: "{YYYY-MM-DD}"
 | `OBSOLETE` | 要件が既に古く現在のシステムに適合しない | requirements review時 |
 | `DRIFT` | 要件と実装の間に乖離が生じている | requirements review時 |
 
+### inspect-promote 自動 promote
+
+`/agentdev/inspect-promote --auto` は、高確信度の inspect finding を HITL 承認を経ずに intake/backlog パイプラインへ流入させる（REQ-0136-016, REQ-0126-010）。本節は自動 promote の対象カテゴリ・投入先・実行ログ・誤検知 revoke 手順の正である。コマンドは判定表を重複保持しない。
+
+#### 自動 promote 対象カテゴリ
+
+自動 promote は「機械的に特定可能で、移行先 SPEC が一意に定まり、意味判断を要しない」高確信度 finding に限定する。`--auto` は明示 opt-in であり、省略時は手動分類フローのみ動作する。
+
+| カテゴリ | 自動 promote 対象 | 自動 promote 対象外（手動分類へ） |
+|---|---|---|
+| SPEC分離基準違反（high-specificity） | 具体的証拠を伴う Step 番号・schema field・enum 一覧・fixture detail・作業履歴など、移行先が SPEC/command reference に一意に定まるもの | 安定契約例外（REQ-0101-069）、否定文脈、判定表・内部パラメータなど意味解釈を要するもの |
+| 構造的即時是正 | リンク切れ・旧 namespace 残存など、正解が一意で破壊的でない修復 | — |
+| 命名・分類の意味判断 | — | SPLIT/MERGE/MOVE/RETIRE/DRIFT 判断、scope 決定、優先度付け（全件手動） |
+| ADR 要否判断 | — | ADR閾値判定を含む finding（全件手動） |
+
+自動 promote 対象外の finding は `--auto` 指定時でも手動分類フロー（HITL 承認）に回し、自動投入しない。
+
+#### 投入先・成果物形式
+
+- 投入先: `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md`（フラット構造）
+- backlog-review は既存の intake promoted artifact と同様に読み込み、RU 化対象として処理する
+- 自動投入された元 finding の inbox file は、手動 promote と同様に削除する
+
+#### 実行ログ
+
+`--auto` 実行の都度、投入対象を `.agentdev/inspect/promoted/auto-promote-log.md`（append-only）に記録する。
+
+```markdown
+## {YYYY-MM-DD HH:MM} auto-promote run
+
+- source finding: .agentdev/inspect/inbox/{file}
+- category: {自動 promote 対象カテゴリ}
+- destination: .agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md
+- evidence: {finding が提示した証拠の要約}
+- exempt check: 安定契約例外/否定文脈でないことを確認した旨
+```
+
+ログは git 管理対象（`.agentdev/inspect/promoted/` 配下）。各実行のトレーサビリティと誤検知検出の証跡とする。
+
+#### 誤検知 revoke 手順
+
+自動 promote された finding が誤検知と判明した場合、以下の手順で revoke する。revoke は人間の判断により行う。
+
+1. 対象の投入先ファイル `.agentdev/intake/promoted/inspect-auto-*.md` を特定する（`auto-promote-log.md` のエントリから追跡）
+2. 当該ファイルが backlog-review により未処理（RU 未生成）の場合: ファイルを削除し、元 finding を `.agentdev/inspect/inbox/` に戻す
+3. 当該ファイルが backlog-review により既に RU 化済みの場合: 生成された RU を `.agentdev/backlog/req-units/` から削除し、要件化されていないことを確認する。要件化（REQ/Issue 化）が既に進行している場合はユーザーに停止を依頼する
+4. `auto-promote-log.md` の該当エントリに `status: revoked` と revoke 理由を追記する
+5. 同種の誤検知が再発しないよう、誤検知となった判定根拠を docs-check rule / IR の false positive 抑制へフィードバックする候補として記録する（intake 経由または PR 本文の Findings セクション）
+
 ## REQ File Consistency Check
 
 ### 検証項目
