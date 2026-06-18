@@ -6,7 +6,7 @@
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| req-define | Step 4（要件展開）〜Step 9（ドラフト保存） | 要件doc draft（`.agentdev/drafts/req-draft-*.md`） |
+| req-define | Step 3（既存REQ照合・SPLIT予兆計測）〜Step 10（要件doc確認・ドラフトSPLIT予兆計測） | 要件doc draft（`.agentdev/drafts/req-draft-*.md`） |
 | req-save | Step 3（ドラフト検証）〜Step 4（REQ 操作） | REQ ファイル（`docs/requirements/REQ-*.md`）・ADR ファイル（`docs/adr/ADR-*.md`） |
 
 ## 検査観点
@@ -42,7 +42,7 @@ ADR 候補が REQ/SPEC 相当でないか（ADR禁止ゲート）。作業手段
 
 ### 5. 必須セクション完全性
 
-要件doc / REQ ファイルがテンプレート（`doc_requirement.md`）の【必須】セクションを全て含むか。
+要件doc / REQ ファイルがテンプレート（`doc_requirement.md`）の【必須】セクションを全て含むか。SPEC候補セクション（`## SPEC候補`）は補助（任意）セクションであり、必須セクションの完全性判定対象外である（REQ-0136-009）。
 
 - **fail**: 必須セクション（目的 / 要件 / 適用範囲 等）の欠落。
 
@@ -54,11 +54,27 @@ ADR 候補が REQ/SPEC 相当でないか（ADR禁止ゲート）。作業手段
 - **warn**: 安定契約例外（REQ-0101-069）の適用境界が曖昧な候補がある。REQ/SPEC 両方に要約と詳細を分割すべき候補が未整理。
 - **pass**: 各要件行が REQ/SPEC 境界判定基準に適合し、安定契約例外が必要な箇所は REQ に要約・SPEC 等に詳細が分割されている。
 
+### 7. SPEC 候補分離の妥当性（REQ-0136-010）
+
+SPEC 等に配置すべきと判定された要件行候補が、ドラフトの `## SPEC候補` 補助セクションと `draft-meta.spec-candidates`（SC-ID・content・intended_spec・classification・source）に分離されているか。各 SPEC 候補に想定配置先 SPEC と分離根拠（REQ-0101-068 該当種別）が記録されているか。
+
+- **fail**: SPEC 等に配置すべき要件行候補が REQ 要件行に残留している（SPEC 残留）。または SPEC 候補に想定配置先 SPEC・分離根拠が未記録。
+- **warn**: 安定契約例外（REQ-0101-069）の適用境界が曖昧で、SPEC 候補と REQ 要件行の振り分けが判断余地のある候補がある。
+- **pass**: SPEC 候補が全て `draft-meta.spec-candidates` に分離され、各候補に想定配置先 SPEC と分離根拠が記録されている。安定契約例外は REQ に要約として残されている。
+
+### 8. SPLIT 予兆の記録（REQ-0136-011）
+
+既存 REQ を APPEND/UPDATE 対象とする場合、または生成ドラフトの要件行数が 51 行を超える場合、`draft-meta.split-forecast`（target・metrics・signals・total・recommended_action・thresholds_ref）が記録されているか。閾値の正は `docs/specs/req-health-metrics.md` とする。
+
+- **fail**: 記録すべき SPLIT 予兆（要件行数 51+、関心分類数 2+、artifact 種別数 3+ のいずれか）があるのに `draft-meta.split-forecast` が未記録。
+- **warn**: split-forecast は記録されているが推奨アクション（SPLIT 検討・SPLIT 推奨）に対するユーザー応答が未確認。
+- **pass**: SPLIT 予兆がない、または split-forecast が記録され推奨アクションがユーザーに提示されている。
+
 ## pass / warn / fail 基準
 
-- **pass**: 上記 1〜6 の全てを満たす。
-- **warn**: 構造は保たれているが改善推奨事項がある（主に観点 3 の粒度、観点 6 の境界曖昧候補）。進行可能。
-- **fail**: 構造的欠陥がある（観点 1, 2, 5, 6 の fail）。req-define へ差し戻し。
+- **pass**: 上記 1〜8 の全てを満たす。
+- **warn**: 構造は保たれているが改善推奨事項がある（主に観点 3 の粒度、観点 6 の境界曖昧候補、観点 7 の安定契約例外適用境界、観点 8 の推奨アクション未確認）。進行可能。
+- **fail**: 構造的欠陥がある（観点 1, 2, 5, 6, 7, 8 の fail）。req-define へ差し戻し。
 
 ## 委譲接続点
 
