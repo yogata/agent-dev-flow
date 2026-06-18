@@ -55,6 +55,7 @@
 - [Runtime Package Boundary](specs/runtime-package-boundary.md)
 - [Rule Ownership Matrix](specs/rule-ownership.md)
 - [REQ Impact Map](specs/req-impact-map.md)
+- [REQ Health Metrics](specs/req-health-metrics.md)
 
 ## ADR
 

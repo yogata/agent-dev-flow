@@ -65,6 +65,7 @@
 | [integrity-rule-catalog.md](specs/integrity-rule-catalog.md) | 整合性検査ルールのカタログ |
 | [artifact-responsibilities.md](specs/artifact-responsibilities.md) | アーティファクト責務マトリックス |
 | [req-impact-map.md](specs/req-impact-map.md) | REQ 影響マッピング |
+| [req-health-metrics.md](specs/req-health-metrics.md) | REQ 健全性メトリクス（肥大化・関心ズレ閾値） |
 | [rule-ownership.md](specs/rule-ownership.md) | ルール所有権マトリックス |
 
 ## ADR

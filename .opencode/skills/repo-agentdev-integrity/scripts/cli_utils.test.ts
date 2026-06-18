@@ -14,6 +14,7 @@ import {
   formatMarkdownReport,
   determineExitCode,
   findRepoRoot,
+  VALID_GATE_LEVELS,
 } from "./cli_utils.ts";
 import type { CheckResult, IntegrityReport } from "./cli_utils.ts";
 
@@ -36,6 +37,9 @@ describe("parseArgs", () => {
     expect(opts.json).toBe(false);
     expect(opts.dryRun).toBe(false);
     expect(opts.paths).toEqual([]);
+    expect(opts.gate).toBe("full-audit");
+    expect(opts.gatePaths).toEqual([]);
+    expect(opts.reqs).toEqual([]);
   });
 
   it("parses --help", () => {
@@ -76,8 +80,88 @@ describe("parseArgs", () => {
       help: true,
       json: true,
       dryRun: true,
+      classification: false,
       paths: ["path/a", "path/b"],
+      gate: "full-audit",
+      gatePaths: [],
+      reqs: [],
     });
+  });
+
+  it("defaults gate to full-audit (backward compatibility)", () => {
+    expect(parseArgs([]).gate).toBe("full-audit");
+  });
+
+  it("parses --gate delta-guard", () => {
+    expect(parseArgs(["--gate", "delta-guard"]).gate).toBe("delta-guard");
+  });
+
+  it("parses --gate impact-guard", () => {
+    expect(parseArgs(["--gate", "impact-guard"]).gate).toBe("impact-guard");
+  });
+
+  it("parses --gate=full-audit (equals form)", () => {
+    expect(parseArgs(["--gate=full-audit"]).gate).toBe("full-audit");
+  });
+
+  it("parses --paths as comma-separated gatePaths", () => {
+    const opts = parseArgs(["--paths", "a.md,b.md,c.md"]);
+    expect(opts.gatePaths).toEqual(["a.md", "b.md", "c.md"]);
+  });
+
+  it("parses --paths= form", () => {
+    const opts = parseArgs(["--paths=x.md,y.md"]);
+    expect(opts.gatePaths).toEqual(["x.md", "y.md"]);
+  });
+
+  it("trims and filters empty --paths entries", () => {
+    const opts = parseArgs(["--paths", " a.md , , b.md "]);
+    expect(opts.gatePaths).toEqual(["a.md", "b.md"]);
+  });
+
+  it("parses --reqs as comma-separated REQ IDs", () => {
+    const opts = parseArgs(["--reqs", "REQ-0101,REQ-0108"]);
+    expect(opts.reqs).toEqual(["REQ-0101", "REQ-0108"]);
+  });
+
+  it("parses --reqs= form", () => {
+    const opts = parseArgs(["--reqs=REQ-0103"]);
+    expect(opts.reqs).toEqual(["REQ-0103"]);
+  });
+
+  it("does not let --paths/--reqs collide with positional paths", () => {
+    const opts = parseArgs(["--paths", "a.md", "pos1", "--reqs", "REQ-0101", "pos2"]);
+    expect(opts.gatePaths).toEqual(["a.md"]);
+    expect(opts.reqs).toEqual(["REQ-0101"]);
+    expect(opts.paths).toEqual(["pos1", "pos2"]);
+  });
+
+  it("throws on invalid --gate value", () => {
+    expect(() => parseArgs(["--gate", "bogus"])).toThrow(/Invalid --gate/);
+  });
+
+  it("throws on invalid --gate= value", () => {
+    expect(() => parseArgs(["--gate=nope"])).toThrow(/Invalid --gate/);
+  });
+
+  it("throws when --gate has no value", () => {
+    expect(() => parseArgs(["--gate"])).toThrow(/requires a value/);
+  });
+
+  it("throws when --paths has no value", () => {
+    expect(() => parseArgs(["--paths"])).toThrow(/requires a value/);
+  });
+
+  it("throws when --reqs has no value", () => {
+    expect(() => parseArgs(["--reqs"])).toThrow(/requires a value/);
+  });
+
+  it("exposes VALID_GATE_LEVELS", () => {
+    expect(VALID_GATE_LEVELS).toEqual([
+      "full-audit",
+      "delta-guard",
+      "impact-guard",
+    ]);
   });
 });
 

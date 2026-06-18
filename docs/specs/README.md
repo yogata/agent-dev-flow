@@ -23,6 +23,7 @@ They describe what the system *is* now, as opposed to REQ files that define requ
 | [runtime-package-boundary.md](runtime-package-boundary.md) | Runtime Package 境界 | Repo type 別 `.opencode/` 定義・命名規約・導入方式・sync 範囲 |
 | [rule-ownership.md](rule-ownership.md) | Rule 所有権マトリックス | rule domain と責任 REQ/SPEC の対応（REQ-0103-058） |
 | [req-impact-map.md](req-impact-map.md) | REQ 影響マップ | 各 active REQ が影響する integrity rule と artifact（REQ-0108-152） |
+| [req-health-metrics.md](req-health-metrics.md) | REQ 健全性メトリクス | REQ 肥大化・関心ズレ検出の定量閾値（要件行数・関心分類数・artifact種別数）（REQ-0136-040） |
 
 ## Document Relationships (REQ-0101)
 
