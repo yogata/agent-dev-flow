@@ -2,7 +2,7 @@
 
 ## Active Requirements
 
-現在の要件判断では、以下27件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
+現在の要件判断では、以下28件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を第一参照先とする。旧REQ 50件はすべて retired であり、履歴参照に限定する。
 
 | REQ ID | タイトル | 関心対象 |
 |---|---|---|
@@ -33,6 +33,7 @@
 | [REQ-0133](REQ-0133.md) | case-update / Issue更新 | case-update、Issue本文更新（テンプレート構造維持）、コメント追加、REQ ファイル更新（直接commit+push）、レビューNG対応、フェーズ維持 |
 | [REQ-0134](REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install | source/projection layout、sync/migration script、repo type、consumer install |
 | [REQ-0135](REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry、`.sisyphus/` 除外 |
+| [REQ-0136](REQ-0136.md) | REQ/SPEC/ADR 適正運用の自動化（3層ゲート + 新ワークフロー） | 3層ゲート自動化（Delta/Impact/Full Audit）、spec-save 新設、req-define SPEC分離強化、IR-044 実装、finding 自動フィードバック、REQ健全性メトリクス |
 
 ## Retired Requirements
 
