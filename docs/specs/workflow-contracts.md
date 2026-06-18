@@ -526,6 +526,106 @@ task(category="unspecified-high", run_in_background=true, prompt="...")
 
 サブエージェントが使用できない場合、Sequential Wave（親エージェントがWave内でIssueを1件ずつ順次処理）に切り替え。
 
+## 子Issue単位オーケストレーションモデル
+
+> 本セクションは case-auto の薄いオーケストレーター化（REQ-0114-045〜048, 073〜075）および case-open の自律構成生成（REQ-0132-007〜010）に基づく。従来の Epic Orchestrator Contract（Wave一括実行）は本モデルに置き換えられる。
+
+### OU / Epic / Wave / Issue 階層（SC-001）
+
+```text
+OU (Operation Unit):
+  要件変更の処理単位。req-define / backlog-review 由来。
+  実装順序やIssue分解そのものではない。
+
+Epic:
+  case-open が OU を実行可能にするために作る上位 Issue。
+  大きな OU を複数 Issue で処理する必要がある場合に作成。
+  子 Issue 全体の進捗 SSoT を持つ。
+
+Wave:
+  Epic 内の実行段階。case-open が技術的依存関係から作成。
+  Wave 内 Issue は同じ前提条件のもとで実行可能。
+  Wave 間には順序がある。
+
+Issue:
+  case-run が1回で扱う最小実装単位。
+  サブエージェント委譲の単位。PR作成・検証・case-close の単位。
+```
+
+階層パターン（規模に応じて省略可能）:
+
+| 規模 | 構成 |
+|------|------|
+| 小規模 OU | OU → Issue |
+| 中規模 OU | OU → Epic → Issue |
+| 大規模 OU | OU → Epic → Wave → Issue |
+
+### 子Issue 実行状態 enum（SC-002, SC-003）
+
+| status | 意味 | 設定主体 |
+|--------|------|----------|
+| `pending` | 依存 Issue または前 Wave の完了待ち。異常ではない | case-open（初期値） |
+| `ready` | 依存が満たされ、case-auto が次に case-run へ渡せる状態 | case-auto |
+| `running` | case-auto が選択し、case-run が実行中の状態 | case-auto |
+| `completed` | Issue の実装・検証・必要な case-close が完了した状態 | case-close |
+| `blocked` | 要件曖昧性・外部副作用・権限不足・矛盾等により自動継続できない状態 | case-run / case-auto |
+| `failed` | 実装・検証・CI・PR 作成などの実行結果として失敗した状態 | case-run |
+
+- `skipped` は採用しない（REQ-0106-030）。前提未達の Issue は `pending` のまま選択対象外となる。
+- Wave status は保存しない。Wave 内 Issue 状態から導出する。
+- OU / Epic の status は進捗集約として扱い、主たる実行状態は Issue status とする。
+
+### case-open 構成生成基準（SC-005, SC-006）
+
+case-open は要件doc の operation_units を読み取り、以下を自律生成する:
+
+- Epic 要否判定（単一 Issue で完結する場合は Epic を作成しない）
+- Issue 分解（OU を実装可能なサイズに分割）
+- 依存関係設定（技術的依存に基づく Wave 構成）
+- 初期 status 付与（原則 `pending`）
+
+**停止条件**: 以下の場合、case-open は停止し要件の明確化を求める:
+- 要件が曖昧で Issue 構造を生成できない場合
+- operation_units の要件に矛盾が含まれる場合
+
+**禁止事項**:
+- 機能要件・非機能要件・制約・対象外・受け入れ条件の新規作成
+- 実装順序・Issue分解についてのユーザー確認要求
+
+### case-auto 子Issue選択・永続状態（SC-007）
+
+case-auto は薄いオーケストレーターとして以下を読み取る:
+
+- Epic Issue 本文の子 Issue 一覧・Wave 構成
+- 各子 Issue の status（pending / ready / running / completed / blocked / failed）
+- 関連 PR の open / merged 状態
+
+**子Issue選択ロジック**:
+1. status が `ready` の子 Issue を1件選択
+2. `ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させ選択
+3. 選択した Issue を `running` に遷移させ case-run に渡す
+4. case-run 完了後、永続状態を再読込し結果を確認
+
+**case-run への最小入力**: Issue 番号・要件docパス（該当 OU の target_req 情報を含む）
+
+### case-run 1 Issue 委譲入力（SC-008）
+
+case-run は case-auto から指定された1 Issue のみを処理する:
+
+- サブエージェントへの委譲入力: Issue 番号・実装指示・worktree パス・specs 更新禁止・Finding 記録指示
+- 結果の永続化形式: PR 本文（成功時）・Issue コメント（blocked / failed 時）
+- 親コンテキストへの実装過程ログ持ち越し禁止
+
+### 結果状態遷移と出力契約（SC-009）
+
+| case-run 結果 | Issue status 遷移 | case-auto アクション |
+|---------------|-------------------|---------------------|
+| completed(pr) | `running` → `completed` | case-close 相当処理を実行 |
+| blocked | `running` → `blocked` | 停止理由を報告し再開可能コマンドを提示 |
+| failed | `running` → `failed` | 正常完了した他 Issue のみ case-close 対象とする |
+
+**親コンテキスト非累積原則**: case-auto は子 Issue の実装詳細・実装過程ログを親コンテキストに保持しない。進行状態は永続状態（Issue / PR / `.agentdev/`）から再読込する。
+
 ## 責務分界表
 
 Command・Skill・Script・サブエージェント委譲の責務境界（ADR-0107, ADR-0112）。

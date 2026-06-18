@@ -368,6 +368,7 @@ draft-meta:
           artifact_types: +0
         total: 0
         recommended_action: no-action
+  spec-saved: true
   status: saved
 ```
 
