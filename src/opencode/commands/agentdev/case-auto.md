@@ -43,14 +43,14 @@ agent: sisyphus
        2. **クリーンアップ検証ゲート**を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0114-060〜062）。残存時は停止すること
        3. Step 4-1〜4-3 のキュー処理に進む
      - **Step 4-1 キュー開始**: ドラフトの `operation_units` セクションから OU 構造を読み取り、処理順序を決定する（`recommended_order`, `depends_on` に基づく）。Epic Issue 番号を記録する。Epic Issue の子Issue一覧（Wave 構成含む）を読み取る。case-run 相当処理に Epic Issue 番号を渡す。case-run の Epic Orchestrator モードが全 Wave の子Issue実行を処理する。case-auto は Wave 実行プロトコルを実装しない（`agentdev-workflow-orchestration` を参照）
-     - **Step 4-2 case-close ループ**: case-run 相当処理の完了後、その出力（成功/失敗/スキップされた子Issue一覧）から case-close 対象を決定する:
-      - 正常完了した子Issue: case-close 相当処理を実行
-      - 失敗・スキップされた子Issue: case-close を試みない
+     - **Step 4-2 case-close ループ**: case-run 相当処理の完了後、その出力（completed / blocked / failed の子Issue一覧）から case-close 対象を決定する:
+      - 正常完了した子Issue（completed）: case-close 相当処理を実行
+      - blocked / failed の子Issue: case-close を試みない（`⏭スキップ` 状態は採用しない。前提未達の Issue は pending のまま選択対象外となる）
       - 各子Issue の case-close は既存の case-close.md 定義に従う（learning/intake capture、`.agentdev/` commit/push を含む）。各子Issue ごとに独立して実行し、キュー全体での一括 capture は行わない
       - case-auto は 1 OU を close まで完了した後に次の OU へ進むこと（REQ-0114-053）
      - **Step 4-3 全体完了判定**: 全子Issue の case-close 処理完了後:
      - Epic Issue の子Issue全ステータスが CLOSED の場合 → Epic 自動クローズ確認（case-close Step 8 相当） → 全体完了報告
-      - 未クローズの子Issue が残る場合（失敗/スキップ） → 部分完了報告
+      - 未クローズの子Issue が残る場合（blocked / failed） → 部分完了報告
      - 停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告すること（REQ-0114-056）
    - **クリーンアップ検証ゲート**: Epic Issue の Step 4-1 キュー処理開始前に、以下を検証する（REQ-0114-060〜063）:
      - ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
@@ -69,7 +69,7 @@ agent: sisyphus
    - (8) merge conflict / remote hash不一致
    - (9) 作成元不明branch / user-owned branch / 他作業branchの削除検出
    - (10) 未コミット変更の帰属不明
-8. **完了報告**: 最終工程（case-close）の完了報告をそのまま出力する。Epic Issue を伴うキュー実行時は、完了・失敗・スキップ子Issue一覧を含める。停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する（REQ-0114-056）
+8. **完了報告**: 最終工程（case-close）の完了報告をそのまま出力する。Epic Issue を伴うキュー実行時は、完了・blocked・failed 子Issue一覧を含める。停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する（REQ-0114-056）
 8-1. **Standard flow 逐次OU処理ループ**: Standard flow の case-close 完了後、未処理 OU が残存する場合は次 OU の処理を自動的に開始する（REQ-0114-065〜067）:
    - 処理対象の全 OU から次の未処理 OU を特定する（`recommended_order`, `depends_on` に基づく）
     - 次 OU が存在する場合: 当該 OU の work_type に応じた工程分岐で Step 2 に戻る（feature: req-save → spec-save → case-open → …、bugfix/maintenance/docs_chore: case-open → …）。feature の場合の spec-save 実行判定は Step 3 に従う

@@ -32,17 +32,16 @@ agent: sisyphus
 2. **マルチREQ入力判定**: 入力要件doc数を確認
    - 単一REQ → Step 3
    - 複数REQ または draft-meta `scale: large` → **マルチREQ Epic flow**（Step 4〜）
-   - **OU モード時**: Step 0-1 で選択した OU が複数または `scale: large` を含む場合 → `execution_groups` 検証（Step 2-1）を経て Epic flow に分岐
+   - **OU モード時**: Step 0-1 で選択した OU が複数または `scale: large` を含む場合 → Epic flow に分岐（Step 2-1 で自律的に構成を生成）
 
 3. **規模判定**（Step 2で単一REQの場合）:
    - `scale: large` → **単一REQ Epic flow**（Step 4〜）
    - `scale: standard` / フィールドなし → **Standard flow**（Step 14〜）
 
-2-1. **execution_groups 検証**（OU モード・複数REQ時）: ドラフトの `execution_groups` セクションを読み取り、Epic 候補の根拠を検証する（REQ-0104-039）:
-   - 各 execution_group の `rationale` が明示されている場合 → Epic / child Issue を作成
-   - `rationale` が空・矛盾している場合 → Epic 化せず、停止または単体 Issue 化
-   - **独自推論禁止**: `execution_groups` の提案に基づかない独自推論で Epic Issue を作成しない（REQ-0104-040）
-   - 複数 OU であることだけを理由に Epic Issue を作成しない（REQ-0104-041）
+2-1. **自律構成生成**（OU モード・複数REQ時）: ドラフトの `operation_units` セクションを読み取り、要件分析に基づいて Epic / Wave / Issue 構造を自律生成する（REQ-0104-039, REQ-0132-007）。req-define の出力（operation_units の `depends_on`, `recommended_order` 等）は参考情報とし、case-open が最終構造を決定する:
+   - 複数 OU が存在する場合、要件分析に基づいて Epic Issue および子 Issue 構造を生成する（REQ-0104-041）
+   - **停止条件**: 要件が曖昧で Issue 構造を生成できない場合、または operation_units の要件に矛盾が含まれる場合は停止し、要件の明確化を求める（REQ-0132-010）
+   - **禁止事項**: 機能要件・非機能要件・制約・対象外・受け入れ条件を新規に作成しない（REQ-0132-009, REQ-0104-040）。実装順序・Issue分解についてユーザー確認を求めない（REQ-0132-008）
 
 **共通ルール**（全Step適用）:
 - **VERIFY**: gh CLI書込後は毎回 `agentdev-gh-cli` の VERIFY操作に従い検証
@@ -62,7 +61,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 4. `agentdev-workflow-templates` の選定ルールに従いテンプレートを読み込む。詳細は `agentdev-issue-management` を参照
 
-5. Epic Issue本文を生成。`execution_groups` セクションから Epic 候補グループの根拠を読み取る（REQ-0104-039）。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
+5. Epic Issue本文を生成。Step 2-1 の自律構成分析結果（Epic / Wave / Issue 構造・依存関係）に基づいて Epic 本文を構築する（REQ-0104-039, REQ-0132-007）。詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントは分解候補・依存候補・子Issue数検査を pass/warn/fail/partial で返し、親エージェントがEpic本文と停止判断を確定する
 
 6. Epic Issueを作成:
    - ラベル: `enhancement`, `feature`, `epic`
@@ -132,7 +131,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 - G18: case-open は intake / learning capture を行わない。capture 境界の詳細は `agentdev-workflow-orchestration` を参照
 
 ### OU 処理制約
-- G19: case-open は `execution_groups` の提案に基づかない独自推論で Epic Issue を作成しないこと（REQ-0104-040）
-- G20: case-open は複数 OU であることだけを理由に Epic Issue を作成しないこと（REQ-0104-041）。REQ-0104-029（複数REQ doc → Epic）は本要件により狭義化される
+- G19: case-open は自律的な要件分析に基づいて Epic Issue を作成すること（REQ-0104-040）。ただし機能要件・非機能要件・対象外・受け入れ条件を新規に作成しないこと（REQ-0132-009）
+- G20: case-open は複数 OU が存在する場合、要件分析に基づいて Epic Issue および子 Issue 構造を生成すること（REQ-0104-041）。単一 Issue で完結する場合は Epic を作成しないこと
 - G21: case-open の Issue 化単位は REQ doc 単位ではなく OU 単位とすること（REQ-0104-042）
 - G22: case-open の capture 責務は非関与。intake / learning capture を行わない。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照
