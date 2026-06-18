@@ -54,7 +54,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0031 | migrated | REQ-0107 | GitHubリンク正規化を移行 |
 | REQ-0032 | migrated | REQ-0106 | case-close未チェック項目判定を移行 |
 | REQ-0033 | migrated | REQ-0108 | 二次整合性是正をintegrityへ移行 |
-| REQ-0034 | migrated | REQ-0102 | 関連ドキュメント更新候補抽出を要件定義へ移行 |
+| REQ-0034 | migrated | REQ-0102 | 変更影響候補抽出を要件定義へ移行 |
 | REQ-0035 | migrated | REQ-0101 | DOC-MAP導入とviews廃止を文書基準へ移行 |
 | REQ-0036 | migrated | REQ-0107 | no-ai-slop skill方針を文章品質へ移行 |
 | REQ-0037 | migrated | REQ-0106 | worktree削除対策をcase完了へ移行 |
