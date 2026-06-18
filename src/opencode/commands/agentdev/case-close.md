@@ -77,7 +77,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 7. **ブランチ・worktree削除**: `agentdev-git-worktree` の worktree削除手順に従う:
    - 未コミット変更検出（`agentdev-git-worktree` skill に従い）
-   - squash merge 済みの場合 → `git checkout .` で破棄可
+   - squash merge 済みの場合 → 当該 worktree が隔離されている（専用 worktree + branch で index が独立）場合のみ `git checkout .` で破棄可。**共有作業ツリー（main worktree）では `git checkout .` は禁止**（REQ-0137-001・他セッション変更の無差別破壊）。本 Step は worktree 削除フェーズ内の隔離 worktree でのみ実行する
    - .sisyphus/ クリーンアップ
    - worktree remove → Permission denied 時は停止（リトライは skill 定義に従う）
    - ローカルブランチ削除（squash merge 後の条件付き `-D` は skill 定義に従う）
@@ -129,7 +129,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G14: gh CLI出力読み取りは `agentdev-gh-cli` の安全な手順に従う
 - G15: intake と learning を混合した単一成果物にしない（`agentdev-workflow-orchestration` の capture 境界に準拠）
 - G16: 今回の完了条件に含まれる未対応事項を intake に逃がして完了扱いにしない
-- G17: Step 11 の commit は `.agentdev/` 配下のみ。他パスを巻き込まない
+- G17: Step 11 の commit は並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、明示パス（`git add <path>` / `git rm <path>`）でステージし、`git commit -- <paths>`（--only pathspec 形式）で実行する（REQ-0137-002）。`git add` は capture 成果物の専用サブディレクトリ（`.agentdev/learning/`・`.agentdev/intake/`）または明示パスに限定し、`.agentdev/` 全体の一括スコープにしないこと（REQ-0137-005）。他パスを巻き込まない
 - G18: learning と intake を同一 commit に含める
 - G19: Step 12 は結果状態を分離して報告。`.agentdev` push失敗時は完了扱いにしない
 - G20: 完了条件チェックボックスの評価・更新は case-close の専任責務（ADR-0114）。case-run / driver / 外部実行バックエンドは更新しない。case-close は別コンテキストで Issue 本文を再読込して最終完了判定し、更新後に再読込 VERIFY を必ず実施する

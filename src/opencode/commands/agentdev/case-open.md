@@ -87,9 +87,11 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
 17. コメント追加: `agentdev-workflow-templates` の選定ルールに従いコメント用テンプレートを読み込む（Epic flowではEpic Issueにコメント追加）→ VERIFY
 
- 18. ドラフトが存在する場合、`.agentdev/drafts/req-draft-{topic-slug}.md` を削除（Standard / Epic 全フロー共通）
+ 18. ドラフトが存在する場合、`.agentdev/drafts/req-draft-{topic-slug}.md` を削除（Standard / Epic 全フロー共通）。削除は並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、`git rm <draft-path>` で明示パスをステージし、同一ステップ内で `git commit -- <draft-path>` により即時コミットする（Form Zero・REQ-0137-003/006）。未ステージの削除を作業ツリーに残存させないこと
 
- 18-1. **RU ファイル削除**（Standard / Epic 全フロー共通）。詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする
+ 18-1. **RU ファイル削除**（Standard / Epic 全フロー共通）。詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが削除・同期確認を行う。サブエージェントへ委譲する場合は削除対象候補の抽出までとする。削除は並列実行安全ステージングプロシージャに従い `git rm <RU-path>` で明示パスをステージし、同一ステップ内で `git commit -- <RU-path>` により即時コミットする（Form Zero・REQ-0137-003/006）
+
+ 18-1-1. **draft / RU 削除残存検証**（Standard / Epic 全フロー共通・REQ-0137-007）: Step 18 / 18-1 の削除後、当該ファイルが作業ツリー・index に残存していないことを検証する（`git status --porcelain -- <draft-path> <RU-path>` が空であること、またはファイル非存在確認）。残存を検出した場合、即座に停止し残存ファイル一覧を報告する。本検証は Standard flow と Epic flow の双方で実施する（Epic flow 限定のクリーンアップ検証ゲートを Standard flow にも拡張）
 
 18-2. 完了報告 → template variant:
    - Standard → `templates/case-open/standard.md`
@@ -135,3 +137,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 - G20: case-open は複数 OU が存在する場合、要件分析に基づいて Epic Issue および子 Issue 構造を生成すること（REQ-0104-041）。単一 Issue で完結する場合は Epic を作成しないこと
 - G21: case-open の Issue 化単位は REQ doc 単位ではなく OU 単位とすること（REQ-0104-042）
 - G22: case-open の capture 責務は非関与。intake / learning capture を行わない。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照
+
+### 並列実行安全 git 操作制約
+- G23: 共有作業ツリーでスイープ操作（`git add -A` / `git add .` / `git add --all` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` / 非所有パスへの `git checkout -- <path>` / `git restore <path>`）を実行しないこと（REQ-0137-001）。`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従うこと
+- G24: ステージ・コミットは明示パス指定（`git add <path>` / `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）で行い、共有 index の他セッション変更を排出しないこと（REQ-0137-002）。draft / RU の削除は同一ステップで即時ステージ・コミットし未ステージ残存を許さないこと（Form Zero・REQ-0137-003/006）。`git add` は `.agentdev/` 全体の一括スコープではなく明示パスに限定すること（REQ-0137-005）
