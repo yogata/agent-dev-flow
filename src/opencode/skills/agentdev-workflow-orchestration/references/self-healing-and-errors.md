@@ -61,17 +61,6 @@ CI/CD失敗を検出した場合、実装フェーズへループバックし自
 | 提出フェーズ・デプロイ検証 | 実装フェーズ | 自律修正ループ（最大3回） |
 | 提出フェーズ | 提出フェーズ・乖離検出 | 乖離検出から再実行 |
 
-### 多重Issueモード固有エラー
-
-| エラー | 対応 |
-|---|---|
-| 多重Issue入力上限超過（> 5件） | 拒否してユーザーに通知 |
-| 有効Issues = 0 | 中止してユーザーに通知 |
-| 依存分析でエラー | ユーザーに手動指定を促す |
-| サブエージェント失敗 | 該当Issueをスキップ、他は継続 |
-| specs更新競合 | 昇順で処理、マージで解決 |
-| 全Wave失敗 | 集約レポートで全件失敗を報告 |
-
 ### worktree 環境での `source-projection-sync` 失敗（Windows + junction 環境固有）
 
 整合性検査（`check_integrity.ts`）を worktree（`.worktrees/{N}`）内で実行した際、`source-projection-sync`（IR-016）が失敗する既知のパターン。
@@ -85,97 +74,21 @@ CI/CD失敗を検出した場合、実装フェーズへループバックし自
 | フォールバックの限界 | `resolvePathWithFallback`（REQ-0108-189）は runtime projection 不在時に `src/opencode/` 原本へ読み取りをフォールバックするが、source/projection 双方向の存在比較を要する `source-projection-sync` までは解決しない。broken junction 検出ゲート（REQ-0108-173）も同様に worktree 内の junction 状態に依存する |
 | Self-Healing 対象外 | junction 再作成は環境固有の作業であり要件・仕様の修正ではないため、Self-Healing Loop の対象外。ユーザーへ状況と再作成手順への誘導を報告する |
 
-## マージコンフリクト予防
+## Merge Conflict 対応
 
-Wave 並列実行時のマージコンフリクトを予防するガイダンス。
+case-run は1 Issue を処理する。PR 作成時や base branch との同期で merge conflict が検出された場合の対応。
 
-### 予防策
+### 基本方針
 
-1. **非重複の確認**: 各 Wave の開始前に、その Wave 内の Issue のファイル変更範囲が重複していないことを確認する
-2. **順次 Wave の設計**: 依存関係のある Issue は同じ Wave に配置せず、前の Wave の完了を待つ
-3. **base branch の更新**: 各 Wave 開始時に base branch を pull して最新の状態にする
-4. **コンフリクト検出時**: PR 作成時にコンフリクトが検出された場合、以下の対応を行う:
-   - 前の Wave の PR がマージ済みであれば rebase して解決
-   - 解決不能な場合は停止してユーザーに報告
-
-### コンフリクト解消の制約
-
+- merge conflict は Self-Healing Loop の対象外とする（解決には要件・仕様の意図判断が必要なため）
+- conflict 検出時は即座に停止し、ユーザーに手動解決を依頼する
 - 自動的な force push は禁止
-- コンフリクト解消で要件や仕様の意図を変えてはならない
-- 解消後はローカル検証を再実行する
+- conflict 解消で要件や仕様の意図を変えてはならない
+- 解決後はローカル検証を再実行する
 
-## Merge Conflict 対応パターン
+## Issue 完了時残存参照チェック
 
-### Wave並列実行時のmerge conflict事前防止・事後対応
-
-#### 1. Wave間でのファイル重複リスク評価
-
-Wave並列実行を開始する前に、各Wave内のIssueが変更するファイルの重複を評価する:
-
-**評価手順**:
-1. 各Wave内のIssueの変更予定ファイルをリスト化（specs、コード、テスト等）
-2. Wave間のファイル重複をチェック
-3. 重複がある場合のリスクを判定
-
-**リスク判定基準**:
-
-| 重複状況 | リスクレベル | 対応 |
-|----------|-------------|------|
-| 同一ファイルの異なる行範囲 | 低 | Wave並列可（conflict発生可能性低） |
-| 同一ファイルの同一行範囲 | 高 | Wave直列化（同一Waveに統合） |
-| frontmatter共通の設定ファイル | 中 | Wave並列可だが、frontmatter競合リスクを通知 |
-| 依存関係のあるファイル（例: モデルとテスト） | 中 | Wave並列可だが、整合性チェックを強化 |
-
-#### 2. conflict発生時のWave再スケジューリング方針
-
-PR作成時やmerge時にconflictが検出された場合:
-
-**即時対応**:
-1. 該当Waveの全Issueを停止
-2. conflictの詳細を報告
-3. ユーザーに解決方法を提示
-
-**再スケジューリングパターン**:
-
-| パターン | 条件 | 再スケジュール方針 |
-|----------|------|-------------------|
-| 前のWaveのPRがマージ済み | conflictの原因が前のWaveの変更 | 該当Issueをrebaseして再実行 |
-| 同一Wave内のconflict | Wave内のIssue間で競合 | Waveを分割して直列化 |
-| 他のWaveのPR未マージ | 他のWaveの変更と競合 | 先行するWaveの完了を待ってから再実行 |
-| 解決不能なconflict | 要件や仕様の意図が矛盾 | Wave実行を停止して要件調整 |
-
-**報告フォーマット**:
-```markdown
-## Wave Conflict 検出エラー
-
-**Wave番号**: {wave_number}
-**影響Issue**: {affected_issues}
-**conflictファイル**: {conflicted_files}
-**conflict原因**: {conflict_cause}
-**再スケジュール方針**: {reschedule_plan}
-**ユーザーアクション**: {user_action}
-```
-
-#### 3. self-healing対象外としての明示
-
-Merge conflictはSelf-Healing Loopの対象外とする:
-
-**対象外の理由**:
-- conflict解決には要件・仕様の意図判断が必要
-- 自動的なforce pushはリスクが高い
-- 手動でのconflict解決が推奨される
-
-**対応**:
-- conflict検出時は即座に停止
-- ユーザーに手動解決を依頼
-- 解決後にSelf-Healing Loopを再開可能（ローカル検証から）
-
-**停止条件への追加**:
-conflict発生時は、Self-Healing Loopの停止条件に該当するため、即座に停止してユーザーに報告する。
-
-## Wave 境界横断残存参照チェック
-
-Wave 完了ごとに、非推奨コマンド名・旧名前空間参照・陳腐化パス参照が残存していないかを確認する手順。
+Issue（PR）の完了ごとに、非推奨コマンド名・旧名前空間参照・陳腐化パス参照が残存していないかを確認する手順。case-run は1 Issue ごとに本チェックを適用する。
 
 ### チェック対象
 
@@ -187,8 +100,8 @@ Wave 完了ごとに、非推奨コマンド名・旧名前空間参照・陳腐
 
 ### 実行タイミング
 
-1. **各 Wave 完了直後** — Wave 境界で実行し、次 Wave 開始前に残存参照を排除
-2. **最終 Wave 完了後** — 全体の最終チェックとして実行
+1. **各 Issue の PR 作成前／完了時** — Issue 完了境界で実行し、残存参照を排除
+2. **Epic の全子Issue 処理完了後（case-auto）** — 全体の最終チェックとして実行
 3. **トリガー条件**: 以下のいずれかに該当する場合に必須
    - 名前空間変更（namespace change）を含む
    - コマンドの廃止（deprecation）を含む
@@ -201,18 +114,18 @@ Wave 完了ごとに、非推奨コマンド名・旧名前空間参照・陳腐
 
 ### チェック手順
 
-1. Wave 内の変更内容から、非推奨名称・旧パスのリストを抽出
+1. 当該 Issue の変更内容から、非推奨名称・旧パスのリストを抽出
 2. worktree 全体を対象に grep で残存参照を検索
 3. 検出された残存参照を修正
 4. 修正後、再度 grep で残存がないことを確認
-5. 結果を集約して Wave 完了報告に含める
+5. 結果を集約して Issue 完了報告に含める
 
 ### 報告フォーマット
 
 ```markdown
-## Wave 境界横断残存参照チェック結果
+## 残存参照チェック結果
 
-**Wave番号**: {wave_number}
+**Issue番号**: {issue_number}
 **チェック対象**: {deprecated_names}
 **検出件数**: {count}件
 **対応**: {fixed_count}件修正, {remaining_count}件残存（理由: {reason}）

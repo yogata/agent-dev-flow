@@ -42,12 +42,18 @@ agent: sisyphus
        1. case-open の共通終了処理（Step 17〜18-2: コメント追加・ドラフト削除・RU削除・完了報告）の完了を確認すること（REQ-0104-045〜047）
        2. **クリーンアップ検証ゲート**を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0114-060〜062）。残存時は停止すること
        3. Step 4-1〜4-3 のキュー処理に進む
-     - **Step 4-1 キュー開始**: ドラフトの `operation_units` セクションから OU 構造を読み取り、処理順序を決定する（`recommended_order`, `depends_on` に基づく）。Epic Issue 番号を記録する。Epic Issue の子Issue一覧（Wave 構成含む）を読み取る。case-run 相当処理に Epic Issue 番号を渡す。case-run の Epic Orchestrator モードが全 Wave の子Issue実行を処理する。case-auto は Wave 実行プロトコルを実装しない（`agentdev-workflow-orchestration` を参照）
-     - **Step 4-2 case-close ループ**: case-run 相当処理の完了後、その出力（completed / blocked / failed の子Issue一覧）から case-close 対象を決定する:
-      - 正常完了した子Issue（completed）: case-close 相当処理を実行
-      - blocked / failed の子Issue: case-close を試みない（`⏭スキップ` 状態は採用しない。前提未達の Issue は pending のまま選択対象外となる）
-      - 各子Issue の case-close は既存の case-close.md 定義に従う（learning/intake capture、`.agentdev/` commit/push を含む）。各子Issue ごとに独立して実行し、キュー全体での一括 capture は行わない
-      - case-auto は 1 OU を close まで完了した後に次の OU へ進むこと（REQ-0114-053）
+      - **Step 4-1 キュー開始（子Issue単位オーケストレーション）**: Epic Issue 番号を記録する。Epic Issue 本文から子Issue一覧・Wave 構成・ステータス追跡テーブルを読み取る（永続状態を SSoT とする）。以下の子Issue単位ループを実行する（SPEC `docs/specs/workflow-contracts.md` 子Issue単位オーケストレーションモデル SC-007, REQ-0114-045〜048）:
+       1. **子Issue選択**: status が `ready` の子Issue を1件選択する。`ready` がない場合、依存（前 Wave 含む）が満たされた `pending` Issue を `ready` に遷移させて選択する。`running` / `completed` / `blocked` / `failed` は選択対象外（`skipped` は採用しない。前提未達の Issue は `pending` のまま選択対象外となる）
+       2. **running 遷移**: 選択した子Issue を `running` に遷移させる（Epic Issue ステータス追跡テーブルを更新）
+       3. **case-run 委譲**: 選択した子Issue 番号 + 要件docパス（該当 OU の target_req 情報を含む）を case-run 相当処理に渡す。case-run は1 Issue のみを処理する（REQ-0130-010）。Wave全体の一括実行を case-run に委譲しない
+       4. **結果確認**: case-run 完了後、永続状態（Issue / PR / `.agentdev/`）を再読込し driver result（completed(pr) / blocked / failed）を確認する。親コンテキストに子Issue の実装過程ログを持ち越さない（SC-009 親コンテキスト非累積原則）
+       5. **次子Issue選択**: Step 4-2 の case-close 処理後、Step 1 に戻り次の子Issue を選択する。選択可能な子Issue がなくなったら Step 4-3 へ進む
+      - **Step 4-2 case-close（子Issue単位）**: case-run 完了後、Step 4-1-4 で確認した結果に基づき当該1子Issue の case-close 処理を決定する（SC-009）:
+       - 正常完了（completed(pr)）: 該当子Issue を `completed` に遷移させ case-close 相当処理を実行する
+       - blocked: 該当子Issue を `blocked` に遷移させ、停止理由・再開可能コマンドを報告する
+       - failed: 該当子Issue を `failed` に遷移させる。正常完了した他の子Issue のみ case-close 対象とする
+       - 各子Issue の case-close は既存の case-close.md 定義に従う（learning/intake capture、`.agentdev/` commit/push を含む）。子Issue ごとに独立して実行し、キュー全体での一括 capture は行わない
+       - case-auto は 1 OU（Epic の場合は全子Issue 処理完了）を close まで完了した後に次の OU へ進むこと（REQ-0114-053）
      - **Step 4-3 全体完了判定**: 全子Issue の case-close 処理完了後:
      - Epic Issue の子Issue全ステータスが CLOSED の場合 → Epic 自動クローズ確認（case-close Step 8 相当） → 全体完了報告
       - 未クローズの子Issue が残る場合（blocked / failed） → 部分完了報告
@@ -93,7 +99,7 @@ agent: sisyphus
 - G09: 既存のreq-save / spec-save / case-open / case-run / case-closeの責務を変更しない
 - G13: case-auto は Issue 階層決定ロジックを持ってはならない。複数 REQ doc または scale:large の場合は case-open の Issue 構造ルールに委譲する
 - G14: case-auto は req-save 相当処理から case-open 相当処理への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価してはならない。保存結果をそのまま渡す
-- G15: case-auto は Wave 実行プロトコル（`agentdev-workflow-orchestration` 参照）を実装してはならない。これらは case-run Epic Orchestrator に委譲する
+- G15: case-auto は子Issue を1件ずつ選択し case-run に委譲する。Wave全体の一括実行を case-run に委譲しない（REQ-0114-045, REQ-0130-010）
 - G16: case-auto は独自の操作単位ステータス追跡を持ってはならない。Epic Issue のステータス追跡テーブルを使用する
 - G18: case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わないこと（REQ-0114-051）
 - G19: case-auto は draft を OU 情報の SSoT として扱い、独自の OU 状態管理を持たないこと（REQ-0114-058）
