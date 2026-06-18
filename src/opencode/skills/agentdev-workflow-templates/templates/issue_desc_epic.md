@@ -29,8 +29,8 @@ REQ-{req_number}
 
 | # | Issue | ステータス | 内容 |
 |---|-------|-----------|------|
-| {seq} | #{child_issue} | ☐ 未着手 | {child_1_title} |
-| {seq} | #{child_issue} | ☐ 未着手 | {child_2_title} |
+| {seq} | #{child_issue} | pending | {child_1_title} |
+| {seq} | #{child_issue} | pending | {child_2_title} |
 
 ## 実行順序
 <!-- 【必須】 -->
@@ -45,12 +45,15 @@ REQ-{req_number}
 ## ステータス追跡
 <!-- 【必須】 -->
 
+子Issue 実行状態 enum（`pending` / `ready` / `running` / `completed` / `blocked` / `failed`）。`⏭スキップ` は採用しない（REQ-0106-030）。
+
 | 状態 | 件数 |
 |------|------|
-| ☐ 未着手 | {total} |
-| 🔄 進行中 | 0 |
-| ✅ 完了 | 0 |
-| ❌ 対処不要 | 0 |
+| pending | {total} |
+| running | 0 |
+| completed | 0 |
+| blocked | 0 |
+| failed | 0 |
 
 ## 完了条件
 <!-- 【必須】 -->

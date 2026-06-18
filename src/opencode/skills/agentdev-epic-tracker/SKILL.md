@@ -5,20 +5,26 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 
 # Epic Status Tracker
 
-親Epic Issueのステータス追跡テーブル（☐ 未着手 / 🔄 進行中 / ✅ 完了 / ❌ 対処不要 / ⏭ スキップ）を更新する知識ベース。
+親Epic Issueのステータス追跡テーブル（`pending` / `ready` / `running` / `completed` / `blocked` / `failed`）を更新する知識ベース。
 
-- **参照元**: `case-run`（進行中更新）、`case-close`（完了更新）
+- **参照元**: `case-auto`（子Issue選択・running 更新）、`case-close`（completed 更新）
 - **特性**: 宣言的定義のみ提供。手順・手続きは各コマンド定義に委ねる
+- **`⏭スキップ` は採用しない**（REQ-0106-030）。前提未達の Issue は `pending` のまま選択対象外となる。Wave status は保存せず、Wave 内 Issue 状態から導出する
 
 ## ステータス値定義
 
-| 値 | 意味 | 設定タイミング | 終了状態 |
+子Issue 実行状態 enum（REQ-0106-030、workflow-contracts.md「子Issue実行状態 enum」参照）:
+
+| 値 | 意味 | 設定主体 | 終了状態 |
 |---|---|---|---|
-| `☐ 未着手` | 子Issue未着手 | Epic作成時（初期値） | いいえ |
-| `🔄 進行中` | 子Issue作業中 | `case-run` 実行中 | いいえ |
-| `✅ 完了 ([PR#N](URL))` | 子Issue完了 | `case-close` 完了時 | はい |
-| `❌ 対処不要` | 対処不要（手動設定） | ユーザー手動 | はい |
-| `⏭ スキップ` | 前提条件未達・依存関係未充足等で Orchestrator がスキップした子Issue。手動操作では使用不可（Orchestratorのみ設定可能） | Epic Orchestrator（Wave完了時） | はい |
+| `pending` | 依存 Issue または前 Wave の完了待ち。異常ではない | case-open（初期値） | いいえ |
+| `ready` | 依存が満たされ、case-auto が次に case-run へ渡せる状態 | case-auto | いいえ |
+| `running` | case-auto が選択し、case-run が実行中の状態 | case-auto | いいえ |
+| `completed` | Issue の実装・検証・必要な case-close が完了した状態 | case-close | はい |
+| `blocked` | 要件曖昧性・外部副作用・権限不足・矛盾等により自動継続できない状態 | case-run / case-auto | はい |
+| `failed` | 実装・検証・CI・PR 作成などの実行結果として失敗した状態 | case-run | はい |
+
+Epic自動クローズ判定では `completed` を終了状態として扱う（`blocked` / `failed` は終了状態だが自動クローズ完了とはみなさない）。
 
 ## 親Epic検出
 
@@ -29,58 +35,48 @@ description: Updates parent Epic Issue status tracking tables across case-run an
 
 ## ステータス更新プロトコル
 
-### case-run: 進行中更新
+### case-auto: running 更新（子Issue選択時）
 
-**単一Issueモード**:
+`case-auto` が子Issue を選択して `case-run` に渡す際、当該子Issue を `ready`/`pending` → `running` に更新する:
 1. 子Issue本文から `Parent: #{N}` を検出
 2. 親Epicが存在しない → スキップ
 3. `gh issue view {N}` でEpic本文を取得（`agentdev-gh-cli` 準拠）
 4. 正規表現で該当子Issue行を特定・置換（後述「正規表現パターン」の新4列/旧4列形式に対応）:
-   - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
-   - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
-5. 既に `🔄 進行中`、`✅ 完了`、`❌ 対処不要`、または `⏭ スキップ` の場合 → スキップ（べき等性）
+   - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )(pending|ready) (\|)` → `$1running $2`
+   - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )(pending|ready) (\|)` → `$1running $2`
+5. 既に `running`、`completed`、`blocked`、または `failed` の場合 → スキップ（べき等性）
 6. `gh issue edit {N} --body-file {temp}` でEpic本文を更新
-7. 更新失敗時 → 警告表示して `case-run` 自体は継続（フォールバック）
+7. 更新失敗時 → 警告表示して継続（フォールバック）
 
-**Epic Orchestratorモード（Wave一括更新）**:
+### case-close: completed 更新
 
-Epic Orchestrator は各 Wave 開始時に対象子 Issue の Epic ステータスを一括更新する。サブエージェントによる同時更新の競合を回避するため、親エージェントが一括処理を担う。
+`case-close` 完了時に子Issue を `running` → `completed` に更新する:
+1. 子Issue本文から `Parent: #{N}` を検出
+2. 親Epicが存在しない → スキップ
+3. `gh issue view {N}` でEpic本文を取得（`agentdev-gh-cli` 準拠）
+4. 正規表現で該当子Issue行を特定・置換:
+   - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )running (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
+   - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )running (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
+5. 既に `completed` の場合 → スキップ（べき等性）
+6. `gh issue edit {N} --body-file {temp}` でEpic本文を更新
 
-Wave開始時一括更新（`☐ 未着手` → `🔄 進行中`）:
-1. Wave テーブルから該当 Wave の子 Issue 番号を抽出
-2. 親Epic本文を取得（`gh issue view {epic_N}`）
-3. 子Issue番号の昇順で、各子Issue行を一括置換:
-   - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
-   - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )☐ 未着手 (\|)` → `$1🔄 進行中 $2`
-4. 既に `🔄 進行中`、`✅ 完了`、`❌ 対処不要`、または `⏭ スキップ` の場合 → スキップ（べき等性）
-5. `gh issue edit {epic_N} --body-file {temp}` でEpic本文を一括更新
+`blocked` / `failed` は case-run / case-auto が設定する終了状態。case-close はこれらを `completed` に上書きしない。
 
-Wave完了時ステータス更新:
-- 成功した子Issue: `🔄 進行中` → `✅ 完了 ([PR#{pr_number}]({pr_url}))` （`case-close` で実行）
-- 失敗した子Issue: `🔄 進行中` を維持（再実行可能にするため）
-- スキップされた子Issue: `🔄 進行中` → `⏭ スキップ` （Orchestratorのみ設定、手動操作では使用不可）
-
-一括更新順序: 子Issue番号の昇順
-
-### case-close: 完了更新
-
-`case-close` の既存実装を変更しない:
-- `✅ 完了` への更新・Epic自動クローズ判定は既存手順のまま
-- 本スキルは知識ベースとして参照されるのみ
+一括更新順序（Epic Orchestrator 等の複数子Issue一括更新時）: 子Issue番号の昇順
 
 ## 正規表現パターン
 
-Epic本文のステータス追跡テーブルは以下の2形式をサポートする:
+Epic本文のステータス追跡テーブルは以下の2形式をサポートする。ステータス値は子Issue 実行状態 enum（`pending` / `ready` / `running` / `completed` / `blocked` / `failed`）を使用する。
 
 ### 新4列形式（# / Issue / ステータス / 内容）
 
 ```markdown
 | # | Issue | ステータス | 内容 |
 |---|-------|-----------|------|
-| 1-1 | #42 | ☐ 未着手 | 子Issueの概要 |
-| 1-2 | #43 | 🔄 進行中 | 子Issueの概要 |
-| 1-3 | #44 | ✅ 完了 ([PR#100](https://...)) | 子Issueの概要 |
-| 1-4 | #45 | ❌ 対処不要 | 子Issueの概要 |
+| 1-1 | #42 | pending | 子Issueの概要 |
+| 1-2 | #43 | running | 子Issueの概要 |
+| 1-3 | #44 | completed ([PR#100](https://...)) | 子Issueの概要 |
+| 1-4 | #45 | blocked | 子Issueの概要 |
 ```
 
 ### 旧4列形式（# / Issue / タイトル / ステータス）
@@ -88,51 +84,51 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 ```markdown
 | # | Issue | タイトル | ステータス |
 |---|-------|----------|-----------|
-| 1 | #42 | 子Issueの概要 | ☐ 未着手 |
-| 2 | #43 | 子Issueの概要 | 🔄 進行中 |
-| 3 | #44 | 子Issueの概要 | ✅ 完了 ([PR#99](https://github.com/...)) |
-| 4 | #45 | 子Issueの概要 | ❌ 対処不要 |
+| 1 | #42 | 子Issueの概要 | pending |
+| 2 | #43 | 子Issueの概要 | running |
+| 3 | #44 | 子Issueの概要 | completed ([PR#99](https://github.com/...)) |
+| 4 | #45 | 子Issueの概要 | failed |
 ```
 
-### 新4列形式: 未着手 → 進行中
+### 新4列形式: pending/ready → running
 
 ```
-検索: (\| \d+-\d+ \| #{child_issue} \| )☐ 未着手 (\|)
-置換: $1🔄 進行中 $2
+検索: (\| \d+-\d+ \| #{child_issue} \| )(pending|ready) (\|)
+置換: $1running $2
 ```
 
-### 新4列形式: 進行中/未着手 → 完了
+### 新4列形式: running → completed
 
 ```
-検索: (\| \d+-\d+ \| #{child_issue} \| )(☐ 未着手|🔄 進行中) (\|)
-置換: $1✅ 完了 ([PR#{pr_number}]({pr_url})) $3
+検索: (\| \d+-\d+ \| #{child_issue} \| )running (\|)
+置換: $1completed ([PR#{pr_number}]({pr_url})) $2
 ```
 
-### 旧4列形式: 未着手 → 進行中
+### 旧4列形式: pending/ready → running
 
 ```
-検索: (\| \d+ \| #{child_issue} \| [^|]* \| )☐ 未着手 (\|)
-置換: $1🔄 進行中 $2
+検索: (\| \d+ \| #{child_issue} \| [^|]* \| )(pending|ready) (\|)
+置換: $1running $2
 ```
 
-### 旧4列形式: 進行中/未着手 → 完了
+### 旧4列形式: running → completed
 
 ```
-検索: (\| \d+ \| #{child_issue} \| [^|]* \| )(☐ 未着手|🔄 進行中) (\|)
-置換: $1✅ 完了 ([PR#{pr_number}]({pr_url})) $3
+検索: (\| \d+ \| #{child_issue} \| [^|]* \| )running (\|)
+置換: $1completed ([PR#{pr_number}]({pr_url})) $2
 ```
 
 ### 完了状態のべき等性確認
 
-`✅ 完了` はPRリンク付き `✅ 完了 ([PR#N](...))` の場合もあるため、
-べき等性確認時は `✅ 完了` で前方一致させる:
+`completed` はPRリンク付き `completed ([PR#N](...))` の場合もあるため、
+べき等性確認時は `completed` で前方一致させる:
 
 ```
 旧4列形式:
-検索: \| \d+ \| #{child_issue} \|[^|]*\| ✅ 完了
+検索: \| \d+ \| #{child_issue} \|[^|]*\| completed
 
 新4列形式:
-検索: \| \d+-\d+ \| #{child_issue} \| ✅ 完了
+検索: \| \d+-\d+ \| #{child_issue} \| completed
 ```
 
 ### べき等性確認
@@ -140,8 +136,8 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 更新前に現在のステータス値を確認:
 - 対象行が既に目標ステータス → スキップ
 - 対象行が不存在 → 警告表示してスキップ
-- `❌ 対処不要` の行 → 更新対象外（スキップ）
-- `⏭ スキップ` の行 → 更新対象外（スキップ）
+- `completed` の行 → 更新対象外（スキップ）
+- `blocked` / `failed` の行 → case-close による `completed` 上書きの対象外（スキップ）
 
 ## See Also
 
@@ -156,12 +152,12 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 
 Epicステータス更新はPRのmerge前後で一貫性を保つ必要がある:
 
-**merge前（case-run 実行中）**:
-- 子Issueを `☐ 未着手` → `🔄 進行中` に更新
+**merge前（case-auto が case-run に子Issue を渡す時）**:
+- 子Issueを `pending`/`ready` → `running` に更新
 - 親Epic本文を取得し、該当子Issue行を更新
 
 **merge後（case-close 完了時）**:
-- 子Issueを `🔄 進行中` → `✅ 完了 ([PR#N](URL))` に更新
+- 子Issueを `running` → `completed ([PR#N](URL))` に更新
 - PR番号とURLを含める
 
 **状態遷移の一貫性チェック**:
@@ -185,11 +181,11 @@ PR mergeに失敗した場合、Epicステータスの整合性を保つ:
 | 失敗タイミング | Epicステータス | 対応 |
 |--------------|----------------|------|
 | PR作成前（conflict検出） | 変更なし | PR作成を停止 |
-| PR作成後、merge前 | `🔄 進行中` | status維持（完了しない） |
-| merge時（conflict発生） | `🔄 進行中` | status維持、解決後に再試行 |
-| merge時（CI失敗等） | `🔄 進行中` | status維持、問題修正後に再試行 |
+| PR作成後、merge前 | `running` | status維持（完了しない） |
+| merge時（conflict発生） | `running` | status維持、解決後に再試行 |
+| merge時（CI失敗等） | `running` | status維持、問題修正後に再試行 |
 
-**重要**: merge失敗時はステータスを `✅ 完了` にしない。`🔄 進行中` を維持し、再実行可能にする。
+**重要**: merge失敗時はステータスを `completed` にしない。`running` を維持し、再実行可能にする。実行結果として失敗が確定した場合は `failed` に遷移する。
 
 **失敗報告フォーマット**:
 ```markdown
@@ -198,9 +194,9 @@ PR mergeに失敗した場合、Epicステータスの整合性を保つ:
 **PR番号**: #{pr_number}
 **Epic番号**: #{epic_number}
 **子Issue**: #{child_issue}
-**現在ステータス**: 🔄 進行中
+**現在ステータス**: running
 **失敗理由**: {failure_reason}
-**対応**: ステータスを維持（🔄 進行中）、問題解決後に再実行
+**対応**: ステータスを維持（running）、問題解決後に再実行
 ```
 
 #### 3. Epic本文のconflictリスク
