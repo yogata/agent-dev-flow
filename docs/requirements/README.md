@@ -11,7 +11,7 @@
 | [REQ-0103](REQ-0103.md) | Artifact責任分界 | command / skill / template / script の責務境界、namespace、frontmatter 規約、runtime-only 配布制約、repo-local namespace・配布対象外制約、Skill 粒度・参照妥当性 |
 | [REQ-0104](REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type + scale 分類、workflow_route、SSoT、case-open/run/close基本契約、case-open共通終了の全フロー共通化、upstream handoff protocol |
 | [REQ-0105](REQ-0105.md) | RU lifecycle / Requirement Unit 管理 | RU lifecycle（生成・削除タイミング・一時成果物位置づけ）、session-sourced RU、RU frontmatter メタデータ、promoted/ の RU 化対象統一 |
-| [REQ-0106](REQ-0106.md) | Case実行オーケストレーション / Epic・Wave | Epic/Wave 並列実行、親Issue SSoT・子Issue実行状態整合、Wave rebase・コンフリクト時停止、委譲プロンプト事後検証、子Issue ⏭スキップ終了状態 |
+| [REQ-0106](REQ-0106.md) | Case実行オーケストレーション / Epic・Wave | Epic/Wave 並列実行、親Issue SSoT・子Issue実行状態整合、Wave rebase・コンフリクト時停止、委譲プロンプト事後検証、子Issue 実行状態ライフサイクル・skipped除外・Wave status導出 |
 | [REQ-0107](REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、AI-slop抑止 |
 | [REQ-0108](REQ-0108.md) | docs-check / Validation / Tests | 整合性検査、finding分類・route、レポート出力、ガードレール、体系的テスト、frontmatter 規約検査、artifact collection registry、source/projection scan分離、baseline管理、rule catalog、REQ impact map、3層gate、meta-integrity、repo-local自己監査・配布対象外、ADR主題妥当性検出 |
 | [REQ-0109](REQ-0109.md) | inspect-docs / REQ体系整合性 | retired archive、移行表、REQ再構成intake、REQ再構成レビューコマンド、100番台採番 |
