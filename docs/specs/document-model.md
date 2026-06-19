@@ -168,6 +168,16 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 | `.sisyphus/` | runtime 作業領域 | 一時的ワークスペース。domain state ではない |
 | `.agentdev/drafts/` | command workflow での作業用一時領域 | active command の明示的な working draft handoff でのみ使用 |
 
+### draft の位置づけ（REQ-0138, ADR-0124）
+
+`.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成し req-save / spec-save / case-open / case-auto / case-run / case-close が消費する一時的な構造化ハンドオフ成果物である。永久文書（REQ/ADR/SPEC/guides/DOC-MAP）ではなく、以下の性質を持つ:
+
+- **soft contract**: API 契約ではなく producer 側の標準。LLM 推論経由で消費され、機械的パースを前提としない（ADR-0124）。厳格 schema version・JSON Schema・validator は導入しない
+- **構造化データが正**: 下流処理の権威ある情報源は `# draft-data` fenced YAML block であり、人間可読 Markdown セクション（`# summary` 等）は補助的である（REQ-0138-001, REQ-0138-002）
+- **一時成果物**: case-open 成功後（Issue/Epic 作成 + VERIFY）は削除されてよい。case-open 成功後は Issue/Epic を SSoT とし、req_draft は存在しない一時成果物となる（REQ-0138-015, REQ-0138-016）
+- **標準データモデル**: `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `case_open_hints` を中心フィールドとする（REQ-0138-011）。詳細構造は `docs/specs/artifact-contracts.md` の「req_draft 出力構造」を参照
+- **artifact_actions 統合**: REQ/ADR/SPEC への保存対象は成果物別配列に分散させず、単一の `artifact_actions` 配列に統合する（REQ-0138-009）。後続コマンドの工程分岐は `work_type` 固定分岐ではなく `artifact_actions` の存在で判定する
+
 ## Source-of-Truth Priority
 
 文書間に矛盾がある場合の優先順位（REQ-0101-011）:

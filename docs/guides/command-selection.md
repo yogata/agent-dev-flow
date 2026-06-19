@@ -7,8 +7,8 @@
 | 現在の状態 | 次のコマンド | 出力 |
 |-----------|-------------|------|
 | 要件を整理したい | `/agentdev/req-define` | 要件doc（draft） |
-| 要件docがあり、機能追加の場合 | `/agentdev/req-save` | REQ/ADR ファイル |
-| REQ/ADR ファイルがあり、SPEC候補がある場合（機能追加のみ） | `/agentdev/spec-save` | SPEC ファイル（`docs/specs/`） |
+| 要件docがあり、REQ/ADR 対象 artifact_actions がある場合 | `/agentdev/req-save` | REQ/ADR ファイル |
+| REQ/ADR ファイルがあり、SPEC対象 artifact_actions がある場合 | `/agentdev/spec-save` | SPEC ファイル（`docs/specs/`） |
 | REQ ファイルまたは要件docがある | `/agentdev/case-open` | GitHub Issue |
 | Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
@@ -39,8 +39,7 @@
 
 ## 補足
 
-- 機能追加は `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/spec-save`（SPEC候補がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close` の流れが基本
-- バグ修正・保守作業・ドキュメント作業は `/agentdev/req-save` ・ `/agentdev/spec-save` をスキップする
+- 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（REQ-0138, ADR-0124）。REQ/ADR 対象 artifact_actions があれば req-save、SPEC 対象 artifact_actions があれば spec-save を実行する
 - Intake / Learning パイプラインの詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) を参照
 - 各コマンドの入出力の詳細は [要件定義 → Case実行フロー](req-case-flow.md) を参照
 - `/agentdev/case-auto` は明示指定時のみ使用する追加入口。標準ワークフローを置き換えない

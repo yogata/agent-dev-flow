@@ -7,9 +7,11 @@ agent: sisyphus
 
 要件定義（req-define）の結果をもとにGitHub Issueを作成する。①壁打ち→②構造的実行フェーズの境界。
 
+**draft-data 入力**: case-open は構造化 `draft-data`（`# draft-data` fenced YAML block）を入力として読み取る（REQ-0138-001, ADR-0124）。draft 全体の `agreed_items`・`artifact_actions`・`operation_units` を処理対象とし、OU ごとにスライスせず draft 全体の合意結果を取り扱う（REQ-0138-009）。`auto_gate.auto_ready` が false、または未解決質問・未解決衝突・repo外操作・停止理由が残る場合は停止する（REQ-0138-013）。`conflict_resolutions` に記録済みの衝突については同じ内容をユーザーへ再確認しない（REQ-0138-014）。
+
 ## Input
 
-- req-defineで生成された要件doc（チェックボックス付き）
+- req-defineで生成された要件doc（構造化 `draft-data` 形式: REQ-0138, ADR-0124。チェックボックス付き）
 
 ## Output
 

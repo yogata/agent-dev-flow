@@ -5,8 +5,10 @@
 ## 全体の流れ
 
 ```
-/agentdev/req-define → /agentdev/req-save（機能追加のみ）→ /agentdev/spec-save（SPEC候補がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
+/agentdev/req-define → /agentdev/req-save（REQ/ADR 対象 artifact_actions がある場合）→ /agentdev/spec-save（SPEC 対象 artifact_actions がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
+
+> 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（REQ-0138, ADR-0124）。draft は構造化 `draft-data` 形式（soft contract）で req-define が生成し、後続コマンドが LLM 推論で消費する。
 
 ## req-define
 
@@ -25,23 +27,23 @@ AI と対話して要件を整理するコマンド。
 
 ## req-save
 
-要件docを REQ/ADR ファイルとして `docs/` に保存するコマンド。機能追加（feature）のみ対象。バグ修正・保守作業・ドキュメント作業はスキップする。
+要件docを REQ/ADR ファイルとして `docs/` に保存するコマンド。REQ/ADR 対象 artifact_actions（`artifact: req` / `artifact: adr`）がある場合に実行する。`work_type` による判定は廃止した（REQ-0138-009）。
 
-**入力**: 要件doc（feature のみ）
+**入力**: 要件doc（REQ/ADR 対象 artifact_actions がある場合）
 
 **出力**: REQ/ADR ファイル（commit/push まで実行）
 
 ## spec-save
 
-req-define で分離された SPEC 候補（`draft-meta.spec-candidates`）を SPEC ファイルとして `docs/specs/` に保存・確定するコマンド。機能追加（feature）かつ SPEC候補がある場合のみ実行する。req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す（ADR-0123）。
+req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を SPEC ファイルとして `docs/specs/` に保存・確定するコマンド。SPEC 対象 artifact_actions がある場合に実行する（全 work_type 対象・`work_type` による判定は廃止・REQ-0138-009）。req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す（ADR-0123）。
 
-**入力**: 要件doc（feature のみ・SPEC候補あり）
+**入力**: 要件doc（SPEC 対象 artifact_actions がある場合）
 
 **出力**: SPEC ファイル（`docs/specs/*.md`）。新規作成時は `status: draft` を付与
 
 **SPEC lifecycle**: SPEC は frontmatter `status`（`draft` / `accepted`）で成熟度を管理する。`draft`（spec-save で保存直後）→ `accepted`（case-close で実装が SPEC 内容を検証した旨を確認）の順で昇格する。
 
-**スキップ条件**: `spec-candidates` が空、または旧形式 draft（`spec-candidates` フィールドなし）の場合はスキップし従来ワークフローで実行（後方互換）。
+**スキップ条件**: `artifact: spec` entry がない、または旧形式 draft（`artifact_actions` フィールドなし）の場合はスキップし従来ワークフローで実行（後方互換）。
 
 ## case-open
 
@@ -106,16 +108,16 @@ PR をマージし、Issue をクローズするコマンド。
 
 ## work_type 分類
 
-Issue の work_type に基づき、経路（`/agentdev/req-save` の要否）が変わる。docs 更新責務は全 work_type 共通である（bugfix も含む。REQ-0104-034）。
+Issue の work_type は参考情報であり、パイプライン分岐（`/agentdev/req-save` の要否）は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（REQ-0138-009, ADR-0124）。docs 更新責務は全 work_type 共通である（bugfix も含む。REQ-0104-034）。
 
-| work_type | 名称 | ラベル | REQ | ブランチ種別 |
-|-----------|------|--------|-----|-------------|
-| bugfix | バグ修正・軽微変更 | `bug`, `critical` | 不要 | `fix` |
-| feature | 機能追加 | `enhancement`, `feature` | 必要 | `feature` |
-| maintenance | リファクタリング・保守作業 | `refactor`, `maintenance` | 不要 | `refactor` |
-| docs_chore | ドキュメント・雑務 | `docs`, `chore` | 不要 | `chore` |
+| work_type | 名称 | ラベル | ブランチ種別 |
+|-----------|------|--------|-------------|
+| bugfix | バグ修正・軽微変更 | `bug`, `critical` | `fix` |
+| feature | 機能追加 | `enhancement`, `feature` | `feature` |
+| maintenance | リファクタリング・保守作業 | `refactor`, `maintenance` | `refactor` |
+| docs_chore | ドキュメント・雑務 | `docs`, `chore` | `chore` |
 
-**昇格ルール**: bugfix で ADR が必要と判定された場合、feature に昇格し `/agentdev/req-save` を実行する。
+**工程分岐**: req_draft の `artifact_actions` に `artifact: req` / `artifact: adr` entry が含まれれば req-save が実行され、`artifact: spec` entry が含まれれば spec-save が実行される。いずれの artifact_actions もない場合は case-open から開始する。
 
 ## 最大自走モード
 
@@ -123,10 +125,10 @@ Issue の work_type に基づき、経路（`/agentdev/req-save` の要否）が
 
 ### 実行内容
 
-入力要件docの draft-meta から work_type を読み取り、工程を分岐する:
+入力要件docの `draft-data` の `artifact_actions` を読み取り、工程を動的判定する（`work_type` 固定分岐ではなく `artifact_actions` 存在による判定・REQ-0138-009）:
 
-- **feature**: `/agentdev/req-save` → `/agentdev/spec-save`（SPEC候補がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
-- **bugfix / maintenance / docs_chore**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` ・ `/agentdev/spec-save` をスキップ）
+- **REQ/ADR artifact_actions あり**: `/agentdev/req-save` → `/agentdev/spec-save`（SPEC artifact_actions がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
+- **REQ/ADR artifact_actions なし**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` ・ `/agentdev/spec-save` をスキップ）
 
 ### 自走対象
 
