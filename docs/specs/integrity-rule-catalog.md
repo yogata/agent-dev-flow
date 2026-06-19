@@ -1,3 +1,7 @@
+---
+updated: 2026-06-19
+---
+
 # Integrity Rule Catalog
 
 Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各 rule は 15 以上の field を持つ。
@@ -905,6 +909,26 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | finding_route | req-define |
 | triage_action | 該当要件行の詳細を SPEC・rule catalog・command reference・skill reference・test docs のいずれかに移管し、REQ 側は外部契約・状態要件の要約に置き換える |
 | last_verified | 2026-06-17 |
+
+### IR-045: docs 日本語表現・文意整合検査
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-045 |
+| description | docs/SPEC/REQ/command/skill の日本語表現・文意整合を検査すること。`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate` 等の英字混じり抽象用語・読取専用セマンティクスについて、日本語説明の併記・許可/禁止操作の明示・具体許可操作への置換を検証する（REQ-0108, REQ-0140） |
+| severity | heuristic |
+| category | canonical-conflict |
+| detection_method | 対象ファイル（`docs/**/*.md` ただし `docs/**/retired/**` は除外、`src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md`、`.opencode/commands/repo/**/*.md`、`.opencode/skills/repo-agentdev-integrity/**/*.md`）から検出対象語（`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate`）を検出。識別子（enum 値・frontmatter field・ファイル名・ディレクトリ名）の場合は周辺に日本語説明が存在するか確認。`read-only` 検出時は同一段落または直後のリストで許可出力・禁止操作が記述されているか検証。YAML 例中の `read_only` は具体の許可操作に置換されているか検証。英字のみの見出し・英字混じり抽象見出しを検出 |
+| affected_artifacts | [docs, REQ, SPEC, guides, commands, skills] |
+| related_req | [REQ-0108, REQ-0140] |
+| related_spec | [integrity-contracts.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 高。英字混じり抽象用語の「抽象」判定・日本語説明充足度の判定に意味判断が必要。識別子として正当な英字語（enum 値等）は文脈判定で除外が必要 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 分類に基づき修正。NG（英字混じり抽象用語に日本語説明不在／`read-only` 宣言に反して出力生成・commit・push が許可されている）は許可/禁止操作を明示化・日本語説明を併記。WARNING（識別子は保持するが日本語説明が不十分）は説明を補強。OK（日本語名と識別子が両立し許可/禁止操作が明確）は対応不要。default severity は warning、accepted SPEC または active REQ で NG 分類の場合は error に昇格 |
+| last_verified | 2026-06-19 |
 
 ## Gate Levels
 

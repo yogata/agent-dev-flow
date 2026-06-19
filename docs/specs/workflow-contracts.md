@@ -1,3 +1,7 @@
+---
+updated: 2026-06-19
+---
+
 # Workflow Contracts Specification
 
 > **Scope**: This SPEC applies to the agent-dev-flow repository only.
@@ -861,6 +865,63 @@ REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成in
 ### 検知時の扱い
 
 検知はSHOULD。検知時は通常のREQ保存処理を妨げず、非同期に保存する。
+
+## artifact_actions ベース工程分岐
+
+case-auto / case-open / req-save / spec-save の工程分岐は `work_type` の固定分岐ではなく、req_draft の `artifact_actions` 存在に基づく動的判定とする（ADR-0123, REQ-0136-014）。
+
+- `req-save` は `artifact_actions` に `artifact: req` または `artifact: adr` の entry が含まれる場合に実行する（`work_type` に依存しない）
+- `spec-save` は `artifact_actions` に `artifact: spec` の entry が含まれる場合に実行する（`work_type` に依存しない）
+- `case-open` は `req-save` / `spec-save` の後に常に実行する
+- `case-auto` はパイプラインの各工程を `work_type` の固定分岐ではなく `artifact_actions` の存在から決定する
+- `auto_gate` preflight: `case-auto` は `auto_gate.auto_ready` を確認し、false の場合または未解決 item が残る場合は停止する
+
+## 委譲定義副作用境界YAML推奨例
+
+委譲定義の `side_effect_boundary` には `read_only` のような包括値（blanket value）を使用せず、許可する操作を具体名で列挙すること。以下の YAML を推奨例とする。
+
+```yaml
+side_effect_boundary:
+  allowed:
+    - read_files
+    - inspect_content
+    - classify_candidates
+    - return_summary
+    - return_evidence
+    - return_artifact_body_when_requested
+  forbidden:
+    - file_write
+    - issue_pr_update
+    - commit
+    - push
+    - user_confirmation
+```
+
+> `read_only` を包括値として使用することは禁止する。許可する操作を具体的に列挙すること。
+
+## 文書表記・文意品質ゲート接続
+
+文書表記・文意品質ゲート（REQ-0140）と各 command/skill の接続関係を以下に定義する。
+
+| command/skill | gate connection |
+|---|---|
+| `req-define` | ADR 判断前の draft body 品質検査 |
+| `req-save` | 保存前の REQ/ADR/SPEC body 品質検査 |
+| `spec-save` | 保存前の SPEC body 品質検査 |
+| `case-run` | PR 作成前の docs/** diff 品質検査 |
+| `case-close` | SPEC status 更新の品質検査 |
+| `case-auto` | 構成する各 command の gate を継承 |
+| `inspect-docs` | 英字混じり抽象用語・読取専用セマンティクスの検出 |
+| `/repo/docs-check` | 機械的な表記違反の検出 |
+
+## 外部アーキテクチャ助言エージェント接続
+
+外部アーキテクチャ助言エージェント（oracle）の接続点を定義する。
+
+- **起動点**: `req-define` Step 4（要件展開）→ Step 4-4（アーキテクチャ確認）→ Step 5（ADR判断）
+- **oracle 入力**: 要件候補、既存 REQ/ADR/SPEC の矛盾候補、ADR 候補、SPEC 候補、責務境界変更、未解決分岐、具体質問
+- **oracle 出力**: 推奨方向、主要な設計リスク、ADR create/update/unnecessary 判断、SPEC 分離候補、矛盾解消提案、根拠参照、確信度
+- **親エージェント分類**: oracle の出力を confirmed / inferred / user-decision / blocker のいずれかに分類して取り扱う
 
 ## Scope Declaration
 

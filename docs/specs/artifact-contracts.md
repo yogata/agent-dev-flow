@@ -1,3 +1,7 @@
+---
+updated: 2026-06-19
+---
+
 # Artifact Contracts Specification
 
 > **Scope**: This SPEC applies to the agent-dev-flow repository only.
@@ -262,3 +266,37 @@ frontmatter の基本フィールドは `draft_type`・`topic`・`status`・`cre
 ### inspect-skills Side Effect 境界
 
 `inspect-skills` は read-only 診断 command とする。許可される side effect は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成のみとし、それ以外のファイル変更・canonical docs 変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・RU 保存・Issue 作成・PR 作成・commit・push を行わない（inspect lifecycle、REQ-0103-140-151）。inspect finding は `inspect-promote` による promote/defer/reject lifecycle の対象となる。
+
+## req_draft 出力構造
+
+`req_draft`（`.agentdev/drafts/req-draft-{topic}.md`）は req-define が生成する一時的な構造化ハンドオフ成果物であり、req-save / spec-save / case-open / case-auto / case-run / case-close が消費する。
+
+- req_draft は API 契約ではなく、producer 側の標準（soft contract）である。LLM 推論経由で消費され、機械的パースを前提としない（ADR-0124）
+- schema version・JSON Schema・validator は導入しない
+- 下流処理の権威ある情報源は `draft-data` YAML block であり、人間可読 Markdown セクションではない
+- 標準データモデル fields: `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `case_open_hints`
+- `summary` 等の人間可読セクションは補助的であり、下流処理の権威ある情報源ではない
+
+### artifact_actions 詳細構造
+
+- 1 action = 1 artifact × 1 editing concern とする（REQ-ID 単位でも、箇条書き1行単位でもない）
+- 同一関心の複数 agreed items は、単一 action に複数段落の `content` としてまとめる
+
+各 action の field 構成:
+
+| field | 説明 |
+|---|---|
+| `id` | `ACT-REQ-NNN` / `ACT-ADR-NNN` / `ACT-SPEC-NNN` |
+| `artifact` | `req` / `adr` / `spec` |
+| `operation` | REQ/ADR: `create` / `append` / `update`、SPEC: `create` / `update` |
+| `target` | file path または `new:{slug}` |
+| `target_area` | optional: section / area 指定 |
+| `source_items` | 対応する agreed_item ID の list |
+| `content` | 保存対象の full text |
+
+### frontmatter 構造
+
+req_draft の frontmatter は最小限のメタデータのみとする。下流処理の主入力は `# draft-data` fenced YAML block である。
+
+- 最小 frontmatter fields: `draft_type`, `topic_slug`, `status`, `created_at`、optional で `source_rus`
+- frontmatter は lightweight metadata のみ。下流処理の主入力は `# draft-data` fenced YAML であり、frontmatter ではない

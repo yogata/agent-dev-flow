@@ -436,6 +436,9 @@ scale: large
 status: saved
 upstream_handoff: false
 spec-candidates: [SC-001, SC-002, SC-003, SC-004, SC-005, SC-006, SC-007, SC-008, SC-009]
+spec-saved: true
+spec-saved-skip: [SC-004, SC-009]
+spec-saved-skip-reason: "SC-004 (forbidden-phrases.md) and SC-009 (SKILL.md) target skill source files outside docs/specs/. Handled by case-run implementation."
 ```
 
 ---
