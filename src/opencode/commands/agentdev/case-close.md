@@ -33,7 +33,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - `gh pr view` 実行不可時: 後方互換性として Step 9（実行前同期）でフォールバック検出を維持
 
 2. **前提確認**: 達成判定・完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価・更新する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md` を参照:
-   - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run・driver subagent・外部実行バックエンドは完了条件チェックボックスを更新しない（ADR-0114）。case-close は case-run / driver とは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
+   - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run・実行担当サブエージェント・外部実行バックエンドは完了条件チェックボックスを更新しない（ADR-0114）。case-close は case-run / 実行担当サブエージェントとは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
    - unchecked項目を達成判定（証拠ソース・`agentdev-workflow-orchestration` のプロトコルに従い）し `[x]` に更新
    - 達成不可項目を自律解決判定（変更対象分類×検証種別分類）
    - `agentdev-gh-cli` に従い `--body-file` で Issue本文更新 → VERIFY

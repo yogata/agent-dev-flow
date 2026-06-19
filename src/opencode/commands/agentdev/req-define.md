@@ -45,6 +45,7 @@ agent: sisyphus
    - **4-1. 変更影響候補抽出**: 変更影響候補を抽出し、ドラフトに保持する。委譲接続点: サブエージェントは探索結果・分類候補・根拠のみを返し、親エージェントがドラフト反映を判断する
    - **4-2. 分類ゲート**: 各要件行候補を「変更後仕様」or「反映作業」に分類する。併せて REQ/SPEC 境界判定（REQ-0101-067〜069）を行い、SPEC 等に配置すべき要件行候補を SPEC 保存対象として分離し、`draft-data` の `artifact_actions`（`artifact: spec`）に記録すること（REQ-0136-010, REQ-0138-009）。委譲接続点: サブエージェントは分類候補・SPEC 候補と根拠のみを返し、親エージェントが要件doc混入可否を判断する
    - **4-3. 文書分類妥当性検証**: 各要件の対象ドキュメント種別を検証する。REQ 要件行として残った行に SPEC 分離基準（REQ-0101-068）違反の残留がないか検出し、検出時は当該行を SPEC 保存対象へ移送して `artifact_actions`（`artifact: spec`）に追加すること（安定契約例外 REQ-0101-069 は検出対象外）。委譲接続点: サブエージェントは不適合候補・SPEC 残留候補と根拠のみを返し、親エージェントがflag記録を判断する
+   - **4-4. アーキテクチャ確認**: アーキテクチャに影響する要件、ADR候補、既存REQ/ADR/SPECとの衝突候補、command/skill/workflow/docsの責務境界変更を含む場合、`agentdev-architecture-advisory`に従いoracleに確認する。oracleの助言は判断材料として扱い、親エージェントが確定事項・推定事項・ユーザー確認事項・ブロッカーに分類する。既存文書またはユーザー合意で裏付けられていない内容を要件本文へ確定事項として混入させない。
 
 5. **ADR判断** → `agentdev-adr-guidelines`（manual reference）に従ってADR判断を記録（ADRファイル作成は req-save で実行）
 
@@ -108,3 +109,6 @@ agent: sisyphus
 - G13: req-define は Issue 階層を決定しない。Issue 階層の決定は case-open の責務範囲
 - G14: req-define は draft に `operation_units` セクションを出力し、`execution_groups` セクションは出力しないこと（REQ-0102-033, 038）。単一REQ操作の場合も 1 件の OU として出力する。Epic / Wave / Issue 構成の生成は case-open の責務である
 - G15: SPEC 分離基準（REQ-0101-068）に該当する要件行候補は REQ 要件行に残留させず、`draft-data` の `artifact_actions`（`artifact: spec`）へ分離すること（REQ-0136-010, REQ-0138-009）。安定契約例外（REQ-0101-069）は分離対象外
+- G16: アーキテクチャに影響する要件ではADR判断前に `agentdev-architecture-advisory` を参照する（REQ-0139-009）
+- G17: oracleの助言は親エージェントが分類し、未確認事項を要件本文へ混入させない（REQ-0139-002, REQ-0139-004）
+- G18: oracleはファイル編集主体ではない（REQ-0139-003）
