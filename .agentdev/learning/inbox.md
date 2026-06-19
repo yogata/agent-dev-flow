@@ -45,3 +45,17 @@
 
 **再発防止**: REQ を新規作成・更新する際、要件行に command の Step 番号を直接書かない。振る舞いで記述し、ステップ詳細は command reference へ委ねる。IR-044 が Step 番号混入を検出したら移行（番号除去 + 振る舞い残留）で是正する。
 
+## 2026-06-19: gh CLI の --body-file が Windows Shift-JIS コンソール環境で文字化け — コンソール UTF-8 初期化で解消
+
+**状況**: case-auto 自走中（Issue #932 / PR #933）に gh CLI の `--body-file` で Issue 本文を作成した際、本文が文字化けした。原因調査: 一時ファイルは正しく UTF-8 (BOM なし) で書かれていた（最初のバイト `23 23 20 E8 AA AC E6 98 8E 0A` = `## 説明\n`）。一方、PowerShell のコンソール出力エンコーディングが shift_jis（chcp 932）だった。gh CLI が PowerShell の Shift-JIS 環境下でファイル読み込み・引数渡し時にエンコーディング変換を起こし、GitHub 上の本文が文字化けした。READ 操作（Node.js execSync）では再発せず（パイプラインをバイパスするため）、WRITE 操作（--body-file / --title）でのみ発生。
+
+**学び**: agentdev-gh-cli skill は「OpenCode の Write tool も使用可能（BOMなしUTF-8で書き出す）」としているが、コンソールエンコーディングが Shift-JIS の場合、それだけでは文字化けを防げない。gh CLI の呼び出し前に `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` + `cmd /c chcp 65001` でコンソールを UTF-8 に設定する必要がある。これは agentdev-gh-cli skill の Section 2（標準手順）に明記すべき初期化ステップ（現在は Section 1 禁止事項・Section 2 標準手順にコンソールエンコーディング初期化が明記されていない）。
+
+**再発防止**: gh CLI を PowerShell から呼ぶ際（特に --body-file / --title で日本語を含む場合）、必ず以下を先に実行する:
+```
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+cmd /c chcp 65001 | Out-Null
+```
+agentdev-gh-cli skill の Section 2（標準手順）にこのコンソールエンコーディング初期化ステップを追記すべき（intake 経由で RU 化 → req-define → req-save を推奨・本件は case-run worktree precondition gate とは別件）。
+
