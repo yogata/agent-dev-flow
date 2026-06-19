@@ -37,7 +37,7 @@ agent: sisyphus
    - **auto_gate preflight**: `draft-data` の `auto_gate.auto_ready` を確認し、false の場合または未解決 item（unresolved_questions / unresolved_conflicts / out_of_repo_operations / stop_reasons）が残る場合は停止する（REQ-0138-013）
 4. **各工程の実行**: 既存コマンド定義（req-save.md / spec-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）も含めて既存コマンド定義に従うこと
    - **品質ゲート（QG-1〜QG-4）の継承**: case-auto は QG を独自実装しない。構成コマンド（req-save: QG-1, case-open: QG-2, case-run: QG-3, case-close: QG-4）がそれぞれ `agentdev-quality-gates` スキルを参照して Gate を適用する。case-auto は工程間制御のみを担い、Gate 判定を再評価・差し替えしない（G07, G09）
-   - **case-run の driver 委譲モデル**: case-run は実装実行を driver subagent（`agentdev-execution-backend`）経由で外部実行バックエンドへ委譲し、自身は orchestration に専念する（ADR-0114）。case-auto は case-run の driver 委譲モデルを変更せず、実装実行・PR作成を自ら行わない。driver result（completed(pr)/blocked/failed）の処理は case-run 定義に従う
+   - **case-run の 実行担当サブエージェント委譲モデル**: case-run は実装実行を実行担当サブエージェント（`agentdev-case-run-execution-adapter`）経由で外部実行バックエンドへ委譲し、自身は orchestration に専念する（ADR-0114）。case-auto は case-run の実行担当サブエージェント委譲モデルを変更せず、実装実行・PR作成を自ら行わない。実行担当サブエージェント result（completed(pr)/blocked/failed）の処理は case-run 定義に従う
    - case-auto は req-save / case-open に draft path と OU ID のみを渡すこと（REQ-0114-052）。OU 本文の切り出しは行わない
    - case-auto は OU の統合・分割、REQ 操作分類、Issue 階層判定を再評価しないこと（REQ-0114-054）
     - case-open 相当処理の完了後、出力を確認して以下のいずれかに分岐する:
@@ -53,7 +53,7 @@ agent: sisyphus
        1. **子Issue選択**: status が `ready` の子Issue を1件選択する。`ready` がない場合、依存（前 Wave 含む）が満たされた `pending` Issue を `ready` に遷移させて選択する。`running` / `completed` / `blocked` / `failed` は選択対象外（`skipped` は採用しない。前提未達の Issue は `pending` のまま選択対象外となる）
        2. **running 遷移**: 選択した子Issue を `running` に遷移させる（Epic Issue ステータス追跡テーブルを更新）
        3. **case-run 委譲**: 選択した子Issue 番号 + 要件docパス（該当 OU の target_req 情報を含む）を case-run 相当処理に渡す。case-run は1 Issue のみを処理する（REQ-0130-010）。Wave全体の一括実行を case-run に委譲しない
-       4. **結果確認**: case-run 完了後、永続状態（Issue / PR / `.agentdev/`）を再読込し driver result（completed(pr) / blocked / failed）を確認する。親コンテキストに子Issue の実装過程ログを持ち越さない（SC-009 親コンテキスト非累積原則）
+       4. **結果確認**: case-run 完了後、永続状態（Issue / PR / `.agentdev/`）を再読込し実行担当サブエージェント result（completed(pr) / blocked / failed）を確認する。親コンテキストに子Issue の実装過程ログを持ち越さない（SC-009 親コンテキスト非累積原則）
        5. **次子Issue選択**: Step 4-2 の case-close 処理後、Step 1 に戻り次の子Issue を選択する。選択可能な子Issue がなくなったら Step 4-3 へ進む
       - **Step 4-2 case-close（子Issue単位）**: case-run 完了後、Step 4-1-4 で確認した結果に基づき当該1子Issue の case-close 処理を決定する（SC-009）:
        - 正常完了（completed(pr)）: 該当子Issue を `completed` に遷移させ case-close 相当処理を実行する
