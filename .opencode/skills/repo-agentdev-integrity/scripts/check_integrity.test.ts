@@ -321,6 +321,18 @@ function buildInvalidFixture(root: string): void {
   const specsDir = join(root, "docs", "specs");
   mkdirp(specsDir);
 
+  // IR-045 fixture: SPEC file with undocumented English abstract term
+  writeFileSync(
+    join(specsDir, "doc-quality-fixture.md"),
+    [
+      "# Doc Quality Fixture",
+      "",
+      "This command is a read-only diagnostic.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
   const skill1 = join(root, ".opencode", "skills", "agentdev-test-skill");
   mkdirp(skill1);
   writeFileSync(join(skill1, "SKILL.md"), "# agentdev-test-skill\n", "utf-8");
@@ -823,5 +835,28 @@ describe("Capture boundary checks", () => {
         res.message.includes("case-run.md"),
     );
     expect(dutyNg.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("Doc language quality checks (IR-045)", () => {
+  it("valid fixture: doc-language-quality check passes (no undocumented terms)", () => {
+    const r = runScript(VALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const check = parsed.results.find(
+      (res: { check: string }) => res.check === "doc-language-quality",
+    );
+    expect(check).toBeDefined();
+  });
+
+  it("invalid fixture: doc-language-quality detects undocumented read-only term", () => {
+    const r = runScript(INVALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const warnings = parsed.results.filter(
+      (res: { check: string; level: string; message: string }) =>
+        res.check === "doc-language-quality" &&
+        res.level === "warning" &&
+        res.message.includes("read-only"),
+    );
+    expect(warnings.length).toBeGreaterThanOrEqual(1);
   });
 });

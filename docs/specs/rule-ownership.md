@@ -37,6 +37,7 @@
 | 29 | mapping-table 履歴名明示 | REQ-0108 (240) | integrity-contracts.md | 旧語彙に履歴名を明示 |
 | 30 | REQ 検証基準（必達要件） | REQ-0108 | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証（REQ-0115-044 から REQ-0108 に移管） |
 | 31 | Quality Gates | REQ-0108 | quality-gates.md | QG-1〜QG-4 定義・機械化境界・実装マッピング（REQ-0115 から REQ-0108 に移管） |
+| 32 | docs 日本語表現・文意整合 | REQ-0140, REQ-0108 (255-257) | integrity-rule-catalog.md (IR-045) | 英字混じり抽象用語・読取専用セマンティクスの検出。文書表記・文意品質ゲート（付帯品質ゲート）の機械検査担当 |
 
 ## 重複ルールの解消状況
 

@@ -1,13 +1,13 @@
 ---
-description: Command→Skill 参照妥当性と Skill 構造を read-only で診断する
+description: Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正せずに診断する
 agent: sisyphus
 ---
 
 # inspect-skills
 
-Command→Skill 参照妥当性と Skill 構造を read-only で診断し、finding、分類、根拠、推奨 route を提示する。診断結果は `.agentdev/inspect/inbox/` へ出力する。
+Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せずに診断し、finding、分類、根拠、推奨 route を提示する。診断結果は `.agentdev/inspect/inbox/` へ出力する。
 
-## 基本原則: 診断専用（Read-Only）
+## 基本原則: 診断専用（検査対象を直接修正しない）
 
 診断を基本とし、許可される side effect は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ。
 

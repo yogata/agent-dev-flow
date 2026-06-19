@@ -7027,6 +7027,191 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
   return results;
 }
 
+/**
+ * Recursively collect .md files under a directory.
+ */
+function collectMarkdownRecursive(dirPath: string): string[] {
+  const out: string[] = [];
+  if (!fs.existsSync(dirPath)) return out;
+  let entries: import("fs").Dirent[];
+  try {
+    entries = fs.readdirSync(dirPath, { withFileTypes: true }) as import("fs").Dirent[];
+  } catch {
+    return out;
+  }
+  for (const ent of entries) {
+    const full = path.join(dirPath, ent.name);
+    let isDir = ent.isDirectory();
+    // Windows junction handling
+    if (!isDir) {
+      try {
+        isDir = fs.statSync(full).isDirectory();
+      } catch {
+        isDir = false;
+      }
+    }
+    if (isDir) {
+      out.push(...collectMarkdownRecursive(full));
+    } else if (ent.name.endsWith(".md")) {
+      out.push(full);
+    }
+  }
+  return out;
+}
+
+/**
+ * Strip fenced code blocks (``` ... ```) from content, preserving line numbers.
+ * Replaced with spaces so line offsets remain valid.
+ */
+function stripFencedCodeBlocks(content: string): string {
+  return content.replace(
+    /```[\s\S]*?```/g,
+    (m) => m.replace(/[^\n]/g, " "),
+  );
+}
+
+/**
+ * IR-045 (REQ-0140): docs 日本語表現・文意整合検査
+ * Detects English-mixed abstract terms (read-only, advisor, architecture-affecting, etc.)
+ * that require Japanese annotation / allowed-forbidden operation decomposition.
+ */
+const IR045_TARGET_TERMS: ReadonlyArray<{
+  signal: string;
+  pattern: RegExp;
+  hint: string;
+}> = [
+  {
+    signal: "read-only / Read-Only",
+    pattern: /\b[Rr]ead-[Oo]nly\b/,
+    hint: 'decompose into 参照専用入力 / 検査対象を直接修正しない診断 / 保存更新を親に残す委譲 (REQ-0140-004)',
+  },
+  {
+    signal: "read_only (YAML blanket value)",
+    pattern: /(^|\s)read_only(\s|$)/,
+    hint: 'replace with specific allowed operations: read_files, inspect_content, return_evidence (REQ-0140-011)',
+  },
+  {
+    signal: "advisor / advisory",
+    pattern: /\b(advisor|advisory)\b/,
+    hint: 'decompose into 誰が最終判断するか / 何を返すか (REQ-0140-006)',
+  },
+  {
+    signal: "architecture-affecting",
+    pattern: /\barchitecture-affecting\b/,
+    hint: '「ADR判断が必要な変更」または「ADR要否確認が必要な変更」(REQ-0140-012)',
+  },
+  {
+    signal: "Architecture advisory gate",
+    pattern: /\bArchitecture advisory gate\b/i,
+    hint: '「ADR要否確認ゲート」(REQ-0140-013)',
+  },
+];
+
+// Files that describe the detection rules themselves — exempt from IR-045
+const IR045_EXEMPT_FILES: ReadonlySet<string> = new Set([
+  "forbidden-phrases.md",
+  "vocabulary-registry.md",
+  "gate-levels.md",
+  "integrity-rule-catalog.md",
+  "remediation-routing.md",
+]);
+
+const IR045_EXEMPT_PATH_PARTS: ReadonlyArray<RegExp> = [
+  /agentdev-no-ai-slop-writing[\\/]+SKILL\.md$/,
+  /docs[\\/]+requirements[\\/]+retired[\\/]/,
+  /docs[\\/]+adr[\\/]+retired[\\/]/,
+];
+
+function checkDocLanguageQuality(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  let foundViolation = false;
+
+  // Collect target directories
+  const targetDirs = [
+    path.join(root, "docs"),
+    path.join(root, "src", "opencode", "commands"),
+    path.join(root, "src", "opencode", "skills"),
+    path.join(root, ".opencode", "commands", "repo"),
+    path.join(root, ".opencode", "skills", "repo-agentdev-integrity"),
+  ];
+
+  const scannedFiles = new Set<string>();
+  for (const dir of targetDirs) {
+    for (const filePath of collectMarkdownRecursive(dir)) {
+      const norm = filePath.replace(/\\/g, "/");
+      // Skip retired docs
+      if (/\/retired\//.test(norm)) continue;
+      scannedFiles.add(filePath);
+    }
+  }
+
+  for (const filePath of scannedFiles) {
+    const fileName = path.basename(filePath);
+    const norm = filePath.replace(/\\/g, "/");
+    // Exempt self-describing rule files
+    if (IR045_EXEMPT_FILES.has(fileName)) continue;
+    if (IR045_EXEMPT_PATH_PARTS.some((re) => re.test(norm))) continue;
+
+    const content = readText(filePath);
+    if (!content) continue;
+    const relPath = resolveRelative(filePath, root);
+
+    // Strip fenced code blocks before scanning
+    const stripped = stripFencedCodeBlocks(content);
+    const lines = stripped.split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      // Strip inline code so code-only tokens don't trigger
+      const lineNoInline = line.replace(/`[^`]*`/g, "  ");
+
+      for (const { signal, pattern, hint } of IR045_TARGET_TERMS) {
+        if (pattern.test(lineNoInline)) {
+          // Check if nearby Japanese explanation exists (same line or next 2 lines)
+          const nearby = [line, lines[i + 1] || "", lines[i + 2] || ""].join(
+            " ",
+          );
+          const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/.test(
+            nearby,
+          );
+          // If Japanese explanation is present on the same line, skip (likely annotated)
+          if (hasJapanese && /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/.test(line)) {
+            continue;
+          }
+          foundViolation = true;
+          results.push(
+            warn(
+              "CanonicalConflict",
+              "doc-language-quality",
+              `English abstract term "${signal}" detected without nearby Japanese annotation — ${hint} (IR-045, REQ-0140)`,
+              relPath,
+              i + 1,
+              {
+                evidence: line.trim().slice(0, 120),
+                expected:
+                  "Decompose English abstract term into specific operations / responsibilities with Japanese annotation",
+                route: "intake",
+              },
+            ),
+          );
+          break; // one finding per line
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "CanonicalConflict",
+        "doc-language-quality",
+        "No undocumented English abstract terms detected (IR-045, REQ-0140)",
+      ),
+    );
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -7187,6 +7372,7 @@ async function main(): Promise<void> {
     ...checkMappingTableHistoryLabels(root),
     ...checkReqVerificationBasis(root),
     ...checkReqSpecBoundaryViolation(root), // IR-044 (REQ-0136-006)
+    ...checkDocLanguageQuality(root), // IR-045 (REQ-0140)
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)

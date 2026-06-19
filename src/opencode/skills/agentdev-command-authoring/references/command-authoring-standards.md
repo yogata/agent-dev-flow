@@ -437,7 +437,12 @@ inputs:
     - {参照してよい基準、読んでよい範囲、除外対象}
 side_effect_boundary:
   allowed:
-    - read_only
+    - read_files
+    - inspect_content
+    - classify_candidates
+    - return_summary
+    - return_evidence
+    - return_artifact_body_when_requested
   forbidden:
     - file_write
     - issue_pr_update
@@ -465,7 +470,7 @@ capture_handoff:
 | フィールド | 必須 | 説明 |
 |---|---|---|
 | `inputs` | ✅ | 委譲先に渡す限定された入力範囲 |
-| `side_effect_boundary` | ✅ | 委譲先の副作用境界。原則は読み取り専用 |
+| `side_effect_boundary` | ✅ | 委譲先の副作用境界。許可操作は `read_files` / `inspect_content` / `return_evidence` 等の具体名で列挙し、包括値 `read_only` は使用しない（REQ-0140-011） |
 | `output_contract` | ✅ | `pass` / `warn` / `fail` / `partial` を基本とする返却形式 |
 | `capture_handoff` | ✅ | intake / learning 候補を保存せず親へ返す形式 |
 
@@ -496,7 +501,7 @@ capture_handoff:
 
 - **委譲先**: skill `{skill-name}`, reference `{path}`
 - **入力**: {検査対象、参照基準、除外対象}
-- **副作用境界**: 読み取り専用。保存、Issue / PR 更新、commit、push、ユーザー確認は禁止
+- **副作用境界**: 検査対象を直接修正しない。許可操作は `read_files` / `inspect_content` / `return_evidence` 等。保存、Issue / PR 更新、commit、push、ユーザー確認は禁止
 - **返却形式**: `pass` / `warn` / `fail` / `partial`、要約、根拠、親判断事項、副作用なしの明示
 - **capture handoff**: intake / learning 候補は保存せず親へ返す
 - **制約**: 検証結果の最終判断は本コマンドが保持する

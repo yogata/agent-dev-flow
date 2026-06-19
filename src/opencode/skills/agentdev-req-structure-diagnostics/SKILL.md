@@ -5,7 +5,7 @@ description: inspect-docs コマンドの REQ structure 診断ロジックの知
 
 # REQ Structure Diagnostics Knowledge Base
 
-inspect-docs コマンドの REQ structure 診断知識ベース。REQ参照ID整合性・第一参照導線・active/retired/世代境界・6観点診断・未処理artifact確認・問題候補出力スキーマの判定基準と検出シグナルを提供する。診断専用（read-only）であり、本スキルは判定ロジックの提供のみを行い、ファイル変更や artifact 処理は行わない。
+inspect-docs コマンドの REQ structure 診断知識ベース。REQ参照ID整合性・第一参照導線・active/retired/世代境界・6観点診断・未処理artifact確認・問題候補出力スキーマの判定基準と検出シグナルを提供する。検査対象を直接修正しない診断専用であり、本スキルは判定ロジックの提供のみを行い、ファイル変更や artifact 処理は行わない。
 
 ## USE FOR
 
