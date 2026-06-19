@@ -33,7 +33,7 @@
 | [REQ-0133](requirements/REQ-0133.md) | case-update / Issue更新 |
 | [REQ-0134](requirements/REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install |
 | [REQ-0135](requirements/REQ-0135.md) | Drafts配置・Draft Type Registry |
-| [REQ-0136](requirements/REQ-0136.md) | REQ/SPEC/ADR 適正運用の自動化（3層ゲート + 新ワークフロー） |
+| [REQ-0136](requirements/REQ-0136.md) | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設・req-define 強化） |
 | [REQ-0137](requirements/REQ-0137.md) | 並列実行安全 git 操作規律（共有作業ツリーでの case-auto 並行実行支援） |
 | [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 |
 | [REQ-0139](requirements/REQ-0139.md) | 外部エージェント統合契約 |

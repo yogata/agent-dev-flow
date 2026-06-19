@@ -65,14 +65,6 @@ export interface IntegrityReport {
 }
 
 // REQ-0108-196: classification policy support
-// REQ-0136-040 (Issue #898, Task 1.1): 3-layer gate switching
-export type GateLevel = "full-audit" | "delta-guard" | "impact-guard";
-
-export const VALID_GATE_LEVELS: readonly GateLevel[] = [
-  "full-audit",
-  "delta-guard",
-  "impact-guard",
-];
 
 export interface CliOptions {
   help: boolean;
@@ -80,37 +72,6 @@ export interface CliOptions {
   dryRun: boolean;
   classification: boolean; // REQ-0108-196
   paths: string[];
-  gate: GateLevel; // REQ-0136-040
-  gatePaths: string[]; // REQ-0136-040
-  reqs: string[]; // REQ-0136-040
-  strictOnly: boolean; // REQ-0136-004/005: hooks fail only on strict findings
-}
-
-/**
- * Resolve the value of a `--flag <value>` / `--flag=value` token. Returns
- * `{ value, advanced }` where `advanced` indicates whether the next argv token
- * was consumed (caller must skip it). Throws on a missing value.
- */
-function resolveFlagValue(
-  flagName: string,
-  current: string,
-  next: string | undefined,
-): { value: string; advanced: boolean } {
-  const eqIdx = current.indexOf("=");
-  if (eqIdx > -1) {
-    return { value: current.slice(eqIdx + 1), advanced: false };
-  }
-  if (next === undefined || next.startsWith("-")) {
-    throw new Error(`${flagName} requires a value (usage: ${flagName} <value>)`);
-  }
-  return { value: next, advanced: true };
-}
-
-function splitCsv(value: string): string[] {
-  return value
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
 }
 
 export function parseArgs(args: string[]): CliOptions {
@@ -120,10 +81,6 @@ export function parseArgs(args: string[]): CliOptions {
     dryRun: false,
     classification: false, // REQ-0108-196
     paths: [],
-    gate: "full-audit", // REQ-0136-040: backward-compatible default
-    gatePaths: [],
-    reqs: [],
-    strictOnly: false, // REQ-0136-004/005
   };
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -135,25 +92,6 @@ export function parseArgs(args: string[]): CliOptions {
       options.dryRun = true;
     } else if (arg === "--classification") { // REQ-0108-196
       options.classification = true;
-    } else if (arg === "--strict-only") { // REQ-0136-004/005
-      options.strictOnly = true;
-    } else if (arg === "--gate" || arg.startsWith("--gate=")) {
-      const { value, advanced } = resolveFlagValue("--gate", arg, args[i + 1]);
-      if (advanced) i++;
-      if (!VALID_GATE_LEVELS.includes(value as GateLevel)) {
-        throw new Error(
-          `Invalid --gate value "${value}". Valid values: ${VALID_GATE_LEVELS.join(", ")}`,
-        );
-      }
-      options.gate = value as GateLevel;
-    } else if (arg === "--paths" || arg.startsWith("--paths=")) {
-      const { value, advanced } = resolveFlagValue("--paths", arg, args[i + 1]);
-      if (advanced) i++;
-      options.gatePaths = splitCsv(value);
-    } else if (arg === "--reqs" || arg.startsWith("--reqs=")) {
-      const { value, advanced } = resolveFlagValue("--reqs", arg, args[i + 1]);
-      if (advanced) i++;
-      options.reqs = splitCsv(value);
     } else if (!arg.startsWith("-")) {
       options.paths.push(arg);
     }
@@ -176,16 +114,6 @@ OPTIONS:
   --json            Output results in JSON format
   --dry-run         Show what would be checked without running checks
   --classification  Enable document classification policy checks (REQ-0108-196)
-  --gate <level>    Integrity gate selector: full-audit | delta-guard | impact-guard
-                    (default: full-audit). full-audit runs all rules; delta-guard
-                    runs change-scoped rules (--paths); impact-guard runs
-                    REQ-scoped rules (--reqs).
-  --paths <csv>     Delta-guard file scoping, comma-separated paths
-                    (e.g. --paths docs/requirements/REQ-0101.md)
-  --reqs <csv>      Impact-guard REQ scoping, comma-separated REQ IDs
-                    (e.g. --reqs REQ-0101,REQ-0108)
-  --strict-only     Exit non-zero only on strict findings; heuristic/observation
-                    findings do not cause failure (used by git hooks)
 
 EXIT CODES:
   0  No issues found
@@ -427,16 +355,6 @@ export function determineExitCode(summary: ScanSummary): number {
   return EXIT_OK;
 }
 
-export function determineExitCodeStrict(
-  results: CheckResult[],
-): number {
-  const hasStrict = results.some(
-    (r) =>
-      r.finding_level === "strict" && r.level !== "ok" && r.level !== "info",
-  );
-  return hasStrict ? EXIT_NG : EXIT_OK;
-}
-
 export function determineRoute(
   category: FindingCategory,
   occurrences: number,
@@ -477,7 +395,6 @@ const CHECK_TO_FINDING_CATEGORY: Record<string, FindingCategory> = {
   "adr-status-normalization": "canonical-conflict",
   "workflow-status-prohibition": "canonical-conflict",
   "lifecycle-boundary": "canonical-conflict",
-  "req-spec-boundary-violation": "canonical-conflict",
   "readme-index-sync": "broken-reference",
   "adr-readme-index-sync": "broken-reference",
   "spec-readme-index-sync": "broken-reference",

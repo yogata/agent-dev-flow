@@ -33,7 +33,7 @@
 | [REQ-0133](REQ-0133.md) | case-update / Issue更新 | case-update、Issue本文更新（テンプレート構造維持）、コメント追加、REQ ファイル更新（直接commit+push）、レビューNG対応、フェーズ維持 |
 | [REQ-0134](REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install | source/projection layout、sync/migration script、repo type、consumer install |
 | [REQ-0135](REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry、`.sisyphus/` 除外 |
-| [REQ-0136](REQ-0136.md) | REQ/SPEC/ADR 適正運用の自動化（3層ゲート + 新ワークフロー） | 3層ゲート自動化（Delta/Impact/Full Audit）、spec-save 新設、req-define SPEC分離強化、IR-044 実装、finding 自動フィードバック、REQ健全性メトリクス |
+| [REQ-0136](REQ-0136.md) | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設・req-define 強化） | spec-save 新設、req-define SPEC分離強化、case-* SPEC確定フロー、inspect-promote 自動promote、REQ健全性メトリクス |
 | [REQ-0137](REQ-0137.md) | 並列実行安全 git 操作規律 | 並列実行安全 git 操作規律、スイープ操作禁止、明示パスステージ&コミット、消費アーティファクト(draft/RU)削除信頼性・Form Zero解消・削除検証 Standard/Epic 全flow適用 |
 | [REQ-0138](REQ-0138.md) | 構造化req_draft契約 | inter-command draft handoff契約、soft-contract原則、artifact_actions構造、LLM推論消費 |
 | [REQ-0139](REQ-0139.md) | 外部エージェント統合契約 | 外部エージェント統合、case-run外部実行委譲、driver adapter契約 |

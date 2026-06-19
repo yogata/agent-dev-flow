@@ -63,27 +63,7 @@
 ### No Direct Impact
 - **REQ-0110**: Git worktree cleanup 信頼性（infrastructure 層）
 
-## 3-Layer Gate Structure
-
-| Layer | Trigger | 実行 Rules | Target |
-|-------|---------|-----------|--------|
-| Full Audit | 定期実行、重大変更、リリース前 | IR-001 ~ IR-024 (全24件) | 全 artifact |
-| Delta Guard | PR 作成時、通常開発時 | 変更ファイル種別に対応する rules | 変更関連 artifact |
-| Impact Guard | 特定 REQ/ADR 変更時 | 該当 REQ の Impact Matrix 行の rules | 影響範囲 artifact |
-
-### Delta Guard Rule Selection
-
-| 変更種別 | 実行 Rules |
-|---------|-----------|
-| Command 追加/変更 | IR-006, IR-007, IR-013, IR-024 |
-| Skill 追加/変更 | IR-007, IR-008, IR-014 |
-| REQ 追加/変更 | IR-001, IR-002, IR-004, IR-022 |
-| ADR 追加/変更 | IR-005, IR-010 |
-| SPEC 変更 | IR-017, IR-023 |
-| Template 変更 | IR-012, IR-013 |
-| Source/projection 変更 | IR-016 |
-
-### Recurrence Triage
+## Recurrence Triage
 
 再発 finding 検出時の対応ループ:
 
@@ -91,7 +71,7 @@
 2. **分類**: known (baseline済み) vs new
 3. **再発判定**: known finding が再度検出された場合:
    - rule/detector の誤検知 → rule を修正 (false positive)
-   - 真の再発 → detector を強化、または prevention gate を追加
+   - 真の再発 → detector を強化、または検出ルールを追加
    - baseline 判定ミス → baseline を更新
 4. **改善 loop**: rule catalog / baseline / impact map / exception を更新
 5. **記録**: トリアージ結果を integrity report に記録

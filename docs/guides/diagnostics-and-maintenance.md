@@ -63,46 +63,6 @@ Finding ごとに以下の route で後続処理に送る。
 
 結果は `.agentdev/integrity/reports/` に JSON または Markdown 形式で出力する。結果分類は NG / warning / info の3段階。
 
-## 3層ゲート（自動実行）
-
-docs-check は3層構成で自動実行され、事前予防（commit / push 時）から定期・事後監査までを機械的に担保する（REQ-0108-153, REQ-0136-004/005/007/008）。各層は同じ `check_integrity.ts` を起動し、ゲート種別（`--gate`）と検出水準（`--strict-only`）で検査範囲を切り替える。
-
-| 層 | Gate | 起動タイミング | 検査範囲 | 実行方法 | ブロック条件 |
-|----|------|---------------|----------|----------|-------------|
-| 事前予防 | **Delta Guard** | `git commit` 実行時 | staged files に関連する strict 違反のみ | `.githooks/pre-commit` | strict 違反で commit block |
-| 事前予防 | **Impact Guard** | `git push` 実行時 | 未 push 範囲の変更 REQ/ADR に関連する strict 違反 | `.githooks/pre-push` | strict 違反で push block |
-| 定期・事後 | **Full Audit** | 月次 schedule・catalog/ADR 変更時・手動 | 全 rule（strict + heuristic + observation） | `.github/workflows/full-audit.yml` | PR 上で strict 違反で fail |
-
-Delta / Impact Guard は `--strict-only` 付きで起動し、heuristic / observation finding は警告表示のみで commit / push をブロックしない。3層の検出水準（strict / heuristic / observation）の定義は [gate-levels.md](../../.opencode/skills/repo-agentdev-integrity/references/gate-levels.md) を参照。
-
-### セットアップ（初回のみ）
-
-Delta / Impact Guard を有効化するには、各プラットフォームの setup スクリプトを1回実行する。スクリプトは `git config core.hooksPath .githooks` を設定するだけで冪等であり、何度実行しても安全。
-
-```powershell
-# Windows (PowerShell 7+)
-./.githooks/setup-hooks.ps1
-```
-
-```sh
-# Unix / macOS / Linux / Git Bash
-./.githooks/setup-hooks.sh
-```
-
-有効化確認・一時無効化・再有効化:
-
-```powershell
-./.githooks/setup-hooks.ps1 -Action status
-./.githooks/setup-hooks.ps1 -Action disable
-./.githooks/setup-hooks.ps1 -Action enable
-```
-
-前提: bun（`check_integrity.ts` 起動に使用）と Git 2.9+（`core.hooksPath` サポート）。bun が PATH にない場合、hook は警告を出してスキップする（ブロックしない）。setup の詳細・bypass・troubleshooting は [.githooks/README.md](../../.githooks/README.md) を参照。
-
-### Full Audit
-
-Full Audit は GitHub Actions で実行され、月次（cron）・`integrity-rule-catalog.md` 変更・ADR 変更・REQ retire 時に起動し、手動（`workflow_dispatch`）でも実行できる。結果は artifact として upload され、定期/手動実行時は `.agentdev/integrity/reports/` へ commit される。PR 上で strict 違反がある場合は fail する。ワークフロー定義は [`.github/workflows/full-audit.yml`](../../.github/workflows/full-audit.yml) を参照。
-
 ## inspect-docs
 
 docs 全体の意味整合検出と REQ 体系の健全性検出を行うコマンド（REQ-0109）。旧 `req-restructure-review` を統合し、REQ 再構成観点を含む全体意味検出を担う。
