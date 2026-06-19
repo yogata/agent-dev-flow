@@ -5,11 +5,11 @@ agent: sisyphus
 
 # Repo Self-Audit: Docs Check
 
-agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理下の artifact（REQ、ADR、skill、command、spec）の整合性を検査し、結果をレポートとして出力する read-only コマンド。
+agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理下の artifact（REQ、ADR、skill、command、spec）の整合性を検査し、結果をレポートとして出力する。検査対象 artifact を直接修正せず、許可出力は `.agentdev/integrity/reports/` のレポートと `.agentdev/intake/inbox/` の intake item のみ。
 
 > **Note**: このコマンドは repo-local であり、AgentDevFlow の配布対象外である。Consumer project では利用しない。
 
-## 基本原則: Read-Only 制約
+## 基本原則: 検査対象を直接修正しない制約
 
 検査対象 artifact を変更しない。許容する新規作成は `.agentdev/integrity/reports/` のレポート生成と `.agentdev/intake/inbox/` の intake item（実行＝保存承認、REQ-0108-225）。
 

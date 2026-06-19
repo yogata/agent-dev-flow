@@ -73,6 +73,7 @@ integrity-check の検出結果を3水準に分類し、それぞれの意味と
 | `post-completion-output` | 完了後の出力指示 | REQ-0108 |
 | `old-terminology` | 旧用語の使用 | REQ-0108 |
 | `vocabulary-compliance` | 語彙レジストリ違反 | 本ドキュメント |
+| `doc-language-quality` | docs 日本語表現・文意整合違反（英字混じり抽象用語・`read-only` 読取専用セマンティクス・許可/禁止操作の非明示）。IR-045 | REQ-0140, REQ-0108-255〜257 |
 
 ## observation（参考情報）
 

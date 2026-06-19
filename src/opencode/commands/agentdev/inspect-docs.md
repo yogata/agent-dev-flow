@@ -5,9 +5,9 @@ agent: sisyphus
 
 # inspect-docs
 
-docs全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、finding を `.agentdev/inspect/inbox/` へ出力する read-only 診断コマンド。REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC・ADR・guides・DOC-MAP の意味診断を含む。
+docs全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、finding を `.agentdev/inspect/inbox/` へ出力するコマンド。検査対象を直接修正しない診断を行い、REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC・ADR・guides・DOC-MAP の意味診断を含む。
 
-## 基本原則: 診断専用（Read-Only）
+## 基本原則: 診断専用（検査対象を直接修正しない）
 
 診断のみを実行する。許可される side effect は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ。
 

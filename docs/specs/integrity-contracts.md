@@ -107,7 +107,7 @@ command guardrails を以下の6カテゴリに分類する:
 
 | Command | Allowed Changes | Forbidden |
 |---|---|---|
-| `req-define` | なし（read-only 対話） | 全ファイル書込 |
+| `req-define` | `.agentdev/drafts/req-draft-*.md` の生成（対話セッションで合意形成し、canonical docs は変更しない） | canonical docs（`docs/`・`.opencode/`）の変更、Issue/PR 作成・更新、commit/push |
 | `req-save` | `docs/requirements/`, `docs/adr/`, `docs/DOC-MAP.md`, `.agentdev/intake/inbox/req-restructure/`（REQ再構成intakeのみ） | `.agentdev/`（req-restructure 除く）, `.opencode/` |
 | `case-open` | GitHub Issue/PR のみ | ローカルファイル |
 | `case-run` | worktree 内の全ファイル | worktree 外、`.agentdev/` |
@@ -124,14 +124,14 @@ command guardrails を以下の6カテゴリに分類する:
 | `intake-promote` | `.agentdev/intake/promoted/` | 他パス |
 | `learning-promote` | `.agentdev/learning/promoted/` | 他パス |
 | `backlog-review` | `.agentdev/backlog/req-units/`, `.agentdev/intake/promoted/`, `.agentdev/learning/promoted/` | `.opencode/`, 検査対象外artifact |
-| `inspect-docs` | なし（read-only 診断） | 全ファイル書込 |
+| `inspect-docs` | `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、`.agentdev/inspect/` 配下の git 永続化（commit / push） | 検査対象アーティファクト（docs/・REQ/ADR/SPEC/guides/DOC-MAP・Command/Skill/Template/Script）の変更、許可範囲外 commit/push、Issue/PR 作成・更新 |
 
 ## Postflight Diff Checking
 
-postflight diff checking は read-only command から段階導入する:
+postflight diff checking は検査対象を直接修正しない command から段階導入する:
 
-**read-only command 検証**:
-- `inspect-docs` は実行後にローカルファイル変更がないことを確認（真の read-only 診断）
+**検査対象を直接修正しない command 検証**:
+- `inspect-docs` は実行後に検査対象アーティファクト（docs/・REQ/ADR/SPEC/guides/DOC-MAP・Command/Skill/Template/Script）に変更がないことを確認。許可出力（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成・`.agentdev/inspect/` 配下の commit/push）以外の変更を warning として報告する
 - `docs-check`（配布対象外 `/repo/docs-check`）は検査対象 artifact を変更しないが、許可された出力（`.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`）を生成する。postflight は「検査対象 artifact への変更がないこと」を確認し、許可出力範囲外の変更を warning として報告する
 - `backlog-review` も検査対象外 artifact を変更せず、許可された `.agentdev/` 配下の出力のみを行う
 - 変更が検出された場合は warning として報告

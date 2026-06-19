@@ -130,6 +130,20 @@ AGENTS.md、system.md、ガイド内の REQ 範囲表記は実際の active REQ 
 | `Intake候補` | `Capture候補` | PR template セクション名変更（REQ-0105-077） |
 | `Findings / Intake候補` | `Findings / Capture候補` | PR セクション見出し（REQ-0105-077） |
 
+## 文意品質検出対象語（IR-045）
+
+docs 日本語表現・文意整合検査（IR-045, REQ-0140）の検出対象語。これらは「旧語彙」ではなく、文脈に応じて日本語説明の併記・許可/禁止操作の明示・具体許可操作への置換を要する英字混じり抽象用語。固定識別子（enum 値・frontmatter field・ファイル名等）として原語を維持する場合は、初出位置に日本語注記を付与する。
+
+| 検出語 | 扱い | 備考 |
+|--------|------|------|
+| `read-only` / `Read-Only` / `read_only` | 文脈分解: 参照専用入力・検査対象を直接修正しない診断・保存更新を親に残す委譲・検出報告型。一律「読み取り専用」にしない（REQ-0140-004） | 実際に出力生成・commit・push を行う場合は `read-only` 表記を撤回し許可/禁止操作を明記（REQ-0140-005）。委譲定義 YAML の `side_effect_boundary` に包括値としては使用禁止（REQ-0140-011） |
+| `read-only-diagnostic` | 検査対象を直接修正しない診断型（識別子として維持可、初出に日本語注記） | 実装分類の識別子。`read-only` 系表記と同様に許可/禁止操作の明示を要する |
+| `advisor` / `advisory` | 責務分解: 誰が最終判断するか・何を返すかを明記（REQ-0140-006） | 助言・推奨を返す主体と最終判断主体（多くは親コマンド）を分離 |
+| `architecture-affecting` | 「ADR判断が必要な変更」または「ADR要否確認が必要な変更」（REQ-0140-012） | 「アーキテクチャに影響する」のみで使用しない |
+| `Architecture advisory gate` | 「ADR要否確認ゲート」（REQ-0140-013） | ADR 要否を確認しガードする役割 |
+
+除外: 識別子として原語を維持しつつ初出に日本語注記がある場合、code block 内、検出ルール自体の記述、retired 文書、forbidden-phrases.md / SKILL.md の検出ルール説明自体。
+
 ## メンテナンス
 
 - 新規語彙の追加・旧語彙の変更は docs-check（/repo/docs-check）の検出パターンと同期すること

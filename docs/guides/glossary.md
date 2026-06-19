@@ -49,7 +49,7 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 定義 |
 |------|------|
 | work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。経路と docs 更新範囲を決定する。旧称 Pattern（A/B/C/D）は非推奨・廃止済み |
-| Implementation Pattern | コマンド内部構造の分類軸（wall-session / file-pipeline / manager-orchestrator / capture-only / read-only-diagnostic）。旧称 Pattern（A/B/C/D）= work_type とは別概念（REQ-0103-016, workflow-contracts.md） |
+| 実装分類（Implementation Pattern） | コマンド内部構造の分類軸（wall-session=対話セッション型 / file-pipeline=ファイル変換パイプライン型 / manager-orchestrator=状態機械統制型 / capture-only=データ収集型 / read-only-diagnostic=検査対象を直接修正しない診断型）。旧称 Pattern（A/B/C/D）= work_type とは別概念（REQ-0103-016, workflow-contracts.md） |
 | SSoT（Single Source of Truth） | 各フェーズでの信頼できる唯一の情報源 |
 | HITL（Human-in-the-loop） | ユーザーの確認を挟む判断ポイント |
 | マクロフェーズ | 壁打ち・構造的実行・レビュー完了の3段階 |

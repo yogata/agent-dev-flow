@@ -12,9 +12,9 @@ agent: sisyphus
 - ユーザーの自然言語による機能追加/バグ修正の説明
 - GitHub Issue URL（既存Issueの場合）
 - エラーログ（バグ修正の場合）
-- **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て read-only（G04）
+- **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力（G04）
 - req-save SPLIT 検出時の finding（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
-- inspect-skills 診断結果の finding（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。read-only input として扱い、未確認事項・採否未確定事項を要件本文に混入させない（inspect lifecycle、REQ-0103-140-151 相当）
+- inspect-skills 診断結果の finding（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項・採否未確定事項を要件本文に混入させない（inspect lifecycle、REQ-0103-140-151 相当）
 - **promoted 直読み禁止**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない。backlog-review による RU 化を経由すること
 
 ## Output
@@ -96,8 +96,8 @@ agent: sisyphus
 - G01: 壁打ちフェーズのみ（実装コード禁止）
 - G02: 関連ドキュメントの個別ファイル列挙をユーザーに求めない
 - G03: ファイル編集スコープ: `.agentdev/drafts/**` のみ作成・編集を許可
-- G04: ユーザーが明示した入力ファイルは read-only。`.agentdev/backlog/req-units/RU-*.md` の削除は行わない（後続の case-open 成功後に実行）
-- G05: `docs/` 配下の広範な探索禁止（例外: 明示入力ファイルと docs/requirements/\*\* の read-only 参照、Step 4-1 の限定探索は許可）
+- G04: ユーザーが明示した入力ファイルは参照専用入力（変更・削除しない）。`.agentdev/backlog/req-units/RU-*.md` の削除は行わない（後続の case-open 成功後に実行）
+- G05: `docs/` 配下の広範な探索禁止（例外: 明示入力ファイルと docs/requirements/\*\* の参照専用参照、Step 4-1 の限定探索は許可）
 - G06: inbox.md / archive/active.md を直接ロードしない
 - G07: promoted artifact の直読み禁止
 - G08: `git` コマンドは実行しない
