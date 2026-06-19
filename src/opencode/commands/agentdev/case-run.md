@@ -57,6 +57,15 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 
 **Step 4-1**: 親Epicステータス更新（`agentdev-epic-tracker` 参照）
 
+**Step 4-2**: worktree precondition gate（実行担当サブエージェント起動前の隔離検証）。`agentdev-git-worktree` の検証ヘルパー（`references/worktree-operations.md` の「worktree 内判定ヘルパー」参照）に従い、当該 Issue の worktree+ブランチが作成済みであることを検証する:
+
+- **検証1**: `git worktree list` の出力に当該 Issue の worktree（`.worktrees/{N}-{type}`）が含まれること
+- **検証2**: `git rev-parse --show-toplevel`（worktree 内で実行）の結果がメインリポジトリルートと**一致しない**こと（現在 worktree 内にいることの確認）
+
+**検証失敗時（worktree 未作成・メインリポジトリにいる）**: 実行担当サブエージェントを起動**せず**停止し、Step 4（Worktree作成・ブランチ準備）へ戻るようユーザーに報告する。実行担当サブエージェント委譲フェーズへ進んではならない。
+
+本 gate は REQ-0137 適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提を保護する機構である。worktree 隔離が構造的に保証されているという前提を、実行時に検証して担保する。
+
 ### 実行担当サブエージェント委譲フェーズ（Steps 5-6）
 
 **Step 5: 実行担当サブエージェント起動**: 実装実行を外部実行バックエンドへ委譲するため、実行担当サブエージェントを起動する。実行担当サブエージェントは `agentdev-case-run-execution-adapter` skill の adapter protocol に従い、Issue読込・ADR/REQ/SPEC/docs repository context 再確認・外部実行バックエンドへの委譲・REJECT/ITERATE/blocker処理・result返却を実行する。
@@ -104,6 +113,8 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 - G26: 外部実行バックエンドの plan artifact は不透明な外部成果物として扱い、内部構造に依存した処理・検証を行わない
 - G28: oh-my-openagent 利用時・実行計画ファイル作成時に実装開始前に momus 確認を依頼する。momus による確認は QG-3/QG-4 の代替ではなく実装開始前の確認である（REQ-0139-006）
 - G29: 外部実行手段の中間成果物を AgentDevFlow の永続成果物として扱わない（REQ-0139-007）
+- G30: Step 5（実行担当サブエージェント起動）の前に worktree+ブランチが作成済みであることを検証すること（Step 4-2 precondition gate）。未作成時・メインリポジトリにいる場合は実行担当サブエージェントを起動禁止（REQ-0137 適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提保護）
+- G31: 実行担当サブエージェントへの引き渡しにおいて worktree root（相対パス・`.worktrees/{N}-{type}/`）を必ず含め、メインリポジトリパスを渡さないこと
 
 ### 本筋外発見の退避方針
 

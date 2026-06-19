@@ -33,6 +33,42 @@ git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/{base_bran
 | ブランチのみ既存 | `git worktree add ".worktrees/{N}-{type}" "{type}/issue-{N}"` |
 | ダーティなworktree | 削除禁止。未コミット変更時はエラー停止 |
 
+## worktree 内判定ヘルパー
+
+現在 worktree 内にいるか（メインリポジトリで作業していないか）を判定する検証ヘルパー手順。case-run の precondition gate（Step 4-2）および実行担当サブエージェントの自己検証から参照される。2つの検証を組合せて判定する。
+
+### 1. 検証コマンド
+
+**検証A**: `git worktree list` で当該 worktree が登録されていることの確認
+
+```bash
+git worktree list
+```
+
+出力に当該 Issue の worktree（`.worktrees/{N}-{type}`）が含まれることを確認する。
+
+**検証B**: `git rev-parse --show-toplevel` で現在の作業ディレクトリのルートがメインリポジトリルートと**一致しない**ことの確認
+
+```bash
+# worktree 内で実行
+git rev-parse --show-toplevel
+```
+
+この結果がメインリポジトリルート（`.worktrees/` を含まないパス）と**一致しない**ことを確認する。一致する場合はメインリポジトリにいる（worktree 内ではない）。
+
+### 2. 判定基準
+
+| 検証A（worktree list 登録） | 検証B（toplevel ≠ メインルート） | 判定 |
+|---|---|---|
+| 当該 worktree あり | 一致しない（worktree 内） | ✅ worktree 内にいる（隔離されている） |
+| 当該 worktree あり | 一致する（メインルート） | ❌ メインリポジトリにいる（隔離されていない） |
+| 当該 worktree なし | — | ❌ worktree 未作成 |
+
+### 3. 適用箇所
+
+- **case-run Step 4-2（precondition gate）**: 実行担当サブエージェント起動前に本ヘルパーで検証し、worktree 内にいない場合は起動を停止して Step 4 へ戻る
+- **実行担当サブエージェントの自己検証**: 実装作業開始前に本ヘルパーで worktree 内にいることを自己検証する（詳細は `agentdev-case-run-execution-adapter` 参照）
+
 ## 削除手順
 
 **追跡済みファイル削除禁止**: クリーンアップ操作中は追跡済みファイルを削除してはならない。削除対象は未追跡ファイルのみ（ランタイムワークスペース配下の一時ファイル、ビルド成果物等）。
