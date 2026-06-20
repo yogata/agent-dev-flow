@@ -76,15 +76,15 @@ updated: {YYYY-MM-DD}
 
 ## REQ分類規約
 
-旧REQ（REQ-0001〜0050 [全てretired]）は3分類で管理する（REQ-0109）:
+旧REQ（REQ-0001〜0050 [全て廃止]）は3分類で管理する（REQ-0109）:
 
 | 分類 | 意味 | 取扱い |
 |------|------|--------|
-| `migrated` | 新active REQへ要件内容を移行した | 履歴参照として保持。後継REQは mapping-table.md で追跡 |
-| `retired-no-successor` | 最新方針では不要なため新active REQへ移行しない | 履歴参照として保持 |
+| `migrated` | 新現行 REQへ要件内容を移行した | 履歴参照として保持。後継REQは mapping-table.md で追跡 |
+| `retired-no-successor` | 最新方針では不要なため新現行 REQへ移行しない | 履歴参照として保持 |
 | `historical-only` | 当時の判断・経緯として残すが現行要件ではない | 履歴参照として保持 |
 
-**新基準REQ群**（REQ-0101〜0133、25件、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を現行仕様の主参照とする。active REQ の一覧・範囲は `docs/requirements/README.md` を正とし、本SPECでは複製しない。
+**新基準REQ群**（REQ-0101〜0133、25件、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を現行仕様の主参照とする。現行 REQ の一覧・範囲は `docs/requirements/README.md` を正とし、本SPECでは複製しない。
 
 **要件行の記述規約**（REQ-0109, 004）:
 - 要件行には振る舞い・制約・状態のみを記述する
