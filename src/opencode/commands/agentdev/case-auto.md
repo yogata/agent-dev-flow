@@ -50,11 +50,13 @@ agent: sisyphus
        2. **クリーンアップ検証ゲート**を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0114-060〜062）。残存時は停止すること
        3. Step 4-1〜4-3 のキュー処理に進む
       - **Step 4-1 キュー開始（子Issue単位オーケストレーション）**: Epic Issue 番号を記録する。Epic Issue 本文から子Issue一覧・Wave 構成・ステータス追跡テーブルを読み取る（永続状態を SSoT とする）。以下の子Issue単位ループを実行する（SPEC `docs/specs/workflow-contracts.md` 子Issue単位オーケストレーションモデル SC-007, REQ-0114-045〜048）:
-       1. **子Issue選択**: status が `ready` の子Issue を1件選択する。`ready` がない場合、依存（前 Wave 含む）が満たされた `pending` Issue を `ready` に遷移させて選択する。`running` / `completed` / `blocked` / `failed` は選択対象外（`skipped` は採用しない。前提未達の Issue は `pending` のまま選択対象外となる）
-       2. **running 遷移**: 選択した子Issue を `running` に遷移させる（Epic Issue ステータス追跡テーブルを更新）
-       3. **case-run 委譲**: 選択した子Issue 番号 + 要件docパス（該当 OU の target_req 情報を含む）を case-run 相当処理に渡す。case-run は1 Issue のみを処理する（REQ-0130-010）。Wave全体の一括実行を case-run に委譲しない
-       4. **結果確認**: case-run 完了後、永続状態（Issue / PR / `.agentdev/`）を再読込し実行担当サブエージェント result（completed(pr) / blocked / failed）を確認する。親コンテキストに子Issue の実装過程ログを持ち越さない（SC-009 親コンテキスト非累積原則）
-       5. **次子Issue選択**: Step 4-2 の case-close 処理後、Step 1 に戻り次の子Issue を選択する。選択可能な子Issue がなくなったら Step 4-3 へ進む
+        1. **子Issue選択**: Wave table の「実行方法」列を確認し、status が `ready` の子Issue を選択する。「並列」指定は最大5件まで同時選択。「直列」指定は1件。`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択する。ただし前提Issue が blocked/failed の場合は `pending` のまま選択対象外。
+        2. **running 遷移**: 選択した全子Issue を `running` に遷移させる（Epic Issue ステータス追跡テーブルを case-auto が更新）。
+        3. **case-run 並行委譲**: 選択した各子Issue 番号 + 要件docパスを case-run 相当処理に渡す。「並列」指定は同時に起動。「直列」指定は1件完了後に次を起動。case-run は1 Issue のみを処理する（REQ-0130-010）。
+        4. **全完了待機**: 全 case-run の完了を待つ。
+        5. **結果確認**: 永続状態を再読込し各子Issue の結果（completed(pr) / blocked / failed）を確認する。
+        6. **case-close（子Issue単位・逐次）**: 完了した子Issue を Issue番号昇順で case-close 相当処理に渡す。blocked/failed の子Issue は case-close 対象外。
+        7. **次Wave判定**: 同一Waveの全子Issue の結果が出揃ったら、次Waveの ready 判定に進む。Step 1 に戻る。
       - **Step 4-2 case-close（子Issue単位）**: case-run 完了後、Step 4-1-4 で確認した結果に基づき当該1子Issue の case-close 処理を決定する（SC-009）:
        - 正常完了（completed(pr)）: 該当子Issue を `completed` に遷移させ case-close 相当処理を実行する
        - blocked: 該当子Issue を `blocked` に遷移させ、停止理由・再開可能コマンドを報告する
@@ -106,7 +108,7 @@ agent: sisyphus
 - G09: 既存のreq-save / spec-save / case-open / case-run / case-closeの責務を変更しない
 - G13: case-auto は Issue 階層決定ロジックを持ってはならない。複数 REQ doc または scale:large の場合は case-open の Issue 構造ルールに委譲する
 - G14: case-auto は req-save 相当処理から case-open 相当処理への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価してはならない。保存結果をそのまま渡す
-- G15: case-auto は子Issue を1件ずつ選択し case-run に委譲する。Wave全体の一括実行を case-run に委譲しない（REQ-0114-045, REQ-0130-010）
+- G15: case-auto は Wave table の「実行方法」列に基づき子Issue を選択し case-run に委譲する。「並列」指定の ready 子Issue は最大5件まで同時に委譲する。「直列」指定は1件ずつ委譲する。Wave全体の一括実行を case-run に委譲しない（REQ-0114-045, REQ-0130-010）
 - G16: case-auto は独自の操作単位ステータス追跡を持ってはならない。Epic Issue のステータス追跡テーブルを使用する
 - G18: case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わないこと（REQ-0114-051）
 - G19: case-auto は draft を OU 情報の SSoT として扱い、独自の OU 状態管理を持たないこと（REQ-0114-058）
