@@ -37,7 +37,7 @@
 | [REQ-0137](REQ-0137.md) | 並列実行安全 git 操作規律 | 並列実行安全 git 操作規律、スイープ操作禁止、明示パスステージ&コミット、消費アーティファクト(draft/RU)削除信頼性・Form Zero解消・削除検証 Standard/Epic 全flow適用 |
 | [REQ-0138](REQ-0138.md) | 構造化req_draft契約 | inter-command draft handoff契約、soft-contract原則、artifact_actions構造、LLM推論消費 |
 | [REQ-0139](REQ-0139.md) | 外部エージェント統合契約 | 外部エージェント統合、case-run外部実行委譲、driver adapter契約、req-define分類結果アクション |
-| [REQ-0140](REQ-0140.md) | 文書品質ゲート | 文書種別責務・要件性・文意品質・粒度の査読、AI-slop検出、IR-045、ドリフト検出 |
+| [REQ-0140](REQ-0140.md) | 文書品質ゲート | 文書種別責務・要件性・文意品質・粒度の査読、AI-slop検出、IR-045、ドリフト検出、既存文書への遡及準拠修正 |
 | [REQ-0141](REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 | ローカル版生成方式、src/opencode-local/ 生成時ソース領域、ローカルCaseファイル、GitHub Issue/PR 置換、変換プロンプト、生成安全性制約 |
 
 ## Retired Requirements
