@@ -270,15 +270,15 @@ updated: 2026-06-19
 | triage_action | 必須セクションを追加 |
 | last_verified | 2026-06-06 |
 
-### IR-013: 完了報告 variant 実在
+### IR-013: 完了報告種別実在
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-013 |
-| description | Command 定義が参照する variant path が templates/ に実在すること |
+| description | Command 定義が参照する種別パス（variant path）が templates/ に実在すること |
 | severity | strict |
 | category | broken-reference |
-| detection_method | command 本文から variant path 抽出 → 存在確認 |
+| detection_method | command 本文から種別パス（variant path）抽出 → 存在確認 |
 | affected_artifacts | [commands, templates] |
 | related_req | [REQ-0108-089-091] |
 | related_spec | [integrity-contracts.md] |
@@ -287,7 +287,7 @@ updated: 2026-06-19
 | regression_test | commands_structure.test.ts |
 | baseline_status | resolved |
 | finding_route | intake |
-| triage_action | variant を作成または参照を修正 |
+| triage_action | 種別（variant）を作成または参照を修正 |
 | last_verified | 2026-06-06 |
 
 ### IR-014: reference/ 残存検出
@@ -343,7 +343,7 @@ updated: 2026-06-19
 | related_req | [REQ-0103-048-052, REQ-0108-143-144] |
 | related_spec | [system.md] |
 | gate_level | full-audit, delta-guard |
-| false_positive_risk | 低。junction 壊れは確実な NG |
+| false_positive_risk | 低。ジャンクション（junction）破損は確実な NG |
 | regression_test | (sync script で検証) |
 | baseline_status | known |
 | finding_route | intake |
@@ -423,11 +423,11 @@ updated: 2026-06-19
 | related_req | [REQ-0108-145, 148] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit, impact-guard |
-| false_positive_risk | 中。baseline の陳腐化判定に注意 |
+| false_positive_risk | 中。基準（baseline）の陳腐化判定に注意 |
 | regression_test | (手動確認) |
 | baseline_status | resolved |
 | finding_route | none |
-| triage_action | baseline を更新 |
+| triage_action | 基準（baseline）を更新 |
 | last_verified | 2026-06-06 |
 
 ### IR-021: 廃止済み skill 参照検出
@@ -915,10 +915,10 @@ updated: 2026-06-19
 | Field | Value |
 |-------|-------|
 | rule_id | IR-045 |
-| description | docs/SPEC/REQ/command/skill の日本語表現・文意整合を検査すること。`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate` 等の英字混じり抽象用語・読取専用セマンティクス、および `現行 REQ`/`廃止 REQ`/`accepted ADR`/`active docs`（修飾語）、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`（複合技術語）、`fixture`/`variant`/`provider`/`baseline`（専門カタカナ語）について、日本語説明の併記・文意に基づく自然な日本語化・許可/禁止操作の明示・具体許可操作への置換を検証する（REQ-0108, REQ-0140, REQ-0101-061）。推奨訳は docs/specs/writing-style.md を参照 |
+| description | docs/SPEC/REQ/command/skill の日本語表現・文意整合を検査すること。`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate` 等の英字混じり抽象用語・読取専用セマンティクス、および `現行 REQ`/`廃止 REQ`/`accepted ADR`/`active docs`（修飾語）、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`/`self-hosting`/`junction`/`session-sourced`/`top-level`（複合技術語）、`fixture`/`variant`/`provider`/`baseline`（専門カタカナ語）について、日本語説明の併記・文意に基づく自然な日本語化・許可/禁止操作の明示・具体許可操作への置換を検証する（REQ-0108, REQ-0140, REQ-0101-061）。推奨訳は docs/specs/writing-style.md を参照 |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | 対象ファイル（`docs/**/*.md` ただし `docs/**/retired/**` は除外、`src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md`、`.opencode/commands/repo/**/*.md`、`.opencode/skills/repo-agentdev-integrity/**/*.md`）から検出対象語（`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate`、および `現行 REQ`/`廃止 REQ`/`accepted ADR`/`active docs`、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`、`fixture`/`variant`/`provider`/`baseline`）を検出。識別子（enum 値・frontmatter field・ファイル名・ディレクトリ名）の場合は周辺に日本語説明が存在するか確認。`read-only` 検出時は同一段落または直後のリストで許可出力・禁止操作が記述されているか検証。YAML 例中の `read_only` は具体の許可操作に置換されているか検証。英字のみの見出し・英字混じり抽象見出しを検出。修飾語・複合技術語・専門カタカナ語の検出時は、文意に基づく自然な日本語化がされているか docs/specs/writing-style.md の指針に合致しているかを検証 |
+| detection_method | 対象ファイル（`docs/**/*.md` ただし `docs/**/retired/**` は除外、`src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md`、`.opencode/commands/repo/**/*.md`、`.opencode/skills/repo-agentdev-integrity/**/*.md`）から検出対象語（`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate`、および `現行 REQ`/`廃止 REQ`/`accepted ADR`/`active docs`、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`/`self-hosting`/`junction`/`session-sourced`/`top-level`、`fixture`/`variant`/`provider`/`baseline`）を検出。識別子（enum 値・frontmatter field・ファイル名・ディレクトリ名・バッククォート内コード値）の場合は周辺に日本語説明が存在するか確認。`read-only` 検出時は同一段落または直後のリストで許可出力・禁止操作が記述されているか検証。YAML 例中の `read_only` は具体の許可操作に置換されているか検証。英字のみの見出し・英字混じり抽象見出しを検出。修飾語・複合技術語・専門カタカナ語の検出時は、文意に基づく自然な日本語化がされているか docs/specs/writing-style.md の指針に合致しているかを検証 |
 | affected_artifacts | [docs, REQ, SPEC, guides, commands, skills] |
 | related_req | [REQ-0108, REQ-0140, REQ-0101] |
 | related_spec | [integrity-contracts.md, writing-style.md] |
