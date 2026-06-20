@@ -14,7 +14,7 @@ SPEC ファイルは現行アーキテクチャの正規文書である（REQ-01
 | [quality-specs.md](quality-specs.md) | 品質仕様 | 品質基準・検証ルール |
 | [quality-gates.md](quality-gates.md) | 品質ゲート | QG-1〜QG-4 定義・機械化境界・実装マッピング |
 | [document-model.md](document-model.md) | 文書モデル | REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックス |
-| [writing-style.md](writing-style.md) | 文書執筆スタイルガイドライン | 日本語執筆の判断指針・REQ-0101-061 詳細参照先 |
+| [writing-style.md](writing-style.md) | 文書執筆スタイルガイドライン | 文書品質ゲート正本仕様・REQ-0140 参照先・文書種別責務・要件行の書き方・要件性・粒度・移送判断・AI-slop検出基準 |
 | [artifact-contracts.md](artifact-contracts.md) | アーティファクト契約 | Command/Skill/Template/Script の入出力・依存方向 |
 | [artifact-responsibilities.md](artifact-responsibilities.md) | 成果物責任表 | 各成果物種別の正規所有者（canonical owner）と責務（REQ-0103-057） |
 | [integrity-contracts.md](integrity-contracts.md) | 整合性契約 | strict/heuristic/observation 分類と検査カテゴリ |
