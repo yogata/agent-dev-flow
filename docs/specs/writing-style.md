@@ -2,12 +2,12 @@
 title: 文書執筆スタイルガイドライン
 status: accepted
 created: 2026-06-20
-updated: 2026-06-20
+updated: 2026-06-21
 ---
 
 # 文書執筆スタイルガイドライン
 
-docs/ 配下の文書（REQ/ADR/SPEC/guides/DOC-MAP/README）および AGENTS.md の日本語執筆における判断指針。REQ-0140（文書品質ゲート）の正本仕様であり、agentdev-doc-writing スキルの参照先である。REQ-0101-061 の詳細参照先。IR-045（英字混じり抽象用語検出）と連動する。
+docs/ 配下の文書（REQ/ADR/SPEC/guides/DOC-MAP/README）および AGENTS.md の日本語執筆における判断指針。REQ-0140（文書品質ゲート）の原本仕様であり、agentdev-doc-writing スキルの参照先である。REQ-0101-061 の詳細参照先。IR-045（英字混じり抽象用語検出）と連動する。
 
 ## 基本原則
 

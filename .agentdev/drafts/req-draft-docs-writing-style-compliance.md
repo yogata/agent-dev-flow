@@ -161,7 +161,12 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      saved_spec: docs/specs/writing-style.md
+      operation: spec-update
+      modified_sections: [line 10 リード文, frontmatter updated]
+      change_summary: 「正本仕様」→「原本仕様」用語統一（REQ-0140-017 と整合）
+      saved_at: 2026-06-21
 
 # case_open_hints: case-open 構成生成への参考情報（Issue 階層は case-open が決定する）
 case_open_hints:
