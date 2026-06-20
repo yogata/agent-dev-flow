@@ -895,20 +895,48 @@ updated: 2026-06-21
 | Field | Value |
 |-------|-------|
 | rule_id | IR-044 |
-| description | 現行 REQ 要件行の主たる文意がスキーマフィールド・enum 値一覧・テストデータ詳細（fixture detail）・チェッカー個別ルール・誤検知（false positive）抑制方式・Step 番号・Phase 番号・内部アルゴリズム・具体的な作業履歴のいずれかである場合、当該 SPEC 詳細の混入を検出すること（REQ-0108-260, REQ-0101-067〜069） |
+| description | 現行 REQ 要件行の主たる文意がスキーマフィールド・enum 値一覧・テストデータ詳細（fixture detail）・チェッカー個別ルール・誤検知（false positive）抑制方式・Step 番号・Phase 番号・内部アルゴリズム・具体的な作業履歴のいずれかである場合、当該 SPEC 詳細の混入を検出すること（REQ-0108-259, REQ-0108-260, REQ-0101-067〜069）。exemption 条件（isNegationContext / isDelegationContext・安定契約例外）は下位セクション「IR-044 exemption 条件」に詳細を記載 |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | 現行 REQ 要件行の主たる文意からスキーマ・enum・テストデータ・チェッカー個別ルール・FP 抑制・Step 番号・Phase 番号・内部アルゴリズム・作業履歴キーワードをパターンマッチで検出 |
+| detection_method | 現行 REQ 要件行の主たる文意からスキーマ・enum・テストデータ・チェッカー個別ルール・FP 抑制・Step 番号・Phase 番号・内部アルゴリズム・作業履歴キーワードをパターンマッチで検出。検出後、exemption 条件（isNegationContext / isDelegationContext / 安定契約例外）を満たす場合は warning から免除 |
 | affected_artifacts | [現行 REQ] |
-| related_req | [REQ-0108-260, REQ-0101-067, REQ-0101-068, REQ-0101-069] |
+| related_req | [REQ-0108-259, REQ-0108-260, REQ-0101-067, REQ-0101-068, REQ-0101-069] |
 | related_spec | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |
-| false_positive_risk | 高。REQ-0101-069 安定契約例外（公開コマンド名・公開入口・ドメイン状態位置づけ・他コマンド接続契約・利用者可視分類体系・安全境界・停止条件の大枠・後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外 |
-| regression_test | (追加予定) |
+| false_positive_risk | 高。REQ-0101-069 安定契約例外（公開コマンド名・公開入口・ドメイン状態位置づけ・他コマンド接続契約・利用者可視分類体系・安全境界・停止条件の大枠・後続工程が依存する安定した外部契約）に該当する要約残留、および isNegationContext / isDelegationContext 文脈での SPEC キーワード出現は検出対象外。詳細は下位セクション「IR-044 exemption 条件」 |
+| regression_test | (追加予定)。既知の true positive が exemption により誤って免除されないことを回帰テストで検証する |
 | baseline_status | new |
 | finding_route | req-define |
 | triage_action | 該当要件行の詳細を SPEC・ルールカタログ・コマンドリファレンス・スキルリファレンス・テスト文書のいずれかに移管し、REQ 側は外部契約・状態要件の要約に置き換える |
-| last_verified | 2026-06-17 |
+| last_verified | 2026-06-21 |
+
+#### IR-044 exemption 条件
+
+IR-044 は isNegationContext と同列に isDelegationContext を exemption（免除）条件として扱う。委譲・集約・切り出し・存在確認の文脈で SPEC キーワード（テストデータ・チェッカー等）が現れる場合、検出を warning から免除する（REQ-0108-259, AG-006 / ACT-SPEC-001）。
+
+**exemption 対象文脈と代表キーワード**:
+
+| 文脈述語 | 代表キーワード | 典型例 |
+|---------|---------------|------|
+| `isNegationContext` | 「〜しない」「〜以外」「〜を禁止」「〜を除く」 | 「SPEC キーワード X を要件行に書かない」「X 以外の用語」 |
+| `isDelegationContext` | 「委譲先」「集約先」「切り出し」「切り出し先」「routing」「経路分類名」「検証要件」「移送先」「参照先」 | 「委譲先 SPEC にテストデータ詳細を配置」「routing 経路分類名『fixture』」「切り出し先 SPEC を参照」 |
+
+**閾値・判定表（true positive 保護）**:
+
+| 条件 | 判定 |
+|------|------|
+| SPEC キーワード単独で現れ、文脈述語なし | warning（true positive 候補） |
+| SPEC キーワード + `isNegationContext` 成立 | 免除 |
+| SPEC キーワード + `isDelegationContext` 成立 | 免除 |
+| SPEC キーワード + `isNegationContext` + `isDelegationContext`（重なり） | 免除（OR 条件・いずれか一方が成立すれば免除） |
+| SPEC キーワード + 安定契約例外（REQ-0101-069） | 免除（既存 `false_positive_risk` 記載通り） |
+| SPEC キーワード + 委譲文脈キーワード + SPEC 詳細の平叙述（両立でない） | warning（true positive 候補） |
+
+**境界ケース（exemption 適用外）**:
+
+- 委譲文脈キーワードが SPEC 詳細の記述そのものである場合（例: 「委譲先 SPEC に fixture/checker の enum 一覧を列挙する」）は免除しない。委譲先を指す語（「委譲先」「集約先」「切り出し先」）と SPEC 詳細を並列表記する両立ケースに限り免除する。
+- `isNegationContext` と `isDelegationContext` が同時出現する場合は OR 条件とし、いずれか一方が成立すれば免除する。
+- 回帰テストで既知の true positive（SPEC 詳細が REQ に残留している実例）が免除されないことを検証する。exemption 実装後は既知の false positive 9 件（`.agentdev/drafts/req-spec-cleanup-plan.md` 参照）が cleanup plan から除外される。
 
 ### IR-045: docs 日本語表現・文意整合検査
 

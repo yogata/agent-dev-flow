@@ -14,6 +14,8 @@ source_rus:
   - RU-0008
   - RU-0009
 agentdev_handoff: true
+spec_artifact_actions_consumed: true
+spec_saved_at: 2026-06-21
 ---
 
 <!-- req_draft: 9件のRU（RU-0001〜RU-0009）を統合管理するメタ要件doc。

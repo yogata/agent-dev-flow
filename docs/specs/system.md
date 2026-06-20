@@ -207,6 +207,18 @@ Capture 境界の一次参照は `agentdev-workflow-orchestration` skill の `re
 
 **req-define の責務**: 関連ドキュメントの個別ファイル列挙をユーザーに求めない。責務は要件の壁打ち・構造化に専念する。
 
+### ID 体系
+
+AgentDevFlow の文書 ID 形式は種別ごとに桁数が異なる。catalog・impact-map 等のパーサ実装で REQ ID を 3 桁で書いた場合にマッチしない不具合（Issue #898）の再発を防止するため、ID 抽出・検証処理は以下の形式と正規表現に従う（AG-007 / ACT-SPEC-002）。
+
+| 種別 | 形式 | 桁数 | 正規表現 |
+|------|------|------|---------|
+| REQ | `REQ-NNNN` | 4 桁 | `/^REQ-\d{4}$/` |
+| ADR | `ADR-NNNN` | 4 桁 | `/^ADR-\d{4}$/` |
+| IR | `IR-NNN` | 3 桁 | `/^IR-\d{3}$/` |
+
+REQ と IR で桁数が異なる点（REQ は 4 桁・IR は 3 桁）に注意すること。同一パーサで両方を扱う場合は桁数を混同せず、各正規表現を個別に適用する。
+
 ### REQ 体系基準構造
 
 旧 REQ 群（REQ-0001〜0050 [全て retired]）を現行仕様基準として再構成した新基準 REQ 群（REQ-0101〜REQ-0133、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を主参照とする。旧 REQ は履歴として保持し、移行分類（migrated / retired-no-successor / historical-only）に基づき扱う（REQ-0109）。
