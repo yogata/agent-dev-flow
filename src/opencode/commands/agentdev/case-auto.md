@@ -25,7 +25,7 @@ agent: sisyphus
    - **要件doc入力モード**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
 2. **work_type 読取**: 入力要件docの `draft-data` から work_type を取得する（参考情報・パイプライン分岐の判定には使用しない・REQ-0138-010）
 3. **工程分岐**（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定・REQ-0138-009）:
-   - **Issue番号/URL入力**: case-run → case-close（req-save・spec-save・case-open・work_type読取をスキップ）。Step 1 で解決した Issue番号/URL を case-run 相当処理にそのまま渡す。draft-data の読み取りを行わない
+   - **Issue番号/URL入力**: case-run → case-close（req-save・spec-save・case-open・work_type読取をスキップ）。Step 1 で解決した Issue番号/URL を case-run（CLI subprocess・ADR-0114）にそのまま渡す。draft-data の読み取りを行わない
    - **artifact_actions ベース分岐**: `draft-data` の `artifact_actions` を読み取り以下の工程を動的判定する:
      - `artifact: req` または `artifact: adr` の entry が含まれる場合 → req-save を実行
      - `artifact: spec` の entry が含まれる場合 → spec-save を実行（req-save の後）
@@ -36,34 +36,48 @@ agent: sisyphus
      - `artifact: spec` entry が空の場合 → spec-save をスキップし case-open へ進む
      - `artifact_actions` フィールドが存在しない（旧形式 draft）場合 → **後方互換**: spec-save をスキップし従来ワークフロー（req-save → case-open → …）で実行
    - **auto_gate preflight**: `draft-data` の `auto_gate.auto_ready` を確認し、false の場合または未解決 item（unresolved_questions / unresolved_conflicts / out_of_repo_operations / stop_reasons）が残る場合は停止する（REQ-0138-013）
-4. **各工程の実行**: 既存コマンド定義（req-save.md / spec-save.md / case-open.md / case-run.md / case-close.md）を authoritative source として読み込み、各コマンドの Steps / Guardrails / Error handling に従って実行する。手順を再実装しない。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）も含めて既存コマンド定義に従うこと
-   - **品質ゲート（QG-1〜QG-4）の継承**: case-auto は QG を独自実装しない。構成コマンド（req-save: QG-1, case-open: QG-2, case-run: QG-3, case-close: QG-4）がそれぞれ `agentdev-quality-gates` スキルを参照して Gate を適用する。case-auto は工程間制御のみを担い、Gate 判定を再評価・差し替えしない（G07, G09）
-   - **case-run の 実行担当サブエージェント委譲モデル**: case-run は実装実行を実行担当サブエージェント（`agentdev-case-run-execution-adapter`）経由で外部実行バックエンドへ委譲し、自身は orchestration に専念する（ADR-0114）。case-auto は case-run の実行担当サブエージェント委譲モデルを変更せず、実装実行・PR作成を自ら行わない。実行担当サブエージェント result（completed(pr)/blocked/failed）の処理は case-run 定義に従う
-   - case-auto は req-save / case-open に draft path と OU ID のみを渡すこと（REQ-0114-052）。OU 本文の切り出しは行わない
-   - case-auto は OU の統合・分割、REQ 操作分類、Issue 階層判定を再評価しないこと（REQ-0114-054）
-    - case-open 相当処理の完了後、出力を確認して以下のいずれかに分岐する:
-      - **Standard flow（単一 Issue）**:
-        1. case-open の共通終了処理（Step 17〜18-2: コメント追加・ドラフト削除・RU削除・完了報告）の完了を確認すること（REQ-0104-045〜047）
-        2. **クリーンアップ検証ゲート**（後述）を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0137-007）。残存時は停止すること
-        3. 既存の直列フロー（case-run → case-close）を実行
-      - **Epic Issue（マルチREQ または 単一REQ Epic flow）**:
-       1. case-open の共通終了処理（Step 17〜18-2: コメント追加・ドラフト削除・RU削除・完了報告）の完了を確認すること（REQ-0104-045〜047）
-       2. **クリーンアップ検証ゲート**を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0114-060〜062）。残存時は停止すること
-       3. Step 4-1〜4-3 のキュー処理に進む
-      - **Step 4-1 キュー開始（子Issue単位オーケストレーション）**: Epic Issue 番号を記録する。Epic Issue 本文から子Issue一覧・Wave 構成・ステータス追跡テーブルを読み取る（永続状態を SSoT とする）。以下の子Issue単位ループを実行する（SPEC `docs/specs/workflow-contracts.md` 子Issue単位オーケストレーションモデル SC-007, REQ-0114-045〜048）:
-        1. **子Issue選択**: Wave table の「実行方法」列を確認し、status が `ready` の子Issue を選択する。「並列」指定は最大5件まで同時選択。「直列」指定は1件。`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択する。ただし前提Issue が blocked/failed の場合は `pending` のまま選択対象外。
-        2. **running 遷移**: 選択した全子Issue を `running` に遷移させる（Epic Issue ステータス追跡テーブルを case-auto が更新）。
-        3. **case-run 並行委譲**: 選択した各子Issue 番号 + 要件docパスを case-run 相当処理に渡す。「並列」指定は同時に起動。「直列」指定は1件完了後に次を起動。case-run は1 Issue のみを処理する（REQ-0130-010）。
-        4. **全完了待機**: 全 case-run の完了を待つ。
-        5. **結果確認**: 永続状態を再読込し各子Issue の結果（completed(pr) / blocked / failed）を確認する。
-        6. **case-close（子Issue単位・逐次）**: 完了した子Issue を Issue番号昇順で case-close 相当処理に渡す。blocked/failed の子Issue は case-close 対象外。
-        7. **次Wave判定**: 同一Waveの全子Issue の結果が出揃ったら、次Waveの ready 判定に進む。Step 1 に戻る。
-      - **Step 4-2 case-close（子Issue単位）**: case-run 完了後、Step 4-1-4 で確認した結果に基づき当該1子Issue の case-close 処理を決定する（SC-009）:
-       - 正常完了（completed(pr)）: 該当子Issue を `completed` に遷移させ case-close 相当処理を実行する
-       - blocked: 該当子Issue を `blocked` に遷移させ、停止理由・再開可能コマンドを報告する
-       - failed: 該当子Issue を `failed` に遷移させる。正常完了した他の子Issue のみ case-close 対象とする
-       - 各子Issue の case-close は既存の case-close.md 定義に従う（learning/intake capture、`.agentdev/` commit/push を含む）。子Issue ごとに独立して実行し、キュー全体での一括 capture は行わない
-       - case-auto は 1 OU（Epic の場合は全子Issue 処理完了）を close まで完了した後に次の OU へ進むこと（REQ-0114-053）
+4. **各工程の実行**: case-auto は各工程（req-save / spec-save / case-open / case-close）を task() で起動し、オーケストレーションに専念する（ADR-0127, REQ-0114-006/084/085）。case-run は引き続き CLI subprocess 委譲モデル（ADR-0114）を使用する。各工程の task() は対応するコマンド定義（`.opencode/commands/agentdev/{step}.md`）を authoritative source として読み込み実行する。case-auto は各工程の完了結果（保存済みファイル・Issue/PR番号・pass/warn/fail）のみを受領し、次工程への入力として渡す。**インライン実行は禁止する**（REQ-0114-073・コンテキスト枯渇防止）
+
+   ### 工程別委譲契約（ADR-0112 §5・ADR-0127）
+
+   case-auto は各工程を以下の委譲契約で起動する:
+
+   | 工程 | 起動方式 | inputs | output_contract |
+   |------|---------|--------|-----------------|
+   | req-save | task() | draft path, OU ID | 保存済みREQ/ADRリスト, draft status=saved, pass/warn/fail |
+   | spec-save | task() | draft path | 保存済みSPECリスト, SPEC消費済みフラグ, pass/warn/fail |
+   | case-open | task() | draft path, OU ID | Issue番号(Epic含む), pass/warn/fail |
+   | case-run | CLI subprocess（ADR-0114） | Issue番号, worktree root | completed(pr)/blocked/failed |
+   | case-close | task() | Issue番号, PR番号 | マージ結果, Capture保存結果, 削除済みブランチ, pass/warn/fail |
+
+   各 task() の side_effect_boundary は対応するコマンド定義のガードレール（ファイル操作制約）に従う。case-auto は各 task() の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）は各 task() が対応するコマンド定義に従って実行する
+   - **品質ゲート（QG-1〜QG-4）の継承**: case-auto は QG を独自実装しない。構成コマンド（req-save: QG-1, case-open: QG-2, case-run: QG-3, case-close: QG-4）がそれぞれ `agentdev-quality-gates` スキルを参照して Gate を適用する。各 task() が対応する Gate を実行する。case-auto は工程間制御のみを担い、Gate 判定を再評価・差し替えしない（G07, G09）
+   - **case-run の実行担当サブエージェント委譲モデル**: case-run は実装実行を実行担当サブエージェント（`agentdev-case-run-execution-adapter`）経由で外部実行バックエンドへ委譲し、自身は orchestration に専念する（ADR-0114）。case-auto は case-run の実行担当サブエージェント委譲モデルを変更せず、実装実行・PR作成を自ら行わない。実行担当サブエージェント result（completed(pr)/blocked/failed）の処理は case-run 定義に従う
+   - case-auto は req-save / case-open の task() に draft path と OU ID のみを渡すこと（REQ-0114-052）。OU 本文の切り出しは行わない
+   - case-auto は OU の統合・分割、REQ 操作分類、Issue 階層判定を再評価しないこと（REQ-0114-054）。各 task() が対応するコマンド定義（req-save / case-open）の判定結果に従う
+     - case-open task() の完了後、出力を確認して以下のいずれかに分岐する:
+       - **Standard flow（単一 Issue）**:
+         1. case-open task() が共通終了処理（Step 17〜18-2: コメント追加・ドラフト削除・RU削除・完了報告）を完了していることを確認すること（REQ-0104-045〜047）
+         2. **クリーンアップ検証ゲート**（後述）を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0137-007）。残存時は停止すること
+         3. 既存の直列フロー（case-run → case-close）を実行
+       - **Epic Issue（マルチREQ または 単一REQ Epic flow）**:
+        1. case-open task() が共通終了処理（Step 17〜18-2: コメント追加・ドラフト削除・RU削除・完了報告）を完了していることを確認すること（REQ-0104-045〜047）
+        2. **クリーンアップ検証ゲート**を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること（REQ-0114-060〜062）。残存時は停止すること
+        3. Step 4-1〜4-3 のキュー処理に進む
+       - **Step 4-1 キュー開始（子Issue単位オーケストレーション）**: Epic Issue 番号を記録する。Epic Issue 本文から子Issue一覧・Wave 構成・ステータス追跡テーブルを読み取る（永続状態を SSoT とする）。以下の子Issue単位ループを実行する（SPEC `docs/specs/workflow-contracts.md` 子Issue単位オーケストレーションモデル SC-007, REQ-0114-045〜048）:
+         1. **子Issue選択**: Wave table の「実行方法」列を確認し、status が `ready` の子Issue を選択する。「並列」指定は最大5件まで同時選択。「直列」指定は1件。`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択する。ただし前提Issue が blocked/failed の場合は `pending` のまま選択対象外。
+         2. **running 遷移**: 選択した全子Issue を `running` に遷移させる（Epic Issue ステータス追跡テーブルを case-auto が更新）。
+         3. **case-run 並行委譲**: 選択した各子Issue 番号 + 要件docパスを case-run（CLI subprocess・ADR-0114）に渡す。「並列」指定は同時に起動。「直列」指定は1件完了後に次を起動。case-run は1 Issue のみを処理する（REQ-0130-010）。
+         4. **全完了待機**: 全 case-run の完了を待つ。
+         5. **結果確認**: 永続状態を再読込し各子Issue の結果（completed(pr) / blocked / failed）を確認する。
+         6. **case-close task()（子Issue単位・逐次）**: 完了した子Issue を Issue番号昇順で case-close task() に渡す。blocked/failed の子Issue は case-close 対象外。
+         7. **次Wave判定**: 同一Waveの全子Issue の結果が出揃ったら、次Waveの ready 判定に進む。Step 1 に戻る。
+       - **Step 4-2 case-close（子Issue単位）**: case-run 完了後、Step 4-1-4 で確認した結果に基づき当該1子Issue の case-close task() 起動を決定する（SC-009）:
+        - 正常完了（completed(pr)）: 該当子Issue を `completed` に遷移させ case-close task() を起動する
+        - blocked: 該当子Issue を `blocked` に遷移させ、停止理由・再開可能コマンドを報告する
+        - failed: 該当子Issue を `failed` に遷移させる。正常完了した他の子Issue のみ case-close 対象とする
+        - 各子Issue の case-close task() は既存の case-close.md 定義に従う（learning/intake capture、`.agentdev/` commit/push を含む）。子Issue ごとに独立して起動し、キュー全体での一括 capture は行わない
+        - case-auto は 1 OU（Epic の場合は全子Issue 処理完了）を close まで完了した後に次の OU へ進むこと（REQ-0114-053）
      - **Step 4-3 全体完了判定**: 全子Issue の case-close 処理完了後:
      - Epic Issue の子Issue全ステータスが CLOSED の場合 → Epic 自動クローズ確認（case-close Step 8 相当） → 全体完了報告
       - 未クローズの子Issue が残る場合（blocked / failed） → 部分完了報告
@@ -72,8 +86,8 @@ agent: sisyphus
       - ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
       - 当該ケースで消費した RU ファイル（`.agentdev/backlog/req-units/RU-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
       - 検証結果（成功・残存ファイル一覧）を case-auto 完了報告（Step 8）に含めること
-5. **工程間の状態引き継ぎ**: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) RU ファイルパス（case-open 相当処理の RU 削除で使用） (2) capture 対象情報（case-close 相当処理の learning/intake capture で使用）
-6. **複数REQ対応**: req-save 相当処理の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールをそのまま使用する。case-auto 自体に Issue 階層決定ロジックを持ってはならない。req-save 相当処理から case-open 相当処理へ状態を引き継ぐ際、case-auto は複数 REQ doc の保存結果をフィルタリングや再評価なしでそのまま渡す。case-auto は Epic Issue 化の判定に関与しないこと（REQ-0114-057）。case-open の判定結果に従うこと
+5. **工程間の状態引き継ぎ**: 各工程の task() 起動結果（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) RU ファイルパス（case-open task() の RU 削除で使用） (2) capture 対象情報（case-close task() の learning/intake capture で使用）
+6. **複数REQ対応**: req-save task() の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールをそのまま使用する。case-auto 自体に Issue 階層決定ロジックを持ってはならない。req-save task() から case-open task() へ状態を引き継ぐ際、case-auto は複数 REQ doc の保存結果をフィルタリングや再評価なしでそのまま渡す。case-auto は Epic Issue 化の判定に関与しないこと（REQ-0114-057）。case-open の判定結果に従うこと
 7. **停止条件の検出**: 以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:
    - **停止時タイミング情報の追記（REQ-0114-083）**: 停止報告に Step 1 で記録した `case_auto_started_at`（開始時刻）・停止時刻（JST・人間が読みやすい形式: 例 `2026-06-21 15:30:00 JST`）・経過時間（停止時刻 − 開始時刻、人間が読みやすい形式: 例 `12分34秒`・全体合計のみ・工程別内訳は含めない）を含めること
    - (1) req-define合意要件からの逸脱
@@ -86,13 +100,13 @@ agent: sisyphus
    - (8) merge conflict / remote hash不一致
    - (9) 作成元不明branch / user-owned branch / 他作業branchの削除検出
    - (10) 未コミット変更の帰属不明
-8. **完了報告**: 最終工程（case-close）の完了報告をそのまま出力する。Epic Issue を伴うキュー実行時は、完了・blocked・failed 子Issue一覧を含める。停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する（REQ-0114-056）
-   - **タイミング情報の追記（REQ-0114-083）**: 完了報告生成時刻（Step 8 開始時点）を JST・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録する。case-close の完了報告（テンプレート）は変更せず、case-auto が以下を追記すること:
-     - 開始時刻: Step 1 で記録した `case_auto_started_at`
-     - 終了時刻: 完了報告生成時刻
-     - 所要時間: 終了時刻 − 開始時刻（人間が読みやすい形式: 例 `12分34秒`・全体合計のみ・工程別内訳は含めない）
-   - 停止条件による中断時（Step 7 経由）の報告にも、上記と同じ形式で開始時刻・停止時刻・経過時間を含めること（停止時刻を終了時刻として扱う）
-8-1. **Standard flow 逐次OU処理ループ**: Standard flow の case-close 完了後、未処理 OU が残存する場合は次 OU の処理を自動的に開始する（REQ-0114-065〜067）:
+8. **完了報告**: 最終工程（case-close task()）の完了報告をそのまま出力する。Epic Issue を伴うキュー実行時は、完了・blocked・failed 子Issue一覧を含める。停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する（REQ-0114-056）
+    - **タイミング情報の追記（REQ-0114-083）**: 完了報告生成時刻（Step 8 開始時点）を JST・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録する。case-close task() の完了報告（テンプレート）は変更せず、case-auto が以下を追記すること:
+      - 開始時刻: Step 1 で記録した `case_auto_started_at`
+      - 終了時刻: 完了報告生成時刻
+      - 所要時間: 終了時刻 − 開始時刻（人間が読みやすい形式: 例 `12分34秒`・全体合計のみ・工程別内訳は含めない）
+    - 停止条件による中断時（Step 7 経由）の報告にも、上記と同じ形式で開始時刻・停止時刻・経過時間を含めること（停止時刻を終了時刻として扱う）
+8-1. **Standard flow 逐次OU処理ループ**: Standard flow の case-close task() 完了後、未処理 OU が残存する場合は次 OU の処理を自動的に開始する（REQ-0114-065〜067）:
    - 処理対象の全 OU から次の未処理 OU を特定する（`recommended_order`, `depends_on` に基づく）
     - 次 OU が存在する場合: 当該 OU の `artifact_actions` に応じた工程分岐で Step 2 に戻る（REQ/ADR artifact_actions あり: req-save → …、SPEC artifact_actions あり: spec-save → …、常に case-open → …）。spec-save 実行判定は Step 3 に従う
    - 全 OU の処理が完了した場合のみ全体完了報告を出力する（REQ-0114-067）
@@ -110,11 +124,13 @@ agent: sisyphus
 - G06: docs / REQ / ADR / SPEC / command reference / guide の更新を自走対象に含める
 
 ### 委譲・参照制約
-- G07: 既存コマンドの手順をcase-auto定義内に再実装しない
-- G08: 工程固有の詳細手順とcase-auto定義が矛盾する場合、工程固有処理は既存コマンド定義を優先し、自走境界・入力解決・工程間制御はcase-auto定義を優先する
-- G09: 既存のreq-save / spec-save / case-open / case-run / case-closeの責務を変更しない
+- G07: case-auto は各工程（req-save / spec-save / case-open / case-close）を task() で起動し、**インライン実行してはならない**（ADR-0127, REQ-0114-006/073/084）。case-run は CLI subprocess（ADR-0114）を使用し task() に切替えない。各工程の task() は対応するコマンド定義を authoritative source として実行する（手順の case-auto 定義内再実装は回避）
+- G08: 工程固有の詳細手順とcase-auto定義が矛盾する場合、工程固有処理は既存コマンド定義を優先し、自走境界・入力解決・工程間制御はcase-auto定義を優先する。各 task() の実行は対応するコマンド定義に従う
+- G09: 既存のreq-save / spec-save / case-open / case-run / case-closeの責務を変更しない。task() 委譲は起動方式の変更であり、各コマンドの責務・ガードレール・成果物を変更しない
+- G27: 各 task() の起動は工程別委譲契約（Step 4 の委譲契約表・ADR-0112 §5）に従うこと。inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領する
+- G28: case-auto は各 task() の完了結果（Issue/PR番号・pass/warn/fail）のみを親コンテキストに保持し、工程内部の調査過程・中間ログ・読解メモを親コンテキストに累積しないこと（REQ-0114-073/085・ADR-0127）
 - G13: case-auto は Issue 階層決定ロジックを持ってはならない。複数 REQ doc または scale:large の場合は case-open の Issue 構造ルールに委譲する
-- G14: case-auto は req-save 相当処理から case-open 相当処理への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価してはならない。保存結果をそのまま渡す
+- G14: case-auto は req-save task() から case-open task() への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価してはならない。保存結果をそのまま渡す
 - G15: case-auto は Wave table の「実行方法」列に基づき子Issue を選択し case-run に委譲する。「並列」指定の ready 子Issue は最大5件まで同時に委譲する。「直列」指定は1件ずつ委譲する。Wave全体の一括実行を case-run に委譲しない（REQ-0114-045, REQ-0130-010）
 - G16: case-auto は独自の操作単位ステータス追跡を持ってはならない。Epic Issue のステータス追跡テーブルを使用する
 - G18: case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わないこと（REQ-0114-051）
