@@ -37,7 +37,7 @@
 | [REQ-0137](requirements/REQ-0137.md) | 並列実行安全 git 操作規律（共有作業ツリーでの case-auto 並行実行支援） |
 | [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 |
 | [REQ-0139](requirements/REQ-0139.md) | 外部エージェント統合契約 |
-| [REQ-0140](requirements/REQ-0140.md) | 文書表記・文意品質ゲート |
+| [REQ-0140](requirements/REQ-0140.md) | 文書品質ゲート |
 
 - [要件インデックス](requirements/README.md)
 - [移行表](requirements/mapping-table.md)
