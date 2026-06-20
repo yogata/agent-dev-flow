@@ -64,8 +64,11 @@
 | [writing-style.md](specs/writing-style.md) | 文書執筆スタイルガイドライン |
 | [artifact-contracts.md](specs/artifact-contracts.md) | アーティファクト間契約 |
 | [integrity-contracts.md](specs/integrity-contracts.md) | 整合性検査分類フレームワーク |
-| [workflow-contracts.md](specs/workflow-contracts.md) | ワークフロー契約の雛形 |
+| [workflow-contracts.md](specs/workflow-contracts.md) | ワークフロー契約の雛形・Local backend 差分 |
 | [runtime-package-boundary.md](specs/runtime-package-boundary.md) | 実行時配布物の境界と依存制約 |
+| [local-case-file.md](specs/local-case-file.md) | ローカル版 OpenCode の Case ファイルスキーマ・状態遷移・採番・見出し |
+| [local-generation.md](specs/local-generation.md) | ローカル版 OpenCode 生成フロー・`generated_by` 識別子・ジャンクション検出安全ゲート |
+| [local-transform.md](specs/local-transform.md) | ローカル版 OpenCode 変換プロンプト・レビュープロンプトの要件 |
 | [integrity-rule-catalog.md](specs/integrity-rule-catalog.md) | 整合性検査ルールのカタログ |
 | [artifact-responsibilities.md](specs/artifact-responsibilities.md) | アーティファクト責務マトリックス |
 | [req-impact-map.md](specs/req-impact-map.md) | REQ 影響マッピング |

@@ -19,8 +19,11 @@ SPEC ファイルは現行アーキテクチャの正規文書である（REQ-01
 | [artifact-responsibilities.md](artifact-responsibilities.md) | 成果物責任表 | 各成果物種別の正規所有者（canonical owner）と責務（REQ-0103-057） |
 | [integrity-contracts.md](integrity-contracts.md) | 整合性契約 | strict/heuristic/observation 分類と検査カテゴリ |
 | [integrity-rule-catalog.md](integrity-rule-catalog.md) | 整合性ルールカタログ | 整合性検査の全ルール定義（REQ-0108-150, 151） |
-| [workflow-contracts.md](workflow-contracts.md) | ワークフロー契約 | コマンドパイプラインの入出力・前提条件 |
+| [workflow-contracts.md](workflow-contracts.md) | ワークフロー契約 | コマンドパイプラインの入出力・前提条件・Local backend 差分 |
 | [runtime-package-boundary.md](runtime-package-boundary.md) | 実行時パッケージ境界 | リポジトリ種別別 `.opencode/` 定義・命名規約・導入方式・同期範囲 |
+| [local-case-file.md](local-case-file.md) | ローカル Case ファイル | ローカル版 OpenCode の Case ファイルスキーマ・状態遷移・採番・見出し（REQ-0141） |
+| [local-generation.md](local-generation.md) | ローカル版 OpenCode 生成 | ローカル版生成フロー・`generated_by` 識別子・ジャンクション検出安全ゲート・ガードレール（REQ-0141, ADR-0126） |
+| [local-transform.md](local-transform.md) | ローカル版 OpenCode 変換プロンプト | 変換用プロンプト・レビュー用プロンプト・変換仕様の要件（REQ-0141） |
 | [rule-ownership.md](rule-ownership.md) | ルール所有権マトリックス | ルールドメインと責任 REQ/SPEC の対応（REQ-0103-058） |
 | [req-impact-map.md](req-impact-map.md) | REQ 影響マップ | 各現行 REQ が影響する整合性ルールとアーティファクト（REQ-0108-152） |
 | [req-health-metrics.md](req-health-metrics.md) | REQ 健全性メトリクス | REQ 肥大化・関心ズレ検出の定量閾値（要件行数・関心分類数・アーティファクト種別数）（REQ-0136-040） |

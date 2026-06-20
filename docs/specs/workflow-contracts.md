@@ -88,7 +88,21 @@ draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 
 壁打ち→構造的実行の境界で満たすべき要件: 壁打ちフェーズ完了時、docs変更（REQファイル、READMEインデックス、ADR等）を必ずコミット・プッシュする。これにより構造的実行フェーズのworktreeがdocs変更を継承する。
 
+### Local backend の SSoT 位置づけ
+
+Local backend（ローカル版 OpenCode）では、構造的実行以降の SSoT は GitHub Issue / PR ではなくローカル Case ファイル（`.agentdev/cases/case-{NNNN}.md`）である（REQ-0141-021〜023）。
+
+| マクロフェーズ | Local backend の SSoT |
+|---|---|
+| 壁打ち | セッション会話 + draft（GitHub backend と共通） |
+| 構造的実行 | Case ファイル本文 |
+| レビュー完了 | Case ファイル `## マージ結果` |
+
+Local backend の SSoT 差分は『コマンド I/O 契約』節の『Local backend（差分）』サブセクションと整合する。Case ファイルの構造・状態遷移は [ローカル Case ファイル](local-case-file.md) を参照。
+
 ## コマンド I/O 契約
+
+> **バックエンド既定**: 本節の契約は GitHub backend を既定とする。Local backend は『Local backend（差分）』節による差分適用後の契約に従う（REQ-0141）。
 
 ### req/case パイプライン
 
@@ -101,6 +115,21 @@ draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 | `/agentdev/case-close` | PR | マージ済み + クローズ済み | case-run 完了 |
 | `/agentdev/case-auto` | 要件 doc | マージ済み + クローズ済み | req-define 完了（明示指定時のみ） |
 | `/agentdev/case-update` | Issue 番号 | 更新済み Issue | Issue 存在 |
+
+### Local backend（差分）
+
+Local backend（ローカル版 OpenCode）は GitHub backend との差分のみを定義する（REQ-0141）。重複定義は行わず、GitHub backend の契約に差分テーブルを適用した結果が Local backend の契約となる。
+
+| コマンド / 対象 | 差分項目 | GitHub backend | Local backend |
+|---|---|---|---|
+| `case-open` | 出力 | GitHub Issue | `.agentdev/cases/case-{NNNN}.md` |
+| `case-run` | 出力 | GitHub PR | Case ファイルへ PR 相当セクション追記 |
+| `case-close` | 入力 | Issue + PR | Case ファイル |
+| `case-close` | 出力 | GitHub PR 取り込み + Issue クローズ | Case ファイル `## マージ結果` + ローカル Git 取り込み |
+| SSoT（構造的実行） | 情報源 | Issue 本文 + Work Plan | Case ファイル本文 |
+| SSoT（レビュー完了） | 情報源 | PR + レビュー結果 | Case ファイル `## マージ結果` |
+
+Local backend では GitHub Issue / PR を使わない（REQ-0141-021〜023, 026）。`gh issue` / `gh pr` を必須操作としない。Case ファイルの構造・状態遷移・採番は [ローカル Case ファイル](local-case-file.md) を参照。生成プロセスは [ローカル版 OpenCode 生成](local-generation.md) を参照。
 
 ### learning パイプライン
 

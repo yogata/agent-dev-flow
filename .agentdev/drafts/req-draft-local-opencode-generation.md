@@ -14,6 +14,8 @@ work_type: feature
 
 scale: large
 
+spec_actions_consumed: true
+
 summary: |
   AgentDevFlow に GitHub Issue/PR を使わない個人利用環境向け「ローカル版 OpenCode」生成方式を追加する。
   仕様管理リポジトリ（AgentDevFlow 本体）の src/opencode/ と新設 src/opencode-local/ を入力とし、
@@ -464,7 +466,7 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result: {saved: true, spec_path: docs/specs/local-case-file.md}
 
   - ou_id: OU-004
     source_ru: RU-20260620-01
@@ -474,7 +476,7 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 4
     issue_policy: single
-    result: {}
+    result: {saved: true, spec_path: docs/specs/local-generation.md}
 
   - ou_id: OU-005
     source_ru: RU-20260620-01
@@ -484,7 +486,7 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 5
     issue_policy: single
-    result: {}
+    result: {saved: true, spec_path: docs/specs/local-transform.md}
 
   - ou_id: OU-006
     source_ru: RU-20260620-01
@@ -494,7 +496,7 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 6
     issue_policy: single
-    result: {}
+    result: {saved: true, spec_path: docs/specs/runtime-package-boundary.md}
 
   - ou_id: OU-007
     source_ru: RU-20260620-01
@@ -504,7 +506,7 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 7
     issue_policy: single
-    result: {}
+    result: {saved: true, spec_path: docs/specs/workflow-contracts.md}
 
 case_open_hints:
   epic_needed: true
