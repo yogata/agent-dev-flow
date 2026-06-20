@@ -51,7 +51,7 @@ command / skill 変更時の完了定義。以下の全項目を満たすこと:
 - **Steps数**: 5〜12個
 - **共通処理重複**: 共通処理は共通 skill / script に集約
 - **Canonical path**: `references/`（非 `reference/`）
-- **完了報告 variant**: 本文直接保持なし。variant path + 選択条件 + 置換変数のみ
+- **完了報告の種別**: 本文直接保持なし。種別 path + 選択条件 + 置換変数のみ
 - **Script-backed 可否**: 決定的検査・変換は script 化を検討
 
 ## Runtime Path 規約

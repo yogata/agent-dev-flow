@@ -26,7 +26,7 @@
 | 18 | Namespace legacy 残存 | REQ-0108 (016) | integrity-contracts.md | 旧コマンド名・旧パス検出 |
 | 19 | REQ/ADR 相互参照 | REQ-0108 (005) | integrity-contracts.md | 双方向参照確認 |
 | 20 | Authoring DoD | REQ-0108 (060-064) | quality-specs.md | 行数・Steps・共通化・正規パス（canonical path） |
-| 21 | Command Step 整数化 | REQ-0119 (005, 007) | artifact-contracts.md | トップレベル Step は整数のみ。小数 Step を禁止 |
+| 21 | Command Step 整数化 | REQ-0119 (005, 007) | artifact-contracts.md | 最上位 Step は整数のみ。小数 Step を禁止 |
 | 22 | Command サブステップ表記 | REQ-0119 (006) | artifact-contracts.md | サブステップは N-M 形式のみ許容。英字サブステップを禁止 |
 | 23 | Subagent verbatim 条件 | REQ-0119 (013) | workflow-contracts.md | 成果物本文のみそのまま（verbatim）。一律 verbatim 制約を禁止 |
 | 24 | Findings / Capture候補 見出し | REQ-0119 (014, 020, 021) | workflow-contracts.md | current/source は新見出しへ統一。旧語検出用文字列は許容 |

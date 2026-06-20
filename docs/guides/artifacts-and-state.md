@@ -117,11 +117,11 @@ scripts/
 |--------|------|------|-------------|
 | 採用済み成果物（Intake） | `/agentdev/intake-promote` | `/agentdev/backlog-review` | RU 化成功時 |
 | 採用済み成果物（Learning） | `/agentdev/learning-promote` | `/agentdev/backlog-review` | RU 化成功時 |
-| RU | `/agentdev/backlog-review`, session-sourced | `/agentdev/req-define`, `/agentdev/req-save`, `/agentdev/case-open` | `/agentdev/case-open` の Issue 作成 + VERIFY 成功時 |
+| RU | `/agentdev/backlog-review`, セッション由来 | `/agentdev/req-define`, `/agentdev/req-save`, `/agentdev/case-open` | `/agentdev/case-open` の Issue 作成 + VERIFY 成功時 |
 | REQ ファイル | `/agentdev/req-save` | `/agentdev/case-open`, `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
 | Issue | `/agentdev/case-open` | `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
 
-流れ: 採用済み成果物 / session-sourced → RU → REQ ファイル / Issue → マージ → クローズ。RU 削除は `/agentdev/case-open` の永続化成功に限定する。
+流れ: 採用済み成果物 / セッション由来 → RU → REQ ファイル / Issue → マージ → クローズ。RU 削除は `/agentdev/case-open` の永続化成功に限定する。
 
 ## フェーズ体系
 

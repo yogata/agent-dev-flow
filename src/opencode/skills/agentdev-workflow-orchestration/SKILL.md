@@ -19,12 +19,12 @@ case-run は常に1 Issue のみを処理する（REQ-0130-010）。複数 Issue
 | 実装フェーズ | 5-6 | work planが未完了 または チェックボックス未完了 |
 | 提出フェーズ | 7-11 | PRが未作成 |
 
-### 準備フェーズの既知の制約（Windows + junction 環境）
+### 準備フェーズの既知の制約（Windows + ジャンクション環境）
 
-- メインリポジトリで `sync-self-opencode.ps1` / `install-consumer-opencode.ps1` が作成する `.opencode/` 配下の junction link は、git worktree（`.worktrees/{N}`）へ伝播しない。worktree 作成後に個別に再作成が必要になる場合がある。
-- worktree 内で junction 依存の整合性検査（`source-projection-sync` 等）を実行すると、projection 側が存在せず失敗することがある。提出フェーズのローカル検証で整合性検査を含む場合は注意。
-- junction 再作成は既存手順に準拠し、本スキルで新規手順は定義しない。詳細・復旧手順は `references/self-healing-and-errors.md` の該当セクションを参照。
-- この制約は Windows + junction 環境固有。`resolvePathWithFallback`（REQ-0108-189）による runtime→source の部分フォールバックはあるが、source/projection 双方向比較を要する検査までは補完しない。
+- メインリポジトリで `sync-self-opencode.ps1` / `install-consumer-opencode.ps1` が作成する `.opencode/` 配下のジャンクション link は、git worktree（`.worktrees/{N}`）へ伝播しない。worktree 作成後に個別に再作成が必要になる場合がある。
+- worktree 内でジャンクション依存の整合性検査（`source-projection-sync` 等）を実行すると、projection 側が存在せず失敗することがある。提出フェーズのローカル検証で整合性検査を含む場合は注意。
+- ジャンクション再作成は既存手順に準拠し、本スキルで新規手順は定義しない。詳細・復旧手順は `references/self-healing-and-errors.md` の該当セクションを参照。
+- この制約は Windows + ジャンクション環境固有。`resolvePathWithFallback`（REQ-0108-189）による runtime→source の部分フォールバックはあるが、source/projection 双方向比較を要する検査までは補完しない。
 
 ## 参照先
 

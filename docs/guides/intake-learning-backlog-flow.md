@@ -102,9 +102,9 @@ Intake/Learning 両方の採用済み成果物を RU に統合する。
 - 1:N（1 つの採用済み成果物を複数 RU に分割）可能
 - 採用済み成果物の単純コピー（パススルー）は不可
 
-### session-sourced RU
+### セッション由来 RU
 
-チャット内でユーザーと合意形成済みの内容は、session-sourced RU として直接 `.agentdev/backlog/req-units/` に保存できる。RU 本文は後続工程（req-define）で必要な情報を自足し、整理済みの合意形成内容のみを保存対象とする。
+チャット内でユーザーと合意形成済みの内容は、セッション由来 RU として直接 `.agentdev/backlog/req-units/` に保存できる。RU 本文は後続工程（req-define）で必要な情報を自足し、整理済みの合意形成内容のみを保存対象とする。
 
 ## RU の削除ルール
 

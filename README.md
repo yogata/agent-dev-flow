@@ -76,7 +76,7 @@ AgentDevFlow を外部プロジェクトに導入する手順。
 
 ```powershell
 # 1. scripts/ を適用先リポジトリにコピー
-# 2. インストールを実行（clone + junction 作成）
+# 2. インストールを実行（clone + ジャンクション 作成）
 ./scripts/install-consumer-opencode.ps1 -Mode apply
 ```
 

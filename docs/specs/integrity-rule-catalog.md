@@ -410,12 +410,12 @@ updated: 2026-06-19
 | triage_action | guide から要件本文・契約本文を削除し、REQ/ADR/SPEC への参照に置き換える |
 | last_verified | 2026-06-06 |
 
-### IR-020: Baseline-known vs new finding 区別
+### IR-020: 基準既知（baseline-known）と新規 finding の区別
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-020 |
-| description | Baseline (.agentdev/integrity/baseline.json) に記録された known finding と新規 finding が区別されていること |
+| description | 基準（`.agentdev/integrity/baseline.json`）に記録された known finding と新規 finding が区別されていること |
 | severity | heuristic |
 | category | integrity-rule-gap |
 | detection_method | baseline.json の known_findings と現行 finding の比較 |
@@ -570,12 +570,12 @@ updated: 2026-06-19
 | triage_action | 参照に [retired] 注記を追加、または現行 ADR へ更新 |
 | last_verified | 2026-06-08 |
 
-### IR-028: Command トップレベル Step 整数化
+### IR-028: Command 最上位 Step 整数化
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-028 |
-| description | Command のトップレベル Step 見出し・参照が整数のみであり、`Step N.M` 形式の小数 Step が残存していないこと |
+| description | Command の最上位 Step 見出し・参照が整数のみであり、`Step N.M` 形式の小数 Step が残存していないこと |
 | severity | strict |
 | category | obsolete-structure |
 | detection_method | `src/opencode/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側または integrity rule 内の旧語検出用文字列は REQ-0119-021 により除外 |

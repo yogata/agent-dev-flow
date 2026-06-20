@@ -18,8 +18,8 @@
 | DOC-MAP | `docs/DOC-MAP.md` | — | — | 文書探索入口（非基準） |
 | Guide | `docs/guides/*.md` | — | — | 参照用読み物（ナビゲーション層） |
 | ドメイン状態 | `.agentdev/` | — | — | Intake / Learning / Backlog / Integrity 永続状態 |
-| リポジトリローカル Command | `.opencode/commands/repo/` | — | — | セルフホスティングリポジトリ専用コマンド（ADR-0106）。AgentDevFlow 配布対象外。原本・配置先同期対象外 |
-| リポジトリローカル Skill | `.opencode/skills/repo-*/` | — | — | セルフホスティングリポジトリ専用スキル（ADR-0106）。AgentDevFlow 配布対象外。原本・配置先同期対象外 |
+| リポジトリローカル Command | `.opencode/commands/repo/` | — | — | 本体リポジトリ専用コマンド（ADR-0106）。AgentDevFlow 配布対象外。原本・配置先同期対象外 |
+| リポジトリローカル Skill | `.opencode/skills/repo-*/` | — | — | 本体リポジトリ専用スキル（ADR-0106）。AgentDevFlow 配布対象外。原本・配置先同期対象外 |
 | リポジトリローカルレジストリ | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | — | — | リポジトリローカル語彙レジストリ。`.agentdev/` には配置しない（ADR-0106） |
 
 ## 責務境界原則

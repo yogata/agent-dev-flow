@@ -57,11 +57,14 @@ agent: sisyphus
 
    **5-3. 作業手段ADR拒否ゲート**: ADR候補が削除・廃止・移行・統合・再構築・完全削除そのものを主題にしている場合、ADR候補から除外する（REQ-0101-044）。過去判断の除去は新規ADRではなくretire/supersedeで処理する（REQ-0101-045）。委譲接続点: サブエージェントは除外候補と根拠のみを返し、親エージェントがADR候補提示可否を判断する
 
-6. **要件doc生成** → テンプレート: `.opencode/commands/agentdev/templates/req-define/req-draft.md` を Read → 構造化 `draft-data` 形式（REQ-0138, ADR-0124）に従って生成。draft の正は人間向け Markdown 本文ではなく構造化された `# draft-data` fenced YAML block である（REQ-0138-001）。Step 4-2/4-3 で分離した SPEC 候補は `artifact_actions`（`artifact: spec`）として統合し、`## SPEC候補` 補助セクションは出力しない（REQ-0138-009）。REQ/ADR/SPEC への保存対象は成果物別トップレベル配列に分散させず、単一の `artifact_actions` 配列に統合する
+6. **要件doc生成** → テンプレート: `.opencode/commands/agentdev/templates/req-define/req-draft.md` を Read → 構造化 `draft-data` 形式（REQ-0138, ADR-0124）に従って生成。draft の正は人間向け Markdown 本文ではなく構造化された `# draft-data` fenced YAML block である（REQ-0138-001）。Step 4-2/4-3 で分離した SPEC 候補は `artifact_actions`（`artifact: spec`）として統合し、`## SPEC候補` 補助セクションは出力しない（REQ-0138-009）。REQ/ADR/SPEC への保存対象は成果物別最上位配列に分散させず、単一の `artifact_actions` 配列に統合する
    - **6-0. 定義完全性ゲート（QG-1）**: 要件doc生成後、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、REQ/SPEC 分類・ADR ゲート・チェックボックス測可能性・必須フィールド完全性・artifact_actions 構成の妥当性を検証する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は壁打ち（Step 2）へ差し戻し
-   - **6-1. operation_units 生成**: 複数RU入力時の統合/分離結果（Step 10-2）を基に `draft-data` 内の `operation_units` を生成する。各 OU は `ou_id`, `source_ru`, `target_req`, `target_spec`, `operation`, `scale`, `depends_on`, `recommended_order`, `issue_policy`, `result` フィールドを持つ（REQ-0102-033〜035, REQ-0136-013）。単一REQ操作の場合も 1 件の OU として出力する
-      - `operation` の値は対象 artifact により2系統（REQ-0136-013）: REQ 操作は `create` / `append` / `update`、SPEC 操作は `spec-create` / `spec-update`。後方互換性のため既存の `create` / `append` / `update` は維持する
-      - `target_req` は REQ 操作（create/append/update）の対象 REQ、`target_spec` は SPEC 操作（spec-create/spec-update）の対象 SPEC パス（例: `docs/specs/patterns.md`、新規は `new:{topic-slug}`）。両フィールドは操作種別に応じて使い分け、未使用時は省略可能とする
+    - **6-1. operation_units 生成**: 複数RU入力時の統合/分離結果（Step 10-2）を基に `draft-data` 内の `operation_units` を生成する。各 OU は `ou_id`, `source_ru`, `target_req`, `target_spec`, `operation`, `scale`, `depends_on`, `recommended_order`, `issue_policy`, `result` フィールドを持つ（REQ-0102-033〜035, REQ-0136-013）。単一REQ操作の場合も 1 件の OU として出力する
+       - `operation` の値は対象 artifact により2系統（REQ-0136-013）: REQ 操作は `create` / `append` / `update`、SPEC 操作は `spec-create` / `spec-update`。後方互換性のため既存の `create` / `append` / `update` は維持する
+       - `target_req` は REQ 操作（create/append/update）の対象 REQ、`target_spec` は SPEC 操作（spec-create/spec-update）の対象 SPEC パス（例: `docs/specs/patterns.md`、新規は `new:{topic-slug}`）。両フィールドは操作種別に応じて使い分け、未使用時は省略可能とする
+    - **6-2. artifact_actions 生成**: Step 4-2/4-3 の分類結果・Step 5 の ADR 判断結果を `draft-data` の `artifact_actions` に統合する。1 action = 1 artifact × 1 editing concern 単位とし、同一関心の複数 agreed items は単一 action に複数段落の `content` としてまとめる（REQ-0138-009, REQ-0138-017）。各 action は `id`（ACT-REQ-NNN / ACT-ADR-NNN / ACT-SPEC-NNN）, `artifact`（req/adr/spec）, `operation`, `target`, `source_items`, `content` を持つ
+
+  7. **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）。bugfix + ADR必要時は feature に昇格
    - **6-2. artifact_actions 生成**: Step 4-2/4-3 の分類結果・Step 5 の ADR 判断結果を `draft-data` の `artifact_actions` に統合する。1 action = 1 artifact × 1 editing concern 単位とし、同一関心の複数 agreed items は単一 action に複数段落の `content` としてまとめる（REQ-0138-009, REQ-0138-017）。各 action は `id`（ACT-REQ-NNN / ACT-ADR-NNN / ACT-SPEC-NNN）, `artifact`（req/adr/spec）, `operation`, `target`, `source_items`, `content` を持つ
 
 7. **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）。bugfix + ADR必要時は feature に昇格

@@ -256,11 +256,15 @@ docs 記述中に英語抽象語を検出した場合、以下の 6 項目を順
 
 ### 修飾語の日本語化の方向性
 
-active→現行、retired→廃止、accepted→承認済み、upstream/downstream→文脈で「前工程/次工程」「上位/下位」等（固定しない）、current→現行/現在の。
+active→現行、retired→廃止、accepted→承認済み、upstream/downstream→文脈で「前工程/次工程」「上位/下位」等（固定しない）、current→現行/現在の、top-level→最上位（既存「トップレベル」も統一）。
 
 ### 複合技術語の訳し方指針（文意に基づく）
 
-domain state→「ドメイン状態」「保持する管理情報」等、runtime command→「実行時コマンド」、command topology→「コマンド構成」、provenance marker→「出典標識」、upstream handoff→「前工程からの引き継ぎ」「上位工程からの受渡し」等、fixture detail→「テストデータ詳細」「検査データ詳細」等、runtime workspace→「実行時作業領域」、canonical path→「正規パス」。いずれも文脈で最も自然な表現を選ぶ。
+domain state→「ドメイン状態」「保持する管理情報」等、runtime command→「実行時コマンド」、command topology→「コマンド構成」、provenance marker→「出典標識」、upstream handoff→「前工程からの引き継ぎ」「上位工程からの受渡し」等、fixture detail→「テストデータ詳細」「検査データ詳細」等、runtime workspace→「実行時作業領域」、canonical path→「正規パス」、self-hosting（普通名詞）→「本体リポジトリ」、junction→「ジャンクション」、session-sourced→「セッション由来」。いずれも文脈で最も自然な表現を選ぶ。
+
+### 識別子と散文普通名詞の区別
+
+識別子（Type ID・enum 値・frontmatter field・ファイル名・ディレクトリ名・バッククォート内コード値）は英語のまま許容する。日本語散文中で普通名詞として使用する場合は推奨訳に置換する。runtime-package-boundary.md が実装している良いパターン（本文は日本語、表の Type ID 列は `` `self-hosting` `` のまま）を参照。
 
 ### 専門カタカナ語の日本語訳（文意に基づく）
 

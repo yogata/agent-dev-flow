@@ -32,7 +32,7 @@ AgentDevFlow で使う用語の定義。
 | guides | 利用者向けの参照用読み物。`docs/guides/*.md` に配置 |
 | RU（Requirement Unit） | Intake/Learning の採用済み成果物を統合した構造化成果物。`.agentdev/backlog/req-units/RU-*.md` に配置 |
 | promoted artifact（採用済み成果物） | backlog-review の入力となる整形済み成果物。Intake/Learning それぞれの `promoted/` に配置 |
-| session-sourced RU | チャット内で合意形成済みの内容を直接保存した RU |
+| セッション由来 RU | チャット内で合意形成済みの内容を直接保存した RU |
 | evaluation-report | learning-promote 内部で生成される分析レポート。同コマンドの昇華判定フェーズの入力として使用される |
 
 ## パイプライン
@@ -74,4 +74,4 @@ AgentDevFlow で使う用語の定義。
 | Template | Issue/PR 本文の出力構造。Skill 配下 `templates/` に配置 |
 | Script | ガードレール・検査・補助処理の実行可能ロジック。Skill 配下 `scripts/` に配置 |
 | 原本（source） | `src/opencode/` 配下の正規の定義ファイル。AgentDevFlow 本体の command/skill/template はここに配置される |
-| 配置先（projection） | `.opencode/` 配下の実行時の配布先。AgentDevFlow 本体リポジトリでは junction/symlink による投影先、適用プロジェクトでは install script による配置先 |
+| 配置先（projection） | `.opencode/` 配下の実行時の配布先。AgentDevFlow 本体リポジトリでは ジャンクション/symlink による投影先、適用プロジェクトでは install script による配置先 |
