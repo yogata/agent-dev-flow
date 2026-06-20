@@ -35,7 +35,7 @@ docs全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、find
 7. **guides意味診断**: guides が navigation layer の範囲を超えていないか確認。履歴混入を検出した場合 route を追加（REQ-0115-041）
 8. **DOC-MAP意味診断**: DOC-MAP が索引の範囲を超えていないか確認。内容過多を検出した場合分割を誘導（REQ-0115-042）
 9. **REQ structure review（6観点）**: SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT。`agentdev-req-structure-diagnostics` 参照
-10. **文書分類一貫性検査**: `docs/specs/document-model.md` の classification policy への適合確認。REQ 要件行に schema field、enum 値一覧、route/category/status 判定表、file pattern、template variant、report format、内部アルゴリズム、作業履歴、実装パラメータ等の SPEC分離基準違反が残留していないかを `agentdev-req-structure-diagnostics` に従って自動検出する
+10. **文書分類一貫性検査**: `docs/specs/document-model.md` の classification policy への適合確認。REQ 要件行に schema field、enum 値一覧、route/category/status 判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等の SPEC分離基準違反が残留していないかを `agentdev-req-structure-diagnostics` に従って自動検出する
 11. **docs-check route判定**: 意味的疑いのうち機械的検査に落とせるものを docs-check rule/fixture 候補として提示
 12. **未処理artifact確認**: `agentdev-req-structure-diagnostics` 参照
 13. **finding 出力**: finding を `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md` へ出力。source-of-truth priority: active REQ > accepted ADR > SPEC > DOC-MAP/guides

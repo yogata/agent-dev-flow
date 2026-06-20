@@ -71,7 +71,7 @@
 - **ADR/REQ/spec影響**: なし
 - **横展開観点**: Windows環境でのファイルシステム操作で同様のハンドル解放待ちリトライパターンが適用可能
 - **再発条件**: Windows環境で worktree を削除する場合
-- **予防策候補**: worktree 削除プロシージャに Permission denied 時の待機リトライ（最大3回）を組み込む。junction 環境では junction 削除フォールバック手順を適用
+- **予防策候補**: worktree 削除プロシージャに Permission denied 時の待機リトライ（最大3回）を組み込む。ジャンクション環境ではジャンクション削除フォールバック手順を適用
 - **想定反映先**: worktree 削除プロシージャ
 - **関連**: worktree-operations プロシージャ, Issue #{issue_number}
 - **タグ**: `#git` `#windows` `#ワークアラウンド`

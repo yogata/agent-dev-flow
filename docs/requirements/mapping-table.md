@@ -37,15 +37,15 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0014 | migrated | REQ-0106 | case-run自律修正ループをCase実行・完了へ移行 |
 | REQ-0015 | migrated | REQ-0106 | 関連ドキュメントの達成対象化をCase実行・完了へ移行 |
 | REQ-0016 | migrated | REQ-0103 | artifact責任分界へ移行 |
-| REQ-0017 | migrated | REQ-0103, REQ-0105 | namespaceとdomain stateを分割移行 |
+| REQ-0017 | migrated | REQ-0103, REQ-0105 | namespaceとドメイン状態を分割移行 |
 | REQ-0018 | migrated | REQ-0102 | 未決分岐解消を要件定義へ移行 |
 | REQ-0019 | migrated | REQ-0105 | intake / learning責任境界を移行 |
 | REQ-0020 | migrated | REQ-0104, REQ-0106 | Epic実行順序SSoTをworkflowとcase実行へ移行 |
 | REQ-0021 | migrated | REQ-0103, REQ-0108 | guardrail script方針をartifact責任分界とintegrityへ移行 |
-| REQ-0022 | migrated | REQ-0108 | domain state git永続化をintegrityへ移行 |
+| REQ-0022 | migrated | REQ-0108 | ドメイン状態のgit永続化をintegrityへ移行 |
 | REQ-0023 | migrated | REQ-0105 | learning staging管理をlearning/RU lifecycleへ移行 |
 | REQ-0024 | migrated | REQ-0107 | 完了報告フォーマットを移行 |
-| REQ-0025 | migrated | REQ-0108 | intake domain state git永続化をintegrityへ移行 |
+| REQ-0025 | migrated | REQ-0108 | intakeドメイン状態のgit永続化をintegrityへ移行 |
 | REQ-0026 | migrated | REQ-0105 | intake lifecycleを移行 |
 | REQ-0027 | migrated | REQ-0105 | learning artifact lifecycleを移行 |
 | REQ-0028 | migrated | REQ-0101 | documentation granularityを文書基準へ移行 |
@@ -78,7 +78,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0120 | migrated | REQ-0103 | Runtime Command Authoring 制約（非必須参照除去）を REQ-0103 に吸収（REQ-0103-152: Runtime Command Authoring 制約の統合先）。独立REQは不要と判断（agentdev-system-reorganization OU-04）。retired 文書は `retired/REQ-0120.md` を参照 |
 | REQ-0121 | migrated | REQ-0103, REQ-0108 | Runtime Command 規範語構成を REQ-0103 に吸収（REQ-0103-152）、Integrity 検査定義（規範語検査の責務境界違反検査への再定義・規範語残存前提の除去）を REQ-0108 に吸収（REQ-0108-242, REQ-0108-243）。語彙ポリシー整合は REQ-0103/REQ-0108/REQ-0119 で一貫管理するため独立REQは不要と判断（agentdev-system-reorganization OU-04）。retired 文書は `retired/REQ-0121.md` を参照 |
 | REQ-0115 | migrated | REQ-0108, REQ-0109, REQ-0124 | 恒久要件を REQ-0108（docs-check 検査責務）、REQ-0109（inspect-docs）、REQ-0124（inspect 命名恒久制約）へ移行し retire（2026-06-16）。タイトル「docs-* command suite」が移行主題であり REQ-0124-021 に抵触。retired 文書は `retired/REQ-0115.md` を参照 |
-| REQ-0117 | migrated | REQ-0110 | Git worktree junction cleanup フォールバック手順を REQ-0110 に統合（REQ-0110-008: Windows + junction 環境の "Not a directory" エラーフォールバック）。worktree 削除信頼性を一元管理するため独立REQは不要と判断（agentdev-system-reorganization OU-06）。retired 文書は `retired/REQ-0117.md` を参照 |
+| REQ-0117 | migrated | REQ-0110 | Git worktree ジャンクションクリーンアップフォールバック手順を REQ-0110 に統合（REQ-0110-008: Windows + ジャンクション環境の "Not a directory" エラーフォールバック）。worktree 削除信頼性を一元管理するため独立REQは不要と判断（agentdev-system-reorganization OU-06）。retired 文書は `retired/REQ-0117.md` を参照 |
 
 ## Active Set
 
@@ -94,7 +94,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0108 | docs-check / Validation / Tests |
 | REQ-0109 | inspect-docs / REQ体系整合性 |
 | REQ-0110 | Git worktree cleanup 信頼性 |
-| REQ-0112 | ADRライフサイクル・文書体系基盤・runtime独立性 |
+| REQ-0112 | ADRライフサイクル・文書体系基盤・実行時独立性 |
 | REQ-0113 | Skill References SPEC分離 |
 | REQ-0114 | /agentdev/case-auto 最大自走モード |
 | REQ-0119 | コマンド・スキル・サブエージェント責務分界（新規、旧REQ移行なし） |

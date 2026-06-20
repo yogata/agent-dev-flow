@@ -26,7 +26,7 @@ agent: sisyphus
    - **`--comment`**: 更新コメントを追加する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントはコメント案と必須セクション検査のみを返し、親エージェントが投稿する
    - **`--req`**: REQファイル更新を行う。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは関連REQ候補・APPEND/UPDATE候補・根拠のみを返し、親エージェントがファイル更新とcommit/pushを行う
    - **`--review-ng`**: レビューNG時の専用フローを実行する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは乖離タイプ候補・推奨アクション・更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
-4. 完了報告 → 完了報告templateに従って出力。更新種別に応じたvariantを選択:
+4. 完了報告 → 完了報告templateに従って出力。更新種別に応じた種別を選択:
     - --body → .opencode/commands/agentdev/templates/case-update/body.md
     - --comment → .opencode/commands/agentdev/templates/case-update/comment.md
     - --req → .opencode/commands/agentdev/templates/case-update/req.md（変数: {APPEND/UPDATE}, {REQ番号}, {セクション名}）

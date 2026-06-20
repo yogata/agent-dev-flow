@@ -12,6 +12,6 @@
   ブランチ・worktree:
     - 削除: ✅ 成功
   Findings回収: {回収済みN件 / 保存済みN件}（{該当なしの場合は「該当なし」}）
-検証結果: ⚠️ 注意（GitHub完了 / domain state永続化失敗）
+検証結果: ⚠️ 注意（GitHub完了 / ドメイン状態永続化失敗）
 git 永続化: commit: {hash}, push: ❌ 失敗
 次のコマンド: 手動で `git push` を実行してください

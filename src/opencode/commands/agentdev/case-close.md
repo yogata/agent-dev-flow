@@ -104,11 +104,11 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
  11. **Domain state 永続化**: `agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める
 
-12. **完了報告**: 完了報告templateに従って出力。結果状態に応じたvariantを選択:
+12. **完了報告**: 完了報告templateに従って出力。結果状態に応じた種別を選択:
     - 全系統成功 → .opencode/commands/agentdev/templates/case-close/standard.md
     - .agentdev push失敗 → .opencode/commands/agentdev/templates/case-close/agentdev-push-failed.md
     - ブランチ・worktree削除失敗 → .opencode/commands/agentdev/templates/case-close/worktree-cleanup-failed.md
-     - GitHub完了後に .agentdev push失敗の場合は standard variant を使用してはならない
+     - GitHub完了後に .agentdev push失敗の場合は standard 種別 を使用してはならない
      - **結果状態の分離報告**: GitHub側完了状態・`.agentdev` 永続化状態・ブランチ削除状態を独立して報告
 
 ## Guardrails
@@ -133,6 +133,6 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G18: learning と intake を同一 commit に含める
 - G19: Step 12 は結果状態を分離して報告。`.agentdev` push失敗時は完了扱いにしない
 - G20: 完了条件チェックボックスの評価・更新は case-close の専任責務（ADR-0114）。case-run / driver / 外部実行バックエンドは更新しない。case-close は別コンテキストで Issue 本文を再読込して最終完了判定し、更新後に再読込 VERIFY を必ず実施する
-- G21: case-close の capture 責務は回収・保存。PR 本文から intake / learning を分離回収し domain state に保存する。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照
+- G21: case-close の capture 責務は回収・保存。PR 本文から intake / learning を分離回収しドメイン状態に保存する。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照
 - G22: SPEC status 昇格（draft → accepted）は case-close の責務（ADR-0123）。昇格は対象 SPEC が `draft` かつ今回の実装が SPEC 内容を検証済みの場合のみ実施する。spec-save は accepted を付与しない
 - G23: SPEC確定候補の処理（Step 3-2）は PR 本文の `## SPEC確定候補` セクションを入力とし、`## Findings / Capture候補` とは区別して扱う

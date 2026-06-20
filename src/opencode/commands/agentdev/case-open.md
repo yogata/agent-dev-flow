@@ -98,10 +98,10 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
 
  18-1-1. **draft / RU 削除残存検証**（Standard / Epic 全フロー共通・REQ-0137-007）: Step 18 / 18-1 の削除後、当該ファイルが作業ツリー・index に残存していないことを検証する（`git status --porcelain -- <draft-path> <RU-path>` が空であること、またはファイル非存在確認）。残存を検出した場合、即座に停止し残存ファイル一覧を報告する。本検証は Standard flow と Epic flow の双方で実施する（Epic flow 限定のクリーンアップ検証ゲートを Standard flow にも拡張）
 
-18-2. 完了報告 → template variant:
-   - Standard → `templates/case-open/standard.md`
-   - 単一REQ Epic → `templates/case-open/epic.md`
-   - マルチREQ Epic → `templates/case-open/multi-req-epic.md`
+  18-2. 完了報告 → テンプレート種別:
+    - Standard → `templates/case-open/standard.md`
+    - 単一REQ Epic → `templates/case-open/epic.md`
+    - マルチREQ Epic → `templates/case-open/multi-req-epic.md`
 
 ## Guardrails
 

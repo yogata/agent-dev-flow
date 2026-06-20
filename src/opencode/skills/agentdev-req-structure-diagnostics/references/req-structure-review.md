@@ -49,7 +49,7 @@ REQ の active/retired/世代境界の整合性を確認する:
 
 要件行数・関心分類数・artifact種別数の定量閾値と SPLIT シグナル加算ルールは `docs/specs/req-health-metrics.md`（REQ-0136-040）に定義する。本観点の SPLIT シグナル計算は同 SPEC の閾値を参照する。
 
-SPEC分離基準違反シグナルは high-specificity signal として扱う。active REQ の要件行で以下のいずれかが主たる文意になっている場合、1シグナルでも MOVE finding 候補として出す。安定契約例外（公開 command 名、domain state の位置づけ、接続契約、安全境界、停止条件の大枠等）に該当する可能性がある場合は、確信度を medium/low に下げ、根拠に例外候補を明記する。
+SPEC分離基準違反シグナルは high-specificity signal として扱う。active REQ の要件行で以下のいずれかが主たる文意になっている場合、1シグナルでも MOVE finding 候補として出す。安定契約例外（公開 command 名、ドメイン状態の位置づけ、接続契約、安全境界、停止条件の大枠等）に該当する可能性がある場合は、確信度を medium/low に下げ、根拠に例外候補を明記する。
 
 ## SPEC分離基準違反検出
 
@@ -63,7 +63,7 @@ SPEC分離基準違反シグナルは high-specificity signal として扱う。
 | enum値一覧残留 | enum 値の一覧そのものが要件内容になっている | `promote/defer/reject`, `accepted/superseded/deprecated`, `strict/heuristic/observation` |
 | route判定表残留 | route/category/status の詳細判定表または分岐表が要件行に入っている | `route 判定`, `category 判定`, `status 判定`, `分類表`, `判定表` |
 | file pattern残留 | 具体的な glob/path pattern が要件行の主内容になっている | `docs/requirements/REQ-*.md`, `*.md`, `src/opencode/**/*.md` |
-| template variant残留 | template variant の選択ロジックまたは variant 名一覧が要件行を占有している | `standard/compact`, `variant`, `テンプレート種別`, `選択ロジック` |
+| template variant残留 | テンプレート種別の選択ロジックまたは種別名一覧が要件行を占有している | `standard/compact`, `variant`, `テンプレート種別`, `選択ロジック` |
 | report format残留 | report 出力形式、列、セクション、ファイル名形式の詳細が要件行を占有している | `report format`, `出力形式`, `7フィールド`, `列構成`, `finding-{timestamp}.md` |
 | 内部アルゴリズム残留 | 検査・抽出・検証の内部手順やアルゴリズムが要件行を占有している | `抽出手順`, `検証手順`, `照合順`, `スコアリング`, `正規表現で検出` |
 | 作業履歴残留 | PR/commit/rename/retire/migration 等の作業記録が要件行を占有している | `PR #123`, `commit abc1234`, `renamed`, `retired history`, `移行履歴` |
