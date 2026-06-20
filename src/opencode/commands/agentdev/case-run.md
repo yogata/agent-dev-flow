@@ -68,14 +68,14 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 
 ### 実行担当サブエージェント委譲フェーズ（Steps 5-6）
 
-**Step 5: 実行担当サブエージェント起動**: 実装実行を外部実行バックエンドへ委譲するため、実行担当サブエージェントを起動する。実行担当サブエージェントは `agentdev-case-run-execution-adapter` skill の adapter protocol に従い、Issue読込・ADR/REQ/SPEC/docs repository context 再確認・外部実行バックエンドへの委譲・REJECT/ITERATE/blocker処理・result返却を実行する。
+**Step 5: 実行担当サブエージェント起動**: 実装実行を外部実行バックエンドへ委譲するため、実行担当サブエージェントを起動する。実行担当サブエージェントは `agentdev-case-run-execution-adapter` skill の adapter protocol に従い、Issue読込・ADR/REQ/SPEC/docs repository context 再確認・外部実行バックエンドへの委譲・blocker処理・result返却を実行する。
 
 - **case-run が直接行わない（実行担当サブエージェント / 外部実行バックエンドの責務）**: work plan生成・実装実行・TDD・乖離検出（QG-3）・specs更新・関連ドキュメント整合性確認・ローカル検証・PR本文作成・PR作成・デプロイ検証
 - **実行担当サブエージェントへの引き渡し**: 割り当てられた1 Issue の Issue番号・worktree root（相対パス指定・worktree内制約）・ブランチ名。実行担当サブエージェントはこの1 Issue のみを実装対象とする（Wave全体や他子Issue のオーケストレーションは含まない）
-- 外部実行バックエンドの plan artifact は不透明な外部成果物として扱う（解釈・検証しない）
+- ハーネス起動方式（CLI subprocess）の詳細は `agentdev-case-run-execution-adapter` スキル参照。AGENTS.md で指定されたハーネスを読み込んで起動する
+- 外部実行ハーネスの plan artifact 等の中間成果物の内部構造に依存した処理・検証を行わない（REQ-0139-007）。最終結果は PR URL で受領する
 - 実行担当サブエージェントが Issue 完了条件チェックボックスを更新しない（case-close QG-4 の責務）
 - Findings / Capture 候補は実行担当サブエージェントが PR 本文の `## Findings / Capture候補` に記録する
-- **momus 実行計画確認（oh-my-openagent 利用時）**: oh-my-openagent を利用し実行計画ファイルを作成する場合、実装開始前に momus へ確認依頼する。[OKAY]→実装開始、[REJECT]→計画修正、[REJECT]反復→blocked/failed。momus による確認は QG-3（実装差分確認）/QG-4（完了条件チェックボックス最終評価）のいずれの代替でもなく、実装開始前の確認として扱う（REQ-0139-006）
 - **外部実行手段の中間成果物**: 外部実行手段の plan artifact 等の中間成果物を AgentDevFlow の永続成果物（draft/Issue/PR/REQ/ADR/SPEC）として扱わない（REQ-0139-007）
 - **SPEC確定候補（ADR-0123 Decision #4, REQ-0136-015）**: 実装時に発見された SPEC レベルの詳細（SPEC に記載すべき schema・enum・判定表・内部アルゴリズム等、実装で判明した仕様詳細）は、実行担当サブエージェントが PR 本文の `## SPEC確定候補` セクションに記録する。`## Findings / Capture候補`（本筋外発見・intake/learning 候補）とは別セクションとし、混在させない。SPEC確定候補は case-close Step 3 で SPEC 確定チェックの入力となり、draft → accepted 昇格または spec-save 再起動の判断材料となる
 
@@ -110,8 +110,7 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 - G23: 実行担当サブエージェント result の3状態（completed(pr)/blocked/failed）は `agentdev-case-run-execution-adapter` の result 契約に従う。成功成果は PR 作成である
 - G24: 完了条件チェックボックスの評価・更新は case-close QG-4 の責務。case-run・実行担当サブエージェント・外部実行バックエンドは完了条件チェックボックスを更新しない
 - G25: blocked / failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。一時会話コンテキスト・中間ファイルは SSoT としない
-- G26: 外部実行バックエンドの plan artifact は不透明な外部成果物として扱い、内部構造に依存した処理・検証を行わない
-- G28: oh-my-openagent 利用時・実行計画ファイル作成時に実装開始前に momus 確認を依頼する。momus による確認は QG-3/QG-4 の代替ではなく実装開始前の確認である（REQ-0139-006）
+- G26: 外部実行ハーネスの plan artifact 等の中間成果物の内部構造に依存した処理・検証を行わない（REQ-0139-007）。最終結果は PR URL で受領する。
 - G29: 外部実行手段の中間成果物を AgentDevFlow の永続成果物として扱わない（REQ-0139-007）
 - G30: Step 5（実行担当サブエージェント起動）の前に worktree+ブランチが作成済みであることを検証すること（Step 4-2 precondition gate）。未作成時・メインリポジトリにいる場合は実行担当サブエージェントを起動禁止（REQ-0137 適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提保護）
 - G31: 実行担当サブエージェントへの引き渡しにおいて worktree root（相対パス・`.worktrees/{N}-{type}/`）を必ず含め、メインリポジトリパスを渡さないこと
