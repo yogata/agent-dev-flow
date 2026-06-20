@@ -20,6 +20,7 @@ agent: sisyphus
 ## Steps
 
 1. **入力解決**:
+   - **実行開始時刻の記録（REQ-0114-082）**: 本 Step の冒頭（入力解決の最初の処理）で、case-auto の実行開始時刻を JST（Etc/GMT-9）・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録し、変数（`case_auto_started_at`）に保持する。この時刻は Step 7（停止時報告）および Step 8（完了報告）での所要時間算出の基準として使用する
    - **Issue番号/URL入力モード**: 引数が数値のみ（`^\d+$`）または GitHub Issue URL の場合、Issue番号として解決し case-run移行モードへ分岐する（Step 3 の Issue番号/URL入力分岐へ）。この場合、要件docの入力解決・work_type読取はスキップする
    - **要件doc入力モード**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
 2. **work_type 読取**: 入力要件docの `draft-data` から work_type を取得する（参考情報・パイプライン分岐の判定には使用しない・REQ-0138-010）
@@ -74,6 +75,7 @@ agent: sisyphus
 5. **工程間の状態引き継ぎ**: 各工程の成果物（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) RU ファイルパス（case-open 相当処理の RU 削除で使用） (2) capture 対象情報（case-close 相当処理の learning/intake capture で使用）
 6. **複数REQ対応**: req-save 相当処理の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールをそのまま使用する。case-auto 自体に Issue 階層決定ロジックを持ってはならない。req-save 相当処理から case-open 相当処理へ状態を引き継ぐ際、case-auto は複数 REQ doc の保存結果をフィルタリングや再評価なしでそのまま渡す。case-auto は Epic Issue 化の判定に関与しないこと（REQ-0114-057）。case-open の判定結果に従うこと
 7. **停止条件の検出**: 以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:
+   - **停止時タイミング情報の追記（REQ-0114-083）**: 停止報告に Step 1 で記録した `case_auto_started_at`（開始時刻）・停止時刻（JST・人間が読みやすい形式: 例 `2026-06-21 15:30:00 JST`）・経過時間（停止時刻 − 開始時刻、人間が読みやすい形式: 例 `12分34秒`・全体合計のみ・工程別内訳は含めない）を含めること
    - (1) req-define合意要件からの逸脱
    - (2) 要件未合意のscope拡大
    - (3) repo外実体変更の必要性
@@ -85,6 +87,11 @@ agent: sisyphus
    - (9) 作成元不明branch / user-owned branch / 他作業branchの削除検出
    - (10) 未コミット変更の帰属不明
 8. **完了報告**: 最終工程（case-close）の完了報告をそのまま出力する。Epic Issue を伴うキュー実行時は、完了・blocked・failed 子Issue一覧を含める。停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する（REQ-0114-056）
+   - **タイミング情報の追記（REQ-0114-083）**: 完了報告生成時刻（Step 8 開始時点）を JST・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録する。case-close の完了報告（テンプレート）は変更せず、case-auto が以下を追記すること:
+     - 開始時刻: Step 1 で記録した `case_auto_started_at`
+     - 終了時刻: 完了報告生成時刻
+     - 所要時間: 終了時刻 − 開始時刻（人間が読みやすい形式: 例 `12分34秒`・全体合計のみ・工程別内訳は含めない）
+   - 停止条件による中断時（Step 7 経由）の報告にも、上記と同じ形式で開始時刻・停止時刻・経過時間を含めること（停止時刻を終了時刻として扱う）
 8-1. **Standard flow 逐次OU処理ループ**: Standard flow の case-close 完了後、未処理 OU が残存する場合は次 OU の処理を自動的に開始する（REQ-0114-065〜067）:
    - 処理対象の全 OU から次の未処理 OU を特定する（`recommended_order`, `depends_on` に基づく）
     - 次 OU が存在する場合: 当該 OU の `artifact_actions` に応じた工程分岐で Step 2 に戻る（REQ/ADR artifact_actions あり: req-save → …、SPEC artifact_actions あり: spec-save → …、常に case-open → …）。spec-save 実行判定は Step 3 に従う
