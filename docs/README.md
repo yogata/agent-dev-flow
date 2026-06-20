@@ -38,6 +38,7 @@
 | [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 |
 | [REQ-0139](requirements/REQ-0139.md) | 外部エージェント統合契約 |
 | [REQ-0140](requirements/REQ-0140.md) | 文書品質ゲート |
+| [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 |
 
 - [要件インデックス](requirements/README.md)
 - [移行表](requirements/mapping-table.md)
