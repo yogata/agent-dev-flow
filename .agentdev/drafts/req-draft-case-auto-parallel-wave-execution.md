@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: case-auto-parallel-wave-execution
 status: saved
+spec_consumed: true
 created_at: "2026-06-20T00:00:00+09:00"
 ---
 
