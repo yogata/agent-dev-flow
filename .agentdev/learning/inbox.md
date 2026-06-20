@@ -75,3 +75,11 @@ agentdev-gh-cli skill の Section 2（標準手順）にこのコンソールエ
 
 **再発防止**: case-run Step 4 の worktree 作成時に `git fetch origin` を必ず実行する。並列 Wave 実行の場合、前 Wave 完了後に次 Wave の worktree を作成するタイミングで origin/main が更新されていることを前提とする。draft の Oracle 推定事項「Wave-2 の case-run が Wave-1 merge 後の origin/main から worktree を新規作成すること」の実装確認を case-run precondition gate に含めることを検討する。
 
+## 2026-06-20: case-run で oh-my-openagent の存在確認をして停止した — 検出不要・bunx で直接起動
+
+**状況**: case-auto（Issue #953）の case-run フェーズで、oh-my-openagent がインストールされているか確認しようとして `Get-Command oh-my-openagent` を実行し、NOT_FOUND となったため case-run をエラー停止した。実際には oh-my-openagent は opencode に統合済みであり、bunx 経由で常に起動可能だった。
+
+**学び**: oh-my-openagent は opencode 統合済み。bunx oh-my-openagent run で常に起動可能。事前検出・存在確認は不要。adapter protocol（agentdev-case-run-execution-adapter）の記載通り、AGENTS.md で指定されたハーネスを前提として bunx で直接起動する。
+
+**再発防止**: case-run Step 5 で oh-my-openagent の存在確認を行わない。AGENTS.md のハーネス選定記述を信頼し、bunx oh-my-openagent run --directory worktree で直接起動する。adapter protocol に「ハーネス不在時は case-run がエラー停止する（フォールバック経路なし）」とあるが、これは bunx 実行時のエラーを指すものであり、事前検出の必要を意味しない。
+
