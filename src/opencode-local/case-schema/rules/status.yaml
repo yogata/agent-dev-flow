@@ -1,0 +1,128 @@
+# ローカル Case ファイル status enum と状態遷移表
+#
+# 正本: docs/specs/local-case-file.md「status enum と状態遷移」
+# 要件: REQ-0141-018
+#
+# status 値域・意味・終端状態・状態遷移表・再開経路・禁止遷移を定義する。
+# 本ファイルは docs/specs/local-case-file.md と矛盾してはならない。
+
+schema_version: "1.0"
+target: ".agentdev/cases/case-{NNNN}.md の status フィールド"
+canonical_spec: "docs/specs/local-case-file.md"
+
+# status enum（REQ-0141-018）
+status_enum:
+  open:
+    description: "Case オープン済み・作業前"
+    terminal: false
+  running:
+    description: "作業中"
+    terminal: false
+  blocked:
+    description: "停止中（障害・未解決事項あり）"
+    terminal: false
+  review:
+    description: "作業完了・レビュー対象"
+    terminal: false
+  closed:
+    description: "完了"
+    terminal: true
+  cancelled:
+    description: "中止"
+    terminal: true
+
+# 終端状態（REQ-0141-018）
+# closed と cancelled は終端状態とする。終端状態からの遷移は定義しない。
+terminal_states:
+  - closed
+  - cancelled
+
+# 状態遷移表（REQ-0141-018, SPEC local-case-file.md「状態遷移表」）
+# 操作・変更前 status・変更後 status の対応を定義する。
+transitions:
+  - operation: "ローカル版 case-open"
+    from: "(新規作成)"
+    to: "open"
+    note: "Case ファイル新規作成時"
+
+  - operation: "ローカル版 case-run 開始"
+    from: "open"
+    to: "running"
+    note: "open からの開始"
+
+  - operation: "ローカル版 case-run 開始"
+    from: "blocked"
+    to: "running"
+    note: "blocked からの再開"
+
+  - operation: "ローカル版 case-run 完了"
+    from: "running"
+    to: "review"
+    note: "実装完了・レビュー対象へ"
+
+  - operation: "ローカル版 case-run 停止"
+    from: "running"
+    to: "blocked"
+    note: "障害・未解決事項による停止"
+
+  - operation: "ローカル版 case-close 停止"
+    from: "review"
+    to: "blocked"
+    note: "完了処理中の停止"
+
+  - operation: "ローカル版 case-close 再開"
+    from: "blocked"
+    to: "review"
+    note: "blocked から完了処理への再開"
+
+  - operation: "ローカル版 case-close 完了"
+    from: "review"
+    to: "closed"
+    note: "完了確定。終端状態"
+
+  - operation: "明示中止"
+    from: "open"
+    to: "cancelled"
+    note: "利用者による明示的キャンセル"
+
+  - operation: "明示中止"
+    from: "running"
+    to: "cancelled"
+    note: "利用者による明示的キャンセル"
+
+  - operation: "明示中止"
+    from: "blocked"
+    to: "cancelled"
+    note: "利用者による明示的キャンセル"
+
+  - operation: "明示中止"
+    from: "review"
+    to: "cancelled"
+    note: "利用者による明示的キャンセル"
+
+# 再開経路（SPEC local-case-file.md「再開経路」）
+recovery_paths:
+  case_run:
+    description: "ローカル版 case-run 停止後の再開経路"
+    path:
+      - "blocked"
+      - "running"
+      - "review"
+  case_close:
+    description: "ローカル版 case-close 停止後の再開経路"
+    path:
+      - "blocked"
+      - "review"
+      - "closed"
+
+# 禁止遷移（SPEC local-case-file.md「禁止遷移」）
+forbidden_transitions:
+  - from: "blocked"
+    to: "closed"
+    reason: "blocked から closed への直接遷移は禁止。review を経由すること"
+  - from: "closed"
+    to: "*"
+    reason: "終端状態からの遷移は定義しない"
+  - from: "cancelled"
+    to: "*"
+    reason: "終端状態からの遷移は定義しない"

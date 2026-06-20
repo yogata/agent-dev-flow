@@ -1,0 +1,123 @@
+# ローカル Case ファイル 見出し一覧
+#
+# 正本: docs/specs/local-case-file.md「見出し一覧」
+# 要件: REQ-0141-020
+#
+# Case ファイル本文が持つ 15 セクション見出しと必須/任意を定義する。
+# 本ファイルは docs/specs/local-case-file.md と矛盾してはならない。
+
+schema_version: "1.0"
+target: ".agentdev/cases/case-{NNNN}.md の本文見出し"
+canonical_spec: "docs/specs/local-case-file.md"
+
+# 見出し一覧（REQ-0141-020）
+# 15 セクションを定義する。SPEC確定候補 と Findings / Capture候補 は必須。
+# 必須の理由: これらは GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、
+# case-close への引き継ぎ経路を失わせないため（REQ-0141-020）。
+headings:
+  - number: 1
+    name: "入力"
+    heading: "## 入力"
+    required: false
+    role: "Case の入力情報（REQ パス・要件 doc パス・参照 Issue 等）"
+
+  - number: 2
+    name: "背景"
+    heading: "## 背景"
+    required: false
+    role: "Case の背景説明"
+
+  - number: 3
+    name: "問題"
+    heading: "## 問題"
+    required: false
+    role: "Case が解決する問題"
+
+  - number: 4
+    name: "目的"
+    heading: "## 目的"
+    required: false
+    role: "Case の目的"
+
+  - number: 5
+    name: "対象範囲"
+    heading: "## 対象範囲"
+    required: false
+    role: "Case の対象範囲"
+
+  - number: 6
+    name: "対象外"
+    heading: "## 対象外"
+    required: false
+    role: "Case の対象外"
+
+  - number: 7
+    name: "受け入れ条件"
+    heading: "## 受け入れ条件"
+    required: false
+    role: "Case の受け入れ条件"
+
+  - number: 8
+    name: "作業ログ"
+    heading: "## 作業ログ"
+    required: false
+    role: "作業の進行ログ。GitHub Issue コメント相当の内容を記録"
+
+  - number: 9
+    name: "マージ前確認"
+    heading: "## マージ前確認"
+    required: false
+    role: "マージ前確認事項。GitHub PR 本文の引き継ぎ情報の一部"
+
+  - number: 10
+    name: "SPEC確定候補"
+    heading: "## SPEC確定候補"
+    required: true
+    role: "SPEC 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替（REQ-0141-020）"
+
+  - number: 11
+    name: "Findings / Capture候補"
+    heading: "## Findings / Capture候補"
+    required: true
+    role: "Findings / Capture候補。GitHub PR 本文が担っていた引き継ぎ情報の代替。下位に ### intake と ### learning サブ見出しを持つ"
+    subheadings:
+      - heading: "### intake"
+        role: "intake 候補のリスト"
+      - heading: "### learning"
+        role: "learning 候補のリスト"
+
+  - number: 12
+    name: "マージ結果"
+    heading: "## マージ結果"
+    required: false
+    role: "ローカル Git 上の取り込み結果。ブランチ情報は本セクションに記録する（YAML 前書きには持たせない）"
+
+  - number: 13
+    name: "残課題"
+    heading: "## 残課題"
+    required: false
+    role: "残課題・フォローアップ項目"
+
+  - number: 14
+    name: "完了判定"
+    heading: "## 完了判定"
+    required: false
+    role: "完了判定結果"
+
+  - number: 15
+    name: "自由拡張"
+    heading: "（自由拡張）"
+    required: false
+    role: "上記以外のセクションは必要に応じて追加可能"
+
+# 必須見出し
+required_headings:
+  - "## SPEC確定候補"
+  - "## Findings / Capture候補"
+
+# 必須サブ見出し
+required_subheadings:
+  - parent: "## Findings / Capture候補"
+    subheading: "### intake"
+  - parent: "## Findings / Capture候補"
+    subheading: "### learning"
