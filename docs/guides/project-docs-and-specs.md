@@ -22,33 +22,33 @@ DOC-MAP（文書探索入口: 索引）
 
 要件定義の永続基準。システムが満たすべき要件を記述する。
 
-- 現行の active REQ は REQ-0101 から REQ-0136 までの 28 件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）
-- 旧 REQ（REQ-0001〜REQ-0050 [全てretired]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
+- 現行 REQ は REQ-0101 から REQ-0136 までの 28 件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）
+- 旧 REQ（REQ-0001〜REQ-0050 [全て廃止]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
-> active REQ の一覧・範囲は `docs/requirements/README.md` を正とする。本ガイドでは REQ 一覧を複製しない。
+> 現行 REQ の一覧・範囲は `docs/requirements/README.md` を正とする。本ガイドでは REQ 一覧を複製しない。
 
 ## ADR（アーキテクチャ決定記録）
 
 **格納先**:
-- 現行 baseline: `docs/adr/ADR-01XX.md`（current ADR collection）
-- 履歴: `docs/adr/retired/ADR-00XX.md`（retired ADR collection）
+- 現行基準: `docs/adr/ADR-01XX.md`（現行の番号帯）
+- 履歴: `docs/adr/retired/ADR-00XX.md`（廃止済みの番号帯）
 
 将来の設計・運用・文書システムを制約する決定とその背景を記録する（REQ-0101-008）。
 
-- 現行 baseline は ADR-0101 以降の番号帯を使用する（REQ-0112-047）
+- 現行基準は ADR-0101 以降の番号帯を使用する（REQ-0112-047）
 - ADR-0001〜0099 は再編前の履歴番号帯であり、`docs/adr/retired/` に配置されている（REQ-0112-048）
-- accepted ADR の決定内容は安定して維持する（REQ-0112-045）。変更が必要な場合は新規 ADR を作成する
+- 承認済み ADR の決定内容は安定して維持する（REQ-0112-045）。変更が必要な場合は新規 ADR を作成する
 - ADR 体系の全面改定時は例外として、ユーザー承認済み範囲で最小限を超える編集を許可する（REQ-0112-044）
 - REQ → ADR、ADR → ADR、Issue → ADR の参照を許可
 - REQ → Issue の一方向参照である（Issue から REQ への逆参照は行わない）
-- 一覧は `docs/adr/README.md` にインデックスがある（Current Baseline View / Retired Historical View）
+- 一覧は `docs/adr/README.md` に索引がある（現行基準ビュー / 廃止済み履歴ビュー）
 
 ## SPEC（現在仕様）
 
 **格納先**: `docs/specs/*.md`
 
-実装者が参照する現在のシステム仕様。「今どう動いているか」を記述する。repo-internal 設計文書であり、runtime 配布物の依存先ではない（ADR-0103, ADR-0104）。
+実装者が参照する現在のシステム仕様。「今どう動いているか」を記述する。リポジトリ内部の設計文書であり、実行時配布物の依存先ではない（ADR-0103, ADR-0104）。
 
 | SPEC | 内容 |
 |------|------|
@@ -63,7 +63,7 @@ DOC-MAP（文書探索入口: 索引）
 | integrity-contracts.md | 整合性検査分類フレームワーク |
 | integrity-rule-catalog.md | 整合性ルールカタログ |
 | workflow-contracts.md | ワークフロー契約の雛形 |
-| runtime-package-boundary.md | Runtime package 境界 |
+| runtime-package-boundary.md | 実行時パッケージ境界 |
 | rule-ownership.md | ルール所有権 |
 | req-impact-map.md | REQ 影響マップ |
 
@@ -75,7 +75,7 @@ DOC-MAP（文書探索入口: 索引）
 
 ## このガイドの位置づけ
 
-本ファイルを含む `docs/guides/` は人間向け navigation 層である（REQ-0101-014, 027、ADR-0103）。REQ/ADR/SPEC と矛盾する記述がある場合は基準文書を優先する。
+本ファイルを含む `docs/guides/` は人間向けの案内層である（REQ-0101-014, 027、ADR-0103）。REQ/ADR/SPEC と矛盾する記述がある場合は基準文書を優先する。
 
 ## 参照関係のルール
 

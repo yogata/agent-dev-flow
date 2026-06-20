@@ -1,8 +1,8 @@
-# Documentation Hub
+# ドキュメント入口
 
 ## Requirements
 
-現行要件の第一参照先は REQ-0101 から REQ-0140 までの 32 件（active REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）である。retired REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0140 までの 32 件（現行 REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）である。廃止済み REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -39,33 +39,33 @@
 | [REQ-0139](requirements/REQ-0139.md) | 外部エージェント統合契約 |
 | [REQ-0140](requirements/REQ-0140.md) | 文書表記・文意品質ゲート |
 
-- [Requirements Index](requirements/README.md)
-- [Migration Table](requirements/mapping-table.md)
-- [Retired Requirements](requirements/retired/)
+- [要件インデックス](requirements/README.md)
+- [移行表](requirements/mapping-table.md)
+- [廃止済み要件](requirements/retired/)
 
-## Specifications
+## 仕様（SPEC）
 
-- [System Specification](specs/system.md)
-- [Document Format Patterns](specs/patterns.md)
-- [Design Principles](specs/design-principles.md)
-- [Quality Specifications](specs/quality-specs.md)
-- [Quality Gates](specs/quality-gates.md)
-- [Document Model](specs/document-model.md)
-- [Artifact Contracts](specs/artifact-contracts.md)
-- [Artifact Responsibility Table](specs/artifact-responsibilities.md)
-- [Integrity Contracts](specs/integrity-contracts.md)
-- [Integrity Rule Catalog](specs/integrity-rule-catalog.md)
-- [Workflow Contracts](specs/workflow-contracts.md)
-- [Runtime Package Boundary](specs/runtime-package-boundary.md)
-- [Rule Ownership Matrix](specs/rule-ownership.md)
-- [REQ Impact Map](specs/req-impact-map.md)
-- [REQ Health Metrics](specs/req-health-metrics.md)
+- [システム仕様](specs/system.md)
+- [文書フォーマット規約](specs/patterns.md)
+- [設計原則](specs/design-principles.md)
+- [品質仕様](specs/quality-specs.md)
+- [品質ゲート](specs/quality-gates.md)
+- [文書モデル](specs/document-model.md)
+- [アーティファクト契約](specs/artifact-contracts.md)
+- [成果物責任表](specs/artifact-responsibilities.md)
+- [整合性契約](specs/integrity-contracts.md)
+- [整合性ルールカタログ](specs/integrity-rule-catalog.md)
+- [ワークフロー契約](specs/workflow-contracts.md)
+- [実行時パッケージ境界](specs/runtime-package-boundary.md)
+- [ルール所有権マトリックス](specs/rule-ownership.md)
+- [REQ 影響マップ](specs/req-impact-map.md)
+- [REQ 健全性メトリクス](specs/req-health-metrics.md)
 
 ## ADR
 
-- [ADR Index](adr/README.md)
+- [ADR インデックス](adr/README.md)
 
-## Guides
+## ガイド
 
 - [ガイド入口](guides/README.md)
 - [クイックスタート](guides/quickstart.md)

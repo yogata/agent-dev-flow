@@ -1,17 +1,17 @@
 # agent-dev-flow
 
-AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted development workflow を支えるコマンド・スキル・ドキュメントを一元管理する。
+AgentDevFlow プラグインの設定を管理するリポジトリ。AI エージェントによる開発ワークフローを支えるコマンド・スキル・ドキュメントを一元管理する。
 
-## Plugin identity
+## プラグイン識別
 
 | 項目 | 値 |
 |------|------|
-| Plugin 表示名 | `AgentDevFlow` |
-| Canonical namespace | `agentdev` |
-| Public command prefix | `/agentdev/*` |
-| Domain state directory | `.agentdev/` |
-| Skill prefix | `agentdev-*` |
-| Domains | req, case, learning, intake, integrity |
+| プラグインの表示名 | `AgentDevFlow` |
+| 正規の名前空間 | `agentdev` |
+| 公開コマンドのプレフィックス | `/agentdev/*` |
+| ドメイン状態ディレクトリ | `.agentdev/` |
+| スキルのプレフィックス | `agentdev-*` |
+| 対象ドメイン | req, case, learning, intake, integrity |
 
 ## 入口表
 
@@ -26,17 +26,17 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 | Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
 | Issue の更新・コメント追加が必要 | `/agentdev/case-update` | 更新済み Issue |
-| 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox item |
-| クローズ済み Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox item |
-| inbox に item がある | `/agentdev/intake-promote` | promoted / archive |
+| 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox 項目 |
+| クローズ済み Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox 項目 |
+| inbox に項目がある | `/agentdev/intake-promote` | 採用済み / archive |
 | 再発防止知見を蓄積したい | `learning-capture`（スキル） | inbox.md エントリ |
-| inbox.md にエントリがある | `/agentdev/learning-promote` | promoted artifact |
-| promoted artifact（intake/learning/inspect）がある | `/agentdev/backlog-review` | `RU-*.md` |
+| inbox.md にエントリがある | `/agentdev/learning-promote` | 採用済み成果物 |
+| 採用済み成果物（intake/learning/inspect）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
-| docs 全体の意味整合性を検出したい | `/agentdev/inspect-docs` | inspect finding |
-| Command/Skill 参照妥当性を検出したい | `/agentdev/inspect-skills` | inspect finding |
-| inspect finding を分類したい | `/agentdev/inspect-promote` | promoted artifact |
-| ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート（self-hosting repo 専用） |
+| docs 全体の意味整合性を検出したい | `/agentdev/inspect-docs` | 検出事項（finding） |
+| Command/Skill 参照妥当性を検出したい | `/agentdev/inspect-skills` | 検出事項（finding） |
+| 検出事項を分類したい | `/agentdev/inspect-promote` | 採用済み成果物 |
+| ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート（自己ホストリポジトリ専用） |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
 ## 参照先
@@ -68,26 +68,26 @@ AgentDevFlow plugin の設定を管理するリポジトリ。AI agent-assisted 
 /agentdev/case-auto     # req-save → spec-save → case-open → case-run → case-close を自走（明示指定時のみ）
 ```
 
-## Consumer Repository Installation
+## 適用プロジェクトへの導入
 
 AgentDevFlow を外部プロジェクトに導入する手順。
 
-### Install
+### インストール
 
 ```powershell
-# 1. scripts/ を consumer リポジトリにコピー
-# 2. インストール実行（clone + junction 作成）
+# 1. scripts/ を適用先リポジトリにコピー
+# 2. インストールを実行（clone + junction 作成）
 ./scripts/install-consumer-opencode.ps1 -Mode apply
 ```
 
-### Check
+### 状態確認
 
 ```powershell
 # インストール状態を確認
 ./scripts/check-consumer-opencode.ps1
 ```
 
-### Update
+### 更新
 
 ```powershell
 # agent-dev-flow の最新を取得して再同期
@@ -95,7 +95,7 @@ cd .agentdev-plugin && git pull && cd ..
 ./scripts/install-consumer-opencode.ps1 -Mode apply
 ```
 
-### Recommended .gitignore
+### 推奨 .gitignore 設定
 
 ```gitignore
 .agentdev-plugin/
@@ -104,4 +104,4 @@ cd .agentdev-plugin && git pull && cd ..
 .opencode/skills/agentdev-*/
 ```
 
-> `.agentdev/` は gitignore に**含めない**こと（domain state として git 管理対象）。
+> `.agentdev/` は gitignore に**含めない**こと（ドメイン状態として git 管理対象）。
