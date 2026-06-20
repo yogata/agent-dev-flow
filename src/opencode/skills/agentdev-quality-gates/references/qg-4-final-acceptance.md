@@ -109,6 +109,6 @@ QG-4 の検査をサブエージェントに委譲する場合:
 ## See Also
 
 - [common-gate-contract.md](common-gate-contract.md)
-- [qg-3-implementation-deviation.md](qg-3-implementation-deviation.md) — 上流の実装乖離検出（QG-4 は QG-3 pass を前提とする）
+- [qg-3-implementation-deviation.md](qg-3-implementation-deviation.md) — 前工程の実装乖離検出（QG-4 は QG-3 pass を前提とする）
 - **agentdev-workflow-orchestration**: 達成判定プロトコル・証拠ソース
 - **agentdev-issue-management**: Issue 本文更新・前後内容比較

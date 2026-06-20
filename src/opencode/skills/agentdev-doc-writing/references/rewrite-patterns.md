@@ -1,6 +1,6 @@
 # 検出→書き換えパターン
 
-> **正本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)。本ファイルは [ai-slop-detection.md](ai-slop-detection.md) の10基準を検出→書き換えの操作ルールとして具体化した運用ビューである。禁止語彙リストではなく、検出パターンごとの書き換えルールセットである。
+> **原本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)。本ファイルは [ai-slop-detection.md](ai-slop-detection.md) の10基準を検出→書き換えの操作ルールとして具体化した運用ビューである。禁止語彙リストではなく、検出パターンごとの書き換えルールセットである。
 
 ## 対象言語
 

@@ -9,18 +9,18 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 **完了条件チェックボックスの評価・更新は case-close の専任責務**（ADR-0114）。case-run / driver / 外部実行バックエンドが完了条件チェックボックスを更新しない。case-close は PR 作成後に別コンテキストで Issue 本文の完了条件を再読込し、PR 本文を capture 入力源として最終完了判定する。
 
-## Input
+## 入力
 
 - Issue番号
 - PR番号（または自動検出）
 
-## Output
+## 出力
 
 - マージ済みPR
 - クローズ済みCase
 - 削除済みブランチ・worktree
 
-## Steps
+## 手順
 
 1. **Issue番号解決**: ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
 
@@ -96,13 +96,13 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 10. **学びの検知・抽出**: `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断:
       - ユーザーに学びの有無を問うことは禁止
      - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
-     - promoted artifact imported 判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
+      - 採用済み成果物取り込み判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
       - **Capture 回収責務**: PR 本文の `## Findings / Capture候補` セクションから intake / learning を分離回収する。intake 候補は `.agentdev/intake/inbox/` に保存し、learning 候補は `.agentdev/learning/inbox.md` に保存する。Epic 横断回収
        - **Capture 境界**: intake / learning 境界は `agentdev-workflow-orchestration` を参照
       - intake と learning を別々の成果物として扱う
       - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数・中間ファイル等）を capture の入力として使用しない。capture 情報の入力源は PR 本文のみ
 
- 11. **Domain state 永続化**: `agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める
+ 11. **ドメイン状態永続化**: `agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める
 
 12. **完了報告**: 完了報告templateに従って出力。結果状態に応じた種別を選択:
     - 全系統成功 → .opencode/commands/agentdev/templates/case-close/standard.md
@@ -111,7 +111,7 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
      - GitHub完了後に .agentdev push失敗の場合は standard 種別 を使用してはならない
      - **結果状態の分離報告**: GitHub側完了状態・`.agentdev` 永続化状態・ブランチ削除状態を独立して報告
 
-## Guardrails
+## ガードレール
 
 - G01: 未マージPRはクローズしない
 - G02: Issue番号省略は同一セッション内で作成済みの場合のみ

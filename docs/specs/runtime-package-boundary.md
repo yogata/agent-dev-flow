@@ -1,4 +1,4 @@
-# Runtime Package Boundary Specification
+# 実行時パッケージ境界
 
 > **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。リポジトリ種別（repo type）間の実行時パッケージ境界モデルを本リポジトリの観点から記述し、consumer プロジェクトの振る舞いを規定しない。Consumer プロジェクトは独自の規約に従い、本 SPEC は agent-dev-flow リポジトリが実行時パッケージをどう構成・配布するかのみを定義する。
 

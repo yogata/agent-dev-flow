@@ -29,10 +29,10 @@ YYYY-MM-DD
 
 - [実施したテストとその結果]
 
-### 関連docs
+### 関連ドキュメント
 <!-- 【任意】 -->
 
-- Requirements: {req_url}
-- Specifications: {spec_url}
-- Implementation Guide: {impl_guide_url}
+- 要件: {req_url}
+- 仕様: {spec_url}
+- 実装ガイド: {impl_guide_url}
 - ADR: {adr_url}

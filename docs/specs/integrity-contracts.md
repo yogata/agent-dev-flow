@@ -1,4 +1,4 @@
-# Integrity Contracts Specification
+# 整合性契約
 
 > **Scope**: 本 SPEC は agent-dev-flow リポジトリのみに適用される。
 
@@ -48,7 +48,7 @@
 |---|---|
 | REQ | frontmatter 整合性、ID 一意性、タグ妥当性 |
 | ADR | status 遷移妥当性、参照 REQ 存在確認、現行・廃止コレクション区別（REQ-0112-050） |
-| Skill | USE FOR / DO NOT USE FOR 整合性、references/ 存在確認 |
+| Skill | USE FOR / DO NOT USE FOR 整合性、`references/` 存在確認 |
 | Command | frontmatter 許可フィールド、Steps 構造 |
 | Template | 必須セクション存在、プレースホルダー妥当性 |
 | Workflow | ワークフロー経路定義の整合性 |
@@ -90,7 +90,7 @@
 
 ## ガードレール分類（Guardrails Classification）
 
-コマンドガードレールを以下の6カテゴリに分類する:
+コマンドガードレールを以下の 6 カテゴリに分類する:
 
 | カテゴリ | 意味 | 例 |
 |---|---|---|
@@ -107,8 +107,8 @@
 
 | Command | 許可変更 | 禁止 |
 |---|---|---|
-| `req-define` | `.agentdev/drafts/req-draft-*.md` の生成（対話セッションで合意形成し、正規文書は変更しない） | 正規文書（`docs/`・`.opencode/`）の変更、Issue/PR 作成・更新、commit/push |
-| `req-save` | `docs/requirements/`, `docs/adr/`, `docs/DOC-MAP.md`, `.agentdev/intake/inbox/req-restructure/`（REQ再構成intakeのみ） | `.agentdev/`（req-restructure 除く）, `.opencode/` |
+| `req-define` | `.agentdev/drafts/req-draft-*.md` の生成（対話セッションで合意形成し、原本文書は変更しない） | 原本文書（`docs/`・`.opencode/`）の変更、Issue/PR 作成・更新、commit/push |
+| `req-save` | `docs/requirements/`, `docs/adr/`, `docs/DOC-MAP.md`, `.agentdev/intake/inbox/req-restructure/`（REQ 再構成 intake のみ） | `.agentdev/`（req-restructure 除く）, `.opencode/` |
 | `case-open` | GitHub Issue/PR のみ | ローカルファイル |
 | `case-run` | worktree 内の全ファイル | worktree 外、`.agentdev/` |
 | `case-close` | GitHub Issue/PR, worktree 削除 | `.agentdev/intake/inbox/` 直接書込 |

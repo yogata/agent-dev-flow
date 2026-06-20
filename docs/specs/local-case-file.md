@@ -46,7 +46,7 @@ Case ファイルの YAML 前書きは以下のフィールドを持つ。各フ
 
 ### 前書きスキーマ定義ファイル
 
-前書きスキーマの形式定義は `src/opencode-local/case-schema/rules/frontmatter.yaml` に機械可読形式で保持する。本 SPEC は意味仕様の正本であり、`frontmatter.yaml` は本 SPEC と矛盾してはならない。
+前書きスキーマの形式定義は `src/opencode-local/case-schema/rules/frontmatter.yaml` に機械可読形式で保持する。本 SPEC は意味仕様の原本であり、`frontmatter.yaml` は本 SPEC と矛盾してはならない。
 
 ## status enum と状態遷移
 

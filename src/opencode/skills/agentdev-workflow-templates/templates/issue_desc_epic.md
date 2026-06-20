@@ -24,7 +24,7 @@ labels: enhancement, feature, epic
 
 REQ-{req_number}
 
-## 分解（Decomposition）
+## 分解
 <!-- 【必須】 -->
 
 | # | Issue | ステータス | 内容 |

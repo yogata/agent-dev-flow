@@ -11,7 +11,7 @@ description: Creates and configures OpenCode custom commands for automating recu
 - ファイル名（`test.md`）がコマンド名（`/test`）になる
 - ハイフン区切り: `my-command.md`
 
-## Quick Reference
+## 簡易参照（Quick Reference）
 
 | 設定項目 | 必須/任意 | 説明 |
 |----------|-----------|------|

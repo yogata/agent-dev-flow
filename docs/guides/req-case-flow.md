@@ -8,7 +8,7 @@
 /agentdev/req-define → /agentdev/req-save（REQ/ADR 対象 artifact_actions がある場合）→ /agentdev/spec-save（SPEC 対象 artifact_actions がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
 
-> 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（REQ-0138, ADR-0124）。draft は構造化 `draft-data` 形式（soft contract）で req-define が生成し、後続コマンドが LLM 推論で消費する。
+> 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（REQ-0138, ADR-0124）。draft は構造化 `draft-data` 形式（緩やかな契約：soft contract）で req-define が生成し、後続コマンドが LLM 推論で消費する。
 
 ## req-define
 
@@ -41,7 +41,7 @@ req-define で分離された SPEC 保存対象（`draft-data` の `artifact_act
 
 **出力**: SPEC ファイル（`docs/specs/*.md`）。新規作成時は `status: draft` を付与
 
-**SPEC lifecycle**: SPEC は frontmatter `status`（`draft` / `accepted`）で成熟度を管理する。`draft`（spec-save で保存直後）→ `accepted`（case-close で実装が SPEC 内容を検証した旨を確認）の順で昇格する。
+**SPEC ライフサイクル**: SPEC は frontmatter `status`（`draft` / `accepted`）で成熟度を管理する。`draft`（spec-save で保存直後）→ `accepted`（case-close で実装が SPEC 内容を検証した旨を確認）の順で昇格する。
 
 **スキップ条件**: `artifact: spec` entry がない、または旧形式 draft（`artifact_actions` フィールドなし）の場合はスキップし従来ワークフローで実行（後方互換）。
 

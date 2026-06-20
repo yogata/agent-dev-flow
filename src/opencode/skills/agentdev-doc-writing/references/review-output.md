@@ -1,6 +1,6 @@
 # 査読出力形式
 
-> **正本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)「移送判断」。本ファイルは運用ビュー（査読結果の分類・出力形式）である。
+> **原本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)「移送判断」。本ファイルは運用ビュー（査読結果の分類・出力形式）である。
 
 ## 4 分類
 

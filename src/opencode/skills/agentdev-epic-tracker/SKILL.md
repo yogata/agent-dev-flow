@@ -3,7 +3,7 @@ name: agentdev-epic-tracker
 description: Updates parent Epic Issue status tracking tables across case-run and case-close workflows. USE FOR: updating Epic status to in-progress or completed, tracking child Issue progress in parent Epics, detecting parent-child relationships via Parent: #N patterns. DO NOT USE FOR: creating Epics, managing non-Epic Issues, or general Issue operations.
 ---
 
-# Epic Status Tracker
+# Epic 状態追跡（Epic Status Tracker）
 
 親Epic Issueのステータス追跡テーブル（`pending` / `ready` / `running` / `completed` / `blocked` / `failed`）を更新する知識ベース。
 

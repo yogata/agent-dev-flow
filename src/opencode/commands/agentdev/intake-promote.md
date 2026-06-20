@@ -1,22 +1,22 @@
 ---
-description: inbox 内の intake item をレビュー・分類し、採用 item を backlog-review 向け promoted artifact に整形する
+description: inbox 内の intake item をレビュー・分類し、採用 item を backlog-review 向けの採用済み成果物に整形する
 agent: sisyphus
 ---
 
-# Intake Promote
+# Intake 昇格
 
-`.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる promoted artifact に整形する。
+`.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる採用済み成果物に整形する。
 
 **このコマンドは review・分類・整形を行う。** GitHub Issue の作成は行わない。`intake-review` は廃止済みであり、本コマンドが review 機能を吸収している。
 
-## Input
+## 入力
 
 - intake item 群（`.agentdev/intake/inbox/` 内の Markdown ファイル）
 - ユーザーによる追加コンテキスト・分類修正指示（対話的に）
 
-## Output
+## 出力
 
-- 採用 item の promoted artifact（`backlog-review` 用）
+- 採用 item の採用済み成果物（`backlog-review` 用）
 - 整形済み item は `.agentdev/intake/promoted/*.md` に保存（フラット構造）
 - 分類結果レポート（採用 / 保留 / 却下）
 
@@ -26,7 +26,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 | 分類 | 意味 | 後続 |
 |------|------|------|
-| `採用` | 対応すべきと判断。promoted artifact に整形 | `/agentdev/backlog-review` |
+| `採用` | 対応すべきと判断。採用済み成果物に整形 | `/agentdev/backlog-review` |
 | `保留` | 判断を保留。inbox に残す | 再度 `/agentdev/intake-promote` |
 | `却下` | 対応不要と判断 | `.agentdev/intake/archive/rejected/` |
 
@@ -38,25 +38,25 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 |------------|------|----------|
 | `backlog-review` | 採用 item 全て | backlog-review が分析しやすい形式に整理（観測内容・影響・課題・既存要件との関連を構造化） |
 
-## Steps
+## 手順
 
-### Phase 1: Inbox Scan
+### フェーズ1: inbox スキャン
 
 1. **inbox の確認**: `.agentdev/intake/inbox/` 内の intake item を一覧表示する。詳細は `agentdev-intake-pipeline` を参照
 
 2. **item の読み込み**: 各 intake item を読み込み、内容を把握する。委譲接続点: サブエージェントは読解メモ・分類候補・根拠・capture候補のみを返し、親エージェントが分類提示と保存判断を行う
 
-### Phase 2: Internal Review
+### フェーズ2: 内部レビュー
 
 3. **レビュー・評価**: 各 item を評価する。詳細は `agentdev-intake-pipeline` を参照。委譲接続点: サブエージェントは採用 / 保留 / 却下の候補と根拠を pass/warn/fail/partial で返し、親エージェントが最終分類を決める
 
 4. **分類の提示**: 各 item の評価結果を分類（採用 / 保留 / 却下）と共に提示する。見出しは `## Findings / Capture候補` とする。詳細は `agentdev-intake-pipeline` を参照
 
-### Phase 3: HITL Confirmation
+### フェーズ3: HITL 確定
 
 5. **ユーザー確認**: 評価・分類結果をユーザーに提示し、明示的な承認を得る。詳細は `agentdev-intake-pipeline` を参照。委譲接続点: 親エージェントのみが承認確認と次フェーズ進行判断を行う
 
-### Phase 4: Distribution
+### フェーズ4: 振り分け
 
 6. **採用 item の整形**: 採用と判定された item を backlog-review 向けに整形する。詳細は `agentdev-intake-pipeline` を参照。委譲接続点: サブエージェントは整形案のみを返し、親エージェントが保存対象本文を確定する
 
@@ -64,7 +64,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 8. **振り分け**: 確定した分類に基づいて item を振り分ける。詳細は `agentdev-intake-pipeline` を参照。委譲接続点: 親エージェントのみが移動を行う
 
-### Phase 5: Git & Completion
+### フェーズ5: git 操作と完了報告
 
 9. **実行前同期（git pull）**: `git pull --ff-only` を実行する。失敗時の扱いは `agentdev-intake-pipeline` を参照。委譲接続点: 親エージェントのみが git 操作を行う
 
@@ -72,14 +72,14 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 11. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-promote/standard.md。分類結果（採用・保留・却下の件数・一覧）と git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
-## Error Handling
+## エラー処理
 
 | エラー | 対処 |
 |--------|------|
 | git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
 | git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
-## Guardrails
+## ガードレール
 
 ### 責務境界
 - G01: GitHub Issue の作成を行わない（`backlog-review` / `case-open` が担当）
@@ -89,14 +89,14 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 - G05: learning item の保存・分類・昇華を担当しない
 
 ### HITL 制約
-- G06: ユーザーの明示的な承認なしに promoted artifact を生成してはならない
+- G06: ユーザーの明示的な承認なしに採用済み成果物を生成してはならない
 - G07: 分類結果は必ずユーザーに提示し、確認・修正の機会を与えること
 - G08: 自動確定・自動進行は行わない。ユーザーが「確定」を明示的に指示してから次フェーズに進む
 
 ### 形式制約
-- G09: workflow 管理 artifact として扱わない
+- G09: workflow 管理成果物として扱わない
 - G10: 整形結果に frontmatter（route/status 等）を含めてはならない
-- G11: 整形結果に重複排除キー・後続 artifact 参照を含めない
+- G11: 整形結果に重複排除キー・後続成果物参照を含めない
 - G12: 元 item の本文に整形結果を書き込まない
 
 ### accepted/ 廃止
@@ -106,4 +106,4 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 ### 実行制約
 - G15: review・整形はユーザーとの対話を通じて行う
 - G16: 保存先は `.agentdev/intake/promoted/` 直下のみ（フラット構造）
-- G17: 採用 item の inbox 元ファイルは artifact 保存後に `.agentdev/intake/archive/promoted/` に移動する
+- G17: 採用 item の inbox 元ファイルは成果物保存後に `.agentdev/intake/archive/promoted/` に移動する

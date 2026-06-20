@@ -1,4 +1,4 @@
-# Intake from GitHub 抽出ロジック
+# GitHub からの残課題抽出ロジック
 
 GitHub から残課題を抽出する際のロジック（期間解釈・データ取得・構造検出・LLM全文解析・intake item生成）を定義する。
 

@@ -11,12 +11,12 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 
 3フェーズ構成で各フェーズは独立して再実行可能（べき等性）。フェーズ間エラー時は Step 0 の再開判定から再開できる。
 
-## Input
+## 入力
 
 - Issue番号またはURL（要件doc埋め込み済み）
 - ブランチ名（自動生成または指定）
 
-## Output
+## 出力
 
 - 成功: 実装済みブランチ + GitHub PR（実行担当サブエージェントが作成）。**case-run の成功成果は PR 作成である**
 - blocked / failed: blocker 詳細は Issue コメントに SSoT として記録される（実行担当サブエージェント責務）
@@ -29,7 +29,7 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 | 実行担当サブエージェント委譲フェーズ | 5-6 | PRが未作成 または 実行担当サブエージェント result 未確定 |
 | クリーンアップフェーズ | 7 | 実行担当サブエージェント result = completed(pr) |
 
-## Steps
+## 手順
 
 ### Step 0: フェーズ判定（再開ポイント検出）
 
@@ -41,7 +41,7 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 
 1. Issue番号を解決する。case-run は常に1 Issue のみを処理する（case-auto から1件委譲、または直接起動）。複数 Issue の一括実行・Epic 全体の一括実行・Wave 単位のオーケストレーションは提供しない（REQ-0130-010）
 
-**upstream handoff 停止判定**: Issue 本文、要件doc本文に `agentdev_handoff: true` が含まれる場合、実装を開始せず停止する。agent-dev-flow repository への手動取り込み対象として報告する。判定は `agentdev-workflow-lifecycle` に従う
+**前工程からの引き継ぎ停止判定**: Issue 本文、要件doc本文に `agentdev_handoff: true` が含まれる場合、実装を開始せず停止する。agent-dev-flow repository への手動取り込み対象として報告する。判定は `agentdev-workflow-lifecycle` に従う
 
 ### 準備フェーズ（Steps 1-4）
 
@@ -96,7 +96,7 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 
 エラー発生時の対応は `agentdev-workflow-orchestration` に従う。実行担当サブエージェント result が blocked / failed の場合、Issue コメント（SSoT）を参照して停止理由・再開ポイントをユーザーに報告する。実行担当サブエージェント内の自律修正ループ（同一入力の機械的再試行・検証ループ）は `agentdev-case-run-execution-adapter` / `agentdev-workflow-orchestration` に従う。
 
-## Guardrails
+## ガードレール
 
 ### orchestration・委譲境界
 - G01: 壁打ち禁止（構造的実行フェーズ — 実装は実行担当サブエージェント経由）

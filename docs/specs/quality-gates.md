@@ -1,6 +1,6 @@
-# Quality Gates
+# 品質ゲート
 
-AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-0108）。各ゲートの判定基準・機械化境界・実装マッピングを示す。
+AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-0108）。各ゲートの判定基準・機械化境界・実装マッピングを示す。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリの設計文書であり、実行時配布対象ではない（ADR-0103, ADR-0104）。実行時コマンドは本 SPEC に依存せず、`agentdev-quality-gates` スキルの参照ファイルを実行時参照先とする。
 
@@ -14,12 +14,12 @@ AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPE
 
 | Gate | 名称 | 配置コマンド | 対象成果物 | 判定結果 |
 |------|------|-------------|-----------|---------|
-| QG-1 | Definition Integrity Gate | req-define / req-save | 要件doc draft / REQ・ADR ファイル | pass / warn / fail |
+| QG-1 | Definition Integrity Gate | req-define / req-save | 要件 doc draft / REQ・ADR ファイル | pass / warn / fail |
 | QG-2 | Acceptance Criteria Coverage Gate | case-open | Issue 本文（完了条件） | pass / warn / fail |
 | QG-3 | Implementation Deviation Gate | case-run | git diff（実装差分） | pass / warn / fail（乖離分類付き） |
 | QG-4 | Final Acceptance Gate | case-close | PR / CI / Issue チェックボックス | pass / fail |
 
-各 Gate の詳細な判定基準・検査観点は `agentdev-quality-gates` スキルの参照ファイルを正とする。
+各 Gate の詳細な判定基準・検査観点は `agentdev-quality-gates` スキルの参照ファイルを原本とする。
 
 ## QG-1: Definition Integrity Gate
 
@@ -29,7 +29,7 @@ AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPE
 
 ### 配置
 
-- **req-define**: 要件doc draft 生成時（Step 6〜9）。REQ/SPEC 分類・ADR ゲート・チェックボックス測可能性を検証。
+- **req-define**: 要件 doc draft 生成時（Step 6〜9）。REQ/SPEC 分類・ADR ゲート・チェックボックス測可能性を検証。
 - **req-save**: REQ/ADR ファイル保存時（Step 3〜4）。保存前の最終構造検証。
 
 ### pass / warn / fail 基準

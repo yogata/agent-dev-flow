@@ -1,8 +1,8 @@
 ---
-updated: 2026-06-20
+updated: 2026-06-21
 ---
 
-# Workflow Contracts Specification
+# ワークフロー契約
 
 > **Scope**: 本 SPEC は agent-dev-flow リポジトリのみに適用される。
 
@@ -12,7 +12,7 @@ updated: 2026-06-20
 
 ## パイプライン概要
 
-AgentDevFlow は3つのパイプラインで構成される:
+AgentDevFlow は 3 つのパイプラインで構成される:
 
 | パイプライン | コマンド | 目的 |
 |---|---|---|

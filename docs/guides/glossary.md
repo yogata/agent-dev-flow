@@ -31,7 +31,7 @@ AgentDevFlow で使う用語の定義。
 | DOC-MAP | 文書探索・参照経路の入口。`docs/DOC-MAP.md` に配置 |
 | guides | 利用者向けの参照用読み物。`docs/guides/*.md` に配置 |
 | RU（Requirement Unit） | Intake/Learning の採用済み成果物を統合した構造化成果物。`.agentdev/backlog/req-units/RU-*.md` に配置 |
-| promoted artifact（採用済み成果物） | backlog-review の入力となる整形済み成果物。Intake/Learning それぞれの `promoted/` に配置 |
+| 採用済み成果物（promoted artifact） | backlog-review の入力となる整形済み成果物。Intake/Learning それぞれの `promoted/` に配置 |
 | セッション由来 RU | チャット内で合意形成済みの内容を直接保存した RU |
 | evaluation-report | learning-promote 内部で生成される分析レポート。同コマンドの昇華判定フェーズの入力として使用される |
 | ローカル Case ファイル（Local Case File） | GitHub Issue/PR を使わない個人利用環境（ローカル版 OpenCode）で Issue/PR 相当の永続情報を保持するファイル。`.agentdev/cases/case-{NNNN}.md` に配置（REQ-0141-016）。詳細なスキーマは SPEC `local-case-file.md` 参照 |
@@ -62,9 +62,9 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 定義 |
 |------|------|
 | Epic | 大規模 Issue を複数の子 Issue に分割した親 Issue |
-| Wave | Epic Orchestrator が子 Issue を並列実行する単位 |
+| Wave | Epic 統率者（Orchestrator）が子 Issue を並列実行する単位 |
 | Epic 自動クローズ | 全子 Issue 完了時に親 Epic を自動的にクローズする仕組み |
-| ステータス追跡テーブル | Epic 本文内の子 Issue 進捗管理表（未着手/進行中/完了/対処不要/スキップ）。⏭スキップ は前提条件未達等で Orchestrator が設定する終了状態（REQ-0106-030） |
+| ステータス追跡テーブル | Epic 本文内の子 Issue 進捗管理表（未着手/進行中/完了/対処不要/スキップ）。⏭スキップは前提条件未達等で Epic 統率者が設定する終了状態（REQ-0106-030） |
 
 ## ツール・スキル
 
@@ -75,7 +75,7 @@ AgentDevFlow で使う用語の定義。
 | Template | Issue/PR 本文の出力構造。Skill 配下 `templates/` に配置 |
 | Script | ガードレール・検査・補助処理の実行可能ロジック。Skill 配下 `scripts/` に配置 |
 | 原本（source） | `src/opencode/` 配下の正規の定義ファイル。AgentDevFlow 本体の command/skill/template はここに配置される |
-| 配置先（projection） | `.opencode/` 配下の実行時の配布先。AgentDevFlow 本体リポジトリでは ジャンクション/symlink による投影先、適用プロジェクトでは install script による配置先 |
+| 配置先（projection） | `.opencode/` 配下の実行時の配布先。AgentDevFlow 本体リポジトリではジャンクション/symlink による投影先、適用プロジェクトではインストールスクリプトによる配置先 |
 
 ## ローカル版 OpenCode
 

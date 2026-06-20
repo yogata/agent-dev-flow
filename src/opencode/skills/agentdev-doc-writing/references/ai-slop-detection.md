@@ -1,6 +1,6 @@
 # AI-slop 検出基準
 
-> **正本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)「AI-slop 検出基準」。本ファイルは運用ビュー（チェックリスト形式）である。内容が重複する場合は正本を優先する。
+> **原本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)「AI-slop 検出基準」。本ファイルは運用ビュー（チェックリスト形式）である。内容が重複する場合は原本を優先する。
 
 AI-slop とは、一見整っているが判断材料として機能しないテキストである。目的は「文章をきれいにする」ことではなく、読者が判断・実行できる文書にすることである。
 

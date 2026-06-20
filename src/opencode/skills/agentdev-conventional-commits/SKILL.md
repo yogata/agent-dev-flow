@@ -11,7 +11,7 @@ description: Generates commit messages following Conventional Commits v1.0.0 spe
 - フッター参照形式: `Refs: #N`（参照）、`Closes: #N`（クローズ）
 - スコープ例: `api`, `auth`, `ui`, `database`, `config`, `test`
 
-## Quick Reference
+## 簡易参照（Quick Reference）
 
 | type | SemVer | 例 |
 |------|--------|----|
@@ -27,7 +27,7 @@ description: Generates commit messages following Conventional Commits v1.0.0 spe
 | `chore` | PATCH | `chore: 依存パッケージを更新` |
 | `revert` | PATCH | `revert: feat: ユーザー認証機能を追加` |
 
-## Common Mistakes
+## よくある誤り（Common Mistakes）
 
 | 間違い | 修正 |
 |--------|------|

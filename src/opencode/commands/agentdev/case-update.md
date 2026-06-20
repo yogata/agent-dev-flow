@@ -7,17 +7,17 @@ agent: sisyphus
 
 既存Caseの本文更新、コメント追加、またはREQファイル更新を行う。主にレビューNG時の対応に使用。
 
-## Input
+## 入力
 
 - Issue番号
 - 更新内容（本文更新 or コメント追加 or REQファイル更新）
 - 更新種別（`--body` / `--comment` / `--req` / `--review-ng`）
 
-## Output
+## 出力
 
 - 更新されたIssue本文 または 追加されたコメント または 更新されたREQファイル または レビューNGコメント
 
-## Steps
+## 手順
 
 1. Issue番号解決。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは候補番号抽出のみを返し、親エージェントが確認・停止を判断する
 2. 現在のIssue状態を取得 → `agentdev-workflow-lifecycle` で現在フェーズを判定
@@ -40,7 +40,7 @@ agent: sisyphus
 | APPEND | 要件テーブルへの行追加、適用範囲の拡張 | 受け入れ基準の追加、新規要件の追加 |
 | UPDATE | 既存セクションの内容修正 | テキスト置換、要件の文言修正、適用範囲の変更 |
 
-## Guardrails
+## ガードレール
 
 ### フェーズ制約
 - G01: フェーズは変更なし（現在のフェーズを維持）
