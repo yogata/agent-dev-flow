@@ -1,7 +1,6 @@
-# AI-slop 検出・置換ルールセット
+# 検出→書き換えパターン
 
-検出・置換ルールセット。禁止語彙リストではない。
-対象は、主語・条件・根拠・行動・責任・基準を欠く usage pattern。
+> **正本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)。本ファイルは [ai-slop-detection.md](ai-slop-detection.md) の10基準を検出→書き換えの操作ルールとして具体化した運用ビューである。禁止語彙リストではなく、検出パターンごとの書き換えルールセットである。
 
 ## 対象言語
 
@@ -248,3 +247,29 @@ docs 記述中に英語抽象語を検出した場合、以下の 6 項目を順
 > ADR判断が必要な変更（アーキテクチャ判断を要する変更）については、アーキテクチャ助言エージェントが ADR 要否・推奨方向・設計リスク・根拠を返し、最終的な ADR 作成判断は親コマンド（req-define）が行う（ADR要否確認ゲート）。
 
 **Allowed exceptions**: 適用除外1〜5。固定識別子（YAML key・enum 値・Conventional Commits type・外部仕様名）として原語を維持する場合は、初出に日本語注記を付与すれば許容される。
+
+---
+
+## 英語のまま残す語（固有名詞・識別子）
+
+製品名（AgentDevFlow, OpenCode）、ID（REQ-0138 等）、略語（REQ/ADR/SPEC/RU/OU/PR/SSoT/HITL）、コマンド名、ファイルパス、YAMLフィールド名（説明文では日本語訳を併記）、パイプライン名（Intake/Learning/Backlog）は英語のまま残す。
+
+### 修飾語の日本語化の方向性
+
+active→現行、retired→廃止、accepted→承認済み、upstream/downstream→文脈で「前工程/次工程」「上位/下位」等（固定しない）、current→現行/現在の。
+
+### 複合技術語の訳し方指針（文意に基づく）
+
+domain state→「ドメイン状態」「保持する管理情報」等、runtime command→「実行時コマンド」、command topology→「コマンド構成」、provenance marker→「出典標識」、upstream handoff→「前工程からの引き継ぎ」「上位工程からの受渡し」等、fixture detail→「テストデータ詳細」「検査データ詳細」等、runtime workspace→「実行時作業領域」、canonical path→「正規パス」。いずれも文脈で最も自然な表現を選ぶ。
+
+### 専門カタカナ語の日本語訳（文意に基づく）
+
+fixture→「テストデータ」「検査データ」、variant→「種別」「バリエーション」「形式」、provider→「提供元」、baseline→「基準」、finding→「検出事項」、promoted artifact→「採用済み成果物」。
+
+### カタカナ語（一般的定着語は許容）
+
+許容: スキーマ、ライフサイクル、カタログ、パイプライン 程度。非許容（文意に基づく日本語訳）: フィクスチャ、バリアント、プロバイダ、ベースライン 等。
+
+### 略語の扱い
+
+SSoT, HITL は略語のまま使用。初出時のみ日本語訳（「唯一の情報源（SSoT）」「人の判断を挟む（HITL）」）を併記。
