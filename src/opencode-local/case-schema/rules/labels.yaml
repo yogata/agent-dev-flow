@@ -1,0 +1,36 @@
+# ローカル Case ファイル labels 値域
+#
+# 正本: docs/specs/local-case-file.md「labels 値域」
+# 要件: REQ-0141-019
+#
+# labels フィールドに設定可能な値を定義する。
+# 本ファイルは docs/specs/local-case-file.md と矛盾してはならない。
+
+schema_version: "1.0"
+target: ".agentdev/cases/case-{NNNN}.md の labels フィールド"
+canonical_spec: "docs/specs/local-case-file.md"
+
+# label_enum（REQ-0141-019）
+# labels は配列とし、以下の値域から選定する。
+# labels は補助分類であり、状態遷移やワークフロー状態の代替として扱わない。
+label_enum:
+  feature:
+    description: "機能追加・新規実装"
+  bugfix:
+    description: "バグ修正"
+  maintenance:
+    description: "保守作業・運用改善"
+  docs:
+    description: "ドキュメント作成・更新"
+  refactor:
+    description: "リファクタリング・構造改善（振る舞い保持）"
+  chore:
+    description: "雑務・設定変更・依存更新"
+  epic:
+    description: "Epic（複数子 Case を束ねる大型課題）"
+
+# ガードレール
+constraints:
+  - "labels.yaml の label_enum に存在しないラベルを追加してはならない"
+  - "labels は配列として扱い、単一文字列としては扱わない"
+  - "labels を状態遷移やワークフロー状態の代替として扱わない"

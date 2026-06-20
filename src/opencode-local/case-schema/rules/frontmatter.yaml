@@ -1,0 +1,92 @@
+# ローカル Case ファイル YAML 前書きスキーマ
+#
+# 正本: docs/specs/local-case-file.md「YAML 前書きスキーマ」
+# 要件: REQ-0141-017
+#
+# ローカル Case ファイル (.agentdev/cases/case-{NNNN}.md) の YAML 前書きに
+# 含めるフィールドの型・必須/任意・値域を定義する。
+# 本ファイルは docs/specs/local-case-file.md と矛盾してはならない。
+
+schema_version: "1.0"
+target: ".agentdev/cases/case-{NNNN}.md の YAML 前書き"
+canonical_spec: "docs/specs/local-case-file.md"
+
+# 必須フィールド（REQ-0141-017）
+fields:
+  id:
+    type: string
+    required: true
+    pattern: "^case-[0-9]{4}$"
+    constraint: "ファイル名 case-{NNNN}.md の {NNNN} 部と一致すること"
+    description: "Case 識別子。4 桁ゼロ埋め"
+    examples:
+      - "case-0001"
+      - "case-0042"
+
+  title:
+    type: string
+    required: true
+    constraint: "自由記述。Case の概要を簡潔に表す日本語または英語"
+    description: "Case のタイトル"
+
+  status:
+    type: string
+    required: true
+    enum_ref: "status.yaml#status_enum"
+    constraint: "status.yaml の status_enum のいずれか"
+    description: "Case のライフサイクル状態"
+
+  created_at:
+    type: string
+    required: true
+    format: "ISO 8601 (日時)"
+    constraint: "タイムゾーンオフセット付きを推奨"
+    description: "Case 作成日時"
+    examples:
+      - "2026-06-20T21:39:00+09:00"
+
+  updated_at:
+    type: string
+    required: true
+    format: "ISO 8601 (日時)"
+    constraint: "最終更新日時。更新の都度書き換える"
+    description: "Case 最終更新日時"
+    examples:
+      - "2026-06-20T22:05:00+09:00"
+
+  closed_at:
+    type: string
+    required: conditional
+    format: "ISO 8601 (日時) または空文字列"
+    condition: "status が closed または cancelled の場合のみ値を持つ。それ以外では空文字列またはフィールド値なし"
+    description: "Case 終端日時（クローズ/キャンセル日時）"
+    examples:
+      - "2026-06-21T10:00:00+09:00"
+      - ""
+
+  labels:
+    type: array
+    required: true
+    items:
+      type: string
+      enum_ref: "labels.yaml#label_enum"
+    constraint: "labels.yaml の label_enum から選定。補助分類であり状態遷移やワークフロー状態の代替として扱わない"
+    description: "Case のラベル一覧"
+
+# 禁止フィールド（REQ-0141-017, 024）
+# 以下のフィールドは YAML 前書きに含めてはならない。
+forbidden_fields:
+  - name: work_type
+    reason: "REQ-0141-017: work_type は前書きに持たせない"
+  - name: source
+    reason: "REQ-0141-017: source は前書きに持たせない"
+  - name: branch
+    reason: "REQ-0141-017, 024: ブランチ情報は ## マージ結果 セクションに記録する"
+  - name: base_branch
+    reason: "REQ-0141-017, 024: ブランチ情報は ## マージ結果 セクションに記録する"
+
+# closed_at の値条件（REQ-0141-017, SPEC local-case-file.md「closed_at の値条件」）
+closed_at_rules:
+  - "status: closed の場合: クローズ日時を ISO 8601 形式で記録"
+  - "status: cancelled の場合: キャンセル日時を ISO 8601 形式で記録"
+  - "それ以外の status: 空文字列またはフィールド値なし"
