@@ -4,20 +4,20 @@ updated: 2026-06-19
 
 # Integrity Rule Catalog
 
-Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各 rule は 15 以上の field を持つ。
+整合性検査の全ルールを定義するカタログ（REQ-0108-150, 151）。各ルールは 15 以上のフィールドを持つ。
 
-> **Repo-local context**: integrity 検査は `/repo/docs-check` コマンドと `repo-agentdev-integrity` skill により実行される repo-local 自己監査である（ADR-0106）。AgentDevFlow の consumer 配布対象外。語彙レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` に配置する。
+> **リポジトリローカル文脈**: 整合性検査は `/repo/docs-check` コマンドと `repo-agentdev-integrity` skill により実行されるリポジトリローカル自己監査である（ADR-0106）。AgentDevFlow の consumer 配布対象外。語彙レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` に配置する。
 
-## Schema
+## スキーマ
 
 | Field | 型 | 説明 |
 |-------|------|------|
 | rule_id | string | 一意識別子 (例: IR-001) |
-| description | string | Rule の説明 |
+| description | string | ルールの説明 |
 | severity | enum | strict / heuristic / observation |
 | category | enum | document-drift / broken-reference / obsolete-structure / canonical-conflict / workflow-gap / integrity-rule-gap |
 | detection_method | string | 検出方法（正規表現・構造解析・存在確認等） |
-| affected_artifacts | list[str] | 対象 artifact 種別 |
+| affected_artifacts | list[str] | 対象アーティファクト種別 |
 | related_req | list[str] | 関連 REQ ID |
 | related_spec | list[str] | 関連 SPEC ファイル |
 | gate_level | enum | full-audit / delta-guard / impact-guard |
@@ -28,38 +28,38 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | string | 新規検出時の対応アクション |
 | last_verified | date | 最終検証日 |
 
-## Rules
+## ルール
 
-### IR-001: Active REQ frontmatter id ↔ filename
+### IR-001: 現行 REQ frontmatter id ↔ ファイル名
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-001 |
-| description | Active REQ の frontmatter id とファイル名（REQ-NNNN.md）が一致すること |
+| description | 現行 REQ の frontmatter id とファイル名（REQ-NNNN.md）が一致すること |
 | severity | strict |
 | category | document-drift |
-| detection_method | frontmatter id 抽出 → filename と照合 |
-| affected_artifacts | [active REQ] |
+| detection_method | frontmatter id 抽出 → ファイル名と照合 |
+| affected_artifacts | [現行 REQ] |
 | related_req | [REQ-0108-001, REQ-0101] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
-| false_positive_risk | 低。id/filename の不一致は確実な NG |
+| false_positive_risk | 低。id/ファイル名 の不一致は確実な NG |
 | regression_test | commands_structure.test.ts |
 | baseline_status | resolved |
 | finding_route | intake |
-| triage_action | frontmatter id または filename を修正 |
+| triage_action | frontmatter id またはファイル名を修正 |
 | last_verified | 2026-06-06 |
 
-### IR-002: Active REQ 必須 frontmatter fields
+### IR-002: 現行 REQ 必須 frontmatter fields
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-002 |
-| description | Active REQ に id, title, created, updated が存在すること |
+| description | 現行 REQ に id, title, created, updated が存在すること |
 | severity | strict |
 | category | document-drift |
 | detection_method | frontmatter field 存在確認 |
-| affected_artifacts | [active REQ] |
+| affected_artifacts | [現行 REQ] |
 | related_req | [REQ-0108-001] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
@@ -70,16 +70,16 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | 欠落 field を追加 |
 | last_verified | 2026-06-06 |
 
-### IR-003: Active/retired REQ ID 重複
+### IR-003: Active/廃止 REQ ID 重複
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-003 |
-| description | active REQ と retired REQ の間で ID 重複がないこと |
+| description | 現行 REQ と 廃止 REQ の間で ID 重複がないこと |
 | severity | strict |
 | category | canonical-conflict |
 | detection_method | ID set の intersection 確認 |
-| affected_artifacts | [active REQ, retired REQ] |
+| affected_artifacts | [現行 REQ, 廃止 REQ] |
 | related_req | [REQ-0108-082] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
@@ -90,16 +90,16 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | 重複 ID を解消 |
 | last_verified | 2026-06-06 |
 
-### IR-004: REQ index ↔ active REQ 一致
+### IR-004: REQ index ↔ 現行 REQ 一致
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-004 |
-| description | docs/requirements/README.md の active REQ 一覧と実際の REQ ファイルが一致すること |
+| description | docs/requirements/README.md の 現行 REQ 一覧と実際の REQ ファイルが一致すること |
 | severity | strict |
 | category | document-drift |
 | detection_method | README から REQ ID 抽出 → glob 結果と照合 |
-| affected_artifacts | [REQ index, active REQ] |
+| affected_artifacts | [REQ index, 現行 REQ] |
 | related_req | [REQ-0108-003] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
@@ -123,7 +123,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | related_req | [REQ-0108-005] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
-| false_positive_risk | 中。retired REQ 参照は別 rule で判定 |
+| false_positive_risk | 中。廃止 REQ 参照は別 rule で判定 |
 | regression_test | check_integrity.test.ts |
 | baseline_status | resolved |
 | finding_route | intake |
@@ -235,11 +235,11 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-011 |
-| description | 全 retired REQ が mapping-table.md に記録されていること |
+| description | 全 廃止 REQ が mapping-table.md に記録されていること |
 | severity | strict |
 | category | document-drift |
-| detection_method | retired REQ ファイル一覧と mapping-table の照合 |
-| affected_artifacts | [retired REQ, mapping-table] |
+| detection_method | 廃止 REQ ファイル一覧と mapping-table の照合 |
+| affected_artifacts | [廃止 REQ, mapping-table] |
 | related_req | [REQ-0108-083-088] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
@@ -310,15 +310,15 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | reference/ を references/ にリネーム |
 | last_verified | 2026-06-06 |
 
-### IR-015: Retired REQ 現行参照検出
+### IR-015: 廃止 REQ 現行参照検出
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-015 |
-| description | Retired REQ が現行要件判断の第一参照として案内されていないこと |
+| description | 廃止 REQ が現行要件判断の第一参照として案内されていないこと |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | 現行 docs 内の retired REQ 参照検出・コンテキスト判定 |
+| detection_method | 現行 docs 内の 廃止 REQ 参照検出・コンテキスト判定 |
 | affected_artifacts | [REQ, SPEC, guides] |
 | related_req | [REQ-0108-070-074, 136] |
 | related_spec | [integrity-contracts.md] |
@@ -375,7 +375,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-018 |
-| description | AGENTS.md、SPEC、guides の REQ 範囲表記が実際の active REQ 数と一致すること |
+| description | AGENTS.md、SPEC、guides の REQ 範囲表記が実際の 現行 REQ 数と一致すること |
 | severity | heuristic |
 | category | document-drift |
 | detection_method | N件・through 等の表記と glob 結果の照合 |
@@ -459,7 +459,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | severity | strict |
 | category | canonical-conflict |
 | detection_method | REQ 内の強制条件・禁止事項の抽出 → 矛盾検出 |
-| affected_artifacts | [active REQ] |
+| affected_artifacts | [現行 REQ] |
 | related_req | [REQ-0108-139, 149] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
@@ -510,7 +510,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | README にコマンド追加/削除 |
 | last_verified | 2026-06-06 |
 
-### IR-025: Retired ADR path 規則
+### IR-025: 廃止 ADR path 規則
 
 | Field | Value |
 |-------|-------|
@@ -550,15 +550,15 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | triage_action | ADR 誤分類兆候を確認し、必要に応じて REQ/SPEC 移管を検討 |
 | last_verified | 2026-06-08 |
 
-### IR-027: Retired ADR 現行根拠引用検出
+### IR-027: 廃止 ADR 現行根拠引用検出
 
 | Field | Value |
 |-------|-------|
 | rule_id | IR-027 |
-| description | 現行 docs 内で retired ADR（`docs/adr/retired/`）が現行根拠として引用されていないこと。履歴参照には retired path と [retired] 注記を必須とする（REQ-0112-048） |
+| description | 現行 docs 内で 廃止 ADR（`docs/adr/retired/`）が現行根拠として引用されていないこと。履歴参照には廃止パス（`retired/`）と [retired] 注記を必須とする（REQ-0112-048） |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | 現行 docs 内の retired ADR 参照検出・コンテキスト判定 |
+| detection_method | 現行 docs 内の 廃止 ADR 参照検出・コンテキスト判定 |
 | affected_artifacts | [REQ, SPEC, guides] |
 | related_req | [REQ-0112-048, REQ-0112-050] |
 | related_spec | [integrity-contracts.md, document-model.md] |
@@ -567,7 +567,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | regression_test | (手動確認) |
 | baseline_status | known |
 | finding_route | intake |
-| triage_action | 参照に [retired] 注記を追加、または current ADR へ更新 |
+| triage_action | 参照に [retired] 注記を追加、または現行 ADR へ更新 |
 | last_verified | 2026-06-08 |
 
 ### IR-028: Command トップレベル Step 整数化
@@ -735,10 +735,10 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-036 |
-| description | accepted ADR のタイトル・本文に作業手段（削除・廃止・移行・完全削除・統合・再構築）の混入を検出すること（REQ-0108-249）。作業手段を主題とする ADR は作成不可であるため、accepted ADR にこれらが主題として含まれていないかを検査する |
+| description | 承認済み ADR のタイトル・本文に作業手段（削除・廃止・移行・完全削除・統合・再構築）の混入を検出すること（REQ-0108-249）。作業手段を主題とする ADR は作成不可であるため、承認済み ADR にこれらが主題として含まれていないかを検査する |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | accepted ADR のタイトル・Decision セクションから作業手段キーワード（削除・廃止・移行・完全削除・統合・再構築）を検出し、主題か背景記述かを判定 |
+| detection_method | 承認済み ADR のタイトル・Decision セクションから作業手段キーワード（削除・廃止・移行・完全削除・統合・再構築）を検出し、主題か背景記述かを判定 |
 | affected_artifacts | [current ADR] |
 | related_req | [REQ-0108-249, REQ-0101-044, REQ-0101-045] |
 | related_spec | [integrity-contracts.md, document-model.md] |
@@ -755,10 +755,10 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-037 |
-| description | retired ADR（`docs/adr/retired/`）が現行基盤（current baseline）として参照・案内されていないこと（REQ-0108-250）。Current Baseline View・後継ADRの Related Decisions・REQ/SPEC の現行根拠において retired ADR が現行扱いされていないかを検査する |
+| description | 廃止 ADR（`docs/adr/retired/`）が現行基準（current baseline）として参照・案内されていないこと（REQ-0108-250）。Current Baseline View・後継ADRの Related Decisions・REQ/SPEC の現行根拠において 廃止 ADR が現行扱いされていないかを検査する |
 | severity | strict |
 | category | canonical-conflict |
-| detection_method | retired ADR 番号が current baseline 文脈（Current Baseline View・現行根拠引用・後継指定なしの参照）に出現していないかを検出 |
+| detection_method | 廃止 ADR 番号が現行基準文脈（Current Baseline View・現行根拠引用・後継指定なしの参照）に出現していないかを検出 |
 | affected_artifacts | [ADR, ADR index, REQ, SPEC] |
 | related_req | [REQ-0108-250, REQ-0112-048] |
 | related_spec | [integrity-contracts.md, document-model.md] |
@@ -767,7 +767,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | regression_test | (追加予定) |
 | baseline_status | new |
 | finding_route | intake |
-| triage_action | retired ADR への現行参照を後継 ADR へ更新、または `(retired)` 注記を付与 |
+| triage_action | 廃止 ADR への現行参照を後継 ADR へ更新、または `(retired)` 注記を付与 |
 | last_verified | 2026-06-16 |
 
 ### IR-038: ADR-index-consistency
@@ -775,7 +775,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-038 |
-| description | accepted ADR（`docs/adr/ADR-*.md`）と retired ADR（`docs/adr/retired/ADR-*.md`）の index（`docs/adr/README.md`）整合性を検査すること（REQ-0108-251）。Current Baseline View に accepted ADR が過不足なく記載され、Retired View に retired ADR が過不足なく記載されていること |
+| description | 承認済み ADR（`docs/adr/ADR-*.md`）と 廃止 ADR（`docs/adr/retired/ADR-*.md`）の index（`docs/adr/README.md`）整合性を検査すること（REQ-0108-251）。Current Baseline View に承認済み ADR が過不足なく記載され、Retired View に 廃止 ADR が過不足なく記載されていること |
 | severity | strict |
 | category | document-drift |
 | detection_method | `docs/adr/README.md` の Current Baseline View / Retired View と実 ADR ファイル一覧の双方向差分を検出 |
@@ -799,7 +799,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | severity | strict |
 | category | document-drift |
 | detection_method | 各索引から REQ タイトル抽出 → 対応 REQ ファイル frontmatter title と文字列照合 |
-| affected_artifacts | [DOC-MAP, REQ index, mapping-table, active REQ] |
+| affected_artifacts | [DOC-MAP, REQ index, mapping-table, 現行 REQ] |
 | related_req | [REQ-0108-003, REQ-0101-063, REQ-0101] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
@@ -815,10 +815,10 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-040 |
-| description | active docs の HTMLコメント（provenance marker 含む）が retired REQ ID を単独参照しないこと。検出範囲は HTMLコメントのみに限定し、本文の意味解析は対象外（REQ-0101-063） |
+| description | 現行 docs の HTMLコメント（出典標識: provenance marker 含む）が 廃止 REQ ID を単独参照しないこと。検出範囲は HTMLコメントのみに限定し、本文の意味解析は対象外（REQ-0101-063） |
 | severity | strict |
 | category | canonical-conflict |
-| detection_method | `<!-- ... REQ-0NNN ... -->` 形式の HTMLコメントから retired REQ ID を抽出し、後継 active REQ への併記がないか検出 |
+| detection_method | `<!-- ... REQ-0NNN ... -->` 形式の HTMLコメントから 廃止 REQ ID を抽出し、後継 現行 REQ への併記がないか検出 |
 | affected_artifacts | [REQ, SPEC, guides, ADR] |
 | related_req | [REQ-0101-063, REQ-0108-070] |
 | related_spec | [integrity-contracts.md, document-model.md] |
@@ -827,7 +827,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | regression_test | (追加予定) |
 | baseline_status | new |
 | finding_route | intake |
-| triage_action | retired REQ の HTMLコメント参照を後継 active REQ へ置換 |
+| triage_action | 廃止 REQ の HTMLコメント参照を後継 現行 REQ へ置換 |
 | last_verified | 2026-06-17 |
 
 ### IR-041: retired-req-broken-link
@@ -835,19 +835,19 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-041 |
-| description | retired REQ ファイルへのリンクが `retired/` パス接頭辞を使用すること |
+| description | 廃止 REQ ファイルへのリンクが `retired/` パス接頭辞を使用すること |
 | severity | strict |
 | category | broken-reference |
-| detection_method | Markdown リンク `[REQ-0NNN](../requirements/REQ-0NNN.md)` から retired REQ への直接パス（retired/ なし）を検出 |
+| detection_method | Markdown リンク `[REQ-0NNN](../requirements/REQ-0NNN.md)` から 廃止 REQ への直接パス（retired/ なし）を検出 |
 | affected_artifacts | [REQ, SPEC, guides, ADR] |
 | related_req | [REQ-0108-070, REQ-0101-063] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
-| false_positive_risk | 低。retired REQ ID 集合とリンク先パスの照合 |
+| false_positive_risk | 低。廃止 REQ ID 集合とリンク先パスの照合 |
 | regression_test | (追加予定) |
 | baseline_status | new |
 | finding_route | intake |
-| triage_action | retired REQ へのリンク先を `retired/` パスに修正 |
+| triage_action | 廃止 REQ へのリンク先を `retired/` パスに修正 |
 | last_verified | 2026-06-17 |
 
 ### IR-042: hardcoded-req-count
@@ -855,10 +855,10 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-042 |
-| description | docs 内の REQ 件数・範囲の固定表記が実際の active REQ ファイル数と一致すること |
+| description | docs 内の REQ 件数・範囲の固定表記が実際の 現行 REQ ファイル数と一致すること |
 | severity | heuristic |
 | category | document-drift |
-| detection_method | N件・範囲表記（REQ-0101〜0NNN 等）抽出 → glob による実際の active REQ ファイル数と照合 |
+| detection_method | N件・範囲表記（REQ-0101〜0NNN 等）抽出 → glob による実際の 現行 REQ ファイル数と照合 |
 | affected_artifacts | [SPEC, guides, AGENTS.md] |
 | related_req | [REQ-0108-140, REQ-0101] |
 | related_spec | [integrity-contracts.md] |
@@ -875,11 +875,11 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-043 |
-| description | retired/README.md が全 retired REQ のエントリを含むこと |
+| description | retired/README.md が全 廃止 REQ のエントリを含むこと |
 | severity | strict |
 | category | document-drift |
-| detection_method | retired REQ ファイル一覧と retired/README.md のエントリを双方向差分で照合 |
-| affected_artifacts | [retired REQ, retired README] |
+| detection_method | 廃止 REQ ファイル一覧と retired/README.md のエントリを双方向差分で照合 |
+| affected_artifacts | [廃止 REQ, retired README] |
 | related_req | [REQ-0108-083, REQ-0101] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
@@ -887,7 +887,7 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | regression_test | (追加予定) |
 | baseline_status | new |
 | finding_route | intake |
-| triage_action | retired/README.md に欠落する retired REQ エントリを追加 |
+| triage_action | retired/README.md に欠落する 廃止 REQ エントリを追加 |
 | last_verified | 2026-06-17 |
 
 ### IR-044: REQ/SPEC 境界違反検出
@@ -895,19 +895,19 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-044 |
-| description | Active REQ 要件行の主たる文意が schema field・enum 値一覧・fixture detail・checker 個別ルール・false positive 抑制方式・Step 番号・Phase 番号・内部アルゴリズム・具体的な作業履歴のいずれかである場合、当該 SPEC detail の混入を検出すること（REQ-0108-260, REQ-0101-067〜069） |
+| description | 現行 REQ 要件行の主たる文意がスキーマフィールド・enum 値一覧・テストデータ詳細（fixture detail）・チェッカー個別ルール・誤検知（false positive）抑制方式・Step 番号・Phase 番号・内部アルゴリズム・具体的な作業履歴のいずれかである場合、当該 SPEC 詳細の混入を検出すること（REQ-0108-260, REQ-0101-067〜069） |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | Active REQ 要件行の主たる文意から schema/enum/fixture/checker 個別ルール/FP 抑制/Step 番号/Phase 番号/内部アルゴリズム/作業履歴キーワードをパターンマッチで検出 |
-| affected_artifacts | [active REQ] |
+| detection_method | 現行 REQ 要件行の主たる文意からスキーマ・enum・テストデータ・チェッカー個別ルール・FP 抑制・Step 番号・Phase 番号・内部アルゴリズム・作業履歴キーワードをパターンマッチで検出 |
+| affected_artifacts | [現行 REQ] |
 | related_req | [REQ-0108-260, REQ-0101-067, REQ-0101-068, REQ-0101-069] |
 | related_spec | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |
-| false_positive_risk | 高。REQ-0101-069 安定契約例外（公開 command 名・公開入口・domain state 位置づけ・他 command 接続契約・利用者可視分類体系・安全境界・停止条件の大枠・後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外 |
+| false_positive_risk | 高。REQ-0101-069 安定契約例外（公開コマンド名・公開入口・ドメイン状態位置づけ・他コマンド接続契約・利用者可視分類体系・安全境界・停止条件の大枠・後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外 |
 | regression_test | (追加予定) |
 | baseline_status | new |
 | finding_route | req-define |
-| triage_action | 該当要件行の詳細を SPEC・rule catalog・command reference・skill reference・test docs のいずれかに移管し、REQ 側は外部契約・状態要件の要約に置き換える |
+| triage_action | 該当要件行の詳細を SPEC・ルールカタログ・コマンドリファレンス・スキルリファレンス・テスト文書のいずれかに移管し、REQ 側は外部契約・状態要件の要約に置き換える |
 | last_verified | 2026-06-17 |
 
 ### IR-045: docs 日本語表現・文意整合検査
@@ -915,10 +915,10 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-045 |
-| description | docs/SPEC/REQ/command/skill の日本語表現・文意整合を検査すること。`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate` 等の英字混じり抽象用語・読取専用セマンティクス、および `active REQ`/`retired REQ`/`accepted ADR`/`active docs`（修飾語）、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`（複合技術語）、`fixture`/`variant`/`provider`/`baseline`（専門カタカナ語）について、日本語説明の併記・文意に基づく自然な日本語化・許可/禁止操作の明示・具体許可操作への置換を検証する（REQ-0108, REQ-0140, REQ-0101-061）。推奨訳は docs/specs/writing-style.md を参照 |
+| description | docs/SPEC/REQ/command/skill の日本語表現・文意整合を検査すること。`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate` 等の英字混じり抽象用語・読取専用セマンティクス、および `現行 REQ`/`廃止 REQ`/`accepted ADR`/`active docs`（修飾語）、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`（複合技術語）、`fixture`/`variant`/`provider`/`baseline`（専門カタカナ語）について、日本語説明の併記・文意に基づく自然な日本語化・許可/禁止操作の明示・具体許可操作への置換を検証する（REQ-0108, REQ-0140, REQ-0101-061）。推奨訳は docs/specs/writing-style.md を参照 |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | 対象ファイル（`docs/**/*.md` ただし `docs/**/retired/**` は除外、`src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md`、`.opencode/commands/repo/**/*.md`、`.opencode/skills/repo-agentdev-integrity/**/*.md`）から検出対象語（`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate`、および `active REQ`/`retired REQ`/`accepted ADR`/`active docs`、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`、`fixture`/`variant`/`provider`/`baseline`）を検出。識別子（enum 値・frontmatter field・ファイル名・ディレクトリ名）の場合は周辺に日本語説明が存在するか確認。`read-only` 検出時は同一段落または直後のリストで許可出力・禁止操作が記述されているか検証。YAML 例中の `read_only` は具体の許可操作に置換されているか検証。英字のみの見出し・英字混じり抽象見出しを検出。修飾語・複合技術語・専門カタカナ語の検出時は、文意に基づく自然な日本語化がされているか docs/specs/writing-style.md の指針に合致しているかを検証 |
+| detection_method | 対象ファイル（`docs/**/*.md` ただし `docs/**/retired/**` は除外、`src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md`、`.opencode/commands/repo/**/*.md`、`.opencode/skills/repo-agentdev-integrity/**/*.md`）から検出対象語（`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate`、および `現行 REQ`/`廃止 REQ`/`accepted ADR`/`active docs`、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`、`fixture`/`variant`/`provider`/`baseline`）を検出。識別子（enum 値・frontmatter field・ファイル名・ディレクトリ名）の場合は周辺に日本語説明が存在するか確認。`read-only` 検出時は同一段落または直後のリストで許可出力・禁止操作が記述されているか検証。YAML 例中の `read_only` は具体の許可操作に置換されているか検証。英字のみの見出し・英字混じり抽象見出しを検出。修飾語・複合技術語・専門カタカナ語の検出時は、文意に基づく自然な日本語化がされているか docs/specs/writing-style.md の指針に合致しているかを検証 |
 | affected_artifacts | [docs, REQ, SPEC, guides, commands, skills] |
 | related_req | [REQ-0108, REQ-0140, REQ-0101] |
 | related_spec | [integrity-contracts.md, writing-style.md] |
@@ -927,21 +927,21 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | regression_test | (追加予定) |
 | baseline_status | new |
 | finding_route | intake |
-| triage_action | 分類に基づき修正。NG（英字混じり抽象用語に日本語説明不在／`read-only` 宣言に反して出力生成・commit・push が許可されている）は許可/禁止操作を明示化・日本語説明を併記。WARNING（識別子は保持するが日本語説明が不十分）は説明を補強。OK（日本語名と識別子が両立し許可/禁止操作が明確）は対応不要。default severity は warning、accepted SPEC または active REQ で NG 分類の場合は error に昇格 |
+| triage_action | 分類に基づき修正。NG（英字混じり抽象用語に日本語説明不在／`read-only` 宣言に反して出力生成・commit・push が許可されている）は許可/禁止操作を明示化・日本語説明を併記。WARNING（識別子は保持するが日本語説明が不十分）は説明を補強。OK（日本語名と識別子が両立し許可/禁止操作が明確）は対応不要。default severity は warning、accepted SPEC または 現行 REQ で NG 分類の場合は error に昇格 |
 | last_verified | 2026-06-19 |
 
-## Gate Levels
+## ゲートレベル
 
 | Level | Description | Trigger |
 |-------|-------------|---------|
-| full-audit | 全 rule を実行 | 定期実行、重大変更後 |
-| delta-guard | 変更関連 rule のみ実行 | PR 作成時、通常開発時 |
-| impact-guard | 影響範囲 rule のみ実行 | 特定 artifact 変更時 |
+| full-audit | 全ルールを実行 | 定期実行、重大変更後 |
+| delta-guard | 変更関連ルールのみ実行 | PR 作成時、通常開発時 |
+| impact-guard | 影響範囲ルールのみ実行 | 特定アーティファクト変更時 |
 
-## Meta-Integrity
+## メタ整合性
 
-本 catalog 自体の整合性を以下で担保する:
-- 各 rule の field 数 ≥ 15
-- 全 rule に related_req を持つ
+本カタログ自体の整合性を以下で担保する:
+- 各ルールのフィールド数 ≥ 15
+- 全ルールに related_req を持つ
 - gate_level が 3 層のいずれか
 - severity が strict/heuristic/observation のいずれか

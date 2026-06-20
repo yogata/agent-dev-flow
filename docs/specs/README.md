@@ -1,11 +1,10 @@
 # Specifications Index
 
-SPEC files are canonical documents for the current architecture (REQ-0101).
-They describe what the system *is* now, as opposed to REQ files that define required outcomes.
+SPEC ファイルは現行アーキテクチャの正規文書である（REQ-0101）。システムが現在「どうなっているか」を記述し、満たすべき成果を定義する REQ ファイルとは対比される。
 
-> **Repo-internal 設計文書**: SPEC files are repo-internal design documents for the agent-dev-flow repository. They are not runtime distribution targets and runtime commands do not depend on them (ADR-0103, ADR-0104).
+> **リポジトリ内部設計文書**: SPEC ファイルは agent-dev-flow リポジトリのリポジトリ内部設計文書である。実行時配布対象ではなく、実行時コマンドは本ファイル群に依存しない（ADR-0103, ADR-0104）。
 
-## SPEC Files
+## SPEC ファイル一覧
 
 | SPEC | タイトル | 責務 |
 |------|---------|------|
@@ -17,31 +16,31 @@ They describe what the system *is* now, as opposed to REQ files that define requ
 | [document-model.md](document-model.md) | 文書モデル | REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックス |
 | [writing-style.md](writing-style.md) | 文書執筆スタイルガイドライン | 日本語執筆の判断指針・REQ-0101-061 詳細参照先 |
 | [artifact-contracts.md](artifact-contracts.md) | アーティファクト契約 | Command/Skill/Template/Script の入出力・依存方向 |
-| [artifact-responsibilities.md](artifact-responsibilities.md) | 成果物責任表 | 各 artifact 種別の canonical owner と責務（REQ-0103-057） |
+| [artifact-responsibilities.md](artifact-responsibilities.md) | 成果物責任表 | 各成果物種別の正規所有者（canonical owner）と責務（REQ-0103-057） |
 | [integrity-contracts.md](integrity-contracts.md) | 整合性契約 | strict/heuristic/observation 分類と検査カテゴリ |
-| [integrity-rule-catalog.md](integrity-rule-catalog.md) | Integrity Rule Catalog | integrity 検査の全 rule 定義（REQ-0108-150, 151） |
+| [integrity-rule-catalog.md](integrity-rule-catalog.md) | 整合性ルールカタログ | 整合性検査の全ルール定義（REQ-0108-150, 151） |
 | [workflow-contracts.md](workflow-contracts.md) | ワークフロー契約 | コマンドパイプラインの入出力・前提条件 |
-| [runtime-package-boundary.md](runtime-package-boundary.md) | Runtime Package 境界 | Repo type 別 `.opencode/` 定義・命名規約・導入方式・sync 範囲 |
-| [rule-ownership.md](rule-ownership.md) | Rule 所有権マトリックス | rule domain と責任 REQ/SPEC の対応（REQ-0103-058） |
-| [req-impact-map.md](req-impact-map.md) | REQ 影響マップ | 各 active REQ が影響する integrity rule と artifact（REQ-0108-152） |
-| [req-health-metrics.md](req-health-metrics.md) | REQ 健全性メトリクス | REQ 肥大化・関心ズレ検出の定量閾値（要件行数・関心分類数・artifact種別数）（REQ-0136-040） |
+| [runtime-package-boundary.md](runtime-package-boundary.md) | 実行時パッケージ境界 | リポジトリ種別別 `.opencode/` 定義・命名規約・導入方式・同期範囲 |
+| [rule-ownership.md](rule-ownership.md) | ルール所有権マトリックス | ルールドメインと責任 REQ/SPEC の対応（REQ-0103-058） |
+| [req-impact-map.md](req-impact-map.md) | REQ 影響マップ | 各現行 REQ が影響する整合性ルールとアーティファクト（REQ-0108-152） |
+| [req-health-metrics.md](req-health-metrics.md) | REQ 健全性メトリクス | REQ 肥大化・関心ズレ検出の定量閾値（要件行数・関心分類数・アーティファクト種別数）（REQ-0136-040） |
 
-## Document Relationships (REQ-0101)
+## 文書間関係（REQ-0101）
 
 ```
-REQ (requirements/REQ-*.md)    -- 要件定義（required outcomes）
+REQ (requirements/REQ-*.md)    -- 要件定義（満たすべき成果）
   |
   v
-ADR (adr/ADR-*.md)            -- アーキテクチャ決定記録（why）
+ADR (adr/ADR-*.md)            -- アーキテクチャ決定記録（判断根拠）
   |
   v
-SPEC (specs/*.md)              -- 現在アーキテクチャ基準（what is）
+SPEC (specs/*.md)              -- 現行アーキテクチャ基準（現在どうなっているか）
   |
   v
 DOC-MAP (DOC-MAP.md)           -- 文書探索入口（参照用・分類索引）
 ```
 
-- **REQ** files define requirements. They are the source of truth for required system outcomes.
-- **ADR** files record architectural decisions and their rationale.
-- **SPEC** files describe the current architecture as implemented. They are canonical for "how it works now."
-- **DOC-MAP** is a non-canonical navigation index. It does not replace any REQ, ADR, or SPEC.
+- **REQ** ファイルは要件を定義する。システムが満たすべき成果の信頼できる情報源である。
+- **ADR** ファイルはアーキテクチャ決定とその判断根拠を記録する。
+- **SPEC** ファイルは実装された現行アーキテクチャを記述する。「現在どう動作しているか」の正となる。
+- **DOC-MAP** は非正規のナビゲーション索引である。REQ・ADR・SPEC のいずれも代替しない。
