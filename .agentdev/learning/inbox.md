@@ -59,3 +59,19 @@ cmd /c chcp 65001 | Out-Null
 ```
 agentdev-gh-cli skill の Section 2（標準手順）にこのコンソールエンコーディング初期化ステップを追記すべき（intake 経由で RU 化 → req-define → req-save を推奨・本件は case-run worktree precondition gate とは別件）。
 
+## 2026-06-20: req-define で指定した ADR 番号が adr-file-manager 採番ルールと矛盾 — req-save で max+1 に修正
+
+**状況**: case-auto 並列Wave実行モデル（Epic #944）の req-save で、draft の artifact_actions に ADR-0115 と指定されていた。しかし adr-file-manager skill の採番ルールは「欠番の再利用禁止（常に最大番号+1）」であり、ADR-0115 は ADR-0114 と ADR-0123 の間の欠番だった。最大番号は ADR-0124 のため、正しい番号は ADR-0125 となる。req-save 実行時に ADR-0125 に修正したが、draft 内の全参照（AG-006, AG-007, REQ改訂内容, SPEC改訂内容）で ADR-0115 → ADR-0125 の置換が必要だった。
+
+**学び**: req-define で ADR 番号を推測指定する場合、adr-file-manager の採番ルール（max+1, 欠番埋め禁止）と矛盾する可能性がある。req-save は ADR 番号の妥当性を保存前に検証し、必要に応じて正しい番号に修正すべき。draft の target フィールド（`new:{slug}`）は番号を指定しない形式のため、req-save が番号を決定する設計が安全。
+
+**再発防止**: req-define の artifact_actions で ADR 番号を content タイトルに直接書き込む場合、req-save が adr-file-manager 採番ルールで番号を再検証し、矛盾時に自動修正する。または、draft では番号を未指定（`new:{slug}` のみ）とし、req-save が番号を割り当てる。
+
+## 2026-06-20: 実行担当サブエージェントの worktree が古い commit 基準だと PR conflict — origin/main fetch 必須
+
+**状況**: case-auto Wave 2（Issue #947 / PR #950）で、実行担当サブエージェントが worktree を作成した際、Wave 1 の PR merge 前の commit を基準にしていた。Wave 1 merge 後に main が更新されたため、PR #950 が DIRTY/CONFLICTING になった。worktree を削除し、origin/main から再作成して force-push で解消した。
+
+**学び**: case-run の worktree 作成（Step 4）は `origin/main` をベースとするが、Wave 内並列実行の場合、前 Wave の merge によって origin/main が更新されている可能性がある。worktree 作成前に `git fetch origin` を実行し、最新の origin/main から worktree を作成する必要がある。サブエージェントへの引き継ぎでも worktree の鮮度（base commit が最新か）を確認すべき。
+
+**再発防止**: case-run Step 4 の worktree 作成時に `git fetch origin` を必ず実行する。並列 Wave 実行の場合、前 Wave 完了後に次 Wave の worktree を作成するタイミングで origin/main が更新されていることを前提とする。draft の Oracle 推定事項「Wave-2 の case-run が Wave-1 merge 後の origin/main から worktree を新規作成すること」の実装確認を case-run precondition gate に含めることを検討する。
+
