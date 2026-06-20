@@ -38,6 +38,9 @@
 | 30 | REQ 検証基準（必達要件） | REQ-0108 | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証（REQ-0115-044 から REQ-0108 に移管） |
 | 31 | Quality Gates | REQ-0108 | quality-gates.md | QG-1〜QG-4 定義・機械化境界・実装マッピング（REQ-0115 から REQ-0108 に移管） |
 | 32 | docs 日本語表現・文意整合 | REQ-0140, REQ-0108 (255-257) | integrity-rule-catalog.md (IR-045) | 英字混じり抽象用語・読取専用セマンティクスの検出。文書表記・文意品質ゲート（付帯品質ゲート）の機械検査担当 |
+| 33 | local-case-file（ローカル Case ファイルスキーマ） | REQ-0141 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode の Case ファイル YAML 前書き・status enum・labels 値域・見出し一覧・マージ結果記録 |
+| 34 | local-generation（ローカル版生成フロー・安全ゲート） | REQ-0141 (001-015) | local-generation.md | ローカル版生成フロー Step・`generated_by: local-opencode-transform` 識別子・ジャンクション検出安全ゲート・上書き許可条件 |
+| 35 | local-transform（ローカル版変換プロンプト） | REQ-0141 (028, 029, 032) | local-transform.md | 変換用プロンプト（`transform/generate.md`）・レビュー用プロンプト（`transform/review.md`）・変換仕様（`transform/spec.md`）の要件 |
 
 ## 重複ルールの解消状況
 
