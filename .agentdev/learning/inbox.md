@@ -83,3 +83,19 @@ agentdev-gh-cli skill の Section 2（標準手順）にこのコンソールエ
 
 **再発防止**: case-run Step 5 で oh-my-openagent の存在確認を行わない。AGENTS.md のハーネス選定記述を信頼し、bunx oh-my-openagent run --directory worktree で直接起動する。adapter protocol に「ハーネス不在時は case-run がエラー停止する（フォールバック経路なし）」とあるが、これは bunx 実行時のエラーを指すものであり、事前検出の必要を意味しない。
 
+## 2026-06-20: bunx oh-my-opencode run が Windows でモジュール解決エラー — npx をフォールバックとして使用
+
+**状況**: case-auto（Issue #955）の case-run フェーズで、`bunx oh-my-opencode run` を実行したところ `Cannot find module '...oh-my-openagent\bin\oh-my-opencode.js'` エラーが発生した。bunx がバイナリ解決でグローバルインストールディレクトリの bin パスを期待するが、Windows 版 oh-my-openagent のパッケージ構造（oh-my-openagent-windows-x64 等）と不一致だった。`npx oh-my-opencode run` では正常に動作した（npm がパッケージ解決を適切に行うため）。
+
+**学び**: Windows 環境で bunx 経由の oh-my-opencode run がモジュール解決エラーを起こす場合がある。oh-my-openagent.md リファレンスの起動スクリプト例は `bunx` を前提としているが、bunx の解決が壊れている場合は `npx oh-my-opencode run` をフォールバックとして使用できる。パッケージ名は `oh-my-opencode`（npm）/ `oh-my-openagent`（bun global）で、バイナリ名は `oh-my-opencode`。
+
+**再発防止**: case-run で bunx oh-my-opencode run がモジュール解決エラーで失敗した場合、npx oh-my-opencode run にフォールバックする。oh-my-openagent.md リファレンスの起動スクリプト例に npx フォールバック経路を追記すべき（intake 経由で RU 化候補）。
+
+## 2026-06-20: oh-my-opencode ハーネスは最終検証フェーズでタイムアウト — 完了後も残留確認が必要
+
+**状況**: case-auto（Issue #955）で oh-my-opencode ハーネスに30分タイムアウトを設定したところ、実装自体は完了（48ファイル変更）していたが、最終検証フェーズ（grep残留確認）の途中でタイムアウトした。ハーネスが作成した変更はコミット前にタイムアウトしたため、手動でコミット・PR作成を行う必要があった。また、ハーネスが「セルフホスティング」2件を見落としており、手動修正が必要だった。
+
+**学び**: oh-my-opencode ハーネスの実装能力は高い（48ファイルの適用を完了）が、最終検証フェーズで時間を要する場合がある。タイムアウト後は worktree 内の未コミット変更を確認し、残留箇所を手動修正してからコミット・PR作成する。ハーネスの全件走査でも少数の見落としが発生するため、case-run 側での最終確認が重要。
+
+**再発防止**: case-run でハーネスがタイムアウトした場合、worktree の git status で未コミット変更を確認し、対象語の grep で残留を検出して手動修正する。タイムアウト＝failed ではなく、実装完了・検証未完了として扱い、case-run 側で検証を引き継ぐ。
+
