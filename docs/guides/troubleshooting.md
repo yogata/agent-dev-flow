@@ -52,11 +52,11 @@ AgentDevFlow の利用でよくある問題と対処法をまとめる。
 
 **対処**: case-run のレポートから失敗項目一覧・エラーログ要約・各試行の修正内容を確認する。要件・仕様の見直しが必要か判断し、必要に応じて req-define に戻る。
 
-### Findings が intake に回収されない
+### 検出事項が Intake に回収されない
 
-**症状**: PR 本文に記録した Findings が case-close で回収されない。
+**症状**: PR 本文に記録した検出事項が case-close で回収されない。
 
-**確認**: PR 本文の「Findings / Intake候補」セクションに正しく記録されているか確認する。
+**確認**: PR 本文の「検出事項 / Intake 候補」セクションに正しく記録されているか確認する。
 
 **対処**: case-close はマージ済み PR 本文の同セクションを回収する。セクション構造が壊れている場合は手動で intake-capture に登録する。
 
@@ -70,9 +70,9 @@ AgentDevFlow の利用でよくある問題と対処法をまとめる。
 
 ## 整合性関連
 
-### docs-check で大量の finding が出る
+### docs-check で大量の検出事項が出る
 
-**対処**: まず finding の分類と route を確認する。`document-drift` や `broken-reference` は intake に回して段階的に対応できる。一度に全てを修正する必要はない。
+**対処**: まず検出事項の分類と振り分け先を確認する。`document-drift` や `broken-reference` は Intake に回して段階的に対応できる。一度に全てを修正する必要はない。
 
 ### REQ 体系が複雑になりすぎている
 

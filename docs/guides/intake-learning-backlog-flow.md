@@ -13,7 +13,7 @@ Learning パイプライン ↗
 
 - **Intake**: 具体的な修正対象が特定できる作業候補を収集する
 - **Learning**: 再発防止の知見・判断ミス・手順漏れを蓄積する
-- **Backlog**: 両パイプラインの promoted artifact を RU に統合する
+- **Backlog**: 両パイプラインの採用済み成果物を RU に統合する
 
 ## Intake と Learning の境界
 
@@ -21,17 +21,17 @@ Learning パイプライン ↗
 
 - 具体的な修正対象が特定できる → Intake
 - 再発防止の知見・判断ミス・手順漏れ → Learning
-- 両方の性質を持つ → intake item と learning item に分割
+- 両方の性質を持つ → Intake 項目と Learning 項目に分割
 
 ## Intake パイプライン
 
-具体的な作業候補・不整合・未回収課題の収集・レビュー・促進を行う。
+具体的な作業候補・不整合・未回収課題の収集・レビュー・採用判断を行う。
 
 ### 状態遷移
 
 ```
 inbox/ → promoted/
-      ↘ archive/rejected/
+       ↘ archive/rejected/
 promoted/ → archive/promoted/
 ```
 
@@ -48,9 +48,9 @@ promoted/ → archive/promoted/
 | ディレクトリ | 役割 |
 |-------------|------|
 | `inbox/` | 収集された気づき・課題の一次受け |
-| `archive/rejected/` | 却下 item の記録（終端状態） |
-| `promoted/` | backlog-review 入力用の promoted artifact |
-| `archive/promoted/` | promote 済み item の記録（終端状態） |
+| `archive/rejected/` | 却下項目の記録（終端状態） |
+| `promoted/` | backlog-review 入力用の採用済み成果物 |
+| `archive/promoted/` | 採用済み項目の記録（終端状態） |
 
 `promoted/` はフラット構成で、ディレクトリ配置で route / status を表現する。
 
@@ -75,10 +75,10 @@ inbox.md + archive/active.md → promoted/
 
 | 成果物 | 役割 |
 |--------|------|
-| `inbox.md` | 未整理 learning entry の active queue。capture で蓄積し、promote 成功後にクリアされる |
-| `archive/active.md` | 分類済み entry の蓄積（living pool）。未処分・保留中・再評価対象を保持する |
-| `evaluation-report.md` | promote 内部フェーズで生成される一時 artifact（非公開） |
-| `promoted/` | 昇華判定済み artifact の配置先。フラット構造 |
+| `inbox.md` | 未整理の Learning エントリを受け溜めるキュー。capture で蓄積し、採用判断成功後にクリアされる |
+| `archive/active.md` | 分類済みエントリの蓄積（継続的に再評価される領域）。未処分・保留中・再評価対象を保持する |
+| `evaluation-report.md` | 採用判断の内部フェーズで生成される一時成果物（非公開） |
+| `promoted/` | 昇華判定済み成果物の配置先。フラット構造 |
 
 ### エントリ形式
 
@@ -86,7 +86,7 @@ inbox.md + archive/active.md → promoted/
 
 ## Backlog パイプライン
 
-intake/learning 両方の promoted artifact を RU に統合する。
+Intake/Learning 両方の採用済み成果物を RU に統合する。
 
 ### コマンド
 
@@ -98,9 +98,9 @@ intake/learning 両方の promoted artifact を RU に統合する。
 
 ### RU の粒度
 
-- N:1（複数 promoted artifact を 1 RU に統合）可能
-- 1:N（1 promoted artifact を複数 RU に分割）可能
-- promoted artifact の単純コピー（パススルー）は不可
+- N:1（複数の採用済み成果物を 1 RU に統合）可能
+- 1:N（1 つの採用済み成果物を複数 RU に分割）可能
+- 採用済み成果物の単純コピー（パススルー）は不可
 
 ### session-sourced RU
 
@@ -111,23 +111,23 @@ intake/learning 両方の promoted artifact を RU に統合する。
 | トリガー | 実行コマンド | 対象 |
 |----------|-------------|------|
 | RU の内容が Issue に永続化完了（Issue作成 + VERIFY 成功） | `/agentdev/case-open` | 該当 RU ファイル |
-| promoted artifact の RU 化成功 | `/agentdev/backlog-review` | 該当 promoted artifact |
+| 採用済み成果物の RU 化成功 | `/agentdev/backlog-review` | 該当する採用済み成果物 |
 
 `/agentdev/req-save` は RU を残置し、RU パスを docs 永続文書の根拠参照から除外する。RU は一時成果物であり、永続化未完了の場合は残置する。
 
 ## 矛盾検出
 
-promoted artifact 間に矛盾が検出された場合、矛盾する artifact を RU 化せずユーザーに確認する。矛盾しない artifact は通常通り RU 化を継続する（partial success）。
+採用済み成果物間に矛盾が検出された場合、矛盾する成果物を RU 化せずユーザーに確認する。矛盾しない成果物は通常通り RU 化を継続する（一部成功）。
 
 ## 状態モデル制約
 
 AgentDevFlow のパイプライン状態はディレクトリ配置とファイルの存在で表現する（REQ-0112-023）。frontmatter や status フィールドによる状態管理は行わず、各段階の進行はディレクトリ構造で追跡する。
 
-- **promoted artifact の状態表現**: ディレクトリ配置（`inbox/` → `promoted/`）が状態の表現である（REQ-0112-028）。frontmatter の route / status はディレクトリ配置で代替する
+- **採用済み成果物の状態表現**: ディレクトリ配置（`inbox/` → `promoted/`）が状態の表現である（REQ-0112-028）。frontmatter の route / status はディレクトリ配置で代替する
 - **GitHub 状態の管理場所**: Issue / PR の open / closed / merged 状態は Issue / PR で管理する（REQ-0112-029）。REQ / SPEC / guides への複製は行わない
-- **command-map は状態遷移エンジンではない**: 入口表は次に実行すべきコマンドの案内であり、状態機械の遷移表ではない（REQ-0112-030）
-- **6 マイクロフェーズは説明用ラベル**: workflow の進行状況を人間が理解するための呼称であり、システムが管理する状態値ではない（REQ-0112-023）
+- **入口表は状態遷移エンジンではない**: 入口表は次に実行すべきコマンドの案内であり、状態機械の遷移表ではない（REQ-0112-030）
+- **6 マイクロフェーズは説明用ラベル**: ワークフローの進行状況を人間が理解するための呼称であり、システムが管理する状態値ではない（REQ-0112-023）
 
 ## .agentdev/ の位置づけ
 
-`.agentdev/` は AgentDevFlow の canonical domain state である（REQ-0112-024）。パイプラインの状態（intake / learning / backlog / integrity）を保持する永続領域であり、runtime 配布物の一部ではない。各コマンドは `.agentdev/` 配下の変更を scoped commit で git に永続化する。
+`.agentdev/` は AgentDevFlow の正規のドメイン状態である（REQ-0112-024）。パイプラインの状態（Intake / Learning / Backlog / 整合性）を保持する永続領域であり、実行時配布物の一部ではない。各コマンドは `.agentdev/` 配下の変更を scoped commit で git に永続化する。

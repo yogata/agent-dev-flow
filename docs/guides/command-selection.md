@@ -13,23 +13,23 @@
 | Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
 | Issue の更新・コメント追加が必要 | `/agentdev/case-update` | 更新済み Issue |
-| 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox item |
-| クローズ済み Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox item |
-| inbox に item がある | `/agentdev/intake-promote` | promoted / archive |
+| 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox 項目 |
+| クローズ済み Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox 項目 |
+| inbox に項目がある | `/agentdev/intake-promote` | 採用済み / archive |
 | 再発防止知見を蓄積したい | `learning-capture`（スキル） | inbox.md エントリ |
-| inbox.md にエントリがある | `/agentdev/learning-promote` | promoted artifact |
-| promoted artifact（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
+| inbox.md にエントリがある | `/agentdev/learning-promote` | 採用済み成果物 |
+| 採用済み成果物（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | REQ 体系の健全性を検出したい | `/agentdev/inspect-docs` | 検出レポート |
 | 要件docがあり req-saveからcase-closeまで自走させたい / Issue番号・URL があり case-run〜case-close を自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
-## Repository maintenance（AgentDevFlow本体リポジトリのみ）
+## リポジトリメンテナンス（AgentDevFlow 本体リポジトリのみ）
 
 | 現在の状態 | 次のコマンド | 出力 |
 |-----------|-------------|------|
 | ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート |
 
-> これらのコマンドは配布対象外（ADR-0106）であり、AgentDevFlow の配布対象外。
+> これらのコマンドは配布対象外（ADR-0106）であり、AgentDevFlow 本体リポジトリでのみ利用する。
 
 ## 使い方
 

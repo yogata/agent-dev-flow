@@ -1,93 +1,93 @@
-# Consumer Project 導入モデル
+# 適用プロジェクトへの導入モデル
 
-AgentDevFlow を適用プロジェクトに導入する際の model を定義する（REQ-0103-061~065, REQ-0103-072~077）。
+AgentDevFlow を適用プロジェクトに導入する際のモデルを定義する（REQ-0103-061~065, REQ-0103-072~077）。
 
-## 4 種の Repo Type
+## 4 種のリポジトリ種別（Repo Type）
 
-| Type | 説明 | `.opencode/` の意味 | 例 |
+| 種別 | 説明 | `.opencode/` の意味 | 例 |
 |------|------|---------------------|-----|
-| **self-hosting** | AgentDevFlow 本体開発 repo。source と projection が同一 repo に存在 | `.opencode/` = runtime projection（junction → `src/opencode/`） | agent-dev-flow |
-| **consumer-with-agentdev** | AgentDevFlow を導入する製品 repo。AgentDevFlow 提供 skill/command を利用 | `.opencode/` = project-local customization 入口 + AgentDevFlow 提供 command/skill の runtime 位置 | 各種製品開発 repo |
-| **consumer-local** | AgentDevFlow を利用しない OpenCode プロジェクト。独自 command/skill のみ | `.opencode/` = project-local customization 専用。`agentdev` namespace は使用しない | 実験的 repo |
-| **plugin-future** | 将来の plugin/npm/package 配布形態（現在は未対応） | `.opencode/` = plugin が管理する runtime 位置 | （将来） |
+| **self-hosting** | AgentDevFlow 本体開発リポジトリ。原本と配置先が同一リポジトリに存在 | `.opencode/` = 実行時の配置先（junction → `src/opencode/`） | agent-dev-flow |
+| **consumer-with-agentdev** | AgentDevFlow を導入する製品リポジトリ。AgentDevFlow 提供 skill/command を利用 | `.opencode/` = プロジェクト独自設定の入口 + AgentDevFlow 提供 command/skill の実行時の位置 | 各種製品開発リポジトリ |
+| **consumer-local** | AgentDevFlow を利用しない OpenCode プロジェクト。独自 command/skill のみ | `.opencode/` = プロジェクト独自設定専用。`agentdev` 名前空間は使用しない | 実験的リポジトリ |
+| **plugin-future** | 将来の plugin/npm/package 配布形態（現在は未対応） | `.opencode/` = plugin が管理する実行時の位置 | （将来） |
 
 ## `.opencode/` の意味の違い
 
-### Self-hosting (AgentDevFlow 本体)
+### Self-hosting（AgentDevFlow 本体）
 
 ```
-.opencode/           → junction → src/opencode/ (runtime projection)
+.opencode/           → junction → src/opencode/ (実行時の配置先)
 src/opencode/
-  commands/agentdev/  → canonical source（public command definitions 13件、README除外）
-  skills/agentdev-*/  → canonical source（agentdev skill 20件）
+  commands/agentdev/  → 原本（公開コマンド定義13件、README除外）
+  skills/agentdev-*/  → 原本（agentdev スキル20件）
 scripts/
-  sync-self-opencode.ps1  → AgentDevFlow本体リポジトリ用同期スクリプト
+  sync-self-opencode.ps1  → AgentDevFlow 本体リポジトリ用同期スクリプト
 ```
 
-- source 編集は `src/opencode/` で行う
-- `.opencode/` は junction/symlink による runtime projection
-- `scripts/sync-self-opencode.ps1` で source↔projection 同期を管理
+- 原本の編集は `src/opencode/` で行う
+- `.opencode/` は junction/symlink による実行時の配置先
+- `scripts/sync-self-opencode.ps1` で原本↔配置先の同期を管理する
 
-### Consumer-with-agentdev (適用プロジェクト)
+### Consumer-with-agentdev（適用プロジェクト）
 
 ```
-.agentdev-plugin/                → agent-dev-flow の git clone 先（consumer 専用）
-  src/opencode/                  → canonical source
+.agentdev-plugin/                → agent-dev-flow の git clone 先（適用プロジェクト専用）
+  src/opencode/                  → 原本
 .opencode/
   commands/agentdev/              → junction → .agentdev-plugin/src/opencode/commands/agentdev/
-  commands/{local}/               → project-local command（real directory）
+  commands/{local}/               → プロジェクト独自コマンド（実ディレクトリ）
   skills/agentdev-*/              → junction → .agentdev-plugin/src/opencode/skills/agentdev-*/
-  skills/{local}-*/               → project-local skill（real directory）
+  skills/{local}-*/               → プロジェクト独自スキル（実ディレクトリ）
 scripts/
-  install-consumer-opencode.ps1   → consumer 用インストールスクリプト
-  check-consumer-opencode.ps1     → consumer 用状態確認スクリプト
+  install-consumer-opencode.ps1   → 適用プロジェクト用インストールスクリプト
+  check-consumer-opencode.ps1     → 適用プロジェクト用状態確認スクリプト
 ```
 
-- `.agentdev-plugin/` に agent-dev-flow を clone する（NOT `.agentdev/`）
-- `.agentdev/` は AgentDevFlow の domain state 用（intake, learning, backlog 等）として予約
-- `.opencode/` は AgentDevFlow 提供 command/skill と project-local customization の混在場所
-- AgentDevFlow 提供 file は junction（更新時に clone を pull すれば自動反映）
-- project-local file は直接管理
+- `.agentdev-plugin/` に agent-dev-flow を clone する（`.agentdev/` ではない）
+- `.agentdev/` は AgentDevFlow のドメイン状態用（Intake, Learning, Backlog 等）として予約
+- `.opencode/` は AgentDevFlow 提供 command/skill とプロジェクト独自設定の混在場所
+- AgentDevFlow 提供ファイルは junction（更新時に clone を pull すれば自動反映）
+- プロジェクト独自ファイルは直接管理する
 
-### Consumer-local (非AgentDevFlow プロジェクト)
+### Consumer-local（非 AgentDevFlow プロジェクト）
 
 ```
 .opencode/
-  commands/{local}/   → project-local command のみ
-  skills/{local}-*/   → project-local skill のみ
+  commands/{local}/   → プロジェクト独自コマンドのみ
+  skills/{local}-*/   → プロジェクト独自スキルのみ
 ```
 
-- AgentDevFlow namespace を使用しない
-- 自由に `.opencode/` を管理
+- AgentDevFlow の名前空間を使用しない
+- 自由に `.opencode/` を管理する
 
-## Reserved Names
+## 予約名（Reserved Names）
 
-| 名前 | 種別 | 使用可能な Repo Type |
+| 名前 | 種別 | 使用可能なリポジトリ種別 |
 |------|------|---------------------|
-| `agentdev` | command namespace | self-hosting, consumer-with-agentdev |
-| `agentdev-*` | skill prefix | self-hosting, consumer-with-agentdev |
-| `.agentdev/` | domain state directory | self-hosting, consumer-with-agentdev |
-| `.agentdev-plugin/` | consumer clone target | consumer-with-agentdev |
+| `agentdev` | コマンド名前空間 | self-hosting, consumer-with-agentdev |
+| `agentdev-*` | スキルプレフィックス | self-hosting, consumer-with-agentdev |
+| `.agentdev/` | ドメイン状態ディレクトリ | self-hosting, consumer-with-agentdev |
+| `.agentdev-plugin/` | 適用プロジェクトの clone 先 | consumer-with-agentdev |
 
 **禁止事項**:
-- consumer-local での `agentdev` namespace 使用（REQ-0103-056）
-- consumer-with-agentdev での AgentDevFlow 提供 file の直接編集（上書きされる可能性）
-- `.agentdev-plugin/` を `.agentdev/` として使用すること（domain state と競合）
+- consumer-local での `agentdev` 名前空間の使用（REQ-0103-056）
+- consumer-with-agentdev での AgentDevFlow 提供ファイルの直接編集（上書きされる可能性）
+- `.agentdev-plugin/` を `.agentdev/` として使用すること（ドメイン状態と競合）
 
-> **Note**: `agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-0106）。docs-check は `repo-agentdev-integrity`（配布対象外スキル）として AgentDevFlow本体リポジトリでのみ実行される。適用プロジェクトには配布されない。
+> **注意**: `agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-0106）。docs-check は `repo-agentdev-integrity`（配布対象外スキル）として AgentDevFlow 本体リポジトリでのみ実行される。適用プロジェクトには配布されない。
 
-## Installation Method Policy
+## インストール方式の方針
 
-| Method | 対応 | 推奨 | 備考 |
+| 方式 | 対応 | 推奨 | 備考 |
 |--------|------|------|------|
-| Junction + clone (`.agentdev-plugin/`) | ✅ | **推奨** | 更新が自動反映、source が単一 |
-| Copy | ⚠️ | 非推奨 | 手動更新が必要、drift リスク |
+| Junction + clone（`.agentdev-plugin/`） | ✅ | **推奨** | 更新が自動反映、原本が単一 |
+| Copy | ⚠️ | 非推奨 | 手動更新が必要、乖離のリスク |
 | Git submodule | ⚠️ | 検討可能 | 複雑性が増す |
-| Plugin/npm/package | ❌ | 将来対応 | REQ-0103-064 で将来 option 扱い |
+| Plugin/npm/package | ❌ | 将来対応 | REQ-0103-064 で将来の選択肢扱い |
 
-### Junction-based installation with clone（推奨）
+### Junction と clone によるインストール（推奨）
 
-agent-dev-flow を `.agentdev-plugin/` に clone し、junction で runtime projection を作成する。
+agent-dev-flow を `.agentdev-plugin/` に clone し、junction で実行時の配置先を作成する。
 
 ```powershell
 # 1. インストール（clone + junction 作成を一括実行）
@@ -110,83 +110,83 @@ cd .agentdev-plugin && git pull && cd ..
 ./scripts/install-consumer-opencode.ps1 -Mode apply
 ```
 
-### Copy-based installation (非推奨)
+### Copy によるインストール（非推奨）
 
 - 初回は手動コピーで動作するが、AgentDevFlow 更新時に再コピーが必要
-- docs-check で drift を検出可能（IR-016）
+- docs-check で乖離を検出可能（IR-016）
 
-## Script Scope
+## スクリプトの適用範囲
 
-| Script | 対象 Repo Type | 役割 |
+| スクリプト | 対象リポジトリ種別 | 役割 |
 |--------|---------------|------|
 | `scripts/sync-self-opencode.ps1` | self-hosting | `src/opencode/` ↔ `.opencode/` の同期 |
 | `scripts/install-consumer-opencode.ps1` | consumer-with-agentdev | `.agentdev-plugin/` clone + junction 作成 |
 | `scripts/check-consumer-opencode.ps1` | consumer-with-agentdev | インストール状態の検証 |
 
-### Self-hosting での sync
+### Self-hosting での同期
 
 ```powershell
 ./scripts/sync-self-opencode.ps1 -Mode apply   # src/opencode/ → .opencode/ 同期
-./scripts/sync-self-opencode.ps1 -Mode check   # divergence 検出
+./scripts/sync-self-opencode.ps1 -Mode check   # 乖離の検出
 ./scripts/sync-self-opencode.ps1 -Mode dry-run # 変更予測
 ```
 
-### Consumer-with-agentdev での install/check
+### Consumer-with-agentdev でのインストール/確認
 
 ```powershell
 ./scripts/install-consumer-opencode.ps1 -Mode apply   # clone + junction 作成
-./scripts/install-consumer-opencode.ps1 -Mode check   # divergence 検出
+./scripts/install-consumer-opencode.ps1 -Mode check   # 乖離の検出
 ./scripts/install-consumer-opencode.ps1 -Mode dry-run # 変更予測
 ./scripts/check-consumer-opencode.ps1                  # 状態確認（check のみ）
 ```
 
-## Project-Local Naming Rules
+## プロジェクト独自の命名ルール
 
-Consumer project で独自 command/skill を追加する場合:
+適用プロジェクトで独自 command/skill を追加する場合:
 
-| Rule | 説明 |
+| ルール | 説明 |
 |------|------|
-| Namespace 衝突回避 | `agentdev` および `agentdev-*` は使用不可 |
+| 名前空間の衝突回避 | `agentdev` および `agentdev-*` は使用不可 |
 | kebab-case | skill 名は小文字・数字・ハイフンのみ（REQ-0103-011） |
-| 意味的命名 | project 名や domain 名を prefix に含めることを推奨 |
-| 独自 directory | 独自 skill は `.opencode/skills/{project}-*/` に配置 |
+| 意味に基づく命名 | プロジェクト名やドメイン名をプレフィックスに含めることを推奨 |
+| 独自ディレクトリ | 独自 skill は `.opencode/skills/{project}-*/` に配置 |
 
 例: プロジェクト `myapp` の場合:
 - command: `.opencode/commands/myapp/`
 - skill: `.opencode/skills/myapp-deployment/`
 
-## Recommended .gitignore (Consumer Repository)
+## 推奨 .gitignore 設定（適用プロジェクトリポジトリ）
 
-Consumer リポジトリで推奨される `.gitignore` 設定:
+適用プロジェクトリポジトリで推奨される `.gitignore` 設定:
 
 ```gitignore
-# AgentDevFlow checkout (clone target)
+# AgentDevFlow の clone 先
 .agentdev-plugin/
 
-# OpenCode runtime workspace
+# OpenCode の実行時作業領域
 .sisyphus/
 
-# AgentDevFlow junction-managed directories (auto-created by install script)
+# AgentDevFlow が junction 管理するディレクトリ（install script が自動作成）
 .opencode/commands/agentdev/
 .opencode/skills/agentdev-*/
 ```
 
-**注意**: `.agentdev/` は gitignore に**含めない**こと。`.agentdev/` は AgentDevFlow の domain state（intake, learning, backlog 等）を保持し、git 管理対象である。
+**注意**: `.agentdev/` は gitignore に**含めない**こと。`.agentdev/` は AgentDevFlow のドメイン状態（Intake, Learning, Backlog 等）を保持し、git 管理対象である。
 
-## Migration Guide
+## 移行ガイド
 
-### 新規 Consumer 導入手順
+### 新規適用プロジェクトの導入手順
 
-1. Consumer リポジトリに `scripts/` ディレクトリをコピー（または agent-dev-flow から取得）
+1. 適用プロジェクトリポジトリに `scripts/` ディレクトリをコピー（または agent-dev-flow から取得）
 2. `./scripts/install-consumer-opencode.ps1 -Mode apply` を実行
 3. `./scripts/check-consumer-opencode.ps1` で動作確認
-4. `.agentdev/` directory が存在することを確認（Intake/Learning 用）
+4. `.agentdev/` ディレクトリが存在することを確認（Intake/Learning 用）
 5. `.gitignore` に推奨エントリを追加
 
 ### 既存プロジェクトへの導入手順
 
 1. 既存の `.opencode/` 内容を確認
-2. `agentdev` namespace との衝突がないことを確認
+2. `agentdev` 名前空間との衝突がないことを確認
 3. `./scripts/install-consumer-opencode.ps1 -Mode apply` でインストール
 4. `./scripts/check-consumer-opencode.ps1` で整合性確認
 5. `.gitignore` を更新

@@ -14,11 +14,11 @@ AgentDevFlow で使う用語の定義。
 | case-update | ケース・アップデート | Issue の本文更新・コメント追加を行うコマンド |
 | intake-capture | インテイク・キャプチャ | 手動で気づき・課題を inbox に記録するコマンド |
 | intake-from-github | インテイク・フロム・ギットハブ | クローズ済み Issue/PR から改善候補を抽出するコマンド |
-| intake-promote | インテイク・プロモート | inbox の item をレビュー・採用・却下・保留判定し、promoted artifact に整形するコマンド |
-| learning-promote | ラーニング・プロモート | learning entry を分析・分類・昇華判定し、promoted artifact を生成するコマンド |
-| backlog-review | バックログ・レビュー | promoted artifact を分析・統合し、ユーザー承認後に RU を生成するコマンド |
+| intake-promote | インテイク・プロモート | inbox の項目をレビュー・採用・却下・保留判定し、採用済み成果物に整形するコマンド |
+| learning-promote | ラーニング・プロモート | Learning エントリを分析・分類・昇華判定し、採用済み成果物を生成するコマンド |
+| backlog-review | バックログ・レビュー | 採用済み成果物を分析・統合し、ユーザー承認後に RU を生成するコマンド |
 | docs-check | ドックス・チェック | ドキュメント・スキル・コマンドの整合性を検証するコマンド（旧称: integrity-check）。配布対象外コマンド `/repo/docs-check` に配置し、`/agentdev/*` コマンド体系とは区別する（ADR-0106, REQ-0108-156） |
-| inspect-docs | インスペクト・ドックス | docs 全体の意味整合性を検出し、inspect finding を出力するコマンド（旧称: req-restructure-review, docs-review, diagnostics-docs） |
+| inspect-docs | インスペクト・ドックス | docs 全体の意味整合性を検出し、検出事項（finding）を出力するコマンド（旧称: req-restructure-review, docs-review, diagnostics-docs） |
 | case-auto | ケース・オート | 最大自走モード。req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close を順次実行するコマンド |
 
 ## 成果物
@@ -26,12 +26,12 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 定義 |
 |------|------|
 | REQ | 要件定義の永続基準。`docs/requirements/REQ-{NNNN}.md` に配置 |
-| ADR | 取り返しのつかない技術判断の記録。現行 baseline は `docs/adr/ADR-01XX.md`（current collection）、再編前は `docs/adr/retired/ADR-00XX.md`（retired collection）。retired ADR は現行根拠として使用しない（REQ-0112-047, 048） |
+| ADR | 取り返しのつかない技術判断の記録。現行基準は `docs/adr/ADR-01XX.md`（現行の番号帯）、再編前は `docs/adr/retired/ADR-00XX.md`（廃止済み番号帯）。廃止済み ADR は現行根拠として使用しない（REQ-0112-047, 048） |
 | SPEC | 実装者が参照する現在仕様。`docs/specs/*.md` に配置 |
 | DOC-MAP | 文書探索・参照経路の入口。`docs/DOC-MAP.md` に配置 |
 | guides | 利用者向けの参照用読み物。`docs/guides/*.md` に配置 |
-| RU（Requirement Unit） | intake/learning の promoted artifact を統合した構造化成果物。`.agentdev/backlog/req-units/RU-*.md` に配置 |
-| promoted artifact | backlog-review の入力となる整形済み成果物。intake/learning それぞれの `promoted/` に配置 |
+| RU（Requirement Unit） | Intake/Learning の採用済み成果物を統合した構造化成果物。`.agentdev/backlog/req-units/RU-*.md` に配置 |
+| promoted artifact（採用済み成果物） | backlog-review の入力となる整形済み成果物。Intake/Learning それぞれの `promoted/` に配置 |
 | session-sourced RU | チャット内で合意形成済みの内容を直接保存した RU |
 | evaluation-report | learning-promote 内部で生成される分析レポート。同コマンドの昇華判定フェーズの入力として使用される |
 
@@ -39,9 +39,9 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| Intake パイプライン | 具体的な作業候補を収集・レビュー・促進するパイプライン |
+| Intake パイプライン | 具体的な作業候補を収集・レビュー・採用判断するパイプライン |
 | Learning パイプライン | 再発防止の知見を蓄積・分類・昇華するパイプライン |
-| Backlog パイプライン | intake/learning の promoted artifact を RU に統合するパイプライン |
+| Backlog パイプライン | Intake/Learning の採用済み成果物を RU に統合するパイプライン |
 | req/case パイプライン | 要件定義から実装・完了までを管理するパイプライン |
 
 ## 分類・状態
@@ -50,11 +50,11 @@ AgentDevFlow で使う用語の定義。
 |------|------|
 | work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。経路と docs 更新範囲を決定する。旧称 Pattern（A/B/C/D）は非推奨・廃止済み |
 | 実装分類（Implementation Pattern） | コマンド内部構造の分類軸（wall-session=対話セッション型 / file-pipeline=ファイル変換パイプライン型 / manager-orchestrator=状態機械統制型 / capture-only=データ収集型 / read-only-diagnostic=検査対象を直接修正しない診断型）。旧称 Pattern（A/B/C/D）= work_type とは別概念（REQ-0103-016, workflow-contracts.md） |
-| SSoT（Single Source of Truth） | 各フェーズでの信頼できる唯一の情報源 |
-| HITL（Human-in-the-loop） | ユーザーの確認を挟む判断ポイント |
+| SSoT（Single Source of Truth / 唯一の情報源） | 各フェーズでの信頼できる唯一の情報源 |
+| HITL（Human-in-the-loop / 人の判断を挟む） | ユーザーの確認を挟む判断ポイント |
 | マクロフェーズ | 壁打ち・構造的実行・レビュー完了の3段階 |
 | マイクロフェーズ | requirement / analyzed / created / in_progress / review / done の6状態（説明用ラベルであり、状態管理モデルではない。REQ-0112-023） |
-| Finding | docs-check や case-run で検出された乖離・発見事項 |
+| 検出事項（Finding） | docs-check や case-run で検出された乖離・発見事項 |
 
 ## Epic 関連
 
@@ -73,5 +73,5 @@ AgentDevFlow で使う用語の定義。
 | Skill | 判定基準・共通知識・宣言的ルールの一次参照。原本は `src/opencode/skills/agentdev-*`、配置先は `.opencode/skills/agentdev-*` に配置 |
 | Template | Issue/PR 本文の出力構造。Skill 配下 `templates/` に配置 |
 | Script | ガードレール・検査・補助処理の実行可能ロジック。Skill 配下 `scripts/` に配置 |
-| 原本（source） | `src/opencode/` 配下の canonical な定義ファイル。AgentDevFlow 本体の command/skill/template はここに配置される |
-| 配置先（projection） | `.opencode/` 配下の runtime 配布先。AgentDevFlow本体リポジトリでは junction/symlink による投影先、適用プロジェクトでは install script による配置先 |
+| 原本（source） | `src/opencode/` 配下の正規の定義ファイル。AgentDevFlow 本体の command/skill/template はここに配置される |
+| 配置先（projection） | `.opencode/` 配下の実行時の配布先。AgentDevFlow 本体リポジトリでは junction/symlink による投影先、適用プロジェクトでは install script による配置先 |
