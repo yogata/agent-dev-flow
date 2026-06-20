@@ -61,6 +61,7 @@
 | [quality-specs.md](specs/quality-specs.md) | 品質基準・検証ルール |
 | [quality-gates.md](specs/quality-gates.md) | QG-1〜QG-4 品質ゲート定義 |
 | [document-model.md](specs/document-model.md) | 文書種別の責務マトリックス |
+| [writing-style.md](specs/writing-style.md) | 文書執筆スタイルガイドライン |
 | [artifact-contracts.md](specs/artifact-contracts.md) | アーティファクト間契約 |
 | [integrity-contracts.md](specs/integrity-contracts.md) | 整合性検査分類フレームワーク |
 | [workflow-contracts.md](specs/workflow-contracts.md) | ワークフロー契約の雛形 |

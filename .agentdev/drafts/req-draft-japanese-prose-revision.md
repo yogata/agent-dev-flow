@@ -23,6 +23,7 @@ summary: |
 
 auto_gate:
   auto_ready: true
+  spec_consumed: true
   unresolved_questions: []
   unresolved_conflicts: []
   out_of_repo_operations: []

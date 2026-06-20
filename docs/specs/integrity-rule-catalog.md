@@ -915,13 +915,13 @@ Integrity 検査の全 rule を定義する catalog（REQ-0108-150, 151）。各
 | Field | Value |
 |-------|-------|
 | rule_id | IR-045 |
-| description | docs/SPEC/REQ/command/skill の日本語表現・文意整合を検査すること。`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate` 等の英字混じり抽象用語・読取専用セマンティクスについて、日本語説明の併記・許可/禁止操作の明示・具体許可操作への置換を検証する（REQ-0108, REQ-0140） |
+| description | docs/SPEC/REQ/command/skill の日本語表現・文意整合を検査すること。`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate` 等の英字混じり抽象用語・読取専用セマンティクス、および `active REQ`/`retired REQ`/`accepted ADR`/`active docs`（修飾語）、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`（複合技術語）、`fixture`/`variant`/`provider`/`baseline`（専門カタカナ語）について、日本語説明の併記・文意に基づく自然な日本語化・許可/禁止操作の明示・具体許可操作への置換を検証する（REQ-0108, REQ-0140, REQ-0101-061）。推奨訳は docs/specs/writing-style.md を参照 |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | 対象ファイル（`docs/**/*.md` ただし `docs/**/retired/**` は除外、`src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md`、`.opencode/commands/repo/**/*.md`、`.opencode/skills/repo-agentdev-integrity/**/*.md`）から検出対象語（`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate`）を検出。識別子（enum 値・frontmatter field・ファイル名・ディレクトリ名）の場合は周辺に日本語説明が存在するか確認。`read-only` 検出時は同一段落または直後のリストで許可出力・禁止操作が記述されているか検証。YAML 例中の `read_only` は具体の許可操作に置換されているか検証。英字のみの見出し・英字混じり抽象見出しを検出 |
+| detection_method | 対象ファイル（`docs/**/*.md` ただし `docs/**/retired/**` は除外、`src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md`、`.opencode/commands/repo/**/*.md`、`.opencode/skills/repo-agentdev-integrity/**/*.md`）から検出対象語（`read-only`/`Read-Only`/`read_only`/`read-only-diagnostic`/`advisor`/`advisory`/`architecture-affecting`/`Architecture advisory gate`、および `active REQ`/`retired REQ`/`accepted ADR`/`active docs`、`domain state`/`runtime command`/`command topology`/`provenance marker`/`upstream handoff`/`fixture detail`、`fixture`/`variant`/`provider`/`baseline`）を検出。識別子（enum 値・frontmatter field・ファイル名・ディレクトリ名）の場合は周辺に日本語説明が存在するか確認。`read-only` 検出時は同一段落または直後のリストで許可出力・禁止操作が記述されているか検証。YAML 例中の `read_only` は具体の許可操作に置換されているか検証。英字のみの見出し・英字混じり抽象見出しを検出。修飾語・複合技術語・専門カタカナ語の検出時は、文意に基づく自然な日本語化がされているか docs/specs/writing-style.md の指針に合致しているかを検証 |
 | affected_artifacts | [docs, REQ, SPEC, guides, commands, skills] |
-| related_req | [REQ-0108, REQ-0140] |
-| related_spec | [integrity-contracts.md] |
+| related_req | [REQ-0108, REQ-0140, REQ-0101] |
+| related_spec | [integrity-contracts.md, writing-style.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 高。英字混じり抽象用語の「抽象」判定・日本語説明充足度の判定に意味判断が必要。識別子として正当な英字語（enum 値等）は文脈判定で除外が必要 |
 | regression_test | (追加予定) |
