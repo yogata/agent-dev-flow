@@ -63,7 +63,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 
 ---
 
-## 2. Domain state 永続化（git add + commit + push）
+## 2. ドメイン状態永続化（git add + commit + push）
 
 `.agentdev/` 配下の変更を commit / push する共通手順。
 

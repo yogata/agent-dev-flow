@@ -66,7 +66,7 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 
 既存 REQ を APPEND/UPDATE 対象とする場合、または生成ドラフトの要件行数が 51 行を超える場合、`draft-meta.split-forecast`（target・metrics・signals・total・recommended_action・thresholds_ref）が記録されているか。閾値の正は `docs/specs/req-health-metrics.md` とする。
 
-- **fail**: 記録すべき SPLIT 予兆（要件行数 51+、関心分類数 2+、artifact 種別数 3+ のいずれか）があるのに `draft-meta.split-forecast` が未記録。
+- **fail**: 記録すべき SPLIT 予兆（要件行数 51+、関心分類数 2+、成果物種別数 3+ のいずれか）があるのに `draft-meta.split-forecast` が未記録。
 - **warn**: split-forecast は記録されているが推奨アクション（SPLIT 検討・SPLIT 推奨）に対するユーザー応答が未確認。
 - **pass**: SPLIT 予兆がない、または split-forecast が記録され推奨アクションがユーザーに提示されている。
 

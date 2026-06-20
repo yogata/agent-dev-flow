@@ -3,12 +3,12 @@ name: agentdev-case-run-execution-adapter
 description: "case-run external execution adapter. USE FOR: connecting case-run issue execution to an external execution harness (CLI subprocess), handling completed/blocked/failed results. DO NOT USE FOR: req-define architecture review, ADR judgment, workflow state management, or Issue completion checkbox evaluation."
 ---
 
-# case-run External Execution Adapter
+# case-run 外部実行アダプター（External Execution Adapter）
 
-case-run が1 Issue 単位の実装作業を実行担当サブエージェント経由で外部実行手段へ接続する際の adapter protocol を定義する知識ベース。ADR-0114 に基づく委譲境界を具現化する。対象を case-run に限定する。
+case-run が1 Issue 単位の実装作業を実行担当サブエージェント経由で外部実行手段へ接続する際のアダプタープロトコル（adapter protocol）を定義する知識ベース。ADR-0114 に基づく委譲境界を具現化する。対象を case-run に限定する。
 
 - **参照元**: `case-run`（実行担当サブエージェント起動時）
-- **特性**: adapter protocol の宣言的定義のみ提供する。Epic/Wave orchestration・worktree 管理・完了条件チェックボックス評価は本 skill の対象外。
+- **特性**: アダプタープロトコルの宣言的定義のみ提供する。Epic/Wave orchestration・worktree 管理・完了条件チェックボックス評価は本スキルの対象外。
 
 ## 実行モデル
 
@@ -23,7 +23,7 @@ case-run (orchestration)
 ```
 
 - **case-run 本体**: 1 Issue 単位でハーネスを CLI subprocess として起動し、result を処理する。実装実行そのものは行わない。`task(subagent_type=...)` は使用しない。
-- **実行担当サブエージェント**: 本 protocol に従いハーネス（CLI subprocess）と adapter する。1 Issue あたり1起動。仕様を再解釈・再設計しない adapter である。
+- **実行担当サブエージェント**: 本プロトコルに従いハーネス（CLI subprocess）とアダプターする。1 Issue あたり1起動。仕様を再解釈・再設計しないアダプターである。
 - **ハーネス（外部実行手段）**: 実装実行・検証・PR 本文作成を行う。最終結果は **PR URL** で受領する（透明）。plan artifact 等の中間成果物の内部構造には依存しない（REQ-0139-007）。
 
 ## 実行担当サブエージェントの責務
@@ -57,7 +57,7 @@ case-run (orchestration)
 
 ## 責務境界（非対象）
 
-本 protocol は以下を扱わない。各責務主体に委譲する:
+本プロトコルは以下を扱わない。各責務主体に委譲する:
 
 | 非対象 | 責務主体 |
 |--------|----------|
@@ -82,7 +82,7 @@ case-run (orchestration)
 
 ## Findings / Capture 配置
 
-本筋外の Findings / Capture 候補（intake / learning）は **PR 本文** の `## Findings / Capture候補` セクションに記述する。capture 境界の詳細は `agentdev-workflow-orchestration` を参照。実行担当サブエージェントは `.agentdev/intake/`・`.agentdev/learning/` を直接変更しない。
+本筋外の検出事項（Findings）/ Capture 候補（intake / learning）は **PR 本文** の `## Findings / Capture候補` セクションに記述する。capture 境界の詳細は `agentdev-workflow-orchestration` を参照。実行担当サブエージェントは `.agentdev/intake/`・`.agentdev/learning/` を直接変更しない。
 
 ## 外部成果物の取扱い
 
@@ -97,5 +97,5 @@ case-run (orchestration)
 
 ## See Also
 
-- **agentdev-workflow-orchestration**: subagent protocol・capture 境界
+- **agentdev-workflow-orchestration**: サブエージェントプロトコル・capture 境界
 - **agentdev-workflow-templates**: PR 本文・コメント SSoT のテンプレート構造

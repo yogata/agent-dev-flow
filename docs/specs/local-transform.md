@@ -7,7 +7,7 @@ updated: 2026-06-20
 
 # ローカル版 OpenCode 変換プロンプト
 
-> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。ローカル版 OpenCode を生成するための変換用プロンプト（`transform/generate.md`）・レビュー用プロンプト（`transform/review.md`）・変換仕様（`transform/spec.md`）の要件を定義する。実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0104）。REQ-0141 と ADR-0126 の詳細仕様を正とする。
+> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。ローカル版 OpenCode を生成するための変換用プロンプト（`transform/generate.md`）・レビュー用プロンプト（`transform/review.md`）・変換仕様（`transform/spec.md`）の要件を定義する。実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0104）。REQ-0141 と ADR-0126 の詳細仕様を原本とする。
 
 ## 目的
 
@@ -170,7 +170,7 @@ updated: 2026-06-20
 
 ## transform/spec.md（変換仕様）の要件
 
-`transform/spec.md` は変換プロンプト（`transform/generate.md`）とレビュープロンプト（`transform/review.md`）が参照する変換仕様を保持する。本 SPEC（`docs/specs/local-transform.md`）と `docs/specs/local-generation.md` が意味仕様の正本であり、`transform/spec.md` は実行時の変換対象一覧・ガードレール一覧・レポートフォーマットを集約した運用参照資料とする。
+`transform/spec.md` は変換プロンプト（`transform/generate.md`）とレビュープロンプト（`transform/review.md`）が参照する変換仕様を保持する。本 SPEC（`docs/specs/local-transform.md`）と `docs/specs/local-generation.md` が意味仕様の原本であり、`transform/spec.md` は実行時の変換対象一覧・ガードレール一覧・レポートフォーマットを集約した運用参照資料とする。
 
 `transform/spec.md` は少なくとも以下を含むこと。
 

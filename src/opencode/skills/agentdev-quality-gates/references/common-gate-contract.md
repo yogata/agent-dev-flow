@@ -1,4 +1,4 @@
-# Common Gate Contract
+# 共通ゲート契約
 
 QG-1〜QG-4 全 Gate が共通して従う契約を定義する。各 Gate の参照ファイルは本契約を前提とする。
 

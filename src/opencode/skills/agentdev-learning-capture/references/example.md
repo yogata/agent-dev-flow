@@ -1,4 +1,4 @@
-# Example Workflow
+# 実例ワークフロー
 
 **シナリオ1**: CI で lint エラーが発生し、テンプレート逸脱を修正した
 **シナリオ2**: git worktree 削除時に Permission denied リトライが必要だった
@@ -124,9 +124,9 @@
 
 ---
 
-## Full Pipeline Example (Complete 3-Layer Flow)
+## 全パイプライン実例（3層フロー全体）
 
-### Layer 1: Capture Phase (学びの記録)
+### Layer 1: Capture フェーズ（学びの記録）
 
 エージェントが13フィールド形式で `.agentdev/learning/inbox.md` に直接追記：
 
@@ -150,7 +150,7 @@
 （全13フィールド）
 ```
 
-### Layer 2: Analysis Phase (セマンティック分析と整理)
+### Layer 2: Analysis フェーズ（意味的分類と整理）
 
 ```
 /agentdev/learning-promote
@@ -163,7 +163,7 @@
   - ユーザー承認後、inbox.md の全エントリを archive/active.md（生きている learning プール）に移動
   - inbox.md をクリア
 
-### Layer 3: Promotion Phase (昇華判定とスタブ生成)
+### Layer 3: Promotion フェーズ（昇華判定とスタブ生成）
 
 → 実行内容（昇華判定フェーズ、引き続き learning-promote 内）:
   - evaluation-report.md の問題クラスを主入力として分析

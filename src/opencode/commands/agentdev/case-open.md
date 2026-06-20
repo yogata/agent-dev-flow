@@ -9,17 +9,17 @@ agent: sisyphus
 
 **draft-data 入力**: case-open は構造化 `draft-data`（`# draft-data` fenced YAML block）を入力として読み取る（REQ-0138-001, ADR-0124）。draft 全体の `agreed_items`・`artifact_actions`・`operation_units` を処理対象とし、OU ごとにスライスせず draft 全体の合意結果を取り扱う（REQ-0138-009）。`auto_gate.auto_ready` が false、または未解決質問・未解決衝突・repo外操作・停止理由が残る場合は停止する（REQ-0138-013）。`conflict_resolutions` に記録済みの衝突については同じ内容をユーザーへ再確認しない（REQ-0138-014）。
 
-## Input
+## 入力
 
 - req-defineで生成された要件doc（構造化 `draft-data` 形式: REQ-0138, ADR-0124。チェックボックス付き）
 
-## Output
+## 出力
 
 - GitHub Issue（ラベル付き、要件doc埋め込み）
 
-## Steps
+## 手順
 
-0. **upstream handoff 停止判定**: 要件docまたは RU に `agentdev_handoff: true` が含まれる場合、Issue を作成せず停止。agent-dev-flow repository への手動取り込み対象として報告。判定は `agentdev-workflow-lifecycle` に従う
+0. **前工程からの引き継ぎ停止判定**: 要件docまたは RU に `agentdev_handoff: true` が含まれる場合、Issue を作成せず停止。agent-dev-flow repository への手動取り込み対象として報告。判定は `agentdev-workflow-lifecycle` に従う
 
 0-1. **OU 選択ゲート**: ドラフトに `operation_units` セクションがある場合、処理対象 OU を決定する（REQ-0104-035〜037）:
      - OU ID が指定されている場合 → 指定された OU の req-save result を読み取り、その OU だけを Issue 化する
@@ -103,7 +103,7 @@ Epic flow は Step 2 または Step 3 のルーティングにより開始。マ
     - 単一REQ Epic → `templates/case-open/epic.md`
     - マルチREQ Epic → `templates/case-open/multi-req-epic.md`
 
-## Guardrails
+## ガードレール
 
 ### フェーズ制約
 - G01: ADR・specsの内容はIssue本文の生成に反映すること

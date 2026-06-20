@@ -3,7 +3,7 @@ name: agentdev-workflow-routing
 description: Provides review rejection handling flows and next-command inference rules for post-review scenarios. USE FOR: handling review NG results, determining next command after review rejection, classifying rejection types (spec-bug, impl-bug, scope-creep), or resolving Epic-related command inference. DO NOT USE FOR: general command execution, requirement analysis, or implementation planning.
 ---
 
-# Issue Post-Review Routing スキル
+# レビュー後ルーティングスキル
 
 agentdev系コマンドのレビューNG時の対応フロー・次コマンド推論ルールを提供する。
 

@@ -44,7 +44,7 @@ Command は判定ロジックを Skill の参照先に委ねる。Skill は Comm
 
 ## ディレクトリ構造
 
-### Self-hosting（AgentDevFlow 本体リポジトリ）
+### 本体リポジトリ（self-hosting）
 
 ```
 docs/
@@ -64,7 +64,7 @@ docs/
     inbox.md archive/active.md evaluation-report.md promoted/
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート
-.opencode/                        # 実行時の配置先（junction → src/opencode/）
+.opencode/                        # 実行時の配置先（ジャンクション → src/opencode/）
   commands/agentdev/             # Command 定義（AgentDevFlow 配布対象）
   commands/repo/                 # AgentDevFlow 本体リポジトリ専用コマンド（ADR-0106、配布対象外）
   skills/agentdev-*/             # Skill 定義（AgentDevFlow 配布対象）
@@ -80,7 +80,7 @@ scripts/
   drafts/                        # コマンドワークフローの作業用一時領域（明示的な引き継ぎ時のみ使用）
 ```
 
-### Consumer-with-agentdev（適用プロジェクト）
+### 適用プロジェクト（consumer-with-agentdev）
 
 ```
 .agentdev-plugin/                # agent-dev-flow の git clone 先（適用プロジェクト専用）
@@ -93,10 +93,10 @@ scripts/
   learning/                      # Learning パイプラインのドメイン状態
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート
-.opencode/                       # 実行時の配置先（junction → .agentdev-plugin/src/opencode/）
-  commands/agentdev/             # junction → .agentdev-plugin/src/opencode/commands/agentdev/
+.opencode/                       # 実行時の配置先（ジャンクション → .agentdev-plugin/src/opencode/）
+  commands/agentdev/             # ジャンクション → .agentdev-plugin/src/opencode/commands/agentdev/
   commands/{local}/              # プロジェクト独自コマンド（実ディレクトリ）
-  skills/agentdev-*/             # junction → .agentdev-plugin/src/opencode/skills/agentdev-*/
+  skills/agentdev-*/             # ジャンクション → .agentdev-plugin/src/opencode/skills/agentdev-*/
   skills/{local}-*/              # プロジェクト独自スキル（実ディレクトリ）
 scripts/
   install-consumer-opencode.ps1  # 適用プロジェクト用インストールスクリプト
@@ -121,7 +121,7 @@ scripts/
 | REQ ファイル | `/agentdev/req-save` | `/agentdev/case-open`, `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
 | Issue | `/agentdev/case-open` | `/agentdev/case-run`, `/agentdev/case-close` | なし（永続） |
 
-流れ: 採用済み成果物 / セッション由来 → RU → REQ ファイル / Issue → マージ → クローズ。RU 削除は `/agentdev/case-open` の永続化成功に限定する。
+流れは以下の通り。採用済み成果物 / セッション由来 → RU → REQ ファイル / Issue → マージ → クローズ。RU 削除は `/agentdev/case-open` の永続化成功に限定する。
 
 ## フェーズ体系
 
@@ -146,7 +146,7 @@ scripts/
 
 ## 状態モデル制約（REQ-0112）
 
-以下の制約が AgentDevFlow の状態モデルに適用される:
+以下の制約を AgentDevFlow の状態モデルに適用する。
 
 - REQ / SPEC の状態管理は Issue ラベル・GitHub Project で行う（REQ-0112-027）
 - intake promoted の route / status はディレクトリ配置で表現する（REQ-0112-028）
@@ -155,7 +155,7 @@ scripts/
 
 ## .agentdev/ の位置づけ
 
-`.agentdev/` は AgentDevFlow の正規のドメイン状態（永続的な管理情報）である（REQ-0112-024）:
+`.agentdev/` は AgentDevFlow の正規のドメイン状態（永続的な管理情報）である（REQ-0112-024）。
 
 - **ドメイン状態**: Intake / Learning / Backlog / 整合性のパイプライン状態を保持する
 - **配布物ではない**: 実行時配布物の一部ではなく、agent-dev-flow リポジトリ内の作業領域である

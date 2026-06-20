@@ -39,7 +39,7 @@ Epic Issue 本文内のステータス追跡テーブル（総数・進行中・
 
 `gh issue edit` で既存 Issue を更新する場合、更新前の本文を保存し、更新後に差分を比較する。
 
-1. 更新前に Issue 本文を安全な読み取り手順で取得し、一時ファイル（ランタイムワークスペース配下）に保存する（更新前スナップショット）。
+1. 更新前に Issue 本文を安全な読み取り手順で取得し、一時ファイル（実行時作業領域配下）に保存する（更新前スナップショット）。
 2. 更新内容をマージした新しい本文を生成し、`--body-file` / `-F` で書き込む。`--body "..."` 直接指定は `agentdev-gh-cli` により禁止。
 3. 更新後、再度本文を取得し、更新前スナップショットと比較する。意図した差分のみが反映され、意図しない削除・文字化け・セクション欠落が発生していないか確認する。
 4. `agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）を適用し、エンコーディング・Markdown 構造・テンプレート必須セクション・リポジトリ参照リンクを検証する。
@@ -49,7 +49,7 @@ Epic Issue 本文内のステータス追跡テーブル（総数・進行中・
 
 `gh issue create` / `gh issue edit` で `--body-file` / `-F` を使用する場合、ファイル内容と反映内容の一致を検証する。本手順は `agentdev-gh-cli` の WRITE 操作・VERIFY 操作と連携する。
 
-1. `agentdev-gh-cli` の WRITE 操作標準手順に従い、本文を一時ファイル（ランタイムワークスペース配下の `gh-temp-{timestamp}.md`）に UTF-8 (BOMなし)・LF 改行で書き出す。PowerShell の `Out-File` / `Set-Content` / `>` リダイレクトは禁止。OpenCode の Write tool または `[System.IO.File]::WriteAllText` + `UTF8Encoding($false)` を使用する。
+1. `agentdev-gh-cli` の WRITE 操作標準手順に従い、本文を一時ファイル（実行時作業領域配下の `gh-temp-{timestamp}.md`）に UTF-8 (BOMなし)・LF 改行で書き出す。PowerShell の `Out-File` / `Set-Content` / `>` リダイレクトは禁止。OpenCode の Write tool または `[System.IO.File]::WriteAllText` + `UTF8Encoding($false)` を使用する。
 2. `gh issue create -F {file}` または `gh issue edit {N} -F {file}` を実行する。
 3. Issue 本文を安全な読み取り手順で取得し、`agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）で検証する。
 4. 検証失敗時は `agentdev-gh-cli` のリトライロジック（同一内容リトライ → 内容再生成 → 停止・ユーザー報告）に従う。リトライ上限到達時は自動的な代替手段を実行せず、ユーザーに差分内容・試行段階・リトライ回数を報告して停止する。

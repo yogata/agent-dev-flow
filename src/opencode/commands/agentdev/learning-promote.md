@@ -1,34 +1,34 @@
 ---
-description: inbox.mdから正規化・分類・8軸評価・HITL確定を経てpromoted artifactを生成する
+description: inbox.mdから正規化・分類・8軸評価・HITL確定を経て採用済み成果物を生成する
 agent: sisyphus
 ---
 
-# 学びの正規化・評価・昇華判定と promoted artifact 生成
+# 学びの正規化・評価・昇華判定と採用済み成果物生成
 
-`.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化・問題クラス分類・8軸評価・廃棄判定・既存対策確認・HITL承認を経て promoted artifact を生成する。
+`.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化・問題クラス分類・8軸評価・廃棄判定・既存対策確認・HITL承認を経て採用済み成果物を生成する。
 
 **重要**: `.opencode/` への直接配置・直接反映は行わない。反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。旧 `learning-refine` の全機能を吸収済み（事前実行不要）。
 
-## Input
+## 入力
 
 - `.agentdev/learning/inbox.md`（必須）— 未処理の学びエントリ
 - `.agentdev/learning/archive/active.md`（任意）— 過去エントリ参照用
 
-## Output
+## 出力
 
 - `.agentdev/learning/evaluation-report.md` — 8軸評価レポート（評価根拠中間成果物）
-- `.agentdev/learning/promoted/{category}-{name}.md` — promoted artifact
+- `.agentdev/learning/promoted/{category}-{name}.md` — 採用済み成果物
 - `.agentdev/learning/archive/active.md` — inbox からの移動分を追記
 - `.agentdev/learning/inbox.md` — ヘッダーのみにクリア
 
-## Steps
+## 手順
 
-### Phase 1: Inbox Scan
+### フェーズ1: inbox スキャン
 
 1. **inbox.md 読込**: ファイルなし → エラー終了（「先に `agentdev-learning-capture` skill で学びを追加してください」）。`---` 区切りエントリをカウント、0件 → 「分析対象の学びがありません」と終了
 2. **archive/active.md 読込**: 存在すれば読込、不存在は空として扱う
 
-### Phase 2-5: Normalize → Classify → Evaluate → Dispose → HITL
+### フェーズ2-5: Normalize → Classify → Evaluate → Dispose → HITL
 
 **判定基準参照**: Step 3〜10 の判定基準・スコアリングルール・提示形式・承認フローは、全て `agentdev-learning-pipeline` の該当 Phase を参照。
 
@@ -41,13 +41,13 @@ agent: sisyphus
 9. **ユーザーへの判定結果提示**（→ agentdev-learning-pipeline を参照）
 10. **ユーザー承認**（→ agentdev-learning-pipeline を参照）
 
-### Phase 6: Execute + Git
+### フェーズ6: 実行と git 操作
 
 11. **実行前同期（git pull）**:
     - `git pull --ff-only` を実行
     - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
 
-12. **promoted artifact 生成**（staging領域のみ）:
+12. **採用済み成果物生成**（staging領域のみ）:
      - 出力先: `.agentdev/learning/promoted/{disposal-category}-{name}.md`
      - **`.opencode/` 直接書込禁止** / **`case-run` への直接受け渡し禁止**（`backlog-review` 経由で RU 化）
      - フォーマット: `agentdev-learning-pipeline` を参照
@@ -67,20 +67,20 @@ agent: sisyphus
     - Step 13-2 失敗 → inbox.md 変更せず、エラー内容を報告
 
 14. **昇華時 prune**（archive/active.md からの除去）:
-    - **prune 対象**: staged（promoted artifact 生成済み）/ rejected / duplicate のエントリのみ
+    - **prune 対象**: staged（採用済み成果物生成済み）/ rejected / duplicate のエントリのみ
     - **prune 非対象**: deferred / 未処理のエントリは残す
-    - **証拠保存**: staged エントリ除去時に promoted artifact の「元learning item / 根拠」セクションに保存
+    - **証拠保存**: staged エントリ除去時に採用済み成果物の「元learning item / 根拠」セクションに保存
     - 詳細は `agentdev-learning-pipeline` を参照
     - **実行手順**: 1) prune 対象特定 → 2) ユーザーに prune 計画提示 → 3) 承認時のみ実行 → 4) 該当エントリ除去
 
  15. **.agentdev 変更の commit と push**:
-     - `git diff --name-only` で `.agentdev/` 配下の変更を確認
-     - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
-      - **変更あり時**:
-         1. `git add` は `.agentdev/learning/` 配下のみを対象とする（REQ-0137-005）。並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする（REQ-0137-002）。`.agentdev/` 全体の一括スコープは禁止し、スイープ操作（`git add -A` / `git add .` 等）も禁止
-         2. commit message: `chore(agentdev): promote learning findings`
-         3. `git push` 実行
-         4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
+      - `git diff --name-only` で `.agentdev/` 配下の変更を確認
+      - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
+       - **変更あり時**:
+          1. `git add` は `.agentdev/learning/` 配下のみを対象とする（REQ-0137-005）。並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする（REQ-0137-002）。`.agentdev/` 全体の一括スコープは禁止し、スイープ操作（`git add -A` / `git add .` 等）も禁止
+          2. commit message: `chore(agentdev): promote learning findings`
+          3. `git push` 実行
+          4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
 
 16. **完了報告** → template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`。以下を含める:
     - 8軸評価サマリ（加重合計スコア分布）
@@ -88,9 +88,9 @@ agent: sisyphus
     - 後続ルート（`/agentdev/backlog-review`）
     - git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）
 
-## Guardrails
+## ガードレール
 
-- G01: `.opencode/` 直接反映禁止: promoted artifact は `.agentdev/learning/promoted/` のみに生成
+- G01: `.opencode/` 直接反映禁止: 採用済み成果物は `.agentdev/learning/promoted/` のみに生成
 - G02: `evaluation-report.md` は本コマンドが生成・管理: 外部コマンドの事前生成に依存しない
 - G03: `case-run` への直接受け渡し禁止: `/agentdev/backlog-review` 経由のみ
 - G04: 主入力は `inbox.md`: raw learning item の再分類は禁止
@@ -104,7 +104,7 @@ agent: sisyphus
 1. **Step 9-10**: 廃棄判定結果・8軸評価スコアの確認・修正・承認
 2. **Step 14**: prune 計画の承認
 
-## Error Handling
+## エラー処理
 
 | エラー | 対処 |
 |--------|------|
@@ -114,13 +114,13 @@ agent: sisyphus
 | ユーザーが承認しない | 「昇華をキャンセルしました」と報告して終了 |
 | 旧フォーマットパース失敗 | 当該エントリをスキップし警告出力、処理継続 |
 | staging領域書込失敗 | エラー内容を報告 |
-| archive/active.md prune 失敗 | promoted artifact は保持。prune エラー報告し手動 prune 案内 |
+| archive/active.md prune 失敗 | 採用済み成果物は保持。prune エラー報告し手動 prune 案内 |
 | archive/active.md 書込失敗 | inbox.md は変更しない。エラー内容を報告 |
 | git pull --ff-only 失敗 | 構造化エラー表示して停止。自動解消しない |
 | git push 失敗 | 構造化エラー表示。完了扱いにしない |
 
-## Artifact Lifecycle
+## 成果物ライフサイクル
 
-各成果物の役割・性格・lifecycle 詳細は `agentdev-learning-pipeline` を参照。
+各成果物の役割・性格・ライフサイクル詳細は `agentdev-learning-pipeline` を参照。
 
-**learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → promoted artifact 生成 → archive move → prune。promoted artifact は `/agentdev/backlog-review` 経由で RU 化後に `/agentdev/req-define` に合流する。
+**learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → 採用済み成果物生成 → archive move → prune。採用済み成果物は `/agentdev/backlog-review` 経由で RU 化後に `/agentdev/req-define` に合流する。

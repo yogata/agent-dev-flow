@@ -56,10 +56,10 @@ Step 3-2（既存REQ）および Step 10-2（生成ドラフト）で REQ 健全
 1. **要件行数**: 対象 REQ（または生成ドラフトの要件テーブル）の `^| REQ-NNNN-\d{3} |` に一致する行数を計測する。目的・適用範囲セクションの散文は除外する。
 2. **関心分類数**: 以下4シグナルの検出数を集計する（`agentdev-req-structure-diagnostics` スキルの SPLIT 観点に準拠）:
    - 関心対象（要件の主題となる対象領域）の複数混在
-   - 複数 artifact 種別の混在（command + skill + template 等）
+   - 複数成果物種別の混在（command + skill + template 等）
    - 複数 command family の混在
    - 複数 lifecycle 段階の混在
-3. **artifact 種別数**: `docs/specs/req-impact-map.md` の「影響する Artifact」列、または要件本文の対象 artifact 記述から集計する。新規 CREATE のドラフトで影響マップに未載の場合は要件本文から推定する。
+3. **成果物種別数**: `docs/specs/req-impact-map.md` の「影響する Artifact」列、または要件本文の対象成果物記述から集計する。新規 CREATE のドラフトで影響マップに未載の場合は要件本文から推定する。
 
 ### シグナル算出
 
@@ -67,7 +67,7 @@ Step 3-2（既存REQ）および Step 10-2（生成ドラフト）で REQ 健全
 |---|---|---|
 | 要件行数 | 0〜50 / 51〜80 / 81+ | +0 / +1 / +2 |
 | 関心分類数 | 0〜1 / 2+ | +0 / +1 |
-| artifact 種別数 | 1〜2 / 3+ | +0 / +1 |
+| 成果物種別数 | 1〜2 / 3+ | +0 / +1 |
 | SPEC分離基準違反（high-specificity） | 0 / 1以上 | +0 / +1（安定契約例外は対象外） |
 
 合計シグナルに基づく推奨アクション: 0〜1 → no-action/APPEND、2 → SPLIT 検討、3+ → SPLIT 推奨。

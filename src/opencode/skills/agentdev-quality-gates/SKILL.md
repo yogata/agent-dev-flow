@@ -42,7 +42,7 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 
 ## 適用範囲外のワークフロー
 
-以下の補助ワークフローは **runtime reference target ではない**。QG-1〜QG-4 を適用しない:
+以下の補助ワークフローは **実行時コマンドの参照対象ではない**。QG-1〜QG-4 を適用しない:
 
 - `inspect-*`（inspect-docs / inspect-skills / inspect-promote）
 - `intake-*`（intake-capture / intake-from-github / intake-promote）

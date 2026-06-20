@@ -7,17 +7,17 @@ agent: sisyphus
 
 要件docから req-save → spec-save → case-open → case-run → case-close を順次実行し、repo内変更に限りマージまで自走する。標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
 
-## Input
+## 入力
 
 - Issue番号（数値）または Issue URL: 既存Issue から case-run → case-close を自走する場合
 - 要件doc: 明示パス指定 / `.agentdev/drafts/req-draft-*.md` 単一自動検出 / セッション内要件doc（3段階優先順位・構造化 `draft-data` 形式: REQ-0138, ADR-0124）
 
-## Output
+## 出力
 
 - REQ/ADR artifact_actions がある場合: REQ/ADRファイル + GitHub Issue + 実装済みブランチ + PR + マージ済み + クローズ済み
 - artifact_actions に応じた各工程の出力（工程分岐は Step 3 参照）
 
-## Steps
+## 手順
 
 1. **入力解決**:
    - **実行開始時刻の記録（REQ-0114-082）**: 本 Step の冒頭（入力解決の最初の処理）で、case-auto の実行開始時刻を JST（Etc/GMT-9）・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録し、変数（`case_auto_started_at`）に保持する。この時刻は Step 7（停止時報告）および Step 8（完了報告）での所要時間算出の基準として使用する
@@ -99,7 +99,7 @@ agent: sisyphus
    - 次 OU の draft ファイルが存在しない場合: 停止し完了済み OU・未実行 OU・再開コマンドを報告する（REQ-0114-066）
    - 逐次OU処理中に停止条件（Step 7）を検出した場合: 完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する
 
-## Guardrails
+## ガードレール
 
 ### 自走境界
 - G01: 自走対象はrepoにファイルとして残る変更に限定する
@@ -129,7 +129,7 @@ agent: sisyphus
 ### Capture 整合制約
 - G17: case-auto は構成コマンド（case-run / case-close）の capture 責務境界に従う。case-auto 固有の capture 振る舞いは持たない。capture 境界の詳細は `agentdev-workflow-orchestration` を参照
 
-### Runtime path 制約
-- G11: 既存コマンド定義を読み込む際、source path を runtime path に読み替えてはならない。コマンド定義内のパス参照は記述された通りに解釈し、source path を runtime 参照先として使用しない
+### 実行時パス制約
+- G11: 既存コマンド定義を読み込む際、source path を実行時パスに読み替えてはならない。コマンド定義内のパス参照は記述された通りに解釈し、source path を実行時参照先として使用しない
 - G12: 委譲先コマンドの実行時 Read / Glob に source path 固定参照を含めない
 - G13: case-auto の capture 責務は委譲。構成コマンド（case-run / case-close）の capture 責務境界に従い、case-auto 固有の capture 振る舞いは持たない。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照

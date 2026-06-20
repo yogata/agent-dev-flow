@@ -7,11 +7,11 @@ source_rus: # optional: RU-* IDs that seeded this draft
 ---
 
 <!-- req_draft テンプレート（REQ-0138, ADR-0124）
-     このテンプレートは req-define が生成する構造化ハンドオフ成果物の原本である。
-     下流処理（req-save / spec-save / case-open / case-auto / case-run / case-close）の
-     正となる情報源は # draft-data 内の fenced YAML であり、人間可読 Markdown セクションではない。
-     soft contract（producer-side standard）であり、LLM 推論経由で消費される。
-     厳格 schema version・JSON Schema・validator は導入しない（ADR-0124）。 -->
+     このテンプレートは req-define が生成する構造化引き継ぎ成果物の原本である。
+     後続工程（req-save / spec-save / case-open / case-auto / case-run / case-close）が参照する
+     原本の情報源は # draft-data 内の YAML コードブロックであり、人間可読 Markdown セクションではない。
+     soft contract（生成元側標準）であり、LLM 推論経由で消費される。
+     厳格なスキーマバージョン・JSON Schema・バリデータは導入しない（ADR-0124）。 -->
 
 # draft-data
 
@@ -100,8 +100,8 @@ case_open_hints:
 
 # summary
 
-<!-- 【任意】 人間可読サマリー。下流処理の正としては扱われない（REQ-0138-002）。
-     処理の権威ある情報源は上記 # draft-data YAML block である。
+<!-- 【任意】 人間可読サマリー。後続工程の原本としては扱われない（REQ-0138-002）。
+     処理の原本は上記 # draft-data YAML ブロックである。
      検討経緯や採用しない方針は処理対象として残さない（REQ-0138-003）。 -->
 
 {合意内容の人間可読補足。検討経緯・不採用方針は含めない}

@@ -5,7 +5,7 @@ description: Diagnoses Command to Skill reference validity and Skill structure w
 
 # Inspect Skills
 
-Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（Command/Skill 定義ファイル）を直接修正せずに診断する。修正は実行せず、inspect finding、分類、根拠、推奨 route を提示する。
+Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（Command/Skill 定義ファイル）を直接修正せずに診断する。修正は実行せず、検出事項、分類、根拠、推奨 route を提示する。
 
 ## 検査対象を直接修正しない制約
 
@@ -13,17 +13,17 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（C
 - 診断結果はセッション内テキストで提示する
 - 修正案は route として提示し、実装・保存・自動整形は行わない
 
-## Inspect Finding Export
+## 検出事項のエクスポート
 
-診断結果を `inspect-promote` に引き継ぐ必要がある場合、`.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` に inspect finding を書き出すことができる。この finding は inspect lifecycle（`.agentdev/inspect/` inbox/promoted/archive）の対象であり、`inspect-promote` への参照専用中間成果物である。
+診断結果を `inspect-promote` に引き継ぐ必要がある場合、`.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` に検出事項を書き出すことができる。この検出事項は inspect lifecycle（`.agentdev/inspect/` inbox/promoted/archive）の対象であり、`inspect-promote` への参照専用中間成果物である。
 
-finding には以下を含める:
-- Summary
-- Scope
-- Findings（id, target, classification, evidence, recommended_route, confidence, unresolved_questions）
-- Initial Remediation Direction
-- Out of Scope
-- Suggested intake / learning route
+検出事項には以下を含める:
+- 概要（Summary）
+- 対象範囲（Scope）
+- 検出事項（Findings: id, target, classification, evidence, recommended_route, confidence, unresolved_questions）
+- 初期是正方針（Initial Remediation Direction）
+- 対象外（Out of Scope）
+- 推奨 intake / learning route
 
 ## 診断観点
 
@@ -67,9 +67,9 @@ finding には以下を含める:
 6. Command から Skill を参照する場合は Skill 名までに留め、内部見出しや Step 名を参照しない
 7. `USE FOR` に合致し、`DO NOT USE FOR` に衝突しない参照のみ妥当とする
 
-## Seed Cases
+## 初期確認候補
 
-初期レビューでは次の既知候補を優先的に確認する。候補は確定 finding ではなく、実ファイル読込後に判定する。
+初期レビューでは次の既知候補を優先的に確認する。候補は確定した検出事項ではなく、実ファイル読込後に判定する。
 
 | 対象 | 参照先 | 初期分類候補 |
 |------|--------|--------------|
@@ -83,7 +83,7 @@ finding には以下を含める:
 
 ## 出力形式
 
-各 inspect finding は次の形で報告する。
+各検出事項は次の形で報告する。
 
 ```markdown
 - Finding: [短い説明]
@@ -95,5 +95,5 @@ finding には以下を含める:
 
 ## See Also
 
-- **agentdev-skill-authoring**: Skill authoring quality criteria
-- **agentdev-command-authoring**: Command definition conventions
+- **agentdev-skill-authoring**: スキルオーサリングの品質基準
+- **agentdev-command-authoring**: コマンド定義の規約

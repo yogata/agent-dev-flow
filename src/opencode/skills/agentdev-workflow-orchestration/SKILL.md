@@ -3,9 +3,9 @@ name: agentdev-workflow-orchestration
 description: case-run の状態機械・サブエージェント protocol・self-healing loop・CI 対応 loop・1 Issue オーケストレーションの知識ベース。USE FOR: case-run の再開ポイント判定・自律修正ループ判定・CI 対応・subagent起動・障害伝播。DO NOT USE FOR: 単一Issue の基本的な Step 実行手順（case-run コマンド定義を参照）、work_type 判定（agentdev-workflow-lifecycle を参照）、乖離検出（agentdev-spec-compliance を参照）、子Issue 選択・Wave 構成生成（case-open / case-auto を参照）
 ---
 
-# case-run Orchestration Knowledge Base
+# case-run オーケストレーションナレッジベース
 
-case-run コマンドのオーケストレーション知識ベース。状態機械・サブエージェント protocol・self-healing loop・CI loop・エラー回復の判定基準と詳細構造を提供する。case-run は常に1 Issue のみを処理し、Epic 全体や Wave 一括の実行・Wave scheduling は扱わない（Wave 構成生成は case-open、子Issue 選択は case-auto の責務）。
+case-run コマンドのオーケストレーション知識ベース。状態機械・サブエージェントプロトコル・自律修正ループ・CI 対応ループ・エラー回復の判定基準と詳細構造を提供する。case-run は常に1 Issue のみを処理し、Epic 全体や Wave 一括の実行・Wave スケジューリングは扱わない（Wave 構成生成は case-open、子Issue 選択は case-auto の責務）。
 
 ## 状態機械
 
@@ -21,10 +21,10 @@ case-run は常に1 Issue のみを処理する（REQ-0130-010）。複数 Issue
 
 ### 準備フェーズの既知の制約（Windows + ジャンクション環境）
 
-- メインリポジトリで `sync-self-opencode.ps1` / `install-consumer-opencode.ps1` が作成する `.opencode/` 配下のジャンクション link は、git worktree（`.worktrees/{N}`）へ伝播しない。worktree 作成後に個別に再作成が必要になる場合がある。
+- メインリポジトリで `sync-self-opencode.ps1` / `install-consumer-opencode.ps1` が作成する `.opencode/` 配下のジャンクションリンクは、git worktree（`.worktrees/{N}`）へ伝播しない。worktree 作成後に個別に再作成が必要になる場合がある。
 - worktree 内でジャンクション依存の整合性検査（`source-projection-sync` 等）を実行すると、projection 側が存在せず失敗することがある。提出フェーズのローカル検証で整合性検査を含む場合は注意。
 - ジャンクション再作成は既存手順に準拠し、本スキルで新規手順は定義しない。詳細・復旧手順は `references/self-healing-and-errors.md` の該当セクションを参照。
-- この制約は Windows + ジャンクション環境固有。`resolvePathWithFallback`（REQ-0108-189）による runtime→source の部分フォールバックはあるが、source/projection 双方向比較を要する検査までは補完しない。
+- この制約は Windows + ジャンクション環境固有。`resolvePathWithFallback`（REQ-0108-189）によるランタイムパス→ソースパスの部分フォールバックはあるが、source/projection 双方向比較を要する検査までは補完しない。
 
 ## 参照先
 
@@ -32,11 +32,11 @@ case-run は常に1 Issue のみを処理する（REQ-0130-010）。複数 Issue
 
 | トピック | 参照先 |
 |----------|--------|
-| Capture 境界定義 | `references/capture-boundaries.md` — intake/learning 境界・Split Rule・コマンド責務境界 |
-| Self-Healing・CI Loop・エラー | `references/self-healing-and-errors.md` — 自律修正ループ・CI対応・エラー回復マップ |
-| サブエージェント Edit 安全手順 | `references/subagent-protocol.md` — oldString最小化・Read検証・大規模ファイル分割・AST-grep推奨 |
+| キャプチャ境界定義 | `references/capture-boundaries.md` — Intake/Learning 境界・分割ルール・コマンド責務境界 |
+| 自律修正ループ・CI 対応ループ・エラー | `references/self-healing-and-errors.md` — 自律修正ループ・CI対応・エラー回復マップ |
+| サブエージェント編集安全手順 | `references/subagent-protocol.md` — oldString最小化・Read検証・大規模ファイル分割・AST-grep推奨 |
 
-case-run コマンドの runtime projection path は `commands/agentdev/case-run.md`。command 本文内で case-run を参照する場合はこちらを使用。
+case-run コマンドのランタイムパス（projection 先）は `commands/agentdev/case-run.md`。command 本文内で case-run を参照する場合はこちらを使用。
 
 ## See Also
 

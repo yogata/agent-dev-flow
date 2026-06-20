@@ -3,13 +3,13 @@ name: agentdev-skill-authoring
 description: Provides quality criteria and best practices for authoring OpenCode SKILL.md files across five evaluation axes and four check protocols. USE FOR: creating new skills, improving existing skills, reviewing skill quality, designing skill structure, writing trigger descriptions, or planning progressive disclosure. DO NOT USE FOR: creating command definitions, general coding tasks, or simple documentation fixes.
 ---
 
-# Skill Authoring Best Practices
+# スキル作成ベストプラクティス
 
 OpenCodeのSKILL.mdを書く際の実践ガイド。スキルの品質を7つの観点から体系的に担保する。
 
 ## 1. 設計原則
 
-### Concise is Key
+### 簡潔さを優先する
 
 コンテキストウィンドウは共有リソース。LLMが既に知っていることの説明は省く:
 
@@ -32,7 +32,7 @@ Git is a version control system that tracks changes in source code.
 Commits are snapshots of your repository at a point in time...
 ```
 
-### Degrees of Freedom
+### 自由度
 
 タスクの脆さと変動性に合わせて指示の具体的レベルを調整する:
 
@@ -65,7 +65,7 @@ Do not modify the command or add additional flags.
 4. Verify adherence to project conventions
 ```
 
-### Token Budget Awareness
+### トークン予算管理
 
 コンテキストウィンドウは有限リソース。定量的な予算管理で品質を担保:
 
@@ -78,7 +78,7 @@ Do not modify the command or add additional flags.
 トークン数の見積もり: 英語は約4文字≈1 token、日本語は約1.5文字≈1 token。実測推奨。
 予算超過の兆候: 400行超で分割検討、同セクション反復参照は統合、未アクセスファイルは削除検討。
 
-### Line Count Governance
+### 行数ガバナンス
 
 SKILL.md の行数が **500行を超過** した場合、`references/` サブディレクトリへの抽出が **必須** となる。
 
@@ -105,7 +105,7 @@ SKILL.md の行数が **500行を超過** した場合、`references/` サブデ
 
 ## 2. スキル仕様
 
-### Naming Conventions
+### 命名規則
 
 **動名詞形（gerund form）** を推奨。実行する活動を明確に示す:
 
@@ -116,11 +116,11 @@ SKILL.md の行数が **500行を超過** した場合、`references/` サブデ
 
 ルール: 小文字・数字・ハイフンのみ。最大64文字。
 
-### Writing Effective Descriptions
+### 効果的な description の記述
 
 description は **3人称** で書く（システムプロンプトに注入されるため）。何をするか + いつ使うかの両方を含める。100+のスキルから正しいものを選ぶために十分な詳細が必要。descriptionはスキル選択の要。
 
-### Trigger Design
+### トリガー設計
 
 description内に `USE FOR:` / `DO NOT USE FOR:` を埋め込む。agentskills.ioのde facto標準。`WHEN:` も可（Microsoft sensei形式）。
 
@@ -137,7 +137,7 @@ description: Helps with documents
 - **Negative triggers** (`DO NOT USE FOR:`): 誤選択を防ぐ除外条件を明記
 - トリガーはdescriptionテキスト内に記述（frontmatterの別フィールドにはしない）
 
-### Trigger Convention（USE FOR / DO NOT USE FOR 表記規約）
+### トリガー表記規約（USE FOR / DO NOT USE FOR）
 
 `USE FOR:` / `DO NOT USE FOR:` は skill description 内に **必須** で記述する。
 
@@ -171,7 +171,7 @@ description: Helps with documents
 
 ## 3. 構造設計
 
-### Complexity Classification
+### 複雑度分類
 
 3段階の複雑度に応じて構造とトークン予算を調整する:
 
@@ -183,7 +183,7 @@ description: Helps with documents
 
 デフォルトは **simple**（200行以内が最善）。複数の独立した関心事があれば **moderate**。ドメイン横断で複数モジュールが必要な場合のみ **detailed**。
 
-### Progressive Disclosure
+### 段階的開示
 
 SKILL.md は目次として機能し、詳細は必要に応じて読み込む:
 
@@ -201,11 +201,11 @@ skill/
 - **Domain-specific Organization**: ドメイン別ファイル、質問に応じて該当ドメインのみ読み込み
 - **Conditional Details**: 基本はSKILL.md内、高度な内容は別ファイル
 
-### Avoid Deep Nesting
+### 深いネストの回避
 
 参照は **SKILL.mdから1階層まで**。深いネストは部分的な読み込みを引き起こす。
 
-### Structure Longer Reference Files
+### 長い参照ファイルの構造化
 
 100行を超える参照ファイルには目次を付ける。
 
@@ -215,56 +215,56 @@ skill/
 
 | 軸 | 定義 | 評価基準 | よくある失敗 |
 |----|------|----------|-------------|
-| **Clarity** | 指示が一意に解釈可能 | 各セクションが単一の明確な目的を持つ | 複数の意味に取れる表現 |
-| **Completeness** | 対象複雑度に必要な情報が存在 | ワークフローに欠落ステップがない | 「詳細は別途」で参照先が空 |
-| **Trigger Precision** | USE FOR / DO NOT USE FOR が実際の選択場面と一致 | 偽陽性・偽陰性が少ない | 抽象的すぎるトリガー |
-| **Scope Coverage** | 内容が定義済みスコープ内に収まる | 他スキルの領域に侵出していない | スコープクリープ |
-| **Anti-Pattern Detection** | 既知のアンチパターンが存在しない | 不要な説明、深いネストがない | セクション7のアンチパターン一覧にある問題 |
+| **明確性** | 指示が一意に解釈可能 | 各セクションが単一の明確な目的を持つ | 複数の意味に取れる表現 |
+| **完全性** | 対象複雑度に必要な情報が存在 | ワークフローに欠落ステップがない | 「詳細は別途」で参照先が空 |
+| **トリガー精度** | USE FOR / DO NOT USE FOR が実際の選択場面と一致 | 偽陽性・偽陰性が少ない | 抽象的すぎるトリガー |
+| **スコープ範囲** | 内容が定義済みスコープ内に収まる | 他スキルの領域に侵出していない | スコープクリープ |
+| **アンチパターン検出** | 既知のアンチパターンが存在しない | 不要な説明、深いネストがない | セクション7のアンチパターン一覧にある問題 |
 
 ## 5. レビュープロトコル
 
 4つの観点でスキル品質をチェックする:
 
-### 5.1 Frontmatter Check
+### 5.1 frontmatter チェック
 
 - [ ] nameが命名規則に従っている（kebab-case、gerund form推奨）
 - [ ] descriptionにトリガー（USE FOR / DO NOT USE FOR または WHEN）が含まれている
 - [ ] descriptionが3人称で書かれている
 - [ ] frontmatterフィールドはnameとdescriptionのみ（拡張フィールドを追加しない）
 
-### 5.2 Budget Check
+### 5.2 予算チェック
 
-- [ ] 行数 ≤500行（超過時は `references/` への抽出が必須 — Section 1 Line Count Governance 参照）
+- [ ] 行数 ≤500行（超過時は `references/` への抽出が必須 — 第1章 行数ガバナンス 参照）
 - [ ] 推定トークン数が複雑度の予算内（simple: <2K、moderate: <4K、detailed: <5K）
 - [ ] 複雑度に対してSKILL.mdが大きすぎない（simpleなのに300行等）
 
-### 5.3 Structure Check
+### 5.3 構造チェック
 
-- [ ] Progressive disclosureが適用されている
+- [ ] 段階的開示が適用されている
 - [ ] 参照深度が1階層まで
 - [ ] 複雑度分類が内容に合っている
 - [ ] 100行超の参照ファイルに目次がある
 
-### 5.4 Advisory Check
+### 5.4 助言チェック
 
 - [ ] 参照モジュール数が適切（moderate: 2-3、detailed: 3-5）
 - [ ] 過度な具体性（環境固有のハードコード等）がない
 - [ ] 手続き的コンテンツがワークフローセクションに配置されている
 - [ ] 用語が一貫している
 
-### 5.5 Subagent Edit Safety
+### 5.5 サブエージェント編集安全性
 
-Subagent に編集を委譲する場合、REQ-0118-001 / REQ-0118-002 および Issue #653/#655/#656 の再発防止として、以下を満たすこと:
+サブエージェントに編集を委譲する場合、REQ-0118-001 / REQ-0118-002 および Issue #653/#655/#656 の再発防止として、以下を満たすこと:
 
-- **Worktree 内制約**: Subagent は worktree root 外のファイルを編集してはならない。編集対象は worktree root からの相対パスで指定し、worktree 外へのパス遷移を防止しなければならない
+- **Worktree 内制約**: サブエージェントは worktree root 外のファイルを編集してはならない。編集対象は worktree root からの相対パスで指定し、worktree 外へのパス遷移を防止しなければならない
 - **パスプレフィクス確認**: 編集操作の前に、対象パスが worktree root からの相対パスであることを検証しなければならない。絶対パスや worktree 外パスを使用してはならない
 - **ファイル存在確認**: 編集対象ファイルの存在を事前に確認しなければならない。存在しないファイルへの edit 操作を行ってはならない
 
-Source path と runtime path の混同を防止するため、`src/opencode/...`（source path）と `.opencode/...`（runtime path）を明確に区別すること。Command / skill 定義内のパス参照は記述された通りに解釈し、source path を runtime 参照先として使用してはならない。
+ソースパスとランタイムパスの混同を防止するため、`src/opencode/...`（ソースパス）と `.opencode/...`（ランタイムパス）を明確に区別すること。Command / skill 定義内のパス参照は記述された通りに解釈し、ソースパスをランタイムパスの参照先として使用してはならない。
 
 ## 6. 開発ワークフロー
 
-### Iterative Development（最も効果的なプロセス）
+### 反復開発（最も効果的なプロセス）
 
 1. **スキルなしでタスク完了** — 繰り返し提供したコンテキストに注目
 2. **再利用可能なパターンを特定** — 表名、フィルタリングルール、共通クエリ
@@ -276,7 +276,7 @@ Source path と runtime path の混同を防止するため、`src/opencode/...`
 
 観察すべきポイント: 予期しない読み込み順序→構造が直感的でない、参照見落とし→リンクを明確に、同セクション反復→本体に移す、未アクセスファイル→不要かも。
 
-### Feedback Loop
+### フィードバックループ
 
 「バリデート → 修正 → 繰り返し」のパターンで品質を担保:
 
@@ -285,19 +285,19 @@ Source path と runtime path の混同を防止するため、`src/opencode/...`
 3. 問題があれば該当セクションを特定、SKILL.mdを修正、別セッションで再テスト
 4. **全項目パスしたら完了**
 
-### Build Evaluations First
+### 評価先行構築
 
 豊富なドキュメントを書く前に評価を作成する:
 
 1. **ギャップ特定**: スキルなしで代表タスクを実行し、失敗を記録
 2. **評価作成**: ギャップをテストする3つのシナリオを作成
-3. **ベースライン測定**: スキルなしでの性能を計測
+  3. **基準測定**: スキルなしでの性能を計測
 4. **最小限の指示を書く**: ギャップを埋める分だけのコンテンツを作成
-5. **反復**: 評価を実行、ベースラインと比較、洗練
+  5. **反復**: 評価を実行、基準と比較、洗練
 
-### Common Patterns
+### 共通パターン
 
-#### Template Pattern
+#### テンプレートパターン
 
 **Strict**（APIレスポンスやデータフォーマット向け）:
 ````markdown
@@ -333,7 +333,7 @@ description: [What + USE FOR + DO NOT USE FOR]
 Adapt sections as needed.
 ````
 
-#### Conditional Workflow Pattern
+#### 条件付きワークフローパターン
 
 分岐ポイントで意思決定をガイド:
 
@@ -343,7 +343,7 @@ Adapt sections as needed.
    **Multiple domains or over 200 lines?** → Split into separate files
 ```
 
-## 7. Anti-Patterns
+## 7. アンチパターン
 
 | アンチパターン | 問題 | 修正 |
 |---------------|------|------|
@@ -356,15 +356,15 @@ Adapt sections as needed.
 | 過度な具体性 | 環境変更で破綻 | 汎用的な記述にし環境依存は変数化 |
 | frontmatterの拡張 | 互換性リスク | nameとdescriptionのみに制限 |
 
-### Avoid Time-sensitive Information
+### 時間依存情報の回避
 
 期限付きの情報は履歴セクションで管理する（時期別の分岐はアンチパターン）。
 
-### Use Consistent Terminology
+### 用語の一貫性
 
 一つの用語を決めてスキル全体で一貫して使用。
 
-## 8. Command / Skill 境界
+## 8. コマンドとスキルの境界
 
 Skill の品質基準は本スキルの範囲とする。Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（`docs/specs/artifact-contracts.md`）を参照。Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
 
@@ -387,10 +387,10 @@ Skill の品質基準は本スキルの範囲とする。Command に何を置き
 新規コンテンツをどこに配置するかの判断フロー:
 
 ```
-Q1: runtime 配布物で個別プロジェクトで実行されるか？
+Q1: 実行時配布物で個別プロジェクトで実行されるか？
   → Yes: Q2 へ / No: Q5 へ（authoring-only）
 
-Q2: 宣言的ルール・判断基準・domain knowledge か？
+Q2: 宣言的ルール・判断基準・ドメイン知識 か？
   → Yes: Skill / No: Q3 へ
 
 Q3: 決定的でテスト可能な処理ロジックか？
@@ -413,7 +413,7 @@ Q7: 人間向けナビゲーション・案内か？
 
 | 分岐 | 判定基準 | 例 |
 |---|---|---|
-| runtime 配布物 | 個別プロジェクトで command/skill 実行時に必要 | 判断基準、テンプレート、検査スクリプト |
+| 実行時配布物 | 個別プロジェクトで command/skill 実行時に必要 | 判断基準、テンプレート、検査スクリプト |
 | Skill | 再利用可能、宣言的、複数 command から参照可能 | フェーズ体系、命名規則、状態遷移 |
 | Script | 入力が同じなら出力も同じ。テスト可能 | 採番、validation、INDEX 生成 |
 | Template | 変数置換で使用。ロジックなし | Issue/PR 本文、コメント |
@@ -421,14 +421,14 @@ Q7: 人間向けナビゲーション・案内か？
 | ADR | 「なぜその決定をしたか」の記録 | 技術選定、方針変更 |
 | Guide | 人間向けの案内・説明 | ワークフロー概要、クイックスタート |
 
-**注意**: skill `references/` は runtime 配布物のみを含める（現在は SPEC system.md で規定）。authoring-only 資料は `references/` に含めない。
+**注意**: skill `references/` は実行時配布物のみを含める（現在は SPEC system.md で規定）。authoring-only 資料は `references/` に含めない。
 
 配置判断の補強:
 - Command 固有の実行手順（Issue 作成・保存・削除・完了報告）は Skill 化せず Command に置く
 - 出力本文や固定文言は Template、決定的でテスト可能な検査は Script に置く
 - 操作安全手順は、複数 Command から再利用される場合のみ操作用 Skill として切り出す
 
-## 10. Skill 粒度と参照妥当性
+## 10. スキル粒度と参照妥当性
 
 Skill は、同一関心・同一責任境界・同一判断モデルを共有し、矛盾しない `USE FOR` / `DO NOT USE FOR` で説明できる単位とする。
 

@@ -5,35 +5,35 @@ agent: sisyphus
 
 # inspect-skills
 
-Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せずに診断し、finding、分類、根拠、推奨 route を提示する。診断結果は `.agentdev/inspect/inbox/` へ出力する。
+Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せずに診断し、検出事項、分類、根拠、推奨 route を提示する。診断結果は `.agentdev/inspect/inbox/` へ出力する。
 
 ## 基本原則: 診断専用（検査対象を直接修正しない）
 
-診断を基本とし、許可される side effect は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ。
+診断を基本とし、許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ。
 
 - 診断結果の提示
 - 根拠と推奨 route の提示
-- canonical docs 変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・Issue作成・PR作成・RU保存・branch・worktree 操作の禁止
+- 正規文書変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・Issue作成・PR作成・RU保存・branch・worktree 操作の禁止
 
-## Input
+## 入力
 
 - Command 定義ファイル群
 - Skill 定義ファイル群
 - 必要に応じて関連する template / reference / script ファイル群
 
-## Output
+## 出力
 
 - 診断レポート（セッション内テキスト出力）
-- finding リスト（対象、観点、分類、根拠、推奨 route）
-- `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md`（finding file 出力）
+- 検出事項リスト（対象、観点、分類、根拠、推奨 route）
+- `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md`（検出事項ファイル出力）
 
-## Steps
+## 手順
 
 1. **診断対象の読込**: Command / Skill 定義を読み込み、Command→Skill 参照、Skill frontmatter、本文構造、references 利用、template / script 参照を把握する
 2. **各診断観点の評価**: `agentdev-inspect-skills` に従い、参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存を評価する
-3. **分類**: finding ごとに診断分類ラベルを付与する
+3. **分類**: 検出事項ごとに診断分類ラベルを付与する
 4. **route 提示**: 修正は実行せず、推奨 route を提示する
-5. **finding 出力**: finding を `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` へ出力
+5. **検出事項出力**: 検出事項を `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` へ出力
 6. **実行前同期（git pull --ff-only）**:
     - `git pull --ff-only` を実行
     - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
@@ -47,18 +47,18 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
        4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
 8. **完了報告**: 完了報告 template に従って出力
 
-## Guardrails
+## ガードレール
 
 - G01: ファイルを変更・作成・削除しない。ただし `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成は例外として許可する
 - G02: GitHub Issue/PR を作成・更新しない
-- G03: RU、intake、learning、backlog artifact を保存しない
+- G03: RU、intake、learning、backlog 成果物を保存しない
 - G04: commit / push は `.agentdev/inspect/` 配下の永続化のみ許可。branch / worktree 操作は禁止
 - G05: 自動修正せず、推奨 route の提示に留める
 
-## Error Handling
+## エラー処理
 
 | エラー | 対処 |
 |--------|------|
 | 対象ファイルが存在しない | 該当カテゴリを空として扱い、警告を出力 |
 | ファイル読込失敗 | 該当ファイルをスキップし、警告を出力 |
-| 参照先 Skill が存在しない | finding として報告し、canonical name の確認を推奨 |
+| 参照先 Skill が存在しない | 検出事項として報告し、canonical name の確認を推奨 |

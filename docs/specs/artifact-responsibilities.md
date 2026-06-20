@@ -1,10 +1,10 @@
-# Artifact Responsibility Table
+# 成果物責任表
 
-各成果物種別の正規所有者（canonical owner）と責務を定義する（REQ-0103-057）。
+各成果物種別の原本所有者（`canonical owner`）と責務を定義する（REQ-0103-057）。
 
 ## 成果物責任表
 
-| Artifact | Canonical Owner | Source Location | Runtime Location | 責務 |
+| 成果物 | Canonical Owner | Source Location | Runtime Location | 責務 |
 |----------|----------------|-----------------|------------------|------|
 | Command 定義 | `src/opencode/commands/agentdev/` | 原本優先 | `.opencode/commands/agentdev/` | ユーザー向け入口、入出力、ガードレール、高レベル Steps |
 | Skill 定義 | `src/opencode/skills/` | 原本優先 | `.opencode/skills/` | 再利用可能な判断基準、ドメイン知識 |
@@ -28,7 +28,7 @@
 2. **Skill は再利用可能**: 共通判断基準・ドメイン知識（REQ-0103-003）
 3. **Template は構造のみ**: 出力フォーマット・プレースホルダー（REQ-0103-005）
 4. **Script は決定的**: テスト可能・再現可能（REQ-0103-006）
-5. **原本優先（Source first）**: 正規原本（canonical source）は `src/opencode/`、実行時は `.opencode/` 配置先（projection）（ADR-0105）
+5. **原本優先（Source first）**: 原本（`canonical source`）は `src/opencode/`、実行時は `.opencode/` 配置先（`projection`）（ADR-0105）
 
 ## 親エージェント / サブエージェント責務
 

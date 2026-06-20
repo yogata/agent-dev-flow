@@ -1,6 +1,6 @@
 # 文書種別責務・配置判定
 
-> **正本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)「文書種別責務」「移送判断」。本ファイルは運用ビュー（判定フロー・チェックリスト）である。
+> **原本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)「文書種別責務」「移送判断」。本ファイルは運用ビュー（判定フロー・チェックリスト）である。
 
 ## 文書種別の責務
 

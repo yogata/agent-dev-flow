@@ -3,24 +3,24 @@ description: 未分類の変更候補を手動入力から intake item として
 agent: sisyphus
 ---
 
-# Intake Capture（手動入力）
+# Intake 取り込み（手動入力）
 
 ユーザーの手動入力から、未分類の作業候補・不整合・規約違反・未回収課題を intake item として作成し、`.agentdev/intake/inbox/` に保存する。
 
 **このコマンドは保存専用である。** GitHub Issue の作成・採用可否の判断は行わない。作業知見だけの内容は対象外である（`agentdev-workflow-orchestration` skill の Split Rule を参照）。
 
-## Input
+## 入力
 
 - ユーザーの自然言語による変更候補の記述
 - 任意で観測元・影響・判断保留事項の指定
 
-## Output
+## 出力
 
 - `.agentdev/intake/inbox/YYYY-MM-DD-{topic-slug}.md` に保存された intake item
 
 ## Intake Item 形式
 
-intake item は以下の推奨標準形に従う Markdown artifact とする。workflow 管理用の frontmatter・状態フィールド・重複排除キーは持たない。
+intake item は以下の推奨標準形に従う Markdown 成果物とする。workflow 管理用の frontmatter・状態フィールド・重複排除キーは持たない。
 
 ```markdown
 # {タイトル}
@@ -42,12 +42,12 @@ intake item は以下の推奨標準形に従う Markdown artifact とする。w
 ```
 
 **セクションに関する制約**:
-- 各セクションの見出し名は固定しない。ユーザーの入力に合わせて適切に整理する
+- 各セクションの見出し名は固定しない。ユーザーの入力に合わせて整理する
 - 必須セクション・省略不可セクションを設けない
 - 内容がないセクションを形式維持のためだけに作成しない
 - frontmatter・状態値・メタデータフィールドを必須にしない
 
-## Steps
+## 手順
 
 1. **入力の受領**: ユーザーから変更候補の内容を受け取る。自然言語で記述された内容をそのまま取り扱う。
 
@@ -78,14 +78,14 @@ intake item は以下の推奨標準形に従う Markdown artifact とする。w
 
 5. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-capture/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
-## Error Handling
+## エラー処理
 
 | エラー | 対処 |
 |--------|------|
 | git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
 | git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
 
-## Guardrails
+## ガードレール
 
 ### 責務境界
 - G01: GitHub Issue の作成を行わない（`case-open` が担当）
@@ -96,8 +96,8 @@ intake item は以下の推奨標準形に従う Markdown artifact とする。w
 - G06: learning item の保存・分類・昇華を担当しない。再発防止知見のみの観測は `/agentdev/learning-capture` に委ねる
 
 ### 形式制約
-- G07: workflow 管理 artifact として扱わない
-- G08: frontmatter・状態値・重複排除キー・後続 artifact 参照を必須にしない
+- G07: workflow 管理成果物として扱わない
+- G08: frontmatter・状態値・重複排除キー・後続成果物参照を必須にしない
 - G09: 特定セクションを必須セクションとして扱わない
 - G10: review 結果を item に書き込まない
 
