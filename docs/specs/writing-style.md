@@ -1,6 +1,6 @@
 ---
 title: 文書執筆スタイルガイドライン
-status: draft
+status: accepted
 created: 2026-06-20
 updated: 2026-06-20
 ---
