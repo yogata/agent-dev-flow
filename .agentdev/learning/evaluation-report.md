@@ -1,224 +1,385 @@
 # 評価レポート
 
 ## メタデータ
-- **実行日時**: 2026-06-17 (JST)
-- **対象エントリ数**: 10件（inbox: 5件, archive: 5件）
-- **問題クラス数**: 1（未分類のみ - 全エントリが単独問題クラス）
+- **実行日時**: 2026-06-21 (JST)
+- **対象エントリ数**: 16件（inbox: 11件, archive: 5件）
+- **問題クラス数**: 0（厳密基準でクラスタ形成なし、全エントリ未分類）
 
 ## 分析サマリ
 
 ### 正規化結果
-- inbox 全5エントリが新13フィールドフォーマット準拠（タイトル日付プレフィックスなしは非ブロッキング軽微ドリフト）
-- 旧フォーマットからの変換不要
+- inbox 全11エントリは旧フォーマット（状況 / 学び / 再発防止 の3フィールド形式）
+- 正規化マッピング（解析時のみ適用、元ファイル不改修）:
+  - `状況` → `問題事象`
+  - `学び` → `根本原因` + `予防策候補`（文脈で分割）
+  - `再発防止` → `自律対応内容` + `予防策候補`
+- 旧フォーマットに存在しないフィールド（発生局面/検知方法/ユーザー確認有無/ADR-REQ-spec影響/横展開観点/再発条件/想定反映先）は空文字（推測補完しない）
 
 ### 問題クラス分類結果
-- **多エントリクラスタ**: 0件（最小クラスタサイズ=2に満たず）
-- **未分類（単独エントリ）**: 10件（inbox 5件 + archive 5件）
-- 全エントリが異なる (根本原因 + 再発条件 + 予防策) を持つため、クラスタ形成なし
+- **厳密基準（根本原因+再発条件+予防策 が同一）でのクラスタ**: 0件
+- **未分類（単独エントリ）**: 16件（inbox 11件 + archive 5件）
+- inbox と archive の間でも同一問題クラスを形成する組合せなし
+- 関連テーマで3つの promoted artifact にグループ化（後述）
 
-### 既存対策確認サマリ（inbox 5件に対し explore agent x5 で照会）
+### 既存対策確認サマリ（inbox 11件に対し explore agent x4 で照会）
 
 | # | エントリ | 確認対象 | 結果 | ギャップ分類 |
 |---|---------|---------|------|-------------|
-| 1 | worktree junction integrity | workflow-orchestration, check_integrity.ts, AGENTS.md | partial | application miss |
-| 2 | RFC2119 retired REQ historical mention | check_integrity.ts RFC2119 regex | partial | guardrail insufficiency（ただし影響度極低） |
-| 3 | REQ range glob verification | req-analysis, workflow-orchestration, req-define, case-run | no | fix gap |
-| 4 | case-close duplicate file check | case-close.md, git-common-procedures.md | no（特定重複チェック） | fix gap |
-| 5 | REQ-0119-025 precedent reuse | req-file-manager, req-analysis, templates | no | application miss |
+| 1 | case-open cleanup git add -A | case-open/case-close G23/G24/G17, REQ-0137-005 | あり | なし |
+| 2 | REQ/IR ID 桁数取り違え | REQ-0101-003, req-file-manager, AGENTS.md | 部分 | fix gap（IR ID 3桁規定なし） |
+| 3 | gate hook strict/heuristic | cli_utils.ts determineExitCode/classifyResult | なし | fix gap（実装削除済） |
+| 4 | Windows+junction worktree | workflow-orchestration 22-27行 | 部分 | application miss（driver 引き継ぎルール不在） |
+| 5 | REQ Step 番号 drift | REQ-0101-068, req-file-manager, AGENTS.md | 部分 | application miss（実践ガイド不在） |
+| 6 | gh CLI Shift-JIS 文字化け | gh-cli SKILL Section 1/2 | 部分 | application miss（コンソール初期化手順不在） |
+| 7 | req-define ADR 番号矛盾 | req-define/req-save artifact_actions | 部分 | 部分（req-define 側推測指定ガイド不在） |
+| 8 | worktree 古い commit で PR conflict | case-run Step 4 (行56) | 部分 | fix gap（git fetch origin 明示不在） |
+| 9 | oh-my-openagent 存在確認で停止 | case-run Step 5 (行75-76) | あり | なし（AGENTS.md 信頼方針明記済） |
+| 10 | bunx モジュール解決エラー | adapter/references/oh-my-openagent.md | なし | fix gap（npx フォールバック不在） |
+| 11 | ハーネス タイムアウト | adapter/references/oh-my-openagent.md 72-80行 | 部分 | guardrail insufficiency（事後処理手順不在） |
 
 ## 問題クラス一覧
 
-全エントリが未分類（単独）のため、未分類セクションに個別評価を記載。
+厳密基準でクラスタ形成なし。全エントリを未分類として個別評価。
 
-### 未分類
+### 未分類（inbox 11件）
 
-#### エントリ1: worktree 環境で integrity スクリプトの source-projection-sync が失敗する [inbox]
+#### エントリ1: case-open cleanup で git add -A を使用すると意図しないファイル削除が混入 [inbox]
 
-- **根本原因**: worktree は独立チェックアウトであり、install-consumer-opencode.ps1 が作成する junction link が伝播しない
-- **再発条件**: worktree 上で integrity/projection 関連チェックを実行する全ケース
-- **予防策**: case-run worktree セットアップに junction 再作成ステップを組み込む、または integrity スクリプトが worktree を検知して該当チェックをスキップ/警告
-
-##### 8軸評価スコア
-
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 1/5 | 単独エントリ（1件） |
-| 影響度 | 3/5 | integrity 検証が失敗し手動 workaround が必要。ブロックするが致命的ではない |
-| 横展開性 | 4/5 | 全 case-run worktree 環境で発生し得る。Windows+junction 環境で顕著 |
-| 反映先明確度 | 4/5 | workflow-orchestration（case-run worktree セットアップ）、check_integrity.ts（worktree 検知）で明確 |
-| 自動化適性 | 3/5 | integrity スクリプトでの worktree 検知は可能。junction 再作成の自動化も検討可能 |
-| プロジェクト固有知識再利用性 | 4/5 | worktree+junction+integrity は AgentDevFlow 固有の技術的落とし穴 |
-| 再発可能性 | 4/5 | worktree で integrity を実行する全ケースで再発 |
-| 費用対効果 | 4/5 | 低コスト（手順追記またはスクリプト拡張）で手動 workaround を削減 |
-| **加重合計** | **27/40** | |
-
-- **推奨処分案**: **既存 skill へ反映**（`agentdev-workflow-orchestration`）。理由: application miss であり、既存の fallback (`resolvePathWithFallback`) は存在するが worktree 特有の手順が未整備。副次反映先: `scripts/check_integrity.ts`（worktree 検知）
-
-##### 既存対策確認
-- **確認結果**: 既存対策 partial
-- **該当ファイル**: `.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`（`resolvePathWithFallback` 関数、REQ-0108-173 broken junction 検出 gate）、`agentdev-git-worktree/references/worktree-operations.md`（Windows junction 削除フォールバック）
-- **ギャップ分類**: application miss
-- **ギャップ詳細**: fallback logic と broken junction 検出は存在するが、(1) worktree 環境での手順が `agentdev-workflow-orchestration` に未記載、(2) integrity スクリプトに worktree 明示検知がない、(3) AGENTS.md にガイドレールなし
-
----
-
-#### エントリ2: retired REQ の履歴言及における規範語の位置づけ（REQ-0109-038）[inbox]
-
-- **根本原因**: REQ-0109-038（REQ-0122 retire 宣言）に RFC2119 キーワードが含まれ、規範的使用に見える可能性
-- **再発条件**: retired REQ の規範語を active 文書で歴史的に言及する全ケース
-- **予防策**: integrity スクリプトの RFC2119 検知 regex に retired/historical コンテキスト例外追加、または言及時に「履歴言及」マーカー付与
+- **根本原因**: cleanup操作で `git add -A` を使うと作業ディレクトリの全状態を巻き込む
+- **再発条件**: cleanup系操作で `git add -A` を使う時
+- **予防策**: 削除対象ファイルのパスを明示的に `git rm` / `git add` で指定
 
 ##### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
 | 発生件数 | 1/5 | 単独エントリ（1件） |
-| 影響度 | 1/5 | 実際の integrity 違反なし。見た目の懸念のみ。スクリプトは活性REQをスキャンしないため非検知 |
-| 横展開性 | 3/5 | retired REQ の歴史言及で発生し得るが頻度は低い |
-| 反映先明確度 | 3/5 | check_integrity.ts（regex 例外）。ただし既存の `/retired\/REQ-/` 例外で大部分対応済み |
-| 自動化適性 | 3/5 | 既存 regex 例外が大部分を自動化済み。残差の意味論的判別は困難 |
-| プロジェクト固有知識再利用性 | 3/5 | integrity rule のプロジェクト固有知識。再利用価値は中程度 |
-| 再発可能性 | 3/5 | retire 宣言で規範語を歴史言及する全ケース。頻度は中程度 |
-| 費用対効果 | 3/5 | 影響度が極めて低く、既存対策で大部分カバー。追加投資の費用対効果は妥当レベル |
-| **加重合計** | **20/40** | |
-
-- **推奨処分案**: **rejected**（HITL 承認済）。理由: 主懸念（integrity スクリプトの誤検知）は既存の `/retired\/REQ-/` 例外と活性REQ非スキャン設計で技術的に解決済み。影響度スコア1/5（極低）で実害なし。副次的予防策（履歴言及マーカーの文書化）は情報断片的で優先度低。すでに別の対策で十分対応済みのため rejected とし、再評価対象外とする
-
-##### 既存対策確認
-- **確認結果**: 既存対策 partial（主懸念は既存対策で解決済み）
-- **該当ファイル**: `.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts` lines 6943-6950（`LEGACY_NORMATIVE_MARKER_EXEMPT_PATHS` に `/retired\/REQ-/` 含む）、`checkCanonicalBoundary()` は活性REQファイルをスキャンしない
-- **ギャップ分類**: guardrail insufficiency（ただし影響度極低）
-- **ギャップ詳細**: 経路ベース例外（`/retired\/REQ-/`）は存在するが、活性文書内の歴史言及 vs 規範的使用の意味論的判別は未実装。ただし現状の設計（活性REQ非スキャン + retired パス例外）で実害なし
-
----
-
-#### エントリ3: 要件定義・plan 作成時に active REQ の実ファイル一覧を grep/glob で実証確認すべき [inbox]
-
-- **根本原因**: 文書の REQ 番号レンジ（例: REQ-0101〜REQ-0123）を信頼し、実ファイル一覧の glob/grep 実証確認を怠った
-- **再発条件**: 文書のレンジ表現を信頼して実ファイル一覧を確認しない場合
-- **予防策**: req-define / case-run plan 作成ステップに「active REQ 実ファイル一覧の glob 確認」を必須ステップとして組み込む
-
-##### 8軸評価スコア
-
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 1/5 | 単独エントリ（1件） |
-| 影響度 | 4/5 | REQ 见落としは要件定義の抜け漏れに直結。Momus review で指摘されるレベル |
-| 横展開性 | 4/5 | 全ての要件定義・plan 作成で発生し得る。ADR 番号等でも同様 |
-| 反映先明確度 | 4/5 | req-analysis（要件定義手順）、workflow-orchestration（case-run plan 作成）で明確 |
-| 自動化適性 | 4/5 | glob 確認ステップは手順化が容易。REQ/ADR 番号レンジ照合も自動化可能 |
-| プロジェクト固有知識再利用性 | 4/5 | 「文書レンジを信頼せず実証確認」という規範は汎用性高い |
-| 再発可能性 | 4/5 | 文書レンジを信頼する運用が継続する限り再発 |
-| 費用対効果 | 5/5 | 極めて低コスト（glob 1行）で major rework を予防 |
-| **加重合計** | **30/40** | |
-
-- **推奨処分案**: **既存 skill へ反映**（`agentdev-req-analysis`）。副次反映先: `agentdev-workflow-orchestration`（case-run plan 作成）、`req-define.md`（Step 3-4）。理由: fix gap であり、実証確認ステップが明示的に存在しない
-
-##### 既存対策確認
-- **確認結果**: 既存対策なし（fix gap）
-- **該当ファイル**: なし（`agentdev-req-analysis/SKILL.md`、`agentdev-workflow-orchestration/SKILL.md`、`req-define.md` Step 3-4 のいずれにも glob 実証確認ステップなし）
-- **ギャップ分類**: fix gap
-- **ギャップ詳細**: req-define Step 3（既存REQ照合）は `agentdev-req-file-manager` の照合方法論に従うが、実ファイル一覧の glob 確認は明示されていない。Step 4-1（関連ドキュメント更新候補抽出）は glob を探索に使うが、番号レンジと実ファイルの一致検証は不在
-
----
-
-#### エントリ4: case-close 実行前にメインリポジトリの未コミット変更と対象 PR の変更ファイル重複をチェックすべき [inbox]
-
-- **根本原因**: 別件作業の未コミット変更が対象 PR の変更ファイルと重複し、`git pull --ff-only` が拒否される
-- **再発条件**: メインリポジトリに未コミット変更がある状態で case-close を実行し、変更ファイルが対象 PR と重複する場合
-- **予防策**: case-close Step 1（Issue 番号解決）直後にメインリポジトリの `git status --short` と PR 変更ファイル一覧（`gh pr view --json files`）の重複チェック追加。重複時は Step 4（merge）前にユーザーに警告
-
-##### 8軸評価スコア
-
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 1/5 | 単独エントリ（1件） |
-| 影響度 | 4/5 | Domain state 永続化（Step 11）がブロックされ、手動リカバリが必要 |
-| 横展開性 | 4/5 | 並行作業（複数 Issue 同時進行）環境で特に発生しやすい |
-| 反映先明確度 | 5/5 | case-close.md Step 1-2 に特定済み。修正箇所が明確 |
-| 自動化適性 | 4/5 | `gh pr view --json files` と `git status --short` の比較は容易に自動化可能 |
-| プロジェクト固有知識再利用性 | 4/5 | case-close ワークフロー固有の並行作業パターン |
-| 再発可能性 | 4/5 | 並行作業環境では高確率で再発 |
-| 費用対効果 | 5/5 | 低コスト（早期チェック追加）で Step 9-11 ブロックを予防 |
-| **加重合計** | **31/40** | 最高スコア |
-
-- **推奨処分案**: **既存 command へ反映**（`case-close.md` Step 1-2）。理由: fix gap であり、既存の「任意のローカル変更で停止」チェックは粗すぎる。重複特化の早期警告が必要
-
-##### 既存対策確認
-- **確認結果**: 既存対策なし（特定の重複チェックが不在）
-- **該当ファイル**: `agentdev-git-worktree/references/git-common-procedures.md`（「実行前同期」手順に `git status --porcelain` で任意のローカル変更を検出して停止するチェックは存在）
-- **ギャップ分類**: fix gap
-- **ギャップ詳細**: 既存チェックは「任意のローカル変更」で停止する粗い粒度。学びが提案する「PR 変更ファイルとの重複特化チェック」は不在。重複時の早期警告（Step 1-2）も不在で、Step 9 で初めて発覚
-
----
-
-#### エントリ5: REQ-0119-025 precedent 形式は retire 宣言（APPEND）で再利用可能 [inbox]
-
-- **根本原因**: なし（ポジティブ学び。REQ-0119-025 precedent 形式で REQ-0109-038 を機械的に作成できた）
-- **再発条件**: retire 宣言を行う全ケース
-- **予防策**: retire 宣言用のテンプレート化、または precedent 参照を req-define 手順に明記
-
-##### 8軸評価スコア
-
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 1/5 | 単独エントリ（1件、ポジティブ） |
-| 影響度 | 3/5 | 今後の retire 宣言の設計工数を削減。直接の被害なし |
-| 横展開性 | 4/5 | 全ての今後の retire 宣言で再利用可能 |
-| 反映先明確度 | 4/5 | req-file-manager（retire 宣言テンプレート）、req-analysis（precedent 活用手順）で明確 |
-| 自動化適性 | 2/5 | precedent 参照は文書化が主で自動化適性は低い |
-| プロジェクト固有知識再利用性 | 4/5 | retire 宣言パターンは AgentDevFlow プロジェクト固有の知識 |
-| 再発可能性 | 5/5 | retire 宣言を行う全ケースでほぼ確実に再利用可能 |
-| 費用対効果 | 5/5 | 極めて低コスト（precedent 参照追記）で今後の設計工数を削減 |
+| 影響度 | 3/5 | 復元commitが必要だがデータ損失なし |
+| 横展開性 | 4/5 | 全cleanup操作で発生し得る |
+| 反映先明確度 | 5/5 | case-open/case-close G23/G24/G17 で特定済 |
+| 自動化適性 | 4/5 | 明示パス指定ルールで容易に徹底可能 |
+| プロジェクト固有知識再利用性 | 3/5 | git の汎用知識だが AgentDevFlow 固有の cleanup 文脈 |
+| 再発可能性 | 3/5 | ルール明文化で低下するが残リスク |
+| 費用対効果 | 5/5 | ルール徹定で防止可能、コスト低 |
 | **加重合計** | **28/40** | |
 
-- **推奨処分案**: **既存 skill へ反映**（`agentdev-req-file-manager`、`agentdev-req-analysis`）。理由: application miss であり、pattern は実在するが skill に文書化されていない
-
-##### 既存対策確認
-- **確認結果**: 既存対策なし（application miss）
-- **該当ファイル**: なし（`agentdev-req-file-manager/SKILL.md` APPEND セクション、`agentdev-req-analysis/SKILL.md`、`templates/doc_requirement.md` のいずれにも retire 宣言 precedent の記載なし）
-- **ギャップ分類**: application miss
-- **ギャップ詳細**: REQ-0119-025 → REQ-0109-038 の機械的再利用パターンは実在するが、(1) retire 宣言テンプレートが不在、(2) precedent 活用手順が req-define に未記載、(3) REQ-0119-025 への参照が skill に一切なし
+- **推奨処分案**: **duplicate**。理由: case-open G23/G24、case-close G17 + REQ-0137-005 で既存対策が完全。学びは既存ルールの再確認に相当
 
 ---
 
-#### archive 継続エントリ（entries 6-10）[archive]
+#### エントリ2: REQ ID は4桁、IR ID は3桁 — パーサ実装で桁数を取り違える落とし穴 [inbox]
 
-以下のエントリは前回 promote で deferred 扱いとなり archive/active.md に残置中。今回も新たなクラスタを形成しないため deferred を継続。
+- **根本原因**: REQ(4桁)とIR(3桁)の桁数差を認識せず正規表現を書く
+- **再発条件**: パーサ・バリデータ実装時
+- **予防策**: 実データサンプルをコメントに併記
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（1件） |
+| 影響度 | 3/5 | パーサ不具合だがテストで早期発見 |
+| 横展開性 | 2/5 | パーサ実装者のみ、限定 |
+| 反映先明確度 | 4/5 | docs/specs/system.md ID体系、REQ-0101 で明確 |
+| 自動化適性 | 3/5 | 実データサンプルテストで可能 |
+| プロジェクト固有知識再利用性 | 5/5 | AgentDevFlow 固有のID体系 |
+| 再発可能性 | 3/5 | 中程度 |
+| 費用対効果 | 4/5 | 良い（規定追記で予防） |
+| **加重合計** | **25/40** | |
+
+- **推奨処分案**: **既存 REQ/SPEC へ反映**。理由: fix gap（IR ID 3桁の規定が docs/specs/system.md / REQ-0101 / AGENTS.md のいずれにも不在）。promoted artifact C にグループ化
+
+---
+
+#### エントリ3: gate hook の strict/heuristic 区別は --strict-only flag で解決する [inbox]
+
+- **根本原因**: `determineExitCode()` が ng と warning を区別せず、heuristic 違反でも EXIT_NG を返す
+- **再発条件**: gate hook で strict/heuristic を区別する必要がある場面
+- **予防策**: flag-based opt-in（--strict-only flag と determineExitCodeStrict()）
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（1件） |
+| 影響度 | 4/5 | commit/push が block される |
+| 横展開性 | 3/5 | gate hook 設計一般 |
+| 反映先明確度 | 4/5 | integrity-check / cli_utils.ts で明確 |
+| 自動化適性 | 4/5 | flag 追加で解決容易 |
+| プロジェクト固有知識再利用性 | 4/5 | flag-based opt-in パターン |
+| 再発可能性 | 2/5 | 実装削除の経緯あり、別途議論が必要 |
+| 費用対効果 | 4/5 | 良い（ただし現状仕様との整合要議論） |
+| **加重合計** | **26/40** | |
+
+- **推奨処分案**: **deferred**。理由: PR #912 で実装されたが commit a27a8e56「3層ゲート・本体運用自動化を取り下げ汎用仕組みのみに縮小」で削除済。現在の integrity-check 方針（汎用仕組みのみ）と整合しないため、別途議論が必要。学び自体は有効だが即時反映先が未定
+
+##### 既存対策確認
+- **確認結果**: なし（fix gap）
+- **該当ファイル**: `.opencode/skills/repo-agentdev-integrity/scripts/cli_utils.ts` 行353-356 `determineExitCode()`
+- **ギャップ詳細**: PR #912 (commit 3e1099bf) で `--strict-only` flag と `determineExitCodeStrict()` が実装されたが、commit a27a8e56 で削除。現在 `determineExitCode()` は `summary.ng > 0 || summary.warning > 0` で EXIT_NG を返す。`classifyFindingLevel()` は strict/heuristic/observation を区別するが `determineExitCode()` はこれを考慮しない
+
+---
+
+#### エントリ4: Windows+junction worktree では .opencode/ が空になり source/projection 手動同期が必要 [inbox]
+
+- **根本原因**: junction 未伝播 + .gitignore で .opencode/agentdev-* が追跡対象外
+- **再発条件**: Windows+junction 環境で worktree 作成時
+- **予防策**: source/projection 両辺手動編集、driver subagent 引き継ぎプロンプトに明記
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（1件） |
+| 影響度 | 4/5 | worktree 内で検証失敗 |
+| 横展開性 | 2/5 | Windows+junction 環境限定 |
+| 反映先明確度 | 5/5 | workflow-orchestration SKILL 22-27行で特定済 |
+| 自動化適性 | 2/5 | 手動両辺編集が必要 |
+| プロジェクト固有知識再利用性 | 5/5 | Windows 固有の技術的落とし穴 |
+| 再発可能性 | 5/5 | Windows 環境ではほぼ確実 |
+| 費用対効果 | 4/5 | 良い（引き継ぎルール追加で低コスト） |
+| **加重合計** | **28/40** | |
+
+- **推奨処分案**: **既存 skill へ反映**（application miss）。理由: workflow-orchestration 22-27行で制約記載あり、しかし driver subagent 引き継ぎプロンプトへの明記ルールが不在。promoted artifact A にグループ化
+
+---
+
+#### エントリ5: REQ に command の Step 番号を固定すると drift する [inbox]
+
+- **根本原因**: REQ に command の Step 番号を直接書くと command リファクタで即座に陳腐化
+- **再発条件**: REQ 作成・更新時
+- **予防策**: 振る舞いで書き、Step 番号は command reference へ
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（ただし複数REQ-0131-010/REQ-0104-047/REQ-0114-060/063/REQ-0136-010 で発生） |
+| 影響度 | 3/5 | REQ 陳腐化、IR-044 で検出 |
+| 横展開性 | 4/5 | 全REQ作成で発生 |
+| 反映先明確度 | 5/5 | REQ-0101-068 / req-file-manager / AGENTS.md で特定済 |
+| 自動化適性 | 4/5 | REQ lint でStep番号検出可能 |
+| プロジェクト固有知識再利用性 | 4/5 | REQ/SPEC 責務分離の実践的知見 |
+| 再発可能性 | 4/5 | 高い（実践ガイド不在のため） |
+| 費用対効果 | 5/5 | 極めて良い（ガイド追記で予防） |
+| **加重合計** | **30/40** | |
+
+- **推奨処分案**: **既存 skill/AGENTS.md へ反映**（application miss）。理由: REQ-0101-068 で「Step番号のみを主たる文意とする場合は command reference 等に配置」は規定済み、しかし req-file-manager SKILL/AGENTS.md 編集ガードレールに実践ガイドが不在。promoted artifact C にグループ化
+
+---
+
+#### エントリ6: gh CLI の --body-file が Windows Shift-JIS コンソール環境で文字化け [inbox]
+
+- **根本原因**: PowerShell コンソールエンコーディングが shift_jis（chcp 932）
+- **再発条件**: Windows PowerShell から gh CLI を --body-file/--title で呼ぶ
+- **予防策**: `[Console]::OutputEncoding = UTF8` + `cmd /c chcp 65001`
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（1件） |
+| 影響度 | 4/5 | GitHub 上の本文が文字化け |
+| 横展開性 | 3/5 | Windows PowerShell + gh CLI 利用者 |
+| 反映先明確度 | 5/5 | gh-cli SKILL Section 1/2 で特定済 |
+| 自動化適性 | 5/5 | 初期化ステップ追加で即自動化可 |
+| プロジェクト固有知識再利用性 | 4/5 | Windows + gh CLI 固有 |
+| 再発可能性 | 5/5 | 現行設定に未記載のためほぼ確実 |
+| 費用対効果 | 5/5 | 極めて良い（初期化ステップ追記で防止） |
+| **加重合計** | **32/40** | 最高スコア |
+
+- **推奨処分案**: **既存 skill へ反映**（application miss）。理由: gh-cli SKILL Section 1/2 に UTF-8 BOM なし保存・WriteAllText 規定はあるが、コンソールエンコーディング初期化手順が不在。promoted artifact B（単独）にグループ化
+
+---
+
+#### エントリ7: req-define で指定した ADR 番号が adr-file-manager 採番ルールと矛盾 [inbox]
+
+- **根本原因**: req-define が ADR 番号を推測指定（ADR-0115）したが adr-file-manager 採番ルール（max+1, 欠番埋め禁止）と矛盾
+- **再発条件**: req-define で ADR 番号を content タイトルに直接書く場合
+- **予防策**: req-save が採番ルールで再検証、または req-define では `new:{slug}` のみ
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（1件） |
+| 影響度 | 3/5 | 番号置換の手戻り |
+| 横展開性 | 3/5 | req-define で ADR 番号指定時に発生 |
+| 反映先明確度 | 5/5 | req-define/req-save/adr-file-manager で特定済 |
+| 自動化適性 | 4/5 | req-save での番号再検証で容易 |
+| プロジェクト固有知識再利用性 | 4/5 | adr-file-manager 採番ルール固有 |
+| 再発可能性 | 4/5 | 高い（ガイド不在） |
+| 費用対効果 | 4/5 | 良い（ガイド追記で予防） |
+| **加重合計** | **28/40** | |
+
+- **推奨処分案**: **既存 command/skill へ反映**（部分）。理由: `target_spec` の `new:{topic-slug}` 仕様は規定済み、しかし req-define 側での ADR 番号推測指定のガイドが不在。promoted artifact C にグループ化
+
+---
+
+#### エントリ8: 実行担当サブエージェントの worktree が古い commit 基準だと PR conflict [inbox]
+
+- **根本原因**: worktree 作成時に origin/main が最新でない（並列 Wave 実行で前 Wave merge 後に更新）
+- **再発条件**: 並列 Wave 実行で前 Wave merge 後に次 Wave の worktree を作る時
+- **予防策**: worktree 作成前に `git fetch origin` 必須
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（1件） |
+| 影響度 | 4/5 | PR conflict で force-push 必要 |
+| 横展開性 | 4/5 | 並列 Wave 実行一般 |
+| 反映先明確度 | 5/5 | case-run Step 4 で特定済 |
+| 自動化適性 | 5/5 | `git fetch origin` 追加で即自動化可 |
+| プロジェクト固有知識再利用性 | 4/5 | case-run worktree 固有 |
+| 再発可能性 | 4/5 | 高い（手順不在） |
+| 費用対効果 | 5/5 | 極めて良い（1行追加で予防） |
+| **加重合計** | **32/40** | 最高スコア |
+
+- **推奨処分案**: **既存 command へ反映**（fix gap）。理由: case-run Step 4 で `origin/main` ベース記載あるが `git fetch origin` の明示不在。promoted artifact A にグループ化
+
+---
+
+#### エントリ9: case-run で oh-my-openagent の存在確認をして停止した [inbox]
+
+- **根本原因**: 不要な事前検出（bunx で常に起動可能）
+- **再発条件**: case-run Step 5 で存在確認を行う
+- **予防策**: AGENTS.md のハーネス選定を信頼し bunx で直接起動
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（1件） |
+| 影響度 | 3/5 | case-run 停止だが即復帰可能 |
+| 横展開性 | 3/5 | case-run Step 5 利用者 |
+| 反映先明確度 | 5/5 | case-run Step 5 / adapter で特定済 |
+| 自動化適性 | 5/5 | 存在確認ステップ削除で即解決 |
+| プロジェクト固有知識再利用性 | 4/5 | oh-my-openagent 統合固有 |
+| 再発可能性 | 3/5 | 中程度 |
+| 費用対効果 | 5/5 | 極めて良い |
+| **加重合計** | **29/40** | |
+
+- **推奨処分案**: **duplicate**。理由: case-run Step 5（行75-76）で「AGENTS.md のハーネス選定を信頼して起動する」方針が既に明記済。学びは既存ルールの再確認に相当
+
+---
+
+#### エントリ10: bunx oh-my-opencode run が Windows でモジュール解決エラー [inbox]
+
+- **根本原因**: bunx の Windows でのバイナリ解決バグ（oh-my-openagent-windows-x64 等のパッケージ構造と不一致）
+- **再発条件**: Windows で bunx 経由で oh-my-opencode を起動
+- **予防策**: `npx oh-my-opencode run` フォールバック
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（1件） |
+| 影響度 | 3/5 | npx で回避可能 |
+| 横展開性 | 3/5 | Windows + bunx 利用者 |
+| 反映先明確度 | 5/5 | adapter/references/oh-my-openagent.md で特定済 |
+| 自動化適性 | 4/5 | npx フォールバック記述で容易 |
+| プロジェクト固有知識再利用性 | 5/5 | oh-my-openagent Windows 固有 |
+| 再発可能性 | 4/5 | bunx バグ継続限り高い |
+| 費用対効果 | 5/5 | 極めて良い |
+| **加重合計** | **30/40** | |
+
+- **推奨処分案**: **既存 skill へ反映**（fix gap）。理由: adapter/references/oh-my-openagent.md に bunx のみ記載、npx フォールバック経路が完全不在。promoted artifact A にグループ化
+
+---
+
+#### エントリ11: oh-my-opencode ハーネスは最終検証フェーズでタイムアウト [inbox]
+
+- **根本原因**: ハーネスの最終検証フェーズが時間を要する + タイムアウト後の処理フロー未定義
+- **再発条件**: 大規模実装をハーネスに任せる時
+- **予防策**: タイムアウト後の worktree git status 確認・残留 grep・手動修正手順
+
+##### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 単独（1件） |
+| 影響度 | 3/5 | 手動コミットが必要だが実装は完了 |
+| 横展開性 | 3/5 | 大規模実装をハーネス任せる全ケース |
+| 反映先明確度 | 4/5 | case-run / adapter で明確 |
+| 自動化適性 | 3/5 | タイムアウト後手順の定型化は可能 |
+| プロジェクト固有知識再利用性 | 4/5 | oh-my-opencode ハーネス固有 |
+| 再発可能性 | 4/5 | 高い（事後処理手順不在） |
+| 費用対効果 | 4/5 | 良い |
+| **加重合計** | **26/40** | |
+
+- **推奨処分案**: **既存 command/skill へ反映**（guardrail insufficiency）。理由: adapter/references/oh-my-openagent.md 72-80行に「タイムアウト=failed として処理」記載あるが、事後処理（worktree git status・残留 grep・手動修正）が不在。promoted artifact A にグループ化
+
+---
+
+### 未分類（archive 継続 5件）
+
+以下のエントリは前回 promote で deferred 扱いとなり archive/active.md に残置中。今回 inbox 11エントリと厳密な問題クラスを形成しなかったため deferred を継続。
 
 | # | タイトル | 移動日 | 経過期間 | 今回判定 |
 |---|---------|--------|---------|---------|
-| 6 | baseline分類の乖離と解決 | 2026-06-06 | 約11日 | deferred（継続） |
-| 7 | スクリプトエンコーディング破損 | 2026-06-06 | 約11日 | deferred（継続） |
-| 8 | Squash merge conflict resolution W1→W2 | 2026-06-07 | 約10日 | deferred（継続） |
-| 9 | Epic Orchestrator Wave間変更漏れ | 2026-06-07 | 約10日 | deferred（継続） |
-| 10 | runtime template path 暗黙参照 | 2026-06-07 | 約10日 | deferred（継続） |
+| A1 | baseline分類の乖離と解決 | 2026-06-06 | 約15日 | deferred（継続） |
+| A2 | スクリプトエンコーディング破損 | 2026-06-06 | 約15日 | deferred（継続） |
+| A3 | Squash merge conflict resolution W1→W2 | 2026-06-07 | 約14日 | deferred（継続） |
+| A4 | Epic Orchestrator Wave間変更漏れ | 2026-06-07 | 約14日 | deferred（継続） |
+| A5 | runtime template path 暗黙参照 | 2026-06-07 | 約14日 | deferred（継続） |
 
-※ 全エントリが記録から約10-11日経過（2026-06-17 現在）。内部分析フェーズ時 prune 基準（3ヶ月以上経過）に該当しないため prune 対象外。
+※ 全エントリが記録から約14-15日経過（2026-06-21 現在）。内部分析フェーズ時 prune 基準（3ヶ月以上経過）に該当しないため prune 対象外。
 
-## promote 時 prune結果
+## promoted artifact グループ化
 
-- **対象エントリ数**: 5件（inbox からの移動分）
-- **prune実施**: なし（HITL承認後に実施予定）
-- **prune候補**: 5件（staged: entries 1, 3, 4, 5 ＋ rejected: entry 2）
-- **prune却下**: 0件
+promote 対象 8エントリを関連テーマで3つの artifact にグループ化。厳密な問題クラス分類ではなく、反映先の近接性による実用的まとまり。
+
+### Artifact A: case-run worktree・ハーネス手順の強化（4エントリ）
+- **対象**: #4, #8, #10, #11
+- **テーマ**: case-run の worktree 作成・ハーネス起動・タイムアウト事後処理
+- **反映先**: workflow-orchestration SKILL / git-worktree SKILL / case-run command / adapter SKILL + references/oh-my-openagent.md
+- **出力ファイル**: `.agentdev/learning/promoted/case-run-worktree-harness-hardening.md`
+
+### Artifact B: gh CLI Windows 文字化け対策（1エントリ）
+- **対象**: #6
+- **テーマ**: Windows PowerShell 環境での gh CLI --body-file/--title 文字化け防止
+- **反映先**: agentdev-gh-cli SKILL Section 1（禁止事項）/ Section 2（標準手順）
+- **出力ファイル**: `.agentdev/learning/promoted/gh-cli-windows-encoding.md`
+
+### Artifact C: ドキュメント作成品質ガイドの強化（3エントリ）
+- **対象**: #2, #5, #7
+- **テーマ**: ID 桁数規定・REQ Step 番号の扱い・ADR 番号取り扱い
+- **反映先**: docs/specs/system.md / REQ-0101 / req-file-manager SKILL / AGENTS.md / req-define command / req-save command / adr-file-manager SKILL
+- **出力ファイル**: `.agentdev/learning/promoted/docs-quality-id-and-step-numbering.md`
+
+## promote 時 prune 計画
+
+- **対象エントリ数**: 11件（inbox からの移動分）
+- **prune実施**: あり（HITL承認後に実施予定）
+- **prune候補**: 10件
+  - staged（promoted artifact 生成済み）: 8件（#2, #4, #5, #6, #7, #8, #10, #11）
+  - duplicate: 2件（#1, #9）
+- **prune非対象**: 1件
+  - deferred: #3（archive/active.md に残置）
 
 ## 全体傾向
 
-- **高スコア領域**: 「実証確認の欠如」（entry 3: 30/40）と「並行作業の競合検知」（entry 4: 31/40）が高スコア。いずれも低コストで予防可能な手順改善
-- **横展開性の高さ**: inbox 5エントリ中4エントリが横展開性スコア4以上。AgentDevFlow 運用全体に関わる知見が多い
-- **自動化適性**: entries 3, 4 は自動化適性スコア4。glob 確認・ファイル重複チェックは容易に自動化可能
-- **ポジティブ学びの存在**: entry 5 は成功パターンの記録。今後の retire 宣言で再利用可能
-- **低優先度エントリ**: entry 2 は既存対策で大部分カバーされており、rejected（再評価対象外）。HITL承認済
-- **ADR候補なし**: 全エントリがアーキテクチャ判断ではなく運用・手順・技術的落とし穴。ADR 除外フィルタで全件除外、適切な反映先（skill/command）に振り分け
-- **archive 蓄積**: deferred エントリが5件蓄積中（約10-11日経過）。prune 基準（3ヶ月）には遠く、観察継続
+- **高スコア領域**: #6 (gh CLI 文字化け, 32/40) と #8 (worktree 古い commit, 32/40) が最高スコア。いずれも1行〜数行の追記で予防可能
+- **横展開性の高さ**: inbox 11エントリ中、横展開性スコア4以上は #1, #5, #6, #7, #8（5件）。AgentDevFlow 運用全体に関わる知見が多い
+- **自動化適性**: #6, #8, #9 は自動化適性スコア5。初期化ステップ・fetch・ステップ削除で即解決
+- **既存対策との重複**: #1, #9 は既存ルールで完全カバー（duplicate）。学びの再確認価値はあるが新規 artifact 不要
+- **deferred の存在**: #3 は PR #912 で実装後、方針転換で削除された経緯あり。現在の integrity-check 方針（汎用仕組みのみ）と整合しないため別途議論が必要
+- **ADR候補なし**: 全エントリが運用ルール・手順・仕様追加・command 仕様が主でアーキテクチャ判断を含まない。ADR 除外フィルタで全件除外
+- **archive 蓄積**: deferred エントリが5件蓄積中（約14-15日経過）。prune 基準（3ヶ月）には遠く、観察継続
 
 ## ADR候補除外記録
 
 | 対象item | 除外理由 | 根拠事実 | 代替反映先候補 |
 |---------|---------|---------|---------------|
-| Entry 1: worktree junction | 運用ルール | worktree セットアップ手順の運用制約であり、技術的トレードオフを含まない | agentdev-workflow-orchestration, check_integrity.ts |
-| Entry 2: RFC2119 retired historical | 運用ルール | integrity rule の運用詳細であり、アーキテクチャ判断ではない | check_integrity.ts（既存で大部分対応済み） |
-| Entry 3: REQ range glob | 運用ルール | 要件定義手順の改善であり、技術的トレードオフを含まない | agentdev-req-analysis, agentdev-workflow-orchestration |
-| Entry 4: case-close duplicate check | command仕様 | case-close の手順・ガードレール改善であり、アーキテクチャ判断ではない | case-close.md |
-| Entry 5: retire precedent | 運用ルール | precedent 再利用の文書化であり、技術的トレードオフを含まない | agentdev-req-file-manager, agentdev-req-analysis |
+| #1 case-open cleanup git add -A | 運用ルール | git cleanup 操作手順の運用制約。技術的トレードオフ不含 | case-open/case-close（既存対策あり=duplicate） |
+| #2 REQ/IR ID 桁数 | 仕様変更のみ | ID 体系の仕様追記。技術判断不含 | docs/specs/system.md, REQ-0101, AGENTS.md |
+| #3 gate hook strict/heuristic | command仕様 | integrity-check の挙動設計。ただし方針転換で削除済 | cli_utils.ts（要議論=deferred） |
+| #4 Windows+junction worktree | 運用ルール | worktree セットアップの環境固有手順。技術判断不含 | workflow-orchestration, git-worktree |
+| #5 REQ Step 番号 drift | 運用ルール | REQ 作成時の記述ガイドライン。REQ-0101-068 で規定済 | req-file-manager, AGENTS.md, command-authoring |
+| #6 gh CLI Shift-JIS | 運用ルール | gh CLI 呼び出し時のコンソール初期化手順 | agentdev-gh-cli |
+| #7 req-define ADR 番号 | command仕様 | req-define/req-save の番号取り扱い手順 | req-define, req-save, adr-file-manager |
+| #8 worktree 古い commit | command仕様 | case-run Step 4 の手順改善 | case-run |
+| #9 oh-my-openagent 存在確認 | 運用ルール | ハーネス起動時の存在確認不要ルール | case-run（既存対策あり=duplicate） |
+| #10 bunx モジュール解決 | 運用ルール | Windows 環境でのフォールバック手順 | adapter/references/oh-my-openagent.md |
+| #11 ハーネス タイムアウト | command仕様 | case-run / adapter のタイムアウト事後処理手順 | case-run, adapter |
