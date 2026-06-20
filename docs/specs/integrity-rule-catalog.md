@@ -1,5 +1,5 @@
 ---
-updated: 2026-06-19
+updated: 2026-06-20
 ---
 
 # Integrity Rule Catalog
@@ -929,6 +929,66 @@ updated: 2026-06-19
 | finding_route | intake |
 | triage_action | 分類に基づき修正。NG（英字混じり抽象用語に日本語説明不在／`read-only` 宣言に反して出力生成・commit・push が許可されている）は許可/禁止操作を明示化・日本語説明を併記。WARNING（識別子は保持するが日本語説明が不十分）は説明を補強。OK（日本語名と識別子が両立し許可/禁止操作が明確）は対応不要。default severity は warning、accepted SPEC または 現行 REQ で NG 分類の場合は error に昇格 |
 | last_verified | 2026-06-19 |
+
+### IR-046: consumer-generated リポジトリ種別誤検知防止
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-046 |
+| description | `.opencode/commands/agentdev/` が実ディレクトリ（非ジャンクション）かつ `generated_by: local-opencode-transform` 識別子を含む場合、当該リポジトリを consumer-generated として扱い、IR-016（Source/projection 整合性）の source/projection divergence 対象から除外すること（REQ-0141-007, 011）。ローカル版生成物はジャンクションではなく実ファイル配置であるため、IR-016 の「ジャンクション破損」判定が誤検知となるのを防ぐ |
+| severity | heuristic |
+| category | canonical-conflict |
+| detection_method | `.opencode/commands/agentdev/` がジャンクション・シンボリックリンクでないことを確認後、配下のファイルから `generated_by: local-opencode-transform` 識別子を検出。識別子検出時は consumer-generated と判定し IR-016 を適用除外とする |
+| affected_artifacts | [.opencode/commands/agentdev/, .opencode/skills/agentdev-*/] |
+| related_req | [REQ-0141-007, REQ-0141-011, REQ-0141-014] |
+| related_spec | [runtime-package-boundary.md, local-generation.md] |
+| gate_level | full-audit |
+| false_positive_risk | 低。ジャンクション検出と `generated_by` 識別子検出の組合せで確実に判定可能 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | IR-016 を consumer-generated リポジトリでは適用除外とする。識別子不在の場合は IR-016 を通常適用する |
+| last_verified | 2026-06-20 |
+
+### IR-047: src/opencode-local/ 生成時ソース領域ディレクトリ構成
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-047 |
+| description | `src/opencode-local/` はローカル版生成時ソース領域であり、許容されたディレクトリ構成（`README.md`, `case-schema/`, `transform/`, `generation-flow.md`）のみを保持すること（REQ-0141-004）。禁止パス（`requirements/`, `specs/`, `_conv/`, `commands/`, `skills/`）を作成しないこと（REQ-0141-005） |
+| severity | strict |
+| category | obsolete-structure |
+| detection_method | `src/opencode-local/` 配下のディレクトリ・ファイル一覧を取得し、許容リスト（`README.md`, `case-schema/`, `transform/`, `generation-flow.md`）外のパスを検出 |
+| affected_artifacts | [src/opencode-local/] |
+| related_req | [REQ-0141-003, REQ-0141-004, REQ-0141-005] |
+| related_spec | [local-generation.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | なし。パスの直接比較による機械的検出 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 許容リスト外のディレクトリ・ファイルを削除し、`src/opencode-local/` を生成時ソース領域の構成に復元 |
+| last_verified | 2026-06-20 |
+
+### IR-048: generated_by 識別子整合性
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-048 |
+| description | ローカル版生成物に `generated_by: local-opencode-transform` 識別情報が付与されていること（REQ-0141-011）。同名ファイル上書きは識別子が一致する場合のみ許可され、識別子不在・異なる識別子のファイルを上書きしてはならないこと（REQ-0141-012, 013） |
+| severity | strict |
+| category | canonical-conflict |
+| detection_method | `.opencode/commands/agentdev/**/*.md` と `.opencode/skills/agentdev-*/**/*.md` から frontmatter またはメタ識別子中の `generated_by` を抽出し、`local-opencode-transform` と一致することを確認。同名ファイル上書き時の識別子整合性はローカル版生成プロセスが `## 変換仕様` ガードレールで検証 |
+| affected_artifacts | [.opencode/commands/agentdev/, .opencode/skills/agentdev-*/] |
+| related_req | [REQ-0141-011, REQ-0141-012, REQ-0141-013] |
+| related_spec | [local-generation.md, local-transform.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 中。生成物への識別子付与方式（frontmatter vs ヘッダコメント）の揺れ・AgentDevFlow 本体原本（識別子なし）との混同に注意 |
+| regression_test | (追加予定) |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 識別子付与方式を `local-generation.md` の定義に統一。競合ファイルは手動マージまたは識別子付与後に再生成 |
+| last_verified | 2026-06-20 |
 
 ## ゲートレベル
 
