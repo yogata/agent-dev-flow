@@ -45,7 +45,7 @@ agent: sisyphus
    - **4-1. 変更影響候補抽出**: 変更影響候補を抽出し、ドラフトに保持する。委譲接続点: サブエージェントは探索結果・分類候補・根拠のみを返し、親エージェントがドラフト反映を判断する
    - **4-2. 分類ゲート**: 各要件行候補を「変更後仕様」or「反映作業」に分類する。併せて REQ/SPEC 境界判定（REQ-0101-067〜069）を行い、SPEC 等に配置すべき要件行候補を SPEC 保存対象として分離し、`draft-data` の `artifact_actions`（`artifact: spec`）に記録すること（REQ-0136-010, REQ-0138-009）。委譲接続点: サブエージェントは分類候補・SPEC 候補と根拠のみを返し、親エージェントが要件doc混入可否を判断する
    - **4-3. 文書分類妥当性検証**: 各要件の対象ドキュメント種別を検証する。REQ 要件行として残った行に SPEC 分離基準（REQ-0101-068）違反の残留がないか検出し、検出時は当該行を SPEC 保存対象へ移送して `artifact_actions`（`artifact: spec`）に追加すること（安定契約例外 REQ-0101-069 は検出対象外）。委譲接続点: サブエージェントは不適合候補・SPEC 残留候補と根拠のみを返し、親エージェントがflag記録を判断する
-   - **4-4. アーキテクチャ確認**: アーキテクチャに影響する要件、ADR候補、既存REQ/ADR/SPECとの衝突候補、command/skill/workflow/docsの責務境界変更を含む場合、`agentdev-architecture-advisory`に従いoracleに確認する。oracleの助言は判断材料として扱い、親エージェントが確定事項・推定事項・ユーザー確認事項・ブロッカーに分類する。既存文書またはユーザー合意で裏付けられていない内容を要件本文へ確定事項として混入させない。
+   - **4-4. アーキテクチャ確認**: アーキテクチャに影響する要件、ADR候補、既存REQ/ADR/SPECとの衝突候補、command/skill/workflow/docsの責務境界変更を含む場合、`agentdev-architecture-advisory`に従いoracleに確認する。oracleの助言は判断材料として扱い、親エージェントが確定事項・推定事項・ユーザー確認事項・ブロッカーに分類する。既存文書またはユーザー合意で裏付けられていない内容を要件本文へ確定事項として混入させない。分類結果にブロッカーが含まれる場合、または未決事項が解消されず残る場合、要件doc生成（Step 6）へ進まず壁打ち（Step 2）へ差し戻すこと（REQ-0139-004, REQ-0139-014）
 
 5. **ADR判断** → `agentdev-adr-guidelines`（manual reference）に従ってADR判断を記録（ADRファイル作成は req-save で実行）
 
@@ -63,9 +63,6 @@ agent: sisyphus
        - `operation` の値は対象 artifact により2系統（REQ-0136-013）: REQ 操作は `create` / `append` / `update`、SPEC 操作は `spec-create` / `spec-update`。後方互換性のため既存の `create` / `append` / `update` は維持する
        - `target_req` は REQ 操作（create/append/update）の対象 REQ、`target_spec` は SPEC 操作（spec-create/spec-update）の対象 SPEC パス（例: `docs/specs/patterns.md`、新規は `new:{topic-slug}`）。両フィールドは操作種別に応じて使い分け、未使用時は省略可能とする
     - **6-2. artifact_actions 生成**: Step 4-2/4-3 の分類結果・Step 5 の ADR 判断結果を `draft-data` の `artifact_actions` に統合する。1 action = 1 artifact × 1 editing concern 単位とし、同一関心の複数 agreed items は単一 action に複数段落の `content` としてまとめる（REQ-0138-009, REQ-0138-017）。各 action は `id`（ACT-REQ-NNN / ACT-ADR-NNN / ACT-SPEC-NNN）, `artifact`（req/adr/spec）, `operation`, `target`, `source_items`, `content` を持つ
-
-  7. **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）。bugfix + ADR必要時は feature に昇格
-   - **6-2. artifact_actions 生成**: Step 4-2/4-3 の分類結果・Step 5 の ADR 判断結果を `draft-data` の `artifact_actions` に統合する。1 action = 1 artifact × 1 editing concern 単位とし、同一関心の複数 agreed items は単一 action に複数段落の `content` としてまとめる（REQ-0138-009, REQ-0138-017）。各 action は `id`（ACT-REQ-NNN / ACT-ADR-NNN / ACT-SPEC-NNN）, `artifact`（req/adr/spec）, `operation`, `target`, `source_items`, `content` を持つ
 
 7. **work_type 判定**: ラベルに基づき4値分類（bugfix/feature/maintenance/docs_chore）。bugfix + ADR必要時は feature に昇格
 
