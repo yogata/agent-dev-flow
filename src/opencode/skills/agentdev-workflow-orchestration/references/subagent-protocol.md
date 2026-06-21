@@ -77,3 +77,29 @@ oldString: "    const result = items.map(i => i.value);"
 | 名前空間変更 | AST-grep | 境界を正確に認識 |
 | 特定行の追加・変更 | edit | 位置指定が明確な場合に適している |
 | 大規模なコードブロックの再構築 | Write | ファイル全体の再生成が必要な場合 |
+
+## driver 起動プロンプトテンプレート（Windows + ジャンクション環境）
+
+case-run Step 5 で実行担当サブエージェント（driver）へ引き継ぐプロンプトに**必須**で含める項目（OU-012 / REQ-0110）。ジャンクション未伝播により worktree 内 `.opencode/` が空になる事象を事前通知し、driver が手動両辺編集・同期スクリプト非依存で作業するよう誘導する。
+
+### 必須項目
+
+driver 起動プロンプトには以下を明記する:
+
+- **worktree 内 `.opencode/` は空**: ジャンクション未伝播のため `.opencode/skills/agentdev-*`・`.opencode/commands/agentdev/` が存在しない。`.opencode/skills/repo-*`（実ディレクトリ）のみ存在する
+- **source / projection 手動両辺編集**: ジャンクション未伝播時は同期スクリプトで自動化できず、source（`src/opencode/`）と projection（`.opencode/`）を手動で両辺編集する運用をとる。agent-dev-flow 自己ホストの場合は source 編集後にメインリポジトリのジャンクションが merge 後に自動反映するため worktree での projection 手動編集は不要だが、consumer プロジェクト（ジャンクションなし・`.opencode/` が git 管理対象）では両辺の手動同期が必要
+- **同期スクリプト非依存**: `sync-self-opencode.ps1`・`install-consumer-opencode.ps1` を worktree 内で実行してジャンクションを再作成しない（worktree 汚染・競合リスク）。ジャンクション再作成は case-run 終了後にメインリポジトリで実施する
+- **`.opencode/skills/repo-*` は実ディレクトリ**: `repo-agentdev-integrity` 等の `repo-*` プレフィックススキルはジャンクションではなく実ディレクトリのため worktree にも伝播する。これらは worktree 内で直接編集してよい
+
+### プロンプトテンプレート断片
+
+driver 起動プロンプトの末尾に以下を埋め込む:
+
+```
+## 環境制約（Windows + ジャンクション）
+
+- 本 worktree の `.opencode/skills/agentdev-*`・`.opencode/commands/agentdev/` は空です（ジャンクション未伝播）。
+- source（`src/opencode/`）を編集してください。projection（`.opencode/`）の手動同期は不要です（メインリポジトリのジャンクションが merge 後に自動反映します）。
+- 同期スクリプト（sync-self-opencode.ps1 等）を worktree 内で実行しないでください。
+- `.opencode/skills/repo-*`（実ディレクトリ）は worktree にも伝播しているため直接編集してかまいません。
+```

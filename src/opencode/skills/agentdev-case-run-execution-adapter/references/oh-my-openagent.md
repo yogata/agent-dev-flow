@@ -18,6 +18,22 @@ bunx oh-my-openagent run \
 
 `task(subagent_type="sisyphus")` 等 OpenCode 組込サブエージェント起動を使わない理由: oh-my-openagent 側でオーケストレーションが二重に走る問題（oh-my-openagent issue #4027）を回避するため。AgentDevFlow 側は worktree と Issue を用意して PR を受領するだけの薄いオーケストレーターに徹し、詳細実行計画策定〜実装〜PR 発行まではハーネス側に委譲する。
 
+### bunx → npx フォールバック（OU-013 / REQ-0130）
+
+bunx がモジュール解決エラー（`Cannot find module`・`ERR_MODULE_NOT_FOUND`・`error: module not found` 等）で失敗する場合がある（Windows 環境・bun 1.x の一部バージョンで実績あり）。この場合は直ちに `npx` にフォールバックする。
+
+```bash
+# 主経路（bunx）
+if ! bunx oh-my-openagent run --directory "$WORKTREE_PATH" ... ; then
+  # フォールバック（npx）
+  npx oh-my-openagent run --directory "$WORKTREE_PATH" ...
+fi
+```
+
+- フォールバックは1回のみ（npx でも失敗する場合は `failed`）
+- bunx 失敗がモジュール解決エラー以外（ハーネス側の実行時エラー・タイムアウト等）の場合は npx フォールバックせず、エラー種別に応じた処理（`blocked`・`failed`・タイムアウト事後処理）を行う
+- Windows 環境では npx フォールバック経路の利用頻度が高くなる想定（bunx の安定性課題）
+
 ## worktree 取り扱い
 
 - `--directory "$WORKTREE_PATH"` で case-run が作成した worktree パス（`.worktrees/{N}-{type}/`）を渡す。メインリポジトリパスは渡さない。
@@ -76,7 +92,7 @@ timeout 3600 bunx oh-my-openagent run ...
 ```
 
 - タイムアウトは **1時間（3600秒）** を既定値とする（REQ-0130-016 由来の運用想定）
-- タイムアウト発生時: oh-my-openagent プロセスを強制終了し、`failed` として処理する
+- タイムアウト発生時: oh-my-openagent プロセスを強制終了し、**即 `failed` とせず** 親 SKILL.md の「ハーネスタイムアウト事後処理（OU-013 / REQ-0130）」セクションに従い事後処理（worktree git status 確認・未コミット変更の grep 検出・手動修正または PR 化）を行う
 - 中断時の worktree クリーンアップは case-run 側の責務（ハーネス側にクリーンアップを期待しない）
 
 ## 完全起動スクリプト例
@@ -111,12 +127,21 @@ $(cat "$ISSUE_BODY_FILE")
 EOF
 )
 
-# 起動（1時間タイムアウト）
-timeout 3600 bunx oh-my-openagent run \
+# 起動（1時間タイムアウト・bunx→npx フォールバック付き）
+RUNNER="bunx"
+if ! timeout 3600 $RUNNER oh-my-openagent run \
   --directory "$WORKTREE_PATH" \
   --on-complete "$ON_COMPLETE_SCRIPT" \
   --json \
-  "$PROMPT" || EXIT_CODE=$?
+  "$PROMPT" ; then
+  # bunx のモジュール解決エラー等の場合は npx にフォールバック（OU-013）
+  RUNNER="npx"
+  timeout 3600 $RUNNER oh-my-openagent run \
+    --directory "$WORKTREE_PATH" \
+    --on-complete "$ON_COMPLETE_SCRIPT" \
+    --json \
+    "$PROMPT" || EXIT_CODE=$?
+fi
 
 # 結果ファイルから status / pr_url を読込
 STATUS=$(grep -oP '(?<=<status>)[^<]+' "$RESULT_FILE" || echo "")
