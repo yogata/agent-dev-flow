@@ -3,6 +3,8 @@ draft_type: req_draft
 topic_slug: doc-system-restructure
 status: saved
 created_at: 2026-06-21T17:30:00+09:00
+spec_actions_consumed: true
+spec_actions_consumed_at: 2026-06-21T18:00:00+09:00
 ---
 
 <!-- req_draft: AgentDevFlow 文書体系再構築

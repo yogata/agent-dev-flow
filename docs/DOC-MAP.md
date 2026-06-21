@@ -58,6 +58,53 @@
 
 ## 仕様（SPEC）
 
+SPEC は 3 層構造を持つ（AG-007）。横断 SPEC（`specs/workflows/`）は共通契約のみを扱い、個別 command / skill の動作は代替しない（AG-008）。
+
+### 横断 SPEC（`specs/workflows/`）
+
+共通契約・共通状態・artifact lifecycle 等、複数コマンド・スキルにまたがる契約。個別 command / skill の現在動作は各 SPEC を参照のこと。
+
+| SPEC | 内容 |
+|---|---|
+| [workflows/workflow-contracts.md](specs/workflows/workflow-contracts.md) | ワークフロー全体像・共通フェーズ・共通状態・artifact lifecycle・実装分類（Pattern Taxonomy） |
+| [workflows/delegation-contracts.md](specs/workflows/delegation-contracts.md) | サブエージェント委譲契約（委譲時最小契約・委譲種別・制約・manager-orchestrator 分離） |
+| [workflows/capture-boundaries.md](specs/workflows/capture-boundaries.md) | キャプチャ境界（intake / learning 境界・Split Rule・PR 本文永続チャネル・REQ 再構成 intake） |
+| [workflows/epic-wave-model.md](specs/workflows/epic-wave-model.md) | Epic / Wave / Issue 実行モデル（OU 階層・子Issue 状態 enum・Wave スケジューリング） |
+| [workflows/backlog-artifact-lifecycle.md](specs/workflows/backlog-artifact-lifecycle.md) | RU / 採用済み成果物 / draft ライフサイクル・検出事項プロトコル・artifact_actions 工程分岐 |
+
+### command SPEC（`specs/commands/`）
+
+各 `/agentdev/*` 公開コマンドの現在動作。配布物（`src/opencode/commands/`）の動作を docs 内部から参照する用。
+
+- [commands/_template.md](specs/commands/_template.md) — command SPEC テンプレート
+- [commands/req-define.md](specs/commands/req-define.md) — `/agentdev/req-define`
+- [commands/req-save.md](specs/commands/req-save.md) — `/agentdev/req-save`
+- [commands/spec-save.md](specs/commands/spec-save.md) — `/agentdev/spec-save`
+- [commands/case-open.md](specs/commands/case-open.md) — `/agentdev/case-open`
+- [commands/case-run.md](specs/commands/case-run.md) — `/agentdev/case-run`
+- [commands/case-close.md](specs/commands/case-close.md) — `/agentdev/case-close`
+- [commands/case-auto.md](specs/commands/case-auto.md) — `/agentdev/case-auto`
+- [commands/case-update.md](specs/commands/case-update.md) — `/agentdev/case-update`
+- [commands/intake-capture.md](specs/commands/intake-capture.md) — `/agentdev/intake-capture`
+- [commands/intake-from-github.md](specs/commands/intake-from-github.md) — `/agentdev/intake-from-github`
+- [commands/intake-promote.md](specs/commands/intake-promote.md) — `/agentdev/intake-promote`
+- [commands/learning-promote.md](specs/commands/learning-promote.md) — `/agentdev/learning-promote`
+- [commands/backlog-review.md](specs/commands/backlog-review.md) — `/agentdev/backlog-review`
+- [commands/inspect-docs.md](specs/commands/inspect-docs.md) — `/agentdev/inspect-docs`
+- [commands/inspect-skills.md](specs/commands/inspect-skills.md) — `/agentdev/inspect-skills`
+- [commands/inspect-promote.md](specs/commands/inspect-promote.md) — `/agentdev/inspect-promote`
+
+### skill SPEC（`specs/skills/`）
+
+各 `agentdev-*` 配布スキルの現在動作。配布物（`src/opencode/skills/`）の動作を docs 内部から参照する用。
+
+- [skills/_template.md](specs/skills/_template.md) — skill SPEC テンプレート
+- skill SPEC 一覧は `specs/skills/` ディレクトリ配下（27 件）。`repo-agentdev-integrity` は repo-local・配布対象外のため対象外。
+
+### その他 SPEC（`specs/` 直下）
+
+システム全体の構成・フォーマット・整合性検査など、複数層にまたがる基盤 SPEC。
+
 | SPEC | 内容 |
 |---|---|
 | [system.md](specs/system.md) | コマンドシステムの構成 |
@@ -69,7 +116,7 @@
 | [writing-style.md](specs/writing-style.md) | 文書執筆スタイルガイドライン |
 | [artifact-contracts.md](specs/artifact-contracts.md) | アーティファクト間契約 |
 | [integrity-contracts.md](specs/integrity-contracts.md) | 整合性検査分類フレームワーク |
-| [workflow-contracts.md](specs/workflow-contracts.md) | ワークフロー契約の雛形・Local backend 差分 |
+| [workflow-contracts.md](specs/workflow-contracts.md) | ワークフロー契約（旧版・縮小済み・横断契約は `workflows/` を参照） |
 | [runtime-package-boundary.md](specs/runtime-package-boundary.md) | 実行時配布物の境界と依存制約 |
 | [local-case-file.md](specs/local-case-file.md) | ローカル版 OpenCode の Case ファイルスキーマ・状態遷移・採番・見出し |
 | [local-generation.md](specs/local-generation.md) | ローカル版 OpenCode 生成フロー・`generated_by` 識別子・ジャンクション検出安全ゲート |
@@ -79,6 +126,13 @@
 | [req-impact-map.md](specs/req-impact-map.md) | REQ 影響マッピング |
 | [req-health-metrics.md](specs/req-health-metrics.md) | REQ 健全性メトリクス（肥大化・関心ズレ閾値） |
 | [rule-ownership.md](specs/rule-ownership.md) | ルール所有権マトリックス |
+
+## SPEC 探索経路ガイド
+
+1. 個別コマンドの現在動作を知りたい → `specs/commands/<command>.md`
+2. 個別スキルの現在動作を知りたい → `specs/skills/<skill-name>.md`
+3. 複数コマンド・スキルにまたがる共通契約 → `specs/workflows/*.md`
+4. 文書フォーマット・設計原則・整合性検査基盤 → `specs/*.md`（直下）
 
 ## ADR
 

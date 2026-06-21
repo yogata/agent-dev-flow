@@ -1,0 +1,109 @@
+---
+title: case-open SPEC
+status: draft
+created: 2026-06-21
+updated: 2026-06-21
+---
+
+# case-open SPEC
+
+## 目的
+
+要件定義（req-define）の結果をもとに GitHub Issue を作成する。壁打ち→構造的実行フェーズの境界。Epic + 子 Issue 一括作成に対応する。
+
+## 入力
+
+- req-define で生成された要件doc（構造化 `draft-data` 形式: REQ-0138, ADR-0124・チェックボックス付き）
+- draft 全体の `agreed_items`・`artifact_actions`・`operation_units` を処理対象。OU ごとにスライスせず draft 全体を取り扱う（REQ-0138-009）
+- `auto_gate.auto_ready` が false、または未解決質問・未解決衝突・repo外操作・停止理由が残る場合は停止（REQ-0138-013）
+- `conflict_resolutions` に記録済みの衝突は同じ内容をユーザーへ再確認しない（REQ-0138-014）
+
+## 出力
+
+- GitHub Issue（ラベル付き、要件doc埋め込み）
+- Epic flow の場合は Epic Issue + 子 Issue 群（最大10件・G05/G15）
+- ドラフト削除: `.agentdev/drafts/req-draft-{topic-slug}.md`
+- RU ファイル削除: `.agentdev/backlog/req-units/RU-*.md`
+- OU `result` 書き戻し: `operation_units` セクションに Issue / Epic 番号
+
+## 副作用
+
+- ファイル削除: `.agentdev/drafts/req-draft-*.md`, `.agentdev/backlog/req-units/RU-*.md`（Standard / Epic 全フロー共通・REQ-0137-003/006 Form Zero）
+- git 操作: `git rm <path>` + `git commit -- <paths>` の即時ステージ・コミット（並列実行安全ステージング）
+- GitHub API: `gh issue create`, `gh issue edit`, `gh issue comment`（`agentdev-gh-cli` VERIFY 付き）
+- intake / learning capture: 非関与（G18, G22）
+
+## 現在の動作
+
+- Step 0: 前工程からの引き継ぎ停止判定 — `agentdev_handoff: true` 含まれる場合は Issue 作成せず停止
+- Step 0-1: OU 選択ゲート — `operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止）
+- Step 1: 要件docからIssue本文生成（`agentdev-issue-management`）— REQ読解・テンプレート充足検査・完了条件候補抽出
+  - Step 1-1: 完了条件網羅性検証（QG-2）— Issue作成前に REQ/ADR/SPEC 必達要件の網羅性を検証
+- Step 2: マルチREQ入力判定 — 単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐
+  - Step 2-1: 自律構成生成（OU モード・複数REQ時）— `operation_units` から Epic / Wave / Issue 構造を自律生成
+- Step 3: 規模判定（単一REQの場合）— `scale: large` → Epic flow / `scale: standard` → Standard flow
+- Epic flow（Steps 4-8-1）:
+  - Step 4: テンプレート読込（`agentdev-workflow-templates`）
+  - Step 5: Epic Issue本文生成 — 自律構成分析結果に基づき Epic 本文を構築
+  - Step 6: Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）— VERIFY
+  - Step 7: 子Issue作成（OU 単位・順次処理）— Issue化単位は REQ doc 単位ではなく OU 単位（REQ-0104-042）
+  - Step 8: Epic Issue本文更新 — ステータス追跡テーブル更新
+  - Step 8-1: OU `result` 書き戻し — Issue / Epic 番号
+- Standard flow（Steps 14-16-1）:
+  - Step 14: 関連ADR特定
+  - Step 15: ラベル付与（`agentdev-workflow-lifecycle`）
+  - Step 16: GitHub Issue作成 — VERIFY
+  - Step 16-1: OU `result` 書き戻し — Issue 番号
+- 共通終了処理（Steps 17-18-2）:
+  - Step 17: コメント追加（`agentdev-workflow-templates`）
+  - Step 18: ドラフト削除（`git rm` + `git commit` Form Zero）
+  - Step 18-1: RU ファイル削除（`git rm` + `git commit` Form Zero）
+  - Step 18-1-1: draft / RU 削除残存検証 — `git status --porcelain` で残存検出
+  - Step 18-2: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
+
+## 参照する横断 SPEC
+
+- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md) — フェーズ定義・コマンド分類・workflow_route
+- [workflows/epic-wave-model.md](../workflows/epic-wave-model.md) — Epic / Wave / Issue 階層・子Issue 状態 enum・case-open 構成生成基準
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md) — RU 削除トリガー・draft lifecycle
+- [quality-gates.md](../quality-gates.md) — QG-2
+- [writing-style.md](../writing-style.md) — Issue 本文品質検査
+
+## 対象外
+
+- 機能要件・非機能要件・制約・対象外・受け入れ条件の新規作成（G19・REQ-0132-009）
+- 実装順序・Issue分解についてのユーザー確認要求（G20・REQ-0132-008）
+- 単一 Issue で完結する場合の Epic 作成（G20・REQ-0104-041）
+- Wave単位のみの子Issue構造（G14・子Issueは必ずREQドキュメントと対応付けること）
+- 子Issue最大10件超過時の作成続行（G05・エラー停止）
+- intake / learning capture の実施（G18, G22）
+- Issue作成の gh CLI 安全手順省略（G12・`agentdev-gh-cli` 参照）
+- スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（G23・REQ-0137-001）
+- 明示パス指定以外のステージ・コミット（G24・REQ-0137-002/005）
+- draft / RU 削除の未ステージ残存許可（G24・Form Zero・REQ-0137-003/006）
+
+## 検証観点
+
+- QG-2（Acceptance Criteria Coverage Gate）: Step 1-1 で完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
+- 子Issue 先頭行 `Parent: #{epic_number}` 含有（G03・親子関係追跡用）
+- 全子Issue作成完了後の Epic 本文ステータス追跡テーブル更新（G04・部分更新禁止）
+- 子Issue数上限（G05・最大10件・Epic 1件あたり）
+- テンプレート必須セクション完備確認（G09・G10・`完了条件` セクション含む）
+- 出力制約: Issue 本文・commit message は verbatim で返す（G17）
+- draft / RU 削除残存検証（Step 18-1-1・`git status --porcelain` で空であること）
+
+## See Also
+
+- [req-define.md](req-define.md) — 前段コマンド
+- [req-save.md](req-save.md) — 前段コマンド（REQ/ADR 保存）
+- [spec-save.md](spec-save.md) — 前段コマンド（SPEC 保存）
+- [case-run.md](case-run.md) — 後続コマンド（実装）
+- `agentdev-issue-management` skill — Issue 本文生成・テンプレート充足
+- `agentdev-workflow-templates` skill — テンプレート選定
+- `agentdev-workflow-lifecycle` skill — work_type・scale 判定・ラベル付与
+- `agentdev-gh-cli` skill — gh CLI 安全使用
+- `agentdev-git-worktree` skill — 並列実行安全ステージング
+- `agentdev-quality-gates` skill — QG-2
+- `agentdev-epic-tracker` skill — ステータス追跡テーブル
+- REQ-0132 — case-open / Issue作成
+- REQ-0137 — 並列実行安全 git 操作規律

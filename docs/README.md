@@ -46,18 +46,39 @@
 
 ## 仕様（SPEC）
 
+SPEC は 3 層構造を持つ（commands / skills / workflows）。詳細は [SPEC インデックス](specs/README.md) 参照。
+
+### 横断 SPEC（`specs/workflows/`）
+
+- [ワークフロー契約（横断）](specs/workflows/workflow-contracts.md)
+- [サブエージェント委譲契約](specs/workflows/delegation-contracts.md)
+- [キャプチャ境界](specs/workflows/capture-boundaries.md)
+- [Epic / Wave / Issue 実行モデル](specs/workflows/epic-wave-model.md)
+- [RU / 採用済み成果物 / draft lifecycle](specs/workflows/backlog-artifact-lifecycle.md)
+
+### command SPEC / skill SPEC
+
+- [command SPEC 一覧](specs/commands/) — 各 `/agentdev/*` コマンド専用 SPEC（`_template.md` 含む）
+- [skill SPEC 一覧](specs/skills/) — 各 `agentdev-*` スキル専用 SPEC（`_template.md` 含む）
+
+### 基盤 SPEC（`specs/` 直下）
+
 - [システム仕様](specs/system.md)
 - [文書フォーマット規約](specs/patterns.md)
 - [設計原則](specs/design-principles.md)
 - [品質仕様](specs/quality-specs.md)
 - [品質ゲート](specs/quality-gates.md)
 - [文書モデル](specs/document-model.md)
+- [文書執筆スタイルガイドライン](specs/writing-style.md)
 - [アーティファクト契約](specs/artifact-contracts.md)
 - [成果物責任表](specs/artifact-responsibilities.md)
 - [整合性契約](specs/integrity-contracts.md)
 - [整合性ルールカタログ](specs/integrity-rule-catalog.md)
-- [ワークフロー契約](specs/workflow-contracts.md)
+- [ワークフロー契約（旧版・縮小済み）](specs/workflow-contracts.md)
 - [実行時パッケージ境界](specs/runtime-package-boundary.md)
+- [ローカル Case ファイル](specs/local-case-file.md)
+- [ローカル版 OpenCode 生成](specs/local-generation.md)
+- [ローカル版 OpenCode 変換プロンプト](specs/local-transform.md)
 - [ルール所有権マトリックス](specs/rule-ownership.md)
 - [REQ 影響マップ](specs/req-impact-map.md)
 - [REQ 健全性メトリクス](specs/req-health-metrics.md)
