@@ -27,9 +27,9 @@ oldString: "    const result = items.map(i => i.value);"
 
 1. **各 edit 操作の直後に Read で該当ファイルを検証する**
 2. **検証内容**:
-   - 編集意図どおりの変更が適用されているか
-   - 意図しない行の削除・変更が発生していないか
-   - ファイルの構造（インデント・括弧の整合）が保持されているか
+ - 編集意図どおりの変更が適用されているか
+ - 意図しない行の削除・変更が発生していないか
+ - ファイルの構造（インデント・括弧の整合）が保持されているか
 3. **検証失敗時**: 即座に修正し、再度 Read で確認。3回試行しても解決しない場合は停止して親エージェントに報告
 
 ## 大規模ファイルの分割委譲ガイダンス
@@ -39,9 +39,9 @@ oldString: "    const result = items.map(i => i.value);"
 1. **1000行を超えるファイルの変更は、単一タスクとして委譲しない** — タイムアウトやコンテキスト溢れの原因になる
 2. **分割単位**: 1タスクあたり最大約200行
 3. **親エージェントの責務**:
-   - ファイルの変更範囲を行単位で特定
-   - 各タスクに正確な行範囲と変更内容を割り当て
-   - タスク間の依存関係（上流の変更が下流に影響する場合）を管理
+ - ファイルの変更範囲を行単位で特定
+ - 各タスクに正確な行範囲と変更内容を割り当て
+ - タスク間の依存関係（上流の変更が下流に影響する場合）を管理
 4. **各タスクの完了後**: 親エージェントが結果を確認し、次のタスクへ進む
 
 ### 分割例
@@ -80,14 +80,14 @@ oldString: "    const result = items.map(i => i.value);"
 
 ## driver 起動プロンプトテンプレート（Windows + ジャンクション環境）
 
-case-run Step 5 で実行担当サブエージェント（driver）へ引き継ぐプロンプトに**必須**で含める項目（OU-012 / REQ-0110）。ジャンクション未伝播により worktree 内 `.opencode/` が空になる事象を事前通知し、driver が手動両辺編集・同期スクリプト非依存で作業するよう誘導する。
+case-run Step 5 で実行担当サブエージェント（driver）へ引き継ぐプロンプトに**必須**で含める項目（OU-012/）。ジャンクション未伝播により worktree 内 `.opencode/` が空になる事象を事前通知し、driver が手動両辺編集・同期スクリプト非依存で作業するよう誘導する。
 
 ### 必須項目
 
 driver 起動プロンプトには以下を明記する:
 
 - **worktree 内 `.opencode/` は空**: ジャンクション未伝播のため `.opencode/skills/agentdev-*`・`.opencode/commands/agentdev/` が存在しない。`.opencode/skills/repo-*`（実ディレクトリ）のみ存在する
-- **source / projection 手動両辺編集**: ジャンクション未伝播時は同期スクリプトで自動化できず、source（`src/opencode/`）と projection（`.opencode/`）を手動で両辺編集する運用をとる。agent-dev-flow 自己ホストの場合は source 編集後にメインリポジトリのジャンクションが merge 後に自動反映するため worktree での projection 手動編集は不要だが、consumer プロジェクト（ジャンクションなし・`.opencode/` が git 管理対象）では両辺の手動同期が必要
+- **source/ projection 手動両辺編集**: ジャンクション未伝播時は同期スクリプトで自動化できず、source（`src/opencode/`）と projection（`.opencode/`）を手動で両辺編集する運用をとる。agent-dev-flow 自己ホストの場合は source 編集後にメインリポジトリのジャンクションが merge 後に自動反映するため worktree での projection 手動編集は不要だが、consumer プロジェクト（ジャンクションなし・`.opencode/` が git 管理対象）では両辺の手動同期が必要
 - **同期スクリプト非依存**: `sync-self-opencode.ps1`・`install-consumer-opencode.ps1` を worktree 内で実行してジャンクションを再作成しない（worktree 汚染・競合リスク）。ジャンクション再作成は case-run 終了後にメインリポジトリで実施する
 - **`.opencode/skills/repo-*` は実ディレクトリ**: `repo-agentdev-integrity` 等の `repo-*` プレフィックススキルはジャンクションではなく実ディレクトリのため worktree にも伝播する。これらは worktree 内で直接編集してよい
 
@@ -103,3 +103,5 @@ driver 起動プロンプトの末尾に以下を埋め込む:
 - 同期スクリプト（sync-self-opencode.ps1 等）を worktree 内で実行しないでください。
 - `.opencode/skills/repo-*`（実ディレクトリ）は worktree にも伝播しているため直接編集してかまいません。
 ```
+
+

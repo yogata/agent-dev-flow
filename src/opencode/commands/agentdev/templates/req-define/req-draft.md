@@ -6,18 +6,18 @@ created_at: {ISO 8601 timestamp}
 source_rus: # optional: RU-* IDs that seeded this draft
 ---
 
-<!-- req_draft テンプレート（REQ-0138, ADR-0124）
-     このテンプレートは req-define が生成する構造化引き継ぎ成果物の原本である。
-     後続工程（req-save / spec-save / case-open / case-auto / case-run / case-close）が参照する
-     原本の情報源は # draft-data 内の YAML コードブロックであり、人間可読 Markdown セクションではない。
-     soft contract（生成元側標準）であり、LLM 推論経由で消費される。
-     厳格なスキーマバージョン・JSON Schema・バリデータは導入しない（ADR-0124）。 -->
+<!-- req_draft テンプレート
+ このテンプレートは req-define が生成する構造化引き継ぎ成果物の原本である。
+ 後続工程（req-save/ spec-save/ case-open/ case-auto/ case-run/ case-close）が参照する
+ 原本の情報源は # draft-data 内の YAML コードブロックであり、人間可読 Markdown セクションではない。
+ soft contract（生成元側標準）であり、LLM 推論経由で消費される。
+ 厳格なスキーマバージョン・JSON Schema・バリデータは導入しない。 -->
 
 # draft-data
 
 ```yaml
 # work_type: 要件の分類（bugfix / feature / maintenance / docs_chore）
-# workflow_route の派生値は保存せず、work_type + scale から各コマンドが導出する（REQ-0138-010）
+# workflow_route の派生値は保存せず、work_type + scale から各コマンドが導出する
 work_type: feature
 
 # scale: feature のみ standard / large。それ以外は未設定でよい
@@ -28,7 +28,7 @@ summary: {合意内容の1段落要約}
 
 # auto_gate: case-auto 自走可否の判定材料
 auto_gate:
-  # auto_ready が false の場合、または未解決 item が残る場合、後続コマンドは停止する（REQ-0138-013）
+  # auto_ready が false の場合、または未解決 item が残る場合、後続コマンドは停止する
   auto_ready: true
   unresolved_questions: []      # 未解決質問が残る場合は停止理由として列挙
   unresolved_conflicts: []      # 未解決衝突が残る場合は停止理由として列挙
@@ -36,15 +36,15 @@ auto_gate:
   stop_reasons: []              # その他の停止理由
 
 # agreed_items: 合意された個別項目。artifact_actions.source_items から ID 参照される
-# 必要十分な長文として保持し、項目数を増やして短い値を多数並べない（REQ-0138-008）
+# 必要十分な長文として保持し、項目数を増やして短い値を多数並べない
 agreed_items:
   - id: AG-001
     content: {合意された要件内容の本文}
   - id: AG-002
     content: {合意された要件内容の本文}
 
-# artifact_actions: REQ/ADR/SPEC への保存対象を成果物別ではなく1つの配列に統合（REQ-0138-009）
-# 1 action = 1 artifact × 1 editing concern（REQ-ID 単位でも箇条書き1行単位でもない・REQ-0138-017）
+# artifact_actions: REQ/ADR/SPEC への保存対象を成果物別ではなく1つの配列に統合
+# 1 action = 1 artifact × 1 editing concern（REQ-ID 単位でも箇条書き1行単位でもない）
 # 同一関心の複数 agreed items は単一 action に複数段落の content としてまとめる
 artifact_actions:
   - id: ACT-REQ-001             # ACT-{ARTIFACT}-{NNN}
@@ -72,7 +72,7 @@ artifact_actions:
       {保存対象の本文}
 
 # conflict_resolutions: 壁打ちで解消された衝突の記録
-# 記録済みの衝突について、後続コマンドは同じ内容をユーザーへ再確認しない（REQ-0138-014）
+# 記録済みの衝突について、後続コマンドは同じ内容をユーザーへ再確認しない
 conflict_resolutions:
   - id: CR-001
     conflict: {検出された衝突内容}
@@ -100,8 +100,10 @@ case_open_hints:
 
 # summary
 
-<!-- 【任意】 人間可読サマリー。後続工程の原本としては扱われない（REQ-0138-002）。
-     処理の原本は上記 # draft-data YAML ブロックである。
-     検討経緯や採用しない方針は処理対象として残さない（REQ-0138-003）。 -->
+<!-- 【任意】 人間可読サマリー。後続工程の原本としては扱われない。
+ 処理の原本は上記 # draft-data YAML ブロックである。
+ 検討経緯や採用しない方針は処理対象として残さない。 -->
 
 {合意内容の人間可読補足。検討経緯・不採用方針は含めない}
+
+

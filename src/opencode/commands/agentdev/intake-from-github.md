@@ -5,7 +5,7 @@ agent: sisyphus
 
 # Intake（GitHub 抽出）
 
-クローズ済みの GitHub Issue / PR の本文・コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存する。
+クローズ済みの GitHub Issue/ PR の本文・コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存する。
 
 旧 `issue-backlog` の抽出機能を intake ワークフローに再定義したコマンド。
 
@@ -38,22 +38,22 @@ agent: sisyphus
 5. **intake item 生成**: item 生成ルール・ファイル名規則は `agentdev-intake-pipeline` を参照
 
 5-1. **実行前同期（git pull）**:
-    - `git pull --ff-only` を実行する
-    - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git 同期エラー」形式で表示して停止する（自動解消しない）
+ - `git pull --ff-only` を実行する
+ - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git 同期エラー」形式で表示して停止する（自動解消しない）
 
 6. **保存**:
-    - 保存先: `.agentdev/intake/inbox/`
-    - ディレクトリが存在しない場合は作成する
-    - 同名ファイルが存在する場合は連番を付与する
+ - 保存先: `.agentdev/intake/inbox/`
+ - ディレクトリが存在しない場合は作成する
+ - 同名ファイルが存在する場合は連番を付与する
 
  6-1. **.agentdev/intake 変更の commit と push**:
-     - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
-     - **変更なし時**: commit/push せず、Step 8 の完了報告で「変更なし」と報告
-     - **変更あり時**:
-       1. `git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする。他のパスを巻き込まない
-       2. commit message: `chore(agentdev): capture intake items from github`（Conventional Commits 形式）
-       3. `git push` を実行する
-        4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git Push エラー」形式で表示し、完了扱いにしない
+ - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
+ - **変更なし時**: commit/push せず、Step 8 の完了報告で「変更なし」と報告
+ - **変更あり時**:
+ 1. `git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする。他のパスを巻き込まない
+ 2. commit message: `chore(agentdev): capture intake items from github`（Conventional Commits 形式）
+ 3. `git push` を実行する
+ 4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git Push エラー」形式で表示し、完了扱いにしない
 
 7. **サマリーレポート提示**: 抽出結果をサマリーとしてユーザーに提示する:
    ```
@@ -98,3 +98,5 @@ agent: sisyphus
 - G11: `agentdev-gh-cli` に従って読み取り操作を実行する
 - G12: 保存先は `.agentdev/intake/inbox/` のみ
 - G13: 成果物本文（Issue本文・PR本文・commit message・保存対象ファイル本文・テンプレート成果物）はverbatimで返す。判定結果・調査過程・中間ログ・読解メモは要約・成果物パス・根拠・親判断事項・capture候補へ圧縮して返す
+
+

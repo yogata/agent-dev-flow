@@ -45,7 +45,7 @@ REQ-{req_number}
 ## ステータス追跡
 <!-- 【必須】 -->
 
-子Issue 実行状態 enum（`pending` / `ready` / `running` / `completed` / `blocked` / `failed`）。`⏭スキップ` は採用しない（REQ-0106-030）。
+子Issue 実行状態 enum（`pending`/ `ready`/ `running`/ `completed`/ `blocked`/ `failed`）。`⏭スキップ` は採用しない。
 
 | 状態 | 件数 |
 |------|------|
@@ -65,3 +65,5 @@ REQ-{req_number}
 <!-- 【任意】 -->
 
 {additional_context}
+
+

@@ -25,7 +25,7 @@ GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git
 
 work_type判定は `agentdev-workflow-lifecycle` を参照。
 
-## origin/main 鮮度確認（OU-014 / REQ-0137）
+## origin/main 鮮度確認（OU-014/）
 
 並列 Wave 実行時・PR merge 後再開時は、worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認する。古い commit 基準の worktree による DIRTY/CONFLICTING を防止するため。
 
@@ -46,3 +46,4 @@ work_type判定は `agentdev-workflow-lifecycle` を参照。
 - `--force` によるダーティworktreeの強制削除禁止
 - メインリポジトリ内でのファイル編集禁止（case-run中）
 - worktree ライフサイクルに伴うブランチクリーンアップは禁止事項の対象外
+

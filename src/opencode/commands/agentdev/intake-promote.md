@@ -18,7 +18,7 @@ agent: sisyphus
 
 - 採用 item の採用済み成果物（`backlog-review` 用）
 - 整形済み item は `.agentdev/intake/promoted/*.md` に保存（フラット構造）
-- 分類結果レポート（採用 / 保留 / 却下）
+- 分類結果レポート（採用/ 保留/ 却下）
 
 ## 分類値
 
@@ -48,9 +48,9 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### フェーズ2: 内部レビュー
 
-3. **レビュー・評価**: 各 item を評価する。詳細は `agentdev-intake-pipeline` を参照。委譲接続点: サブエージェントは採用 / 保留 / 却下の候補と根拠を pass/warn/fail/partial で返し、親エージェントが最終分類を決める
+3. **レビュー・評価**: 各 item を評価する。詳細は `agentdev-intake-pipeline` を参照。委譲接続点: サブエージェントは採用/ 保留/ 却下の候補と根拠を pass/warn/fail/partial で返し、親エージェントが最終分類を決める
 
-4. **分類の提示**: 各 item の評価結果を分類（採用 / 保留 / 却下）と共に提示する。見出しは `## Findings / Capture候補` とする。詳細は `agentdev-intake-pipeline` を参照
+4. **分類の提示**: 各 item の評価結果を分類（採用/ 保留/ 却下）と共に提示する。見出しは `## Findings / Capture候補` とする。詳細は `agentdev-intake-pipeline` を参照
 
 ### フェーズ3: HITL 確定
 
@@ -82,7 +82,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 ## ガードレール
 
 ### 責務境界
-- G01: GitHub Issue の作成を行わない（`backlog-review` / `case-open` が担当）
+- G01: GitHub Issue の作成を行わない（`backlog-review`/ `case-open` が担当）
 - G02: intake item の元の内容を改変しない（整理・構造化のみ）
 - G03: `backlog-review` を自動起動しない（次ステップの提示のみ）
 - G04: learning pipeline の入力を生成しない。採用 item の後続ルートは `backlog-review` のみ
@@ -107,3 +107,4 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 - G15: review・整形はユーザーとの対話を通じて行う
 - G16: 保存先は `.agentdev/intake/promoted/` 直下のみ（フラット構造）
 - G17: 採用 item の inbox 元ファイルは成果物保存後に `.agentdev/intake/archive/promoted/` に移動する
+

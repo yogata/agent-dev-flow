@@ -18,7 +18,7 @@ agentdev_handoff: true
 
 - `agentdev_handoff: true` は AgentDevFlow 本体向けの引き継ぎマーカーである。
 - 通常の RU には `agentdev_handoff` を含めない（`agentdev_handoff: false` も記録しない）。
-- consumer repo では case-open / case-run が `agentdev_handoff: true` を停止条件とする。agent-dev-flow repo 本体では停止せず、通常の req/case workflow 入力として扱う。
+- consumer repo では case-open/ case-run が `agentdev_handoff: true` を停止条件とする。agent-dev-flow repo 本体では停止せず、通常の req/case workflow 入力として扱う。
 
 ## 各 Command の引き継ぎ停止条件
 
@@ -44,5 +44,6 @@ Issue 本文、要件doc本文に `agentdev_handoff: true` がある場合、実
 
 ## 参照
 
-- 前工程からの引き継ぎワークフロープロトコル（Workflow / Command Protocol で規定）
+- 前工程からの引き継ぎワークフロープロトコル（Workflow/ Command Protocol で規定）
 - 前工程からの引き継ぎメタデータ規約
+
