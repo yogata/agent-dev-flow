@@ -21,29 +21,6 @@ agent: sisyphus
 
 1. **入力解決**:
  - **実行開始時刻の記録**: 本 Step の冒頭（入力解決の最初の処理）で、case-auto の実行開始時刻を JST（Etc/GMT-9）・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録し、変数（`case_auto_started_at`）に保持する。この時刻は Step 7（停止時報告）および Step 8（完了報告）での所要時間算出の基準として使用する
- - **Issue番号/URL入力モード**: 引数が数値のみ（`^\d+---
-description: req-save→spec-save→case-open→case-run→case-closeを順次自走実行する（明示指定時のみ）
-agent: sisyphus
----
-
-# 最大自走モード
-
-要件docから req-save → spec-save → case-open → case-run → case-close を順次実行し、repo内変更に限りマージまで自走する。標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
-
-## 入力
-
-- Issue番号（数値）または Issue URL: 既存Issue から case-run → case-close を自走する場合
-- 要件doc: 明示パス指定/ `.agentdev/drafts/req-draft-*.md` 単一自動検出/ セッション内要件doc（3段階優先順位・構造化 `draft-data` 形式）
-
-## 出力
-
-- REQ/ADR artifact_actions がある場合: REQ/ADRファイル + GitHub Issue + 実装済みブランチ + PR + マージ済み + クローズ済み
-- artifact_actions に応じた各工程の出力（工程分岐は Step 3 参照）
-
-## 手順
-
-1. **入力解決**:
- - **実行開始時刻の記録**: 本 Step の冒頭（入力解決の最初の処理）で、case-auto の実行開始時刻を JST（Etc/GMT-9）・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録し、変数（`case_auto_started_at`）に保持する。この時刻は Step 7（停止時報告）および Step 8（完了報告）での所要時間算出の基準として使用する
  - **Issue番号/URL入力モード**: 引数が数値のみまたは GitHub Issue URL の場合、Issue番号として解決し case-run移行モードへ分岐する（Step 3 の Issue番号/URL入力分岐へ）。この場合、要件docの入力解決・work_type読取はスキップする
  - **要件doc入力モード**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
 2. **work_type 読取**: 入力要件docの `draft-data` から work_type を取得する（参考情報・パイプライン分岐の判定には使用しない）
