@@ -26,6 +26,15 @@ case-run は常に1 Issue のみを処理する（REQ-0130-010）。複数 Issue
 - ジャンクション再作成は既存手順に準拠し、本スキルで新規手順は定義しない。詳細・復旧手順は `references/self-healing-and-errors.md` の該当セクションを参照。
 - この制約は Windows + ジャンクション環境固有。`resolvePathWithFallback`（REQ-0108-189）によるランタイムパス→ソースパスの部分フォールバックはあるが、source/projection 双方向比較を要する検査までは補完しない。
 
+### driver サブエージェント引き継ぎプロンプト制約（MUST・REQ-0110）
+
+Windows + ジャンクション環境の worktree では `.opencode/skills/agentdev-*`・`.opencode/commands/agentdev/` が空になる（ジャンクション未伝播）。case-run Step 5 で実行担当サブエージェントへ引き継ぐプロンプトには、以下を**必須項目**として明記する（OU-012 / REQ-0110）。
+
+- worktree 内 `.opencode/` は空（ジャンクション未伝播）であること
+- source（`src/opencode/`）と projection（`.opencode/`）の編集は手動両辺編集を行うこと
+- 同期スクリプト（`sync-self-opencode.ps1` 等）には依存しないこと
+- 起動プロンプトテンプレートは `references/subagent-protocol.md` の「driver 起動プロンプトテンプレート（Windows + ジャンクション環境）」を参照
+
 ## 参照先
 
 詳細は以下の reference files を参照:
@@ -34,7 +43,7 @@ case-run は常に1 Issue のみを処理する（REQ-0130-010）。複数 Issue
 |----------|--------|
 | キャプチャ境界定義 | `references/capture-boundaries.md` — Intake/Learning 境界・分割ルール・コマンド責務境界 |
 | 自律修正ループ・CI 対応ループ・エラー | `references/self-healing-and-errors.md` — 自律修正ループ・CI対応・エラー回復マップ |
-| サブエージェント編集安全手順 | `references/subagent-protocol.md` — oldString最小化・Read検証・大規模ファイル分割・AST-grep推奨 |
+| サブエージェント編集安全手順 | `references/subagent-protocol.md` — oldString最小化・Read検証・大規模ファイル分割・AST-grep推奨・driver 起動プロンプトテンプレート（Windows + ジャンクション環境） |
 
 case-run コマンドのランタイムパス（projection 先）は `commands/agentdev/case-run.md`。command 本文内で case-run を参照する場合はこちらを使用。
 

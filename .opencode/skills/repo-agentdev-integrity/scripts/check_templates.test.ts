@@ -7,7 +7,6 @@ import crypto from "crypto";
 
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_PATH = path.join(SCRIPT_DIR, "check_templates.ts");
-const UTILS_PATH = path.join(SCRIPT_DIR, "cli_utils.ts");
 
 const REPO_ROOT = path.resolve(SCRIPT_DIR, "..", "..", "..", "..", "..");
 const WORKTREE_ROOT = path.resolve(REPO_ROOT, ".worktrees", "328-feature");
@@ -142,8 +141,11 @@ function setupFixtureDir(): string {
   fs.mkdirSync(FIXTURE_TEMPLATES_DIR, { recursive: true });
   fs.mkdirSync(FIXTURE_SCRIPTS_DIR, { recursive: true });
 
-  fs.copyFileSync(SCRIPT_PATH, path.join(FIXTURE_SCRIPTS_DIR, "check_templates.ts"));
-  fs.copyFileSync(UTILS_PATH, path.join(FIXTURE_SCRIPTS_DIR, "cli_utils.ts"));
+  for (const f of fs.readdirSync(SCRIPT_DIR)) {
+    if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+      fs.copyFileSync(path.join(SCRIPT_DIR, f), path.join(FIXTURE_SCRIPTS_DIR, f));
+    }
+  }
 
   return FIXTURE_TEMPLATES_DIR;
 }
@@ -318,8 +320,11 @@ describe("check_templates.ts", () => {
   describe("exit codes", () => {
     it("returns exit code 2 when templates directory is missing", () => {
       fs.mkdirSync(FIXTURE_SCRIPTS_DIR, { recursive: true });
-      fs.copyFileSync(SCRIPT_PATH, path.join(FIXTURE_SCRIPTS_DIR, "check_templates.ts"));
-      fs.copyFileSync(UTILS_PATH, path.join(FIXTURE_SCRIPTS_DIR, "cli_utils.ts"));
+      for (const f of fs.readdirSync(SCRIPT_DIR)) {
+        if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+          fs.copyFileSync(path.join(SCRIPT_DIR, f), path.join(FIXTURE_SCRIPTS_DIR, f));
+        }
+      }
 
       cleanupDir(FIXTURE_TEMPLATES_DIR);
 

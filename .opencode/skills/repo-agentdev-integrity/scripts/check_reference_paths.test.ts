@@ -1,10 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
-import { mkdirSync, writeFileSync, copyFileSync, rmSync } from "fs";
+import { mkdirSync, writeFileSync, copyFileSync, rmSync, readdirSync } from "fs";
 import { join } from "path";
 import type { IntegrityReport } from "./cli_utils.ts";
 const SCRIPT_DIR = import.meta.dir;
-const SCRIPT_FILE = join(SCRIPT_DIR, "check_integrity.ts");
-const CLI_UTILS_FILE = join(SCRIPT_DIR, "cli_utils.ts");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `ref-paths-test-${crypto.randomUUID().slice(0, 8)}`;
 const TEMP_ROOT = join(TEMP_BASE, RUN_ID);
@@ -20,8 +18,11 @@ function copyScripts(fixtureRoot: string): void {
     "scripts",
   );
   mkdirp(dest);
-  copyFileSync(SCRIPT_FILE, join(dest, "check_integrity.ts"));
-  copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
+  for (const f of readdirSync(SCRIPT_DIR)) {
+    if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+      copyFileSync(join(SCRIPT_DIR, f), join(dest, f));
+    }
+  }
 }
 interface RunResult {
   exitCode: number;

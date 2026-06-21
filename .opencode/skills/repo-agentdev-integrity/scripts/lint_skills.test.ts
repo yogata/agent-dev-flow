@@ -15,8 +15,7 @@ import * as path from "path";
 // Paths
 // ---------------------------------------------------------------------------
 
-const SCRIPT_SRC = path.join(import.meta.dir, "lint_skills.ts");
-const UTILS_SRC = path.join(import.meta.dir, "cli_utils.ts");
+const SCRIPTS_DIR = import.meta.dir;
 const TEMP_BASE = path.join("C:", "WINDOWS", "TEMP", "opencode");
 
 // ---------------------------------------------------------------------------
@@ -67,8 +66,11 @@ function setupTempEnv(
   // Copy scripts to <temp>/_scripts/ so findRepoRoot walks up to <temp>/
   const scriptsDir = path.join(tempDir, "_scripts");
   fs.mkdirSync(scriptsDir, { recursive: true });
-  fs.copyFileSync(SCRIPT_SRC, path.join(scriptsDir, "lint_skills.ts"));
-  fs.copyFileSync(UTILS_SRC, path.join(scriptsDir, "cli_utils.ts"));
+  for (const f of fs.readdirSync(SCRIPTS_DIR)) {
+    if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+      fs.copyFileSync(path.join(SCRIPTS_DIR, f), path.join(scriptsDir, f));
+    }
+  }
   const scriptPath = path.join(scriptsDir, "lint_skills.ts");
 
   // Create .opencode/skills/ tree

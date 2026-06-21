@@ -53,7 +53,7 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 
 **Step 3**: work_type 判定 → `agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定。scale は feature のみ standard/large。workflow_route は都度導出し保存しない
 
-**Step 4**: Worktree作成・ブランチ準備 → `agentdev-git-worktree` に従って実行。`origin/main` をベースとして明示的に指定。べき等チェック: worktree既存時は作成スキップ
+**Step 4**: Worktree作成・ブランチ準備 → `agentdev-git-worktree` に従って実行。`origin/main` をベースとして明示的に指定。べき等チェック: worktree既存時は作成スキップ。**並列 Wave 実行時・PR merge 後再開時は worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認すること（OU-013 / REQ-0130）**。
 
 **Step 4-1**: 親Epicステータス更新（`agentdev-epic-tracker` 参照）
 
@@ -69,6 +69,8 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 ### 実行担当サブエージェント委譲フェーズ（Steps 5-6）
 
 **Step 5: 実行担当サブエージェント起動**: 実装実行を外部実行バックエンドへ委譲するため、実行担当サブエージェントを起動する。実行担当サブエージェントは `agentdev-case-run-execution-adapter` skill の adapter protocol に従い、Issue読込・ADR/REQ/SPEC/docs repository context 再確認・外部実行バックエンドへの委譲・blocker処理・result返却を実行する。
+
+**ハーネス起動コマンドのフォールバック（OU-013 / REQ-0130）**: 既定では `bunx oh-my-openagent run ...` を使用する。bunx がモジュール解決エラー（`Cannot find module`・`ERR_MODULE_NOT_FOUND` 等）で失敗した場合は、直ちに `npx oh-my-openagent run ...` にフォールバックする。再起動は1回まで。npx フォールバックでも失敗する場合は `failed` として処理する。タイムアウト時の事後処理は `agentdev-case-run-execution-adapter` スキル参照。
 
 - **case-run が直接行わない（実行担当サブエージェント / 外部実行バックエンドの責務）**: work plan生成・実装実行・TDD・乖離検出（QG-3）・specs更新・関連ドキュメント整合性確認・ローカル検証・PR本文作成・PR作成・デプロイ検証
 - **実行担当サブエージェントへの引き渡し**: 割り当てられた1 Issue の Issue番号・worktree root（相対パス指定・worktree内制約）・ブランチ名。実行担当サブエージェントはこの1 Issue のみを実装対象とする（Wave全体や他子Issue のオーケストレーションは含まない）
