@@ -57,6 +57,8 @@ agent: sisyphus
 
    **5-3. 作業手段ADR拒否ゲート**: ADR候補が削除・廃止・移行・統合・再構築・完全削除そのものを主題にしている場合、ADR候補から除外する（REQ-0101-044）。過去判断の除去は新規ADRではなくretire/supersedeで処理する（REQ-0101-045）。委譲接続点: サブエージェントは除外候補と根拠のみを返し、親エージェントがADR候補提示可否を判断する
 
+   **5-4. ADR 番号指定形式**: req-define は ADR 番号を推測指定せず `new:{topic-slug}` 形式を使用すること（REQ-0102-069）。draft 内の ADR 参照は `new:{topic-slug}` 形式とし、確定番号は req-save が `agentdev-adr-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定して置換する。`ADR-NNNN` の直接指定は既存 ADR の UPDATE/APPEND 場合のみ許可され、新規 ADR 作成では番号を指定しないこと
+
 6. **要件doc生成** → テンプレート: `.opencode/commands/agentdev/templates/req-define/req-draft.md` を Read → 構造化 `draft-data` 形式（REQ-0138, ADR-0124）に従って生成。draft の原本は人間向け Markdown 本文ではなく構造化された `# draft-data` fenced YAML block である（REQ-0138-001）。Step 4-2/4-3 で分離した SPEC 候補は `artifact_actions`（`artifact: spec`）として統合し、`## SPEC候補` 補助セクションは出力しない（REQ-0138-009）。REQ/ADR/SPEC への保存対象は成果物別最上位配列に分散させず、単一の `artifact_actions` 配列に統合する
    - **6-0. 定義完全性ゲート（QG-1）**: 要件doc生成後、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、REQ/SPEC 分類・ADR ゲート・チェックボックス測可能性・必須フィールド完全性・artifact_actions 構成の妥当性を検証する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は壁打ち（Step 2）へ差し戻し
     - **6-1. operation_units 生成**: 複数RU入力時の統合/分離結果（Step 10-2）を基に `draft-data` 内の `operation_units` を生成する。各 OU は `ou_id`, `source_ru`, `target_req`, `target_spec`, `operation`, `scale`, `depends_on`, `recommended_order`, `issue_policy`, `result` フィールドを持つ（REQ-0102-033〜035, REQ-0136-013）。単一REQ操作の場合も 1 件の OU として出力する
