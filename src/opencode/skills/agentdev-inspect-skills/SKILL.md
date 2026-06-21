@@ -40,6 +40,21 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（C
 | 操作安全手順の配置 | git、gh、worktree などの安全手順が適切な operation Skill に置かれているか |
 | canonical Skill name 使用 | Skill 参照が正式な `agentdev-*` 名で記述されているか |
 | Skill 内部構造依存 | Command が Skill 内の見出し、Step、protocol 名に依存していないか |
+| 配布物 frontmatter 構文健全性 | 配布物（`src/opencode/commands/agentdev/`・`src/opencode/skills/agentdev-*/`）の Markdown frontmatter が重複・破損していないか（`docs/specs/docs-spec-rebuild-integrity.md` 構文健全性検査パターン準拠） |
+| 配布物見出し構文健全性 | 配布物の H1/H2 等の主要見出しが同一文書内で意図せず重複していないか（同上） |
+| 配布物 Markdown 構文破損 | 配布物に正規表現破損・未対応フェンス・不正インラインコード等の Markdown 構文破損がないか（同上） |
+| 配布物壊れた括弧・参照残骸 | 配布物に ID 除去で残った壊れた括弧（例: `（OU-XXX/）`・`（）`・`（/）`）・壊れた参照表現・主語/目的語欠落文がないか（同上文意保持検査パターン準拠） |
+| command-skill 責務説明矛盾 | 同一 Command の責務説明が Command 本体と関連 Skill 間で矛盾していないか（同上責務整合検査パターン準拠） |
+
+## NG 分類
+
+配布物整合性検査（`docs/specs/docs-spec-rebuild-integrity.md` 準拠）で検出した事項には以下の NG 分類を付ける。各分類の定義・後続対象は同 SPEC の NG 分類表に従う:
+
+| 分類 | 意味 |
+|------|------|
+| false positive | 検査ルールの誤検知 |
+| pre-existing | 今回の変更以前から存在する既知の問題 |
+| 今回修正対象 | 今回の変更で導入・残存した問題 |
 
 ## 診断分類
 

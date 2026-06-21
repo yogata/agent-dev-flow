@@ -25,7 +25,7 @@ GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git
 
 work_type判定は `agentdev-workflow-lifecycle` を参照。
 
-## origin/main 鮮度確認（OU-014/）
+## origin/main 鮮度確認
 
 並列 Wave 実行時・PR merge 後再開時は、worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認する。古い commit 基準の worktree による DIRTY/CONFLICTING を防止するため。
 

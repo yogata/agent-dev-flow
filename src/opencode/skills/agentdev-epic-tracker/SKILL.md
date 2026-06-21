@@ -1,30 +1,32 @@
 ---
 name: agentdev-epic-tracker
-description: Updates parent Epic Issue status tracking tables across case-run and case-close workflows. USE FOR: updating Epic status to in-progress or completed, tracking child Issue progress in parent Epics, detecting parent-child relationships via Parent: #N patterns. DO NOT USE FOR: creating Epics, managing non-Epic Issues, or general Issue operations.
+description: Updates parent Epic Issue status tracking tables in case-close workflows (single-writer). USE FOR: case-close(#epic) Epic Issue status writes (pending→completed/blocked/failed), tracking child Issue progress in parent Epics, detecting parent-child relationships via Parent: #N patterns. DO NOT USE FOR: creating Epics, managing non-Epic Issues, case-run(#epic) internal ready/running tracking (not persisted to Epic Issue), or general Issue operations.
 ---
 
 # Epic 状態追跡（Epic Status Tracker）
 
-親Epic Issueのステータス追跡テーブル（`pending`/ `ready`/ `running`/ `completed`/ `blocked`/ `failed`）を更新する知識ベース。
+親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベース。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR-0125 単一書き手制約・`docs/specs/workflows/epic-wave-model.md` 参照）。
 
-- **参照元**: `case-auto`（子Issue選択・running 更新）、`case-close`（completed 更新）
+- **参照元**: `case-close`（completed/ blocked/ failed 更新・単一書き手）。`case-auto`・`case-run` は Epic Issue 本文を読み取るのみで書き込まない
 - **特性**: 宣言的定義のみ提供。手順・手続きは各コマンド定義に委ねる
 - **`⏭スキップ` は採用しない**。前提未達の Issue は `pending` のまま選択対象外となる。Wave status は保存せず、Wave 内 Issue 状態から導出する
 
 ## ステータス値定義
 
-子Issue 実行状態 enum（workflow-contracts.md「子Issue実行状態 enum」参照）:
+子Issue 実行状態 enum（`docs/specs/workflows/epic-wave-model.md`「子Issue実行状態 enum」参照）:
 
 | 値 | 意味 | 設定主体 | 終了状態 |
 |---|---|---|---|
 | `pending` | 依存 Issue または前 Wave の完了待ち。異常ではない | case-open（初期値） | いいえ |
-| `ready` | 依存が満たされ、case-auto が次に case-run へ渡せる状態 | case-auto | いいえ |
-| `running` | case-auto が選択し、case-run が実行中の状態 | case-auto | いいえ |
+| `ready` | 依存が満たされ、case-run(#epic) が実行可能と判定した状態。**永続状態には書き込まれない** | case-run 内部判定（永続状態に書き込まない） | いいえ |
+| `running` | case-run(#epic) が task() 起動し実行中の状態。**永続状態には書き込まれない** | case-run 内部状態（永続状態に書き込まない） | いいえ |
 | `completed` | Issue の実装・検証・必要な case-close が完了した状態 | case-close | はい |
-| `blocked` | 要件曖昧性・外部副作用・権限不足・矛盾等により自動継続できない状態 | case-run/ case-auto | はい |
-| `failed` | 実装・検証・CI・PR 作成などの実行結果として失敗した状態 | case-run | はい |
+| `blocked` | 要件曖昧性・外部副作用・権限不足・矛盾等により自動継続できない状態 | case-close（実行結果から確定） | はい |
+| `failed` | 実装・検証・CI・PR 作成などの実行結果として失敗した状態 | case-close（実行結果から確定） | はい |
 
 Epic自動クローズ判定では `completed` を終了状態として扱う（`blocked`/ `failed` は終了状態だが自動クローズ完了とはみなさない）。
+
+**永続状態遷移**: Epic Issue 本文（永続状態）に書き込まれるのは `pending` → `completed`/ `blocked`/ `failed` の遷移のみ。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない（ADR-0125 単一書き手制約・case-close のみが書き込み）。
 
 ## 親Epic検出
 
@@ -35,38 +37,28 @@ Epic自動クローズ判定では `completed` を終了状態として扱う（
 
 ## ステータス更新プロトコル
 
-### case-auto: running 更新（子Issue選択時）
+### case-close: completed/ blocked/ failed 更新（単一書き手）
 
-`case-auto` が子Issue を選択して `case-run` に渡す際、当該子Issue を `ready`/`pending` → `running` に更新する:
+`case-close(#epic)` 完了時に子Issue を `pending` → `completed`/ `blocked`/ `failed` に更新する。case-close は Epic Issue 本文ステータス追跡テーブルの単一書き手（ADR-0125）。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれないため、本プロトコルの対象は `pending` → 終了状態（`completed`/ `blocked`/ `failed`）の遷移のみ:
+
 1. 子Issue本文から `Parent: #{N}` を検出
 2. 親Epicが存在しない → スキップ
 3. `gh issue view {N}` でEpic本文を取得（`agentdev-gh-cli` 準拠）
 4. 正規表現で該当子Issue行を特定・置換（後述「正規表現パターン」の新4列/旧4列形式に対応）:
- - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )(pending|ready) (\|)` → `$1running $2`
- - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )(pending|ready) (\|)` → `$1running $2`
-5. 既に `running`、`completed`、`blocked`、または `failed` の場合 → スキップ（べき等性）
-6. `gh issue edit {N} --body-file {temp}` でEpic本文を更新
-7. 更新失敗時 → 警告表示して継続（フォールバック）
-
-### case-close: completed 更新
-
-`case-close` 完了時に子Issue を `running` → `completed` に更新する:
-1. 子Issue本文から `Parent: #{N}` を検出
-2. 親Epicが存在しない → スキップ
-3. `gh issue view {N}` でEpic本文を取得（`agentdev-gh-cli` 準拠）
-4. 正規表現で該当子Issue行を特定・置換:
- - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )running (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
- - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )running (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
-5. 既に `completed` の場合 → スキップ（べき等性）
+ - completed の場合:
+   - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )pending (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
+   - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )pending (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
+ - blocked/ failed の場合: 当該ステータス値で `pending` を置換
+5. 既に `completed`、`blocked`、または `failed` の場合 → スキップ（べき等性）
 6. `gh issue edit {N} --body-file {temp}` でEpic本文を更新
 
-`blocked`/ `failed` は case-run/ case-auto が設定する終了状態。case-close はこれらを `completed` に上書きしない。
+`blocked`/ `failed` は case-close が case-run(#epic) の実行結果（`completed(pr)`/ `blocked`/ `failed`）から確定して Epic Issue 本文へ反映する終了状態。case-close は確定済みの `completed`/ `blocked`/ `failed` を上書きしない。
 
-一括更新順序（Epic Orchestrator 等の複数子Issue一括更新時）: 子Issue番号の昇順
+一括更新順序（case-close(#epic) の複数子Issue一括更新時）: 子Issue番号の昇順
 
 ## 正規表現パターン
 
-Epic本文のステータス追跡テーブルは以下の2形式をサポートする。ステータス値は子Issue 実行状態 enum（`pending`/ `ready`/ `running`/ `completed`/ `blocked`/ `failed`）を使用する。
+Epic本文のステータス追跡テーブルは以下の2形式をサポートする。Epic Issue 本文（永続状態）に書き込まれるステータス値は `pending`/ `completed`/ `blocked`/ `failed` のみ（`ready`/ `running` は case-run(#epic) の内部状態のため永続状態に書き込まれない）。
 
 ### 新4列形式（#/ Issue/ ステータス/ 内容）
 
@@ -74,9 +66,9 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 | # | Issue | ステータス | 内容 |
 |---|-------|-----------|------|
 | 1-1 | #42 | pending | 子Issueの概要 |
-| 1-2 | #43 | running | 子Issueの概要 |
-| 1-3 | #44 | completed ([PR#100](https://...)) | 子Issueの概要 |
-| 1-4 | #45 | blocked | 子Issueの概要 |
+| 1-2 | #43 | completed ([PR#100](https://...)) | 子Issueの概要 |
+| 1-3 | #44 | blocked | 子Issueの概要 |
+| 1-4 | #45 | failed | 子Issueの概要 |
 ```
 
 ### 旧4列形式（#/ Issue/ タイトル/ ステータス）
@@ -85,37 +77,39 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 | # | Issue | タイトル | ステータス |
 |---|-------|----------|-----------|
 | 1 | #42 | 子Issueの概要 | pending |
-| 2 | #43 | 子Issueの概要 | running |
-| 3 | #44 | 子Issueの概要 | completed ([PR#99](https://github.com/...)) |
+| 2 | #43 | 子Issueの概要 | completed ([PR#99](https://github.com/...)) |
+| 3 | #44 | 子Issueの概要 | blocked |
 | 4 | #45 | 子Issueの概要 | failed |
 ```
 
-### 新4列形式: pending/ready → running
+### 新4列形式: pending → completed
 
 ```
-検索: (\| \d+-\d+ \| #{child_issue} \| )(pending|ready) (\|)
-置換: $1running $2
-```
-
-### 新4列形式: running → completed
-
-```
-検索: (\| \d+-\d+ \| #{child_issue} \| )running (\|)
+検索: (\| \d+-\d+ \| #{child_issue} \| )pending (\|)
 置換: $1completed ([PR#{pr_number}]({pr_url})) $2
 ```
 
-### 旧4列形式: pending/ready → running
+### 新4列形式: pending → blocked/ failed
 
 ```
-検索: (\| \d+ \| #{child_issue} \| [^|]* \| )(pending|ready) (\|)
-置換: $1running $2
+検索: (\| \d+-\d+ \| #{child_issue} \| )pending (\|)
+置換: $1{terminal_status} $2
 ```
 
-### 旧4列形式: running → completed
+`{terminal_status}` は `blocked` または `failed`。
+
+### 旧4列形式: pending → completed
 
 ```
-検索: (\| \d+ \| #{child_issue} \| [^|]* \| )running (\|)
+検索: (\| \d+ \| #{child_issue} \| [^|]* \| )pending (\|)
 置換: $1completed ([PR#{pr_number}]({pr_url})) $2
+```
+
+### 旧4列形式: pending → blocked/ failed
+
+```
+検索: (\| \d+ \| #{child_issue} \| [^|]* \| )pending (\|)
+置換: $1{terminal_status} $2
 ```
 
 ### 完了状態のべき等性確認
@@ -150,42 +144,42 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 
 #### 1. PR merge前後のEpic状態遷移
 
-Epicステータス更新はPRのmerge前後で一貫性を保つ必要がある:
+Epic Issue 本文（永続状態）の書き込みは case-close(#epic) のみが行う（単一書き手・ADR-0125）。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない。
 
-**merge前（case-auto が case-run に子Issue を渡す時）**:
-- 子Issueを `pending`/`ready` → `running` に更新
-- 親Epic本文を取得し、該当子Issue行を更新
+**case-run(#epic) 実行中（merge前・Epic Issue 本文不変）**:
+- 子Issue の `ready`/ `running` は case-run(#epic) の内部状態として追跡（Epic Issue 本文には書き込まない）
+- Epic Issue 本文ステータス追跡テーブルは `pending` のまま
 
-**merge後（case-close 完了時）**:
-- 子Issueを `running` → `completed ([PR#N](URL))` に更新
-- PR番号とURLを含める
+**case-close(#epic) 完了時（merge後・Epic Issue 本文更新）**:
+- 子Issue を `pending` → `completed ([PR#N](URL))`/ `blocked`/ `failed` に更新
+- PR番号とURLを含める（`completed` の場合）
 
 **状態遷移の一貫性チェック**:
 ```markdown
 ## Epicステータス更新チェック
 
 **子Issue**: #{child_issue}
-**更新前ステータス**: {previous_status}
-**更新後ステータス**: {new_status}
+**更新前ステータス**: pending
+**更新後ステータス**: {new_status（completed/blocked/failed）}
 **PR番号**: #{pr_number}
-**更新タイミング**: {timing（前/後）}
+**更新タイミング**: case-close(#epic) 完了時
 **一貫性**: ✅ OK / ❌ NG
 ```
 
 #### 2. merge失敗がEpic進捗に与える影響
 
-PR mergeに失敗した場合、Epicステータスの整合性を保つ:
+PR mergeに失敗した場合、Epicステータスの整合性を保つ。Epic Issue 本文は case-close が完了するまで更新されないため、merge失敗時は `pending` が維持される:
 
 **merge失敗時の対応**:
 
-| 失敗タイミング | Epicステータス | 対応 |
-|--------------|----------------|------|
-| PR作成前（conflict検出） | 変更なし | PR作成を停止 |
-| PR作成後、merge前 | `running` | status維持（完了しない） |
-| merge時（conflict発生） | `running` | status維持、解決後に再試行 |
-| merge時（CI失敗等） | `running` | status維持、問題修正後に再試行 |
+| 失敗タイミング | Epic Issue 本文ステータス | case-run(#epic) 内部状態 | 対応 |
+|--------------|--------------------------|-------------------------|------|
+| PR作成前（conflict検出） | `pending` | `ready`/ `running` | PR作成を停止 |
+| PR作成後、merge前 | `pending` | `running` | 内部状態維持（Epic 本文不変） |
+| merge時（conflict発生） | `pending` | `running` | 内部状態維持、解決後に再試行 |
+| merge時（CI失敗等） | `pending` | `running` | 内部状態維持、問題修正後に再試行 |
 
-**重要**: merge失敗時はステータスを `completed` にしない。`running` を維持し、再実行可能にする。実行結果として失敗が確定した場合は `failed` に遷移する。
+**重要**: merge失敗時は Epic Issue 本文を更新しない（`pending` を維持）。case-close(#epic) が実行結果として失敗を確定した場合のみ `failed`/ `blocked` を書き込む。`running` は case-run(#epic) の内部状態であり、Epic Issue 本文には現れない。
 
 **失敗報告フォーマット**:
 ```markdown
@@ -194,29 +188,28 @@ PR mergeに失敗した場合、Epicステータスの整合性を保つ:
 **PR番号**: #{pr_number}
 **Epic番号**: #{epic_number}
 **子Issue**: #{child_issue}
-**現在ステータス**: running
+**Epic Issue 本文ステータス**: pending（維持）
+**case-run(#epic) 内部状態**: running
 **失敗理由**: {failure_reason}
-**対応**: ステータスを維持（running）、問題解決後に再実行
+**対応**: case-close(#epic) が失敗を確定するまで Epic Issue 本文は保留
 ```
 
 #### 3. Epic本文のconflictリスク
 
-Epic本文は複数の子Issueから並行して更新される可能性があるため、conflictリスクが高い:
+Epic Issue 本文の書き込みは case-close(#epic) が単一書き手（ADR-0125）であるため、サブエージェント間の同時書き込みConflictは発生しない。残るConflictリスクは case-close(#epic) 書き込みと手動編集の競合のみ:
 
 **conflictリスク**:
-- 複数の子Issueが同時にEpicステータスを更新
-- 同じEpic内の複数のWaveが並列実行される場合
-- 手動でのEpic編集と自動更新が競合
+- case-close(#epic) の Epic 本文更新と手動編集の競合
+- case-close(#epic) 実行中にユーザーが手動でステータスを変更
 
 **conflict予防**:
-1. **Wave単位の一括更新**（Epic Orchestratorモード）:
- - Wave開始時にEpicステータスを一括更新
- - Wave完了時にステータスを一括更新
- - サブエージェントによる同時更新を回避
+1. **case-close(#epic) 単一書き手の維持**:
+  - Wave 完了時に case-close(#epic) が一括更新（子Issue番号昇順）
+  - case-run(#epic)・case-auto は Epic Issue 本文に書き込まない
 
 2. **更新順序の制御**:
- - 子Issue番号の昇順で更新
- - 同一Wave内の更新は親エージェントが一括処理
+  - 子Issue番号の昇順で更新
+  - 同一Wave内の完了子Issue 更新は case-close(#epic) が一括処理
 
 3. **更新失敗時のフォールバック**:
    ```markdown
