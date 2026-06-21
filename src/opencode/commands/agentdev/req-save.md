@@ -87,6 +87,9 @@ ADR保存の直前に、以下の妥当性を再検証すること:
 - ADRが技術判断（アーキテクチャ上の決定）を含むか確認
 - REQ/SPEC相当の内容のみの場合、保存を停止し理由を報告
 - adr-guidelinesの判定結果を前提として検証する
+- ADR ファイル保存時に `agentdev-adr-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定した番号を振ること（REQ-0102-069）
+- draft 内の全 ADR 参照（`new:{topic-slug}` 形式）を当該確定番号で置換すること
+- 採番は `docs/adr/` 配下の既存 ADR ファイルの最大番号 + 1 とし、欠番があっても埋めないこと
 
 ### 委譲・参照制約
 - G09: 工程分岐は `work_type` 固定分岐ではなく `artifact_actions` の有無で判定する（REQ-0138-009）。判定基準の詳細は `agentdev-workflow-lifecycle` を参照

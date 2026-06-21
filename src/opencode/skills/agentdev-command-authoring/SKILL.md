@@ -42,6 +42,14 @@ Commandに書くべきでない内容:
 - 決定的な変換・検証・生成処理 → Scriptへ
 - テンプレート選定ルールの詳細 → Skillへ
 
+### Step 番号と詳細手順の配置
+
+Command が持つ Step 番号は高レベル（整数 Step 1, 2, 3...）に限定する。Step の細分番号（4-1, 4-2 等）・判定表・状態機械詳細は skill 本体または skill の `references/` へ配置すること。Command Steps が深く階層化されている場合、それは skill への切り出し不足のシグナルである。
+
+REQ 要件行には振る舞い・制約・状態のみを記述し、Step 番号参照やコマンド実装詳細を混入させないこと（REQ-0102-006/023）。REQ 要件行が特定 Step 番号（例: 「Step 4-2 で分類する」）に依存している場合、command 実装の変更が REQ 解釈に影響する結合が生じるため、振る舞い単位の記述に書き換えること。
+
+詳細ガイドは `agentdev-req-file-manager` の「REQ 要件行の記述基準」セクションを参照のこと。
+
 ## Definition of Done（DoD）
 
 command / skill 変更時の完了定義。以下の全項目を満たすこと:
