@@ -13,6 +13,9 @@ inspect-docs コマンドの REQ 構造診断知識ベース。REQ参照ID整合
 - 第一参照導線確認（DOC-MAP・README・requirements/README 導線）
 - 現行/廃止/世代境界確認（廃止専有 ID、二重存在、100s番台境界）
 - SPEC分離基準違反検出（REQ 要件行に残留した schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ）
+- 配布物 ID 汚染検出（`src/opencode/commands/`・`src/opencode/skills/` への `REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等の内部 ID 残留）
+- SPEC 三層構造の整合性検出（commands/skills/workflows 層分離違反・旧 grab-bag SPEC 残存）
+- HOW 除去後の acceptance-criteria 順位検証（機械的除去で見逃された HOW 残留・ID 残留・責務混入の再検出）
 - 6観点診断（SPLIT/ MERGE/ MOVE/ DUPLICATE/ RETIRE/ DRIFT）とシグナル閾値
 - 未処理成果物の確認（intake/learning/RU の存在と影響の報告）
 - 問題候補出力スキーマ（7フィールド構成）と診断結果の出力構成
@@ -33,7 +36,7 @@ inspect-docs コマンドの REQ 構造診断知識ベース。REQ参照ID整合
 
 | ファイル | 内容 |
 |----------|------|
-| `references/req-structure-review.md` | REQ参照ID整合性確認・第一参照導線確認・現行/廃止/世代境界確認・SPEC分離基準違反検出・6観点診断（観点・検出シグナル・シグナル閾値）・未処理成果物確認・診断結果の出力（問題候補出力スキーマ7フィールド） |
+| `references/req-structure-review.md` | REQ参照ID整合性確認・第一参照導線確認・現行/廃止/世代境界確認・SPEC分離基準違反検出・配布物 ID 汚染検出・SPEC 三層構造の整合性検出・HOW 除去後の acceptance-criteria 順位検証・6観点診断（観点・検出シグナル・シグナル閾値）・未処理成果物確認・診断結果の出力（問題候補出力スキーマ7フィールド） |
 
 ## See Also
 

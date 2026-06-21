@@ -251,6 +251,35 @@ proposed → deprecated
 - ADR UPDATE（ステータス変更）時: 状態別ビュー（Status View）を更新
 - ADR APPEND（関連情報追加）時: 意思決定マップ/ 関連REQ を更新
 
+### ステータス変更時の README 整合性検証
+
+ADR の `status` を変更した場合、`docs/adr/README.md` の全ビューが実ファイルと一致していることを検証する。ステータス変更と README 更新が同一変更内で行われないと、README と実ファイルの不整合が発生する（OU-010 学習）。
+
+#### 検証対象ビュー
+
+| ビュー | 検証内容 |
+|-------|----------|
+| 現行基盤ビュー | 変更後 status が `accepted` の場合のみ現行基盤ビューに掲載。`superseded`/`deprecated` に遷移した場合は現行基盤ビューから除外されていること |
+| 状態別ビュー（superseded） | `superseded` の ADR が「置き換え済み」セクションに掲載され、`superseded by ADR-MMMM` が明記されていること |
+| 状態別ビュー（deprecated） | `deprecated` の ADR が「非推奨」セクションに掲載され、deprecation 理由が明記されていること |
+| トピック別ビュー | トピック分類は status によらず維持（歴史的参照のため）。ただし status 表記がある場合は実ファイルと一致 |
+| 意思決定マップ | `superseded-by`/`supersedes` のリレーションが正しく記載されていること |
+
+#### 検証手順
+
+1. ADR frontmatter の `status` を読み取る
+2. `docs/adr/README.md` の各ビューを照合し、実ファイルと一致しているか確認する
+3. 不整合を検出した場合、ステータス変更と README 更新を同一変更（同一 PR・同一コミット群）で実施する
+4. 整合性確認を保存前の検証ステップに組み込む（`req-save`・`case-update` での ADR status 変更時）
+
+#### 共起必須項目
+
+| status 遷移 | frontmatter 必須項目 | README 必須反映 |
+|-------------|----------------------|-----------------|
+| `accepted` → `superseded` | `superseded_by: ADR-MMMM` | superseded セクションへ移動・`superseded-by` リレーション明記・現行基盤ビューから除外 |
+| `accepted` → `deprecated` | （deprecation 理由を本文に明記） | deprecated セクションへ移動・deprecation 理由を簡潔に明記・現行基盤ビューから除外 |
+| `proposed` → `accepted` | （更新日時のみ） | 現行基盤ビューに掲載・accepted セクションに掲載 |
+
 ---
 
 ## APPEND/UPDATE判定基準
