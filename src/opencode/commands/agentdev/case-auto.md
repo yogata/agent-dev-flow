@@ -134,7 +134,7 @@ agent: sisyphus
 - G15: case-auto は Wave table の「実行方法」列に基づき子Issue を選択し case-run に委譲する。「並列」指定の ready 子Issue は最大5件まで同時に委譲する。「直列」指定は1件ずつ委譲する。Wave全体の一括実行を case-run に委譲しない（REQ-0114-045, REQ-0130-010）
 - G16: case-auto は独自の操作単位ステータス追跡を持ってはならない。Epic Issue のステータス追跡テーブルを使用する
 - G18: case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わないこと（REQ-0114-051）
-- G19: case-auto は draft を OU 情報の SSoT として扱い、独自の OU 状態管理を持たないこと（REQ-0114-058）
+- G19: case-auto は req-save 段階（case-open 完了前）のみ draft を OU 情報の SSoT として扱うこと。case-open 完了後は子Issue（Epic Issue のステータス追跡テーブル含む）が SSoT となること。クリーンアップ検証ゲート（ドラフト削除検証）は case-open 完了後に実行すること。独自の OU 状態管理を持たないこと（REQ-0114-058）
 - G20: OU 間依存は queue dependency として扱い、依存関係があるだけでは Epic Issue 化しないこと（REQ-0114-055）
 - G21: case-auto は Epic Issue 化の判定に関与しないこと。case-open の判定結果に従うこと（REQ-0114-057）
 - G26: 並列実行の最大同時委譲数（5件）は運用環境の外部実行バックエンド並行負荷に応じて調整可能とする。外部実行バックエンドの同時実行能力が5未満の場合、実行環境の制約に合わせて並列数を減らすこと
