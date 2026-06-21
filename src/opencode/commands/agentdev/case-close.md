@@ -1,28 +1,60 @@
 ---
-description: PRをマージし、対応記録を追記し、Caseをクローズしてブランチを削除する
+description: PRをマージし、対応記録を追記し、Caseをクローズしてブランチを削除する。Epic Issue番号入力時は現在 Wave の一括クローズ（Epic Wave クローズ）を行う
 agent: sisyphus
 ---
 
 # 完了処理
 
-PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブランチを削除する。レビュー完了フェーズ。
+PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブランチを削除する。レビュー完了フェーズ。Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ・クローズし、Epic status table を更新する（Epic Wave クローズ）。
 
 **完了条件チェックボックスの評価・更新は case-close の専任責務**（ADR-0114）。case-run / driver / 外部実行バックエンドが完了条件チェックボックスを更新しない。case-close は PR 作成後に別コンテキストで Issue 本文の完了条件を再読込し、PR 本文を capture 入力源として最終完了判定する。
 
+**Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する**（ADR-0125 単一書き手制約）。case-run は Epic Issue 本文を読み取るのみ（書き込まない）。case-auto は Wave 反復制御のみ行い、Epic Issue 本文に直接書き込まない。last-write-wins 競合防止は case-close の単一書き手で維持される。
+
 ## 入力
 
-- Issue番号
-- PR番号（または自動検出）
+- Issue番号（単一 Issue または Epic Issue）
+- PR番号（または自動検出・Epic Wave クローズ時は各子Issue の PR を Epic Issue 本文から特定）
 
 ## 出力
 
-- マージ済みPR
-- クローズ済みCase
-- 削除済みブランチ・worktree
+- **単一 Issue クローズ時**: マージ済みPR・クローズ済みCase・削除済みブランチ・worktree
+- **Epic Wave クローズ時**: 現在 Wave の全子Issue マージ・クローズ・Epic status table 更新・最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
 
 ## 手順
 
+### 入力判定
+
 1. **Issue番号解決**: ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
+   - **Epic Issue 判定**: 解決した Issue番号の本文を `agentdev-gh-cli` の安全な読み取り手順で取得し、ステータス追跡テーブル（Wave/子Issue 構成・`agentdev-epic-tracker` の新4列/旧4列形式）が存在するか確認。テーブル存在時は **Epic Wave クローズ**（Step E1〜E6・REQ-0131-021/022/023）へ分岐。テーブル不存在時は **単一 Issue クローズ**（Step 1-1〜）へ進む（後方互換）
+
+### Epic Wave クローズ（REQ-0131-021/022/023）
+
+`case-close` が Epic Issue番号を受領した場合の Wave 単位クローズフロー。現在 Wave の PR作成済み子Issue を一括マージ・クローズし、Epic status table を更新する。最終 Wave 判定後に Epic Issue クローズ または 残 Wave 通知を行う。
+
+**E1. Epic Issue 本文読込**: `agentdev-gh-cli` の安全な読み取り手順で Epic Issue 本文を取得。ステータス追跡テーブル（新4列形式: `#` / `Issue` / `ステータス` / `内容`、または旧4列形式）を解析し、Wave 構成・各子Issue のステータス（`pending` / `ready` / `running` / `completed` / `blocked` / `failed`）・PR番号リンクを抽出
+
+**E2. 現在 Wave 特定**: ステータス追跡テーブルから、`running` ステータスの子Issue が属する Wave を「現在 Wave」として特定。`running` が存在しない場合、Wave 番号昇順で最も若い未完了 Wave（`completed` 以外の子Issue を含む Wave）を現在 Wave とする
+
+**E3. PR作成済み子Issue 特定（REQ-0131-021）**: 現在 Wave 内の `running` ステータス子Issue を「PR作成済み子Issue」として特定。各子Issue に紐づく PR 番号を子Issue 本文・`gh pr list --search "Closes #N"` 等で特定。`running` 以外のステータス（`pending` / `ready` / `blocked` / `failed`）は本フローの対象外
+
+**E4. 各子Issue の PR マージ・子Issue クローズ**: E3 で特定した子Issue を番号昇順で処理。各子Issue について、単一 Issue クローズの Step 1-1（重複ファイルチェック）・Step 2（完了条件評価・QG-4）・Step 3（docs/ 検証）・Step 4（PR マージ・リトライ・フォールバック）・Step 5（Post-merge テスト戦略検証）・Step 6（子Issue クローズ）・Step 7（ブランチ・worktree削除）・Step 10（学びの検知・Capture 回収）相当の処理を順次実行:
+   - **PR マージ**: `gh pr merge --squash` 実行（Step 4 の squash merge リトライ・フォールバック手順に準拠）
+   - **子Issue クローズ**: `gh issue close --reason completed`
+   - **完了条件チェックボックス評価**: QG-4 に従い子Issue 本文の完了条件を最終評価・更新
+   - **Capture 回収**: 各子Issue の PR 本文から intake / learning を分離回収（Step 10 相当・Epic 横断回収）
+
+**E5. Epic status table 更新（単一書き手: case-close・ADR-0125）**: E4 でクローズした各子Issue のステータスを `running` → `completed ([PR#N](URL))` に更新。`agentdev-epic-tracker` スキルの正規表現パターン（running → completed）に従い、`agentdev-issue-management` の安全手順・`agentdev-gh-cli` の VERIFY 操作で本文を再取得し検証
+   - **Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する**（ADR-0125 単一書き手制約）。case-run は読み取るのみ（書き込まない）。case-auto は Wave 反復制御のみ（直接書き込まない）
+
+**E6. 最終 Wave 判定**: ステータス追跡テーブル全体を再確認し、全子Issue が `completed` かを判定（`blocked` / `failed` は終了状態だが `completed` とはみなさない）:
+   - **E6a. 最終 Wave（全子Issue completed）**: Epic Issue 自体を `gh issue close --reason completed` でクローズ（REQ-0131-022）→ Epic レベルの最終処理（Step 10 / Step 11 相当の Epic 横断 capture 回収・`.agentdev/` 永続化・学びの検知）→ Epic 完了報告（Step 12 相当）
+   - **E6b. 最終 Wave 以外（REQ-0131-023）**: 残 Wave 状況を通知して停止:
+     - 完了 Wave 一覧（Wave 番号・子Issue 番号・PR 番号）
+     - 残 Wave 一覧（Wave 番号・対象子Issue 番号・各ステータス）
+     - 次実行可能 Issue（依存が満たされた `pending` 子Issue のうち最も若い番号・存在しない場合は「次 Wave の case-run 完了待ち」と明記）
+
+### 単一 Issue クローズ（従来フロー・後方互換）
 
 1-1. **重複ファイルチェック**: merge/pull 実行前に、ローカル未コミット変更ファイルと対象 PR 変更ファイルの重複を検出する:
      - `git status --short` でローカル未コミット変更ファイル一覧を取得
@@ -136,3 +168,6 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 - G21: case-close の capture 責務は回収・保存。PR 本文から intake / learning を分離回収しドメイン状態に保存する。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照
 - G22: SPEC status 昇格（draft → accepted）は case-close の責務（ADR-0123）。昇格は対象 SPEC が `draft` かつ今回の実装が SPEC 内容を検証済みの場合のみ実施する。spec-save は accepted を付与しない
 - G23: SPEC確定候補の処理（Step 3-2）は PR 本文の `## SPEC確定候補` セクションを入力とし、`## Findings / Capture候補` とは区別して扱う
+- G24: Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する（ADR-0125 単一書き手制約）。case-run は Epic Issue 本文を読み取るのみで書き込まない。case-auto は Wave 反復制御のみ行い Epic Issue 本文に直接書き込まない。last-write-wins 競合防止は case-close の単一書き手で維持される
+- G25: Epic Wave クローズ（Step E1〜E6）は Epic Issue番号入力時（ステータス追跡テーブル存在時）のみ実行。単一 Issue番号入力時は従来フロー（単一 Issue クローズ Step 1-1〜）を維持する（後方互換）
+- G26: Epic Wave クローズ時の PR マージ・子Issue クローズは現在 Wave の `running` 子Issue のみを対象とする。`pending` / `ready` / `blocked` / `failed` は対象外。`blocked` / `failed` を `completed` に上書きしない（べき等性・`agentdev-epic-tracker` 準拠）
