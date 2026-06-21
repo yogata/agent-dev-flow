@@ -4,7 +4,7 @@
 
 ## 現行基盤ビュー
 
-承認済みステータス（accepted）の ADR-01XX 17件が、現在のアーキテクチャ判断の基盤である。各 ADR は基準再編により旧 ADR の内容を統合・再定義している。現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）・非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
+承認済みステータス（accepted）の ADR-01XX 18件が、現在のアーキテクチャ判断の基盤である。各 ADR は基準再編により旧 ADR の内容を統合・再定義している。現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）・非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
 
 | ADR番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|
@@ -25,6 +25,7 @@
 | ADR-0125 | case-auto Wave 内並列子Issue実行モデル | accepted | 2026-06-20 |
 | ADR-0126 | ローカル版 OpenCode 生成基盤: source model 拡張と生成安全性制約 | accepted | 2026-06-20 |
 | ADR-0127 | case-auto 構成工程の task() 委譲によるスケーラビリティ確立 | accepted | 2026-06-21 |
+| ADR-0128 | case-run CLI subprocess 廃止: task() + ulw-loop 委譲への全面移行 | accepted | 2026-06-21 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -49,6 +50,7 @@
 - [ADR-0125](ADR-0125.md) — case-auto Wave 内並列子Issue実行モデル
 - [ADR-0126](ADR-0126.md) — ローカル版 OpenCode 生成基盤: source model 拡張と生成安全性制約
 - [ADR-0127](ADR-0127.md) — case-auto 構成工程の task() 委譲によるスケーラビリティ確立
+- [ADR-0128](ADR-0128.md) — case-run CLI subprocess 廃止: task() + ulw-loop 委譲への全面移行
 
 ### 置き換え済み（superseded）
 
@@ -88,6 +90,7 @@
 - [ADR-0114](ADR-0114.md) — case-run 実行責務の外部実行バックエンド委譲
 - [ADR-0125](ADR-0125.md) — case-auto Wave 内並列子Issue実行モデル
 - [ADR-0127](ADR-0127.md) — case-auto 構成工程の task() 委譲によるスケーラビリティ確立
+- [ADR-0128](ADR-0128.md) — case-run CLI subprocess 廃止: task() + ulw-loop 委譲への全面移行
 
 ### 文書
 
@@ -146,6 +149,10 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0127 | relates-to | ADR-0112 | 委譲一般化の case-auto 工程への特定適用（委譲時最小契約に従う） |
 | ADR-0127 | relates-to | ADR-0114 | case-run CLI subprocess 委譲モデルの維持（本 ADR は残り4工程の task() 委譲を追加） |
 | ADR-0127 | relates-to | ADR-0125 | Wave/子Issueオーケストレーションの維持（case-auto 保持責務は変更しない） |
+| ADR-0128 | relates-to | ADR-0114 | case-run 実行モデルを CLI subprocess から task()/ulw-loop に変更（result 契約3状態・worktree隔離・Findings/Capture配置は維持） |
+| ADR-0128 | relates-to | ADR-0127 | case-auto から Epic/Wave orchestration を削除し case-run/case-close に移管 |
+| ADR-0128 | relates-to | ADR-0125 | Epic Issue 本文の単一書き手を case-auto から case-close に移行 |
+| ADR-0128 | relates-to | ADR-0109 | Epic Issue 本文を SSoT として維持（case-run/case-close が進行状況を判定する基盤） |
 
 ## 関連 REQ
 
@@ -170,6 +177,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0125 | [REQ-0106](../requirements/REQ-0106.md), [REQ-0114](../requirements/REQ-0114.md) | case-auto Wave 内並列子Issue実行モデル |
 | ADR-0126 | [REQ-0141](../requirements/REQ-0141.md), [REQ-0134](../requirements/REQ-0134.md) | ローカル版 OpenCode 生成基盤: source model 拡張と生成安全性制約 |
 | ADR-0127 | [REQ-0114](../requirements/REQ-0114.md), [REQ-0119](../requirements/REQ-0119.md) | case-auto 構成工程の task() 委譲によるスケーラビリティ確立 |
+| ADR-0128 | [REQ-0130](../requirements/REQ-0130.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0139](../requirements/REQ-0139.md) | case-run CLI subprocess 廃止: task() + ulw-loop 委譲への全面移行 |
 
 ## 廃止済み・履歴ビュー
 
