@@ -137,4 +137,38 @@
 - **関連**: Epic #990 全 OUs（#991〜#1000）, Wave 1〜5 実行, PR #1009 (Wave 4 #998 残余 violation 発見時)
 - **タグ**: `#epic-execution` `#verification-centric-issue` `#acceptance-criteria-verification` `#subagent-scope-control` `#case-auto`
 
+## 2026-06-21 PR #1012 (Issue #1011 / REQ-0142: 配布物 ID 除去後の整合性回復)
+
+### docs-check バックエンドへの検査カテゴリ追加と skill-category-gap NG 汚染のトレードオフ
+
+- **問題事象**: REQ-0142-006/007 で新設した配布物整合性検査パターン（構文健全性・文意保持・責務整合）を `inspect-docs` / `inspect-skills` / `req-structure-diagnostics` の各 skill に実装したが、docs-check 自動バックエンド（`check_integrity.ts`）へのカテゴリ直接追加は見送った。追加すると `skill-category-gap` NG が新カテゴリで汚染され、既存の「配布物↔スキルカテゴリ一致」チェックのターゲットングが隠退化するため。
+- **発生局面**: 実装（機能追加・横断検査観点拡充 Issue の case-run）。
+- **検知方法**: case-run 実行担当が `check_integrity.ts` 拡張を検討した際、`skill-category-gap` ルールとの相互作用を事前検証し、追加不可を判定。
+- **根本原因**: docs-check には「スクリプト修正を含める自動チェック項目」と「command/skill 定義レベルの手動検査項目」の 2 系統があるが、この境界と各 NG ルール（skill-category-gap 等）との相互作用が SPEC 化されていない。新カテゴリを追加する際は既存 NG への副作用を毎回手動で評価する必要がある。
+- **自律対応内容**: case-run 実行担当はバックエンド直接追加を回避し、command/skill 定義レベル（inspect-docs Step 11・inspect-skills Step 3・req-structure-review.md）に検査パターンを実装。この判断基準（何をバックエンドに入れ・何を skill 定義に入れるか）は PR Findings と intake inbox に記録（別途 RU 化候補）。
+- **ユーザー確認有無**: なし。
+- **ADR/REQ/spec影響**: あり。docs-check の項目役割範囲（スクリプト修正を含める範囲 vs 含めない範囲）を SPEC として明文化すべきか。候補: `docs/specs/integrity-rule-catalog.md` または `docs/specs/skills/repo-agentdev-integrity.md`。
+- **横展開観点**: 既存の他 NG ルール（`req-range-staleness`・`legacy-normative-marker`・`source-projection-sync` 等）でも、新カテゴリ・新対象ファイル追加時の副作用を事前評価する仕組みが欠けている。NG ルール間の依存関係マップ（カテゴリ追加 → 影響を受ける NG 一覧）があると、追加判断を機械化できる。
+- **再発条件**: (1) 新たな検査カテゴリを docs-check に追加する要件が発生した場合、(2) 既存 NG ルール（skill-category-gap 等）との相互作用を SPEC 化していない場合、(3) case-run 実行担当が毎回手動で副作用を評価する運用が続く場合。
+- **予防策候補**: (1) docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象）を SPEC 明文化。 (2) NG ルール間依存関係マップ（新カテゴリ追加時の影響 NG 一覧）を `integrity-rule-catalog.md` に整備。 (3) case-run で新カテゴリ追加を検討する際の判定フロー（既存 NG への副作用 → 追加可否）を SKILL に明示。
+- **想定反映先**: `docs/specs/integrity-rule-catalog.md`（docs-check 項目役割範囲・NG 依存関係マップ）、`src/opencode/skills/repo-agentdev-integrity/SKILL.md`（新カテゴリ追加判定フロー）。
+- **関連**: PR #1012, Issue #1011, REQ-0142-006/007, SPEC `docs/specs/docs-spec-rebuild-integrity.md`, intake `2026-06-21-issue1011-docs-check-backend-category-scope.md`
+- **タグ**: `#docs-check-design` `#NG-rule-interaction` `#skill-category-gap` `#scope-tradeoff` `#intake-coupled`
+
+### case-auto 委譲契約 MUST NOT DO と case-close G22 SPEC 昇格責務の衝突
+
+- **問題事象**: case-auto（最大自走モード）から case-close への工程委譲契約で「REQ/ADR/SPEC ファイルを変更しない」という MUST NOT DO が指定されていた。一方 case-close の G22 ガードレールは「SPEC status 昇格（draft → accepted）は case-close の責務」と明示しており、両者が衝突した。本セッションでは SPEC `docs-spec-rebuild-integrity.md`（draft）の accepted 昇格が G22 条件（draft + 実装による検証済み）を満たしていたが、委譲契約の MUST NOT DO を優先して昇格を見送り、後続課題として報告した。
+- **発生局面**: 完了処理（case-close Step 3-2 SPEC 確定フロー・case-auto からの委譲実行）。
+- **検知方法**: case-close Step 3-2 の手順に従い SPEC 昇格可否を評価した際、委譲契約の MUST NOT DO と G22 の責務定義が両立しないことを検出。
+- **根本原因**: case-auto の委譲契約設計が「要件・仕様・決定の実質的変更」を禁止する意図で「REQ/ADR/SPEC ファイルを変更しない」と包括的に表現したが、SPEC lifecycle 状態遷移（draft → accepted のみの機械的更新）まで巻き込んでいた。SPEC 昇格は case-close の正当な責務（G22）であり、要件内容の変更とは区別されるべき。
+- **自律対応内容**: システムプロンプト「task conflicts with repo instructions or safety constraints, follow the higher-priority rule and report the conflict」に従い、ユーザー（委譲元）の MUST NOT DO を高優先とし、G22 の昇格を見送って完了報告に「SPEC 昇格見送り・後続推奨」と明記。実施後コメントにも同じ内容を記録。
+- **ユーザー確認有無**: あり（case-auto からの委譲契約がユーザー指定のため）。
+- **ADR/REQ/spec影響**: あり。case-auto → case-close の委譲契約で SPEC 昇格を許容するか否かを明文化すべき。候補: (a) MUST NOT DO を「実質的 SPEC 内容編集のみ禁止・lifecycle 状態遷移は許容」に精密化、(b) case-close 側で SPEC 昇格を実施した場合昇格対象 SPEC を明示して委譲元に取り消し機会を与える、(c) 現状通り包括禁止を維持する場合は SPEC 昇格を別コマンド（case-update 等）で実施する運用を明文化。
+- **横展開観点**: 他の工程委譲（case-open → case-run 等）でも「状態遷移は許可・実質編集は禁止」の区別が同様に必要な場合がある。例: case-open の Issue 作成、case-run の PR 作成等。
+- **再発条件**: (1) case-auto で SPEC 候補を含む feature Issue を自走する場合、(2) 委譲契約に「REQ/ADR/SPEC ファイルを変更しない」が包括的に含まれる場合、(3) case-close が SPEC 昇格条件（draft + 検証済み）を満たす場合。
+- **予防策候補**: (1) case-auto 委譲契約テンプレートの MUST NOT DO を「実質的 SPEC 内容編集禁止（lifecycle 状態遷移 draft→accepted は除く）」に精密化。 (2) case-auto と case-close の責務境界 SPEC で SPEC 昇格の取扱いを明示。 (3) case-close 完了報告テンプレートに「SPEC 昇格見送り」セクションを設け、後続コマンド（case-update）への引継ぎを標準化。
+- **想定反映先**: `src/opencode/commands/agentdev/case-auto.md`（委譲契約出力契約・Step 5）、`docs/specs/workflow-contracts.md` または case-close SPEC（SPEC lifecycle 取扱い）、`src/opencode/commands/agentdev/templates/case-close/standard.md`（完了報告テンプレート）。
+- **関連**: PR #1012, Issue #1011, case-close Step 3-2 / G22, case-auto MUST NOT DO, SPEC `docs/specs/docs-spec-rebuild-integrity.md`（昇格見送り対象）
+- **タグ**: `#delegation-contract` `#MUST-NOT-DO-scope` `#SPEC-lifecycle` `#case-close-G22` `#case-auto`
+
 
