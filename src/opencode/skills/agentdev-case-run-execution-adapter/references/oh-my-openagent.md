@@ -1,165 +1,96 @@
-# oh-my-openagent 起動実装ノート
+# oh-my-openagent task()/ulw-loop 委譲実装ノート
 
-AgentDevFlow 側（case-run）から oh-my-openagent を呼び出すための実装ノート。読者は AgentDevFlow の case-run 実装者。抽象IF（ハーネス非依存）は親の `SKILL.md` 参照。本ファイルは oh-my-openagent 固有の具象実装を扱う。
+AgentDevFlow 側（case-run）から oh-my-openagent のエージェント型（Sisyphus-Junior）を `task()` 経由で呼び出すための実装ノート。読者は AgentDevFlow の case-run 実装者。抽象IF（ハーネス非依存）は親の `SKILL.md` 参照。本ファイルは oh-my-openagent 固有の具象実装を扱う。
 
-> **前提**: 本ファイルの記述は Issue #951 時点の設計意図に基づく。oh-my-openagent 側 CLI 仕様・終了コード・構造化結果出力の信頼性は実体に合わせて随時更新すること（後述「懸念点・未検証事項」参照）。
+> **前提（ADR-0128）**: case-run は ADR-0128 に基づき oh-my-openagent CLI の subprocess 起動を廃止し、`task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])` 委譲に全面移行した。oh-my-openagent は CLI ツールとしてだけでなく OpenCode プラグインとしてエージェント型（Sisyphus-Junior 等）を提供しており、task() 経由で起動すると oh-my-openagent の実行エンジンをネイティブに利用できる。CLI subprocess で問題となっていた bash ハングアップ（case-run #971 事例）は、各ツール呼び出しごとの120秒 timeout で構造的に検知されるようになる。
 
-## 起動方式（CLI subprocess）
+## 起動方式（task() 委譲）
 
-case-run は oh-my-openagent を CLI subprocess として起動する。
+case-run は Sisyphus-Junior を task() 経由で起動する。CLI subprocess は使用しない（ADR-0128 Decision #1, REQ-0130-017）。
 
-```bash
-bunx oh-my-openagent run \
-  --directory "$WORKTREE_PATH" \
-  --on-complete "<結果書込みスクリプト>" \
-  --json \
-  "<Issue本文を含む指示プロンプト>"
+```
+task(
+  subagent_type="Sisyphus-Junior",
+  load_skills=["ulw-loop"],
+  prompt="/ulw-loop Implement Issue #N: <Issue本文>"
+)
 ```
 
-`task(subagent_type="sisyphus")` 等 OpenCode 組込サブエージェント起動を使わない理由: oh-my-openagent 側でオーケストレーションが二重に走る問題（oh-my-openagent issue #4027）を回避するため。AgentDevFlow 側は worktree と Issue を用意して PR を受領するだけの薄いオーケストレーターに徹し、詳細実行計画策定〜実装〜PR 発行まではハーネス側に委譲する。
+- `subagent_type="Sisyphus-Junior"`: oh-my-openagent が OpenCode プラグインとして提供するエージェント型。CLI subprocess を介さず oh-my-openagent の実行エンジンを直接利用する
+- `load_skills=["ulw-loop"]`: Sisyphus-Junior が ulw-loop スキルを読み込んで実行する。ulw-loop は Issue を success criteria に分解・各 criterion に observable evidence を要求・品質ゲート（code review + QA review + gate review）を実行する
+- 委譲プロンプト: `/ulw-loop Implement Issue #N: <Issue本文>`（REQ-0130-017）。Issue 本文は `<Issue本文>` 部に埋め込む
 
-### bunx → npx フォールバック（OU-013 / REQ-0130）
-
-bunx がモジュール解決エラー（`Cannot find module`・`ERR_MODULE_NOT_FOUND`・`error: module not found` 等）で失敗する場合がある（Windows 環境・bun 1.x の一部バージョンで実績あり）。この場合は直ちに `npx` にフォールバックする。
-
-```bash
-# 主経路（bunx）
-if ! bunx oh-my-openagent run --directory "$WORKTREE_PATH" ... ; then
-  # フォールバック（npx）
-  npx oh-my-openagent run --directory "$WORKTREE_PATH" ...
-fi
-```
-
-- フォールバックは1回のみ（npx でも失敗する場合は `failed`）
-- bunx 失敗がモジュール解決エラー以外（ハーネス側の実行時エラー・タイムアウト等）の場合は npx フォールバックせず、エラー種別に応じた処理（`blocked`・`failed`・タイムアウト事後処理）を行う
-- Windows 環境では npx フォールバック経路の利用頻度が高くなる想定（bunx の安定性課題）
+CLI subprocess を使わない理由: oh-my-openagent 内部の bash コマンドがハングアップした場合、CLI subprocess では case-run 側から検知不可能だった（case-run #971 事例: tui-state cancelled/lastTool:bash/toolCalls:129）。task() 経由では各ツール呼び出しが120秒 timeout で保護されるため、ハングアップは構造的に検知される。また oh-my-openagent issue #4027（重複オーケストレーション問題）は PR #4071 で解決済み（2026-05-21 クローズ）であり、task() 移行の技術的障壁はない。
 
 ## worktree 取り扱い
 
-- `--directory "$WORKTREE_PATH"` で case-run が作成した worktree パス（`.worktrees/{N}-{type}/`）を渡す。メインリポジトリパスは渡さない。
-- oh-my-openagent は worktree 内で作業する。`.omo/` 等のハーネス作業領域は worktree 配下に作成され、AgentDevFlow 側は関与しない。worktree 削除時に `.omo/` も破棄される（REQ-0139-007: 永続状態として扱わない）。
+- case-run が task() の prompt 内で worktree root（`.worktrees/{N}-{type}/`）を相対パスで明示的に指定する。メインリポジトリパスは渡さない
+- Sisyphus-Junior は worktree 内で作業する。`.omo/` 等のハーネス作業領域（`.omo/ulw-loop/ledger.jsonl` 等）は worktree 配下に作成され、AgentDevFlow 側は関与しない。worktree 削除時に `.omo/` も破棄される（REQ-0139-007: 永続状態として扱わない）
 
 ## PR 作成と URL 受領
 
-### プロンプト指示
+### PR 作成
 
-oh-my-openagent に渡す指示プロンプト内で `gh pr create` による PR 発行を明示的に指示する:
+Sisyphus-Junior(ulw-loop) は実装完了後、`gh pr create` で直接 PR を作成する。PR 本文には Issue 番号（`Refs: #N`）を含める。ulw-loop の品質ゲート（code review + QA review + gate review）を通過した PR のみが作成される。
+
+### URL 受領
+
+Sisyphus-Junior は PR URL を task() result として返却する。case-run は result から PR URL（PR番号）を取り出す。CLI subprocess 時代の PR URL フォールバック検索は廃止された（REQ-0130-021）。Sisyphus-Junior が直接 PR 作成を行うため、PR URL は確実に result に含まれる。
+
+## result 受領
+
+Sisyphus-Junior の task() result は以下の3状態いずれかである（`agentdev-case-run-execution-adapter` の result 契約）:
+
+- **`completed(pr)`**: PR番号 / PR URL を含む。case-run は PR URL を受け取りクリーンアップフェーズへ
+- **`blocked`**: 回答可能な blocker の内容。Sisyphus-Junior が Issue コメントに SSoT として詳細本文を記録済み。case-run はエラー処理に従い停止・ユーザー報告
+- **`failed`**: repository context で回答不能な blocker の内容。Sisyphus-Junior が Issue コメントに構造化記録済み。case-run はエラー処理に従い停止・ユーザー報告
+
+### 終了コード・異常終了の活用
+
+- task() result が空・エラー含み・異常終了時は、即 `failed` とせず「実装完了・検証未完了」として扱う（REQ-0130-025）。詳細は親 `SKILL.md` の「task() 起動失敗・異常終了時事後処理」参照
+- result が構造化3状態のいずれかの場合は、result を優先する
+
+## evidence 確認（ulw-loop 監査トレイル）
+
+ulw-loop は Issue を success criteria に分解し、各 criterion に observable evidence を要求する。監査トレイル（`.omo/ulw-loop/ledger.jsonl`）は worktree 配下に配置される。
+
+- case-run は監査トレイルの**内部構造に依存した処理・検証を行わない**（REQ-0139-007）。最終結果は PR URL で受領する
+- 監査トレイルは worktree 削除時に破棄される（永続状態として扱わない）
+- Sisyphus-Junior 内部で evidence 不足が検知された場合は ulw-loop の品質ゲートが機能し、`blocked` または `failed` として result に反映される
+
+## timeout・中断
+
+- CLI subprocess 時代の全体 timeout（REQ-0130-020 廃止）は廃止された。Sisyphus-Junior の各ツール呼び出しごとに120秒 timeout が適用される
+- ツール呼び出し timeout が発生した場合は、Sisyphus-Junior 内部でリトライまたは blocker 評価が行われ、最終的に result 契約（3状態）のいずれかとして case-run に返却される
+- task() 起動失敗・異常終了時の事後処理は親 `SKILL.md` の「task() 起動失敗・異常終了時事後処理」参照
+- 中断時の worktree クリーンアップは case-run 側の責務（Sisyphus-Junior 側にクリーンアップを期待しない）
+
+## 委譲プロンプト構築例
+
+case-run が Sisyphus-Junior を起動する際の委譲プロンプト構築例。実環境の Issue番号・worktree パス・ブランチ名に置き換えること。
 
 ```
-実装完了後、gh pr create で PR を作成すること。PR 本文には Issue 番号（Refs: #N）を含めること。
+/ulw-loop Implement Issue #N:
+
+<worktree>
+- worktree root: .worktrees/980-case/
+- branch: case-980
+</worktree>
+
+<Issue body>
+（gh issue view N で取得した Issue 本文を埋め込み）
+</Issue body>
 ```
 
-### URL 受領（主経路）
-
-`--on-complete` に指定した結果書込みスクリプトが、PR URL を結果ファイルに書き込む。case-run は結果ファイルから PR URL を読み取る。
-
-### フォールバック（PR URL 不在時）
-
-結果ファイルから PR URL を取得できなかった場合、ブランチ名から PR を逆引きする:
-
-```bash
-gh pr list --head "$BRANCH_NAME" --json url --jq '.[0].url'
-```
-
-このフォールバックは oh-my-openagent が PR を発行したが URL を結果ファイルに書き込めなかった場合の救済措置。PR 自体が存在しない場合は `failed` として処理する。
-
-## blocked / failed 通知
-
-oh-my-openagent 側の結果を構造化して受領するため、結果書込みスクリプトで以下の構造化結果出力を生成させる:
-
-```
-<RESULT>
-<status>completed|blocked|failed</status>
-<pr_url>https://github.com/.../pull/N</pr_url>
-<reason>blocked/failed の理由</reason>
-</RESULT>
-```
-
-- **`completed`**: `<pr_url>` を含む。case-run は PR URL を result に格納
-- **`blocked`**: `<reason>` に回答可能な blocker の内容。Issue コメント SSoT として記録
-- **`failed`**: `<reason>` に repository context で回答不能な blocker の内容。Issue コメントに構造化記録
-
-### 終了コード・stderr の活用
-
-- oh-my-openagent の終了コード（0: 成功系・非0: 異常系）と stderr も結果判定の補助に用いる
-- 構造化結果出力（`<RESULT>`）が取得できた場合はそちらを優先し、終了コードは補助情報とする
-- 構造化結果出力が破損・不在の場合は終了コードと stderr から `completed` / `blocked` / `failed` を推定する
-
-## タイムアウト・中断
-
-```bash
-timeout 3600 bunx oh-my-openagent run ...
-```
-
-- タイムアウトは **1時間（3600秒）** を既定値とする（REQ-0130-016 由来の運用想定）
-- タイムアウト発生時: oh-my-openagent プロセスを強制終了し、**即 `failed` とせず** 親 SKILL.md の「ハーネスタイムアウト事後処理（OU-013 / REQ-0130）」セクションに従い事後処理（worktree git status 確認・未コミット変更の grep 検出・手動修正または PR 化）を行う
-- 中断時の worktree クリーンアップは case-run 側の責務（ハーネス側にクリーンアップを期待しない）
-
-## 完全起動スクリプト例
-
-case-run 実行担当サブエージェントが使用する起動スクリプトの雛形。実環境のパス・ブランチ名に置き換えること。
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-WORKTREE_PATH="${1:?usage: $0 <worktree_path> <branch_name> <issue_body_file> <result_file> <branch_name_for_fallback}"
-BRANCH_NAME="${2:?}"
-ISSUE_BODY_FILE="${3:?}"
-RESULT_FILE="${4:?}"
-
-# 結果書込みスクリプト（--on-complete に渡す）
-ON_COMPLETE_SCRIPT=$(cat <<'EOF'
-#!/usr/bin/env bash
-# oh-my-openagent 完了時に呼ばれる。標準入力/引数から結果を受け取り RESULT_FILE に書込む。
-# 実装は oh-my-openagent 側の完了コールバック仕様に合わせる。
-EOF
-)
-
-# 指示プロンプト構築
-PROMPT=$(cat <<EOF
-以下の Issue を実装し、gh pr create で PR を作成せよ。
-PR 本文には Refs: #${BRANCH_NAME} を含めること。
-完了後、<RESULT> 構造で結果を出力せよ。
-
---- Issue 本文 ---
-$(cat "$ISSUE_BODY_FILE")
-EOF
-)
-
-# 起動（1時間タイムアウト・bunx→npx フォールバック付き）
-RUNNER="bunx"
-if ! timeout 3600 $RUNNER oh-my-openagent run \
-  --directory "$WORKTREE_PATH" \
-  --on-complete "$ON_COMPLETE_SCRIPT" \
-  --json \
-  "$PROMPT" ; then
-  # bunx のモジュール解決エラー等の場合は npx にフォールバック（OU-013）
-  RUNNER="npx"
-  timeout 3600 $RUNNER oh-my-openagent run \
-    --directory "$WORKTREE_PATH" \
-    --on-complete "$ON_COMPLETE_SCRIPT" \
-    --json \
-    "$PROMPT" || EXIT_CODE=$?
-fi
-
-# 結果ファイルから status / pr_url を読込
-STATUS=$(grep -oP '(?<=<status>)[^<]+' "$RESULT_FILE" || echo "")
-PR_URL=$(grep -oP '(?<=<pr_url>)[^<]+' "$RESULT_FILE" || echo "")
-
-# PR URL 不在時のフォールバック
-if [ "$STATUS" = "completed" ] && [ -z "$PR_URL" ]; then
-  PR_URL=$(gh pr list --head "$BRANCH_NAME" --json url --jq '.[0].url' || echo "")
-fi
-
-echo "status=$STATUS pr_url=$PR_URL exit=$EXIT_CODE"
-```
+- `/ulw-loop Implement Issue #N:`: ulw-loop スキルを呼び出し、Issue #N の実装を指示する
+- `<worktree>`: case-run が用意した worktree root とブランチ名を明示。メインリポジトリパスは含めない
+- `<Issue body>`: 対象 Issue の本文。Sisyphus-Junior は完了条件・受け入れ基準を success criteria に分解する
 
 ## 懸念点・未検証事項
 
-本実装ノートは設計段階の記述であり、以下は実体検証が必要な項目である。実運用で判明した挙動は本ファイルに随時反映すること。
+本実装ノートは ADR-0128 承認時点の記述であり、以下は実体検証が必要な項目である。実運用で判明した挙動は本ファイルに随時反映すること。
 
-- **Sisyphus の PR 発行能力**: oh-my-openagent 配下の Sisyphus が `gh pr create` を確実に実行できるか。PR 本文品質・Refs 記述の確度は実証が必要。
-- **CLI subprocess と OpenCode セッションの協調安定性**: OpenCode セッション内から `bunx` 経由で長時間プロセスを起動した場合の安定性・リソース消費・ログ可視性。
-- **タイムアウト時の挙動**: `timeout` 強制終了時、worktree 内の未コミット変更・`.omo/` 状態・gh 認証状態がどう残るか。クリーンアップ手順の確定が必要。
-- **構造化結果出力の信頼性**: `<RESULT>` 構造を oh-my-openagent 側が確実に出力するか。出力形式の変動・エスケープ・エンコーディング問題の確認が必要。`--on-complete` コールバック仕様の実体確認も必要。
+- **Sisyphus-Junior の PR 発行能力**: Sisyphus-Junior が `gh pr create` を確実に実行できるか。PR 本文品質・Refs 記述の確度は実証が必要。
+- **task() と OpenCode セッションの協調安定性**: OpenCode セッション内から Sisyphus-Junior を task() 起動した場合の安定性・リソース消費・ログ可視性。
+- **ulw-loop 監査トレイルの実体**: `.omo/ulw-loop/ledger.jsonl` の構造・サイズ・運用時の影響。worktree 削除時の破棄確認。
+- **task() result の構造化信頼性**: result が常に3状態のいずれかで返却されるか。異常終了時の result 形式の確認。
