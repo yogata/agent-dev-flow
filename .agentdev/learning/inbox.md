@@ -67,3 +67,21 @@
 - 再発防止候補2: sub-agent のプロンプトで「worktree のファイルが Issue 本文と乖離している場合、REQ/ADR/SPEC を編集せず blocked として報告せよ」と明記する。
 - 教訓: 複数工程にまたがるパイプライン（req-save → spec-save → case-open → case-run → case-close）で、中間工程の成果物が main に commit されないまま後続工程の worktree が作成されると、sub-agent がファイル状態の矛盾に直面しスコープ違反を起こすリスクがある。
 
+## 2026-06-21 PR #1009 (Issue #998 / OU-008: REQ HOW 除去と SPEC 移管)
+
+### 前工程実施済みの機械的除去でも acceptance criteria 順位検証が残余 violation を捕える
+
+- **問題事象**: req-save commit `5c7fed3` で実施済みとされた REQ HOW 除去（10 REQ ファイル）を、case-run 検証フェーズで acceptance criteria 順位検証した結果、8 件の residual violation を検出した（REQ-0114-002/004/030/034 ファイルパス詳細、REQ-0102-045 ファイルパス詳細、REQ-0124-018 旧名称参照 `req-restructure-review`、REQ-0127 scope ファイルパス詳細、REQ-0133 scope CLI コマンド詳細 `gh issue list 禁止`）。
+- **発生局面**: 実装（検証中心 Issue の case-run）。前工程 (req-save) で機械的除去完了済み、後工程 (case-run) で検証時に発見。
+- **検知方法**: 各 REQ の `## 完了条件` チェックボックスを順位検証（criterion-by-criterion）。REQ-NNNN-NNN 単位の acceptance criteria を 1 件ずつ REQ 本文行と照合。
+- **根本原因**: 単一パスの機械的除去は複数 HOW カテゴリ（ファイルパス / CLI コマンド詳細 / 旧名称参照 / スキル名直参照 / プロンプト文字列 / 【廃止】履歴 / API シグネチャ）を横断するため、カテゴリ毎の抜けが生じる。特に REQ-0114-030 は REQ-0131-005 で同パターンを除去済みだったのに不整合で残存するなど、横断 REQ 間での除去一貫性も崩れやすい。
+- **自律対応内容**: case-run 実行担当が 8 件を補完修正し PR #1009 として提出。PR 本文に修正対比表（REQ / 行 / criterion / 修正）を記録し、QG-4 で完了条件チェックボックス 13 件全て [x] 化。
+- **ユーザー確認有無**: なし（検証→補完修正→マージまで自律完結）。
+- **ADR/REQ/spec影響**: あり。REQ HOW 除去の判定基準（API シグネチャ・プロンプト・【廃止】・スキル名・CLI コマンド・ファイルパスの各パターンと適否判断）は SPEC `docs/specs/req-health-metrics.md` または document-model SPEC に判定表として記載すべき候補。Wave 5 (#1000) 横断検査スコープで処理予定。
+- **横展開観点**: 配布物内部 ID 除去（Issue #999）と同パターン。複数カテゴリを横断する機械的除去（命名規則・ID 参照・特定文字列表現等）では全て、単一パス実施後に acceptance criteria 順位検証を挟むことで残余 violation を効率的に捕獲できる。
+- **再発条件**: (1) 複数カテゴリの機械的除去を単一パスで実施する場合、(2) 前工程 (req-save 等) の成果物を case-run で「検証中心」として引き継ぐ場合、(3) acceptance criteria が細粒度（REQ-NNNN-NNN 単位）で定義されている場合。
+- **予防策候補**: (1) `agentdev-req-structure-diagnostics` スキルに「HOW 除去のカテゴリ別チェックリスト」を追加し、機械的検出を強化。 (2) req-save が HOW 除去を実施する際、acceptance criteria を checklist として用いた自己検証を必須化。 (3) case-run 検証フェーズで「前工程完了済み」の前提に頼らず、必ず acceptance criteria 順位検証を実施。
+- **想定反映先**: `src/opencode/skills/agentdev-req-structure-diagnostics/`（HOW 検出カテゴリ拡張）、`docs/specs/req-health-metrics.md` または `docs/specs/document-model.md`（HOW 除去判定表）、Wave 5 (#1000) の横断検査スコープ。
+- **関連**: PR #1009, Issue #998, Epic #990 OU-008, commit `d44e408`
+- **タグ**: `#REQ-HOW-removal` `#acceptance-criteria-verification` `#case-run` `#mechanical-refactor-residual` `#multi-category-removal`
+
