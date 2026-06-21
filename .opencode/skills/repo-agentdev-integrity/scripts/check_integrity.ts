@@ -3661,6 +3661,19 @@ function isNegationContext(line: string): boolean {
   );
 }
 
+/**
+ * IR-044 exemption predicate (REQ-0108-259). Co-occurrence of a delegation
+ * keyword with a SPEC keyword exempts the line only when both appear in a
+ * delegation phrasing. Plain SPEC-detail narration that merely contains a
+ * delegation word is NOT exempt (true-positive protection). Boundary cases
+ * are codified in integrity-rule-catalog.md「IR-044 exemption 条件・境界ケース」.
+ */
+export function isDelegationContext(line: string): boolean {
+  return /委譲先|委譲|集約先|集約|切り出し|切り出し先|routing|経路分類名|検証要件|移送先|参照先|移管|配置|delegate|delegation|extract|move\s+to|refer\s+to/i.test(
+    line,
+  );
+}
+
 function strictVocabMatch(line: string, term: string): boolean {
   const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   if (/^[a-zA-Z][a-zA-Z0-9-]*$/.test(term) && !term.startsWith("-")) {
@@ -7065,6 +7078,143 @@ function checkDocLanguageQuality(root: string): CheckResult[] {
   return results;
 }
 
+// ─── IR-044: REQ/SPEC boundary violation detection (REQ-0108-259, REQ-0108-260) ──
+// Detects SPEC detail contamination in active REQ requirement lines.
+// 9 SPEC separation criteria violation signals (REQ-0101-067, 068):
+//   1. schema field   2. enum value list      3. fixture detail
+//   4. checker individual rule   5. false positive suppression
+//   6. Step number    7. Phase number         8. internal algorithm
+//   9. specific work history
+// Exemption conditions (OR): IR044_STABLE_CONTRACT_PATTERN (REQ-0101-069),
+//   isNegationContext, isDelegationContext. Severity: heuristic (warn / exit 0).
+
+const IR044_SIGNAL_PATTERNS: ReadonlyArray<{ signal: string; pattern: RegExp }> =
+  [
+    {
+      signal: "schema field",
+      pattern:
+        /schema\s*field|スキーマ\s*フィールド|frontmatter\s*フィールド\s*の\s*型|フィールド\s*の\s*型\s*は\s*["'`]|必須\s*フィールド\s*.*型\s*[=:]/i,
+    },
+    {
+      signal: "enum value list",
+      pattern:
+        /\benum\s*(値|リスト|一覧)?|列挙値?\s*(一覧|リスト)?|値\s*一覧\s*[:：]/i,
+    },
+    {
+      signal: "fixture detail",
+      pattern: /\bfixtures?\b|フィクスチャ|テスト\s*データ\s*詳細/i,
+    },
+    {
+      signal: "checker individual rule",
+      pattern:
+        /checker\s*(個別\s*)?ルール|検出\s*(ルール|パターン)\s*[:：]|detection\s*pattern\s*[:：]/i,
+    },
+    {
+      signal: "false positive suppression",
+      pattern:
+        /false\s*positive\s*(抑制|除外)|偽陽性\s*(抑制|除外)|\bFP\s*抑制|除外\s*(パス|ルール)\s*[:：]|\bexempt\s*(path|file)/i,
+    },
+    {
+      signal: "Step number",
+      pattern: /\bStep\s*\d+(?:\s*[-–]\s*\d+)?\b|ステップ\s*\d+(?:\s*[-–]\s*\d+)?/,
+    },
+    {
+      signal: "Phase number",
+      pattern: /\bPhase\s*\d+\b|フェーズ\s*\d+/,
+    },
+    {
+      signal: "internal algorithm",
+      pattern: /内部\s*アルゴリズム|internal\s*algorithm|実装\s*の\s*アルゴリズム/i,
+    },
+    {
+      signal: "work history",
+      pattern:
+        /作業履歴\s*[:：]|PR\s*#\d+|commit\s+[0-9a-f]{7,40}|\bINC-\d{4,}\b|Issue\s*#\d+\s*で\s*(実装|追加|修正)/i,
+    },
+  ];
+
+// REQ-0101-069 stable contract exception — these topics may be summarized
+// in REQ even when phrased as parameters/classifications.
+const IR044_STABLE_CONTRACT_PATTERN =
+  /公開\s*command\s*名|公開\s*入口|domain\s*state\s*の\s*位置づけ|接続\s*契約|利用者\s*可視\s*分類\s*体系|安全\s*境界|停止条件\s*の\s*大枠|安定した\s*外部\s*契約|安定する\s*外部\s*契約/;
+
+function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const reqDir = path.join(root, "docs", "requirements");
+  if (!fs.existsSync(reqDir)) return results;
+  let foundViolation = false;
+
+  for (const file of listFiles(reqDir)) {
+    // listFiles returns top-level .md files only; retired/ subdirectory excluded.
+    if (!file.startsWith("REQ-") || !file.endsWith(".md")) continue;
+    const fullPath = path.join(reqDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const relPath = resolveRelative(fullPath, root);
+
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      // Only inspect requirement table rows: | REQ-NNNN-NNN | description |
+      const rowMatch = line.match(
+        /^\|\s*(REQ-\d{4}-\d{3})\s*\|\s*([\s\S]*?)\s*\|\s*$/,
+      );
+      if (!rowMatch) continue;
+      const reqItemId = rowMatch[1];
+      const description = rowMatch[2];
+
+      // Skip header / separator artifacts
+      if (/^-+$/.test(description) || /^要\s*件$/.test(description.trim())) {
+        continue;
+      }
+
+      // Strip inline code spans so code-only tokens don't trigger keyword match
+      const stripped = stripInlineCode(description);
+
+      // Exemption (OR conditions):
+      //   - stable contract exception (REQ-0101-069)
+      //   - negation context (existing exemption)
+      //   - delegation context (REQ-0108-259, new exemption)
+      if (IR044_STABLE_CONTRACT_PATTERN.test(stripped)) continue;
+      if (isNegationContext(line)) continue;
+      if (isDelegationContext(line)) continue;
+
+      for (const { signal, pattern } of IR044_SIGNAL_PATTERNS) {
+        if (pattern.test(stripped)) {
+          foundViolation = true;
+          results.push(
+            warn(
+              "CanonicalConflict",
+              "req-spec-boundary-violation",
+              `REQ requirement line may contain SPEC detail ("${signal}") — consider moving to SPEC/rule catalog/command reference (IR-044, REQ-0108-259)`,
+              relPath,
+              i + 1,
+              {
+                evidence: `${reqItemId}: ${description.trim()}`,
+                expected:
+                  "REQ should describe external contract / state / behavior; SPEC detail belongs in SPEC docs",
+                route: "req-define",
+              },
+            ),
+          );
+          break; // one finding per requirement line
+        }
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "CanonicalConflict",
+        "req-spec-boundary-violation",
+        "No REQ/SPEC boundary violations detected in active REQs (IR-044, REQ-0108-259)",
+      ),
+    );
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -7225,6 +7375,7 @@ async function main(): Promise<void> {
     ...checkMappingTableHistoryLabels(root),
     ...checkReqVerificationBasis(root),
     ...checkDocLanguageQuality(root), // IR-045 (REQ-0140)
+    ...checkReqSpecBoundaryViolation(root), // IR-044 (REQ-0108-259)
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)
@@ -7257,4 +7408,6 @@ async function main(): Promise<void> {
   process.exit(exitCode);
 }
 
-main();
+if (import.meta.main) {
+  main();
+}

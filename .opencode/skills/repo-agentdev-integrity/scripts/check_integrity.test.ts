@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync } from "fs";
 import { join } from "path";
+import { isDelegationContext } from "./check_integrity.ts";
 
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_integrity.ts");
@@ -858,5 +859,221 @@ describe("Doc language quality checks (IR-045)", () => {
         res.message.includes("read-only"),
     );
     expect(warnings.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// ─── IR-044: REQ/SPEC boundary violation (REQ-0108-259) ──────────────────────
+// Dedicated fixture with REQ requirement table rows covering:
+//   - true positive (SPEC detail, no exemption context)
+//   - false positive exempted by isDelegationContext
+//   - false positive exempted by isNegationContext
+//   - false positive exempted by stable contract (REQ-0101-069)
+
+const IR044_ROOT = join(TEMP_ROOT, "ir044");
+
+function buildIr044Fixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+
+  writeFileSync(
+    join(reqDir, "README.md"),
+    [
+      "# Requirements",
+      "",
+      "| ID | Title |",
+      "|----|-------|",
+      "| REQ-9001 | IR-044 fixture |",
+      "| REQ-9002 | IR-044 fixture |",
+      "| REQ-9003 | IR-044 fixture |",
+      "| REQ-9004 | IR-044 fixture |",
+      "| REQ-9005 | IR-044 fixture |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9001: true positive — SPEC detail (enum list) without any exemption context
+  writeFileSync(
+    join(reqDir, "REQ-9001.md"),
+    [
+      "---",
+      "id: REQ-9001",
+      "title: IR-044 true positive",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9001-001 | 値一覧: A, B, C, D, E, F, G |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9002: false positive — delegation context exempts SPEC keyword
+  writeFileSync(
+    join(reqDir, "REQ-9002.md"),
+    [
+      "---",
+      "id: REQ-9002",
+      "title: IR-044 delegation exemption",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9002-001 | fixture 詳細は委譲先 SPEC に配置すること |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9003: false positive — negation context exempts SPEC keyword
+  writeFileSync(
+    join(reqDir, "REQ-9003.md"),
+    [
+      "---",
+      "id: REQ-9003",
+      "title: IR-044 negation exemption",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9003-001 | fixture 詳細を REQ に含めることを禁止する |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9004: false positive — stable contract exception (REQ-0101-069)
+  writeFileSync(
+    join(reqDir, "REQ-9004.md"),
+    [
+      "---",
+      "id: REQ-9004",
+      "title: IR-044 stable contract",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9004-001 | 公開 command 名は正規名前空間に従うこと |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9005: true positive — Step number SPEC detail
+  writeFileSync(
+    join(reqDir, "REQ-9005.md"),
+    [
+      "---",
+      "id: REQ-9005",
+      "title: IR-044 step number",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9005-001 | 実装は Step 3 で checker 個別ルールを適用すること |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // Empty adr/specs/skills to satisfy other checks minimally
+  mkdirp(join(root, "docs", "adr"));
+  mkdirp(join(root, "docs", "specs"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+}
+
+describe("IR-044 isDelegationContext predicate (REQ-0108-259)", () => {
+  it("returns true for delegation phrases", () => {
+    expect(isDelegationContext("委譲先 SPEC に配置")).toBe(true);
+    expect(isDelegationContext("集約先に記載")).toBe(true);
+    expect(isDelegationContext("切り出し先を参照")).toBe(true);
+    expect(isDelegationContext("routing 経路分類名")).toBe(true);
+    expect(isDelegationContext("delegate to SPEC")).toBe(true);
+  });
+
+  it("returns false for normal lines without delegation keywords", () => {
+    expect(isDelegationContext("要件行は外部契約を記述する")).toBe(false);
+    expect(isDelegationContext("値一覧: A, B, C")).toBe(false);
+    expect(isDelegationContext("実装は Step 3 で実行")).toBe(false);
+  });
+});
+
+describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
+  beforeAll(() => {
+    mkdirp(IR044_ROOT);
+    buildIr044Fixture(IR044_ROOT);
+    copyScripts(IR044_ROOT);
+  });
+
+  it("detects true positive: SPEC detail without exemption (enum list)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9001"),
+    );
+    expect(violations.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects true positive: Step number SPEC detail", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9005"),
+    );
+    expect(violations.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("exempts delegation context: fixture keyword with 委譲先", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9002"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("exempts negation context: fixture keyword with しないこと", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9003"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("exempts stable contract: 公開 command 名 (REQ-0101-069)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9004"),
+    );
+    expect(violations.length).toBe(0);
   });
 });
