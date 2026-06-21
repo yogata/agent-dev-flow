@@ -48,3 +48,11 @@
 - 観測: `check_integrity.ts` の `main()` がモジュール末尾で無条件実行されており、テストファイルからの import 時に副作用（スクリプト実行）が発生していた。
 - 教訓: bun の `import.meta.main` を用いたガードは、エントリポイント判定の標準パターンとして他のスクリプトでも推奨。新規スクリプト作成時のデフォルトパターン化を検討すべきか。
 
+## 2026-06-21 PR #977 (Issue #971 / バッチC 実行インフラ改善)
+
+### ハーネスタイムアウト事後処理の実証
+
+- 観測: 本 Issue の実装プロセス自体が「oh-my-openagent 起動失敗 → 直接実装へ切り替え」の事後処理手順（OU-013 で新設）の実証例となった。`bunx oh-my-openagent run` に prompt を標準入力で渡すと `error: missing required argument 'message'` で即時失敗したことを契機に、直接実装へ切り替えて PR を完遂した。
+- 教訓: ハーネス起動失敗時の事後処理として以下の 3 点が有効だった: (1) CLI 引数仕様の事前検証（`--help` で必須引数を確認）、(2) タイムアウト後の worktree `git status` 確認（未コミット変更の有無で再実装 vs 継続を判断）、(3) フォールバック時も REQ/ADR/SPEC/docs を再確認する（driver 引き継ぎプロンプト制約の実践）。本 PR で SKILL 化した手順が即座に自己適用された形。
+- 関連 intake: `2026-06-21-issue971-oh-my-openagent-cli-arg-spec.md`（CLI 引数仕様の文脈）。
+
