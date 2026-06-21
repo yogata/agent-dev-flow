@@ -76,6 +76,77 @@ SPEC分離基準違反シグナルは high-specificity signal として扱う。
 - 要件行が外部契約を要約し、詳細値だけを例示している場合は安定契約例外候補として扱い、即時 high 検出事項にしない。
 - 同一 REQ 内で複数種の SPEC分離基準違反シグナルが出た場合、根拠をまとめて1件の MOVE 検出事項候補として出す。
 
+## 配布物 ID 汚染検出
+
+AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等）が配布物に残留していないかを検出する。配布物（`src/opencode/commands/`・`src/opencode/skills/`）は AgentDevFlow 利用者が読む成果物であり、内部 ID はノイズとなるため記述しない（OU-009 原則）。
+
+### 検査対象
+
+| 対象 | 理由 |
+|------|------|
+| `src/opencode/commands/**/*.md` | 利用者向けコマンド定義 |
+| `src/opencode/skills/**/*.md` | 利用者向けスキル知識ベース |
+
+`docs/` 配下・`scripts/` 配下は検査対象外（AgentDevFlow 内部アーティファクトであり内部 ID 記述を許容する）。
+
+### 検出パターン
+
+| パターン | 検出対象 | 例外（許容） |
+|----------|----------|--------------|
+| `REQ-\d{4}` | REQ 番号の直接参照 | — |
+| `ADR-\d{4}` | ADR 番号の直接参照 | — |
+| `SPEC-[A-Z]+(-[A-Z]+)*-\d+` | SPEC-ID 形式 | — |
+| `IR-\d{2,}` | Implementation Requirement 番号 | — |
+
+コードブロック内・テンプレート変数プレースホルダー（`{xxx}`）・フロントマターの `name`/`description` 以外の本文行で検出した場合、検出事項候補（観点 `MOVE`・確信度 `high`）として出す。推奨アクションは「内部 ID を機能的記述（コマンド名・スキル名・機能概要）へ置換」。
+
+### 判定ルール
+
+- 単語露出のみならず、当該 ID 参照が利用者にとって意味を持つかを判定する（利用者が当該 ID を追跡する導線がない場合は除去）。
+- `agentdev-*` スキル名・`/agentdev/*` コマンド名は配布物自身の識別子であり許容する（内部 ID ではない）。
+- 内部 ID を含む説明が必要な場合は、配布物ではなく `docs/specs/` または `docs/guides/` に配置する。
+
+## SPEC 三層構造の整合性検出
+
+SPEC は 3 層構造（`docs/specs/commands/`・`docs/specs/skills/`・`docs/specs/workflows/`）を持ち、横断 SPEC（`workflows/`）は個別 command/skill の現在動作を含まない（OU-002 原則）。これに違反する配置を検出する。
+
+### 検出シグナル
+
+| 観点 | 検出対象 | 推奨アクション |
+|------|----------|----------------|
+| 横断 SPEC 中の個別動作 | `docs/specs/workflows/*.md` に個別 command または skill のみに適用される手順・ステップ・判定表が含まれる | 該当 command/skill SPEC へ移送（`MOVE`） |
+| 個別 SPEC 中の横断契約 | `docs/specs/commands/*.md` または `docs/specs/skills/*.md` に複数 command/skill をまたぐ契約が含まれる | 横断 SPEC へ移送（`MOVE`） |
+| 旧 grab-bag SPEC 残存 | `docs/specs/*.md` 直下に複数関心事が混在 | 関心事別 SPEC へ分割（`SPLIT`） |
+
+### 判定ルール
+
+- 個別 SPEC は1コマンドまたは1スキルの現在動作のみを記述する。
+- 複数コマンド/スキル間の契約（委譲・キャプチャ境界・Wave モデル等）は `workflows/` に配置する。
+- `docs/specs/*.md` 直下の SPEC は基盤 SPEC（system/writing-style/patterns/design-principles 等）のみとし、command/skill 固有の動作は含まない。
+
+## HOW 除去後の acceptance-criteria 順位検証
+
+機械的（単パス）な HOW 除去を実施した後、完了条件（acceptance criteria）順位で再検証を行う。前工程で機械的に HOW を除去しても残余 violation が残る場合がある（OU-008/Wave 4 学習: 8件の残余 violation を検出）。
+
+### 検証手順
+
+1. **完了条件の展開**: Issue の完了条件・REQ の必達要件を受け入れ基準単位に展開し、優先順位をつける
+2. **順位順の検証**: 高優先度の完了条件から順に、REQ ファイル・配布物・SPEC を照合し、HOW 残存・ID 残留・責務混入がないか確認する
+3. **残余検出時**: 機械的除去で見逃されたパターン（複数行にまたがる HOW 記述・文脈依存の ID 参照・間接的なスキル名直参照等）を検出事項候補として出す
+
+### 残余 violation の高頻度パターン
+
+| パターン | 例 | 検出観点 |
+|----------|----|----------|
+| 複数行にまたがる HOW 記述 | ステップ番号参照が別段落に分散 | `MOVE` |
+| 文脈依存の ID 参照 | 「当該 REQ」等の代名詞的参照 | `MOVE` |
+| 間接的なスキル名直参照 | `agentdev-xxx` を要件文中に埋め込み | `MOVE` |
+| 旧名称の残存 | diagnostics → inspect 改名前の名称 | `DRIFT` |
+| CLI 詳細の抽象化漏れ | コマンドライン引数・フラグ詳細 | `MOVE` |
+| ファイルパスの直接参照 | `src/opencode/...` 等の実装パス | `MOVE` |
+
+機械的除去の単パスでこれらを完全に捕えられないため、acceptance criteria 順位による再検証を必ず実施する。
+
 ## 未処理成果物の確認
 
 未処理の intake/learning/RU が存在する場合、その存在と影響のみを報告する:
