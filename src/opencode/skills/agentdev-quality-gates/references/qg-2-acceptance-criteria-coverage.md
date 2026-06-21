@@ -46,7 +46,7 @@ Issue 本文がテンプレート（`issue_desc_*.md`）の【必須】セクシ
 
 - **fail**: `完了条件` セクションの欠落、または【必須】セクションの欠落。
 
-## pass / warn / fail 基準
+## pass/ warn/ fail 基準
 
 - **pass**: 上記 1〜5 の全てを満たす。全必達要件が完了条件に traceable に対応づけられている。
 - **warn**: 対応づけはあるが表現が曖昧、または一部網羅性に疑義がある。Issue 作成可能（警告併記）。
@@ -54,10 +54,10 @@ Issue 本文がテンプレート（`issue_desc_*.md`）の【必須】セクシ
 
 ## Epic flow での適用
 
-Epic flow（マルチREQ / 単一REQ Epic）の場合:
+Epic flow（マルチREQ/ 単一REQ Epic）の場合:
 
 - Epic Issue の完了条件は子Issue の完了条件の集約ではなく、Epic 固有の受け入れ基準を含む。
-- 各子Issue の完了条件が当該子Issue が担当する OU / REQ の必達要件を網羅しているかを検証する。
+- 各子Issue の完了条件が当該子Issue が担当する OU/ REQ の必達要件を網羅しているかを検証する。
 - 子Issue 間で必達要件の漏れ・重複がないかを確認する。
 
 ## 委譲接続点
@@ -79,3 +79,4 @@ QG-2 の検査をサブエージェントに委譲する場合:
 - [qg-1-definition-integrity.md](qg-1-definition-integrity.md) — 前工程の要件定義の完全性（QG-2 はその成果物を入力とする）
 - **agentdev-issue-management**: Issue 本文生成・テンプレート選定
 - **agentdev-workflow-templates**: Issue 本文テンプレート（`issue_desc_*.md`）
+

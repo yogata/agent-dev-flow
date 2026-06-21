@@ -47,7 +47,7 @@ REQ の現行/廃止/世代境界の整合性を確認する:
 | 2シグナル以上 | 問題候補検出事項として出す |
 | 3シグナル以上、または 現行/廃止 判断に影響 | 高優先度候補として出す |
 
-要件行数・関心分類数・成果物種別数の定量閾値と SPLIT シグナル加算ルールは `docs/specs/req-health-metrics.md`（REQ-0136-040）に定義する。本観点の SPLIT シグナル計算は同 SPEC の閾値を参照する。
+要件行数・関心分類数・成果物種別数の定量閾値と SPLIT シグナル加算ルールは `docs/specs/req-health-metrics.md`に定義する。本観点の SPLIT シグナル計算は同 SPEC の閾値を参照する。
 
 SPEC分離基準違反シグナルは high-specificity signal として扱う。現行 REQ の要件行で以下のいずれかが主たる文意になっている場合、1シグナルでも MOVE 検出事項候補として出す。安定契約例外（公開 command 名、ドメイン状態の位置づけ、接続契約、安全境界、停止条件の大枠等）に該当する可能性がある場合は、確信度を medium/low に下げ、根拠に例外候補を明記する。
 
@@ -102,10 +102,12 @@ SPEC分離基準違反シグナルは high-specificity signal として扱う。
 
 | フィールド | 内容 |
 |-----------|------|
-| 観点 | SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT のいずれか |
+| 観点 | SPLIT/ MERGE/ MOVE/ DUPLICATE/ RETIRE/ DRIFT のいずれか |
 | 対象 | REQ ID または対象成果物 |
 | 根拠 | 検出されたシグナルの具体的内容 |
 | シグナル数 | 検出されたシグナル数（通常は2以上で検出事項化、SPEC分離基準違反の high-specificity signal は1以上で検出事項候補化） |
-| 確信度 | high / medium / low のいずれか |
-| 推奨アクション | SPLIT / MERGE / MOVE / RETIRE / UPDATE / APPEND / no-action のいずれか |
+| 確信度 | high/ medium/ low のいずれか |
+| 推奨アクション | SPLIT/ MERGE/ MOVE/ RETIRE/ UPDATE/ APPEND/ no-action のいずれか |
 | req-define入力案 | req-define での壁打ち内容のドラフト（不要な場合は「—」） |
+
+

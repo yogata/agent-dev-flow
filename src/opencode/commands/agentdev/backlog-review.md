@@ -100,14 +100,14 @@ RU 生成が成功した採用済み成果物のみを削除する:
 
 ### Step 7: Git 永続化
 
-`.agentdev/` 配下の変更を commit / push する:
+`.agentdev/` 配下の変更を commit/ push する:
 
 - `git diff --name-only` で `.agentdev/` 配下の変更を確認
 - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
 - **変更あり時**:
-  1. 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする（REQ-0137-002/005）。生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>` / `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止
-  2. commit message: `chore(agentdev): generate requirement units via backlog-review`
-  3. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止
+ 1. 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止
+ 2. commit message: `chore(agentdev): generate requirement units via backlog-review`
+ 3. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止
 
 ### Step 8: 完了報告
 
@@ -127,3 +127,6 @@ RU 生成結果・git 永続化結果を含める。次のコマンド: `/agentd
 - G05: 矛盾検出時はユーザーの指示を待ち、自動的に解決しない
 - G06: RU 生成に失敗した成果物は削除しない
 - G07: depends_on に採用済み成果物パスを指定しない。RU-ID のみ許容
+
+
+

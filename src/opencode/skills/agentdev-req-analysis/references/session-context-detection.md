@@ -29,8 +29,8 @@
 - 存在する場合: ファイル名の topic-slug とセッションの要件内容の一致を確認
 - トピック不一致 → draft を無視（セッションコンテキスト優先）
 - トピック一致 → draft の `status` 値でルーティング:
-  - `saved` → req-save 完了状態。case-open 待ち
-  - `draft` → req-save 未実行。req-save 待ち
+ - `saved` → req-save 完了状態。case-open 待ち
+ - `draft` → req-save 未実行。req-save 待ち
 
 ## 推論サマリー表示形式
 
@@ -55,12 +55,13 @@
 推論サマリー表示後、ユーザーの同意を確認した後に実行:
 
 - **全項目 高信頼度で推論済み（+ draft 存在）**:
-  - feature → Step 10 へスキップ
-  - bugfix → Step 10 へスキップ
+ - feature → Step 10 へスキップ
+ - bugfix → Step 10 へスキップ
 - **全項目 高信頼度で推論済み（draft なし）**:
-  - feature → Step 9 へスキップ
-  - bugfix → Step 10 へスキップ
+ - feature → Step 9 へスキップ
+ - bugfix → Step 10 へスキップ
 - **一部項目が低信頼度または未推論**:
-  - 推論済み項目（高信頼度）を継承し、不足項目のみを対象に Step 1（壁打ち）を開始
+ - 推論済み項目（高信頼度）を継承し、不足項目のみを対象に Step 1（壁打ち）を開始
 - **推論結果なし（セッションに要件情報が存在しない）**:
-  - 通常の Step 1 から開始
+ - 通常の Step 1 から開始
+

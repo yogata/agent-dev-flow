@@ -9,7 +9,7 @@
 | 項目 | 内容 |
 |------|------|
 | 成果物パス | 元ファイルパス |
-| source type | intake / learning |
+| source type | intake/ learning |
 | 主要テーマ | 抽出された主論点 |
 | 関連成果物群 | 同一趣旨の可能性がある他の成果物 |
 
@@ -51,16 +51,18 @@
 
 1. `.agentdev/backlog/req-units/` が存在しない場合は作成
 2. 各 RU について:
-    - frontmatter 生成（source_type, generated_by: backlog-review, generated_at, status: draft, depends_on（任意）, sources）
-    - **前工程からの引き継ぎメタデータ転記**: 分析結果に `agentdev_handoff: true` が存在する場合、RU frontmatter に転記する。RU 本文に現在プロジェクトでは実装しない前工程からの引き継ぎ用 RU であることを記載する
-    - Sources セクション: 各 source の要点（パススルー禁止）
-    - Source Summary セクション: 統合サマリ
-    - 統合理由セクション: N:1/1:N の理由
-    - 要件化の方向セクション: req-define への推奨方向
+ - frontmatter 生成（source_type, generated_by: backlog-review, generated_at, status: draft, depends_on（任意）, sources）
+ - **前工程からの引き継ぎメタデータ転記**: 分析結果に `agentdev_handoff: true` が存在する場合、RU frontmatter に転記する。RU 本文に現在プロジェクトでは実装しない前工程からの引き継ぎ用 RU であることを記載する
+ - Sources セクション: 各 source の要点（パススルー禁止）
+ - Source Summary セクション: 統合サマリ
+ - 統合理由セクション: N:1/1:N の理由
+ - 要件化の方向セクション: req-define への推奨方向
 3. ファイル名: `RU-{NNNN}.md`（既存ファイルの最大番号 +1 から採番）
 4. **depends_on 検証**:
-    - depends_on 値は RU-ID に限定（採用済み成果物のパス不可）
-    - 依存先 RU が存在することを確認
-    - 循環依存がないことを確認
-    - 依存順に並べ替え可能であることを確認
-    - 検証失敗時は当該 RU を生成せず理由を提示
+ - depends_on 値は RU-ID に限定（採用済み成果物のパス不可）
+ - 依存先 RU が存在することを確認
+ - 循環依存がないことを確認
+ - 依存順に並べ替え可能であることを確認
+ - 検証失敗時は当該 RU を生成せず理由を提示
+
+

@@ -19,9 +19,9 @@ git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/{base_bran
 ### 3. 重要事項
 
 - **worktreeプレフィクス必須**: ファイルパスには `.worktrees/{N}-{type}/` を含めること
-  - 正: `C:/path/to/repo/.worktrees/516-fix/src/components/App.tsx`
-  - 正: `.worktrees/516-fix/src/components/App.tsx`
-  - 誤: `src/components/App.tsx`（メインリポジトリのファイルを誤編集リスク）
+ - 正: `C:/path/to/repo/.worktrees/516-fix/src/components/App.tsx`
+ - 正: `.worktrees/516-fix/src/components/App.tsx`
+ - 誤: `src/components/App.tsx`（メインリポジトリのファイルを誤編集リスク）
 - Windows環境: パスにスペースが含まれる可能性があるためダブルクォート必須
 - 作成後: `git worktree list` で正しく追加されたことを検証
 
@@ -211,3 +211,4 @@ rebase中にconflictを解決した場合:
 3. rebase完了後push: `git push --force-with-lease`（必要に応じて）
 
 **重要**: force pushは慎重に実行すること。リモートの変更を上書きするリスクがあるため、事前に確認が必要。
+

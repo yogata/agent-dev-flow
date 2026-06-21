@@ -6,7 +6,7 @@ case-close で PR マージ前に、最終受け入れ状態を確認する Gate
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| case-close | Step 2（前提確認・達成判定）・Step 3（docs 検証）・Step 3-1（close 時局所確認） | PR / CI 結果 / Issue 完了条件チェックボックス / docs |
+| case-close | Step 2（前提確認・達成判定）・Step 3（docs 検証）・Step 3-1（close 時局所確認） | PR/ CI 結果/ Issue 完了条件チェックボックス/ docs |
 
 ## 検査観点
 
@@ -55,7 +55,7 @@ PR の CI が全て通過しているか。
 - **warn**: 分類ポリシーとの不適合候補がある。警告表示してユーザー判断を仰ぐ。
 - **pass**: 分類ポリシーに適合。
 
-### 5. close 時 SPEC / commands / skills 更新漏れ（局所確認）
+### 5. close 時 SPEC/ commands/ skills 更新漏れ（局所確認）
 
 今回の変更に伴う更新漏れの局所確認（case-close Step 3-1）。
 
@@ -68,13 +68,13 @@ PR の CI が全て通過しているか。
 
 > **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない。
 
-## pass / fail 基準
+## pass/ fail 基準
 
 - **pass**: 上記 1, 2 を満たし（3, 4, 5 は warn 以下）、マージ可能。
 - **fail**: 観点 1（未達チェックボックス）または観点 2（CI 失敗）。構造化エラーで停止。
 - **partial**: CI pending 等、判定に必要な証拠が未取得。証拠取得後に再判定。
 
-QG-4 は最終受け入れの二値性が強く、`pass` / `fail` を基本とする。`partial` は CI 保留等の例外的状況のみ。
+QG-4 は最終受け入れの二値性が強く、`pass`/ `fail` を基本とする。`partial` は CI 保留等の例外的状況のみ。
 
 ## 完了条件チェックボックス評価の具体手順
 
@@ -112,3 +112,4 @@ QG-4 の検査をサブエージェントに委譲する場合:
 - [qg-3-implementation-deviation.md](qg-3-implementation-deviation.md) — 前工程の実装乖離検出（QG-4 は QG-3 pass を前提とする）
 - **agentdev-workflow-orchestration**: 達成判定プロトコル・証拠ソース
 - **agentdev-issue-management**: Issue 本文更新・前後内容比較
+

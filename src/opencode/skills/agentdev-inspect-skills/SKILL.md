@@ -9,7 +9,7 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（C
 
 ## 検査対象を直接修正しない制約
 
-- ファイル変更（canonical docs・REQ/ADR/SPEC・Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch / worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ
+- ファイル変更（canonical docs・REQ/ADR/SPEC・Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/ worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ
 - 診断結果はセッション内テキストで提示する
 - 修正案は route として提示し、実装・保存・自動整形は行わない
 
@@ -23,7 +23,7 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（C
 - 検出事項（Findings: id, target, classification, evidence, recommended_route, confidence, unresolved_questions）
 - 初期是正方針（Initial Remediation Direction）
 - 対象外（Out of Scope）
-- 推奨 intake / learning route
+- 推奨 intake/ learning route
 
 ## 診断観点
 
@@ -35,7 +35,7 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（C
 | references/* 段階的開示妥当性 | 詳細手順・長い表・具体例が必要時参照に分離されているか |
 | Skill 分割候補 | 複数の独立責務が単一 Skill に混在していないか |
 | Command 固有手順の Skill 流入 | 特定 Command の Step 番号、Phase、局所手順が Skill に入っていないか |
-| 出力本文の Command/Skill 混入 | 固定文言や出力テンプレートが Command / Skill 本文に混在していないか |
+| 出力本文の Command/Skill 混入 | 固定文言や出力テンプレートが Command/ Skill 本文に混在していないか |
 | 決定的検査の Script 化可否 | 同じ入力で同じ結果になる検査が script に分離可能か |
 | 操作安全手順の配置 | git、gh、worktree などの安全手順が適切な operation Skill に置かれているか |
 | canonical Skill name 使用 | Skill 参照が正式な `agentdev-*` 名で記述されているか |
@@ -97,3 +97,4 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（C
 
 - **agentdev-skill-authoring**: スキルオーサリングの品質基準
 - **agentdev-command-authoring**: コマンド定義の規約
+
