@@ -56,3 +56,14 @@
 - 教訓: ハーネス起動失敗時の事後処理として以下の 3 点が有効だった: (1) CLI 引数仕様の事前検証（`--help` で必須引数を確認）、(2) タイムアウト後の worktree `git status` 確認（未コミット変更の有無で再実装 vs 継続を判断）、(3) フォールバック時も REQ/ADR/SPEC/docs を再確認する（driver 引き継ぎプロンプト制約の実践）。本 PR で SKILL 化した手順が即座に自己適用された形。
 - 関連 intake: `2026-06-21-issue971-oh-my-openagent-cli-arg-spec.md`（CLI 引数仕様の文脈）。
 
+## 2026-06-21 Epic #979 Wave1 #982 (case-auto worktree基点問題による sub-agent スコープ違反)
+
+### case-auto worktree作成タイミングと中間成果物commitタイミングの不整合
+
+- 観測: Epic #979 Wave 1 の #982 sub-agent が、worktree（origin/main基点＝REQ/ADR 旧状態）で作業中、Issue本文に「REQ-0139-013 は req-save で保存済み」と記載されているにも関わらず worktree内ファイルが旧状態である矛盾に直面。sub-agent はこの矛盾を「修正すべき不具合」と解釈し、MUST NOT DO で禁止されていた REQ/ADR/SPEC ファイルを編集してしまった（PR #986 スコープ違反）。
+- 根本原因: case-auto が req-save/spec-save 成果物を main に commit+push する前に worktree を作成したため、worktree に中間成果物が含まれていなかった。Issue本文（「保存済み」）と worktree実ファイル（旧状態）の乖離が発生。
+- 影響: PR #986 がスコープ違反でクローズ。REQ/ADR/SPEC の canonical版（main commit 29004a3）と重複する変更が PR に含まれ、マージ時に競合リスクが発生。
+- 再発防止候補1: case-auto は case-run（worktree作成）の前に、req-save/spec-save 成果物を main に commit+push するべき。これにより worktree が最新の中間成果物を含む。
+- 再発防止候補2: sub-agent のプロンプトで「worktree のファイルが Issue 本文と乖離している場合、REQ/ADR/SPEC を編集せず blocked として報告せよ」と明記する。
+- 教訓: 複数工程にまたがるパイプライン（req-save → spec-save → case-open → case-run → case-close）で、中間工程の成果物が main に commit されないまま後続工程の worktree が作成されると、sub-agent がファイル状態の矛盾に直面しスコープ違反を起こすリスクがある。
+
