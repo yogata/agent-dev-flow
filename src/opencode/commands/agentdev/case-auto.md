@@ -25,7 +25,7 @@ agent: sisyphus
    - **要件doc入力モード**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
 2. **work_type 読取**: 入力要件docの `draft-data` から work_type を取得する（参考情報・パイプライン分岐の判定には使用しない・REQ-0138-010）
 3. **工程分岐**（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定・REQ-0138-009）:
-   - **Issue番号/URL入力**: case-run → case-close（req-save・spec-save・case-open・work_type読取をスキップ）。Step 1 で解決した Issue番号/URL を case-run（CLI subprocess・ADR-0114）にそのまま渡す。draft-data の読み取りを行わない
+   - **Issue番号/URL入力**: case-run → case-close（req-save・spec-save・case-open・work_type読取をスキップ）。Step 1 で解決した Issue番号/URL を case-run（task()・ADR-0114/0128）にそのまま渡す。draft-data の読み取りを行わない
    - **artifact_actions ベース分岐**: `draft-data` の `artifact_actions` を読み取り以下の工程を動的判定する:
      - `artifact: req` または `artifact: adr` の entry が含まれる場合 → req-save を実行
      - `artifact: spec` の entry が含まれる場合 → spec-save を実行（req-save の後）
@@ -36,7 +36,7 @@ agent: sisyphus
      - `artifact: spec` entry が空の場合 → spec-save をスキップし case-open へ進む
      - `artifact_actions` フィールドが存在しない（旧形式 draft）場合 → **後方互換**: spec-save をスキップし従来ワークフロー（req-save → case-open → …）で実行
    - **auto_gate preflight**: `draft-data` の `auto_gate.auto_ready` を確認し、false の場合または未解決 item（unresolved_questions / unresolved_conflicts / out_of_repo_operations / stop_reasons）が残る場合は停止する（REQ-0138-013）
-4. **各工程の実行**: case-auto は各工程（req-save / spec-save / case-open / case-close）を task() で起動し、オーケストレーションに専念する（ADR-0127, REQ-0114-006/084/085）。case-run は引き続き CLI subprocess 委譲モデル（ADR-0114）を使用する。各工程の task() は対応するコマンド定義（`.opencode/commands/agentdev/{step}.md`）を authoritative source として読み込み実行する。case-auto は各工程の完了結果（保存済みファイル・Issue/PR番号・pass/warn/fail）のみを受領し、次工程への入力として渡す。**インライン実行は禁止する**（REQ-0114-073・コンテキスト枯渇防止）
+4. **各工程の実行**: case-auto は各工程（req-save / spec-save / case-open / case-run / case-close）を task() で起動し、オーケストレーションに専念する（ADR-0127, REQ-0114-006/084/085）。case-run は Sisyphus-Junior(ulw-loop) への task() 委譲モデル（ADR-0114/0128）を使用する。各工程の task() は対応するコマンド定義（`.opencode/commands/agentdev/{step}.md`）を authoritative source として読み込み実行する。case-auto は各工程の完了結果（保存済みファイル・Issue/PR番号・pass/warn/fail）のみを受領し、次工程への入力として渡す。**インライン実行は禁止する**（REQ-0114-073・コンテキスト枯渇防止）
 
    ### 工程別委譲契約（ADR-0112 §5・ADR-0127）
 
@@ -47,7 +47,7 @@ agent: sisyphus
    | req-save | task() | draft path, OU ID | 保存済みREQ/ADRリスト, draft status=saved, pass/warn/fail |
    | spec-save | task() | draft path | 保存済みSPECリスト, SPEC消費済みフラグ, pass/warn/fail |
    | case-open | task() | draft path, OU ID | Issue番号(Epic含む), pass/warn/fail |
-   | case-run | CLI subprocess（ADR-0114） | Issue番号, worktree root | completed(pr)/blocked/failed |
+    | case-run | task()（ADR-0114/0128） | Issue番号, worktree root | completed(pr)/blocked/failed |
    | case-close | task() | Issue番号, PR番号 | マージ結果, Capture保存結果, 削除済みブランチ, pass/warn/fail |
 
    各 task() の side_effect_boundary は対応するコマンド定義のガードレール（ファイル操作制約）に従う。case-auto は各 task() の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture・.agentdev/ commit/push 等）は各 task() が対応するコマンド定義に従って実行する
@@ -67,7 +67,7 @@ agent: sisyphus
        - **Step 4-1 キュー開始（子Issue単位オーケストレーション）**: Epic Issue 番号を記録する。Epic Issue 本文から子Issue一覧・Wave 構成・ステータス追跡テーブルを読み取る（永続状態を SSoT とする）。以下の子Issue単位ループを実行する（SPEC `docs/specs/workflow-contracts.md` 子Issue単位オーケストレーションモデル SC-007, REQ-0114-045〜048）:
          1. **子Issue選択**: Wave table の「実行方法」列を確認し、status が `ready` の子Issue を選択する。「並列」指定は最大5件まで同時選択。「直列」指定は1件。`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択する。ただし前提Issue が blocked/failed の場合は `pending` のまま選択対象外。
          2. **running 遷移**: 選択した全子Issue を `running` に遷移させる（Epic Issue ステータス追跡テーブルを case-auto が更新）。
-         3. **case-run 並行委譲**: 選択した各子Issue 番号 + 要件docパスを case-run（CLI subprocess・ADR-0114）に渡す。「並列」指定は同時に起動。「直列」指定は1件完了後に次を起動。case-run は1 Issue のみを処理する（REQ-0130-010）。
+          3. **case-run 並行委譲**: 選択した各子Issue 番号 + 要件docパスを case-run（task()・ADR-0114/0128）に渡す。「並列」指定は同時に起動。「直列」指定は1件完了後に次を起動。case-run は単一 Issue または単一 Wave を処理する（REQ-0130-010）。
          4. **全完了待機**: 全 case-run の完了を待つ。
          5. **結果確認**: 永続状態を再読込し各子Issue の結果（completed(pr) / blocked / failed）を確認する。
          6. **case-close task()（子Issue単位・逐次）**: 完了した子Issue を Issue番号昇順で case-close task() に渡す。blocked/failed の子Issue は case-close 対象外。
@@ -124,7 +124,7 @@ agent: sisyphus
 - G06: docs / REQ / ADR / SPEC / command reference / guide の更新を自走対象に含める
 
 ### 委譲・参照制約
-- G07: case-auto は各工程（req-save / spec-save / case-open / case-close）を task() で起動し、**インライン実行してはならない**（ADR-0127, REQ-0114-006/073/084）。case-run は CLI subprocess（ADR-0114）を使用し task() に切替えない。各工程の task() は対応するコマンド定義を authoritative source として実行する（手順の case-auto 定義内再実装は回避）
+- G07: case-auto は各工程（req-save / spec-save / case-open / case-run / case-close）を task() で起動し、**インライン実行してはならない**（ADR-0127, REQ-0114-006/073/084）。case-run も task() 起動を使用する（ADR-0114/0128）。各工程の task() は対応するコマンド定義を authoritative source として実行する（手順の case-auto 定義内再実装は回避）
 - G08: 工程固有の詳細手順とcase-auto定義が矛盾する場合、工程固有処理は既存コマンド定義を優先し、自走境界・入力解決・工程間制御はcase-auto定義を優先する。各 task() の実行は対応するコマンド定義に従う
 - G09: 既存のreq-save / spec-save / case-open / case-run / case-closeの責務を変更しない。task() 委譲は起動方式の変更であり、各コマンドの責務・ガードレール・成果物を変更しない
 - G27: 各 task() の起動は工程別委譲契約（Step 4 の委譲契約表・ADR-0112 §5）に従うこと。inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領する
