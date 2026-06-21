@@ -70,11 +70,9 @@ Case に対して実装実行を実行担当サブエージェント経由で外
 
 **Step 5: 実行担当サブエージェント起動**: 実装実行を外部実行バックエンドへ委譲するため、実行担当サブエージェントを起動する。実行担当サブエージェントは `agentdev-case-run-execution-adapter` skill の adapter protocol に従い、Issue読込・ADR/REQ/SPEC/docs repository context 再確認・外部実行バックエンドへの委譲・blocker処理・result返却を実行する。
 
-**ハーネス起動コマンドのフォールバック（OU-013 / REQ-0130）**: 既定では `bunx oh-my-openagent run ...` を使用する。bunx がモジュール解決エラー（`Cannot find module`・`ERR_MODULE_NOT_FOUND` 等）で失敗した場合は、直ちに `npx oh-my-openagent run ...` にフォールバックする。再起動は1回まで。npx フォールバックでも失敗する場合は `failed` として処理する。タイムアウト時の事後処理は `agentdev-case-run-execution-adapter` スキル参照。
-
 - **case-run が直接行わない（実行担当サブエージェント / 外部実行バックエンドの責務）**: work plan生成・実装実行・TDD・乖離検出（QG-3）・specs更新・関連ドキュメント整合性確認・ローカル検証・PR本文作成・PR作成・デプロイ検証
 - **実行担当サブエージェントへの引き渡し**: 割り当てられた1 Issue の Issue番号・worktree root（相対パス指定・worktree内制約）・ブランチ名。実行担当サブエージェントはこの1 Issue のみを実装対象とする（Wave全体や他子Issue のオーケストレーションは含まない）
-- ハーネス起動方式（CLI subprocess）の詳細は `agentdev-case-run-execution-adapter` スキル参照。AGENTS.md で指定されたハーネスを読み込んで起動する
+- ハーネス起動方式（task() 委譲）の詳細は `agentdev-case-run-execution-adapter` スキル参照。AGENTS.md で指定されたハーネスを task() で起動する（ADR-0128）
 - 外部実行ハーネスの plan artifact 等の中間成果物の内部構造に依存した処理・検証を行わない（REQ-0139-007）。最終結果は PR URL で受領する
 - 実行担当サブエージェントが Issue 完了条件チェックボックスを更新しない（case-close QG-4 の責務）
 - Findings / Capture 候補は実行担当サブエージェントが PR 本文の `## Findings / Capture候補` に記録する
