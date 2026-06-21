@@ -36,3 +36,15 @@
 - 観測: ADR 採番（max+1, 欠番埋め禁止）の強調ブロックを SKILL.md と req-save.md の両方に記載した。知識の二重保持は意図的（SKILL は知識ベース・command は実行手順）だが、将来の改定時に同期漏れが起き得る。
 - 教訓: SKILL ↔ command の同一ルール重複を許容するか・一方向参照にするかの判断基準が artfact-responsibilities で明示されていない。SKILL/command の責務分割原則に「同一ルール重複」の許容条件を追加すべきか。
 
+## 2026-06-21 PR #976 (Issue #972 / バッチD 記録・検出精度)
+
+### SPEC catalog と実装の同期重要
+
+- 観測: IR-044 検出関数は commit a27a8e56 で「3層ゲート自動化と共に削除」されたが、catalog 定義（IR-044）は維持された。SPEC catalog と実装の間に乖離が生じないよう、削除時は catalog の `baseline_status` を `new` から `resolved` に変更する等の同期運用が必要。
+- 教訓: 今回の再実装でこの教訓を反映し、catalog（spec-save 済み）と実装を一致させた。今後 SPEC catalog ↔ 実装の削除・復活時には双方向同期を必須とする。
+
+### `import.meta.main` ガードパターン（bun）
+
+- 観測: `check_integrity.ts` の `main()` がモジュール末尾で無条件実行されており、テストファイルからの import 時に副作用（スクリプト実行）が発生していた。
+- 教訓: bun の `import.meta.main` を用いたガードは、エントリポイント判定の標準パターンとして他のスクリプトでも推奨。新規スクリプト作成時のデフォルトパターン化を検討すべきか。
+
