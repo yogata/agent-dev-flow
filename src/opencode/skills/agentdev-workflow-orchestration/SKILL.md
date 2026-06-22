@@ -5,7 +5,7 @@ description: case-run の状態機械・サブエージェント protocol・self
 
 # case-run オーケストレーションナレッジベース
 
-case-run コマンドのオーケストレーション知識ベース。状態機械・サブエージェントプロトコル・自律修正ループ・CI 対応ループ・エラー回復の判定基準と詳細構造を提供する。case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を Sisyphus-Junior(ulw-loop) に並列委譲・最大5件）を処理し、Epic 全体（複数 Wave）の一括実行・Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
+case-run コマンドのオーケストレーション知識ベース。状態機械・サブエージェントプロトコル・自律修正ループ・CI 対応ループ・エラー回復の判定基準と詳細構造を提供する。case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を Sisyphus-Junior・ulw-loop（adapter skill + 委譲 prompt 内 `/ulw-loop` command）に並列委譲・最大5件）を処理し、Epic 全体（複数 Wave）の一括実行・Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
 
 ## 状態機械
 
