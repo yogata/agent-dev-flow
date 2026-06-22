@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-06-23
 ---
 
 # req-define SPEC
@@ -61,6 +61,7 @@ updated: 2026-06-21
   - Step 8-1: 実装スコープシグナル確認
 - Step 9: ドラフト保存（`.agentdev/drafts/req-draft-{topic-slug}.md`）
   - Step 9-1: 実装詳細の分離
+  - Step 9-2: auto_gate完了ゲート — auto_gate.auto_ready:false または未解決 item 残存時、stop_reasons を提示し解消方策を壁打ちで合意。解消時は auto_ready:true に更新。ユーザーが明示的に false 選択時は conflict_resolutions に記録し継続。未解決のままの場合は壁打ちへ差し戻し。
 - Step 10: 要件doc確認（ユーザー提示のみ・承認は求めない）
   - Step 10-1〜10-6: 複数RU受付・統合/分離判定・出力生成・Epic規模検出・Wave候補記録・OU 構造検証
 - Step 11: 完了報告（work_type 別テンプレート選択）
