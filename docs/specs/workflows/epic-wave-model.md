@@ -174,6 +174,18 @@ case-open は複数独立 OU（`depends_on` 空・L0 相当）を検出した場
 - 直列集約対象（採番・index・draft・commit・push・Epic 本文更新）は並列委譲完了後に親コマンドが実行（REQ-0114-093）
 - Epic 本文ステータス追跡テーブルの単一書き手制約（L136, ADR-0125）は集約更新で維持
 
+## 前工程完了度3段階分類（REQ-0146-010）
+
+OU 属性「前工程完了度」を追加する。本属性は子 Issue 実行状態 enum（pending / ready / running / completed / blocked / failed）とは直交する分類であり、前工程（req-save / spec-save）の完了状況を表す。
+
+| 前工程完了度 | 意味 | subagent の振る舞い（REQ-0146-012） |
+|---|---|---|
+| 完全完了 | req-save / spec-save 等の前工程で実施済み・追加作業不要 | 通常実行（acceptance criteria 順位検証を実施） |
+| 検証のみ | 前工程完了を前提・acceptance criteria 順位検証のみ実施 | acceptance criteria 順位検証は必須・前工程相当作業は実施しない |
+| 補完あり | 前工程に残余あり・補完実装の可能性 | 前工程相当作業の補完可能性を考慮しつつ acceptance criteria 順位検証を実施 |
+
+case-open は子 Issue 本文に本属性を埋め込む（REQ-0146-011）。subagent は属性に応じた振る舞い指針に従う。
+
 ## See Also
 
 - [workflow-contracts.md](workflow-contracts.md) — ワークフロー全体契約

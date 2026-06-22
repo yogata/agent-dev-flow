@@ -1,9 +1,10 @@
 ---
 draft_type: req_draft
 topic_slug: backlog-batch-2026-06-22
-status: saved
+status: spec_saved
 created_at: 2026-06-22T18:50:00+09:00
 saved_at: 2026-06-22T19:30:00+09:00
+spec_saved_at: 2026-06-22T20:00:00+09:00
 source_rus:
   - RU-0001
   - RU-0002
@@ -461,6 +462,26 @@ case_open_hints:
     - wave: 2
       ous: [OU-002]
       rationale: "OU-001（G1是正）完了後に実施。IR-050/051 適用前に既存NGを解消するため"
+
+spec_save:
+  consumed_at: 2026-06-22T20:00:00+09:00
+  consumed_artifact_actions:
+    - id: ACT-SPEC-001
+      target: docs/specs/workflows/delegation-contracts.md
+      operation: update
+      result: consumed
+    - id: ACT-SPEC-002
+      target: docs/specs/integrity-contracts.md
+      operation: update
+      result: consumed
+    - id: ACT-SPEC-003
+      target: docs/specs/workflows/epic-wave-model.md
+      operation: update
+      result: consumed
+    - id: ACT-SPEC-004
+      target: docs/specs/artifact-responsibilities.md
+      operation: update
+      result: consumed
 ```
 
 # summary

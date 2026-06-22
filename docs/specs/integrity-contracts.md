@@ -135,3 +135,32 @@
 - `docs-check`（配布対象外 `/repo/docs-check`）は検査対象アーティファクトを変更しないが、許可された出力（`.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`）を生成する。実行後差分検査は「検査対象アーティファクトへの変更がないこと」を確認し、許可出力範囲外の変更を warning として報告する
 - `backlog-review` も検査対象外アーティファクトを変更せず、許可された `.agentdev/` 配下の出力のみを行う
 - 変更が検出された場合は warning として報告
+
+## 3層検出構造の責務分担（REQ-0145-008, REQ-0146-008）
+
+整合性検出は以下の3層構造で責務分担する:
+
+| 層 | 担当 | 検出対象 | 検出形式 |
+|---|---|---|---|
+| 機械的検出 | docs-check + IR（[integrity-rule-catalog.md](integrity-rule-catalog.md)） | 文書構造・ID 参照・frontmatter・命名規則等、決定論的検出可能な違反 | strict / heuristic / observation の severity 分類 |
+| 意味的診断 | inspect-skills（REQ-0125） | Command → Skill 参照妥当性・Skill 構造・読み取り専用診断 | finding 出力・推奨 route 提示 |
+| 査読時観点 | doc-writing skill（REQ-0140） | 文書種別責務・要件性・文意品質・粒度・AI-slop | 査読コメント・follow-up 指摘 |
+
+各層は他層の担当を重複して実施せず、検出内容に応じて適切な層へ委譲する。機械的検出で偽陽性となる意味的判断は inspect-skills へ、文書品質の査読は doc-writing skill へ、それぞれ振り分ける。
+
+## IR-050 / IR-051 適用条件（REQ-0145-006/007）
+
+IR-050（load_skills 誤指定検出）・IR-051（実行主体 skill 表記誤認検出）は、語彙レジストリ（`.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`）の存在確認・必要語彙の補充後に適用する。IR-051 の「一定文字距離内」は語彙レジストリで確定された具体閾値（文字数・行数）を使用する。閾値未確定時は heuristic として報告するが auto-promote 対象外とする。
+
+## catalog ↔ 実装双方向同期運用（REQ-0145-003/004）
+
+[integrity-rule-catalog.md](integrity-rule-catalog.md) と `check_integrity.ts` 実装は双方向同期運用を行う。同期ルール:
+
+| イベント | catalog 側の処理 | 実装側の処理 |
+|---|---|---|
+| 整合性ルール削除 | 該当 IR エントリの `baseline_status` を `resolved` へ更新 | 実装も削除、または存置して catalog 側で無効化 |
+| 実装削除 | 該当 IR エントリの `baseline_status` を `resolved` へ更新 | — |
+| 実装復活 | 該当 IR エントリの `baseline_status` を `new` へ更新 | — |
+| 新規ルール追加 | 新規 IR エントリを `baseline_status: new` で追加 | 実装追加 |
+
+docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象）・対象ファイル設計（`.md` のみ・正当使用例外）・NG ルール間依存関係マップの詳細は [integrity-rule-catalog.md](integrity-rule-catalog.md) 参照。
