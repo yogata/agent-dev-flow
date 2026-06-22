@@ -207,4 +207,22 @@
 - **関連**: PR #1022, Issue #1017, REQ-0139 (REQ-0139-013), ADR-0128 (Decision #1, #2), SPEC `docs/specs/commands/case-run.md`, intake `2026-06-22-issue1017-case-auto-sisyphus-junior-ulw-loop-residual.md` / `2026-06-22-issue1017-workflow-orchestration-source-sisyphus-junior-ulw-loop.md` / `2026-06-22-issue1017-completion-criteria-grep-pattern-design-gap.md`, 後続 Epic OU-002
 - **タグ**: `#delegation-contract` `#command-skill-harness-boundary` `#cross-cutting-propagation` `#SPEC-source-sync` `#completion-criteria-grep-design` `#req-define-classification-table`
 
+## 2026-06-22 PR #1025 (Issue #1021 / OU-002 Wave 3: 横断検出・修正・再発防止 / Epic #1018 完結)
+
+### 3層検出構造（docs-check + inspect-skills + doc-writing）の横断適用が同型違反の残存を零化した事例
+
+- **問題事象**: OU-002 は `ulw-loop` 誤認（PR #1022 で直接是正済み・OU-001）を症状と捉え、文書種別責務境界の同型違反が複数ファイルへ伝播し得る構造問題を抜本是正する目的で起案された。Wave 1 (PR #1023: doc-writing 実行主体分類査読) と Wave 2 (PR #1024: inspect-skills 診断観点 + integrity-rule-catalog 機械判定ルール) で確立した検出能力を Wave 3 (#1021 / PR #1025) でリポジトリ全体に横断適用し、編集可能範囲（command / skill / SPEC / AGENTS.md）における新規違反が **0件** であることを確認した。
+- **発生局面**: 単発バグ是正（OU-001）と抜本対策（OU-002）の責務分離。OU-001 で直接是正した ulw-loop 契約バグと同一構造の違反が他ファイル（`case-auto.md` L45/L74, `workflow-orchestration` SKILL.md L8）に横断残存していたため、Wave 3 で同型違反を横断検出・是正。
+- **検知方法**: Wave 1/2 で追加した3層検出構造を適用。機械的検出（`/repo/docs-check` + integrity-rule-catalog IR-050/IR-051）・意味的診断（inspect-skills REQ-0125-010）・査読時観点（doc-writing REQ-0140-027）の組み合わせで `Sisyphus-Junior(ulw-loop)` / `load_skills=["ulw-loop"]` / `/ulw-loop skill 誤称` / ADR Decision 主題違反 の各パターンを grep 検出。
+- **根本原因**: 単発の契約バグは直接是正（OU-001）であっても、同型違反が他の文書種別（command / skill / SPEC / AGENTS.md）へ伝播している場合がある。伝播先の検出には「単一 SPEC↔source 同期検査」では不十分で、複数層（機械 / 意味 / 査読）の直交する検出観点が必要。
+- **自律対応内容**: PR #1025 Part A で3件の `Sisyphus-Junior(ulw-loop)` 表記を正しい委譲モデル（`Sisyphus-Junior・ulw-loop` shorthand + 括弧内詳細）へ是正。Part B で Wave 1/2 PR で追加された新規 references ファイルが各 SPEC の references リストに反映されていなかった SPEC ドリフトを是正。Part C で横断検出を実施し、編集可能範囲での新規違反 0件を確認。ADR-0113 (deprecated) の Decision 主題違反は constraint「Do NOT edit REQ/ADR」により未修正で Findings 記載。
+- **ユーザー確認有無**: なし（Wave 1/2/3 を通じて自律完結）。
+- **ADR/REQ/spec影響**: あり。3層検出構造（機械 / 意味 / 柜読）の責務分担を SPEC レベルで明文化する価値が確認された。候補 SPEC は `docs/specs/integrity-contracts.md` または `docs/specs/writing-style.md`（Wave 2 intake `2026-06-22-epic1018-wave12-ir050-051-deferred-decisions.md` と統合して整理すべき）。
+- **横展開観点**: 同型違反の横断伝播は ulw-loop 契約以外でも発生し得る。委譲契約・統合契約の変更時は「単一 SPEC↔source 同期」だけでなく、複数層での検出観点を事前に設定することで伝播残存を予防できる。本 Epic で確立した「REQ/ADR/SPEC で基準を正規化 → 実装系（skill/catalog）に検出能力を反映 → 横断適用で残存を零化」の3段階パターンは、他の横断是正 Issue にも適用可能。
+- **再発条件**: (1) 単発バグ是正（直接修正）で満足し、同型違反の横断検出を実施しない場合、(2) 検出能力を単一層（grep のみ・意味診断のみ・査読のみ）に限定した場合、(3) REQ/ADR/SPEC の基準正規化と実装系（skill/catalog）への反映が別 Issue に分離されず、横断適用前に実装系検出能力が未整備のままとなる場合。
+- **予防策候補**: (1) 単発バグ是正 Issue の完了条件に「同型違反の横断 grep 検出 0件」を必須項目として組み込むか検討。 (2) 3層検出構造の責務分担（機械 / 意味 / 柜読）を SPEC レベルで明文化し、新規契約変更時にどの層で検出すべきかを機械的に判定可能にする。 (3) Wave 分割パターン（基準正規化 → 実装系反映 → 横断適用）を case-open のサブ Wave テンプレートに組み込むか検討。
+- **想定反映先**: `docs/specs/integrity-contracts.md` または `docs/specs/writing-style.md`（3層検出構造の責務分担）、`src/opencode/skills/agentdev-doc-writing/`（査読観点の横断適用指針）、`src/opencode/commands/agentdev/case-open.md`（Wave 分割テンプレート）。
+- **関連**: PR #1025, Issue #1021, Epic #1018, OU-001 PR #1022 (Issue #1017), Wave 1 PR #1023 (Issue #1019), Wave 2 PR #1024 (Issue #1020), REQ-0140-027 / REQ-0108-261 / REQ-0125-010, ADR-0103, intake `2026-06-22-epic1018-wave3-adr0113-deprecated-decision-violation.md` / `2026-06-22-epic1018-wave12-ir050-051-deferred-decisions.md`, learning entry 2026-06-22 PR #1022（OU-001 後続 Epic OU-002 完結）
+- **タグ**: `#cross-cutting-detection` `#3-layer-detection-structure` `#delegation-contract` `#wave-pattern` `#SPEC-source-sync` `#same-type-violation-propagation`
+
 
