@@ -150,7 +150,7 @@ function extractReadmeTableReqIds(content: string): Set<string> {
   for (const line of content.split("\n")) {
     const headingMatch = line.match(/^#{1,6}\s+(.+)$/);
     if (headingMatch) {
-      underRetiredHeading = /\b(retired|historical)\b|履歴|過去経緯|retired-no-successor|historical-only/i.test(
+      underRetiredHeading = /\b(retired|historical)\b|履歴|過去経緯|廃止済み|廃止|retired-no-successor|historical-only/i.test(
         headingMatch[1],
       );
       continue;
@@ -3656,7 +3656,7 @@ function isRangeExpression(token: string): boolean {
 }
 
 function isNegationContext(line: string): boolean {
-  return /廃止|不要|禁止|使用しない|べきではない|持たない|含まない|除く|abolish|deprecated|obsolete|superseded|prohibit|do not use|must not/i.test(
+  return /廃止|不要|禁止|使用しない|べきではない|持たない|含まない|除く|混入させない|書かない|含めない|させない|記述しない|否定|抗わない|abolish|deprecated|obsolete|superseded|prohibit|do not use|must not|not\s+to\s+include|without\s+including/i.test(
     line,
   );
 }
@@ -3669,7 +3669,7 @@ function isNegationContext(line: string): boolean {
  * are codified in integrity-rule-catalog.md「IR-044 exemption 条件・境界ケース」.
  */
 export function isDelegationContext(line: string): boolean {
-  return /委譲先|委譲|集約先|集約|切り出し|切り出し先|routing|経路分類名|検証要件|移送先|参照先|移管|配置|delegate|delegation|extract|move\s+to|refer\s+to/i.test(
+  return /委譲先|委譲|集約先|集約|切り出し|切り出す|切り出し先|routing|経路分類名|検証要件|移送先|移送|参照先|移管|配置|抽出|delegate|delegation|extract|move\s+to|refer\s+to/i.test(
     line,
   );
 }
@@ -3825,6 +3825,83 @@ export function checkScriptTemplateReferencePaths(
               ),
             );
           } else {
+            // REQ-0145-010: command files referencing bare `references/X.md`
+            // are skill-relative. Resolve via nearby skill context, then all skills.
+            let contextResolved = false;
+            const isSkillRelativeBare =
+              !rawRef.startsWith(".opencode/") &&
+              !rawRef.startsWith("agentdev-") &&
+              /^(scripts|templates|references)\//.test(rawRef);
+            if (!skillDir && isSkillRelativeBare) {
+              const ctxStart = Math.max(0, i - 5);
+              const ctxEnd = Math.min(lines.length, i + 6);
+              const contextSlice = lines.slice(ctxStart, ctxEnd).join("\n");
+              const candidateSkills: string[] = [];
+              const seenSkills = new Set<string>();
+              const ctxMatches = contextSlice.matchAll(
+                /\b(agentdev-[a-z][a-z0-9-]*)\b/g,
+              );
+              for (const m of ctxMatches) {
+                if (!seenSkills.has(m[1])) {
+                  seenSkills.add(m[1]);
+                  candidateSkills.push(m[1]);
+                }
+              }
+              const srcSkillsDir = skillsDir.replace(
+                /[\\/]\.opencode[\\/]skills$/,
+                path.sep + "src" + path.sep + "opencode" + path.sep + "skills",
+              );
+              for (const baseDir of [skillsDir, srcSkillsDir]) {
+                if (!fs.existsSync(baseDir)) continue;
+                for (const otherSkill of listDirs(baseDir)) {
+                  if (
+                    otherSkill.startsWith("agentdev-") &&
+                    !seenSkills.has(otherSkill)
+                  ) {
+                    seenSkills.add(otherSkill);
+                    candidateSkills.push(otherSkill);
+                  }
+                }
+              }
+              for (const candidate of candidateSkills) {
+                const candidatePath = path.join(
+                  skillsDir,
+                  candidate,
+                  rawRef,
+                );
+                if (fs.existsSync(candidatePath)) {
+                  contextResolved = true;
+                  results.push(
+                    ok(
+                      "ReferencePath",
+                      "reference-path-existence",
+                      `Referenced path resolves to skill ${candidate}: ${rawRef}`,
+                      { file: relPath, line: i + 1, evidence: rawRef },
+                    ),
+                  );
+                  break;
+                }
+                const srcCandidatePath = path.join(
+                  srcSkillsDir,
+                  candidate,
+                  rawRef,
+                );
+                if (fs.existsSync(srcCandidatePath)) {
+                  contextResolved = true;
+                  results.push(
+                    ok(
+                      "ReferencePath",
+                      "reference-path-existence",
+                      `Referenced path resolves to skill ${candidate} (src fallback): ${rawRef}`,
+                      { file: relPath, line: i + 1, evidence: rawRef },
+                    ),
+                  );
+                  break;
+                }
+              }
+            }
+            if (contextResolved) continue;
+
             // Cross-skill bare reference detection (REQ-0108-119)
             let crossSkillFound = false;
             if (skillDir && !rawRef.startsWith(".opencode/")) {
@@ -4062,8 +4139,25 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
       const lines = content.split("\n");
       for (let i = 0; i < lines.length; i++) {
         if (isNegationContext(lines[i])) continue;
+        // REQ-0145-002: skip data-model enum rows (e.g. Case file status field
+        // `open`, `running`, `blocked`, `review`, `closed`, `cancelled`).
+        // When a phase word like `review` appears inside backticks it is an
+        // enum literal, not workflow status state management.
         sixPhasePattern.lastIndex = 0;
-        if (sixPhasePattern.test(lines[i])) {
+        let phaseMatch;
+        let phaseInEnum = false;
+        let phaseInNarrative = false;
+        while ((phaseMatch = sixPhasePattern.exec(lines[i])) !== null) {
+          const matchEnd = phaseMatch.index + phaseMatch[0].length;
+          if (isInsideCodeSpan(lines[i], phaseMatch.index) ||
+              isInsideCodeSpan(lines[i], matchEnd - 1)) {
+            phaseInEnum = true;
+          } else {
+            phaseInNarrative = true;
+            break;
+          }
+        }
+        if (phaseInNarrative) {
           foundViolation = true;
           results.push(
             ng(
@@ -4080,6 +4174,7 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
               },
             ),
           );
+        } else if (phaseInEnum) {
         }
       }
     }
@@ -5308,8 +5403,33 @@ function checkTemplatePathIntegrity(
 // ─── Source vs Projection consistency check ─────────────────────────────────
 
 // REQ-0108-190: Extended to cover commands AND skills source/projection pairs
+function isInsideWorktree(root: string): boolean {
+  // `git worktree add` creates a `.git` file (not directory) pointing at the
+  // main repo's worktree admin path. Junctions under `.opencode/skills/` are
+  // not recreated in worktrees, so source-projection-sync would falsely fire.
+  const dotGitPath = path.join(root, ".git");
+  try {
+    const stat = fs.statSync(dotGitPath);
+    return stat.isFile();
+  } catch {
+    return false;
+  }
+}
+
 function checkSourceProjectionConsistency(root: string): CheckResult[] {
   const results: CheckResult[] = [];
+
+  // REQ-0145-010: skip in worktree (see isInsideWorktree).
+  if (isInsideWorktree(root)) {
+    results.push(
+      info(
+        "Inventory",
+        "source-projection-sync",
+        "Skipped inside git worktree (junctions not recreated)",
+      ),
+    );
+    return results;
+  }
 
   // Commands: src/opencode/commands/ ↔ .opencode/commands/
   const projectionCmdDir = path.join(root, ".opencode", "commands", "agentdev");
@@ -7093,13 +7213,33 @@ function checkDocLanguageQuality(root: string): CheckResult[] {
     const stripped = stripFencedCodeBlocks(content);
     const lines = stripped.split("\n");
 
+    // REQ-0144-004: frontmatter holds identifiers (name:, title:), not prose.
+    let inFrontmatter = false;
+    let sawOpeningFence = false;
+    if (lines.length > 0 && lines[0].trim() === "---") {
+      inFrontmatter = true;
+      sawOpeningFence = true;
+    }
+
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+      const rawLine = lines[i];
+      if (inFrontmatter) {
+        if (sawOpeningFence && i > 0 && rawLine.trim() === "---") {
+          inFrontmatter = false;
+        }
+        continue;
+      }
+      const line = rawLine;
       // Strip inline code so code-only tokens don't trigger
       const lineNoInline = line.replace(/`[^`]*`/g, "  ");
+      // REQ-0144-004: filename-only link text is an identifier reference.
+      const lineNoFileNameLinks = lineNoInline.replace(
+        /\[[^\]]*\.(md|ts|json|yaml|yml)\]\([^)]*\)/g,
+        "  ",
+      );
 
       for (const { signal, pattern, hint } of IR045_TARGET_TERMS) {
-        if (pattern.test(lineNoInline)) {
+        if (pattern.test(lineNoFileNameLinks)) {
           // Check if nearby Japanese explanation exists (same line or next 2 lines)
           const nearby = [line, lines[i + 1] || "", lines[i + 2] || ""].join(
             " ",
@@ -7165,7 +7305,7 @@ const IR044_SIGNAL_PATTERNS: ReadonlyArray<{ signal: string; pattern: RegExp }> 
     {
       signal: "enum value list",
       pattern:
-        /\benum\s*(値|リスト|一覧)?|列挙値?\s*(一覧|リスト)?|値\s*一覧\s*[:：]/i,
+        /\benum\s*(値|リスト|一覧)?|列挙値\s*(一覧|リスト)?|列挙\s*(一覧|リスト)|値\s*一覧\s*[:：]/i,
     },
     {
       signal: "fixture detail",

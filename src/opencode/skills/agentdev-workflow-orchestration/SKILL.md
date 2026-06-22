@@ -26,7 +26,7 @@ case-run は単一 Issue または単一 Wave（`#epic` 指定時）を処理す
 - ジャンクション再作成は既存手順に準拠し、本スキルで新規手順は定義しない。詳細・復旧手順は `references/self-healing-and-errors.md` の該当セクションを参照。
 - この制約は Windows + ジャンクション環境固有。`resolvePathWithFallback`によるランタイムパス→ソースパスの部分フォールバックはあるが、source/projection 双方向比較を要する検査までは補完しない。
 
-### driver サブエージェント引き継ぎプロンプト制約（MUST）
+### driver サブエージェント引き継ぎプロンプト制約
 
 Windows + ジャンクション環境の worktree では `.opencode/skills/agentdev-*`・`.opencode/commands/agentdev/` が空になる（ジャンクション未伝播）。case-run Step 6 で実行担当サブエージェントへ引き継ぐプロンプトには、以下を**必須項目**として明記する。
 
