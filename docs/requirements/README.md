@@ -12,7 +12,7 @@
 | [REQ-0104](REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type + scale 分類、workflow_route、SSoT、case-open/run/close基本契約、case-open共通終了の全フロー共通化、前工程からの引き継ぎプロトコル |
 | [REQ-0105](REQ-0105.md) | RU lifecycle / Requirement Unit 管理 | RU lifecycle（生成・削除タイミング・一時成果物位置づけ）、セッション由来 RU、RU frontmatter メタデータ、promoted/ の RU 化対象統一 |
 | [REQ-0106](REQ-0106.md) | Case実行オーケストレーション / Epic・Wave | Epic/Wave 並列実行、親Issue SSoT・子Issue実行状態整合、Wave rebase・コンフリクト時停止、委譲プロンプト事後検証、子Issue 実行状態ライフサイクル・skipped除外・Wave status導出 |
-| [REQ-0107](REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、AI-slop抑止 |
+| [REQ-0107](REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、自然言語成果物品質（japanese-tech-writing準拠） |
 | [REQ-0108](REQ-0108.md) | docs-check / Validation / Tests | 整合性検査、検出事項の分類・ルーティング、レポート出力、ガードレール、体系的テスト、frontmatter 規約検査、artifact collection registry、source/projection scan分離、基準管理、ルールカタログ、REQ impact map、3層gate、meta-integrity、repo-local自己監査・配布対象外、ADR主題妥当性検出 |
 | [REQ-0109](REQ-0109.md) | inspect-docs / REQ体系整合性 | retired archive、移行表、REQ再構成intake、REQ再構成レビューコマンド、100番台採番 |
 | [REQ-0110](REQ-0110.md) | Git worktree cleanup 信頼性 | git-worktree、リトライ、cleanup、prune フォールバック、tracked files 復元、Windows + junction フォールバック |
@@ -37,7 +37,7 @@
 | [REQ-0137](REQ-0137.md) | 並列実行安全 git 操作規律 | 並列実行安全 git 操作規律、スイープ操作禁止、明示パスステージ&コミット、消費アーティファクト(draft/RU)削除信頼性・Form Zero解消・削除検証 Standard/Epic 全flow適用 |
 | [REQ-0138](REQ-0138.md) | 構造化req_draft契約 | コマンド間引き継ぎ draft 契約、soft-contract原則、artifact_actions構造、LLM推論消費 |
 | [REQ-0139](REQ-0139.md) | 外部エージェント統合契約 | 外部エージェント統合、case-run外部実行委譲、driver adapter契約、req-define分類結果アクション |
-| [REQ-0140](REQ-0140.md) | 文書品質ゲート | 文書種別責務・要件性・文意品質・粒度の査読、AI-slop検出、IR-045、ドリフト検出、既存文書への遡及準拠修正 |
+| [REQ-0140](REQ-0140.md) | 文書品質ゲート | 文書種別責務・要件性・文意品質・粒度の査読、執筆規範（japanese-tech-writing）・配置基準（document-type-responsibilities.md）のSSoT分割、IR-045、ドリフト検出、既存文書への遡及準拠修正 |
 | [REQ-0141](REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 | ローカル版生成方式、src/opencode-local/ 生成時ソース領域、ローカルCaseファイル、GitHub Issue/PR 置換、変換プロンプト、生成安全性制約 |
 | [REQ-0142](REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 | 配布物 ID 除去後の完了条件（構文健全性・文意保持・責務整合）、command/skill/SPEC 間の責務説明整合（case-open/run/close/auto）、横断検査の観点拡充、NG 分類明確化 |
 | [REQ-0143](REQ-0143.md) | Command 定義ファイルフォーマット標準化 | AgentDevFlow 管理 command 定義ファイル（src/opencode/commands/agentdev/*.md・.opencode/commands/repo/*.md）の command file format 準拠要件、適用対象限定、consumer project 独自 command の強制対象外 |
