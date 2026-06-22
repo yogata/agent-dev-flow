@@ -75,7 +75,7 @@ SPEC は 3 層構造を持つ（commands / skills / workflows）。詳細は [SP
 - [品質仕様](specs/quality-specs.md)
 - [品質ゲート](specs/quality-gates.md)
 - [文書モデル](specs/document-model.md)
-- [文書執筆スタイルガイドライン](specs/writing-style.md)
+- [文書種別責務・配置基準](specs/document-type-responsibilities.md)
 - [アーティファクト契約](specs/artifact-contracts.md)
 - [成果物責任表](specs/artifact-responsibilities.md)
 - [整合性契約](specs/integrity-contracts.md)

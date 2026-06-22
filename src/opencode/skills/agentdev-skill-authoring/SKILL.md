@@ -462,6 +462,6 @@ Skill 分割を検討する条件:
 
 ## See Also
 
-- **agentdev-doc-writing**: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責務・要件性・文意品質・粒度・AI-slop検出）
+- **agentdev-doc-writing**: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責務・要件性・文意品質・粒度）
 
 

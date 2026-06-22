@@ -181,7 +181,7 @@ SPEC は 3 層構造（`docs/specs/commands/`・`docs/specs/skills/`・`docs/spe
 
 - 個別 SPEC は1コマンドまたは1スキルの現在動作のみを記述する。
 - 複数コマンド/スキル間の契約（委譲・キャプチャ境界・Wave モデル等）は `workflows/` に配置する。
-- `docs/specs/*.md` 直下の SPEC は基盤 SPEC（system/writing-style/patterns/design-principles 等）のみとし、command/skill 固有の動作は含まない。
+- `docs/specs/*.md` 直下の SPEC は基盤 SPEC（system/document-type-responsibilities/patterns/design-principles 等）のみとし、command/skill 固有の動作は含まない。
 
 ## HOW 除去後の acceptance-criteria 順位検証
 
