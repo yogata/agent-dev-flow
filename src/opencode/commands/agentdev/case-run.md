@@ -40,8 +40,8 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 
 **実行モード分岐**:
 
-1. **単一 Issue 実行モード**: 引数が非 Epic Issue 番号の場合。当該1 Issue を Sisyphus-Junior(ulw-loop) に委譲する（後述 Step 2-8）
-2. **Epic Wave 実行モード（`case-run #epic`）**: 引数が Epic Issue 番号の場合。Epic Issue 本文から現在 ready な Wave の子Issue を特定し、各子Issue を task() で Sisyphus-Junior(ulw-loop) に並列委譲する（最大5件）。詳細は後述「Epic Wave 実行モード」セクション
+1. **単一 Issue 実行モード**: 引数が非 Epic Issue 番号の場合。当該1 Issue を Sisyphus-Junior に委譲する（委譲 prompt 内で `/ulw-loop` command を指定・後述 Step 2-8）
+2. **Epic Wave 実行モード（`case-run #epic`）**: 引数が Epic Issue 番号の場合。Epic Issue 本文から現在 ready な Wave の子Issue を特定し、各子Issue を task() で Sisyphus-Junior に並列委譲する（最大5件・委譲 prompt 内で `/ulw-loop` command を指定）。詳細は後述「Epic Wave 実行モード」セクション
 
 いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
 
@@ -78,11 +78,11 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 
 ### Step 6: 実行担当サブエージェント起動（task() 委譲）
 
-実装実行を `task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])` で委譲する。Sisyphus-Junior は oh-my-openagent 提供の OpenCode ネイティブエージェント型であり、CLI subprocess を介さず oh-my-openagent の実行エンジンを直接利用する。adapter protocol は `agentdev-case-run-execution-adapter` skill 参照。
+実装実行を `task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` で委譲する（委譲 prompt 内で `/ulw-loop` command を指定）。Sisyphus-Junior は oh-my-openagent 提供の OpenCode ネイティブエージェント型であり、CLI subprocess を介さず oh-my-openagent の実行エンジンを直接利用する。adapter protocol は `agentdev-case-run-execution-adapter` skill 参照。
 
 **委譲プロンプト**: `/ulw-loop Implement Issue #N: <Issue本文>`。Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情報）が含まれ得る。Sisyphus-Junior はこれを参考情報として扱い、束縛されない。
 
-**Sisyphus-Junior(ulw-loop) の責務**: ulw-loop による目標分解（Issue を success criteria に分解）・各 criterion に observable evidence を要求・品質ゲート（code review + QA review + gate review）の実行。ulw-loop の監査トレイル（`.omo/ulw-loop/ledger.jsonl`）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しは120秒 timeout で保護される。
+**Sisyphus-Junior の責務**: 委譲 prompt 内で指定された `/ulw-loop` command による目標分解（Issue を success criteria に分解）・各 criterion に observable evidence を要求・品質ゲート（code review + QA review + gate review）の実行。ulw-loop の監査トレイル（`.omo/ulw-loop/ledger.jsonl`）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しは120秒 timeout で保護される。
 
 **task() 起動失敗・異常終了時の扱い**: Sisyphus-Junior の task() 起動失敗・異常終了時は即 `failed` とせず**実装完了・検証未完了**として扱う。詳細な事後処理（worktree の `git status` で未コミット変更確認・残留箇所の grep と手動修正）は `agentdev-case-run-execution-adapter` スキル参照。
 
@@ -117,7 +117,7 @@ Sisyphus-Junior が返す3状態（`agentdev-case-run-execution-adapter` の res
 2. **現在 ready な Wave の子Issue 特定**: ステータス追跡テーブルから現在 ready な Wave の子Issue を特定する。`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択する。ただし前提Issue が blocked/failed の場合は `pending` のまま選択対象外
 3. **`git fetch origin` 実行**: 各子Issue の worktree 作成前に `git fetch origin` を実行し、origin/main の鮮度を確認する。詳細手順は `agentdev-git-worktree` 参照
 4. **子Issue の worktree 作成**: 各子Issue について Step 5（Worktree作成・ブランチ準備）・Step 5-2（precondition gate）を実行する
-5. **各子Issue を task() で並列委譲**: 各子Issue を `task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])` で並列委譲する。**最大5件**まで同時起動。委譲プロンプトは `/ulw-loop Implement Issue #N: <Issue本文>`
+5. **各子Issue を task() で並列委譲**: 各子Issue を `task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` で並列委譲する。**最大5件**まで同時起動。委譲プロンプトは `/ulw-loop Implement Issue #N: <Issue本文>`
 6. **全 task() 完了待機**: 全 task() の完了を待つ。各 task() は Step 7 の result 処理と同じ3状態を返す
 7. **結果収集**: 各子Issue の result（completed(pr)/ blocked/ failed）を収集する。子Issue ごとに worktree は独立しており、他子Issue の結果に依存しない（子Issue の結果は親コンテキストではなく永続状態に記録）
 8. **return**: 収集した結果（子Issue ごとの PR番号・blocked/failed の理由）を報告して return する。Wave 境界（PR マージ）は case-close の責務。`completed(pr)` となった子Issue を次 Wave へ進めるためには、case-close でマージ後に再度 `case-run #epic` を実行する（べき等）
@@ -136,7 +136,7 @@ Sisyphus-Junior が返す3状態（`agentdev-case-run-execution-adapter` の res
 - G06: Issue番号解決に `gh issue list` 等のopen issue一覧取得は禁止
 - G10: work_type 判定基準は `agentdev-workflow-lifecycle` を参照
 - G11: case-run は単一 Issue または単一 Wave（Epic 指定時: 現在 ready な Wave の子Issue を並列実行・最大5件）のみを処理する。Epic 全体（複数 Wave）の一括実行・Wave 境界（PR マージ）は扱わない。Wave 境界は case-close の責務
-- G22: case-run は実装実行を Sisyphus-Junior(ulw-loop) へ task() 委譲し、自ら work plan生成・実装・乖離検出・specs更新・PR作成を行わない。adapter protocol は `agentdev-case-run-execution-adapter` 参照
+- G22: case-run は実装実行を Sisyphus-Junior へ task() 委譲し、自ら work plan生成・実装・乖離検出・specs更新・PR作成を行わない。adapter protocol は `agentdev-case-run-execution-adapter` 参照
 - G23: Sisyphus-Junior result の3状態（completed(pr)/blocked/failed）は `agentdev-case-run-execution-adapter` の result 契約に従う。成功成果は PR 作成である
 - G24: 完了条件チェックボックスの評価・更新は case-close QG-4 の責務。case-run・Sisyphus-Junior は完了条件チェックボックスを更新しない
 - G25: blocked/ failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。一時会話コンテキスト・中間ファイルは SSoT としない
