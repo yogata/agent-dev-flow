@@ -144,7 +144,7 @@
 |---|---|---|---|
 | 機械的検出 | docs-check + IR（[integrity-rule-catalog.md](integrity-rule-catalog.md)） | 文書構造・ID 参照・frontmatter・命名規則等、決定論的検出可能な違反 | strict / heuristic / observation の severity 分類 |
 | 意味的診断 | inspect-skills（REQ-0125） | Command → Skill 参照妥当性・Skill 構造・読み取り専用診断 | finding 出力・推奨 route 提示 |
-| 査読時観点 | doc-writing skill（REQ-0140） | 文書種別責務・要件性・文意品質・粒度・AI-slop | 査読コメント・follow-up 指摘 |
+| 査読時観点 | doc-writing skill（REQ-0140） | 文書種別責務・要件性・文意品質・粒度 | 査読コメント・follow-up 指摘 |
 
 各層は他層の担当を重複して実施せず、検出内容に応じて適切な層へ委譲する。機械的検出で偽陽性となる意味的判断は inspect-skills へ、文書品質の査読は doc-writing skill へ、それぞれ振り分ける。
 

@@ -1,6 +1,6 @@
 # 実行主体分類誤認の判定基準
 
-> **原本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)「実行主体分類の査読基準」。本ファイルは inspect-skills 診断観点「実行主体分類の誤認」（REQ-0125-010）の判定基準詳細を集約する運用ビューである。原本と内容が重複する場合は原本を優先する（REQ-0125-004）。
+> **原本**: [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md)「実行主体分類の査読基準」。本ファイルは inspect-skills 診断観点「実行主体分類の誤認」（REQ-0125-010）の判定基準詳細を集約する運用ビューである。原本と内容が重複する場合は原本を優先する（REQ-0125-004）。
 
 ## 適用範囲
 

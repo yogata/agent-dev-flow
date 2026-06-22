@@ -37,7 +37,7 @@
 | REQ-0137 | 並列実行安全 git 操作規律 | — (infrastructure) | — |
 | REQ-0138 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
 | REQ-0139 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
-| REQ-0140 | 文書品質ゲート | IR-013, IR-045 | docs, SPEC, writing-style.md |
+| REQ-0140 | 文書品質ゲート | IR-013, IR-045 | docs, SPEC, document-type-responsibilities.md |
 | REQ-0141 | ローカル版 OpenCode 生成方式とローカル Case ファイル運用 | IR-016, IR-046, IR-047, IR-048 | src/opencode-local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/cases/, SPEC, guides |
 
 ## 要件行影響（Requirement-Line Impact）

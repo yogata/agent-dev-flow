@@ -32,7 +32,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0009 | migrated | REQ-0103 | template規約をArtifact責任分界へ移行 |
 | REQ-0010 | migrated | REQ-0104 | command実装改善方針をworkflowへ移行 |
 | REQ-0011 | migrated | REQ-0107 | Issue/PR本文品質検証をReporting / Writing Qualityへ移行 |
-| REQ-0012 | migrated | REQ-0107 | AI-slop品質基準をReporting / Writing Qualityへ移行 |
+| REQ-0012 | migrated | REQ-0107 | 文章品質基準をReporting / Writing Qualityへ移行 |
 | REQ-0013 | migrated | REQ-0105 | intake承認フローをintake lifecycleへ移行 |
 | REQ-0014 | migrated | REQ-0106 | case-run自律修正ループをCase実行・完了へ移行 |
 | REQ-0015 | migrated | REQ-0106 | 関連ドキュメントの達成対象化をCase実行・完了へ移行 |
@@ -56,7 +56,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0033 | migrated | REQ-0108 | 二次整合性是正をintegrityへ移行 |
 | REQ-0034 | migrated | REQ-0102 | 変更影響候補抽出を要件定義へ移行 |
 | REQ-0035 | migrated | REQ-0101 | DOC-MAP導入とviews廃止を文書基準へ移行 |
-| REQ-0036 | migrated | REQ-0107 | no-ai-slop skill方針を文章品質へ移行 |
+| REQ-0036 | migrated | REQ-0107 | 文章品質skill方針をReporting / Writing Qualityへ移行 |
 | REQ-0037 | migrated | REQ-0106 | worktree削除対策をcase完了へ移行 |
 | REQ-0038 | migrated | REQ-0106 | case実行信頼性を移行 |
 | REQ-0039 | migrated | REQ-0105 | req-backlog / RU pipelineを移行 |

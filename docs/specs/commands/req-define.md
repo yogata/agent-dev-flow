@@ -72,7 +72,7 @@ updated: 2026-06-21
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md) — REQ再構成 intake・draft lifecycle
 - [req-health-metrics.md](../req-health-metrics.md) — SPLIT 予兆計測閾値
 - [quality-gates.md](../quality-gates.md) — QG-1
-- [writing-style.md](../writing-style.md) — draft body 品質検査
+- [document-type-responsibilities.md](../document-type-responsibilities.md) — draft body 品質検査
 
 ## 対象外
 
