@@ -2,7 +2,7 @@
 title: spec-save SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-06-22
 ---
 
 # spec-save SPEC
@@ -71,6 +71,10 @@ req-define で分離された SPEC 保存対象（`draft-data` の `artifact_act
 - frontmatter 完全性: 新規作成時の `title`, `status: draft`, `created`, `updated`
 - 配置先解決の正確性: 既存パス vs `new:{slug}` の判定・重複候補統合
 - 変更範囲検証: `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を含まないこと
+
+## case-auto 並列委譲モデル（REQ-0114-087〜093）
+
+spec-save は複数 SPEC ファイルの変更案作成・検査を並列化できる（REQ-0114-091）。異なる target パスの SPEC create/update は L0（完全独立）のため並列可能（最大5件）。同一 SPEC ファイルへの複数 action のみ順序依存のため直列サブセットとして分離。最終的な commit/push は REQ-0137 の明示パス指定で一括実行。
 
 ## See Also
 

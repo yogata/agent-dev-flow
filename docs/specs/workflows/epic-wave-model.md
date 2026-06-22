@@ -2,7 +2,7 @@
 title: Epic / Wave / Issue 実行モデル
 status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-06-22
 ---
 
 # Epic / Wave / Issue 実行モデル
@@ -161,6 +161,18 @@ scale: large（Epic）の場合、case-auto は Epic Issue に対し case-run(#e
 | failed | `running` → `failed` | 正常完了した他 Issue のみ case-close 対象とする |
 
 **親コンテキスト非累積原則**: case-auto は子 Issue の実装詳細・実装過程ログを親コンテキストに保持しない。進行状態は永続状態（Issue / PR / `.agentdev/`）から再読込する。
+
+## case-auto 並列委譲モデル拡張（REQ-0114-087〜093）
+
+### 独立 OU の自動 Epic 化
+
+case-open は複数独立 OU（`depends_on` 空・L0 相当）を検出した場合、自動的に Epic Issue 化し Wave 1 に全 OU を配置する（REQ-0114-088）。これにより Standard flow と Epic flow の二系統を単一 Wave 実行モデルに統一する。
+
+### 並列委譲上限と集約
+
+- 独立 OU または同一 Wave 内子Issue の並列委譲は最大5件（L93, L123 準拠・REQ-0114-087）
+- 直列集約対象（採番・index・draft・commit・push・Epic 本文更新）は並列委譲完了後に親コマンドが実行（REQ-0114-093）
+- Epic 本文ステータス追跡テーブルの単一書き手制約（L136, ADR-0125）は集約更新で維持
 
 ## See Also
 

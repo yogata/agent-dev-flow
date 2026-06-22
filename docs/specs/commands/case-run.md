@@ -2,7 +2,7 @@
 title: case-run SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-06-22
 ---
 
 # case-run SPEC
@@ -117,6 +117,10 @@ ADR-0128 Decision #3 に基づく。1 Wave の実行（PR作成まで）で retu
 - PR URL 受領の確実性（REQ-0130-021 廃止に伴い PR URL フォールバック検索不使用）
 - Epic Wave 実行時の1 Wave のみ処理・べき等性（同コマンド再実行で次 Wave に進む）
 - 出力制約: PR 本文・commit message は verbatim で返す（成果物本文）
+
+## case-auto 並列委譲モデル（REQ-0114-087〜093）
+
+case-run は同一 Wave 内子Issue 処理を最大5件まで並列委譲する（REQ-0130-026・REQ-0114-087）。本機能は Epic Wave モデル（ADR-0128）で既に実装済み。case-auto 並列委譲モデル拡張により、Standard flow 起因の独立 OU 自動 Epic 化（REQ-0114-088）でも本機能が適用される。case-run 側の新規機能追加は不要で、入力としての Epic Issue が増えるのみ。
 
 ## See Also
 

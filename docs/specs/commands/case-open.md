@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-06-22
 ---
 
 # case-open SPEC
@@ -91,6 +91,18 @@ updated: 2026-06-21
 - テンプレート必須セクション完備確認（G09・G10・`完了条件` セクション含む）
 - 出力制約: Issue 本文・commit message は verbatim で返す（G17）
 - draft / RU 削除残存検証（Step 18-1-1・`git status --porcelain` で空であること）
+
+## case-auto 並列委譲モデル（REQ-0114-087〜093）
+
+### 独立 OU の自動 Epic 化
+
+case-open は複数の独立 OU（`depends_on` 空・L0 相当）を検出した場合、自動的に Epic Issue 化し Wave 1 に全 OU を配置する（REQ-0114-088）。これにより Standard flow は「真に単一 OU のみ」に縮退し、Standard/Epic 二系統を単一 Wave 実行モデルに統一する。
+
+### 子Issue 作成の並列化
+
+- 子Issue 本文案作成・検査・Issue 作成は最大5件まで並列化できる（REQ-0114-089）
+- Epic Issue 作成・Wave 1 配置・Epic 本文ステータス追跡テーブル更新は親が直列集約（REQ-0114-093）
+- G04「全子Issue 作成完了後にテーブル更新（部分更新禁止）」は集約更新で維持
 
 ## See Also
 

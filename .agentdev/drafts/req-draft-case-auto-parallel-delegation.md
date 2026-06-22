@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: case-auto-parallel-delegation
 status: saved
+spec_saved: true
 created_at: 2026-06-22T01:50:00+09:00
 ---
 

@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-06-22
 ---
 
 # case-auto SPEC
@@ -88,6 +88,14 @@ updated: 2026-06-21
 - クリーンアップ検証ゲート（Standard / Epic Issue flow 双方）: ドラフトファイル・RU ファイルの残存がないこと
 - 出力制約: 成果物本文 verbatim・調査過程等は圧縮（G10）
 - タイミング情報: 開始時刻・終了時刻・所要時間を人間が読みやすい形式で報告（REQ-0114-082/083）
+
+## case-auto 並列委譲モデル（REQ-0114-087〜093）
+
+case-auto は独立 OU（`depends_on` 空・L0 相当）が複数存在する場合、最大5件まで並列委譲で処理する（REQ-0114-087）。
+
+- **Standard flow 逐次OU処理（Step 8-1）の例外**: 独立 OU は並列委譲可能。REQ-0114-053 の例外条項に従う
+- **並列委譲の実施**: 複数独立 OU を case-open が自動 Epic 化（REQ-0114-088）した後、case-run(#epic) が Wave 1 の子Issue を並列委譲（既存 Epic Wave モデル・最大5件）
+- **結果集約**: 並列委譲された単位の成功・失敗は case-auto が集約し最終判定に反映（REQ-0114-092）
 
 ## See Also
 
