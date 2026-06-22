@@ -500,7 +500,7 @@ describe("checkScriptTemplateReferencePaths", () => {
     expect(crossSkillNg[0].evidence).toBe("references/shared.md");
     expect(crossSkillNg[0].expected).toContain("agentdev-other-skill");
   });
-  it("command file bare reference is not cross-skill detected", () => {
+  it("command file bare reference resolves via skill fallback (REQ-0145-010)", () => {
     const root = join(TEMP_ROOT, "cmd-no-crossskill");
     buildMinimalFixture(root);
     copyScripts(root);
@@ -542,6 +542,40 @@ describe("checkScriptTemplateReferencePaths", () => {
       (r) => r.level === "ng" && r.message?.includes("found in"),
     );
     expect(crossSkillNg.length).toBe(0);
+    const resolved = refResults.filter(
+      (r) =>
+        r.level === "ok" &&
+        r.message?.includes("resolves to skill agentdev-other-skill"),
+    );
+    expect(resolved.length).toBeGreaterThanOrEqual(1);
+    const genericNg = refResults.filter((r) => r.level === "ng");
+    expect(genericNg.length).toBe(0);
+  });
+  it("command file bare reference NG when not in any skill (REQ-0145-010)", () => {
+    const root = join(TEMP_ROOT, "cmd-bare-not-found");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const cmdDir = join(root, ".opencode", "commands", "agentdev");
+    writeFileSync(
+      join(cmdDir, "test-cmd.md"),
+      [
+        "---",
+        "description: Test",
+        "agent: oracle",
+        "---",
+        "",
+        "See references/nonexistent.md for details.",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence",
+    );
     const genericNg = refResults.filter((r) => r.level === "ng");
     expect(genericNg.length).toBeGreaterThanOrEqual(1);
   });
