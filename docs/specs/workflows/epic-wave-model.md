@@ -129,7 +129,7 @@ case-run が Epic Issue 指定時の横断実行契約（ADR-0128 Decision #3, R
 
 - case-run(#epic) は Epic Issue 本文を読み込む（子Issue 一覧・Wave 構成・各子Issue status・PR 状態）
 - case-run(#epic) は現在 Wave の実行可能な子Issue を内部判定する（依存関係充足確認・永続状態には書き込まない）
-- case-run(#epic) は各子Issue を task() で Sisyphus-Junior(ulw-loop) に並列委譲する（最大5件・各 task() は1 Issue 処理）
+- case-run(#epic) は各子Issue を task() で Sisyphus-Junior に並列委譲する（最大5件・各 task() は1 Issue 処理・委譲 prompt 内で `/ulw-loop` command を指定）
 - case-run(#epic) は全 task() 完了を待ち、結果を収集して return する（1 Wave のみ・マージしない）
 - case-run(#epic) は再実行時、Epic Issue 本文から進行状況を判定し次 Wave を処理する（べき等）
 

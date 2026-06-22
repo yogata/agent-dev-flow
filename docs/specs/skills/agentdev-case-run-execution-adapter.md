@@ -9,7 +9,7 @@ updated: 2026-06-21
 
 ## 目的
 
-case-run が Issue 実装を実行担当サブエージェント（Sisyphus-Junior・ulw-loop）へ委譲する際のアダプタープロトコルを定義し、実行結果（completed(pr) / blocked / failed）を処理する。
+case-run が Issue 実装を実行担当サブエージェント（Sisyphus-Junior）へ委譲する際のアダプタープロトコルを定義し、実行結果（completed(pr) / blocked / failed）を処理する。実行 command（`/ulw-loop`）は委譲 prompt 内で指定され、`load_skills` には adapter skill を指定する。
 
 ## 適用対象
 
@@ -19,7 +19,7 @@ case-run が Issue 実装を実行担当サブエージェント（Sisyphus-Juni
 
 ## 提供する判断・操作
 
-- task() 委譲プロトコル（`task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])`）
+- task() 委譲プロトコル（`task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` + 委譲 prompt 内 `/ulw-loop` command）
 - result 契約（3状態: completed(pr) / blocked / failed）
 - worktree 隔離遵守・自己検証
 - task() 起動失敗時の事後処理（worktree `git status` で未コミット変更確認・残留箇所 grep と手動修正）
@@ -30,7 +30,7 @@ case-run が Issue 実装を実行担当サブエージェント（Sisyphus-Juni
 
 ## 現在の動作
 
-- CLI subprocess（bunx 等）は使用せず `task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])` で起動
+- CLI subprocess（bunx 等）は使用せず `task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` で起動（委譲 prompt 内で `/ulw-loop` command を指定）
 - Sisyphus-Junior は oh-my-openagent 提供の OpenCode ネイティブエージェント型
 - worktree root 外での作業を禁止
 - PR URL を SSoT として返却（REQ-0130-021 廃止に伴い PR URL フォールバック検索不使用）
