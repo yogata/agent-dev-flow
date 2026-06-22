@@ -22,7 +22,7 @@ docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/
 ## 提供する判断・操作
 
 - 文書種別責務・要件性・文意品質・粒度の補助査読
-- AI-slop 検出（10基準・5出力原則・11ルール）
+- `japanese-tech-writing` 規範（LLM っぽい表現の禁止・空虚な形容・空虚な動詞等）への適合査読
 - 英語混じり表現・抽象語の具体的書き換え
 - 査読出力の分類（残す/分割/移送/削除候補）と修正文案提示
 
@@ -32,12 +32,11 @@ docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/
 - `references/req-line-quality.md` — 要件行の品質
 - `references/adr-writing-quality.md` — ADR 本文の品質
 - `references/spec-writing-quality.md` — SPEC 本文の品質
-- `references/ai-slop-detection.md` — AI-slop 検出
 - `references/rewrite-patterns.md` — 検出→書き換え
 - `references/review-output.md` — 査読出力形式
 - `references/execution-subject-classification.md` — 実行主体分類（command / skill / subagent / harness）の査読
 
-原本は `docs/specs/writing-style.md`。内容が重複する場合は原本を優先（REQ-0140-023）。
+配置基準・用語政策の原本は `docs/specs/document-type-responsibilities.md`、執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。内容が重複する場合は原本を優先（REQ-0140-023）。
 
 ## 現在の動作
 
@@ -60,11 +59,11 @@ docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/
 - 要件行が主語・対象・状態・検証可能性・独立性・肯定文主文を満たすか
 - ADR 本文が意思決定文書として成立しているか
 - SPEC 本文が詳細仕様の置き場として成立しているか
-- AI-slop 基準（10基準・5出力原則・11ルール）への適合
+- `japanese-tech-writing` 規範（LLM っぽい表現の禁止・空虚な形容・空虚な動詞等）への適合
 
 ## See Also
 
 - [agentdev-req-analysis.md](agentdev-req-analysis.md) — 要件分析（動的判断）
 - [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md) — ADR 要否判定（動的判断）
-- [writing-style.md](../../writing-style.md) — 原本 SPEC
+- [document-type-responsibilities.md](../document-type-responsibilities.md) — 配置基準・用語政策 原本 SPEC
 - REQ-0140 — 文書品質ゲート
