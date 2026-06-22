@@ -1,6 +1,6 @@
 # REQ 要件行の合格基準
 
-> **原本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)「要件行の書き方」「要件性」「粒度」「肯定文主文」。本ファイルは運用ビュー（チェックリスト）である。
+> **原本**: 配置基準・用語政策は [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md)（「要件行の書き方」「要件性」「粒度」「肯定文主文」節）、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。本ファイルは運用ビュー（チェックリスト）である。
 
 ## 1行1関心原則
 

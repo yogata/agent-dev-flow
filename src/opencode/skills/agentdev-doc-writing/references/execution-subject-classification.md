@@ -1,6 +1,6 @@
 # 実行主体分類の査読
 
-> **原本**: [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md)「実行主体分類の査読基準」。本ファイルは判定表・誤認パターン・検出チェックリストの運用ビューである。原本と内容が重複する場合は原本を優先する。
+> **原本**: 配置基準・用語政策は [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md)「実行主体分類の査読基準」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。本ファイルは判定表・誤認パターン・検出チェックリストの運用ビューである。原本と内容が重複する場合は原本を優先する。
 
 ## 適用範囲
 
@@ -40,4 +40,4 @@ SPEC / command / skill / AGENTS.md 等の記述で言及される実行主体の
 
 ## 出力形式
 
-検出した誤認は [review-output.md](review-output.md) の分類（残す/分割/移送/削除候補）に従い提示する。誤認の修正は「正しい分類名への置換」または「委譲契約記述への置換」とする。実行主体分類の定義・判定基準の原本は [docs/specs/writing-style.md](../../../../../docs/specs/writing-style.md) を参照する。
+検出した誤認は [review-output.md](review-output.md) の分類（残す/分割/移送/削除候補）に従い提示する。誤認の修正は「正しい分類名への置換」または「委譲契約記述への置換」とする。実行主体分類の定義・判定基準の原本は [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md) を参照する。
