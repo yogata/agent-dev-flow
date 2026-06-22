@@ -189,4 +189,22 @@
 - **関連**: PR #1014, Issue #1013, case-close Step 9（実行前同期）, commit `4eecd980`（case-open RU 削除・未 push）, commit `ee246c5d`（squash merge）
 - **タグ**: `#case-open-unpushed-commit` `#squash-merge-divergence` `#git-pull-ff-only` `#case-close-step9` `#agentdev-persistence`
 
+## 2026-06-22 PR #1022 (Issue #1017 / OU-001: ulw-loop 委譲契約の直接是正)
+
+### command/skill/harness 境界の誤分類が横断波及する現象と req-define/spec-save 段階の分類明示の有効性
+
+- **問題事象**: case-run の task() 委譲契約において `ulw-loop`（command）を `load_skills=["ulw-loop"]` で skill として誤指定していた。この誤分類は REQ-0139 / ADR-0128 / SPEC `docs/specs/commands/case-run.md` で req-save/spec-save 段階で既に正規化済みだったが、実装系（command / skill / references / AGENTS.md）および他 SPEC 3 件に横断波及したまま残存。後続検出で合計 7 対象ファイルの修正が必要となった（PR #1022）。さらに本 PR の Findings として、対象外の `case-auto.md`（L45, L74）・`workflow-orchestration` source SKILL.md（L8）にも同パターン残存（F-1/F-2）を検出。
+- **発生局面**: 要件定義→設計（req-define/spec-save で契約モデルは正規化済み）と実装（command/skill/AGENTS.md は未追従）の間の同期欠落。後続 Issue で横断波及残存を実装系是正。
+- **検知方法**: SPEC `docs/specs/commands/case-run.md` の委譲契約セクションを実装系に照合し、`load_skills=["ulw-loop"]` / `Sisyphus-Junior(ulw-loop)` / `ulw-loop skill` の各パターンで grep 検出。
+- **根本原因**: 委譲契約設計段階で「adapter skill / 実行 command / subagent / harness」の4分類が明示されておず、`load_skills` に command 名を指定可能との誤解が複数ファイルに伝播。一度分類表（4列）を明示した上流（REQ/ADR/SPEC）で正規化しても、下流（command/skill/references/AGENTS.md）の追従には別 Issue が必要になる。
+- **自律対応内容**: case-run 実行担当が SPEC の委譲契約を実装系に機械的に反映し PR #1022 を提出。完了条件の grep パターンが説明文（否定文脈・anti-pattern 例示）を捕捉する設計ギャップ（F-3）は QG-3 warn として記録し、実質達成と判定。
+- **ユーザー確認有無**: なし（検証→補完→マージまで自律完結）。
+- **ADR/REQ/spec影響**: あり。委譲契約設計の初期段階（req-define）で「adapter skill / 実行 command / subagent / harness」の4分類表を必須記述とするべきか。候補: `docs/specs/workflow-contracts.md` または case-run/ case-auto SPEC に分類表テンプレートを埋め込み。
+- **横展開観点**: command/skill/harness 境界の誤分類は oh-my-openagent 連携以外でも発生し得る（MCP server command と plugin skill の混同等）。同種の「実行主体分類」を伴う契約設計では、初期段階での分類表明示が波及コストを最小化する。また SPEC↔source 同期（同一記述が両方にある場合）の片側修正リスクも同根（F-2 パターン）。
+- **再発条件**: (1) 委譲契約・統合契約で実行主体（adapter skill / command / subagent / harness / MCP server 等）の分類を初期要件で明示しない場合、(2) SPEC↔source 同一記述の両側更新が必要な変更を片側だけ実施する場合、(3) 誤用語の除去完了条件を「grep 0 件」で機械的に設定する場合。
+- **予防策候補**: (1) req-define の委譲契約・統合契約セクションに「実行主体分類表」を必須テンプレートとして組み込み。 (2) SPEC↔source 同一記述の更新時は両側をワンセットで変更する検査ルールを `inspect-skills` に追加。 (3) 「誤用語の除去」完了条件は「grep 0 件」ではなく「対象ファイル群で 0 件（ガイダンス・否定文脈は除外）」等の精密な判定基準に置換。
+- **想定反映先**: `docs/specs/workflow-contracts.md` または `docs/specs/commands/case-run.md`（委譲契約分類表テンプレート）、`src/opencode/skills/agentdev-req-analysis/`（req-define での分類表必須判定）、`src/opencode/skills/agentdev-doc-writing/`（SPEC↔source 同期検査）、`src/opencode/skills/agentdev-quality-gates/`（完了条件 grep パターン設計指針）。
+- **関連**: PR #1022, Issue #1017, REQ-0139 (REQ-0139-013), ADR-0128 (Decision #1, #2), SPEC `docs/specs/commands/case-run.md`, intake `2026-06-22-issue1017-case-auto-sisyphus-junior-ulw-loop-residual.md` / `2026-06-22-issue1017-workflow-orchestration-source-sisyphus-junior-ulw-loop.md` / `2026-06-22-issue1017-completion-criteria-grep-pattern-design-gap.md`, 後続 Epic OU-002
+- **タグ**: `#delegation-contract` `#command-skill-harness-boundary` `#cross-cutting-propagation` `#SPEC-source-sync` `#completion-criteria-grep-design` `#req-define-classification-table`
+
 
