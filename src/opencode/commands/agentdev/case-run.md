@@ -122,6 +122,8 @@ Sisyphus-Junior が返す3状態（`agentdev-case-run-execution-adapter` の res
 7. **結果収集**: 各子Issue の result（completed(pr)/ blocked/ failed）を収集する。子Issue ごとに worktree は独立しており、他子Issue の結果に依存しない（子Issue の結果は親コンテキストではなく永続状態に記録）
 8. **return**: 収集した結果（子Issue ごとの PR番号・blocked/failed の理由）を報告して return する。Wave 境界（PR マージ）は case-close の責務。`completed(pr)` となった子Issue を次 Wave へ進めるためには、case-close でマージ後に再度 `case-run #epic` を実行する（べき等）
 
+**Standard flow 起因の Epic Wave 適用**: case-auto 並列委譲モデル拡張により、case-open が複数の独立 OU（`depends_on` 空・L0 相当）を検出して自動 Epic 化した場合も、本 Epic Wave 実行モードが適用される。case-run 側の新規機能追加は不要で、入力としての Epic Issue が増えるのみ（Standard flow 起因・Epic Issue 指定時ともに同一の Epic Wave 実行フローを使用）。詳細は `docs/specs/commands/case-run.md` の case-auto 並列委譲モデルセクション参照
+
 ## エラー処理
 
 エラー発生時の対応は `agentdev-workflow-orchestration` に従う。Sisyphus-Junior result が blocked/ failed の場合、Issue コメント（SSoT）を参照して停止理由・再開ポイントをユーザーに報告する。Sisyphus-Junior 内の自律修正ループ（同一入力の機械的再試行・検証ループ）は `agentdev-case-run-execution-adapter`/ `agentdev-workflow-orchestration` に従う。
