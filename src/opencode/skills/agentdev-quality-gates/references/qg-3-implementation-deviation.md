@@ -6,7 +6,7 @@ case-run で PR 作成前に、実装が Issue/ REQ/ ADR/ SPEC/ work plan から
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| case-run | Step 8（提出フェーズ・乖離検出） | git diff（実装差分）・変更ファイル一覧 |
+| case-run | Step 6-7（実行担当サブエージェント委譲・result 処理） | Sisyphus-Junior が実装と乖離検出を実行。case-run は result として受領 |
 
 ## 乖離の定義
 

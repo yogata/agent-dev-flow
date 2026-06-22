@@ -145,6 +145,11 @@ function buildValidFixture(root: string): void {
       "| Command | Description |",
       "|---------|-------------|",
       "| `/agentdev/test-cmd` | Test command |",
+      "| `/agentdev/case-run` | Run |",
+      "| `/agentdev/case-close` | Close |",
+      "| `/agentdev/case-open` | Open |",
+      "| `/agentdev/case-auto` | Auto |",
+      "| `/agentdev/req-save` | Save |",
       "",
     ].join("\n"),
     "utf-8",
@@ -187,10 +192,26 @@ function buildValidFixture(root: string): void {
     writeFileSync(join(guidesDir, `${name}.md`), `# ${name}\n`, "utf-8");
   }
 
-  // Skills: agentdev-test-skill (valid prefix)
+  // Skills: agentdev-test-skill (valid prefix) — both source and projection
   const skillDir = join(root, ".opencode", "skills", "agentdev-test-skill");
   mkdirp(skillDir);
   writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-test-skill\n", "utf-8");
+  const skillSrcDir = join(root, "src", "opencode", "skills", "agentdev-test-skill");
+  mkdirp(skillSrcDir);
+  writeFileSync(join(skillSrcDir, "SKILL.md"), "# agentdev-test-skill\n", "utf-8");
+
+  // Skills: agentdev-workflow-orchestration — both source and projection
+  const wfOrchProjDir = join(root, ".opencode", "skills", "agentdev-workflow-orchestration");
+  mkdirp(wfOrchProjDir);
+  writeFileSync(join(wfOrchProjDir, "SKILL.md"), "# agentdev-workflow-orchestration\n", "utf-8");
+
+  // Skills: agentdev-workflow-templates — both source and projection
+  const wfTemplatesProjDir = join(root, ".opencode", "skills", "agentdev-workflow-templates");
+  mkdirp(wfTemplatesProjDir);
+  writeFileSync(join(wfTemplatesProjDir, "SKILL.md"), "# agentdev-workflow-templates\n", "utf-8");
+  const wfTemplatesSrcDir = join(root, "src", "opencode", "skills", "agentdev-workflow-templates");
+  mkdirp(wfTemplatesSrcDir);
+  writeFileSync(join(wfTemplatesSrcDir, "SKILL.md"), "# agentdev-workflow-templates\n", "utf-8");
 
   // Skills: repo-agentdev-integrity (required by the script)
   const integritySkillDir = join(
@@ -218,6 +239,20 @@ function buildValidFixture(root: string): void {
     ].join("\n"),
     "utf-8",
   );
+  const integrityRefsDir = join(integritySkillDir, "references");
+  mkdirp(integrityRefsDir);
+  writeFileSync(
+    join(integrityRefsDir, "vocabulary-registry.md"),
+    [
+      "# Vocabulary Registry",
+      "",
+      "| コマンド名 | コマンドパス | スキル名 | 廃止済み概念 |",
+      "|---|---|---|---|",
+      "| test-cmd | .opencode/commands/agentdev/test-cmd.md | agentdev-test-skill | (none) |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
 
   // Commands
   const cmdDir = join(root, ".opencode", "commands", "agentdev");
@@ -235,6 +270,31 @@ function buildValidFixture(root: string): void {
     ].join("\n"),
     "utf-8",
   );
+
+  // Capture-boundary duty commands (required by check_integrity.ts checkCommandCaptureDuties)
+  const captureDutyCommands: Record<string, string> = {
+    "case-run.md": "記録のみ（capture-boundaries 参照）",
+    "case-close.md": "回収・保存（capture-boundaries 参照）",
+    "req-save.md": "原則非関与（capture-boundaries 参照）",
+    "case-open.md": "非関与（capture-boundaries 参照）",
+    "case-auto.md": "委譲（capture-boundaries 参照）",
+  };
+  for (const [filename, body] of Object.entries(captureDutyCommands)) {
+    writeFileSync(
+      join(cmdDir, filename),
+      [
+        "---",
+        `description: ${filename} capture duty stub`,
+        "agent: sisyphus",
+        "---",
+        "",
+        `capture-boundaries 参照。duty: ${body}`,
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+  }
+
   writeFileSync(
     join(cmdDir, "README.md"),
     [
@@ -243,6 +303,55 @@ function buildValidFixture(root: string): void {
       "| Command | Description | Agent |",
       "|---------|-------------|-------|",
       "| `agentdev/test-cmd` | Test command | test-agent |",
+      "| `agentdev/case-run` | Run | sisyphus |",
+      "| `agentdev/case-close` | Close | sisyphus |",
+      "| `agentdev/case-open` | Open | sisyphus |",
+      "| `agentdev/case-auto` | Auto | sisyphus |",
+      "| `agentdev/req-save` | Save | sisyphus |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // capture-boundaries.md at canonical location (src/opencode/skills/agentdev-workflow-orchestration/references/)
+  const captureBoundariesDir = join(
+    root,
+    "src",
+    "opencode",
+    "skills",
+    "agentdev-workflow-orchestration",
+    "references",
+  );
+  mkdirp(captureBoundariesDir);
+  writeFileSync(
+    join(captureBoundariesDir, "capture-boundaries.md"),
+    "# Capture Boundaries\n",
+    "utf-8",
+  );
+
+  // pr_desc.md template with required capture section structure
+  const templatesDir = join(
+    root,
+    ".opencode",
+    "skills",
+    "agentdev-workflow-templates",
+    "templates",
+  );
+  mkdirp(templatesDir);
+  writeFileSync(
+    join(templatesDir, "pr_desc.md"),
+    [
+      "# PR Description",
+      "",
+      "## Findings / Capture候補",
+      "",
+      "### intake",
+      "",
+      "（intake 候補）",
+      "",
+      "### learning",
+      "",
+      "（learning 候補）",
       "",
     ].join("\n"),
     "utf-8",
@@ -254,7 +363,7 @@ function buildValidFixture(root: string): void {
     [
       "# Test Repo",
       "",
-      "test-cmd",
+      "test-cmd case-run case-close case-open case-auto req-save",
       "",
     ].join("\n"),
     "utf-8",
@@ -480,6 +589,35 @@ describe("Issue #657 regression: CLI execution verification", () => {
       const content = require("fs").readFileSync(fixturePath, "utf-8") as string;
       expect(content).toContain("10 ガイド");
       expect(content).not.toContain("9 ガイド");
+    });
+  });
+
+  describe("fixture drift detection (REQ-0144-009)", () => {
+    it("valid fixture produces zero NG (drift detection smoke test)", () => {
+      const r = runCli(VALID_ROOT, ["--json"]);
+      const parsed = JSON.parse(r.stdout);
+      expect(parsed.summary.ng).toBe(0);
+    });
+
+    it("valid fixture produces zero warnings (drift detection for warning-level rules)", () => {
+      const r = runCli(VALID_ROOT, ["--json"]);
+      const parsed = JSON.parse(r.stdout);
+      expect(parsed.summary.warning).toBe(0);
+    });
+
+    it("copied script matches source script (copyScripts sync verification)", () => {
+      const sourceScript = join(PARENT_SCRIPTS_DIR, "check_integrity.ts");
+      const copiedScript = join(
+        VALID_ROOT,
+        ".opencode",
+        "skills",
+        "repo-agentdev-integrity",
+        "scripts",
+        "check_integrity.ts",
+      );
+      const sourceContent = require("fs").readFileSync(sourceScript, "utf-8") as string;
+      const copiedContent = require("fs").readFileSync(copiedScript, "utf-8") as string;
+      expect(copiedContent).toBe(sourceContent);
     });
   });
 });
