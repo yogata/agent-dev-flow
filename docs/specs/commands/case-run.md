@@ -9,7 +9,18 @@ updated: 2026-06-22
 
 ## 目的
 
-単一 Issue または単一 Wave（Epic Issue 指定時: 現在 ready な Wave の子Issue を並列実行）を実行担当サブエージェント（Sisyphus-Junior・ulw-loop）へ委譲し、result を処理する。worktree前提・task() 委譲・結果処理を責務とする。3フェーズ構成でべき等性・再開ポイントを提供する。case-run 本体は orchestration に専念し、実装実行そのものは行わない（ADR-0114・ADR-0128）。
+単一 Issue または単一 Wave（Epic Issue 指定時: 現在 ready な Wave の子Issue を並列実行）を実行担当サブエージェント（Sisyphus-Junior）へ委譲し、result を処理する。worktree前提・task() 委譲・結果処理を責務とする。3フェーズ構成でべき等性・再開ポイントを提供する。case-run 本体は orchestration に専念し、実装実行そのものは行わない（ADR-0114・ADR-0128）。
+
+## task() 委譲契約
+
+case-run から実行担当サブエージェントへの委譲契約を以下に正規化する。
+
+- **委譲先**: case-run は task() により実行担当サブエージェント（Sisyphus-Junior）へ実装作業を委譲する。
+- **load_skills**: AgentDevFlow 側の case-run 実行 adapter skill（`agentdev-case-run-execution-adapter`）を指定する。adapter skill は委譲契約・result 契約・worktree 隔離等の case-run 固有知識を提供する。
+- **委譲 prompt**: 実行 command（`/ulw-loop` 等）を prompt 内に含めて委譲する。実行担当サブエージェントは prompt 内で指定された command を起動する。
+- **実行主体分類**: `/ulw-loop` は skill ではなく、委譲 prompt 内で実行される command である。`load_skills` には command 名を指定せず、adapter skill 名を指定する。
+
+旧仕様の `load_skills=["ulw-loop"]` は誤りであり、上記委譲契約に置換する。
 
 ## 入力
 
@@ -34,7 +45,7 @@ updated: 2026-06-22
 ### Step 0: フェーズ判定（再開ポイント検出・実行モード分岐）
 
 `agentdev-workflow-orchestration` に従い再開フェーズを判定。実行モード分岐:
-- 単一 Issue 実行モード: 非 Epic Issue 番号の場合。当該1 Issue を Sisyphus-Junior(ulw-loop) に委譲
+- 単一 Issue 実行モード: 非 Epic Issue 番号の場合。当該1 Issue を Sisyphus-Junior に委譲（委譲 prompt 内で `/ulw-loop` command を指定）
 - Epic Wave 実行モード（`case-run #epic`）: Epic Issue 番号の場合。現在 ready な Wave の子Issue を特定し各子Issue を task() で並列委譲（最大5件）
 
 前工程からの引き継ぎ停止判定: `agentdev_handoff: true` 含まれる場合は実装開始せず停止
@@ -52,9 +63,9 @@ updated: 2026-06-22
 
 ### 実行担当サブエージェント委譲フェーズ（Steps 5-6）
 
-- Step 5: 実行担当サブエージェント起動（task() 委譲）— `task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])`（ADR-0128, REQ-0130-016/017）
-  - 委譲プロンプト: `/ulw-loop Implement Issue #N: <Issue本文>`
-  - Sisyphus-Junior 責務: ulw-loop による目標分解・observable evidence 要求・品質ゲート（code review + QA review + gate review）
+- Step 5: 実行担当サブエージェント起動（task() 委譲）— `task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])`（ADR-0128, REQ-0130-016/017）。task() 委譲契約の詳細は前述「task() 委譲契約」セクション参照
+  - 委譲プロンプト: `/ulw-loop Implement Issue #N: <Issue本文>`（実行 command を prompt 内で指定）
+  - Sisyphus-Junior 責務: 委譲 prompt 内で指定された command（`/ulw-loop`）による目標分解・observable evidence 要求・品質ゲート（code review + QA review + gate review）
   - task() 起動失敗・異常終了時の扱い: 即 `failed` とせず**実装完了・検証未完了**として扱う（REQ-0130-025）
   - case-run が直接行わない（Sisyphus-Junior 責務）: work plan生成・実装実行・TDD・乖離検出（QG-3）・specs更新・関連ドキュメント整合性確認・ローカル検証・PR本文作成・PR作成・デプロイ検証
   - PR URL 受領: Sisyphus-Junior が直接 PR 作成し PR URL を task() result として返却
@@ -73,7 +84,7 @@ ADR-0128 Decision #3 に基づく。1 Wave の実行（PR作成まで）で retu
 2. 現在 ready な Wave の子Issue 特定 — `ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択。前提Issue が blocked/failed の場合は `pending` のまま選択対象外
 3. `git fetch origin` 実行（REQ-0130-023）
 4. 子Issue の worktree 作成 — Step 4・Step 4-2 を各子Issue について実行
-5. 各子Issue を task() で並列委譲 — `task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])`。最大5件同時起動
+5. 各子Issue を task() で並列委譲 — `task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])`。委譲 prompt 内で `/ulw-loop` command を指定する。最大5件同時起動
 6. 全 task() 完了待機
 7. 結果収集 — 各子Issue の result（completed(pr) / blocked / failed）を収集
 8. return — 収集結果を報告して return。Wave 境界（PR マージ）は case-close の責務

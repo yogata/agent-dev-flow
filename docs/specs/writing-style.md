@@ -2,7 +2,7 @@
 title: 文書執筆スタイルガイドライン
 status: accepted
 created: 2026-06-20
-updated: 2026-06-21
+updated: 2026-06-22
 ---
 
 # 文書執筆スタイルガイドライン
@@ -26,6 +26,25 @@ docs/ 配下の文書（REQ/ADR/SPEC/guides/DOC-MAP/README）および AGENTS.md
 | README | identity・入口表・参照先リンク・最小限のクイックスタート |
 
 REQ 要件行が SPEC 相当内容（スキーマフィールド・enum 値一覧・判定表・ファイルパターン・テンプレート種別・レポート形式・テストデータ詳細・個別 checker ルール・retry 回数・token 目安・行数上限・Step 番号・Phase 番号・内部アルゴリズム・作業履歴）のみを主たる文意とする場合、当該内容は SPEC 等へ配置する対象とする。ただし公開 command 名・公開入口・ドメイン状態の位置づけ・他 command との接続契約・安全境界・停止条件の大枠・後続工程が依存する安定した外部契約に該当する場合は、REQ に要約として記述できる（安定契約例外・REQ-0101-069）。
+
+## 実行主体分類の査読基準
+
+文書内で言及される実行主体は、以下の分類に従って正確に記述すること。この基準は agentdev-doc-writing（REQ-0140-027）および agentdev-inspect-skills（REQ-0125-010）の査読対象である。
+
+| 分類 | 説明 | 判定方法 |
+|---|---|---|
+| command | ユーザーまたはプロンプトから実行される命令（`/agentdev/*`, `/ulw-loop` 等） | 先頭に `/` を持つ、または prompt 内で実行指示として記述される |
+| skill | `load_skills` で指定される、モデルが参照する判断補助・実行知識（`agentdev-*`） | `agentdev-*` プレフィックスを持ち、`SKILL.md` を持つ |
+| subagent | `task(subagent_type=...)` で起動されるエージェント型 | `task()` の `subagent_type` 引数に指定される |
+| harness | 外部実行エンジン・OpenCode プラグイン（oh-my-openagent 等） | OpenCode プラグインとして提供される実行エンジン |
+
+よくある誤認パターン:
+
+- command を skill と呼ぶ（例: `/ulw-loop` を skill と記述、`load_skills` に command 名を指定）
+- harness を skill と呼ぶ
+- subagent を skill と呼ぶ
+
+これらの誤認は `load_skills` への誤指定や文書種別間の契約不整合を引き起こすため、査読で検出する。具体的な誤認事例と修正方向性は agentdev-inspect-skills skill の診断観点を参照。
 
 ## 要件行の書き方
 
