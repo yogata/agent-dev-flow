@@ -26,7 +26,7 @@ agent: sisyphus
 **Step 1-1**: OU 選択ゲート — ドラフトに `operation_units` セクションがある場合、処理対象 OU を決定する:
 - OU ID が指定されている場合 → 指定された OU の req-save result を読み取り、その OU だけを Issue 化する
 - OU ID 指定なし・OU 1 件 → その OU を自動選択して処理する
-- OU ID 指定なし・OU 2 件以上 → OU 一覧（`ou_id`, `target_req`, `target_spec`, `operation`, `result`）を表示して停止する。ユーザーに OU ID の指定を求める
+- OU ID 指定なし・OU 2 件以上 → OU 一覧（`ou_id`, `target_req`, `target_spec`, `operation`, `result`）を表示して停止する。ユーザーに OU ID の指定を求める。ただし独立 OU（`depends_on` 空・L0 相当）が複数含まれる場合は停止せず自動的に Epic Issue 化する（REQ-0114-088・Step 3-1 の自律構成生成へ分岐・独立 OU は Wave 1 に配置）
 - `operation_units` セクションがない場合 → 従来どおり全要件docを処理する（後方互換）
 
 ### Step 2: 要件docからIssue本文を生成
