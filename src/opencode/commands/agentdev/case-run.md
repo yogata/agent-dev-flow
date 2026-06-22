@@ -113,6 +113,8 @@ Sisyphus-Junior が返す3状態（`agentdev-case-run-execution-adapter` の res
 
 以下のフローに基づく。Epic Issue 番号を受け取った場合、以下のフローで現在 ready な Wave の子Issue を並列実行する。1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。同一コマンド再実行で次 Wave に進む（べき等・Epic Issue 本文から進行状況判定）。
 
+**Epic Issue の入力ソース（REQ-0114-087/088）**: Epic Issue は本来の Epic flow（マルチREQ・`scale: large`）に加え、Standard flow 起因の独立 OU 自動 Epic 化（case-open が `depends_on` 空・L0 相当の独立 OU を検出して Epic 化）によるものも含む。case-run は入力ソースを区別せず、Epic Wave モデル（ADR-0128・最大5件並列委譲）で一様に処理する。case-run 側の新規機能追加は不要で、入力としての Epic Issue が増えるのみである。
+
 1. **Epic Issue 本文読込**: Epic Issue 本文から子Issue一覧・Wave 構成・ステータス追跡テーブルを読み取る（永続状態を SSoT とする）
 2. **現在 ready な Wave の子Issue 特定**: ステータス追跡テーブルから現在 ready な Wave の子Issue を特定する。`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択する。ただし前提Issue が blocked/failed の場合は `pending` のまま選択対象外
 3. **`git fetch origin` 実行**: 各子Issue の worktree 作成前に `git fetch origin` を実行し、origin/main の鮮度を確認する。詳細手順は `agentdev-git-worktree` 参照
