@@ -42,7 +42,7 @@ agent: sisyphus
  - **auto_gate preflight**: `draft-data` の `auto_gate.auto_ready` を確認し、false の場合または未解決 item（unresolved_questions/ unresolved_conflicts/ out_of_repo_operations/ stop_reasons）が残る場合は停止する
 ### Step 4: 各工程の実行
 
-case-auto は全工程（req-save/ spec-save/ case-open/ case-run/ case-close）を各コマンドの委譲契約に従って task で起動し、オーケストレーションに専念する。case-run は Sisyphus-Junior(ulw-loop) への task 委譲モデルを使用する。各工程の task は対応するコマンド定義（`.opencode/commands/agentdev/{step}.md`）を authoritative source として読み込み実行する。case-auto は各工程の完了結果（保存済みファイル・Issue/PR番号・pass/warn/fail）のみを受領し、次工程への入力として渡す。**インライン実行は禁止する**（コンテキスト枯渇防止）
+case-auto は全工程（req-save/ spec-save/ case-open/ case-run/ case-close）を各コマンドの委譲契約に従って task で起動し、オーケストレーションに専念する。case-run は Sisyphus-Junior・ulw-loop への task 委譲モデル（`task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` + 委譲 prompt 内 `/ulw-loop` command）を使用する。各工程の task は対応するコマンド定義（`.opencode/commands/agentdev/{step}.md`）を authoritative source として読み込み実行する。case-auto は各工程の完了結果（保存済みファイル・Issue/PR番号・pass/warn/fail）のみを受領し、次工程への入力として渡す。**インライン実行は禁止する**（コンテキスト枯渇防止）
 
 **工程別委譲契約**:
 
@@ -71,7 +71,7 @@ case-auto は全工程（req-save/ spec-save/ case-open/ case-run/ case-close）
  2. **クリーンアップ検証ゲート**を実行し、ドラフトファイル・RUファイルの残存がないことを確認すること。残存時は停止すること
  3. Step 4-1（Wave 反復制御）に進む
  - **Step 4-1 Wave 反復制御（case-run #epic → case-close #epic の反復）**: Epic Issue 番号を記録する。Epic Issue 本文（SSoT）から Wave 構成・各子Issue ステータスを読み取る（**読み取りのみ・Epic Issue 本文の書き込みは case-close の単一書き手責務・**）。Epic/Wave orchestration（子Issue 選択・task 並列起動・Epic Issue 本文ステータス追跡テーブルの更新）は case-run/ case-close が担い、case-auto は Wave 反復制御に専念する。以下の Wave 反復ループを実行する:
- 1. **task→case-run(#epic)**: Epic Issue 番号を case-run task に渡す。case-run は現在 Wave の ready 子Issue を Sisyphus-Junior(ulw-loop) に並列委譲（最大5件）し、1 Wave の実行（PR作成まで）で return する
+ 1. **task→case-run(#epic)**: Epic Issue 番号を case-run task に渡す。case-run は現在 Wave の ready 子Issue を Sisyphus-Junior・ulw-loop（adapter skill + 委譲 prompt 内 `/ulw-loop` command）に並列委譲（最大5件）し、1 Wave の実行（PR作成まで）で return する
  2. **task→case-close(#epic)**: case-run task の結果（子Issue ごとの completed(pr)/ blocked/ failed）を確認する。completed(pr) の子Issue がある場合、Epic Issue 番号を case-close task に渡す。case-close は現在 Wave の PR作成済み子Issue を一括マージ・クローズし、Epic status table を更新する（単一書き手）。case-close は最終 Wave 判定を行い、Epic クローズ または 残 Wave 通知を返す
  3. **次 Wave 判定**: case-close task() の結果から Epic 全 Wave 完了可否を判定する:
  - **全 Wave 完了（Epic クローズ済み）**: Epic 完了報告（Step 8）へ進む

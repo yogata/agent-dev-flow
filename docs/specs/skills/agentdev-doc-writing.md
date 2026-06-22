@@ -35,6 +35,7 @@ docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/
 - `references/ai-slop-detection.md` — AI-slop 検出
 - `references/rewrite-patterns.md` — 検出→書き換え
 - `references/review-output.md` — 査読出力形式
+- `references/execution-subject-classification.md` — 実行主体分類（command / skill / subagent / harness）の査読
 
 原本は `docs/specs/writing-style.md`。内容が重複する場合は原本を優先（REQ-0140-023）。
 

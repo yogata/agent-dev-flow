@@ -25,7 +25,7 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 
 ## 参照する references
 
-- なし（SKILL.md 本文に集約）
+- `references/execution-subject-misclassification.md` — 実行主体分類誤認の判定基準（REQ-0125-010）
 
 ## 現在の動作
 
