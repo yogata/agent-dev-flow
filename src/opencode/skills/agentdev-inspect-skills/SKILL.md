@@ -1,11 +1,11 @@
 ---
 name: agentdev-inspect-skills
-description: Diagnoses Command to Skill reference validity and Skill structure without changing files. USE FOR: diagnosing Command→Skill reference validity, evaluating skill granularity, reviewing skill structure. DO NOT USE FOR: modifying files, creating issues, executing fixes.
+description: Diagnoses Command to Skill reference validity, Skill structure, and execution subject classification without changing files. USE FOR: diagnosing Command→Skill reference validity, evaluating skill granularity, reviewing skill structure, detecting execution subject misclassification (command/harness/subagent referred to as skill). DO NOT USE FOR: modifying files, creating issues, executing fixes.
 ---
 
 # Inspect Skills
 
-Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（Command/Skill 定義ファイル）を直接修正せずに診断する。修正は実行せず、検出事項、分類、根拠、推奨 route を提示する。
+Command→Skill 参照妥当性、Skill 粒度、Skill 構造、実行主体分類を検査対象（Command/Skill 定義ファイル）を直接修正せずに診断する。修正は実行せず、検出事項、分類、根拠、推奨 route を提示する。
 
 ## 検査対象を直接修正しない制約
 
@@ -45,6 +45,7 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（C
 | 配布物 Markdown 構文破損 | 配布物に正規表現破損・未対応フェンス・不正インラインコード等の Markdown 構文破損がないか（同上） |
 | 配布物壊れた括弧・参照残骸 | 配布物に ID 除去で残った壊れた括弧（例: `（OU-XXX/）`・`（）`・`（/）`）・壊れた参照表現・主語/目的語欠落文がないか（同上文意保持検査パターン準拠） |
 | command-skill 責務説明矛盾 | 同一 Command の責務説明が Command 本体と関連 Skill 間で矛盾していないか（同上責務整合検査パターン準拠） |
+| 実行主体分類の誤認 | 文書内で言及される実行主体（command / skill / subagent / harness）の分類が正確か。誤認（command を skill と呼ぶ・harness を skill と呼ぶ・subagent を skill と呼ぶ・`load_skills` に command 名を指定）を検出する（REQ-0125-010）。判定基準の詳細は [execution-subject-misclassification.md](references/execution-subject-misclassification.md) |
 
 ## NG 分類
 
@@ -71,6 +72,7 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（C
 | do-not-use-for-conflict | 参照用途が参照 Skill の除外条件に衝突している |
 | canonical-name-violation | canonical Skill name ではない参照がある |
 | skill-internal-reference-leak | Command が Skill 内部構造に依存している |
+| execution-subject-misclassification | 実行主体（command / skill / subagent / harness）の分類が誤っている（command を skill と呼ぶ、`load_skills` に command 名を指定、harness を skill と呼ぶ、subagent を skill と呼ぶ等） |
 
 ## 判定ルール
 
@@ -112,4 +114,6 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造を検査対象（C
 
 - **agentdev-skill-authoring**: スキルオーサリングの品質基準
 - **agentdev-command-authoring**: コマンド定義の規約
+- **agentdev-doc-writing**: 実行主体分類の査読観点（doc-writing は意味的査読、inspect-skills は診断観点。原本は `docs/specs/writing-style.md`「実行主体分類の査読基準」）
+- **`docs/specs/integrity-rule-catalog.md`**: 機械判定可能な境界違反ルール（IR-050・IR-051・REQ-0108-261 準拠）
 
