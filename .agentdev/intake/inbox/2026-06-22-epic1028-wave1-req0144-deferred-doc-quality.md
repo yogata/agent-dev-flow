@@ -24,3 +24,11 @@ Wave 2（#1032 / REQ-0145 検出設計改善）または別途整備 Issue。REQ
 - #1029 Issue 本文: 3項目 unchecked + deviation note で明示
 - Epic #1028 完了条件: REQ-0144 全14要件完了は未達（Epic 自体は未クローズ）
 - Wave 2 #1032: pending（#1029 クローズにより実行可能）
+
+## 解消状態（2026-06-22 Wave 2 close）
+
+- **解消**: PR #1036 (squash 244ea3b4, #1032 / REQ-0145 Wave 2) にて解消
+  - REQ-0144-002: `checkWorkflowStatusProhibition` が data-model enum context をスキップ（phase word が backtick 内の場合）+ `extractReadmeTableReqIds` が retired section 認識を拡張
+  - REQ-0144-003: `agentdev-workflow-orchestration/SKILL.md` の `（MUST）` legacy marker 見出し削除
+  - REQ-0144-004: IR-045 (`checkDocLanguageQuality`) が frontmatter・filename-only link をスキップ + `agentdev-architecture-advisory.md` SPEC 見出しに日本語注記追加
+- この intake item は archive/promoted へ移動可能（採用済み・解消済み）。
