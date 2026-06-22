@@ -70,11 +70,19 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 - **warn**: split-forecast は記録されているが推奨アクション（SPLIT 検討・SPLIT 推奨）に対するユーザー応答が未確認。
 - **pass**: SPLIT 予兆がない、または split-forecast が記録され推奨アクションがユーザーに提示されている。
 
+### 9. auto_gate完全性
+
+要件doc draft の `auto_gate` フィールドが、req-define の完了条件として妥当に設定されているか（REQ-0102-070, REQ-0102-071）。`auto_ready:false` の場合は `stop_reasons` が記録され、かつユーザー承認（合意による解消・または明示的な false 選択）が得られているか。
+
+- **fail**: `auto_gate` フィールドが不在、または `auto_ready:false` で `stop_reasons` が空。
+- **warn**: `auto_ready:false` で `stop_reasons` が記載されているが、ユーザー承認（合意による解消・または明示的 false 選択の `conflict_resolutions` 記録）が未確認。
+- **pass**: `auto_ready:true`、または `auto_ready:false` で `stop_reasons` がユーザー承認済み（`conflict_resolutions` 記録済み）。
+
 ## pass/ warn/ fail 基準
 
-- **pass**: 上記 1〜8 の全てを満たす。
-- **warn**: 構造は保たれているが改善推奨事項がある（主に観点 3 の粒度、観点 6 の境界曖昧候補、観点 7 の安定契約例外適用境界、観点 8 の推奨アクション未確認）。進行可能。
-- **fail**: 構造的欠陥がある（観点 1, 2, 5, 6, 7, 8 の fail）。req-define へ差し戻し。
+- **pass**: 上記 1〜9 の全てを満たす。
+- **warn**: 構造は保たれているが改善推奨事項がある（主に観点 3 の粒度、観点 6 の境界曖昧候補、観点 7 の安定契約例外適用境界、観点 8 の推奨アクション未確認、観点 9 のユーザー承認未確認）。進行可能。
+- **fail**: 構造的欠陥がある（観点 1, 2, 5, 6, 7, 8, 9 の fail）。req-define へ差し戻し。
 
 ## 委譲接続点
 
