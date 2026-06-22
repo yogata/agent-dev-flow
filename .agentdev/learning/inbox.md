@@ -171,4 +171,22 @@
 - **関連**: PR #1012, Issue #1011, case-close Step 3-2 / G22, case-auto MUST NOT DO, SPEC `docs/specs/docs-spec-rebuild-integrity.md`（昇格見送り対象）
 - **タグ**: `#delegation-contract` `#MUST-NOT-DO-scope` `#SPEC-lifecycle` `#case-close-G22` `#case-auto`
 
+## 2026-06-22 PR #1014 (Issue #1013 / REQ-0143: command file format 標準化)
+
+### case-open の未 push `.agentdev/` commit と squash merge による post-merge ローカル分岐
+
+- **問題事象**: case-close Step 9（実行前同期 `git pull --ff-only`）で、ローカル main が origin/main と分岐しており fast-forward 不可になった。原因は case-open が消費済み RU 削除 commit（`4eecd980`）をローカル main に作成したが push せず、そのローカル main から feature branch を作成したため、squash merge（`ee246c5d`）が当該 commit の内容（RU 削除）を取り込んでいたこと。結果としてローカル main の `4eecd980` は内容が squash merge と重複し、履歴のみが分岐した状態になった。
+- **発生局面**: 完了処理（case-close Step 9 実行前同期・squash merge 後）。
+- **検知方法**: Step 9 の `git pull --ff-only` 実行前に `git log origin/main..HEAD` でローカル先行 commit を検出し、`git diff --stat HEAD origin/main` と `git cat-file -e origin/main:<RU path>` で origin/main が当該 commit の内容を既に取り込んでいる（strict superset）ことを確認。
+- **根本原因**: case-open が `.agentdev/` 配下の commit（RU 削除）をローカルに留めたまま case-run へ引き継ぎ、case-run がそのローカル main を起点に feature branch を作成した。squash merge は feature branch の全 diff（未 push の case-open commit 含む）を取り込むため、merge 後にローカル main の当該 commit が冗長化する。case-close Step 9 はこの分岐を想定した手順を持たない。
+- **自律対応内容**: `git diff --stat HEAD origin/main` で origin/main が strict superset（RU ファイル削除も origin 側で完了）であることを検証した上で、ワーキングツリー clean を確認し `git reset --hard origin/main` で内容ロスなくローカル main を `ee246c5d` へ同期。冗長 commit `4eecd980` は内容が squash merge に完全に含まれるため履歴オブジェクトのみ消失。
+- **ユーザー確認有無**: なし（case-close 単一 Issue フロー内で自律完結）。
+- **ADR/REQ/spec影響**: あり。case-open の `.agentdev/` commit の push タイミング、および case-close Step 9 の分岐ハンドリング手順を明文化すべきか。候補: (a) case-open が RU 削除 commit を即座に push する運用、(b) case-close Step 9 に「ローカル先行 commit が squash merge に取り込み済みか」の検証と reset 手順を追加。
+- **横展開観点**: case-open → case-run → case-close 以外でも、コマンド間でローカル commit を引き継ぐ工程（req-save → spec-save 等）で squash merge 時に同種の分岐が発生し得る。特に `.agentdev/` のドメイン状態 commit は case-open/backlog-review 等でローカルに蓄積しやすい。
+- **再発条件**: (1) case-open が `.agentdev/` commit を push せずに case-run へ引き継ぐ場合、(2) case-run がそのローカル main から feature branch を作成し squash merge する場合、(3) case-close Step 9 が `git pull --ff-only` のみで分岐を想定しない場合。
+- **予防策候補**: (1) case-open の RU 削除 commit を即座に push する手順を case-open command へ明示。 (2) case-close Step 9（agentdev-git-worktree）に「squash merge 後のローカル先行 commit 検出 → 内容重複確認 → reset 手順」を追加。 (3) `git pull --ff-only` 失敗時のフォールバック手順（reset / rebase の判断基準）を skill に明示。
+- **想定反映先**: `src/opencode/commands/agentdev/case-open.md`（RU 削除 commit の push タイミング）、`src/opencode/skills/agentdev-git-worktree/references/git-common-procedures.md`（squash merge 後分岐ハンドリング）、`src/opencode/commands/agentdev/case-close.md` Step 9 参照先。
+- **関連**: PR #1014, Issue #1013, case-close Step 9（実行前同期）, commit `4eecd980`（case-open RU 削除・未 push）, commit `ee246c5d`（squash merge）
+- **タグ**: `#case-open-unpushed-commit` `#squash-merge-divergence` `#git-pull-ff-only` `#case-close-step9` `#agentdev-persistence`
+
 
