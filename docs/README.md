@@ -2,7 +2,7 @@
 
 ## 要件
 
-現行要件の第一参照先は REQ-0101 から REQ-0143 までの 35 件（現行 REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）である。廃止済み REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0147 までの 39 件（現行 REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）である。廃止済み REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -41,6 +41,10 @@
 | [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 |
 | [REQ-0142](requirements/REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 |
 | [REQ-0143](requirements/REQ-0143.md) | Command 定義ファイルフォーマット標準化 |
+| [REQ-0144](requirements/REQ-0144.md) | docs-check/integrity 運用是正 |
+| [REQ-0145](requirements/REQ-0145.md) | docs-check/integrity 検出設計改善 |
+| [REQ-0146](requirements/REQ-0146.md) | 実行契約・委譲・プロセス設計 |
+| [REQ-0147](requirements/REQ-0147.md) | 文書化規律・HITL境界 |
 
 - [要件インデックス](requirements/README.md)
 - [移行表](requirements/mapping-table.md)

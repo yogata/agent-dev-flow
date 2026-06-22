@@ -2,7 +2,7 @@
 
 ## 現行要件
 
-現在の要件判断では、以下35件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を第一参照先とする。旧REQ 50件はすべて廃止済みであり、履歴参照に限定する。
+現在の要件判断では、以下39件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を第一参照先とする。旧REQ 50件はすべて廃止済みであり、履歴参照に限定する。
 
 | REQ ID | タイトル | 関心対象 |
 |---|---|---|
@@ -41,6 +41,10 @@
 | [REQ-0141](REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 | ローカル版生成方式、src/opencode-local/ 生成時ソース領域、ローカルCaseファイル、GitHub Issue/PR 置換、変換プロンプト、生成安全性制約 |
 | [REQ-0142](REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 | 配布物 ID 除去後の完了条件（構文健全性・文意保持・責務整合）、command/skill/SPEC 間の責務説明整合（case-open/run/close/auto）、横断検査の観点拡充、NG 分類明確化 |
 | [REQ-0143](REQ-0143.md) | Command 定義ファイルフォーマット標準化 | AgentDevFlow 管理 command 定義ファイル（src/opencode/commands/agentdev/*.md・.opencode/commands/repo/*.md）の command file format 準拠要件、適用対象限定、consumer project 独自 command の強制対象外 |
+| [REQ-0144](REQ-0144.md) | docs-check/integrity 運用是正 | 廃止REQ履歴マーク参照・workflow否定表現・RFC2119マーカー・日本語品質・skill-category-gap・コマンド一覧網羅・REQ範囲表記・fixture経年劣化・QG/case-close Step番号・Sisyphus-Junior(ulw-loop)誤分類・integrity reports git除外 |
+| [REQ-0145](REQ-0145.md) | docs-check/integrity 検出設計改善 | IR-044 SPEC詳細混入解消・委譲キーワード境界ケース・catalog↔実装双方向同期・docs-check項目役割範囲・新カテゴリ追加判定フロー・IR-050/051 語彙レジストリ・閾値確定・3層検出構造責務分担・draft SPEC参照リスト・references checker偽陽性・完了条件grep設計 |
+| [REQ-0146](REQ-0146.md) | 実行契約・委譲・プロセス設計 | oh-my-openagent CLI引数正規化・委譲プロンプト雛形・case-open即時push・case-auto委譲契約MUST NOT DO・case-close squash merge後reset・git-common-procedures・実行主体分類表・3層検出構造SPEC化・doc-writing査読観点・前工程完了度3段階・subagent-protocol・command-authoring判断基準・バッチIssue完了判定追跡性 |
+| [REQ-0147](REQ-0147.md) | 文書化規律・HITL境界 | SKILL↔command同一ルール重複許容基準・新旧REQ適用運用ルール・promote/review系HITL限定・判断確定後自動実行・破壊的変更承認維持・learning-promote prune・intake-promote自動実行・backlog-review矛盾検出時追加判断 |
 
 ## 廃止済み要件
 
