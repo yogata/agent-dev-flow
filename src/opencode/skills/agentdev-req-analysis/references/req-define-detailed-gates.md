@@ -127,7 +127,7 @@ Step 1 で 2 件以上の RU が検出または指定された場合、全ての
 - **REQ 操作**（`target_req` フィールド指定）: `create`/ `append`/ `update`。req-save が消費
 - **SPEC 操作**（`target_spec` フィールド指定）: `spec-create`/ `spec-update`。spec-save が消費
 
-両系統は後方互換性のため既存の `create`/ `append`/ `update` を維持する。SPEC 候補（Step 4-2/4-3 で分離した `draft-meta.spec-candidates`）が存在する場合、対応する SPEC 操作 OU を生成し `target_spec` に想定配置先 SPEC パスを設定する。
+両系統は後方互換性のため既存の `create`/ `append`/ `update` を維持する。SPEC 候補（Step 5-2/5-3 で分離した `draft-meta.spec-candidates`）が存在する場合、対応する SPEC 操作 OU を生成し `target_spec` に想定配置先 SPEC パスを設定する。
 
 ## Epic 規模記録
 

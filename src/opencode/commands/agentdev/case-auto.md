@@ -19,12 +19,16 @@ agent: sisyphus
 
 ## 手順
 
-1. **入力解決**:
+### Step 1: 入力解決
+
  - **実行開始時刻の記録**: 本 Step の冒頭（入力解決の最初の処理）で、case-auto の実行開始時刻を JST（Etc/GMT-9）・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録し、変数（`case_auto_started_at`）に保持する。この時刻は Step 7（停止時報告）および Step 8（完了報告）での所要時間算出の基準として使用する
  - **Issue番号/URL入力モード**: 引数が数値のみまたは GitHub Issue URL の場合、Issue番号として解決し case-run移行モードへ分岐する（Step 3 の Issue番号/URL入力分岐へ）。この場合、要件docの入力解決・work_type読取はスキップする
  - **要件doc入力モード**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
-2. **work_type 読取**: 入力要件docの `draft-data` から work_type を取得する（参考情報・パイプライン分岐の判定には使用しない）
-3. **工程分岐**（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定）:
+### Step 2: work_type 読取
+
+入力要件docの `draft-data` から work_type を取得する（参考情報・パイプライン分岐の判定には使用しない）
+### Step 3: **工程分岐**（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定）
+
  - **Issue番号/URL入力**: case-run → case-close（req-save・spec-save・case-open・work_type読取をスキップ）。Step 1 で解決した Issue番号/URL を case-run（task()）にそのまま渡す。draft-data の読み取りを行わない
  - **artifact_actions ベース分岐**: `draft-data` の `artifact_actions` を読み取り以下の工程を動的判定する:
  - `artifact: req` または `artifact: adr` の entry が含まれる場合 → req-save を実行
@@ -36,9 +40,11 @@ agent: sisyphus
  - `artifact: spec` entry が空の場合 → spec-save をスキップし case-open へ進む
  - `artifact_actions` フィールドが存在しない（旧形式 draft）場合 → **後方互換**: spec-save をスキップし従来ワークフロー（req-save → case-open → …）で実行
  - **auto_gate preflight**: `draft-data` の `auto_gate.auto_ready` を確認し、false の場合または未解決 item（unresolved_questions/ unresolved_conflicts/ out_of_repo_operations/ stop_reasons）が残る場合は停止する
-4. **各工程の実行**: case-auto は全工程（req-save/ spec-save/ case-open/ case-run/ case-close）を各コマンドの委譲契約に従って task で起動し、オーケストレーションに専念する。case-run は Sisyphus-Junior(ulw-loop) への task 委譲モデルを使用する。各工程の task は対応するコマンド定義（`.opencode/commands/agentdev/{step}.md`）を authoritative source として読み込み実行する。case-auto は各工程の完了結果（保存済みファイル・Issue/PR番号・pass/warn/fail）のみを受領し、次工程への入力として渡す。**インライン実行は禁止する**（コンテキスト枯渇防止）
+### Step 4: 各工程の実行
 
- ### 工程別委譲契約
+case-auto は全工程（req-save/ spec-save/ case-open/ case-run/ case-close）を各コマンドの委譲契約に従って task で起動し、オーケストレーションに専念する。case-run は Sisyphus-Junior(ulw-loop) への task 委譲モデルを使用する。各工程の task は対応するコマンド定義（`.opencode/commands/agentdev/{step}.md`）を authoritative source として読み込み実行する。case-auto は各工程の完了結果（保存済みファイル・Issue/PR番号・pass/warn/fail）のみを受領し、次工程への入力として渡す。**インライン実行は禁止する**（コンテキスト枯渇防止）
+
+**工程別委譲契約**:
 
  case-auto は各工程を以下の委譲契約で起動する:
 
@@ -76,9 +82,15 @@ agent: sisyphus
  - ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
  - 当該ケースで消費した RU ファイル（`.agentdev/backlog/req-units/RU-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
  - 検証結果（成功・残存ファイル一覧）を case-auto 完了報告（Step 8）に含めること
-5. **工程間の状態引き継ぎ**: 各工程の task 起動結果（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) RU ファイルパス（case-open task の RU 削除で使用） (2) capture 対象情報（case-close task の learning/intake capture で使用）
-6. **複数REQ対応**: req-save task の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールをそのまま使用する。case-auto 自体に Issue 階層決定ロジックを持ってはならない。req-save task から case-open task へ状態を引き継ぐ際、case-auto は複数 REQ doc の保存結果をフィルタリングや再評価なしでそのまま渡す。case-auto は Epic Issue 化の判定に関与しないこと。case-open の判定結果に従うこと
-7. **停止条件の検出**: 以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:
+### Step 5: 工程間の状態引き継ぎ
+
+各工程の task 起動結果（Issue番号、PR番号）を次工程の入力として渡す。加えて以下の引き継ぎ情報を最終工程まで保持すること: (1) RU ファイルパス（case-open task の RU 削除で使用） (2) capture 対象情報（case-close task の learning/intake capture で使用）
+### Step 6: 複数REQ対応
+
+req-save task の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールをそのまま使用する。case-auto 自体に Issue 階層決定ロジックを持ってはならない。req-save task から case-open task へ状態を引き継ぐ際、case-auto は複数 REQ doc の保存結果をフィルタリングや再評価なしでそのまま渡す。case-auto は Epic Issue 化の判定に関与しないこと。case-open の判定結果に従うこと
+### Step 7: 停止条件の検出
+
+以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する:
  - **停止時タイミング情報の追記**: 停止報告に Step 1 で記録した `case_auto_started_at`（開始時刻）・停止時刻（JST・人間が読みやすい形式: 例 `2026-06-21 15:30:00 JST`）・経過時間（停止時刻 − 開始時刻、人間が読みやすい形式: 例 `12分34秒`・全体合計のみ・工程別内訳は含めない）を含めること
  - (1) req-define合意要件からの逸脱
  - (2) 要件未合意のscope拡大
@@ -90,7 +102,9 @@ agent: sisyphus
  - (8) merge conflict/ remote hash不一致
  - (9) 作成元不明branch/ user-owned branch/ 他作業branchの削除検出
  - (10) 未コミット変更の帰属不明
-8. **完了報告**: 最終工程（case-close task）の完了報告をそのまま出力する。Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り・case-auto は書き込まない）。停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する
+### Step 8: 完了報告
+
+最終工程（case-close task）の完了報告をそのまま出力する。Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り・case-auto は書き込まない）。停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する
  - **タイミング情報の追記**: 完了報告生成時刻（Step 8 開始時点）を JST・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録する。case-close task() の完了報告（テンプレート）は変更せず、case-auto が以下を追記すること:
  - 開始時刻: Step 1 で記録した `case_auto_started_at`
  - 終了時刻: 完了報告生成時刻

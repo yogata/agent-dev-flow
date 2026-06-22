@@ -27,26 +27,37 @@ agent: sisyphus
 
 ## 手順
 
-1. **期間解釈**: 抽出アルゴリズムは `agentdev-intake-pipeline` を参照
+### Step 1: 期間解釈
 
-2. **データ取得**: 取得方法・CLI コマンドは `agentdev-intake-pipeline` を参照
+抽出アルゴリズムは `agentdev-intake-pipeline` を参照
 
-3. **構造的検出**: 抽出ルールは `agentdev-intake-pipeline` を参照
+### Step 2: データ取得
 
-4. **LLM 全文解析**: キーワードリスト・コンテキスト付与ルールは `agentdev-intake-pipeline` を参照
+取得方法・CLI コマンドは `agentdev-intake-pipeline` を参照
 
-5. **intake item 生成**: item 生成ルール・ファイル名規則は `agentdev-intake-pipeline` を参照
+### Step 3: 構造的検出
+
+抽出ルールは `agentdev-intake-pipeline` を参照
+
+### Step 4: LLM 全文解析
+
+キーワードリスト・コンテキスト付与ルールは `agentdev-intake-pipeline` を参照
+
+### Step 5: intake item 生成
+
+item 生成ルール・ファイル名規則は `agentdev-intake-pipeline` を参照
 
 5-1. **実行前同期（git pull）**:
  - `git pull --ff-only` を実行する
  - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git 同期エラー」形式で表示して停止する（自動解消しない）
 
-6. **保存**:
+### Step 6: 保存
+
  - 保存先: `.agentdev/intake/inbox/`
  - ディレクトリが存在しない場合は作成する
  - 同名ファイルが存在する場合は連番を付与する
 
- 6-1. **.agentdev/intake 変更の commit と push**:
+**Step 6-1**: .agentdev/intake 変更の commit と push
  - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
  - **変更なし時**: commit/push せず、Step 8 の完了報告で「変更なし」と報告
  - **変更あり時**:
@@ -55,7 +66,9 @@ agent: sisyphus
  3. `git push` を実行する
  4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git Push エラー」形式で表示し、完了扱いにしない
 
-7. **サマリーレポート提示**: 抽出結果をサマリーとしてユーザーに提示する:
+### Step 7: サマリーレポート提示
+
+抽出結果をサマリーとしてユーザーに提示する:
    ```
    ## Intake from GitHub 抽出サマリー
 
@@ -69,7 +82,9 @@ agent: sisyphus
    | 1 | ... | #XX | YYYY-MM-DD-xxx.md |
    ```
 
-8. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-from-github/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+### Step 8: 完了報告
+
+完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-from-github/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## エラー処理
 

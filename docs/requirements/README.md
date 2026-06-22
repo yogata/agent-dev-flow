@@ -2,7 +2,7 @@
 
 ## 現行要件
 
-現在の要件判断では、以下34件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を第一参照先とする。旧REQ 50件はすべて廃止済みであり、履歴参照に限定する。
+現在の要件判断では、以下35件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を第一参照先とする。旧REQ 50件はすべて廃止済みであり、履歴参照に限定する。
 
 | REQ ID | タイトル | 関心対象 |
 |---|---|---|
@@ -40,6 +40,7 @@
 | [REQ-0140](REQ-0140.md) | 文書品質ゲート | 文書種別責務・要件性・文意品質・粒度の査読、AI-slop検出、IR-045、ドリフト検出、既存文書への遡及準拠修正 |
 | [REQ-0141](REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 | ローカル版生成方式、src/opencode-local/ 生成時ソース領域、ローカルCaseファイル、GitHub Issue/PR 置換、変換プロンプト、生成安全性制約 |
 | [REQ-0142](REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 | 配布物 ID 除去後の完了条件（構文健全性・文意保持・責務整合）、command/skill/SPEC 間の責務説明整合（case-open/run/close/auto）、横断検査の観点拡充、NG 分類明確化 |
+| [REQ-0143](REQ-0143.md) | Command 定義ファイルフォーマット標準化 | AgentDevFlow 管理 command 定義ファイル（src/opencode/commands/agentdev/*.md・.opencode/commands/repo/*.md）の command file format 準拠要件、適用対象限定、consumer project 独自 command の強制対象外 |
 
 ## 廃止済み要件
 
