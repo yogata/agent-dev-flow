@@ -23,12 +23,12 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 ## 手順
 
-### 入力判定
+### Step 1: Issue番号解決
 
-1. **Issue番号解決**: ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
+ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
  - **Epic Issue 判定**: 解決した Issue番号の本文を `agentdev-gh-cli` の安全な読み取り手順で取得し、ステータス追跡テーブル（Wave/子Issue 構成・`agentdev-epic-tracker` の新4列/旧4列形式）が存在するか確認。テーブル存在時は **Epic Wave クローズ**（Step E1〜E6）へ分岐。テーブル不存在時は **単一 Issue クローズ**（Step 1-1〜）へ進む（後方互換）
 
-### Epic Wave クローズ
+**Epic Wave クローズ**（`case-close #epic` 受領時・Step 1 から分岐）:
 
 `case-close` が Epic Issue番号を受領した場合の Wave 単位クローズフロー。現在 Wave の PR作成済み子Issue を一括マージ・クローズし、Epic status table を更新する。最終 Wave 判定後に Epic Issue クローズ または 残 Wave 通知を行う。
 
@@ -54,9 +54,9 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  - 残 Wave 一覧（Wave 番号・対象子Issue 番号・各ステータス）
  - 次実行可能 Issue（依存が満たされた `pending` 子Issue のうち最も若い番号・存在しない場合は「次 Wave の case-run 完了待ち」と明記）
 
-### 単一 Issue クローズ（従来フロー・後方互換）
+**単一 Issue クローズ**（従来フロー・後方互換）:
 
-1-1. **重複ファイルチェック**: merge/pull 実行前に、ローカル未コミット変更ファイルと対象 PR 変更ファイルの重複を検出する:
+**Step 1-1**: 重複ファイルチェック — merge/pull 実行前に、ローカル未コミット変更ファイルと対象 PR 変更ファイルの重複を検出する:
  - `git status --short` でローカル未コミット変更ファイル一覧を取得
  - `gh pr view {pr_number} --json files` で対象 PR 変更ファイル一覧を取得
  - 両者の重複ファイルを特定
@@ -64,7 +64,9 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  - 重複なしの場合: 後続ステップへ進む
  - `gh pr view` 実行不可時: 後方互換性として Step 9（実行前同期）でフォールバック検出を維持
 
-2. **前提確認**: 達成判定・完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価・更新する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md` を参照:
+### Step 2: 前提確認
+
+達成判定・完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価・更新する。判定基準・検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md` を参照:
  - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run・実行担当サブエージェント・外部実行バックエンドは完了条件チェックボックスを更新しない。case-close は case-run/ 実行担当サブエージェントとは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
  - unchecked項目を達成判定（証拠ソース・`agentdev-workflow-orchestration` のプロトコルに従い）し `[x]` に更新
  - 達成不可項目を自律解決判定（変更対象分類×検証種別分類）
@@ -73,17 +75,19 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  - 未達項目が残る場合 → 構造化エラーで停止（G08）
  - PR存在確認
 
-3. **docs/ 検証**: 機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認。不足時は警告表示してユーザー判断を仰ぐ。PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（Step 3-2）を実行する
+### Step 3: docs/ 検証
+
+機能追加固有の検証（REQ作成・インデックス記載・spec更新・ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認。不足時は警告表示してユーザー判断を仰ぐ。PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（Step 3-2）を実行する
  - **文書分類ポリシー適合確認**: `docs/specs/document-model.md` の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する
 
-3-1. **close 時 SPEC/ commands/ skills 更新漏れの局所確認**: 実装完了・PRマージ前に、今回の変更に伴う以下の更新漏れを局所的に確認する:
+**Step 3-1**: close 時 SPEC/ commands/ skills 更新漏れの局所確認 — 実装完了・PRマージ前に、今回の変更に伴う以下の更新漏れを局所的に確認する:
  - SPEC 本文と実装の最終矛盾確認
  - 変更に伴う command 定義の更新漏れ
  - 変更に伴う skill 責務境界の変更漏れ
  - 更新漏れを検出した場合は警告表示してユーザー判断を仰ぐ
  - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない
 
-3-2. **SPEC 確定フロー**: PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録）を読み取り、SPEC の確定・昇格を処理する。セクションが存在しない・空の場合はスキップする:
+**Step 3-2**: SPEC 確定フロー — PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録）を読み取り、SPEC の確定・昇格を処理する。セクションが存在しない・空の場合はスキップする:
  - **SPEC確定候補の提示**: SPEC確定候補一覧（対象 SPEC・内容・分類）をユーザーに提示する
  - **確定判断**: 各候補について以下のいずれかをユーザー承認のもと選択する:
  - (a) **case-close 内で SPEC 昇格**: 対象 SPEC の `status` を `draft` → `accepted` に昇格する（編集スコープ: `docs/specs/**`）。実装が SPEC 内容を検証済みであることを確認できた場合
@@ -94,7 +98,8 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  - 今回の実装（PR）が当該 SPEC の内容を検証（実装と整合）したことを case-close Step 3 の docs/検証で確認できたこと
  - 昇格時は SPEC frontmatter `status` を `accepted` に更新し、`updated` 日付を更新する
 
-4. **PRマージ**:
+### Step 4: PRマージ
+
  - `gh pr merge --squash` 実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）
  - **Squash merge失敗時の自動リトライ**:
  - 失敗時は5秒待機して再試行
@@ -103,11 +108,17 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  - **全リトライ失敗時のフォールバック**: フォールバック手順は template (`.opencode/commands/agentdev/templates/case-close/standard.md`) を参照
  - 対応記録コメントをIssueに追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Readして `agentdev-gh-cli` の VERIFY 操作に従って内容検証
 
-5. **Post-merge テスト戦略検証**: マージ後のみ確認可能な項目（CI通過等）を反映。`agentdev-gh-cli` に従い `--body-file` で更新 → VERIFY
+### Step 5: Post-merge テスト戦略検証
 
-6. **Issueクローズ**: `gh issue close --reason completed`
+マージ後のみ確認可能な項目（CI通過等）を反映。`agentdev-gh-cli` に従い `--body-file` で更新 → VERIFY
 
-7. **ブランチ・worktree削除**: `agentdev-git-worktree` の worktree削除手順に従う:
+### Step 6: Issueクローズ
+
+`gh issue close --reason completed`
+
+### Step 7: ブランチ・worktree削除
+
+`agentdev-git-worktree` の worktree削除手順に従う:
  - 未コミット変更検出（`agentdev-git-worktree` skill に従い）
  - squash merge 済みの場合 → 当該 worktree が隔離されている（専用 worktree + branch で index が独立）場合のみ `git checkout .` で破棄可。**共有作業ツリー（main worktree）では `git checkout .` は禁止**（他セッション変更の無差別破壊）。本 Step は worktree 削除フェーズ内の隔離 worktree でのみ実行する
  - .sisyphus/ クリーンアップ
@@ -116,16 +127,22 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  - リモートブランチ削除
  - 削除失敗時は警告表示して停止すること
 
-8. **親Epic Issue更新**: `agentdev-epic-tracker` スキル参照:
+### Step 8: 親Epic Issue更新
+
+`agentdev-epic-tracker` スキル参照:
  - Issue本文から Parent Issue番号を特定（`Parent: #{N}` パターン）
  - Parent なし → スキップ
  - ステータストラッキング表を更新 → `agentdev-gh-cli` VERIFY
  - 子Issue状態事前取得: `gh issue view --json comments` 等で全子Issueの OPEN/CLOSED 状態を一覧取得しログ出力（例: `子Issue状態一覧: #N1 (OPEN), #N2 (CLOSED), ...`）
  - Epic自動クローズ判定: 全子Issue CLOSED → 自動クローズ。1件以上 OPEN → スキップ
 
-9. **実行前同期**: `agentdev-git-worktree` に従い `git pull --ff-only` を実行。ローカル変更事前チェック・hash検証・不一致時は評価・承認のやり直し
+### Step 9: 実行前同期
 
-10. **学びの検知・抽出**: `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断:
+`agentdev-git-worktree` に従い `git pull --ff-only` を実行。ローカル変更事前チェック・hash検証・不一致時は評価・承認のやり直し
+
+### Step 10: 学びの検知・抽出
+
+`agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断:
  - ユーザーに学びの有無を問うことは禁止
  - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
  - 採用済み成果物取り込み判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
@@ -134,9 +151,13 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  - intake と learning を別々の成果物として扱う
  - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数・中間ファイル等）を capture の入力として使用しない。capture 情報の入力源は PR 本文のみ
 
- 11. **ドメイン状態永続化**: `agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める
+### Step 11: ドメイン状態永続化
 
-12. **完了報告**: 完了報告templateに従って出力。結果状態に応じた種別を選択:
+`agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める
+
+### Step 12: 完了報告
+
+完了報告templateに従って出力。結果状態に応じた種別を選択:
  - 全系統成功 → .opencode/commands/agentdev/templates/case-close/standard.md
  - .agentdev push失敗 → .opencode/commands/agentdev/templates/case-close/agentdev-push-failed.md
  - ブランチ・worktree削除失敗 → .opencode/commands/agentdev/templates/case-close/worktree-cleanup-failed.md

@@ -35,7 +35,7 @@ git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/{base_bran
 
 ## worktree 内判定ヘルパー
 
-現在 worktree 内にいるか（メインリポジトリで作業していないか）を判定する検証ヘルパー手順。case-run の precondition gate（Step 4-2）および実行担当サブエージェントの自己検証から参照される。2つの検証を組合せて判定する。
+現在 worktree 内にいるか（メインリポジトリで作業していないか）を判定する検証ヘルパー手順。case-run の precondition gate（Step 5-2）および実行担当サブエージェントの自己検証から参照される。2つの検証を組合せて判定する。
 
 ### 1. 検証コマンド
 
@@ -66,7 +66,7 @@ git rev-parse --show-toplevel
 
 ### 3. 適用箇所
 
-- **case-run Step 4-2（precondition gate）**: 実行担当サブエージェント起動前に本ヘルパーで検証し、worktree 内にいない場合は起動を停止して Step 4 へ戻る
+- **case-run Step 5-2（precondition gate）**: 実行担当サブエージェント起動前に本ヘルパーで検証し、worktree 内にいない場合は起動を停止して Step 5 へ戻る
 - **実行担当サブエージェントの自己検証**: 実装作業開始前に本ヘルパーで worktree 内にいることを自己検証する（詳細は `agentdev-case-run-execution-adapter` 参照）
 
 ## 削除手順

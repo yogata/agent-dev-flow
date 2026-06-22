@@ -49,11 +49,16 @@ intake item は以下の推奨標準形に従う Markdown 成果物とする。w
 
 ## 手順
 
-1. **入力の受領**: ユーザーから変更候補の内容を受け取る。自然言語で記述された内容をそのまま取り扱う。
+### Step 1: 入力の受領
 
-2. **intake item の生成**: ユーザーの入力を上記推奨標準形に整理する。ユーザーが明示的に指定していないセクションは推測・補完せず、そのセクションを省略する（内容がないセクションを作成しない）。ユーザーの入力に含まれない情報を自動生成・推論して記載することを禁止する。
+ユーザーから変更候補の内容を受け取る。自然言語で記述された内容をそのまま取り扱う。
 
-3. **ファイル名の生成**:
+### Step 2: intake item の生成
+
+ユーザーの入力を上記推奨標準形に整理する。ユーザーが明示的に指定していないセクションは推測・補完せず、そのセクションを省略する（内容がないセクションを作成しない）。ユーザーの入力に含まれない情報を自動生成・推論して記載することを禁止する。
+
+### Step 3: ファイル名の生成
+
  - 日付: 実行時のシステム日付（`YYYY-MM-DD`）
  - topic-slug: タイトルから生成（小文字英数字・ハイフン区切り、30文字以内）
  - 形式: `YYYY-MM-DD-{topic-slug}.md`
@@ -62,12 +67,13 @@ intake item は以下の推奨標準形に従う Markdown 成果物とする。w
  - `git pull --ff-only` を実行する
  - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git 同期エラー」形式で表示して停止する（自動解消しない）
 
-4. **保存**:
+### Step 4: 保存
+
  - 保存先: `.agentdev/intake/inbox/`
  - ディレクトリが存在しない場合は作成する
  - 同名ファイルが存在する場合は `{topic-slug}-2`, `{topic-slug}-3` のように連番を付与する
 
- 4-1. **.agentdev/intake 変更の commit と push**:
+**Step 4-1**: .agentdev/intake 変更の commit と push
  - `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する
  - **変更なし時**: commit/push せず、Step 5 の完了報告で「変更なし」と報告
  - **変更あり時**:
@@ -76,7 +82,9 @@ intake item は以下の推奨標準形に従う Markdown 成果物とする。w
  3. `git push` を実行する
  4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git Push エラー」形式で表示し、完了扱いにしない
 
-5. **完了報告** → 完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-capture/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
+### Step 5: 完了報告
+
+完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-capture/standard.md。git 永続化結果（変更有無・ファイル一覧・commit hash・push 成否）を含める
 
 ## エラー処理
 

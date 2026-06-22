@@ -80,7 +80,7 @@ oldString: "    const result = items.map(i => i.value);"
 
 ## driver 起動プロンプトテンプレート（Windows + ジャンクション環境）
 
-case-run Step 5 で実行担当サブエージェント（driver）へ引き継ぐプロンプトに**必須**で含める項目。ジャンクション未伝播により worktree 内 `.opencode/` が空になる事象を事前通知し、driver が手動両辺編集・同期スクリプト非依存で作業するよう誘導する。
+case-run Step 6 で実行担当サブエージェント（driver）へ引き継ぐプロンプトに**必須**で含める項目。ジャンクション未伝播により worktree 内 `.opencode/` が空になる事象を事前通知し、driver が手動両辺編集・同期スクリプト非依存で作業するよう誘導する。
 
 ### 必須項目
 

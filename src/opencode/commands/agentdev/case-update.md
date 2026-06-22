@@ -19,19 +19,29 @@ agent: sisyphus
 
 ## 手順
 
-1. Issue番号解決。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは候補番号抽出のみを返し、親エージェントが確認・停止を判断する
-2. 現在のIssue状態を取得 → `agentdev-workflow-lifecycle` で現在フェーズを判定
-3. 更新内容に応じて分岐:
- - **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが `gh issue edit` を行う
- - **`--comment`**: 更新コメントを追加する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントはコメント案と必須セクション検査のみを返し、親エージェントが投稿する
- - **`--req`**: REQファイル更新を行う。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは関連REQ候補・APPEND/UPDATE候補・根拠のみを返し、親エージェントがファイル更新とcommit/pushを行う
- - **`--review-ng`**: レビューNG時の専用フローを実行する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは乖離タイプ候補・推奨アクション・更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
-4. 完了報告 → 完了報告templateに従って出力。更新種別に応じた種別を選択:
- - --body → .opencode/commands/agentdev/templates/case-update/body.md
- - --comment → .opencode/commands/agentdev/templates/case-update/comment.md
- - --req → .opencode/commands/agentdev/templates/case-update/req.md（変数: {APPEND/UPDATE}, {REQ番号}, {セクション名}）
- - --review-ng → .opencode/commands/agentdev/templates/case-update/review-ng.md（変数: {乖離タイプ}, {REQ番号}, {推奨アクション}）
- - 更新種別の推論: ユーザー入力、直前のレビュー結果、対象Issue/REQ、会話文脈から推論。推論不能時のみユーザーに指定を求めて停止
+### Step 1: Issue番号解決
+
+詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは候補番号抽出のみを返し、親エージェントが確認・停止を判断する
+
+### Step 2: 現在のIssue状態を取得
+
+`agentdev-workflow-lifecycle` で現在フェーズを判定
+
+### Step 3: 更新内容に応じて分岐
+
+- **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが `gh issue edit` を行う
+- **`--comment`**: 更新コメントを追加する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントはコメント案と必須セクション検査のみを返し、親エージェントが投稿する
+- **`--req`**: REQファイル更新を行う。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは関連REQ候補・APPEND/UPDATE候補・根拠のみを返し、親エージェントがファイル更新とcommit/pushを行う
+- **`--review-ng`**: レビューNG時の専用フローを実行する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは乖離タイプ候補・推奨アクション・更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
+
+### Step 4: 完了報告
+
+完了報告templateに従って出力。更新種別に応じた種別を選択:
+- --body → .opencode/commands/agentdev/templates/case-update/body.md
+- --comment → .opencode/commands/agentdev/templates/case-update/comment.md
+- --req → .opencode/commands/agentdev/templates/case-update/req.md（変数: {APPEND/UPDATE}, {REQ番号}, {セクション名}）
+- --review-ng → .opencode/commands/agentdev/templates/case-update/review-ng.md（変数: {乖離タイプ}, {REQ番号}, {推奨アクション}）
+- 更新種別の推論: ユーザー入力、直前のレビュー結果、対象Issue/REQ、会話文脈から推論。推論不能時のみユーザーに指定を求めて停止
 
 ## APPEND vs UPDATE 判定基準
 

@@ -29,16 +29,30 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 
 ## 手順
 
-1. **診断対象の読込**: Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatter、本文構造、references 利用、template/ script 参照を把握する
-2. **各診断観点の評価**: `agentdev-inspect-skills` に従い、参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存を評価する
-3. **配布物構文健全性・責務整合診断**: 配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/specs/docs-spec-rebuild-integrity.md` が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複・見出し重複・Markdown 構文破損・壊れた括弧・command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する
-4. **分類**: 検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は `docs/specs/docs-spec-rebuild-integrity.md` の NG 分類表に従い、各検出事項に分類・理由・後続対象を付ける
-5. **route 提示**: 修正は実行せず、推奨 route を提示する
-6. **検出事項出力**: 検出事項を `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` へ出力
-7. **実行前同期（git pull --ff-only）**:
+### Step 1: 診断対象の読込
+
+Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatter、本文構造、references 利用、template/ script 参照を把握する
+### Step 2: 各診断観点の評価
+
+`agentdev-inspect-skills` に従い、参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存を評価する
+### Step 3: 配布物構文健全性・責務整合診断
+
+配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/specs/docs-spec-rebuild-integrity.md` が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複・見出し重複・Markdown 構文破損・壊れた括弧・command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する
+### Step 4: 分類
+
+検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は `docs/specs/docs-spec-rebuild-integrity.md` の NG 分類表に従い、各検出事項に分類・理由・後続対象を付ける
+### Step 5: route 提示
+
+修正は実行せず、推奨 route を提示する
+### Step 6: 検出事項出力
+
+検出事項を `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` へ出力
+### Step 7: 実行前同期（git pull --ff-only）
+
  - `git pull --ff-only` を実行
  - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
-8. **.agentdev/inspect/ 変更の commit と push**:
+### Step 8: .agentdev/inspect/ 変更の commit と push
+
  - `git diff --name-only` で `.agentdev/inspect/` 配下の変更を確認
  - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
  - **変更あり時**:
@@ -46,7 +60,9 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
  2. commit message: `chore(agentdev): capture inspect-skills finding`
  3. `git push` 実行
  4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
-9. **完了報告**: 完了報告 template に従って出力
+### Step 9: 完了報告
+
+完了報告 template に従って出力
 
 ## ガードレール
 

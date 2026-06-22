@@ -9,7 +9,7 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 
 **スコープ**: case-run は単一 Issue または単一 Wave を処理する。Epic 全体（複数 Wave）の処理・Wave 境界（PR マージ）は case-close の責務であり、case-run は扱わない。1 Wave の実行（PR作成まで）で return する。複数 Issue の一括実行・Wave 順序制御にまたがるオーケストレーションは case-auto の責務（SPEC `docs/specs/workflow-contracts.md` SC-008）。
 
-3フェーズ構成で各フェーズは独立して再実行可能（べき等性）。フェーズ間エラー時は Step 0 の再開判定から再開できる。
+3フェーズ構成で各フェーズは独立して再実行可能（べき等性）。フェーズ間エラー時は Step 1 の再開判定から再開できる。
 
 ## 入力
 
@@ -26,13 +26,13 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 
 | フェーズ | Steps | 再開条件 |
 |---|---|---|
-| 準備フェーズ | 1-4 | worktree+ブランチが存在しない |
-| 実行担当サブエージェント委譲フェーズ | 5-6 | PRが未作成 または 実行担当サブエージェント result 未確定 |
-| クリーンアップフェーズ | 7 | 実行担当サブエージェント result = completed(pr) |
+| 準備フェーズ | 2-5 | worktree+ブランチが存在しない |
+| 実行担当サブエージェント委譲フェーズ | 6-7 | PRが未作成 または 実行担当サブエージェント result 未確定 |
+| クリーンアップフェーズ | 8 | 実行担当サブエージェント result = completed(pr) |
 
 ## 手順
 
-### Step 0: フェーズ判定（再開ポイント検出・実行モード分岐）
+### Step 1: フェーズ判定（再開ポイント検出・実行モード分岐）
 
 `agentdev-workflow-orchestration` に従い、再開フェーズを判定する。Issue番号解決・引数パース・妥当性確認・実行パス分岐・成果物チェックの詳細は同skill参照。
 
@@ -40,39 +40,45 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 
 **実行モード分岐**:
 
-1. **単一 Issue 実行モード**: 引数が非 Epic Issue 番号の場合。当該1 Issue を Sisyphus-Junior(ulw-loop) に委譲する（後述 Step 1-7）
+1. **単一 Issue 実行モード**: 引数が非 Epic Issue 番号の場合。当該1 Issue を Sisyphus-Junior(ulw-loop) に委譲する（後述 Step 2-8）
 2. **Epic Wave 実行モード（`case-run #epic`）**: 引数が Epic Issue 番号の場合。Epic Issue 本文から現在 ready な Wave の子Issue を特定し、各子Issue を task() で Sisyphus-Junior(ulw-loop) に並列委譲する（最大5件）。詳細は後述「Epic Wave 実行モード」セクション
 
 いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
 
 **前工程からの引き継ぎ停止判定**: Issue 本文、要件doc本文に `agentdev_handoff: true` が含まれる場合、実装を開始せず停止する。agent-dev-flow repository への手動取り込み対象として報告する。判定は `agentdev-workflow-lifecycle` に従う
 
-### 準備フェーズ（Steps 1-4）
+### Step 2: Issue本文から要件docと受け入れ基準を抽出
 
-**べき等性**: worktreeとブランチが既に存在する場合、Step 4をスキップして実行担当サブエージェント委譲フェーズへ移行。
+**べき等性**: worktreeとブランチが既に存在する場合、Step 5をスキップして Step 6 へ移行。
 
-**Step 1**: Issue本文から要件docと受け入れ基準を抽出 → `agentdev-req-analysis` のチェックボックス品質基準で検証
+`agentdev-req-analysis` のチェックボックス品質基準で検証
 
-**Step 2**: `docs/adr/README.md` を読み込み、関連ADRを特定。関連ADRがあれば個別に読み込み、実装がADRの決定事項に矛盾しないことを確認
+### Step 3: 関連ADR特定
 
-**Step 3**: work_type 判定 → `agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定。scale は feature のみ standard/large。workflow_route は都度導出し保存しない
+`docs/adr/README.md` を読み込み、関連ADRを特定。関連ADRがあれば個別に読み込み、実装がADRの決定事項に矛盾しないことを確認
 
-**Step 4**: Worktree作成・ブランチ準備 → `agentdev-git-worktree` に従って実行。`origin/main` をベースとして明示的に指定。べき等チェック: worktree既存時は作成スキップ。**Wave 実行時・PR merge 後再開時は worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認すること**。詳細手順は `agentdev-git-worktree` 参照
+### Step 4: work_type 判定
 
-**Step 4-1**: 親Epicステータス更新（`agentdev-epic-tracker` 参照）
+`agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定。scale は feature のみ standard/large。workflow_route は都度導出し保存しない
 
-**Step 4-2**: worktree precondition gate（実行担当サブエージェント起動前の隔離検証）。`agentdev-git-worktree` の検証ヘルパー（`references/worktree-operations.md` の「worktree 内判定ヘルパー」参照）に従い、当該 Issue の worktree+ブランチが作成済みであることを検証する:
+### Step 5: Worktree作成・ブランチ準備
+
+`agentdev-git-worktree` に従って実行。`origin/main` をベースとして明示的に指定。べき等チェック: worktree既存時は作成スキップ。**Wave 実行時・PR merge 後再開時は worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認すること**。詳細手順は `agentdev-git-worktree` 参照
+
+**Step 5-1**: 親Epicステータス更新（`agentdev-epic-tracker` 参照）
+
+**Step 5-2**: worktree precondition gate（実行担当サブエージェント起動前の隔離検証）。`agentdev-git-worktree` の検証ヘルパー（`references/worktree-operations.md` の「worktree 内判定ヘルパー」参照）に従い、当該 Issue の worktree+ブランチが作成済みであることを検証する:
 
 - **検証1**: `git worktree list` の出力に当該 Issue の worktree（`.worktrees/{N}-{type}`）が含まれること
 - **検証2**: `git rev-parse --show-toplevel`（worktree 内で実行）の結果がメインリポジトリルートと**一致しない**こと（現在 worktree 内にいることの確認）
 
-**検証失敗時（worktree 未作成・メインリポジトリにいる）**: 実行担当サブエージェントを起動**せず**停止し、Step 4（Worktree作成・ブランチ準備）へ戻るようユーザーに報告する。実行担当サブエージェント委譲フェーズへ進んではならない。
+**検証失敗時（worktree 未作成・メインリポジトリにいる）**: 実行担当サブエージェントを起動**せず**停止し、Step 5（Worktree作成・ブランチ準備）へ戻るようユーザーに報告する。Step 6 へ進んではならない。
 
 本 gate は 適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提を保護する機構である。worktree 隔離が構造的に保証されているという前提を、実行時に検証して担保する。
 
-### 実行担当サブエージェント委譲フェーズ（Steps 5-6）
+### Step 6: 実行担当サブエージェント起動（task() 委譲）
 
-**Step 5: 実行担当サブエージェント起動（task() 委譲）**: 実装実行を `task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])` で委譲する。Sisyphus-Junior は oh-my-openagent 提供の OpenCode ネイティブエージェント型であり、CLI subprocess を介さず oh-my-openagent の実行エンジンを直接利用する。adapter protocol は `agentdev-case-run-execution-adapter` skill 参照。
+実装実行を `task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])` で委譲する。Sisyphus-Junior は oh-my-openagent 提供の OpenCode ネイティブエージェント型であり、CLI subprocess を介さず oh-my-openagent の実行エンジンを直接利用する。adapter protocol は `agentdev-case-run-execution-adapter` skill 参照。
 
 **委譲プロンプト**: `/ulw-loop Implement Issue #N: <Issue本文>`。Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情報）が含まれ得る。Sisyphus-Junior はこれを参考情報として扱い、束縛されない。
 
@@ -89,31 +95,32 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 - **外部実行手段の中間成果物**: 外部実行手段の plan artifact 等の中間成果物を AgentDevFlow の永続成果物（draft/Issue/PR/REQ/ADR/SPEC）として扱わない
 - **SPEC確定候補**: 実装時に発見された SPEC レベルの詳細（SPEC に記載すべき schema・enum・判定表・内部アルゴリズム等、実装で判明した仕様詳細）は、Sisyphus-Junior が PR 本文の `## SPEC確定候補` セクションに記録する。`## Findings / Capture候補`（本筋外発見・intake/learning 候補）とは別セクションとし、混在させない。SPEC確定候補は case-close Step 3 で SPEC 確定チェックの入力となり、draft → accepted 昇格または spec-save 再起動の判断材料となる
 
-**Step 6: 実行担当サブエージェント result 処理**: Sisyphus-Junior が返す3状態（`agentdev-case-run-execution-adapter` の result 契約）のいずれかを処理する:
+### Step 7: 実行担当サブエージェント result 処理
 
-- **completed(pr)**: 実装完了・PR作成済み。PR番号を受け取りクリーンアップフェーズへ。成功成果は PR 作成である
+Sisyphus-Junior が返す3状態（`agentdev-case-run-execution-adapter` の result 契約）のいずれかを処理する:
+
+- **completed(pr)**: 実装完了・PR作成済み。PR番号を受け取りクリーンアップStepへ。成功成果は PR 作成である
 - **blocked**: 回答可能な blocker。詳細本文は Issue コメントに SSoT として記録済み（Sisyphus-Junior 責務）。エラー処理に従い停止・ユーザー報告
 - **failed**: repository context で回答不能な blocker。詳細本文は Issue コメントに構造化して記録済み（Sisyphus-Junior 責務）。エラー処理に従い停止・ユーザー報告
 
-### Epic Wave 実行モード（`case-run #epic` 受領時）
+### Step 8: worktree クリーンアップ確認 + 完了報告
+
+- 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄・コミットは行わない
+- 未コミット変更なし: 完了報告へ。.sisyphus/ の削除は行わない（case-close で実施）
+- 完了報告templateに従って出力（Sisyphus-Junior result 状態・PR番号を含める）
+
+## Epic Wave 実行モード（`case-run #epic` 受領時）
 
 以下のフローに基づく。Epic Issue 番号を受け取った場合、以下のフローで現在 ready な Wave の子Issue を並列実行する。1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。同一コマンド再実行で次 Wave に進む（べき等・Epic Issue 本文から進行状況判定）。
 
 1. **Epic Issue 本文読込**: Epic Issue 本文から子Issue一覧・Wave 構成・ステータス追跡テーブルを読み取る（永続状態を SSoT とする）
 2. **現在 ready な Wave の子Issue 特定**: ステータス追跡テーブルから現在 ready な Wave の子Issue を特定する。`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択する。ただし前提Issue が blocked/failed の場合は `pending` のまま選択対象外
 3. **`git fetch origin` 実行**: 各子Issue の worktree 作成前に `git fetch origin` を実行し、origin/main の鮮度を確認する。詳細手順は `agentdev-git-worktree` 参照
-4. **子Issue の worktree 作成**: 各子Issue について Step 4（Worktree作成・ブランチ準備）・Step 4-2（precondition gate）を実行する
+4. **子Issue の worktree 作成**: 各子Issue について Step 5（Worktree作成・ブランチ準備）・Step 5-2（precondition gate）を実行する
 5. **各子Issue を task() で並列委譲**: 各子Issue を `task(subagent_type="Sisyphus-Junior", load_skills=["ulw-loop"])` で並列委譲する。**最大5件**まで同時起動。委譲プロンプトは `/ulw-loop Implement Issue #N: <Issue本文>`
-6. **全 task() 完了待機**: 全 task() の完了を待つ。各 task() は Step 6 の result 処理と同じ3状態を返す
+6. **全 task() 完了待機**: 全 task() の完了を待つ。各 task() は Step 7 の result 処理と同じ3状態を返す
 7. **結果収集**: 各子Issue の result（completed(pr)/ blocked/ failed）を収集する。子Issue ごとに worktree は独立しており、他子Issue の結果に依存しない（子Issue の結果は親コンテキストではなく永続状態に記録）
 8. **return**: 収集した結果（子Issue ごとの PR番号・blocked/failed の理由）を報告して return する。Wave 境界（PR マージ）は case-close の責務。`completed(pr)` となった子Issue を次 Wave へ進めるためには、case-close でマージ後に再度 `case-run #epic` を実行する（べき等）
-
-### クリーンアップフェーズ（Step 7）
-
-**Step 7**: worktree クリーンアップ確認 + 完了報告
-- 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄・コミットは行わない
-- 未コミット変更なし: 完了報告へ。.sisyphus/ の削除は行わない（case-close で実施）
-- 完了報告templateに従って出力（Sisyphus-Junior result 状態・PR番号を含める）
 
 ## エラー処理
 
@@ -135,7 +142,7 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 - G25: blocked/ failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。一時会話コンテキスト・中間ファイルは SSoT としない
 - G26: 外部実行ハーネスの plan artifact 等の中間成果物の内部構造に依存した処理・検証を行わない。最終結果は PR URL で受領する。
 - G29: 外部実行手段の中間成果物を AgentDevFlow の永続成果物として扱わない
-- G30: Step 5（Sisyphus-Junior 起動）の前に worktree+ブランチが作成済みであることを検証すること（Step 4-2 precondition gate）。未作成時・メインリポジトリにいる場合は Sisyphus-Junior を起動禁止（適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提保護）
+- G30: Step 6（Sisyphus-Junior 起動）の前に worktree+ブランチが作成済みであることを検証すること（Step 5-2 precondition gate）。未作成時・メインリポジトリにいる場合は Sisyphus-Junior を起動禁止（適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提保護）
 - G31: Sisyphus-Junior への引き渡しにおいて worktree root（相対パス・`.worktrees/{N}-{type}/`）を必ず含め、メインリポジトリパスを渡さないこと
 - G32: Epic Wave 実行モードでは1 Wave のみ実行し PR 作成で return する。Wave 境界（PR マージ）は case-close へ委譲する
 

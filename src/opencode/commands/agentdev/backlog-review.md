@@ -56,11 +56,11 @@ status: draft
 
 ## 手順
 
-### Step 0: 実行前同期
+### Step 1: 実行前同期
 
 `git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（`agentdev-git-worktree` と同一のエラー形式）。
 
-### Step 1: 成果物検出
+### Step 2: 成果物検出
 
 引数の有無に応じて対象を切り替える:
 
@@ -72,25 +72,25 @@ status: draft
 
 検出結果の判定:
 - **0件**: 正常終了（エラー扱いとしない）。完了報告で「対象なし」と報告
-- **1件以上**: ファイルパス昇順で Step 2 へ
+- **1件以上**: ファイルパス昇順で Step 3 へ
 
-### Step 2: 成果物読み込み・分析
+### Step 3: 成果物読み込み・分析
 
 分析基準・前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` を参照
 
-### Step 3: 統合・分割判定 + depends_on 依存解決 + ユーザー承認
+### Step 4: 統合・分割判定 + depends_on 依存解決 + ユーザー承認
 
 統合・分割判定基準・depends_on 依存解決ルールは `agentdev-backlog-integration` を参照
 
-### Step 4: 矛盾検出 + ユーザー承認
+### Step 5: 矛盾検出 + ユーザー承認
 
 矛盾検出ロジック・出力形式は `agentdev-backlog-integration` を参照
 
-### Step 5: RU 生成
+### Step 6: RU 生成
 
 RU 生成ルール・frontmatter スキーマ・depends_on 検証は `agentdev-backlog-integration` を参照
 
-### Step 6: 成功成果物の削除
+### Step 7: 成功成果物の削除
 
 RU 生成が成功した採用済み成果物のみを削除する:
 
@@ -98,18 +98,18 @@ RU 生成が成功した採用済み成果物のみを削除する:
 - **残置対象**: RU 化に失敗した成果物、矛盾により除外された成果物
 - 削除結果を記録する
 
-### Step 7: Git 永続化
+### Step 8: Git 永続化
 
 `.agentdev/` 配下の変更を commit/ push する:
 
 - `git diff --name-only` で `.agentdev/` 配下の変更を確認
 - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
 - **変更あり時**:
- 1. 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止
- 2. commit message: `chore(agentdev): generate requirement units via backlog-review`
- 3. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止
+  1. 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止
+  2. commit message: `chore(agentdev): generate requirement units via backlog-review`
+  3. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止
 
-### Step 8: 完了報告
+### Step 9: 完了報告
 
 完了報告 → 完了報告templateに従って出力:
 - 全て成功 → `.opencode/commands/agentdev/templates/backlog-review/standard.md`

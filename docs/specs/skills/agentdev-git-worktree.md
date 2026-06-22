@@ -14,7 +14,7 @@ Issue 番号に基づいて安全かつ一貫性のある方法で git worktree 
 ## 適用対象
 
 - worktree の作成・切り替え・完了後のクリーンアップ
-- case-run（Step 4 Worktree 作成・ブランチ準備・Step 4-2 precondition gate）
+- case-run（Step 5 Worktree 作成・ブランチ準備・Step 5-2 precondition gate）
 - case-close（Step 7 ブランチ・worktree 削除）
 - case-open・req-save・spec-save・case-auto（並列実行安全ステージングプロシージャ）
 
