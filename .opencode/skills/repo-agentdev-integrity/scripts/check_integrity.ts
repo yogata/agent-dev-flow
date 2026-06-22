@@ -5141,6 +5141,7 @@ function checkSkillCategoryGap(
     ["Mapping table history", ["MappingTableHistoryLabels"]],
     ["REQ verification basis", ["ReqVerificationBasis"]],
     ["Skill-internal section ref", ["SkillInternalSectionRef"]],
+    ["docs 日本語表現・文意整合", ["DocLanguageQuality"]],
   ]);
 
   let foundGap = false;
@@ -6738,6 +6739,72 @@ function checkLegacyNormativeMarkers(root: string): CheckResult[] {
   return results;
 }
 
+const SJ_ULWLOOP_PATTERN = /Sisyphus-Junior[\s]*[(（]\s*ulw-loop\s*[)）]/;
+const SJ_ULWLOOP_EXEMPT_PATHS: RegExp[] = [
+  /retired\/REQ-/,
+  /docs[\\/]+requirements[\\/]+REQ-/,
+  /mapping-table\.md$/,
+  /integrity-rule-catalog\.md$/,
+  /\.test\.ts$/,
+  /check_integrity\.ts$/,
+];
+
+function checkSisyphusJuniorUlwLoopMisclassification(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const scanDirs = [
+    path.join(root, "docs"),
+    path.join(root, ".opencode", "skills"),
+    path.join(root, ".opencode", "commands"),
+    path.join(root, "src", "opencode", "skills"),
+    path.join(root, "src", "opencode", "commands"),
+  ];
+
+  const mdFiles: string[] = [];
+  for (const dir of scanDirs) {
+    if (!fs.existsSync(dir)) continue;
+    if (fs.statSync(dir).isDirectory()) {
+      const entries = fs.readdirSync(dir, { recursive: true }) as string[];
+      for (const entry of entries) {
+        if (typeof entry === "string" && entry.endsWith(".md")) {
+          mdFiles.push(path.join(dir, entry));
+        }
+      }
+    }
+  }
+
+  let found = false;
+  for (const filePath of mdFiles) {
+    const content = readText(filePath);
+    if (!content) continue;
+    const relPath = resolveRelative(filePath, root);
+    if (SJ_ULWLOOP_EXEMPT_PATHS.some((re) => re.test(relPath))) continue;
+    const inCodeBlock = content.split("```");
+    const nonCodeParts = inCodeBlock.filter((_, i) => i % 2 === 0).join(" ");
+    if (SJ_ULWLOOP_PATTERN.test(nonCodeParts)) {
+      found = true;
+      results.push(
+        ng(
+          "ExecutionSubject",
+          "sisyphus-junior-ulw-loop-misclassification",
+          "'Sisyphus-Junior(ulw-loop)' misclassification found: /ulw-loop is a command, not a skill (REQ-0144-012/013)",
+          relPath,
+        ),
+      );
+    }
+  }
+
+  if (!found) {
+    results.push(
+      ok(
+        "ExecutionSubject",
+        "sisyphus-junior-ulw-loop-misclassification",
+        "No 'Sisyphus-Junior(ulw-loop)' misclassification detected (REQ-0144-013)",
+      ),
+    );
+  }
+  return results;
+}
+
 const CROSS_REQ_VOCAB_PATTERNS: Array<{
   current: string;
   deprecated: string[];
@@ -7376,6 +7443,7 @@ async function main(): Promise<void> {
     ...checkReqVerificationBasis(root),
     ...checkDocLanguageQuality(root), // IR-045 (REQ-0140)
     ...checkReqSpecBoundaryViolation(root), // IR-044 (REQ-0108-259)
+    ...checkSisyphusJuniorUlwLoopMisclassification(root), // REQ-0144-013
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)

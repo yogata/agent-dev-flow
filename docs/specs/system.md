@@ -31,6 +31,7 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプライン
 |---|---|---|---|
 | `agentdev-learning-capture`（スキル） | エージェント主体で学びを検知・抽出・自律蓄積 | キャプチャ層 | [skills/agentdev-learning-capture.md](skills/agentdev-learning-capture.md) |
 | `/agentdev/learning-promote` | learning entry を分析・分類・昇華判定 | 昇華層 | [commands/learning-promote.md](commands/learning-promote.md) |
+| `/agentdev/backlog-review` | 採用済み成果物を分析・統合し RU を生成 | backlog 層 | [commands/backlog-review.md](commands/backlog-review.md) |
 
 #### intake ワークフロー
 
