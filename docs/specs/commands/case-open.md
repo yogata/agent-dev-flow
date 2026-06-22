@@ -46,7 +46,7 @@ updated: 2026-06-22
   - Step 4: テンプレート読込（`agentdev-workflow-templates`）
   - Step 5: Epic Issue本文生成 — 自律構成分析結果に基づき Epic 本文を構築
   - Step 6: Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）— VERIFY
-  - Step 7: 子Issue作成（OU 単位・順次処理）— Issue化単位は REQ doc 単位ではなく OU 単位（REQ-0104-042）
+  - Step 7: 子Issue作成（OU 単位・順次処理）— Issue化単位は REQ doc 単位ではなく OU 単位（REQ-0104-042）。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-0146-011・`docs/specs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
   - Step 8: Epic Issue本文更新 — ステータス追跡テーブル更新
   - Step 8-1: OU `result` 書き戻し — Issue / Epic 番号
 - Standard flow（Steps 14-16-1）:
@@ -58,8 +58,9 @@ updated: 2026-06-22
   - Step 17: コメント追加（`agentdev-workflow-templates`）
   - Step 18: ドラフト削除（`git rm` + `git commit` Form Zero）
   - Step 18-1: RU ファイル削除（`git rm` + `git commit` Form Zero）
-  - Step 18-1-1: draft / RU 削除残存検証 — `git status --porcelain` で残存検出
-  - Step 18-2: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
+- Step 18-1-1: draft / RU 削除残存検証 — `git status --porcelain` で残存検出
+- Step 18-1-2: draft/RU 削除 commit 後の即時 push（REQ-0146-003） — Step 18 / 18-1 の削除コミット後に `git push` を即時実行する。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
+- Step 18-2: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
 
 ## 参照する横断 SPEC
 

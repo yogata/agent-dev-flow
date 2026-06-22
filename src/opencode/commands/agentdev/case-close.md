@@ -106,7 +106,9 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
  - 最大5回リトライ（初期試行 + 5回リトライ）
  - 各リトライ試行をログ記録
  - **全リトライ失敗時のフォールバック**: フォールバック手順は template (`.opencode/commands/agentdev/templates/case-close/standard.md`) を参照
- - 対応記録コメントをIssueに追記 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Readして `agentdev-gh-cli` の VERIFY 操作に従って内容検証
+ - 対応記録コメントをIssueに追加 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Readして `agentdev-gh-cli` の VERIFY 操作に従って内容検証
+
+**Step 4-1: Squash merge 後のローカル先行 commit 検出・処理（REQ-0146-005）** — squash merge 完了後、ローカルに remote 未 push の先行 commit が存在する場合、`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順（log/diff/reset）に従い検出・内容重複確認・reset を実行する。手順詳細は `agentdev-git-worktree` の references/git-common-procedures.md 「Squash merge 後分岐ハンドリング手順（REQ-0146-006）」セクション参照。本処理により `git pull --ff-only` 失敗を予防する
 
 ### Step 5: Post-merge テスト戦略検証
 

@@ -87,6 +87,22 @@ case-run が Sisyphus-Junior を起動する際の委譲プロンプト構築例
 - `<worktree>`: case-run が用意した worktree root とブランチ名を明示。メインリポジトリパスは含めない
 - `<Issue body>`: 対象 Issue の本文。Sisyphus-Junior は完了条件・受け入れ基準を success criteria に分解する
 
+## 委譲プロンプト雛形（委譲契約必須テンプレート・REQ-0146-002）
+
+委譲プロンプトには以下の「## Findings / Capture候補」テンプレートを必須として含めること。Sisyphus-Junior が本筋外発見を分類・回収するための構造を提供する。
+
+```markdown
+## Findings / Capture候補
+
+### intake
+（intake 候補をここに記述。本筋外発見・intake inbox 該当項目等）
+
+### learning
+（learning 候補をここに記述。再発防止知見・学び等）
+```
+
+case-run は委譲プロンプト構築時に本テンプレート構造を維持し、Sisyphus-Junior からの result に含まれる回収項目を PR 本文に転記する。
+
 ## 懸念点・未検証事項
 
 本実装ノートは 承認時点の記述であり、以下は実体検証が必要な項目である。実運用で判明した挙動は本ファイルに随時反映すること。

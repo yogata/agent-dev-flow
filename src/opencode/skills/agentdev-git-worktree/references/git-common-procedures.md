@@ -306,4 +306,63 @@ command 側には共通処理の詳細本文ではなく、使用するプロシ
 
 3. **push失敗時の構造化エラー**（ドメイン状態永続化プロシージャに定義済み）を適用
 
+---
+
+## Squash merge 後分岐ハンドリング手順（REQ-0146-006）
+
+squash merge（`gh pr merge --squash`）実行後にローカルと remote で分岐（divergent）が発生した場合のハンドリング手順。本手順は case-close Step 4-1 から参照される。
+
+### 前提確認
+
+本手順は PR squash merge 完了後に適用される。squash merge により remote 側に1つの統合 commit が作成される一方、ローカル側には元の個別 commit が残存する場合、ローカルと remote が分岐状態となる。
+
+### 手順
+
+1. **ローカル先行 commit 検出**:
+   ```bash
+   git fetch origin
+   git log origin/{branch}..HEAD --oneline
+   ```
+   出力が空でない場合、ローカルに remote 未 push の commit が存在する。
+
+2. **remote 先行 commit 確認**:
+   ```bash
+   git log HEAD..origin/{branch} --oneline
+   ```
+   出力が空でない場合、remote 側に squash merge 結合 commit が存在する。
+
+3. **内容重複確認**:
+   ```bash
+   git diff origin/{branch} HEAD --name-status
+   ```
+   ローカル先行 commit の変更ファイルと squash merge 統合 commit の変更ファイルの重複を確認する。
+
+4. **処理分岐**:
+   - **完全重複**: ローカル先行 commit の変更が squash merge に完全に含まれている場合 → `git reset --hard origin/{branch}` でローカル先行 commit を破棄し、squash merge 状態に reset する
+   - **部分重複**: 一部変更が重複している場合 → ユーザーに状況を報告し、`git reset --soft origin/{branch}` での soft reset または手動解決を提案
+   - **独立変更**: 重複なし・独立した変更がある場合 → ユーザーに状況を報告し、対応を委ねる
+
+### 構造化エラー: 分岐検出時
+
+```markdown
+## Squash Merge 後分岐検出エラー
+
+**対象ブランチ**: {current_branch}
+**ローカル先行コミット**:
+{git log origin/{branch}..HEAD --oneline の出力}
+**remote 先行コミット**:
+{git log HEAD..origin/{branch} --oneline の出力}
+**重複分析**: {完全重複|部分重複|独立変更}
+**ユーザーアクション**: 内容を確認し、対応を選択してください
+- 完全重複: `git reset --hard origin/{branch}` で reset
+- 部分重複: `git reset --soft origin/{branch}` で soft reset または手動解決
+- 独立変更: 手動で状況を確認して対応
+```
+
+### 各 command の参照方法
+
+command 側（case-close 等）には以下のように参照する:
+
+- 「`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順（REQ-0146-006）に従い、ローカル先行 commit 検出・内容重複確認・reset を実行」
+
 
