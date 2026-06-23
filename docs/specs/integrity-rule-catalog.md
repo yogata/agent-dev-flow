@@ -535,7 +535,7 @@ updated: 2026-06-22
 | Field | Value |
 |-------|-------|
 | rule_id | IR-026 |
-| description | current ADR に技術判断不在・REQ/SPEC 相当内容の混入・ADR-0103 適合外・文書種別不一致の兆候がないこと（REQ-0112-043） |
+| description | 現行 ADR に技術判断不在・REQ/SPEC 相当内容の混入・ADR-0103 適合外・文書種別不一致の兆候がないこと（REQ-0112-043） |
 | severity | heuristic |
 | category | canonical-conflict |
 | detection_method | ADR 本文の内容分析（技術判断の有無、REQ/SPEC 相当キーワード検出） |
@@ -635,7 +635,7 @@ updated: 2026-06-22
 | Field | Value |
 |-------|-------|
 | rule_id | IR-031 |
-| description | current docs/source の Findings/Intake 系見出しが `Findings / Capture候補` に統一され、旧語は projection 側または integrity rule の検出目的に限って残存していること |
+| description | 現行 docs/source の Findings/Intake 系見出しが `Findings / Capture候補` に統一され、旧語は projection 側または integrity rule の検出目的に限って残存していること |
 | severity | heuristic |
 | category | obsolete-structure |
 | detection_method | `Findings`, `Capture候補`, `Intake` 周辺の見出しを検出し、current/source の見出し統一と REQ-0119-021 の検出目的例外を判定 |
@@ -1192,7 +1192,7 @@ checkDocLanguageQuality (IR-045)
 1. **既存 NG への副作用評価**: 新ルールが既存ルールの誤検知を増加させないか。特に exemption 条件・baseline_status・severity 分類の整合性を確認する
 2. **catalog エントリ追加**: `integrity-rule-catalog.md` に 15 フィールド以上の IR エントリを `baseline_status: new` で追加する
 3. **実装追加**: `check_integrity.ts` に検出関数を実装する。exemption 条件・false_positive_risk を実装に反映する
-4. **fixture 更新**: `check_integrity.test.ts` の valid fixture が新ルールで NG とならないことを確認する（drift detection smoke test）
+4. **テストデータ更新**: `check_integrity.test.ts` の有効なテストデータ（valid fixture）が新ルールで NG とならないことを確認する（drift detection smoke test）
 5. **vocabulary-registry 同期**: 新ルールが語彙検出に関わる場合、`vocabulary-registry.md` を更新する
 6. **categoryToCheckPattern map 更新**: `check_integrity.ts` の category-to-check-pattern map に新カテゴリを追加する（skill-category-gap 解消・REQ-0144-005）
 
