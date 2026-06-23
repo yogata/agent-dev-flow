@@ -2,15 +2,15 @@
 
 GitHub Issue の作成、更新、リンク、確認を安全に行うための手順。
 本書は `agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）と連携し、Issue 操作特有の安全性要件を補完する。
-各手順の読み取りは `agentdev-gh-cli` の安全な読み取り手順（Node.js `execSync` + 一時ファイル経由 + Read tool）に従うこと。
+各手順の読み取りは `agentdev-gh-cli` の読み取り手続きに従うこと。
 
 ## Issue 作成後の内容反映確認
 
-`gh issue create` 実行後、Issue番号を取得し、本文が正しく反映されたかを確認する。
+Issue 作成手続き（agentdev-gh-cli）実行後、Issue番号を取得し、本文が正しく反映されたかを確認する。
 
-1. `gh issue create` の標準出力から Issue番号（`#N` または Issue URL）を取得する。
-Issue番号を取得できない場合は作成失敗とみなし、再作成前に `gh issue list` で重複、既存 Issue の有無を確認する。
-2. 作成した Issue の本文を `agentdev-gh-cli` の安全な読み取り手順で取得する（`gh issue view {N} --json body -q .body` を Node.js `execSync` 経由で一時ファイルに書き出し、Read tool で読む）。
+1. Issue 作成手続き（agentdev-gh-cli）の戻り値から Issue番号（`#N` または Issue URL）を取得する。
+Issue番号を取得できない場合は作成失敗とみなし、再作成前に Issue/PR 一覧取得手続き（agentdev-gh-cli）で重複、既存 Issue の有無を確認する。
+2. 作成した Issue の本文を Issue 本文読込手続き（agentdev-gh-cli）で取得する。
 3. `agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）に従い、書き込み元テキストと読み戻しテキストを以下の観点で比較検証する。
  - **(a) エンコーディング検証**: 日本語文字列の一致、制御文字の混入有無
  - **(b) Markdown 構造検証**: テーブル列数、チェックボックス、コードブロック、リスト階層
@@ -50,11 +50,10 @@ Epic Issue 本文内のステータス追跡テーブル（総数、進行中、
 
 ## Issue 更新時の前後内容比較
 
-`gh issue edit` で既存 Issue を更新する場合、更新前の本文を保存し、更新後に差分を比較する。
+Issue 本文更新手続き（agentdev-gh-cli）で既存 Issue を更新する場合、更新前の本文を保存し、更新後に差分を比較する。
 
-1. 更新前に Issue 本文を安全な読み取り手順で取得し、一時ファイル（実行時作業領域配下）に保存する（更新前スナップショット）。
-2. 更新内容をマージした新しい本文を生成し、`--body-file`/ `-F` で書き込む。
-`--body "..."` 直接指定は `agentdev-gh-cli` により禁止。
+1. 更新前に Issue 本文を Issue 本文読込手続き（agentdev-gh-cli）で取得し、一時ファイル（実行時作業領域配下）に保存する（更新前スナップショット）。
+2. 更新内容をマージした新しい本文を生成し、Issue 本文更新手続き（agentdev-gh-cli）で書き込む。
 
 3. 更新後、再度本文を取得し、更新前スナップショットと比較する。
 意図した差分のみが反映され、意図しない削除、文字化け、セクション欠落が発生していないか確認する。
@@ -62,19 +61,17 @@ Epic Issue 本文内のステータス追跡テーブル（総数、進行中、
 4. `agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）を適用し、エンコーディング、Markdown 構造、テンプレート必須セクション、リポジトリ参照リンクを検証する。
 5. 検証完了後、更新前スナップショットの一時ファイルを削除する。
 
-## --body-file 使用時の Issue 内容検証
+## Issue 内容検証（agentdev-gh-cli VERIFY 連携）
 
-`gh issue create`/ `gh issue edit` で `--body-file`/ `-F` を使用する場合、ファイル内容と反映内容の一致を検証する。
-本手順は `agentdev-gh-cli` の WRITE 操作、VERIFY 操作と連携する。
+Issue 作成手続き/ Issue 本文更新手続き（agentdev-gh-cli）を使用する場合、ファイル内容と反映内容の一致を検証する。
+本手順は `agentdev-gh-cli` の I/O 手続き、VERIFY 操作と連携する。
 
 
-1. `agentdev-gh-cli` の WRITE 操作標準手順に従い、本文を一時ファイル（実行時作業領域配下の `gh-temp-{timestamp}.md`）に UTF-8 (BOMなし)、LF 改行で書き出す。
-PowerShell の `Out-File`/ `Set-Content`/ `>` リダイレクトは禁止。
-OpenCode の Write tool または `[System.IO.File]::WriteAllText` + `UTF8Encoding($false)` を使用する。
+1. `agentdev-gh-cli` の標準版実装（references/standard-procedures.md）に従い、本文の書き込みを行う。具体的なファイル書き出し、エンコーディング、フラグの扱いは `agentdev-gh-cli` が管理する。
 
-2. `gh issue create -F {file}` または `gh issue edit {N} -F {file}` を実行する。
+2. Issue 作成手続き/ Issue 本文更新手続き（agentdev-gh-cli）を実行する。
 
-3. Issue 本文を安全な読み取り手順で取得し、`agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）で検証する。
+3. Issue 本文を Issue 本文読込手続き（agentdev-gh-cli）で取得し、`agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）で検証する。
 
 4. 検証失敗時は `agentdev-gh-cli` のリトライロジック（同一内容リトライ → 内容再生成 → 停止、ユーザー報告）に従う。
 リトライ上限到達時は自動的な代替手段を実行せず、ユーザーに差分内容、試行段階、リトライ回数を報告して停止する。
@@ -82,12 +79,12 @@ OpenCode の Write tool または `[System.IO.File]::WriteAllText` + `UTF8Encodi
 
 ## 禁止事項
 
-- `--body "..."` による直接本文指定禁止（`agentdev-gh-cli` 準拠）
+- GitHub Issue 操作は agentdev-gh-cli の手続きへ委譲（gh コマンド直接記述禁止、REQ-0149）
 - Issue番号を確認せずに後続操作へ進むこと禁止
 - Parent/Child リンクの片方向のみ確認して完了とすること禁止（双方向確認が必須）
 - Epic テーブル更新後に VERIFY 操作を省略すること禁止
 - `#{TBD}`/ `#{TBD_Wn}` 等のプレースホルダーが残存している状態で Issue 作成、更新を完了とすること禁止
-- 更新前スナップショットを取得せずに `gh issue edit` を実行すること禁止
+- 更新前スナップショットを取得せずに Issue 本文更新手続き（agentdev-gh-cli）を実行すること禁止
 - **Epic Issue 本文ステータス追跡テーブルの更新を case-close 以外のコマンド（case-run、case-auto）が直接行うこと禁止**（単一書き手制約）。case-run は読み取りのみ、case-auto は Wave 反復制御のみとし、Epic Issue 本文への書き込みは case-close に限定する
 
 

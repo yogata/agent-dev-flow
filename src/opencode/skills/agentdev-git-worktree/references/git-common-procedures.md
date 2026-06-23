@@ -140,7 +140,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 
 ## 4. PR merge 前 HEAD hash 記録
 
-`gh pr merge` 実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する。
+PR merge 手続き（agentdev-gh-cli）実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する。
 自マージ検出で使用する。
 
 ---
@@ -169,7 +169,7 @@ PR squash merge および `git pull --ff-only` の実行前に、ローカル未
 ### 前提確認
 
 PR 番号が解決済みであること。
-`gh pr view` が実行可能であること。
+PR 補助データ読込手続き（agentdev-gh-cli）が実行可能であること。
 
 ### 手順
 
@@ -181,7 +181,7 @@ PR 番号が解決済みであること。
 
 2. 対象 PR 変更ファイル一覧を取得:
    ```bash
-   gh pr view {pr_number} --json files --jq '.files[].path'
+   PR 補助データ読込手続き（agentdev-gh-cli）で変更ファイル一覧を取得
    ```
 
 3. 両者の重複ファイルを特定:
@@ -192,7 +192,7 @@ PR 番号が解決済みであること。
 4. 結果に応じた分岐:
  - **重複ファイルあり**: 以下の構造化警告を提示して merge/pull を停止し、ユーザーによる対応を促す
  - **重複ファイルなし**: 後続ステップ（merge/ pull）へ進む
- - **`gh pr view` 実行不可時**: 本チェックをスキップし、後方互換性として「1. 実行前同期」プロシージャのローカル変更検出でフォールバック検出を維持する
+  - **PR 補助データ読込手続き（agentdev-gh-cli）実行不可時**: 本チェックをスキップし、後方互換性として「1. 実行前同期」プロシージャのローカル変更検出でフォールバック検出を維持する
 
 ### 警告: 重複ファイル検出
 
@@ -323,7 +323,7 @@ command 側には共通処理の詳細本文ではなく、使用するプロシ
 
 ## Squash merge 後分岐ハンドリング手順（REQ-0146-006）
 
-squash merge（`gh pr merge --squash`）実行後にローカルと remote で分岐（divergent）が発生した場合のハンドリング手順。
+squash merge（PR merge 手続き、agentdev-gh-cli）実行後にローカルと remote で分岐（divergent）が発生した場合のハンドリング手順。
 本手順は case-close Step 4-1 から参照される。
 
 ### 前提確認

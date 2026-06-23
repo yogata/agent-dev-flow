@@ -21,7 +21,7 @@ case-run (orchestration)
         ├── ADR / REQ / SPEC / docs / repository context 再確認
         ├── `/ulw-loop` command による evidence-backed 実装・品質ゲート（code review + QA review + gate review）
         ├── blocker 処理
-        ├── gh pr create による PR 作成（PR URL を result に格納）
+        ├── PR 作成手続き（agentdev-gh-cli）による PR 作成（PR URL を result に格納）
         └── result を case-run へ返却
 ```
 
@@ -36,7 +36,7 @@ Sisyphus-Junior は以下を順に実行する:
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。ulw-loop が Issue を success criteria に分解する
 2. **context 再確認**: ADR/ REQ/ SPEC/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する
-3. **実装、検証、PR 作成**: ulw-loop に従い evidence-backed に実装を実行し、品質ゲートを通して `gh pr create` で PR を作成する。ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する
+3. **実装、検証、PR 作成**: ulw-loop に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（agentdev-gh-cli）で PR を作成する。ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する
 4. **blocker 処理**: 回答可能な blocker（ADR/REQ/SPEC/docs/Issue本文で回答できるもの）は自律的に ulw-loop 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
 
