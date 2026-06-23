@@ -1,6 +1,6 @@
 # 整合性契約
 
-> **Scope**: 本 SPEC は agent-dev-flow リポジトリのみに適用される。
+本 SPEC は agent-dev-flow リポジトリのみに適用される。
 
 ## 目的
 

@@ -130,7 +130,7 @@ cd .agentdev-plugin && git pull && cd ..
 - consumer-generated での `generated_by` 識別子を持たないファイル、異なる識別子を持つファイルの上書き（REQ-0141-012, 013）
 - consumer-generated での `.opencode/` が `src/opencode/` 配下へ解決される環境での生成実行（REQ-0141-010）
 
-> **注意**: `agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-0106）。docs-check は `repo-agentdev-integrity`（配布対象外スキル）として AgentDevFlow 本体リポジトリでのみ実行される。適用プロジェクトには配布されない。
+`agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-0106）。docs-check は `repo-agentdev-integrity`（配布対象外スキル）として AgentDevFlow 本体リポジトリでのみ実行される。適用プロジェクトには配布されない。
 
 ## インストール方式の方針
 

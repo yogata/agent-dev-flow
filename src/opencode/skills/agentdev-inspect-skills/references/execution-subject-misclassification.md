@@ -4,7 +4,7 @@
 
 ## 適用範囲
 
-Command→Skill 参照妥当性診断において、文書内で言及される実行主体（command / skill / subagent / harness）の分類が正確かを診断する。実行主体の誤認は `load_skills` への誤指定や委譲契約不整合を引き起こすため、本診断観点で検出する。
+Command→Skill 参照妥当性診断で、文書内で言及される実行主体（command / skill / subagent / harness）の分類が正確かを診断する。実行主体の誤認は `load_skills` への誤指定や委譲契約不整合を引き起こすため、本診断観点で検出する。
 
 機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子の skill 表記）は `docs/specs/integrity-rule-catalog.md`（IR-050、IR-051、REQ-0108-261）が担う。本診断はより複雑な文脈依存の誤認（command と skill の混同等）を担う。
 

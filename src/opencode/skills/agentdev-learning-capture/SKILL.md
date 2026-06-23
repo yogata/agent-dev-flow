@@ -55,7 +55,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 - `.agentdev/learning/inbox.md` — 最新の学び（常にここに追加）
 - `.agentdev/learning/archive/active.md` — 過去の学び（`/agentdev/learning-promote` 実行時に移動）
 
-> **注意**: inbox.md、archive/active.mdが存在しない場合、エージェントは当該ファイルを作成してから追記する。
+inbox.md、archive/active.mdが存在しない場合、エージェントは当該ファイルを作成してから追記する。
 
 ### ファイル操作とgit永続化の分離
 
@@ -83,7 +83,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 > **基準テンプレート**: [references/capture-entry-template.md](references/capture-entry-template.md) — エージェントは推論でフォーマットを組み立てず、この基準テンプレートから取得すること。
 
-> **注意**: `**タグ**` フィールドは人間の可読性のため保持している。セマンティック分析（`/agentdev/learning-promote` 内部フェーズ）ではタグに依存せず、LLMが内容からテーマを判定する。
+`**タグ**` フィールドは人間の可読性のため保持している。セマンティック分析（`/agentdev/learning-promote` 内部フェーズ）ではタグに依存せず、LLMが内容からテーマを判定する。
 
 #### フィールド記述ガイドライン
 
@@ -92,7 +92,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 | 問題事象 | 必須 | 事実ベースで客観的に |
 | 発生局面 | 必須 | 定型値推奨: 実装/CI/レビュー/デプロイ/運用 |
 | 検知方法 | 必須 | どう見つけたか |
-| 根本原因 | 必須 | 表面的でなく根本的に |
+| 根本原因 | 必須 | 表面的でなく |
 | 自律対応内容 | 必須 | エージェントが行った具体的アクション |
 | ユーザー確認有無 | 必須 | あり/なし の二値 |
 | ADR/REQ/spec影響 | 必須 | 「なし」でも明記。ユーザー確認「あり」の時は特に注意 |

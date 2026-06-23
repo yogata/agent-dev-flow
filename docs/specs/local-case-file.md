@@ -11,7 +11,7 @@ updated: 2026-06-20
 
 ## 目的
 
-GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）において、Issue / PR 相当の永続情報を保持する Case ファイルの構造を定義する（REQ-0141-016〜020, 024）。ローカル版コマンド（`case-open` / `case-run` / `case-close`）は本 SPEC に従って `.agentdev/cases/case-{NNNN}.md` を生成、更新する。
+GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）で、Issue / PR 相当の永続情報を保持する Case ファイルの構造を定義する（REQ-0141-016〜020, 024）。ローカル版コマンド（`case-open` / `case-run` / `case-close`）は本 SPEC に従って `.agentdev/cases/case-{NNNN}.md` を生成、更新する。
 
 ## 配置先
 
