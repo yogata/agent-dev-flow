@@ -19,7 +19,7 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプライン
 | `/agentdev/req-define` | 要件定義（壁打ち） | prometheus | [commands/req-define.md](commands/req-define.md) |
 | `/agentdev/req-save` | 要件定義の保存 | sisyphus | [commands/req-save.md](commands/req-save.md) |
 | `/agentdev/spec-save` | SPEC 候補の保存・確定 | sisyphus | [commands/spec-save.md](commands/spec-save.md) |
-| `/agentdev/case-open` | Issue 登録（Epic + 子 Issue 一括作成対応） | sisyphus | [commands/case-open.md](commands/case-open.md) |
+| `/agentdev/case-open` | Issue 登録（連結成分ベース複数 Standard/Epic 構成生成・3軸判断） | sisyphus | [commands/case-open.md](commands/case-open.md) |
 | `/agentdev/case-run` | 実装パイプライン（3 フェーズ構成） | sisyphus | [commands/case-run.md](commands/case-run.md) |
 | `/agentdev/case-update` | Issue 更新 | sisyphus | [commands/case-update.md](commands/case-update.md) |
 | `/agentdev/case-close` | 完了処理（達成判定プロトコル付き完了ゲート） | sisyphus | [commands/case-close.md](commands/case-close.md) |
