@@ -41,7 +41,7 @@
 | [REQ-0129](requirements/REQ-0129.md) | Backlog-review | backlog-review コマンド定義 |
 | [REQ-0130](requirements/REQ-0130.md) | case-run / 実装パイプライン | case-run 3フェーズ構成・自律修正ループ |
 | [REQ-0131](requirements/REQ-0131.md) | case-close / 完了処理 | case-close 完了ゲート・QG-4・達成判定 |
-| [REQ-0132](requirements/REQ-0132.md) | case-open / Issue作成 | case-open Epic・子Issue作成 |
+| [REQ-0132](requirements/REQ-0132.md) | case-open / Issue作成 | case-open Epic・子Issue作成、連結成分ベース複数Standard/Epic構成生成・3軸判断・単独根Standard flow |
 | [REQ-0133](requirements/REQ-0133.md) | case-update / Issue更新 | case-update Issue本文更新・コメント追加 |
 | [REQ-0134](requirements/REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install | source/projection layout、sync/migration script、repo type、consumer install |
 | [REQ-0135](requirements/REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry、`.sisyphus/` 除外 |
