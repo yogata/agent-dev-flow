@@ -89,7 +89,7 @@ updated: 2026-06-20
 
 ### 残存 GitHub 固有参照の違反判定基準
 
-`transform/generate.md` は残存する GitHub 固有参照の違反判定基準を明記すること（REQ-0141-029）。
+本判定基準は `transform/spec.md` に正本として集約し、`transform/generate.md`・`transform/review.md` はこれを参照すること（REQ-0141-029）。
 
 | 参照の性質 | 違反/非違反 |
 |---|---|
@@ -175,9 +175,9 @@ updated: 2026-06-20
 `transform/spec.md` は少なくとも以下を含むこと。
 
 - 変換対象コマンド / スキル / ひな形の一覧
-- ガードレール一覧（`transform/generate.md` と同一内容を保持し整合すること）
-- レポートフォーマット（`transform/generate.md` と同一の必須項目を保持し整合すること）
-- 残存 GitHub 固有参照の違反判定基準
+- ガードレール一覧（正本。`transform/generate.md` は本ファイルを参照すること）
+- レポートフォーマット（正本。`transform/generate.md` は本ファイルを参照すること）
+- 残存 GitHub 固有参照の違反判定基準（根拠列を含む正本。`transform/generate.md`・`transform/review.md` は本ファイルを参照すること）
 
 ## 関連項目
 

@@ -92,7 +92,6 @@ labels: [feature]
 ### 禁止遷移
 
 - `blocked` から `closed` への直接遷移は禁止する。`blocked` から `closed` に至る場合は `review` を経由する。
-- 終端状態（`closed`, `cancelled`）からの遷移は定義しない。
 
 ## 採番規則
 
