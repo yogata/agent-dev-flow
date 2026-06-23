@@ -5,7 +5,7 @@ agent: sisyphus
 
 # 要件保存（壁打ち→docs永続化）
 
-req-define（Prometheus）で壁打ちした成果物をREQ/ADRファイルとしてdocs/に保存し、コミット、プッシュする。
+req-defineで生成された壁打ち成果物をREQ/ADRファイルとしてdocs/に保存し、コミット、プッシュする。
 壁打ちフェーズで使用（REQ/ADR 対象 artifact_actions がある場合）。
 `work_type` による消費判定は廃止し、`artifact_actions` の有無で判定する。
 
@@ -185,6 +185,3 @@ ADR保存の直前に、以下の妥当性を再検証すること:
 
 ### Issue作成制約
 - G11: req-saveはIssueを作成してはならない。Issue作成はcase-openの責任範囲である
-
-
-
