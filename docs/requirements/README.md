@@ -18,7 +18,7 @@
 | [REQ-0110](REQ-0110.md) | Git worktree cleanup 信頼性 | git-worktree、リトライ、cleanup、prune フォールバック、tracked files 復元、Windows + junction フォールバック |
 | [REQ-0112](REQ-0112.md) | ADRライフサイクル・文書体系基盤・実行時独立性 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、6状態否定、integrity検査追加、ADR全面改定例外・01XX baseline・retired移動 |
 | [REQ-0113](REQ-0113.md) | Skill References SPEC分離 | skill / skill references 内 SPEC 相当記述の分離基準、移管先 SPEC 選択、実行時自己完束制約 |
-| [REQ-0114](REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件、Epic flowクリーンアップ検証ゲート、Standard flow複数draft一括処理、Issue番号/URL入力case-run移行、独立OU並列委譲・自動Epic化 |
+| [REQ-0114](REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件、Epic flowクリーンアップ検証ゲート、Standard flow複数draft一括処理、Issue番号/URL入力case-run移行、連結成分ベース複数Standard/Epic分散（REQ-0114-088破壊的UPDATE） |
 | [REQ-0119](REQ-0119.md) | コマンド・スキル・サブエージェント責務分界 | command 薄型化 / skill 詳細移管 / サブエージェント委譲境界 / Step 整数化 / verbatim 条件付き / delegation_type SPEC降格 / ADR-0112 承認済み化 |
 | [REQ-0123](REQ-0123.md) | workflow-lifecycle 宣言的定義責務とコマンド固有手順のスキル分担 | workflow-lifecycle 責務限定実装 / 4新規スキル移管 / Skill粒度基準 / DO NOT USE FOR整合 |
 | [REQ-0124](REQ-0124.md) | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle | inspect-docs/skills/promote 命名統一、diagnostics→inspect 全面改名完了状態、draft type 単一化、inspect ドメイン状態、inspect 命名恒久制約 |
