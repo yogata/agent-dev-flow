@@ -61,4 +61,4 @@ updated: 2026-06-21
 - [agentdoc-architecture-advisory.md](agentdev-architecture-advisory.md)
 - [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)
 - [commands/req-define.md](../commands/req-define.md)
-- REQ-0102 — 要件定義・保存
+- REQ-0102（要件定義・保存）

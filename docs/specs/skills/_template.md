@@ -55,7 +55,7 @@ USE FOR / DO NOT USE FOR を記述。
 
 ## See Also
 
-- [commands/_template.md](../commands/_template.md) — command SPEC テンプレート
-- [workflows/](../workflows/) — 横断ワークフロー契約
-- ADR-0123 — SPEC lifecycle（draft/accepted）
-- REQ-0136 — REQ/SPEC 責務分離
+- [commands/_template.md](../commands/_template.md)（command SPEC テンプレート）
+- [workflows/](../workflows/)（横断ワークフロー契約）
+- ADR-0123（SPEC lifecycle（draft/accepted））
+- REQ-0136（REQ/SPEC 責務分離）

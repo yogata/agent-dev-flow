@@ -32,20 +32,20 @@ updated: 2026-06-21
 ## 現在の動作
 
 - Step 1: 期間解釈（`agentdev-intake-pipeline`）
-- Step 2: データ取得（`agentdev-intake-pipeline`）— クローズ済み Issue/PR のみ対象（G10）
+- Step 2: データ取得（`agentdev-intake-pipeline`）（クローズ済み Issue/PR のみ対象（G10））
 - Step 3: 構造的検出（`agentdev-intake-pipeline`）
 - Step 4: LLM 全文解析（`agentdev-intake-pipeline`）
 - Step 5: intake item 生成（`agentdev-intake-pipeline`）
-- Step 5-1: 実行前同期 — `git pull --ff-only`
-- Step 6: 保存 — `.agentdev/intake/inbox/`（同名時連番）
-- Step 6-1: commit/push — `.agentdev/intake/` 配下変更のみ
+- Step 5-1: 実行前同期（`git pull --ff-only`）
+- Step 6: 保存（`.agentdev/intake/inbox/`（同名時連番））
+- Step 6-1: commit/push（`.agentdev/intake/` 配下変更のみ）
 - Step 7: サマリーレポート提示
 - Step 8: 完了報告
 
 ## 参照する横断 SPEC
 
-- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) — Capture 境界
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md) — backlog draft プロトコル
+- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（backlog draft プロトコル）
 
 ## 対象外
 
@@ -67,7 +67,7 @@ updated: 2026-06-21
 
 ## See Also
 
-- [intake-capture.md](intake-capture.md) — 手動 capture
-- [intake-promote.md](intake-promote.md) — 後続コマンド（採用判断）
-- `agentdev-intake-pipeline` skill — 抽出アルゴリズム
-- REQ-0127 — Intake command群
+- [intake-capture.md](intake-capture.md)（手動 capture）
+- [intake-promote.md](intake-promote.md)（後続コマンド（採用判断））
+- `agentdev-intake-pipeline` skill（抽出アルゴリズム）
+- REQ-0127（Intake command群）

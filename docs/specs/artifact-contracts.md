@@ -103,8 +103,8 @@ Command 固有の実行順序・Issue 作成・保存・更新・削除・完了
 | 種別 | 推奨上限 | 実運用上限 | 例外状態 |
 |---|---|---|---|
 | Command | 100 行 | 150 行 | 200 行超 |
-| SKILL.md | 200 行 | — | docs-check で報告 |
-| Steps 数 | 5〜12 個 | — | — |
+| SKILL.md | 200 行 | - | docs-check で報告 |
+| Steps 数 | 5〜12 個 | - ||
 
 ## サブエージェント委譲契約
 
@@ -221,8 +221,8 @@ Template の配置先は以下の 2 種類を定義する（REQ-0103-046）。
 ## リポジトリローカルアーティファクト（ADR-0106）
 
 配布対象外コマンド/スキルは AgentDevFlow の配布対象外である:
-- `.opencode/commands/repo/` — AgentDevFlow 本体リポジトリ専用コマンド。`src/opencode/` に原本を持たず、sync-opencode.ps1 のジャンクション管理対象外
-- `.opencode/skills/repo-*/` — AgentDevFlow 本体リポジトリ専用スキル。同上
+- `.opencode/commands/repo/`（AgentDevFlow 本体リポジトリ専用コマンド）。`src/opencode/` に原本を持たず、sync-opencode.ps1 のジャンクション管理対象外
+- `.opencode/skills/repo-*/`（AgentDevFlow 本体リポジトリ専用スキル）。同上
 - `repo-*` プレフィックスは AgentDevFlow 配布コマンド体系（`agentdev-*`）とは独立に管理される
 
 ## ドラフトアーティファクト契約（REQ-0103-129〜139）

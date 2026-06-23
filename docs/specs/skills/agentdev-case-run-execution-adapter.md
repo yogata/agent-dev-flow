@@ -55,7 +55,7 @@ case-run が Issue 実装を実行担当サブエージェント（Sisyphus-Juni
 - [agentdev-workflow-orchestration.md](agentdev-workflow-orchestration.md)
 - [agentdev-git-worktree.md](agentdev-git-worktree.md)
 - [commands/case-run.md](../commands/case-run.md)
-- REQ-0130 — case-run / 実装パイプライン
-- REQ-0139 — 外部エージェント統合契約
-- ADR-0114 — case-auto 最大自走モード
-- ADR-0128 — case-run 外部実行委譲
+- REQ-0130（case-run / 実装パイプライン）
+- REQ-0139（外部エージェント統合契約）
+- ADR-0114（case-auto 最大自走モード）
+- ADR-0128（case-run 外部実行委譲）

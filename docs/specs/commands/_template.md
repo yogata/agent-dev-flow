@@ -59,7 +59,7 @@ updated: YYYY-MM-DD
 
 ## See Also
 
-- [skills/_template.md](../skills/_template.md) — skill SPEC テンプレート
-- [workflows/](../workflows/) — 横断ワークフロー契約
-- ADR-0123 — SPEC lifecycle（draft/accepted）
-- REQ-0136 — REQ/SPEC 責務分離
+- [skills/_template.md](../skills/_template.md)（skill SPEC テンプレート）
+- [workflows/](../workflows/)（横断ワークフロー契約）
+- ADR-0123（SPEC lifecycle（draft/accepted））
+- REQ-0136（REQ/SPEC 責務分離）

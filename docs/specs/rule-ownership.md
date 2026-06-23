@@ -13,10 +13,10 @@
 | 5 | Template 配置 | REQ-0103 (005, 046) | artifact-contracts.md | command-local template 配置規約 |
 | 6 | Script 配置 | REQ-0103 (006, 014) | artifact-contracts.md | skill scripts/ 配下 |
 | 7 | Namespace 予約 | REQ-0103 (009, 056) | system.md | agentdev / agentdev-* 予約 |
-| 8 | References 正規化 | REQ-0103 (013, 039) | — | `references/` が正規、`reference/` は廃止 |
-| 9 | Progressive disclosure | REQ-0103 (035, 036) | — | SKILL.md 入口 + `references/` 詳細 |
+| 8 | References 正規化 | REQ-0103 (013, 039) | - | `references/` が正規、`reference/` は廃止 |
+| 9 | Progressive disclosure | REQ-0103 (035, 036) | - | SKILL.md 入口 + `references/` 詳細 |
 | 10 | 完了報告フォーマット | REQ-0103 (046), REQ-0107 (013, 022) | artifact-contracts.md | 種別（`variant`）別管理 |
-| 11 | 共通処理集約 | REQ-0103 (040-043) | — | Git 同期等の共通化 |
+| 11 | 共通処理集約 | REQ-0103 (040-043) | - | Git 同期等の共通化 |
 | 12 | Source/projection 分離 | REQ-0103 (048-055) | system.md | `src/opencode/` 原本 + `.opencode/` 配置先 |
 | 13 | Integrity 検査カテゴリ | REQ-0108 (001-021) | integrity-contracts.md | 18 集合・strict/heuristic/observation |
 | 14 | Finding 分類 | REQ-0108 (017, 018) | integrity-contracts.md | 6 カテゴリ + 経路 |

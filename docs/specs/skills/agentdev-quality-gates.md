@@ -30,7 +30,7 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 
 ## 参照する references
 
-- `references/common-gate-contract.md` — 全 Gate 共通契約
+- `references/common-gate-contract.md`（全 Gate 共通契約）
 - `references/qg-1-definition-integrity.md`
 - `references/qg-2-acceptance-criteria-coverage.md`
 - `references/qg-3-implementation-deviation.md`
@@ -60,6 +60,6 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 
 ## See Also
 
-- [quality-gates.md](../quality-gates.md) — SPEC 定義
-- [commands/req-define.md](../commands/req-define.md), [commands/req-save.md](../commands/req-save.md), [commands/case-open.md](../commands/case-open.md), [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md) — 適用先
-- REQ-0136 — REQ/SPEC 責務分離の徹底
+- [quality-gates.md](../quality-gates.md)（SPEC 定義）
+- [commands/req-define.md](../commands/req-define.md), [commands/req-save.md](../commands/req-save.md), [commands/case-open.md](../commands/case-open.md), [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（適用先）
+- REQ-0136（REQ/SPEC 責務分離の徹底）

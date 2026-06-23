@@ -49,8 +49,8 @@ inbox 内の intake item をレビュー・分類し、採用 item を backlog-r
 
 ## 参照する横断 SPEC
 
-- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) — Capture 境界・Split Rule
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md) — 採用済み成果物 lifecycle
+- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界・Split Rule）
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
 
 ## 対象外
 
@@ -78,7 +78,7 @@ inbox 内の intake item をレビュー・分類し、採用 item を backlog-r
 
 ## See Also
 
-- [intake-capture.md](intake-capture.md), [intake-from-github.md](intake-from-github.md) — 前段コマンド
-- [backlog-review.md](backlog-review.md) — 後続コマンド（RU 生成）
-- `agentdev-intake-pipeline` skill — inbox スキャン・レビュー評価・分類提示・整形保存
-- REQ-0127 — Intake command群
+- [intake-capture.md](intake-capture.md), [intake-from-github.md](intake-from-github.md)（前段コマンド）
+- [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
+- `agentdev-intake-pipeline` skill（inbox スキャン・レビュー評価・分類提示・整形保存）
+- REQ-0127（Intake command群）

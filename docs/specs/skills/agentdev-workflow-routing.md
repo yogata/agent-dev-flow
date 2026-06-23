@@ -53,4 +53,4 @@ updated: 2026-06-21
 - [agentdev-workflow-lifecycle.md](agentdev-workflow-lifecycle.md)
 - [agentdev-quality-gates.md](agentdev-quality-gates.md)
 - [commands/case-update.md](../commands/case-update.md)
-- REQ-0133 — case-update / Issue更新
+- REQ-0133（case-update / Issue更新）
