@@ -9,7 +9,7 @@ description: Evaluates whether architectural decisions require an ADR. USE FOR: 
 
 1. **アーキテクチャ上の重要性**: システム全体の構造、主要コンポーネント間の関係に影響
 2. **長期的影響**: 将来の開発や運用に長期的に影響を与える
-3. **逆転の困難さ**: 後で変更するコストが非常に高い、困難
+3. **逆転の困難さ**: 後で変更するコストが高い、困難
 
 ## ADR作成ガイドライン
 
@@ -48,7 +48,7 @@ description: Evaluates whether architectural decisions require an ADR. USE FOR: 
 
 ### False Negative 防止基準
 
-ADR要否判定において、以下の兆候が検出された場合は、たとえ上記「ADRを作成してはならない条件」に該当しそうであっても、再度技術判断の有無を確認すること:
+ADR要否判定で、以下の兆候が検出された場合は、たとえ上記「ADRを作成してはならない条件」に該当しそうであっても、再度技術判断の有無を確認すること:
 
 | 兆候 | 確認内容 |
 |------|---------|

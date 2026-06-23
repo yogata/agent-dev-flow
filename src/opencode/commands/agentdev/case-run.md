@@ -145,7 +145,7 @@ Sisyphus-Junior が返す3状態（`agentdev-case-run-execution-adapter` の res
 - G26: 外部実行ハーネスの plan artifact 等の中間成果物の内部構造に依存した処理、検証を行わない。最終結果は PR URL で受領する。
 - G29: 外部実行手段の中間成果物を AgentDevFlow の永続成果物として扱わない
 - G30: Step 6（Sisyphus-Junior 起動）の前に worktree+ブランチが作成済みであることを検証すること（Step 5-2 precondition gate）。未作成時、メインリポジトリにいる場合は Sisyphus-Junior を起動禁止（適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提保護）
-- G31: Sisyphus-Junior への引き渡しにおいて worktree root（相対パス、`.worktrees/{N}-{type}/`）を必ず含め、メインリポジトリパスを渡さないこと
+- G31: Sisyphus-Junior への引き渡しで worktree root（相対パス、`.worktrees/{N}-{type}/`）を必ず含め、メインリポジトリパスを渡さないこと
 - G32: Epic Wave 実行モードでは1 Wave のみ実行し PR 作成で return する。Wave 境界（PR マージ）は case-close へ委譲する
 
 ### 本筋外発見の退避方針
