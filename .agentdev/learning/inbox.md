@@ -43,3 +43,12 @@
 - **学び**: Windows 環境で OpenCode の Write ツールが、既存 UTF-8 (BOM なし) ファイルを上書きする際にシステムデフォルトエンコーディング (cp932/Shift-JIS) で書き出す事象を確認。`docs/requirements/README.md` の編集時に発生し、edit ツール (per-line string replace) を使用することで回避した。配布物配布先環境 (consumer repo) でも同様の落とし穴が発生する可能性がある。`agentdev-gh-cli` スキルは gh CLI 用に `[System.IO.File]::WriteAllText` または Write ツールを許可しているが、既存 UTF-8 ファイルの編集では edit ツールが安全。
 - **適用場面**: Windows 環境で既存 UTF-8 (BOM なし) ファイルを編集する場合。特に README.md 等、改行・エンコーディングが厳格なファイル。edit ツール (per-line string replace) を優先し、Write ツールの全面上書きは新規ファイル作成時に限定する。
 
+## 2026-06-23 Epic #1075 Wave 2 close
+
+### L-006: 並列機械的テキスト置換 OU の Wave 実行で文字レベルマージが必要になる
+
+- **発生源**: PR #1088/#1089/#1090/#1091 (#1078/#1076/#1079/#1080 / OU-001〜004)
+- **学び**: 異なる文字種（中黒・em-dash・LLM表現・一文一行）の機械的置換を並列 Wave で実行した場合、同一行に複数種の変更が及ぶと行レベルの git merge が必ず競合する。競合解消には文字レベルの SequenceMatcher 結合（ours の文字変更を保持しつつ theirs の行分割を挿入）が有効。`git apply --3way` で 3-way マージを試行した後、残った競合マーカーを Python スクリプトで文字レベル結合するアプローチが実用十分だった。Wave 設計時は、異なる文字種の置換を同一 Wave で並列実行する場合の競合解消コストを見積もるべき。
+- **適用場面**: 複数の機械的テキスト置換 OU を並列 Wave で実行する場合の競合解消計画。文字レベルマージツールの事前準備。
+
+
