@@ -73,4 +73,22 @@
 - **学び**: 異なる文字種（中黒・em-dash・LLM表現・一文一行）の機械的置換を並列 Wave で実行した場合、同一行に複数種の変更が及ぶと行レベルの git merge が必ず競合する。競合解消には文字レベルの SequenceMatcher 結合（ours の文字変更を保持しつつ theirs の行分割を挿入）が有効。`git apply --3way` で 3-way マージを試行した後、残った競合マーカーを Python スクリプトで文字レベル結合するアプローチが実用十分だった。Wave 設計時は、異なる文字種の置換を同一 Wave で並列実行する場合の競合解消コストを見積もるべき。
 - **適用場面**: 複数の機械的テキスト置換 OU を並列 Wave で実行する場合の競合解消計画。文字レベルマージツールの事前準備。
 
+## 2026-06-24 Issue #1102 close
+
+### L-010: ハーネス制約で task() 委譲不可時に同一エージェント統合実行が有効（adapter protocol 準拠）
+
+- **問題事象**: case-run orchestration（worktree 準備・Step 1-5 相当）と Sisyphus-Junior 実装実行を別エージェントへ task() 委譲しようとしたが、ハーネスのツール制約で task() による別 Sisyphus-Junior 起動が不可だった。
+- **発生局面**: 実装（case-run の実行担当サブエージェント起動ステップ）
+- **検知方法**: task() 起動失敗のハーネス応答
+- **根本原因**: 当該ハーネス実行環境では task() ツールが提供されておらず、別サブエージェント起動経路が存在しない。
+- **自律対応内容**: case-run orchestration と実装実行を同一エージェント（case-run 起動元の Sisyphus-Junior）が統合実施した。adapter protocol（証拠ベース実装・品質ゲート・PR 作成・worktree 隔離・Findings 配置）には従い、委譲先が不在でもプロトコル要件を満たす形で完結させた。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。adapter protocol（agentdev-case-run-execution-adapter）のフォールバックパス適用範囲内。L-004（docs 系 Issue で adapter skill フォールバックが有効）と同根の知見だが、本件は docs 系に限らず task() 不可時の汎用パターンとして再実証された。
+- **横展開観点**: task() 委譲がハーネス制約で不可な環境では、起動元エージェントが orchestration + 実装を統合実行する経路を標準的に取る。adapter protocol 準拠は委譲の有無にかかわらず必須。
+- **再発条件**: task() ツールを提供しないハーネス環境（またはツール権限で task() が無効化された環境）で case-run を実行する場合。
+- **予防策候補**: case-run の driver 起動ステップで task() 可否を事前 probe し、不可の場合は起動元統合実行へ自動切替するプロトコル記述を adapter skill に明記。
+- **想定反映先**: agentdev-case-run-execution-adapter skill（task() 起動失敗時事後処理セクションの拡充）、agentdev-workflow-orchestration references（委譲可否 probe 手順）
+- **関連**: PR #1103 (#1102)、L-004 (PR #1068)、agentdev-case-run-execution-adapter SKILL.md
+- **タグ**: `#case-run` `#task-delegation` `#adapter-protocol` `#harness-constraint`
+
 
