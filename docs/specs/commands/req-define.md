@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-23
+updated: 2026-06-24
 ---
 
 # req-define SPEC
@@ -43,9 +43,11 @@ updated: 2026-06-23
   - Step 3-2: SPLIT 予兆計測（既存REQの健全性メトリクス計測）
 - Step 4: 要件展開（`agentdev-req-analysis` 分析観点）
   - Step 4-1: 変更影響候補抽出
+    - RU 由来キーワード抽出 + glob/grep 前処理による explore 委譲スコープの絞り込み（REQ-0102-072）。絞り込みは explore 委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-0102-002）の完全性は維持する
   - Step 4-2: 分類ゲート（変更後仕様 or 反映作業、REQ/SPEC 境界判定）
 - Step 4-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
 - Step 4-4: ADR要否確認ゲート（`agentdev-architecture-advisory` oracle 連携）
+  - oracle 入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-0102-073）。ラベル構造は soft-contract（ADR-0124）とし、分類権限は親が保持する
 - Step 4-5: 実行主体分類表（REQ-0146-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
 - Step 5: ADR判断（`agentdev-adr-guidelines`）
   - Step 5-0: 既存ADR重複確認

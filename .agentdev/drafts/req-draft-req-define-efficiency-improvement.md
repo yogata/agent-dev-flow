@@ -149,6 +149,15 @@ operation_units:
       qg1_result: pass
       saved_at: 2026-06-24
 
+spec_save_result:
+  consumed: true
+  consumed_at: 2026-06-24
+  spec_actions:
+    - artifact_action_id: ACT-SPEC-001
+      target: docs/specs/commands/req-define.md
+      operation: spec-update
+      applied: true
+
 case_open_hints:
   epic_needed: false
   decomposition:
