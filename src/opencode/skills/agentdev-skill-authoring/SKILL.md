@@ -5,7 +5,8 @@ description: Provides quality criteria and best practices for authoring OpenCode
 
 # スキル作成ベストプラクティス
 
-OpenCodeのSKILL.mdを書く際の実践ガイド。スキルの品質を7つの観点から体系的に担保する。
+OpenCodeのSKILL.mdを書く際の実践ガイド。
+スキルの品質を7つの観点から体系的に担保する。
 
 ## 1. 設計原則
 
@@ -75,7 +76,8 @@ Do not modify the command or add additional flags.
 | **指示トークン数** | <5,000 tokens | 1スキルが占めるコンテキストの適正規模 |
 | **参照ファイル** | 無制限（渐进的読み込み） | 必要時のみ読み込まれるため影響は限定的 |
 
-トークン数の見積もり: 英語は約4文字≈1 token、日本語は約1.5文字≈1 token。実測推奨。
+トークン数の見積もり: 英語は約4文字≈1 token、日本語は約1.5文字≈1 token。
+実測推奨。
 予算超過の兆候: 400行超で分割検討、同セクション反復参照は統合、未アクセスファイルは削除検討。
 
 ### 行数ガバナンス
@@ -114,15 +116,21 @@ SKILL.md の行数が **500行を超過** した場合、`references/` サブデ
 - ✗ `helper`, `utils`, `tools`（曖昧すぎる）
 - ✗ `anthropic-helper`, `claude-tools`（予約語を含む）
 
-ルール: 小文字、数字、ハイフンのみ。最大64文字。
+ルール: 小文字、数字、ハイフンのみ。
+最大64文字。
 
 ### 効果的な description の記述
 
-description は **3人称** で書く（システムプロンプトに注入されるため）。何をするか + いつ使うかの両方を含める。100+のスキルから正しいものを選ぶために十分な詳細が必要。descriptionはスキル選択の要。
+description は **3人称** で書く（システムプロンプトに注入されるため）。
+何をするか + いつ使うかの両方を含める。
+100+のスキルから正しいものを選ぶために十分な詳細が必要。
+descriptionはスキル選択の要。
 
 ### トリガー設計
 
-description内に `USE FOR:`/ `DO NOT USE FOR:` を埋め込む。agentskills.ioのde facto標準。`WHEN:` も可（Microsoft sensei形式）。
+description内に `USE FOR:`/ `DO NOT USE FOR:` を埋め込む。
+agentskills.ioのde facto標準。
+`WHEN:` も可（Microsoft sensei形式）。
 
 ```yaml
 # Good — トリガー明示付き
@@ -181,7 +189,9 @@ description: Helps with documents
 | **moderate** | 複数関心、参照ファイル必要 | 200-400行 | SKILL.md + 1-2参照ファイル | 2,000-4,000 tokens |
 | **detailed** | 複雑なワークフロー、ドメイン別モジュール | 400-500行 | SKILL.md + references/ ディレクトリ | 4,000-5,000 tokens |
 
-デフォルトは **simple**（200行以内が最善）。複数の独立した関心事があれば **moderate**。ドメイン横断で複数モジュールが必要な場合のみ **detailed**。
+デフォルトは **simple**（200行以内が最善）。
+複数の独立した関心事があれば **moderate**。
+ドメイン横断で複数モジュールが必要な場合のみ **detailed**。
 
 ### 段階的開示
 
@@ -203,7 +213,8 @@ skill/
 
 ### 深いネストの回避
 
-参照は **SKILL.mdから1階層まで**。深いネストは部分的な読み込みを引き起こす。
+参照は **SKILL.mdから1階層まで**。
+深いネストは部分的な読み込みを引き起こす。
 
 ### 長い参照ファイルの構造化
 
@@ -260,7 +271,8 @@ skill/
 - **パスプレフィクス確認**: 編集操作の前に、対象パスが worktree root からの相対パスであることを検証しなければならない。絶対パスや worktree 外パスを使用してはならない
 - **ファイル存在確認**: 編集対象ファイルの存在を事前に確認しなければならない。存在しないファイルへの edit 操作を行ってはならない
 
-ソースパスとランタイムパスの混同を防止するため、`src/opencode/...`（ソースパス）と `.opencode/...`（ランタイムパス）を明確に区別すること。Command/ skill 定義内のパス参照は記述された通りに解釈し、ソースパスをランタイムパスの参照先として使用してはならない。
+ソースパスとランタイムパスの混同を防止するため、`src/opencode/...`（ソースパス）と `.opencode/...`（ランタイムパス）を明確に区別すること。
+Command/ skill 定義内のパス参照は記述された通りに解釈し、ソースパスをランタイムパスの参照先として使用してはならない。
 
 ## 6. 開発ワークフロー
 
@@ -366,7 +378,9 @@ Adapt sections as needed.
 
 ## 8. コマンドとスキルの境界
 
-Skill の品質基準は本スキルの範囲とする。Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（`docs/specs/artifact-contracts.md`）を参照。Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
+Skill の品質基準は本スキルの範囲とする。
+Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（`docs/specs/artifact-contracts.md`）を参照。
+Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
 
 ## 参照記述ルール
 
@@ -446,7 +460,8 @@ Skill 分割候補:
 
 ### references/* 分割基準
 
-`references/*` は同一 Skill 内の段階的開示であり、小さい Skill ではない。詳細手順、判定表、例、長いチェックリストを遅延読み込みするために使う。
+`references/*` は同一 Skill 内の段階的開示であり、小さい Skill ではない。
+詳細手順、判定表、例、長いチェックリストを遅延読み込みするために使う。
 
 `references/*` に切り出してよい条件:
 - SKILL.md の判断モデルは単一のまま、詳細だけが長い

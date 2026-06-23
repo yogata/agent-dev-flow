@@ -7,7 +7,8 @@ updated: 2026-06-22
 
 # コマンドファイルフォーマット規約
 
-AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準。本 SPEC は command 定義ファイルが従うべき詳細なフォーマット規約を定義する。
+AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準。
+本 SPEC は command 定義ファイルが従うべき詳細なフォーマット規約を定義する。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
 

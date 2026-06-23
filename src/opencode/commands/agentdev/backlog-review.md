@@ -58,7 +58,8 @@ status: draft
 
 ### Step 1: 実行前同期
 
-`git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（`agentdev-git-worktree` と同一のエラー形式）。
+`git pull --ff-only` を実行する。
+失敗時は構造化エラーメッセージを表示して停止する（`agentdev-git-worktree` と同一のエラー形式）。
 
 ### Step 2: 成果物検出
 
@@ -109,7 +110,9 @@ RU 生成が成功した採用済み成果物のみを削除する:
 - `git diff --name-only` で `.agentdev/` 配下の変更を確認
 - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
 - **変更あり時**:
-  1. 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止
+  1. 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。
+  生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。
+  `.agentdev/` 全体の一括 `git add` は禁止
   2. commit message: `chore(agentdev): generate requirement units via backlog-review`
   3. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止
 

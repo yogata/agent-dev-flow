@@ -5,7 +5,8 @@ description: Enforces safe GitHub Issue operation procedures for creation, updat
 
 # agentdev-issue-management
 
-GitHub Issue の作成、更新、リンク、確認を安全に行うための操作手順を提供するスキル。`agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）と連携し、Issue 操作特有の安全性要件を補完する。
+GitHub Issue の作成、更新、リンク、確認を安全に行うための操作手順を提供するスキル。
+`agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）と連携し、Issue 操作特有の安全性要件を補完する。
 
 ## USE FOR
 

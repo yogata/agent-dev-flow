@@ -4,7 +4,8 @@
 
 ## 目的
 
-GitHub Issue / PR を使えない個人利用環境（ローカル版 OpenCode）向けに、AgentDevFlow のコマンド / スキル / ひな形を生成先リポジトリの `.opencode/` に直接生成するためのスキーマ、変換プロンプト、変換仕様、生成フローを保持する（REQ-0141-003, 004, 031）。生成済みコマンド / スキル / ひな形は配置しない。
+GitHub Issue / PR を使えない個人利用環境（ローカル版 OpenCode）向けに、AgentDevFlow のコマンド / スキル / ひな形を生成先リポジトリの `.opencode/` に直接生成するためのスキーマ、変換プロンプト、変換仕様、生成フローを保持する（REQ-0141-003, 004, 031）。
+生成済みコマンド / スキル / ひな形は配置しない。
 
 ## ディレクトリ構成
 
@@ -27,7 +28,8 @@ src/opencode-local/
 
 ### 作成しないディレクトリ（REQ-0141-005）
 
-以下は作成しない。`requirements/` と `specs/` は `docs/` 配下の同名ディレクトリと概念衝突するため不採用。
+以下は作成しない。
+`requirements/` と `specs/` は `docs/` 配下の同名ディレクトリと概念衝突するため不採用。
 
 - `src/opencode-local/_conv/`
 - `src/opencode-local/commands/`
@@ -37,7 +39,8 @@ src/opencode-local/
 
 ## ローカル版生成の実行手順
 
-ローカル版 OpenCode の生成は、OpenCode 等 AI エージェントで `transform/generate.md`（変換用プロンプト）を入力またはファイル参照して実行する（REQ-0141-031, 032）。決定的な変換ロジックを実装した変換スクリプトは使用しない。
+ローカル版 OpenCode の生成は、OpenCode 等 AI エージェントで `transform/generate.md`（変換用プロンプト）を入力またはファイル参照して実行する（REQ-0141-031, 032）。
+決定的な変換ロジックを実装した変換スクリプトは使用しない。
 
 ### 前提
 
@@ -88,7 +91,9 @@ src/opencode-local/
 
 ## 更新運用（全削除して作り直し）
 
-ローカル版の高頻度更新は想定しない。更新時は `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す（REQ-0141-033）。差分更新は想定しない。
+ローカル版の高頻度更新は想定しない。
+更新時は `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す（REQ-0141-033）。
+差分更新は想定しない。
 
 全削除により `generated_by` 識別子による上書き保護を迂回できるが、これは利用者自身の明示的操作によるものであり、ローカル版生成プロンプトによる自動上書きとは区別する。
 
@@ -100,7 +105,8 @@ src/opencode-local/
 
 ## 安全性制約
 
-ローカル版生成は以下の安全性制約に従う（ADR-0126）。詳細は `generation-flow.md` 参照。
+ローカル版生成は以下の安全性制約に従う（ADR-0126）。
+詳細は `generation-flow.md` 参照。
 
 - **原本保護**: `src/opencode/` は GitHub 版専用の原本であり、ローカル版のために変更しない（REQ-0141-014, ADR-0126 decision #4）
 - **`generated_by` 識別子**: 生成物に `generated_by: local-opencode-transform` を記録し、同名ファイル上書きは識別子存在時のみ許可（REQ-0141-011, 012, 013, ADR-0126 decision #2）

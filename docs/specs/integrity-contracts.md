@@ -86,7 +86,9 @@
 
 ## 適用範囲宣言
 
-`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（ADR-0103）。他プロジェクトへの適用を意図しない。実行時コマンドは SPEC ファイルに依存しない（ADR-0104）。
+`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（ADR-0103）。
+他プロジェクトへの適用を意図しない。
+実行時コマンドは SPEC ファイルに依存しない（ADR-0104）。
 
 ## ガードレール分類（Guardrails Classification）
 
@@ -146,11 +148,14 @@
 | 意味的診断 | inspect-skills（REQ-0125） | Command → Skill 参照妥当性、Skill 構造、読み取り専用診断 | finding 出力、推奨 route 提示 |
 | 査読時観点 | doc-writing skill（REQ-0140） | 文書種別責務、要件性、文意品質、粒度 | 査読コメント、follow-up 指摘 |
 
-各層は他層の担当を重複して実施せず、検出内容に応じて適切な層へ委譲する。機械的検出で偽陽性となる意味的判断は inspect-skills へ、文書品質の査読は doc-writing skill へ、それぞれ振り分ける。
+各層は他層の担当を重複して実施せず、検出内容に応じて適切な層へ委譲する。
+機械的検出で偽陽性となる意味的判断は inspect-skills へ、文書品質の査読は doc-writing skill へ、それぞれ振り分ける。
 
 ## IR-050 / IR-051 適用条件（REQ-0145-006/007）
 
-IR-050（load_skills 誤指定検出）、IR-051（実行主体 skill 表記誤認検出）は、語彙レジストリ（`.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`）の存在確認、必要語彙の補充後に適用する。IR-051 の「一定文字距離内」は語彙レジストリで確定された具体閾値（文字数、行数）を使用する。閾値未確定時は heuristic として報告するが auto-promote 対象外とする。
+IR-050（load_skills 誤指定検出）、IR-051（実行主体 skill 表記誤認検出）は、語彙レジストリ（`.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`）の存在確認、必要語彙の補充後に適用する。
+IR-051 の「一定文字距離内」は語彙レジストリで確定された具体閾値（文字数、行数）を使用する。
+閾値未確定時は heuristic として報告するが auto-promote 対象外とする。
 
 ## catalog ↔ 実装双方向同期運用（REQ-0145-003/004）
 

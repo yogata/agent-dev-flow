@@ -5,7 +5,8 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 
 # Epic 状態追跡（Epic Status Tracker）
 
-親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベース。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR-0125 単一書き手制約、`docs/specs/workflows/epic-wave-model.md` 参照）。
+親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベース。
+`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR-0125 単一書き手制約、`docs/specs/workflows/epic-wave-model.md` 参照）。
 
 - **参照元**: `case-close`（completed/ blocked/ failed 更新、単一書き手）。`case-auto`、`case-run` は Epic Issue 本文を読み取るのみで書き込まない
 - **特性**: 宣言的定義のみ提供。手順、手続きは各コマンド定義に委ねる
@@ -39,7 +40,9 @@ Epic自動クローズ判定では `completed` を終了状態として扱う（
 
 ### case-close: completed/ blocked/ failed 更新（単一書き手）
 
-`case-close(#epic)` 完了時に子Issue を `pending` → `completed`/ `blocked`/ `failed` に更新する。case-close は Epic Issue 本文ステータス追跡テーブルの単一書き手（ADR-0125）。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれないため、本プロトコルの対象は `pending` → 終了状態（`completed`/ `blocked`/ `failed`）の遷移のみ:
+`case-close(#epic)` 完了時に子Issue を `pending` → `completed`/ `blocked`/ `failed` に更新する。
+case-close は Epic Issue 本文ステータス追跡テーブルの単一書き手（ADR-0125）。
+`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれないため、本プロトコルの対象は `pending` → 終了状態（`completed`/ `blocked`/ `failed`）の遷移のみ:
 
 1. 子Issue本文から `Parent: #{N}` を検出
 2. 親Epicが存在しない → スキップ
@@ -52,13 +55,15 @@ Epic自動クローズ判定では `completed` を終了状態として扱う（
 5. 既に `completed`、`blocked`、または `failed` の場合 → スキップ（べき等性）
 6. `gh issue edit {N} --body-file {temp}` でEpic本文を更新
 
-`blocked`/ `failed` は case-close が case-run(#epic) の実行結果（`completed(pr)`/ `blocked`/ `failed`）から確定して Epic Issue 本文へ反映する終了状態。case-close は確定済みの `completed`/ `blocked`/ `failed` を上書きしない。
+`blocked`/ `failed` は case-close が case-run(#epic) の実行結果（`completed(pr)`/ `blocked`/ `failed`）から確定して Epic Issue 本文へ反映する終了状態。
+case-close は確定済みの `completed`/ `blocked`/ `failed` を上書きしない。
 
 一括更新順序（case-close(#epic) の複数子Issue一括更新時）: 子Issue番号の昇順
 
 ## 正規表現パターン
 
-Epic本文のステータス追跡テーブルは以下の2形式をサポートする。Epic Issue 本文（永続状態）に書き込まれるステータス値は `pending`/ `completed`/ `blocked`/ `failed` のみ（`ready`/ `running` は case-run(#epic) の内部状態のため永続状態に書き込まれない）。
+Epic本文のステータス追跡テーブルは以下の2形式をサポートする。
+Epic Issue 本文（永続状態）に書き込まれるステータス値は `pending`/ `completed`/ `blocked`/ `failed` のみ（`ready`/ `running` は case-run(#epic) の内部状態のため永続状態に書き込まれない）。
 
 ### 新4列形式（#/ Issue/ ステータス/ 内容）
 
@@ -144,7 +149,8 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 
 #### 1. PR merge前後のEpic状態遷移
 
-Epic Issue 本文（永続状態）の書き込みは case-close(#epic) のみが行う（単一書き手、ADR-0125）。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない。
+Epic Issue 本文（永続状態）の書き込みは case-close(#epic) のみが行う（単一書き手、ADR-0125）。
+`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない。
 
 **case-run(#epic) 実行中（merge前、Epic Issue 本文不変）**:
 - 子Issue の `ready`/ `running` は case-run(#epic) の内部状態として追跡（Epic Issue 本文には書き込まない）

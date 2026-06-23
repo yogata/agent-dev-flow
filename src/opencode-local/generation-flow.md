@@ -4,7 +4,8 @@
 
 ## 目的
 
-ローカル版 OpenCode のコマンド / スキル / ひな形を生成先リポジトリの `.opencode/` に生成する全体手順を定義する（REQ-0141-007, 031, 032）。原本である `src/opencode/` を改変せず、`generated_by` 識別子とジャンクション検出安全ゲートで原本保護を担保する。
+ローカル版 OpenCode のコマンド / スキル / ひな形を生成先リポジトリの `.opencode/` に生成する全体手順を定義する（REQ-0141-007, 031, 032）。
+原本である `src/opencode/` を改変せず、`generated_by` 識別子とジャンクション検出安全ゲートで原本保護を担保する。
 
 ## リポジトリ分離
 
@@ -15,11 +16,14 @@
 | 仕様管理リポジトリ（AgentDevFlow 本体） | ローカル版生成の入力元。GitHub 版原本と生成時ソース領域を保持 | `src/opencode/`, `src/opencode-local/` |
 | 生成先リポジトリ | ローカル版を導入する利用側リポジトリ。生成物と Case ファイルを保持 | `.opencode/commands/`, `.opencode/skills/`, `.agentdev/cases/` |
 
-ローカル版生成は AgentDevFlow 本体リポジトリでは実行しない（REQ-0141-006）。生成時の入力元として AgentDevFlow 本体リポジトリの `src/opencode/` と `src/opencode-local/` を参照する。
+ローカル版生成は AgentDevFlow 本体リポジトリでは実行しない（REQ-0141-006）。
+生成時の入力元として AgentDevFlow 本体リポジトリの `src/opencode/` と `src/opencode-local/` を参照する。
 
 ## 生成フロー
 
-ローカル版生成の全体フロー（REQ-0141-007, 031, 032）。決定的な変換ロジックを実装した変換スクリプトは使用しない。AI エージェントが変換プロンプト（`transform/generate.md`）に従って生成する（REQ-0141-032）。
+ローカル版生成の全体フロー（REQ-0141-007, 031, 032）。
+決定的な変換ロジックを実装した変換スクリプトは使用しない。
+AI エージェントが変換プロンプト（`transform/generate.md`）に従って生成する（REQ-0141-032）。
 
 ### Step 1: 実行環境の特定
 
@@ -42,14 +46,16 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 
 ### Step 3: ジャンクション検出安全ゲート
 
-生成先リポジトリの `.opencode/` の実パスを確認する（REQ-0141-010）。詳細は後述「ジャンクション検出安全ゲート」参照。
+生成先リポジトリの `.opencode/` の実パスを確認する（REQ-0141-010）。
+詳細は後述「ジャンクション検出安全ゲート」参照。
 
 - `.opencode/` の実パスが `src/opencode/` 配下へ解決される場合、生成を停止する
 - ジャンクション検出は決定的な検査として script で実装する（ADR-0107, ADR-0126 decision #3）
 
 ### Step 4: 同名ファイル確認
 
-`.opencode/commands/` と `.opencode/skills/` の同名ファイルを `generated_by` 識別子で確認する（REQ-0141-012, 013）。詳細は後述「`generated_by` 識別子」参照。
+`.opencode/commands/` と `.opencode/skills/` の同名ファイルを `generated_by` 識別子で確認する（REQ-0141-012, 013）。
+詳細は後述「`generated_by` 識別子」参照。
 
 - 同名ファイルに `generated_by: local-opencode-transform` 識別情報がある場合: 再生成、上書きを許可
 - 同名ファイルに識別情報がない場合: 生成を停止
@@ -57,7 +63,8 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 
 ### Step 5: 変換の実行
 
-`transform/generate.md` の指示に従い、AI エージェントがローカル版コマンド / スキル / ひな形を生成する（REQ-0141-032）。変換内容、ガードレール、レポートフォーマットは `transform/spec.md` 参照。
+`transform/generate.md` の指示に従い、AI エージェントがローカル版コマンド / スキル / ひな形を生成する（REQ-0141-032）。
+変換内容、ガードレール、レポートフォーマットは `transform/spec.md` 参照。
 
 ### Step 6: 生成物の配置
 
@@ -69,7 +76,8 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 
 ### Step 7: レポート出力
 
-変換レポートを出力する。レポートフォーマットは `transform/spec.md` 参照。
+変換レポートを出力する。
+レポートフォーマットは `transform/spec.md` 参照。
 
 - 必須項目を過不足なく含める
 - 残存 GitHub 固有参照の違反判定を行う
@@ -77,7 +85,8 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 
 ## `generated_by` 識別子
 
-ローカル版生成物には `generated_by: local-opencode-transform` の識別情報を持たせる（REQ-0141-011, ADR-0126 decision #2）。これは上書き保護のアーキテクチャ不変量である。
+ローカル版生成物には `generated_by: local-opencode-transform` の識別情報を持たせる（REQ-0141-011, ADR-0126 decision #2）。
+これは上書き保護のアーキテクチャ不変量である。
 
 ### 記録形式
 
@@ -104,15 +113,19 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 
 ### 実装方式
 
-ジャンクション検出は決定的な検査として script で実装する（ADR-0107, ADR-0126 decision #3）。AI エージェントの解釈に依存せず、ファイルシステムの実パス解決により機械的に判定する。
+ジャンクション検出は決定的な検査として script で実装する（ADR-0107, ADR-0126 decision #3）。
+AI エージェントの解釈に依存せず、ファイルシステムの実パス解決により機械的に判定する。
 
 ### 停止時の扱い
 
-ジャンクション環境を検出した場合、生成を開始せずに停止する。利用者にジャンクション構成の解除を促すメッセージを出す。
+ジャンクション環境を検出した場合、生成を開始せずに停止する。
+利用者にジャンクション構成の解除を促すメッセージを出す。
 
 ## 更新運用（全削除して作り直し）
 
-ローカル版の高頻度更新は想定しない。更新時は `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す（REQ-0141-033）。差分更新は想定しない。
+ローカル版の高頻度更新は想定しない。
+更新時は `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す（REQ-0141-033）。
+差分更新は想定しない。
 
 全削除により `generated_by` 識別子による上書き保護を迂回できるが、これは利用者自身の明示的操作によるものであり、ローカル版生成プロンプトによる自動上書きとは区別する（AG-015）。
 
@@ -128,7 +141,8 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 
 ## 同名規則と同居制限
 
-ローカル版は GitHub 版 `/agentdev/*` および `agentdev-*` と同じ名前で生成する前提とする（REQ-0141-015）。GitHub 版とローカル版を同じ `.opencode/` に同居させる利用環境は対象外とする。
+ローカル版は GitHub 版 `/agentdev/*` および `agentdev-*` と同じ名前で生成する前提とする（REQ-0141-015）。
+GitHub 版とローカル版を同じ `.opencode/` に同居させる利用環境は対象外とする。
 
 ## 関連項目
 

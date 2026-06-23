@@ -5,7 +5,8 @@ description: DOC-MAP reading guide and document exploration order. USE FOR: unde
 
 # DOC-MAP ガイド
 
-DOC-MAP（`docs/DOC-MAP.md`）は、AgentDevFlow ドキュメント体系の探索経路インデックスである。このスキルは DOC-MAP の位置づけ、読み方、および関連ドキュメント探索順序を定義する。
+DOC-MAP（`docs/DOC-MAP.md`）は、AgentDevFlow ドキュメント体系の探索経路インデックスである。
+このスキルは DOC-MAP の位置づけ、読み方、および関連ドキュメント探索順序を定義する。
 
 ---
 

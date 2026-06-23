@@ -9,7 +9,8 @@ updated: 2026-06-21
 
 ## 目的
 
-docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/skill の自然言語記述の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける（REQ-0140）。
+docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/skill の自然言語記述の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。
+QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける（REQ-0140）。
 
 ## 適用対象
 
@@ -36,7 +37,8 @@ docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/
 - `references/review-output.md`（査読出力形式）
 - `references/execution-subject-classification.md`（実行主体分類（command / skill / subagent / harness）の査読）
 
-配置基準、用語政策の原本は `docs/specs/document-type-responsibilities.md`、執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。内容が重複する場合は原本を優先（REQ-0140-023）。
+配置基準、用語政策の原本は `docs/specs/document-type-responsibilities.md`、執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+内容が重複する場合は原本を優先（REQ-0140-023）。
 
 ## 現在の動作
 

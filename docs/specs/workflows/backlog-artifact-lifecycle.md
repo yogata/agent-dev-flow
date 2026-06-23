@@ -119,11 +119,14 @@ created: "{YYYY-MM-DD}"
 
 ## inspect-promote 自動 promote
 
-`/agentdev/inspect-promote --auto` は、高確信度の検出事項（inspect finding）を HITL 承認を経ずに intake/backlog パイプラインへ流入させる（REQ-0136-016, REQ-0126-010）。コマンドは判定表を重複保持しない。詳細手順は `docs/specs/commands/inspect-promote.md` 参照。
+`/agentdev/inspect-promote --auto` は、高確信度の検出事項（inspect finding）を HITL 承認を経ずに intake/backlog パイプラインへ流入させる（REQ-0136-016, REQ-0126-010）。
+コマンドは判定表を重複保持しない。
+詳細手順は `docs/specs/commands/inspect-promote.md` 参照。
 
 ### 自動 promote 対象カテゴリ
 
-自動 promote は「機械的に特定可能で、移行先 SPEC が一意に定まり、意味判断を要しない」高確信度 finding に限定する。`--auto` は明示 opt-in であり、省略時は手動分類フローのみ動作する。
+自動 promote は「機械的に特定可能で、移行先 SPEC が一意に定まり、意味判断を要しない」高確信度 finding に限定する。
+`--auto` は明示 opt-in であり、省略時は手動分類フローのみ動作する。
 
 | カテゴリ | 自動 promote 対象 | 自動 promote 対象外（手動分類へ） |
 |---|---|---|
@@ -154,11 +157,13 @@ created: "{YYYY-MM-DD}"
 - exempt check: 安定契約例外/否定文脈でないことを確認した旨
 ```
 
-ログは git 管理対象（`.agentdev/inspect/promoted/` 配下）。各実行のトレーサビリティと誤検知検出の証跡とする。
+ログは git 管理対象（`.agentdev/inspect/promoted/` 配下）。
+各実行のトレーサビリティと誤検知検出の証跡とする。
 
 ### 誤検知 revoke 手順
 
-自動 promote された finding が誤検知と判明した場合、以下の手順で revoke する。revoke は人間の判断により行う。
+自動 promote された finding が誤検知と判明した場合、以下の手順で revoke する。
+revoke は人間の判断により行う。
 
 1. 対象の投入先ファイル `.agentdev/intake/promoted/inspect-auto-*.md` を特定する（`auto-promote-log.md` のエントリから追跡）
 2. 当該ファイルが backlog-review により未処理（RU 未生成）の場合: ファイルを削除し、元 finding を `.agentdev/inspect/inbox/` に戻す
@@ -224,7 +229,8 @@ REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成in
 
 ### 検知時の扱い
 
-検知はSHOULD。検知時は通常のREQ保存処理を妨げず、非同期に保存する。
+検知はSHOULD。
+検知時は通常のREQ保存処理を妨げず、非同期に保存する。
 
 ## artifact_actions ベース工程分岐
 

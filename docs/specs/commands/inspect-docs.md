@@ -9,7 +9,9 @@ updated: 2026-06-21
 
 ## 目的
 
-docs 全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力する。検査対象を直接修正しない診断専用コマンド。REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、ADR、guides、DOC-MAP の意味診断を含む。
+docs 全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力する。
+検査対象を直接修正しない診断専用コマンド。
+REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、ADR、guides、DOC-MAP の意味診断を含む。
 
 ## 入力
 

@@ -9,7 +9,9 @@ updated: 2026-06-22
 
 ## 目的
 
-inbox 内の intake item をレビュー、分類し、採用 item を backlog-review 向け採用済み成果物に整形する。review、分類、整形を担う。GitHub Issue 作成は行わない。
+inbox 内の intake item をレビュー、分類し、採用 item を backlog-review 向け採用済み成果物に整形する。
+review、分類、整形を担う。
+GitHub Issue 作成は行わない。
 
 ## HITL 境界、自動実行ルール（REQ-0147-003/004/005/008）
 

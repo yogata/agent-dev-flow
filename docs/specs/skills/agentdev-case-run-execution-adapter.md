@@ -9,7 +9,8 @@ updated: 2026-06-21
 
 ## 目的
 
-case-run が Issue 実装を実行担当サブエージェント（Sisyphus-Junior）へ委譲する際のアダプタープロトコルを定義し、実行結果（completed(pr) / blocked / failed）を処理する。実行 command（`/ulw-loop`）は委譲 prompt 内で指定され、`load_skills` には adapter skill を指定する。
+case-run が Issue 実装を実行担当サブエージェント（Sisyphus-Junior）へ委譲する際のアダプタープロトコルを定義し、実行結果（completed(pr) / blocked / failed）を処理する。
+実行 command（`/ulw-loop`）は委譲 prompt 内で指定され、`load_skills` には adapter skill を指定する。
 
 ## 適用対象
 
