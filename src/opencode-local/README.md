@@ -1,17 +1,29 @@
-# ローカル版 OpenCode 生成時ソース領域
+# ローカル版 OpenCode 固有原本領域
 
-> **非正規文書**: 本ディレクトリは AgentDevFlow 本体リポジトリの `docs/`（リポジトリ内部設計文書）ではなく、ローカル版 OpenCode 生成のための「生成時ソース領域」である（ADR-0126）。要件は `docs/requirements/REQ-0141.md`、仕様は `docs/specs/local-*.md` を正とする。
+> **非正規文書**: 本ディレクトリは AgentDevFlow 本体リポジトリの `docs/`（リポジトリ内部設計文書）ではなく、ローカル版 OpenCode の link 元となるローカル版固有原本を保持する領域である（ADR-0131）。要件は `docs/requirements/REQ-0141.md`、仕様は `docs/specs/local-*.md` を正とする。
 
 ## 目的
 
-GitHub Issue / PR を使えない個人利用環境（ローカル版 OpenCode）向けに、AgentDevFlow のコマンド / スキル / ひな形を生成先リポジトリの `.opencode/` に直接生成するためのスキーマ、変換プロンプト、変換仕様、生成フローを保持する（REQ-0141-003, 004, 031）。
-生成済みコマンド / スキル / ひな形は配置しない。
+GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）向けに、ローカル版固有原本（agentdev-gh-cli）を保持し、link mode での導入手順を記載する（REQ-0141-003, 004, 031, ADR-0131）。
+ローカル版の command / skill / ひな形は配置しない。
+link mode では `src/opencode/` の原本をそのまま接続するため、ローカル版専用の生成物は不要である（ADR-0131 decision #1, #3）。
+
+## リポジトリ構成（前提）
+
+ローカル版 link mode 導入は以下の 2 リポジトリ構成を前提とする（REQ-0141-002, 006）。
+
+| リポジトリ | 役割 | 主な対象パス |
+|---|---|---|
+| 仕様管理リポジトリ（AgentDevFlow 本体） | link 元の原本を保持 | `src/opencode/`, `src/opencode-local/agentdev-gh-cli/` |
+| 導入先リポジトリ | ローカル版を導入する利用側リポジトリ。`.opencode/` に link を張る | `.opencode/commands/`, `.opencode/skills/`, `.agentdev/cases/` |
+
+ローカル版導入の実体は AgentDevFlow 本体リポジトリでは行わない（REQ-0141-006）。
 
 ## ディレクトリ構成
 
 ```text
 src/opencode-local/
-├── README.md              ← 本ファイル（ローカル版生成の実行手順）
+├── README.md              ← 本ファイル（ローカル版 link 設定手順）
 ├── agentdev-gh-cli/       ← ローカル版 agentdev-gh-cli の原本（case-schema を吸収）
 │   ├── SKILL.md           ← ローカル版 agentdev-gh-cli のルーティング入口
 │   ├── references/        ← 操作契約・Case ファイル対応手続き・VERIFY 観点
@@ -22,17 +34,23 @@ src/opencode-local/
 │           ├── status.yaml        ← status enum と状態遷移表の機械可読定義
 │           ├── labels.yaml        ← labels 値域の機械可読定義
 │           └── headings.yaml      ← 見出し一覧の機械可読定義
-├── transform/             ← 変換プロンプトと変換仕様（link mode 移行後に廃止候補: ADR-0131）
-│   ├── generate.md        ← 変換用プロンプト（AI エージェントがローカル版を生成するための指示）
-│   ├── review.md          ← レビュー用プロンプト（生成結果を検証するための指示）
-│   └── spec.md            ← 変換仕様（変換対象・ガードレール一覧・レポートフォーマット）
-└── generation-flow.md     ← 生成フロー定義（手順・安全確認・generated_by 形式）
+├── transform/             ← 変換プロンプトと変換仕様（廃止候補: ADR-0131 decision #4）
+│   ├── generate.md        ← 変換用プロンプト（link mode では使用しない）
+│   ├── review.md          ← レビュー用プロンプト（link mode では使用しない）
+│   └── spec.md            ← 変換仕様（link mode では使用しない）
+└── generation-flow.md     ← 生成フロー定義（廃止候補: ADR-0131 decision #4）
 ```
+
+### 廃止候補
+
+`transform/` と `generation-flow.md` は ADR-0126 時代の直接生成方式（generate-and-place）の資産であり、link mode への移行に伴い廃止候補とする（AG-011, ADR-0131 decision #4, REQ-0141-028）。
+link mode では原本がそのまま接続されるため、変換プロンプトによる意味変換は不要である。
+廃止候補の段階では履歴参照のために残置し、link mode 導入・運用では使用しない。
 
 ### 作成しないディレクトリ（REQ-0141-005）
 
 以下は作成しない。
-`requirements/` と `specs/` は `docs/` 配下の同名ディレクトリと概念衝突するため不採用。
+`requirements/` と `specs/` は `docs/` 配下の同名ディレクトリと概念衝突するため不採用である。
 
 - `src/opencode-local/_conv/`
 - `src/opencode-local/commands/`
@@ -40,95 +58,95 @@ src/opencode-local/
 - `src/opencode-local/requirements/`
 - `src/opencode-local/specs/`
 
-## ローカル版生成の実行手順
+## link 設定手順
 
-ローカル版 OpenCode の生成は、OpenCode 等 AI エージェントで `transform/generate.md`（変換用プロンプト）を入力またはファイル参照して実行する（REQ-0141-031, 032）。
-決定的な変換ロジックを実装した変換スクリプトは使用しない。
+ローカル版 link mode 導入の全体フローを定義する（REQ-0141-007, 032, ADR-0131 decision #1, #2, #3）。
+決定的な変換ロジックを実装した変換スクリプトは使用しない（REQ-0141-032）。
 
 ### 前提
 
-- 生成先リポジトリが AgentDevFlow 本体リポジトリでないこと（REQ-0141-006）
-- 仕様管理リポジトリ（AgentDevFlow 本体）の `src/opencode/` と `src/opencode-local/` にアクセスできること
-- 生成先リポジトリに `.opencode/` ディレクトリが存在すること（または作成可能であること）
+- 導入先リポジトリが AgentDevFlow 本体リポジトリでないこと（REQ-0141-006）
+- 仕様管理リポジトリ（AgentDevFlow 本体）の `src/opencode/` と `src/opencode-local/agentdev-gh-cli/` にアクセスできること
+- 導入先リポジトリに `.opencode/` ディレクトリが存在すること（または作成可能であること）
 - GitHub 版とローカル版を同じ `.opencode/` に同居させないこと（REQ-0141-015）
 
 ### 手順
 
-1. **生成先リポジトリで OpenCode 等 AI エージェントを起動する**
-   - AgentDevFlow 本体リポジトリでは実行しない（REQ-0141-006）
+1. **実行環境の特定**: 導入先リポジトリが AgentDevFlow 本体リポジトリでないことを確認する
 
-2. **AI エージェントに `transform/generate.md` を入力またはファイル参照で渡す**
-   - 入力方法例: `@src/opencode-local/transform/generate.md` でファイル参照
-   - または `transform/generate.md` の内容をプロンプトとして入力
+2. **link target の確認**: 後述の「link target 確認」を実施し、意図した link target がすべて揃っていることを確認する
 
-3. **AI エージェントが生成フロー（`generation-flow.md` 参照）に従って実行する**
-   - 実行環境の特定（Step 1）
-   - 入力の読み込み（Step 2）
-   - ジャンクション検出安全ゲート（Step 3）
-   - 同名ファイル確認（Step 4）
-   - 変換の実行（Step 5）
-   - 生成物の配置（Step 6）
-   - レポート出力（Step 7）
+3. **通常版 link の設定**: `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（agentdev-gh-cli を除く）を `src/opencode/` 配下へ接続する（ADR-0131 decision #2）
 
-4. **生成レポートを確認する**
-   - 結果が `PASS` の場合: 生成完了
-   - 結果が `FAIL` の場合: 違反一覧を確認し、手動で修正または再生成
+4. **agentdev-gh-cli の差し替え**: `.opencode/skills/agentdev-gh-cli/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（ADR-0131 decision #3）
 
-5. **必要に応じてレビューを実行する**
-   - `transform/review.md`（レビュー用プロンプト）を AI エージェントに入力し、生成物を検証
+5. **link 設定の検証**: 各 link が意図した target へ解決されることを確認する
 
-### 実行例
+link mode では原本がそのまま接続されるため、変換プロンプトの実行やひな形の意味変換は不要である（ADR-0131 decision #4）。
 
-```text
-[生成先リポジトリにて]
+### link target 確認
 
-1. OpenCode を起動
-2. AI エージェントへ指示:
-   「@<仕様管理リポジトリへのパス>/src/opencode-local/transform/generate.md
-    に従ってローカル版 OpenCode を生成してください。
-    仕様管理リポジトリ: <パス>
-    生成先: 現在のリポジトリの .opencode/」
-3. AI エージェントが generate.md の指示に従い生成を実行
-4. 生成レポートを確認
-```
+link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認する（REQ-0141-010, AG-012, ADR-0131 decision #6）。
+ジャンクションやシンボリックリンク環境での誤接続を防止するためである。
 
-## 更新運用（全削除して作り直し）
+| 対象 | 期待される link target |
+|---|---|
+| `.opencode/commands/agentdev/` | `src/opencode/commands/agentdev/` |
+| `.opencode/skills/agentdev-*`（agentdev-gh-cli 以外） | `src/opencode/skills/agentdev-*/` |
+| `.opencode/skills/agentdev-gh-cli/` | `src/opencode-local/agentdev-gh-cli/` |
+
+link target 確認は決定的な検査として実施する（ADR-0107, ADR-0131 decision #6）。
+AI エージェントの解釈に依存せず、ファイルシステムの実パス解決により機械的に判定する。
+
+意図した link target 以外へ解決される場合、link 設定を開始せずに停止する。
+ユーザーへ link 構成の修正を促すメッセージを出す。
+link mode 全体を一律停止するのではなく、link target が意図したものであれば許可する（AG-012）。
+
+## 更新運用（unlink / relink）
 
 ローカル版の高頻度更新は想定しない。
-更新時は `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す（REQ-0141-033）。
+更新時は `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を unlink してから relink する（REQ-0141-033, ADR-0131 decision #4）。
 差分更新は想定しない。
 
-全削除により `generated_by` 識別子による上書き保護を迂回できるが、これは利用者自身の明示的操作によるものであり、ローカル版生成プロンプトによる自動上書きとは区別する。
+全削除による再生成は行わない。
+link の張り直しで済むため、`generated_by` 識別子による上書き保護は廃止する（ADR-0131 decision #5）。
+link による接続であるため、上書き問題が発生しない。
 
 ### 更新手順
 
-1. 生成先リポジトリの `.opencode/commands/agentdev/` を全削除
-2. 生成先リポジトリの `.opencode/skills/agentdev-*/` を全削除
-3. 「ローカル版生成の実行手順」に従い、再度生成を実行
+1. 導入先リポジトリの `.opencode/commands/agentdev/` の link を unlink（削除）する
+2. 導入先リポジトリの `.opencode/skills/agentdev-*/` の link を unlink（削除）する
+3. 「link 設定手順」に従い、再度 link 設定を実行する（relink）
 
-## 安全性制約
+## ガードレール
 
-ローカル版生成は以下の安全性制約に従う（ADR-0126）。
-詳細は `generation-flow.md` 参照。
+ローカル版 link mode 導入が遵守するガードレール（REQ-0141-014, AG-009, AG-010, ADR-0131）。
 
-- **原本保護**: `src/opencode/` は GitHub 版専用の原本であり、ローカル版のために変更しない（REQ-0141-014, ADR-0126 decision #4）
-- **`generated_by` 識別子**: 生成物に `generated_by: local-opencode-transform` を記録し、同名ファイル上書きは識別子存在時のみ許可（REQ-0141-011, 012, 013, ADR-0126 decision #2）
-- **ジャンクション検出安全ゲート**: `.opencode/` が `src/opencode/` 配下へ解決される場合は生成を停止（REQ-0141-010, ADR-0126 decision #3）
+- `src/opencode/` を変更しないこと（REQ-0141-014）
+- `src/opencode-local/` を変更しないこと
+- link 設定の結果を `src/opencode-local/` 配下へ出力しないこと
+- AgentDevFlow 本体リポジトリでローカル版 link 設定を実行しないこと（REQ-0141-006）
+- link target が意図した target 以外へ解決される場合は link 設定を停止すること（REQ-0141-010, AG-012）
+- `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（agentdev-gh-cli 以外）を `src/opencode/` 配下へ接続すること（ADR-0131 decision #2）
+- `.opencode/skills/agentdev-gh-cli/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続すること（ADR-0131 decision #3）
+- `runtime-overrides/` を設けないこと
+- バックエンド抽象化を導入しないこと（REQ-0141-027）
+- GitHub 互換ローカルサーバを前提にしないこと（REQ-0141-027）
+- GitHub Issue 作成、PR 作成、PR 取り込み、Issue クローズおよび `gh issue` / `gh pr` をローカル版の必須操作にしないこと（REQ-0141-026）
 
 ## リポジトリ管理対象
 
-- **管理対象外**: 生成された `.opencode/commands/` 、 `.opencode/skills/` 、 `.opencode/` 配下ひな形、変換スクリプト（REQ-0141-008, 009）。生成先リポジトリの `.gitignore` で除外することを推奨
+- **管理対象外**: link により接続された `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（agentdev-gh-cli を含む）。導入先リポジトリの `.gitignore` で除外することを推奨する（REQ-0141-008, ADR-0131 decision #1）
 - **管理対象**: `.agentdev/cases/` 配下の Case ファイル（REQ-0141-016）
 
 ## 関連項目
 
-- [生成フロー定義](generation-flow.md) — 手順、安全確認、`generated_by` 形式
-- [変換用プロンプト](transform/generate.md) — ローカル版生成の指示書
-- [レビュー用プロンプト](transform/review.md) — 生成結果の検証指示
-- [変換仕様](transform/spec.md) — 変換対象一覧、ガードレール一覧、レポートフォーマット
 - [Case ファイルスキーマ定義](agentdev-gh-cli/case-schema/case-file.md) — ローカル Case ファイルの構造
-- `docs/requirements/REQ-0141.md` — ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義（正本）
+- [ローカル版 agentdev-gh-cli ルーティング入口](agentdev-gh-cli/SKILL.md) — ローカル版 agentdev-gh-cli の手続き一覧
+- `docs/requirements/REQ-0141.md` — ローカル版 OpenCode 導入方式とローカル Case ファイル運用の要件定義（正本）
+- `docs/specs/local-generation.md` — link mode 接続フロー、link target 確認、更新運用の正本 SPEC
+- `docs/specs/local-transform.md` — 変換プロンプト廃止根拠、変換品質検証の読み替えの正本 SPEC
 - `docs/specs/local-case-file.md` — Case ファイルスキーマの正本 SPEC
-- `docs/specs/local-generation.md` — 生成フロー、安全ゲートの正本 SPEC
-- `docs/specs/local-transform.md` — 変換プロンプト、レビュープロンプト要件の正本 SPEC
-- `docs/adr/ADR-0126.md` — source model 拡張と生成安全性制約
+- `docs/specs/runtime-package-boundary.md` — `consumer-generated` リポジトリ種別、`.opencode/` 構成
+- `docs/adr/ADR-0131.md` — ローカル版導入方式を link mode へ統一し生成方式を廃止（ADR-0126 を supersede）
+- `docs/adr/ADR-0126.md` — ローカル版 OpenCode 生成基盤（superseded by ADR-0131、歴史参照）
