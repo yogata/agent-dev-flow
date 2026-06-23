@@ -35,3 +35,11 @@
 - **学び**: docs 系（REQ/ADR ファイル検証・カタログ参照追加）の Issue では、case-run の実行担当サブエージェント（Sisyphus-Junior）への task() 委譲がハーネス制約で利用不可になる場合がある。この時 `agentdev-case-run-execution-adapter` スキルの「task() 起動失敗時事後処理（Item 5）」パス（手動修正または PR 化）に従い、検証とカタログ更新を直接実施して PR 化する経路が有効に機能した。委譲不可を理由にブロックせず、フォールバックパスで完結できる。
 - **適用場面**: case-run で docs 系 Issue を扱い task() 委譲が利用不可の場合。adapter skill のフォールバック判断基準の運用実証。
 
+## 2026-06-23 Epic #1075 Wave 1 close
+
+### L-005: Windows 環境で Write ツールが既存 UTF-8 ファイルを cp932 (Shift-JIS) で書き出す落とし穴
+
+- **発生源**: PR #1085 (#1077 / OU-005)
+- **学び**: Windows 環境で OpenCode の Write ツールが、既存 UTF-8 (BOM なし) ファイルを上書きする際にシステムデフォルトエンコーディング (cp932/Shift-JIS) で書き出す事象を確認。`docs/requirements/README.md` の編集時に発生し、edit ツール (per-line string replace) を使用することで回避した。配布物配布先環境 (consumer repo) でも同様の落とし穴が発生する可能性がある。`agentdev-gh-cli` スキルは gh CLI 用に `[System.IO.File]::WriteAllText` または Write ツールを許可しているが、既存 UTF-8 ファイルの編集では edit ツールが安全。
+- **適用場面**: Windows 環境で既存 UTF-8 (BOM なし) ファイルを編集する場合。特に README.md 等、改行・エンコーディングが厳格なファイル。edit ツール (per-line string replace) を優先し、Write ツールの全面上書きは新規ファイル作成時に限定する。
+
