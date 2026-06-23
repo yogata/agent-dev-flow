@@ -23,7 +23,7 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプライン
 | `/agentdev/case-run` | 実装パイプライン（3 フェーズ構成） | sisyphus | [commands/case-run.md](commands/case-run.md) |
 | `/agentdev/case-update` | Issue 更新 | sisyphus | [commands/case-update.md](commands/case-update.md) |
 | `/agentdev/case-close` | 完了処理（達成判定プロトコル付き完了ゲート） | sisyphus | [commands/case-close.md](commands/case-close.md) |
-| `/agentdev/case-auto` | 最大自走モード | sisyphus | [commands/case-auto.md](commands/case-auto.md) |
+| `/agentdev/case-auto` | 最大自走モード（複数 execution_unit 並列 orchestration・blocked 部分停止） | sisyphus | [commands/case-auto.md](commands/case-auto.md) |
 
 #### learning パイプライン
 
