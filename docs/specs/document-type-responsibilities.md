@@ -121,6 +121,41 @@ fixture→「テストデータ」「検査データ」、variant→「種別」
 
 SSoT, HITL は略語のまま使用。初出時のみ日本語訳（「唯一の情報源（SSoT）」「人の判断を挟む（HITL）」）を併記。
 
+### 中黒使用の許容範囲
+
+中黒（・）は原則として日本語並列に使わない（japanese-tech-writing L18）。ただし以下は許容する:
+
+- 固定複合名詞の内部（「実行時・編集時」「コマンド・スキル・テンプレート・スクリプト」等の確定 tech term）
+- 単一固有名詞の内部
+
+流動的並列・識別子の並列・コード値の並列は読点（、）・スラッシュ・箇条書きに置換する。
+
+### em-dash 置換形式
+
+em-dash（`—`・`―`）は japanese-tech-writing L17 に従い、同格・補足は括弧（）、言い換え・敷衍は句点で2文分割または読点でつなぐ。コロン（`:`）による置換は行わない。
+
+### frontmatter 訳語
+
+YAML frontmatter は「YAML フロントマター」を推奨訳とする。原語併記（「frontmatter（YAML 前書き）」）または初出のみ訳出の運用も許容する。ファイル名 `rules/frontmatter.yaml` は原語を保持する。
+
+### 推奨訳語（追補）
+
+既存の用語政策に以下を追加する:
+
+- fixture → テストデータ/検査データ
+- variant → 種別/バリエーション/形式
+- provider → 提供元
+- baseline → 基準
+- current → 現行/現在の
+
+識別子（Type ID・enum 値・frontmatter field・ファイル名・バッククォート内コード値）は英語のままとする。
+
+### LLM 表現の検出→書き換え方針
+
+LLM 表現（接続の型・空虚な動詞・空虚な形容・ラベル前置き）の検出→書き換えパターンの具体例は
+`agentdev-doc-writing` スキルの運用参照資料 `references/llm-expression-patterns.md`（OU-003 の case-run で新規作成）で管理する。本 SPEC には方針のみを記載し、具体例の正誤表は skill references に集約する
+（REQ-0140-026「個別用語の正誤表は agentdev-doc-writing スキルの参照資料で管理」準拠）。
+
 ## 文書種別ごとの japanese-tech-writing 適用サブセット
 
 japanese-tech-writing が定める全規範のうち、文書種別ごとに適用するサブセットを示す。各文書種別は該当サブセットのみを適用対象とし、記載のない規範（演出・パラグラフライティング等）は適用外とする。guides/README のみ全規範を適用する。
