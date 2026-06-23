@@ -46,6 +46,7 @@ agentdev-gh-cli は以下の手続きを提供する（REQ-0149, ADR-0130 decisi
 | Issue 本文読込 | Issue 番号 | Issue 本文（Markdown） |
 | Issue 本文更新 | Issue 番号、本文 | なし（VERIFY で確認） |
 | Issue コメント追加 | Issue 番号、コメント本文 | なし（VERIFY で確認） |
+| PR 作成 | タイトル、本文、ベースブランチ、ヘッドブランチ | PR 番号、PR URL |
 | PR 本文読込 | PR 番号 | PR 本文（Markdown） |
 | PR merge | PR 番号、merge 方式 | merge コミットハッシュ |
 | Issue close | Issue 番号 | なし |
@@ -94,6 +95,7 @@ PR 関連手続きはスキップせず、Case ファイルの対応セクショ
 | Issue 本文読込 | Case ファイル読込 |
 | Issue 本文更新 | Case ファイル本文更新 |
 | Issue コメント追加 | `## 作業ログ` へ追記 |
+| PR 作成 | Case ファイル新規作成（PR 相当セクション: `## マージ前確認`、`## SPEC確定候補`、`## Findings / Capture候補`） |
 | PR 本文読込 | Case ファイル読込（`## マージ前確認`、`## SPEC確定候補`、`## Findings / Capture候補`） |
 | PR merge | `## マージ結果` へ記録 |
 | Issue close | `status: closed` + `closed_at` 更新 |
