@@ -47,7 +47,7 @@
 | [REQ-0135](requirements/REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry、`.sisyphus/` 除外 |
 | [REQ-0136](requirements/REQ-0136.md) | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設・req-define 強化） | spec-save 新設、req-define SPEC分離強化、case-* SPEC確定フロー、inspect-promote 自動promote、REQ健全性メトリクス、SPEC lifecycle（draft/accepted） |
 | [REQ-0137](requirements/REQ-0137.md) | 並列実行安全 git 操作規律（共有作業ツリーでの case-auto 並行実行支援） | 並列実行安全 git 操作規律、スイープ操作禁止、明示パスステージ&コミット、消費アーティファクト(draft/RU)削除信頼性・Form Zero解消・削除検証 Standard/Epic 全flow適用 |
-| [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 | コマンド間引き継ぎ draft 契約、soft-contract原則、artifact_actions構造、LLM推論消費 |
+| [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 | コマンド間引き継ぎ draft 契約、soft-contract原則、artifact_actions構造、LLM推論消費、depends_on意義拡張（技術的+機能的依存ヒント）・case_open_hints記録 |
 | [REQ-0139](requirements/REQ-0139.md) | 外部エージェント統合契約 | 外部エージェント統合、case-run外部実行委譲、driver adapter契約、req-define分類結果アクション |
 | [REQ-0140](requirements/REQ-0140.md) | 文書品質ゲート | 文書種別責務・要件性・文意品質・粒度の査読、IR-045、ドリフト検出、既存文書への遡及準拠修正 |
 | [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 | ローカル版生成方式、src/opencode-local/ 生成時ソース領域、ローカルCaseファイル、GitHub Issue/PR 置換、変換プロンプト、生成安全性制約 |
