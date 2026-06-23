@@ -39,6 +39,7 @@
 | REQ-0139 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
 | REQ-0140 | 文書品質ゲート | IR-013, IR-045 | docs, SPEC, document-type-responsibilities.md |
 | REQ-0141 | ローカル版 OpenCode 生成方式とローカル Case ファイル運用 | IR-016, IR-046, IR-047, IR-048 | src/opencode-local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/cases/, SPEC, guides |
+| REQ-0148 | RU群バッチ処理と複数 execution_unit 並列実行 | IR-006, IR-016 | commands |
 
 ## 要件行影響（Requirement-Line Impact）
 
@@ -67,7 +68,7 @@
 - **REQ-0141**: ローカル版 OpenCode 生成方式とローカル Case ファイル運用 (4 ルール: IR-016, IR-046, IR-047, IR-048)
 
 ### 低影響（1-2 ルール）
-- **REQ-0102**, **REQ-0105**, **REQ-0112**, **REQ-0113**, **REQ-0114**, **REQ-0123**, **REQ-0124**, **REQ-0125**, **REQ-0126**, **REQ-0127**, **REQ-0128**, **REQ-0129**, **REQ-0130**, **REQ-0131**, **REQ-0132**, **REQ-0133**, **REQ-0134**, **REQ-0135**, **REQ-0136**, **REQ-0138**, **REQ-0139**, **REQ-0140**
+- **REQ-0102**, **REQ-0105**, **REQ-0112**, **REQ-0113**, **REQ-0114**, **REQ-0123**, **REQ-0124**, **REQ-0125**, **REQ-0126**, **REQ-0127**, **REQ-0128**, **REQ-0129**, **REQ-0130**, **REQ-0131**, **REQ-0132**, **REQ-0133**, **REQ-0134**, **REQ-0135**, **REQ-0136**, **REQ-0138**, **REQ-0139**, **REQ-0140**, **REQ-0148**
 
 ### 直接影響なし
 - **REQ-0110**: Git worktree cleanup 信頼性（インフラストラクチャ層）
