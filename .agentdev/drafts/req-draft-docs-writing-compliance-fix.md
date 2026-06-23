@@ -150,7 +150,10 @@ operation_units:
     depends_on: []
     recommended_order: 5
     issue_policy: single
-    result: {}
+    result:
+      epic_issue: 1075
+      child_issue: 1078
+      wave: 2
   - ou_id: OU-002
     source_ru: RU-0002
     operation: update
@@ -158,7 +161,10 @@ operation_units:
     depends_on: []
     recommended_order: 6
     issue_policy: single
-    result: {}
+    result:
+      epic_issue: 1075
+      child_issue: 1076
+      wave: 2
   - ou_id: OU-003
     source_ru: RU-0003
     operation: update
@@ -166,7 +172,10 @@ operation_units:
     depends_on: []
     recommended_order: 7
     issue_policy: single
-    result: {}
+    result:
+      epic_issue: 1075
+      child_issue: 1079
+      wave: 2
   - ou_id: OU-004
     source_ru: RU-0004
     operation: update
@@ -174,7 +183,10 @@ operation_units:
     depends_on: []
     recommended_order: 8
     issue_policy: single
-    result: {}
+    result:
+      epic_issue: 1075
+      child_issue: 1080
+      wave: 2
   - ou_id: OU-005
     source_ru: RU-0005
     operation: update
@@ -182,7 +194,10 @@ operation_units:
     depends_on: []
     recommended_order: 1
     issue_policy: single
-    result: {}
+    result:
+      epic_issue: 1075
+      child_issue: 1077
+      wave: 1
   - ou_id: OU-006
     source_ru: RU-0006
     operation: update
@@ -190,7 +205,10 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      epic_issue: 1075
+      child_issue: 1081
+      wave: 1
   - ou_id: OU-007
     source_ru: RU-0007
     operation: update
@@ -198,7 +216,10 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      epic_issue: 1075
+      child_issue: 1082
+      wave: 1
 
 case_open_hints:
   epic_needed: true
