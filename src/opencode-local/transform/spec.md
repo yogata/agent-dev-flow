@@ -129,22 +129,22 @@
 
 ## Case ファイルスキーマ参照
 
-変換時・レビュー時に参照する Case ファイル定義（`src/opencode-local/case-schema/`）。
+変換時・レビュー時に参照する Case ファイル定義（`src/opencode-local/agentdev-gh-cli/case-schema/`）。
 
 | 参照先 | 内容 |
 |---|---|
-| `case-schema/case-file.md` | Case ファイルスキーマ定義（YAML 前書き、status enum、labels、headings、採番） |
-| `case-schema/rules/frontmatter.yaml` | YAML 前書きスキーマの機械可読定義（REQ-0141-017） |
-| `case-schema/rules/status.yaml` | status enum と状態遷移表の機械可読定義（REQ-0141-018） |
-| `case-schema/rules/labels.yaml` | labels 値域の機械可読定義（REQ-0141-019） |
-| `case-schema/rules/headings.yaml` | 見出し一覧の機械可読定義（REQ-0141-020） |
+| `agentdev-gh-cli/case-schema/case-file.md` | Case ファイルスキーマ定義（YAML 前書き、status enum、labels、headings、採番） |
+| `agentdev-gh-cli/case-schema/rules/frontmatter.yaml` | YAML 前書きスキーマの機械可読定義（REQ-0141-017） |
+| `agentdev-gh-cli/case-schema/rules/status.yaml` | status enum と状態遷移表の機械可読定義（REQ-0141-018） |
+| `agentdev-gh-cli/case-schema/rules/labels.yaml` | labels 値域の機械可読定義（REQ-0141-019） |
+| `agentdev-gh-cli/case-schema/rules/headings.yaml` | 見出し一覧の機械可読定義（REQ-0141-020） |
 
 ## 関連項目
 
 - [変換用プロンプト](generate.md) — ローカル版生成の指示書
 - [レビュー用プロンプト](review.md) — 生成結果の検証指示
 - [生成フロー定義](../generation-flow.md) — 手順、安全確認、`generated_by` 形式
-- [Case ファイルスキーマ定義](../case-schema/case-file.md) — ローカル Case ファイルの構造
+- [Case ファイルスキーマ定義](../agentdev-gh-cli/case-schema/case-file.md) — ローカル Case ファイルの構造
 - `docs/specs/local-transform.md` — 変換プロンプト、レビュープロンプト要件の正本
 - `docs/specs/local-generation.md` — 生成フロー、安全ゲートの正本
 - REQ-0141 — ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義

@@ -15,7 +15,7 @@
 | 種別 | 対象 |
 |---|---|
 | レビュー対象（生成物） | 生成先リポジトリの `.opencode/commands/agentdev/` 、 `.opencode/skills/agentdev-*/` 、 `.opencode/` 配下ひな形 |
-| 参照定義（仕様管理リポジトリ） | `src/opencode-local/case-schema/case-file.md` 、 `rules/*.yaml` 、 `transform/spec.md` 、 `generation-flow.md` |
+| 参照定義（仕様管理リポジトリ） | `src/opencode-local/agentdev-gh-cli/case-schema/case-file.md` 、 `rules/*.yaml` 、 `transform/spec.md` 、 `generation-flow.md` |
 | 正本 SPEC | `docs/specs/local-case-file.md` 、 `docs/specs/local-generation.md` 、 `docs/specs/local-transform.md` |
 
 ## 確認対象一覧
@@ -122,6 +122,6 @@ GitHub 固有参照の違反/非違反判定基準は `transform/spec.md` の「
 
 - [変換用プロンプト](generate.md) — ローカル版生成の指示書
 - [変換仕様](spec.md) — 変換対象一覧、ガードレール一覧、レポートフォーマットの集約
-- [Case ファイルスキーマ定義](../case-schema/case-file.md) — ローカル Case ファイルの構造
+- [Case ファイルスキーマ定義](../agentdev-gh-cli/case-schema/case-file.md) — ローカル Case ファイルの構造
 - `docs/specs/local-transform.md` — レビュープロンプト要件の正本
 - REQ-0141 — ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義
