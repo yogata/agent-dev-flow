@@ -29,7 +29,7 @@
 | [REQ-0129](REQ-0129.md) | Backlog-review | backlog-review、RU 直接生成、採用済み成果物の読込・統合・矛盾検出、depends_on（RU-ID限定・循環依存検証）、REQ再構成intake ルーティング分離 |
 | [REQ-0130](REQ-0130.md) | case-run / 実装パイプライン | case-run、作業用 worktree 実装、PR 作成、QG-3（PR作成直前ゲート）、本筋外 検出事項のPR本文記録、capture 責務境界（inbox 非変更・PR本文経由引き継ぎ） |
 | [REQ-0131](REQ-0131.md) | case-close / 完了処理 | case-close、完了ゲート、PR merge（squash・リトライ・フォールバック）、Issue close、capture 回収（PR本文→ドメイン状態）、branch/worktree cleanup、ローカル変更検出時の安全停止、force-with-lease制約 |
-| [REQ-0132](REQ-0132.md) | case-open / Issue作成 | case-open、Issue本文生成（REQ番号埋め込み）、Standard/Epic flow ルーティング、RU削除責務（Issue作成+VERIFY成功後）、capture 非関与 |
+| [REQ-0132](REQ-0132.md) | case-open / Issue作成 | case-open、Issue本文生成（REQ番号埋め込み）、Standard/Epic flow ルーティング、連結成分ベース複数Standard/Epic構成生成・3軸判断・単独根Standard flow、RU削除責務（Issue作成+VERIFY成功後）、capture 非関与 |
 | [REQ-0133](REQ-0133.md) | case-update / Issue更新 | case-update、Issue本文更新（テンプレート構造維持）、コメント追加、REQ ファイル更新（直接commit+push）、レビューNG対応、フェーズ維持 |
 | [REQ-0134](REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install | source/projection layout、sync/migration script、repo type、consumer install |
 | [REQ-0135](REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry、`.sisyphus/` 除外 |
