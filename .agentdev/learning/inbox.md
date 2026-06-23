@@ -51,6 +51,20 @@
 - **学び**: REQ-0149-002 は agentdev-gh-cli の8手続きを列挙したが「PR 作成」が含まれていなかった。Sisyphus-Junior が PR を作成する中核操作のため、実装（SPEC/contracts/standard-procedures）に「PR 作成」を追加しないと REQ-0149-001「PR 操作の委譲」が実装できない。本 PR では SPEC 拡張として「PR 作成」を追加（9手続き）し、REQ-0149-002 本体への追記は別途検討とした。要件定義で「列挙」を明示した場合、実装上必須の中核操作が漏れることがある。実装段階で SPEC を拡張して補完しつつ、REQ との整合は別途 req-save で処理する二段階判断が有効。
 - **適用場面**: REQ で手続き・API・コマンド等を列挙定義した場合。実装で中核操作の欠落に気づいた際、SPEC 拡張で即時対応しつつ REQ 更新を後続工程に委ねる判断基準。
 
+## 2026-06-23 Epic #1093 Wave 2 close
+
+### L-008: worktree + .gitignore で junction が切れた環境では src/opencode/skills/ を直接参照
+
+- **発生源**: PR #1099 (#1095 / REQ-0150 + ADR-0130)
+- **学び**: worktree 内で `.opencode/skills/` への junction が切れている環境（git worktree + .gitignore で `.opencode/*` を除外）では、標準版スキルは `src/opencode/skills/` を直接読む必要がある。今回そのパターンに遭遇し、`src/opencode/skills/agentdev-gh-cli/` を直接参照して標準版構造を把握した。worktree 前提の作業では SoT パス（`src/opencode/`）を直接参照する運用が有用。L-003（source-projection-sync の偽陽性）と同じ根因だが、検査対象ではなく実装時の参照パス問題として再発。worktree 環境の junction 非伝播は検査・実装の両面で影響する。
+- **適用場面**: worktree 環境で標準版スキル・コマンドの構造を確認する場合。`.opencode/` 経由ではなく `src/opencode/` を直接参照する運用の判断基準。
+
+### L-009: Windows + worktree 環境で git mv の実行形式による成否差異
+
+- **発生源**: PR #1099 (#1095 / REQ-0150 + ADR-0130)
+- **学び**: git mv でディレクトリを移動する際、`git -C <worktree> mv <src> <dst>` が `fatal: renaming ... failed: No such file or directory` で失敗した。`workdir` パラメータで worktree を作業ディレクトリにして `git mv` を実行すると成功した。Windows + worktree 環境では、`git -C` と `workdir` + 平置き `git` コマンドで挙動が異なる場合がある。`git -C <path>` はカレントディレクトリを変更せずにパスを指定するが、worktree 内の相対パス解決と Windows のパス処理が干渉したと推測される。ディレクトリ移動を伴う git mv では workdir 指定を優先する。
+- **適用場面**: Windows + worktree 環境で git mv によるディレクトリ移動を実行する場合。`git -C` 失敗時のフォールバックとして workdir 指定 + 平置き git mv を試す判断基準。
+
 ## 2026-06-23 Epic #1075 Wave 2 close
 
 ### L-006: 並列機械的テキスト置換 OU の Wave 実行で文字レベルマージが必要になる
