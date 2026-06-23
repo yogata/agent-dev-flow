@@ -28,13 +28,13 @@ docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/
 
 ## 参照する references
 
-- `references/document-boundaries.md` — 文書種別責務
-- `references/req-line-quality.md` — 要件行の品質
-- `references/adr-writing-quality.md` — ADR 本文の品質
-- `references/spec-writing-quality.md` — SPEC 本文の品質
-- `references/rewrite-patterns.md` — 検出→書き換え
-- `references/review-output.md` — 査読出力形式
-- `references/execution-subject-classification.md` — 実行主体分類（command / skill / subagent / harness）の査読
+- `references/document-boundaries.md`（文書種別責務）
+- `references/req-line-quality.md`（要件行の品質）
+- `references/adr-writing-quality.md`（ADR 本文の品質）
+- `references/spec-writing-quality.md`（SPEC 本文の品質）
+- `references/rewrite-patterns.md`（検出→書き換え）
+- `references/review-output.md`（査読出力形式）
+- `references/execution-subject-classification.md`（実行主体分類（command / skill / subagent / harness）の査読）
 
 配置基準・用語政策の原本は `docs/specs/document-type-responsibilities.md`、執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。内容が重複する場合は原本を優先（REQ-0140-023）。
 
@@ -63,7 +63,7 @@ docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/
 
 ## See Also
 
-- [agentdev-req-analysis.md](agentdev-req-analysis.md) — 要件分析（動的判断）
-- [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md) — ADR 要否判定（動的判断）
-- [document-type-responsibilities.md](../document-type-responsibilities.md) — 配置基準・用語政策 原本 SPEC
-- REQ-0140 — 文書品質ゲート
+- [agentdev-req-analysis.md](agentdev-req-analysis.md)（要件分析（動的判断））
+- [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)（ADR 要否判定（動的判断））
+- [document-type-responsibilities.md](../document-type-responsibilities.md)（配置基準・用語政策 原本 SPEC）
+- REQ-0140（文書品質ゲート）

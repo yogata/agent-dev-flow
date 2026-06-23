@@ -14,7 +14,7 @@ updated: 2026-06-21
 ## 入力
 
 - `.agentdev/inspect/inbox/*.md`（検出事項ファイル群）
-- `--auto`（省略可能）— 高確信度検出事項の自動 promote を有効化
+- `--auto`（省略可能）（高確信度検出事項の自動 promote を有効化）
 
 ## 出力
 
@@ -49,8 +49,8 @@ updated: 2026-06-21
 
 ## 参照する横断 SPEC
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md) — コマンド分類
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md) — 検出事項プロトコル・inspect-promote 自動 promote 対象カテゴリ・投入先・実行ログ・誤検知 revoke 手順
+- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類）
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（検出事項プロトコル・inspect-promote 自動 promote 対象カテゴリ・投入先・実行ログ・誤検知 revoke 手順）
 
 ## 対象外
 
@@ -74,7 +74,7 @@ updated: 2026-06-21
 
 ## See Also
 
-- [inspect-docs.md](inspect-docs.md), [inspect-skills.md](inspect-skills.md) — 前段コマンド（検出事項生成）
-- [backlog-review.md](backlog-review.md) — 後続コマンド（RU 生成）
-- REQ-0126 — inspect-promote / 検出事項分類・昇格
-- REQ-0136 — inspect-promote 自動 promote（REQ-0136-016）
+- [inspect-docs.md](inspect-docs.md), [inspect-skills.md](inspect-skills.md)（前段コマンド（検出事項生成））
+- [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
+- REQ-0126（inspect-promote / 検出事項分類・昇格）
+- REQ-0136（inspect-promote 自動 promote（REQ-0136-016））

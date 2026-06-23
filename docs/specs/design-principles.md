@@ -20,11 +20,11 @@ Issue の種別に応じて異なるワークフローを適用する。work_typ
 
 | work_type | scale | workflow_route | 経路 |
 |---|---|---|---|
-| bugfix | — | direct_case | req-define → case-open → case-run → case-close |
+| bugfix | - | direct_case | req-define → case-open → case-run → case-close |
 | feature | standard | req_backed_case | req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close |
 | feature | large | epic_case | req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open（Epic）→ case-run（Wave）→ case-close |
-| maintenance | — | direct_case | req-define → case-open → case-run → case-close |
-| docs_chore | — | direct_case | req-define → case-open → case-run → case-close |
+| maintenance | - | direct_case | req-define → case-open → case-run → case-close |
+| docs_chore | - | direct_case | req-define → case-open → case-run → case-close |
 
 ---
 

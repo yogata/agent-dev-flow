@@ -58,5 +58,5 @@ Issue 番号に基づいて安全かつ一貫性のある方法で git worktree 
 - [agentdev-conventional-commits.md](agentdev-conventional-commits.md)
 - [commands/case-run.md](../commands/case-run.md)
 - [commands/case-close.md](../commands/case-close.md)
-- REQ-0110 — Git worktree cleanup 信頼性
-- REQ-0137 — 並列実行安全 git 操作規律
+- REQ-0110（Git worktree cleanup 信頼性）
+- REQ-0137（並列実行安全 git 操作規律）

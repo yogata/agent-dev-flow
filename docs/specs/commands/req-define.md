@@ -33,10 +33,10 @@ updated: 2026-06-23
 
 ## 現在の動作
 
-- Step 0: セッションコンテキスト検知（引数なし単体実行時のみ）— 当該セッション履歴・現在コンテキストを Requirement Source 候補として評価
-- Step 1: 明示入力ファイル読込（指定時）— RU 自動検出を含む
+- Step 0: セッションコンテキスト検知（引数なし単体実行時のみ）（当該セッション履歴・現在コンテキストを Requirement Source 候補として評価）
+- Step 1: 明示入力ファイル読込（指定時）（RU 自動検出を含む）
 - Step 2: 壁打ち対話（`agentdev-req-analysis` に従い深掘り）
-  - Step 2-1: 前工程からの引き継ぎ判定 — `agentdev_handoff: true` フラグ処理
+  - Step 2-1: 前工程からの引き継ぎ判定（`agentdev_handoff: true` フラグ処理）
 - Step 3: 既存REQ照合（`agentdev-req-file-manager` 照合方法論）
   - Step 3-1: 定量的データ検証（`glob docs/requirements/REQ-*.md` で AGENTS.md 記載レンジと照合）
   - Step 3-2: SPLIT 予兆計測（既存REQの健全性メトリクス計測）
@@ -45,7 +45,7 @@ updated: 2026-06-23
   - Step 4-2: 分類ゲート（変更後仕様 or 反映作業・REQ/SPEC 境界判定）
 - Step 4-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
 - Step 4-4: ADR要否確認ゲート（`agentdev-architecture-advisory` oracle 連携）
-- Step 4-5: 実行主体分類表（REQ-0146-007） — 委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照）。委譲を含まない要件では省略可
+- Step 4-5: 実行主体分類表（REQ-0146-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
 - Step 5: ADR判断（`agentdev-adr-guidelines`）
   - Step 5-0: 既存ADR重複確認
   - Step 5-1: ADR禁止ゲート
@@ -61,19 +61,19 @@ updated: 2026-06-23
   - Step 8-1: 実装スコープシグナル確認
 - Step 9: ドラフト保存（`.agentdev/drafts/req-draft-{topic-slug}.md`）
   - Step 9-1: 実装詳細の分離
-  - Step 9-2: auto_gate完了ゲート — auto_gate.auto_ready:false または未解決 item 残存時、stop_reasons を提示し解消方策を壁打ちで合意。解消時は auto_ready:true に更新。ユーザーが明示的に false 選択時は conflict_resolutions に記録し継続。未解決のままの場合は壁打ちへ差し戻し。
+  - Step 9-2: auto_gate完了ゲート（auto_gate.auto_ready:false または未解決 item 残存時、stop_reasons を提示し解消方策を壁打ちで合意）。解消時は auto_ready:true に更新。ユーザーが明示的に false 選択時は conflict_resolutions に記録し継続。未解決のままの場合は壁打ちへ差し戻し。
 - Step 10: 要件doc確認（ユーザー提示のみ・承認は求めない）
   - Step 10-1〜10-6: 複数RU受付・統合/分離判定・出力生成・Epic規模検出・Wave候補記録・OU 構造検証
 - Step 11: 完了報告（work_type 別テンプレート選択）
 
 ## 参照する横断 SPEC
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md) — フェーズ定義・SSoT 遷移
-- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md) — extraction / classification 委譲
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md) — REQ再構成 intake・draft lifecycle
-- [req-health-metrics.md](../req-health-metrics.md) — SPLIT 予兆計測閾値
-- [quality-gates.md](../quality-gates.md) — QG-1
-- [document-type-responsibilities.md](../document-type-responsibilities.md) — draft body 品質検査
+- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義・SSoT 遷移）
+- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（extraction / classification 委譲）
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ再構成 intake・draft lifecycle）
+- [req-health-metrics.md](../req-health-metrics.md)（SPLIT 予兆計測閾値）
+- [quality-gates.md](../quality-gates.md)（QG-1）
+- [document-type-responsibilities.md](../document-type-responsibilities.md)（draft body 品質検査）
 
 ## 対象外
 
@@ -100,15 +100,15 @@ updated: 2026-06-23
 
 ## See Also
 
-- [req-save.md](req-save.md) — 後続コマンド（REQ/ADR 保存）
-- [spec-save.md](spec-save.md) — 後続コマンド（SPEC 保存）
-- [case-open.md](case-open.md) — 後続コマンド（Issue 作成）
-- `agentdev-req-analysis` skill — 要件分析手法
-- `agentdev-req-file-manager` skill — REQ ファイル管理・照合
-- `agentdev-adr-guidelines` skill — ADR 判断基準
-- `agentdev-architecture-advisory` skill — oracle 連携
-- `agentdev-workflow-lifecycle` skill — work_type・scale 判定
-- REQ-0102 — 要件定義・保存
-- REQ-0138 — 構造化 req_draft 契約
-- REQ-0139 — 外部エージェント統合契約（oracle）
-- ADR-0124 — 構造化 draft-data 形式
+- [req-save.md](req-save.md)（後続コマンド（REQ/ADR 保存））
+- [spec-save.md](spec-save.md)（後続コマンド（SPEC 保存））
+- [case-open.md](case-open.md)（後続コマンド（Issue 作成））
+- `agentdev-req-analysis` skill（要件分析手法）
+- `agentdev-req-file-manager` skill（REQ ファイル管理・照合）
+- `agentdev-adr-guidelines` skill（ADR 判断基準）
+- `agentdev-architecture-advisory` skill（oracle 連携）
+- `agentdev-workflow-lifecycle` skill（work_type・scale 判定）
+- REQ-0102（要件定義・保存）
+- REQ-0138（構造化 req_draft 契約）
+- REQ-0139（外部エージェント統合契約（oracle））
+- ADR-0124（構造化 draft-data 形式）

@@ -30,17 +30,17 @@ updated: 2026-06-21
 ## 現在の動作
 
 - Step 1: 入力受領
-- Step 2: intake item 生成 — 推奨標準形に整理・ユーザー未指定セクションは省略（G13: 過度補完禁止・G11: 過度解釈禁止）
-- Step 3: ファイル名生成 — `YYYY-MM-DD-{topic-slug}.md`
-- Step 3-1: 実行前同期 — `git pull --ff-only`
-- Step 4: 保存 — `.agentdev/intake/inbox/`。同名時は連番付与
-- Step 4-1: commit/push — `.agentdev/intake/` 配下変更のみ
+- Step 2: intake item 生成（推奨標準形に整理・ユーザー未指定セクションは省略（G13: 過度補完禁止・G11: 過度解釈禁止））
+- Step 3: ファイル名生成（`YYYY-MM-DD-{topic-slug}.md`）
+- Step 3-1: 実行前同期（`git pull --ff-only`）
+- Step 4: 保存（`.agentdev/intake/inbox/`）。同名時は連番付与
+- Step 4-1: commit/push（`.agentdev/intake/` 配下変更のみ）
 - Step 5: 完了報告
 
 ## 参照する横断 SPEC
 
-- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) — Split Rule（作業知見のみは除外）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md) — intake inbox lifecycle
+- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Split Rule（作業知見のみは除外））
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（intake inbox lifecycle）
 
 ## 対象外
 
@@ -64,7 +64,7 @@ updated: 2026-06-21
 
 ## See Also
 
-- [intake-promote.md](intake-promote.md) — 後続コマンド（採用判断）
-- [intake-from-github.md](intake-from-github.md) — GitHub からの自動抽出
-- `agentdev-intake-pipeline` skill — 共通手順
-- REQ-0127 — Intake command群
+- [intake-promote.md](intake-promote.md)（後続コマンド（採用判断））
+- [intake-from-github.md](intake-from-github.md)（GitHub からの自動抽出）
+- `agentdev-intake-pipeline` skill（共通手順）
+- REQ-0127（Intake command群）

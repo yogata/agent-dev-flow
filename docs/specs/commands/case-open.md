@@ -35,40 +35,40 @@ updated: 2026-06-23
 
 ## 現在の動作
 
-- Step 0: 前工程からの引き継ぎ停止判定 — `agentdev_handoff: true` 含まれる場合は Issue 作成せず停止
-- Step 0-1: OU 選択ゲート — `operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止）
-- Step 1: 要件docからIssue本文生成（`agentdev-issue-management`）— REQ読解・テンプレート充足検査・完了条件候補抽出
-  - Step 1-1: 完了条件網羅性検証（QG-2）— Issue作成前に REQ/ADR/SPEC 必達要件の網羅性を検証
-- Step 2: マルチREQ入力判定 — 単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐
-  - Step 2-1: 自律構成生成（OU モード・複数REQ時）— `operation_units` から Epic / Wave / Issue 構造を自律生成
-- Step 3: 規模判定（単一REQの場合）— `scale: large` → Epic flow / `scale: standard` → Standard flow
+- Step 0: 前工程からの引き継ぎ停止判定（`agentdev_handoff: true` 含まれる場合は Issue 作成せず停止）
+- Step 0-1: OU 選択ゲート（`operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止））
+- Step 1: 要件docからIssue本文生成（`agentdev-issue-management`）（REQ読解・テンプレート充足検査・完了条件候補抽出）
+  - Step 1-1: 完了条件網羅性検証（QG-2）（Issue作成前に REQ/ADR/SPEC 必達要件の網羅性を検証）
+- Step 2: マルチREQ入力判定（単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐）
+  - Step 2-1: 自律構成生成（OU モード・複数REQ時）（`operation_units` から Epic / Wave / Issue 構造を自律生成）
+- Step 3: 規模判定（単一REQの場合）（`scale: large` → Epic flow / `scale: standard` → Standard flow）
 - Epic flow（Steps 4-8-1）:
   - Step 4: テンプレート読込（`agentdev-workflow-templates`）
-  - Step 5: Epic Issue本文生成 — 自律構成分析結果に基づき Epic 本文を構築
-  - Step 6: Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）— VERIFY
-  - Step 7: 子Issue作成（OU 単位・順次処理）— Issue化単位は REQ doc 単位ではなく OU 単位（REQ-0104-042）。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-0146-011・`docs/specs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
-  - Step 8: Epic Issue本文更新 — ステータス追跡テーブル更新
-  - Step 8-1: OU `result` 書き戻し — Issue / Epic 番号
+  - Step 5: Epic Issue本文生成（自律構成分析結果に基づき Epic 本文を構築）
+  - Step 6: Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）（VERIFY）
+  - Step 7: 子Issue作成（OU 単位・順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-0104-042））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-0146-011・`docs/specs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
+  - Step 8: Epic Issue本文更新（ステータス追跡テーブル更新）
+  - Step 8-1: OU `result` 書き戻し（Issue / Epic 番号）
 - Standard flow（Steps 14-16-1）:
   - Step 14: 関連ADR特定
   - Step 15: ラベル付与（`agentdev-workflow-lifecycle`）
-  - Step 16: GitHub Issue作成 — VERIFY
-  - Step 16-1: OU `result` 書き戻し — Issue 番号
+  - Step 16: GitHub Issue作成（VERIFY）
+  - Step 16-1: OU `result` 書き戻し（Issue 番号）
 - 共通終了処理（Steps 17-18-2）:
   - Step 17: コメント追加（`agentdev-workflow-templates`）
   - Step 18: ドラフト削除（`git rm` + `git commit` Form Zero）
   - Step 18-1: RU ファイル削除（`git rm` + `git commit` Form Zero）
-- Step 18-1-1: draft / RU 削除残存検証 — `git status --porcelain` で残存検出
-- Step 18-1-2: draft/RU 削除 commit 後の即時 push（REQ-0146-003） — Step 18 / 18-1 の削除コミット後に `git push` を即時実行する。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
+- Step 18-1-1: draft / RU 削除残存検証（`git status --porcelain` で残存検出）
+- Step 18-1-2: draft/RU 削除 commit 後の即時 push（REQ-0146-003）（Step 18 / 18-1 の削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
 - Step 18-2: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
 
 ## 参照する横断 SPEC
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md) — フェーズ定義・コマンド分類・workflow_route
-- [workflows/epic-wave-model.md](../workflows/epic-wave-model.md) — Epic / Wave / Issue 階層・子Issue 状態 enum・case-open 構成生成基準
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md) — RU 削除トリガー・draft lifecycle
-- [quality-gates.md](../quality-gates.md) — QG-2
-- [document-type-responsibilities.md](../document-type-responsibilities.md) — Issue 本文品質検査
+- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義・コマンド分類・workflow_route）
+- [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic / Wave / Issue 階層・子Issue 状態 enum・case-open 構成生成基準）
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（RU 削除トリガー・draft lifecycle）
+- [quality-gates.md](../quality-gates.md)（QG-2）
+- [document-type-responsibilities.md](../document-type-responsibilities.md)（Issue 本文品質検査）
 
 ## 対象外
 
@@ -121,17 +121,17 @@ case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_ope
 
 ## See Also
 
-- [req-define.md](req-define.md) — 前段コマンド
-- [req-save.md](req-save.md) — 前段コマンド（REQ/ADR 保存）
-- [spec-save.md](spec-save.md) — 前段コマンド（SPEC 保存）
-- [case-run.md](case-run.md) — 後続コマンド（実装）
-- `agentdev-issue-management` skill — Issue 本文生成・テンプレート充足
-- `agentdev-workflow-templates` skill — テンプレート選定
-- `agentdev-workflow-lifecycle` skill — work_type・scale 判定・ラベル付与
-- `agentdev-gh-cli` skill — gh CLI 安全使用
-- `agentdev-git-worktree` skill — 並列実行安全ステージング
-- `agentdev-quality-gates` skill — QG-2
-- `agentdev-epic-tracker` skill — ステータス追跡テーブル
-- REQ-0132 — case-open / Issue作成
-- REQ-0137 — 並列実行安全 git 操作規律
-- REQ-0148 — RU群バッチ処理と複数 execution_unit 並列実行
+- [req-define.md](req-define.md)（前段コマンド）
+- [req-save.md](req-save.md)（前段コマンド（REQ/ADR 保存））
+- [spec-save.md](spec-save.md)（前段コマンド（SPEC 保存））
+- [case-run.md](case-run.md)（後続コマンド（実装））
+- `agentdev-issue-management` skill（Issue 本文生成・テンプレート充足）
+- `agentdev-workflow-templates` skill（テンプレート選定）
+- `agentdev-workflow-lifecycle` skill（work_type・scale 判定・ラベル付与）
+- `agentdev-gh-cli` skill（gh CLI 安全使用）
+- `agentdev-git-worktree` skill（並列実行安全ステージング）
+- `agentdev-quality-gates` skill（QG-2）
+- `agentdev-epic-tracker` skill（ステータス追跡テーブル）
+- REQ-0132（case-open / Issue作成）
+- REQ-0137（並列実行安全 git 操作規律）
+- REQ-0148（RU群バッチ処理と複数 execution_unit 並列実行）

@@ -40,20 +40,20 @@ updated: 2026-06-22
 
 ## 現在の動作
 
-- Step 0: 実行前同期 — `git pull --ff-only`
-- Step 1: 成果物検出 — 引数有無切り替え（引数あり: 指定ファイルのみ / 引数なし: `promoted/` 全件）
-- Step 2: 成果物読込・分析 — `agentdev-backlog-integration` 参照
-- Step 3: 統合分割判定 + depends_on 依存解決 + ユーザー承認（判断の確定・REQ-0147-003） — `agentdev-backlog-integration` 参照
-- Step 4: 矛盾検出 — 矛盾検出時のみ追加判断を求める（REQ-0147-009）。矛盾なしの場合、Step 3 の統合・分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない（G05）
-- Step 5: RU 生成 — 採用済み成果物の単純コピー（パススルー）は禁止（G03・REQ-0105）
-- Step 6: 成果成果物削除 — RU 生成失敗成果物は削除しない（G06）
+- Step 0: 実行前同期（`git pull --ff-only`）
+- Step 1: 成果物検出（引数有無切り替え（引数あり: 指定ファイルのみ / 引数なし: `promoted/` 全件））
+- Step 2: 成果物読込・分析（`agentdev-backlog-integration` 参照）
+- Step 3: 統合分割判定 + depends_on 依存解決 + ユーザー承認（判断の確定・REQ-0147-003）（`agentdev-backlog-integration` 参照）
+- Step 4: 矛盾検出（矛盾検出時のみ追加判断を求める（REQ-0147-009））。矛盾なしの場合、Step 3 の統合・分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない（G05）
+- Step 5: RU 生成（採用済み成果物の単純コピー（パススルー）は禁止（G03・REQ-0105））
+- Step 6: 成果成果物削除（RU 生成失敗成果物は削除しない（G06））
 - Step 7: Git 永続化
 - Step 8: 完了報告
 
 ## 参照する横断 SPEC
 
-- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) — Capture 境界
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md) — RU lifecycle・採用済み成果物 lifecycle
+- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（RU lifecycle・採用済み成果物 lifecycle）
 
 ## 対象外
 
@@ -72,8 +72,8 @@ updated: 2026-06-22
 
 ## See Also
 
-- [intake-promote.md](intake-promote.md), [learning-promote.md](learning-promote.md), [inspect-promote.md](inspect-promote.md) — 前段コマンド
-- [req-define.md](req-define.md) — 後続コマンド（RU を入力として要件定義）
-- `agentdev-backlog-integration` skill — 分析基準・統合分割判定・depends_on 依存解決・矛盾検出・RU 生成ルール
-- REQ-0105 — RU lifecycle
-- REQ-0129 — Backlog-review
+- [intake-promote.md](intake-promote.md), [learning-promote.md](learning-promote.md), [inspect-promote.md](inspect-promote.md)（前段コマンド）
+- [req-define.md](req-define.md)（後続コマンド（RU を入力として要件定義））
+- `agentdev-backlog-integration` skill（分析基準・統合分割判定・depends_on 依存解決・矛盾検出・RU 生成ルール）
+- REQ-0105（RU lifecycle）
+- REQ-0129（Backlog-review）

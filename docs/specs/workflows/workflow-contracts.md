@@ -109,14 +109,14 @@ Local backend（ローカル版 OpenCode）では、構造的実行以降の SSo
 
 | コマンド | specs | ADR | REQ | finding | learning | intake | integrity |
 |---|---|---|---|---|---|---|---|
-| `/agentdev/req-define` | — | — | READ | READ（明示入力時） | — | — | — |
-| `/agentdev/req-save` | — | WRITE | WRITE | WRITE（SPLIT検出時） | — | — | — |
-| `/agentdev/spec-save` | WRITE | — | — | — | — | — | — |
-| `/agentdev/case-open` | READ | READ | READ | — | — | — | — |
-| `/agentdev/case-run` | READ+WRITE | READ | READ | — | — | — | — |
-| `/agentdev/case-close` | — | — | READ | — | WRITE（capture） | WRITE（capture） | — |
-| `/agentdev/case-auto` | READ+WRITE | READ+WRITE | READ+WRITE | — | WRITE（capture） | WRITE（capture） | — |
-| `/agentdev/case-update` | — | — | READ+WRITE | — | — | — | — |
+| `/agentdev/req-define` | - || READ | READ（明示入力時） | - || - |
+| `/agentdev/req-save` | - | WRITE | WRITE | WRITE（SPLIT検出時） | - || - |
+| `/agentdev/spec-save` | WRITE | - || - || - ||
+| `/agentdev/case-open` | READ | READ | READ | - || - ||
+| `/agentdev/case-run` | READ+WRITE | READ | READ | - || - ||
+| `/agentdev/case-close` | - || READ | - | WRITE（capture） | WRITE（capture） | - |
+| `/agentdev/case-auto` | READ+WRITE | READ+WRITE | READ+WRITE | - | WRITE（capture） | WRITE（capture） | - |
+| `/agentdev/case-update` | - || READ+WRITE | - || - ||
 
 ## ワークフロー経路制御
 
@@ -126,9 +126,9 @@ work_type と scale により workflow_route を決定する。work_type は bug
 |---|---|---|
 | feature | standard | req_backed_case |
 | feature | large | epic_case |
-| bugfix | — | direct_case |
-| maintenance | — | direct_case |
-| docs_chore | — | direct_case |
+| bugfix | - | direct_case |
+| maintenance | - | direct_case |
+| docs_chore | - | direct_case |
 
 ラベルマッピング・規模判定条件の詳細は各 command SPEC および `agentdev-workflow-lifecycle` skill を参照。
 
@@ -152,10 +152,10 @@ work_type と scale により workflow_route を決定する。work_type は bug
 
 ## See Also
 
-- [delegation-contracts.md](delegation-contracts.md) — サブエージェント委譲契約
-- [capture-boundaries.md](capture-boundaries.md) — キャプチャ境界
-- [epic-wave-model.md](epic-wave-model.md) — Epic / Wave / Issue 実行モデル
-- [backlog-artifact-lifecycle.md](backlog-artifact-lifecycle.md) — RU / 採用済み成果物 / draft lifecycle
+- [delegation-contracts.md](delegation-contracts.md)（サブエージェント委譲契約）
+- [capture-boundaries.md](capture-boundaries.md)（キャプチャ境界）
+- [epic-wave-model.md](epic-wave-model.md)（Epic / Wave / Issue 実行モデル）
+- [backlog-artifact-lifecycle.md](backlog-artifact-lifecycle.md)（RU / 採用済み成果物 / draft lifecycle）
 - 各 command SPEC（`docs/specs/commands/`）・各 skill SPEC（`docs/specs/skills/`）
-- `agentdev-workflow-routing` skill — work_type ルーティング詳細
-- `agentdev-workflow-lifecycle` skill — work_type 判定・scale 昇格
+- `agentdev-workflow-routing` skill（work_type ルーティング詳細）
+- `agentdev-workflow-lifecycle` skill（work_type 判定・scale 昇格）

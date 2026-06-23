@@ -29,12 +29,12 @@
 | REQ-0131 | case-close / 完了処理 | IR-006, IR-013, IR-016 | commands, templates |
 | REQ-0132 | case-open / Issue 作成 | IR-006 | commands |
 | REQ-0133 | case-update / Issue 更新 | IR-006 | commands |
-| REQ-0110 | Git worktree cleanup 信頼性 | — (infrastructure) | — |
+| REQ-0110 | Git worktree cleanup 信頼性 |（(infrastructure)）| - |
 | REQ-0102 | 要件定義・保存 | IR-001, IR-002 | REQ |
 | REQ-0134 | 配布基盤: source/projection・sync・repo type・consumer install | IR-006, IR-016, IR-046 | commands, skills, ドメイン状態 |
 | REQ-0135 | Drafts 配置・Draft Type Registry | IR-016 | ドメイン状態 |
 | REQ-0136 | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設・req-define 強化） | IR-008, IR-044 | REQ, SPEC, commands |
-| REQ-0137 | 並列実行安全 git 操作規律 | — (infrastructure) | — |
+| REQ-0137 | 並列実行安全 git 操作規律 |（(infrastructure)）| - |
 | REQ-0138 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
 | REQ-0139 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
 | REQ-0140 | 文書品質ゲート | IR-013, IR-045 | docs, SPEC, document-type-responsibilities.md |

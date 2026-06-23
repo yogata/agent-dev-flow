@@ -181,9 +181,9 @@ updated: 2026-06-20
 
 ## 関連項目
 
-- [ローカル Case ファイル](local-case-file.md) — Case ファイルのスキーマ・状態遷移・見出し
-- [ローカル版 OpenCode 生成](local-generation.md) — 生成フロー・`generated_by` 識別子・ジャンクション検出安全ゲート
-- [実行時パッケージ境界](runtime-package-boundary.md) — `consumer-generated` リポジトリ種別
-- [ワークフロー契約](workflow-contracts.md) — Local backend 差分契約
-- REQ-0141 — ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義
-- ADR-0126 — ローカル版 OpenCode 生成基盤の source model 拡張と生成安全性制約
+- [ローカル Case ファイル](local-case-file.md)（Case ファイルのスキーマ・状態遷移・見出し）
+- [ローカル版 OpenCode 生成](local-generation.md)（生成フロー・`generated_by` 識別子・ジャンクション検出安全ゲート）
+- [実行時パッケージ境界](runtime-package-boundary.md)（`consumer-generated` リポジトリ種別）
+- [ワークフロー契約](workflow-contracts.md)（Local backend 差分契約）
+- REQ-0141（ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義）
+- ADR-0126（ローカル版 OpenCode 生成基盤の source model 拡張と生成安全性制約）

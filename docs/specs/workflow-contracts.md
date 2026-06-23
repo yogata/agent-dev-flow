@@ -25,7 +25,7 @@ updated: 2026-06-21
 
 ## See Also
 
-- [workflows/](workflows/) — 横断ワークフロー契約（新版）
-- [commands/](commands/) — command SPEC
-- [skills/](skills/) — skill SPEC
-- AG-012 — 文書体系再構築の合意（旧 workflow-contracts.md 縮小）
+- [workflows/](workflows/)（横断ワークフロー契約（新版））
+- [commands/](commands/)（command SPEC）
+- [skills/](skills/)（skill SPEC）
+- AG-012（文書体系再構築の合意（旧 workflow-contracts.md 縮小））

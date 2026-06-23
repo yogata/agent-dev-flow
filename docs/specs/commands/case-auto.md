@@ -13,8 +13,8 @@ updated: 2026-06-23
 
 ## 入力
 
-- Issue番号（数値）または Issue URL — 既存Issue から case-run → case-close を自走する場合
-- 要件doc — 明示パス指定 / `.agentdev/drafts/req-draft-*.md` 単一自動検出 / セッション内要件doc（3段階優先順位・構造化 `draft-data` 形式: REQ-0138, ADR-0124）
+- Issue番号（数値）または Issue URL（既存Issue から case-run → case-close を自走する場合）
+- 要件doc（明示パス指定 / `.agentdev/drafts/req-draft-*.md` 単一自動検出 / セッション内要件doc（3段階優先順位・構造化 `draft-data` 形式: REQ-0138, ADR-0124））
 
 ## 出力
 
@@ -31,37 +31,37 @@ updated: 2026-06-23
 ## 現在の動作
 
 - Step 1: 入力解決
-  - 実行開始時刻の記録（REQ-0114-082）— JST（Etc/GMT-9）・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で `case_auto_started_at` 変数に保持
-  - Issue番号/URL入力モード — `^\d+$` または GitHub Issue URL の場合、case-run移行モードへ分岐
-  - 要件doc入力モード — 明示パス→draft検出（複数件含む全件処理）→セッション内要件docの順で入力特定
-- Step 2: work_type 読取 — `draft-data` から work_type 取得（参考情報・パイプライン分岐には使用しない・REQ-0138-010）
+  - 実行開始時刻の記録（REQ-0114-082）（JST（Etc/GMT-9）・人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で `case_auto_started_at` 変数に保持）
+  - Issue番号/URL入力モード（`^\d+$` または GitHub Issue URL の場合、case-run移行モードへ分岐）
+  - 要件doc入力モード（明示パス→draft検出（複数件含む全件処理）→セッション内要件docの順で入力特定）
+- Step 2: work_type 読取（`draft-data` から work_type 取得（参考情報・パイプライン分岐には使用しない・REQ-0138-010））
 - Step 3: 工程分岐（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定・REQ-0138-009）
   - Issue番号/URL入力: case-run → case-close（req-save・spec-save・case-open・work_type読取スキップ）
   - artifact_actions ベース分岐: `artifact: req` or `artifact: adr` → req-save / `artifact: spec` → spec-save（req-save の後）/ 常に → case-open / その後 → case-run → case-close
-  - spec-save 実行判定（ADR-0123 Decision #3, REQ-0136-014）— req-save 完了後に `artifact: spec` entry 確認
-  - auto_gate preflight — `auto_gate.auto_ready` が false または未解決 item 残る場合は停止
-- Step 4: 各工程の実行 — 各工程（req-save / spec-save / case-open / case-run / case-close）を各コマンド委譲契約に従い task() で起動（ADR-0127, REQ-0114-006/084/085）
+  - spec-save 実行判定（ADR-0123 Decision #3, REQ-0136-014）（req-save 完了後に `artifact: spec` entry 確認）
+  - auto_gate preflight（`auto_gate.auto_ready` が false または未解決 item 残る場合は停止）
+- Step 4: 各工程の実行（各工程（req-save / spec-save / case-open / case-run / case-close）を各コマンド委譲契約に従い task() で起動（ADR-0127, REQ-0114-006/084/085））
   - 工程別委譲契約（ADR-0112 §5・ADR-0127）: 各工程の起動方式・inputs・output_contract は工程別委譲契約表参照
-  - 品質ゲート（QG-1〜QG-4）の継承 — case-auto は QG を独自実装せず、構成コマンドが各自適用
-  - case-run の実行担当サブエージェント委譲モデル — case-auto は変更せず
+  - 品質ゲート（QG-1〜QG-4）の継承（case-auto は QG を独自実装せず、構成コマンドが各自適用）
+  - case-run の実行担当サブエージェント委譲モデル（case-auto は変更せず）
   - Standard flow（単一 Issue）: case-open task() 完了後、クリーンアップ検証ゲート実行 → case-run → case-close
   - Epic Issue flow（マルチREQ or 単一REQ Epic flow）: case-open task() 完了後、クリーンアップ検証ゲート → Step 4-1 Wave 反復制御
-  - Step 4-1 Wave 反復制御（case-run #epic → case-close #epic の反復・ADR-0128 Decision #5, REQ-0114-084）— task()→case-run(#epic) → task()→case-close(#epic) → 次 Wave 判定 → 全 Wave 完了で Epic 完了報告 / 残 Wave ありで Step 1 へ戻る（べき等）。複数 execution_unit 並列実行時は、この反復制御を execution_unit 群反復制御へ一般化する（REQ-0148-012・後述「複数 execution_unit 並列 orchestration」セクション参照）
+  - Step 4-1 Wave 反復制御（case-run #epic → case-close #epic の反復・ADR-0128 Decision #5, REQ-0114-084）（task()→case-run(#epic) → task()→case-close(#epic) → 次 Wave 判定 → 全 Wave 完了で Epic 完了報告 / 残 Wave ありで Step 1 へ戻る（べき等））。複数 execution_unit 並列実行時は、この反復制御を execution_unit 群反復制御へ一般化する（REQ-0148-012・後述「複数 execution_unit 並列 orchestration」セクション参照）
   - blocked / failed の扱い: case-close 対象外。一部 completed(pr) の場合は completed(pr) のみ case-close(#epic) で処理。全 blocked/failed で Wave 反復停止・部分完了報告。複数 execution_unit 並列実行時は blocked になった execution_unit のみ停止し、他の ready 対象は継続する（REQ-0148-015）
   - OU 逐次処理: 1 OU（Epic 全 Wave 完了）を close まで完了後に次 OU へ進む（REQ-0114-053）。必須依存のない execution_unit 群は並列実行されるため、逐次処理は必須依存で結合した execution_unit 群に適用される
-  - クリーンアップ検証ゲート（REQ-0114-060〜063, REQ-0137-007）— ドラフトファイル・RU ファイルの残存がないことを検証。Standard / Epic Issue flow 双方で実施
-- Step 5: 工程間の状態引き継ぎ — Issue番号・PR番号・RU ファイルパス・capture 対象情報を最終工程まで保持
-- Step 6: 複数REQ対応 — req-save task() の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用。case-auto 自体に Issue 階層決定ロジックを持たない
-- Step 7: 停止条件の検出 — 停止時タイミング情報の追記（開始時刻・停止時刻・経過時間・REQ-0114-083）。10項目の停止条件いずれかを検出時、実行停止・停止理由・現在地点・再開可能な次コマンドを報告
-- Step 8: 完了報告 — 最終工程（case-close task()）の完了報告をそのまま出力。タイミング情報追記（開始時刻・終了時刻・所要時間・REQ-0114-083）
-- Step 8-1: Standard flow 逐次OU処理ループ — case-close task() 完了後、未処理 OU が残存する場合は次 OU の処理を自動開始（REQ-0114-065〜067）
+  - クリーンアップ検証ゲート（REQ-0114-060〜063, REQ-0137-007）（ドラフトファイル・RU ファイルの残存がないことを検証）。Standard / Epic Issue flow 双方で実施
+- Step 5: 工程間の状態引き継ぎ（Issue番号・PR番号・RU ファイルパス・capture 対象情報を最終工程まで保持）
+- Step 6: 複数REQ対応（req-save task() の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）。case-auto 自体に Issue 階層決定ロジックを持たない
+- Step 7: 停止条件の検出（停止時タイミング情報の追記（開始時刻・停止時刻・経過時間・REQ-0114-083））。10項目の停止条件いずれかを検出時、実行停止・停止理由・現在地点・再開可能な次コマンドを報告
+- Step 8: 完了報告（最終工程（case-close task()）の完了報告をそのまま出力）。タイミング情報追記（開始時刻・終了時刻・所要時間・REQ-0114-083）
+- Step 8-1: Standard flow 逐次OU処理ループ（case-close task() 完了後、未処理 OU が残存する場合は次 OU の処理を自動開始（REQ-0114-065〜067））
 
 ## 参照する横断 SPEC
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md) — Pattern Taxonomy（manager-orchestrator）
-- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md) — step_execution 委譲（ADR-0127）
-- [workflows/epic-wave-model.md](../workflows/epic-wave-model.md) — Epic Wave 反復制御
-- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) — Capture 責務（委譲）
+- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（Pattern Taxonomy（manager-orchestrator））
+- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（step_execution 委譲（ADR-0127））
+- [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic Wave 反復制御）
+- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 責務（委譲））
 
 ## 対象外
 
@@ -132,16 +132,16 @@ OU 逐次処理（REQ-0114-053）は、必須依存で結合した execution_uni
 
 ## See Also
 
-- [req-save.md](req-save.md), [spec-save.md](spec-save.md), [case-open.md](case-open.md), [case-run.md](case-run.md), [case-close.md](case-close.md) — 構成工程
-- `agentdev-quality-gates` skill — QG-1〜QG-4（各工程で適用）
-- `agentdev-case-run-execution-adapter` skill — case-run 外部実行委譲
-- `agentdev-git-worktree` skill — 並列実行安全 git 操作
-- `agentdev-workflow-orchestration` skill — Capture 境界
-- REQ-0114 — case-auto 最大自走モード
-- REQ-0137 — 並列実行安全 git 操作規律
-- REQ-0138 — 構造化 req_draft 契約
-- REQ-0148 — RU群バッチ処理と複数 execution_unit 並列実行
-- ADR-0112 — サブエージェント委譲
-- ADR-0127 — case-auto 工程委譲
-- ADR-0128 — case-run / case-close Epic Wave モデル
-- ADR-0129 — 複数 execution_unit 並列実行モデル
+- [req-save.md](req-save.md), [spec-save.md](spec-save.md), [case-open.md](case-open.md), [case-run.md](case-run.md), [case-close.md](case-close.md)（構成工程）
+- `agentdev-quality-gates` skill（QG-1〜QG-4（各工程で適用））
+- `agentdev-case-run-execution-adapter` skill（case-run 外部実行委譲）
+- `agentdev-git-worktree` skill（並列実行安全 git 操作）
+- `agentdev-workflow-orchestration` skill（Capture 境界）
+- REQ-0114（case-auto 最大自走モード）
+- REQ-0137（並列実行安全 git 操作規律）
+- REQ-0138（構造化 req_draft 契約）
+- REQ-0148（RU群バッチ処理と複数 execution_unit 並列実行）
+- ADR-0112（サブエージェント委譲）
+- ADR-0127（case-auto 工程委譲）
+- ADR-0128（case-run / case-close Epic Wave モデル）
+- ADR-0129（複数 execution_unit 並列実行モデル）

@@ -29,20 +29,20 @@ updated: 2026-06-21
 
 ## 現在の動作
 
-- Step 1: Issue番号解決 — ユーザー入力またはセッション内会話から取得。`gh issue list` / `gh issue status` 等は禁止（G03）
-- Step 2: 現在の Issue 状態を取得・フェーズ判定 — `agentdev-workflow-routing`・`agentdev-workflow-lifecycle`
+- Step 1: Issue番号解決（ユーザー入力またはセッション内会話から取得）。`gh issue list` / `gh issue status` 等は禁止（G03）
+- Step 2: 現在の Issue 状態を取得・フェーズ判定（`agentdev-workflow-routing`・`agentdev-workflow-lifecycle`）
 - Step 3: 更新内容に応じて分岐:
-  - `--body` — Issue 本文更新。Issue 作成時と同じテンプレート構造を維持（G06）。`--body-file` 使用（G08）・`agentdev-gh-cli` VERIFY（G09）
-  - `--comment` — コメント追加。テンプレート【必須】セクション確認（G07）・`--body-file` 使用・VERIFY
-  - `--req` — REQ ファイル更新（APPEND/UPDATE 対応）・git commit/push
-  - `--review-ng` — レビュー NG コメント。**必ず QG-3 の乖離検出結果を引用**（G05）
+  - `--body`（Issue 本文更新）。Issue 作成時と同じテンプレート構造を維持（G06）。`--body-file` 使用（G08）・`agentdev-gh-cli` VERIFY（G09）
+  - `--comment`（コメント追加）。テンプレート【必須】セクション確認（G07）・`--body-file` 使用・VERIFY
+  - `--req`（REQ ファイル更新（APPEND/UPDATE 対応）・git commit/push）
+  - `--review-ng`（レビュー NG コメント）。**必ず QG-3 の乖離検出結果を引用**（G05）
 - Step 4: 完了報告
 
 ## 参照する横断 SPEC
 
-- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md) — コマンド分類
-- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md) — 連携（review-ng 時の QG-3 引用）
-- [quality-gates.md](../quality-gates.md) — QG-3 乖離検出結果（`--review-ng` 時に引用）
+- [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類）
+- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（連携（review-ng 時の QG-3 引用））
+- [quality-gates.md](../quality-gates.md)（QG-3 乖離検出結果（`--review-ng` 時に引用））
 
 ## 対象外
 
@@ -63,9 +63,9 @@ updated: 2026-06-21
 
 ## See Also
 
-- [case-run.md](case-run.md), [case-close.md](case-close.md) — 関連コマンド
-- `agentdev-workflow-routing` skill — フェーズ判定・次コマンド推論
-- `agentdev-workflow-lifecycle` skill — work_type 分岐判定
-- `agentdev-gh-cli` skill — gh CLI 安全使用
-- `agentdev-quality-gates` skill — QG-3（`--review-ng` 時引用）
-- REQ-0133 — case-update / Issue更新
+- [case-run.md](case-run.md), [case-close.md](case-close.md)（関連コマンド）
+- `agentdev-workflow-routing` skill（フェーズ判定・次コマンド推論）
+- `agentdev-workflow-lifecycle` skill（work_type 分岐判定）
+- `agentdev-gh-cli` skill（gh CLI 安全使用）
+- `agentdev-quality-gates` skill（QG-3（`--review-ng` 時引用））
+- REQ-0133（case-update / Issue更新）

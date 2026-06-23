@@ -55,5 +55,5 @@ updated: 2026-06-21
 - [agentdev-workflow-lifecycle.md](agentdev-workflow-lifecycle.md)
 - [../workflows/epic-wave-model.md](../workflows/epic-wave-model.md)
 - [commands/case-close.md](../commands/case-close.md)
-- REQ-0106 — Case実行オーケストレーション / Epic・Wave
-- ADR-0125 — Epic Issue 本文単一書き手
+- REQ-0106（Case実行オーケストレーション / Epic・Wave）
+- ADR-0125（Epic Issue 本文単一書き手）

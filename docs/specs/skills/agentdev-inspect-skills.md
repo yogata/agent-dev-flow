@@ -25,7 +25,7 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 
 ## 参照する references
 
-- `references/execution-subject-misclassification.md` — 実行主体分類誤認の判定基準（REQ-0125-010）
+- `references/execution-subject-misclassification.md`（実行主体分類誤認の判定基準（REQ-0125-010））
 
 ## 現在の動作
 
@@ -50,4 +50,4 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - [commands/inspect-skills.md](../commands/inspect-skills.md)
 - [agentdev-skill-authoring.md](agentdev-skill-authoring.md)
 - [agentdev-command-authoring.md](agentdev-command-authoring.md)
-- REQ-0125 — inspect-skills / Command/Skill 参照妥当性検出
+- REQ-0125（inspect-skills / Command/Skill 参照妥当性検出）
