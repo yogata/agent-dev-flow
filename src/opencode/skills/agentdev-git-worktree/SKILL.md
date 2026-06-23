@@ -5,7 +5,7 @@ description: Manages git worktree creation, switching, and cleanup based on Issu
 
 # agentdev-git-worktree
 
-GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git worktree を作成・管理・削除する。
+GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git worktree を作成、管理、削除する。
 
 ## 命名規則
 
@@ -18,16 +18,16 @@ GitHub Issue 番号に基づいて、安全かつ一貫性のある方法で git
 
 | 値 | 使用条件 |
 |----|----------|
-| `feature` | 機能追加・enhancement |
-| `fix` | バグ修正・bug |
-| `refactor` | リファクタリング・保守作業 |
-| `chore` | ドキュメント・雑務 |
+| `feature` | 機能追加、enhancement |
+| `fix` | バグ修正、bug |
+| `refactor` | リファクタリング、保守作業 |
+| `chore` | ドキュメント、雑務 |
 
 work_type判定は `agentdev-workflow-lifecycle` を参照。
 
 ## origin/main 鮮度確認
 
-並列 Wave 実行時・PR merge 後再開時は、worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認する。古い commit 基準の worktree による DIRTY/CONFLICTING を防止するため。
+並列 Wave 実行時、PR merge 後再開時は、worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認する。古い commit 基準の worktree による DIRTY/CONFLICTING を防止するため。
 
 - **Wave 2 以降**: Wave 1 の PR merge 後に `git fetch origin` → `origin/main` の最新 commit を確認してから worktree 作成
 - **case-run 再開時**: 前回ケースの PR merge 後に再開する場合も同様
@@ -37,7 +37,7 @@ work_type判定は `agentdev-workflow-lifecycle` を参照。
 
 | トピック | 参照先 |
 |----------|--------|
-| 作成・削除・ブランチ操作の詳細 | `references/worktree-operations.md` |
+| 作成、削除、ブランチ操作の詳細 | `references/worktree-operations.md` |
 | git pull/push/hash検証の共通手順 | `references/git-common-procedures.md` |
 
 ## 禁止事項

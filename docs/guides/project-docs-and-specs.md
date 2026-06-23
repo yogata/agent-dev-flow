@@ -22,11 +22,11 @@ DOC-MAP（文書探索入口：索引）
 
 要件定義の永続基準。システムが満たすべき要件を記述する。
 
-- 現行 REQ は REQ-0101 から REQ-0147 までの 39 件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止・履歴参照のみ）
+- 現行 REQ は REQ-0101 から REQ-0147 までの 39 件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止、履歴参照のみ）
 - 旧 REQ（REQ-0001〜REQ-0050 [全て廃止]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
-> 現行 REQ の一覧・範囲は `docs/requirements/README.md` を正とする。本ガイドでは REQ 一覧を複製しない。
+> 現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とする。本ガイドでは REQ 一覧を複製しない。
 
 ## ADR（アーキテクチャ決定記録）
 
@@ -34,7 +34,7 @@ DOC-MAP（文書探索入口：索引）
 - 現行基準: `docs/adr/ADR-01XX.md`（現行の番号帯）
 - 履歴: `docs/adr/retired/ADR-00XX.md`（廃止済みの番号帯）
 
-将来の設計・運用・文書システムを制約する決定とその背景を記録する（REQ-0101-008）。
+将来の設計、運用、文書システムを制約する決定とその背景を記録する（REQ-0101-008）。
 
 - 現行基準は ADR-0101 以降の番号帯を使用する（REQ-0112-047）
 - ADR-0001〜0099 は再編前の履歴番号帯であり、`docs/adr/retired/` に配置されている（REQ-0112-048）
@@ -55,7 +55,7 @@ DOC-MAP（文書探索入口：索引）
 | system.md | コマンドシステムの構成 |
 | patterns.md | 実装パターンと文書フォーマット |
 | design-principles.md | 設計原則 |
-| quality-specs.md | 品質基準・検証ルール |
+| quality-specs.md | 品質基準、検証ルール |
 | quality-gates.md | 品質ゲート（QG-1〜QG-4） |
 | document-model.md | 文書種別の責務マトリックス |
 | artifact-contracts.md | アーティファクト間契約 |
@@ -71,7 +71,7 @@ DOC-MAP（文書探索入口：索引）
 
 **格納先**: `docs/DOC-MAP.md`
 
-文書探索・参照経路の入口。索引であり、基準ではない。全文書の配置と役割を一覧できる。
+文書探索、参照経路の入口。索引であり、基準ではない。全文書の配置と役割を一覧できる。
 
 ## このガイドの位置づけ
 

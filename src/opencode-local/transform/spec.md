@@ -4,14 +4,14 @@
 
 ## 目的
 
-ローカル版 OpenCode 生成における変換対象一覧・ガードレール一覧・レポートフォーマット・違反判定基準を一箇所に集約し、変換プロンプト・レビュープロンプト・生成フロー定義が共通して参照できるようにする（REQ-0141-028, 029）。
+ローカル版 OpenCode 生成における変換対象一覧、ガードレール一覧、レポートフォーマット、違反判定基準を一箇所に集約し、変換プロンプト、レビュープロンプト、生成フロー定義が共通して参照できるようにする（REQ-0141-028, 029）。
 
 本ファイルと各プロンプトの関係:
 
 | ファイル | 役割 | 本ファイルとの関係 |
 |---|---|---|
-| `transform/generate.md` | 変換用プロンプト（AI エージェントへの生成指示） | ガードレール一覧・レポートフォーマット・違反判定基準の正本を本ファイルに集約し、同ファイルを参照する |
-| `transform/review.md` | レビュー用プロンプト（生成結果の検証指示） | 確認対象一覧の基準として本ファイルのガードレール・違反判定基準を参照 |
+| `transform/generate.md` | 変換用プロンプト（AI エージェントへの生成指示） | ガードレール一覧、レポートフォーマット、違反判定基準の正本を本ファイルに集約し、同ファイルを参照する |
+| `transform/review.md` | レビュー用プロンプト（生成結果の検証指示） | 確認対象一覧の基準として本ファイルのガードレール、違反判定基準を参照 |
 | `transform/spec.md`（本ファイル） | 変換仕様の集約 | 正本 SPEC の運用参照資料 |
 
 ## 変換対象一覧
@@ -23,13 +23,13 @@
 | ローカル版 `case-open` | `src/opencode/commands/agentdev/case-open.md` | `.opencode/commands/agentdev/case-open.md` | GitHub Issue 作成を `.agentdev/cases/case-{NNNN}.md` 作成へ意味変換（REQ-0141-021） |
 | ローカル版 `case-run` | `src/opencode/commands/agentdev/case-run.md` | `.opencode/commands/agentdev/case-run.md` | GitHub PR 作成を行わず、PR 相当の内容を Case ファイルの該当セクションへ追記（REQ-0141-022） |
 | ローカル版 `case-close` | `src/opencode/commands/agentdev/case-close.md` | `.opencode/commands/agentdev/case-close.md` | GitHub PR 取り込み / Issue クローズを行わず、ローカル Git の取り込み結果と完了処理を Case ファイルに記録（REQ-0141-023） |
-| その他ローカル版コマンド | `src/opencode/commands/agentdev/*.md` | `.opencode/commands/agentdev/*.md` | GitHub Issue / PR 必須参照の除去・Case ファイル参照への置換 |
+| その他ローカル版コマンド | `src/opencode/commands/agentdev/*.md` | `.opencode/commands/agentdev/*.md` | GitHub Issue / PR 必須参照の除去、Case ファイル参照への置換 |
 
 ### スキル
 
 | 変換対象 | 入力元 | 生成先 | 変換内容 |
 |---|---|---|---|
-| ローカル版スキル群 | `src/opencode/skills/agentdev-*/` | `.opencode/skills/agentdev-*/` | GitHub Issue / PR 必須参照の除去・Case ファイルスキーマ・状態遷移・見出しへの準拠 |
+| ローカル版スキル群 | `src/opencode/skills/agentdev-*/` | `.opencode/skills/agentdev-*/` | GitHub Issue / PR 必須参照の除去、Case ファイルスキーマ、状態遷移、見出しへの準拠 |
 
 ### ひな形
 
@@ -54,7 +54,7 @@
 ### 安全ゲート
 
 - 生成先リポジトリの `.opencode/` が `src/opencode/` 配下へ解決される場合は生成を停止すること（REQ-0141-010）
-- 同名ファイルに `generated_by: local-opencode-transform` の識別情報がある場合のみ再生成・上書きを許可すること（REQ-0141-012）
+- 同名ファイルに `generated_by: local-opencode-transform` の識別情報がある場合のみ再生成、上書きを許可すること（REQ-0141-012）
 - 同名ファイルに識別情報がない場合、または異なる識別情報がある場合は生成を停止すること（REQ-0141-013）
 
 ### 配置規則
@@ -98,7 +98,7 @@
 | 入力スナップショット | 読み込んだ `src/opencode/` と `src/opencode-local/` のファイル一覧 |
 | 仕様管理リポジトリ | AgentDevFlow 本体リポジトリの識別情報 |
 | 生成先リポジトリ | ローカル版導入先リポジトリの識別情報 |
-| 生成した出力 | 生成したファイルの一覧（パス・種別） |
+| 生成した出力 | 生成したファイルの一覧（パス、種別） |
 | 変換内容 | case-open / case-run / case-close の各変換内容、ひな形の変換内容 |
 | `.opencode/` 実パス確認結果 | ジャンクション検出安全ゲートの結果 |
 | 同名ファイル確認結果 | 既存ファイルと `generated_by` 識別子の照合結果 |
@@ -117,10 +117,10 @@
 | 必須操作として残る GitHub Issue / PR 参照 | 違反 | ローカル版は GitHub Issue / PR を必須操作にしない（REQ-0141-026） |
 | 必須入力として残る GitHub Issue / PR 参照 | 違反 | ローカル版は GitHub Issue / PR を必須入力にしない |
 | 必須出力として残る GitHub Issue / PR 参照 | 違反 | ローカル版は GitHub Issue / PR を必須出力にしない |
-| 背景説明の GitHub Issue / PR 参照 | 非違反 | GitHub 版との対比・経緯説明としての参照は許容 |
+| 背景説明の GitHub Issue / PR 参照 | 非違反 | GitHub 版との対比、経緯説明としての参照は許容 |
 | GitHub 版との置換表の GitHub Issue / PR 参照 | 非違反 | 置換対応表自体が GitHub 版とローカル版の対応を示すため |
 | 対象外の説明の GitHub Issue / PR 参照 | 非違反 | 適用範囲外の説明としての参照は許容 |
-| 用語上の参照 | 非違反 | 用語解説・概念説明としての参照は許容 |
+| 用語上の参照 | 非違反 | 用語解説、概念説明としての参照は許容 |
 
 違反が1件でも残存する場合、レポート結果は `FAIL` とする。
 
@@ -130,7 +130,7 @@
 
 | 参照先 | 内容 |
 |---|---|
-| `case-schema/case-file.md` | Case ファイルスキーマ定義（YAML 前書き・status enum・labels・headings・採番） |
+| `case-schema/case-file.md` | Case ファイルスキーマ定義（YAML 前書き、status enum、labels、headings、採番） |
 | `case-schema/rules/frontmatter.yaml` | YAML 前書きスキーマの機械可読定義（REQ-0141-017） |
 | `case-schema/rules/status.yaml` | status enum と状態遷移表の機械可読定義（REQ-0141-018） |
 | `case-schema/rules/labels.yaml` | labels 値域の機械可読定義（REQ-0141-019） |
@@ -140,9 +140,9 @@
 
 - [変換用プロンプト](generate.md) — ローカル版生成の指示書
 - [レビュー用プロンプト](review.md) — 生成結果の検証指示
-- [生成フロー定義](../generation-flow.md) — 手順・安全確認・`generated_by` 形式
+- [生成フロー定義](../generation-flow.md) — 手順、安全確認、`generated_by` 形式
 - [Case ファイルスキーマ定義](../case-schema/case-file.md) — ローカル Case ファイルの構造
-- `docs/specs/local-transform.md` — 変換プロンプト・レビュープロンプト要件の正本
-- `docs/specs/local-generation.md` — 生成フロー・安全ゲートの正本
+- `docs/specs/local-transform.md` — 変換プロンプト、レビュープロンプト要件の正本
+- `docs/specs/local-generation.md` — 生成フロー、安全ゲートの正本
 - REQ-0141 — ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義
 - ADR-0126 — source model 拡張と生成安全性制約

@@ -9,21 +9,21 @@ updated: 2026-06-21
 
 ## 目的
 
-agentdev 系コマンドで使用する Issue/PR 本文・コメントテンプレートの管理・選定ルール・セクション規約を提供する。
+agentdev 系コマンドで使用する Issue/PR 本文、コメントテンプレートの管理、選定ルール、セクション規約を提供する。
 
 ## 適用対象
 
 - Issue/PR/コメント用テンプレートを選定する場合
 - テンプレートのファイルパスを取得する場合
-- テンプレートのセクション構造・規約を確認する場合
+- テンプレートのセクション構造、規約を確認する場合
 
-## 提供する判断・操作
+## 提供する判断、操作
 
 - Issue 本文テンプレート（feature / bug / epic / child / backlog_child / backlog_epic）
 - コメントテンプレート（bug_analysis / feature_technical / update / review_ng / feature_implementation / bug_record）
-- PR 本文テンプレート（`## Findings / Capture候補`・`## SPEC確定候補` セクション含む）
-- テンプレート選定ルール（work_type・Issue 種別・フロー種別）
-- セクション規約（`<!-- 【必須】 -->`・`<!-- 【任意】 -->` マーカー）
+- PR 本文テンプレート（`## Findings / Capture候補`、`## SPEC確定候補` セクション含む）
+- テンプレート選定ルール（work_type、Issue 種別、フロー種別）
+- セクション規約（`<!-- 【必須】 -->`、`<!-- 【任意】 -->` マーカー）
 
 ## 参照する references
 

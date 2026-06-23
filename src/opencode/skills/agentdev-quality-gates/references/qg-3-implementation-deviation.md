@@ -1,12 +1,12 @@
 # QG-3: Implementation Deviation Gate
 
-case-run で PR 作成前に、実装が Issue/ REQ/ ADR/ SPEC/ work plan から乖離していないかを検証する Gate。本ファイルは QG-3 の判定基準・検査観点・乖離分類を定義する。共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
+case-run で PR 作成前に、実装が Issue/ REQ/ ADR/ SPEC/ work plan から乖離していないかを検証する Gate。本ファイルは QG-3 の判定基準、検査観点、乖離分類を定義する。共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
 ## 配置
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| case-run | Step 6-7（実行担当サブエージェント委譲・result 処理） | Sisyphus-Junior が実装と乖離検出を実行。case-run は result として受領 |
+| case-run | Step 6-7（実行担当サブエージェント委譲、result 処理） | Sisyphus-Junior が実装と乖離検出を実行。case-run は result として受領 |
 
 ## 乖離の定義
 
@@ -140,13 +140,13 @@ QG-3 は乖離の分類と推奨アクションの提示までを責務とし、
 
 QG-3 の検査をサブエージェントに委譲する場合:
 
-- サブエージェントは乖離候補・影響度候補・乖離タイプ候補・根拠のみを返す。
+- サブエージェントは乖離候補、影響度候補、乖離タイプ候補、根拠のみを返す。
 - 親エージェントが pass/warn/fail を確定し、ユーザーへの報告と指示待機を行う。
 
 ## 責務境界
 
 - QG-3 は**乖離の分類と推奨アクションの提示**に限定する。
-- REQ ファイルの更新判断・更新実行は行わない（case-update の責務）。
+- REQ ファイルの更新判断、更新実行は行わない（case-update の責務）。
 - 品質メトリクス収集（型チェック/ Lint/ ビルド/ テスト）は行わない（case-run Step 11-1 ローカル検証の責務）。
 - docs 全体の意味レビューは行わない（`/agentdev/inspect-docs` の責務）。
 

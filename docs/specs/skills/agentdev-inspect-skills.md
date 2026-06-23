@@ -14,9 +14,9 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 ## 適用対象
 
 - inspect-skills コマンドにおける Command 参照の妥当性診断
-- Skill 粒度の評価・Skill 構造のレビュー
+- Skill 粒度の評価、Skill 構造のレビュー
 
-## 提供する判断・操作
+## 提供する判断、操作
 
 - USE FOR / DO NOT USE FOR 照合
 - Skill 分割候補検出

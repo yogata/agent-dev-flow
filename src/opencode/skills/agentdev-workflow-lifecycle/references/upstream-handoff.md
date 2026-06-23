@@ -1,11 +1,11 @@
 # 前工程からの引き継ぎ 共通方針
 
-AgentDevFlow 適用プロジェクト（consumer repo）で AgentDevFlow 本体の不具合・改善点を発見した場合の、前工程からの引き継ぎプロトコル。
+AgentDevFlow 適用プロジェクト（consumer repo）で AgentDevFlow 本体の不具合、改善点を発見した場合の、前工程からの引き継ぎプロトコル。
 
 ## 基本原則
 
 - AgentDevFlow workflow の実装対象は現在のプロジェクトである。
-- AgentDevFlow 適用プロジェクトでは、AgentDevFlow 本体・配布 command・配布 skill・配布 template・配布 script を直接改修対象にしない。
+- AgentDevFlow 適用プロジェクトでは、AgentDevFlow 本体、配布 command、配布 skill、配布 template、配布 script を直接改修対象にしない。
 - agent-dev-flow repository では、AgentDevFlow 本体が現在プロジェクトの成果物であるため、通常の req/case workflow で改修対象にできる。
 
 ## 引き継ぎメタデータ

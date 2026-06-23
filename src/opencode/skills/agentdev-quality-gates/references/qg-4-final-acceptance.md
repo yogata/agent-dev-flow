@@ -1,12 +1,12 @@
 # QG-4: Final Acceptance Gate
 
-case-close で PR マージ前に、最終受け入れ状態を確認する Gate。本ファイルは QG-4 の判定基準・検査観点を定義する。共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
+case-close で PR マージ前に、最終受け入れ状態を確認する Gate。本ファイルは QG-4 の判定基準、検査観点を定義する。共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
 ## 配置
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| case-close | Step 2（前提確認・達成判定）・Step 3（docs 検証）・Step 3-1（close 時局所確認） | PR/ CI 結果/ Issue 完了条件チェックボックス/ docs |
+| case-close | Step 2（前提確認、達成判定）、Step 3（docs 検証）、Step 3-1（close 時局所確認） | PR/ CI 結果/ Issue 完了条件チェックボックス/ docs |
 
 ## 検査観点
 
@@ -19,7 +19,7 @@ Issue 本文の `完了条件` セクションの全チェックボックスが 
 
 #### 達成判定
 
-unchecked 項目を達成判定する。証拠ソース（コミット・PR・CI 結果等）に基づき、`agentdev-workflow-orchestration` のプロトコルに従い達成可否を判定する。
+unchecked 項目を達成判定する。証拠ソース（コミット、PR、CI 結果等）に基づき、`agentdev-workflow-orchestration` のプロトコルに従い達成可否を判定する。
 
 #### 未達項目の取り扱い
 
@@ -39,7 +39,7 @@ PR の CI が全て通過しているか。
 
 機能追加の場合、以下が満たされているか。
 
-- REQ 作成・インデックス記載
+- REQ 作成、インデックス記載
 - SPEC 更新
 - ADR 作成（必要な場合）
 - 関連ドキュメント整合性確認
@@ -82,34 +82,34 @@ case-close Step 2 での完了条件チェックボックス評価:
 
 1. Issue 本文の `完了条件` セクションを読み取る
 2. unchecked 項目（`- [ ]`）を抽出
-3. 各 unchecked 項目を達成判定（証拠ソース: コミット・PR・CI 結果）
+3. 各 unchecked 項目を達成判定（証拠ソース: コミット、PR、CI 結果）
 4. 達成判定した項目を `[x]` に更新（`gh issue edit --body-file`）
 5. **事後確認**: 更新後に Issue 本文を再読込し、全 `- [ ]` が `[x]` に反映されたことを確認。未反映の場合は再更新（最大 2 回）
 6. 未達項目が残る場合 → 構造化エラーで停止（G08）
 
 ### 責務帰属
 
-完了条件チェックボックスの評価・更新は **case-close の責務**（Step 2）である。QG-4 は判定基準を提供し、case-close が実際のチェックボックス更新を実行する。
+完了条件チェックボックスの評価、更新は **case-close の責務**（Step 2）である。QG-4 は判定基準を提供し、case-close が実際のチェックボックス更新を実行する。
 
-> **注意**: 旧設計では case-run がチェックボックス更新を担う箇所があったが、完了条件チェックボックスの最終評価・更新は case-close QG-4 に集約する。case-run Step 7 のチェックボックス更新は実装中の進捗反映（work plan チェックボックス）に限定する。
+> **注意**: 旧設計では case-run がチェックボックス更新を担う箇所があったが、完了条件チェックボックスの最終評価、更新は case-close QG-4 に集約する。case-run Step 7 のチェックボックス更新は実装中の進捗反映（work plan チェックボックス）に限定する。
 
 ## 委譲接続点
 
 QG-4 の検査をサブエージェントに委譲する場合:
 
-- サブエージェントは達成判定候補・証拠候補・未達候補のみを返す。
-- 親エージェントが pass/fail を確定し、チェックボックス更新・マージ判断を行う。
+- サブエージェントは達成判定候補、証拠候補、未達候補のみを返す。
+- 親エージェントが pass/fail を確定し、チェックボックス更新、マージ判断を行う。
 
 ## 責務境界
 
 - QG-4 は**判定基準の提供と判定結果の提示**に限定する。
-- チェックボックス更新・PR マージ・Issue クローズは case-close コマンドの責務。
+- チェックボックス更新、PR マージ、Issue クローズは case-close コマンドの責務。
 - QG-4 fail 時の自動修正は行わない。ユーザー判断または case-run 差し戻し。
 
 ## See Also
 
 - [common-gate-contract.md](common-gate-contract.md)
 - [qg-3-implementation-deviation.md](qg-3-implementation-deviation.md) — 前工程の実装乖離検出（QG-4 は QG-3 pass を前提とする）
-- **agentdev-workflow-orchestration**: 達成判定プロトコル・証拠ソース
-- **agentdev-issue-management**: Issue 本文更新・前後内容比較
+- **agentdev-workflow-orchestration**: 達成判定プロトコル、証拠ソース
+- **agentdev-issue-management**: Issue 本文更新、前後内容比較
 

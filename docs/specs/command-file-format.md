@@ -46,5 +46,5 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 
 ## 他 SPEC との関係
 
-- **`patterns.md`**: frontmatter 規約・テンプレート命名規則を担当。本 SPEC は command 本文構造を担当し、frontmatter 規約は `patterns.md` を参照する。
+- **`patterns.md`**: frontmatter 規約、テンプレート命名規則を担当。本 SPEC は command 本文構造を担当し、frontmatter 規約は `patterns.md` を参照する。
 - **`docs/specs/commands/*.md`**: 個別 command SPEC の位置づけを維持する。横断フォーマット規約は本 SPEC に集約し、個別 command SPEC には配置しない。
