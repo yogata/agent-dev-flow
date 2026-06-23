@@ -10,9 +10,9 @@
 /agentdev/case-close    # PR をマージして Issue をクローズする
 ```
 
-## バグ修正・軽作業の場合
+## バグ修正、軽作業の場合
 
-バグ修正・保守作業・ドキュメント作業は `/agentdev/req-save` をスキップし、`/agentdev/req-define` の直後に `/agentdev/case-open` に進む。
+バグ修正、保守作業、ドキュメント作業は `/agentdev/req-save` をスキップし、`/agentdev/req-define` の直後に `/agentdev/case-open` に進む。
 
 ```
 /agentdev/req-define    # 再現手順・修正方針を整理する

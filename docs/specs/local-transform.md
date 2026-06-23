@@ -7,11 +7,11 @@ updated: 2026-06-20
 
 # ローカル版 OpenCode 変換プロンプト
 
-> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。ローカル版 OpenCode を生成するための変換用プロンプト（`transform/generate.md`）・レビュー用プロンプト（`transform/review.md`）・変換仕様（`transform/spec.md`）の要件を定義する。実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0104）。REQ-0141 と ADR-0126 の詳細仕様を原本とする。
+> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。ローカル版 OpenCode を生成するための変換用プロンプト（`transform/generate.md`）、レビュー用プロンプト（`transform/review.md`）、変換仕様（`transform/spec.md`）の要件を定義する。実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0104）。REQ-0141 と ADR-0126 の詳細仕様を原本とする。
 
 ## 目的
 
-`src/opencode-local/transform/` 配下の 3 ファイルが満たすべき要件を定義する（REQ-0141-028, 029）。各ファイルは AI エージェントがローカル版生成・検証を実行する際の指示書となる。
+`src/opencode-local/transform/` 配下の 3 ファイルが満たすべき要件を定義する（REQ-0141-028, 029）。各ファイルは AI エージェントがローカル版生成、検証を実行する際の指示書となる。
 
 ## transform/generate.md（変換用プロンプト）の要件
 
@@ -53,7 +53,7 @@ updated: 2026-06-20
 - 生成物を `src/opencode-local/` 配下に出力しないこと
 - AgentDevFlow 本体リポジトリで生成を実行しないこと
 - 生成先リポジトリの `.opencode/` が `src/opencode/` 配下へ解決される場合は生成を停止すること
-- 同名ファイルに `generated_by: local-opencode-transform` の識別情報がある場合のみ再生成・上書きを許可すること
+- 同名ファイルに `generated_by: local-opencode-transform` の識別情報がある場合のみ再生成、上書きを許可すること
 - 同名ファイルに識別情報がない場合、または異なる識別情報がある場合は生成を停止すること
 - ローカル版コマンドは `.opencode/commands/` に配置すること
 - ローカル版スキルは `.opencode/skills/` に配置すること
@@ -89,7 +89,7 @@ updated: 2026-06-20
 
 ### 残存 GitHub 固有参照の違反判定基準
 
-本判定基準は `transform/spec.md` に正本として集約し、`transform/generate.md`・`transform/review.md` はこれを参照すること（REQ-0141-029）。
+本判定基準は `transform/spec.md` に正本として集約し、`transform/generate.md`、`transform/review.md` はこれを参照すること（REQ-0141-029）。
 
 | 参照の性質 | 違反/非違反 |
 |---|---|
@@ -103,7 +103,7 @@ updated: 2026-06-20
 
 ## transform/review.md（レビュー用プロンプト）の要件
 
-`transform/review.md` は生成先リポジトリに生成された `.opencode/commands/` および `.opencode/skills/` が `src/opencode-local/` 配下の仕様・定義に合致しているか確認するためのプロンプトである。
+`transform/review.md` は生成先リポジトリに生成された `.opencode/commands/` および `.opencode/skills/` が `src/opencode-local/` 配下の仕様、定義に合致しているか確認するためのプロンプトである。
 
 ### 確認対象一覧
 
@@ -116,7 +116,7 @@ updated: 2026-06-20
 - ローカル版コマンド / スキルが参照するひな形が `.opencode/` 配下に生成されていること
 - 生成物が `src/opencode-local/` 配下に出力されていないこと
 - `.opencode/` が `src/opencode/` 配下へ解決されていないこと
-- 同名ファイルに `generated_by: local-opencode-transform` の識別情報がある場合のみ再生成・上書きが許可されること
+- 同名ファイルに `generated_by: local-opencode-transform` の識別情報がある場合のみ再生成、上書きが許可されること
 - 同名ファイルに識別情報がない場合、または異なる識別情報がある場合、生成が停止されること
 - 生成物に `generated_by: local-opencode-transform` の識別情報があること
 
@@ -148,8 +148,8 @@ updated: 2026-06-20
 
 #### 残存 GitHub 固有参照の扱い確認
 
-- 残存する GitHub 固有参照のうち、必須操作・必須入力・必須出力として残るものが違反として扱われていること
-- 背景説明・置換表・対象外・用語上の GitHub 参照が違反として扱われていないこと
+- 残存する GitHub 固有参照のうち、必須操作、必須入力、必須出力として残るものが違反として扱われていること
+- 背景説明、置換表、対象外、用語上の GitHub 参照が違反として扱われていないこと
 
 ### レビュー結果フォーマット
 
@@ -159,7 +159,7 @@ updated: 2026-06-20
 |---|---|
 | 結果 | `PASS` / `FAIL` |
 | 確認した入力 | レビュー対象としたファイル一覧 |
-| 違反一覧 | 検出された違反のリスト（対象・違反内容） |
+| 違反一覧 | 検出された違反のリスト（対象、違反内容） |
 | 警告 | 違反ではないが注意が必要な事項 |
 | 確認済み要件 | 確認対象一覧の各項目に対する判定結果 |
 | 最終判定 | 総合判定とその根拠 |
@@ -170,19 +170,19 @@ updated: 2026-06-20
 
 ## transform/spec.md（変換仕様）の要件
 
-`transform/spec.md` は変換プロンプト（`transform/generate.md`）とレビュープロンプト（`transform/review.md`）が参照する変換仕様を保持する。本 SPEC（`docs/specs/local-transform.md`）と `docs/specs/local-generation.md` が意味仕様の原本であり、`transform/spec.md` は実行時の変換対象一覧・ガードレール一覧・レポートフォーマットを集約した運用参照資料とする。
+`transform/spec.md` は変換プロンプト（`transform/generate.md`）とレビュープロンプト（`transform/review.md`）が参照する変換仕様を保持する。本 SPEC（`docs/specs/local-transform.md`）と `docs/specs/local-generation.md` が意味仕様の原本であり、`transform/spec.md` は実行時の変換対象一覧、ガードレール一覧、レポートフォーマットを集約した運用参照資料とする。
 
 `transform/spec.md` は少なくとも以下を含むこと。
 
 - 変換対象コマンド / スキル / ひな形の一覧
 - ガードレール一覧（正本。`transform/generate.md` は本ファイルを参照すること）
 - レポートフォーマット（正本。`transform/generate.md` は本ファイルを参照すること）
-- 残存 GitHub 固有参照の違反判定基準（根拠列を含む正本。`transform/generate.md`・`transform/review.md` は本ファイルを参照すること）
+- 残存 GitHub 固有参照の違反判定基準（根拠列を含む正本。`transform/generate.md`、`transform/review.md` は本ファイルを参照すること）
 
 ## 関連項目
 
-- [ローカル Case ファイル](local-case-file.md)（Case ファイルのスキーマ・状態遷移・見出し）
-- [ローカル版 OpenCode 生成](local-generation.md)（生成フロー・`generated_by` 識別子・ジャンクション検出安全ゲート）
+- [ローカル Case ファイル](local-case-file.md)（Case ファイルのスキーマ、状態遷移、見出し）
+- [ローカル版 OpenCode 生成](local-generation.md)（生成フロー、`generated_by` 識別子、ジャンクション検出安全ゲート）
 - [実行時パッケージ境界](runtime-package-boundary.md)（`consumer-generated` リポジトリ種別）
 - [ワークフロー契約](workflow-contracts.md)（Local backend 差分契約）
 - REQ-0141（ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義）

@@ -28,8 +28,8 @@ oldString: "    const result = items.map(i => i.value);"
 1. **各 edit 操作の直後に Read で該当ファイルを検証する**
 2. **検証内容**:
  - 編集意図どおりの変更が適用されているか
- - 意図しない行の削除・変更が発生していないか
- - ファイルの構造（インデント・括弧の整合）が保持されているか
+ - 意図しない行の削除、変更が発生していないか
+ - ファイルの構造（インデント、括弧の整合）が保持されているか
 3. **検証失敗時**: 即座に修正し、再度 Read で確認。3回試行しても解決しない場合は停止して親エージェントに報告
 
 ## 大規模ファイルの分割委譲ガイダンス
@@ -58,7 +58,7 @@ oldString: "    const result = items.map(i => i.value);"
 
 ### AST-grep の適用場面
 
-1. **名前変更（rename）**: 変数名・関数名・クラス名の一括変更
+1. **名前変更（rename）**: 変数名、関数名、クラス名の一括変更
 2. **名前空間変更（namespace change）**: コマンド名やパスの変更
 3. **パターン置換**: 特定のコードパターンを別パターンに置換
 
@@ -73,22 +73,22 @@ oldString: "    const result = items.map(i => i.value);"
 
 | 操作 | 推奨ツール | 理由 |
 |------|-----------|------|
-| 変数・関数のリネーム | AST-grep | 構造的マッチで安全 |
+| 変数、関数のリネーム | AST-grep | 構造的マッチで安全 |
 | 名前空間変更 | AST-grep | 境界を正確に認識 |
-| 特定行の追加・変更 | edit | 位置指定が明確な場合に適している |
+| 特定行の追加、変更 | edit | 位置指定が明確な場合に適している |
 | 大規模なコードブロックの再構築 | Write | ファイル全体の再生成が必要な場合 |
 
 ## driver 起動プロンプトテンプレート（Windows + ジャンクション環境）
 
-case-run Step 6 で実行担当サブエージェント（driver）へ引き継ぐプロンプトに**必須**で含める項目。ジャンクション未伝播により worktree 内 `.opencode/` が空になる事象を事前通知し、driver が手動両辺編集・同期スクリプト非依存で作業するよう誘導する。
+case-run Step 6 で実行担当サブエージェント（driver）へ引き継ぐプロンプトに**必須**で含める項目。ジャンクション未伝播により worktree 内 `.opencode/` が空になる事象を事前通知し、driver が手動両辺編集、同期スクリプト非依存で作業するよう誘導する。
 
 ### 必須項目
 
 driver 起動プロンプトには以下を明記する:
 
-- **worktree 内 `.opencode/` は空**: ジャンクション未伝播のため `.opencode/skills/agentdev-*`・`.opencode/commands/agentdev/` が存在しない。`.opencode/skills/repo-*`（実ディレクトリ）のみ存在する
-- **source/ projection 手動両辺編集**: ジャンクション未伝播時は同期スクリプトで自動化できず、source（`src/opencode/`）と projection（`.opencode/`）を手動で両辺編集する運用をとる。agent-dev-flow 自己ホストの場合は source 編集後にメインリポジトリのジャンクションが merge 後に自動反映するため worktree での projection 手動編集は不要だが、consumer プロジェクト（ジャンクションなし・`.opencode/` が git 管理対象）では両辺の手動同期が必要
-- **同期スクリプト非依存**: `sync-self-opencode.ps1`・`install-consumer-opencode.ps1` を worktree 内で実行してジャンクションを再作成しない（worktree 汚染・競合リスク）。ジャンクション再作成は case-run 終了後にメインリポジトリで実施する
+- **worktree 内 `.opencode/` は空**: ジャンクション未伝播のため `.opencode/skills/agentdev-*`、`.opencode/commands/agentdev/` が存在しない。`.opencode/skills/repo-*`（実ディレクトリ）のみ存在する
+- **source/ projection 手動両辺編集**: ジャンクション未伝播時は同期スクリプトで自動化できず、source（`src/opencode/`）と projection（`.opencode/`）を手動で両辺編集する運用をとる。agent-dev-flow 自己ホストの場合は source 編集後にメインリポジトリのジャンクションが merge 後に自動反映するため worktree での projection 手動編集は不要だが、consumer プロジェクト（ジャンクションなし、`.opencode/` が git 管理対象）では両辺の手動同期が必要
+- **同期スクリプト非依存**: `sync-self-opencode.ps1`、`install-consumer-opencode.ps1` を worktree 内で実行してジャンクションを再作成しない（worktree 汚染、競合リスク）。ジャンクション再作成は case-run 終了後にメインリポジトリで実施する
 - **`.opencode/skills/repo-*` は実ディレクトリ**: `repo-agentdev-integrity` 等の `repo-*` プレフィックススキルはジャンクションではなく実ディレクトリのため worktree にも伝播する。これらは worktree 内で直接編集してよい
 
 ### プロンプトテンプレート断片
@@ -110,20 +110,20 @@ subagent は子 Issue 本文の「前工程完了度」属性（`docs/specs/work
 
 ### 完全完了（通常実行）
 
-- **前提**: req-save / spec-save 等の前工程で実施済み・追加作業不要
-- **振る舞い**: 通常通りの実行フロー。Issue 本文の完了条件を完全に実装し、acceptance criteria 順位検証を実施し、PR 作成・検証・品質ゲートを通過する
+- **前提**: req-save / spec-save 等の前工程で実施済み、追加作業不要
+- **振る舞い**: 通常通りの実行フロー。Issue 本文の完了条件を完全に実装し、acceptance criteria 順位検証を実施し、PR 作成、検証、品質ゲートを通過する
 
 ### 検証のみ
 
 - **前提**: 前工程完了を前提とする。acceptance criteria 順位検証のみ実施
 - **振る舞い**:
   - acceptance criteria 順位検証は必須として実施（前工程相当作業は実施しない）
-  - 前工程相当作業（SPEC 編集・REQ 更新等）は実施しない
+  - 前工程相当作業（SPEC 編集、REQ 更新等）は実施しない
   - PR 作成時は「前工程完了」を前提とした実装検証のみを PR 本文に記録する
 
 ### 補完あり
 
-- **前提**: 前工程に残余あり・補完実装の可能性
+- **前提**: 前工程に残余あり、補完実装の可能性
 - **振る舞い**:
   - 前工程相当作業の補完可能性を考慮しつつ acceptance criteria 順位検証を実施
   - 補完が必要と判断した場合、PR 本文の `## Findings / Capture候補` に補完内容を明記

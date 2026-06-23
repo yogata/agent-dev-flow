@@ -1,11 +1,11 @@
 ---
-description: 採用済み成果物を分析・統合し、ユーザー承認後に RU（Requirement Unit）を生成する
+description: 採用済み成果物を分析、統合し、ユーザー承認後に RU（Requirement Unit）を生成する
 agent: sisyphus
 ---
 
 # Backlog レビュー
 
-`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析・統合してユーザーに判定を提示し、承認後に直接 RU を生成する。
+`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU を生成する。
 
 **このコマンドはユーザー承認後に RU を生成する。ユーザー承認は RU 作成承認を兼ねる。**
 
@@ -74,25 +74,25 @@ status: draft
 - **0件**: 正常終了（エラー扱いとしない）。完了報告で「対象なし」と報告
 - **1件以上**: ファイルパス昇順で Step 3 へ
 
-### Step 3: 成果物読み込み・分析
+### Step 3: 成果物読み込み、分析
 
-分析基準・前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` を参照
+分析基準、前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` を参照
 
-### Step 4: 統合・分割判定 + depends_on 依存解決 + ユーザー承認
+### Step 4: 統合、分割判定 + depends_on 依存解決 + ユーザー承認
 
-統合・分割判定基準・depends_on 依存解決ルールは `agentdev-backlog-integration` を参照
+統合、分割判定基準、depends_on 依存解決ルールは `agentdev-backlog-integration` を参照
 
-**矛盾なしの場合の単一承認（REQ-0147-009）**: 後続の Step 5 で矛盾が検出されない場合、本 Step 4 の統合・分割判定承認を RU 生成承認（Step 5/6）としても扱う。単一承認で処理し、追加の HITL は不要。
+**矛盾なしの場合の単一承認（REQ-0147-009）**: 後続の Step 5 で矛盾が検出されない場合、本 Step 4 の統合、分割判定承認を RU 生成承認（Step 5/6）としても扱う。単一承認で処理し、追加の HITL は不要。
 
 ### Step 5: 矛盾検出 + 必要に応じて追加判断
 
-矛盾検出ロジック・出力形式は `agentdev-backlog-integration` を参照
+矛盾検出ロジック、出力形式は `agentdev-backlog-integration` を参照
 
 **矛盾検出時の追加判断（REQ-0147-009）**: 矛盾が検出された場合のみ、ユーザーに追加判断を求める。矛盾する artifact を RU 化せずユーザーに確認する。矛盾しない artifact は通常通り RU 化する（partial success）。自動解決しない（G05）
 
 ### Step 6: RU 生成
 
-RU 生成ルール・frontmatter スキーマ・depends_on 検証は `agentdev-backlog-integration` を参照
+RU 生成ルール、frontmatter スキーマ、depends_on 検証は `agentdev-backlog-integration` を参照
 
 ### Step 7: 成功成果物の削除
 
@@ -120,7 +120,7 @@ RU 生成が成功した採用済み成果物のみを削除する:
 - partial success（矛盾あり）→ `.opencode/commands/agentdev/templates/backlog-review/partial.md`
 - 採用済み成果物なし → `.opencode/commands/agentdev/templates/backlog-review/zero-promoted.md`
 
-RU 生成結果・git 永続化結果を含める。次のコマンド: `/agentdev/req-define`
+RU 生成結果、git 永続化結果を含める。次のコマンド: `/agentdev/req-define`
 
 ## ガードレール
 
@@ -131,7 +131,7 @@ RU 生成結果・git 永続化結果を含める。次のコマンド: `/agentd
 - G05: 矛盾検出時はユーザーの指示を待ち、自動的に解決しない
 - G06: RU 生成に失敗した成果物は削除しない
 - G07: depends_on に採用済み成果物パスを指定しない。RU-ID のみ許容
-- G08: 破壊的変更（矛盾解消・要件仕様スコープ変更・大量成果物削除等）は明示承認を維持する（REQ-0147-005）
+- G08: 破壊的変更（矛盾解消、要件仕様スコープ変更、大量成果物削除等）は明示承認を維持する（REQ-0147-005）
 
 
 

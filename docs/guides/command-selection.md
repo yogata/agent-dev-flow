@@ -12,7 +12,7 @@
 | REQ ファイルまたは要件docがある | `/agentdev/case-open` | GitHub Issue |
 | Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
-| Issue の更新・コメント追加が必要 | `/agentdev/case-update` | 更新済み Issue |
+| Issue の更新、コメント追加が必要 | `/agentdev/case-update` | 更新済み Issue |
 | 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox 項目 |
 | クローズ済み Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox 項目 |
 | inbox に項目がある | `/agentdev/intake-promote` | 採用済み / archive |
@@ -21,7 +21,7 @@
 | 採用済み成果物（intake/learning）がある | `/agentdev/backlog-review` | `RU-*.md` |
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | REQ 体系の健全性を検出したい | `/agentdev/inspect-docs` | 検出レポート |
-| 要件docがあり req-saveからcase-closeまで自走させたい / Issue番号・URL があり case-run〜case-close を自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
+| 要件docがあり req-saveからcase-closeまで自走させたい / Issue番号、URL があり case-run〜case-close を自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
 
 ## リポジトリメンテナンス（AgentDevFlow 本体リポジトリのみ）
 

@@ -6,22 +6,22 @@
 
 | REQ | タイトル | 影響する Rule IDs | 影響する Artifact |
 |-----|---------|------------------|------------------|
-| REQ-0101 | 文書・REQ 管理基準 | IR-001, IR-002, IR-003, IR-004, IR-017, IR-018, IR-022 | REQ, REQ index, DOC-MAP |
+| REQ-0101 | 文書、REQ 管理基準 | IR-001, IR-002, IR-003, IR-004, IR-017, IR-018, IR-022 | REQ, REQ index, DOC-MAP |
 | REQ-0103 | Artifact 責任分界 | IR-006, IR-008, IR-014, IR-016, IR-024 | commands, skills, templates, SPEC |
 | REQ-0108 | Integrity/Validation/Tests | IR-001~IR-024 (全件) | 全アーティファクト |
 | REQ-0107 | Reporting/Writing Quality | IR-013, IR-019 | templates, guides |
 | REQ-0104 | Workflow/Command Protocol | IR-006, IR-024 | commands |
 | REQ-0105 | RU lifecycle / Requirement Unit 管理 | IR-016 | ドメイン状態 |
-| REQ-0106 | Case 実行オーケストレーション / Epic・Wave | IR-006, IR-013, IR-016 | commands, templates |
+| REQ-0106 | Case 実行オーケストレーション / Epic、Wave | IR-006, IR-013, IR-016 | commands, templates |
 | REQ-0109 | REQ 再構成運用 | IR-004, IR-011, IR-015 | REQ, mapping-table, 廃止 REQ |
 | REQ-0112 | ADR status 正規化 | IR-005, IR-010 | ADR, ADR index |
 | REQ-0113 | Skill References SPEC 分離 | IR-008, IR-014 | skills, skill references |
 | REQ-0114 | case-auto 最大自走モード | IR-006, IR-016 | commands |
-| REQ-0119 | コマンド・スキル・サブエージェント責務分界の再基準化 | IR-006, IR-008, IR-014, IR-024 | commands, skills |
+| REQ-0119 | コマンド、スキル、サブエージェント責務分界の再基準化 | IR-006, IR-008, IR-014, IR-024 | commands, skills |
 | REQ-0123 | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 | IR-006, IR-008, IR-014 | commands, skills |
 | REQ-0124 | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle | IR-006, IR-024 | commands |
 | REQ-0125 | inspect-skills / Command/Skill 参照妥当性検出 | IR-008, IR-014 | commands, skills |
-| REQ-0126 | inspect-promote / 検出事項分類・昇格 | IR-016 | ドメイン状態 |
+| REQ-0126 | inspect-promote / 検出事項分類、昇格 | IR-016 | ドメイン状態 |
 | REQ-0127 | Intake command 群 (capture / from-github / promote) | IR-016 | ドメイン状態 |
 | REQ-0128 | Learning-promote | IR-016 | ドメイン状態 |
 | REQ-0129 | Backlog-review | IR-016 | ドメイン状態 |
@@ -30,10 +30,10 @@
 | REQ-0132 | case-open / Issue 作成 | IR-006 | commands |
 | REQ-0133 | case-update / Issue 更新 | IR-006 | commands |
 | REQ-0110 | Git worktree cleanup 信頼性 |（(infrastructure)）| - |
-| REQ-0102 | 要件定義・保存 | IR-001, IR-002 | REQ |
-| REQ-0134 | 配布基盤: source/projection・sync・repo type・consumer install | IR-006, IR-016, IR-046 | commands, skills, ドメイン状態 |
-| REQ-0135 | Drafts 配置・Draft Type Registry | IR-016 | ドメイン状態 |
-| REQ-0136 | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設・req-define 強化） | IR-008, IR-044 | REQ, SPEC, commands |
+| REQ-0102 | 要件定義、保存 | IR-001, IR-002 | REQ |
+| REQ-0134 | 配布基盤: source/projection、sync、repo type、consumer install | IR-006, IR-016, IR-046 | commands, skills, ドメイン状態 |
+| REQ-0135 | Drafts 配置、Draft Type Registry | IR-016 | ドメイン状態 |
+| REQ-0136 | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設、req-define 強化） | IR-008, IR-044 | REQ, SPEC, commands |
 | REQ-0137 | 並列実行安全 git 操作規律 |（(infrastructure)）| - |
 | REQ-0138 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
 | REQ-0139 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
@@ -43,7 +43,7 @@
 
 ## 要件行影響（Requirement-Line Impact）
 
-特定要件行が影響するアーティファクト・スキル・コマンド（REQ-0109-047）。REQ 全体ではなく要件行粒度で境界基準・検出観点の影響を追跡する必要がある場合に使用する。これらの要件行はすべて IR-044（REQ/SPEC 境界違反検出）を通じてカタログに紐づく。
+特定要件行が影響するアーティファクト、スキル、コマンド（REQ-0109-047）。REQ 全体ではなく要件行粒度で境界基準、検出観点の影響を追跡する必要がある場合に使用する。これらの要件行はすべて IR-044（REQ/SPEC 境界違反検出）を通じてカタログに紐づく。
 
 | 要件行 | 影響するアーティファクト / スキル / コマンド | 経由 |
 |--------|-------------------------------------|------|
@@ -61,7 +61,7 @@
 
 ### 中影響（3-4 ルール）
 - **REQ-0109**: REQ 再構成運用 (3 ルール)
-- **REQ-0119**: コマンド・スキル・サブエージェント責務分界 (4 ルール)
+- **REQ-0119**: コマンド、スキル、サブエージェント責務分界 (4 ルール)
 - **REQ-0104**: Command protocol (2 ルール)
 - **REQ-0106**: Case 実行オーケストレーション (3 ルール)
 - **REQ-0107**: Reporting (2 ルール)
@@ -81,7 +81,7 @@
 1. **検出**: 検出事項が基準既知（baseline-known）に存在するか確認
 2. **分類**: known (基準済み) vs new
 3. **再発判定**: known 検出事項が再度検出された場合:
-   - ルール・検出器の誤検知 → ルールを修正（false positive）
+   - ルール、検出器の誤検知 → ルールを修正（false positive）
    - 真の再発 → 検出器を強化、または検出ルールを追加
    - 基準判定ミス → 基準（baseline）を更新
 4. **改善ループ**: ルールカタログ / 基準 / 影響マップ / 例外を更新

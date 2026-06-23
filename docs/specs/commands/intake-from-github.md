@@ -25,9 +25,9 @@ updated: 2026-06-21
 
 - git commit/push: `.agentdev/intake/` 配下のみ（commit message: `chore: capture intake items from github`）
 - 実行前同期: `git pull --ff-only`
-- GitHub API 読み取り: gh CLI のみ使用（G09・GitHub API 直接呼出禁止）
+- GitHub API 読み取り: gh CLI のみ使用（G09、GitHub API 直接呼出禁止）
 - GitHub Issue 作成: 行わない（G01）
-- Issue/PR コメント投稿・マーカー付与: 行わない（G04）
+- Issue/PR コメント投稿、マーカー付与: 行わない（G04）
 
 ## 現在の動作
 
@@ -51,18 +51,18 @@ updated: 2026-06-21
 
 - GitHub Issue 作成（G01）
 - 採用可否判断（G02）
-- review・整形・分類判断（G03）
-- Issue/PR コメント投稿・マーカー付与（G04）
-- frontmatter・状態値・重複排除キーの必須化（G06）
+- review、整形、分類判断（G03）
+- Issue/PR コメント投稿、マーカー付与（G04）
+- frontmatter、状態値、重複排除キーの必須化（G06）
 - workflow 管理成果物の扱い（G05）
 - 特定セクションの必須扱い（G07）
-- GitHub API 直接呼出（G09・gh CLI のみ使用）
-- オープン状態の Issue/PR の対象化（G10・クローズ済みのみ）
+- GitHub API 直接呼出（G09、gh CLI のみ使用）
+- オープン状態の Issue/PR の対象化（G10、クローズ済みのみ）
 - `.agentdev/intake/inbox/` 以外への保存（G12）
 
 ## 検証観点
 
-- 出力制約（G13）: 成果物本文 verbatim・判定結果・調査過程は圧縮
+- 出力制約（G13）: 成果物本文 verbatim、判定結果、調査過程は圧縮
 - 抽出ロジック精度: `agentdev-intake-pipeline` 参照
 
 ## See Also

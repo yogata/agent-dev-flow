@@ -13,7 +13,7 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 
 - 診断結果の提示
 - 根拠と推奨 route の提示
-- 正規文書変更・REQ/ADR/SPEC 変更・Command/Skill/Template/Script 変更・Issue作成・PR作成・RU保存・branch・worktree 操作の禁止
+- 正規文書変更、REQ/ADR/SPEC 変更、Command/Skill/Template/Script 変更、Issue作成、PR作成、RU保存、branch、worktree 操作の禁止
 
 ## 入力
 
@@ -35,12 +35,12 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 ### Step 2: 各診断観点の評価
 
 `agentdev-inspect-skills` に従い、参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存を評価する
-### Step 3: 配布物構文健全性・責務整合診断
+### Step 3: 配布物構文健全性、責務整合診断
 
-配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/specs/docs-spec-rebuild-integrity.md` が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複・見出し重複・Markdown 構文破損・壊れた括弧・command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する
+配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/specs/docs-spec-rebuild-integrity.md` が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複、見出し重複、Markdown 構文破損、壊れた括弧、command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する
 ### Step 4: 分類
 
-検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は `docs/specs/docs-spec-rebuild-integrity.md` の NG 分類表に従い、各検出事項に分類・理由・後続対象を付ける
+検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は `docs/specs/docs-spec-rebuild-integrity.md` の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける
 ### Step 5: route 提示
 
 修正は実行せず、推奨 route を提示する
@@ -66,8 +66,8 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 
 ## ガードレール
 
-- G01: ファイルを変更・作成・削除しない。ただし `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成は例外として許可する
-- G02: GitHub Issue/PR を作成・更新しない
+- G01: ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成は例外として許可する
+- G02: GitHub Issue/PR を作成、更新しない
 - G03: RU、intake、learning、backlog 成果物を保存しない
 - G04: commit/ push は `.agentdev/inspect/` 配下の永続化のみ許可。branch/ worktree 操作は禁止
 - G05: 自動修正せず、推奨 route の提示に留める

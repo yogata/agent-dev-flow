@@ -9,12 +9,12 @@ updated: 2026-06-21
 
 ## 目的
 
-未分類の変更候補を手動入力から intake item として保存する。保存専用コマンドであり、GitHub Issue 作成・採用可否判断は行わない。
+未分類の変更候補を手動入力から intake item として保存する。保存専用コマンドであり、GitHub Issue 作成、採用可否判断は行わない。
 
 ## 入力
 
 - ユーザーの自然言語による変更候補記述
-- 任意で観測元・影響・判断保留事項の指定
+- 任意で観測元、影響、判断保留事項の指定
 
 ## 出力
 
@@ -30,7 +30,7 @@ updated: 2026-06-21
 ## 現在の動作
 
 - Step 1: 入力受領
-- Step 2: intake item 生成（推奨標準形に整理・ユーザー未指定セクションは省略（G13: 過度補完禁止・G11: 過度解釈禁止））
+- Step 2: intake item 生成（推奨標準形に整理、ユーザー未指定セクションは省略（G13: 過度補完禁止、G11: 過度解釈禁止））
 - Step 3: ファイル名生成（`YYYY-MM-DD-{topic-slug}.md`）
 - Step 3-1: 実行前同期（`git pull --ff-only`）
 - Step 4: 保存（`.agentdev/intake/inbox/`）。同名時は連番付与
@@ -46,14 +46,14 @@ updated: 2026-06-21
 
 - GitHub Issue 作成（G01）
 - 採用可否判断（G02）
-- intake item 変更・更新（G03）
-- review・整形・分類（G04）
-- 作業知見のみの内容（G05・learning item 扱い）
-- learning item 保存・分類・昇華（G06）
-- frontmatter・状態値・重複排除キーの必須化（G08）
+- intake item 変更、更新（G03）
+- review、整形、分類（G04）
+- 作業知見のみの内容（G05、learning item 扱い）
+- learning item 保存、分類、昇華（G06）
+- frontmatter、状態値、重複排除キーの必須化（G08）
 - workflow 管理成果物の扱い（G07）
 - 特定セクションの必須扱い（G09）
-- ユーザー入力内容の過度解釈・変形（G11）
+- ユーザー入力内容の過度解釈、変形（G11）
 - `.agentdev/intake/` 以外への保存（G12）
 
 ## 検証観点

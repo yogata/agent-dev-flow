@@ -1,12 +1,12 @@
 # QG-2: Acceptance Criteria Coverage Gate
 
-case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する Gate。本ファイルは QG-2 の判定基準・検査観点を定義する。共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
+case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する Gate。本ファイルは QG-2 の判定基準、検査観点を定義する。共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
 ## 配置
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| case-open | Step 1（Issue 本文生成）・Step 5（Epic 本文生成）・Step 15（Standard Issue 生成） | Issue 本文（完了条件セクション・チェックボックス） |
+| case-open | Step 1（Issue 本文生成）、Step 5（Epic 本文生成）、Step 15（Standard Issue 生成） | Issue 本文（完了条件セクション、チェックボックス） |
 
 ## 検査観点
 
@@ -58,13 +58,13 @@ Epic flow（マルチREQ/ 単一REQ Epic）の場合:
 
 - Epic Issue の完了条件は子Issue の完了条件の集約ではなく、Epic 固有の受け入れ基準を含む。
 - 各子Issue の完了条件が当該子Issue が担当する OU/ REQ の必達要件を網羅しているかを検証する。
-- 子Issue 間で必達要件の漏れ・重複がないかを確認する。
+- 子Issue 間で必達要件の漏れ、重複がないかを確認する。
 
 ## 委譲接続点
 
 QG-2 の検査をサブエージェントに委譲する場合:
 
-- サブエージェントは完了条件候補・必達要件 mapping 候補・網羅性の疑義のみを返す。
+- サブエージェントは完了条件候補、必達要件 mapping 候補、網羅性の疑義のみを返す。
 - 親エージェントが pass/warn/fail を確定し、Issue 本文の確定と作成を行う。
 - 具体的な委譲接続点は case-open の各 Step（Step 1, Step 5, Step 7）を参照。
 
@@ -77,6 +77,6 @@ QG-2 の検査をサブエージェントに委譲する場合:
 
 - [common-gate-contract.md](common-gate-contract.md)
 - [qg-1-definition-integrity.md](qg-1-definition-integrity.md) — 前工程の要件定義の完全性（QG-2 はその成果物を入力とする）
-- **agentdev-issue-management**: Issue 本文生成・テンプレート選定
+- **agentdev-issue-management**: Issue 本文生成、テンプレート選定
 - **agentdev-workflow-templates**: Issue 本文テンプレート（`issue_desc_*.md`）
 

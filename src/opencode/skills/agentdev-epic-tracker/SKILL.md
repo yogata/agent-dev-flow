@@ -5,10 +5,10 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 
 # Epic 状態追跡（Epic Status Tracker）
 
-親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベース。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR-0125 単一書き手制約・`docs/specs/workflows/epic-wave-model.md` 参照）。
+親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベース。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR-0125 単一書き手制約、`docs/specs/workflows/epic-wave-model.md` 参照）。
 
-- **参照元**: `case-close`（completed/ blocked/ failed 更新・単一書き手）。`case-auto`・`case-run` は Epic Issue 本文を読み取るのみで書き込まない
-- **特性**: 宣言的定義のみ提供。手順・手続きは各コマンド定義に委ねる
+- **参照元**: `case-close`（completed/ blocked/ failed 更新、単一書き手）。`case-auto`、`case-run` は Epic Issue 本文を読み取るのみで書き込まない
+- **特性**: 宣言的定義のみ提供。手順、手続きは各コマンド定義に委ねる
 - **`⏭スキップ` は採用しない**。前提未達の Issue は `pending` のまま選択対象外となる。Wave status は保存せず、Wave 内 Issue 状態から導出する
 
 ## ステータス値定義
@@ -20,13 +20,13 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 | `pending` | 依存 Issue または前 Wave の完了待ち。異常ではない | case-open（初期値） | いいえ |
 | `ready` | 依存が満たされ、case-run(#epic) が実行可能と判定した状態。**永続状態には書き込まれない** | case-run 内部判定（永続状態に書き込まない） | いいえ |
 | `running` | case-run(#epic) が task() 起動し実行中の状態。**永続状態には書き込まれない** | case-run 内部状態（永続状態に書き込まない） | いいえ |
-| `completed` | Issue の実装・検証・必要な case-close が完了した状態 | case-close | はい |
-| `blocked` | 要件曖昧性・外部副作用・権限不足・矛盾等により自動継続できない状態 | case-close（実行結果から確定） | はい |
-| `failed` | 実装・検証・CI・PR 作成などの実行結果として失敗した状態 | case-close（実行結果から確定） | はい |
+| `completed` | Issue の実装、検証、必要な case-close が完了した状態 | case-close | はい |
+| `blocked` | 要件曖昧性、外部副作用、権限不足、矛盾等により自動継続できない状態 | case-close（実行結果から確定） | はい |
+| `failed` | 実装、検証、CI、PR 作成などの実行結果として失敗した状態 | case-close（実行結果から確定） | はい |
 
 Epic自動クローズ判定では `completed` を終了状態として扱う（`blocked`/ `failed` は終了状態だが自動クローズ完了とはみなさない）。
 
-**永続状態遷移**: Epic Issue 本文（永続状態）に書き込まれるのは `pending` → `completed`/ `blocked`/ `failed` の遷移のみ。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない（ADR-0125 単一書き手制約・case-close のみが書き込み）。
+**永続状態遷移**: Epic Issue 本文（永続状態）に書き込まれるのは `pending` → `completed`/ `blocked`/ `failed` の遷移のみ。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない（ADR-0125 単一書き手制約、case-close のみが書き込み）。
 
 ## 親Epic検出
 
@@ -44,7 +44,7 @@ Epic自動クローズ判定では `completed` を終了状態として扱う（
 1. 子Issue本文から `Parent: #{N}` を検出
 2. 親Epicが存在しない → スキップ
 3. `gh issue view {N}` でEpic本文を取得（`agentdev-gh-cli` 準拠）
-4. 正規表現で該当子Issue行を特定・置換（後述「正規表現パターン」の新4列/旧4列形式に対応）:
+4. 正規表現で該当子Issue行を特定、置換（後述「正規表現パターン」の新4列/旧4列形式に対応）:
  - completed の場合:
    - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )pending (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
    - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )pending (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
@@ -136,7 +136,7 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 ## See Also
 
 - **agentdev-gh-cli**
-- **agentdev-workflow-lifecycle**: Epic振る舞いルール・進捗追跡テーブル定義
+- **agentdev-workflow-lifecycle**: Epic振る舞いルール、進捗追跡テーブル定義
 
 ## Merge Conflict 対応パターン
 
@@ -144,13 +144,13 @@ Epic本文のステータス追跡テーブルは以下の2形式をサポート
 
 #### 1. PR merge前後のEpic状態遷移
 
-Epic Issue 本文（永続状態）の書き込みは case-close(#epic) のみが行う（単一書き手・ADR-0125）。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない。
+Epic Issue 本文（永続状態）の書き込みは case-close(#epic) のみが行う（単一書き手、ADR-0125）。`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない。
 
-**case-run(#epic) 実行中（merge前・Epic Issue 本文不変）**:
+**case-run(#epic) 実行中（merge前、Epic Issue 本文不変）**:
 - 子Issue の `ready`/ `running` は case-run(#epic) の内部状態として追跡（Epic Issue 本文には書き込まない）
 - Epic Issue 本文ステータス追跡テーブルは `pending` のまま
 
-**case-close(#epic) 完了時（merge後・Epic Issue 本文更新）**:
+**case-close(#epic) 完了時（merge後、Epic Issue 本文更新）**:
 - 子Issue を `pending` → `completed ([PR#N](URL))`/ `blocked`/ `failed` に更新
 - PR番号とURLを含める（`completed` の場合）
 
@@ -205,7 +205,7 @@ Epic Issue 本文の書き込みは case-close(#epic) が単一書き手（ADR-0
 **conflict予防**:
 1. **case-close(#epic) 単一書き手の維持**:
   - Wave 完了時に case-close(#epic) が一括更新（子Issue番号昇順）
-  - case-run(#epic)・case-auto は Epic Issue 本文に書き込まない
+  - case-run(#epic)、case-auto は Epic Issue 本文に書き込まない
 
 2. **更新順序の制御**:
   - 子Issue番号の昇順で更新

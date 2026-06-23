@@ -1,6 +1,6 @@
 # case-update 詳細手順
 
-case-update が既存 Case の本文更新、コメント追加、REQ ファイル更新、レビュー NG コメント投稿を行う際の詳細手順を定義する。親エージェントは Issue 更新、REQ ファイル更新、commit、push、ユーザー確認を担当する。サブエージェントへ委譲する場合は状態読解・分類候補・根拠抽出のみを依頼する。
+case-update が既存 Case の本文更新、コメント追加、REQ ファイル更新、レビュー NG コメント投稿を行う際の詳細手順を定義する。親エージェントは Issue 更新、REQ ファイル更新、commit、push、ユーザー確認を担当する。サブエージェントへ委譲する場合は状態読解、分類候補、根拠抽出のみを依頼する。
 
 ## Issue 番号解決
 
@@ -34,12 +34,12 @@ case-update `--req` は req-save へ委譲せず、直接 commit と push を行
 
 入力条件は、`agentdev-spec-compliance` の乖離報告とユーザー承認済み判断が存在することとする。
 
-1. `agentdev-spec-compliance` の乖離報告から影響度・対象・内容・推奨アクション・理由を抽出する。
-2. 乖離タイプに基づき、spec-bug、impl-bug、scope-creep、テスト不足・品質基準未達へ分類する。
+1. `agentdev-spec-compliance` の乖離報告から影響度、対象、内容、推奨アクション、理由を抽出する。
+2. 乖離タイプに基づき、spec-bug、impl-bug、scope-creep、テスト不足、品質基準未達へ分類する。
 3. spec-bug は REQ UPDATE とレビュー NG コメント投稿を行う。
 4. impl-bug はレビュー NG コメント投稿のみを行う。
 5. scope-creep は REQ UPDATE とレビュー NG コメント投稿を行う。
-6. テスト不足・品質基準未達はレビュー NG コメント投稿のみを行う。
+6. テスト不足、品質基準未達はレビュー NG コメント投稿のみを行う。
 7. `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_review_ng.md` を Read tool で読み込み、必須セクション欠落時は生成をやり直す。
 8. agentdev-spec-compliance 結果をテンプレートの「仕様適合性 結果」セクションに展開する。
 9. NG 理由分類のチェックボックスを自動選択する。

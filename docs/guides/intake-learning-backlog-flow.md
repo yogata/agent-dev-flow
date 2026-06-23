@@ -1,6 +1,6 @@
 # Intake / Learning / Backlog フロー
 
-作業候補・学びの収集から RU（Requirement Unit）生成までの流れを説明する。
+作業候補、学びの収集から RU（Requirement Unit）生成までの流れを説明する。
 
 ## 概要
 
@@ -12,7 +12,7 @@ Learning パイプライン ↗
 ```
 
 - **Intake**: 具体的な修正対象が特定できる作業候補を収集する
-- **Learning**: 再発防止の知見・判断ミス・手順漏れを蓄積する
+- **Learning**: 再発防止の知見、判断ミス、手順漏れを蓄積する
 - **Backlog**: 両パイプラインの採用済み成果物を RU に統合する
 
 ## Intake と Learning の境界
@@ -20,12 +20,12 @@ Learning パイプライン ↗
 両パイプラインは以下の基準で振り分ける。
 
 - 具体的な修正対象が特定できる → Intake
-- 再発防止の知見・判断ミス・手順漏れ → Learning
+- 再発防止の知見、判断ミス、手順漏れ → Learning
 - 両方の性質を持つ → Intake 項目と Learning 項目に分割
 
 ## Intake パイプライン
 
-具体的な作業候補・不整合・未回収課題の収集・レビュー・採用判断を行う。
+具体的な作業候補、不整合、未回収課題の収集、レビュー、採用判断を行う。
 
 ### 状態遷移
 
@@ -47,7 +47,7 @@ promoted/ → archive/promoted/
 
 | ディレクトリ | 役割 |
 |-------------|------|
-| `inbox/` | 収集された気づき・課題の一次受け |
+| `inbox/` | 収集された気づき、課題の一次受け |
 | `archive/rejected/` | 却下項目の記録（終端状態） |
 | `promoted/` | backlog-review 入力用の採用済み成果物 |
 | `archive/promoted/` | 採用済み項目の記録（終端状態） |
@@ -56,7 +56,7 @@ promoted/ → archive/promoted/
 
 ## Learning パイプライン
 
-再発防止に使う知見の蓄積・分類・昇華を行う。
+再発防止に使う知見の蓄積、分類、昇華を行う。
 
 ### 状態遷移
 
@@ -76,7 +76,7 @@ inbox.md + archive/active.md → promoted/
 | 成果物 | 役割 |
 |--------|------|
 | `inbox.md` | 未整理の Learning エントリを受け溜めるキュー。`learning-capture` で蓄積し、採用判断成功後にクリアされる |
-| `archive/active.md` | 分類済みエントリの蓄積（継続的に再評価される領域）。未処分・保留中・再評価対象を保持する |
+| `archive/active.md` | 分類済みエントリの蓄積（継続的に再評価される領域）。未処分、保留中、再評価対象を保持する |
 | `evaluation-report.md` | 採用判断の内部フェーズで生成される一時成果物（非公開） |
 | `promoted/` | 昇華判定済み成果物の配置先。フラット構造 |
 
@@ -94,7 +94,7 @@ Intake/Learning 両方の採用済み成果物を RU に統合する。
 |----------|------|------|
 | `promoted/`（intake/learning） | `/agentdev/backlog-review` | `RU-*.md` |
 
-`/agentdev/backlog-review` は分析・統合結果をユーザーに確認（HITL：人の判断を挟む）し、承認後に直接 RU を生成する。
+`/agentdev/backlog-review` は分析、統合結果をユーザーに確認（HITL：人の判断を挟む）し、承認後に直接 RU を生成する。
 
 ### RU の粒度
 

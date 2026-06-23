@@ -1,6 +1,6 @@
 # ローカル版 OpenCode 生成フロー定義
 
-> 本ファイルはローカル版 OpenCode 生成の全体フロー・安全確認手順・`generated_by` 識別子の形式を定義する。意味仕様の正本は `docs/specs/local-generation.md`。本ファイルは正本 SPEC と矛盾してはならない。
+> 本ファイルはローカル版 OpenCode 生成の全体フロー、安全確認手順、`generated_by` 識別子の形式を定義する。意味仕様の正本は `docs/specs/local-generation.md`。本ファイルは正本 SPEC と矛盾してはならない。
 
 ## 目的
 
@@ -37,7 +37,7 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 - `src/opencode/skills/agentdev-*/` — GitHub 版スキル原本
 - `src/opencode/` 配下のひな形群 — GitHub 版ひな形原本
 - `src/opencode-local/case-schema/` — Case ファイルスキーマ定義
-- `src/opencode-local/transform/` — 変換プロンプト・レビュープロンプト・変換仕様
+- `src/opencode-local/transform/` — 変換プロンプト、レビュープロンプト、変換仕様
 - `src/opencode-local/generation-flow.md` — 本ファイル（生成フロー定義）
 
 ### Step 3: ジャンクション検出安全ゲート
@@ -51,13 +51,13 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 
 `.opencode/commands/` と `.opencode/skills/` の同名ファイルを `generated_by` 識別子で確認する（REQ-0141-012, 013）。詳細は後述「`generated_by` 識別子」参照。
 
-- 同名ファイルに `generated_by: local-opencode-transform` 識別情報がある場合: 再生成・上書きを許可
+- 同名ファイルに `generated_by: local-opencode-transform` 識別情報がある場合: 再生成、上書きを許可
 - 同名ファイルに識別情報がない場合: 生成を停止
 - 同名ファイルに異なる識別情報がある場合: 生成を停止
 
 ### Step 5: 変換の実行
 
-`transform/generate.md` の指示に従い、AI エージェントがローカル版コマンド / スキル / ひな形を生成する（REQ-0141-032）。変換内容・ガードレール・レポートフォーマットは `transform/spec.md` 参照。
+`transform/generate.md` の指示に従い、AI エージェントがローカル版コマンド / スキル / ひな形を生成する（REQ-0141-032）。変換内容、ガードレール、レポートフォーマットは `transform/spec.md` 参照。
 
 ### Step 6: 生成物の配置
 
@@ -88,9 +88,9 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 
 ### 上書き許可条件
 
-同名ファイルに対する再生成・上書きは以下の条件でのみ許可する（REQ-0141-012, 013）。
+同名ファイルに対する再生成、上書きは以下の条件でのみ許可する（REQ-0141-012, 013）。
 
-- 同名ファイルに `generated_by: local-opencode-transform` 識別情報がある場合: 再生成・上書きを許可
+- 同名ファイルに `generated_by: local-opencode-transform` 識別情報がある場合: 再生成、上書きを許可
 - 同名ファイルに識別情報がない場合: 安全確認不能として生成を停止
 - 同名ファイルに異なる識別情報がある場合: 生成を停止
 
@@ -135,8 +135,8 @@ AI エージェントが仕様管理リポジトリの `src/opencode/` と `src/
 - [ローカル版生成の実行手順](README.md) — AI エージェントでの実行エントリポイント
 - [変換用プロンプト](transform/generate.md) — ローカル版生成の指示書
 - [レビュー用プロンプト](transform/review.md) — 生成結果の検証指示
-- [変換仕様](transform/spec.md) — 変換対象一覧・ガードレール一覧・レポートフォーマット
+- [変換仕様](transform/spec.md) — 変換対象一覧、ガードレール一覧、レポートフォーマット
 - [Case ファイルスキーマ定義](case-schema/case-file.md) — ローカル Case ファイルの構造
-- `docs/specs/local-generation.md` — 生成フロー・安全ゲートの正本
+- `docs/specs/local-generation.md` — 生成フロー、安全ゲートの正本
 - REQ-0141 — ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義
 - ADR-0126 — source model 拡張と生成安全性制約

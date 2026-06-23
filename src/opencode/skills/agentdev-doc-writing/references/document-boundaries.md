@@ -1,16 +1,16 @@
-# 文書種別責務・配置判定
+# 文書種別責務、配置判定
 
-> **原本**: 配置基準・用語政策は [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md)（「文書種別責務」「移送判断」節）、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。本ファイルは運用ビュー（判定フロー・チェックリスト）である。
+> **原本**: 配置基準、用語政策は [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md)（「文書種別責務」「移送判断」節）、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。本ファイルは運用ビュー（判定フロー、チェックリスト）である。
 
 ## 文書種別の責務
 
 | 文書種別 | 責務 |
 |---|---|
-| REQ | 満たすべき状態・振る舞い・制約・外部契約を記述する |
-| ADR | 将来の設計・運用・文書システムを制約する意思決定の記録 |
-| SPEC | 現在の実装構成を成立させるスキーマ・ライフサイクル・コマンド構成・ルールカタログ・判定表・enum・format・内部パラメータを記述する |
+| REQ | 満たすべき状態、振る舞い、制約、外部契約を記述する |
+| ADR | 将来の設計、運用、文書システムを制約する意思決定の記録 |
+| SPEC | 現在の実装構成を成立させるスキーマ、ライフサイクル、コマンド構成、ルールカタログ、判定表、enum、format、内部パラメータを記述する |
 | guide | 人間向けナビゲーション層（REQ/ADR/SPEC/DOC-MAP の内容を代替しない） |
-| README | identity・入口表・参照先リンク・最小限のクイックスタート |
+| README | identity、入口表、参照先リンク、最小限のクイックスタート |
 
 ## REQ と SPEC の配置判定
 
@@ -26,8 +26,8 @@ REQ 要件行が以下のみを主たる文意とする場合、当該内容は 
 - レポート形式
 - テストデータ詳細
 - 個別 checker ルール
-- retry 回数・token 目安・行数上限
-- Step 番号・Phase 番号
+- retry 回数、token 目安、行数上限
+- Step 番号、Phase 番号
 - 内部アルゴリズム
 - 作業履歴
 
@@ -47,25 +47,25 @@ REQ 要件行が以下のみを主たる文意とする場合、当該内容は 
 
 査読対象の記述が適切な文書種別に配置されているか、以下の順で判定する。
 
-1. **REQ か?** — 満たすべき状態・振る舞い・制約・外部契約を記述しているか。SPEC 相当内容のみを主たる文意とする場合は「移送: SPEC」を提示する。安定契約例外に該当する場合は REQ に残せる。
-2. **ADR か?** — 将来を制約する意思決定を記録しているか。意思決定ではなく要件・仕様の記述の場合は移送先を提示する。詳細は [adr-writing-quality.md](adr-writing-quality.md) 参照。
+1. **REQ か?** — 満たすべき状態、振る舞い、制約、外部契約を記述しているか。SPEC 相当内容のみを主たる文意とする場合は「移送: SPEC」を提示する。安定契約例外に該当する場合は REQ に残せる。
+2. **ADR か?** — 将来を制約する意思決定を記録しているか。意思決定ではなく要件、仕様の記述の場合は移送先を提示する。詳細は [adr-writing-quality.md](adr-writing-quality.md) 参照。
 3. **SPEC か?** — 現在の実装構成を成立させる詳細を記述しているか。要件（満たすべき成果）の記述が混入している場合は移送先を提示する。詳細は [spec-writing-quality.md](spec-writing-quality.md) 参照。
 4. **guide/ README か?** — ナビゲーション層として機能しているか。REQ/ADR/SPEC の内容を代替していないか。
 
 ## 硬直的固定記述の回避
 
-件数（「10 ガイド」等）・ファイル名列挙を要件に埋め込まない。件数・ファイル名は SPEC・README・guide 側で管理し、REQ は構造（「README.md（入口）と個別ガイドファイルで構成する」等）のみ記述する。
+件数（「10 ガイド」等）、ファイル名列挙を要件に埋め込まない。件数、ファイル名は SPEC、README、guide 側で管理し、REQ は構造（「README.md（入口）と個別ガイドファイルで構成する」等）のみ記述する。
 
 ## 配布物への内部 ID 記述禁止
 
-配布物（`src/opencode/commands/`・`src/opencode/skills/`）には AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等）を記述しない。配布物は利用者向け成果物であり、内部 ID は利用者にとってノイズになる。
+配布物（`src/opencode/commands/`、`src/opencode/skills/`）には AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等）を記述しない。配布物は利用者向け成果物であり、内部 ID は利用者にとってノイズになる。
 
 ### 査読対象
 
-- `src/opencode/commands/**/*.md` の本文行（コードブロック内・テンプレート変数プレースホルダーは除く）
+- `src/opencode/commands/**/*.md` の本文行（コードブロック内、テンプレート変数プレースホルダーは除く）
 - `src/opencode/skills/**/*.md` の本文行（同上）
 
-`docs/` 配下・`scripts/` 配下は内部アーティファクトであり、内部 ID 記述を許容するため査読対象外。
+`docs/` 配下、`scripts/` 配下は内部アーティファクトであり、内部 ID 記述を許容するため査読対象外。
 
 ### 検出パターン
 
@@ -80,8 +80,8 @@ REQ 要件行が以下のみを主たる文意とする場合、当該内容は 
 
 内部 ID を機能的記述へ置換する。具体例:
 
-- REQ 番号 → 該当コマンド名・スキル名・機能名
-- ADR 番号 → 意思決定の内容（例: 委譲モデル・ライフサイクル方針）
+- REQ 番号 → 該当コマンド名、スキル名、機能名
+- ADR 番号 → 意思決定の内容（例: 委譲モデル、ライフサイクル方針）
 - SPEC-ID → 該当 SPEC の主題（例: 「case-run SPEC」）
 
 内部 ID を含む説明が必要な場合は、配布物ではなく `docs/specs/` または `docs/guides/` へ移送する（`移送: SPEC` または `移送: guide`）。

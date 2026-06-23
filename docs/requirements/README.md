@@ -8,24 +8,24 @@
 
 | REQ ID | タイトル | 関心対象 |
 |---|---|---|
-| [REQ-0101](REQ-0101.md) | 文書・REQ管理基準 | 文書種別の基準境界と ADR 記述対象 |
-| [REQ-0102](REQ-0102.md) | 要件定義・保存 | req-define・req-save・分類ゲート |
+| [REQ-0101](REQ-0101.md) | 文書、REQ管理基準 | 文書種別の基準境界と ADR 記述対象 |
+| [REQ-0102](REQ-0102.md) | 要件定義、保存 | req-define、req-save、分類ゲート |
 | [REQ-0103](REQ-0103.md) | Artifact責任分界 | command/skill/template/script の責務境界 |
-| [REQ-0104](REQ-0104.md) | Workflow / Command Protocol | ワークフロー・work_type/scale 分類・SSoT |
+| [REQ-0104](REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type/scale 分類、SSoT |
 | [REQ-0105](REQ-0105.md) | RU lifecycle / Requirement Unit 管理 | RU lifecycle と RU メタデータ |
-| [REQ-0106](REQ-0106.md) | Case実行オーケストレーション / Epic・Wave | Epic/Wave 並列実行と子Issue 状態整合 |
+| [REQ-0106](REQ-0106.md) | Case実行オーケストレーション / Epic、Wave | Epic/Wave 並列実行と子Issue 状態整合 |
 | [REQ-0107](REQ-0107.md) | Reporting / Writing Quality | 完了報告と自然言語成果物品質 |
 | [REQ-0108](REQ-0108.md) | docs-check / Validation / Tests | 整合性検査と検出事項ライフサイクル |
 | [REQ-0109](REQ-0109.md) | inspect-docs / REQ体系整合性 | retired archive と REQ 再構成運用 |
 | [REQ-0110](REQ-0110.md) | Git worktree cleanup 信頼性 | git worktree cleanup 信頼性 |
-| [REQ-0112](REQ-0112.md) | ADRライフサイクル・文書体系基盤・実行時独立性 | ADR lifecycle 基盤と文書体系正規化 |
+| [REQ-0112](REQ-0112.md) | ADRライフサイクル、文書体系基盤、実行時独立性 | ADR lifecycle 基盤と文書体系正規化 |
 | [REQ-0113](REQ-0113.md) | Skill References SPEC分離 | skill references の SPEC 分離基準 |
 | [REQ-0114](REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto 最大自走と複数 execution_unit |
-| [REQ-0119](REQ-0119.md) | コマンド・スキル・サブエージェント責務分界 | command/skill/サブエージェント責務分界 |
+| [REQ-0119](REQ-0119.md) | コマンド、スキル、サブエージェント責務分界 | command/skill/サブエージェント責務分界 |
 | [REQ-0123](REQ-0123.md) | workflow-lifecycle 宣言的定義責務とコマンド固有手順のスキル分担 | workflow-lifecycle 宣言的責務とスキル移管 |
 | [REQ-0124](REQ-0124.md) | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle | inspect-* コマンド群と lifecycle |
 | [REQ-0125](REQ-0125.md) | inspect-skills / Command/Skill参照妥当性検出 | inspect-skills 参照妥当性検出 |
-| [REQ-0126](REQ-0126.md) | inspect-promote / 検出事項分類・昇格 | inspect 検出事項の分類・昇格 |
+| [REQ-0126](REQ-0126.md) | inspect-promote / 検出事項分類、昇格 | inspect 検出事項の分類、昇格 |
 | [REQ-0127](REQ-0127.md) | Intake command群 (capture / from-github / promote) | intake コマンド群とドメイン状態 |
 | [REQ-0128](REQ-0128.md) | Learning-promote | learning-promote と 8-axis 評価 |
 | [REQ-0129](REQ-0129.md) | Backlog-review | backlog-review と RU 生成 |
@@ -33,25 +33,25 @@
 | [REQ-0131](REQ-0131.md) | case-close / 完了処理 | case-close 完了処理と branch cleanup |
 | [REQ-0132](REQ-0132.md) | case-open / Issue作成 | case-open Issue 作成と flow routing |
 | [REQ-0133](REQ-0133.md) | case-update / Issue更新 | case-update Issue/REQ 更新 |
-| [REQ-0134](REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install | 配布基盤の source/projection と consumer install |
-| [REQ-0135](REQ-0135.md) | Drafts配置・Draft Type Registry | drafts 配置と type registry |
-| [REQ-0136](REQ-0136.md) | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設・req-define 強化） | spec-save 新設と REQ/SPEC 責務分離 |
+| [REQ-0134](REQ-0134.md) | 配布基盤: source/projection、sync、repo type、consumer install | 配布基盤の source/projection と consumer install |
+| [REQ-0135](REQ-0135.md) | Drafts配置、Draft Type Registry | drafts 配置と type registry |
+| [REQ-0136](REQ-0136.md) | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設、req-define 強化） | spec-save 新設と REQ/SPEC 責務分離 |
 | [REQ-0137](REQ-0137.md) | 並列実行安全 git 操作規律 | 並列実行安全 git 操作規律 |
 | [REQ-0138](REQ-0138.md) | 構造化req_draft契約 | 構造化 req_draft 契約 |
 | [REQ-0139](REQ-0139.md) | 外部エージェント統合契約 | 外部エージェント統合契約 |
 | [REQ-0140](REQ-0140.md) | 文書品質ゲート | 文書品質ゲートと SSoT 分割 |
 | [REQ-0141](REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 | ローカル版生成方式と Case ファイル運用 |
-| [REQ-0142](REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 | 配布物 ID 除去後の品質保持 |
+| [REQ-0142](REQ-0142.md) | 配布物ID除去後の文意保持、構文健全性、責務整合 | 配布物 ID 除去後の品質保持 |
 | [REQ-0143](REQ-0143.md) | Command 定義ファイルフォーマット標準化 | command 定義ファイルフォーマット標準 |
 | [REQ-0144](REQ-0144.md) | docs-check/integrity 運用是正 | docs-check/integrity 運用是正の完了条件 |
 | [REQ-0145](REQ-0145.md) | docs-check/integrity 検出設計改善 | docs-check/integrity 検出設計改善 |
-| [REQ-0146](REQ-0146.md) | 実行契約・委譲・プロセス設計 | 実行契約・委譲・プロセス設計 |
-| [REQ-0147](REQ-0147.md) | 文書化規律・HITL境界 | 文書化規律と HITL 境界 |
+| [REQ-0146](REQ-0146.md) | 実行契約、委譲、プロセス設計 | 実行契約、委譲、プロセス設計 |
+| [REQ-0147](REQ-0147.md) | 文書化規律、HITL境界 | 文書化規律と HITL 境界 |
 | [REQ-0148](REQ-0148.md) | RU群バッチ処理と複数 execution_unit 並列実行 | RU 群バッチと複数 execution_unit 並列 |
 
 ## 廃止済み要件
 
-旧REQは削除せず、[retired/](retired/) に移動した。廃止済み REQ は履歴・根拠の参照用であり、現行要件判断に使わない。
+旧REQは削除せず、[retired/](retired/) に移動した。廃止済み REQ は履歴、根拠の参照用であり、現行要件判断に使わない。
 
 | 範囲 | 状態 | 備考 |
 |---|---|---|
@@ -73,7 +73,7 @@
 |---|---|
 | migrated | 新たな現行 REQ へ要件内容を移行した |
 | retired-no-successor | 最新方針では不要なため新たな現行 REQ へ移行しない |
-| historical-only | 当時の判断・経緯として残すが現行要件ではない |
+| historical-only | 当時の判断、経緯として残すが現行要件ではない |
 
 ## 基準構造
 

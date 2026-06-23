@@ -15,14 +15,14 @@ case-run が Issue 実装を実行担当サブエージェント（Sisyphus-Juni
 
 - Issue 単位の実装作業を Sisyphus-Junior に接続し、実行結果を case-run へ返却する時
 - ADR-0114 / ADR-0128 に基づく外部実行委譲
-- task() 起動失敗・異常終了時の事後処理
+- task() 起動失敗、異常終了時の事後処理
 
-## 提供する判断・操作
+## 提供する判断、操作
 
 - task() 委譲プロトコル（`task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` + 委譲 prompt 内 `/ulw-loop` command）
 - result 契約（3状態: completed(pr) / blocked / failed）
-- worktree 隔離遵守・自己検証
-- task() 起動失敗時の事後処理（worktree `git status` で未コミット変更確認・残留箇所 grep と手動修正）
+- worktree 隔離遵守、自己検証
+- task() 起動失敗時の事後処理（worktree `git status` で未コミット変更確認、残留箇所 grep と手動修正）
 
 ## 参照する references
 
@@ -41,7 +41,7 @@ case-run が Issue 実装を実行担当サブエージェント（Sisyphus-Juni
 
 - req-define のアーキテクチャ確認（`agentdev-architecture-advisory` 担当）
 - ワークフロー状態管理（`agentdev-workflow-lifecycle` 担当）
-- Issue 完了条件チェックボックスの評価・更新（case-close QG-4 責務）
+- Issue 完了条件チェックボックスの評価、更新（case-close QG-4 責務）
 
 ## 検証観点
 

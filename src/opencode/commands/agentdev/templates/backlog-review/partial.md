@@ -4,7 +4,7 @@
 対象: 採用済み成果物 {promoted_count}件
 結果:
  - 分析完了: {analyzed_count}件
- - 統合・分割判定: {grouping_summary}
+ - 統合、分割判定: {grouping_summary}
  - 矛盾検出: {contradiction_count}件
  - 矛盾詳細: {contradiction_details}
  - RU 生成: {ru_count}件（{ru_list}）

@@ -4,7 +4,7 @@
 
 ## 目的
 
-GitHub Issue / PR を使えない個人利用環境（ローカル版 OpenCode）向けに、AgentDevFlow のコマンド / スキル / ひな形を生成先リポジトリの `.opencode/` に直接生成するためのスキーマ・変換プロンプト・変換仕様・生成フローを保持する（REQ-0141-003, 004, 031）。生成済みコマンド / スキル / ひな形は配置しない。
+GitHub Issue / PR を使えない個人利用環境（ローカル版 OpenCode）向けに、AgentDevFlow のコマンド / スキル / ひな形を生成先リポジトリの `.opencode/` に直接生成するためのスキーマ、変換プロンプト、変換仕様、生成フローを保持する（REQ-0141-003, 004, 031）。生成済みコマンド / スキル / ひな形は配置しない。
 
 ## ディレクトリ構成
 
@@ -108,18 +108,18 @@ src/opencode-local/
 
 ## リポジトリ管理対象
 
-- **管理対象外**: 生成された `.opencode/commands/` ・ `.opencode/skills/` ・ `.opencode/` 配下ひな形・変換スクリプト（REQ-0141-008, 009）。生成先リポジトリの `.gitignore` で除外することを推奨
+- **管理対象外**: 生成された `.opencode/commands/` 、 `.opencode/skills/` 、 `.opencode/` 配下ひな形、変換スクリプト（REQ-0141-008, 009）。生成先リポジトリの `.gitignore` で除外することを推奨
 - **管理対象**: `.agentdev/cases/` 配下の Case ファイル（REQ-0141-016）
 
 ## 関連項目
 
-- [生成フロー定義](generation-flow.md) — 手順・安全確認・`generated_by` 形式
+- [生成フロー定義](generation-flow.md) — 手順、安全確認、`generated_by` 形式
 - [変換用プロンプト](transform/generate.md) — ローカル版生成の指示書
 - [レビュー用プロンプト](transform/review.md) — 生成結果の検証指示
-- [変換仕様](transform/spec.md) — 変換対象一覧・ガードレール一覧・レポートフォーマット
+- [変換仕様](transform/spec.md) — 変換対象一覧、ガードレール一覧、レポートフォーマット
 - [Case ファイルスキーマ定義](case-schema/case-file.md) — ローカル Case ファイルの構造
 - `docs/requirements/REQ-0141.md` — ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義（正本）
 - `docs/specs/local-case-file.md` — Case ファイルスキーマの正本 SPEC
-- `docs/specs/local-generation.md` — 生成フロー・安全ゲートの正本 SPEC
-- `docs/specs/local-transform.md` — 変換プロンプト・レビュープロンプト要件の正本 SPEC
+- `docs/specs/local-generation.md` — 生成フロー、安全ゲートの正本 SPEC
+- `docs/specs/local-transform.md` — 変換プロンプト、レビュープロンプト要件の正本 SPEC
 - `docs/adr/ADR-0126.md` — source model 拡張と生成安全性制約

@@ -11,7 +11,7 @@ source_rus: # optional: RU-* IDs that seeded this draft
  後続工程（req-save/ spec-save/ case-open/ case-auto/ case-run/ case-close）が参照する
  原本の情報源は # draft-data 内の YAML コードブロックであり、人間可読 Markdown セクションではない。
  soft contract（生成元側標準）であり、LLM 推論経由で消費される。
- 厳格なスキーマバージョン・JSON Schema・バリデータは導入しない。 -->
+ 厳格なスキーマバージョン、JSON Schema、バリデータは導入しない。 -->
 
 # draft-data
 
@@ -104,6 +104,6 @@ case_open_hints:
  処理の原本は上記 # draft-data YAML ブロックである。
  検討経緯や採用しない方針は処理対象として残さない。 -->
 
-{合意内容の人間可読補足。検討経緯・不採用方針は含めない}
+{合意内容の人間可読補足。検討経緯、不採用方針は含めない}
 
 
