@@ -9,7 +9,8 @@ updated: 2026-06-23
 
 ## 目的
 
-機能追加またはバグ修正の要件を壁打ちにより整理、定義し、構造化 `draft-data` 形式の要件 doc（`.agentdev/drafts/req-draft-{topic-slug}.md`）を生成する。壁打ちフェーズで使用。
+機能追加またはバグ修正の要件を壁打ちにより整理、定義し、構造化 `draft-data` 形式の要件 doc（`.agentdev/drafts/req-draft-{topic-slug}.md`）を生成する。
+壁打ちフェーズで使用。
 
 ## 入力
 

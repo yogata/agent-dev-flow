@@ -9,7 +9,9 @@ updated: 2026-06-21
 
 ## 目的
 
-PR をマージし、Case に記録を追記し、クローズ後に worktree とブランチを削除する。レビュー完了フェーズ。Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic status table を更新する（Epic Wave クローズ）。
+PR をマージし、Case に記録を追記し、クローズ後に worktree とブランチを削除する。
+レビュー完了フェーズ。
+Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic status table を更新する（Epic Wave クローズ）。
 
 **完了条件チェックボックスの評価、更新は case-close の専任責務**（ADR-0114）。case-run / Sisyphus-Junior / 外部実行バックエンドは完了条件チェックボックスを更新しない。
 

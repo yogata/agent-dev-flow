@@ -9,7 +9,8 @@ updated: 2026-06-21
 
 ## 目的
 
-`.agentdev/inspect/inbox/` の検出事項を分類、採用し、採用済み成果物として `.agentdev/inspect/promoted/` へ出力する。`--auto` オプションで高確信度検出事項の自動 promote を有効化する。
+`.agentdev/inspect/inbox/` の検出事項を分類、採用し、採用済み成果物として `.agentdev/inspect/promoted/` へ出力する。
+`--auto` オプションで高確信度検出事項の自動 promote を有効化する。
 
 ## 入力
 

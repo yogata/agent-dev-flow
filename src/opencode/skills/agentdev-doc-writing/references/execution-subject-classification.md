@@ -4,7 +4,8 @@
 
 ## 適用範囲
 
-SPEC / command / skill / AGENTS.md 等の記述で言及される実行主体の分類が正確かを査読する。実行主体の誤認は `load_skills` への誤指定や文書種別間の委譲契約不整合を引き起こすため、静的査読で検出する。
+SPEC / command / skill / AGENTS.md 等の記述で言及される実行主体の分類が正確かを査読する。
+実行主体の誤認は `load_skills` への誤指定や文書種別間の委譲契約不整合を引き起こすため、静的査読で検出する。
 
 ## 実行主体の分類
 
@@ -27,8 +28,11 @@ SPEC / command / skill / AGENTS.md 等の記述で言及される実行主体の
 
 査読対象文書の以下の箇所を順に確認する。
 
-1. **`load_skills` 引数の検査** — `load_skills=["..."]` に指定された名前が `agentdev-*` プレフィックスを持つ skill 名であること。command 名（`/` 先頭、または `/` を持たない command識別子）が指定されている場合は誤認。
-2. **`task(subagent_type=...)` 記述の検査** — subagent 型名が skill として言及されていないか。`agentdev-*` skill 名が `subagent_type` に指定されていないか。
+1. **`load_skills` 引数の検査** — `load_skills=["..."]` に指定された名前が `agentdev-*` プレフィックスを持つ skill 名であること。
+command 名（`/` 先頭、または `/` を持たない command識別子）が指定されている場合は誤認。
+
+2. **`task(subagent_type=...)` 記述の検査** — subagent 型名が skill として言及されていないか。
+`agentdev-*` skill 名が `subagent_type` に指定されていないか。
 3. **`/` 先頭識別子の skill 表記検査** — `/agentdev/*` や `/ulw-loop` 等の command 名が「スキル」「skill」と呼ばれていないか。
 4. **harness 名の skill 表記検査** — oh-my-openagent 等、OpenCode プラグインとして提供される実行エンジンが「スキル」「skill」と呼ばれていないか。
 5. **委譲契約の主語一貫性** — 委譲元、委譲先の記述で実行主体の分類が一貫しているか（例: case-run は command、Sisyphus-Junior は subagent、agentdev-case-run-execution-adapter は skill、oh-my-openagent は harness）。
@@ -40,4 +44,6 @@ SPEC / command / skill / AGENTS.md 等の記述で言及される実行主体の
 
 ## 出力形式
 
-検出した誤認は [review-output.md](review-output.md) の分類（残す/分割/移送/削除候補）に従い提示する。誤認の修正は「正しい分類名への置換」または「委譲契約記述への置換」とする。実行主体分類の定義、判定基準の原本は [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md) を参照する。
+検出した誤認は [review-output.md](review-output.md) の分類（残す/分割/移送/削除候補）に従い提示する。
+誤認の修正は「正しい分類名への置換」または「委譲契約記述への置換」とする。
+実行主体分類の定義、判定基準の原本は [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md) を参照する。

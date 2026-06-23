@@ -1,6 +1,8 @@
 # QG-1: Definition Integrity Gate
 
-要件定義フェーズ（req-define/ req-save）で生成される成果物の構造的完全性を検証する Gate。本ファイルは QG-1 の判定基準、検査観点を定義する。共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
+要件定義フェーズ（req-define/ req-save）で生成される成果物の構造的完全性を検証する Gate。
+本ファイルは QG-1 の判定基準、検査観点を定義する。
+共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
 ## 配置
 
@@ -13,21 +15,24 @@
 
 ### 1. REQ/ SPEC 分類
 
-各要件行候補が「変更後仕様（REQ/SPEC 相当）」か「反映作業（コマンド実行、ファイル移動等）」か正しく分類されているか。詳細な分類基準は `agentdev-req-analysis` を参照。
+各要件行候補が「変更後仕様（REQ/SPEC 相当）」か「反映作業（コマンド実行、ファイル移動等）」か正しく分類されているか。
+詳細な分類基準は `agentdev-req-analysis` を参照。
 
 - **fail**: REQ にすべき内容が反映作業として扱われている、またはその逆。
 - **warn**: 分類は妥当だが境界が曖昧な候補がある。
 
 ### 2. ADR ゲート
 
-ADR 候補が REQ/SPEC 相当でないか（ADR禁止ゲート）。作業手段 ADR（削除、廃止、移行、統合そのものを主題とするもの）が除外されているか。
+ADR 候補が REQ/SPEC 相当でないか（ADR禁止ゲート）。
+作業手段 ADR（削除、廃止、移行、統合そのものを主題とするもの）が除外されているか。
 
 - **fail**: REQ/SPEC 相当の内容が ADR 候補として提示されている。作業手段 ADR が ADR 候補に含まれている。
 - **pass**: ADR 候補が技術判断（アーキテクチャ上の決定）を含む。既存 ADR との重複確認済み。
 
 ### 3. チェックボックス測可能性
 
-要件doc のチェックボックスが測定可能（measurable）かつ一意（unambiguous）か。基準は `agentdev-req-analysis` の品質基準に従う。
+要件doc のチェックボックスが測定可能（measurable）かつ一意（unambiguous）か。
+基準は `agentdev-req-analysis` の品質基準に従う。
 
 - **fail**: チェックボックスが測定不能（例: 「適切に処理する」等の主観表現のみ）。
 - **warn**: 測定可能だが粒度が粗い、または複数の意味を含む。
@@ -42,13 +47,15 @@ ADR 候補が REQ/SPEC 相当でないか（ADR禁止ゲート）。作業手段
 
 ### 5. 必須セクション完全性
 
-要件doc/ REQ ファイルがテンプレート（`doc_requirement.md`）の【必須】セクションを全て含むか。SPEC候補セクション（`## SPEC候補`）は補助（任意）セクションであり、必須セクションの完全性判定対象外である。
+要件doc/ REQ ファイルがテンプレート（`doc_requirement.md`）の【必須】セクションを全て含むか。
+SPEC候補セクション（`## SPEC候補`）は補助（任意）セクションであり、必須セクションの完全性判定対象外である。
 
 - **fail**: 必須セクション（目的/ 要件/ 適用範囲 等）の欠落。
 
 ### 6. REQ/SPEC 配置判定
 
-要件行候補が REQ に記述すべき外部契約、状態要件であるか、SPEC、rule catalog、command reference 等に配置すべき詳細、内部パラメータであるかを判定する。判定基準は `agentdev-req-analysis` の REQ/SPEC 境界判定基準（-069, -055）に従う。
+要件行候補が REQ に記述すべき外部契約、状態要件であるか、SPEC、rule catalog、command reference 等に配置すべき詳細、内部パラメータであるかを判定する。
+判定基準は `agentdev-req-analysis` の REQ/SPEC 境界判定基準（-069, -055）に従う。
 
 - **fail**: REQ に記述すべき外部契約、状態要件（公開 command 名、ドメイン状態の位置づけ、接続契約、安全境界等）が SPEC 等にしか配置されていない。または SPEC 等に配置すべき詳細、内部パラメータ（schema field、enum 値一覧、判定表、内部アルゴリズム等）が REQ 要件行を専有している。
 - **warn**: 安定契約例外の適用境界が曖昧な候補がある。REQ/SPEC 両方に要約と詳細を分割すべき候補が未整理。
@@ -56,7 +63,8 @@ ADR 候補が REQ/SPEC 相当でないか（ADR禁止ゲート）。作業手段
 
 ### 7. SPEC 候補分離の妥当性
 
-SPEC 等に配置すべきと判定された要件行候補が、ドラフトの `## SPEC候補` 補助セクションと `draft-meta.spec-candidates`（SC-ID、content、intended_spec、classification、source）に分離されているか。各 SPEC 候補に想定配置先 SPEC と分離根拠（該当種別）が記録されているか。
+SPEC 等に配置すべきと判定された要件行候補が、ドラフトの `## SPEC候補` 補助セクションと `draft-meta.spec-candidates`（SC-ID、content、intended_spec、classification、source）に分離されているか。
+各 SPEC 候補に想定配置先 SPEC と分離根拠（該当種別）が記録されているか。
 
 - **fail**: SPEC 等に配置すべき要件行候補が REQ 要件行に残留している（SPEC 残留）。または SPEC 候補に想定配置先 SPEC、分離根拠が未記録。
 - **warn**: 安定契約例外の適用境界が曖昧で、SPEC 候補と REQ 要件行の振り分けが判断余地のある候補がある。
@@ -64,7 +72,8 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 
 ### 8. SPLIT 予兆の記録
 
-既存 REQ を APPEND/UPDATE 対象とする場合、または生成ドラフトの要件行数が 51 行を超える場合、`draft-meta.split-forecast`（target、metrics、signals、total、recommended_action、thresholds_ref）が記録されているか。閾値の正は `docs/specs/req-health-metrics.md` とする。
+既存 REQ を APPEND/UPDATE 対象とする場合、または生成ドラフトの要件行数が 51 行を超える場合、`draft-meta.split-forecast`（target、metrics、signals、total、recommended_action、thresholds_ref）が記録されているか。
+閾値の正は `docs/specs/req-health-metrics.md` とする。
 
 - **fail**: 記録すべき SPLIT 予兆（要件行数 51+、関心分類数 2+、成果物種別数 3+ のいずれか）があるのに `draft-meta.split-forecast` が未記録。
 - **warn**: split-forecast は記録されているが推奨アクション（SPLIT 検討、SPLIT 推奨）に対するユーザー応答が未確認。
@@ -72,7 +81,8 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 
 ### 9. auto_gate完全性
 
-要件doc draft の `auto_gate` フィールドが、req-define の完了条件として妥当に設定されているか（REQ-0102-070, REQ-0102-071）。`auto_ready:false` の場合は `stop_reasons` が記録され、かつユーザー承認（合意による解消、または明示的な false 選択）が得られているか。
+要件doc draft の `auto_gate` フィールドが、req-define の完了条件として妥当に設定されているか（REQ-0102-070, REQ-0102-071）。
+`auto_ready:false` の場合は `stop_reasons` が記録され、かつユーザー承認（合意による解消、または明示的な false 選択）が得られているか。
 
 - **fail**: `auto_gate` フィールドが不在、または `auto_ready:false` で `stop_reasons` が空。
 - **warn**: `auto_ready:false` で `stop_reasons` が記載されているが、ユーザー承認（合意による解消、または明示的 false 選択の `conflict_resolutions` 記録）が未確認。

@@ -8,7 +8,9 @@
 git remote show origin | grep 'HEAD branch' | sed 's/.*: //'
 ```
 
-検出結果を `origin/{base_branch}` として使用。デフォルトは `main`。ローカルのベースブランチは古くなっている可能性があるため、常にリモートの最新状態を起点とする。
+検出結果を `origin/{base_branch}` として使用。
+デフォルトは `main`。
+ローカルのベースブランチは古くなっている可能性があるため、常にリモートの最新状態を起点とする。
 
 ### 2. worktree作成コマンド
 
@@ -35,7 +37,9 @@ git worktree add ".worktrees/{N}-{type}" -b "{type}/issue-{N}" origin/{base_bran
 
 ## worktree 内判定ヘルパー
 
-現在 worktree 内にいるか（メインリポジトリで作業していないか）を判定する検証ヘルパー手順。case-run の precondition gate（Step 5-2）および実行担当サブエージェントの自己検証から参照される。2つの検証を組合せて判定する。
+現在 worktree 内にいるか（メインリポジトリで作業していないか）を判定する検証ヘルパー手順。
+case-run の precondition gate（Step 5-2）および実行担当サブエージェントの自己検証から参照される。
+2つの検証を組合せて判定する。
 
 ### 1. 検証コマンド
 
@@ -54,7 +58,8 @@ git worktree list
 git rev-parse --show-toplevel
 ```
 
-この結果がメインリポジトリルート（`.worktrees/` を含まないパス）と**一致しない**ことを確認する。一致する場合はメインリポジトリにいる（worktree 内ではない）。
+この結果がメインリポジトリルート（`.worktrees/` を含まないパス）と**一致しない**ことを確認する。
+一致する場合はメインリポジトリにいる（worktree 内ではない）。
 
 ### 2. 判定基準
 
@@ -100,7 +105,8 @@ git worktree prune
 
 成功時: `git worktree remove` 正常終了後の管理情報のクリーンアップ。
 
-失敗時: `git worktree remove` がすべてのリトライ後に失敗した場合のフォールバッククリーンアップ。`prune` は無効な worktree 管理情報のみを削除し、worktree ディレクトリ自体は削除しない。
+失敗時: `git worktree remove` がすべてのリトライ後に失敗した場合のフォールバッククリーンアップ。
+`prune` は無効な worktree 管理情報のみを削除し、worktree ディレクトリ自体は削除しない。
 
 #### Windows + ジャンクション環境の削除フォールバック
 

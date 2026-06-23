@@ -4,7 +4,8 @@
 
 ### エージェント指定
 
-コマンドの frontmatter で agent を指定する。対話系コマンド（req-define）は `agent: prometheus`、ファイル操作系コマンド（req-save, case-open 等）は `agent: sisyphus` を使用する。
+コマンドの frontmatter で agent を指定する。
+対話系コマンド（req-define）は `agent: prometheus`、ファイル操作系コマンド（req-save, case-open 等）は `agent: sisyphus` を使用する。
 
 **対話系コマンド（req-define）:**
 ```yaml
@@ -32,7 +33,8 @@ command frontmatter の許可フィールドは `description` と `agent` のみ
 
 ## .sisyphus/ 命名規則
 
-`.sisyphus/` 配下の 7 カテゴリ（plans, drafts, evidence, execution, notepads, tasks, reports）のファイル、ディレクトリ命名は plan 名を基準とする。詳細なルール、例は `AGENTS.md` の「Sisyphus 命名規則」セクションを参照。
+`.sisyphus/` 配下の 7 カテゴリ（plans, drafts, evidence, execution, notepads, tasks, reports）のファイル、ディレクトリ命名は plan 名を基準とする。
+詳細なルール、例は `AGENTS.md` の「Sisyphus 命名規則」セクションを参照。
 
 **重要**: notepads は完全一致マッチングのみ対応。plan 名にサフィックスがある場合、notepad ディレクトリ名にも同一サフィックスが必要。
 

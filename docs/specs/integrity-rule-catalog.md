@@ -4,7 +4,8 @@ updated: 2026-06-22
 
 # 整合性ルールカタログ
 
-整合性検査の全ルールを定義するカタログ（REQ-0108-150, 151）。各ルールは 15 以上のフィールドを持つ。
+整合性検査の全ルールを定義するカタログ（REQ-0108-150, 151）。
+各ルールは 15 以上のフィールドを持つ。
 
 > **リポジトリローカル文脈**: 整合性検査は `/repo/docs-check` コマンドと `repo-agentdev-integrity` skill により実行されるリポジトリローカル自己監査である（ADR-0106）。AgentDevFlow の consumer 配布対象外。語彙レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` に配置する。
 
@@ -912,7 +913,8 @@ updated: 2026-06-22
 
 #### IR-044 exemption 条件
 
-IR-044 は isNegationContext と同列に isDelegationContext を exemption（免除）条件として扱う。委譲、集約、切り出し、存在確認の文脈で SPEC キーワード（テストデータ、チェッカー等）が現れる場合、検出を warning から免除する（REQ-0108-259, AG-006 / ACT-SPEC-001）。
+IR-044 は isNegationContext と同列に isDelegationContext を exemption（免除）条件として扱う。
+委譲、集約、切り出し、存在確認の文脈で SPEC キーワード（テストデータ、チェッカー等）が現れる場合、検出を warning から免除する（REQ-0108-259, AG-006 / ACT-SPEC-001）。
 
 **exemption 対象文脈と代表キーワード**:
 
@@ -1114,7 +1116,8 @@ grep ベースの完了条件 checkbox 検出（`- [ ]` / `- [x]`）を実装す
 2. 上記除外条件を適用後、残った `- [ ]` を未達として報告
 3. `- [x]` は達成済みとして扱い、未達カウントから除外
 
-現在の QG-4 完了条件評価は推論ベース（case-close Step 4、agent が各 checkbox の達成を意味判断）。grep ベース実装は推論ベースを置き換えるのではなく、補助的機械検出として追加する場合に本基準を適用する。
+現在の QG-4 完了条件評価は推論ベース（case-close Step 4、agent が各 checkbox の達成を意味判断）。
+grep ベース実装は推論ベースを置き換えるのではなく、補助的機械検出として追加する場合に本基準を適用する。
 
 
 
@@ -1126,7 +1129,8 @@ grep ベースの完了条件 checkbox 検出（`- [ ]` / `- [x]`）を実装す
 
 ## docs-check 項目役割範囲（REQ-0145-004）
 
-docs-check（`/repo/docs-check`、`check_integrity.ts`）と skill 定義（SKILL.md、references/）の責務分担。検出ルールは docs-check が機械的検出を担い、skill 定義は判定基準、運用手順の説明を担う。
+docs-check（`/repo/docs-check`、`check_integrity.ts`）と skill 定義（SKILL.md、references/）の責務分担。
+検出ルールは docs-check が機械的検出を担い、skill 定義は判定基準、運用手順の説明を担う。
 
 ### バックエンド対象 vs skill 定義対象
 
@@ -1150,7 +1154,8 @@ docs-check（`/repo/docs-check`、`check_integrity.ts`）と skill 定義（SKIL
 
 ### NG ルール間依存関係マップ
 
-主要な NG ルールの依存関係。あるルールの修正が他ルールに影響する場合の参照用。
+主要な NG ルールの依存関係。
+あるルールの修正が他ルールに影響する場合の参照用。
 
 ```
 checkReferencePathIntegrity (REQ-0145-010)
@@ -1187,7 +1192,8 @@ checkDocLanguageQuality (IR-045)
 
 ### 新規カテゴリ追加判定フロー（REQ-0145-005）
 
-新規 NG ルール、検査カテゴリを追加する際の副作用評価フロー。`repo-agentdev-integrity` SKILL.md が主体となり、以下を満たしてから追加する。
+新規 NG ルール、検査カテゴリを追加する際の副作用評価フロー。
+`repo-agentdev-integrity` SKILL.md が主体となり、以下を満たしてから追加する。
 
 1. **既存 NG への副作用評価**: 新ルールが既存ルールの誤検知を増加させないか。特に exemption 条件、baseline_status、severity 分類の整合性を確認する
 2. **catalog エントリ追加**: `integrity-rule-catalog.md` に 15 フィールド以上の IR エントリを `baseline_status: new` で追加する
@@ -1196,7 +1202,8 @@ checkDocLanguageQuality (IR-045)
 5. **vocabulary-registry 同期**: 新ルールが語彙検出に関わる場合、`vocabulary-registry.md` を更新する
 6. **categoryToCheckPattern map 更新**: `check_integrity.ts` の category-to-check-pattern map に新カテゴリを追加する（skill-category-gap 解消、REQ-0144-005）
 
-追加可否判定: 上記 1-6 全て満たす場合のみ追加可。副作用が確認できない場合は追加を見送り、別途 inspect-docs / inspect-skills で評価する。
+追加可否判定: 上記 1-6 全て満たす場合のみ追加可。
+副作用が確認できない場合は追加を見送り、別途 inspect-docs / inspect-skills で評価する。
 
 ## メタ整合性
 

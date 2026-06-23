@@ -46,7 +46,11 @@ Pull Request作成時の本文テンプレート。
 該当なし
 
 ## SPEC確定候補
-<!-- 【任意】 case-run/ driver が実装時に発見した SPEC レベルの詳細（SPEC に記載すべき schema、enum、判定表、内部アルゴリズム等）を記録する。`## Findings / Capture候補` とは別セクション。case-close Step 3 で SPEC 確定チェックの入力となり、draft → 承認済み 昇格または spec-save 再起動の判断材料となる。SPEC確定候補がない場合はセクションごと省略する。 -->
+<!-- 【任意】 case-run/ driver が実装時に発見した SPEC レベルの詳細（SPEC に記載すべき schema、enum、判定表、内部アルゴリズム等）を記録する。
+`## Findings / Capture候補` とは別セクション。
+case-close Step 3 で SPEC 確定チェックの入力となり、draft → 承認済み 昇格または spec-save 再起動の判断材料となる。
+SPEC確定候補がない場合はセクションごと省略する。
+ -->
 
 該当なし
 

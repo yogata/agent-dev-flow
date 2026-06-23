@@ -5,11 +5,17 @@ description: case-run の状態機械、サブエージェント protocol、self
 
 # case-run オーケストレーションナレッジベース
 
-case-run コマンドのオーケストレーション知識ベース。状態機械、サブエージェントプロトコル、自律修正ループ、CI 対応ループ、エラー回復の判定基準と詳細構造を提供する。case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を Sisyphus-Junior、ulw-loop（adapter skill + 委譲 prompt 内 `/ulw-loop` command）に並列委譲、最大5件）を処理し、Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
+case-run コマンドのオーケストレーション知識ベース。
+状態機械、サブエージェントプロトコル、自律修正ループ、CI 対応ループ、エラー回復の判定基準と詳細構造を提供する。
+case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を Sisyphus-Junior、ulw-loop（adapter skill + 委譲 prompt 内 `/ulw-loop` command）に並列委譲、最大5件）を処理し、Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
+
 
 ## 状態機械
 
-case-run は単一 Issue または単一 Wave（`#epic` 指定時）を処理する。Epic 全体（複数 Wave）の一括実行、Wave スケジューリング（次 Wave 判定）は提供しない。Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: ADR-0125、`docs/specs/workflows/epic-wave-model.md`、ADR-0128）。
+
+case-run は単一 Issue または単一 Wave（`#epic` 指定時）を処理する。
+Epic 全体（複数 Wave）の一括実行、Wave スケジューリング（次 Wave 判定）は提供しない。
+Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: ADR-0125、`docs/specs/workflows/epic-wave-model.md`、ADR-0128）。
 
 ### フェーズ構成
 
@@ -28,7 +34,8 @@ case-run は単一 Issue または単一 Wave（`#epic` 指定時）を処理す
 
 ### driver サブエージェント引き継ぎプロンプト制約
 
-Windows + ジャンクション環境の worktree では `.opencode/skills/agentdev-*`、`.opencode/commands/agentdev/` が空になる（ジャンクション未伝播）。case-run Step 6 で実行担当サブエージェントへ引き継ぐプロンプトには、以下を**必須項目**として明記する。
+Windows + ジャンクション環境の worktree では `.opencode/skills/agentdev-*`、`.opencode/commands/agentdev/` が空になる（ジャンクション未伝播）。
+case-run Step 6 で実行担当サブエージェントへ引き継ぐプロンプトには、以下を**必須項目**として明記する。
 
 - worktree 内 `.opencode/` は空（ジャンクション未伝播）であること
 - source（`src/opencode/`）と projection（`.opencode/`）の編集は手動両辺編集を行うこと
@@ -45,7 +52,8 @@ Windows + ジャンクション環境の worktree では `.opencode/skills/agent
 | 自律修正ループ、CI 対応ループ、エラー | `references/self-healing-and-errors.md` — 自律修正ループ、CI対応、エラー回復マップ |
 | サブエージェント編集安全手順 | `references/subagent-protocol.md` — oldString最小化、Read検証、大規模ファイル分割、AST-grep推奨、driver 起動プロンプトテンプレート（Windows + ジャンクション環境） |
 
-case-run コマンドのランタイムパス（projection 先）は `commands/agentdev/case-run.md`。command 本文内で case-run を参照する場合はこちらを使用。
+case-run コマンドのランタイムパス（projection 先）は `commands/agentdev/case-run.md`。
+command 本文内で case-run を参照する場合はこちらを使用。
 
 ## See Also
 

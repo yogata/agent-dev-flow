@@ -9,7 +9,8 @@ updated: 2026-06-21
 
 ## 目的
 
-Learning pipeline（capture → promote）の共通知識。schema、分類基準、評価ディメンション、prune 方針を定義する。
+Learning pipeline（capture → promote）の共通知識。
+schema、分類基準、評価ディメンション、prune 方針を定義する。
 
 ## 適用対象
 

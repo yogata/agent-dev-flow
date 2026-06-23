@@ -5,7 +5,8 @@ description: "Defines lightweight quality gates for AgentDevFlow main workflow. 
 
 # Quality Gates スキル
 
-AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準、検査観点を提供する knowledge base。本スキルは参照専用であり、ファイル編集、Issue 作成、PR 作成、マージ、テスト実行は行わない。
+AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準、検査観点を提供する knowledge base。
+本スキルは参照専用であり、ファイル編集、Issue 作成、PR 作成、マージ、テスト実行は行わない。
 
 ## 概要
 
@@ -59,15 +60,18 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 
 ### QG-3 と docs 全体レビューの関係
 
-QG-3 は実装と Issue/ REQ/ ADR/ SPEC/ work plan の乖離検出ゲートであり、docs 全体の意味レビューの代替ではない。docs 全体の意味レビューは `/agentdev/inspect-docs` が担う。
+QG-3 は実装と Issue/ REQ/ ADR/ SPEC/ work plan の乖離検出ゲートであり、docs 全体の意味レビューの代替ではない。
+docs 全体の意味レビューは `/agentdev/inspect-docs` が担う。
 
 ### case-update 連携
 
-QG-3 は乖離の分類と推奨アクションの提示までを責務とし、REQ 更新の最終判断は case-update（ユーザー承認入力）に委譲する。乖離分類 → case-update フラグの mapping は `references/qg-3-implementation-deviation.md` を参照。
+QG-3 は乖離の分類と推奨アクションの提示までを責務とし、REQ 更新の最終判断は case-update（ユーザー承認入力）に委譲する。
+乖離分類 → case-update フラグの mapping は `references/qg-3-implementation-deviation.md` を参照。
 
 ## 自動ループバック禁止
 
-QG-3/ QG-4 の fail 判定時、エージェントは推奨アクションを提示しユーザーが決定する。自動的な差し戻し、修正は行わない。
+QG-3/ QG-4 の fail 判定時、エージェントは推奨アクションを提示しユーザーが決定する。
+自動的な差し戻し、修正は行わない。
 
 ## See Also
 

@@ -9,7 +9,8 @@ updated: 2026-06-22
 
 ## 目的
 
-req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ に保存し、コミット、プッシュする。壁打ちフェーズで使用（REQ/ADR 対象 artifact_actions がある場合）。
+req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ に保存し、コミット、プッシュする。
+壁打ちフェーズで使用（REQ/ADR 対象 artifact_actions がある場合）。
 
 ## 入力
 

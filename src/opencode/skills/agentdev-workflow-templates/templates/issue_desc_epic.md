@@ -35,7 +35,8 @@ REQ-{req_number}
 ## 実行順序
 <!-- 【必須】 -->
 
-ケースオープン時に Wave テーブルが自動生成される。手動での編集は可能だが、列構造を維持すること。
+ケースオープン時に Wave テーブルが自動生成される。
+手動での編集は可能だが、列構造を維持すること。
 
 | Wave | Issue | 実行方法 | 前提 |
 |------|-------|----------|------|
@@ -45,7 +46,8 @@ REQ-{req_number}
 ## ステータス追跡
 <!-- 【必須】 -->
 
-子Issue 実行状態 enum（`pending`/ `ready`/ `running`/ `completed`/ `blocked`/ `failed`）。`⏭スキップ` は採用しない。
+子Issue 実行状態 enum（`pending`/ `ready`/ `running`/ `completed`/ `blocked`/ `failed`）。
+`⏭スキップ` は採用しない。
 
 | 状態 | 件数 |
 |------|------|

@@ -5,7 +5,9 @@ agent: sisyphus
 
 # 完了処理
 
-PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブランチを削除する。レビュー完了フェーズ。Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic status table を更新する（Epic Wave クローズ）。
+PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブランチを削除する。
+レビュー完了フェーズ。
+Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic status table を更新する（Epic Wave クローズ）。
 
 **完了条件チェックボックスの評価、更新は case-close の専任責務**。case-run/ driver/ 外部実行バックエンドが完了条件チェックボックスを更新しない。case-close は PR 作成後に別コンテキストで Issue 本文の完了条件を再読込し、PR 本文を capture 入力源として最終完了判定する。
 
@@ -25,12 +27,17 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 ### Step 1: Issue番号解決
 
-ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止
+ユーザー入力またはセッション内会話から番号を取得。
+複数候補時は直近を優先して確認。
+検出不可時はユーザーに指定を求めて停止
+
  - **Epic Issue 判定**: 解決した Issue番号の本文を `agentdev-gh-cli` の安全な読み取り手順で取得し、ステータス追跡テーブル（Wave/子Issue 構成、`agentdev-epic-tracker` の新4列/旧4列形式）が存在するか確認。テーブル存在時は **Epic Wave クローズ**（Step E1〜E6）へ分岐。テーブル不存在時は **単一 Issue クローズ**（Step 1-1〜）へ進む（後方互換）
 
 **Epic Wave クローズ**（`case-close #epic` 受領時、Step 1 から分岐）:
 
-`case-close` が Epic Issue番号を受領した場合の Wave 単位クローズフロー。現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic status table を更新する。最終 Wave 判定後に Epic Issue クローズ または 残 Wave 通知を行う。
+`case-close` が Epic Issue番号を受領した場合の Wave 単位クローズフロー。
+現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic status table を更新する。
+最終 Wave 判定後に Epic Issue クローズ または 残 Wave 通知を行う。
 
 **E1. Epic Issue 本文読込**: `agentdev-gh-cli` の安全な読み取り手順で Epic Issue 本文を取得。ステータス追跡テーブル（新4列形式: `#`/ `Issue`/ `ステータス`/ `内容`、または旧4列形式）を解析し、Wave 構成、各子Issue のステータス（`pending`/ `ready`/ `running`/ `completed`/ `blocked`/ `failed`）、PR番号リンクを抽出
 
@@ -77,7 +84,10 @@ PRをマージし、Caseに記録を追記し、クローズ後にworktreeとブ
 
 ### Step 3: docs/ 検証
 
-機能追加固有の検証（REQ作成、インデックス記載、spec更新、ADR作成）および全work_type共通の関連ドキュメント整合性確認。DOC-MAP整合性確認。不足時は警告表示してユーザー判断を仰ぐ。PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（Step 3-2）を実行する
+機能追加固有の検証（REQ作成、インデックス記載、spec更新、ADR作成）および全work_type共通の関連ドキュメント整合性確認。
+DOC-MAP整合性確認。
+不足時は警告表示してユーザー判断を仰ぐ。
+PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（Step 3-2）を実行する
  - **文書分類ポリシー適合確認**: `docs/specs/document-model.md` の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する
 
 **Step 3-1**: close 時 SPEC/ commands/ skills 更新漏れの局所確認 — 実装完了、PRマージ前に、今回の変更に伴う以下の更新漏れを局所的に確認する:

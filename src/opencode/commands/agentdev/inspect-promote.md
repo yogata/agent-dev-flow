@@ -5,7 +5,8 @@ agent: sisyphus
 
 # inspect-promote
 
-`.agentdev/inspect/inbox/` の検出事項を分類（promote/ defer/ reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ、却下した検出事項を `.agentdev/inspect/archive/rejected/` へ移動する。明示的な `--auto` opt-in 時は、高確信度の検出事項を HITL を経ずに `.agentdev/intake/promoted/` へ自動投入し、intake/backlog パイプラインへ流入させる。
+`.agentdev/inspect/inbox/` の検出事項を分類（promote/ defer/ reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ、却下した検出事項を `.agentdev/inspect/archive/rejected/` へ移動する。
+明示的な `--auto` opt-in 時は、高確信度の検出事項を HITL を経ずに `.agentdev/intake/promoted/` へ自動投入し、intake/backlog パイプラインへ流入させる。
 
 ## 入力
 
@@ -22,7 +23,8 @@ agent: sisyphus
 
 ## 自動 promote 対象カテゴリ
 
-`--auto` で自動 promote される高確信度カテゴリ、投入先、実行ログ、誤検知 revoke 手順の詳細は `docs/specs/workflow-contracts.md` の「inspect-promote 自動 promote」セクションに原本を置く。本コマンドはカテゴリ定義を重複保持しない。
+`--auto` で自動 promote される高確信度カテゴリ、投入先、実行ログ、誤検知 revoke 手順の詳細は `docs/specs/workflow-contracts.md` の「inspect-promote 自動 promote」セクションに原本を置く。
+本コマンドはカテゴリ定義を重複保持しない。
 
 ## 手順
 
@@ -42,7 +44,9 @@ agent: sisyphus
  - 具体的修正対象を持たない再発防止知見 → defer（learning 送付候補）
 ### Step 4: 自動 promote（`--auto` opt-in 時のみ）
 
-`--auto` が指定された場合、分類結果のうち `docs/specs/workflow-contracts.md` の自動 promote 対象カテゴリに合致し、かつ安定契約例外および否定文脈を満たさない高確信度検出事項を HITL 承認なしで `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md` へ投入する。各投入を `.agentdev/inspect/promoted/auto-promote-log.md` に追記する（対象検出事項、カテゴリ、投入先ファイル、根拠）。`--auto` 未指定時は本 step をスキップし、自動投入を行わない
+`--auto` が指定された場合、分類結果のうち `docs/specs/workflow-contracts.md` の自動 promote 対象カテゴリに合致し、かつ安定契約例外および否定文脈を満たさない高確信度検出事項を HITL 承認なしで `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md` へ投入する。
+各投入を `.agentdev/inspect/promoted/auto-promote-log.md` に追記する（対象検出事項、カテゴリ、投入先ファイル、根拠）。
+`--auto` 未指定時は本 step をスキップし、自動投入を行わない
 ### Step 5: HITL 確定（手動分類対象）
 
 自動 promote 対象外の検出事項はユーザーの明示的な承認なしに採用済み成果物を生成しない。分類結果を提示し、承認を得る

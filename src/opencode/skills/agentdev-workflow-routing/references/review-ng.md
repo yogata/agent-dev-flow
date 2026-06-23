@@ -12,4 +12,5 @@
 
 ### `--review-ng` フラグ
 
-`case-update` に `--review-ng` を付与すると、レビューNG専用テンプレート（`issue_comment_review_ng.md`）を使用してコメントを投稿する。`agentdev-spec-compliance` の報告内容（影響度、対象、内容、推奨アクション、理由）をテンプレートに反映する。
+`case-update` に `--review-ng` を付与すると、レビューNG専用テンプレート（`issue_comment_review_ng.md`）を使用してコメントを投稿する。
+`agentdev-spec-compliance` の報告内容（影響度、対象、内容、推奨アクション、理由）をテンプレートに反映する。

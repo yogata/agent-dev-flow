@@ -11,7 +11,8 @@ updated: 2026-06-20
 
 ## 目的
 
-`src/opencode-local/transform/` 配下の 3 ファイルが満たすべき要件を定義する（REQ-0141-028, 029）。各ファイルは AI エージェントがローカル版生成、検証を実行する際の指示書となる。
+`src/opencode-local/transform/` 配下の 3 ファイルが満たすべき要件を定義する（REQ-0141-028, 029）。
+各ファイルは AI エージェントがローカル版生成、検証を実行する際の指示書となる。
 
 ## transform/generate.md（変換用プロンプト）の要件
 
@@ -71,7 +72,8 @@ updated: 2026-06-20
 
 ### レポート出力の必須項目
 
-`transform/generate.md` は変換後にレポート出力を要求する。レポートには少なくとも以下を含めること（REQ-0141-028, AG-009）。
+`transform/generate.md` は変換後にレポート出力を要求する。
+レポートには少なくとも以下を含めること（REQ-0141-028, AG-009）。
 
 - 入力スナップショット
 - 仕様管理リポジトリ
@@ -166,11 +168,13 @@ updated: 2026-06-20
 
 ### 必須チェック失敗時の扱い
 
-必須チェックが 1 つでも失敗した場合、結果は `FAIL` とする（REQ-0141-028）。部分通過（一部必須項目のみ通過）を `PASS` として扱わない。
+必須チェックが 1 つでも失敗した場合、結果は `FAIL` とする（REQ-0141-028）。
+部分通過（一部必須項目のみ通過）を `PASS` として扱わない。
 
 ## transform/spec.md（変換仕様）の要件
 
-`transform/spec.md` は変換プロンプト（`transform/generate.md`）とレビュープロンプト（`transform/review.md`）が参照する変換仕様を保持する。本 SPEC（`docs/specs/local-transform.md`）と `docs/specs/local-generation.md` が意味仕様の原本であり、`transform/spec.md` は実行時の変換対象一覧、ガードレール一覧、レポートフォーマットを集約した運用参照資料とする。
+`transform/spec.md` は変換プロンプト（`transform/generate.md`）とレビュープロンプト（`transform/review.md`）が参照する変換仕様を保持する。
+本 SPEC（`docs/specs/local-transform.md`）と `docs/specs/local-generation.md` が意味仕様の原本であり、`transform/spec.md` は実行時の変換対象一覧、ガードレール一覧、レポートフォーマットを集約した運用参照資料とする。
 
 `transform/spec.md` は少なくとも以下を含むこと。
 

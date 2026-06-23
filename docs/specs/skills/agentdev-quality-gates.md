@@ -18,7 +18,8 @@ AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準
 - QG-3（Implementation Deviation Gate）: case-run での実装乖離検出、分類
 - QG-4（Final Acceptance Gate）: case-close での最終受け入れ確認
 
-主ワークフロー（req-define / req-save / spec-save / case-open / case-run / case-close）のみ適用。spec-save は独自 QG を持たず QG-1、QG-4 で担保される。
+主ワークフロー（req-define / req-save / spec-save / case-open / case-run / case-close）のみ適用。
+spec-save は独自 QG を持たず QG-1、QG-4 で担保される。
 
 ## 提供する判断、操作
 

@@ -7,7 +7,8 @@ updated: "2026-06-16"
 
 ## 目的
 
-REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口は25件（retired 8件を除く）である。
+REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を active set として再構成した結果を記録する。
+旧REQを削除せず履歴として残しつつ、現行要件判断の入口は25件（retired 8件を除く）である。
 
 ## 判定
 

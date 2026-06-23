@@ -9,7 +9,9 @@ updated: 2026-06-22
 
 ## 目的
 
-req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/*.md` に保存、確定する。req-save の次、case-open の前に実行する。全 work_type 対象であり、`work_type` による判定は廃止する（REQ-0138-009）。
+req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/*.md` に保存、確定する。
+req-save の次、case-open の前に実行する。
+全 work_type 対象であり、`work_type` による判定は廃止する（REQ-0138-009）。
 
 ## 入力
 
@@ -74,7 +76,10 @@ req-define で分離された SPEC 保存対象（`draft-data` の `artifact_act
 
 ## case-auto 並列委譲モデル（REQ-0114-087〜093）
 
-spec-save は複数 SPEC ファイルの変更案作成、検査を並列化できる（REQ-0114-091）。異なる target パスの SPEC create/update は L0（完全独立）のため並列可能（最大5件）。同一 SPEC ファイルへの複数 action のみ順序依存のため直列サブセットとして分離。最終的な commit/push は REQ-0137 の明示パス指定で一括実行。
+spec-save は複数 SPEC ファイルの変更案作成、検査を並列化できる（REQ-0114-091）。
+異なる target パスの SPEC create/update は L0（完全独立）のため並列可能（最大5件）。
+同一 SPEC ファイルへの複数 action のみ順序依存のため直列サブセットとして分離。
+最終的な commit/push は REQ-0137 の明示パス指定で一括実行。
 
 ## See Also
 

@@ -5,11 +5,14 @@ agent: sisyphus
 
 # 実装パイプライン
 
-Case に対して実装実行を実行担当サブエージェント（Sisyphus-Junior、ulw-loop）経由で委譲し、その result を処理する。case-run 本体は orchestration に専念し、実装実行そのものは行わない。常に git worktree を使用。
+Case に対して実装実行を実行担当サブエージェント（Sisyphus-Junior、ulw-loop）経由で委譲し、その result を処理する。
+case-run 本体は orchestration に専念し、実装実行そのものは行わない。
+常に git worktree を使用。
 
 **スコープ**: case-run は単一 Issue または単一 Wave を処理する。Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、case-run は扱わない。1 Wave の実行（PR作成まで）で return する。複数 Issue の一括実行、Wave 順序制御にまたがるオーケストレーションは case-auto の責務（SPEC `docs/specs/workflow-contracts.md` SC-008）。
 
-3フェーズ構成で各フェーズは独立して再実行可能（べき等性）。フェーズ間エラー時は Step 1 の再開判定から再開できる。
+3フェーズ構成で各フェーズは独立して再実行可能（べき等性）。
+フェーズ間エラー時は Step 1 の再開判定から再開できる。
 
 ## 入力
 
@@ -34,14 +37,18 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 
 ### Step 1: フェーズ判定（再開ポイント検出、実行モード分岐）
 
-`agentdev-workflow-orchestration` に従い、再開フェーズを判定する。Issue番号解決、引数パース、妥当性確認、実行パス分岐、成果物チェックの詳細は同skill参照。
+`agentdev-workflow-orchestration` に従い、再開フェーズを判定する。
+Issue番号解決、引数パース、妥当性確認、実行パス分岐、成果物チェックの詳細は同skill参照。
 
 - **再開ポイントの報告**: 再開が必要なフェーズをユーザーに通知。準備フェーズから開始する場合は省略
 
 **実行モード分岐**:
 
 1. **単一 Issue 実行モード**: 引数が非 Epic Issue 番号の場合。当該1 Issue を Sisyphus-Junior に委譲する（委譲 prompt 内で `/ulw-loop` command を指定、後述 Step 2-8）
-2. **Epic Wave 実行モード（`case-run #epic`）**: 引数が Epic Issue 番号の場合。Epic Issue 本文から現在 ready な Wave の子Issue を特定し、各子Issue を task() で Sisyphus-Junior に並列委譲する（最大5件、委譲 prompt 内で `/ulw-loop` command を指定）。詳細は後述「Epic Wave 実行モード」セクション
+
+2. **Epic Wave 実行モード（`case-run #epic`）**: 引数が Epic Issue 番号の場合。
+Epic Issue 本文から現在 ready な Wave の子Issue を特定し、各子Issue を task() で Sisyphus-Junior に並列委譲する（最大5件、委譲 prompt 内で `/ulw-loop` command を指定）。
+詳細は後述「Epic Wave 実行モード」セクション
 
 いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
 
@@ -59,11 +66,17 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 
 ### Step 4: work_type 判定
 
-`agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定。scale は feature のみ standard/large。workflow_route は都度導出し保存しない
+`agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定。
+scale は feature のみ standard/large。
+workflow_route は都度導出し保存しない
 
 ### Step 5: Worktree作成、ブランチ準備
 
-`agentdev-git-worktree` に従って実行。`origin/main` をベースとして明示的に指定。べき等チェック: worktree既存時は作成スキップ。**Wave 実行時、PR merge 後再開時は worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認すること**。詳細手順は `agentdev-git-worktree` 参照
+`agentdev-git-worktree` に従って実行。
+`origin/main` をベースとして明示的に指定。
+べき等チェック: worktree既存時は作成スキップ。
+**Wave 実行時、PR merge 後再開時は worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認すること**。
+詳細手順は `agentdev-git-worktree` 参照
 
 **Step 5-1**: 親Epicステータス更新（`agentdev-epic-tracker` 参照）
 
@@ -74,11 +87,14 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 
 **検証失敗時（worktree 未作成、メインリポジトリにいる）**: 実行担当サブエージェントを起動**せず**停止し、Step 5（Worktree作成、ブランチ準備）へ戻るようユーザーに報告する。Step 6 へ進んではならない。
 
-本 gate は 適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提を保護する機構である。worktree 隔離が構造的に保証されているという前提を、実行時に検証して担保する。
+本 gate は 適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提を保護する機構である。
+worktree 隔離が構造的に保証されているという前提を、実行時に検証して担保する。
 
 ### Step 6: 実行担当サブエージェント起動（task() 委譲）
 
-実装実行を `task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` で委譲する（委譲 prompt 内で `/ulw-loop` command を指定）。Sisyphus-Junior は oh-my-openagent 提供の OpenCode ネイティブエージェント型であり、CLI subprocess を介さず oh-my-openagent の実行エンジンを直接利用する。adapter protocol は `agentdev-case-run-execution-adapter` skill 参照。
+実装実行を `task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` で委譲する（委譲 prompt 内で `/ulw-loop` command を指定）。
+Sisyphus-Junior は oh-my-openagent 提供の OpenCode ネイティブエージェント型であり、CLI subprocess を介さず oh-my-openagent の実行エンジンを直接利用する。
+adapter protocol は `agentdev-case-run-execution-adapter` skill 参照。
 
 **委譲プロンプト**: `/ulw-loop Implement Issue #N: <Issue本文>`。Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情報）が含まれ得る。Sisyphus-Junior はこれを参考情報として扱い、束縛されない。
 
@@ -111,22 +127,42 @@ Sisyphus-Junior が返す3状態（`agentdev-case-run-execution-adapter` の res
 
 ## Epic Wave 実行モード（`case-run #epic` 受領時）
 
-以下のフローに基づく。Epic Issue 番号を受け取った場合、以下のフローで現在 ready な Wave の子Issue を並列実行する。1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
+以下のフローに基づく。
+Epic Issue 番号を受け取った場合、以下のフローで現在 ready な Wave の子Issue を並列実行する。
+1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。
+同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
 
 **Epic Issue の入力ソース（REQ-0114-087/088）**: Epic Issue は本来の Epic flow（マルチREQ、`scale: large`）に加え、Standard flow 起因の独立 OU 自動 Epic 化（case-open が `depends_on` 空、L0 相当の独立 OU を検出して Epic 化）によるものも含む。case-run は入力ソースを区別せず、Epic Wave モデル（ADR-0128、最大5件並列委譲）で一様に処理する。case-run 側の新規機能追加は不要で、入力としての Epic Issue が増えるのみである。
 
 1. **Epic Issue 本文読込**: Epic Issue 本文から子Issue一覧、Wave 構成、ステータス追跡テーブルを読み取る（永続状態を SSoT とする）
-2. **現在 ready な Wave の子Issue 特定**: ステータス追跡テーブルから現在 ready な Wave の子Issue を特定する。`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択する。ただし前提Issue が blocked/failed の場合は `pending` のまま選択対象外
+
+2. **現在 ready な Wave の子Issue 特定**: ステータス追跡テーブルから現在 ready な Wave の子Issue を特定する。
+`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択する。
+ただし前提Issue が blocked/failed の場合は `pending` のまま選択対象外
+
 3. **`git fetch origin` 実行**: 各子Issue の worktree 作成前に `git fetch origin` を実行し、origin/main の鮮度を確認する。詳細手順は `agentdev-git-worktree` 参照
+
 4. **子Issue の worktree 作成**: 各子Issue について Step 5（Worktree作成、ブランチ準備）、Step 5-2（precondition gate）を実行する
-5. **各子Issue を task() で並列委譲**: 各子Issue を `task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` で並列委譲する。**最大5件**まで同時起動。委譲プロンプトは `/ulw-loop Implement Issue #N: <Issue本文>`
+
+5. **各子Issue を task() で並列委譲**: 各子Issue を `task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` で並列委譲する。
+**最大5件**まで同時起動。
+委譲プロンプトは `/ulw-loop Implement Issue #N: <Issue本文>`
+
 6. **全 task() 完了待機**: 全 task() の完了を待つ。各 task() は Step 7 の result 処理と同じ3状態を返す
+
 7. **結果収集**: 各子Issue の result（completed(pr)/ blocked/ failed）を収集する。子Issue ごとに worktree は独立しており、他子Issue の結果に依存しない（子Issue の結果は親コンテキストではなく永続状態に記録）
-8. **return**: 収集した結果（子Issue ごとの PR番号、blocked/failed の理由）を報告して return する。Wave 境界（PR マージ）は case-close の責務。`completed(pr)` となった子Issue を次 Wave へ進めるためには、case-close でマージ後に再度 `case-run #epic` を実行する（べき等）
+
+8. **return**: 収集した結果（子Issue ごとの PR番号、blocked/failed の理由）を報告して return する。
+Wave 境界（PR マージ）は case-close の責務。
+`completed(pr)` となった子Issue を次 Wave へ進めるためには、case-close でマージ後に再度 `case-run #epic` を実行する（べき等）
+
 
 ## エラー処理
 
-エラー発生時の対応は `agentdev-workflow-orchestration` に従う。Sisyphus-Junior result が blocked/ failed の場合、Issue コメント（SSoT）を参照して停止理由、再開ポイントをユーザーに報告する。Sisyphus-Junior 内の自律修正ループ（同一入力の機械的再試行、検証ループ）は `agentdev-case-run-execution-adapter`/ `agentdev-workflow-orchestration` に従う。
+
+エラー発生時の対応は `agentdev-workflow-orchestration` に従う。
+Sisyphus-Junior result が blocked/ failed の場合、Issue コメント（SSoT）を参照して停止理由、再開ポイントをユーザーに報告する。
+Sisyphus-Junior 内の自律修正ループ（同一入力の機械的再試行、検証ループ）は `agentdev-case-run-execution-adapter`/ `agentdev-workflow-orchestration` に従う。
 
 ## ガードレール
 
@@ -150,7 +186,8 @@ Sisyphus-Junior が返す3状態（`agentdev-case-run-execution-adapter` の res
 
 ### 本筋外発見の退避方針
 
-intake/ learning 境界は `agentdev-workflow-orchestration` を参照する。Sisyphus-Junior が PR 本文の `## Findings / Capture候補` に記録する。
+intake/ learning 境界は `agentdev-workflow-orchestration` を参照する。
+Sisyphus-Junior が PR 本文の `## Findings / Capture候補` に記録する。
 
 - G14: スコープ拡大禁止。発見は記録し修正は後続処理に委ねる
 - G15: intake 候補を PR 本文の `## Findings / Capture候補` に記録。`.agentdev/intake/inbox/` の直接変更禁止

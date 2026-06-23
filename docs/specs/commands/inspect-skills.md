@@ -9,7 +9,8 @@ updated: 2026-06-21
 
 ## 目的
 
-Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正せずに診断するコマンド。検出事項を `.agentdev/inspect/inbox/` へ出力する。
+Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正せずに診断するコマンド。
+検出事項を `.agentdev/inspect/inbox/` へ出力する。
 
 ## 入力
 

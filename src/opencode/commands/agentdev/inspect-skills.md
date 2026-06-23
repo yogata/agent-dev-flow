@@ -5,7 +5,8 @@ agent: sisyphus
 
 # inspect-skills
 
-Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せずに診断し、検出事項、分類、根拠、推奨 route を提示する。診断結果は `.agentdev/inspect/inbox/` へ出力する。
+Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せずに診断し、検出事項、分類、根拠、推奨 route を提示する。
+診断結果は `.agentdev/inspect/inbox/` へ出力する。
 
 ## 基本原則: 診断専用（検査対象を直接修正しない）
 

@@ -66,7 +66,8 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 
 ### ワークフロー状態管理
 
-ワークフロー状態（例: "要件定義", "実装", "テスト" 等）は Issue ラベル、GitHub Project で管理する（REQ-0108-123、REQ-0101-037）。REQ/SPEC 文書内には状態として埋め込まず、上記マイクロフェーズは説明目的でのみ使用する。
+ワークフロー状態（例: "要件定義", "実装", "テスト" 等）は Issue ラベル、GitHub Project で管理する（REQ-0108-123、REQ-0101-037）。
+REQ/SPEC 文書内には状態として埋め込まず、上記マイクロフェーズは説明目的でのみ使用する。
 
 ## SSoT 遷移規則
 
@@ -87,7 +88,8 @@ draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 
 ### フェーズ境界ルール
 
-壁打ち→構造的実行の境界で満たすべき要件: 壁打ちフェーズ完了時、docs変更を必ずコミット、プッシュする。これにより構造的実行フェーズのworktreeがdocs変更を継承する。
+壁打ち→構造的実行の境界で満たすべき要件: 壁打ちフェーズ完了時、docs変更を必ずコミット、プッシュする。
+これにより構造的実行フェーズのworktreeがdocs変更を継承する。
 
 ### Local backend の SSoT 位置づけ
 
@@ -103,7 +105,8 @@ Local backend（ローカル版 OpenCode）では、構造的実行以降の SSo
 
 ## コマンド I/O 契約（共通）
 
-各コマンドの入力、出力、前提条件の詳細は各 command SPEC（`docs/specs/commands/<command>.md`）を参照。本節は横断 I/O 契約のみを定義する。
+各コマンドの入力、出力、前提条件の詳細は各 command SPEC（`docs/specs/commands/<command>.md`）を参照。
+本節は横断 I/O 契約のみを定義する。
 
 ### 参照フロー（共通）
 
@@ -120,7 +123,9 @@ Local backend（ローカル版 OpenCode）では、構造的実行以降の SSo
 
 ## ワークフロー経路制御
 
-work_type と scale により workflow_route を決定する。work_type は bugfix / feature / maintenance / docs_chore の 4 値である（REQ-0112-011, REQ-0104-014）。scale は feature のみ standard / large をとる（REQ-0112-011）。
+work_type と scale により workflow_route を決定する。
+work_type は bugfix / feature / maintenance / docs_chore の 4 値である（REQ-0112-011, REQ-0104-014）。
+scale は feature のみ standard / large をとる（REQ-0112-011）。
 
 | work_type | scale | workflow_route |
 |---|---|---|
@@ -134,7 +139,8 @@ work_type と scale により workflow_route を決定する。work_type は bug
 
 ## 実装分類（Implementation Pattern Taxonomy）
 
-コマンドの内部構造に基づく分類軸（REQ-0103-016）。work_type とは直交する概念である。
+コマンドの内部構造に基づく分類軸（REQ-0103-016）。
+work_type とは直交する概念である。
 
 | Pattern | 日本語名称 | 主責務 |
 |---|---|---|
@@ -148,7 +154,9 @@ work_type と scale により workflow_route を決定する。work_type は bug
 
 ## 適用範囲宣言
 
-`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（ADR-0103）。他プロジェクトへの適用を意図しない。実行時コマンドは SPEC ファイルに依存しない（ADR-0104）。
+`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（ADR-0103）。
+他プロジェクトへの適用を意図しない。
+実行時コマンドは SPEC ファイルに依存しない（ADR-0104）。
 
 ## See Also
 

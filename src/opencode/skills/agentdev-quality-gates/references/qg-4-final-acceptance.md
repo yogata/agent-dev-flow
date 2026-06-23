@@ -1,6 +1,8 @@
 # QG-4: Final Acceptance Gate
 
-case-close で PR マージ前に、最終受け入れ状態を確認する Gate。本ファイルは QG-4 の判定基準、検査観点を定義する。共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
+case-close で PR マージ前に、最終受け入れ状態を確認する Gate。
+本ファイルは QG-4 の判定基準、検査観点を定義する。
+共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
 ## 配置
 
@@ -19,7 +21,8 @@ Issue 本文の `完了条件` セクションの全チェックボックスが 
 
 #### 達成判定
 
-unchecked 項目を達成判定する。証拠ソース（コミット、PR、CI 結果等）に基づき、`agentdev-workflow-orchestration` のプロトコルに従い達成可否を判定する。
+unchecked 項目を達成判定する。
+証拠ソース（コミット、PR、CI 結果等）に基づき、`agentdev-workflow-orchestration` のプロトコルに従い達成可否を判定する。
 
 #### 未達項目の取り扱い
 
@@ -74,7 +77,8 @@ PR の CI が全て通過しているか。
 - **fail**: 観点 1（未達チェックボックス）または観点 2（CI 失敗）。構造化エラーで停止。
 - **partial**: CI pending 等、判定に必要な証拠が未取得。証拠取得後に再判定。
 
-QG-4 は最終受け入れの二値性が強く、`pass`/ `fail` を基本とする。`partial` は CI 保留等の例外的状況のみ。
+QG-4 は最終受け入れの二値性が強く、`pass`/ `fail` を基本とする。
+`partial` は CI 保留等の例外的状況のみ。
 
 ## 完了条件チェックボックス評価の具体手順
 
@@ -89,7 +93,8 @@ case-close Step 2 での完了条件チェックボックス評価:
 
 ### 責務帰属
 
-完了条件チェックボックスの評価、更新は **case-close の責務**（Step 2）である。QG-4 は判定基準を提供し、case-close が実際のチェックボックス更新を実行する。
+完了条件チェックボックスの評価、更新は **case-close の責務**（Step 2）である。
+QG-4 は判定基準を提供し、case-close が実際のチェックボックス更新を実行する。
 
 > **注意**: 旧設計では case-run がチェックボックス更新を担う箇所があったが、完了条件チェックボックスの最終評価、更新は case-close QG-4 に集約する。case-run Step 7 のチェックボックス更新は実装中の進捗反映（work plan チェックボックス）に限定する。
 

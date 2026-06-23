@@ -9,7 +9,9 @@ updated: 2026-06-23
 
 ## 目的
 
-要件定義（req-define）の結果をもとに GitHub Issue を作成する。壁打ち→構造的実行フェーズの境界。Epic + 子 Issue 一括作成に対応する。
+要件定義（req-define）の結果をもとに GitHub Issue を作成する。
+壁打ち→構造的実行フェーズの境界。
+Epic + 子 Issue 一括作成に対応する。
 
 ## 入力
 
@@ -109,9 +111,13 @@ case-open は OU 群の依存グラフの連結成分（必須依存のみをエ
 | Epic サイズ | 1 Epic あたり子 Issue 推奨 3-10、上限 10 ハード制約（REQ-0148-009）。上限超過時は必須依存があっても分割を検討 |
 | 機能的一貫性 | 連結成分内の OU 群が単一の機能的主題を成すか。主題を欠く場合は複数 Epic へ分割、または Standard flow へ分散 |
 
-case-open は無関係な OU 群を単一 Epic へ機械的に集約しない（REQ-0148-010）。3軸判断の個別エッジケース（同機能独立、共通基盤等）は LLM 推論に委ねる。REQ/SPEC で固定するのは不変の方針（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow）のみである。
+case-open は無関係な OU 群を単一 Epic へ機械的に集約しない（REQ-0148-010）。
+3軸判断の個別エッジケース（同機能独立、共通基盤等）は LLM 推論に委ねる。
+REQ/SPEC で固定するのは不変の方針（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow）のみである。
 
-case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_open_hints` に記録する（REQ-0148-011, REQ-0138-020）。連結成分アルゴリズム、3軸判断基準、Epic 分割例外（REQ-0148-023）の詳細は `docs/specs/workflows/epic-wave-model.md` の「連結成分ベース execution_unit 構成モデル」セクション参照。
+
+case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_open_hints` に記録する（REQ-0148-011, REQ-0138-020）。
+連結成分アルゴリズム、3軸判断基準、Epic 分割例外（REQ-0148-023）の詳細は `docs/specs/workflows/epic-wave-model.md` の「連結成分ベース execution_unit 構成モデル」セクション参照。
 
 ### 子Issue 作成の並列化
 

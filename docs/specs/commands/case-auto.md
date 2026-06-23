@@ -9,7 +9,8 @@ updated: 2026-06-23
 
 ## 目的
 
-要件doc から req-save → spec-save → case-open → case-run → case-close を順次自走実行する最大自走モード。ユーザーが明示的に指定した場合のみ使用する追加入口であり、標準ワークフローを置き換えない。
+要件doc から req-save → spec-save → case-open → case-run → case-close を順次自走実行する最大自走モード。
+ユーザーが明示的に指定した場合のみ使用する追加入口であり、標準ワークフローを置き換えない。
 
 ## 入力
 
@@ -91,7 +92,10 @@ updated: 2026-06-23
 
 ## 複数 execution_unit 並列 orchestration（REQ-0148, ADR-0129）
 
-case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を orchestration 対象とする（REQ-0148-012）。従来の「単一 Epic の Wave 反復制御」を「複数 execution_unit 群反復制御」へ一般化する。case-auto は case-open の判定結果に従い case-run(#epic) / case-run(standard) を task() 起動する（薄いオーケストレーター原則、G13/G15/G21 維持）。Issue 階層決定、子 Issue 選択、Epic 化判定の判断ロジックは持たない。
+case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を orchestration 対象とする（REQ-0148-012）。
+従来の「単一 Epic の Wave 反復制御」を「複数 execution_unit 群反復制御」へ一般化する。
+case-auto は case-open の判定結果に従い case-run(#epic) / case-run(standard) を task() 起動する（薄いオーケストレーター原則、G13/G15/G21 維持）。
+Issue 階層決定、子 Issue 選択、Epic 化判定の判断ロジックは持たない。
 
 ### 並列実行の判定
 
@@ -101,7 +105,9 @@ case-auto は case-open が生成した execution_unit 群（standard | epic の
 - 同一 Epic 内の Wave 間は直列（REQ-0148-013）
 - 技術的依存レベル（L0-L3）は並列判定軸から外す。ファイル衝突（L2）があっても並列を許容し、PR マージコンフリクトは後続 PR の rebase で解決する（REQ-0148-014, REQ-0148-024）
 
-グローバル並列上限は設定しない（REQ-0148-018）。case-run 単位の5件上限（REQ-0130-026 踏襲）のみを制御対象とする。N 個の execution_unit が並列実行された場合、N×5 件の task() 同時起動リスクを許容する（運用監視対象、ADR-0129）。
+グローバル並列上限は設定しない（REQ-0148-018）。
+case-run 単位の5件上限（REQ-0130-026 踏襲）のみを制御対象とする。
+N 個の execution_unit が並列実行された場合、N×5 件の task() 同時起動リスクを許容する（運用監視対象、ADR-0129）。
 
 ### blocked 部分停止、ready 継続判定フロー
 
@@ -124,11 +130,13 @@ case-auto は case-open が生成した execution_unit 群（standard | epic の
 - execution_unit が standard issue の場合: case-run(standard) → case-close を1回実行
 - execution_unit が epic issue の場合: Wave 反復制御（case-run(#epic) → case-close(#epic) の反復）を完遂（ADR-0128 Decision #5, REQ-0114-084）
 
-OU 逐次処理（REQ-0114-053）は、必須依存で結合した execution_unit 群に適用される。必須依存のない execution_unit 群は順序を問わず並列実行できる（REQ-0114-053 例外条項）。
+OU 逐次処理（REQ-0114-053）は、必須依存で結合した execution_unit 群に適用される。
+必須依存のない execution_unit 群は順序を問わず並列実行できる（REQ-0114-053 例外条項）。
 
 ### 結果集約
 
-各 execution_unit の結果（completed(pr) / blocked / failed）を case-auto が集約し最終判定に反映する（REQ-0114-092）。親コンテキスト非累積原則に従い、実装詳細は保持せず Issue / PR 状態から再読込する。
+各 execution_unit の結果（completed(pr) / blocked / failed）を case-auto が集約し最終判定に反映する（REQ-0114-092）。
+親コンテキスト非累積原則に従い、実装詳細は保持せず Issue / PR 状態から再読込する。
 
 ## See Also
 

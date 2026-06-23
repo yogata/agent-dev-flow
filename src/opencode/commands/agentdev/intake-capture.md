@@ -20,7 +20,8 @@ agent: sisyphus
 
 ## Intake Item 形式
 
-intake item は以下の推奨標準形に従う Markdown 成果物とする。workflow 管理用の frontmatter、状態フィールド、重複排除キーは持たない。
+intake item は以下の推奨標準形に従う Markdown 成果物とする。
+workflow 管理用の frontmatter、状態フィールド、重複排除キーは持たない。
 
 ```markdown
 # {タイトル}
@@ -51,11 +52,14 @@ intake item は以下の推奨標準形に従う Markdown 成果物とする。w
 
 ### Step 1: 入力の受領
 
-ユーザーから変更候補の内容を受け取る。自然言語で記述された内容をそのまま取り扱う。
+ユーザーから変更候補の内容を受け取る。
+自然言語で記述された内容をそのまま取り扱う。
 
 ### Step 2: intake item の生成
 
-ユーザーの入力を上記推奨標準形に整理する。ユーザーが明示的に指定していないセクションは推測、補完せず、そのセクションを省略する（内容がないセクションを作成しない）。ユーザーの入力に含まれない情報を自動生成、推論して記載することを禁止する。
+ユーザーの入力を上記推奨標準形に整理する。
+ユーザーが明示的に指定していないセクションは推測、補完せず、そのセクションを省略する（内容がないセクションを作成しない）。
+ユーザーの入力に含まれない情報を自動生成、推論して記載することを禁止する。
 
 ### Step 3: ファイル名の生成
 
@@ -84,7 +88,9 @@ intake item は以下の推奨標準形に従う Markdown 成果物とする。w
 
 ### Step 5: 完了報告
 
-完了報告templateに従って出力。template: .opencode/commands/agentdev/templates/intake-capture/standard.md。git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）を含める
+完了報告templateに従って出力。
+template: .opencode/commands/agentdev/templates/intake-capture/standard.md。
+git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）を含める
 
 ## エラー処理
 

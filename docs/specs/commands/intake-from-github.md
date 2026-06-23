@@ -9,7 +9,8 @@ updated: 2026-06-21
 
 ## 目的
 
-クローズ済み GitHub Issue/PR から未回収の変更候補を抽出し、intake item として保存する。保存専用コマンド。
+クローズ済み GitHub Issue/PR から未回収の変更候補を抽出し、intake item として保存する。
+保存専用コマンド。
 
 ## 入力
 
