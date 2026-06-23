@@ -2,6 +2,8 @@
 draft_type: req_draft
 topic_slug: overridable-gh-cli-procedure
 status: saved
+spec_saved: true
+spec_saved_at: 2026-06-23T20:24:00+09:00
 created_at: 2026-06-23T19:30:00+09:00
 source_rus:
   - RU-20260623-01-overridable-gh-cli-procedure
@@ -23,13 +25,11 @@ summary: >
   含む）でアーキテクチャ判断を記録する。
 
 auto_gate:
-  auto_ready: false
+  auto_ready: true
   unresolved_questions: []
   unresolved_conflicts: []
   out_of_repo_operations: []
-  stop_reasons:
-    - "scale large - 4 OU 分割・2件の新規 ADR 作成・REQ-0141 大幅 UPDATE（ADR-0126 supersede）を伴う Epic 規模要件"
-    - "ADR-0126 supersede を伴うアーキテクチャ転換であり、req-save による ADR ファイル作成が必須"
+  stop_reasons: []
 
 agreed_items:
   - id: AG-001
@@ -409,6 +409,16 @@ conflict_resolutions:
       REQ-0103-078 は load 関係の宣言として REQ-0103 に残し、新規REQ（REQ-0149）
       で責務境界（I/O hub 化・担当/非担当・12ファイル委譲）を定義する。REQ-0103 の肥大化（84行, +2シグナル）
       を避けるため、全てを REQ-0103 に詰め込まない。oracle 推奨 + ユーザー合意済み。
+
+  - id: CR-003
+    conflict: >
+      req-define 時点の auto_gate.auto_ready: false の根拠（scale large/Epic 規模・ADR 作成必須）。
+      case-auto が Step 3 auto_gate preflight で停止する。
+    resolution: >
+      ユーザー明示的承認により auto_ready を true に更新。理由: (1) scale large/Epic 規模は
+      case-auto Step 4-1（Wave 反復制御）が明示的にサポートしており、ブロック理由ではない。
+      (2) ADR ファイル作成（ADR-0130/0131）は req-save で完了済み（commit feb3ed6 push 済み）。
+      両 stop_reason とも解消済みまたは非ブロック要因である。
 
 operation_units:
   - ou_id: OU-001

@@ -2,12 +2,12 @@
 title: ローカル Case ファイル
 status: draft
 created: 2026-06-20
-updated: 2026-06-20
+updated: 2026-06-23
 ---
 
 # ローカル Case ファイル
 
-> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。ローカル版 OpenCode 生成先リポジトリで運用される Case ファイルのスキーマ、状態遷移、採番、見出しを定義する。実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0104）。REQ-0141 の詳細仕様を正とする。
+> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。ローカル版 OpenCode 導入先リポジトリで運用される Case ファイルのスキーマ、状態遷移、採番、見出しを定義する。実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0104）。REQ-0141 の詳細仕様を正とする。Case ファイル仕様の正本は本 SPEC であり、`src/opencode-local/agentdev-gh-cli/case-schema/` 配下の定義は操作用定義（正本ではない）とする（AG-008）。
 
 ## 目的
 
@@ -49,8 +49,9 @@ YAML 前書きには持たせない。
 
 ### 前書きスキーマ定義ファイル
 
-前書きスキーマの形式定義は `src/opencode-local/case-schema/rules/frontmatter.yaml` に機械可読形式で保持する。
+前書きスキーマの形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/frontmatter.yaml` に機械可読形式で保持する。
 本 SPEC は意味仕様の原本であり、`frontmatter.yaml` は本 SPEC と矛盾してはならない。
+`frontmatter.yaml` は操作用定義（正本ではない）とする（AG-008）。
 
 ## status enum と状態遷移
 
@@ -97,7 +98,7 @@ YAML 前書きには持たせない。
 
 ### status 定義ファイル
 
-状態遷移表の形式定義は `src/opencode-local/case-schema/rules/status.yaml` に機械可読形式で保持する。
+状態遷移表の形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/status.yaml` に機械可読形式で保持する。
 本 SPEC と `status.yaml` は矛盾してはならない。
 
 ## 採番規則
@@ -127,7 +128,7 @@ YAML 前書きには持たせない。
 
 ### labels 定義ファイル
 
-ラベル値域の形式定義は `src/opencode-local/case-schema/rules/labels.yaml` に機械可読形式で保持する。
+ラベル値域の形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/labels.yaml` に機械可読形式で保持する。
 本 SPEC と `labels.yaml` は矛盾してはならない。
 
 ## 見出し一覧
@@ -173,7 +174,7 @@ Case ファイル本文は以下の 15 セクション見出しを持つ（REQ-0
 
 ### headings 定義ファイル
 
-見出し一覧の形式定義は `src/opencode-local/case-schema/rules/headings.yaml` に機械可読形式で保持する。
+見出し一覧の形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/headings.yaml` に機械可読形式で保持する。
 本 SPEC と `headings.yaml` は矛盾してはならない。
 
 ## closed_at の値条件
