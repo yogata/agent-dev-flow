@@ -2,7 +2,7 @@
 title: agentdev-gh-cli SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-23
+updated: 2026-06-24
 ---
 
 # agentdev-gh-cli SPEC
@@ -82,6 +82,33 @@ agentdev-gh-cli の SKILL.md は薄いルーティング入口とする（REQ-01
 SKILL.md は各手続きのルーティングのみを記述する。
 具体的な gh CLI フラグ、一時ファイル扱い、エンコーディング初期化は SKILL.md に直接記述しない。
 
+## gh 直接記述の検出スコープ（inspect-skills 連携）
+
+command/skill 配下で gh コマンド直接記述を検出する `/agentdev/inspect-skills` 診断のスキャン対象と除外対象を定義する（REQ-0149, Issue #1104）。委譲基盤確立後も新規 command/skill が gh 直接記述を導入しないよう、検出辞書が自動担保する。
+
+### スキャン対象
+
+| 対象 | パス | 理由 |
+|------|------|------|
+| command 配下 | `src/opencode/commands/agentdev/*.md` | 公開コマンド定義。gh 直接記述は agentdev-gh-cli 手続きへの委譲が必須 |
+| skill 配下 | `src/opencode/skills/agentdev-*/**/*.md` | 公開スキル定義（references 配下を含む）。gh 直接記述は agentdev-gh-cli 手続きへの委譲が必須 |
+
+検出パターン: `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)`
+
+コードブロック内、インラインコード内の記述も検出対象とする。許容ファイル（除外対象）に該当しない限り、委譲漏れとして報告する。
+
+### 除外対象（許容ファイル）
+
+| 除外ファイル | 理由 | 根拠 |
+|-------------|------|------|
+| `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` | 標準版（GitHub 版）の既定実装として gh コマンド直接実行を保持する唯一のファイル | REQ-0149-003 |
+
+agentdev-gh-cli は GitHub I/O を集約する I/O 境界であり、その標準版実装が gh コマンドを直接保持することは委譲の目的と矛盾しない。standard-procedures.md 以外のファイルが gh 直接記述を保持する場合は委譲漏れとして検出する。
+
+### 検出時の推奨 route
+
+gh 直接記述を検出した場合、`gh-direct-invocation-leak` 分類で報告し、agentdev-gh-cli 手続き（references/contracts.md の操作契約）への委譲を推奨する。
+
 ## 差し替え可能性（ローカル版）
 
 ローカル版は agentdev-gh-cli を差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（REQ-0150, ADR-0130 decision #4, #5）。
@@ -117,6 +144,7 @@ PR 関連手続きはスキップせず、Case ファイルの対応セクショ
 ## 関連項目
 
 - [agentdev-issue-management.md](agentdev-issue-management.md)
+- [agentdev-inspect-skills.md](agentdev-inspect-skills.md)（gh 直接記述の検出辞書を参照）
 - [ローカル Case ファイル](../local-case-file.md)
 - [REQ-0149](../../requirements/REQ-0149.md)（agentdev-gh-cli 手続き委譲基盤）
 - [REQ-0150](../../requirements/REQ-0150.md)（ローカル版 agentdev-gh-cli 実装）
