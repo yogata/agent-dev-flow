@@ -56,6 +56,7 @@
 | [REQ-0145](requirements/REQ-0145.md) | docs-check/integrity 検出設計改善 | IR-044 SPEC詳細混入解消・委譲キーワード境界ケース・catalog↔実装双方向同期・docs-check項目役割範囲・新カテゴリ追加判定フロー・IR-050/051 語彙レジストリ・閾値確定・3層検出構造責務分担・draft SPEC参照リスト・references checker偽陽性・完了条件grep設計 |
 | [REQ-0146](requirements/REQ-0146.md) | 実行契約・委譲・プロセス設計 | oh-my-openagent CLI引数正規化・委譲プロンプト雛形・case-open即時push・case-auto委譲契約MUST NOT DO・case-close squash merge後reset・git-common-procedures・実行主体分類表・3層検出構造SPEC化・doc-writing査読観点・前工程完了度3段階・subagent-protocol・command-authoring判断基準・バッチIssue完了判定追跡性 |
 | [REQ-0147](requirements/REQ-0147.md) | 文書化規律・HITL境界 | SKILL↔command同一ルール重複許容基準・新旧REQ適用運用ルール・promote/review系HITL限定・判断確定後自動実行・破壊的変更承認維持・learning-promote prune・intake-promote自動実行・backlog-review矛盾検出時追加判断 |
+| [REQ-0148](requirements/REQ-0148.md) | RU群バッチ処理と複数 execution_unit 並列実行 | 複数RUバッチ統合・連結成分ベース複数Standard/Epic構成・3軸判断（依存強度・Epicサイズ・機能的一貫性）・execution_unit 並列 orchestration・blocked部分停止・REQ-0114-088破壊的UPDATE |
 
 ## 廃止済み REQ
 
