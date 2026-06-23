@@ -148,6 +148,10 @@ operation_units:
             operation: spec-update
       qg1_result: pass
       saved_at: 2026-06-24
+      case_open_result:
+        issue_number: 1102
+        issue_url: https://github.com/yogata/agent-dev-flow/issues/1102
+        opened_at: 2026-06-24
 
 spec_save_result:
   consumed: true
