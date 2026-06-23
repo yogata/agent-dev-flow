@@ -17,6 +17,8 @@ work_type: feature
 
 scale: large
 
+spec_actions_consumed: true  # spec-save 完了マーク（ACT-SPEC-001/002/003 消費済み・2026-06-23）
+
 summary: |
   複数RU（intake/learning 由来含む）を一括処理するため、1回の req-define で1ドラフトに複数OUを統合し、
   case-open が依存グラフの連結成分と3軸判断（依存強度・Epic サイズ・機能的一貫性）で複数 Standard Issue / Epic Issue / 混在を自律生成し、
@@ -246,6 +248,7 @@ artifact_actions:
     operation: spec-update
     target: docs/specs/workflows/epic-wave-model.md
     source_items: [AG-002, AG-003, AG-007]
+    consumed: true  # spec-save 完了（2026-06-23）
     content: |
       epic-wave-model.md の更新内容:
       - execution_unit 定義（standard issue | epic issue、Wave 含まず）の追加
@@ -258,6 +261,7 @@ artifact_actions:
     operation: spec-update
     target: docs/specs/commands/case-open.md
     source_items: [AG-003]
+    consumed: true  # spec-save 完了（2026-06-23）
     content: |
       case-open.md SPEC の更新内容:
       - 「独立 OU の自動 Epic 化」セクションを「連結成分ベース複数 Standard/Epic 構成生成」へ書き換え
@@ -268,6 +272,7 @@ artifact_actions:
     operation: spec-update
     target: docs/specs/commands/case-auto.md
     source_items: [AG-004, AG-005]
+    consumed: true  # spec-save 完了（2026-06-23）
     content: |
       case-auto.md SPEC の更新内容:
       - 複数 execution_unit 並列 orchestration ロジックを追加
@@ -379,7 +384,18 @@ operation_units:
     depends_on: [OU-001, OU-002, OU-003, OU-004]
     recommended_order: 3
     issue_policy: epic
-    result: {}
+    result:
+      saved_specs:
+        - path: docs/specs/workflows/epic-wave-model.md
+          operation: spec-update
+          source_action: ACT-SPEC-001
+          updates:
+            - execution_unit 定義（standard | epic・Wave 含まず）追加
+            - 連結成分アルゴリズム（必須依存のみエッジ）追加
+            - 3軸判断モデル（依存強度3レベル・Epic サイズ・機能的一貫性）追加
+            - case-auto 並列委託モデル拡張セクションを新モデルへ書き換え
+            - Epic 統率者契約セクションに per-Epic 単一書き手拡張を追加
+            - ADR-0129 を See Also へ追加
   - ou_id: OU-006
     target_spec: docs/specs/commands/case-open.md
     operation: spec-update
@@ -387,7 +403,16 @@ operation_units:
     depends_on: [OU-001, OU-003]
     recommended_order: 3
     issue_policy: epic
-    result: {}
+    result:
+      saved_specs:
+        - path: docs/specs/commands/case-open.md
+          operation: spec-update
+          source_action: ACT-SPEC-002
+          updates:
+            - 「独立 OU の自動 Epic 化」サブセクションを「連結成分ベース複数 Standard/Epic 構成生成」へ書き換え
+            - 3軸判断（依存強度・Epic サイズ・機能的一貫性）の判定基準詳細を追加
+            - 単独根の Standard flow 扱いを明記
+            - REQ-0148 を See Also へ追加
   - ou_id: OU-007
     target_spec: docs/specs/commands/case-auto.md
     operation: spec-update
@@ -395,7 +420,19 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 3
     issue_policy: epic
-    result: {}
+    result:
+      saved_specs:
+        - path: docs/specs/commands/case-auto.md
+          operation: spec-update
+          source_action: ACT-SPEC-003
+          updates:
+            - 従来の case-auto 並列委譲モデルセクションを「複数 execution_unit 並列 orchestration」セクションへ書き換え
+            - 並列実行判定（連結成分ベース・技術的依存レベル除外）を追加
+            - blocked 部分停止・ready 継続判定フローを追加
+            - execution_unit 群反復制御への一般化を追加
+            - グローバル並列上限なし（case-run 5件上限のみ）を明記
+            - Step 4-1 Wave 反復制御・OU 逐次処理記述を新モデルへ一般化
+            - REQ-0148・ADR-0129 を See Also へ追加
 
 case_open_hints:
   epic_needed: true

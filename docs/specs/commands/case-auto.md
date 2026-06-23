@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-22
+updated: 2026-06-23
 ---
 
 # case-auto SPEC
@@ -46,9 +46,9 @@ updated: 2026-06-22
   - case-run の実行担当サブエージェント委譲モデル — case-auto は変更せず
   - Standard flow（単一 Issue）: case-open task() 完了後、クリーンアップ検証ゲート実行 → case-run → case-close
   - Epic Issue flow（マルチREQ or 単一REQ Epic flow）: case-open task() 完了後、クリーンアップ検証ゲート → Step 4-1 Wave 反復制御
-  - Step 4-1 Wave 反復制御（case-run #epic → case-close #epic の反復・ADR-0128 Decision #5, REQ-0114-084）— task()→case-run(#epic) → task()→case-close(#epic) → 次 Wave 判定 → 全 Wave 完了で Epic 完了報告 / 残 Wave ありで Step 1 へ戻る（べき等）
-  - blocked / failed の扱い: case-close 対象外。一部 completed(pr) の場合は completed(pr) のみ case-close(#epic) で処理。全 blocked/failed で Wave 反復停止・部分完了報告
-  - OU 逐次処理: 1 OU（Epic 全 Wave 完了）を close まで完了後に次 OU へ進む（REQ-0114-053）
+  - Step 4-1 Wave 反復制御（case-run #epic → case-close #epic の反復・ADR-0128 Decision #5, REQ-0114-084）— task()→case-run(#epic) → task()→case-close(#epic) → 次 Wave 判定 → 全 Wave 完了で Epic 完了報告 / 残 Wave ありで Step 1 へ戻る（べき等）。複数 execution_unit 並列実行時は、この反復制御を execution_unit 群反復制御へ一般化する（REQ-0148-012・後述「複数 execution_unit 並列 orchestration」セクション参照）
+  - blocked / failed の扱い: case-close 対象外。一部 completed(pr) の場合は completed(pr) のみ case-close(#epic) で処理。全 blocked/failed で Wave 反復停止・部分完了報告。複数 execution_unit 並列実行時は blocked になった execution_unit のみ停止し、他の ready 対象は継続する（REQ-0148-015）
+  - OU 逐次処理: 1 OU（Epic 全 Wave 完了）を close まで完了後に次 OU へ進む（REQ-0114-053）。必須依存のない execution_unit 群は並列実行されるため、逐次処理は必須依存で結合した execution_unit 群に適用される
   - クリーンアップ検証ゲート（REQ-0114-060〜063, REQ-0137-007）— ドラフトファイル・RU ファイルの残存がないことを検証。Standard / Epic Issue flow 双方で実施
 - Step 5: 工程間の状態引き継ぎ — Issue番号・PR番号・RU ファイルパス・capture 対象情報を最終工程まで保持
 - Step 6: 複数REQ対応 — req-save task() の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用。case-auto 自体に Issue 階層決定ロジックを持たない
@@ -89,13 +89,46 @@ updated: 2026-06-22
 - 出力制約: 成果物本文 verbatim・調査過程等は圧縮（G10）
 - タイミング情報: 開始時刻・終了時刻・所要時間を人間が読みやすい形式で報告（REQ-0114-082/083）
 
-## case-auto 並列委譲モデル（REQ-0114-087〜093）
+## 複数 execution_unit 並列 orchestration（REQ-0148, ADR-0129）
 
-case-auto は独立 OU（`depends_on` 空・L0 相当）が複数存在する場合、最大5件まで並列委譲で処理する（REQ-0114-087）。
+case-auto は case-open が生成した execution_unit 群（standard | epic の混在）を orchestration 対象とする（REQ-0148-012）。従来の「単一 Epic の Wave 反復制御」を「複数 execution_unit 群反復制御」へ一般化する。case-auto は case-open の判定結果に従い case-run(#epic) / case-run(standard) を task() 起動する（薄いオーケストレーター原則・G13/G15/G21 維持）。Issue 階層決定・子 Issue 選択・Epic 化判定の判断ロジックは持たない。
 
-- **Standard flow 逐次OU処理（Step 8-1）の例外**: 独立 OU は並列委譲可能。REQ-0114-053 の例外条項に従う
-- **並列委譲の実施**: 複数独立 OU を case-open が自動 Epic 化（REQ-0114-088）した後、case-run(#epic) が Wave 1 の子Issue を並列委譲（既存 Epic Wave モデル・最大5件）
-- **結果集約**: 並列委譲された単位の成功・失敗は case-auto が集約し最終判定に反映（REQ-0114-092）
+### 並列実行の判定
+
+並列可否は連結成分（必須依存のみをエッジとする）で判定する（REQ-0148-014）:
+
+- 必須依存がない複数 execution_unit 間（Epic 間・Standard 間・混在）は並列実行
+- 同一 Epic 内の Wave 間は直列（REQ-0148-013）
+- 技術的依存レベル（L0-L3）は並列判定軸から外す。ファイル衝突（L2）があっても並列を許容し、PR マージコンフリクトは後続 PR の rebase で解決する（REQ-0148-014, REQ-0148-024）
+
+グローバル並列上限は設定しない（REQ-0148-018）。case-run 単位の5件上限（REQ-0130-026 踏襲）のみを制御対象とする。N 個の execution_unit が並列実行された場合、N×5 件の task() 同時起動リスクを許容する（運用監視対象・ADR-0129）。
+
+### blocked 部分停止・ready 継続判定フロー
+
+各 execution_unit の状態（closed/blocked/failed/running/ready）を読み取り、以下の判定フローで orchestration する（REQ-0148-015, REQ-0148-016）:
+
+| execution_unit 状態 | case-auto アクション |
+|---|---|
+| ready | task() 起動（case-run(standard) または case-run(#epic)） |
+| running | 完了待機 |
+| completed | case-close 相当処理へ進行 |
+| blocked | 当該 execution_unit のみ停止。他の ready 対象は継続 |
+| failed | 当該 execution_unit のみ case-close 対象外。他の completed(pr) は case-close 対象 |
+
+**終了条件**: 全 execution_unit が closed/blocked/failed になったら終了する。一部 blocked が残存する場合は partial blocked として報告する（REQ-0148-016）。
+
+### execution_unit 群反復制御への一般化
+
+従来の「単一 Epic の Wave 反復制御」は execution_unit 群反復制御の特殊ケース（execution_unit = 1 件の Epic）となる。
+
+- execution_unit が standard issue の場合: case-run(standard) → case-close を1回実行
+- execution_unit が epic issue の場合: Wave 反復制御（case-run(#epic) → case-close(#epic) の反復）を完遂（ADR-0128 Decision #5, REQ-0114-084）
+
+OU 逐次処理（REQ-0114-053）は、必須依存で結合した execution_unit 群に適用される。必須依存のない execution_unit 群は順序を問わず並列実行できる（REQ-0114-053 例外条項）。
+
+### 結果集約
+
+各 execution_unit の結果（completed(pr) / blocked / failed）を case-auto が集約し最終判定に反映する（REQ-0114-092）。親コンテキスト非累積原則に従い、実装詳細は保持せず Issue / PR 状態から再読込する。
 
 ## See Also
 
@@ -107,6 +140,8 @@ case-auto は独立 OU（`depends_on` 空・L0 相当）が複数存在する場
 - REQ-0114 — case-auto 最大自走モード
 - REQ-0137 — 並列実行安全 git 操作規律
 - REQ-0138 — 構造化 req_draft 契約
+- REQ-0148 — RU群バッチ処理と複数 execution_unit 並列実行
 - ADR-0112 — サブエージェント委譲
 - ADR-0127 — case-auto 工程委譲
 - ADR-0128 — case-run / case-close Epic Wave モデル
+- ADR-0129 — 複数 execution_unit 並列実行モデル

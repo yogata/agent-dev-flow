@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-22
+updated: 2026-06-23
 ---
 
 # case-open SPEC
@@ -95,9 +95,23 @@ updated: 2026-06-22
 
 ## case-auto 並列委譲モデル（REQ-0114-087〜093）
 
-### 独立 OU の自動 Epic 化
+### 連結成分ベース複数 Standard/Epic 構成生成（REQ-0114-088 更新・REQ-0148）
 
-case-open は複数の独立 OU（`depends_on` 空・L0 相当）を検出した場合、自動的に Epic Issue 化し Wave 1 に全 OU を配置する（REQ-0114-088）。これにより Standard flow は「真に単一 OU のみ」に縮退し、Standard/Epic 二系統を単一 Wave 実行モデルに統一する。
+case-open は OU 群の依存グラフの連結成分（必須依存のみをエッジとする）を Epic 候補の出発点とし、依存強度・Epic サイズ・機能的一貫性の3軸判断で複数 Standard Issue / 複数 Epic Issue / 混在を自律生成する（REQ-0148-005, REQ-0148-006, REQ-0148-007, REQ-0132-015/016）。
+
+**単独根の Standard flow 扱い**: 連結成分が 1 OU だけ（単独根）の場合、Epic 化せず Standard flow とする（REQ-0148-008, REQ-0132-017）。
+
+**3軸判断の判定基準**:
+
+| 軸 | 判定基準 |
+|---|---|
+| 依存強度 | 必須依存で結合した OU 群は原則同一 Epic。弱依存・関連依存は連結成分のエッジにしない |
+| Epic サイズ | 1 Epic あたり子 Issue 推奨 3-10・上限 10 ハード制約（REQ-0148-009）。上限超過時は必須依存があっても分割を検討 |
+| 機能的一貫性 | 連結成分内の OU 群が単一の機能的主題を成すか。主題を欠く場合は複数 Epic へ分割、または Standard flow へ分散 |
+
+case-open は無関係な OU 群を単一 Epic へ機械的に集約しない（REQ-0148-010）。3軸判断の個別エッジケース（同機能独立・共通基盤等）は LLM 推論に委ねる。REQ/SPEC で固定するのは不変の方針（依存強度3レベル定義・Epic サイズ上限・単独根 Standard flow）のみである。
+
+case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_open_hints` に記録する（REQ-0148-011, REQ-0138-020）。連結成分アルゴリズム・3軸判断基準・Epic 分割例外（REQ-0148-023）の詳細は `docs/specs/workflows/epic-wave-model.md` の「連結成分ベース execution_unit 構成モデル」セクション参照。
 
 ### 子Issue 作成の並列化
 
@@ -120,3 +134,4 @@ case-open は複数の独立 OU（`depends_on` 空・L0 相当）を検出した
 - `agentdev-epic-tracker` skill — ステータス追跡テーブル
 - REQ-0132 — case-open / Issue作成
 - REQ-0137 — 並列実行安全 git 操作規律
+- REQ-0148 — RU群バッチ処理と複数 execution_unit 並列実行
