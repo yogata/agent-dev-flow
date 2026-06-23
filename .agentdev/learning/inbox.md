@@ -43,6 +43,14 @@
 - **学び**: Windows 環境で OpenCode の Write ツールが、既存 UTF-8 (BOM なし) ファイルを上書きする際にシステムデフォルトエンコーディング (cp932/Shift-JIS) で書き出す事象を確認。`docs/requirements/README.md` の編集時に発生し、edit ツール (per-line string replace) を使用することで回避した。配布物配布先環境 (consumer repo) でも同様の落とし穴が発生する可能性がある。`agentdev-gh-cli` スキルは gh CLI 用に `[System.IO.File]::WriteAllText` または Write ツールを許可しているが、既存 UTF-8 ファイルの編集では edit ツールが安全。
 - **適用場面**: Windows 環境で既存 UTF-8 (BOM なし) ファイルを編集する場合。特に README.md 等、改行・エンコーディングが厳格なファイル。edit ツール (per-line string replace) を優先し、Write ツールの全面上書きは新規ファイル作成時に限定する。
 
+## 2026-06-23 Epic #1093 Wave 1 close
+
+### L-007: REQ の手続き列挙に中核操作（PR 作成）が抜けていた場合の SPEC 拡張判断
+
+- **発生源**: PR #1098 (#1094 / REQ-0149 + ADR-0130)
+- **学び**: REQ-0149-002 は agentdev-gh-cli の8手続きを列挙したが「PR 作成」が含まれていなかった。Sisyphus-Junior が PR を作成する中核操作のため、実装（SPEC/contracts/standard-procedures）に「PR 作成」を追加しないと REQ-0149-001「PR 操作の委譲」が実装できない。本 PR では SPEC 拡張として「PR 作成」を追加（9手続き）し、REQ-0149-002 本体への追記は別途検討とした。要件定義で「列挙」を明示した場合、実装上必須の中核操作が漏れることがある。実装段階で SPEC を拡張して補完しつつ、REQ との整合は別途 req-save で処理する二段階判断が有効。
+- **適用場面**: REQ で手続き・API・コマンド等を列挙定義した場合。実装で中核操作の欠落に気づいた際、SPEC 拡張で即時対応しつつ REQ 更新を後続工程に委ねる判断基準。
+
 ## 2026-06-23 Epic #1075 Wave 2 close
 
 ### L-006: 並列機械的テキスト置換 OU の Wave 実行で文字レベルマージが必要になる
