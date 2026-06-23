@@ -4,7 +4,7 @@
 
 ## 現行基盤ビュー
 
-承認済みステータス（accepted）の ADR-01XX 18件が、現在のアーキテクチャ判断の基盤である。各 ADR は基準再編により旧 ADR の内容を統合・再定義している。現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）・非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
+承認済みステータス（accepted）の ADR-01XX 19件が、現在のアーキテクチャ判断の基盤である。各 ADR は基準再編により旧 ADR の内容を統合・再定義している。現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）・非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
 
 | ADR番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|
@@ -26,6 +26,7 @@
 | ADR-0126 | ローカル版 OpenCode 生成基盤: source model 拡張と生成安全性制約 | accepted | 2026-06-20 |
 | ADR-0127 | case-auto 構成工程の task() 委譲によるスケーラビリティ確立 | accepted | 2026-06-21 |
 | ADR-0128 | case-run の実行モデル: task() による実行担当サブエージェント委譲 | accepted | 2026-06-21 |
+| ADR-0129 | 複数 execution_unit 並列実行モデル — 複数 SSoT 並立と Epic 間並列 orchestration | accepted | 2026-06-23 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
 
@@ -51,6 +52,7 @@
 - [ADR-0126](ADR-0126.md) — ローカル版 OpenCode 生成基盤: source model 拡張と生成安全性制約
 - [ADR-0127](ADR-0127.md) — case-auto 構成工程の task() 委譲によるスケーラビリティ確立
 - [ADR-0128](ADR-0128.md) — case-run の実行モデル: task() による実行担当サブエージェント委譲
+- [ADR-0129](ADR-0129.md) — 複数 execution_unit 並列実行モデル — 複数 SSoT 並立と Epic 間並列 orchestration
 
 ### 置き換え済み（superseded）
 
@@ -91,6 +93,7 @@
 - [ADR-0125](ADR-0125.md) — case-auto Wave 内並列子Issue実行モデル
 - [ADR-0127](ADR-0127.md) — case-auto 構成工程の task() 委譲によるスケーラビリティ確立
 - [ADR-0128](ADR-0128.md) — case-run の実行モデル: task() による実行担当サブエージェント委譲
+- [ADR-0129](ADR-0129.md) — 複数 execution_unit 並列実行モデル — 複数 SSoT 並立と Epic 間並列 orchestration
 
 ### 文書
 
@@ -153,6 +156,10 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0128 | relates-to | ADR-0127 | case-auto から Epic/Wave orchestration を削除し case-run/case-close に移管 |
 | ADR-0128 | relates-to | ADR-0125 | Epic Issue 本文の単一書き手を case-auto から case-close に移行 |
 | ADR-0128 | relates-to | ADR-0109 | Epic Issue 本文を SSoT として維持（case-run/case-close が進行状況を判定する基盤） |
+| ADR-0129 | relates-to | ADR-0109 | SSoT 原則の per-Epic 拡張（複数 Epic の SSoT 並立） |
+| ADR-0129 | relates-to | ADR-0125 | Wave 内並列の維持・Epic 間並列の追加（直交する別次元の並列制御） |
+| ADR-0129 | relates-to | ADR-0127 | case-auto orchestration 拡張（複数 execution_unit 並列 orchestration の追加・task() 委譲モデルは維持） |
+| ADR-0129 | relates-to | ADR-0128 | case-run スコープ維持（case-run は引き続き単一 standard/epic の現在 Wave を実行） |
 
 ## 関連 REQ
 
@@ -178,6 +185,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0126 | [REQ-0141](../requirements/REQ-0141.md), [REQ-0134](../requirements/REQ-0134.md) | ローカル版 OpenCode 生成基盤: source model 拡張と生成安全性制約 |
 | ADR-0127 | [REQ-0114](../requirements/REQ-0114.md), [REQ-0119](../requirements/REQ-0119.md) | case-auto 構成工程の task() 委譲によるスケーラビリティ確立 |
 | ADR-0128 | [REQ-0130](../requirements/REQ-0130.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0139](../requirements/REQ-0139.md) | case-run の実行モデル: task() による実行担当サブエージェント委譲 |
+| ADR-0129 | [REQ-0148](../requirements/REQ-0148.md), [REQ-0114](../requirements/REQ-0114.md) | 複数 execution_unit 並列実行モデル（複数 SSoT 並立・Epic 間並列 orchestration） |
 
 ## 廃止済み・履歴ビュー
 
