@@ -74,16 +74,24 @@ AgentDevFlow を外部プロジェクトに導入する手順。
 
 ### インストール
 
+通常版（GitHub 版 OpenCode を利用する環境）のインストール。
+
 ```powershell
 # 1. scripts/ を適用先リポジトリにコピー
 # 2. インストールを実行（clone + ジャンクション 作成）
 ./scripts/install-consumer-opencode.ps1 -Mode apply
 ```
 
+ローカル版（ローカル版 OpenCode を利用する環境）のインストール。`-LocalMode` を付けると `agentdev-gh-cli` だけが `src/opencode-local/agentdev-gh-cli/` へ接続され、それ以外の command/skill は通常版と同じ `src/opencode/` 配下へ接続される（REQ-0103-158、ADR-0131）。
+
+```powershell
+./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
+```
+
 ### 状態確認
 
 ```powershell
-# インストール状態を確認
+# インストール状態を確認（リンクモードを自動検出して報告）
 ./scripts/check-consumer-opencode.ps1
 ```
 
@@ -93,9 +101,13 @@ AgentDevFlow を外部プロジェクトに導入する手順。
 # agent-dev-flow の最新を取得して再同期
 cd .agentdev-plugin && git pull && cd ..
 ./scripts/install-consumer-opencode.ps1 -Mode apply
+# ローカル版環境の場合は -LocalMode を付けて再実行
+# ./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
 ```
 
 ### 推奨 .gitignore 設定
+
+通常版・ローカル版ともに同一。`agentdev-gh-cli` はリンク先が異なるだけなので `.opencode/skills/agentdev-*/` パターンで網羅される。
 
 ```gitignore
 .agentdev-plugin/
