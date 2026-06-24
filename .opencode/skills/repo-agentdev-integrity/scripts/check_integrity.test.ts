@@ -481,6 +481,11 @@ describe("check_integrity.ts --json output schema", () => {
   });
 });
 
+// REQ-0144-008 drift baseline（要件成立時点の履歴値）:
+//   既存5件赤 / valid fixture 7件 NG
+//   check_integrity.ts ルール更新時に fixture が追従せず drift していた状態の定量記録。
+//   件数は本要件の成立動機であり、 REQ 要件行からは REQ-0101-068 準拠のため除去済み。
+//   本テストファイルの fixture が最新 check_integrity.ts ルールに追従することを検証する。
 describe("valid fixture (all checks pass or info-only)", () => {
   it("exits with code 0", () => {
     const r = runScript(VALID_ROOT, ["--json"]);
