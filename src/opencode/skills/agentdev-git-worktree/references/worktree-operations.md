@@ -67,7 +67,7 @@ git rev-parse --show-toplevel
 |---|---|---|
 | 当該 worktree あり | 一致しない（worktree 内） | ✅ worktree 内にいる（隔離されている） |
 | 当該 worktree あり | 一致する（メインルート） | ❌ メインリポジトリにいる（隔離されていない） |
-| 当該 worktree なし | — | ❌ worktree 未作成 |
+| 当該 worktree なし | - | ❌ worktree 未作成 |
 
 ### 3. 適用箇所
 

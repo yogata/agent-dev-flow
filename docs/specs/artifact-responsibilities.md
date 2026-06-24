@@ -12,15 +12,15 @@
 | Skill Scripts | `src/opencode/skills/*/scripts/` | 原本優先 | `.opencode/skills/*/scripts/` | 決定的でテスト可能な実行ロジック |
 | Command Template | `src/opencode/commands/agentdev/templates/` | 原本優先 | `.opencode/commands/agentdev/templates/` | 完了報告の出力構造。Issue/PR 本文の出力構造は `agentdev-workflow-templates` skill 配下（artifact-contracts.md 参照） |
 | Skill Template | `src/opencode/skills/*/templates/` | 原本優先 | `.opencode/skills/*/templates/` | ドキュメント生成テンプレート |
-| REQ | `docs/requirements/REQ-*.md` | - | — | 要件定義（基準） |
-| ADR | `docs/adr/ADR-*.md` | - | — | アーキテクチャ決定記録（基準） |
-| SPEC | `docs/specs/*.md` | - | — | 現在仕様（リポジトリ内部） |
-| DOC-MAP | `docs/DOC-MAP.md` | - | — | 文書探索入口（非基準） |
-| Guide | `docs/guides/*.md` | - | — | 参照用読み物（ナビゲーション層） |
-| ドメイン状態 | `.agentdev/` | - | — | Intake / Learning / Backlog / Integrity 永続状態 |
-| リポジトリローカル Command | `.opencode/commands/repo/` | - | — | 本体リポジトリ専用コマンド（ADR-0106）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
-| リポジトリローカル Skill | `.opencode/skills/repo-*/` | - | — | 本体リポジトリ専用スキル（ADR-0106）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
-| リポジトリローカルレジストリ | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | - | — | リポジトリローカル語彙レジストリ。`.agentdev/` には配置しない（ADR-0106） |
+| REQ | `docs/requirements/REQ-*.md` | - | - | 要件定義（基準） |
+| ADR | `docs/adr/ADR-*.md` | - | - | アーキテクチャ決定記録（基準） |
+| SPEC | `docs/specs/*.md` | - | - | 現在仕様（リポジトリ内部） |
+| DOC-MAP | `docs/DOC-MAP.md` | - | - | 文書探索入口（非基準） |
+| Guide | `docs/guides/*.md` | - | - | 参照用読み物（ナビゲーション層） |
+| ドメイン状態 | `.agentdev/` | - | - | Intake / Learning / Backlog / Integrity 永続状態 |
+| リポジトリローカル Command | `.opencode/commands/repo/` | - | - | 本体リポジトリ専用コマンド（ADR-0106）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
+| リポジトリローカル Skill | `.opencode/skills/repo-*/` | - | - | 本体リポジトリ専用スキル（ADR-0106）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
+| リポジトリローカルレジストリ | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | - | - | リポジトリローカル語彙レジストリ。`.agentdev/` には配置しない（ADR-0106） |
 
 ## 責務境界原則
 
