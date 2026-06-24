@@ -12,6 +12,11 @@ source_rus: [RU-0011]
 work_type: feature
 scale: standard
 
+spec_actions_consumed:
+  status: consumed
+  consumed_at: 2026-06-24
+  consumed_actions: [ACT-SPEC-001]
+
 summary: >
   check_integrity.ts の IR-044 req-spec-boundary-violation 検出に exoneration 条件を追加し、
   META 規則行（REQ-0101-067 の REQ/SPEC スコープ定義行）と振る舞い要件行（REQ-0144-009
