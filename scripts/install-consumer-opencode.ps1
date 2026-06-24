@@ -17,8 +17,17 @@
     - .opencode/commands/repo/      = real directory (repo-local only)
     - .opencode/skills/repo-*/      = real directories (repo-local only)
 
+    -LocalMode redirects agentdev-gh-cli to the local OpenCode source:
+    - skills/agentdev-gh-cli/       = junction -> .agentdev-plugin/src/opencode-local/agentdev-gh-cli/
+    All other agentdev-* artifacts still link to src/opencode/ as normal.
+
 .PARAMETER Mode
     One of: dry-run, check, apply
+
+.PARAMETER LocalMode
+    Switch. When set, agentdev-gh-cli is junctioned to src/opencode-local/agentdev-gh-cli/
+    instead of src/opencode/skills/agentdev-gh-cli/. All other agentdev-* command/skill
+    junctions target src/opencode/ as normal (REQ-0103-158, ADR-0131 decision #3).
 
 .PARAMETER PluginDir
     Directory name for the agent-dev-flow checkout (default: .agentdev-plugin).
@@ -35,12 +44,15 @@
     ./scripts/install-consumer-opencode.ps1 -Mode check
     ./scripts/install-consumer-opencode.ps1 -Mode apply
     ./scripts/install-consumer-opencode.ps1 -Mode apply -PluginDir .agentdev-plugin
+    ./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
 #>
 
 param(
     [Parameter(Mandatory)]
     [ValidateSet('dry-run', 'check', 'apply')]
     [string]$Mode,
+
+    [switch]$LocalMode,
 
     [string]$PluginDir = '.agentdev-plugin',
 
@@ -53,6 +65,7 @@ $ErrorActionPreference = 'Stop'
 $RepoRoot = $PWD.Path
 $PluginPath = Join-Path $RepoRoot $PluginDir
 $SourceDir = Join-Path $PluginPath 'src\opencode'
+$LocalSourceDir = Join-Path $PluginPath 'src\opencode-local'
 $ProjectionDir = Join-Path $RepoRoot '.opencode'
 $CommandsDir = Join-Path $ProjectionDir 'commands'
 $SkillsDir = Join-Path $ProjectionDir 'skills'
@@ -60,6 +73,9 @@ $SkillsDir = Join-Path $ProjectionDir 'skills'
 # Repo-local patterns excluded from junction management
 $RepoLocalCommandNames = @('repo')
 $RepoLocalSkillPrefix = 'repo-'
+
+# In LocalMode this skill is redirected from src/opencode-local/ (REQ-0103-158, ADR-0131 decision #3)
+$LocalModeRedirectSkill = 'agentdev-gh-cli'
 
 # --- Helper Functions ---
 
@@ -100,6 +116,21 @@ function Get-ConsumerJunctionTargets {
     }
 
     return ($targets | Sort-Object)
+}
+
+function Get-TargetSourcePath {
+    <#
+    .SYNOPSIS
+        Resolve the absolute source path backing a projection relative path.
+        In LocalMode, skills\<LocalModeRedirectSkill> is redirected to
+        src/opencode-local/<LocalModeRedirectSkill>/ (REQ-0103-158, ADR-0131 decision #3).
+        All other targets back to src/opencode/ as normal.
+    #>
+    param([string]$RelPath)
+    if ($LocalMode -and $RelPath -eq "skills\$LocalModeRedirectSkill") {
+        return Join-Path $LocalSourceDir $LocalModeRedirectSkill
+    }
+    return Join-Path $SourceDir $RelPath
 }
 
 # --- Clone / Update ---
@@ -146,6 +177,15 @@ if (-not (Test-Path -LiteralPath $SourceDir)) {
     exit 1
 }
 
+# LocalMode requires the local source redirect target to exist
+if ($LocalMode) {
+    $localRedirectSource = Join-Path $LocalSourceDir $LocalModeRedirectSkill
+    if (-not (Test-Path -LiteralPath $localRedirectSource)) {
+        Write-Error "[ERROR] LocalMode redirect source not found: $localRedirectSource. Ensure $PluginDir contains agent-dev-flow checkout with src/opencode-local/."
+        exit 1
+    }
+}
+
 $targets = Get-ConsumerJunctionTargets
 
 # ============================================================
@@ -154,6 +194,9 @@ $targets = Get-ConsumerJunctionTargets
 
 if ($Mode -eq 'check') {
     Write-Host '=== Consumer Install Check ==='
+    if ($LocalMode) {
+        Write-Host '[INFO] LocalMode: agentdev-gh-cli redirects to src/opencode-local/agentdev-gh-cli/'
+    }
     $divergences = 0
 
     # 1. Plugin checkout
@@ -170,6 +213,16 @@ if ($Mode -eq 'check') {
         $divergences++
     } else {
         Write-Host "[OK] Source directory exists: $PluginDir/src/opencode/"
+    }
+
+    # 2b. Local redirect source (LocalMode only)
+    if ($LocalMode) {
+        if (-not (Test-Path -LiteralPath $localRedirectSource)) {
+            Write-Host "[DIVERGENCE] LocalMode redirect source not found: $PluginDir/src/opencode-local/$LocalModeRedirectSkill/"
+            $divergences++
+        } else {
+            Write-Host "[OK] LocalMode redirect source exists: $PluginDir/src/opencode-local/$LocalModeRedirectSkill/"
+        }
     }
 
     # 3. .opencode/ must be a real directory
@@ -204,7 +257,7 @@ if ($Mode -eq 'check') {
             Write-Host "[DIVERGENCE] Missing junction: $relPath"
             $divergences++
         } elseif (Test-Junction -Path $targetPath) {
-            $expectedSource = Join-Path $SourceDir $relPath
+            $expectedSource = Get-TargetSourcePath -RelPath $relPath
             $actualTarget = Get-JunctionTarget -Path $targetPath
             if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $expectedSource).Path)) {
                 Write-Host "[OK] Junction: $relPath"
@@ -248,6 +301,9 @@ if ($Mode -eq 'check') {
 
 if ($Mode -eq 'dry-run') {
     Write-Host '=== Consumer Install Dry Run ==='
+    if ($LocalMode) {
+        Write-Host '[INFO] LocalMode: agentdev-gh-cli redirects to src/opencode-local/agentdev-gh-cli/'
+    }
 
     # .opencode/ status
     if (Test-Junction -Path $ProjectionDir) {
@@ -275,9 +331,9 @@ if ($Mode -eq 'dry-run') {
 
     foreach ($relPath in $targets) {
         $targetPath = Join-Path $ProjectionDir $relPath
+        $expectedSource = Get-TargetSourcePath -RelPath $relPath
         if (Test-Junction -Path $targetPath) {
             $actualTarget = Get-JunctionTarget -Path $targetPath
-            $expectedSource = Join-Path $SourceDir $relPath
             if ($actualTarget -and (Test-Path -LiteralPath $actualTarget)) {
                 Write-Host "[OK] Already junctioned: $relPath"
             } else {
@@ -287,7 +343,7 @@ if ($Mode -eq 'dry-run') {
         } elseif (Test-Path -LiteralPath $targetPath) {
             Write-Host "[ERROR] Path exists and is not a junction: $relPath"
         } else {
-            Write-Host "[WOULD ADD] Create junction: $relPath"
+            Write-Host "[WOULD ADD] Create junction: $relPath -> $expectedSource"
         }
     }
 
@@ -302,6 +358,9 @@ if ($Mode -eq 'dry-run') {
 
 if ($Mode -eq 'apply') {
     Write-Host '=== Consumer Install: applying junctions ==='
+    if ($LocalMode) {
+        Write-Host '[INFO] LocalMode: agentdev-gh-cli redirects to src/opencode-local/agentdev-gh-cli/'
+    }
 
     # Step 1: Ensure .opencode/ is a real directory
     if (Test-Junction -Path $ProjectionDir) {
@@ -338,18 +397,19 @@ if ($Mode -eq 'apply') {
     Write-Host '--- Junctions ---'
     foreach ($relPath in $targets) {
         $targetPath = Join-Path $ProjectionDir $relPath
-        $sourcePath = Join-Path $SourceDir $relPath
+        $sourcePath = Get-TargetSourcePath -RelPath $relPath
 
         if (Test-Junction -Path $targetPath) {
             $actualTarget = Get-JunctionTarget -Path $targetPath
-            if ($actualTarget -and (Test-Path -LiteralPath $actualTarget)) {
+            $expectedSource = $sourcePath
+            if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $expectedSource).Path)) {
                 Write-Host "[OK] Already junctioned: $relPath"
                 continue
             } else {
-                Write-Host "[ACTION] Removing broken junction: $relPath"
+                Write-Host "[ACTION] Removing junction (wrong target): $relPath"
                 cmd /c "rmdir `"$targetPath`"" 2>&1
                 if ($LASTEXITCODE -ne 0) {
-                    Write-Error "[ERROR] Failed to remove broken junction: $relPath"
+                    Write-Error "[ERROR] Failed to remove junction: $relPath"
                     exit 1
                 }
             }
@@ -364,7 +424,7 @@ if ($Mode -eq 'apply') {
             New-Item -ItemType Directory -Path $parentPath -Force | Out-Null
         }
 
-        Write-Host "[ACTION] Creating junction: $relPath"
+        Write-Host "[ACTION] Creating junction: $relPath -> $sourcePath"
         $result = cmd /c "mklink /J `"$targetPath`" `"$sourcePath`" 2>&1"
         if ($LASTEXITCODE -ne 0) {
             Write-Error "[ERROR] Failed to create junction ${relPath}: $result"

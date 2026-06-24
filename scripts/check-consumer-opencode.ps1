@@ -9,6 +9,10 @@
     - All expected junctions exist and point to correct targets
     - Reports divergences
 
+    Auto-detects link mode from the agentdev-gh-cli junction target:
+    - Normal mode: agentdev-gh-cli -> src/opencode/skills/agentdev-gh-cli/
+    - Local mode:  agentdev-gh-cli -> src/opencode-local/agentdev-gh-cli/ (consumer-generated)
+
     No apply mode is provided. Use install-consumer-opencode.ps1 -Mode apply to fix issues.
 
 .PARAMETER PluginDir
@@ -27,9 +31,13 @@ $ErrorActionPreference = 'Stop'
 $RepoRoot = $PWD.Path
 $PluginPath = Join-Path $RepoRoot $PluginDir
 $SourceDir = Join-Path $PluginPath 'src\opencode'
+$LocalSourceDir = Join-Path $PluginPath 'src\opencode-local'
 $ProjectionDir = Join-Path $RepoRoot '.opencode'
 $CommandsDir = Join-Path $ProjectionDir 'commands'
 $SkillsDir = Join-Path $ProjectionDir 'skills'
+
+# Skill redirected to src/opencode-local/ in local mode (REQ-0103-158, ADR-0131 decision #3)
+$LocalModeRedirectSkill = 'agentdev-gh-cli'
 
 # --- Helper Functions ---
 
@@ -46,6 +54,20 @@ function Get-JunctionTarget {
     if (-not $item) { return $null }
     if (-not ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) { return $null }
     return $item.Target
+}
+
+function Get-TargetSourcePath {
+    <#
+    .SYNOPSIS
+        Resolve the absolute source path backing a projection relative path.
+        When $DetectedLocalMode is true, skills\<LocalModeRedirectSkill> is redirected
+        to src/opencode-local/<LocalModeRedirectSkill>/ (REQ-0103-158, ADR-0131 decision #3).
+    #>
+    param([string]$RelPath, [bool]$LocalMode)
+    if ($LocalMode -and $RelPath -eq "skills\$LocalModeRedirectSkill") {
+        return Join-Path $LocalSourceDir $LocalModeRedirectSkill
+    }
+    return Join-Path $SourceDir $RelPath
 }
 
 # --- Main ---
@@ -82,7 +104,36 @@ if (-not (Test-Path -LiteralPath $SourceDir)) {
     Write-Host "[OK] Source directory exists: $PluginDir/src/opencode/"
 }
 
-# 3. .opencode/ status
+# 3. Link mode detection (agentdev-gh-cli junction target)
+# Local mode: agentdev-gh-cli -> src/opencode-local/agentdev-gh-cli/ (consumer-generated)
+# Normal mode: agentdev-gh-cli -> src/opencode/skills/agentdev-gh-cli/ (consumer-with-agentdev)
+$DetectedLocalMode = $false
+$ghCliProjection = Join-Path $SkillsDir $LocalModeRedirectSkill
+$ghCliLocalSource = Join-Path $LocalSourceDir $LocalModeRedirectSkill
+if (Test-Junction -Path $ghCliProjection) {
+    $ghCliTarget = Get-JunctionTarget -Path $ghCliProjection
+    if ($ghCliTarget -and (Test-Path -LiteralPath $ghCliTarget) -and
+        ((Resolve-Path -LiteralPath $ghCliTarget).Path -eq (Resolve-Path -LiteralPath $ghCliLocalSource).Path)) {
+        $DetectedLocalMode = $true
+    }
+}
+if ($DetectedLocalMode) {
+    Write-Host '[INFO] Link mode: local (consumer-generated) — agentdev-gh-cli -> src/opencode-local/'
+} else {
+    Write-Host '[INFO] Link mode: normal (consumer-with-agentdev) — agentdev-gh-cli -> src/opencode/'
+}
+
+# 3b. Local redirect source (local mode only)
+if ($DetectedLocalMode) {
+    if (-not (Test-Path -LiteralPath $ghCliLocalSource)) {
+        Write-Host "[DIVERGENCE] Local redirect source not found: $PluginDir/src/opencode-local/$LocalModeRedirectSkill/"
+        $divergences++
+    } else {
+        Write-Host "[OK] Local redirect source exists: $PluginDir/src/opencode-local/$LocalModeRedirectSkill/"
+    }
+}
+
+# 4. .opencode/ status
 if (-not (Test-Path -LiteralPath $ProjectionDir)) {
     Write-Host '[DIVERGENCE] .opencode/ does not exist'
     $divergences++
@@ -93,7 +144,7 @@ if (-not (Test-Path -LiteralPath $ProjectionDir)) {
     Write-Host '[OK] .opencode/ is a real directory'
 }
 
-# 4. Parent directories
+# 5. Parent directories
 if (Test-Path -LiteralPath $ProjectionDir) {
     foreach ($parentRel in @('commands', 'skills')) {
         $parentPath = Join-Path $ProjectionDir $parentRel
@@ -109,7 +160,7 @@ if (Test-Path -LiteralPath $ProjectionDir) {
     }
 }
 
-# 5. Junction checks
+# 6. Junction checks
 if (Test-Path -LiteralPath $SourceDir) {
     # Enumerate expected targets from source
     $targets = [System.Collections.Generic.List[string]]::new()
@@ -130,7 +181,7 @@ if (Test-Path -LiteralPath $SourceDir) {
 
     foreach ($relPath in ($targets | Sort-Object)) {
         $targetPath = Join-Path $ProjectionDir $relPath
-        $expectedSource = Join-Path $SourceDir $relPath
+        $expectedSource = Get-TargetSourcePath -RelPath $relPath -LocalMode $DetectedLocalMode
 
         if (-not (Test-Path -LiteralPath $targetPath)) {
             Write-Host "[DIVERGENCE] Missing junction: $relPath"
@@ -149,7 +200,7 @@ if (Test-Path -LiteralPath $SourceDir) {
         }
     }
 
-    # 6. Orphan detection (agentdev-* junctions that don't match source)
+    # 7. Orphan detection (agentdev-* junctions that don't match source)
     Write-Host ''
     Write-Host '--- Orphan junctions ---'
     $orphansFound = $false
