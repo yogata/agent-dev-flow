@@ -88,11 +88,18 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 - **warn**: `auto_ready:false` で `stop_reasons` が記載されているが、ユーザー承認（合意による解消、または明示的 false 選択の `conflict_resolutions` 記録）が未確認。
 - **pass**: `auto_ready:true`、または `auto_ready:false` で `stop_reasons` がユーザー承認済み（`conflict_resolutions` 記録済み）。
 
+### 10. test_strategy 3要素完全性（REQ-0102-077）
+
+要件doc draft の `test_strategy` セクションに含まれる各項目が、verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持しているか（REQ-0102-074, REQ-0102-075, REQ-0102-076）。
+
+- **fail**: test strategy 項目のいずれかが3要素のいずれかを欠落している。on_failure（不合格時の処置）を持たない検証項目が test_strategy に含まれている。
+- **pass**: `test_strategy` セクションが不在（test strategy を定義しない要件）、または全項目が3要素を完全に保持している。
+
 ## pass/ warn/ fail 基準
 
-- **pass**: 上記 1〜9 の全てを満たす。
+- **pass**: 上記 1〜10 の全てを満たす。
 - **warn**: 構造は保たれているが改善推奨事項がある（主に観点 3 の粒度、観点 6 の境界曖昧候補、観点 7 の安定契約例外適用境界、観点 8 の推奨アクション未確認、観点 9 のユーザー承認未確認）。進行可能。
-- **fail**: 構造的欠陥がある（観点 1, 2, 5, 6, 7, 8, 9 の fail）。req-define へ差し戻し。
+- **fail**: 構造的欠陥がある（観点 1, 2, 5, 6, 7, 8, 9, 10 の fail）。req-define へ差し戻し。
 
 ## 委譲接続点
 
