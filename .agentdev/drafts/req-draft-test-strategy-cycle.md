@@ -157,6 +157,7 @@ operation_units:
         - REQ-0102-076
         - REQ-0102-077
       status: completed
+      issue_number: 1130
 
   - ou_id: OU-002
     source_ru: null
@@ -173,6 +174,7 @@ operation_units:
       requirement_line_ids:
         - REQ-0132-018
       status: completed
+      issue_number: 1131
 
   - ou_id: OU-003
     source_ru: null
@@ -190,6 +192,7 @@ operation_units:
         - REQ-0130-029
         - REQ-0130-030
       status: completed
+      issue_number: 1132
 
   - ou_id: OU-004
     source_ru: null
@@ -206,6 +209,7 @@ operation_units:
       requirement_line_ids:
         - REQ-0131-026
       status: completed
+      issue_number: 1133
 
   - ou_id: OU-005
     source_ru: null
@@ -216,7 +220,8 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      issue_number: 1130
 
   - ou_id: OU-006
     source_ru: null
@@ -227,7 +232,8 @@ operation_units:
     depends_on: [OU-001, OU-004]
     recommended_order: 6
     issue_policy: single
-    result: {}
+    result:
+      issue_number: 1133
 
 # case_open_hints: case-open 構成生成への参考情報
 case_open_hints:
