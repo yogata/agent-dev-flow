@@ -12,6 +12,11 @@ source_rus: [RU-0008]
 work_type: feature
 scale: standard
 
+spec_actions_consumed:
+  status: consumed
+  consumed_at: 2026-06-24
+  consumed_actions: [ACT-SPEC-001]
+
 summary: >
   install-consumer-opencode.ps1 に local mode（consumer-generated）のリンク設定を追加する。
   local mode では agentdev-gh-cli のみ src/opencode-local/agentdev-gh-cli/ へ接続し、

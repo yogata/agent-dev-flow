@@ -171,6 +171,39 @@ docs-check（IR-016）が乖離（divergence）を検出、報告する。
 Consumer では AgentDevFlow 本体から提供されるファイルのみを同期対象とする。
 プロジェクトローカルカスタマイズは同期の影響を受けない。
 
+## link mode 接続手順技術詳細
+
+`consumer-generated` リポジトリ種別における link mode 接続の技術詳細を明文化する（ADR-0131 decision #2, #3, #6, REQ-0141, REQ-0150）。
+
+### local mode のリンク構成
+
+| リンク元（`.opencode/` 配下） | リンク先 | 備考 |
+|-------------------------------|----------|------|
+| `commands/agentdev/` | `src/opencode/commands/agentdev/` | 通常版と同一接続先（ADR-0131 decision #2） |
+| `skills/agentdev-*/`（agentdev-gh-cli 以外） | `src/opencode/skills/agentdev-*/` | 通常版と同一接続先（ADR-0131 decision #2） |
+| `skills/agentdev-gh-cli/` | `src/opencode-local/agentdev-gh-cli/` | local mode のみ差し替え接続先（ADR-0131 decision #3, REQ-0150） |
+
+agentdev-gh-cli 以外は通常版と同一の `src/opencode/` 配下へ接続し、agentdev-gh-cli のみ `src/opencode-local/agentdev-gh-cli/` へ接続することでローカル版環境を構成する。`src/opencode/` は GitHub 版専用原本であり、ローカル版はこれを変更しない（ADR-0131 decision #7）。
+
+### install-consumer-opencode.ps1 -LocalMode の入出力契約
+
+`install-consumer-opencode.ps1` は既存の `-Mode` パラメータ（dry-run / check / apply）に `-LocalMode` スイッチを追加し、local mode のリンク設定を実行する。
+
+| パラメータ | リンク構成 |
+|-----------|-----------|
+| `-LocalMode` 未指定（既定） | 通常版: 全 agentdev command/skill を `src/opencode/` 配下へ接続 |
+| `-LocalMode` 指定時 | local mode: agentdev-gh-cli のみ `src/opencode-local/agentdev-gh-cli/` へ接続、それ以外は `src/opencode/` 配下へ接続 |
+
+`-Mode`（dry-run / check / apply）は `-LocalMode` の有無にかかわらず従来通り動作し、clone・update・link 作成の各フェーズで適用される。別スクリプト（`install-consumer-opencode-local.ps1` 等）は新設せず、エントリポイントを単一に維持する。これは既存 `-Mode` パターンと整合し、clone/update ロジックの重複を避けるための採用判断である。
+
+### check-consumer-opencode.ps1 の local mode リンク状態検出条件
+
+`check-consumer-opencode.ps1` は `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合、リポジトリ種別を `consumer-generated` として検出・報告する（リポジトリ種別判定基準表参照）。通常版のリンク構成（agentdev-gh-cli も `src/opencode/` 配下へ接続）との違いを当該 link target で識別する。
+
+### link target 確認方式
+
+`.opencode/` 配下の実パス確認は、ジャンクション環境での一律停止（ADR-0126 decision #3、廃止済み）から、意図した link target かどうかを確認する方式へ見直す（ADR-0131 decision #6, REQ-0141-010, AG-012）。link target が意図した target 以外へ解決される場合は link 設定を停止する。
+
 ## 関連項目（See Also）
 
 - [Consumer Project Setup Guide](../guides/consumer-project-setup.md)（Consumer 向け導入手順）
