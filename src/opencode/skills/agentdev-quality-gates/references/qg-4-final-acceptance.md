@@ -8,7 +8,7 @@ case-close で PR マージ前に、最終受け入れ状態を確認する Gate
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| case-close | Step 2（前提確認、達成判定）、Step 3（docs 検証）、Step 3-1（close 時局所確認） | PR/ CI 結果/ Issue 完了条件チェックボックス/ docs |
+| case-close | Step 2（前提確認、達成判定、test strategy 処理完了確認）、Step 3（docs 検証）、Step 3-1（close 時局所確認） | PR/ CI 結果/ Issue 完了条件チェックボックス/ Issue テスト戦略項目/ PR Findings/ docs |
 
 ## 検査観点
 
@@ -71,10 +71,20 @@ PR の CI が全て通過しているか。
 
 > **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない。
 
+### 6. test strategy 処理完了
+
+Issue 本文のテスト戦略セクションに含まれる全 test strategy 項目（verification / pass_criteria / on_failure の3要素構造）が処理済みであることを確認する。各項目は「合格」（pass_criteria を満たす）または PR 本文の `## Findings / Capture候補` セクションへの Findings 記録（record-in-findings）のいずれかに分類されていること。
+
+- **fail**: 未処理の test strategy 項目が残る。構造化エラーで停止（case-close G08）。未処理項目が残る場合は完了扱いとしない（REQ-0131-026）。
+- **pass**: 全項目が合格または Findings 記録済み。
+- **N/A**: Issue 本文にテスト戦略セクションが存在しない場合（旧形式 Issue 等）。本観点は skip する。
+
+> **前提**: test strategy 項目の検証、不合格時処置（fix-and-reverify / record-in-findings）、全項目処理までの反復は case-run の実行担当サブエージェント（Sisyphus-Junior、`/ulw-loop`）が実施する（REQ-0130-030）。QG-4 はその処理結果（PR 本文の Findings 記録を含む）を最終確認する。
+
 ## pass/ fail 基準
 
-- **pass**: 上記 1, 2 を満たし（3, 4, 5 は warn 以下）、マージ可能。
-- **fail**: 観点 1（未達チェックボックス）または観点 2（CI 失敗）。構造化エラーで停止。
+- **pass**: 上記 1, 2, 6 を満たし（3, 4, 5 は warn 以下）、マージ可能。
+- **fail**: 観点 1（未達チェックボックス）、観点 2（CI 失敗）、または観点 6（test strategy 未処理項目）。構造化エラーで停止。
 - **partial**: CI pending 等、判定に必要な証拠が未取得。証拠取得後に再判定。
 
 QG-4 は最終受け入れの二値性が強く、`pass`/ `fail` を基本とする。
