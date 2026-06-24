@@ -91,6 +91,20 @@ operation_units:
     issue_policy: single        # single / epic
     result: {}                  # req-save / spec-save / case-open が書き戻す。req-define は空を出力
 
+# test_strategy: 各合意項目（AG-*）の検証方法。各項目は3要素（verification / pass_criteria / on_failure）を必須とする
+# on_failure（不合格時の処置）を持たない検証項目は test_strategy に含めないこと（REQ-0102-075）
+# 項目識別子: TS-NNN 形式（NNNは3桁ゼロ埋め連番）
+# on_failure アクション種別: fix-and-reverify（実装を修正して再検証）/ record-in-findings（Findings に out-of-scope として記録）
+test_strategy:
+  - id: TS-001                 # TS-NNN（3桁ゼロ埋め連番）
+    target_item: AG-001        # agreed_items の id（AG-*）への参照
+    verification: |            # 検証手順
+      {検証手順の本文}
+    pass_criteria: |           # 合格基準
+      {合格基準の本文}
+    on_failure: |              # 不合格時の処置（fix-and-reverify / record-in-findings の選択理由を含む）
+      {不合格時の処置の本文}
+
 # case_open_hints: case-open 構成生成への参考情報（Issue 階層は case-open が決定する）
 case_open_hints:
   epic_needed: false            # 単一 Issue で完結する場合は false
