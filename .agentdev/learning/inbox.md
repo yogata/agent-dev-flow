@@ -136,3 +136,22 @@
 - **タグ**: `#shared-worktree` `#parallel-session` `#pull-ff-only-block` `#case-close-step9` `#non-destructive-handling`
 
 
+## 2026-06-25 Epic #1138 Wave 1 close (PR #1140)
+
+### L-014: 複数 checker で共用される関数の削除要求は対象スコープ明示が前提。包括的定義削除は他 checker 破壊
+
+- **問題事象**: Issue #1139 完了条件（AG-002/013）が「IR-044 context exemption 関数（isNegationContext, isDelegationContext, isMetaScopeRuleContext, isBehaviorPredicateContext, IR044_STABLE_CONTRACT_PATTERN）の定義・呼出が 0 件」と関数単位で包括的に削除を求めた。実装の結果、isNegationContext は checkWorkflowStatusProhibition（IR-044 とは別 checker）でも使用されており、定義削除すると同関数が壊れることが判明した。
+- **発生局面**: 実装（AG-002/013 対応時）
+- **検知方法**: 実装中の grep 確認。isNegationContext の全使用箇所を探索した結果、checkWorkflowStatusProhibition での呼び出しを発見。
+- **根本原因**: 完了条件チェックボックスの記述が関数単位の包括的削除（「定義・呼出が0件」）を要求したが、実際には一部関数が複数 checker で共用されていた。完了条件の記述が対象スコープ（「IR-044 からの context exemption 削除」）を関数名列举で代用し、共用関数の存在を見落とす構造だった。
+- **自律対応内容**: AG-002/013 の本来意図（IR-044 からの context exemption 削除）に従い、IR-044（checkReqSpecBoundaryViolation）からの呼出のみ削除し、isNegationContext の定義は checkWorkflowStatusProhibition 使用のため維持した。判断経緯を PR #1140 の `## Findings / Capture候補` セクションに明示。TS-007 は IR-044 context exemption removal の実質基準で PASS 判定。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。AG-002/013 は REQ-0145 に基づく SPEC 変更だが、本件は完了条件の表現精度に起因する実装判断であり REQ/SPEC 本文の改訂を要しない。
+- **横展開観点**: 関数削除を要求する完了条件を持つ全 Issue。特に複数 checker 共用関数、cross-cutting helper、utility 関数の削除を求める完了条件で同様の共用見落としが発生し得る。
+- **再発条件**: 完了条件が「関数 X の定義・呼出が 0 件」と包括的削除を要求し、かつ関数 X が他 checker でも使用されている場合。実装者が他使用箇所を確認せず 機械的に削除すると破壊的変更になる。
+- **予防策候補**: (1) 関数削除を要求する完了条件は対象スコープ（「from checkX」）を明記し、関数名列举と完全削除を混同させない。(2) case-run 実装時に削除対象関数の全使用箇所を grep で確認する手順をテスト戦略（TS）に標準組み込み。(3) AG-/OU- 等 action item で共用関数削除を指示する場合、事前に `grep -rn "funcName" scripts/` の結果を議論に含める。
+- **想定反映先**: agentdev-workflow-templates（Issue 完了条件の書き方ガイド: 関数削除要求のスコープ明示）、case-run.md（テスト戦略への全使用箇所 grep 確認の標準化）
+- **関連**: PR #1140 (#1139)、Epic #1138、AG-002/013、check_integrity.ts checkReqSpecBoundaryViolation, checkWorkflowStatusProhibition
+- **タグ**: `#function-deletion` `#shared-helper` `#completion-criteria-scope` `#ag-action-item` `#grep-all-usages`
+
+
