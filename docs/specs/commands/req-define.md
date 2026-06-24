@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-24
+updated: 2026-06-25
 ---
 
 # req-define SPEC
@@ -112,6 +112,17 @@ test_strategy:
 |------|------|---------|
 | fix-and-reverify | 実装を修正して再検証する | 修正可能な実装不良の場合 |
 | record-in-findings | Findings に out-of-scope として記録する | スコープ外または修正困難な事象の場合 |
+
+## draft-data artifact_actions フィールド形式
+
+artifact_actions の各 entry が出力する `target_area` と `content` の扱いは operation 別に以下を規定する（REQ-0102-078, REQ-0102-079）。
+
+| operation | target_area | content |
+|-----------|-------------|---------|
+| create / spec-create | 任意（省略時は spec-save が既存セクション構造から追加位置を判断） | 新規セクション本文 |
+| update / spec-update | 必須（対象セクション見出し、Markdown 見出し行形式。例: `### IR-044`） | 変更後セクション全文（対象セクションの見出し行から次の同レベル見出しの直前までの全内容） |
+
+req-define 側は出力形式のみを規定する。`target_area` の形式（Markdown 見出し行）、見出し階層の解釈規則、複数マッチ・未検出時の挙動は [spec-save.md](spec-save.md) 側に配置する。
 
 ## 参照する横断 SPEC
 

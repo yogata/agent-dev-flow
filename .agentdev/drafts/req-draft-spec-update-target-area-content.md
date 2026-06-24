@@ -169,8 +169,22 @@ operation_units:
     recommended_order: 2
     issue_policy: single
     result:
-      status: pending
-      note: "spec-save 責務 (REQ-0102-067)。ACT-SPEC-001 は req-save 処理対象外"
+      status: saved
+      operation_mode: UPDATE
+      saved_spec_docs:
+        - docs/specs/commands/req-define.md
+      artifact_action_mapping:
+        ACT-SPEC-001: docs/specs/commands/req-define.md
+      source_items_mapping:
+        AG-001: REQ-0102-078 (target_area 必須化)
+        AG-002: REQ-0102-079 (content 格上げ)
+      target_area_resolution: "not_found → append fallback"
+      target_area_warn: "target_area '## artifact_actions' は既存見出しに完全一致せず。新規セクション '## draft-data artifact_actions フィールド形式' を追記（test_strategy スキーマセクション直後）"
+      operation_applied: append
+      section_added: "## draft-data artifact_actions フィールド形式"
+      frontmatter_updated: "updated: 2026-06-25"
+      status_unchanged: true
+      case_open_consumable: true
   - ou_id: OU-004
     target_spec: docs/specs/commands/spec-save.md
     operation: spec-update
@@ -179,8 +193,24 @@ operation_units:
     recommended_order: 2
     issue_policy: single
     result:
-      status: pending
-      note: "spec-save 責務 (REQ-0102-067)。ACT-SPEC-002 は req-save 処理対象外"
+      status: saved
+      operation_mode: UPDATE
+      saved_spec_docs:
+        - docs/specs/commands/spec-save.md
+      artifact_action_mapping:
+        ACT-SPEC-002: docs/specs/commands/spec-save.md
+      source_items_mapping:
+        AG-003: REQ-0136-027 (target_area 置換ロジック)
+        AG-004: REQ-0136-028 (後方互換・追記維持)
+      target_area_resolution: "not_found → append fallback"
+      target_area_warn: "target_area '## SPEC ファイル操作' は既存見出しに完全一致せず（Step 5 説明は ## 現在の動作 配下）。新規セクション '## target_area ベースのセクション置換ロジック' を追記（## 現在の動作 直後）"
+      operation_applied: append
+      step_5_update_description_updated: true
+      step_5_change: "update bullet を「追記」から「target_area 指定時は置換、未指定時は追記」に更新"
+      section_added: "## target_area ベースのセクション置換ロジック"
+      frontmatter_updated: "updated: 2026-06-25"
+      status_unchanged: true
+      case_open_consumable: true
 
 test_strategy:
   - id: TS-001
@@ -234,6 +264,15 @@ test_strategy:
 
 case_open_hints:
   epic_needed: false
+
+spec_actions_consumed: true
+spec_actions_consumed_at: 2026-06-25T04:10:00+09:00
+spec_actions_result_summary:
+  total_spec_actions: 2
+  saved: 2
+  skipped: 0
+  operation_mode: append_fallback
+  note: "両 action の target_area が既存見出しに完全一致せず。bootstrapping draft のため append fallback で処理（task MUST DO の『追記（または該当セクションを置換）』に準拠）"
 ```
 
 # summary
