@@ -1,11 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync } from "fs";
 import { join } from "path";
-import {
-  isDelegationContext,
-  isMetaScopeRuleContext,
-  isBehaviorPredicateContext,
-} from "./check_integrity.ts";
 
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_integrity.ts");
@@ -129,15 +124,47 @@ function buildValidFixture(root: string): void {
       "| Command | Description |",
       "|---------|-------------|",
       "| `/agentdev/test-cmd` | Test command |",
+      "| `/agentdev/case-run` | case-run |",
+      "| `/agentdev/case-close` | case-close |",
+      "| `/agentdev/req-save` | req-save |",
+      "| `/agentdev/case-open` | case-open |",
+      "| `/agentdev/case-auto` | case-auto |",
       "",
     ].join("\n"),
     "utf-8",
   );
   writeFileSync(join(specsDir, "patterns.md"), "# Patterns\n", "utf-8");
 
+  const docsDir = join(root, "docs");
+  writeFileSync(
+    join(docsDir, "DOC-MAP.md"),
+    [
+      "# DOC-MAP",
+      "",
+      "| 分類 | パス |",
+      "|------|------|",
+      "| REQ | docs/requirements/REQ-0001.md |",
+      "| SPEC | docs/specs/system.md |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
   const skillDir = join(root, ".opencode", "skills", "agentdev-test-skill");
   mkdirp(skillDir);
-  writeFileSync(join(skillDir, "SKILL.md"), "# agentdev-test-skill\n", "utf-8");
+  writeFileSync(join(skillDir, "SKILL.md"), "---\nname: agentdev-test-skill\n---\n# agentdev-test-skill\n\n## USE FOR\n\n- test\n", "utf-8");
+
+  const workflowOrchSkillDir = join(root, ".opencode", "skills", "agentdev-workflow-orchestration");
+  mkdirp(workflowOrchSkillDir);
+  writeFileSync(join(workflowOrchSkillDir, "SKILL.md"), "---\nname: agentdev-workflow-orchestration\n---\n# agentdev-workflow-orchestration\n\n## USE FOR\n\n- orchestration\n", "utf-8");
+
+  const workflowTplSkillDir = join(root, ".opencode", "skills", "agentdev-workflow-templates");
+  mkdirp(workflowTplSkillDir);
+  writeFileSync(join(workflowTplSkillDir, "SKILL.md"), "---\nname: agentdev-workflow-templates\n---\n# agentdev-workflow-templates\n\n## USE FOR\n\n- templates\n", "utf-8");
+
+  // Source-side skill dirs (source-projection-sync)
+  mkdirp(join(root, "src", "opencode", "skills", "agentdev-test-skill"));
+  mkdirp(join(root, "src", "opencode", "skills", "agentdev-workflow-templates"));
 
   const integritySkillDir = join(
     root,
@@ -160,6 +187,41 @@ function buildValidFixture(root: string): void {
       "| 検査カテゴリ | 対象 |",
       "|---|---|",
       "| REQ frontmatter ↔ ファイル名 | REQ files |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  const vocabRegistryDir = join(integritySkillDir, "references");
+  mkdirp(vocabRegistryDir);
+  writeFileSync(
+    join(vocabRegistryDir, "vocabulary-registry.md"),
+    [
+      "# Vocabulary Registry",
+      "",
+      "## コマンド名",
+      "",
+      "| 旧語彙 | 新語彙 | 備考 |",
+      "|--------|--------|------|",
+      "| issue-req | req-save | migration |",
+      "",
+      "## コマンドパス",
+      "",
+      "| 旧語彙 | 新語彙 | 備考 |",
+      "|--------|--------|------|",
+      "| commands/issue/ | commands/agentdev/ | migration |",
+      "",
+      "## スキル名",
+      "",
+      "| 旧語彙 | 新語彙 | 備考 |",
+      "|--------|--------|------|",
+      "| issue-lifecycle | agentdev-workflow-lifecycle | migration |",
+      "",
+      "## 廃止済み概念",
+      "",
+      "| 旧語彙 | 新語彙 | 備考 |",
+      "|--------|--------|------|",
+      "| tips プール | learning プール | migration |",
       "",
     ].join("\n"),
     "utf-8",
@@ -190,6 +252,11 @@ function buildValidFixture(root: string): void {
       "| Command | Description | Agent |",
       "|---------|-------------|-------|",
       "| `agentdev/test-cmd` | Test command | test-agent |",
+      "| `agentdev/case-run` | case-run | sisyphus |",
+      "| `agentdev/case-close` | case-close | sisyphus |",
+      "| `agentdev/req-save` | req-save | prometheus |",
+      "| `agentdev/case-open` | case-open | prometheus |",
+      "| `agentdev/case-auto` | case-auto | sisyphus |",
       "",
     ].join("\n"),
     "utf-8",
@@ -848,35 +915,10 @@ describe("Capture boundary checks", () => {
   });
 });
 
-describe("Doc language quality checks (IR-045)", () => {
-  it("valid fixture: doc-language-quality check passes (no undocumented terms)", () => {
-    const r = runScript(VALID_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const check = parsed.results.find(
-      (res: { check: string }) => res.check === "doc-language-quality",
-    );
-    expect(check).toBeDefined();
-  });
-
-  it("invalid fixture: doc-language-quality detects undocumented read-only term", () => {
-    const r = runScript(INVALID_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const warnings = parsed.results.filter(
-      (res: { check: string; level: string; message: string }) =>
-        res.check === "doc-language-quality" &&
-        res.level === "warning" &&
-        res.message.includes("read-only"),
-    );
-    expect(warnings.length).toBeGreaterThanOrEqual(1);
-  });
-});
-
 // ─── IR-044: REQ/SPEC boundary violation (REQ-0108-259) ──────────────────────
 // Dedicated fixture with REQ requirement table rows covering:
 //   - true positive (SPEC detail, no exemption context)
-//   - false positive exempted by isDelegationContext
-//   - false positive exempted by isNegationContext
-//   - false positive exempted by stable contract (REQ-0101-069)
+//   - pure pattern-match detection (no meaning-based context exemption)
 
 const IR044_ROOT = join(TEMP_ROOT, "ir044");
 
@@ -1047,83 +1089,6 @@ function buildIr044Fixture(root: string): void {
   writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
 }
 
-describe("IR-044 isDelegationContext predicate (REQ-0108-259)", () => {
-  it("returns true for delegation phrases", () => {
-    expect(isDelegationContext("委譲先 SPEC に配置")).toBe(true);
-    expect(isDelegationContext("集約先に記載")).toBe(true);
-    expect(isDelegationContext("切り出し先を参照")).toBe(true);
-    expect(isDelegationContext("routing 経路分類名")).toBe(true);
-    expect(isDelegationContext("delegate to SPEC")).toBe(true);
-  });
-
-  it("returns false for normal lines without delegation keywords", () => {
-    expect(isDelegationContext("要件行は外部契約を記述する")).toBe(false);
-    expect(isDelegationContext("値一覧: A, B, C")).toBe(false);
-    expect(isDelegationContext("実装は Step 3 で実行")).toBe(false);
-  });
-});
-
-describe("IR-044 isMetaScopeRuleContext predicate (REQ-0145-012)", () => {
-  it("returns true for META scope rule lines declaring REQ/SPEC boundary", () => {
-    expect(
-      isMetaScopeRuleContext(
-        "REQ は外部契約を記述する文章主体であり、SPEC は スキーマ、コマンド体系、enum、format を記述する文章主体であること",
-      ),
-    ).toBe(true);
-    expect(
-      isMetaScopeRuleContext(
-        "enum 値、フォーマット（format）等は SPEC 領域に列挙する責務範囲規定行である",
-      ),
-    ).toBe(true);
-    expect(
-      isMetaScopeRuleContext("REQ/SPEC 境界において enum と schema を SPEC 対象とする"),
-    ).toBe(true);
-  });
-
-  it("returns false for plain SPEC detail enumeration without boundary declaration", () => {
-    expect(isMetaScopeRuleContext("値一覧: A, B, C, D, E, F, G")).toBe(false);
-    expect(
-      isMetaScopeRuleContext(
-        "scripts/tests/check_integrity.test.ts の fixture は最新 check_integrity.ts ルールに追従する",
-      ),
-    ).toBe(false);
-    expect(
-      isMetaScopeRuleContext("case-auto は実行開始時刻および完了報告生成時刻を記録すること"),
-    ).toBe(false);
-  });
-});
-
-describe("IR-044 isBehaviorPredicateContext predicate (REQ-0145-012)", () => {
-  it("returns true for existence predicate + drift-target type modifier", () => {
-    expect(
-      isBehaviorPredicateContext(
-        "copyScripts 本採用環境下で fixture drift を自動検出する仕組みが存在する",
-      ),
-    ).toBe(true);
-    expect(
-      isBehaviorPredicateContext("variant drift を検出する仕組みが存在する"),
-    ).toBe(true);
-  });
-
-  it("returns false when modifier lacks existence predicate", () => {
-    expect(
-      isBehaviorPredicateContext(
-        "scripts/tests/check_integrity.test.ts の fixture は最新 check_integrity.ts ルールに追従する",
-      ),
-    ).toBe(false);
-    expect(
-      isBehaviorPredicateContext("case-auto は実行開始時刻および完了報告生成時刻を記録すること"),
-    ).toBe(false);
-  });
-
-  it("returns false when existence predicate lacks drift-target modifier", () => {
-    expect(isBehaviorPredicateContext("監査ログの保存仕組みが存在する")).toBe(false);
-    expect(
-      isBehaviorPredicateContext("要件ドキュメントの改版履歴が存在する"),
-    ).toBe(false);
-  });
-});
-
 describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
   beforeAll(() => {
     mkdirp(IR044_ROOT);
@@ -1153,94 +1118,5 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
         (res.evidence ?? "").includes("REQ-9005"),
     );
     expect(violations.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("exempts delegation context: fixture keyword with 委譲先", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const violations = parsed.results.filter(
-      (res: { check: string; level: string; evidence?: string }) =>
-        res.check === "req-spec-boundary-violation" &&
-        res.level === "warning" &&
-        (res.evidence ?? "").includes("REQ-9002"),
-    );
-    expect(violations.length).toBe(0);
-  });
-
-  it("exempts negation context: fixture keyword with しないこと", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const violations = parsed.results.filter(
-      (res: { check: string; level: string; evidence?: string }) =>
-        res.check === "req-spec-boundary-violation" &&
-        res.level === "warning" &&
-        (res.evidence ?? "").includes("REQ-9003"),
-    );
-    expect(violations.length).toBe(0);
-  });
-
-  it("exempts stable contract: 公開 command 名 (REQ-0101-069)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const violations = parsed.results.filter(
-      (res: { check: string; level: string; evidence?: string }) =>
-        res.check === "req-spec-boundary-violation" &&
-        res.level === "warning" &&
-        (res.evidence ?? "").includes("REQ-9004"),
-    );
-    expect(violations.length).toBe(0);
-  });
-
-  it("exempts meta scope rule context: enum/format as SPEC territory (REQ-0145-012)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const violations = parsed.results.filter(
-      (res: { check: string; level: string; evidence?: string }) =>
-        res.check === "req-spec-boundary-violation" &&
-        res.level === "warning" &&
-        (res.evidence ?? "").includes("REQ-9006"),
-    );
-    expect(violations.length).toBe(0);
-  });
-
-  it("exempts behavior predicate context: fixture drift existence (REQ-0145-012)", () => {
-    const r = runScript(IR044_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const violations = parsed.results.filter(
-      (res: { check: string; level: string; evidence?: string }) =>
-        res.check === "req-spec-boundary-violation" &&
-        res.level === "warning" &&
-        (res.evidence ?? "").includes("REQ-9007"),
-    );
-    expect(violations.length).toBe(0);
-  });
-});
-
-// REQ-0108-259, REQ-0108-055: regression lock for protected true positives.
-// These REQ lines are real examples of SPEC detail residue in REQ that the new
-// exemption predicates (isMetaScopeRuleContext, isBehaviorPredicateContext)
-// MUST NOT exempt. If a future predicate change accidentally catches one of
-// these, the test fails before the false-negative reaches production.
-describe("IR-044 protected true positives (REQ-0145-012 regression)", () => {
-  // Actual requirement text from docs/requirements/REQ-0114.md and REQ-0144.md.
-  const REQ_0114_082 =
-    "case-auto は実行開始時刻および完了報告生成時刻を記録すること";
-  const REQ_0144_008 =
-    "scripts/tests/check_integrity.test.ts の fixture は最新 check_integrity.ts ルールに追従する";
-
-  it("REQ-0114-082 is NOT exempted by isMetaScopeRuleContext", () => {
-    expect(isMetaScopeRuleContext(REQ_0114_082)).toBe(false);
-  });
-
-  it("REQ-0114-082 is NOT exempted by isBehaviorPredicateContext", () => {
-    expect(isBehaviorPredicateContext(REQ_0114_082)).toBe(false);
-  });
-
-  it("REQ-0144-008 is NOT exempted by isMetaScopeRuleContext", () => {
-    expect(isMetaScopeRuleContext(REQ_0144_008)).toBe(false);
-  });
-
-  it("REQ-0144-008 is NOT exempted by isBehaviorPredicateContext", () => {
-    expect(isBehaviorPredicateContext(REQ_0144_008)).toBe(false);
   });
 });
