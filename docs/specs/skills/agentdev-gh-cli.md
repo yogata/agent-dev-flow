@@ -1,6 +1,6 @@
 ---
 title: agentdev-gh-cli SPEC
-status: draft
+status: accepted
 created: 2026-06-21
 updated: 2026-06-24
 ---
