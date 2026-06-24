@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-23
+updated: 2026-06-24
 ---
 
 # case-auto SPEC
@@ -53,7 +53,7 @@ updated: 2026-06-23
   - クリーンアップ検証ゲート（REQ-0114-060〜063, REQ-0137-007）（ドラフトファイル、RU ファイルの残存がないことを検証）。Standard / Epic Issue flow 双方で実施
 - Step 5: 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
 - Step 6: 複数REQ対応（req-save task() の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）。case-auto 自体に Issue 階層決定ロジックを持たない
-- Step 7: 停止条件の検出（停止時タイミング情報の追記（開始時刻、停止時刻、経過時間、REQ-0114-083））。10項目の停止条件いずれかを検出時、実行停止、停止理由、現在地点、再開可能な次コマンドを報告
+- Step 7: 停止条件の検出（停止時タイミング情報の追記（開始時刻、停止時刻、経過時間、REQ-0114-083））。10項目の停止条件いずれかを検出時、実行停止、停止理由、現在地点、再開可能な次コマンドを報告。停止条件「merge 競合」（REQ-0114-016(8)）は「アクセス可能な文脈を総動員しても解消不能なコンフリクト」に段階化済み（REQ-0151-006、後述「コンフリクト解消モデル」参照）。機械的競合（rebase で自動解決可能）は停止条件に含まない
 - Step 8: 完了報告（最終工程（case-close task()）の完了報告をそのまま出力）。タイミング情報追記（開始時刻、終了時刻、所要時間、REQ-0114-083）
 - Step 8-1: Standard flow 逐次OU処理ループ（case-close task() 完了後、未処理 OU が残存する場合は次 OU の処理を自動開始（REQ-0114-065〜067））
 
@@ -138,6 +138,28 @@ OU 逐次処理（REQ-0114-053）は、必須依存で結合した execution_uni
 各 execution_unit の結果（completed(pr) / blocked / failed）を case-auto が集約し最終判定に反映する（REQ-0114-092）。
 親コンテキスト非累積原則に従い、実装詳細は保持せず Issue / PR 状態から再読込する。
 
+### コンフリクト解消モデル（3レベルエスカレーション）（REQ-0151, ADR-0132）
+
+PR マージコンフリクト発生時は、以下3レベルのエスカレーションで解消を図る。各レベルを試行しても解消できない場合のみ次のレベルへ進む。機械的競合（rebase で自動解決可能）は停止条件に含まず、Level 1 で case-close が解消する。
+
+| Level | 実行主体 | 解消手法 | 失敗時 |
+|---|---|---|---|
+| Level 1 | case-close | `git rebase` による機械的解消。自動解決時は再マージ（REQ-0151-001） | case-auto へエスカレーション（REQ-0151-002） |
+| Level 2 | case-auto | 両PRのdiffを読み取りコンフリクト箇所を特定し、コンフリクト文脈を付けて case-run へ再委譲。最大2回（元の並列実行を含む計3回の case-run 実行）（REQ-0151-003/004） | Level 3 へ |
+| Level 3 | case-auto | マージ順序変更、blocked 単位の隔離（REQ-0148-015 拡張） | 停止 |
+
+**停止条件の段階化**: case-auto はコンフリクト解消に対して常に全力で解消を図る。発生元（同一 case-auto 内、別 case-auto 跨ぎ）に関わらずアクセス可能な文脈を総動員する（REQ-0151-005）。停止条件は Level 2 の再委譲を上限回数（2回）試行しても解消しない場合とする（REQ-0151-006）。Level 1 で解消できる機械的競合は case-auto の停止条件から除外する。
+
+Level 1 の rebase 実行、エスカレーション判定は case-close の責務（`docs/specs/commands/case-close.md` Step 4-2 参照）。case-auto は Level 2/3 のオーケストレーション級判断を担う。
+
+## 工程別タイムスタンプ計測（L1: case-auto）（REQ-0151-008）
+
+case-auto は各工程（req-save / spec-save / case-open / case-run / case-close）の task() 起動前後にタイムスタンプを記録し、工程別の壁時計時間を完了報告に含める。現行の開始・終了時刻記録（REQ-0114-082/083）を工程別内訳へ拡張する（REQ-0114-094）。
+
+- 計測単位: task() 起動前後の壁時計時刻（JST、REQ-0114-082 の時刻形式に準拠）
+- 記録先: case-auto 完了報告への工程別内訳追記。永続化は必要になった段階で別途検討
+- 対象外: ulw-loop 内部メトリクス（L3）は oh-my-openagent 依存が強すぎるため対象外（REQ-0151-010）。case-run 内の Sisyphus-Junior 計測（L2）は case-run result に含まれる（REQ-0151-009、REQ-0130-028）
+
 ## See Also
 
 - [req-save.md](req-save.md), [spec-save.md](spec-save.md), [case-open.md](case-open.md), [case-run.md](case-run.md), [case-close.md](case-close.md)（構成工程）
@@ -149,7 +171,9 @@ OU 逐次処理（REQ-0114-053）は、必須依存で結合した execution_uni
 - REQ-0137（並列実行安全 git 操作規律）
 - REQ-0138（構造化 req_draft 契約）
 - REQ-0148（RU群バッチ処理と複数 execution_unit 並列実行）
+- REQ-0151（コンフリクト解消モデルと実行時間観測）
 - ADR-0112（サブエージェント委譲）
 - ADR-0127（case-auto 工程委譲）
 - ADR-0128（case-run / case-close Epic Wave モデル）
 - ADR-0129（複数 execution_unit 並列実行モデル）
+- ADR-0132（コンフリクト解消モデル（3レベルエスカレーションと責務割当））

@@ -4,6 +4,7 @@ topic_slug: case-auto-conflict-resolution-and-timing
 status: saved
 created_at: 2026-06-24T12:38:02+09:00
 saved_at: 2026-06-24
+spec_saved_at: 2026-06-24
 ---
 
 # draft-data
@@ -355,10 +356,10 @@ operation_units:
         ACT-REQ-003: { op: append, target: REQ-0131, added_rows: ["REQ-0131-024", "REQ-0131-025"], notes: ["case-close 責務境界再定義"] }
         ACT-REQ-004: { op: append, target: REQ-0130, added_rows: ["REQ-0130-028"] }
         ACT-REQ-005: { op: append, target: REQ-0148, scope_change: "対象外「case-close（ほぼ変更不要）」撤回", notes: ["撤回ノート"] }
-      spec_actions_skipped:
-        - ACT-SPEC-001
-        - ACT-SPEC-002
-        - ACT-SPEC-003
+      spec_actions_consumed:
+        ACT-SPEC-001: { op: update, target: docs/specs/commands/case-auto.md, saved: docs/specs/commands/case-auto.md, notes: ["コンフリクト解消モデルセクション追加", "停止条件改訂", "工程別タイムスタンプ計測(L1)セクション追加"] }
+        ACT-SPEC-002: { op: update, target: docs/specs/commands/case-close.md, saved: docs/specs/commands/case-close.md, notes: ["Step 4-2 rebase パス追加", "責務境界再定義"] }
+        ACT-SPEC-003: { op: update, target: docs/specs/workflows/epic-wave-model.md, saved: docs/specs/workflows/epic-wave-model.md, notes: ["3レベルコンフリクト解消モデル参照追加"] }
       qg1_result: pass
       case_open_input:
         primary_req: REQ-0151
