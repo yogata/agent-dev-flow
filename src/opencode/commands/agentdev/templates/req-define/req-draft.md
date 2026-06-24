@@ -51,7 +51,7 @@ artifact_actions:
     artifact: req               # req / adr / spec
     operation: create           # REQ/ADR: create / append / update、SPEC: create / update
     target: new:{topic-slug}    # file path または new:{slug}
-    target_area: # optional: section / area 指定
+    target_area: # artifact: spec の場合、operation: update/spec-update では必須（対象セクション見出し）。operation: create/spec-create および req/adr では任意
     source_items: [AG-001, AG-002] # 対応する agreed_item ID の list
     content: |                  # 保存対象の full text
       {保存対象の本文}
@@ -66,7 +66,7 @@ artifact_actions:
     artifact: spec
     operation: create           # SPEC: create / update
     target: new:{topic-slug}
-    target_area:
+    target_area: # operation: create/spec-create では任意、operation: update/spec-update では必須（対象セクション見出し）
     source_items: [AG-004]
     content: |
       {保存対象の本文}
