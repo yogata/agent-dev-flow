@@ -61,9 +61,9 @@ PR 本文の capture 関連セクションは以下を分離する:
 | case-close | PR 本文から回収し inbox へ保存 | PR 本文から回収し inbox.md へ保存 | Epic 横断回収含む |
 | case-auto | 各工程の責務を継承 | 各工程の責務を継承 | - |
 | case-update | 非関与 | 非関与 | REQ 更新、レビュー NG コメント、Issue 本文更新のみ |
-| intake-* | 各コマンド責務（各 command SPEC 参照） | - | — |
+| intake-* | 各コマンド責務（各 command SPEC 参照） | - | - |
 | learning-promote | - | 各コマンド責務（command SPEC 参照） | - |
-| inspect-* | 各コマンド責務（各 command SPEC 参照） | - | — |
+| inspect-* | 各コマンド責務（各 command SPEC 参照） | - | - |
 | backlog-review | 非関与 | 非関与 | RU 生成のみ |
 
 詳細は各 command SPEC を参照。
