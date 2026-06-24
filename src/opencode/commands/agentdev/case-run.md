@@ -102,7 +102,9 @@ adapter protocol は `agentdev-case-run-execution-adapter` skill 参照。
 
 **委譲プロンプト**: `/ulw-loop Implement Issue #N: <Issue本文>`。Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情報）が含まれ得る。Sisyphus-Junior はこれを参考情報として扱い、束縛されない。
 
-**Sisyphus-Junior の責務**: 委譲 prompt 内で指定された `/ulw-loop` command による目標分解（Issue を success criteria に分解）、各 criterion に observable evidence を要求、品質ゲート（code review + QA review + gate review）の実行。ulw-loop の監査トレイル（`.omo/ulw-loop/ledger.jsonl`）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しは120秒 timeout で保護される。
+**test strategy 項目の test-fix ループ（REQ-0130-029）**: Issue 本文のテスト戦略セクションに test strategy 項目（3要素構造: verification / pass_criteria / on_failure）が含まれる場合、委譲契約は各項目の検証、不合格時の処置（実装修正して再検証、または Findings 記録）、全項目処理までの反復を Sisyphus-Junior に要求する。Sisyphus-Junior の具体的責務は `agentdev-case-run-execution-adapter` スキル（REQ-0130-030）参照。
+
+**Sisyphus-Junior の責務**: 委譲 prompt 内で指定された `/ulw-loop` command による目標分解（Issue を success criteria に分解）、各 criterion に observable evidence を要求、品質ゲート（code review + QA review + gate review）の実行、test strategy 項目の test-fix ループ（各項目ごとの検証、不合格時処置、全項目処理までの反復、REQ-0130-030）。ulw-loop の監査トレイル（`.omo/ulw-loop/ledger.jsonl`）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しは120秒 timeout で保護される。
 
 **task() 起動失敗、異常終了時の扱い**: Sisyphus-Junior の task() 起動失敗、異常終了時は即 `failed` とせず**実装完了、検証未完了**として扱う。詳細な事後処理（worktree の `git status` で未コミット変更確認、残留箇所の grep と手動修正）は `agentdev-case-run-execution-adapter` スキル参照。
 
