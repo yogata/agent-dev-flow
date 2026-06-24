@@ -2,13 +2,38 @@
 title: "配布物整合性検査ルール"
 status: draft
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-06-24
 ---
 
 # 配布物整合性検査ルール
 
 REQ-0142-006 / REQ-0142-007 の検査観点の詳細を配置する。
 配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）から内部管理 ID を除去した後の完了条件として、構文健全性、文意保持、責務整合を検査するための検出パターンと NG 分類を定義する。
+
+## 検査バックエンド責務分担（check_integrity.ts vs inspect-* skills）
+
+配布物整合性検査（本 SPEC が定義する構文健全性、文意保持、責務整合の検出パターン）の実行バックエンドを以下の通り確定する。`docs-check` バックエンド（`check_integrity.ts`）と inspect-* skills の責務分担を明確化し、検出漏れと NG 汚染を防ぐ（REQ-0145-004）。
+
+### 責務分担（決定論的 vs 意味的診断）
+
+[integrity-contracts.md](integrity-contracts.md) 「3層検出構造の責務分担」に基づき、配布物整合性検査は**意味的診断層**に位置づける。
+
+| 層 | 担当 | 配布物整合性検査における役割 |
+|-----|------|------------------------------|
+| 機械的検出 | `docs-check` + `check_integrity.ts`（IR ルール） | 配布物に対する**決定論的**検出のみ（frontmatter 許可フィールド、`### Step N` 連番、ガードレール番号形式、リンク先存在等、IR ルールカタログ既定の検出） |
+| 意味的診断 | inspect-* skills（inspect-docs / inspect-skills） | **配布物整合性検査の本体**。本 SPEC が定義する構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command↔SPEC、command↔skill 責務説明照合、case-* 責務境界一致）を診断する |
+| 査読時観点 | doc-writing skill | 文書品質の査読 |
+
+### 境界の明文化
+
+- **`check_integrity.ts`（docs-check バックエンド）の扱い**: 配布物に対して REQ/SPEC/reference 整合性（frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存等、IR ルールカタログ既定の決定論的検出）を実施する。本 SPEC が定義する配布物整合性検査（構文健全性の重複検出、文意保持の意味解析、責務整合の照合）は `check_integrity.ts` に追加**しない**。
+- **inspect-* skills の扱い**: 配布物整合性検査（本 SPEC）は inspect-docs（Step 11: 配布物整合性検査）、inspect-skills（配布物 frontmatter 構文健全性、見出し構文健全性、Markdown 構文破損、壊れた括弧/参照残骸、command-skill 責務説明矛盾）のみで運用する。
+- **`skill-category-gap` ルールとの整合**: 配布物整合性検査を `check_integrity.ts` に新カテゴリとして追加しないことにより、`check_integrity.ts` の `categoryToCheckPattern` map と SKILL.md カテゴリ定義の不一致（skill-category-gap、REQ-0108-161/171、REQ-0144-005）による NG 汚染を生じない。新カテゴリ導入に伴うターゲットング隠退化を防ぐため、配布物整合性検査は inspect-* skills（意味的診断層）に集約する。
+
+### 根拠
+
+- 配布物整合性検査の主要観点（重複検出、文意保持の意味解析、責務説明照合）は意味判断を含み、決定論的機械検出では偽陽性リスクが高い。`integrity-contracts.md`「3層検出構造の責務分担」は「機械的検出で偽陽性となる意味的判断は inspect-skills へ振り分ける」を定めるため、配布物整合性検査は意味的診断層（inspect-* skills）に集約する。
+- `check_integrity.ts` は決定論的検出（IR ルール）に特化し、実行速度、再現性、CI 適性を維持する。意味的診断を混入しないことで NG ノイズを低減する。
 
 ## 構文健全性検査
 
