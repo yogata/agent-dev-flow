@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: test-strategy-cycle
 status: saved
+spec_consumed: true
 created_at: 2026-06-24T00:00:00+09:00
 source_rus: []
 ---

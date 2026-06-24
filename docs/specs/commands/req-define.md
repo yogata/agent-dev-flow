@@ -49,25 +49,69 @@ updated: 2026-06-24
 - Step 4-4: ADR要否確認ゲート（`agentdev-architecture-advisory` oracle 連携）
   - oracle 入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-0102-073）。ラベル構造は soft-contract（ADR-0124）とし、分類権限は親が保持する
 - Step 4-5: 実行主体分類表（REQ-0146-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
-- Step 5: ADR判断（`agentdev-adr-guidelines`）
-  - Step 5-0: 既存ADR重複確認
-  - Step 5-1: ADR禁止ゲート
-  - Step 5-2: ADR判断根拠記録
-  - Step 5-3: 作業手段ADR拒否ゲート
-  - Step 5-4: ADR 番号指定形式（`new:{topic-slug}` 形式）
-- Step 6: 要件doc生成（テンプレート: `templates/req-define/req-draft.md`）
-  - Step 6-0: 定義完全性ゲート（QG-1）
-  - Step 6-1: operation_units 生成
-  - Step 6-2: artifact_actions 生成
-- Step 7: work_type 判定（bugfix/feature/maintenance/docs_chore）
-- Step 8: Scale判断（featureのみ、`agentdev-workflow-lifecycle`）
-  - Step 8-1: 実装スコープシグナル確認
-- Step 9: ドラフト保存（`.agentdev/drafts/req-draft-{topic-slug}.md`）
-  - Step 9-1: 実装詳細の分離
-  - Step 9-2: auto_gate完了ゲート（auto_gate.auto_ready:false または未解決 item 残存時、stop_reasons を提示し解消方策を壁打ちで合意）。解消時は auto_ready:true に更新。ユーザーが明示的に false 選択時は conflict_resolutions に記録し継続。未解決のままの場合は壁打ちへ差し戻し。
-- Step 10: 要件doc確認（ユーザー提示のみ、承認は求めない）
-  - Step 10-1〜10-6: 複数RU受付、統合/分離判定、出力生成、Epic規模検出、Wave候補記録、OU 構造検証
-- Step 11: 完了報告（work_type 別テンプレート選択）
+- Step 5: Test strategy 定義（要件展開内）
+  - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
+  - on_failure（不合格時の処置）を持たない検証項目は test strategy に含めない
+  - 項目識別子: TS-NNN 形式（NNNは3桁ゼロ埋め連番）
+  - 各項目属性: id（TS-NNN）、target_item（AG-* への参照）、verification、pass_criteria、on_failure
+  - on_failure アクション種別: fix-and-reverify（実装を修正して再検証）/ record-in-findings（Findings に out-of-scope として記録）の2値
+- Step 6: ADR判断（`agentdev-adr-guidelines`）
+  - Step 6-0: 既存ADR重複確認
+  - Step 6-1: ADR禁止ゲート
+  - Step 6-2: ADR判断根拠記録
+  - Step 6-3: 作業手段ADR拒否ゲート
+  - Step 6-4: ADR 番号指定形式（`new:{topic-slug}` 形式）
+- Step 7: 要件doc生成（テンプレート: `templates/req-define/req-draft.md`）
+  - Step 7-0: 定義完全性ゲート（QG-1）
+  - Step 7-1: operation_units 生成
+  - Step 7-2: artifact_actions 生成
+  - Step 7-3: draft-data test_strategy 生成（各項目の5属性をYAML形式で格納）
+- Step 8: work_type 判定（bugfix/feature/maintenance/docs_chore）
+- Step 9: Scale判断（featureのみ、`agentdev-workflow-lifecycle`）
+  - Step 9-1: 実装スコープシグナル確認
+- Step 10: ドラフト保存（`.agentdev/drafts/req-draft-{topic-slug}.md`）
+  - Step 10-1: 実装詳細の分離
+  - Step 10-2: auto_gate完了ゲート（auto_gate.auto_ready:false または未解決 item 残存時、stop_reasons を提示し解消方策を壁打ちで合意）。解消時は auto_ready:true に更新。ユーザーが明示的に false 選択時は conflict_resolutions に記録し継続。未解決のままの場合は壁打ちへ差し戻し。
+- Step 11: 要件doc確認（ユーザー提示のみ、承認は求めない）
+  - Step 11-1〜11-6: 複数RU受付、統合/分離判定、出力生成、Epic規模検出、Wave候補記録、OU 構造検証
+- Step 12: 完了報告（work_type 別テンプレート選択）
+
+## draft-data test_strategy フィールドスキーマ
+
+要件定義において test_strategy（テスト戦略）を定義する場合のシリアライズ形式を定義する。
+
+### test_strategy 項目構造
+
+各 test strategy 項目は以下の5属性を持つ:
+
+| 属性 | 型 | 説明 | 例 |
+|------|------|------|----|
+| id | string | TS-NNN 形式（NNNは3桁ゼロ埋め連番） | `TS-001` |
+| target_item | string | AG-* への参照 | `AG-002` |
+| verification | string | 検証手順 | `check_integrity.ts を実行する` |
+| pass_criteria | string | 合格基準 | `エラー 0 件で完了すること` |
+| on_failure | string | 不合格時の処置 | `実装を修正して再検証する` |
+
+### YAML 表現形式
+
+```yaml
+test_strategy:
+  - id: TS-001
+    target_item: AG-002
+    verification: |
+      検証手順の記述
+    pass_criteria: |
+      合格基準の記述
+    on_failure: |
+      不合格時の処置の記述
+```
+
+### on_failure アクション種別
+
+| 種別 | 説明 | 選択基準 |
+|------|------|---------|
+| fix-and-reverify | 実装を修正して再検証する | 修正可能な実装不良の場合 |
+| record-in-findings | Findings に out-of-scope として記録する | スコープ外または修正困難な事象の場合 |
 
 ## 参照する横断 SPEC
 
@@ -96,10 +140,11 @@ updated: 2026-06-24
 
 ## 検証観点
 
-- QG-1（Definition Integrity Gate）: Step 6-0 で要件doc構造的完全性を検証（REQ/SPEC 分類、ADR ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成妥当性）
+- QG-1（Definition Integrity Gate）: Step 7-0 で要件doc構造的完全性を検証（REQ/SPEC 分類、ADR ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成妥当性）
+  - test_strategy 3要素完全性検査: 各 test strategy 項目が verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持すること。いずれかが欠落する項目を検出した場合、fail とする
 - チェックボックス品質基準: `agentdev-req-analysis` に従い測定可能で一意（G09）
 - artifact_actions 構成: REQ/ADR/SPEC 別 action が適切に統合されているか
-- OU 構造検証: Step 10-6 で ou_id、operation、target_req/target_spec、depends_on、result 整合性
+- OU 構造検証: Step 11-6 で ou_id、operation、target_req/target_spec、depends_on、result 整合性
 
 ## See Also
 
