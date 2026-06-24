@@ -50,7 +50,7 @@
 | [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 | コマンド間引き継ぎ draft 契約、soft-contract原則、artifact_actions構造、LLM推論消費、depends_on意義拡張（技術的+機能的依存ヒント）・case_open_hints記録 |
 | [REQ-0139](requirements/REQ-0139.md) | 外部エージェント統合契約 | 外部エージェント統合、case-run外部実行委譲、driver adapter契約、req-define分類結果アクション |
 | [REQ-0140](requirements/REQ-0140.md) | 文書品質ゲート | 文書種別責務・要件性・文意品質・粒度の査読、IR-045、ドリフト検出、既存文書への遡及準拠修正 |
-| [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 | ローカル版生成方式、src/opencode-local/ 生成時ソース領域、ローカルCaseファイル、GitHub Issue/PR 置換、変換プロンプト、生成安全性制約 |
+| [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 導入方式とローカルCaseファイル運用 | link mode導入方式、src/opencode-local/ agentdev-gh-cli原本領域、agentdev-gh-cli差し替え、ローカルCaseファイル、GitHub Issue/PR 置換、unlink/relink、link target確認 |
 | [REQ-0142](requirements/REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 | 配布物 ID 除去後の完了条件としての文意保持・構文健全性・責務整合、Markdown 構文破損回避・主要構造重複回避・壊れた参照残骸除去、command / skill / SPEC 間責務説明整合（case-open / case-run / case-close / case-auto）、横断検査観点拡充、NG / false positive 分類明確化、docs-spec-rebuild-integrity.md |
 | [REQ-0143](requirements/REQ-0143.md) | Command 定義ファイルフォーマット標準化 | AgentDevFlow 管理 command 定義ファイル（src/opencode/commands/agentdev/*.md・.opencode/commands/repo/*.md）の command file format 準拠、適用対象限定、consumer project 独自 command 強制対象外 |
 | [REQ-0144](requirements/REQ-0144.md) | docs-check/integrity 運用是正 | 廃止REQ履歴マーク参照・workflow否定表現・RFC2119マーカー・日本語品質・skill-category-gap・コマンド一覧網羅・REQ範囲表記・fixture経年劣化・QG/case-close Step番号・Sisyphus-Junior×/ulw-loop 誤分類表記・integrity reports git除外 |

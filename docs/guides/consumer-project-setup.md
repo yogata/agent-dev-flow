@@ -67,41 +67,38 @@ scripts/
 ### ローカル版 OpenCode 導入（consumer-generated）
 
 GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別。
-AgentDevFlow 本体リポジトリの `src/opencode/` と `src/opencode-local/` を入力とし、AI エージェントが変換プロンプト（`src/opencode-local/transform/generate.md`）に従って `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` に直接生成する（REQ-0141, ADR-0126）。
-詳細な生成フロー、安全ゲートは SPEC [ローカル版 OpenCode 生成](../specs/local-generation.md) を参照。
+通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入し、agentdev-gh-cli だけを `src/opencode-local/agentdev-gh-cli/` から差し替える（REQ-0141, ADR-0131）。
+詳細な接続フロー、link target 確認は SPEC [ローカル版 OpenCode 生成](../specs/local-generation.md) を参照。
 
 ```
-.agentdev-plugin/                → agent-dev-flow の git clone 先（生成時入力の取得元）
-  src/opencode/                  → GitHub 版 AgentDevFlow の原本（生成入力その1）
-  src/opencode-local/            → ローカル版生成時ソース領域（生成入力その2）
-    README.md                    → ローカル版生成の実行手順
-    case-schema/                 → ローカル Case ファイルスキーマ定義
-    transform/                   → 変換用プロンプト・レビュー用プロンプト・変換仕様
-    generation-flow.md           → 生成フロー定義
+.agentdev-plugin/                → agent-dev-flow の git clone 先（link 元の取得元）
+  src/opencode/                  → GitHub 版 AgentDevFlow の原本（agentdev-gh-cli 以外の接続先）
+  src/opencode-local/            → ローカル版 link 先原本領域（agentdev-gh-cli のみ）
+    README.md                    → ローカル版 link 設定の実行手順
+    agentdev-gh-cli/             → ローカル版 agentdev-gh-cli の原本（case-schema を吸収）
 .opencode/
-  commands/agentdev/             → 生成されたローカル版コマンド（実ディレクトリ・非ジャンクション）
-  skills/agentdev-*/             → 生成されたローカル版スキル（実ディレクトリ・非ジャンクション）
+  commands/agentdev/             → link → src/opencode/commands/agentdev/
+  skills/agentdev-*/             → link → src/opencode/skills/agentdev-*/（agentdev-gh-cli 以外）
+  skills/agentdev-gh-cli/        → link → src/opencode-local/agentdev-gh-cli/
 .agentdev/
   cases/                         → ローカル Case ファイル（Issue / PR 相当の永続情報）
 ```
 
-- **生成物の識別子**: 生成された `.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/**/*.md` は `generated_by: local-opencode-transform` 識別子を持つ（REQ-0141-011）
-- **上書き安全性**: 同名ファイル上書きは `generated_by` 識別子が一致する場合のみ許可される（REQ-0141-012, 013）
-- **ジャンクション検出安全ゲート**: 生成前に `.opencode/` の実パスを確認し、`.opencode/` が `src/opencode/` 配下へ解決される場合は生成を停止する（REQ-0141-010）
-- **リポジトリ管理対象外**: 生成された `.opencode/commands/`, `.opencode/skills/`, `.opencode/` 配下ひな形、変換スクリプトはリポジトリ管理対象外（REQ-0141-008, 009）
+- **link による接続**: command/skill を生成せず、`.opencode/` 配下を src 配下へ link で接続する（ADR-0131 decision #1, #2, #3）
+- **agentdev-gh-cli の差し替え**: agentdev-gh-cli 以外は通常版と同じ `src/opencode/` 配下へ接続し、agentdev-gh-cli だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（ADR-0131 decision #3）
+- **link target 確認**: link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認し、意図しない target の場合は link 設定を停止する（REQ-0141-010, ADR-0131 decision #6）
+- **リポジトリ管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` はリポジトリ管理対象外（REQ-0141-008）
 - **リポジトリ管理対象**: `.agentdev/cases/` 配下のローカル Case ファイルは Issue/PR 相当の永続情報としてリポジトリ管理対象（REQ-0141-016）
-- **更新方式**: 差分更新を想定しない。`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す（REQ-0141-033）
-- **判定基準**: `.opencode/commands/agentdev/` が実ディレクトリ（非ジャンクション）で `generated_by: local-opencode-transform` を含む場合に consumer-generated と判定される（SPEC runtime-package-boundary.md）
+- **更新方式**: unlink / relink により行う。`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す方式は採らない（REQ-0141-033, ADR-0131 decision #4）
+- **判定基準**: `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合に consumer-generated と判定される（SPEC runtime-package-boundary.md）
 
 #### ローカル版セットアップ手順
 
 1. agent-dev-flow リポジトリを `.agentdev-plugin/` に clone する
-2. OpenCode 等 AI エージェントで `src/opencode-local/README.md` の実行手順に従う
-3. AI エージェントが `src/opencode-local/transform/generate.md`（変換用プロンプト）を入力またはファイル参照して実行する
-4. `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` に生成物が配置されることを確認する
-5. `generated_by: local-opencode-transform` 識別子が付与されていることを確認する
-6. `.agentdev/cases/` ディレクトトリが存在することを確認する（ローカル Case ファイル用）
-7. `.gitignore` に生成物（`.opencode/commands/agentdev/`, `.opencode/skills/agentdev-*/`）を追加する
+2. `./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode` を実行し、link 設定を行う（agentdev-gh-cli のみ `src/opencode-local/agentdev-gh-cli/` へ接続、それ以外は `src/opencode/` 配下へ接続）
+3. 各 link が意図した target へ解決されることを `./scripts/check-consumer-opencode.ps1` で確認する
+4. `.agentdev/cases/` ディレクトリが存在することを確認する（ローカル Case ファイル用）
+5. `.gitignore` に link 先（`.opencode/commands/agentdev/`, `.opencode/skills/agentdev-*/`）を追加する
 
 #### ローカル版の更新手順
 
@@ -109,12 +106,11 @@ AgentDevFlow 本体リポジトリの `src/opencode/` と `src/opencode-local/` 
 # agent-dev-flow の最新を取得
 cd .agentdev-plugin && git pull && cd ..
 
-# ローカル版の全削除と再生成（差分更新は非対応）
-# 1. .opencode/commands/agentdev/ と .opencode/skills/agentdev-*/ を削除
-# 2. 変換プロンプトを再実行（src/opencode-local/README.md の手順に従う）
+# unlink / relink により link を張り直す（全削除して作り直す方式は採らない）
+./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
 ```
 
-> 詳細な実行手順、制約、安全ゲートは `src/opencode-local/README.md`（生成時ソース領域の実行エントリポイント）と SPEC [ローカル版 OpenCode 生成](../specs/local-generation.md)、[ローカル Case ファイル](../specs/local-case-file.md)、[ローカル版 OpenCode 変換プロンプト](../specs/local-transform.md) を参照。
+> 詳細な実行手順、制約、link target 確認は `src/opencode-local/README.md`（link 設定の実行エントリポイント）と SPEC [ローカル版 OpenCode 生成](../specs/local-generation.md)、[ローカル Case ファイル](../specs/local-case-file.md)、[ローカル版 OpenCode 変換プロンプト](../specs/local-transform.md) を参照。
 
 ## 予約名（Reserved Names）
 
