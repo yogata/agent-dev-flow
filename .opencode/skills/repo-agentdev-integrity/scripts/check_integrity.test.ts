@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync } from "fs";
 import { join } from "path";
-import { isDelegationContext } from "./check_integrity.ts";
+import {
+  isDelegationContext,
+  isMetaScopeRuleContext,
+  isBehaviorPredicateContext,
+} from "./check_integrity.ts";
 
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_integrity.ts");
@@ -887,6 +891,8 @@ function buildIr044Fixture(root: string): void {
       "| REQ-9003 | IR-044 fixture |",
       "| REQ-9004 | IR-044 fixture |",
       "| REQ-9005 | IR-044 fixture |",
+      "| REQ-9006 | IR-044 fixture |",
+      "| REQ-9007 | IR-044 fixture |",
       "",
     ].join("\n"),
     "utf-8",
@@ -987,6 +993,48 @@ function buildIr044Fixture(root: string): void {
     "utf-8",
   );
 
+  // REQ-9006: false positive — meta scope rule context exempts SPEC keyword
+  // (REQ-0145-012). Line declares the REQ/SPEC boundary by naming SPEC types
+  // as territory; it does not contain SPEC detail, it defines the boundary.
+  writeFileSync(
+    join(reqDir, "REQ-9006.md"),
+    [
+      "---",
+      "id: REQ-9006",
+      "title: IR-044 meta scope rule exemption",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9006-001 | REQ は対象とする外部契約を記述する文章主体であり、SPEC は現在の実装体系を示す スキーマ、コマンド体系、ルールカタログ、enum、format、必要パラメータを記述する文章主体であること |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9007: false positive — behavior predicate context exempts SPEC keyword
+  // (REQ-0145-012). Existence predicate + drift-target type modifier without
+  // quantity/content specification.
+  writeFileSync(
+    join(reqDir, "REQ-9007.md"),
+    [
+      "---",
+      "id: REQ-9007",
+      "title: IR-044 behavior predicate exemption",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9007-001 | copyScripts 本採用環境下で fixture drift を自動検出する仕組みが存在すること |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
   // Empty adr/specs/skills to satisfy other checks minimally
   mkdirp(join(root, "docs", "adr"));
   mkdirp(join(root, "docs", "specs"));
@@ -1007,6 +1055,67 @@ describe("IR-044 isDelegationContext predicate (REQ-0108-259)", () => {
     expect(isDelegationContext("要件行は外部契約を記述する")).toBe(false);
     expect(isDelegationContext("値一覧: A, B, C")).toBe(false);
     expect(isDelegationContext("実装は Step 3 で実行")).toBe(false);
+  });
+});
+
+describe("IR-044 isMetaScopeRuleContext predicate (REQ-0145-012)", () => {
+  it("returns true for META scope rule lines declaring REQ/SPEC boundary", () => {
+    expect(
+      isMetaScopeRuleContext(
+        "REQ は外部契約を記述する文章主体であり、SPEC は スキーマ、コマンド体系、enum、format を記述する文章主体であること",
+      ),
+    ).toBe(true);
+    expect(
+      isMetaScopeRuleContext(
+        "enum 値、フォーマット（format）等は SPEC 領域に列挙する責務範囲規定行である",
+      ),
+    ).toBe(true);
+    expect(
+      isMetaScopeRuleContext("REQ/SPEC 境界において enum と schema を SPEC 対象とする"),
+    ).toBe(true);
+  });
+
+  it("returns false for plain SPEC detail enumeration without boundary declaration", () => {
+    expect(isMetaScopeRuleContext("値一覧: A, B, C, D, E, F, G")).toBe(false);
+    expect(
+      isMetaScopeRuleContext(
+        "scripts/tests/check_integrity.test.ts の fixture は最新 check_integrity.ts ルールに追従する",
+      ),
+    ).toBe(false);
+    expect(
+      isMetaScopeRuleContext("case-auto は実行開始時刻および完了報告生成時刻を記録すること"),
+    ).toBe(false);
+  });
+});
+
+describe("IR-044 isBehaviorPredicateContext predicate (REQ-0145-012)", () => {
+  it("returns true for existence predicate + drift-target type modifier", () => {
+    expect(
+      isBehaviorPredicateContext(
+        "copyScripts 本採用環境下で fixture drift を自動検出する仕組みが存在する",
+      ),
+    ).toBe(true);
+    expect(
+      isBehaviorPredicateContext("variant drift を検出する仕組みが存在する"),
+    ).toBe(true);
+  });
+
+  it("returns false when modifier lacks existence predicate", () => {
+    expect(
+      isBehaviorPredicateContext(
+        "scripts/tests/check_integrity.test.ts の fixture は最新 check_integrity.ts ルールに追従する",
+      ),
+    ).toBe(false);
+    expect(
+      isBehaviorPredicateContext("case-auto は実行開始時刻および完了報告生成時刻を記録すること"),
+    ).toBe(false);
+  });
+
+  it("returns false when existence predicate lacks drift-target modifier", () => {
+    expect(isBehaviorPredicateContext("監査ログの保存仕組みが存在する")).toBe(false);
+    expect(
+      isBehaviorPredicateContext("要件ドキュメントの改版履歴が存在する"),
+    ).toBe(false);
   });
 });
 
@@ -1075,5 +1184,58 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
         (res.evidence ?? "").includes("REQ-9004"),
     );
     expect(violations.length).toBe(0);
+  });
+
+  it("exempts meta scope rule context: enum/format as SPEC territory (REQ-0145-012)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9006"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("exempts behavior predicate context: fixture drift existence (REQ-0145-012)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9007"),
+    );
+    expect(violations.length).toBe(0);
+  });
+});
+
+// REQ-0108-259, REQ-0108-055: regression lock for protected true positives.
+// These REQ lines are real examples of SPEC detail residue in REQ that the new
+// exemption predicates (isMetaScopeRuleContext, isBehaviorPredicateContext)
+// MUST NOT exempt. If a future predicate change accidentally catches one of
+// these, the test fails before the false-negative reaches production.
+describe("IR-044 protected true positives (REQ-0145-012 regression)", () => {
+  // Actual requirement text from docs/requirements/REQ-0114.md and REQ-0144.md.
+  const REQ_0114_082 =
+    "case-auto は実行開始時刻および完了報告生成時刻を記録すること";
+  const REQ_0144_008 =
+    "scripts/tests/check_integrity.test.ts の fixture は最新 check_integrity.ts ルールに追従する";
+
+  it("REQ-0114-082 is NOT exempted by isMetaScopeRuleContext", () => {
+    expect(isMetaScopeRuleContext(REQ_0114_082)).toBe(false);
+  });
+
+  it("REQ-0114-082 is NOT exempted by isBehaviorPredicateContext", () => {
+    expect(isBehaviorPredicateContext(REQ_0114_082)).toBe(false);
+  });
+
+  it("REQ-0144-008 is NOT exempted by isMetaScopeRuleContext", () => {
+    expect(isMetaScopeRuleContext(REQ_0144_008)).toBe(false);
+  });
+
+  it("REQ-0144-008 is NOT exempted by isBehaviorPredicateContext", () => {
+    expect(isBehaviorPredicateContext(REQ_0144_008)).toBe(false);
   });
 });
