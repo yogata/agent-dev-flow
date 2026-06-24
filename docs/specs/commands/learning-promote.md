@@ -2,7 +2,7 @@
 title: learning-promote SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-22
+updated: 2026-06-25
 ---
 
 # learning-promote SPEC
@@ -73,7 +73,6 @@ backlog-review 経由で RU 化する。
 - case-run への直接受け渡し（G03、backlog-review 経由のみ）
 - raw learning item の再分類（G04）
 - 管理用ファイル（elevation-ledger.md 等）の生成（G07）
-- learning-refine への依存（G08）
 
 ## 検証観点
 

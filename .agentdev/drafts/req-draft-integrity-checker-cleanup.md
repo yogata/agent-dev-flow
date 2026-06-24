@@ -12,6 +12,8 @@ work_type: maintenance
 
 scale: large
 
+spec_actions_consumed: true
+
 summary: |
   repo-agentdev-integrity チェックスクリプト（check_integrity.ts）から、意味ベース検査・推論系検査・重複実装・過去リネーム由来の LEGACY パターン・廃止済み bare slash コマンド検出・過渡期の normative marker 検出を削除し、docs-check を REQ-0108-056/254/261 + REQ-0146-008 が既に規定する「機械的・再現可能な整合性検査」に原則復帰させる。意味判断を要する検出は inspect-skills / inspect-docs / agentdev-doc-writing（3層検出構造）へ委譲し、catalog / vocabulary / gate-levels / SKILL.md / guides の参照更新と REQ-0108/0144/0145 の改訂を連動させる。ADR 不要（既存REQへの準拠であり新規方針導入ではない）。
 
@@ -233,7 +235,18 @@ operation_units:
     depends_on: [OU-001, OU-002, OU-003]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [docs/specs/integrity-rule-catalog.md]
+      operation_mode: SPEC-UPDATE
+      source_artifact_action: ACT-SPEC-001
+      source_items: [AG-005, AG-006, AG-007, AG-008]
+      changes:
+        - IR-045 entry 削除（REQ-0145-003 catalog↔実装同期手順: baseline_status resolved → entry 削除）。tombstone note で agentdev-doc-writing への移譲を明示
+        - IR-044 detection_method/false_positive_risk/triage_action 更新（AG-002/013/014 exemption 機械化）
+        - IR-044 exemption 条件セクション全文書き換え（META 規則行 exemption のみ残存、文脈免除は inspect-docs 委譲）
+        - NG ルール間依存関係マップ整理（checkLegacyNormativeMarkers/checkDocLanguageQuality 削除、checkReqSpecBoundaryViolation 更新）
+      req_0108_262_catalog_warn_resolved: true
+      qg1_result: pass
   - ou_id: OU-005
     target_spec: .opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md
     operation: spec-update
@@ -241,7 +254,17 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md]
+      operation_mode: SPEC-UPDATE
+      source_artifact_action: ACT-SPEC-002
+      source_items: [AG-006, AG-007, AG-009, AG-010]
+      changes:
+        - /repo/semantic-integrity-review 行削除（AG-009）
+        - REQ 範囲表記 REQ-0151/43件に最新化（AG-010）
+        - /agentdev/req-restructure-review 行を統合済みに更新
+        - 「検出パターン縮小（REQ-0108-262）」セクション追加（AG-006/007 対照表維持・検出対象除外明示）
+      qg1_result: pass
   - ou_id: OU-006
     target_spec: .opencode/skills/repo-agentdev-integrity/references/gate-levels.md
     operation: spec-update
@@ -249,7 +272,15 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [.opencode/skills/repo-agentdev-integrity/references/gate-levels.md]
+      operation_mode: SPEC-UPDATE
+      source_artifact_action: ACT-SPEC-003
+      source_items: [AG-005, AG-006, AG-007, AG-008]
+      changes:
+        - heuristic カテゴリから vocabulary-compliance/doc-language-quality 行削除（AG-005）
+        - 「3層検出構造の責務分担（REQ-0146-008）」セクション追加・補強
+      qg1_result: pass
   - ou_id: OU-007
     target_spec: .opencode/skills/repo-agentdev-integrity/SKILL.md
     operation: spec-update
@@ -257,7 +288,14 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [.opencode/skills/repo-agentdev-integrity/SKILL.md]
+      operation_mode: SPEC-UPDATE
+      source_artifact_action: ACT-SPEC-004
+      source_items: [AG-005, AG-006, AG-007, AG-008]
+      changes:
+        - 検査カテゴリ表から 語彙ポリシー/Cross-REQ vocab/docs 日本語表現・文意整合 の3行削除（AG-005）。categoryToCheckPattern map との整合は case-run（Wave3）で実装反映時に担保
+      qg1_result: pass
   - ou_id: OU-008
     target_spec: docs/guides/*.md
     operation: spec-update
@@ -265,7 +303,14 @@ operation_units:
     depends_on: [OU-002]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [docs/guides/project-docs-and-specs.md]
+      operation_mode: SPEC-UPDATE
+      source_artifact_action: ACT-SPEC-005
+      source_items: [AG-011]
+      changes:
+        - project-docs-and-specs.md REQ 範囲表記を REQ-0151/43件に最新化（AG-011）。他の guides ファイルに古い REQ 範囲表記は確認されず
+      qg1_result: pass
   - ou_id: OU-009
     target_spec: docs/specs/commands/learning-promote.md
     operation: spec-update
@@ -273,7 +318,15 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [docs/specs/commands/learning-promote.md]
+      operation_mode: SPEC-UPDATE
+      source_artifact_action: ACT-SPEC-006
+      source_items: [AG-007]
+      changes:
+        - 「learning-refine への依存（G08）」対象外行削除（AG-007 付随修正、ADR-0022 廃止反映）
+        - frontmatter updated=2026-06-25
+      qg1_result: pass
 
 test_strategy:
   - id: TS-001
