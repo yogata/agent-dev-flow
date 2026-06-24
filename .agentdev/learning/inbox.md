@@ -117,4 +117,22 @@
 - **関連**: PR #1122 (#1118 partial)、PR #1090 (#1079)、mechanical-replacement-rules.md「再現性の確保」節
 - **タグ**: `#mechanical-replacement` `#cross-directory-correction` `#zero-remaining-verification` `#regression-miss`
 
+## 2026-06-24 Issue #1127 close (PR #1128)
+
+### L-013: case-close Step 9 の pull --ff-only は共有 main worktree で並列セッションの未コミット変更によりブロックされる
+
+- **問題事象**: case-close Step 9（git pull --ff-only）の実行時、共有 main worktree に並列セッション由来の未コミット変更（REQ-0130.md、case-run.md）が存在し、うち case-run.md が今回の squash merge 取り込み対象と重複したため pull が拒否された（"Your local changes would be overwritten by merge"）。Step 1-1（重複ファイルチェック）実行時点では working tree は clean であったが、Step 9 実行までの間に並列セッションが変更を加えた。
+- **発生局面**: case-close Step 9（実行前同期）
+- **検知方法**: `git pull --ff-only` のエラー出力（ローカル変更が merge により上書きされる旨）。`git status --porcelain` での対象ファイル特定。
+- **根本原因**: case-close の Step 9-11 は共有 main worktree で動作する。並列セッションが PR 変更対象ファイルと同一ファイルに未コミット変更を残していると、pull --ff-only は working tree の保護のため拒否される。Step 1-1 は case-close 開始時点のスナップショット検査であり、Step 9 実行時までの間に生じた並列変更を検知できない。
+- **自律対応内容**: 並列実行安全ステージングプロシージャ（`agentdev-git-worktree` references/git-common-procedures.md Section 3）に従い、非所有パス（他セッション変更中）への `git checkout`/`git stash`/`git reset --hard` 等のスイープ操作を回避した。ブロッカーを構造化エラーで報告し、破壊的操作を行わず停止した。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。並列実行安全ステージングプロシージャは既存であり、本件はその正しい適用事例。設計改善の候補（case-close Step 9-11 の worktree 隔離等）は別途検討。
+- **横展開観点**: 共有 main worktree で case-close を実行する全環境で、並列セッションの未コミット変更が Step 9 をブロックし得る。case-run の worktree 隔離と異なり、case-close の post-merge ステップ（9-11）は隔離されていない。
+- **再発条件**: 共有 main worktree で複数セッションが並列実行され、一方が case-close の Step 9 を実行する前に他方が PR 変更対象ファイルへ未コミット変更を残した場合。
+- **予防策候補**: (1) case-close Step 9 で pull 失敗時のフォールバック手順（一時的な stash-with-patch 保存とリストア、ただし非所有パスの扱いは要検討）。(2) case-close post-merge ステップ（9-11）を隔離 worktree で実行する設計変更の検討。(3) Step 1-1 を Step 9 直前にも再実行する（マージ後の最新状態での重複チェック）。
+- **想定反映先**: agentdev-git-worktree（pull 失敗時の並列セッション安全なフォールバック手順）、case-close.md Step 9（ブロッカー報告の標準化）
+- **関連**: PR #1128 (#1127)、`agentdev-git-worktree/references/git-common-procedures.md` Section 3（並列実行安全ステージング）、Step 1-1（重複ファイルチェック）
+- **タグ**: `#shared-worktree` `#parallel-session` `#pull-ff-only-block` `#case-close-step9` `#non-destructive-handling`
+
 
