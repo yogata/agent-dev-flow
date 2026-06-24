@@ -99,4 +99,22 @@
 - **関連**: PR #1103 (#1102)、L-004 (PR #1068)、agentdev-case-run-execution-adapter SKILL.md
 - **タグ**: `#case-run` `#task-delegation` `#adapter-protocol` `#harness-constraint`
 
+## 2026-06-24 Issue #1118 partial close (PR #1122)
+
+### L-012: 機械横断修正の完了宣言には再 grep 0 件確認が必須（PR #1090 で X-6 残存 3 件を見落とし）
+
+- **問題事象**: PR #1090（#1079 / X-6「において」濫用の横断是正）は「7 ディレクトリ完全対応」と完了宣言したが、実際には 3 件の X-6 残存があった。本 PR #1122 で `docs/specs/command-file-format.md` L53、`docs/requirements/REQ-0134.md` L34、`src/opencode/skills/agentdev-inspect-skills/SKILL.md` L51 の 3 件を回帰または修正漏れとして是正した。
+- **発生局面**: 機械横断是正の完了判定
+- **検知方法**: PR #1122 作成時の裏付け grep（`mechanical-replacement-rules.md` section 3 対象表に従う再 grep）
+- **根本原因**: PR #1090 で機械置換を実施した後に「再 grep で 0 件確認」手順が実行されなかった可能性が高い。`mechanical-replacement-rules.md`「再現性の確保」節 Step 3-4 が既にこの手順を定義しているが、運用されなかった。
+- **自律対応内容**: 本 PR #1122 で残存 3 件を是正し、対象 7 ディレクトリで X-6 残存 0 件を再 grep で確認した。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。`mechanical-replacement-rules.md`「再現性の確保」節の手順は既存。運用徹底が課題。
+- **横展開観点**: 機械横断修正を完了宣言する全 PR で、対象ディレクトリ群に対する再 grep 0 件確認を必須手順とする。`mechanical-replacement-rules.md` Step 3-4 の運用徹底。PR 本文の品質メトリクス欄に「再 grep 結果（0 件）」を必須記載項目として運用する候補。
+- **再発条件**: 機械横断テキスト置換を実施し、完了宣言時に再 grep 0 件確認を省略した場合。
+- **予防策候補**: case-run/case-close の QG-3/QG-4 で、機械横断是正を含む PR の完了判定に「`mechanical-replacement-rules.md` Step 3-4 の再 grep 0 件証拠」を要求する検査項目を追加する。
+- **想定反映先**: agentdev-quality-gates（QG-3/QG-4 の機械横断是正向け検査項目拡充）、agentdev-doc-writing/references/mechanical-replacement-rules.md（運用徹底の明記）
+- **関連**: PR #1122 (#1118 partial)、PR #1090 (#1079)、mechanical-replacement-rules.md「再現性の確保」節
+- **タグ**: `#mechanical-replacement` `#cross-directory-correction` `#zero-remaining-verification` `#regression-miss`
+
 
