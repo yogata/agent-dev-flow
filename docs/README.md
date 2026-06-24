@@ -2,7 +2,7 @@
 
 ## 要件
 
-現行要件の第一参照先は REQ-0101 から REQ-0150 までの 42 件（現行 REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）である。廃止済み REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0151 までの 43 件（現行 REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）である。廃止済み REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -48,6 +48,7 @@
 | [REQ-0148](requirements/REQ-0148.md) | RU群バッチ処理と複数 execution_unit 並列実行 |
 | [REQ-0149](requirements/REQ-0149.md) | agentdev-gh-cli 手続き委譲基盤 |
 | [REQ-0150](requirements/REQ-0150.md) | ローカル版 agentdev-gh-cli 実装 |
+| [REQ-0151](requirements/REQ-0151.md) | コンフリクト解消モデルと実行時間観測 |
 
 - [要件インデックス](requirements/README.md)
 - [移行表](requirements/mapping-table.md)
