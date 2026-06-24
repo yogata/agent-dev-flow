@@ -20,6 +20,7 @@ case-run (orchestration)
         ├── Issue 本文・受け入れ基準読込（委譲 prompt 内 `/ulw-loop` command が success criteria に分解）
         ├── ADR / REQ / SPEC / docs / repository context 再確認
         ├── `/ulw-loop` command による evidence-backed 実装・品質ゲート（code review + QA review + gate review）
+        ├── test strategy 項目の test-fix ループ（項目ごと検証、不合格時 fix-and-reverify / record-in-findings、全項目処理まで反復）
         ├── blocker 処理
         ├── PR 作成手続き（agentdev-gh-cli）による PR 作成（PR URL を result に格納）
         └── result を case-run へ返却
@@ -36,9 +37,19 @@ Sisyphus-Junior は以下を順に実行する:
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。ulw-loop が Issue を success criteria に分解する
 2. **context 再確認**: ADR/ REQ/ SPEC/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する
-3. **実装、検証、PR 作成**: ulw-loop に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（agentdev-gh-cli）で PR を作成する。ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する
+3. **実装、検証、PR 作成**: ulw-loop に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（agentdev-gh-cli）で PR を作成する。ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。実装完了後、Issue 本文の test strategy 項目の test-fix ループ（後述「test strategy 項目の test-fix ループ」）を実行する
 4. **blocker 処理**: 回答可能な blocker（ADR/REQ/SPEC/docs/Issue本文で回答できるもの）は自律的に ulw-loop 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
+
+## test strategy 項目の test-fix ループ（REQ-0130-030）
+
+Sisyphus-Junior は実装完了後、Issue 本文のテスト戦略セクションに含まれる各 test strategy 項目（3要素構造: verification / pass_criteria / on_failure）について以下のループを実行する。全項目の処理が完了するまで反復する。
+
+1. **項目ごとの検証**: 各 test strategy 項目の `verification` 手順に従い検証を実行し、`pass_criteria` を満たすか確認する
+2. **不合格時の処置**: 検証結果が `pass_criteria` を満たさない場合、当該項目の `on_failure` に従い以下いずれかを実行する:
+   - **fix-and-reverify（実装修正して再検証）**: 実装を修正し、当該項目の検証を再実行する。再検証で合格するまで修正と再検証を反復する
+   - **record-in-findings（Findings 記録）**: 実装修正で対応困難な場合（仕様上の制約、スコープ外の原因等）、当該項目を不合格理由とともに PR 本文の `## Findings / Capture候補` セクションに記録する
+3. **全項目処理までの反復**: 未処理の test strategy 項目が残る場合、1〜2 を繰り返す。全項目が「合格」または「Findings 記録済み」のいずれかに分類されるまで反復を完了しない
 
 ## Result 契約（最小契約）
 
