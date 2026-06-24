@@ -3674,6 +3674,51 @@ export function isDelegationContext(line: string): boolean {
   );
 }
 
+/**
+ * IR-044 exemption predicate (REQ-0108-259, REQ-0145-012). A line that
+ * declares the REQ/SPEC responsibility boundary by naming SPEC types as
+ * territory (enum/format/schema listed as "SPEC 領域") is exempt: it does
+ * not contain SPEC detail, it defines the boundary itself. Boundary cases
+ * are codified in integrity-rule-catalog.md「IR-044 exemption 条件・境界ケース」.
+ *
+ * The exemption requires BOTH a META scope marker (responsibility boundary
+ * declaration) AND a SPEC-type token (enum/format/schema/etc.). Lines that
+ * merely enumerate SPEC details (e.g. "enum 値: A, B, C") without declaring
+ * a boundary are NOT exempt.
+ */
+export function isMetaScopeRuleContext(line: string): boolean {
+  const hasSpecTypeToken =
+    /\b(?:enum|format|schema|frontmatter|signature|checksum)\b|スキーマ\s*フィールド|テーブル\s*定義|判定表/i.test(
+      line,
+    );
+  const hasMetaScopeRule =
+    /REQ\s*[\/／]\s*SPEC\s*境界|責務\s*範囲|責務\s*区分|SPEC\s*領域|SPEC\s*対象|SPEC\s*に\s*列挙|SPEC\s*（領域）\s*と\s*する|SPEC\s*territory|REQ\s*は[\s\S]*?SPEC\s*は/i.test(
+      line,
+    );
+  return hasMetaScopeRule && hasSpecTypeToken;
+}
+
+/**
+ * IR-044 exemption predicate (REQ-0108-259, REQ-0145-012). A line whose main
+ * clause is an existence/state predicate ("仕組みが存在する" etc.) accompanied
+ * only by a drift-target type modifier (fixture/variant/etc. naming the
+ * category without specifying quantity or content) is exempt. Boundary cases
+ * are codified in integrity-rule-catalog.md「IR-044 exemption 条件・境界ケース」.
+ *
+ * The exemption requires BOTH an existence predicate AND a drift-target type
+ * modifier. Lines that add quantity/content specification, or that merely
+ * contain a modifier without the existence predicate, are NOT exempt.
+ */
+export function isBehaviorPredicateContext(line: string): boolean {
+  const hasExistencePredicate =
+    /仕組みが\s*存在|が\s*存在する|が\s*存在しない|状態として\s*存在|状態として\s*実装|を\s*実装する\s*（\s*状態|実装として\s*存在|mechanism\s+exists|is\s+implemented\s+as\s+state/i.test(
+      line,
+    );
+  const hasTypeModifier =
+    /\b(?:fixture|variant|provider|baseline|drift)\b/i.test(line);
+  return hasExistencePredicate && hasTypeModifier;
+}
+
 function strictVocabMatch(line: string, term: string): boolean {
   const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   if (/^[a-zA-Z][a-zA-Z0-9-]*$/.test(term) && !term.startsWith("-")) {
@@ -7293,7 +7338,8 @@ function checkDocLanguageQuality(root: string): CheckResult[] {
 //   6. Step number    7. Phase number         8. internal algorithm
 //   9. specific work history
 // Exemption conditions (OR): IR044_STABLE_CONTRACT_PATTERN (REQ-0101-069),
-//   isNegationContext, isDelegationContext. Severity: heuristic (warn / exit 0).
+//   isNegationContext, isDelegationContext, isMetaScopeRuleContext,
+//   isBehaviorPredicateContext. Severity: heuristic (warn / exit 0).
 
 const IR044_SIGNAL_PATTERNS: ReadonlyArray<{ signal: string; pattern: RegExp }> =
   [
@@ -7382,9 +7428,13 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
       //   - stable contract exception (REQ-0101-069)
       //   - negation context (existing exemption)
       //   - delegation context (REQ-0108-259, new exemption)
+      //   - meta scope rule context (REQ-0145-012, new exemption)
+      //   - behavior predicate context (REQ-0145-012, new exemption)
       if (IR044_STABLE_CONTRACT_PATTERN.test(stripped)) continue;
       if (isNegationContext(line)) continue;
       if (isDelegationContext(line)) continue;
+      if (isMetaScopeRuleContext(line)) continue;
+      if (isBehaviorPredicateContext(line)) continue;
 
       for (const { signal, pattern } of IR044_SIGNAL_PATTERNS) {
         if (pattern.test(stripped)) {
