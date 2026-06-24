@@ -38,9 +38,15 @@ labels: enhancement
 ## テスト戦略
 <!-- 【必須】 -->
 
-- [ ] ユニットテスト: [テスト対象と期待される結果]
-- [ ] E2Eテスト: [テスト対象と期待される結果]
-- カバレッジ目標: 100%
+<!-- テスト戦略: 各項目を verification（検証手順）/ pass_criteria（合格基準）/ on_failure（不合格時の処置）の3要素構造で記述 -->
+- id: TS-001
+  target_item: [検証対象]
+  verification: |
+    [検証手順]
+  pass_criteria: |
+    [合格基準]
+  on_failure: |
+    [不合格時の処置]
 
 ## 補足情報（オプション）
 <!-- 【任意】 -->

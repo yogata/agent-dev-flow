@@ -38,6 +38,8 @@ agent-dev-flow repository への手動取り込み対象として報告。
 
 **Step 2-1**: 完了条件網羅性検証（QG-2） — Issue本文生成後、Issue作成前に、`agentdev-quality-gates` の QG-2（Acceptance Criteria Coverage Gate）に従い、完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する。判定基準、検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md` を参照。fail 時は Issue 作成前に req-define 差し戻しを推奨
 
+**Step 2-2**: test_strategy 埋め込み（REQ-0132-018） — draft-data の `test_strategy` を読み取り、Issue 本文の「テスト戦略」セクションに埋め込む。各項目を 3 要素構造（`verification`（検証手順）、`pass_criteria`（合格基準）、`on_failure`（不合格時の処置））で反映する。3 要素のスキーマは `docs/specs/commands/req-define.md` の「draft-data test_strategy フィールドスキーマ」に従う。draft-data に `test_strategy` が未定義の場合は、テンプレートのプレースホルダをそのまま残す
+
 ### Step 3: マルチREQ入力判定
 
 入力要件doc数を確認
