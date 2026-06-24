@@ -84,7 +84,7 @@ case-run から引き渡された worktree root（相対パス）配下でのみ
 | worktree root 以外のパス（メインリポジトリルート直下、他 worktree 等）でのファイル編集 | メインリポジトリでの作業を検知した場合は直ちに作業を停止し、`failed` として result を返却する。詳細本文は Issue コメントに SSoT として構造化して記録する |
 | メインリポジトリパスを引き渡し、使用すること | case-run は worktree root（相対パス）のみを引き渡す。Sisyphus-Junior は受け取った worktree root 配下でのみ作業する |
 
-**自己検証**: 実装作業開始前に `agentdev-git-worktree` の検証ヘルパー（`references/worktree-operations.md`「worktree 内判定ヘルパー」参照）で現在 worktree 内にいることを自己検証する。メインリポジトリにいると判定された場合は実装を開始せず `failed` として result を返却する。
+**自己検証**: 実装作業開始前に `agentdev-git-worktree` の検証ヘルパー（`.opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「worktree 内判定ヘルパー」参照）で現在 worktree 内にいることを自己検証する。メインリポジトリにいると判定された場合は実装を開始せず `failed` として result を返却する。
 
 ## Findings/ Capture 配置
 
