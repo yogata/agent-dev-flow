@@ -38,7 +38,15 @@ REQ-{req_number}
 ## テスト戦略
 <!-- 【必須】 -->
 
-{test_strategy}
+<!-- テスト戦略: case-open が draft-data の test_strategy を各項目の3要素構造（verification/pass_criteria/on_failure）で埋め込む -->
+- id: TS-001
+  target_item: [検証対象]
+  verification: |
+    [検証手順]
+  pass_criteria: |
+    [合格基準]
+  on_failure: |
+    [不合格時の処置]
 
 ## 補足情報
 <!-- 【任意】 -->
