@@ -96,7 +96,7 @@ bun src/opencode/skills/agentdev-req-file-manager/scripts/src/search-target-area
 # matches[0].line から次の同レベル見出し行の直前までをセクションとして特定し、content で置換
 ```
 
-**Step 5-1**: 複数 SPEC action の並列化（REQ-0114-091/093） — 異なる `target` パスの SPEC create/update は並列化可能。同一 SPEC ファイルへの複数 action は順序依存のため直列サブセットとして分離する。詳細は後述「case-auto 並列委譲モデル」セクション参照
+**Step 5-1**: 複数 SPEC action の並列化（REQ-0114-091/093）。異なる `target` パスの SPEC create/update は並列化可能。同一 SPEC ファイルへの複数 action は順序依存のため直列サブセットとして分離する。詳細は後述「case-auto 並列委譲モデル」セクション参照
 
 ### Step 6: インデックス整合
 

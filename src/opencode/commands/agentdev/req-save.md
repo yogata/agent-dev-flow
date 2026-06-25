@@ -46,11 +46,11 @@ REQ/ADR 対象 artifact_actions がない場合は no-op 完了（後続の case
 
 `draft-data` の必須フィールド（artifact_actions, operation_units, topic_slug）が存在することを確認。欠損時はエラーで中止
 
-**Step 3-1**: 分類ゲート検査 — CREATE対象REQの要件テーブルを検査する。詳細は `agentdev-req-file-manager` を参照。委譲接続点: サブエージェントは反映作業候補、理由、移送先候補のみを返し、親エージェントが停止とユーザー指示待ちを判断する
+**Step 3-1**: 分類ゲート検査。CREATE対象REQの要件テーブルを検査する。詳細は `agentdev-req-file-manager` を参照。委譲接続点: サブエージェントは反映作業候補、理由、移送先候補のみを返し、親エージェントが停止とユーザー指示待ちを判断する
 
-**Step 3-2**: 文書分類適合確認 — REQ/ADR 保存前に対象ドキュメント種別を確認する。詳細は `agentdev-req-file-manager` を参照。委譲接続点: サブエージェントは分類適合の判定材料のみを返し、親エージェントが保存可否を判断する
+**Step 3-2**: 文書分類適合確認。REQ/ADR 保存前に対象ドキュメント種別を確認する。詳細は `agentdev-req-file-manager` を参照。委譲接続点: サブエージェントは分類適合の判定材料のみを返し、親エージェントが保存可否を判断する
 
-**Step 3-3**: REQ/ADR artifact_actions 処理ゲート — ドラフトの `artifact_actions` から `artifact: req`/ `artifact: adr` の entry を処理対象とする（draft 全体の REQ/ADR artifact_actions を処理し、OU ごとに分割しない）:
+**Step 3-3**: REQ/ADR artifact_actions 処理ゲート。ドラフトの `artifact_actions` から `artifact: req`/ `artifact: adr` の entry を処理対象とする（draft 全体の REQ/ADR artifact_actions を処理し、OU ごとに分割しない）:
 - `artifact_actions` に REQ/ADR entry がない場合 → no-op 完了（Step 1 で判定済み）
 - `operation_units` が存在する場合 → 処理対象 OU を決定する:
   - OU ID が指定されている場合 → 指定された OU を処理対象とする
@@ -83,13 +83,13 @@ bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-frontmatter-
 # → stdout: { ok: boolean, errors: string[], warnings: string[] }
 ```
 
-**Step 4-0**: QG-1（適用結果の整合性検証、REQ-0102-081/082、AG-003） — REQ/ADR ファイル保存前に、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）を「適用結果の整合性検証」として実行する。検証項目: 採番結果の整合性（`new:{slug}` → 確定番号の置換漏れなし）、マージ結果の整合性（要件テーブル構造、番号重複なし）、インデックスの整合性（README/DOC-MAP/mapping-table エントリと採番結果の一致）、変更範囲の妥当性（Step 9 で検証）。各検証は決定的スクリプトの JSON 結果で機械的に確認する。判定基準、検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は保存を停止し req-define へ差し戻しを推奨。**REQ-0102-082**: req-save の QG-1 は内容の品質（検証可能性、REQ/SPEC 分類適合性等）を再検証せず、内容の品質は req-define の QG-1 の責務とする
+**Step 4-0**: QG-1（適用結果の整合性検証、REQ-0102-081/082、AG-003）。REQ/ADR ファイル保存前に、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）を「適用結果の整合性検証」として実行する。検証項目: 採番結果の整合性（`new:{slug}` → 確定番号の置換漏れなし）、マージ結果の整合性（要件テーブル構造、番号重複なし）、インデックスの整合性（README/DOC-MAP/mapping-table エントリと採番結果の一致）、変更範囲の妥当性（Step 9 で検証）。各検証は決定的スクリプトの JSON 結果で機械的に確認する。判定基準、検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は保存を停止し req-define へ差し戻しを推奨。**REQ-0102-082**: req-save の QG-1 は内容の品質（検証可能性、REQ/SPEC 分類適合性等）を再検証せず、内容の品質は req-define の QG-1 の責務とする
 
-**Step 4-1**: 語彙、責務、runtime境界矛盾の防止 — Step 4 の保存完了後、既知の矛盾を検出可能な範囲で防止する。詳細は `agentdev-req-file-manager` を参照。委譲接続点: サブエージェントは検査結果と根拠のみを返し、親エージェントがfollow-up扱いを判断する
+**Step 4-1**: 語彙、責務、runtime境界矛盾の防止。Step 4 の保存完了後、既知の矛盾を検出可能な範囲で防止する。詳細は `agentdev-req-file-manager` を参照。委譲接続点: サブエージェントは検査結果と根拠のみを返し、親エージェントがfollow-up扱いを判断する
 
-**Step 4-2**: Catalog entry 確認（APPEND 時） — Step 4 で への APPEND 操作を実行した場合、追加した要件行に関連する `docs/specs/integrity-rule-catalog.md` の catalog entry 有無を確認する。catalog entry が未記載の場合、ユーザーに追記を促す。req-save 自身は `docs/specs/` 配下を直接編集しない（G02 制約）
+**Step 4-2**: Catalog entry 確認（APPEND 時）。Step 4 で への APPEND 操作を実行した場合、追加した要件行に関連する `docs/specs/integrity-rule-catalog.md` の catalog entry 有無を確認する。catalog entry が未記載の場合、ユーザーに追記を促す。req-save 自身は `docs/specs/` 配下を直接編集しない（G02 制約）
 
-**Step 4-3**: 複数 REQ/ADR ファイルの3フェーズ分離（REQ-0114-090/093） — 複数 REQ/ADR ファイルを保存する場合、並列委譲可能な作成フェーズと直列集約フェーズを分離する（詳細は後述「case-auto 並列委譲モデル」セクション参照）
+**Step 4-3**: 複数 REQ/ADR ファイルの3フェーズ分離（REQ-0114-090/093）。複数 REQ/ADR ファイルを保存する場合、並列委譲可能な作成フェーズと直列集約フェーズを分離する（詳細は後述「case-auto 並列委譲モデル」セクション参照）
 
 ### Step 5: インデックス、ハブ更新
 
@@ -183,7 +183,7 @@ Step 10 で更新したドラフトファイルのstatus変更をcommit対象に
 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、`git add <path>` で明示パスステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする。
 スイープ操作（`git add -A`/ `git add .` 等）は禁止し、共有 index の他セッション変更を排出しないこと
 
-**Step 11-1**: REQ/ADR artifact_actions 処理結果の保存 — ドラフトに複数の `artifact_actions` entry が含まれる場合、以下を保存する:
+**Step 11-1**: REQ/ADR artifact_actions 処理結果の保存（ドラフトに複数の `artifact_actions` entry が含まれる場合、以下を保存する）:
 - (a) 保存したREQドキュメントのリスト（REQ番号を含む）
 - (b) 各 artifact_action から保存したREQドキュメントへのマッピング
 - (c) ソースRUからREQ操作へのマッピング
@@ -191,7 +191,7 @@ Step 10 で更新したドラフトファイルのstatus変更をcommit対象に
 
 **OU 結果の書き戻し**: ドラフトに `operation_units` セクションがある場合、各 OU の `result` に保存結果を書き戻す。書き戻し内容: (a) 保存したREQドキュメント一覧 (b) OU 操作と保存先REQ doc の対応 (c) source RUとOU操作の対応 (d) case-open が入力として扱える保存結果
 
-**Step 11-2**: Issue作成の責任分離 — req-saveはREQドキュメントの保存中にIssueを作成しない。Issue作成はcase-openの責任範囲とする
+**Step 11-2**: Issue作成の責任分離。req-saveはREQドキュメントの保存中にIssueを作成しない。Issue作成はcase-openの責任範囲とする
 
 ### Step 12: 完了報告
 
