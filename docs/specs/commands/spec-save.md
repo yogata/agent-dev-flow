@@ -32,16 +32,16 @@ req-save の次、case-open の前に実行する。
 
 - Step 1: 事前チェック（`draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認）。なければ no-op 完了。ドラフト不存在時はエラー中止
 - Step 2: SPEC artifact_actions 読込（`artifact: spec` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は SPEC 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（create/update）、`content` を処理対象とする
-- Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/patterns.md`）→ update 操作）。`new:{topic-slug}` → 新規 SPEC 作成（`docs/specs/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約
+- Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/patterns.md`）→ update 操作）。`new:{topic-slug}` → 新規 SPEC 作成（`docs/specs/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-0136-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
 - Step 4: SPEC 分離基準の最終確認（各 action が REQ-0101-055（SPEC に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-0101-069）相当は除外し follow-up に明示
-- Step 5: SPEC ファイル操作
+- Step 5: SPEC ファイル操作。`target_area` 見出し検索は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行
   - create: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
   - update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
   - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
-- Step 6: インデックス整合（新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加）。既存 SPEC 追記時は README 更新不要
+- Step 6: インデックス整合（新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加）。既存 SPEC 追記時は README 更新不要。エントリ存在確認は決定的スクリプトで実行
 - Step 7: DOC-MAP 影響確認（SPEC 操作が `docs/DOC-MAP.md` に影響するか確認し、影響がある場合は更新（`agentdev-doc-map`））
 - Step 8: ドラフト status 更新（`draft-data` に SPEC 消費済みフラグを付与）。commit/push より前に更新し commit 対象に含める
-- Step 9: 変更範囲検証（`git diff --name-only` で `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を検出したらエラー報告、指示待ち（自動破棄しない））
+- Step 9: 変更範囲検証（許可パス照合は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行。`git diff --name-only` で `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を検出したらエラー報告、指示待ち（自動破棄しない））
 - Step 10: コミット、プッシュ（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
 - Step 11: 完了報告（保存した SPEC 一覧（新規/追記別）、スキップ有無、follow-up（安定契約例外で除外した候補））
 
@@ -92,6 +92,7 @@ req-save の次、case-open の前に実行する。
 
 ## 検証観点
 
+- 品質ゲート（適用結果の整合性検証）: target_area 置換結果の整合性、SPEC status の整合性（新規作成時 `status: draft` 付与）、インデックスの整合性（`docs/specs/README.md` エントリと新規 SPEC の一致）、変更範囲の妥当性を検証。内容の品質は req-define の QG-1 の責務（REQ-0136-030）
 - SPEC 分離基準適合性（REQ-0101-055）: 各 action の content が SPEC に置くべき内容か
 - frontmatter 完全性: 新規作成時の `title`, `status: draft`, `created`, `updated`
 - 配置先解決の正確性: 既存パス vs `new:{slug}` の判定、重複候補統合

@@ -100,6 +100,8 @@ ADR 対象となる判断を REQ/SPEC/guide のみとして扱う判断漏れ（
 この分離の意図は、**Command の肥大化防止**と**再利用性の最大化**にある。
 Command が薄いディスパッチャーに徹することで、新しい Command の追加、既存 Command の変更コストを最小化する。
 
+**決定的処理の Script 委譲原則**: Command は決定的処理（採番、整合性確認、エントリ存在確認、変更範囲検証、target_area 見出し検索等）を LLM 推論で実行せず、Script へ委譲することを原則とする。req-save / spec-save の決定的処理（REQ 番号採番、ADR 番号採番、要件行 ID 採番、frontmatter 整合性確認、README/DOC-MAP/mapping-table エントリ存在確認、変更範囲検証、target_area 見出し検索）は `agentdev-req-file-manager/scripts/` 配下の決定的スクリプトで実行する（REQ-0136-029、本節「Script」責務の忠実な実装）。
+
 ### Command
 
 **置くもの**:

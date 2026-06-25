@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-24
+updated: 2026-06-25
 ---
 
 # case-auto SPEC
@@ -41,7 +41,8 @@ updated: 2026-06-24
   - artifact_actions ベース分岐: `artifact: req` or `artifact: adr` → req-save / `artifact: spec` → spec-save（req-save の後）/ 常に → case-open / その後 → case-run → case-close
   - spec-save 実行判定（ADR-0123 Decision #3, REQ-0136-014）（req-save 完了後に `artifact: spec` entry 確認）
   - auto_gate preflight（`auto_gate.auto_ready` が false または未解決 item 残る場合は停止）
-- Step 4: 各工程の実行（各工程（req-save / spec-save / case-open / case-run / case-close）を各コマンド委譲契約に従い task() で起動（ADR-0127, REQ-0114-006/084/085））
+- Step 4: 各工程の実行（req-save と spec-save は1つの task で順次実行（AG-005 統合）、case-open / case-run / case-close は各コマンド委譲契約に従い task() で起動（ADR-0127, REQ-0114-006/084/085））
+  - req-save / spec-save 統合 task（AG-005）: req-save と spec-save を1つの task で順次実行。task 内では両コマンドの定義を順次読み込み、draft を1回読み込み、req-save の手順を実行後、引き続き spec-save の手順を実行する。commit/push は1回に統合（REQ + SPEC の変更を1コミット）。各コマンドの権限（ファイル操作範囲）は task に両方のガードレールを適用。req-save/spec-save のコマンド定義・責務・ガードレールは変更しない（統合は case-auto の実行制御レイヤーのみ）
   - 工程別委譲契約（ADR-0112 §5、ADR-0127）: 各工程の起動方式、inputs、output_contract は工程別委譲契約表参照
   - 品質ゲート（QG-1〜QG-4）の継承（case-auto は QG を独自実装せず、構成コマンドが各自適用）
   - case-run の実行担当サブエージェント委譲モデル（case-auto は変更せず）

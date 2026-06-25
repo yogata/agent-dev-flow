@@ -184,35 +184,75 @@ operation_units:
     depends_on: [OU-001, OU-002, OU-003]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [docs/specs/design-principles.md]
+      artifact_action_mapping:
+        ACT-SPEC-001: docs/specs/design-principles.md
+      applied_sections:
+        - "第5節本文: 決定的処理の Script 委譲原則を追記（AG-002、REQ-0136-029）"
+      notes:
+        - "target_area='## 5. ...' は strict 置換すると破壊的のため、意図（Script 記述の補強）を読み取り第5節本文に追記。AG-001 違反の疑い（content が指示形）"
+        - "frontmatter なし（基盤 SPEC）、updated 更新省略"
   - ou_id: OU-005
     target_spec: docs/specs/commands/req-save.md
     operation: spec-update
     depends_on: [OU-001]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [docs/specs/commands/req-save.md]
+      artifact_action_mapping:
+        ACT-SPEC-002: docs/specs/commands/req-save.md
+      applied_sections:
+        - "## 現在の動作 Step 4/4-0/5/7/8/9: 決定的処理のスクリプト呼出化、QG-1 を適用結果の整合性検証に更新（AG-002/003、REQ-0136-029、REQ-0102-081/082）"
+        - "## 検証観点: QG-1 位置づけ更新"
+      notes:
+        - "target_area='## 現在の動作' は strict 置換すると破壊的のため、該当 Step 記述を更新。AG-001 違反の疑い（content が指示形）"
+        - "frontmatter updated: 2026-06-22 -> 2026-06-25"
   - ou_id: OU-006
     target_spec: docs/specs/commands/spec-save.md
     operation: spec-update
     depends_on: [OU-002]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [docs/specs/commands/spec-save.md]
+      artifact_action_mapping:
+        ACT-SPEC-003: docs/specs/commands/spec-save.md
+      applied_sections:
+        - "## 現在の動作 Step 3/5/6/9: 決定的処理のスクリプト呼出化（AG-002、REQ-0136-029）"
+        - "## 検証観点: 品質ゲート（適用結果の整合性検証）を追記（AG-004、REQ-0136-030）"
+      notes:
+        - "target_area='## 現在の動作' は strict 置換すると破壊的のため、該当 Step 記述を更新。AG-001 違反の疑い（content が指示形）"
+        - "frontmatter updated: 既に 2026-06-25（更新不要）"
   - ou_id: OU-007
     target_spec: docs/specs/commands/case-auto.md
     operation: spec-update
     depends_on: [OU-001, OU-002]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [docs/specs/commands/case-auto.md]
+      artifact_action_mapping:
+        ACT-SPEC-004: docs/specs/commands/case-auto.md
+      applied_sections:
+        - "## 現在の動作 Step 4: req-save/spec-save 統合 task 記述を追記（AG-005）"
+      notes:
+        - "target_area='## 手順' は case-auto.md に存在しない。content の意図（工程別委譲契約 Step 4 更新）を読み取り ## 現在の動作 Step 4 に適用。target_area 修正を推奨（## 現在の動作 へ）"
+        - "frontmatter updated: 2026-06-24 -> 2026-06-25"
   - ou_id: OU-008
     target_spec: src/opencode/skills/agentdev-req-file-manager/SKILL.md
     operation: spec-update
     depends_on: [OU-003]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: []
+      artifact_action_mapping: {}
+      skipped: true
+      skip_reason: "G02/G03 違反: src/opencode/skills/agentdev-req-file-manager/SKILL.md は docs/specs/** 外（スキル編集禁止）。case-run または別ルートでの処理を推奨"
+      notes:
+        - "ACT-SPEC-005 は spec-save ガードレール G02（docs/specs/** のみ編集許可）、G03（スキル編集禁止）に違反。draft の artifact 種別（spec）と target path（skills/）の不整合。req-define での再分類を推奨"
 
 test_strategy:
   - id: TS-001
@@ -295,6 +335,24 @@ case_open_hints:
       issues: [I, J, K]
       rationale: 実装（コマンド定義更新 + 新規Script作成）はSPEC完了後
       depends_on: [wave 2]
+
+spec_actions_consumed:
+  consumed: true
+  consumed_at: 2026-06-25T15:00:00+09:00
+  saved_specs:
+    - docs/specs/design-principles.md
+    - docs/specs/commands/req-save.md
+    - docs/specs/commands/spec-save.md
+    - docs/specs/commands/case-auto.md
+  skipped_specs:
+    - target: src/opencode/skills/agentdev-req-file-manager/SKILL.md
+      reason: "G02/G03 違反（docs/specs/** 外、スキル編集禁止）"
+  follow_ups:
+    - "ACT-SPEC-001/002/003: content が指示形（AG-001 違反の疑い）。req-define での content 完成本化を推奨"
+    - "ACT-SPEC-001: target_area が広域（第5節全体）。### Script 等への細分化を推奨"
+    - "ACT-SPEC-002/003: target_area='## 現在の動作' は strict 置換すると破壊的。意図を読み取り該当 Step を更新"
+    - "ACT-SPEC-004: target_area='## 手順' は case-auto.md に存在しない。## 現在の動作 への修正を推奨"
+    - "ACT-SPEC-005: G02/G03 違反。case-run または別ルートでの処理を推奨。req-define での artifact 種別再分類を推奨"
 ```
 
 # summary
