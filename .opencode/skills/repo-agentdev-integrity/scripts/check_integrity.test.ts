@@ -940,6 +940,8 @@ function buildIr044Fixture(root: string): void {
       "| REQ-9005 | IR-044 fixture |",
       "| REQ-9006 | IR-044 fixture |",
       "| REQ-9007 | IR-044 fixture |",
+      "| REQ-9008 | IR-044 fixture |",
+      "| REQ-9009 | IR-044 fixture |",
       "",
     ].join("\n"),
     "utf-8",
@@ -1082,6 +1084,48 @@ function buildIr044Fixture(root: string): void {
     "utf-8",
   );
 
+  // REQ-9008: true positive — 手順 N (kanji step reference) SPEC detail.
+  // "手順 N" is a Japanese step-reference variant covered by REQ-0136-031.
+  writeFileSync(
+    join(reqDir, "REQ-9008.md"),
+    [
+      "---",
+      "id: REQ-9008",
+      "title: IR-044 step number (手順 N)",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9008-001 | 実装は 手順 4 で入力検証を行うこと |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9009: false positive — META rule declaration line containing the word
+  // "Step 番号" (without digit literal). Mirrors REQ-0136-031 itself, which
+  // declares the principle and must NOT be flagged as a Step number violation.
+  // The digit-literal distinction in the regex provides the mechanical guarantee.
+  writeFileSync(
+    join(reqDir, "REQ-9009.md"),
+    [
+      "---",
+      "id: REQ-9009",
+      "title: IR-044 META rule Step 番号 (no digit)",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9009-001 | 全現行 REQ の要件行は command 定義または SPEC の Step 番号を直接参照せず、機能名・フェーズ名で参照すること。検出の詳細シグナルは SPEC に配置すること |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
   // Empty adr/specs/skills to satisfy other checks minimally
   mkdirp(join(root, "docs", "adr"));
   mkdirp(join(root, "docs", "specs"));
@@ -1118,6 +1162,30 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
         (res.evidence ?? "").includes("REQ-9005"),
     );
     expect(violations.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects true positive: 手順 N step-reference SPEC detail", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9008"),
+    );
+    expect(violations.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("does NOT flag META rule declaration line with Step 番号 word (REQ-0136-031 guard)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9009"),
+    );
+    expect(violations.length).toBe(0);
   });
 });
 

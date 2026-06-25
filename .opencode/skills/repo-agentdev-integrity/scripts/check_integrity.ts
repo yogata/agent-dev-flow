@@ -6063,6 +6063,10 @@ function checkReqVerificationBasis(root: string): CheckResult[] {
 //   4. checker individual rule   5. false positive suppression
 //   6. Step number    7. Phase number         8. internal algorithm
 //   9. specific work history
+// Step number signal covers `Step N`, `ステップ N`, `手順 N` direct references
+// (REQ-0136-031). The word "Step 番号" (without digit literal) is NOT matched,
+// preventing META rule declaration lines like REQ-0136-031 itself from being
+// falsely flagged (mechanical digit-literal distinction, not context exemption).
 // Pure pattern-match detection (no meaning-based context exemption).
 // Severity: heuristic (warn / exit 0).
 
@@ -6094,7 +6098,7 @@ const IR044_SIGNAL_PATTERNS: ReadonlyArray<{ signal: string; pattern: RegExp }> 
     },
     {
       signal: "Step number",
-      pattern: /\bStep\s*\d+(?:\s*[-–]\s*\d+)?\b|ステップ\s*\d+(?:\s*[-–]\s*\d+)?/,
+      pattern: /\bStep\s*\d+(?:\s*[-–]\s*\d+)?\b|ステップ\s*\d+(?:\s*[-–]\s*\d+)?|手順\s*\d+(?:\s*[-–]\s*\d+)?/,
     },
     {
       signal: "Phase number",
