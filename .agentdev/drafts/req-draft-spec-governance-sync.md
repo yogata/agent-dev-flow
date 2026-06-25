@@ -154,7 +154,13 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      saved_specs: [case-run.md]
+      saved_path: docs/specs/commands/case-run.md
+      case_open:
+        issue_number: 1191
+        issue_url: https://github.com/yogata/agent-dev-flow/issues/1191
+        created_at: 2026-06-26T01:19:05+09:00
 
 test_strategy:
   - id: TS-001
