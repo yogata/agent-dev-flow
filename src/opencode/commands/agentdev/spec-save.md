@@ -65,7 +65,10 @@ SPEC 対象 artifact_actions がない場合は no-op で完了。
 
 `draft-data` の `artifact_actions`（`artifact: spec`）の全 entry を処理する:
 - **create**: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
-- **update**: 既存 SPEC ファイルの該当セクションへ action の `content` を追記し、frontmatter `updated` を更新。`status` は変更しない
+- **update**:
+  - `target_area` 指定時（operation が `update`/`spec-update`）: 対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-0136-027）。詳細は後述「target_area ベースのセクション置換ロジック」
+  - `target_area` 未指定時: 既存 SPEC ファイルの該当セクションへ action の `content` を追記（後方互換、REQ-0136-028）
+  - frontmatter `updated` を更新。`status` は変更しない
 - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
 
 **Step 5-1**: 複数 SPEC action の並列化（REQ-0114-091/093） — 異なる `target` パスの SPEC create/update は並列化可能。同一 SPEC ファイルへの複数 action は順序依存のため直列サブセットとして分離する。詳細は後述「case-auto 並列委譲モデル」セクション参照
@@ -96,6 +99,29 @@ Step 8 の status 変更を commit 対象に含める。
 ### Step 11: 完了報告
 
 完了報告 template に従い、保存した SPEC 一覧（新規/追記別）、スキップ有無、follow-up（安定契約例外で除外した候補）を出力
+
+## target_area ベースのセクション置換ロジック（REQ-0136-027/028）
+
+`operation: update` / `operation: spec-update` において action の `target_area` が指定された場合、spec-save は対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う。
+
+### マッチング規則
+
+- 対象 SPEC ファイル内の見出し行を走査し、`target_area` と完全一致する見出し行を検索する（見出しテキスト部分の一致）
+- 当該見出し行から次の同レベル（または上位レベル）見出し行の直前までを「セクション」として特定する
+  - 例: `### X` で検索した場合、次の `###` / `##` / `#` 見出し行の直前までを範囲とする
+- 特定したセクションを action の `content` で置換する
+
+### 複数マッチ時の挙動
+
+`target_area` に一致する見出しが複数存在する場合、最初のマッチを採用し warn を出力する。
+
+### 未検出時の挙動
+
+`target_area` に一致する見出しが存在しない場合、当該 action をスキップし、follow-up として「target_area 未検出、operation を spec-create へ切り替えを推奨」を報告する（全体中止しない）。
+
+### 後方互換（target_area 未指定）
+
+`target_area` が未指定の draft（旧形式）、または `operation` が `create`/`spec-create` の場合は従来の「追記」動作を維持する（REQ-0136-028）。`target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
 
 ## case-auto 並列委譲モデル（REQ-0114-091/093）
 
