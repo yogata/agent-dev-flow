@@ -103,6 +103,10 @@ artifact_actions:
       - worktree クリーンアップ（開始・完了）
 
       記録された L2 タイムスタンプは case-auto の工程別壁時計時間報告（REQ-0151-008）の入力として消費される。L3（ulw-loop 内部メトリクス）は対象外とする（REQ-0151-010）。
+    consumed:
+      spec_save: true
+      consumed_at: 2026-06-25T23:54:20+09:00
+      saved_path: docs/specs/commands/case-run.md
 
 conflict_resolutions:
   - id: CR-001
