@@ -209,8 +209,12 @@ operation_units:
     recommended_order: 4
     issue_policy: single
     result:
-      consumed_by: none
+      consumed_by: [case-open]
       note: "CR-002 検証完了のみ。dangling 参照なし（references/req-define-detailed-gates.md は既存・完結）。補修正不要のため req-save/spec-save いずれも対象外。"
+      issue_number: 1197
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1197
+      created_at: 2026-06-25T17:46:32Z
+      case_open_note: "OU-004 全体スコープ（agentdev-req-analysis SKILL.md の references 参照整合性検証）を単一 Issue #1197 として作成。issue_policy=single 採用（単一スキルの参照整合性検証という単一関心、Epic 化根拠なし G20）。labels: enhancement, maintenance。OU-004 は verification-only（target_req/target_spec なし、operation=update は検証スコープのみ）のため、req-save/spec-save の消費対象なし。case-run は TS-005 に基づく検証のみ（実在性・完結性の再確定）。"
 
 req_save_results:
   consumed_at: 2026-06-26T01:49:41+09:00
