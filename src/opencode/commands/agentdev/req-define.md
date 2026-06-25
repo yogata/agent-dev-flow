@@ -165,7 +165,7 @@ Step 7 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で
 - G10: 要件doc構造は req-draft.md テンプレート（構造化 `draft-data` 形式）に従う
 - G11: ADR閾値以上の判断は `agentdev-adr-guidelines` へ
 - G12: work_type 判定基準は `agentdev-workflow-lifecycle` を参照
-- G13: req-define は Issue 階層を決定しない。Issue 階層の決定は case-open の責務範囲
+- G13: req-define は Issue 階層を決定しない。`depends_on`（必須依存のみ）は case-open が execution_unit 構成（連結成分判定）に使用する依存情報であり、最終 Issue 構成は case-open が決定する
 - G14: req-define は draft に `operation_units` セクションを出力し、`execution_groups` セクションは出力しないこと（038）。単一REQ操作の場合も 1 件の OU として出力する。Epic/ Wave/ Issue 構成の生成は case-open の責務である
 - G15: SPEC 分離基準に該当する要件行候選は REQ 要件行に残留させず、`draft-data` の `artifact_actions`（`artifact: spec`）へ分離すること。安定契約例外は分離対象外
 - G16: ADR判断が必要な変更（ADR要否確認ゲート）では ADR 判断前に `agentdev-architecture-advisory` を参照する。oracle は ADR 要否、推奨方向、設計リスク、根拠を返し、最終的な ADR 作成判断は親エージェントが行う
