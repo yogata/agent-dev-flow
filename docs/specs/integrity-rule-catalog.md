@@ -938,7 +938,7 @@ REQ/SPEC 責務範囲を規定する META 規則行（enum/format/schema 等 SPE
 | 対象 | 判定 | 根拠 |
 |------|------|------|
 | REQ-NNNN-MMM 形式 + SPEC 種別列挙（enum/format/schema 等）を名指しする責務範囲規定行 | 免除（META 規則行） | REQ-0145-012。当該行は SPEC 詳細の記述ではなく責務範囲の規定 |
-| SPEC 詳細そのものを列挙する行（enum 値 A/B/C の一覧、fixture の具体件数と内容の羅列） | 免除しない（true positive 候補） | 件数・内容を規定する行は責務範囲規定ではない |
+| SPEC 詳細そのものを列挙する行（enum 値 A/B/C の一覧、テストデータ（fixture）の具体件数と内容の羅列） | 免除しない（true positive 候補） | 件数・内容を規定する行は責務範囲規定ではない |
 
 **inspect-docs へ委譲した文脈免除（docs-check 対象外）**:
 
@@ -1133,7 +1133,7 @@ grep ベース実装は推論ベースを置き換えるのではなく、補助
 | related_spec | [integrity-rule-catalog.md, integrity-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。agentdev-gh-cli 許容ファイル（standard-procedures.md）を除外対象に含めない場合 false positive が発生する。除外リストの厳密な適用で抑制する |
-| regression_test | (追加予定)。gh 直接記述を含む fixture で検出されること、standard-procedures.md で検出されないことを検証する |
+| regression_test | (追加予定)。gh 直接記述を含むテストデータ（fixture）で検出されること、standard-procedures.md で検出されないことを検証する |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | 検出された gh 直接記述を agentdev-gh-cli 手続き委譲に置き換える。除外対象外の正当な gh 記述（standard-procedures.md 内）はそのまま |
