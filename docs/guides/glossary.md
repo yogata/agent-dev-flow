@@ -79,19 +79,16 @@ AgentDevFlow で使う用語の定義。
 
 ## ローカル版 OpenCode
 
-GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態（REQ-0141, ADR-0126）に関連する用語。
+GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態（REQ-0141, ADR-0131）に関連する用語。
 
 | 用語 | 定義 |
 |------|------|
-| ローカル版 OpenCode | GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態（REQ-0141-001）。GitHub 版 AgentDevFlow の原本を変換プロンプト経由でローカル運用向けに生成して利用する |
-| 仕様管理リポジトリ | AgentDevFlow 本体リポジトリ（agent-dev-flow）。ローカル版生成の入力元として扱われる（REQ-0141-002） |
-| 生成先リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ。`consumer-generated` リポジトリ種別に対応（REQ-0141-002） |
-| consumer-generated | ローカル版 OpenCode を導入するリポジトリ種別。`.opencode/commands/agentdev/` が実ディレクトリ（非ジャンクション）かつ `generated_by: local-opencode-transform` 識別子を含むことで判定される（SPEC `runtime-package-boundary.md`） |
-| `generated_by` 識別子 | ローカル版生成物に付与される識別情報。値は `local-opencode-transform`（REQ-0141-011）。同名ファイル上書きは本識別子が一致する場合のみ許可される（REQ-0141-012, 013）。IR-048 で整合性を検証 |
+| ローカル版 OpenCode | GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態（REQ-0141-001）。link mode により GitHub 版 AgentDevFlow の原本を `.opencode/` 配下へ接続して利用する（ADR-0131） |
+| 仕様管理リポジトリ | AgentDevFlow 本体リポジトリ（agent-dev-flow）。ローカル版 link 先の原本を保持する（REQ-0141-002） |
+| 導入先リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ。`consumer-generated` リポジトリ種別に対応（REQ-0141-002） |
+| consumer-generated | ローカル版 OpenCode を導入するリポジトリ種別。`.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決されることで判定される（SPEC `runtime-package-boundary.md`, ADR-0131） |
+| `generated_by` 識別子 | ADR-0126 時代のローカル版生成物に付与された識別情報。値は `local-opencode-transform`。link mode への移行後は付与されず、上書き保護も廃止された（ADR-0131 decision #5）。IR-046/048 は link mode 移行前の生成物が混在する環境向けの整合性検証語彙として残る |
 | `src/opencode-local/` | ローカル版 link 先原本領域。AgentDevFlow 本体リポジトリに配置され、`README.md` と `agentdev-gh-cli/` のみを保持する（REQ-0141-004, 005）。IR-047 でディレクトリ構成を検証 |
-| 生成時ソース（generation-time source） | `src/opencode-local/` の役割。生成済みコマンド/スキル/ひな形を配置せず、生成プロセスへの入力のみを保持する。IR-047 で監視される |
+| link mode | ローカル版導入方式。`.opencode/` 配下を src 配下へ接続し、原本をそのまま利用する。agentdev-gh-cli だけを `src/opencode-local/agentdev-gh-cli/` から差し替える（ADR-0131, REQ-0141-007） |
+| link target 確認 | ローカル版 link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認する安全機構（REQ-0141-010, ADR-0131 decision #6）。意図した target 以外へ解決される場合は link 設定を停止する |
 | Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として SPEC `workflow-contracts.md` で定義される。SSoT は GitHub Issue/PR ではなくローカル Case ファイル（`.agentdev/cases/case-{NNNN}.md`）となる |
-| 変換用プロンプト | `src/opencode-local/transform/generate.md`。AI エージェントが GitHub 版原本をローカル版に変換する際に従うプロンプト（REQ-0141-028, 032） |
-| レビュー用プロンプト | `src/opencode-local/transform/review.md`。ローカル版生成物の変換品質を検証するプロンプト（REQ-0141-028） |
-| 変換仕様 | `src/opencode-local/transform/spec.md`。変換対象、ガードレール、レポートフォーマットを定義する（REQ-0141-029） |
-| ジャンクション検出安全ゲート | ローカル版生成前に `.opencode/` の実パスを確認し、`src/opencode/` 配下へ解決される場合は生成を停止する安全機構（REQ-0141-010）。原本保護を担保する |
