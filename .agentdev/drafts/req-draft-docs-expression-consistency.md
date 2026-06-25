@@ -194,7 +194,46 @@ operation_units:
     depends_on: []
     recommended_order: 5
     issue_policy: epic
-    result: {}
+    result:
+      epic: 1169
+      epic_url: https://github.com/yogata/agent-dev-flow/issues/1169
+      children:
+        - seq: 1-1
+          wave: 1
+          scope: docs/requirements
+          issue: 1170
+          issue_url: https://github.com/yogata/agent-dev-flow/issues/1170
+        - seq: 1-2
+          wave: 1
+          scope: docs/adr
+          issue: 1171
+          issue_url: https://github.com/yogata/agent-dev-flow/issues/1171
+        - seq: 1-3
+          wave: 1
+          scope: docs/specs
+          issue: 1172
+          issue_url: https://github.com/yogata/agent-dev-flow/issues/1172
+        - seq: 1-4
+          wave: 1
+          scope: docs/guides
+          issue: 1173
+          issue_url: https://github.com/yogata/agent-dev-flow/issues/1173
+        - seq: 1-5
+          wave: 1
+          scope: AGENTS.md
+          issue: 1174
+          issue_url: https://github.com/yogata/agent-dev-flow/issues/1174
+        - seq: 2-1
+          wave: 2
+          scope: src/opencode/commands
+          issue: 1175
+          issue_url: https://github.com/yogata/agent-dev-flow/issues/1175
+        - seq: 2-2
+          wave: 2
+          scope: src/opencode/skills
+          issue: 1176
+          issue_url: https://github.com/yogata/agent-dev-flow/issues/1176
+      created_at: 2026-06-25T22:05:00+09:00
 
   - ou_id: OU-003
     source_ru: RU-0007
