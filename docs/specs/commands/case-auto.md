@@ -159,7 +159,7 @@ case-auto は各工程（req-save / spec-save / case-open / case-run / case-clos
 
 - 計測単位: task() 起動前後の壁時計時刻（JST、REQ-0114-082 の時刻形式に準拠）
 - 記録先: case-auto 完了報告への工程別内訳追記。永続化は必要になった段階で別途検討
-- 対象外: ulw-loop 内部メトリクス（L3）は oh-my-openagent 依存が強すぎるため対象外（REQ-0151-010）。case-run 内の Sisyphus-Junior 計測（L2）は case-run result に含まれる（REQ-0151-009、REQ-0130-028）
+- 対象外: ulw-loop 内部メトリクス（L3）は oh-my-openagent 依存が強すぎるため対象外（REQ-0151-010）。case-run 内の L2 計測は case-run result に含まれる（REQ-0151-009、REQ-0130-028）
 
 ## See Also
 
