@@ -190,11 +190,17 @@ operation_units:
     recommended_order: 3
     issue_policy: single
     result:
-      consumed_by: req-save
+      consumed_by: [req-save, spec-save, case-open]
       consumed_at: 2026-06-26T01:49:41+09:00
       saved_path: docs/requirements/REQ-0143.md
       allocated_id: REQ-0143-004
       artifact_action_ref: ACT-REQ-004
+      req_save_note: "ACT-REQ-004 は req-save コマンドの対象（commit 606f4c9d で消費済み）。REQ-0143-004 として REQ-0143.md へ APPEND 済み。"
+      spec_save_note: "ACT-SPEC-002 は spec-save コマンドの対象（commit 59032773 で消費済み）。req-define.md の '## 現在の動作' セクションへ REQ-0143-004 整合宣言と case-run 委譲注記を追記。Step 再採番は OU-003 case-run へ委譲。"
+      issue_number: 1196
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1196
+      created_at: 2026-06-25T17:40:49Z
+      case_open_note: "OU-003 全体スコープ（REQ-0143-004 確認 + req-define.md SPEC の Step 再採番 + command-file-format.md Step 0 規則配置 + 他 command/SPEC ペア横展開確認）を単一 Issue #1196 として作成。issue_policy=single 採用（単一 REQ APPEND 1 件 + SPEC Step 再採番 + 横展開確認は同一原則「Step 番号構成一致」へ帰着、単一 PR で変換負荷の実測と原則成立を同時検証）。labels: enhancement, maintenance。REQ-0143-004 は req-save 完了済み、ACT-SPEC-002 整合宣言は spec-save 完了済みのため case-run 主作業は SPEC 側 Step 再採番と他ペア横展開確認。"
   - ou_id: OU-004
     source_ru: RU-0014
     operation: update
