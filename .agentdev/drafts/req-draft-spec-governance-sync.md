@@ -142,6 +142,10 @@ operation_units:
     result:
       saved_reqs: [REQ-0125-011]
       saved_path: docs/requirements/REQ-0125.md
+      case_open:
+        issue_number: 1189
+        issue_url: https://github.com/yogata/agent-dev-flow/issues/1189
+        created_at: 2026-06-26T00:49:35+09:00
   - ou_id: OU-003
     source_ru: RU-0010
     target_spec: docs/specs/commands/case-run.md
