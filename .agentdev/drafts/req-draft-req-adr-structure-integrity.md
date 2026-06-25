@@ -59,6 +59,11 @@ artifact_actions:
       - **関連 SPEC**: local-generation.md、local-transform.md、runtime-package-boundary.md
 
       ADR-0126（superseded）は履歴参照のみとし、現行根拠として扱わない（REQ-0112-053 準拠）。
+    consumed:
+      spec_save: skipped
+      consumed_at: 2026-06-26T02:35:00+09:00
+      skip_reason: "target_area '## 関連情報' 未検出。Actual heading: '## 関連項目' (L235)。search-target-area.ts result: { ok: true, matches: [] }。Per spec-save.md Step 5 + target_area 未検出 rule（REQ-0136-029、AG-002 決定的スクリプト）、action skipped。"
+      recommended_fix: "draft target_area を '## 関連項目' へ修正（見出しテキスト完全一致）して spec-save 再実行、または operation を spec-create へ切り替え。"
   - id: ACT-REQ-001
     artifact: req
     operation: update
@@ -123,6 +128,11 @@ artifact_actions:
       req-define の Step 番号構成は command 定義（src/opencode/commands/agentdev/req-define.md）と一致する（REQ-0143-004）。Step 0「セッションコンテキスト検知」は明示的な採番対象とし、後続フェーズの Step 番号は command 定義と完全に一致させる。 SPEC と command で Step 番号がずれる場合、SPEC 側を command 定義へ合わせる。
 
       注: 本セクションの Step 番号再採番（旧構成からの移行）は case-run で実施する。移行後、完了条件・テスト戦略と実装の間で Step 番号変換が不要となることを確認すること。
+    consumed:
+      spec_save: skipped
+      consumed_at: 2026-06-26T02:35:00+09:00
+      skip_reason: "target_area '## 現在の動き' 未検出。Actual heading: '## 現在の動作' (L35)。search-target-area.ts result: { ok: true, matches: [] }。Per spec-save.md Step 5 + target_area 未検出 rule（REQ-0136-029、AG-002 決定的スクリプト）、action skipped。"
+      recommended_fix: "draft target_area を '## 現在の動作' へ修正（replace intent の場合）、または operation を spec-create へ切り替え（TASK の 'add it in an appropriate location' intent の場合）。その後 spec-save 再実行。"
 
 conflict_resolutions:
   - id: CR-001
@@ -213,6 +223,37 @@ req_save_results:
     entry_existence_REQ-0143: { ok: true, found_in: [docs/requirements/README.md, docs/DOC-MAP.md] }
     change_impact: { ok: true, violations: [] }
   index_update_note: "新規 REQ ファイル追加なし（全 UPDATE/APPEND）。README/docs/README.md の REQ 数（46件）は不変のためインデックス更新不要。"
+
+spec_save_results:
+  consumed_at: 2026-06-26T02:35:00+09:00
+  outcome: skipped_all
+  skip_summary: |
+    spec-save は ACT-SPEC-001/002 両 action をスキップした。両者とも target_area が対象 SPEC 内の実見出しと不一致のため、spec-save.md Step 5 + target_area 未検出 rule（REQ-0136-029、AG-002 決定的スクリプト）に従いスキップ。SPEC ファイル本体は一切編集していない。
+  skipped_actions:
+    ACT-SPEC-001:
+      target: docs/specs/local-case-file.md
+      draft_target_area: "## 関連情報"
+      actual_heading: "## 関連項目" (L235)
+      script_result: { ok: true, matches: [] }
+      recommended_fix: "draft target_area を '## 関連項目' へ修正（見出しテキスト完全一致）、または operation を spec-create へ切り替え"
+    ACT-SPEC-002:
+      target: docs/specs/commands/req-define.md
+      draft_target_area: "## 現在の動き"
+      actual_heading: "## 現在の動作" (L35)
+      script_result: { ok: true, matches: [] }
+      recommended_fix: "draft target_area を '## 現在の動作' へ修正（replace intent）、または operation を spec-create へ切り替え（TASK 'add it in an appropriate location' intent）"
+  validation_results:
+    search_target_area_ACT-SPEC-001: { ok: true, matches: [], note: "target_area '関連情報' not found in docs/specs/local-case-file.md" }
+    search_target_area_ACT-SPEC-002: { ok: true, matches: [], note: "target_area '現在の動き' not found in docs/specs/commands/req-define.md" }
+    change_impact: { ok: true, violations: [], note: "変更範囲は .agentdev/drafts/** のみ（SPEC ファイル無変更）" }
+  gate_evidence:
+    G01: "PASS - artifact: spec entry 2件検出（ACT-SPEC-001, ACT-SPEC-002）"
+    G02: "PASS - 変更範囲は .agentdev/drafts/** のみ（SPEC スキップのため docs/specs/** は不変）"
+    G04: "N/A - SPEC 対象 artifact_actions は存在するが両者スキップ（no-op相当）"
+    G06: "N/A - 既存 SPEC status 変更なし（SPEC ファイル無変更）"
+    G09: "PASS - target_area 未検出のため SPEC ファイル編集せず（実行時非依存維持）"
+    G12: "PASS - Issue 作成なし"
+  next_action: "draft target_area 修正後 spec-save 再実行、またはユーザーが手動 SPEC 編集を指示"
 
 test_strategy:
   - id: TS-001
