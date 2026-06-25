@@ -16,10 +16,10 @@ agent: sisyphus
 
 ## 出力
 
-- `.agentdev/learning/evaluation-report.md` — 8軸評価レポート（評価根拠中間成果物）
-- `.agentdev/learning/promoted/{category}-{name}.md` — 採用済み成果物
-- `.agentdev/learning/archive/active.md` — inbox からの移動分を追記
-- `.agentdev/learning/inbox.md` — ヘッダーのみにクリア
+- `.agentdev/learning/evaluation-report.md`（8軸評価レポート、評価根拠中間成果物）
+- `.agentdev/learning/promoted/{category}-{name}.md`（採用済み成果物）
+- `.agentdev/learning/archive/active.md`（inbox からの移動分を追記）
+- `.agentdev/learning/inbox.md`（ヘッダーのみにクリア）
 
 ## 手順
 
