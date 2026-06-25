@@ -169,13 +169,18 @@ operation_units:
     recommended_order: 2
     issue_policy: single
     result:
-      consumed_by: req-save
+      consumed_by: [req-save, case-open]
       consumed_at: 2026-06-26T01:49:41+09:00
       saved_path: docs/requirements/REQ-0136.md
       allocated_id: REQ-0136-031
       draft_proposed_id: REQ-0136-029
       allocation_note: "REQ-0136-029 は既存行のため欠番埋め禁止規約（agentdev-req-file-manager）により REQ-0136-031 を採番（max=030 → +1）。alloc-composite-id.ts 実行結果に基づく。"
       artifact_action_ref: ACT-REQ-003
+      req_save_note: "ACT-REQ-003 は req-save コマンドの対象（commit 606f4c9d で消費済み）。REQ-0136-031 として REQ-0136.md へ APPEND 済み。"
+      issue_number: 1194
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1194
+      created_at: 2026-06-25T17:33:50Z
+      case_open_note: "OU-002 全体スコープ（REQ-0136-031 確認 + IR-044 検出シグナル追記）を単一 Issue #1194 として作成。issue_policy=single 採用（単一 REQ APPEND + 対応 SPEC 検出シグナル追記を技術的独立なしと判定）。labels: enhancement, maintenance。REQ-0136-031 は req-save 完了済みのため case-run 主作業は IR-044 検出シグナル追記と回帰テスト固定。"
   - ou_id: OU-003
     source_ru: RU-0004
     target_req: REQ-0143
