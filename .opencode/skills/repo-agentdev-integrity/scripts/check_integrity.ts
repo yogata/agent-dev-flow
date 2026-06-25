@@ -6280,6 +6280,81 @@ function checkGhDirectInvocation(root: string): CheckResult[] {
   return results;
 }
 
+// ===== IR-054: draft SPEC 放置検出 (REQ-0154-002) =====
+// 閾値: 30日（docs/specs/integrity-rule-catalog.md「IR-054 閾値設計」が原本）
+const IR054_DRAFT_STALE_DAYS = 30;
+const IR054_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+function checkDraftSpecStaleness(specsDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  if (!fs.existsSync(specsDir)) return results;
+
+  // docs/specs/**/*.md を再帰収集（README.md は対象外）
+  const collected: string[] = [];
+  walkMarkdown(specsDir, collected);
+  const specFiles = collected.filter((full) => {
+    const base = path.basename(full);
+    return base !== "README.md";
+  });
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let foundStale = false;
+  let draftCount = 0;
+
+  for (const fullPath of specFiles) {
+    const content = readText(fullPath);
+    if (!content) continue;
+    const fm = parseFrontmatter(content);
+    if (!fm) continue;
+    const status = fm["status"];
+    if (typeof status !== "string" || status !== "draft") continue;
+    draftCount++;
+
+    const updated = fm["updated"];
+    if (typeof updated !== "string") continue; // updated なしは別ルール（IR-002 相当）対象
+    const m = updated.match(IR054_DATE_PATTERN);
+    if (!m) continue;
+    const updatedDate = new Date(
+      Number(m[1]),
+      Number(m[2]) - 1,
+      Number(m[3]),
+    );
+    if (isNaN(updatedDate.getTime())) continue;
+
+    const diffMs = today.getTime() - updatedDate.getTime();
+    const ageDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (ageDays > IR054_DRAFT_STALE_DAYS) {
+      foundStale = true;
+      results.push(
+        warn(
+          "Specs",
+          "draft-spec-staleness",
+          `Draft SPEC stale: age=${ageDays}d (threshold=${IR054_DRAFT_STALE_DAYS}d), updated=${updated}. Triage: (a) promote to accepted via case-close SPEC determination, (b) update content and bump updated, or (c) retire (IR-054, REQ-0154-002)`,
+          resolveRelative(fullPath, root),
+          1,
+          {
+            evidence: `status: draft, updated: ${updated}, age: ${ageDays}d`,
+            expected: `draft SPEC updated within ${IR054_DRAFT_STALE_DAYS} days, or promoted to accepted`,
+            route: "intake",
+          },
+        ),
+      );
+    }
+  }
+
+  if (!foundStale) {
+    results.push(
+      ok(
+        "Specs",
+        "draft-spec-staleness",
+        `No stale draft SPECs detected (checked ${draftCount} draft SPECs, threshold ${IR054_DRAFT_STALE_DAYS}d) (IR-054, REQ-0154-002)`,
+      ),
+    );
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -6429,6 +6504,7 @@ async function main(): Promise<void> {
     ...checkReqVerificationBasis(root),
     ...checkReqSpecBoundaryViolation(root), // IR-044 (REQ-0108-259)
     ...checkGhDirectInvocation(root), // IR-053 (REQ-0152-001/002)
+    ...checkDraftSpecStaleness(specsDir, root), // IR-054 (REQ-0154-002)
     ...checkSisyphusJuniorUlwLoopMisclassification(root), // REQ-0144-013
   ];
 
