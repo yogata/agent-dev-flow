@@ -135,6 +135,7 @@ fixture→「テストデータ」「検査データ」、variant→「種別」
 識別子（Type ID、enum 値、frontmatter field、ファイル名、ディレクトリ名、バッククォート内コード値）は英語のまま許容する。
 日本語散文中で普通名詞として使用する場合は推奨訳に置換する。
 runtime-package-boundary.md が実装している良いパターン（本文は日本語、表の Type ID 列は `` `self-hosting` `` のまま）を参照。
+識別子（backticks 必須）と一般名詞（backticks 任意）の機械判定閾値は [backticks-identifier-threshold.md](backticks-identifier-threshold.md) を参照。
 
 ### カタカナ語（一般的定着語は許容）
 
