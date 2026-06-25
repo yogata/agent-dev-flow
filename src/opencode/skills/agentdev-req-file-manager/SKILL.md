@@ -302,6 +302,52 @@ updated: YYYY-MM-DD
 
 ---
 
+## Scripts（決定的処理）
+
+`scripts/` 配下の決定的スクリプトが、本スキルが規定する採番・検証・検索処理を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、REQ-0103-159/160、AG-002/006）。LLM 推論で実行していた決定的処理をスクリプトへ委譲することで、番号の重複・欠番埋め・frontmatter 不整合を確実に防止する。
+
+配置先: `src/opencode/skills/agentdev-req-file-manager/scripts/`（REQ-0103-159）。実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`、REQ-0103-160）。
+
+### I/O 契約（REQ-0103-160）
+
+| 項目 | 規約 |
+|------|------|
+| 入力 | argv（ファイル/ディレクトリパス）または stdin（JSON） |
+| 出力 | stdout に JSON |
+| エラー | 非ゼロ終了コード + stderr にエラーメッセージ |
+| 副作用 | なし（純粋関数、ファイル I/O は入力読み込みのみ） |
+
+### スクリプト一覧
+
+| スクリプト | 役割 | 入力 | 出力 JSON |
+|-----------|------|------|-----------|
+| `alloc-req-number.ts` | REQ番号採番（max+1、欠番埋め禁止） | argv[2]=REQ dir | `{ ok, allocated: "REQ-NNNN", max }` |
+| `alloc-adr-number.ts` | ADR番号採番（max+1、欠番埋め禁止） | argv[2]=ADR dir | `{ ok, allocated: "ADR-NNNN", max }` |
+| `alloc-composite-id.ts` | 要件行ID採番（REQ-NNNN-MMM、max+1） | argv[2]=REQ file, argv[3]=req番号（省略可） | `{ ok, allocated: "REQ-NNNN-MMM", req, max }` |
+| `check-frontmatter-consistency.ts` | frontmatter id ↔ ファイル名整合性 | argv[2]=dir, argv[3]=kind(req\|adr) | `{ ok, errors[], warnings[] }` |
+| `check-entry-existence.ts` | README/DOC-MAP/mapping-table エントリ存在 | argv[2]=id, argv[3..]=files、または stdin JSON | `{ ok, errors[], warnings[], found[] }` |
+| `check-change-impact.ts` | 変更範囲検証（許可パスリストとの積集合） | argv[2]=changed-list-file, argv[3]=allowed-list-file、または stdin JSON | `{ ok, errors[], warnings[], violations[] }` |
+| `search-target-area.ts` | SPEC ファイル内 target_area 見出し検索 | argv[2]=target_area, argv[3..]=spec files、または stdin JSON | `{ ok, matches: [{file, line, text}] }` |
+
+### 実行方法
+
+```bash
+# bun 経由で直接実行（REQ-0103-160: LLM は bash 経由で呼び出し）
+bun src/opencode/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts docs/requirements
+
+# stdin JSON 入力
+echo '{"id":"REQ-0103","files":["docs/requirements/README.md"]}' | bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-entry-existence.ts
+
+# テスト実行（npm test または bun test）
+cd src/opencode/skills/agentdev-req-file-manager/scripts && npm test
+```
+
+### req-save / spec-save からの呼び出し
+
+req-save と spec-save は本スクリプト群を bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ-0103-160）。これにより REQ番号採番、ADR番号採番、要件行ID採番、frontmatter 整合性確認、エントリ存在確認、変更範囲検証、target_area 検索を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
+
+---
+
 ## REQ-ID 安定ID 規約
 
 REQ-ID（`REQ-{NNNN}`）は安定IDであり、ファイル配置に依存しない。
