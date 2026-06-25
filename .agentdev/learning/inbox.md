@@ -68,3 +68,19 @@
 - **想定反映先**: `agentdev-quality-gates`（QG-4 検査項目拡充）、`agentdev-doc-writing`（`mechanical-replacement-rules.md` Step 3-4 の case-run 連動）
 - **関連**: Issue #1162, PR #1163, PR #1122, 既知 L-012（再 grep 0 件確認）を補強する追加事例、REQ-0153、commit 465d9047、`src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md`
 - **タグ**: `#inspect-docs` `#機械横断修正` `#完了宣言` `#再grep確認` `#宣言不一致`
+
+## gh CLI の日本語出力を PowerShell で捕获すると stdout encoding 不一致で mojibake し書き戻しで本文破損
+
+- **問題事象**: case-close Step 2（QG-4 完了条件チェックボックス更新）で `gh issue view 1164 --json body -q .body` で Issue 本文を PowerShell に取り込んだ際、stdout エンコーディングが既定（日本語 Windows では cp932/Shift-JIS 扱い）となり、UTF-8 の日本語本文が mojibake 化した。その後 `-replace` で ASCII パターンのみ置換して `gh issue edit --body-file` で書き戻したところ、GitHub 上の Issue 本文が mojibake 状態で上書き破損した（ASCII パターン3件は置換成功、日本語パターン1件は未置換で残）。VERIFY 再読込で破損を検知。
+- **発生局面**: 完了処理（case-close Step 2 QG-4、Issue 本文読込・更新）
+- **検知方法**: 書き戻し後の VERIFY 再読込（`gh issue view` 再取得）で、`unchecked=1 checked=3` となり想定（4項目すべて `[x]`）と不一致。本文ダンプで日本語が `縺ョも�E` 状の mojibake であることを確認。
+- **根本原因**: PowerShell（Windows）でネイティブコマンド `gh` の stdout を取り込む際、`[Console]::OutputEncoding` が既定でシステムロケール（cp932）扱いとなり、UTF-8 バイト列を cp932 として誤デコードする。L-005（Write ツール既存 UTF-8 ファイル cp932 化）と同根の Windows PowerShell + UTF-8 非互換事象だが、Write ツールではなく gh CLI stdout 経路で発生する点が異なる。`-replace` で ASCII のみのパターンは元バイト列でも一致するため置換成功、日本語文字を含むパターンは mojibake バイト列と一致せず未置換。
+- **自律対応内容**: (1) 破損検知後、セッション内会話から取得済みのクリーンな元本文を `Write` ツール（新規ファイル作成時は UTF-8 で書出すため安全、L-005 適用範囲外）で一時ファイルに出力し、4項目すべて `[x]` に反転済みの本文を再構築。(2) `gh issue edit --body-file` 実行前に `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` および `$OutputEncoding = [System.Text.Encoding]::UTF8` を設定してから再度実行。(3) VERIFY 再読込で mojibake 解消・4項目すべて `[x]` を確認。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。本件は実行環境のエンコーディング設定に起因する運用事象であり、SPEC/REQ/ADR の新規改廃を要さない。L-005（Write ツール既存 UTF-8 ファイル cp932 化）の知見を gh CLI stdout 経路に拡張適用する事例。
+- **横展開観点**: PowerShell（Windows）で `gh` CLI の JSON 出力（`--json`/`-q .field`）から日本語本文を取り込むすべての処理（`gh issue view`、`gh pr view`、`gh issue edit --body-file` 前の読込等）で同様の mojibake リスクがある。`agentdev-gh-cli` skill の references/standard-procedures.md（Windows 標準版実装手順）、verify.md（VERIFY 手順）が該当経路。
+- **再発条件**: PowerShell（Windows、特に日本語ロケール環境）で `[Console]::OutputEncoding` を UTF-8 に設定せずに `gh` CLI の日本語を含む JSON 出力を取り込み、そのデータを加工して GitHub へ書き戻す場合。
+- **予防策候補**: (a) `agentdev-gh-cli` skill の standard-procedures.md / verify.md に「PowerShell 実行時は gh CLI 呼出し前に `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` を設定する」旨の標準手順を明記する、(b) verify.md の再読込 VERIFY 手順に「書き戻し後は mojibake チェック（日本語文字の健全性確認）を含める」ことを検査項目として追加する。
+- **想定反映先**: `agentdev-gh-cli`（references/standard-procedures.md の Windows 手順、references/verify.md の再読込 VERIFY 検査項目）
+- **関連**: Issue #1164, PR #1165, L-005（Write ツール既存 UTF-8 ファイル cp932 化、`src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md`）、`src/opencode/skills/agentdev-gh-cli/references/verify.md`
+- **タグ**: `#gh-cli` `#encoding` `#powershell` `#mojibake` `#verify` `#windows`
