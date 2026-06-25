@@ -207,7 +207,7 @@ Issue close 手続き（理由: completed、agentdev-gh-cli）
 - G18: learning と intake を同一 commit に含める
 - G19: Step 12 は結果状態を分離して報告。`.agentdev` push失敗時は完了扱いにしない
 - G20: 完了条件チェックボックスの評価、更新は case-close の専任責務。case-run/ driver/ 外部実行バックエンドは更新しない。case-close は別コンテキストで Issue 本文を再読込して最終完了判定し、更新後に再読込 VERIFY を必ず実施する
-- G21: case-close の capture 責務は回収、保存。PR 本文から intake/ learning を分離回収しドメイン状態に保存する。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照
+- G21: case-close の capture 責務は回収・保存。PR 本文から intake/ learning を分離回収しドメイン状態に保存する。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照
 - G22: SPEC status 昇格（draft → accepted）は case-close の責務。昇格は対象 SPEC が `draft` かつ今回の実装が SPEC 内容を検証済みの場合のみ実施する。spec-save は accepted を付与しない
 - G23: SPEC確定候補の処理（Step 3-2）は PR 本文の `## SPEC確定候補` セクションを入力とし、`## Findings / Capture候補` とは区別して扱う
 - G24: Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する（単一書き手制約）。case-run は Epic Issue 本文を読み取るのみで書き込まない。case-auto は Wave 反復制御のみ行い Epic Issue 本文に直接書き込まない。last-write-wins 競合防止は case-close の単一書き手で維持される
