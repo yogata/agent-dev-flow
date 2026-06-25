@@ -1,4 +1,4 @@
-# キャプチャ境界 — Intake/ Learning 境界定義
+# キャプチャ境界（Intake/ Learning 境界定義）
 
 AgentDevFlow コマンド群における Intake/ Learning キャプチャの責務境界を定義する一次参照。
 各コマンドのキャプチャ関連振る舞いは本ファイルに基づく。

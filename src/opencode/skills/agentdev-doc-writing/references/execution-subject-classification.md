@@ -28,14 +28,14 @@ SPEC / command / skill / AGENTS.md 等の記述で言及される実行主体の
 
 査読対象文書の以下の箇所を順に確認する。
 
-1. **`load_skills` 引数の検査** — `load_skills=["..."]` に指定された名前が `agentdev-*` プレフィックスを持つ skill 名であること。
+1. **`load_skills` 引数の検査**（`load_skills=["..."]` に指定された名前が `agentdev-*` プレフィックスを持つ skill 名であること。）
 command 名（`/` 先頭、または `/` を持たない command識別子）が指定されている場合は誤認。
 
-2. **`task(subagent_type=...)` 記述の検査** — subagent 型名が skill として言及されていないか。
+2. **`task(subagent_type=...)` 記述の検査**（subagent 型名が skill として言及されていないか。）
 `agentdev-*` skill 名が `subagent_type` に指定されていないか。
-3. **`/` 先頭識別子の skill 表記検査** — `/agentdev/*` や `/ulw-loop` 等の command 名が「スキル」「skill」と呼ばれていないか。
-4. **harness 名の skill 表記検査** — oh-my-openagent 等、OpenCode プラグインとして提供される実行エンジンが「スキル」「skill」と呼ばれていないか。
-5. **委譲契約の主語一貫性** — 委譲元、委譲先の記述で実行主体の分類が一貫しているか（例: case-run は command、Sisyphus-Junior は subagent、agentdev-case-run-execution-adapter は skill、oh-my-openagent は harness）。
+3. **`/` 先頭識別子の skill 表記検査**（`/agentdev/*` や `/ulw-loop` 等の command 名が「スキル」「skill」と呼ばれていないか。）
+4. **harness 名の skill 表記検査**（oh-my-openagent 等、OpenCode プラグインとして提供される実行エンジンが「スキル」「skill」と呼ばれていないか。）
+5. **委譲契約の主語一貫性**（委譲元、委譲先の記述で実行主体の分類が一貫しているか。例: case-run は command、Sisyphus-Junior は subagent、agentdev-case-run-execution-adapter は skill、oh-my-openagent は harness。）
 
 ## 査読対象外
 

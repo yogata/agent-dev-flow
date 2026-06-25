@@ -165,7 +165,7 @@ QG-3 の検査をサブエージェントに委譲する場合:
 ## See Also
 
 - [common-gate-contract.md](common-gate-contract.md)
-- [qg-4-final-acceptance.md](qg-4-final-acceptance.md) — 次工程の最終受け入れ（QG-4 は QG-3 の結果を前提とする）
+- [qg-4-final-acceptance.md](qg-4-final-acceptance.md)（次工程の最終受け入れ。QG-4 は QG-3 の結果を前提とする）
 - **agentdev-workflow-routing**: case-update --review-ng 手順（QG-3 結果の消費先）
 - **agentdev-workflow-templates**: `issue_comment_review_ng.md` テンプレート
 

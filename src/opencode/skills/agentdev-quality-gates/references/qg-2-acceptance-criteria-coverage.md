@@ -79,7 +79,7 @@ QG-2 の検査をサブエージェントに委譲する場合:
 ## See Also
 
 - [common-gate-contract.md](common-gate-contract.md)
-- [qg-1-definition-integrity.md](qg-1-definition-integrity.md) — 前工程の要件定義の完全性（QG-2 はその成果物を入力とする）
+- [qg-1-definition-integrity.md](qg-1-definition-integrity.md)（前工程の要件定義の完全性。QG-2 はその成果物を入力とする）
 - **agentdev-issue-management**: Issue 本文生成、テンプレート選定
 - **agentdev-workflow-templates**: Issue 本文テンプレート（`issue_desc_*.md`）
 

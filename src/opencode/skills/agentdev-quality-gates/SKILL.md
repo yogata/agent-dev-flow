@@ -75,8 +75,8 @@ QG-3/ QG-4 の fail 判定時、エージェントは推奨アクションを提
 
 ## See Also
 
-- [common-gate-contract.md](references/common-gate-contract.md) — 全 Gate 共通契約（pass/warn/fail/partial、evidence-first、結果フォーマット）
-- [quality-gates.md SPEC](../../../../docs/specs/quality-gates.md) — QG-1〜QG-4 の SPEC 定義、機械化境界、実装マッピング
+- [common-gate-contract.md](references/common-gate-contract.md)（全 Gate 共通契約。pass/warn/fail/partial、evidence-first、結果フォーマット）
+- [quality-gates.md SPEC](../../../../docs/specs/quality-gates.md)（QG-1〜QG-4 の SPEC 定義、機械化境界、実装マッピング）
 - **agentdev-req-analysis**: 要件分析手法、チェックボックス品質基準（QG-1 の基準）
 - **agentdev-workflow-lifecycle**: work_type 判定、フェーズ定義
 - **agentdev-workflow-routing**: case-update --review-ng 手順（QG-3 結果の消費先）
