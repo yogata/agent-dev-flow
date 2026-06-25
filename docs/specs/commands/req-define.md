@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-25
+updated: 2026-06-26
 ---
 
 # req-define SPEC
@@ -75,6 +75,10 @@ updated: 2026-06-25
 - Step 11: 要件doc確認（ユーザー提示のみ、承認は求めない）
   - Step 11-1〜11-6: 複数RU受付、統合/分離判定、出力生成、Epic規模検出、Wave候補記録、OU 構造検証
 - Step 12: 完了報告（work_type 別テンプレート選択）
+
+req-define の Step 番号構成は command 定義（src/opencode/commands/agentdev/req-define.md）と一致する（REQ-0143-004）。Step 0「セッションコンテキスト検知」は明示的な採番対象とし、後続フェーズの Step 番号は command 定義と完全に一致させる。 SPEC と command で Step 番号がずれる場合、SPEC 側を command 定義へ合わせる。
+
+注: 本セクションの Step 番号再採番（旧構成からの移行）は case-run で実施する。移行後、完了条件・テスト戦略と実装の間で Step 番号変換が不要となることを確認すること。
 
 ## draft-data test_strategy フィールドスキーマ
 

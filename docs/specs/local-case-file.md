@@ -2,7 +2,7 @@
 title: ローカル Case ファイル
 status: draft
 created: 2026-06-20
-updated: 2026-06-23
+updated: 2026-06-26
 ---
 
 # ローカル Case ファイル
@@ -234,9 +234,8 @@ GitHub PR 取り込みは実行しない。
 
 ## 関連項目
 
-- [ローカル版 OpenCode 生成](local-generation.md)（生成フロー、`generated_by` 識別子、ジャンクション検出安全ゲート）
-- [ローカル版 OpenCode 変換プロンプト](local-transform.md)（変換用プロンプト、レビュー用プロンプトの要件）
-- [実行時パッケージ境界](runtime-package-boundary.md)（`consumer-generated` リポジトリ種別）
-- [ワークフロー契約](workflow-contracts.md)（Local backend 差分契約）
-- REQ-0141（ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義）
-- ADR-0126（ローカル版 OpenCode 生成基盤の source model 拡張と生成安全性制約）
+- **関連 ADR**: ADR-0131（ローカル版導入方式を link mode へ統一し生成方式を廃止。ADR-0126 を supersede）
+- **関連 REQ**: REQ-0141（ローカル版 OpenCode 導入方式とローカルCaseファイル運用）、REQ-0150（ローカル版 agentdev-gh-cli 実装）
+- **関連 SPEC**: local-generation.md、local-transform.md、runtime-package-boundary.md
+
+ADR-0126（superseded）は履歴参照のみとし、現行根拠として扱わない（REQ-0112-053 準拠）。
