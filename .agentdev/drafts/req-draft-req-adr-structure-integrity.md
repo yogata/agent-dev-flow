@@ -154,8 +154,12 @@ operation_units:
     recommended_order: 1
     issue_policy: single
     result:
-      consumed_by: spec-save
-      note: "ACT-SPEC-001 は spec-save コマンドの対象。req-save は処理せず。"
+      consumed_by: [spec-save, case-open]
+      issue_number: 1193
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1193
+      created_at: 2026-06-25T17:23:38Z
+      spec_save_note: "ACT-SPEC-001 は spec-save コマンドの対象（local-case-file.md ## 関連項目 セクション、commit 59032773 で消費済み）。"
+      case_open_note: "OU-001 全体スコープ（4 ファイル横断 + transform/ 削除）を単一 Issue #1193 として作成。issue_policy=single 採用（AG-001 で case-open 判断委譲 → 単一 Issue 採用）。labels: enhancement, maintenance。"
   - ou_id: OU-002
     source_ru: RU-0003
     target_req: REQ-0136
