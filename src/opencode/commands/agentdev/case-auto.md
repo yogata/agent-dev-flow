@@ -102,7 +102,7 @@ case-close は最終 Wave 判定を行い、Epic クローズ または 残 Wave
 一部 completed(pr) がある場合は case-close(#epic) で completed(pr) のみ処理し、その後停止条件（Step 7）の判定へ進む。
 全子Issue が blocked/ failed の場合は Wave 反復を停止し部分完了報告（Step 8）へ進む。
 停止時は完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告すること
- 5. **OU 逐次処理**: 1 OU（Epic 全 Wave 完了）を close まで完了した後に次の OU へ進むこと。Epic Issue flow でも Step 8-1（逐次OU処理ループ）相当の処理を適用する
+ 5. **OU 処理順序**: 必須依存（`depends_on`）で結合した execution_unit 群は順次処理し、必須依存のない execution_unit 群は並列実行する（REQ-0114-053）。`recommended_order` は処理順序のヒントであり直列化ゲートではない（REQ-0114-064）。Epic Issue flow でも Step 8-1（OU処理ループ）相当の処理を適用する
  - **クリーンアップ検証ゲート**: Standard flow の case-run 移行前、Epic Issue flow の Step 4-1（Wave 反復制御）開始前の双方で、以下を検証する:
  - ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
  - 当該ケースで消費した RU ファイル（`.agentdev/backlog/req-units/RU-*.md`）が削除されていること。残存する場合は停止し手動削除を依頼すること
@@ -143,24 +143,24 @@ Epic Issue を伴う Wave 反復実行時は、完了、blocked、failed 子Issu
   - 所要時間: 終了時刻 − 開始時刻（人間が読みやすい形式: 例 `12分34秒`、全体合計）
   - **工程別タイムスタンプ内訳（L1）（REQ-0151-008）**: Step 4 で記録した工程別（req-save+spec-save 統合 task/ case-open/ case-run/ case-close）の task() 起動前後タイムスタンプ、工程別所要時間を含める。スキップした工程（例: SPEC artifact_actions がない場合の spec-save スキップ時、統合 task は req-save 単体で実行）は除外可。case-run の L2 内訳は case-run result から読み取って含める（詳細は case-run result 参照）
   - 停止条件による中断時（Step 7 経由）の報告にも、上記と同じ形式で開始時刻、停止時刻、経過時間、工程別タイムスタンプ内訳を含めること（停止時刻を終了時刻として扱う、停止時点までの工程別内訳のみ）
-8-1. **Standard flow 逐次OU処理ループ**: Standard flow の case-close task 完了後、未処理 OU が残存する場合は次 OU の処理を自動的に開始する。ただし `depends_on` 空、L0 相当の独立 OU が複数残存する場合は Step 8-2（独立 OU 並列委譲）を優先する（REQ-0114-053 例外条項、REQ-0114-087）:
-  - 処理対象の全 OU から次の未処理 OU を特定する（`recommended_order`, `depends_on` に基づく）
+8-1. **Standard flow OU処理ループ**: Standard flow の case-close task 完了後、未処理 OU が残存する場合は次 OU の処理を開始する。直列化要因は `depends_on`（必須依存のみ）に基づき判定し、必須依存のない execution_unit 群は並列実行する（REQ-0114-053/064/087）。`recommended_order` は処理順序のヒントであり直列化ゲートではない:
+  - 処理対象の全 OU から次の未処理 OU を特定する（`depends_on`（必須依存）に基づく。`recommended_order` はヒントとして参照）
   - 次 OU が存在する場合: 当該 OU の `artifact_actions` に応じた工程分岐で Step 2 に戻る（REQ/ADR artifact_actions あり: req-save → …、SPEC artifact_actions あり: spec-save → …、常に case-open → …）。spec-save 実行判定は Step 3 に従う
   - 全 OU の処理が完了した場合のみ全体完了報告を出力する
   - 次 OU の draft ファイルが存在しない場合: 停止し完了済み OU、未実行 OU、再開コマンドを報告する
 
-  - 逐次OU処理中に停止条件（Step 7）を検出した場合: 完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する
+  - OU処理中に停止条件（Step 7）を検出した場合: 完了済み OU、進行中 OU、未実行 OU、再開可能な次コマンドを報告する
 
-8-2. **独立 OU 並列委譲（REQ-0114-087〜093）**: Step 8-1 の例外。
-未処理 OU のうち `depends_on` 空、L0 相当の独立 OU が複数存在する場合、それらを最大5件まで並列委譲で処理する（REQ-0114-087、Epic Wave Model の最大5件上限に準拠）。
-Step 8-1 と同様に Step 2 に戻り、case-open task に独立 OU 群をまとめて渡す。
+8-2. **必須依存のない execution_unit 並列委譲（REQ-0114-087〜093）**:
+未処理 OU のうち `depends_on`（必須依存）が空の execution_unit 群は全て並列委譲する（REQ-0114-053/087）。case-auto レベルでのグローバル並列上限は設定せず、case-run Wave内子Issue並列上限（最大5件、REQ-0130-026）のみを制御対象とする（REQ-0114-087）。ファイル衝突等の技術的依存レベル（L0-L3）は並列判定軸から外し、直列化要因としない（REQ-0114-064）。
+Step 8-1 と同様に Step 2 に戻り、case-open task に execution_unit 群をまとめて渡す。
 case-open が自動 Epic 化した後は Step 4-1（Wave 反復制御）経由で処理する:
-  - **独立 OU 検出**: 未処理 OU の `depends_on` 配列が空（L0 相当）の OU を抽出する。`depends_on` 非空の依存関係のある OU は並列委譲対象外とし Step 8-1（逐次OU処理）で扱う
-  - **自動 Epic 化**: 複数の独立 OU を case-open task が自動的に Epic Issue 化し Wave 1 に全 OU を配置する（REQ-0114-088）。case-auto は Epic Issue 化判定に関与しない（G21、case-open の判定結果に従う）
-  - **Wave 1 並列実行**: case-run(#epic) task が Wave 1 の子Issue を task() で並列委譲する（最大5件、既存 Epic Wave モデル、REQ-0130-010/026）。本処理は Step 4-1（Wave 反復制御）と同じ経路を通る
-  - **結果集約**: 並列委譲された単位の成功、失敗は case-auto が集約し最終判定に反映する（REQ-0114-092）。一部失敗時は REQ-0114-049（停止時報告）に従い完了単位、進行中、未実行、再開コマンドを報告する
+  - **並列対象検出**: 未処理 OU の `depends_on`（必須依存）が空の execution_unit を抽出する。`depends_on` 非空（必須依存あり）の execution_unit は Step 8-1 で順次処理する
+  - **自動 Epic 化**: 複数の必須依存のない execution_unit を case-open task が自動的に Epic Issue 化し Wave 1 に全 OU を配置する（REQ-0114-088）。case-auto は Epic Issue 化判定に関与しない（G21、case-open の判定結果に従う）
+  - **Wave 1 並列実行**: case-run(#epic) task が Wave 1 の子Issue を task() で並列委譲する（case-run Wave内子Issue並列上限 最大5件、REQ-0130-026。本上限は case-run 単位であり case-auto レベルのグローバル上限ではない）。本処理は Step 4-1（Wave 反復制御）と同じ経路を通る
+  - **結果集約**: 並列委譲された単位の成功、失敗は case-auto が集約し最終判定に反映する（REQ-0114-092）。blocked/ failed となった execution_unit のみ停止対象とし、他の ready な execution_unit は継続する（REQ-0114-053）。一部失敗時は REQ-0114-049（停止時報告）に従い完了単位、進行中、未実行、再開コマンドを報告する
   - **直列集約対象**: 採番、index 更新、draft 更新、commit、push、Epic 本文更新は各 task() が対応するコマンド定義に従い、並列委譲の完了を待ってから実行する（REQ-0114-093）
-  - 並列委譲完了後、残りに依存関係のある OU があれば Step 8-1（逐次OU処理）に戻る
+  - 並列委譲完了後、残りに必須依存のある execution_unit があれば Step 8-1 で順次処理する
 
 ## コンフリクト解消モデル（3レベルエスカレーション）（REQ-0151, ADR-0132）
 
