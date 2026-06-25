@@ -1120,3 +1120,166 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
     expect(violations.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+// ─── IR-053: gh direct invocation detection (REQ-0152-001/002) ────────────────
+// Dedicated fixture covering:
+//   - true positive: direct gh invocation in prose (outside code block)
+//   - code-block exemption: gh inside a fenced block is not flagged
+//   - exclusion path: standard-procedures.md (REQ-0149-003) is never flagged
+
+const IR053_ROOT = join(TEMP_ROOT, "ir053");
+
+function buildIr053Fixture(root: string): void {
+  // Minimal docs skeleton so the validator script runs.
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "README.md"),
+    [
+      "# Requirements",
+      "",
+      "| ID | Title |",
+      "|----|-------|",
+      "| REQ-9101 | IR-053 fixture |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "REQ-9101.md"),
+    [
+      "---",
+      "id: REQ-9101",
+      "title: IR-053 fixture",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "Body.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  mkdirp(join(root, "docs", "specs"));
+  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+
+  // True positive: direct gh invocation in prose (inline code span, NOT a code block).
+  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(cmdDir);
+  writeFileSync(
+    join(cmdDir, "violation-cmd.md"),
+    [
+      "---",
+      "description: violation command",
+      "agent: test-agent",
+      "---",
+      "",
+      "# Violation command",
+      "",
+      "Issue を作成するときは `gh issue create` を直接実行すること。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // Code-block exemption: gh invocation inside a fenced block must NOT be flagged.
+  const sampleSkillDir = join(
+    root,
+    "src",
+    "opencode",
+    "skills",
+    "agentdev-sample-skill",
+  );
+  mkdirp(sampleSkillDir);
+  writeFileSync(
+    join(sampleSkillDir, "SKILL.md"),
+    [
+      "---",
+      "name: agentdev-sample-skill",
+      "---",
+      "",
+      "# Sample skill",
+      "",
+      "## USE FOR",
+      "",
+      "- sample",
+      "",
+      "## 例",
+      "",
+      "```sh",
+      "gh issue view 123",
+      "```",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // Exclusion path: standard-procedures.md may use gh directly (REQ-0149-003).
+  const ghCliRefDir = join(
+    root,
+    "src",
+    "opencode",
+    "skills",
+    "agentdev-gh-cli",
+    "references",
+  );
+  mkdirp(ghCliRefDir);
+  writeFileSync(
+    join(ghCliRefDir, "standard-procedures.md"),
+    [
+      "# Standard Procedures",
+      "",
+      "gh pr create --title \"{title}\" --body-file {body}",
+      "gh issue edit {N} --body-file {body}",
+      "gh pr merge {N} --squash",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("IR-053 gh-direct-invocation (REQ-0152-001/002)", () => {
+  beforeAll(() => {
+    mkdirp(IR053_ROOT);
+    buildIr053Fixture(IR053_ROOT);
+    copyScripts(IR053_ROOT);
+  });
+
+  it("detects direct gh invocation in prose (true positive)", () => {
+    const r = runScript(IR053_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; file?: string }) =>
+        res.check === "gh-direct-invocation" &&
+        res.level === "warning" &&
+        (res.file ?? "").includes("violation-cmd.md"),
+    );
+    expect(violations.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("exempts gh invocation inside fenced code blocks", () => {
+    const r = runScript(IR053_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const inCodeBlock = parsed.results.filter(
+      (res: { check: string; level: string; file?: string }) =>
+        res.check === "gh-direct-invocation" &&
+        res.level === "warning" &&
+        (res.file ?? "").includes("agentdev-sample-skill"),
+    );
+    expect(inCodeBlock.length).toBe(0);
+  });
+
+  it("excludes standard-procedures.md (REQ-0149-003 permitted file)", () => {
+    const r = runScript(IR053_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const inExcluded = parsed.results.filter(
+      (res: { check: string; level: string; file?: string }) =>
+        res.check === "gh-direct-invocation" &&
+        res.level === "warning" &&
+        (res.file ?? "").includes("standard-procedures.md"),
+    );
+    expect(inExcluded.length).toBe(0);
+  });
+});
