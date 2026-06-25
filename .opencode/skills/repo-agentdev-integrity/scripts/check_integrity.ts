@@ -6180,6 +6180,106 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
   return results;
 }
 
+// ─── IR-053: gh direct invocation detection (REQ-0152-001, REQ-0152-002) ──────
+// Detects direct `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)`
+// invocations embedded in command/skill definitions. Direct gh CLI usage bypasses
+// the agentdev-gh-cli delegation base (REQ-0149) and must route through it.
+// Scan targets (REQ-0152-001):
+//   src/opencode/commands/agentdev/*.md
+//   src/opencode/skills/agentdev-*/**/*.md
+// Exclusion (REQ-0152-002, REQ-0149-003 permitted file):
+//   src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md
+// Code-block contents are exempt (example/pattern description, REQ-0108-254).
+// Severity: heuristic (warn / exit 1).
+
+const IR053_GH_DIRECT_PATTERN =
+  /\bgh\s+(issue|pr)\s+(create|edit|view|comment|merge|close|list|status)\b/i;
+
+// Exemption paths (repo-root-relative, forward-slash normalized).
+const IR053_EXEMPT_PATHS: RegExp[] = [
+  /src\/opencode\/skills\/agentdev-gh-cli\/references\/standard-procedures\.md$/,
+];
+
+function walkMarkdown(dirPath: string, acc: string[]): void {
+  if (!fs.existsSync(dirPath)) return;
+  for (
+    const entry of fs.readdirSync(dirPath, { withFileTypes: true }) as import("fs").Dirent[]
+  ) {
+    const full = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      walkMarkdown(full, acc);
+    } else if (entry.name.endsWith(".md")) {
+      acc.push(full);
+    }
+  }
+}
+
+function collectAgentdevSkillMarkdown(skillRoot: string): string[] {
+  // Walk src/opencode/skills/agentdev-*/**/*.md recursively.
+  const collected: string[] = [];
+  if (!fs.existsSync(skillRoot)) return collected;
+  for (const dir of listDirs(skillRoot)) {
+    if (!dir.startsWith("agentdev-")) continue;
+    walkMarkdown(path.join(skillRoot, dir), collected);
+  }
+  return collected;
+}
+
+function checkGhDirectInvocation(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  const commandDir = path.join(root, "src", "opencode", "commands", "agentdev");
+  const skillRoot = path.join(root, "src", "opencode", "skills");
+
+  const targets: string[] = [];
+  if (fs.existsSync(commandDir)) {
+    for (const f of listFiles(commandDir)) targets.push(path.join(commandDir, f));
+  }
+  for (const f of collectAgentdevSkillMarkdown(skillRoot)) targets.push(f);
+
+  let foundViolation = false;
+  for (const fullPath of targets) {
+    const relPath = resolveRelative(fullPath, root);
+    if (IR053_EXEMPT_PATHS.some((re) => re.test(relPath))) continue;
+    const content = readText(fullPath);
+    if (!content) continue;
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      if (isInsideCodeBlock(lines, i)) continue;
+      const match = lines[i].match(IR053_GH_DIRECT_PATTERN);
+      if (match) {
+        foundViolation = true;
+        results.push(
+          warn(
+            "CanonicalConflict",
+            "gh-direct-invocation",
+            `Direct gh CLI invocation 'gh ${match[1]} ${match[2]}' detected — route via agentdev-gh-cli delegation (IR-053, REQ-0152-001)`,
+            relPath,
+            i + 1,
+            {
+              evidence: match[0],
+              expected:
+                "delegate gh CLI access through agentdev-gh-cli procedures (REQ-0149)",
+              route: "intake",
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "CanonicalConflict",
+        "gh-direct-invocation",
+        "No direct gh CLI invocations detected in command/skill definitions (IR-053, REQ-0152-001)",
+      ),
+    );
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -6328,6 +6428,7 @@ async function main(): Promise<void> {
     ...checkMappingTableHistoryLabels(root),
     ...checkReqVerificationBasis(root),
     ...checkReqSpecBoundaryViolation(root), // IR-044 (REQ-0108-259)
+    ...checkGhDirectInvocation(root), // IR-053 (REQ-0152-001/002)
     ...checkSisyphusJuniorUlwLoopMisclassification(root), // REQ-0144-013
   ];
 

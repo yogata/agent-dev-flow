@@ -394,6 +394,7 @@ const CHECK_TO_FINDING_CATEGORY: Record<string, FindingCategory> = {
   "adr-status-normalization": "canonical-conflict",
   "workflow-status-prohibition": "canonical-conflict",
   "lifecycle-boundary": "canonical-conflict",
+  "gh-direct-invocation": "canonical-conflict",
   "readme-index-sync": "broken-reference",
   "adr-readme-index-sync": "broken-reference",
   "spec-readme-index-sync": "broken-reference",
