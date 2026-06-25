@@ -20,10 +20,10 @@ agent: prometheus | sisyphus
 ```
 
 **禁止フィールド**（frontmatter への記述は error として検出される）:
-- `pattern` — 追加禁止フィールド
-- `workflow_route` — 追加禁止フィールド
-- `branch_type` — 追加禁止フィールド
-- `labels` — 追加禁止フィールド
+- `pattern`（追加禁止フィールド）
+- `workflow_route`（追加禁止フィールド）
+- `branch_type`（追加禁止フィールド）
+- `labels`（追加禁止フィールド）
 
 これらの情報は command-map.md 等の参照用文書で管理し、frontmatter には混入させない。
 

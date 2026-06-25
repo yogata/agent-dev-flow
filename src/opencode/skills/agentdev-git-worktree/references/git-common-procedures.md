@@ -53,7 +53,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 3. 自マージ以外のコミットが含まれる → 以下の構造化エラーで停止:
 
 ```markdown
-## Git 同期エラー（hash 不一致 — 自マージ以外の新規コミット検出）
+## Git 同期エラー（hash 不一致、自マージ以外の新規コミット検出）
 
 **事前hash**: {pre_hash}
 **事後hash**: {post_hash}
