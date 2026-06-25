@@ -227,7 +227,10 @@ operation_units:
     depends_on: []
     recommended_order: 4
     issue_policy: single
-    result: {}
+    result:
+      issue: 1167
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1167
+      created_at: 2026-06-25T21:30:00+09:00
 
 # test_strategy: 各合意項目（AG-*）の検証方法。各項目は3要素（verification / pass_criteria / on_failure）を必須とする
 test_strategy:
