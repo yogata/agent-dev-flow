@@ -200,7 +200,10 @@ operation_units:
     depends_on: []
     recommended_order: 1
     issue_policy: single
-    result: {}
+    result:
+      issue: 1162
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1162
+      created_at: 2026-06-25T10:30:00+09:00
 
   - ou_id: OU-004
     source_ru: RU-0013
