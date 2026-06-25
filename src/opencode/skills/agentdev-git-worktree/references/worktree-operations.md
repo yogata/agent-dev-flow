@@ -74,6 +74,22 @@ git rev-parse --show-toplevel
 - **case-run Step 5-2（precondition gate）**: 実行担当サブエージェント起動前に本ヘルパーで検証し、worktree 内にいない場合は起動を停止して Step 5 へ戻る
 - **実行担当サブエージェントの自己検証**: 実装作業開始前に本ヘルパーで worktree 内にいることを自己検証する（詳細は `agentdev-case-run-execution-adapter` 参照）
 
+## worktree 標準運用ガイド
+
+worktree 環境の運用落とし穴に対する標準運用ガイド（L-003, L-008, L-009, L-013、PR #1036/#1099/#1128 由来）。
+
+### src/opencode/ 直接参照（SoT パス）
+
+worktree 内では `.opencode/skills/` の junction が再作成されないため、junction 切断時に `.opencode/` 経由参照が失敗する。整合性検査・スキル参照は `src/opencode/` を SoT パスとして直接参照すること。
+
+### isInsideWorktree 適用
+
+`isInsideWorktree` で worktree 実行を判定し、junction 依存検査（`checkSourceProjectionConsistency` 等）に適用すること。worktree 内で junction が再作成されない場合の偽陽性を防止するためである。
+
+### isInsideWorktree 適用範囲の拡張候補
+
+`checkSourceProjectionConsistency` 以外の junction 依存検査に対する `isInsideWorktree` 適用を評価対象として明記すること。 junction 依存の整合性検査全般に worktree 実行判定を拡張する候補を個別に評価し、偽陽性の発生する検査から順次適用する。
+
 ## 削除手順
 
 **追跡済みファイル削除禁止**: クリーンアップ操作中は追跡済みファイルを削除してはならない。削除対象は未追跡ファイルのみ（実行時作業領域配下の一時ファイル、ビルド成果物等）。

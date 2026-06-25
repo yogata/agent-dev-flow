@@ -54,7 +54,7 @@ agentdev-gh-cli の各手続きの標準版（GitHub 版）実装手順（REQ-01
    ```
    [System.IO.File]::WriteAllText(".sisyphus/tmp/gh-temp-{timestamp}.md", $content, (New-Object System.Text.UTF8Encoding($false)))
    ```
- **OpenCode の Write tool も使用可能**（BOMなしUTF-8で書き出す）。PowerShell の `Out-File`, `Set-Content`, `>` 等は使用禁止（Section 1 参照）。
+ **OpenCode の Write tool は新規ファイル作成時に限定して使用可能**（BOMなしUTF-8で書き出す）。既存 UTF-8（BOM なし）ファイル編集時は edit ツール（per-line string replace）を優先すること。Windows 環境で Write tool が既存 UTF-8 ファイルを cp932 で書き出す事象が実証されているため、Write tool の全面上書きは新規作成時のみ許可する。大規模構造変更で edit ツールが不向きな場合は `[System.IO.File]::WriteAllText` with `UTF8Encoding($false)` を使用すること。PowerShell の `Out-File`, `Set-Content`, `>` 等は使用禁止（Section 1 参照）。
 2. 保存形式は **UTF-8 (BOMなし)**、改行コードは **LF** とする。
 3. `gh` コマンド実行時に該当ファイルを `--body-file`/ `-F` オプションで指定する。
 

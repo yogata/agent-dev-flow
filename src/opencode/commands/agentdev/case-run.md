@@ -166,6 +166,14 @@ Wave 境界（PR マージ）は case-close の責務。
 `completed(pr)` となった子Issue を次 Wave へ進めるためには、case-close でマージ後に再度 `case-run #epic` を実行する（べき等）
 
 
+## テスト戦略（TS）標準手順
+
+関数削除を伴う Issue の test strategy 標準手順（L-014、PR #1140 / #1139 Epic #1138 由来）。共用関数の包括的削除による破壊的変更を防止する。
+
+- 関数削除を伴う Issue の test strategy に、削除対象関数の全使用箇所 grep 確認手順を追加すること
+- 標準手順: 削除対象関数名で `scripts/` 配下を grep（例: `grep -rn "funcName" scripts/`）し、対象スコープ外の使用箇所が 0 件であることを確認する
+- 対象スコープ外に残存する使用箇所がある場合、削除を中止し Findings に記録する
+
 ## エラー処理
 
 

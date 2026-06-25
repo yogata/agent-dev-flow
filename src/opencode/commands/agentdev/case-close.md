@@ -159,6 +159,11 @@ Issue close 手続き（理由: completed、agentdev-gh-cli）
 
 ### Step 9: 実行前同期
 
+**Step 9-1**: Step 1-1（重複ファイルチェック）再実行 — `git pull --ff-only` 直前に、Step 1-1 の重複ファイルチェックを再実行する（L-013、PR #1128 由来）。
+ - 共有 main worktree で Step 1-1 実行時点から Step 9 実行までの間に並列セッションが加えた未コミット変更を検知するためである
+ - Step 1-1 再実行で重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと
+ - 既存 REQ-0131-020（重複ファイル検出）の運用手順を Step 9 実行直前へ拡張するものであり、検出ロジック自体は変更しないこと
+
 `agentdev-git-worktree` に従い `git pull --ff-only` を実行。ローカル変更事前チェック、hash検証、不一致時は評価、承認のやり直し
 
 ### Step 10: 学びの検知、抽出
