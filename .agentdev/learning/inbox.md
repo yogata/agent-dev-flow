@@ -20,3 +20,35 @@
 - **想定反映先**: `agentdev-gh-cli` 標準手続き（PR merge）、`case-close` Step 4 の `gh pr merge` 呼び出し箇所
 - **関連**: `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md`, `src/opencode/commands/agentdev/case-close.md` Step 4/7, PR #1143, Issue #1141
 - **タグ**: `#git` `#gh-cli` `#worktree` `#ワークアラウンド`
+
+## Issue 本文の事前状態記載が実装時点と乖離し、既解消 NG が残存NGとして列挙されていた
+
+- **問題事象**: Issue #1145 の完了条件・課題セクションに「事前状態 ok 294 / ng 4 / warning 10」と「安定 NG 4件」が記載されていたが、case-run 実施時に check_integrity.ts を実行すると実測は「ok 206 / ng 2 / warning 13」であり、列挙された 4 NG のうち 2 件（case-run-execution-adapter reference path、japanese-tech-writing skill prefix）は既に別 commit（18643295, 574db1d0）で解消済みだった。Issue は case-open 時点の正しい状態を記載していたが、その後の check_integrity.ts 本体改修（f329537d IR-045 削除、IR-044 exemption 機械化等）により検出結果が変化し、Issue が陳腐化していた。
+- **発生局面**: 実装（case-run の前提確認フェーズ）
+- **検知方法**: case-run での check_integrity.ts 実行結果と Issue 本文の事前状態記載の突き合わせ。PR 本文 `## Findings / Capture候補` に数値差異と既解消 2件の経緯を記録。
+- **根本原因**: Issue 本文（case-open 成果物）に check_integrity.ts の実行時点スナップショットを記載しているが、その後の check_integrity.ts 本体改修で検出結果が変動しても Issue 本文は追従更新されない。docs-check 対象 SPEC/実装の進化と Issue 事前状態記載の間に同期仕組みがない。
+- **自律対応内容**: 既解消 2件（NG-1, NG-2）は本 case-run では触らず、未解消 2件（NG-3, NG-4）のみ修正対象とした。PR 本文の Findings セクションに「Issue 記載 4 NG のうち 2件は既解消、2件を本 PR で修正」と明記し、事前状態の数値差異（294/4/10 → 206/2/13）の原因も記録した。case-close の完了報告コメントでも 4 NG の解消経緯を表形式で明示した。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。本件は手続きの不備ではなく、Issue 事前状態の陳腐化という運用上の現象。case-open が記載すべき事前状態の粒度・更新タイミングに SPEC 上の規定なし。
+- **横展開観点**: case-open で check_integrity.ts の実行結果（絶対件数）を Issue 本文に記載する場合、実装時点（case-run）での再計測結果と乖離するリスクが常にある。件数ではなく「解消すべき NG の識別子（ファイル・行・ルール）」を主情報とし、件数は参考値とする運用が陳腐化に強い。
+- **再発条件**: case-open で check_integrity.ts の絶対件数を事前状態として Issue 本文に記載し、case-open から case-run の間に check_integrity.ts 本体が改修された場合。
+- **予防策候補**: (a) case-open の事前状態記載を「NG 識別子リスト」中心にし、件数は補助情報とする、(b) case-run 開始時に Issue 事前状態を再計測して差異があれば Findings に記録する手順を明文化する（現在は case-run の自律判断に委ねられている）。
+- **想定反映先**: `case-open` コマンド（事前状態記載フォーマット）、`case-run` コマンド（前提確認フェーズでの再計測・差異記録）
+- **関連**: Issue #1145, PR #1147, commits 18643295 (#1126), 574db1d0, f329537d, `docs/specs/integrity-rule-catalog.md`
+- **タグ**: `#docs-check` `#issue-staleness` `#case-open` `#case-run` `#事前状態`
+
+## 複合ラベルの duty keyword 是正では読点（、）ではなく中黒（・）を使用する
+
+- **問題事象**: case-close.md G21 の capture 責務 duty keyword「回収・保存」が読点表記「回収、保存」になっており、check_integrity.ts の `duties["case-close.md"].dutyKeyword`（値: `回収・保存`）と不一致のため command-capture-duty NG が報告されていた。文書是正で読点（、）を中黒（・）に修正して解消した。
+- **発生局面**: 実装（case-run での文書是正）
+- **検知方法**: check_integrity.ts の command-capture-duty ルールによる検出。NG メッセージから該当 duty keyword と期待値を特定。
+- **根本原因**: 複合ラベル（複数の責務を1語で表す duty keyword）の区切り文字が読点と中黒のどちらかについて、文書作成時に規定が曖昧だった。check_integrity.ts 側は中黒（`・`）を期待しているが、case-close.md 本文は読点（`、`）を使用していた。日本語の複合語区切りには読点と中黒の両方が使われ得るため、機械的検出と文書表記の不一致が生じた。
+- **自律対応内容**: case-close.md G21 の「回収、保存」を「回収・保存」に修正（中黒化）。check_integrity.ts の dutyKeyword 期待値と完全一致させることで NG を解消。PR 本文で「回収・保存」は capture 責務の複合ラベルであり、流動的並列（OU-001 読点化対象）ではないことを明記した。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。check_integrity.ts の dutyKeyword 定義が正（single source of truth）であり、文書側を是正するのが正しい方向。
+- **横展開観点**: 他のコマンド（case-run, req-save 等の G21相当箇所）でも duty keyword が複合ラベルの場合、中黒表記を使用すべき。読点は「流動的並列」（プロセス段階の列挙等）に使い、中黒は「複合ラベル」（1語として固定の責務名）に使うという使い分け規約を文書化すると再発防止になる。
+- **再発条件**: 複合ラベル duty keyword を読点区切りで文書に記載し、check_integrity.ts が中黒を期待している場合。
+- **予防策候補**: (a) duty keyword の区切り文字規約（読点=流動的並列、中黒=複合ラベル）を `integrity-rule-catalog.md` または `japanese-tech-writing` スキルに明文化する、(b) 新規コマンド追加時に duty keyword を check_integrity.ts と文書で同時設定するチェックリストを設ける。
+- **想定反映先**: `integrity-rule-catalog.md`（duty keyword 区切り文字規約）、`japanese-tech-writing` スキル（複合ラベルの中黒使用）
+- **関連**: Issue #1145, PR #1147, `src/opencode/commands/agentdev/case-close.md` G21, `scripts/check_integrity.ts` dutyKeyword 定義
+- **タグ**: `#docs-check` `#duty-keyword` `#文書是正` `#中黒` `#複合ラベル`
