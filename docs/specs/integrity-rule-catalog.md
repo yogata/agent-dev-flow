@@ -952,7 +952,9 @@ REQ/SPEC 責務範囲を規定する META 規則行（enum/format/schema 等 SPE
 
 **true positive 保護（回帰テスト）**:
 
-回帰テストで既知の true positive（SPEC 詳細が REQ に残留している実例: REQ-0114-082、REQ-0144-008 等）が META 規則行 exemption により誤って免除されないことを検証する（REQ-0108-259, REQ-0108-055 準拠）。保護対象の真陽性は件数・内容を規定する SPEC 詳細の残留であり、META 規則行（責務範囲規定）には該当しないことをテストで固定する。
+回帰テストで既知の true positive（SPEC 詳細が REQ に残留している実例）が META 規則行 exemption により誤って免除されないことを検証する（REQ-0108-259, REQ-0108-055 準拠）。保護対象の真陽性は件数・内容を規定する SPEC 詳細の残留であり、META 規則行（責務範囲規定）には該当しないことをテストで固定する。
+
+**是正済み経緯（保護対象から除外）**: REQ-0114-082、REQ-0144-008 は #1109 PR で SPEC 詳細が REQ から SPEC へ移行済みであり、真陽性保護対象から除外する（REQ-0144-017）。当該 REQ は SPEC 詳細を残留させないため META 規則行 exemption の誤免除検証の根拠とならない。保護対象の真陽性は、件数・内容を規定する SPEC 詳細の残留実例に限定する。この明記により RU-0011（検出ロジック改良）実施前に同箇所を根拠としたテスト設計の前提崩壊を防ぐ。
 
 ### IR-045: （削除）docs 日本語表現、文意整合検査
 
@@ -1117,6 +1119,26 @@ grep ベースの完了条件 checkbox 検出（`- [ ]` / `- [x]`）を実装す
 現在の QG-4 完了条件評価は推論ベース（case-close Step 4、agent が各 checkbox の達成を意味判断）。
 grep ベース実装は推論ベースを置き換えるのではなく、補助的機械検出として追加する場合に本基準を適用する。
 
+### IR-053: gh 直接記述検出
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-053 |
+| description | command/skill 定義中の gh CLI 直接呼出し（gh issue/pr create/edit/view/comment/merge/close/list/status 等）を検出すること（REQ-0152-001）。gh CLI 直接記述は agentdev-gh-cli 手続き委譲基盤（REQ-0149）経由を原則とし、command/skill 定義への直接埋め込みを禁止する。検出パターン・除外対象の詳細は inspect-skills 診断観点 gh-direct-invocation-leak（PR #1107）と整合する（REQ-0152-002） |
+| severity | heuristic |
+| category | canonical-conflict |
+| detection_method | 対象ファイル（src/opencode/commands/agentdev/*.md, src/opencode/skills/agentdev-*/**/*.md）から gh CLI 直接呼出しパターン（gh (issue|pr) (create|edit|view|comment|merge|close|list|status)）を正規表現で検出。除外対象（src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md、REQ-0149-003 許容ファイル）を適用後に報告する |
+| affected_artifacts | [src/opencode/commands/agentdev/*.md, src/opencode/skills/agentdev-*/**/*.md] |
+| related_req | [REQ-0152-001, REQ-0152-002, REQ-0149-003] |
+| related_spec | [integrity-rule-catalog.md, integrity-contracts.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 中。agentdev-gh-cli 許容ファイル（standard-procedures.md）を除外対象に含めない場合 false positive が発生する。除外リストの厳密な適用で抑制する |
+| regression_test | (追加予定)。gh 直接記述を含む fixture で検出されること、standard-procedures.md で検出されないことを検証する |
+| baseline_status | new |
+| finding_route | intake |
+| triage_action | 検出された gh 直接記述を agentdev-gh-cli 手続き委譲に置き換える。除外対象外の正当な gh 記述（standard-procedures.md 内）はそのまま |
+| last_verified | (新規登録時) |
+
 
 
 | Level | Description | Trigger |
@@ -1202,6 +1224,17 @@ checkWorkflowStatusProhibition
 | inspect-* skills（inspect-docs / inspect-skills） | 配布物整合性検査（REQ-0142-006/007）。構文健全性の重複検出、文意保持の意味解析、責務説明照合など意味判断を含む診断 | 意味的診断層。詳細は [docs-spec-rebuild-integrity.md](docs-spec-rebuild-integrity.md)「検査バックエンド責務分担」参照 |
 
 **配布物整合性検査（REQ-0142-006/007）は `check_integrity.ts` に追加しない**。配布物に対する決定論的検出（IR ルール）は既存カテゴリで網羅し、意味的診断は inspect-* skills に集約する。これにより `categoryToCheckPattern` map への新カテゴリ追加（skill-category-gap、REQ-0108-161/171、REQ-0144-005）を不要とし、ターゲットング隠退化を防ぐ。
+
+### check_integrity test suite 責務分担（REQ-0144-008/009）
+
+check_integrity に関わる test suite 2系統の責務分担。
+
+| test file | 責務 | 根拠 |
+|-----------|------|------|
+| scripts/tests/check_integrity.test.ts | fixture drift detection・Issue #657 regression 専用・copyScripts 環境下の drift 自動検出 | REQ-0144-009 |
+| scripts/check_integrity.test.ts | IR-044 正規スイート・check_integrity.ts ルール適合検証 | REQ-0144-008 |
+
+両ファイルの使い分け基準（regression 検出 vs ルール適合検証）を明文化し、後続エージェントが誤ったファイルを編集するリスクを排除する。
 
 ## メタ整合性
 
