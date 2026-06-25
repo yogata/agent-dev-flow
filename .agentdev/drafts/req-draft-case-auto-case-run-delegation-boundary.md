@@ -128,6 +128,10 @@ operation_units:
       adr_created: false
       adr_judgment: "ADR不要（既存 ADR-0127/0128 が委譲・実行モデルをカバー。本件は既存アーキテクチャ原則の実装是正）"
       case_open_consumable: true
+      case_open:
+        issue_number: 1186
+        issue_url: https://github.com/yogata/agent-dev-flow/issues/1186
+        created_at: 2026-06-26T00:00:00+09:00
 
 # test_strategy: 各合意項目の検証方法。3要素（verification/pass_criteria/on_failure）必須
 test_strategy:
