@@ -37,32 +37,32 @@ Epic + 子 Issue 一括作成に対応する。
 
 ## 現在の動作
 
-- Step 0: 前工程からの引き継ぎ停止判定（`agentdev_handoff: true` 含まれる場合は Issue 作成せず停止）
-- Step 0-1: OU 選択ゲート（`operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止））
-- Step 1: 要件docからIssue本文生成（`agentdev-issue-management`）（REQ読解、テンプレート充足検査、完了条件候補抽出）
-  - Step 1-1: 完了条件網羅性検証（QG-2）（Issue作成前に REQ/ADR/SPEC 必達要件の網羅性を検証）
-- Step 2: マルチREQ入力判定（単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐）
-  - Step 2-1: 自律構成生成（OU モード、複数REQ時）（`operation_units` から Epic / Wave / Issue 構造を自律生成）
-- Step 3: 規模判定（単一REQの場合）（`scale: large` → Epic flow / `scale: standard` → Standard flow）
-- Epic flow（Steps 4-8-1）:
-  - Step 4: テンプレート読込（`agentdev-workflow-templates`）
-  - Step 5: Epic Issue本文生成（自律構成分析結果に基づき Epic 本文を構築）
-  - Step 6: Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）（VERIFY）
-  - Step 7: 子Issue作成（OU 単位、順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-0104-042））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-0146-011、`docs/specs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
-  - Step 8: Epic Issue本文更新（ステータス追跡テーブル更新）
-  - Step 8-1: OU `result` 書き戻し（Issue / Epic 番号）
-- Standard flow（Steps 14-16-1）:
-  - Step 14: 関連ADR特定
-  - Step 15: ラベル付与（`agentdev-workflow-lifecycle`）
-  - Step 16: GitHub Issue作成（VERIFY）
-  - Step 16-1: OU `result` 書き戻し（Issue 番号）
-- 共通終了処理（Steps 17-18-2）:
-  - Step 17: コメント追加（`agentdev-workflow-templates`）
-  - Step 18: ドラフト削除（`git rm` + `git commit` Form Zero）
-  - Step 18-1: RU ファイル削除（`git rm` + `git commit` Form Zero）
-- Step 18-1-1: draft / RU 削除残存検証（`git status --porcelain` で残存検出）
-- Step 18-1-2: draft/RU 削除 commit 後の即時 push（REQ-0146-003）（Step 18 / 18-1 の削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
-- Step 18-2: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
+- Step 1: 前工程からの引き継ぎ停止判定（`agentdev_handoff: true` 含まれる場合は Issue 作成せず停止）
+- Step 1-1: OU 選択ゲート（`operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止））
+- Step 2: 要件docからIssue本文生成（`agentdev-issue-management`）（REQ読解、テンプレート充足検査、完了条件候補抽出）
+  - Step 2-1: 完了条件網羅性検証（QG-2）（Issue作成前に REQ/ADR/SPEC 必達要件の網羅性を検証）
+- Step 3: マルチREQ入力判定（単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐）
+  - Step 3-1: 自律構成生成（OU モード、複数REQ時）（`operation_units` から Epic / Wave / Issue 構造を自律生成）
+- Step 4: 規模判定（単一REQの場合）（`scale: large` → Epic flow / `scale: standard` → Standard flow）
+- Epic flow（Steps 5-9-1）:
+  - Step 5: テンプレート読込（`agentdev-workflow-templates`）
+  - Step 6: Epic Issue本文生成（自律構成分析結果に基づき Epic 本文を構築）
+  - Step 7: Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）（VERIFY）
+  - Step 8: 子Issue作成（OU 単位、順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-0104-042））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-0146-011、`docs/specs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
+  - Step 9: Epic Issue本文更新（ステータス追跡テーブル更新）
+  - Step 9-1: OU `result` 書き戻し（Issue / Epic 番号）
+- Standard flow（Steps 15-17-1）:
+  - Step 15: 関連ADR特定
+  - Step 16: ラベル付与（`agentdev-workflow-lifecycle`）
+  - Step 17: GitHub Issue作成（VERIFY）
+  - Step 17-1: OU `result` 書き戻し（Issue 番号）
+- 共通終了処理（Steps 18-19-2）:
+  - Step 18: コメント追加（`agentdev-workflow-templates`）
+  - Step 19: ドラフト削除（`git rm` + `git commit` Form Zero）
+  - Step 19-1: RU ファイル削除（`git rm` + `git commit` Form Zero）
+- Step 19-1-1: draft / RU 削除残存検証（`git status --porcelain` で残存検出）
+- Step 19-1-2: draft/RU 削除 commit 後の即時 push（REQ-0146-003）（Step 19 / 19-1 の削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
+- Step 19-2: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
 
 ## 参照する横断 SPEC
 
@@ -87,13 +87,13 @@ Epic + 子 Issue 一括作成に対応する。
 
 ## 検証観点
 
-- QG-2（Acceptance Criteria Coverage Gate）: Step 1-1 で完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
+- QG-2（Acceptance Criteria Coverage Gate）: Step 2-1 で完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
 - 子Issue 先頭行 `Parent: #{epic_number}` 含有（G03、親子関係追跡用）
 - 全子Issue作成完了後の Epic 本文ステータス追跡テーブル更新（G04、部分更新禁止）
 - 子Issue数上限（G05、最大10件、Epic 1件あたり）
 - テンプレート必須セクション完備確認（G09、G10、`完了条件` セクション含む）
 - 出力制約: Issue 本文、commit message は verbatim で返す（G17）
-- draft / RU 削除残存検証（Step 18-1-1、`git status --porcelain` で空であること）
+- draft / RU 削除残存検証（Step 19-1-1、`git status --porcelain` で空であること）
 
 ## case-auto 並列委譲モデル（REQ-0114-087〜093）
 
