@@ -67,17 +67,46 @@ Step 3-3 で処理対象とした `artifact_actions`（`artifact: req`/ `artifac
 詳細は `agentdev-req-file-manager` を参照。
 委譲接続点: サブエージェントはCREATE/APPEND/UPDATE候補、SPLIT候補、REQ再構成候補を返し、親エージェントがファイル保存を行う
 
-**Step 4-1**: 保存前定義完全性ゲート（QG-1） — REQ/ADR ファイル保存前に、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、保存対象の構造的完全性を最終検証する。判定基準、検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は保存を停止し req-define へ差し戻しを推奨
+**決定的処理のスクリプト呼出（REQ-0136-029、AG-002、design-principles.md 第5節）**: 本 Step の決定的処理（REQ番号採番、要件行ID採番、frontmatter id↔ファイル名整合性確認）は `agentdev-req-file-manager/scripts/` の決定的スクリプトを bash 経由で呼び出して実行する（SKILL.md「Scripts（決定的処理）」セクション参照）。LLM 推論で代替しない:
 
-**Step 4-2**: 語彙、責務、runtime境界矛盾の防止 — Step 4 の保存完了後、既知の矛盾を検出可能な範囲で防止する。詳細は `agentdev-req-file-manager` を参照。委譲接続点: サブエージェントは検査結果と根拠のみを返し、親エージェントがfollow-up扱いを判断する
+```bash
+# REQ番号採番（CREATE 時、max+1、欠番埋め禁止）
+bun src/opencode/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts docs/requirements
+# → stdout: { ok: true, allocated: "REQ-NNNN", max: N }
 
-**Step 4-3**: Catalog entry 確認（APPEND 時） — Step 4 で への APPEND 操作を実行した場合、追加した要件行に関連する `docs/specs/integrity-rule-catalog.md` の catalog entry 有無を確認する。catalog entry が未記載の場合、ユーザーに追記を促す。req-save 自身は `docs/specs/` 配下を直接編集しない（G02 制約）
+# 要件行ID採番（APPEND 時、REQ-NNNN-MMM 形式、max+1）
+bun src/opencode/skills/agentdev-req-file-manager/scripts/src/alloc-composite-id.ts docs/requirements/REQ-NNNN.md
+# → stdout: { ok: true, allocated: "REQ-NNNN-MMM", req: N, max: M }
 
-**Step 4-4**: 複数 REQ/ADR ファイルの3フェーズ分離（REQ-0114-090/093） — 複数 REQ/ADR ファイルを保存する場合、並列委譲可能な作成フェーズと直列集約フェーズを分離する（詳細は後述「case-auto 並列委譲モデル」セクション参照）
+# frontmatter id ↔ ファイル名整合性確認（保存前後の検証）
+bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-frontmatter-consistency.ts docs/requirements req
+# → stdout: { ok: boolean, errors: string[], warnings: string[] }
+```
+
+**Step 4-0**: QG-1（適用結果の整合性検証、REQ-0102-081/082、AG-003） — REQ/ADR ファイル保存前に、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）を「適用結果の整合性検証」として実行する。検証項目: 採番結果の整合性（`new:{slug}` → 確定番号の置換漏れなし）、マージ結果の整合性（要件テーブル構造、番号重複なし）、インデックスの整合性（README/DOC-MAP/mapping-table エントリと採番結果の一致）、変更範囲の妥当性（Step 9 で検証）。各検証は決定的スクリプトの JSON 結果で機械的に確認する。判定基準、検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は保存を停止し req-define へ差し戻しを推奨。**REQ-0102-082**: req-save の QG-1 は内容の品質（検証可能性、REQ/SPEC 分類適合性等）を再検証せず、内容の品質は req-define の QG-1 の責務とする
+
+**Step 4-1**: 語彙、責務、runtime境界矛盾の防止 — Step 4 の保存完了後、既知の矛盾を検出可能な範囲で防止する。詳細は `agentdev-req-file-manager` を参照。委譲接続点: サブエージェントは検査結果と根拠のみを返し、親エージェントがfollow-up扱いを判断する
+
+**Step 4-2**: Catalog entry 確認（APPEND 時） — Step 4 で への APPEND 操作を実行した場合、追加した要件行に関連する `docs/specs/integrity-rule-catalog.md` の catalog entry 有無を確認する。catalog entry が未記載の場合、ユーザーに追記を促す。req-save 自身は `docs/specs/` 配下を直接編集しない（G02 制約）
+
+**Step 4-3**: 複数 REQ/ADR ファイルの3フェーズ分離（REQ-0114-090/093） — 複数 REQ/ADR ファイルを保存する場合、並列委譲可能な作成フェーズと直列集約フェーズを分離する（詳細は後述「case-auto 並列委譲モデル」セクション参照）
 
 ### Step 5: インデックス、ハブ更新
 
 詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが `docs/` ファイルを更新する
+
+**エントリ存在確認のスクリプト呼出（REQ-0136-029、AG-002）**: README/DOC-MAP/mapping-table へのエントリ追加後に、当該エントリが正しく登録されたかを決定的スクリプトで検証する:
+
+```bash
+# REQ エントリが README/DOC-MAP/mapping-table に存在するか確認
+bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-entry-existence.ts REQ-NNNN \
+  docs/requirements/README.md docs/DOC-MAP.md docs/requirements/mapping-table.md
+# → stdout: { ok: boolean, errors: string[], warnings: string[], found: string[] }
+
+# stdin JSON 入力（複数 ID 一括確認）も可能
+echo '{"id":"REQ-NNNN","files":["docs/requirements/README.md"]}' | \
+  bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-entry-existence.ts
+```
 
 ### Step 6: ADR ファイル作成
 
@@ -87,6 +116,17 @@ Step 3-3 で処理対象とした `artifact_actions`（`artifact: req`/ `artifac
 
 REQ番号の連続性確認、frontmatter の `id` とファイル名の一致を確認
 
+**決定的処理のスクリプト呼出（REQ-0136-029、AG-002）**: frontmatter id ↔ ファイル名整合性確認は決定的スクリプトで実行する:
+
+```bash
+# REQ ファイル群の frontmatter id ↔ ファイル名整合性確認
+bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-frontmatter-consistency.ts docs/requirements req
+# → stdout: { ok: boolean, errors: string[], warnings: string[] }
+
+# ADR ファイル群の整合性確認（ADR 保存時）
+bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-frontmatter-consistency.ts docs/adr adr
+```
+
 ### Step 8: DOC-MAP 影響確認
 
 REQ/ADR/SPEC操作が `docs/DOC-MAP.md` に影響するか確認する。
@@ -95,9 +135,36 @@ REQ/ADR/SPEC操作が `docs/DOC-MAP.md` に影響するか確認する。
 DOC-MAP更新は探索経路の更新であり、要件、判断、仕様の更新ではない。
 影響確認ルールの詳細は `agentdev-doc-map` スキルを参照
 
+**エントリ存在確認のスクリプト呼出（REQ-0136-029、AG-002）**: DOC-MAP 更新の有無にかかわらず、REQ/ADR エントリが DOC-MAP に存在するかを決定的スクリプトで確認する:
+
+```bash
+bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-entry-existence.ts REQ-NNNN docs/DOC-MAP.md
+# → stdout: { ok: boolean, errors: string[], warnings: string[], found: string[] }
+```
+
 ### Step 9: 変更範囲検証
 
-`git diff --name-only` で変更ファイル一覧を取得し、`docs/` 以外の変更が含まれていればエラー内容をユーザーに報告して指示を待つ（変更の自動破棄は行わない）
+**決定的処理のスクリプト呼出（REQ-0136-029、AG-002）**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を決定的スクリプトで実行する。許可範囲外の変更を検出したらエラー内容をユーザーに報告して指示を待つ（変更の自動破棄は行わない）:
+
+```bash
+# git diff --name-only をファイルに出力し、許可パスリストと照合
+git diff --name-only > /tmp/changed-paths.txt
+cat > /tmp/allowed-paths.txt <<EOF
+docs/requirements/**
+docs/adr/**
+docs/README.md
+.agentdev/drafts/**
+EOF
+bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-change-impact.ts \
+  /tmp/changed-paths.txt /tmp/allowed-paths.txt
+# → stdout: { ok: boolean, errors: string[], warnings: string[], violations: string[] }
+
+# stdin JSON 入力も可能
+echo '{"changed":["docs/requirements/REQ-0102.md"],"allowed":["docs/requirements/**"]}' | \
+  bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-change-impact.ts
+```
+
+`violations` が空でない場合は G02 違反としてユーザーに報告し、指示を待つ
 
 **Step 9-1**: リモート同期と hash 検証。詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが git 操作と読込やり直し判断を行う
 
