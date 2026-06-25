@@ -34,38 +34,38 @@ updated: 2026-06-26
 
 ## 現在の動作
 
-- Step 0: セッションコンテキスト検知（引数なし単体実行時のみ）（当該セッション履歴、現在コンテキストを Requirement Source 候補として評価）
-- Step 1: 明示入力ファイル読込（指定時）（RU 自動検出を含む）
-- Step 2: 壁打ち対話（`agentdev-req-analysis` に従い深掘り）
-  - Step 2-1: 前工程からの引き継ぎ判定（`agentdev_handoff: true` フラグ処理）
-- Step 3: 既存REQ照合（`agentdev-req-file-manager` 照合方法論）
-  - Step 3-1: 定量的データ検証（`glob docs/requirements/REQ-*.md` で AGENTS.md 記載レンジと照合）
-  - Step 3-2: SPLIT 予兆計測（既存REQの健全性メトリクス計測）
-- Step 4: 要件展開（`agentdev-req-analysis` 分析観点）
-  - Step 4-1: 変更影響候補抽出
+- Step 1: セッションコンテキスト検知（引数なし単体実行時のみ）（当該セッション履歴、現在コンテキストを Requirement Source 候補として評価）
+- Step 2: 明示入力ファイル読込（指定時）（RU 自動検出を含む）
+- Step 3: 壁打ち対話（`agentdev-req-analysis` に従い深掘り）
+  - Step 3-1: 前工程からの引き継ぎ判定（`agentdev_handoff: true` フラグ処理）
+- Step 4: 既存REQ照合（`agentdev-req-file-manager` 照合方法論）
+  - Step 4-1: 定量的データ検証（`glob docs/requirements/REQ-*.md` で AGENTS.md 記載レンジと照合）
+  - Step 4-2: SPLIT 予兆計測（既存REQの健全性メトリクス計測）
+- Step 5: 要件展開（`agentdev-req-analysis` 分析観点）
+  - Step 5-1: 変更影響候補抽出
     - RU 由来キーワード抽出 + glob/grep 前処理による explore 委譲スコープの絞り込み（REQ-0102-072）。絞り込みは explore 委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-0102-002）の完全性は維持する
-  - Step 4-2: 分類ゲート（変更後仕様 or 反映作業、REQ/SPEC 境界判定）
-- Step 4-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
-- Step 4-4: ADR要否確認ゲート（`agentdev-architecture-advisory` oracle 連携）
-  - oracle 入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-0102-073）。ラベル構造は soft-contract（ADR-0124）とし、分類権限は親が保持する
-- Step 4-5: 実行主体分類表（REQ-0146-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
-- Step 5: Test strategy 定義（要件展開内）
-  - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
-  - on_failure（不合格時の処置）を持たない検証項目は test strategy に含めない
-  - 項目識別子: TS-NNN 形式（NNNは3桁ゼロ埋め連番）
-  - 各項目属性: id（TS-NNN）、target_item（AG-* への参照）、verification、pass_criteria、on_failure
-  - on_failure アクション種別: fix-and-reverify（実装を修正して再検証）/ record-in-findings（Findings に out-of-scope として記録）の2値
+  - Step 5-2: 分類ゲート（変更後仕様 or 反映作業、REQ/SPEC 境界判定）
+  - Step 5-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
+  - Step 5-4: ADR要否確認ゲート（`agentdev-architecture-advisory` oracle 連携）
+    - oracle 入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-0102-073）。ラベル構造は soft-contract（ADR-0124）とし、分類権限は親が保持する
+  - Step 5-5: 実行主体分類表（REQ-0146-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
+  - Step 5-6: Test strategy 定義（要件展開内）
+    - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
+    - on_failure（不合格時の処置）を持たない検証項目は test strategy に含めない
+    - 項目識別子: TS-NNN 形式（NNNは3桁ゼロ埋め連番）
+    - 各項目属性: id（TS-NNN）、target_item（AG-* への参照）、verification、pass_criteria、on_failure
+    - on_failure アクション種別: fix-and-reverify（実装を修正して再検証）/ record-in-findings（Findings に out-of-scope として記録）の2値
 - Step 6: ADR判断（`agentdev-adr-guidelines`）
-  - Step 6-0: 既存ADR重複確認
-  - Step 6-1: ADR禁止ゲート
-  - Step 6-2: ADR判断根拠記録
-  - Step 6-3: 作業手段ADR拒否ゲート
-  - Step 6-4: ADR 番号指定形式（`new:{topic-slug}` 形式）
+  - Step 6-1: 既存ADR重複確認
+  - Step 6-2: ADR禁止ゲート
+  - Step 6-3: ADR判断根拠記録
+  - Step 6-4: 作業手段ADR拒否ゲート
+  - Step 6-5: ADR 番号指定形式（`new:{topic-slug}` 形式）
 - Step 7: 要件doc生成（テンプレート: `templates/req-define/req-draft.md`）
-  - Step 7-0: 定義完全性ゲート（QG-1）
-  - Step 7-1: operation_units 生成
-  - Step 7-2: artifact_actions 生成
-  - Step 7-3: draft-data test_strategy 生成（各項目の5属性をYAML形式で格納）
+  - Step 7-1: 定義完全性ゲート（QG-1）
+  - Step 7-2: operation_units 生成
+  - Step 7-3: artifact_actions 生成
+  - Step 7-4: draft-data test_strategy 生成（各項目の5属性をYAML形式で格納）
 - Step 8: work_type 判定（bugfix/feature/maintenance/docs_chore）
 - Step 9: Scale判断（featureのみ、`agentdev-workflow-lifecycle`）
   - Step 9-1: 実装スコープシグナル確認
@@ -76,9 +76,7 @@ updated: 2026-06-26
   - Step 11-1〜11-6: 複数RU受付、統合/分離判定、出力生成、Epic規模検出、Wave候補記録、OU 構造検証
 - Step 12: 完了報告（work_type 別テンプレート選択）
 
-req-define の Step 番号構成は command 定義（src/opencode/commands/agentdev/req-define.md）と一致する（REQ-0143-004）。Step 0「セッションコンテキスト検知」は明示的な採番対象とし、後続フェーズの Step 番号は command 定義と完全に一致させる。 SPEC と command で Step 番号がずれる場合、SPEC 側を command 定義へ合わせる。
-
-注: 本セクションの Step 番号再採番（旧構成からの移行）は case-run で実施する。移行後、完了条件・テスト戦略と実装の間で Step 番号変換が不要となることを確認すること。
+req-define の Step 番号構成は command 定義（src/opencode/commands/agentdev/req-define.md）と一致する（REQ-0143-004）。本 SPEC の Step 1〜Step 12 は command 定義の同名 Step と完全に一致する。SPEC と command で Step 番号がずれる場合、SPEC 側を command 定義へ合わせる。Step 0 扱い、採番開始位置の規則は `command-file-format.md` 参照。
 
 ## draft-data test_strategy フィールドスキーマ
 
@@ -143,7 +141,7 @@ req-define 側は出力形式のみを規定する。`target_area` の形式（M
 - 関連ドキュメントの個別ファイル列挙をユーザーに求める（G02）
 - `.agentdev/drafts/**` 以外のファイル作成、編集（G03）
 - ユーザー明示入力ファイルの変更、削除、RU 削除（G04）
-- `docs/` 配下の広範な探索（G05。例外: 明示入力ファイル、`docs/requirements/**` 参照、Step 4-1 限定探索）
+- `docs/` 配下の広範な探索（G05。例外: 明示入力ファイル、`docs/requirements/**` 参照、Step 5-1 限定探索）
 - `inbox.md` / `archive/active.md` 直接ロード（G06）
 - 採用済み成果物の直読み（G07）
 - `git` コマンド実行（G08）
@@ -155,7 +153,7 @@ req-define 側は出力形式のみを規定する。`target_area` の形式（M
 
 ## 検証観点
 
-- QG-1（Definition Integrity Gate）: Step 7-0 で要件doc構造的完全性を検証（REQ/SPEC 分類、ADR ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成妥当性）
+- QG-1（Definition Integrity Gate）: Step 7-1 で要件doc構造的完全性を検証（REQ/SPEC 分類、ADR ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成妥当性）
   - test_strategy 3要素完全性検査: 各 test strategy 項目が verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持すること。いずれかが欠落する項目を検出した場合、fail とする
 - チェックボックス品質基準: `agentdev-req-analysis` に従い測定可能で一意（G09）
 - artifact_actions 構成: REQ/ADR/SPEC 別 action が適切に統合されているか
