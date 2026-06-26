@@ -95,10 +95,6 @@ skills/agentdev-*/             → 原本
 - `.opencode/commands/`, `.opencode/skills/`, `.opencode/` 配下ひな形は link により git 管理対象外（REQ-0141-008, ADR-0131 decision #1）
 - `.agentdev/cases/` 配下のローカル Case ファイルはリポジトリ管理対象（REQ-0141-016）
 
-### 将来の配布形態
-
-将来の plugin/npm/package 配布形態は現在未対応である（REQ-0103-064 参照）。
-
 ## プロジェクトローカル命名規則（Project-Local Naming Rules）
 
 Consumer プロジェクトで独自 command/skill を追加する際の命名規約（REQ-0103-063）。
