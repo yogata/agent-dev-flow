@@ -58,6 +58,14 @@
 | [REQ-0146](requirements/REQ-0146.md) | 実行契約・委譲・プロセス設計 | oh-my-openagent CLI引数正規化・委譲プロンプト雛形・case-open即時push・case-auto委譲契約MUST NOT DO・case-close squash merge後reset・git-common-procedures・実行主体分類表・3層検出構造SPEC化・doc-writing査読観点・前工程完了度3段階・subagent-protocol・command-authoring判断基準・バッチIssue完了判定追跡性 |
 | [REQ-0147](requirements/REQ-0147.md) | 文書化規律・HITL境界 | SKILL↔command同一ルール重複許容基準・新旧REQ適用運用ルール・promote/review系HITL限定・判断確定後自動実行・破壊的変更承認維持・learning-promote prune・intake-promote自動実行・backlog-review矛盾検出時追加判断 |
 | [REQ-0148](requirements/REQ-0148.md) | RU群バッチ処理と複数 execution_unit 並列実行 | 複数RUバッチ統合・連結成分ベース複数Standard/Epic構成・3軸判断（依存強度・Epicサイズ・機能的一貫性）・execution_unit 並列 orchestration・blocked部分停止・REQ-0114-088破壊的UPDATE |
+| [REQ-0149](requirements/REQ-0149.md) | agentdev-gh-cli 手続き委譲基盤 | gh-cli 手続き委譲基盤と I/O 責務分離 |
+| [REQ-0150](requirements/REQ-0150.md) | ローカル版 agentdev-gh-cli 実装 | ローカル版 agentdev-gh-cli と Case ファイル差し替え |
+| [REQ-0151](requirements/REQ-0151.md) | コンフリクト解消モデルと実行時間観測 | 3レベルコンフリクト解消モデルと工程別タイムスタンプ計測 |
+| [REQ-0152](requirements/REQ-0152.md) | gh 直接記述機械検出（IR-053） | gh CLI 直接呼出しの機械検出ルール（IR-053）と inspect-skills 診断観点との協調 |
+| [REQ-0153](requirements/REQ-0153.md) | 機械横断是正の完了証明 | 機械横断是正 PR の再 grep 0 件証拠の完了条件化と PR 本文記載 |
+| [REQ-0154](requirements/REQ-0154.md) | SPEC status 追跡と draft 放置検出 | SPEC status 単一情報源化と draft 放置機械検出 |
+| [REQ-0155](requirements/REQ-0155.md) | 文書粒度モデル | SPEC内部5論理区分・文書7分類モデル・粒度ゲート2点必須化・RU暫定→確定分類・learning自動REQ化禁止・レポジトリ種別非区別・局所物理分離許容 |
+| [REQ-0156](requirements/REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 | docs/specs 直下基盤SPECの6ドメイン分類・段階移送方針・spec-health-metrics・integrity/rules 分離 |
 
 ## 廃止済み REQ
 
