@@ -132,3 +132,19 @@
 - **想定反映先**: `agentdev-conventional-commits`、`agentdev-gh-cli`（references/standard-procedures.md の Windows git commit 手順）
 - **関連**: commit 8ebe0e98、L-005（Write ツール既存 UTF-8 ファイル cp932 化）、L72-86（gh CLI stdout cp932 デコード）、`src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md`
 - **タグ**: `#git` `#encoding` `#powershell` `#mojibake` `#commit-message` `#windows`
+
+## Epic 分解時に既存 Issue/PR とのスコープ完全重複を検知できず空コミット PR に終始した
+
+- **問題事象**: Epic #1231（docs 機械判定表記是正）の子 Issue #1239（OU-001-8: IR-025〜051 regression_test 表記統一）の作業対象が、並行して進行していた別 Issue #1240（doc-structural-cleanup、AG-005: IR 表記統一）の PR #1240 で完全に処理済みだった。case-run は重複を検知して PR #1247 を空コミットとし、Findings に「既処理（DEFERRED）」と記録して PR #1240/#1246 のマージで完了条件を満たす構成とした。結果として #1239 の case-open/case-run/case-close リソースが空コミット PR に消費され、8子 Issue 中1つが実質作業なしとなった。
+- **発生局面**: 完了処理（case-close(#epic) Wave 2 close 時の Capture 回収で顕在化）
+- **検知方法**: PR #1247 本文の Findings セクション「重複作業の回避（既処理）」記載と、Epic #1231 ステータステーブル上の #1239 行が `pending → completed ([PR#1247])` に遷移したが PR #1247 は files 差分0件（空コミット）であることの突合。
+- **根本原因**: Epic #1231 の case-open でのディレクトリ単位8分割（OU-001-1〜8）時に、既存 OPEN Issue #1240（doc-structural-cleanup）の AG-005 スコープ（IR 表記統一）と OU-001-8 のスコープが完全一致することを検知しなかった。両者は AG（acceptance goal）粒度で同じ「IR regression_test 表記統一」を対象としていたが、Epic 分解はディレクトリ/ファイル単位で行い、既存 Issue の AG 単位との照合をスキップした。
+- **自律対応内容**: case-run（#1239 担当）は task hint「既に処理済みの場合はスキップし、PR 本文の Findings に『既処理』と記録」に従い空コミット PR #1247 を作成。case-close(#epic) Wave 2 close では #1239 を `completed ([PR#1247])` として扱い、AG-005 は PR #1240/#1246（merge 0b6e6428）で満たされたことを VERIFY の上で Epic 完了判定に組み込んだ。本 learning と intake（`2026-06-27-epic1231-wave2-issue1239-pr1240-scope-overlap.md`）に記録。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。本件は case-open の Epic 分解手順の運用上の改善余地であり、現行 SPEC（`docs/specs/commands/case-open.md`）に既存 Issue との AG 粒度照合手順は規定なし。
+- **横展開観点**: 横断是正 Epic（ディレクトリ/パターン単位分割）と、doc-structural-cleanup のような横断 Issue（AG 単位で複数パターンを束ねる）が並行運用される場合、スコープ重複が構造的に発生し得る。両者の分解軸（ディレクトリ vs AG）が直交しないため。
+- **再発条件**: 横断是正 Epic を case-open でディレクトリ単位分割する際、同一リポジトリに doc-structural-cleanup 系の横断 Issue が OPEN/進行中で、かつその AG が Epic 子 Issue の OU と同じ対象（ファイル群 or パターン）を含む場合。
+- **予防策候補**: (a) case-open の Epic 分解フローで、既存 OPEN Issue の AG/対象ファイル群と分解候補 OU の照合ステップを追加する、(b) doc-structural-cleanup Issue と並行する横断是正 Epic を起票する場合、両者のスコープ境界を事前に合意（CR）する運用を SPEC に明文化する。
+- **想定反映先**: `case-open` コマンド（Epic 分解ロジック、既存 Issue 照合）、`docs/specs/commands/case-open.md`（分解 SPEC）
+- **関連**: Epic #1231、Issue #1239/#1240、PR #1247/#1240/#1246、`docs/specs/commands/case-open.md`、`docs/specs/commands/case-auto.md`
+- **タグ**: `#case-open` `#epic-decomposition` `#scope-overlap` `#cross-epic` `#横断是正`
