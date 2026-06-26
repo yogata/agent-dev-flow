@@ -116,3 +116,19 @@
 - **想定反映先**: `case-open` コマンド（完了条件調整）、`case-auto` コマンド（整合性チェック）
 - **関連**: Issue #1212, PR #1213, follow-up Issue #1214, RU-0002 case_open_hints
 - **タグ**: `#case-open` `#case-auto` `#direct-scope` `#完了条件` `#整合性`
+
+## git commit -m の日本語タイトル行が PowerShell で mojibake（本文は正常）
+
+- **問題事象**: `git commit -m "fix(spec): runtime-package-boundary.md plugin-future 追加対応\n\ninspect-docs Finding 1 追加対応。..."` を PowerShell で実行した際、タイトル行の「追加対応」が「Z>」に mojibake した。本文（2行目以降）は正常に日本語で記録された。commit 8ebe0e98 で発生、push 済みのため amend を見送り記録上の問題として残留。
+- **発生局面**: commit 作成（Phase 4e 指摘3 対応の runtime-package-boundary.md 修正 commit）
+- **検知方法**: `git log -1 8ebe0e98 --format="%B"` でタイトル行が「fix(spec): runtime-package-boundary.md plugin-future Z>」となっていることを確認。
+- **根本原因**: PowerShell（Windows）で `git commit -m "..."` の `-m` 引数に日本語を含めた際、タイトル行の日本語が化けた。詳細不明だが、PowerShell の文字列処理、またはメッセージ内の「>」文字（リダイレクト解釈）の干渉が疑われる。L-005（Write ツール既存 UTF-8 ファイル cp932 化）、L72-86（gh CLI stdout cp932 デコード）と同根の Windows PowerShell + UTF-8 非互換事象だが、git commit -m 引数経路で発生する点が異なる。本文が正常な理由は、改行以降が別の処理経路（ヒアドキュメント的取り扱い）に回された可能性。
+- **自律対応内容**: commit は push 済み（`8ebe0e98`）のため、amend + force-push は共有履歴の書き換えリスクを避けて見送り。ファイル変更（runtime-package-boundary.md の4行削除）は正しく反映されており、実害は commit message のタイトル行のみ。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。実行環境のエンコーディング設定に起因する運用事象。
+- **横展開観点**: PowerShell（Windows）で `git commit -m "..."` に日本語を含めるすべての処理で同様の mojibake リスクがある。`agentdev-conventional-commits`、`agentdev-gh-cli` の standard-procedures.md が該当経路。
+- **再発条件**: PowerShell（Windows、特に日本語ロケール環境）で `[Console]::OutputEncoding` を UTF-8 に設定せずに `git commit -m "..."` で日本語タイトル行を含む commit を作成する場合。
+- **予防策候補**: (a) 日本語を含む commit message は `git commit -m "..."` ではなく `git commit -F <utf8-file>`（UTF-8 ファイル指定）を使用する、(b) `agentdev-gh-cli` skill の standard-procedures.md に「PowerShell 実行時の git commit は -F <file> を推奨、-m は ASCII-only に限定」旨の標準手順を明記する。
+- **想定反映先**: `agentdev-conventional-commits`、`agentdev-gh-cli`（references/standard-procedures.md の Windows git commit 手順）
+- **関連**: commit 8ebe0e98、L-005（Write ツール既存 UTF-8 ファイル cp932 化）、L72-86（gh CLI stdout cp932 デコード）、`src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md`
+- **タグ**: `#git` `#encoding` `#powershell` `#mojibake` `#commit-message` `#windows`
