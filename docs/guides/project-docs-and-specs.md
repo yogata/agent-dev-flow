@@ -27,7 +27,8 @@ DOC-MAP（文書探索入口：索引）
 - 旧 REQ（REQ-0001〜REQ-0050 [全て廃止]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
-> 現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とする。本ガイドでは REQ 一覧を複製しない。
+> 現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とする。
+> 本ガイドでは REQ 一覧を複製しない。
 
 ## ADR（アーキテクチャ決定記録）
 
