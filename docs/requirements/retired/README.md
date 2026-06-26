@@ -1,8 +1,10 @@
 # Retired Requirements
 
-このディレクトリは retired REQ の履歴アーカイブである。ここにある REQ は削除されていないが、現行要件判断には使用しない。
+このディレクトリは retired REQ の履歴アーカイブである。
+ここにある REQ は削除されていないが、現行要件判断には使用しない。
 
-active REQ は `docs/requirements/REQ-{NNNN}.md` 直下の25件である。旧REQから新REQへの移行有無は `docs/requirements/mapping-table.md` を参照する。
+active REQ は `docs/requirements/REQ-{NNNN}.md` 直下の25件である。
+旧REQから新REQへの移行有無は `docs/requirements/mapping-table.md` を参照する。
 
 ## Retired REQ
 
