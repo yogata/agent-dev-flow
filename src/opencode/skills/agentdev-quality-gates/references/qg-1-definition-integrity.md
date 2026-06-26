@@ -40,7 +40,7 @@ ADR 候補が REQ/SPEC 相当でないか（ADR禁止ゲート）。
 
 ### 4. ドキュメント分類妥当性
 
-各要件の対象ドキュメント種別が `docs/specs/document-model.md` の Document Classification Policy に適合しているか。
+各要件の対象ドキュメント種別が `docs/specs/foundations/document-model.md` の Document Classification Policy に適合しているか。
 
 - **fail**: SPEC にすべき内容が guides に、REQ にすべき内容が SPEC に、等の分類不適合。
 - **warn**: 分類は妥当だが根拠が薄弱。
@@ -73,7 +73,7 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 ### 8. SPLIT 予兆の記録
 
 既存 REQ を APPEND/UPDATE 対象とする場合、または生成ドラフトの要件行数が 51 行を超える場合、`draft-meta.split-forecast`（target、metrics、signals、total、recommended_action、thresholds_ref）が記録されているか。
-閾値の正は `docs/specs/req-health-metrics.md` とする。
+閾値の正は `docs/specs/quality/req-health-metrics.md` とする。
 
 - **fail**: 記録すべき SPLIT 予兆（要件行数 51+、関心分類数 2+、成果物種別数 3+ のいずれか）があるのに `draft-meta.split-forecast` が未記録。
 - **warn**: split-forecast は記録されているが推奨アクション（SPLIT 検討、SPLIT 推奨）に対するユーザー応答が未確認。

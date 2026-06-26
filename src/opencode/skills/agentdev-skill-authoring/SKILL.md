@@ -379,7 +379,7 @@ Adapt sections as needed.
 ## 8. コマンドとスキルの境界
 
 Skill の品質基準は本スキルの範囲とする。
-Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（`docs/specs/artifact-contracts.md`）を参照。
+Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（`docs/specs/responsibilities/artifact-contracts.md`）を参照。
 Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
 
 ## 参照記述ルール

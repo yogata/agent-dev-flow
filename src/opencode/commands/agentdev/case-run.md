@@ -9,7 +9,7 @@ Case に対して実装実行を実行担当サブエージェント（Sisyphus-
 case-run 本体は orchestration に専念し、実装実行そのものは行わない。
 常に git worktree を使用。
 
-**スコープ**: case-run は単一 Issue または単一 Wave を処理する。Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、case-run は扱わない。1 Wave の実行（PR作成まで）で return する。複数 Issue の一括実行、Wave 順序制御にまたがるオーケストレーションは case-auto の責務（SPEC `docs/specs/workflow-contracts.md` SC-008）。
+**スコープ**: case-run は単一 Issue または単一 Wave を処理する。Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、case-run は扱わない。1 Wave の実行（PR作成まで）で return する。複数 Issue の一括実行、Wave 順序制御にまたがるオーケストレーションは case-auto の責務（SPEC `docs/specs/foundations/workflow-contracts.md` SC-008）。
 
 3フェーズ構成で各フェーズは独立して再実行可能（べき等性）。
 フェーズ間エラー時は Step 1 の再開判定から再開できる。

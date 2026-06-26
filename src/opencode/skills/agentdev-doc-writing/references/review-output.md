@@ -1,6 +1,6 @@
 # 査読出力形式
 
-> **原本**: 配置基準、用語政策は [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md)「移送判断」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。本ファイルは運用ビュー（査読結果の分類、出力形式）である。
+> **原本**: 配置基準、用語政策は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md)「移送判断」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。本ファイルは運用ビュー（査読結果の分類、出力形式）である。
 
 ## 4 分類
 

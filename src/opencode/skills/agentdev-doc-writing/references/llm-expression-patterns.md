@@ -100,5 +100,5 @@ docs/ 配下の REQ/ADR/SPEC/guides/DOC-MAP/README、および docs を生成・
 ## See Also
 
 - 執筆規範 SSoT: `japanese-tech-writing` スキル（AGENTS.md 経由）
-- 用語政策 原本: [docs/specs/document-type-responsibilities.md](../../../../../docs/specs/document-type-responsibilities.md) 「LLM 表現の検出→書き換え方針」節
+- 用語政策 原本: [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md) 「LLM 表現の検出→書き換え方針」節
 - 検出→書き換え査読観点: `agentdev-doc-writing` SKILL.md「検出→書き換え」行

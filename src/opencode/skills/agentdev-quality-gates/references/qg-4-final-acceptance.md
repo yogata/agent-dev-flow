@@ -53,7 +53,7 @@ PR の CI が全て通過しているか。
 
 ### 4. 文書分類ポリシー適合
 
-最終ドキュメント状態が `docs/specs/document-model.md` の Document Classification Policy に適合しているか。
+最終ドキュメント状態が `docs/specs/foundations/document-model.md` の Document Classification Policy に適合しているか。
 
 - **warn**: 分類ポリシーとの不適合候補がある。警告表示してユーザー判断を仰ぐ。
 - **pass**: 分類ポリシーに適合。

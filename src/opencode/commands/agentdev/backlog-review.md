@@ -80,7 +80,7 @@ status: draft
 
 分析基準、前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` を参照
 
-**暫定分類付与（REQ-0155-004）**: 各 RU 候補について、`docs/specs/document-model.md` の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。暫定分類は後続 `/agentdev/req-define` の Step 5-2 で最終確定される候補であり、本コマンドが確定しない。分析結果と併せて RU frontmatter に `tentative_classification` として記録する。
+**暫定分類付与（REQ-0155-004）**: 各 RU 候補について、`docs/specs/foundations/document-model.md` の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。暫定分類は後続 `/agentdev/req-define` の Step 5-2 で最終確定される候補であり、本コマンドが確定しない。分析結果と併せて RU frontmatter に `tentative_classification` として記録する。
 
 ### Step 4: 統合、分割判定 + depends_on 依存解決 + ユーザー承認
 
