@@ -75,7 +75,7 @@
 
 SPEC は 3 層構造を持つ（AG-007）。横断 SPEC（`specs/workflows/`）は共通契約のみを扱い、個別 command / skill の動作は代替しない（AG-008）。
 
-> **SPEC status 追跡**: SPEC の status（draft / accepted、ADR-0123 定義）は [specs/README.md](specs/README.md) が単一の追跡情報源である（REQ-0154-001）。本 DOC-MAP の SPEC 表には status 列を設けず、重複管理しない。draft SPEC 放置検出（IR-054）は [specs/integrity-rule-catalog.md](specs/integrity/integrity-rule-catalog.md) 参照（REQ-0154-002）。
+> **SPEC status 追跡**: SPEC の status（draft / accepted、ADR-0123 定義）は [specs/README.md](specs/README.md) が単一の追跡情報源である（REQ-0154-001）。本 DOC-MAP の SPEC 表には status 列を設けず、重複管理しない。draft SPEC 放置検出（IR-054）は [specs/integrity/integrity-rule-catalog.md](specs/integrity/integrity-rule-catalog.md) 参照（REQ-0154-002）。
 
 ### 横断 SPEC（`specs/workflows/`）
 
