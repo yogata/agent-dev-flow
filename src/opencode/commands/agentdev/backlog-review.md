@@ -7,7 +7,9 @@ agent: sisyphus
 
 `.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU を生成する。
 
-**このコマンドはユーザー承認後に RU を生成する。ユーザー承認は RU 作成承認を兼ねる。**
+**このコマンドはユーザー承認後に RU を生成する。
+ユーザー承認は RU 作成承認を兼ねる。
+**
 
 ## 入力
 
@@ -70,7 +72,8 @@ status: draft
 - `.agentdev/intake/promoted/*.md`
 - `.agentdev/learning/promoted/*.md`
 
-**引数ありの場合**: 指定されたファイルパスのみを対象。存在しないパスはエラー報告してスキップ。
+**引数ありの場合**: 指定されたファイルパスのみを対象。
+存在しないパスはエラー報告してスキップ。
 
 検出結果の判定:
 - **0件**: 正常終了（エラー扱いとしない）。完了報告で「対象なし」と報告
@@ -80,19 +83,25 @@ status: draft
 
 分析基準、前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` を参照
 
-**暫定分類付与（REQ-0155-004）**: 各 RU 候補について、`docs/specs/foundations/document-model.md` の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。暫定分類は後続 `/agentdev/req-define` の Step 5-2 で最終確定される候補であり、本コマンドが確定しない。分析結果と併せて RU frontmatter に `tentative_classification` として記録する。
+**暫定分類付与（REQ-0155-004）**: 各 RU 候補について、`docs/specs/foundations/document-model.md` の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。
+暫定分類は後続 `/agentdev/req-define` の Step 5-2 で最終確定される候補であり、本コマンドが確定しない。
+分析結果と併せて RU frontmatter に `tentative_classification` として記録する。
 
 ### Step 4: 統合、分割判定 + depends_on 依存解決 + ユーザー承認
 
 統合、分割判定基準、depends_on 依存解決ルールは `agentdev-backlog-integration` を参照
 
-**矛盾なしの場合の単一承認（REQ-0147-009）**: 後続の Step 5 で矛盾が検出されない場合、本 Step 4 の統合、分割判定承認を RU 生成承認（Step 5/6）としても扱う。単一承認で処理し、追加の HITL は不要。
+**矛盾なしの場合の単一承認（REQ-0147-009）**: 後続の Step 5 で矛盾が検出されない場合、本 Step 4 の統合、分割判定承認を RU 生成承認（Step 5/6）としても扱う。
+単一承認で処理し、追加の HITL は不要。
 
 ### Step 5: 矛盾検出 + 必要に応じて追加判断
 
 矛盾検出ロジック、出力形式は `agentdev-backlog-integration` を参照
 
-**矛盾検出時の追加判断（REQ-0147-009）**: 矛盾が検出された場合のみ、ユーザーに追加判断を求める。矛盾する artifact を RU 化せずユーザーに確認する。矛盾しない artifact は通常通り RU 化する（partial success）。自動解決しない（G05）
+**矛盾検出時の追加判断（REQ-0147-009）**: 矛盾が検出された場合のみ、ユーザーに追加判断を求める。
+矛盾する artifact を RU 化せずユーザーに確認する。
+矛盾しない artifact は通常通り RU 化する（partial success）。
+自動解決しない（G05）
 
 ### Step 6: RU 生成
 
@@ -113,11 +122,11 @@ RU 生成が成功した採用済み成果物のみを削除する:
 - `git diff --name-only` で `.agentdev/` 配下の変更を確認
 - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
 - **変更あり時**:
-  1. 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。
-  生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。
-  `.agentdev/` 全体の一括 `git add` は禁止
-  2. commit message: `chore(agentdev): generate requirement units via backlog-review`
-  3. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止
+ 1. 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。
+ 生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。
+ `.agentdev/` 全体の一括 `git add` は禁止
+ 2. commit message: `chore(agentdev): generate requirement units via backlog-review`
+ 3. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止
 
 ### Step 9: 完了報告
 

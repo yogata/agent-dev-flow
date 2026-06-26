@@ -57,7 +57,9 @@ SPEC 対象 artifact_actions がない場合は no-op で完了。
 - `new:{topic-slug}` → 新規 SPEC 作成（`create` 操作）。ファイル名は `docs/specs/{topic-slug}.md`
 - 重複候補の統合: 同一 `target` の action は1つの SPEC へ集約する
 
-**決定的処理のスクリプト呼出（REQ-0136-029、AG-002、design-principles.md 第5節）**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は `agentdev-req-file-manager/scripts/` の決定的スクリプトを bash 経由で呼び出して実行する（SKILL.md「Scripts（決定的処理）」セクション参照）。LLM 推論で代替しない。`update` 操作かつ `target_area` 指定時は、配置先候補 SPEC に対して `search-target-area.ts` を実行し、`target_area` 見出しの存在を確認する（結果は Step 5 のセクション置換で再利用）:
+**決定的処理のスクリプト呼出（REQ-0136-029、AG-002、design-principles.md 第5節）**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は `agentdev-req-file-manager/scripts/` の決定的スクリプトを bash 経由で呼び出して実行する（SKILL.md「Scripts（決定的処理）」セクション参照）。
+LLM 推論で代替しない。
+`update` 操作かつ `target_area` 指定時は、配置先候補 SPEC に対して `search-target-area.ts` を実行し、`target_area` 見出しの存在を確認する（結果は Step 5 のセクション置換で再利用）:
 
 ```bash
 # 配置先候補 SPEC 内の target_area 見出し検索
@@ -81,12 +83,14 @@ echo '{"target_area":"パターン","files":["docs/specs/foundations/patterns.md
 `draft-data` の `artifact_actions`（`artifact: spec`）の全 entry を処理する:
 - **create**: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
 - **update**:
-  - `target_area` 指定時（operation が `update`/`spec-update`）: 対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-0136-027）。詳細は後述「target_area ベースのセクション置換ロジック」
-  - `target_area` 未指定時: 既存 SPEC ファイルの該当セクションへ action の `content` を追記（後方互換、REQ-0136-028）
-  - frontmatter `updated` を更新。`status` は変更しない
+ - `target_area` 指定時（operation が `update`/`spec-update`）: 対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-0136-027）。詳細は後述「target_area ベースのセクション置換ロジック」
+ - `target_area` 未指定時: 既存 SPEC ファイルの該当セクションへ action の `content` を追記（後方互換、REQ-0136-028）
+ - frontmatter `updated` を更新。`status` は変更しない
 - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
 
-**target_area 見出し検索のスクリプト呼出（REQ-0136-029、AG-002）**: `update` 操作における `target_area` 見出し検索は決定的スクリプトで実行する。Step 3 で得た `search-target-area.ts` の結果（`matches`）を用いてセクション範囲を特定し、`content` で置換する。`matches` が空の場合はスキップして follow-up に記録し、複数マッチの場合は G09 に従い置換を拒否する:
+**target_area 見出し検索のスクリプト呼出（REQ-0136-029、AG-002）**: `update` 操作における `target_area` 見出し検索は決定的スクリプトで実行する。
+Step 3 で得た `search-target-area.ts` の結果（`matches`）を用いてセクション範囲を特定し、`content` で置換する。
+`matches` が空の場合はスキップして follow-up に記録し、複数マッチの場合は G09 に従い置換を拒否する:
 
 ```bash
 # target_area 検索（Step 3 と同一スクリプト、Step 5 では置換位置特定に使用）
@@ -96,7 +100,10 @@ bun src/opencode/skills/agentdev-req-file-manager/scripts/src/search-target-area
 # matches[0].line から次の同レベル見出し行の直前までをセクションとして特定し、content で置換
 ```
 
-**Step 5-1**: 複数 SPEC action の並列化（REQ-0114-091/093）。異なる `target` パスの SPEC create/update は並列化可能。同一 SPEC ファイルへの複数 action は順序依存のため直列サブセットとして分離する。詳細は後述「case-auto 並列委譲モデル」セクション参照
+**Step 5-1**: 複数 SPEC action の並列化（REQ-0114-091/093）。
+異なる `target` パスの SPEC create/update は並列化可能。
+同一 SPEC ファイルへの複数 action は順序依存のため直列サブセットとして分離する。
+詳細は後述「case-auto 並列委譲モデル」セクション参照
 
 ### Step 6: インデックス整合
 
@@ -166,13 +173,13 @@ Step 8 の status 変更を commit 対象に含める。
 
 ## target_area ベースのセクション置換ロジック（REQ-0136-027/028）
 
-`operation: update` / `operation: spec-update` において action の `target_area` が指定された場合、spec-save は対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う。
+`operation: update` / `operation: spec-update` で action の `target_area` が指定された場合、spec-save は対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う。
 
 ### マッチング規則
 
 - 対象 SPEC ファイル内の見出し行を走査し、`target_area` と完全一致する見出し行を検索する（見出しテキスト部分の一致）
 - 当該見出し行から次の同レベル（または上位レベル）見出し行の直前までを「セクション」として特定する
-  - 例: `### X` で検索した場合、次の `###` / `##` / `#` 見出し行の直前までを範囲とする
+ - 例: `### X` で検索した場合、次の `###` / `##` / `#` 見出し行の直前までを範囲とする
 - 特定したセクションを action の `content` で置換する
 
 ### 複数マッチ時の挙動
@@ -185,7 +192,8 @@ Step 8 の status 変更を commit 対象に含める。
 
 ### 後方互換（target_area 未指定）
 
-`target_area` が未指定の draft（旧形式）、または `operation` が `create`/`spec-create` の場合は従来の「追記」動作を維持する（REQ-0136-028）。`target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
+`target_area` が未指定の draft（旧形式）、または `operation` が `create`/`spec-create` の場合は従来の「追記」動作を維持する（REQ-0136-028）。
+`target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
 
 ## case-auto 並列委譲モデル（REQ-0114-091/093）
 
