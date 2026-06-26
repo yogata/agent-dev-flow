@@ -4,7 +4,10 @@ updated: 2026-06-21
 
 # ワークフロー契約（旧版、縮小済み）
 
-> **縮小済み**: 本 SPEC は AG-012 文書体系再構築により縮小した。個別 command / skill の動作は各 command SPEC（`commands/`）、各 skill SPEC（`skills/`）に移管した。横断契約は `workflows/` 配下の各 SPEC に再構成した。本ファイルは互換性のため残置するが、実質的な内容は以下の新 SPEC 群を参照のこと。
+> **縮小済み**: 本 SPEC は AG-012 文書体系再構築により縮小した。
+> 個別 command / skill の動作は各 command SPEC（`commands/`）、各 skill SPEC（`skills/`）に移管した。
+> 横断契約は `workflows/` 配下の各 SPEC に再構成した。
+> 本ファイルは互換性のため残置するが、実質的な内容は以下の新 SPEC 群を参照のこと。
 
 ## 移管先
 

@@ -10,7 +10,8 @@ updated: 2026-06-26
 AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準。
 本 SPEC は command 定義ファイルが従うべき詳細なフォーマット規約を定義する。
 
-> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
+> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
+> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
 
 ## 適用範囲
 
@@ -45,7 +46,8 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 - 代替フローが主手順の特定 Step（例: `Step 1`）から分岐し、主手順の別 Step（例: `Step 2` 以降）に合流する構造で、主手順 Step 番号の連番を維持したい場合に使用する
 - 代替フローのサブステップは `### Step N` 見出しではなく、ボールド段落プレフィックス（`**EN.**`）で表現する。これにより主手順の Step 番号と代替フローの番号が別空間となり、Step 連番検査（非連番 Step 番号検出）に抵触しない
 
-**代表例**: `case-close.md` の Epic Wave クローズフロー（`**E1.**` 〜 `**E6.**`、`**E6a.**` / `**E6b.**` 細分）。`Step 1`（Issue番号解決）から Epic Issue 判定で分岐し、`Step 2`（単一 Issue クローズの前提確認）に合流する構造で使用する。
+**代表例**: `case-close.md` の Epic Wave クローズフロー（`**E1.**` 〜 `**E6.**`、`**E6a.**` / `**E6b.**` 細分）。
+`Step 1`（Issue番号解決）から Epic Issue 判定で分岐し、`Step 2`（単一 Issue クローズの前提確認）に合流する構造で使用する。
 
 **注意**:
 
@@ -68,11 +70,14 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 | numbered list 主手順 | `## 手順` 直下の numbered list による手順記述 |
 | `G01` 形式以外のガードレール番号 | `G` + ゼロ埋め2桁に一致しないガードレール識別子 |
 
-> **非検出対象（許容形式）**: `**EN.**` lettered prefix（代替フロー内サブステップ表現）は主手順の Step 番号連番とは独立した番号空間を持つため、上記検出項目のいずれにも該当しない。`check_command_format.ts` は `### Step N` 見出しのみを Step 番号連番検査の対象とし、`**EN.**` ボールド段落プレフィックスを検出対象外とする（「代替フロー内サブステップ表現」参照）。
+> **非検出対象（許容形式）**: `**EN.**` lettered prefix（代替フロー内サブステップ表現）は主手順の Step 番号連番とは独立した番号空間を持つため、上記検出項目のいずれにも該当しない。
+> `check_command_format.ts` は `### Step N` 見出しのみを Step 番号連番検査の対象とし、`**EN.**` ボールド段落プレフィックスを検出対象外とする（「代替フロー内サブステップ表現」参照）。
 
 ## command SPEC と command 定義の Step 番号一致（REQ-0143-004）
 
-command SPEC（`docs/specs/commands/*.md`）が記述する Step 番号構成は、対応する command 定義ファイル（`src/opencode/commands/agentdev/*.md`）と一致すること（REQ-0143-004）。同一フェーズを指す Step 番号が SPEC と command 定義で異なる場合、読者は都度変換を強いられ、完了条件・テスト戦略・実装メモの照合で誤読が生じる。本節は Step 0 扱いと採番開始位置の規則を確定し、変換負荷を除去する。
+command SPEC（`docs/specs/commands/*.md`）が記述する Step 番号構成は、対応する command 定義ファイル（`src/opencode/commands/agentdev/*.md`）と一致すること（REQ-0143-004）。
+同一フェーズを指す Step 番号が SPEC と command 定義で異なる場合、読者は都度変換を強いられ、完了条件、テスト戦略、実装メモの照合で誤読が生じる。
+本節は Step 0 扱いと採番開始位置の規則を確定し、変換負荷を除去する。
 
 - **採番開始位置**: Step 番号は `1` から開始する（「手順セクション形式」表参照）。`Step 0` は使用しない
 - **SPEC 側優先**: SPEC と command 定義で Step 番号構成がずれる場合、SPEC 側を command 定義へ合わせる。command 定義が正とするのは、command 定義が実行時配布対象の正本であり、SPEC は現状記述であるためである
@@ -81,7 +86,8 @@ command SPEC（`docs/specs/commands/*.md`）が記述する Step 番号構成は
 
 **適用対象**: `docs/specs/commands/*.md` の全 command SPEC（`_template.md` を含む）
 
-**検証**: 各 command/SPEC ペアについて、SPEC の Step 番号と command 定義の Step 番号が同一フェーズで一致することを確認する。ずれを検出した場合、SPEC 側を command 定義へ一致させる。
+**検証**: 各 command/SPEC ペアについて、SPEC の Step 番号と command 定義の Step 番号が同一フェーズで一致することを確認する。
+ずれを検出した場合、SPEC 側を command 定義へ一致させる。
 
 ## 他 SPEC との関係
 

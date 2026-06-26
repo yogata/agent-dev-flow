@@ -23,7 +23,9 @@ agent: sisyphus
 ---
 ```
 
-**理由**: デフォルトエージェント（Plan/Prometheus）の誤用を防止するため。Plan エージェントは読み取り権限のみを持ち、ファイル書込やコマンド実行ができない。対話系、ファイル操作系いずれも Sisyphus 系（書込、実行可能）を要求するため、明示指定が必要。
+**理由**: デフォルトエージェント（Plan/Prometheus）の誤用を防止するため。
+Plan エージェントは読み取り権限のみを持ち、ファイル書込やコマンド実行ができない。
+対話系、ファイル操作系いずれも Sisyphus 系（書込、実行可能）を要求するため、明示指定が必要。
 
 ### Frontmatter 許可フィールド
 
@@ -36,7 +38,8 @@ command frontmatter の許可フィールドは `description` と `agent` のみ
 `.sisyphus/` 配下の 7 カテゴリ（plans, drafts, evidence, execution, notepads, tasks, reports）のファイル、ディレクトリ命名は plan 名を基準とする。
 詳細なルール、例は `AGENTS.md` の「Sisyphus 命名規則」セクションを参照。
 
-**重要**: notepads は完全一致マッチングのみ対応。plan 名にサフィックスがある場合、notepad ディレクトリ名にも同一サフィックスが必要。
+**重要**: notepads は完全一致マッチングのみ対応。
+plan 名にサフィックスがある場合、notepad ディレクトリ名にも同一サフィックスが必要。
 
 ## REQ frontmatter 規約
 
@@ -86,7 +89,8 @@ updated: {YYYY-MM-DD}
 | `retired-no-successor` | 最新方針では不要なため新現行 REQ へ移行しない | 履歴参照として保持 |
 | `historical-only` | 当時の判断、経緯として残すが現行要件ではない | 履歴参照として保持 |
 
-**新基準 REQ 群**（REQ-0101〜0133、25 件、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を現行仕様の主参照とする。現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とし、本 SPEC では複製しない。
+**新基準 REQ 群**（REQ-0101〜0133、25 件、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を現行仕様の主参照とする。
+現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とし、本 SPEC では複製しない。
 
 **要件行の記述規約**（REQ-0109, 004）:
 - 要件行には振る舞い、制約、状態のみを記述する

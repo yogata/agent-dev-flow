@@ -21,7 +21,7 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - USE FOR / DO NOT USE FOR 照合
 - Skill 分割候補検出
 - Command 固有手順の Skill 流入検出
-- gh 直接記述の委譲漏れ検出（REQ-0149）。スキャン対象・除外対象は [agentdev-gh-cli SPEC](agentdev-gh-cli.md)「gh 直接記述の検出スコープ」参照
+- gh 直接記述の委譲漏れ検出（REQ-0149）。スキャン対象、除外対象は [agentdev-gh-cli SPEC](agentdev-gh-cli.md)「gh 直接記述の検出スコープ」参照
 - 出力形式生成（Finding / Classification / Route）
 
 ## 参照する references

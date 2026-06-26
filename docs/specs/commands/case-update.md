@@ -33,10 +33,10 @@ updated: 2026-06-21
 - Step 1: Issue番号解決（ユーザー入力またはセッション内会話から取得）。`gh issue list` / `gh issue status` 等は禁止（G03）
 - Step 2: 現在の Issue 状態を取得、フェーズ判定（`agentdev-workflow-routing`、`agentdev-workflow-lifecycle`）
 - Step 3: 更新内容に応じて分岐:
-  - `--body`（Issue 本文更新）。Issue 作成時と同じテンプレート構造を維持（G06）。`--body-file` 使用（G08）、`agentdev-gh-cli` VERIFY（G09）
-  - `--comment`（コメント追加）。テンプレート【必須】セクション確認（G07）、`--body-file` 使用、VERIFY
-  - `--req`（REQ ファイル更新（APPEND/UPDATE 対応）、git commit/push）
-  - `--review-ng`（レビュー NG コメント）。**必ず QG-3 の乖離検出結果を引用**（G05）
+ - `--body`（Issue 本文更新）。Issue 作成時と同じテンプレート構造を維持（G06）。`--body-file` 使用（G08）、`agentdev-gh-cli` VERIFY（G09）
+ - `--comment`（コメント追加）。テンプレート【必須】セクション確認（G07）、`--body-file` 使用、VERIFY
+ - `--req`（REQ ファイル更新（APPEND/UPDATE 対応）、git commit/push）
+ - `--review-ng`（レビュー NG コメント）。**必ず QG-3 の乖離検出結果を引用**（G05）
 - Step 4: 完了報告
 
 ## 参照する横断 SPEC

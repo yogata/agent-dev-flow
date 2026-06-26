@@ -7,7 +7,9 @@ updated: 2026-06-21
 
 # command SPEC テンプレート
 
-> 全ての `/agentdev/*` 公開コマンドは、`docs/specs/commands/<command-name>.md` に専用 SPEC を持つ（AG-005）。本ファイルは新規 command SPEC を作成する際の最小構成テンプレートである。`/repo/docs-check` は repo-local、配布対象外のため対象外。
+> 全ての `/agentdev/*` 公開コマンドは、`docs/specs/commands/<command-name>.md` に専用 SPEC を持つ（AG-005）。
+> 本ファイルは新規 command SPEC を作成する際の最小構成テンプレートである。
+> `/repo/docs-check` は repo-local、配布対象外のため対象外。
 
 ## 最小構成
 

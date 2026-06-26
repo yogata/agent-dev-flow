@@ -84,7 +84,8 @@ SKILL.md は各手続きのルーティングのみを記述する。
 
 ## gh 直接記述の検出スコープ（inspect-skills 連携）
 
-command/skill 配下で gh コマンド直接記述を検出する `/agentdev/inspect-skills` 診断のスキャン対象と除外対象を定義する（REQ-0149, Issue #1104）。委譲基盤確立後も新規 command/skill が gh 直接記述を導入しないよう、検出辞書が自動担保する。
+command/skill 配下で gh コマンド直接記述を検出する `/agentdev/inspect-skills` 診断のスキャン対象と除外対象を定義する（REQ-0149, Issue #1104）。
+委譲基盤確立後も新規 command/skill が gh 直接記述を導入しないよう、検出辞書が自動担保する。
 
 ### スキャン対象
 
@@ -95,7 +96,8 @@ command/skill 配下で gh コマンド直接記述を検出する `/agentdev/in
 
 検出パターン: `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)`
 
-コードブロック内、インラインコード内の記述も検出対象とする。許容ファイル（除外対象）に該当しない限り、委譲漏れとして報告する。
+コードブロック内、インラインコード内の記述も検出対象とする。
+許容ファイル（除外対象）に該当しない限り、委譲漏れとして報告する。
 
 ### 除外対象（許容ファイル）
 
@@ -103,7 +105,8 @@ command/skill 配下で gh コマンド直接記述を検出する `/agentdev/in
 |-------------|------|------|
 | `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` | 標準版（GitHub 版）の既定実装として gh コマンド直接実行を保持する唯一のファイル | REQ-0149-003 |
 
-agentdev-gh-cli は GitHub I/O を集約する I/O 境界であり、その標準版実装が gh コマンドを直接保持することは委譲の目的と矛盾しない。standard-procedures.md 以外のファイルが gh 直接記述を保持する場合は委譲漏れとして検出する。
+agentdev-gh-cli は GitHub I/O を集約する I/O 境界であり、その標準版実装が gh コマンドを直接保持することは委譲の目的と矛盾しない。
+standard-procedures.md 以外のファイルが gh 直接記述を保持する場合は委譲漏れとして検出する。
 
 ### 検出時の推奨 route
 
