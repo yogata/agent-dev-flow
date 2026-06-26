@@ -7,7 +7,9 @@ agent: sisyphus
 
 `.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる採用済み成果物に整形する。
 
-**このコマンドは review、分類、整形を行う。** GitHub Issue の作成は行わない。`intake-review` は廃止済みであり、本コマンドが review 機能を吸収している。
+**このコマンドは review、分類、整形を行う。
+** GitHub Issue の作成は行わない。
+`intake-review` は廃止済みであり、本コマンドが review 機能を吸収している。
 
 ## 入力
 
@@ -66,7 +68,8 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 詳細は `agentdev-intake-pipeline` を参照。
 委譲接続点: 親エージェントのみが承認確認と次フェーズ進行判断を行う
 
-**分類承認後の自動実行（REQ-0147-008）**: Step 5 で分類が確定（採用/保留/却下のいずれか）した場合、Step 6〜10（採用 item 整形 / promoted 保存 / archive 移動 / git pull / commit-push）は追加確認なしで自動実行する。分類未確定、修正中の場合は進まない。
+**分類承認後の自動実行（REQ-0147-008）**: Step 5 で分類が確定（採用/保留/却下のいずれか）した場合、Step 6〜10（採用 item 整形 / promoted 保存 / archive 移動 / git pull / commit-push）は追加確認なしで自動実行する。
+分類未確定、修正中の場合は進まない。
 
 ### Step 6: 採用 item の整形
 

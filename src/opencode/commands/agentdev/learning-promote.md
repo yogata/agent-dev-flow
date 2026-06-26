@@ -7,7 +7,9 @@ agent: sisyphus
 
 `.agentdev/learning/inbox.md` の学びエントリを読み込み、正規化、問題クラス分類、8軸評価、廃棄判定、既存対策確認、HITL承認を経て採用済み成果物を生成する。
 
-**重要**: `.opencode/` への直接配置、直接反映は行わない。反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。旧 `learning-refine` の全機能を吸収済み（事前実行不要）。
+**重要**: `.opencode/` への直接配置、直接反映は行わない。
+反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
+旧 `learning-refine` の全機能を吸収済み（事前実行不要）。
 
 ## 入力
 
@@ -51,9 +53,14 @@ agent: sisyphus
 
 `agentdev-learning-pipeline` を参照
 
-**昇華可能性評価、無条件自動REQ化禁止（REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に昇華可否を判定する。**無条件の自動REQ化は禁止する**。学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save`）を経て初めて REQ 化される。学びを直接 REQ 化しない。
+**昇華可能性評価、無条件自動REQ化禁止（REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。
+8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に昇華可否を判定する。
+**無条件の自動REQ化は禁止する**。
+学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save`）を経て初めて REQ 化される。
+学びを直接 REQ 化しない。
 
-**living pool 維持（REQ-0155-005）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `archive/active.md` の living pool で維持し、REQ 化しない。living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
+**living pool 維持（REQ-0155-005）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `archive/active.md` の living pool で維持し、REQ 化しない。
+living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
 
 ### Step 8: 既存対策確認
 
@@ -85,14 +92,14 @@ agent: sisyphus
 - **Step 13-1**: inbox.md 全エントリを archive/active.md に追記（`**移動日**: YYYY-MM-DD` フィールド追加）
 - **Step 13-2**: archive/active.md 書込検証（追記エントリ数をカウント照合）
 - **Step 13-3**: Step 13-2 成功時のみ inbox.md をヘッダーのみにクリア:
-      ```markdown
-      # 学び・教訓
+ ```markdown
+ # 学び、教訓
 
-      このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
-      まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類・整理して永続的なドキュメントに移動する。
+ このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
+ まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
 
-      ---
-      ```
+ ---
+ ```
 - Step 13-2 失敗 → inbox.md 変更せず、エラー内容を報告
 
 ### Step 14: 昇華時 prune（archive/active.md からの除去）
@@ -108,12 +115,12 @@ agent: sisyphus
 - `git diff --name-only` で `.agentdev/` 配下の変更を確認
 - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
 - **変更あり時**:
-  1. `git add` は `.agentdev/learning/` 配下のみを対象とする。
-  並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする。
-  `.agentdev/` 全体の一括スコープは禁止し、スイープ操作（`git add -A`/ `git add .` 等）も禁止
-  2. commit message: `chore(agentdev): promote learning findings`
-  3. `git push` 実行
-  4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
+ 1. `git add` は `.agentdev/learning/` 配下のみを対象とする。
+ 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする。
+ `.agentdev/` 全体の一括スコープは禁止し、スイープ操作（`git add -A`/ `git add .` 等）も禁止
+ 2. commit message: `chore(agentdev): promote learning findings`
+ 3. `git push` 実行
+ 4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
 
 ### Step 16: 完了報告
 
@@ -162,6 +169,7 @@ staged/rejected/duplicate の追加確認は不要。
 
 各成果物の役割、性格、ライフサイクル詳細は `agentdev-learning-pipeline` を参照。
 
-**learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → 採用済み成果物生成 → archive move → prune。採用済み成果物は `/agentdev/backlog-review` 経由で RU 化後に `/agentdev/req-define` に合流する。
+**learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → 採用済み成果物生成 → archive move → prune。
+採用済み成果物は `/agentdev/backlog-review` 経由で RU 化後に `/agentdev/req-define` に合流する。
 
 
