@@ -4,8 +4,7 @@ updated: 2026-06-26
 
 # 整合性ルールカタログ
 
-整合性検査の全ルールを定義するカタログ（REQ-0108-150, 151）。
-各ルールは 15 以上のフィールドを持つ。
+整合性検査の全ルールのスキーマ定義とルールインデックスを維持するカタログ（REQ-0108-150, 151, REQ-0156-008）。各ルールの15フィールド詳細は [rules/](rules/) サブディレクトリの個別ファイル `IR-NNN-{slug}.md` に配置する（REQ-0155-007 局所物理分離）。
 
 > **リポジトリローカル文脈**: 整合性検査は `/repo/docs-check` コマンドと `repo-agentdev-integrity` skill により実行されるリポジトリローカル自己監査である（ADR-0106）。AgentDevFlow の consumer 配布対象外。語彙レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` に配置する。
 
