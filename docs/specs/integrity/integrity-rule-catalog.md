@@ -91,221 +91,25 @@ updated: 2026-06-26
 
 - [IR-030: Subagent verbatim 条件付き返却](rules/IR-030-subagent-verbatim-conditional-return.md)
 
-### IR-031: Findings / Capture候補 見出し統一
+- [IR-031: Findings / Capture候補 見出し統一](rules/IR-031-findings-capture-heading-unification.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-031 |
-| description | 現行 docs/source の Findings/Intake 系見出しが `Findings / Capture候補` に統一され、旧語は projection 側または integrity rule の検出目的に限って残存していること |
-| severity | heuristic |
-| category | obsolete-structure |
-| detection_method | `Findings`, `Capture候補`, `Intake` 周辺の見出しを検出し、current/source の見出し統一と REQ-0119-021 の検出目的例外を判定 |
-| affected_artifacts | [commands, command projection, SPEC, integrity rules] |
-| related_req | [REQ-0119-014, REQ-0119-020, REQ-0119-021] |
-| related_spec | [workflow-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 高。通常語としての findings、旧語検出パターン、projection 側の比較対象を除外する必要がある |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 見出しを `Findings / Capture候補` に統一し、保存判断は親エージェントへ保持する |
-| last_verified | 2026-06-12 |
+- [IR-032: delegation_type/on_result 必須 envelope 禁止](rules/IR-032-delegation-type-on-result-envelope-prohibition.md)
 
-### IR-032: delegation_type/on_result 必須 envelope 禁止
+- [IR-033: lightweight-delegation primary pattern 禁止](rules/IR-033-lightweight-delegation-primary-pattern-prohibition.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-032 |
-| description | `delegation_type` / `on_result` がサブエージェント委譲の必須 envelope として扱われず、必要な場合のみ参考ラベルまたは親側の扱いとして記述されていること |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | `delegation_type` / `on_result` 周辺文脈を検出し、必須 envelope 表現ではなく任意、参考分類の表現であることを確認 |
-| affected_artifacts | [commands, SPEC, skills] |
-| related_req | [REQ-0119-017, REQ-0119-018] |
-| related_spec | [workflow-contracts.md, artifact-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 中。taxonomy 定義、任意ラベル説明、旧語検出用文字列は許容 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 必須 envelope 表現を削除し、inputs / side_effect_boundary / output_contract / capture_handoff 中心の契約に更新 |
-| last_verified | 2026-06-12 |
+- [IR-034: Skill 内部 section / protocol / Step 参照検出](rules/IR-034-skill-internal-section-step-reference-detection.md)
 
-### IR-033: lightweight-delegation primary pattern 禁止
+- [IR-035: Skill See Also 検出観点](rules/IR-035-skill-see-also-detection-perspective.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-033 |
-| description | `lightweight-delegation` が primary pattern として扱われず、主要な実装分類に重ねる委譲の扱いとして記述されていること |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | `lightweight-delegation` 周辺文脈を検出し、primary pattern 宣言、frontmatter pattern、実装分類としての扱いがないことを確認 |
-| affected_artifacts | [commands, SPEC, skills] |
-| related_req | [REQ-0119-015, REQ-0119-016] |
-| related_spec | [workflow-contracts.md, artifact-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 中。`primary pattern ではない` という否定表現と検出用文字列は許容 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | primary pattern としての記述を削除し、重ねる委譲、manager-orchestrator との差分として説明する |
-| last_verified | 2026-06-12 |
+- [IR-036: ADR-work-means-detection](rules/IR-036-adr-work-means-detection.md)
 
-### IR-034: Skill 内部 section / protocol / Step 参照検出
+- [IR-037: retired-ADR-current-baseline-ref](rules/IR-037-retired-adr-current-baseline-ref.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-034 |
-| description | command から skill 内部の protocol 名、Step 名、Section 名、見出し名への参照、自然言語ラベルから存在しないファイル名を推測させる参照、skill 側に command 固有 Step 番号を一次情報として保持する記述を検出すること |
-| severity | heuristic |
-| category | canonical-conflict |
-| detection_method | command 定義本文、SKILL.md 本文から skill 内部 section 名、protocol 名、Step 名への直接参照パターンを検出 |
-| affected_artifacts | [commands, skills] |
-| related_req | [REQ-0108-244] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。検出パターン例示、検査ルール自体の記述は対象外 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | req-define |
-| triage_action | 参照先を正規の公開 API（SKILL.md description / USE FOR）に置き換える |
-| last_verified | 2026-06-14 |
+- [IR-038: ADR-index-consistency](rules/IR-038-adr-index-consistency.md)
 
-### IR-035: Skill See Also 検出観点
+- [IR-039: index-req-title-consistency](rules/IR-039-index-req-title-consistency.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-035 |
-| description | skill の `See Also` に実行判断材料（委譲先、責務境界、禁止条件、停止条件）が含まれている、`DO NOT USE FOR` と `See Also` の重複、skill が全コマンド一覧等の別 SSoT 管理対象を保持していることを検出すること |
-| severity | heuristic |
-| category | canonical-conflict |
-| detection_method | SKILL.md の `See Also` セクションから実行判断材料、DO NOT USE FOR 重複、別 SSoT 一覧を検出 |
-| affected_artifacts | [skills] |
-| related_req | [REQ-0108-245] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。補助導線として必要な参照は許容 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | req-define |
-| triage_action | 実行判断材料を SKILL.md 本文に移動、See Also を関連スキルへの導線のみに整理する |
-| last_verified | 2026-06-14 |
-
-### IR-036: ADR-work-means-detection
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-036 |
-| description | 承認済み ADR（frontmatter `status: accepted`）のタイトル、本文に作業手段（削除、廃止、移行、完全削除、統合、再構築）の混入を検出すること（REQ-0108-249）。作業手段を主題とする ADR は作成不可であるため、承認済み ADR にこれらが主題として含まれていないかを検査する。`deprecated`、`superseded` 等の非承認ステータス ADR は frontmatter `status` フラグにより機械的に除外する（REQ-0101-043/044 は承認済み ADR のみを対象とするため） |
-| severity | heuristic |
-| category | canonical-conflict |
-| detection_method | (1) frontmatter `status` field 抽出 → `status: accepted` のみ検査対象とし、`deprecated`/`superseded`/`proposed` 等は機械的除外。(2) 承認済み ADR のタイトル、Decision セクションから作業手段キーワード（削除、廃止、移行、完全削除、統合、再構築）を検出し、主題か背景記述かを判定 |
-| affected_artifacts | [accepted ADR（frontmatter `status: accepted` のみ。`deprecated`/`superseded` は status flag で除外）] |
-| related_req | [REQ-0108-249, REQ-0101-043, REQ-0101-044, REQ-0101-045] |
-| related_spec | [integrity-contracts.md, document-model.md] |
-| gate_level | full-audit |
-| false_positive_risk | 高。Context（背景）セクションでの作業手段言及は許容されるため、Decision セクションの主題判定に注意。非承認ステータス ADR（例: ADR-0113 `status: deprecated`）は frontmatter `status` フラグで確実に除外されるため、当該 ADR の作業手段言及は検出対象外となる（履歴参照として扱う） |
-| regression_test | (追加予定)。`status: deprecated` ADR が除外されること、`status: accepted` ADR の作業手段主題が検出されることを検証する |
-| baseline_status | new |
-| finding_route | req-define |
-| triage_action | 作業手段を主題とする ADR を retire/supersede または REQ/case へ移管 |
-| last_verified | 2026-06-24 |
-
-#### IR-036 適用範囲（deprecated ADR 除外判定）
-
-IR-036 は REQ-0101-043/044（承認済み ADR の記述対象制約）の機械検査として機能する。
-REQ-0101-043/044 は「承認済み ADR」を対象とするため、IR-036 の検査対象も frontmatter `status: accepted` の ADR に限定する。
-
-**除外判定（機械的）**:
-
-| frontmatter `status` 値 | IR-036 適用 | 根拠 |
-|--------------------------|-------------|------|
-| `accepted` | 適用（検査対象） | REQ-0101-043/044 の対象 |
-| `deprecated` | 除外 | 当該 ADR の決定内容は現行基盤に反映されていない（履歴参照）。作業手段言及が残っていても現行判断ではないため検出不要 |
-| `superseded` | 除外 | 後継 ADR に置き換え済み。旧 ADR の Decision は歴史記録 |
-| `proposed` | 除外 | 未承認のため現行判断ではない |
-
-**代表例**: ADR-0113（`status: deprecated`、diagnostics → inspect 改名により現行根拠として非適用）。Decision セクションに「完全削除」等の作業手段言及が残存するが、当該 ADR は非承認ステータスのため IR-036 の検査対象外となる。ADR-0113 ファイル自体の編集（`retired/` 移動、Decision セクション再分類）は ADR 整理フロー（別 RU）で扱い、本ルールの機械的除外判定とは独立させる。
-
-### IR-037: retired-ADR-current-baseline-ref
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-037 |
-| description | 廃止 ADR（`docs/adr/retired/`）が現行基準（current baseline）として参照、案内されていないこと（REQ-0108-250）。Current Baseline View、後継ADRの Related Decisions、REQ/SPEC の現行根拠で 廃止 ADR が現行扱いされていないかを検査する |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | 廃止 ADR 番号が現行基準文脈（Current Baseline View、現行根拠引用、後継指定なしの参照）に出現していないかを検出 |
-| affected_artifacts | [ADR, ADR index, REQ, SPEC] |
-| related_req | [REQ-0108-250, REQ-0112-048] |
-| related_spec | [integrity-contracts.md, document-model.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。履歴参照 `(retired)` 注記付きの言及は除外 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 廃止 ADR への現行参照を後継 ADR へ更新、または `(retired)` 注記を付与 |
-| last_verified | 2026-06-16 |
-
-### IR-038: ADR-index-consistency
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-038 |
-| description | 承認済み ADR（`docs/adr/ADR-*.md`）と 廃止 ADR（`docs/adr/retired/ADR-*.md`）の index（`docs/adr/README.md`）整合性を検査すること（REQ-0108-251）。Current Baseline View に承認済み ADR が過不足なく記載され、Retired View に 廃止 ADR が過不足なく記載されていること |
-| severity | strict |
-| category | document-drift |
-| detection_method | `docs/adr/README.md` の Current Baseline View / Retired View と実 ADR ファイル一覧の双方向差分を検出 |
-| affected_artifacts | [ADR, ADR index] |
-| related_req | [REQ-0108-251, REQ-0112-047, REQ-0112-048] |
-| related_spec | [integrity-contracts.md, document-model.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 低。ファイル一覧と index の差分は確実 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | README.md の該当 View に ADR を追加/削除 |
-| last_verified | 2026-06-16 |
-
-### IR-039: index-req-title-consistency
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-039 |
-| description | 索引文書（DOC-MAP、requirements/README、mapping-table）の REQ タイトルが各 REQ ファイル frontmatter title と一致すること |
-| severity | strict |
-| category | document-drift |
-| detection_method | 各索引から REQ タイトル抽出 → 対応 REQ ファイル frontmatter title と文字列照合 |
-| affected_artifacts | [DOC-MAP, REQ index, mapping-table, 現行 REQ] |
-| related_req | [REQ-0108-003, REQ-0101-063, REQ-0101] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低。title 文字列の直接比較 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 索引の REQ タイトルを frontmatter title に一致させる |
-| last_verified | 2026-06-17 |
-
-### IR-040: retired-req-authority-comment
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-040 |
-| description | 現行 docs の HTMLコメント（出典標識: provenance marker 含む）が 廃止 REQ ID を単独参照しないこと。検出範囲は HTMLコメントのみに限定し、本文の意味解析は対象外（REQ-0101-063） |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | `<!-- ... REQ-0NNN ... -->` 形式の HTMLコメントから 廃止 REQ ID を抽出し、後継 現行 REQ への併記がないか検出 |
-| affected_artifacts | [REQ, SPEC, guides, ADR] |
-| related_req | [REQ-0101-063, REQ-0108-070] |
-| related_spec | [integrity-contracts.md, document-model.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 低。HTMLコメント構文に限定した機械的検出 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 廃止 REQ の HTMLコメント参照を後継 現行 REQ へ置換 |
-| last_verified | 2026-06-17 |
+- [IR-040: retired-req-authority-comment](rules/IR-040-retired-req-authority-comment.md)
 
 ### IR-041: retired-req-broken-link
 
