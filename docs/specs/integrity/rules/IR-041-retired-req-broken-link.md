@@ -12,7 +12,7 @@
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。廃止 REQ ID 集合とリンク先パスの照合 |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | 廃止 REQ へのリンク先を `retired/` パスに修正 |

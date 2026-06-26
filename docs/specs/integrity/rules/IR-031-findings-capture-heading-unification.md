@@ -12,7 +12,7 @@
 | related_spec | [workflow-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 高。通常語としての findings、旧語検出パターン、projection 側の比較対象を除外する必要がある |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | 見出しを `Findings / Capture候補` に統一し、保存判断は親エージェントへ保持する |

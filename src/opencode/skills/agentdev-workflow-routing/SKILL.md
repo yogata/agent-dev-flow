@@ -7,11 +7,6 @@ description: Provides review rejection handling flows and next-command inference
 
 agentdev系コマンドのレビューNG時の対応フロー、次コマンド推論ルールを提供する。
 
-- **知識ベース**: レビューNG時の対応フロー、次コマンド推論ルール
-- **参照先**: agentdevコマンドから参照される
-- **特性**: 宣言的定義のみを提供。手順、手続きは含まない
-- **自明な質問の禁止**: エージェントが自律的に判断できることをユーザーに確認しない
-
 ## USE FOR
 
 - レビューNG結果の処理

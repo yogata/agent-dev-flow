@@ -12,7 +12,7 @@
 | related_spec | [integrity-contracts.md, document-type-responsibilities.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。`/` 先頭形式は確実な command 名指示。`agentdev-*` プレフィックスを持たない識別子は語彙レジストリとの照合で判定。コードブロック例示、IR パターン説明は除外が必要 |
-| regression_test | (追加予定)。既知 true positive として OU-001 修正前の `load_skills=["ulw-loop"]` を回帰テストで検証 |
+| regression_test | (未実装)。既知 true positive として OU-001 修正前の `load_skills=["ulw-loop"]` を回帰テストで検証 |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | `load_skills=["..."]` の command 名を skill 名（`agentdev-*`）に修正、または委譲 prompt 内で command を指定する形式（`prompt="/ulw-loop Implement Issue #N: ..."`）に変更 |

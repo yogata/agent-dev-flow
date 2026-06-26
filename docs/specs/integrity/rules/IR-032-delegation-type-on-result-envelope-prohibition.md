@@ -12,7 +12,7 @@
 | related_spec | [workflow-contracts.md, artifact-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。taxonomy 定義、任意ラベル説明、旧語検出用文字列は許容 |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | 必須 envelope 表現を削除し、inputs / side_effect_boundary / output_contract / capture_handoff 中心の契約に更新 |

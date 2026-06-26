@@ -5,16 +5,13 @@ description: case-run の状態機械、サブエージェント protocol、self
 
 # case-run オーケストレーションナレッジベース
 
-case-run コマンドのオーケストレーション知識ベース。
-状態機械、サブエージェントプロトコル、自律修正ループ、CI 対応ループ、エラー回復の判定基準と詳細構造を提供する。
-case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を Sisyphus-Junior、ulw-loop（adapter skill + 委譲 prompt 内 `/ulw-loop` command）に並列委譲、最大5件）を処理し、Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
+case-run コマンドの状態機械、サブエージェントプロトコル、自律修正ループ、CI 対応ループ、エラー回復の判定基盤を提供する。
 
 
 ## 状態機械
 
 
-case-run は単一 Issue または単一 Wave（`#epic` 指定時）を処理する。
-Epic 全体（複数 Wave）の一括実行、Wave スケジューリング（次 Wave 判定）は提供しない。
+case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を Sisyphus-Junior、ulw-loop（adapter skill + 委譲 prompt 内 `/ulw-loop` command）に並列委譲、最大5件）を処理し、Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
 Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: ADR-0125、`docs/specs/workflows/epic-wave-model.md`、ADR-0128）。
 
 ### フェーズ構成

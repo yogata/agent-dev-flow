@@ -12,7 +12,7 @@
 | related_spec | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |
 | false_positive_risk | なし。番号帯マッチングは確実 |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | known |
 | finding_route | intake |
 | triage_action | 旧番号帯 ADR を `docs/adr/retired/` に移動 |

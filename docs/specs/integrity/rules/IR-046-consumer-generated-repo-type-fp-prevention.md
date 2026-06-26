@@ -12,7 +12,7 @@
 | related_spec | [runtime-package-boundary.md, local-generation.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。ジャンクション検出と `generated_by` 識別子検出の組合せで確実に判定可能 |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | IR-016 を consumer-generated リポジトリでは適用除外とする。識別子不在の場合は IR-016 を通常適用する |

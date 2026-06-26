@@ -12,7 +12,7 @@
 | related_spec | [local-generation.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | なし。パスの直接比較による機械的検出 |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | 許容リスト外のディレクトリ、ファイルを削除し、`src/opencode-local/` を link mode の原本構成（`README.md`, `agentdev-gh-cli/`）へ復元。導入先リポジトリは unlink / relink により link を張り直す（ADR-0131 decision #1） |

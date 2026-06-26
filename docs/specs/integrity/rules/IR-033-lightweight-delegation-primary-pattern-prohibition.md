@@ -12,7 +12,7 @@
 | related_spec | [workflow-contracts.md, artifact-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。`primary pattern ではない` という否定表現と検出用文字列は許容 |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | primary pattern としての記述を削除し、重ねる委譲、manager-orchestrator との差分として説明する |

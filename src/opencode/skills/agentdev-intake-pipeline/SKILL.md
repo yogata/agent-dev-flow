@@ -6,7 +6,6 @@ description: intake-from-github（GitHub残課題抽出）と intake-promote（r
 # Intake パイプライン知識ベース
 
 intake-from-github と intake-promote コマンドの知識ベース。
-GitHub からの残課題抽出ロジックと inbox item の review、分類、整形、振り分け基準を提供する。
 
 ## USE FOR
 
