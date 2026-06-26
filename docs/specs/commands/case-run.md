@@ -110,7 +110,7 @@ ADR-0128 Decision #3 に基づく。
 - [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（controlled_case_execution 委譲）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（intake / learning capture（PR 本文記録のみ））
 - [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic Wave 実行モデル、子Issue 状態 enum）
-- [quality-gates.md](../quality-gates.md)（QG-3（Sisyphus-Junior 責務））
+- [quality-gates.md](../quality/quality-gates.md)（QG-3（Sisyphus-Junior 責務））
 
 ## 対象外
 

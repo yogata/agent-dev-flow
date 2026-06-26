@@ -81,8 +81,8 @@ SPEC は 3 層構造を持つ（commands / skills / workflows）。詳細は [SP
 - [システム仕様](specs/foundations/system.md)
 - [文書フォーマット規約](specs/foundations/patterns.md)
 - [設計原則](specs/foundations/design-principles.md)
-- [品質仕様](specs/quality-specs.md)
-- [品質ゲート](specs/quality-gates.md)
+- [品質仕様](specs/quality/quality-specs.md)
+- [品質ゲート](specs/quality/quality-gates.md)
 - [文書モデル](specs/foundations/document-model.md)
 - [文書種別責務・配置基準](specs/responsibilities/document-type-responsibilities.md)
 - [アーティファクト契約](specs/responsibilities/artifact-contracts.md)
@@ -96,7 +96,7 @@ SPEC は 3 層構造を持つ（commands / skills / workflows）。詳細は [SP
 - [ローカル版 OpenCode 変換プロンプト](specs/local-transform.md)
 - [ルール所有権マトリックス](specs/rule-ownership.md)
 - [REQ 影響マップ](specs/responsibilities/req-impact-map.md)
-- [REQ 健全性メトリクス](specs/req-health-metrics.md)
+- [REQ 健全性メトリクス](specs/quality/req-health-metrics.md)
 
 ## ADR
 
