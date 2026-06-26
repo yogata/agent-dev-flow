@@ -101,7 +101,7 @@ Local backend（ローカル版 OpenCode）では、構造的実行以降の SSo
 | 構造的実行 | Case ファイル本文 |
 | レビュー完了 | Case ファイル `## マージ結果` |
 
-詳細は `docs/specs/local-case-file.md` を参照。
+詳細は `docs/specs/local/local-case-file.md` を参照。
 
 ## コマンド I/O 契約（共通）
 
