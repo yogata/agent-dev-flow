@@ -389,3 +389,37 @@ SPEC の記述範囲を責務境界として定義する。
 - **配置先 (projection)**: `.opencode/` 配下の実行時投影先
 - **投影方向**: 原本 → 配置先（逆方向禁止）
 - **編集原則**: 配置先を直接編集せず、原本を変更後に同期スクリプトで配置先を更新する
+
+## SPEC 内部論理区分（5区分）
+
+SPEC は文書種別として維持し、内部を以下の5論理区分で整理する。従来の3層ディレクトリ構造（commands/skills/workflows/直下）を維持しつつ、各 SPEC ファイルの内容がいずれの論理区分に属するかを明確にする。
+
+| 論理区分 | 記述対象 | 代表例 |
+|---|---|---|
+| 挙動SPEC | コマンド、スキル、ワークフローの振る舞い、入出力、副作用、停止条件 | commands/req-define.md、skills/agentdev-req-analysis.md |
+| カタログSPEC | スキーマ、enum、判定表、ルールカタログ、テンプレート種別 | integrity-rule-catalog.md、req-impact-map.md |
+| 横断contract SPEC | 複数コマンド、スキルにまたがる共通契約 | workflows/workflow-contracts.md、workflows/delegation-contracts.md |
+| 索引SPEC | 文書探索、参照経路の入口 | DOC-MAP.md、specs/README.md |
+| 詳細SPEC | 内部アルゴリズム、パラメータ、実装詳細 | req-health-metrics.md、quality-gates.md |
+
+1つの SPEC ファイルが複数の論理区分にまたがる場合、主たる区分をファイルの冒頭に明示する。論理区分は物理的なディレクトリ分離を意味せず、既存3層構造内での内容整理のための区分である。従来の workflows/ 層が横断contract SPEC に対応する。
+
+## 文書7分類モデル
+
+文書全体を以下の7分類で整理する。REQ と SPEC の文書種別境界（REQ-0101-067）に加え、文書の関心と役割に基づく分類を提供する。
+
+| 分類 | 記述対象 |
+|---|---|
+| REQ | 満たすべき振る舞い、制約、状態 |
+| 挙動SPEC | コマンド、スキルの振る舞い、入出力、契約 |
+| カタログSPEC | スキーマ、enum、判定表、ルールカタログ |
+| guide | 人間向けナビゲーション（規範的権限なし） |
+| learning維持 | learning 知見の恒久契約への昇華候補 |
+| 作業記録 | Case/RU/Issue/PR/OU 由来の一時作業記録 |
+| 対象外 | 当該要件化の対象外 |
+
+7分類は文書の振る舞いを規定するものではなく、文書整理と粒度判定の参照分類である。分類確定は backlog-review（暫定分類）→ req-define（最終分類確定）の流れで行う。
+
+## 局所物理分離の許容
+
+*-rules.md 併設、integrity-rules/ サブディレクトリによる局所物理分離を許容する。docs/specs/behavior|catalog/ への全面再配置は禁止し、既存3層構造（commands/skills/workflows/直下）を維持する。具体配置は各レポジトリの document-model.md に従う。局所物理分離は文書の物理的分離を許容するが、全面再配置を強制しない。
