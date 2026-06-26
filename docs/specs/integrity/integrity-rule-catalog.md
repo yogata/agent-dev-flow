@@ -71,205 +71,25 @@ updated: 2026-06-26
 
 - [IR-020: 基準既知（baseline-known）と新規 finding の区別](rules/IR-020-baseline-known-vs-new-finding.md)
 
-### IR-021: 廃止済み skill 参照検出
+- [IR-021: 廃止済み skill 参照検出](rules/IR-021-retired-skill-reference-detection.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-021 |
-| description | agentdev-workflow-reporting 等の廃止済み skill への参照が残存していないこと |
-| severity | strict |
-| category | obsolete-structure |
-| detection_method | 正規表現で廃止 skill 名検出 |
-| affected_artifacts | [commands, skills, SPEC] |
-| related_req | [REQ-0108-126-128] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低 |
-| regression_test | commands_e2e.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 廃止 skill 参照を削除 |
-| last_verified | 2026-06-06 |
+- [IR-022: REQ 内部整合性](rules/IR-022-req-internal-consistency.md)
 
-### IR-022: REQ 内部整合性
+- [IR-023: Integrity artifact validator drift](rules/IR-023-integrity-artifact-validator-drift.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-022 |
-| description | 同一 REQ 内で同一実体が一方で要求され他方で禁止されていないこと |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | REQ 内の強制条件、禁止事項の抽出 → 矛盾検出 |
-| affected_artifacts | [現行 REQ] |
-| related_req | [REQ-0108-139, 149] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。意味判断が必要な場合あり |
-| regression_test | (手動確認) |
-| baseline_status | resolved |
-| finding_route | req-define |
-| triage_action | REQ の矛盾を解消 |
-| last_verified | 2026-06-06 |
+- [IR-024: Command README ↔ 実体](rules/IR-024-command-readme-actual.md)
 
-### IR-023: Integrity artifact validator drift
+- [IR-025: 廃止 ADR path 規則](rules/IR-025-retired-adr-path-rule.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-023 |
-| description | Integrity scripts/tests/fixtures/SKILL.md/SPEC 間で drift がないこと |
-| severity | heuristic |
-| category | integrity-rule-gap |
-| detection_method | script の検査カテゴリと SKILL.md/SPEC の定義照合 |
-| affected_artifacts | [integrity scripts, SKILL.md, SPEC] |
-| related_req | [REQ-0108-147] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit, impact-guard |
-| false_positive_risk | 中 |
-| regression_test | prevention_gates.test.ts |
-| baseline_status | resolved |
-| finding_route | intake+learning |
-| triage_action | drift を解消 |
-| last_verified | 2026-06-06 |
+- [IR-026: ADR 誤分類兆候検出](rules/IR-026-adr-misclassification-sign.md)
 
-### IR-024: Command README ↔ 実体
+- [IR-027: 廃止 ADR 現行根拠引用検出](rules/IR-027-retired-adr-current-authority-citation.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-024 |
-| description | .opencode/commands/agentdev/README.md の一覧と実際のコマンドファイルが一致すること |
-| severity | strict |
-| category | document-drift |
-| detection_method | README からコマンド名抽出 → glob と照合 |
-| affected_artifacts | [command README, commands] |
-| related_req | [REQ-0101-026, REQ-0108-003] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低 |
-| regression_test | commands_structure.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | README にコマンド追加/削除 |
-| last_verified | 2026-06-06 |
+- [IR-028: Command 最上位 Step 整数化](rules/IR-028-command-top-step-int-only.md)
 
-### IR-025: 廃止 ADR path 規則
+- [IR-029: Command 英字サブステップ禁止](rules/IR-029-command-alphabet-substep-prohibition.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-025 |
-| description | 旧番号帯 ADR（ADR-0001〜0099）が `docs/adr/retired/` に配置されていること。`docs/adr/` 直下に旧番号帯 ADR が残存していないこと（REQ-0112-047, 048） |
-| severity | strict |
-| category | obsolete-structure |
-| detection_method | `docs/adr/ADR-0*.md`（ADR-0000〜ADR-0099）の存在確認 |
-| affected_artifacts | [ADR] |
-| related_req | [REQ-0112-047, REQ-0112-048] |
-| related_spec | [integrity-contracts.md, document-model.md] |
-| gate_level | full-audit |
-| false_positive_risk | なし。番号帯マッチングは確実 |
-| regression_test | (追加予定) |
-| baseline_status | known |
-| finding_route | intake |
-| triage_action | 旧番号帯 ADR を `docs/adr/retired/` に移動 |
-| last_verified | 2026-06-08 |
-
-### IR-026: ADR 誤分類兆候検出
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-026 |
-| description | 現行 ADR に技術判断不在、REQ/SPEC 相当内容の混入、ADR-0103 適合外、文書種別不一致の兆候がないこと（REQ-0112-043） |
-| severity | heuristic |
-| category | canonical-conflict |
-| detection_method | ADR 本文の内容分析（技術判断の有無、REQ/SPEC 相当キーワード検出） |
-| affected_artifacts | [current ADR] |
-| related_req | [REQ-0112-043, REQ-0112-031, REQ-0112-032, REQ-0112-033] |
-| related_spec | [integrity-contracts.md, document-model.md] |
-| gate_level | full-audit |
-| false_positive_risk | 高。意味判断が必要なため observation として報告 |
-| regression_test | (手動確認) |
-| baseline_status | known |
-| finding_route | req-define |
-| triage_action | ADR 誤分類兆候を確認し、必要に応じて REQ/SPEC 移管を検討 |
-| last_verified | 2026-06-08 |
-
-### IR-027: 廃止 ADR 現行根拠引用検出
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-027 |
-| description | 現行 docs 内で 廃止 ADR（`docs/adr/retired/`）が現行根拠として引用されていないこと。履歴参照には廃止パス（`retired/`）と [retired] 注記を必須とする（REQ-0112-048） |
-| severity | heuristic |
-| category | canonical-conflict |
-| detection_method | 現行 docs 内の 廃止 ADR 参照検出、コンテキスト判定 |
-| affected_artifacts | [REQ, SPEC, guides] |
-| related_req | [REQ-0112-048, REQ-0112-050] |
-| related_spec | [integrity-contracts.md, document-model.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。履歴参照の文脈判定に注意 |
-| regression_test | (手動確認) |
-| baseline_status | known |
-| finding_route | intake |
-| triage_action | 参照に [retired] 注記を追加、または現行 ADR へ更新 |
-| last_verified | 2026-06-08 |
-
-### IR-028: Command 最上位 Step 整数化
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-028 |
-| description | Command の最上位 Step 見出し、参照が整数のみであり、`Step N.M` 形式の小数 Step が残存していないこと |
-| severity | strict |
-| category | obsolete-structure |
-| detection_method | `src/opencode/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側または integrity rule 内の旧語検出用文字列は REQ-0119-021 により除外 |
-| affected_artifacts | [commands, command projection, integrity rules] |
-| related_req | [REQ-0119-005, REQ-0119-007, REQ-0119-021] |
-| related_spec | [artifact-contracts.md, workflow-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 中。旧語検出用の正規表現文字列と projection 側の残存確認文は除外が必要 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 小数 Step を整数 Step または N-M 形式のサブステップへ置換 |
-| last_verified | 2026-06-12 |
-
-### IR-029: Command 英字サブステップ禁止
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-029 |
-| description | Command の Step 見出し、参照に `10a` / `11c` などの英字サブステップが残存せず、必要なサブステップは `N-M` 形式で表記されていること |
-| severity | strict |
-| category | obsolete-structure |
-| detection_method | `src/opencode/commands/agentdev/*.md` を対象に Step 文脈の `[0-9][a-z]` を検出し、N-M 形式への統一を確認 |
-| affected_artifacts | [commands, command projection, integrity rules] |
-| related_req | [REQ-0119-006, REQ-0119-021] |
-| related_spec | [artifact-contracts.md, workflow-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 中。一般語、旧語検出用文字列、projection 側の確認文は除外が必要 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 英字サブステップを N-M 形式へ置換 |
-| last_verified | 2026-06-12 |
-
-### IR-030: Subagent verbatim 条件付き返却
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-030 |
-| description | Subagent 返却契約で、成果物本文のみ verbatim とし、判定結果、調査過程、中間ログ、読解メモへ一律 verbatim を要求していないこと |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | Command/SPEC/skill references 内の `verbatim` 周辺文脈を確認し、成果物本文条件付き表現か、一律 verbatim 禁止の検出用文字列かを判定 |
-| affected_artifacts | [commands, skills, SPEC, integrity rules] |
-| related_req | [REQ-0119-013, REQ-0119-021] |
-| related_spec | [workflow-contracts.md, artifact-contracts.md, artifact-responsibilities.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 高。検出用文字列、REQ本文、旧語説明、成果物本文の正当な verbatim 指示を文脈判定する必要がある |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake+learning |
-| triage_action | 一律 verbatim 指示を、成果物本文のみ verbatim、その他は要約/根拠/capture候補へ圧縮する表現に更新 |
-| last_verified | 2026-06-12 |
+- [IR-030: Subagent verbatim 条件付き返却](rules/IR-030-subagent-verbatim-conditional-return.md)
 
 ### IR-031: Findings / Capture候補 見出し統一
 
