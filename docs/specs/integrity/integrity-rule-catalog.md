@@ -111,259 +111,27 @@ updated: 2026-06-26
 
 - [IR-040: retired-req-authority-comment](rules/IR-040-retired-req-authority-comment.md)
 
-### IR-041: retired-req-broken-link
+- [IR-041: retired-req-broken-link](rules/IR-041-retired-req-broken-link.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-041 |
-| description | 廃止 REQ ファイルへのリンクが `retired/` パス接頭辞を使用すること |
-| severity | strict |
-| category | broken-reference |
-| detection_method | Markdown リンク `[REQ-0NNN](../requirements/REQ-0NNN.md)` から 廃止 REQ への直接パス（retired/ なし）を検出 |
-| affected_artifacts | [REQ, SPEC, guides, ADR] |
-| related_req | [REQ-0108-070, REQ-0101-063] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低。廃止 REQ ID 集合とリンク先パスの照合 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 廃止 REQ へのリンク先を `retired/` パスに修正 |
-| last_verified | 2026-06-17 |
+- [IR-042: hardcoded-req-count](rules/IR-042-hardcoded-req-count.md)
 
-### IR-042: hardcoded-req-count
+- [IR-043: retired-readme-coverage](rules/IR-043-retired-readme-coverage.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-042 |
-| description | docs 内の REQ 件数、範囲の固定表記が実際の 現行 REQ ファイル数と一致すること |
-| severity | heuristic |
-| category | document-drift |
-| detection_method | N件、範囲表記（REQ-0101〜0NNN 等）抽出 → glob による実際の 現行 REQ ファイル数と照合 |
-| affected_artifacts | [SPEC, guides, AGENTS.md] |
-| related_req | [REQ-0108-140, REQ-0101] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。表記揺れ、retired 除外の判定に注意 |
-| regression_test | (手動確認) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 固定表記を実際の REQ ファイル数、範囲に更新 |
-| last_verified | 2026-06-17 |
-
-### IR-043: retired-readme-coverage
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-043 |
-| description | retired/README.md が全 廃止 REQ のエントリを含むこと |
-| severity | strict |
-| category | document-drift |
-| detection_method | 廃止 REQ ファイル一覧と retired/README.md のエントリを双方向差分で照合 |
-| affected_artifacts | [廃止 REQ, retired README] |
-| related_req | [REQ-0108-083, REQ-0101] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低。ファイル一覧とエントリの差分 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | retired/README.md に欠落する 廃止 REQ エントリを追加 |
-| last_verified | 2026-06-17 |
-
-### IR-044: REQ/SPEC 境界違反検出
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-044 |
-| description | 現行 REQ 要件行の主たる文意がスキーマフィールド、enum 値一覧、テストデータ詳細（fixture detail）、チェッカー個別ルール、誤検知（false positive）抑制方式、Step 番号直接参照、Phase 番号、内部アルゴリズム、具体的な作業履歴のいずれかである場合、当該 SPEC 詳細の混入を検出すること（REQ-0108-259, REQ-0108-260, REQ-0108-262, REQ-0101-067〜069, REQ-0136-031）。Step 番号直接参照は現行 REQ の記述制約（REQ-0136-031）に違反する SPEC 詳細混入の代表例であり、検出シグナル、exemption 条件の詳細は下位セクション「IR-044 Step 番号直接参照検出」に配置する。exemption は META 規則行（機械的行構造マッチ）のみとし、文脈解釈を要する免除は inspect-docs へ委譲する（REQ-0145-002, REQ-0145-012）。詳細は下位セクション「IR-044 exemption 条件」 |
-| severity | heuristic |
-| category | canonical-conflict |
-| detection_method | 現行 REQ 要件行から SPEC 詳細キーワード（スキーマ、enum、テストデータ、チェッカー個別ルール、FP 抑制、Step 番号直接参照、Phase 番号、内部アルゴリズム、作業履歴）をパターンマッチで検出。Step 番号直接参照は `Step N`、`ステップ N`、`手順 N`（N は数字、範囲表現 `N-M` 含む）の正規表現パターンで検出する（実装: `check_integrity.ts` の `IR044_SIGNAL_PATTERNS` Step number エントリ）。検出後、META 規則行 exemption（REQ-NNNN-MMM 形式 + enum/format 等の列挙パターンを行構造で機械判定、REQ-0145-012）のみを適用する。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は実施せず inspect-docs へ委譲する（REQ-0108-259, REQ-0145-002） |
-| affected_artifacts | [現行 REQ] |
-| related_req | [REQ-0108-259, REQ-0108-260, REQ-0108-262, REQ-0101-067, REQ-0101-068, REQ-0101-069, REQ-0145-002, REQ-0145-012, REQ-0136-031] |
-| related_spec | [integrity-contracts.md, document-model.md] |
-| gate_level | full-audit |
-| false_positive_risk | 高。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は docs-check では実施せず inspect-docs へ委譲したため（REQ-0108-259/262, REQ-0145-002）、純粋なパターンマッチの false positive は inspect-docs での意味的再評価で事後処理する。META 規則行 exemption は行構造の機械判定に限定し、件数・内容を規定する SPEC 詳細列挙行は免除しない（REQ-0145-012）。Step 番号直接参照パターンは数字を伴わない「Step 番号」「ステップ番号」語句を検出対象とせず、REQ-0136-031 自身（原則宣言の META 規則行）を誤検知しない。これは語句「番号」と数字リテラルの機械的区別により保証し、文脈免除には依存しない。既知の true positive が META exemption により誤って免除されないことを回帰テストで検証する |
-| regression_test | `scripts/check_integrity.test.ts` の IR-044 正規スイート（REQ-9001〜REQ-9007）が真陽性保護と exemption 境界を検証する。Step 番号直接参照の true positive として REQ-9005（`Step 3`）を含み、手順 N パターン、REQ-0136-031 META 規則行の誤検知非検出を追加固定する（REQ-0108-259, REQ-0108-055 準拠） |
-| baseline_status | new |
-| finding_route | req-define |
-| triage_action | 該当要件行の詳細を SPEC、ルールカタログ、コマンドリファレンス、スキルリファレンス、テスト文書のいずれかに移管し、REQ 側は外部契約、状態要件の要約に置き換える。Step 番号直接参照の triage は機能名・フェーズ名参照への置換とする（REQ-0136-031）。文脈免除の境界判定は inspect-docs が担う |
-| last_verified | 2026-06-26 |
-
-#### IR-044 exemption 条件
-
-IR-044 の exemption は META 規則行（機械的行構造マッチ）のみに限定する（REQ-0108-259, REQ-0145-002, REQ-0145-012）。文脈解釈を要する免除（isNegationContext / isDelegationContext / isMetaScopeRuleContext / isBehaviorPredicateContext / IR044_STABLE_CONTRACT_PATTERN）は docs-check から廃止し inspect-docs へ委譲した（REQ-0108-262）。
-
-**META 規則行 exemption（機械判定のみ）**:
-
-REQ/SPEC 責務範囲を規定する META 規則行（enum/format/schema 等 SPEC 対象種別を名指しして責務境界を宣言する行）を機械的に判定し免除する。判定は行構造のパターンマッチ（REQ-NNNN-MMM 形式 + enum/format 等の列挙パターン）に限定し、意味判断は含めない。
-
-| 対象 | 判定 | 根拠 |
-|------|------|------|
-| REQ-NNNN-MMM 形式 + SPEC 種別列挙（enum/format/schema 等）を名指しする責務範囲規定行 | 免除（META 規則行） | REQ-0145-012。当該行は SPEC 詳細の記述ではなく責務範囲の規定 |
-| SPEC 詳細そのものを列挙する行（enum 値 A/B/C の一覧、テストデータ（fixture）の具体件数と内容の羅列） | 免除しない（true positive 候補） | 件数・内容を規定する行は責務範囲規定ではない |
-
-**inspect-docs へ委譲した文脈免除（docs-check 対象外）**:
-
-| 文脈 | 委譲先 | 根拠 |
-|------|--------|------|
-| isNegationContext（否定文脈: 「〜しない」「〜以外」等） | inspect-docs | 文脈解釈を要する（REQ-0108-259, REQ-0145-002） |
-| isDelegationContext（委譲文脈: 「委譲先」「切り出し先」等） | inspect-docs | 文脈解釈を要する |
-| isMetaScopeRuleContext（メタスコープルール文脈の意味判断範囲） | inspect-docs | 意味判断を要する範囲は META 規則行の機械判定を超える |
-| isBehaviorPredicateContext（振る舞い述語文脈） | inspect-docs | 存在・状態述語の意味判断を要する |
-| IR044_STABLE_CONTRACT_PATTERN（安定契約例外 REQ-0101-069） | inspect-docs | 安定契約判定は意味判断を要する |
-
-**true positive 保護（回帰テスト）**:
-
-回帰テストで既知の true positive（SPEC 詳細が REQ に残留している実例）が META 規則行 exemption により誤って免除されないことを検証する（REQ-0108-259, REQ-0108-055 準拠）。保護対象の真陽性は件数・内容を規定する SPEC 詳細の残留であり、META 規則行（責務範囲規定）には該当しないことをテストで固定する。
-
-**是正済み経緯（保護対象から除外）**: REQ-0114-082、REQ-0144-008 は #1109 PR で SPEC 詳細が REQ から SPEC へ移行済みであり、真陽性保護対象から除外する（REQ-0144-017）。当該 REQ は SPEC 詳細を残留させないため META 規則行 exemption の誤免除検証の根拠とならない。保護対象の真陽性は、件数・内容を規定する SPEC 詳細の残留実例に限定する。この明記により RU-0011（検出ロジック改良）実施前に同箇所を根拠としたテスト設計の前提崩壊を防ぐ。REQ-0102-070、REQ-0151-007 は AG-002（OU-002 と source_ru 同じ RU-0003 だが別 AG/ACT）で Step 番号直接参照から機能名・フェーズ名参照へ是正済みであり、真陽性保護対象から除外する。当該 REQ は Step 番号直接参照を残留させないため、Step 番号検出の回帰テスト根拠とならない（AG-003、REQ-0136-031 の case-open 由来）。
-
-#### IR-044 Step 番号直接参照検出
-
-REQ-0136-031 が宣言する「現行 REQ の要件行は command 定義または SPEC の Step 番号を直接参照せず、機能名・フェーズ名で参照する」原則に基づく検出セクション（REQ-0136-031 の検出委譲先 SPEC 配置）。本セクションは Step 番号直接参照パターンの機械検出仕様を規定し、exemption 境界を明示する。
-
-**検出パターン（機械判定）**:
-
-Step 番号直接参照は次の正規表現パターンで検出する（実装: `check_integrity.ts` の `IR044_SIGNAL_PATTERNS` Step number エントリ）。
-
-| パターン | 正規表現 | 検出例 |
-|---------|---------|--------|
-| `Step N`（英語、範囲含む） | `\bStep\s*\d+(?:\s*[-–]\s*\d+)?\b` | `Step 3`、`Step 4-6`、`Step  2` |
-| `ステップ N`（カタカナ、範囲含む） | `ステップ\s*\d+(?:\s*[-–]\s*\d+)?` | `ステップ 3`、`ステップ3` |
-| `手順 N`（漢字、範囲含む） | `手順\s*\d+(?:\s*[-–]\s*\d+)?` | `手順 4`、`手順4-5` |
-
-N は数字（`\d+`）。範囲表現（`N-M`、`N–M`）を含む。検出対象は現行 REQ 要件行（`| REQ-NNNN-NNN | description |` 形式のテーブル行）のみ。
-
-**非検出語句（false positive 抑制）**:
-
-次の語句は数字リテラルを伴わない「番号」語であり、検出対象外とする。これにより原則宣言の META 規則行（REQ-0136-031 自身を含む）が語句「Step 番号」を含んでも true positive として誤検知されない。本境界は語句と数字リテラルの機械的区別により保証し、文脈免除に依存しない。
-
-| 語句 | 取扱い | 根拠 |
-|------|--------|------|
-| `Step 番号`、`ステップ番号`、`手順番号` | 非検出 | 「番号」は数字リテラルではなく一般名詞。原則宣言、責務規定の META 規則行で使用される |
-| `Step番号`（空白なし） | 非検出 | 同上 |
-
-**exemption 条件（Step 番号直接参照固有）**:
-
-Step 番号直接参照パターンは他の SPEC 詳細キーワードと同じく META 規則行 exemption のみを適用する。Step 番号直接参照に固有の文脈免除は設けない。SPEC ファイル、コマンドリファレンス、テスト戦略セクションにおける Step 番号参照は対象外（`affected_artifacts: [現行 REQ]`）であり、exemption ではなく検出スコープ外として扱う。文脈解釈を要する免除は inspect-docs へ委譲する（REQ-0145-002, REQ-0145-012）。
-
-**severity / 分類**:
-
-Step 番号直接参照は REQ レベルの記述制約違反（REQ-0136-031）であり、IR-044 全体と同じく severity: `heuristic`、category: `canonical-conflict` に分類する。REQ 要件行が SPEC 詳細（Step 番号）へ依存すると SPEC↔command の Step 構成変更が REQ 側へ波及し、REQ と SPEC の責務分離（REQ-0136 体系）を損なう。
-
-**回帰テスト**:
-
-`scripts/check_integrity.test.ts` の IR-044 正規スイートが次を検証する。
-
-- `Step 3` 形式の true positive 検出（REQ-9005）
-- `手順 N` 形式の true positive 検出（REQ-9008）
-- REQ-0136-031 META 規則行（`Step 番号` 語句のみ、数字なし）の false positive 非検出（REQ-9009）
+- [IR-044: REQ/SPEC 境界違反検出](rules/IR-044-req-spec-boundary-violation-detection.md)
 
 ### IR-045: （削除）docs 日本語表現、文意整合検査
 
 > **削除済み（REQ-0108-255/256, REQ-0108-262）**: IR-045 の検査は docs-check の機械検出対象から除外し、agentdev-doc-writing スキル配下へ移譲した。docs-check は意味判断を要する文意整合検査を保持しない（機械化原則 REQ-0108-056/254/261/262）。catalog↔実装双方向同期運用手順（REQ-0145-003）に従い baseline_status: resolved の上で本エントリを削除した。IR-045 識別子は REQ-0108-255/256、`vocabulary-registry.md`「文意品質検出対象語（IR-045）」で文意品質検出対象語の参照として残る。新規検出時の復活運用（REQ-0145-003）に従い、必要に応じて docs-check 検出対象への復活を検討する。
 
-### IR-046: consumer-generated リポジトリ種別誤検知防止
+- [IR-046: consumer-generated リポジトリ種別誤検知防止](rules/IR-046-consumer-generated-repo-type-fp-prevention.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-046 |
-| description | `.opencode/commands/agentdev/` が実ディレクトリ（非ジャンクション）かつ `generated_by: local-opencode-transform` 識別子を含む場合、当該リポジトリを consumer-generated として扱い、IR-016（Source/projection 整合性）の source/projection divergence 対象から除外すること（REQ-0141-007, 011）。ローカル版生成物はジャンクションではなく実ファイル配置であるため、IR-016 の「ジャンクション破損」判定が誤検知となるのを防ぐ |
-| severity | heuristic |
-| category | canonical-conflict |
-| detection_method | `.opencode/commands/agentdev/` がジャンクション、シンボリックリンクでないことを確認後、配下のファイルから `generated_by: local-opencode-transform` 識別子を検出。識別子検出時は consumer-generated と判定し IR-016 を適用除外とする |
-| affected_artifacts | [.opencode/commands/agentdev/, .opencode/skills/agentdev-*/] |
-| related_req | [REQ-0141-007, REQ-0141-011, REQ-0141-014] |
-| related_spec | [runtime-package-boundary.md, local-generation.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低。ジャンクション検出と `generated_by` 識別子検出の組合せで確実に判定可能 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | IR-016 を consumer-generated リポジトリでは適用除外とする。識別子不在の場合は IR-016 を通常適用する |
-| last_verified | 2026-06-20 |
+- [IR-047: src/opencode-local/ link 先原本領域ディレクトリ構成](rules/IR-047-src-opencode-local-link-origin-dir-structure.md)
 
-### IR-047: src/opencode-local/ link 先原本領域ディレクトリ構成
+- [IR-048: generated_by 識別子整合性](rules/IR-048-generated-by-identifier-integrity.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-047 |
-| description | `src/opencode-local/` はローカル版 link 先原本領域であり、許容されたディレクトリ構成（`README.md`, `agentdev-gh-cli/`）のみを保持すること（REQ-0141-004, ADR-0131 decision #3）。`agentdev-gh-cli/` 配下に `SKILL.md`, `references/`, `case-schema/` を保持する（`case-schema/` は `agentdev-gh-cli/` 配下のディレクトリとして扱う）。禁止パス（`requirements/`, `specs/`, `_conv/`, `commands/`, `skills/`, `transform/`, `generation-flow.md`）を作成しないこと（REQ-0141-005, ADR-0131 decision #4） |
-| severity | strict |
-| category | obsolete-structure |
-| detection_method | `src/opencode-local/` 配下のディレクトリ、ファイル一覧を取得し、許容リスト（`README.md`, `agentdev-gh-cli/`）外のトップレベルパスを検出。`agentdev-gh-cli/case-schema/` は `agentdev-gh-cli/` 配下の許容ディレクトリとして扱う |
-| affected_artifacts | [src/opencode-local/] |
-| related_req | [REQ-0141-003, REQ-0141-004, REQ-0141-005, REQ-0134] |
-| related_spec | [local-generation.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | なし。パスの直接比較による機械的検出 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 許容リスト外のディレクトリ、ファイルを削除し、`src/opencode-local/` を link mode の原本構成（`README.md`, `agentdev-gh-cli/`）へ復元。導入先リポジトリは unlink / relink により link を張り直す（ADR-0131 decision #1） |
-| last_verified | 2026-06-24 |
+- [IR-049: Command file format violation](rules/IR-049-command-file-format-violation.md)
 
-### IR-048: generated_by 識別子整合性
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-048 |
-| description | ローカル版生成物に `generated_by: local-opencode-transform` 識別情報が付与されていること（REQ-0141-011）。同名ファイル上書きは識別子が一致する場合のみ許可され、識別子不在、異なる識別子のファイルを上書きしてはならないこと（REQ-0141-012, 013） |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | `.opencode/commands/agentdev/**/*.md` と `.opencode/skills/agentdev-*/**/*.md` から frontmatter またはメタ識別子中の `generated_by` を抽出し、`local-opencode-transform` と一致することを確認。同名ファイル上書き時の識別子整合性はローカル版生成プロセスが `## 変換仕様` ガードレールで検証 |
-| affected_artifacts | [.opencode/commands/agentdev/, .opencode/skills/agentdev-*/] |
-| related_req | [REQ-0141-011, REQ-0141-012, REQ-0141-013] |
-| related_spec | [local-generation.md, local-transform.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 中。生成物への識別子付与方式（frontmatter vs ヘッダコメント）の揺れ、AgentDevFlow 本体原本（識別子なし）との混同に注意 |
-| regression_test | (追加予定) |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | 識別子付与方式を `local-generation.md` の定義に統一。競合ファイルは手動マージまたは識別子付与後に再生成 |
-| last_verified | 2026-06-20 |
-
-### IR-049: Command file format violation
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-049 |
-| description | command 定義ファイル（`src/opencode/commands/agentdev/*.md`、`.opencode/commands/repo/*.md`）が `docs/specs/command-file-format.md` のフォーマット規約に適合すること（REQ-0143）。検出項目: Step 0 使用、非連番 Step 番号、ゼロ起点サブステップ（Step N-0）、numbered list 主手順、G01 形式以外のガードレール番号 |
-| severity | strict |
-| category | document-drift |
-| detection_method | `check_command_format.ts` により command 定義ファイルを走査。`## 手順` 配下の Step 見出し、参照、numbered list、ガードレール番号を正規表現で検出し、command-file-format.md の規約と照合 |
-| affected_artifacts | [commands] |
-| related_req | [REQ-0143, REQ-0108] |
-| related_spec | [command-file-format.md, integrity-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 低。正規表現による機械的検出。`## 手順` 配下判定、ガードレール行（`- G\d+:`）の形式照合により誤検知リスクを最小化 |
-| regression_test | check_command_format.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 対象 command ファイルのフォーマット違反を修正（Step 0 → Step 1、numbered list → ### Step N 見出し、ゼロ起点サブステップ → Step N-1、非 G01 ガードレール番号 → G01 形式） |
-| last_verified | 2026-06-22 |
-
-### IR-050: load_skills command 誤指定検出
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-050 |
-| description | `load_skills=["..."]` 形式で command 名（`/` 先頭識別子、`/agentdev/*` 等の公開 command 名、`/ulw-loop` 等の外部 command 名、`agentdev-` プレフィックスを持たない command 識別子）が指定されていることを検出すること（REQ-0108-261）。command 名は `load_skills` の対象ではなく委譲 prompt 内で `/ulw-loop` 等の command 指定として扱うべきものであるため、`load_skills` への指定は文書種別責務境界違反である |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | `load_skills\s*=\s*\["([^"]+)"\]` パターンから各要素を抽出し、各要素が `/` 先頭形式（command 名）であるか、`agentdev-*` プレフィックスを持たない既知 command 名（語彙レジストリ `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` 参照）であるかを照合。コードブロック内の例示、検出用文字列、IR ルール本文中のパターン説明は除外対象 |
-| affected_artifacts | [commands, skills, SPEC] |
-| related_req | [REQ-0108-261, REQ-0140-027, REQ-0125-010] |
-| related_spec | [integrity-contracts.md, document-type-responsibilities.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 低。`/` 先頭形式は確実な command 名指示。`agentdev-*` プレフィックスを持たない識別子は語彙レジストリとの照合で判定。コードブロック例示、IR パターン説明は除外が必要 |
-| regression_test | (追加予定)。既知 true positive として OU-001 修正前の `load_skills=["ulw-loop"]` を回帰テストで検証 |
-| baseline_status | new |
-| finding_route | intake |
-| triage_action | `load_skills=["..."]` の command 名を skill 名（`agentdev-*`）に修正、または委譲 prompt 内で command を指定する形式（`prompt="/ulw-loop Implement Issue #N: ..."`）に変更 |
-| last_verified | 2026-06-22 |
+- [IR-050: load_skills command 誤指定検出](rules/IR-050-load-skills-command-mis-specification.md)
 
 ### IR-051: 実行主体の skill 表記誤認検出
 
