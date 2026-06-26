@@ -31,205 +31,25 @@ updated: 2026-06-26
 
 ## ルール
 
-### IR-001: 現行 REQ frontmatter id ↔ ファイル名
+- [IR-001: 現行 REQ frontmatter id ↔ ファイル名](rules/IR-001-req-frontmatter-id-filename.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-001 |
-| description | 現行 REQ の frontmatter id とファイル名（REQ-NNNN.md）が一致すること |
-| severity | strict |
-| category | document-drift |
-| detection_method | frontmatter id 抽出 → ファイル名と照合 |
-| affected_artifacts | [現行 REQ] |
-| related_req | [REQ-0108-001, REQ-0101] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低。id/ファイル名 の不一致は確実な NG |
-| regression_test | commands_structure.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | frontmatter id またはファイル名を修正 |
-| last_verified | 2026-06-06 |
+- [IR-002: 現行 REQ 必須 frontmatter fields](rules/IR-002-req-required-frontmatter.md)
 
-### IR-002: 現行 REQ 必須 frontmatter fields
+- [IR-003: Active/廃止 REQ ID 重複](rules/IR-003-active-retired-req-id-conflict.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-002 |
-| description | 現行 REQ に id, title, created, updated が存在すること |
-| severity | strict |
-| category | document-drift |
-| detection_method | frontmatter field 存在確認 |
-| affected_artifacts | [現行 REQ] |
-| related_req | [REQ-0108-001] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低。必須 field 欠落は確実な NG |
-| regression_test | commands_structure.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 欠落 field を追加 |
-| last_verified | 2026-06-06 |
+- [IR-004: REQ index ↔ 現行 REQ 一致](rules/IR-004-req-index-actual-consistency.md)
 
-### IR-003: Active/廃止 REQ ID 重複
+- [IR-005: ADR ↔ REQ 相互参照存在](rules/IR-005-adr-req-bidirectional-reference.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-003 |
-| description | 現行 REQ と 廃止 REQ の間で ID 重複がないこと |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | ID set の intersection 確認 |
-| affected_artifacts | [現行 REQ, 廃止 REQ] |
-| related_req | [REQ-0108-082] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | なし |
-| regression_test | commands_structure.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 重複 ID を解消 |
-| last_verified | 2026-06-06 |
+- [IR-006: Command frontmatter 許可フィールド](rules/IR-006-command-allowed-frontmatter.md)
 
-### IR-004: REQ index ↔ 現行 REQ 一致
+- [IR-007: Skill frontmatter name ↔ dir](rules/IR-007-skill-name-dir-match.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-004 |
-| description | docs/requirements/README.md の 現行 REQ 一覧と実際の REQ ファイルが一致すること |
-| severity | strict |
-| category | document-drift |
-| detection_method | README から REQ ID 抽出 → glob 結果と照合 |
-| affected_artifacts | [REQ index, 現行 REQ] |
-| related_req | [REQ-0108-003] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低 |
-| regression_test | commands_structure.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | README に REQ 追加/削除 |
-| last_verified | 2026-06-06 |
+- [IR-008: Skill references/ 存在](rules/IR-008-skill-references-existence.md)
 
-### IR-005: ADR ↔ REQ 相互参照存在
+- [IR-009: 旧 namespace 残存](rules/IR-009-obsolete-namespace-residual.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-005 |
-| description | ADR の Related REQ セクションの REQ ID と、REQ の ADR index からの参照が双方向に存在すること |
-| severity | strict |
-| category | broken-reference |
-| detection_method | ADR から REQ ID 抽出 → 存在確認、逆方向も確認 |
-| affected_artifacts | [ADR, REQ, ADR index] |
-| related_req | [REQ-0108-005] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。廃止 REQ 参照は別 rule で判定 |
-| regression_test | check_integrity.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 参照を追加/修正 |
-| last_verified | 2026-06-06 |
-
-### IR-006: Command frontmatter 許可フィールド
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-006 |
-| description | Command frontmatter に description と agent のみが存在すること。pattern, workflow_route, branch_type, labels は禁止 |
-| severity | strict |
-| category | document-drift |
-| detection_method | frontmatter field 列挙 → 許可リストと照合 |
-| affected_artifacts | [commands] |
-| related_req | [REQ-0103-015, REQ-0108-046, 095-099, 108, 124, 129] |
-| related_spec | [integrity-contracts.md, artifact-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 低 |
-| regression_test | command_fixtures.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 禁止 field を frontmatter から削除 |
-| last_verified | 2026-06-06 |
-
-### IR-007: Skill frontmatter name ↔ dir
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-007 |
-| description | .opencode/skills/{dir}/SKILL.md の frontmatter name が {dir} と一致すること |
-| severity | strict |
-| category | document-drift |
-| detection_method | directory 名と frontmatter name の比較 |
-| affected_artifacts | [skills] |
-| related_req | [REQ-0108-092] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低 |
-| regression_test | lint_skills.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | frontmatter name または directory 名を修正 |
-| last_verified | 2026-06-06 |
-
-### IR-008: Skill references/ 存在
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-008 |
-| description | SKILL.md が参照する references/ ファイルが存在すること |
-| severity | strict |
-| category | broken-reference |
-| detection_method | SKILL.md 内のパス抽出 → 存在確認 |
-| affected_artifacts | [skills, skill references] |
-| related_req | [REQ-0108-110, 115-120] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 中。裸参照の解決ルールに注意 |
-| regression_test | check_reference_paths.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 参照先を作成または参照を修正 |
-| last_verified | 2026-06-06 |
-
-### IR-009: 旧 namespace 残存
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-009 |
-| description | 旧コマンド名、旧パス、二重 prefix、bare slash command form が docs/specs/guides に残存しないこと |
-| severity | strict |
-| category | obsolete-structure |
-| detection_method | 正規表現パターンマッチ |
-| affected_artifacts | [REQ, SPEC, guides, skills, commands] |
-| related_req | [REQ-0108-016] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。検出対象外パスの設定に注意 |
-| regression_test | commands_e2e.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 旧 namespace を更新 |
-| last_verified | 2026-06-06 |
-
-### IR-010: ADR status 正規化
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-010 |
-| description | ADR status が正規形式であること。旧形式 superseded-by:[ADR-XXXX] を検出 |
-| severity | strict |
-| category | obsolete-structure |
-| detection_method | frontmatter status field 検査 |
-| affected_artifacts | [ADR] |
-| related_req | [REQ-0108-121] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低 |
-| regression_test | check_integrity.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | ADR status を正規形式に更新 |
-| last_verified | 2026-06-06 |
+- [IR-010: ADR status 正規化](rules/IR-010-adr-status-normalization.md)
 
 ### IR-011: Mapping table 全件記録
 
