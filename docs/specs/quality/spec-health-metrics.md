@@ -1,6 +1,6 @@
 ---
 title: SPEC 健全性メトリクス
-status: draft
+status: accepted
 created: 2026-06-26
 updated: 2026-06-26
 ---
