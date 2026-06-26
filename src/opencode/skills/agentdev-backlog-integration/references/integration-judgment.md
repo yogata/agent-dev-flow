@@ -15,6 +15,8 @@
 
 **前工程からの引き継ぎ（upstream handoff）メタデータ付与**: 成果物が AgentDevFlow 本体の不具合、改善点を扱う場合、分析結果に `agentdev_handoff: true` を記録する。判定は `agentdev-workflow-lifecycle` の前工程からの引き継ぎ判定に従う
 
+**暫定分類付与（REQ-0155-004）**: 各 RU 候補について `docs/specs/document-model.md` の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。暫定分類は後続 `/agentdev/req-define` の Step 5-2 で最終確定される候補であり、本コマンドが確定しない。RU frontmatter の `tentative_classification` フィールドに記録する。
+
 ## 統合、分割判定 + depends_on 依存解決 + ユーザー承認
 
 分析結果に基づき、RU への統合、分割を判定し、ユーザーに提示して承認を得る:
@@ -52,7 +54,7 @@
 
 1. `.agentdev/backlog/req-units/` が存在しない場合は作成
 2. 各 RU について:
- - frontmatter 生成（source_type, generated_by: backlog-review, generated_at, status: draft, depends_on（任意）, sources）
+ - frontmatter 生成（source_type, generated_by: backlog-review, generated_at, status: draft, depends_on（任意）, tentative_classification（REQ-0155-004）, sources）
  - **前工程からの引き継ぎメタデータ転記**: 分析結果に `agentdev_handoff: true` が存在する場合、RU frontmatter に転記する。RU 本文に現在プロジェクトでは実装しない前工程からの引き継ぎ用 RU であることを記載する
  - Sources セクション: 各 source の要点（パススルー禁止）
  - Source Summary セクション: 統合サマリ
