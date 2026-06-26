@@ -5,7 +5,9 @@ AgentDevFlow 側（case-run）から oh-my-openagent のエージェント型（
 抽象IF（ハーネス非依存）は親の `SKILL.md` 参照。
 本ファイルは oh-my-openagent 固有の具象実装を扱う。
 
-case-run は に基づき oh-my-openagent CLI の subprocess 起動を廃止し、`task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` 委譲（委譲 prompt 内で `/ulw-loop` command を指定）に全面移行した。oh-my-openagent は CLI ツールとしてだけでなく OpenCode プラグインとしてエージェント型（Sisyphus-Junior 等）を提供しており、task() 経由で起動すると oh-my-openagent の実行エンジンをネイティブに利用できる。CLI subprocess で問題となっていた bash ハングアップ（case-run #971 事例）は、各ツール呼び出しごとの120秒 timeout で構造的に検知されるようになる。
+case-run は に基づき oh-my-openagent CLI の subprocess 起動を廃止し、`task(subagent_type="Sisyphus-Junior", load_skills=["agentdev-case-run-execution-adapter"])` 委譲（委譲 prompt 内で `/ulw-loop` command を指定）に全面移行した。
+oh-my-openagent は CLI ツールとしてだけでなく OpenCode プラグインとしてエージェント型（Sisyphus-Junior 等）を提供しており、task() 経由で起動すると oh-my-openagent の実行エンジンをネイティブに利用できる。
+CLI subprocess で問題となっていた bash ハングアップ（case-run #971 事例）は、各ツール呼び出しごとの120秒 timeout で構造的に検知されるようになる。
 
 ## 起動方式（task() 委譲）
 

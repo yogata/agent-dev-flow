@@ -73,17 +73,19 @@ PR の CI が全て通過しているか。
 
 ### 6. test strategy 処理完了
 
-Issue 本文のテスト戦略セクションに含まれる全 test strategy 項目（verification / pass_criteria / on_failure の3要素構造）が処理済みであることを確認する。各項目は「合格」（pass_criteria を満たす）または PR 本文の `## Findings / Capture候補` セクションへの Findings 記録（record-in-findings）のいずれかに分類されていること。
+Issue 本文のテスト戦略セクションに含まれる全 test strategy 項目（verification / pass_criteria / on_failure の3要素構造）が処理済みであることを確認する。
+各項目は「合格」（pass_criteria を満たす）または PR 本文の `## Findings / Capture候補` セクションへの Findings 記録（record-in-findings）のいずれかに分類されていること。
 
 - **fail**: 未処理の test strategy 項目が残る。構造化エラーで停止（case-close G08）。未処理項目が残る場合は完了扱いとしない（REQ-0131-026）。
 - **pass**: 全項目が合格または Findings 記録済み。
 - **N/A**: Issue 本文にテスト戦略セクションが存在しない場合（旧形式 Issue 等）。本観点は skip する。
 
-> **前提**: test strategy 項目の検証、不合格時処置（fix-and-reverify / record-in-findings）、全項目処理までの反復は case-run の実行担当サブエージェント（Sisyphus-Junior、`/ulw-loop`）が実施する（REQ-0130-030）。QG-4 はその処理結果（PR 本文の Findings 記録を含む）を最終確認する。
+> **前提**: test strategy 項目の検証、不合格時処置（fix-and-reverify / record-in-findings）、全項目処理までの反復は case-run の実行担当サブエージェント（Sisyphus-Junior、`/ulw-loop`）が実施する（REQ-0130-030）。
+> QG-4 はその処理結果（PR 本文の Findings 記録を含む）を最終確認する。
 
 ### 7. 機械横断是正向け完了判定（REQ-0153）
 
-機械的テキスト置換・複数ディレクトリ横断是正を含む PR 向けの完了判定検査項目（L-012、PR #1090 / #1122 由来）。
+機械的テキスト置換、複数ディレクトリ横断是正を含む PR 向けの完了判定検査項目（L-012、PR #1090 / #1122 由来）。
 
 - **検査項目**: 機械横断是正を含む PR は PR 本文に再 grep 結果（0 件）が記載されていることを完了条件とする
 - **fail**: 再 grep 結果（0 件）の記載がない場合、完了扱いとしない（構造化エラーで停止）
@@ -113,7 +115,8 @@ case-close Step 2 での完了条件チェックボックス評価:
 完了条件チェックボックスの評価、更新は **case-close の責務**（Step 2）である。
 QG-4 は判定基準を提供し、case-close が実際のチェックボックス更新を実行する。
 
-> **注意**: 旧設計では case-run がチェックボックス更新を担う箇所があったが、完了条件チェックボックスの最終評価、更新は case-close QG-4 に集約する。case-run Step 7 のチェックボックス更新は実装中の進捗反映（work plan チェックボックス）に限定する。
+> **注意**: 旧設計では case-run がチェックボックス更新を担う箇所があったが、完了条件チェックボックスの最終評価、更新は case-close QG-4 に集約する。
+> case-run Step 7 のチェックボックス更新は実装中の進捗反映（work plan チェックボックス）に限定する。
 
 ## 委譲接続点
 

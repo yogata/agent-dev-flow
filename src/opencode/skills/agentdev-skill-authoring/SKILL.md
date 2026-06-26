@@ -435,7 +435,8 @@ Q7: 人間向けナビゲーション・案内か？
 | ADR | 「なぜその決定をしたか」の記録 | 技術選定、方針変更 |
 | Guide | 人間向けの案内、説明 | ワークフロー概要、クイックスタート |
 
-**注意**: skill `references/` は実行時配布物のみを含める（現在は SPEC system.md で規定）。authoring-only 資料は `references/` に含めない。
+**注意**: skill `references/` は実行時配布物のみを含める（現在は SPEC system.md で規定）。
+authoring-only 資料は `references/` に含めない。
 
 配置判断の補強:
 - Command 固有の実行手順（Issue 作成、保存、削除、完了報告）は Skill 化せず Command に置く
