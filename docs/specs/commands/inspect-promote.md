@@ -37,10 +37,10 @@ updated: 2026-06-21
 - inbox スキャン
 - 検出事項分類（promote / defer / reject）
 - 自動 promote（`--auto` opt-in 時のみ）:
-  - 自動 promote 対象: SPEC分離基準違反（high-specificity）、構造的即時是正
-  - 自動 promote 対象外: 命名、分類の意味判断、ADR 要否判断（手動分類へ回す）
-  - 投入先: `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md`
-  - 実行ログ: `.agentdev/inspect/promoted/auto-promote-log.md` に投入対象記録
+ - 自動 promote 対象: SPEC分離基準違反（high-specificity）、構造的即時是正
+ - 自動 promote 対象外: 命名、分類の意味判断、ADR 要否判断（手動分類へ回す）
+ - 投入先: `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md`
+ - 実行ログ: `.agentdev/inspect/promoted/auto-promote-log.md` に投入対象記録
 - HITL 確定（手動分類対象）
 - promote 処理: `.agentdev/inspect/promoted/` へ保存
 - reject 処理: `.agentdev/inspect/archive/rejected/` へ移動

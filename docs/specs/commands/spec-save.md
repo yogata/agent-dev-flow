@@ -35,9 +35,9 @@ req-save の次、case-open の前に実行する。
 - Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/foundations/patterns.md`）→ update 操作）。`new:{topic-slug}` → 新規 SPEC 作成（`docs/specs/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-0136-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
 - Step 4: SPEC 分離基準の最終確認（各 action が REQ-0101-055（SPEC に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-0101-069）相当は除外し follow-up に明示
 - Step 5: SPEC ファイル操作。`target_area` 見出し検索は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行
-  - create: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
-  - update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
-  - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
+ - create: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
+ - update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
+ - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
 - Step 6: インデックス整合（新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加）。既存 SPEC 追記時は README 更新不要。エントリ存在確認は決定的スクリプトで実行
 - Step 7: DOC-MAP 影響確認（SPEC 操作が `docs/DOC-MAP.md` に影響するか確認し、影響がある場合は更新（`agentdev-doc-map`））
 - Step 8: ドラフト status 更新（`draft-data` に SPEC 消費済みフラグを付与）。commit/push より前に更新し commit 対象に含める
@@ -53,7 +53,7 @@ req-save の次、case-open の前に実行する。
 
 - 対象 SPEC ファイル内の見出し行を走査し、`target_area` と完全一致する見出し行を検索する
 - 当該見出し行から次の同レベル（または上位レベル）見出し行の直前までを「セクション」として特定する
-  - 例: `### X` で検索した場合、次の `###` または `##` または `#` 見出しの直前までを範囲とする
+ - 例: `### X` で検索した場合、次の `###` または `##` または `#` 見出しの直前までを範囲とする
 - 特定したセクションを action の `content` で置換する
 
 ### 複数マッチ時の挙動
@@ -66,7 +66,8 @@ req-save の次、case-open の前に実行する。
 
 ### 後方互換（target_area 未指定）
 
-`target_area` が未指定の draft（旧形式）、または `operation` が create/spec-create の場合は従来の「追記」動作を維持する（REQ-0136-028）。`target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
+`target_area` が未指定の draft（旧形式）、または `operation` が create/spec-create の場合は従来の「追記」動作を維持する（REQ-0136-028）。
+`target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
 
 ## 参照する横断 SPEC
 

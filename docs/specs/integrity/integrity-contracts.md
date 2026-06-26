@@ -27,7 +27,8 @@
 | workflow-gap | workflow 定義の欠落 | heuristic |
 | integrity-rule-gap | 検査ルール自体の欠落 | observation |
 
-> **REQ/SPEC 境界違反**（REQ-0108-260）: 現行 REQ 要件行の主たる文意が SPEC 詳細（スキーマフィールド、enum 値一覧、テストデータ詳細、チェッカー個別ルール、誤検知抑制方式、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）である場合は canonical-conflict のサブカテゴリとして扱い、IR-044 で heuristic 検出する。REQ-0101-069 の安定契約例外（公開コマンド名、公開入口、ドメイン状態位置づけ、他コマンド接続契約、利用者可視分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外とする。
+> **REQ/SPEC 境界違反**（REQ-0108-260）: 現行 REQ 要件行の主たる文意が SPEC 詳細（スキーマフィールド、enum 値一覧、テストデータ詳細、チェッカー個別ルール、誤検知抑制方式、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）である場合は canonical-conflict のサブカテゴリとして扱い、IR-044 で heuristic 検出する。
+> REQ-0101-069 の安定契約例外（公開コマンド名、公開入口、ドメイン状態位置づけ、他コマンド接続契約、利用者可視分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外とする。
 
 ## 検出事項経路マップ（Finding Route Map）
 
@@ -117,7 +118,8 @@
 | `case-update` | GitHub Issue のみ | ローカルファイル |
 | `docs-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（実行時。実行自体を承認として扱い、追加のユーザー承認は不要。REQ-0108-225, REQ-0112-059） | 検査対象アーティファクト |
 
-> **注記**: `docs-check` は `/repo/docs-check` として実行される配布対象外コマンドである（ADR-0106）。AgentDevFlow の配布対象外。
+> **注記**: `docs-check` は `/repo/docs-check` として実行される配布対象外コマンドである（ADR-0106）。
+> AgentDevFlow の配布対象外。
 
 | Command | 許可変更 | 禁止 |
 |---|---|---|

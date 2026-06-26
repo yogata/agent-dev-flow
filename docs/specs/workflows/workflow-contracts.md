@@ -7,7 +7,9 @@ updated: 2026-06-21
 
 # ワークフロー契約（横断）
 
-> **Scope**: 本 SPEC は agent-dev-flow リポジトリに適用される横断契約である。個別 command / skill の現在動作は各 command SPEC（`docs/specs/commands/`）、各 skill SPEC（`docs/specs/skills/`）を参照のこと（AG-008）。横断 SPEC は個別 SPEC の代替ではない。
+> **Scope**: 本 SPEC は agent-dev-flow リポジトリに適用される横断契約である。
+> 個別 command / skill の現在動作は各 command SPEC（`docs/specs/commands/`）、各 skill SPEC（`docs/specs/skills/`）を参照のこと（AG-008）。
+> 横断 SPEC は個別 SPEC の代替ではない。
 
 ## 目的
 
@@ -53,7 +55,8 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 
 ### マイクロフェーズ
 
-> **注意**: 以下の6マイクロフェーズは説明用ラベルであり、状態管理モデルではない（REQ-0112-023）。実際の状態管理は Issue ラベル、GitHub Project で行う。
+> **注意**: 以下の6マイクロフェーズは説明用ラベルであり、状態管理モデルではない（REQ-0112-023）。
+> 実際の状態管理は Issue ラベル、GitHub Project で行う。
 
 | フェーズ | 状態 | マクロフェーズ |
 |---|---|---|

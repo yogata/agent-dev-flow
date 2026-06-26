@@ -7,7 +7,8 @@ updated: 2026-06-21
 
 # キャプチャ境界（Capture Boundaries）
 
-> 本 SPEC は intake / learning の境界定義、Split Rule、PR 本文永続チャネル、REQ 再構成 intake など、複数コマンド、スキルにまたがるキャプチャ契約を定義する（AG-008）。個別 command の capture 責務は各 command SPEC を参照。
+> 本 SPEC は intake / learning の境界定義、Split Rule、PR 本文永続チャネル、REQ 再構成 intake など、複数コマンド、スキルにまたがるキャプチャ契約を定義する（AG-008）。
+> 個別 command の capture 責務は各 command SPEC を参照。
 
 ## 目的
 

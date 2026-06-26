@@ -7,7 +7,10 @@ updated: 2026-06-23
 
 # ローカル版 OpenCode 変換プロンプト
 
-> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。link mode への移行に伴い、ローカル版 OpenCode 変換プロンプト（`transform/generate.md`, `transform/review.md`, `transform/spec.md`）が不要となった経緯と、変換品質検証の読み替え先を定義する。実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0104）。REQ-0141 と ADR-0131 の詳細仕様を原本とする。
+> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。
+> link mode への移行に伴い、ローカル版 OpenCode 変換プロンプト（`transform/generate.md`, `transform/review.md`, `transform/spec.md`）が不要となった経緯と、変換品質検証の読み替え先を定義する。
+> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0104）。
+> REQ-0141 と ADR-0131 の詳細仕様を原本とする。
 
 ## 目的
 

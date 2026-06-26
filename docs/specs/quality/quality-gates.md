@@ -3,7 +3,8 @@
 AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-0108）。
 各ゲートの判定基準、機械化境界、実装マッピングを示す。
 
-> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリの設計文書であり、実行時配布対象ではない（ADR-0103, ADR-0104）。実行時コマンドは本 SPEC に依存せず、`agentdev-quality-gates` スキルの参照ファイルを実行時参照先とする。
+> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリの設計文書であり、実行時配布対象ではない（ADR-0103, ADR-0104）。
+> 実行時コマンドは本 SPEC に依存せず、`agentdev-quality-gates` スキルの参照ファイルを実行時参照先とする。
 
 ## 適用範囲
 
@@ -47,7 +48,8 @@ AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPE
 #### test_strategy 3要素完全性検査
 
 各 test strategy 項目が verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持することを検証する。
-いずれかが欠落する項目を検出した場合、fail とする。この検査は req-define / req-save が適用する。
+いずれかが欠落する項目を検出した場合、fail とする。
+この検査は req-define / req-save が適用する。
 
 ## QG-2: Acceptance Criteria Coverage Gate
 

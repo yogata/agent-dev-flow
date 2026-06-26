@@ -11,9 +11,11 @@ docs/ 配下の文書（REQ/ADR/SPEC/guides/DOC-MAP/README）および AGENTS.md
 REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）であり、agentdev-doc-writing スキルの参照先である。
 REQ-0101-061、REQ-0103-032 の詳細参照先。
 
-> **執筆規範の SSoT は japanese-tech-writing スキル**: 基本原則、術語の平易化、文体基準、不自然な日本語の典型は AGENTS.md 経由で japanese-tech-writing スキルを参照する。本 SPEC は文書種別の配置基準とリポジトリ固有の用語政策に特化し、japanese-tech-writing の内容を複製しない。
+> **執筆規範の SSoT は japanese-tech-writing スキル**: 基本原則、術語の平易化、文体基準、不自然な日本語の典型は AGENTS.md 経由で japanese-tech-writing スキルを参照する。
+> 本 SPEC は文書種別の配置基準とリポジトリ固有の用語政策に特化し、japanese-tech-writing の内容を複製しない。
 >
-> **AI-slop 検出基準は含めない**: AI-slop 概念は完全廃止し、文章品質の判定は japanese-tech-writing（LLM っぽい表現の禁止、空虚な形容、空虚な動詞）に完全委譲する。対応表は作成しない。
+> **AI-slop 検出基準は含めない**: AI-slop 概念は完全廃止し、文章品質の判定は japanese-tech-writing（LLM っぽい表現の禁止、空虚な形容、空虚な動詞）に完全委譲する。
+> 対応表は作成しない。
 
 ## 文書種別責務
 
@@ -114,7 +116,8 @@ SKILL.md の節構成は以下の役割分担に従う。
 | 概要節（`# {スキル名}` 直下、`## 目的` 等） | 入口 | スキルの役割、位置づけを簡潔に導入。機能説明の詳細は含まない |
 | 機能節（`## 責務`, `## USE FOR`, `## 担当` 等） | 新情報追加 | 概要節で触れない具体的な対象、対象外、查読観点、判定基準を詳細に記述 |
 
-**禁止パターン**: 概要節に機能節と同じ内容の詳細説明を含め、機能節で再説明する重複構造。SKILL.md 査読時（agentdev-doc-writing）に概要節と機能節の重複を検出し、概要節を簡潔な導入へ縮退するよう指示する。
+**禁止パターン**: 概要節に機能節と同じ内容の詳細説明を含め、機能節で再説明する重複構造。
+SKILL.md 査読時（agentdev-doc-writing）に概要節と機能節の重複を検出し、概要節を簡潔な導入へ縮退するよう指示する。
 
 **適用対象**: src/opencode/skills/agentdev-*/SKILL.md（全27ファイル）。
 

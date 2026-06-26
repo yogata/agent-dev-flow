@@ -7,7 +7,8 @@ updated: 2026-06-21
 
 # RU / 採用済み成果物 / draft ライフサイクル
 
-> 本 SPEC は intake / learning / inspect / backlog パイプラインにまたがるアーティファクトライフサイクル契約を定義する（AG-008）。個別コマンドの動作は各 command SPEC を参照。
+> 本 SPEC は intake / learning / inspect / backlog パイプラインにまたがるアーティファクトライフサイクル契約を定義する（AG-008）。
+> 個別コマンドの動作は各 command SPEC を参照。
 
 ## 目的
 

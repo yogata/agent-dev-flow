@@ -39,12 +39,12 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 
 - 診断対象の読込（Command、Skill 群）
 - 各診断観点の評価（`agentdev-inspect-skills`）:
-  - Command 参照の妥当性診断
-  - Skill 粒度の評価
-  - Skill 構造のレビュー
-  - USE FOR / DO NOT USE FOR 照合
-  - Skill 分割候補検出
-  - Command 固有手順の Skill 流入検出
+ - Command 参照の妥当性診断
+ - Skill 粒度の評価
+ - Skill 構造のレビュー
+ - USE FOR / DO NOT USE FOR 照合
+ - Skill 分割候補検出
+ - Command 固有手順の Skill 流入検出
 - 分類（finding / classification / route）
 - route 提示
 - 検出事項出力（`.agentdev/inspect/inbox/inspect-skills-finding-*.md`）

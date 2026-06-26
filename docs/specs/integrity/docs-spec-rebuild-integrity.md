@@ -12,7 +12,8 @@ REQ-0142-006 / REQ-0142-007 の検査観点の詳細を配置する。
 
 ## 検査バックエンド責務分担（check_integrity.ts vs inspect-* skills）
 
-配布物整合性検査（本 SPEC が定義する構文健全性、文意保持、責務整合の検出パターン）の実行バックエンドを以下の通り確定する。`docs-check` バックエンド（`check_integrity.ts`）と inspect-* skills の責務分担を明確化し、検出漏れと NG 汚染を防ぐ（REQ-0145-004）。
+配布物整合性検査（本 SPEC が定義する構文健全性、文意保持、責務整合の検出パターン）の実行バックエンドを以下の通り確定する。
+`docs-check` バックエンド（`check_integrity.ts`）と inspect-* skills の責務分担を明確化し、検出漏れと NG 汚染を防ぐ（REQ-0145-004）。
 
 ### 責務分担（決定論的 vs 意味的診断）
 

@@ -7,7 +7,9 @@ updated: 2026-06-21
 
 # skill SPEC テンプレート
 
-> 全ての `agentdev-*` 配布スキルは、`docs/specs/skills/<skill-name>.md` に専用 SPEC を持つ（AG-006）。本ファイルは新規 skill SPEC を作成する際の最小構成テンプレートである。`repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
+> 全ての `agentdev-*` 配布スキルは、`docs/specs/skills/<skill-name>.md` に専用 SPEC を持つ（AG-006）。
+> 本ファイルは新規 skill SPEC を作成する際の最小構成テンプレートである。
+> `repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
 
 ## 最小構成
 
