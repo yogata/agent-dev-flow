@@ -2,7 +2,7 @@
 
 ## 要件
 
-現行要件の第一参照先は REQ-0101 から REQ-0155 までの 47 件（現行 REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）である。廃止済み REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
+現行要件の第一参照先は REQ-0101 から REQ-0156 までの 48 件（現行 REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）である。廃止済み REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。
 
 | REQ | タイトル |
 |---|---|
@@ -53,6 +53,7 @@
 | [REQ-0153](requirements/REQ-0153.md) | 機械横断是正の完了証明 |
 | [REQ-0154](requirements/REQ-0154.md) | SPEC status 追跡と draft 放置検出 |
 | [REQ-0155](requirements/REQ-0155.md) | 文書粒度モデル |
+| [REQ-0156](requirements/REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 |
 
 - [要件インデックス](requirements/README.md)
 - [移行表](requirements/mapping-table.md)
