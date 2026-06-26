@@ -78,18 +78,18 @@ SPEC は 3 層構造を持つ（commands / skills / workflows）。詳細は [SP
 
 ### 基盤 SPEC（`specs/` 直下）
 
-- [システム仕様](specs/system.md)
-- [文書フォーマット規約](specs/patterns.md)
-- [設計原則](specs/design-principles.md)
+- [システム仕様](specs/foundations/system.md)
+- [文書フォーマット規約](specs/foundations/patterns.md)
+- [設計原則](specs/foundations/design-principles.md)
 - [品質仕様](specs/quality-specs.md)
 - [品質ゲート](specs/quality-gates.md)
-- [文書モデル](specs/document-model.md)
+- [文書モデル](specs/foundations/document-model.md)
 - [文書種別責務・配置基準](specs/document-type-responsibilities.md)
 - [アーティファクト契約](specs/artifact-contracts.md)
 - [成果物責任表](specs/artifact-responsibilities.md)
 - [整合性契約](specs/integrity-contracts.md)
 - [整合性ルールカタログ](specs/integrity-rule-catalog.md)
-- [ワークフロー契約（旧版・縮小済み）](specs/workflow-contracts.md)
+- [ワークフロー契約（旧版・縮小済み）](specs/foundations/workflow-contracts.md)
 - [実行時パッケージ境界](specs/runtime-package-boundary.md)
 - [ローカル Case ファイル](specs/local-case-file.md)
 - [ローカル版 OpenCode 生成](specs/local-generation.md)
