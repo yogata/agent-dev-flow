@@ -127,7 +127,9 @@ cd .agentdev-plugin && git pull && cd ..
 - `.agentdev-plugin/` を `.agentdev/` として使用すること（ドメイン状態と競合）
 - consumer-generated で link target が意図した src 配下以外へ解決される環境での link 設定実行（REQ-0141-010, ADR-0131 decision #6）
 
-`agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-0106）。docs-check は `repo-agentdev-integrity`（配布対象外スキル）として AgentDevFlow 本体リポジトリでのみ実行される。適用プロジェクトには配布されない。
+`agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-0106）。
+docs-check は `repo-agentdev-integrity`（配布対象外スキル）として AgentDevFlow 本体リポジトリでのみ実行される。
+適用プロジェクトには配布されない。
 
 ## インストール方式の方針
 
@@ -225,7 +227,8 @@ cd .agentdev-plugin && git pull && cd ..
 .opencode/skills/agentdev-*/
 ```
 
-**注意**: `.agentdev/` は gitignore に**含めない**こと。`.agentdev/` は AgentDevFlow のドメイン状態（Intake, Learning, Backlog 等）を保持し、git 管理対象である。
+**注意**: `.agentdev/` は gitignore に**含めない**こと。
+`.agentdev/` は AgentDevFlow のドメイン状態（Intake, Learning, Backlog 等）を保持し、git 管理対象である。
 
 ## 移行ガイド
 
