@@ -52,7 +52,7 @@ agent-dev-flow repository への手動取り込み対象として報告。
 - **独立 OU の自動 Epic 化（REQ-0114-088）**: 複数の独立 OU（`depends_on` 空、L0 相当）を検出した場合、自動的に Epic Issue 化し Wave 1 に全 OU を配置する。これにより Standard flow は「真に単一 OU のみ」に縮退し、Standard/Epic 二系統を単一 Wave 実行モデルに統一する。独立 OU が1件のみの場合は Standard flow（Epic 化しない、G20）
 - **停止条件**: 要件が曖昧で Issue 構造を生成できない場合、または operation_units の要件に矛盾が含まれる場合は停止し、要件の明確化を求める
 - **禁止事項**: 機能要件、非機能要件、制約、対象外、受け入れ条件を新規に作成しない。実装順序、Issue分解についてユーザー確認を求めない
-- **Wave テーブル「実行方法」列の生成**: case-open は各子Issue の実行方法（並列/直列）を技術的依存関係レベルに基づいて Wave テーブルに明記する。判定基準は `docs/specs/workflow-contracts.md` Wave スケジューリングセクションの依存レベル定義に基づく:
+- **Wave テーブル「実行方法」列の生成**: case-open は各子Issue の実行方法（並列/直列）を技術的依存関係レベルに基づいて Wave テーブルに明記する。判定基準は `docs/specs/foundations/workflow-contracts.md` Wave スケジューリングセクションの依存レベル定義に基づく:
   - L0（完全独立）、L1（Specs共有）→「並列」
   - L2（ファイル衝突）、L3（明示的依存）→「直列」
 

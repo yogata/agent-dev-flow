@@ -87,7 +87,7 @@ bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-frontmatter-
 
 **Step 4-1**: 語彙、責務、runtime境界矛盾の防止。Step 4 の保存完了後、既知の矛盾を検出可能な範囲で防止する。詳細は `agentdev-req-file-manager` を参照。委譲接続点: サブエージェントは検査結果と根拠のみを返し、親エージェントがfollow-up扱いを判断する
 
-**Step 4-2**: Catalog entry 確認（APPEND 時）。Step 4 で への APPEND 操作を実行した場合、追加した要件行に関連する `docs/specs/integrity-rule-catalog.md` の catalog entry 有無を確認する。catalog entry が未記載の場合、ユーザーに追記を促す。req-save 自身は `docs/specs/` 配下を直接編集しない（G02 制約）
+**Step 4-2**: Catalog entry 確認（APPEND 時）。Step 4 で への APPEND 操作を実行した場合、追加した要件行に関連する `docs/specs/integrity/integrity-rule-catalog.md` の catalog entry 有無を確認する。catalog entry が未記載の場合、ユーザーに追記を促す。req-save 自身は `docs/specs/` 配下を直接編集しない（G02 制約）
 
 **Step 4-3**: 複数 REQ/ADR ファイルの3フェーズ分離（REQ-0114-090/093）。複数 REQ/ADR ファイルを保存する場合、並列委譲可能な作成フェーズと直列集約フェーズを分離する（詳細は後述「case-auto 並列委譲モデル」セクション参照）
 

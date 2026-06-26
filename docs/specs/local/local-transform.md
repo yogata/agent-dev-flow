@@ -43,7 +43,7 @@ link mode では、agentdev-gh-cli の link 先だけを差し替えることで
 ### 契約一致の検証観点
 
 ローカル版 agentdev-gh-cli の品質検証は以下の観点で実施する。
-詳細は [agentdev-gh-cli SPEC](skills/agentdev-gh-cli.md) の差し替え可能性セクション参照。
+詳細は [agentdev-gh-cli SPEC](../skills/agentdev-gh-cli.md) の差し替え可能性セクション参照。
 
 - 標準版 agentdev-gh-cli の手続き名と、ローカル版 agentdev-gh-cli の手続き名が一致していること
 - 標準版の Issue / PR 操作が、ローカル版で Case ファイルの対応セクションへ正しく読み替えられていること
@@ -68,7 +68,7 @@ link mode では、agentdev-gh-cli の link 先だけを差し替えることで
 
 - [ローカル Case ファイル](local-case-file.md)（Case ファイルのスキーマ、状態遷移、見出し）
 - [ローカル版 OpenCode 生成](local-generation.md)（link mode 接続フロー、link target 確認）
-- [agentdev-gh-cli SPEC](skills/agentdev-gh-cli.md)（I/O hub、差し替え可能性、操作契約）
+- [agentdev-gh-cli SPEC](../skills/agentdev-gh-cli.md)（I/O hub、差し替え可能性、操作契約）
 - [実行時パッケージ境界](runtime-package-boundary.md)（`consumer-generated` リポジトリ種別）
 - REQ-0141（ローカル版 OpenCode 生成方式とローカル Case ファイル運用）
 - ADR-0131（ローカル版導入方式を link mode へ統一し生成方式を廃止）

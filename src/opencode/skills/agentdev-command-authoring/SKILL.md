@@ -124,7 +124,7 @@ Command作成、改定時に以下を確認する:
 ## See Also
 
 - **agentdev-skill-authoring**: Skill品質基準
-- **docs/specs/artifact-contracts.md**: Command/Skill/Template/Script 責務境界
+- **docs/specs/responsibilities/artifact-contracts.md**: Command/Skill/Template/Script 責務境界
 - **references/command-authoring-standards.md**: 行数目安、Steps数目安、共通処理重複、正規パス、完了報告種別、後方互換性の詳細
 
 

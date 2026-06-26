@@ -263,7 +263,7 @@ RU の frontmatter・本文から対象領域キーワードを抽出し、glob/
 
 ### REQ 健全性メトリクスと SPLIT 予兆検知
 
-req-define は既存 REQ（Step 3-2）および生成ドラフト（Step 10-2）の健全性を、`docs/specs/req-health-metrics.md` の定量閾値で計測し SPLIT 予兆として `draft-meta.split-forecast` に記録する。
+req-define は既存 REQ（Step 3-2）および生成ドラフト（Step 10-2）の健全性を、`docs/specs/quality/req-health-metrics.md` の定量閾値で計測し SPLIT 予兆として `draft-meta.split-forecast` に記録する。
 
 **計測メトリクス**（計測対象は要件テーブル行 `^| REQ-NNNN-MMM |` のみ。目的、適用範囲の散文は除外）:
 
@@ -273,7 +273,7 @@ req-define は既存 REQ（Step 3-2）および生成ドラフト（Step 10-2）
 | 関心分類数 | 後述4シグナル（関心対象、成果物種別、command family、lifecycle 段階の複数混在）の検出数 |
 | 成果物種別数 | `req-impact-map.md` の「影響する Artifact」列、または要件本文の対象成果物記述から集計 |
 
-**SPLIT シグナル閾値**（詳細は `docs/specs/req-health-metrics.md` を正とする）:
+**SPLIT シグナル閾値**（詳細は `docs/specs/quality/req-health-metrics.md` を正とする）:
 
 | メトリクス | 閾値 | シグナル |
 |---|---|---|
@@ -284,7 +284,7 @@ req-define は既存 REQ（Step 3-2）および生成ドラフト（Step 10-2）
 
 **推奨アクション**: 合計シグナル 0〜1 → APPEND 許可、2 → SPLIT 検討（ユーザーへ提案）、3+ → SPLIT 推奨。
 
-`split-forecast` は計測対象（既存 REQ ID または `draft`/`new`）、各メトリクス値、各シグナル値、合計、推奨アクション、`thresholds_ref: docs/specs/req-health-metrics.md` を構造化して記録する。
+`split-forecast` は計測対象（既存 REQ ID または `draft`/`new`）、各メトリクス値、各シグナル値、合計、推奨アクション、`thresholds_ref: docs/specs/quality/req-health-metrics.md` を構造化して記録する。
 計算式の詳細、ドラフト適用時の注意は `references/req-define-detailed-gates.md`「SPLIT 予兆計算」を参照。
 
 ### APPEND 操作での precedent 利用
