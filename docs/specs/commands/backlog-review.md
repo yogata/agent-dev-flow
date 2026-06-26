@@ -71,6 +71,32 @@ updated: 2026-06-22
 - depends_on に RU-ID のみ許容（G07）
 - 統合分割判定ロジック: `agentdev-backlog-integration` 参照
 
+## tentative_classification フィールド仕様
+
+RU frontmatter の `tentative_classification` フィールドの仕様（REQ-0155-008）。
+
+### 許容値
+
+REQ-0155-003 が定義する文書7分類のいずれか1値。
+
+| 値 | 分類 |
+|---|---|
+| `REQ` | 要件定義 |
+| `挙動SPEC` | 挙動SPEC |
+| `カタログSPEC` | カタログSPEC |
+| `guide` | ガイド |
+| `learning維持` | learning 維持 |
+| `作業記録` | 作業記録 |
+| `対象外` | 要件化対象外 |
+
+### 7値以外の入力時の挙動
+
+backlog-review が `tentative_classification` に7値以外の値を付与しようとした場合、RU 生成を停止し、訂正を求めること。7値以外の値で RU を生成しないこと。
+
+### フィールド欠落時の挙動
+
+backlog-review は全 RU frontmatter に `tentative_classification` を付与すること。フィールド欠落の RU は生成しないこと。
+
 ## See Also
 
 - [intake-promote.md](intake-promote.md), [learning-promote.md](learning-promote.md), [inspect-promote.md](inspect-promote.md)（前段コマンド）

@@ -78,6 +78,16 @@ updated: 2026-06-26
 
 req-define の Step 番号構成は command 定義（src/opencode/commands/agentdev/req-define.md）と一致する（REQ-0143-004）。本 SPEC の Step 1〜Step 12 は command 定義の同名 Step と完全に一致する。SPEC と command で Step 番号がずれる場合、SPEC 側を command 定義へ合わせる。Step 0 扱い、採番開始位置の規則は `command-file-format.md` 参照。
 
+### tentative_classification 最終確定のバリデーション（REQ-0155-008）
+
+Step 5-2 が backlog-review 付与の暫定分類（`tentative_classification`）を最終分類として確定（上書き）する際、以下を検証すること:
+
+1. 暫定分類が REQ-0155-003 の7値のいずれかであること。7値以外の場合、確定を停止し理由を提示すること
+2. フィールドが欠落している場合、暫定分類未付与として確定を停止し、backlog-review への差し戻しを提示すること
+3. 最終分類への上書き値も7値のいずれかであること
+
+7値の定義、検出時の具体的挙動は backlog-review.md「tentative_classification フィールド仕様」を参照すること。
+
 ## draft-data test_strategy フィールドスキーマ
 
 要件定義において test_strategy（テスト戦略）を定義する場合のシリアライズ形式を定義する。
