@@ -43,7 +43,7 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 - Step 7: guides 意味診断（guides が navigation layer の範囲を超えていないか確認）。履歴混入検出時は route 追加（REQ-0115-041）
 - Step 8: DOC-MAP 意味診断（DOC-MAP が索引の範囲を超えていないか確認）。内容過多検出時は分割誘導（REQ-0115-042）
 - Step 9: REQ structure review（6観点）（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT（`agentdev-req-structure-diagnostics`））
-- Step 10: 文書分類一貫性検査（`docs/specs/document-model.md` の classification policy への適合確認）。REQ 要件行への SPEC 分離基準違反残留（schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出
+- Step 10: 文書分類一貫性検査（`docs/specs/foundations/document-model.md` の classification policy への適合確認）。REQ 要件行への SPEC 分離基準違反残留（schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出
 - Step 11: docs-check route 判定（意味的疑いのうち機械的検査に落とせるものを docs-check ルール／検査データ候補として提示）
 - Step 12: 未処理 artifact 確認（`agentdev-req-structure-diagnostics`）
 - Step 13: 検出事項出力（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）。source-of-truth priority: 現行 REQ > 承認済み ADR > SPEC > DOC-MAP/guides

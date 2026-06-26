@@ -44,7 +44,7 @@ updated: 2026-06-26
 - Step 5: 要件展開（`agentdev-req-analysis` 分析観点）
   - Step 5-1: 変更影響候補抽出
     - RU 由来キーワード抽出 + glob/grep 前処理による explore 委譲スコープの絞り込み（REQ-0102-072）。絞り込みは explore 委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-0102-002）の完全性は維持する
-  - Step 5-2: 分類ゲート（REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/SPEC 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/specs/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする
+  - Step 5-2: 分類ゲート（REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/SPEC 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/specs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする
   - Step 5-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
   - Step 5-4: ADR要否確認ゲート（`agentdev-architecture-advisory` oracle 連携）
     - oracle 入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-0102-073）。ラベル構造は soft-contract（ADR-0124）とし、分類権限は親が保持する
@@ -131,9 +131,9 @@ req-define 側は出力形式のみを規定する。`target_area` の形式（M
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、SSoT 遷移）
 - [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（extraction / classification 委譲）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ再構成 intake、draft lifecycle）
-- [req-health-metrics.md](../req-health-metrics.md)（SPLIT 予兆計測閾値）
-- [quality-gates.md](../quality-gates.md)（QG-1）
-- [document-type-responsibilities.md](../document-type-responsibilities.md)（draft body 品質検査）
+- [req-health-metrics.md](../quality/req-health-metrics.md)（SPLIT 予兆計測閾値）
+- [quality-gates.md](../quality/quality-gates.md)（QG-1）
+- [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（draft body 品質検査）
 
 ## 対象外
 

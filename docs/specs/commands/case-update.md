@@ -43,7 +43,7 @@ updated: 2026-06-21
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類）
 - [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（連携（review-ng 時の QG-3 引用））
-- [quality-gates.md](../quality-gates.md)（QG-3 乖離検出結果（`--review-ng` 時に引用））
+- [quality-gates.md](../quality/quality-gates.md)（QG-3 乖離検出結果（`--review-ng` 時に引用））
 
 ## 対象外
 
