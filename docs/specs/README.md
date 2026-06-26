@@ -14,7 +14,7 @@ SPEC ファイルは現行アーキテクチャの正規文書である（REQ-01
 - **更新タイミング**: spec-save（draft 保存）、case-close（draft から accepted への昇格）の各工程で本ファイルの status 列を更新する
 - **欠落扱い**: `status` frontmatter を持たない SPEC は表中で `-` で示す。当該 SPEC への status 付与は本ファイルの対象外とし、別課題で扱う
 
-draft status の SPEC が一定期間更新されず放置されることを検出するルール（IR-054）は [integrity-rule-catalog.md](integrity-rule-catalog.md) 参照（REQ-0154-002）。
+draft status の SPEC が一定期間更新されず放置されることを検出するルール（IR-054）は [integrity-rule-catalog.md](integrity/integrity-rule-catalog.md) 参照（REQ-0154-002）。
 
 ## 3 層構造（AG-007, AG-008）
 
