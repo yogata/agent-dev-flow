@@ -12,7 +12,7 @@
 | related_spec | [artifact-contracts.md, workflow-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。一般語、旧語検出用文字列、projection 側の確認文は除外が必要 |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | 英字サブステップを N-M 形式へ置換 |

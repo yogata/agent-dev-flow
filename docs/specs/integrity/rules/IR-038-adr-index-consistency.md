@@ -12,7 +12,7 @@
 | related_spec | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。ファイル一覧と index の差分は確実 |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | README.md の該当 View に ADR を追加/削除 |

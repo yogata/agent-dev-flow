@@ -5,11 +5,7 @@ description: Manages Issue/PR description and comment templates, selection rules
 
 # Issue テンプレート管理スキル
 
-agentdev系コマンドで使用するIssue/PR本文、コメントテンプレートの管理、選定ルール、セクション規約を提供する。
-
-- **知識ベース**: テンプレート本体、選定ルール、セクション規約
-- **参照先**: agentdevコマンドから直接参照される
-- **特性**: テンプレートは Read tool で読み込み、変数部分を置換して使用する
+agentdev系コマンドで使用するIssue/PR本文、コメントテンプレートの管理、選定ルール、セクション規約を提供する。テンプレートは Read tool で読み込み、変数部分を置換して使用する。
 
 ## USE FOR
 

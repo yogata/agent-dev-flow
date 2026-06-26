@@ -7,11 +7,6 @@ description: Provides development workflow phase definitions, SSoT transitions, 
 
 agentdev系コマンドのフェーズ定義、SSoT遷移、work_type 判定基準、コマンド関連を提供する。
 
-- **知識ベース**: フェーズ定義、SSoT遷移、work_type 判定基準、コマンド関連
-- **参照先**: agentdevコマンドから参照される
-- **特性**: 宣言的定義のみを提供。手順、手続きは含まない
-- **自明な質問の禁止**: エージェントが自律的に判断できることをユーザーに確認しない
-
 ---
 
 ## USE FOR

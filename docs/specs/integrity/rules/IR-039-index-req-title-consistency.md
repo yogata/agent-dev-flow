@@ -12,7 +12,7 @@
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。title 文字列の直接比較 |
-| regression_test | (追加予定) |
+| regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | 索引の REQ タイトルを frontmatter title に一致させる |
