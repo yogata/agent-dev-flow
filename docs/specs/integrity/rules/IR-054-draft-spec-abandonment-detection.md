@@ -12,7 +12,7 @@
 | related_spec | [integrity-rule-catalog.md, integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。`updated` frontmatter が実態と乖離している場合（更新忘れ）、放置でない SPEC が報告される。レポートは候補提示であり、SPEC owner による確認を前提とする。`updated` frontmatter 自体の正確性は別ルール（REQ-0108-002 必須 field、既存）で担保する |
-| regression_test | (追加予定)。既知 true positive として `updated` を閾値以上過去日とした draft SPEC fixture が報告されること、accepted SPEC、status なし SPEC が報告されないことを検証する |
+| regression_test | (未実装)。既知 true positive として `updated` を閾値以上過去日とした draft SPEC fixture が報告されること、accepted SPEC、status なし SPEC が報告されないことを検証する |
 | baseline_status | new |
 | finding_route | intake |
 | triage_action | 報告された draft SPEC を (a) accepted へ昇格（case-close SPEC 確定チェック）、(b) 内容更新のうえ `updated` を最新化、(c) 廃止判断のいずれかへ分類する |

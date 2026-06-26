@@ -23,7 +23,7 @@ DOC-MAP（文書探索入口：索引）
 要件定義の永続基準。
 システムが満たすべき要件を記述する。
 
-- 現行 REQ は REQ-0101 から REQ-0152 までの 44 件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止、履歆参照のみ）
+- 現行 REQ は REQ-0101 から REQ-0156 までの 48 件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止、履歆参照のみ）
 - 旧 REQ（REQ-0001〜REQ-0050 [全て廃止]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
