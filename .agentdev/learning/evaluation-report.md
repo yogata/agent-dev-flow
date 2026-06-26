@@ -1,183 +1,232 @@
 # 評価レポート
 
 ## メタデータ
-- **実行日時**: 2026-06-25 00:00
-- **対象エントリ数**: 14件（inbox: 14件, archive: 0件新規参照）
-- **問題クラス数**: 3（未分類含む）
+- **実行日時**: 2026-06-27 00:00
+- **対象エントリ数**: 9件（inbox: 9件, archive: 0件新規参照）
+- **問題クラス数**: 8（クラスタ1 + 未分類7）
 
 ## 正規化結果
 
-inbox 14件中、L-001〜L-009（9件）は旧フォーマット（発生源/学び/適用場面）、L-010〜L-014（5件）は新フォーマット（13項目）。旧フォーマットは解析時に以下マッピングで正規化（元ファイルは書き換えず）:
-
-- 発生源 → 関連
-- 学び → 根本原因 + 自律対応内容 + 予防策候補 に分割
-- 適用場面 → 横展開観点 + 想定反映先 に分割
+inbox 9件は全て新フォーマット（13フィールド）。正規化不要。
 
 ## 問題クラス一覧
 
-### 問題クラス1: worktree 環境の junction 非伝播に起因する検査偽陽性・参照断絶
+### 問題クラス1: Windows PowerShell + UTF-8 エンコーディング不一致による mojibake
 
-- **根本原因**: worktree 内で `.opencode/`（skills/commands）への junction が git worktree + `.gitignore` により再作成されず、junction 依存の整合性検査で偽陽性が発生し、標準版スキル参照でも `.opencode/` 経由が失敗する
-- **再発条件**: worktree 環境で junction 依存の整合性検査を追加・変更する場合、または標準版スキル・コマンドの構造を `.opencode/` 経由で参照する場合
-- **予防策**: (1) junction 依存検査に `isInsideWorktree` ヘルパー（`.git` が file かで判定）を適用 (2) worktree 環境では SoT パス（`src/opencode/`）を直接参照する運用の標準化 (3) `isInsideWorktree` の適用範囲拡張候補の評価
-
-#### 8軸評価スコア
-
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 2/5 | 2件（L-003, L-008） |
-| 影響度 | 4/5 | 偽陽性27件発生・実装時の参照断絶 |
-| 横展開性 | 4/5 | worktree 環境で junction 依存処理全般 |
-| 反映先明確度 | 4/5 | agentdev-git-worktree, integrity 検査 |
-| 自動化適性 | 4/5 | isInsideWorktree ヘルパーで自動化可能 |
-| プロジェクト固有知識再利用性 | 4/5 | worktree+junction 固有の運用知見 |
-| 再発可能性 | 4/5 | worktree 使用継続でほぼ確実 |
-| 費用対効果 | 4/5 | ヘルパー適用・運用明文化で低コスト高効果 |
-| **加重合計** | **30/40** | |
-
-- **推奨処分案**: **既存 skill へ反映** — `isInsideWorktree` ヘルパーは L-003 で checkSourceProjectionConsistency に適用済み（偽陽性27件解消）。ただし worktree 環境の標準運用（src/opencode/ 直接参照）および `isInsideWorktree` の適用範囲拡張候補の評価が `agentdev-git-worktree` に明文化されていない。運用ガイドラインの標準化が必要。
-
-#### エントリ一覧
-- 2026-06-23 L-003: worktree 環境で junction 未伝播に起因する偽陽性の汎用化 [inbox]
-- 2026-06-23 L-008: worktree + .gitignore で junction が切れた環境では src/opencode/skills/ を直接参照 [inbox]
-
----
-
-### 問題クラス2: case-close Step 9 の pull --ff-only が共有 main worktree の並列セッション未コミット変更でブロックされる
-
-- **根本原因**: case-close の Step 9-11 は共有 main worktree で動作し、Step 1-1（重複ファイルチェック）は開始時点のスナップショット検査のため、Step 9 実行までの間に並列セッションが加えた未コミット変更を検知できない。当該変更が pull 取り込み対象と重複すると pull が拒否される
-- **再発条件**: 共有 main worktree で複数セッションが並列実行され、case-close の Step 9 実行前に他セッションが PR 変更対象ファイルへ未コミット変更を残した場合
-- **予防策**: (1) Step 1-1 を Step 9 直前にも再実行する (2) pull 失敗時の並列セッション安全なフォールバック手順の明文化 (3) post-merge ステップ（9-11）の worktree 隔離設計変更の検討
+- **根本原因**: Windows PowerShell（日本語ロケール）でネイティブコマンドの stdout 取り込み・stdin 引数受け渡し時に `[Console]::OutputEncoding` が既定（cp932）となり、UTF-8 バイト列を cp932 として誤デコードする。L-005（Write ツール既存 UTF-8 ファイル cp932 化）と同根だが、発生経路が gh CLI stdout 読込・git commit -m 引数で異なる。
+- **再発条件**: PowerShell（Windows、日本語ロケール環境）で `[Console]::OutputEncoding` を UTF-8 に設定せずに、日本語を含む CLI 出力の取り込み・加工・書き戻し、または日本語を含む `-m` 引数の commit 作成を行う場合。
+- **予防策**: (a) PowerShell 実行時に `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` を標準設定、(b) git commit の日本語メッセージは `-F <utf8-file>` 使用、`-m` は ASCII-only に限定、(c) 書き戻し後の VERIFY に mojibake チェックを含める。
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | 1件（L-013） |
-| 影響度 | 3/5 | case-close ブロック、ただし破壊的操作なしで停止 |
-| 横展開性 | 3/5 | 共有 main worktree で case-close を実行する環境全般 |
-| 反映先明確度 | 4/5 | case-close.md Step 9, agentdev-git-worktree |
-| 自動化適性 | 3/5 | Step 1-1 再実行・フォールバック手順化可能 |
-| プロジェクト固有知識再利用性 | 4/5 | AgentDevFlow 固有の case-close 工程 |
-| 再発可能性 | 4/5 | 並列実行継続で高確率 |
-| 費用対効果 | 3/5 | 手順追加コスト妥当、隔離設計は要検討 |
-| **加重合計** | **25/40** | |
+| 発生件数 | 2/5 | 2件（gh CLI stdout、git commit -m） |
+| 影響度 | 3/5 | Issue 本文破損（書き戻しで mojibake 上書き）は重大だが VERIFY 再読込で検知可能。commit message タイトル破損は実害軽微 |
+| 横展開性 | 5/5 | PowerShell（Windows）で日本語含む全 CLI 出力/入力経路で汎用的に発生 |
+| 反映先明確度 | 4/5 | agentdev-gh-cli（standard-procedures.md, verify.md）、agentdev-conventional-commits。特定済 |
+| 自動化適性 | 4/5 | encoding 設定の標準手順化、`-F` 使用ルール化で容易 |
+| プロジェクト固有知識再利用性 | 4/5 | Windows + PowerShell + 日本語環境の落とし穴として再利用価値高い |
+| 再発可能性 | 5/5 | 設定しない限り日本語ロケール環境で毎回発生 |
+| 費用対効果 | 5/5 | 標準手順への追記のみで低コスト・高効果 |
+| **加重合計** | **32/40** | |
 
-- **推奨処分案**: **既存 skill/command へ反映** — `agentdev-git-worktree/references/git-common-procedures.md` Section 1（pull --ff-only）と Section 3（重複ファイルチェック）は既存だが、(a) Step 1-1 の Step 9 直前再実行、(b) 並列セッション由来変更の取扱い、(c) pull 失敗時フォールバック手順の標準化が未規定。`case-close.md` Step 9 と `git-common-procedures.md` への手順追加が必要。
+- **推奨処分案**: 既存 skill へ反映（agentdev-gh-cli standard-procedures.md / verify.md、agentdev-conventional-commits）。L-005 の適用範囲を gh CLI stdout・git commit -m 経路へ拡張。
 
 #### エントリ一覧
-- 2026-06-24 L-013: case-close Step 9 の pull --ff-only は共有 main worktree で並列セッションの未コミット変更によりブロックされる [inbox]
+- gh CLI の日本語出力を PowerShell で捕獲すると stdout encoding 不一致で mojibake し書き戻しで本文破損 [inbox]
+- git commit -m の日本語タイトル行が PowerShell で mojibake（本文は正常） [inbox]
 
----
+### 問題クラス2（未分類）: gh pr merge --delete-branch が worktree 占有で local/remote 削除を巻き込み失敗
 
-### 問題クラス3: task() 委譲不可時に adapter skill フォールバックパスが有効
-
-- **根本原因**: ハーネスのツール制約で task() による別サブエージェント起動が不可。委譲先不在でも case-run の orchestration + 実装を完結させる必要がある
-- **再発条件**: task() ツールを提供しないハーネス環境（またはツール権限で task() が無効化された環境）で case-run を実行する場合
-- **予防策**: (1) adapter skill の「task() 起動失敗時事後処理」フォールバックパスに従い起動元エージェントが統合実行 (2) task() 可否の事前 probe と自動切替プロトコルの明記
+- **根本原因**: `--delete-branch` は local→remote の順で削除を試みる。local 削除が worktree 占有エラーで失敗すると全体が中断され、remote 削除フェーズに到達しない。case-close Step 4 と Step 7 の順序は正しいが、Step 4 で `--delete-branch` を使うと順序が逆転する。
+- **再発条件**: case-close Step 4 で `gh pr merge --squash --delete-branch` を実行し、対象ブランチがアクティブ worktree に checkout されている場合。
+- **予防策**: case-close の PR マージ手続きを `gh pr merge <N> --squash`（`--delete-branch` なし）に統一し、branch 削除は Step 7 で worktree 削除後に明示実行する。
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 2/5 | 2件（L-004, L-010） |
-| 影響度 | 3/5 | case-run ブロック回避、プロトコル準拠で完結 |
-| 横展開性 | 4/5 | 全ハーネス環境の case-run で発生し得る |
-| 反映先明確度 | 5/5 | agentdev-case-run-execution-adapter（特定済） |
-| 自動化適性 | 3/5 | 事前 probe は自動化可能だが現状未実装 |
-| プロジェクト固有知識再利用性 | 4/5 | adapter protocol 固有の運用知見 |
-| 再発可能性 | 4/5 | ハーネス制約継続で高確率 |
-| 費用対効果 | 3/5 | フォールバックは既存、probe 強化は将来 |
-| **加重合計** | **28/40** | |
+| 発生件数 | 1/5 | 1件 |
+| 影響度 | 3/5 | remote branch 残存、手動 cleanup で復旧可能だが手戻り発生 |
+| 横展開性 | 3/5 | worktree 運用 + gh pr merge --delete-branch の組み合わせ環境で中程度 |
+| 反映先明確度 | 4/5 | case-close Step 4/7、agentdev-gh-cli standard-procedures.md。特定済 |
+| 自動化適性 | 4/5 | `--delete-branch` なし運用への統一で容易 |
+| プロジェクト固有知識再利用性 | 3/5 | worktree 運用環境固有の落とし穴 |
+| 再発可能性 | 4/5 | `--delete-branch` を使えば worktree 運用下で再発 |
+| 費用対効果 | 4/5 | 手順変更のみで低コスト |
+| **加重合計** | **26/40** | |
 
-- **推奨処分案**: **deferred** — `agentdev-case-run-execution-adapter/SKILL.md` L131-148「task() 起動失敗、異常終了時事後処理」がフォールバックパス（事後処理 Item 1-5、PR 化）を完全カバー。L-004（docs系）・L-010（汎用）は既存設計の妥当性を実証する記録。新規に昇華すべき内容は「事前 probe による自動切替」のみだが、出現2件とも事後フォールバックで完結しており、probe 強化の成熟度不足。将来の再蓄積を待つ。
+- **推奨処分案**: 既存 command/skill へ反映（case-close guardrail、agentdev-gh-cli standard-procedures.md）。既存手順は正しいが `--delete-branch` 使用の副作用に対するガードレール不十分。
 
 #### エントリ一覧
-- 2026-06-23 L-004: docs 系 Issue で case-run task() 委譲不可時に adapter skill フォールバックパスが有効 [inbox]
-- 2026-06-24 L-010: ハーネス制約で task() 委譲不可時に同一エージェント統合実行が有効（adapter protocol 準拠）[inbox]
+- gh pr merge --delete-branch が worktree 活動中ブランチで local/remote 削除を巻き込み失敗 [inbox]
 
----
+### 問題クラス3（未分類）: Issue 本文の事前状態記載が実装時点と乖離し陳腐化
 
-### 未分類
+- **根本原因**: Issue 本文（case-open 成果物）に check_integrity.ts の実行時点スナップショット（絶対件数）を記載するが、その後の本体改修で検出結果が変動しても Issue 本文は追従更新されない。事前状態記載の粒度・更新タイミングに SPEC 上の規定がない。
+- **再発条件**: case-open で check_integrity.ts の絶対件数を事前状態として Issue 本文に記載し、case-open から case-run の間に本体が改修された場合。
+- **予防策**: (a) case-open の事前状態記載を「NG 識別子リスト」中心にし件数は補助情報とする、(b) case-run 開始時に再計測して差異があれば Findings に記録する手順の明文化。
 
-#### L-001: check_integrity.ts 検出ルール追加時の fixture/categoryMap ペア更新
-- **8軸加重合計**: 23/40
-- **推奨処分案**: **deferred** — copyScripts + drift detection テストが fixture/categoryMap 乖離を自動検出する仕組みが既存かつ有効。運用徹底レベルの知見であり、新規対策不要。
-- **既存対策**: あり（自動検出仕組み存在・機能中）
+#### 8軸評価スコア
 
-#### L-002: HITL 境界精密化パターンの汎用性
-- **8軸加重合計**: 21/40
-- **推奨処分案**: **deferred** — REQ-0147 で promote 系に実装済み。case-close 等への汎用化は別途整備候補だが、具体性・出現回数ともに不足。
-- **既存対策**: あり（REQ-0147 で promote 系に実装済み）
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 1件 |
+| 影響度 | 2/5 | case-run で差異記録が必要になる程度。実害は限定的 |
+| 横展開性 | 3/5 | check_integrity.ts 件数を記載する全 case-open で中程度 |
+| 反映先明確度 | 4/5 | case-open（事前状態フォーマット）、case-run（再計測手順）。特定済 |
+| 自動化適性 | 3/5 | フォーマット変更（識別子中心）で可能 |
+| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow の case-open 運用固有 |
+| 再発可能性 | 3/5 | check_integrity.ts 改修建度に依存 |
+| 費用対効果 | 3/5 | フォーマット調整で中コスト中効果 |
+| **加重合計** | **22/40** | |
 
-#### L-005: Windows 環境で Write ツールが既存 UTF-8 ファイルを cp932 で書き出す
-- **8軸加重合計**: 28/40
-- **推奨処分案**: **既存 skill へ反映** — `agentdev-gh-cli/references/standard-procedures.md` L57 は「OpenCode の Write tool も使用可能（BOMなしUTF-8で書き出す）」と記載するが、L-005 は既存 UTF-8 ファイル上書き時に cp932 で書き出される事象を実証。記載と事実が矛盾しており、既存 UTF-8 ファイル編集時は edit ツール（per-line string replace）を優先するルールの明文化が必要。`agentdev-gh-cli` と `AGENTS.md`（常時ルール候補）への反映。
-- **既存対策**: あり（部分的・事実矛盾）。WriteAllText 規定は存在するが、Write ツールの既存ファイル上書き挙動の注意喚起なし。
+- **推奨処分案**: 保留（deferred）。出現1件・中スコア。事前状態フォーマット調整は有効だが、再発時に具体化してから昇華を再評価する。
 
-#### L-006: 並列機械的テキスト置換 OU の Wave 実行で文字レベルマージが必要になる
-- **8軸加重合計**: 22/40
-- **推奨処分案**: **deferred** — 文字レベル SequenceMatcher 結合の実証記録。ツール事前準備が前提だが、出現回数1件・汎用化には専用ツール整備が必要。Wave 設計ガイダンスへの競合コスト見積もり追記は将来検討。
-- **既存対策**: なし（文字レベルマージツール未標準化）
+### 問題クラス4（未分類）: 複合ラベル duty keyword の区切り文字規約未整備
 
-#### L-007: REQ の手続き列挙に中核操作（PR 作成）が抜けていた場合の SPEC 拡張判断
-- **8軸加重合計**: 21/40
-- **推奨処分案**: **deferred** — REQ 列挙で中核操作が漏れるパターンの実証。SPEC 拡張で即時対応しつつ REQ 更新を後続工程に委ねる二段階判断は有効だったが、出現1件・手順化困難。
-- **既存対策**: なし（二段階判断フロー未明記だが、個別判断で対応可能）
+- **根本原因**: 複合ラベル（複数の責務を1語で表す duty keyword）の区切り文字が読点と中黒のどちらかについて規定が曖昧。check_integrity.ts 側は中黒を期待するが文書側が読点を使用し、機械的検出と文書表記が不一致。
+- **再発条件**: 複合ラベル duty keyword を読点区切りで文書に記載し、check_integrity.ts が中黒を期待している場合。
+- **予防策**: duty keyword の区切り文字規約（読点=流動的並列、中黒=複合ラベル）を integrity-rule-catalog.md または japanese-tech-writing スキルに明文化する。
 
-#### L-009: Windows + worktree 環境で git mv の実行形式による成否差異
-- **8軸加重合計**: 23/40
-- **推奨処分案**: **既存 skill へ反映** — `git -C <worktree> mv` が失敗し `workdir` 指定 + 平置き `git mv` が成功した事象。Windows + worktree 環境の git mv で `git -C` と `workdir` の挙動差を `agentdev-git-worktree` に明記。ディレクトリ移動を伴う git mv では workdir 指定を優先するフォールバック手順の追記。
-- **既存対策**: なし（git mv の実行形式差異に関する記載なし）
+#### 8軸評価スコア
 
-#### L-011: 作成時ゲート vs 事後機械検出 の責務分担（二重安全網の許容）
-- **8軸加重合計**: 21/40
-- **推奨処分案**: **deferred** — REQ-0101-047/048/049（作成時ゲート）と IR-036（事後機械検出）の両方が既存。冗長性を許容する設計指針の観察記録。新規対策不要。
-- **既存対策**: あり（ゲート + 機械検出の二重構造が既存）
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 1件 |
+| 影響度 | 2/5 | check_integrity NG 1件。文書是正で即解消 |
+| 横展開性 | 3/5 | 全コマンドの G21 duty keyword で中程度 |
+| 反映先明確度 | 4/5 | integrity-rule-catalog.md、japanese-tech-writing。特定済 |
+| 自動化適性 | 3/5 | 区切り文字規約の明文化で可能 |
+| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow の duty keyword 規約固有 |
+| 再発可能性 | 3/5 | 新規コマンド追加時に再発し得る |
+| 費用対効果 | 4/5 | 規約明文化のみで低コスト |
+| **加重合計** | **23/40** | |
 
-#### L-012: 機械横断修正の完了宣言には再 grep 0 件確認が必須
-- **8軸加重合計**: 27/40
-- **推奨処分案**: **既存 skill へ反映** — `agentdev-doc-writing/references/mechanical-replacement-rules.md`「再現性の担保」節（L178-190）に Step 3 で0件確認手順が既存。しかし PR #1090 で運用されず残存3件を見落とした（application miss）。`agentdev-quality-gates` の QG-3/QG-4 に機械横断是正向け「再 grep 0 件証拠」要求項が未整備（guardrail insufficiency）。QG 検査項目拡充 + 運用徹底の明記が必要。
-- **既存対策**: あり（手順存在・運用未徹底）。ギャップ分類: application miss + guardrail insufficiency。
+- **推奨処分案**: 保留（deferred）。出現1件。再利用性ある規約だが、duty keyword NG が再発した場合に具体化して昇華を再評価する。
 
-#### L-014: 複数 checker で共用される関数の削除要求は対象スコープ明示が前提
-- **8軸加重合計**: 25/40
-- **推奨処分案**: **既存 skill/command へ反映** — `agentdev-workflow-templates` の Issue 完了条件テンプレート（checkbox 形式）は既存だが、関数削除要求時のスコープ明示（「from checkX」表記）ガイドが未整備（fix gap）。`case-run.md` のテスト戦略（TS）に削除対象関数の全使用箇所 grep 確認の標準化も未実施。
-- **既存対策**: あり（部分的）。完了条件テンプレート存在、スコープ明示ルールなし。
+### 問題クラス5（未分類）: 機械横断置換 PR の完了宣言と再 grep 確認の連動不備
 
----
+- **根本原因**: `mechanical-replacement-rules.md`「再現性の担保」Step 3-4（再 grep 0 件確認、REQ-0153 で必須化済み）が PR の完了宣言時に実行されなかった可能性。PR 完了宣言と機械的検証の連動が機能しなかった。
+- **再発条件**: 機械横断置換を伴う PR で、Step 3-4（再 grep 0 件確認）を省略して完了宣言した場合。
+- **予防策**: (a) case-close QG-4 の検査項目に「機械横断置換を伴う PR は再 grep 0 件確認結果を Findings に記録」を追加、(b) mechanical-replacement-rules.md Step 3-4 を case-run の test-fix ループに組み込む。
 
-### 除外エントリ（deferred）の根拠
+#### 8軸評価スコア
 
-| 対象 | 除外理由 | 根拠 |
-|------|---------|------|
-| L-001 | 既存自動検出で対応済 | copyScripts + drift detection が機能中 |
-| L-002 | 汎用化の具体性不足 | promote 系以外への適用は候補止まり |
-| L-006 | ツール前提・出現1件 | 文字レベルマージツール未整備 |
-| L-007 | 手順化困難・出現1件 | 二段階判断は個別対応可能 |
-| L-011 | 対策既存・観察記録 | ゲート + 機械検出の二重構造が既存 |
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 1件 |
+| 影響度 | 3/5 | 完了宣言不正確、後続 inspect で検出 |
+| 横展開性 | 3/5 | 機械横断置換 PR 全般で中程度 |
+| 反映先明確度 | 4/5 | agentdev-quality-gates（QG-4）、agentdev-doc-writing。特定済 |
+| 自動化適性 | 3/5 | case-run test-fix ループへの組み込みで可能 |
+| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow の機械横断置換運用固有 |
+| 再発可能性 | 3/5 | REQ-0153 必須化済みだが運用徹底次第 |
+| 費用対効果 | 4/5 | QG-4 検査項目追加で低コスト |
+| **加重合計** | **24/40** | |
 
-## promote 時 prune 計画
+- **推奨処分案**: 保留（deferred）。REQ-0153 で再 grep 0 件確認は既に必須化済み。本件は適用徹底レベルの知見（application miss）。QG-4 明示的組み込みは有効だが、REQ-0153 適用の運用徹底で対応可能な範囲。
 
-- **対象エントリ数**: 14件（inbox から移動予定）
-- **prune 予定**: staged 7件（L-003, L-005, L-008, L-009, L-012, L-013, L-014）— 証拠は各採用済み成果物の「元learning item / 根拠」セクションに保存
-- **prune 対象外**: deferred 7件（L-001, L-002, L-004, L-006, L-007, L-010, L-011）は archive/active.md に残存
+### 問題クラス6（未分類）: SUB-D 網羅検証の gloss 形式判定規則未整備
+
+- **根本原因**: SUB-D 網羅検証は候補語の bare 英語出現を grep 抽出するため `日本語（英語）` gloss 形式も候補に含まれる。これを「未置換」と扱うか「推奨訳語置換済」と扱うかの判定規則が明文化されていない。
+- **再発条件**: SUB-D 網羅検証で候補語 grep を実行し、`日本語（英語）` gloss 形式インスタンスが含まれる場合。
+- **予防策**: SUB-D 検証手順に「gloss 形式 `日本語（英語）` は推奨訳語置換済として再置換対象外とする」運用規則を明文化する。
+
+#### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 1件 |
+| 影響度 | 3/5 | 誤置換で gloss 情報欠落・重複リスク |
+| 横展開性 | 3/5 | SUB-D 検証全般、他 SPEC ファイルで中程度 |
+| 反映先明確度 | 3/5 | backticks-identifier-threshold.md 境界ケース追記 or 新規 SPEC。候補あり |
+| 自動化適性 | 3/5 | 判定規則の明文化で可能 |
+| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow の表記是正運用固有 |
+| 再発可能性 | 3/5 | SUB-D 検証で gloss 形式出現度に依存 |
+| 費用対効果 | 4/5 | 運用規則明文化で低コスト |
+| **加重合計** | **23/40** | |
+
+- **推奨処分案**: 保留（deferred）。出現1件・SUB-D 検証の境界ケース。gloss 形式誤置換が再発した場合に具体化して昇華を再評価する。
+
+### 問題クラス7（未分類）: case-open direct scope 外と Issue 完了条件の表現乖離
+
+- **根本原因**: case-open の case_open_hints は direct scope 外を明記するが、Issue 完了条件（REQ から機械生成）は direct scope 外要件を除外せず構造存在要求の表現を維持する。case_open_hints と完了条件の間に同期仕組みがない。
+- **再発条件**: case-open で direct scope 外要件を完了条件に含め、完了条件が構造存在要求の表現のまま残存する場合。
+- **予防策**: (a) case-open で direct scope 外要件の完了条件を達成可能な表現に調整、(b) case-auto で case_open_hints と完了条件の整合性をチェックするステップを追加。
+
+#### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 1件 |
+| 影響度 | 3/5 | QG-4 で完了条件調整が必要 |
+| 横展開性 | 3/5 | direct scope 外要件を含む case-open 全般で中程度 |
+| 反映先明確度 | 4/5 | case-open、case-auto。特定済 |
+| 自動化適性 | 3/5 | 整合性チェックステップで可能 |
+| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow の case-open 運用固有 |
+| 再発可能性 | 3/5 | direct scope 外要件を含める度に |
+| 費用対効果 | 3/5 | 手順追加で中コスト中効果 |
+| **加重合計** | **23/40** | |
+
+- **推奨処分案**: 保留（deferred）。出現1件・中スコア。case-open/case-auto の整合性チェックは有効だが再発時に具体化して昇華を再評価する。
+
+### 問題クラス8（未分類）: Epic 分解時に既存 Issue とのスコープ完全重複を検知できず空コミット PR に終始
+
+- **根本原因**: Epic case-open のディレクトリ単位分割時に、既存 OPEN Issue の AG（acceptance goal）スコープと分解候補 OU の照合をスキップした。両者の分解軸（ディレクトリ vs AG）が直交しないため構造的に重複が発生し得る。
+- **再発条件**: 横断是正 Epic を case-open でディレクトリ単位分割する際、同一リポジトリに doc-structural-cleanup 系の横断 Issue が OPEN/進行中で、かつその AG が Epic 子 Issue の OU と同じ対象を含む場合。
+- **予防策**: (a) case-open の Epic 分解フローで既存 OPEN Issue の AG/対象ファイル群と分解候補 OU の照合ステップを追加、(b) 横断是正 Epic と横断 Issue 並行時のスコープ境界事前合意運用を SPEC に明文化。
+
+#### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | 1件 |
+| 影響度 | 3/5 | 空コミット PR でリソース消費 |
+| 横展開性 | 2/5 | 横断是正 Epic + 横断 Issue 並行運用の特定条件で限定 |
+| 反映先明確度 | 4/5 | case-open（Epic 分解ロジック）、docs/specs/commands/case-open.md。特定済 |
+| 自動化適性 | 3/5 | 既存 Issue AG 照合ステップで可能 |
+| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow の Epic 運用固有 |
+| 再発可能性 | 3/5 | 横断是正 Epic と横断 Issue 並行時に中程度 |
+| 費用対効果 | 3/5 | 照合ステップ追加で中コスト中効果 |
+| **加重合計** | **22/40** | |
+
+- **推奨処分案**: 保留（deferred）。出現1件・特定シナリオ。Epic 分解と横断 Issue 並行が再発した場合に具体化して昇華を再評価する。
+
+## promote 時prune結果
+
+- **対象エントリ数**: 9件
+- **prune実施**: あり（staged エントリのみ）
+- **prune候補**: 3件（PC-1 エントリ2件 + PC-2 エントリ1件）
+- **prune却下**: 0件
 
 ## 全体傾向
-- **高スコアクラス**: 問題クラス1（worktree junction、30/40）と問題クラス3（task() フォールバック、28/40）。worktree 環境の運用落とし穴が複数回にわたり再発しており、`agentdev-git-worktree` へのガードレール強化が優先度高。
-- **横展開性が高い**: worktree 関連（L-003, L-008, L-009, L-013）は worktree 使用継続でほぼ確実に再発。Windows 環境固有（L-005, L-009）も consumer repo 配布先で同様の落とし穴が予測される。
-- **自動化適性が高い**: L-012（再 grep 0 件確認）は QG-3/QG-4 への検査項目組み込みで自動化可能。L-003/L-008 の isInsideWorktree ヘルパーも適用範囲拡張で自動化可能。
-- **全体的な観察所見**: 2026-06-22〜25（Epic #1028〜#1138）の集中的な学び蓄積。Wave 実行・機械横断是正・worktree 運用・ハーネス制約の4テーマで知見が集中。既存スキル（git-worktree, gh-cli, doc-writing, quality-gates, workflow-templates）へのガードレール追加が主な昇華先。
+
+- **高頻出・高影響の問題クラス**: Windows PowerShell + UTF-8 エンコーディング不一致（PC-1、32/40）が突出。L-005 系の知見が新たな経路（gh CLI stdout、git commit -m）で再実証されており、Windows 環境の継続的な落とし穴。
+- **横展開性が高い問題クラス**: PC-1（5/5）が圧倒的。PowerShell で日本語を扱う全経路が対象。PC-2（worktree + --delete-branch）も worktree 運用環境で横展開性あり。
+- **自動化適性が高い問題クラス**: PC-1（encoding 設定標準化）、PC-2（--delete-branch なし運用）ともに手順変更のみで対応可能。
+- **全体的な観察所見**: 9件中2件（PC-1 クラスタ）が明確な昇華対象。残り7件は出現1件の中スコア（22-24/40）で、再発時に具体化する deferred 判定が妥当。REQ-0155-005（無条件自動REQ化禁止、living pool 維持）に従い、断片的・単発の知見は living pool で維持する。
 
 ## ADR候補除外記録
 
-全 staged 候補に対して `agentdev-adr-guidelines` の除外基準を適用:
+全問題クラスについて `agentdev-adr-guidelines` の除外基準を適用した結果、ADR 候補は0件。全て運用ルール・command仕様・skill 手順の範疇。
 
-| 対象item | 除外理由 | 根拠事実 | 代替反映先候補 |
-|----------|---------|---------|--------------|
-| 問題クラス1（worktree junction） | 運用ルール | worktree 環境の標準運用（src/opencode/ 直接参照）・ヘルパー適用範囲の文書化であり、技術選定・設計判断を含まない | skill（agentdev-git-worktree） |
-| 問題クラス2（pull block） | command仕様・運用ルール | case-close Step 9 の手順追加・フォールバック手順の標準化であり、アーキテクチャ決定を含まない | command（case-close.md）, skill（agentdev-git-worktree） |
-| L-005（Write cp932） | 運用ルール | edit ツール優先ルールの文書化であり、技術判断を含まない | skill（agentdev-gh-cli）, AGENTS.md |
-| L-009（git mv 実行形式） | 運用ルール | workdir 指定フォールバック手順の文書化 | skill（agentdev-git-worktree） |
-| L-012（再 grep 確認） | 運用ルール | QG 検査項目拡充・運用徹底の文書化 | skill（agentdev-quality-gates, agentdev-doc-writing） |
-| L-014（関数削除スコープ） | 運用ルール | Issue 完了条件の書き方ガイド・TS 標準化の文書化 | skill（agentdev-workflow-templates）, command（case-run.md） |
+| 問題クラス | 除外理由 | 根拠事実 | 代替反映先候補 |
+|---|---|---|---|
+| PC-1 (PowerShell mojibake) | 運用ルール | encoding 設定の標準手順化・`-F` 使用ルール化であり技術判断不在 | agentdev-gh-cli skill, agentdev-conventional-commits |
+| PC-2 (--delete-branch worktree) | 運用ルール・command仕様 | `--delete-branch` 使用の副作用に対するガードレール追加 | case-close command, agentdev-gh-cli skill |
+| PC-3〜PC-8 | 運用ルール・command仕様 | 各々手続き・フォーマット・運用徹底の範疇 | 各 command/skill/spec |
+
+## 既存対策確認サマリ
+
+| 問題クラス | 既存対策 | ギャップ分類 | 詳細 |
+|---|---|---|---|
+| PC-1 | L-005（AGENTS.md, standard-procedures.md）は Write ツール経路のみカバー | fix gap | gh CLI stdout・git commit -m 経路は未カバー。verify.md に mojibake チェックなし |
+| PC-2 | case-close Step 4/7 は正しい順序を規定済み | guardrail insufficiency | `--delete-branch` 使用の副作用に対するガードレール不十分 |
+| PC-3 | 事前状態記載の粒度・更新タイミングに SPEC 規定なし | fix gap | 規定なし |
+| PC-4 | duty keyword 区切り文字規約なし（check_integrity.ts は中黒期待） | fix gap | 規約未明文化 |
+| PC-5 | REQ-0153 で再 grep 0 件確認は必須化済み | application miss | 規定は存在するが適用されていないケースあり |
+| PC-6 | backticks-identifier-threshold.md は gloss 形式を明示的に扱わない | fix gap | 判定規則未明文化 |
+| PC-7 | case_open_hints と完了条件の整合性チェック規定なし | fix gap | 規定なし |
+| PC-8 | case-open SPEC に既存 Issue AG 照合手順なし | fix gap | 規定なし |
