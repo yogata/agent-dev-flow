@@ -42,13 +42,13 @@ labels: bug
 
 <!-- テスト戦略: 各項目を verification（検証手順）/ pass_criteria（合格基準）/ on_failure（不合格時の処置）の3要素構造で記述 -->
 - id: TS-001
-  target_item: [検証対象]
-  verification: |
-    [検証手順]
-  pass_criteria: |
-    [合格基準]
-  on_failure: |
-    [不合格時の処置]
+ target_item: [検証対象]
+ verification: |
+ [検証手順]
+ pass_criteria: |
+ [合格基準]
+ on_failure: |
+ [不合格時の処置]
 
 ## 補足情報（オプション）
 <!-- 【任意】 -->

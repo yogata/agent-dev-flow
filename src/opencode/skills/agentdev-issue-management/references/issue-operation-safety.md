@@ -34,7 +34,10 @@ Issue番号を取得できない場合は作成失敗とみなし、再作成前
 
 Epic Issue 本文内のステータス追跡テーブル（総数、進行中、完了）を更新する場合、更新前後でテーブル構造と数値の整合性を保つ。
 
-**単一書き手制約**: Epic Issue 本文ステータス追跡テーブルの更新は **case-close のみ**が実施する。case-run は Epic Issue 本文を読み取るのみ（書き込まない）。case-auto は Wave 反復制御のみを行い、Epic Issue 本文に直接書き込まない。last-write-wins 競合防止は case-close の単一書き手で維持される。
+**単一書き手制約**: Epic Issue 本文ステータス追跡テーブルの更新は **case-close のみ**が実施する。
+case-run は Epic Issue 本文を読み取るのみ（書き込まない）。
+case-auto は Wave 反復制御のみを行い、Epic Issue 本文に直接書き込まない。
+last-write-wins 競合防止は case-close の単一書き手で維持される。
 
 1. Epic Issue の現状本文を安全な読み取り手順で取得し、ステータス追跡テーブルの行数、列数を記録する（更新前スナップショット）。
 
@@ -67,7 +70,8 @@ Issue 作成手続き/ Issue 本文更新手続き（agentdev-gh-cli）を使用
 本手順は `agentdev-gh-cli` の I/O 手続き、VERIFY 操作と連携する。
 
 
-1. `agentdev-gh-cli` の標準版実装（references/standard-procedures.md）に従い、本文の書き込みを行う。具体的なファイル書き出し、エンコーディング、フラグの扱いは `agentdev-gh-cli` が管理する。
+1. `agentdev-gh-cli` の標準版実装（references/standard-procedures.md）に従い、本文の書き込みを行う。
+具体的なファイル書き出し、エンコーディング、フラグの扱いは `agentdev-gh-cli` が管理する。
 
 2. Issue 作成手続き/ Issue 本文更新手続き（agentdev-gh-cli）を実行する。
 

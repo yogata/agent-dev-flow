@@ -1,6 +1,8 @@
 # 実行主体分類の査読
 
-> **原本**: 配置基準、用語政策は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md)「実行主体分類の査読基準」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。本ファイルは判定表、誤認パターン、検出チェックリストの運用ビューである。原本と内容が重複する場合は原本を優先する。
+> **原本**: 配置基準、用語政策は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md)「実行主体分類の査読基準」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+> 本ファイルは判定表、誤認パターン、検出チェックリストの運用ビューである。
+> 原本と内容が重複する場合は原本を優先する。
 
 ## 適用範囲
 

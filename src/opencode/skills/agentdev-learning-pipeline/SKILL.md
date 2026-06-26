@@ -28,7 +28,8 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 | evaluation-report.md | promote 内部で生成される境界成果物。毎回上書きされ長期履歴ではない。promote の分析フェーズで生成され、昇華判定フェーズの主入力として取り込みされる | 境界成果物。promote 内部の分析→昇華判定間の受け渡し専用。履歴蓄積は行わない | promote が生成（上書き）し、読み取り、取り込みする。capture は参照しない |
 | promoted/ | 採用済み成果物の staging 領域。生成された成果物は `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` に合流する。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止 | staging 専用。promote が生成し、backlog-review が取り込みする。pipeline 外への直接反映は不可 | promote が採用済み成果物を生成する。backlog-review が明示的に読み取る |
 
-**制約**: raw learning item を実行時コマンド/ skill の直接参照対象にしない。学びは昇華（promote → 採用済み成果物 → backlog-review → RU → req-define）を経て初めて command/ skill/ template/ AGENTS.md/ docs へ組み込まれる。
+**制約**: raw learning item を実行時コマンド/ skill の直接参照対象にしない。
+学びは昇華（promote → 採用済み成果物 → backlog-review → RU → req-define）を経て初めて command/ skill/ template/ AGENTS.md/ docs へ組み込まれる。
 
 ## 責任分界
 
@@ -196,9 +197,13 @@ learning-promote は除外した item について、evaluation-report に除外
 
 learning-promote が各クラスタに対して判定する廃棄カテゴリ。
 
-**昇華可能性評価、無条件自動REQ化禁止（REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。**無条件の自動REQ化は禁止する**。学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` の昇華経路を経て初めて REQ 化される。
+**昇華可能性評価、無条件自動REQ化禁止（REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。
+8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。
+**無条件の自動REQ化は禁止する**。
+学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` の昇華経路を経て初めて REQ 化される。
 
-**living pool 維持（REQ-0155-005）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `archive/active.md` の living pool で維持し、REQ 化しない。living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
+**living pool 維持（REQ-0155-005）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `archive/active.md` の living pool で維持し、REQ 化しない。
+living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
 
 | # | カテゴリ | 判定基準 |
 |---|---------|---------|
@@ -406,14 +411,14 @@ promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/re
 ### Archive 処理手順
 
 1. 成果物本文の末尾に `## 取り込み記録` セクションを追記:
-   ```markdown
-   ## 取り込み記録
+ ```markdown
+ ## 取り込み記録
 
-   - **Issue**: #{N}
-   - **PR**: #{M}
-   - **取り込み日**: YYYY-MM-DD
-   - **処理**: case-close
-   ```
+ - **Issue**: #{N}
+ - **PR**: #{M}
+ - **取り込み日**: YYYY-MM-DD
+ - **処理**: case-close
+ ```
 2. `promoted/archive/` ディレクトリに移動
 3. 同名ファイル既存時は上書きしない（警告のみ）
 

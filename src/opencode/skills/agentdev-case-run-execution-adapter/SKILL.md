@@ -37,18 +37,21 @@ Sisyphus-Junior は以下を順に実行する:
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。ulw-loop が Issue を success criteria に分解する
 2. **context 再確認**: ADR/ REQ/ SPEC/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する
-3. **実装、検証、PR 作成**: ulw-loop に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（agentdev-gh-cli）で PR を作成する。ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。実装完了後、Issue 本文の test strategy 項目の test-fix ループ（後述「test strategy 項目の test-fix ループ」）を実行する
+3. **実装、検証、PR 作成**: ulw-loop に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（agentdev-gh-cli）で PR を作成する。
+ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。
+実装完了後、Issue 本文の test strategy 項目の test-fix ループ（後述「test strategy 項目の test-fix ループ」）を実行する
 4. **blocker 処理**: 回答可能な blocker（ADR/REQ/SPEC/docs/Issue本文で回答できるもの）は自律的に ulw-loop 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
 
 ## test strategy 項目の test-fix ループ（REQ-0130-030）
 
-Sisyphus-Junior は実装完了後、Issue 本文のテスト戦略セクションに含まれる各 test strategy 項目（3要素構造: verification / pass_criteria / on_failure）について以下のループを実行する。全項目の処理が完了するまで反復する。
+Sisyphus-Junior は実装完了後、Issue 本文のテスト戦略セクションに含まれる各 test strategy 項目（3要素構造: verification / pass_criteria / on_failure）について以下のループを実行する。
+全項目の処理が完了するまで反復する。
 
 1. **項目ごとの検証**: 各 test strategy 項目の `verification` 手順に従い検証を実行し、`pass_criteria` を満たすか確認する
 2. **不合格時の処置**: 検証結果が `pass_criteria` を満たさない場合、当該項目の `on_failure` に従い以下いずれかを実行する:
-   - **fix-and-reverify（実装修正して再検証）**: 実装を修正し、当該項目の検証を再実行する。再検証で合格するまで修正と再検証を反復する
-   - **record-in-findings（Findings 記録）**: 実装修正で対応困難な場合（仕様上の制約、スコープ外の原因等）、当該項目を不合格理由とともに PR 本文の `## Findings / Capture候補` セクションに記録する
+ - **fix-and-reverify（実装修正して再検証）**: 実装を修正し、当該項目の検証を再実行する。再検証で合格するまで修正と再検証を反復する
+ - **record-in-findings（Findings 記録）**: 実装修正で対応困難な場合（仕様上の制約、スコープ外の原因等）、当該項目を不合格理由とともに PR 本文の `## Findings / Capture候補` セクションに記録する
 3. **全項目処理までの反復**: 未処理の test strategy 項目が残る場合、1〜2 を繰り返す。全項目が「合格」または「Findings 記録済み」のいずれかに分類されるまで反復を完了しない
 
 ## Result 契約（最小契約）
@@ -95,7 +98,8 @@ case-run から引き渡された worktree root（相対パス）配下でのみ
 | worktree root 以外のパス（メインリポジトリルート直下、他 worktree 等）でのファイル編集 | メインリポジトリでの作業を検知した場合は直ちに作業を停止し、`failed` として result を返却する。詳細本文は Issue コメントに SSoT として構造化して記録する |
 | メインリポジトリパスを引き渡し、使用すること | case-run は worktree root（相対パス）のみを引き渡す。Sisyphus-Junior は受け取った worktree root 配下でのみ作業する |
 
-**自己検証**: 実装作業開始前に `agentdev-git-worktree` の検証ヘルパー（`.opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「worktree 内判定ヘルパー」参照）で現在 worktree 内にいることを自己検証する。メインリポジトリにいると判定された場合は実装を開始せず `failed` として result を返却する。
+**自己検証**: 実装作業開始前に `agentdev-git-worktree` の検証ヘルパー（`.opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「worktree 内判定ヘルパー」参照）で現在 worktree 内にいることを自己検証する。
+メインリポジトリにいると判定された場合は実装を開始せず `failed` として result を返却する。
 
 ## Findings/ Capture 配置
 

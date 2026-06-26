@@ -1,6 +1,7 @@
 # 英語抽象語の検出→書き換えパターン
 
-> **原本**: 英語抽象語（`read-only`、`advisor`、`architecture-affecting` 等）の分解ルールは本ファイルが原本。一般的な執筆規範（LLM っぽい表現の禁止、空虚な形容、空虚な動詞等）は `japanese-tech-writing` スキル（AGENTS.md 経由）、用語政策（英字許容リスト、訳語表）は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md) を参照。
+> **原本**: 英語抽象語（`read-only`、`advisor`、`architecture-affecting` 等）の分解ルールは本ファイルが原本。
+> 一般的な執筆規範（LLM っぽい表現の禁止、空虚な形容、空虚な動詞等）は `japanese-tech-writing` スキル（AGENTS.md 経由）、用語政策（英字許容リスト、訳語表）は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md) を参照。
 
 ## 適用除外
 
@@ -17,11 +18,16 @@
 
 **Severity**: High
 
-**Detection pattern**: docs/ command/ skill 記述中に `read-only`、`advisor`、`advisory`、`architecture-affecting`、`Architecture advisory gate` 等の英語混じり抽象語が、文脈定義なしで残留している。これらの語は単独では「何を変更せず何を許可するか」「誰が判断するか」が特定できず、読者、実装者、検査者が解釈を分岐させる。
+**Detection pattern**: docs/ command/ skill 記述中に `read-only`、`advisor`、`advisory`、`architecture-affecting`、`Architecture advisory gate` 等の英語混じり抽象語が、文脈定義なしで残留している。
+これらの語は単独では「何を変更せず何を許可するか」「誰が判断するか」が特定できず、読者、実装者、検査者が解釈を分岐させる。
 
-**Why problematic**: 英語抽象語の機械的残置は文意を不明にする。`read-only` を「読み取り専用」と一律置換すると、実際には finding を生成し commit/push を行う診断コマンドの副作用境界が隠蔽される。`advisor` は誰が最終判断するかを曖昧にする。`architecture-affecting` は ADR 要否の判断主体を欠かせる（012, 013）。
+**Why problematic**: 英語抽象語の機械的残置は文意を不明にする。
+`read-only` を「読み取り専用」と一律置換すると、実際には finding を生成し commit/push を行う診断コマンドの副作用境界が隠蔽される。
+`advisor` は誰が最終判断するかを曖昧にする。
+`architecture-affecting` は ADR 要否の判断主体を欠かせる（012, 013）。
 
-**Rewrite rule**: 英語抽象語を検出した場合、文脈に応じて具体的な操作、責務、判断条件へ分解する。単なる語彙の置換ではなく、検出→書き換えのルールとして適用する。
+**Rewrite rule**: 英語抽象語を検出した場合、文脈に応じて具体的な操作、責務、判断条件へ分解する。
+単なる語彙の置換ではなく、検出→書き換えのルールとして適用する。
 
 ### 変換テーブル
 
@@ -59,7 +65,9 @@ docs 記述中に英語抽象語を検出した場合、以下の 6 項目を順
 > inspect-skills は read-only 診断コマンドである。
 
 **After**:
-> inspect-skills は検査対象（Command/Skill 定義ファイル）を直接修正しない診断コマンドである。許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成と、`.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ。最終判断（promote/ defer/ reject）は inspect-promote が行う。
+> inspect-skills は検査対象（Command/Skill 定義ファイル）を直接修正しない診断コマンドである。
+> 許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成と、`.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ。
+> 最終判断（promote/ defer/ reject）は inspect-promote が行う。
 
 **Before**:
 > アーキテクチャに影響する変更は advisor が確認する。
@@ -67,7 +75,8 @@ docs 記述中に英語抽象語を検出した場合、以下の 6 項目を順
 **After**:
 > ADR判断が必要な変更（アーキテクチャ判断を要する変更）については、アーキテクチャ助言エージェントが ADR 要否、推奨方向、設計リスク、根拠を返し、最終的な ADR 作成判断は親コマンド（req-define）が行う（ADR要否確認ゲート）。
 
-**Allowed exceptions**: 適用除外1〜4。固定識別子（YAML key、enum 値、Conventional Commits type、外部仕様名）として原語を維持する場合は、初出に日本語注記を付与すれば許容される。
+**Allowed exceptions**: 適用除外1〜4。
+固定識別子（YAML key、enum 値、Conventional Commits type、外部仕様名）として原語を維持する場合は、初出に日本語注記を付与すれば許容される。
 
 ---
 
