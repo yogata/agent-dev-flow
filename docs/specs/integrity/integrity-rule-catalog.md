@@ -51,205 +51,25 @@ updated: 2026-06-26
 
 - [IR-010: ADR status 正規化](rules/IR-010-adr-status-normalization.md)
 
-### IR-011: Mapping table 全件記録
+- [IR-011: Mapping table 全件記録](rules/IR-011-mapping-table-full-coverage.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-011 |
-| description | 全 廃止 REQ が mapping-table.md に記録されていること |
-| severity | strict |
-| category | document-drift |
-| detection_method | 廃止 REQ ファイル一覧と mapping-table の照合 |
-| affected_artifacts | [廃止 REQ, mapping-table] |
-| related_req | [REQ-0108-083-088] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低 |
-| regression_test | commands_structure.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | mapping-table にエントリ追加 |
-| last_verified | 2026-06-06 |
+- [IR-012: Template 必須セクション](rules/IR-012-template-required-sections.md)
 
-### IR-012: Template 必須セクション
+- [IR-013: 完了報告種別実在](rules/IR-013-variant-path-existence.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-012 |
-| description | Template ファイルに frontmatter と必須セクション（<!-- 【必須】 -->）が存在すること |
-| severity | strict |
-| category | document-drift |
-| detection_method | template ファイルの構造検証 |
-| affected_artifacts | [templates] |
-| related_req | [REQ-0108 (workflow template 構造)] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 低 |
-| regression_test | check_templates.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 必須セクションを追加 |
-| last_verified | 2026-06-06 |
+- [IR-014: reference/ 残存検出](rules/IR-014-singular-reference-dir-residual.md)
 
-### IR-013: 完了報告種別実在
+- [IR-015: 廃止 REQ 現行参照検出](rules/IR-015-retired-req-current-ref-detection.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-013 |
-| description | Command 定義が参照する種別パス（variant path）が templates/ に実在すること |
-| severity | strict |
-| category | broken-reference |
-| detection_method | command 本文から種別パス（variant path）抽出 → 存在確認 |
-| affected_artifacts | [commands, templates] |
-| related_req | [REQ-0108-089-091] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 低 |
-| regression_test | commands_structure.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 種別（variant）を作成または参照を修正 |
-| last_verified | 2026-06-06 |
+- [IR-016: Source/projection 整合性](rules/IR-016-source-projection-integrity.md)
 
-### IR-014: reference/ 残存検出
+- [IR-017: DOC-MAP ↔ 実体整合性](rules/IR-017-docmap-actual-consistency.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-014 |
-| description | .opencode/skills/**/reference/ (単数形) ディレクトリが残存していないこと |
-| severity | strict |
-| category | obsolete-structure |
-| detection_method | glob で reference/ ディレクトリ検索 |
-| affected_artifacts | [skills] |
-| related_req | [REQ-0103-013, 039, REQ-0108-039, 040, 094] |
-| related_spec | [artifact-responsibilities.md] |
-| gate_level | full-audit |
-| false_positive_risk | なし |
-| regression_test | lint_skills.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | reference/ を references/ にリネーム |
-| last_verified | 2026-06-06 |
+- [IR-018: REQ 範囲表記鮮度](rules/IR-018-req-range-notation-freshness.md)
 
-### IR-015: 廃止 REQ 現行参照検出
+- [IR-019: Guide 要件定義、契約記述検出](rules/IR-019-guide-req-contract-content-detection.md)
 
-| Field | Value |
-|-------|-------|
-| rule_id | IR-015 |
-| description | 廃止 REQ が現行要件判断の第一参照として案内されていないこと |
-| severity | heuristic |
-| category | canonical-conflict |
-| detection_method | 現行 docs 内の 廃止 REQ 参照検出、コンテキスト判定 |
-| affected_artifacts | [REQ, SPEC, guides] |
-| related_req | [REQ-0108-070-074, 136] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。mapping-table 等の履歴参照は除外 |
-| regression_test | commands_e2e.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 参照に [retired] 注記を追加 |
-| last_verified | 2026-06-06 |
-
-### IR-016: Source/projection 整合性
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-016 |
-| description | src/opencode/ と .opencode/ (projection) の間に divergence がないこと |
-| severity | strict |
-| category | canonical-conflict |
-| detection_method | sync-opencode.ps1 -Mode check 相当の比較 |
-| affected_artifacts | [commands, skills, templates] |
-| related_req | [REQ-0103-048-052, REQ-0108-143-144] |
-| related_spec | [system.md] |
-| gate_level | full-audit, delta-guard |
-| false_positive_risk | 低。ジャンクション（junction）破損は確実な NG |
-| regression_test | (sync script で検証) |
-| baseline_status | known |
-| finding_route | intake |
-| triage_action | sync-opencode.ps1 -Mode apply を実行 |
-| last_verified | 2026-06-06 |
-
-### IR-017: DOC-MAP ↔ 実体整合性
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-017 |
-| description | DOC-MAP が参照するファイルが存在すること |
-| severity | strict |
-| category | broken-reference |
-| detection_method | DOC-MAP 内のリンク抽出 → 存在確認 |
-| affected_artifacts | [DOC-MAP] |
-| related_req | [REQ-0108-003] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 低 |
-| regression_test | check_integrity.test.ts |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | DOC-MAP エントリを更新 |
-| last_verified | 2026-06-06 |
-
-### IR-018: REQ 範囲表記鮮度
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-018 |
-| description | AGENTS.md、SPEC、guides の REQ 範囲表記が実際の 現行 REQ 数と一致すること |
-| severity | heuristic |
-| category | document-drift |
-| detection_method | N件、through 等の表記と glob 結果の照合 |
-| affected_artifacts | [AGENTS.md, SPEC, guides] |
-| related_req | [REQ-0108-140] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。表記揺れの判定に注意 |
-| regression_test | (手動確認) |
-| baseline_status | resolved |
-| finding_route | intake |
-| triage_action | 表記を実際の REQ 数に更新 |
-| last_verified | 2026-06-06 |
-
-### IR-019: Guide 要件定義、契約記述検出
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-019 |
-| description | Guide ファイルが要件本文または契約本文を保持していないこと（REQ-0101）。語彙ベースの検出ではなく、guide が REQ/ADR/SPEC の責務を侵害する内容を保持していないかを検査する |
-| severity | heuristic |
-| category | canonical-conflict |
-| detection_method | Guide 内の要件定義表、契約記述、REQ 相当の振る舞い定義の検出。語彙ベースの判定ではなく構造的判定を主とし、強制条件表現は補助シグナル |
-| affected_artifacts | [guides] |
-| related_req | [REQ-0108-138, REQ-0101] |
-| related_spec | [document-model.md] |
-| gate_level | full-audit |
-| false_positive_risk | 中。引用、メタ文の除外に注意 |
-| regression_test | (手動確認) |
-| baseline_status | resolved |
-| finding_route | intake+learning |
-| triage_action | guide から要件本文、契約本文を削除し、REQ/ADR/SPEC への参照に置き換える |
-| last_verified | 2026-06-06 |
-
-### IR-020: 基準既知（baseline-known）と新規 finding の区別
-
-| Field | Value |
-|-------|-------|
-| rule_id | IR-020 |
-| description | 基準（`.agentdev/integrity/baseline.json`）に記録された known finding と新規 finding が区別されていること |
-| severity | heuristic |
-| category | integrity-rule-gap |
-| detection_method | baseline.json の known_findings と現行 finding の比較 |
-| affected_artifacts | [baseline, integrity reports] |
-| related_req | [REQ-0108-145, 148] |
-| related_spec | [integrity-contracts.md] |
-| gate_level | full-audit, impact-guard |
-| false_positive_risk | 中。基準（baseline）の陳腐化判定に注意 |
-| regression_test | (手動確認) |
-| baseline_status | resolved |
-| finding_route | none |
-| triage_action | 基準（baseline）を更新 |
-| last_verified | 2026-06-06 |
+- [IR-020: 基準既知（baseline-known）と新規 finding の区別](rules/IR-020-baseline-known-vs-new-finding.md)
 
 ### IR-021: 廃止済み skill 参照検出
 
