@@ -43,7 +43,7 @@ updated: 2026-06-22
 
 - Step 1: 実行前同期（`git pull --ff-only`）
 - Step 2: 成果物検出（引数有無切り替え（引数あり: 指定ファイルのみ / 引数なし: `promoted/` 全件））
-- Step 3: 成果物読込、分析 + 暫定分類付与（`agentdev-backlog-integration` 参照）。暫定分類は `docs/specs/foundations/document-model.md` の文書7分類モデルを参照して付与し、RU frontmatter `tentative_classification` に記録する（REQ-0155-004）。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本コマンドが確定しない
+- Step 3: 成果物読込、分析 + 暫定分類付与（`agentdev-backlog-integration` 参照）。暫定分類は `docs/specs/foundations/document-model.md` の文書7分類モデルを参照して付与し、RU frontmatter `tentative_classification` に記録する（REQ-0155-004）。`tentative_classification` の許容値、7値以外入力時・フィールド欠落時の取り扱いは REQ-0155-008、後述「tentative_classification フィールド仕様」に定める。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本コマンドが確定しない
 - Step 4: 統合分割判定 + depends_on 依存解決 + ユーザー承認（判断の確定、REQ-0147-003）（`agentdev-backlog-integration` 参照）
 - Step 5: 矛盾検出（矛盾検出時のみ追加判断を求める（REQ-0147-009））。矛盾なしの場合、Step 4 の統合、分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない（G05）
 - Step 6: RU 生成（採用済み成果物の単純コピー（パススルー）は禁止（G03、REQ-0105））
