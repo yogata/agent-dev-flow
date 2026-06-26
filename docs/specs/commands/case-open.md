@@ -70,7 +70,7 @@ Epic + 子 Issue 一括作成に対応する。
 - [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic / Wave / Issue 階層、子Issue 状態 enum、case-open 構成生成基準）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（RU 削除トリガー、draft lifecycle）
 - [quality-gates.md](../quality-gates.md)（QG-2）
-- [document-type-responsibilities.md](../document-type-responsibilities.md)（Issue 本文品質検査）
+- [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（Issue 本文品質検査）
 
 ## 対象外
 

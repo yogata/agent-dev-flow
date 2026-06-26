@@ -73,7 +73,7 @@ req-save の次、case-open の前に実行する。
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、コマンド分類）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（artifact_actions 工程分岐、DOC-MAP 影響規則）
 - [quality-gates.md](../quality-gates.md)（SPEC lifecycle 連携（QG-4 で accepted 昇格））
-- [document-type-responsibilities.md](../document-type-responsibilities.md)（SPEC body 品質検査）
+- [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（SPEC body 品質検査）
 - [req-health-metrics.md](../req-health-metrics.md)（SPEC 分離基準との連携）
 
 ## 対象外
