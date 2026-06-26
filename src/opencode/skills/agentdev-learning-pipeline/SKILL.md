@@ -196,6 +196,10 @@ learning-promote は除外した item について、evaluation-report に除外
 
 learning-promote が各クラスタに対して判定する廃棄カテゴリ。
 
+**昇華可能性評価、無条件自動REQ化禁止（REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。**無条件の自動REQ化は禁止する**。学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` の昇華経路を経て初めて REQ 化される。
+
+**living pool 維持（REQ-0155-005）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `archive/active.md` の living pool で維持し、REQ 化しない。living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
+
 | # | カテゴリ | 判定基準 |
 |---|---------|---------|
 | 1 | 既存 command へ反映 | 既存コマンドのステップ、ガードレール、エラーハンドリングに追加すべき手順、制約 |
@@ -205,9 +209,9 @@ learning-promote が各クラスタに対して判定する廃棄カテゴリ。
 | 5 | template 反映 | ドキュメント、Issue、PR等のテンプレート形式に反映すべきフォーマット知見 |
 | 6 | ADR 候補 | アーキテクチャに関する設計判断、技術選定の理由を記録すべき内容 |
 | 7 | spec 候補 | システム仕様、実装パターン、設計原則として docs/specs/ に反映すべき内容 |
-| 8 | REQ 候補 | 要件変更、機能追加の要因となる知見、既存REQの更新が必要な内容 |
+| 8 | REQ 候補 | 要件変更、機能追加の要因となる知見、既存REQの更新が必要な内容。**自動REQ化ではなく候補扱い**（REQ-0155-005）。確定は `/agentdev/req-define` → `/agentdev/req-save` 経路で行う |
 | 9 | project-local knowledge | プロジェクト固有の落とし穴、環境依存の知見、汎用化が難しい内容 |
-| 10 | deferred | まだ昇華の余地がない、情報が断片的、出現回数が少ない |
+| 10 | deferred | まだ昇華の余地がない、情報が断片的、出現回数が少ない。**living pool（`archive/active.md`）で維持し REQ 化しない**（REQ-0155-005） |
 | 11 | rejected | ユーザーが明示的に却下、すでに別の対策で十分対応済み |
 | + | duplicate | 既存の command/skill/template/docs で既に同等の内容が十分にカバーされている |
 

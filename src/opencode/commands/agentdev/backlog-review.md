@@ -32,6 +32,7 @@ generated_by: backlog-review
 generated_at: {ISO 8601 timestamp}
 status: draft
   depends_on: [RU-{NNNN}] (optional)
+  tentative_classification: {REQ | 挙動SPEC | カタログSPEC | guide | learning維持 | 作業記録 | 対象外} (REQ-0155-004)
   sources:
   - path: {.agentdev/intake/promoted/xxx.md | .agentdev/learning/promoted/xxx.md | .agentdev/inspect/promoted/xxx.md}
     type: {intake | learning | inspect}
@@ -75,9 +76,11 @@ status: draft
 - **0件**: 正常終了（エラー扱いとしない）。完了報告で「対象なし」と報告
 - **1件以上**: ファイルパス昇順で Step 3 へ
 
-### Step 3: 成果物読み込み、分析
+### Step 3: 成果物読み込み、分析 + 暫定分類付与
 
 分析基準、前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` を参照
+
+**暫定分類付与（REQ-0155-004）**: 各 RU 候補について、`docs/specs/document-model.md` の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。暫定分類は後続 `/agentdev/req-define` の Step 5-2 で最終確定される候補であり、本コマンドが確定しない。分析結果と併せて RU frontmatter に `tentative_classification` として記録する。
 
 ### Step 4: 統合、分割判定 + depends_on 依存解決 + ユーザー承認
 
