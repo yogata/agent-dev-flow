@@ -260,6 +260,25 @@ docs-check の機械化原則徹底（REQ-0108-056/254/261/262）に基づき、
 
 これらは retired 配下でのみ実在が確認済みであり、現行 docs での誤使用リスクが解消されたため検出対象から除外した。新規検出時の復活運用（REQ-0145-003）に従い、現行 docs で再出現した場合は検出パターンを復活させる。
 
+## integrity rule カタログ英語普通名詞（正規使用）
+
+integrity-rule-catalog.md および rules/ 配下で使用される英語普通名詞。IR-044（英字普通名詞 drift）の検出対象外（正規使用許可）（RU-0007）。
+
+| 英語普通名詞 | 用途 | 備考 |
+|------------|------|------|
+| `finding` | 検出事項 | inspect-docs/inspect-skills の検出結果単位 |
+| `drift` | 文書の drift | REQ/SPEC の不一致、陳腐化 |
+| `regression` | 回帰 | regression test、回帰検出 |
+| `gate` | 品質ゲート | QG-1〜QG-4、gate level |
+| `severity` | 重要度 | strict / heuristic / observation |
+| `category` | カテゴリ | IR の分類 |
+| `schema` | スキーマ | IR のフィールド定義 |
+| `observation` | 観察 | severity の1つ |
+| `baseline` | 基準 | baseline_status |
+| `provider` | 提供者 | 外部エージェント提供者 |
+| `variant` | バリアント | テンプレートのバリアント |
+| `fixture` | フィクスチャ | テスト fixture |
+
 ## メンテナンス
 
 - 新規語彙の追加・旧語彙の変更は docs-check（/repo/docs-check）の検出パターンと同期すること
