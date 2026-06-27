@@ -4,8 +4,18 @@ status: accepted
 
 # ルール所有権マトリックス
 
-各ルールドメインと責任 REQ/SPEC の対応を示す（REQ-0103-058）。
-12 以上のルールドメインをカバーする。
+> **位置づけ**: 本ファイルは全ドメイン（foundations/responsibilities/quality/integrity/local/authoring）横断のルール所有権マトリックスである。
+> `integrity/` 配下に配置するが `integrity` ドメイン専用ではなく、全ルールドメインの canonical REQ/SPEC 対応を示すメタファイルとして機能する。
+
+## req-impact-map.md との関係
+
+本ファイル（ルールドメイン → canonical REQ/SPEC）と `../responsibilities/req-impact-map.md`（REQ → 影響するルール/アーティファクト）は逆方向の対応マップである。両者の整合性維持運用:
+
+- 新規 IR 追加時: 両ファイルの対応行列を同期更新する
+- IR の `baseline_status` 変更時（new / resolved 等）: 両ファイルで整合を確認する
+- canonical owner 変更時: 両ファイルで参照先を更新する
+
+req-impact-map.md の配置移動は Phase 1 の対象外とし、本節では関係整理のみを扱う。
 
 ## ルールドメイン一覧
 

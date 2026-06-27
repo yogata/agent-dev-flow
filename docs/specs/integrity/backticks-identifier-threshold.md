@@ -2,7 +2,7 @@
 title: "backticks 識別子/一般名詞 判定閾値"
 status: accepted
 created: 2026-06-25
-updated: 2026-06-25
+updated: 2026-06-27
 ---
 
 # backticks 識別子/一般名詞 判定閾値
@@ -41,6 +41,7 @@ runtime-package-boundary.md「5 種のリポジトリ種別」表の Type ID 列
 
 ## 関連
 
-- 用語政策 SSoT: `docs/specs/responsibilities/document-type-responsibilities.md`
-- 機械判定アルゴリズム: `src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md`
-- 良パターン基準: `docs/specs/local/runtime-package-boundary.md`「5 種のリポジトリ種別」Type ID 列
+- **用語政策 SSoT**: `../responsibilities/document-type-responsibilities.md`
+  - 本 SPEC は `document-type-responsibilities.md`「識別子と散文普通名詞の区別」節を機械判定レベルで補完する。用語政策の意図・許容リストは `document-type-responsibilities.md` を SSoT とし、本 SPEC は「どの語句が識別子（backticks必須）でどの語句が一般名詞（backticks任意）か」の機械判定条件のみを定義する。
+- **機械判定アルゴリズム**: `../../../src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md`
+- **良パターン基準**: `../local/runtime-package-boundary.md`「5 種のリポジトリ種別」Type ID 列

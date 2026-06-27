@@ -76,7 +76,9 @@ SPEC は 3 層構造を持つ（commands / skills / workflows）。詳細は [SP
 - [command SPEC 一覧](specs/commands/) — 各 `/agentdev/*` コマンド専用 SPEC（`_template.md` 含む）
 - [skill SPEC 一覧](specs/skills/) — 各 `agentdev-*` スキル専用 SPEC（`_template.md` 含む）
 
-### 基盤 SPEC（`specs/` 直下）
+### 基盤 SPEC（`specs/{foundations,responsibilities,quality,integrity,local,authoring}/`）
+
+基盤 SPEC は REQ-0156 に基づき6ドメインへ整理済み。各ドメインの責務は [document-model.md](specs/foundations/document-model.md)「docs/specs/ 直下のドメイン別体系化」参照。
 
 - [システム仕様](specs/foundations/system.md)
 - [文書フォーマット規約](specs/foundations/patterns.md)

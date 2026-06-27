@@ -10,6 +10,18 @@ status: accepted
 
 REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスを定義し、各文書種別が何を記述し、何を記述しないかを明確にする（REQ-0101）。
 
+### 他 SPEC との役割分担
+
+本 SPEC と `../responsibilities/document-type-responsibilities.md` は補完関係にある。重複しやすい関心を以下の通り分担する。
+
+| 関心 | 主に扱う SPEC |
+|---|---|
+| 文書種別の基準境界（REQ/ADR/SPEC/guides/DOC-MAP の役割定義、ライフサイクル、優先順位、参照規則、投影方向） | 本 SPEC |
+| SPEC 内部5論理区分、文書7分類、局所物理分離、docs/specs/ 直下のドメイン別体系化規範 | 本 SPEC |
+| 文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策 | `../responsibilities/document-type-responsibilities.md` |
+
+両 SPEC の境界を変更する場合は、相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
+
 ## 責務マトリックス
 
 | 文書種別 | 記述するもの | 記述しないもの |
