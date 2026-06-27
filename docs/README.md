@@ -38,7 +38,7 @@
 | [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 |
 | [REQ-0139](requirements/REQ-0139.md) | 外部エージェント統合契約 |
 | [REQ-0140](requirements/REQ-0140.md) | 文書品質ゲート |
-| [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 生成方式とローカルCaseファイル運用 |
+| [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 導入方式とローカルCaseファイル運用 |
 | [REQ-0142](requirements/REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 |
 | [REQ-0143](requirements/REQ-0143.md) | Command 定義ファイルフォーマット標準化 |
 | [REQ-0144](requirements/REQ-0144.md) | docs-check/integrity 運用是正 |
