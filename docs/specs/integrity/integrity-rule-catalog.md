@@ -1,5 +1,6 @@
 ---
 updated: 2026-06-26
+status: accepted
 ---
 
 # 整合性ルールカタログ

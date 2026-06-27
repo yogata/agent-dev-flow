@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # 文書モデル
 
 本 SPEC は agent-dev-flow リポジトリのみに適用される。

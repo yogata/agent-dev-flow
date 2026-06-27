@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # 整合性契約
 
 本 SPEC は agent-dev-flow リポジトリのみに適用される。
