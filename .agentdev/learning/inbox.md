@@ -52,3 +52,19 @@
 - **想定反映先**: SPEC `docs/specs/commands/case-run.md`（PR 作成要否判定）、SPEC `docs/specs/commands/case-close.md` Step E3/E4（PR なしクローズ手順）、SPEC `docs/specs/commands/spec-save.md`（commit 直接適用時の case-run 連携）、REQ-0130、REQ-0131。
 - **関連**: Epic #1301、子Issue #1302〜#1307、SPEC 変更 main commit 7f9e3472。実行日時 2026-06-27。
 - **タグ**: `#case-run` `#spec-save` `#docs-chore` `#edge-case` `#boundary` `#pr-less-close`
+
+## 学び: case-close Epic Wave クローズ手順中の SPEC 昇格編集が origin/main 進行後に行われることによる working tree 衝突
+
+- **問題事象**: Epic Wave クローズ（Step E1-E6）の実行中、Step 3-2 SPEC 昇格（`draft → accepted`）の frontmatter 編集を Step 9（`git pull --ff-only`）の前に行ったところ、ローカル main の3ファイルが dirty 状態となり `git pull --ff-only` がブロックされた。ローカル main は origin/main より3コミット（4子Issue の squash merge）遅れており、編集した SPEC ファイルのうち `document-type-responsibilities.md` は Phase B（PR #1316）で変更されていたため、pull の fast-forward が working tree 変更により失敗した。
+- **発生局面**: case-close Epic Wave クローズ（Step E4 / Step 3-2 SPEC 昇格編集 → Step 9 git pull の順序）
+- **検知方法**: `git pull --ff-only` 実行時のエラーメッセージ「Your local changes to the following files would be overwritten by merge」により検知。
+- **根本原因**: case-close の手順順序で Step 3-2（SPEC 昇格）が Step 9（git pull --ff-only）より前段に位置するが、Epic Wave クローズでは Step E4 で複数 PR をマージした直後に Step 3-2 を実行するとローカル main が古いまま編集を加える形になる。単一 Issue クローズでは PR マージが1回のみで working tree の編集衝突が起きにくいが、Wave クローズではマージ回数が増えるほど差分が蓄積し衝突可能性が高まる。
+- **自律対応内容**: `git stash push -- <明示パス3件>` で SPEC 編集を退避 → `git pull --ff-only` で fast-forward → 退避した SPEC 編集を破棾し、pull 済みの最新内容へ編集を再適用（frontmatter は draft のまま維持されていたため昇格編集はそのまま有効）。これにより pull と SPEC 昇格を両立させた。
+- **ユーザー確認有無**: なし。
+- **ADR/REQ/spec影響**: あり。case-close SPEC（`docs/specs/commands/case-close.md`）の Step 3-2 と Step 9 の順序依存性、または Step E4 と Step 3-2 の実行順序に関する明示が必要。Step 9 を先に実行してから Step 3-2 を行う順序、または SPEC 昇格を `.agentdev/` commit と同時に最終ステージで行う順序が安全。
+- **横展開観点**: 単一 Issue クローズでも PR マージ後の `git pull` 前にローカル編集を行う全ケース。特に docs/specs/ 配下の SPEC を直接編集する工程（case-close Step 3-2 以外にも spec-save、case-update 等）で同様のリスクあり。
+- **再発条件**: (a) Epic Wave クローズで複数 PR を連続マージした後に SPEC 昇格編集を行う、(b) 単一クローズでも PR マージと git pull の間に docs/specs/ 配下ファイルを編集する、(c) PR が編集対象 SPEC と同一ファイルを変更している。
+- **予防策候補**: (a) Step 3-2 SPEC 昇格を Step 9（git pull）の後に実行する順序に変更する、(b) Epic Wave クローズ Step E4 完了直後に Step 9 を実行し、その後に Step 3-2 / E5 / E6 を行う順序にする、(c) Step 3-2 編集前に必ず `git status` と `git fetch` を実行し origin/main との差分を確認する。
+- **想定反映先**: SPEC `docs/specs/commands/case-close.md` Step 3-2、同 Step 9、同 Step E4-E6 の順序依存性、agentdev-git-worktree skill の references/git-common-procedures.md。
+- **関連**: Epic #1308 Wave 1 クローズ（PR #1313/#1314/#1315/#1316）。実行日時 2026-06-28。
+- **タグ**: `#case-close` `#epic-wave-close` `#spec-elevation` `#git-pull` `#working-tree` `#ordering`
