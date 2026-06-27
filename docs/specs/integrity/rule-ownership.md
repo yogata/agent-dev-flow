@@ -15,8 +15,9 @@ updated: 2026-06-28
 - 新規 IR 追加時: 両ファイルの対応行列を同期更新する
 - IR の `baseline_status` 変更時（new / resolved 等）: 両ファイルで整合を確認する
 - canonical owner 変更時: 両ファイルで参照先を更新する
+- 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、`req-impact-map.md` で影響先ルールドメインの整合を確認する
 
-req-impact-map.md の配置移動は Phase 1 の対象外とし、本節では関係整理のみを扱う。
+req-impact-map.md の配置移動は未確定事項とし、参照方向、利用頻度、更新責務を確認した後に別途判断する。本節では関係整理のみを扱い、`responsibilities/` 残置を維持する。
 
 ## ルールドメイン一覧
 
