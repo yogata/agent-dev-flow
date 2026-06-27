@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-25
+updated: 2026-06-28
 ---
 
 # case-auto SPEC
@@ -41,22 +41,38 @@ updated: 2026-06-25
  - artifact_actions ベース分岐: `artifact: req` or `artifact: adr` → req-save / `artifact: spec` → spec-save（req-save の後）/ 常に → case-open / その後 → case-run → case-close
  - spec-save 実行判定（ADR-0123 Decision #3, REQ-0136-014）（req-save 完了後に `artifact: spec` entry 確認）
  - auto_gate preflight（`auto_gate.auto_ready` が false または未解決 item 残る場合は停止）
-- Step 4: 各工程の実行（req-save と spec-save は1つの task で順次実行（AG-005 統合）、case-open / case-run / case-close は各コマンド委譲契約に従い task() で起動（ADR-0127, REQ-0114-006/084/085））
- - req-save / spec-save 統合 task（AG-005）: req-save と spec-save を1つの task で順次実行。task 内では両コマンドの定義を順次読み込み、draft を1回読み込み、req-save の手順を実行後、引き続き spec-save の手順を実行する。commit/push は1回に統合（REQ + SPEC の変更を1コミット）。各コマンドの権限（ファイル操作範囲）は task に両方のガードレールを適用。req-save/spec-save のコマンド定義、責務、ガードレールは変更しない（統合は case-auto の実行制御レイヤーのみ）
- - 工程別委譲契約（ADR-0112 §5、ADR-0127）: 各工程の起動方式、inputs、output_contract は工程別委譲契約表参照
- - 品質ゲート（QG-1〜QG-4）の継承（case-auto は QG を独自実装せず、構成コマンドが各自適用）
- - case-run の実行担当サブエージェント委譲モデル（case-auto は変更せず）
- - Standard flow（単一 Issue）: case-open task() 完了後、クリーンアップ検証ゲート実行 → case-run → case-close
- - Epic Issue flow（マルチREQ or 単一REQ Epic flow）: case-open task() 完了後、クリーンアップ検証ゲート → Step 4-1 Wave 反復制御
- - Step 4-1 Wave 反復制御（case-run #epic → case-close #epic の反復、ADR-0128 Decision #5, REQ-0114-084）（task()→case-run(#epic) → task()→case-close(#epic) → 次 Wave 判定 → 全 Wave 完了で Epic 完了報告 / 残 Wave ありで Step 1 へ戻る（べき等））。複数 execution_unit 並列実行時は、この反復制御を execution_unit 群反復制御へ一般化する（REQ-0148-012、後述「複数 execution_unit 並列 orchestration」セクション参照）
- - blocked / failed の扱い: case-close 対象外。一部 completed(pr) の場合は completed(pr) のみ case-close(#epic) で処理。全 blocked/failed で Wave 反復停止、部分完了報告。複数 execution_unit 並列実行時は blocked になった execution_unit のみ停止し、他の ready 対象は継続する（REQ-0148-015）
- - OU 逐次処理: 1 OU（Epic 全 Wave 完了）を close まで完了後に次 OU へ進む（REQ-0114-053）。必須依存のない execution_unit 群は並列実行されるため、逐次処理は必須依存で結合した execution_unit 群に適用される
- - クリーンアップ検証ゲート（REQ-0114-060〜063, REQ-0137-007）（ドラフトファイル、RU ファイルの残存がないことを検証）。Standard / Epic Issue flow 双方で実施
+- Step 4: 各工程の実行（task() 委譲が基本、委譲失敗時にインラインフォールバック（ADR-0127 例外））
+ - 通常時: 各工程を task() で起動（ADR-0127, REQ-0114-006/084/085）。req-save / spec-save 統合 task（AG-005）で順次実行、case-open / case-run / case-close は各コマンド委譲契約に従い task() で起動
+ - フォールバック時（委譲失敗検知時）: 当該工程をインライン実行へ切替。詳細は「フォールバックモデル」セクション参照
+- Step 4-0: フォールバック判定（各工程の task() 起動後または起動失敗時）
+ - task() 起動失敗（ツール不在、ハードリジェクト）→ インラインフォールバックへ
+ - task() 結果が blocked/failed → 理由を確認: 委譲 chain 破綾ならインラインフォールバックへ、genuine blocker なら Step 7 停止条件として扱う
+ - フォールバック判定時、compress で直前工程のコンテキストを圧縮してからインライン実行へ移行
 - Step 5: 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
 - Step 6: 複数REQ対応（req-save task() の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）。case-auto 自体に Issue 階層決定ロジックを持たない
-- Step 7: 停止条件の検出（停止時タイミング情報の追記（開始時刻、停止時刻、経過時間、REQ-0114-083））。10項目の停止条件いずれかを検出時、実行停止、停止理由、現在地点、再開可能な次コマンドを報告。停止条件「merge 競合」（REQ-0114-016(8)）は「アクセス可能な文脈を総動員しても解消不能なコンフリクト」に段階化済み（REQ-0151-006、後述「コンフリクト解消モデル」参照）。機械的競合（rebase で自動解決可能）は停止条件に含まない
-- Step 8: 完了報告（最終工程（case-close task()）の完了報告をそのまま出力）。タイミング情報追記（開始時刻、終了時刻、所要時間、REQ-0114-083）
+- Step 7: 停止条件の検出（停止時タイミング情報の追記（開始時刻、停止時刻、経過時間、REQ-0114-083））。10項目の停止条件いずれかを検出時、実行停止、停止理由、現在地点、再開可能な次コマンドを報告
+- Step 8: 完了報告（最終工程の完了報告をそのまま出力）。タイミング情報追記（開始時刻、終了時刻、所要時間、REQ-0114-083）。フォールバック発動の有無と compress 使用状況を記録
 - Step 8-1: Standard flow 逐次OU処理ループ（case-close task() 完了後、未処理 OU が残存する場合は次 OU の処理を自動開始（REQ-0114-065〜067））
+
+### フォールバックモデル（ADR-0127 例外）
+
+各工程の task() 委譲が失敗した場合、case-auto は当該工程をインライン実行へフォールバックする。
+
+フォールバックトリガー:
+1. task() 起動失敗（ツール不在、ハードリジェクト、agent type 拒否）
+2. task() 結果が blocked/failed で、理由が委譲 chain 破綾（Sisyphus-Junior 起動失敗、ネスト委譲制限等）
+
+※ genuine blocker（実装上の問題、スコープ外操作、コンフリクト解消不能等）はフォールバック対象外。Step 7 停止条件として扱う。
+
+工程別のインライン実行方式:
+- req-save / spec-save / case-open / case-close: case-auto がコマンド定義を読み込み手順を自ら実行。各コマンドのガードレール、品質ゲート（QG-1〜QG-4）を適用。
+- case-run（単一 Issue / Epic Wave）: case-auto が case-run Step 1-5, 7-8 を実行。Step 6 は case-auto から直接 Sisyphus-Junior へ task() 委譲（委譲起点の折りたたみ）。adapter protocol の委譲契約、result 契約は維持。
+
+コンテキスト管理:
+- フォールバック発動時に compress で直前工程のコンテキストを圧縮
+- 各工程インライン実行完了後、次工程へ進む前に compress で調査過程・中間ログを圧縮、完了結果のみ保持
+- REQ-0114-073（親コンテキスト非累積）はフォールバック時の例外
+- フォールバック発動と compress 使用を完了報告（Step 8）に記録
 
 ## 参照する横断 SPEC
 
@@ -70,7 +86,7 @@ updated: 2026-06-25
 - DB migration実行、deploy/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更、repo 外実データ操作、通知送信（G02）
 - migrationファイル、IaCファイルの作成、修正以外の migration実行、IaC apply（G03）
 - remote branch 削除で当該 case-auto / case-run が作成した branch 以外の対象（G05）
-- 各工程のインライン実行（G07、task() 起動必須、ADR-0127, REQ-0114-006/073/084）
+- 各工程のインライン実行は通常時対象外（G07、task() 起動必須、ADR-0127, REQ-0114-006/073/084）。委譲失敗時（task() 起動失敗、blocked/failed 結果のうち委譲 chain 破綾）のフォールバックとしてのインライン実行は例外として許可（ADR-0127 フォールバック例外、compress でコンテキスト管理）
 - 既存 req-save / spec-save / case-open / case-run / case-close の責務変更（G09、task() 委譲は起動方式変更のみ）
 - source path の実行時パス読み替え（G11）
 - Issue 階層決定ロジックの独自保持（G13、case-open に委譲）
