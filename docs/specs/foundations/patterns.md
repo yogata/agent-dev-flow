@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # 文書フォーマット規約
 
 ## コマンド frontmatter 規約

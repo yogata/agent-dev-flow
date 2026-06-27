@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # 品質仕様
 
 AgentDevFlow の品質基準、検証ルールを定義する。

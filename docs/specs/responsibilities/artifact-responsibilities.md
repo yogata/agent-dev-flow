@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # 成果物責任表
 
 各成果物種別の原本所有者（`canonical owner`）と責務を定義する（REQ-0103-057）。

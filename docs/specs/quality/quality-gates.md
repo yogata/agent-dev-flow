@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # 品質ゲート
 
 AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-0108）。

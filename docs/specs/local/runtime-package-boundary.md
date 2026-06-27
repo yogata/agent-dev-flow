@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # 実行時パッケージ境界
 
 > **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（ADR-0103）。
