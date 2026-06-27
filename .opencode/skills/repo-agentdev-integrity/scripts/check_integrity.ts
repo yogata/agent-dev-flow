@@ -6115,6 +6115,22 @@ const IR044_SIGNAL_PATTERNS: ReadonlyArray<{ signal: string; pattern: RegExp }> 
     },
   ];
 
+// REQ-0145-013: 件数・内容規定検出。予防的ガード句の判定根拠。
+function hasCountOrContentRule(line: string): boolean {
+  return /\d+\s*(件|個|本|つ|種類|項目|以上|以下)|最大\s*\d+|最小\s*\d+/.test(
+    line,
+  );
+}
+
+// REQ-0145-012/013: behavior predicate context 判定。契約・状態・禁止の記述文脈を検出する。
+// REQ-0145-013 予防的ガード句: 件数・内容規定を含む行は exemption を拒否する。
+function isBehaviorPredicateContext(line: string): boolean {
+  if (hasCountOrContentRule(line)) {
+    return false;
+  }
+  return /が\s*存在\s*すること|を\s*禁止\s*する|を\s*許可\s*しない/.test(line);
+}
+
 function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const reqDir = path.join(root, "docs", "requirements");
@@ -6150,6 +6166,11 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
 
       for (const { signal, pattern } of IR044_SIGNAL_PATTERNS) {
         if (pattern.test(stripped)) {
+          // REQ-0145-012/013: behavior predicate context は exemption 対象。
+          // 件数・内容規定を含む行は isBehaviorPredicateContext が false を返し拒否される。
+          if (isBehaviorPredicateContext(stripped)) {
+            break;
+          }
           foundViolation = true;
           results.push(
             warn(
