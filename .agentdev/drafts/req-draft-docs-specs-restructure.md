@@ -1,10 +1,21 @@
 ---
 draft_type: req_draft
 topic_slug: docs-specs-restructure
-status: draft
+status: saved
 created_at: 2026-06-27T23:45:00+09:00
 source_rus:
   - session:2026-06-27-docs-specs-restructure
+spec_artifact_actions_consumed:
+  consumed_at: 2026-06-28T00:00:00+09:00
+  consumed_by: spec-save
+  processed: [ACT-SPEC-001, ACT-SPEC-003, ACT-SPEC-004, ACT-SPEC-005, ACT-SPEC-006, ACT-SPEC-007, ACT-SPEC-008, ACT-SPEC-009, ACT-SPEC-010, ACT-SPEC-011, ACT-SPEC-012]
+  skipped:
+    - id: ACT-SPEC-002
+      reason: "G02 guardrail violation: docs/README.md is outside spec-save allowed paths (docs/specs/**, .agentdev/drafts/**, docs/specs/README.md, docs/DOC-MAP.md). To be handled by case-run."
+  notes: >
+    target_area slug-based strings (e.g. "# workflow-contracts") did not match actual Japanese H1 headings;
+    spec-save interpreted each target as the file's primary section and applied edits per content direction.
+    All 11 actionable items processed; ACT-SPEC-002 deferred to case-run per G02.
 ---
 
 <!-- req-define が生成した構造化引き継ぎ成果物。

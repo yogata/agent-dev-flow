@@ -1,14 +1,15 @@
 ---
-updated: 2026-06-21
+updated: 2026-06-28
 status: accepted
 ---
 
 # ワークフロー契約（旧版、縮小済み）
 
-> **縮小済み**: 本 SPEC は AG-012 文書体系再構築により縮小した。
-> 個別 command / skill の動作は各 command SPEC（`commands/`）、各 skill SPEC（`skills/`）に移管した。
-> 横断契約は `workflows/` 配下の各 SPEC に再構成した。
-> 本ファイルは互換性のため残置するが、実質的な内容は以下の新 SPEC 群を参照のこと。
+> **旧版互換索引**: 本 SPEC は旧版ワークフロー契約の縮小残置ファイルであり、通常の横断ワークフロー契約本体ではない（AG-012 文書体系再構築で縮小、REQ-0156-002 で旧版互換索引として位置づけ確定）。
+> 個別 command / skill の動作は各 command SPEC（`commands/`）、各 skill SPEC（`skills/`）に移管済み。
+> 正規の横断ワークフロー契約は `workflows/` 配下の各 SPEC を参照すること。
+> 本ファイルに新規契約を追加せず、実質内容は以下の移行先参照表（旧セクション → 移行先）のみを維持する。
+> frontmatter `status: accepted` は維持する（縮小済み参照ファイルとしての位置づけを保持）。
 
 ## 移管先
 

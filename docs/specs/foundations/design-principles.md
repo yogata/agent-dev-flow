@@ -1,8 +1,17 @@
 ---
 status: accepted
+updated: 2026-06-28
 ---
 
 # 設計原則
+
+> **SPEC と ADR の境界（AG-005, REQ-0101-043/044/050）**: 本 SPEC は現行仕様として機能する分類表、導出表（work_type / scale / workflow_route 等）、適用基準を扱う。
+> 判断理由、歴史的経緯、設計意図、トレードオフ説明の正本は以下の ADR 群を参照すること（新規 ADR は作成しない、既存 ADR で覆えない内容は本 SPEC の範囲外として報告）。
+> - ADR-0103（文書種別責務境界、runtime/authoring 分離）
+> - ADR-0102（実行時配布物と執筆時関心の分離）
+> - ADR-0104（Skill references SPEC 分離基準）
+> - ADR-0005（plugin namespace）
+> **artifact-contracts.md との責任分界**: `../responsibilities/artifact-contracts.md` が Command/Skill/Template/Script の詳細契約（入出力、依存方向）を扱うのに対し、本 SPEC は上位原則と分類規則に限定する。詳細契約の参照先は artifact-contracts.md を優先する。
 
 本プロジェクトの設計判断の根拠を集約した前方視の指針。
 どう考えるかを記述し、実装の背景にある意図を明らかにする。

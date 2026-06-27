@@ -1,8 +1,12 @@
 ---
 status: accepted
+updated: 2026-06-28
 ---
 
 # 文書フォーマット規約
+
+> **正本としての位置づけ（AG-006）**: 本 SPEC が共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）の正本である。
+> 本文構造、見出し構成、Step 表現、記述形式等の執筆規約寄り内容は `../authoring/` ドメイン（現在は `command-file-format.md` のみ）への移管候補とする。実移管の判断は case-run で行い、本 SPEC からの一括移送は行わない。
 
 ## コマンド frontmatter 規約
 

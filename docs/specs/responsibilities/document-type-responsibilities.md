@@ -2,14 +2,16 @@
 title: 文書種別責務・配置基準
 status: draft
 created: 2026-06-23
-updated: 2026-06-27
+updated: 2026-06-28
 ---
 
 # 文書種別責務、配置基準
 
-> **他 SPEC との役割分担**: 本 SPEC と `../foundations/document-model.md` は補完関係にある。
-> 文書種別の基準境界（REQ/ADR/SPEC/guides/DOC-MAP の役割定義、ライフサイクル、優先順位、参照規則、SPEC内部5論理区分、文書7分類、ドメイン別体系化規範）は `document-model.md` を参照する。
+> **他 SPEC との役割分担**: 本 SPEC と `../foundations/document-model.md` は補完関係にある（AG-004）。
+> 文書種別の基準境界（REQ/ADR/SPEC/guides/DOC-MAP の役割定義、ライフサイクル、優先順位、参照規則、投影方向、SPEC内部5論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `document-model.md` の正本を参照する。
 > 本 SPEC は文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策を扱う。
+> 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）は `../foundations/patterns.md` を参照する（AG-006）。
+> 新規ファイル分割は行わず、既存2ファイル（本 SPEC と document-model.md）間の重複削除で運用する（AG-004）。両 SPEC の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
 
 docs/ 配下の文書（REQ/ADR/SPEC/guides/DOC-MAP/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
 REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）であり、agentdev-doc-writing スキルの参照先である。
