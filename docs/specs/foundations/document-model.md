@@ -465,7 +465,7 @@ agent-dev-flow リポジトリの docs/specs/ 直下の基盤SPECは、既存の
 | responsibilities/ | 文書種別責務、成果物責任、アーティファクト契約、REQ影響マップ | document-type-responsibilities.md, artifact-responsibilities.md, artifact-contracts.md, req-impact-map.md |
 | quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/SPEC 双方向） | quality-specs.md, quality-gates.md, req-health-metrics.md, spec-health-metrics.md |
 | integrity/ | 整合性契約、整合性ルールカタログ、ルール所有権、配布物整合性、backticks 判定閾値 | integrity-contracts.md, integrity-rule-catalog.md, rule-ownership.md, docs-spec-rebuild-integrity.md, backticks-identifier-threshold.md |
-| local/ | ローカル版 SPEC 群（実行時パッケージ境界、Case ファイル、生成） | runtime-package-boundary.md, local-case-file.md, local-generation.md（local-transform.md は local-generation.md へ一本化、case-run で削除予定: AG-003, REQ-0141-028/029） |
+| local/ | ローカル版 SPEC 群（実行時パッケージ境界、Case ファイル、生成） | runtime-package-boundary.md, local-case-file.md, local-generation.md（local-transform.md は local-generation.md へ一本化、削除済み: AG-003, REQ-0141-028/029） |
 | authoring/ | コマンドファイル執筆規約 | command-file-format.md |
 
 ### 分類確定ファイル（親エージェント確認済み）

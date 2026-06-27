@@ -9,7 +9,7 @@
 | detection_method | `.opencode/commands/agentdev/**/*.md` と `.opencode/skills/agentdev-*/**/*.md` から frontmatter またはメタ識別子中の `generated_by` を抽出し、`local-opencode-transform` と一致することを確認。同名ファイル上書き時の識別子整合性はローカル版生成プロセスが `## 変換仕様` ガードレールで検証 |
 | affected_artifacts | [.opencode/commands/agentdev/, .opencode/skills/agentdev-*/] |
 | related_req | [REQ-0141-011, REQ-0141-012, REQ-0141-013] |
-| related_spec | [local-generation.md, local-transform.md] |
+| related_spec | [local-generation.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。生成物への識別子付与方式（frontmatter vs ヘッダコメント）の揺れ、AgentDevFlow 本体原本（識別子なし）との混同に注意 |
 | regression_test | (未実装) |

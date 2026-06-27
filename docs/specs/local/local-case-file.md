@@ -240,6 +240,6 @@ GitHub PR 取り込みは実行しない。
 
 - **関連 ADR**: ADR-0131（ローカル版導入方式を link mode へ統一し生成方式を廃止。ADR-0126 を supersede）
 - **関連 REQ**: REQ-0141（ローカル版 OpenCode 導入方式とローカルCaseファイル運用）、REQ-0150（ローカル版 agentdev-gh-cli 実装）
-- **関連 SPEC**: local-generation.md、local-transform.md、runtime-package-boundary.md
+- **関連 SPEC**: local-generation.md、runtime-package-boundary.md
 
 ADR-0126（superseded）は履歴参照のみとし、現行根拠として扱わない（REQ-0112-053 準拠）。

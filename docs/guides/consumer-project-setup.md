@@ -110,7 +110,7 @@ cd .agentdev-plugin && git pull && cd ..
 ./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
 ```
 
-> 詳細な実行手順、制約、link target 確認は `src/opencode-local/README.md`（link 設定の実行エントリポイント）と SPEC [ローカル版 OpenCode 生成](../specs/local/local-generation.md)、[ローカル Case ファイル](../specs/local/local-case-file.md)、[ローカル版 OpenCode 変換プロンプト](../specs/local/local-transform.md) を参照。
+> 詳細な実行手順、制約、link target 確認は `src/opencode-local/README.md`（link 設定の実行エントリポイント）と SPEC [ローカル版 OpenCode 生成](../specs/local/local-generation.md)、[ローカル Case ファイル](../specs/local/local-case-file.md) を参照。
 
 ## 予約名（Reserved Names）
 
