@@ -41,7 +41,7 @@
 | 32 | docs 日本語表現、文意整合 | REQ-0140, REQ-0108 (255-257) | integrity-rule-catalog.md (IR-045) | 英字混じり抽象用語、読取専用セマンティクスの検出。文書表記、文意品質ゲート（付帯品質ゲート）の機械検査担当 |
 | 33 | local-case-file（ローカル Case ファイルスキーマ） | REQ-0141 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode の Case ファイル YAML 前書き、status enum、labels 値域、見出し一覧、マージ結果記録 |
 | 34 | local-generation（ローカル版生成フロー、安全ゲート） | REQ-0141 (001-015) | local-generation.md | ローカル版生成フロー Step、`generated_by: local-opencode-transform` 識別子、ジャンクション検出安全ゲート、上書き許可条件 |
-| 35 | local-transform（ローカル版変換プロンプト） | REQ-0141 (028, 029, 032) | local-transform.md | 変換用プロンプト（`transform/generate.md`）、レビュー用プロンプト（`transform/review.md`）、変換仕様（`transform/spec.md`）の要件 |
+| 35 | local-transform（ローカル版変換プロンプト） | REQ-0141 (028, 029, 032) | local-transform.md | **確定廃止**（PR#1195 で transform/ 完全削除、REQ-0141-004/009/028 確定廃止昇格）。変換用プロンプト、レビュー用プロンプト、変換仕様の要件は全て廃止済み |
 
 ## 重複ルールの解消状況
 

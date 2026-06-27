@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-23
+updated: 2026-06-27
 ---
 
 # case-open SPEC
@@ -124,6 +124,13 @@ case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_ope
 - 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化できる（REQ-0114-089）
 - Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（REQ-0114-093）
 - G04「全子Issue 作成完了後にテーブル更新（部分更新禁止）」は集約更新で維持
+
+### Step 番号体系再構成方針
+
+case-open SPEC の Epic flow と Standard flow の Step 番号を連続した番号体系へ再構成する。
+詳細な再構成後の Step 番号は case-open SPEC で定義する。
+再構成方針: Epic flow と Standard flow で共通する Step は同一番号を共用し、
+flow 固有の Step は連番で採番する。Step 10-14 の未定義ギャップを解消する。
 
 ## See Also
 

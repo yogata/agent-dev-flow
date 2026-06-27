@@ -55,6 +55,18 @@ skills/agentdev-*/             → 原本
 - `.gitignore` は `src/opencode/.gitignore` から実ファイルとしてコピー
 - `.opencode/` 内の非管理ファイル（セッション、設定等）は opencode ランタイムが自由に配置可能
 
+### 本体リポジトリ sync
+
+**配布対象ディレクトリ**:
+- `.opencode/commands/agentdev/` → junction → `src/opencode/commands/agentdev/`
+- `.opencode/skills/agentdev-*/` → junction → `src/opencode/skills/agentdev-*/`
+
+**scripts/ 配下の配布境界（skills/agentdev-*/scripts/ 配下）**:
+配布対象: `*.ts`（TSソース）、`lib/*.ts`（共有ライブラリ）、`tests/*.test.ts`（テスト）、`package.json`、`tsconfig.json`、`bun.lock`、`.gitignore`、`README.md`
+除外対象: `node_modules/`（.gitignore で除外済み、consumer 側で `bun install` により再生成）
+
+scripts/ は skill junction の配下に位置し、skill の一部として配布される。ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）。
+
 ### Consumer（AgentDevFlow 導入済み）
 
 ```

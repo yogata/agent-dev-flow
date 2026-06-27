@@ -2,7 +2,7 @@
 title: 文書種別責務・配置基準
 status: draft
 created: 2026-06-23
-updated: 2026-06-26
+updated: 2026-06-27
 ---
 
 # 文書種別責務、配置基準
@@ -165,17 +165,24 @@ SSoT, HITL は略語のまま使用。
 
 ### 中黒使用の許容範囲
 
-中黒（、）は原則として日本語並列に使わない（japanese-tech-writing L18）。ただし以下は許容する:
+中黒（`・`）は原則として日本語並列に使わない（japanese-tech-writing L18）。ただし以下は許容する:
 
 - 固定複合名詞の内部（「実行時・編集時」「コマンド・スキル・テンプレート・スクリプト」等の確定 tech term）
 - 単一固有名詞の内部
 
 流動的並列、識別子の並列、コード値の並列は読点（、）、スラッシュ、箇条書きに置換する。
 
+中黒許容範囲の機械判定アルゴリズム（許容条件4種、判定手順、テーブルセル扱い）は algorithm SSoT（[mechanical-replacement-rules.md](../../../src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md)）Section 1 を参照。
+本節は固定複合名詞・単一固有名詞の許容例の原本として機能し、algorithm 的記述は SSoT へ委任する。
+
 ### em-dash 置換形式
 
-em-dash（`（`、`―`）は japanese-tech-writing L17 に従い、同格、補足は括弧（）、言い換え、敷衍は句点で2文分割または読点でつなぐ）。
+em-dash（`—`、`―`）は japanese-tech-writing L17 に従い、同格、補足は括弧（`（）`）で、言い換え、敷衍は句点で2文分割または読点でつなぐ。
 コロン（`:`）による置換は行わない。
+
+テーブルセル内の em-dash（`| — |`、N/A プレースホルダ用途）は `| - |`（ハイフン1文字）へ機械置換する。
+本文中の em-dash とは意味が異なり、文脈判断を要しない安全な機械置換である。
+検出後の文脈判定パターン（A: label—explanation、B: 句点直後、C: 括弧内既存、D: テーブルセル、ママ）の詳細は algorithm SSoT（mechanical-replacement-rules.md）Section 2 を参照。
 
 ### frontmatter 訳語
 

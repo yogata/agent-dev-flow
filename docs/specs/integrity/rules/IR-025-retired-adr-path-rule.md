@@ -17,3 +17,13 @@
 | finding_route | intake |
 | triage_action | 旧番号帯 ADR を `docs/adr/retired/` に移動 |
 | last_verified | 2026-06-08 |
+
+## detection_method
+
+`docs/adr/ADR-0*.md`（ADR-0000〜ADR-0099、旧番号帯）の存在確認。
+
+**適用範囲**: ADR-00XX（旧番号帯、REQ-0112-048 に基づく retired/ 移動対象）のみ。
+ADR-01XX（現行番号帯）は status に関わらず docs/adr/ に残留する（deprecated ADR-01XX を含む）。
+deprecated ADR-01XX の配置は frontmatter status で管理し、retired/ への移動対象ではない。
+
+IR-036 が status:deprecated を work-means 検出から除外する（履歴参照、現行判断ではない）。

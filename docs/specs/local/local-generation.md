@@ -2,7 +2,7 @@
 title: ローカル版 OpenCode 生成
 status: draft
 created: 2026-06-20
-updated: 2026-06-23
+updated: 2026-06-27
 ---
 
 # ローカル版 OpenCode 生成
@@ -52,7 +52,7 @@ src/opencode-local/
 
 ### 廃止対象
 
-`src/opencode-local/transform/` と `src/opencode-local/generation-flow.md` は link mode では不要となるため廃止候補とする（AG-011, ADR-0131 decision #4）。
+`src/opencode-local/transform/` と `src/opencode-local/generation-flow.md` は link mode では不要のため確定廃止とする（AG-011, ADR-0131 decision #4、PR#1195 で完全削除済み、REQ-0141-004/009/028 確定廃止昇格）。
 
 ### 作成しないディレクトリ
 
@@ -63,8 +63,8 @@ src/opencode-local/
 - `src/opencode-local/skills/`
 - `src/opencode-local/requirements/`
 - `src/opencode-local/specs/`
-- `src/opencode-local/transform/`（廃止候補）
-- `src/opencode-local/generation-flow.md`（廃止候補）
+- `src/opencode-local/transform/`（確定廃止）
+- `src/opencode-local/generation-flow.md`（確定廃止）
 
 `requirements/` と `specs/` は `docs/` 配下の同名ディレクトリと概念衝突するため不採用である。
 要件は `docs/requirements/` で一元管理し、`src/opencode-local/` には配置しない。
