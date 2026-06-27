@@ -4564,18 +4564,42 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
   const rangePattern =
     /REQ-\d{4}\s*(?:through|〜|~|から|through)\s*REQ-\d{4}/gi;
 
+  // REQ-0144-018: scan docs/guides/*.md and vocabulary-registry.md in addition to core files
   const filesToCheck: { absPath: string; label: string }[] = [
     { absPath: path.join(root, "AGENTS.md"), label: "AGENTS.md" },
     {
       absPath: path.join(root, "docs", "specs", "system.md"),
       label: "system.md",
     },
-    {
-      absPath: path.join(root, "docs", "guides", "project-docs-and-specs.md"),
-      label: "project-docs-and-specs.md",
-    },
     { absPath: path.join(root, "docs", "DOC-MAP.md"), label: "DOC-MAP.md" },
   ];
+
+  const guidesDir = path.join(root, "docs", "guides");
+  if (fs.existsSync(guidesDir)) {
+    for (const f of listFiles(guidesDir)) {
+      filesToCheck.push({
+        absPath: path.join(guidesDir, f),
+        label: `docs/guides/${f}`,
+      });
+    }
+  }
+
+  const vocabPath = resolvePathWithFallback(
+    path.join(
+      root,
+      ".opencode",
+      "skills",
+      "repo-agentdev-integrity",
+      "references",
+      "vocabulary-registry.md",
+    ),
+  );
+  if (fs.existsSync(vocabPath)) {
+    filesToCheck.push({
+      absPath: vocabPath,
+      label: "vocabulary-registry.md",
+    });
+  }
 
   let foundStale = false;
 
