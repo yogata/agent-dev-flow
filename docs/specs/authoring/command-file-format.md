@@ -1,6 +1,6 @@
 ---
 title: "コマンドファイルフォーマット規約"
-status: draft
+status: accepted
 created: 2026-06-22
 updated: 2026-06-28
 ---

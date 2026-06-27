@@ -1,6 +1,6 @@
 ---
 title: 文書種別責務・配置基準
-status: draft
+status: accepted
 created: 2026-06-23
 updated: 2026-06-28
 ---
