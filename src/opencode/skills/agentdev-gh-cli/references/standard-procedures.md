@@ -214,6 +214,7 @@ gh pr merge {N} --{merge_method}
 `{merge_method}` は `squash`、`merge`、`rebase` のいずれか。
 merge 前に `git rev-parse HEAD` で HEAD commit hash を記録する。
 Merge Conflict 発生時は後述「Merge Conflict 対応パターン」に従う。
+**`--delete-branch` 非推奨**: `gh pr merge` で `--delete-branch` オプションを使用しない。アクティブ worktree に checkout されたブランチで `--delete-branch` を使用すると local 削除が失敗し remote 削除フェーズへ到達しない。ブランチ削除は case-close Step 7 で独立実施する（REQ-0146-003）。
 
 ### Issue close
 
