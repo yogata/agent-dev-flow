@@ -942,6 +942,8 @@ function buildIr044Fixture(root: string): void {
       "| REQ-9007 | IR-044 fixture |",
       "| REQ-9008 | IR-044 fixture |",
       "| REQ-9009 | IR-044 fixture |",
+      "| REQ-9010 | IR-044 fixture |",
+      "| REQ-9011 | IR-044 fixture |",
       "",
     ].join("\n"),
     "utf-8",
@@ -1126,6 +1128,48 @@ function buildIr044Fixture(root: string): void {
     "utf-8",
   );
 
+  // REQ-9010: true positive — behavior predicate with count rule (REQ-0145-013 guard).
+  // Line contains "仕組みが存在すること" (behavior predicate) AND "3件" (count rule).
+  // REQ-0145-013 guard rejects exemption → still detected as SPEC detail violation.
+  writeFileSync(
+    join(reqDir, "REQ-9010.md"),
+    [
+      "---",
+      "id: REQ-9010",
+      "title: IR-044 behavior predicate with count rule (guard)",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9010-001 | fixture drift を検出し 3件 以上の違反を記録する仕組みが存在すること |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9011: false positive — behavior predicate without count rule (REQ-0145-012/013).
+  // Line contains "仕組みが存在すること" (behavior predicate) and no count/content rule.
+  // Exemption applies → NOT detected.
+  writeFileSync(
+    join(reqDir, "REQ-9011.md"),
+    [
+      "---",
+      "id: REQ-9011",
+      "title: IR-044 behavior predicate exemption (no count)",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9011-001 | fixture drift を自動検出する仕組みが存在すること |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
   // Empty adr/specs/skills to satisfy other checks minimally
   mkdirp(join(root, "docs", "adr"));
   mkdirp(join(root, "docs", "specs"));
@@ -1184,6 +1228,30 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
         res.check === "req-spec-boundary-violation" &&
         res.level === "warning" &&
         (res.evidence ?? "").includes("REQ-9009"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("detects true positive: behavior predicate with count rule (REQ-0145-013 guard rejects exemption)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9010"),
+    );
+    expect(violations.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("does NOT flag behavior predicate without count rule (REQ-0145-012 exemption)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9011"),
     );
     expect(violations.length).toBe(0);
   });
