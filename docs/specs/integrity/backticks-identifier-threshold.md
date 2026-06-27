@@ -41,6 +41,6 @@ runtime-package-boundary.md「5 種のリポジトリ種別」表の Type ID 列
 
 ## 関連
 
-- 用語政策 SSoT: docs/specs/responsibilities/document-type-responsibilities.md
-- 機械判定アルゴリズム: src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md
-- 良パターン基準: docs/specs/local/runtime-package-boundary.md「5 種のリポジトリ種別」Type ID 列
+- 用語政策 SSoT: `docs/specs/responsibilities/document-type-responsibilities.md`
+- 機械判定アルゴリズム: `src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md`
+- 良パターン基準: `docs/specs/local/runtime-package-boundary.md`「5 種のリポジトリ種別」Type ID 列
