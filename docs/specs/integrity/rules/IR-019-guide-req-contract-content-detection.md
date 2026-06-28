@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-019: Guide 要件定義、契約記述検出
 
 | Field | Value |

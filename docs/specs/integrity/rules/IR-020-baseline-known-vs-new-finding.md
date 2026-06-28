@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-020: 基準既知（baseline-known）と新規 finding の区別
 
 | Field | Value |

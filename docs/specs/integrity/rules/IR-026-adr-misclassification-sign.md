@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-026: ADR 誤分類兆候検出
 
 | Field | Value |

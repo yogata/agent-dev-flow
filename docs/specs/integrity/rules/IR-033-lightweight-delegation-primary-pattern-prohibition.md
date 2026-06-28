@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-033: lightweight-delegation primary pattern 禁止
 
 | Field | Value |

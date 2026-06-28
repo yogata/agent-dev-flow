@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-040: retired-req-authority-comment
 
 | Field | Value |

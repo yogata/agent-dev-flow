@@ -1,5 +1,6 @@
 ---
 updated: 2026-06-21
+status: accepted
 ---
 
 # アーティファクト契約

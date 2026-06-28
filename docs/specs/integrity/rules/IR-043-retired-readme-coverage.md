@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-043: retired-readme-coverage
 
 | Field | Value |

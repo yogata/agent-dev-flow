@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-016: Source/projection 整合性
 
 | Field | Value |

@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-008: Skill references/ 存在
 
 | Field | Value |

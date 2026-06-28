@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-015: 廃止 REQ 現行参照検出
 
 | Field | Value |

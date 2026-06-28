@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-034: Skill 内部 section / protocol / Step 参照検出
 
 | Field | Value |

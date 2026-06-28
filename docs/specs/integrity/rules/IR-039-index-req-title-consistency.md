@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-039: index-req-title-consistency
 
 | Field | Value |

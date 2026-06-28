@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-027: 廃止 ADR 現行根拠引用検出
 
 | Field | Value |

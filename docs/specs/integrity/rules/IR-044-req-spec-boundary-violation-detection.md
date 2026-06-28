@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-044: REQ/SPEC 境界違反検出
 
 | Field | Value |

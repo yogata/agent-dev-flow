@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-038: ADR-index-consistency
 
 | Field | Value |

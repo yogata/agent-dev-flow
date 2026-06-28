@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-051: 実行主体の skill 表記誤認検出
 
 | Field | Value |

@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-050: load_skills command 誤指定検出
 
 | Field | Value |

@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-029: Command 英字サブステップ禁止
 
 | Field | Value |

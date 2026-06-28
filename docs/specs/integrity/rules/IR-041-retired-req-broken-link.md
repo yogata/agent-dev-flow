@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-041: retired-req-broken-link
 
 | Field | Value |

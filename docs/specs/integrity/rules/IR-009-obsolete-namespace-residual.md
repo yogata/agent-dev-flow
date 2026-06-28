@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-009: 旧 namespace 残存
 
 | Field | Value |

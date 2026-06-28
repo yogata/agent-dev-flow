@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-042: hardcoded-req-count
 
 | Field | Value |

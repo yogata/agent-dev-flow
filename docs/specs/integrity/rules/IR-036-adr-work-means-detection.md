@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-036: ADR-work-means-detection
 
 | Field | Value |

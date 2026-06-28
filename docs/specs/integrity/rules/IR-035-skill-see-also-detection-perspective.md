@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-035: Skill See Also 検出観点
 
 | Field | Value |

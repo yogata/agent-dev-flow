@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-025: 廃止 ADR path 規則
 
 | Field | Value |

@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-017: DOC-MAP ↔ 実体整合性
 
 | Field | Value |
