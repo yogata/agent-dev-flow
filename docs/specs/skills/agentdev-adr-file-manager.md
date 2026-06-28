@@ -1,11 +1,11 @@
 ---
-title: agentdev-adr-file-manager SPEC
+title: `agentdev-adr-file-manager` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-adr-file-manager SPEC
+# `agentdev-adr-file-manager` SPEC
 
 ## 目的
 

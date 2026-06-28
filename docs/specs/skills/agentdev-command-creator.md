@@ -1,11 +1,11 @@
 ---
-title: agentdev-command-creator SPEC
+title: `agentdev-command-creator` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-command-creator SPEC
+# `agentdev-command-creator` SPEC
 
 ## 目的
 

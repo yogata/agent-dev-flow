@@ -1,9 +1,9 @@
 ---
-name: agentdev-learning-capture
+name: `agentdev-learning-capture`
 description: Agent-first extraction and capture of learnings from problems autonomously detected/avoided/corrected. Covers CI failures, template deviations, gh/git workarounds, reopen causes, and implementation errors. USE FOR: case-close post-processing, post-incident capture, workflow deviation detection. DO NOT USE FOR: general note-taking, documentation generation, elevation/judgment, or ADR/REQ/spec creation.
 ---
 
-# agentdev-learning-capture
+# `agentdev-learning-capture`
 
 会話中にエージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/learning/inbox.md` に蓄積するスキル。
 

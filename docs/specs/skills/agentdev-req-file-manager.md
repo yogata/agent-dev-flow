@@ -1,11 +1,11 @@
 ---
-title: agentdev-req-file-manager SPEC
+title: `agentdev-req-file-manager` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-req-file-manager SPEC
+# `agentdev-req-file-manager` SPEC
 
 ## 目的
 

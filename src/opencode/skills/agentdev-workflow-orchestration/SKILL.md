@@ -1,6 +1,6 @@
 ---
-name: agentdev-workflow-orchestration
-description: case-run の状態機械、サブエージェント protocol、self-healing loop、CI 対応 loop、1 Issue オーケストレーションの知識ベース。USE FOR: case-run の再開ポイント判定、自律修正ループ判定、CI 対応、subagent起動、障害伝播。DO NOT USE FOR: 単一Issue の基本的な Step 実行手順（case-run コマンド定義を参照）、work_type 判定（agentdev-workflow-lifecycle を参照）、乖離検出（agentdev-spec-compliance を参照）、子Issue 選択、Wave 構成生成（case-open/ case-auto を参照）
+name: `agentdev-workflow-orchestration`
+description: case-run の状態機械、サブエージェント protocol、self-healing loop、CI 対応 loop、1 Issue オーケストレーションの知識ベース。USE FOR: case-run の再開ポイント判定、自律修正ループ判定、CI 対応、subagent起動、障害伝播。DO NOT USE FOR: 単一Issue の基本的な Step 実行手順（case-run コマンド定義を参照）、work_type 判定（`agentdev-workflow-lifecycle` を参照）、乖離検出（`agentdev-spec-compliance` を参照）、子Issue 選択、Wave 構成生成（case-open/ case-auto を参照）
 ---
 
 # case-run オーケストレーションナレッジベース

@@ -1,5 +1,5 @@
 ---
-name: agentdev-doc-map
+name: `agentdev-doc-map`
 description: DOC-MAP reading guide and document exploration order. USE FOR: understanding document structure, finding related documents, determining exploration order. DO NOT USE FOR: creating REQ/ADR/SPEC files, implementing changes, or replacing canonical document content.
 ---
 

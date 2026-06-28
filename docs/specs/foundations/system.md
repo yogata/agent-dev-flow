@@ -86,7 +86,7 @@ case-run が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、ca
 | Issue テンプレート完了条件セクション | [skills/agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md), [commands/case-open.md](../commands/case-open.md) |
 | .opencode/ ディレクトリ責務、スクリプト配置方針、テスト配布方針 | [runtime-package-boundary.md](../local/runtime-package-boundary.md) |
 | 安全性スキル（gh-cli） | [skills/agentdev-gh-cli.md](../skills/agentdev-gh-cli.md) |
-| 整合性検査スキル（repo-agentdev-integrity） | (repo-local、配布対象外、SPEC 対象外) |
+| 整合性検査スキル（repo-`agentdev-integrity`） | (repo-local、配布対象外、SPEC 対象外) |
 
 ## 適用範囲宣言
 

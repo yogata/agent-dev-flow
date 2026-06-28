@@ -1,11 +1,11 @@
 ---
-title: agentdev-git-worktree SPEC
+title: `agentdev-git-worktree` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-git-worktree SPEC
+# `agentdev-git-worktree` SPEC
 
 ## 目的
 

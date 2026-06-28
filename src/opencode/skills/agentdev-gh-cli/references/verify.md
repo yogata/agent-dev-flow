@@ -1,6 +1,6 @@
 # VERIFY 実装観点
 
-agentdev-gh-cli の VERIFY 手続きの実装観点と検査項目（REQ-0149-002, ADR-0130 decision #2）。
+`agentdev-gh-cli` の VERIFY 手続きの実装観点と検査項目（REQ-0149-002, ADR-0130 decision #2）。
 書き込み操作（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成）の直後に実施し、内容が正しく反映されたかを検証する。
 各書き込み操作ごとに個別に実行すること（一括検証は不可）。
 

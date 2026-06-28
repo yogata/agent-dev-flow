@@ -1,11 +1,11 @@
 ---
-title: agentdev-skill-authoring SPEC
+title: `agentdev-skill-authoring` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-skill-authoring SPEC
+# `agentdev-skill-authoring` SPEC
 
 ## 目的
 

@@ -9,7 +9,7 @@
 
 ## 対象読者
 
-docs/ 配下の REQ/ADR/SPEC/guides/DOC-MAP/README、および docs を生成、編集する command/skill の自然言語記述に対し、機械判定可能な是正を適用する agentdev-doc-writing スキル利用者、inspect-docs 実装者、CI 検証設定者。
+docs/ 配下の REQ/ADR/SPEC/guides/DOC-MAP/README、および docs を生成、編集する command/skill の自然言語記述に対し、機械判定可能な是正を適用する `agentdev-doc-writing` スキル利用者、inspect-docs 実装者、CI 検証設定者。
 
 ## 対象範囲と適用除外
 

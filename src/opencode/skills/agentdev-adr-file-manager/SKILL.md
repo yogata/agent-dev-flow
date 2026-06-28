@@ -1,5 +1,5 @@
 ---
-name: agentdev-adr-file-manager
+name: `agentdev-adr-file-manager`
 description: Manages ADR numbering and architecture decision record file operations (CREATE/APPEND/UPDATE). USE FOR: creating ADR files, appending sections, or updating existing ADRs. DO NOT USE FOR: evaluating whether an ADR is needed, analyzing requirement quality, or general document management.
 ---
 
@@ -46,7 +46,7 @@ ADR要否の判定は `agentdev-adr-guidelines` スキルが行う。
 **強調**: req-save が ADR ファイルを保存する際、本採番ルールに従うことを必須とする。
 - 必ず `docs/adr/` 配下の最大番号 + 1 で採番する（欠番埋め禁止、一貫性維持）
 - req-define が `new:{topic-slug}` 形式で参照した ADR を、req-save が確定番号に置換する
-- 採番の判断を req-define 側で行わない（番号推測禁止）。req-save と agentdev-adr-file-manager の連携で確定する
+- 採番の判断を req-define 側で行わない（番号推測禁止）。req-save と `agentdev-adr-file-manager` の連携で確定する
 
 #### 基準番号帯例外
 
@@ -322,7 +322,7 @@ ADR の `status` を変更した場合、`docs/adr/README.md` の全ビューが
 
 ADRテンプレートは以下のパスで参照可能:
 
-@.opencode/skills/agentdev-adr-file-manager/templates/doc_adr.md
+@.opencode/skills/`agentdev-adr-file-manager`/templates/doc_adr.md
 
 **テンプレートの構成**:
 - Context（背景、文脈）

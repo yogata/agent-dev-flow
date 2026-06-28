@@ -1,6 +1,6 @@
 # 操作契約
 
-agentdev-gh-cli が提供する I/O 手続きと VERIFY の操作契約（REQ-0149-002, ADR-0130 decision #2, #3）。
+`agentdev-gh-cli` が提供する I/O 手続きと VERIFY の操作契約（REQ-0149-002, ADR-0130 decision #2, #3）。
 手続きの引数、戻り値、エラー扱いを定義する。
 標準版（GitHub 版）の具体的実装手順は [standard-procedures.md](standard-procedures.md) 参照。
 

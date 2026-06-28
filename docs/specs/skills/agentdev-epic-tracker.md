@@ -1,11 +1,11 @@
 ---
-title: agentdev-epic-tracker SPEC
+title: `agentdev-epic-tracker` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-epic-tracker SPEC
+# `agentdev-epic-tracker` SPEC
 
 ## 目的
 

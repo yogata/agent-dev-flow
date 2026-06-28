@@ -1,11 +1,11 @@
 ---
-title: agentdev-architecture-advisory SPEC
+title: `agentdev-architecture-advisory` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-22
 ---
 
-# agentdev-architecture-advisory SPEC（アーキテクチャ助言、req-define 事前確認）
+# `agentdev-architecture-advisory` SPEC（アーキテクチャ助言、req-define 事前確認）
 
 ## 目的
 

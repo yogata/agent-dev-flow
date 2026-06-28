@@ -1,11 +1,11 @@
 ---
-title: agentdev-req-analysis SPEC
+title: `agentdev-req-analysis` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-req-analysis SPEC
+# `agentdev-req-analysis` SPEC
 
 ## 目的
 

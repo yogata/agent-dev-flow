@@ -1,11 +1,11 @@
 ---
-title: agentdev-inspect-skills SPEC
+title: `agentdev-inspect-skills` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-24
 ---
 
-# agentdev-inspect-skills SPEC
+# `agentdev-inspect-skills` SPEC
 
 ## 目的
 
@@ -46,7 +46,7 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - 参照の整合性（Command → Skill 参照妥当性）
 - 粒度の適切性（Skill 分割候補検出）
 - 診断分類の正確性
-- gh 直接記述の委譲漏れ（REQ-0149）。command/skill 配下で agentdev-gh-cli へ委譲すべき gh 直接記述が残留していないか。許容ファイル（standard-procedures.md）の除外が正しく機能しているか
+- gh 直接記述の委譲漏れ（REQ-0149）。command/skill 配下で `agentdev-gh-cli` へ委譲すべき gh 直接記述が残留していないか。許容ファイル（standard-procedures.md）の除外が正しく機能しているか
 
 ## See Also
 
@@ -55,4 +55,4 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - [agentdev-command-authoring.md](agentdev-command-authoring.md)
 - [agentdev-gh-cli.md](agentdev-gh-cli.md)（gh 直接記述の検出スコープ）
 - REQ-0125（inspect-skills / Command/Skill 参照妥当性検出）
-- REQ-0149（agentdev-gh-cli 手続き委譲基盤）
+- REQ-0149（`agentdev-gh-cli` 手続き委譲基盤）

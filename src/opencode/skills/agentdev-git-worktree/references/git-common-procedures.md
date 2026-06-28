@@ -140,7 +140,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 
 ## 4. PR merge 前 HEAD hash 記録
 
-PR merge 手続き（agentdev-gh-cli）実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する。
+PR merge 手続き（`agentdev-gh-cli`）実行前に `git rev-parse HEAD` で現在の HEAD commit hash を記録する。
 自マージ検出で使用する。
 
 ---
@@ -169,7 +169,7 @@ PR squash merge および `git pull --ff-only` の実行前に、ローカル未
 ### 前提確認
 
 PR 番号が解決済みであること。
-PR 補助データ読込手続き（agentdev-gh-cli）が実行可能であること。
+PR 補助データ読込手続き（`agentdev-gh-cli`）が実行可能であること。
 
 ### 手順
 
@@ -349,7 +349,7 @@ command 側には共通処理の詳細本文ではなく、使用するプロシ
 
 ## Squash merge 後分岐ハンドリング手順（REQ-0146-006）
 
-squash merge（PR merge 手続き、agentdev-gh-cli）実行後にローカルと remote で分岐（divergent）が発生した場合のハンドリング手順。
+squash merge（PR merge 手続き、`agentdev-gh-cli`）実行後にローカルと remote で分岐（divergent）が発生した場合のハンドリング手順。
 本手順は case-close Step 4-1 から参照される。
 
 ### 前提確認

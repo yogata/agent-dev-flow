@@ -1,4 +1,4 @@
-# agentdev-req-file-manager scripts
+# `agentdev-req-file-manager` scripts
 
 REQ/ADR/SPEC ファイル管理の決定的処理スクリプト群（REQ-0103-159/160、AG-002/006、design-principles.md 第5節）。
 

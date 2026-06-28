@@ -1,11 +1,11 @@
 ---
-title: agentdev-intake-pipeline SPEC
+title: `agentdev-intake-pipeline` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-intake-pipeline SPEC
+# `agentdev-intake-pipeline` SPEC
 
 ## 目的
 

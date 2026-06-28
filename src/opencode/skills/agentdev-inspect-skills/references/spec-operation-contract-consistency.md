@@ -30,7 +30,7 @@ SPEC 内の「操作契約」見出しを走査し、対応する skill の `ref
 
 SPEC 操作契約テーブルの列と `references/contracts.md` の手続きごとの表の行は、以下のように対応する。
 
-### SPEC 操作契約テーブルの標準構造（agentdev-gh-cli 事例）
+### SPEC 操作契約テーブルの標準構造（`agentdev-gh-cli` 事例）
 
 | 列 | 内容 |
 |----|------|
@@ -39,7 +39,7 @@ SPEC 操作契約テーブルの列と `references/contracts.md` の手続きご
 | 出力 | 当該手続きの出力概要 |
 
 SPEC 側は薄いルーティング入口として要約版を保持する。
-詳細化は `references/contracts.md` に分離する（薄いルーティング入口と references 分離の原則、agentdev-gh-cli SPEC 参照）。
+詳細化は `references/contracts.md` に分離する（薄いルーティング入口と references 分離の原則、`agentdev-gh-cli` SPEC 参照）。
 
 ### references/contracts.md の手続きごとの表の標準構造
 

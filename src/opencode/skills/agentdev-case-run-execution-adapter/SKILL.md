@@ -1,5 +1,5 @@
 ---
-name: agentdev-case-run-execution-adapter
+name: `agentdev-case-run-execution-adapter`
 description: "case-run external execution adapter. USE FOR: connecting case-run issue execution to Sisyphus-Junior via task() delegation (adapter skill + 委譲 prompt 内 `/ulw-loop` command), handling completed(pr)/blocked/failed results. DO NOT USE FOR: req-define architecture review, ADR judgment, workflow state management, or Issue completion checkbox evaluation."
 ---
 
@@ -37,7 +37,7 @@ Sisyphus-Junior は以下を順に実行する:
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。ulw-loop が Issue を success criteria に分解する
 2. **context 再確認**: ADR/ REQ/ SPEC/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する
-3. **実装、検証、PR 作成**: ulw-loop に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（agentdev-gh-cli）で PR を作成する。
+3. **実装、検証、PR 作成**: ulw-loop に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（`agentdev-gh-cli`）で PR を作成する。
 ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。
 実装完了後、Issue 本文の test strategy 項目の test-fix ループ（後述「test strategy 項目の test-fix ループ」）を実行する
 4. **blocker 処理**: 回答可能な blocker（ADR/REQ/SPEC/docs/Issue本文で回答できるもの）は自律的に ulw-loop 内で再評価できる

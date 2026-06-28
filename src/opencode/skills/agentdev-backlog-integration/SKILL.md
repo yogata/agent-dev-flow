@@ -1,6 +1,6 @@
 ---
-name: agentdev-backlog-integration
-description: backlog-review の採用済み成果物（promoted artifact）統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決の知識ベース。USE FOR: 採用済み成果物の統合、分割判定、矛盾検出、RU 生成ルール、depends_on 依存解決基準、成果物読み込み、分析メタデータ項目。DO NOT USE FOR: intake 抽出、promote（agentdev-intake-pipeline）、REQ 構造診断（agentdev-req-structure-diagnostics）、work_type 判定（agentdev-workflow-lifecycle）
+name: `agentdev-backlog-integration`
+description: backlog-review の採用済み成果物（promoted artifact）統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決の知識ベース。USE FOR: 採用済み成果物の統合、分割判定、矛盾検出、RU 生成ルール、depends_on 依存解決基準、成果物読み込み、分析メタデータ項目。DO NOT USE FOR: intake 抽出、promote（`agentdev-intake-pipeline`）、REQ 構造診断（`agentdev-req-structure-diagnostics`）、work_type 判定（`agentdev-workflow-lifecycle`）
 ---
 
 # バックログレビュー統合知識ベース（backlog-review）

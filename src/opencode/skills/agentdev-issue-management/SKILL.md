@@ -1,9 +1,9 @@
 ---
-name: agentdev-issue-management
-description: Enforces safe GitHub Issue operation procedures for creation, update, linking, and verification across case-open/case-close/case-update. Operation skill (like agentdev-gh-cli) providing safe procedures, NOT judgment criteria. Coordinates with agentdev-gh-cli VERIFY operations. USE FOR: GitHub Issue作成、更新、リンク、確認の安全手順、Issue操作後のVERIFY手順、Parent/Child Issue間リンク確認（Parent: #N パターン検証）、Epic Issueステータス追跡テーブル更新の安全手順、Issue更新時の前後内容比較手順、Issue内容検証手続き（agentdev-gh-cli VERIFY 連携）. DO NOT USE FOR: Epic/child Issue作成順序（case-open command）、Issue本文構造（template）、RU削除（req-file-manager）、完了報告、work_type判定（workflow-lifecycle）、gh CLI のエンコーディング、ファイル書き込み安全性（agentdev-gh-cli）.
+name: `agentdev-issue-management`
+description: Enforces safe GitHub Issue operation procedures for creation, update, linking, and verification across case-open/case-close/case-update. Operation skill (like `agentdev-gh-cli`) providing safe procedures, NOT judgment criteria. Coordinates with `agentdev-gh-cli` VERIFY operations. USE FOR: GitHub Issue作成、更新、リンク、確認の安全手順、Issue操作後のVERIFY手順、Parent/Child Issue間リンク確認（Parent: #N パターン検証）、Epic Issueステータス追跡テーブル更新の安全手順、Issue更新時の前後内容比較手順、Issue内容検証手続き（`agentdev-gh-cli` VERIFY 連携）. DO NOT USE FOR: Epic/child Issue作成順序（case-open command）、Issue本文構造（template）、RU削除（req-file-manager）、完了報告、work_type判定（workflow-lifecycle）、gh CLI のエンコーディング、ファイル書き込み安全性（`agentdev-gh-cli`）.
 ---
 
-# agentdev-issue-management
+# `agentdev-issue-management`
 
 GitHub Issue の作成、更新、リンク、確認を安全に行うための操作手順を提供するスキル。
 `agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）と連携し、Issue 操作特有の安全性要件を補完する。

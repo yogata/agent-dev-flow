@@ -50,8 +50,8 @@
 | [REQ-0146](REQ-0146.md) | 実行契約、委譲、プロセス設計 | 実行契約、委譲、プロセス設計 |
 | [REQ-0147](REQ-0147.md) | 文書化規律、HITL境界 | 文書化規律と HITL 境界 |
 | [REQ-0148](REQ-0148.md) | RU群バッチ処理と複数 execution_unit 並列実行 | RU 群バッチと複数 execution_unit 並列 |
-| [REQ-0149](REQ-0149.md) | agentdev-gh-cli 手続き委譲基盤 | gh-cli 手続き委譲基盤と I/O 責務分離 |
-| [REQ-0150](REQ-0150.md) | ローカル版 agentdev-gh-cli 実装 | ローカル版 agentdev-gh-cli と Case ファイル差し替え |
+| [REQ-0149](REQ-0149.md) | `agentdev-gh-cli` 手続き委譲基盤 | gh-cli 手続き委譲基盤と I/O 責務分離 |
+| [REQ-0150](REQ-0150.md) | ローカル版 `agentdev-gh-cli` 実装 | ローカル版 `agentdev-gh-cli` と Case ファイル差し替え |
 | [REQ-0151](REQ-0151.md) | コンフリクト解消モデルと実行時間観測 | 3レベルコンフリクト解消モデルと工程別タイムスタンプ計測 |
 | [REQ-0152](REQ-0152.md) | gh 直接記述機械検出（IR-053） | gh CLI 直接呼出しの機械検出ルール（IR-053）と inspect-skills 診断観点との協調 |
 | [REQ-0153](REQ-0153.md) | 機械横断是正の完了証明 | 機械横断是正 PR の再 grep 0 件証拠の完了条件化と PR 本文記載 |

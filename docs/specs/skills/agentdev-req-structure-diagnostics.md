@@ -1,11 +1,11 @@
 ---
-title: agentdev-req-structure-diagnostics SPEC
+title: `agentdev-req-structure-diagnostics` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-req-structure-diagnostics SPEC
+# `agentdev-req-structure-diagnostics` SPEC
 
 ## 目的
 
