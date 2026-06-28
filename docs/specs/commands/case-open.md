@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-27
+updated: 2026-06-28
 ---
 
 # case-open SPEC
@@ -51,18 +51,18 @@ Epic + 子 Issue 一括作成に対応する。
  - Step 8: 子Issue作成（OU 単位、順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-0104-042））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-0146-011、`docs/specs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
  - Step 9: Epic Issue本文更新（ステータス追跡テーブル更新）
  - Step 9-1: OU `result` 書き戻し（Issue / Epic 番号）
-- Standard flow（Steps 15-17-1）:
- - Step 15: 関連ADR特定
- - Step 16: ラベル付与（`agentdev-workflow-lifecycle`）
- - Step 17: GitHub Issue作成（VERIFY）
- - Step 17-1: OU `result` 書き戻し（Issue 番号）
-- 共通終了処理（Steps 18-19-2）:
- - Step 18: コメント追加（`agentdev-workflow-templates`）
- - Step 19: ドラフト削除（`git rm` + `git commit` Form Zero）
- - Step 19-1: RU ファイル削除（`git rm` + `git commit` Form Zero）
-- Step 19-1-1: draft / RU 削除残存検証（`git status --porcelain` で残存検出）
-- Step 19-1-2: draft/RU 削除 commit 後の即時 push（REQ-0146-003）（Step 19 / 19-1 の削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
-- Step 19-2: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
+- Standard flow（Steps 10-12-1）:
+  - Step 10: 関連ADR特定
+  - Step 11: ラベル付与（`agentdev-workflow-lifecycle`）
+  - Step 12: GitHub Issue作成（VERIFY）
+  - Step 12-1: OU `result` 書き戻し（Issue 番号）
+- 共通終了処理（Steps 13-15）:
+  - Step 13: コメント追加（`agentdev-workflow-templates`）
+  - Step 14: ドラフト削除（`git rm` + `git commit` Form Zero）
+  - Step 14-1: RU ファイル削除（`git rm` + `git commit` Form Zero）
+- Step 14-2: draft / RU 削除残存検証（`git status --porcelain` で残存検出）
+- Step 14-3: draft/RU 削除 commit 後の即時 push（REQ-0146-003）（Step 14 / 14-1 の削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
+- Step 15: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
 
 ## 参照する横断 SPEC
 
@@ -93,7 +93,7 @@ Epic + 子 Issue 一括作成に対応する。
 - 子Issue数上限（G05、最大10件、Epic 1件あたり）
 - テンプレート必須セクション完備確認（G09、G10、`完了条件` セクション含む）
 - 出力制約: Issue 本文、commit message は verbatim で返す（G17）
-- draft / RU 削除残存検証（Step 19-1-1、`git status --porcelain` で空であること）
+- draft / RU 削除残存検証（Step 14-2、`git status --porcelain` で空であること）
 
 ## case-auto 並列委譲モデル（REQ-0114-087〜093）
 
@@ -124,13 +124,6 @@ case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_ope
 - 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化できる（REQ-0114-089）
 - Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（REQ-0114-093）
 - G04「全子Issue 作成完了後にテーブル更新（部分更新禁止）」は集約更新で維持
-
-### Step 番号体系再構成方針
-
-case-open SPEC の Epic flow と Standard flow の Step 番号を連続した番号体系へ再構成する。
-詳細な再構成後の Step 番号は case-open SPEC で定義する。
-再構成方針: Epic flow と Standard flow で共通する Step は同一番号を共用し、
-flow 固有の Step は連番で採番する。Step 10-14 の未定義ギャップを解消する。
 
 ## See Also
 
