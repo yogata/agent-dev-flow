@@ -6,6 +6,7 @@
 !.opencode/commands/repo/
 .opencode/skills/*
 !.opencode/skills/repo-*/
+!.opencode/skills/japanese-tech-writing/
 .sisyphus/
 .worktrees/
 .omo/
