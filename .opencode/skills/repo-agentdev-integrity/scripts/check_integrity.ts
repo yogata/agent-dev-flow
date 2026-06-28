@@ -5084,8 +5084,15 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
     // repo-* skills are repo-local and projection-only (ADR-0020): they
     // intentionally have no src/opencode/skills/ counterpart and are excluded
     // from selective-junction sync (sync-self-opencode.ps1 RepoLocalSkillPrefix).
+    // japanese-tech-writing is an external immutable skill (REQ-0140-023,
+    // ADR-0105 decision 4, REQ-0103-076): it lacks the agentdev-* prefix by
+    // design (writing-standard referenced from AGENTS.md), is not an install
+    // target for consumers, and is intentionally projection-only.
     const extraSkills = [...projectionSkillDirs].filter(
-      (d) => !sourceSkillDirs.has(d) && !d.startsWith("repo-"),
+      (d) =>
+        !sourceSkillDirs.has(d) &&
+        !d.startsWith("repo-") &&
+        d !== "japanese-tech-writing",
     );
 
     for (const d of missingSkills) {
