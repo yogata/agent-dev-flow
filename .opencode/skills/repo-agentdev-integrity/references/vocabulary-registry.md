@@ -260,24 +260,43 @@ docs-check の機械化原則徹底（REQ-0108-056/254/261/262）に基づき、
 
 これらは retired 配下でのみ実在が確認済みであり、現行 docs での誤使用リスクが解消されたため検出対象から除外した。新規検出時の復活運用（REQ-0145-003）に従い、現行 docs で再出現した場合は検出パターンを復活させる。
 
-## integrity rule カタログ英語普通名詞（正規使用）
+## 候補語対照表（IR-044 連携）
 
-integrity-rule-catalog.md および rules/ 配下で使用される英語普通名詞。IR-044（英字普通名詞 drift）の検出対象外（正規使用許可）（RU-0007）。
+`document-type-responsibilities.md` 訳語表および `integrity-rule-catalog.md` / `rules/` 配下に掲載される散文英語普通名詞の候補語対照表（RU-0007, RU-0008）。各語を検出対象（IR-044 drift 検出候補）または正規使用（対象外）に分類し、対象外の語には IR-044 適用除外の根拠を併記する。候補語の限定は `document-type-responsibilities.md` 訳語表全体での検証結果に基づく。
 
-| 英語普通名詞 | 用途 | 備考 |
-|------------|------|------|
-| `finding` | 検出事項 | inspect-docs/inspect-skills の検出結果単位 |
-| `drift` | 文書の drift | REQ/SPEC の不一致、陳腐化 |
-| `regression` | 回帰 | regression test、回帰検出 |
-| `gate` | 品質ゲート | QG-1〜QG-4、gate level |
-| `severity` | 重要度 | strict / heuristic / observation |
-| `category` | カテゴリ | IR の分類 |
-| `schema` | スキーマ | IR のフィールド定義 |
-| `observation` | 観察 | severity の1つ |
-| `baseline` | 基準 | baseline_status |
-| `provider` | 提供者 | 外部エージェント提供者 |
-| `variant` | バリアント | テンプレートのバリアント |
-| `fixture` | フィクスチャ | テスト fixture |
+### document-type-responsibilities.md 訳語表掲載語
+
+`document-type-responsibilities.md` 訳語表の「専門カタカナ語」「複合技術語（普通名詞明記）」「frontmatter 訳語」セクションに掲載される散文英語普通名詞。修飾語（active, retired, current 等）、識別子（製品名、ID、略語、コマンド名、パイプライン名）、固定複合表現（domain state, runtime command 等）は候補語対象外とする。
+
+| 英語普通名詞 | 推奨訳 | 由来 | IR-044 扱い | IR-044 適用除外根拠 |
+|------------|--------|------|------------|-------------------|
+| `fixture` | テストデータ/検査データ | 専門カタカナ語 | 対象外（正規使用） | テスト手法概念。REQ/SPEC 両域で正規使用 |
+| `variant` | 種別/バリエーション/形式 | 専門カタカナ語 | 対象外（正規使用） | 種別分類のドメイン概念。REQ/SPEC 両域で正規使用 |
+| `provider` | 提供元 | 専門カタカナ語 | 対象外（正規使用） | 提供元分類のドメイン概念。REQ/SPEC 両域で正規使用 |
+| `baseline` | 基準 | 専門カタカナ語 | 対象外（正規使用） | baseline_status 等の基準概念。REQ/SPEC 両域で正規使用 |
+| `finding` | 検出事項 | 専門カタカナ語 | 対象外（正規使用） | inspect-* 検出結果単位のドメイン概念。REQ/SPEC 両域で正規使用 |
+| `promoted artifact` | 採用済み成果物 | 専門カタカナ語 | 対象外（正規使用） | intake/learning/inspect pipeline 成果物単位のドメイン概念。REQ/SPEC 両域で正規使用 |
+| `self-hosting` | 本体リポジトリ | 複合技術語（普通名詞明記） | 対象外（正規使用） | 配布基盤アーキテクチャ概念。REQ/SPEC 両域で正規使用 |
+| `junction` | ジャンクション | 複合技術語 | 対象外（正規使用） | Windows 実装環境固有のファイルシステム概念。実装詳細文脈で正規使用 |
+| `frontmatter` | YAML フロントマター | frontmatter 訳語 | 対象外（正規使用） | 文書フォーマット概念。REQ/SPEC 両域で正規使用 |
+
+### integrity-rule-catalog.md / rules/ 掲載語
+
+`integrity-rule-catalog.md` および `rules/` 配下で使用される英語普通名詞（RU-0007）。IR-044（英字普通名詞 drift）の検出対象外（正規使用許可）。
+
+| 英語普通名詞 | 用途 | IR-044 扱い | IR-044 適用除外根拠 |
+|------------|------|------------|-------------------|
+| `drift` | 文書の drift（REQ/SPEC の不一致、陳腐化） | 対象外（正規使用） | IR-044 自体の検出対象概念。integrity SPEC での記述が正規使用 |
+| `regression` | 回帰（regression test、回帰検出） | 対象外（正規使用） | regression test 概念。integrity SPEC での記述が正規使用 |
+| `gate` | 品質ゲート（QG-1〜QG-4、gate level） | 対象外（正規使用） | 品質ゲート概念。integrity SPEC での記述が正規使用 |
+| `severity` | 重要度（strict / heuristic / observation） | 対象外（正規使用） | IR severity 分類概念。integrity SPEC での記述が正規使用 |
+| `category` | カテゴリ（IR の分類） | 対象外（正規使用） | IR category 分類概念。integrity SPEC での記述が正規使用 |
+| `schema` | スキーマ（IR のフィールド定義） | 対象外（正規使用） | IR フィールド定義概念。integrity SPEC での記述が正規使用 |
+| `observation` | 観察（severity の1つ） | 対象外（正規使用） | severity 値の1つ。integrity SPEC での記述が正規使用 |
+
+### PR #1177 候補語 4 種の妥当性検証（RU-0008）
+
+PR #1177 で候補語対照表に追加された 4 種（`baseline`, `provider`, `variant`, `fixture`）の妥当性を `document-type-responsibilities.md` 訳語表全体で検証した結果、4 種とも「専門カタカナ語」セクションに掲載される散文英語普通名詞であり、検出対象外（正規使用）の分類が妥当である。訳語表全体の検証で「検出対象」とすべき語は存在せず、既存 4 種の分類を維持する。訳語表の他の散文英語普通名詞（`finding`, `promoted artifact`, `self-hosting`, `junction`, `frontmatter`）も検出対象外（正規使用）として本表へ追加した。
 
 ## IR-055 runtime-unresolved-reference 対照（REQ-0108-263/264）
 
