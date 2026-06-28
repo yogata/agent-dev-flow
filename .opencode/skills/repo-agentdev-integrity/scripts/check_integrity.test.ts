@@ -980,8 +980,10 @@ function buildIr044Fixture(root: string): void {
       "| REQ-9007 | IR-044 fixture |",
       "| REQ-9008 | IR-044 fixture |",
       "| REQ-9009 | IR-044 fixture |",
-      "| REQ-9010 | IR-044 fixture |",
-      "| REQ-9011 | IR-044 fixture |",
+    "| REQ-9010 | IR-044 fixture |",
+    "| REQ-9011 | IR-044 fixture |",
+    "| REQ-9012 | IR-044 fixture |",
+    "| REQ-9013 | IR-044 fixture |",
       "",
     ].join("\n"),
     "utf-8",
@@ -1208,6 +1210,48 @@ function buildIr044Fixture(root: string): void {
     "utf-8",
   );
 
+  // REQ-9012: false positive — META rule line with 切り出し/配置 declaration.
+  // Line contains SPEC target types (enum) but declares they should be placed in SPEC.
+  // isMetaRuleLine pattern (1) exempts → NOT detected.
+  writeFileSync(
+    join(reqDir, "REQ-9012.md"),
+    [
+      "---",
+      "id: REQ-9012",
+      "title: IR-044 META rule line (切り出し declaration)",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9012-001 | REQ 要件行に混入する enum 値一覧は SPEC に切り出す対象であること |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9013: false positive — META rule line with 委譲 to SPEC/catalog.
+  // Line contains SPEC detail keyword (checker) but delegates to SPEC/catalog.
+  // isMetaRuleLine pattern (4) exempts (委譲 + SPEC/catalog keyword) → NOT detected.
+  writeFileSync(
+    join(reqDir, "REQ-9013.md"),
+    [
+      "---",
+      "id: REQ-9013",
+      "title: IR-044 META rule line (委譲 to SPEC)",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "| ID | 要件 |",
+      "|----|------|",
+      "| REQ-9013-001 | checker 個別ルールと検出条件は SPEC または rule catalog に委譲すること |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
   // Empty adr/specs/skills to satisfy other checks minimally
   mkdirp(join(root, "docs", "adr"));
   mkdirp(join(root, "docs", "specs"));
@@ -1290,6 +1334,42 @@ describe("IR-044 req-spec-boundary-violation (REQ-0108-259)", () => {
         res.check === "req-spec-boundary-violation" &&
         res.level === "warning" &&
         (res.evidence ?? "").includes("REQ-9011"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("does NOT flag META rule line with REQ/SPEC definitional structure (REQ-0145-012 META exemption)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9006"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("does NOT flag META rule line with 切り出し/配置 declaration (REQ-0145-012 META exemption)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9012"),
+    );
+    expect(violations.length).toBe(0);
+  });
+
+  it("does NOT flag META rule line with 委譲 to SPEC/catalog (REQ-0145-012 META exemption)", () => {
+    const r = runScript(IR044_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string; evidence?: string }) =>
+        res.check === "req-spec-boundary-violation" &&
+        res.level === "warning" &&
+        (res.evidence ?? "").includes("REQ-9013"),
     );
     expect(violations.length).toBe(0);
   });

@@ -215,6 +215,10 @@ check_integrity に関わる test suite 2系統の責務分担。
 
 両ファイルの使い分け基準（regression 検出 vs ルール適合検証）を明文化し、後続エージェントが誤ったファイルを編集するリスクを排除する。
 
+**regression test fixture mirroring 方式（REQ-0108-258 実装詳細）**:
+
+regression test の fixture copy は実ファイル構成の完全ミラーリング（全 `.ts` ファイルコピー）を行う。手動 copy 対象更新運用は禁止し、新規モジュール追加時に `copyScripts()` が自動的に全ファイルをコピーすることで追従する。実装は `check_integrity.test.ts` の `copyScripts()` 関数が担う。
+
 ## メタ整合性
 
 本カタログ自体の整合性を以下で担保する:
