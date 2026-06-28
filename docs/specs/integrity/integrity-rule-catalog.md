@@ -1,5 +1,5 @@
 ---
-updated: 2026-06-26
+updated: 2026-06-28
 status: accepted
 ---
 
@@ -115,6 +115,7 @@ catalog はスキーマ定義とインデックスを維持する。
 - [IR-052: 完了条件 grep パターン設計（REQ-0145-011）](rules/IR-052-completion-grep-pattern-design.md)
 - [IR-053: gh 直接記述検出](rules/IR-053-gh-direct-invocation-detection.md)
 - [IR-054: draft SPEC 放置検出](rules/IR-054-draft-spec-abandonment-detection.md)
+- [IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）](rules/IR-055-runtime-unresolved-reference.md)
 
 | Level | Description | Trigger |
 |-------|-------------|---------|
@@ -196,11 +197,11 @@ checkWorkflowStatusProhibition
 
 | バックエンド | 適用範囲 | 根拠 |
 |--------------|----------|------|
-| `check_integrity.ts`（docs-check + IR ルール） | REQ/SPEC/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft SPEC 放置検出等、本カタログ（IR-001〜IR-054、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-0108-056/254/261/262） |
+| `check_integrity.ts`（docs-check + IR ルール） | REQ/SPEC/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft SPEC 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-0108-056/254/261/262、REQ-0103-079/080/081） |
 | inspect-* skills（inspect-docs / inspect-skills） | 配布物整合性検査（REQ-0142-006/007）。構文健全性の重複検出、文意保持の意味解析、責務説明照合など意味判断を含む診断 | 意味的診断層。詳細は [docs-spec-rebuild-integrity.md](docs-spec-rebuild-integrity.md)「検査バックエンド責務分担」参照 |
 
-**配布物整合性検査（REQ-0142-006/007）は `check_integrity.ts` に追加しない**。
-配布物に対する決定論的検出（IR ルール）は既存カテゴリで網羅し、意味的診断は inspect-* skills に集約する。
+**配布物整合性検査（REQ-0142-006/007: 文意保持・構文健全性・責務整合などの意味的観点）は `check_integrity.ts` に追加せず、inspect-* skills に集約する**。
+配布物に対する決定論的検出（IR ルール）は既存カテゴリおよび REQ-0103-079/080/081 に基づく機械検出（IR-055 runtime-unresolved-reference）で構成し、機械的検出層（docs-check + IR）と意味的診断層（inspect-* skills）の責務境界は 3層検出構造（[integrity-contracts.md](integrity-contracts.md)）に従う。
 これにより `categoryToCheckPattern` map への新カテゴリ追加（skill-category-gap、REQ-0108-161/171、REQ-0144-005）を不要とし、ターゲットング隠退化を防ぐ。
 
 ### check_integrity test suite 責務分担（REQ-0144-008/009）
