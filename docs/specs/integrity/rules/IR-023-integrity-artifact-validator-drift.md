@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-023: Integrity artifact validator drift
 
 | Field | Value |

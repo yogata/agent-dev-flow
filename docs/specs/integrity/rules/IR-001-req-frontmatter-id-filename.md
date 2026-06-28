@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-001: 現行 REQ frontmatter id ↔ ファイル名
 
 | Field | Value |

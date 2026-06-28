@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-024: Command README ↔ 実体
 
 | Field | Value |

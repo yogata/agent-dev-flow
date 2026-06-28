@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-010: ADR status 正規化
 
 | Field | Value |

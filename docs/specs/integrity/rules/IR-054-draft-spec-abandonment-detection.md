@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-054: draft SPEC 放置検出
 
 | Field | Value |

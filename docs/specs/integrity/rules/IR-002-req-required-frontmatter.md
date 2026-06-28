@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-002: 現行 REQ 必須 frontmatter fields
 
 | Field | Value |

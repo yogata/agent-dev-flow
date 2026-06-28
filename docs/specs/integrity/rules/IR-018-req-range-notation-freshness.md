@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-018: REQ 範囲表記鮮度
 
 | Field | Value |

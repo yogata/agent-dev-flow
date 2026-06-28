@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-005: ADR ↔ REQ 相互参照存在
 
 | Field | Value |

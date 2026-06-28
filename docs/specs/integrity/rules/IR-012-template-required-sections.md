@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-012: Template 必須セクション
 
 | Field | Value |

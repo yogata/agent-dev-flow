@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-013: 完了報告種別実在
 
 | Field | Value |

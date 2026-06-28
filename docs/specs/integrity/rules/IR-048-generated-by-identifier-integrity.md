@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-048: generated_by 識別子整合性
 
 | Field | Value |

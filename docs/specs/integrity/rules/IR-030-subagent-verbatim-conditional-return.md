@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-030: Subagent verbatim 条件付き返却
 
 | Field | Value |

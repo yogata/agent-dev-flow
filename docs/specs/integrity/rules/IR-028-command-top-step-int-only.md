@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-028: Command 最上位 Step 整数化
 
 | Field | Value |

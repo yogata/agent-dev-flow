@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-014: reference/ 残存検出
 
 | Field | Value |

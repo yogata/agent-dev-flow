@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-021: 廃止済み skill 参照検出
 
 | Field | Value |

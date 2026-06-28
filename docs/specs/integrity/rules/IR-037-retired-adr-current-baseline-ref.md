@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-037: retired-ADR-current-baseline-ref
 
 | Field | Value |

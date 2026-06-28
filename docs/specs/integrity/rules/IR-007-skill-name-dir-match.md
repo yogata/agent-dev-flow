@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-007: Skill frontmatter name ↔ dir
 
 | Field | Value |

@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-047: src/opencode-local/ link 先原本領域ディレクトリ構成
 
 | Field | Value |

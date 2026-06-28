@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-011: Mapping table 全件記録
 
 | Field | Value |

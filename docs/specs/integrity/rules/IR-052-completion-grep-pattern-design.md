@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-052: 完了条件 grep パターン設計（REQ-0145-011）
 
 | Field | Value |

@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-022: REQ 内部整合性
 
 | Field | Value |

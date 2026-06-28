@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-049: Command file format violation
 
 | Field | Value |

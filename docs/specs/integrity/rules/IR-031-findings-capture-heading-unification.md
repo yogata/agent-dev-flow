@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-031: Findings / Capture候補 見出し統一
 
 | Field | Value |

@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-004: REQ index ↔ 現行 REQ 一致
 
 | Field | Value |

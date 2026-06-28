@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-003: Active/廃止 REQ ID 重複
 
 | Field | Value |

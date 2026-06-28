@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-046: consumer-generated リポジトリ種別誤検知防止
 
 | Field | Value |

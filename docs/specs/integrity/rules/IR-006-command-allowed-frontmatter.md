@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-006: Command frontmatter 許可フィールド
 
 | Field | Value |

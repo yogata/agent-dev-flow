@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）
 
 | Field | Value |

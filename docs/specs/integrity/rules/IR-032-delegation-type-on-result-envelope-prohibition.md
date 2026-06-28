@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-032: delegation_type/on_result 必須 envelope 禁止
 
 | Field | Value |

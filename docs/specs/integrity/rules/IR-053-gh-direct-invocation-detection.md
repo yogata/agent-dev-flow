@@ -1,3 +1,7 @@
+---
+status: accepted
+---
+
 # IR-053: gh 直接記述検出
 
 | Field | Value |
