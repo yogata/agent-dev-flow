@@ -28,7 +28,7 @@ import {
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
 const USAGE =
-  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification]";
+  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--update-ir055-baseline]";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -4791,6 +4791,7 @@ function checkSkillCategoryGap(
     ["Capture boundary", ["CaptureBoundaryReference", "PrTemplateCaptureSection", "CommandCaptureDuties"]],
     ["Mapping table history", ["MappingTableHistoryLabels"]],
     ["REQ verification basis", ["ReqVerificationBasis"]],
+    ["Runtime reference", ["RuntimeUnresolvedReference"]],
   ]);
 
   let foundGap = false;
@@ -6404,6 +6405,314 @@ function checkDraftSpecStaleness(specsDir: string, root: string): CheckResult[] 
   return results;
 }
 
+// ===== IR-055: runtime-unresolved-reference (REQ-0108-263, REQ-0108-264) =====
+// Detects references in distribution files (src/opencode/commands/agentdev/**/*.md,
+// src/opencode/skills/agentdev-*/**/*.md) that cannot be resolved in consumer
+// environments: REQ/ADR IDs, src/opencode/ paths, docs/specs/, docs/guides/,
+// /repo/*, repo-*, main-repo GitHub URLs, line-number-qualified internal refs.
+// Severity per SPEC docs/specs/integrity/rules/IR-055-runtime-unresolved-reference.md:
+//   strict:    REQ-NNNN, REQ-NNNN-NNN, ADR-NNNN, src/opencode/, /repo/*, repo-*
+//   heuristic: docs/specs/, docs/guides/, main-repo GitHub URL, file.md#L<N>
+// Gradual rollout (REQ-0108-264): baseline-known violations are reported as info
+// (no fail). New violations (delta from baseline) are reported as warn/ng and
+// fail in delta guard / impact guard. Full audit fails once baseline reaches 0.
+
+const IR055_STRICT_PATTERNS: ReadonlyArray<{ name: string; pattern: RegExp }> = [
+  { name: "REQ-NNNN-NNN", pattern: /\bREQ-\d{4}-\d{3}\b/g },
+  { name: "REQ-NNNN", pattern: /\bREQ-\d{4}\b/g },
+  { name: "ADR-NNNN", pattern: /\bADR-\d{4}\b/g },
+  { name: "src/opencode/", pattern: /\bsrc\/opencode\//g },
+  { name: "/repo/", pattern: /\/repo\//g },
+  { name: "repo-*", pattern: /\brepo-[a-z][a-z0-9-]*/g },
+];
+
+const IR055_HEURISTIC_PATTERNS: ReadonlyArray<{ name: string; pattern: RegExp }> = [
+  { name: "docs/specs/", pattern: /\bdocs\/specs\//g },
+  { name: "docs/guides/", pattern: /\bdocs\/guides\//g },
+  {
+    name: "main-repo GitHub URL",
+    pattern:
+      /\bhttps?:\/\/github\.com\/yogata\/agent-dev-flow\/(blob|tree|issues|pull)\//g,
+  },
+  { name: "line-number ref", pattern: /\b[\w.-]+\.md#L\d+\b/g },
+];
+
+const IR055_EXEMPT_PATH_PATTERNS: RegExp[] = [
+  /\/vocabulary-registry\.md$/,
+  /\/integrity-rule-catalog\.md$/,
+  /\/integrity-contracts\.md$/,
+  /\/rules\/IR-055[-/]/,
+  /\/baselines\/ir-055-baseline\.json$/,
+];
+
+const IR055_BASELINE_PATH = path.join(
+  ".opencode",
+  "skills",
+  "repo-agentdev-integrity",
+  "baselines",
+  "ir-055-baseline.json",
+);
+
+interface Ir055BaselineEntry {
+  file: string;
+  pattern: string;
+  severity: "strict" | "heuristic";
+  count: number;
+}
+
+interface Ir055Baseline {
+  version: number;
+  rule_id: "IR-055";
+  generated_at: string;
+  entries: Ir055BaselineEntry[];
+}
+
+function loadIr055Baseline(root: string): Ir055Baseline | null {
+  const baselineAbs = path.join(root, IR055_BASELINE_PATH);
+  const content = readText(baselineAbs);
+  if (!content) return null;
+  try {
+    return JSON.parse(content) as Ir055Baseline;
+  } catch {
+    return null;
+  }
+}
+
+function writeIr055Baseline(root: string, baseline: Ir055Baseline): void {
+  const baselineAbs = path.join(root, IR055_BASELINE_PATH);
+  const dir = path.dirname(baselineAbs);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(baselineAbs, JSON.stringify(baseline, null, 2) + "\n", "utf-8");
+}
+
+function isIr055ExemptPath(relPath: string): boolean {
+  return IR055_EXEMPT_PATH_PATTERNS.some((re) => re.test(relPath));
+}
+
+function isIr055ExemptLine(line: string): boolean {
+  // Template placeholder exemption: lines carrying {NNN} style placeholders where
+  // the match is a parameter rather than a concrete reference.
+  if (/\{[^}]*\}/.test(line)) {
+    // Only exempt when the placeholder is adjacent to the pattern kind; cheap
+    // heuristic: if the line contains any "{...}" we skip it to avoid noisy FPs
+    // on templated example text.
+    return true;
+  }
+  return false;
+}
+
+interface Ir055RawViolation {
+  file: string;
+  line: number;
+  pattern: string;
+  severity: "strict" | "heuristic";
+  evidence: string;
+}
+
+function collectIr055Violations(root: string): Ir055RawViolation[] {
+  const commandDir = path.join(root, "src", "opencode", "commands", "agentdev");
+  const skillRoot = path.join(root, "src", "opencode", "skills");
+
+  const targets: string[] = [];
+  if (fs.existsSync(commandDir)) {
+    for (const f of listFiles(commandDir)) {
+      if (f.endsWith(".md")) targets.push(path.join(commandDir, f));
+    }
+  }
+  for (const f of collectAgentdevSkillMarkdown(skillRoot)) targets.push(f);
+
+  const violations: Ir055RawViolation[] = [];
+
+  for (const fullPath of targets) {
+    const relPath = resolveRelative(fullPath, root);
+    if (isIr055ExemptPath(relPath)) continue;
+    const content = readText(fullPath);
+    if (!content) continue;
+    const lines = content.split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      if (isInsideCodeBlock(lines, i)) continue;
+      const line = lines[i];
+      if (isIr055ExemptLine(line)) continue;
+
+      const scanList: ReadonlyArray<{ name: string; pattern: RegExp; severity: "strict" | "heuristic" }> = [
+        ...IR055_STRICT_PATTERNS.map((p) => ({ ...p, severity: "strict" as const })),
+        ...IR055_HEURISTIC_PATTERNS.map((p) => ({ ...p, severity: "heuristic" as const })),
+      ];
+
+      for (const { name, pattern, severity } of scanList) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(line)) !== null) {
+          violations.push({
+            file: relPath,
+            line: i + 1,
+            pattern: name,
+            severity,
+            evidence: match[0],
+          });
+        }
+      }
+    }
+  }
+
+  return violations;
+}
+
+function summarizeIr055Violations(
+  violations: Ir055RawViolation[],
+): Map<string, Ir055BaselineEntry> {
+  // Key: `${file}\t${pattern}\t${severity}` → aggregated count.
+  const summary = new Map<string, Ir055BaselineEntry>();
+  for (const v of violations) {
+    const key = `${v.file}\t${v.pattern}\t${v.severity}`;
+    const existing = summary.get(key);
+    if (existing) {
+      existing.count++;
+    } else {
+      summary.set(key, {
+        file: v.file,
+        pattern: v.pattern,
+        severity: v.severity,
+        count: 1,
+      });
+    }
+  }
+  return summary;
+}
+
+function checkRuntimeUnresolvedReference(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const violations = collectIr055Violations(root);
+  const baseline = loadIr055Baseline(root);
+
+  // Index baseline by `${file}\t${pattern}\t${severity}` for O(1) lookup.
+  const baselineIndex = new Map<string, number>();
+  if (baseline) {
+    for (const entry of baseline.entries) {
+      const key = `${entry.file}\t${entry.pattern}\t${entry.severity}`;
+      baselineIndex.set(key, entry.count);
+    }
+  }
+
+  // Count current violations per (file, pattern, severity) bucket so we can
+  // distinguish baseline-known from new at the bucket granularity.
+  const currentSummary = summarizeIr055Violations(violations);
+
+  // Per-bucket classification. A bucket with count <= baseline is fully
+  // baseline-known (reported as info). Any excess is "new" and reported as
+  // warn (heuristic) or ng (strict) so delta guard fails on new growth.
+  const newBuckets = new Set<string>();
+  for (const [key, entry] of currentSummary) {
+    const baselineCount = baselineIndex.get(key) ?? 0;
+    if (entry.count > baselineCount) {
+      newBuckets.add(key);
+    }
+  }
+
+  // Re-walk violations to emit per-line results, tracking how many we've
+  // emitted per bucket so only the excess (new) entries are flagged.
+  const emittedPerBucket = new Map<string, number>();
+
+  // Sort violations by (file, line) so that for each bucket the earliest
+  // occurrences are treated as baseline-known and the trailing ones as new.
+  // This keeps the "new" tag stable relative to file position.
+  const sorted = [...violations].sort((a, b) => {
+    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+    return a.line - b.line;
+  });
+
+  let baselineKnownCount = 0;
+  let newCount = 0;
+
+  for (const v of sorted) {
+    const key = `${v.file}\t${v.pattern}\t${v.severity}`;
+    const baselineCount = baselineIndex.get(key) ?? 0;
+    const emitted = emittedPerBucket.get(key) ?? 0;
+    emittedPerBucket.set(key, emitted + 1);
+    const isBaselineKnown = emitted < baselineCount;
+
+    const expected =
+      v.severity === "strict"
+        ? `distribution files must not contain ${v.pattern} references (unresolved in consumer env)`
+        : `distribution files should avoid ${v.pattern} references (likely unresolved in consumer env)`;
+
+    const route: FindingRoute = "intake";
+
+    if (isBaselineKnown) {
+      baselineKnownCount++;
+      results.push(
+        info(
+          "RuntimeReference",
+          "runtime-unresolved-reference",
+          `Baseline-known ${v.severity} violation: ${v.pattern} reference '${v.evidence}' (IR-055 baseline, not yet cleaned)`,
+          v.file,
+          v.line,
+          {
+            evidence: v.evidence,
+            expected,
+            route,
+            finding_category: "broken-reference",
+            finding_level: v.severity,
+          },
+        ),
+      );
+    } else {
+      newCount++;
+      const ctor = v.severity === "strict" ? ng : warn;
+      results.push(
+        ctor(
+          "RuntimeReference",
+          "runtime-unresolved-reference",
+          `New ${v.severity} violation: ${v.pattern} reference '${v.evidence}' detected (IR-055 delta from baseline)`,
+          v.file,
+          v.line,
+          {
+            evidence: v.evidence,
+            expected,
+            route,
+            finding_category: "broken-reference",
+            finding_level: v.severity,
+          },
+        ),
+      );
+    }
+  }
+
+  // Always emit a summary result so the check surface is visible even when
+  // there are zero violations (post-cleanup steady state).
+  if (newCount === 0) {
+    results.push(
+      ok(
+        "RuntimeReference",
+        "runtime-unresolved-reference",
+        `IR-055 runtime-unresolved-reference: ${baselineKnownCount} baseline-known (info), 0 new violations. Full audit report-only mode (REQ-0108-264).`,
+      ),
+    );
+  }
+
+  return results;
+}
+
+function updateIr055Baseline(root: string): void {
+  const violations = collectIr055Violations(root);
+  const summary = summarizeIr055Violations(violations);
+  const baseline: Ir055Baseline = {
+    version: 1,
+    rule_id: "IR-055",
+    generated_at: new Date().toISOString().slice(0, 10),
+    entries: [...summary.values()].sort((a, b) => {
+      if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+      if (a.pattern !== b.pattern) return a.pattern < b.pattern ? -1 : 1;
+      return a.severity < b.severity ? -1 : 1;
+    }),
+  };
+  writeIr055Baseline(root, baseline);
+  console.error(
+    `[integrity] IR-055 baseline regenerated: ${baseline.entries.length} entries across ${new Set(baseline.entries.map((e) => e.file)).size} files (${violations.length} total violations).`,
+  );
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -6424,6 +6733,12 @@ async function main(): Promise<void> {
     __dirname ||
     process.cwd();
   const root = findRepoRoot(scriptDir);
+
+  if (args.includes("--update-ir055-baseline")) {
+    updateIr055Baseline(root);
+    process.exit(EXIT_OK);
+  }
+
   const reqDir = path.join(root, "docs", "requirements");
   const adrDir = path.join(root, "docs", "adr");
   const specsDir = path.join(root, "docs", "specs");
@@ -6555,6 +6870,7 @@ async function main(): Promise<void> {
     ...checkGhDirectInvocation(root), // IR-053 (REQ-0152-001/002)
     ...checkDraftSpecStaleness(specsDir, root), // IR-054 (REQ-0154-002)
     ...checkSisyphusJuniorUlwLoopMisclassification(root), // REQ-0144-013
+    ...checkRuntimeUnresolvedReference(root), // IR-055 (REQ-0108-263/264)
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)

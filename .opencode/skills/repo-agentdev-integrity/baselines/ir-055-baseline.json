@@ -1,0 +1,937 @@
+{
+  "version": 1,
+  "rule_id": "IR-055",
+  "generated_at": "2026-06-28",
+  "entries": [
+    {
+      "file": "src/opencode/commands/agentdev/README.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/backlog-review.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/commands/agentdev/backlog-review.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/commands/agentdev/backlog-review.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 34
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 33
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 13
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 12
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 8
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 8
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 12
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 12
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-update.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/inspect-docs.md",
+      "pattern": "docs/guides/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/inspect-docs.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/commands/agentdev/inspect-docs.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/inspect-promote.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/inspect-skills.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/inspect-skills.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/commands/agentdev/intake-promote.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/commands/agentdev/learning-promote.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 8
+    },
+    {
+      "file": "src/opencode/commands/agentdev/learning-promote.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 8
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-define.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-define.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 16
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-define.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 16
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-define.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 11
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 11
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/spec-save.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 16
+    },
+    {
+      "file": "src/opencode/commands/agentdev/spec-save.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 15
+    },
+    {
+      "file": "src/opencode/commands/agentdev/spec-save.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 9
+    },
+    {
+      "file": "src/opencode/skills/agentdev-architecture-advisory/SKILL.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-architecture-advisory/SKILL.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-architecture-advisory/SKILL.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-backlog-integration/references/integration-judgment.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-backlog-integration/references/integration-judgment.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-backlog-integration/references/integration-judgment.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/oh-my-openagent.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/oh-my-openagent.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-command-authoring/SKILL.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-command-authoring/SKILL.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-command-authoring/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-command-authoring/SKILL.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-command-authoring/references/command-authoring-standards.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-map/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/SKILL.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/adr-writing-quality.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/document-boundaries.md",
+      "pattern": "docs/guides/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/document-boundaries.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/document-boundaries.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/execution-subject-classification.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/execution-subject-classification.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/execution-subject-classification.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/llm-expression-patterns.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/llm-expression-patterns.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/llm-expression-patterns.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/req-line-quality.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/review-output.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/rewrite-patterns.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/spec-writing-quality.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-epic-tracker/SKILL.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-epic-tracker/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/SKILL.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/SKILL.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/SKILL.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/contracts.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/contracts.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/contracts.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/retry.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/retry.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/retry.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/verify.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/verify.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/verify.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-git-worktree/references/git-common-procedures.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-git-worktree/references/git-common-procedures.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md",
+      "pattern": "/repo/",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 8
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/execution-subject-misclassification.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/execution-subject-misclassification.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/execution-subject-misclassification.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/spec-operation-contract-consistency.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/spec-operation-contract-consistency.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/spec-operation-contract-consistency.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/spec-operation-contract-consistency.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-intake-pipeline/references/intake-extraction.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-learning-pipeline/SKILL.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-learning-pipeline/SKILL.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-learning-pipeline/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-3-implementation-deviation.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-3-implementation-deviation.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/SKILL.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/SKILL.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/references/explore-scope-refinement.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/references/explore-scope-refinement.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 9
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/references/explore-scope-refinement.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 7
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/references/explore-scope-refinement.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/references/req-define-detailed-gates.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/references/verification-log.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/SKILL.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/SKILL.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/SKILL.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/references/req-save-procedure.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/scripts/README.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/scripts/README.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
+      "pattern": "docs/guides/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 15
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 8
+    },
+    {
+      "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
+      "pattern": "repo-*",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/SKILL.md",
+      "pattern": "ADR-NNNN",
+      "severity": "strict",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/SKILL.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/self-healing-and-errors.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/subagent-protocol.md",
+      "pattern": "REQ-NNNN",
+      "severity": "strict",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/subagent-protocol.md",
+      "pattern": "REQ-NNNN-NNN",
+      "severity": "strict",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/subagent-protocol.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/subagent-protocol.md",
+      "pattern": "repo-*",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/subagent-protocol.md",
+      "pattern": "src/opencode/",
+      "severity": "strict",
+      "count": 1
+    }
+  ]
+}
