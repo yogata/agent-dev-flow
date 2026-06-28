@@ -135,6 +135,31 @@ function buildValidFixture(root: string): void {
   );
   writeFileSync(join(specsDir, "patterns.md"), "# Patterns\n", "utf-8");
 
+  mkdirp(join(specsDir, "foundations"));
+  writeFileSync(
+    join(specsDir, "foundations", "system.md"),
+    "# System (foundations)\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(specsDir, "foundations", "patterns.md"),
+    "# Patterns (foundations)\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(specsDir, "README.md"),
+    [
+      "# SPEC Index",
+      "",
+      "| SPEC | status |",
+      "|------|--------|",
+      "| foundations/system.md | accepted |",
+      "| foundations/patterns.md | accepted |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
   const docsDir = join(root, "docs");
   writeFileSync(
     join(docsDir, "DOC-MAP.md"),
@@ -400,6 +425,19 @@ function buildInvalidFixture(root: string): void {
       "# Doc Quality Fixture",
       "",
       "This command is a read-only diagnostic.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  writeFileSync(
+    join(specsDir, "README.md"),
+    [
+      "# SPEC Index",
+      "",
+      "| SPEC | status |",
+      "|------|--------|",
+      "| foundations/missing-spec.md | draft |",
       "",
     ].join("\n"),
     "utf-8",
