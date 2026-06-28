@@ -1419,3 +1419,409 @@ describe("IR-053 gh-direct-invocation (REQ-0152-001/002)", () => {
     expect(inExcluded.length).toBe(0);
   });
 });
+
+// ─── IR-055: runtime-unresolved-reference (REQ-0108-263, REQ-0108-264) ─────────
+// Fixture covers:
+//   - strict pattern detection (REQ-NNNN, REQ-NNNN-NNN, ADR-NNNN, src/opencode/, /repo/, repo-*)
+//   - heuristic pattern detection (docs/specs/, docs/guides/, GitHub URL, line-number ref)
+//   - code-block exemption
+//   - template placeholder exemption
+//   - exemption paths (vocabulary-registry.md, integrity-rule-catalog.md)
+//   - baseline-known vs new classification (REQ-0108-145)
+//   - report fields (file, line, evidence, expected, route)
+
+const IR055_ROOT = join(TEMP_ROOT, "ir055");
+
+function buildIr055Fixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "README.md"),
+    [
+      "# Requirements",
+      "",
+      "| ID | Title |",
+      "|----|-------|",
+      "| REQ-9201 | IR-055 fixture |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "REQ-9201.md"),
+    [
+      "---",
+      "id: REQ-9201",
+      "title: IR-055 fixture",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "Body.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  mkdirp(join(root, "docs", "specs"));
+  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+
+  // Strict violations: command file containing all 6 strict patterns.
+  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(cmdDir);
+  writeFileSync(
+    join(cmdDir, "violation-cmd.md"),
+    [
+      "---",
+      "description: IR-055 strict violation command",
+      "agent: test-agent",
+      "---",
+      "",
+      "# Violation command",
+      "",
+      "See REQ-1234 for context.",
+      "See REQ-5678-001 for sub-item detail.",
+      "See ADR-0099 for decision.",
+      "Source at src/opencode/commands/agentdev/violation-cmd.md.",
+      "Repo-local at /repo/docs-check.",
+      "Skill repo-agentdev-integrity handles checks.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // Heuristic violations: skill file containing heuristic patterns.
+  const skillDir = join(
+    root,
+    "src",
+    "opencode",
+    "skills",
+    "agentdev-sample-skill",
+  );
+  mkdirp(skillDir);
+  writeFileSync(
+    join(skillDir, "SKILL.md"),
+    [
+      "---",
+      "name: agentdev-sample-skill",
+      "---",
+      "",
+      "# Sample skill",
+      "",
+      "## USE FOR",
+      "",
+      "- sample",
+      "",
+      "See docs/specs/system.md for system spec.",
+      "See docs/guides/quickstart.md for guide.",
+      "Main repo: https://github.com/yogata/agent-dev-flow/blob/main/README.md",
+      "See system.md#L42 for line detail.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // Code-block exemption: REQ ID inside fenced block must NOT be flagged.
+  writeFileSync(
+    join(cmdDir, "codeblock-cmd.md"),
+    [
+      "---",
+      "description: code block exemption command",
+      "agent: test-agent",
+      "---",
+      "",
+      "# Code block command",
+      "",
+      "```sh",
+      "# REQ-9999 is inside a code block and should not be flagged",
+      "gh issue view 9999",
+      "```",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // Exemption path: vocabulary-registry.md may legitimately reference patterns.
+  const integRefDir = join(
+    root,
+    "src",
+    "opencode",
+    "skills",
+    "agentdev-sample-skill",
+    "references",
+  );
+  mkdirp(integRefDir);
+  writeFileSync(
+    join(integRefDir, "vocabulary-registry.md"),
+    [
+      "# Vocabulary Registry",
+      "",
+      "REQ-1234 is a legitimate reference in this registry.",
+      "src/opencode/ path is described here.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // Template placeholder exemption: line with {NNNN} placeholder.
+  writeFileSync(
+    join(cmdDir, "placeholder-cmd.md"),
+    [
+      "---",
+      "description: placeholder exemption command",
+      "agent: test-agent",
+      "---",
+      "",
+      "# Placeholder command",
+      "",
+      "Replace REQ-{NNNN} with the actual requirement ID.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
+  beforeAll(() => {
+    mkdirp(IR055_ROOT);
+    buildIr055Fixture(IR055_ROOT);
+    copyScripts(IR055_ROOT);
+  });
+
+  it("detects strict pattern REQ-NNNN in distribution command file", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string; file?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "REQ-1234" &&
+        (res.file ?? "").includes("violation-cmd.md"),
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects strict pattern REQ-NNNN-NNN (sub-item ID)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string; file?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "REQ-5678-001" &&
+        (res.file ?? "").includes("violation-cmd.md"),
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects strict pattern ADR-NNNN", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string; file?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "ADR-0099" &&
+        (res.file ?? "").includes("violation-cmd.md"),
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects strict pattern src/opencode/", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string; pattern?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "src/opencode/",
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects strict pattern /repo/", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "/repo/",
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects strict pattern repo-* (repo-local skill reference)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "repo-agentdev-integrity",
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects heuristic pattern docs/specs/", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "docs/specs/",
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects heuristic pattern docs/guides/", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "docs/guides/",
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects heuristic pattern main-repo GitHub URL", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        (res.evidence ?? "").startsWith("https://github.com/yogata/agent-dev-flow/"),
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("detects heuristic pattern line-number ref (file.md#L<N>)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        /\.md#L\d+/.test(res.evidence ?? ""),
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("classifies strict patterns with finding_level=strict", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const strictHit = parsed.results.find(
+      (res: { check: string; evidence?: string; finding_level?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "REQ-1234" &&
+        res.finding_level === "strict",
+    );
+    expect(strictHit).toBeDefined();
+  });
+
+  it("classifies heuristic patterns with finding_level=heuristic", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const heuristicHit = parsed.results.find(
+      (res: { check: string; evidence?: string; finding_level?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "docs/specs/" &&
+        res.finding_level === "heuristic",
+    );
+    expect(heuristicHit).toBeDefined();
+  });
+
+  it("emits all 5 report fields (file, line, evidence, expected, route) for violations", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const violations = parsed.results.filter(
+      (res: { check: string; level: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.level !== "ok",
+    );
+    expect(violations.length).toBeGreaterThan(0);
+    for (const v of violations) {
+      expect(v.file).toBeDefined();
+      expect(v.line).toBeDefined();
+      expect(v.evidence).toBeDefined();
+      expect(v.expected).toBeDefined();
+      expect(v.route).toBeDefined();
+    }
+  });
+
+  it("emits new (non-baseline) violations at warn/ng level (delta guard fail)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    // No baseline file exists in this fixture → all violations are "new".
+    const newViolations = parsed.results.filter(
+      (res: { check: string; level: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        (res.level === "ng" || res.level === "warning"),
+    );
+    expect(newViolations.length).toBeGreaterThan(0);
+    // Strict new violations should be ng; heuristic new violations should be warning.
+    const strictNew = newViolations.filter(
+      (v: { finding_level?: string }) => v.finding_level === "strict",
+    );
+    const heuristicNew = newViolations.filter(
+      (v: { finding_level?: string }) => v.finding_level === "heuristic",
+    );
+    expect(strictNew.every((v: { level: string }) => v.level === "ng")).toBe(true);
+    expect(
+      heuristicNew.every((v: { level: string }) => v.level === "warning"),
+    ).toBe(true);
+  });
+
+  it("exempts REQ ID references inside fenced code blocks", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const inCodeBlock = parsed.results.filter(
+      (res: { check: string; evidence?: string; file?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "REQ-9999" &&
+        (res.file ?? "").includes("codeblock-cmd.md"),
+    );
+    expect(inCodeBlock.length).toBe(0);
+  });
+
+  it("exempts template placeholder lines ({NNNN} style)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const placeholderHits = parsed.results.filter(
+      (res: { check: string; file?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        (res.file ?? "").includes("placeholder-cmd.md"),
+    );
+    expect(placeholderHits.length).toBe(0);
+  });
+
+  it("exempts vocabulary-registry.md (legitimate pattern documentation)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const vocabHits = parsed.results.filter(
+      (res: { check: string; file?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        (res.file ?? "").includes("vocabulary-registry.md"),
+    );
+    expect(vocabHits.length).toBe(0);
+  });
+
+  it("treats violations as baseline-known (info) after baseline regeneration", () => {
+    // Regenerate baseline from current fixture violations.
+    const proc = Bun.spawnSync(
+      ["bun", "run", join(IR055_ROOT, ".opencode", "skills", "repo-agentdev-integrity", "scripts", "check_integrity.ts"), "--update-ir055-baseline"],
+      { cwd: IR055_ROOT, stdout: "pipe", stderr: "pipe" },
+    );
+    expect(proc.exitCode).toBe(0);
+
+    // Re-run: all violations should now be baseline-known (info level).
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const newViolations = parsed.results.filter(
+      (res: { check: string; level: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        (res.level === "ng" || res.level === "warning"),
+    );
+    expect(newViolations.length).toBe(0);
+    const baselineKnown = parsed.results.filter(
+      (res: { check: string; level: string }) =>
+        res.check === "runtime-unresolved-reference" && res.level === "info",
+    );
+    expect(baselineKnown.length).toBeGreaterThan(0);
+  });
+});

@@ -114,6 +114,7 @@ OPTIONS:
   --json            Output results in JSON format
   --dry-run         Show what would be checked without running checks
   --classification  Enable document classification policy checks (REQ-0108-196)
+  --update-ir055-baseline  Regenerate IR-055 baseline file from current violations
 
 EXIT CODES:
   0  No issues found
@@ -129,6 +130,7 @@ export interface CheckResultOptions {
   route?: FindingRoute;
   artifact_type?: string;
   finding_category?: FindingCategory;
+  finding_level?: FindingLevel;
 }
 
 export function ok(
@@ -416,6 +418,7 @@ const CHECK_TO_FINDING_CATEGORY: Record<string, FindingCategory> = {
   "active-retired-duplication": "broken-reference",
   "retired-in-active-index": "broken-reference",
   "reference-path-existence": "broken-reference",
+  "runtime-unresolved-reference": "broken-reference",
   "legacy-namespace": "obsolete-structure",
   "expanded-legacy-namespace": "obsolete-structure",
   "obsolete-reference-dir": "obsolete-structure",
