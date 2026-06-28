@@ -1,5 +1,5 @@
 ---
-updated: 2026-06-28
+updated: 2026-06-29
 status: accepted
 ---
 
@@ -218,6 +218,12 @@ check_integrity に関わる test suite 2系統の責務分担。
 **regression test fixture mirroring 方式（REQ-0108-258 実装詳細）**:
 
 regression test の fixture copy は実ファイル構成の完全ミラーリング（全 `.ts` ファイルコピー）を行う。手動 copy 対象更新運用は禁止し、新規モジュール追加時に `copyScripts()` が自動的に全ファイルをコピーすることで追従する。実装は `check_integrity.test.ts` の `copyScripts()` 関数が担う。
+
+### 候補語網羅性規定（IR-044 連携）
+
+`document-type-responsibilities.md` 訳語表に掲載される散文英語普通名詞（finding, promoted artifact, drift, regression, gate, severity, category, schema, observation 等）を候補語として網羅検証し、各語を検出対象（IR-044 drift 検出候補）または正規使用（対象外）のいずれかに分類する。
+
+候補語対照表は `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` と連携して最新状態を保ち、対象外とする語には IR-044 適用除外の根拠を併記する。候補語の限定は訳語表全体で検証した結果に基づき、限定の根拠を対照表へ明記する。
 
 ## メタ整合性
 

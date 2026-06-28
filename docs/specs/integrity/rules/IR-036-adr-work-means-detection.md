@@ -17,10 +17,10 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 高。Context（背景）セクションでの作業手段言及は許容されるため、Decision セクションの主題判定に注意。非承認ステータス ADR（例: ADR-0113 `status: deprecated`）は frontmatter `status` フラグで確実に除外されるため、当該 ADR の作業手段言及は検出対象外となる（履歴参照として扱う） |
 | regression_test | (未実装)。`status: deprecated` ADR が除外されること、`status: accepted` ADR の作業手段主題が検出されることを検証する |
-| baseline_status | new |
+| baseline_status | resolved |
 | finding_route | req-define |
 | triage_action | 作業手段を主題とする ADR を retire/supersede または REQ/case へ移管 |
-| last_verified | 2026-06-24 |
+| last_verified | 2026-06-29 |
 
 ## IR-036 適用範囲（deprecated ADR 除外判定）
 
