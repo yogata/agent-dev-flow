@@ -1229,20 +1229,65 @@ function checkTerminology(cmdDir: string, root: string): CheckResult[] {
   return results;
 }
 
+// SPEC inventory source: docs/specs/README.md (REQ-0154-001/003). Reading the
+// explicit list (instead of enumerating the directory) keeps missing SPECs
+// detectable. Old direct paths (system.md, patterns.md) are no longer required.
+const SPEC_DOMAINS =
+  "commands|skills|workflows|foundations|responsibilities|quality|integrity|local|authoring";
+// Capture group 1 holds the SPEC entry. The leading (?:^|[|(])\s* boundary
+// restricts matches to a table-cell start ("| ") or link href "(", so prose
+// mentions of multiple domains (e.g. "commands/skills/workflows") and
+// placeholders (specs/commands/<x>.md) are not captured. The segment class
+// excludes "/" so each match is a single domain/file entry.
+const SPEC_ENTRY_RE = new RegExp(
+  `(?:^|[|(])\\s*((${SPEC_DOMAINS})/[A-Za-z0-9._-]+(?:\\.md|/))`,
+  "gm",
+);
+
 function checkSpecsExistence(specsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const requiredSpecs = ["system.md", "patterns.md"];
+  const readmePath = path.join(specsDir, "README.md");
+  const readmeContent = readText(readmePath);
 
-  for (const specFile of requiredSpecs) {
-    const fullPath = path.join(specsDir, specFile);
+  if (!readmeContent) {
+    results.push(
+      info(
+        "Specs",
+        "specs-existence",
+        `docs/specs/README.md not found at ${resolveRelative(readmePath, root)}; specs-existence skipped`,
+      ),
+    );
+    return results;
+  }
+
+  const entries = new Set<string>();
+  let m: RegExpExecArray | null;
+  SPEC_ENTRY_RE.lastIndex = 0;
+  while ((m = SPEC_ENTRY_RE.exec(readmeContent)) !== null) {
+    entries.add(m[1]);
+  }
+
+  if (entries.size === 0) {
+    results.push(
+      ng(
+        "Specs",
+        "specs-existence",
+        `No SPEC entries found in ${resolveRelative(readmePath, root)}`,
+      ),
+    );
+    return results;
+  }
+
+  for (const rel of [...entries].sort()) {
+    const fullPath = path.join(specsDir, rel);
     if (fs.existsSync(fullPath)) {
-      results.push(ok("Specs", "specs-existence", `${specFile} exists`));
+      results.push(ok("Specs", "specs-existence", `${rel} exists`));
     } else {
       results.push(
         ng(
           "Specs",
           "specs-existence",
-          `${specFile} not found at ${resolveRelative(path.join(specsDir, specFile), root)}`,
+          `${rel} not found at ${resolveRelative(fullPath, root)}`,
         ),
       );
     }
@@ -6795,7 +6840,7 @@ async function main(): Promise<void> {
     const targets = [
       `REQ files: ${reqDir} (${scanned.REQ} files)`,
       `ADR files: ${adrDir} (${scanned.ADR} files)`,
-      `Specs: ${specsDir}/system.md, ${specsDir}/patterns.md`,
+      `Specs: ${specsDir} (existence verified against ${specsDir}/README.md, REQ-0154-001/003)`,
       `Skills: ${skillsDir} (${scanned.Skill} directories)`,
       `Commands: ${cmdDir} (${scanned.Command} files)`,
       `Report: .agentdev/integrity/reports/ (${scanned.Report} files)`, // REQ-0108-188
