@@ -6208,6 +6208,33 @@ function isBehaviorPredicateContext(line: string): boolean {
   return /が\s*存在\s*すること|を\s*禁止\s*する|を\s*許可\s*しない/.test(line);
 }
 
+// REQ-0145-012: META 規則行 exemption。REQ/SPEC 責務範囲を規定する行（SPEC 種別を
+// 名指しして責務境界を宣言する行）を機械的に判定し免除する。件数・内容規定を含む行は
+// 予防的ガード句 (REQ-0145-013) により免除を拒否し、true positive 保護を維持する。
+// 当該行は SPEC 詳細の記述ではなく責務範囲の規定である（REQ-0145-012 準拠）。
+function isMetaRuleLine(line: string): boolean {
+  if (hasCountOrContentRule(line)) {
+    return false;
+  }
+  // (1) SPEC への切り出し・配置・混入排除を宣言する行
+  if (/切り出し|切り出す|配置する\s*(対象|こと)|混入\s*させ(ない|ぬ)/.test(line)) {
+    return true;
+  }
+  // (2) REQ/SPEC 定義構造（REQ は X、SPEC は Y の文書種別定義）
+  if (/REQ\s*は.*SPEC\s*は/.test(line)) {
+    return true;
+  }
+  // (3) 文書種別・境界・exemption のメタ言語
+  if (/文書種別|境界\s*を\s*(定義|規定)|exemption\s*対象/.test(line)) {
+    return true;
+  }
+  // (4) SPEC / catalog / reference への委譲（委譲先に SPEC 系キーワードを含む行のみ）
+  if (/委譲/.test(line) && /SPEC|catalog|カタログ|reference|リファレンス/.test(line)) {
+    return true;
+  }
+  return false;
+}
+
 function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const reqDir = path.join(root, "docs", "requirements");
@@ -6246,6 +6273,10 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
           // REQ-0145-012/013: behavior predicate context は exemption 対象。
           // 件数・内容規定を含む行は isBehaviorPredicateContext が false を返し拒否される。
           if (isBehaviorPredicateContext(stripped)) {
+            break;
+          }
+          // REQ-0145-012: META 規則行 exemption。REQ/SPEC 責務範囲を規定する行は免除する。
+          if (isMetaRuleLine(stripped)) {
             break;
           }
           foundViolation = true;
