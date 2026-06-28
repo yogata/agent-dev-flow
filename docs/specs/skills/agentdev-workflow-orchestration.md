@@ -1,11 +1,11 @@
 ---
-title: agentdev-workflow-orchestration SPEC
+title: `agentdev-workflow-orchestration` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-workflow-orchestration SPEC
+# `agentdev-workflow-orchestration` SPEC
 
 ## 目的
 

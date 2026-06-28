@@ -1,11 +1,11 @@
 ---
-title: agentdev-workflow-lifecycle SPEC
+title: `agentdev-workflow-lifecycle` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-workflow-lifecycle SPEC
+# `agentdev-workflow-lifecycle` SPEC
 
 ## 目的
 

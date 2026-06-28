@@ -1,11 +1,11 @@
 ---
-title: agentdev-doc-writing SPEC
+title: `agentdev-doc-writing` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-doc-writing SPEC
+# `agentdev-doc-writing` SPEC
 
 ## 目的
 

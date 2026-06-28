@@ -1,11 +1,11 @@
 ---
-title: agentdev-quality-gates SPEC
+title: `agentdev-quality-gates` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-quality-gates SPEC
+# `agentdev-quality-gates` SPEC
 
 ## 目的
 

@@ -1,11 +1,11 @@
 ---
-title: agentdev-backlog-integration SPEC
+title: `agentdev-backlog-integration` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-backlog-integration SPEC
+# `agentdev-backlog-integration` SPEC
 
 ## 目的
 

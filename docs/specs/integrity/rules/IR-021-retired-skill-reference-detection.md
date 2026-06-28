@@ -7,7 +7,7 @@ status: accepted
 | Field | Value |
 |-------|-------|
 | rule_id | IR-021 |
-| description | agentdev-workflow-reporting 等の廃止済み skill への参照が残存していないこと |
+| description | `agentdev-workflow-reporting` 等の廃止済み skill への参照が残存していないこと |
 | severity | strict |
 | category | obsolete-structure |
 | detection_method | 正規表現で廃止 skill 名検出 |

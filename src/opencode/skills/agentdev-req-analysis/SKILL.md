@@ -1,5 +1,5 @@
 ---
-name: agentdev-req-analysis
+name: `agentdev-req-analysis`
 description: Provides requirement analysis methods with quality criteria and ADR threshold judgment. USE FOR: analyzing requirements, defining acceptance criteria, or evaluating requirement completeness. DO NOT USE FOR: creating requirement files, managing file operations, architecture decision evaluation, or implementation planning.
 ---
 
@@ -359,7 +359,7 @@ Issue本文のチェックボックスが満たすべき品質条件。
 ### ADR参照
 
 ADRが必要と判定された場合 → `agentdev-adr-guidelines` スキルを参照する。
-ADR候補記録までを責務とし、ADRファイル作成は req-save + agentdev-adr-file-manager に委譲する。
+ADR候補記録までを責務とし、ADRファイル作成は req-save + `agentdev-adr-file-manager` に委譲する。
 
 ---
 
@@ -367,7 +367,7 @@ ADR候補記録までを責務とし、ADRファイル作成は req-save + agent
 
 要件定義テンプレートは以下のパスで参照可能:
 
-@.opencode/skills/agentdev-req-file-manager/templates/doc_requirement.md
+@.opencode/skills/`agentdev-req-file-manager`/templates/doc_requirement.md
 
 テンプレート構成:
 - **frontmatter**: `id`, `title`, `created`, `updated`

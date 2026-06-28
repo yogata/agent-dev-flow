@@ -1,5 +1,5 @@
 ---
-name: agentdev-epic-tracker
+name: `agentdev-epic-tracker`
 description: Updates parent Epic Issue status tracking tables in case-close workflows (single-writer). USE FOR: case-close(#epic) Epic Issue status writes (pending→completed/blocked/failed), tracking child Issue progress in parent Epics, detecting parent-child relationships via Parent: #N patterns. DO NOT USE FOR: creating Epics, managing non-Epic Issues, case-run(#epic) internal ready/running tracking (not persisted to Epic Issue), or general Issue operations.
 ---
 
@@ -46,14 +46,14 @@ case-close は Epic Issue 本文ステータス追跡テーブルの単一書き
 
 1. 子Issue本文から `Parent: #{N}` を検出
 2. 親Epicが存在しない → スキップ
-3. Issue 本文読込手続き（agentdev-gh-cli）でEpic本文を取得
+3. Issue 本文読込手続き（`agentdev-gh-cli`）でEpic本文を取得
 4. 正規表現で該当子Issue行を特定、置換（後述「正規表現パターン」の新4列/旧4列形式に対応）:
  - completed の場合:
  - 新4列: `(\| \d+-\d+ \| #{child_issue} \| )pending (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
  - 旧4列: `(\| \d+ \| #{child_issue} \| [^|]* \| )pending (\|)` → `$1completed ([PR#{pr_number}]({pr_url})) $2`
  - blocked/ failed の場合: 当該ステータス値で `pending` を置換
 5. 既に `completed`、`blocked`、または `failed` の場合 → スキップ（べき等性）
-6. Issue 本文更新手続き（agentdev-gh-cli）でEpic本文を更新
+6. Issue 本文更新手続き（`agentdev-gh-cli`）でEpic本文を更新
 
 `blocked`/ `failed` は case-close が case-run(#epic) の実行結果（`completed(pr)`/ `blocked`/ `failed`）から確定して Epic Issue 本文へ反映する終了状態。
 case-close は確定済みの `completed`/ `blocked`/ `failed` を上書きしない。
@@ -231,10 +231,10 @@ Epic Issue 本文の書き込みは case-close(#epic) が単一書き手（ADR-0
  ```
 
 **conflict解決手順**:
-1. Issue 本文読込手続き（agentdev-gh-cli）で最新のEpic本文を取得
+1. Issue 本文読込手続き（`agentdev-gh-cli`）で最新のEpic本文を取得
 2. 正規表現で該当子Issue行を特定
 3. ステータス値を更新（べき等性を確認）
-4. Issue 本文更新手続き（agentdev-gh-cli）で更新
+4. Issue 本文更新手続き（`agentdev-gh-cli`）で更新
 5. 更新失敗時は警告表示して継続
 
 

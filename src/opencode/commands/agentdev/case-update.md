@@ -30,7 +30,7 @@ agent: sisyphus
 
 ### Step 3: 更新内容に応じて分岐
 
-- **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが Issue 本文更新手続き（agentdev-gh-cli）を行う
+- **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが Issue 本文更新手続き（`agentdev-gh-cli`）を行う
 - **`--comment`**: 更新コメントを追加する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントはコメント案と必須セクション検査のみを返し、親エージェントが投稿する
 - **`--req`**: REQファイル更新を行う。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは関連REQ候補、APPEND/UPDATE候補、根拠のみを返し、親エージェントがファイル更新とcommit/pushを行う
 - **`--review-ng`**: レビューNG時の専用フローを実行する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは乖離タイプ候補、推奨アクション、更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
@@ -58,7 +58,7 @@ agent: sisyphus
 - G02: CI/CD修正、自律修正ループは case-update の管轄外とする（case-run の責務）。case-update はREQ更新、レビューNG時のコメント追加、Issue本文更新のみを責務とする
 
 ### 実行制約
-- G03: Issue番号の解決に Issue/PR 一覧取得手続き（agentdev-gh-cli）等で open issue 一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
+- G03: Issue番号の解決に Issue/PR 一覧取得手続き（`agentdev-gh-cli`）等で open issue 一覧を取得することは禁止。番号はユーザー入力またはセッション内会話からのみ取得可能
 
 ### 品質ゲート
 - G04: SSoTの整合性を維持（Issue本文と要件docの不整合を防ぐ）
@@ -67,7 +67,7 @@ agent: sisyphus
 - G07: コメント/レビューNGコメントのテンプレート【必須】セクションが全て含まれていることを確認してから投稿すること
 
 ### 委譲、参照制約
-- G08: GitHub Issue/PR 操作は agentdev-gh-cli の手続きへ委譲（gh コマンド直接記述禁止、REQ-0149）
+- G08: GitHub Issue/PR 操作は `agentdev-gh-cli` の手続きへ委譲（gh コマンド直接記述禁止、REQ-0149）
 - G09: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
 - G10: work_type分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照
 

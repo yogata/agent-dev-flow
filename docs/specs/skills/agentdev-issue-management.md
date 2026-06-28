@@ -1,11 +1,11 @@
 ---
-title: agentdev-issue-management SPEC
+title: `agentdev-issue-management` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-issue-management SPEC
+# `agentdev-issue-management` SPEC
 
 ## 目的
 

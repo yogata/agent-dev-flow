@@ -1,5 +1,5 @@
 ---
-name: agentdev-command-authoring
+name: `agentdev-command-authoring`
 description: Provides quality criteria and best practices for authoring OpenCode command definitions (`.opencode/commands/`), including frontmatter verification, line count thresholds, step structure standards, and orchestration skill judgment criteria. USE FOR: creating new commands, improving existing commands, reviewing command quality, deciding whether to extract orchestration skills, or checking DoD compliance for command/skill changes. DO NOT USE FOR: creating skills, writing templates, general coding tasks, or documentation fixes.
 ---
 

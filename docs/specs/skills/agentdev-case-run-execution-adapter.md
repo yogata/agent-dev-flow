@@ -1,11 +1,11 @@
 ---
-title: agentdev-case-run-execution-adapter SPEC
+title: `agentdev-case-run-execution-adapter` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-case-run-execution-adapter SPEC
+# `agentdev-case-run-execution-adapter` SPEC
 
 ## 目的
 

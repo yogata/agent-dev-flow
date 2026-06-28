@@ -1,6 +1,6 @@
 # 標準版実装手順（GitHub 版）
 
-agentdev-gh-cli の各手続きの標準版（GitHub 版）実装手順（REQ-0149-003）。
+`agentdev-gh-cli` の各手続きの標準版（GitHub 版）実装手順（REQ-0149-003）。
 ローカル版は本ファイルを差し替え、同一手続き名で Case ファイルの読み書きへ読み替える（REQ-0150, ADR-0130 decision #4, #5）。
 
 操作契約（手続き名、引数、戻り値）は [contracts.md](contracts.md) 参照。

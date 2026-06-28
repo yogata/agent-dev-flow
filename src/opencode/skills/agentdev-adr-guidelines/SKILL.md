@@ -1,5 +1,5 @@
 ---
-name: agentdev-adr-guidelines
+name: `agentdev-adr-guidelines`
 description: Evaluates whether architectural decisions require an ADR. USE FOR: proposing architecture changes, selecting tech stacks, or making hard-to-reverse technical decisions. DO NOT USE FOR: creating or managing ADR files, requirement analysis, or implementation planning.
 ---
 

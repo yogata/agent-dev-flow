@@ -1,5 +1,5 @@
 ---
-name: agentdev-skill-authoring
+name: `agentdev-skill-authoring`
 description: Provides quality criteria and best practices for authoring OpenCode SKILL.md files across five evaluation axes and four check protocols. USE FOR: creating new skills, improving existing skills, reviewing skill quality, designing skill structure, writing trigger descriptions, or planning progressive disclosure. DO NOT USE FOR: creating command definitions, general coding tasks, or simple documentation fixes.
 ---
 

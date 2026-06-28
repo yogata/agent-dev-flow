@@ -1,11 +1,11 @@
 ---
-title: agentdev-doc-map SPEC
+title: `agentdev-doc-map` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-doc-map SPEC
+# `agentdev-doc-map` SPEC
 
 ## 目的
 

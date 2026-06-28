@@ -28,7 +28,7 @@
 | ADR-0127 | case-auto 構成工程の task() 委譲によるスケーラビリティ確立 | accepted | 2026-06-21 |
 | ADR-0128 | case-run の実行モデル: task() による実行担当サブエージェント委譲 | accepted | 2026-06-21 |
 | ADR-0129 | 複数 execution_unit 並列実行モデル（複数 SSoT 並立と Epic 間並列 orchestration）| accepted | 2026-06-23 |
-| ADR-0130 | agentdev-gh-cli を差し替え可能な I/O 境界として確立 | accepted | 2026-06-23 |
+| ADR-0130 | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 | accepted | 2026-06-23 |
 | ADR-0131 | ローカル版導入方式を link mode へ統一し生成方式を廃止 | accepted | 2026-06-23 |
 | ADR-0132 | コンフリクト解消モデル（3レベルエスカレーションと責務割当）| accepted | 2026-06-24 |
 
@@ -57,7 +57,7 @@
 - [ADR-0127](ADR-0127.md)（case-auto 構成工程の task() 委譲によるスケーラビリティ確立）
 - [ADR-0128](ADR-0128.md)（case-run の実行モデル: task() による実行担当サブエージェント委譲）
 - [ADR-0129](ADR-0129.md)（複数 execution_unit 並列実行モデル）（複数 SSoT 並立と Epic 間並列 orchestration）
-- [ADR-0130](ADR-0130.md)（agentdev-gh-cli を差し替え可能な I/O 境界として確立）
+- [ADR-0130](ADR-0130.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）
 - [ADR-0131](ADR-0131.md)（ローカル版導入方式を link mode へ統一し生成方式を廃止）
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
 
@@ -204,7 +204,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0127 | [REQ-0114](../requirements/REQ-0114.md), [REQ-0119](../requirements/REQ-0119.md) | case-auto 構成工程の task() 委譲によるスケーラビリティ確立 |
 | ADR-0128 | [REQ-0130](../requirements/REQ-0130.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0139](../requirements/REQ-0139.md) | case-run の実行モデル: task() による実行担当サブエージェント委譲 |
 | ADR-0129 | [REQ-0148](../requirements/REQ-0148.md), [REQ-0114](../requirements/REQ-0114.md) | 複数 execution_unit 並列実行モデル（複数 SSoT 並立、Epic 間並列 orchestration） |
-| ADR-0130 | [REQ-0149](../requirements/REQ-0149.md), [REQ-0150](../requirements/REQ-0150.md) | agentdev-gh-cli を差し替え可能な I/O 境界として確立 |
+| ADR-0130 | [REQ-0149](../requirements/REQ-0149.md), [REQ-0150](../requirements/REQ-0150.md) | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 |
 | ADR-0131 | [REQ-0141](../requirements/REQ-0141.md), [REQ-0134](../requirements/REQ-0134.md), [REQ-0150](../requirements/REQ-0150.md) | ローカル版導入方式を link mode へ統一し生成方式を廃止 |
 | ADR-0132 | [REQ-0151](../requirements/REQ-0151.md), [REQ-0148](../requirements/REQ-0148.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0130](../requirements/REQ-0130.md) | コンフリクト解消モデル（3レベルエスカレーションと責務割当） |
 

@@ -1,11 +1,11 @@
 ---
-title: agentdev-adr-guidelines SPEC
+title: `agentdev-adr-guidelines` SPEC
 status: draft
 created: 2026-06-21
 updated: 2026-06-21
 ---
 
-# agentdev-adr-guidelines SPEC
+# `agentdev-adr-guidelines` SPEC
 
 ## 目的
 
