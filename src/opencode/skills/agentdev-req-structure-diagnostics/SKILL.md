@@ -1,5 +1,5 @@
 ---
-name: `agentdev-req-structure-diagnostics`
+name: agentdev-req-structure-diagnostics
 description: inspect-docs コマンドの REQ 構造診断ロジックの知識ベース。USE FOR: REQ参照ID整合性確認、第一参照導線確認、現行/廃止/世代境界確認、6観点診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）、未処理成果物確認、問題候補出力スキーマ。DO NOT USE FOR: backlog統合手順（`agentdev-backlog-integration` を参照）、intake pipeline（`agentdev-intake-pipeline` を参照）、work_type判定（`agentdev-workflow-lifecycle` を参照）
 ---
 

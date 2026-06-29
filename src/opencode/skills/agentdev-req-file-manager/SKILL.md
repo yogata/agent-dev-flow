@@ -1,5 +1,5 @@
 ---
-name: `agentdev-req-file-manager`
+name: agentdev-req-file-manager
 description: Manages REQ numbering and requirement file operations (CREATE/APPEND/UPDATE). USE FOR: creating requirement files, appending sections, updating existing requirements, matching existing requirements for CREATE/APPEND/UPDATE judgment, or deleting requirement unit files. DO NOT USE FOR: analyzing requirement quality, creating ADR files, general document management, or requirement gathering.
 ---
 
