@@ -68,3 +68,19 @@
 - **想定反映先**: SPEC `docs/specs/commands/case-close.md` Step 3-2、同 Step 9、同 Step E4-E6 の順序依存性、agentdev-git-worktree skill の references/git-common-procedures.md。
 - **関連**: Epic #1308 Wave 1 クローズ（PR #1313/#1314/#1315/#1316）。実行日時 2026-06-28。
 - **タグ**: `#case-close` `#epic-wave-close` `#spec-elevation` `#git-pull` `#working-tree` `#ordering`
+
+## gh issue edit --body-file でコンソールエンコーディング初期化（Step 0）を省略すると UTF-8 BOM なしファイルでも本文が mojibake 化する
+
+- **問題事象**: case-close Step 2 で完了条件 checkbox を [x] 化するため、`[System.IO.File]::WriteAllText($tmp, $body, UTF8Encoding($false))` で UTF-8 BOM なしファイルを作成し `gh issue edit 1341 --body-file $tmp` を実行したところ、Issue 本文が CP932 として解釈され日本語が文字化けした（4562 バイトの本来本文が 3281 文字の mojibake 文字列として保存された）。
+- **発生局面**: 実装（case-close Step 2 完了条件更新）。Windows + pwsh 7 環境。
+- **検知方法**: 書き込み直後の VERIFY で `[regex]::Matches($body, '- \[ \]').Count` を見ると更新されているはずが 0 のままで、さらに本文頭部が `## 讎りｦ・` のように mojibake になっていることで検知。
+- **根本原因**: gh CLI は `--body-file` で指定したファイル読み込み時にコンソールのコードページ（chcp）を参照する。Step 0（`[Console]::OutputEncoding`, `$OutputEncoding`, `chcp 65001` の3行）を省略したため chcp 932（Shift-JIS）環境で gh が UTF-8 バイト列を CP932 として解釈し文字化けした。`[System.IO.File]::WriteAllText` によるファイル側の UTF-8 BOM なし書き出し規定は、gh CLI のファイル読み取り側エンコーディング判別には影響しない。
+- **自律対応内容**: agentdev-gh-cli skill の standard-procedures.md Section 2 Step 0 に規定の3行（`[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`, `$OutputEncoding = [System.Text.Encoding]::UTF8`, `cmd /c chcp 65001 | Out-Null`）を実行後に、正しい元本文（手元に残っていた最初の gh issue view 出力）を再構成して `[x]` 化し、`gh issue edit --body-file` を再実行して本文を復元した。VERIFY で unchecked=0, checked=2, mojibake なしを確認。
+- **ユーザー確認有無**: なし。
+- **ADR/REQ/spec影響**: なし。agentdev-gh-cli skill `references/standard-procedures.md` Section 2 Step 0 は既に規定済み。本事例は規定の運用徹底不足に起因。
+- **横展開観点**: gh CLI の全 WRITE 操作（`gh issue edit`, `gh issue comment`, `gh issue create`, `gh pr create`, `gh pr edit`）で `--body-file`/ `--title` 引数を使用する際に同様に発生する。`--title` への日本語渡し、gh CLI 内部の文字列表記も影響を受ける。
+- **再発条件**: (a) Windows PowerShell / pwsh 環境で chcp 932 のまま gh issue edit --body-file を実行した場合、(b) Step 0 の3行を実行せずに WRITE 操作に進んだ場合、(c) セッションを新規起動後にコンソールエンコーディング初期化を忘れた場合。
+- **予防策候補**: (a) case-close / case-open / case-update 等、gh CLI WRITE を呼ぶ全 command の該当 Step に「agentdev-gh-cli standard-procedures Section 2 Step 0 を必ず実行」を明記、(b) verify.md の書き込み後 VERIFY に「本文の mojibake チェック（日本語文字種の正常性確認）」項目を追加、(c) README 等のハーネス側 AGENTS.md に Windows 環境での gh CLI 実行前のエンコーディング初期化を必須事項として明記。
+- **想定反映先**: (a) `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` Section 2 Step 0（既存・再徹底）、(b) `src/opencode/skills/agentdev-gh-cli/references/verify.md`（mojibake 検査項目追加候補）、(c) `src/opencode/commands/agentdev/case-close.md` 等 gh CLI WRITE を呼ぶ command の該当 Step（Step 0 参照を明記）。
+- **関連**: Issue #1341 case-close、PR #1344。agentdev-gh-cli skill `references/standard-procedures.md` Section 2 Step 0、Section 1 禁止事項。
+- **タグ**: `#gh-cli` `#encoding` `#windows` `#mojibake` `#case-close` `#verify`
