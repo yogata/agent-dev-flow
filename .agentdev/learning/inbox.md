@@ -100,3 +100,19 @@
 - **想定反映先**: `src/opencode/skills/agentdev-git-worktree/references/git-common-procedures.md`（pull/push/hash 検証の共通手順に現在ブランチ判定の分岐を追加）、`src/opencode/commands/agentdev/case-close.md` Step 9。
 - **関連**: Issue #1342 case-close、PR #1347（merge bc8331c3）。sibling: Issue #1345（OU-004）、ブランチ `fix/skill-frontmatter-backticks-removal-1345`。実行日時 2026-06-29。
 - **タグ**: `#case-close` `#case-auto` `#parallel` `#git-fetch` `#main-worktree` `#workaround`
+
+## 学び: 機械横断是正の除外ロジックが YAML frontmatter を考慮していなかった事例と Level 2 コンフリクト解消モデルの実証
+
+- **問題事象**: PR #1334 の機械横断是正（backticks 機械付与）で、`src/opencode/skills/agentdev-*/SKILL.md` 計27ファイルの frontmatter `name:` 行にバッククォートが誤って付与された。frontmatter は構造データ（YAML）であり Markdown インラインコード表記の対象外であるため、opencode がスキル名を `` `agentdev-xxx` `` として誤認する不具合を引き起こした。さらに本是正 PR (#1346) の case-close 実行中に、origin/main へ PR #1347（AG-002）が push され `agentdev-inspect-skills/SKILL.md` で content conflict が発生。Level 1 rebase で自動解決失敗し case-auto へエスカレーション、Level 2 で rebase 解消してマージ完了した。
+- **発生局面**: 機械横断是正の実行時（PR #1334）、および case-close Step 4-2（コンフリクト解消 rebase パス Level 1）。
+- **検知方法**: (a) backticks 付与は opencode のスキルロード時の名前空間解決不正で発覚。(b) conflict は `gh pr merge 1346 --squash` が `GraphQL: Pull Request has merge conflicts` で失敗し、`gh pr view 1346 --json mergeable,mergeStateStatus` が `CONFLICTING/DIRTY` を返したことで検知。
+- **根本原因**: (a) backticks 機械付与対象の除外ロジックが YAML frontmatter 等の構造データを考慮していなかった。自然言語記述（本文）のみが付与対象と明文化されていなかった。(b) conflict は case-close 実行中に別 PR (#1347) が origin/main へ push された纯粋なタイミング競合。
+- **自律対応内容**: (a) 是正として frontmatter `name:` 行を YAML スカラー値（プレーン文字列）へ修正。再発防止として agentdev-inspect-skills へ frontmatter name バッククォート検出基準を追加、agentdev-skill-authoring へバッククォート禁止規定を明示。(b) Level 1 rebase 試行→自動解決失敗→`git rebase --abort`→case-auto へエスカレーション。case-auto から Level 2 再委譲を受け case-close Step 4 から再開、squash merge 成功。
+- **ユーザー確認有無**: なし。
+- **ADR/REQ/spec影響**: あり（前工程で完了済み）。REQ-0140（文書品質ゲート: 構造データ除外を明確化）、REQ-0153（機械横断是正の完了証明: 対象範囲妥当性）、`docs/specs/integrity/backticks-identifier-threshold.md`（適用対象外の構造データ明示）。_commit 11c754d9 で main マージ済み_。
+- **横展開観点**: (a) 機械横断是正を実装する全ケースで、付与対象が自然言語記述のみであることの明示と、構造データ（YAML/JSON/ TOML frontmatter 等）の除外判定が必須。検出自動化は inspect-skills で担保（新設 `references/skill-frontmatter-name-backtick.md`、診断ラベル `skill-frontmatter-name-backtick`）。(b) コンフリクト解消モデル Level 1/2/3 の運用実績として、Level 1 失敗→Level 2 委譲の経路が機能することを実証。Level 2 は実装変更を伴う rebase 解消を case-auto/case-run が担う。
+- **再発条件**: (a) backticks 機械付与対象を自然言語記述のみに限定する判定なしに機械横断是正を実行した場合。(b) case-close 実行中に別 PR が origin/main へ push され、同じファイルへ変更を加える場合。
+- **予防策候補**: (a) 機械横断是正の実装前に付与対象・除外対象の分類チェックを必須化（REQ-0153 対象範囲妥当性）。検出は inspect-skills `skill-frontmatter-name-backtick` ラベルで自動化済み。(b) コンフリクト解消モデル文書（`docs/specs/commands/case-auto.md` Level 1/2/3）の運用継続。Level 1 失敗時のエスカレーション指示は case-close Step 4-2 に明記済み。
+- **想定反映先**: 既に対処済み。(a) REQ-0140/0153、`docs/specs/integrity/backticks-identifier-threshold.md`、agentdev-inspect-skills（検出基準）、agentdev-skill-authoring（オーサリング規範）。(b) `docs/specs/commands/case-auto.md` コンフリクト解消モデル、`src/opencode/commands/agentdev/case-close.md` Step 4-2。
+- **関連**: Issue #1345、PR #1346（squash merge c4e78897）、PR #1334（原本是正）、PR #1347（AG-002 conflict 相手、merge bc8331c3）、commit 11c754d9（REQ/SPEC 前提）。実行日時 2026-06-29。
+- **タグ**: `#machine-transversal-correction` `#backticks` `#yaml-frontmatter` `#structural-data` `#conflict-resolution` `#level-2` `#case-auto` `#case-close`
