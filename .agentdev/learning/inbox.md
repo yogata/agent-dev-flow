@@ -84,3 +84,19 @@
 - **想定反映先**: (a) `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` Section 2 Step 0（既存・再徹底）、(b) `src/opencode/skills/agentdev-gh-cli/references/verify.md`（mojibake 検査項目追加候補）、(c) `src/opencode/commands/agentdev/case-close.md` 等 gh CLI WRITE を呼ぶ command の該当 Step（Step 0 参照を明記）。
 - **関連**: Issue #1341 case-close、PR #1344。agentdev-gh-cli skill `references/standard-procedures.md` Section 2 Step 0、Section 1 禁止事項。
 - **タグ**: `#gh-cli` `#encoding` `#windows` `#mojibake` `#case-close` `#verify`
+
+## 学び: case-auto 並列実行中に main worktree が sibling ブランチにいる場合の main ref 同期
+
+- **問題事象**: case-close Step 9（git pull --ff-only で main 同期）を実行しようとしたところ、main worktree の現在ブランチが sibling セッションの `fix/skill-frontmatter-backticks-removal-1345` になっていた。`git checkout main && git pull --ff-only` を実行すると working tree の状態（`.gitignore` 変更、`.agentdev/drafts/` 未追跡）が sibling セッション側へ持ち込まれ、sibling 作業を破壊するリスクがあった。
+- **発生局面**: case-close Step 9（実行前同期）。case-auto draft9 並列実行中（OU-002 #1342、OU-003 #1343、OU-004 #1345 が同時進行）。
+- **検知方法**: `git branch --show-current` で現在ブランチが main ではなく sibling ブランチであることを確認。`git pull --ff-only` が "Already up to date." を返し（sibling ブランチ視点では既に最新）、HEAD がマージコミット bc8331c3 でないことで検知。
+- **根本原因**: case-auto 並列実行で sibling セッション（OU-004 #1345）が main worktree で `fix/skill-frontmatter-backticks-removal-1345` ブランチを作成し作業中。case-close の標準手順（Step 9 git pull --ff-only）は main worktree が main ブランチにいることを暗黙に前提としているが、並列実行時はその前提が崩れる。
+- **自律対応内容**: `git checkout main` で working tree を移動する代わりに `git fetch origin main:main` を実行し、local main ref のみを fast-forward 更新した（working tree は sibling ブランチのまま、`.gitignore` 変更と `.agentdev/drafts/` 未追跡ファイルもそのまま保持）。これにより main ref は bc8331c3 へ同期され、sibling セッションの作業状態は無傷で維持された。
+- **ユーザー確認有無**: なし。
+- **ADR/REQ/spec影響**: あり。case-close Step 9（`agentdev-git-worktree` skill の `git pull --ff-only` 手順）は、main worktree が main ブランチにいることを前提としている。case-auto 並列実行時の main worktree 共有利用に関する明示が必要。REQ-0131（case-close）、agentdev-git-worktree skill。
+- **横展開観点**: case-auto 並列実行で main worktree を sibling ブランチが占有する全ケース。Epic Wave クローズ等の自動マージ処理でも、sibling が main worktree を使用中に main 同期が必要な場面で同様。
+- **再発条件**: (a) case-auto が OU を並列委譲し、sibling セッションが main worktree でブランチを作成している場合、(b) case-close Step 9 を実行する際に main worktree が main 以外のブランチにいる場合。
+- **予防策候補**: (a) case-close Step 9 に「現在ブランチが main でない場合は `git fetch origin main:main` で ref のみ同期し、working tree を移動しない」分岐を明記、(b) case-auto 並列実行時に各 OU 専用の worktree を必ず作成させ main worktree を共有させない、(c) agentdev-git-worktree skill に main 以外のブランチにいる場合の代替同期手順を追加。
+- **想定反映先**: `src/opencode/skills/agentdev-git-worktree/references/git-common-procedures.md`（pull/push/hash 検証の共通手順に現在ブランチ判定の分岐を追加）、`src/opencode/commands/agentdev/case-close.md` Step 9。
+- **関連**: Issue #1342 case-close、PR #1347（merge bc8331c3）。sibling: Issue #1345（OU-004）、ブランチ `fix/skill-frontmatter-backticks-removal-1345`。実行日時 2026-06-29。
+- **タグ**: `#case-close` `#case-auto` `#parallel` `#git-fetch` `#main-worktree` `#workaround`
