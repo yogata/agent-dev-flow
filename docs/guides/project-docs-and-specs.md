@@ -54,22 +54,8 @@ DOC-MAP（文書探索入口：索引）
 「今どう動いているか」を記述する。
 リポジトリ内部の設計文書であり、実行時配布物の依存先ではない（ADR-0103, ADR-0104）。
 
-| SPEC | 内容 |
-|------|------|
-| system.md | コマンドシステムの構成 |
-| patterns.md | 実装パターンと文書フォーマット |
-| design-principles.md | 設計原則 |
-| quality-specs.md | 品質基準、検証ルール |
-| quality-gates.md | 品質ゲート（QG-1〜QG-4） |
-| document-model.md | 文書種別の責務マトリックス |
-| artifact-contracts.md | アーティファクト間契約 |
-| artifact-responsibilities.md | アーティファクト責務定義 |
-| integrity-contracts.md | 整合性検査分類フレームワーク |
-| integrity-rule-catalog.md | 整合性ルールカタログ |
-| workflow-contracts.md | ワークフロー契約の雛形 |
-| runtime-package-boundary.md | 実行時パッケージ境界 |
-| rule-ownership.md | ルール所有権 |
-| req-impact-map.md | REQ 影響マップ |
+> 現行 SPEC の一覧は `docs/README.md`（基盤 SPEC 一覧）を正とする。
+> 本ガイドでは SPEC 一覧を複製しない。
 
 ## DOC-MAP（文書探索入口）
 
