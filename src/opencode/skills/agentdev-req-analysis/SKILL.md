@@ -1,5 +1,5 @@
 ---
-name: `agentdev-req-analysis`
+name: agentdev-req-analysis
 description: Provides requirement analysis methods with quality criteria and ADR threshold judgment. USE FOR: analyzing requirements, defining acceptance criteria, or evaluating requirement completeness. DO NOT USE FOR: creating requirement files, managing file operations, architecture decision evaluation, or implementation planning.
 ---
 

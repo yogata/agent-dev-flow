@@ -1,5 +1,5 @@
 ---
-name: `agentdev-doc-writing`
+name: agentdev-doc-writing
 description: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度、japanese-tech-writing規範適合、配布物 ID 汚染検出、実行主体分類）。USE FOR: docs配下のREQ/ADR/SPEC/guides/DOC-MAP/READMEの査読、docsを生成、編集するcommand/skillの自然言語記述の査読、japanese-tech-writing規範（LLM っぽい表現の禁止、空虚な形容、空虚な動詞等）への適合査読、read-only/advisor/architecture-affecting系表現の分解、英文混じり表現の検出、配布物（src/opencode/commands/、skills/）への内部 ID（REQ/ADR/SPEC-ID/IR）残留の検出、実行主体（command/skill/subagent/harness）の誤認検出。DO NOT USE FOR: コード実装、テスト実行、REQ/ADR番号付与、APPEND/UPDATE/CREATE判定、ADR必要性判定、command手順設計、Issue/PR CRUD、要件分析（req-analysis担当）、ADR要否動的判断（adr-guidelines担当）、ファイル保存、commit、push。
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: `agentdev-learning-pipeline`
+name: agentdev-learning-pipeline
 description: Learning pipeline（capture → promote）の共通知識。inbox entry schema、問題クラス分類基準、8軸評価ディメンション、evaluation-report schema、処分区分、既存対策照合、採用済み成果物スキーマ、prune 方針、各層の責任分界を定義する。USE FOR: learning-promote の実行時参照、learning pipeline の拡張、変更時の基準確認。DO NOT USE FOR: `agentdev-learning-capture`（capture専用として独立）、req-define（採用済み成果物の参照側だが本 skill は参照しない）、一般的なコマンド作成。
 ---
 

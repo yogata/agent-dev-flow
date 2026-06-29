@@ -1,5 +1,5 @@
 ---
-name: `agentdev-intake-pipeline`
+name: agentdev-intake-pipeline
 description: intake-from-github（GitHub残課題抽出）と intake-promote（review、分類、振り分け）の知識ベース。USE FOR: GitHub intake抽出ロジック（期間解釈、データ取得、構造検出、LLM解析、item生成）、intake-promote時のreview、分類、整形、振り分け基準、Inbox確認、Review観点、採用/保留/却下の分類判定、promoted/archiveへの振り分け、Git永続化手順。DO NOT USE FOR: Issue作成（`agentdev-issue-management`）、RU生成（`agentdev-backlog-integration`）、REQ構造診断（`agentdev-req-structure-diagnostics`）、work_type判定（`agentdev-workflow-lifecycle`）
 ---
 

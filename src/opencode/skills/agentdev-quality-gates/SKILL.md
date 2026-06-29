@@ -1,5 +1,5 @@
 ---
-name: `agentdev-quality-gates`
+name: agentdev-quality-gates
 description: "Defines lightweight quality gates for AgentDevFlow main workflow. USE FOR: QG-1 definition integrity, QG-2 acceptance criteria coverage, QG-3 implementation deviation, QG-4 final acceptance. DO NOT USE FOR: executing tests, modifying files, creating issues, updating issue checkboxes, creating PRs, merging PRs, or replacing command-specific procedures."
 ---
 

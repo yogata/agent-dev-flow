@@ -1,5 +1,5 @@
 ---
-name: `agentdev-epic-tracker`
+name: agentdev-epic-tracker
 description: Updates parent Epic Issue status tracking tables in case-close workflows (single-writer). USE FOR: case-close(#epic) Epic Issue status writes (pending→completed/blocked/failed), tracking child Issue progress in parent Epics, detecting parent-child relationships via Parent: #N patterns. DO NOT USE FOR: creating Epics, managing non-Epic Issues, case-run(#epic) internal ready/running tracking (not persisted to Epic Issue), or general Issue operations.
 ---
 

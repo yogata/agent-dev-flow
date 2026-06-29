@@ -1,5 +1,5 @@
 ---
-name: `agentdev-case-run-execution-adapter`
+name: agentdev-case-run-execution-adapter
 description: "case-run external execution adapter. USE FOR: connecting case-run issue execution to Sisyphus-Junior via task() delegation (adapter skill + 委譲 prompt 内 `/ulw-loop` command), handling completed(pr)/blocked/failed results. DO NOT USE FOR: req-define architecture review, ADR judgment, workflow state management, or Issue completion checkbox evaluation."
 ---
 

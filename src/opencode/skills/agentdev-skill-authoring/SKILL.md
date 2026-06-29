@@ -1,5 +1,5 @@
 ---
-name: `agentdev-skill-authoring`
+name: agentdev-skill-authoring
 description: Provides quality criteria and best practices for authoring OpenCode SKILL.md files across five evaluation axes and four check protocols. USE FOR: creating new skills, improving existing skills, reviewing skill quality, designing skill structure, writing trigger descriptions, or planning progressive disclosure. DO NOT USE FOR: creating command definitions, general coding tasks, or simple documentation fixes.
 ---
 
@@ -239,9 +239,39 @@ skill/
 ### 5.1 frontmatter チェック
 
 - [ ] nameが命名規則に従っている（kebab-case、gerund form推奨）
+- [ ] nameが **YAML スカラー値（プレーン文字列）** で記述されている（バッククォートで囲まない）。frontmatter は構造データであり Markdown インラインコード表記の対象外（`docs/specs/integrity/backticks-identifier-threshold.md`「適用対象外」準拠、PR #1334 事例）
 - [ ] descriptionにトリガー（USE FOR/ DO NOT USE FOR または WHEN）が含まれている
 - [ ] descriptionが3人称で書かれている
 - [ ] frontmatterフィールドはnameとdescriptionのみ（拡張フィールドを追加しない）
+
+#### frontmatter `name:` のバッククォート禁止（必須規定）
+
+frontmatter の `name:` フィールドは YAML スカラー値であり、バッククォート（Markdown インラインコード記法）で囲んではならない。囲んだ場合、YAML パーサが `` `agentdev-xxx` `` 全体を name 値として解釈し、ディレクトリ名との不一致（IR-007 違反）と opencode のスキル名解決不具合を引き起こす（PR #1334 事例）。
+
+| 箇所 | 形式 | 例 |
+|------|------|-----|
+| frontmatter `name:` | プレーン文字列（バッククォートなし） | `name: agentdev-xxx` |
+| Markdown 本文中のスキル名言及 | バッククォート囲み（識別子表記） | `` `agentdev-xxx` スキルは… `` |
+
+この使い分けを徹底する。frontmatter は構造データ、本文は自然言語記述であり、同じスキル名でも文脈により表記が異なる。
+
+誤例（禁止）:
+
+```
+---
+name: `agentdev-xxx`
+---
+```
+
+正例:
+
+```
+---
+name: agentdev-xxx
+---
+```
+
+既存テンプレート例示（本ファイル「6. 開発ワークフロー」内「テンプレートパターン」のコードブロック）は正例であり、frontmatter の `name:` がプレーン文字列で記述されている。本規定と矛盾しない。
 
 ### 5.2 予算チェック
 
