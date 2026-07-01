@@ -282,7 +282,11 @@ operation_units:
     depends_on: []
     recommended_order: 1
     issue_policy: single
-    result: {}
+    result:
+      issue_number: 1351
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1351
+      req_id: REQ-0157
+      status: opened
   - ou_id: OU-002
     source_ru: RU-20260701-project-read-contract-migration
     target_req: REQ-0103
