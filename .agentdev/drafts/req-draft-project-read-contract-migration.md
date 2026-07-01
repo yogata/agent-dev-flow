@@ -295,7 +295,11 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      issue_number: 1353
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1353
+      req_id: REQ-0103
+      status: opened
 
 test_strategy:
   - id: TS-001
