@@ -247,6 +247,12 @@ operation_units:
       file: docs/requirements/REQ-0141.md
       change: REQ-0141-004 廃止候補→廃止確定
       source_artifact_action: ACT-REQ-002
+      case_open:
+        issue_number: 1357
+        issue_url: https://github.com/yogata/agent-dev-flow/issues/1357
+        status: issue_created
+        qg2_verdict: pass
+        created_at: 2026-07-02
   - ou_id: OU-003
     source_ru: RU-20260701-doc-control-plane-targeted-docs-guard
     target_req: REQ-0156
