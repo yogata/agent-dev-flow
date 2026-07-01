@@ -8,11 +8,19 @@ description: case-run の状態機械、サブエージェント protocol、self
 case-run コマンドの状態機械、サブエージェントプロトコル、自律修正ループ、CI 対応ループ、エラー回復の判定基盤を提供する。
 
 
+## skill read contract 参照方針
+
+本スキルは以下の方針に従う（ADR-0133）。
+
+1. プロジェクト固有の `docs/specs/**` 内部構成を仮定しない
+2. 呼び出し元コマンドから渡された解決済み文脈を優先する
+3. 解決済み文脈がなく skill read contract が存在する場合のみ読む
+4. read contract に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない
 ## 状態機械
 
 
 case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を Sisyphus-Junior、ulw-loop（adapter skill + 委譲 prompt 内 `/ulw-loop` command）に並列委譲、最大5件）を処理し、Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
-Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: ADR-0125、`docs/specs/workflows/epic-wave-model.md`、ADR-0128）。
+Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: ADR-0125、epic-wave-model SPEC、ADR-0128）。
 
 ### フェーズ構成
 

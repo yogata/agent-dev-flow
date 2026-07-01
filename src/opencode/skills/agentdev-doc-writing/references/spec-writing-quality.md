@@ -1,6 +1,6 @@
 # SPEC 本文の合格基準
 
-> **原本**: 配置基準、用語政策は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md)「文書種別責務」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+> **原本**: 配置基準、用語政策は document-type-responsibilities SPEC「文書種別責務」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
 > 本ファイルは運用ビュー（詳細仕様の置き場としての成立性判定）である。
 
 SPEC は現在の実装構成を成立させるスキーマ、ライフサイクル、コマンド構成、ルールカタログ、判定表、enum、format、内部パラメータを記述する。

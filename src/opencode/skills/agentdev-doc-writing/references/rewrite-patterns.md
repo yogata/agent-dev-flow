@@ -1,7 +1,7 @@
 # 英語抽象語の検出→書き換えパターン
 
 > **原本**: 英語抽象語（`read-only`、`advisor`、`architecture-affecting` 等）の分解ルールは本ファイルが原本。
-> 一般的な執筆規範（LLM っぽい表現の禁止、空虚な形容、空虚な動詞等）は `japanese-tech-writing` スキル（AGENTS.md 経由）、用語政策（英字許容リスト、訳語表）は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md) を参照。
+> 一般的な執筆規範（LLM っぽい表現の禁止、空虚な形容、空虚な動詞等）は `japanese-tech-writing` スキル（AGENTS.md 経由）、用語政策（英字許容リスト、訳語表）は document-type-responsibilities SPEC を参照。
 
 ## 適用除外
 
@@ -82,5 +82,5 @@ docs 記述中に英語抽象語を検出した場合、以下の 6 項目を順
 
 ## 用語政策の参照先
 
-英字許容リスト、訳語表（修飾語の日本語化、複合技術語の訳し方、専門カタカナ語、略語の扱い等）は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md)「用語政策」節を SSoT とする。
+英字許容リスト、訳語表（修飾語の日本語化、複合技術語の訳し方、専門カタカナ語、略語の扱い等）は document-type-responsibilities SPEC「用語政策」節を SSoT とする。
 本ファイルは重複記述しない。

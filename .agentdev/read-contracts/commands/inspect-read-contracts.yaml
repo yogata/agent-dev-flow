@@ -1,0 +1,9 @@
+command: inspect-read-contracts
+must_read:
+  - docs/specs/foundations/project-read-contracts.md
+conditional_read:
+  ir056:
+    - docs/specs/integrity/rules/IR-056-project-read-contract-integrity.md
+allowed_discovery: []
+forbidden: []
+read_completion: []

@@ -112,7 +112,7 @@
 - **再発条件**: 新規REQ作成時に既存ドキュメントとの整合性チェックをスキップする場合
 - **予防策候補**: req-save の実行ステップに specs/ADR 整合性チェックを追加する
 - **想定反映先**: `req-save` コマンド、`agentdev-req-analysis` スキル
-- **関連**: `docs/requirements/{REQ-ID}.md`, `docs/specs/foundations/design-principles.md`, Issue #{issue_number}
+- **関連**: `docs/requirements/{REQ-ID}.md`, design-principles SPEC, Issue #{issue_number}
 - **タグ**: `#仕様矛盾` `#REQ更新` `#ADR影響`
 ```
 

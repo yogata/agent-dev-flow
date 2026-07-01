@@ -1,0 +1,8 @@
+command: spec-save
+must_read:
+  - docs/specs/foundations/document-model.md
+  - docs/specs/foundations/patterns.md
+conditional_read: {}
+allowed_discovery: []
+forbidden: []
+read_completion: []

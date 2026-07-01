@@ -21,6 +21,21 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 - **対象**: `src/opencode/commands/agentdev/*.md`（AgentDevFlow 配布 command 原本）、`.opencode/commands/repo/*.md`（repo-local command）
 - **対象外**: AgentDevFlow 適用プロジェクト（consumer project）の独自 command
 
+## project read contract 手順
+
+command 本文は project read contract 手順（ADR-0133、SPEC `../foundations/project-read-contracts.md`）のみを持ち、具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を固定しない。
+
+各 command は以下の6歩からなる共通手順を本文に持つ（SPEC パス例示、検査対象パス指定は例外として許可する）:
+
+1. `.agentdev/config.yaml` を読み込む
+2. 当該コマンドに対応する `.agentdev/read-contracts/commands/<command>.yaml` を読み込む
+3. `must_read` に列挙された paths を読み込む
+4. `conditional_read` の条件が該当する場合のみ、当該 paths を読み込む
+5. read contract に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
+6. read contract が存在しない場合は `config.yaml` の `roots` と明示入力のみを使う
+
+実行時に読むべき docs 文書への参照は command read contract（`.agentdev/read-contracts/commands/<command>.yaml`）の `must_read`, `conditional_read`, `allowed_discovery` へ移す。command 本文に直接の docs パスを記述しない。
+
 ## 手順セクション形式
 
 `## 手順` 配下の Step 構造は以下の形式に従う。

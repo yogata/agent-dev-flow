@@ -1,0 +1,8 @@
+skill: agentdev-skill-authoring
+conditional_read:
+  backticks_threshold:
+    - docs/specs/integrity/backticks-identifier-threshold.md
+  artifact_contracts:
+    - docs/specs/responsibilities/artifact-contracts.md
+allowed_discovery: []
+forbidden: []

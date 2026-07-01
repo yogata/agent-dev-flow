@@ -1,0 +1,14 @@
+skill: agentdev-inspect-skills
+conditional_read:
+  docs_spec_rebuild_integrity:
+    - docs/specs/integrity/docs-spec-rebuild-integrity.md
+  agentdev_gh_cli_spec:
+    - docs/specs/skills/agentdev-gh-cli.md
+  integrity_rule_catalog:
+    - docs/specs/integrity/integrity-rule-catalog.md
+  document_type_responsibilities:
+    - docs/specs/responsibilities/document-type-responsibilities.md
+  backticks_threshold:
+    - docs/specs/integrity/backticks-identifier-threshold.md
+allowed_discovery: []
+forbidden: []

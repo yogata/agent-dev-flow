@@ -1,0 +1,8 @@
+command: inspect-promote
+must_read: []
+conditional_read:
+  workflow_contracts:
+    - docs/specs/workflows/workflow-contracts.md
+allowed_discovery: []
+forbidden: []
+read_completion: []

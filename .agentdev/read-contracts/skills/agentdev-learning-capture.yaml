@@ -1,0 +1,6 @@
+skill: agentdev-learning-capture
+conditional_read:
+  design_principles:
+    - docs/specs/foundations/design-principles.md
+allowed_discovery: []
+forbidden: []

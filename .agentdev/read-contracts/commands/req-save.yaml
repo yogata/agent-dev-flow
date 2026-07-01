@@ -1,0 +1,12 @@
+command: req-save
+must_read:
+  - docs/specs/foundations/document-model.md
+conditional_read:
+  integrity_rule_catalog:
+    - docs/specs/integrity/integrity-rule-catalog.md
+  req_file_manager_procedure:
+    - docs/specs/skills/agentdev-req-file-manager.md
+allowed_discovery: []
+forbidden: []
+read_completion:
+  - docs/specs/foundations/patterns.md

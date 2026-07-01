@@ -28,6 +28,17 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 - 検出事項リスト（対象、観点、分類、根拠、推奨 route）
 - `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md`（検出事項ファイル出力）
 
+## project read contract
+
+本コマンドは以下の6歩で docs を解決する（ADR-0133）。
+
+1. `.agentdev/config.yaml` を読み込む
+2. `.agentdev/read-contracts/commands/inspect-skills.yaml` を読み込む
+3. `must_read` に列挙された paths を読み込む
+4. `conditional_read` の条件が該当する場合のみ、当該 paths を読み込む
+5. read contract に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
+6. read contract が存在しない場合は `config.yaml` の `roots` と明示入力のみを使う
+
 ## 手順
 
 ### Step 1: 診断対象の読込
@@ -38,10 +49,10 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 `agentdev-inspect-skills` に従い、参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存を評価する
 ### Step 3: 配布物構文健全性、責務整合診断
 
-配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/specs/integrity/docs-spec-rebuild-integrity.md` が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複、見出し重複、Markdown 構文破損、壊れた括弧、command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する
+配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（read contract 経由）が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複、見出し重複、Markdown 構文破損、壊れた括弧、command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する
 ### Step 4: 分類
 
-検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は `docs/specs/integrity/docs-spec-rebuild-integrity.md` の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける
+検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（read contract 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける
 ### Step 5: route 提示
 
 修正は実行せず、推奨 route を提示する

@@ -18,7 +18,7 @@
 
 | 対象 SPEC | 対応 references/contracts.md |
 |-----------|------------------------------|
-| `docs/specs/skills/agentdev-gh-cli.md`「## 操作契約」 | `src/opencode/skills/agentdev-gh-cli/references/contracts.md`（標準版）、`src/opencode-local/agentdev-gh-cli/references/contracts.md`（ローカル版） |
+| agentdev-gh-cli SPEC「## 操作契約」 | `src/opencode/skills/agentdev-gh-cli/references/contracts.md`（標準版）、`src/opencode-local/agentdev-gh-cli/references/contracts.md`（ローカル版） |
 
 新規に `## 操作契約` セクションを持つ SPEC が追加された場合、本診断の対象に自動的に含まれる。
 SPEC 内の「操作契約」見出しを走査し、対応する skill の `references/contracts.md` が存在するかを確認する。
@@ -67,7 +67,7 @@ contracts.md では I/O 手続きが `### {手続き名}` 見出しで並び、V
 ### 1. 対象 SPEC の特定
 
 `docs/specs/` 配下を走査し、`## 操作契約` 見出しを含む SPEC ファイルを特定する。
-現在は `docs/specs/skills/agentdev-gh-cli.md` のみが該当する。
+現在は agentdev-gh-cli SPEC のみが該当する。
 新規追加 SPEC が同見出しを持つ場合、自動的に対象に含める。
 
 ### 2. 対応 contracts.md の特定
@@ -126,7 +126,7 @@ Recommended route には `references`（contracts.md 側の修正）、`spec`（
 
 ```markdown
 - Finding: SPEC 操作契約テーブルと references/contracts.md の手続き集合が不一致
-- Target: docs/specs/skills/agentdev-gh-cli.md、src/opencode/skills/agentdev-gh-cli/references/contracts.md
+- Target: agentdev-gh-cli SPEC、src/opencode/skills/agentdev-gh-cli/references/contracts.md
 - Classification: spec-operation-contract-consistency
 - Evidence: SPEC 操作契約テーブルに「Issue close」手続きがあるが、contracts.md に該当手続きのセクションが存在しない
 - Recommended route: references

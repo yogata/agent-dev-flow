@@ -1,0 +1,11 @@
+version: 1
+kind: agentdev-project-config
+roots:
+  docs: docs
+  requirements: docs/requirements
+  adr: docs/adr
+  specs: docs/specs
+  doc_map: docs/DOC-MAP.md
+read_contracts:
+  commands: .agentdev/read-contracts/commands
+  skills: .agentdev/read-contracts/skills

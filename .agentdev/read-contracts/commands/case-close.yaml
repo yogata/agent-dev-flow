@@ -1,0 +1,12 @@
+command: case-close
+must_read:
+  - docs/specs/foundations/document-model.md
+conditional_read:
+  case_auto_conflict_model:
+    - docs/specs/commands/case-auto.md
+  case_close_spec:
+    - docs/specs/commands/case-close.md
+allowed_discovery: []
+forbidden: []
+read_completion:
+  - docs/specs/foundations/document-model.md

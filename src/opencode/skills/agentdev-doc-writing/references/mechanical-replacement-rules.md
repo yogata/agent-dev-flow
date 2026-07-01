@@ -5,7 +5,7 @@
 
 > **原本**: 中黒、em-dash、一文一行の機械判定アルゴリズムは本ファイルが原本。
 > LLM 表現の検出、書き換え辞書は [llm-expression-patterns.md](llm-expression-patterns.md) を参照。
-> 執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）、用語政策の原本は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md) を参照。
+> 執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）、用語政策の原本は document-type-responsibilities SPEC を参照。
 
 ## 対象読者
 
@@ -220,6 +220,6 @@ X-6（「において」検出）のヒューリスティックについて、PR
 
 - LLM 表現パターン辞書: [llm-expression-patterns.md](llm-expression-patterns.md)
 - 英語抽象語の検出→書き換え: [rewrite-patterns.md](rewrite-patterns.md)
-- backticks 識別子/一般名詞 判定閾値: [docs/specs/integrity/backticks-identifier-threshold.md](../../../../../docs/specs/integrity/backticks-identifier-threshold.md)（識別子 backticks 必須、一般名詞 backticks 任意の機械判定閾値。inspect-docs 検出処理が参照）
-- 用語政策 原本: [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md)「中黒使用の許容範囲」「em-dash 置換形式」「LLM 表現の検出→書き換え方針」節
+- backticks 識別子/一般名詞 判定閾値: backticks-identifier-threshold SPEC（識別子 backticks 必須、一般名詞 backticks 任意の機械判定閾値。inspect-docs 検出処理が参照）
+- 用語政策 原本: document-type-responsibilities SPEC「中黒使用の許容範囲」「em-dash 置換形式」「LLM 表現の検出→書き換え方針」節
 - 執筆規範 SSoT: `japanese-tech-writing` スキル（AGENTS.md 経由）

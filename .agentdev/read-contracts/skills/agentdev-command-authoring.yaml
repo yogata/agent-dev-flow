@@ -1,0 +1,6 @@
+skill: agentdev-command-authoring
+conditional_read:
+  artifact_contracts:
+    - docs/specs/responsibilities/artifact-contracts.md
+allowed_discovery: []
+forbidden: []
