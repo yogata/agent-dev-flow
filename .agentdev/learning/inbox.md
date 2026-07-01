@@ -116,3 +116,19 @@
 - **想定反映先**: 既に対処済み。(a) REQ-0140/0153、`docs/specs/integrity/backticks-identifier-threshold.md`、agentdev-inspect-skills（検出基準）、agentdev-skill-authoring（オーサリング規範）。(b) `docs/specs/commands/case-auto.md` コンフリクト解消モデル、`src/opencode/commands/agentdev/case-close.md` Step 4-2。
 - **関連**: Issue #1345、PR #1346（squash merge c4e78897）、PR #1334（原本是正）、PR #1347（AG-002 conflict 相手、merge bc8331c3）、commit 11c754d9（REQ/SPEC 前提）。実行日時 2026-06-29。
 - **タグ**: `#machine-transversal-correction` `#backticks` `#yaml-frontmatter` `#structural-data` `#conflict-resolution` `#level-2` `#case-auto` `#case-close`
+
+## 学び: check_read_contracts.ts は Bun ランタイム必須（node --experimental-strip-types は ESM エラーで失敗）
+
+- **問題事象**: case-close Step 2 の QG-4 証拠取得で `.opencode/skills/repo-agentdev-integrity/scripts/check_read_contracts.ts` を `node --experimental-strip-types` で実行したところ `ReferenceError: require is not defined in ES module scope, you can use import instead` で失敗した。スクリプト冒頭が `const path = require("path") as typeof import("path")` のハイブリッド記法であり、Node のネイティブ ESM（package.json なし）では解釈できない。
+- **発生局面**: case-close Step 2（QG-4 証拠検証）、Step 3-1（read contract 検査 strict 実行）。
+- **検知方法**: node 実行時の ReferenceError。併設テスト `check_read_contracts.test.ts` が `import { expect, test, describe } from "bun:test"` を持つことから Bun が想定ランタイムと判明。
+- **根本原因**: スクリプトが TypeScript + CommonJS require を Bun 上で動かす前提で書かれている。`require() as typeof import()` は TS の型キャスト付き require であり、純 ESM の Node では構文エラーになる。docs-check.md Step 1 と `docs/specs/commands/inspect-read-contracts.md` は「check_read_contracts.ts を実行し」とだけ書き、ランナー（Bun）を明記していない。
+- **自律対応内容**: テストを `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/check_read_contracts.test.ts` で実行し 2 pass を確認。スクリプト直接実行は `bun run` 用の小さなラッパ（checkReadContracts を import して呼ぶ）を書いて JSON レポートを取得し、ok=true / direct_refs=0 を確認した。
+- **ユーザー確認有無**: なし。
+- **ADR/REQ/spec影響**: なし（運用上の呼び出し方法）。docs-check.md Step 1、`docs/specs/commands/inspect-read-contracts.md`「検証観点」にランナー明記が望ましいが、機能欠陥ではない。
+- **横展開観点**: repo-agentdev-integrity 配下の他スクリプト群も同様の require/bun:test 記法を採用する可能性がある。docs-check、inspect-read-contracts、case-close Step 3-1 が同スクリプトを呼ぶ全局面で Bun が必要。
+- **再発条件**: (a) 新規セッションや CI で check_read_contracts.ts を node 系ランナーで実行しようとした場合、(b) docs-check を実行する agent がテストファイルの import 文を確認せずランナーを推測した場合。
+- **予防策候補**: (a) docs-check.md Step 1 と inspect-read-contracts SPEC の「check_read_contracts.ts を実行し」に「Bun で実行し（`bun run` / `bun test`）」を明記、(b) スクリプト冒頭に実行方法のコメントを追記、(c) repo-agentdev-integrity 配下に package.json を置き `scripts` としてエイリアスを定義。
+- **想定反映先**: `src/opencode/commands/repo/docs-check.md` Step 1、`docs/specs/commands/inspect-read-contracts.md`「検証観点」。必要なら `src/opencode/skills/repo-agentdev-integrity/SKILL.md` の実行手順。
+- **関連**: Issue #1351、PR #1352（squash merge 0002cee2）、スクリプト `.opencode/skills/repo-agentdev-integrity/scripts/check_read_contracts.ts`、テスト `check_read_contracts.test.ts`。実行日時 2026-07-02。
+- **タグ**: `#bun` `#node` `#esm` `#runtime` `#docs-check` `#inspect-read-contracts` `#workaround`
