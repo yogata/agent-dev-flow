@@ -266,6 +266,12 @@ operation_units:
       file: docs/requirements/REQ-0156.md
       appended_rows: [REQ-0156-010, REQ-0156-011, REQ-0156-012]
       source_artifact_action: ACT-REQ-003
+      case_open:
+        issue_number: 1359
+        issue_url: https://github.com/yogata/agent-dev-flow/issues/1359
+        status: issue_created
+        qg2_verdict: pass
+        created_at: 2026-07-02
 
 test_strategy:
   - id: TS-001
