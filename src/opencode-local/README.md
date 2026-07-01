@@ -1,6 +1,6 @@
 # ローカル版 OpenCode 固有原本領域
 
-> **非正規文書**: 本ディレクトリは AgentDevFlow 本体リポジトリの `docs/`（リポジトリ内部設計文書）ではなく、ローカル版 OpenCode の link 元となるローカル版固有原本を保持する領域である（ADR-0131）。要件は `docs/requirements/REQ-0141.md`、仕様は `docs/specs/local-*.md` を正とする。
+> **非正規文書**: 本ディレクトリは AgentDevFlow 本体リポジトリの `docs/`（リポジトリ内部設計文書）ではなく、ローカル版 OpenCode の link 元となるローカル版固有原本を保持する領域である（ADR-0131）。要件は `docs/requirements/REQ-0141.md`、仕様は `docs/specs/local/*.md` を正とする。
 
 ## 目的
 
@@ -27,25 +27,17 @@ src/opencode-local/
 ├── agentdev-gh-cli/       ← ローカル版 agentdev-gh-cli の原本（case-schema を吸収）
 │   ├── SKILL.md           ← ローカル版 agentdev-gh-cli のルーティング入口
 │   ├── references/        ← 操作契約・Case ファイル対応手続き・VERIFY 観点
-│   └── case-schema/       ← Case ファイルの操作用定義（正本は docs/specs/local-case-file.md）
+│   └── case-schema/       ← Case ファイルの操作用定義（正本は docs/specs/local/local-case-file.md）
 │       ├── case-file.md   ← スキーマ定義（YAML 前書き・status enum・labels・headings・採番）
 │       └── rules/
 │           ├── frontmatter.yaml   ← YAML 前書きスキーマの機械可読定義
 │           ├── status.yaml        ← status enum と状態遷移表の機械可読定義
 │           ├── labels.yaml        ← labels 値域の機械可読定義
 │           └── headings.yaml      ← 見出し一覧の機械可読定義
-├── transform/             ← 変換用/レビュー用プロンプトと変換仕様（廃止候補: ADR-0131 decision #4）
-│   ├── generate.md        ← 変換用プロンプト（link mode では使用しない）
-│   ├── review.md          ← レビュー用プロンプト（link mode では使用しない）
-│   └── spec.md            ← 変換仕様（link mode では使用しない）
-└── generation-flow.md     ← 生成フロー定義（廃止候補: ADR-0131 decision #4）
 ```
 
-### 廃止候補
-
-`transform/` と `generation-flow.md` は ADR-0126 時代の直接生成方式（generate-and-place）の資産であり、link mode への移行に伴い廃止候補とする（AG-011, ADR-0131 decision #4, REQ-0141-028）。
+link mode への移行に伴い、`transform/` と `generation-flow.md` は現行構成から除去済みである（AG-002, ADR-0131 decision #4, REQ-0141-028）。
 link mode では原本がそのまま接続されるため、旧変換資産による意味変換は不要である。
-廃止候補の段階では履歴参照のために残置し、link mode 導入・運用では使用しない。
 
 ### 作成しないディレクトリ（REQ-0141-005）
 
@@ -144,8 +136,8 @@ link による接続であるため、上書き問題が発生しない。
 - [Case ファイルスキーマ定義](agentdev-gh-cli/case-schema/case-file.md) — ローカル Case ファイルの構造
 - [ローカル版 agentdev-gh-cli ルーティング入口](agentdev-gh-cli/SKILL.md) — ローカル版 agentdev-gh-cli の手続き一覧
 - `docs/requirements/REQ-0141.md` — ローカル版 OpenCode 導入方式とローカル Case ファイル運用の要件定義（正本）
-- `docs/specs/local-generation.md` — link mode 接続フロー、link target 確認、更新運用の正本 SPEC
-- `docs/specs/local-case-file.md` — Case ファイルスキーマの正本 SPEC
-- `docs/specs/runtime-package-boundary.md` — `consumer-generated` リポジトリ種別、`.opencode/` 構成
+- `docs/specs/local/local-generation.md` — link mode 接続フロー、link target 確認、更新運用の正本 SPEC
+- `docs/specs/local/local-case-file.md` — Case ファイルスキーマの正本 SPEC
+- `docs/specs/local/runtime-package-boundary.md` — `consumer-generated` リポジトリ種別、`.opencode/` 構成
 - `docs/adr/ADR-0131.md` — ローカル版導入方式を link mode へ統一し生成方式を廃止（ADR-0126 を supersede）
 - `docs/adr/ADR-0126.md` — ローカル版 OpenCode 生成基盤（superseded by ADR-0131、歴史参照）

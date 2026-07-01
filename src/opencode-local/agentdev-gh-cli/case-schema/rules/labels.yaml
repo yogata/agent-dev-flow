@@ -1,14 +1,14 @@
 # ローカル Case ファイル labels 値域
 #
-# 正本: docs/specs/local-case-file.md「labels 値域」
+# 正本: docs/specs/local/local-case-file.md「labels 値域」
 # 要件: REQ-0141-019
 #
 # labels フィールドに設定可能な値を定義する。
-# 本ファイルは docs/specs/local-case-file.md と矛盾してはならない。
+# 本ファイルは docs/specs/local/local-case-file.md と矛盾してはならない。
 
 schema_version: "1.0"
 target: ".agentdev/cases/case-{NNNN}.md の labels フィールド"
-canonical_spec: "docs/specs/local-case-file.md"
+canonical_spec: "docs/specs/local/local-case-file.md"
 
 # label_enum（REQ-0141-019）
 # labels は配列とし、以下の値域から選定する。

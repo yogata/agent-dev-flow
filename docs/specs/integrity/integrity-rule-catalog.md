@@ -117,6 +117,7 @@ catalog はスキーマ定義とインデックスを維持する。
 - [IR-054: draft SPEC 放置検出](rules/IR-054-draft-spec-abandonment-detection.md)
 - [IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）](rules/IR-055-runtime-unresolved-reference.md)
 - [IR-056: project-read-contract-integrity（read contract 機構の整合性検査）](rules/IR-056-project-read-contract-integrity.md)
+- [IR-057: obsolete-spec-path-after-domain-split（旧SPEC直下パス参照検出）](rules/IR-057-obsolete-spec-path-after-domain-split.md)
 
 | Level | Description | Trigger |
 |-------|-------------|---------|

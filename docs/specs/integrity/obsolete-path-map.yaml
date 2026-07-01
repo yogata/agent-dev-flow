@@ -1,0 +1,155 @@
+# obsolete-path-map.yaml
+#
+# 旧SPEC直下パス → 現行ドメイン分割パス対応表（REQ-0158-002、IR-057）。
+# docs/specs/ 基盤SPEC ドメイン別体系化（REQ-0156）以前は SPEC ファイルが
+# docs/specs/ 直下に配置されていた。本 map はその旧パスを現行パスへmapし、
+# IR-057 obsolete-spec-path-after-domain-split が現行文書、原本、配置先、
+# 検査スクリプトに旧パスが残っていないことを検証するための参照データである。
+#
+# 各エントリのスキーマ:
+#   old      : 旧SPEC直下パス（docs/specs/<name>.md 形式）
+#   new      : 現行ドメイン分割パス（docs/specs/<domain>/<name>.md 形式）
+#   severity : ng（旧直下パス参照は不整合として扱う）
+#   scope    : 検査対象範囲（include / exclude の glob リスト）
+#
+# 検査対象外（scope.exclude）は履歴参照領域。retired/ 配下は旧パスを履歴として
+# 残すことを許容するため、IR-057 検査から除外する。現行ADRに歴史的経緯として
+# 旧パスを記載する場合は rule 側で例外登録する（IR-057 rule ファイル参照）。
+
+version: "1"
+
+scope:
+  include:
+    - "AGENTS.md"
+    - "README.md"
+    - "docs/**"
+    - "src/**"
+    - ".opencode/**"
+  exclude:
+    - "docs/requirements/retired/**"
+    - "docs/adr/retired/**"
+
+entries:
+  # foundations/（基盤モデル）
+  - old: "docs/specs/system.md"
+    new: "docs/specs/foundations/system.md"
+    severity: "ng"
+  - old: "docs/specs/patterns.md"
+    new: "docs/specs/foundations/patterns.md"
+    severity: "ng"
+  - old: "docs/specs/design-principles.md"
+    new: "docs/specs/foundations/design-principles.md"
+    severity: "ng"
+  - old: "docs/specs/document-model.md"
+    new: "docs/specs/foundations/document-model.md"
+    severity: "ng"
+  - old: "docs/specs/workflow-contracts.md"
+    new: "docs/specs/foundations/workflow-contracts.md"
+    severity: "ng"
+
+  # responsibilities/（文書種別、成果物責務）
+  - old: "docs/specs/document-type-responsibilities.md"
+    new: "docs/specs/responsibilities/document-type-responsibilities.md"
+    severity: "ng"
+  - old: "docs/specs/artifact-responsibilities.md"
+    new: "docs/specs/responsibilities/artifact-responsibilities.md"
+    severity: "ng"
+  - old: "docs/specs/artifact-contracts.md"
+    new: "docs/specs/responsibilities/artifact-contracts.md"
+    severity: "ng"
+  - old: "docs/specs/req-impact-map.md"
+    new: "docs/specs/responsibilities/req-impact-map.md"
+    severity: "ng"
+
+  # quality/（品質、メトリクス）
+  - old: "docs/specs/quality-specs.md"
+    new: "docs/specs/quality/quality-specs.md"
+    severity: "ng"
+  - old: "docs/specs/quality-gates.md"
+    new: "docs/specs/quality/quality-gates.md"
+    severity: "ng"
+  - old: "docs/specs/req-health-metrics.md"
+    new: "docs/specs/quality/req-health-metrics.md"
+    severity: "ng"
+  - old: "docs/specs/spec-health-metrics.md"
+    new: "docs/specs/quality/spec-health-metrics.md"
+    severity: "ng"
+
+  # integrity/（整合性契約、ルール）
+  - old: "docs/specs/integrity-contracts.md"
+    new: "docs/specs/integrity/integrity-contracts.md"
+    severity: "ng"
+  - old: "docs/specs/integrity-rule-catalog.md"
+    new: "docs/specs/integrity/integrity-rule-catalog.md"
+    severity: "ng"
+  - old: "docs/specs/rule-ownership.md"
+    new: "docs/specs/integrity/rule-ownership.md"
+    severity: "ng"
+  - old: "docs/specs/docs-spec-rebuild-integrity.md"
+    new: "docs/specs/integrity/docs-spec-rebuild-integrity.md"
+    severity: "ng"
+  - old: "docs/specs/backticks-identifier-threshold.md"
+    new: "docs/specs/integrity/backticks-identifier-threshold.md"
+    severity: "ng"
+
+  # local/（ローカル版 SPEC）
+  - old: "docs/specs/runtime-package-boundary.md"
+    new: "docs/specs/local/runtime-package-boundary.md"
+    severity: "ng"
+  - old: "docs/specs/local-case-file.md"
+    new: "docs/specs/local/local-case-file.md"
+    severity: "ng"
+  - old: "docs/specs/local-generation.md"
+    new: "docs/specs/local/local-generation.md"
+    severity: "ng"
+
+  # authoring/（執筆規約）
+  - old: "docs/specs/command-file-format.md"
+    new: "docs/specs/authoring/command-file-format.md"
+    severity: "ng"
+
+# local 版旧生成方式語彙（直接生成方式、生成フロー、再生成、上書き保護、
+# local-opencode-transform 識別子）。link mode 統一（ADR-0131）に伴い廃止確定。
+# generated_by は local-opencode-transform と組み合わせた場合のみ local 版旧生成
+# 方式として検出する（backlog 等の別文脈での generated_by 使用を除外するため）。
+legacy_local_generation_vocabulary:
+  - term: "src/opencode-local/generation-flow.md"
+    severity: "ng"
+    note: "物理削除済み。参照残存は不可。"
+  - term: "src/opencode-local/transform/"
+    severity: "ng"
+    note: "PR#1195 で transform/ 完全削除済み。"
+  - term: "transform/generate.md"
+    severity: "ng"
+    note: "transform/ 配下の旧資産。"
+  - term: "transform/review.md"
+    severity: "ng"
+    note: "transform/ 配下の旧資産。"
+  - term: "transform/spec.md"
+    severity: "ng"
+    note: "transform/ 配下の旧資産。"
+  - term: "local-opencode-transform"
+    severity: "ng"
+    note: "旧生成方式の識別子。link mode 統一に伴い廃止。"
+  - term: "直接生成方式"
+    severity: "ng"
+    note: "旧生成方式の言及。link mode への置き換えが必要。"
+  - term: "生成フロー"
+    severity: "ng"
+    note: "旧生成方式の言及。link mode への置き換えが必要。"
+  - term: "再生成"
+    severity: "ng"
+    note: "旧生成方式の言及。link mode への置き換えが必要。"
+  - term: "上書き保護"
+    severity: "ng"
+    note: "旧生成方式の言及。link mode への置き換えが必要。"
+
+# generated_by は local-opencode-transform と組み合わせた場合のみ検出する。
+generated_by_combination_rule:
+  trigger: "generated_by"
+  paired_with: "local-opencode-transform"
+  severity: "ng"
+  note: |
+    generated_by 単独は backlog 等の別文脈で使用されるため検出対象外。
+    generated_by と local-opencode-transform が同一ファイルに共存する場合のみ
+    local 版旧生成方式として検出する。

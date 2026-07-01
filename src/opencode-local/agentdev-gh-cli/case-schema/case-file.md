@@ -1,6 +1,6 @@
 # ローカル Case ファイル スキーマ定義
 
-> **正本**: `docs/specs/local-case-file.md`（意味仕様の正本）。本ファイルは運用参照資料であり、SPEC と矛盾してはならない。
+> **正本**: `docs/specs/local/local-case-file.md`（意味仕様の正本）。本ファイルは運用参照資料であり、SPEC と矛盾してはならない。
 > **機械可読定義**: `case-schema/rules/*.yaml`（frontmatter、status、labels、headings）。
 
 ## 目的
@@ -218,5 +218,5 @@ GitHub PR 取り込みは実行しない。
 - `rules/status.yaml` — status enum と状態遷移表の機械可読定義
 - `rules/labels.yaml` — labels 値域の機械可読定義
 - `rules/headings.yaml` — 見出し一覧の機械可読定義
-- `docs/specs/local-case-file.md` — 意味仕様の正本
+- `docs/specs/local/local-case-file.md` — 意味仕様の正本
 - REQ-0141 — ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義

@@ -66,18 +66,18 @@ PR 関連手続きはスキップせず、Case ファイルの対応セクショ
 - GitHub Issue/PR の直接操作（標準版 agentdev-gh-cli の担当）
 - 一般的な git 操作（`agentdev-git-worktree` 担当）
 - 本文生成、完了判定、Epic 依存判定、capture 分類（domain skill 担当）
-- Case ファイルの詳細スキーマ（正本は [docs/specs/local-case-file.md](../../../../../docs/specs/local-case-file.md)。[case-schema/](case-schema/case-file.md) は操作用定義）
+- Case ファイルの詳細スキーマ（正本は [docs/specs/local/local-case-file.md](../../../../../docs/specs/local/local-case-file.md)。[case-schema/](case-schema/case-file.md) は操作用定義）
 
 ## Case ファイルスキーマ（操作用定義）
 
 Case ファイルの YAML 前書き、status enum、labels 値域、見出し一覧、採番規則は [case-schema/case-file.md](case-schema/case-file.md) 参照。
 機械可読定義は [case-schema/rules/](case-schema/rules/) 配下（`frontmatter.yaml`, `status.yaml`, `labels.yaml`, `headings.yaml`）。
-これらは操作用定義であり、意味仕様の正本は SPEC [local-case-file.md](../../../../../docs/specs/local-case-file.md) である（REQ-0150-007）。
+これらは操作用定義であり、意味仕様の正本は SPEC [local/local-case-file.md](../../../../../docs/specs/local/local-case-file.md) である（REQ-0150-007）。
 
 ## 関連項目
 
 - SPEC [agentdev-gh-cli.md](../../../../../docs/specs/skills/agentdev-gh-cli.md)（手続きと Case ファイルセクションの対応表の正本）
-- SPEC [local-case-file.md](../../../../../docs/specs/local-case-file.md)（Case ファイルスキーマの正本）
+- SPEC [local/local-case-file.md](../../../../../docs/specs/local/local-case-file.md)（Case ファイルスキーマの正本）
 - [REQ-0150](../../../../../docs/requirements/REQ-0150.md)（ローカル版 agentdev-gh-cli 実装）
 - [ADR-0130](../../../../../docs/adr/ADR-0130.md)（agentdev-gh-cli を差し替え可能な I/O 境界として確立）
 - 標準版 [../../skills/agentdev-gh-cli/SKILL.md](../../skills/agentdev-gh-cli/SKILL.md)（GitHub 版の原本。差し替え元）

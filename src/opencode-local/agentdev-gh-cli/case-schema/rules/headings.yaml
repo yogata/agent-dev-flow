@@ -1,14 +1,14 @@
 # ローカル Case ファイル 見出し一覧
 #
-# 正本: docs/specs/local-case-file.md「見出し一覧」
+# 正本: docs/specs/local/local-case-file.md「見出し一覧」
 # 要件: REQ-0141-020
 #
 # Case ファイル本文が持つ 15 セクション見出しと必須/任意を定義する。
-# 本ファイルは docs/specs/local-case-file.md と矛盾してはならない。
+# 本ファイルは docs/specs/local/local-case-file.md と矛盾してはならない。
 
 schema_version: "1.0"
 target: ".agentdev/cases/case-{NNNN}.md の本文見出し"
-canonical_spec: "docs/specs/local-case-file.md"
+canonical_spec: "docs/specs/local/local-case-file.md"
 
 # 見出し一覧（REQ-0141-020）
 # 15 セクションを定義する。SPEC確定候補 と Findings / Capture候補 は必須。

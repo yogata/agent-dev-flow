@@ -165,6 +165,15 @@ REQ/ADR/SPEC操作が `docs/DOC-MAP.md` に影響するか確認する。
 DOC-MAP更新は探索経路の更新であり、要件、判断、仕様の更新ではない。
 影響確認ルールの詳細は `agentdev-doc-map` スキルを参照
 
+**targeted docs guard（REQ-0158-003）**: 変更された REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/DOC-MAP.md`、`docs/README.md`、`AGENTS.md`）に対し targeted docs guard を実行する。実行コマンド:
+
+```bash
+bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
+  --workflow req-save --files <changed REQ files> --json
+```
+
+JSON 出力の `failures` に strict severity が含まれる場合は保存工程を継続せず、対象ファイルを修正して再実行する。`doc_map_update_required` が true の場合は Step 8 の更新要否判定に反映する。`full_docs_check_recommended` が true の場合は `/repo/docs-check` の実行をユーザーに提案する。
+
 **read contract 更新要否の確認（REQ-0157）**: REQ/ADR の追加、移動、削除が `.agentdev/read-contracts/**` に影響するか確認する。該当 REQ/ADR を must_read, conditional_read に列挙している command または skill read contract がある場合、それらの paths も更新対象となる。read contract 更新が必要な場合はユーザーに指示を仰ぐ（req-save 自身は read contract を直接編集しない）。
 
 **エントリ存在確認のスクリプト呼出（REQ-0136-029、AG-002）**: DOC-MAP 更新の有無にかかわらず、REQ/ADR エントリが DOC-MAP に存在するかを決定的スクリプトで確認する:
