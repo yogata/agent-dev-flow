@@ -58,6 +58,7 @@
 | [REQ-0154](REQ-0154.md) | SPEC status 追跡と draft 放置検出 | SPEC status 単一情報源化と draft 放置機械検出 |
 | [REQ-0155](REQ-0155.md) | 文書粒度モデル | SPEC内部5論理区分、文書7分類モデル、粒度ゲート2点必須化、局所物理分離許容 |
 | [REQ-0156](REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 | docs/specs 直下基盤SPECの6ドメイン分類と段階移送方針 |
+| [REQ-0157](REQ-0157.md) | Project Read Contract Migration | 配布コードの docs/specs/** 直接参照を read contract 経由に移行 |
 
 ## 廃止済み要件
 
