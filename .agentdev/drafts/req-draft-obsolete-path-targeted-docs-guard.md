@@ -228,6 +228,12 @@ operation_units:
       target_resolved: REQ-0158
       file: docs/requirements/REQ-0158.md
       source_artifact_action: ACT-REQ-001
+      case_open:
+        issue_number: 1355
+        issue_url: https://github.com/yogata/agent-dev-flow/issues/1355
+        status: issue_created
+        qg2_verdict: pass
+        created_at: 2026-07-02
   - ou_id: OU-002
     source_ru: RU-20260701-doc-control-plane-targeted-docs-guard
     target_req: REQ-0141
