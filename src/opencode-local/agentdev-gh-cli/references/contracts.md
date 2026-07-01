@@ -4,7 +4,7 @@
 標準版（GitHub 版）の操作契約（[../../skills/agentdev-gh-cli/references/contracts.md](../../../skills/agentdev-gh-cli/references/contracts.md)）と手続き名、引数、戻り値を一致させる。対象リソースが GitHub Issue/PR から Case ファイル（`.agentdev/cases/case-{NNNN}.md`）に読み替わる点のみが相違である。
 ローカル版（Case ファイル版）の具体的実装手順は [local-procedures.md](local-procedures.md) 参照。
 
-Case ファイルのスキーマ、status enum、見出し一覧は [../case-schema/case-file.md](../case-schema/case-file.md) 参照（操作用定義）。意味仕様の正本は SPEC [local-case-file.md](../../../../../docs/specs/local-case-file.md) である。
+Case ファイルのスキーマ、status enum、見出し一覧は [../case-schema/case-file.md](../case-schema/case-file.md) 参照（操作用定義）。意味仕様の正本は SPEC [local/local-case-file.md](../../../../../docs/specs/local/local-case-file.md) である。
 
 ## I/O 手続き
 

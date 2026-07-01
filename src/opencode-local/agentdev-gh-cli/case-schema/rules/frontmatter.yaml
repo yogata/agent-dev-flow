@@ -1,15 +1,15 @@
 # ローカル Case ファイル YAML 前書きスキーマ
 #
-# 正本: docs/specs/local-case-file.md「YAML 前書きスキーマ」
+# 正本: docs/specs/local/local-case-file.md「YAML 前書きスキーマ」
 # 要件: REQ-0141-017
 #
 # ローカル Case ファイル (.agentdev/cases/case-{NNNN}.md) の YAML 前書きに
 # 含めるフィールドの型・必須/任意・値域を定義する。
-# 本ファイルは docs/specs/local-case-file.md と矛盾してはならない。
+# 本ファイルは docs/specs/local/local-case-file.md と矛盾してはならない。
 
 schema_version: "1.0"
 target: ".agentdev/cases/case-{NNNN}.md の YAML 前書き"
-canonical_spec: "docs/specs/local-case-file.md"
+canonical_spec: "docs/specs/local/local-case-file.md"
 
 # 必須フィールド（REQ-0141-017）
 fields:

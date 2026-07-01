@@ -105,6 +105,38 @@ function listFiles(dirPath: string): string[] {
   }
 }
 
+// REQ-0158-004: docs/specs/**/*.md 再帰収集ヘルパー。
+// AC-7: collectAllArtifactPaths, checkDocMapSpecSync, checkSpecReadmeIndexSync,
+// checkUpdateNotesInDocs, scanned.Specs, SPEC inventory 照合、DOC-MAP と SPEC の
+// 照合処理は再帰前提へ更新する（docs/specs/*.md 直下のみ前提の廃止）。
+// opts.excludeReadme: docs/specs/README.md は SPEC status の単一追跡情報源
+// （REQ-0154-001/003、REQ-0158-005）であり、SPEC 本文検査では除外する。
+// SPEC inventory/status 同期検査と DOC-MAP との照合では対象とするため、
+// 各呼び出し元で明示的に指定する（AC-8）。
+function collectSpecMarkdownRecursively(
+  specsDir: string,
+  opts?: { excludeReadme?: boolean },
+): string[] {
+  if (!fs.existsSync(specsDir)) return [];
+  const collected: string[] = [];
+  walkMarkdown(specsDir, collected);
+  if (opts?.excludeReadme) {
+    return collected.filter((full) => path.basename(full) !== "README.md");
+  }
+  return collected;
+}
+
+// REQ-0158-005: docs/specs/README.md は SPEC status の単一追跡情報源。
+// SPEC 本文検査では除外し、SPEC inventory/status 同期検査と DOC-MAP 照合では対象とする。
+function isSpecReadme(fullPath: string, specsDir: string): boolean {
+  const readmePath = path.join(specsDir, "README.md");
+  try {
+    return fs.realpathSync(fullPath) === fs.realpathSync(readmePath);
+  } catch {
+    return fullPath === readmePath;
+  }
+}
+
 function listDirs(dirPath: string): string[] {
   try {
     if (!fs.existsSync(dirPath)) return [];
@@ -581,7 +613,7 @@ function checkExpandedReadmeSync(cmdDir: string, root: string): CheckResult[] {
     { label: "root README", absPath: path.join(root, "README.md") },
     {
       label: "system.md",
-      absPath: path.join(root, "docs", "specs", "system.md"),
+      absPath: path.join(root, "docs", "specs", "foundations", "system.md"),
     },
   ];
 
@@ -1300,31 +1332,34 @@ function checkSpecsExistence(specsDir: string, root: string): CheckResult[] {
 function collectAllArtifactPaths(root: string): string[] {
   const paths: string[] = [];
   // REQ-0108-188: 8 independent collections aligned with Document Classification Policy
-  const globs: string[] = [
-    // 1. active_req
-    path.join(root, "docs", "requirements", "*.md"),
+  // REQ-0158-004: docs/specs/**/*.md 再帰収集に更新
+  const collections: { dir: string; recursive?: boolean }[] = [
+    { dir: path.join(root, "docs", "requirements") }, // 1. active_req
     // 2. retired_req (excluded from active)
-    // 3. adr
-    path.join(root, "docs", "adr", "*.md"),
-    // 4. spec
-    path.join(root, "docs", "specs", "*.md"),
-    // 5. guide
-    path.join(root, "docs", "guides", "*.md"),
-    // 6. doc_map
-    path.join(root, "docs", "DOC-MAP.md"),
-    path.join(root, "docs", "README.md"),
-    path.join(root, "README.md"),
+    { dir: path.join(root, "docs", "adr") }, // 3. adr
+    { dir: path.join(root, "docs", "specs"), recursive: true }, // 4. spec (recursive)
+    { dir: path.join(root, "docs", "guides") }, // 5. guide
+    // 6. doc_map (single files added below)
     // 7. report: deliberately omitted — generated artifacts; scanning them
     //    re-detects their own error text (feedback loop, REQ-0108-213).
     // 8. runtime (included via .opencode/commands and .opencode/skills elsewhere)
   ];
-  for (const g of globs) {
-    const dir = path.dirname(g);
+  for (const { dir, recursive } of collections) {
     if (!fs.existsSync(dir)) continue;
-    for (const f of listFiles(dir)) {
-      const full = path.join(dir, f);
+    const files = recursive
+      ? collectSpecMarkdownRecursively(dir)
+      : listFiles(dir).map((f) => path.join(dir, f));
+    for (const full of files) {
       if (!paths.includes(full)) paths.push(full);
     }
+  }
+  // 6. doc_map (single files)
+  for (const single of [
+    path.join(root, "docs", "DOC-MAP.md"),
+    path.join(root, "docs", "README.md"),
+    path.join(root, "README.md"),
+  ]) {
+    if (fs.existsSync(single) && !paths.includes(single)) paths.push(single);
   }
   return paths;
 }
@@ -1946,11 +1981,11 @@ function checkExpandedLegacyNamespace(
       filesToCheck.push(path.join(guidesDir, f));
   }
 
-  // NEW: docs/specs/*.md
+  // NEW: docs/specs/**/*.md (REQ-0158-004: recursive)
   const specsDir = path.join(root, "docs", "specs");
   if (fs.existsSync(specsDir)) {
-    for (const f of listFiles(specsDir))
-      filesToCheck.push(path.join(specsDir, f));
+    for (const f of collectSpecMarkdownRecursively(specsDir))
+      filesToCheck.push(f);
   }
 
   // NEW: skills references/*.md (canonical)
@@ -2138,9 +2173,11 @@ function checkDocMapSpecSync(root: string): CheckResult[] {
     return results;
   }
 
+  // REQ-0158-004/005: docs/specs/**/*.md を再帰収集。docs/specs/README.md は
+  // DOC-MAP との照合では対象とする（SPEC status の単一追跡情報源、REQ-0154-001/003）。
   const specsDir = path.join(root, "docs", "specs");
-  const specFiles = listFiles(specsDir);
-  const specNames = new Set(specFiles);
+  const specFiles = collectSpecMarkdownRecursively(specsDir);
+  const specNames = new Set(specFiles.map((full) => path.basename(full)));
 
   // Check file links to specs in DOC-MAP
   const links = parseMarkdownLinks(docMapContent);
@@ -2576,8 +2613,15 @@ function checkCommandMapConsistency(
 function checkSpecReadmeIndexSync(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const specsDir = path.join(root, "docs", "specs");
-  const specFiles = listFiles(specsDir).filter((f) => f !== "README.md");
-  const specNames = new Set(specFiles);
+  // REQ-0158-004/005: docs/specs/**/*.md を再帰収集。docs/specs/README.md 自身は
+  // SPEC inventory/status 同期検査の追跡情報源（REQ-0154-001/003）として扱うため、
+  // 収集対象から除外する（自身との照合を避ける）。
+  const specFiles = collectSpecMarkdownRecursively(specsDir, {
+    excludeReadme: true,
+  });
+  const specRelPaths = specFiles.map((full) =>
+    path.relative(specsDir, full).replace(/\\/g, "/"),
+  );
 
   const readmePath = path.join(specsDir, "README.md");
   const readmeContent = readText(readmePath);
@@ -2588,18 +2632,55 @@ function checkSpecReadmeIndexSync(root: string): CheckResult[] {
     return results;
   }
 
+  // REQ-0158-004: README.md は個別 SPEC ファイル（basename or 相対パス）と
+  // ディレクトリ参照（例: `integrity/rules/`）の両方を持つ。ディレクトリ参照は
+  // 配下全ファイルを網羅扱いとする。
   const readmeFileRefs = new Set<string>();
+  const readmeDirRefs = new Set<string>();
   const links = parseMarkdownLinks(readmeContent);
   for (const link of links) {
-    readmeFileRefs.add(path.basename(link.href));
+    const href = link.href.replace(/^\.?\//, "");
+    if (href.endsWith("/")) {
+      readmeDirRefs.add(href);
+    } else {
+      readmeFileRefs.add(path.basename(href));
+    }
   }
-  // Also check bare filenames in tables
+  // Also check bare filenames / directory paths in tables
   for (const line of readmeContent.split("\n")) {
-    const match = line.match(/\b(\w+\.md)\b/);
-    if (match && match[1] !== "README.md") readmeFileRefs.add(match[1]);
+    const fileMatch = line.match(/\b([\w./-]+\.md)\b/);
+    if (fileMatch && fileMatch[1] !== "README.md") {
+      readmeFileRefs.add(path.basename(fileMatch[1]));
+    }
+    // Detect directory references like `integrity/rules/` in table cells
+    const dirMatches = line.match(/`?([a-z][a-z0-9-]*\/(?:[a-z][a-z0-9-]*\/)*)`?/g);
+    if (dirMatches) {
+      for (const dm of dirMatches) {
+        const cleaned = dm.replace(/`/g, "");
+        if (cleaned.endsWith("/") || /^[a-z][a-z0-9-]*\//.test(cleaned)) {
+          readmeDirRefs.add(cleaned.endsWith("/") ? cleaned : cleaned + "/");
+        }
+      }
+    }
   }
 
-  const missingFromIndex = [...specNames].filter((n) => !readmeFileRefs.has(n));
+  // REQ-0158-004: 各 SPEC ファイルについて、basename が個別参照されているか、
+  // 親ディレクトリパスがディレクトリ参照として README に含まれるかを判定する。
+  const missingFromIndex: string[] = [];
+  for (const relPath of specRelPaths) {
+    const basename = path.basename(relPath);
+    if (readmeFileRefs.has(basename)) continue;
+    const parts = relPath.split("/");
+    let covered = false;
+    for (let i = 1; i < parts.length; i++) {
+      const dirPrefix = parts.slice(0, i).join("/") + "/";
+      if (readmeDirRefs.has(dirPrefix)) {
+        covered = true;
+        break;
+      }
+    }
+    if (!covered) missingFromIndex.push(relPath);
+  }
   for (const name of missingFromIndex) {
     results.push(
       ng(
@@ -3958,66 +4039,73 @@ function checkAdrStatusNormalization(
 
 function checkRuidGroundReference(root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const dirsToScan = [
+  // REQ-0158-004: docs/specs/**/*.md 再帰対応。flat dirs (requirements/guides/adr) は
+  // listFiles、specs のみ collectSpecMarkdownRecursively で収集する。
+  const flatDirs = [
     path.join(root, "docs", "requirements"),
-    path.join(root, "docs", "specs"),
     path.join(root, "docs", "guides"),
     path.join(root, "docs", "adr"),
   ];
+  const specsDir = path.join(root, "docs", "specs");
 
   const ruidPattern = /\.agentdev\/backlog\/req-units\/RU-\d{8}-\d{2,}/g;
   let foundViolation = false;
 
-  for (const dir of dirsToScan) {
+  const allFiles: string[] = [];
+  for (const dir of flatDirs) {
     if (!fs.existsSync(dir)) continue;
-    for (const file of listFiles(dir)) {
-      const fullPath = path.join(dir, file);
-      const content = readText(fullPath);
-      if (!content) continue;
-      const relPath = resolveRelative(fullPath, root);
+    for (const f of listFiles(dir)) allFiles.push(path.join(dir, f));
+  }
+  if (fs.existsSync(specsDir)) {
+    for (const f of collectSpecMarkdownRecursively(specsDir)) allFiles.push(f);
+  }
 
-      const lines = content.split("\n");
-      // A RU path listed in an out-of-scope / exclusion context (e.g. REQ-0124
-      // 適用範囲 "- **対象外**:" naming RU-20260615-01 as edit-exempt) is a scope
-      // boundary statement, not a ground reference. Skip such contexts. This
-      // covers both "## 対象外" headings and "- **対象外**:" list markers.
-      let underExclusion = false;
-      for (let i = 0; i < lines.length; i++) {
-        const headingMatch = lines[i].match(/^#{1,6}\s+(.+)$/);
-        if (headingMatch) {
-          underExclusion = /対象外|out.of.scope|excluded|スコープ外/i.test(
-            headingMatch[1],
-          );
-          continue;
-        }
-        if (/^\s*-\s*\*\*対象外/.test(lines[i])) {
-          underExclusion = true;
-          continue;
-        }
-        if (/^\s*-\s*\*\*対象\*\*:?\s*$/.test(lines[i])) {
-          underExclusion = false;
-          continue;
-        }
-        if (underExclusion) continue;
-        ruidPattern.lastIndex = 0;
-        if (ruidPattern.test(lines[i])) {
-          foundViolation = true;
-          results.push(
-            ng(
-              "Canonical",
-              "ruid-ground-reference",
-              `RU-ID ground reference detected in persistent docs`,
-              relPath,
-              i + 1,
-              {
-                evidence: lines[i].trim(),
-                expected:
-                  "RU-ID references should not appear in persistent docs",
-                route: "intake",
-              },
-            ),
-          );
-        }
+  for (const fullPath of allFiles) {
+    const content = readText(fullPath);
+    if (!content) continue;
+    const relPath = resolveRelative(fullPath, root);
+
+    const lines = content.split("\n");
+    // A RU path listed in an out-of-scope / exclusion context (e.g. REQ-0124
+    // 適用範囲 "- **対象外**:" naming RU-20260615-01 as edit-exempt) is a scope
+    // boundary statement, not a ground reference. Skip such contexts. This
+    // covers both "## 対象外" headings and "- **対象外**:" list markers.
+    let underExclusion = false;
+    for (let i = 0; i < lines.length; i++) {
+      const headingMatch = lines[i].match(/^#{1,6}\s+(.+)$/);
+      if (headingMatch) {
+        underExclusion = /対象外|out.of.scope|excluded|スコープ外/i.test(
+          headingMatch[1],
+        );
+        continue;
+      }
+      if (/^\s*-\s*\*\*対象外/.test(lines[i])) {
+        underExclusion = true;
+        continue;
+      }
+      if (/^\s*-\s*\*\*対象\*\*:?\s*$/.test(lines[i])) {
+        underExclusion = false;
+        continue;
+      }
+      if (underExclusion) continue;
+      ruidPattern.lastIndex = 0;
+      if (ruidPattern.test(lines[i])) {
+        foundViolation = true;
+        results.push(
+          ng(
+            "Canonical",
+            "ruid-ground-reference",
+            `RU-ID ground reference detected in persistent docs`,
+            relPath,
+            i + 1,
+            {
+              evidence: lines[i].trim(),
+              expected:
+                "RU-ID references should not appear in persistent docs",
+              route: "intake",
+            },
+          ),
+        );
       }
     }
   }
@@ -4038,10 +4126,9 @@ function checkRuidGroundReference(root: string): CheckResult[] {
 
 function checkWorkflowStatusProhibition(root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const dirsToScan = [
-    path.join(root, "docs", "requirements"),
-    path.join(root, "docs", "specs"),
-  ];
+  // REQ-0158-004: docs/specs/**/*.md 再帰対応
+  const reqDir = path.join(root, "docs", "requirements");
+  const specsDir = path.join(root, "docs", "specs");
 
   // "domain state" / "ドメイン状態" denote .agentdev persistent state
   // (ADR-0105), not workflow status. Exclude them so the 6-micro-phase
@@ -4058,55 +4145,63 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
   );
   let foundViolation = false;
 
-  for (const dir of dirsToScan) {
-    if (!fs.existsSync(dir)) continue;
-    for (const file of listFiles(dir)) {
-      if (!file.startsWith("REQ-") && !file.endsWith(".md")) continue;
-      const fullPath = path.join(dir, file);
-      const content = readText(fullPath);
-      if (!content) continue;
-      const relPath = resolveRelative(fullPath, root);
+  // REQ-0158-004: flat dirs (requirements) は listFiles、specs のみ再帰収集
+  const allFiles: string[] = [];
+  if (fs.existsSync(reqDir)) {
+    for (const file of listFiles(reqDir)) allFiles.push(path.join(reqDir, file));
+  }
+  if (fs.existsSync(specsDir)) {
+    for (const f of collectSpecMarkdownRecursively(specsDir)) {
+      allFiles.push(f);
+    }
+  }
 
-      const lines = content.split("\n");
-      for (let i = 0; i < lines.length; i++) {
-        if (isNegationContext(lines[i])) continue;
-        // REQ-0145-002: skip data-model enum rows (e.g. Case file status field
-        // `open`, `running`, `blocked`, `review`, `closed`, `cancelled`).
-        // When a phase word like `review` appears inside backticks it is an
-        // enum literal, not workflow status state management.
-        sixPhasePattern.lastIndex = 0;
-        let phaseMatch;
-        let phaseInEnum = false;
-        let phaseInNarrative = false;
-        while ((phaseMatch = sixPhasePattern.exec(lines[i])) !== null) {
-          const matchEnd = phaseMatch.index + phaseMatch[0].length;
-          if (isInsideCodeSpan(lines[i], phaseMatch.index) ||
-              isInsideCodeSpan(lines[i], matchEnd - 1)) {
-            phaseInEnum = true;
-          } else {
-            phaseInNarrative = true;
-            break;
-          }
+  for (const fullPath of allFiles) {
+    const file = path.basename(fullPath);
+    if (!file.startsWith("REQ-") && !file.endsWith(".md")) continue;
+    const content = readText(fullPath);
+    if (!content) continue;
+    const relPath = resolveRelative(fullPath, root);
+
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      if (isNegationContext(lines[i])) continue;
+      // REQ-0145-002: skip data-model enum rows (e.g. Case file status field
+      // `open`, `running`, `blocked`, `review`, `closed`, `cancelled`).
+      // When a phase word like `review` appears inside backticks it is an
+      // enum literal, not workflow status state management.
+      sixPhasePattern.lastIndex = 0;
+      let phaseMatch;
+      let phaseInEnum = false;
+      let phaseInNarrative = false;
+      while ((phaseMatch = sixPhasePattern.exec(lines[i])) !== null) {
+        const matchEnd = phaseMatch.index + phaseMatch[0].length;
+        if (isInsideCodeSpan(lines[i], phaseMatch.index) ||
+            isInsideCodeSpan(lines[i], matchEnd - 1)) {
+          phaseInEnum = true;
+        } else {
+          phaseInNarrative = true;
+          break;
         }
-        if (phaseInNarrative) {
-          foundViolation = true;
-          results.push(
-            ng(
-              "LifecycleBoundary",
-              "workflow-status-prohibition",
-              `Workflow status / 6 micro-phase state management pattern detected in REQ/SPEC`,
-              relPath,
-              i + 1,
-              {
-                evidence: lines[i].trim(),
-                expected:
-                  "REQ/SPEC must not define workflow status state management",
-                route: "intake",
-              },
-            ),
-          );
-        } else if (phaseInEnum) {
-        }
+      }
+      if (phaseInNarrative) {
+        foundViolation = true;
+        results.push(
+          ng(
+            "LifecycleBoundary",
+            "workflow-status-prohibition",
+            `Workflow status / 6 micro-phase state management pattern detected in REQ/SPEC`,
+            relPath,
+            i + 1,
+            {
+              evidence: lines[i].trim(),
+              expected:
+                "REQ/SPEC must not define workflow status state management",
+              route: "intake",
+            },
+          ),
+        );
+      } else if (phaseInEnum) {
       }
     }
   }
@@ -4157,6 +4252,7 @@ function checkAcceptedAdrOnlyCitation(root: string): CheckResult[] {
     return results;
   }
 
+  // REQ-0158-004: docs/specs/**/*.md 再帰対応
   const filesToScan = [
     path.join(root, "docs", "requirements"),
     path.join(root, "docs", "specs"),
@@ -4170,8 +4266,11 @@ function checkAcceptedAdrOnlyCitation(root: string): CheckResult[] {
 
     const stat = fs.statSync(scanTarget);
     if (stat.isDirectory()) {
-      for (const file of listFiles(scanTarget)) {
-        const fullPath = path.join(scanTarget, file);
+      const isSpecsDir = scanTarget === path.join(root, "docs", "specs");
+      const fileList = isSpecsDir
+        ? collectSpecMarkdownRecursively(scanTarget)
+        : listFiles(scanTarget).map((f) => path.join(scanTarget, f));
+      for (const fullPath of fileList) {
         checkNonAcceptedAdrRefsInFile(fullPath, root, nonAcceptedAdrs, results);
       }
     } else {
@@ -4522,11 +4621,11 @@ function checkAbolishedSkillReferences(root: string): CheckResult[] {
     }
   }
 
-  // Scope: docs/specs/*.md (runtime guidance)
+  // Scope: docs/specs/**/*.md (runtime guidance) — REQ-0158-004: recursive
   const specsDir = path.join(root, "docs", "specs");
   if (fs.existsSync(specsDir)) {
-    for (const f of listFiles(specsDir)) {
-      filesToScan.push(path.join(specsDir, f));
+    for (const f of collectSpecMarkdownRecursively(specsDir)) {
+      filesToScan.push(f);
     }
   }
 
@@ -4613,7 +4712,7 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
   const filesToCheck: { absPath: string; label: string }[] = [
     { absPath: path.join(root, "AGENTS.md"), label: "AGENTS.md" },
     {
-      absPath: path.join(root, "docs", "specs", "system.md"),
+      absPath: path.join(root, "docs", "specs", "foundations", "system.md"),
       label: "system.md",
     },
     { absPath: path.join(root, "docs", "DOC-MAP.md"), label: "DOC-MAP.md" },
@@ -6796,6 +6895,438 @@ function updateIr055Baseline(root: string): void {
   );
 }
 
+// ===== IR-057: obsolete-spec-path-after-domain-split (REQ-0158-002) =====
+// Detects残留する旧SPEC直下パス参照 (`docs/specs/<name>.md`) と link mode 統一
+// (ADR-0131) に伴う廃止語彙 (`generation-flow.md`, `transform/`, `local-opencode-transform`,
+// 直接生成方式、生成フロー、再生成、上書き保護) を検出する。
+// `generated_by` は `local-opencode-transform` と同一ファイルに共存する場合のみ検出する。
+// 対照表: docs/specs/integrity/obsolete-path-map.yaml
+
+interface ObsoletePathEntry {
+  old: string;
+  new: string;
+  severity: string;
+}
+
+interface ObsoletePathMap {
+  scope: { include: string[]; exclude: string[] };
+  entries: ObsoletePathEntry[];
+  legacy_local_generation_vocabulary?: { term: string; severity: string }[];
+  generated_by_combination_rule?: {
+    trigger: string;
+    paired_with: string;
+    severity: string;
+  };
+}
+
+function loadObsoletePathMap(root: string): ObsoletePathMap | null {
+  const mapPath = path.join(
+    root,
+    "docs",
+    "specs",
+    "integrity",
+    "obsolete-path-map.yaml",
+  );
+  const content = readText(mapPath);
+  if (!content) return null;
+
+  // 簡易YAMLパーサー（check_integrity.ts 内の parseFrontmatter と同レベルの依存）
+  // 構造化YAMLを扱うが、obsolete-path-map.yaml のスキーマに特化する。
+  const lines = content.split("\n");
+  const map: ObsoletePathMap = { scope: { include: [], exclude: [] }, entries: [] };
+  let section: "scope" | "entries" | "vocab" | "combo" | null = null;
+  let currentEntry: Partial<ObsoletePathEntry> | null = null;
+  let currentVocab: { term: string; severity: string } | null = null;
+  let currentScopeKey: "include" | "exclude" | null = null;
+
+  const flushEntry = () => {
+    if (currentEntry && currentEntry.old) {
+      map.entries.push(currentEntry as ObsoletePathEntry);
+    }
+    currentEntry = null;
+  };
+  const flushVocab = () => {
+    if (currentVocab && currentVocab.term) {
+      if (!map.legacy_local_generation_vocabulary) {
+        map.legacy_local_generation_vocabulary = [];
+      }
+      map.legacy_local_generation_vocabulary.push(currentVocab);
+    }
+    currentVocab = null;
+  };
+
+  for (const raw of lines) {
+    const line = raw.replace(/\r$/, "");
+    if (!line.trim() || line.trim().startsWith("#")) continue;
+
+    if (/^scope:/.test(line)) {
+      flushEntry();
+      flushVocab();
+      section = "scope";
+      continue;
+    }
+    if (/^entries:/.test(line)) {
+      flushEntry();
+      flushVocab();
+      section = "entries";
+      continue;
+    }
+    if (/^legacy_local_generation_vocabulary:/.test(line)) {
+      flushEntry();
+      flushVocab();
+      section = "vocab";
+      continue;
+    }
+    if (/^generated_by_combination_rule:/.test(line)) {
+      flushEntry();
+      flushVocab();
+      section = "combo";
+      continue;
+    }
+
+    if (section === "scope") {
+      const incMatch = line.match(/^\s*include:\s*$/);
+      if (incMatch) {
+        currentScopeKey = "include";
+        continue;
+      }
+      const excMatch = line.match(/^\s*exclude:\s*$/);
+      if (excMatch) {
+        currentScopeKey = "exclude";
+        continue;
+      }
+      const itemMatch = line.match(/^\s*-\s*"([^"]+)"/);
+      if (itemMatch && currentScopeKey) {
+        map.scope[currentScopeKey].push(itemMatch[1]);
+        continue;
+      }
+    }
+
+    if (section === "entries") {
+      const startMatch = line.match(/^\s*-\s*old:\s*"([^"]+)"/);
+      if (startMatch) {
+        flushEntry();
+        currentEntry = { old: startMatch[1] };
+        continue;
+      }
+      if (currentEntry) {
+        const newMatch = line.match(/^\s*new:\s*"([^"]+)"/);
+        if (newMatch) {
+          currentEntry.new = newMatch[1];
+          continue;
+        }
+        const sevMatch = line.match(/^\s*severity:\s*"([^"]+)"/);
+        if (sevMatch) {
+          currentEntry.severity = sevMatch[1];
+          continue;
+        }
+      }
+    }
+
+    if (section === "vocab") {
+      const startMatch = line.match(/^\s*-\s*term:\s*"([^"]+)"/);
+      if (startMatch) {
+        flushVocab();
+        currentVocab = { term: startMatch[1], severity: "ng" };
+        continue;
+      }
+      if (currentVocab) {
+        const sevMatch = line.match(/^\s*severity:\s*"([^"]+)"/);
+        if (sevMatch) {
+          currentVocab.severity = sevMatch[1];
+          continue;
+        }
+      }
+    }
+
+    if (section === "combo" && map.generated_by_combination_rule) {
+      const m = line.match(/^\s*(trigger|paired_with|severity):\s*"([^"]+)"/);
+      if (m) {
+        (map.generated_by_combination_rule as any)[m[1]] = m[2];
+      }
+    }
+    if (section === "combo" && !map.generated_by_combination_rule) {
+      if (line.match(/^\s*(trigger|paired_with|severity):\s*"([^"]+)"/)) {
+        map.generated_by_combination_rule = {
+          trigger: "generated_by",
+          paired_with: "local-opencode-transform",
+          severity: "ng",
+        };
+        const m = line.match(/^\s*(trigger|paired_with|severity):\s*"([^"]+)"/);
+        if (m) {
+          (map.generated_by_combination_rule as any)[m[1]] = m[2];
+        }
+      }
+    }
+  }
+  flushEntry();
+  flushVocab();
+  return map;
+}
+
+function isIr057ExemptPath(relPath: string): boolean {
+  // 履歴参照領域
+  if (/docs\/requirements\/retired\//.test(relPath)) return true;
+  if (/docs\/adr\/retired\//.test(relPath)) return true;
+  // 対照表・カタログ自身の参照は正当
+  if (/docs\/specs\/integrity\/obsolete-path-map\.yaml$/.test(relPath)) return true;
+  if (/docs\/specs\/integrity\/rules\/IR-057-obsolete-spec-path-after-domain-split\.md$/.test(relPath)) return true;
+  if (/docs\/specs\/integrity\/integrity-rule-catalog\.md$/.test(relPath)) return true;
+  if (/vocabulary-registry\.md$/.test(relPath)) return true;
+  if (/docs\/specs\/integrity\/rule-ownership\.md$/.test(relPath)) return true;
+  // 検査スクリプト自身のドキュメント参照
+  if (/repo-agentdev-integrity.*\/(SKILL|references\/)/.test(relPath)) return true;
+  // legacy vocabulary を定義・検出する正当な文書:
+  // - REQ-0158 (IR-057 の要件元。vocabulary を列挙)
+  // - REQ-0141 (link mode 移行に伴う廃止語彙を規定)
+  // - local-generation.md (link mode 移行と廃止経緯を記載)
+  // - IR-048 (generated_by 識別子整合性ルール)
+  if (/docs\/requirements\/REQ-0158\.md$/.test(relPath)) return true;
+  if (/docs\/requirements\/REQ-0141\.md$/.test(relPath)) return true;
+  if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) return true;
+  if (/docs\/specs\/integrity\/rules\/IR-048-generated-by-identifier-integrity\.md$/.test(relPath)) return true;
+  return false;
+}
+
+function isIr057InCodeBlock(lines: string[], lineIdx: number): boolean {
+  // 行番号は 0-indexed。コードブロック内 (``` で囲まれた範囲) は exemption。
+  let inCode = false;
+  for (let i = 0; i <= lineIdx && i < lines.length; i++) {
+    if (/^\s*```/.test(lines[i])) {
+      inCode = !inCode;
+    }
+  }
+  // 当該行が ``` 自体である場合、直前状態で判定
+  if (/^\s*```/.test(lines[lineIdx])) {
+    // トグル前の状態で考える: 上位ループでカウント済みならトグル後
+    let countAbove = 0;
+    for (let i = 0; i < lineIdx; i++) {
+      if (/^\s*```/.test(lines[i])) countAbove++;
+    }
+    return countAbove % 2 === 1;
+  }
+  return inCode;
+}
+
+function isIr057HistoricalAdrContext(
+  fullPath: string,
+  root: string,
+  line: string,
+): boolean {
+  // REQ-0158-002 例外登録: 現行 ADR (accepted) の履歴説明コンテキストは免除。
+  // 履歴マーカーを含む行のみ免除する。
+  const relPath = resolveRelative(fullPath, root);
+  if (!/^docs\/adr\/ADR-\d+\.md$/.test(relPath)) return false;
+  const historicalMarkers = [
+    "旧",
+    "移行前",
+    "廃止",
+    "前提",
+    "historical",
+    "legacy",
+    "deprecated",
+    "歴史",
+    "経緯",
+  ];
+  return historicalMarkers.some((m) => line.includes(m));
+}
+
+function checkObsoleteSpecPath(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const map = loadObsoletePathMap(root);
+  if (!map) {
+    results.push(
+      info(
+        "CanonicalConflict",
+        "obsolete-spec-path",
+        "obsolete-path-map.yaml not found; IR-057 skipped",
+      ),
+    );
+    return results;
+  }
+
+  // 収集対象ファイル: scope.include に合致し scope.exclude に合致しない .md, .yaml ファイル
+  // 簡易実装: AGENTS.md, README.md, docs/**, src/**, .opencode/**
+  const targetFiles: string[] = [];
+  const candidateRoots = [
+    path.join(root, "AGENTS.md"),
+    path.join(root, "README.md"),
+  ];
+  const candidateDirs = [
+    path.join(root, "docs"),
+    path.join(root, "src"),
+    path.join(root, ".opencode"),
+  ];
+  for (const f of candidateRoots) {
+    if (fs.existsSync(f)) targetFiles.push(f);
+  }
+  for (const dir of candidateDirs) {
+    if (!fs.existsSync(dir)) continue;
+    const acc: string[] = [];
+    walkAllFiles(dir, acc);
+    targetFiles.push(...acc);
+  }
+
+  let foundViolation = false;
+
+  // 1. 旧SPEC直下パス参照検出
+  for (const fullPath of targetFiles) {
+    const relPath = resolveRelative(fullPath, root);
+    // scope.exclude 判定
+    if (isIr057ExemptPath(relPath)) continue;
+    // 対象外拡張子
+    if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
+
+    const content = readText(fullPath);
+    if (!content) continue;
+    const lines = content.split("\n");
+
+    for (const entry of map.entries) {
+      const pattern = entry.old;
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.includes(pattern)) continue;
+        // コードブロック内は exemption
+        if (isIr057InCodeBlock(lines, i)) continue;
+        // 履歴 ADR コンテキストは exemption
+        if (isIr057HistoricalAdrContext(fullPath, root, line)) continue;
+        // backticks 内 (例: `docs/specs/system.md`) も免除
+        if (isInsideCodeSpan(line, line.indexOf(pattern))) continue;
+        foundViolation = true;
+        results.push(
+          ng(
+            "CanonicalConflict",
+            "obsolete-spec-path",
+            `Old SPEC direct path reference '${pattern}' detected (current: ${entry.new})`,
+            relPath,
+            i + 1,
+            {
+              evidence: line.trim(),
+              expected: `use current path: ${entry.new}`,
+              route: "intake",
+              finding_category: "broken-reference",
+              finding_level: "strict",
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  // 2. legacy local generation vocabulary 検出
+  if (map.legacy_local_generation_vocabulary) {
+    for (const fullPath of targetFiles) {
+      const relPath = resolveRelative(fullPath, root);
+      if (isIr057ExemptPath(relPath)) continue;
+      if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
+      // local-generation.md は廃止経緯を説明する正当な文書
+      if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) continue;
+
+      const content = readText(fullPath);
+      if (!content) continue;
+      const lines = content.split("\n");
+
+      for (const item of map.legacy_local_generation_vocabulary) {
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (!line.includes(item.term)) continue;
+          if (isIr057InCodeBlock(lines, i)) continue;
+          if (isIr057HistoricalAdrContext(fullPath, root, line)) continue;
+          if (isInsideCodeSpan(line, line.indexOf(item.term))) continue;
+          foundViolation = true;
+          results.push(
+            ng(
+              "CanonicalConflict",
+              "obsolete-spec-path",
+              `Legacy local generation vocabulary '${item.term}' detected (link mode unified, ADR-0131)`,
+              relPath,
+              i + 1,
+              {
+                evidence: line.trim(),
+                expected:
+                  "remove legacy vocabulary; use link mode terminology (ADR-0131)",
+                route: "intake",
+                finding_category: "broken-reference",
+                finding_level: "strict",
+              },
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  // 3. generated_by + local-opencode-transform 組み合わせ検出
+  if (map.generated_by_combination_rule) {
+    const { trigger, paired_with } = map.generated_by_combination_rule;
+    for (const fullPath of targetFiles) {
+      const relPath = resolveRelative(fullPath, root);
+      if (isIr057ExemptPath(relPath)) continue;
+      if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
+      if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) continue;
+
+      const content = readText(fullPath);
+      if (!content) continue;
+      if (!content.includes(trigger)) continue;
+      if (!content.includes(paired_with)) continue;
+
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.includes(trigger)) continue;
+        if (isIr057InCodeBlock(lines, i)) continue;
+        if (isIr057HistoricalAdrContext(fullPath, root, line)) continue;
+        if (isInsideCodeSpan(line, line.indexOf(trigger))) continue;
+        // 同一ファイル内に paired_with が出現することを確認済み
+        foundViolation = true;
+        results.push(
+          ng(
+            "CanonicalConflict",
+            "obsolete-spec-path",
+            `Legacy local generation identifier '${trigger}' coexists with '${paired_with}' (link mode unified, ADR-0131)`,
+            relPath,
+            i + 1,
+            {
+              evidence: line.trim(),
+              expected:
+                "remove legacy generated_by: local-opencode-transform identifier",
+              route: "intake",
+              finding_category: "broken-reference",
+              finding_level: "strict",
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "CanonicalConflict",
+        "obsolete-spec-path",
+        "No obsolete SPEC direct path references or legacy local generation vocabulary detected (IR-057, REQ-0158-002)",
+      ),
+    );
+  }
+  return results;
+}
+
+// walkAllFiles: walkMarkdown と同等だが .md に限定しない（.yaml/.yml 含む）
+function walkAllFiles(dirPath: string, acc: string[]): void {
+  if (!fs.existsSync(dirPath)) return;
+  for (
+    const entry of fs.readdirSync(dirPath, { withFileTypes: true }) as import("fs").Dirent[]
+  ) {
+    const full = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      walkAllFiles(full, acc);
+    } else if (/\.(md|yaml|yml)$/.test(entry.name)) {
+      acc.push(full);
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -6848,7 +7379,7 @@ async function main(): Promise<void> {
     Guides: fs.existsSync(path.join(root, "docs", "guides"))
       ? listFiles(path.join(root, "docs", "guides")).length
       : 0,
-    Specs: listFiles(specsDir).length,
+    Specs: collectSpecMarkdownRecursively(specsDir).length,
     RetiredREQ: fs.existsSync(path.join(reqDir, "retired"))
       ? listFiles(path.join(reqDir, "retired")).filter((f: string) =>
           f.startsWith("REQ-"),
@@ -6954,6 +7485,7 @@ async function main(): Promise<void> {
     ...checkDraftSpecStaleness(specsDir, root), // IR-054 (REQ-0154-002)
     ...checkSisyphusJuniorUlwLoopMisclassification(root), // REQ-0144-013
     ...checkRuntimeUnresolvedReference(root), // IR-055 (REQ-0108-263/264)
+    ...checkObsoleteSpecPath(root), // IR-057 (REQ-0158-002)
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)

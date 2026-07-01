@@ -1,14 +1,14 @@
 # ローカル Case ファイル status enum と状態遷移表
 #
-# 正本: docs/specs/local-case-file.md「status enum と状態遷移」
+# 正本: docs/specs/local/local-case-file.md「status enum と状態遷移」
 # 要件: REQ-0141-018
 #
 # status 値域・意味・終端状態・状態遷移表・再開経路・禁止遷移を定義する。
-# 本ファイルは docs/specs/local-case-file.md と矛盾してはならない。
+# 本ファイルは docs/specs/local/local-case-file.md と矛盾してはならない。
 
 schema_version: "1.0"
 target: ".agentdev/cases/case-{NNNN}.md の status フィールド"
-canonical_spec: "docs/specs/local-case-file.md"
+canonical_spec: "docs/specs/local/local-case-file.md"
 
 # status enum（REQ-0141-018）
 status_enum:

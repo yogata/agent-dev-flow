@@ -76,6 +76,18 @@ req-save の次、case-open の前に実行する。
 - [quality-gates.md](../quality/quality-gates.md)（SPEC lifecycle 連携（QG-4 で accepted 昇格））
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（SPEC body 品質検査）
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPEC 分離基準との連携）
+- [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)（IR-057 obsolete-spec-path-after-domain-split、targeted docs guard 連携）
+
+## targeted docs guard (REQ-0158-003)
+
+SPEC 保存工程で targeted docs guard を実行する。対象は保存工程で変更された SPEC ファイルと連動ファイル（`docs/specs/README.md`、`docs/DOC-MAP.md`）。
+
+- 実行タイミング: Step 7（DOC-MAP 影響確認）の直後、Step 8（ドラフト status 更新）の前
+- 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json`
+- 検査項目: SPEC frontmatter 必須項目、`status` 値妥当性（draft/accepted）、`docs/specs/README.md` の status 表との同期、SPEC ドメイン分類妥当性、新規 SPEC・移動・改名・主要入口変更時の DOC-MAP 更新要否判定、変更 SPEC と近接リンクの整合、旧SPEC直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、command SPEC の場合の対象command原本との最低限の整合、skill SPEC の場合の対象skill原本との最低限の整合、integrity SPEC の場合の catalog/rule file/script 整合、REQ相当/ADR相当/guide相当の混入検出
+- 失敗時: 検査対象文書（SPEC ファイル、`docs/specs/README.md`、`docs/DOC-MAP.md`）を修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行を検討する
+
+JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。`failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
 
 ## 対象外
 
