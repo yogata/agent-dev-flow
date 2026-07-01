@@ -8,6 +8,14 @@ description: Provides quality criteria and best practices for authoring OpenCode
 OpenCodeのCommand定義（`.opencode/commands/`）を書く際の実践ガイド。
 Command/ Skill/ Template/ Script の責任分界に基づき、Commandを薄く保つ基準を提供する。
 
+## skill read contract 参照方針
+
+本スキルは以下の方針に従う（ADR-0133）。
+
+1. プロジェクト固有の `docs/specs/**` 内部構成を仮定しない
+2. 呼び出し元コマンドから渡された解決済み文脈を優先する
+3. 解決済み文脈がなく skill read contract が存在する場合のみ読む
+4. read contract に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない
 ## Frontmatter 規約
 
 command frontmatter の許可フィールドは `description` と `agent` のみ:
@@ -124,7 +132,7 @@ Command作成、改定時に以下を確認する:
 ## See Also
 
 - **agentdev-skill-authoring**: Skill品質基準
-- **docs/specs/responsibilities/artifact-contracts.md**: Command/Skill/Template/Script 責務境界
+- **artifact-contracts SPEC**: Command/Skill/Template/Script 責務境界
 - **references/command-authoring-standards.md**: 行数目安、Steps数目安、共通処理重複、正規パス、完了報告種別、後方互換性の詳細
 
 

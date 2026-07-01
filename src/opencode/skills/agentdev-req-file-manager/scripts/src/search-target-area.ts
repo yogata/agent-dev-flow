@@ -4,7 +4,7 @@
  * 指定 SPEC ファイル群から、target_area（Markdown 見出し行）を検索する。
  * spec-save の update 操作で、target_area に一致するセクションを特定するために使用する。
  *
- * マッチ規約（docs/specs/commands/spec-save.md の target_area ベースのセクション置換ロジックに準拠）:
+ * マッチ規約（spec-save command SPEC の target_area ベースのセクション置換ロジックに準拠）:
  *   - 完全一致: 見出しテキストが target_area に完全一致
  *   - 前方一致: 見出しテキストが target_area で始まる
  *   - 複数マッチ時は warning（spec-save G09 で置換拒否の根拠）

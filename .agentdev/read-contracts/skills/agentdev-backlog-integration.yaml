@@ -1,0 +1,6 @@
+skill: agentdev-backlog-integration
+conditional_read:
+  document_model:
+    - docs/specs/foundations/document-model.md
+allowed_discovery: []
+forbidden: []

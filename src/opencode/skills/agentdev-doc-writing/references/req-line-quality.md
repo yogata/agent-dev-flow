@@ -1,6 +1,6 @@
 # REQ 要件行の合格基準
 
-> **原本**: 配置基準、用語政策は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md)（「要件行の書き方」「要件性」「粒度」「肯定文主文」節）、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+> **原本**: 配置基準、用語政策は document-type-responsibilities SPEC（「要件行の書き方」「要件性」「粒度」「肯定文主文」節）、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
 > 本ファイルは運用ビュー（チェックリスト）である。
 
 ## 1行1関心原則

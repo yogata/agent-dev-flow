@@ -1,6 +1,6 @@
 # 文書種別責務、配置判定
 
-> **原本**: 配置基準、用語政策は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md)（「文書種別責務」「移送判断」節）、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+> **原本**: 配置基準、用語政策は document-type-responsibilities SPEC（「文書種別責務」「移送判断」節）、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
 > 本ファイルは運用ビュー（判定フロー、チェックリスト）である。
 
 ## 文書種別の責務

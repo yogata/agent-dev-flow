@@ -83,7 +83,7 @@ operation_units:
   - ou_id: OU-001
     source_ru: # optional: 元 RU-ID
     target_req: REQ-{NNNN}      # REQ 操作の対象 REQ
-    target_spec: # optional: SPEC 操作の対象 SPEC パス（例: docs/specs/foundations/patterns.md、新規は new:{topic-slug}）
+    target_spec: # optional: SPEC 操作の対象 SPEC パス（例: docs/specs/<existing-spec>.md、新規は new:{topic-slug}）
     operation: create           # create / append / update（SPEC 操作は spec-create / spec-update も可・後方互換）
     scale: standard             # standard / large
     depends_on: []              # 実在する ou_id を参照

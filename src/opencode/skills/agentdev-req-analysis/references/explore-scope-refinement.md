@@ -24,7 +24,7 @@ REQ-0102-002 が要求する実ファイル完全列挙は維持する。
 |--------|---------------|-----|
 | frontmatter | `source_artifact`, `target_artifact`, `area` 等の対象示唆フィールド | `REQ-0102`, `req-define`, `agentdev-req-analysis` |
 | 本文見出し | 対象 command/skill/文書名 | `case-run`, `agentdev-gh-cli` |
-| 本文 | 既存 REQ/ADR/SPEC の参照 ID（`REQ-NNNN`, `ADR-NNNN`, SPEC パス） | `REQ-0149`, `ADR-0130`, `docs/specs/commands/case-run.md` |
+| 本文 | 既存 REQ/ADR/SPEC の参照 ID（`REQ-NNNN`, `ADR-NNNN`, SPEC パス） | `REQ-0149`, `ADR-0130`, `<command SPEC>` |
 | 本文 | ドメイン用語、対象機能名 | `委譲`, `I/O 境界`, `soft-contract` |
 
 抽出キーワードは正規化（大小区別しない、`agentdev-` 等のプレフィクス揺れの吸収）した上で重複排除する。

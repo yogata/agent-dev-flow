@@ -1,0 +1,10 @@
+skill: agentdev-req-structure-diagnostics
+conditional_read:
+  docs_spec_rebuild_integrity:
+    - docs/specs/integrity/docs-spec-rebuild-integrity.md
+  document_model:
+    - docs/specs/foundations/document-model.md
+  req_health_metrics:
+    - docs/specs/quality/req-health-metrics.md
+allowed_discovery: []
+forbidden: []

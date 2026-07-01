@@ -23,6 +23,17 @@ agent: sisyphus
 - `.agentdev/backlog/req-units/RU-*.md`（Requirement Unit）
 - 成功した採用済み成果物の削除
 
+## project read contract
+
+本コマンドは以下の6歩で docs を解決する（ADR-0133）。
+
+1. `.agentdev/config.yaml` を読み込む
+2. `.agentdev/read-contracts/commands/backlog-review.yaml` を読み込む
+3. `must_read` に列挙された paths を読み込む
+4. `conditional_read` の条件が該当する場合のみ、当該 paths を読み込む
+5. read contract に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
+6. read contract が存在しない場合は `config.yaml` の `roots` と明示入力のみを使う
+
 ## RU フォーマット
 
 RU-*.md は以下の構造に従う:
@@ -83,7 +94,7 @@ status: draft
 
 分析基準、前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` を参照
 
-**暫定分類付与（REQ-0155-004）**: 各 RU 候補について、`docs/specs/foundations/document-model.md` の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。
+**暫定分類付与（REQ-0155-004）**: 各 RU 候補について、document-model SPEC（read contract 経由）の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。
 暫定分類は後続 `/agentdev/req-define` の Step 5-2 で最終確定される候補であり、本コマンドが確定しない。
 分析結果と併せて RU frontmatter に `tentative_classification` として記録する。
 

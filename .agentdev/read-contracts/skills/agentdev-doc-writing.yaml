@@ -1,0 +1,8 @@
+skill: agentdev-doc-writing
+conditional_read:
+  document_type_responsibilities:
+    - docs/specs/responsibilities/document-type-responsibilities.md
+  backticks_threshold:
+    - docs/specs/integrity/backticks-identifier-threshold.md
+allowed_discovery: []
+forbidden: []

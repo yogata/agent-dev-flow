@@ -1,0 +1,9 @@
+command: inspect-docs
+must_read:
+  - docs/specs/foundations/document-model.md
+conditional_read:
+  docs_spec_rebuild_integrity:
+    - docs/specs/integrity/docs-spec-rebuild-integrity.md
+allowed_discovery: []
+forbidden: []
+read_completion: []

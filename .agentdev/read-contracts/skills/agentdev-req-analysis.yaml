@@ -1,0 +1,10 @@
+skill: agentdev-req-analysis
+conditional_read:
+  req_health_metrics:
+    - docs/specs/quality/req-health-metrics.md
+  document_model:
+    - docs/specs/foundations/document-model.md
+  req_impact_map:
+    - docs/specs/responsibilities/req-impact-map.md
+allowed_discovery: []
+forbidden: []

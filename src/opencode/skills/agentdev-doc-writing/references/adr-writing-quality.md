@@ -1,6 +1,6 @@
 # ADR 本文の合格基準
 
-> **原本**: 配置基準、用語政策は [docs/specs/responsibilities/document-type-responsibilities.md](../../../../../docs/specs/responsibilities/document-type-responsibilities.md)「文書種別責務」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+> **原本**: 配置基準、用語政策は document-type-responsibilities SPEC「文書種別責務」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
 > 本ファイルは運用ビュー（意思決定文書としての成立性判定）である。
 
 ADR は将来の設計、運用、文書システムを制約する意思決定の記録である。

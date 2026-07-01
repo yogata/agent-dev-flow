@@ -23,8 +23,19 @@ agent: sisyphus
 
 ## 自動 promote 対象カテゴリ
 
-`--auto` で自動 promote される高確信度カテゴリ、投入先、実行ログ、誤検知 revoke 手順の詳細は `docs/specs/foundations/workflow-contracts.md` の「inspect-promote 自動 promote」セクションに原本を置く。
+`--auto` で自動 promote される高確信度カテゴリ、投入先、実行ログ、誤検知 revoke 手順の詳細は workflow-contracts SPEC（read contract 経由で解決）の「inspect-promote 自動 promote」セクションに原本を置く。
 本コマンドはカテゴリ定義を重複保持しない。
+
+## project read contract
+
+本コマンドは以下の6歩で docs を解決する（ADR-0133）。
+
+1. `.agentdev/config.yaml` を読み込む
+2. `.agentdev/read-contracts/commands/inspect-promote.yaml` を読み込む
+3. `must_read` に列挙された paths を読み込む
+4. `conditional_read` の条件が該当する場合のみ、当該 paths を読み込む
+5. read contract に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
+6. read contract が存在しない場合は `config.yaml` の `roots` と明示入力のみを使う
 
 ## 手順
 
@@ -44,7 +55,7 @@ agent: sisyphus
  - 具体的修正対象を持たない再発防止知見 → defer（learning 送付候補）
 ### Step 4: 自動 promote（`--auto` opt-in 時のみ）
 
-`--auto` が指定された場合、分類結果のうち `docs/specs/foundations/workflow-contracts.md` の自動 promote 対象カテゴリに合致し、かつ安定契約例外および否定文脈を満たさない高確信度検出事項を HITL 承認なしで `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md` へ投入する。
+`--auto` が指定された場合、分類結果のうち workflow-contracts SPEC（read contract 経由）の自動 promote 対象カテゴリに合致し、かつ安定契約例外および否定文脈を満たさない高確信度検出事項を HITL 承認なしで `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md` へ投入する。
 各投入を `.agentdev/inspect/promoted/auto-promote-log.md` に追記する（対象検出事項、カテゴリ、投入先ファイル、根拠）。
 `--auto` 未指定時は本 step をスキップし、自動投入を行わない
 ### Step 5: HITL 確定（手動分類対象）
@@ -80,7 +91,7 @@ promote/ defer/ reject/ auto-promote の判定結果と後続 route を提示。
 - G04: defer された検出事項は `.agentdev/inspect/inbox/` に残す
 - G05: docs-check ルール／検査データ追加候補は独立 route とせず、採用済み成果物の要件化方向または受け入れ条件に含める
 - G06: `--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない
-- G07: `--auto` は自動 promote 対象カテゴリ（`docs/specs/foundations/workflow-contracts.md` 参照）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す
+- G07: `--auto` は自動 promote 対象カテゴリ（workflow-contracts SPEC 参照、read contract 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す
 - G08: `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する。誤検知 revoke 手順は同 SPEC 参照
 
 ## エラー処理

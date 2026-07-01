@@ -8,6 +8,14 @@ description: Provides quality criteria and best practices for authoring OpenCode
 OpenCodeのSKILL.mdを書く際の実践ガイド。
 スキルの品質を7つの観点から体系的に担保する。
 
+## skill read contract 参照方針
+
+本スキルは以下の方針に従う（ADR-0133）。
+
+1. プロジェクト固有の `docs/specs/**` 内部構成を仮定しない
+2. 呼び出し元コマンドから渡された解決済み文脈を優先する
+3. 解決済み文脈がなく skill read contract が存在する場合のみ読む
+4. read contract に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない
 ## 1. 設計原則
 
 ### 簡潔さを優先する
@@ -239,7 +247,7 @@ skill/
 ### 5.1 frontmatter チェック
 
 - [ ] nameが命名規則に従っている（kebab-case、gerund form推奨）
-- [ ] nameが **YAML スカラー値（プレーン文字列）** で記述されている（バッククォートで囲まない）。frontmatter は構造データであり Markdown インラインコード表記の対象外（`docs/specs/integrity/backticks-identifier-threshold.md`「適用対象外」準拠、PR #1334 事例）
+- [ ] nameが **YAML スカラー値（プレーン文字列）** で記述されている（バッククォートで囲まない）。frontmatter は構造データであり Markdown インラインコード表記の対象外（backticks-identifier-threshold SPEC「適用対象外」準拠、PR #1334 事例）
 - [ ] descriptionにトリガー（USE FOR/ DO NOT USE FOR または WHEN）が含まれている
 - [ ] descriptionが3人称で書かれている
 - [ ] frontmatterフィールドはnameとdescriptionのみ（拡張フィールドを追加しない）
@@ -409,7 +417,7 @@ Adapt sections as needed.
 ## 8. コマンドとスキルの境界
 
 Skill の品質基準は本スキルの範囲とする。
-Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（`docs/specs/responsibilities/artifact-contracts.md`）を参照。
+Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（artifact-contracts SPEC）を参照。
 Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
 
 ## 参照記述ルール
