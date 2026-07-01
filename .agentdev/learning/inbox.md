@@ -132,3 +132,19 @@
 - **想定反映先**: `src/opencode/commands/repo/docs-check.md` Step 1、`docs/specs/commands/inspect-read-contracts.md`「検証観点」。必要なら `src/opencode/skills/repo-agentdev-integrity/SKILL.md` の実行手順。
 - **関連**: Issue #1351、PR #1352（squash merge 0002cee2）、スクリプト `.opencode/skills/repo-agentdev-integrity/scripts/check_read_contracts.ts`、テスト `check_read_contracts.test.ts`。実行日時 2026-07-02。
 - **タグ**: `#bun` `#node` `#esm` `#runtime` `#docs-check` `#inspect-read-contracts` `#workaround`
+
+## 学び: REQ スキーマ要件の記述が per-entry / top-level の区別を曖昧にし、実装と解釈が分岐した
+
+- **問題事象**: REQ-0156-011「各エントリは old、new、severity、scope（include、exclude）を持つこと」という記述が `scope` を per-entry フィールドのように読ませる一方、実装（`docs/specs/integrity/obsolete-path-map.yaml` と IR-057 rule file、`check_integrity.ts`）は `scope` を top-level 共有フィールドとして扱っている。両者の解釈が分岐しており、REQ 文面だけを読むとエントリごとに `scope` を書くべきだと誤読する可能性があった。case-auto Draft 2 OU-003 (PR #1360) の TS-001 Verify-1 で実装と要件の整合性を確認した際に発覚。
+- **発生局面**: 要件定義（REQ-0156 APPEND、REQ-0156-011 の解釈）、実装検証（TS-001 Verify-1 完了条件 #2「REQ-0156-011 の要件が実際のエントリと整合していることを検証する」）。
+- **検知方法**: OU-003 PR 本文の TS-001 Verify-1 で22 entries を照合した際、実装は top-level `scope` であることと REQ 文面の「各エントリは ... scope ... を持つ」が食い違うことを確認。yaml ヘッダコメントが「ファイル構成（REQ-0156-011 スキーマ）」として `scope` が top-level 共有フィールドであることを明記する修正で運用上の曖昧性を除去した。
+- **根本原因**: REQ のスキーマ定義で「ファイル全体が持つフィールド」と「各エントリが持つフィールド」の階層区別が明示されていなかった。REQ-0156-011 のみでなく、スキーマ系要件全般で「所有者（file / entry / 別の場所）」を明記しないと実装時の解釈が分かれ得る。
+- **自律対応内容**: (a) 本 PR (#1360) で yaml ヘッダコメントに「ファイル構成（REQ-0156-011 スキーマ）」セクションを設け、`scope` が top-level 共有フィールドであることを明記して運用上の曖昧性を即時解消。(b) REQ-0156-011 文言自体の修正（「ファイルは scope を持ち、各エントリは old/new/severity を持つ」等への整理）は別 Issue での対応を PR 本文の Findings に記録して委譲。
+- **ユーザー確認有無**: なし。
+- **ADR/REQ/spec影響**: あり。REQ-0156-011 の文言修正候補。本 PR では yaml ヘッダで運用上の曖昧性を除去済みだが、REQ 側の表現自体は依然として per-entry のように読めるため、今後の SPEC ドメイン再編時や新規エントリ追記時に誤読リスクが残る。具体的には REQ-0156-011 のスキーマ表現を「所有者（file/entry）」付きに整理することが推奨される。
+- **横展開観点**: REQ/SPEC でデータスキーマを定義する全要件。特に YAML/JSON 等の階層構造を持つファイル形式では、フィールドの「所有者（file/entry/別ノード）」を明示しないと実装者間の解釈が分かれる。integrity rule ファイル群（IR-057 等）や他 SPEC のスキーマ定義でも同様のリスク。
+- **再発条件**: (a) REQ でスキーマ要件を「各エントリは ... を持つ」形式で記述し、所有者階層を明示しない場合、(b) 実装者が REQ を一次ソースとして読み、実装パターン（既存類似ファイル等）を参照せずにスキーマを設計した場合。
+- **予防策候補**: (a) REQ/SPEC でスキーマ要件を記述する際、フィールド所有者（file top-level / 各 entry / 別ノード）を明示する表記規約を設ける、(b) agentdev-req-analysis / agentdoc-writing skill に「スキーマ要件は所有者階層を明示する」チェック項目を追加、(c) REQ-0156-011 を別 Issue で「ファイルは scope を持ち、各エントリは old/new/severity を持つ」へ修正。
+- **想定反映先**: (a) REQ-0156-011 文言（別 Issue で修正候補）、(b) `src/opencode/skills/agentdev-req-analysis/`、`src/opencode/skills/agentdev-doc-writing/`（スキーマ要件の表記規約）、(c) `docs/specs/integrity/obsolete-path-map.yaml` ヘッダ（本 PR で対応済み、再発防止の参照例として活用）。
+- **関連**: Issue #1359、PR #1360（case-auto Draft 2 OU-003 FINAL、squash merge 562148cf）。REQ-0156-010/011/012、IR-057、`docs/specs/integrity/obsolete-path-map.yaml`。実行日時 2026-07-02。
+- **タグ**: `#req-wording` `#schema-ambiguity` `#field-ownership` `#req-0156` `#integrity` `#learning-candidate`
