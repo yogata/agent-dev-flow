@@ -53,7 +53,7 @@ PR 関連手続きはスキップせず、Case ファイルの対応セクショ
 
 書き込み操作の直後に実施する。観点は標準版と同じ4つ: エンコーディング、Markdown 構造、必須セクション、リポジトリ参照リンク正規化。
 実装観点と検査項目は [references/verify.md](references/verify.md) 参照。
-失敗時の3段階リトライ（同一内容リトライ、内容再生成、停止）は [references/retry.md](references/retry.md) 参照。
+失敗時の3段階リトライ（同一内容リトライ、内容の再構築、停止）は [references/retry.md](references/retry.md) 参照。
 
 ## 適用対象
 

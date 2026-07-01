@@ -212,8 +212,7 @@ GitHub PR 取り込みは実行しない。
 
 ## 関連項目
 
-- [ローカル版 OpenCode 生成](../../../generation-flow.md) — 生成フロー、`generated_by` 識別子、ジャンクション検出安全ゲート
-- [ローカル版 OpenCode 変換プロンプト](../../../transform/spec.md) — 変換用プロンプトとレビュー用プロンプトの要件
+- `docs/specs/local/local-generation.md` — link mode 接続フロー、link target 確認、更新運用の正本 SPEC
 - `rules/frontmatter.yaml` — YAML 前書きスキーマの機械可読定義
 - `rules/status.yaml` — status enum と状態遷移表の機械可読定義
 - `rules/labels.yaml` — labels 値域の機械可読定義
