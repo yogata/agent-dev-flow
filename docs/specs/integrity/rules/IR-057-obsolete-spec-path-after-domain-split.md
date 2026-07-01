@@ -62,6 +62,10 @@ status: accepted
 
 本ルールは `obsolete-path-map.yaml` 新規導入に伴うものであり、baseline 0 で開始する。full audit を即 fail gate 化する。
 
+## エントリ追記手順（REQ-0156-010）
+
+`docs/specs/` 配下でドメイン分割による移送が発生した場合、移送実行者は移送単位で `obsolete-path-map.yaml` の `entries` へ旧パス（`old`）と新パス（`new`）の対応を追記する。追記後、`check_integrity.ts` で IR-057 を実行し、旧パス混入が検出できることを確認する（REQ-0156-012）。スキーマ詳細および手順の逐次ステップは `obsolete-path-map.yaml` ヘッダコメントの「運用手順（REQ-0156-010）」セクションを参照。
+
 ## See Also
 
 - [obsolete-path-map.yaml](../obsolete-path-map.yaml)
