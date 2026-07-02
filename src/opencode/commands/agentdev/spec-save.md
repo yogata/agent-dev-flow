@@ -5,7 +5,7 @@ agent: sisyphus
 
 # SPEC 保存（SPEC artifact_actions → docs/specs 永続化）
 
-req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/*.md` に保存、確定する。
+req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/**/*.md` に保存、確定する。
 req-save の次、case-open の前に実行する。
 req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す。
 全 work_type 対象であり、`work_type` による判定は廃止する。
@@ -16,7 +16,7 @@ req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 
 
 ## 出力
 
-- `docs/specs/*.md`（既存 SPEC への追記 or 新規 SPEC 作成）
+- `docs/specs/**/*.md`（既存 SPEC への追記 or 新規 SPEC 作成）
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（SPEC artifact_actions 消費済みフラグの status 更新）
 
 ## SPEC ライフサイクル
@@ -60,9 +60,9 @@ SPEC 対象 artifact_actions がない場合は no-op で完了。
 
 ### Step 3: 配置先解決
 
-各 SPEC action の `target` から配置先 SPEC を解決する:
-- 既存 SPEC パス（例: `docs/specs/<existing-spec>.md`）→ 当該 SPEC へ追記（`update` 操作）
-- `new:{topic-slug}` → 新規 SPEC 作成（`create` 操作）。ファイル名は `docs/specs/{topic-slug}.md`
+各 SPEC action の `target`（または `target_spec: {operation, domain, slug}` 構造化）から配置先 SPEC を解決する:
+- 既存 SPEC パス（例: `docs/specs/{domain}/<existing-spec>.md`、または `target_spec: {operation: update, domain, slug}`）→ 当該 SPEC へ追記（`update` 操作）
+- `target_spec: {operation: create, domain, slug}` → 新規 SPEC 作成（`create` 操作）。ファイル名は `docs/specs/{domain}/{slug}.md`
 - 重複候補の統合: 同一 `target` の action は1つの SPEC へ集約する
 
 **決定的処理のスクリプト呼出（REQ-0136-029、AG-002、design-principles.md 第5節）**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は `agentdev-req-file-manager/scripts/` の決定的スクリプトを bash 経由で呼び出して実行する（SKILL.md「Scripts（決定的処理）」セクション参照）。
@@ -72,13 +72,13 @@ LLM 推論で代替しない。
 ```bash
 # 配置先候補 SPEC 内の target_area 見出し検索
 bun src/opencode/skills/agentdev-req-file-manager/scripts/src/search-target-area.ts \
-  "target_area文字列" docs/specs/<existing-spec>.md
+  "target_area文字列" docs/specs/{domain}/<existing-spec>.md
 # → stdout: { ok: true, matches: [{file, line, text}] }
 # matches 空 → target_area 未検出（Step 5 で follow-up 報告、operation を create 系に切り替え推奨）
 # matches 複数 → warning（G09 で置換拒否の根拠）
 
 # stdin JSON 入力（複数 SPEC 横断検索）も可能。target_area は見出しテキスト部（# プレフィクス不含）
-echo '{"target_area":"パターン","files":["docs/specs/<existing-spec>.md"]}' | \
+echo '{"target_area":"パターン","files":["docs/specs/{domain}/<existing-spec>.md"]}' | \
   bun src/opencode/skills/agentdev-req-file-manager/scripts/src/search-target-area.ts
 ```
 
@@ -103,7 +103,7 @@ Step 3 で得た `search-target-area.ts` の結果（`matches`）を用いてセ
 ```bash
 # target_area 検索（Step 3 と同一スクリプト、Step 5 では置換位置特定に使用）
 bun src/opencode/skills/agentdev-req-file-manager/scripts/src/search-target-area.ts \
-  "target_area文字列" docs/specs/<existing-spec>.md
+  "target_area文字列" docs/specs/{domain}/<existing-spec>.md
 # → stdout: { ok: true, matches: [{file, line, text}] }
 # matches[0].line から次の同レベル見出し行の直前までをセクションとして特定し、content で置換
 ```
@@ -165,7 +165,7 @@ bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-change-impac
 # → stdout: { ok: boolean, errors: string[], warnings: string[], violations: string[] }
 
 # stdin JSON 入力も可能
-echo '{"changed":["docs/specs/<existing-spec>.md"],"allowed":["docs/specs/**"]}' | \
+echo '{"changed":["docs/specs/{domain}/<existing-spec>.md"],"allowed":["docs/specs/**"]}' | \
   bun src/opencode/skills/agentdev-req-file-manager/scripts/src/check-change-impact.ts
 ```
 

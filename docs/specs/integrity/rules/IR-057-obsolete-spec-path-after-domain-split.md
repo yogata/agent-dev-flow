@@ -7,10 +7,10 @@ status: accepted
 | Field | Value |
 |-------|-------|
 | rule_id | IR-057 |
-| description | `docs/specs/integrity/obsolete-path-map.yaml` に登録された旧SPEC直下パス（`docs/specs/<name>.md` 形式）が現行文書、原本、配置先、検査スクリプトに残っていないことを検証する（REQ-0158-002）。同時に link mode 統一（ADR-0131）に伴い廃止確定となった直接生成方式語彙（`src/opencode-local/generation-flow.md`、`src/opencode-local/transform/`、`transform/generate.md`、`transform/review.md`、`transform/spec.md`、`local-opencode-transform`、`直接生成方式`、`生成フロー`、`再生成`、`上書き保護`）の残留も検出する。`generated_by` は `local-opencode-transform` と組み合わせた場合のみ local 版旧生成方式として検出する |
+| description | `docs/specs/integrity/obsolete-path-map.yaml` に登録された旧SPEC直下パス（`docs/specs/<name>.md` 形式）が現行文書、原本、配置先、検査スクリプトに残っていないことを検証する（REQ-0158-002）。同時に link mode 統一（ADR-0131）に伴い廃止確定となった直接生成方式語彙を検出する。語彙は「単独検出語」（即 ng）と「近接条件つき検出語」（同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ ng）に分離する。単独検出語: `src/opencode-local/generation-flow.md`、`src/opencode-local/transform/`、`transform/generate.md`、`transform/review.md`、`transform/spec.md`、`local-opencode-transform`、`直接生成方式`、`生成フロー`。近接条件つき検出語: `再生成`、`上書き保護`、`generated_by`。`generated_by` + `local-opencode-transform` 組み合わせ検出は `generated_by_combination_rule` で維持する |
 | severity | strict |
 | category | broken-reference |
-| detection_method | `check_integrity.ts` による `obsolete-path-map.yaml` ロード、各エントリ `old` パターンの正規表現マッチング（行単位走査）。`scope.include`、`scope.exclude` で検査対象を絞り込む。`generated_by` + `local-opencode-transform` の組み合わせ検出は同一ファイル内共存を条件とする |
+| detection_method | `check_integrity.ts` による `obsolete-path-map.yaml` ロード、各エントリ `old` パターンの正規表現マッチング（行単位走査）。`scope.include`、`scope.exclude` で検査対象を絞り込む。語彙検出は `legacy_local_generation_vocabulary`（単独検出語: severity=ng）と `legacy_local_generation_conditional_vocabulary`（近接条件つき検出語: proximity_required=true）に分離し、後者は同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ検出する。`generated_by` + `local-opencode-transform` の組み合わせ検出は `generated_by_combination_rule` で維持する |
 | affected_artifacts | [AGENTS.md, README.md, docs/requirements/**/*.md, docs/adr/**/*.md, docs/specs/**/*.md, src/opencode/**/*.md, src/opencode-local/**/*.md, .opencode/skills/**/*.md, .opencode/commands/**/*.md] |
 | related_req | [REQ-0158-002, REQ-0156-006, REQ-0141-004, REQ-0108-265] |
 | related_spec | [../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/local-generation.md] |
@@ -29,9 +29,10 @@ status: accepted
 | # | 検査項目 | 失敗時 |
 |---|----------|--------|
 | 1 | `obsolete-path-map.yaml` の `entries[].old` に列挙された旧SPEC直下パスが `scope.include` 配下のファイルに出現しないこと | strict fail |
-| 2 | `obsolete-path-map.yaml` の `legacy_local_generation_vocabulary[].term` に列挙された直接生成方式語彙が出現しないこと | strict fail |
-| 3 | `generated_by` と `local-opencode-transform` が同一ファイルに共存しないこと（`generated_by_combination_rule`） | strict fail |
-| 4 | 検出時は旧パス、現行パス（該当時）、検出ファイル、行番号を出力すること | — |
+| 2 | `obsolete-path-map.yaml` の `legacy_local_generation_vocabulary[].term`（単独検出語）が出現しないこと | strict fail |
+| 3 | `obsolete-path-map.yaml` の `legacy_local_generation_conditional_vocabulary[].term`（近接条件つき検出語）は、同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ検出すること。文脈語がない場合は検出しない | conditional fail |
+| 4 | `generated_by` と `local-opencode-transform` が同一ファイルに共存しないこと（`generated_by_combination_rule`） | strict fail |
+| 5 | 検出時は旧パス、現行パス（該当時）、検出ファイル、行番号を出力すること | — |
 
 ## 検査対象範囲（scope）
 
@@ -44,13 +45,30 @@ status: accepted
 
 ## exemption（検出対象外）
 
+以下の exemption は `check_changed_docs.ts`（targeted guard）の旧直下パス検出（`checkObsoleteSpecPath`）と legacy vocabulary 検出（`checkLegacyVocab`）の両方に適用する。`check_integrity.ts`（full audit）も同等の exemption を実装する。
+
 | 対象 | 理由 |
 |------|------|
-| コードブロック内の例示 | 例示、パターン説明は検出対象外（既存の code-block exemption に準拠） |
-| `obsolete-path-map.yaml` 自体 | 旧パスを対照表として列挙する正当なファイル |
+| コードブロック内の例示（明示的検査 fixture） | 例示、パターン説明は検出対象外（既存の code-block exemption に準拠） |
+| `obsolete-path-map.yaml` 自体 | 旧パス、廃止語彙を対照表として列挙する正当なファイル |
+| IR-057 ルール説明としての旧パス例 | ルール定義内の例示は検出対象外 |
 | `integrity-rule-catalog.md`、`vocabulary-registry.md` | 検出ルール自体の記述、正規語彙の対照表 |
+| `rule-ownership.md` | ルール所有権マトリックス。各ルールが検出・管理する語彙を説明する検出ルール記述 |
+| `check_integrity.ts`（検査スクリプト本体） | IR-057 検出を実装するスクリプト。検出語・旧パスを文字列リテラル、コメント、エラーメッセージとして含む（テスト fixture と同等） |
+| `docs/guides/glossary.md` | 用語集。廃止語彙の歴史的識別子値を定義する語彙参照文書 |
 | `retired/` 配下 | 履歴参照領域 |
+| テスト fixture（`*.test.ts` 等） | 検査ロジックのテストデータは検出対象外 |
 | 現行ADRに履歴として旧パスを記載する場合 | rule 側で例外登録を明示する（後述） |
+
+## 通常検出対象
+
+以下は例外適用後の通常検出対象である。
+
+- command 本文の実行手順
+- skill 本文 / references 参照先
+- docs 現行本文の通常説明
+- README / DOC-MAP 探索導線
+- 保存工程テンプレートの生成実パス例
 
 ## 例外登録（現行ADRの履歴記載）
 

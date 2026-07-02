@@ -29,7 +29,9 @@ conditional_read:
     paths:
       - docs/specs/skills/agentdev-req-file-manager.md
     purpose: REQ 番号採番と CREATE/APPEND/UPDATE 判定の確認
-allowed_discovery: []
+allowed_discovery:
+  - "docs/DOC-MAP.md 経由で関連 SPEC を探索してよい"
+  - "docs/specs/README.md 経由で SPEC 一覧と status を参照してよい"
 forbidden:
   - "実装本文（src/opencode/**）は読まない"
 read_completion:

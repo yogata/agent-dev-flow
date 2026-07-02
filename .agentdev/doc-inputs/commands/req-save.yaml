@@ -15,7 +15,9 @@ conditional_read:
     paths:
       - docs/specs/skills/agentdev-req-file-manager.md
     purpose: REQ 番号採番ルールと frontmatter 規約の確認
-allowed_discovery: []
+allowed_discovery:
+  - "docs/DOC-MAP.md 経由で関連 SPEC と ADR を探索してよい"
+  - "docs/requirements/README.md 経由で REQ インデックスを確認してよい"
 forbidden:
   - "実装本文（src/opencode/**）は読まない"
 read_completion:

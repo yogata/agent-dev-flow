@@ -15,7 +15,10 @@ conditional_read:
     paths:
       - docs/specs/commands/case-close.md
     purpose: case-close の完了ゲートと QG-4 達成判定の確認
-allowed_discovery: []
+allowed_discovery:
+  - "docs/DOC-MAP.md 経由で SPEC 確定対象と整合性ルールを探索してよい"
+  - "docs/specs/README.md 経由で SPEC status と整合性ルールカタログを参照してよい"
+  - "docs/specs/integrity/integrity-rule-catalog.md 経由で関連 IR を確認してよい"
 forbidden:
   - "実装本文（src/opencode/**）は読まない"
 read_completion:

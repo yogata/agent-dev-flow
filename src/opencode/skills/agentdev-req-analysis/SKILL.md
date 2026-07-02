@@ -121,7 +121,7 @@ QG-1 の観点 6（REQ/SPEC 配置判定）がこれを担保する。
 req-define は SPEC 等に配置すべきと判定した要件行候補を REQ 要件行に残留させず、ドラフト内の `## SPEC候補` 補助セクションと `draft-meta.spec-candidates`（SC-ID、content、intended_spec、classification、source）に分離する。
 各 SPEC 候補には想定配置先 SPEC（既存 SPEC ファイル名または新規 SPEC 候補）と分離根拠（の該当種別）を記録する。
 この分離経路により、SPEC 相当行が REQ ファイルへ混入することを構造的に防止する。
-req-save は REQ ファイル保存時に SPEC候補セクションを除去し、内容は spec-save が `docs/specs/*.md` へ保存する。
+req-save は REQ ファイル保存時に SPEC候補セクションを除去し、内容は spec-save が `docs/specs/**/*.md` へ保存する。
 
 ### 用語定義
 

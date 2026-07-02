@@ -456,7 +456,8 @@ function collectDocInputPaths(
         });
       } else {
         for (let idx = 0; idx < docInput[k].length; idx++) {
-          if (typeof docInput[k][idx] !== "string") {
+          const item = docInput[k][idx];
+          if (typeof item !== "string") {
             schemaFailures.push({
               check: 5,
               check_name: "doc-input-schema",
@@ -464,8 +465,52 @@ function collectDocInputPaths(
               file: rcFile,
               message: `doc-input '${k}[${idx}]' must be a string`,
             });
+          } else if (item.length === 0) {
+            schemaFailures.push({
+              check: 5,
+              check_name: "doc-input-schema",
+              severity: "strict",
+              file: rcFile,
+              message: `doc-input '${k}[${idx}]' must not be empty string`,
+            });
           }
         }
+      }
+    }
+  }
+
+  if (!isCommand) {
+    if (docInput["must_read"] !== undefined && docInput["must_read"] !== null) {
+      schemaFailures.push({
+        check: 5,
+        check_name: "doc-input-schema",
+        severity: "strict",
+        file: rcFile,
+        message: `skill doc-input must not have 'must_read' (use conditional_read instead)`,
+      });
+    }
+    if (docInput["read_completion"] !== undefined && docInput["read_completion"] !== null) {
+      schemaFailures.push({
+        check: 5,
+        check_name: "doc-input-schema",
+        severity: "strict",
+        file: rcFile,
+        message: `skill doc-input must not have 'read_completion'`,
+      });
+    }
+  }
+
+  if (isCommand) {
+    const requiredFields = ["must_read", "conditional_read", "allowed_discovery", "forbidden", "read_completion"];
+    for (const field of requiredFields) {
+      if (docInput[field] === undefined || docInput[field] === null) {
+        schemaFailures.push({
+          check: 5,
+          check_name: "doc-input-schema",
+          severity: "strict",
+          file: rcFile,
+          message: `command doc-input missing required field '${field}'`,
+        });
       }
     }
   }
@@ -529,7 +574,6 @@ function validateFrontmatter(
       message: `doc-input missing 'id' string`,
     });
   } else if (isCommand) {
-    // command id should be "/agentdev/<command-name>"
     if (!parsed.id.startsWith("/agentdev/")) {
       failures.push({
         check: 5,
@@ -537,6 +581,29 @@ function validateFrontmatter(
         severity: "strict",
         file: rcFile,
         message: `command doc-input 'id' should start with '/agentdev/' (got: ${parsed.id})`,
+      });
+    } else {
+      const expectedName = parsed.id.replace(/^\/agentdev\//, "");
+      const fileBase = rcFile.replace(/\\/g, "/").replace(/\.yaml$/, "").split("/").pop();
+      if (fileBase && expectedName !== fileBase) {
+        failures.push({
+          check: 5,
+          check_name: "doc-input-schema",
+          severity: "strict",
+          file: rcFile,
+          message: `command doc-input 'id' (${parsed.id}) does not match filename (expected: /agentdev/${fileBase})`,
+        });
+      }
+    }
+  } else {
+    const fileBase = rcFile.replace(/\\/g, "/").replace(/\.yaml$/, "").split("/").pop();
+    if (fileBase && parsed.id !== fileBase) {
+      failures.push({
+        check: 5,
+        check_name: "doc-input-schema",
+        severity: "strict",
+        file: rcFile,
+        message: `skill doc-input 'id' (${parsed.id}) does not match filename (expected: ${fileBase})`,
       });
     }
   }

@@ -10,7 +10,9 @@ conditional_read:
     paths:
       - docs/specs/integrity/docs-spec-rebuild-integrity.md
     purpose: 配布物 ID 除去後の品質保持ルールの確認
-allowed_discovery: []
+allowed_discovery:
+  - "docs/DOC-MAP.md 経由で診断対象 SPEC と文書群を探索してよい"
+  - "docs/specs/README.md 経由で SPEC status とインデックスを参照してよい"
 forbidden:
   - "実装本文（src/opencode/**）は読まない"
 read_completion: []

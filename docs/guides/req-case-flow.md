@@ -45,7 +45,7 @@ req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 
 
 **入力**: 要件doc（SPEC 対象 artifact_actions がある場合）
 
-**出力**: SPEC ファイル（`docs/specs/*.md`）。新規作成時は `status: draft` を付与
+**出力**: SPEC ファイル（`docs/specs/**/*.md`）。新規作成時は `status: draft` を付与
 
 **SPEC ライフサイクル**: SPEC は frontmatter `status`（`draft` / `accepted`）で成熟度を管理する。
 `draft`（spec-save で保存直後）→ `accepted`（case-close で実装が SPEC 内容を検証した旨を確認）の順で昇格する。

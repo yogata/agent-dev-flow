@@ -29,7 +29,7 @@ req-define が要件 doc を生成する際の詳細ゲートを定義する。
 2. SPEC 等に配置すべきと判定された候補は REQ 要件行に採用せず、`draft-meta.spec-candidates` にエントリを追加する。各エントリは以下のフィールドを持つ:
  - `id`: `SC-{NNN}`（3桁ゼロ埋め連番）
  - `content`: SPEC 候補の内容
- - `intended_spec`: 想定配置先 SPEC ファイルパス（例: patterns SPEC）。該当する既存 SPEC がなければ `new:{topic-slug}` とする
+  - `intended_spec`: 想定配置先 SPEC ファイルパス（例: patterns SPEC）。該当する既存 SPEC がなければ `target_spec: {operation: create, domain, slug}` 構造化（新規 SPEC は `docs/specs/{domain}/{slug}.md` に作成） とする
  - `classification` の SPEC 分離基準該当種別（schema field/ enum 値一覧/ route、category、status 詳細判定表/ file pattern/ テンプレート種別/ report format/ fixture detail/ regression test 条件/ checker 個別ルール/ false positive 抑制方式/ retry 回数/ token 目安/ 行数上限/ Step 番号/ Phase 番号/ 内部アルゴリズム/ 作業履歴）
  - `source`: 元候補の出處（壁打ち候補行番号 または 対象 REQ の要件行 ID `REQ-NNNN-MMM`）
 3. 安定契約例外に該当する候補は SPEC 候補から除外し、REQ に要約として残す（詳細は SPEC 等に分割してもよい）。

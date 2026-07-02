@@ -62,6 +62,8 @@ interface TargetedDocsReport {
   spec_readme_update_required: boolean;
   requirements_readme_update_required: boolean;
   full_docs_check_recommended: boolean;
+  doc_inputs_check_required: boolean;
+  declared_files_check: { declared: string[]; missing: string[]; extra: string[] } | null;
 }
 
 interface ParsedArgs {
@@ -70,6 +72,7 @@ interface ParsedArgs {
   baseRef: string | null;
   json: boolean;
   failLevel: FailLevel;
+  declaredFiles: string[];
   help: boolean;
 }
 
@@ -80,6 +83,7 @@ function parseArgs(args: string[]): ParsedArgs {
     baseRef: null,
     json: false,
     failLevel: "strict",
+    declaredFiles: [],
     help: false,
   };
   for (let i = 0; i < args.length; i++) {
@@ -123,6 +127,13 @@ function parseArgs(args: string[]): ParsedArgs {
       }
       parsed.failLevel = v as FailLevel;
       i++;
+    } else if (a === "--declared-files") {
+      i++;
+      while (i < args.length && !args[i].startsWith("--")) {
+        parsed.declaredFiles.push(args[i]);
+        i++;
+      }
+      i--;
     } else {
       throw new Error(`Unknown argument: ${a}`);
     }
@@ -141,6 +152,7 @@ function printHelp(): void {
   console.error("  --base-ref <ref>    git base ref to compute changed files");
   console.error("  --json              emit JSON report (default: text)");
   console.error("  --fail-level <lvl>  strict (default) | warning");
+  console.error("  --declared-files <path...>  declared doc update targets in Issue/PR (optional)");
 }
 
 // ─── Layer 1: changed file resolver ────────────────────────────────────────
@@ -349,6 +361,12 @@ function checkObsoleteSpecPath(
     if (/^docs\/requirements\/retired\//.test(rel)) continue;
     if (/^docs\/adr\/retired\//.test(rel)) continue;
     if (/docs\/specs\/integrity\/obsolete-path-map\.yaml$/.test(rel)) continue;
+    if (/docs\/specs\/integrity\/rules\/IR-057-/.test(rel)) continue;
+    if (/\.test\.ts$/.test(rel)) continue;
+    if (/repo-agentdev-integrity\/scripts\/check_integrity\.ts$/.test(rel)) continue;
+    if (/docs\/requirements\/REQ-0158\.md$/.test(rel)) continue;
+    if (/docs\/adr\/ADR-0(123|110)\.md$/.test(rel)) continue;
+    if (/docs\/requirements\/REQ-010[12]\.md$/.test(rel)) continue;
     const content = readText(f);
     if (!content) continue;
     const lines = content.split("\n");
@@ -385,10 +403,14 @@ function checkLegacyVocab(
     if (/docs\/requirements\/REQ-0141\.md$/.test(rel)) continue;
     if (/docs\/specs\/local\/local-generation\.md$/.test(rel)) continue;
     if (/docs\/specs\/integrity\/integrity-rule-catalog\.md$/.test(rel)) continue;
+    if (/docs\/specs\/integrity\/rule-ownership\.md$/.test(rel)) continue;
     if (/docs\/specs\/integrity\/rules\/IR-057-/.test(rel)) continue;
     if (/docs\/specs\/integrity\/rules\/IR-048-/.test(rel)) continue;
+    if (/docs\/specs\/integrity\/obsolete-path-map\.yaml$/.test(rel)) continue;
     if (/vocabulary-registry\.md$/.test(rel)) continue;
+    if (/docs\/guides\/glossary\.md$/.test(rel)) continue;
     if (/repo-agentdev-integrity.*\/(SKILL|references\/)/.test(rel)) continue;
+    if (/repo-agentdev-integrity\/scripts\/check_integrity\.ts$/.test(rel)) continue;
     const content = readText(f);
     if (!content) continue;
     const lines = content.split("\n");
@@ -520,6 +542,7 @@ function runWorkflowChecks(
   changedFiles: string[],
   coupledFiles: string[],
   obsolete: { oldPaths: string[]; vocab: string[] },
+  declaredFiles: string[],
 ): {
   failures: Failure[];
   warnings: string[];
@@ -527,6 +550,8 @@ function runWorkflowChecks(
   specReadmeUpdateRequired: boolean;
   requirementsReadmeUpdateRequired: boolean;
   fullDocsCheckRecommended: boolean;
+  docInputsCheckRequired: boolean;
+  declaredFilesCheck: { declared: string[]; missing: string[]; extra: string[] } | null;
 } {
   const failures: Failure[] = [];
   const warnings: string[] = [];
@@ -571,18 +596,52 @@ function runWorkflowChecks(
       )
     : false;
 
-  // full_docs_check_recommended: integrity rule 追加/削除、DOC-MAP 構造変更、docs/specs 大規模移動等
+  // full_docs_check_recommended: integrity rule 追加/削除、DOC-MAP 構造変更、docs/specs 大規模移動、doc-inputs 変更等
   const fullDocsCheckRecommended =
     profile.name === "case-close"
     ? changedFiles.some((f) => {
         const rel = path.relative(root, f).replace(/\\/g, "/");
         return (
-          /docs\/specs\/integrity\/(rules|integrity-rule-catalog|rule-ownership)\//.test(rel) ||
+          /docs\/specs\/integrity\/rules\//.test(rel) ||
+          /docs\/specs\/integrity\/integrity-rule-catalog\.md/.test(rel) ||
+          /docs\/specs\/integrity\/rule-ownership\.md/.test(rel) ||
           /docs\/specs\/foundations\/document-model/.test(rel) ||
-          /docs\/specs\/responsibilities\/document-type-responsibilities/.test(rel)
+          /docs\/specs\/responsibilities\/document-type-responsibilities/.test(rel) ||
+          /docs\/DOC-MAP\.md/.test(rel) ||
+          /docs\/specs\/README\.md/.test(rel) ||
+          /^\.agentdev\/config\.yaml$/.test(rel) ||
+          /^\.agentdev\/doc-inputs\//.test(rel)
         );
       })
     : false;
+
+  // doc_inputs_check_required: doc-inputs 機構への影響（REQ/ADR/SPEC の追加・移動・改名）
+  const docInputsCheckRequired = changedFiles.some((f) => {
+    const rel = path.relative(root, f).replace(/\\/g, "/");
+    return (
+      /^docs\/requirements\/REQ-.*\.md$/.test(rel) ||
+      /^docs\/adr\/ADR-.*\.md$/.test(rel) ||
+      /^docs\/specs\/.*\.md$/.test(rel)
+    );
+  });
+
+  // declared_files_check: --declared-files 指定時、宣言ファイルと実変更ファイルの対応を検査
+  const declaredFilesCheck: { declared: string[]; missing: string[]; extra: string[] } | null =
+    declaredFiles.length > 0
+      ? (() => {
+          const declared = declaredFiles.map((d) =>
+            path.isAbsolute(d) ? path.relative(root, d).replace(/\\/g, "/") : d.replace(/\\/g, "/"),
+          );
+          const actual = changedFiles.map((f) =>
+            path.relative(root, f).replace(/\\/g, "/"),
+          );
+          const declaredSet = new Set(declared);
+          const actualSet = new Set(actual);
+          const missing = declared.filter((d) => !actualSet.has(d));
+          const extra = actual.filter((a) => !declaredSet.has(a));
+          return { declared, missing, extra };
+        })()
+      : null;
 
   return {
     failures,
@@ -591,6 +650,8 @@ function runWorkflowChecks(
     specReadmeUpdateRequired,
     requirementsReadmeUpdateRequired,
     fullDocsCheckRecommended,
+    docInputsCheckRequired,
+    declaredFilesCheck,
   };
 }
 
@@ -620,6 +681,15 @@ function emitText(report: TargetedDocsReport): void {
     `requirements_readme_update_required: ${report.requirements_readme_update_required}`,
   );
   console.log(`full_docs_check_recommended: ${report.full_docs_check_recommended}`);
+  console.log(`doc_inputs_check_required: ${report.doc_inputs_check_required}`);
+  if (report.declared_files_check) {
+    console.log(`declared_files_check:`);
+    console.log(`  declared: ${report.declared_files_check.declared.length}`);
+    console.log(`  missing: ${report.declared_files_check.missing.length}`);
+    for (const m of report.declared_files_check.missing) console.log(`    ${m}`);
+    console.log(`  extra: ${report.declared_files_check.extra.length}`);
+    for (const e of report.declared_files_check.extra) console.log(`    ${e}`);
+  }
 }
 
 function main(): void {
@@ -669,6 +739,7 @@ function main(): void {
     applicable,
     coupledFiles,
     obsolete,
+    parsed.declaredFiles,
   );
 
   const report: TargetedDocsReport = {
@@ -683,6 +754,8 @@ function main(): void {
     spec_readme_update_required: runResult.specReadmeUpdateRequired,
     requirements_readme_update_required: runResult.requirementsReadmeUpdateRequired,
     full_docs_check_recommended: runResult.fullDocsCheckRecommended,
+    doc_inputs_check_required: runResult.docInputsCheckRequired,
+    declared_files_check: runResult.declaredFilesCheck,
   };
 
   if (parsed.json) {

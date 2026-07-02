@@ -16,7 +16,7 @@ status: accepted
 | related_spec | [../foundations/project-doc-inputs.md, integrity-rule-catalog.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。SPEC パス例示（`<existing-spec>.md` 等のテンプレート表記）、検査対象パス指定（診断コマンドが検査対象と明示するパス）は exemption 対象とする。exemption 設計を誤ると true positive が誤って免除される |
-| regression_test | (未実装)。検査項目それぞれについて、正常ケースと異常ケースの fixture を用意し、`check_doc_inputs.ts` が正しく fail/pass を報告することを検証する |
+| regression_test | `check_doc_inputs.test.ts` が統合テストとして存在。正常系: 7/2 移行済みリポジトリの既存 doc-inputs で `ok=true` を確認済み。異常系: AG-005 で8種 fixture（allowed_discovery 非配列/空文字含む、command id 形式違反、skill id ファイル名不一致、must_read[].path 不在、conditional_read[].paths[] 不在、skill doc-input の must_read 持ち、command doc-input の5項目欠落）を追加済み。検査項目それぞれについて正常ケースと異常ケースの fixture を用意し、`check_doc_inputs.ts` が正しく fail/pass を報告することを検証する |
 | baseline_status | new |
 | finding_route | intake（既知違反の段階解消は別途処理） |
 | triage_action | 新規検出時は baseline に追加し、delta guard で新規増加を fail 対象とする。doc-inputs 機構は新規導入のため baseline 0 で開始し、full audit を即 fail gate 化する |
@@ -51,3 +51,11 @@ status: accepted
 ## 段階導入運用
 
 本ルールは doc-inputs 機構の新規導入に伴うものであり、baseline 0 で開始する。full audit を即 fail gate 化する（REQ-0157-004）。
+
+## allowed_discovery 運用契約（REQ-0157 APPEND）
+
+`allowed_discovery` は command または skill が DOC-MAP または docs 配下 README 経由で探索を必要とする paths を明示するフィールドである。
+
+- **空配列の許容条件**: `allowed_discovery` が空配列の場合は「探索不要」を意味する。DOC-MAP または docs 配下 README から探索可能な paths を持たない command または skill（must_read, conditional_read が空、または固定パスのみ）の場合のみ空配列を許容する。
+- **探索許可記述条件**: `allowed_discovery` に DOC-MAP または docs 配下 README 経由の探索許可を記述した場合、当該 command または skill はその経路で探索可能な paths を持つことを要件とする。空配列でない `allowed_discovery` を持つ command または skill が DOC-MAP/README 経由で到達可能な paths を持たない場合は検査 fail とする。
+- **検査対象 command**: req-define, req-save, spec-save, case-close, inspect-docs, inspect-doc-inputs は、必要最小限の探索許可（DOC-MAP および docs 配下 README 経由）を `allowed_discovery` に記述する。spec-save は `document-model.md` 確認を明示的に許可する。

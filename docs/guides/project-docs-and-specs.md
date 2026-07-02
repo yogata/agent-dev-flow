@@ -48,7 +48,7 @@ DOC-MAP（文書探索入口：索引）
 
 ## SPEC（現在仕様）
 
-**格納先**: `docs/specs/*.md`
+**格納先**: `docs/specs/**/*.md`（commands/skills/workflows の3層と基盤6ドメイン: foundations/responsibilities/quality/integrity/local/authoring）
 
 実装者が参照する現在のシステム仕様。
 「今どう動いているか」を記述する。
