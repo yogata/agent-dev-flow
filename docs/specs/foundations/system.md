@@ -60,6 +60,7 @@ AgentDevFlow の配布コマンドではなく、AgentDevFlow 本体リポジト
 |---|---|---|---|
 | `/agentdev/inspect-docs` | docs 全体の意味整合レビューと REQ 再構成診断 | prometheus | [commands/inspect-docs.md](../commands/inspect-docs.md) |
 | `/agentdev/inspect-skills` | Command/Skill 参照妥当性、構造の検出 | prometheus | [commands/inspect-skills.md](../commands/inspect-skills.md) |
+| `/agentdev/inspect-doc-inputs` | project doc-inputs 機構の整合性検出 | prometheus | [commands/inspect-doc-inputs.md](../commands/inspect-doc-inputs.md) |
 | `/agentdev/inspect-promote` | 検出事項（finding）の分類、昇格 | prometheus | [commands/inspect-promote.md](../commands/inspect-promote.md) |
 
 ### 品質ゲート

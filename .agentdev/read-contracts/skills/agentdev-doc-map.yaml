@@ -1,5 +1,0 @@
-skill: agentdev-doc-map
-conditional_read: {}
-allowed_discovery:
-  - docs/specs/foundations/system.md
-forbidden: []

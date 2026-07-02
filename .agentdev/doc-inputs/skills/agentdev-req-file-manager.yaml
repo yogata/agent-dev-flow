@@ -1,0 +1,12 @@
+version: 1
+kind: skill-doc-input
+id: agentdev-req-file-manager
+conditional_read:
+  - id: document-model
+    when: 文書モデル参照時
+    paths:
+      - docs/specs/foundations/document-model.md
+    purpose: REQ ファイル管理の文書間関係と frontmatter 規約の確認
+allowed_discovery: []
+forbidden:
+  - "実装本文（src/opencode/**）は読まない"

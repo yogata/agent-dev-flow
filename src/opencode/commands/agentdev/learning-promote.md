@@ -11,6 +11,17 @@ agent: sisyphus
 反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`。
 旧 `learning-refine` の全機能を吸収済み（事前実行不要）。
 
+## project doc-inputs
+
+本コマンドは以下の6歩で docs を解決する（ADR-0133）。
+
+1. `.agentdev/config.yaml` を読み込む
+2. `.agentdev/doc-inputs/commands/learning-promote.yaml` を読み込む
+3. `must_read` に列挙された paths を読み込む
+4. `conditional_read` の条件が該当する場合のみ、当該 paths を読み込む
+5. doc-input に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
+6. doc-input が存在しない場合は `config.yaml` の `roots` と明示入力のみを使う
+
 ## 入力
 
 - `.agentdev/learning/inbox.md`（必須）— 未処理の学びエントリ

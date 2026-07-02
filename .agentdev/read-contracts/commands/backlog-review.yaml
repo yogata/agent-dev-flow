@@ -1,7 +1,0 @@
-command: backlog-review
-must_read:
-  - docs/specs/foundations/document-model.md
-conditional_read: {}
-allowed_discovery: []
-forbidden: []
-read_completion: []

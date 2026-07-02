@@ -1,0 +1,12 @@
+version: 1
+kind: skill-doc-input
+id: agentdev-backlog-integration
+conditional_read:
+  - id: document-model
+    when: REQ/ADR/SPEC 責務マトリックス参照時
+    paths:
+      - docs/specs/foundations/document-model.md
+    purpose: 採用済み成果物と RU 生成の文書間関係確認
+allowed_discovery: []
+forbidden:
+  - "実装本文（src/opencode/**）は読まない"

@@ -8,14 +8,14 @@ description: "Defines lightweight quality gates for AgentDevFlow main workflow. 
 AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準、検査観点を提供する knowledge base。
 本スキルは参照専用であり、ファイル編集、Issue 作成、PR 作成、マージ、テスト実行は行わない。
 
-## skill read contract 参照方針
+## skill doc-input 参照方針
 
 本スキルは以下の方針に従う（ADR-0133）。
 
-1. プロジェクト固有の `docs/specs/**` 内部構成を仮定しない
-2. 呼び出し元コマンドから渡された解決済み文脈を優先する
-3. 解決済み文脈がなく skill read contract が存在する場合のみ読む
-4. read contract に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+2. **doc-input の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill doc-input（`.agentdev/doc-inputs/skills/agentdev-quality-gates.yaml`）を読む。skill doc-input はスキル単位で1ファイルに集約し、reference ごとの doc-input は作らない
+3. **`docs/specs/**` 内部パスの固定知識化の禁止**: doc-input に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
+4. **doc-input 未配置時の挙動**: skill doc-input が存在しない場合は `config.yaml` の `roots` と明示入力のみを使い、推測で docs を読みに行かない
 ## 概要
 
 - **役割**: QG-1〜QG-4 の判定基準、検査観点、乖離分類基準を提供する
@@ -84,7 +84,7 @@ QG-3/ QG-4 の fail 判定時、エージェントは推奨アクションを提
 ## See Also
 
 - [common-gate-contract.md](references/common-gate-contract.md)（全 Gate 共通契約。pass/warn/fail/partial、evidence-first、結果フォーマット）
-- quality-gates SPEC（QG-1〜QG-4 の SPEC 定義、機械化境界、実装マッピング、skill read contract 経由）
+- quality-gates SPEC（QG-1〜QG-4 の SPEC 定義、機械化境界、実装マッピング、skill doc-input 経由）
 - **agentdev-req-analysis**: 要件分析手法、チェックボックス品質基準（QG-1 の基準）
 - **agentdev-workflow-lifecycle**: work_type 判定、フェーズ定義
 - **agentdev-workflow-routing**: case-update --review-ng 手順（QG-3 結果の消費先）

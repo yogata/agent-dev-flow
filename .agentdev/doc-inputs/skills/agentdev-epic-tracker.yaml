@@ -1,0 +1,12 @@
+version: 1
+kind: skill-doc-input
+id: agentdev-epic-tracker
+conditional_read:
+  - id: epic-wave-model
+    when: Epic/Wave モデル参照時
+    paths:
+      - docs/specs/workflows/epic-wave-model.md
+    purpose: Epic ステータス追跡テーブルと per-Epic 単一書き手の確認
+allowed_discovery: []
+forbidden:
+  - "実装本文（src/opencode/**）は読まない"

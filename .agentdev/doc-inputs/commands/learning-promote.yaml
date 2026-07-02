@@ -1,0 +1,9 @@
+version: 1
+kind: command-doc-input
+id: /agentdev/learning-promote
+must_read: []
+conditional_read: []
+allowed_discovery: []
+forbidden:
+  - "実装本文（src/opencode/**）は読まない"
+read_completion: []
