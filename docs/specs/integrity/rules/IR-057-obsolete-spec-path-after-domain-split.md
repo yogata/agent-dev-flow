@@ -45,12 +45,17 @@ status: accepted
 
 ## exemption（検出対象外）
 
+以下の exemption は `check_changed_docs.ts`（targeted guard）の旧直下パス検出（`checkObsoleteSpecPath`）と legacy vocabulary 検出（`checkLegacyVocab`）の両方に適用する。`check_integrity.ts`（full audit）も同等の exemption を実装する。
+
 | 対象 | 理由 |
 |------|------|
 | コードブロック内の例示（明示的検査 fixture） | 例示、パターン説明は検出対象外（既存の code-block exemption に準拠） |
-| `obsolete-path-map.yaml` 自体 | 旧パスを対照表として列挙する正当なファイル |
+| `obsolete-path-map.yaml` 自体 | 旧パス、廃止語彙を対照表として列挙する正当なファイル |
 | IR-057 ルール説明としての旧パス例 | ルール定義内の例示は検出対象外 |
 | `integrity-rule-catalog.md`、`vocabulary-registry.md` | 検出ルール自体の記述、正規語彙の対照表 |
+| `rule-ownership.md` | ルール所有権マトリックス。各ルールが検出・管理する語彙を説明する検出ルール記述 |
+| `check_integrity.ts`（検査スクリプト本体） | IR-057 検出を実装するスクリプト。検出語・旧パスを文字列リテラル、コメント、エラーメッセージとして含む（テスト fixture と同等） |
+| `docs/guides/glossary.md` | 用語集。廃止語彙の歴史的識別子値を定義する語彙参照文書 |
 | `retired/` 配下 | 履歴参照領域 |
 | テスト fixture（`*.test.ts` 等） | 検査ロジックのテストデータは検出対象外 |
 | 現行ADRに履歴として旧パスを記載する場合 | rule 側で例外登録を明示する（後述） |

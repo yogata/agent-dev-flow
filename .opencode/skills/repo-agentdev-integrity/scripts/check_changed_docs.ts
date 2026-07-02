@@ -363,6 +363,7 @@ function checkObsoleteSpecPath(
     if (/docs\/specs\/integrity\/obsolete-path-map\.yaml$/.test(rel)) continue;
     if (/docs\/specs\/integrity\/rules\/IR-057-/.test(rel)) continue;
     if (/\.test\.ts$/.test(rel)) continue;
+    if (/repo-agentdev-integrity\/scripts\/check_integrity\.ts$/.test(rel)) continue;
     if (/docs\/requirements\/REQ-0158\.md$/.test(rel)) continue;
     if (/docs\/adr\/ADR-0(123|110)\.md$/.test(rel)) continue;
     if (/docs\/requirements\/REQ-010[12]\.md$/.test(rel)) continue;
@@ -402,10 +403,14 @@ function checkLegacyVocab(
     if (/docs\/requirements\/REQ-0141\.md$/.test(rel)) continue;
     if (/docs\/specs\/local\/local-generation\.md$/.test(rel)) continue;
     if (/docs\/specs\/integrity\/integrity-rule-catalog\.md$/.test(rel)) continue;
+    if (/docs\/specs\/integrity\/rule-ownership\.md$/.test(rel)) continue;
     if (/docs\/specs\/integrity\/rules\/IR-057-/.test(rel)) continue;
     if (/docs\/specs\/integrity\/rules\/IR-048-/.test(rel)) continue;
+    if (/docs\/specs\/integrity\/obsolete-path-map\.yaml$/.test(rel)) continue;
     if (/vocabulary-registry\.md$/.test(rel)) continue;
+    if (/docs\/guides\/glossary\.md$/.test(rel)) continue;
     if (/repo-agentdev-integrity.*\/(SKILL|references\/)/.test(rel)) continue;
+    if (/repo-agentdev-integrity\/scripts\/check_integrity\.ts$/.test(rel)) continue;
     const content = readText(f);
     if (!content) continue;
     const lines = content.split("\n");
