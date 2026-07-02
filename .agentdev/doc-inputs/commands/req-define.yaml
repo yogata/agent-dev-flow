@@ -1,0 +1,36 @@
+version: 1
+kind: command-doc-input
+id: /agentdev/req-define
+must_read:
+  - path: docs/specs/foundations/document-model.md
+    purpose: REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスと文書間関係の確認
+  - path: docs/specs/foundations/patterns.md
+    purpose: frontmatter、ID 体系、命名規則、URL 参照形式の確認
+  - path: docs/specs/quality/req-health-metrics.md
+    purpose: REQ 健全性メトリクス（肥大化、関心ズレ検出）の確認
+conditional_read:
+  - id: delegation-contracts
+    when: サブエージェント委譲契約参照時
+    paths:
+      - docs/specs/workflows/delegation-contracts.md
+    purpose: 委譲時最小契約と制約の確認
+  - id: epic-wave-model
+    when: Epic/Wave 構成参照時
+    paths:
+      - docs/specs/workflows/epic-wave-model.md
+    purpose: OU 階層と Wave スケジューリングの確認
+  - id: workflow-contracts
+    when: ワークフロー契約（フェーズ、SSoT 遷移）参照時
+    paths:
+      - docs/specs/workflows/workflow-contracts.md
+    purpose: パイプライン概要と共通フェーズ契約の確認
+  - id: req-file-manager-procedure
+    when: REQ ファイル管理手順参照時
+    paths:
+      - docs/specs/skills/agentdev-req-file-manager.md
+    purpose: REQ 番号採番と CREATE/APPEND/UPDATE 判定の確認
+allowed_discovery: []
+forbidden:
+  - "実装本文（src/opencode/**）は読まない"
+read_completion:
+  - "要件doc（draft）が .agentdev/drafts/req-draft-*.md に存在すること"

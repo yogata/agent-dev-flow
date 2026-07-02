@@ -12,14 +12,14 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 
 ---
 
-## skill read contract 参照方針
+## skill doc-input 参照方針
 
 本スキルは以下の方針に従う（ADR-0133）。
 
-1. プロジェクト固有の `docs/specs/**` 内部構成を仮定しない
-2. 呼び出し元コマンドから渡された解決済み文脈を優先する
-3. 解決済み文脈がなく skill read contract が存在する場合のみ読む
-4. read contract に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+2. **doc-input の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill doc-input（`.agentdev/doc-inputs/skills/agentdev-req-file-manager.yaml`）を読む。skill doc-input はスキル単位で1ファイルに集約し、reference ごとの doc-input は作らない
+3. **`docs/specs/**` 内部パスの固定知識化の禁止**: doc-input に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
+4. **doc-input 未配置時の挙動**: skill doc-input が存在しない場合は `config.yaml` の `roots` と明示入力のみを使い、推測で docs を読みに行かない
 ## 概要
 
 REQファイルの作成、追記、更新を管理する。

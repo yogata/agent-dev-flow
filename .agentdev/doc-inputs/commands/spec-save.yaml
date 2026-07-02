@@ -1,0 +1,14 @@
+version: 1
+kind: command-doc-input
+id: /agentdev/spec-save
+must_read:
+  - path: docs/specs/foundations/document-model.md
+    purpose: SPEC 3層構造と基盤SPEC 6ドメイン分類の確認
+  - path: docs/specs/foundations/patterns.md
+    purpose: frontmatter、ID 体系、命名規則の確認
+conditional_read: []
+allowed_discovery: []
+forbidden:
+  - "実装本文（src/opencode/**）は読まない"
+read_completion:
+  - "保存した SPEC が docs/specs/README.md のインデックスに存在すること"

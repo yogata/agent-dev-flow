@@ -1,6 +1,0 @@
-skill: agentdev-epic-tracker
-conditional_read:
-  epic_wave_model:
-    - docs/specs/workflows/epic-wave-model.md
-allowed_discovery: []
-forbidden: []

@@ -1,9 +1,0 @@
-command: case-run
-must_read:
-  - docs/specs/workflows/epic-wave-model.md
-conditional_read:
-  workflow_contracts:
-    - docs/specs/workflows/workflow-contracts.md
-allowed_discovery: []
-forbidden: []
-read_completion: []

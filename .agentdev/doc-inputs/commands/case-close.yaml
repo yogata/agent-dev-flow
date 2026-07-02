@@ -1,0 +1,22 @@
+version: 1
+kind: command-doc-input
+id: /agentdev/case-close
+must_read:
+  - path: docs/specs/foundations/document-model.md
+    purpose: REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスと文書間関係の確認
+conditional_read:
+  - id: case-auto-conflict-model
+    when: case-auto 並行実行時のコンフリクト解消モデル参照時
+    paths:
+      - docs/specs/commands/case-auto.md
+    purpose: case-auto 連携時のコンフリクト解消手順の確認
+  - id: case-close-spec
+    when: case-close 工程 SPEC 参照時
+    paths:
+      - docs/specs/commands/case-close.md
+    purpose: case-close の完了ゲートと QG-4 達成判定の確認
+allowed_discovery: []
+forbidden:
+  - "実装本文（src/opencode/**）は読まない"
+read_completion:
+  - "完了した Issue/PR の成果物が docs/requirements/, docs/adr/, docs/specs/ のいずれかに存在すること"

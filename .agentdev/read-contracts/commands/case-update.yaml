@@ -1,6 +1,0 @@
-command: case-update
-must_read: []
-conditional_read: {}
-allowed_discovery: []
-forbidden: []
-read_completion: []

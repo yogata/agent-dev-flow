@@ -1,0 +1,11 @@
+version: 1
+kind: command-doc-input
+id: /agentdev/backlog-review
+must_read:
+  - path: docs/specs/foundations/document-model.md
+    purpose: REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスと探索入口の確認
+conditional_read: []
+allowed_discovery: []
+forbidden:
+  - "実装本文（src/opencode/**）は読まない"
+read_completion: []

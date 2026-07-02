@@ -1,0 +1,22 @@
+version: 1
+kind: command-doc-input
+id: /agentdev/req-save
+must_read:
+  - path: docs/specs/foundations/document-model.md
+    purpose: REQ/ADR/SPEC の責務マトリックスと文書間関係の確認
+conditional_read:
+  - id: integrity-rule-catalog
+    when: 整合性ルールカタログ参照時
+    paths:
+      - docs/specs/integrity/integrity-rule-catalog.md
+    purpose: REQ 保存後に影響する整合性ルールの確認
+  - id: req-file-manager-procedure
+    when: REQ ファイル管理手順参照時
+    paths:
+      - docs/specs/skills/agentdev-req-file-manager.md
+    purpose: REQ 番号採番ルールと frontmatter 規約の確認
+allowed_discovery: []
+forbidden:
+  - "実装本文（src/opencode/**）は読まない"
+read_completion:
+  - "保存した REQ/ADR が docs/requirements/, docs/adr/ のインデックスに存在すること"

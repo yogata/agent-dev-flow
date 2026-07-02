@@ -8,6 +8,17 @@ agent: sisyphus
 要件docから req-save → spec-save → case-open → case-run → case-close を順次実行し、repo内変更に限りマージまで自走する。
 標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
 
+## project doc-inputs
+
+本コマンドは以下の6歩で docs を解決する（ADR-0133）。
+
+1. `.agentdev/config.yaml` を読み込む
+2. `.agentdev/doc-inputs/commands/case-auto.yaml` を読み込む
+3. `must_read` に列挙された paths を読み込む
+4. `conditional_read` の条件が該当する場合のみ、当該 paths を読み込む
+5. doc-input に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
+6. doc-input が存在しない場合は `config.yaml` の `roots` と明示入力のみを使う
+
 ## 入力
 
 - Issue番号（数値）または Issue URL: 既存Issue から case-run → case-close を自走する場合

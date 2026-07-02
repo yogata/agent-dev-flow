@@ -11,6 +11,17 @@ agent: sisyphus
 ** GitHub Issue の作成、採用可否の判断は行わない。
 作業知見だけの内容は対象外である（`agentdev-workflow-orchestration` skill の Split Rule を参照）。
 
+## project doc-inputs
+
+本コマンドは以下の6歩で docs を解決する（ADR-0133）。
+
+1. `.agentdev/config.yaml` を読み込む
+2. `.agentdev/doc-inputs/commands/intake-capture.yaml` を読み込む
+3. `must_read` に列挙された paths を読み込む
+4. `conditional_read` の条件が該当する場合のみ、当該 paths を読み込む
+5. doc-input に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
+6. doc-input が存在しない場合は `config.yaml` の `roots` と明示入力のみを使う
+
 ## 入力
 
 - ユーザーの自然言語による変更候補の記述
