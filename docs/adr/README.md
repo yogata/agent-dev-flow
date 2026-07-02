@@ -31,7 +31,7 @@
 | ADR-0130 | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 | accepted | 2026-06-23 |
 | ADR-0131 | ローカル版導入方式を link mode へ統一し生成方式を廃止 | accepted | 2026-06-23 |
 | ADR-0132 | コンフリクト解消モデル（3レベルエスカレーションと責務割当）| accepted | 2026-06-24 |
-| ADR-0133 | Read Contract Architecture | accepted | 2026-07-02 |
+| ADR-0133 | Doc Inputs Architecture | accepted | 2026-07-02 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。
 > 基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
@@ -61,7 +61,7 @@
 - [ADR-0130](ADR-0130.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）
 - [ADR-0131](ADR-0131.md)（ローカル版導入方式を link mode へ統一し生成方式を廃止）
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
-- [ADR-0133](ADR-0133.md)（Read Contract Architecture）
+- [ADR-0133](ADR-0133.md)（Doc Inputs Architecture）
 
 ### 置き換え済み（superseded）
 
@@ -109,7 +109,7 @@
 ### 文書
 
 - [ADR-0110](ADR-0110.md)（DOC-MAP 採用判断）
-- [ADR-0133](ADR-0133.md)（Read Contract Architecture）
+- [ADR-0133](ADR-0133.md)（Doc Inputs Architecture）
 
 Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 
@@ -209,7 +209,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0130 | [REQ-0149](../requirements/REQ-0149.md), [REQ-0150](../requirements/REQ-0150.md) | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 |
 | ADR-0131 | [REQ-0141](../requirements/REQ-0141.md), [REQ-0134](../requirements/REQ-0134.md), [REQ-0150](../requirements/REQ-0150.md) | ローカル版導入方式を link mode へ統一し生成方式を廃止 |
 | ADR-0132 | [REQ-0151](../requirements/REQ-0151.md), [REQ-0148](../requirements/REQ-0148.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0130](../requirements/REQ-0130.md) | コンフリクト解消モデル（3レベルエスカレーションと責務割当） |
-| ADR-0133 | [REQ-0157](../requirements/REQ-0157.md), [REQ-0103](../requirements/REQ-0103.md) | Read Contract Architecture |
+| ADR-0133 | [REQ-0157](../requirements/REQ-0157.md), [REQ-0103](../requirements/REQ-0103.md) | Doc Inputs Architecture |
 
 ## 廃止済み、履歴ビュー
 

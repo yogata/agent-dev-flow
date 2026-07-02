@@ -54,7 +54,7 @@
 | [REQ-0154](requirements/REQ-0154.md) | SPEC status 追跡と draft 放置検出 |
 | [REQ-0155](requirements/REQ-0155.md) | 文書粒度モデル |
 | [REQ-0156](requirements/REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 |
-| [REQ-0157](requirements/REQ-0157.md) | Project Read Contract Migration |
+| [REQ-0157](requirements/REQ-0157.md) | Project Doc Inputs Migration |
 | [REQ-0158](requirements/REQ-0158.md) | Targeted Docs Integrity Guard |
 
 - [要件インデックス](requirements/README.md)
