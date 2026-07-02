@@ -125,10 +125,10 @@ entries:
     new: "docs/specs/authoring/command-file-format.md"
     severity: "ng"
 
-# local 版旧生成方式語彙（直接生成方式、生成フロー、再生成、上書き保護、
-# local-opencode-transform 識別子）。link mode 統一（ADR-0131）に伴い廃止確定。
-# generated_by は local-opencode-transform と組み合わせた場合のみ local 版旧生成
-# 方式として検出する（backlog 等の別文脈での generated_by 使用を除外するため）。
+# local 版旧生成方式語彙。link mode 統一（ADR-0131）に伴い廃止確定。
+# 語彙は「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離する。
+# 単独検出語は出現だけで即 ng。近接条件つき検出語は同一ファイル内または近接行に
+# 旧 local 生成方式文脈語（単独検出語のいずれか）がある場合のみ ng とする。
 legacy_local_generation_vocabulary:
   - term: "src/opencode-local/generation-flow.md"
     severity: "ng"
@@ -154,12 +154,23 @@ legacy_local_generation_vocabulary:
   - term: "生成フロー"
     severity: "ng"
     note: "旧生成方式の言及。link mode への置き換えが必要。"
+
+# 近接条件つき検出語: 単独では検出せず、同一ファイル内または近接行に
+# legacy_local_generation_vocabulary のいずれかの文脈語がある場合のみ検出する。
+# これにより backlog 等の別文脈での使用を false positive として除外する。
+legacy_local_generation_conditional_vocabulary:
   - term: "再生成"
-    severity: "ng"
-    note: "旧生成方式の言及。link mode への置き換えが必要。"
+    severity: "conditional"
+    proximity_required: true
+    note: "旧生成方式の言及。link mode への置き換えが必要。単独では backlog 等の別文脈でも使用されるため近接条件つき。"
   - term: "上書き保護"
-    severity: "ng"
-    note: "旧生成方式の言及。link mode への置き換えが必要。"
+    severity: "conditional"
+    proximity_required: true
+    note: "旧生成方式の言及。link mode への置き換えが必要。単独では別文脈でも使用されるため近接条件つき。"
+  - term: "generated_by"
+    severity: "conditional"
+    proximity_required: true
+    note: "generated_by 単独は backlog 等の別文脈で使用されるため検出対象外。下記 generated_by_combination_rule も参照。"
 
 # generated_by は local-opencode-transform と組み合わせた場合のみ検出する。
 generated_by_combination_rule:

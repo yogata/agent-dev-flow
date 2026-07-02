@@ -220,7 +220,7 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 |---|---|
 | REQ ID | 4 桁ゼロ埋めの安定 ID。現行、廃止を問わず再利用しない |
 | ADR ID | 4 桁ゼロ埋め。現行基準（`baseline`）は ADR-0101 以降（現行コレクション）。旧番号帯 ADR-0001〜0099 は廃止（`docs/adr/retired/`）。状態は frontmatter で管理（REQ-0112-047, 048） |
-| SPEC 配置 | `docs/specs/*.md` 直下 |
+| SPEC 配置 | `docs/specs/**/*.md`（基盤SPECは6ドメインディレクトリ、他は commands/skills/workflows の3層。詳細は「docs/specs/ 直下のドメイン別体系化」参照） |
 | SPEC status | frontmatter `status`（`draft` / `accepted`）。既定は `draft`（spec-save 新規作成時）。`status` なしは `accepted` 相当（ADR-0123） |
 | Guides 配置 | `docs/guides/*.md` 直下 |
 | 廃止 REQ | `docs/requirements/retired/` に配置。現行要件判断に使用しない |

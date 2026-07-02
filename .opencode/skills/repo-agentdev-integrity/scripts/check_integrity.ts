@@ -6912,6 +6912,7 @@ interface ObsoletePathMap {
   scope: { include: string[]; exclude: string[] };
   entries: ObsoletePathEntry[];
   legacy_local_generation_vocabulary?: { term: string; severity: string }[];
+  legacy_local_generation_conditional_vocabulary?: { term: string; severity: string; proximity_required?: boolean }[];
   generated_by_combination_rule?: {
     trigger: string;
     paired_with: string;
@@ -6934,10 +6935,11 @@ function loadObsoletePathMap(root: string): ObsoletePathMap | null {
   // 構造化YAMLを扱うが、obsolete-path-map.yaml のスキーマに特化する。
   const lines = content.split("\n");
   const map: ObsoletePathMap = { scope: { include: [], exclude: [] }, entries: [] };
-  let section: "scope" | "entries" | "vocab" | "combo" | null = null;
+  let section: "scope" | "entries" | "vocab" | "conditional_vocab" | "combo" | null = null;
   let currentEntry: Partial<ObsoletePathEntry> | null = null;
-  let currentVocab: { term: string; severity: string } | null = null;
+  let currentVocab: { term: string; severity: string; proximity_required?: boolean } | null = null;
   let currentScopeKey: "include" | "exclude" | null = null;
+  let vocabTarget: "vocab" | "conditional_vocab" | null = null;
 
   const flushEntry = () => {
     if (currentEntry && currentEntry.old) {
@@ -6947,10 +6949,17 @@ function loadObsoletePathMap(root: string): ObsoletePathMap | null {
   };
   const flushVocab = () => {
     if (currentVocab && currentVocab.term) {
-      if (!map.legacy_local_generation_vocabulary) {
-        map.legacy_local_generation_vocabulary = [];
+      if (vocabTarget === "conditional_vocab") {
+        if (!map.legacy_local_generation_conditional_vocabulary) {
+          map.legacy_local_generation_conditional_vocabulary = [];
+        }
+        map.legacy_local_generation_conditional_vocabulary.push(currentVocab);
+      } else {
+        if (!map.legacy_local_generation_vocabulary) {
+          map.legacy_local_generation_vocabulary = [];
+        }
+        map.legacy_local_generation_vocabulary.push(currentVocab);
       }
-      map.legacy_local_generation_vocabulary.push(currentVocab);
     }
     currentVocab = null;
   };
@@ -6975,6 +6984,14 @@ function loadObsoletePathMap(root: string): ObsoletePathMap | null {
       flushEntry();
       flushVocab();
       section = "vocab";
+      vocabTarget = "vocab";
+      continue;
+    }
+    if (/^legacy_local_generation_conditional_vocabulary:/.test(line)) {
+      flushEntry();
+      flushVocab();
+      section = "conditional_vocab";
+      vocabTarget = "conditional_vocab";
       continue;
     }
     if (/^generated_by_combination_rule:/.test(line)) {
@@ -7023,17 +7040,22 @@ function loadObsoletePathMap(root: string): ObsoletePathMap | null {
       }
     }
 
-    if (section === "vocab") {
+    if (section === "vocab" || section === "conditional_vocab") {
       const startMatch = line.match(/^\s*-\s*term:\s*"([^"]+)"/);
       if (startMatch) {
         flushVocab();
-        currentVocab = { term: startMatch[1], severity: "ng" };
+        currentVocab = { term: startMatch[1], severity: section === "conditional_vocab" ? "conditional" : "ng" };
         continue;
       }
       if (currentVocab) {
         const sevMatch = line.match(/^\s*severity:\s*"([^"]+)"/);
         if (sevMatch) {
           currentVocab.severity = sevMatch[1];
+          continue;
+        }
+        const proxMatch = line.match(/^\s*proximity_required:\s*(true|false)/);
+        if (proxMatch) {
+          currentVocab.proximity_required = proxMatch[1] === "true";
           continue;
         }
       }
@@ -7277,7 +7299,6 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
         if (isIr057InCodeBlock(lines, i)) continue;
         if (isIr057HistoricalAdrContext(fullPath, root, line)) continue;
         if (isInsideCodeSpan(line, line.indexOf(trigger))) continue;
-        // 同一ファイル内に paired_with が出現することを確認済み
         foundViolation = true;
         results.push(
           ng(
@@ -7296,6 +7317,52 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
             },
           ),
         );
+      }
+    }
+  }
+
+  // 4. legacy local generation conditional vocabulary（近接条件つき検出語）検出
+  // 単独では検出せず、同一ファイル内に旧 local 生成方式文脈語がある場合のみ検出する
+  if (map.legacy_local_generation_conditional_vocabulary && map.legacy_local_generation_vocabulary) {
+    const contextTerms = map.legacy_local_generation_vocabulary.map((v) => v.term);
+    for (const fullPath of targetFiles) {
+      const relPath = resolveRelative(fullPath, root);
+      if (isIr057ExemptPath(relPath)) continue;
+      if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
+      if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) continue;
+
+      const content = readText(fullPath);
+      if (!content) continue;
+      const hasContextTerm = contextTerms.some((t) => content.includes(t));
+      if (!hasContextTerm) continue;
+
+      const lines = content.split("\n");
+      for (const item of map.legacy_local_generation_conditional_vocabulary) {
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (!line.includes(item.term)) continue;
+          if (isIr057InCodeBlock(lines, i)) continue;
+          if (isIr057HistoricalAdrContext(fullPath, root, line)) continue;
+          if (isInsideCodeSpan(line, line.indexOf(item.term))) continue;
+          foundViolation = true;
+          results.push(
+            ng(
+              "CanonicalConflict",
+              "obsolete-spec-path",
+              `Legacy local generation conditional vocabulary '${item.term}' detected with context term nearby (link mode unified, ADR-0131)`,
+              relPath,
+              i + 1,
+              {
+                evidence: line.trim(),
+                expected:
+                  "remove legacy vocabulary; use link mode terminology (ADR-0131)",
+                route: "intake",
+                finding_category: "broken-reference",
+                finding_level: "strict",
+              },
+            ),
+          );
+        }
       }
     }
   }

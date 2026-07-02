@@ -50,7 +50,7 @@ artifact_actions:
   - id: ACT-REQ-001             # ACT-{ARTIFACT}-{NNN}
     artifact: req               # req / adr / spec
     operation: create           # REQ/ADR: create / append / update、SPEC: create / update
-    target: new:{topic-slug}    # file path または new:{slug}
+    target: new:{topic-slug}    # REQ/ADR: file path または new:{slug}。SPEC は target_spec 構造化推奨
     target_area: # artifact: spec の場合、operation: update/spec-update では必須（対象セクション見出し）。operation: create/spec-create および req/adr では任意
     source_items: [AG-001, AG-002] # 対応する agreed_item ID の list
     content: |                  # 保存対象の full text
@@ -65,7 +65,10 @@ artifact_actions:
   - id: ACT-SPEC-001            # SPEC 保存対象（artifact: spec）が含まれる場合 spec-save が実行される
     artifact: spec
     operation: create           # SPEC: create / update
-    target: new:{topic-slug}
+    target_spec:                # SPEC 操作は target_spec 構造化推奨（operation, domain, slug）。target: file path との併用も可
+      operation: create         # create / update
+      domain: foundations       # docs/specs/{domain}/ の domain（foundations/responsibilities/quality/integrity/local/authoring/commands/skills/workflows）
+      slug: {topic-slug}        # ファイル名 slug（docs/specs/{domain}/{slug}.md を作成）
     target_area: # operation: create/spec-create では任意、operation: update/spec-update では必須（対象セクション見出し）
     source_items: [AG-004]
     content: |
@@ -83,7 +86,7 @@ operation_units:
   - ou_id: OU-001
     source_ru: # optional: 元 RU-ID
     target_req: REQ-{NNNN}      # REQ 操作の対象 REQ
-    target_spec: # optional: SPEC 操作の対象 SPEC パス（例: docs/specs/<existing-spec>.md、新規は new:{topic-slug}）
+    target_spec: # optional: SPEC 操作の対象 SPEC パス（例: docs/specs/{domain}/<existing-spec>.md、新規は target_spec: {operation, domain, slug} 構造化）
     operation: create           # create / append / update（SPEC 操作は spec-create / spec-update も可・後方互換）
     scale: standard             # standard / large
     depends_on: []              # 実在する ou_id を参照

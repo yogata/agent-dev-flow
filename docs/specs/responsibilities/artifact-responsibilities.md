@@ -18,7 +18,7 @@ status: accepted
 | Skill Template | `src/opencode/skills/*/templates/` | 原本優先 | `.opencode/skills/*/templates/` | ドキュメント生成テンプレート |
 | REQ | `docs/requirements/REQ-*.md` | - | - | 要件定義（基準） |
 | ADR | `docs/adr/ADR-*.md` | - | - | アーキテクチャ決定記録（基準） |
-| SPEC | `docs/specs/*.md` | - | - | 現在仕様（リポジトリ内部） |
+| SPEC | `docs/specs/**/*.md` | - | - | 現在仕様（リポジトリ内部）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成 |
 | DOC-MAP | `docs/DOC-MAP.md` | - | - | 文書探索入口（非基準） |
 | Guide | `docs/guides/*.md` | - | - | 参照用読み物（ナビゲーション層） |
 | ドメイン状態 | `.agentdev/` | - | - | Intake / Learning / Backlog / Integrity 永続状態 |

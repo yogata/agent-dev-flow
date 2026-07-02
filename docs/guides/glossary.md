@@ -27,7 +27,7 @@ AgentDevFlow で使う用語の定義。
 |------|------|
 | REQ | 要件定義の永続基準。`docs/requirements/REQ-{NNNN}.md` に配置 |
 | ADR | 取り返しのつかない技術判断の記録。現行基準は `docs/adr/ADR-01XX.md`（現行の番号帯）、再編前は `docs/adr/retired/ADR-00XX.md`（廃止済み番号帯）。廃止済み ADR は現行根拠として使用しない（REQ-0112-047, 048） |
-| SPEC | 実装者が参照する現在仕様。`docs/specs/*.md` に配置 |
+| SPEC | 実装者が参照する現在仕様。`docs/specs/**/*.md` に配置（commands/skills/workflows の3層と基盤6ドメイン） |
 | DOC-MAP | 文書探索、参照経路の入口。`docs/DOC-MAP.md` に配置 |
 | guides | 利用者向けの参照用読み物。`docs/guides/*.md` に配置 |
 | RU（Requirement Unit） | Intake/Learning の採用済み成果物を統合した構造化成果物。`.agentdev/backlog/req-units/RU-*.md` に配置 |

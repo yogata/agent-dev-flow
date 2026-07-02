@@ -42,7 +42,7 @@ updated: YYYY-MM-DD
 
 ## 参照する横断 SPEC
 - docs/specs/workflows/*.md の関連契約
-- 依存する他の docs/specs/*.md
+- 依存する他の docs/specs/**/*.md
 
 ## 対象外
 - DO NOT FOR・ガードレールに明示された禁止事項

@@ -9,7 +9,7 @@ updated: 2026-06-25
 
 ## 目的
 
-req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/*.md` に保存、確定する。
+req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/**/*.md` に保存、確定する。
 req-save の次、case-open の前に実行する。
 全 work_type 対象であり、`work_type` による判定は廃止する（REQ-0138-009）。
 
@@ -19,7 +19,7 @@ req-save の次、case-open の前に実行する。
 
 ## 出力
 
-- `docs/specs/*.md`（既存 SPEC への追記 or 新規 SPEC 作成）
+- `docs/specs/**/*.md`（既存 SPEC への追記 or 新規 SPEC 作成）
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（SPEC artifact_actions 消費済みフラグの status 更新）
 
 ## 副作用
@@ -32,7 +32,7 @@ req-save の次、case-open の前に実行する。
 
 - Step 1: 事前チェック（`draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認）。なければ no-op 完了。ドラフト不存在時はエラー中止
 - Step 2: SPEC artifact_actions 読込（`artifact: spec` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は SPEC 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（create/update）、`content` を処理対象とする
-- Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/foundations/patterns.md`）→ update 操作）。`new:{topic-slug}` → 新規 SPEC 作成（`docs/specs/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-0136-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
+- Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/foundations/patterns.md`）→ update 操作）。`target_spec: {operation, domain, slug}` 構造化 → 新規 SPEC 作成（`docs/specs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-0136-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
 - Step 4: SPEC 分離基準の最終確認（各 action が REQ-0101-055（SPEC に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-0101-069）相当は除外し follow-up に明示
 - Step 5: SPEC ファイル操作。`target_area` 見出し検索は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行
  - create: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
