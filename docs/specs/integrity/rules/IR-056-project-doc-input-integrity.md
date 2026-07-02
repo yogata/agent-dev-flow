@@ -16,7 +16,7 @@ status: accepted
 | related_spec | [../foundations/project-doc-inputs.md, integrity-rule-catalog.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。SPEC パス例示（`<existing-spec>.md` 等のテンプレート表記）、検査対象パス指定（診断コマンドが検査対象と明示するパス）は exemption 対象とする。exemption 設計を誤ると true positive が誤って免除される |
-| regression_test | `check_doc_inputs.test.ts` が統合テストとして存在。正常系: 7/2 移行済みリポジトリの既存 doc-inputs で `ok=true` を確認済み。異常系: AG-005 で8種 fixture（allowed_discovery 非配列/空文字含む、command id 形式違反、skill id ファイル名不一致、must_read[].path 不在、conditional_read[].paths[] 不在、skill doc-input の must_read 持ち、command doc-input の5項目欠落）を追加予定。検査項目それぞれについて正常ケースと異常ケースの fixture を用意し、`check_doc_inputs.ts` が正しく fail/pass を報告することを検証する |
+| regression_test | `check_doc_inputs.test.ts` が統合テストとして存在。正常系: 7/2 移行済みリポジトリの既存 doc-inputs で `ok=true` を確認済み。異常系: AG-005 で8種 fixture（allowed_discovery 非配列/空文字含む、command id 形式違反、skill id ファイル名不一致、must_read[].path 不在、conditional_read[].paths[] 不在、skill doc-input の must_read 持ち、command doc-input の5項目欠落）を追加済み。検査項目それぞれについて正常ケースと異常ケースの fixture を用意し、`check_doc_inputs.ts` が正しく fail/pass を報告することを検証する |
 | baseline_status | new |
 | finding_route | intake（既知違反の段階解消は別途処理） |
 | triage_action | 新規検出時は baseline に追加し、delta guard で新規増加を fail 対象とする。doc-inputs 機構は新規導入のため baseline 0 で開始し、full audit を即 fail gate 化する |
