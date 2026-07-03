@@ -5,7 +5,7 @@ agent: sisyphus
 
 # inspect-promote
 
-`.agentdev/inspect/inbox/` の検出事項を分類（promote/ defer/ reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ、却下した検出事項を `.agentdev/inspect/archive/rejected/` へ移動する。
+`.agentdev/inspect/inbox/` の検出事項を分類（promote/ defer/ reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ保存し、却下した検出事項は即時削除する（`archive/rejected/` 廃止）。
 明示的な `--auto` opt-in 時は、高確信度の検出事項を HITL を経ずに `.agentdev/intake/promoted/` へ自動投入し、intake/backlog パイプラインへ流入させる。
 
 ## 入力
@@ -16,7 +16,7 @@ agent: sisyphus
 ## 出力
 
 - `.agentdev/inspect/promoted/*.md`（手動 promote 採用済み、RU 化対象）
-- `.agentdev/inspect/archive/rejected/*.md`（却下済み）
+- reject 検出事項は即時削除（`archive/rejected/` 廃止）。reject 時の commit message に却下理由を含める（AG-006、監査証跡の補強）
 - `.agentdev/intake/promoted/inspect-auto-*.md`（`--auto` 時の自動 promote 成果物。backlog-review へ流入）
 - `.agentdev/inspect/promoted/auto-promote-log.md`（`--auto` 実行ログ。append-only）
 - セッション内完了報告
@@ -66,7 +66,7 @@ agent: sisyphus
 承認された promote 対象検出事項を `.agentdev/inspect/promoted/` へ保存。元の inbox file は削除
 ### Step 7: reject 処理
 
-承認された reject 対象検出事項を `.agentdev/inspect/archive/rejected/` へ移動
+承認された reject 対象検出事項は即時削除する。reject 時の commit message に却下理由を含める（AG-006、監査証跠の補強）
 ### Step 8: defer 処理
 
 defer となった検出事項は `.agentdev/inspect/inbox/` に残置。intake/ learning 送付の推奨を報告
@@ -75,7 +75,7 @@ defer となった検出事項は `.agentdev/inspect/inbox/` に残置。intake/
 promote/ defer/ reject/ auto-promote の判定結果と後続 route を提示。`--auto` 実行時は投入件数、投入先一覧、ログパスを含める
 ### Step 10: .agentdev/ 変更の commit と push
 
- - `git diff --name-only` で `.agentdev/inspect/` および `.agentdev/intake/` 配下の変更を確認（auto-promote の intake/promoted/ 投入、promoted/rejected への移動、inbox 削除、auto-promote-log 更新を含む）
+ - `git diff --name-only` で `.agentdev/inspect/` および `.agentdev/intake/` 配下の変更を確認（auto-promote の intake/promoted/ 投入、promoted/ への保存、reject に伴う inbox 削除、auto-promote-log 更新を含む）
  - **変更なし時**: commit/push せず「変更なし」と報告
  - **変更あり時**:
  1. `git add` は `.agentdev/inspect/` と `.agentdev/intake/` のみ対象
@@ -87,7 +87,7 @@ promote/ defer/ reject/ auto-promote の判定結果と後続 route を提示。
 
 - G01: ユーザーの明示的な承認なしに採用済み成果物を生成しない（`--auto` による自動 promote 対象を除く）
 - G02: promote された検出事項のみを `.agentdev/inspect/promoted/` へ保存する
-- G03: reject された検出事項は `.agentdev/inspect/archive/rejected/` へ移動する
+- G03: reject された検出事項は即時削除される（`archive/rejected/` への移動は廃止）。即時削除以外の取扱を禁止する
 - G04: defer された検出事項は `.agentdev/inspect/inbox/` に残す
 - G05: docs-check ルール／検査データ追加候補は独立 route とせず、採用済み成果物の要件化方向または受け入れ条件に含める
 - G06: `--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない
