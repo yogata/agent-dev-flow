@@ -7417,7 +7417,7 @@ async function main(): Promise<void> {
     (typeof import.meta !== "undefined" && (import.meta as any).dir) ||
     __dirname ||
     process.cwd();
-  const root = findRepoRoot(scriptDir);
+  const root = findRepoRoot(scriptDir, { explicitRoot: options.root });
 
   if (args.includes("--update-ir055-baseline")) {
     updateIr055Baseline(root);

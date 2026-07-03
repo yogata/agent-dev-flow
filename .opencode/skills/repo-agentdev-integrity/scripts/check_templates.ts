@@ -57,7 +57,9 @@ function main(): void {
     printHelp(SCRIPT_NAME, DESCRIPTION, USAGE);
     process.exit(EXIT_OK);
   }
-  const repoRoot = findRepoRoot(import.meta.dir);
+  const repoRoot = findRepoRoot(import.meta.dir, {
+    explicitRoot: options.root,
+  });
   const templatesDir = path.join(repoRoot, TEMPLATE_REL_DIR);
   if (!fs.existsSync(templatesDir)) {
     console.error(`Templates directory not found: ${templatesDir}`);

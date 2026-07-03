@@ -18,6 +18,7 @@
  *   --base-ref <git-ref>          git diff の base ref（--files と排他）
  *   --json                        JSON 出力
  *   --fail-level strict|warning   失敗扱いとする最低レベル（デフォルト strict）
+ *   --root <path>                 明示的リポジトリルート（REQ-0145-014: worktree/CI 対応）
  *
  * 責務境界は全体監査と不変。実行タイミングと対象を保存工程内の変更ファイルへ狭めるだけ。
  * 本機構は REQ-0108-153 delta guard の具体化である。
@@ -29,6 +30,7 @@ import {
   EXIT_ERROR,
   type FindingRoute,
   type FindingCategory,
+  findRepoRoot,
 } from "./cli_utils.ts";
 
 const path = require("path") as typeof import("path");
@@ -38,7 +40,7 @@ const SCRIPT_NAME = "check_changed_docs.ts";
 const DESCRIPTION =
   "Targeted docs integrity guard for save workflows (REQ-0158-003)";
 const USAGE =
-  "bun run check_changed_docs.ts --workflow <name> [--files <path...> | --base-ref <git-ref>] [--json] [--fail-level strict|warning]";
+  "bun run check_changed_docs.ts --workflow <name> [--files <path...> | --base-ref <git-ref>] [--json] [--fail-level strict|warning] [--root <path>]";
 
 type Workflow = "req-save" | "spec-save" | "case-close" | "docs-check";
 type FailLevel = "strict" | "warning";
@@ -74,6 +76,7 @@ interface ParsedArgs {
   failLevel: FailLevel;
   declaredFiles: string[];
   help: boolean;
+  root?: string; // REQ-0145-014
 }
 
 function parseArgs(args: string[]): ParsedArgs {
@@ -127,6 +130,11 @@ function parseArgs(args: string[]): ParsedArgs {
       }
       parsed.failLevel = v as FailLevel;
       i++;
+    } else if (a === "--root") { // REQ-0145-014
+      const v = args[i + 1];
+      if (!v) throw new Error("--root requires a value");
+      parsed.root = v;
+      i++;
     } else if (a === "--declared-files") {
       i++;
       while (i < args.length && !args[i].startsWith("--")) {
@@ -152,6 +160,7 @@ function printHelp(): void {
   console.error("  --base-ref <ref>    git base ref to compute changed files");
   console.error("  --json              emit JSON report (default: text)");
   console.error("  --fail-level <lvl>  strict (default) | warning");
+  console.error("  --root <path>        explicit repository root (REQ-0145-014: worktree/CI support)");
   console.error("  --declared-files <path...>  declared doc update targets in Issue/PR (optional)");
 }
 
@@ -721,7 +730,7 @@ function main(): void {
     (typeof import.meta !== "undefined" && (import.meta as any).dir) ||
     __dirname ||
     process.cwd();
-  const root = findRepoRoot(scriptDir);
+  const root = findRepoRoot(scriptDir, { explicitRoot: parsed.root });
 
   const profile = profileFor(parsed.workflow);
   const changedFiles = resolveChangedFiles(root, parsed.files, parsed.baseRef);
@@ -769,17 +778,6 @@ function main(): void {
       ? report.failures.length > 0
       : report.failures.some((f) => f.severity === "strict");
   process.exit(hasFailures ? EXIT_NG : EXIT_OK);
-}
-
-function findRepoRoot(startPath: string): string {
-  let cur = startPath;
-  for (let i = 0; i < 20; i++) {
-    if (fs.existsSync(path.join(cur, ".git"))) return cur;
-    const parent = path.dirname(cur);
-    if (parent === cur) break;
-    cur = parent;
-  }
-  return startPath;
 }
 
 if (import.meta.main) {
