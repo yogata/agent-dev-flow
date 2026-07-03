@@ -78,11 +78,16 @@ function Get-SelectiveJunctionTargets {
         $targets.Add('commands\agentdev')
     }
 
-    # skills\agentdev-* (dynamic enumeration)
+    # skills\agentdev-* (dynamic enumeration) plus japanese-tech-writing
+    # (distribution-dependent skill referenced by agentdev-doc-writing, ADR-0134/REQ-0159-001).
     $skillsSource = Join-Path $SourceDir 'skills'
     if (Test-Path -LiteralPath $skillsSource) {
         Get-ChildItem -LiteralPath $skillsSource -Directory -Filter 'agentdev-*' |
             ForEach-Object { $targets.Add("skills\$($_.Name)") }
+        # japanese-tech-writing is promoted to src/ but lacks agentdev-* prefix (ADR-0134).
+        if (Test-Path -LiteralPath (Join-Path $skillsSource 'japanese-tech-writing')) {
+            $targets.Add('skills\japanese-tech-writing')
+        }
     }
 
     return ($targets | Sort-Object)

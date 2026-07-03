@@ -1963,3 +1963,265 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
     expect(baselineKnown.length).toBeGreaterThan(0);
   });
 });
+
+// ─── IR-058: distribution-untracked-skill-reference (REQ-0159-003) ────────
+
+const IR058_ROOT = join(TEMP_ROOT, "ir058");
+
+function buildIr058Fixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "REQ-9301.md"),
+    [
+      "---",
+      "id: REQ-9301",
+      "title: IR-058 fixture",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "Body.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "README.md"),
+    [
+      "# Requirements",
+      "",
+      "| ID | Title |",
+      "|----|-------|",
+      "| REQ-9301 | IR-058 fixture |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  mkdirp(join(root, "docs", "specs"));
+  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+  writeFileSync(join(root, "docs", "DOC-MAP.md"), "# DOC-MAP\n\n| 分類 | パス |\n|------|------|\n| REQ | docs/requirements/REQ-9301.md |\n", "utf-8");
+
+  // Distribution skill that references both a projection-only skill and a repo-* skill.
+  const distSkillDir = join(root, "src", "opencode", "skills", "agentdev-sample");
+  mkdirp(distSkillDir);
+  writeFileSync(
+    join(distSkillDir, "SKILL.md"),
+    [
+      "---",
+      "name: agentdev-sample",
+      "---",
+      "",
+      "# agentdev-sample",
+      "",
+      "## USE FOR",
+      "",
+      "- sample",
+      "",
+      "Reference to projection-only: `test-projection-only` スキル.",
+      "Reference to repo-local: `repo-test-local` スキル.",
+      "Path-style: .opencode/skills/test-projection-only/SKILL.md",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  // Also create a sibling agentdev-* dir so source-side enumeration works.
+  mkdirp(join(root, "src", "opencode", "skills", "agentdev-other"));
+
+  // Projection-only skill (no src/ counterpart) — should be flagged.
+  mkdirp(join(root, ".opencode", "skills", "test-projection-only"));
+  writeFileSync(
+    join(root, ".opencode", "skills", "test-projection-only", "SKILL.md"),
+    "---\nname: test-projection-only\n---\n# test-projection-only\n",
+    "utf-8",
+  );
+  // repo-* skill (carve-out per ADR-0106) — must NOT be flagged even if referenced.
+  mkdirp(join(root, ".opencode", "skills", "repo-test-local"));
+  writeFileSync(
+    join(root, ".opencode", "skills", "repo-test-local", "SKILL.md"),
+    "---\nname: repo-test-local\n---\n# repo-test-local\n",
+    "utf-8",
+  );
+  // Mirror agentdev-sample into projection so source-projection-sync stays clean.
+  mkdirp(join(root, ".opencode", "skills", "agentdev-sample"));
+  writeFileSync(
+    join(root, ".opencode", "skills", "agentdev-sample", "SKILL.md"),
+    "---\nname: agentdev-sample\n---\n# agentdev-sample\n",
+    "utf-8",
+  );
+  mkdirp(join(root, ".opencode", "skills", "agentdev-other"));
+  writeFileSync(
+    join(root, ".opencode", "skills", "agentdev-other", "SKILL.md"),
+    "---\nname: agentdev-other\n---\n# agentdev-other\n",
+    "utf-8",
+  );
+  // repo-agentdev-integrity in projection so capture boundary checks have data.
+  const integritySkillDir = join(root, ".opencode", "skills", "repo-agentdev-integrity");
+  mkdirp(integritySkillDir);
+  writeFileSync(
+    join(integritySkillDir, "SKILL.md"),
+    [
+      "# repo-agentdev-integrity",
+      "",
+      "## USE FOR",
+      "",
+      "- integrity checks",
+      "",
+      "## 検査カテゴリ",
+      "",
+      "| 検査カテゴリ | 対象 |",
+      "|---|---|",
+      "| REQ frontmatter ↔ ファイル名 | REQ files |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  const vocabDir = join(integritySkillDir, "references");
+  mkdirp(vocabDir);
+  writeFileSync(
+    join(vocabDir, "vocabulary-registry.md"),
+    [
+      "# Vocabulary Registry",
+      "",
+      "## コマンド名",
+      "",
+      "| 旧語彙 | 新語彙 | 備考 |",
+      "|--------|--------|------|",
+      "| issue-req | req-save | migration |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // Commands dir for README fixture (source-projection-sync expects it).
+  const cmdDir = join(root, ".opencode", "commands", "agentdev");
+  mkdirp(cmdDir);
+  writeFileSync(
+    join(cmdDir, "README.md"),
+    [
+      "# Commands",
+      "",
+      "| Command | Description | Agent |",
+      "|---------|-------------|-------|",
+      "| `agentdev/case-run` | case-run | sisyphus |",
+      "| `agentdev/case-close` | case-close | sisyphus |",
+      "| `agentdev/req-save` | req-save | prometheus |",
+      "| `agentdev/case-open` | case-open | prometheus |",
+      "| `agentdev/case-auto` | case-auto | sisyphus |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  const srcCmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(srcCmdDir);
+  for (const fname of ["case-run.md", "case-close.md", "req-save.md", "case-open.md", "case-auto.md"]) {
+    writeFileSync(
+      join(srcCmdDir, fname),
+      `---\ndescription: ${fname}\nagent: sisyphus\n---\n\nBody.\n`,
+      "utf-8",
+    );
+  }
+  writeFileSync(join(cmdDir, "case-run.md"), "---\ndescription: case-run\nagent: sisyphus\n---\n\nBody.\n", "utf-8");
+  writeFileSync(join(cmdDir, "case-close.md"), "---\ndescription: case-close\nagent: sisyphus\n---\n\nBody.\n", "utf-8");
+  writeFileSync(join(cmdDir, "req-save.md"), "---\ndescription: req-save\nagent: prometheus\n---\n\nBody.\n", "utf-8");
+  writeFileSync(join(cmdDir, "case-open.md"), "---\ndescription: case-open\nagent: prometheus\n---\n\nBody.\n", "utf-8");
+  writeFileSync(join(cmdDir, "case-auto.md"), "---\ndescription: case-auto\nagent: sisyphus\n---\n\nBody.\n", "utf-8");
+
+  // workflow-orchestration capture-boundaries.md (referenced by capture boundary check).
+  const captureBoundaryDir = join(root, "src", "opencode", "skills", "agentdev-workflow-orchestration", "references");
+  mkdirp(captureBoundaryDir);
+  writeFileSync(
+    join(captureBoundaryDir, "capture-boundaries.md"),
+    "# Capture Boundaries\n\nSplit rule and command duty boundaries.\n",
+    "utf-8",
+  );
+  mkdirp(join(root, ".opencode", "skills", "agentdev-workflow-orchestration"));
+  writeFileSync(
+    join(root, ".opencode", "skills", "agentdev-workflow-orchestration", "SKILL.md"),
+    "---\nname: agentdev-workflow-orchestration\n---\n# orchestration\n",
+    "utf-8",
+  );
+  mkdirp(join(root, "src", "opencode", "skills", "agentdev-workflow-orchestration"));
+  // workflow-templates skill in both source and projection (referenced by templates check).
+  mkdirp(join(root, ".opencode", "skills", "agentdev-workflow-templates", "templates"));
+  writeFileSync(
+    join(root, ".opencode", "skills", "agentdev-workflow-templates", "SKILL.md"),
+    "---\nname: agentdev-workflow-templates\n---\n# templates\n",
+    "utf-8",
+  );
+  writeFileSync(
+    join(root, ".opencode", "skills", "agentdev-workflow-templates", "templates", "pr_desc.md"),
+    [
+      "# PR Description Template",
+      "",
+      "## Findings / Capture候補",
+      "",
+      "### intake",
+      "",
+      "Intake capture items.",
+      "",
+      "### learning",
+      "",
+      "Learning capture items.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  mkdirp(join(root, "src", "opencode", "skills", "agentdev-workflow-templates"));
+}
+
+describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
+  beforeAll(() => {
+    rmSync(IR058_ROOT, { recursive: true, force: true });
+    mkdirp(IR058_ROOT);
+    buildIr058Fixture(IR058_ROOT);
+    copyScripts(IR058_ROOT);
+  });
+
+  afterAll(() => {
+    rmSync(IR058_ROOT, { recursive: true, force: true });
+  });
+
+  it("detects projection-only skill referenced by distribution", () => {
+    const r = runScript(IR058_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngResults = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "distribution-untracked-skill-reference" &&
+        res.level === "ng" &&
+        (res.message ?? "").includes("test-projection-only"),
+    );
+    expect(ngResults.length).toBe(1);
+  });
+
+  it("does not flag repo-* skills (ADR-0106 carve-out)", () => {
+    const r = runScript(IR058_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const repoNgResults = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "distribution-untracked-skill-reference" &&
+        res.level === "ng" &&
+        (res.message ?? "").includes("repo-test-local"),
+    );
+    expect(repoNgResults.length).toBe(0);
+  });
+
+  it("includes src/ promotion guidance in NG message", () => {
+    const r = runScript(IR058_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngResults = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "distribution-untracked-skill-reference" &&
+        res.level === "ng",
+    );
+    expect(ngResults.length).toBeGreaterThan(0);
+    const promotionMessage = ngResults.find(
+      (res: { message?: string }) =>
+        (res.message ?? "").includes("Promote to src/opencode/skills/") &&
+        (res.message ?? "").includes("ADR-0134"),
+    );
+    expect(promotionMessage).toBeDefined();
+  });
+});

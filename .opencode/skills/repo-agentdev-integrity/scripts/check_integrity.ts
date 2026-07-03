@@ -4940,6 +4940,7 @@ function checkSkillCategoryGap(
     ["Mapping table history", ["MappingTableHistoryLabels"]],
     ["REQ verification basis", ["ReqVerificationBasis"]],
     ["Runtime reference", ["RuntimeUnresolvedReference"]],
+    ["Distribution untracked skill", ["DistributionUntrackedSkillReference"]],
   ]);
 
   let foundGap = false;
@@ -5187,15 +5188,13 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
     // repo-* skills are repo-local and projection-only (ADR-0020): they
     // intentionally have no src/opencode/skills/ counterpart and are excluded
     // from selective-junction sync (sync-self-opencode.ps1 RepoLocalSkillPrefix).
-    // japanese-tech-writing is an external immutable skill (REQ-0140-023,
-    // ADR-0105 decision 4, REQ-0103-076): it lacks the agentdev-* prefix by
-    // design (writing-standard referenced from AGENTS.md), is not an install
-    // target for consumers, and is intentionally projection-only.
+    // Other projection-only skills referenced by distribution must be promoted
+    // to src/opencode/skills/ (ADR-0134/REQ-0159-001); detection is handled by
+    // checkDistributionUntrackedSkillReference (IR-058).
     const extraSkills = [...projectionSkillDirs].filter(
       (d) =>
         !sourceSkillDirs.has(d) &&
-        !d.startsWith("repo-") &&
-        d !== "japanese-tech-writing",
+        !d.startsWith("repo-"),
     );
 
     for (const d of missingSkills) {
@@ -5224,6 +5223,161 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
         "Inventory",
         "source-projection-sync",
         "Source and projection directories are in sync for commands and skills",
+      ),
+    );
+  }
+  return results;
+}
+
+// ─── IR-058: distribution-untracked-skill-reference (REQ-0159-003) ──────────
+
+// Distribution roots whose .md content is scanned for skill name references.
+const IR058_DISTRIBUTION_DIRS = [
+  "src/opencode/commands/agentdev",
+  "src/opencode/skills",
+] as const;
+
+// Patterns that count as a reference to skill <name>:
+//   - path reference: `.opencode/skills/<name>` or `src/opencode/skills/<name>`
+//   - backtick-quoted: `` `<name>` ``
+//   - Japanese prose: `<name> スキル` / `<name>スキル`
+//   - load_skills literal: `load_skills` value containing `<name>`
+function buildIr058ReferencePattern(skillName: string): RegExp {
+  const escaped = skillName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(
+    "(" +
+      "\\.opencode/skills/" +
+      escaped +
+      "(?=[/\\s\"'`]|$)" +
+      "|" +
+      "src/opencode/skills/" +
+      escaped +
+      "(?=[/\\s\"'`]|$)" +
+      "|" +
+      "`" +
+      escaped +
+      "`" +
+      "|" +
+      "\\b" +
+      escaped +
+      "\\s*スキル" +
+      "|" +
+      "\\b" +
+      escaped +
+      "スキル" +
+      "|" +
+      'load_skills\\s*[=:].*?"[^"]*\\b' +
+      escaped +
+      '\\b[^"]*"' +
+      ")",
+    "g",
+  );
+}
+
+// Exemption: the rule catalog itself documents skill names; do not flag those.
+const IR058_EXEMPT_PATH_PATTERNS: RegExp[] = [
+  /\/integrity-rule-catalog\.md$/,
+  /\/rules\/IR-058[-/]/,
+  /\/runtime-package-boundary\.md$/,
+  /\/vocabulary-registry\.md$/,
+];
+
+function isIr058ExemptPath(relPath: string): boolean {
+  return IR058_EXEMPT_PATH_PATTERNS.some((re) => re.test(relPath));
+}
+
+function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  const projectionSkillsDir = path.join(root, ".opencode", "skills");
+  const sourceSkillsDir = path.join(root, "src", "opencode", "skills");
+
+  if (!fs.existsSync(projectionSkillsDir) || !fs.existsSync(sourceSkillsDir)) {
+    return results;
+  }
+
+  const sourceSkillDirs = new Set(listDirs(sourceSkillsDir));
+  const projectionSkillDirs = listDirs(projectionSkillsDir);
+
+  // Projection-only skill names: exist in .opencode/skills/ but not in src/opencode/skills/.
+  // repo-* prefix is repo-local by design (ADR-0106 / REQ-0159-002).
+  const projectionOnlySkills = projectionSkillDirs.filter(
+    (d) => !sourceSkillDirs.has(d) && !d.startsWith("repo-"),
+  );
+
+  if (projectionOnlySkills.length === 0) {
+    results.push(
+      ok(
+        "Inventory",
+        "distribution-untracked-skill-reference",
+        "No projection-only skills referenced by distribution (REQ-0159-003)",
+      ),
+    );
+    return results;
+  }
+
+  // Collect distribution .md targets once.
+  const targets: string[] = [];
+  for (const rel of IR058_DISTRIBUTION_DIRS) {
+    const absDir = path.join(root, ...rel.split("/"));
+    if (!fs.existsSync(absDir)) continue;
+    const acc: string[] = [];
+    if (rel.endsWith("skills")) {
+      for (const sub of listDirs(absDir)) {
+        walkMarkdown(path.join(absDir, sub), acc);
+      }
+    } else {
+      walkMarkdown(absDir, acc);
+    }
+    targets.push(...acc);
+  }
+
+  let foundViolation = false;
+  for (const skillName of projectionOnlySkills) {
+    const refPattern = buildIr058ReferencePattern(skillName);
+    let referenced = false;
+    let evidence: { file: string; line: number; text: string } | null = null;
+    for (const fullPath of targets) {
+      const relPath = resolveRelative(fullPath, root);
+      if (isIr058ExemptPath(relPath)) continue;
+      const content = readText(fullPath);
+      if (!content) continue;
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        refPattern.lastIndex = 0;
+        if (refPattern.test(lines[i])) {
+          referenced = true;
+          evidence = { file: relPath, line: i + 1, text: lines[i].trim() };
+          break;
+        }
+      }
+      if (referenced) break;
+    }
+    if (referenced) {
+      foundViolation = true;
+      results.push(
+        ng(
+          "Inventory",
+          "distribution-untracked-skill-reference",
+          `Skill '${skillName}' is referenced by distribution (${evidence!.file}:${evidence!.line}) but exists only in .opencode/skills/. Promote to src/opencode/skills/ (ADR-0134/REQ-0159-001).`,
+          undefined,
+          undefined,
+          {
+            evidence: `${evidence!.file}:${evidence!.line}: ${evidence!.text}`,
+            expected: `src/opencode/skills/${skillName}/`,
+            route: determineRoute("integrity-rule-gap", 1),
+          },
+        ),
+      );
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "Inventory",
+        "distribution-untracked-skill-reference",
+        "No projection-only skills referenced by distribution (REQ-0159-003)",
       ),
     );
   }
@@ -7536,6 +7690,7 @@ async function main(): Promise<void> {
     ...checkSkillCategoryGap(root, skillsDir, cmdDir),
     ...checkTemplatePathIntegrity(cmdDir, root),
     ...checkSourceProjectionConsistency(root),
+    ...checkDistributionUntrackedSkillReference(root), // IR-058 (REQ-0159-003)
     ...checkBrokenJunctions(skillsDir, root, cmdDir),
     ...checkUpdateNotesInDocs(root),
     ...checkSummaryReqRangeConsistency(root),
