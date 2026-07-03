@@ -63,6 +63,35 @@ VERIFY は以下の 4 観点で実施する。
 
 リポジトリ参照リンク正規化は裸パス、相対パスを検出する。
 
+## WRITE 手続きの Windows encoding 初期化必須化（REQ-0149-009）
+
+`agentdev-gh-cli` の WRITE 手続き（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成、PR merge、Issue close 等）は、Windows 環境においてコンソールエンコーディング初期化（standard-procedures Section 2 Step 0）を**必須前置**する（REQ-0149-009）。
+
+### 要件
+
+- **対象**: 全 WRITE 手続き（gh CLI に `--body-file`/ `-F`/ `--title` 等の引数を渡す操作）
+- **対象外**: READ 手続き（Node.js `execSync` でコンソールエンコーディングに依存せず取得）
+- **対象外環境**: Linux/ macOS/ WSL 等の Windows 以外の環境（既定で UTF-8 コンソール）
+- **必須前置内容**: WRITE 操作前に以下の3行を実行してコンソールエンコーディングを UTF-8 に初期化する
+
+```powershell
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+cmd /c chcp 65001 | Out-Null
+```
+
+### 理由
+
+既定の Shift-JIS コンソール（`chcp 932`）では、gh CLI が `--title` の日本語引数やメタデータを Shift-JIS として扱い、`--body-file` で UTF-8 BOM なしファイルを指定しても mojibake が発生する。3行はそれぞれ独立した役割（gh CLI の標準出力/ 標準エラー読み取りエンコーディング、PowerShell からネイティブコマンドへのパイプ渡しエンコーディング、コンソールコードページ）を持つため省略不可。
+
+### 委譲基盤との関係
+
+gh WRITE 操作を行う全 command/ skill（case-open、case-run、case-close、case-update 等）は `agentdev-gh-cli` 手続き（Section 2 標準手順）経由で Step 0 の恩恵を受ける（REQ-0149-001/006/007）。command/ skill 側での個別実装は不要であり、委譲基盤が本要件を一括して担保する。
+
+### ローカル版の扱い
+
+ローカル版は Case ファイル読み書きへ差し替えるため、本要件の対象外（gh CLI を使用しない）。ローカル版の具体的取扱いは REQ-0150 参照。
+
 ## 薄いルーティング入口と references 分離
 
 `agentdev-gh-cli` の SKILL.md は薄いルーティング入口とする（REQ-0149, ADR-0130 decision #3）。

@@ -4,6 +4,20 @@
 書き込み操作（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成）の直後に実施し、内容が正しく反映されたかを検証する。
 各書き込み操作ごとに個別に実行すること（一括検証は不可）。
 
+## encoding 初期化実行確認（Windows 環境・事前確認）
+
+Windows 環境で WRITE 手続きを実行する場合、書き込み操作の前にコンソールエンコーディング初期化（[standard-procedures.md](standard-procedures.md) Section 2 Step 0）が実行されていることを確認する（REQ-0149-009）。
+
+- **確認対象**: 現在の PowerShell セッションで以下の3行が実行済みであること
+ - `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`
+ - `$OutputEncoding = [System.Text.Encoding]::UTF8`
+ - `cmd /c chcp 65001 | Out-Null`
+- **確認方法**: 後続の WRITE 手続きが Section 2 の標準手順に従うことで Step 0 を経由する（手続き順序の遵守により保証）
+- **対象外環境**: Linux/ macOS/ WSL 等の Windows 以外の環境では事前確認不要
+- **失敗時の扱い**: Step 0 を経由せず WRITE 操作を実行した場合は mojibake が発生する可能性が高く、事後の読み戻し検証（後述「4観点の比較検証 (a) エンコーディング検証」）で検出される。検出時は [retry.md](retry.md) に従い Step 0 実行後に再書き込みする
+
+本確認は事前の予防措置であり、事後の読み戻し検証（後述）を代替しない。両者を併用する。
+
 ## 検証手順
 
 ### 1. 読み戻し
