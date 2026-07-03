@@ -3784,21 +3784,25 @@ export function checkScriptTemplateReferencePaths(
         regex.lastIndex = 0;
         let match;
         while ((match = regex.exec(line)) !== null) {
+          // REQ-0144-020: strip Markdown backticks (inline code formatting of
+          // path components) before resolving. Backticks are never literal
+          // path characters.
           const rawRef = match[1];
+          const normalizedRef = rawRef.replace(/`/g, "");
 
           // Skip template placeholders
-          if (isTemplatePlaceholder(rawRef)) continue;
+          if (isTemplatePlaceholder(normalizedRef)) continue;
 
           // Skip paths that are clearly glob patterns
-          if (rawRef.includes("*")) continue;
+          if (normalizedRef.includes("*")) continue;
 
           // Skip runtime-generated paths (check parent dir only)
           if (
-            rawRef.startsWith(".agentdev/") ||
-            rawRef.startsWith(".sisyphus/")
+            normalizedRef.startsWith(".agentdev/") ||
+            normalizedRef.startsWith(".sisyphus/")
           ) {
             const parentDir = path.dirname(
-              resolveReferencePath(rawRef, absPath, root, skillsDir),
+              resolveReferencePath(normalizedRef, absPath, root, skillsDir),
             );
             if (!fs.existsSync(parentDir)) {
               foundViolation = true;
@@ -3821,7 +3825,7 @@ export function checkScriptTemplateReferencePaths(
           }
 
           const resolvedPath = resolveReferencePath(
-            rawRef,
+            normalizedRef,
             absPath,
             root,
             skillsDir,
@@ -3841,9 +3845,9 @@ export function checkScriptTemplateReferencePaths(
             // are skill-relative. Resolve via nearby skill context, then all skills.
             let contextResolved = false;
             const isSkillRelativeBare =
-              !rawRef.startsWith(".opencode/") &&
-              !rawRef.startsWith("agentdev-") &&
-              /^(scripts|templates|references)\//.test(rawRef);
+              !normalizedRef.startsWith(".opencode/") &&
+              !normalizedRef.startsWith("agentdev-") &&
+              /^(scripts|templates|references)\//.test(normalizedRef);
             if (!skillDir && isSkillRelativeBare) {
               const ctxStart = Math.max(0, i - 5);
               const ctxEnd = Math.min(lines.length, i + 6);
@@ -3879,7 +3883,7 @@ export function checkScriptTemplateReferencePaths(
                 const candidatePath = path.join(
                   skillsDir,
                   candidate,
-                  rawRef,
+                  normalizedRef,
                 );
                 if (fs.existsSync(candidatePath)) {
                   contextResolved = true;
@@ -3896,7 +3900,7 @@ export function checkScriptTemplateReferencePaths(
                 const srcCandidatePath = path.join(
                   srcSkillsDir,
                   candidate,
-                  rawRef,
+                  normalizedRef,
                 );
                 if (fs.existsSync(srcCandidatePath)) {
                   contextResolved = true;
@@ -3916,12 +3920,12 @@ export function checkScriptTemplateReferencePaths(
 
             // Cross-skill bare reference detection (REQ-0108-119)
             let crossSkillFound = false;
-            if (skillDir && !rawRef.startsWith(".opencode/")) {
+            if (skillDir && !normalizedRef.startsWith(".opencode/")) {
               const otherSkills = listDirs(skillsDir).filter(
                 (d) => d !== skillDir,
               );
               for (const otherSkill of otherSkills) {
-                const crossSkillPath = path.join(skillsDir, otherSkill, rawRef);
+                const crossSkillPath = path.join(skillsDir, otherSkill, normalizedRef);
                 if (fs.existsSync(crossSkillPath)) {
                   crossSkillFound = true;
                   foundViolation = true;
@@ -3934,7 +3938,7 @@ export function checkScriptTemplateReferencePaths(
                       i + 1,
                       {
                         evidence: rawRef,
-                        expected: `use explicit path: ${resolveRelative(path.join(skillsDir, otherSkill, rawRef), root)} or move file to current skill`,
+                        expected: `use explicit path: ${resolveRelative(path.join(skillsDir, otherSkill, normalizedRef), root)} or move file to current skill`,
                         route: "intake",
                       },
                     ),
