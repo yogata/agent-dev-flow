@@ -63,7 +63,7 @@ docs/
   guides/*.md                    # 参照用読み物（案内層、非基準）
 .agentdev/
   intake/                        # Intake パイプラインのドメイン状態
-    inbox/ promoted/ archive/
+    inbox/ promoted/
   learning/                      # Learning パイプラインのドメイン状態
     inbox.md archive/active.md evaluation-report.md promoted/
   backlog/req-units/RU-*.md      # Requirement Unit
@@ -93,7 +93,7 @@ scripts/
     skills/agentdev-*/           # Skill 原本
 .agentdev/
   intake/                        # Intake パイプラインのドメイン状態
-    inbox/ promoted/ archive/
+    inbox/ promoted/
   learning/                      # Learning パイプラインのドメイン状態
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート

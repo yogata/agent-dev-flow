@@ -39,9 +39,9 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 | 分類 | 意味 | 後続 |
 |------|------|------|
-| `採用` | 対応すべきと判断。採用済み成果物に整形 | `/agentdev/backlog-review` |
+| `採用` | 対応すべきと判断。採用済み成果物に整形。inbox 元ファイルは削除 | `/agentdev/backlog-review` |
 | `保留` | 判断を保留。inbox に残す | 再度 `/agentdev/intake-promote` |
-| `却下` | 対応不要と判断 | `.agentdev/intake/archive/rejected/` |
+| `却下` | 対応不要と判断。inbox 元ファイルは即時削除（reject commit message に却下理由を含める、AG-006） | - |
 
 ## 整形の方向性
 
@@ -79,7 +79,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 詳細は `agentdev-intake-pipeline` を参照。
 委譲接続点: 親エージェントのみが承認確認と次フェーズ進行判断を行う
 
-**分類承認後の自動実行（REQ-0147-008）**: Step 5 で分類が確定（採用/保留/却下のいずれか）した場合、Step 6〜10（採用 item 整形 / promoted 保存 / archive 移動 / git pull / commit-push）は追加確認なしで自動実行する。
+**分類承認後の自動実行（REQ-0147-008）**: Step 5 で分類が確定（採用/保留/却下のいずれか）した場合、Step 6〜10（採用 item 整形 / promoted 保存 / inbox 削除 / git pull / commit-push）は追加確認なしで自動実行する。
 分類未確定、修正中の場合は進まない。
 
 ### Step 6: 採用 item の整形
@@ -157,5 +157,6 @@ template: .opencode/commands/agentdev/templates/intake-promote/standard.md。
 ### 実行制約
 - G15: review、整形はユーザーとの対話を通じて行う
 - G16: 保存先は `.agentdev/intake/promoted/` 直下のみ（フラット構造）
-- G17: 採用 item の inbox 元ファイルは成果物保存後に `.agentdev/intake/archive/promoted/` に移動する
+- G17: 採用 item の inbox 元ファイルは成果物保存後に削除する（`.agentdev/intake/archive/promoted/` への移動を廃止）
+- G19: reject item の inbox 元ファイルは即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（AG-006、監査証跠の補強）
 

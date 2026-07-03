@@ -153,7 +153,7 @@ RU 生成結果、git 永続化結果を含める。次のコマンド: `/agentd
 - G01: REQ ファイルの保存を行わない（`req-save` が担当）
 - G02: GitHub Issue の作成を行わない（`case-open` が担当）
 - G03: 採用済み成果物の単純コピー（パススルー）を生成しない
-- G04: `.agentdev/intake/inbox/`、`.agentdev/intake/archive/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/archive/active.md` を更新しない
+- G04: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/archive/active.md` を更新しない
 - G05: 矛盾検出時はユーザーの指示を待ち、自動的に解決しない
 - G06: RU 生成に失敗した成果物は削除しない
 - G07: depends_on に採用済み成果物パスを指定しない。RU-ID のみ許容
