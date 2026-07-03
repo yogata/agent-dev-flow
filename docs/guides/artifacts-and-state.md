@@ -65,7 +65,7 @@ docs/
   intake/                        # Intake パイプラインのドメイン状態
     inbox/ promoted/
   learning/                      # Learning パイプラインのドメイン状態
-    inbox.md archive/active.md evaluation-report.md promoted/
+    inbox.md deferred.md evaluation-report.md promoted/
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート
 .opencode/                        # 実行時の配置先（ジャンクション → src/opencode/）

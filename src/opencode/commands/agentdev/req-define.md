@@ -188,7 +188,7 @@ Step 7 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で
 - G03: ファイル編集スコープ: `.agentdev/drafts/**` のみ作成、編集を許可
 - G04: ユーザーが明示した入力ファイルは参照専用入力（変更、削除しない）。`.agentdev/backlog/req-units/RU-*.md` の削除は行わない（後続の case-open 成功後に実行）
 - G05: `docs/` 配下の広範な探索禁止（例外: 明示入力ファイルと docs/requirements/\*\* の参照専用参照、Step 5-1 の限定探索は許可）
-- G06: inbox.md/ archive/active.md を直接ロードしない
+- G06: inbox.md/ deferred.md を直接ロードしない
 - G07: 採用済み成果物の直読み禁止
 - G08: `git` コマンドは実行しない
 - G09: チェックボックスは測定可能で一意（`agentdev-req-analysis` 品質基準）
