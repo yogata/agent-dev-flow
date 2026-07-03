@@ -33,8 +33,8 @@ case-run / Sisyphus-Junior / 外部実行バックエンドは完了条件チェ
 
 ## 副作用
 
-- GitHub API: `gh pr merge --squash`（リトライ最大5回、フォールバック手順あり）、`gh issue close --reason completed`、Issue 本文更新（`--body-file` + VERIFY）
-- git 操作: `git pull --ff-only`、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング、REQ-0137-002/005）
+- GitHub API: `gh pr merge --squash`（リトライ最大5回、フォールバック手順あり）、`gh issue close --reason completed`、Issue 本文更新（`--body-file` + VERIFY）、`gh pr view --json mergeable,mergeStateStatus`（squash merge 前の mergeable UNKNOWN ポーリング、REQ-0131-028、最大60秒・10秒間隔）
+- git 操作: `git pull --ff-only`、`git fetch origin main:main`（非 main ブランチ占有時の代替同期、REQ-0131-029）、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング、REQ-0137-002/005）
 - worktree / ブランチ削除: `agentdev-git-worktree` 手順に従う
 - capture 回収: PR 本文から intake / learning を分離回収し `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` へ保存
 - SPEC status 昇格: `docs/specs/**` の `status: draft` → `accepted` 昇格（Step 3-2）
@@ -66,6 +66,7 @@ case-run / Sisyphus-Junior / 外部実行バックエンドは完了条件チェ
  - Step 3-1: close 時 SPEC / commands / skills 更新漏れの局所確認
  - Step 3-2: SPEC 確定フロー（ADR-0123 Decision #4, REQ-0136-015）（PR 本文の `## SPEC確定候補` セクション読取、確定判断（(a) 昇格 / (b) spec-save 再起動提案 / (c) 見送り））
 - Step 4: PRマージ（`gh pr merge --squash`（リトライ最大5回、フォールバック手順）、対応記録コメント追記）
+- Step 4-0: squash merge 前の mergeable UNKNOWN ポーリング（REQ-0131-028）（PR 補助データ読込（`agentdev-gh-cli`）で `gh pr view {N} --json mergeable,mergeStateStatus` を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時は Step 4-2 へ分岐）
 - Step 4-1: Squash merge 後のローカル先行 commit 検出、処理（REQ-0146-005）（`git log origin/{branch}..HEAD --oneline` で検出、内容重複確認後に `git reset --hard origin/{branch}` で reset（`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順参照））
 - Step 4-2: コンフリクト解消 rebase パス（REQ-0151-001/002、REQ-0131-024/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（Step 4 へ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/specs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
 - Step 5: Post-merge テスト戦略検証（CI通過等の反映）
@@ -73,6 +74,7 @@ case-run / Sisyphus-Junior / 外部実行バックエンドは完了条件チェ
 - Step 7: ブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（REQ-0137-001）
 - Step 8: 親Epic Issue更新（`agentdev-epic-tracker`、Epic 自動クローズ判定）
 - Step 9: 実行前同期（`git pull --ff-only`、hash 検証）
+- Step 9-2: git main 同期リスク事前検出、代替同期手順選択（REQ-0131-029）（`git pull --ff-only` 直前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出。検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main` による非チェックアウト同期）を選択。`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ参照）
 - Step 10: 学びの検知、抽出（`agentdev-learning-capture`、ユーザーに学び有無を問わない（G13）、Capture 回収（PR 本文から intake/learning を分離））
 - Step 11: ドメイン状態永続化（`.agentdev/` 配下を commit/push（learning と intake を同一 commit））
 - Step 12: 完了報告（結果状態の分離報告（GitHub側、`.agentdev`、ブランチ削除））
@@ -120,6 +122,8 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 - QG-4（Final Acceptance Gate）: Step 2 で Issue 本文の完了条件チェックボックスを最終評価、更新
 - チェックボックス事後確認: 更新後に Issue 本文を再読込し全 `- [ ]` が `[x]` に反映されたことを確認（最大2回）
 - Squash merge リトライ: 最大5回（5秒待機付き）
+- mergeable UNKNOWN ポーリング（REQ-0131-028）: squash merge 前に `gh pr view --json mergeable,mergeStateStatus` で事前確認、UNKNOWN 時は最大60秒（10秒間隔）でポーリング、上限超過時はマージ中止・構造化エラー停止
+- git main 同期リスク事前検出（REQ-0131-029）: `git pull --ff-only` 直前に worktree 状態・並列実行 ref lock 競合・非 main ブランチ占有の3リスクを事前検出、検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main`）を選択
 - 出力制約: 成果物本文（PR本文、commit message）は verbatim で返す（G10/G18、別途成果物パス、根拠、親判断事項は圧縮）
 - 結果状態分離報告: GitHub側、`.agentdev` 永続化、ブランチ削除状態を独立して報告（G19）
 

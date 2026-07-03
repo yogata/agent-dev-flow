@@ -238,6 +238,115 @@ Windows + worktree 環境で `git -C <worktree> mv` が `fatal: renaming ... fai
 
 ---
 
+## 9. git main 同期リスク事前検出（REQ-0131-029）
+
+`git pull --ff-only` 実行前に、worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出し、安全な代替同期手順を選択する。
+暗黙の手順順序依存を明示的な事前チェックに置き換える（3件の pull 失敗事象: worktree 状態、並列実行コンテキスト、非 main ブランチ占有に基づく）。
+case-close Step 9-2 から参照される。
+
+### 前提確認
+
+本プロシージャは case-close Step 9（実行前同期）で `git pull --ff-only` を実行する直前に適用される。
+Step 9-1（重複ファイルチェック再実行）の後に実行する。
+
+### リスク判定
+
+3リスクを順に判定する。いずれかのリスク検出時は後述「代替同期手順選択」へ分岐する。
+
+#### リスク1: worktree 状態（dirty tree）
+
+```bash
+git status --porcelain
+```
+
+出力が空でない場合、worktree に未コミット変更が存在する。
+`git pull --ff-only` はローカル変更と競合して失敗する。
+
+#### リスク2: 並列実行による ref lock 競合
+
+並列実行コンテキスト（case-close Epic Wave クローズ、case-auto 複数 execution_unit 並列等）で、他セッションが同一 main worktree で git 操作を実行中の場合、`git pull --ff-only` が ref lock 競合で失敗する。
+
+判定:
+
+- `.git/index.lock` の存在確認（存在時は他セッションが操作中）
+- 実行コンテキストが並列（Epic Wave、case-auto 複数 execution_unit）かの確認
+
+#### リスク3: 非 main ブランチ占有
+
+```bash
+git rev-parse --abbrev-ref HEAD
+```
+
+現在のブランチが `main` 以外の場合、`git pull --ff-only` は当該ブランチの pull となり main の同期にならない。
+他セッションが `main` を checkout している場合も ref の占有で失敗する。
+
+### 代替同期手順選択
+
+リスク判定結果に応じ、以下の手順を選択する。
+
+| 検出リスク | 選択手順 |
+|---|---|
+| なし | 通常の `git pull --ff-only`（手順1 実行前同期プロシージャ） |
+| リスク1（dirty tree） | 構造化エラーで停止。ユーザーによる対応（stash/commit/checkout）を待つ。スイープ操作禁止（手順3 並列実行安全ステージングプロシージャ準拠） |
+| リスク2（ref lock 競合） | 直列化待機: 短い間隔（5秒）で lock 解放を待機（最大60秒）し、解放後に `git pull --ff-only` を再試行。上限超過時は構造化エラーで停止 |
+| リスク3（非 main ブランチ占有） | `git fetch origin main:main` による非チェックアウト同期（後述）。現在のブランチを維持したまま main ref を更新 |
+| リスク1 + リスク2/3 | リスク1 を優先し構造化エラーで停止 |
+
+### 代替同期手順: git fetch origin main:main（非チェックアウト同期）
+
+```bash
+git fetch origin main:main
+```
+
+現在 checkout 中のブランチを切り替えずにローカル main ref を更新する。
+worktree が非 main ブランチを保持している場合や、他セッションが main を占有している場合に安全な同期手段。
+
+**制約**: ローカル main がリモートから分岐している場合（独自 commit がある場合）は non-fast-forward エラーとなる。
+その場合は構造化エラーで停止しユーザー判断を仰ぐ。
+
+### エラー: リスク1 dirty tree 検出
+
+```markdown
+## Git 同期リスク検出エラー（worktree dirty tree）
+
+**対象ブランチ**: {current_branch}
+**未コミット変更**:
+{git status --porcelain output}
+**停止理由**: worktree に未コミット変更が存在するため、安全に pull できない
+**ユーザーアクション**: ローカル変更を確認し、`git stash` / `git commit` / `git checkout -- <file>` 等で対応後に再実行してください
+```
+
+### エラー: リスク2 ref lock 競合（直列化待機上限超過）
+
+```markdown
+## Git 同期リスク検出エラー（ref lock 競合）
+
+**対象ブランチ**: {current_branch}
+**待機時間**: {elapsed_seconds}秒（上限60秒）
+**停止理由**: 他セッションが ref lock を保持したまま60秒以内に解放しなかったため、直列化待機を中止した
+**ユーザーアクション**: 並列セッションの完了を確認後、再実行してください
+```
+
+### エラー: リスク3 非 main ブランチ占有・fetch 失敗
+
+```markdown
+## Git 同期リスク検出エラー（非 main ブランチ占有・fetch 失敗）
+
+**現在ブランチ**: {current_branch}
+**停止理由**: 非 main ブランチ占有を検出し `git fetch origin main:main` を試行したが、ローカル main がリモートから分岐しているため non-fast-forward エラーとなった
+**ユーザーアクション**: ローカル main の分岐状況を確認し、手動で同期してください
+**raw git output**:
+{git_error_output}
+```
+
+### 各 command の参照方法
+
+command 側（case-close Step 9-2 等）には以下のように参照する:
+
+- 「`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ（REQ-0131-029）に従い、3リスクの事前検出と代替同期手順選択を実行」
+
+---
+
 ## 各 command の参照方法
 
 command 側には共通処理の詳細本文ではなく、使用するプロシージャ名と停止条件のみを記述する:
