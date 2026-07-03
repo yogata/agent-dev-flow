@@ -206,6 +206,24 @@ checkWorkflowStatusProhibition
 配布物に対する決定論的検出（IR ルール）は既存カテゴリおよび REQ-0103-079/080/081 に基づく機械検出（IR-055 runtime-unresolved-reference）で構成し、機械的検出層（docs-check + IR）と意味的診断層（inspect-* skills）の責務境界は 3層検出構造（[integrity-contracts.md](integrity-contracts.md)）に従う。
 これにより `categoryToCheckPattern` map への新カテゴリ追加（skill-category-gap、REQ-0108-161/171、REQ-0144-005）を不要とし、ターゲットング隠退化を防ぐ。
 
+### check_changed_docs.ts profile rules と SPEC 記載項目の対応関係（REQ-0108-269）
+
+req-save / spec-save / case-close 各 SPEC が記載する検査項目と、`check_changed_docs.ts` の `profileFor()` が返す `rules`（profile rules）の対応関係は 1:1 を要求しない。
+1 つの SPEC 記載項目に対して専用 profile rule を実装しなくても、既存 rule 群による包括カバーを許容する。
+本方針は今後の SPEC / rule 追加時の判断基準となる。
+
+**新規 SPEC 記載項目追加時の判断手順**:
+
+1. 既存 profile rules が当該項目を包括カバーするかを `profileFor()` の各 rule 実装で確認する
+2. 包括カバーされる場合、専用 rule の追加を省略する
+3. 既存 rules でカバーできない検出漏れが実用上発生した場合のみ、新規 profile rule を追加する。追加時は本カタログ「新規カテゴリ追加判定フロー（REQ-0145-005）」に準拠する
+
+SPEC 記載項目と profile rules の厳密な 1:1 対応を維持するための機械検証（drift detection 等）は設けない。
+両者の乖離が実用上の検出漏れを招かない限り、文書と実装の差分を許容する。
+
+**背景**: `check_changed_docs.ts` は限定変更ファイルに対する delta guard であり、全 SPEC 記載項目を個別 rule で再実装すると検査重複と保守負荷増大を招く。
+包括カバーにより実用上十分な検出精度を保ちつつ、SPEC と実装の過剰な結合を避ける。
+
 ### check_integrity test suite 責務分担（REQ-0144-008/009）
 
 check_integrity に関わる test suite 2系統の責務分担。
