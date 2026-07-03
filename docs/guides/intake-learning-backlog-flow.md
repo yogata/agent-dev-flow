@@ -30,9 +30,8 @@ Learning パイプライン ↗
 ### 状態遷移
 
 ```
-inbox/ → promoted/
-       ↘ archive/rejected/
-promoted/ → archive/promoted/
+inbox/ → promoted/（採用 item の inbox 元ファイルは削除）
+       ↘ 即時削除（reject、commit message に却下理由を記録）
 ```
 
 ### コマンド
@@ -41,16 +40,16 @@ promoted/ → archive/promoted/
 |----------|------|------|
 | ユーザー手動入力 | `/agentdev/intake-capture` | `inbox/` |
 | クローズ済み Issue/PR | `/agentdev/intake-from-github` | `inbox/` |
-| `inbox/` | `/agentdev/intake-promote` | `promoted/` / `archive/` |
+| `inbox/` | `/agentdev/intake-promote` | `promoted/`（inbox 元ファイルは削除） |
 
 ### 各ディレクトリの役割
 
 | ディレクトリ | 役割 |
 |-------------|------|
 | `inbox/` | 収集された気づき、課題の一次受け |
-| `archive/rejected/` | 却下項目の記録（終端状態） |
 | `promoted/` | backlog-review 入力用の採用済み成果物 |
-| `archive/promoted/` | 採用済み項目の記録（終端状態） |
+
+採用・却下いずれの判断も inbox 元ファイルは即時削除とし、監査証跡は commit message（reject の場合は却下理由を含める、AG-006）で確保する。
 
 `promoted/` はフラット構成で、ディレクトリ配置で route / status を表現する。
 
