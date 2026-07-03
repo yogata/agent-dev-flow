@@ -241,7 +241,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）
 `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断:
  - ユーザーに学びの有無を問うことは禁止
  - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
- - 採用済み成果物取り込み判定 → `agentdev-learning-pipeline`（manual reference）の archive ルール
+ - 採用済み成果物取り込み判定 → `agentdev-learning-pipeline`（manual reference）の deferred ルール
  - **Capture 回収責務**: PR 本文の `## Findings / Capture候補` セクションから intake/ learning を分離回収する。intake 候補は `.agentdev/intake/inbox/` に保存し、learning 候補は `.agentdev/learning/inbox.md` に保存する。Epic 横断回収
  - **Capture 境界**: intake/ learning 境界は `agentdev-workflow-orchestration` を参照
  - intake と learning を別々の成果物として扱う
