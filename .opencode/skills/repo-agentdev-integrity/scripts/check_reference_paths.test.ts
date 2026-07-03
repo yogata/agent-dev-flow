@@ -741,6 +741,52 @@ describe("checkScriptTemplateReferencePaths", () => {
     const sisyphusNg = refNg.filter((r) => r.evidence?.includes(".sisyphus/"));
     expect(sisyphusNg.length).toBe(0);
   });
+  it("backtick-wrapped path component resolves via stripping (REQ-0144-020)", () => {
+    const root = join(TEMP_ROOT, "backtick-path");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const cmdDir = join(root, ".opencode", "commands", "agentdev");
+    const tmplDir = join(cmdDir, "templates", "test-cmd");
+    mkdirp(tmplDir);
+    writeFileSync(
+      join(tmplDir, "standard.md"),
+      "# standard variant\n",
+      "utf-8",
+    );
+    writeFileSync(
+      join(tmplDir, "agentdev-push-failed.md"),
+      "# push-failed variant\n",
+      "utf-8",
+    );
+    writeFileSync(
+      join(cmdDir, "test-cmd.md"),
+      [
+        "---",
+        "description: Test",
+        "agent: oracle",
+        "---",
+        "",
+        "- standard -> .opencode/commands/agentdev/templates/test-cmd/standard.md",
+        "- push fail -> .opencode/commands/agentdev/templates/test-cmd/`agentdev-push-failed`.md",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refNg = (result.report!.results || []).filter(
+      (r) => r.category === "ReferencePath" && r.level === "ng",
+    );
+    expect(refNg.length).toBe(0);
+    const okResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence" &&
+        r.level === "ok" &&
+        r.evidence?.includes("agentdev-push-failed"),
+    );
+    expect(okResults.length).toBeGreaterThanOrEqual(1);
+  });
   it("glob pattern in command source is skipped", () => {
     const root = join(TEMP_ROOT, "cmd-glob-skip");
     buildMinimalFixture(root);
