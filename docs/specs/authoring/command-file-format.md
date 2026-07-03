@@ -2,7 +2,7 @@
 title: "コマンドファイルフォーマット規約"
 status: accepted
 created: 2026-06-22
-updated: 2026-07-02
+updated: 2026-07-03
 ---
 
 # コマンドファイルフォーマット規約
@@ -104,9 +104,9 @@ command SPEC（`docs/specs/commands/*.md`）が記述する Step 番号構成は
 - **サブステップ採番**: `Step N-M` の M は `1` から開始する（`Step N-0` は使用しない）。QG ゲート、事前検証等の「先行サブステップ」も `N-1` 以降の番号を採番すること
 - **独立フェーズの Step 0 扱い**: 従来 `Step 0` として独立番号を与えられていたフェーズ（例: セッションコンテキスト検知、フェーズ判定、実行前同期、引き継ぎ停止判定）は、command 定義の Step 1（または後続 Step）に統合し、独立した `Step 0` としては扱わない
 
-**適用対象**: `docs/specs/commands/*.md` の全 command SPEC（`_template.md` を含む）
+**適用対象**: `docs/specs/commands/*.md` のうち、Step 番号構成を記述する command SPEC（`_template.md` を含む）。Step 番号を持たない command SPEC（読み取り専用、分類系の `inspect-skills.md`、`inspect-promote.md`、`inspect-doc-inputs.md` 等で `### Step N` 見出しを使用しない SPEC）は適用対象外とする（REQ-0143-004）。これらの SPEC は対応する command 定義ファイルと比較すべき Step 番号構成を持たないため、一致検証の対象とならない。
 
-**検証**: 各 command/SPEC ペアについて、SPEC の Step 番号と command 定義の Step 番号が同一フェーズで一致することを確認する。
+**検証**: 各 command/SPEC ペアについて、SPEC の Step 番号と command 定義の Step 番号が同一フェーズで一致することを確認する。ただし SPEC が Step 番号を記述しない場合は検証対象外とする。
 ずれを検出した場合、SPEC 側を command 定義へ一致させる。
 
 ## 他 SPEC との関係
