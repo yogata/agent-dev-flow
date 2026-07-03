@@ -72,6 +72,7 @@ export interface CliOptions {
   dryRun: boolean;
   classification: boolean; // REQ-0108-196
   paths: string[];
+  root?: string; // REQ-0145-014: explicit repo root for worktree/CI
 }
 
 export function parseArgs(args: string[]): CliOptions {
@@ -92,6 +93,11 @@ export function parseArgs(args: string[]): CliOptions {
       options.dryRun = true;
     } else if (arg === "--classification") { // REQ-0108-196
       options.classification = true;
+    } else if (arg === "--root") { // REQ-0145-014
+      const v = args[i + 1];
+      if (!v) throw new Error("--root requires a value");
+      options.root = v;
+      i++;
     } else if (!arg.startsWith("-")) {
       options.paths.push(arg);
     }
@@ -114,6 +120,7 @@ OPTIONS:
   --json            Output results in JSON format
   --dry-run         Show what would be checked without running checks
   --classification  Enable document classification policy checks (REQ-0108-196)
+  --root <path>     Explicit repository root (REQ-0145-014: worktree/CI support)
   --update-ir055-baseline  Regenerate IR-055 baseline file from current violations
 
 EXIT CODES:
@@ -530,16 +537,88 @@ export function writeReportFile(root: string, report: IntegrityReport): string {
   return filePath;
 }
 
-export function findRepoRoot(startPath: string): string {
+/**
+ * Resolve the repository root for integrity scans (REQ-0145-014).
+ *
+ * Resolution priority:
+ *   1. options.explicitRoot  — `--root` CLI arg (highest priority)
+ *   2. AGENTDEV_INTEGRITY_ROOT env var — CI/local explicit override
+ *   3. worktree detection    — walk up for a `.git` *file* (worktree admin pointer)
+ *   4. main repo detection   — walk up for `.opencode` (existing behavior), then `.git` dir
+ *
+ * The worktree branch lets check_integrity.ts resolve the worktree root when
+ * invoked inside `.worktrees/{N}-{type}/`, instead of falling through to the
+ * main repo root. CI (check_changed_docs.ts --base-ref) and local development
+ * both get consistent results because the same resolver is used.
+ */
+export function findRepoRoot(
+  startPath: string,
+  options?: { explicitRoot?: string },
+): string {
   const { resolve, dirname, join } = require("path");
+  const fs = require("fs") as typeof import("fs");
+
+  // 1. explicit --root
+  if (options?.explicitRoot) {
+    return resolve(options.explicitRoot);
+  }
+
+  // 2. env var
+  const envRoot = process.env.AGENTDEV_INTEGRITY_ROOT;
+  if (envRoot) {
+    return resolve(envRoot);
+  }
+
+  // 3. worktree detection: .git file (worktree admin pointer) walking up
   let dir = resolve(startPath);
   for (let i = 0; i < 20; i++) {
-    if (require("fs").existsSync(join(dir, ".opencode"))) {
+    const dotGitPath = join(dir, ".git");
+    if (fs.existsSync(dotGitPath)) {
+      try {
+        const stat = fs.statSync(dotGitPath);
+        // `.git` as a file → git worktree root (admin pointer to main repo).
+        // `.git` as a directory → main repo root, handled in step 4.
+        if (stat.isFile()) {
+          return dir;
+        }
+      } catch {
+        // stat failed; keep walking
+      }
+    }
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+
+  // 4. main repo fallback: walk up for `.opencode` (existing behavior)
+  dir = resolve(startPath);
+  for (let i = 0; i < 20; i++) {
+    if (fs.existsSync(join(dir, ".opencode"))) {
       return dir;
     }
     const parent = dirname(dir);
     if (parent === dir) break;
     dir = parent;
   }
+
+  // 5. final fallback: walk up for `.git` directory (main repo without .opencode,
+  //    preserves check_changed_docs.ts local findRepoRoot semantics)
+  dir = resolve(startPath);
+  for (let i = 0; i < 20; i++) {
+    const dotGitPath = join(dir, ".git");
+    if (fs.existsSync(dotGitPath)) {
+      try {
+        if (fs.statSync(dotGitPath).isDirectory()) {
+          return dir;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+
   return resolve(startPath);
 }

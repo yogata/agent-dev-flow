@@ -323,7 +323,9 @@ function main(): void {
     process.exit(EXIT_OK);
   }
 
-  const repoRoot = findRepoRoot(import.meta.dir);
+  const repoRoot = findRepoRoot(import.meta.dir, {
+    explicitRoot: options.root,
+  });
   const skillsDir = path.join(repoRoot, ".opencode", "skills");
   if (!fs.existsSync(skillsDir)) {
     console.error(`Skills directory not found: ${skillsDir}`);

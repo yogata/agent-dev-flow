@@ -54,6 +54,14 @@ describe("parseArgs", () => {
     expect(parseArgs(["--dry-run"]).dryRun).toBe(true);
   });
 
+  it("parses --root with a value (REQ-0145-014)", () => {
+    expect(parseArgs(["--root", "/tmp/repo"]).root).toBe("/tmp/repo");
+  });
+
+  it("throws when --root has no value (REQ-0145-014)", () => {
+    expect(() => parseArgs(["--root"])).toThrow(/--root requires a value/);
+  });
+
   it("collects positional paths", () => {
     const opts = parseArgs(["foo", "bar/baz"]);
     expect(opts.paths).toEqual(["foo", "bar/baz"]);
@@ -332,5 +340,88 @@ describe("findRepoRoot", () => {
     const start = path.resolve("C:\\WINDOWS\\TEMP");
     const result = findRepoRoot(start);
     expect(result).toBe(start);
+  });
+
+  it("honors explicit --root option over filesystem walk (REQ-0145-014)", () => {
+    const path = require("path");
+    const fs = require("fs");
+    const os = require("os");
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "frt-explicit-"));
+    try {
+      const root = findRepoRoot(process.cwd(), { explicitRoot: tmp });
+      expect(root).toBe(path.resolve(tmp));
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("honors AGENTDEV_INTEGRITY_ROOT env var when no --root (REQ-0145-014)", () => {
+    const path = require("path");
+    const fs = require("fs");
+    const os = require("os");
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "frt-env-"));
+    const prev = process.env.AGENTDEV_INTEGRITY_ROOT;
+    process.env.AGENTDEV_INTEGRITY_ROOT = tmp;
+    try {
+      const root = findRepoRoot(process.cwd());
+      expect(root).toBe(path.resolve(tmp));
+    } finally {
+      if (prev === undefined) delete process.env.AGENTDEV_INTEGRITY_ROOT;
+      else process.env.AGENTDEV_INTEGRITY_ROOT = prev;
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("prefers explicit --root over env var (REQ-0145-014)", () => {
+    const path = require("path");
+    const fs = require("fs");
+    const os = require("os");
+    const tmpExplicit = fs.mkdtempSync(path.join(os.tmpdir(), "frt-ex-"));
+    const tmpEnv = fs.mkdtempSync(path.join(os.tmpdir(), "frt-env2-"));
+    const prev = process.env.AGENTDEV_INTEGRITY_ROOT;
+    process.env.AGENTDEV_INTEGRITY_ROOT = tmpEnv;
+    try {
+      const root = findRepoRoot(process.cwd(), { explicitRoot: tmpExplicit });
+      expect(root).toBe(path.resolve(tmpExplicit));
+    } finally {
+      if (prev === undefined) delete process.env.AGENTDEV_INTEGRITY_ROOT;
+      else process.env.AGENTDEV_INTEGRITY_ROOT = prev;
+      fs.rmSync(tmpExplicit, { recursive: true, force: true });
+      fs.rmSync(tmpEnv, { recursive: true, force: true });
+    }
+  });
+
+  it("detects worktree root via .git file (REQ-0145-014)", () => {
+    const path = require("path");
+    const fs = require("fs");
+    const os = require("os");
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "frt-wt-"));
+    try {
+      const wtRoot = path.join(tmp, "wt");
+      const wtScripts = path.join(wtRoot, "sub", "dir");
+      fs.mkdirSync(wtScripts, { recursive: true });
+      fs.writeFileSync(path.join(wtRoot, ".git"), "gitdir: /fake/path");
+      const root = findRepoRoot(wtScripts);
+      expect(root).toBe(path.resolve(wtRoot));
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("falls back to .git directory when .opencode is absent (REQ-0145-014)", () => {
+    const path = require("path");
+    const fs = require("fs");
+    const os = require("os");
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "frt-gitdir-"));
+    try {
+      const repoRoot = path.join(tmp, "repo");
+      const nested = path.join(repoRoot, "a", "b");
+      fs.mkdirSync(nested, { recursive: true });
+      fs.mkdirSync(path.join(repoRoot, ".git"));
+      const root = findRepoRoot(nested);
+      expect(root).toBe(path.resolve(repoRoot));
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
   });
 });
