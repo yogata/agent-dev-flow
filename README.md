@@ -108,13 +108,14 @@ cd .agentdev-plugin && git pull && cd ..
 
 ### 推奨 .gitignore 設定
 
-通常版・ローカル版ともに同一。`agentdev-gh-cli` はリンク先が異なるだけなので `.opencode/skills/agentdev-*/` パターンで網羅される。
+通常版・ローカル版ともに同一。`agentdev-gh-cli` はリンク先が異なるだけなので `.opencode/skills/agentdev-*/` パターンで網羅される。`japanese-tech-writing` は配布物依存スキル（`agentdev-doc-writing` が参照、ADR-0134/REQ-0159-001）のため別途 gitignore に含める。
 
 ```gitignore
 .agentdev-plugin/
 .sisyphus/
 .opencode/commands/agentdev/
 .opencode/skills/agentdev-*/
+.opencode/skills/japanese-tech-writing/
 ```
 
 > `.agentdev/` は gitignore に**含めない**こと（ドメイン状態として git 管理対象）。
