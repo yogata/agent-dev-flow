@@ -45,6 +45,10 @@ function writeFile(p: string, content: string): void {
   writeFileSync(p, content, "utf-8");
 }
 
+// REQ-0108-268: fixture には check_integrity.ts と cli_utils.ts のみコピーする。
+// baseline ファイル（baselines/ir-055-baseline.json）はコピーしないことで、
+// valid fixture は本番の baseline 既知違反から独立し、既知違反の変更が
+// valid fixture 系の成否に影響しない。
 function copyScripts(fixtureRoot: string): void {
   const dest = join(
     fixtureRoot,
@@ -135,10 +139,26 @@ function buildValidFixture(root: string): void {
   );
   writeFileSync(join(specsDir, "patterns.md"), "# Patterns\n", "utf-8");
 
+  // REQ-0108-268: foundations/system.md は expanded-readme-sync チェック対象。
+  // agentdev/ 配下の全コマンド名を含め、同チェックを OK にする。
   mkdirp(join(specsDir, "foundations"));
   writeFileSync(
     join(specsDir, "foundations", "system.md"),
-    "# System (foundations)\n",
+    [
+      "# System (foundations)",
+      "",
+      "## Commands",
+      "",
+      "| Command | Description |",
+      "|---------|-------------|",
+      "| `/agentdev/test-cmd` | Test command |",
+      "| `/agentdev/case-run` | case-run |",
+      "| `/agentdev/case-close` | case-close |",
+      "| `/agentdev/req-save` | req-save |",
+      "| `/agentdev/case-open` | case-open |",
+      "| `/agentdev/case-auto` | case-auto |",
+      "",
+    ].join("\n"),
     "utf-8",
   );
   writeFileSync(
