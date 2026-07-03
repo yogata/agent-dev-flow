@@ -2,7 +2,7 @@
 
 ## 現行要件
 
-現在の要件判断では、以下50件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を第一参照先とする。
+現在の要件判断では、以下51件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を第一参照先とする。
 旧REQ 50件はすべて廃止済みであり、履歴参照に限定する。
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -60,6 +60,7 @@
 | [REQ-0156](REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 | docs/specs 直下基盤SPECの6ドメイン分類と段階移送方針 |
 | [REQ-0157](REQ-0157.md) | Project Doc Inputs Migration | 配布コードの docs/specs/** 直接参照を doc-inputs 経由に移行 |
 | [REQ-0158](REQ-0158.md) | Targeted Docs Integrity Guard | 変更ファイル限定文書整合性ガードと旧パス検出機構 |
+| [REQ-0159](REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 | 配布物依存スキルの src 昇格、repo-local 境界、docs-check 未トラック検出 |
 
 ## 廃止済み要件
 

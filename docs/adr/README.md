@@ -63,6 +63,10 @@
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
 - [ADR-0133](ADR-0133.md)（Doc Inputs Architecture）
 
+### 提案中（proposed）
+
+- [ADR-0134](ADR-0134.md)（配布物依存スキルの src 昇格方針）
+
 ### 置き換え済み（superseded）
 
 - [ADR-0111](ADR-0111.md)（マネージャー、オーケストレータパターンの限定採用（superseded by ADR-0112））
@@ -86,6 +90,7 @@
 - [ADR-0104](ADR-0104.md)（実行時独立性）
 - [ADR-0105](ADR-0105.md)（OpenCode ソース、プロジェクション分離）
 - [ADR-0124](ADR-0124.md)（req_draft soft-contract 原則: LLM推論消費、厳格schemaなし）
+- [ADR-0134](ADR-0134.md)（配布物依存スキルの src 昇格方針）
 
 ### コマンド、スキル設計
 
@@ -180,6 +185,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0132 | relates-to | ADR-0129 | ADR-0129 が受容したコンフリクトコストの解決メカニズムを定義 |
 | ADR-0132 | relates-to | ADR-0128 | case-run の再委譲は既存の task() 委譲モデルを使用 |
 | ADR-0133 | relates-to | ADR-0104 | 実行時独立性の具体化機構を提供。supersede しない |
+| ADR-0134 | relates-to | ADR-0105 | 配布物依存スキルの src 昇格は source/projection 分離における配布物自己完結性の具体化 |
 
 ## 関連 REQ
 
@@ -210,6 +216,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0131 | [REQ-0141](../requirements/REQ-0141.md), [REQ-0134](../requirements/REQ-0134.md), [REQ-0150](../requirements/REQ-0150.md) | ローカル版導入方式を link mode へ統一し生成方式を廃止 |
 | ADR-0132 | [REQ-0151](../requirements/REQ-0151.md), [REQ-0148](../requirements/REQ-0148.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0130](../requirements/REQ-0130.md) | コンフリクト解消モデル（3レベルエスカレーションと責務割当） |
 | ADR-0133 | [REQ-0157](../requirements/REQ-0157.md), [REQ-0103](../requirements/REQ-0103.md) | Doc Inputs Architecture |
+| ADR-0134 | [REQ-0159](../requirements/REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 |
 
 ## 廃止済み、履歴ビュー
 
