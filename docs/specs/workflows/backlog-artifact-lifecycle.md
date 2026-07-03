@@ -2,7 +2,7 @@
 title: RU / 採用済み成果物 / draft ライフサイクル
 status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-03
 ---
 
 # RU / 採用済み成果物 / draft ライフサイクル
@@ -46,8 +46,8 @@ updated: 2026-06-21
 | inspect（自動 promote 含む） | `.agentdev/intake/promoted/` または `.agentdev/inspect/promoted/` | フラット（`*.md`） |
 
 - サブディレクトリへのルーティングは行わない（フラット構造）
-- intake-promote は inbox から直接読み取り、内部でレビュー、HITL確認後に採用済み成果物を生成
-- learning-promote は inbox.md + archive/active.md から読み取り、内部で normalize/classify/eval、HITL確認後に採用済み成果物を生成
+- intake-promote は inbox から直接読み取り、内部でレビュー、HITL確認後に採用済み成果物を `promoted/` へ保存し、元 inbox item を削除する（`archive/promoted/` への移動は行わない）
+- learning-promote は inbox.md + deferred.md から読み取り、内部で normalize/classify/eval、HITL確認後に採用済み成果物を生成
 - inspect-promote は inbox（検出事項）から読み取り、分類（promote/defer/reject）、HITL承認後に採用済み成果物を生成。`--auto` は高確信度の検出事項を HITL 承認なしで自動投入する
 - RU 生成に成功した採用済み成果物は `backlog-review` が削除（REQ-0105）
 

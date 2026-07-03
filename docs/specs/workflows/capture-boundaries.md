@@ -2,7 +2,7 @@
 title: キャプチャ境界
 status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-03
 ---
 
 # キャプチャ境界（Capture Boundaries）
@@ -76,7 +76,7 @@ PR 本文の capture 関連セクションは以下を分離する:
 | 状態 | パス |
 |---|---|
 | inbox | `.agentdev/intake/inbox/req-restructure/` |
-| 却下 | `.agentdev/intake/archive/rejected/req-restructure/` |
+| 却下 | 即時削除（`archive/rejected/` 廃止）。reject commit message に却下理由を含めることで監査証跡を確保（AG-006） |
 
 req-define の明示入力としてルーティングする（backlog-review 経由ではない）。検知カテゴリ: SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT
 

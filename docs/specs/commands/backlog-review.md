@@ -2,7 +2,7 @@
 title: backlog-review SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-22
+updated: 2026-07-03
 ---
 
 # backlog-review SPEC
@@ -61,7 +61,7 @@ updated: 2026-06-22
 - REQ ファイル保存（G01、req-save 責務）
 - GitHub Issue 作成（G02、case-open 責務）
 - 採用済み成果物の単純コピー（パススルー）（G03、REQ-0105）
-- `.agentdev/intake/inbox/`, `.agentdev/intake/archive/`, `.agentdev/learning/inbox.md`, `.agentdev/learning/archive/active.md` の更新（G04）
+- `.agentdev/intake/inbox/`, `.agentdev/learning/inbox.md`, `.agentdev/learning/deferred.md` の更新（G04）
 - 矛盾検出時の自動解決（G05）
 - RU 生成失敗成果物の削除（G06）
 - depends_on への採用済み成果物パス指定（G07、RU-ID のみ許容）

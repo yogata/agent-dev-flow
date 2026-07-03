@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-26
+updated: 2026-07-03
 ---
 
 # req-define SPEC
@@ -156,7 +156,7 @@ req-define 側は出力形式のみを規定する。
 - `.agentdev/drafts/**` 以外のファイル作成、編集（G03）
 - ユーザー明示入力ファイルの変更、削除、RU 削除（G04）
 - `docs/` 配下の広範な探索（G05。例外: 明示入力ファイル、`docs/requirements/**` 参照、Step 5-1 限定探索）
-- `inbox.md` / `archive/active.md` 直接ロード（G06）
+- `inbox.md` / `deferred.md` 直接ロード（G06）
 - 採用済み成果物の直読み（G07）
 - `git` コマンド実行（G08）
 - Issue 階層決定（G13、case-open 責務）

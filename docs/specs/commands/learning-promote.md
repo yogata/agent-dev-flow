@@ -2,7 +2,7 @@
 title: learning-promote SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-25
+updated: 2026-07-03
 ---
 
 # learning-promote SPEC
@@ -15,7 +15,7 @@ backlog-review 経由で RU 化する。
 
 **昇華可能性評価、無条件自動REQ化禁止（REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
 無条件の自動REQ化は禁止し、学びは backlog-review → req-define → req-save の昇華経路を経て初めて REQ 化される。
-昇華不能な知見は `archive/active.md` の living pool で維持する。
+昇華不能な知見は `deferred.md` の living pool で維持する。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-005）。
 
 ## HITL 境界、自動実行ルール（REQ-0147-003/004/005/006/007）
 
@@ -28,13 +28,13 @@ backlog-review 経由で RU 化する。
 ## 入力
 
 - `.agentdev/learning/inbox.md`（必須、未処理学びエントリ）
-- `.agentdev/learning/archive/active.md`（任意、過去エントリ参照）
+- `.agentdev/learning/deferred.md`（任意、過去エントリ参照）
 
 ## 出力
 
 - `.agentdev/learning/evaluation-report.md`（8軸評価レポート）
 - `.agentdev/learning/promoted/{category}-{name}.md`（採用済み成果物、フラット構造）
-- `.agentdev/learning/archive/active.md`（inbox 移動分追記）
+- `.agentdev/learning/deferred.md`（inbox 移動分追記）
 - `.agentdev/learning/inbox.md`（ヘッダーのみクリア）
 
 ## 副作用
@@ -48,13 +48,13 @@ backlog-review 経由で RU 化する。
 
 6 フェーズ構成:
 
-- フェーズ1 inbox スキャン: Step 1 inbox.md 読込、Step 2 archive/active.md 読込
+- フェーズ1 inbox スキャン: Step 1 inbox.md 読込、Step 2 deferred.md 読込
 - フェーズ2-5 Normalize→Classify→Evaluate→Dispose→HITL:
  - Step 3: 正規化
  - Step 4: 問題クラス分類
  - Step 5: 8軸評価
  - Step 6: evaluation-report 生成
- - Step 7: 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（REQ-0155-005）。無条件の自動REQ化を禁止し、昇華不能な知見は `archive/active.md` の living pool で維持する
+  - Step 7: 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（REQ-0155-005）。無条件の自動REQ化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
  - Step 8: 既存対策確認（G05: 既存対策優先、新規 X 化より既存 X へ反映）
  - Step 9: 結果提示
  - Step 10: ユーザー承認（G06: 判定、prune にユーザー承認必須）

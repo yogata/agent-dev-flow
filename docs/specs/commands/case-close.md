@@ -2,7 +2,7 @@
 title: case-close SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-26
+updated: 2026-07-03
 ---
 
 # case-close SPEC
@@ -135,7 +135,7 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 - `agentdev-git-worktree` skill（worktree、ブランチ削除）
 - `agentdev-epic-tracker` skill（ステータス追跡テーブル）
 - `agentdev-learning-capture` skill（学びの検知）
-- `agentdev-learning-pipeline` skill（archive ルール）
+- `agentdev-learning-pipeline` skill（deferred.md ルール）
 - `agentdev-workflow-orchestration` skill（Capture 境界、達成判定プロトコル）
 - `agentdev-gh-cli` skill（gh CLI 安全使用）
 - `agentdev-issue-management` skill（Issue 操作安全性）
