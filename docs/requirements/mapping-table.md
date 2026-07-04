@@ -2,13 +2,12 @@
 id: mapping-table
 title: "旧REQから新active REQへの移行表"
 created: "2026-05-30"
-updated: "2026-06-16"
+updated: "2026-07-04"
 ---
 
 ## 目的
 
-REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を active set として再構成した結果を記録する。
-旧REQを削除せず履歴として残しつつ、現行要件判断の入口は25件（retired 8件を除く）である。
+REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は retired）を active set として再構成した結果を記録する。旧REQを削除せず履歴として残しつつ、現行要件判断の入口は25件（retired 8件を除く）である。REQ-0157 は project-extensions 機構（ADR-0135）採用により置換 retired となり、内容は REQ-0160 に再定義された（2026-07-04）。
 
 ## 判定
 
@@ -80,6 +79,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0121 | migrated | REQ-0103, REQ-0108 | Runtime Command 規範語構成を REQ-0103 に吸収（REQ-0103-152）、Integrity 検査定義（規範語検査の責務境界違反検査への再定義、規範語残存前提の除去）を REQ-0108 に吸収（REQ-0108-242, REQ-0108-243）。語彙ポリシー整合は REQ-0103/REQ-0108/REQ-0119 で一貫管理するため独立REQは不要と判断（`agentdev-system-reorganization` OU-04）。retired 文書は `retired/REQ-0121.md` を参照 |
 | REQ-0115 | migrated | REQ-0108, REQ-0109, REQ-0124 | 恒久要件を REQ-0108（docs-check 検査責務）、REQ-0109（inspect-docs）、REQ-0124（inspect 命名恒久制約）へ移行し retire（2026-06-16）。タイトル「docs-* command suite」が移行主題であり REQ-0124-021 に抵触。retired 文書は `retired/REQ-0115.md` を参照 |
 | REQ-0117 | migrated | REQ-0110 | Git worktree ジャンクションクリーンアップフォールバック手順を REQ-0110 に統合（REQ-0110-008: Windows + ジャンクション環境の "Not a directory" エラーフォールバック）。worktree 削除信頼性を一元管理するため独立REQは不要と判断（`agentdev-system-reorganization` OU-06）。retired 文書は `retired/REQ-0117.md` を参照 |
+| REQ-0157 | migrated | REQ-0160 | Project Doc Inputs Migration の概念を project-extensions 機構（.agentdev/extensions/**）へ全面置換（ADR-0135 採用、2026-07-04）。schema・配置・命名が非互換に変わるため移行ではなく置換。内容は REQ-0160 として再定義。retired 文書は `retired/REQ-0157.md` を参照 |
 
 ## Active Set
 

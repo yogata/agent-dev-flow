@@ -2,7 +2,7 @@
 
 ## 現行要件
 
-現在の要件判断では、以下51件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を第一参照先とする。
+現在の要件判断では、以下51件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122, REQ-0157 は廃止）を第一参照先とする。
 旧REQ 50件はすべて廃止済みであり、履歴参照に限定する。
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -58,9 +58,9 @@
 | [REQ-0154](REQ-0154.md) | SPEC status 追跡と draft 放置検出 | SPEC status 単一情報源化と draft 放置機械検出 |
 | [REQ-0155](REQ-0155.md) | 文書粒度モデル | SPEC内部5論理区分、文書7分類モデル、粒度ゲート2点必須化、局所物理分離許容 |
 | [REQ-0156](REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 | docs/specs 直下基盤SPECの6ドメイン分類と段階移送方針 |
-| [REQ-0157](REQ-0157.md) | Project Doc Inputs Migration | 配布コードの docs/specs/** 直接参照を doc-inputs 経由に移行 |
 | [REQ-0158](REQ-0158.md) | Targeted Docs Integrity Guard | 変更ファイル限定文書整合性ガードと旧パス検出機構 |
 | [REQ-0159](REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 | 配布物依存スキルの src 昇格、repo-local 境界、docs-check 未トラック検出 |
+| [REQ-0160](REQ-0160.md) | Project Extensions 機構と配布物参照境界 | .agentdev/extensions/** によるプロジェクト固有追加・拡張機構と配布物具体参照禁止 |
 
 ## 廃止済み要件
 
@@ -78,6 +78,7 @@
 | REQ-0121 | 移行→廃止済み | 実行時コマンド規範語を REQ-0103（REQ-0103-152）、整合性検査を REQ-0108（REQ-0108-242/243）に吸収。OU-04 再編成で廃止（2026-06-16）。`retired/REQ-0121.md` 参照 |
 | REQ-0115 | 移行→廃止済み | docs-* command suite の恒久要件を REQ-0108（docs-check 検査責務）、REQ-0109（inspect-docs）、REQ-0124（inspect 命名恒久制約）へ移行。タイトルが移行主題であり REQ-0124-021 に抵触。OU-05 再編成で廃止（2026-06-16）。`retired/REQ-0115.md` 参照 |
 | REQ-0117 | 移行→廃止済み | Git worktree ジャンクション cleanup フォールバック手順を REQ-0110 に統合（REQ-0110-008）。OU-06 再編成で廃止（2026-06-16）。`retired/REQ-0117.md` 参照 |
+| REQ-0157 | 移行→廃止済み | Project Doc Inputs Migration の概念を project-extensions 機構（.agentdev/extensions/**）へ全面置換。schema・配置・命名が非互換に変わるため移行ではなく置換とし、内容は REQ-0160 として再定義（2026-07-04、ADR-0135 採用）。`retired/REQ-0157.md` 参照 |
 
 ## 移行表
 

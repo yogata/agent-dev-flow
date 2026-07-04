@@ -4,7 +4,7 @@
 
 ## 現行基盤ビュー
 
-承認済みステータス（accepted）の ADR-01XX 21件が、現在のアーキテクチャ判断の基盤である。
+承認済みステータス（accepted）の ADR-01XX 22件が、現在のアーキテクチャ判断の基盤である。
 各 ADR は基準再編により旧 ADR の内容を統合、再定義している。
 現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）、非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
 
@@ -31,7 +31,7 @@
 | ADR-0130 | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 | accepted | 2026-06-23 |
 | ADR-0131 | ローカル版導入方式を link mode へ統一し生成方式を廃止 | accepted | 2026-06-23 |
 | ADR-0132 | コンフリクト解消モデル（3レベルエスカレーションと責務割当）| accepted | 2026-06-24 |
-| ADR-0133 | Doc Inputs Architecture | accepted | 2026-07-02 |
+| ADR-0135 | Project Extensions Architecture | accepted | 2026-07-04 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。
 > 基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
@@ -61,7 +61,7 @@
 - [ADR-0130](ADR-0130.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）
 - [ADR-0131](ADR-0131.md)（ローカル版導入方式を link mode へ統一し生成方式を廃止）
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
-- [ADR-0133](ADR-0133.md)（Doc Inputs Architecture）
+- [ADR-0135](ADR-0135.md)（Project Extensions Architecture）
 
 ### 提案中（proposed）
 
@@ -71,6 +71,7 @@
 
 - [ADR-0111](ADR-0111.md)（マネージャー、オーケストレータパターンの限定採用（superseded by ADR-0112））
 - [ADR-0126](ADR-0126.md)（ローカル版 OpenCode 生成基盤: source model 拡張と生成安全性制約（superseded by ADR-0131））
+- [ADR-0133](ADR-0133.md)（Doc Inputs Architecture（superseded by ADR-0135））
 
 ### 非推奨（deprecated）
 
@@ -114,7 +115,8 @@
 ### 文書
 
 - [ADR-0110](ADR-0110.md)（DOC-MAP 採用判断）
-- [ADR-0133](ADR-0133.md)（Doc Inputs Architecture）
+- [ADR-0133](ADR-0133.md)（Doc Inputs Architecture。superseded by ADR-0135、歴史参照）
+- [ADR-0135](ADR-0135.md)（Project Extensions Architecture）
 
 Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 
@@ -184,8 +186,11 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0131 | relates-to | ADR-0130 | I/O 境界確立を前提とした link mode 統一 |
 | ADR-0132 | relates-to | ADR-0129 | ADR-0129 が受容したコンフリクトコストの解決メカニズムを定義 |
 | ADR-0132 | relates-to | ADR-0128 | case-run の再委譲は既存の task() 委譲モデルを使用 |
-| ADR-0133 | relates-to | ADR-0104 | 実行時独立性の具体化機構を提供。supersede しない |
+| ADR-0133 | relates-to | ADR-0104 | 実行時独立性の具体化機構を提供。supersede しない（当時） |
+| ADR-0133 | superseded-by | ADR-0135 | doc-inputs 機構が project-extensions 機構へ全面置換 |
 | ADR-0134 | relates-to | ADR-0105 | 配布物依存スキルの src 昇格は source/projection 分離における配布物自己完結性の具体化 |
+| ADR-0135 | supersedes | ADR-0133 | doc-inputs 機構を project-extensions 機構（.agentdev/extensions/**）へ全面置換。schema・配置・命名が非互換 |
+| ADR-0135 | relates-to | ADR-0104 | 実行時独立性の具体化機構を引き続き提供（doc-inputs から project-extensions へ引き継ぎ） |
 
 ## 関連 REQ
 
@@ -215,8 +220,9 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0130 | [REQ-0149](../requirements/REQ-0149.md), [REQ-0150](../requirements/REQ-0150.md) | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 |
 | ADR-0131 | [REQ-0141](../requirements/REQ-0141.md), [REQ-0134](../requirements/REQ-0134.md), [REQ-0150](../requirements/REQ-0150.md) | ローカル版導入方式を link mode へ統一し生成方式を廃止 |
 | ADR-0132 | [REQ-0151](../requirements/REQ-0151.md), [REQ-0148](../requirements/REQ-0148.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0130](../requirements/REQ-0130.md) | コンフリクト解消モデル（3レベルエスカレーションと責務割当） |
-| ADR-0133 | [REQ-0157](../requirements/REQ-0157.md), [REQ-0103](../requirements/REQ-0103.md) | Doc Inputs Architecture |
+| ADR-0133 | [REQ-0157](../requirements/retired/REQ-0157.md) (retired), [REQ-0103](../requirements/REQ-0103.md) | Doc Inputs Architecture（superseded by ADR-0135、歴史参照） |
 | ADR-0134 | [REQ-0159](../requirements/REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 |
+| ADR-0135 | [REQ-0160](../requirements/REQ-0160.md), [REQ-0103](../requirements/REQ-0103.md) | Project Extensions Architecture（doc-inputs から project-extensions への全面置換） |
 
 ## 廃止済み、履歴ビュー
 
