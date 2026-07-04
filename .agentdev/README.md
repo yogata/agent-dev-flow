@@ -13,7 +13,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 | `intake/archive/rejected/*.md` | 却下（終端） | `intake-promote` | なし | 永続（履歴参照） |
 | `intake/archive/promoted/*.md` | promote 済み（終端） | `intake-promote` | なし | 永続（履歴参照） |
 | `learning/inbox.md` | 未整理エントリ | `learning-capture`（skill） | `learning-promote` | `learning-promote` 成功後にクリア |
-| `learning/archive/active.md` | 分類済み living pool | `learning-promote` | `learning-promote` | living pool。prune 対象は削除可 |
+| `learning/deferred.md` | 分類済み living pool | `learning-promote` | `learning-promote` | 多状態 living pool。staged/rejected/duplicate は promote 時 prune、deferred/未処理/再評価対象は保持 |
 | `learning/evaluation-report.md` | 境界 artifact | `learning-promote` | `learning-promote` | 毎回上書き |
 | `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
@@ -47,8 +47,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 ├── learning/
 │   ├── inbox.md         ← learning-capture が生学びを追記
 │   ├── evaluation-report.md ← learning-promote が評価レポートを生成
-│   ├── archive/
-│   │   └── active.md    ← 分類済み learning entry の living pool
+│   ├── deferred.md      ← 分類済み learning entry の living pool
 │   └── promoted/        ← learning-promote が promoted artifact を出力（フラット）
 ├── backlog/
 │   └── req-units/       ← backlog-review が RU を生成

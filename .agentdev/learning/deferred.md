@@ -1,9 +1,9 @@
-# 学びアーカイブ（生きている learning プール）
+# 学び deferred pool（生きている learning プール）
 
-未処分・保留中・再評価対象の learning item を保持する生きている learning プール（SHALL）。
+未処理・保留中・再評価対象の learning item を保持する多状態の生きている learning プール（SHALL）。deferred（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する（AG-005）。
 learning-capture によって inbox.md に追記されたエントリが、learning-promote の処分判定や prune によって動的に変化する。
 
-永久保存先ではなく、処分済みの learning item は削除される。昇格対象の根拠は staging スタブに残す。
+終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。処分済みの learning item は prune 対象となる。昇格対象の根拠は staging スタブに残す。
 
 ## エントリフォーマット（13項目 + 移動日）
 
@@ -39,9 +39,9 @@ learning-capture によって inbox.md に追記されたエントリが、learn
 
 ## Prune ポリシー
 
-archive.md は append-only ではなく、以下のタイミングでエントリが削除される:
-- **refine 時 prune**（MAY）: 長期間再発していない単発レアケース。ただし判断基準・技術知識・プロジェクト固有知識を含む learning item は削除不可
-- **promote 時 prune**（SHALL）: staged / rejected / duplicate の learning item。deferred・未処分の learning item は削除不可
+deferred.md は append-only ではなく、以下のタイミングでエントリが削除される:
+- **promote 内部分析フェーズ時 prune**（MAY）: 長期間再発していない単発レアケース。ただし判断基準・技術知識・プロジェクト固有知識を含む learning item は削除不可
+- **promote 時 prune**（SHALL）: staged / rejected / duplicate の learning item。deferred/未処理/再評価対象の learning item は削除不可（REQ-0147-007）
 
 **注意**: learning-refine は廃止済み（REQ-0105-051）。refine 機能は learning-promote に統合されている。
 
