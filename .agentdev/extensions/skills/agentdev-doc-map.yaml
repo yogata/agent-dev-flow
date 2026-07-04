@@ -1,0 +1,16 @@
+version: 1
+kind: skill-extension
+id: agentdev-doc-map
+
+context:
+  - id: discovery-1
+    purpose: "docs/DOC-MAP.md 経由で docs/specs/foundations/system.md を探索してよい"
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

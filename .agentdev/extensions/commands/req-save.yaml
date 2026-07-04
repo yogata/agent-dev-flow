@@ -1,0 +1,33 @@
+version: 1
+kind: command-extension
+id: /agentdev/req-save
+
+context:
+  - id: must-1
+    paths:
+      - "docs/specs/foundations/document-model.md"
+    purpose: REQ/ADR/SPEC の責務マトリックスと文書間関係の確認
+  - id: integrity-rule-catalog
+    when: 整合性ルールカタログ参照時
+    paths:
+      - "docs/specs/integrity/integrity-rule-catalog.md"
+    purpose: REQ 保存後に影響する整合性ルールの確認
+  - id: req-file-manager-procedure
+    when: REQ ファイル管理手順参照時
+    paths:
+      - "docs/specs/skills/agentdev-req-file-manager.md"
+    purpose: REQ 番号採番ルールと frontmatter 規約の確認
+  - id: discovery-1
+    purpose: "docs/DOC-MAP.md 経由で関連 SPEC と ADR を探索してよい"
+  - id: discovery-2
+    purpose: docs/requirements/README.md 経由で REQ インデックスを確認してよい
+
+rules: []
+
+checks: []
+
+acceptance_gates:
+  - 保存した REQ/ADR が docs/requirements/, docs/adr/ のインデックスに存在すること
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

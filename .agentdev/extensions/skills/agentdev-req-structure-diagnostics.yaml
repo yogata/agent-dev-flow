@@ -1,0 +1,29 @@
+version: 1
+kind: skill-extension
+id: agentdev-req-structure-diagnostics
+
+context:
+  - id: docs-spec-rebuild-integrity
+    when: 配布物整合性ルール参照時
+    paths:
+      - "docs/specs/integrity/docs-spec-rebuild-integrity.md"
+    purpose: 配布物 ID 除去後の品質保持ルールの確認
+  - id: document-model
+    when: 文書モデル参照時
+    paths:
+      - "docs/specs/foundations/document-model.md"
+    purpose: REQ 構造診断の文書間関係確認
+  - id: req-health-metrics
+    when: REQ 健全性メトリクス参照時
+    paths:
+      - "docs/specs/quality/req-health-metrics.md"
+    purpose: REQ 肥大化・関心ズレ検出の定量閾値確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

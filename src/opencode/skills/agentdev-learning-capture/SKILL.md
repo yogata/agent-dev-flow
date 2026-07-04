@@ -7,14 +7,15 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 会話中にエージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/learning/inbox.md` に蓄積するスキル。
 
-## skill doc-input 参照方針
+## skill extension 参照方針
 
-本スキルは以下の方針に従う（ADR-0133）。
+本スキルは以下の方針に従う（ADR-0135）。
 
 1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
-2. **doc-input の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill doc-input（`.agentdev/doc-inputs/skills/agentdev-learning-capture.yaml`）を読む。skill doc-input はスキル単位で1ファイルに集約し、reference ごとの doc-input は作らない
-3. **`docs/specs/**` 内部パスの固定知識化の禁止**: doc-input に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
-4. **doc-input 未配置時の挙動**: skill doc-input が存在しない場合は `config.yaml` の `roots` と明示入力のみを使い、推測で docs を読みに行かない
+2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-learning-capture.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
+3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
+4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
+
 ## ⚠ 基本原則
 
 **エージェントが学びを検知、抽出し、ユーザー承認なしで自律的に inbox.md に蓄積する。

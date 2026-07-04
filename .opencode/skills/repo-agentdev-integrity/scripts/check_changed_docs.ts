@@ -64,7 +64,7 @@ interface TargetedDocsReport {
   spec_readme_update_required: boolean;
   requirements_readme_update_required: boolean;
   full_docs_check_recommended: boolean;
-  doc_inputs_check_required: boolean;
+  extensions_check_required: boolean;
   declared_files_check: { declared: string[]; missing: string[]; extra: string[] } | null;
 }
 
@@ -559,7 +559,7 @@ function runWorkflowChecks(
   specReadmeUpdateRequired: boolean;
   requirementsReadmeUpdateRequired: boolean;
   fullDocsCheckRecommended: boolean;
-  docInputsCheckRequired: boolean;
+  extensionsCheckRequired: boolean;
   declaredFilesCheck: { declared: string[]; missing: string[]; extra: string[] } | null;
 } {
   const failures: Failure[] = [];
@@ -605,7 +605,7 @@ function runWorkflowChecks(
       )
     : false;
 
-  // full_docs_check_recommended: integrity rule 追加/削除、DOC-MAP 構造変更、docs/specs 大規模移動、doc-inputs 変更等
+  // full_docs_check_recommended: integrity rule 追加/削除、DOC-MAP 構造変更、docs/specs 大規模移動、extensions 変更等
   const fullDocsCheckRecommended =
     profile.name === "case-close"
     ? changedFiles.some((f) => {
@@ -619,13 +619,13 @@ function runWorkflowChecks(
           /docs\/DOC-MAP\.md/.test(rel) ||
           /docs\/specs\/README\.md/.test(rel) ||
           /^\.agentdev\/config\.yaml$/.test(rel) ||
-          /^\.agentdev\/doc-inputs\//.test(rel)
+          /^\.agentdev\/extensions\//.test(rel)
         );
       })
     : false;
 
-  // doc_inputs_check_required: doc-inputs 機構への影響（REQ/ADR/SPEC の追加・移動・改名）
-  const docInputsCheckRequired = changedFiles.some((f) => {
+  // extensions_check_required: extensions 機構への影響（REQ/ADR/SPEC の追加・移動・改名）
+  const extensionsCheckRequired = changedFiles.some((f) => {
     const rel = path.relative(root, f).replace(/\\/g, "/");
     return (
       /^docs\/requirements\/REQ-.*\.md$/.test(rel) ||
@@ -659,7 +659,7 @@ function runWorkflowChecks(
     specReadmeUpdateRequired,
     requirementsReadmeUpdateRequired,
     fullDocsCheckRecommended,
-    docInputsCheckRequired,
+    extensionsCheckRequired,
     declaredFilesCheck,
   };
 }
@@ -690,7 +690,7 @@ function emitText(report: TargetedDocsReport): void {
     `requirements_readme_update_required: ${report.requirements_readme_update_required}`,
   );
   console.log(`full_docs_check_recommended: ${report.full_docs_check_recommended}`);
-  console.log(`doc_inputs_check_required: ${report.doc_inputs_check_required}`);
+  console.log(`extensions_check_required: ${report.extensions_check_required}`);
   if (report.declared_files_check) {
     console.log(`declared_files_check:`);
     console.log(`  declared: ${report.declared_files_check.declared.length}`);

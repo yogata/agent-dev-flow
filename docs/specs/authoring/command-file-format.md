@@ -21,22 +21,19 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 - **対象**: `src/opencode/commands/agentdev/*.md`（AgentDevFlow 配布 command 原本）、`.opencode/commands/repo/*.md`（repo-local command）
 - **対象外**: AgentDevFlow 適用プロジェクト（consumer project）の独自 command
 
-## doc-inputs 手順
+## extensions 手順
 
-command 本文は doc-inputs 手順（ADR-0133、SPEC `../foundations/project-doc-inputs.md`）のみを持ち、具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を固定しない。
+command 本文は extensions 手順（ADR-0135、SPEC `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を固定しない。
 
-各 command は以下の6歩からなる共通手順を本文に持つ（SPEC パス例示、検査対象パス指定は例外として許可する）:
+各 command は以下の共通記述を本文に持つ。extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`）を持ち、標準動作に追加・拡張される（上書きではない）。SPEC パス例示、検査対象パス指定は例外として許可する:
 
-1. `.agentdev/config.yaml` を読み込む
-2. 当該コマンドに対応する `.agentdev/doc-inputs/commands/<command>.yaml` を読み込む
-3. `must_read` に列挙された paths を読み込む
-4. `conditional_read` の条件が該当する場合のみ、当該 paths を読み込む
-5. doc-input に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
-6. doc-input が存在しない場合は `config.yaml` の `roots` と明示入力のみを使う
+- 実行時に対応する project extension（`.agentdev/extensions/commands/<command>.yaml`）を読み込む
+- extension が存在しない場合は標準動作で続行する
+- extension が破損している場合はエラーを表示して無視し、標準動作で続行する
 
-実行時に読むべき docs 文書への参照は command doc-input（`.agentdev/doc-inputs/commands/<command>.yaml`）の `must_read`, `conditional_read`, `allowed_discovery` へ移す。command 本文に直接の docs パスを記述しない。
+実行時に読むべき docs 文書への参照は command extension（`.agentdev/extensions/commands/<command>.yaml`）の `context` へ移す。command 本文に直接の docs パスを記述しない。
 
-command doc-input は RU-20260701 形式の schema に従う。フロントマタ（`version: 1`, `kind: command-doc-input`, `id: /agentdev/<command>`）と、`must_read` は `{path, purpose}` を持つオブジェクトのリスト、`conditional_read` は `{id, when, paths, purpose}` を持つオブジェクトのリスト、`allowed_discovery` / `forbidden` / `read_completion` は説明文字列のリストである。各 doc-input オブジェクトは `path` と目的（`purpose`）を持ち、`conditional_read` は条件（`when`）と識別子（`id`）を持つ。schema 詳細は SPEC `../foundations/project-doc-inputs.md` 参照。
+command extension はフロントマタ（`version: 1`, `kind: command-extension`, `id: /agentdev/<command>`）と、5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`、各配列）を持つ。`context` entry は `{id, when?, paths?, purpose?}`、`rules`/`checks` entry は `{id, when?, skill?}`、`acceptance_gates`/`must_not` は説明文字列のリストである。schema 詳細は SPEC `../foundations/project-extensions.md` 参照。
 
 ## 手順セクション形式
 
@@ -104,7 +101,7 @@ command SPEC（`docs/specs/commands/*.md`）が記述する Step 番号構成は
 - **サブステップ採番**: `Step N-M` の M は `1` から開始する（`Step N-0` は使用しない）。QG ゲート、事前検証等の「先行サブステップ」も `N-1` 以降の番号を採番すること
 - **独立フェーズの Step 0 扱い**: 従来 `Step 0` として独立番号を与えられていたフェーズ（例: セッションコンテキスト検知、フェーズ判定、実行前同期、引き継ぎ停止判定）は、command 定義の Step 1（または後続 Step）に統合し、独立した `Step 0` としては扱わない
 
-**適用対象**: `docs/specs/commands/*.md` のうち、Step 番号構成を記述する command SPEC（`_template.md` を含む）。Step 番号を持たない command SPEC（読み取り専用、分類系の `inspect-skills.md`、`inspect-promote.md`、`inspect-doc-inputs.md` 等で `### Step N` 見出しを使用しない SPEC）は適用対象外とする（REQ-0143-004）。これらの SPEC は対応する command 定義ファイルと比較すべき Step 番号構成を持たないため、一致検証の対象とならない。
+**適用対象**: `docs/specs/commands/*.md` のうち、Step 番号構成を記述する command SPEC（`_template.md` を含む）。Step 番号を持たない command SPEC（読み取り専用、分類系の `inspect-skills.md`、`inspect-promote.md`、`inspect-extensions.md` 等で `### Step N` 見出しを使用しない SPEC）は適用対象外とする（REQ-0143-004）。これらの SPEC は対応する command 定義ファイルと比較すべき Step 番号構成を持たないため、一致検証の対象とならない。
 
 **検証**: 各 command/SPEC ペアについて、SPEC の Step 番号と command 定義の Step 番号が同一フェーズで一致することを確認する。ただし SPEC が Step 番号を記述しない場合は検証対象外とする。
 ずれを検出した場合、SPEC 側を command 定義へ一致させる。

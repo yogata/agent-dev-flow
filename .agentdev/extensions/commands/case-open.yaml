@@ -1,0 +1,28 @@
+version: 1
+kind: command-extension
+id: /agentdev/case-open
+
+context:
+  - id: must-1
+    paths:
+      - "docs/specs/workflows/epic-wave-model.md"
+    purpose: Epic/Wave/Issue 実行モデルと連結成分ベース構成生成の確認
+  - id: workflow-contracts
+    when: ワークフロー契約（フェーズ、SSoT 遷移）参照時
+    paths:
+      - "docs/specs/workflows/workflow-contracts.md"
+    purpose: パイプライン概要と共通フェーズ契約の確認
+  - id: req-define-test-strategy
+    when: "req-define のテスト戦略セクション参照時"
+    paths:
+      - "docs/specs/commands/req-define.md"
+    purpose: Issue 本文の test strategy 項目構造の確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

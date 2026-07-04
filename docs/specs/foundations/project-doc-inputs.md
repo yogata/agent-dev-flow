@@ -1,8 +1,11 @@
 ---
 status: accepted
+superseded_by: project-extensions.md
 ---
 
 # Project Doc Inputs
+
+> **本 SPEC は歴史参照用です。現行機構は [project-extensions.md](project-extensions.md)（ADR-0135、REQ-0160）に移行済み**（Issue #1406）。本文中の `inspect-doc-inputs` command 参照は旧名称であり、現行は `/agentdev/inspect-extensions` へ統合・改名済み。
 
 実行時 docs 参照の外部化機構としての project doc-inputs を定義する（ADR-0133、REQ-0157）。
 配布コマンド・スキル本文が AgentDevFlow 本体固有 `docs/specs/**` 内部パスを固定知識として持たず、プロジェクト別の doc-inputs 経由で docs を解決する仕組みを規定する。

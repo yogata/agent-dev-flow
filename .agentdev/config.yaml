@@ -6,6 +6,3 @@ roots:
   adr: docs/adr
   specs: docs/specs
   doc_map: docs/DOC-MAP.md
-doc_inputs:
-  commands: .agentdev/doc-inputs/commands
-  skills: .agentdev/doc-inputs/skills

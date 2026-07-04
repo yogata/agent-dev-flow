@@ -1,0 +1,19 @@
+version: 1
+kind: skill-extension
+id: agentdev-command-authoring
+
+context:
+  - id: artifact-contracts
+    when: アーティファクト間契約参照時
+    paths:
+      - "docs/specs/responsibilities/artifact-contracts.md"
+    purpose: command 定義ファイルの入出力と依存方向の確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

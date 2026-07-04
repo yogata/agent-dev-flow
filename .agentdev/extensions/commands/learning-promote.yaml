@@ -1,0 +1,14 @@
+version: 1
+kind: command-extension
+id: /agentdev/learning-promote
+
+context: []
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

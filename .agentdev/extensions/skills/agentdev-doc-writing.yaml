@@ -1,0 +1,24 @@
+version: 1
+kind: skill-extension
+id: agentdev-doc-writing
+
+context:
+  - id: document-type-responsibilities
+    when: 文書種別責務参照時
+    paths:
+      - "docs/specs/responsibilities/document-type-responsibilities.md"
+    purpose: 文書品質ゲート原本仕様と文書種別責務の確認
+  - id: backticks-threshold
+    when: backticks 識別子判定閾値参照時
+    paths:
+      - "docs/specs/integrity/backticks-identifier-threshold.md"
+    purpose: backticks 必須と任意の機械判定閾値の確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

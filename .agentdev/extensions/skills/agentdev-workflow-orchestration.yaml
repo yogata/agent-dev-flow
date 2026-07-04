@@ -1,0 +1,19 @@
+version: 1
+kind: skill-extension
+id: agentdev-workflow-orchestration
+
+context:
+  - id: epic-wave-model
+    when: Epic/Wave モデル参照時
+    paths:
+      - "docs/specs/workflows/epic-wave-model.md"
+    purpose: Wave スケジューリングと子Issue 状態 enum の確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

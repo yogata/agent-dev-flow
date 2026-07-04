@@ -1,0 +1,19 @@
+version: 1
+kind: command-extension
+id: /agentdev/inspect-promote
+
+context:
+  - id: workflow-contracts
+    when: ワークフロー契約（検出事項 lifecycle、capture 境界）参照時
+    paths:
+      - "docs/specs/workflows/workflow-contracts.md"
+    purpose: 検出事項の分類・昇格ワークフロー契約の確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない
