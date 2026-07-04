@@ -8,10 +8,8 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 
 | Path | 状態 | Producer | Consumer / Next command | Retention / Removal |
 |------|------|----------|------------------------|---------------------|
-| `intake/inbox/*.md` | raw item | `intake-capture`, `intake-from-github` | `intake-promote` | `intake-promote` 成功後に `archive/` へ移動 |
+| `intake/inbox/*.md` | raw item | `intake-capture`, `intake-from-github` | `intake-promote` | `intake-promote` の分類確定後に削除（採用 item は promoted/ へ保存、却下 item は即時削除） |
 | `intake/promoted/*.md` | promoted artifact | `intake-promote`, `inspect-promote`(--auto) | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
-| `intake/archive/rejected/*.md` | 却下（終端） | `intake-promote` | なし | 永続（履歴参照） |
-| `intake/archive/promoted/*.md` | promote 済み（終端） | `intake-promote` | なし | 永続（履歴参照） |
 | `learning/inbox.md` | 未整理エントリ | `learning-capture`（skill） | `learning-promote` | `learning-promote` 成功後にクリア |
 | `learning/deferred.md` | 分類済み living pool | `learning-promote` | `learning-promote` | 多状態 living pool。staged/rejected/duplicate は promote 時 prune、deferred/未処理/再評価対象は保持 |
 | `learning/evaluation-report.md` | 境界 artifact | `learning-promote` | `learning-promote` | 毎回上書き |
@@ -20,10 +18,9 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 | `drafts/req-draft-*.md` | working draft | `req-define` | `req-save`（feature） / `case-open`（bugfix/maintenance/docs_chore） | `case-open` の Issue 作成 + VERIFY 成功後に削除 |
 | `drafts/requirements-review-finding-*.md` | review finding | `req-save`（SPLIT 検出時） | `req-define` | `req-define` の消化後に削除 |
 | `integrity/reports/*.md` | 検証レポート（非永続） | `docs-check` | `docs-check`（intake化）・ユーザー参照 | 非永続・git管理対象外（`.gitignore` で除外） |
-| `inspect/inbox/*.md` | 未分類 inspect finding | `inspect-docs`, `inspect-skills` | `inspect-promote` | `inspect-promote` 成功後に `promoted/` または `archive/` へ移動 |
+| `inspect/inbox/*.md` | 未分類 inspect finding | `inspect-docs`, `inspect-skills` | `inspect-promote` | `inspect-promote` の分類後に削除（promote 時は promoted/ へ保存、reject 時は即時削除、defer 時は inbox 残置） |
 | `inspect/promoted/*.md` | promoted artifact（採用済み・RU化対象） | `inspect-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `inspect/promoted/auto-promote-log.md` | `--auto` 実行ログ（append-only） | `inspect-promote`(--auto) | ユーザー参照・revoke 手順 | 永続（トレーサビリティ） |
-| `inspect/archive/rejected/*.md` | 却下（終端） | `inspect-promote` | なし | 永続（履歴参照） |
 
 ## .agentdev/ と .sisyphus/ の境界
 
@@ -40,10 +37,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 .agentdev/
 ├── intake/
 │   ├── inbox/           ← intake-capture / intake-from-github が raw item を保存
-│   ├── promoted/        ← intake-promote が派生 artifact を出力（フラット）
-│   └── archive/
-│       ├── promoted/    ← promote 済み item の記録
-│       └── rejected/    ← 却下 item の記録
+│   └── promoted/        ← intake-promote が派生 artifact を出力（フラット）
 ├── learning/
 │   ├── inbox.md         ← learning-capture が生学びを追記
 │   ├── evaluation-report.md ← learning-promote が評価レポートを生成
@@ -55,9 +49,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 ├── drafts/              ← req-define が要件ドラフトを保存（req-save/case-open で消費・削除）
 ├── inspect/
 │   ├── inbox/           ← inspect-docs / inspect-skills が未分類 finding を保存
-│   ├── promoted/        ← inspect-promote が採用済み artifact を出力（フラット）
-│   └── archive/
-│       └── rejected/    ← inspect-promote が却下 finding を移動
+│   └── promoted/        ← inspect-promote が採用済み artifact を出力（フラット）
 └── integrity/
     └── reports/         ← docs-check が検証結果を保存（非永続・git管理対象外）
 ```
