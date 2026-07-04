@@ -12,16 +12,14 @@ agent: sisyphus
 **このコマンドは保存専用である。
 ** GitHub Issue の作成、採用可否の判断は行わない。
 
-## project doc-inputs
+## project extensions
 
-本コマンドは以下の6歩で docs を解決する（ADR-0133）。
+本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/intake-from-github.yaml`）を読み込む（ADR-0135）。
 
-1. `.agentdev/config.yaml` を読み込む
-2. `.agentdev/doc-inputs/commands/intake-from-github.yaml` を読み込む
-3. `must_read` に列挙された paths を読み込む
-4. `conditional_read` の条件が該当する場合のみ、当該 paths を読み込む
-5. doc-input に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
-6. doc-input が存在しない場合は `config.yaml` の `roots` と明示入力のみを使う
+- extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
+- extension が存在しない場合は標準動作で続行する
+- extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
+- 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## 入力
 

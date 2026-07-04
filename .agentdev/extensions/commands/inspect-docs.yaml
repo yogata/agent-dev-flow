@@ -1,0 +1,27 @@
+version: 1
+kind: command-extension
+id: /agentdev/inspect-docs
+
+context:
+  - id: must-1
+    paths:
+      - "docs/specs/foundations/document-model.md"
+    purpose: "REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスと探索入口の確認"
+  - id: docs-spec-rebuild-integrity
+    when: 配布物整合性ルール参照時
+    paths:
+      - "docs/specs/integrity/docs-spec-rebuild-integrity.md"
+    purpose: 配布物 ID 除去後の品質保持ルールの確認
+  - id: discovery-1
+    purpose: "docs/DOC-MAP.md 経由で診断対象 SPEC と文書群を探索してよい"
+  - id: discovery-2
+    purpose: docs/specs/README.md 経由で SPEC status とインデックスを参照してよい
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

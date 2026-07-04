@@ -1,0 +1,19 @@
+version: 1
+kind: skill-extension
+id: agentdev-epic-tracker
+
+context:
+  - id: epic-wave-model
+    when: Epic/Wave モデル参照時
+    paths:
+      - "docs/specs/workflows/epic-wave-model.md"
+    purpose: "Epic ステータス追跡テーブルと per-Epic 単一書き手の確認"
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

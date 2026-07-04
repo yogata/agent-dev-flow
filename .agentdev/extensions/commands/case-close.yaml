@@ -1,0 +1,35 @@
+version: 1
+kind: command-extension
+id: /agentdev/case-close
+
+context:
+  - id: must-1
+    paths:
+      - "docs/specs/foundations/document-model.md"
+    purpose: "REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスと文書間関係の確認"
+  - id: case-auto-conflict-model
+    when: "case-auto 並行実行時のコンフリクト解消モデル参照時"
+    paths:
+      - "docs/specs/commands/case-auto.md"
+    purpose: "case-auto 連携時のコンフリクト解消手順の確認"
+  - id: case-close-spec
+    when: "case-close 工程 SPEC 参照時"
+    paths:
+      - "docs/specs/commands/case-close.md"
+    purpose: "case-close の完了ゲートと QG-4 達成判定の確認"
+  - id: discovery-1
+    purpose: "docs/DOC-MAP.md 経由で SPEC 確定対象と整合性ルールを探索してよい"
+  - id: discovery-2
+    purpose: docs/specs/README.md 経由で SPEC status と整合性ルールカタログを参照してよい
+  - id: discovery-3
+    purpose: "docs/specs/integrity/integrity-rule-catalog.md 経由で関連 IR を確認してよい"
+
+rules: []
+
+checks: []
+
+acceptance_gates:
+  - 完了した Issue/PR の成果物が docs/requirements/, docs/adr/, docs/specs/ のいずれかに存在すること
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

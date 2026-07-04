@@ -1,0 +1,39 @@
+version: 1
+kind: skill-extension
+id: agentdev-inspect-skills
+
+context:
+  - id: docs-spec-rebuild-integrity
+    when: 配布物整合性ルール参照時
+    paths:
+      - "docs/specs/integrity/docs-spec-rebuild-integrity.md"
+    purpose: 配布物 ID 除去後の品質保持ルールの確認
+  - id: agentdev-gh-cli-spec
+    when: "agentdev-gh-cli SPEC 参照時"
+    paths:
+      - "docs/specs/skills/agentdev-gh-cli.md"
+    purpose: gh CLI 手続き委譲基盤の SPEC 確認
+  - id: integrity-rule-catalog
+    when: 整合性ルールカタログ参照時
+    paths:
+      - "docs/specs/integrity/integrity-rule-catalog.md"
+    purpose: "IR-053（gh 直接記述機械検出）等のルール確認"
+  - id: document-type-responsibilities
+    when: 文書種別責務参照時
+    paths:
+      - "docs/specs/responsibilities/document-type-responsibilities.md"
+    purpose: 文書種別責務と配置基準の確認
+  - id: backticks-threshold
+    when: backticks 識別子判定閾値参照時
+    paths:
+      - "docs/specs/integrity/backticks-identifier-threshold.md"
+    purpose: backticks 必須と任意の機械判定閾値の確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない

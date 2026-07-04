@@ -1,8 +1,0 @@
-version: 1
-kind: skill-doc-input
-id: agentdev-doc-map
-conditional_read: []
-allowed_discovery:
-  - "docs/DOC-MAP.md 経由で docs/specs/foundations/system.md を探索してよい"
-forbidden:
-  - "実装本文（src/opencode/**）は読まない"

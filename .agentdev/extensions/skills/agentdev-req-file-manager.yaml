@@ -1,0 +1,19 @@
+version: 1
+kind: skill-extension
+id: agentdev-req-file-manager
+
+context:
+  - id: document-model
+    when: 文書モデル参照時
+    paths:
+      - "docs/specs/foundations/document-model.md"
+    purpose: REQ ファイル管理の文書間関係と frontmatter 規約の確認
+
+rules: []
+
+checks: []
+
+acceptance_gates: []
+
+must_not:
+  - 実装本文（src/opencode/**）は読まない
