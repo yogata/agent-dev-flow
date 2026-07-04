@@ -23,17 +23,14 @@
  *   7. legacy .agentdev/doc-inputs/** residual detection (warning)
  *   8. override intent detection in extension bodies (warning, heuristic)
  *
- * Plus 2 retained checks from the doc-inputs era (still apply per SPEC
- * "command/skill 本文の参照禁止"):
- *   9. no direct docs/specs/{domain}/** refs in src/opencode/commands/agentdev/
- *  10. no direct docs/specs/{domain}/** refs in src/opencode/skills/agentdev-/
+ * Distribution reference boundary (direct refs in src/opencode/commands|skills)
+ * is handled by check_distribution_boundary.ts.
  *
- * exemptions:
- *   - SPEC path example (<existing-spec>.md etc., template notation)
- *   - glob pattern docs/specs/** in procedure text
- *   - .agentdev/extensions/** refs are legitimate (hybrid model)
+ * exemptions within extensions directory:
  *   - inspect-extensions.md legitimately references .agentdev/doc-inputs/**
- *     (residual detection target declaration)
+ *     (residual detection target declaration) but that file is in
+ *     src/opencode/commands/agentdev/ and therefore outside this script's
+ *     scope.
  */
 
 const path = require("path") as typeof import("path");
@@ -55,8 +52,6 @@ export interface CheckReport {
     skill_extensions: number;
     public_commands: number;
     public_skills: number;
-    direct_refs_in_commands: number;
-    direct_refs_in_skills: number;
     doc_inputs_residual_files: number;
   };
 }
@@ -67,16 +62,6 @@ const REPO_LOCAL_SKILLS_DIR = ".opencode/skills";
 const EXTENSIONS_COMMANDS_DIR = ".agentdev/extensions/commands";
 const EXTENSIONS_SKILLS_DIR = ".agentdev/extensions/skills";
 const LEGACY_DOC_INPUTS_DIR = ".agentdev/doc-inputs";
-
-// Migration-target pattern: docs/specs/(foundations|...)/...
-const DIRECT_REF_PATTERN =
-  /docs\/specs\/(foundations|responsibilities|quality|integrity|local|authoring|commands|skills|workflows)\//g;
-
-const EXEMPTION_HINTS = [
-  "<existing-spec>",
-  "docs/specs/**",
-  "docs/specs/<",
-];
 
 // Heuristic override-intent phrases (check #8). Extension is additive-only.
 const OVERRIDE_PHRASES = [
@@ -271,13 +256,6 @@ function parseSimpleYaml(text: string): any {
     }
   })(root);
   return root;
-}
-
-function isExemptLine(line: string): boolean {
-  for (const hint of EXEMPTION_HINTS) {
-    if (line.includes(hint)) return true;
-  }
-  return false;
 }
 
 /**
@@ -478,8 +456,6 @@ export function checkExtensions(repoRoot: string): CheckReport {
       skill_extensions: 0,
       public_commands: 0,
       public_skills: 0,
-      direct_refs_in_commands: 0,
-      direct_refs_in_skills: 0,
       doc_inputs_residual_files: 0,
     };
 
@@ -606,60 +582,6 @@ export function checkExtensions(repoRoot: string): CheckReport {
       const skillDirs = (fs.readdirSync(SKILLS_DIR, { withFileTypes: true }) as any[])
         .filter((d) => d.isDirectory() && d.name.startsWith("agentdev-"));
       stats.public_skills = skillDirs.length;
-    }
-
-    // Check 9: direct refs in commands
-    const commandMds = listMarkdownFiles(PUBLIC_COMMAND_DIR, true);
-    for (const cf of commandMds) {
-      // inspect-extensions.md legitimately declares .agentdev/doc-inputs/**
-      // as a scan target — its direct docs/specs/** refs are exempt as scan
-      // target declarations, but the generic DIRECT_REF_PATTERN still applies.
-      const text = readText(cf);
-      if (!text) continue;
-      const lines = text.split(/\r?\n/);
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const matches = line.match(DIRECT_REF_PATTERN);
-        if (matches && !isExemptLine(line)) {
-          stats.direct_refs_in_commands += matches.length;
-          failures.push({
-            check: 9,
-            check_name: "direct-refs-in-commands",
-            severity: "strict",
-            file: cf,
-            message: `direct docs/specs/** ref at line ${i + 1}: ${line.trim().substring(0, 200)}`,
-          });
-        }
-      }
-    }
-
-    // Check 10: direct refs in skills
-    if (dirExists(SKILLS_DIR)) {
-      const skillDirs = (fs.readdirSync(SKILLS_DIR, { withFileTypes: true }) as any[])
-        .filter((d) => d.isDirectory() && d.name.startsWith("agentdev-"))
-        .map((d) => path.join(SKILLS_DIR, d.name).replace(/\\/g, "/"));
-      for (const sd of skillDirs) {
-        const skillMds = listMarkdownFiles(sd, true);
-        for (const sf of skillMds) {
-          const text = readText(sf);
-          if (!text) continue;
-          const lines = text.split(/\r?\n/);
-          for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            const matches = line.match(DIRECT_REF_PATTERN);
-            if (matches && !isExemptLine(line)) {
-              stats.direct_refs_in_skills += matches.length;
-              failures.push({
-                check: 10,
-                check_name: "direct-refs-in-skills",
-                severity: "strict",
-                file: sf,
-                message: `direct docs/specs/** ref at line ${i + 1}: ${line.trim().substring(0, 200)}`,
-              });
-            }
-          }
-        }
-      }
     }
 
     const strictFailures = failures.filter((f) => f.severity === "strict");

@@ -3,9 +3,10 @@
  *
  * Uses the parent repo (the agent-dev-flow repo this script ships in) as the
  * integration target. Per TS-001, the script must report ok=true against the
- * fully-migrated repo (valid extensions under .agentdev/extensions/**, zero
- * direct docs/specs/{domain}/** refs in src/opencode/**, no legacy
- * .agentdev/doc-inputs/** residual).
+ * fully-migrated repo (valid extensions under .agentdev/extensions/**, no
+ * legacy .agentdev/doc-inputs/** residual). Distribution reference boundary
+ * (direct refs in src/opencode/**) is covered by check_distribution_boundary
+ * .test.ts.
  */
 
 import { expect, test, describe } from "bun:test";
@@ -22,8 +23,6 @@ describe("checkExtensions (integration against real repo)", () => {
     expect(report.stats.command_extensions).toBeGreaterThan(0);
     expect(report.stats.skill_extensions).toBeGreaterThan(0);
     expect(report.stats.public_commands).toBeGreaterThan(0);
-    expect(report.stats.direct_refs_in_commands).toBe(0);
-    expect(report.stats.direct_refs_in_skills).toBe(0);
     expect(report.stats.doc_inputs_residual_files).toBe(0);
     // No strict failures (warnings on legacy residual / missing optional skills allowed)
     const strictFailures = report.failures.filter((f) => f.severity === "strict");
@@ -38,8 +37,6 @@ describe("checkExtensions (integration against real repo)", () => {
     expect(typeof report.stats.skill_extensions).toBe("number");
     expect(typeof report.stats.public_commands).toBe("number");
     expect(typeof report.stats.public_skills).toBe("number");
-    expect(typeof report.stats.direct_refs_in_commands).toBe("number");
-    expect(typeof report.stats.direct_refs_in_skills).toBe("number");
     expect(typeof report.stats.doc_inputs_residual_files).toBe("number");
   });
 });
