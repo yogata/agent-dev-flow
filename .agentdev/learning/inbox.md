@@ -74,3 +74,21 @@
 - **想定反映先**: case-open command 手順（完了条件記載ガイドライン）、agentdev-issue-management skill（実測値記載時の実ファイル確認必須化）、または case-open test strategy テンプレート
 - **関連**: Issue #1412 AG-004, PR #1413 Findings セクション, QG-4 no-deviation 判定
 - **タグ**: `#case-open` `#acceptance-criteria` `#actual-count` `#qg-4`
+
+---
+
+## 廃止 REQ 由来の SKILL 記述が残置する documentation drift は inspect 系で検出されていない
+
+- **問題事象**: `agentdev-learning-pipeline/SKILL.md` の「取り込み済みスタブの archive ルール」セクション（旧 388-430行）が、REQ-0023 廃止後も残置していた。当該セクションは REQ-0023 廃止時に整理されるべきだったが、廃止イベントと SKILL 本文の紐付けがなく、文書間で孤儿化したまま停滞。本 Issue #1414 のテスト戦略 TS-005 (3)（関連 skill ファイルの lifecycle 記述確認）で偶発的に発見されるまで検出されなかった
+- **発生局面**: case-run 実装中（テスト戦略 TS-005 (3) の関連 skill ファイル精査）
+- **検知方法**: テスト戦略 TS-005 (3) で関連 skill ファイルの lifecycle 記述を精査した際、`learning-pipeline/SKILL.md` に現行 lifecycle（backlog-artifact-lifecycle SPEC）と矛盾する archive ルール記述が残っていることを発見
+- **根本原因**: REQ 廃止時（REQ-0023 廃止）に、当該 REQ を由来とする SKILL/ command/ guide 記述の横断クリーンアップ手順が存在しなかった。REQ 廃止は REQ ファイルの retired/ 化や ADR の supersede 整理にとどまり、下流の SKILL 本文に埋め込まれた運用ルール記述まで追跡・整理する仕組みがなかった。`inspect-skills`/`inspect-docs` の検出観点にも「廃止 REQ 由来の記述残置」というカテゴリが明示されていない
+- **自律対応内容**: 本 PR #1415 で当該セクションを削除し、併せて `inspect-skills/SKILL.md`、`intake-pipeline/SKILL.md` の旧 archive 記述も整理した。QG-3 で no-deviation を判定
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（本PRはドキュメント整理のみ。REQ/ADR/SPEC 変更なし）。検出強化候補の記録のみ
+- **横展開観点**: REQ 廃止、SPEC 廃止、ADR supersede のいずれかが発生した場合、当該要件/仕様/決定を由来とする SKILL/ command/ guide/ README 記述が孤儿化する同種の documentation drift が発生し得る。特に「運用ルール」「ライフサイクル」「配置先」等の記述は、由来 REQ/ SPEC の廃止後に陳腐化しやすく、かつ機械的検出が困難
+- **再発条件**: (1) REQ/ SPEC/ ADR が廃止・supersede され、(2) 当該由来の記述が SKILL/ command/ guide 本文に埋め込まれており、(3) 廃止時の横断クリーンアップが実行されない場合
+- **予防策候補**: (1) `inspect-skills`/`inspect-docs` の検出観点に「廃止 REQ/ SPEC 由来の記述残置」カテゴリを追加し、retired/ 化された REQ/ SPEC への言及を SKILL/ command/ guide 本文から横断検索する。(2) REQ/ SPEC 廃止手順（req-save/ spec-save または専用コマンド）に、下流 SKILL/ command/ guide 記述のクリーンアップステップを組み込む。(3) 学習サイクルで本パターンの検出精度を向上させる
+- **想定反映先**: inspect-skills skill（検出観点追加候補）、inspect-docs skill（検出観点追加候補）、REQ/ SPEC 廃止手順（横断クリーンアップステップ）
+- **関連**: Issue #1414, PR #1415 Findings セクション, TS-005 (3), REQ-0023（廃止済み）, backlog-artifact-lifecycle SPEC, capture-boundaries SPEC
+- **タグ**: `#documentation-drift` `#inspect-skills` `#inspect-docs` `#req-retirement` `#orphaned-skill-section`
