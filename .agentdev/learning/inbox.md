@@ -56,3 +56,21 @@
 - **想定反映先**: case-open（受け入れ基準の検査可能性明示）、QG-2（acceptance criteria coverage に検査カバレッジ観点追加を検討）、agentdev-quality-gates skill（達成報告の表現ガイドライン）
 - **関連**: Epic #1403, Wave 1 (#1404/#1405), Wave 2 (#1406), Wave 3 (#1407/PR#1411), check_extensions.ts 検査 #9/#10, check_distribution_boundary.ts
 - **タグ**: `#wave-coverage` `#acceptance-criteria` `#partial-achievement` `#qg-2`
+
+---
+
+## case-open の完了条件に実測値（件数等）を記載する際に実ファイル確認を省略すると事実誤認が混入する
+
+- **問題事象**: Issue #1412 AG-004 pass criteria「learning entry（8件）が保持されていること」は事実誤認で、実際の `.agentdev/learning/deferred.md`（旧 `archive/active.md`）には17件の学びエントリが存在した（H2 セクション20件からメタセクション3件を除いた値）。本 PR では `git mv` で全学びエントリを完全保持したため、「learning entry が保持されていること」という本質的 pass criteria は満たした
+- **発生局面**: case-close（QG-4 完了条件チェックボックス評価時、PR 本文 Findings の記録内容から発覚）
+- **検知方法**: case-run 実装担当者が AG-004 検証時に実ファイルのエントリ数をカウントし、Issue 本文の「8件」と乖離していることを PR 本文 Findings に記録。case-close QG-4 で当該 Findings を確認
+- **根本原因**: case-open 完了条件記載時に `.agentdev/learning/archive/active.md` の実エントリ数を実測せず、推定値（8件）を記載した。完了条件に件数等の実測値を含めた場合、実ファイル確認を前置する手順が存在しなかった
+- **自律対応内容**: 本 PR では `git mv` で全学びエントリを完全保持し、本質的 pass criteria「learning entry が保持されていること」を満たす形で実装。case-close QG-4 で AG-004 を pass 判定し、PR 本文 Findings に事実誤認（spec-bug 分類）を記録。Issue 本文の「8件」は CLOSED 済みのため修正せず、Findings 記録で処理
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（プロセス改善候補の記録のみ）。REQ/ADR/SPEC 本文の数値記載ではなく、Issue 完了条件の記載精度の問題
+- **横展開観点**: case-open で件数・行数・サイズ等の実測値を完了条件・pass criteria に記載する場合全般に同様のリスクがある。特にドメイン状態（`.agentdev/**`）の集計値や、仕様書の節数、コードの行数等を記載する場合。推定値が記載されると case-run 実装担当者が実測値と照合できず、QG-3/QG-4 でspec-bug として処理する手戻りが生じる
+- **再発条件**: case-open が完了条件に実測値（件数、行数、サイズ等）を含め、かつ実ファイル確認を省略して推定値を記載した場合
+- **予防策候補**: (1) case-open の完了条件記載時に件数・行数等の実測値を要求する場合、実ファイル確認を必須化する。(2) 完了条件には「実測値」ではなく「性質」（例: learning entry が保持されていること）を記載し、実測値は pass criteria の検証時に測る運用にする。(3) case-open の test strategy verification に「実測値を含む場合、当該ファイルの実測を行う」ステップを追加する
+- **想定反映先**: case-open command 手順（完了条件記載ガイドライン）、agentdev-issue-management skill（実測値記載時の実ファイル確認必須化）、または case-open test strategy テンプレート
+- **関連**: Issue #1412 AG-004, PR #1413 Findings セクション, QG-4 no-deviation 判定
+- **タグ**: `#case-open` `#acceptance-criteria` `#actual-count` `#qg-4`
