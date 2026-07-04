@@ -385,48 +385,5 @@ promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/re
 
 - `case-run` への直接受け渡しは禁止（`backlog-review` → `req-define` を経由すること）
 
-## 取り込み済みスタブの archive ルール
-
-取り込み済み採用済み成果物の archive ルール。
-`case-close` が本 skill を load して実行する。
-
-### 対象
-
-- `.agentdev/learning/promoted/*.md`（learning-promote が生成した採用済み成果物）
-- imported と判定された成果物のみ（機械的4条件全充足）。不採用成果物は対象外
-
-### imported 判定基準
-
-以下の4条件が全て充足された場合に imported と判定する。
-意味的一致検証は実行しない。
-
-1. Issue に stub パスが記録されている
-2. 対応 PR がマージ済み
-3. Issue が completed としてクローズされる
-4. GitHub完了処理成功後、archive処理に入った時点で imported と判定する
-
-### Archive 先
-
-- `.agentdev/learning/promoted/archive/`
-
-### Archive 処理手順
-
-1. 成果物本文の末尾に `## 取り込み記録` セクションを追記:
- ```markdown
- ## 取り込み記録
-
- - **Issue**: #{N}
- - **PR**: #{M}
- - **取り込み日**: YYYY-MM-DD
- - **処理**: case-close
- ```
-2. `promoted/archive/` ディレクトリに移動
-3. 同名ファイル既存時は上書きしない（警告のみ）
-
-### 対象外
-
-- 不採用 stub（rejected/ duplicate 処分の stub）
-- imported と判定されなかった成果物
-- 成果物パスが Issue に記録されていない場合
 
 
