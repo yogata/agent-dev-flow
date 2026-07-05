@@ -122,6 +122,7 @@ OPTIONS:
   --classification  Enable document classification policy checks (REQ-0108-196)
   --root <path>     Explicit repository root (REQ-0145-014: worktree/CI support)
   --update-ir055-baseline  Regenerate IR-055 baseline file from current violations
+  --update-ng-baseline     Regenerate NG baseline file from current NG set (REQ-0161-005)
 
 EXIT CODES:
   0  No issues found
