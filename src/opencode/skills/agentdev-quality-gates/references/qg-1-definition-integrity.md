@@ -81,16 +81,16 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 
 ### 9. auto_gate完全性
 
-要件doc draft の `auto_gate` フィールドが、req-define の完了条件として妥当に設定されているか（REQ-0102-070, REQ-0102-071）。
+要件doc draft の `auto_gate` フィールドが、req-define の完了条件として妥当に設定されているか（REQ, REQ）。
 `auto_ready:false` の場合は `stop_reasons` が記録され、かつユーザー承認（合意による解消、または明示的な false 選択）が得られているか。
 
 - **fail**: `auto_gate` フィールドが不在、または `auto_ready:false` で `stop_reasons` が空。
 - **warn**: `auto_ready:false` で `stop_reasons` が記載されているが、ユーザー承認（合意による解消、または明示的 false 選択の `conflict_resolutions` 記録）が未確認。
 - **pass**: `auto_ready:true`、または `auto_ready:false` で `stop_reasons` がユーザー承認済み（`conflict_resolutions` 記録済み）。
 
-### 10. test_strategy 3要素完全性（REQ-0102-077）
+### 10. test_strategy 3要素完全性（REQ）
 
-要件doc draft の `test_strategy` セクションに含まれる各項目が、verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持しているか（REQ-0102-074, REQ-0102-075, REQ-0102-076）。
+要件doc draft の `test_strategy` セクションに含まれる各項目が、verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持しているか（REQ, REQ, REQ）。
 
 - **fail**: test strategy 項目のいずれかが3要素のいずれかを欠落している。on_failure（不合格時の処置）を持たない検証項目が test_strategy に含まれている。
 - **pass**: `test_strategy` セクションが不在（test strategy を定義しない要件）、または全項目が3要素を完全に保持している。

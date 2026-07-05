@@ -6,14 +6,14 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 # Epic 状態追跡（Epic Status Tracker）
 
 親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベース。
-`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR-0125 単一書き手制約、epic-wave-model SPEC 参照）。
+`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR 単一書き手制約、epic-wave-model SPEC 参照）。
 
 - **参照元**: `case-close`（completed/ blocked/ failed 更新、単一書き手）。`case-auto`、`case-run` は Epic Issue 本文を読み取るのみで書き込まない
 - **`⏭スキップ` は採用しない**。前提未達の Issue は `pending` のまま選択対象外となる。Wave status は保存せず、Wave 内 Issue 状態から導出する
 
 ## skill extension 参照方針
 
-本スキルは以下の方針に従う（ADR-0135）。
+本スキルは以下の方針に従う（ADR）。
 
 1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-epic-tracker.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
@@ -36,7 +36,7 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 Epic自動クローズ判定では `completed` を終了状態として扱う（`blocked`/ `failed` は終了状態だが自動クローズ完了とはみなさない）。
 
 **永続状態遷移**: Epic Issue 本文（永続状態）に書き込まれるのは `pending` → `completed`/ `blocked`/ `failed` の遷移のみ。
-`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない（ADR-0125 単一書き手制約、case-close のみが書き込み）。
+`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない（ADR 単一書き手制約、case-close のみが書き込み）。
 
 ## 親Epic検出
 
@@ -50,7 +50,7 @@ Epic自動クローズ判定では `completed` を終了状態として扱う（
 ### case-close: completed/ blocked/ failed 更新（単一書き手）
 
 `case-close(#epic)` 完了時に子Issue を `pending` → `completed`/ `blocked`/ `failed` に更新する。
-case-close は Epic Issue 本文ステータス追跡テーブルの単一書き手（ADR-0125）。
+case-close は Epic Issue 本文ステータス追跡テーブルの単一書き手（ADR）。
 `ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれないため、本プロトコルの対象は `pending` → 終了状態（`completed`/ `blocked`/ `failed`）の遷移のみ:
 
 1. 子Issue本文から `Parent: #{N}` を検出
@@ -158,7 +158,7 @@ Epic Issue 本文（永続状態）に書き込まれるステータス値は `p
 
 #### 1. PR merge前後のEpic状態遷移
 
-Epic Issue 本文（永続状態）の書き込みは case-close(#epic) のみが行う（単一書き手、ADR-0125）。
+Epic Issue 本文（永続状態）の書き込みは case-close(#epic) のみが行う（単一書き手、ADR）。
 `ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文には書き込まれない。
 
 **case-run(#epic) 実行中（merge前、Epic Issue 本文不変）**:
@@ -213,7 +213,7 @@ case-close(#epic) が実行結果として失敗を確定した場合のみ `fai
 
 #### 3. Epic本文のconflictリスク
 
-Epic Issue 本文の書き込みは case-close(#epic) が単一書き手（ADR-0125）であるため、サブエージェント間の同時書き込みConflictは発生しない。残るConflictリスクは case-close(#epic) 書き込みと手動編集の競合のみ:
+Epic Issue 本文の書き込みは case-close(#epic) が単一書き手（ADR）であるため、サブエージェント間の同時書き込みConflictは発生しない。残るConflictリスクは case-close(#epic) 書き込みと手動編集の競合のみ:
 
 **conflictリスク**:
 - case-close(#epic) の Epic 本文更新と手動編集の競合

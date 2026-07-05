@@ -1,7 +1,7 @@
 # 標準版実装手順（GitHub 版）
 
-`agentdev-gh-cli` の各手続きの標準版（GitHub 版）実装手順（REQ-0149-003）。
-ローカル版は本ファイルを差し替え、同一手続き名で Case ファイルの読み書きへ読み替える（REQ-0150, ADR-0130 decision #4, #5）。
+`agentdev-gh-cli` の各手続きの標準版（GitHub 版）実装手順（REQ）。
+ローカル版は本ファイルを差し替え、同一手続き名で Case ファイルの読み書きへ読み替える（REQ, ADR decision #4, #5）。
 
 操作契約（手続き名、引数、戻り値）は [contracts.md](contracts.md) 参照。
 
@@ -10,7 +10,7 @@
 - `--body-file`/ `-F` によるファイル指定を全環境で使用する（`--body` 直接指定は禁止）
 - 書き込み後の VERIFY 操作（[verify.md](verify.md)）を全環境で実行する
 - 保存形式は **UTF-8 (BOMなし)**、改行コード **LF** とする
-- **Windows 環境での WRITE 手続きはコンソールエンコーディング初期化（Section 2 Step 0）を必須前置する（REQ-0149-009）**: 全 WRITE 手続き（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成、PR merge、Issue close 等）は Section 2 の標準手順に従い、Step 0 を経由してコンソールエンコーディング初期化の恩恵を受ける。Linux/ macOS/ WSL 等の Windows 以外の環境では既定で UTF-8 コンソールのため実行不要
+- **Windows 環境での WRITE 手続きはコンソールエンコーディング初期化（Section 2 Step 0）を必須前置する（REQ）**: 全 WRITE 手続き（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成、PR merge、Issue close 等）は Section 2 の標準手順に従い、Step 0 を経由してコンソールエンコーディング初期化の恩恵を受ける。Linux/ macOS/ WSL 等の Windows 以外の環境では既定で UTF-8 コンソールのため実行不要
 
 ## Windows 固有の制約
 
@@ -41,7 +41,7 @@
 
 ### 2. 標準手順
 
-0. **コンソールエンコーディング初期化（Windows 環境では必須、Windows 以外では不要）**: Windows PowerShell/ pwsh 環境では、`gh` の WRITE 操作（`--body-file`/ `--title` 等）を実行する前に、現在のセッションで以下の 3 行を実行してコンソールエンコーディングを UTF-8 に初期化すること（REQ-0149-009）:
+0. **コンソールエンコーディング初期化（Windows 環境では必須、Windows 以外では不要）**: Windows PowerShell/ pwsh 環境では、`gh` の WRITE 操作（`--body-file`/ `--title` 等）を実行する前に、現在のセッションで以下の 3 行を実行してコンソールエンコーディングを UTF-8 に初期化すること（REQ）:
  ```powershell
  [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
  $OutputEncoding = [System.Text.Encoding]::UTF8
@@ -215,7 +215,7 @@ gh pr merge {N} --{merge_method}
 `{merge_method}` は `squash`、`merge`、`rebase` のいずれか。
 merge 前に `git rev-parse HEAD` で HEAD commit hash を記録する。
 Merge Conflict 発生時は後述「Merge Conflict 対応パターン」に従う。
-**`--delete-branch` 非推奨**: `gh pr merge` で `--delete-branch` オプションを使用しない。アクティブ worktree に checkout されたブランチで `--delete-branch` を使用すると local 削除が失敗し remote 削除フェーズへ到達しない。ブランチ削除は case-close Step 7 で独立実施する（REQ-0146-003）。
+**`--delete-branch` 非推奨**: `gh pr merge` で `--delete-branch` オプションを使用しない。アクティブ worktree に checkout されたブランチで `--delete-branch` を使用すると local 削除が失敗し remote 削除フェーズへ到達しない。ブランチ削除は case-close Step 7 で独立実施する（REQ）。
 
 ### Issue close
 

@@ -102,7 +102,7 @@ case-run が Sisyphus-Junior を起動する際の委譲プロンプト構築例
 - `<worktree>`: case-run が用意した worktree root とブランチ名を明示。メインリポジトリパスは含めない
 - `<Issue body>`: 対象 Issue の本文。Sisyphus-Junior は完了条件、受け入れ基準を success criteria に分解する
 
-## 委譲プロンプト雛形（委譲契約必須テンプレート、REQ-0146-002）
+## 委譲プロンプト雛形（委譲契約必須テンプレート、REQ）
 
 委譲プロンプトには以下の「## Findings / Capture候補」テンプレートを必須として含めること。
 Sisyphus-Junior が本筋外発見を分類、回収するための構造を提供する。

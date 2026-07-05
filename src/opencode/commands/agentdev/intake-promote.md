@@ -13,7 +13,7 @@ agent: sisyphus
 
 ## project extensions
 
-本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/intake-promote.yaml`）を読み込む（ADR-0135）。
+本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/intake-promote.yaml`）を読み込む（ADR）。
 
 - extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
 - extension が存在しない場合は標準動作で続行する
@@ -73,11 +73,11 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### Step 5: ユーザー確認
 
-評価、分類結果をユーザーに提示し、明示的な承認を得る（判断の確定、REQ-0147-003）。
+評価、分類結果をユーザーに提示し、明示的な承認を得る（判断の確定、REQ）。
 詳細は `agentdev-intake-pipeline` を参照。
 委譲接続点: 親エージェントのみが承認確認と次フェーズ進行判断を行う
 
-**分類承認後の自動実行（REQ-0147-008）**: Step 5 で分類が確定（採用/保留/却下のいずれか）した場合、Step 6〜10（採用 item 整形 / promoted 保存 / inbox 削除 / git pull / commit-push）は追加確認なしで自動実行する。
+**分類承認後の自動実行（REQ）**: Step 5 で分類が確定（採用/保留/却下のいずれか）した場合、Step 6〜10（採用 item 整形 / promoted 保存 / inbox 削除 / git pull / commit-push）は追加確認なしで自動実行する。
 分類未確定、修正中の場合は進まない。
 
 ### Step 6: 採用 item の整形
@@ -106,7 +106,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### Step 10: .agentdev/intake 変更の commit と push
 
-`.agentdev/intake/` 配下の変更のみを commit/push する（分類承認後の自動実行、REQ-0147-008）。
+`.agentdev/intake/` 配下の変更のみを commit/push する（分類承認後の自動実行、REQ）。
 詳細は `agentdev-intake-pipeline` を参照。
 委譲接続点: 親エージェントのみが commit/push を行う
 
@@ -137,10 +137,10 @@ template: .opencode/commands/agentdev/templates/intake-promote/standard.md。
 ### HITL 制約
 - G06: ユーザーの明示的な承認なしに採用済み成果物を生成してはならない
 - G07: 分類結果は必ずユーザーに提示し、確認、修正の機会を与えること
-- G08: 分類未確定のままの自動確定、自動進行は行わない（REQ-0147-003）。ユーザーが「確定」を明示的に指示してから次フェーズに進む。確定後の自動進行は REQ-0147-008 で許容される。
+- G08: 分類未確定のままの自動確定、自動進行は行わない（REQ）。ユーザーが「確定」を明示的に指示してから次フェーズに進む。確定後の自動進行は REQ で許容される。
 
 ### 破壊的変更制約
-- G18: 破壊的変更（inbox 大量削除、重要 item の誤分類是正等）は Step 5 承認とは別に明示承認を維持する（REQ-0147-005）
+- G18: 破壊的変更（inbox 大量削除、重要 item の誤分類是正等）は Step 5 承認とは別に明示承認を維持する（REQ）
 
 ### 形式制約
 - G09: workflow 管理成果物として扱わない

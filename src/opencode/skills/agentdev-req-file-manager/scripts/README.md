@@ -1,6 +1,6 @@
 # `agentdev-req-file-manager` scripts
 
-REQ/ADR/SPEC ファイル管理の決定的処理スクリプト群（REQ-0103-159/160、AG-002/006、design-principles.md 第5節）。
+REQ/ADR/SPEC ファイル管理の決定的処理スクリプト群（REQ/160、AG-002/006、design-principles.md 第5節）。
 
 ## 構成
 
@@ -24,7 +24,7 @@ scripts/
     └── *.test.ts                    # 各スクリプトの core 純粋関数テスト
 ```
 
-## I/O 契約（REQ-0103-160）
+## I/O 契約（REQ）
 
 - 入力: argv（ファイル/ディレクトリパス）または stdin（JSON）
 - 出力: stdout に JSON

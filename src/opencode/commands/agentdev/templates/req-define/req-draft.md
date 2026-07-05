@@ -95,7 +95,7 @@ operation_units:
     result: {}                  # req-save / spec-save / case-open が書き戻す。req-define は空を出力
 
 # test_strategy: 各合意項目（AG-*）の検証方法。各項目は3要素（verification / pass_criteria / on_failure）を必須とする
-# on_failure（不合格時の処置）を持たない検証項目は test_strategy に含めないこと（REQ-0102-075）
+# on_failure（不合格時の処置）を持たない検証項目は test_strategy に含めないこと（REQ）
 # 項目識別子: TS-NNN 形式（NNNは3桁ゼロ埋め連番）
 # on_failure アクション種別: fix-and-reverify（実装を修正して再検証）/ record-in-findings（Findings に out-of-scope として記録）
 test_strategy:

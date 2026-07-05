@@ -25,7 +25,7 @@ agent: sisyphus
 
 ## project extensions
 
-本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/backlog-review.yaml`）を読み込む（ADR-0135）。
+本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/backlog-review.yaml`）を読み込む（ADR）。
 
 - extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
 - extension が存在しない場合は標準動作で続行する
@@ -43,7 +43,7 @@ generated_by: backlog-review
 generated_at: {ISO 8601 timestamp}
 status: draft
   depends_on: [RU-{NNNN}] (optional)
-  tentative_classification: {REQ | 挙動SPEC | カタログSPEC | guide | learning維持 | 作業記録 | 対象外} (REQ-0155-004)
+  tentative_classification: {REQ | 挙動SPEC | カタログSPEC | guide | learning維持 | 作業記録 | 対象外} (REQ)
   sources:
   - path: {.agentdev/intake/promoted/xxx.md | .agentdev/learning/promoted/xxx.md | .agentdev/inspect/promoted/xxx.md}
     type: {intake | learning | inspect}
@@ -92,7 +92,7 @@ status: draft
 
 分析基準、前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` を参照
 
-**暫定分類付与（REQ-0155-004）**: 各 RU 候補について、document-model SPEC（extension 経由）の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。
+**暫定分類付与（REQ）**: 各 RU 候補について、document-model SPEC（extension 経由）の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する。
 暫定分類は後続 `/agentdev/req-define` の Step 5-2 で最終確定される候補であり、本コマンドが確定しない。
 分析結果と併せて RU frontmatter に `tentative_classification` として記録する。
 
@@ -100,14 +100,14 @@ status: draft
 
 統合、分割判定基準、depends_on 依存解決ルールは `agentdev-backlog-integration` を参照
 
-**矛盾なしの場合の単一承認（REQ-0147-009）**: 後続の Step 5 で矛盾が検出されない場合、本 Step 4 の統合、分割判定承認を RU 生成承認（Step 5/6）としても扱う。
+**矛盾なしの場合の単一承認（REQ）**: 後続の Step 5 で矛盾が検出されない場合、本 Step 4 の統合、分割判定承認を RU 生成承認（Step 5/6）としても扱う。
 単一承認で処理し、追加の HITL は不要。
 
 ### Step 5: 矛盾検出 + 必要に応じて追加判断
 
 矛盾検出ロジック、出力形式は `agentdev-backlog-integration` を参照
 
-**矛盾検出時の追加判断（REQ-0147-009）**: 矛盾が検出された場合のみ、ユーザーに追加判断を求める。
+**矛盾検出時の追加判断（REQ）**: 矛盾が検出された場合のみ、ユーザーに追加判断を求める。
 矛盾する artifact を RU 化せずユーザーに確認する。
 矛盾しない artifact は通常通り RU 化する（partial success）。
 自動解決しない（G05）
@@ -155,7 +155,7 @@ RU 生成結果、git 永続化結果を含める。次のコマンド: `/agentd
 - G05: 矛盾検出時はユーザーの指示を待ち、自動的に解決しない
 - G06: RU 生成に失敗した成果物は削除しない
 - G07: depends_on に採用済み成果物パスを指定しない。RU-ID のみ許容
-- G08: 破壊的変更（矛盾解消、要件仕様スコープ変更、大量成果物削除等）は明示承認を維持する（REQ-0147-005）
+- G08: 破壊的変更（矛盾解消、要件仕様スコープ変更、大量成果物削除等）は明示承認を維持する（REQ）
 
 
 
