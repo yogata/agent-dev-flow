@@ -142,10 +142,10 @@ agentskills.ioのde facto標準。
 `WHEN:` も可（Microsoft sensei形式）。
 
 ```yaml
-# Good — トリガー明示付き
+# Good：トリガー明示付き
 description: Manages git worktree creation, switching, and cleanup based on branch names. USE FOR: creating worktrees, switching between branches, cleaning up completed worktrees. DO NOT USE FOR: basic git operations like commit/push/pull.
 
-# Bad — 曖昧で選択精度が低い
+# Bad：曖昧で選択精度が低い
 description: Helps with documents
 ```
 
