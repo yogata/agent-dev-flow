@@ -2,7 +2,7 @@
 title: case-close SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-07-03
+updated: 2026-07-05
 ---
 
 # case-close SPEC
@@ -93,7 +93,7 @@ case-run / Sisyphus-Junior / 外部実行バックエンドは完了条件チェ
 case-close 工程で targeted docs guard を実行する。対象は PR で変更されたファイルと連動ファイル（`docs/DOC-MAP.md`、`docs/README.md`、`docs/specs/README.md`）。
 
 - 実行タイミング: Step 3（docs/ 検証）の一部。変更ファイル対象の targeted docs guard を実行し、draft→accepted 等の SPEC status 変更時の `docs/specs/README.md` 同期、Issue/PR で宣言した文書更新対象と実変更ファイルの対応、旧SPEC直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、full docs-check 実行要否判定を行う
-- 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-close --base-ref <merge-base-ref> --json`
+- 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`。PR 変更ファイル一覧は PR 補助データ読込手続き（`agentdev-gh-cli`）で `gh pr view <PR> --json files` から取得する（case-close はマージ後 main 環境で実行されるため `--files` を使用。`--base-ref` は worktree 環境（マージ前、case-run 等）向け）
 - `full_docs_check_recommended` が true の場合: case-close 完了判定の追加確認として扱う。integrity rule 追加・削除・大幅変更、DOC-MAP 構造変更、docs/specs の大規模移動・改名、repo-agentdev-integrity の検査スコープ変更、文書分類・責務境界の基準変更を検出した場合は `/repo/docs-check`（全体監査）の実行を推奨する
 - 失敗時: 検査対象文書（PR 変更ファイル、`docs/DOC-MAP.md`、`docs/specs/README.md`、`docs/README.md`）を修正して再実行する
 
