@@ -2,7 +2,7 @@
 title: spec-save SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-25
+updated: 2026-07-05
 ---
 
 # spec-save SPEC
@@ -88,6 +88,16 @@ SPEC 保存工程で targeted docs guard を実行する。対象は保存工程
 - 失敗時: 検査対象文書（SPEC ファイル、`docs/specs/README.md`、`docs/DOC-MAP.md`）を修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行を検討する
 
 JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。`failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
+
+### spec-save が使用する検査ツール
+
+spec-save が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
+
+- check_changed_docs.ts（--workflow spec-save、SPEC files 変更時）: SPEC 保存工程で実行（[targeted docs guard (REQ-0158-003)](#targeted-docs-guard-req-0158-003) 参照）
+
+spec-save は check_integrity.ts（全体監査）を使用しない（保存工程は変更ファイル限定の targeted 検査が責務。全体監査は /repo/docs-check の責務）。
+
+※肯定表現のみ（REQ-0144-002, REQ-0144-003 準拠）。
 
 ## 対象外
 

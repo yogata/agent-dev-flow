@@ -1,5 +1,6 @@
 ---
 status: accepted
+updated: 2026-07-05
 ---
 
 # 整合性契約
@@ -231,3 +232,27 @@ docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PAT
 | 新規ルール追加 | 新規 IR エントリを `baseline_status: new` で追加 | 実装追加 |
 
 docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象）、対象ファイル設計（`.md` のみ、正当使用例外）、NG ルール間依存関係マップの詳細は [integrity-rule-catalog.md](integrity-rule-catalog.md) 参照。
+
+## Workflow × 使用ツールマトリックス
+
+本セクションは全 workflow の使用検査ツールを肯定表現で一元管理する SSoT であり、各 workflow SPEC から参照される。
+
+| workflow | check_changed_docs.ts | check_extensions.ts | check_integrity.ts | test_strategy |
+|---|---|---|---|---|
+| req-save | ✓（REQ files） | — | — | — |
+| spec-save | ✓（SPEC files） | — | — | — |
+| case-open | — | — | — | — |
+| case-run | ✓（docs/** 変更時、--workflow case-run） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（Issue 完了条件検証） |
+| case-close | ✓（PR files、--workflow case-close） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（QG-4 完了条件確認） |
+| req-define | — | — | ✓（全体監査、検証手順） | — |
+| /repo/docs-check | ✓ | ✓ | ✓（全体監査） | — |
+
+全セル肯定表現（✓ または —）を使用する（REQ-0144-002, REQ-0144-003 準拠）。check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、他 workflow は — で「使用しない」を暗黙表現する。
+
+参照元 workflow SPEC 一覧（各 SPEC から本マトリックス表を参照）:
+
+- [commands/req-save.md](../commands/req-save.md)
+- [commands/spec-save.md](../commands/spec-save.md)
+- [commands/case-open.md](../commands/case-open.md)
+- [commands/case-run.md](../commands/case-run.md)
+- [commands/case-close.md](../commands/case-close.md)

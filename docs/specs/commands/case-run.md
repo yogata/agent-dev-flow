@@ -155,6 +155,18 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
 - [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic Wave 実行モデル、子Issue 状態 enum）
 - [quality-gates.md](../quality/quality-gates.md)（QG-3（Sisyphus-Junior 責務））
 
+### case-run が使用する検査ツール
+
+case-run が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
+
+- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、Step 6 委譲前に実行（AG-002。[docs/** 変更時の targeted docs guard（REQ-0130-035）](#docs-変更時の-targeted-docs-guardreq-0130-035) 参照）
+- check_extensions.ts（IR-056）: `src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/SKILL.md`, `src/opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
+- test_strategy: Issue 完了条件検証（REQ-0130-029/030）
+
+case-run は check_integrity.ts（全体監査）を使用しない（case-run は worktree で実行、PR 単位の targeted 検査が責務。全体監査は /repo/docs-check の責務）。
+
+※上記は全て肯定表現である（REQ-0144-002, REQ-0144-003 準拠）。
+
 ## 対象外
 
 - 壁打ち（G01、構造的実行フェーズ、実装は Sisyphus-Junior 経由）

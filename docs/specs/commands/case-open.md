@@ -97,6 +97,14 @@ case-open は Issue 本文の完了条件・事前状態セクションの記載
 - [quality-gates.md](../quality/quality-gates.md)（QG-2）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（Issue 本文品質検査）
 
+### case-open が使用する検査ツール
+
+case-open が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
+
+- なし（case-open は GitHub Issue 作成を責務とし、docs 整合性検査・extensions 検査を実行しない。検査は後続工程の req-save/spec-save/case-run/case-close で実施）
+
+※肯定表現のみ（REQ-0144-002, REQ-0144-003 準拠）。
+
 ## 対象外
 
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（G19、REQ-0132-009）

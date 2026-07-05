@@ -434,7 +434,56 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_reqs: []
+      saved_specs:
+        - docs/specs/integrity/integrity-contracts.md
+        - docs/specs/commands/case-run.md
+        - docs/specs/commands/case-close.md
+        - docs/specs/commands/req-save.md
+        - docs/specs/commands/spec-save.md
+        - docs/specs/commands/case-open.md
+      req_operations: []
+      spec_operations:
+        - spec: docs/specs/integrity/integrity-contracts.md
+          operation: spec-update
+          source_items: [AG-005]
+          target_area: "## Workflow × 使用ツールマトリックス"
+          target_area_status: not_found
+          applied_as: new_section_appended
+        - spec: docs/specs/commands/case-run.md
+          operation: spec-update
+          source_items: [AG-006, AG-007]
+          target_area: "## 対象外"
+          target_area_status: found
+          applied_as: new_subsection_inserted_before_target_area
+        - spec: docs/specs/commands/case-close.md
+          operation: spec-update
+          source_items: [AG-006, AG-007]
+          target_area: "## 対象外"
+          target_area_status: found
+          applied_as: new_subsection_inserted_before_target_area
+        - spec: docs/specs/commands/req-save.md
+          operation: spec-update
+          source_items: [AG-006]
+          target_area: "## 対象外"
+          target_area_status: found
+          applied_as: new_subsection_inserted_before_target_area
+        - spec: docs/specs/commands/spec-save.md
+          operation: spec-update
+          source_items: [AG-006]
+          target_area: "## 対象外"
+          target_area_status: found
+          applied_as: new_subsection_inserted_before_target_area
+        - spec: docs/specs/commands/case-open.md
+          operation: spec-update
+          source_items: [AG-006]
+          target_area: "## 対象外"
+          target_area_status: found
+          applied_as: new_subsection_inserted_before_target_area
+      adr_created: false
+      targeted_docs_guard: pass
+      committed: pending
 
 test_strategy:
   - id: TS-001
