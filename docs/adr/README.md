@@ -182,6 +182,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0131 | supersedes | ADR-0126 | ローカル版導入方式の link mode 統一と生成方式廃止 |
 | ADR-0131 | relates-to | ADR-0105 | source/projection 分離の link mode 適用 |
 | ADR-0131 | relates-to | ADR-0130 | I/O 境界確立を前提とした link mode 統一 |
+| ADR-0132 | relates-to | ADR-0129 | ADR-0129 が受容したコンフリクトコストの解決メカニズムを定義 |
 | ADR-0132 | relates-to | ADR-0128 | case-run の再委譲は既存の task() 委譲モデルを使用 |
 | ADR-0134 | relates-to | ADR-0105 | 配布物依存スキルの src 昇格は source/projection 分離における配布物自己完結性の具体化 |
 | ADR-0135 | relates-to | ADR-0104 | 実行時独立性の具体化機構を提供（project-extensions 機構） |
