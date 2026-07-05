@@ -68,3 +68,18 @@
 - **想定反映先**: `mechanical-replacement-rules.md` section 2（適用実例の追記候補）、docs_chore 運用
 - **関連**: Issue #1434, PR #1435, RU-0022, PR #1122（X-2 follow-up 元）
 - **タグ**: `#docs-chore` `#em-dash` `#文脈判定` `#mechanical-replacement-rules`
+## inspect-docs スナップショットが case-open 時点で先行 PR により陳腐化している（cross-case）
+
+- **問題事象**: Epic #1436（inspect-docs findings 是正）の case-run（PR #1439, #1440）で、Step 5-3 QG-3 前置 staleness check が両子Issue の完了条件が既に満たされていることを検出。Issue 本文記載の対象件数（#1437: runtime-package-boundary.md の「将来」「plugin-future」2件、#1438: IR-025〜051 の「(追加予定)」21件以上）が現行リポジトリ状態（両方 0件）と乖離。PR は検証記録として empty commit で作成された。
+- **発生局面**: case-run（Step 5-3 QG-3 前置 staleness check）/ docs_chore
+- **検知方法**: case-run Step 5-3 QG-3 前置 staleness check で Issue 本文の参照件数と現行 grep 結果を比較。両 PR の Findings / Capture候補 セクションに stale-reference として記録。
+- **根本原因**: Epic #1436 の case-open 実行時点（inspect-docs 再実行結果を入力とした RU-0027）より前に、別 Epic 由来の先行 PR が該当 findings を解決済み。#1437 は 5a1c965a/8ebe0e98（2026-06-26）、#1438 は 0b6e6428（2026-06-26「IR 表記統一」）。inspect-docs スナップショットがこれら先行マージを取り込んでおらず、case-open が旧状態の件数を子Issue 本文の「参考」として記載した。
+- **自律対応内容**: 両子Issue とも verify-only empty commit PR で完了条件充足を検証記録として残し、QG-3 no-deviation でマージ。Issue 本文「参考」の件数記載の陳腐化は cosmetic（完了条件自体は「語が存在せず」で客観的に充足）と判断し case-update では修正せず、本 learning に記録。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（運用知見。case-run Step 5-3 QG-3 前置 staleness check が既に機能し、cross-case 陳腐化も検出済み。REQ-0130-031 運用準拠）
+- **横展開観点**: inspect-docs 由来の RU から case-open を起動する全ケースで、inspect-docs 実行時点から case-open 実行時点までの間に別 PR が対象ファイルを変更した場合に同様の陳腐化が発生する。特に docs_chore は実装規模が小さく先行解決されやすい。
+- **再発条件**: (1) inspect-docs 実行、(2) その後別ケースで検出対象が修正されマージ、(3) 元の inspect-docs 結果由来の RU から case-open 起動、(4) case-run Step 5-3 で staleness 検出。
+- **予防策候補**: (1) case-open 実行時に inspect-docs スナップショットの鮮度を再検証（対象ファイルの最終コミット日時 vs inspect-docs 実行日時）、(2) case-run Step 5-3 QG-3 staleness check の必須実行維持（現行運用で機能）、(3) Issue 本文「参考」件数は目安と明記し完了条件は grep 結果で客観評価する運用の徹底（現行 QG-3 で実現済み）。
+- **想定反映先**: case-open command（スナップショット鮮度再検証検討）、case-run Step 5-3（現行必須実行の運用維持）
+- **関連**: Epic #1436, Issue #1437, Issue #1438, PR #1439, PR #1440, 先行 PR 5a1c965a/8ebe0e98/0b6e6428, REQ-0130-031
+- **タグ**: #case-run #qg-3-staleness #inspect-docs #cross-case #verify-only
