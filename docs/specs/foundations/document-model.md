@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-03
+updated: 2026-07-05
 ---
 
 # 文書モデル
@@ -175,11 +175,13 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 |---|---|---|---|
 | `draft` | spec-save で保存された直後の未確定状態 | IR-044（REQ/SPEC 境界違反検出）等の対象外 | spec-save が新規 SPEC 作成時に付与（既定値） |
 | `accepted` | case-close で SPEC 確定チェック通過済み | すべての整合性ルールの検査対象 | case-close Step 3 で実装が SPEC 内容を検証したことを確認時 |
+| `superseded` | 後継 SPEC へ移行済み。frontmatter `superseded_by` で後継を明示 | docs-check/inspect-docs 検査対象外（`superseded_by` 存在で機械判定） | req-save/spec-save で後継 SPEC 作成時に付与 |
 
 - 新規 SPEC 作成（spec-save）時は `status: draft` を付与する
 - 既存 SPEC へ追記時は当該 SPEC の `status` を変更しない
 - `draft` → `accepted` の昇格は case-close の責務（spec-save は accepted を付与しない）
 - `status` フィールドがない既存 SPEC は `accepted` と同等に扱う（後方互換）
+- superseded SPEC は元位置に残置し `superseded_by` frontmatter で後継を明示する（`docs/specs/retired/` は新設しない）。superseded 宣言は req-save/spec-save で後継 SPEC 作成時に行う
 
 ## 適用範囲宣言
 
@@ -288,7 +290,7 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 |---|---|---|
 | REQ | created → active → superseded / partially superseded | APPEND/UPDATE で拡張。個別要件の supersede は mapping-table で追跡 |
 | ADR | proposed → accepted → superseded / deprecated | 承認済みのみ現行根拠。全面改訂時は新世代を創設（ADR-0001〜0023 → ADR-0101〜0112） |
-| SPEC | active（実装とともに進化） | SPEC は「現在仕様」の記録であり、REQ や ADR の意味での「廃止」状態を持たない |
+| SPEC | active → superseded（後継SPECへの移行表示） | SPEC は「現在仕様」の記録。後継SPECへの移行表示を frontmatter `superseded_by` で保持し、廃止状態を持たず元位置に残置する |
 | Guide | active → outdated → removed | 内容陳腐化時に移行。規範的権限なし |
 | Report | published → archived | 作成後の修正は事実確認の範囲に限定 |
 | DOC-MAP | always active | 更新のみ。廃止なし |

@@ -121,6 +121,28 @@ catalog はスキーマ定義とインデックスを維持する。
 - [IR-058: distribution-untracked-skill-reference（配布物参照の未トラックスキル検出）](rules/IR-058-distribution-untracked-skill-reference.md)
 - [IR-059: distribution-reference-boundary（配布物参照境界検出）](rules/IR-059-distribution-reference-boundary.md)
 
+### 新規 IR 候補（baseline_status: candidate）
+
+以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。REQ-0145-005 の新規 IR 追加フロー（6ステップ）に従い確定する。
+
+| Field | 値 |
+|-------|------|
+| rule_id | （確定前: retired-reference-residual） |
+| description | 廃止 REQ/SPEC 由来の SKILL/command/guide/docs 本文記述残置検出 |
+| severity | heuristic |
+| category | document-drift |
+| detection_method | retired REQ/SPEC ID リストをソースとした本文横断検索。活性 REQ/SPEC への言及は対象外。supersede 元への言及は文脈判定で finding 扱い |
+| affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**`, `docs/guides/**` |
+| related_req | REQ-0124, REQ-0125 |
+| related_spec | `docs/specs/foundations/document-model.md`（SPEC ライフサイクル superseded） |
+| gate_level | full-audit |
+| false_positive_risk | supersede 元への妥当な文脈参照。finding 扱いで人間確認を挟む |
+| regression_test | （未実装） |
+| baseline_status | candidate |
+| finding_route | intake / req-define |
+| triage_action | finding を inspect-promote で分類し、廃止 ID の参照先を現行後継文書へ更新する |
+| last_verified | （未検証） |
+
 | Level | Description | Trigger |
 |-------|-------------|---------|
 | full-audit | 全ルールを実行 | 定期実行、重大変更後 |
