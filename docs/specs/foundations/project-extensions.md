@@ -2,7 +2,7 @@
 title: Project Extensions
 status: draft
 created: 2026-07-04
-updated: 2026-07-04
+updated: 2026-07-05
 ---
 
 # Project Extensions
@@ -62,6 +62,8 @@ command/skill は実行時に自分に対応する extension だけを読む。
 - 対応 extension が破損している場合はエラーを表示し、当該 extension を無視して標準動作で続行する。
 - extension は標準 command/skill の上書きではなく、追加・拡張としてのみ扱う。
 
+対応 extension が存在しない command/skill は正常動作であり、異常状態ではない。command が project 非依存で単体動作する正当な状態である。例として /agentdev/inspect-extensions は SPEC 直接参照を持たず project 非依存で動作するため extension 不要である。
+
 ## project-local skill 委譲
 
 rules/checks は skill: に具体的な project-local skill 名を記述し、その skill に実行を委譲する。
@@ -115,6 +117,24 @@ agent-dev-flow リポジトリ自身は適用プロジェクトの1つとして 
 ## ハイブリッド方式
 
 extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は初期テンプレート、schema、検査、/agentdev/inspect-extensions コマンドを提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。AgentDevFlow 本体リポジトリの .agentdev/extensions/** には本体固有 SPEC パスを記述してよい。
+
+## 配布物参照境界の検知パターン
+
+配布 command/skill 本文に含まれる具体参照（ADR/REQ/SPEC の具体ID、具体パス、固定URL）を検知するパターンと exemption 条件を定義する。本パターンに基づく検出ルールは IR-059（distribution-reference-boundary）として整合性ルールカタログに登録する。
+
+### 検知対象
+
+- 具体ID: ADR-NNNN, REQ-NNNN (4桁数字), REQ-NNNN-NNN (サブ要件番号)。文書種別名としての ADR/REQ/SPEC は対象外。
+- 具体パス: `docs/(adr|requirements|specs)/<file>.md`。README.md は索引として許容。テンプレート表記 `{}`, `<>`, `*` は許容。
+- 固定URL: `github.com/<owner>/<repo>/(blob|raw)/`, `raw.githubusercontent.com/<owner>/<repo>/`。
+
+### exemption 条件
+
+テンプレートプレースホルダー（`{NNNN}`, `<NNNN>`, `<existing-spec>`, `<domain>`, `<command>`, `<spec>`, `<rule>`）を行内に含む場合は具体ID/具体パス検査をスキップする。
+
+### 是正方針
+
+配布物本文に具体参照を検出した場合、generic 表記（文書種別名や抽象的参照）への是正を原則とする。是正後の traceability は extension 経由で担保する。
 
 ## 関連
 

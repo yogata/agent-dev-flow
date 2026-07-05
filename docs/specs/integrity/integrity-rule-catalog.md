@@ -1,5 +1,5 @@
 ---
-updated: 2026-07-02
+updated: 2026-07-05
 status: accepted
 ---
 
@@ -119,6 +119,7 @@ catalog はスキーマ定義とインデックスを維持する。
 - [IR-056: project-extensions-integrity（extensions 機構の整合性検査）](rules/IR-056-project-extensions-integrity.md)
 - [IR-057: obsolete-spec-path-after-domain-split（旧SPEC直下パス参照検出）](rules/IR-057-obsolete-spec-path-after-domain-split.md)
 - [IR-058: distribution-untracked-skill-reference（配布物参照の未トラックスキル検出）](rules/IR-058-distribution-untracked-skill-reference.md)
+- [IR-059: distribution-reference-boundary（配布物参照境界検出）](rules/IR-059-distribution-reference-boundary.md)
 
 | Level | Description | Trigger |
 |-------|-------------|---------|
