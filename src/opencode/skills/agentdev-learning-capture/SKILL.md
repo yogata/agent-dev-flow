@@ -67,9 +67,9 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 学びの保存先：
 - `.agentdev/learning/inbox.md`（最新の学び。常にここに追加）
-- `.agentdev/learning/deferred.md`（過去の学び。`/agentdev/learning-promote` 実行時に移動）
 
-inbox.md、deferred.mdが存在しない場合、エージェントは当該ファイルを作成してから追記する。
+inbox.mdが存在しない場合、エージェントは当該ファイルを作成してから追記する。
+`deferred.md` は `/agentdev/learning-promote` のみが管理し、capture は参照・作成しない。
 
 ### ファイル操作とgit永続化の分離
 
