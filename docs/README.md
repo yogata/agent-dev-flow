@@ -2,7 +2,7 @@
 
 ## 要件
 
-現行要件の第一参照先は REQ-0101 から REQ-0160 までの 51 件（現行 REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122, REQ-0157 は廃止）である。廃止済み REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122, REQ-0157）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。REQ-0160 は REQ-0157（Project Doc Inputs Migration）を置換し、project-extensions 機構（ADR-0135）の要件を定義する。
+現行要件の第一参照先は REQ-0101 から REQ-0160 までの 51 件（現行 REQ、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）である。廃止済み REQ（REQ-0001〜REQ-0050, REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122）は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。REQ-0160 は project-extensions 機構（ADR-0135）の要件を定義する。
 
 | REQ | タイトル |
 |---|---|

@@ -2,7 +2,7 @@
 
 ## 現行要件
 
-現在の要件判断では、以下52件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122, REQ-0157 は廃止）を第一参照先とする。
+現在の要件判断では、以下53件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を第一参照先とする。
 旧REQ 50件はすべて廃止済みであり、履歴参照に限定する。
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -79,7 +79,6 @@
 | REQ-0121 | 移行→廃止済み | 実行時コマンド規範語を REQ-0103（REQ-0103-152）、整合性検査を REQ-0108（REQ-0108-242/243）に吸収。OU-04 再編成で廃止（2026-06-16）。`retired/REQ-0121.md` 参照 |
 | REQ-0115 | 移行→廃止済み | docs-* command suite の恒久要件を REQ-0108（docs-check 検査責務）、REQ-0109（inspect-docs）、REQ-0124（inspect 命名恒久制約）へ移行。タイトルが移行主題であり REQ-0124-021 に抵触。OU-05 再編成で廃止（2026-06-16）。`retired/REQ-0115.md` 参照 |
 | REQ-0117 | 移行→廃止済み | Git worktree ジャンクション cleanup フォールバック手順を REQ-0110 に統合（REQ-0110-008）。OU-06 再編成で廃止（2026-06-16）。`retired/REQ-0117.md` 参照 |
-| REQ-0157 | 移行→廃止済み | Project Doc Inputs Migration の概念を project-extensions 機構（.agentdev/extensions/**）へ全面置換。schema・配置・命名が非互換に変わるため移行ではなく置換とし、内容は REQ-0160 として再定義（2026-07-04、ADR-0135 採用）。`retired/REQ-0157.md` 参照 |
 
 ## 移行表
 
