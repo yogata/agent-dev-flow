@@ -63,6 +63,69 @@ const EXTENSIONS_COMMANDS_DIR = ".agentdev/extensions/commands";
 const EXTENSIONS_SKILLS_DIR = ".agentdev/extensions/skills";
 const LEGACY_DOC_INPUTS_DIR = ".agentdev/doc-inputs";
 
+// REQ-0161-005: baseline-aware strict pass. Mirrors check_integrity.ts NG
+// baseline: baseline-known strict failures are demoted to warning (report-only),
+// only strict failures exceeding the baseline cause ok=false. The baseline is
+// regenerated explicitly via --update-ng-baseline.
+const NG_BASELINE_PATH = path.join(
+  ".opencode",
+  "skills",
+  "repo-agentdev-integrity",
+  "baselines",
+  "check-extensions-baseline.json",
+);
+
+interface ExtensionsNgBaselineEntry {
+  check: number;
+  check_name: string;
+  file: string | null;
+  message: string | null;
+  count: number;
+}
+
+interface ExtensionsNgBaseline {
+  version: number;
+  rule_id: "CHECK-EXTENSIONS-NG-BASELINE";
+  generated_at: string;
+  entries: ExtensionsNgBaselineEntry[];
+}
+
+function extBaselineKey(
+  check: number,
+  checkName: string,
+  file: string | null,
+  message: string | null,
+): string {
+  return `${check}\t${checkName}\t${file ?? ""}\t${message ?? ""}`;
+}
+
+function loadExtensionsNgBaseline(
+  repoRoot: string,
+): ExtensionsNgBaseline | null {
+  const baselineAbs = path.join(repoRoot, NG_BASELINE_PATH);
+  const content = readText(baselineAbs);
+  if (!content) return null;
+  try {
+    return JSON.parse(content) as ExtensionsNgBaseline;
+  } catch {
+    return null;
+  }
+}
+
+function writeExtensionsNgBaseline(
+  repoRoot: string,
+  baseline: ExtensionsNgBaseline,
+): void {
+  const baselineAbs = path.join(repoRoot, NG_BASELINE_PATH);
+  const dir = path.dirname(baselineAbs);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(
+    baselineAbs,
+    JSON.stringify(baseline, null, 2) + "\n",
+    "utf-8",
+  );
+}
+
 // Heuristic override-intent phrases (check #8). Extension is additive-only.
 const OVERRIDE_PHRASES = [
   "置き換える",
@@ -585,8 +648,42 @@ export function checkExtensions(repoRoot: string): CheckReport {
     }
 
     const strictFailures = failures.filter((f) => f.severity === "strict");
+    // REQ-0161-005: baseline-aware pass. Demote baseline-known strict failures
+    // to warning so only new (delta) strict failures cause ok=false.
+    const baseline = loadExtensionsNgBaseline(repoRoot);
+    let newStrictCount = strictFailures.length;
+    if (baseline) {
+      const baselineIndex = new Map<string, number>();
+      for (const entry of baseline.entries) {
+        const key = extBaselineKey(
+          entry.check,
+          entry.check_name,
+          entry.file,
+          entry.message,
+        );
+        baselineIndex.set(key, entry.count);
+      }
+      const emitted = new Map<string, number>();
+      for (const f of failures) {
+        if (f.severity !== "strict") continue;
+        const key = extBaselineKey(
+          f.check,
+          f.check_name,
+          f.file ?? null,
+          f.message ?? null,
+        );
+        const baselineCount = baselineIndex.get(key) ?? 0;
+        const n = emitted.get(key) ?? 0;
+        emitted.set(key, n + 1);
+        if (n < baselineCount) {
+          f.severity = "warning";
+          f.message = `[baseline-known] ${f.message} (check-extensions baseline, not yet cleaned)`;
+        }
+      }
+      newStrictCount = failures.filter((f) => f.severity === "strict").length;
+    }
     return {
-      ok: strictFailures.length === 0,
+      ok: newStrictCount === 0,
       failures,
       stats,
     };
@@ -595,11 +692,54 @@ export function checkExtensions(repoRoot: string): CheckReport {
   }
 }
 
+function updateExtensionsNgBaseline(
+  repoRoot: string,
+  failures: CheckFailure[],
+): void {
+  const summary = new Map<string, ExtensionsNgBaselineEntry>();
+  for (const f of failures) {
+    const key = extBaselineKey(
+      f.check,
+      f.check_name,
+      f.file ?? null,
+      f.message ?? null,
+    );
+    const existing = summary.get(key);
+    if (existing) {
+      existing.count++;
+    } else {
+      summary.set(key, {
+        check: f.check,
+        check_name: f.check_name,
+        file: f.file ?? null,
+        message: f.message ?? null,
+        count: 1,
+      });
+    }
+  }
+  const baseline: ExtensionsNgBaseline = {
+    version: 1,
+    rule_id: "CHECK-EXTENSIONS-NG-BASELINE",
+    generated_at: new Date().toISOString().slice(0, 10),
+    entries: [...summary.values()].sort((a, b) => a.check - b.check),
+  };
+  writeExtensionsNgBaseline(repoRoot, baseline);
+  console.error(
+    `[check_extensions] NG baseline regenerated: ${baseline.entries.length} entries (${failures.length} total failures).`,
+  );
+}
+
 if (require.main === module) {
   const args = process.argv.slice(2);
-  const repoRoot = args[0] || process.cwd();
   const json = args.includes("--json");
+  const updateBaseline = args.includes("--update-ng-baseline");
+  const positional = args.filter((a) => !a.startsWith("--"));
+  const repoRoot = positional[0] || process.cwd();
   const report = checkExtensions(repoRoot);
+  if (updateBaseline) {
+    updateExtensionsNgBaseline(repoRoot, report.failures);
+    process.exit(0);
+  }
   if (json) {
     process.stdout.write(JSON.stringify(report, null, 2) + "\n");
   } else {

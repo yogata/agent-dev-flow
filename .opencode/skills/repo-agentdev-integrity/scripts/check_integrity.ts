@@ -28,7 +28,7 @@ import {
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
 const USAGE =
-  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--update-ir055-baseline]";
+  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--update-ir055-baseline] [--update-ng-baseline]";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -441,6 +441,33 @@ function checkReqReadmeIndexSync(reqDir: string, root: string): CheckResult[] {
   return results;
 }
 
+// REQ-0161-004: deletion self-reference exclusion.
+// A REQ that mandates deletion of specific legacy IDs (REQ-NNNN / ADR-NNNN)
+// legitimately mentions those IDs in its requirement rows — the REQ describes
+// what it deletes. Such mentions are self-references, not dangling pointers.
+// Without this exclusion, the deletion requirement becomes structurally
+// unreachable: the REQ can never pass integrity because it names its own
+// deletion targets (broken-req-ref / broken-adr-ref / adr-req-crossref).
+// Entries are keyed by repo-relative source path and the deleted IDs.
+const DELETION_SELF_REFERENCE_EXCLUSIONS: ReadonlyArray<{
+  sourceReq: string;
+  deletedIds: string[];
+}> = [
+  {
+    sourceReq: "docs/requirements/REQ-0161.md",
+    deletedIds: ["ADR-0133", "REQ-0157"],
+  },
+];
+
+function isDeletionSelfReference(
+  sourceRelPath: string,
+  refId: string,
+): boolean {
+  return DELETION_SELF_REFERENCE_EXCLUSIONS.some(
+    (e) => e.sourceReq === sourceRelPath && e.deletedIds.includes(refId),
+  );
+}
+
 function checkAdrReqCrossReference(
   reqDir: string,
   adrDir: string,
@@ -470,9 +497,13 @@ function checkAdrReqCrossReference(
     const fullPath = path.join(reqDir, file);
     const content = readText(fullPath);
     if (!content) continue;
+    const relPath = resolveRelative(fullPath, root);
     const references = content.match(/\bADR-\d{4}\b/g) || [];
     const uniqueRefs = [...new Set(references)];
     for (const ref of uniqueRefs) {
+      // REQ-0161-004: skip deletion self-references (REQ describes its own
+      // deletion targets; see DELETION_SELF_REFERENCE_EXCLUSIONS).
+      if (isDeletionSelfReference(relPath, ref)) continue;
       if (!allAdrIds.has(ref)) {
         results.push(
           ng(
@@ -1522,6 +1553,8 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     for (const ref of uniqueReqRefs) {
       // REQ-0108-194: Skip template-like content with placeholders or workflow markers
       if (isTemplateLike) break;
+      // REQ-0161-004: skip deletion self-references
+      if (isDeletionSelfReference(relPath, ref)) continue;
       const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
       const retiredPath = path.join(
         root,
@@ -1556,6 +1589,8 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     for (const ref of uniqueAdrRefs) {
       // REQ-0108-194: Skip template-like content with placeholders or workflow markers
       if (isTemplateLike) break;
+      // REQ-0161-004: skip deletion self-references
+      if (isDeletionSelfReference(relPath, ref)) continue;
       const adrPath = path.join(root, "docs", "adr", `${ref}.md`);
       const retiredAdrPath = path.join(root, "docs", "adr", "retired", `${ref}.md`);
       if (!fs.existsSync(adrPath) && !fs.existsSync(retiredAdrPath)) {
@@ -7053,6 +7088,152 @@ function updateIr055Baseline(root: string): void {
   );
 }
 
+// ===== NG baseline (REQ-0161-005): baseline-aware strict pass =====
+// The strict pass criterion ("exit 0 only when zero NG") is structurally
+// unreachable while a known baseline of pre-existing NGs exists. REQ-0161-005
+// redefines the pass criterion as delta-aware: baseline-known NGs are demoted
+// to info (report-only), only NGs exceeding the baseline (new, caused by the
+// change under review) cause failure. The baseline is regenerated explicitly
+// via --update-ng-baseline; it is NOT auto-updated on every run.
+//
+// Bucket key: `${category}\t${check}\t${file||''}\t${evidence||''}`. A bucket
+// with current count <= baseline count is fully baseline-known.
+
+const NG_BASELINE_PATH = path.join(
+  ".opencode",
+  "skills",
+  "repo-agentdev-integrity",
+  "baselines",
+  "ng-baseline.json",
+);
+
+interface NgBaselineEntry {
+  category: string;
+  check: string;
+  file: string | null;
+  evidence: string | null;
+  count: number;
+}
+
+interface NgBaseline {
+  version: number;
+  rule_id: "NG-BASELINE";
+  generated_at: string;
+  entries: NgBaselineEntry[];
+}
+
+function ngBaselineKey(
+  category: string,
+  check: string,
+  file: string | null,
+  evidence: string | null,
+): string {
+  return `${category}\t${check}\t${file ?? ""}\t${evidence ?? ""}`;
+}
+
+function loadNgBaseline(root: string): NgBaseline | null {
+  const baselineAbs = path.join(root, NG_BASELINE_PATH);
+  const content = readText(baselineAbs);
+  if (!content) return null;
+  try {
+    return JSON.parse(content) as NgBaseline;
+  } catch {
+    return null;
+  }
+}
+
+function writeNgBaseline(root: string, baseline: NgBaseline): void {
+  const baselineAbs = path.join(root, NG_BASELINE_PATH);
+  const dir = path.dirname(baselineAbs);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(baselineAbs, JSON.stringify(baseline, null, 2) + "\n", "utf-8");
+}
+
+function summarizeNgResults(
+  results: CheckResult[],
+): Map<string, NgBaselineEntry> {
+  const summary = new Map<string, NgBaselineEntry>();
+  for (const r of results) {
+    // REQ-0161-005: baseline covers both ng and warning levels so the strict
+    // pass criterion (exit 0) is reachable while pre-existing findings remain.
+    if (r.level !== "ng" && r.level !== "warning") continue;
+    const key = ngBaselineKey(r.category, r.check, r.file ?? null, r.evidence ?? null);
+    const existing = summary.get(key);
+    if (existing) {
+      existing.count++;
+    } else {
+      summary.set(key, {
+        category: r.category,
+        check: r.check,
+        file: r.file ?? null,
+        evidence: r.evidence ?? null,
+        count: 1,
+      });
+    }
+  }
+  return summary;
+}
+
+// Demote baseline-known ng/warning to info so the exit code reflects only the
+// delta (new findings) from the baseline. Returns counts for reporting.
+function applyNgBaseline(
+  results: CheckResult[],
+  baseline: NgBaseline,
+): { demotedToInfo: number; newNg: number } {
+  const baselineIndex = new Map<string, number>();
+  for (const entry of baseline.entries) {
+    const key = ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
+    baselineIndex.set(key, entry.count);
+  }
+
+  const currentSummary = summarizeNgResults(results);
+  const newBuckets = new Set<string>();
+  for (const [key, entry] of currentSummary) {
+    const baselineCount = baselineIndex.get(key) ?? 0;
+    if (entry.count > baselineCount) newBuckets.add(key);
+  }
+
+  const emittedPerBucket = new Map<string, number>();
+  let demotedToInfo = 0;
+  let newNg = 0;
+
+  for (const r of results) {
+    if (r.level !== "ng" && r.level !== "warning") continue;
+    const key = ngBaselineKey(r.category, r.check, r.file ?? null, r.evidence ?? null);
+    const baselineCount = baselineIndex.get(key) ?? 0;
+    const emitted = emittedPerBucket.get(key) ?? 0;
+    emittedPerBucket.set(key, emitted + 1);
+    if (emitted < baselineCount && !newBuckets.has(key)) {
+      r.level = "info";
+      r.finding_level = "observation";
+      r.message = `[baseline-known] ${r.message} (NG baseline, not yet cleaned)`;
+      demotedToInfo++;
+    } else {
+      newNg++;
+    }
+  }
+  return { demotedToInfo, newNg };
+}
+
+function updateNgBaseline(root: string, results: CheckResult[]): void {
+  const summary = summarizeNgResults(results);
+  const baseline: NgBaseline = {
+    version: 1,
+    rule_id: "NG-BASELINE",
+    generated_at: new Date().toISOString().slice(0, 10),
+    entries: [...summary.values()].sort((a, b) => {
+      if (a.category !== b.category) return a.category < b.category ? -1 : 1;
+      if (a.check !== b.check) return a.check < b.check ? -1 : 1;
+      if ((a.file ?? "") !== (b.file ?? "")) return (a.file ?? "") < (b.file ?? "") ? -1 : 1;
+      return 0;
+    }),
+  };
+  writeNgBaseline(root, baseline);
+  console.error(
+    `[integrity] NG baseline regenerated: ${baseline.entries.length} entries (${results.filter((r) => r.level === "ng").length} total NG).`,
+  );
+}
+
 // ===== IR-057: obsolete-spec-path-after-domain-split (REQ-0158-002) =====
 // Detects残留する旧SPEC直下パス参照 (`docs/specs/<name>.md`) と link mode 統一
 // (ADR-0131) に伴う廃止語彙 (`generation-flow.md`, `transform/`, `local-opencode-transform`,
@@ -7721,6 +7902,20 @@ async function main(): Promise<void> {
 
   const processed = processResults(results);
 
+  // REQ-0161-005: baseline-aware strict pass. When --update-ng-baseline is
+  // requested, snapshot the current NG set and exit. Otherwise, demote
+  // baseline-known NGs to info so the exit code reflects only the delta.
+  if (args.includes("--update-ng-baseline")) {
+    updateNgBaseline(root, processed);
+    process.exit(EXIT_OK);
+  }
+
+  const ngBaseline = loadNgBaseline(root);
+  let ngBaselineInfo: { demotedToInfo: number; newNg: number } | null = null;
+  if (ngBaseline) {
+    ngBaselineInfo = applyNgBaseline(processed, ngBaseline);
+  }
+
   const summary = computeSummary(processed);
 
   const report: IntegrityReport = {
@@ -7739,6 +7934,11 @@ async function main(): Promise<void> {
 
   const reportPath = writeReportFile(root, report);
   console.error(`Report written to: ${reportPath}`);
+  if (ngBaselineInfo) {
+    console.error(
+      `[integrity] NG baseline applied: ${ngBaselineInfo.demotedToInfo} baseline-known (demoted to info), ${ngBaselineInfo.newNg} new NG (delta).`,
+    );
+  }
 
   const exitCode = determineExitCode(summary);
   process.exit(exitCode);

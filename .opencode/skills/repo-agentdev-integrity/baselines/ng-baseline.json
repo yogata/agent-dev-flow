@@ -1,0 +1,273 @@
+{
+  "version": 1,
+  "rule_id": "NG-BASELINE",
+  "generated_at": "2026-07-05",
+  "entries": [
+    {
+      "category": "ADR",
+      "check": "accepted-adr-only-citation",
+      "file": "README.md",
+      "evidence": "ADR-0134",
+      "count": 1
+    },
+    {
+      "category": "ADR",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/integrity/rules/IR-058-distribution-untracked-skill-reference.md",
+      "evidence": "ADR-0134",
+      "count": 1
+    },
+    {
+      "category": "ADR",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/local/runtime-package-boundary.md",
+      "evidence": "ADR-0134",
+      "count": 1
+    },
+    {
+      "category": "Canonical",
+      "check": "abolished-skill-references",
+      "file": "docs/specs/integrity/rules/IR-021-retired-skill-reference-detection.md",
+      "evidence": "agentdev-workflow-reporting",
+      "count": 1
+    },
+    {
+      "category": "Canonical",
+      "check": "req-range-staleness",
+      "file": "docs/guides/project-docs-and-specs.md",
+      "evidence": "REQ-0101 から REQ-0158",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "gh-direct-invocation",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": "gh pr view",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "obsolete-spec-path",
+      "file": "docs/adr/ADR-0126.md",
+      "evidence": "これは上書き保護のアーキテクチャ不変量である。",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "obsolete-spec-path",
+      "file": "docs/adr/ADR-0131.md",
+      "evidence": "- 変換プロンプト資産（transform/generate.md, review.md）が不要になる。",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "obsolete-spec-path",
+      "file": "docs/adr/ADR-0131.md",
+      "evidence": "この場合、直接生成方式の変換プロンプト、全削除再生成、`generated_by` 上書き保護は不要になり、link mode（`.opencode/` 配下を src 配下へ接続）へ統一できる。",
+      "count": 3
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "obsolete-spec-path",
+      "file": "docs/adr/ADR-0131.md",
+      "evidence": "link mode 自体は可逆だが、現行契約（REQ-0141-007 直接生成、032 変換スクリプト不使用、033 全削除再生成）と変換プロンプト資産を破棄する点で、文書体系、運用モデルの根本変更であり、ADR で判断根拠を残さないと履歴が失われる。",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "obsolete-spec-path",
+      "file": "docs/adr/ADR-0131.md",
+      "evidence": "`generated_by` 識別子による上書き保護とジャンクション環境での生成停止を安全制約として宣言した。",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "obsolete-spec-path",
+      "file": "docs/guides/glossary.md",
+      "evidence": "| `generated_by` 識別子 | ADR-0126 時代のローカル版生成物に付与された識別情報。値は `local-opencode-transform`。link mode への移行後は付与されず、上書き保護も廃止された（ADR-0131 decision #5）。IR-046/048 は link mode 移行前の生成物が混在する環境向けの整合性検証語彙として残る |",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "req-spec-boundary-violation",
+      "file": "docs/requirements/REQ-0108.md",
+      "evidence": "REQ-0108-268: docs-check 回帰テストの valid fixture は baseline 登録済みの既知違反の影響を受けず、安定して通過するテストデータ構成であること。既知違反と valid fixture の分離が不十分な場合はテストデータ構成を見直すこと（REQ-0108-055、REQ-0108-258 関連）",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "req-spec-boundary-violation",
+      "file": "docs/requirements/REQ-0140.md",
+      "evidence": "REQ-0140-028: docs/requirements/REQ-*.md の要件行は操作主体（command 名、skill 名、ユーザー、システム）を明示すること。ただし enum 定義、派生ルール、システム側判断ルールなど主体明示が不要な場合はこの限りでないこと",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "req-spec-boundary-violation",
+      "file": "docs/requirements/REQ-0144.md",
+      "evidence": "REQ-0144-009: システムは copyScripts 本採用環境下で fixture drift を自動検出する仕組みを提供すること",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "req-spec-boundary-violation",
+      "file": "docs/requirements/REQ-0149.md",
+      "evidence": "REQ-0149-009: agentdev-gh-cli の WRITE 手続きは Windows 環境においてコンソールエンコーディング初期化（standard-procedures Section2 Step0）を必須前置すること。UTF-8 BOM なしファイルの編集結果の mojibake 化を排除すること",
+      "count": 1
+    },
+    {
+      "category": "CanonicalConflict",
+      "check": "req-spec-boundary-violation",
+      "file": "docs/requirements/REQ-0153.md",
+      "evidence": "REQ-0153-001: case-run は機械的テキスト置換または複数ディレクトリ横断の是正を含む PR について、置換対象パターンの再 grep 結果が 0 件であることを完了証拠とすること。ただし「0 件」は意味論的に正しい置換対象範囲（自然言語記述）での 0 件を指し、構造データ（YAML frontmatter、fenced code block 内字句等）への誤付与による 0 件は完了証拠として無効とする（PR #1334 事例）",
+      "count": 1
+    },
+    {
+      "category": "LifecycleBoundary",
+      "check": "retired-req-primary-ref",
+      "file": "docs/specs/commands/inspect-docs.md",
+      "evidence": "REQ-0115",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "docs/specs/integrity/rules/IR-025-retired-adr-path-rule.md",
+      "evidence": "ADR-0000",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "docs/specs/integrity/rules/IR-025-retired-adr-path-rule.md",
+      "evidence": "ADR-0099",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-file-link",
+      "file": "docs/specs/authoring/command-file-format.md",
+      "evidence": "../requirements/REQ-0143.md",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-file-link",
+      "file": "docs/specs/local/runtime-package-boundary.md",
+      "evidence": "../guides/consumer-project-setup.md",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-file-link",
+      "file": "docs/specs/quality/quality-gates.md",
+      "evidence": "../../src/opencode/skills/agentdev-quality-gates/SKILL.md",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/specs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md",
+      "evidence": "REQ-9001",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/specs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md",
+      "evidence": "REQ-9013",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/specs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md",
+      "evidence": "REQ-9005",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/specs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md",
+      "evidence": "REQ-9008",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/specs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md",
+      "evidence": "REQ-9006",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/specs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md",
+      "evidence": "REQ-9009",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/specs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md",
+      "evidence": "REQ-9011",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/specs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md",
+      "evidence": "REQ-9010",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "docs/specs/integrity/rules/IR-044-req-spec-boundary-violation-detection.md",
+      "evidence": "REQ-9012",
+      "count": 1
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "retired-req-as-current",
+      "file": "docs/specs/commands/inspect-docs.md",
+      "evidence": "REQ-0115",
+      "count": 1
+    },
+    {
+      "category": "RuntimeReference",
+      "check": "runtime-unresolved-reference",
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "evidence": "src/opencode/",
+      "count": 1
+    },
+    {
+      "category": "RuntimeReference",
+      "check": "runtime-unresolved-reference",
+      "file": "src/opencode/commands/agentdev/inspect-extensions.md",
+      "evidence": "src/opencode/",
+      "count": 3
+    },
+    {
+      "category": "integrity-rule-gap",
+      "check": "skill-category-gap",
+      "file": ".opencode/skills/repo-agentdev-integrity/SKILL.md",
+      "evidence": "Obsolete spec path",
+      "count": 1
+    },
+    {
+      "category": "integrity-rule-gap",
+      "check": "skill-category-gap",
+      "file": ".opencode/skills/repo-agentdev-integrity/SKILL.md",
+      "evidence": "Distribution reference boundary",
+      "count": 1
+    },
+    {
+      "category": "integrity-rule-gap",
+      "check": "skill-category-gap",
+      "file": ".opencode/skills/repo-agentdev-integrity/SKILL.md",
+      "evidence": "Targeted docs guard",
+      "count": 1
+    }
+  ]
+}
