@@ -50,7 +50,7 @@ status: accepted
 
 ## 移行経緯
 
-本ルールは元来 project doc-inputs 機構（ADR-0133、REQ-0157）の整合性検査として `check_doc_inputs.ts` が担っていた。Issue #1406 で project extensions 機構（ADR-0135、REQ-0160）へ一括移行され、`check_doc_inputs.ts` は `check_extensions.ts` へ改名・再実装された。検査項目は拡張され、extension schema 検証（5セクション構造）、kind/配置/id 対応検証、project-local skill 存在確認、上書き意図検出、旧 doc-inputs 残存検出を含む。`allowed_discovery` 運用契約、DOC-MAP/README 探索可能性要件、config.yaml schema 検査は doc-inputs 機構固有であり、extensions 移行で廃止された。
+本ルールは元来 project doc-inputs 機構の整合性検査として `check_doc_inputs.ts` が担っていた。Issue #1406 で project extensions 機構（ADR-0135、REQ-0160）へ一括移行され、`check_doc_inputs.ts` は `check_extensions.ts` へ改名・再実装された。検査項目は拡張され、extension schema 検証（5セクション構造）、kind/配置/id 対応検証、project-local skill 存在確認、上書き意図検出、旧 doc-inputs 残存検出を含む。`allowed_discovery` 運用契約、DOC-MAP/README 探索可能性要件は旧機構固有であり、extensions 移行で廃止された。
 
 ## 関連
 
