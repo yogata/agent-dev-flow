@@ -20,3 +20,19 @@
 - **想定反映先**: case-open command（完了条件展開前の最新状態再確認ステップ）
 - **関連**: Issue #1418, PR #1419, RU-0016, PR #1412, PR #1415
 - **タグ**: `#case-open` `#陳腐化` `#一括是正` `#scope-partial`
+
+## check_changed_docs.ts の --base-ref が main チェックアウト時に空 diff を返し docs guard が false-clean になる
+
+- **問題事象**: case-close Step 3-1 の targeted docs guard（REQ-0158-003）で `check_changed_docs.ts --base-ref <merge-base>` を実行した際、`files_checked: []`・`failures: []` が返り、PR が2ファイル変更しているのに検査対象ゼロの false-clean になった。
+- **発生局面**: case-close（Step 3-1 docs guard 実行時）。main ワークツリー上で case-close を実行し PR ブランチを checkout していない状況。
+- **検知方法**: `--base-ref 453cf9a8`（merge-base）実行結果の `files_checked: []` を確認時、PR が case-close.md と SKILL.md の2ファイルを変更しているのに空だったため不整合に気づいた。
+- **根本原因**: check_changed_docs.ts は `git diff <base-ref>..HEAD` で変更ファイルを算出する。case-close は main ワークツリーで実行され PR ブランチを checkout しないため、HEAD は main の先端（= merge-base と同一）になり diff が空になる。`--base-ref` は PR ブランチ上で実行する前提だが、case-close 手順はその前提を明記していない。
+- **自律対応内容**: `--files <PR 変更ファイルの明示パス>` に切り替えて再実行し、`files_checked` に2ファイルが入ることを確認してからマージへ進んだ。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（運用手順の補完。REQ-0158-003 手順記述の明確化候補）
+- **横展開観点**: `--base-ref` を使う整合性スクリプト全般（check_integrity.ts 等）で、main 上で実行して空結果になる同パターンの注意。
+- **再発条件**: case-close 等 main ワークツリーで実行するコマンドが `--base-ref` で docs guard / integrity check を起動し、結果の `files_checked` 空を確認せず pass 判断した場合。
+- **予防策候補**: (1) case-close Step 3-1 の起動例を `--files`（PR 変更ファイル明示）を標準とする、(2) スクリプトが `files_checked` 空時に warning を出す、(3) case-close 手順に「`files_checked` が空でないことの確認」を追加する。
+- **想定反映先**: case-close command Step 3-1、repo-agentdev-integrity/scripts/check_changed_docs.ts
+- **関連**: Issue #1425, PR #1426, REQ-0158-003, IR-056
+- **タグ**: `#case-close` `#docs-guard` `#false-clean` `#check_changed_docs`
