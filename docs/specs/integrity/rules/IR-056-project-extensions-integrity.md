@@ -12,7 +12,7 @@ status: accepted
 | category | broken-reference |
 | detection_method | `check_extensions.ts` による extension YAML schema 検証、frontmatter (`version`/`kind`/`id`) 検証、5セクション配列検証、kind/配置整合検証、id/ファイル名対応検証、`context.paths` 実在確認、`rules.skill`/`checks.skill` project-local skill 存在確認（warning）、旧 `.agentdev/doc-inputs/**` 残存検出（warning）、上書き意図検出（warning、ヒューリスティック）、配布コード `docs/specs/**` 直接参照正規表現パターンマッチング。SPEC パス例示、検査対象パス指定、テンプレート例（`<existing-spec>.md` 等）は exemption 対象とする。`inspect-extensions.md` が検査対象として宣言する `.agentdev/doc-inputs/**` は residual 検出対象宣言であるため exemption |
 | affected_artifacts | [.agentdev/extensions/commands/*.yaml, .agentdev/extensions/skills/*.yaml, src/opencode/commands/agentdev/**/*.md, src/opencode/skills/agentdev-*/SKILL.md, src/opencode/skills/agentdev-*/references/**/*.md] |
-| related_req | [REQ-0160-001, REQ-0160-002, REQ-0160-003, REQ-0108-263] |
+| related_req | [REQ-0160-001, REQ-0160-002, REQ-0160-003, REQ-0124-022, REQ-0108-263] |
 | related_spec | [../foundations/project-extensions.md, integrity-rule-catalog.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。SPEC パス例示（`<existing-spec>.md` 等のテンプレート表記）、検査対象パス指定（診断コマンドが検査対象と明示するパス、`inspect-extensions.md` の `.agentdev/doc-inputs/**` 宣言等）は exemption 対象とする。上書き意図検出はヒューリスティックであるため warning 扱い |
