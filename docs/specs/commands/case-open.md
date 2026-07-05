@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-28
+updated: 2026-07-05
 ---
 
 # case-open SPEC
@@ -63,6 +63,31 @@ Epic + 子 Issue 一括作成に対応する。
 - Step 14-2: draft / RU 削除残存検証（`git status --porcelain` で残存検出）
 - Step 14-3: draft/RU 削除 commit 後の即時 push（REQ-0146-003）（Step 14 / 14-1 の削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
 - Step 15: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
+
+## 完了条件・事前状態記載ガイドライン（新規セクション）
+
+case-open は Issue 本文の完了条件・事前状態セクションの記載を識別子中心とし、件数等の変動しやすい実測値スナップショットは補助値として扱う（REQ-0132-021）。本ガイドラインは case-run の QG-3 前置 staleness check（ファイルパス存在確認、検査結果件数再計測）が安定動作するための入力前提を整える目的で設定する。
+
+### 識別子中心記載
+
+完了条件・事前状態には、変動しやすい実測値ではなく安定識別子を主として記載する。
+
+- **記載対象（識別子中心）**: ファイル相対パス（`src/opencode/commands/agentdev/case-run.md` 等）、NG 識別子（`NG-xxx`）、IR ID（`IR-NNN`）、REQ ID（`REQ-NNNN-MMM`）
+- **補助値として許容する実測値**: NG 件数、IR 違反件数等の集計値。識別子リストに付随する参考情報として記載し、判定の主軸にはしない
+
+### 記載例
+
+```
+## 完了条件（識別子中心）
+
+- [ ] `src/opencode/commands/agentdev/case-run.md` に staleness check Step が追加されていること
+- [ ] NG-123 が解消されていること
+- [ ] IR-053 違反が 0 件であること（参考: 現行 3 件）
+```
+
+### 変動しやすい実測値の取扱い
+
+件数・集計値は Issue 作成時点のスナップショットであり、実装進行中に変動する。そのため完了条件の判定主軸から外し、識別子リストの補助情報とする。case-run 側は staleness check で件数再計測を行い、Issue 本文記載値との差異を検出した場合は Findings 記録 + case-update 連携により本文更新を委譲する。
 
 ## 参照する横断 SPEC
 

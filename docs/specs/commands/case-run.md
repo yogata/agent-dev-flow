@@ -2,7 +2,7 @@
 title: case-run SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-06-26
+updated: 2026-07-05
 ---
 
 # case-run SPEC
@@ -101,8 +101,29 @@ ADR-0128 Decision #3 に基づく。
 ### クリーンアップフェーズ（Step 8）
 
 - Step 8: worktree クリーンアップ確認 + 完了報告
- - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
- - 未コミット変更なし: 完了報告へ。`.sisyphus/` の削除は行わない（case-close で実施）
+  - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
+  - 未コミット変更なし: 完了報告へ。`.sisyphus/` の削除は行わない（case-close で実施）
+
+## QG-3 前置 staleness check 手順（新規セクション）
+
+case-run は実装作業開始前に QG-3 本体とは独立した前置検査として staleness check を実行する（REQ-0130-031〜034）。本検査は QG-3 deviation 分類（spec-bug 等）運用を変更せず、deviation 発生前の予防層として位置づける。
+
+### 検証項目
+
+- **ファイルパス現行存在確認**: Issue 本文が参照するファイルパス（command 定義、SPEC、template 等）が現行リポジトリに存在するか確認する。Issue 作成時点から移動、改名、削除されたパスを検出対象とする
+- **検査結果件数再計測**: Issue 本文の事前状態セクションが列挙する検査結果件数（NG 件数、IR 違反件数等）を再計測し、Issue 本文記載値と比較する。件数は変動しやすい実測値スナップショットであるため、差異の有無のみを判定材料とする
+
+### 差異検出時のアクション
+
+差異を検出した場合、case-run は以下を実施する:
+
+1. PR 本文の `## Findings / Capture候補` セクションに `### stale-reference` 小見出しで差異内容（対象パス、Issue 本文記載値、現行値）を記録する
+2. case-update へ連携し、Issue 本文の参照パス・件数の更新を委譲する
+3. case-run 単独では Issue 本文を書き換えない（Issue 本文更新は case-update の責務）
+
+### QG-3 本体との関係
+
+staleness check は QG-3 本体（PR 作成直前の実装充足・乖離ゲート）とは独立した前置検査である。QG-3 が実装結果に対するゲートであるのに対し、staleness check は実装開始前の入力妥当性検査である。両者は順序依存を持たず、staleness check で差異を検出しても QG-3 本体の実施要否には影響しない。
 
 ## 参照する横断 SPEC
 
