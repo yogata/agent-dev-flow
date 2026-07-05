@@ -61,7 +61,7 @@ backlog-review 経由で RU 化する。
 - フェーズ6 実行 git 操作:
  - Step 11: git pull
  - Step 12: 採用済み成果物生成
- - Step 13: アーカイブ移動（原子的）
+  - Step 13: deferred 移動（原子的）
  - Step 14: 昇華時 prune
  - Step 15: commit/push
  - Step 16: 完了報告

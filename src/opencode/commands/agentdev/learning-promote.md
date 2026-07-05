@@ -95,7 +95,7 @@ agent: sisyphus
 - **`.opencode/` 直接書込禁止**/ **`case-run` への直接受け渡し禁止**（`backlog-review` 経由で RU 化）
 - フォーマット: `agentdev-learning-pipeline` を参照
 
-### Step 13: アーカイブ移動（原子的操作）
+### Step 13: deferred 移動（原子的操作）
 
 - **Step 13-1**: inbox.md 全エントリを deferred.md に追記（`**移動日**: YYYY-MM-DD` フィールド追加）
 - **Step 13-2**: deferred.md 書込検証（追記エントリ数をカウント照合）
