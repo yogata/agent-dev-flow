@@ -411,7 +411,13 @@ operation_units:
           target_area_status: not_found
           applied_as: targeted_docs_guard_files_update
       adr_created: false
-      committed: pending
+      committed: done
+      commit_sha: 5c03f6f2
+      case_open:
+        issue_number: 1455
+        issue_url: https://github.com/yogata/agent-dev-flow/issues/1455
+        flow: standard
+        labels: [refactor, maintenance]
 
   - ou_id: OU-002
     source_ru: RU-0028
