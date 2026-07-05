@@ -32,7 +32,7 @@ status: accepted
 | 2 | `obsolete-path-map.yaml` の `legacy_local_generation_vocabulary[].term`（単独検出語）が出現しないこと | strict fail |
 | 3 | `obsolete-path-map.yaml` の `legacy_local_generation_conditional_vocabulary[].term`（近接条件つき検出語）は、同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ検出すること。文脈語がない場合は検出しない | conditional fail |
 | 4 | `generated_by` と `local-opencode-transform` が同一ファイルに共存しないこと（`generated_by_combination_rule`） | strict fail |
-| 5 | 検出時は旧パス、現行パス（該当時）、検出ファイル、行番号を出力すること | — |
+| 5 | 検出時は旧パス、現行パス（該当時）、検出ファイル、行番号を出力すること | - |
 
 ## 検査対象範囲（scope）
 

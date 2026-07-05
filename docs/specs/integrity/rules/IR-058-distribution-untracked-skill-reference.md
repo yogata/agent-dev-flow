@@ -29,8 +29,8 @@ status: accepted
 | # | 検査項目 | 失敗時 |
 |---|----------|--------|
 | 1 | projection-only スキル（`.opencode/skills/` 配下、`src/opencode/skills/` 配下に不在、`repo-*` 以外）が配布物から参照されていないこと | strict fail |
-| 2 | 検出時はスキル名、参照元ファイルパス、行番号、`src/opencode/skills/<name>/` への昇格を促すメッセージを出力すること | — |
-| 3 | projection-only スキルが存在しない場合は OK を出力すること | — |
+| 2 | 検出時はスキル名、参照元ファイルパス、行番号、`src/opencode/skills/<name>/` への昇格を促すメッセージを出力すること | - |
+| 3 | projection-only スキルが存在しない場合は OK を出力すること | - |
 
 ## 検査対象範囲（scope）
 
