@@ -246,6 +246,8 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）
 
 `agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める
 
+> **auto-close 回避の留意点**: 本コマンド名 `case-close` は "close" を含む複合語である。コミットメッセージに `(case-close #N)` 等のコマンド名と Issue 番号の近接表記を用いると、GitHub が "close" を auto-close キーワードと誤認し Issue を意図せずクローズするリスクがある。コミットメッセージのフォーマットは `agentdev-conventional-commits` skill の「GitHub auto-close 回避ガイドライン」に従い、コマンド名と Issue 番号を分離し `#` 記号による近接参照を避けること（例: `case-close for Issue N`）。
+
 ### Step 12: 完了報告
 
 完了報告templateに従って出力。結果状態に応じた種別を選択:
