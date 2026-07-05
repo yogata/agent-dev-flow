@@ -11,7 +11,7 @@ REQ参照ID整合性、第一参照導線、現行/廃止/世代境界、6観点
 
 ## skill extension 参照方針
 
-本スキルは以下の方針に従う（ADR-0135）。
+本スキルは以下の方針に従う（ADR）。
 
 1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-req-structure-diagnostics.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない

@@ -1,8 +1,8 @@
 # SKILL.md frontmatter `name:` バッククォート検出の判定基準
 
 > **原本**: backticks-identifier-threshold SPEC「適用対象外（PR #1334 事例に基づく明示）」。
-> 本ファイルは inspect-skills 診断観点「SKILL.md frontmatter `name:` バッククォート検出」（REQ-0125-003 準拠）の判定基準詳細を集約する運用ビューである。
-> 原本と内容が重複する場合は原本を優先する（REQ-0125-004）。
+> 本ファイルは inspect-skills 診断観点「SKILL.md frontmatter `name:` バッククォート検出」（REQ 準拠）の判定基準詳細を集約する運用ビューである。
+> 原本と内容が重複する場合は原本を優先する（REQ）。
 
 ## 適用範囲
 
@@ -58,7 +58,7 @@ SKILL.md frontmatter `name:` 行が以下の正規表現に一致する場合を
 
 ## 推奨経路
 
-検出した違反に対し、ファイル修正は行わず以下を推奨 route として提示する（REQ-0125-005 準拠、検出のみで修正は実施しない）。
+検出した違反に対し、ファイル修正は行わず以下を推奨 route として提示する（REQ 準拠、検出のみで修正は実施しない）。
 
 - **推奨 route**: `skill`
 - **推奨修正**: 該当 SKILL.md の frontmatter `name:` 行からバッククォートを除去し、`name: agentdev-xxx` 形式（YAML スカラー値）に修正する
@@ -78,5 +78,5 @@ Classification には `skill-frontmatter-name-backtick` を使用する。IR-007
 
 - **原本**: backticks-identifier-threshold SPEC「適用対象外（PR #1334 事例に基づく明示）」
 - **IR-007**: skill-name-dir-match 整合性ルール（IR-007、integrity-rule-catalog 経由で参照）
-- **REQ-0125-003**: Skill frontmatter 整合（本検出の根拠 REQ）
-- **REQ-0125-005**: 推奨 route 提示、修正実施禁止
+- **REQ**: Skill frontmatter 整合（本検出の根拠 REQ）
+- **REQ**: 推奨 route 提示、修正実施禁止

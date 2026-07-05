@@ -152,7 +152,7 @@ ID 汚染（前節）が 0 件でも本検査は実施する。
 | command 本体 ↔ 関連 skill | 当該 command の責務、権限、禁止事項が skill 記述と矛盾していないか |
 | case-open ↔ case-run ↔ case-close ↔ case-auto | 責務境界（PR 作成、Wave 境界、Epic Issue 単一書き手、クリーンアップ、委譲モデル）が全ての記述元で一致しているか |
 
-判定の SSoT 優先順位: 現行 REQ（REQ-0130〜REQ-0133, REQ-0114）> 承認済み ADR（ADR-0114, ADR-0125, ADR-0127, ADR-0128）> SPEC（command SPEC 群、epic-wave-model SPEC）> command 本体 > skill。
+判定の SSoT 優先順位: 現行 REQ（REQ〜REQ, REQ）> 承認済み ADR（ADR, ADR, ADR, ADR）> SPEC（command SPEC 群、epic-wave-model SPEC）> command 本体 > skill。
 
 ### NG 分類
 

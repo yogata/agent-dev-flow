@@ -1,6 +1,6 @@
 # SPEC 操作契約テーブルと references/contracts.md のフィールド一致性判定基準
 
-> **原本**: 本ファイルは inspect-skills 診断観点「SPEC 操作契約テーブル ↔ references/contracts.md フィールド一致性」（REQ-0125-011 / AG-003）の判定基準詳細、対象 SPEC 範囲、フィールド対応規則を集約する運用ビューである（REQ-0125-004 準拠）。
+> **原本**: 本ファイルは inspect-skills 診断観点「SPEC 操作契約テーブル ↔ references/contracts.md フィールド一致性」（REQ / AG-003）の判定基準詳細、対象 SPEC 範囲、フィールド対応規則を集約する運用ビューである（REQ 準拠）。
 > 原本と内容が重複する場合は原本を優先する。
 
 ## 適用範囲
@@ -23,7 +23,7 @@
 新規に `## 操作契約` セクションを持つ SPEC が追加された場合、本診断の対象に自動的に含まれる。
 SPEC 内の「操作契約」見出しを走査し、対応する skill の `references/contracts.md` が存在するかを確認する。
 
-ローカル版 `references/contracts.md` は標準版と手続き名、引数、戻り値を一致させる（REQ-0150-001、各 contracts.md 先頭に明記）。
+ローカル版 `references/contracts.md` は標準版と手続き名、引数、戻り値を一致させる（REQ、各 contracts.md 先頭に明記）。
 標準版、ローカル版ともに SPEC 操作契約テーブルとの一致が求められる。
 
 ## フィールド対応規則

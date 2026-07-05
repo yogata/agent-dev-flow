@@ -106,10 +106,10 @@ driver 起動プロンプトの末尾に以下を埋め込む:
 - `.opencode/skills/repo-*`（実ディレクトリ）は worktree にも伝播しているため直接編集してかまいません。
 ```
 
-## 前工程完了度に応じた振る舞い指針（REQ-0146-012）
+## 前工程完了度に応じた振る舞い指針（REQ）
 
-subagent は子 Issue 本文の「前工程完了度」属性（epic-wave-model SPEC の REQ-0146-010 3段階分類参照）に応じて以下の振る舞い指針に従う。
-属性は case-open が子 Issue 本文に埋め込む（REQ-0146-011）。
+subagent は子 Issue 本文の「前工程完了度」属性（epic-wave-model SPEC の REQ 3段階分類参照）に応じて以下の振る舞い指針に従う。
+属性は case-open が子 Issue 本文に埋め込む（REQ）。
 
 ### 完全完了（通常実行）
 

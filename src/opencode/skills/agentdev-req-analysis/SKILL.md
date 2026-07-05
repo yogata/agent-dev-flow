@@ -15,7 +15,7 @@ description: Provides requirement analysis methods with quality criteria and ADR
 
 ## skill extension 参照方針
 
-本スキルは以下の方針に従う（ADR-0135）。
+本スキルは以下の方針に従う（ADR）。
 
 1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-req-analysis.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
@@ -263,14 +263,14 @@ req-define Step1 のセッションコンテキスト検知の詳細手順は `r
 REQ レンジ、ADR レンジの双方に適用する。
 詳細な照合方法論（CREATE/APPEND/UPDATE 評価等）は `agentdev-req-file-manager` を参照。
 
-### explore 委譲スコープの絞り込み（REQ-0102-072）
+### explore 委譲スコープの絞り込み（REQ）
 
 req-define Step 5-1（変更影響候補抽出）で explore 委譲へ渡す調査スコープを、決定的前処理で絞り込む。
 RU の frontmatter、本文から対象領域キーワードを抽出し、glob/grep で関連 REQ/ADR/SPEC を事前特定して、調査優先対象リスト（priority targets）を explore 委譲へヒントとして渡す。
 
 **ヒントでありハードフィルタではない**。
 絞り込みは explore 委譲の調査優先対象リストのみに適用し、リスト外のファイルを調査対象から除外しない。
-REQ-0102-002 が要求する実ファイル完全列挙は維持し、本前処理が完全列挙を代替、省略しない。
+REQ が要求する実ファイル完全列挙は維持し、本前処理が完全列挙を代替、省略しない。
 
 キーワード抽出、glob/grep 前処理、調査優先対象リスト構築、explore 委譲への引き渡し契約の詳細は `references/explore-scope-refinement.md` を参照。
 

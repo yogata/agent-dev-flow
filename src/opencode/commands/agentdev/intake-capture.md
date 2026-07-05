@@ -13,7 +13,7 @@ agent: sisyphus
 
 ## project extensions
 
-本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/intake-capture.yaml`）を読み込む（ADR-0135）。
+本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/intake-capture.yaml`）を読み込む（ADR）。
 
 - extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
 - extension が存在しない場合は標準動作で続行する

@@ -1,6 +1,6 @@
 # LLM 表現の検出→書き換え辞書
 
-LLM が生成しがちな表現パターンの検出と書き換え辞書。`agentdev-doc-writing` スキルの査読観点「検出→書き換え」の具体例正誤表である。執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。本ファイルは運用参照資料（REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの参照資料で管理」準拠）。
+LLM が生成しがちな表現パターンの検出と書き換え辞書。`agentdev-doc-writing` スキルの査読観点「検出→書き換え」の具体例正誤表である。執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。本ファイルは運用参照資料（REQ「個別用語の正誤表は `agentdev-doc-writing` スキルの参照資料で管理」準拠）。
 
 ## 対象読者
 

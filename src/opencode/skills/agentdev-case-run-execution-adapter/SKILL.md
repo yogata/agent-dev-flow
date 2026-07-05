@@ -43,7 +43,7 @@ Sisyphus-Junior は以下を順に実行する:
 4. **blocker 処理**: 回答可能な blocker（ADR/REQ/SPEC/docs/Issue本文で回答できるもの）は自律的に ulw-loop 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
 
-## test strategy 項目の test-fix ループ（REQ-0130-030）
+## test strategy 項目の test-fix ループ（REQ）
 
 Sisyphus-Junior は実装完了後、Issue 本文のテスト戦略セクションに含まれる各 test strategy 項目（3要素構造: verification / pass_criteria / on_failure）について以下のループを実行する。
 全項目の処理が完了するまで反復する。

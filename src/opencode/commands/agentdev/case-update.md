@@ -10,7 +10,7 @@ agent: sisyphus
 
 ## project extensions
 
-本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/case-update.yaml`）を読み込む（ADR-0135）。
+本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/case-update.yaml`）を読み込む（ADR）。
 
 - extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
 - extension が存在しない場合は標準動作で続行する
@@ -76,7 +76,7 @@ agent: sisyphus
 - G07: コメント/レビューNGコメントのテンプレート【必須】セクションが全て含まれていることを確認してから投稿すること
 
 ### 委譲、参照制約
-- G08: GitHub Issue/PR 操作は `agentdev-gh-cli` の手続きへ委譲（gh コマンド直接記述禁止、REQ-0149）
+- G08: GitHub Issue/PR 操作は `agentdev-gh-cli` の手続きへ委譲（gh コマンド直接記述禁止、REQ）
 - G09: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
 - G10: work_type分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照
 
