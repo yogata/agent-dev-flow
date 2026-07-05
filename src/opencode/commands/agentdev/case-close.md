@@ -117,12 +117,12 @@ PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（
  - 更新漏れを検出した場合は警告表示してユーザー判断を仰ぐ
  - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない
   - **extensions 整合性検査（IR-056、REQ）**: 当該 PR が `src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/SKILL.md`、`src/opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合、`check_extensions.ts` を strict 実行し、IR-056 違反がないことを確認する。違反時はマージを停止しユーザー判断を仰ぐ
- - **targeted docs guard（REQ）**: 変更ファイルと連動ファイルに対し targeted docs guard を実行する。実行コマンド:
+  - **targeted docs guard（REQ）**: 変更ファイルと連動ファイルに対し targeted docs guard を実行する。PR 変更ファイル一覧は PR 補助データ読込手続き（`agentdev-gh-cli`）で `gh pr view <PR> --json files` から取得する（case-close はマージ後 main 環境で実行されるため `--files` を使用。`--base-ref` は worktree 環境（マージ前、case-run 等）向け）。実行コマンド:
 
-   ```bash
-   bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
-     --workflow case-close --base-ref <merge-base-ref> --json
-   ```
+    ```bash
+    bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
+      --workflow case-close --files <PR 変更ファイル一覧> --json
+    ```
 
    JSON 出力の `failures` に strict severity が含まれる場合はマージを停止し、対象ファイルを修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行をユーザーに提案する。draft→accepted 等の SPEC status 変更時は `spec_readme_update_required` を Step 3-2 SPEC 確定フローに反映する
 

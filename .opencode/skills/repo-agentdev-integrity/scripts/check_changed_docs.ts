@@ -1,7 +1,7 @@
 /**
  * check_changed_docs.ts — Targeted docs guard (REQ-0158-003).
  *
- * 変更ファイル限定の整合性検査。req-save / spec-save / case-close / docs-check の
+ * 変更ファイル限定の整合性検査。req-save / spec-save / case-run / case-close / docs-check の
  * 各 workflow で実行する。全体監査 (`check_integrity.ts`) に処理を密結合させず、
  * 変更ファイルと連動ファイルだけを対象とする薄い入口として振る舞う。
  *
@@ -13,9 +13,9 @@
  *   5. JSON/text reporter        — 結果を JSON または text で出力
  *
  * CLI:
- *   --workflow req-save|spec-save|case-close|docs-check
- *   --files <path...>             変更ファイル（--base-ref と排他）
- *   --base-ref <git-ref>          git diff の base ref（--files と排他）
+ *   --workflow req-save|spec-save|case-run|case-close|docs-check
+ *   --files <path...>             変更ファイル（main 環境向け。--base-ref と排他）
+ *   --base-ref <git-ref>          git diff の base ref（worktree 環境向け。--files と排他）
  *   --json                        JSON 出力
  *   --fail-level strict|warning   失敗扱いとする最低レベル（デフォルト strict）
  *   --root <path>                 明示的リポジトリルート（REQ-0145-014: worktree/CI 対応）
@@ -41,8 +41,11 @@ const DESCRIPTION =
   "Targeted docs integrity guard for save workflows (REQ-0158-003)";
 const USAGE =
   "bun run check_changed_docs.ts --workflow <name> [--files <path...> | --base-ref <git-ref>] [--json] [--fail-level strict|warning] [--root <path>]";
+const REF_USAGE_NOTES =
+  "--files は main 環境（マージ後、case-close 等）で PR 変更ファイルを直接指定するときに使用。" +
+  "--base-ref は worktree 環境（マージ前、case-run 等）で git diff により変更ファイル検出するときに使用。";
 
-type Workflow = "req-save" | "spec-save" | "case-close" | "docs-check";
+type Workflow = "req-save" | "spec-save" | "case-run" | "case-close" | "docs-check";
 type FailLevel = "strict" | "warning";
 
 interface Failure {
@@ -101,11 +104,12 @@ function parseArgs(args: string[]): ParsedArgs {
       if (
         v !== "req-save" &&
         v !== "spec-save" &&
+        v !== "case-run" &&
         v !== "case-close" &&
         v !== "docs-check"
       ) {
         throw new Error(
-          `--workflow must be one of: req-save, spec-save, case-close, docs-check (got: ${v})`,
+          `--workflow must be one of: req-save, spec-save, case-run, case-close, docs-check (got: ${v})`,
         );
       }
       parsed.workflow = v as Workflow;
@@ -155,9 +159,10 @@ function printHelp(): void {
   console.error(`description: ${DESCRIPTION}`);
   console.error("");
   console.error("options:");
-  console.error("  --workflow <name>   req-save | spec-save | case-close | docs-check (required)");
-  console.error("  --files <path...>   changed files (mutually exclusive with --base-ref)");
-  console.error("  --base-ref <ref>    git base ref to compute changed files");
+  console.error("  --workflow <name>   req-save | spec-save | case-run | case-close | docs-check (required)");
+  console.error("  --files <path...>   changed files; for main env (post-merge, case-close). mutually exclusive with --base-ref");
+  console.error("  --base-ref <ref>    git base ref to compute changed files; for worktree env (pre-merge, case-run). mutually exclusive with --files");
+  console.error(`  ${REF_USAGE_NOTES}`);
   console.error("  --json              emit JSON report (default: text)");
   console.error("  --fail-level <lvl>  strict (default) | warning");
   console.error("  --root <path>        explicit repository root (REQ-0145-014: worktree/CI support)");
@@ -241,6 +246,29 @@ function profileFor(workflow: Workflow): WorkflowProfile {
         "obsolete-spec-path",
         "legacy-local-generation-vocab",
         "spec-responsibility-classification",
+      ],
+    };
+  }
+  if (workflow === "case-run") {
+    return {
+      name: "case-run",
+      appliesTo: (rel) =>
+        /^docs\/specs\//.test(rel) ||
+        /^docs\/requirements\//.test(rel) ||
+        /^docs\/adr\//.test(rel) ||
+        /^docs\/guides\//.test(rel) ||
+        rel === "AGENTS.md" ||
+        rel === "README.md" ||
+        rel === "docs/DOC-MAP.md" ||
+        rel === "docs/README.md",
+      coupledFor: (rel) => defaultCoupling(rel),
+      rules: [
+        "obsolete-spec-path",
+        "legacy-local-generation-vocab",
+        "doc-type-responsibility",
+        "docmap-update-required",
+        "spec-readme-update-required",
+        "requirements-readme-sync",
       ],
     };
   }
