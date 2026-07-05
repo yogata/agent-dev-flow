@@ -36,3 +36,19 @@
 - **想定反映先**: case-close command Step 3-1、repo-agentdev-integrity/scripts/check_changed_docs.ts
 - **関連**: Issue #1425, PR #1426, REQ-0158-003, IR-056
 - **タグ**: `#case-close` `#docs-guard` `#false-clean` `#check_changed_docs`
+
+## 順次Wave構成で先行Wave の実装が後続Wave 子Issue の件数前提を陳腐化させる
+
+- **問題事象**: Wave 2 子Issue #1429 は case-open 時点で concrete_id 301件 + concrete_path 2件 = 計303件を是正対象と想定していたが、case-run 実施時には concrete_id 315件 + concrete_path 2件 = 計317件に増加していた。Wave 1 PR #1431（IR-059 ルールファイル定義）と PR #1432（project-extensions SPEC 起動時読込契約）で、これら SPEC/IR ファイル内に concrete_id 参照（REQ-NNNN, ADR-NNNN 等）が新規追加されたため。
+- **発生局面**: case-run（Step 5-3 QG-3 staleness check）/ Epic 順次Wave 構成
+- **検知方法**: case-run Step 5-3 QG-3 staleness check が Issue 本文の件数と実測値（check_distribution_boundary.ts スナップショット）を比較し乖離を検出。PR #1433 Findings セクションに stale-reference として記録。
+- **根本原因**: 順次Wave（Wave 1 → Wave 2）構成で、Wave 1 の実装が concrete_id 参照を新規追加する SPEC/IR ファイルを変更し、Wave 2 の是正対象件数を増加させた。case-open 時点（Wave 1 マージ前）の件数はスナップショットであり、Wave 1 マージ後に陳腐化。
+- **自律対応内容**: PR #1433 は実測値317件の全てを是正対象として実装し、check_distribution_boundary.ts = 0件で完了条件を達成。件数表記のズレ（Issue 本文 303 vs 実測 317）は情報提供のみとし、機能的影響なしと判断。Issue は close するため件数表記修正は case-update 候補として intake inbox へ回収。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（運用知見。case-run QG-3 staleness check が既に機能した事例。REQ-0130-031 運用実績）
+- **横展開観点**: 順次Wave構成で「件数」「参照範囲」「ファイル一覧」等の定量的前提を子Issue本文に記載する全ケースで、先行Wave がその前提を変化させるリスクがある。
+- **再発条件**: (1) Epic が順次Wave構成を持ち、(2) 後続Wave 子Issue が件数/参照範囲の定量的前提を本文に持ち、(3) 先行Wave の実装がその前提を変化させるファイルを変更した場合。
+- **予防策候補**: (1) case-open が件数を子Issue本文に記載する際「Wave 1 マージ後に再計算される可能性」注記を添える、(2) 件数を行動基準にせず「check_*.ts = 0件」を完了条件の主軸にする（本Issue #1429 は既にこの形式で機能）、(3) case-run Step 5-3 QG-3 staleness check を順次Wave では必須実行とする（現状運用で機能）。
+- **想定反映先**: case-open command（件数記載時の注意書き候補）、case-run Step 5-3（QG-3 staleness check 順次Wave 必須実行の運用実例）
+- **関連**: Issue #1429, PR #1433, Epic #1427, Wave 1 PR #1431 / PR #1432, REQ-0160, REQ-0130-031
+- **タグ**: `#case-run` `#qg-3-staleness` `#epic-wave` `#陳腐化` `#件数前提`
