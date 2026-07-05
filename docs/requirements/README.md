@@ -2,7 +2,7 @@
 
 ## 現行要件
 
-現在の要件判断では、以下51件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122, REQ-0157 は廃止）を第一参照先とする。
+現在の要件判断では、以下52件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122, REQ-0157 は廃止）を第一参照先とする。
 旧REQ 50件はすべて廃止済みであり、履歴参照に限定する。
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -61,6 +61,7 @@
 | [REQ-0158](REQ-0158.md) | Targeted Docs Integrity Guard | 変更ファイル限定文書整合性ガードと旧パス検出機構 |
 | [REQ-0159](REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 | 配布物依存スキルの src 昇格、repo-local 境界、docs-check 未トラック検出 |
 | [REQ-0160](REQ-0160.md) | Project Extensions 機構と配布物参照境界 | .agentdev/extensions/** によるプロジェクト固有追加・拡張機構と配布物具体参照禁止 |
+| [REQ-0161](REQ-0161.md) | config.yaml および旧 doc-inputs 機構定義の完全削除 | config.yaml 削除と旧 doc-inputs 機構定義文書の完全削除 |
 
 ## 廃止済み要件
 
