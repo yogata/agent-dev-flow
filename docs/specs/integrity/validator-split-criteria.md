@@ -1,6 +1,6 @@
 ---
 title: validator 分割基準
-status: draft
+status: accepted
 created: 2026-07-07
 updated: 2026-07-07
 ---
