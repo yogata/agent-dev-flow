@@ -592,13 +592,9 @@ function runWorkflowChecks(
 } {
   const failures: Failure[] = [];
   const warnings: string[] = [];
-  // files_checked 空時警告（REQ-0158）: 検査対象ファイルが検出されなかった場合、
-  // --files 指定の不備・PR 変更ファイル取得失敗・検査対象パス誤りの見逃しを防ぐ
-  if (changedFiles.length === 0) {
-    warnings.push(
-      "files_checked is empty: no files were checked. Verify --files specification and PR changed file list.",
-    );
-  }
+  // files_checked 空時の分岐判定は main() 側で行う（REQ-0158 Phase 3）。
+  // check_changed_docs.ts は対象選定の十分性を判定せず、対象が空の場合は
+  // 「対象ファイルが検出されなかった」旨のメッセージを main() で生成する。
   const allTargets = [...changedFiles, ...coupledFiles];
 
   if (profile.rules.includes("obsolete-spec-path")) {
@@ -798,9 +794,31 @@ function main(): void {
     spec_readme_update_required: runResult.specReadmeUpdateRequired,
     requirements_readme_update_required: runResult.requirementsReadmeUpdateRequired,
     full_docs_check_recommended: runResult.fullDocsCheckRecommended,
-    doc_inputs_check_required: runResult.docInputsCheckRequired,
+    extensions_check_required: runResult.extensionsCheckRequired,
     declared_files_check: runResult.declaredFilesCheck,
   };
+
+  // Phase 3（REQ-0158）: 対象確定の命令側移行。
+  // --files 指定で files_checked が空の場合は FAILURE、--base-ref 指定で空の場合は WARNING。
+  // check_changed_docs.ts は対象選定の十分性を判定せず、対象ファイル未検出のみを報告する。
+  if (report.files_checked.length === 0) {
+    if (parsed.files.length > 0) {
+      report.failures.push({
+        rule_id: "TARGET-EMPTY",
+        severity: "strict",
+        file: "",
+        line: 0,
+        message:
+          "対象ファイルが検出されませんでした（--files 指定）。指定ファイルが workflow profile の対象外、または存在しません。",
+        expected:
+          "--files に対象ファイルを正しく指定してください（workflow profile の appliesTo に一致するファイルである必要があります）",
+      });
+    } else if (parsed.baseRef) {
+      report.warnings.push(
+        "対象ファイルが検出されませんでした（--base-ref 指定）。git diff 結果が空、または workflow profile の対象外です。",
+      );
+    }
+  }
 
   if (parsed.json) {
     emitJson(report);
