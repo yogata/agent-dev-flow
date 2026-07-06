@@ -56,7 +56,7 @@
 | [REQ-0152](REQ-0152.md) | gh 直接記述機械検出（IR-053） | gh CLI 直接呼出しの機械検出ルール（IR-053）と inspect-skills 診断観点との協調 |
 | [REQ-0153](REQ-0153.md) | 機械横断是正の完了証明 | 機械横断是正 PR の再 grep 0 件証拠の完了条件化と PR 本文記載 |
 | [REQ-0154](REQ-0154.md) | SPEC status 追跡と draft 放置検出 | SPEC status 単一情報源化と draft 放置機械検出 |
-| [REQ-0155](REQ-0155.md) | 文書粒度モデル | SPEC内部5論理区分、文書7分類モデル、粒度ゲート2点必須化、局所物理分離許容 |
+| [REQ-0155](REQ-0155.md) | 文書粒度モデル | SPEC内部4論理区分、文書7分類モデル、粒度ゲート2点必須化、局所物理分離許容 |
 | [REQ-0156](REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 | docs/specs 直下基盤SPECの6ドメイン分類と段階移送方針 |
 | [REQ-0158](REQ-0158.md) | Targeted Docs Integrity Guard | 変更ファイル限定文書整合性ガードと旧パス検出機構 |
 | [REQ-0159](REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 | 配布物依存スキルの src 昇格、repo-local 境界、docs-check 未トラック検出 |
