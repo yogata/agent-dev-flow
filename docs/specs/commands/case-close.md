@@ -111,19 +111,19 @@ case-close は check_integrity.ts（全体監査）を使用しない（case-clo
 
 ※上記は全て肯定表現である（REQ-0144-002, REQ-0144-003 準拠）。
 
-### files_checked 空時警告と確認ステップ（REQ-0131-030, REQ-0158）
+### files_checked 空時の取扱い（REQ-0131-030, REQ-0158 Phase 3）
 
-targeted docs guard（check_changed_docs.ts）の実行結果で `files_checked` が空の場合、検査対象ファイルが検出されなかったことを示す。これは `--files` 指定の不備、PR 変更ファイル取得の失敗、または検査対象パスの誤りの可能性がある。
+targeted docs guard（check_changed_docs.ts）の実行結果で `files_checked` が空の場合、検査対象ファイルが検出されなかったことを示す。case-close は `--files` で PR 変更ファイル一覧を指定するため、Phase 3 契約により FAILURE（exit code 非ゼロ）として報告される。
 
-#### check_changed_docs.ts 側の出力（AG-007）
+#### check_changed_docs.ts 側の出力（AG-007, REQ-0158 Phase 3）
 
-`files_checked` が空の場合、`warnings` 配列に検査対象ファイル未検出の警告を追加する。警告メッセージは検査対象ファイルが検出されなかった旨と `--files` 指定の確認を促す内容とする。
+`--files` 指定で `files_checked` が空の場合、`failures` 配列に severity `strict` の FAILURE を追加する（exit code 非ゼロ）。メッセージは対象ファイルが検出されなかった旨を示す。`--base-ref` 指定で空の場合は WARNING となる（case-close は `--files` を使用するため対象外）。check_changed_docs.ts は対象選定の十分性を判定せず、対象ファイル未検出のみを報告する。
 
 #### case-close 側の確認ステップ（AG-006）
 
-case-close は targeted docs guard の結果で `files_checked` が空の場合、以下を行う:
+case-close は targeted docs guard が FAILURE を返した場合、以下を行う:
 
-1. 警告を検査見逃しのリスクとして認識する
+1. FAILURE を検査見逃しのリスクとして認識する
 2. `--files` 指定の妥当性を確認する（PR 変更ファイル一覧の再取得、パス指定の確認）
 3. 必要に応じて `--files` での再実行、または対象ファイルの手動確認を行う
 4. 空の理由が正当（対象ファイルが本当に変更されていない等）であることを確認してから続行する
