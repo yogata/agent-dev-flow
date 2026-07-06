@@ -110,4 +110,4 @@ command SPEC（`docs/specs/commands/*.md`）が記述する Step 番号構成は
 
 - **`patterns.md`**: frontmatter 規約、テンプレート命名規則を担当。本 SPEC は command 本文構造を担当し、frontmatter 規約は `patterns.md` を参照する。
 - **`docs/specs/commands/*.md`**: 個別 command SPEC の位置づけを維持する。横断フォーマット規約は本 SPEC に集約し、個別 command SPEC には配置しない。各 command SPEC は本 SPEC の「command SPEC と command 定義の Step 番号一致（REQ-0143-004）」節に従い、対応する command 定義ファイル（`src/opencode/commands/agentdev/*.md`）と Step 番号構成を一致させる。
-- **[REQ-0143](../requirements/REQ-0143.md)**: command 定義ファイルフォーマット標準化の要件定義。REQ-0143-004 が SPEC↔command Step 一致原則を指示し、本 SPEC はその詳細（Step 0 扱い、採番開始位置）を配置する。
+- **[REQ-0143](../../requirements/REQ-0143.md)**: command 定義ファイルフォーマット標準化の要件定義。REQ-0143-004 が SPEC↔command Step 一致原則を指示し、本 SPEC はその詳細（Step 0 扱い、採番開始位置）を配置する。

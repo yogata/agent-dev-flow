@@ -17,7 +17,7 @@ project extensions 機構（`.agentdev/extensions/**`）の整合性を読み取
 - 検出事項ファイル生成（`.agentdev/inspect/inbox/`）
 - 推奨 route の提示（intake / learning / req-define / 直接修正 等）
 
-検査対象（`.agentdev/extensions/**`、`.agentdev/doc-inputs/**`、`src/opencode/**`、`docs/**`）の直接修正は行わない。
+検査対象（`.agentdev/extensions/**`、`.agentdev/doc-inputs/**`、`.opencode/**`、`docs/**`）の直接修正は行わない。
 
 ## 入力
 
@@ -37,8 +37,8 @@ project extensions 機構（`.agentdev/extensions/**`）の整合性を読み取
 - `.agentdev/extensions/commands/*.yaml`
 - `.agentdev/extensions/skills/*.yaml`
 - `.agentdev/doc-inputs/**`（旧機構残存検出用）
-- `src/opencode/commands/agentdev/**/*.md`
-- `src/opencode/skills/agentdev-*/SKILL.md`
+- `.opencode/commands/agentdev/**/*.md`
+- `.opencode/skills/agentdev-*/SKILL.md`
 
 ### Step 2: 8項目の検査実行
 

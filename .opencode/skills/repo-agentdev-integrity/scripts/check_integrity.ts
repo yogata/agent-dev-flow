@@ -457,6 +457,10 @@ const DELETION_SELF_REFERENCE_EXCLUSIONS: ReadonlyArray<{
     sourceReq: "docs/requirements/REQ-0161.md",
     deletedIds: ["ADR-0133", "REQ-0157"],
   },
+  {
+    sourceReq: "docs/requirements/REQ-0144.md",
+    deletedIds: ["ADR-0133", "REQ-0157"],
+  },
 ];
 
 function isDeletionSelfReference(
@@ -466,6 +470,12 @@ function isDeletionSelfReference(
   return DELETION_SELF_REFERENCE_EXCLUSIONS.some(
     (e) => e.sourceReq === sourceRelPath && e.deletedIds.includes(refId),
   );
+}
+
+// REQ-0145-015: 検出ルール説明文（IR-*.md）は例示用 ID、廃止 skill 例、廃止 ADR 番号帯を
+// 含む自己参照的資料であり、全検出関数のスコープから除外する。
+function isIntegrityRuleDescriptionFile(relPath: string): boolean {
+  return /docs\/specs\/integrity\/rules\/IR-\d+/.test(relPath);
 }
 
 function checkAdrReqCrossReference(
@@ -1470,6 +1480,8 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     const content = readText(filePath);
     if (!content) continue;
     const relPath = resolveRelative(filePath, root);
+    // REQ-0145-015: 検出ルール説明文（IR-*.md）は例示用 ID を含むため除外
+    if (isIntegrityRuleDescriptionFile(relPath)) continue;
     const contentLines = content.split("\n");
 
     const links = parseMarkdownLinks(content);
@@ -4675,6 +4687,8 @@ function checkAbolishedSkillReferences(root: string): CheckResult[] {
   for (const fullPath of filesToScan) {
     const relPath = resolveRelative(fullPath, root);
     if (exemptPatterns.some((p) => p.test(relPath))) continue;
+    // REQ-0145-015: 検出ルール説明文（IR-*.md）は廃止 skill 例を含むため除外
+    if (isIntegrityRuleDescriptionFile(relPath)) continue;
     const content = readText(fullPath);
     if (!content) continue;
 
@@ -6540,6 +6554,8 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
     const content = readText(fullPath);
     if (!content) continue;
     const relPath = resolveRelative(fullPath, root);
+    // REQ-0145-015: 検出ルール説明文（IR-*.md）は phantom REQ 例示を含むため除外
+    if (isIntegrityRuleDescriptionFile(relPath)) continue;
 
     const lines = content.split("\n");
     for (let i = 0; i < lines.length; i++) {
@@ -7469,27 +7485,56 @@ function isIr057InCodeBlock(lines: string[], lineIdx: number): boolean {
   return inCode;
 }
 
-function isIr057HistoricalAdrContext(
+// REQ-0144-024: 歴史経緯説明文脈の汎用判定（ADR-0131/0126 等）。
+// isIr057HistoricalAdrContext を汎用化し、ADR 以外のドキュメント
+// （glossary.md 等）にも適用する。以下のいずれかが成立する行を除外する:
+//   1. ファイルが「旧語彙の引用について」宣言を含む歴史文書（ファイル単位）
+//   2. 行が歴史経緯マーカーを含む（行単位）
+// 「廃止」は時制判定する（「廃止された」「廃止済み」は歴史、「廃止する」は現行）。
+const ir057HistoricalFileCache = new Map<string, boolean>();
+
+function isIr057HistoricalContext(
   fullPath: string,
   root: string,
   line: string,
 ): boolean {
-  // REQ-0158-002 例外登録: 現行 ADR (accepted) の履歴説明コンテキストは免除。
-  // 履歴マーカーを含む行のみ免除する。
   const relPath = resolveRelative(fullPath, root);
-  if (!/^docs\/adr\/ADR-\d+\.md$/.test(relPath)) return false;
-  const historicalMarkers = [
+
+  // 1. ファイル単位: 「旧語彙の引用について」等の明示的歴史宣言を持つ文書は全体を歴史扱い
+  //    （ADR-0131/0126 のブロック引用宣言。著者が意図的に付与したアノテーション）
+  let fileIsHistorical = ir057HistoricalFileCache.get(relPath);
+  if (fileIsHistorical === undefined) {
+    const content = readText(fullPath);
+    fileIsHistorical =
+      content !== null &&
+      /旧語彙の引用について|歴史文書である|旧概念.*引用/.test(content);
+    ir057HistoricalFileCache.set(relPath, fileIsHistorical);
+  }
+  if (fileIsHistorical) return true;
+
+  // 2. 行単位: 歴史経緯マーカー
+  const lineMarkers = [
     "旧",
     "移行前",
-    "廃止",
+    "移行後",
     "前提",
+    "時代",
+    "履歴",
     "historical",
     "legacy",
     "deprecated",
     "歴史",
     "経緯",
+    "過去",
+    "以前",
+    "従来",
   ];
-  return historicalMarkers.some((m) => line.includes(m));
+  if (lineMarkers.some((m) => line.includes(m))) return true;
+
+  // 3. 「廃止」の時制判定: 過去形・完了形は歴史、能望形は現行
+  if (/廃止(された|済み|確定)/.test(line)) return true;
+
+  return false;
 }
 
 function checkObsoleteSpecPath(root: string): CheckResult[] {
@@ -7550,7 +7595,7 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
         // コードブロック内は exemption
         if (isIr057InCodeBlock(lines, i)) continue;
         // 履歴 ADR コンテキストは exemption
-        if (isIr057HistoricalAdrContext(fullPath, root, line)) continue;
+        if (isIr057HistoricalContext(fullPath, root, line)) continue;
         // backticks 内 (例: `docs/specs/system.md`) も免除
         if (isInsideCodeSpan(line, line.indexOf(pattern))) continue;
         foundViolation = true;
@@ -7592,7 +7637,7 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
           const line = lines[i];
           if (!line.includes(item.term)) continue;
           if (isIr057InCodeBlock(lines, i)) continue;
-          if (isIr057HistoricalAdrContext(fullPath, root, line)) continue;
+          if (isIr057HistoricalContext(fullPath, root, line)) continue;
           if (isInsideCodeSpan(line, line.indexOf(item.term))) continue;
           foundViolation = true;
           results.push(
@@ -7636,7 +7681,7 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
         const line = lines[i];
         if (!line.includes(trigger)) continue;
         if (isIr057InCodeBlock(lines, i)) continue;
-        if (isIr057HistoricalAdrContext(fullPath, root, line)) continue;
+        if (isIr057HistoricalContext(fullPath, root, line)) continue;
         if (isInsideCodeSpan(line, line.indexOf(trigger))) continue;
         foundViolation = true;
         results.push(
@@ -7681,7 +7726,7 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
           const line = lines[i];
           if (!line.includes(item.term)) continue;
           if (isIr057InCodeBlock(lines, i)) continue;
-          if (isIr057HistoricalAdrContext(fullPath, root, line)) continue;
+          if (isIr057HistoricalContext(fullPath, root, line)) continue;
           if (isInsideCodeSpan(line, line.indexOf(item.term))) continue;
           foundViolation = true;
           results.push(
