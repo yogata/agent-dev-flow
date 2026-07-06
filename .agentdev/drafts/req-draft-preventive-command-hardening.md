@@ -217,7 +217,9 @@ operation_units:
     depends_on: []
     recommended_order: 1
     issue_policy: single
-    result: {}
+    result:
+      issue_number: 1459
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1459
   - ou_id: OU-002
     source_ru: RU-0002
     target_req: REQ-0132
@@ -227,7 +229,9 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      issue_number: 1460
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1460
   - ou_id: OU-003
     source_ru: RU-0003
     target_req: [REQ-0131, REQ-0158]
@@ -237,7 +241,9 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      issue_number: 1461
+      issue_url: https://github.com/yogata/agent-dev-flow/issues/1461
 
 test_strategy:
   - id: TS-001
