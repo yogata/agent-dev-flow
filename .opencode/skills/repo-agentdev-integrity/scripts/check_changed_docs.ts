@@ -592,6 +592,13 @@ function runWorkflowChecks(
 } {
   const failures: Failure[] = [];
   const warnings: string[] = [];
+  // files_checked 空時警告（REQ-0158）: 検査対象ファイルが検出されなかった場合、
+  // --files 指定の不備・PR 変更ファイル取得失敗・検査対象パス誤りの見逃しを防ぐ
+  if (changedFiles.length === 0) {
+    warnings.push(
+      "files_checked is empty: no files were checked. Verify --files specification and PR changed file list.",
+    );
+  }
   const allTargets = [...changedFiles, ...coupledFiles];
 
   if (profile.rules.includes("obsolete-spec-path")) {
