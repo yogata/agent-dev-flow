@@ -10,7 +10,7 @@ sources:
     type: ru
   - path: .agentdev/backlog/req-units/RU-0003.md
     type: ru
-agentdev_handoff: true
+agentdev_handoff: false
 ---
 
 # draft-data
