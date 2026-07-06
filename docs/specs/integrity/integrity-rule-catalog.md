@@ -1,5 +1,5 @@
 ---
-updated: 2026-07-05
+updated: 2026-07-07
 status: accepted
 ---
 
@@ -148,6 +148,12 @@ catalog はスキーマ定義とインデックスを維持する。
 | full-audit | 全ルールを実行 | 定期実行、重大変更後 |
 | delta-guard | 変更関連ルールのみ実行 | PR 作成時、通常開発時 |
 | impact-guard | 影響範囲ルールのみ実行 | 特定アーティファクト変更時 |
+
+### check_changed_docs.ts 関連ルールの整理（REQ-0158 Phase 1）
+
+check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（req-save/spec-save/case-run/case-close）に必要なルールサブセットを適用する。catalog は IR ルールの正典であり、check_changed_docs.ts の profileFor() が返す rules は catalog IR のサブセット参照である。check_integrity.ts は全 IR ルール（full-audit gate_level）を実装する。check_changed_docs.ts と check_integrity.ts の二系統で IR ルールを共有し、検出ロジックを重複実装しない。
+
+詳細な IR-*.md の追加・更新内容は後続の spec-save / case-run 工程で確定する。check_changed_docs.ts の profile rules と SPEC 記載項目の対応関係は REQ-0108-269（1:1 対応不要、包括カバー許容）に従う。
 
 ## docs-check 項目役割範囲（REQ-0145-004）
 
