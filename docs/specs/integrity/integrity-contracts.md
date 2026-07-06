@@ -83,7 +83,7 @@ updated: 2026-07-07
 
 ### TargetedDocsReport 型契約（REQ-0158 Phase 2）
 
-check_changed_docs.ts の JSON 出力型である TargetedDocsReport の型定義を固定する。必須フィールド: workflow, files_checked, coupled_files_checked, failures, warnings, doc_map_update_required, spec_readme_update_required, requirements_readme_update_required, full_docs_check_recommended, extensions_check_required, declared_files_check。型/戻り値/JSON/text出力/テストが一致する契約とする。doc_inputs_check_required は含めない（extensions_check_required が後継）。
+check_changed_docs.ts の JSON 出力型である TargetedDocsReport の型定義を固定する。必須フィールド: workflow, files_checked, coupled_files_checked, failures, warnings, doc_map_update_required, spec_readme_update_required, requirements_readme_update_required, full_docs_check_recommended, extensions_check_required, declared_files_check。上記リストのみを必須フィールドとし、それ以外を許容しない。型/戻り値/JSON/text出力/テストが一致する契約とする。
 
 ## スクリプト契約（Script Contract）
 
