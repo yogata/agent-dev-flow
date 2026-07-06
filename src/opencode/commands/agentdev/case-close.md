@@ -125,6 +125,11 @@ PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（
     ```
 
    JSON 出力の `failures` に strict severity が含まれる場合はマージを停止し、対象ファイルを修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行をユーザーに提案する。draft→accepted 等の SPEC status 変更時は `spec_readme_update_required` を Step 3-2 SPEC 確定フローに反映する
+   - **files_checked 空時の確認（REQ）**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱う。`warnings` 配列に検査対象ファイル未検出の警告が出力されるため、以下を確認する。確認を経ずに `files_checked` 空のまま完了扱いとしない:
+     1. 警告を検査見逃しのリスクとして認識する
+     2. `--files` 指定の妥当性を確認する（PR 変更ファイル一覧の再取得、パス指定の確認）
+     3. 必要に応じて `--files` を修正して再実行、または対象ファイルを手動確認する
+     4. 空の理由が正当（対象ファイルが本当に変更されていない等）であることを確認してから続行する
 
 **Step 3-2**: SPEC 確定フロー。
 PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録）を読み取り、SPEC の確定、昇格を処理する。
