@@ -1,10 +1,11 @@
 ---
 draft_type: req_draft
 topic_slug: harness-boundary-purification
-status: draft
+status: saved
 created_at: 2026-07-12T13:30:00+09:00
 source_rus: [RU-0001]
 agentdev_handoff: true
+spec_actions_consumed: true
 ---
 
 # draft-data
