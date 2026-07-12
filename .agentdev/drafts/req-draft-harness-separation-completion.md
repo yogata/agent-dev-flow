@@ -1,7 +1,7 @@
 ---
 draft_type: req_draft
 topic_slug: harness-separation-completion
-status: draft
+status: saved
 created_at: 2026-07-12T00:00:00+09:00
 source_rus: []
 ---
@@ -200,7 +200,7 @@ artifact_actions:
     content: |
       ---
       title: harness 分離モデル
-status: saved
+      status: draft
       created: 2026-07-12
       updated: 2026-07-12
       ---
