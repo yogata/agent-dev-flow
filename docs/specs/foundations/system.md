@@ -13,21 +13,20 @@ status: accepted
 ### AgentDevFlow コマンド群
 
 AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプラインで構成され、開発ワークフローを提供する。
-コマンドごとに適切な agent を frontmatter に指定する。
-対話系コマンド（req-define）は prometheus、ファイル操作系コマンドは sisyphus。
+各コマンドの目的、責務、入出力は後述の表および各コマンド専用 SPEC に記述する。実行エージェントの選定、起動方法は harness の責務であり、本 SPEC の対象外（ADR-0136）。
 
 #### req/case パイプライン
 
-| コマンド | 役割 | エージェント | 詳細 |
-|---|---|---|---|
-| `/agentdev/req-define` | 要件定義（壁打ち） | prometheus | [commands/req-define.md](../commands/req-define.md) |
-| `/agentdev/req-save` | 要件定義の保存 | sisyphus | [commands/req-save.md](../commands/req-save.md) |
-| `/agentdev/spec-save` | SPEC 候補の保存、確定 | sisyphus | [commands/spec-save.md](../commands/spec-save.md) |
-| `/agentdev/case-open` | Issue 登録（連結成分ベース複数 Standard/Epic 構成生成、3軸判断） | sisyphus | [commands/case-open.md](../commands/case-open.md) |
-| `/agentdev/case-run` | 実装パイプライン（3 フェーズ構成） | sisyphus | [commands/case-run.md](../commands/case-run.md) |
-| `/agentdev/case-update` | Issue 更新 | sisyphus | [commands/case-update.md](../commands/case-update.md) |
-| `/agentdev/case-close` | 完了処理（達成判定プロトコル付き完了ゲート） | sisyphus | [commands/case-close.md](../commands/case-close.md) |
-| `/agentdev/case-auto` | 最大自走モード（複数 execution_unit 並列 orchestration、blocked 部分停止） | sisyphus | [commands/case-auto.md](../commands/case-auto.md) |
+| コマンド | 役割 | 詳細 |
+|---|---|---|
+| `/agentdev/req-define` | 要件定義（壁打ち） | [commands/req-define.md](../commands/req-define.md) |
+| `/agentdev/req-save` | 要件定義の保存 | [commands/req-save.md](../commands/req-save.md) |
+| `/agentdev/spec-save` | SPEC 候補の保存、確定 | [commands/spec-save.md](../commands/spec-save.md) |
+| `/agentdev/case-open` | Issue 登録（連結成分ベース複数 Standard/Epic 構成生成、3軸判断） | [commands/case-open.md](../commands/case-open.md) |
+| `/agentdev/case-run` | 実装パイプライン（3 フェーズ構成） | [commands/case-run.md](../commands/case-run.md) |
+| `/agentdev/case-update` | Issue 更新 | [commands/case-update.md](../commands/case-update.md) |
+| `/agentdev/case-close` | 完了処理（達成判定プロトコル付き完了ゲート） | [commands/case-close.md](../commands/case-close.md) |
+| `/agentdev/case-auto` | 最大自走モード（複数 execution_unit 並列 orchestration、blocked 部分停止） | [commands/case-auto.md](../commands/case-auto.md) |
 
 #### learning パイプライン
 
@@ -50,18 +49,18 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプライン
 docs-check は `/repo/*` コマンド体系の配布対象リポジトリ内コマンドである（ADR-0106、REQ-0108-156）。
 AgentDevFlow の配布コマンドではなく、AgentDevFlow 本体リポジトリの自己監査コマンドである。
 
-| コマンド | 役割 | エージェント |
-|---|---|---|
-| `/repo/docs-check` | AgentDevFlow 本体リポジトリの自己監査（配布対象外） | sisyphus |
+| コマンド | 役割 |
+|---|---|
+| `/repo/docs-check` | AgentDevFlow 本体リポジトリの自己監査（配布対象外） |
 
 #### inspect ワークフロー
 
-| コマンド | 役割 | エージェント | 詳細 |
-|---|---|---|---|
-| `/agentdev/inspect-docs` | docs 全体の意味整合レビューと REQ 再構成診断 | prometheus | [commands/inspect-docs.md](../commands/inspect-docs.md) |
-| `/agentdev/inspect-skills` | Command/Skill 参照妥当性、構造の検出 | prometheus | [commands/inspect-skills.md](../commands/inspect-skills.md) |
-| `/agentdev/inspect-extensions` | project extensions 機構の整合性検出 | prometheus | [commands/inspect-extensions.md](../commands/inspect-extensions.md) |
-| `/agentdev/inspect-promote` | 検出事項（finding）の分類、昇格 | prometheus | [commands/inspect-promote.md](../commands/inspect-promote.md) |
+| コマンド | 役割 | 詳細 |
+|---|---|---|
+| `/agentdev/inspect-docs` | docs 全体の意味整合レビューと REQ 再構成診断 | [commands/inspect-docs.md](../commands/inspect-docs.md) |
+| `/agentdev/inspect-skills` | Command/Skill 参照妥当性、構造の検出 | [commands/inspect-skills.md](../commands/inspect-skills.md) |
+| `/agentdev/inspect-extensions` | project extensions 機構の整合性検出 | [commands/inspect-extensions.md](../commands/inspect-extensions.md) |
+| `/agentdev/inspect-promote` | 検出事項（finding）の分類、昇格 | [commands/inspect-promote.md](../commands/inspect-promote.md) |
 
 ### 品質ゲート
 
