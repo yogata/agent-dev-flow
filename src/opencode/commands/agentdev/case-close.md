@@ -213,7 +213,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）
 `agentdev-git-worktree` の worktree削除手順に従う:
  - 未コミット変更検出（`agentdev-git-worktree` skill に従い）
  - squash merge 済みの場合 → 当該 worktree が隔離されている（専用 worktree + branch で index が独立）場合のみ `git checkout .` で破棄可。**共有作業ツリー（main worktree）では `git checkout .` は禁止**（他セッション変更の無差別破壊）。本 Step は worktree 削除フェーズ内の隔離 worktree でのみ実行する
- - .sisyphus/ クリーンアップ
+  - runtime workspace のクリーンアップは harness の責務（REQ-0162-002）。case-close は関与しない
  - worktree remove → Permission denied 時は停止（リトライは skill 定義に従う）
  - ローカルブランチ削除（squash merge 後の条件付き `-D` は skill 定義に従う）
  - リモートブランチ削除
