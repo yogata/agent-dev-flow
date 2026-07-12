@@ -84,7 +84,7 @@ case-run (orchestration)
 | 複数 Issue/ Epic orchestration | case-auto/ case-run |
 | Issue 完了条件チェックボックスの評価、更新 | case-close |
 | 完了条件チェックボックスの最終完了判定 | case-close |
-| req-define のアーキテクチャ確認 | `agentdev-architecture-advisory`（oracle） |
+| req-define のアーキテクチャ確認 | `agentdev-architecture-advisory` |
 
 実行担当サブエージェント、外部実行基盤は Issue 本文の完了条件チェックボックスを更新しない（PR 作成後に case-close が別コンテキストで評価する）。
 
