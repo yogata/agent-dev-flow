@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-06-28
+updated: 2026-07-12
 ---
 
 # 文書フォーマット規約
@@ -40,14 +40,6 @@ Plan エージェントは読み取り権限のみを持ち、ファイル書込
 command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044, ADR-0102）。
 
 分類定義は `design-principles.md` を参照。
-
-## .sisyphus/ 命名規則
-
-`.sisyphus/` 配下の 7 カテゴリ（plans, drafts, evidence, execution, notepads, tasks, reports）のファイル、ディレクトリ命名は plan 名を基準とする。
-詳細なルール、例は `AGENTS.md` の「Sisyphus 命名規則」セクションを参照。
-
-**重要**: notepads は完全一致マッチングのみ対応。
-plan 名にサフィックスがある場合、notepad ディレクトリ名にも同一サフィックスが必要。
 
 ## REQ frontmatter 規約
 
