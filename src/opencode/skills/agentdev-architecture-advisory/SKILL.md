@@ -78,7 +78,7 @@ oracle の助言は判断材料である。
 | 非対象 | 責務主体 |
 |--------|----------|
 | 実装実行 | case-run（`agentdev-case-run-execution-adapter`） |
-| 実行計画確認（実装開始前） | momus（oh-my-openagent 利用時） |
+| 実行計画確認（実装開始前） | momus（外部実行基盤利用時） |
 | ADR 判断の確定、記録 | req-define 親エージェント（`agentdev-adr-guidelines`） |
 | ファイル編集 | 親エージェント、各コマンド |
 

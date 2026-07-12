@@ -26,7 +26,7 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0003 | migrated | REQ-0106 | 並列実行をCase実行、完了へ移行 |
 | REQ-0004 | migrated | REQ-0101 | 文書、REQ管理基準へ移行 |
 | REQ-0005 | migrated | REQ-0104, REQ-0106 | Epic管理をworkflowとcase実行へ移行 |
-| REQ-0006 | retired-no-successor | なし | `.sisyphus/` 非関与方針により移行しない |
+| REQ-0006 | retired-no-successor | なし | 実行時作業領域の命名規則であり AgentDevFlow 管理対象外のため移行しない |
 | REQ-0007 | migrated | REQ-0105 | learning pipelineをIntake / Learning / Backlogへ移行 |
 | REQ-0008 | migrated | REQ-0103 | skill品質基準をArtifact責任分界へ移行 |
 | REQ-0009 | migrated | REQ-0103 | template規約をArtifact責任分界へ移行 |

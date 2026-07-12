@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-07
+updated: 2026-07-12
 ---
 
 # 文書モデル
@@ -194,7 +194,6 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 | ディレクトリ | 役割 | 性質 |
 |---|---|---|
 | `.agentdev/` | AgentDevFlow の原本ドメイン状態（intake / learning / backlog / integrity） | 永続的なドメイン状態。配布物ではない |
-| `.sisyphus/` | 実行時作業領域 | 一時的ワークスペース。ドメイン状態ではない |
 | `.agentdev/drafts/` | コマンドワークフローでの作業用一時領域 | 現行コマンドの明示的な作業用ドラフト引き継ぎでのみ使用 |
 
 ### draft の位置づけ（REQ-0138, ADR-0124）
