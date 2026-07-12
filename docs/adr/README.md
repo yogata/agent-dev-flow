@@ -4,7 +4,7 @@
 
 ## 現行基盤ビュー
 
-承認済みステータス（accepted）の ADR-01XX 22件が、現在のアーキテクチャ判断の基盤である。
+承認済みステータス（accepted）の ADR-01XX 23件が、現在のアーキテクチャ判断の基盤である。
 各 ADR は基準再編により旧 ADR の内容を統合、再定義している。
 現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）、非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
 
@@ -25,13 +25,14 @@
 | ADR-0123 | SPEC lifecycle と spec-save の導入 | accepted | 2026-06-18 |
 | ADR-0124 | req_draft soft-contract 原則: LLM推論消費、厳格schemaなし | accepted | 2026-06-19 |
 | ADR-0125 | case-auto Wave 内並列子Issue実行モデル | accepted | 2026-06-20 |
-| ADR-0127 | case-auto 構成工程の task() 委譲によるスケーラビリティ確立 | accepted | 2026-06-21 |
-| ADR-0128 | case-run の実行モデル: task() による実行担当サブエージェント委譲 | accepted | 2026-06-21 |
+| ADR-0127 | case-auto 構成工程の委譲によるスケーラビリティ確立 | accepted | 2026-06-21 |
+| ADR-0128 | case-run の実行モデル: 実行担当サブエージェント委譲 | accepted | 2026-06-21 |
 | ADR-0129 | 複数 execution_unit 並列実行モデル（複数 SSoT 並立と Epic 間並列 orchestration）| accepted | 2026-06-23 |
 | ADR-0130 | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 | accepted | 2026-06-23 |
 | ADR-0131 | ローカル版導入方式を link mode へ統一し生成方式を廃止 | accepted | 2026-06-23 |
 | ADR-0132 | コンフリクト解消モデル（3レベルエスカレーションと責務割当）| accepted | 2026-06-24 |
 | ADR-0135 | Project Extensions Architecture | accepted | 2026-07-04 |
+| ADR-0136 | 配布物ハーネス境界の浄化 | accepted | 2026-07-12 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。
 > 基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
@@ -55,13 +56,14 @@
 - [ADR-0123](ADR-0123.md)（SPEC lifecycle と spec-save の導入）
 - [ADR-0124](ADR-0124.md)（req_draft soft-contract 原則: LLM推論消費、厳格schemaなし）
 - [ADR-0125](ADR-0125.md)（case-auto Wave 内並列子Issue実行モデル）
-- [ADR-0127](ADR-0127.md)（case-auto 構成工程の task() 委譲によるスケーラビリティ確立）
-- [ADR-0128](ADR-0128.md)（case-run の実行モデル: task() による実行担当サブエージェント委譲）
+- [ADR-0127](ADR-0127.md)（case-auto 構成工程の委譲によるスケーラビリティ確立）
+- [ADR-0128](ADR-0128.md)（case-run の実行モデル: 実行担当サブエージェント委譲）
 - [ADR-0129](ADR-0129.md)（複数 execution_unit 並列実行モデル）（複数 SSoT 並立と Epic 間並列 orchestration）
 - [ADR-0130](ADR-0130.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）
 - [ADR-0131](ADR-0131.md)（ローカル版導入方式を link mode へ統一し生成方式を廃止）
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
 - [ADR-0135](ADR-0135.md)（Project Extensions Architecture）
+- [ADR-0136](ADR-0136.md)（配布物ハーネス境界の浄化）
 
 ### 提案中（proposed）
 
@@ -106,10 +108,11 @@
 - [ADR-0109](ADR-0109.md)（Epic Issue 本文を実行順序 SSoT とする設計）
 - [ADR-0114](ADR-0114.md)（case-run 実行責務の外部実行バックエンド委譲）
 - [ADR-0125](ADR-0125.md)（case-auto Wave 内並列子Issue実行モデル）
-- [ADR-0127](ADR-0127.md)（case-auto 構成工程の task() 委譲によるスケーラビリティ確立）
-- [ADR-0128](ADR-0128.md)（case-run の実行モデル: task() による実行担当サブエージェント委譲）
+- [ADR-0127](ADR-0127.md)（case-auto 構成工程の委譲によるスケーラビリティ確立）
+- [ADR-0128](ADR-0128.md)（case-run の実行モデル: 実行担当サブエージェント委譲）
 - [ADR-0129](ADR-0129.md)（複数 execution_unit 並列実行モデル）（複数 SSoT 並立と Epic 間並列 orchestration）
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
+- [ADR-0136](ADR-0136.md)（配布物ハーネス境界の浄化）
 
 ### 文書
 
@@ -165,15 +168,17 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0125 | relates-to | ADR-0114 | 委譲モデルの維持（case-run は1 Issue/call のまま） |
 | ADR-0126 | relates-to | ADR-0105 | source/projection 分離の source model 拡張 |
 | ADR-0127 | relates-to | ADR-0112 | 委譲一般化の case-auto 工程への特定適用（委譲時最小契約に従う） |
-| ADR-0127 | relates-to | ADR-0114 | case-run CLI subprocess 委譲モデルの維持（本 ADR は残り4工程の task() 委譲を追加） |
+| ADR-0127 | relates-to | ADR-0114 | case-run 外部実行バックエンド委譲モデルの維持（本 ADR は残り4工程の委譲を追加） |
 | ADR-0127 | relates-to | ADR-0125 | Wave/子Issueオーケストレーションの維持（case-auto 保持責務は変更しない） |
-| ADR-0128 | relates-to | ADR-0114 | case-run 実行モデルを CLI subprocess から task() による実行担当サブエージェント委譲に変更（result 契約3状態、worktree隔離、Findings/Capture配置は維持） |
+| ADR-0127 | relates-to | ADR-0136 | 本 ADR の委譲記述から harness 固有詳細を除去し、result 契約を4状態へ拡張 |
+| ADR-0128 | relates-to | ADR-0114 | case-run 実行モデルを外部実行バックエンドから実行担当サブエージェント委譲に変更（result 契約4状態、worktree隔離、Findings/Capture配置は維持） |
 | ADR-0128 | relates-to | ADR-0127 | case-auto から Epic/Wave orchestration を削除し case-run/case-close に移管 |
 | ADR-0128 | relates-to | ADR-0125 | Epic Issue 本文の単一書き手を case-auto から case-close に移行 |
 | ADR-0128 | relates-to | ADR-0109 | Epic Issue 本文を SSoT として維持（case-run/case-close が進行状況を判定する基盤） |
+| ADR-0128 | relates-to | ADR-0136 | result 契約を3状態から4状態へ拡張し、harness 固有詳細を配布物から除去 |
 | ADR-0129 | relates-to | ADR-0109 | SSoT 原則の per-Epic 拡張（複数 Epic の SSoT 並立） |
 | ADR-0129 | relates-to | ADR-0125 | Wave 内並列の維持、Epic 間並列の追加（直交する別次元の並列制御） |
-| ADR-0129 | relates-to | ADR-0127 | case-auto orchestration 拡張（複数 execution_unit 並列 orchestration の追加、task() 委譲モデルは維持） |
+| ADR-0129 | relates-to | ADR-0127 | case-auto orchestration 拡張（複数 execution_unit 並列 orchestration の追加、委譲モデルは維持） |
 | ADR-0129 | relates-to | ADR-0128 | case-run スコープ維持（case-run は引き続き単一 standard/epic の現在 Wave を実行） |
 | ADR-0126 | superseded-by | ADR-0131 | ローカル版導入方式の link mode 統一と生成方式廃止 |
 | ADR-0130 | relates-to | ADR-0107 | コマンド・スキル・テンプレート・スクリプト責任分界の適用 |
@@ -183,9 +188,12 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0131 | relates-to | ADR-0105 | source/projection 分離の link mode 適用 |
 | ADR-0131 | relates-to | ADR-0130 | I/O 境界確立を前提とした link mode 統一 |
 | ADR-0132 | relates-to | ADR-0129 | ADR-0129 が受容したコンフリクトコストの解決メカニズムを定義 |
-| ADR-0132 | relates-to | ADR-0128 | case-run の再委譲は既存の task() 委譲モデルを使用 |
+| ADR-0132 | relates-to | ADR-0128 | case-run の再委譲は既存の委譲モデルを使用 |
 | ADR-0134 | relates-to | ADR-0105 | 配布物依存スキルの src 昇格は source/projection 分離における配布物自己完結性の具体化 |
 | ADR-0135 | relates-to | ADR-0104 | 実行時独立性の具体化機構を提供（project-extensions 機構） |
+| ADR-0136 | relates-to | ADR-0114 | case-run 実行委譲の結果契約拡張（3状態→4状態、delegation-unavailable 追加） |
+| ADR-0136 | relates-to | ADR-0127 | case-auto 構成工程委譲の harness 固有詳細除去 |
+| ADR-0136 | relates-to | ADR-0128 | case-run 実行委譲の harness 固有詳細除去 |
 
 ## 関連 REQ
 
@@ -209,14 +217,15 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0124 | [REQ-0138](../requirements/REQ-0138.md) | 構造化 req_draft 契約 |
 | ADR-0125 | [REQ-0106](../requirements/REQ-0106.md), [REQ-0114](../requirements/REQ-0114.md) | case-auto Wave 内並列子Issue実行モデル |
 | ADR-0126 | [REQ-0141](../requirements/REQ-0141.md), [REQ-0134](../requirements/REQ-0134.md) | ローカル版 OpenCode 生成基盤: source model 拡張と生成安全性制約 |
-| ADR-0127 | [REQ-0114](../requirements/REQ-0114.md), [REQ-0119](../requirements/REQ-0119.md) | case-auto 構成工程の task() 委譲によるスケーラビリティ確立 |
-| ADR-0128 | [REQ-0130](../requirements/REQ-0130.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0139](../requirements/REQ-0139.md) | case-run の実行モデル: task() による実行担当サブエージェント委譲 |
+| ADR-0127 | [REQ-0114](../requirements/REQ-0114.md), [REQ-0119](../requirements/REQ-0119.md) | case-auto 構成工程の委譲によるスケーラビリティ確立 |
+| ADR-0128 | [REQ-0130](../requirements/REQ-0130.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0139](../requirements/REQ-0139.md) | case-run の実行モデル: 実行担当サブエージェント委譲 |
 | ADR-0129 | [REQ-0148](../requirements/REQ-0148.md), [REQ-0114](../requirements/REQ-0114.md) | 複数 execution_unit 並列実行モデル（複数 SSoT 並立、Epic 間並列 orchestration） |
 | ADR-0130 | [REQ-0149](../requirements/REQ-0149.md), [REQ-0150](../requirements/REQ-0150.md) | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 |
 | ADR-0131 | [REQ-0141](../requirements/REQ-0141.md), [REQ-0134](../requirements/REQ-0134.md), [REQ-0150](../requirements/REQ-0150.md) | ローカル版導入方式を link mode へ統一し生成方式を廃止 |
 | ADR-0132 | [REQ-0151](../requirements/REQ-0151.md), [REQ-0148](../requirements/REQ-0148.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0131](../requirements/REQ-0131.md), [REQ-0130](../requirements/REQ-0130.md) | コンフリクト解消モデル（3レベルエスカレーションと責務割当） |
 | ADR-0134 | [REQ-0159](../requirements/REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 |
 | ADR-0135 | [REQ-0160](../requirements/REQ-0160.md), [REQ-0103](../requirements/REQ-0103.md) | Project Extensions Architecture（doc-inputs から project-extensions への全面置換） |
+| ADR-0136 | [REQ-0162](../requirements/REQ-0162.md), [REQ-0139](../requirements/REQ-0139.md), [REQ-0130](../requirements/REQ-0130.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0151](../requirements/REQ-0151.md) | 配布物ハーネス境界の浄化（harness 固有詳細の配布物からの除去、4状態結果契約） |
 
 ## 廃止済み、履歴ビュー
 
