@@ -28,7 +28,7 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 |---|---|---|---|
 | `pending` | 依存 Issue または前 Wave の完了待ち。異常ではない | case-open（初期値） | いいえ |
 | `ready` | 依存が満たされ、case-run(#epic) が実行可能と判定した状態。**永続状態には書き込まれない** | case-run 内部判定（永続状態に書き込まない） | いいえ |
-| `running` | case-run(#epic) が task() 起動し実行中の状態。**永続状態には書き込まれない** | case-run 内部状態（永続状態に書き込まない） | いいえ |
+| `running` | case-run(#epic) が委譲起動し実行中の状態。**永続状態には書き込まれない** | case-run 内部状態（永続状態に書き込まない） | いいえ |
 | `completed` | Issue の実装、検証、必要な case-close が完了した状態 | case-close | はい |
 | `blocked` | 要件曖昧性、外部副作用、権限不足、矛盾等により自動継続できない状態 | case-close（実行結果から確定） | はい |
 | `failed` | 実装、検証、CI、PR 作成などの実行結果として失敗した状態 | case-close（実行結果から確定） | はい |
@@ -64,7 +64,7 @@ case-close は Epic Issue 本文ステータス追跡テーブルの単一書き
 5. 既に `completed`、`blocked`、または `failed` の場合 → スキップ（べき等性）
 6. Issue 本文更新手続き（`agentdev-gh-cli`）でEpic本文を更新
 
-`blocked`/ `failed` は case-close が case-run(#epic) の実行結果（`completed(pr)`/ `blocked`/ `failed`）から確定して Epic Issue 本文へ反映する終了状態。
+`blocked`/ `failed` は case-close が case-run(#epic) の実行結果（`completed-pr`/ `blocked`/ `failed`）から確定して Epic Issue 本文へ反映する終了状態。
 case-close は確定済みの `completed`/ `blocked`/ `failed` を上書きしない。
 
 一括更新順序（case-close(#epic) の複数子Issue一括更新時）: 子Issue番号の昇順
