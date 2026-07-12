@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-07-03
+updated: 2026-07-12
 ---
 
 # req-define SPEC
@@ -32,7 +32,7 @@ updated: 2026-07-03
 - git 操作: 実行しない（G08）
 - Issue 作成: 行わない（後続 case-open 責務）
 
-## 現在の動作
+## 現在の動作（oracle/explore 抽象化後）
 
 - Step 1: セッションコンテキスト検知（引数なし単体実行時のみ）（当該セッション履歴、現在コンテキストを Requirement Source 候補として評価）
 - Step 2: 明示入力ファイル読込（指定時）（RU 自動検出を含む）
@@ -43,11 +43,11 @@ updated: 2026-07-03
  - Step 4-2: SPLIT 予兆計測（既存REQの健全性メトリクス計測）
 - Step 5: 要件展開（`agentdev-req-analysis` 分析観点）
  - Step 5-1: 変更影響候補抽出
- - RU 由来キーワード抽出 + glob/grep 前処理による explore 委譲スコープの絞り込み（REQ-0102-072）。絞り込みは explore 委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-0102-002）の完全性は維持する
+  - RU 由来キーワード抽出 + glob/grep 前処理によるサブエージェント調査委譲スコープの絞り込み（REQ-0102-072）。絞り込みはサブエージェント調査委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-0102-002）の完全性は維持する
  - Step 5-2: 分類ゲート（REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/SPEC 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/specs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（REQ-0155-008）」に定める
  - Step 5-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
- - Step 5-4: ADR要否確認ゲート（`agentdev-architecture-advisory` oracle 連携）
- - oracle 入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-0102-073）。ラベル構造は soft-contract（ADR-0124）とし、分類権限は親が保持する
+  - Step 5-4: ADR要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
+  - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-0102-073）。ラベル構造は soft-contract（ADR-0124）とし、分類権限は親が保持する
  - Step 5-5: 実行主体分類表（REQ-0146-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
  - Step 5-6: Test strategy 定義（要件展開内）
  - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
@@ -177,7 +177,7 @@ req-define 側は出力形式のみを規定する。
 - [quality-gates.md](../quality/quality-gates.md)（QG-1）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（draft body 品質検査）
 
-## 対象外
+## 対象外（G18 抽象化後）
 
 - 実装コードの作成、編集（G01: 壁打ちフェーズのみ）
 - 関連ドキュメントの個別ファイル列挙をユーザーに求める（G02）
@@ -191,7 +191,7 @@ req-define 側は出力形式のみを規定する。
 - `execution_groups` セクション出力（G14）
 - SPEC 分離基準（REQ-0101-068）該当要件行の REQ 残留（G15、`artifact_actions` へ分離）
 - ADR判断における未確認事項の要件本文混入（G17、REQ-0139-002/004）
-- oracle によるファイル編集（G18、REQ-0139-003）
+- アーキテクチャ助言サブエージェントによるファイル編集（G18、REQ-0139-003）
 
 ## 検証観点
 
@@ -201,7 +201,7 @@ req-define 側は出力形式のみを規定する。
 - artifact_actions 構成: REQ/ADR/SPEC 別 action が適切に統合されているか
 - OU 構造検証: Step 11-6 で ou_id、operation、target_req/target_spec、depends_on、result 整合性
 
-## See Also
+## See Also（oracle 抽象化後）
 
 - [req-save.md](req-save.md)（後続コマンド（REQ/ADR 保存））
 - [spec-save.md](spec-save.md)（後続コマンド（SPEC 保存））
@@ -209,9 +209,9 @@ req-define 側は出力形式のみを規定する。
 - `agentdev-req-analysis` skill（要件分析手法）
 - `agentdev-req-file-manager` skill（REQ ファイル管理、照合）
 - `agentdev-adr-guidelines` skill（ADR 判断基準）
-- `agentdev-architecture-advisory` skill（oracle 連携）
+- `agentdev-architecture-advisory` skill（アーキテクチャ助言サブエージェント連携）
 - `agentdev-workflow-lifecycle` skill（work_type、scale 判定）
 - REQ-0102（要件定義、保存）
 - REQ-0138（構造化 req_draft 契約）
-- REQ-0139（外部エージェント統合契約（oracle））
+- REQ-0139（外部エージェント統合契約）
 - ADR-0124（構造化 draft-data 形式）
