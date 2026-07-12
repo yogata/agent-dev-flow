@@ -219,9 +219,6 @@ cd .agentdev-plugin && git pull && cd ..
 # AgentDevFlow の clone 先
 .agentdev-plugin/
 
-# OpenCode の実行時作業領域
-.sisyphus/
-
 # AgentDevFlow がジャンクション管理するディレクトリ（インストールスクリプトが自動作成）
 .opencode/commands/agentdev/
 .opencode/skills/agentdev-*/

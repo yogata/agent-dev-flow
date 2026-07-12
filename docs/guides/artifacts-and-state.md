@@ -80,8 +80,6 @@ scripts/
   sync-self-opencode.ps1         # AgentDevFlow 本体リポジトリ用同期スクリプト
   install-consumer-opencode.ps1  # 適用プロジェクト用インストールスクリプト
   check-consumer-opencode.ps1    # 適用プロジェクト用状態確認スクリプト
-.sisyphus/                       # 一時的な実行時作業領域（ドメイン状態ではない、ADR-0104）
-  drafts/                        # コマンドワークフローの作業用一時領域（明示的な引き継ぎ時のみ使用）
 ```
 
 ### 適用プロジェクト（consumer-with-agentdev）
@@ -105,14 +103,12 @@ scripts/
 scripts/
   install-consumer-opencode.ps1  # 適用プロジェクト用インストールスクリプト
   check-consumer-opencode.ps1    # 適用プロジェクト用状態確認スクリプト
-.sisyphus/                       # 一時的な実行時作業領域
 ```
 
 ### ディレクトリ責務の補足
 
 - `.agentdev/`: AgentDevFlow のドメイン状態。Intake / Learning / Backlog / 整合性の永続データを管理する。配布物ではなく、リポジトリの動作状態を保持する（ADR-0103）。AgentDevFlow 本体リポジトリ / 適用プロジェクトの双方で使用される。
 - `.agentdev-plugin/`: 適用プロジェクトにおける agent-dev-flow の git clone 先（REQ-0103-072~077）。AgentDevFlow 本体リポジトリでは直接 `.agentdev/` を使用する。`.gitignore` で管理対象外とする。
-- `.sisyphus/`: 実行時の一時作業領域。ドメイン状態ではなく、`.gitignore` で管理対象外とする（ADR-0104）。
 - `.agentdev/drafts/`: コマンドワークフローでのみ明示的に定義された作業中ドラフトの引き継ぎに使用する一時領域。
 
 ## 成果物ライフサイクル
@@ -166,4 +162,3 @@ RU 削除は `/agentdev/case-open` の永続化成功に限定する。
 - **ドメイン状態**: Intake / Learning / Backlog / 整合性のパイプライン状態を保持する
 - **配布物ではない**: 実行時配布物の一部ではなく、agent-dev-flow リポジトリ内の作業領域である
 - **git 管理対象**: コマンド実行時に scoped commit で永続化される
-- `.sisyphus/` は実行時作業領域であり、ドメイン状態ではない
