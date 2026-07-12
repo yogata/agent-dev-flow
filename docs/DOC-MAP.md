@@ -44,7 +44,7 @@
 | [REQ-0132](requirements/REQ-0132.md) | case-open / Issue作成 | case-open Epic・子Issue作成、連結成分ベース複数Standard/Epic構成生成・3軸判断・単独根Standard flow |
 | [REQ-0133](requirements/REQ-0133.md) | case-update / Issue更新 | case-update Issue本文更新・コメント追加 |
 | [REQ-0134](requirements/REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install | source/projection layout、sync/migration script、repo type、consumer install |
-| [REQ-0135](requirements/REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry、`.sisyphus/` 除外 |
+| [REQ-0135](requirements/REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry |
 | [REQ-0136](requirements/REQ-0136.md) | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設・req-define 強化） | spec-save 新設、req-define SPEC分離強化、case-* SPEC確定フロー、inspect-promote 自動promote、REQ健全性メトリクス、SPEC lifecycle（draft/accepted） |
 | [REQ-0137](requirements/REQ-0137.md) | 並列実行安全 git 操作規律（共有作業ツリーでの case-auto 並行実行支援） | 並列実行安全 git 操作規律、スイープ操作禁止、明示パスステージ&コミット、消費アーティファクト(draft/RU)削除信頼性・Form Zero解消・削除検証 Standard/Epic 全flow適用 |
 | [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 | コマンド間引き継ぎ draft 契約、soft-contract原則、artifact_actions構造、LLM推論消費、depends_on意義拡張（技術的+機能的依存ヒント）・case_open_hints記録 |
@@ -53,9 +53,9 @@
 | [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 導入方式とローカルCaseファイル運用 | link mode導入方式、src/opencode-local/ agentdev-gh-cli原本領域、agentdev-gh-cli差し替え、ローカルCaseファイル、GitHub Issue/PR 置換、unlink/relink、link target確認 |
 | [REQ-0142](requirements/REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 | 配布物 ID 除去後の完了条件としての文意保持・構文健全性・責務整合、Markdown 構文破損回避・主要構造重複回避・壊れた参照残骸除去、command / skill / SPEC 間責務説明整合（case-open / case-run / case-close / case-auto）、横断検査観点拡充、NG / false positive 分類明確化、docs-spec-rebuild-integrity.md |
 | [REQ-0143](requirements/REQ-0143.md) | Command 定義ファイルフォーマット標準化 | AgentDevFlow 管理 command 定義ファイル（src/opencode/commands/agentdev/*.md・.opencode/commands/repo/*.md）の command file format 準拠、適用対象限定、consumer project 独自 command 強制対象外 |
-| [REQ-0144](requirements/REQ-0144.md) | docs-check/integrity 運用是正 | 廃止REQ履歴マーク参照・workflow否定表現・RFC2119マーカー・日本語品質・skill-category-gap・コマンド一覧網羅・REQ範囲表記・fixture経年劣化・QG/case-close Step番号・Sisyphus-Junior×/ulw-loop 誤分類表記・integrity reports git除外 |
+| [REQ-0144](requirements/REQ-0144.md) | docs-check/integrity 運用是正 | 廃止REQ履歴マーク参照・workflow否定表現・RFC2119マーカー・日本語品質・skill-category-gap・コマンド一覧網羅・REQ範囲表記・fixture経年劣化・QG/case-close Step番号・実行主体誤分類表記検出・integrity reports git除外 |
 | [REQ-0145](requirements/REQ-0145.md) | docs-check/integrity 検出設計改善 | IR-044 SPEC詳細混入解消・委譲キーワード境界ケース・catalog↔実装双方向同期・docs-check項目役割範囲・新カテゴリ追加判定フロー・IR-050/051 語彙レジストリ・閾値確定・3層検出構造責務分担・draft SPEC参照リスト・references checker偽陽性・完了条件grep設計 |
-| [REQ-0146](requirements/REQ-0146.md) | 実行契約・委譲・プロセス設計 | oh-my-openagent CLI引数正規化・委譲プロンプト雛形・case-open即時push・case-auto委譲契約MUST NOT DO・case-close squash merge後reset・git-common-procedures・実行主体分類表・3層検出構造SPEC化・doc-writing査読観点・前工程完了度3段階・subagent-protocol・command-authoring判断基準・バッチIssue完了判定追跡性 |
+| [REQ-0146](requirements/REQ-0146.md) | 実行契約・委譲・プロセス設計 | 委譲契約・case-open即時push・case-auto委譲契約MUST NOT DO・case-close squash merge後reset・git-common-procedures・実行主体分類表・3層検出構造SPEC化・doc-writing査読観点・前工程完了度3段階・subagent-protocol・command-authoring判断基準・バッチIssue完了判定追跡性 |
 | [REQ-0147](requirements/REQ-0147.md) | 文書化規律・HITL境界 | SKILL↔command同一ルール重複許容基準・新旧REQ適用運用ルール・promote/review系HITL限定・判断確定後自動実行・破壊的変更承認維持・learning-promote prune・intake-promote自動実行・backlog-review矛盾検出時追加判断 |
 | [REQ-0148](requirements/REQ-0148.md) | RU群バッチ処理と複数 execution_unit 並列実行 | 複数RUバッチ統合・連結成分ベース複数Standard/Epic構成・3軸判断（依存強度・Epicサイズ・機能的一貫性）・execution_unit 並列 orchestration・blocked部分停止・REQ-0114-088破壊的UPDATE |
 | [REQ-0149](requirements/REQ-0149.md) | agentdev-gh-cli 手続き委譲基盤 | gh-cli 手続き委譲基盤と I/O 責務分離 |
