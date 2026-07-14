@@ -1,8 +1,8 @@
 ---
 title: 責務境界浄化: 所有/非所有リスト詳細
-status: draft
+status: accepted
 created: 2026-07-14
-updated: 2026-07-14
+updated: 2026-07-15
 ---
 
 # 責務境界浄化: 所有/非所有リスト詳細
