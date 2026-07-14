@@ -258,7 +258,7 @@ operation_units:
     depends_on: []
     recommended_order: 1
     issue_policy: single
-    result: {}
+    result: {issue_number: 1495, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1495'}
   - ou_id: OU-002
     source_ru: RU-20260714-01
     target_req: REQ-0119
@@ -267,7 +267,7 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result: {issue_number: 1496, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1496'}
   - ou_id: OU-003
     source_ru: RU-20260714-01
     target_req: REQ-0103
@@ -276,7 +276,7 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result: {issue_number: 1497, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1497'}
   - ou_id: OU-004
     source_ru: RU-20260714-01
     target_req: REQ-0114
@@ -285,7 +285,7 @@ operation_units:
     depends_on: []
     recommended_order: 4
     issue_policy: single
-    result: {}
+    result: {issue_number: 1498, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1498'}
   - ou_id: OU-005
     source_ru: RU-20260714-01
     target_req: REQ-0130
@@ -294,7 +294,7 @@ operation_units:
     depends_on: []
     recommended_order: 5
     issue_policy: single
-    result: {}
+    result: {issue_number: 1499, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1499'}
   - ou_id: OU-006
     source_ru: RU-20260714-01
     target_req: REQ-0139
@@ -303,7 +303,7 @@ operation_units:
     depends_on: []
     recommended_order: 6
     issue_policy: single
-    result: {}
+    result: {issue_number: 1500, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1500'}
   - ou_id: OU-007
     source_ru: RU-20260714-01
     target_req: REQ-0160
@@ -312,7 +312,7 @@ operation_units:
     depends_on: []
     recommended_order: 7
     issue_policy: single
-    result: {}
+    result: {issue_number: 1501, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1501'}
   - ou_id: OU-008
     source_ru: RU-20260714-01
     target_req: REQ-0151
@@ -321,7 +321,7 @@ operation_units:
     depends_on: []
     recommended_order: 8
     issue_policy: single
-    result: {}
+    result: {issue_number: 1502, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1502'}
   - ou_id: OU-009
     source_ru: RU-20260714-01
     target_req: ADR-0136
@@ -330,7 +330,7 @@ operation_units:
     depends_on: [OU-001, OU-002, OU-003, OU-004, OU-005, OU-006, OU-007, OU-008]
     recommended_order: 9
     issue_policy: single
-    result: {}
+    result: {issue_number: 1503, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1503'}
   - ou_id: OU-010
     source_ru: RU-20260714-01
     target_spec:
@@ -342,7 +342,7 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 10
     issue_policy: single
-    result: {}
+    result: {issue_number: 1504, issue_url: 'https://github.com/yogata/agent-dev-flow/issues/1504'}
 
 test_strategy:
   - id: TS-001
@@ -396,6 +396,8 @@ test_strategy:
     on_failure: fix-and-reverify
 
 case_open_hints:
+  epic_issue: 1494
+  epic_url: 'https://github.com/yogata/agent-dev-flow/issues/1494'
   epic_needed: true
   decomposition:
     - OU-001〜008は各REQのUPDATEであり、REQ-0162の原則への参照依存のみ（必須依存なし、並列実行可能）
