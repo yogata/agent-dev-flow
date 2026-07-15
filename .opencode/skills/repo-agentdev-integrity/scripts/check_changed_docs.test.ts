@@ -70,9 +70,10 @@ function copyScripts(fixtureRoot: string): void {
   copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
 }
 
-// Required TargetedDocsReport fields (REQ-0158 Phase 2 / AG-002).
+// Required TargetedDocsReport fields (REQ-0158 Phase 2 / AG-002 / Epic #1515 OU-005 TS-013).
 // doc_inputs_check_required is intentionally absent (extensions_check_required
-// is its successor).
+// is its successor). docInputsCheckRequired (camelCase, REQ-0158 「check_changed_docs.ts
+// report フィールド」節) は別フィールドとして必須。
 const REQUIRED_FIELDS = [
   "workflow",
   "files_checked",
@@ -84,6 +85,7 @@ const REQUIRED_FIELDS = [
   "requirements_readme_update_required",
   "full_docs_check_recommended",
   "extensions_check_required",
+  "docInputsCheckRequired",
   "declared_files_check",
 ] as const;
 
@@ -285,6 +287,7 @@ describe("TS-004: text output reports every required field name", () => {
     requirements_readme_update_required: "requirements_readme_update_required:",
     full_docs_check_recommended: "full_docs_check_recommended:",
     extensions_check_required: "extensions_check_required:",
+    docInputsCheckRequired: "docInputsCheckRequired:",
   };
 
   it("text output mentions every required field via its stable token", () => {

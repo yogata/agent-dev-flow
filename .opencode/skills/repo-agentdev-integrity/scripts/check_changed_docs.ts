@@ -68,6 +68,11 @@ interface TargetedDocsReport {
   requirements_readme_update_required: boolean;
   full_docs_check_recommended: boolean;
   extensions_check_required: boolean;
+  // REQ-0158「check_changed_docs.ts report フィールド」節。
+  // 検査入力の必要性（boolean）。当該 workflow profile が文書検査入力を
+  // 必要とするかを示す。downstream（case-close 等）が silent pass 検出に使用。
+  // 現行 5 workflow はすべて文書検査ルールを持つため true。
+  docInputsCheckRequired: boolean;
   declared_files_check: { declared: string[]; missing: string[]; extra: string[] } | null;
 }
 
@@ -722,6 +727,7 @@ function emitText(report: TargetedDocsReport): void {
   );
   console.log(`full_docs_check_recommended: ${report.full_docs_check_recommended}`);
   console.log(`extensions_check_required: ${report.extensions_check_required}`);
+  console.log(`docInputsCheckRequired: ${report.docInputsCheckRequired}`);
   if (report.declared_files_check) {
     console.log(`declared_files_check:`);
     console.log(`  declared: ${report.declared_files_check.declared.length}`);
@@ -795,6 +801,7 @@ function main(): void {
     requirements_readme_update_required: runResult.requirementsReadmeUpdateRequired,
     full_docs_check_recommended: runResult.fullDocsCheckRecommended,
     extensions_check_required: runResult.extensionsCheckRequired,
+    docInputsCheckRequired: profile.rules.length > 0,
     declared_files_check: runResult.declaredFilesCheck,
   };
 
