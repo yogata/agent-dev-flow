@@ -117,7 +117,7 @@ PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（
  - 更新漏れを検出した場合は警告表示してユーザー判断を仰ぐ
  - **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない
   - **extensions 整合性検査（IR-056、REQ）**: 当該 PR が `.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/SKILL.md`、`.opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合、`check_extensions.ts` を strict 実行し、IR-056 違反がないことを確認する。違反時はマージを停止しユーザー判断を仰ぐ
-  - **targeted docs guard（REQ）**: 変更ファイルと連動ファイルに対し targeted docs guard を実行する。PR 変更ファイル一覧は PR 補助データ読込手続き（`agentdev-gh-cli`）で `gh pr view <PR> --json files` から取得する（case-close はマージ後 main 環境で実行されるため `--files` を使用。`--base-ref` は worktree 環境（マージ前、case-run 等）向け）。実行コマンド:
+   - **targeted docs guard（REQ）**: 変更ファイルと連動ファイルに対し targeted docs guard を実行する。PR 変更ファイル一覧は PR 補助データ読込手続き（`agentdev-gh-cli`、PR 変更ファイル一覧取得）で取得する（case-close はマージ後 main 環境で実行されるため `--files` を使用。`--base-ref` は worktree 環境（マージ前、case-run 等）向け）。実行コマンド:
 
     ```bash
     bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
@@ -158,7 +158,7 @@ case-close が使用する検査ツール（[integrity-contracts.md](../../../..
 
 **Step 4-0: squash merge 前の mergeable UNKNOWN ポーリング（REQ）**。
 squash merge 実行前に、対象 PR の mergeable 状態を事前確認し、`UNKNOWN` の場合は mergeable になるまでポーリング待機する。連続 squash merge 時に GitHub が mergeable を `UNKNOWN` 状態で返し、マージが失敗する事象（バックグラウンドの mergeable 再計算未完了）を回避する:
-  - **状態取得**: PR 補助データ読込手続き（`agentdev-gh-cli`）で `gh pr view {N} --json mergeable,mergeStateStatus` を実行し、`mergeable` 値を取得
+  - **状態取得**: PR 補助データ読込手続き（`agentdev-gh-cli`、PR mergeable 状態取得）で `mergeable` 値を取得する
   - **判定**: `mergeable` が `MERGEABLE` の場合は即時 squash merge（次項）へ進む。`UNKNOWN` の場合はポーリングへ移行。`CONFLICTING` の場合はコンフリクト解消パス（Step 4-2）へ進む
   - **ポーリング**: 最大60秒、10秒間隔で状態取得を再実行し `mergeable` が `MERGEABLE` になるのを待機する。各ポーリング試行（時刻、`mergeable`、`mergeStateStatus`）をログ記録すること
   - **上限超過時**: 60秒経過しても `UNKNOWN` の場合はマージを中止し、構造化エラーとして報告して停止する。エラーには PR 番号、最終 `mergeable`/ `mergeStateStatus`、ポーリング試行回数を含める
