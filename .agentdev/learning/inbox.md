@@ -36,3 +36,35 @@
 - 想定反映先: agentdev-quality-gates QG-2 (acceptance-criteria-coverage)、agentdev-req-analysis (テスト戦略の実現可能性検証)、agentdev-workflow-templates (Epic 完了条件テンプレート)
 - 関連: Issue #1516, PR #1525, Epic #1515 Wave 1
 - タグ: #qg4 #spec-bug #epic-scope #test-strategy #acceptance-judgment
+
+## verification-only PR の squash merge と files_checked 空の正当ケース (Epic #1515 Wave 2)
+
+- 問題事象: PR #1527 (Issue #1521 / OU-006) は verification-only でファイル変更 0件。squash merge 可能か、また case-close Step 3-1 targeted docs guard で files_checked が空になる際の正当性確認手順が不明だった
+- 発生局面: レビュー (case-close QG-4 / Step 3-1)
+- 検知方法: gh pr view の files 配列が空、check_changed_docs.ts --files 指定で files_checked が空になり TARGET-EMPTY が問うた際の Step 3-1 REQ 確認手順 (item 1-4) 実行
+- 根本原因: verification-only case-run (実装差分なし、検証のみ) の成果物である空 PR の取り扱いが command SPEC に明文化されていない。GitHub は空 PR の squash merge を許容し空 commit を生成するが、case-close 側は files_checked 空 を正当理由で処理する手順 (REQ Phase 3) を踏む必要がある
+- 自律対応内容: (1) GitHub が空 PR の squash merge を受入れたことを確認 (commit 2b34f8b0 生成)、(2) Step 3-1 REQ item 1-4 に従い files_checked 空の理由を「verification-only PR で変更ファイル 0件」と特定し正当と判断、(3) QG-4 は完了条件を現在の repo 状態で客観評価し PASS 判定
+- ユーザー確認有無: なし
+- ADR/REQ/spec影響: あり。verification-only PR の case-close 取り扱い (merge 可否、files_checked 空の確認手順) が command SPEC に未明文化。false-clean 3層防御 (本 Epic OU-005 で実装) との相互作用の文書化が必要
+- 横展開観点: REQ/SPEC の受け入れ基準が既存 repo 状態で満たされている場合 (req-save/spec-save 完了済みで case-run が検証のみ) に発生し得る
+- 再発条件: case-run が verification-only (実装差分なし) で PR を作成し、case-close が targeted docs guard を実行する場合
+- 予防策候補: (a) case-run SPEC に verification-only PR の取り扱い (空 commit 許容、case-close への引継ぎ) を明文化、(b) check_changed_docs.ts が files_checked 空時に verification-only フラグを考慮、(c) case-close Step 3-1 に verification-only PR の確認手順を明記
+- 想定反映先: docs/specs/commands/case-run.md (verification-only セクション)、docs/specs/commands/case-close.md (Step 3-1 verification-only 確認)、docs/requirements/REQ-0158.md (false-clean と verification-only の相互作用)
+- 関連: Issue #1521, PR #1527, Epic #1515 Wave 2, REQ-0158 false-clean 3層防御 (本 Epic OU-005)
+- タグ: #verification-only #empty-pr #squash-merge #files-checked-empty #false-clean #case-close
+
+## check_changed_docs.ts --files 引数解析 (comma 区切り vs space 区切り) (Epic #1515 Wave 2)
+
+- 問題事象: case-close Step 3-1 で check_changed_docs.ts --files に comma 区切り文字列 ("file1,file2,file3") を渡すと、1つのファイルパスとして解釈され fs.existsSync で除外され files_checked が空になり TARGET-EMPTY (strict severity) が発火した
+- 発生局面: レビュー (case-close Step 3-1 targeted docs guard)
+- 検知方法: check_changed_docs.ts 実行結果の files_checked 空と TARGET-EMPTY strict failure、script ソース (L121-126) の --files パーサ確認で space 区切り仕様を発見
+- 根本原因: --files パーサが `while (i < args.length && !args[i].startsWith("--")) parsed.files.push(args[i])` で次トークンを順次 file として積む仕様。comma 区切りは 1 file 扱い。case-close.md の実行コマンド例は `--files <PR 変更ファイル一覧>` と抽象表記で区切り文字が明示されていない
+- 自律対応内容: space 区切りで再実行し files_checked 3件、coupled 3件、failures 0 で PASS を確認。comma 区切りが仕様外であることを特定
+- ユーザー確認有無: なし
+- ADR/REQ/spec影響: あり。case-close.md Step 3-1 の実行コマンド例で --files の区切り形式が未明示。check_changed_docs.ts のヘルプテキスト、SPEC targeted-docs-guard-implementation.md の呼出例でも区切り形式が未明記
+- 横展開観点: case-run、spec-save 等 --files を使用する全 workflow で同一事象が発生し得る
+- 再発条件: --files に comma 区切りで複数ファイルを渡す場合
+- 予防策候補: (a) check_changed_docs.ts ヘルプ/エラーメッセージで区切り形式を明示、(b) comma 区切りも併用受入 (split on comma)、(c) case-close.md / SPEC 呼出例で space 区切りを明示
+- 想定反映先: check_changed_docs.ts (usage メッセージ)、docs/specs/integrity/targeted-docs-guard-implementation.md (呼出例)、src/opencode/commands/agentdev/case-close.md (Step 3-1 実行コマンド)
+- 関連: Issue #1520, PR #1526, Epic #1515 Wave 2, OU-005 false-clean 3層防御
+- タグ: #check-changed-docs #files-arg #cli-usage #false-clean-trigger #case-close
