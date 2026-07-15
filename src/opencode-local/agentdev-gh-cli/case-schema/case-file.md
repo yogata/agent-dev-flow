@@ -212,10 +212,10 @@ GitHub PR 取り込みは実行しない。
 
 ## 関連項目
 
-- `docs/specs/local/local-generation.md` — link mode 接続フロー、link target 確認、更新運用の正本 SPEC
-- `rules/frontmatter.yaml` — YAML 前書きスキーマの機械可読定義
-- `rules/status.yaml` — status enum と状態遷移表の機械可読定義
-- `rules/labels.yaml` — labels 値域の機械可読定義
-- `rules/headings.yaml` — 見出し一覧の機械可読定義
-- `docs/specs/local/local-case-file.md` — 意味仕様の正本
-- REQ-0141 — ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義
+- `docs/specs/local/local-generation.md`：link mode 接続フロー、link target 確認、更新運用の正本 SPEC
+- `rules/frontmatter.yaml`：YAML 前書きスキーマの機械可読定義
+- `rules/status.yaml`：status enum と状態遷移表の機械可読定義
+- `rules/labels.yaml`：labels 値域の機械可読定義
+- `rules/headings.yaml`：見出し一覧の機械可読定義
+- `docs/specs/local/local-case-file.md`：意味仕様の正本
+- REQ-0141：ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義
