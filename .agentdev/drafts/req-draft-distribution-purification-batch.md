@@ -322,7 +322,7 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {saved_reqs: [REQ-0162-007, REQ-0162-008], saved_spec: docs/specs/foundations/harness-separation-model.md}
+    result: {saved_reqs: [REQ-0162-007, REQ-0162-008], saved_spec: docs/specs/foundations/harness-separation-model.md, epic_number: 1515, issue_number: 1516, wave: 1}
 
   - ou_id: OU-002
     source_rus: [RU-0006, RU-0007]
@@ -332,7 +332,7 @@ operation_units:
     depends_on: []
     recommended_order: 4
     issue_policy: single
-    result: {saved_reqs: [REQ-0152-003]}
+    result: {saved_reqs: [REQ-0152-003], epic_number: 1515, issue_number: 1517, wave: 1}
 
   - ou_id: OU-003
     source_rus: [RU-0003, RU-0010, RU-0011, RU-0012]
@@ -342,7 +342,7 @@ operation_units:
     depends_on: []
     recommended_order: 1
     issue_policy: single
-    result: {saved_reqs: [REQ-0161-001, REQ-0161-002, REQ-0161-004 (broken-ref purified)], coreq_updated: REQ-0144 (broken-ref count 5->4)}
+    result: {saved_reqs: [REQ-0161-001, REQ-0161-002, REQ-0161-004 (broken-ref purified)], coreq_updated: REQ-0144 (broken-ref count 5->4), epic_number: 1515, issue_number: 1518, wave: 1}
 
   - ou_id: OU-004
     source_rus: [RU-0004]
@@ -356,7 +356,7 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {saved_reqs: [REQ-0130-035 (WHAT purified)], saved_spec: docs/specs/integrity/targeted-docs-guard-implementation.md (new)}
+    result: {saved_reqs: [REQ-0130-035 (WHAT purified)], saved_spec: docs/specs/integrity/targeted-docs-guard-implementation.md (new), epic_number: 1515, issue_number: 1519, wave: 1}
 
   - ou_id: OU-005
     source_rus: [RU-0005]
@@ -370,7 +370,7 @@ operation_units:
     depends_on: [OU-004]
     recommended_order: 5
     issue_policy: single
-    result: {saved_reqs: [REQ-0158 Phase1-6 section migrated to SPEC, false-clean/report-field sections appended], saved_spec: docs/specs/integrity/targeted-docs-guard-implementation.md (Phase1-6 + report field sections)}
+    result: {saved_reqs: [REQ-0158 Phase1-6 section migrated to SPEC, false-clean/report-field sections appended], saved_spec: docs/specs/integrity/targeted-docs-guard-implementation.md (Phase1-6 + report field sections), epic_number: 1515, issue_number: 1520, wave: 2, depends_on_issue: 1519}
 
   - ou_id: OU-006
     source_rus: [RU-0009]
@@ -380,7 +380,7 @@ operation_units:
     depends_on: [OU-004]
     recommended_order: 6
     issue_policy: single
-    result: {saved_reqs: [REQ-0130-037 (draft expected -036, deterministic alloc overrode to -037 due to existing -036)]}
+    result: {saved_reqs: [REQ-0130-037 (draft expected -036, deterministic alloc overrode to -037 due to existing -036)], epic_number: 1515, issue_number: 1521, wave: 2, depends_on_issue: 1519}
 
 test_strategy:
   - id: TS-001
