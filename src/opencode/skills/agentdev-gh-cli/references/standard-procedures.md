@@ -28,6 +28,14 @@
 
 - `gh` コマンドの出力取得には Node.js `child_process.execSync` を使用する（pwsh パイプラインをバイパスして gh CLI の生の UTF-8 出力を直接取得するため）
 
+### PowerShell 変数補間（regex backreference `$N`）
+
+- PowerShell は文字列内の `$N`（N は数字）を変数補間の開始として解釈する。regex の backreference（`$1`, `$2` 等）を `-replace` 演算子の右辺にダブルクォート（`"..."`）で渡すと、PowerShell 変数として展開され空文字列になる等の破壊が発生する。
+- **対策**: regex backreference を含む置換文字列はシングルクォート（`'...'`）で囲むこと。または `[regex]::Replace()` を直接使用し、`-replace` 演算子のダブルクォート右辺を避けること。
+- **適用場面**: Issue/PR 本文やタイトルに対する regex 加工、Epic ステータス追跡テーブルの正規表現置換（`$1`, `$2` capture group 参照）等。
+- **例（NG）**: `"pattern" -replace "(foo)", "$1-bar"`（`$1` が PowerShell 変数として展開され、空文字列になる）
+- **例（OK）**: `"pattern" -replace "(foo)", '$1-bar'`（シングルクォートで backreference を保持）
+
 ## WRITE 手続き（書き込み安全性）
 
 ### 1. 禁止事項
