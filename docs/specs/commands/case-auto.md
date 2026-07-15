@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-07-12
+updated: 2026-07-16
 ---
 
 # case-auto SPEC
@@ -32,42 +32,40 @@ updated: 2026-07-12
 ## 現在の動作
 
 - Step 1: 入力解決
- - 実行開始時刻の記録（REQ-0114-082）（JST（Etc/GMT-9）、人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で `case_auto_started_at` 変数に保持）
- - Issue番号/URL入力モード（`^\d+$` または GitHub Issue URL の場合、case-run移行モードへ分岐）
- - 要件doc入力モード（明示パス→draft検出（複数件含む全件処理）→セッション内要件docの順で入力特定）
-- Step 2: work_type 読取（`draft-data` から work_type 取得（参考情報、パイプライン分岐には使用しない、REQ-0138-010））
-- Step 3: 工程分岐（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定、REQ-0138-009）
- - Issue番号/URL入力: case-run → case-close（req-save、spec-save、case-open、work_type読取スキップ）
- - artifact_actions ベース分岐: `artifact: req` or `artifact: adr` → req-save / `artifact: spec` → spec-save（req-save の後）/ 常に → case-open / その後 → case-run → case-close
- - spec-save 実行判定（ADR-0123 Decision #3, REQ-0136-014）（req-save 完了後に `artifact: spec` entry 確認）
- - auto_gate preflight（`auto_gate.auto_ready` が false または未解決 item 残る場合は停止）
-- Step 4: 各工程の実行（実行担当サブエージェント委譲が基本、委譲起動不能時に delegation-unavailable 報告（REQ-0162-003/004））
-  - 通常時: 各工程を実行担当サブエージェントとして起動（ADR-0127, REQ-0114-006/084/085）。req-save / spec-save 統合委譲（AG-005）で順次実行、case-open / case-run / case-close は各コマンド委譲契約に従い起動
-  - 委譲起動不能時（インフラ起動失敗検知時）: 当該工程を `delegation-unavailable` として報告。詳細は「委譲起動不能時の扱い」セクション参照
-- Step 4-0: 委譲起動判定（各工程の委譲起動後または起動失敗時）
-  - 委譲起動失敗（ツール不在、ハードリジェクト）→ `delegation-unavailable` 状態として報告
-  - 委譲結果が blocked/failed → 理由を確認: genuine blocker なら Step 7 停止条件として扱う
-  - 委譲起動判定時、context 管理は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-0162-002）
+  - 実行開始時刻の記録（REQ-0114-082）（JST、人間が読みやすい形式で case_auto_started_at 変数に保持）
+  - Issue番号/URL入力モード（^\d+$ または GitHub Issue URL の場合、case-run移行モードへ分岐）
+  - 要件doc入力モード（明示パス→draft検出（複数件含む全件処理）→セッション内要件docの順で入力特定）
+- Step 2: work_type 読取（draft-data から work_type 取得（参考情報、パイプライン分岐には使用しない、REQ-0138-010））
+- Step 3: 工程分岐（work_type 固定分岐ではなく artifact_actions 存在による動的判定、REQ-0138-009）
+  - Issue番号/URL入力: case-run（インライン）→ case-close（req-save、spec-save、case-open、work_type読取スキップ）
+  - artifact_actions ベース分岐: artifact: req or artifact: adr → req-save / artifact: spec → spec-save（req-save の後）/ 常に → case-open / その後 → case-run（インライン）→ case-close
+  - spec-save 実行判定（ADR-0123 Decision #3, REQ-0136-014）（req-save 完了後に artifact: spec entry 確認）
+  - auto_gate preflight（auto_gate.auto_ready が false または未解決 item 残る場合は停止）
+- Step 4: 各工程の実行
+  - 委譲工程（req-save / spec-save / case-open / case-close）: 実行担当サブエージェントとして起動（ADR-0127, REQ-0114-006/084/085）。req-save / spec-save 統合委譲で順次実行、case-open / case-close は各コマンド委譲契約に従い起動。委譲起動不能時に delegation-unavailable 報告（REQ-0162-003/004）
+  - case-run（インライン実行）: case-auto が case-run.md を authoritative source として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ、AG-001/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
+- Step 4-1: Wave 反復制御（Epic Issue 指定時）
+  - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
+  - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、REQ-0130-026 踏襲）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
+  - Wave 内全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機
+  - completed-pr の子Issue がある場合、case-close(#epic) へ委譲
+  - 残 Wave がある場合、次 Wave を実行（べき等）
 - Step 5: 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
-- Step 6: 複数REQ対応（req-save 委譲の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）。case-auto 自体に Issue 階層決定ロジックを持たない
-- Step 7: 停止条件の検出（停止時タイミング情報の追記（開始時刻、停止時刻、経過時間、REQ-0114-083））。10項目の停止条件いずれかを検出時、実行停止、停止理由、現在地点、再開可能な次コマンドを報告
-- Step 8: 完了報告（最終工程の完了報告をそのまま出力）。タイミング情報追記（開始時刻、終了時刻、所要時間、REQ-0114-083）。delegation-unavailable 発生の有無を記録
-- Step 8-1: Standard flow 逐次OU処理ループ（case-close 委譲完了後、未処理 OU が残存する場合は次 OU の処理を自動開始（REQ-0114-065〜067））
+- Step 6: 複数REQ対応（req-save 委譲の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）
+- Step 7: 停止条件の検出（停止時タイミング情報の追記。10項目の停止条件いずれかを検出時、実行停止）
+- Step 8: 完了報告（タイミング情報追記。インライン実行の適用を記録）
 
 ### 委譲起動不能時の扱い（REQ-0162-003/004）
 
-各工程の委譲が起動できなかった場合、case-auto は当該工程を `delegation-unavailable` として報告する。
+委譲工程（req-save / spec-save / case-open / case-close）の委譲が起動できなかった場合、case-auto は当該工程を delegation-unavailable として報告する。
 
-委譲起動不能トリガー:
-1. 委譲起動失敗（ツール不在、ハードリジェクト、agent type 拒否）
-2. 委譲結果が blocked/failed で、理由が委譲 chain 破綾（起動失敗、ネスト委譲制限等）
+case-run インライン実行時の実行担当サブエージェントへの委譲失敗は、case-run result 契約（completed-pr / blocked / failed / delegation-unavailable）に従い処理する。delegation-unavailable の場合は当該子Issue を pending に戻す（REQ-0162-004）。
 
-※ genuine blocker（実装上の問題、スコープ外操作、コンフリクト解消不能等）は `delegation-unavailable` 対象外。Step 7 停止条件として扱う。
+genuine blocker（実装上の問題、スコープ外操作、コンフリクト解消不能等）は Step 7 停止条件として扱う。
 
 context 管理:
-- context 管理（compress 等）は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-0162-002）
-- REQ-0114-073（親コンテキスト非累積）は委譲起動不能時の例外として取り扱う
-- delegation-unavailable 発生を完了報告（Step 8）に記録
+- case-run インライン実行時のコンテキスト管理は harness の責務（REQ-0162-002）
+- REQ-0114-073（親コンテキスト非累積）は case-run インライン実行時の例外として取り扱う
 
 ## 参照する横断 SPEC
 

@@ -33,6 +33,7 @@
 | ADR-0132 | コンフリクト解消モデル（3レベルエスカレーションと責務割当）| accepted | 2026-06-24 |
 | ADR-0135 | Project Extensions Architecture | accepted | 2026-07-04 |
 | ADR-0136 | 配布物ハーネス境界の浄化 | accepted | 2026-07-12 |
+| ADR-0137 | case-auto における case-run インライン実行（多重委譲回避） | accepted | 2026-07-16 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。
 > 基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
