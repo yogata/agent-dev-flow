@@ -100,3 +100,19 @@
 - 想定反映先: docs/specs/responsibilities/artifact-responsibilities.md、docs/specs/responsibilities/command-authoring-standards.md（※パスは extension 経由で確認）、src/opencode/skills/agentdev-project-extensions/SKILL.md
 - 関連: Issue #1532, PR #1534, REQ-0119-034 (例外規定), REQ-0147-001 (SPEC 重複許容基準)
 - タグ: #spec-duplication-allowance #boilerplate #project-extensions #req-0147-001 #public-contract-declaration
+
+## inspect 連鎖委任の正規 Issue/PR による追跡パターン (#1532 → #1533)
+
+- 問題事象: inspect-docs (#1532) で検出された agentdev-inspect-skills への意味的診断観点追加が必要な課題が、#1532 本体のスコープ外でありながら関連性が高い。そのまま #1532 に含めると完了条件が曖昧になり、別途 Issue 化しないと追跡が途切れる
+- 発生局面: レビュー (inspect-docs → case-close)
+- 検知方法: #1532 case-run の SPEC確定候補分析で inspect-skills への反映が別 Issue として #1533 へ委任されることが明記され、#1533 で当該委任を正規対応したことを PR #1535 Findings に記録
+- 根本原因: inspect-docs は検出と主題分割に専念し、具体的 skill 改修は個別 Issue で実施する責務分界。しかし「委任」と明示的に記録しないと連鎖が途切れる
+- 自律対応内容: #1532 の Findings に inspect-skills 反映を #1533 委任と明記、#1533 の Findings に「委任連鎖の正規対応」と明記。両 PR の Findings を突き合わせることで委任の完結が追跡可能
+- ユーザー確認有無: なし
+- ADR/REQ/spec影響: なし。既存の inspect-docs / inspect-skills / case-open / case-close フローで完結する運用知見
+- 横展開観点: inspect-docs で複数の主題独立な改善候補を検出した際、各々を主題別 Issue に分割して委任関係を Findings で明示的に記録する運用が有効
+- 再発条件: inspect-docs が複数配布物にまたがる改善候補を検出し、各配布物ごとに個別 skill 改修 Issue を起票する場合
+- 予防策候補: (a) inspect-docs の Findings 形式に「委任先 Issue 番号」欄を明示、(b) case-open が inspect 由来 Issue に「委任元 Issue」リンクを自動付与、(c) inspect-promote が主題分割を自動提案
+- 想定反映先: src/opencode/skills/agentdev-intake-pipeline/references/ (intake-from-github の委任追跡)、src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md (capture 境界の委任記録)
+- 関連: Issue #1532 (PR #1534 merge 61edb46), Issue #1533 (PR #1535 merge 1c10ad2), OU-002 / RU-20260718-01
+- タグ: #inspect-chain #delegation-tracking #findings-linkage #case-close
