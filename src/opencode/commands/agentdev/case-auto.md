@@ -20,7 +20,7 @@ agent: sisyphus
 ## 入力
 
 - Issue番号（数値）または Issue URL: 既存Issue から case-run → case-close を自走する場合
-- 要件doc: 明示パス指定/ `.agentdev/drafts/req-draft-*.md` 単一自動検出/ セッション内要件doc（3段階優先順位、構造化 `draft-data` 形式）
+- 要件doc（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定 / セッション指定キーワードによるセッション内要件doc参照（暗黙判断廃止、構造化 `draft-data` 形式: REQ-0138, ADR-0124））
 
 ## 出力
 
@@ -32,8 +32,13 @@ agent: sisyphus
 ### Step 1: 入力解決
 
  - **実行開始時刻の記録**: 本 Step の冒頭（入力解決の最初の処理）で、case-auto の実行開始時刻を JST（Etc/GMT-9）、人間が読みやすい形式（例: `2026-06-21 15:30:00 JST`）で記録し、変数（`case_auto_started_at`）に保持する。この時刻は Step 7（停止時報告）および Step 8（完了報告）での所要時間算出の基準として使用する
- - **Issue番号/URL入力モード**: 引数が数値のみまたは GitHub Issue URL の場合、Issue番号として解決し case-run移行モードへ分岐する（Step 3 の Issue番号/URL入力分岐へ）。この場合、要件docの入力解決、work_type読取はスキップする
- - **要件doc入力モード**: 明示パス→draft検出（複数件含む全件処理対象）→セッション内要件docの順で入力を特定する。`.agentdev/drafts/req-draft-*.md` が2件以上存在する場合、全draftを処理対象として検出し、各draftの `operation_units` から `recommended_order` と `depends_on` に基づいて全OUの処理順序を決定する。不明時は停止しreq-define実行またはパス指定を求める
+ - **Issue番号/URL入力モード**: 引数が数値のみまたは GitHub Issue URL の場合、Issue番号として解決し case-run移行モードへ分岐する（Step 3 の Issue番号/URL入力分岐へ）。要件doc入力モードより優先して処理する（REQ-0114-068/069）。この場合、要件docの入力解決、work_type読取はスキップする
+ - **要件doc入力モード**: 引数種別に応じて以下を処理対象とする（REQ-0114-002）。数値引数/Issue URL は本モードより優先する（REQ-0114-069）:
+   - (1) 引数なし時: `.agentdev/drafts/req-draft-*.md` 全件処理（デフォルト）。draft が1件以上存在する場合は全件（1件含む）を処理対象とする（REQ-0114-004）。draft 0件の場合のみ停止し req-define 実行またはパス指定を求める。複数draft存在時は無確認で全件処理する（AG-004）
+   - (2) 明示パス指定時: 当該draftのみ処理対象。ファイル不在時は停止しエラーを報告する（REQ-0114-003）
+   - (3) セッション指定キーワード時（例: `req-define セッション`、`req-define 上記の内容`）: セッション内要件docを参照する。**暗黙判断は行わない**（REQ-0114-002、AG-003）
+   - (4) 特定不可時: 停止する（REQ-0114-005）
+   - 複数draft読み込み時の順序制御は各draftの `operation_units` から `recommended_order` / `depends_on` に基づいて全OUの処理順序を決定する（REQ-0148, ADR-0129 準拠、AG-005）
 ### Step 2: work_type 読取
 
 入力要件docの `draft-data` から work_type を取得する（参考情報、パイプライン分岐の判定には使用しない）
