@@ -515,4 +515,32 @@ command 側（case-close 等）には以下のように参照する:
 
 - 「`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順（REQ）に従い、ローカル先行 commit 検出、内容重複確認、reset を実行」
 
+---
+
+## コンフリクト解消 rebase パス（REQ/002、REQ/025）
+
+squash merge がコンフリクトで失敗した場合（リトライ全失敗後、エラー原因がコンフリクトの場合）に実行する機械的解消パス（コンフリクト解消モデル Level 1）。
+**実装変更は行わず** rebase のみ試みる。
+本手順は case-close Step 4-2 から参照される。
+
+### rebase 実行
+
+`git fetch origin main` 後、`git rebase origin/main` を実行し機械的解消を試みる（rebase プロシージャは worktree-operations.md「Merge Conflict 対応パターン」参照）。
+
+### 分岐
+
+- **rebase 自動解決時**: rebase が自動解決した場合は `git push --force-with-lease` で更新し、**squash merge（PR merge 手続き、`agentdev-gh-cli`）へ戻り再マージ**する
+- **rebase コンフリクト発生時**: rebase 自体がコンフリクトを発生した場合は実装変更を行わず、`git rebase --abort` で rebase を破棄し、**case-auto へエスカレーションして停止**する（コンフリクト解消モデル Level 2/3 は case-auto の責務、case-auto command SPEC のコンフリクト解消モデル Level 2/3 参照、extension 経由）。停止理由に「Level 1 rebase で解消不能、Level 2/3 へエスカレーション」を明記する
+
+### 対象外
+
+コンフリクト解消のための実装変更、ソース編集は case-close の責務外。
+Level 2（コンフリクト文脈付き再委譲）、Level 3（マージ順序変更、blocked 単位の隔離）は case-auto が担う。
+
+### 各 command の参照方法
+
+command 側（case-close Step 4-2 等）には以下のように参照する:
+
+- 「`agentdev-git-worktree` のコンフリクト解消 rebase パス（REQ）に従い、rebase による機械的解消を試み、失敗時は case-auto Level 2/3 へエスカレーション」
+
 

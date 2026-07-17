@@ -63,13 +63,7 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
  - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
 ### Step 8: .agentdev/inspect/ 変更の commit と push
 
- - `git diff --name-only` で `.agentdev/inspect/` 配下の変更を確認
- - **変更なし時**: commit/push せず完了報告で「変更なし」と報告
- - **変更あり時**:
- 1. `git add` は `.agentdev/inspect/` のみ対象
- 2. commit message: `chore(agentdev): capture inspect-skills finding`
- 3. `git push` 実行
- 4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
+`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（`references/git-common-procedures.md` Section 2、並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/inspect/` 配下の変更を commit/ push する。commit message は `chore(agentdev): capture inspect-skills finding`（Conventional Commits 形式）。変更なし時は commit/push せず完了報告で「変更なし」と報告する。push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）
 ### Step 9: 完了報告
 
 完了報告 template に従って出力
