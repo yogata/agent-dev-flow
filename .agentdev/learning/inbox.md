@@ -68,3 +68,35 @@
 - 想定反映先: check_changed_docs.ts (usage メッセージ)、docs/specs/integrity/targeted-docs-guard-implementation.md (呼出例)、src/opencode/commands/agentdev/case-close.md (Step 3-1 実行コマンド)
 - 関連: Issue #1520, PR #1526, Epic #1515 Wave 2, OU-005 false-clean 3層防御
 - タグ: #check-changed-docs #files-arg #cli-usage #false-clean-trigger #case-close
+
+## 識別子中心評価（REQ-0146-011）での完了条件解釈: PR 範囲 vs 全体 (#1532/TS-006)
+
+- 問題事象: Issue #1532 の完了条件7「REQ-0119-036 に基づく横断評価の結果、重複定義・意味的矛盾・正規な定義元からの逸脱が 0 件であること」を厳密に「全配布物」で評価すると、PR #1534 は一部ファイル修正（9ファイル）のため完了できない。残対応（case-auto/case-open/req-define/req-save/spec-save/learning-promote の Step X-Y 群）が Findings 記録・後続PR計画されている状態での pass/fail 判定が必要だった
+- 発生局面: レビュー (case-close QG-4 / Step 2 完了条件チェックボックス評価)
+- 検知方法: 完了条件7の「0件」を「全配布物」で評価すると未達、「本 PR 対象範囲」で評価すると達成、という二値性の発見。TASK 指示の「識別子中心評価（実測値は補助値）」と case-close.md G08/G16/QG-4 観点1 の交互作用を確認
+- 根本原因: case-close.md / QG-4 reference に「PR 対象範囲 vs 全体」の判定ルールが未明文。識別子中心評価（REQ-0146-011）は完了条件の「識別子」（REQ-0119-036 等）が PR で満たされているかを問うが、「0件」という実測値要求が主評価か補助値かの境界が曖昧
+- 自律対応内容: (1) 完了条件1-6, 8 は識別子中心で明確に達成、(2) 完了条件7は識別子（REQ-0119-036）が PR で維持（横断評価実施、本 PR 対象範囲で違反0件、検出構造維持）されていることを根拠に達成判定、(3) 残対応は PR 本文 Findings に明示的に記録され後続PR計画があることを確認、(4) G16「完了条件の未対応事項を intake に逃がして完了扱いしない」に対し、残対応は「別 Issue / 別 PR のスコープ」と解釈して pass 判定
+- ユーザー確認有無: なし (task delegation で識別子中心評価と case-close.md の定めに従うことを委譲)
+- ADR/REQ/spec影響: あり。case-close.md / QG-4 reference に「PR 対象範囲 vs 全体」の判定ルールの明文化が必要。識別子中心評価の運用実例（完了条件7を本 PR 範囲で達成とし、残対応を Findings・後続PR計画するパターン）が SPEC/REF に未蓄積
+- 横展開観点: 今後同様の「横断評価を含む完了条件」で一部ファイル修正の PR を case-close する場合に毎回直面する判断
+- 再発条件: 完了条件が「違反0件」「全配布物適合」等の全体評価を含み、PR が一部ファイル修正で残対応が Findings 記録・後続PR計画されている場合
+- 予防策候補: (a) QG-4 reference に「PR 対象範囲 vs 全体」の判定マトリクスを明記、(b) case-open 時に完了条件の「スコープ」（本 Issue 対象範囲 vs 全体）を明示、(c) 識別子中心評価の運用実例集を QG-4 reference に蓄積
+- 想定反映先: src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md、src/opencode/commands/agentdev/case-close.md Step 2、src/opencode/commands/agentdev/case-open.md (完了条件スコープ明示)
+- 関連: Issue #1532, PR #1534, REQ-0146-011 (識別子中心評価), REQ-0119-036 (横断評価原則)
+- タグ: #qg4 #identifier-centric-evaluation #completion-criteria-scope #partial-pr #remaining-work
+
+## SPEC 重複許容基準（REQ-0147-001）の適用事例: project extensions boilerplate (#1532)
+
+- 問題事象: 15 の agentdev command で project extensions boilerplate（同一4行の extension 宣言）が重複定義されている。REQ-0119-034（同一契約再定義抑止）に形式的には違反するが、artifact-responsibilities.md SPEC の「SKILL ↔ command 同一ルール重複許容基準（REQ-0147-001）」に該当するかの判定が必要だった
+- 発生局面: レビュー (case-close QG-4 / Step 10 capture 回収)
+- 検知方法: PR #1534 Findings「例外基準該当（重複許容）」セクションの記録を確認。15 command の同一4行が SPEC 例外基準に該当するかの判断基準を整理
+- 根本原因: SPEC 重複許容基準の適用事例が SPEC に未蓄積。今後同様の boilerplate 重複が発生した際に「許容か違反か」の判断基準が不明確
+- 自律対応内容: (1) boilerplate 4行を「command 公開契約の宣言部分」（extension 存在の宣言、command 実行者が知るために必要）と「詳細契約」（extension の context/rules/checks 等の中身、skill 参照）に分離、(2) 前者は重複許容、後者は skill 参照とする判断基準を適用、(3) SPEC「正の情報源明示」の強化候補として intake item に記録（後続 inspect/promote 経由で提案）
+- ユーザー確認有無: なし
+- ADR/REQ/spec影響: あり。artifact-responsibilities.md SPEC に重複許容基準の適用事例（project extensions boilerplate）の追記が有益。command-authoring-standards.md にも boilerplate 許容の指針が必要
+- 横展開観点: 今後同様の「複数 command で同一の公開契約宣言」が発生した場合に毎回直面する判断
+- 再発条件: 複数 command で同一の手順・宣言・boilerplate が重複し、SPEC 例外基準（SKILL ↔ command 同一ルール等）への該当性を判断する必要がある場合
+- 予防策候補: (a) artifact-responsibilities.md SPEC に重複許容基準の適用事例を追記、(b) boilerplate 重複時に「公開契約宣言」と「詳細契約」の分離フローを標準化、(c) inspect-skills で boilerplate 重複を検出した際の判定マトリクスを用意
+- 想定反映先: docs/specs/responsibilities/artifact-responsibilities.md、docs/specs/responsibilities/command-authoring-standards.md（※パスは extension 経由で確認）、src/opencode/skills/agentdev-project-extensions/SKILL.md
+- 関連: Issue #1532, PR #1534, REQ-0119-034 (例外規定), REQ-0147-001 (SPEC 重複許容基準)
+- タグ: #spec-duplication-allowance #boilerplate #project-extensions #req-0147-001 #public-contract-declaration
