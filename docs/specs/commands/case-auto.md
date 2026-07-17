@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-07-16
+updated: 2026-07-17
 ---
 
 # case-auto SPEC
@@ -15,7 +15,7 @@ updated: 2026-07-16
 ## 入力
 
 - Issue番号（数値）または Issue URL（既存Issue から case-run → case-close を自走する場合）
-- 要件doc（明示パス指定 / `.agentdev/drafts/req-draft-*.md` 単一自動検出 / セッション内要件doc（3段階優先順位、構造化 `draft-data` 形式: REQ-0138, ADR-0124））
+- 要件doc（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定 / セッション指定キーワードによるセッション内要件doc参照（暗黙判断廃止、構造化 `draft-data` 形式: REQ-0138, ADR-0124））
 
 ## 出力
 
@@ -34,7 +34,7 @@ updated: 2026-07-16
 - Step 1: 入力解決
   - 実行開始時刻の記録（REQ-0114-082）（JST、人間が読みやすい形式で case_auto_started_at 変数に保持）
   - Issue番号/URL入力モード（^\d+$ または GitHub Issue URL の場合、case-run移行モードへ分岐）
-  - 要件doc入力モード（明示パス→draft検出（複数件含む全件処理）→セッション内要件docの順で入力特定）
+  - 要件doc入力モード（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定時は当該draft / セッション指定キーワード時はセッション内要件doc参照、暗黙判断は行わない）
 - Step 2: work_type 読取（draft-data から work_type 取得（参考情報、パイプライン分岐には使用しない、REQ-0138-010））
 - Step 3: 工程分岐（work_type 固定分岐ではなく artifact_actions 存在による動的判定、REQ-0138-009）
   - Issue番号/URL入力: case-run（インライン）→ case-close（req-save、spec-save、case-open、work_type読取スキップ）
