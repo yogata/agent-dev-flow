@@ -96,37 +96,13 @@ workflow_route は都度導出し保存しない
 
 **Step 5-1**: 親Epicステータス更新（`agentdev-epic-tracker` 参照）
 
-**Step 5-2**: worktree precondition gate（実行担当サブエージェント起動前の隔離検証）。`agentdev-git-worktree` の検証ヘルパー（`references/worktree-operations.md` の「worktree 内判定ヘルパー」参照）に従い、当該 Issue の worktree+ブランチが作成済みであることを検証する:
+**Step 5-2**: worktree precondition gate（実行担当サブエージェント起動前の隔離検証）。`agentdev-git-worktree` の「worktree 内判定ヘルパー」（`references/worktree-operations.md` 該当セクション）に従い、当該 Issue の worktree+ブランチが作成済みであり、現在 worktree 内にいることを検証する。検証失敗時（worktree 未作成、メインリポジトリにいる）は実行担当サブエージェントを起動**せず**停止し、Step 5（Worktree作成、ブランチ準備）へ戻るようユーザーに報告する。Step 6 へ進んではならない。
 
-- **検証1**: `git worktree list` の出力に当該 Issue の worktree（`.worktrees/{N}-{type}`）が含まれること
-- **検証2**: `git rev-parse --show-toplevel`（worktree 内で実行）の結果がメインリポジトリルートと**一致しない**こと（現在 worktree 内にいることの確認）
-
-**検証失敗時（worktree 未作成、メインリポジトリにいる）**: 実行担当サブエージェントを起動**せず**停止し、Step 5（Worktree作成、ブランチ準備）へ戻るようユーザーに報告する。
-Step 6 へ進んではならない。
-
-本 gate は 適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提を保護する機構である。
-worktree 隔離が構造的に保証されているという前提を、実行時に検証して担保する。
+本 gate は適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提を保護する機構である。worktree 隔離が構造的に保証されているという前提を、実行時に検証して担保する。
 
 ### Step 5-3: QG-3 前置 staleness check（実装作業開始前、REQ〜034）
 
-本 Step は QG-3 本体（Step 6 委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類（spec-bug 等）運用を変更しない（REQ）。staleness check は実装開始前の入力妥当性検査であり、QG-3 本体の実施要否には影響しない。
-
-**検証項目**:
-
-1. **ファイルパス現行存在確認**: Issue 本文が参照するファイルパス（command 定義、SPEC、template 等）が現行リポジトリに存在するか確認する。Issue 作成時点から移動、改名、削除されたパスを検出対象とする（REQ）
-2. **検査結果件数再計測**: Issue 本文の事前状態セクションが列挙する検査結果件数（NG 件数、IR 違反件数等）を再計測し、Issue 本文記載値と比較する。件数は変動しやすい実測値スナップショットであるため、差異の有無のみを判定材料とする（REQ）
-
-**差異検出時のアクション**（REQ、REQ）:
-
-差異を検出した場合、case-run は以下を実施する:
-
-1. 検出結果（対象パス、Issue 本文記載値、現行値）を Step 6 委譲プロンプトに含めて実行担当サブエージェントへ引き渡す。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` セクションに `### stale-reference` 小見出しで差異内容を記録する（Findings 記録は実行担当サブエージェント責務）
-2. case-update へ連携し、Issue 本文の参照パス・件数の更新を委譲する
-3. case-run 単独では Issue 本文を書き換えない（Issue 本文更新は case-update の責務）
-
-差異非検出時はそのまま Step 6 へ進む。staleness check の差異有無によらず QG-3 本体（Step 6 委譲先）の実施要否は変更しない。
-
-**QG-3 本体との関係**: staleness check は QG-3 本体（PR 作成直前の実装充足・乖離ゲート）とは独立した前置検査である。QG-3 が実装結果に対するゲートであるのに対し、staleness check は実装開始前の入力妥当性検査である。両者は順序依存を持たない。
+`agentdev-quality-gates` の「case-run 前置 staleness check（REQ〜034）」（`references/case-run-pre-delegation-staleness-check.md`）に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・case-update 連携を実行する。本検査は QG-3 本体（Step 6 委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類運用、QG-3 本体実施要否には影響しない。差異非検出時はそのまま Step 6 へ進む
 
 ### Step 5-4: docs/** 変更時の targeted docs guard（REQ-0130-035）
 

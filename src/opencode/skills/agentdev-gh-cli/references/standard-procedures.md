@@ -225,6 +225,36 @@ merge 前に `git rev-parse HEAD` で HEAD commit hash を記録する。
 Merge Conflict 発生時は後述「Merge Conflict 対応パターン」に従う。
 **`--delete-branch` 非推奨**: `gh pr merge` で `--delete-branch` オプションを使用しない。アクティブ worktree に checkout されたブランチで `--delete-branch` を使用すると local 削除が失敗し remote 削除フェーズへ到達しない。ブランチ削除は case-close Step 7 で独立実施する（REQ）。
 
+### squash merge 前の mergeable UNKNOWN ポーリング（REQ）
+
+squash merge 実行前に、対象 PR の `mergeable` 状態を事前確認し、`UNKNOWN` の場合は mergeable になるまでポーリング待機する。連続 squash merge 時に GitHub が mergeable を `UNKNOWN` 状態で返し、マージが失敗する事象（バックエンドの mergeable 再計算未完了）を回避する。
+
+- **状態取得**: PR 補助データ読込手続き（`gh pr view {N} --json mergeable,mergeStateStatus`）で `mergeable` 値を取得する
+- **判定**: `mergeable` が `MERGEABLE` の場合は即時 squash merge（PR merge 手続き）へ進む。`UNKNOWN` の場合はポーリングへ移行。`CONFLICTING` の場合はコンフリクト解消パス（case-close Step 4-2 等）へ進む
+- **ポーリング**: 最大60秒、10秒間隔で状態取得を再実行し `mergeable` が `MERGEABLE` になるのを待機する。各ポーリング試行（時刻、`mergeable`、`mergeStateStatus`）をログ記録すること
+- **上限超過時**: 60秒経過しても `UNKNOWN` の場合はマージを中止し、構造化エラーとして報告して停止する。エラーには PR 番号、最終 `mergeable`/ `mergeStateStatus`、ポーリング試行回数を含める
+- **待機中のコンフリクト遷移**: ポーリング中に `CONFLICTING` に遷移した場合は即時ポーリングを打ち切り、コンフリクト解消パス（case-close Step 4-2 等）へ進む
+
+#### 構造化エラー: mergeable UNKNOWN ポーリング上限超過
+
+```markdown
+## mergeable UNKNOWN ポーリング上限超過エラー（REQ）
+
+**PR番号**: #{pr_number}
+**最終 mergeable**: UNKNOWN
+**最終 mergeStateStatus**: {merge_state_status}
+**ポーリング試行回数**: {attempts}
+**経過時間**: {elapsed_seconds}秒（上限60秒）
+**停止理由**: mergeable が60秒以内に UNKNOWN から遷移しなかったため、マージを中止した
+**ユーザーアクション**: GitHub 側の mergeable 再計算の完了を待ってから再実行してください
+```
+
+#### 各 command の参照方法
+
+command 側（case-close Step 4-0 等）には以下のように参照する:
+
+- 「`agentdev-gh-cli` の mergeable UNKNOWN ポーリング手続き（REQ）に従い、squash merge 前の mergeable 状態事前確認、UNKNOWN ポーリング待機、上限超過時の構造化エラー停止を実行」
+
 ### Issue close
 
 ```
