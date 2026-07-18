@@ -78,6 +78,23 @@ test("checkCommandFile detects zero-based substep", () => {
   expect(violations.some((v) => v.rule === "command-format-zero-substep")).toBe(true);
 });
 
+test("checkCommandFile allows Step N-0 when positive siblings exist (issue #1562 AG-003)", () => {
+  const content = `## 手順
+
+### Step 4: main
+
+**Step 4-0**: preparatory substep
+
+main body
+
+**Step 4-1**: follow-up substep
+
+**Step 4-2**: another substep
+`;
+  const violations = checkCommandFile("test.md", content);
+  expect(violations.some((v) => v.rule === "command-format-zero-substep")).toBe(false);
+});
+
 test("checkCommandFile detects non-sequential steps", () => {
   const content = `## 手順
 

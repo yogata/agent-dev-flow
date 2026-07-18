@@ -134,16 +134,54 @@ export function checkCommandFile(
     }
   }
 
-  // Check for zero-based substeps (Step N-0) anywhere in file
+  // Check for zero-based substeps (Step N-0) anywhere in file.
+  //
+  // Permissive criteria (Issue #1562 AG-003 option A):
+  //   Step N-0 を許容するのは、同ファイルに Step N-M (M >= 1) 兄弟が
+  //   存在する場合に限定する。「主 Step N 本体の前処理（preparatory
+  //   substep）」パターン（Step 4-0 の後に Step 4-1, 4-2 ... が続く）を
+  //   認めつつ、兄弟が存在しない孤立 Step N-0 は Step N へ統合または
+  //   Step N-1 へリネームを要求する。
+  //
+  //   1. 当該 Step は子ステップを持たない単独工程であること
+  //   2. 同一 command 内で他の Step が Step N-M (M >= 1) 形式を採用しており
+  //      番号体系の一貫性を保つ必要があること
+  //   3. 機械検査が条件を誤検知対象外として認識できること（本実装）
+  //
+  // 後続 SPEC docs/specs/authoring/command-authoring-standards.md の
+  // 「Step X-Y 表記許容基準」セクションにて条文化予定（AG-001 引継ぎ）。
+  const substepSiblings = new Map<number, Set<number>>();
+  for (const line of lines) {
+    for (const m of line.matchAll(/\bStep\s+(\d+)-(\d+)\b/g)) {
+      const parent = parseInt(m[1], 10);
+      const sub = parseInt(m[2], 10);
+      if (!substepSiblings.has(parent)) {
+        substepSiblings.set(parent, new Set());
+      }
+      substepSiblings.get(parent)!.add(sub);
+    }
+  }
   for (let i = 0; i < lines.length; i++) {
-    if (/\bStep\s+\d+-0\b/.test(lines[i]) || /\*\*\d+-0\./.test(lines[i])) {
-      violations.push({
-        file: filePath,
-        line: i + 1,
-        rule: "command-format-zero-substep",
-        description: "ゼロ起点サブステップ Step N-0 は禁止（Step N-1 から開始）",
-        severity: "NG",
-      });
+    const line = lines[i];
+    const zeroParents: number[] = [];
+    for (const m of line.matchAll(/\bStep\s+(\d+)-0\b/g)) {
+      zeroParents.push(parseInt(m[1], 10));
+    }
+    for (const m of line.matchAll(/\*\*(\d+)-0\./g)) {
+      zeroParents.push(parseInt(m[1], 10));
+    }
+    for (const parent of zeroParents) {
+      const siblings = substepSiblings.get(parent) ?? new Set<number>();
+      const hasPositiveSibling = Array.from(siblings).some((s) => s >= 1);
+      if (!hasPositiveSibling) {
+        violations.push({
+          file: filePath,
+          line: i + 1,
+          rule: "command-format-zero-substep",
+          description: `ゼロ起点サブステップ Step ${parent}-0 は Step ${parent}-1 以降の兄弟が同ファイルに存在しないため禁止（Step ${parent}-1 から開始、または Step ${parent} へ統合）`,
+          severity: "NG",
+        });
+      }
     }
   }
 
