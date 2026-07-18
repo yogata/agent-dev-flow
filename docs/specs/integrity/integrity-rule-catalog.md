@@ -120,6 +120,7 @@ catalog はスキーマ定義とインデックスを維持する。
 - [IR-057: obsolete-spec-path-after-domain-split（旧SPEC直下パス参照検出）](rules/IR-057-obsolete-spec-path-after-domain-split.md)
 - [IR-058: distribution-untracked-skill-reference（配布物参照の未トラックスキル検出）](rules/IR-058-distribution-untracked-skill-reference.md)
 - [IR-059: distribution-reference-boundary（配布物参照境界検出）](rules/IR-059-distribution-reference-boundary.md)
+- [IR-060: forbidden Japanese word detection（禁止語機械検出）](rules/IR-060-forbidden-japanese-word-detection.md)
 
 ### 新規 IR 候補（baseline_status: candidate）
 
