@@ -148,3 +148,19 @@
 - 想定反映先: src/opencode/commands/agentdev/case-auto.md (subagent 委譲ガイドライン・category 選定指針)、src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md (subagent プロトコル・MUST NOT DO 記載要件)、src/opencode/skills/agentdev-case-run-execution-adapter/ (委譲プロトコルと category 設計)
 - 関連: Issue #1538, PR #1539 (merge 5e373217), case-auto case-open 委譲, category=writing vs unspecified-high, REQ-0149 (agentdev-gh-cli 委譲基盤)
 - タグ: #subagent-delegation #category-selection #must-not-do #case-open #case-auto #writing-category #scope-discipline #prompt-engineering
+
+## test strategy の行頭マッチ regex がコードブロック例示で偽陽性になる問題 (#1542 maintenance)
+
+- 問題事象: Issue #1542 の完了条件 TS-001 は `Select-String -Pattern '^status:\s*draft\s*$'` で docs/specs/ 配下の frontmatter `status: draft` 行頭マッチを検出する。case-auto 前置の staleness check で対象50件に加え `docs/specs/responsibilities/artifact-contracts.md:264` の本文中コードブロック例示（`.agentdev/drafts/` 配下の req_draft frontmatter 例示）が偽陽性で1件ヒットした。frontmatter は冒頭 `---` ブロック内のみだが、`Select-String` はファイル全体を走査するためコードブロック内の行も行頭マッチ対象になる
+- 発生局面: 実装 (case-auto 前置 staleness check / case-run TS-001 検証)
+- 検知方法: case-auto 前置の staleness check で対象50件に対して実測51件ヒットした差分から、artifact-contracts.md:264 のコードブロック例示を特定。PR 本文の Findings `### stale-reference` セクションに記録
+- 根本原因: (1) test strategy の verification で行頭マッチ regex（`^key:\s*value\s*$`）を採用した際、frontmatter 限定ではなくファイル全体が走査対象になる設計になった、(2) コードブロック例示で `key: value` 形式の行を含む SPEC が偽陽性の原因になることを事前に評価していなかった、(3) Issue 本文 TS-001 verification の「本文中のコードブロック例示は行頭マッチしないため除外される」という記述が不正確（コードブロック内でも行頭は行頭マッチする）
+- 自律対応内容: (1) 当該コードブロック行に YAML コメント形式（`status: draft  # draft_type=req_draft の初期状態（SPEC status とは無関係）`）で文脈を付与して `^status:\s*draft\s*$` 行頭マッチを回避、(2) artifact-contracts.md 自体の frontmatter は触らず（対象外ファイル）、(3) PR 本文 Findings に経緯と回避策を記録、(4) 後続運用候補（TS-001 pattern を frontmatter 限定へ狭める検討）を intake inbox へ分離保存
+- ユーザー確認有無: なし
+- ADR/REQ/spec影響: あり。test strategy の verification で行頭マッチ regex を採用する際、コードブロック例示の偽陽性リスクを考慮する運用ルールが REQ/SPEC に未明文化。REQ-0131（test strategy 策定フロー）、agentdev-req-analysis skill の test strategy ガイドと関連。pattern を frontmatter 限定へ狭める実装手法（`Select-String` 単体では frontmatter ブロック判定困難、事前抽出スクリプトが必要）も未整備
+- 横展開観点: 今後 test strategy で `^key:\s*value\s*$` 形式の行頭マッチ regex を使う全場面（SPEC status 昇格、frontmatter 検査、YAML 例示を含む SPEC の検証）で同一の偽陽性リスクが存在する。YAML 例示を含む SPEC（artifact-contracts.md, responsibilities/ 系）は要注意
+- 再発条件: (1) test strategy の verification で `^key:\s*value\s*$` 等の行頭マッチ regex を採用し、(2) 対象ディレクトリ配下にコードブロック例示で同形式の行を含む SPEC が存在し、(3) frontmatter 限定や escape 手法を考慮しない場合
+- 予防策候補: (a) test strategy 策定時に行頭マッチ regex を採用する場合、対象範囲にコードブロック例示が含まれないか事前確認、(b) frontmatter 限定抽出スクリプトを用意して行頭マッチを frontmatter 内のみへ制限、(c) YAML コメント形式で文脈付与する場当たり回避を暫定運用として明文化、(d) req-analysis skill の test strategy 策定ガイドに行頭マッチ regex 利用時の注意事項を追記
+- 想定反映先: src/opencode/skills/agentdev-req-analysis/references/ (test strategy 策定ガイド)、src/opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md (test strategy 検証観点)、intake inbox の TS-001 pattern frontmatter 限定検討 item
+- 関連: Issue #1542 (CLOSED), PR #1543 (merge 43155347211cb0ef065b1abc8489a40fcb7b507d), Findings ### stale-reference, artifact-contracts.md L264, ADR-0123 (SPEC lifecycle), REQ-0154 (SPEC status 単一追跡源), intake item intake-2026-07-18-ts001-pattern-frontmatter-only.md
+- タグ: #test-strategy #regex #false-positive #code-block-example #frontmatter #verification #line-start-match #ts-001 #maintenance
