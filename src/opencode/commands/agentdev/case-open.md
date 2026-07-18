@@ -53,6 +53,18 @@ Issue本文生成後、Issue作成前に、`agentdev-quality-gates` の QG-2（A
 判定基準、検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md` を参照。
 fail 時は Issue 作成前に req-define 差し戻しを推奨
 
+**Step 2-1a**: 完了条件の数値閾値到達可能性検証（REQ-0131-031、QG-2 観点6）。
+完了条件に数値閾値（LF 数、行数、ファイル数、件数等）を含む場合、当該閾値が同種既存成果物の実測値と比較して対象成果物の自然な構造で到達可能であることを検証する。
+test strategy 策定ガイド（`agentdev-req-analysis` の `references/test-strategy-numeric-threshold-guide.md`）に基づく策定が前提。境界ケース #1538/TS-007 由来。
+- 検出時点で閾値の根拠（同種既存例の実測値、中央値/最小値/最大値）が記載されていない場合、要件定義者に根拠明示を確認する
+- case-open は自動推論を行わず、要件定義者が明示した閾値のみを受け付ける
+
+**Step 2-1b**: 完了条件のスコープ明示（本 Issue 対象範囲 vs 全体）。
+完了条件が横断評価（REQ-0119-036 等、全成果物を横断する評価）を含む場合、各完了条件の評価スコープ（本 Issue 対象範囲 or リポジトリ全体/当該 SPEC/REQ 全体）を要件定義者が明示したかを確認する。QG-4 の「PR 対象範囲 vs 全体 判定マトリクス」（`qg-4-final-acceptance.md` 観点8）に対応する入力前提。境界ケース #1532/TS-006 由来。
+- スコープ明示がない場合、case-open は要件定義者に確認する（自動推論しない）
+- スコープは識別子中心（ファイルパス、REQ ID、NG ID、IR ID）で明示する（Step 2-3 記載粒度ガイドライン準拠）
+- 横断評価の完了条件は「全体（再 grep、再検査）」をスコープとすることをデフォルトとする
+
 **Step 2-2**: test_strategy 埋め込み（REQ）。
 draft-data の `test_strategy` を読み取り、Issue 本文の「テスト戦略」セクションに埋め込む。
 各項目を 3 要素構造（`verification`（検証手順）、`pass_criteria`（合格基準）、`on_failure`（不合格時の処置））で反映する。
