@@ -118,6 +118,8 @@ PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（
       --workflow case-close --files <PR 変更ファイル一覧> --json
     ```
 
+   `<PR 変更ファイル一覧>` の区切り形式は space 区切り（推奨、例: `--files docs/a.md docs/b.md docs/c.md`）、または comma 区切り（例: `--files docs/a.md,docs/b.md,docs/c.md`、REQ-0158-001）。両形式の混在も可。
+
    JSON 出力の `failures` に strict severity が含まれる場合はマージを停止し、対象ファイルを修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行をユーザーに提案する。draft→accepted 等の SPEC status 変更時は `spec_readme_update_required` を Step 3-2 SPEC 確定フローに反映する
    - **files_checked 空時の確認（REQ）**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱う。`warnings` 配列に検査対象ファイル未検出の警告が出力されるため、以下を確認する。確認を経ずに `files_checked` 空のまま完了扱いとしない:
      1. 警告を検査見逃しのリスクとして認識する
