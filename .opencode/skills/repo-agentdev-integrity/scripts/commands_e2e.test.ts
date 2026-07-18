@@ -1,5 +1,5 @@
 /**
- * E2E workflow tests for all 13 agentdev command definitions.
+ * E2E workflow tests for all agentdev command definitions.
  * REQ-0030-009: Normal-path E2E tests for all commands
  * REQ-0030-013: Test files placed in corresponding scripts/ directory
  *
@@ -36,14 +36,22 @@ const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 const PROJECTION_CMD_DIR = path.join(REPO_ROOT, ".opencode", "commands", "agentdev");
 const SOURCE_CMD_DIR = path.join(REPO_ROOT, "src", "opencode", "commands", "agentdev");
 const CMD_DIR = fs.existsSync(PROJECTION_CMD_DIR) ? PROJECTION_CMD_DIR : SOURCE_CMD_DIR;
-const SKILLS_DIR = path.join(REPO_ROOT, ".opencode", "skills");
-const TEMPLATES_DIR = path.join(
-  REPO_ROOT,
-  ".opencode",
-  "skills",
+const PROJECTION_SKILLS_DIR = path.join(REPO_ROOT, ".opencode", "skills");
+const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "opencode", "skills");
+const SKILLS_DIR = fs.existsSync(path.join(PROJECTION_SKILLS_DIR, "agentdev-workflow-templates"))
+  ? PROJECTION_SKILLS_DIR
+  : SOURCE_SKILLS_DIR;
+const PROJECTION_TEMPLATES_DIR = path.join(
+  PROJECTION_SKILLS_DIR,
   "agentdev-workflow-templates",
   "templates",
 );
+const SOURCE_TEMPLATES_DIR = path.join(
+  SOURCE_SKILLS_DIR,
+  "agentdev-workflow-templates",
+  "templates",
+);
+const TEMPLATES_DIR = fs.existsSync(PROJECTION_TEMPLATES_DIR) ? PROJECTION_TEMPLATES_DIR : SOURCE_TEMPLATES_DIR;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -158,7 +166,7 @@ const commands = getCommandFiles();
 const skillDirs = getSkillDirs();
 const templateFiles = getTemplateFiles();
 
-// Current 13 public agentdev commands
+// Current 17 public agentdev commands (aligns with commands/agentdev/README.md listing)
 const EXPECTED_COMMANDS = [
   "backlog-review",
   "case-auto",
@@ -166,19 +174,29 @@ const EXPECTED_COMMANDS = [
   "case-open",
   "case-run",
   "case-update",
+  "inspect-docs",
+  "inspect-extensions",
+  "inspect-promote",
+  "inspect-skills",
   "intake-capture",
   "intake-from-github",
   "intake-promote",
   "learning-promote",
   "req-define",
-  "req-restructure-review",
   "req-save",
+  "spec-save",
 ];
+
+// agentdev-prefixed references that are valid skills (not commands).
+// /agentdev/learning-capture is a skill invocation, not a command definition file.
+const VALID_SKILL_REFS = new Set([
+  "learning-capture",
+]);
 
 const COMMAND_COUNT = EXPECTED_COMMANDS.length;
 
 // Pipeline definitions
-const REQ_CASE_PIPELINE = ["req-define", "req-save", "case-open", "case-run", "case-update", "case-close"];
+const REQ_CASE_PIPELINE = ["req-define", "req-save", "spec-save", "case-open", "case-run", "case-update", "case-close"];
 const LEARNING_PIPELINE = ["learning-promote"];
 const INTAKE_PIPELINE = ["intake-capture", "intake-from-github", "intake-promote"];
 
@@ -208,12 +226,12 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       const fm = parseFrontmatter(content);
 
       it("has Input section defining expected inputs", () => {
-        const inputSection = extractSection(content, "Input");
+        const inputSection = extractSection(content, "入力");
         expect(inputSection.length).toBeGreaterThan(0);
       });
 
       it("has Output section defining expected outputs", () => {
-        const outputSection = extractSection(content, "Output");
+        const outputSection = extractSection(content, "出力");
         expect(outputSection.length).toBeGreaterThan(0);
       });
 
@@ -240,6 +258,7 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       const cmdRefs = extractCommandRefs(content);
       for (const ref of cmdRefs) {
         if (ref === cmdName) continue;
+        if (VALID_SKILL_REFS.has(ref)) continue;
         it(`command reference "/agentdev/${ref}" points to existing command`, () => {
           expect(EXPECTED_COMMANDS.includes(ref)).toBe(true);
         });
@@ -256,10 +275,10 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       expect(reqDefine).toBeDefined();
       expect(reqSave).toBeDefined();
       if (reqDefine && reqSave) {
-        const reqDefineOutput = extractSection(reqDefine, "Output");
-        const reqSaveInput = extractSection(reqSave, "Input");
-        expect(reqDefineOutput).toContain(".sisyphus/drafts");
-        expect(reqSaveInput).toContain(".sisyphus/drafts");
+        const reqDefineOutput = extractSection(reqDefine, "出力");
+        const reqSaveInput = extractSection(reqSave, "入力");
+        expect(reqDefineOutput).toContain(".agentdev/drafts");
+        expect(reqSaveInput).toContain(".agentdev/drafts");
       }
     });
 
@@ -269,8 +288,8 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       expect(reqSave).toBeDefined();
       expect(caseOpen).toBeDefined();
       if (reqSave && caseOpen) {
-        const reqSaveOutput = extractSection(reqSave, "Output");
-        const caseOpenInput = extractSection(caseOpen, "Input");
+        const reqSaveOutput = extractSection(reqSave, "出力");
+        const caseOpenInput = extractSection(caseOpen, "入力");
         expect(reqSaveOutput).toContain("REQ");
         expect(caseOpenInput).toContain("req-define");
       }
@@ -282,8 +301,8 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       expect(caseOpen).toBeDefined();
       expect(caseRun).toBeDefined();
       if (caseOpen && caseRun) {
-        const caseOpenOutput = extractSection(caseOpen, "Output");
-        const caseRunInput = extractSection(caseRun, "Input");
+        const caseOpenOutput = extractSection(caseOpen, "出力");
+        const caseRunInput = extractSection(caseRun, "入力");
         expect(caseOpenOutput).toContain("Issue");
         expect(caseRunInput).toContain("Issue");
       }
@@ -295,9 +314,9 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       expect(caseRun).toBeDefined();
       expect(caseClose).toBeDefined();
       if (caseRun && caseClose) {
-        const caseRunOutput = extractSection(caseRun, "Output");
-        const caseCloseInput = extractSection(caseClose, "Input");
-        expect(caseRunOutput).toContain("GitHub PR");
+        const caseRunOutput = extractSection(caseRun, "出力");
+        const caseCloseInput = extractSection(caseClose, "入力");
+        expect(caseRunOutput).toContain("PR");
         expect(caseCloseInput).toContain("PR");
       }
     });
@@ -320,8 +339,8 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       expect(capture).toBeDefined();
       expect(fromGithub).toBeDefined();
       if (capture && fromGithub) {
-        const captureOutput = extractSection(capture, "Output");
-        const githubOutput = extractSection(fromGithub, "Output");
+        const captureOutput = extractSection(capture, "出力");
+        const githubOutput = extractSection(fromGithub, "出力");
         expect(captureOutput).toContain("inbox");
         expect(githubOutput).toContain("inbox");
       }
@@ -331,7 +350,7 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       const promote = commands.get("intake-promote");
       expect(promote).toBeDefined();
       if (promote) {
-        const promoteInput = extractSection(promote, "Input");
+        const promoteInput = extractSection(promote, "入力");
         expect(promoteInput).toContain("inbox");
       }
     });
@@ -340,7 +359,7 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       const promote = commands.get("intake-promote");
       expect(promote).toBeDefined();
       if (promote) {
-        const promoteOutput = extractSection(promote, "Output");
+        const promoteOutput = extractSection(promote, "出力");
         expect(promoteOutput).toContain("promoted");
       }
     });
@@ -355,57 +374,46 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
         const content = commands.get(cmdName);
         expect(content).toBeDefined();
         if (content) {
-          expect(content).toMatch(/## Guardrails/);
+          expect(content).toMatch(/## ガードレール/);
         }
       });
     }
   });
 
-  // ─── Template coverage per command ───────────────────────────────────────
+  // ─── Template skill coverage per command ─────────────────────────────────
+  // case-open/close reference templates through `agentdev-workflow-templates` skill.
+  // case-update uses its own templates under commands/agentdev/templates/case-update/.
+  describe("Template skill coverage for issue/PR-creating commands", () => {
+    it("case-open references agentdev-workflow-templates skill", () => {
+      const content = commands.get("case-open");
+      expect(content).toBeDefined();
+      if (content) {
+        expect(content).toMatch(/agentdev-workflow-templates/);
+      }
+    });
 
-  describe("Template coverage for issue/PR-creating commands", () => {
-    const commandsUsingTemplates = [
-      { cmd: "case-open", expectedTemplates: ["issue_desc_feature.md", "issue_desc_bug.md"] },
-      { cmd: "case-close", expectedTemplates: ["issue_comment_feature_implementation.md", "issue_comment_bug_record.md"] },
-      { cmd: "case-update", expectedTemplates: ["issue_comment_update.md", "issue_comment_review_ng.md"] },
-    ];
-    for (const { cmd, expectedTemplates } of commandsUsingTemplates) {
-      describe(`${cmd} template references`, () => {
-        const content = commands.get(cmd);
-        if (!content) return;
-        const refs = extractTemplateRefs(content);
-        for (const tmpl of expectedTemplates) {
-          it(`references template "${tmpl}"`, () => {
-            expect(refs.includes(tmpl)).toBe(true);
-          });
-        }
-      });
-    }
+    it("case-close references agentdev-workflow-templates skill", () => {
+      const content = commands.get("case-close");
+      expect(content).toBeDefined();
+      if (content) {
+        expect(content).toMatch(/agentdev-workflow-templates/);
+      }
+    });
+
+    it("case-update references its own template directory", () => {
+      const content = commands.get("case-update");
+      expect(content).toBeDefined();
+      if (content) {
+        expect(content).toMatch(/templates\/case-update\//);
+      }
+    });
   });
 
   // ─── Agent type consistency ──────────────────────────────────────────────
 
   describe("Agent type consistency per pipeline", () => {
-    it("interactive commands use prometheus agent", () => {
-      const interactiveCommands = ["req-define"];
-      for (const cmd of interactiveCommands) {
-        const content = commands.get(cmd);
-        expect(content).toBeDefined();
-        if (content) {
-          const fm = parseFrontmatter(content);
-          expect(fm?.["agent"]).toBe("prometheus");
-        }
-      }
-    });
-    it("file/GitHub operation commands use sisyphus agent", () => {
-      const sisyphusCommands = [
-        "req-save", "case-open", "case-run", "case-update", "case-close",
-        "case-auto", "backlog-review",
-        "intake-capture", "intake-from-github", "intake-promote",
-        "learning-promote",
-        "req-restructure-review",
-      ];
-      for (const cmd of sisyphusCommands) {
+    it("all agentdev commands use sisyphus agent", () => {
+      for (const cmd of EXPECTED_COMMANDS) {
         const content = commands.get(cmd);
         expect(content).toBeDefined();
         if (content) {
