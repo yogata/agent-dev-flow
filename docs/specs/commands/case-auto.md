@@ -90,7 +90,7 @@ context 管理:
 - case-open 完了後の draft SSoT 扱い（G19、case-open 完了後は子Issue が SSoT）
 - OU 間依存のみでの Epic Issue 化（G20、REQ-0114-055）
 - Epic Issue 化判定への関与（G21、REQ-0114-057）
-- case-auto 固有の capture 振る舞い（G17, G13、構成コマンドの capture 責務境界に従う）
+- case-auto 固有の capture 振る舞い（G17、構成コマンドの capture 責務境界に従う）
 
 ## 検証観点
 
