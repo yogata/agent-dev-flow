@@ -1,8 +1,8 @@
 ---
 title: backlog-review SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-03
+updated: 2026-07-18
 ---
 
 # backlog-review SPEC
@@ -106,3 +106,4 @@ backlog-review は全 RU frontmatter に `tentative_classification` を付与す
 - `agentdev-backlog-integration` skill（分析基準、統合分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール）
 - REQ-0105（RU lifecycle）
 - REQ-0129（Backlog-review）
+

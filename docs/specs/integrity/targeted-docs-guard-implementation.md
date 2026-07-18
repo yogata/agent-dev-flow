@@ -1,8 +1,8 @@
 ---
 title: Targeted Docs Guard 実装詳細
-status: draft
+status: accepted
 created: 2026-07-15
-updated: 2026-07-15
+updated: 2026-07-18
 ---
 
 # Targeted Docs Guard 実装詳細
@@ -62,3 +62,4 @@ check_changed_docs.ts の report JSON に含まれる全フィールドを列挙
 - REQ-0158（Targeted Docs Integrity Guard）
 - `docs/specs/integrity/validator-split-criteria.md`（validator 分割基準、Phase 6 の詳細）
 - `docs/specs/integrity/integrity-contracts.md`（Workflow×ツールマトリックス表）
+

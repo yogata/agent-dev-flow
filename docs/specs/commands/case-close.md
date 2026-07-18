@@ -1,8 +1,8 @@
 ---
 title: case-close SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-12
+updated: 2026-07-18
 ---
 
 # case-close SPEC
@@ -176,3 +176,4 @@ case-close は targeted docs guard が FAILURE を返した場合、以下を行
 - ADR-0114（完了条件チェックボックス case-close 専任）
 - ADR-0125（Epic Issue 本文単一書き手）
 - ADR-0132（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
+

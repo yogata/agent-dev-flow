@@ -1,8 +1,8 @@
 ---
 title: req-define SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-12
+updated: 2026-07-18
 ---
 
 # req-define SPEC
@@ -215,3 +215,4 @@ req-define 側は出力形式のみを規定する。
 - REQ-0138（構造化 req_draft 契約）
 - REQ-0139（外部エージェント統合契約）
 - ADR-0124（構造化 draft-data 形式）
+

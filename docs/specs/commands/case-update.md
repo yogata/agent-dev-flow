@@ -1,8 +1,8 @@
 ---
 title: case-update SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # case-update SPEC
@@ -70,3 +70,4 @@ updated: 2026-06-21
 - `agentdev-gh-cli` skill（gh CLI 安全使用）
 - `agentdev-quality-gates` skill（QG-3（`--review-ng` 時引用））
 - REQ-0133（case-update / Issue更新）
+

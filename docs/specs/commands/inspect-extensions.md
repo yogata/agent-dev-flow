@@ -1,8 +1,8 @@
 ---
 title: inspect-extensions command SPEC
-status: draft
+status: accepted
 created: 2026-07-04
-updated: 2026-07-04
+updated: 2026-07-18
 ---
 
 # inspect-extensions command SPEC
@@ -77,3 +77,4 @@ AgentDevFlow 標準の inspect 責務は構造確認（検査1〜4）、path 実
 - [inspect-promote.md](inspect-promote.md)（検出事項分類、昇格）
 - REQ-0160（Project Extensions 機構と配布物参照境界）
 - ADR-0135（Project Extensions Architecture）
+

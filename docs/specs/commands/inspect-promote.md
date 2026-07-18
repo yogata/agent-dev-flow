@@ -1,8 +1,8 @@
 ---
 title: inspect-promote SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-03
+updated: 2026-07-18
 ---
 
 # inspect-promote SPEC
@@ -79,3 +79,4 @@ updated: 2026-07-03
 - [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
 - REQ-0126（inspect-promote / 検出事項分類、昇格）
 - REQ-0136（inspect-promote 自動 promote（REQ-0136-016））
+

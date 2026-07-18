@@ -1,8 +1,8 @@
 ---
 title: inspect-docs SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-28
+updated: 2026-07-18
 ---
 
 # inspect-docs SPEC
@@ -87,3 +87,4 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 - `agentdev-req-structure-diagnostics` skill（REQ 構造検査ロジック）
 - REQ-0109（inspect-docs / REQ 再構成運用）
 - REQ-0124（inspect-* 検出コマンド群）
+

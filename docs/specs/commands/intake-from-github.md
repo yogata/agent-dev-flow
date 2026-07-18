@@ -1,8 +1,8 @@
 ---
 title: intake-from-github SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # intake-from-github SPEC
@@ -72,3 +72,4 @@ updated: 2026-06-21
 - [intake-promote.md](intake-promote.md)（後続コマンド（採用判断））
 - `agentdev-intake-pipeline` skill（抽出アルゴリズム）
 - REQ-0127（Intake command群）
+

@@ -1,8 +1,8 @@
 ---
 title: `agentdev-req-analysis` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # `agentdev-req-analysis` SPEC
@@ -62,3 +62,4 @@ updated: 2026-06-21
 - [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)
 - [commands/req-define.md](../commands/req-define.md)
 - REQ-0102（要件定義、保存）
+

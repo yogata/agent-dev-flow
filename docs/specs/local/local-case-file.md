@@ -1,8 +1,8 @@
 ---
 title: ローカル Case ファイル
-status: draft
+status: accepted
 created: 2026-06-20
-updated: 2026-06-26
+updated: 2026-07-18
 ---
 
 # ローカル Case ファイル
@@ -243,3 +243,4 @@ GitHub PR 取り込みは実行しない。
 - **関連 SPEC**: local-generation.md、runtime-package-boundary.md
 
 ADR-0126（superseded）は履歴参照のみとし、現行根拠として扱わない（REQ-0112-053 準拠）。
+

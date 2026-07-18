@@ -1,8 +1,8 @@
 ---
 title: `agentdev-architecture-advisory` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-12
+updated: 2026-07-18
 ---
 
 # `agentdev-architecture-advisory` SPEC（アーキテクチャ助言、req-define 事前確認）
@@ -53,3 +53,4 @@ req-define が要件を確定する前にアーキテクチャ上の影響を確
 - [agentdev-req-analysis.md](agentdev-req-analysis.md)
 - [commands/req-define.md](../commands/req-define.md)
 - REQ-0139（外部エージェント統合契約）
+

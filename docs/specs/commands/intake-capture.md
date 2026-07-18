@@ -1,8 +1,8 @@
 ---
 title: intake-capture SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # intake-capture SPEC
@@ -69,3 +69,4 @@ updated: 2026-06-21
 - [intake-from-github.md](intake-from-github.md)（GitHub からの自動抽出）
 - `agentdev-intake-pipeline` skill（共通手順）
 - REQ-0127（Intake command群）
+

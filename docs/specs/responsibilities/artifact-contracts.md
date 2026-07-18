@@ -261,7 +261,7 @@ Skill/Command 参照妥当性の検出結果は inspect lifecycle（`.agentdev/i
 ---
 draft_type: req_draft
 topic: example-topic
-status: draft
+status: draft  # draft_type=req_draft の初期状態（SPEC status とは無関係）
 created_at: 2026-06-14T19:36:47+09:00
 ---
 ```

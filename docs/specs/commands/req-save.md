@@ -1,8 +1,8 @@
 ---
 title: req-save SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-05
+updated: 2026-07-18
 ---
 
 # req-save SPEC
@@ -135,3 +135,4 @@ G07（commit 前 status 更新）は フェーズ3 で維持。
 - REQ-0102（要件定義、保存）
 - REQ-0138（構造化 req_draft 契約）
 - REQ-0137（並列実行安全 git 操作規律）
+

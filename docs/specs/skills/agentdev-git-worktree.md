@@ -1,8 +1,8 @@
 ---
 title: `agentdev-git-worktree` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # `agentdev-git-worktree` SPEC
@@ -61,3 +61,4 @@ Issue 番号に基づいて安全かつ一貫性のある方法で git worktree 
 - [commands/case-close.md](../commands/case-close.md)
 - REQ-0110（Git worktree cleanup 信頼性）
 - REQ-0137（並列実行安全 git 操作規律）
+

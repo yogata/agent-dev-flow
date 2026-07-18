@@ -1,8 +1,8 @@
 ---
 title: `agentdev-doc-map` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # `agentdev-doc-map` SPEC
@@ -53,3 +53,4 @@ DOC-MAP を基準文書ではなく補助インデックスとして扱う。
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)
 - [agentdev-adr-file-manager.md](agentdev-adr-file-manager.md)
 - REQ-0101（文書、REQ 管理基準）
+

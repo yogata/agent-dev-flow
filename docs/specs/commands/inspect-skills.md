@@ -1,8 +1,8 @@
 ---
 title: inspect-skills SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # inspect-skills SPEC
@@ -77,3 +77,4 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 - [inspect-promote.md](inspect-promote.md)（検出事項分類、昇格）
 - `agentdev-inspect-skills` skill（詳細手順、finding 形式、推奨 route）
 - REQ-0125（inspect-skills / Command/Skill 参照妥当性検出）
+

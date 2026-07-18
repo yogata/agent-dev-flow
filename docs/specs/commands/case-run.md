@@ -1,8 +1,8 @@
 ---
 title: case-run SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-12
+updated: 2026-07-18
 ---
 
 # case-run SPEC
@@ -231,3 +231,4 @@ L3（委譲先内部メトリクス）は対象外とする（REQ-0151-010）。
 - REQ-0139（外部エージェント統合契約）
 - ADR-0114（case-auto 最大自走モード）
 - ADR-0128（case-run 外部実行委譲）
+
