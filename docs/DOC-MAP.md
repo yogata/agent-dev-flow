@@ -70,6 +70,7 @@
 | [REQ-0160](requirements/REQ-0160.md) | Project Extensions 機構と配布物参照境界 | .agentdev/extensions/** によるプロジェクト固有追加・拡張機構、配布物具体参照禁止（ADR-0135） |
 | [REQ-0161](requirements/REQ-0161.md) | config.yaml および旧 doc-inputs 機構定義の完全削除 | config.yaml 削除と旧 doc-inputs 機構定義文書の完全削除 |
 | [REQ-0162](requirements/REQ-0162.md) | 配布物ハーネス境界浄化 | AgentDevFlow と harness の責務境界、4状態結果契約、具象参照抽象化 |
+| [REQ-0163](requirements/REQ-0163.md) | subagent 委譲プロトコル要件（category 選定、MUST NOT DO） | category 選定ガイドライン（事務的手続きは unspecified-high 推奨、writing は執筆作業のみ）、MUST NOT DO セクション必須化、subagent 委譲プロンプトテンプレート要件 |
 
 ## 廃止済み REQ
 
