@@ -1,8 +1,8 @@
 ---
 title: Project Extensions
-status: draft
+status: accepted
 created: 2026-07-04
-updated: 2026-07-05
+updated: 2026-07-18
 ---
 
 # Project Extensions
@@ -140,3 +140,4 @@ extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は
 
 - ADR-0135: Project Extensions Architecture
 - ADR-0104: 実行時独立性（本 SPEC は具体化機構を提供）
+

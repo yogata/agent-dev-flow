@@ -1,8 +1,8 @@
 ---
 title: `agentdev-epic-tracker` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # `agentdev-epic-tracker` SPEC
@@ -57,3 +57,4 @@ updated: 2026-06-21
 - [commands/case-close.md](../commands/case-close.md)
 - REQ-0106（Case実行オーケストレーション / Epic、Wave）
 - ADR-0125（Epic Issue 本文単一書き手）
+

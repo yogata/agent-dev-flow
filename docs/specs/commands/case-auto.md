@@ -1,8 +1,8 @@
 ---
 title: case-auto SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-17
+updated: 2026-07-18
 ---
 
 # case-auto SPEC
@@ -195,3 +195,4 @@ case-auto は各工程（req-save / spec-save / case-open / case-run / case-clos
 - ADR-0128（case-run / case-close Epic Wave モデル）
 - ADR-0129（複数 execution_unit 並列実行モデル）
 - ADR-0132（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
+

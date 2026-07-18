@@ -1,8 +1,8 @@
 ---
 title: `agentdev-issue-management` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: "2026-07-18"
+updated: 2026-07-18
 ---
 
 # `agentdev-issue-management` SPEC
@@ -67,3 +67,4 @@ case-open がサブエージェントへ本文生成を委譲する接続点（S
 - [commands/case-open.md](../commands/case-open.md)
 - [commands/case-update.md](../commands/case-update.md)
 - [commands/case-close.md](../commands/case-close.md)
+

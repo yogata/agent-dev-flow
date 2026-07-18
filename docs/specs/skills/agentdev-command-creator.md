@@ -1,8 +1,8 @@
 ---
 title: `agentdev-command-creator` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # `agentdev-command-creator` SPEC
@@ -50,3 +50,4 @@ updated: 2026-06-21
 
 - [agentdev-command-authoring.md](agentdev-command-authoring.md)
 - [agentdev-skill-authoring.md](agentdev-skill-authoring.md)
+

@@ -1,8 +1,8 @@
 ---
 title: `agentdev-learning-capture` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # `agentdev-learning-capture` SPEC
@@ -53,3 +53,4 @@ updated: 2026-06-21
 - [agentdev-workflow-orchestration.md](agentdev-workflow-orchestration.md)
 - [../workflows/capture-boundaries.md](../workflows/capture-boundaries.md)
 - [commands/case-close.md](../commands/case-close.md)
+

@@ -1,8 +1,8 @@
 ---
 title: `agentdev-inspect-skills` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-24
+updated: 2026-07-18
 ---
 
 # `agentdev-inspect-skills` SPEC
@@ -56,3 +56,4 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - [agentdev-gh-cli.md](agentdev-gh-cli.md)（gh 直接記述の検出スコープ）
 - REQ-0125（inspect-skills / Command/Skill 参照妥当性検出）
 - REQ-0149（`agentdev-gh-cli` 手続き委譲基盤）
+

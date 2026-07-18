@@ -1,8 +1,8 @@
 ---
 title: case-open SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: "2026-07-18"
+updated: 2026-07-18
 ---
 
 # case-open SPEC
@@ -188,3 +188,4 @@ case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_ope
 - REQ-0132（case-open / Issue作成）
 - REQ-0137（並列実行安全 git 操作規律）
 - REQ-0148（RU群バッチ処理と複数 execution_unit 並列実行）
+

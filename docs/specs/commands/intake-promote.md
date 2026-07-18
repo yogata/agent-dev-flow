@@ -1,8 +1,8 @@
 ---
 title: intake-promote SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-03
+updated: 2026-07-18
 ---
 
 # intake-promote SPEC
@@ -86,3 +86,4 @@ GitHub Issue 作成は行わない。
 - [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
 - `agentdev-intake-pipeline` skill（inbox スキャン、レビュー評価、分類提示、整形保存）
 - REQ-0127（Intake command群）
+

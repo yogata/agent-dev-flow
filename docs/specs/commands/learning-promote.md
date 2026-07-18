@@ -1,8 +1,8 @@
 ---
 title: learning-promote SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-07-03
+updated: 2026-07-18
 ---
 
 # learning-promote SPEC
@@ -90,3 +90,4 @@ backlog-review 経由で RU 化する。
 - `agentdev-learning-pipeline` skill（全判定基準、スコアリングルール、提示形式、承認フロー）
 - `agentdev-learning-capture` skill（capture 層（独立スキル））
 - REQ-0128（Learning-promote）
+

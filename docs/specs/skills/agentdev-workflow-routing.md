@@ -1,8 +1,8 @@
 ---
 title: `agentdev-workflow-routing` SPEC
-status: draft
+status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-18
 ---
 
 # `agentdev-workflow-routing` SPEC
@@ -54,3 +54,4 @@ updated: 2026-06-21
 - [agentdev-quality-gates.md](agentdev-quality-gates.md)
 - [commands/case-update.md](../commands/case-update.md)
 - REQ-0133（case-update / Issue更新）
+

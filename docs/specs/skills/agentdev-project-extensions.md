@@ -1,8 +1,8 @@
 ---
 title: agentdev-project-extensions SPEC
-status: draft
+status: accepted
 created: 2026-07-04
-updated: 2026-07-04
+updated: 2026-07-18
 ---
 
 # agentdev-project-extensions SPEC
@@ -70,3 +70,4 @@ updated: 2026-07-04
 - [commands/inspect-extensions.md](../commands/inspect-extensions.md)（保守診断 command SPEC）
 - REQ-0160（Project Extensions 機構と配布物参照境界）
 - ADR-0135（Project Extensions Architecture）
+
