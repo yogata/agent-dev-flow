@@ -40,10 +40,13 @@ const SCRIPT_NAME = "check_changed_docs.ts";
 const DESCRIPTION =
   "Targeted docs integrity guard for save workflows (REQ-0158-003)";
 const USAGE =
-  "bun run check_changed_docs.ts --workflow <name> [--files <path...> | --base-ref <git-ref>] [--json] [--fail-level strict|warning] [--root <path>]";
+  "bun run check_changed_docs.ts --workflow <name> [--files <path...> (space-separated recommended; comma-separated also accepted) | --base-ref <git-ref>] [--json] [--fail-level strict|warning] [--root <path>]";
 const REF_USAGE_NOTES =
   "--files は main 環境（マージ後、case-close 等）で PR 変更ファイルを直接指定するときに使用。" +
   "--base-ref は worktree 環境（マージ前、case-run 等）で git diff により変更ファイル検出するときに使用。";
+// REQ-0158-001: --files の区切り形式（space 区切り推奨、comma 区切りも受入）。後方互換性を担保。
+const FILES_DELIMITER_NOTES =
+  "--files の区切り形式: space 区切り（推奨、例: --files a.md b.md c.md）、または comma 区切り（例: --files a.md,b.md,c.md）。両形式の混在も可。";
 
 type Workflow = "req-save" | "spec-save" | "case-run" | "case-close" | "docs-check";
 type FailLevel = "strict" | "warning";
@@ -122,7 +125,11 @@ function parseArgs(args: string[]): ParsedArgs {
     } else if (a === "--files") {
       i++;
       while (i < args.length && !args[i].startsWith("--")) {
-        parsed.files.push(args[i]);
+        // REQ-0158-001: comma 区切り（例: --files a.md,b.md）も受入。各 token を split して個別 file として積む。
+        for (const token of args[i].split(",")) {
+          const trimmed = token.trim();
+          if (trimmed.length > 0) parsed.files.push(trimmed);
+        }
         i++;
       }
       i--;
@@ -165,7 +172,8 @@ function printHelp(): void {
   console.error("");
   console.error("options:");
   console.error("  --workflow <name>   req-save | spec-save | case-run | case-close | docs-check (required)");
-  console.error("  --files <path...>   changed files; for main env (post-merge, case-close). mutually exclusive with --base-ref");
+  console.error("  --files <path...>   changed files (space-separated recommended; comma-separated also accepted); for main env (post-merge, case-close). mutually exclusive with --base-ref");
+  console.error(`  ${FILES_DELIMITER_NOTES}`);
   console.error("  --base-ref <ref>    git base ref to compute changed files; for worktree env (pre-merge, case-run). mutually exclusive with --files");
   console.error(`  ${REF_USAGE_NOTES}`);
   console.error("  --json              emit JSON report (default: text)");
