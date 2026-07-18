@@ -3654,6 +3654,9 @@ function isInsideCodeBlock(lines: string[], lineIndex: number): boolean {
  */
 function isTemplatePlaceholder(refPath: string): boolean {
   if (/\{[^}]*\}/.test(refPath)) return true;
+  // REQ-0144-025 / ADR-0136: <harness> 等の angle-bracket placeholder は
+  // 実ファイルを指さない抽象表記のため検査対象外とする。
+  if (/<[a-zA-Z][a-zA-Z0-9_-]*>/.test(refPath)) return true;
   return false;
 }
 

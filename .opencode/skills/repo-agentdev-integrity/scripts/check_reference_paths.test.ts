@@ -299,6 +299,32 @@ describe("checkScriptTemplateReferencePaths", () => {
     const placeholderNg = refNg.filter((r) => r.evidence?.includes("{"));
     expect(placeholderNg.length).toBe(0);
   });
+  it("does not flag angle-bracket placeholders like <harness> (REQ-0144-025)", () => {
+    const root = join(TEMP_ROOT, "angle-placeholder-path");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const cmdDir = join(root, ".opencode", "commands", "agentdev");
+    writeFileSync(
+      join(cmdDir, "test-cmd.md"),
+      [
+        "---",
+        "description: Test",
+        "agent: oracle",
+        "---",
+        "",
+        "起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md 参照。",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refNg = (result.report!.results || []).filter(
+      (r) => r.category === "ReferencePath" && r.level === "ng",
+    );
+    const harnessNg = refNg.filter((r) => r.evidence?.includes("<harness>"));
+    expect(harnessNg.length).toBe(0);
+  });
   it("reports ng for missing repo-root-relative references", () => {
     const root = join(TEMP_ROOT, "root-rel-missing");
     buildMinimalFixture(root);
