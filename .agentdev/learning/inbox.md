@@ -116,3 +116,35 @@
 - 想定反映先: src/opencode/skills/agentdev-intake-pipeline/references/ (intake-from-github の委任追跡)、src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md (capture 境界の委任記録)
 - 関連: Issue #1532 (PR #1534 merge 61edb46), Issue #1533 (PR #1535 merge 1c10ad2), OU-002 / RU-20260718-01
 - タグ: #inspect-chain #delegation-tracking #findings-linkage #case-close
+
+## Issue 完了条件の数値閾値到達不能問題: draft LF 数を基準にした閾値が自然な本文構造で到達不能 (#1538/TS-007)
+
+- 問題事象: Issue #1538 完了条件 TS-007 pass criteria「LF 数 200 以上」が、case-open が生成する自然な Issue 本文構造では到達不能。姉妹 Issue（#1532=164, #1534=90, #1535=58）も同様に 200 未満。元 draft（LF=246）を基準にしたが、draft は YAML block 全体（7 AG, 7 ACT-REQ, 4 CR, 7 TS 等）を含む長さであり、case-open が生成する Issue 本文とは構造が異なるため到達不能
+- 発生局面: 実装 (case-run TS-007 検証)
+- 検知方法: PR #1539 品質メトリクスの LF 数比較（元 draft 246 vs 修復後 98 vs 姉妹 Issue 58-164）。PR 本文の WARN 判定と根拠記述
+- 根本原因: 完了条件の数値閾値を、対象成果物の自然な構造（テンプレート適用後）で到達可能な範囲を事前計測せずに設定した。draft（要件定義書）と case-open 生成 Issue 本文（テンプレート要約、重複 TS マージ等）は構造が異なるため、draft の LF 数を基準にすると到達不能閾値になる
+- 自律対応内容: (1) 姉妹 Issue の LF 数を実測して到達不能範囲を特定、(2) 構造的修復（Markdown レンダリング復元: 見出し8個・サブ見出し6個・リスト31個・チェックボックス8個が全て行頭から開始）の目的は達成したと判定、(3) PR 本文に WARN と根拠（姉妹 Issue 実測値との同水準比較）を明示
+- ユーザー確認有無: なし
+- ADR/REQ/spec影響: あり。完了条件に数値閾値を設定する場合、対象成果物の自然な構造で到達可能かの事前計測を要求する運用ルールが REQ/SPEC に未明文化。REQ-0131 系（test strategy 策定フロー）、QG-2 (Acceptance Criteria Coverage Gate) の実現可能性検証と関連
+- 横展開観点: 今後 case-open、case-close、spec-save 等、完了条件に数値閾値を設定する全場面で同一事象が発生し得る。Inspect 系 Issue でも「違反0件」等の全体評価閾値で同様の問題が既に発生（#1532 完了条件7）
+- 再発条件: 完了条件に「N 個以上」「N 件以上」等の数値閾値を設定し、対象成果物の自然な構造で到達可能かを事前計測しない場合
+- 予防策候補: (a) case-open が完了条件の数値閾値を検証して到達不能場合は警告、(b) QG-2 (Acceptance Criteria Coverage Gate) で数値閾値の実現可能性を同種既存成果物の実測値で検証、(c) test strategy 策定時に基準値を同種の既存成果物から実測、(d) draft の絶対数を基準にする場合はテンプレート適用後の自然構造での数値も併記
+- 想定反映先: src/opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md、src/opencode/skills/agentdev-req-analysis/references/ (test strategy 策定ガイド)、src/opencode/commands/agentdev/case-open.md (完了条件の数値閾値検証)
+- 関連: Issue #1538, PR #1539 (merge 5e373217), TS-007, 姉妹 Issue #1532/#1534/#1535, REQ-0131 (test strategy), REQ-0146-011 (識別子中心評価)
+- タグ: #numeric-threshold #unreachable-criteria #test-strategy #lf-count #case-open #qg2 #acceptance-criteria
+
+## case-open subagent 委譲での手順逸脱: category=writing が文書監査的振る舞いを誘発、draft 作成へスコープ拡大 (#1538 case-auto 委譲)
+
+- 問題事象: case-auto から case-open を subagent へ委譲した際、複数回の試行で手順逸脱が発生。1回目は文書監査ファイル生成（japanese-audit, replacement-dictionary 等、スコープ外）を実施し case-open の本来責務（Issue 作成・VERIFY）へ到達せず。その後の試行では draft 作成（`.agentdev/drafts/` 配下）という case-open とは無関係の作業へ逸脱。親コンテキストの MUST NOT DO（draft ファイル作成禁止、文書監査禁止、REQ/SPEC/src 修正禁止）に抵触
+- 発生局面: 実装 (case-auto からの case-open subagent 委譲)
+- 検知方法: subagent 出力の `.agentdev/drafts/` 配下ファイル生成、japanese-audit 系ファイル生成の検知。親コンテキスト MUST NOT DO 違反の発覚。最終的に category=unspecified-high + プロンプト強化で正常完了したことからの逆算
+- 根本原因: (1) category=writing が「文書作業」を連想させ、subagent が文書監査・校正的振る舞いを誘発した可能性（japanese-tech-writing 等の発火スキルとの相互作用）、(2) subagent プロンプトで禁止事項（MUST NOT DO）が明示されておらずスコープ境界が弱かった、(3) writing category が「書く」作業全般を意味するため case-open の事務的手続き作業と認識されなかった
+- 自律対応内容: (1) category=writing を廃止し category=unspecified-high に変更、(2) プロンプトへ MUST NOT DO セクションを明示的に追加（`.agentdev/drafts/` 書き込み禁止、文書監査禁止、REQ/SPEC/src 修正禁止、draft 作成禁止）、(3) 強化プロンプトで再試行し case-open が正常完了（Issue 作成 + VERIFY 成功）
+- ユーザー確認有無: なし
+- ADR/REQ/spec影響: あり。case-open subagent 委譲時の category 選定基準、プロンプトの MUST NOT DO 記載要件が SPEC に未明文化。category=writing の発火スキル（japanese-tech-writing 等）と subagent 振る舞いの相互作用が未検証。agentdev-case-run-execution-adapter の委譲プロトコルと category 設計の関係も要整理
+- 横展開観点: case-auto から subagent へ委譲する全場面（case-open, case-run, case-update, case-close 等）で category 設計と MUST NOT DO 明示が同様に重要。特に command 名と category 名の意味的距離が大きい場合は要注意
+- 再発条件: (1) case-open 等の事務的手続き作業を category=writing で委譲した場合、(2) subagent プロンプトに MUST NOT DO が明示されていない場合、(3) category 名が subagent の「作業の意味」を誤誘導する場合
+- 予防策候補: (a) case-auto から subagent 委譲時の category 選定ガイドラインを SPEC 化（事務的手続きは unspecified-high を推奨、writing は執筆作業のみ）、(b) subagent プロンプトテンプレートに MUST NOT DO セクションを必須化、(c) writing category の発火スキル（japanese-tech-writing 等）を case-open 等、事務的手続き委譲時は無効化する仕組み、(d) category 別の subagent 振る舞い事例集を蓄積
+- 想定反映先: src/opencode/commands/agentdev/case-auto.md (subagent 委譲ガイドライン・category 選定指針)、src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md (subagent プロトコル・MUST NOT DO 記載要件)、src/opencode/skills/agentdev-case-run-execution-adapter/ (委譲プロトコルと category 設計)
+- 関連: Issue #1538, PR #1539 (merge 5e373217), case-auto case-open 委譲, category=writing vs unspecified-high, REQ-0149 (agentdev-gh-cli 委譲基盤)
+- タグ: #subagent-delegation #category-selection #must-not-do #case-open #case-auto #writing-category #scope-discipline #prompt-engineering
