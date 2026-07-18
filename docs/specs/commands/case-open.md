@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: draft
 created: 2026-06-21
-updated: 2026-07-05
+updated: "2026-07-18"
 ---
 
 # case-open SPEC
@@ -127,6 +127,7 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 - 子Issue最大10件超過時の作成続行（G05、エラー停止）
 - intake / learning capture の実施（G18, G22）
 - Issue作成の gh CLI 安全手順省略（G12、`agentdev-gh-cli` 参照）
+- case-open は Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）を文字列変数で持ち回らず、`[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡すこと（G25、REQ-0132-024）。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでをファイル経由で固定し、親エージェントの本文再構成を禁止する（REQ-0132-025）
 - スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（G23、REQ-0137-001）
 - 明示パス指定以外のステージ、コミット（G24、REQ-0137-002/005）
 - draft / RU 削除の未ステージ残存許可（G24、Form Zero、REQ-0137-003/006）
@@ -138,7 +139,7 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 - 全子Issue作成完了後の Epic 本文ステータス追跡テーブル更新（G04、部分更新禁止）
 - 子Issue数上限（G05、最大10件、Epic 1件あたり）
 - テンプレート必須セクション完備確認（G09、G10、`完了条件` セクション含む）
-- 出力制約: Issue 本文、commit message は verbatim で返す（G17）
+- 出力制約: Issue 本文、commit message は verbatim で返す。「verbatim」とは LF・空行・インデントを含む行構造を byte 単位で保持することを指し、文字列の正規化、改行圧縮、空白挿入・削除をすべて禁止する。委譲接続点（Step 2/6/8/9）と最終 gh CLI 渡し（Step 12/13）の双方に適用する。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す（G17）
 - draft / RU 削除残存検証（Step 14-2、`git status --porcelain` で空であること）
 
 ## case-auto 並列委譲モデル（REQ-0114-087〜093）
