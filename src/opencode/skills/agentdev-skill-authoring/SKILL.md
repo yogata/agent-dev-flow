@@ -19,100 +19,7 @@ OpenCodeのSKILL.mdを書く際の実践ガイド。
 
 ## 1. 設計原則
 
-### 簡潔さを優先する
-
-コンテキストウィンドウは共有リソース。LLMが既に知っていることの説明は省く:
-
-**Good**（不要な説明を省略）:
-````markdown
-## Git Commit
-
-Analyze staged changes and generate a commit message:
-
-```bash
-git diff --cached --stat
-```
-
-Follow Conventional Commits format.
-````
-
-**Bad**（既知の概念を説明）:
-```markdown
-Git is a version control system that tracks changes in source code.
-Commits are snapshots of your repository at a point in time...
-```
-
-### 自由度
-
-タスクの脆さと変動性に合わせて指示の具体的レベルを調整する:
-
-| 自由度 | いつ使う | 例 |
-|--------|----------|-----|
-| **High** | 複数の有効なアプローチが存在、文脈依存の判断 | コードレビュー、分析タスク |
-| **Medium** | 推奨パターンはあるが変動OK | 設定可能なテンプレート |
-| **Low** | 操作が脆くエラーが出やすい、一貫性が重要 | DB マイグレーション、デプロイ手順 |
-
-**Low freedom**（安全な道が一つだけの場合）:
-````markdown
-## Database migration
-
-Run exactly this script:
-
-```bash
-python scripts/migrate.py --verify --backup
-```
-
-Do not modify the command or add additional flags.
-````
-
-**High freedom**（多くの道が成功に至る場合）:
-```markdown
-## Code review process
-
-1. Analyze the code structure and organization
-2. Check for potential bugs or edge cases
-3. Suggest improvements for readability and maintainability
-4. Verify adherence to project conventions
-```
-
-### トークン予算管理
-
-コンテキストウィンドウは有限リソース。定量的な予算管理で品質を担保:
-
-| 指標 | 上限 | 根拠 |
-|------|------|------|
-| **SKILL.md 行数** | ≤500行 | トリガー時に全文がコンテキストに読み込まれる |
-| **指示トークン数** | <5,000 tokens | 1スキルが占めるコンテキストの適正規模 |
-| **参照ファイル** | 無制限（渐进的読み込み） | 必要時のみ読み込まれるため影響は限定的 |
-
-トークン数の見積もり: 英語は約4文字≈1 token、日本語は約1.5文字≈1 token。
-実測推奨。
-予算超過の兆候: 400行超で分割検討、同セクション反復参照は統合、未アクセスファイルは削除検討。
-
-### 行数ガバナンス
-
-SKILL.md の行数が **500行を超過** した場合、`references/` サブディレクトリへの抽出が **必須** となる。
-
-| 行数 | 判定 | アクション |
-|------|------|-----------|
-| ≤400行 | ✅ 適正 | なし |
-| 401〜500行 | ⚠️ 抽出検討 | 独立した関心事を `references/` に移動する計画を立案 |
-| >500行 | ❌ 必須抽出 | SKILL.md を概要、ナビゲーションに絞り、詳細を `references/` に切り出し |
-
-**抽出ルール**:
-
-1. SKILL.md は概要、判断基準、ナビゲーションのみを保持する
-2. 詳細な手順、判定表、具体例は `references/` に移動する
-3. SKILL.md から `references/` への参照深度は **1階層** まで
-4. 抽出後の SKILL.md は 400行以下を目標とする
-5. `references/` に抽出したファイルが 100行を超える場合は目次を付ける
-
-**抽出対象の優先順位**:
-
-1. 大きなコード例、テンプレート例 → `references/{topic}-examples.md`
-2. 詳細な判定表、分類表 → `references/{topic}-standards.md`
-3. ワークフローの詳細手順 → `references/{topic}-workflow.md`
-4. 開発プロセスの詳細 → `references/{topic}-process.md`
+SKILL.md の設計は、簡潔さ、自由度、トークン予算、行数ガバナンスの4観点で設計する。行数が500行を超える場合は `references/`への抽出が必須となり、抽出後の SKILL.md は400行以下を目標とする（REQ-0113-010）。各原則の詳細、コード例、行数ガバナンス表、抽出ルールと優先順位は [references/design-principles.md](references/design-principles.md) 参照。
 
 ## 2. スキル仕様
 
@@ -243,177 +150,15 @@ skill/
 
 ## 5. レビュープロトコル
 
-4つの観点でスキル品質をチェックする:
-
-### 5.1 frontmatter チェック
-
-- [ ] nameが命名規則に従っている（kebab-case、gerund form推奨）
-- [ ] nameが **YAML スカラー値（プレーン文字列）** で記述されている（バッククォートで囲まない）。frontmatter は構造データであり Markdown インラインコード表記の対象外（backticks-identifier-threshold SPEC「適用対象外」準拠、PR #1334 事例）
-- [ ] descriptionにトリガー（USE FOR/ DO NOT USE FOR または WHEN）が含まれている
-- [ ] descriptionが3人称で書かれている
-- [ ] frontmatterフィールドはnameとdescriptionのみ（拡張フィールドを追加しない）
-
-#### frontmatter `name:` のバッククォート禁止（必須規定）
-
-frontmatter の `name:` フィールドは YAML スカラー値であり、バッククォート（Markdown インラインコード記法）で囲んではならない。囲んだ場合、YAML パーサが `` `agentdev-xxx` `` 全体を name 値として解釈し、ディレクトリ名との不一致（IR-007 違反）と opencode のスキル名解決不具合を引き起こす（PR #1334 事例）。
-
-| 箇所 | 形式 | 例 |
-|------|------|-----|
-| frontmatter `name:` | プレーン文字列（バッククォートなし） | `name: agentdev-xxx` |
-| Markdown 本文中のスキル名言及 | バッククォート囲み（識別子表記） | `` `agentdev-xxx` スキルは… `` |
-
-この使い分けを徹底する。frontmatter は構造データ、本文は自然言語記述であり、同じスキル名でも文脈により表記が異なる。
-
-誤例（禁止）:
-
-```
----
-name: `agentdev-xxx`
----
-```
-
-正例:
-
-```
----
-name: agentdev-xxx
----
-```
-
-既存テンプレート例示（本ファイル「6. 開発ワークフロー」内「テンプレートパターン」のコードブロック）は正例であり、frontmatter の `name:` がプレーン文字列で記述されている。本規定と矛盾しない。
-
-### 5.2 予算チェック
-
-- [ ] 行数 ≤500行（超過時は `references/` への抽出が必須。第1章 行数ガバナンス 参照）
-- [ ] 推定トークン数が複雑度の予算内（simple: <2K、moderate: <4K、detailed: <5K）
-- [ ] 複雑度に対してSKILL.mdが大きすぎない（simpleなのに300行等）
-
-### 5.3 構造チェック
-
-- [ ] 段階的開示が適用されている
-- [ ] 参照深度が1階層まで
-- [ ] 複雑度分類が内容に合っている
-- [ ] 100行超の参照ファイルに目次がある
-
-### 5.4 助言チェック
-
-- [ ] 参照モジュール数が適切（moderate: 2-3、detailed: 3-5）
-- [ ] 過度な具体性（環境固有のハードコード等）がない
-- [ ] 手続き的コンテンツがワークフローセクションに配置されている
-- [ ] 用語が一貫している
-
-### 5.5 サブエージェント編集安全性
-
-サブエージェントに編集を委譲する場合、/ および Issue #653/#655/#656 の再発防止として、以下を満たすこと:
-
-- **Worktree 内制約**: サブエージェントは worktree root 外のファイルを編集してはならない。編集対象は worktree root からの相対パスで指定し、worktree 外へのパス遷移を防止しなければならない
-- **パスプレフィクス確認**: 編集操作の前に、対象パスが worktree root からの相対パスであることを検証しなければならない。絶対パスや worktree 外パスを使用してはならない
-- **ファイル存在確認**: 編集対象ファイルの存在を事前に確認しなければならない。存在しないファイルへの edit 操作を行ってはならない
-
-ソースパスとランタイムパスの混同を防止するため、`src/opencode/...`（ソースパス）と `.opencode/...`（ランタイムパス）を明確に区別すること。
-Command/ skill 定義内のパス参照は記述された通りに解釈し、ソースパスをランタイムパスの参照先として使用してはならない。
+スキル品質を5軸（明確性、完全性、トリガー精度、スコープ範囲、アンチパターン検出）で評価し、frontmatter、予算、構造、助言、サブエージェント編集安全性の4観点でチェックする。各観点のチェックリストと frontmatter `name:` のバッククォート禁止規定（PR #1334 事例）は [references/review-protocol.md](references/review-protocol.md) 参照。
 
 ## 6. 開発ワークフロー
 
-### 反復開発（最も効果的なプロセス）
-
-1. **スキルなしでタスク完了**（繰り返し提供したコンテキストに注目）
-2. **再利用可能なパターンを特定**（表名、フィルタリングルール、共通クエリ）
-3. **スキルを作成**（特定したパターンをSKILL.mdに抽出）
-4. **簡潔さをレビュー**（不要な説明を削除）
-5. **情報構造を改善**（大きな内容は別ファイルに分割）
-6. **実際のタスクでテスト**（別セッションで検証）
-7. **観察に基づいて反復**（困難な点を特定し改善）
-
-観察すべきポイント: 予期しない読み込み順序→構造が直感的でない、参照見落とし→リンクを明確に、同セクション反復→本体に移す、未アクセスファイル→不要かも。
-
-### フィードバックループ
-
-「バリデート → 修正 → 繰り返し」のパターンで品質を担保:
-
-1. スキルをロードして代表タスクを実行
-2. **即座に評価**（セクション5のチェックリストに照らす）
-3. 問題があれば該当セクションを特定、SKILL.mdを修正、別セッションで再テスト
-4. **全項目パスしたら完了**
-
-### 評価先行構築
-
-豊富なドキュメントを書く前に評価を作成する:
-
-1. **ギャップ特定**: スキルなしで代表タスクを実行し、失敗を記録
-2. **評価作成**: ギャップをテストする3つのシナリオを作成
- 3. **基準測定**: スキルなしでの性能を計測
-4. **最小限の指示を書く**: ギャップを埋める分だけのコンテンツを作成
- 5. **反復**: 評価を実行、基準と比較、洗練
-
-### 共通パターン
-
-#### テンプレートパターン
-
-**Strict**（APIレスポンスやデータフォーマット向け）:
-````markdown
-## Skill description template
-
-ALWAYS use this exact format:
-
-```yaml
----
-name: [verb]-[noun]
-description: [What it does]. USE FOR: [trigger conditions]. DO NOT USE FOR: [exclusions].
----
-```
-````
-
-**Flexible**（適応が有用な場合）:
-````markdown
-```markdown
----
-name: [kebab-case-name]
-description: [What + USE FOR + DO NOT USE FOR]
----
-
-# [Skill Title]
-
-## Overview
-[1-2 sentences]
-
-## Instructions
-[Main content]
-```
-
-Adapt sections as needed.
-````
-
-#### 条件付きワークフローパターン
-
-分岐ポイントで意思決定をガイド:
-
-```markdown
-1. Determine the skill complexity:
-   **Single concern, under 200 lines?** → Write everything in SKILL.md
-   **Multiple domains or over 200 lines?** → Split into separate files
-```
+スキルは「スキルなしでタスク完了 → パターン特定 → スキル作成 → レビュー → 構造改善 → テスト → 反復」のサイクルで開発する。テンプレートパターン（Strict/ Flexible）、条件付きワークフローパターン、評価先行構築、フィードバックループの詳細は [references/development-workflow.md](references/development-workflow.md) 参照。
 
 ## 7. アンチパターン
 
-| アンチパターン | 問題 | 修正 |
-|---------------|------|------|
-| Windows形式のパス `\path\to\file` | Unix環境でエラー | 常にフォワードスラッシュ `path/to/file` |
-| 多すぎる選択肢の提示 | 混乱を招く | デフォルトを1つ提示、代替は例外時のみ |
-| 不必要な前提知識の説明 | トークン無駄遣い | LLMが既に知っていることを説明しない |
-| 深いネストの参照 | 不完全な読み込み | SKILL.mdから1階層まで |
-| 時間依存の情報 | すぐに不正確に | 履歴セクションで管理 |
-| 用語の不統一 | 混乱 | 一つの用語を決めて一貫使用 |
-| 過度な具体性 | 環境変更で破綻 | 汎用的な記述にし環境依存は変数化 |
-| frontmatterの拡張 | 互換性リスク | nameとdescriptionのみに制限 |
-
-### 時間依存情報の回避
-
-期限付きの情報は履歴セクションで管理する（時期別の分岐はアンチパターン）。
-
-### 用語の一貫性
-
-一つの用語を決めてスキル全体で一貫して使用。
+Windows形式パス、多すぎる選択肢、不必要な前提知識の説明、深いネストの参照、時間依存の情報、用語の不統一、過度な具体性、frontmatterの拡張の8パターンを避ける。アンチパターン一覧表と詳細は [references/development-workflow.md](references/development-workflow.md) 参照。
 
 ## 8. コマンドとスキルの境界
 
@@ -514,6 +259,16 @@ Skill 分割を検討する条件:
 - 参照ファイルを選ぶこと自体が別 Skill の選択判断になっている
 
 配置判断は 9 章を優先し、Skill 粒度の最終確認として本章を使う。
+
+## references 一覧
+
+SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える（REQ-0113-010）。
+
+| ファイル | 内容 |
+|----------|------|
+| [references/design-principles.md](references/design-principles.md) | 設計原則の詳細（簡潔さ、自由度、トークン予算管理、行数ガバナンス、抽出ルールと優先順位） |
+| [references/review-protocol.md](references/review-protocol.md) | レビュープロトコル（frontmatter、予算、構造、助言、サブエージェント編集安全性のチェックリスト） |
+| [references/development-workflow.md](references/development-workflow.md) | 開発ワークフロー（反復開発、フィードバックループ、評価先行構築、テンプレートパターン）とアンチパターン一覧 |
 
 ## See Also
 
