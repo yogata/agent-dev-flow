@@ -2,7 +2,7 @@
 title: case-close SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-19
 ---
 
 # case-close SPEC
@@ -127,8 +127,35 @@ case-close は targeted docs guard が FAILURE を返した場合、以下を行
 2. `--files` 指定の妥当性を確認する（PR 変更ファイル一覧の再取得、パス指定の確認）
 3. 必要に応じて `--files` での再実行、または対象ファイルの手動確認を行う
 4. 空の理由が正当（対象ファイルが本当に変更されていない等）であることを確認してから続行する
+5. PR が verification-only（変更ファイル0件）の場合、後述「verification-only PR の files_checked 空確認（REQ-0158-002）」に従い判定する
 
 上記確認を経ずに `files_checked` 空のまま完了扱いとしない。
+
+#### verification-only PR の files_checked 空確認（REQ-0158-002）
+
+verification-only PR（実装差分0件、検証のみで作成された PR）の場合、`files_checked` が空になることが正規の状態として発生する。case-close は次の手順で verification-only 判定を行い、正当と判断された場合に PASS 処理する。要件の SSoT は REQ-0158-002、verification-only PR の定義と case-run 側引継ぎ注意事项は [case-run.md](case-run.md)「verification-only PR（実装差分なし、検証のみ）（REQ-0158-002）」参照。
+
+**判定基準（全て満たすこと）**:
+
+1. PR 変更ファイル一覧（`gh pr view <PR> --json files`）が空配列であること
+2. PR 本文に verification-only である旨が明記されていること（「実装差分なし（verification-only）」等の表現）
+3. PR 本文に検証 evidence（`## 完了条件検証`、`## 変更内容` 等）が記録されており、Issue の受け入れ基準が検証のみで充足されたことが確認できること
+
+**PASS 処理**:
+
+上記3項目を全て満たす場合、case-close は verification-only PR と判定し、files_checked 空の FAILURE を PASS 処理する。判定根拠（PR 本文の verification-only 宣言、検証 evidence の参照、`gh pr view --json files` の空配列確認）を完了報告に記録する。
+
+**false-clean 3層防御との相互作用**:
+
+REQ-0158「case-close 向け false-clean 予防」節は files_checked 空を silent pass としないための3層防御（対象空時の warning 報告、`--files` 標準化、files_checked 非空の確認ステップ）を定める。REQ-0158-002 はこの3層防御を回避するものではなく、verification-only の正当性確認により3層防御の警告を吸収する経路を追加する。両者の関係は以下の通り:
+
+| 層 | REQ-0158 false-clean 予防節 | REQ-0158-002 による相互作用 |
+|---|---|---|
+| 第1層 | check_changed_docs.ts が files_checked 空を warning として報告 | warning を検知した case-close が verification-only 判定ステップへ進むトリガーとして扱う（silent pass しない） |
+| 第2層 | case-close は `--files <PR変更ファイル>` 指定を標準とする | verification-only PR では `--files` が空配列となり、それ自体が verification-only のシグナルとなる |
+| 第3層 | files_checked が空でないことの確認ステップを含める | 本ステップが verification-only 判定基準（3項目）の適用場所となる。3項目を満たさない場合は silent pass を許さず FAILURE を維持する |
+
+verification-only 判定基準3項目を満たさない files_checked 空（例: PR 本文に verification-only 宣言がない、検証 evidence がない）は silent pass を許さず、FAILURE を維持して構造化エラー停止とする。
 
 ## 対象外
 

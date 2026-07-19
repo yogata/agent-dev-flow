@@ -2,7 +2,7 @@
 title: case-run SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-19
 ---
 
 # case-run SPEC
@@ -145,6 +145,32 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
 
 - 検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` セクションに `### docs-integrity` 小見出しで記録する
 - case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない、REQ-0130-034 準拠）
+
+## verification-only PR（実装差分なし、検証のみ）（REQ-0158-002）
+
+case-run は実行担当サブエージェント委譲の結果、実装差分0件・検証のみで完了する PR（**verification-only PR**）を生成する場合がある。本節は verification-only PR の判定条件、GitHub の空 PR 取り扱い、case-close への引継ぎ注意事项を定める。要件の SSoT は REQ-0158-002。
+
+### 定義
+
+verification-only PR は以下を全て満たす PR とする（REQ-0158-002）。
+
+- PR の変更ファイル数が0件（`gh pr view --json files` で `files: []`）
+- Issue の受け入れ基準が検証のみで充足された（既存実装・既存文書が要件を満たしており、追加実装を要しなかった）
+- 検証結果が PR 本文（`## 変更内容`、`## 完了条件検証` 等）に evidence として記録されている
+
+実行担当サブエージェントは verification-only で完了した場合も `completed-pr` を返し、PR URL を委譲 result に含める（`blocked` / `failed` にはしない）。PR 本文には「実装差分なし（verification-only）」である旨と検証 evidence を記載する。
+
+### GitHub の空 PR 許容
+
+GitHub は空 PR（変更ファイル0件）の squash merge を許可し、空 commit を生成する（commit 2b34f8b0 で実証）。case-run は空 PR の作成・マージを GitHub の挙動に依存して実行する。squash merge で生成された空 commit は履歴に残り、`gh pr merge --squash` の通常フローに従う。
+
+### case-close 引継ぎ注意事项
+
+verification-only PR は case-close Step 3-1 targeted docs guard で files_checked が空になるため、次の注意事项を case-close へ引き継ぐ。
+
+- PR 本文に「verification-only である旨」と「検証 evidence（`## 完了条件検証` 等）」が記録されていること（[case-close.md](case-close.md)「verification-only PR の files_checked 空確認（REQ-0158-002）」参照）
+- case-close は files_checked 空を検出した場合、REQ-0158-002 に基づき verification-only 判定ステップを経て PASS 処理する（false-clean 3層防御との相互作用は case-close SPEC 参照）
+- case-run 側は PR 作成までを責務とし、verification-only 判定自体は case-close が行う（単一書き手: case-close、ADR-0114 完了条件チェックボックス専任責務）
 
 ## 参照する横断 SPEC
 
