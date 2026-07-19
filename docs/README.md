@@ -97,7 +97,6 @@ SPEC は 3 層構造を持つ（commands / skills / workflows）。詳細は [SP
 - [成果物責任表](specs/responsibilities/artifact-responsibilities.md)
 - [整合性契約](specs/integrity/integrity-contracts.md)
 - [整合性ルールカタログ](specs/integrity/integrity-rule-catalog.md)
-- [ワークフロー契約（旧版・縮小済み）](specs/foundations/workflow-contracts.md)：旧版互換索引（縮小済み参照ファイル）。正規の横断ワークフロー契約は [workflows/](specs/workflows/) 配下を参照
 - [実行時パッケージ境界](specs/local/runtime-package-boundary.md)
 - [ローカル Case ファイル](specs/local/local-case-file.md)
 - [ローカル版 OpenCode 生成](specs/local/local-generation.md)

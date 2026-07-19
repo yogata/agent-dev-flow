@@ -61,7 +61,10 @@ entries:
     new: "docs/specs/foundations/document-model.md"
     severity: "ng"
   - old: "docs/specs/workflow-contracts.md"
-    new: "docs/specs/foundations/workflow-contracts.md"
+    new: "docs/specs/workflows/workflow-contracts.md"
+    severity: "ng"
+  - old: "docs/specs/foundations/workflow-contracts.md"
+    new: "docs/specs/workflows/workflow-contracts.md"
     severity: "ng"
 
   # responsibilities/（文書種別、成果物責務）
