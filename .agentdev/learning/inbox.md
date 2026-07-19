@@ -197,3 +197,37 @@
 - **タグ**: #index #automation #readme #single-source-of-truth #integrity #ir-042 #generate
 
 ---
+
+## Issue 本文崩壊（LF 圧縮・見出し消失）の修復手法と予防線
+
+- **問題事象**: Issue #1533 の本文が LF=0（事実上1行化）に圧縮され、Markdown の見出し構造（`## ...`）が崩壊。GitHub Web UI で見出しが見出しとしてレンダリングされず、本文全体が平文化して読めなくなっていた。前工程の draft（commit `51fff8b2`）は LF=246 で正常、テンプレート原本も正常であり、#1525〜#1535 の11件中 #1533 だけが異常だった。
+- **発生局面**: 完了処理（case-close Step 2 QG-4 評価の前置として AG-007 修復を実施）
+- **検知方法**: `gh api ... --jq .body` で取得した本文の LF 数計測で LF=0 を検出。`-1` を含む `headings` 計測で「見出し行頭の `##` が 0 件」を確認。
+- **根本原因**: case-open の本文作成経路が、テンプレート読込後の本文をファイル経由で扱わず、PowerShell 文字列変数で持ち回し、`gh` CLI へ渡す前に LF 圧縮・空行正規化が走っていた。LF 欠損は Markdown 構造破壊（見出しの見出しとしての認識消失）の直接原因。
+- **自律対応内容**: REQ-0125.md（UTF-8 LF 保存済みの原本）を主ソースとして意味内容を抽出し、`issue_desc_feature.md` テンプレート構造で本文を再構成。`.tmp/issue1533-body.md` を Write tool（Node.js による UTF-8 BOM なし LF 書き出し）で作成し、`gh issue edit 1533 --body-file <path>` で投稿。修復後 LF=204、見出し16個すべて直前空行またはファイル先頭、行中 `##` 0件、日本語文字化けなし。
+- **ユーザー確認有無**: なし（AG-007 は Issue #1537 の完了条件に含まれ、エージェント自律で修復を実施）
+- **ADR/REQ/spec影響**: あり。本件は既に REQ-0132-024/025/026（case-open ファイル経由本文保持）および REQ-0149-010（VERIFY の LF 数一致・見出し空行・行頭検証）として実装済み（PR #1539）。本学びは修復手法の記録であり、新規 REQ ではない。
+- **横展開観点**: GitHub Issue に限らず、Markdown 構造を持つ任意の成果物（PR 本文、完了報告コメント、Case ファイル（ローカル版））で LF 圧縮・見出し消失の同種事故が発生し得る。本文作成時は常に `[System.IO.File]::WriteAllText` UTF8Encoding($false) によるファイル経由を固定し、読み戻し時に LF 数・見出し空行・行頭検証を行う VERIFY を併用する。修復が必要な場合は UTF-8 LF の原本ソース（REQ ファイル、draft commit 等）を主ソースとし、テンプレート構造で再構成する。
+- **再発条件**: (1) PowerShell パイプライン経由で本文を取り回す、(2) `--body` 直接指定する、(3) VERIFY で LF 数と見出し構造を検査しない、のいずれかが発生した場合。
+- **予防策候補**: (a) REQ-0132-024/025/026 実装（既実施）により構造的に防止。(b) 修復が必要になった場合、標準手順として「原本ソースの特定 → テンプレート構造で再構成 → `[System.IO.File]::WriteAllText` UTF8Encoding($false) でファイル作成 → `gh ... --body-file` で投稿 → Node.js `execSync` で LF 数・見出し数を読み戻し検証」を常に踏む。
+- **想定反映先**: `agentdev-gh-cli/references/standard-procedures.md`（本文修復手順の記載）、`agentdev-issue-management/references/issue-operation-safety.md`（修復時の前後スナップショット比較）。両者とも REQ-0132/0149 実装で既カバーされており、本学びは具体的事例の補強。
+- **関連**: PR #1600, Issue #1537（AG-007）, Issue #1533（修復対象）, RU-20260718-01（起点 RU）, REQ-0132-024/025/026, REQ-0149-010, PR #1539（実装 PR）
+- **タグ**: `#case-close` `#issue-body-restore` `#lf-corruption` `#markdown-structure` `#verify` `#ag-007` `#powershell-encoding` `#req-0132-024` `#req-0149-010`
+
+## gh CLI 出力の PowerShell パイプライン経由読み取りによる UTF-8 損傷と Node.js execSync 回避
+
+- **問題事象**: PowerShell から `gh api ... --jq .body`（または `gh issue view ... -q .body`）をパイプライン経由で取得すると、PowerShell が UTF-8 バイト列を cp932（Shift-JIS）として再解釈し、日本語文字化けと LF 数の不正確な計測を同時に生じる。本件事例では LF 数を正しく計測できず、見出し数の検査も信頼できない状態になった。本来 LF=204 の本文が PowerShell 経由では異なる値で観測される。
+- **発生局面**: 完了処理（case-close Step 2 QG-4 評価時の本文読み戻し、AG-007 修復後の検証）
+- **検知方法**: 同一 PR 作業中に PowerShell パイプライン経由と Node.js `execSync` 経由で LF 数を並列計測し、値が一致しないことで検出。
+- **根本原因**: PowerShell はネイティブコマンド（gh CLI）の UTF-8 出力をパイプライン経由でエンコーディング変換する。Windows PowerShell 5.x では Shift-JIS に変換、pwsh 7 でもネイティブコマンド出力の取り回しで日本語が破損する場合がある。文字化けと同時に改行バイト列も影響を受け、LF 数計測が不正確になる。
+- **自律対応内容**: 全ての gh CLI 出力読み取りを Node.js `child_process.execSync` に切替。`execSync` は PowerShell パイプラインをバイパスして gh CLI の生の UTF-8 出力を直接取得するため、エンコーディング変換による文字化けが発生しない。検証用スクリプトは `node -e` で単発計測するか、`.js` スクリプトファイル（`$env:TEMP/agentdev/` 配下）へ退避して実行する（クォート階層競合回避）。
+- **ユーザー確認有無**: なし（エージェント自律で検証経路を Node.js に統一）
+- **ADR/REQ/spec影響**: なし。本件は `agentdev-gh-cli/references/standard-procedures.md` Section 3「安全な読み取り手順」に既規定の内容の具体的事例。新規 REQ/ADR/SPEC 影響なし。
+- **横展開観点**: gh CLI 出力に限らず、PowerShell からネイティブコマンド（git, bun, gh, gh api 等）の出力を取得する際、UTF-8 を含む場合は常に Node.js `execSync` 経由を原則とする。特に日本語文字列、改行コード、バイト長を厳密に扱う検証（VERIFY、targeted docs guard、extensions integrity 等）では PowerShell パイプライン経由を避ける。Linux/macOS 環境では発生しない（既定で UTF-8 コンソール）。
+- **再発条件**: (1) Windows 環境、(2) PowerShell からネイティブコマンドの UTF-8 出力をパイプライン経由で取得、(3) その結果を文字列操作・正規表現マッチ・JSON parse に直接渡す、の全てが揃った場合。
+- **予防策候補**: (a) README/AGENTS.md の PowerShell 利用ガイドラインに「ネイティブコマンド UTF-8 出力読み取りは Node.js `execSync` を使用」というルールを明示する（現状は standard-procedures.md に記載だが、より上位のガイドラインにも言及を広げる）。(b) jq 式にシングルクォート・角括弧・パイプを含む場合は `node -e` を禁止し `.js` スクリプトファイルへ退避するルール（既規定）の周知徹底。
+- **想定反映先**: `agentdev-gh-cli/references/standard-procedures.md` Section 3（既規定・具体的事例の補強）、AGENTS.md「PowerShell 利用ガイドライン」（もし該当セクションがあれば。なければハーネス選定セクション配下に簡潔に追記）。
+- **関連**: PR #1600, Issue #1537, AGENTS.md「ハーネス選定」セクション, `agentdev-gh-cli/references/standard-procedures.md` Section 3「安全な読み取り手順」
+- **タグ**: `#powershell` `#encoding` `#utf8` `#cp932` `#node-execsync` `#verify` `#gh-cli` `#case-close` `#windows`
+
+---
