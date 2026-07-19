@@ -200,6 +200,12 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0136 | relates-to | ADR-0114 | case-run 実行委譲の結果契約拡張（3状態→4状態、delegation-unavailable 追加） |
 | ADR-0136 | relates-to | ADR-0127 | case-auto 構成工程委譲の harness 固有詳細除去 |
 | ADR-0136 | relates-to | ADR-0128 | case-run 実行委譲の harness 固有詳細除去 |
+| ADR-0137 | relates-to | ADR-0114 | case-auto 経由 case-run の実行モデルを case-run 実行担当委譲に整理（result 契約4状態は維持） |
+| ADR-0137 | relates-to | ADR-0125 | Wave 内並列実行を case-run インライン実行で実現（子Issue ごと case-run 委譲という旧実行方式には依存しない） |
+| ADR-0137 | relates-to | ADR-0127 | case-run を構成工程委譲の対象から除外し、case-auto 内インライン実行を標準動作化（委譲起点の折りたたみ） |
+| ADR-0137 | relates-to | ADR-0128 | case-auto 経由時の委譲起点を折りたたみ、単独 case-run と case-auto 経由 case-run の2形態を読み分ける |
+| ADR-0137 | relates-to | ADR-0136 | 多重委譲を要求しない形でハーネス境界を維持（harness 固有詳細の配布物依存を回避しつつ、実行制御は harness 側） |
+| ADR-0138 | relates-to | ADR-0125 | Wave 内固定並列数5と Phase 2 実行制御主体を AgentDevFlow 側制御点として具体化（REQ-0114-106） |
 | ADR-0138 | relates-to | ADR-0136 | case-auto の Phase 分離、固定並列数、bg task 状態管理を AgentDevFlow 側へ集約（決定2の限定注記） |
 | ADR-0138 | relates-to | ADR-0137 | case-run インライン実行モデルを維持しつつ Phase 2 並列実行の安全境界を規定 |
 | ADR-0138 | relates-to | ADR-0129 | 複数 execution_unit 並列実行モデルの上に Phase 分離モデルを重ね、Phase 2 同時起動数を固定値5として規定 |

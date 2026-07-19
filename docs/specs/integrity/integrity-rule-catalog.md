@@ -1,5 +1,5 @@
 ---
-updated: 2026-07-07
+updated: 2026-07-19
 status: accepted
 ---
 
@@ -155,6 +155,20 @@ catalog はスキーマ定義とインデックスを維持する。
 check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（req-save/spec-save/case-run/case-close）に必要なルールサブセットを適用する。catalog は IR ルールの正典であり、check_changed_docs.ts の profileFor() が返す rules は catalog IR のサブセット参照である。check_integrity.ts は全 IR ルール（full-audit gate_level）を実装する。check_changed_docs.ts と check_integrity.ts の二系統で IR ルールを共有し、検出ロジックを重複実装しない。
 
 詳細な IR-*.md の追加・更新内容は後続の spec-save / case-run 工程で確定する。check_changed_docs.ts の profile rules と SPEC 記載項目の対応関係は REQ-0108-269（1:1 対応不要、包括カバー許容）に従う。
+
+### IR-055 heuristic 行内複数パターン集計仕様（REQ-0108-263/264、AG-005）
+
+IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/specs/`、`docs/guides/`、`docs/adr/` 等）が存在する場合の集計規則を以下のとおり定める。本節は `check_integrity.ts` 実装が従うべき契約であり、実装詳細は対象外とする（intake-2026-07-19-check-integrity-ir055-heuristic-aggregation.md）。
+
+**集計単位**: 行内に複数パターンがマッチした場合、パターン種別ごとに1件を検出件数へ計上する。同一パターンの複数回マッチは1件に集約し、異なるパターン種別のマッチは別件として計上する。
+
+**ファイルパス・行番号表現**: 検出結果レコードは `ファイルパス:行番号:違反内容:検出ルール` 形式とし、同一行に複数パターン種別が存在する場合はパターン種別ごとに別レコードとして列挙する。同一行の複数パターンを単一レコードへ圧縮しない。
+
+**baseline 整合**: `docs/specs/foundations/harness-separation-model.md` の baseline リスト（11件）は本集計仕様に従って再抽出した結果と一致すること。baseline 抽出元と SPEC 記載の不一致が検出された場合、本節の集計仕様を正として実装または baseline を調整する。
+
+**適用対象**: heuristic level（WARNING）の検出に適用する。strict level（NG）の検出は行単位1件の従来仕様を維持し、本節の対象外とする。
+
+実装側（`check_integrity.ts`）の集計ロジックは本仕様に従うことが期待される。仕様と実装の不整合が観察された場合は intake / inspect 経由で本 SPEC の更新または実装の修正を提案する。
 
 ## docs-check 項目役割範囲（REQ-0145-004）
 
