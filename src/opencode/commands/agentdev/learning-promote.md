@@ -97,18 +97,7 @@ agent: sisyphus
 
 ### Step 13: deferred 移動（原子的操作）
 
-- **Step 13-1**: inbox.md 全エントリを deferred.md に追記（`**移動日**: YYYY-MM-DD` フィールド追加）
-- **Step 13-2**: deferred.md 書込検証（追記エントリ数をカウント照合）
-- **Step 13-3**: Step 13-2 成功時のみ inbox.md をヘッダーのみにクリア:
- ```markdown
- # 学び、教訓
-
- このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
- まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
-
- ---
- ```
-- Step 13-2 失敗 → inbox.md 変更せず、エラー内容を報告
+`agentdev-learning-pipeline` の「deferred 移動原子的操作プロシージャ」（`references/deferred-atomic-move-procedure.md` 参照）に従い、当該プロシージャが定める inbox.md 全エントリの deferred.md 追記、書込検証、inbox.md クリアを実行する。本手順は原子的操作であり、検証失敗時は inbox.md を変更せずエラー内容を報告する（データ喪失防止）。
 
 ### Step 14: 昇華時 prune（deferred.md からの除去）
 
