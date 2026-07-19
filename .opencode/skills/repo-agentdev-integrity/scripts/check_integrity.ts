@@ -24,6 +24,15 @@ import {
   type FindingCategory,
   type FindingRoute,
 } from "./cli_utils.ts";
+import {
+  collectIrFiles,
+  generateCatalogBlocks,
+  generateRuleOwnershipAppendix,
+  findAutogenBlocks,
+  CATALOG_PRE_BLOCK_ID,
+  CATALOG_POST_BLOCK_ID,
+  RULE_OWNERSHIP_BLOCK_ID,
+} from "./generate_indexes.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
@@ -7766,6 +7775,200 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
   return results;
 }
 
+// ===== IR-061: 索引類自動生成整合性 (SC-002 Phase C, REQ-0108) =====
+// catalog（integrity-rule-catalog.md）と rule-ownership.md の AUTOGEN マーカーで
+// 囲まれた領域が、IR-* ファイルから再生成した期待値と一致することを検証する。
+// severity: strict（再現可能な機械的パターンマッチング）。
+// 生成スクリプト（generate_indexes.ts）と共通の抽出・生成ロジックを再利用し、
+// 検査と生成の論理的同一性を保証する（AG-002 docs-check G01 分離原則維持）。
+
+function checkIndexGenerationConsistency(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const rulesDir = path.join(root, "docs", "specs", "integrity", "rules");
+  const catalogPath = path.join(
+    root,
+    "docs",
+    "specs",
+    "integrity",
+    "integrity-rule-catalog.md",
+  );
+  const ruleOwnershipPath = path.join(
+    root,
+    "docs",
+    "specs",
+    "integrity",
+    "rule-ownership.md",
+  );
+
+  if (!fs.existsSync(rulesDir)) {
+    results.push(
+      info(
+        "IndexGenerationConsistency",
+        "index-generation-consistency",
+        "rules dir not found; IR-061 skipped",
+      ),
+    );
+    return results;
+  }
+
+  const infos = collectIrFiles(rulesDir);
+  const { pre: expectedPre, post: expectedPost } =
+    generateCatalogBlocks(infos);
+  const expectedRuleOwnership = generateRuleOwnershipAppendix(infos);
+
+  let foundViolation = false;
+
+  const catalogContent = readText(catalogPath);
+  if (catalogContent !== null) {
+    const blocks = findAutogenBlocks(catalogContent);
+    const preBlock = blocks.find((b) => b.id === CATALOG_PRE_BLOCK_ID);
+    const postBlock = blocks.find((b) => b.id === CATALOG_POST_BLOCK_ID);
+
+    if (!preBlock && !postBlock) {
+      results.push(
+        info(
+          "IndexGenerationConsistency",
+          "index-generation-consistency",
+          "catalog AUTOGEN markers not found (pre-Phase C); IR-061 catalog check skipped",
+          resolveRelative(catalogPath, root),
+          1,
+        ),
+      );
+    } else {
+      if (preBlock) {
+        const mismatchIndex = findFirstMismatch(
+          preBlock.currentBody,
+          expectedPre,
+        );
+        if (mismatchIndex !== -1) {
+          foundViolation = true;
+          results.push(
+            ng(
+              "IndexGenerationConsistency",
+              "index-generation-consistency",
+              `catalog pre-045 AUTOGEN block out of sync with IR-* files. ` +
+                `first mismatch at line ${mismatchIndex + 1} (current=${truncateForLog(
+                  preBlock.currentBody[mismatchIndex],
+                )}, expected=${truncateForLog(expectedPre[mismatchIndex])}). ` +
+                `Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)`,
+              resolveRelative(catalogPath, root),
+              preBlock.startLine + 1 + mismatchIndex,
+              {
+                evidence: `block_id=${CATALOG_PRE_BLOCK_ID}, current_lines=${preBlock.currentBody.length}, expected_lines=${expectedPre.length}`,
+                expected: `AUTOGEN block contents must match IR-* H1 + filename derivation`,
+                route: "intake",
+              },
+            ),
+          );
+        }
+      }
+      if (postBlock && !foundViolation) {
+        const mismatchIndex = findFirstMismatch(
+          postBlock.currentBody,
+          expectedPost,
+        );
+        if (mismatchIndex !== -1) {
+          foundViolation = true;
+          results.push(
+            ng(
+              "IndexGenerationConsistency",
+              "index-generation-consistency",
+              `catalog post-045 AUTOGEN block out of sync with IR-* files. ` +
+                `first mismatch at line ${mismatchIndex + 1} (current=${truncateForLog(
+                  postBlock.currentBody[mismatchIndex],
+                )}, expected=${truncateForLog(expectedPost[mismatchIndex])}). ` +
+                `Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)`,
+              resolveRelative(catalogPath, root),
+              postBlock.startLine + 1 + mismatchIndex,
+              {
+                evidence: `block_id=${CATALOG_POST_BLOCK_ID}, current_lines=${postBlock.currentBody.length}, expected_lines=${expectedPost.length}`,
+                expected: `AUTOGEN block contents must match IR-* H1 + filename derivation`,
+                route: "intake",
+              },
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  const ruleOwnershipContent = readText(ruleOwnershipPath);
+  if (ruleOwnershipContent !== null) {
+    const blocks = findAutogenBlocks(ruleOwnershipContent);
+    const block = blocks.find((b) => b.id === RULE_OWNERSHIP_BLOCK_ID);
+    if (!block) {
+      results.push(
+        info(
+          "IndexGenerationConsistency",
+          "index-generation-consistency",
+          "rule-ownership AUTOGEN marker not found (pre-Phase C); IR-061 rule-ownership check skipped",
+          resolveRelative(ruleOwnershipPath, root),
+          1,
+        ),
+      );
+    } else {
+      const mismatchIndex = findFirstMismatch(
+        block.currentBody,
+        expectedRuleOwnership,
+      );
+      if (mismatchIndex !== -1) {
+        foundViolation = true;
+        results.push(
+          ng(
+            "IndexGenerationConsistency",
+            "index-generation-consistency",
+            `rule-ownership AUTOGEN block out of sync with IR-* files. ` +
+              `first mismatch at line ${mismatchIndex + 1} (current=${truncateForLog(
+                block.currentBody[mismatchIndex],
+              )}, expected=${truncateForLog(
+                expectedRuleOwnership[mismatchIndex],
+              )}). ` +
+              `Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)`,
+            resolveRelative(ruleOwnershipPath, root),
+            block.startLine + 1 + mismatchIndex,
+            {
+              evidence: `block_id=${RULE_OWNERSHIP_BLOCK_ID}, current_lines=${block.currentBody.length}, expected_lines=${expectedRuleOwnership.length}`,
+              expected: `AUTOGEN block contents must match IR-* related_req / related_spec derivation`,
+              route: "intake",
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  if (!foundViolation) {
+    results.push(
+      ok(
+        "IndexGenerationConsistency",
+        "index-generation-consistency",
+        `索引類自動生成整合性: All AUTOGEN blocks consistent with IR-* files (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership appendix=${expectedRuleOwnership.length} rows) (IR-061, SC-002 Phase C)`,
+      ),
+    );
+  }
+  return results;
+}
+
+/** 2つの行配列の最初の不一致インデックスを返す（一致時は -1）。 */
+function findFirstMismatch(
+  current: string[],
+  expected: string[],
+): number {
+  const len = Math.max(current.length, expected.length);
+  for (let i = 0; i < len; i++) {
+    if (current[i] !== expected[i]) return i;
+  }
+  return -1;
+}
+
+/** ログ出力用に行を切り詰める（undefined は "<missing>" 表記）。 */
+function truncateForLog(line: string | undefined): string {
+  if (line === undefined) return "<missing>";
+  const trimmed = line.trim();
+  if (trimmed.length <= 60) return trimmed;
+  return trimmed.slice(0, 57) + "...";
+}
+
 // walkAllFiles: walkMarkdown と同等だが .md に限定しない（.yaml/.yml 含む）
 function walkAllFiles(dirPath: string, acc: string[]): void {
   if (!fs.existsSync(dirPath)) return;
@@ -7941,6 +8144,7 @@ async function main(): Promise<void> {
     ...checkSisyphusJuniorUlwLoopMisclassification(root), // REQ-0144-013
     ...checkRuntimeUnresolvedReference(root), // IR-055 (REQ-0108-263/264)
     ...checkObsoleteSpecPath(root), // IR-057 (REQ-0158-002)
+    ...checkIndexGenerationConsistency(root), // IR-061 (SC-002 Phase C, 索引類自動生成整合性)
   ];
 
   // REQ-0108-196: classification policy checks (enabled by --classification flag)
