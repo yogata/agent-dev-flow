@@ -132,3 +132,35 @@
 - **想定反映先**: case-auto command SPEC（子 task 中断回復パス拡張: commit 済みケースと未コミットケースの2パターン）、workflow-orchestration skill（子 task ライフサイクルと working tree ライフサイクル分離）
 - **関連**: PR #1579, Issue #1577, PR #1578（先行する commit 済み・PR 未作成ケース）, Issue #1575, case-auto, case-run
 - **タグ**: `#case-auto` `#case-run` `#bg-task` `#recovery` `#uncommitted-changes` `#pr-creation`
+
+## ADR frontmatter の relates-to / supersedes を本文と Decision Map で表現する運用
+
+- **問題事象**: ADR-0138 を新規作成する Issue #1582 の完了条件に「relates-to=ADR-0136,ADR-0137,ADR-0129,ADR-0132、supersedes=none であること」と frontmatter 項目として扱う前提で記載されていた。しかし本リポジトリの ADR frontmatter は `id/title/status/created/updated` のみで構成され（ADR-0135/0136/0137/0138 で一貫）、`relates-to` / `supersedes` は本文「関連する決定」セクションと ADR-README の Decision Map テーブルで表現する形式が採用されている。Issue 完了条件の記述と実体の表現形式が一致しておらず、QG-4 評価時に形式の齟齬を解釈する手間が発生した。
+- **発生局面**: レビュー・クローズ（case-close の QG-4 完了条件評価）
+- **検知方法**: 手動確認。PR #1589 の QG-3 staleness check で ADR-0138 frontmatter に `relates-to` / `supersedes` が無いことを確認し、Decision Map と本文「関連する決定」セクションで表現されていることを照合。
+- **根本原因**: case-open が Issue 完了条件を起票する際、ADR frontmatter の形式を `id/title/status/created/updated/relates-to/supersedes` の7項目と想定して記載した。リポジトリの実運用では relates-to / supersedes を frontmatter ではなく本文 + Decision Map で表現する方針が暗黙に採用されているが、これが SPEC/ガイドレベルで明文化されていないため、case-open の自動生成条件文に齟齬が混入した。
+- **自律対応内容**: PR #1589 本文の Findings セクションに「ADR frontmatter は id/title/status/created/updated のみ。relates-to/supersedes は本文と Decision Map で表現する形式」と明記し、Issue 完了条件を実体の表現形式で達成していることを記録した。Issue 本文の完了条件は frontmatter 項目としての記載のままで、case-close で実体照合により pass 判定。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり。document-type-responsibilities SPEC または ADR 運用ガイドで「ADR frontmatter の必須項目は id/title/status/created/updated。relates-to/supersedes は本文 + Decision Map で表現する」ことが明文化されていない。ADR 形式 SPEC への追記候補。
+- **横展開観点**: REQ/ADR を対象とする case-open の自動完了条件生成で、対象文書の実運用形式（frontmatter vs 本文 vs 別ファイル）を前提とする記述を置く際、実形式との整合を確認せず一般的テンプレートで記載すると同種の齟齬が再発する。SPEC や README の形式定義を参照してから完了条件を書く、または「実運用形式に従い表現されていること」の抽象度で記載することが望ましい。
+- **再発条件**: (1) ADR を新規作成または更新する Issue を case-open が起票する、(2) 完了条件に frontmatter 項目として relates-to/supersedes を指定する、(3) リポジトリの実運用が frontmatter 項目ではなく本文 + Decision Map 表現を採用している、の全てが揃った場合。
+- **予防策候補**: (a) ADR 形式 SPEC または agentdev-adr-file-manager skill に「ADR frontmatter 構成要素（id/title/status/created/updated の5項目）と relates-to/supersedes の表現場所（本文 + Decision Map）」を明文化する。(b) case-open テンプレートで ADR を対象とする完了条件を「指定メタデータが frontmatter または本文の適切な位置に表現されていること」の抽象度で記載する。
+- **想定反映先**: ADR 運用形式 SPEC（document-type-responsibilities 配下）、agentdev-adr-file-manager skill、case-open テンプレート（ADR 対応の完了条件記述抽象度）
+- **関連**: PR #1589, Issue #1582, Epic #1581, ADR-0138, ADR-0136（限定注記）, ADR-README Decision Map
+- **タグ**: `#adr` `#frontmatter` `#case-open` `#completion-criteria` `#qg-4` `#form-policy`
+
+## call_omo_agent が explore/librarian 型のみ許可されるハーネス制約と adapter protocol の運用
+
+- **問題事象**: Issue #1588（harness-separation-model.md SPEC update）の検証・PR 作成フェーズで、oh-my-openagent ハーネスの `call_omo_agent` が explore/librarian 型サブエージェントのみ許可し、case-run 実行担当サブエージェントを直接起動できない制約に直面。adapter protocol に従い case-run 実行コンテキストをインライン逐次実行に切り替えて検証・PR 作成を実施した。この制約は adapter protocol で規定される想定パスであるが、ハーネス固有の制約が adapter protocol 経由で発火する具体的事例として記録する。
+- **発生局面**: 実装・検証（case-run 実行フェーズ、インライン逐次実行での SPEC 検証・PR 作成）
+- **検知方法**: 実行時エラー。`call_omo_agent` で case-run 実行担当サブエージェント起動を試行した際、ハーネスが explore/librarian 型のみ許可する制約により起動を拒否され、adapter protocol の delegation-unavailable パスへ分岐。
+- **根本原因**: oh-my-openagent ハーネスの `call_omo_agent` API はセキュリティ/責務境界の観点から explore/librarian 型のみ許可する設計。case-run 実行担当サブエージェントは別途規定される起動 API（`task()` 等の標準 OpenCode API、`references/<harness>.md` 参照）を経由する必要がある。adapter protocol はこの差異を抽象化するが、ハーネス側 API の制約が具体化された形での発火事例。
+- **自律対応内容**: adapter protocol の delegation-unavailable パスに従い、case-run 実行コンテキストをインライン逐次実行へ切り替え、SPEC 検証・PR 作成を case-close 側の責務範囲で完結。委譲起動不能を PR 本文 Findings に記録。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。adapter protocol で規定される delegation-unavailable パスの正常発火事例であり、新規 ADR/REQ/spec 影響はない。harness-separation-model.md SPEC で規定される「実行担当サブエージェント起動 API は harness 側」という責務分離の実例。
+- **横展開観点**: oh-my-openagent 以外のハーネスでも、サブエージェント起動 API の型制限や権限スコープ制限により `call_omo_agent` 等の API が explore/librarian 型のみ許可するケースがある。adapter protocol 経由で case-run を委譲する設計はこの差異を吸収する前提であり、委譲先が限定される場合はインライン逐次実行へのフォールバックが標準パスとして機能する。
+- **再発条件**: (1) oh-my-openagent ハーネスまたは同等の API 制限を持つハーネスで case-run を起動する、(2) `call_omo_agent` 等の限定 API で case-run 実行担当サブエージェントを起動しようとする、(3) adapter protocol が委譲失敗を検知し delegation-unavailable パスへ分岐する、の全てが揃った場合。
+- **予防策候補**: (a) case-run command SPEC の「インライン逐次実行」セクションに、`call_omo_agent` 型制限への遭遇を想定する旨を明記し、adapter protocol delegation-unavailable パスとの接続を整理する。(b) `references/<harness>.md` で各ハーネスのサブエージェント起動 API 一覧と型制限を明示する。
+- **想定反映先**: case-run command SPEC（インライン逐次実行セクション）、adapter protocol skill、`references/<harness>.md`
+- **関連**: PR #1594, Issue #1588, Epic #1581, harness-separation-model.md, adapter protocol, agentdev-case-run-execution-adapter skill
+- **タグ**: `#harness` `#oh-my-openagent` `#call-omo-agent` `#adapter-protocol` `#delegation-unavailable` `#case-run` `#inline-execution`
