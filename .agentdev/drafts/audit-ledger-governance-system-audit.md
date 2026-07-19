@@ -444,6 +444,7 @@
 - 関連記載: `docs/requirements/README.md` は REQ-0101〜0163 の 54 件を列挙、REQ-0157 を飛ばして REQ-0156 → REQ-0158 と連番。`docs/README.md` L3「REQ-0101 から REQ-0163 までの 54 件」も 54 件で一致（欠番含まず）
 - 整合: 0101-0163 の範囲で欠番 7 個（0111, 0115, 0116, 0117, 0118, 0120, 0121, 0122 = 廃止済み、retired 移動済み）+ 0157 = 計 8 個の欠番。0101-0163 は 63番号、63 - 8 = 55 だが実測 54 件のため、廃止 8 個のうち REQ-0111 は retired にある（0111, 0115-0118, 0120-0122 の 8 件はすべて retired に存在確認済み）。よって 0157 は純粋な未使用番号
 - 処置（再編フェーズ判断）: 欠番として維持するか、採番管理で言及するか判断。本監査では確定しない（4硬制約「未決事項確定不可」）
+- 解消状況（書き戻し）: 解消済。SC-001 `docs/specs/foundations/numbering-policy.md`（PR #1613、OU-002）の「既知の欠番」表で REQ-0157 を「純粋な未使用番号（F-003）。採番ミス、廃止移動を含まない。欠番として維持する」と確定（U-001 解消）
 
 ### 追加不整合 #4: IR-045 未使用番号（新規検出）
 
@@ -451,6 +452,7 @@
 - 実測: ファイル不在（IR-044 の次は IR-046）
 - 関連記載: `docs/specs/integrity/integrity-rule-catalog.md` の記載との整合要確認
 - 処置（再編フェーズ判断）: 欠番として維持するか、採番管理で言及するか判断。本監査では確定しない
+- 解消状況（書き戻し）: 解消済。SC-001 `docs/specs/foundations/numbering-policy.md`（PR #1613、OU-002）の「既知の欠番」表で IR-045 を「docs 日本語表現検査機能の廃止に伴う削除（REQ-0108-255/256/262）。識別子のみ参照用に残し、欠番として維持する」と確定（U-002 解消）
 
 ### 追加不整合 #5: ADR README のトピック別ビューから ADR-0137 欠落
 
@@ -502,23 +504,23 @@
 
 本監査では「未決事項確定不可」（4硬制約）に従い、以下を確定せず列挙のみ。
 
-| ID | 未決事項 | 再編フェーズでの検討事項 |
-|---|---|---|
-| U-001 | REQ-0157 欠番の扱い | 採番ミスか意図的予約か。欠番維持か再利用か（不整合 #3） |
-| U-002 | IR-045 欠番の扱い | 採番ミスか意図的予約か。欠番維持か再利用か（不整合 #4） |
-| U-003 | ADR README キャプション「24件」の修正 【解消済 PR #1599, #1609 検証】 | 「25件」への修正（不整合 #1） |
-| U-004 | ADR-0137 のステータス別ビュー accepted リスト追加 【解消済 PR #1599, #1609 検証】 | リストへ追加（不整合 #2） |
-| U-005 | ADR-0137 のトピック別ビュー分類 【解消済 PR #1599, #1609 検証】 | ワークフロー分類への追加（不整合 #5） |
-| U-006 | REQ-0102 SPLIT 可否 | 79 要件行で肥大化。CR-004 指摘。SPLIT または UPDATE の内容分割 |
-| U-007 | foundations/workflow-contracts.md と workflows/workflow-contracts.md の物理統合 | 現状は縮小参照关系。物理統合するか参照关系維持か |
-| U-008 | catalog / rule-ownership の GENERATE 化範囲 | 自動化候補 #1, #4 の最終判断 |
-| U-009 | SKILL.md 重複查読の段階的処置（Wave 1/2/3） | REQ-0140 基準に従う優先度順の処理計画 |
-| U-010 | local-generation.md の記述縮小範囲 | ADR-0131 link mode 移行後の生成方式記述の歴史参照化 |
-| U-011 | project-extensions 関連の foundations/responsibilities 統合 | 重複主張の集約先 |
-| U-012 | extension と SKILL.md の記載重複解消 | extension の補完範囲と SKILL.md の標準範囲の境界 |
-| U-013 | 監査台帳の廃棄時期 | 再編フェーズ完了時か自動化移行完了時か、いずれか早い方を確定 |
-| U-014 | command SPEC と command 定義の粒度差整備 | どちらに何を載せるかの運用ガイドライン |
-| U-015 | ADR README の docs/specs/README.md との照合 | 本監査では照合保留、再編フェーズで追加確認 |
+| ID | 未決事項 | 再編フェーズでの検討事項 | フェーズ2解決結果（書き戻し） |
+|---|---|---|---|
+| U-001 | REQ-0157 欠番の扱い | 採番ミスか意図的予約か。欠番維持か再利用か（不整合 #3） | 【解消済 PR #1613】SC-001 numbering-policy.md で「純粋な未使用番号、欠番として維持」を確定 |
+| U-002 | IR-045 欠番の扱い | 採番ミスか意図的予約か。欠番維持か再利用か（不整合 #4） | 【解消済 PR #1613】SC-001 numbering-policy.md で「docs 日本語表現検査機能の廃止に伴う削除、欠番として維持」を確定 |
+| U-003 | ADR README キャプション「24件」の修正 | 「25件」への修正（不整合 #1） | 【解消済 PR #1599, #1609 検証】 |
+| U-004 | ADR-0137 のステータス別ビュー accepted リスト追加 | リストへ追加（不整合 #2） | 【解消済 PR #1599, #1609 検証】 |
+| U-005 | ADR-0137 のトピック別ビュー分類 | ワークフロー分類への追加（不整合 #5） | 【解消済 PR #1599, #1609 検証】 |
+| U-006 | REQ-0102 SPLIT 可否 | 79 要件行で肥大化。CR-004 指摘。SPLIT または UPDATE の内容分割 | 【解消済 PR #1614】REQ-0138/0140 へ17要件行を移行、79→62要件行へ縮小。関連情報セクションで分割先REQ群への参照を明文化 |
+| U-007 | foundations/workflow-contracts.md と workflows/workflow-contracts.md の物理統合 | 現状は縮小参照关系。物理統合するか参照关系維持か | 【解消済 PR #1619】foundations/workflow-contracts.md を完全削除、workflows/ 版へ一本化。stub/redirect 残置なし。IR-057 で旧パス参照検出を設定 |
+| U-008 | catalog / rule-ownership の GENERATE 化範囲 | 自動化候補 #1, #4 の最終判断 | 【部分解決 機構定義済 PR #1615、実装はフェーズ3】SC-002 index-auto-generation.md で GENERATE 機構を定義。実装はフェーズ3用入力へ転記 |
+| U-009 | SKILL.md 重複查読の段階的処置（Wave 1/2/3） | REQ-0140 基準に従う優先度順の処理計画 | 【部分解決 Wave 1 完了 #1610、Wave 2/3 はフェーズ3】Wave 1（doc-writing REFERENCE 強化 + 高優先度重複除去）は #1610 で実施。Wave 2/3 はフェーズ3用入力へ転記 |
+| U-010 | local-generation.md の記述縮小範囲 | ADR-0131 link mode 移行後の生成方式記述の歴史参照化 | 【解消済 local-generation.md 本体 + PR #1619 関連項目更新】link mode 一元化済み、local-transform.md 削除済み。関連項目リンクを新パスへ更新 |
+| U-011 | project-extensions 関連の foundations/responsibilities 統合 | 重複主張の集約先 | 【解消済 cb8e5891 + responsibility-boundary-purification.md】Project Extensions 境界を responsibility-boundary-purification.md で明確化。foundations/project-extensions.md が ADR-0135/REQ-0160 で SSoT 確立 |
+| U-012 | extension と SKILL.md の記載重複解消 | extension の補完範囲と SKILL.md の標準範囲の境界 | 【フェーズ3転記】SKILL.md DERIVE/GENERATE 機構（候補7 Wave 2/3）と併せてフェーズ3で処理。フェーズ3用入力へ転記 |
+| U-013 | 監査台帳の廃棄時期 | 再編フェーズ完了時か自動化移行完了時か、いずれか早い方を確定 | 【解消済 PR #1612 + 本Issue #1611】SC-003 audit-ledger-lifecycle.md で「フェーズ2完了時（CR-004）」を確定。本Issue で監査台帳を git rm で削除 |
+| U-014 | command SPEC と command 定義の粒度差整備 | どちらに何を載せるかの運用ガイドライン | 【解消済 cb8e5891 + 各 SPEC accepted 昇格】command SPEC が契約 SSoT、command 定義が手順 SSoT と責務分離済み（REQ-0103）。全 command SPEC が accepted 昇格済み |
+| U-015 | ADR README の docs/specs/README.md との照合 | 本監査では照合保留、再編フェーズで追加確認 | 【部分解決 機構定義済 PR #1615、実装はフェーズ3】SC-002 index-auto-generation.md で docs/README.md、specs/README.md を含む索引の自動生成機構を定義。実装はフェーズ3用入力へ転記 |
 
 ## 廃棄条件
 
