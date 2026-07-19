@@ -1,8 +1,8 @@
 ---
 title: 索引類自動生成 SPEC
-status: draft
+status: accepted
 created: 2026-07-19
-updated: 2026-07-19
+updated: 2026-07-20
 ---
 
 # 索引類自動生成 SPEC
@@ -14,6 +14,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 ## 適用範囲
 
 - **対象**: 以下の索引類に含まれる件数、一覧、ステータス別ビュー、トピック別ビュー、Decision Map、関連 REQ 表の各自動生成対象領域
+  - `docs/README.md`（ドキュメント入口。REQ 件数表明、SPEC 一覧、ADR/ガイド/DOC-MAP 参照リンク）
   - `docs/requirements/README.md`（REQ 一覧、廃止済み REQ 一覧）
   - `docs/adr/README.md`（現行基盤ビュー、ステータス別ビュー、トピック別ビュー、Decision Map、関連 REQ 表、廃止済み履歴ビュー）
   - `docs/specs/README.md`（command SPEC、skill SPEC、横断 SPEC、基盤 SPEC 一覧）
@@ -25,6 +26,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 | 索引類 | 自動生成対象 | 生成元 |
 |--------|-------------|--------|
+| `docs/README.md` | REQ 件数表明、SPEC 一覧（3 層 + 基盤 6 ドメイン）、ADR/ガイド/DOC-MAP 参照リンク | `docs/requirements/REQ-*.md`、`docs/specs/**/*.md`、`docs/adr/ADR-*.md` の frontmatter |
 | `docs/requirements/README.md` | REQ 一覧表、件数表明 | `docs/requirements/REQ-*.md` の frontmatter（`id`、`title`） |
 | `docs/adr/README.md` 現行基盤ビュー | accepted ADR 一覧表、件数表明 | `docs/adr/ADR-*.md` の frontmatter（`id`、`title`、`status`、`created`） |
 | `docs/adr/README.md` ステータス別ビュー | accepted、proposed、superseded、deprecated 各リスト | 同上 |
@@ -44,9 +46,13 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 各一覧表は実ファイル全体を網羅する。追加、廃止、移動が発生した場合は生成タイミングで自動的に一覧へ反映される。人手による一覧行の追加、削除は原則として行わない（自動生成マーカー外の編集領域のみ人手編集を許容する）。
 
+例: `docs/adr/README.md` のステータス別ビュー「承認済み（accepted）」リストは、`docs/adr/ADR-*.md` のうち `status: accepted` の全 ADR を漏れなく網羅しなければならない。新規 ADR 追加時にリストだけが更新されない事態（F-002）を構造的に防ぐ。
+
 ### ステータス別ビュー、トピック別ビュー
 
 ビューの分類基準は実ファイルの frontmatter またはメタデータから導出する。トピック分類など frontmatter に存在しないメタデータは、各 ADR 本文のセクション構造から導出する規則を定めるか、frontmatter への分類フィールド追加を別途検討する。
+
+例: `docs/adr/README.md` のトピック別ビューは、各 ADR の分類メタデータから全 ADR を主題別に網羅する。新規 ADR 追加時にトピック分類だけが更新されない事態（F-005）を構造的に防ぐ。
 
 Decision Map は各 ADR 本文「関連する決定」セクションに記載された supersedes、relates-to、superseded-by 宣言を集計した結果とする。人手で Decision Map を直接編集しない。
 
