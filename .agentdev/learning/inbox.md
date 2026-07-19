@@ -313,3 +313,53 @@
 - **タグ**: `#audit-ledger` `#writeback` `#phase-separation` `#case-close` `#sc-003` `#link-tracking` `#governance`
 
 ---
+
+## 2026-07-20: AG-001 制約内で公開 SKILL.md の文書構成を是正する REFERENCE 強化パターン（#1610）
+
+- **問題事象**: doc-writing SKILL.md の査読観点 table が `references/` 配下10ファイルのうち `mechanical-replacement-rules.md`, `japanese-replacement-dictionary.md` の2ファイルへの参照を欠いていた。また doc-map SKILL.md に intro 段落と重複する redundant な `### 目的` subsection が存在した。これらは AG-006' 候補6/7 Wave 1 が指摘する SKILL.md 重複問題の一部だが、動作（発火条件、判定ロジック等）に影響しない文書構成の不備であり、AG-001「公開 skill 動作不改」制約内で修正可能かの判断が必要だった。
+- **発生局面**: 実装・検証（case-run 実装フェーズ、Wave 3 #1610 PR #1621）
+- **検知方法**: Phase1 監査台帳 AG-006' M節 item 8（候補6/7 Wave 1）の指示と、`src/opencode/skills/agentdev-doc-writing/SKILL.md` の査読観点 table と `references/` 配下実ファイルの突合で検出。doc-map については冒頭 `# DOC-MAP 読み方ガイド` 直下の `### 目的` が intro 段落と意味重複するかの精読で検出。
+- **根本原因**: SKILL.md の参照漏れ・redundant subsection は拡張時の accumulate 結果。動作不改範囲での是正判断基準が SPEC に明示されず、「動作箇所（description frontmatter, Trigger conditions, 制約事項, コマンド実行, フラグ判定, 判定ロジック等）に触れない変更」と「文書構成（查読観点 table の参照追加、原本 section の対応表、リード文への構造変更、count 表記訂正）」の区別を case-run 側で都度判断していた。
+- **自律対応内容**: PR #1621 で3変更を適用。(a) doc-writing 査読観点 table へ2参照を追加、(b) doc-writing「原本」section に「運用ビュー↔原本」対応表を新設（原本節は `japanese-tech-writing`、document-type-responsibilities SPEC と明示）、(c) doc-map redundant `### 目的` subsection を intro 段落へ統合、参照可能 section の count 表記を 7→10 ファイルへ訂正。`git diff` で動作箇所への変更なしを確認。
+- **ユーザー確認有無**: なし（エージェント自律で実施、PR 本文に AG-001 制約遵守確認セクションを明記）
+- **ADR/REQ/spec影響**: なし。AG-001 制約内の運用知見であり、新規 ADR/REQ/spec 影響なし。SC-002 DERIVE/GENERATE 機構（フェーズ3対象）で SKILL.md 参照整合性を自動維持する候補が補強される。
+- **横展開観点**: 公開 SKILL.md の動作不改範囲での文書構成是正（参照追加、redundant subsection 統合、count 表記訂正、原本への対応表新設等）は Wave 1 パターンとして標準化可能。動作箇所（発火・判定・実行）と文書構成箇所（参照・構造・表記）を `git diff` で区別して確認する観点が、他の agentdev-* SKILL.md でも適用可能。
+- **再発条件**: (1) 公開 SKILL.md に `references/` 配下ファイルへの参照漏れ、redundant subsection、count 表記不正のいずれかが存在、(2) AG-001「公開 skill 動作不改」制約下で修正可否の判断が必要、(3) 動作箇所と文書構成箇所の区別基準が SPEC に未明文化、の全てが揃った場合。
+- **予防策候補**: (a) document-type-responsibilities SPEC（または後続SPEC）に「SKILL.md 重複読の優先度基準と段階的スケジュール」節で Wave 1 対象ファイル一覧（doc-writing, doc-map 等）を明示する。(b) case-run skill 検証テンプレートに「SKILL.md 変更時は動作箇所（Trigger/制約/ロジック）と文書構成箇所（参照/構造/表記）を git diff で区別確認」の観点を追加する。
+- **想定反映先**: `docs/specs/responsibilities/document-type-responsibilities.md`（SKILL.md 重複読章）、case-run skill 検証テンプレート、workflow-templates skill `templates/pr_desc.md`（AG-001 制約確認セクション）
+- **関連**: PR #1621, Issue #1610, Epic #1601 Wave 3, AG-006' 候補6（doc-writing REFERENCE 強化）・候補7 Wave 1（SKILL.md 手作業重複除去）, CR-003 フェーズ2/3 振り分け基準
+- **タグ**: `#ag-001` `#skill-md` `#reference` `#redundant-subsection` `#wave-1` `#case-run` `#verification` `#ag-008`
+
+## 2026-07-20: 中間成果物ライフサイクル完遂を 2 commit 構成で証明するパターン（#1611）
+
+- **問題事象**: Phase1 監査台帳（`.agentdev/drafts/audit-ledger-governance-system-audit.md`）は SC-003 が定める5ステップライフサイクル（Step 1 生成→Step 2 参照→Step 3 参照専用化→Step 4 次フェーズ転記→Step 5 廃棄・削除）に従う中間成果物だが、Step 3〜5（最終書き戻し→フェーズ3転記→監査台帳削除）を1 commit で実施すると「いつ書き戻し、いつ転記し、いつ削除したか」のトレーサビリティが失われる恐れがあった。
+- **発生局面**: 完了処理（case-run 実装フェーズ、Wave 3 #1611 PR #1620）
+- **検知方法**: SC-003 SPEC の Step 3/4/5 要件と、PR 設計時の commit 構成検討。1 commit 構成では Step 3 書き戻し（監査台帳 U-001〜U-015 に解決結果を記録）と Step 5 廃棄（同ファイル削除）が同一 commit になり、Step 4 転記（フェーズ3用入力新規作成）も同 commit に混入するため、ライフサイクル各ステップの証跡が不明瞭になることを踏まえ、2 commit 構成を採用。
+- **根本原因**: 中間成果物ライフサイクルの最終ステップ群は同一ファイルへの操作（書き戻し→削除）を含むため、機械的に1 commit で処理しがち。しかし SPEC が定めるライフサイクル各ステップは独立した意味を持つ（Step 3 参照専用化、Step 4 次フェーズ転記、Step 5 廃棄・削除）ため、ステップごとの証跡が求められる場合がある。
+- **自律対応内容**: PR #1620 を2 commit 構成とした。commit 1/2（86e2a301）で Step 3 最終書き戻し（監査台帳 U-001〜U-015 に解決結果を記録）、commit 2/2（68a73bdf）で Step 4 フェーズ3転記（`req-draft-governance-reorganization-phase3.md` 新規作成）+ Step 5 監査台帳 `git rm` を実施。commit 2/2 メッセージに各ステップの SC-003 準拠根拠（Step 4 AC-1〜AC-2-3, Step 5 SC-003 Step 5）を明記し、ライフサイクル完遂の証跡を確保。
+- **ユーザー確認有無**: なし（エージェント自律で実施、PR 本文 TS-006 検証結果セクションに各ステップの PASS 判定根拠を明記）
+- **ADR/REQ/spec影響**: なし。SC-003 SPEC「既知の適用例」表に Phase 2 完了時の廃棄・削除実績データの追加候補（capture候補）。
+- **横展開観点**: 中間成果物ライフサイクル SPEC（SC-003, REQ-0105 等）が定める複数ステップの完了を証明する必要がある PR 全般で、各ステップを1 commit ずつ（または意味単位で分割）に分ける構成が有効。特に「ファイル削除」を伴う最終ステップは、その前段の「書き戻し」「転記」と分離することで、ライフサイクル完遂の証跡を時系列順に復元できる。
+- **再発条件**: (1) 中間成果物が SPEC 定義のライフサイクルを持つ、(2) ライフサイクル最終ステップがファイル削除を伴う、(3) 書き戻し・転記・削除を1 commit に圧縮すると各ステップ証跡が失われる、の全てが揃った場合。
+- **予防策候補**: (a) SC-003 SPEC「既知の適用例」表に「Phase 2 完了時の廃棄・削除実績（2 commit 構成）」を追加し、標準パターンとして明示する。(b) case-run skill に「中間成果物ライフサイクル最終ステップを含む PR は、Step 3/4/5 を2 commit 以上に分割し、各 commit メッセージに SC-003 準拠根拠を明記」の観点を追加する。
+- **想定反映先**: `docs/specs/local/audit-ledger-lifecycle.md`（SC-003、既知の適用例表）、case-run skill 検証テンプレート
+- **関連**: PR #1620, Issue #1611, Epic #1601 Wave 3, SC-003（`docs/specs/local/audit-ledger-lifecycle.md`）, commit 86e2a301, commit 68a73bdf, AG-009, CR-004
+- **タグ**: `#intermediate-artifact` `#lifecycle` `#sc-003` `#2-commit-structure` `#traceability` `#case-run` `#phase-2`
+
+## 2026-07-20: 次フェーズ用入力の自足性を6要素構成で確保する転記パターン（#1611）
+
+- **問題事象**: Phase2 から Phase3 への引き継ぎは Phase1 監査台帳（`.agentdev/drafts/audit-ledger-governance-system-audit.md`）を削除する前提で実施されるため、削除後に Phase3 側が単独で作業を完結できる自足性が求められる。Phase2 処理済みの候補、未処理（フェーズ3対象）候補、各候補の正規所有者 SPEC、自動化後の想定状態等を含めないと、Phase3 req-define 起動時に都度 Phase2 Issue/PR を参照し直す必要が生じる。
+- **発生局面**: 完了処理（case-run 実装フェーズ、Wave 3 #1611 PR #1620）
+- **検知方法**: Phase2 全 Wave 完了前提で、Phase3 用入力 `.agentdev/drafts/req-draft-governance-reorganization-phase3.md` を新規作成する際、TS-006 (b)「フェーズ3用入力が自足していること（背景/対象候補/正規所有者/自動化後の状態/対象外/受け入れ条件を含む）」を満たす必要があることを確認。
+- **根本原因**: フェーズ間入力は次フェーズ単独での完結を前提とするが、要素構成の標準形式が SPEC に明示されていなかった。Phase1 から Phase2 への引き継ぎ（監査台帳）は「候補羅列」形式だったが、Phase2 から Phase3（実装フェーズ）への引き継ぎは「正規所有者・自動化後状態・受け入れ条件」まで含む必要があり、要素構成が異なる。
+- **自律対応内容**: PR #1620 commit 2/2 で `.agentdev/drafts/req-draft-governance-reorganization-phase3.md` を frontmatter（`work_type: maintenance`, `scale: large`, `phase: 3`, `parent_epic: "1601"`）付きで新規作成。本文に6要素（背景／対象候補／正規所有者／自動化後の状態／対象外／受け入れ条件）を全て含め、Phase3 単独完結を担保。対象候補は候補1〜5、候補7 Wave 2/3、候補8、U-012 を網羅。各候補に正規所有者 SPEC と実ファイル frontmatter を明記し、受け入れ条件 AC-1〜AC-6 を定義。
+- **ユーザー確認有無**: なし（エージェント自律で実施、PR 本文 TS-006 (b)(c) で PASS 判定）
+- **ADR/REQ/spec影響**: なし。SC-003 SPEC「次フェーズ用入力」節での配置基準実例候補（capture候補）。
+- **横展開観点**: 大規模変更計画でフェーズを分割する全ケースで、フェーズ間入力を「6要素構成（背景/対象候補/正規所有者/自動化後の状態/対象外/受け入れ条件）」で記述するパターンが有効。特に「対象外」セクションに前フェーズ処理済み内容を明示することで、次フェーズでの作業重複を防げる。配置基準（`.agentdev/drafts/req-draft-*.md` パターン、frontmatter の `phase` / `parent_epic` 属性）も標準化候補。
+- **再発条件**: (1) 大規模変更計画をフェーズ分割、(2) 前フェーズ中間成果物を削除する前提、(3) 次フェーズ用入力の要素構成標準が未定義、の全てが揃った場合。
+- **予防策候補**: (a) SC-003 SPEC「次フェーズ用入力」節に6要素構成と frontmatter 形式（`phase`, `parent_epic` 等）を明示する。(b) req-save/spec-save フローに「次フェーズ用入力テンプレート」を用意し、6要素が埋まっているかを post-condition 検査する。
+- **想定反映先**: `docs/specs/local/audit-ledger-lifecycle.md`（SC-003「次フェーズ用入力」節）、workflow-templates skill（次フェーズ用入力テンプレート候補）
+- **関連**: PR #1620, Issue #1611, Epic #1601 Wave 3, フェーズ3用入力 `.agentdev/drafts/req-draft-governance-reorganization-phase3.md`, TS-006 (b)(c), AG-009, CR-004, CR-003
+- **タグ**: `#phase-handoff` `#self-contained` `#sc-003` `#cr-004` `#phase-3` `#case-run` `#req-draft`
+
+---
