@@ -2,7 +2,7 @@
 title: `agentdev-gh-cli` SPEC
 status: accepted
 created: 2026-06-21
-updated: "2026-07-18"
+updated: "2026-07-19"
 ---
 
 # `agentdev-gh-cli` SPEC
@@ -51,6 +51,18 @@ command と skill は GitHub CLI（gh）コマンドを直接記述せず、`age
 | PR merge | PR 番号、merge 方式 | merge コミットハッシュ |
 | Issue close | Issue 番号、close 理由（`completed` / `not_planned`、省略時 `completed`） | なし |
 | VERIFY | 操作対象の識別子 | 検証結果（PASS / FAIL、検証観点別結果） |
+
+### 拡張手続き（REQ-0149-011）
+
+基盤手続き一覧（REQ-0149-002）を UPDATE せず、拡張手続きとして新設する2手続き（REQ-0149-011）。case-close 等、PR のメタデータを読み取る command から委譲される。
+
+| 手続き | 入力 | 出力 | 事後条件 |
+|---|---|---|---|
+| PR 変更ファイル一覧取得 | PR 番号 | 変更ファイルパス一覧（文字列配列） | 出力配列の各要素が PR の変更ファイルパスと一致すること |
+| PR mergeable 状態取得 | PR 番号 | `MERGEABLE` / `CONFLICTING` / `UNKNOWN` | gh CLI が返した `mergeable` 値をそのまま enum に写すこと |
+
+事後条件は READ 手続き（VERIFY 4観点の対象外）であるため、上記出力検証条件を適用する。本文生成、完了判定を含まない（REQ-0149-004 準拠）。
+標準版（GitHub 版）の gh CLI 実行例、Windows 環境での READ 手続き扱いは `references/standard-procedures.md` 参照。
 
 ### VERIFY の観点
 
