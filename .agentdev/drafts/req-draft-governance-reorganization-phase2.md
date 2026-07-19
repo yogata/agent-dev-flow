@@ -447,7 +447,7 @@ operation_units:
     depends_on: []
     recommended_order: 1
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1602, url: "https://github.com/yogata/agent-dev-flow/issues/1602"}
 
   - ou_id: OU-002
     target_spec:
@@ -459,7 +459,7 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1603, url: "https://github.com/yogata/agent-dev-flow/issues/1603"}
 
   - ou_id: OU-003
     target_spec:
@@ -471,7 +471,7 @@ operation_units:
     depends_on: []
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1604, url: "https://github.com/yogata/agent-dev-flow/issues/1604"}
 
   - ou_id: OU-004
     target_spec:
@@ -483,7 +483,7 @@ operation_units:
     depends_on: []
     recommended_order: 4
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1605, url: "https://github.com/yogata/agent-dev-flow/issues/1605"}
 
   - ou_id: OU-005
     target_req: REQ-0162
@@ -492,7 +492,7 @@ operation_units:
     depends_on: [OU-001]
     recommended_order: 5
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1606, url: "https://github.com/yogata/agent-dev-flow/issues/1606"}
 
   - ou_id: OU-006
     # target: ADR-0114/0125/0127/0128 + docs/adr/README.md（ACT-ADR-001〜005）
@@ -501,7 +501,7 @@ operation_units:
     depends_on: []
     recommended_order: 6
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1607, url: "https://github.com/yogata/agent-dev-flow/issues/1607"}
 
   - ou_id: OU-007
     target_spec:
@@ -513,7 +513,7 @@ operation_units:
     depends_on: []
     recommended_order: 7
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1608, url: "https://github.com/yogata/agent-dev-flow/issues/1608"}
 
   - ou_id: OU-008
     # target: docs/adr/README.md（F-001/002/005 即時修正、U-003/004/005 解消）
@@ -522,7 +522,7 @@ operation_units:
     depends_on: []
     recommended_order: 8
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1609, url: "https://github.com/yogata/agent-dev-flow/issues/1609"}
 
   - ou_id: OU-009
     # target: src/opencode/skills/agentdev-doc-writing/SKILL.md + src/opencode/skills/agentdev-*/SKILL.md Wave 1
@@ -532,7 +532,7 @@ operation_units:
     depends_on: []
     recommended_order: 9
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1610, url: "https://github.com/yogata/agent-dev-flow/issues/1610"}
 
   - ou_id: OU-010
     # target: フェーズ3用入力（新規作成）+ U-001〜U-015 横断解消残の最終確認
@@ -542,7 +542,7 @@ operation_units:
     depends_on: [OU-001, OU-002, OU-003, OU-004, OU-005, OU-006, OU-007, OU-008, OU-009]
     recommended_order: 10
     issue_policy: single
-    result: {}
+    result: {epic: 1601, issue: 1611, url: "https://github.com/yogata/agent-dev-flow/issues/1611"}
 
 # test_strategy: AG-001〜AG-009 の検証。on_failure は必須（REQ-0138 テスト戦略3要素）。
 test_strategy:
