@@ -100,3 +100,19 @@
 - **想定反映先**: `agentdev-case-run-execution-adapter` SKILL.md「ハーネス制約適応」節（本 PR で新設済み）、`agentdev-workflow-orchestration/references/capture-boundaries.md`「委譲可否 probe と Inability 記録」節（本 PR で新設済み）
 - **関連**: PR #1576, Issue #1573, REQ-0149-012, RU-0017, ADR-0130, PR #1068（L-004）, PR #1103（L-010）
 - **タグ**: `#harness-constraint` `#adapter-skill` `#inline-execution` `#delegation` `#req-0149-012`
+
+## bg task 異常終了からの回復パターン（commit 作成済み・PR 作成前 task 破棄）
+
+- **問題事象**: case-run が worktree で commit を作成した後、PR 作成を待たずに bg task が異常終了（task 破棄）した。PR が未作成のまま case-auto 親ループへ制御が戻り、Phase 2 成果物が GitHub 上で行き場を失う状況が発生した。PR #1578（Issue #1575 Phase 2）で顕在化。
+- **発生局面**: case-run（実装フェーズ完了後、提出フェーズの PR 作成直前/最中に task が破棄）
+- **検知方法**: case-auto 親ループが case-run 子 task の終了ステータスを確認し、実装 commit が worktree に存在するのに PR が未作成であることを検出。
+- **根本原因**: case-run 子 task は worktree に commit を作成した段階で進行中だが、ハーネスの bg task 機能は親ループへ制御を戻す際に子 task を破棄できる。子 task のライフサイクルと成果物（commit）のライフサイクルが分離されておらず、PR 作成完了前に task が破棄されると成果物が行き場を失う。
+- **自律対応内容**: case-auto 親ループが子 task 破棄を検知後、(a) worktree の commit を確認、(b) origin/main を fetch して rebase（必要時）、(c) feature ブランチへ push、(d) PR 作成を代行することで回復。本 PR #1578 はこの回復パスで作成された。
+- **ユーザー確認有無**: なし（エージェント自律で回復、PR 本文 Findings に明記）
+- **ADR/REQ/spec影響**: なし。本件は case-auto の回復ループ知見であり、新規 ADR/REQ/spec 影響はない。case-auto の自律継続動作の延長。
+- **横展開観点**: case-auto が case-run を子 task として起動する全ケースで適用可能。子 task の中断/破棄を検知した場合、(a) worktree の commit 有無確認、(b) commit が存在する場合は rebase + push + PR 作成を親が代行するパターンが有効。Epic Wave 並列委譲でも同様の子 task 破棄回復パスとして機能する可能性がある。
+- **再発条件**: (1) case-run 子 task が commit を作成した後、PR 作成前にハーネスが task を破棄した場合、(2) case-auto 親ループが子 task の中断を検知できる場合。
+- **予防策候補**: (a) case-auto 親ループに「子 task 中断検知 → worktree commit 確認 → PR 作成代行」の標準回復パスを組み込む。(b) case-run 子 task は commit 作成直後に PR 作成までを一単位として実行する（task の中途終了確率を下げるための粒度調整）。
+- **想定反映先**: case-auto command SPEC（子 task 中断回復パス）、workflow-orchestration skill（子 task ライフサイクルと成果物ライフサイクル分離）
+- **関連**: PR #1578, Issue #1575, case-auto, case-run
+- **タグ**: `#case-auto` `#case-run` `#bg-task` `#recovery` `#pr-creation`
