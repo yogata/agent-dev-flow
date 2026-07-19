@@ -159,7 +159,26 @@ REQ-0140-032 が定める段階的查読の詳細基準。REQ-0140-031 の查読
 
 ### 対象 SKILL.md
 
-src/opencode/skills/*/SKILL.md 配下の27ファイル。個別リストは inspect-skills 検出結果を参照して展開する。
+src/opencode/skills/agentdev-*/SKILL.md（28ファイル）。各 SKILL.md は docs/specs/skills/agentdev-*.md（1:1 対応）を SSoT とし、重複部分を SPEC から DERIVE した生成物に変更する。
+
+#### Wave 1（高優先度、フェーズ2 #1610 で実施済）
+- agentdev-doc-writing（REFERENCE 強化 + 高優先度重複除去）
+
+#### Wave 2（中優先度、フェーズ3対象）
+- 中核スキル群: agentdev-req-analysis, agentdev-req-file-manager, agentdev-adr-file-manager, agentdev-adr-guidelines, agentdev-workflow-orchestration, agentdev-workflow-routing, agentdev-workflow-lifecycle
+- 概要節と機能節の重複が明確に存在し、SPEC への DERIVE による解消が効果的なスキルを優先
+- DERIVE 対象: 各 SKILL.md の機能一覧、責務宣言、入出力等の SPEC と重複する記述
+
+#### Wave 3（低優先度、フェーズ3対象）
+- 補助スキル群: agentdev-doc-map, agentdev-case-run-execution-adapter, agentdev-issue-management, agentdev-epic-tracker, agentdev-gh-cli, agentdev-git-worktree, agentdev-intake-pipeline, agentdev-learning-capture, agentdev-learning-pipeline, agentdev-quality-gates, agentdev-inspect-skills, agentdev-command-authoring, agentdev-command-creator, agentdev-conventional-commits, agentdev-skill-authoring, agentdev-backlog-integration, agentdev-project-extensions, agentdev-req-structure-diagnostics
+- 重複度合いが低い、または SPEC との対応が限定的なスキル
+- U-012（extension と SKILL.md の記載重複）の解消を含める
+
+#### 優先度判定基準
+- 重複度合い（概要節と機能節の文字重複率）
+- 文書の影響度（配布対象、利用頻度）
+- SPEC との対応関係の明確さ（1:1 対応が取れているか）
+- DERIVE 機構導入の効果（重複解消による保守性向上の大きさ）
 
 
 ## 用語政策
