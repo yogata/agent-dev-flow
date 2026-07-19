@@ -116,3 +116,19 @@
 - **想定反映先**: case-auto command SPEC（子 task 中断回復パス）、workflow-orchestration skill（子 task ライフサイクルと成果物ライフサイクル分離）
 - **関連**: PR #1578, Issue #1575, case-auto, case-run
 - **タグ**: `#case-auto` `#case-run` `#bg-task` `#recovery` `#pr-creation`
+
+## bg task 異常終了からの回復パターン（未コミット変更あり・作業中 task 破棄）
+
+- **問題事象**: case-run が req-save.md, spec-save.md 編集中（未コミット）に bg task が異常終了（task 破棄）。case-run は spec-save.md 編集途中で停止し、worktree に未コミット変更のみが残り、commit も PR も未作成の状態になった。PR #1579（Issue #1577 Phase 2）で顕在化。
+- **発生局面**: case-run（実装フェーズの作業中、ファイル編集が完了する前に task が破棄）
+- **検知方法**: case-auto 親ループが case-run 子 task の終了ステータスを確認し、worktree に未コミット変更が存在するのに commit も PR も未作成であることを検出。
+- **根本原因**: case-run 子 task は編集途中でもハーネスの bg task 機能が親ループへ制御を戻す際に task を破棄できる。子 task のライフサイクルと作業中の変更（working tree）のライフサイクルが分離されておらず、commit 前に task が破棄されると working tree に変更が残留する。既知の PR #1578 回復パターン（commit 済み・PR 未作成）の一段手前の状態。
+- **自律対応内容**: case-auto 親ループが子 task 破棄を検知後、(a) worktree の git status で未コミット変更を確認、(b) 変更内容が case-run の意図通り（req-save.md, spec-save.md の concrete パス参照除去）であることを確認、(c) 親が commit 作成を代行、(d) origin/main を fetch して rebase、(e) feature ブランチへ push、(f) PR 作成を代行することで回復。本 PR #1579 はこの回復パスで作成された。
+- **ユーザー確認有無**: なし（エージェント自律で回復、PR 本文 Findings に明記）
+- **ADR/REQ/spec影響**: なし。本件は case-auto の回復ループ知見（PR #1578 パターンの拡張）であり、新規 ADR/REQ/spec 影響はない。case-auto の自律継続動作の延長。
+- **横展開観点**: case-auto が case-run を子 task として起動する全ケースで適用可能。子 task の中断/破棄を検知した場合、(a) worktree の git status で未コミット変更有無確認、(b) 変更内容が case-run の作業意図と整合するか確認、(c) commit → rebase → push → PR 作成を親が代行するパターンが有効。PR #1578（commit 済み・PR 未作成）と #1579（未コミット変更）で2パターンの回復を確認。Epic Wave 並列委譲でも同様の子 task 破棄回復パスとして機能する可能性がある。
+- **再発条件**: (1) case-run 子 task がファイル編集中（commit 前）にハーネスが task を破棄した場合、(2) worktree に未コミット変更が残留、(3) case-auto 親ループが子 task の中断と未コミット変更を検知できる場合。
+- **予防策候補**: (a) case-auto 親ループに「子 task 中断検知 → worktree git status 確認 → 未コミット変更あり場合は内容確認 → commit → rebase → push → PR 作成代行」の標準回復パスを組み込む。(b) case-run 子 task は細粒度で commit を作成する（編集途中でも意味単位で commit することで、task 破棄時の回復範囲を限定）。
+- **想定反映先**: case-auto command SPEC（子 task 中断回復パス拡張: commit 済みケースと未コミットケースの2パターン）、workflow-orchestration skill（子 task ライフサイクルと working tree ライフサイクル分離）
+- **関連**: PR #1579, Issue #1577, PR #1578（先行する commit 済み・PR 未作成ケース）, Issue #1575, case-auto, case-run
+- **タグ**: `#case-auto` `#case-run` `#bg-task` `#recovery` `#uncommitted-changes` `#pr-creation`
