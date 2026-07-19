@@ -247,3 +247,69 @@
 - **タグ**: `#japanese` `#chinese-character` `#cjk` `#verify` `#spec-save` `#req-save` `#integrated-delegation` `#ag-001`
 
 ---
+
+## 2026-07-20: 要件行は進捗値ではなく仕様としてベースライン値を記述すべき（#1606）
+
+- **問題事象**: REQ-0162-010 が「影響範囲 NG 218件・WARNING 10件」と記述しているが、現状は intake-2026-07-19 で NG 216件・WARNING 10件に減少（PR #1579 で req-save.md/spec-save.md 処理済み）。ベースライン（起票時 218件）と現状進捗値（216件）の使い分けが REQ-0162-010/-011 で混在しており、case-close QG-4 評価時に「進捗値の更新漏れか、意図的なベースライン記述か」を判別する手間が発生した。
+- **発生局面**: レビュー・クローズ（case-close の QG-4 完了条件照合時）
+- **検知方法**: PR #1617 Findings セクションに「ベースライン値 vs 進捗値の使い分けは適切」と明記されていたことで判別可能だった。しかし REQ-0162-010/-011 本文だけでは意図が読めず、Findings に依存する構造。
+- **根本原因**: 要件行に数量を記述する際「ベースライン値（仕様として固定）」と「進捗値（現状報告）」の運用区別が SPEC/ガイドレベルで未明文化。両者が混在すると、数量が変動した場合に「要件行を更新すべきか」「更新不要（ベースライン）か」が判断できない。
+- **自律対応内容**: case-close では REQ-0162-010 をベースライン値のままとし、216件への更新を実施しなかった。PR #1617 Findings で「要件行は進捗値ではなく仕様としてベースラインを記述すべき」と明文化済み。進捗値は intake item（intake-2026-07-19-concrete-id-path-remaining-216-ng-10-warn.md）が別途追跡する二重管理構造とした。
+- **ユーザー確認有無**: なし（エージェント自律で判断、PR Findings に記録済み）
+- **ADR/REQ/spec影響**: なし（運用規約の明文化候補）。REQ-0162-010/-011 文面は現状維持。要件行数量記述ガイドラインの整備候補。
+- **横展開観点**: 数量ベースラインを要件行に含む全ケース（影響範囲、検出件数、ファイル数等）で、「ベースライン（仕様）」と「進捗値（運用報告）」を区別する記述ガイドラインが有効。進捗値は intake/learning 等の別 artifact で追跡し、要件行は仕様としてベースラインを保持する二重管理構造を標準化する。
+- **再発条件**: (1) 要件行に数量を記述、(2) 数量が運用進捗で変動、(3) ベースラインと進捗値の運用区別が SPEC/ガイドで未明文化、の全てが揃った場合。
+- **予防策候補**: (a) REQ/SPEC 記述ガイドに「要件行の数量は起票時ベースラインを記述し、運用進捗値は intake/learning 等の別 artifact で追跡する」運用を明文化する。(b) 数量の後に `(baseline YYYY-MM-DD)` 等の日付明示でベースライン値であることを形式化する。
+- **想定反映先**: document-type-responsibilities SPEC（要件行記述ガイド）、または workflow-templates skill `templates/req_*.md`（数量記述ガイドライン）
+- **関連**: PR #1617, Issue #1606, Epic #1601 Wave 2, REQ-0162-010/-011, intake-2026-07-19-concrete-id-path-remaining-216-ng-10-warn.md
+- **タグ**: `#requirements` `#baseline-value` `#progress-value` `#quantity-description` `#case-close` `#qg-4` `#req-0162`
+
+## 2026-07-20: 再構成検証型 Issue で「決定」更新後に「結果・影響」節が取り残される内部矛盾パターン（#1607）
+
+- **問題事象**: ADR-0114/0125/0127/0128 再構成（commit cb8e5891）で「決定」本文の更新は実施されたが、「結果・影響」「保持責務リスト」等の派生節が旧い前提のまま取り残される内部矛盾2件を検出。ADR-0114.md line 66「ドライバー結果の3状態契約により」は §2 で4状態契約へ拡張したのに結果節が3状態のまま。ADR-0127.md §3「case-run 並行委譲制御」は §1 で case-run を構成工程委譲対象外に変更したのに保持責務リストが旧表現のまま。
+- **発生局面**: 実装・検証（case-run 検証フェーズ、Wave 2 #1607 PR #1616）
+- **検知方法**: case-run 検証フェーズで ADR 内のセクション間整合性を精読し発見。§1 vs §3、決定節 vs 結果節の突き合わせで機械的に検出可能。
+- **根本原因**: ADR 再構成を「決定本文」中心で実施した際、派生節（結果・影響、保持責務、関連項目等）の追随更新が漏れた。req-save/spec-save 統合委譲（cb8e5891）はバッチ処理で主要節を更新したが、派生節の網羅性確認プロセスが無かった。
+- **自律対応内容**: PR #1616 で2件の内部矛盾を補完修正。ADR-0114.md line 66 を「3状態」→「4状態（blocked / failed / delegation-unavailable）」へ更新、ADR-0127.md §3 を「並行委譲制御」→「インライン実行制御」へ更新。Q4 壁打ち合意に合致。
+- **ユーザー確認有無**: なし（エージェント自律で検出・修正、PR 本文に記録）
+- **ADR/REQ/spec影響**: なし。本件は ADR 再構成の運用知見であり、新規 ADR/REQ/spec 影響なし。
+- **横展開観点**: 文書再構成を「決定節」中心で実施する全ケース（ADR, REQ, SPEC の大規模 UPDATE）で、派生節（結果・影響、保持責務、関連項目、Decision Map、Consequences 等）の追随確認を検証フェーズで実施する観点が有効。再構成 PR には「派生節整合性確認」チェックリストを含める運用。
+- **再発条件**: (1) 文書の主要節を再構成、(2) 派生節（結果・影響等）が旧前提を保持、(3) 派生節の網羅性確認プロセスが存在しない、の全てが揃った場合。
+- **予防策候補**: (a) case-run 検証テンプレートに「再構成を伴う ADR/REQ/SPEC は §単位の整合性（決定 vs 結果・影響、§1 vs §3 等）を確認する観点」を追加する。(b) inspect-docs に「文書内セクション間整合性（同一概念の表記揺れ、旧前提の取り残し）」検出カテゴリを新設する。
+- **想定反映先**: case-run skill 検証テンプレート、workflow-templates skill `templates/pr_desc.md`（再構成 PR の検証項目）、inspect-docs 検出カテゴリ候補
+- **関連**: PR #1616, Issue #1607, Epic #1601 Wave 2, ADR-0114（3状態→4状態）, ADR-0127（並行委譲→インライン実行）, commit cb8e5891（統合委譲本体）, Q4 壁打ち合意（2026-07-19）
+- **タグ**: `#adr` `#restructure` `#internal-contradiction` `#section-consistency` `#case-run` `#verification` `#ag-005`
+
+## 2026-07-20: 物理統合時の参照更新網羅性チェックパターン（#1608）
+
+- **問題事象**: `docs/specs/foundations/workflow-contracts.md`（旧版縮小互換索引）を完全削除し `docs/specs/workflows/workflow-contracts.md` へ物理統合する際、active 文書10件（docs/README.md, DOC-MAP.md, specs/local/local-generation.md, specs/README.md, ADR-0127.md, REQ-0112/0119/0126/0137）に残存する旧パス参照の網羅的更新が必要だった。grep で `obsolete-path-map.yaml`（IR-057 exemption 対象）のみ残ることを確認し、stub/redirect/互換索引の残置なしを検証した。
+- **発生局面**: 実装・検証（case-run 実装フェーズ、Wave 2 #1608 PR #1619）
+- **検知方法**: リポジトリ全体 git grep で旧パス文字列を検索し、active 文書から完全除去されたことを確認。`obsolete-path-map.yaml` は IR-057 検査の exemption リストとして意図的に残置する設計のため除外。
+- **根本原因**: 物理統合（ファイル削除・移動）では参照元の網羅的更新が必須だが、手動 grep では見落としリスクがある。本 case では `obsolete-path-map.yaml` に旧パス→新パス対応を追記し、IR-057 が旧パス参照を検出できる二重安全装置を設定。
+- **自律対応内容**: PR #1619 で10件の active 文書の旧パス参照を新パスへ更新、`obsolete-path-map.yaml` に新エントリ追加、stub/redirect/互換索引を残さず完全削除。acceptance 検証表で5項目（旧パス削除、新パス存在、active 文書参照残存ゼロ、obsolete map 記録、stub なし）を全て ✅ で確認。
+- **ユーザー確認有無**: なし（エージェント自律で実施、PR 本文に詳細記録）
+- **ADR/REQ/spec影響**: なし。本件は物理統合時の運用知見であり、新規 ADR/REQ/spec 影響なし。`obsolete-path-map.yaml` の運用が有効性を実証。
+- **横展開観点**: SPEC/ADR/REQ の物理統合、ファイル移動、リネーム全般で適用可能。(a) 旧パスを網羅的に grep、(b) active 文書の参照を新パスへ更新、(c) `obsolete-path-map.yaml` への対応記録、(d) stub/redirect/互換索引を残さない、の4ステップを標準パターンとする。
+- **再発条件**: (1) SPEC/ADR/REQ の物理統合・移動を実施、(2) 参照元の網羅的更新が必要、(3) stub/redirect 残置の判断が必要、の全てが揃った場合。
+- **予防策候補**: (a) workflow-templates skill に「物理統合・ファイル移動時の標準4ステップ（grep、active 更新、obsolete map 記録、stub 残置なし）」テンプレートを追加する。(b) inspect-docs に「物理統合・移動後の参照残存検出（`obsolete-path-map.yaml` 連動）」検出カテゴリを強化する。
+- **想定反映先**: workflow-templates skill `templates/*.md`（物理統合テンプレート）、inspect-docs 検出カテゴリ（`obsolete-path-map.yaml` 連動）、`docs/specs/integrity/obsolete-path-map.yaml`（運用実例の補強）
+- **関連**: PR #1619, Issue #1608, Epic #1601 Wave 2, IR-057（obsolete path 参照検出）, `docs/specs/integrity/obsolete-path-map.yaml`, ACT-SPEC-004（U-007 物理統合）, commit cb8e5891
+- **タグ**: `#physical-integration` `#reference-update` `#obsolete-path-map` `#ir-057` `#case-run` `#verification` `#ag-002`
+
+## 2026-07-20: 監査→実装 PR→監査台帳書き戻しの紐付けを明示的にする運用（#1609）
+
+- **問題事象**: 第1フェーズ監査（監査台帳 `.agentdev/drafts/audit-ledger-governance-system-audit.md`）で検出された F-001/002/005（U-003/004/005）は PR #1599（commit 28a00f86）で ADR README の件数是正と ADR-0137 追加を実施した際に副次的に解消されていた。しかし監査台帳と実装 PR の紐付けが明示的でなかったため、本 Issue #1609 で書き戻し（監査台帳 U-003/004/005 欄へ「解消状況」行追加）を実施するまで、解消状況が監査台帳上で未確定状態だった。
+- **発生局面**: 完了処理（case-close Wave 2 #1609、監査台帳書き戻し）
+- **検知方法**: case-run 検証フェーズで監査台帳の U-003/004/005 欄に解消状況記録がなく、PR #1599 で既に解消済みであることを再検証で確認。監査台帳と実装 PR のリンクが不在だった。
+- **根本原因**: 監査フェーズ（Phase1）と再編実施フェーズ（Phase2）が分離されており、Phase2 の実装 PR（#1599 等）が Phase1 監査台帳のどの未決事項を解消したかを示す標準的なリンク形式が無かった。Phase2 各 PR の close 時に監査台帳へ書き戻すプロセスが暗黙裡に期待されていたが、case-close で明示的に実施するまで放置された。
+- **自律対応内容**: PR #1618 で監査台帳 U-003/004/005 欄へ「【解消済 PR #1599, #1609 検証】」注記を追加、照合サマリ表の docs/adr/README.md 関連3行を「整合」へ更新、未決事項一覧の該当行へ注記追加（8 insertions 5 deletions）。Wave 2 close の標準プロセスとして実施。
+- **ユーザー確認有無**: なし（エージェント自律で実施、PR 本文に記録）
+- **ADR/REQ/spec影響**: なし。本件は監査台帳運用の知見であり、新規 ADR/REQ/spec 影響なし。SC-003（`docs/specs/local/audit-ledger-lifecycle.md`）が監査台帳ライフサイクル SPEC として accepted のため、運用実例の補強。
+- **横展開観点**: 監査台帳を前提情報とする大規模変更計画全般で適用可能。実装 PR の close 時に監査台帳の該当未決事項欄へ「解消状況（書き戻し）」行を追加するプロセスを標準化する。Wave 単位の case-close で一括書き戻しを実施する運用が有効（本 Wave 2 #1609 で実証）。
+- **再発条件**: (1) 監査フェーズ（Phase1）と再編実施フェーズ（Phase2）が分離、(2) Phase2 実装 PR と Phase1 監査台帳のリンク形式が未定義、(3) case-close で監査台帳書き戻しを実施しない、の全てが揃った場合。
+- **予防策候補**: (a) SC-003（`docs/specs/local/audit-ledger-lifecycle.md`）に「Phase2 実装 PR close 時の監査台帳書き戻し標準形式」を追記する。(b) case-close skill に「監査台帳が存在する場合、書き戻しを必須手順とする」チェックリスト項目を追加する。
+- **想定反映先**: `docs/specs/local/audit-ledger-lifecycle.md`（SC-003、書き戻し形式の標準化）、case-close skill（監査台帳存在時の書き戻しチェックリスト）、workflow-templates skill（監査→実装 PR→書き戻しテンプレート）
+- **関連**: PR #1618, Issue #1609, Epic #1601 Wave 2, PR #1599（commit 28a00f86、副次解消 PR）, 監査台帳 `.agentdev/drafts/audit-ledger-governance-system-audit.md`（U-003/004/005）, SC-003（`docs/specs/local/audit-ledger-lifecycle.md`）, F-001/002/005
+- **タグ**: `#audit-ledger` `#writeback` `#phase-separation` `#case-close` `#sc-003` `#link-tracking` `#governance`
+
+---
