@@ -98,6 +98,31 @@ subagent 委譲を実施する agentdev command（case-auto、case-open、case-r
 - **由来**: Issue #1538 で case-open を `category=writing` で委譲した際、MUST NOT DO が未明示で subagent が `.agentdev/drafts/` 配下へ draft を作成した事象（REQ-0163-002）
 - **関連**: category 選定ガイドラインは REQ-0163-001、`case-auto.md` の「Subagent 委譲プロトコル」節、`agentdev-case-run-execution-adapter` SKILL の「委譲プロトコルと category 設計」節参照
 
+## 委譲可否 probe と Inability 記録
+
+case-run は委譲起動前にハーネス能力を probe し、委譲可否を判断する（REQ-0149-012）。
+probe 手順、委譲可否判定の詳細は `agentdev-case-run-execution-adapter` SKILL「ハーネス制約適応（call_omo_agent schema 制約時）」参照。
+本節は委譲不可時の Inability 記録境界のみを定める。
+
+### Inability 明示タイミング
+
+委譲不可と判定した時点で、case-run は実装作業の冒頭で Inability を明示する。
+タイミングは worktree 作成後、実装開始前である。
+
+Inability の記録先は result 状態に応じて決まる（既存の SSoT 契約に準拠）:
+
+| result | Inability 記録先 |
+|--------|-----------------|
+| `completed-pr` | PR 本文 `## Findings / Capture候補` |
+| `blocked` / `failed` | Issue コメント |
+
+### Inability のキャプチャ分類
+
+Inability の内容は既存の分割ルール（「分割ルール（観測の分割）」参照）に従い Intake 候補と Learning 候補に分離する:
+
+- ハーネス制約そのもの（`call_omo_agent` schema の制約など）は Learning 候補（再発防止知見）
+- 特定 Issue での影響（並列委譲不可による逐次実行等）は Intake 候補（個別作業）
+
 ## See Also
 
 - **agentdev-learning-capture**: Learning 抽出の具体的スキル（13 項目形式、実観測ベース原則）

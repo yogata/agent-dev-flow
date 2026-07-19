@@ -161,6 +161,55 @@ adapter skill 経由の委譲（case-run からの実行担当サブエージェ
 
 adapter skill は本要件を宣言的に定義し、case-run からの委譲 prompt 構築時に参照される。詳細な category 選定ガイドラインは `case-auto.md` の「Subagent 委譲プロトコル」節、MUST NOT DO 記載要件は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照。
 
+## ハーネス制約適応（call_omo_agent schema 制約時）
+
+adapter skill は `call_omo_agent` ツール schema が custom agent 型（実行担当サブエージェント型）を許可しないハーネス環境で動作することを前提とする（REQ-0149-012）。
+oh-my-openagent 等のハーネスでは explore/ librarian 型のみが許可され、Epic Wave 並列委譲（最大5件）も機能しない。
+
+### 事前 probe（ハーネス能力検出）
+
+case-run は委譲起動前にハーネス能力を probe し、実行担当サブエージェント型が起動可能かを判定する。
+
+1. **probe 対象**: `call_omo_agent`（または同等の委譲起動 API）が受け入れる `subagent_type` の一覧
+2. **probe 方法**: harness 固有。AGENTS.md および `references/<harness>.md` 参照（REQ-0162-002）
+3. **判定結果**:
+ - 実行担当サブエージェント型が許可される → 通常委譲パス（前節「委譲抽象IF」）
+ - 実行担当サブエージェント型が不許可 → 後述「インライン逐次実行」へ移行
+
+### Inability の冒頭明示
+
+probe の結果、委譲が利用不可の場合、case-run はインライン実行へ移行する旨を冒頭で明示する。
+最終的な SSoT は result 契約に従う（completed-pr → PR 本文、blocked/ failed → Issue コメント）。
+
+明示内容は以下の3点である:
+
+- **制約事実**: `call_omo_agent` schema が custom agent 型を許可しないこと
+- **影響範囲**: 1 Issue 単位の委譲不可、Epic Wave 並列委譲不可
+- **採用措置**: インライン逐次実行で adapter protocol に従うこと
+
+### インライン逐次実行時の adapter protocol 遵守
+
+委譲が利用不可の場合、case-run の実行コンテキストが adapter skill を読み込み、インラインで逐次実行する。
+この場合も本スキルの定める adapter protocol に従う:
+
+- worktree root 配下のみ編集（「worktree 隔離の遵守（禁止事項）」）
+- Issue 読込 → context 再確認 → 実装 → 検証 → PR 作成の順序（「実行担当サブエージェントの責務」）
+- test strategy 項目の test-fix ループ（「test strategy 項目の test-fix ループ（REQ）」）
+- result 契約（4状態）の維持（「Result 契約（最小契約）」）。委譲を起動していないため `delegation-unavailable` は返さず、`completed-pr` / `blocked` / `failed` のいずれかを返す
+- Findings / SPEC確定候補の配置規約（「Findings/ Capture 配置」「SPEC確定候補配置」）
+
+### Epic Wave 並列委譲不可時の運用
+
+`#epic` 指定時も本制約により Wave 内の子Issue 並列委譲（最大5件）は機能しない。
+case-run は現在 ready な Wave の子Issue を順次（インライン逐次）処理する。
+Wave 境界（PR マージ）は case-close が担うため本適応の対象外。
+
+### 既存フォールバックパスとの関係
+
+本節は事前 probe による**委譲起動前**の適応である。
+次節「委譲起動失敗、異常終了時事後処理」は**委譲起動後**の異常終了に対する事後処理である。
+両者は対象段階が異なり、重複しない。委譲起動の可否に応じて使い分ける。
+
 ## 委譲起動失敗、異常終了時事後処理
 
 実行担当サブエージェントの委譲起動失敗、異常終了時（エージェント型利用不可、異常終了、実行 command 内部エラー等）は即 `failed` とせず**実装完了、検証未完了**として扱い、以下の手順で事後処理する:
