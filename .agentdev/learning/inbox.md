@@ -230,4 +230,20 @@
 - **関連**: PR #1600, Issue #1537, AGENTS.md「ハーネス選定」セクション, `agentdev-gh-cli/references/standard-procedures.md` Section 3「安全な読み取り手順」
 - **タグ**: `#powershell` `#encoding` `#utf8` `#cp932` `#node-execsync` `#verify` `#gh-cli` `#case-close` `#windows`
 
+## 2026-07-20: req-save/spec-save 統合委譲で生成された SPEC 本文への中国語文字混入
+
+- **問題事象**: req-save/spec-save 統合委譲（commit cb8e5891）で新設された SC-001 SPEC（`docs/specs/foundations/numbering-policy.md`）の L10 に中国語文字「单」（U+5355）が混入していた。AGENTS.md「基本言語は日本語。あらゆる場面で中国語の使用を禁止する」への違反。PR #1613（Issue #1603、Epic #1601 Wave 1）の case-run で検出され、「単」（U+5358）へ修正済み。
+- **発生局面**: 要件保存・SPEC 保存（req-save/spec-save 統合委譲による SPEC 新設時）
+- **検知方法**: case-run 実装中の SPEC 本文 review で発見。機械的検出ではなく作業者の目視。
+- **根本原因**: 統合委譲で SPEC 本文を一括生成した際、原稿（要件ドラフトまたは前段テキスト）に混入した中国語文字をそのまま引き継いだ。req-save/spec-save フローに日本語以外の CJK 文字を検出する自動検査工程が存在せず、レビュー段階で拾えなかった可能性が高い。AGENTS.md の中国語禁止ルールは人手による遵守に依存している。
+- **自律対応内容**: 本 PR #1613 で「单」→「単」へ修正。他の SPEC ファイル（SC-002, SC-003、既存 SPEC UPDATE 分）には同様の混入なしことを確認済み。
+- **ユーザー確認有無**: なし（エージェント自律で PR 本文 Findings に記録し修正）
+- **ADR/REQ/spec影響**: なし。本件は SPEC 本文の表記修正であり、新規 REQ/ADR/SPEC 影響なし。AGENTS.md 既存ルールの運用改善候補。
+- **横展開観点**: req-save/spec-save 統合委譲に限らず、AgentDevFlow 配布物（commands/, skills/, docs/）を新規生成・編集する全局面で、CJK 同形異字（「单」と「単」、「学」と「學」等）、簡体字・繁体字の混入リスクがある。文字コード検査（U+4E00〜U+9FFF のうち日本語外字を検出する正規表現等）を VERIFY に組み込む候補。
+- **再発条件**: (1) req-save/spec-save 統合委譲または同等の一括生成フロー、(2) 原稿に中国語文字が含まれる、(3) 自動的な CJK 文字検査が存在しない、の全てが揃った場合。
+- **予防策候補**: (a) agentdev-gh-cli VERIFY 観点「Markdown 構造」に「日本語外 CJK 文字検出」を追加する（中国語簡体字・繁体字を検出する正規表現パターンを用意）。(b) inspect-docs または inspect-skills に「日中同形異字」検出カテゴリを新設する。(c) req-save/spec-save フローの post-condition に「日本語外 CJK 文字 0件」を加える。
+- **想定反映先**: `agentdev-gh-cli/references/verify.md`（VERIFY 観点拡張）、`docs/specs/integrity/integrity-rule-catalog.md`（IR 追加候補）、inspect-docs または inspect-skills の検出カテゴリ
+- **関連**: PR #1613, Issue #1603, Epic #1601 Wave 1, commit cb8e5891（統合委譲本体）, AGENTS.md「基本言語は日本語」
+- **タグ**: `#japanese` `#chinese-character` `#cjk` `#verify` `#spec-save` `#req-save` `#integrated-delegation` `#ag-001`
+
 ---
