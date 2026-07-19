@@ -164,3 +164,36 @@
 - **想定反映先**: case-run command SPEC（インライン逐次実行セクション）、adapter protocol skill、`references/<harness>.md`
 - **関連**: PR #1594, Issue #1588, Epic #1581, harness-separation-model.md, adapter protocol, agentdev-case-run-execution-adapter skill
 - **タグ**: `#harness` `#oh-my-openagent` `#call-omo-agent` `#adapter-protocol` `#delegation-unavailable` `#case-run` `#inline-execution`
+## 2026-07-19: 監査フェーズを one-time ライフサイクルとして独立させると未決事項確定不可制約を守りやすい
+
+- **問題事象**: AgentDevFlow 統合再編計画のように「現状の監査」と「再編処置の確定」が混在する計画では、監査台帳なしに処置割当（KEEP/MERGE/REFERENCE/DERIVE/GENERATE/RETIRE）を確定しようとすると「未決事項確定不可」制約に抵触する恐れがあった。実際に Issue #1596 では全体を単一 Epic ドラフトにする案（CR-001）がこの制約抵触リスクとして検出された。
+- **発生局面**: 要件定義（req-define でのフェーズ分割判断）
+- **検知方法**: 計画文書の分析と CR-001 検討を通じた意味確認。Oracle Q4 検証で「監査→再編」の二相性と one-time 分類が必然と確認。
+- **根本原因**: 大規模変更計画で「分析フェーズ」と「処置確定フェーズ」を分離せず一括確定しようとする設計は、前提情報（台帳）不足のまま判断を強いる構造的問題を抱える。
+- **自律対応内容**: 第1ドラフトを監査フェーズ（one-time ライフサイクル）のみに限定し、再編フェーズは別セッションで生成するよう分離。計画 Section 1 の4硬制約（特に未決事項確定不可）を守る構成とした。
+- **ユーザー確認有無**: あり（ユーザー合意「決定1: 監査フェーズを独立」として探求的req-defineで合意）
+- **ADR/REQ/spec影響**: なし。本知見は既存 backlog-artifact-lifecycle SPEC の one-time 分類を活用した運用知見であり、新規 ADR/REQ/spec 変更不要。SC-003（監査台帳ライフサイクル SPEC 候補）として再編フェーズで SPEC 化の候補。
+- **横展開観点**: 大規模変更計画全般で「前提分析フェーズ」と「処置確定フェーズ」の分離パターンが有効。フェーズごとに別 Issue/Case とし、one-time 成果物（台帳・照合表）を橋渡しに使う構成は他プロジェクトの大規模リファクタでも適用可能。
+- **再発条件**: (1) 大規模変更計画を立ち上げる、(2) 現状分析と処置確定が未分離、(3) 監査台帳等の前提情報がない、(4) 計画文書で「未決事項確定不可」制約を掲げる、の全てが揃った場合。
+- **予防策候補**: (a) req-define スキルの探求的フェーズで「分析→処置確定」の二相性を常に検査する観点を追加する。(b) one-time ライフサイクルと standard ライフサイクルの使い分け基準を backlog-artifact-lifecycle SPEC に例示付きで追記する。
+- **想定反映先**: agentdev-req-analysis skill（探求的req-define のフェーズ分割観点）、docs/specs/workflows/backlog-artifact-lifecycle.md（one-time 適用例の追記候補）
+- **関連**: PR #1597, Issue #1596, CR-001, CR-002, backlog-artifact-lifecycle SPEC, intake item intake-2026-07-19-spec-candidate-audit-ledger-lifecycle.md
+- **タグ**: #req-define #one-time #phase-separation #large-scale-change #governance #exploratory
+
+## 2026-07-19: 索引類の件数表明は実ファイルから GENERATE 可能で人手更新漏れを根絶できる
+
+- **問題事象**: 監査フェーズ AG-005 で検出された ADR README のキャプションずれ（実測 accepted 25件 vs キャプション「24件」、F-001）や accepted リストの ADR-0137 欠落（F-002）のように、README 群の件数・一覧表記は人手更新に依存しており追加時の更新漏れが散発する。REQ-0157 未使用番号（F-003）、IR-045 欠番（F-004）、トピック別ビューの ADR-0137 欠落（F-005）も同じ類の問題。
+- **発生局面**: 実装・保守（ADR/REQ 追加時の README 整合性維持）
+- **検知方法**: 監査フェーズ AG-001 の実ファイル列挙と AG-005 の索引類照合で検出。glob パターンと Get-ChildItem -Recurse の交差検証で抽出。
+- **根本原因**: 索引類（docs/requirements/README.md, docs/adr/README.md, mapping-table.md 等）が人手更新を前提としており、要件/ADR/IR 追加時の整合性維持が個人の注意力に依存している。既存 IR-042 (hardcoded-req-count) 等で検出はできるが、自動生成までは至っていない。
+- **自律対応内容**: 本監査フェーズでは検出と台帳記録までで保留（4硬制約「新規REQ/ADR原則追加不可」「公開command動作不改」遵守）。AG-006 候補 #2/#3 として README 自動生成パイプラインを提案し、SC-002（索引類自動生成 SPEC 候補）として case-close で記録。
+- **ユーザー確認有無**: なし（監査結果の記録と候補提示はエージェント自律で実施）
+- **ADR/REQ/spec影響**: なし（本 Issue は artifact_actions 空で SPEC 変更なし）。SC-002 を intake に記録し、再編フェーズ以降の req-define / spec-save で判断する。
+- **横展開観点**: 索引類・一覧表・件数キャプションを人手で維持する運用全般に適用可能。実ファイルを single source of truth とし、派生物（README の件数・リスト等）を自動生成するパターンは、README 以外にも DOC-MAP.md、影响対応表、ステータス別ビュー等で有効。
+- **再発条件**: (1) 索引類が人手更新、(2) 要素追加時の整合性チェックなし、(3) 自動生成パイプライン未導入、の全てが揃った場合。
+- **予防策候補**: (a) 索引類自動生成 SPEC を新設し（SC-002）、対象ファイルと生成規則を契約化する。(b) pre-commit hook または CI で実ファイル件数と README 記載を突合し、差分を fail とする検査を追加する。(c) README の件数・リスト部分を自動生成マーカーで囲い、人手編集を禁止する。
+- **想定反映先**: docs/specs/integrity/（新規 SPEC 候補、SC-002 参照）、docs/specs/foundations/integrity-rules.md または IR カタログ（IR-042 等の拡充）
+- **関連**: PR #1597, Issue #1596, F-001/F-002/F-005, AG-006 候補 #2/#3, SC-002, IR-042, intake item intake-2026-07-19-spec-candidate-index-auto-generation.md, intake item intake-2026-07-19-audit-ledger-governance-index-inconsistencies.md
+- **タグ**: #index #automation #readme #single-source-of-truth #integrity #ir-042 #generate
+
+---
