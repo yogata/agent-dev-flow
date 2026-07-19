@@ -84,3 +84,19 @@
 - **想定反映先**: quality-gates skill `references/qg-4-final-acceptance.md`（record-in-findings 判断基準）、workflow-templates skill `templates/issue_desc_feature.md`（test strategy on_failure 記載ガイド）
 - **関連**: PR #1568, Issue #1566, TS-004, REQ-0163, Issue #1538（由来事象）, PR #1539（解消 PR）, REQ-0131-026
 - **タグ**: `#test-strategy` `#record-in-findings` `#subagent-protocol` `#qg-4` `#case-close` `#req-0163`
+
+## call_omo_agent schema 制約による委譲起動不可とインライン逐次実行時の adapter protocol 遵守
+
+- **問題事象**: oh-my-openagent ハーネスの `call_omo_agent` ツール schema は `subagent_type` に explore/ librarian 型のみを許可し、adapter skill（`agentdev-case-run-execution-adapter`）が定義する実行担当サブエージェント型（custom agent 型）を起動できない。Epic Wave 並列委譲（最大5件）も機能しない。PR #1576（Issue #1573 Phase 2）で顕在化。
+- **発生局面**: case-run（実行担当サブエージェントへの委譲起動を試みるフェーズ）
+- **検知方法**: 現ハーネスの `call_omo_agent` tool description に "Only explore and librarian are allowed" "Other built-in agents, custom agents, and task categories are intentionally not supported by this tool" と明記されていることを確認。本 PR 実行経路自体が制約下でのインライン逐次実行の実証。
+- **根本原因**: adapter skill は前提として「実行担当サブエージェント型を起動できるハーネス」を想定していたが、oh-my-openagent ハーネスでは tool schema が明示的に custom agent 型を拒否する。adapter skill L131-148 の事後フォールバックパス（委譲起動失敗時）で運用は完結するが、事前 probe（ハーネス能力検出）と委譲可否判断、委譲不可時の Inability 冒頭明示が adapter skill に未明文化だった。
+- **自律対応内容**: Phase 1 で REQ-0149-012 を APPEND して事前 probe、委譲可否判断、Inability 冒頭明示、インライン逐次実行時の adapter protocol 遵守、Epic Wave 並列委譲不可時の運用明文化を要件化。Phase 2 で adapter SKILL.md に「ハーネス制約適応（call_omo_agent schema 制約時）」セクション、`capture-boundaries.md` に「委譲可否 probe と Inability 記録」セクションを新設。本 PR 実行時も制約により委譲起動不可、Sisyphus-Junior が親 context 内で adapter protocol に従いインライン逐次実行で実装した。
+- **ユーザー確認有無**: なし（エージェント自律で実証、PR 本文 Findings に明記）
+- **ADR/REQ/spec影響**: REQ-0149-012（本件で要件化）。ADR-0130（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立、参考）。親学習 RU-0017（harness-delegation-constraint.md）。
+- **横展開観点**: 別ハーネス（OpenCode 標準、Codex 等）への移行時にも、当該ハーネスが custom agent 型を許可するかを事前 probe する必要がある。adapter skill はハーネス非依存の protocol とハーネス依存の起動実装を分離して保持する設計が本件で有効性を実証された。
+- **再発条件**: (1) adapter skill が想定する custom agent 型をハーネスが許可しない場合、(2) `call_omo_agent` 相当の委譲起動 API の schema が限定列挙型で型を固定している場合。
+- **予防策候補**: adapter skill がハーネス導入時に `references/<harness>.md` へ能力 probe 手順を必須記載する運用。case-run は委譲起動前に probe を実施し result に Inability を含める。
+- **想定反映先**: `agentdev-case-run-execution-adapter` SKILL.md「ハーネス制約適応」節（本 PR で新設済み）、`agentdev-workflow-orchestration/references/capture-boundaries.md`「委譲可否 probe と Inability 記録」節（本 PR で新設済み）
+- **関連**: PR #1576, Issue #1573, REQ-0149-012, RU-0017, ADR-0130, PR #1068（L-004）, PR #1103（L-010）
+- **タグ**: `#harness-constraint` `#adapter-skill` `#inline-execution` `#delegation` `#req-0149-012`
