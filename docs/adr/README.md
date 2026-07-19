@@ -4,7 +4,7 @@
 
 ## 現行基盤ビュー
 
-承認済みステータス（accepted）の ADR-01XX 24件が、現在のアーキテクチャ判断の基盤である。
+承認済みステータス（accepted）の ADR-01XX 25件が、現在のアーキテクチャ判断の基盤である。
 各 ADR は基準再編により旧 ADR の内容を統合、再定義している。
 現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）、非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
 
@@ -66,6 +66,7 @@
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
 - [ADR-0135](ADR-0135.md)（Project Extensions Architecture）
 - [ADR-0136](ADR-0136.md)（配布物ハーネス境界の浄化）
+- [ADR-0137](ADR-0137.md)（case-auto における case-run インライン実行（多重委譲回避））
 - [ADR-0138](ADR-0138.md)（case-auto オーケストレーション制御の AgentDevFlow 側集約）
 
 ### 提案中（proposed）
@@ -116,6 +117,7 @@
 - [ADR-0129](ADR-0129.md)（複数 execution_unit 並列実行モデル）（複数 SSoT 並立と Epic 間並列 orchestration）
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
 - [ADR-0136](ADR-0136.md)（配布物ハーネス境界の浄化）
+- [ADR-0137](ADR-0137.md)（case-auto における case-run インライン実行（多重委譲回避））
 - [ADR-0138](ADR-0138.md)（case-auto オーケストレーション制御の AgentDevFlow 側集約）
 
 ### 文書
