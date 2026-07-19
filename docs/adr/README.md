@@ -4,7 +4,7 @@
 
 ## 現行基盤ビュー
 
-承認済みステータス（accepted）の ADR-01XX 23件が、現在のアーキテクチャ判断の基盤である。
+承認済みステータス（accepted）の ADR-01XX 24件が、現在のアーキテクチャ判断の基盤である。
 各 ADR は基準再編により旧 ADR の内容を統合、再定義している。
 現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）、非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
 
@@ -34,6 +34,7 @@
 | ADR-0135 | Project Extensions Architecture | accepted | 2026-07-04 |
 | ADR-0136 | 配布物ハーネス境界の浄化 | accepted | 2026-07-12 |
 | ADR-0137 | case-auto における case-run インライン実行（多重委譲回避） | accepted | 2026-07-16 |
+| ADR-0138 | case-auto オーケストレーション制御の AgentDevFlow 側集約 | accepted | 2026-07-19 |
 
 > この README は分類ビューであり、ADR本文のSSoTではない。
 > 基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
@@ -65,6 +66,7 @@
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
 - [ADR-0135](ADR-0135.md)（Project Extensions Architecture）
 - [ADR-0136](ADR-0136.md)（配布物ハーネス境界の浄化）
+- [ADR-0138](ADR-0138.md)（case-auto オーケストレーション制御の AgentDevFlow 側集約）
 
 ### 提案中（proposed）
 
@@ -114,6 +116,7 @@
 - [ADR-0129](ADR-0129.md)（複数 execution_unit 並列実行モデル）（複数 SSoT 並立と Epic 間並列 orchestration）
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
 - [ADR-0136](ADR-0136.md)（配布物ハーネス境界の浄化）
+- [ADR-0138](ADR-0138.md)（case-auto オーケストレーション制御の AgentDevFlow 側集約）
 
 ### 文書
 
@@ -195,6 +198,10 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0136 | relates-to | ADR-0114 | case-run 実行委譲の結果契約拡張（3状態→4状態、delegation-unavailable 追加） |
 | ADR-0136 | relates-to | ADR-0127 | case-auto 構成工程委譲の harness 固有詳細除去 |
 | ADR-0136 | relates-to | ADR-0128 | case-run 実行委譲の harness 固有詳細除去 |
+| ADR-0138 | relates-to | ADR-0136 | case-auto の Phase 分離、固定並列数、bg task 状態管理を AgentDevFlow 側へ集約（決定2の限定注記） |
+| ADR-0138 | relates-to | ADR-0137 | case-run インライン実行モデルを維持しつつ Phase 2 並列実行の安全境界を規定 |
+| ADR-0138 | relates-to | ADR-0129 | 複数 execution_unit 並列実行モデルの上に Phase 分離モデルを重ね、Phase 2 同時起動数を固定値5として規定 |
+| ADR-0138 | relates-to | ADR-0132 | bg task 破棄時の状態別回復とコンフリクト解消モデルの協調 |
 
 ## 関連 REQ
 
@@ -227,6 +234,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0134 | [REQ-0159](../requirements/REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 |
 | ADR-0135 | [REQ-0160](../requirements/REQ-0160.md), [REQ-0103](../requirements/REQ-0103.md) | Project Extensions Architecture（doc-inputs から project-extensions への全面置換） |
 | ADR-0136 | [REQ-0162](../requirements/REQ-0162.md), [REQ-0139](../requirements/REQ-0139.md), [REQ-0130](../requirements/REQ-0130.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0151](../requirements/REQ-0151.md) | 配布物ハーネス境界の浄化（harness 固有詳細の配布物からの除去、4状態結果契約） |
+| ADR-0138 | [REQ-0114](../requirements/REQ-0114.md), [REQ-0148](../requirements/REQ-0148.md), [REQ-0162](../requirements/REQ-0162.md) | case-auto オーケストレーション制御の AgentDevFlow 側集約（Phase 分離、固定並列数、bg task 状態管理と回復） |
 
 ## 廃止済み、履歴ビュー
 

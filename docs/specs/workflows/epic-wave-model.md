@@ -2,7 +2,7 @@
 title: Epic / Wave / Issue 実行モデル
 status: accepted
 created: 2026-06-21
-updated: 2026-07-12
+updated: 2026-07-19
 ---
 
 # Epic / Wave / Issue 実行モデル
@@ -244,6 +244,12 @@ case-auto は case-open が生成した execution_unit 群（standard | epic の
 - PR マージコンフリクト発生時は 3レベルコンフリクト解消モデル（ADR-0132、REQ-0151）に従う。Level 1 は case-close が rebase による機械的解消を試みる（REQ-0148-024、REQ-0151-001）。Level 2 は case-auto が両PRのdiffを読み取りコンフリクト文脈を付けて case-run へ再委譲する（最大2回、計3回の case-run 実行、REQ-0151-003/004）。Level 3 は case-auto がマージ順序変更、blocked 単位の隔離（REQ-0148-015 拡張）を行う。3段階すべてを試行しても解消できない場合のみ停止する（REQ-0151-006）。worktree 分離により作業自体は並列可能であり、マージコンフリクト解決コストを受容する（ADR-0129）。詳細は `docs/specs/commands/case-auto.md` コンフリクト解消モデル、`docs/specs/commands/case-close.md` Step 4-2 参照
 
 詳細な orchestration ロジック（blocked 部分停止、ready 継続判定フロー、execution_unit 群反復制御）は `docs/specs/commands/case-auto.md` 参照。
+
+## ドラフト間並列実行モデル（REQ-0114-102〜107、ADR-0138）
+
+case-auto が複数の対象を処理する場合、Phase 分離モデルを適用する。Phase 1 は case-open を順次実行し、Phase 2 は case-run を bg task として最大5件ずつ並列実行し、Phase 3 は case-close を順次実行する。Phase 1 と Phase 3 を main push と capture の直列集約ポイントとし、commit も並列実行区間の外で処理する。
+
+Phase 2 の bg task がシステムにより破棄されたことを検知した場合、commit 済みで PR 未作成の状態と未コミット変更が残る状態を区別し、それぞれの状態に対応する回復パターンを適用する。実行担当サブエージェント内部の制御と bg task API の具体は harness 側に維持する。並列実行が利用できない場合だけ順次フォールバックを使用し、理由を完了報告に残す。
 
 ## 前工程完了度3段階分類（REQ-0146-010）
 
