@@ -8,8 +8,7 @@
 #
 # ファイル構成（REQ-0156-011 スキーマ）:
 #   scope          : 検査対象範囲。全エントリで共有する top-level フィールド。
-#                    include / exclude は glob リスト。exclude は必ず
-#                    docs/requirements/retired/** と docs/adr/retired/** を含める。
+#                    include / exclude は glob リスト。
 #   entries[]      : 旧→新パス対応エントリのリスト。各エントリは以下を持つ:
 #     old          : 旧SPEC直下パス（docs/specs/<name>.md 形式）
 #     new          : 現行ドメイン分割パス（docs/specs/<domain>/<name>.md 形式）
@@ -19,9 +18,9 @@
 #   generated_by_combination_rule        : generated_by と local-opencode-transform
 #                    の組み合わせ検出ルール。
 #
-# 検査対象外（scope.exclude）は履歴参照領域。retired/ 配下は旧パスを履歴として
-# 残すことを許容するため、IR-057 検査から除外する。現行ADRに歴史的経緯として
-# 旧パスを記載する場合は rule 側で例外登録する（IR-057 rule ファイル参照）。
+# 検査対象外（scope.exclude）は IR-057 の検査対象から除外する領域である。
+# 現行ADRに歴史的経緯として旧パスを記載する場合は rule 側で例外登録する
+# （IR-057 rule ファイル参照）。
 #
 # 運用手順（REQ-0156-010、REQ-0156-006 の具体化）:
 #   docs/specs/ 配下でドメイン分割による移送が発生した場合、移送実行者は
@@ -30,7 +29,7 @@
 #     1. 移送対象ファイルの docs/specs/ 直下パス（old）と移送先ドメインパス（new）を確認
 #     2. entries へ old / new / severity="ng" のエントリを追加
 #     3. check_integrity.ts（IR-057）を実行し、旧パス混入が検出できることを確認（REQ-0156-012）
-#     4. scope.exclude から retired 領域が除外されていることを維持
+#     4. scope.exclude の内容が現行の検査対象外定義と一致することを確認
 #   追記漏れを防ぐため、移送 PR のレビューで本 yaml の追記有無を必ず確認する。
 
 version: "1"
@@ -42,9 +41,7 @@ scope:
     - "docs/**"
     - "src/**"
     - ".opencode/**"
-  exclude:
-    - "docs/requirements/retired/**"
-    - "docs/adr/retired/**"
+  exclude: []
 
 entries:
   # foundations/（基盤モデル）

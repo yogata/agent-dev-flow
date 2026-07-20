@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-12
+updated: 2026-07-20
 ---
 
 # 文書モデル
@@ -161,7 +161,7 @@ DOC-MAP（索引）/ Guides（案内）
 ```
 
 - REQ は領域別の総体として管理する。変更の都度 REQ を作成せず、既存 REQ への APPEND / UPDATE で対応する。
-- ADR は `proposed` → `accepted` / `superseded` / `deprecated` の状態遷移を持つ。現行基準（`baseline`）は ADR-0101 以降（現行 ADR コレクション）。ADR-0001〜0099 は `docs/adr/retired/` に配置された履歴番号帯である（REQ-0112-047, 048）。
+- ADR は `proposed` → `accepted` / `superseded` / `deprecated` の状態遷移を持つ。現行基準（`baseline`）は ADR-0101 以降（現行 ADR コレクション）。ADR-0001〜0099 は過去に存在した履歴番号帯である（実体は2026-07-20に物理削除）（REQ-0112-047, 048）。
 - SPEC は実装とともに変化する「生きた文書」である。REQ や ADR の判断内容を代替しない。
 - DOC-MAP は非正規索引であり、REQ/ADR/SPEC の内容を代替しない。
 - Guides はナビゲーション層であり、規範文書ではない。
@@ -220,12 +220,12 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 | 規則 | 内容 |
 |---|---|
 | REQ ID | 4 桁ゼロ埋めの安定 ID。現行、廃止を問わず再利用しない |
-| ADR ID | 4 桁ゼロ埋め。現行基準（`baseline`）は ADR-0101 以降（現行コレクション）。旧番号帯 ADR-0001〜0099 は廃止（`docs/adr/retired/`）。状態は frontmatter で管理（REQ-0112-047, 048） |
+| ADR ID | 4 桁ゼロ埋め。現行基準（`baseline`）は ADR-0101 以降（現行コレクション）。旧番号帯 ADR-0001〜0099 は廃止され、実体は物理削除済みである。状態は frontmatter で管理（REQ-0112-047, 048） |
 | SPEC 配置 | `docs/specs/**/*.md`（基盤SPECは6ドメインディレクトリ、他は commands/skills/workflows の3層。詳細は「docs/specs/ 直下のドメイン別体系化」参照） |
 | SPEC status | frontmatter `status`（`draft` / `accepted`）。既定は `draft`（spec-save 新規作成時）。`status` なしは `accepted` 相当（ADR-0123） |
 | Guides 配置 | `docs/guides/*.md` 直下 |
-| 廃止 REQ | `docs/requirements/retired/` に配置。現行要件判断に使用しない |
-| 廃止 ADR | `docs/adr/retired/` に配置。現行根拠として使用しない。履歴参照時は廃止パスを明示（REQ-0112-048） |
+| 廃止 REQ | 物理削除を第一選択肢とし、運用上は `docs/requirements/retired/` へ移動する選択肢も残す。現行要件判断に使用しない |
+| 廃止 ADR | 物理削除を第一選択肢とし、運用上は `docs/adr/retired/` へ移動する選択肢も残す。現行根拠として使用しない。履歴参照時は廃止パスを明示（REQ-0112-048） |
 
 ## ADR 編集制約
 
@@ -299,7 +299,7 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 文書体系の全面改訂時の取り扱いを定義する。
 
 - **全面改訂は世代交代であり、上書きではない**
-- 世代交代の例: ADR 基準（`baseline`）再編（ADR-0001〜0023 → ADR-0101〜0112）。旧番号帯は `docs/adr/retired/` に配置し、現行判断の基盤は新番号帯にある
+- 世代交代の例: ADR 基準（`baseline`）再編（ADR-0001〜0023 → ADR-0101〜0112）。旧番号帯は物理削除済みであり、現行判断の基盤は新番号帯にある
 - 新世代の創設時は、旧世代から引き継ぐ判断内容、移管先、移管しない判断を明示する
 - 旧世代は履歴参照専用とし、現行判断の根拠として引用しない
 
