@@ -5,7 +5,7 @@
 ## 現行基盤ビュー
 
 <!-- AUTOGEN:BEGIN:id=adr-baseline-count -->
-承認済みステータス（accepted）の ADR-01XX 25件が、現在のアーキテクチャ判断の基盤である。
+承認済みステータス（accepted）の ADR-01XX 26件が、現在のアーキテクチャ判断の基盤である。
 <!-- AUTOGEN:END -->
 各 ADR は基準再編により旧 ADR の内容を統合、再定義している。
 現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）、非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
@@ -34,6 +34,7 @@
 | ADR-0130 | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 | accepted | 2026-06-23 |
 | ADR-0131 | ローカル版導入方式を link mode へ統一し生成方式を廃止 | accepted | 2026-06-23 |
 | ADR-0132 | コンフリクト解消モデル（3レベルエスカレーションと責務割当） | accepted | 2026-06-24 |
+| ADR-0134 | 配布物依存スキルの src 昇格方針 | accepted | 2026-07-03 |
 | ADR-0135 | Project Extensions Architecture | accepted | 2026-07-04 |
 | ADR-0136 | 配布物の harness 実行制御分離 | accepted | 2026-07-12 |
 | ADR-0137 | case-auto における case-run インライン実行（多重委譲回避） | accepted | 2026-07-16 |
@@ -69,6 +70,7 @@
 - [ADR-0130](ADR-0130.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）
 - [ADR-0131](ADR-0131.md)（ローカル版導入方式を link mode へ統一し生成方式を廃止）
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
+- [ADR-0134](ADR-0134.md)（配布物依存スキルの src 昇格方針）
 - [ADR-0135](ADR-0135.md)（Project Extensions Architecture）
 - [ADR-0136](ADR-0136.md)（配布物の harness 実行制御分離）
 - [ADR-0137](ADR-0137.md)（case-auto における case-run インライン実行（多重委譲回避））
@@ -78,7 +80,6 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=adr-status-proposed -->
-- [ADR-0134](ADR-0134.md)（配布物依存スキルの src 昇格方針）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
