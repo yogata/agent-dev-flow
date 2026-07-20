@@ -16,7 +16,7 @@ description: Provides requirement analysis methods with quality criteria and ADR
 ## 原本（SSoT）
 
 本スキルの原本仕様は [`agentdev-req-analysis` SPEC](../../../../docs/specs/skills/agentdev-req-analysis.md) である。
-本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
