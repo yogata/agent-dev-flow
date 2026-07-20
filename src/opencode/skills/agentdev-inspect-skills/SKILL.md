@@ -8,6 +8,12 @@ description: Diagnoses Command to Skill reference validity, Skill structure, exe
 Command→Skill 参照妥当性、Skill 粒度、Skill 構造、実行主体分類を検査対象（Command/Skill 定義ファイル）を直接修正せずに診断する。
 修正は実行せず、検出事項、分類、根拠、推奨 route を提示する。
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-inspect-skills` SPEC](../../../../docs/specs/skills/agentdev-inspect-skills.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR）。

@@ -11,6 +11,12 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 - **参照元**: `case-close`（completed/ blocked/ failed 更新、単一書き手）。`case-auto`、`case-run` は Epic Issue 本文を読み取るのみで書き込まない
 - **`⏭スキップ` は採用しない**。前提未達の Issue は `pending` のまま選択対象外となる。Wave status は保存せず、Wave 内 Issue 状態から導出する
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-epic-tracker` SPEC](../../../../docs/specs/skills/agentdev-epic-tracker.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR）。

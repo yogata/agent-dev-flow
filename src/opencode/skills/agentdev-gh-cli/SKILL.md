@@ -8,6 +8,12 @@ description: AgentDevFlow の GitHub Issue/PR I/O を集約する中央集権的
 GitHub Issue/PR の I/O 手続きと VERIFY を集約する中央集権的な I/O 境界（REQ, ADR）。
 command と skill は gh コマンドを直接記述せず、本スキルの手続きへ委譲する（REQ/006/007）。
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-gh-cli` SPEC](../../../../docs/specs/skills/agentdev-gh-cli.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## 責務
 
 ### 担当

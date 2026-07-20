@@ -8,6 +8,12 @@ description: Resolves project-specific extensions (.agentdev/extensions/**) for 
 実行時に自分に対応する project extension を読み込み、プロジェクト固有の文脈、規約、検査、受け入れゲート、禁止事項を解決する。
 配布 command/skill 本文はプロジェクト非依存であり、プロジェクト固有情報は `.agentdev/extensions/**` 経由で実行時に与えられる。
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-project-extensions` SPEC](../../../../docs/specs/skills/agentdev-project-extensions.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## 担当、非担当
 
 ### 担当

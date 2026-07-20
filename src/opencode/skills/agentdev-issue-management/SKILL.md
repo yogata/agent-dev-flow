@@ -8,6 +8,12 @@ description: Enforces safe GitHub Issue operation procedures for creation, updat
 GitHub Issue の作成、更新、リンク、確認を安全に行うための操作手順を提供するスキル。
 `agentdev-gh-cli` の VERIFY 操作（書き込み内容検証）と連携し、Issue 操作特有の安全性要件を補完する。
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-issue-management` SPEC](../../../../docs/specs/skills/agentdev-issue-management.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## USE FOR
 
 - GitHub Issue の作成、更新、リンク、確認の安全手順

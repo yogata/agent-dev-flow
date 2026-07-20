@@ -12,6 +12,12 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 
 ---
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-req-file-manager` SPEC](../../../../docs/specs/skills/agentdev-req-file-manager.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR）。
@@ -20,13 +26,6 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-req-file-manager.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
 3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
-
-## 概要
-
-REQファイルの作成、追記、更新を管理する。
-各操作は宣言的に定義され、エージェントがコンテキストに応じて適切なモードを選択する。
-
----
 
 ## REQ番号採番と要件行記述
 
