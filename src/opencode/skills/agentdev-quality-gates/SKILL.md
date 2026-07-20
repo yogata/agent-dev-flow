@@ -8,6 +8,12 @@ description: "Defines lightweight quality gates for AgentDevFlow main workflow. 
 AgentDevFlow 主ワークフローの品質ゲート QG-1〜QG-4 の判定基準、検査観点を提供する knowledge base。
 本スキルは参照専用であり、ファイル編集、Issue 作成、PR 作成、マージ、テスト実行は行わない。
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-quality-gates` SPEC](../../../../docs/specs/skills/agentdev-quality-gates.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR）。

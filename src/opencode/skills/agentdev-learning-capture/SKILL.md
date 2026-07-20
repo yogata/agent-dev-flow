@@ -7,6 +7,12 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 会話中にエージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/learning/inbox.md` に蓄積するスキル。
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-learning-capture` SPEC](../../../../docs/specs/skills/agentdev-learning-capture.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR）。

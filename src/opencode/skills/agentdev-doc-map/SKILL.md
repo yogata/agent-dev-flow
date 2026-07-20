@@ -8,7 +8,11 @@ description: DOC-MAP reading guide and document exploration order. USE FOR: unde
 DOC-MAP（`docs/DOC-MAP.md`）は、AgentDevFlow ドキュメント体系の探索経路インデックスである。
 このスキルは DOC-MAP の位置づけ、読み方、および関連ドキュメント探索順序を定義する。
 
----
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-doc-map` SPEC](../../../../docs/specs/skills/agentdev-doc-map.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
 

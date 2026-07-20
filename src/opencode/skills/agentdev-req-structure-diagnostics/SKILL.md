@@ -9,6 +9,12 @@ inspect-docs コマンドの REQ 構造診断知識ベース。
 REQ参照ID整合性、第一参照導線、現行/廃止/世代境界、6観点診断、未処理成果物確認、問題候補出力スキーマの判定基準と検出シグナルを提供する。
 検査対象を直接修正しない診断専用であり、本スキルは判定ロジックの提供のみを行い、ファイル変更や成果物処理は行わない。
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-req-structure-diagnostics` SPEC](../../../../docs/specs/skills/agentdev-req-structure-diagnostics.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR）。

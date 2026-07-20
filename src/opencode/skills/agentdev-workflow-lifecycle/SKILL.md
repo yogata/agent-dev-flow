@@ -7,6 +7,12 @@ description: Provides development workflow phase definitions, SSoT transitions, 
 
 agentdev系コマンドのフェーズ定義、SSoT遷移、work_type 判定基準、コマンド関連を提供する。
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-workflow-lifecycle` SPEC](../../../../docs/specs/skills/agentdev-workflow-lifecycle.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ---
 
 ## USE FOR

@@ -7,6 +7,12 @@ description: intake-from-github（GitHub残課題抽出）と intake-promote（r
 
 intake-from-github と intake-promote コマンドの知識ベース。
 
+## 原本（SSoT）
+
+本スキルの原本仕様は [`agentdev-intake-pipeline` SPEC](../../../../docs/specs/skills/agentdev-intake-pipeline.md) である。
+本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する。機能節の記述は SPEC と整合し、SKILL.md 固有の運用ビュー、参照資料、トリガーを補完する。SPEC と重複する場合、SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
 ## USE FOR
 
 - GitHub intake抽出ロジック: 期間解釈、データ取得、構造検出、LLM全文解析、intake item生成
