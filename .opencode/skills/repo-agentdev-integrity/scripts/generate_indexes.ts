@@ -745,6 +745,25 @@ export function countSpecFiles(specsDir: string): number {
   return count;
 }
 
+// ─── AG-006候補2: docs/README.md 件数表明 (Phase E 残) ────────────────────────
+
+export const README_REQ_SUMMARY_COUNT_BLOCK_ID = "readme-req-summary-count";
+
+/**
+ * docs/README.md「要件」セクション冒頭の件数表明 AUTOGEN ブロック本体（1行）。
+ * 形式: "現行 REQ: N件、廃止済み: M件"
+ *
+ * docs/README.md は入口文書であり、REQ 詳細一覧は docs/requirements/README.md へ誘導する。
+ * 件数表明のみを AUTOGEN 化し、続く説明文（範囲、関連 ADR 等）は人手編集領域として残置する
+ * （SC-002 SPEC「件数表明」自動生成原則、Wave 5 Phase E 残）。
+ */
+export function generateReadmeReqSummaryCount(args: {
+  activeReqCount: number;
+  retiredReqCount: number;
+}): string[] {
+  return [`現行 REQ: ${args.activeReqCount}件、廃止済み: ${args.retiredReqCount}件`];
+}
+
 // ─── AG-006候補5: REQ/SPEC 健全性メトリクス計測例生成 (Phase C 拡張) ────────
 
 export const REQ_METRICS_BLOCK_ID = "req-metrics-measurement-example";
@@ -1080,6 +1099,8 @@ TARGET FILES (SC-002 Phase C):
   Wave 3 (AG-006 候補5):
     - docs/specs/quality/req-health-metrics.md (REQ line count + signal table)
     - docs/specs/quality/spec-health-metrics.md (SPEC line count + status + domain table)
+  Wave 5 (Phase E 残):
+    - docs/README.md (REQ count summary only; detailed table is hand-curated)
 
 GENERATION SOURCE:
   - docs/specs/integrity/rules/IR-*.md (frontmatter + body Field/Value table)
@@ -1179,6 +1200,11 @@ RELATED:
   const specMetrics = collectSpecMetrics(specsDir);
   const reqMetricsTable = generateReqMetricsTable(reqMetrics, measureDate);
   const specMetricsTable = generateSpecMetricsTable(specMetrics, measureDate);
+
+  const readmeReqSummary = generateReadmeReqSummaryCount({
+    activeReqCount: reqInfos.length,
+    retiredReqCount: reqRetiredInfos.length,
+  });
 
   const { pre: catalogPre, post: catalogPost } = generateCatalogBlocks(infos);
   const ruleOwnershipLines = generateRuleOwnershipAppendix(infos);
@@ -1408,6 +1434,32 @@ RELATED:
     updates.push({ file: specHealthMetricsPath, content: specMetricsUpdated });
   }
 
+  // docs/README.md 更新 (Phase E 残, Wave 5)
+  const docsReadmePath = path.join(root, "docs", "README.md");
+  const docsReadmeOriginal = readText(docsReadmePath);
+  if (docsReadmeOriginal === null) {
+    console.error(
+      `[generate_indexes] docs/README.md not found: ${docsReadmePath}`,
+    );
+    process.exit(EXIT_ERROR);
+  }
+  if (!findAutogenBlocks(docsReadmeOriginal).some(
+    (b) => b.id === README_REQ_SUMMARY_COUNT_BLOCK_ID,
+  )) {
+    console.error(
+      `[generate_indexes] docs/README.md AUTOGEN marker not found. Expected id: ${README_REQ_SUMMARY_COUNT_BLOCK_ID}`,
+    );
+    process.exit(EXIT_ERROR);
+  }
+  const docsReadmeUpdated = replaceAutogenBlock(
+    docsReadmeOriginal,
+    README_REQ_SUMMARY_COUNT_BLOCK_ID,
+    readmeReqSummary,
+  );
+  if (docsReadmeUpdated !== docsReadmeOriginal) {
+    updates.push({ file: docsReadmePath, content: docsReadmeUpdated });
+  }
+
   if (options.dryRun) {
     console.log(
       `[generate_indexes] dry-run: ${infos.length} IR files collected`,
@@ -1435,6 +1487,9 @@ RELATED:
     );
     console.log(
       `[generate_indexes] spec-health-metrics: ${specMetrics.length} SPECs (measure date ${measureDate})`,
+    );
+    console.log(
+      `[generate_indexes] docs/README.md: REQ summary active=${reqInfos.length} retired=${reqRetiredInfos.length}`,
     );
     for (const u of updates) {
       console.log(`[generate_indexes] WOULD UPDATE: ${u.file}`);
