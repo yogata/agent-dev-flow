@@ -1,11 +1,14 @@
 ---
 title: 監査台帳ライフサイクル SPEC
-status: accepted
+status: superseded
+superseded_by: ../workflows/backlog-artifact-lifecycle.md
 created: 2026-07-19
 updated: 2026-07-20
 ---
 
 # 監査台帳ライフサイクル SPEC
+
+> 本 SPEC は docs/specs/workflows/backlog-artifact-lifecycle.md へ統合済みであり、現行契約としては参照しないこと。履歴参照用途。
 
 one-time 監査成果物（監査台帳、照合表、一時分析ファイル等）のライフサイクルを一般化し、生成、参照、フェーズ参照化、廃棄の各段階で満たすべき条件を定義する。フェーズ横断の進捗管理台帳として恒久化せず、一定の完了条件を満たした時点で廃棄する運用を確立する（AG-009、CR-004）。
 
