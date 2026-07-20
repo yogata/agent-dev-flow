@@ -56,6 +56,13 @@ import {
   REQ_ACTIVE_TABLE_BLOCK_ID,
   REQ_RETIRED_TABLE_BLOCK_ID,
   DOCMAP_INVENTORY_BLOCK_ID,
+  REQ_METRICS_BLOCK_ID,
+  SPEC_METRICS_BLOCK_ID,
+  collectReqMetrics,
+  collectSpecMetrics,
+  generateReqMetricsTable,
+  generateSpecMetricsTable,
+  formatMeasureDate,
 } from "./generate_indexes.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
@@ -8043,12 +8050,61 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
     foundViolation = docMapOutcome.foundViolation;
   }
 
+  // AG-006 候補5 (Wave 3): req-health-metrics.md — 1 AUTOGEN block
+  const qualityDir = path.join(specsDir, "quality");
+  const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
+  const reqHealthMetricsContent = readText(reqHealthMetricsPath);
+  if (reqHealthMetricsContent !== null && fs.existsSync(reqDir)) {
+    const measureDate = formatMeasureDate(new Date());
+    const reqMetrics = collectReqMetrics(reqDir);
+    const reqMetricsSpecs: AutogenBlockSpec[] = [
+      {
+        blockId: REQ_METRICS_BLOCK_ID,
+        expected: generateReqMetricsTable(reqMetrics, measureDate),
+        label: "req-metrics-measurement-example",
+      },
+    ];
+    const reqMetricsOutcome = verifyAutogenBlocksInFile(
+      reqHealthMetricsContent,
+      reqHealthMetricsPath,
+      root,
+      reqMetricsSpecs,
+      foundViolation,
+    );
+    results.push(...reqMetricsOutcome.results);
+    foundViolation = reqMetricsOutcome.foundViolation;
+  }
+
+  // AG-006 候補5 (Wave 3): spec-health-metrics.md — 1 AUTOGEN block
+  const specHealthMetricsPath = path.join(qualityDir, "spec-health-metrics.md");
+  const specHealthMetricsContent = readText(specHealthMetricsPath);
+  if (specHealthMetricsContent !== null) {
+    const measureDate = formatMeasureDate(new Date());
+    const specMetrics = collectSpecMetrics(specsDir);
+    const specMetricsSpecs: AutogenBlockSpec[] = [
+      {
+        blockId: SPEC_METRICS_BLOCK_ID,
+        expected: generateSpecMetricsTable(specMetrics, measureDate),
+        label: "spec-metrics-measurement-example",
+      },
+    ];
+    const specMetricsOutcome = verifyAutogenBlocksInFile(
+      specHealthMetricsContent,
+      specHealthMetricsPath,
+      root,
+      specMetricsSpecs,
+      foundViolation,
+    );
+    results.push(...specMetricsOutcome.results);
+    foundViolation = specMetricsOutcome.foundViolation;
+  }
+
   if (!foundViolation) {
     results.push(
       ok(
         "IndexGenerationConsistency",
         "index-generation-consistency",
-        `索引類自動生成整合性: All AUTOGEN blocks consistent (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership=${expectedRuleOwnership.length}; ADR README + REQ README + DOC-MAP) (IR-061, SC-002 Phase C)`,
+        `索引類自動生成整合性: All AUTOGEN blocks consistent (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership=${expectedRuleOwnership.length}; ADR README + REQ README + DOC-MAP + req-health-metrics + spec-health-metrics) (IR-061, SC-002 Phase C)`,
       ),
     );
   }
