@@ -457,6 +457,7 @@ const CHECK_TO_FINDING_CATEGORY: Record<string, FindingCategory> = {
   "accepted-adr-only-citation": "workflow-gap",
   "non-accepted-adr-refs": "workflow-gap",
   "draft-spec-staleness": "document-drift",
+  "index-generation-consistency": "broken-reference",
 };
 
 function classifyArtifactType(category: string): string {
