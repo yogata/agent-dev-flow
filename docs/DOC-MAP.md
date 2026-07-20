@@ -14,6 +14,15 @@
 | Guides | `guides/*.md` | 人間向けの案内層。規範的権限を持たない（ADR-0103） |
 | DOC-MAP | このファイル | 文書探索入口 |
 
+## インデックス統計（自動生成）
+
+<!-- AUTOGEN:BEGIN:id=docmap-inventory -->
+- 現行 REQ: 54件（`docs/requirements/REQ-*.md`）
+- 廃止済み REQ: 58件（`docs/requirements/retired/REQ-*.md`）
+- ADR: 29件（`docs/adr/ADR-*.md`）、retired: 23件（`docs/adr/retired/ADR-*.md`）
+- SPEC: 142件（`docs/specs/**/*.md`）
+<!-- AUTOGEN:END -->
+
 ## 現行 REQ
 
 | REQ | タイトル | 概要 |

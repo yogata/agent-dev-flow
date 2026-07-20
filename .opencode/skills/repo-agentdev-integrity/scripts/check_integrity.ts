@@ -32,6 +32,30 @@ import {
   CATALOG_PRE_BLOCK_ID,
   CATALOG_POST_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
+  collectAdrFiles,
+  collectRetiredAdrFiles,
+  collectReqFiles,
+  collectRetiredReqFiles,
+  countSpecFiles,
+  generateAdrBaselineCaption,
+  generateAdrBaselineTable,
+  generateAdrStatusList,
+  generateAdrRetiredTable,
+  generateReqActiveCaption,
+  generateReqActiveTable,
+  generateReqRetiredTable,
+  generateDocMapInventory,
+  ADR_BASELINE_COUNT_BLOCK_ID,
+  ADR_BASELINE_TABLE_BLOCK_ID,
+  ADR_STATUS_ACCEPTED_BLOCK_ID,
+  ADR_STATUS_PROPOSED_BLOCK_ID,
+  ADR_STATUS_SUPERSEDED_BLOCK_ID,
+  ADR_STATUS_DEPRECATED_BLOCK_ID,
+  ADR_RETIRED_TABLE_BLOCK_ID,
+  REQ_ACTIVE_COUNT_BLOCK_ID,
+  REQ_ACTIVE_TABLE_BLOCK_ID,
+  REQ_RETIRED_TABLE_BLOCK_ID,
+  DOCMAP_INVENTORY_BLOCK_ID,
 } from "./generate_indexes.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
@@ -7937,16 +7961,155 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
     }
   }
 
+  // AG-008: ADR README (docs/adr/README.md) — 7 AUTOGEN blocks
+  const adrDir = path.join(root, "docs", "adr");
+  const adrRetiredDir = path.join(adrDir, "retired");
+  const adrReadmePath = path.join(adrDir, "README.md");
+  const adrReadmeContent = readText(adrReadmePath);
+  if (adrReadmeContent !== null && fs.existsSync(adrDir)) {
+    const adrInfos = collectAdrFiles(adrDir);
+    const adrRetiredInfos = collectRetiredAdrFiles(adrRetiredDir);
+    const acceptedAdrs = adrInfos.filter((a) => a.status === "accepted");
+    const adrSpecs: AutogenBlockSpec[] = [
+      { blockId: ADR_BASELINE_COUNT_BLOCK_ID, expected: generateAdrBaselineCaption(acceptedAdrs), label: "adr-baseline-count" },
+      { blockId: ADR_BASELINE_TABLE_BLOCK_ID, expected: generateAdrBaselineTable(acceptedAdrs), label: "adr-baseline-table" },
+      { blockId: ADR_STATUS_ACCEPTED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "accepted"), label: "adr-status-accepted" },
+      { blockId: ADR_STATUS_PROPOSED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "proposed"), label: "adr-status-proposed" },
+      { blockId: ADR_STATUS_SUPERSEDED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "superseded"), label: "adr-status-superseded" },
+      { blockId: ADR_STATUS_DEPRECATED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "deprecated"), label: "adr-status-deprecated" },
+      { blockId: ADR_RETIRED_TABLE_BLOCK_ID, expected: generateAdrRetiredTable(adrRetiredInfos), label: "adr-retired-table" },
+    ];
+    const adrOutcome = verifyAutogenBlocksInFile(
+      adrReadmeContent,
+      adrReadmePath,
+      root,
+      adrSpecs,
+      foundViolation,
+    );
+    results.push(...adrOutcome.results);
+    foundViolation = adrOutcome.foundViolation;
+  }
+
+  // AG-009: REQ README (docs/requirements/README.md) — 3 AUTOGEN blocks
+  const reqDir = path.join(root, "docs", "requirements");
+  const reqRetiredDir = path.join(reqDir, "retired");
+  const reqReadmePath = path.join(reqDir, "README.md");
+  const reqReadmeContent = readText(reqReadmePath);
+  if (reqReadmeContent !== null && fs.existsSync(reqDir)) {
+    const reqInfos = collectReqFiles(reqDir);
+    const reqRetiredInfos = collectRetiredReqFiles(reqRetiredDir);
+    const reqSpecs: AutogenBlockSpec[] = [
+      { blockId: REQ_ACTIVE_COUNT_BLOCK_ID, expected: generateReqActiveCaption(reqInfos), label: "req-active-count" },
+      { blockId: REQ_ACTIVE_TABLE_BLOCK_ID, expected: generateReqActiveTable(reqInfos), label: "req-active-table" },
+      { blockId: REQ_RETIRED_TABLE_BLOCK_ID, expected: generateReqRetiredTable(reqRetiredInfos), label: "req-retired-table" },
+    ];
+    const reqOutcome = verifyAutogenBlocksInFile(
+      reqReadmeContent,
+      reqReadmePath,
+      root,
+      reqSpecs,
+      foundViolation,
+    );
+    results.push(...reqOutcome.results);
+    foundViolation = reqOutcome.foundViolation;
+  }
+
+  // AG-013: DOC-MAP (docs/DOC-MAP.md) — 1 AUTOGEN block
+  const specsDir = path.join(root, "docs", "specs");
+  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
+  const docMapContent = readText(docMapPath);
+  if (docMapContent !== null) {
+    const docMapSpecs: AutogenBlockSpec[] = [
+      {
+        blockId: DOCMAP_INVENTORY_BLOCK_ID,
+        expected: generateDocMapInventory({
+          activeReqCount: fs.existsSync(reqDir) ? collectReqFiles(reqDir).length : 0,
+          retiredReqCount: fs.existsSync(reqRetiredDir) ? collectRetiredReqFiles(reqRetiredDir).length : 0,
+          activeAdrCount: fs.existsSync(adrDir) ? collectAdrFiles(adrDir).length : 0,
+          retiredAdrCount: fs.existsSync(adrRetiredDir) ? collectRetiredAdrFiles(adrRetiredDir).length : 0,
+          specCount: countSpecFiles(specsDir),
+        }),
+        label: "docmap-inventory",
+      },
+    ];
+    const docMapOutcome = verifyAutogenBlocksInFile(
+      docMapContent,
+      docMapPath,
+      root,
+      docMapSpecs,
+      foundViolation,
+    );
+    results.push(...docMapOutcome.results);
+    foundViolation = docMapOutcome.foundViolation;
+  }
+
   if (!foundViolation) {
     results.push(
       ok(
         "IndexGenerationConsistency",
         "index-generation-consistency",
-        `索引類自動生成整合性: All AUTOGEN blocks consistent with IR-* files (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership appendix=${expectedRuleOwnership.length} rows) (IR-061, SC-002 Phase C)`,
+        `索引類自動生成整合性: All AUTOGEN blocks consistent (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership=${expectedRuleOwnership.length}; ADR README + REQ README + DOC-MAP) (IR-061, SC-002 Phase C)`,
       ),
     );
   }
   return results;
+}
+
+interface AutogenBlockSpec {
+  blockId: string;
+  expected: string[];
+  label: string;
+}
+
+function verifyAutogenBlocksInFile(
+  content: string,
+  filePath: string,
+  root: string,
+  specs: AutogenBlockSpec[],
+  foundViolationIn: boolean,
+): { results: CheckResult[]; foundViolation: boolean } {
+  const results: CheckResult[] = [];
+  let foundViolation = foundViolationIn;
+  const blocks = findAutogenBlocks(content);
+
+  for (const spec of specs) {
+    const block = blocks.find((b) => b.id === spec.blockId);
+    if (!block) {
+      results.push(
+        info(
+          "IndexGenerationConsistency",
+          "index-generation-consistency",
+          `${spec.label} AUTOGEN marker not found; IR-061 ${spec.label} check skipped`,
+          resolveRelative(filePath, root),
+          1,
+        ),
+      );
+      continue;
+    }
+    const mismatchIndex = findFirstMismatch(block.currentBody, spec.expected);
+    if (mismatchIndex !== -1) {
+      foundViolation = true;
+      results.push(
+        ng(
+          "IndexGenerationConsistency",
+          "index-generation-consistency",
+          `${spec.label} AUTOGEN block out of sync. ` +
+            `first mismatch at line ${mismatchIndex + 1} (current=${truncateForLog(
+              block.currentBody[mismatchIndex],
+            )}, expected=${truncateForLog(spec.expected[mismatchIndex])}). ` +
+            `Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)`,
+          resolveRelative(filePath, root),
+          block.startLine + 1 + mismatchIndex,
+          {
+            evidence: `block_id=${spec.blockId}, current_lines=${block.currentBody.length}, expected_lines=${spec.expected.length}`,
+            expected: `AUTOGEN block contents must match source file derivation (${spec.label})`,
+            route: "intake",
+          },
+        ),
+      );
+    }
+  }
+  return { results, foundViolation };
 }
 
 /** 2つの行配列の最初の不一致インデックスを返す（一致時は -1）。 */

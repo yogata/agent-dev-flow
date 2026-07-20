@@ -4,37 +4,41 @@
 
 ## 現行基盤ビュー
 
+<!-- AUTOGEN:BEGIN:id=adr-baseline-count -->
 承認済みステータス（accepted）の ADR-01XX 25件が、現在のアーキテクチャ判断の基盤である。
+<!-- AUTOGEN:END -->
 各 ADR は基準再編により旧 ADR の内容を統合、再定義している。
 現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）、非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
 
+<!-- AUTOGEN:BEGIN:id=adr-baseline-table -->
 | ADR番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|
 | ADR-0101 | AgentDevFlow プラグイン名前空間の統一 | accepted | 2026-06-08 |
 | ADR-0102 | 実行時 / 編集時 関心分離 | accepted | 2026-06-08 |
-| ADR-0103 | 文書種別責務境界、記述対象境界 | accepted | 2026-06-08 |
+| ADR-0103 | 文書種別責務境界 | accepted | 2026-06-08 |
 | ADR-0104 | 実行時独立性 | accepted | 2026-06-08 |
-| ADR-0105 | OpenCode ソース、プロジェクション分離 | accepted | 2026-06-08 |
-| ADR-0106 | /repo/* Namespace for Repo-Local Tooling | accepted | 2026-06-08 |
+| ADR-0105 | OpenCode ソース・プロジェクション分離 | accepted | 2026-06-08 |
+| ADR-0106 | リポジトリローカルツールのための /repo/* 名前空間 | accepted | 2026-06-08 |
 | ADR-0107 | コマンド・スキル・テンプレート・スクリプト責任分界の正式定義 | accepted | 2026-06-08 |
 | ADR-0108 | オーケストレーションスキル作成基準の導入 | accepted | 2026-06-08 |
 | ADR-0109 | Epic Issue 本文を実行順序 SSoT とする設計 | accepted | 2026-06-08 |
 | ADR-0110 | DOC-MAP 採用判断 | accepted | 2026-06-08 |
 | ADR-0112 | サブエージェント委譲の一般化と委譲時最小契約 | accepted | 2026-06-10 |
 | ADR-0114 | case-run 実行責務の外部実行バックエンド委譲 | accepted | 2026-06-16 |
-| ADR-0123 | SPEC lifecycle と spec-save の導入 | accepted | 2026-06-18 |
-| ADR-0124 | req_draft soft-contract 原則: LLM推論消費、厳格schemaなし | accepted | 2026-06-19 |
+| ADR-0123 | SPEC ライフサイクルと spec-save の導入 | accepted | 2026-06-18 |
+| ADR-0124 | req_draft ソフトコントラクト原則: LLM推論消費・厳格スキーマなし | accepted | 2026-06-19 |
 | ADR-0125 | case-auto Wave 内並列子Issue実行モデル | accepted | 2026-06-20 |
 | ADR-0127 | case-auto 構成工程の委譲によるスケーラビリティ確立 | accepted | 2026-06-21 |
 | ADR-0128 | case-run の実行モデル: 実行担当サブエージェント委譲 | accepted | 2026-06-21 |
-| ADR-0129 | 複数 execution_unit 並列実行モデル（複数 SSoT 並立と Epic 間並列 orchestration）| accepted | 2026-06-23 |
+| ADR-0129 | 複数 execution_unit 並列実行モデル（複数 SSoT 並立と Epic 間並列 orchestration"） | accepted | 2026-06-23 |
 | ADR-0130 | `agentdev-gh-cli` を差し替え可能な I/O 境界として確立 | accepted | 2026-06-23 |
 | ADR-0131 | ローカル版導入方式を link mode へ統一し生成方式を廃止 | accepted | 2026-06-23 |
-| ADR-0132 | コンフリクト解消モデル（3レベルエスカレーションと責務割当）| accepted | 2026-06-24 |
+| ADR-0132 | コンフリクト解消モデル（3レベルエスカレーションと責務割当） | accepted | 2026-06-24 |
 | ADR-0135 | Project Extensions Architecture | accepted | 2026-07-04 |
-| ADR-0136 | 配布物ハーネス境界の浄化 | accepted | 2026-07-12 |
+| ADR-0136 | 配布物の harness 実行制御分離 | accepted | 2026-07-12 |
 | ADR-0137 | case-auto における case-run インライン実行（多重委譲回避） | accepted | 2026-07-16 |
 | ADR-0138 | case-auto オーケストレーション制御の AgentDevFlow 側集約 | accepted | 2026-07-19 |
+<!-- AUTOGEN:END -->
 
 > この README は分類ビューであり、ADR本文のSSoTではない。
 > 基準は各 `ADR-{NNNN}.md` ファイルである（REQ-0101）。
@@ -43,44 +47,52 @@
 
 ### 承認済み（accepted）
 
+<!-- AUTOGEN:BEGIN:id=adr-status-accepted -->
 - [ADR-0101](ADR-0101.md)（AgentDevFlow プラグイン名前空間の統一）
 - [ADR-0102](ADR-0102.md)（実行時 / 編集時 関心分離）
-- [ADR-0103](ADR-0103.md)（文書種別責務境界、記述対象境界）
+- [ADR-0103](ADR-0103.md)（文書種別責務境界）
 - [ADR-0104](ADR-0104.md)（実行時独立性）
-- [ADR-0105](ADR-0105.md)（OpenCode ソース、プロジェクション分離）
-- [ADR-0106](ADR-0106.md)（/repo/* Namespace for Repo-Local Tooling）
+- [ADR-0105](ADR-0105.md)（OpenCode ソース・プロジェクション分離）
+- [ADR-0106](ADR-0106.md)（リポジトリローカルツールのための /repo/* 名前空間）
 - [ADR-0107](ADR-0107.md)（コマンド・スキル・テンプレート・スクリプト責任分界の正式定義）
 - [ADR-0108](ADR-0108.md)（オーケストレーションスキル作成基準の導入）
 - [ADR-0109](ADR-0109.md)（Epic Issue 本文を実行順序 SSoT とする設計）
 - [ADR-0110](ADR-0110.md)（DOC-MAP 採用判断）
 - [ADR-0112](ADR-0112.md)（サブエージェント委譲の一般化と委譲時最小契約）
 - [ADR-0114](ADR-0114.md)（case-run 実行責務の外部実行バックエンド委譲）
-- [ADR-0123](ADR-0123.md)（SPEC lifecycle と spec-save の導入）
-- [ADR-0124](ADR-0124.md)（req_draft soft-contract 原則: LLM推論消費、厳格schemaなし）
+- [ADR-0123](ADR-0123.md)（SPEC ライフサイクルと spec-save の導入）
+- [ADR-0124](ADR-0124.md)（req_draft ソフトコントラクト原則: LLM推論消費・厳格スキーマなし）
 - [ADR-0125](ADR-0125.md)（case-auto Wave 内並列子Issue実行モデル）
 - [ADR-0127](ADR-0127.md)（case-auto 構成工程の委譲によるスケーラビリティ確立）
 - [ADR-0128](ADR-0128.md)（case-run の実行モデル: 実行担当サブエージェント委譲）
-- [ADR-0129](ADR-0129.md)（複数 execution_unit 並列実行モデル）（複数 SSoT 並立と Epic 間並列 orchestration）
+- [ADR-0129](ADR-0129.md)（複数 execution_unit 並列実行モデル（複数 SSoT 並立と Epic 間並列 orchestration"））
 - [ADR-0130](ADR-0130.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）
 - [ADR-0131](ADR-0131.md)（ローカル版導入方式を link mode へ統一し生成方式を廃止）
 - [ADR-0132](ADR-0132.md)（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
 - [ADR-0135](ADR-0135.md)（Project Extensions Architecture）
-- [ADR-0136](ADR-0136.md)（配布物ハーネス境界の浄化）
+- [ADR-0136](ADR-0136.md)（配布物の harness 実行制御分離）
 - [ADR-0137](ADR-0137.md)（case-auto における case-run インライン実行（多重委譲回避））
 - [ADR-0138](ADR-0138.md)（case-auto オーケストレーション制御の AgentDevFlow 側集約）
+<!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
+<!-- AUTOGEN:BEGIN:id=adr-status-proposed -->
 - [ADR-0134](ADR-0134.md)（配布物依存スキルの src 昇格方針）
+<!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
 
-- [ADR-0111](ADR-0111.md)（マネージャー、オーケストレータパターンの限定採用（superseded by ADR-0112））
-- [ADR-0126](ADR-0126.md)（ローカル版 OpenCode 生成基盤: source model 拡張と生成安全性制約（superseded by ADR-0131））
+<!-- AUTOGEN:BEGIN:id=adr-status-superseded -->
+- [ADR-0111](ADR-0111.md)（マネージャー・オーケストレータパターンの限定採用）
+- [ADR-0126](ADR-0126.md)（ローカル版 OpenCode 生成基盤: ソースモデル拡張と生成安全性制約）
+<!-- AUTOGEN:END -->
 
 ### 非推奨（deprecated）
 
-- [ADR-0113](ADR-0113.md)（診断ワークフロー導入とレビュー系コマンド完全削除（diagnostics → inspect 改名により現行根拠として非適用）。現行状態は REQ-0124 / SPEC 参照）
+<!-- AUTOGEN:BEGIN:id=adr-status-deprecated -->
+- [ADR-0113](ADR-0113.md)（診断ワークフロー導入とレビュー系コマンド完全削除）
+<!-- AUTOGEN:END -->
 
 ## トピック別ビュー
 
@@ -249,28 +261,32 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 ADR-0001 から ADR-0023 までの23件は、ADR-01XX 現行基盤導入に伴い `retired/` ディレクトリに移動された歴史的決定記録である。
 これらは再編前の判断を保持しており、現行アーキテクチャの基盤は上記 現行基盤ビューの ADR-01XX にある。
 
-| ADR番号 | タイトル | retired時ステータス | 引き継ぎ先 |
-|---------|---------|-------------------|-----------|
-| [ADR-0001](retired/ADR-0001.md) | Command/Skill/Template/Script責任分界の正式定義 | proposed | ADR-0107 |
-| [ADR-0002](retired/ADR-0002.md) | Orchestration skill作成基準の導入 | proposed | ADR-0108 |
-| [ADR-0003](retired/ADR-0003.md) | issue-req入力の抽象化 | deprecated | なし（再編前から非現行） |
-| [ADR-0004](retired/ADR-0004.md) | 要件管理構造の area-based 移行方針 | superseded | なし（再編前から非現行） |
-| [ADR-0005](retired/ADR-0005.md) | AgentDevFlow を配布 plugin 名として採用し、公開 command namespace を /agentdev/*、domain state を .agentdev/、skill prefix を agentdev-* に統一する | accepted | ADR-0101 |
-| [ADR-0006](retired/ADR-0006.md) | Epic Issue 本文を実行順序 SSoT とする設計 | proposed | ADR-0109 |
-| [ADR-0007](retired/ADR-0007.md) | REQ/ADR基準構造と分類ビュー運用の再定義 | superseded | なし（再編前から非現行） |
-| [ADR-0008](retired/ADR-0008.md) | DOC-MAP導入と requirements/views 廃止 | proposed | ADR-0110 |
-| [ADR-0009](retired/ADR-0009.md) | REQ体系再基準化（旧REQ分類モデル、対応表、分類ゲート導入）| deprecated | なし（再編前から非現行） |
-| [ADR-0010](retired/ADR-0010.md) | HITL boundary（全 agentdev command の Human-in-the-Loop 境界原則）| deprecated | なし（再編前から非現行） |
-| [ADR-0011](retired/ADR-0011.md) | マネージャー、オーケストレータパターンの限定採用（標準構造とはしない）| proposed | ADR-0111 |
-| [ADR-0012](retired/ADR-0012.md) | Requirement Source pipeline の正式定義（promoted→RU→req-define の一貫流）| deprecated | なし（再編前から非現行） |
-| [ADR-0013](retired/ADR-0013.md) | runtime / authoring 関心分離 | accepted | ADR-0102 |
-| [ADR-0014](retired/ADR-0014.md) | ADR / SPEC 再分類基準 | superseded | なし（再編前から非現行） |
-| [ADR-0015](retired/ADR-0015.md) | docs/specs 非runtime依存宣言 | superseded | なし（再編前から非現行） |
-| [ADR-0016](retired/ADR-0016.md) | skill references runtime-only 制約 | superseded | なし（再編前から非現行） |
-| [ADR-0017](retired/ADR-0017.md) | 文書種別責務境界 | accepted | ADR-0103 |
-| [ADR-0018](retired/ADR-0018.md) | runtime 独立性 | accepted | ADR-0104 |
-| [ADR-0019](retired/ADR-0019.md) | OpenCode ソース、プロジェクション分離 | accepted | ADR-0105 |
-| [ADR-0020](retired/ADR-0020.md) | Adopt /repo/* Namespace for Repo-Local Tooling | accepted | ADR-0106 |
-| [ADR-0021](retired/ADR-0021.md) | Upstream Handoff Metadata Convention | deprecated | なし（再編前から非現行） |
-| [ADR-0022](retired/ADR-0022.md) | review/refine 系中間コマンドを promote 内フェーズへ統合 | deprecated | なし（再編前から非現行） |
-| [ADR-0023](retired/ADR-0023.md) | backlog-save 廃止とパイプライン再構築 | deprecated | なし（再編前から非現行） |
+<!-- AUTOGEN:BEGIN:id=adr-retired-table -->
+| ADR番号 | タイトル | retired時ステータス |
+|---------|---------|-------------------|
+| [ADR-0001](retired/ADR-0001.md) | Command/Skill/Template/Script責任分界の正式定義 | proposed |
+| [ADR-0002](retired/ADR-0002.md) | Orchestration skill作成基準の導入 | proposed |
+| [ADR-0003](retired/ADR-0003.md) | issue-req入力の抽象化 | deprecated |
+| [ADR-0004](retired/ADR-0004.md) | 要件管理構造の area-based 移行方針 | superseded |
+| [ADR-0005](retired/ADR-0005.md) | AgentDevFlow を配布 plugin 名として採用し、公開 command namespace を /agentdev/*、domain state を .agentdev/、skill prefix を agentdev-* に統一する | accepted |
+| [ADR-0006](retired/ADR-0006.md) | Epic Issue 本文を実行順序 SSoT とする設計 | proposed |
+| [ADR-0007](retired/ADR-0007.md) | REQ/ADR基準構造と分類ビュー運用の再定義 | superseded |
+| [ADR-0008](retired/ADR-0008.md) | DOC-MAP導入と requirements/views 廃止 | proposed |
+| [ADR-0009](retired/ADR-0009.md) | REQ体系再基準化：旧REQ分類モデル・対応表・分類ゲート導入 | deprecated |
+| [ADR-0010](retired/ADR-0010.md) | HITL boundary：全 agentdev command の Human-in-the-Loop 境界原則 | deprecated |
+| [ADR-0011](retired/ADR-0011.md) | Manager/orchestrator パターンの限定採用：標準構造とはしない | proposed |
+| [ADR-0012](retired/ADR-0012.md) | Requirement Source pipeline の正式定義：promoted→RU→req-define の一貫流 | deprecated |
+| [ADR-0013](retired/ADR-0013.md) | runtime / authoring 関心分離 | accepted |
+| [ADR-0014](retired/ADR-0014.md) | ADR / SPEC 再分類基準 | superseded |
+| [ADR-0015](retired/ADR-0015.md) | docs/specs 非runtime依存宣言 | superseded |
+| [ADR-0016](retired/ADR-0016.md) | skill references runtime-only 制約 | superseded |
+| [ADR-0017](retired/ADR-0017.md) | 文書種別責務境界 | accepted |
+| [ADR-0018](retired/ADR-0018.md) | runtime 独立性 | accepted |
+| [ADR-0019](retired/ADR-0019.md) | OpenCode Source / Projection 分離 | accepted |
+| [ADR-0020](retired/ADR-0020.md) | Adopt /repo/* Namespace for Repo-Local Tooling | accepted |
+| [ADR-0021](retired/ADR-0021.md) | Upstream Handoff Metadata Convention | deprecated |
+| [ADR-0022](retired/ADR-0022.md) | review/refine 系中間コマンドを promote 内フェーズへ統合 | deprecated |
+| [ADR-0023](retired/ADR-0023.md) | backlog-save 廃止とパイプライン再構築 | deprecated |
+<!-- AUTOGEN:END -->
+
+> 引き継ぎ先（各 ADR-01XX の supersedes 宣言）は Decision Map（関連 ADR 依存関係）の欄を参照。
