@@ -63,6 +63,8 @@ import {
   generateReqMetricsTable,
   generateSpecMetricsTable,
   formatMeasureDate,
+  README_REQ_SUMMARY_COUNT_BLOCK_ID,
+  generateReadmeReqSummaryCount,
 } from "./generate_indexes.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
@@ -8099,12 +8101,37 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
     foundViolation = specMetricsOutcome.foundViolation;
   }
 
+  // Phase E 残 (Wave 5): docs/README.md — 1 AUTOGEN block (REQ count summary only)
+  const docsReadmePath = path.join(root, "docs", "README.md");
+  const docsReadmeContent = readText(docsReadmePath);
+  if (docsReadmeContent !== null && fs.existsSync(reqDir) && fs.existsSync(reqRetiredDir)) {
+    const docsReadmeSpecs: AutogenBlockSpec[] = [
+      {
+        blockId: README_REQ_SUMMARY_COUNT_BLOCK_ID,
+        expected: generateReadmeReqSummaryCount({
+          activeReqCount: collectReqFiles(reqDir).length,
+          retiredReqCount: collectRetiredReqFiles(reqRetiredDir).length,
+        }),
+        label: "readme-req-summary-count",
+      },
+    ];
+    const docsReadmeOutcome = verifyAutogenBlocksInFile(
+      docsReadmeContent,
+      docsReadmePath,
+      root,
+      docsReadmeSpecs,
+      foundViolation,
+    );
+    results.push(...docsReadmeOutcome.results);
+    foundViolation = docsReadmeOutcome.foundViolation;
+  }
+
   if (!foundViolation) {
     results.push(
       ok(
         "IndexGenerationConsistency",
         "index-generation-consistency",
-        `索引類自動生成整合性: All AUTOGEN blocks consistent (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership=${expectedRuleOwnership.length}; ADR README + REQ README + DOC-MAP + req-health-metrics + spec-health-metrics) (IR-061, SC-002 Phase C)`,
+        `索引類自動生成整合性: All AUTOGEN blocks consistent (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership=${expectedRuleOwnership.length}; ADR README + REQ README + DOC-MAP + req-health-metrics + spec-health-metrics + docs/README.md) (IR-061, SC-002 Phase C/E)`,
       ),
     );
   }
