@@ -3,10 +3,10 @@
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 54件、廃止済み: 58件
+現行 REQ: 54件、廃止済み: 0件
 <!-- AUTOGEN:END -->
 
-現行要件の第一参照先は REQ-0101 から REQ-0163 までの範囲である（範囲内の廃止済み REQ を除く）。廃止済み REQ は削除せず [requirements/retired/](requirements/retired/) に移動し、履歴参照に限定する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。REQ-0160 は project-extensions 機構（ADR-0135）の要件を定義する。
+現行要件の第一参照先は REQ-0101 から REQ-0163 までの範囲である（範囲内の廃止済み REQ を除く）。過去に存在した旧REQ（REQ-0001〜REQ-0050、REQ-0111〜REQ-0121 の一部）は2026-07-20に物理削除され、移行履歴は [移行表](requirements/mapping-table.md) で参照する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。REQ-0160 は project-extensions 機構（ADR-0135）の要件を定義する。
 
 | REQ | タイトル |
 |---|---|
@@ -67,7 +67,6 @@
 
 - [要件インデックス](requirements/README.md)
 - [移行表](requirements/mapping-table.md)
-- [廃止済み要件](requirements/retired/)
 
 ## 仕様（SPEC）
 

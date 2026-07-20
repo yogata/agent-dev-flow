@@ -716,12 +716,21 @@ export function generateDocMapInventory(args: {
   retiredAdrCount: number;
   specCount: number;
 }): string[] {
-  return [
-    `- 現行 REQ: ${args.activeReqCount}件（\`docs/requirements/REQ-*.md\`）`,
-    `- 廃止済み REQ: ${args.retiredReqCount}件（\`docs/requirements/retired/REQ-*.md\`）`,
-    `- ADR: ${args.activeAdrCount}件（\`docs/adr/ADR-*.md\`）、retired: ${args.retiredAdrCount}件（\`docs/adr/retired/ADR-*.md\`）`,
-    `- SPEC: ${args.specCount}件（\`docs/specs/**/*.md\`）`,
-  ];
+  const lines: string[] = [`- 現行 REQ: ${args.activeReqCount}件（\`docs/requirements/REQ-*.md\`）`];
+  // retired 実体が存在する場合のみパス文字列を伴う行を出力する。実体不在（件数0）のときに
+  // パス文字列を残すと、retired/ ディレクトリ削除後も grep 検出で残留参照のように見えるため。
+  if (args.retiredReqCount > 0) {
+    lines.push(`- 廃止済み REQ: ${args.retiredReqCount}件（\`docs/requirements/retired/REQ-*.md\`）`);
+  }
+  if (args.retiredAdrCount > 0) {
+    lines.push(
+      `- ADR: ${args.activeAdrCount}件（\`docs/adr/ADR-*.md\`）、retired: ${args.retiredAdrCount}件（\`docs/adr/retired/ADR-*.md\`）`,
+    );
+  } else {
+    lines.push(`- ADR: ${args.activeAdrCount}件（\`docs/adr/ADR-*.md\`）`);
+  }
+  lines.push(`- SPEC: ${args.specCount}件（\`docs/specs/**/*.md\`）`);
+  return lines;
 }
 
 /**

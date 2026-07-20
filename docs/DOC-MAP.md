@@ -7,9 +7,7 @@
 | 文書種別 | 基準 | 役割 |
 |---|---|---|
 | 現行 REQ | `requirements/REQ-{NNNN}.md` | 現行要件の永続基準 |
-| 廃止済み REQ | `requirements/retired/REQ-{NNNN}.md` | 履歴参照。現行要件判断には使わない |
 | ADR | `adr/ADR-{NNNN}.md` | アーキテクチャ決定記録 |
-| 廃止済み ADR | `adr/retired/ADR-00XX.md` | 再編前 ADR の履歴番号帯。現行根拠として引用しない（REQ-0112-047/048） |
 | SPEC | `specs/**/*.md` | リポジトリ内部の設計文書（現在仕様）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成。実行時配布物の依存先ではない（ADR-0103, ADR-0104） |
 | Guides | `guides/*.md` | 人間向けの案内層。規範的権限を持たない（ADR-0103） |
 | DOC-MAP | このファイル | 文書探索入口 |
@@ -18,8 +16,7 @@
 
 <!-- AUTOGEN:BEGIN:id=docmap-inventory -->
 - 現行 REQ: 54件（`docs/requirements/REQ-*.md`）
-- 廃止済み REQ: 58件（`docs/requirements/retired/REQ-*.md`）
-- ADR: 29件（`docs/adr/ADR-*.md`）、retired: 23件（`docs/adr/retired/ADR-*.md`）
+- ADR: 29件（`docs/adr/ADR-*.md`）
 - SPEC: 142件（`docs/specs/**/*.md`）
 <!-- AUTOGEN:END -->
 
@@ -83,7 +80,7 @@
 
 ## 廃止済み REQ
 
-旧REQ 50件は [requirements/retired/](requirements/retired/) に移動した。旧REQから新たな現行 REQ への移行有無は [mapping-table.md](requirements/mapping-table.md) を参照する。
+旧REQ 50件は2026-07-20に物理削除された。旧REQから新たな現行 REQ への移行履歴は [mapping-table.md](requirements/mapping-table.md) を参照する。
 
 ## 仕様（SPEC）
 

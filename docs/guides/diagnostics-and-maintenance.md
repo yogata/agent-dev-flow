@@ -46,7 +46,7 @@ REQ/ADR/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/Imple
 docs-check は ADR を現行の番号帯と廃止済みの番号帯に区別して検査する（REQ-0112-050）:
 
 - **現行 ADR 番号帯**（`docs/adr/ADR-01XX.md`）: status 遷移の妥当性、参照先 REQ の存在確認、誤分類の兆候検出を検査する
-- **廃止済み ADR 番号帯**（`docs/adr/retired/ADR-00XX.md`）: 配置を確認する。現行根拠としての引用を警告する
+- 再編前の旧番号帯（ADR-00XX）は物理削除済み。Decision Map (`docs/adr/README.md`) で後継関係のみ参照する
 - 廃止済み ADR への履歴参照は、現行根拠としての引用による警告とは区別して扱う
 
 ### 振り分け先の判定
