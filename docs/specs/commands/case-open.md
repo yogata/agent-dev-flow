@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-20
 ---
 
 # case-open SPEC
@@ -64,6 +64,26 @@ Epic + 子 Issue 一括作成に対応する。
 - Step 14-3: draft/RU 削除 commit 後の即時 push（REQ-0146-003）（Step 14 / 14-1 の削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
 - Step 15: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
 
+## 構成生成事前検証（preflight）
+
+case-open は Standard flow、Epic flow、混在構成の全ルートで、GitHub Issue 作成前に共通の事前検証を実施する（REQ-0132-027）。検証は execution_unit 構成の確定後、最初の GitHub Issue 作成呼び出し（Epic Issue 作成、Standard Issue 作成、子 Issue 作成を含む）の前に完了する。
+
+### 検証項目
+
+- 各 Epic の子 Issue 数が10件以下であること（REQ-0148-009 ハード制約）
+- 各 Wave の同時実行対象が5件以下であること（REQ-0130-026）
+- 各 Standard Issue および各子 Issue が1つの OU と対応していること（REQ-0104-042）
+- 必須依存関係（連結成分のエッジ）が維持されていること（REQ-0148-006）
+- 全 OU がいずれか1つの execution_unit へ割り当てられ、欠落・重複がないこと
+
+### 検証失敗時の扱い
+
+検証で上限超過または構成不備を検出した場合、case-open は GitHub Issue 作成呼び出しを行わず停止する（REQ-0132-028）。Epic Issue、Standard Issue、子 Issue のいずれかを作成済みの状態での検証失敗を許容しない。検証失敗時は要件doc（draft）の削除、RU ファイルの削除を実施せず、再開可能な状態で停止する。
+
+### 挿入位置の規範
+
+本セクションは case-open SPEC の手順順序において、構成確定（Epic flow は Step 6、Standard flow は Step 11 相当）の直後、最初の Issue 作成（Epic flow は Step 7、Standard flow は Step 12）の前に挿入される。command reference 側の具体的ステップ番号は case-run 工程で確定する。
+
 ## 完了条件・事前状態記載ガイドライン（新規セクション）
 
 case-open は Issue 本文の完了条件・事前状態セクションの記載を識別子中心とし、件数等の変動しやすい実測値スナップショットは補助値として扱う（REQ-0132-021）。本ガイドラインは case-run の QG-3 前置 staleness check（ファイルパス存在確認、検査結果件数再計測）が安定動作するための入力前提を整える目的で設定する。
@@ -123,10 +143,11 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（G19、REQ-0132-009）
 - 実装順序、Issue分解についてのユーザー確認要求（G20、REQ-0132-008）
 - 単一 Issue で完結する場合の Epic 作成（G20、REQ-0104-041）
-- Wave単位のみの子Issue構造（G14、子Issueは必ずREQドキュメントと対応付けること）
-- 子Issue最大10件超過時の作成続行（G05、エラー停止）
+- Wave単位のみの子Issue構造（G14、子Issue は OU 単位で作成し、対応 OU 経由で REQ/ADR/SPEC トレーサビリティを保持。子Issue を REQ 文書単位で対応付ける規定は廃止、REQ-0104-042 準拠）
+- 子Issue最大10件超過時の作成続行（G05、エラー停止、REQ-0132-028）
+- 構成生成事前検証を GitHub Issue 作成後に行う扱い（G05、REQ-0132-027）
 - intake / learning capture の実施（G18, G22）
-- Issue作成の gh CLI 安全手順省略（G12、`agentdev-gh-cli` 参照）
+- Issue作成の gh CLI 安全手続き省略（G12、`agentdev-gh-cli` 参照）
 - case-open は Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）を文字列変数で持ち回らず、`[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡すこと（G25、REQ-0132-024）。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでをファイル経由で固定し、親エージェントの本文再構成を禁止する（REQ-0132-025）
 - スイープ操作（`git add -A` / `git add .` / `git commit -a` / `git checkout .` / `git reset --hard` / `git stash` 等）の実行（G23、REQ-0137-001）
 - 明示パス指定以外のステージ、コミット（G24、REQ-0137-002/005）

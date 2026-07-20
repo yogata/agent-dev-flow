@@ -2,7 +2,7 @@
 title: Epic / Wave / Issue 実行モデル
 status: accepted
 created: 2026-06-21
-updated: 2026-07-19
+updated: 2026-07-20
 ---
 
 # Epic / Wave / Issue 実行モデル
@@ -244,6 +244,42 @@ case-auto は case-open が生成した execution_unit 群（standard | epic の
 - PR マージコンフリクト発生時は 3レベルコンフリクト解消モデル（ADR-0132、REQ-0151）に従う。Level 1 は case-close が rebase による機械的解消を試みる（REQ-0148-024、REQ-0151-001）。Level 2 は case-auto が両PRのdiffを読み取りコンフリクト文脈を付けて case-run へ再委譲する（最大2回、計3回の case-run 実行、REQ-0151-003/004）。Level 3 は case-auto がマージ順序変更、blocked 単位の隔離（REQ-0148-015 拡張）を行う。3段階すべてを試行しても解消できない場合のみ停止する（REQ-0151-006）。worktree 分離により作業自体は並列可能であり、マージコンフリクト解決コストを受容する（ADR-0129）。詳細は `docs/specs/commands/case-auto.md` コンフリクト解消モデル、`docs/specs/commands/case-close.md` Step 4-2 参照
 
 詳細な orchestration ロジック（blocked 部分停止、ready 継続判定フロー、execution_unit 群反復制御）は `docs/specs/commands/case-auto.md` 参照。
+
+### 並列上限と停止条件の整理
+
+case-open、case-auto、case-run で参照される並列上限と停止条件は以下の通り、文脈ごとに区別して扱う。
+
+#### 並列上限の3文脈
+
+| 文脈 | 上限 | 根拠 |
+|---|---|---|
+| case-run Wave 内子 Issue 並列 | 5件 | REQ-0130-026（同一 Wave 内の case-run サブエージェント並列起動上限） |
+| case-auto Phase 2 同時起動数 | 5件 | REQ-0114-106（Phase 分離モデルにおける case-run bg task 同時起動数） |
+| execution_unit 全体並列 | 上限なし | REQ-0148-018（必須依存がない execution_unit 群は全て並列実行可能） |
+
+3つの「5件」は別文脈であり、混同しない。
+
+#### case-open 停止条件
+
+case-open は以下の場合に限り GitHub Issue 作成前に停止する。
+
+- 要件が曖昧で execution_unit 構成を一意に生成できない場合
+- OU 間に未解決の矛盾がある場合
+- 必須依存または機能的一貫性を維持したまま各 Epic を10子 Issue 以下へ分割できない場合
+- OU と Issue の対応を維持できない場合
+
+OU が複数存在すること、または OU 総数が10件を超えることだけでは停止しない（REQ-0132-012、REQ-0148-005/010）。
+
+#### case-auto 停止理由分類
+
+case-auto は停止時に停止理由を以下の分類で報告する（REQ-0114-016/108 拡張）。
+
+- **req-define 合意要件からの逸脱**: case-open または後続工程が合意済み要件、対象外、受け入れ条件を変更した場合、合意されていない機能要件または制約を追加した場合、合意済み OU を欠落・統合・分割して要件の意味を変更した場合
+- **command 契約・実装不整合**: execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証（REQ-0132-027）が実装されていない場合
+- **repo 外実体変更**: DB マイグレーション実行、デプロイ/apply、認証・秘密・権限変更が必要な場合
+- **CI/test/lint 失敗**: コンフリクト解消モデル（ADR-0132）の Level 2 まで試行しても自己修復不能な場合
+
+分類は再開コマンド選択とユーザー通知の精度向上が目的であり、HITL 境界の変更ではない。
 
 ## ドラフト間並列実行モデル（REQ-0114-102〜107、ADR-0138）
 
