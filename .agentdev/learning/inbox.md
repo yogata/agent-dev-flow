@@ -381,3 +381,57 @@
 - **タグ**: #ir-format #frontmatter #related-req-spec #phase-e #wave-1 #rule-ownership
 
 ---
+
+## 索引類自動生成における frontmatter 由来情報と人手編集情報の分離パターン（Wave 2 実証）
+
+- **問題事象**: Wave 2（PR #1629）で ADR README、REQ README、DOC-MAP の AUTOGEN 化を実施した際、各ファイルの全てのセクションが frontmatter から機械生成できるわけではないことが判明。具体的には以下の4事象: (1) 廃止済み履歴ビュー（adr-retired-table）: retired ADR frontmatter に後継 ADR を示すフィールドが存在せず、3列生成（ADR番号/タイトル/retired時ステータス）にとどまり、引き継ぎ先情報は Decision Map 参照で運用。(2) REQ README の関心対象列: SC-002 SPEC が生成元を frontmatter id+title と指定しているため、2列生成（REQ ID/タイトル）にとどまり、関心対象列は各 REQ ファイル本文参照に委任。(3) Topic View / Decision Map / Related REQ 表: トピックタグ等の frontmatter に存在しないメタデータは生成不可。人手編集領域として残置（SC-002 SPEC「混合領域」許容）。(4) DOC-MAP 詳細 REQ 表: hand-curated 概要列の価値を保持するため AUTOGEN 対象外とし、別途 docmap-inventory block で件数機械検証を新設。
+- **発生局面**: 実装（case-run Wave 2 #1624 PR #1629、generate_indexes.ts 生成関数拡張時）
+- **検知方法**: 実装検証。generate_indexes.ts へ ADR/REQ README、DOC-MAP の生成関数を追加する際、各ファイルの対象セクションが frontmatter から導出可能かを確認。
+- **根本原因**: README/DOC-MAP 群は元々人手で編集される前提で構築されており、全ての情報が frontmatter（機械処理可能）に集約されているわけではない。frontmatter 由来情報（id/title/status/count 等）と人手編集情報（概要・関心対象・Decision Map・トピック 等）が混在する「混合領域」が標準的な状態。
+- **自律対応内容**: PR #1629 で以下の対応を実施。(a) frontmatter から導出可能な情報（id/title/status/count）は AUTOGEN block で機械生成。(b) frontmatter に存在しない情報（引き継ぎ先・関心対象・Topic View 等）は人手編集領域として残置、または別 block で補完（docmap-inventory）。(c) 詳細 REQ 表の hand-curated 概要列は AUTOGEN 対象外とし、件数機械検証を別 block で新設。(d) SC-002 SPEC「混合領域」許容を根拠として採用。
+- **ユーザー確認有無**: なし（エージェント自律で設計判断、PR 本文 Findings に明記）
+- **ADR/REQ/spec影響**: あり（要評価）。SC-002 SPEC（`docs/specs/integrity/index-auto-generation.md`）に「混合領域」許容と frontmatter 由来情報と人手編集情報の分離基準が明文化されているか確認要。明文化不足の場合は SPEC UPDATE 候補（Wave 5 Phase E または別 Issue）。
+- **横展開観点**: 索引類（README、DOC-MAP、mapping-table 等）の AUTOGEN 化全般で適用可能。frontmatter 由来情報と人手編集情報を明確に分離し、前者は AUTOGEN block、後者は人手編集領域または別 block で補完する設計パターン。Wave 3（metrics GENERATE 化）でも同様の判断が必要な可能性。Wave 4（SKILL.md DERIVE 機構）でも、SKILL.md の機械生成可能部分と人手編集部分の分離に適用可能。
+- **再発条件**: (1) 索引類の AUTOGEN 化を実施、(2) 対象ファイルに frontmatter 由来でない情報（概要・関心対象・Decision Map 等）が混在、(3) 全ての情報を AUTOGEN 化しようとする、の全てが揃った場合。
+- **予防策候補**: (a) SC-002 SPEC に「frontmatter 由来情報と人手編集情報の分離基準」と「混合領域」許容を明文化する。(b) generate_indexes.ts の拡張時に、対象セクションが frontmatter から導出可能かをチェックリスト化する。(c) 人手編集情報を保持するセクションには「本セクションは人手編集領域です」の注記を追加する。
+- **想定反映先**: `docs/specs/integrity/index-auto-generation.md`（SC-002 SPEC、混合領域の明文化）、`docs/specs/integrity/rules/IR-061-index-generation-consistency.md`（検査対象の明確化）、Wave 3（metrics GENERATE 化）設計、Wave 4（SKILL.md DERIVE 機構）設計
+- **関連**: PR #1629, Issue #1624, Epic #1622 Wave 2, SC-002 SPEC, AG-008/009/013, Wave 1（catalog/rule-ownership GENERATE 化、PR #1628）
+- **タグ**: #wave2 #autogen #frontmatter #hand-curated #mixed-region #sc-002 #generate-indexes #adr-readme #req-readme #doc-map
+
+---
+
+## 配布物 SKILL.md の DERIVE 宣言に内部 ID を含めると IR-055 strict violation となる設計制約（Wave 4 実証）
+
+- **問題事象**: Wave 4（PR #1631）で src/opencode/skills/agentdev-*/SKILL.md 25ファイルへ原本（SSoT）節を新設し、SPEC 参照と DERIVE 宣言を記述した際、初期実装で原本節に `REQ-0140-041/042` を含めたところ IR-055 strict violation（84件）が検出された。配布物（src/opencode/skills/）は consumer 環境（AgentDevFlow プラグイン利用先）へ配布されるため、consumer 側に存在しない内部 REQ-ID への未解決参照となり strict violation となる。
+- **発生局面**: 実装（case-run Wave 4 #1627 PR #1631、SKILL.md 原本節新設時）
+- **検知方法**: check_integrity.ts 実行で IR-055 strict violation 84件を検出。追加行に `REQ-[0-9]` パターンが含まれることを `git diff main` で確認。
+- **根本原因**: IR-055 は配布物（src/opencode/{commands,skills}/）に AgentDevFlow 内部 ID（REQ-XXXX/ADR-XXXX/SPEC-{KIND}-{NNN}/IR-XX 等）が残留することを検出するルール。consumer 環境ではこれらの内部 ID は解決できないため、配布物仕様として禁止されている。SKILL.md の DERIVE 宣言は配布物の一部であり、内部 ID の直接言及は IR-055 違反となる。
+- **自律対応内容**: PR #1631 で原本節から内部 REQ-ID を除去し、SPEC 参照リンク（`docs/specs/skills/agentdev-{name}.md`）と機能的記述（「本 SKILL.md は実行入口であり、SPEC を SSoT として DERIVE する」「extension は標準 SKILL.md を前提とし、重複しない補完情報のみを提供する」）のみで DERIVE 宣言を完結。再検証で IR-055 violation 0件を確認。
+- **ユーザー確認有無**: なし（エージェント自律で設計判断、PR 本文 Findings に明記）
+- **ADR/REQ/spec影響**: あり（要評価）。REQ-0108（配布物境界）の具体的事例。SC-002 SPEC または document-type-responsibilities SPEC に「SKILL.md DERIVE 宣言は SPEC 参照リンクと機能的記述のみで完結し、内部 ID の直接言及は避ける」設計指針の明文化候補。
+- **横展開観点**: 配布物（src/opencode/{commands,skills}/）の自然言語記述で内部 ID を参照する全ケースに適用可能。DERIVE 機構、REFERENCE、See Also 等の参照リンクは SPEC または外部ドキュメントへの相対パスで表現し、内部 ID（REQ-/ADR-/SPEC-/IR-）の直接言及は避ける設計が適切。
+- **再発条件**: (1) 配布物（src/opencode/skills/）の SKILL.md を編集、(2) DERIVE 宣言または参照記述に内部 ID（REQ-XXXX 等）を含める、(3) check_integrity.ts または CI で IR-055 を検査、の全てが揃った場合。
+- **予防策候補**: (a) SC-002 SPEC または document-type-responsibilities SPEC に「SKILL.md DERIVE 宣言は SPEC 参照リンクと機能的記述のみで完結し、内部 ID の直接言及は避ける」設計指針を明文化する。(b) case-run skill の検証テンプレートに「配布物変更時は IR-055 strict violation 0件を必須確認」項を追加する。(c) SKILL.md テンプレート（agentdev-skill-authoring）に原本節の標準フォーマット（内部 ID を含めない）を定義する。
+- **想定反映先**: `docs/specs/responsibilities/document-type-responsibilities.md`（SKILL.md DERIVE 機構の設計指針）、`docs/specs/integrity/index-auto-generation.md`（SC-002 SPEC、配布物と内部 ID の境界）、`src/opencode/skills/agentdev-skill-authoring/`（SKILL.md テンプレート）、case-run skill 検証テンプレート
+- **関連**: PR #1631, Issue #1627, Epic #1622 Wave 4, REQ-0140-041/042, IR-055, SC-002 Phase D, AG-012, U-012
+- **タグ**: #wave4 #skill-md #derive #ir-055 #strict-violation #internal-id #distribution-boundary #consumer-environment #sc-002 #phase-d
+
+---
+
+## worktree 委譲先での cd 操作誤りによるメインリポジトリ一時汚染と検出・是正パターン（Wave 5 実証）
+
+- **問題事象**: Wave 5（PR #1632）で case-run 実行担当サブエージェント（deep category）へ worktree root（`.worktrees/1626-maintenance`）配下での作業を委譲した際、委譲先が検証ステップで cd 操作を誤り、一時的にメインリポジトリ（`C:/Users/ogatay/work/agent-dev-flow`）の作業ツリーへ変更を迷い込ませた。委譲先は即座に異常を検知し、(a) パッチ抽出、(b) worktree 再適用、(c) メインリポジトリ `git checkout --` で原状復帰する手順で是正。最終状態でメインリポジトリに本 PR 由来の変更は一切残らなかったが、worktree 隔離原則の一時的破綻事例として記録する。
+- **発生局面**: 実装・検証（case-run Wave 5 #1626 PR #1632、委譲先での検証ステップ）
+- **検知方法**: 委譲先の自律検知。cd 操作後に git status で対象ファイルパスが worktree root 配下でないことを確認し、即座に是正シーケンスへ移行。
+- **根本原因**: 委譲先プロンプトで worktree root の絶対パスを明示していたが、検証ステップで bash コマンドを連続実行する際に `cd` を伴う操作（例: 別ディレクトリへの移動を伴うスクリプト実行）で worktree root を離れる余地があった。委譲先は worktree 隔離原則を理解していたが、操作の連続性の中で一時的な離脱が発生。
+- **自律対応内容**: 委譲先が (a) 異常検知、(b) 変更内容のパッチ抽出、(c) worktree root への再適用、(d) メインリポジトリ `git checkout --` で原状復帰、(e) 最終 git status でクリーン状態を確認、の5ステップで是正。PR 本文 Findings に経緯を明示。case-auto 側でもマージ前に git status でメインリポジトリの状態を確認し、本 PR 由来の変更が残っていないことを検証済み。
+- **ユーザー確認有無**: なし（エージェント自律で検出・是正、PR 本文 Findings に明記）
+- **ADR/REQ/spec影響**: なし（本件は case-run 委譲時の worktree 運用リスクの運用知見であり、新規 ADR/REQ/spec 影響はない。adapter protocol で規定される worktree 隔離原則の一時的破綻と回復の具体的事例）。
+- **横展開観点**: case-run 実行担当サブエージェントへ worktree root 配下での作業を委譲する全ケースに適用可能。(a) 委譲先プロンプトで worktree root の絶対パスを明示するだけでなく、検証ステップで `cd` を伴う操作を禁止する、または worktree root 配下でのみ実行するスクリプト形式を推奨する。(b) case-auto 親ループは case-run 委譲完了後にメインリポジトリの git status を確認し、本 PR 由来の変更がないことを検証する防壁を標準搭載する。(c) 委譲先は worktree 隔離原則を事前確認し、cd 操作の必要性がある場合は作業前に親へ申請する運用。
+- **再発条件**: (1) case-run を委譲先へ worktree root 配下で実行させる、(2) 委譲先が検証ステップで `cd` を伴う操作を実行する、(3) worktree root の絶対パスを離れる余地がある、の全てが揃った場合。
+- **予防策候補**: (a) 委譲先プロンプトの MUST DO に「worktree root 配下でのみ作業し、cd で worktree root を離れる操作は禁止。検証コマンドは worktree root を基準とした相対パスまたは絶対パスで実行」を明記。(b) adapter protocol skill または case-run skill に worktree 隔離原則違反時の検出・是正手順を標準化。(c) case-auto 親ループに「case-run 委譲完了後、メインリポジトリ git status でクリーン状態を確認する」標準ゲートを組み込む。
+- **想定反映先**: `agentdev-case-run-execution-adapter` SKILL.md（worktree 隔離原則と検出・是正手順）、case-auto command SPEC（委譲完了後のメインリポジトリ状態確認ゲート）
+- **関連**: PR #1632, Issue #1626, Epic #1622 Wave 5, adapter protocol, worktree 隔離原則
+- **タグ**: #wave5 #worktree #isolation-violation #delegation #adapter-protocol #case-auto #case-run #recovery
+
+---
