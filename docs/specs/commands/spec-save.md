@@ -80,25 +80,19 @@ req-save の次、case-open の前に実行する。
 
 ## targeted docs guard (REQ-0158-003)
 
-SPEC 保存工程で targeted docs guard を実行する。対象は保存工程で変更された SPEC ファイルと連動ファイル（`docs/specs/README.md`、`docs/DOC-MAP.md`）。
+SPEC保存工程では、変更されたSPECと連動する`docs/specs/README.md`、`docs/DOC-MAP.md`を`check_changed_docs.ts --workflow spec-save`で検査する。
 
-- 実行タイミング: Step 7（DOC-MAP 影響確認）の直後、Step 8（ドラフト status 更新）の前
-- 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json`
-- 検査項目: SPEC frontmatter 必須項目、`status` 値妥当性（draft/accepted）、`docs/specs/README.md` の status 表との同期、SPEC ドメイン分類妥当性、新規 SPEC・移動・改名・主要入口変更時の DOC-MAP 更新要否判定、変更 SPEC と近接リンクの整合、旧SPEC直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、command SPEC の場合の対象command原本との最低限の整合、skill SPEC の場合の対象skill原本との最低限の整合、integrity SPEC の場合の catalog/rule file/script 整合、REQ相当/ADR相当/guide相当の混入検出
-- 失敗時: 検査対象文書（SPEC ファイル、`docs/specs/README.md`、`docs/DOC-MAP.md`）を修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行を検討する
+検査は以下を含む。
 
-JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。`failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
+- SPEC frontmatter必須項目
+- status値`draft`、`accepted`、`superseded`の妥当性
+- `superseded`時の`superseded_by`必須性
+- `superseded_by`保持SPECの通常内容検査対象外判定
+- SPEC READMEのstatus同期
+- SPECドメイン分類、リンク、DOC-MAP更新要否
+- command/skill/integrity SPECと対応原本・catalog・rule file・scriptの整合
 
-### spec-save が使用する検査ツール
-
-spec-save が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
-
-- check_changed_docs.ts（--workflow spec-save、SPEC files 変更時）: SPEC 保存工程で実行（[targeted docs guard (REQ-0158-003)](#targeted-docs-guard-req-0158-003) 参照）
-
-spec-save は check_integrity.ts（全体監査）を使用しない（保存工程は変更ファイル限定の targeted 検査が責務。全体監査は /repo/docs-check の責務）。
-
-※肯定表現のみ（REQ-0144-002, REQ-0144-003 準拠）。
-
+strict failureが存在する場合は修正して再実行する。
 ## 対象外
 
 - SPEC 対象 artifact_actions（`artifact: spec`）がない場合の SPEC ファイル作成、編集（G01、G04、no-op）

@@ -168,21 +168,18 @@ DOC-MAP（索引）/ Guides（案内）
 
 ### SPEC ライフサイクル（ADR-0123）
 
-SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`）で成熟度を管理する。
-`status` は「現在仕様の基準」という SPEC の位置づけ（ADR-0103）を変更せず、その確定度合いを表す追加的なメタデータである。
+SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `draft`、`accepted`、`superseded` の3つである。frontmatter形式は`patterns.md`が所有する。
 
-| status | 意味 | 検査対象 | 遷移契機 |
+| status | 意味 | 通常内容検査 | 遷移契機 |
 |---|---|---|---|
-| `draft` | spec-save で保存された直後の未確定状態 | IR-044（REQ/SPEC 境界違反検出）等の対象外 | spec-save が新規 SPEC 作成時に付与（既定値） |
-| `accepted` | case-close で SPEC 確定チェック通過済み | すべての整合性ルールの検査対象 | case-close Step 3 で実装が SPEC 内容を検証したことを確認時 |
-| `superseded` | 後継 SPEC へ移行済み。frontmatter `superseded_by` で後継を明示 | docs-check/inspect-docs 検査対象外（`superseded_by` 存在で機械判定） | req-save/spec-save で後継 SPEC 作成時に付与 |
+| `draft` | spec-saveで保存された未確定状態 | 境界違反等の確定SPEC向け検査対象外 | 新規SPEC保存時 |
+| `accepted` | 実装との整合確認を通過した現在仕様 | 通常の整合性検査対象 | case-closeで確定時 |
+| `superseded` | 後継SPECへ移行済みの状態 | docs-check・inspect-docsの通常内容検査対象外 | 後継SPECを確定し`superseded_by`を設定時 |
 
-- 新規 SPEC 作成（spec-save）時は `status: draft` を付与する
-- 既存 SPEC へ追記時は当該 SPEC の `status` を変更しない
-- `draft` → `accepted` の昇格は case-close の責務（spec-save は accepted を付与しない）
-- `status` フィールドがない既存 SPEC は `accepted` と同等に扱う（後方互換）
-- superseded SPEC は元位置に残置し `superseded_by` frontmatter で後継を明示する（`docs/specs/retired/` は新設しない）。superseded 宣言は req-save/spec-save で後継 SPEC 作成時に行う
-
+- statusがない既存SPECは後方互換のため`accepted`相当として扱う。
+- `superseded`は元位置を維持し、`superseded_by`で後継SPECを示す。
+- `superseded_by`の存在を通常検査対象外判定に使用する。
+- `draft`から`accepted`への昇格はcase-close、後継移行時の`superseded`設定はspec-saveまたはcase-closeの確定処理が扱う。
 ## 適用範囲宣言
 
 `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（ADR-0103）。
@@ -219,14 +216,13 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 
 | 規則 | 内容 |
 |---|---|
-| REQ ID | 4 桁ゼロ埋めの安定 ID。現行、廃止を問わず再利用しない |
-| ADR ID | 4 桁ゼロ埋め。現行基準（`baseline`）は ADR-0101 以降（現行コレクション）。旧番号帯 ADR-0001〜0099 は廃止され、実体は物理削除済みである。状態は frontmatter で管理（REQ-0112-047, 048） |
-| SPEC 配置 | `docs/specs/**/*.md`（基盤SPECは6ドメインディレクトリ、他は commands/skills/workflows の3層。詳細は「docs/specs/ 直下のドメイン別体系化」参照） |
-| SPEC status | frontmatter `status`（`draft` / `accepted`）。既定は `draft`（spec-save 新規作成時）。`status` なしは `accepted` 相当（ADR-0123） |
-| Guides 配置 | `docs/guides/*.md` 直下 |
-| 廃止 REQ | 物理削除を第一選択肢とする。運用上は各 retired/ ディレクトリへの移動も選択肢として認める（REQ-0101-002）。現行要件判断に使用しない |
-| 廃止 ADR | 物理削除を第一選択肢とする。運用上は各 retired/ ディレクトリへの移動も選択肢として認める（REQ-0112-048）。現行根拠として使用しない。履歴参照時は廃止番号であることを明示 |
-
+| REQ ID | 4桁ゼロ埋めの安定ID。現行・廃止を問わず再利用しない |
+| ADR ID | 4桁ゼロ埋め。状態はfrontmatterで管理する |
+| SPEC配置 | `docs/specs/**/*.md` |
+| SPEC status | `draft`、`accepted`、`superseded`。status欠落は`accepted`相当。`superseded`は`superseded_by`を必須とする |
+| Guides配置 | `docs/guides/*.md` |
+| 廃止REQ | 物理削除を第一選択とし、履歴参照用途に限定してretired配下への移動も選択できる |
+| 廃止ADR | 物理削除を第一選択とし、履歴参照用途に限定してretired配下への移動も選択できる |
 ## ADR 編集制約
 
 - 承認済み ADR の決定内容を意味変更してはならない（REQ-0112-045）。変更が必要な場合は新規 ADR を作成し、旧 ADR を superseded/deprecated とする
@@ -281,19 +277,14 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 
 ### ライフサイクル規則 <!-- REQ-0101 -->
 
-各文書種別の状態遷移を定義する。
-
-**共通状態**: 作成 → 現行 → 改訂 → 廃止（種別ごとに表現が異なる）
-
 | 文書種別 | 状態遷移 | 備考 |
 |---|---|---|
-| REQ | created → active → superseded / partially superseded | APPEND/UPDATE で拡張。個別要件の supersede は mapping-table で追跡 |
-| ADR | proposed → accepted → superseded / deprecated | 承認済みのみ現行根拠。全面改訂時は新世代を創設（ADR-0001〜0023 → ADR-0101〜0112） |
-| SPEC | active → superseded（後継SPECへの移行表示） | SPEC は「現在仕様」の記録。後継SPECへの移行表示を frontmatter `superseded_by` で保持し、廃止状態を持たず元位置に残置する |
-| Guide | active → outdated → removed | 内容陳腐化時に移行。規範的権限なし |
-| Report | published → archived | 作成後の修正は事実確認の範囲に限定 |
-| DOC-MAP | always active | 更新のみ。廃止なし |
-
+| REQ | created → active → superseded / partially superseded | APPEND/UPDATEで拡張し、旧REQから現行REQへの移行関係はmapping-tableで追跡する |
+| ADR | proposed → accepted → superseded / deprecated | acceptedだけを現行判断の根拠とする |
+| SPEC | draft → accepted → superseded | 後継SPECへの移行表示は`superseded_by`で保持する |
+| Guide | active → outdated → removed | 規範的権限を持たない |
+| Report | published → archived | 事実記録として扱う |
+| DOC-MAP | always active | 探索索引として更新だけを行う |
 ### 基準再設定規則 <!-- REQ-0101 -->
 
 文書体系の全面改訂時の取り扱いを定義する。

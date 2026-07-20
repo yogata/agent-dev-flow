@@ -14,33 +14,24 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 ## 適用範囲
 
-- **対象**: 以下の索引類に含まれる件数、一覧、ステータス別ビュー、トピック別ビュー、Decision Map、関連 REQ 表の各自動生成対象領域
-  - `docs/README.md`（ドキュメント入口。REQ 件数表明、SPEC 一覧、ADR/ガイド/DOC-MAP 参照リンク）
-  - `docs/requirements/README.md`（REQ 一覧、廃止済み REQ 一覧）
-  - `docs/adr/README.md`（現行基盤ビュー、ステータス別ビュー、トピック別ビュー、Decision Map、関連 REQ 表、廃止済み履歴ビュー）
-  - `docs/specs/README.md`（command SPEC、skill SPEC、横断 SPEC、基盤 SPEC 一覧）
-  - `docs/DOC-MAP.md`（探索経路インデックス）
-  - `docs/requirements/mapping-table.md`（REQ 移行表）
-  - `docs/specs/integrity/integrity-rule-catalog.md`（IR エントリ一覧。IR-* frontmatter から catalog エントリを再生成。スキーマ定義セクションは人手編集領域として残置）
-  - `docs/specs/integrity/rule-ownership.md`（ルールドメイン → canonical REQ/SPEC の対応マトリクス。IR-* と各 SPEC の canonical owner 宣言から再生成）
-  - `docs/specs/quality/req-health-metrics.md`（現行 REQ の計測例テーブル）
-  - `docs/specs/quality/spec-health-metrics.md`（SPEC 計測例テーブル）
-- **対象外**: 各 SPEC、REQ、ADR の本文（自動生成対象は索引類のみ）
-
+- **現在自動生成される領域**: 実装済みAUTOGENブロックで生成される件数、一覧、status別ビュー、IR索引、関連マッピング、メトリクス例
+- **現在人手管理される領域**: ADRトピック別ビュー、Decision Map、ADR関連REQ表、REQ移行判定
+- **現在混合管理される領域**: 自動生成列と人手管理列が同一表に共存し、生成実装が対象列だけを更新する領域
+- **対象外**: REQ、ADR、SPEC本文そのもの、および未実装の将来自動生成計画
 ## 自動生成の対象領域と生成元
 
-| 索引類 | 自動生成対象 | 生成元 |
-|--------|-------------|--------|
-| `docs/README.md` | REQ 件数表明、SPEC 一覧（3 層 + 基盤 6 ドメイン）、ADR/ガイド/DOC-MAP 参照リンク | `docs/requirements/REQ-*.md`、`docs/specs/**/*.md`、`docs/adr/ADR-*.md` の frontmatter |
-| `docs/requirements/README.md` | REQ 一覧表、件数表明 | `docs/requirements/REQ-*.md` の frontmatter（`id`、`title`） |
-| `docs/adr/README.md` 現行基盤ビュー | accepted ADR 一覧表、件数表明 | `docs/adr/ADR-*.md` の frontmatter（`id`、`title`、`status`、`created`） |
-| `docs/adr/README.md` ステータス別ビュー | accepted、proposed、superseded、deprecated 各リスト | 同上 |
-| `docs/adr/README.md` トピック別ビュー | トピック分類一覧 | 同上 + トピック分類メタデータ（要拡張） |
-| `docs/adr/README.md` Decision Map | supersedes、relates-to、superseded-by 関係 | 各 ADR 本文の「関連する決定」セクション |
-| `docs/specs/README.md` 各一覧表 | SPEC 一覧、status 列 | `docs/specs/**/*.md` の frontmatter（`title`、`status`） |
+| 索引類 | 現在の管理 | 生成元 |
+|---|---|---|
+| `docs/requirements/README.md`のREQ一覧・件数 | 自動生成 | REQ frontmatter |
+| `docs/adr/README.md`の基盤一覧・status別一覧・件数 | 自動生成 | ADR frontmatter |
+| `docs/adr/README.md`のトピック別ビュー・Decision Map・関連REQ表 | 人手管理 | ADR本文と人手判断 |
+| `docs/specs/README.md`のSPEC一覧・status列 | 現行実装に従う混合管理 | SPEC frontmatterと人手管理列 |
+| `docs/DOC-MAP.md`のインベントリ | 自動生成 | 実ファイル一覧 |
+| `docs/requirements/mapping-table.md`の移行判定 | 人手管理 | 旧REQから現行REQへの移行判断 |
+| integrity rule catalogとrule ownershipのAUTOGENブロック | 自動生成 | 個別IR文書 |
+| REQ/SPECメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
 
-各索引類の人手編集領域は章導入、説明文、規約参照等の自動生成対象外の本文で、共通規則は「人手編集領域と自動生成領域の分離」節に定める。検査契約は全索引類共通で IR-061（index generation consistency）を適用し、ADR 索引には IR-038、REQ 索引には IR-039、REQ 件数表明には IR-042 を追加適用する（「関連情報」節参照）。自動生成対象外の人手管理領域は「現在人手管理領域の5領域」節に列挙する。
-
+管理区分を変更する場合は、本SPEC、生成実装、検査実装を同時に整合させる。
 ## 生成規則
 
 ### 件数表明
@@ -57,10 +48,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 ### ステータス別ビュー、トピック別ビュー
 
-ステータス別ビューの分類基準は実ファイルの frontmatter から導出する。トピック別ビュー、Decision Map、関連 REQ 表は人手管理領域に分類される（後述「現在人手管理領域の5領域」参照）。
-
-Decision Map は各 ADR 本文「関連する決定」セクションに記載された supersedes、relates-to、superseded-by 宣言を集計した結果とする。人手で Decision Map を直接編集しない。
-
+ステータス別ビューはADR frontmatterから自動生成する。トピック別ビュー、Decision Map、関連REQ表は現在人手管理とし、実装されていない生成処理を現在契約として扱わない。
 ### 一致の検証
 
 自動生成の実行有無にかかわらず、docs-check（`check_integrity.ts`、IR-061）が索引類と実ファイルの整合性を検証する。不整合を検出した場合、生成スクリプトの再実行または人手修正を促す。

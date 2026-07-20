@@ -43,7 +43,7 @@ command frontmatter の許可フィールドは `description` と `agent` のみ
 
 ## REQ frontmatter 規約
 
-REQ 文書の frontmatter には以下のフィールドを定義する:
+REQ文書のfrontmatterは以下のフィールドを持つ。
 
 ```yaml
 ---
@@ -54,12 +54,33 @@ updated: {YYYY-MM-DD}
 ---
 ```
 
-- フィールドは `id`, `title`, `created`, `updated` のみ（`status`、`scale` は REQ frontmatter には含めない）
-- `id` は `REQ-{NNNN}` 形式（例: `REQ-0104`）。要件行の ID は `REQ-{NNNN}-{MMM}` 形式（例: `REQ-0104-001`）
+- 許可フィールドは`id`、`title`、`created`、`updated`だけとする。
+- `id`は`REQ-{NNNN}`、要件行IDは`REQ-{NNNN}-{MMM}`形式とする。
 
 ### REQ セクション構成
 
 ```markdown
+## 目的
+
+{この領域の要件が存在する理由}
+
+## 要件
+
+| ID | 要件 |
+|---|---|
+| REQ-{NNNN}-001 | {検証可能な要件} |
+
+## 適用範囲
+
+- **対象**: ...
+- **対象外**: ...
+```
+
+REQファイルは`## 目的`、`## 要件`、`## 適用範囲`の3セクションだけを持つ。`## 関連情報`、`## Requirement Source`、`## Update Notes`、`## 関連ドキュメント更新候補`、変更履歴節は持たない。
+
+### SPEC frontmatter 形式
+
+SPEC frontmatterは`title`、`status`、`created`、`updated`を基本とする。`status`は`draft`、`accepted`、`superseded`のいずれかとする。`superseded`では後継SPECのリポジトリ相対パスを`superseded_by`へ記録する。status欠落は後方互換のため`accepted`相当として扱う。
 ## 目的
 
 {この領域の要件が存在する理由}

@@ -118,24 +118,11 @@ agent-dev-flow リポジトリ自身は適用プロジェクトの1つとして 
 
 extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は初期テンプレート、schema、検査、/agentdev/inspect-extensions コマンドを提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。AgentDevFlow 本体リポジトリの .agentdev/extensions/** には本体固有 SPEC パスを記述してよい。
 
-## 配布物参照境界の検知パターン
+## 配布物参照境界の責務分担
 
-配布 command/skill 本文に含まれる具体参照（ADR/REQ/SPEC の具体ID、具体パス、固定URL）を検知するパターンと exemption 条件を定義する。本パターンに基づく検出ルールは IR-059（distribution-reference-boundary）として整合性ルールカタログに登録する。
+本SPECはProject Extensionsのschema、配置、読込、標準診断、責務境界を所有する。配布command/skill本文の具体ID、具体パス、固定URLに対する検知パターン、exemption、severity、false-positive条件はIR-059個別文書が所有する。
 
-### 検知対象
-
-- 具体ID: ADR-NNNN, REQ-NNNN (4桁数字), REQ-NNNN-NNN (サブ要件番号)。文書種別名としての ADR/REQ/SPEC は対象外。
-- 具体パス: `docs/(adr|requirements|specs)/<file>.md`。README.md は索引として許容。テンプレート表記 `{}`, `<>`, `*` は許容。
-- 固定URL: `github.com/<owner>/<repo>/(blob|raw)/`, `raw.githubusercontent.com/<owner>/<repo>/`。
-
-### exemption 条件
-
-テンプレートプレースホルダー（`{NNNN}`, `<NNNN>`, `<existing-spec>`, `<domain>`, `<command>`, `<spec>`, `<rule>`）を行内に含む場合は具体ID/具体パス検査をスキップする。
-
-### 是正方針
-
-配布物本文に具体参照を検出した場合、generic 表記（文書種別名や抽象的参照）への是正を原則とする。是正後の traceability は extension 経由で担保する。
-
+配布物参照境界の検出結果はgeneric表記への是正とextensionによるtraceability補完へ接続する。
 ## 関連
 
 - ADR-0135: Project Extensions Architecture
