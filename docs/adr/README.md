@@ -239,7 +239,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0110 | [REQ-0101](../requirements/REQ-0101.md) | DOC-MAP導入、views廃止 |
 | ADR-0111 | - | 対応REQなし（architecture principleとして定義）。superseded by ADR-0112 |
 | ADR-0112 | [REQ-0119](../requirements/REQ-0119.md) | コマンド、スキル、サブエージェント責務分界の再基準化 |
-| ADR-0113 | [REQ-0103](../requirements/REQ-0103.md), [REQ-0105](../requirements/REQ-0105.md), [REQ-0109](../requirements/REQ-0109.md), [REQ-0115](../requirements/retired/REQ-0115.md) (retired) | 診断ワークフロー導入、レビュー系コマンド完全削除（deprecated: 現行状態は REQ-0124 / SPEC 参照） |
+| ADR-0113 | [REQ-0103](../requirements/REQ-0103.md), [REQ-0105](../requirements/REQ-0105.md), [REQ-0109](../requirements/REQ-0109.md), REQ-0115 (旧REQ、削除済み) | 診断ワークフロー導入、レビュー系コマンド完全削除（deprecated: 現行状態は REQ-0124 / SPEC 参照） |
 | ADR-0114 | [REQ-0104](../requirements/REQ-0104.md), [REQ-0106](../requirements/REQ-0106.md) | case-run 実行責務の外部実行バックエンド委譲 |
 | ADR-0123 | [REQ-0136](../requirements/REQ-0136.md), [REQ-0102](../requirements/REQ-0102.md), [REQ-0103](../requirements/REQ-0103.md) | SPEC lifecycle と spec-save の導入 |
 | ADR-0124 | [REQ-0138](../requirements/REQ-0138.md) | 構造化 req_draft 契約 |
@@ -256,37 +256,9 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0136 | [REQ-0162](../requirements/REQ-0162.md), [REQ-0139](../requirements/REQ-0139.md), [REQ-0130](../requirements/REQ-0130.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0151](../requirements/REQ-0151.md) | 配布物ハーネス境界の浄化（harness 固有詳細の配布物からの除去、4状態結果契約） |
 | ADR-0138 | [REQ-0114](../requirements/REQ-0114.md), [REQ-0148](../requirements/REQ-0148.md), [REQ-0162](../requirements/REQ-0162.md) | case-auto オーケストレーション制御の AgentDevFlow 側集約（Phase 分離、固定並列数、bg task 状態管理と回復） |
 
-## 廃止済み、履歴ビュー
-
-ADR-0001 から ADR-0023 までの23件は、ADR-01XX 現行基盤導入に伴い `retired/` ディレクトリに移動された歴史的決定記録である。
-これらは再編前の判断を保持しており、現行アーキテクチャの基盤は上記 現行基盤ビューの ADR-01XX にある。
+ADR-0001 から ADR-0023 までの23件は、ADR-01XX 現行基盤導入に伴い現行基準から外された歴史的決定記録である（2026-07-20に物理削除）。これらは再編前の判断を保持しており、現行アーキテクチャの基盤は上記 現行基盤ビューの ADR-01XX にある。後継関係（各 ADR-01XX の supersedes 宣言）は Decision Map（関連 ADR 依存関係）の欄を参照。
 
 <!-- AUTOGEN:BEGIN:id=adr-retired-table -->
 | ADR番号 | タイトル | retired時ステータス |
 |---------|---------|-------------------|
-| [ADR-0001](retired/ADR-0001.md) | Command/Skill/Template/Script責任分界の正式定義 | proposed |
-| [ADR-0002](retired/ADR-0002.md) | Orchestration skill作成基準の導入 | proposed |
-| [ADR-0003](retired/ADR-0003.md) | issue-req入力の抽象化 | deprecated |
-| [ADR-0004](retired/ADR-0004.md) | 要件管理構造の area-based 移行方針 | superseded |
-| [ADR-0005](retired/ADR-0005.md) | AgentDevFlow を配布 plugin 名として採用し、公開 command namespace を /agentdev/*、domain state を .agentdev/、skill prefix を agentdev-* に統一する | accepted |
-| [ADR-0006](retired/ADR-0006.md) | Epic Issue 本文を実行順序 SSoT とする設計 | proposed |
-| [ADR-0007](retired/ADR-0007.md) | REQ/ADR基準構造と分類ビュー運用の再定義 | superseded |
-| [ADR-0008](retired/ADR-0008.md) | DOC-MAP導入と requirements/views 廃止 | proposed |
-| [ADR-0009](retired/ADR-0009.md) | REQ体系再基準化：旧REQ分類モデル・対応表・分類ゲート導入 | deprecated |
-| [ADR-0010](retired/ADR-0010.md) | HITL boundary：全 agentdev command の Human-in-the-Loop 境界原則 | deprecated |
-| [ADR-0011](retired/ADR-0011.md) | Manager/orchestrator パターンの限定採用：標準構造とはしない | proposed |
-| [ADR-0012](retired/ADR-0012.md) | Requirement Source pipeline の正式定義：promoted→RU→req-define の一貫流 | deprecated |
-| [ADR-0013](retired/ADR-0013.md) | runtime / authoring 関心分離 | accepted |
-| [ADR-0014](retired/ADR-0014.md) | ADR / SPEC 再分類基準 | superseded |
-| [ADR-0015](retired/ADR-0015.md) | docs/specs 非runtime依存宣言 | superseded |
-| [ADR-0016](retired/ADR-0016.md) | skill references runtime-only 制約 | superseded |
-| [ADR-0017](retired/ADR-0017.md) | 文書種別責務境界 | accepted |
-| [ADR-0018](retired/ADR-0018.md) | runtime 独立性 | accepted |
-| [ADR-0019](retired/ADR-0019.md) | OpenCode Source / Projection 分離 | accepted |
-| [ADR-0020](retired/ADR-0020.md) | Adopt /repo/* Namespace for Repo-Local Tooling | accepted |
-| [ADR-0021](retired/ADR-0021.md) | Upstream Handoff Metadata Convention | deprecated |
-| [ADR-0022](retired/ADR-0022.md) | review/refine 系中間コマンドを promote 内フェーズへ統合 | deprecated |
-| [ADR-0023](retired/ADR-0023.md) | backlog-save 廃止とパイプライン再構築 | deprecated |
 <!-- AUTOGEN:END -->
-
-> 引き継ぎ先（各 ADR-01XX の supersedes 宣言）は Decision Map（関連 ADR 依存関係）の欄を参照。

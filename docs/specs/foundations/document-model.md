@@ -224,8 +224,8 @@ SPEC ファイルは frontmatter `status` フィールド（`draft` / `accepted`
 | SPEC 配置 | `docs/specs/**/*.md`（基盤SPECは6ドメインディレクトリ、他は commands/skills/workflows の3層。詳細は「docs/specs/ 直下のドメイン別体系化」参照） |
 | SPEC status | frontmatter `status`（`draft` / `accepted`）。既定は `draft`（spec-save 新規作成時）。`status` なしは `accepted` 相当（ADR-0123） |
 | Guides 配置 | `docs/guides/*.md` 直下 |
-| 廃止 REQ | 物理削除を第一選択肢とし、運用上は `docs/requirements/retired/` へ移動する選択肢も残す。現行要件判断に使用しない |
-| 廃止 ADR | 物理削除を第一選択肢とし、運用上は `docs/adr/retired/` へ移動する選択肢も残す。現行根拠として使用しない。履歴参照時は廃止パスを明示（REQ-0112-048） |
+| 廃止 REQ | 物理削除を第一選択肢とする。運用上は各 retired/ ディレクトリへの移動も選択肢として認める（REQ-0101-002）。現行要件判断に使用しない |
+| 廃止 ADR | 物理削除を第一選択肢とする。運用上は各 retired/ ディレクトリへの移動も選択肢として認める（REQ-0112-048）。現行根拠として使用しない。履歴参照時は廃止番号であることを明示 |
 
 ## ADR 編集制約
 

@@ -61,7 +61,7 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスで�
 | responsibilities/document-type-responsibilities.md | 311 | accepted | responsibilities |
 | workflows/epic-wave-model.md | 304 | accepted | workflows |
 | local/runtime-package-boundary.md | 291 | accepted | local |
-| integrity/integrity-contracts.md | 265 | accepted | integrity |
+| integrity/integrity-contracts.md | 264 | accepted | integrity |
 | commands/case-run.md | 255 | accepted | commands |
 | workflows/backlog-artifact-lifecycle.md | 249 | accepted | workflows |
 | integrity/integrity-rule-catalog.md | 241 | accepted | integrity |
@@ -77,7 +77,7 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスで�
 | quality/quality-gates.md | 181 | accepted | quality |
 | workflows/workflow-contracts.md | 167 | accepted | workflows |
 | integrity/index-auto-generation.md | 158 | accepted | integrity |
-| foundations/patterns.md | 143 | accepted | foundations |
+| foundations/patterns.md | 142 | accepted | foundations |
 | foundations/project-extensions.md | 138 | accepted | foundations |
 | commands/spec-save.md | 137 | accepted | commands |
 | foundations/design-principles.md | 136 | accepted | foundations |
@@ -114,8 +114,8 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスで�
 | foundations/numbering-policy.md | 64 | accepted | foundations |
 | integrity/rules/IR-055-runtime-unresolved-reference.md | 63 | accepted | integrity |
 | skills/agentdev-quality-gates.md | 62 | accepted | skills |
-| skills/agentdev-req-file-manager.md | 62 | accepted | skills |
 | integrity/targeted-docs-guard-implementation.md | 61 | accepted | integrity |
+| skills/agentdev-req-file-manager.md | 61 | accepted | skills |
 | integrity/rules/IR-060-forbidden-japanese-word-detection.md | 60 | accepted | integrity |
 | responsibilities/responsibility-boundary-purification.md | 60 | accepted | responsibilities |
 | skills/agentdev-req-analysis.md | 60 | accepted | skills |
@@ -128,12 +128,12 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスで�
 | skills/agentdev-intake-pipeline.md | 56 | accepted | skills |
 | skills/agentdev-backlog-integration.md | 55 | accepted | skills |
 | skills/agentdev-epic-tracker.md | 55 | accepted | skills |
-| skills/agentdev-adr-file-manager.md | 54 | accepted | skills |
 | skills/agentdev-command-authoring.md | 54 | accepted | skills |
 | skills/agentdev-inspect-skills.md | 54 | accepted | skills |
 | skills/agentdev-learning-pipeline.md | 54 | accepted | skills |
 | skills/agentdev-req-structure-diagnostics.md | 54 | accepted | skills |
 | integrity/backticks-identifier-threshold.md | 53 | accepted | integrity |
+| skills/agentdev-adr-file-manager.md | 53 | accepted | skills |
 | skills/agentdev-adr-guidelines.md | 53 | accepted | skills |
 | skills/agentdev-workflow-routing.md | 52 | accepted | skills |
 | skills/agentdev-architecture-advisory.md | 51 | accepted | skills |

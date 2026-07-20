@@ -24,7 +24,7 @@ DOC-MAP（文書探索入口：索引）
 システムが満たすべき要件を記述する。
 
 - 現行 REQ は REQ-0101 から REQ-0162 までの 53 件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止、履歴参照のみ）
-- 旧 REQ（REQ-0001〜REQ-0050 [全て廃止]）は `docs/requirements/retired/` に移動済み。履歴参照に限定する
+- 旧 REQ（REQ-0001〜REQ-0050 [全て廃止]）は2026-07-20に物理削除された。移行履歴は `docs/requirements/mapping-table.md` を参照
 - 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
 
 > 現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とする。
@@ -34,17 +34,16 @@ DOC-MAP（文書探索入口：索引）
 
 **格納先**:
 - 現行基準: `docs/adr/ADR-01XX.md`（現行の番号帯）
-- 履歴: `docs/adr/retired/ADR-00XX.md`（廃止済みの番号帯）
 
 将来の設計、運用、文書システムを制約する決定とその背景を記録する（REQ-0101-008）。
 
 - 現行基準は ADR-0101 以降の番号帯を使用する（REQ-0112-047）
-- ADR-0001〜0099 は再編前の履歴番号帯であり、`docs/adr/retired/` に配置されている（REQ-0112-048）
+- ADR-0001〜0099 は再編前の履歴番号帯であり、2026-07-20に物理削除された（REQ-0112-048）。後継関係は Decision Map（`docs/adr/README.md`）の参照のこと
 - 承認済み ADR の決定内容は安定して維持する（REQ-0112-045）。変更が必要な場合は新規 ADR を作成する
 - ADR 体系の全面改定時は例外として、ユーザー承認済み範囲で最小限を超える編集を許可する（REQ-0112-044）
 - REQ → ADR、ADR → ADR、Issue → ADR の参照を許可
 - REQ → Issue の一方向参照である（Issue から REQ への逆参照は行わない）
-- 一覧は `docs/adr/README.md` に索引がある（現行基準ビュー / 廃止済み履歴ビュー）
+- 一覧は `docs/adr/README.md` に索引がある（現行基準ビュー）
 
 ## SPEC（現在仕様）
 
