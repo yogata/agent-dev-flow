@@ -7,7 +7,7 @@ updated: 2026-07-12
 
 # キャプチャ境界（Capture Boundaries）
 
-> 本 SPEC は intake / learning の境界定義、Split Rule、PR 本文永続チャネル、REQ 再構成 intake など、複数コマンド、スキルにまたがるキャプチャ契約を定義する（AG-008）。
+> 本 SPEC は intake / learning の境界定義、Split Rule、PR 本文永続チャネル、REQ 再構成 intake など、複数コマンド、スキルにまたがるキャプチャ契約を定義する。
 > 個別 command の capture 責務は各 command SPEC を参照。
 
 ## 目的
@@ -76,7 +76,7 @@ PR 本文の capture 関連セクションは以下を分離する:
 | 状態 | パス |
 |---|---|
 | inbox | `.agentdev/intake/inbox/req-restructure/` |
-| 却下 | 即時削除（`archive/rejected/` 廃止）。reject commit message に却下理由を含めることで監査証跡を確保（AG-006） |
+| 却下 | 即時削除（`archive/rejected/` 廃止）。reject commit message に却下理由を含めることで監査証跡を確保 |
 
 req-define の明示入力としてルーティングする（backlog-review 経由ではない）。検知カテゴリ: SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT
 

@@ -11,7 +11,7 @@ updated: 2026-07-18
 > ローカル版 OpenCode 導入先リポジトリで運用される Case ファイルのスキーマ、状態遷移、採番、見出しを定義する。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0104）。
 > REQ-0141 の詳細仕様を正とする。
-> Case ファイル仕様の正本は本 SPEC であり、`src/opencode-local/agentdev-gh-cli/case-schema/` 配下の定義は操作用定義（正本ではない）とする（AG-008）。
+> Case ファイル仕様の正本は本 SPEC であり、`src/opencode-local/agentdev-gh-cli/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
 
 ## 目的
 
@@ -55,7 +55,7 @@ YAML 前書きには持たせない。
 
 前書きスキーマの形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/frontmatter.yaml` に機械可読形式で保持する。
 本 SPEC は意味仕様の原本であり、`frontmatter.yaml` は本 SPEC と矛盾してはならない。
-`frontmatter.yaml` は操作用定義（正本ではない）とする（AG-008）。
+`frontmatter.yaml` は操作用定義（正本ではない）とする。
 
 ## status enum と状態遷移
 

@@ -49,7 +49,7 @@ inbox/ → promoted/（採用 item の inbox 元ファイルは削除）
 | `inbox/` | 収集された気づき、課題の一次受け |
 | `promoted/` | backlog-review 入力用の採用済み成果物 |
 
-採用・却下いずれの判断も inbox 元ファイルは即時削除とし、監査証跡は commit message（reject の場合は却下理由を含める、AG-006）で確保する。
+採用・却下いずれの判断も inbox 元ファイルは即時削除とし、監査証跡は commit message（reject の場合は却下理由を含める）で確保する。
 
 `promoted/` はフラット構成で、ディレクトリ配置で route / status を表現する。
 

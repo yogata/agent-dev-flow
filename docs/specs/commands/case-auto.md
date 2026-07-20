@@ -43,7 +43,7 @@ updated: 2026-07-18
   - auto_gate preflight（auto_gate.auto_ready が false または未解決 item 残る場合は停止）
 - Step 4: 各工程の実行
   - 委譲工程（req-save / spec-save / case-open / case-close）: 実行担当サブエージェントとして起動（ADR-0127, REQ-0114-006/084/085）。req-save / spec-save 統合委譲で順次実行、case-open / case-close は各コマンド委譲契約に従い起動。委譲起動不能時に delegation-unavailable 報告（REQ-0162-003/004）
-  - case-run（インライン実行）: case-auto が case-run.md を authoritative source として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ、AG-001/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
+  - case-run（インライン実行）: case-auto が case-run.md を authoritative source として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
 - Step 4-1: Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
   - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、REQ-0130-026 踏襲）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲

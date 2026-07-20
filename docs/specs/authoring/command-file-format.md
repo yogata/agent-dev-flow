@@ -13,7 +13,7 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
 
-> **authoring/ ドメインでの配置理由（AG-006）**: 本 SPEC は本文構造・見出し構成・Step 表現・記述形式という執筆規約系の内容を扱うため、共通文書モデル規約（frontmatter・ID 体系・命名規則・URL 参照形式）を扱う `../foundations/patterns.md` と責務分離して `authoring/` ドメインに配置する。
+> **authoring/ ドメインでの配置理由**: 本 SPEC は本文構造・見出し構成・Step 表現・記述形式という執筆規約系の内容を扱うため、共通文書モデル規約（frontmatter・ID 体系・命名規則・URL 参照形式）を扱う `../foundations/patterns.md` と責務分離して `authoring/` ドメインに配置する。
 > `authoring/` は将来 REQ/SPEC/SKILL/guide 執筆規約の集約先として拡張余地を持つ（現状は command のみ）。即時統合・`authoring/` の削除は行わない。
 
 ## 適用範囲

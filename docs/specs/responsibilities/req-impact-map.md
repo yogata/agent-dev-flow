@@ -5,7 +5,7 @@ updated: 2026-06-28
 
 # REQ 影響マップ
 
-> **位置づけと rule-ownership.md との関係（AG-007）**: 本ファイルは **REQ → 影響するルール/アーティファクト** の対応表である。
+> **位置づけと rule-ownership.md との関係**: 本ファイルは **REQ → 影響するルール/アーティファクト** の対応表である。
 > `../integrity/rule-ownership.md`（**ルールドメイン → canonical REQ/SPEC**）と逆方向の対応マップであり、両者は補完関係にある。
 > 配置は `responsibilities/` 残置とする（移動は参照方向、利用頻度、更新責務を確認した後に別途判断）。
 

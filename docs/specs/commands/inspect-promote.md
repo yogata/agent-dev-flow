@@ -20,7 +20,7 @@ updated: 2026-07-18
 ## 出力
 
 - `.agentdev/inspect/promoted/*.md`（手動 promote 採用済み、RU 化対象）
-- reject 検出事項は即時削除（`archive/rejected/` 廃止）。reject 時の commit message に却下理由を含める（AG-006、監査証跠の補強）
+- reject 検出事項は即時削除（`archive/rejected/` 廃止）。reject 時の commit message に却下理由を含める（監査証跠の補強）
 - `.agentdev/intake/promoted/inspect-auto-*.md`（`--auto` 時の自動 promote 成果物）
 - `.agentdev/inspect/promoted/auto-promote-log.md`（`--auto` 実行ログ、append-only）
 - セッション内完了報告
