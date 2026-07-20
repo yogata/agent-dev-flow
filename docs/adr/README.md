@@ -255,6 +255,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0134 | [REQ-0159](../requirements/REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 |
 | ADR-0135 | [REQ-0160](../requirements/REQ-0160.md), [REQ-0103](../requirements/REQ-0103.md) | Project Extensions Architecture（doc-inputs から project-extensions への全面置換） |
 | ADR-0136 | [REQ-0162](../requirements/REQ-0162.md), [REQ-0139](../requirements/REQ-0139.md), [REQ-0130](../requirements/REQ-0130.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0151](../requirements/REQ-0151.md) | 配布物ハーネス境界の浄化（harness 固有詳細の配布物からの除去、4状態結果契約） |
+| ADR-0137 | [REQ-0114](../requirements/REQ-0114.md) | case-auto における case-run インライン実行（多重委譲回避、委譲起点の折りたたみ） |
 | ADR-0138 | [REQ-0114](../requirements/REQ-0114.md), [REQ-0148](../requirements/REQ-0148.md), [REQ-0162](../requirements/REQ-0162.md) | case-auto オーケストレーション制御の AgentDevFlow 側集約（Phase 分離、固定並列数、bg task 状態管理と回復） |
 
 ADR-0001 から ADR-0023 までの23件は、ADR-01XX 現行基盤導入に伴い現行基準から外された歴史的決定記録である（2026-07-20に物理削除）。これらは再編前の判断を保持しており、現行アーキテクチャの基盤は上記 現行基盤ビューの ADR-01XX にある。後継関係（各 ADR-01XX の supersedes 宣言）は Decision Map（関連 ADR 依存関係）の欄を参照。
