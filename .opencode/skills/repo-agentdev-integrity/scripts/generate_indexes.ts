@@ -745,6 +745,299 @@ export function countSpecFiles(specsDir: string): number {
   return count;
 }
 
+// ─── AG-006候補5: REQ/SPEC 健全性メトリクス計測例生成 (Phase C 拡張) ────────
+
+export const REQ_METRICS_BLOCK_ID = "req-metrics-measurement-example";
+export const SPEC_METRICS_BLOCK_ID = "spec-metrics-measurement-example";
+
+/** REQ 要件行数シグナル閾値（req-health-metrics.md L42-46 準拠）。 */
+function computeReqLineSignal(lineCount: number): string {
+  if (lineCount >= 81) return "+2";
+  if (lineCount >= 51) return "+1";
+  return "+0";
+}
+
+/**
+ * REQ ファイル本文内の要件テーブル行数を計測する。
+ * 形式: `| REQ-NNNN-MMM | ... |` に一致する行数（req-health-metrics.md L19 準拠）。
+ */
+export function countReqRequirementLines(
+  content: string,
+  reqId: string,
+): number {
+  const pattern = new RegExp(`^\\| ${reqId}-\\d{3} \\|`);
+  let count = 0;
+  for (const line of content.split("\n")) {
+    if (pattern.test(line)) count++;
+  }
+  return count;
+}
+
+/**
+ * SPEC ファイル本文行数を計測する（spec-health-metrics.md L22 準拠）。
+ * frontmatter（先頭 `---`〜`---`）、HTML コメント（`<!--`〜`-->`、複数行可）、
+ * AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->`〜`<!-- AUTOGEN:END -->`）を除外。
+ * AUTOGEN ブロックを除外することで、SPEC 健全性（人手執筆部分の肥大化検出）と
+ * べき等性（AUTOGEN ブロック自身が計測結果に影響しない）を両立する。
+ * コメント開始/終了と同一行にある本文は除外せず残置する（コメント自身のみ除去）。
+ */
+export function countSpecBodyLines(content: string): number {
+  const lines = content.split("\n");
+  let start = 0;
+  // frontmatter を読み飛ばす。
+  if (lines.length > 0 && lines[0].trim() === "---") {
+    let i = 1;
+    while (i < lines.length && lines[i].trim() !== "---") i++;
+    start = i + 1;
+  }
+  let bodyCount = 0;
+  let inComment = false;
+  let inAutogen = false;
+  for (let i = start; i < lines.length; i++) {
+    const line = lines[i];
+    if (inAutogen) {
+      if (line.includes(AUTOGEN_END_MARKER)) {
+        inAutogen = false;
+      }
+      continue;
+    }
+    if (inComment) {
+      const endIdx = line.indexOf("-->");
+      if (endIdx >= 0) {
+        inComment = false;
+        const after = line.slice(endIdx + 3);
+        if (after.trim().length > 0) bodyCount++;
+      }
+      continue;
+    }
+    const startIdx = line.indexOf("<!--");
+    if (startIdx >= 0) {
+      // AUTOGEN 開始マーカーは AUTOGEN ブロックとして処理。
+      if (line.includes(AUTOGEN_BEGIN_PREFIX)) {
+        inAutogen = true;
+        // 同一行に AUTOGEN 終了マーカーがある場合は即終了（空ブロック）。
+        if (line.includes(AUTOGEN_END_MARKER)) {
+          inAutogen = false;
+        }
+        continue;
+      }
+      const endIdx = line.indexOf("-->", startIdx + 4);
+      if (endIdx >= 0) {
+        // 単一行コメント: 前後の本文を残置。
+        const combined = (line.slice(0, startIdx) + line.slice(endIdx + 3));
+        if (combined.trim().length > 0) bodyCount++;
+      } else {
+        // 複数行コメント開始: 開始より前の本文を残置。
+        inComment = true;
+        const before = line.slice(0, startIdx);
+        if (before.trim().length > 0) bodyCount++;
+      }
+    } else {
+      bodyCount++;
+    }
+  }
+  return bodyCount;
+}
+
+export interface ReqMetricInfo {
+  /** REQ ID（例: "REQ-0101"）。 */
+  id: string;
+  /** 数値部（ソート用）。 */
+  num: number;
+  /** 要件テーブル行数。 */
+  lineCount: number;
+  /** 行数シグナル（"+0"/"+1"/"+2"）。 */
+  signal: string;
+  /** 備考（混合領域）。 */
+  note: string;
+}
+
+export interface SpecMetricInfo {
+  /** SPEC ファイルの docs/specs/ からの相対パス（例: "quality/req-health-metrics.md"）。 */
+  relPath: string;
+  /** SPEC 本文行数。 */
+  lineCount: number;
+  /** frontmatter status（欠落時は "-"）。 */
+  status: string;
+  /** ドメイン分類（commands/skills/workflows/foundations/responsibilities/quality/integrity/local/authoring/uncategorized）。 */
+  domain: string;
+}
+
+/**
+ * 既存の手動記載備考を優先保持するための内部マップ。
+ * req-health-metrics.md「現行 REQ の計測例（参照値）」に既出の8件を混合領域として保持。
+ * 将来的に備考の追加・修正が必要な場合は本マップを更新する（SC-002 混合領域許容）。
+ */
+const REQ_METRICS_HANDCURATED_NOTES: Record<string, string> = {
+  "REQ-0103": "アーティファクト責任分界。肥大化",
+  "REQ-0114": "case-auto。ライフサイクル段階混在で関心シグナル追加",
+  "REQ-0101": "文書、REQ 管理基準",
+  "REQ-0102": "要件定義、保存",
+  "REQ-0112": "ADR ライフサイクル",
+  "REQ-0119": "コマンド、スキル責務分界",
+  "REQ-0108": "docs-check / Validation",
+  "REQ-0136": "REQ/SPEC/ADR 適正運用自動化",
+};
+
+/**
+ * docs/requirements/REQ-*.md を収集し、要件行数・シグナルを算出する。
+ * retired/ 配下は対象外。要件行数降順でソート（同値の場合は REQ ID 昇順）。
+ */
+export function collectReqMetrics(reqDir: string): ReqMetricInfo[] {
+  const reqInfos = collectReqFiles(reqDir);
+  const metrics: ReqMetricInfo[] = [];
+  for (const info of reqInfos) {
+    const fullPath = path.join(reqDir, info.filename);
+    const content = readText(fullPath);
+    if (content === null) continue;
+    const lineCount = countReqRequirementLines(content, info.id);
+    const signal = computeReqLineSignal(lineCount);
+    const note = REQ_METRICS_HANDCURATED_NOTES[info.id] ?? "";
+    metrics.push({
+      id: info.id,
+      num: info.num,
+      lineCount,
+      signal,
+      note,
+    });
+  }
+  metrics.sort((a, b) => {
+    if (b.lineCount !== a.lineCount) return b.lineCount - a.lineCount;
+    return a.num - b.num;
+  });
+  return metrics;
+}
+
+/**
+ * req-health-metrics.md「現行 REQ の計測例（参照値）」AUTOGEN ブロック本体を生成する。
+ * 出力形式:
+ *   | REQ | 要件行数 | 行数シグナル | 備考 |
+ *   |---|---|---|---|
+ *   | REQ-NNNN | N | +N | 備考 |
+ *   ...
+ *   (空行)
+ *   計測日: YYYY-MM-DD
+ */
+export function generateReqMetricsTable(
+  metrics: ReqMetricInfo[],
+  measureDate: string,
+): string[] {
+  const lines: string[] = [];
+  lines.push("| REQ | 要件行数 | 行数シグナル | 備考 |");
+  lines.push("|---|---|---|---|");
+  for (const m of metrics) {
+    lines.push(`| ${m.id} | ${m.lineCount} | ${m.signal} | ${m.note} |`);
+  }
+  lines.push("");
+  lines.push(`計測日: ${measureDate}。`);
+  return lines;
+}
+
+/**
+ * SPEC ファイルの相対パスからドメイン分類を抽出する。
+ * docs/specs/{domain}/{file} の形式を想定。未知のトップレベルディレクトリは uncategorized。
+ * _template.md は collectSpecMetrics 側で除外済みを前提。
+ */
+export function extractSpecDomain(relPath: string): string {
+  const known = [
+    "commands",
+    "skills",
+    "workflows",
+    "foundations",
+    "responsibilities",
+    "quality",
+    "integrity",
+    "local",
+    "authoring",
+  ];
+  const firstSep = relPath.indexOf("/");
+  if (firstSep === -1) return "uncategorized";
+  const top = relPath.slice(0, firstSep);
+  return known.includes(top) ? top : "uncategorized";
+}
+
+/**
+ * docs/specs/ 配下の .md ファイルを再帰収集し、本文行数・status・ドメイン分類を算出する。
+ * _template.md は除外。SPEC 行数降順でソート（同値の場合は relPath 昇順）。
+ */
+export function collectSpecMetrics(specsDir: string): SpecMetricInfo[] {
+  const metrics: SpecMetricInfo[] = [];
+  const walk = (dir: string, relPrefix: string): void => {
+    let entries: import("fs").Dirent[];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true }) as import("fs").Dirent[];
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      const rel = relPrefix === "" ? entry.name : `${relPrefix}/${entry.name}`;
+      if (entry.isDirectory()) {
+        walk(full, rel);
+        continue;
+      }
+      if (!entry.name.endsWith(".md")) continue;
+      if (entry.name === "_template.md") continue;
+      const content = readText(full);
+      if (content === null) continue;
+      const lineCount = countSpecBodyLines(content);
+      const fm = parseFrontmatter(content);
+      let status = "-";
+      if (fm && typeof fm["status"] === "string") status = fm["status"];
+      metrics.push({
+        relPath: rel,
+        lineCount,
+        status,
+        domain: extractSpecDomain(rel),
+      });
+    }
+  };
+  walk(specsDir, "");
+  metrics.sort((a, b) => {
+    if (b.lineCount !== a.lineCount) return b.lineCount - a.lineCount;
+    return a.relPath < b.relPath ? -1 : a.relPath > b.relPath ? 1 : 0;
+  });
+  return metrics;
+}
+
+/**
+ * spec-health-metrics.md「SPEC 計測例」AUTOGEN ブロック本体を生成する。
+ * 出力形式:
+ *   | SPEC | SPEC 行数 | status | ドメイン分類 |
+ *   |---|---|---|---|
+ *   | path/to/spec.md | N | status | domain |
+ *   ...
+ *   (空行)
+ *   計測日: YYYY-MM-DD
+ */
+export function generateSpecMetricsTable(
+  metrics: SpecMetricInfo[],
+  measureDate: string,
+): string[] {
+  const lines: string[] = [];
+  lines.push("| SPEC | SPEC 行数 | status | ドメイン分類 |");
+  lines.push("|---|---|---|---|");
+  for (const m of metrics) {
+    lines.push(
+      `| ${m.relPath} | ${m.lineCount} | ${m.status} | ${m.domain} |`,
+    );
+  }
+  lines.push("");
+  lines.push(`計測日: ${measureDate}。`);
+  return lines;
+}
+
+/**
+ * 現在日付を YYYY-MM-DD 形式（ローカル時刻）で返す。
+ * スクリプト実行環境のタイムゾーンに依存する（docs-check 実行環境と同一）。
+ */
+export function formatMeasureDate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 // ─── main ──────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -784,12 +1077,15 @@ TARGET FILES (SC-002 Phase C):
     - docs/adr/README.md (baseline view, status views, retired history)
     - docs/requirements/README.md (active/retired REQ tables)
     - docs/DOC-MAP.md (inventory stats)
+  Wave 3 (AG-006 候補5):
+    - docs/specs/quality/req-health-metrics.md (REQ line count + signal table)
+    - docs/specs/quality/spec-health-metrics.md (SPEC line count + status + domain table)
 
 GENERATION SOURCE:
   - docs/specs/integrity/rules/IR-*.md (frontmatter + body Field/Value table)
   - docs/adr/ADR-*.md, docs/adr/retired/ADR-*.md (frontmatter)
-  - docs/requirements/REQ-*.md, docs/requirements/retired/REQ-*.md (frontmatter)
-  - docs/specs/**/*.md (file count)
+  - docs/requirements/REQ-*.md, docs/requirements/retired/REQ-*.md (frontmatter, requirement line count)
+  - docs/specs/**/*.md (file count, body line count, frontmatter status)
 
 RELATED:
   - SPEC: docs/specs/integrity/index-auto-generation.md (SC-002)
@@ -835,6 +1131,12 @@ RELATED:
   const adrReadmePath = path.join(adrDir, "README.md");
   const reqReadmePath = path.join(reqDir, "README.md");
   const docMapPath = path.join(root, "docs", "DOC-MAP.md");
+  const qualityDir = path.join(specsDir, "quality");
+  const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
+  const specHealthMetricsPath = path.join(
+    qualityDir,
+    "spec-health-metrics.md",
+  );
 
   if (!fs.existsSync(rulesDir)) {
     console.error(`[generate_indexes] rules dir not found: ${rulesDir}`);
@@ -871,6 +1173,12 @@ RELATED:
     retiredAdrCount: adrRetiredInfos.length,
     specCount,
   });
+
+  const measureDate = formatMeasureDate(new Date());
+  const reqMetrics = collectReqMetrics(reqDir);
+  const specMetrics = collectSpecMetrics(specsDir);
+  const reqMetricsTable = generateReqMetricsTable(reqMetrics, measureDate);
+  const specMetricsTable = generateSpecMetricsTable(specMetrics, measureDate);
 
   const { pre: catalogPre, post: catalogPost } = generateCatalogBlocks(infos);
   const ruleOwnershipLines = generateRuleOwnershipAppendix(infos);
@@ -1050,6 +1358,56 @@ RELATED:
     updates.push({ file: docMapPath, content: docMapUpdated });
   }
 
+  // req-health-metrics 更新 (AG-006 候補5, Wave 3)
+  const reqMetricsOriginal = readText(reqHealthMetricsPath);
+  if (reqMetricsOriginal === null) {
+    console.error(
+      `[generate_indexes] req-health-metrics not found: ${reqHealthMetricsPath}`,
+    );
+    process.exit(EXIT_ERROR);
+  }
+  if (!findAutogenBlocks(reqMetricsOriginal).some(
+    (b) => b.id === REQ_METRICS_BLOCK_ID,
+  )) {
+    console.error(
+      `[generate_indexes] req-health-metrics AUTOGEN marker not found. Expected id: ${REQ_METRICS_BLOCK_ID}`,
+    );
+    process.exit(EXIT_ERROR);
+  }
+  const reqMetricsUpdated = replaceAutogenBlock(
+    reqMetricsOriginal,
+    REQ_METRICS_BLOCK_ID,
+    reqMetricsTable,
+  );
+  if (reqMetricsUpdated !== reqMetricsOriginal) {
+    updates.push({ file: reqHealthMetricsPath, content: reqMetricsUpdated });
+  }
+
+  // spec-health-metrics 更新 (AG-006 候補5, Wave 3)
+  const specMetricsOriginal = readText(specHealthMetricsPath);
+  if (specMetricsOriginal === null) {
+    console.error(
+      `[generate_indexes] spec-health-metrics not found: ${specHealthMetricsPath}`,
+    );
+    process.exit(EXIT_ERROR);
+  }
+  if (!findAutogenBlocks(specMetricsOriginal).some(
+    (b) => b.id === SPEC_METRICS_BLOCK_ID,
+  )) {
+    console.error(
+      `[generate_indexes] spec-health-metrics AUTOGEN marker not found. Expected id: ${SPEC_METRICS_BLOCK_ID}`,
+    );
+    process.exit(EXIT_ERROR);
+  }
+  const specMetricsUpdated = replaceAutogenBlock(
+    specMetricsOriginal,
+    SPEC_METRICS_BLOCK_ID,
+    specMetricsTable,
+  );
+  if (specMetricsUpdated !== specMetricsOriginal) {
+    updates.push({ file: specHealthMetricsPath, content: specMetricsUpdated });
+  }
+
   if (options.dryRun) {
     console.log(
       `[generate_indexes] dry-run: ${infos.length} IR files collected`,
@@ -1071,6 +1429,12 @@ RELATED:
     );
     console.log(
       `[generate_indexes] DOC-MAP inventory: SPEC ${specCount} files`,
+    );
+    console.log(
+      `[generate_indexes] req-health-metrics: ${reqMetrics.length} REQs (measure date ${measureDate})`,
+    );
+    console.log(
+      `[generate_indexes] spec-health-metrics: ${specMetrics.length} SPECs (measure date ${measureDate})`,
     );
     for (const u of updates) {
       console.log(`[generate_indexes] WOULD UPDATE: ${u.file}`);
