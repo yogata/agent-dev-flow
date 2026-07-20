@@ -103,7 +103,7 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 
 case-close が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
 
-- check_changed_docs.ts（--workflow case-close、--files <PR 変更ファイル一覧>）: Step 3-1 targeted docs guard で実行（AG-003）
+- check_changed_docs.ts（--workflow case-close、--files <PR 変更ファイル一覧>）: Step 3-1 targeted docs guard で実行
 - check_extensions.ts（IR-056）: `src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/SKILL.md`, `src/opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行（Step 3-1）
 - test_strategy: QG-4 完了条件確認（REQ-0131-026）
 
@@ -115,11 +115,11 @@ case-close は check_integrity.ts（全体監査）を使用しない（case-clo
 
 targeted docs guard（check_changed_docs.ts）の実行結果で `files_checked` が空の場合、検査対象ファイルが検出されなかったことを示す。case-close は `--files` で PR 変更ファイル一覧を指定するため、Phase 3 契約により FAILURE（exit code 非ゼロ）として報告される。
 
-#### check_changed_docs.ts 側の出力（AG-007, REQ-0158 Phase 3）
+#### check_changed_docs.ts 側の出力（REQ-0158 Phase 3）
 
 `--files` 指定で `files_checked` が空の場合、`failures` 配列に severity `strict` の FAILURE を追加する（exit code 非ゼロ）。メッセージは対象ファイルが検出されなかった旨を示す。`--base-ref` 指定で空の場合は WARNING となる（case-close は `--files` を使用するため対象外）。check_changed_docs.ts は対象選定の十分性を判定せず、対象ファイル未検出のみを報告する。
 
-#### case-close 側の確認ステップ（AG-006）
+#### case-close 側の確認ステップ
 
 case-close は targeted docs guard が FAILURE を返した場合、以下を行う:
 

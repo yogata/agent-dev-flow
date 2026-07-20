@@ -7,7 +7,7 @@ updated: 2026-07-18
 
 # Targeted Docs Guard 実装詳細
 
-REQ-0158（Targeted Docs Integrity Guard）から移送された実装計画・スキーマ詳細（AG-012 で REQ から SPEC へ移送）。配布物たる REQ 側は WHAT（結果要件）のみを残し、HOW（実装計画、スキーマ詳細）は本 SPEC に配置する。
+REQ-0158（Targeted Docs Integrity Guard）から移送された実装計画・スキーマ詳細。配布物たる REQ 側は WHAT（結果要件）のみを残し、HOW（実装計画、スキーマ詳細）は本 SPEC に配置する。
 
 ## Phase1-6 実装計画
 

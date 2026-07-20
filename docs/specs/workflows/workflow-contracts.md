@@ -8,7 +8,7 @@ updated: 2026-06-21
 # ワークフロー契約（横断）
 
 > **Scope**: 本 SPEC は agent-dev-flow リポジトリに適用される横断契約である。
-> 個別 command / skill の現在動作は各 command SPEC（`docs/specs/commands/`）、各 skill SPEC（`docs/specs/skills/`）を参照のこと（AG-008）。
+> 個別 command / skill の現在動作は各 command SPEC（`docs/specs/commands/`）、各 skill SPEC（`docs/specs/skills/`）を参照のこと。
 > 横断 SPEC は個別 SPEC の代替ではない。
 
 ## 目的

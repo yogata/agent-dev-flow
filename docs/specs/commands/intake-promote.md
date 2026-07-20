@@ -34,7 +34,7 @@ GitHub Issue 作成は行わない。
 
 - git commit/push: `.agentdev/intake/` 配下のみ（commit message: `chore: promote intake items`）
 - 採用 item の inbox 元ファイルを削除（`archive/promoted/` への移動を廃止）
-- reject item の inbox 元ファイルを削除（`archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（AG-006、監査証跠の補強）
+- reject item の inbox 元ファイルを削除（`archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（監査証跠の補強）
 - 実行前同期: `git pull --ff-only`
 - GitHub Issue 作成: 行わない（G01）
 

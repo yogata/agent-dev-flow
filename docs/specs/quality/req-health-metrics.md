@@ -161,7 +161,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 
 - **req-define Step 3/10-2**: ドラフト段階で SPLIT シグナルを計算し `draft-meta.split-forecast` に記録（REQ-0136-011）
 - **agentdev-req-structure-diagnostics スキル**: 既存 REQ の健全性診断で本 SPEC の閾値を適用
-- **生成スクリプト**（`.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`）: 本 SPEC の「現行 REQ の計測例（参照値）」テーブルを実ファイルから再生成する（AG-006 候補5、SC-002 Phase C）。定期実行を前提とし、計測結果を実ファイルの最新状態に追従させる
+- **生成スクリプト**（`.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`）: 本 SPEC の「現行 REQ の計測例（参照値）」テーブルを実ファイルから再生成する（SC-002）。定期実行を前提とし、計測結果を実ファイルの最新状態に追従させる
 
 本 SPEC 自体は計測ロジックを実装しない。
 閾値の変更は本 SPEC の更新をもって正とし、各実装は本 SPEC を参照する。

@@ -27,7 +27,7 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 ## 参照する references
 
 - `references/execution-subject-misclassification.md`（実行主体分類誤認の判定基準（REQ-0125-010））
-- `references/spec-operation-contract-consistency.md`（SPEC 操作契約テーブル ↔ references/contracts.md フィールド一致性の判定基準、対象 SPEC 範囲、フィールド対応規則（REQ-0125-011 / AG-003、REQ-0125-004 準拠））
+- `references/spec-operation-contract-consistency.md`（SPEC 操作契約テーブル ↔ references/contracts.md フィールド一致性の判定基準、対象 SPEC 範囲、フィールド対応規則（REQ-0125-011 / REQ-0125-004 準拠））
 
 ## 現在の動作
 

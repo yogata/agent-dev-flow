@@ -184,7 +184,7 @@ verification-only PR は case-close Step 3-1 targeted docs guard で files_check
 
 case-run が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
 
-- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、Step 6 委譲前に実行（AG-002。[docs/** 変更時の targeted docs guard（REQ-0130-035）](#docs-変更時の-targeted-docs-guardreq-0130-035) 参照）
+- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、Step 6 委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-0130-035）](#docs-変更時の-targeted-docs-guardreq-0130-035) 参照）
 - check_extensions.ts（IR-056）: `src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/SKILL.md`, `src/opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
 - test_strategy: Issue 完了条件検証（REQ-0130-029/030）
 

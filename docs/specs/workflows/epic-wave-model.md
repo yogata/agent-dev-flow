@@ -7,7 +7,7 @@ updated: 2026-07-19
 
 # Epic / Wave / Issue 実行モデル
 
-> 本 SPEC は case-open / case-run / case-close / case-auto にまたがる Epic 実行モデルの横断契約を定義する（AG-008）。
+> 本 SPEC は case-open / case-run / case-close / case-auto にまたがる Epic 実行モデルの横断契約を定義する。
 > 各コマンド固有の振る舞いは各 command SPEC を参照。
 
 ## 目的

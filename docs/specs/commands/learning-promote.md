@@ -15,7 +15,7 @@ backlog-review 経由で RU 化する。
 
 **昇華可能性評価、無条件自動REQ化禁止（REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
 無条件の自動REQ化は禁止し、学びは backlog-review → req-define → req-save の昇華経路を経て初めて REQ 化される。
-昇華不能な知見は `deferred.md` の living pool で維持する。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-005）。
+昇華不能な知見は `deferred.md` の living pool で維持する。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
 
 ## HITL 境界、自動実行ルール（REQ-0147-003/004/005/006/007）
 
