@@ -65,10 +65,9 @@ REQ/ADR 保存前に対象ドキュメント種別を確認する。
 
 **Step 3-3**: REQ/ADR artifact_actions 処理ゲート。ドラフトの `artifact_actions` から `artifact: req`/ `artifact: adr` の entry を処理対象とする（draft 全体の REQ/ADR artifact_actions を処理し、OU ごとに分割しない）:
 - `artifact_actions` に REQ/ADR entry がない場合 → no-op 完了（Step 1 で判定済み）
-- `operation_units` が存在する場合 → 処理対象 OU を決定する:
- - OU ID が指定されている場合 → 指定された OU を処理対象とする
- - OU ID 指定なし、OU 1 件 → その OU を自動選択して処理する
- - OU ID 指定なし、OU 2 件以上 → OU 一覧（`ou_id`, `target_req`, `target_spec`, `operation`）を表示して停止する。ユーザーに OU ID の指定を求める
+- `operation_units` が存在する場合 → 処理対象 `artifact_actions` を決定する（REQ-0102-039/040/041）:
+ - OU ID が指定されている場合 → 指定された OU に属する REQ/ADR 対象 `artifact_actions` だけを処理対象とする
+ - OU ID 未指定時 → draft 全体の REQ/ADR 対象 `artifact_actions` を処理対象とする（OU 件数によらず、OU が複数存在することだけを理由に停止しない）
 - `artifact_actions` フィールドがない（旧形式 draft）の場合 → 従来どおり全 req-operation を処理する（後方互換）
 - **SPEC artifact_actions の取扱い**: `artifact: spec` の entry は spec-save コマンドの対象であり、req-save は処理しない（スキップする）
 
