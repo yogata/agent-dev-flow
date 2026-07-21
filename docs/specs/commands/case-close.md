@@ -2,7 +2,7 @@
 title: case-close SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-19
+updated: 2026-07-21
 ---
 
 # case-close SPEC
@@ -56,6 +56,33 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
  - 直列集約: squash merge、main pull&hash確認、Epic本文ステータス追跡テーブル更新、.agentdev永続化commit&push、branch/worktree最終削除
  - rebase による機械的コンフリクト解消は停止条件外（REQ-0151-006 Level1）。解消不能時は case-auto へエスカレーション（REQ-0131-025、REQ-0151-002 Level2/3）
 - Step E5: Epic status table 更新（単一書き手: case-close、ADR-0125）（`running` → `completed ([PR#N](URL))` に更新）
+
+### Step E5b: Epic Issue 完了条件チェックボックス最終評価・更新
+
+Step E5（Epic status table 更新）の後、Step E6（最終 Wave 判定）の前に実施する。Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（ADR-0114 完了条件チェックボックス評価の case-close 専任責務、G08 Epic Wave 経路への明示適用）。
+
+#### 評価対象スコープ（QG-4 観点8）
+
+- **中間 Wave**: 当該 Wave でマージされた PR の対象範囲に属する完了条件のみ `[ ]` → `[x]` とする（PR 対象範囲）。他 Wave の完了条件は `[ ]` のまま残す。
+- **最終 Wave**: Epic Issue の全完了条件を評価する（全体評価スコープ）。実装完了している完了条件を `[ ]` → `[x]` に更新する。
+
+#### 再読込 VERIFY
+
+更新後に Epic Issue 本文を再読込し、対象完了条件の `- [ ]` が0件であることを確認する（最大2回）。
+
+- 1回目の再読込で `- [ ]` が0件なら Step E6（最終 Wave 判定）へ進む。
+- 1回目で `- [ ]` が残る場合は更新を再試行し、再度再読込（2回目）。
+- 2回目でも `- [ ]` が残る場合は構造化エラーで停止する（後述「未達項目残存時の停止」）。
+
+#### 未達項目残存時の停止
+
+最終 Wave で実装完了していない完了条件（`- [ ]`）が残る場合、case-close は構造化エラーで停止する（G08 Epic Wave 経路への明示適用）。中間 Wave で他 Wave の完了条件が `[ ]` のまま残ることは停止条件ではない（対象外 Wave の完了条件は評価対象外のため）。
+
+停止時の出力には以下を含める:
+- 残存する未達完了条件の一覧
+- 対応する子Issue のステータス（completed / blocked / failed）
+- 再開コマンド候補
+
 - Step E6: 最終 Wave 判定（全子Issue completed なら Epic クローズ（Step E6a））。それ以外は残 Wave 通知（Step E6b）
 
 ### 単一 Issue クローズ（従来フロー、後方互換）
