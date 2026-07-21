@@ -19,6 +19,7 @@ Project Extensionsのschema、配置、ID、参照path、委譲先skill、上書
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | テンプレート例、検査対象宣言、repo-local領域をexemptionで抑制する |
 | regression_test | `check_extensions.test.ts`で各検査項目の正常・異常・exemption fixtureを検証する |
+| baseline_status | new |
 | finding_route | intake |
 | triage_action | severityとgate契約に従ってfailまたはwarningとして処理する |
 | last_verified | 検証実行日を記録する |
