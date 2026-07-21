@@ -3,7 +3,7 @@
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 54件、廃止済み: 0件
+現行 REQ: 53件、廃止済み: 1件
 <!-- AUTOGEN:END -->
 
 現行要件の第一参照先は REQ-0101 から REQ-0163 までの範囲である（範囲内の廃止済み REQ を除く）。過去に存在した旧REQ（REQ-0001〜REQ-0050、REQ-0111〜REQ-0121 の一部）は2026-07-20に物理削除され、移行履歴は [移行表](requirements/mapping-table.md) で参照する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。REQ-0160 は project-extensions 機構（ADR-0135）の要件を定義する。
@@ -61,7 +61,6 @@
 | [REQ-0158](requirements/REQ-0158.md) | Targeted Docs Integrity Guard |
 | [REQ-0159](requirements/REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 |
 | [REQ-0160](requirements/REQ-0160.md) | Project Extensions 機構と配布物参照境界 |
-| [REQ-0161](requirements/REQ-0161.md) | config.yaml および旧 doc-inputs 機構定義の完全削除 |
 | [REQ-0162](requirements/REQ-0162.md) | 配布物の harness 実行制御分離 |
 | [REQ-0163](requirements/REQ-0163.md) | subagent 委譲プロトコル要件（category 選定、MUST NOT DO） |
 

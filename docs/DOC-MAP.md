@@ -15,7 +15,8 @@
 ## インデックス統計（自動生成）
 
 <!-- AUTOGEN:BEGIN:id=docmap-inventory -->
-- 現行 REQ: 54件（`docs/requirements/REQ-*.md`）
+- 現行 REQ: 53件（`docs/requirements/REQ-*.md`）
+- 廃止済み REQ: 1件（`docs/requirements/retired/REQ-*.md`）
 - ADR: 29件（`docs/adr/ADR-*.md`）
 - SPEC: 142件（`docs/specs/**/*.md`）
 <!-- AUTOGEN:END -->
@@ -74,7 +75,6 @@
 | [REQ-0156](requirements/REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 | docs/specs 直下基盤SPECの6ドメイン分類・段階移送方針・spec-health-metrics・integrity/rules 分離 |
 | [REQ-0159](requirements/REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 | 配布物依存スキルの src 昇格、repo-local 境界、docs-check 未トラックスキル検出 |
 | [REQ-0160](requirements/REQ-0160.md) | Project Extensions 機構と配布物参照境界 | .agentdev/extensions/** によるプロジェクト固有追加・拡張機構、配布物具体参照禁止（ADR-0135） |
-| [REQ-0161](requirements/REQ-0161.md) | config.yaml および旧 doc-inputs 機構定義の完全削除 | config.yaml 削除と旧 doc-inputs 機構定義文書の完全削除 |
 | [REQ-0162](requirements/REQ-0162.md) | 配布物ハーネス境界浄化 | AgentDevFlow と harness の責務境界、4状態結果契約、具象参照抽象化 |
 | [REQ-0163](requirements/REQ-0163.md) | subagent 委譲プロトコル要件（category 選定、MUST NOT DO） | category 選定ガイドライン（事務的手続きは unspecified-high 推奨、writing は執筆作業のみ）、MUST NOT DO セクション必須化、subagent 委譲プロンプトテンプレート要件 |
 

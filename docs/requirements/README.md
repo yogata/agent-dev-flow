@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下54件を第一参照先とする。
+現在の要件判断では、以下53件を第一参照先とする。
 <!-- AUTOGEN:END -->
 旧REQ 50件は2026-07-20に物理削除された。移行履歴は [mapping-table.md](mapping-table.md) を参照する。
 
@@ -64,7 +64,6 @@
 | [REQ-0158](REQ-0158.md) | Targeted Docs Integrity Guard |
 | [REQ-0159](REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 |
 | [REQ-0160](REQ-0160.md) | Project Extensions 機構と配布物参照境界 |
-| [REQ-0161](REQ-0161.md) | config.yaml および旧 doc-inputs 機構定義の完全削除 |
 | [REQ-0162](REQ-0162.md) | 配布物の harness 実行制御分離 |
 | [REQ-0163](REQ-0163.md) | subagent 委譲プロトコル要件（category 選定、MUST NOT DO） |
 <!-- AUTOGEN:END -->
@@ -74,6 +73,7 @@
 <!-- AUTOGEN:BEGIN:id=req-retired-table -->
 | REQ ID | タイトル |
 |---|---|
+| [REQ-0161](retired/REQ-0161.md) | config.yaml および旧 doc-inputs 機構定義の完全削除 |
 <!-- AUTOGEN:END -->
 
 ## 移行表
