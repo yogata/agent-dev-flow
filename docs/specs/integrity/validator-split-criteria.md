@@ -2,7 +2,7 @@
 title: validator 分割基準
 status: accepted
 created: 2026-07-07
-updated: 2026-07-07
+updated: 2026-07-21
 ---
 
 # validator 分割基準
@@ -11,7 +11,7 @@ updated: 2026-07-07
 
 ## 目的
 
-check_changed_docs.ts の内部 validator 構成と、validator を分割する基準を実装詳細SPEC として文書化する（REQ-0158 Phase 6）。
+check_changed_docs.ts の内部 validator 構成と、validator を分割する基準を実装詳細SPEC として文書化する（targeted-docs-guard-implementation.md Phase 6）。
 
 ## validator の責務境界
 

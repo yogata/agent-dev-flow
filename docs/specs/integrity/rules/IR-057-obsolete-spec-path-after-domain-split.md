@@ -1,5 +1,6 @@
 ---
 status: accepted
+updated: 2026-07-21
 ---
 
 # IR-057: obsolete-spec-path-after-domain-split
@@ -7,12 +8,12 @@ status: accepted
 | Field | Value |
 |-------|-------|
 | rule_id | IR-057 |
-| description | `docs/specs/integrity/obsolete-path-map.yaml` に登録された旧SPEC直下パス（`docs/specs/<name>.md` 形式）が現行文書、原本、配置先、検査スクリプトに残っていないことを検証する（REQ-0158-002）。同時に link mode 統一（ADR-0131）に伴い廃止確定となった直接生成方式語彙を検出する。語彙は「単独検出語」（即 ng）と「近接条件つき検出語」（同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ ng）に分離する。単独検出語: `src/opencode-local/generation-flow.md`、`src/opencode-local/transform/`、`transform/generate.md`、`transform/review.md`、`transform/spec.md`、`local-opencode-transform`、`直接生成方式`、`生成フロー`。近接条件つき検出語: `再生成`、`上書き保護`、`generated_by`。`generated_by` + `local-opencode-transform` 組み合わせ検出は `generated_by_combination_rule` で維持する |
+| description | `docs/specs/integrity/obsolete-path-map.yaml` に登録された旧SPEC直下パス（`docs/specs/<name>.md` 形式）が現行文書、原本、配置先、検査スクリプトに残っていないことを検証する（REQ-0108-280）。同時に link mode 統一（ADR-0131）に伴い廃止確定となった直接生成方式語彙を検出する。語彙は「単独検出語」（即 ng）と「近接条件つき検出語」（同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ ng）に分離する。単独検出語: `src/opencode-local/generation-flow.md`、`src/opencode-local/transform/`、`transform/generate.md`、`transform/review.md`、`transform/spec.md`、`local-opencode-transform`、`直接生成方式`、`生成フロー`。近接条件つき検出語: `再生成`、`上書き保護`、`generated_by`。`generated_by` + `local-opencode-transform` 組み合わせ検出は `generated_by_combination_rule` で維持する |
 | severity | strict |
 | category | broken-reference |
 | detection_method | `check_integrity.ts` による `obsolete-path-map.yaml` ロード、各エントリ `old` パターンの正規表現マッチング（行単位走査）。`scope.include`、`scope.exclude` で検査対象を絞り込む。語彙検出は `legacy_local_generation_vocabulary`（単独検出語: severity=ng）と `legacy_local_generation_conditional_vocabulary`（近接条件つき検出語: proximity_required=true）に分離し、後者は同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ検出する。`generated_by` + `local-opencode-transform` の組み合わせ検出は `generated_by_combination_rule` で維持する |
 | affected_artifacts | [AGENTS.md, README.md, docs/requirements/**/*.md, docs/adr/**/*.md, docs/specs/**/*.md, src/opencode/**/*.md, src/opencode-local/**/*.md, .opencode/skills/**/*.md, .opencode/commands/**/*.md] |
-| related_req | [REQ-0158-002, REQ-0156-006, REQ-0141-004, REQ-0108-265, REQ-0144-024] |
+| related_req | [REQ-0108-280, REQ-0108-282, REQ-0156-006, REQ-0141-004, REQ-0108-265, REQ-0144-024] |
 | related_spec | [../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/local-generation.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。`scope.exclude` で履歴参照領域（`docs/requirements/retired/**`、`docs/adr/retired/**`）を除外する。現行ADRに歴史的経緯として旧パスを記載する場合は rule 側で例外登録を明示する（後述「例外登録」）。コードブロック内の例示は exemption とする |
@@ -61,7 +62,7 @@ status: accepted
 | `local/local-generation.md` | link mode 移行 SPEC。廃止経緯、削除資産、移行手順の正本文書であり、廃止語彙を歴史的経緯として記載する正当なファイル（REQ-0141-028/029） |
 | `IR-046`、`IR-048` ルールファイル | 廃止識別子（`generated_by: local-opencode-transform`）を検出対象とする整合性ルール。検出対象語彙をルール定義として参照する正当なファイル |
 | `REQ-0141` | link mode 移行に伴う廃止確定を定義する REQ。廃止対象資産のパス、語彙を要件文として記載する正当なファイル |
-| `REQ-0158` | IR-057 検出を定義する REQ。検出対象語彙一覧、検出仕様を要件文として記載する正当なファイル |
+| `REQ-0158` | IR-057 検出を定義していた旧 REQ（retired）。検出対象語彙一覧、検出仕様を要件文として記載する正当なファイル（現在は `docs/requirements/retired/REQ-0158.md` へ移動） |
 | 現行ADRに履歴として旧パスを記載する場合 | rule 側で例外登録を明示する（後述） |
 
 ## 通常検出対象
