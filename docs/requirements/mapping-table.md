@@ -2,7 +2,7 @@
 id: mapping-table
 title: "旧REQから新active REQへの移行表"
 created: "2026-05-30"
-updated: "2026-07-04"
+updated: "2026-07-21"
 ---
 
 ## 目的
@@ -79,33 +79,3 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0121 | migrated | REQ-0103, REQ-0108 | Runtime Command 規範語構成を REQ-0103 に吸収（REQ-0103-152）、Integrity 検査定義（規範語検査の責務境界違反検査への再定義、規範語残存前提の除去）を REQ-0108 に吸収（REQ-0108-242, REQ-0108-243）。語彙ポリシー整合は REQ-0103/REQ-0108/REQ-0119 で一貫管理するため独立REQは不要と判断（`agentdev-system-reorganization` OU-04）。旧REQ、削除済み（2026-07-20物理削除） |
 | REQ-0115 | migrated | REQ-0108, REQ-0109, REQ-0124 | 恒久要件を REQ-0108（docs-check 検査責務）、REQ-0109（inspect-docs）、REQ-0124（inspect 命名恒久制約）へ移行し retire（2026-06-16）。タイトル「docs-* command suite」が移行主題であり REQ-0124-021 に抵触。旧REQ、削除済み（2026-07-20物理削除） |
 | REQ-0117 | migrated | REQ-0110 | Git worktree ジャンクションクリーンアップフォールバック手順を REQ-0110 に統合（REQ-0110-008: Windows + ジャンクション環境の "Not a directory" エラーフォールバック）。worktree 削除信頼性を一元管理するため独立REQは不要と判断（`agentdev-system-reorganization` OU-06）。旧REQ、削除済み（2026-07-20物理削除） |
-
-## Active Set
-
-| 新REQ | 関心対象 |
-|---|---|
-| REQ-0101 | 文書、REQ管理基準 |
-| REQ-0102 | 要件定義、保存 |
-| REQ-0103 | Artifact責任分界 |
-| REQ-0104 | Workflow / Command Protocol |
-| REQ-0105 | RU lifecycle / Requirement Unit 管理 |
-| REQ-0106 | Case実行オーケストレーション / Epic、Wave |
-| REQ-0107 | Reporting / Writing Quality |
-| REQ-0108 | docs-check / Validation / Tests |
-| REQ-0109 | inspect-docs / REQ体系整合性 |
-| REQ-0110 | Git worktree cleanup 信頼性 |
-| REQ-0112 | ADRライフサイクル、文書体系基盤、実行時独立性 |
-| REQ-0113 | Skill References SPEC分離 |
-| REQ-0114 | /agentdev/case-auto 最大自走モード |
-| REQ-0119 | コマンド、スキル、サブエージェント責務分界（新規、旧REQ移行なし） |
-| REQ-0123 | workflow-lifecycle 宣言的定義責務とコマンド固有手順のスキル分担（新規、旧REQ移行なし） |
-| REQ-0124 | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle（新規、旧REQ移行なし） |
-| REQ-0125 | inspect-skills / Command/Skill参照妥当性検出（新規、旧REQ移行なし） |
-| REQ-0126 | inspect-promote / 検出finding分類、昇格（新規、旧REQ移行なし） |
-| REQ-0127 | Intake command群 (capture / from-github / promote)（新規、REQ-0105 から分割） |
-| REQ-0128 | Learning-promote（新規、REQ-0105 から分割） |
-| REQ-0129 | Backlog-review（新規、REQ-0105 から分割） |
-| REQ-0130 | case-run / 実装パイプライン（新規、REQ-0106 から分割） |
-| REQ-0131 | case-close / 完了処理（新規、REQ-0106 から分割） |
-| REQ-0132 | case-open / Issue作成（新規、REQ-0105 から分割） |
-| REQ-0133 | case-update / Issue更新（新規、旧REQ移行なし） |
