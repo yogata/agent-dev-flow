@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下53件を第一参照先とする。
+現在の要件判断では、以下52件を第一参照先とする。
 <!-- AUTOGEN:END -->
 旧REQ 50件は2026-07-20に物理削除された。移行履歴は [mapping-table.md](mapping-table.md) を参照する。
 
@@ -61,7 +61,6 @@
 | [REQ-0154](REQ-0154.md) | SPEC status 追跡と draft 放置検出 |
 | [REQ-0155](REQ-0155.md) | 文書粒度モデル |
 | [REQ-0156](REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 |
-| [REQ-0158](REQ-0158.md) | Targeted Docs Integrity Guard |
 | [REQ-0159](REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 |
 | [REQ-0160](REQ-0160.md) | Project Extensions 機構と配布物参照境界 |
 | [REQ-0162](REQ-0162.md) | 配布物の harness 実行制御分離 |
@@ -70,9 +69,12 @@
 
 旧REQ（REQ-0001〜REQ-0050、REQ-0111〜REQ-0121 の一部）は2026-07-20に物理削除された。移行履歴は [mapping-table.md](mapping-table.md) を参照。
 
+## 廃止済み要件
+
 <!-- AUTOGEN:BEGIN:id=req-retired-table -->
 | REQ ID | タイトル |
 |---|---|
+| [REQ-0158](retired/REQ-0158.md) | Targeted Docs Integrity Guard |
 | [REQ-0161](retired/REQ-0161.md) | config.yaml および旧 doc-inputs 機構定義の完全削除 |
 <!-- AUTOGEN:END -->
 
