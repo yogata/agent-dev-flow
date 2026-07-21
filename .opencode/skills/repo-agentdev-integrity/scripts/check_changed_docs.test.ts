@@ -142,6 +142,56 @@ function initGitFixture(root: string): void {
   execSync('git commit -q -m "init fixture" --no-verify', { cwd: root });
 }
 
+function addSupersededFixtures(root: string): void {
+  const specsDir = join(root, "docs", "specs");
+  writeFileSync(
+    join(specsDir, "superseded-valid.md"),
+    [
+      "---",
+      "title: superseded valid spec",
+      "status: superseded",
+      "superseded_by: SPEC-0451",
+      "---",
+      "",
+      "# Superseded valid",
+      "",
+      "Fixture content for superseded_by valid test.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(specsDir, "superseded-invalid.md"),
+    [
+      "---",
+      "title: superseded invalid spec",
+      "status: superseded",
+      "---",
+      "",
+      "# Superseded invalid",
+      "",
+      "Missing superseded_by frontmatter.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(specsDir, "unknown-status.md"),
+    [
+      "---",
+      "title: unknown status spec",
+      "status: foobar",
+      "---",
+      "",
+      "# Unknown status",
+      "",
+      "Invalid status value.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
 const FIXTURE_ROOT = join(TEMP_ROOT, "fixture");
 const GIT_FIXTURE_ROOT = join(TEMP_ROOT, "git-fixture");
 
@@ -150,6 +200,7 @@ beforeAll(() => {
   mkdirp(GIT_FIXTURE_ROOT);
   buildMinimalFixture(FIXTURE_ROOT);
   buildMinimalFixture(GIT_FIXTURE_ROOT);
+  addSupersededFixtures(FIXTURE_ROOT);
   copyScripts(FIXTURE_ROOT);
   copyScripts(GIT_FIXTURE_ROOT);
   initGitFixture(GIT_FIXTURE_ROOT);
@@ -557,5 +608,93 @@ describe("Cross-cutting: doc_inputs_check_required must stay removed", () => {
     const extra = [...actualKeys].filter((k) => !expectedKeys.has(k));
     expect(missing).toEqual([]);
     expect(extra).toEqual([]);
+  });
+});
+
+// ─── Issue #1671 TS-004: SPEC status superseded_by handling ─────────────────
+
+describe("Issue #1671 TS-004: SPEC status superseded_by handling (ADR-0123, REQ-0101-076)", () => {
+  it("superseded + superseded_by 設定済み → SPEC-STATUS failure なし (exit 0)", () => {
+    const r = runScript(FIXTURE_ROOT, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/superseded-valid.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    const statusFailures = parsed.failures.filter(
+      (f: { rule_id: string }) => f.rule_id === "SPEC-STATUS",
+    );
+    expect(statusFailures).toEqual([]);
+  });
+
+  it("superseded + superseded_by 未設定 → SPEC-STATUS strict failure (exit 非0)", () => {
+    const r = runScript(FIXTURE_ROOT, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/superseded-invalid.md",
+      "--json",
+    ]);
+    expect(r.exitCode).not.toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    const target = parsed.failures.find(
+      (f: { rule_id: string; severity: string }) =>
+        f.rule_id === "SPEC-STATUS" && f.severity === "strict",
+    );
+    expect(target).toBeDefined();
+    expect(target.message).toContain("superseded_by");
+  });
+
+  it("不正 status → SPEC-STATUS warning", () => {
+    const r = runScript(FIXTURE_ROOT, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/unknown-status.md",
+      "--json",
+      "--fail-level",
+      "warning",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    const target = parsed.failures.find(
+      (f: { rule_id: string; severity: string }) =>
+        f.rule_id === "SPEC-STATUS" && f.severity === "warning",
+    );
+    expect(target).toBeDefined();
+    expect(target.message).toContain("foobar");
+  });
+
+  it("status 欠落 → accepted 相当 → SPEC-STATUS failure なし", () => {
+    const specsDir = join(FIXTURE_ROOT, "docs", "specs");
+    writeFileSync(
+      join(specsDir, "status-missing.md"),
+      [
+        "---",
+        "title: status missing spec",
+        "---",
+        "",
+        "# Status missing",
+        "",
+        "status frontmatter is absent (accepted equivalent).",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const r = runScript(FIXTURE_ROOT, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/status-missing.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    const statusFailures = parsed.failures.filter(
+      (f: { rule_id: string }) => f.rule_id === "SPEC-STATUS",
+    );
+    expect(statusFailures).toEqual([]);
   });
 });
