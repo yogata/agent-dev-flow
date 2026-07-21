@@ -435,3 +435,39 @@
 - **タグ**: #wave5 #worktree #isolation-violation #delegation #adapter-protocol #case-auto #case-run #recovery
 
 ---
+
+## 複数PR跨ぎの索引 AUTOGEN 再生成忘れによる docs-check NG 発生
+
+- **問題事象**: Epic #1711 Wave 2 で OU-002 (REQ-0158 retire) と OU-003 (REQ-0161 retire) が並列実行された際、OU-002 が REQ-0158 を retired/ へ移動したが索引ファイル（README、DOC-MAP）の AUTOGEN ブロック更新を OU-003 へ委譲し、OU-003 は REQ-0161 のみ処理して REQ-0158 の索引更新が漏れた。これにより case-close QG-4 で docs-check が NG（req-active-count, req-active-table, req-retired-table, docmap-inventory の不整合）を検出した。
+- **発生局面**: case-close（QG-4 最終評価）
+- **検知方法**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts` 実行で index-generation-consistency NG 7件検出
+- **根本原因**: 複数PRが同じ索引ファイルを編集する際、各PRが独立して AUTOGEN ブロックを更新できず、一方が他方へ委譲する設計になった。委譲先のPRが委譲元の要件を完全に把握しておらず、更新漏れが発生した。また generate_indexes.ts に pre-existing bug（spec-health-metrics.md L26 AUTOGEN marker backtick 誤認）があり、自動再生成による安全網が機能していなかった。
+- **自律対応内容**: case-close QG-4 で不整合を検出し、(1) generate_indexes.ts 停止原因の spec-health-metrics.md L26 を抽象化、(2) generate_indexes.ts で全 AUTOGEN ブロックを一括再生成、(3) docs/README.md の REQ-0158 active エントリ削除、(4) docs/requirements/README.md に廃止済み要件セクションヘッダー追加、(5) フォローアップ PR #1718 としてマージ
+- **ユーザー確認有無**: なし（エージェント自律で QG-4 評価中に発見・修正）
+- **ADR/REQ/spec影響**: なし（運用知見。SPEC変更不要）。intake item として generate_indexes.ts bug 改修を記録
+- **横展開観点**: 複数PRが同じ索引ファイルを編集する場合、最後にマージされるPRが generate_indexes.ts を実行して全 AUTOGEN ブロックを一括再生成する運用を検討。または case-close でデフォルトで generate_indexes.ts を実行する手順の追加を検討
+- **再発条件**: (1) 複数PRが同じ索引ファイルの AUTOGEN ブロックに依存する変更を行う、(2) 各PRが独立して索引更新を試みるか委譲する、(3) case-close で docs-check が実行されず不整合が検出されない
+- **予防策候補**: (a) case-close Step 3 に generate_indexes.ts 実行ステップを追加し、マージ後に AUTOGEN ブロックを必ず再生成する。(b) check_integrity.ts の index-generation-consistency を case-close の必須ゲートとして組み込む。(c) 複数PRの索引ファイル編集衝突を case-open Wave 構成で事前検出し、単一PRに集約する
+- **想定反映先**: case-close command SPEC（Step 3 または Step E5b）、check_integrity.ts 運用、case-open Wave 構成ロジック
+- **関連**: PR #1716, PR #1717, PR #1718, Epic #1711, generate_indexes.ts, check_integrity.ts, index-generation-consistency IR-061
+- **タグ**: #case-close #qg-4 #autogen #generate-indexes #index-consistency #multiple-pr #docs-check #epic-1711
+
+---
+
+## verification-only 空 PR の squash merge 許容性
+
+- **問題事象**: Epic #1711 Wave 1 (OU-001 #1712) は完全性台帳作成のみで実装差分0件の verification-only PR となった。GitHub が空コミット単体の squash merge を許容するか不確実だったため、マージ可否の事前確認が必要だった。
+- **発生局面**: case-close（PR マージ）
+- **検知方法**: `gh pr view 1715 --json mergeable,mergeStateStatus` で MERGEABLE/CLEAN を確認後、`gh pr merge 1715 --squash` を実行
+- **根本原因**: REQ-0158-002 で verification-only PR の PASS ロジックが要件化されているが、GitHub が空コミット単体の squash merge を許容するかの実証がなかった
+- **自律対応内容**: GitHub が空コミット単体の squash merge を許容することを実証（PR #1715 merge commit 41cf19de）。REQ-0108-279 の「GitHub が空 PR の squash merge を許可し空 commit を生成することを前提とする」が実証済みとなった
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（実証結果。REQ-0108-279 の前提を強化する観測結果）
+- **横展開観点**: 今後 verification-only PR を作成する case で、GitHub squash merge が許容されることが確定したため、空 PR の取り扱いで躊躇不要
+- **再発条件**: verification-only PR（実装差分0件）を作成する case
+- **予防策候補**: 特になし（実証済み）。case-run で verification-only PR を作成する際、mergeable 確認後に自信を持ってマージ可能
+- **想定反映先**: REQ-0108-279 の実証根拠（参照用）、case-run execution adapter（verification-only PR 作成時の判断材料）
+- **関連**: PR #1715, Issue #1712, REQ-0158-002, REQ-0108-279, Epic #1711
+- **タグ**: #verification-only-pr #empty-commit #squash-merge #github #req-0108-279 #epic-1711
+
+---
