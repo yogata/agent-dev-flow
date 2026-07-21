@@ -549,16 +549,31 @@ function checkSpecFrontmatter(root: string, files: string[]): Failure[] {
     const fm = parseSimpleFrontmatter(content);
     if (!fm) continue;
     const status = fm["status"];
-    if (status && status !== "draft" && status !== "accepted") {
-      failures.push({
-        rule_id: "SPEC-STATUS",
-        severity: "warning",
-        file: path.relative(root, f).replace(/\\/g, "/"),
-        line: 3,
-        message: `SPEC status '${status}' is not 'draft' or 'accepted'`,
-        expected: "draft or accepted (ADR-0123)",
-      });
+    // status 欠落は accepted 相当（document-model.md 設定規則）。
+    if (!status) continue;
+    if (status === "draft" || status === "accepted") continue;
+    if (status === "superseded") {
+      // REQ-0101-076: superseded は superseded_by 必須。保持SPECは通常内容検査対象外。
+      if (!fm["superseded_by"]) {
+        failures.push({
+          rule_id: "SPEC-STATUS",
+          severity: "strict",
+          file: path.relative(root, f).replace(/\\/g, "/"),
+          line: 3,
+          message: `SPEC status 'superseded' requires 'superseded_by' frontmatter`,
+          expected: "superseded_by: <後継SPEC id> (ADR-0123, REQ-0101-076)",
+        });
+      }
+      continue;
     }
+    failures.push({
+      rule_id: "SPEC-STATUS",
+      severity: "warning",
+      file: path.relative(root, f).replace(/\\/g, "/"),
+      line: 3,
+      message: `SPEC status '${status}' is not 'draft', 'accepted', or 'superseded'`,
+      expected: "draft, accepted, or superseded (ADR-0123, REQ-0101-076)",
+    });
   }
   return failures;
 }

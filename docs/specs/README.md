@@ -8,12 +8,12 @@ SPEC ファイルは現行アーキテクチャの正規文書である（REQ-01
 
 ## SPEC status 追跡情報源（REQ-0154-001, REQ-0154-003）
 
-本ファイルが SPEC の `status`（draft / accepted、ADR-0123 定義）を視認する単一の追跡情報源である（REQ-0154-001）。
+本ファイルが SPEC の `status`（draft / accepted / superseded、ADR-0123 定義）を視認する単一の追跡情報源である（REQ-0154-001）。
 後述の各 SPEC 一覧表の `status` 列で全 SPEC のライフサイクル状態を集約表示する。
 基盤SPEC（REQ-0156 の6ドメイン配下）の status を含め、全 SPEC の status を追跡対象とする（REQ-0154-003）。
 
 - **情報源**: 本ファイル（`docs/specs/README.md`）のみ。`docs/DOC-MAP.md` は SPEC の status を重複管理しない（探索経路の案内のみ）
-- **status 値**: ADR-0123 で定義される `draft` / `accepted` のみ。値の追加、変更は本ファイルの対象外（REQ-0154 対象外）
+- **status 値**: ADR-0123 で定義される `draft` / `accepted` / `superseded` の3つ。値の追加、変更は本ファイルの対象外（REQ-0154 対象外）。`superseded` は `superseded_by` で後継SPECを明示する（REQ-0101-076）
 - **更新タイミング**: spec-save（draft 保存）、case-close（draft から accepted への昇格）の各工程で本ファイルの status 列を更新する。基盤SPEC も同一工程に従う（REQ-0154-003）
 - **欠落扱い**: `status` frontmatter を持たない SPEC は表中で `-` で示す。`-` の SPEC は status 付与を要する（対象 SPEC は spec-save / case-close で順次 status を付与する）
 
