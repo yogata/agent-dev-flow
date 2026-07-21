@@ -15,8 +15,8 @@
 ## インデックス統計（自動生成）
 
 <!-- AUTOGEN:BEGIN:id=docmap-inventory -->
-- 現行 REQ: 53件（`docs/requirements/REQ-*.md`）
-- 廃止済み REQ: 1件（`docs/requirements/retired/REQ-*.md`）
+- 現行 REQ: 52件（`docs/requirements/REQ-*.md`）
+- 廃止済み REQ: 2件（`docs/requirements/retired/REQ-*.md`）
 - ADR: 29件（`docs/adr/ADR-*.md`）
 - SPEC: 142件（`docs/specs/**/*.md`）
 <!-- AUTOGEN:END -->
