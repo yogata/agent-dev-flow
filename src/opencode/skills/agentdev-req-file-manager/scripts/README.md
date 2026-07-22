@@ -1,7 +1,8 @@
 # `agentdev-req-file-manager` scripts
 
-REQ/ADR ファイル管理の決定的処理スクリプト群（REQ/160、AG-002/006、design-principles.md 第5節）。
-SPEC 固有スクリプト（`search-target-area.ts`）は `agentdev-spec-file-manager` へ移管済み（REQ-0136-029/032）。
+REQ/ADR 固有の採番・検索処理のみを扱う決定的処理スクリプト群（REQ/160、AG-002/006、design-principles.md 第5節）。
+`search-target-area.ts` は `agentdev-spec-file-manager` へ移管済み（REQ-0136-029/032）。
+文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-019、RU-20260722-01 合意）。
 
 ## 構成
 
@@ -16,10 +17,7 @@ scripts/
 ├── src/
 │   ├── alloc-req-number.ts          # REQ番号採番（max+1、欠番埋め禁止）
 │   ├── alloc-adr-number.ts          # ADR番号採番（max+1、欠番埋め禁止）
-│   ├── alloc-composite-id.ts        # 要件行ID採番（REQ-NNNN-MMM、max+1）
-│   ├── check-frontmatter-consistency.ts  # frontmatter id ↔ ファイル名整合性
-│   ├── check-entry-existence.ts     # README/DOC-MAP/mapping-table エントリ存在
-│   └── check-change-impact.ts       # 変更範囲検証（許可パスリストとの積集合）
+│   └── alloc-composite-id.ts        # 要件行ID採番（REQ-NNNN-MMM、max+1）
 └── tests/
     └── *.test.ts                    # 各スクリプトの core 純粋関数テスト
 ```

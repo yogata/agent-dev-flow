@@ -87,7 +87,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  emitError('Usage: check-entry-existence <id> <file1> [file2 ...]  OR  stdin JSON { id, files: string[] }');
+  emitError('Usage: check-entry-existence <id> <file1> [file2 ...]  OR  stdin JSON { id: string, files: string[] }');
 }
 
 async function readStdin(): Promise<string> {
