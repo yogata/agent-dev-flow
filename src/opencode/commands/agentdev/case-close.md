@@ -282,7 +282,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）
 - G24: Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する（単一書き手制約）。case-run は Epic Issue 本文を読み取るのみで書き込まない。case-auto は Wave 反復制御のみ行い Epic Issue 本文に直接書き込まない。last-write-wins 競合防止は case-close の単一書き手で維持される
 - G25: Epic Wave クローズ（Step E1〜E6）は Epic Issue番号入力時（ステータス追跡テーブル存在時）のみ実行。単一 Issue番号入力時は従来フロー（単一 Issue クローズ Step 1-1〜）を維持する（後方互換）
 - G26: Epic Wave クローズ時の PR マージ、子Issue クローズは現在 Wave の `running` 子Issue のみを対象とする。`pending`/ `ready`/ `blocked`/ `failed` は対象外。`blocked`/ `failed` を `completed` に上書きしない（べき等性、`agentdev-epic-tracker` 準拠）
-- G27: squash merge 実行前に PR の mergeable 状態を事前確認し、UNKNOWN の場合は最大60秒（10秒間隔）ポーリング待機すること（REQ）。上限超過時はマージを中止し構造化エラーで停止する。ポーリングを省略して UNKNOWN 状態のままマージを試行してはならない
+- G27: squash merge 実行前に PR の mergeable 状態を事前確認し、UNKNOWN の場合は mergeable になるまでポーリング待機すること（REQ-0131-028）。待機間隔・上限は `agentdev-gh-cli` の mergeable UNKNOWN ポーリング手続きが所有する（REQ-0103-163、AG-001）。上限超過時はマージを中止し構造化エラーで停止する。ポーリングを省略して UNKNOWN 状態のままマージを試行してはならない
 - G28: `git pull --ff-only` 実行前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出し、検出時に安全な代替同期手順を選択すること（REQ）。暗黙の手順順序依存で pull を継続してはならない
 
 
