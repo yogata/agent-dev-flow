@@ -97,7 +97,7 @@ agent: sisyphus
 
 ### Step 13: deferred 移動（原子的操作）
 
-`agentdev-learning-pipeline` の「deferred 移動原子的操作プロシージャ」（`references/deferred-atomic-move-procedure.md` 参照）に従い、当該プロシージャが定める inbox.md 全エントリの deferred.md 追記、書込検証、inbox.md クリアを実行する。本手順は原子的操作であり、検証失敗時は inbox.md を変更せずエラー内容を報告する（データ喪失防止）。
+`agentdev-learning-pipeline` の「deferred 移動原子的操作プロシージャ」に従い、当該プロシージャが定める inbox.md 全エントリの deferred.md 追記、書込検証、inbox.md クリアを実行する。本手順は原子的操作であり、検証失敗時は inbox.md を変更せずエラー内容を報告する（データ喪失防止）。
 
 ### Step 14: 昇華時 prune（deferred.md からの除去）
 

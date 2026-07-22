@@ -56,7 +56,7 @@ fail 時は Issue 作成前に req-define 差し戻しを推奨
 
 **Step 2-1a**: 完了条件の数値閾値到達可能性検証（REQ-0131-031、QG-2 観点6）。
 完了条件に数値閾値（LF 数、行数、ファイル数、件数等）を含む場合、当該閾値が同種既存成果物の実測値と比較して対象成果物の自然な構造で到達可能であることを検証する。
-test strategy 策定ガイド（`agentdev-req-analysis` の `references/test-strategy-numeric-threshold-guide.md`）に基づく策定が前提。境界ケース #1538/TS-007 由来。
+test strategy 策定ガイド（`agentdev-req-analysis` の「test strategy 数値閾値ガイド」）に基づく策定が前提。境界ケース #1538/TS-007 由来。
 - 検出時点で閾値の根拠（同種既存例の実測値、中央値/最小値/最大値）が記載されていない場合、要件定義者に根拠明示を確認する
 - case-open は自動推論を行わず、要件定義者が明示した閾値のみを受け付ける
 

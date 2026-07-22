@@ -96,13 +96,13 @@ workflow_route は都度導出し保存しない
 
 **Step 5-1**: 親Epicステータス更新（`agentdev-epic-tracker` 参照）
 
-**Step 5-2**: worktree precondition gate（実行担当サブエージェント起動前の隔離検証）。`agentdev-git-worktree` の「worktree 内判定ヘルパー」（`references/worktree-operations.md` 該当セクション）に従い、当該 Issue の worktree+ブランチが作成済みであり、現在 worktree 内にいることを検証する。検証失敗時（worktree 未作成、メインリポジトリにいる）は実行担当サブエージェントを起動**せず**停止し、Step 5（Worktree作成、ブランチ準備）へ戻るようユーザーに報告する。Step 6 へ進んではならない。
+**Step 5-2**: worktree precondition gate（実行担当サブエージェント起動前の隔離検証）。`agentdev-git-worktree` の「worktree 内判定ヘルパー」に従い、当該 Issue の worktree+ブランチが作成済みであり、現在 worktree 内にいることを検証する。検証失敗時（worktree 未作成、メインリポジトリにいる）は実行担当サブエージェントを起動**せず**停止し、Step 5（Worktree作成、ブランチ準備）へ戻るようユーザーに報告する。Step 6 へ進んではならない。
 
 本 gate は適用範囲対象外「case-run の worktree 隔離フェーズ（構造的に保証済み）」の前提を保護する機構である。worktree 隔離が構造的に保証されているという前提を、実行時に検証して担保する。
 
 ### Step 5-3: QG-3 前置 staleness check（実装作業開始前、REQ〜034）
 
-`agentdev-quality-gates` の「case-run 前置 staleness check（REQ〜034）」（`references/case-run-pre-delegation-staleness-check.md`）に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・case-update 連携を実行する。本検査は QG-3 本体（Step 6 委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類運用、QG-3 本体実施要否には影響しない。差異非検出時はそのまま Step 6 へ進む
+`agentdev-quality-gates` の「case-run 前置 staleness check（REQ〜034）」に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・case-update 連携を実行する。本検査は QG-3 本体（Step 6 委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類運用、QG-3 本体実施要否には影響しない。差異非検出時はそのまま Step 6 へ進む
 
 ### Step 5-4: docs/** 変更時の targeted docs guard（REQ-0130-035）
 
