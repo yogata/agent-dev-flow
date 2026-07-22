@@ -38,7 +38,7 @@ REQ 拡張を候補とするのは `new_user_requirement` または `external_co
 
 ### 分類根拠の引き継ぎ
 
-learning-promote は change_nature と併せて、observed_evidence（根拠となる観測事実）、target_stakeholder、user_visible_change 等の分類根拠（`artifact-contracts.md`「分類根拠伝播契約」参照）を RU へ伝播させる。分類根拠は soft-contract（ADR-0124）とし、欠落時は unknown 既定値で警告する。
+learning-promote は change_nature と併せて、observed_evidence（根拠となる観測事実）、target_stakeholder、user_visible_change 等の分類根拠（`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」参照）を RU へ伝播させる。分類根拠は soft-contract（ADR-0124）とし、欠落時は unknown 既定値で警告する。
 
 ## HITL 境界、自動実行ルール（REQ-0147-003/004/005/006/007）
 
