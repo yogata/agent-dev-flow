@@ -34,7 +34,7 @@ case-run (orchestration)
 
 - **case-run 本体**: 単一 Issue または単一 Wave（Epic Issue 指定時、最大5件並列）で実行担当サブエージェントを委譲起動し、result を処理する。実装実行そのものは行わない。起動手段は AGENTS.md および references/<harness>.md 参照（REQ-0162-002）。
 - **実行担当サブエージェント**: 外部実行基盤（AGENTS.md で選定）が提供するエージェント型。1 Issue あたり1起動。adapter skill（`agentdev-case-run-execution-adapter`）を読み込み、委譲 prompt 内で実行 command を起動する。仕様を再解釈、再設計しないアダプターである。
-- **実行 command（harness が提供）**: 委譲 prompt 内で指定される実行 command（skill ではない）。Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲートを実行する。ランタイム作業領域（実行監査トレイル等）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しは120秒 timeout で保護される。command の具体名、起動手段は AGENTS.md および references/<harness>.md 参照（REQ-0162-002）。
+- **実行 command（harness が提供）**: 委譲 prompt 内で指定される実行 command（skill ではない）。Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲートを実行する。ランタイム作業領域（実行監査トレイル等）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しの保護（timeout 等）は harness 側が提供する（REQ-0103-163、詳細は AGENTS.md および references/<harness>.md 参照、REQ-0162-002）。command の具体名、起動手段も AGENTS.md および references/<harness>.md 参照。
 - **外部実行基盤**: 実行担当サブエージェントの背後で実行エンジンとして振る舞う。plan artifact 等の中間成果物の内部構造には依存しない。最終結果は **PR URL** で受領する（透明）。
 
 ## 実行担当サブエージェントの責務

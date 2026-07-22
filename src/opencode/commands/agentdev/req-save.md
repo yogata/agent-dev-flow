@@ -99,7 +99,7 @@ bun .opencode/skills/agentdev-req-file-manager/scripts/src/check-frontmatter-con
 REQ/ADR ファイル保存前に、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）を「適用結果の整合性検証」として実行する。
 検証項目: 採番結果の整合性（`new:{slug}` → 確定番号の置換漏れなし）、マージ結果の整合性（要件テーブル構造、番号重複なし）、インデックスの整合性（README/DOC-MAP/mapping-table エントリと採番結果の一致）、変更範囲の妥当性（Step 9 で検証）。
 各検証は決定的スクリプトの JSON 結果で機械的に確認する。
-判定基準、検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。
+判定基準、検査観点は同スキル（`agentdev-quality-gates`）の QG-1 を参照。
 fail 時は保存を停止し req-define へ差し戻しを推奨。
 **REQ**: req-save の QG-1 は内容の品質（検証可能性、REQ/SPEC 分類適合性等）を再検証せず、内容の品質は req-define の QG-1 の責務とする
 
@@ -312,7 +312,7 @@ ADR保存の直前に、以下の妥当性を再検証すること:
 - G10: 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）はverbatimで返す。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
 
 ### Capture 非関与制約
-- G12: req-save の capture 責務は原則非関与。intake/ learning capture を行わない。例外: REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能。capture 境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` を参照
+- G12: req-save の capture 責務は原則非関与。intake/ learning capture を行わない。例外: REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能。capture 境界の詳細は `agentdev-workflow-orchestration` 参照
 
 ### Issue作成制約
 - G11: req-saveはIssueを作成してはならない。Issue作成はcase-openの責任範囲である

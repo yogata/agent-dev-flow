@@ -116,7 +116,7 @@ draft の原本は人間向け Markdown 本文ではなく構造化された `# 
 Step 6-2/5-3 で分離した SPEC 候補は `artifact_actions`（`artifact: spec`）として統合し、`## SPEC候補` 補助セクションは出力しない。
 REQ/ADR/SPEC への保存対象は成果物別最上位配列に分散させず、単一の `artifact_actions` 配列に統合する
 
- - **7-1. 定義完全性ゲート（QG-1）**: 要件doc生成後、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、REQ/SPEC 分類、ADR ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成の妥当性を検証する。判定基準、検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md` を参照。fail 時は壁打ち（Step 3）へ差し戻し
+ - **7-1. 定義完全性ゲート（QG-1）**: 要件doc生成後、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）に従い、REQ/SPEC 分類、ADR ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成の妥当性を検証する。判定基準、検査観点は同スキル（`agentdev-quality-gates`）の QG-1 を参照。fail 時は壁打ち（Step 3）へ差し戻し
  - **7-2. operation_units 生成**: 複数RU入力時の統合/分離結果（Step 11-2）を基に `draft-data` 内の `operation_units` を生成する。各 OU は `ou_id`, `source_ru`, `target_req`, `target_spec`, `operation`, `scale`, `depends_on`, `recommended_order`, `issue_policy`, `result` フィールドを持つ。単一REQ操作の場合も 1 件の OU として出力する
  - **7-2a. depends_on / recommended_order の定義（REQ）**: `depends_on` には必須依存のみを記録する。必須依存とは、インターフェース契約、データモデル、schema、公開API、検証不能な前提成果物への依存である。弱依存、関連依存、推奨実行順、同一ファイル変更可能性、同一SPECセクション変更可能性、同一機能領域、クリティカルパス優先度は `depends_on` に含めない。推奨実行順は `recommended_order` に記録する
  - `operation` の値は対象 artifact により2系統: REQ 操作は `create`/ `append`/ `update`、SPEC 操作は `spec-create`/ `spec-update`。後方互換性のため既存の `create`/ `append`/ `update` は維持する
