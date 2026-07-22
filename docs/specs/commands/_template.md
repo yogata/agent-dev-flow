@@ -2,7 +2,7 @@
 title: command SPEC テンプレート
 status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-22
 ---
 
 # command SPEC テンプレート
@@ -38,7 +38,9 @@ updated: YYYY-MM-DD
 - git 操作・外部 API 呼び出し・ファイル作成/削除等
 
 ## 現在の動作
-- Step 群・ガードレール・フェーズ制約を要約
+- 公開目的、ガードレール、フェーズ制約を要約
+- 必須順序（成果物、安全性、外部契約へ影響する順序のみ）を記述
+- 利用 skill 名と委譲責務を記述
 
 ## 参照する横断 SPEC
 - docs/specs/workflows/*.md の関連契約
@@ -48,7 +50,7 @@ updated: YYYY-MM-DD
 - DO NOT FOR・ガードレールに明示された禁止事項
 
 ## 検証観点
-- QG-1〜QG-4 のいずれを参照するか・ローカル検証項目
+- QG-1〜QG-4 のいずれかを参照するか・ローカル検証項目
 ```
 
 ## 記述ルール
@@ -58,6 +60,24 @@ updated: YYYY-MM-DD
 - 横断 SPEC（`docs/specs/workflows/`）は共通契約のみを記載する。個別 command SPEC の動作は当該 command SPEC に書く。
 - 実行時コマンドは本 SPEC に依存しない（ADR-0104）。SPEC は docs 内部設計文書である。
 - 既存 SPEC への追記時は frontmatter `status` を変更しない（ADR-0123 Decision #1）。新規作成時は `status: draft` を付与する。
+
+## command SPEC と command 定義の対応付け（AG-001、AG-005、AG-010、AG-013、REQ-0143-005、RU-20260722-01）
+
+command SPEC は command 定義ファイル（`src/opencode/commands/agentdev/*.md`）の Step 番号を複製せず、以下の軸で command 定義と対応付ける（REQ-0143-005）。
+
+| 対応付け軸 | 記述内容 |
+|---|---|
+| 公開目的 | command が解決するユーザー関心 |
+| 入力 | 入力成果物、引数、参照専用入力 |
+| 成果物 | 出力成果物、状態遷移 |
+| 許可される副作用 | ファイル作成、更新、外部 API 呼出 |
+| 安全境界 | G02 等のファイル操作制約、責務範囲 |
+| 承認境界 | ユーザー確認を要する判断 |
+| 停止状態 | 異常時、未解決時、ユーザー判断待ちの状態 |
+| 必須順序 | 成果物、安全性、外部契約へ影響する順序（順序を変えると成果物または安全性が変わるもののみ） |
+| 利用 skill 責務 | command が利用する skill 名と委譲する責務 |
+
+Step 番号を持たない command SPEC（読み取り専用、分類系）は対応付けの対象外とし、その旨を当該 SPEC に文書化する。詳細は `../authoring/command-file-format.md`「command SPEC と command 定義の対応付け（REQ-0143-005）」を参照。
 
 ## See Also
 

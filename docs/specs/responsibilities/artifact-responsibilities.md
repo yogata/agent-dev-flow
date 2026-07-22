@@ -1,5 +1,6 @@
 ---
 status: accepted
+updated: 2026-07-22
 ---
 
 # 成果物責任表
@@ -25,6 +26,24 @@ status: accepted
 | リポジトリローカル Command | `.opencode/commands/repo/` | - | - | 本体リポジトリ専用コマンド（ADR-0106）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
 | リポジトリローカル Skill | `.opencode/skills/repo-*/` | - | - | 本体リポジトリ専用スキル（ADR-0106）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
 | リポジトリローカルレジストリ | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | - | - | リポジトリローカル語彙レジストリ。`.agentdev/` には配置しない（ADR-0106） |
+
+### 操作 skill 正規所有者台帳（AG-007、AG-008、AG-019、RU-20260722-01）
+
+各操作 skill の責務と対象外を正規所有者台帳として定義する。REQ/ADR/SPEC 操作と文書種別横断検証の正規所有者を一つに定め、責務重複を防ぐ。
+
+| skill | 責務 | 対象外 |
+|---|---|---|
+| `agentdev-req-file-manager` | REQ 作成、APPEND、UPDATE、REQ 番号採番、要件行 ID 採番、REQ 固有整合性確認、REQ 固有 script 呼出契約 | ADR 操作、SPEC 操作、内容推論、ファイル編集を実行しない（所有者の案内のみ） |
+| `agentdev-adr-file-manager` | ADR 作成、APPEND、UPDATE、ADR 番号採番、ADR 固有整合性確認、ADR 固有 script 呼出契約 | REQ 操作、SPEC 操作、内容推論 |
+| `agentdev-spec-file-manager` | SPEC 作成、更新、配置先判断、target_area による更新判断、SPEC ライフサイクル規則の適用と整合性確認、SPEC 固有 script の選択と呼出契約 | REQ 操作、ADR 操作、SPEC 内容の新規推論、accepted 昇格判断（case-close 責務、ADR-0123 / REQ-0136-024 準拠）、ユーザー承認、commit、push、共通 script の重複実装 |
+| `agentdev-doc-diagnostics` | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティング | 診断対象の修正、promote 判断、REQ/SPEC/RU 保存、commit、push、Issue/PR 操作、REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（`agentdev-req-structure-diagnostics`）、文意品質診断（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`） |
+| `agentdev-artifact-validation` | 文書種別横断の決定的検証 script、共有 lib、公開検証契約、JSON 結果契約（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact` とそれらが利用する共有 lib、対応 test） | REQ/ADR/SPEC 固有の内容判断、ファイル編集、保存、ユーザー承認、commit、push、REQ 番号/ADR 番号/要件行 ID の採番、target_area の検索 |
+
+**重複なし確認**:
+
+- `agentdev-spec-file-manager` は `agentdev-req-file-manager`（REQ 操作）、`agentdev-adr-file-manager`（ADR 操作）と責務重複しない（SPEC 操作のみを所有）
+- `agentdev-doc-diagnostics` は `agentdev-doc-writing`（文意品質）、`agentdev-doc-map`（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と責務重複しない（横断編成と結果統合のみを所有）
+- `agentdev-artifact-validation` は内容判断、編集、保存を行わず、利用側（`agentdev-req-file-manager`、`agentdev-adr-file-manager`、`agentdev-spec-file-manager`、各 command）は公開検証契約のみへ依存する
 
 ## 責務境界原則
 

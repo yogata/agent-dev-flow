@@ -1,5 +1,5 @@
 ---
-updated: 2026-06-21
+updated: 2026-07-22
 status: accepted
 ---
 
@@ -72,7 +72,7 @@ dev メタデータは含めない（REQ-0103-015, REQ-0103-044）。
 
 ## スキル粒度契約
 
-Skill は以下の条件を全て満たす単位とする（REQ-0103-100）。
+Skill は以下の条件を全て満たす単位とする（REQ-0103-100、AG-002、AG-012、RU-20260722-01 合意で強化）。
 
 | 条件 | 説明 |
 |------|------|
@@ -83,6 +83,14 @@ Skill は以下の条件を全て満たす単位とする（REQ-0103-100）。
 
 - 複数の `USE FOR` があっても、同一判断モデル、同一責任境界に属する場合は同一 Skill として扱う（REQ-0103-101）。
 - 複数の `USE FOR` が異なる判断モデル、入力、出力、責任境界を持つ場合は、`DO NOT USE FOR` が同じであっても Skill 分割候補とする（REQ-0103-102）。
+- 異なる判断モデル、入力、出力、責任境界を持つ内容は Skill 分割候補として扱うこと（AG-002）。
+
+### SKILL.md サイズと内容基準（AG-012、REQ-0103-037）
+
+- 200行を超える SKILL.md は責務集中、不要な手順、例、作業履歴の混入について確認すること
+- 200行を超えることだけを不合格理由にしないこと。責務上の根拠があれば維持を認める
+- SKILL.md に移動済み Step、統合済み Step、将来候補、作業履歴を示す節を残さないこと
+- 詳細な判定表、スキーマ、例、失敗時手順は必要な場合に限り当該 skill 自身の reference へ配置すること（REQ-0103-036）
 
 ## スキル参照妥当性契約
 
@@ -100,6 +108,27 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 | Template | 出力本文構造（Issue/PR description、コメント） |
 | Script | 決定的でテスト可能な検査、処理 |
 | 操作用 Skill | GitHub 操作等の横断的操作の安全手順 |
+
+## Script 所有権と委譲契約（AG-003、AG-009、AG-019、RU-20260722-01）
+
+各 script の正規所有者を文書種別ごとに定義する（REQ-0103-159、REQ-0136-029）。同一 script または共有 lib を複数 skill へ複製せず、正規所有者を一つに定める。
+
+| script 種別 | 正規所有者 skill | 対象 |
+|---|---|---|
+| REQ 番号採番、要件行 ID 採番、REQ 固有検証 | `agentdev-req-file-manager` | REQ 操作に固有の決定的処理 |
+| ADR 番号採番、ADR 固有検証 | `agentdev-adr-file-manager` | ADR 操作に固有の決定的処理 |
+| SPEC 固有処理（target_area 見出し検索、SPEC 固有整合性確認） | `agentdev-spec-file-manager` | SPEC 操作に固有の決定的処理 |
+| 文書種別横断の共通検証（frontmatter 整合性、エントリ存在確認、変更範囲検証）と共有 lib | `agentdev-artifact-validation` | 複数文書種別で共有する決定的検証と共有ライブラリ、対応 test |
+
+**委譲規則**:
+
+- 兄弟 skill と command は所有者 skill の内部 script パスを直接 import またはパス参照しない
+- 利用側は所有者 skill の公開操作契約（操作名、入力、JSON 結果契約、エラー契約）へ委譲する
+- 所有者 skill の SPEC または reference のみが内部 script の物理パスと I/O 詳細を保持する
+- 同一 script または共有 lib を複製しない（REQ-0103-006「Script は決定的: テスト可能、再現可能」の延長）
+- 新規 script 追加時は所有者候補を文書種別で判定し、既存所有者との重複を確認する
+
+本契約は Command → Skill → Script の依存方向を維持し、新規 ADR を作成せず ADR-0107（Command/Skill/Template/Script 責任分界）の適用条件の精緻化として扱う（REQ-0119-033 準拠）。
 
 ## サイズ制約
 
