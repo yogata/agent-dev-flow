@@ -269,7 +269,7 @@ intake/ learning 境界は `agentdev-workflow-orchestration` を参照する。
 - G14: スコープ拡大禁止。発見は記録し修正は後続処理に委ねる
 - G15: intake 候補を PR 本文の `## Findings / Capture候補` に記録。`.agentdev/intake/inbox/` の直接変更禁止
 - G16: learning 候補を intake 候補と区別して記録
-- G17: intake/learning 候補を混ぜた単一成果物にしない。capture 境界の詳細は `agentdev-workflow-orchestration` 参照（case-run の capture 責務は記録のみ）
+- G17: intake/learning 候補を混ぜた単一成果物にしない。capture 境界（capture-boundaries）の詳細は `agentdev-workflow-orchestration` 参照（case-run の capture 責務は記録のみ）
 - G21: `.agentdev/learning/inbox.md` の直接変更禁止。capture 情報は PR 本文経由のみ case-close に引き継ぐ
 - G27: SPEC確定候補（実装で発見された SPEC レベル詳細）は PR 本文の `## SPEC確定候補` セクションに記録し、`## Findings / Capture候補` とは混在させない。SPEC確定候補の確定、SPEC ファイルへの反映判断は case-close の責務
 
