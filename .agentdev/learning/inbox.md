@@ -35,3 +35,12 @@
 - **影響**: 同一 SPEC 内の用語不統一による読手の負荷、REQ と SPEC の表記矛盾。
 - **検出元**: PR #1749 本文 Findings / Capture候補 セクション
 - **日付**: 2026-07-23（Wave 3）
+
+## SPEC 主論理区分・正規所有対象宣言の未宣言: spec-save 段階適用の準備状態
+
+- **由来**: PR #1750（Issue #1743、Epic #1736 Wave 4 最終 Wave）
+- **問題**: SPEC 再評価基準（主論理区分、正規所有対象）の frontmatter 宣言状況を全現行 SPEC 142ファイルで横断確認した結果、`foundations/document-model.md`（L399, 401 で規定を述べる）のみ `spec_logical_division` / `canonical_owner` フィールド宣言を持ち、他 141 SPEC ファイル（基盤 SPEC、command SPEC、skill SPEC、横断 SPEC、IR-* ルール詳細）は frontmatter で主論理区分・正規所有対象を未宣言。OU-007 で責務境界浄化の基準を規定した段階で、宣言形式の運用は「後方互換運用（REQ-0136-035、ADR-0124 soft-contract）」に従い段階適用・警告モード扱いとしている。不合格理由ではないが、宣言付与の運用フローが未整備。
+- **再発防止候補**: spec-save 工程で新規 SPEC から段階的に宣言付与を適用する手順の整備。既存 SPEC は spec-save UPDATE 機会で順次宣言付与。spec-health-metrics で宣言率を指標化し、検知の機械化を検討。
+- **影響**: 142 SPEC 中 141ファイルが宣言未対応。spec-save で新規 SPEC を作成する際、宣言形式の参考がない状態で起票される可能性。横断的再評価（QG-3/QG-4）でも宣言ベースの判定が機能しない。
+- **検出元**: PR #1750 本文 Findings / Capture候補 セクション F-2
+- **日付**: 2026-07-23（Wave 4）
