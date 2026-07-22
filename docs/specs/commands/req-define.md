@@ -76,10 +76,8 @@ updated: 2026-07-18
  - Step 11-1〜11-6: 複数RU受付、統合/分離判定、出力生成、Epic規模検出、Wave候補記録、OU 構造検証
 - Step 12: 完了報告（work_type 別テンプレート選択）
 
-req-define の Step 番号構成は command 定義（src/opencode/commands/agentdev/req-define.md）と一致する（REQ-0143-004）。
-本 SPEC の Step 1〜Step 12 は command 定義の同名 Step と完全に一致する。
-SPEC と command で Step 番号がずれる場合、SPEC 側を command 定義へ合わせる。
-Step 0 扱い、採番開始位置の規則は `command-file-format.md` 参照。
+req-define は command 定義（src/opencode/commands/agentdev/req-define.md）と Step 番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって対応付ける（REQ-0143-005、AG-005、AG-010）。
+詳細は `command-file-format.md`「command SPEC と command 定義の対応付け（REQ-0143-005、AG-005、AG-010）」参照。
 
 ### tentative_classification 最終確定のバリデーション（REQ-0155-008）
 
