@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # 文書モデル
@@ -401,7 +401,35 @@ SPEC は文書種別として維持し、内部を以下の論理区分で整理
 1つの SPEC ファイルが複数の論理区分にまたがる場合、主たる区分（主論理区分）を frontmatter または冒頭宣言節で識別可能にする（REQ-0156-013、AG-003、RU-20260722-02 合意）。複数論理区分を含む SPEC は主論理区分と従属する区分を判別できる状態にする。論理区分は物理的なディレクトリ分離を意味せず、既存3層構造内での内容整理のための区分である。
 従来の workflows/ 層が横断契約 SPEC に対応する。
 
-各 SPEC は frontmatter または冒頭宣言節で正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の所有責務、関心キー）を識別可能にする（REQ-0156-013）。正規所有の単位は「安定した関心キー」であり、1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない（REQ-0119-038）。主論理区分・正規所有対象の宣言形式（frontmatter フィールド名、冒頭宣言節フォーマット）の詳細は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」または本ファイルで定義する。
+各 SPEC は frontmatter または冒頭宣言節で正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の所有責務、関心キー）を識別可能にする（REQ-0156-013）。正規所有の単位は「安定した関心キー」であり、1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない（REQ-0119-038）。主論理区分・正規所有対象の宣言形式（frontmatter フィールド名、冒頭宣言節フォーマット）は後述「SPEC 宣言形式」節で定義し、本ファイル（document-model.md）を正規所有者とする。フィールド名は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド（`spec_logical_division`、`canonical_owner`）と一致させ、工程間での突合を可能にする。
+
+### SPEC 宣言形式
+
+主論理区分・正規所有対象の宣言形式の正規所有者は本ファイルとする（REQ-0156-013）。宣言形式は spec-save の配置一貫性検証（`../commands/spec-save.md`「配置一貫性検証」）および強制ゲート段階適用の前提となる。
+
+#### frontmatter 形式
+
+SPEC frontmatter に以下のフィールドを宣言する。フィールド名と enum 値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールドと同一とし、工程間で同じ名前を用いる（REQ-0136-033）。
+
+| フィールド | 型 | 内容 |
+|---|---|---|
+| `spec_logical_division` | enum | 主論理区分: `behavior`、`catalog`、`cross_cutting_contract`、`parameter`、`implementation_detail`、`unknown` のいずれか |
+| `canonical_owner` | string | 正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー） |
+
+両フィールドとも soft-contract（ADR-0124）とし、欠落時は `unknown` で警告を出し処理を継続する（REQ-0136-033）。欠落により既存 SPEC、req_draft、RU を拒否しない。
+
+#### 冒頭宣言節形式
+
+frontmatter を拡張しない SPEC は、本文冒頭（最初の `##` 見出しの直前）に HTML コメント形式の宣言節を置く。
+
+```
+<!-- declaration
+spec_logical_division: {behavior|catalog|cross_cutting_contract|parameter|implementation_detail|unknown}
+canonical_owner: {正規所有対象の関心キー}
+-->
+```
+
+frontmatter と冒頭宣言節の両方が存在する場合は frontmatter を優先する。spec-save の配置一貫性検証は frontmatter、冒頭宣言節のいずれかから宣言値を読み取る。
 
 索引文書（DOC-MAP.md、specs/README.md）は文書探索、参照経路の入口を担うが、SPEC 内部論理区分には含まれない。索引文書は既存文書種別（DOC-MAP.md = 探索経路インデックス、specs/README.md = SPEC マニフェスト）の役割表現であり、新文書種別ではない。
 

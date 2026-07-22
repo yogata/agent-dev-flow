@@ -1,5 +1,5 @@
 ---
-updated: 2026-07-22
+updated: 2026-07-23
 status: accepted
 ---
 
@@ -132,7 +132,7 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 
 ## 分類根拠伝播契約
 
-learning/intake → RU → req-define → spec-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-0136-033、AG-004、RU-20260722-02 合意、ADR-0139）。
+learning/intake → RU → req-define → spec-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-0136-033、AG-004、RU-20260722-02 合意、ADR-0139）。SPEC ファイルが主論理区分・正規所有対象を宣言する形式（frontmatter フィールド名、冒頭宣言節フォーマット）の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」とし、本節は工程間伝播フィールドの schema を正規所有する。両者は `spec_logical_division`、`canonical_owner` のフィールド名を共有し、工程間で同一の名前を用いる。
 
 ### 伝播フィールド一覧
 
