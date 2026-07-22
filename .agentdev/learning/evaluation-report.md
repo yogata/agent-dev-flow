@@ -1,349 +1,230 @@
 # 評価レポート
 
 ## メタデータ
-
-- **実行日時**: 2026-07-18
-- **対象エントリ数**: 9件（inbox: 9件、deferred: 既存 living pool あり）
-- **問題クラス数**: 9（厳密な問題クラス基準「根本原因+再発条件+予防策が同じ」では全エントリが単独エントリのため、未分類9件を個別掲載）
-- **テーマ関連**: QG/case-close 完了条件解釈（#2/#5/#8）、SPEC/command 境界ケース明文化（#3/#4/#6/#9）、ハーネス制約（#1, deferred L-004/L-010 と同根）、運用知見（#7）
+- **実行日時**: 2026-07-22
+- **対象エントリ数**: 56件（inbox: 31件, deferred: 25件）
+- **問題クラス数**: 6（未分類: 15単独エントリ）
 
 ## 問題クラス一覧
 
-### 問題クラス1: ハーネス call_omo_agent 制約で case-run 実行担当サブエージェント委譲不可
+### 問題クラス1: Windows worktree ジャンクション未伝播による projection 配下ツール実行障害
 
-- **根本原因**: ハーネス（oh-my-openagent）の call_omo_agent ツール schema が explore/librarian agent 型のみを許可し、agentdev-case-run-execution-adapter が定義する実行担当サブエージェント型（custom agent）を起動できない
-- **再発条件**: call_omo_agent が explore/librarian のみを許可するハーネス環境で case-run を実行した場合に必ず発生
-- **予防策**: (a) call_omo_agent schema で custom agents サポート、(b) adapter skill の委譲プロトコルにハーネス能力に応じたフォールバック定義、(c) case-run がハーネス能力を事前検出して委譲可否を判断し Inability を冒頭で明示
-
-#### 8軸評価スコア
-
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 2/5 | inbox 1件 + deferred L-004/L-010 で実質3件（同根） |
-| 影響度 | 3/5 | Epic Wave 並列委譲の速度優位性消失、インライン実行で完結 |
-| 横展開性 | 4/5 | 同一ハーネス環境で動作する全 case-run で発生 |
-| 反映先明確度 | 4/5 | agentdev-case-run-execution-adapter SKILL、workflow-orchestration、REQ-0149 |
-| 自動化適性 | 3/5 | 事前 probe + フォールバック定義で自動化可能 |
-| プロジェクト固有知識再利用性 | 4/5 | ハーネス制約知識として再利用価値高い |
-| 再発可能性 | 5/5 | call_omo_agent が限定的な環境で必ず発生 |
-| 費用対効果 | 4/5 | probe 実装で回避可能、効果高い |
-| **加重合計** | **29/40** | |
-
-- **推奨処分案**: 既存 skill へ反映（agentdev-case-run-execution-adapter に call_omo_agent 制約時の挙動と Epic Wave 影響を追記）。新規 skill/command 化ではなく既存 adapter skill の補強。deferred.md の L-004/L-010 と統合して1つの採用済み成果物にまとめる候補
-
-#### エントリ一覧
-
-- inbox: case-run 実行担当サブエージェント委譲不可 (ハーネス call_omo_agent 制約)
-- deferred（同根参照）: L-004 (PR #1068)、L-010 (PR #1103)
-
-#### ADR候補除外記録
-
-- **除外理由**: 運用ルール（フォールバック定義・事前検出手順）
-- **根拠事実**: call_omo_agent schema 制約への対応はアーキテクチャ決定ではなく運用対応・adapter skill 拡張
-- **代替反映先候補**: agentdev-case-run-execution-adapter SKILL（既存）
-
----
-
-### 問題クラス2: QG-4 spec-bug acceptance で Issue 完了条件 vs Epic 対象外 の矛盾調整
-
-- **根本原因**: Epic 完了条件のテスト戦略（TS-004「配布 command 6ファイル実行制御パラメータ直接記述 0件」）と Epic 対象外（配布 command/skill/docs の実装本体改修）が矛盾。REQ-0162-002 は要件として追加されたが src/opencode/ command 本文からの除去は未実施で、それを要求する TS-004 がスコープ外と衝突
-- **再発条件**: Epic 完了条件のテスト戦略が達成不可能な実装を要求し、同時に Epic がその実装を対象外とする場合
-- **予防策**: (a) case-open 時に Epic 完了条件のテスト戦略と対象外の整合性を自動検証、(b) QG-2 (Acceptance Criteria Coverage Gate) でテスト戦略の実現可能性を検証、(c) spec-bug 分類時の case-close QG-4 判断基準を SPEC 化
+- **根本原因**: git worktree 作成時にメインリポジトリのジャンクションリンク（`.opencode/` 配下）は伝播しない。`.opencode/` 配下は git 管理対象外（`.gitignore`）のため worktree 側に再現されない。
+- **再発条件**: (1) Windows 環境、(2) git worktree を使用、(3) `.opencode/` 配下を走査する検査ツール・テストコードを worktree 内で実行
+- **予防策**: projection → source の段階的パス解決（fallback）の標準化、または検証対象のみの一時ジャンクション作成パターン
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | inbox 1件（#1516/TS-004） |
-| 影響度 | 3/5 | Epic 完了判定に影響、case-close QG-4 で調整必要 |
-| 横展開性 | 4/5 | 他 Epic でも同様の矛盾が発生し得る |
-| 反映先明確度 | 4/5 | agentdev-quality-gates QG-2、agentdev-req-analysis、agentdev-workflow-templates |
-| 自動化適性 | 3/5 | case-open での整合性自動検証が可能 |
-| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow 固有の QG 運用 |
-| 再発可能性 | 4/5 | テスト戦略 vs 対象外の矛盾は今後も発生し得る |
-| 費用対効果 | 4/5 | QG-2 強化で予防可能 |
+| 発生件数 | 2/5 | inbox 2件（lint_skills.ts、README fallback） |
+| 影響度 | 3/5 | 検査 WARNING 評価不能・テスト fail で検証信頼性低下 |
+| 横展開性 | 3/5 | Windows+worktree に固有だが複数ツールで発生 |
+| 反映先明確度 | 4/5 | case-run skill references、repo-agentdev-integrity 規約 |
+| 自動化適性 | 3/5 | fallback パス解決ヘルパの共通化は可能 |
+| プロジェクト固有知識再利用性 | 4/5 | Windows+junction+worktree 固有の落とし穴 |
+| 再発可能性 | 4/5 | worktree 使用継続限り確実に再発 |
+| 費用対効果 | 3/5 | fallback 実装で吸収可能だが全ツールへの展開コスト |
 | **加重合計** | **26/40** | |
 
-- **推奨処分案**: 既存 skill へ反映（agentdev-quality-gates QG-2 acceptance-criteria-coverage、agentdev-req-analysis テスト戦略実現可能性検証）。テーマ関連: #5、#8 と「QG/case-close 完了条件解釈」で束ね可能
+- **推奨処分案**: deferred（既存制約の運用補強。fallback パス共通化は有望だが単独では成熟度不足。repo-agentdev-integrity skill テストコード規約への追記候補として living pool で維持）
 
 #### エントリ一覧
-
-- inbox: QG-4 spec-bug acceptance: Issue完了条件 vs Epic対象外 の調整判断 (#1516/TS-004)
-
-#### ADR候補除外記録
-
-- **除外理由**: 運用ルール・command 仕様（QG-2/QG-4 検証手順・完了条件解釈基準）
-- **根拠事実**: テスト戦略と対象外の整合性検証は QG 運用・command 手順の拡充であり技術判断ではない
-- **代替反映先候補**: agentdev-quality-gates QG-2 reference、agentdev-req-analysis、agentdev-workflow-templates（Epic 完了条件テンプレート）
+- Windows worktree 環境で lint_skills.ts を実行するためのジャンクション一時作成パターン [inbox]
+- worktree ジャンクション未伝播環境での README 参照 fallback 実装パターン [inbox]
 
 ---
 
-### 問題クラス3: verification-only PR の squash merge と files_checked 空の正当ケース
+### 問題クラス2: call_omo_agent ハーネス制約（explore/librarian 型のみ許可）と adapter protocol インライン逐次実行
 
-- **根本原因**: verification-only case-run（実装差分なし、検証のみ）の成果物である空 PR の取り扱いが command SPEC に未明文化。GitHub は空 PR の squash merge を許容し空 commit を生成するが、case-close 側は files_checked 空 を正当理由で処理する手順（REQ Phase 3）を踏む必要がある
-- **再発条件**: case-run が verification-only（実装差分なし）で PR を作成し、case-close が targeted docs guard を実行する場合
-- **予防策**: (a) case-run SPEC に verification-only PR の取り扱い（空 commit 許容、case-close への引継ぎ）を明文化、(b) check_changed_docs.ts が files_checked 空時に verification-only フラグを考慮、(c) case-close Step 3-1 に verification-only PR の確認手順を明記
+- **根本原因**: oh-my-openagent ハーネスの `call_omo_agent` API が explore/librarian 型のみ許可し、実行担当サブエージェント（custom agent 型）を起動できない。
+- **再発条件**: (1) oh-my-openagent ハーネス（または同等の API 制限）で case-run 委譲起動を試みる
+- **予防策**: 事前 probe（ハーネス能力検出）+ adapter protocol delegation-unavailable パス（インライン逐次実行）
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | inbox 1件（Epic #1515 Wave 2 PR #1527） |
-| 影響度 | 3/5 | case-close の手順不明、QG-4 判定に影響 |
-| 横展開性 | 3/5 | REQ/SPEC 受け入れ基準が既存 repo 状態で満たされる場合に発生し得る |
-| 反映先明確度 | 4/5 | docs/specs/commands/case-run.md、case-close.md、REQ-0158 |
-| 自動化適性 | 4/5 | case-close Step 3-1 への手順追加は容易 |
-| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow 固有の PR ワークフロー |
-| 再発可能性 | 3/5 | verification-only case で発生 |
-| 費用対効果 | 4/5 | SPEC 明文化で解決 |
-| **加重合計** | **25/40** | |
+| 発生件数 | 5/5 | inbox 2件 + deferred に L-004/L-010/case-auto フォールバック等多数 |
+| 影響度 | 2/5 | 委譲不可だがインライン逐次実行で完結可能 |
+| 横展開性 | 4/5 | ハーネス移行時にも発生し得る |
+| 反映先明確度 | 5/5 | adapter skill「ハーネス制約適応」節、capture-boundaries.md に既に新設済み |
+| 自動化適性 | 4/5 | 事前 probe は自動化可能 |
+| プロジェクト固有知識再利用性 | 3/5 | ハーネス非依存設計の知見 |
+| 再発可能性 | 5/5 | 現ハーネス継続限りほぼ確実 |
+| 費用対効果 | 4/5 | 既に adapter skill + REQ-0149-012 で完全カバー済み |
+| **加重合計** | **32/40** | |
 
-- **推奨処分案**: spec 候補（docs/specs/commands/case-run.md に verification-only セクション、docs/specs/commands/case-close.md Step 3-1 に verification-only 確認手順）。false-clean 3層防御（REQ-0158）との相互作用も文書化
+- **推奨処分案**: duplicate（adapter skill L131-148 + REQ-0149-012 + deferred pool L-004/L-010/case-auto フォールバックで完全カバー。inbox 2件は既存知識の再実証記録。事前 probe 強化は PR #1576 で要件化・実装済み）
 
 #### エントリ一覧
-
-- inbox: verification-only PR の squash merge と files_checked 空の正当ケース (Epic #1515 Wave 2)
-
-#### ADR候補除外記録
-
-- **除外理由**: command 仕様（case-run/case-close SPEC の手順拡張）
-- **根拠事実**: verification-only PR の取り扱いは command SPEC の境界ケース明文化であり技術判断ではない
-- **代替反映先候補**: docs/specs/commands/case-run.md、docs/specs/commands/case-close.md、REQ-0158（false-clean 3層防御）
+- call_omo_agent schema 制約による委譲起動不可とインライン逐次実行時の adapter protocol 遵守 [inbox]
+- call_omo_agent が explore/librarian 型のみ許可されるハーネス制約と adapter protocol の運用 [inbox]
 
 ---
 
-### 問題クラス4: check_changed_docs.ts --files 引数の区切り形式（comma vs space）
+### 問題クラス3: bg task 異常終了回復（case-auto → case-run 子 task 破棄時の成果物行き場消失）
 
-- **根本原因**: check_changed_docs.ts の --files パーサが space 区切り仕様（`while (i < args.length && !args[i].startsWith("--")) parsed.files.push(args[i])`）だが、case-close.md Step 3-1 の実行コマンド例は `--files <PR 変更ファイル一覧>` と抽象表記で区切り文字が未明示。comma 区切りは 1 file 扱いになり files_checked が空になり TARGET-EMPTY (strict severity) が発火
-- **再発条件**: --files に comma 区切りで複数ファイルを渡す場合
-- **予防策**: (a) check_changed_docs.ts ヘルプ/エラーメッセージで区切り形式を明示、(b) comma 区切りも併用受入（split on comma）、(c) case-close.md / SPEC 呼出例で space 区切りを明示
+- **根本原因**: case-run 子 task のライフサイクルと成果物（commit/working tree）のライフサイクルが分離されておらず、task 破棄で成果物が行き場を失う。
+- **再発条件**: (1) case-run 子 task が commit 作成後またはファイル編集中にハーネスの bg task 機能で task 破棄される、(2) case-auto 親ループが子 task の中断を検知できる
+- **予防策**: case-auto 親ループに「子 task 中断検知 → worktree git status 確認 → commit/rebase/push/PR 作成代行」の標準回復パスを組み込む。子 task は細粒度で commit を作成する。
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | inbox 1件（Epic #1515 Wave 2） |
-| 影響度 | 2/5 | TARGET-EMPTY strict failure で一時停止するが即時回避可能 |
-| 横展開性 | 4/5 | case-run、spec-save 等 --files を使用する全 workflow で発生し得る |
-| 反映先明確度 | 4/5 | check_changed_docs.ts、targeted-docs-guard-implementation.md、case-close.md Step 3-1 |
-| 自動化適性 | 4/5 | usage メッセージ改修、comma 受入は容易 |
-| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow 固有のスクリプト |
-| 再発可能性 | 4/5 | comma 区切りで渡すと必ず再発 |
-| 費用対効果 | 5/5 | 簡単な修正（usage 明示 + comma 受入）で解決 |
+| 発生件数 | 2/5 | inbox 2件（commit 済み・PR 未作成 / 未コミット変更あり） |
+| 影響度 | 3/5 | 成果物消失のリスクだが親ループで回復可能 |
+| 横展開性 | 3/5 | case-auto + Epic Wave 並列委譲でも発生可能性 |
+| 反映先明確度 | 4/5 | case-auto command SPEC、workflow-orchestration skill |
+| 自動化適性 | 4/5 | 回復パスの自動化（git status → commit → push → PR）は容易 |
+| プロジェクト固有知識再利用性 | 3/5 | case-auto 固有のワークフロー知見 |
+| 再発可能性 | 4/5 | bg task の仕様上継続的に発生 |
+| 費用対効果 | 4/5 | 回復パス標準化でリスク大幅低減、コスト低 |
 | **加重合計** | **27/40** | |
 
-- **推奨処分案**: 既存 command/skill/spec へ反映（check_changed_docs.ts usage メッセージ、targeted-docs-guard-implementation.md 呼出例、case-close.md Step 3-1 実行コマンド）。comma 区切り受入（split on comma）の実装も推奨
+- **推奨処分案**: 昇華（既存 command へ反映）— case-auto command SPEC への子 task 中断回復パス標準化、workflow-orchestration skill の子 task ライフサイクルと成果物ライフサイクル分離。2パターン（commit 済み・未コミット）が実証済みで具体性あり。
 
 #### エントリ一覧
-
-- inbox: check_changed_docs.ts --files 引数解析 (comma 区切り vs space 区切り) (Epic #1515 Wave 2)
-
-#### ADR候補除外記録
-
-- **除外理由**: command 仕様（スクリプト usage/SPEC 呼出例の明示）
-- **根拠事実**: CLI 引数の区切り形式明示は command 仕様の整備であり技術判断ではない
-- **代替反映先候補**: check_changed_docs.ts、docs/specs/integrity/targeted-docs-guard-implementation.md、src/opencode/commands/agentdev/case-close.md
+- bg task 異常終了からの回復パターン（commit 作成済み・PR 作成前 task 破棄）[inbox]
+- bg task 異常終了からの回復パターン（未コミット変更あり・作業中 task 破棄）[inbox]
 
 ---
 
-### 問題クラス5: 識別子中心評価（REQ-0146-011）での完了条件解釈: PR 範囲 vs 全体
+### 問題クラス4: 監査台帳ライフサイクル（SC-003）適用パターンの未具体化
 
-- **根本原因**: case-close.md / QG-4 reference に「PR 対象範囲 vs 全体」の判定ルールが未明文。識別子中心評価（REQ-0146-011）は完了条件の「識別子」が PR で満たされているかを問うが、「0件」という実測値要求が主評価か補助値かの境界が曖昧
-- **再発条件**: 完了条件が「違反0件」「全配布物適合」等の全体評価を含み、PR が一部ファイル修正で残対応が Findings 記録・後続PR計画されている場合
-- **予防策**: (a) QG-4 reference に「PR 対象範囲 vs 全体」の判定マトリクスを明記、(b) case-open 時に完了条件の「スコープ」（本 Issue 対象範囲 vs 全体）を明示、(c) 識別子中心評価の運用実例集を QG-4 reference に蓄積
+- **根本原因**: 大規模変更計画で監査フェーズ（Phase1）と再編フェーズ（Phase2）のライフサイクル分離と引き継ぎ形式が SC-003 SPEC で未具体化。適用例が未整備。
+- **再発条件**: (1) 監査台帳を前提情報とする大規模変更計画を立ち上げる
+- **予防策**: SC-003 SPEC の「既知の適用例」「次フェーズ用入力」節へ 4 パターン（フェーズ分割、書き戻し形式、2 commit 構成、6要素構成）を追記
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 2/5 | inbox 1件（#1532/TS-006）+ #1532 完了条件7で同様問題既発生 |
-| 影響度 | 3/5 | case-close QG-4 判定に影響、横断評価を含む完了条件で毎回直面 |
-| 横展開性 | 4/5 | 今後同様の「横断評価を含む完了条件」で発生 |
-| 反映先明確度 | 4/5 | agentdev-quality-gates qg-4-final-acceptance.md、case-close.md、case-open.md |
-| 自動化適性 | 3/5 | case-open で完了条件スコープ明示は可能 |
-| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow 固有の QG-4 運用 |
-| 再発可能性 | 4/5 | 横断評価を含む完了条件の PR が一部修正の場合に発生 |
-| 費用対効果 | 4/5 | QG-4 reference 整備で予防可能 |
-| **加重合計** | **27/40** | |
+| 発生件数 | 4/5 | inbox 4件（one-time 独立、書き戻し、2 commit 構成、6要素構成） |
+| 影響度 | 3/5 | 大規模変更のトレーサビリティ・完遂証跡の欠落 |
+| 横展開性 | 4/5 | 大規模変更計画全般で適用可能 |
+| 反映先明確度 | 5/5 | SC-003 SPEC（`docs/specs/local/audit-ledger-lifecycle.md`、既存 accepted） |
+| 自動化適性 | 2/5 | 手順の標準化だが自動化は低い |
+| プロジェクト固有知識再利用性 | 4/5 | AgentDevFlow 監査台帳運用固有 |
+| 再発可能性 | 4/5 | フェーズ分割アプローチは継続利用 |
+| 費用対効果 | 5/5 | 既存 SPEC への適用例追記で低コスト・高効果 |
+| **加重合計** | **31/40** | |
 
-- **推奨処分案**: 既存 skill へ反映（agentdev-quality-gates qg-4-final-acceptance.md に判定マトリクス・運用実例）。テーマ関連: #2、#8 と「QG/case-close 完了条件解釈」で束ねて1つの採用済み成果物にまとめる候補
+- **推奨処分案**: 昇華（既存 SPEC へ反映）— SC-003 SPEC「既知の適用例」「次フェーズ用入力」節へ 4 パターンを追記。既存 SPEC の補強。
 
 #### エントリ一覧
-
-- inbox: 識別子中心評価（REQ-0146-011）での完了条件解釈: PR 範囲 vs 全体 (#1532/TS-006)
-
-#### ADR候補除外記録
-
-- **除外理由**: 運用ルール・command 仕様（QG-4 判定基準・case-open 完了条件スコープ明示）
-- **根拠事実**: PR 範囲 vs 全体の判定ルールは QG 運用・command 手順の拡充であり技術判断ではない
-- **代替反映先候補**: agentdev-quality-gates qg-4-final-acceptance.md、case-close.md Step 2、case-open.md（完了条件スコープ明示）
+- 監査フェーズを one-time ライフサイクルとして独立させると未決事項確定不可制約を守りやすい [inbox]
+- 監査→実装 PR→監査台帳書き戻しの紐付けを明示的にする運用 [inbox]
+- 中間成果物ライフサイクル完遂を 2 commit 構成で証明するパターン [inbox]
+- 次フェーズ用入力の自足性を6要素構成で確保する転記パターン [inbox]
 
 ---
 
-### 問題クラス6: SPEC 重複許容基準（REQ-0147-001）の適用事例: project extensions boilerplate
+### 問題クラス5: 索引類自動生成（SC-002）の整合性維持と複数PR跨ぎ再生成漏れ
 
-- **根本原因**: SPEC 重複許容基準（REQ-0147-001）の適用事例が SPEC に未蓄積。今後同様の boilerplate 重複が発生した際に「許容か違反か」の判断基準が不明確。REQ-0119-034（同一契約再定義抑止）に形式的には違反するが、例外基準への該当性判断が必要
-- **再発条件**: 複数 command で同一の手順・宣言・boilerplate が重複し、SPEC 例外基準（SKILL ↔ command 同一ルール等）への該当性を判断する必要がある場合
-- **予防策**: (a) artifact-responsibilities.md SPEC に重複許容基準の適用事例を追記、(b) boilerplate 重複時に「公開契約宣言」と「詳細契約」の分離フローを標準化、(c) inspect-skills で boilerplate 重複を検出した際の判定マトリクスを用意
+- **根本原因**: 索引類（README/DOC-MAP）の AUTOGEN block と人手編集領域の分離基準が未明文化。複数PRが同じ索引ファイルを編集する際、最後にマージされるPRが generate_indexes.ts を実行せず AUTOGEN block の不整合が発生。
+- **再発条件**: (1) 複数PRが同じ索引ファイルの AUTOGEN block に依存する変更を行う、(2) 各PRが独立して索引更新を試みるか委譲する、(3) case-close で generate_indexes.ts が必須実行されない
+- **予防策**: case-close SPEC Step 3/E5b へ generate_indexes.ts 必須実行ステップ追加。SC-002 SPEC「混合領域」許容と frontmatter 由来情報と人手編集情報の分離基準を明文化。
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | inbox 1件（#1532 project extensions boilerplate 15 command） |
-| 影響度 | 2/5 | SPEC 運用・inspect-skills 判断に影響、実害は小 |
-| 横展開性 | 4/5 | 今後同様の boilerplate 重複で毎回直面 |
-| 反映先明確度 | 4/5 | artifact-responsibilities.md、command-authoring-standards.md、agentdev-project-extensions |
-| 自動化適性 | 3/5 | inspect-skills での判定マトリクス実装は可能 |
-| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow 固有の SPEC 運用 |
-| 再発可能性 | 4/5 | 同一 boilerplate 重複で発生 |
-| 費用対効果 | 4/5 | SPEC への事例追記で解決 |
-| **加重合計** | **25/40** | |
+| 発生件数 | 3/5 | inbox 3件（GENERATE 可能、混合領域分離、複数PR跨ぎ再生成漏れ） |
+| 影響度 | 3/5 | docs-check NG で case-close QG-4 ブロック |
+| 横展開性 | 4/5 | 索引類 AUTOGEN 化全般、Wave 3/4 でも同様の判断が必要 |
+| 反映先明確度 | 5/5 | SC-002 SPEC、case-close SPEC |
+| 自動化適性 | 5/5 | generate_indexes.ts 必須実行は自動化可能 |
+| プロジェクト固有知識再利用性 | 4/5 | SC-002/IR-061 運用の知見 |
+| 再発可能性 | 4/5 | 複数PR構成は継続、索引編集は頻繁 |
+| 費用対効果 | 5/5 | case-close へのステップ追加で低コスト・高効果 |
+| **加重合計** | **33/40** | |
 
-- **推奨処分案**: spec 候補（artifact-responsibilities.md SPEC、command-authoring-standards.md に事例追記）。「公開契約宣言」と「詳細契約」の分離フロー標準化
+- **推奨処分案**: 昇華（既存 SPEC/command へ反映）— SC-002 SPEC「混合領域」明文化 + case-close SPEC Step 3/E5b へ generate_indexes.ts 必須実行ステップ追加。3エントリ中最も具体性と費用対効果が高い。
 
 #### エントリ一覧
-
-- inbox: SPEC 重複許容基準（REQ-0147-001）の適用事例: project extensions boilerplate (#1532)
-
-#### ADR候補除外記録
-
-- **除外理由**: 仕様変更のみ（SPEC への適用事例追記）
-- **根拠事実**: 重複許容基準の適用事例蓄積は SPEC 整備であり技術判断ではない
-- **代替反映先候補**: docs/specs/responsibilities/artifact-responsibilities.md、docs/specs/responsibilities/command-authoring-standards.md、agentdev-project-extensions SKILL.md
+- 索引類の件数表明は実ファイルから GENERATE 可能で人手更新漏れを根絶できる [inbox]
+- 索引類自動生成における frontmatter 由来情報と人手編集情報の分離パターン（Wave 2 実証）[inbox]
+- 複数PR跨ぎの索引 AUTOGEN 再生成忘れによる docs-check NG 発生 [inbox]
 
 ---
 
-### 問題クラス7: inspect 連鎖委任の正規 Issue/PR による追跡パターン
+### 問題クラス6: Windows PowerShell/gh CLI の UTF-8 出力取り回しによるエンコーディング損傷
 
-- **根本原因**: inspect-docs は検出と主題分割に専念し、具体的 skill 改修は個別 Issue で実施する責務分界。しかし「委任」と明示的に記録しないと連鎖が途切れる
-- **再発条件**: inspect-docs が複数配布物にまたがる改善候補を検出し、各配布物ごとに個別 skill 改修 Issue を起票する場合
-- **予防策**: (a) inspect-docs の Findings 形式に「委任先 Issue 番号」欄を明示、(b) case-open が inspect 由来 Issue に「委任元 Issue」リンクを自動付与、(c) inspect-promote が主題分割を自動提案
+- **根本原因**: Windows 環境で PowerShell がネイティブコマンド（gh CLI, git, bun 等）の UTF-8 出力をパイプライン経由で取得する際、cp932（Shift-JIS）へ再エンコードし文字化け・LF 数不正・JSON parse エラーを生じる。
+- **再発条件**: (1) Windows 環境、(2) PowerShell からネイティブコマンドの UTF-8 出力をパイプライン経由で取得、(3) 結果を文字列操作・正規表現・JSON parse に直接渡す
+- **予防策**: Node.js `execSync`（encoding:'utf-8'）経由の直接取得、`[System.IO.File]::WriteAllText` UTF8Encoding($false) によるファイル経由（`--body-file`）、subprocess 側での明示的 encoding 指定
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | inbox 1件（#1532 → #1533） |
-| 影響度 | 2/5 | 連鎖委任の追跡、実害は小 |
-| 横展開性 | 3/5 | inspect-docs で複数配布物改善候補検出時に発生 |
-| 反映先明確度 | 3/5 | agentdev-intake-pipeline、agentdev-workflow-orchestration capture-boundaries.md |
-| 自動化適性 | 3/5 | Findings 形式拡張、case-open での自動リンクは可能 |
-| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow 固有の inspect フロー |
-| 再発可能性 | 3/5 | inspect-docs で主題独立な改善候補複数検出時に発生 |
-| 費用対効果 | 3/5 | 運用徹底レベル、現状フローで完結 |
-| **加重合計** | **21/40** | |
+| 発生件数 | 3/5 | inbox 3件（Issue 本文崩壊修復、gh CLI pipeline、subprocess JSON empty stdout） |
+| 影響度 | 3/5 | 文字化け・LF 不正で検証 信頼性低下、JSON parse エラーでテスト fail |
+| 横展開性 | 4/5 | Windows 環境のネイティブコマンド出力全般 |
+| 反映先明確度 | 5/5 | agentdev-gh-cli standard-procedures.md Section 3（既規定） |
+| 自動化適性 | 3/5 | execSync 使用ルールは徹底可能だが運用依存 |
+| プロジェクト固有知識再利用性 | 4/5 | Windows+PowerShell 固有の落とし穴 |
+| 再発可能性 | 4/5 | Windows 継続限り確実 |
+| 費用対効果 | 4/5 | 既規定（REQ-0132-024/025/026、REQ-0149-010）の運用徹底 |
+| **加重合計** | **30/40** | |
 
-- **推奨処分案**: deferred（出現1件・ADR/REQ/spec影響なし・運用知見。現状の inspect-docs/inspect-skills/case-open/case-close フローで完結する運用知見。情報断片的）
+- **推奨処分案**: deferred（Entry 13/14 は agentdev-gh-cli standard-procedures.md Section 3 既規定の運用補強。Entry 30（subprocess JSON empty stdout）は別 Issue 推奨の pre-existing 環境問題。既に REQ-0132-024/025/026、REQ-0149-010 で構造的に防止済み）
 
 #### エントリ一覧
-
-- inbox: inspect 連鎖委任の正規 Issue/PR による追跡パターン (#1532 → #1533)
-
-#### ADR候補除外記録
-
-- **除外理由**: 該当なし（ADR/REQ/spec影響なし、運用知見）
-- **根拠事実**: 既存の inspect-docs/inspect-skills/case-open/case-close フローで完結する運用知見であり、恒久契約への昇華不要
-- **代替反映先候補**: なし（deferred で維持）
+- Issue 本文崩壊（LF 圧縮・見出し消失）の修復手法と予防線 [inbox]
+- gh CLI 出力の PowerShell パイプライン経由読み取りによる UTF-8 損傷と Node.js execSync 回避 [inbox]
+- Windows worktree 環境で check_integrity.ts の subprocess JSON が空 stdout を返す問題 [inbox]
 
 ---
 
-### 問題クラス8: Issue 完了条件の数値閾値到達不能問題
+## 未分類
 
-- **根本原因**: 完了条件の数値閾値（LF 数 200 以上等）を、対象成果物の自然な構造（テンプレート適用後）で到達可能な範囲を事前計測せずに設定。draft（要件定義書）と case-open 生成 Issue 本文（テンプレート要約、重複 TS マージ等）は構造が異なるため、draft の LF 数を基準にすると到達不能閾値になる
-- **再発条件**: 完了条件に「N 個以上」「N 件以上」等の数値閾値を設定し、対象成果物の自然な構造で到達可能かを事前計測しない場合
-- **予防策**: (a) case-open が完了条件の数値閾値を検証して到達不能場合は警告、(b) QG-2 で数値閾値の実現可能性を同種既存成果物の実測値で検証、(c) test strategy 策定時に基準値を同種の既存成果物から実測、(d) draft の絶対数を基準にする場合はテンプレート適用後の自然構造での数値も併記
+単独エントリ（最小クラスタサイズ2未満）。全て deferred（living pool）で維持し、再発時に具体化して再評価する。
 
-#### 8軸評価スコア
+| # | エントリ | 想定反映先候補 | 備考 |
+|---|---|---|---|
+| 1 | 要件追加が既存基準の明文化で実変換を伴わない no-op パターン | workflow-templates pr_desc.md、quality-gates qg-4 | pass_criteria 運用知見 |
+| 2 | extension が未サポート形式の brief 授権で意味マッピング処理するパターン | req-save SPEC、workflow-lifecycle | brief 授権経路の明文化候補、未成熟 |
+| 3 | TS-004 subagent 委譲プロトコル適用効果の実証を record-in-findings で処理した判断基準 | quality-gates qg-4、workflow-templates issue_desc | record-in-findings 判断基準の共通化候補 |
+| 4 | ADR frontmatter の relates-to/supersedes を本文と Decision Map で表現する運用 | ADR 形式 SPEC、agentdev-adr-file-manager | 有望だが単発、再発時に具体化 |
+| 5 | req-save/spec-save 統合委譲で生成された SPEC 本文への中国語文字混入 | agentdev-gh-cli verify.md、inspect-docs | CJK 検出 VERIFY 追加候補、既に修正済み |
+| 6 | 要件行は進捗値ではなく仕様としてベースライン値を記述すべき | document-type-responsibilities、workflow-templates req_* | 要件行記述ガイドライン候補 |
+| 7 | 再構成検証型 Issue で「決定」更新後に「結果・影響」節が取り残される内部矛盾パターン | case-run 検証テンプレート、inspect-docs | 派生節整合性確認の観点追加候補 |
+| 8 | 物理統合時の参照更新網羅性チェックパターン | workflow-templates、inspect-docs | 既存 obsolete-path-map.yaml 運用の実証 |
+| 9 | AG-001 制約内で公開 SKILL.md の文書構成を是正する REFERENCE 強化パターン | document-type-responsibilities、case-run 検証 | 動作不改範囲での文書構成是正の標準化候補 |
+| 10 | IR-* frontmatter の Related REQ/SPEC フィールド不在と本文 prose 抽出代替パターン | IR-* 形式 SPEC、Phase E | frontmatter 標準形式への移行候補 |
+| 11 | 配布物 SKILL.md の DERIVE 宣言に内部 ID を含めると IR-055 strict violation となる設計制約 | document-type-responsibilities、SC-002、agentdev-skill-authoring | 設計指針明文化候補、有望だが単発 |
+| 12 | worktree 委譲先での cd 操作誤りによるメインリポジトリ一時汚染と検出・是正パターン | adapter skill、case-auto SPEC | worktree 隔離原則違反時の検出・是正手順候補 |
+| 13 | verification-only 空 PR の squash merge 許容性 | REQ-0108-279 実証根拠 | 実証結果、新規対策不要 |
+| 14 | CaptureBoundary チェックと配布物参照境界（IR-059）の相互作用と両立運用 | integrity-contracts.md、capture-boundaries.md SPEC | 概念名括弧書き残存の運用明文化候補 |
+| 15 | 複数PR跨ぎ semantically 競合の Level 2 コンフリクト解消パターン | case-open Wave 構成ロジック、case-auto | 共通ファイル依存検出の標準化候補 |
 
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 2/5 | inbox 1件（#1538/TS-007）+ #1532 完了条件7で同様問題既発生 |
-| 影響度 | 3/5 | 完了条件到達不能、PR 本文に WARN 記録必要 |
-| 横展開性 | 4/5 | 完了条件に数値閾値を設定する全場面で発生し得る |
-| 反映先明確度 | 4/5 | agentdev-quality-gates qg-2-acceptance-criteria-coverage、agentdev-req-analysis、case-open.md |
-| 自動化適性 | 3/5 | case-open での閾値検証、QG-2 での実現可能性検証 |
-| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow 固有の test strategy 策定 |
-| 再発可能性 | 4/5 | 数値閾値を設定する完了条件で発生 |
-| 費用対効果 | 4/5 | QG-2 強化で予防可能 |
-| **加重合計** | **27/40** | |
+## promote時prune結果
 
-- **推奨処分案**: 既存 skill へ反映（agentdev-quality-gates QG-2 acceptance-criteria-coverage、agentdev-req-analysis test strategy 策定ガイド）。テーマ関連: #2、#5 と「QG/case-close 完了条件解釈」で束ね可能
-
-#### エントリ一覧
-
-- inbox: Issue 完了条件の数値閾値到達不能問題: draft LF 数を基準にした閾値が自然な本文構造で到達不能 (#1538/TS-007)
-
-#### ADR候補除外記録
-
-- **除外理由**: 運用ルール・command 仕様（QG-2 検証手順・test strategy 策定ガイド）
-- **根拠事実**: 数値閾値の到達可能性検証は QG 運用・要件定義手順の拡充であり技術判断ではない
-- **代替反映先候補**: agentdev-quality-gates qg-2-acceptance-criteria-coverage、agentdev-req-analysis（test strategy 策定ガイド）、case-open.md（完了条件の数値閾値検証）
-
----
-
-### 問題クラス9: case-open subagent 委譲での手順逸脱（category=writing が文書監査的振る舞いを誘発）
-
-- **根本原因**: (1) category=writing が「文書作業」を連想させ subagent が文書監査・校正的振る舞いを誘発（japanese-tech-writing 等の発火スキルとの相互作用）、(2) subagent プロンプトで禁止事項（MUST NOT DO）が明示されておらずスコープ境界が弱かった、(3) writing category が「書く」作業全般を意味するため case-open の事務的手続き作業と認識されなかった
-- **再発条件**: (1) case-open 等の事務的手続き作業を category=writing で委譲した場合、(2) subagent プロンプトに MUST NOT DO が明示されていない場合、(3) category 名が subagent の「作業の意味」を誤誘導する場合
-- **予防策**: (a) case-auto から subagent 委譲時の category 選定ガイドラインを SPEC 化（事務的手続きは unspecified-high を推奨、writing は執筆作業のみ）、(b) subagent プロンプトテンプレートに MUST NOT DO セクションを必須化、(c) writing category の発火スキル（japanese-tech-writing 等）を case-open 等、事務的手続き委譲時は無効化する仕組み、(d) category 別の subagent 振る舞い事例集を蓄積
-
-#### 8軸評価スコア
-
-| 軸 | スコア | 判定理由 |
-|---|---|---|
-| 発生件数 | 2/5 | inbox 1件（複数回試行で同一事象） |
-| 影響度 | 3/5 | スコープ逸脱、リソース浪費 |
-| 横展開性 | 4/5 | case-auto から subagent 委譲する全場面（case-open, case-run, case-update, case-close） |
-| 反映先明確度 | 4/5 | case-auto.md、workflow-orchestration capture-boundaries.md、case-run-execution-adapter |
-| 自動化適性 | 4/5 | subagent プロンプトテンプレート MUST NOT DO 必須化は容易 |
-| プロジェクト固有知識再利用性 | 3/5 | AgentDevFlow 固有の委譲プロトコル |
-| 再発可能性 | 4/5 | case-open 等を category=writing で委譲、MUST NOT DO 未明示で再発 |
-| 費用対効果 | 4/5 | category 選定ガイドライン + MUST NOT DO 必須化で予防 |
-| **加重合計** | **28/40** | |
-
-- **推奨処分案**: 既存 command/skill へ反映（case-auto.md subagent 委譲ガイドライン・category 選定指針、workflow-orchestration capture-boundaries.md subagent プロトコル・MUST NOT DO 記載要件、case-run-execution-adapter category 設計）
-
-#### エントリ一覧
-
-- inbox: case-open subagent 委譲での手順逸脱: category=writing が文書監査的振る舞いを誘発、draft 作成へスコープ拡大 (#1538 case-auto 委譲)
-
-#### ADR候補除外記録
-
-- **除外理由**: command 仕様・運用ルール（case-auto subagent 委譲ガイドライン・MUST NOT DO 記載要件）
-- **根拠事実**: category 選定基準・MUST NOT DO 必須化は command 手順・委譲プロトコルの拡充であり技術判断ではない
-- **代替反映先候補**: case-auto.md、agentdev-workflow-orchestration capture-boundaries.md、agentdev-case-run-execution-adapter
-
----
-
-## promote 時 prune 結果
-
-- **対象エントリ数**: 9件（inbox 全エントリ）
-- **prune 実施**: あり（Step 14 で実行予定）
-- **prune 候補**: staged（採用済み成果物生成済み）/ rejected / duplicate のエントリ。今回は全エントリ staged or deferred のため、staged のみ prune 対象
-- **prune 却下**: 0件
+- **対象エントリ数**: 31件（inbox 全エントリを deferred.md へ移動後に prune 対象を判定）
+- **prune実施**: あり（Step 14 で実施予定）
+- **prune候補**: 11件（staged 9件 + duplicate 2件）
+- **prune却下**: 20件（deferred 判定で living pool へ残置）
 
 ## 全体傾向
 
-- **高頻出・高影響の問題クラス**: ハーネス制約で委譲不可（#1, 29/40）、case-open subagent 委譲手順逸脱（#9, 28/40）
-- **横展開性が高い問題クラス**: 全エントリで横展開性スコア 3-5。特にハーネス制約（#1）、--files 区切り（#4）、識別子中心評価（#5）、SPEC 重複許容（#6）、数値閾値（#8）、subagent category（#9）は 4-5
-- **自動化適性が高い問題クラス**: verification-only PR（#3, 4/5）、--files 区切り（#4, 4/5）、subagent category（#9, 4/5）
-- **全体的な観察所見**:
-  - 今回の9エントリは「AgentDevFlow 実運用（Epic #1515/#1532/#1538 等）で顕在化した境界ケース・運用知見」が中心
-  - 厳密な問題クラス基準では全エントリが単独（未分類）だが、3つのテーマクラスタに束ね可能: (A) QG/case-close 完了条件解釈（#2/#5/#8）、(B) SPEC/command 境界ケース明文化（#3/#4/#6/#9）、(C) ハーネス制約（#1、deferred L-004/L-010 と同根）
-  - 全エントリが ADR 候補除外（運用ルール・command 仕様・仕様変更のみ）。技術判断不在のため ADR 不要
-  - inbox#7（inspect 連鎖委任）のみ ADR/REQ/spec影響なし・運用知見・スコア 21/40 で deferred 推奨。他8エントリは staged（採用済み成果物生成）推奨
+- **高スコアクラス（加重合計 30以上）**: 問題クラス2（32/40, duplicate）、問題クラス5（33/40, 昇華）、問題クラス4（31/40, 昇華）。既存 SPEC/command への反映余地が明確なものが高スコア。
+- **既存対策カバー率の高さ**: 問題クラス2（adapter skill 完全覆盖）、問題クラス6（gh-cli standard-procedures 既規定）は既存対策で大部分がカバーされており、新規昇華不要。AgentDevFlow の知識基盤が成熟している領域。
+- **Windows 環境固有の知見集中**: 問題クラス1（worktree junction）、問題クラス6（PowerShell encoding）で Windows 固有の落とし穴が2クラスタを形成。Linux/macOS では発生しない知見が living pool で維持される。
+- **監査台帳・索引自動生成の運用パターン蓄積**: 問題クラス4（SC-003）、問題クラス5（SC-002）で大規模変更計画・索引類自動生成の運用パターンが4件+3件蓄積。既存 SPEC への適用例追記で再利用性が高まる。
+- **bg task 回復パターンの具体化**: 問題クラス3で case-auto 子 task 破棄時の回復パスが2パターン（commit 済み・未コミット）実証済み。case-auto SPEC への標準化が有望。
 
-## ADR候補除外記録（サマリ）
+## ADR候補除外記録
 
-| # | エントリ | 除外理由 | 代替反映先候補 |
-|---|---------|---------|---------------|
-| 1 | call_omo_agent 制約 | 運用ルール | agentdev-case-run-execution-adapter SKILL（既存） |
-| 2 | QG-4 spec-bug acceptance | 運用ルール・command 仕様 | agentdev-quality-gates QG-2、agentdev-req-analysis、workflow-templates |
-| 3 | verification-only PR | command 仕様 | docs/specs/commands/case-run.md、case-close.md、REQ-0158 |
-| 4 | --files 区切り | command 仕様 | check_changed_docs.ts、targeted-docs-guard-implementation.md、case-close.md |
-| 5 | 識別子中心評価 | 運用ルール・command 仕様 | agentdev-quality-gates qg-4-final-acceptance.md、case-close.md、case-open.md |
-| 6 | SPEC 重複許容 | 仕様変更のみ | artifact-responsibilities.md、command-authoring-standards.md |
-| 7 | inspect 連鎖委任 | 該当なし（運用知見） | なし（deferred） |
-| 8 | 数値閾値到達不能 | 運用ルール・command 仕様 | agentdev-quality-gates qg-2、agentdev-req-analysis、case-open.md |
-| 9 | subagent category | command 仕様・運用ルール | case-auto.md、workflow-orchestration、case-run-execution-adapter |
+全問題クラスについて `agentdev-adr-guidelines` の除外基準（禁止条件フィルタリングゲート）を適用した結果、ADR候補は0件。全クラスは運用ルール・手順・command仕様・既存SPEC拡張であり、技術判断不在。
+
+| 問題クラス | 除外基準 | 根拠事実 | 代替反映先候補 |
+|---|---|---|---|
+| 1 | 運用ルール | worktree 環境での検証手順・パス解決の運用知見 | case-run skill、repo-agentdev-integrity |
+| 2 | 運用ルール | ハーネス制約時のフォールバック運用（既に adapter skill で規定済み） | adapter skill（既存） |
+| 3 | command仕様・運用ルール | case-auto 子 task 中断回復手順の標準化 | case-auto SPEC、workflow-orchestration skill |
+| 4 | 仕様変更のみ・運用ルール | 既存 SC-003 SPEC への適用例追記 | SC-003 SPEC（既存） |
+| 5 | command仕様・仕様変更 | case-close へのステップ追加、SC-002 SPEC の明文化 | case-close SPEC、SC-002 SPEC |
+| 6 | 運用ルール | PowerShell/gh CLI 出力取り回しの運用規定（既に standard-procedures.md で規定済み） | agentdev-gh-cli（既存） |
