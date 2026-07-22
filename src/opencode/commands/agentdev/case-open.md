@@ -51,7 +51,7 @@ agent-dev-flow repository への手動取り込み対象として報告。
 
 **Step 2-1**: 完了条件網羅性検証（QG-2）。
 Issue本文生成後、Issue作成前に、`agentdev-quality-gates` の QG-2（Acceptance Criteria Coverage Gate）に従い、完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する。
-判定基準、検査観点は同スキルの `.opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md` を参照。
+判定基準、検査観点は同スキル（`agentdev-quality-gates`）の QG-2 を参照。
 fail 時は Issue 作成前に req-define 差し戻しを推奨
 
 **Step 2-1a**: 完了条件の数値閾値到達可能性検証（REQ-0131-031、QG-2 観点6）。
@@ -270,7 +270,7 @@ push 失敗時は構造化エラーメッセージを表示して停止する
 - G19: case-open は自律的な要件分析に基づいて Epic Issue を作成すること。ただし機能要件、非機能要件、対象外、受け入れ条件を新規に作成しないこと
 - G20: case-open は複数 OU が存在する場合、要件分析に基づいて Epic Issue および子 Issue 構造を生成すること。単一 Issue で完結する場合は Epic を作成しないこと
 - G21: case-open の Issue 化単位は REQ doc 単位ではなく OU 単位とすること
-- G22: case-open の capture 責務は非関与。intake/ learning capture を行わない。境界の詳細は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照
+- G22: case-open の capture 責務は非関与。intake/ learning capture を行わない。境界の詳細は `agentdev-workflow-orchestration` 参照
 
 ### 並列実行安全 git 操作制約
 - G23: 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）を実行しないこと。`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従うこと

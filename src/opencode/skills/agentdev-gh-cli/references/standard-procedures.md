@@ -232,6 +232,18 @@ merge 前に `git rev-parse HEAD` で HEAD commit hash を記録する。
 Merge Conflict 発生時は後述「Merge Conflict 対応パターン」に従う。
 **`--delete-branch` 非推奨**: `gh pr merge` で `--delete-branch` オプションを使用しない。アクティブ worktree に checkout されたブランチで `--delete-branch` を使用すると local 削除が失敗し remote 削除フェーズへ到達しない。ブランチ削除は case-close Step 7 で独立実施する（REQ）。
 
+### squash merge リトライ手続き
+
+squash merge が失敗した場合のリトライ戦略。ネットワーク揺れ、GitHub 側の一時的不具合等、同一内容の再試行で解決する可能性がある失敗を想定する（REQ-0103-163、AG-001 に基づき case-close command 側には具体値を記載せず、本手続きが待機間隔・最大試行回数を所有する）。
+
+- **待機間隔**: 5秒
+- **最大試行回数**: 初期試行 + 5回リトライ（計6回）
+- **各試行のログ記録**: 試行ごとに時刻、結果（成功/失敗）、エラーメッセージを記録する
+- **全試行失敗時のフォールバック**: command 側の template（`.opencode/commands/agentdev/templates/case-close/standard.md`）が定義するフォールバック手順へ接続する
+- **コンフリクト時の扱い**: コンフリクトによる失敗は本リトライの対象外。即座にコンフリクト解消パス（case-close Step 4-2 等）へ進む
+
+VERIFY 失敗時の3段階リトライロジック（[retry.md](retry.md)）とは別手続き。retry.md は VERIFY 後の差分検出に対するリトライ、本手続きは `gh pr merge` コマンド自体の実行失敗に対するリトライ。
+
 ### squash merge 前の mergeable UNKNOWN ポーリング（REQ）
 
 squash merge 実行前に、対象 PR の `mergeable` 状態を事前確認し、`UNKNOWN` の場合は mergeable になるまでポーリング待機する。連続 squash merge 時に GitHub が mergeable を `UNKNOWN` 状態で返し、マージが失敗する事象（バックエンドの mergeable 再計算未完了）を回避する。
