@@ -130,6 +130,45 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 
 本契約は Command → Skill → Script の依存方向を維持し、新規 ADR を作成せず ADR-0107（Command/Skill/Template/Script 責任分界）の適用条件の精緻化として扱う（REQ-0119-033 準拠）。
 
+## 分類根拠伝播契約
+
+learning/intake → RU → req-define → spec-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-0136-033、AG-004、RU-20260722-02 合意、ADR-0139）。
+
+### 伝播フィールド一覧
+
+| フィールド | 型 | 内容 | soft-contract 扱い |
+|---|---|---|---|
+| change_nature | enum | 変更の性質: `new_user_requirement`、`external_contract_change`、`variation_addition`、`edge_case`、`parameter_adjustment`、`nonconformance_fix`、`internal_restructuring`、`document_correction` のいずれか | 欠落時は `unknown` で警告 |
+| req_impact | enum | REQ影響の有無: `yes`、`no`、`unknown` | 欠落時は `unknown` で警告 |
+| target_stakeholder | string | 変更が影響するステークホルダー（利用者、運用者、開発者、外部システム等） | 欠落時は `unknown` で警告 |
+| user_visible_change | enum | 利用者から見える変更の有無: `yes`、`no`、`unknown` | 欠落時は `unknown` で警告 |
+| spec_logical_division | enum | SPEC論理区分: `behavior`、`catalog`、`cross_cutting_contract`、`parameter`、`implementation_detail`、`unknown` のいずれか | 欠落時は `unknown` で警告 |
+| canonical_owner | string | 正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー） | 欠落時は `unknown` で警告 |
+| destination_selection_reason | string | 追記先を選択した理由 | 欠落時は `unknown` で警告 |
+| observed_evidence | string | 根拠となる観測事実（CI 失敗、誤検出、エッジケース発見等） | 欠落時は `unknown` で警告 |
+
+### soft-contract 運用（ADR-0124 準拠）
+
+- 分類根拠は soft-contract（ADR-0124）として追加情報扱いとする
+- 厳格なスキーマ検証、JSON Schema、バリデータを導入しない
+- 欠落時は `unknown` 既定値で警告を出し、処理を継続する（後方互換）
+- 既存の採用済み成果物、RU、req_draft を欠落により拒否しない
+- 具体的なシリアライズ形式は各工程の成果物形式（RU frontmatter、draft-data YAML、SPEC frontmatter 等）に従う
+
+### 各工程での扱い
+
+| 工程 | 入力 | 出力 |
+|---|---|---|
+| learning-promote | 学びから change_nature、observed_evidence を推定 | 採用済み成果物（promoted artifact）に分類根拠を添付 |
+| intake-promote | inbox item から change_nature、observed_evidence を推定 | 採用済み成果物に分類根拠を添付 |
+| backlog-review | 採用済み成果物から読取、`tentative_classification` と併せて RU frontmatter へ記録 | RU frontmatter に `tentative_classification` と分類根拠を記録 |
+| req-define | RU の分類根拠を暫定入力とし、最終分類を自身で確定 | draft-data の artifact_actions、operation_units に最終分類根拠を反映 |
+| spec-save | draft-data の分類根拠を読取、配置一貫性検証の入力とする | 配置一貫性検証結果を commit message、完了報告に反映 |
+
+### REQ 拡張可否判定ルール
+
+change_nature が `new_user_requirement` または `external_contract_change` の場合のみ、REQ の作成または拡張を候補とする（REQ-0136-033）。それ以外の change_nature は、既存 REQ が要求を既に保持している限り REQ を拡張せず、SPEC 等への配置を検討する。
+
 ## サイズ制約
 
 | 種別 | 推奨上限 | 実運用上限 | 例外状態 |

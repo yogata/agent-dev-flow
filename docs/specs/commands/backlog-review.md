@@ -71,6 +71,35 @@ updated: 2026-07-18
 - depends_on に RU-ID のみ許容（G07）
 - 統合分割判定ロジック: `agentdev-backlog-integration` 参照
 
+## tentative_classification と分類根拠伝播
+
+backlog-review は採用済み成果物の分析時に tentative_classification（暫定分類）と分類根拠を RU へ付与して伝播させる（REQ-0136-033、AG-004、RU-20260722-02 合意、ADR-0139）。分類根拠は learning/intake 成果物から後続工程（req-define、spec-save）へ引き継がれる情報であり、本 SPEC は backlog-review での扱いを規定する。
+
+### 伝播させる分類根拠フィールド
+
+backlog-review は採用済み成果物から読み取った次の分類根拠を RU frontmatter へ記録する。詳細なフィールド定義は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」を参照。
+
+- change_nature（変更の性質: 8種別のいずれか）
+- req_impact（REQ影響の有無）
+- target_stakeholder（対象ステークホルダー）
+- user_visible_change（利用者可視変更の有無）
+- spec_logical_division（SPEC論理区分: 5区分のいずれか）
+- canonical_owner（正規所有対象）
+- destination_selection_reason（追記先選択理由）
+- observed_evidence（観測根拠）
+
+### tentative_classification との関係
+
+tentative_classification（REQ-0155-003 の7値）は文書種別の暫定分類であり、分類根拠は分類判断の根拠情報である。両者は併存し、req-define が最終分類を確定する際の入力となる。
+
+### 後方互換運用
+
+分類根拠は soft-contract（ADR-0124）として扱い、欠落時は unknown 既定値で警告する後方互換運用をとる。分類根拠が欠落した旧 RU も unknown 既定値で受け入れる。欠落により RU を拒否しない。具体的なシリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」に従う。
+
+### 暫定扱いの明記
+
+backlog-review が付与する tentative_classification および分類根拠は暫定（tentative）扱いであり、req-define が最終確定する（REQ-0102-087、AG-005、RU-20260722-02 合意）。backlog-review 自体は最終分類を確定しない。
+
 ## tentative_classification フィールド仕様
 
 RU frontmatter の `tentative_classification` フィールドの仕様（REQ-0155-008）。

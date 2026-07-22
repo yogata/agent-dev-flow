@@ -17,8 +17,8 @@
 <!-- AUTOGEN:BEGIN:id=docmap-inventory -->
 - 現行 REQ: 52件（`docs/requirements/REQ-*.md`）
 - 廃止済み REQ: 2件（`docs/requirements/retired/REQ-*.md`）
-- ADR: 29件（`docs/adr/ADR-*.md`）
-- SPEC: 142件（`docs/specs/**/*.md`）
+- ADR: 30件（`docs/adr/ADR-*.md`）
+- SPEC: 145件（`docs/specs/**/*.md`）
 <!-- AUTOGEN:END -->
 
 ## 現行 REQ

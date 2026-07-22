@@ -13,6 +13,29 @@ inbox 内の intake item をレビュー、分類し、採用 item を backlog-r
 review、分類、整形を担う。
 GitHub Issue 作成は行わない。
 
+## 変更種別分類
+
+intake 成果物から RU へ引き継ぐ変更種別を定義する（REQ-0136-033、AG-004、RU-20260722-02 合意、ADR-0139）。intake-promote は採用 item を採用済み成果物（promoted artifact）へ整形する際、各 item に基づき次の8変更種別のいずれかを付与する。変更種別は分類根拠フィールド `change_nature` として RU へ伝播され、req-define が REQ 拡張可否を判定する入力となる。learning-promote.md「変更種別分類」と整合する。
+
+### 変更種別と REQ 拡張可否
+
+| 変更種別 | 内容 | REQ 拡張候補 |
+|---|---|---|
+| new_user_requirement（新しい利用者要求） | 既存REQ が要求を保持していない新しいステークホルダー要求 | ○（REQ 作成または拡張） |
+| external_contract_change（外部契約変更） | 利用者から見える外部契約の変更 | ○（REQ 作成または拡張） |
+| variation_addition（バリエーション追加） | 既存要求を満たすバリエーション追加 | ×（SPEC 拡張） |
+| edge_case（エッジケース） | エッジケース対応 | ×（SPEC 拡張） |
+| parameter_adjustment（パラメータ調整） | retry 回数、timeout、閾値、重み等の調整 | ×（パラメータSPEC 拡張） |
+| nonconformance_fix（不適合修正） | 既存REQ/SPEC への不適合修正 | ×（SPEC 修正） |
+| internal_restructuring（内部再構成） | 外部挙動を変えない内部再構成 | ×（SPEC 再構成） |
+| document_correction（文書訂正） | 文書記述の訂正 | ×（文書修正） |
+
+REQ 拡張を候補とするのは `new_user_requirement` または `external_contract_change` のみ。それ以外は既存 REQ が要求を既に保持している限り REQ を拡張しない（REQ-0136-033）。判定の最終確定は req-define が行う（REQ-0102-087）。
+
+### 分類根拠の引き継ぎ
+
+intake-promote は change_nature と併せて、observed_evidence（根拠となる観測事実）、target_stakeholder、user_visible_change 等の分類根拠（`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」参照）を RU へ伝播させる。分類根拠は soft-contract（ADR-0124）とし、欠落時は unknown 既定値で警告する。
+
 ## HITL 境界、自動実行ルール（REQ-0147-003/004/005/008）
 
 - **HITL は「判断の確定」に限定**（REQ-0147-003）: Step 5 の分類承認（採用/保留/却下の確定）のみが HITL 対象。

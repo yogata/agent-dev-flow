@@ -5,7 +5,7 @@
 ## 現行基盤ビュー
 
 <!-- AUTOGEN:BEGIN:id=adr-baseline-count -->
-承認済みステータス（accepted）の ADR-01XX 26件が、現在のアーキテクチャ判断の基盤である。
+承認済みステータス（accepted）の ADR-01XX 27件が、現在のアーキテクチャ判断の基盤である。
 <!-- AUTOGEN:END -->
 各 ADR は基準再編により旧 ADR の内容を統合、再定義している。
 現行基盤ビューは承認済み ADR のみを現行根拠として含み、置き換え済み（superseded）、非推奨（deprecated）の ADR は別セクション（ステータス別ビュー）に分離する。
@@ -39,6 +39,7 @@
 | ADR-0136 | 配布物の harness 実行制御分離 | accepted | 2026-07-12 |
 | ADR-0137 | case-auto における case-run インライン実行（多重委譲回避） | accepted | 2026-07-16 |
 | ADR-0138 | case-auto オーケストレーション制御の AgentDevFlow 側集約 | accepted | 2026-07-19 |
+| ADR-0139 | REQ/SPEC 意味分類と正規所有モデル | accepted | 2026-07-22 |
 <!-- AUTOGEN:END -->
 
 > この README は分類ビューであり、ADR本文のSSoTではない。
@@ -75,6 +76,7 @@
 - [ADR-0136](ADR-0136.md)（配布物の harness 実行制御分離）
 - [ADR-0137](ADR-0137.md)（case-auto における case-run インライン実行（多重委譲回避））
 - [ADR-0138](ADR-0138.md)（case-auto オーケストレーション制御の AgentDevFlow 側集約）
+- [ADR-0139](ADR-0139.md)（REQ/SPEC 意味分類と正規所有モデル）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
@@ -110,6 +112,7 @@
 - [ADR-0105](ADR-0105.md)（OpenCode ソース、プロジェクション分離）
 - [ADR-0124](ADR-0124.md)（req_draft soft-contract 原則: LLM推論消費、厳格schemaなし）
 - [ADR-0134](ADR-0134.md)（配布物依存スキルの src 昇格方針）
+- [ADR-0139](ADR-0139.md)（REQ/SPEC 意味分類と正規所有モデル）
 
 ### コマンド、スキル設計
 
@@ -119,6 +122,7 @@
 - [ADR-0112](ADR-0112.md)（サブエージェント委譲の一般化と委譲時最小契約）
 - [ADR-0113](ADR-0113.md)（診断ワークフロー導入とレビュー系コマンド完全削除）
 - [ADR-0123](ADR-0123.md)（SPEC lifecycle と spec-save の導入）
+- [ADR-0139](ADR-0139.md)（REQ/SPEC 意味分類と正規所有モデル）
 
 ### ワークフロー
 
@@ -223,6 +227,9 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0138 | relates-to | ADR-0137 | case-run インライン実行モデルを維持しつつ Phase 2 並列実行の安全境界を規定 |
 | ADR-0138 | relates-to | ADR-0129 | 複数 execution_unit 並列実行モデルの上に Phase 分離モデルを重ね、Phase 2 同時起動数を固定値5として規定 |
 | ADR-0138 | relates-to | ADR-0132 | bg task 破棄時の状態別回復とコンフリクト解消モデルの協調 |
+| ADR-0139 | relates-to | ADR-0103 | 文書種別責務境界の枠組みを維持しつつ、REQ 候補受理基準（4妥当性基準）と SPEC 論理区分（5区分）を追加 |
+| ADR-0139 | relates-to | ADR-0123 | SPEC lifecycle を維持しつつ、spec-save の検証観点を配置一貫性検証として拡張 |
+| ADR-0139 | relates-to | ADR-0107 | 責任分界の原則を維持しつつ、「責務ごと」の単位を安定した関心キーとして精緻化 |
 
 ## 関連 REQ
 
@@ -257,6 +264,7 @@ Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
 | ADR-0136 | [REQ-0162](../requirements/REQ-0162.md), [REQ-0139](../requirements/REQ-0139.md), [REQ-0130](../requirements/REQ-0130.md), [REQ-0114](../requirements/REQ-0114.md), [REQ-0151](../requirements/REQ-0151.md) | 配布物ハーネス境界の浄化（harness 固有詳細の配布物からの除去、4状態結果契約） |
 | ADR-0137 | [REQ-0114](../requirements/REQ-0114.md) | case-auto における case-run インライン実行（多重委譲回避、委譲起点の折りたたみ） |
 | ADR-0138 | [REQ-0114](../requirements/REQ-0114.md), [REQ-0148](../requirements/REQ-0148.md), [REQ-0162](../requirements/REQ-0162.md) | case-auto オーケストレーション制御の AgentDevFlow 側集約（Phase 分離、固定並列数、bg task 状態管理と回復） |
+| ADR-0139 | [REQ-0101](../requirements/REQ-0101.md), [REQ-0102](../requirements/REQ-0102.md), [REQ-0108](../requirements/REQ-0108.md), [REQ-0119](../requirements/REQ-0119.md), [REQ-0136](../requirements/REQ-0136.md), [REQ-0155](../requirements/REQ-0155.md), [REQ-0156](../requirements/REQ-0156.md) | REQ/SPEC 意味分類と正規所有モデル（4妥当性基準、SPEC 5区分、関心キー所有、分類根拠伝播、配置一貫性検証、強制ゲート段階適用） |
 
 ADR-0001 から ADR-0023 までの23件は、ADR-01XX 現行基盤導入に伴い現行基準から外された歴史的決定記録である（2026-07-20に物理削除）。これらは再編前の判断を保持しており、現行アーキテクチャの基盤は上記 現行基盤ビューの ADR-01XX にある。後継関係（各 ADR-01XX の supersedes 宣言）は Decision Map（関連 ADR 依存関係）の欄を参照。
 

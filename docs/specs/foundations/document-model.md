@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-20
+updated: 2026-07-22
 ---
 
 # 文書モデル
@@ -384,19 +384,24 @@ SPEC の記述範囲を責務境界として定義する。
 
 ## SPEC 内部論理区分
 
-SPEC は文書種別として維持し、内部を以下の論理区分で整理する（REQ-0155-001）。各区分の規範は各レポジトリの document-model.md が定義する。
+SPEC は文書種別として維持し、内部を以下の論理区分で整理する（REQ-0155-001, REQ-0155-009, ADR-0139）。各区分の規範は各レポジトリの document-model.md が定義する。
 従来の3層ディレクトリ構造（commands/skills/workflows/直下）を維持しつつ、各 SPEC ファイルの内容がいずれの論理区分に属するかを明確にする。
+論理区分は5区分（挙動SPEC、カタログSPEC、横断契約SPEC、パラメータSPEC、実装詳細SPEC）とし、パラメータ責務を実装詳細から区別する（REQ-0155-009）。
 
 | 論理区分 | 記述対象 | 代表例 |
 |---|---|---|
 | 挙動SPEC | コマンド、スキル、ワークフローの振る舞い、入出力、副作用、停止条件 | commands/req-define.md、skills/`agentdev-req-analysis`.md |
 | カタログSPEC | スキーマ、enum、判定表、ルールカタログ、テンプレート種別 | integrity-rule-catalog.md、req-impact-map.md |
 | 横断契約SPEC | 複数コマンド、スキルにまたがる共通契約 | workflows/workflow-contracts.md、workflows/delegation-contracts.md |
-| 実装詳細SPEC | 内部アルゴリズム、パラメータ、実装詳細 | req-health-metrics.md、quality-gates.md |
+| パラメータSPEC | retry 回数、timeout、閾値、重み、優先順位、上限、下限、fallback、許容範囲等のパラメータ責務 | 散在（各 SPEC 内のパラメータ節、専用パラメータ SPEC 等） |
+| 実装詳細SPEC | 内部アルゴリズム、実装詳細（パラメータ責務は除く） | req-health-metrics.md、quality-gates.md |
 
-1つの SPEC ファイルが複数の論理区分にまたがる場合、主たる区分をファイルの冒頭に明示する。
-論理区分は物理的なディレクトリ分離を意味せず、既存3層構造内での内容整理のための区分である。
+パラメータ責務（retry 回数、timeout、閾値、重み、優先順位、上限、下限、fallback、許容範囲等）は実装詳細SPEC から区別し、パラメータSPEC として独立区分を与える（AG-002、RU-20260722-02 合意）。パラメータは単一の全体パラメータファイルへ集約せず、対象 command、skill、workflow、品質ルール、整合性ルール等の所有責務に基づいて配置先を決定する。
+
+1つの SPEC ファイルが複数の論理区分にまたがる場合、主たる区分（主論理区分）を frontmatter または冒頭宣言節で識別可能にする（REQ-0156-013、AG-003、RU-20260722-02 合意）。複数論理区分を含む SPEC は主論理区分と従属する区分を判別できる状態にする。論理区分は物理的なディレクトリ分離を意味せず、既存3層構造内での内容整理のための区分である。
 従来の workflows/ 層が横断契約 SPEC に対応する。
+
+各 SPEC は frontmatter または冒頭宣言節で正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の所有責務、関心キー）を識別可能にする（REQ-0156-013）。正規所有の単位は「安定した関心キー」であり、1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない（REQ-0119-038）。主論理区分・正規所有対象の宣言形式（frontmatter フィールド名、冒頭宣言節フォーマット）の詳細は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」または本ファイルで定義する。
 
 索引文書（DOC-MAP.md、specs/README.md）は文書探索、参照経路の入口を担うが、SPEC 内部論理区分には含まれない。索引文書は既存文書種別（DOC-MAP.md = 探索経路インデックス、specs/README.md = SPEC マニフェスト）の役割表現であり、新文書種別ではない。
 

@@ -57,53 +57,57 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 <!-- AUTOGEN:BEGIN:id=spec-metrics-measurement-example -->
 | SPEC | SPEC 行数 | status | ドメイン分類 |
 |---|---|---|---|
-| foundations/document-model.md | 468 | accepted | foundations |
+| foundations/document-model.md | 473 | accepted | foundations |
+| responsibilities/artifact-contracts.md | 385 | accepted | responsibilities |
 | workflows/epic-wave-model.md | 340 | accepted | workflows |
-| responsibilities/artifact-contracts.md | 317 | accepted | responsibilities |
+| responsibilities/document-type-responsibilities.md | 324 | accepted | responsibilities |
 | local/runtime-package-boundary.md | 291 | accepted | local |
 | integrity/integrity-contracts.md | 284 | accepted | integrity |
-| responsibilities/document-type-responsibilities.md | 273 | accepted | responsibilities |
 | workflows/backlog-artifact-lifecycle.md | 262 | accepted | workflows |
 | commands/case-run.md | 255 | accepted | commands |
+| commands/req-define.md | 241 | accepted | commands |
 | integrity/integrity-rule-catalog.md | 241 | accepted | integrity |
 | local/local-case-file.md | 241 | accepted | local |
-| README.md | 228 | - | uncategorized |
+| README.md | 231 | - | uncategorized |
 | commands/case-close.md | 228 | accepted | commands |
 | local/local-generation.md | 217 | accepted | local |
-| commands/req-define.md | 213 | accepted | commands |
 | commands/case-auto.md | 210 | accepted | commands |
 | integrity/targeted-docs-guard-implementation.md | 208 | accepted | integrity |
 | commands/case-open.md | 207 | accepted | commands |
 | skills/agentdev-gh-cli.md | 192 | accepted | skills |
 | workflows/delegation-contracts.md | 185 | accepted | workflows |
 | quality/quality-gates.md | 181 | accepted | quality |
+| commands/spec-save.md | 170 | accepted | commands |
 | workflows/workflow-contracts.md | 167 | accepted | workflows |
+| foundations/design-principles.md | 158 | accepted | foundations |
 | integrity/index-auto-generation.md | 152 | accepted | integrity |
 | foundations/patterns.md | 147 | accepted | foundations |
-| foundations/design-principles.md | 136 | accepted | foundations |
-| commands/spec-save.md | 131 | accepted | commands |
+| responsibilities/artifact-responsibilities.md | 137 | accepted | responsibilities |
+| commands/backlog-review.md | 133 | accepted | commands |
+| quality/req-health-metrics.md | 127 | accepted | quality |
 | commands/req-save.md | 126 | accepted | commands |
 | foundations/project-extensions.md | 125 | accepted | foundations |
 | foundations/harness-separation-model.md | 121 | accepted | foundations |
 | responsibilities/req-impact-map.md | 115 | accepted | responsibilities |
+| authoring/command-file-format.md | 111 | accepted | authoring |
+| commands/learning-promote.md | 111 | accepted | commands |
 | integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md | 110 | accepted | integrity |
-| authoring/command-file-format.md | 108 | accepted | authoring |
-| responsibilities/artifact-responsibilities.md | 106 | accepted | responsibilities |
+| commands/intake-promote.md | 107 | accepted | commands |
 | integrity/rules/IR-044-req-spec-boundary-violation-detection.md | 105 | accepted | integrity |
-| quality/req-health-metrics.md | 105 | accepted | quality |
-| commands/backlog-review.md | 104 | accepted | commands |
 | foundations/system.md | 99 | accepted | foundations |
+| quality/spec-health-metrics.md | 97 | accepted | quality |
+| responsibilities/responsibility-boundary-purification.md | 96 | accepted | responsibilities |
 | workflows/capture-boundaries.md | 93 | accepted | workflows |
-| commands/learning-promote.md | 88 | accepted | commands |
+| skills/agentdev-spec-file-manager.md | 88 | draft | skills |
 | commands/inspect-docs.md | 85 | accepted | commands |
 | local/audit-ledger-lifecycle.md | 85 | superseded | local |
-| commands/intake-promote.md | 84 | accepted | commands |
+| skills/agentdev-doc-diagnostics.md | 83 | draft | skills |
+| skills/agentdev-artifact-validation.md | 82 | draft | skills |
 | integrity/rule-ownership.md | 79 | accepted | integrity |
 | commands/inspect-promote.md | 77 | accepted | commands |
 | commands/inspect-extensions.md | 75 | accepted | commands |
 | commands/inspect-skills.md | 75 | accepted | commands |
 | skills/agentdev-skill-authoring.md | 74 | accepted | skills |
-| quality/spec-health-metrics.md | 71 | accepted | quality |
 | commands/intake-from-github.md | 70 | accepted | commands |
 | integrity/rules/IR-054-draft-spec-abandonment-detection.md | 69 | accepted | integrity |
 | integrity/rules/IR-058-distribution-untracked-skill-reference.md | 69 | accepted | integrity |
@@ -118,7 +122,6 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-quality-gates.md | 62 | accepted | skills |
 | skills/agentdev-req-file-manager.md | 61 | accepted | skills |
 | integrity/rules/IR-060-forbidden-japanese-word-detection.md | 60 | accepted | integrity |
-| responsibilities/responsibility-boundary-purification.md | 60 | accepted | responsibilities |
 | skills/agentdev-req-analysis.md | 60 | accepted | skills |
 | integrity/docs-spec-rebuild-integrity.md | 59 | accepted | integrity |
 | skills/agentdev-git-worktree.md | 59 | accepted | skills |
@@ -198,7 +201,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-051-executor-skill-notation-misrecognition.md | 21 | accepted | integrity |
 | integrity/rules/IR-053-gh-direct-invocation-detection.md | 21 | accepted | integrity |
 
-計測日: 2026-07-22。
+計測日: 2026-07-23。
 <!-- AUTOGEN:END -->
 
 SPEC 行数は frontmatter、HTML コメントを除く本文行数。
@@ -220,3 +223,29 @@ SPEC 行数は frontmatter、HTML コメントを除く本文行数。
 
 本 SPEC 自体は計測ロジックを実装しない。
 閾値の変更は本 SPEC の更新をもって正とし、各実装は本 SPEC を参照する。
+
+## SPEC 横断診断
+
+SPEC 健全性診断は行数・status・配置に加え、主論理区分・正規所有対象（REQ-0156-013、REQ-0119-038）に基づく次の検出パターンを追加する（REQ-0108-285、AG-008、RU-20260722-02 合意、ADR-0139）。
+
+### 検出パターン
+
+| パターン | 内容 |
+|---|---|
+| 主論理区分不明SPEC | 宣言節（frontmatter または冒頭宣言節）不在、または REQ-0155-009 が定義する5区分（挙動SPEC、カタログSPEC、横断契約SPEC、パラメータSPEC、実装詳細SPEC）のいずれにも該当しない |
+| 正規所有対象不明SPEC | 関心キー宣言不在（REQ-0156-013、REQ-0119-038 違反） |
+| 所有権重複 | 複数 SPEC が同一関心キーの正規所有を主張（REQ-0119-038 違反） |
+| 論理区分不当混在 | 1 SPEC に主従判別不能な複数区分が混在（REQ-0156-013 違反） |
+| 所有先なしパラメータ群 | パラメータSPEC の正規所有者が不在 |
+| 実装/履歴混入 | SPEC に実装計画、マイルストーン、完了履歴が混入（REQ-0101-060 違反） |
+| REQ 規範重複 | SPEC 記述が REQ 要件と重複 |
+| accepted 間分界不一致 | 複数 accepted SPEC 間で所有権が矛盾 |
+| 実装-SPEC 所有不一致 | 実装側（src/opencode/）の所有者が SPEC 宣言と不一致 |
+
+### 後方互換運用
+
+宣言形式（主論理区分、正規所有対象）が未定義の既存 SPEC は警告モードで経過観察する（REQ-0136-035）。強制ゲート（保存拒否条件: 重複所有、配置不一致）は SPEC 宣言形式の定義完了後に有効化し、段階適用（宣言形式定義 → 警告モード棚卸し → 重複解消 → 新規/変更 SPEC 強制 → 全件強制）とする。
+
+### 機械化境界
+
+上記検出パターンの機械判定可能範囲（frontmatter 宣言不在検出、所有権重複検出等）は docs-check が担う。文脈解釈を要する判定（論理区分不当混成、REQ 規範重複等）は inspect-docs / `agentdev-doc-writing` が担う（3層検出構造、REQ-0108-254）。本 SPEC は検出パターンの定義のみを提供し、各実装を規定しない。
