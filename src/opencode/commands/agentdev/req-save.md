@@ -312,7 +312,7 @@ ADR保存の直前に、以下の妥当性を再検証すること:
 - G10: 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）はverbatimで返す。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
 
 ### Capture 非関与制約
-- G12: req-save の capture 責務は原則非関与。intake/ learning capture を行わない。例外: REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能。capture 境界の詳細は `agentdev-workflow-orchestration` 参照
+- G12: req-save の capture 責務は原則非関与。intake/ learning capture を行わない。例外: REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能。capture 境界（capture-boundaries）の詳細は `agentdev-workflow-orchestration` 参照
 
 ### Issue作成制約
 - G11: req-saveはIssueを作成してはならない。Issue作成はcase-openの責任範囲である
