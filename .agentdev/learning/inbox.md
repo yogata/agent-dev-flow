@@ -17,3 +17,21 @@
 - **影響**: QG-3 の信頼性低下、agent の判断負荷増大、Wave 単位で再発し agent が都度誤検知判定を強いられる
 - **検出元**: PR #1745 本文 Findings/docs-integrity セクション（Wave 1）、PR #1746 本文 Findings / Capture候補 セクション（Wave 2）
 - **日付**: 2026-07-23（Wave 1）、2026-07-23（Wave 2 再発追記）
+
+## Phase 1 一括 commit 運用パターン: 子Issue case-run が acceptance criteria 確認主体
+
+- **由来**: PR #1748（Issue #1741、Epic #1736 Wave 3）
+- **問題**: RU-20260722-02 の8 AG を Phase 1 commit 0192019c で一括保存した結果、Wave 1〜3 の子Issue case-run は実装追加でなく acceptance criteria 順位検証と小改善が主体となった。Wave 1 #1737, #1738、Wave 2 #1739, #1740 と同様のパターン（Phase 1 保存内容の確認 + 小改善）。この運用では子Issue の実質的完了判定が case-close に集中する。
+- **再発防止候補**: Phase 1 一括保存と Phase 2 case-open の分離基準の明文化。acceptance criteria 順位検証のみの子Issue と実装追加の子Issue の完了条件テンプレート分離検討。
+- **影響**: 子Issue の完了条件評価が case-close で都度行う負荷。Wave 単位で同パターンが再発。
+- **検出元**: PR #1748 本文 Findings / Capture候補 セクション
+- **日付**: 2026-07-23（Wave 3）
+
+## 用語表記揺れの横断確認不足: SPEC 起票時の揺れが同一文書内に残留
+
+- **由来**: PR #1749（Issue #1742、Epic #1736 Wave 3）
+- **問題**: spec-health-metrics.md「SPEC 横断診断」節に「論理区分不当混成」（機械化境界段落）と「論理区分不当混在」（検出パターンテーブル行）の表記揺れが同一節内に残留していた。Phase 1 commit 0192019c 起票時の揺れと推定される。REQ-0108-285（「論理区分の不当な混在」）、Issue #1742 完了条件 #6（「不当混在」）とも矛盾する表記であり、起票時の用語統一が不十分だった。同種の揺れが他 SPEC にも残留していないか、inspect-docs / doc-writing 査読での横断確認が望ましい。
+- **再発防止候補**: SPEC 起票時の用語統一チェックの強化。inspect-docs への用語揺れ検出パターン追加の検討。
+- **影響**: 同一 SPEC 内の用語不統一による読手の負荷、REQ と SPEC の表記矛盾。
+- **検出元**: PR #1749 本文 Findings / Capture候補 セクション
+- **日付**: 2026-07-23（Wave 3）
