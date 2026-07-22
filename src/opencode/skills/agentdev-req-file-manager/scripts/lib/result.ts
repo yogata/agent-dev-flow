@@ -31,13 +31,6 @@ export type CheckErr = {
 
 export type CheckResult = CheckOk | CheckErr;
 
-export type SearchOk = {
-  ok: true;
-  matches: Array<{ file: string; line: number; text: string }>;
-};
-
-export type SearchResult = SearchOk | CheckErr;
-
 /** stdout に JSON を出力する（argv/stdin → stdout JSON 契約）。 */
 export function emitJson(value: unknown): void {
   process.stdout.write(JSON.stringify(value, null, 2) + "\n");

@@ -1,8 +1,11 @@
 /**
- * target_area 見出し検索スクリプト（AG-002、AG-006、REQ-0103-159/160）。
+ * target_area 見出し検索スクリプト（AG-002、AG-006、REQ-0103-159/160、REQ-0136-029/032）。
  *
  * 指定 SPEC ファイル群から、target_area（Markdown 見出し行）を検索する。
  * spec-save の update 操作で、target_area に一致するセクションを特定するために使用する。
+ *
+ * 本スクリプトは agentdev-spec-file-manager の SPEC 固有決定的処理として配置される
+ * （REQ-0136-029: SPEC 固有 script は agentdev-spec-file-manager 配下）。
  *
  * マッチ規約（spec-save command SPEC の target_area ベースのセクション置換ロジックに準拠）:
  *   - 完全一致: 見出しテキストが target_area に完全一致
