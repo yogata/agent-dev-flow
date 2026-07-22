@@ -66,13 +66,13 @@ SPEC 対象 artifact_actions がない場合は no-op で完了。
 - `target_spec: {operation: create, domain, slug}` → 新規 SPEC 作成（`create` 操作）。ファイル名は `docs/specs/{domain}/{slug}.md`
 - 重複候補の統合: 同一 `target` の action は1つの SPEC へ集約する
 
-**決定的処理のスクリプト呼出（REQ、AG-002、design-principles.md 第5節）**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は `agentdev-req-file-manager/scripts/` の決定的スクリプトを bash 経由で呼び出して実行する（SKILL.md「Scripts（決定的処理）」セクション参照）。
+**決定的処理のスクリプト呼出（REQ、AG-002、design-principles.md 第5節）**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は各 skill が所有する決定的スクリプトを bash 経由で呼び出して実行する（`agentdev-spec-file-manager` SKILL.md「Scripts（決定的処理）」セクション参照）。
 LLM 推論で代替しない。
-`update` 操作かつ `target_area` 指定時は、配置先候補 SPEC に対して `search-target-area.ts` を実行し、`target_area` 見出しの存在を確認する（結果は Step 5 のセクション置換で再利用）:
+`update` 操作かつ `target_area` 指定時は、配置先候補 SPEC に対して SPEC 固有 script（`agentdev-spec-file-manager` 所有）を実行し、`target_area` 見出しの存在を確認する（結果は Step 5 のセクション置換で再利用）:
 
 ```bash
-# 配置先候補 SPEC 内の target_area 見出し検索
-bun .opencode/skills/agentdev-req-file-manager/scripts/src/search-target-area.ts \
+# 配置先候補 SPEC 内の target_area 見出し検索（agentdev-spec-file-manager 公開操作契約）
+bun .opencode/skills/agentdev-spec-file-manager/scripts/src/search-target-area.ts \
   "target_area文字列" docs/specs/{domain}/<existing-spec>.md
 # → stdout: { ok: true, matches: [{file, line, text}] }
 # matches 空 → target_area 未検出（Step 5 で follow-up 報告、operation を create 系に切り替え推奨）
@@ -80,7 +80,7 @@ bun .opencode/skills/agentdev-req-file-manager/scripts/src/search-target-area.ts
 
 # stdin JSON 入力（複数 SPEC 横断検索）も可能。target_area は見出しテキスト部（# プレフィクス不含）
 echo '{"target_area":"パターン","files":["docs/specs/{domain}/<existing-spec>.md"]}' | \
-  bun .opencode/skills/agentdev-req-file-manager/scripts/src/search-target-area.ts
+  bun .opencode/skills/agentdev-spec-file-manager/scripts/src/search-target-area.ts
 ```
 
 ### Step 4: SPEC 分離基準の最終確認
@@ -103,7 +103,7 @@ Step 3 で得た `search-target-area.ts` の結果（`matches`）を用いてセ
 
 ```bash
 # target_area 検索（Step 3 と同一スクリプト、Step 5 では置換位置特定に使用）
-bun .opencode/skills/agentdev-req-file-manager/scripts/src/search-target-area.ts \
+bun .opencode/skills/agentdev-spec-file-manager/scripts/src/search-target-area.ts \
   "target_area文字列" docs/specs/{domain}/<existing-spec>.md
 # → stdout: { ok: true, matches: [{file, line, text}] }
 # matches[0].line から次の同レベル見出し行の直前までをセクションとして特定し、content で置換

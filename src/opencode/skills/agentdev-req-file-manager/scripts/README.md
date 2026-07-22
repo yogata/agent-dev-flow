@@ -1,6 +1,7 @@
 # `agentdev-req-file-manager` scripts
 
-REQ/ADR/SPEC ファイル管理の決定的処理スクリプト群（REQ/160、AG-002/006、design-principles.md 第5節）。
+REQ/ADR ファイル管理の決定的処理スクリプト群（REQ/160、AG-002/006、design-principles.md 第5節）。
+SPEC 固有スクリプト（`search-target-area.ts`）は `agentdev-spec-file-manager` へ移管済み（REQ-0136-029/032）。
 
 ## 構成
 
@@ -18,8 +19,7 @@ scripts/
 │   ├── alloc-composite-id.ts        # 要件行ID採番（REQ-NNNN-MMM、max+1）
 │   ├── check-frontmatter-consistency.ts  # frontmatter id ↔ ファイル名整合性
 │   ├── check-entry-existence.ts     # README/DOC-MAP/mapping-table エントリ存在
-│   ├── check-change-impact.ts       # 変更範囲検証（許可パスリストとの積集合）
-│   └── search-target-area.ts        # SPEC ファイル内 target_area 見出し検索
+│   └── check-change-impact.ts       # 変更範囲検証（許可パスリストとの積集合）
 └── tests/
     └── *.test.ts                    # 各スクリプトの core 純粋関数テスト
 ```
