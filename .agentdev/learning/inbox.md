@@ -471,3 +471,57 @@
 - **タグ**: #verification-only-pr #empty-commit #squash-merge #github #req-0108-279 #epic-1711
 
 ---
+
+## CaptureBoundary チェックと配布物参照境界（IR-059）の相互作用と両立運用（Epic #1719 Wave 4 実証）
+
+- **問題事象**: PR #1728（Wave 1, OU-001）で skill 内部参照の抽象化（コンクリートパス除去）を実施した際、`agentdev-workflow-orchestration` の `capture-boundaries.md` 参照も除去された。結果として `checkCommandCaptureDuties`（`content.includes("capture-boundaries")` で文字列一致を要求）が崩れ、case-run/case-close/req-save/case-open の4配布 command でチェック違反4件が発生した。
+- **発生局面**: 全件回帰検査（Wave 4 final verification）
+- **検知方法**: `repo-agentdev-integrity/scripts` 配下の `checkCommandCaptureDuties` 実行時、4 command のチェック違反を検出
+- **根本原因**: `checkCommandCaptureDuties` は配布 command 本文が `capture-boundaries` 文字列を含むことを要求する一方、配布物参照境界 IR-059 はコンクリートパス（`docs/specs/workflows/capture-boundaries.md`）の直接参照を禁止する。両者の境界条件が直交しており、抽象化（コンクリートパス除去）だけでは文字列一致チェックを満たさなくなる。
+- **自律対応内容**: 配布 command 4件に概念名 `capture-boundaries` を括弧書きで本文へ含める形で復元。コンクリートパスは使わず、概念名のみを残すことで IR-059 違反なし、かつ `checkCommandCaptureDuties` の文字列一致チェックを満たす両立運用を確立。PR #1735 で修復、mergeCommit df48c9f9。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり。SPEC確定候補として PR #1735 本文に「CaptureBoundary チェックと配布物参照境界の相互作用」を記録済み。`integrity-contracts.md` または `capture-boundaries.md` SPEC への明文化を推奨する根拠となる。
+- **横展開観点**: 同種の「チェック文字列」と「配布物参照禁止」が両立する必要がある全配布 command で、概念名を括弧書き等で本文へ含める運用を標準化できる。case-auto.md にも現状コンクリートパス参照が残っており（baseline-known NG）、将来クリーンアップで本パターンへ統一すべき。
+- **再発条件**: (1) 配布 command から skill 内部参照抽象化のためにコンクリートパスを除去する、(2) 当該 command が `capture-boundaries` 文字列を含まなくなる、(3) 回帰検査で `checkCommandCaptureDuties` が実行される。
+- **予防策候補**: (a) 抽象化リファクタリング時に `checkCommandCaptureDuties` が要求する概念名文字列の残存を必ず確認する。(b) `integrity-contracts.md` または `capture-boundaries.md` SPEC へ「概念名は括弧書きで残す」運用を明文化する。(c) `case-auto.md` の既存コンクリートパス参照を概念名参照へ統一する。
+- **想定反映先**: integrity-contracts.md SPEC または capture-boundaries.md SPEC（両立運用の明文化）、抽象化リファクタリング手順（チェック文字列残存確認ステップ）
+- **関連**: PR #1728, PR #1735, Issue #1720, Issue #1725, Epic #1719, checkCommandCaptureDuties, IR-059, agentdev-workflow-orchestration/capture-boundaries
+- **タグ**: #capture-boundaries #ir-059 #distribution-reference-boundary #check-violation #regression-test #epic-1719 #wave-4 #concept-name-pattern
+
+---
+
+## Windows worktree 環境で check_integrity.ts の subprocess JSON が空 stdout を返す問題（Epic #1719 Wave 4 観測）
+
+- **問題事象**: Wave 4 全件回帰検査で `repo-agentdev-integrity/scripts` 配下の test を実行した際、67件が失敗。エラーは `JSON.parse(r.stdout)` が "Unexpected EOF" を返すもの。`git stash` で本 PR 変更を退避しても同一に失敗することを確認し、pre-existing 環境問題と判定した。
+- **発生局面**: テスト実行（Wave 4 final regression）
+- **検知方法**: `bun test` 実行時の失敗ログ解析
+- **根本原因**: Windows worktree 環境で `check_integrity.ts` の subprocess（Node.js `child_process` 経由）が stdout へ JSON を出力する際、stdout エンコーディング（cp932 vs UTF-8）またはバッファリングの問題で親プロセスへ空文字列が渡る。Node.js `execSync` の stdout 取得が Windows コンソール codepage に依存するため、UTF-8 を前提とする JSON parse が EOF エラーとなる。
+- **自律対応内容**: pre-existing 問題と判定し record-in-findings で処理。本 PR のスコープ外として main 環境での再現確認を推奨事項として PR 本文へ明記。実装側の修正は行わず、Wave 4 完了をブロックしない判定根拠を記録。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（環境問題の観測記録。SPEC変更不要）
+- **横展開観点**: Windows 環境で `child_process` 経由の JSON やコマンド出力を扱う全 Node.js 実装で、コンソール codepage 依存の stdout 取得が問題になり得る。`execSync` ではなく `spawn` + 明示的 encoding 指定、または subprocess 側で `--encoding utf-8` 強制が予防策候補。
+- **再発条件**: (1) Windows worktree 環境、(2) `check_integrity.ts` が subprocess 経由で JSON を stdout 出力、(3) stdout が cp932 でエンコードされるかバッファ未フラッシュで空になる。
+- **予防策候補**: (a) subprocess 側で明示的に `process.stdout.write(JSON.stringify(...))` を使い `--encoding utf-8` を指定。(b) 親側で `execSync` の `encoding` option を明示。(c) worktree ではなく main 環境で整合性検査を実行する運用。（いずれも別 Issue での対応推奨）
+- **想定反映先**: check_integrity.ts の subprocess 呼び出し実装（encoding 指定）、または運用ガイド（main 環境での検査実行）
+- **関連**: PR #1735, Issue #1725, Epic #1719, check_integrity.ts, repo-agentdev-integrity/scripts
+- **タグ**: #windows #worktree #subprocess #json-parse #encoding #cp932 #pre-existing #environment-issue #epic-1719 #wave-4
+
+---
+
+## 複数PR跨ぎ semantically 競合の Level 2 コンフリクト解消パターン（Epic #1719 Wave 2 実証）
+
+- **問題事象**: Wave 2 の PR #1732（agentdev-spec-file-manager 新設、search-target-area.ts 移管）と PR #1733（agentdev-artifact-validation 新設、check-* scripts 移管）が semantically 競合。Level 1 rebase（機械的 git rebase）では解消不可、case-auto へエスカレーション。Level 2 コンフリクト解消（手動 rebase、HEAD ba2df921）で両 PR の意図を統合して squash merge（mergeCommit 8fb17eb8）。
+- **発生局面**: マージ（Wave 2 PR マージ時）
+- **検知方法**: PR #1733 の rebase 実行時にコンフリクト発生。コンフリクトファイルは `spec-save.md`, `agentdev-req-file-manager/SKILL.md`, `agentdev-req-file-manager/scripts/README.md` の3件。Level 1（機械的解消）を試みても解消せず、意図統合が必要と判断。
+- **根本原因**: 2 PR が共通ファイル（spec-save.md の SKILL 参照リスト、req-file-manager 配下）へ同時に影響を与え、かつ各々の意図（search-target-area.ts → spec-file-manager 移管、check-* scripts → artifact-validation 移管）が直交しながらも同時適用が必要だった。git の行ベースマージでは意図レベルの統合を表現できない。
+- **自律対応内容**: case-auto が Level 2 コンフリクト解消を判定し、手動 rebase で両 PR の変更を統合。HEAD ba2df921 へ整理後、squash merge を完了。コンフリクト解消経緯を Epic #1719 Wave 2 進捗セクションへ構造化記録。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（ワークフロー運用知見。SPEC変更不要）
+- **横展開観点**: Wave 内並列 PR で共通ファイルへ影響する場合、case-open の Wave 構成で依存関係を事前検出し、直列化または単一PR集約を検討すべき。Level 2 解消は最終手段。同じ skill 配下のファイルへの複数 OU 影響は Wave 構成警告のトリガにできる。
+- **再発条件**: (1) 同一 Wave 内の並列 PR が共通ファイルへ影響する、(2) 各 PR が直交する意図を持ち同時適用が必要、(3) git の行ベースマージでは意図統合を表現できない。
+- **予防策候補**: (a) case-open Wave 構成で共通ファイル影響を事前検出し直列化または単一PR集約。(b) Wave 2 のように同一 skill 配下への複数 OU 影響がある場合、Wave 構成ロジックで依存を明示。(c) Level 2 コンフリクト解消手順を case-auto へ標準化（既存機能だが発火条件の明文化）。
+- **想定反映先**: case-open Wave 構成ロジック（共通ファイル依存検出）、case-auto Level 2 コンフリクト解消発火条件の明文化
+- **関連**: PR #1732, PR #1733, Issue #1723, Issue #1726, Epic #1719, mergeCommit 8fb17eb8, HEAD ba2df921
+- **タグ**: #wave-2 #level-2-conflict #case-auto #parallel-pr #semantic-conflict #merge-pattern #epic-1719
+
+---
