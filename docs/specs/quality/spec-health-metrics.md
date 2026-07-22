@@ -248,4 +248,4 @@ SPEC 健全性診断は行数・status・配置に加え、主論理区分・正
 
 ### 機械化境界
 
-上記検出パターンの機械判定可能範囲（frontmatter 宣言不在検出、所有権重複検出等）は docs-check が担う。文脈解釈を要する判定（論理区分不当混成、REQ 規範重複等）は inspect-docs / `agentdev-doc-writing` が担う（3層検出構造、REQ-0108-254）。本 SPEC は検出パターンの定義のみを提供し、各実装を規定しない。
+上記検出パターンの機械判定可能範囲（frontmatter 宣言不在検出、所有権重複検出等）は docs-check が担う。文脈解釈を要する判定（論理区分不当混在、REQ 規範重複等）は inspect-docs / `agentdev-doc-writing` が担う（3層検出構造、REQ-0108-254）。本 SPEC は検出パターンの定義のみを提供し、各実装を規定しない。
