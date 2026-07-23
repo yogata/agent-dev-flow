@@ -2,7 +2,7 @@
 title: キャプチャ境界
 status: accepted
 created: 2026-06-21
-updated: 2026-07-12
+updated: 2026-07-24
 ---
 
 # キャプチャ境界（Capture Boundaries）
@@ -68,6 +68,17 @@ PR 本文の capture 関連セクションは以下を分離する:
 | backlog-review | 非関与 | 非関与 | RU 生成のみ |
 
 詳細は各 command SPEC を参照。
+
+### CaptureBoundary 検査の例外判定規則
+
+CaptureBoundary 検査（`check_integrity.ts` の `command-capture-duty`）は、上記 capture 責務表を起点とした一般規則で例外を判定する。command ごとの固定例外リストは持たない。
+
+判定規則は次のとおり。
+
+- capture 責務表の intake または learning 列が「各工程の責務を継承」または「非関与」と定義する command は、`capture-boundaries` 参照を個別に持たなくても CaptureBoundary 検査の検出対象としない。
+- capture 責務表の intake または learning 列が具体的な責務記述（PR 本文記録、回収、REQ再構成 intake 生成等）である command は、`capture-boundaries` 参照を個別に持ち、対応する capture 導線を実装する。
+
+例外の根拠は本 capture 責務表である。同表は case-auto の intake、learning をともに「各工程の責務を継承」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。ADR-0127（case-auto 構成工程の委譲）と ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
 
 ## REQ 再構成 intake
 
