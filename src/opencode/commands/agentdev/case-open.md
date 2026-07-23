@@ -99,6 +99,15 @@ Step 2 の Issue 本文生成（完了条件展開）に先立ち、対象パス
 
 再確認は識別子（ファイルパス、REQ ID、NG ID、IR ID）の存在確認を主軸とし、件数等の実測値は補助値として扱う（Step 2-3 の記載粒度ガイドライン準拠）。
 
+**Step 2-5**: review_dispositions の読取、evidence 再確認、証跡転記（AG-008）。
+draft-data の `review_dispositions` を読み取り、default branch 最新化後に各 disposition の evidence（`path`、`section`）の実在性と最新性を再確認する。本手順は review_dispositions の consumer 契約（case-open command SPEC（extension 経由）の「review_dispositions の consumer 契約」節参照）に従う。
+
+- **読取**: draft-data の `review_dispositions` を読み取る。フィールド欠落時は後方互換（AG-001、ADR-0124）として処理を継続する
+- **evidence 再確認**: default branch 最新化後に各 disposition の `evidence.path` と `evidence.section` の実在性を再確認する。再確認時の commit SHA を当該 disposition の `evidence.checked_at_commit` へ記録する
+- **停止条件**: evidence の path または section が存在しない場合（失効）、Issue を作成せず停止する。当該 disposition を `stale_target` へ更新するか再評価対象として扱い、ユーザーへ停止理由を報告する。`covered` のまま失効した根拠で起票しない
+- **証跡転記**: 再確認した disposition を Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。転記規則（単一 Standard Issue / Epic flow / 複数 Standard Issue）は case-open command SPEC（extension 経由）の「review_dispositions の消費と証跡転記」節に従う
+- **再確認禁止**: 記録済みの判断（disposition、reason）をユーザーへ再確認しない。case-open は evidence の実在性と最新性の確認のみを行う
+
 ### Step 3: マルチREQ入力判定
 
 入力要件doc数を確認

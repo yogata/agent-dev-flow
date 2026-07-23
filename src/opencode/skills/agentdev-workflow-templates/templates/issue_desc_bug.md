@@ -47,8 +47,14 @@ labels: bug
  [検証手順]
  pass_criteria: |
  [合格基準]
- on_failure: |
+  on_failure: |
  [不合格時の処置]
+
+## レビュー判断
+<!-- 【必須】 -->
+
+<!-- レビュー判断: case-open が draft-data の review_dispositions を読み取り、採否判断（covered / rejected 等）を恒久証跡として転記する。転記対象がない場合は「該当なし」と記載する -->
+[review_dispositions の転記内容。各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。該当なしの場合は「該当なし」]
 
 ## 補足情報（オプション）
 <!-- 【任意】 -->

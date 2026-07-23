@@ -108,6 +108,24 @@ test_strategy:
     on_failure: |              # 不合格時の処置（fix-and-reverify / record-in-findings の選択理由を含む）
       {不合格時の処置の本文}
 
+# review_dispositions: 採否判断（covered / rejected 等）の記録。optional soft-contract（ADR-0124）
+# 欠落時に後続工程は draft を拒否しない（後方互換）。covered 項目だけで Issue/PR を作成しない方針を維持する
+# 1 エントリ = 単一 source_ru + 単一 source_item（重複禁止）
+# evidence.checked_at_commit は req-define 生成時 null（G08 git 禁止）。case-open が default branch 最新化後に再確認し確認 commit SHA を記録する
+review_dispositions:
+  - id: RD-001                 # RD-NNN 形式の識別子
+    source_ru: {RU-ID}         # optional: 単一の元 RU-ID（RU 入力でない場合は省略可）
+    source_item: {item-id}     # 単一の元 item 識別子（複数指定不可）
+    disposition: covered       # covered / partially_covered / rejected / not_applicable（必要に応じて superseded / stale_target）
+    reason_code: {reason-code} # 判断理由のコード（例: already_satisfied、out_of_scope、superseded_by）
+    reason: |                  # 人間可読の判断理由本文
+      {判断理由の本文}
+    evidence:                  # 根拠
+      path: {file-path}        # 根拠ファイルパス（該当なし時は null）
+      section: {section}       # 根拠セクション（該当なし時は null）
+      checked_at_commit: null  # req-define 生成時は null。case-open が確認 commit SHA を記録する
+    related_removed_items: []  # 本判断により除外された関連項目の識別子リスト（該当なし時は空リスト）
+
 # case_open_hints: case-open 構成生成への参考情報（Issue 階層は case-open が決定する）
 case_open_hints:
   epic_needed: false            # 単一 Issue で完結する場合は false

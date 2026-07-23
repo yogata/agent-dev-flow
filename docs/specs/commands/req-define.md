@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-24
 ---
 
 # req-define SPEC
@@ -66,7 +66,8 @@ updated: 2026-07-18
  - Step 7-2: operation_units 生成
  - Step 7-3: artifact_actions 生成
  - Step 7-4: draft-data test_strategy 生成（各項目の5属性をYAML形式で格納）
-- Step 8: work_type 判定（bugfix/feature/maintenance/docs_chore）
+ - Step 7-5: draft-data review_dispositions 生成（採否判断の記録、AG-007）
+ - Step 8: work_type 判定（bugfix/feature/maintenance/docs_chore）
 - Step 9: Scale判断（featureのみ、`agentdev-workflow-lifecycle`）
  - Step 9-1: 実装スコープシグナル確認
 - Step 10: ドラフト保存（`.agentdev/drafts/req-draft-{topic-slug}.md`）
@@ -195,6 +196,91 @@ artifact_actions の各 entry が出力する `target_area` と `content` の扱
 
 req-define 側は出力形式のみを規定する。
 `target_area` の形式（Markdown 見出し行）、見出し階層の解釈規則、複数マッチ、未検出時の挙動は [spec-save.md](spec-save.md) 側に配置する。
+
+## review_dispositions の producer 契約（AG-007）
+
+req-define は `review_dispositions` の producer である（AG-002）。Step 7-5 で壁打ち過程の採否判断を `draft-data` の `review_dispositions` へ出力する。
+
+### 出力義務
+
+req-define は以下の入力項目について disposition を記録する:
+
+| 記録対象 | 内容 |
+|---|---|
+| 採用しなかった入力 | RU、inbox item、セッション会話から採用を見送った項目 |
+| 既存要件で充足済みの入力 | 既存 REQ、既存 SPEC、同意済み artifact_actions で既に満たされている項目（disposition: `covered`） |
+| 一部のみ採用した入力 | 項目の一部を採用し、残部を採用しなかったもの（disposition: `partially_covered`） |
+
+`review_dispositions` は optional な soft-contract であり（ADR-0124）、欠落時に後続工程が draft を拒否しない（AG-001）。covered 項目だけで構成される Issue や PR を作成しない方針を維持する（AG-005）。
+
+### 未決事項の取扱い
+
+未決事項（未解決質問、未解決衝突、repo 外操作要否等）は disposition で代替せず、`auto_gate` の `unresolved_questions`、`unresolved_conflicts`、`out_of_repo_operations`、`stop_reasons` へ記録する。disposition は確定した採否判断のみを保持する。
+
+### 根拠不足時の取扱い
+
+disposition の `evidence` に根拠（path、section）を設定できない場合、または根拠が曖昧な場合は `auto_gate.auto_ready: false` とし、`stop_reasons` へ根拠不足の旨を記録する。根拠不足のまま draft を完成させてはならない。
+
+`evidence.checked_at_commit` は req-define 生成時 `null` とする（G08 git 操作禁止）。default branch 最新化後の evidence 再確認は consumer（case-open）の責務である（AG-006）。
+
+## draft-data review_dispositions フィールドスキーマ
+
+要件定義で `review_dispositions` を出力する場合のシリアライズ形式を定義する。schema の正規所有先は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「review_dispositions 構造」節である（AG-002）。本節は req-define 固有の出力形式を規定する。
+
+### review_dispositions 項目構造
+
+各 disposition エントリは以下の field を持つ（AG-001、AG-003）:
+
+| field | 型 | 必須 | 説明 |
+|------|------|------|------|
+| id | string | 必須 | `RD-NNN` 形式（NNN は連番） |
+| source_ru | string | optional | 単一の元 RU-ID（RU 入力でない場合は省略可） |
+| source_item | string | 必須 | 単一の元 item 識別子（RU 内の要件行 ID 等。複数指定不可） |
+| disposition | enum | 必須 | `covered` / `partially_covered` / `rejected` / `not_applicable`。必要に応じて `superseded` / `stale_target` を追加（AG-004） |
+| reason_code | string | 必須 | 判断理由のコード |
+| reason | string | 必須 | 人間可読の判断理由本文 |
+| evidence | object | 必須 | 根拠。`path`、`section`、`checked_at_commit` を持つ。`checked_at_commit` は生成時 `null`（AG-006） |
+| related_removed_items | list | optional | 本判断により除外された関連項目の識別子リスト |
+
+1 disposition エントリ = 単一 `source_ru` + 単一 `source_item` の組み合わせとする（重複禁止、AG-003）。
+
+### YAML 表現形式
+
+```yaml
+review_dispositions:
+  - id: RD-001
+    source_ru: RU-20260722-01
+    source_item: RU-20260722-01.req-001
+    disposition: covered
+    reason_code: already_satisfied
+    reason: |
+      REQ-0103 が既に当該要件を保持しているため採用を省略した。
+    evidence:
+      path: docs/requirements/REQ-0103.md
+      section: REQ-0103-045
+      checked_at_commit: null  # req-define 生成時は null。case-open が確認 commit SHA を記録する
+    related_removed_items: []
+  - id: RD-002
+    source_ru: RU-20260722-01
+    source_item: RU-20260722-01.req-002
+    disposition: rejected
+    reason_code: out_of_scope
+    reason: |
+      本 draft の対象範囲外のため採用しない。
+    evidence:
+      path: null
+      section: null
+      checked_at_commit: null
+    related_removed_items: []
+```
+
+### checked_at_commit 運用（AG-006）
+
+`evidence.checked_at_commit` は req-define 生成時 `null` とする（G08 git 操作禁止）。case-open が default branch 最新化後に evidence の path/section を再確認し、確認時の commit SHA を当該フィールドへ記録する（AG-008）。根拠失効時は `covered` のまま起票せず `stale_target` または再評価対象として停止する。
+
+### 後方互換性（AG-001）
+
+`review_dispositions` は optional な soft-contract である。本フィールドを持たない旧ドラフトを req-save、case-open は入力として拒否しない（ADR-0124 準拠）。
 
 ## 参照する横断 SPEC
 
