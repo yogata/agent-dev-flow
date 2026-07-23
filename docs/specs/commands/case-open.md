@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-20
+updated: 2026-07-24
 ---
 
 # case-open SPEC
@@ -121,6 +121,53 @@ case-open は完了条件を Issue 本文に展開する前に、対象パスで
 - **順次 Wave 実行時**: 複数 Wave が順次実行される場合、先行 Wave のマージ完了後に後続 Wave の Issue を起票する際、件数等の実測値が変動している可能性があるため再確認する
 
 再確認は識別子（ファイルパス、REQ ID、NG ID、IR ID）の存在確認を主軸とし、件数等の実測値は補助値として扱う（既存「完了条件・事前状態記載ガイドライン」準拠）。
+
+### review_dispositions evidence 再確認（AG-002、AG-005、AG-006）
+
+draft-data に `review_dispositions` が含まれる場合、case-open は default branch 最新化後に各 disposition の `evidence.path` と `evidence.section` の実在性を再確認する。再確認時の commit SHA を当該 disposition の `evidence.checked_at_commit` へ記録し、Issue 本文の「レビュー判断」セクションへ転記する。
+
+- evidence が実在し内容が最新である場合: `checked_at_commit` へ確認 commit SHA を記録し、証跡転記へ進む
+- evidence の path または section が存在しない場合（失効）: Issue を作成せず停止する。当該 disposition の disposition を `stale_target` へ更新するか再評価対象として扱い、ユーザーへ停止理由を報告する
+- `review_dispositions` が存在しない場合: 後方互換（AG-001）としてそのまま処理を継続する
+
+記録済みの判断（disposition、reason）をユーザーへ再確認しない（AG-008）。case-open は evidence の実在性と最新性の確認のみを行う。
+
+## review_dispositions の consumer 契約（AG-008）
+
+case-open は `review_dispositions` の consumer である（AG-002）。consumer として以下を担う:
+
+| 責務 | 内容 |
+|---|---|
+| 読取 | draft-data の `review_dispositions` を読み取る。フィールド欠落時は後方互換（AG-001）として処理を継続する |
+| 根拠確認 | default branch 最新化後に各 disposition の evidence（path、section）の実在性と最新性を再確認する（前述「review_dispositions evidence 再確認」） |
+| 停止条件 | evidence 失効を検出した場合、Issue を作成せず停止する。`covered` のまま失効した根拠で起票しない |
+| 証跡転記 | 再確認した disposition を Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。転記時 `evidence.checked_at_commit` へ確認 commit SHA を記録する |
+
+記録済みの判断（disposition、reason）をユーザーへ再確認しない。consumer は evidence の実在性と最新性の確認のみを行い、判断そのものを覆さない（AG-008）。
+
+## review_dispositions の消費と証跡転記
+
+case-open は `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。転記により req_draft 削除後も証跡が残る（AG-002、AG-005）。
+
+### 転記規則（AG-011）
+
+| 構成 | 転記先 | 転記内容 |
+|---|---|---|
+| 単一 Standard Issue | 当該 Issue | 全 disposition を当該 Issue へ転記する |
+| Epic flow | Epic Issue | 全 disposition を Epic Issue へ転記する。子 Issue へは重複転記しない |
+| 複数 Standard Issue | 各 Issue + ルート Issue | 各 Issue の OU、変更対象に関連する disposition を当該 Issue へ転記する。ドラフト全体の disposition はルート Issue（`recommended_order` 最小）へ転記する |
+
+### レビュー判断セクションへの転記形式
+
+転記先の Issue 本文「レビュー判断」セクションの構造は workflow-templates SPEC（`docs/specs/skills/agentdev-workflow-templates.md`「review_dispositions 証跡セクション」節）が正規所有する。各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
+
+### child Issue の取扱い
+
+child Issue テンプレートの「レビュー判断」セクションは親 Epic Issue への参照のみを記載し、disposition 明細の重複転記を行わない（AG-009）。全 disposition は Epic Issue 本体へ転記済みである。
+
+### 後方互換（AG-001）
+
+`review_dispositions` を持たない旧ドラフトを case-open は入力として拒否しない（ADR-0124 準拠）。フィールド欠落時は「レビュー判断」セクションへ「該当なし」と記載する。
 
 ## 参照する横断 SPEC
 

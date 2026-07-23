@@ -63,6 +63,12 @@ REQ-{req_number}
 <!-- 完了条件: Epic全体の完了判定条件 -->
 {completion_criteria}
 
+## レビュー判断
+<!-- 【必須】 -->
+
+<!-- レビュー判断: case-open が draft-data の review_dispositions を読み取り、採否判断（covered / rejected 等）を恒久証跡として転記する。Epic flow の場合は全 disposition を Epic Issue へ転記する。転記対象がない場合は「該当なし」と記載する -->
+{review_dispositions}
+
 ## 補足情報
 <!-- 【任意】 -->
 

@@ -45,8 +45,14 @@ REQ-{req_number}
  [検証手順]
  pass_criteria: |
  [合格基準]
- on_failure: |
+  on_failure: |
  [不合格時の処置]
+
+## レビュー判断
+<!-- 【必須】 -->
+
+<!-- レビュー判断: 本 Issue のレビュー判断は親 Epic Issue の「レビュー判断」セクションを参照。disposition 明細の重複転記は行わない。「該当なし」は使用しない -->
+本 Issue のレビュー判断は親 Epic Issue #{epic_number} の「レビュー判断」セクションを参照すること。
 
 ## 補足情報
 <!-- 【任意】 -->
