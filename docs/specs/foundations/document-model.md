@@ -148,6 +148,56 @@ REQ 要件行の粒度を判定するテスト:
 SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT は、inspect-docs の診断観点に加え、REQ 運用品質維持の恒常的基準として参照する（REQ-0109-039）。
 REQ 体系の健全性を維持するため、これらの観点で定期的に REQ 体系を評価する。
 
+### 恒久契約適格性と既存成果物処置分類 <!-- REQ-0155-005, REQ-0109-047, REQ-0140-021 -->
+
+本節は intake / learning / diagnostics の採用済み成果物を恒久契約（REQ/ADR/SPEC/command/skill）へ昇格させる前の共通基準と、既存成果物の見直し処置の定義を正規所有する。適格性基準は ADR-0112（過剰適用防止）、ADR-0139決定4（REQ拡張は2種別に限定）、REQ-0155-005（無条件自動REQ化禁止）を具体化する。
+
+#### 恒久契約適格性
+
+intake、learning、inspect 由来の知見は、既存契約で未充足の新しいステークホルダー要求、外部から観測可能な契約変更、または明示が必要な安全境界に該当する場合だけ恒久契約候補とする。既存要求を満たすバリエーション、エッジケース、不適合修正、内部再構成、文書訂正は、既存契約が要求を保持している限り REQ を拡張しない（ADR-0139決定4の要約）。
+
+詳細な判定項目、優先順位、例外、工程別手順は各 command / workflow SPEC に配置する。適格性チェックポイントは QG-1〜QG-4（主ワークフロー品質ゲート）とは別体系とし、各補助パイプラインの HITL 確定点（REQ-0147-003〜009）で実行する。
+
+#### 既存成果物の6処置
+
+既存REQ、ADR、SPEC、guide、command、skill の記述を見直す際の処置は以下の6区分とする。各処置は相互排他的であり、1つの記述に対して1処置を適用する。
+
+| 処置 | 意味 |
+|---|---|
+| KEEP | 恒久契約として現在位置に残す |
+| MERGE | 同じ責務の正式な定義箇所へ統合する |
+| REFERENCE | 詳細を正式な定義箇所へ寄せ、現在位置は参照へ縮約する |
+| MOVE | 別の文書種、reference、test、fixture 等へ移す |
+| RETIRE | 現行契約として不要なため廃止する |
+| INFERENCE | 当該記述を恒久契約として明文化せず、上位原則からの実行時判断へ委ねる |
+
+INFERENCE は「明文化を残す KEEP」とも「別成果物に残す MOVE」とも異なる処置であり、個別事例ごとの適用規則が SPEC に記載されている場合に、個別規則を恒久契約から除去し上位の一般原則のみを維持して将来の個別適用を実行エージェントの意味判断へ委ねる。
+
+処置の判定根拠は非排他的な情報として記録する。観測事実、適用した既存規則、意味判断、ユーザー合意、機械検出結果等が併存し得る。判定根拠の伝播は REQ-0136-033 が定義する分類根拠フィールドへ統合し、INFERENCE/MANUAL/RULE のような排他的 enum は導入しない。
+
+#### intake・learning 昇格分類との違い
+
+intake・learning パイプラインの対応要否分類（action-required / covered / duplicate / verification-only / deferred / rejected）と対応形態分類（local-fix / example-or-test / knowledge-only / permanent-contract-candidate）は、本節の6処置とは別の分類である。昇格分類は採用済み成果物をどう処理するかの前段階判定であり、既存成果物を実際に変更する段階で必要に応じて6処置を適用する。
+
+#### 診断観点と6処置の対応表
+
+inspect-docs の診断観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と既存成果物6処置（KEEP/MERGE/REFERENCE/MOVE/RETIRE/INFERENCE）は別軸である。診断観点は REQ/SPEC 体系の構造的問題を検出する軸であり、6処置は採用済み成果物へのアクションを表す軸である。
+
+| 診断観点 | 主に対応する処置 | 関係 |
+|---|---|---|
+| SPLIT | MOVE | REQ 分割結果の配置移動 |
+| MERGE | MERGE | 複数REQ/SPECの統合 |
+| MOVE | MOVE | 配置場所変更 |
+| DUPLICATE | REFERENCE または MERGE | 重複の整理 |
+| RETIRE | RETIRE | 廃止 |
+| DRIFT | MOVE または RETIRE | 実態乖離の修正 |
+
+対応表は参照であり、診断観点と処置は1対1対応しない。各検出事項は個別に処置を判定する。
+
+#### 工程別手順の配置先
+
+document-model.md は共通定義のみを正規所有し、工程固有手順は各 SPEC へ分散する: intake の分類と振り分け（intake pipeline SPEC）、learning の分類と振り分け（learning pipeline SPEC）、独立再判定（backlog integration SPEC）、req-define での範囲統制（req-define / req-analysis SPEC）、事後監査（inspect-docs / diagnostics SPEC）。
+
 ## 文書ライフサイクル
 
 ```
