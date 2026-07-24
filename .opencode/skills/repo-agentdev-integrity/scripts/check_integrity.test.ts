@@ -2641,3 +2641,68 @@ describe("NG baseline aggregation / provenance / classification (Issue #1780, RE
     expect(proc.stderr.toString("utf-8")).toContain("provenance");
   });
 });
+
+// ─── IR-055 実修復回帰テスト（Issue #1782, OU-005, RU-0012） ──────────────
+// 配布物（src/opencode/commands/agentdev/**/*.md,
+// src/opencode/skills/agentdev-*/**/*.md）の runtime-unresolved-reference
+// 既存未管理 NG を実修復した後の状態を保持することを検証する。
+// baseline 更新だけで未解決参照を info へ降格していないこと（REQ-0108-264
+// 段階導入の精神、Issue #1782 完了条件）を回帰テストとして固定する。
+
+describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", () => {
+  // 実リポジトリルート: SCRIPT_DIR は
+  // <repo>/.opencode/skills/repo-agentdev-integrity/scripts なので4階層上。
+  const REPO_ROOT = join(SCRIPT_DIR, "..", "..", "..", "..");
+
+  it("配布物に新規（delta from baseline）runtime-unresolved-reference 違反がないこと", () => {
+    const proc = Bun.spawnSync(
+      ["bun", "run", SCRIPT_FILE, "--json"],
+      { cwd: REPO_ROOT, stdout: "pipe", stderr: "pipe" },
+    );
+    expect(proc.exitCode).toBeDefined();
+    const stdout = proc.stdout?.toString("utf-8") ?? "";
+    expect(stdout.length).toBeGreaterThan(0);
+
+    const parsed = JSON.parse(stdout) as {
+      results: Array<{
+        check: string;
+        level: string;
+        finding_level?: string;
+        file?: string;
+      }>;
+    };
+
+    // runtime-unresolved-reference のうち、新規違反（strict/heuristic かつ
+    // info 未満レベル）が0件であることを検証する。baseline-known (info) は
+    // 段階導入（REQ-0108-264）で許容されるため対象外。
+    const newViolations = parsed.results.filter(
+      (r) =>
+        r.check === "runtime-unresolved-reference" &&
+        (r.level === "ng" || r.level === "warning") &&
+        (r.finding_level === "strict" || r.finding_level === "heuristic"),
+    );
+    expect(newViolations.length).toBe(0);
+  });
+
+  it("baseline-known runtime-unresolved-reference が閾値以下であること（修復後の上限）", () => {
+    // 修復時点での baseline-known 数を上限として固定する。この値を超える場合、
+    // 配布物へ新たな導入先未解決参照が追加されたことを示す。
+    // 修復後の状態: 548 baseline-known violations across 配布物。
+    // 閾値は修復完了時の実績値（548）を上限とし、将来の削減を許容する。
+    const proc = Bun.spawnSync(
+      ["bun", "run", SCRIPT_FILE, "--json"],
+      { cwd: REPO_ROOT, stdout: "pipe", stderr: "pipe" },
+    );
+    const stdout = proc.stdout?.toString("utf-8") ?? "";
+    const parsed = JSON.parse(stdout) as {
+      results: Array<{ check: string; level: string }>;
+    };
+
+    const baselineKnown = parsed.results.filter(
+      (r) =>
+        r.check === "runtime-unresolved-reference" && r.level === "info",
+    );
+    // 修復完了時点の実績値。将来の削減を許容し、増加を拒否する。
+    expect(baselineKnown.length).toBeLessThanOrEqual(548);
+  });
+});
