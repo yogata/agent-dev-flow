@@ -381,12 +381,12 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 
 ### review_dispositions 構造
 
-`review_dispositions` は req-define が壁打ち過程で記録した採否判断（covered、rejected 等）を後続工程へ引き継ぐ optional な soft-contract である（AG-001、AG-002、ADR-0124）。
+`review_dispositions` は req-define が壁打ち過程で記録した採否判断（covered、rejected 等）を後続工程へ引き継ぐ optional な soft-contract である（ADR-0124）。
 
-- **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `review_dispositions` の schema を正規所有する（AG-002）
+- **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `review_dispositions` の schema を正規所有する
 - **producer**: req-define（`docs/specs/commands/req-define.md`、`src/opencode/commands/agentdev/req-define.md`、`src/opencode/commands/agentdev/templates/req-define/req-draft.md`）
 - **consumer**: case-open（`docs/specs/commands/case-open.md`、`src/opencode/commands/agentdev/case-open.md`）
-- **Issue 本文永続化先**: workflow-templates（`docs/specs/skills/agentdev-workflow-templates.md`、`src/opencode/skills/agentdev-workflow-templates/SKILL.md`、Issue 本文テンプレート群）が Issue 本文の「レビュー判断」セクション構造を正規所有する（AG-002）
+- **Issue 本文永続化先**: workflow-templates（`docs/specs/skills/agentdev-workflow-templates.md`、`src/opencode/skills/agentdev-workflow-templates/SKILL.md`、Issue 本文テンプレート群）が Issue 本文の「レビュー判断」セクション構造を正規所有する
 
 #### 各エントリの field 構成
 
@@ -395,13 +395,13 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 | `id` | string | `RD-NNN` 形式の識別子（NNN は連番） |
 | `source_ru` | string | 単一の元 RU-ID（RU 入力でない場合は省略可） |
 | `source_item` | string | 単一の元 item 識別子（RU 内の要件行 ID 等。複数指定不可） |
-| `disposition` | enum | `covered` / `partially_covered` / `rejected` / `not_applicable`。必要に応じて `superseded` / `stale_target` を追加（AG-004） |
+| `disposition` | enum | `covered` / `partially_covered` / `rejected` / `not_applicable`。必要に応じて `superseded` / `stale_target` を追加 |
 | `reason_code` | string | 判断理由のコード（例: `already_satisfied`、`out_of_scope`、`superseded_by`） |
 | `reason` | string | 人間可読の判断理由本文 |
-| `evidence` | object | 根拠。`path`（ファイルパス）、`section`（セクション見出し等）、`checked_at_commit`（確認 commit SHA）を持つ。`checked_at_commit` は req-define 生成時 `null`（G08 git 禁止）。case-open が default branch 最新化後に再確認し、確認 commit SHA を記録する（AG-006） |
+| `evidence` | object | 根拠。`path`（ファイルパス）、`section`（セクション見出し等）、`checked_at_commit`（確認 commit SHA）を持つ。`checked_at_commit` は req-define 生成時 `null`（G08 git 禁止）。case-open が default branch 最新化後に再確認し、確認 commit SHA を記録する |
 | `related_removed_items` | list | 本判断により除外された関連項目の識別子リスト（該当なし時は空リスト） |
 
-1 disposition エントリ = 単一 `source_ru` + 単一 `source_item` の組み合わせとする（重複禁止、AG-003）。
+1 disposition エントリ = 単一 `source_ru` + 単一 `source_item` の組み合わせとする（重複禁止）。
 
 #### disposition 値の定義
 
@@ -416,10 +416,10 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 
 #### optional soft-contract 運用（ADR-0124 準拠）
 
-- `review_dispositions` は optional な soft-contract であり、欠落時に既存 req_draft、RU、promoted artifact を拒否しない（AG-001、後方互換）
+- `review_dispositions` は optional な soft-contract であり、欠落時に既存 req_draft、RU、promoted artifact を拒否しない（後方互換）
 - 厳格なスキーマ検証、JSON Schema、バリデータを導入しない
-- covered 項目だけで構成される Issue や PR を作成しない方針を維持する（AG-005）。実行対象（`artifact_actions`、`operation_units`）を持たない disposition のみの draft から空 Issue を作成しない
-- 記録済みの判断を consumer がユーザーへ再確認しない（AG-008）
+- covered 項目だけで構成される Issue や PR を作成しない方針を維持する。実行対象（`artifact_actions`、`operation_units`）を持たない disposition のみの draft から空 Issue を作成しない
+- 記録済みの判断を consumer がユーザーへ再確認しない
 
 ### frontmatter 構造
 
