@@ -66,6 +66,10 @@ import {
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   generateReadmeReqSummaryCount,
 } from "./generate_indexes.ts";
+import {
+  isFileLevelHistoryExempt,
+  hasLineLevelHistoryMarker,
+} from "./ir057_history_exemption.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
@@ -7542,12 +7546,8 @@ function isIr057InCodeBlock(lines: string[], lineIdx: number): boolean {
   return inCode;
 }
 
-// REQ-0144-024: 歴史経緯説明文脈の汎用判定（ADR-0131/0126 等）。
-// isIr057HistoricalAdrContext を汎用化し、ADR 以外のドキュメント
-// （glossary.md 等）にも適用する。以下のいずれかが成立する行を除外する:
-//   1. ファイルが「旧語彙の引用について」宣言を含む歴史文書（ファイル単位）
-//   2. 行が歴史経緯マーカーを含む（行単位）
-// 「廃止」は時制判定する（「廃止された」「廃止済み」は歴史、「廃止する」は現行）。
+// IR-057 文書レベル履歴注記 exemption（Issue #1768、IR-057 SPEC「例外登録」セクション、REQ-0144-024）。
+// targeted guard（check_changed_docs.ts）と共通の純粋関数へ集約し、exemption 判定を一致させる。
 const ir057HistoricalFileCache = new Map<string, boolean>();
 
 function isIr057HistoricalContext(
@@ -7557,41 +7557,16 @@ function isIr057HistoricalContext(
 ): boolean {
   const relPath = resolveRelative(fullPath, root);
 
-  // 1. ファイル単位: 「旧語彙の引用について」等の明示的歴史宣言を持つ文書は全体を歴史扱い
-  //    （ADR-0131/0126 のブロック引用宣言。著者が意図的に付与したアノテーション）
   let fileIsHistorical = ir057HistoricalFileCache.get(relPath);
   if (fileIsHistorical === undefined) {
     const content = readText(fullPath);
     fileIsHistorical =
-      content !== null &&
-      /旧語彙の引用について|歴史文書である|旧概念.*引用/.test(content);
+      content !== null && isFileLevelHistoryExempt(relPath, content);
     ir057HistoricalFileCache.set(relPath, fileIsHistorical);
   }
   if (fileIsHistorical) return true;
 
-  // 2. 行単位: 歴史経緯マーカー
-  const lineMarkers = [
-    "旧",
-    "移行前",
-    "移行後",
-    "前提",
-    "時代",
-    "履歴",
-    "historical",
-    "legacy",
-    "deprecated",
-    "歴史",
-    "経緯",
-    "過去",
-    "以前",
-    "従来",
-  ];
-  if (lineMarkers.some((m) => line.includes(m))) return true;
-
-  // 3. 「廃止」の時制判定: 過去形・完了形は歴史、能望形は現行
-  if (/廃止(された|済み|確定)/.test(line)) return true;
-
-  return false;
+  return hasLineLevelHistoryMarker(line);
 }
 
 function checkObsoleteSpecPath(root: string): CheckResult[] {
