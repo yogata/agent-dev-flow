@@ -2,7 +2,7 @@
 title: intake-promote SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-24
 ---
 
 # intake-promote SPEC
@@ -15,7 +15,7 @@ GitHub Issue 作成は行わない。
 
 ## 変更種別分類
 
-intake 成果物から RU へ引き継ぐ変更種別を定義する（REQ-0136-033、AG-004、RU-20260722-02 合意、ADR-0139）。intake-promote は採用 item を採用済み成果物（promoted artifact）へ整形する際、各 item に基づき次の8変更種別のいずれかを付与する。変更種別は分類根拠フィールド `change_nature` として RU へ伝播され、req-define が REQ 拡張可否を判定する入力となる。learning-promote.md「変更種別分類」と整合する。
+intake 成果物から RU へ引き継ぐ変更種別を定義する（REQ-0136-033、ADR-0139）。intake-promote は採用 item を採用済み成果物（promoted artifact）へ整形する際、各 item に基づき次の8変更種別のいずれかを付与する。変更種別は分類根拠フィールド `change_nature` として RU へ伝播され、req-define が REQ 拡張可否を判定する入力となる。learning-promote.md「変更種別分類」と整合する。
 
 ### 変更種別と REQ 拡張可否
 

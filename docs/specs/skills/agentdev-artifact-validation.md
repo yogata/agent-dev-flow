@@ -2,12 +2,12 @@
 title: agentdev-artifact-validation SPEC
 status: draft
 created: 2026-07-22
-updated: 2026-07-22
+updated: 2026-07-24
 ---
 
 # agentdev-artifact-validation SPEC
 
-複数文書種別で共有する決定的検証 script、共有ライブラリ、公開検証契約、JSON 結果契約を担う検証 skill の仕様を定める（AG-003、AG-009、AG-019、CR-002、RU-20260722-01 合意）。
+複数文書種別で共有する決定的検証 script、共有ライブラリ、公開検証契約、JSON 結果契約を担う検証 skill の仕様を定める。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
@@ -45,13 +45,13 @@ REQ/ADR/SPEC 操作で共有される決定的検証 script（frontmatter 整合
 
 ## 参照する references
 
-- artifact-contracts.md「Script 所有権と委譲契約」（AG-003、AG-009、AG-019）
-- artifact-responsibilities.md「操作 skill 正規所有者台帳」（AG-019）
+- artifact-contracts.md「Script 所有権と委譲契約」
+- artifact-responsibilities.md「操作 skill 正規所有者台帳」
 - req-save.md、spec-save.md（共通検証 script 呼出 Step）
 
 ## 現在の動作
 
-- 所有 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `src/opencode/skills/agentdev-artifact-validation/scripts/` 配下に配置する（要件、AG-019、CR-002、RU-20260722-01 合意）
+- 所有 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `src/opencode/skills/agentdev-artifact-validation/scripts/` 配下に配置する
 - script は決定的（純粋関数）、テスト可能（`tests/*.test.ts`）とする
 - I/O は argv/stdin で入力を受け取り、stdout で JSON 結果を返す（REQ-0103-160）
 - 利用側 command、skill（`agentdev-req-file-manager`、`agentdev-adr-file-manager`、`agentdev-spec-file-manager`、`req-save`、`spec-save` 等）は内部 script パスを直接参照せず、本 skill の公開検証契約へ委譲する
@@ -59,7 +59,7 @@ REQ/ADR/SPEC 操作で共有される決定的検証 script（frontmatter 整合
 
 ## 境界
 
-REQ 固有 script は `agentdev-req-file-manager`、ADR 固有 script は `agentdev-adr-file-manager`、SPEC 固有 script は `agentdev-spec-file-manager` が所有する。利用側は本 skill の内部 script を直接参照せず、公開検証契約へ委譲する。同一 script または共有 lib を複製しない（AG-003、AG-019）。
+REQ 固有 script は `agentdev-req-file-manager`、ADR 固有 script は `agentdev-adr-file-manager`、SPEC 固有 script は `agentdev-spec-file-manager` が所有する。利用側は本 skill の内部 script を直接参照せず、公開検証契約へ委譲する。同一 script または共有 lib を複製しない。
 
 ## 対象外
 
@@ -74,8 +74,8 @@ REQ 固有 script は `agentdev-req-file-manager`、ADR 固有 script は `agent
 - 公開検証契約の安定性（操作名、入力、JSON 結果契約、エラー契約が変更されないこと）
 - script の決定性（同じ入力に対して同じ結果を返すこと）
 - 共有 lib のテスト可能性（`tests/*.test.ts` が通過すること）
-- 利用側 command、skill に内部 script パス参照がないこと（AG-017、TS-017、TS-015）
-- 同一 script の複製がないこと（AG-003）
+- 利用側 command、skill に内部 script パス参照がないこと
+- 同一 script の複製がないこと
 
 ## See Also
 
@@ -84,4 +84,3 @@ REQ 固有 script は `agentdev-req-file-manager`、ADR 固有 script は `agent
 - [agentdev-spec-file-manager.md](agentdev-spec-file-manager.md)（SPEC 操作 skill、SPEC 固有 script 所有）
 - REQ-0103-159（script 所有権の責務別配置）
 - REQ-0136-029（決定的処理の script 委譲）
-- AG-019（共通 script の agentdev-artifact-validation への委譲方式）

@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-22
+updated: 2026-07-24
 ---
 
 # 成果物責任表
@@ -27,13 +27,13 @@ updated: 2026-07-22
 | リポジトリローカル Skill | `.opencode/skills/repo-*/` | - | - | 本体リポジトリ専用スキル（ADR-0106）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
 | リポジトリローカルレジストリ | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | - | - | リポジトリローカル語彙レジストリ。`.agentdev/` には配置しない（ADR-0106） |
 
-### 操作 skill 正規所有者台帳（AG-007、AG-008、AG-019、RU-20260722-01、RU-20260722-02 合意）
+### 操作 skill 正規所有者台帳
 
 各操作 skill の責務と対象外を正規所有者台帳として定義する。REQ/ADR/SPEC 操作と文書種別横断検証の正規所有者を一つに定め、責務重複を防ぐ。
 
-正規所有の単位は「安定した関心キー」である（REQ-0119-038、AG-003、RU-20260722-02 合意、ADR-0139）。REQ-0119-033「責務ごとに最も安定した最小の定義元を正規とする」の延長であり、適用条件を精緻化する。1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない。
+正規所有の単位は「安定した関心キー」である（REQ-0119-038、ADR-0139）。REQ-0119-033「責務ごとに最も安定した最小の定義元を正規とする」の延長であり、適用条件を精緻化する。1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない。
 
-#### 関心キーの定義（AG-003、RU-20260722-02 合意、ADR-0139）
+#### 関心キーの定義（ADR-0139）
 
 | 項目 | 内容 |
 |---|---|
@@ -48,7 +48,7 @@ updated: 2026-07-22
 |---|---|---|
 | `agentdev-req-file-manager` | REQ 作成、APPEND、UPDATE、REQ 番号採番、要件行 ID 採番、REQ 固有整合性確認、REQ 固有 script 呼出契約 | ADR 操作、SPEC 操作、内容推論、ファイル編集を実行しない（所有者の案内のみ） |
 | `agentdev-adr-file-manager` | ADR 作成、APPEND、UPDATE、ADR 番号採番、ADR 固有整合性確認、ADR 固有 script 呼出契約 | REQ 操作、SPEC 操作、内容推論 |
-| `agentdev-spec-file-manager` | SPEC 作成、更新、配置先判断、target_area による更新判断、SPEC ライフサイクル規則の適用と整合性確認、SPEC 固有 script の選択と呼出契約 | REQ 操作、ADR 操作、SPEC 内容の新規推論、accepted 昇格判断（case-close 責務、ADR-0123 / REQ-0136-024 準拠）、ユーザー承認、commit、push、共通 script の重複実装 |
+| `agentdev-spec-file-manager` | SPEC 作成、更新、配置先判断、target_area による更新判断、SPEC ライフサイクル規則の適用と整合性確認、SPEC 固有 script の選択と呼出契約 | REQ 操作、ADR 操作、SPEC 内容の新規推論、accepted 昇格判断（case-close 責務、ADR-0123 / REQ-0136-024 準拠）、ユーザー承認、commit、push、共通 script の重複実行 |
 | `agentdev-doc-diagnostics` | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティング | 診断対象の修正、promote 判断、REQ/SPEC/RU 保存、commit、push、Issue/PR 操作、REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（`agentdev-req-structure-diagnostics`）、文意品質診断（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`） |
 | `agentdev-artifact-validation` | 文書種別横断の決定的検証 script、共有 lib、公開検証契約、JSON 結果契約（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact` とそれらが利用する共有 lib、対応 test） | REQ/ADR/SPEC 固有の内容判断、ファイル編集、保存、ユーザー承認、commit、push、REQ 番号/ADR 番号/要件行 ID の採番、target_area の検索 |
 

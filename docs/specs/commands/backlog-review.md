@@ -2,7 +2,7 @@
 title: backlog-review SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-24
 ---
 
 # backlog-review SPEC
@@ -73,7 +73,7 @@ updated: 2026-07-18
 
 ## tentative_classification と分類根拠伝播
 
-backlog-review は採用済み成果物の分析時に tentative_classification（暫定分類）と分類根拠を RU へ付与して伝播させる（REQ-0136-033、AG-004、RU-20260722-02 合意、ADR-0139）。分類根拠は learning/intake 成果物から後続工程（req-define、spec-save）へ引き継がれる情報であり、本 SPEC は backlog-review での扱いを規定する。
+backlog-review は採用済み成果物の分析時に tentative_classification（暫定分類）と分類根拠を RU へ付与して伝播させる（REQ-0136-033、ADR-0139）。分類根拠は learning/intake 成果物から後続工程（req-define、spec-save）へ引き継がれる情報であり、本 SPEC は backlog-review での扱いを規定する。
 
 ### 伝播させる分類根拠フィールド
 
@@ -98,7 +98,7 @@ tentative_classification（REQ-0155-003 の7値）は文書種別の暫定分類
 
 ### 暫定扱いの明記
 
-backlog-review が付与する tentative_classification および分類根拠は暫定（tentative）扱いであり、req-define が最終確定する（REQ-0102-087、AG-005、RU-20260722-02 合意）。backlog-review 自体は最終分類を確定しない。
+backlog-review が付与する tentative_classification および分類根拠は暫定（tentative）扱いであり、req-define が最終確定する（REQ-0102-087）。backlog-review 自体は最終分類を確定しない。
 
 ## tentative_classification フィールド仕様
 

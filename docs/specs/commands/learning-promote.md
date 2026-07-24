@@ -2,7 +2,7 @@
 title: learning-promote SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-24
 ---
 
 # learning-promote SPEC
@@ -19,7 +19,7 @@ backlog-review 経由で RU 化する。
 
 ## 変更種別分類
 
-learning 成果物から RU へ引き継ぐ変更種別を定義する（REQ-0136-033、AG-004、RU-20260722-02 合意、ADR-0139）。learning-promote は採用済み成果物を生成する際、各問題クラスに基づき次の8変更種別のいずれかを付与する。変更種別は分類根拠フィールド `change_nature` として RU へ伝播され、req-define が REQ 拡張可否を判定する入力となる。
+learning 成果物から RU へ引き継ぐ変更種別を定義する（REQ-0136-033、ADR-0139）。learning-promote は採用済み成果物を生成する際、各問題クラスに基づき次の8変更種別のいずれかを付与する。変更種別は分類根拠フィールド `change_nature` として RU へ伝播され、req-define が REQ 拡張可否を判定する入力となる。
 
 ### 変更種別と REQ 拡張可否
 

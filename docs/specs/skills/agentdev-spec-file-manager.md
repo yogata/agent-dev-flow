@@ -2,12 +2,12 @@
 title: agentdev-spec-file-manager SPEC
 status: draft
 created: 2026-07-22
-updated: 2026-07-22
+updated: 2026-07-24
 ---
 
 # agentdev-spec-file-manager SPEC
 
-SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPEC 固有整合性確認、SPEC 固有 script の選択と呼出契約を担う操作用 skill の仕様を定める（AG-007、RU-20260722-01 合意）。
+SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPEC 固有整合性確認、SPEC 固有 script の選択と呼出契約を担う操作用 skill の仕様を定める。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
@@ -48,8 +48,8 @@ SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPE
 ## 参照する references
 
 - spec-save.md（command 手順）の SPEC 操作 Step
-- artifact-contracts.md「Script 所有権と委譲契約」（AG-003、AG-009、AG-019）
-- artifact-responsibilities.md「操作 skill 正規所有者台帳」（AG-007、AG-008、AG-019）
+- artifact-contracts.md「Script 所有権と委譲契約」
+- artifact-responsibilities.md「操作 skill 正規所有者台帳」
 
 ## 現在の動作
 

@@ -2,7 +2,7 @@
 title: "コマンドファイルフォーマット規約"
 status: accepted
 created: 2026-06-22
-updated: 2026-07-22
+updated: 2026-07-24
 ---
 
 # コマンドファイルフォーマット規約
@@ -90,9 +90,9 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 > **非検出対象（許容形式）**: `**EN.**` lettered prefix（代替フロー内サブステップ表現）は主手順の Step 番号連番とは独立した番号空間を持つため、上記検出項目のいずれにも該当しない。
 > `check_command_format.ts` は `### Step N` 見出しのみを Step 番号連番検査の対象とし、`**EN.**` ボールド段落プレフィックスを検出対象外とする（「代替フロー内サブステップ表現」参照）。
 
-## command SPEC と command 定義の対応付け（REQ-0143-005、AG-005、AG-010）
+## command SPEC と command 定義の対応付け（REQ-0143-005）
 
-command SPEC（`docs/specs/commands/*.md`）は command 定義ファイル（`src/opencode/commands/agentdev/*.md`）の Step 番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって command 定義と対応付ける（REQ-0143-005、AG-005、AG-010、RU-20260722-01 合意）。
+command SPEC（`docs/specs/commands/*.md`）は command 定義ファイル（`src/opencode/commands/agentdev/*.md`）の Step 番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって command 定義と対応付ける（REQ-0143-005）。
 Step 番号一致を要求する旧規則（REQ-0143-004）は2026-07-22に廃止し、成果物、副作用、停止状態、必須順序による対応付け規則へ置き換えた。Step 番号は command 定義の実装詳細属であり、command SPEC が公開契約を独立に記述する構造を維持するため、SPEC 側での複製を求めない。
 
 **対応付けの軸**:

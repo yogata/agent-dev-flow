@@ -2,7 +2,7 @@
 title: command SPEC テンプレート
 status: accepted
 created: 2026-06-21
-updated: 2026-07-22
+updated: 2026-07-24
 ---
 
 # command SPEC テンプレート
@@ -61,7 +61,7 @@ updated: YYYY-MM-DD
 - 実行時コマンドは本 SPEC に依存しない（ADR-0104）。SPEC は docs 内部設計文書である。
 - 既存 SPEC への追記時は frontmatter `status` を変更しない（ADR-0123 Decision #1）。新規作成時は `status: draft` を付与する。
 
-## command SPEC と command 定義の対応付け（AG-001、AG-005、AG-010、AG-013、REQ-0143-005、RU-20260722-01）
+## command SPEC と command 定義の対応付け（REQ-0143-005）
 
 command SPEC は command 定義ファイル（`src/opencode/commands/agentdev/*.md`）の Step 番号を複製せず、以下の軸で command 定義と対応付ける（REQ-0143-005）。
 

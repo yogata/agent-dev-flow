@@ -2,7 +2,7 @@
 title: skill SPEC テンプレート
 status: accepted
 created: 2026-06-21
-updated: 2026-07-22
+updated: 2026-07-24
 ---
 
 # skill SPEC テンプレート
@@ -57,14 +57,14 @@ USE FOR / DO NOT USE FOR を記述。
 - 実行時スキル（src/opencode/skills/<name>/SKILL.md）は本 SPEC に依存しない（ADR-0104）。SPEC は docs 内部設計文書である。
 - 既存 SPEC への追記時は frontmatter `status` を変更しない（ADR-0123 Decision #1）。新規作成時は `status: draft` を付与する。
 
-## skill SPEC の記述中心（AG-002、AG-003、AG-012、RU-20260722-01）
+## skill SPEC の記述中心
 
-skill SPEC は提供する判断、USE FOR、DO NOT USE FOR、入力、出力、副作用、不変条件、reference 選択条件、所有 script、検証条件を中心に記述する（AG-002）。操作手順、例、作業履歴の列挙を必須としない。
+skill SPEC は提供する判断、USE FOR、DO NOT USE FOR、入力、出力、副作用、不変条件、reference 選択条件、所有 script、検証条件を中心に記述する。操作手順、例、作業履歴の列挙を必須としない。
 
-- 200行を超える SKILL.md は責務集中、不要な手順、例、作業履歴の混入について確認する（AG-012、REQ-0103-037）
+- 200行を超える SKILL.md は責務集中、不要な手順、例、作業履歴の混入について確認する（REQ-0103-037）
 - 200行を超えることだけを不合格理由にしない。責務上の根拠があれば維持を認める
 - 異なる判断モデル、入力、出力、責任境界を持つ内容は skill 分割候補として扱う
-- 所有 script は公開検証契約（agentdev-artifact-validation 経由等）として宣言し、内部パスは references/ に限定する（AG-003、AG-009、AG-019）
+- 所有 script は公開検証契約（agentdev-artifact-validation 経由等）として宣言し、内部パスは references/ に限定する
 
 ## See Also
 

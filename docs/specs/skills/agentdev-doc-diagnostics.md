@@ -2,12 +2,12 @@
 title: agentdev-doc-diagnostics SPEC
 status: draft
 created: 2026-07-22
-updated: 2026-07-22
+updated: 2026-07-24
 ---
 
 # agentdev-doc-diagnostics SPEC
 
-docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを担う診断判断 skill の仕様を定める（AG-008、RU-20260722-01 合意）。
+docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを担う診断判断 skill の仕様を定める。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
@@ -49,7 +49,7 @@ docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契
 ## 参照する references
 
 - inspect-docs.md（command 手順）の診断実行 Step
-- artifact-responsibilities.md「操作 skill 正規所有者台帳」（AG-008）
+- artifact-responsibilities.md「操作 skill 正規所有者台帳」
 - artifact-contracts.md「サブエージェント委譲契約」（finding 出力契約）
 
 ## 現在の動作
