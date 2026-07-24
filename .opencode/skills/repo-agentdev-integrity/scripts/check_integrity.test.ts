@@ -5,6 +5,7 @@ import { join } from "path";
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_integrity.ts");
 const CLI_UTILS_FILE = join(SCRIPT_DIR, "cli_utils.ts");
+const GENERATE_INDEXES_FILE = join(SCRIPT_DIR, "generate_indexes.ts");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `integrity-test-${crypto.randomUUID().slice(0, 8)}`;
 const TEMP_ROOT = join(TEMP_BASE, RUN_ID);
@@ -60,6 +61,7 @@ function copyScripts(fixtureRoot: string): void {
   mkdirp(dest);
   copyFileSync(SCRIPT_FILE, join(dest, "check_integrity.ts"));
   copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
+  copyFileSync(GENERATE_INDEXES_FILE, join(dest, "generate_indexes.ts"));
 }
 
 function buildValidFixture(root: string): void {
@@ -349,6 +351,9 @@ function buildValidFixture(root: string): void {
     "utf-8",
   );
 
+  // Issue #1769 / AG-002: case-run, case-close, req-save は具体的 capture 責務を持ち、
+  // capture-boundaries 参照が必須。case-open（非関与）、case-auto（各工程の責務を継承）
+  // は capture 責務表により検出対象外（capture-boundaries 参照不要）。
   const captureCmdDuties: Record<string, string> = {
     "case-run.md":
       "---\ndescription: case-run\nagent: sisyphus\n---\n\nSee capture-boundaries for duty. 記録のみ.\n",
@@ -357,9 +362,9 @@ function buildValidFixture(root: string): void {
     "req-save.md":
       "---\ndescription: req-save\nagent: prometheus\n---\n\nSee capture-boundaries for duty. 原則非関与.\n",
     "case-open.md":
-      "---\ndescription: case-open\nagent: prometheus\n---\n\nSee capture-boundaries for duty. 非関与.\n",
+      "---\ndescription: case-open\nagent: prometheus\n---\n\nNo capture-boundaries reference (exempt: 非関与).\n",
     "case-auto.md":
-      "---\ndescription: case-auto\nagent: sisyphus\n---\n\nSee capture-boundaries for duty. 委譲.\n",
+      "---\ndescription: case-auto\nagent: sisyphus\n---\n\nNo capture-boundaries reference (exempt: 各工程の責務を継承).\n",
   };
   for (const [fname, content] of Object.entries(captureCmdDuties)) {
     writeFileSync(join(cmdDir, fname), content, "utf-8");
@@ -922,7 +927,7 @@ describe("Capture boundary checks", () => {
     expect(check.level).toBe("ok");
   });
 
-  it("valid fixture: command-capture-duty checks pass for all 5 commands", () => {
+  it("valid fixture: command-capture-duty checks pass for 3 specific-duty commands", () => {
     const r = runScript(VALID_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const dutyOk = parsed.results.filter(
@@ -931,7 +936,36 @@ describe("Capture boundary checks", () => {
         res.check === "command-capture-duty" &&
         res.level === "ok",
     );
-    expect(dutyOk.length).toBe(5);
+    expect(dutyOk.length).toBe(3);
+  });
+
+  it("valid fixture: exempt commands (case-open, case-auto) are not checked even without capture-boundaries reference", () => {
+    const r = runScript(VALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const exemptResults = parsed.results.filter(
+      (res: { check: string; category: string; message: string }) =>
+        res.category === "CaptureBoundary" &&
+        res.check === "command-capture-duty" &&
+        (res.message.includes("case-open.md") ||
+          res.message.includes("case-auto.md")),
+    );
+    expect(exemptResults.length).toBe(0);
+  });
+
+  it("valid fixture: specific-duty commands (case-run, case-close, req-save) are checked", () => {
+    const r = runScript(VALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const checkedCommands = ["case-run.md", "case-close.md", "req-save.md"];
+    for (const cmd of checkedCommands) {
+      const found = parsed.results.find(
+        (res: { check: string; category: string; message: string; level: string }) =>
+          res.category === "CaptureBoundary" &&
+          res.check === "command-capture-duty" &&
+          res.message.includes(cmd),
+      );
+      expect(found).toBeDefined();
+      expect(found.level).toBe("ok");
+    }
   });
 
   it("invalid fixture: capture-boundaries-existence detects missing file", () => {
