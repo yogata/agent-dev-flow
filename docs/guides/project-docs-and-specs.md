@@ -23,12 +23,10 @@ DOC-MAP（文書探索入口：索引）
 要件定義の永続基準。
 システムが満たすべき要件を記述する。
 
-- 現行 REQ は REQ-0101 から REQ-0162 までの 53 件（REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止、履歴参照のみ）
-- 旧 REQ（REQ-0001〜REQ-0050 [全て廃止]）は2026-07-20に物理削除された。移行履歴は `docs/requirements/mapping-table.md` を参照
-- 旧 REQ と新 REQ の対応関係は `docs/requirements/mapping-table.md` に記録
+- 現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とする
+- 旧 REQ の移行履歴は `docs/requirements/mapping-table.md` を参照
 
-> 現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とする。
-> 本ガイドでは REQ 一覧を複製しない。
+> 本ガイドでは REQ の件数・番号範囲を複製しない（REQ の増減に追従しないため）。
 
 ## ADR（アーキテクチャ決定記録）
 
