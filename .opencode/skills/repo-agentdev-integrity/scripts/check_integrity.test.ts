@@ -5,6 +5,7 @@ import { join } from "path";
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_integrity.ts");
 const CLI_UTILS_FILE = join(SCRIPT_DIR, "cli_utils.ts");
+const GEN_INDEXES_FILE = join(SCRIPT_DIR, "generate_indexes.ts");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `integrity-test-${crypto.randomUUID().slice(0, 8)}`;
 const TEMP_ROOT = join(TEMP_BASE, RUN_ID);
@@ -49,6 +50,7 @@ function writeFile(p: string, content: string): void {
 // baseline ファイル（baselines/ir-055-baseline.json）はコピーしないことで、
 // valid fixture は本番の baseline 既知違反から独立し、既知違反の変更が
 // valid fixture 系の成否に影響しない。
+// generate_indexes.ts は check_integrity.ts が import するため必須。
 function copyScripts(fixtureRoot: string): void {
   const dest = join(
     fixtureRoot,
@@ -60,6 +62,7 @@ function copyScripts(fixtureRoot: string): void {
   mkdirp(dest);
   copyFileSync(SCRIPT_FILE, join(dest, "check_integrity.ts"));
   copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
+  copyFileSync(GEN_INDEXES_FILE, join(dest, "generate_indexes.ts"));
 }
 
 function buildValidFixture(root: string): void {
@@ -2223,5 +2226,152 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
         (res.message ?? "").includes("ADR-0134"),
     );
     expect(promotionMessage).toBeDefined();
+  });
+});
+
+// ─── mapping-table-completeness (Issue #1781 / REQ-0108-084) ────────────────
+// Dedicated fixture with retired REQs covering both polarities:
+//   - REQ-9002 (retired, recorded in mapping-table)  → no NG
+//   - REQ-9003 (retired, missing from mapping-table) → NG
+
+const MTC_ROOT = join(TEMP_ROOT, "mtc");
+
+function buildMappingTableCompletenessFixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+
+  writeFileSync(
+    join(reqDir, "REQ-9001.md"),
+    [
+      "---",
+      "id: REQ-9001",
+      "title: mapping-table-completeness active fixture",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "## Body",
+      "",
+      "Active REQ for mapping-table-completeness fixture.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  writeFileSync(
+    join(reqDir, "README.md"),
+    [
+      "# Requirements",
+      "",
+      "| ID | Title |",
+      "|----|-------|",
+      "| REQ-9001 | mapping-table-completeness active fixture |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  const retiredDir = join(reqDir, "retired");
+  mkdirp(retiredDir);
+
+  // REQ-9002: retired, recorded in mapping-table (positive case).
+  writeFileSync(
+    join(retiredDir, "REQ-9002.md"),
+    [
+      "---",
+      "id: REQ-9002",
+      "title: mapping-table-completeness recorded retired",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "## retire 宣言",
+      "",
+      "Recorded in mapping-table.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // REQ-9003: retired, NOT recorded in mapping-table (negative case).
+  writeFileSync(
+    join(retiredDir, "REQ-9003.md"),
+    [
+      "---",
+      "id: REQ-9003",
+      "title: mapping-table-completeness missing retired",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "## retire 宣言",
+      "",
+      "Not recorded in mapping-table.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // mapping-table.md lists REQ-9002 only; REQ-9003 omission triggers NG.
+  writeFileSync(
+    join(reqDir, "mapping-table.md"),
+    [
+      "---",
+      "id: mapping-table",
+      "title: mapping-table-completeness fixture",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "## 対応表",
+      "",
+      "| 旧REQ | 判定 | 移行先 | 非移行理由 / 備考 |",
+      "|---|---|---|---|",
+      "| REQ-9002 | retired-no-successor | なし | recorded retired REQ |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  mkdirp(join(root, "docs", "adr"));
+  mkdirp(join(root, "docs", "specs"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+}
+
+describe("mapping-table-completeness retired REQ coverage (REQ-0108-084, Issue #1781)", () => {
+  beforeAll(() => {
+    rmSync(MTC_ROOT, { recursive: true, force: true });
+    mkdirp(MTC_ROOT);
+    buildMappingTableCompletenessFixture(MTC_ROOT);
+    copyScripts(MTC_ROOT);
+  });
+
+  afterAll(() => {
+    rmSync(MTC_ROOT, { recursive: true, force: true });
+  });
+
+  it("does NOT flag retired REQ recorded in mapping-table (positive)", () => {
+    const r = runScript(MTC_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngFor9002 = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "mapping-table-completeness" &&
+        res.level === "ng" &&
+        (res.message ?? "").includes("REQ-9002"),
+    );
+    expect(ngFor9002.length).toBe(0);
+  });
+
+  it("flags retired REQ missing from mapping-table (negative)", () => {
+    const r = runScript(MTC_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const ngFor9003 = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "mapping-table-completeness" &&
+        res.level === "ng" &&
+        (res.message ?? "").includes("REQ-9003"),
+    );
+    expect(ngFor9003.length).toBe(1);
   });
 });

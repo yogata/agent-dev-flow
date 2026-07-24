@@ -2,7 +2,7 @@
 id: mapping-table
 title: "旧REQから新active REQへの移行表"
 created: "2026-05-30"
-updated: "2026-07-21"
+updated: "2026-07-24"
 ---
 
 ## 目的
@@ -79,3 +79,5 @@ REQ-0001〜REQ-0050 をすべて retired とし、REQ-0101〜REQ-0133（REQ-0111
 | REQ-0121 | migrated | REQ-0103, REQ-0108 | Runtime Command 規範語構成を REQ-0103 に吸収（REQ-0103-152）、Integrity 検査定義（規範語検査の責務境界違反検査への再定義、規範語残存前提の除去）を REQ-0108 に吸収（REQ-0108-242, REQ-0108-243）。語彙ポリシー整合は REQ-0103/REQ-0108/REQ-0119 で一貫管理するため独立REQは不要と判断（`agentdev-system-reorganization` OU-04）。旧REQ、削除済み（2026-07-20物理削除） |
 | REQ-0115 | migrated | REQ-0108, REQ-0109, REQ-0124 | 恒久要件を REQ-0108（docs-check 検査責務）、REQ-0109（inspect-docs）、REQ-0124（inspect 命名恒久制約）へ移行し retire（2026-06-16）。タイトル「docs-* command suite」が移行主題であり REQ-0124-021 に抵触。旧REQ、削除済み（2026-07-20物理削除） |
 | REQ-0117 | migrated | REQ-0110 | Git worktree ジャンクションクリーンアップフォールバック手順を REQ-0110 に統合（REQ-0110-008: Windows + ジャンクション環境の "Not a directory" エラーフォールバック）。worktree 削除信頼性を一元管理するため独立REQは不要と判断（`agentdev-system-reorganization` OU-06）。旧REQ、削除済み（2026-07-20物理削除） |
+| REQ-0158 | migrated | REQ-0108 | targeted docs guard（check_changed_docs.ts）の恒久契約を REQ-0108 へ統合（REQ-0108-279: verification-only PR PASS、REQ-0108-280〜282: changed docs guard 統合候補評価）。実装詳細は SPEC（targeted-docs-guard-implementation.md、validator-split-criteria.md、integrity-contracts.md、IR-057、obsolete-path-map.yaml）へ移管。RU-20260721-03 由来（Issue #1713、Epic #1711 Wave 2 OU-002）。独立REQは不要と判断し retired/REQ-0158.md へ移動（2026-07-21） |
+| REQ-0161 | retired-no-successor | なし | config.yaml および旧 doc-inputs 機構の完全削除という完結済み作業記録であり、現行の安定契約を含まないため retire（RU-20260721-03 由来）。恒久契約残存なし、後継REQなし。retired/REQ-0161.md へ移動（2026-07-21） |
