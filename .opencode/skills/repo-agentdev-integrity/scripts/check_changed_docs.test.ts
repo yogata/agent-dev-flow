@@ -698,3 +698,272 @@ describe("Issue #1671 TS-004: SPEC status superseded_by handling (ADR-0123, REQ-
     expect(statusFailures).toEqual([]);
   });
 });
+
+// ─── Issue #1784 / OU-007: line-level semantic diff for update flags ────────
+// check_changed_docs.ts の更新要否フラグを行レベル意味差分（導出元影響）ベースへ限定。
+// SPEC targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節。
+
+function setupGitFixture(root: string): string {
+  execSync("git init -q", { cwd: root });
+  execSync('git config user.email "test@example.com"', { cwd: root });
+  execSync('git config user.name "test"', { cwd: root });
+  execSync("git add -A", { cwd: root });
+  execSync('git commit -q -m "init" --no-verify --allow-empty', { cwd: root });
+  return execSync("git rev-parse HEAD", { cwd: root, encoding: "utf-8" }).trim();
+}
+
+function commitAll(root: string, message: string): void {
+  execSync("git add -A", { cwd: root });
+  execSync(`git commit -q -m "${message}" --no-verify`, { cwd: root });
+}
+
+function writeSpecFile(
+  root: string,
+  name: string,
+  title: string,
+  status: string,
+  body: string,
+): void {
+  const specsDir = join(root, "docs", "specs");
+  mkdirp(specsDir);
+  writeFileSync(
+    join(specsDir, name),
+    [
+      "---",
+      `title: ${title}`,
+      `status: ${status}`,
+      "---",
+      "",
+      `# ${title}`,
+      "",
+      body,
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+function writeReqFile(
+  root: string,
+  name: string,
+  id: string,
+  title: string,
+  body: string,
+): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, name),
+    [
+      "---",
+      `id: ${id}`,
+      `title: ${title}`,
+      "---",
+      "",
+      "## Body",
+      "",
+      body,
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("Issue #1784 TS-010: trivial body-only change does NOT trigger update flags", () => {
+  const NEG_ROOT = join(TEMP_ROOT, "issue1784-neg");
+
+  beforeAll(() => {
+    mkdirp(NEG_ROOT);
+    writeSpecFile(NEG_ROOT, "body-only.md", "body only spec", "accepted", "Original body content.");
+    writeReqFile(NEG_ROOT, "REQ-9001.md", "REQ-9001", "body only req", "Original req body.");
+    setupGitFixture(NEG_ROOT);
+
+    // 相互参照追記 + 相対パス是正 + 表記修正: frontmatter 値は不変
+    writeSpecFile(
+      NEG_ROOT,
+      "body-only.md",
+      "body only spec",
+      "accepted",
+      [
+        "Fixed typo in body.",
+        "関連: [REQ-9001](../requirements/REQ-9001.md)",
+      ].join("\n"),
+    );
+    writeReqFile(NEG_ROOT, "REQ-9001.md", "REQ-9001", "body only req", "Fixed req body typo.");
+
+    copyScripts(NEG_ROOT);
+  });
+
+  it("spec-save: SPEC body-only change → spec_readme_update_required=false", () => {
+    const r = runScript(NEG_ROOT, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/body-only.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(false);
+  });
+
+  it("req-save: REQ body-only change → requirements_readme_update_required=false", () => {
+    const r = runScript(NEG_ROOT, [
+      "--workflow",
+      "req-save",
+      "--files",
+      "docs/requirements/REQ-9001.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.requirements_readme_update_required).toBe(false);
+  });
+
+  it("SPEC body-only change → extensions_check_required=false", () => {
+    const r = runScript(NEG_ROOT, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/body-only.md",
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.extensions_check_required).toBe(false);
+  });
+
+  it("REQ body-only change → extensions_check_required=false", () => {
+    const r = runScript(NEG_ROOT, [
+      "--workflow",
+      "req-save",
+      "--files",
+      "docs/requirements/REQ-9001.md",
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.extensions_check_required).toBe(false);
+  });
+});
+
+describe("Issue #1784 TS-011: lifecycle / frontmatter change triggers update flags", () => {
+  it("TS-011a: added SPEC → spec_readme_update_required=true, extensions_check_required=true", () => {
+    const root = join(TEMP_ROOT, "issue1784-add");
+    mkdirp(root);
+    setupGitFixture(root);
+    writeSpecFile(root, "new-spec.md", "new spec", "accepted", "New spec body.");
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/new-spec.md",
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.extensions_check_required).toBe(true);
+  });
+
+  it("TS-011b: SPEC frontmatter title change → spec_readme_update_required=true", () => {
+    const root = join(TEMP_ROOT, "issue1784-fm-spec");
+    mkdirp(root);
+    writeSpecFile(root, "fm-spec.md", "original title", "accepted", "Body content.");
+    setupGitFixture(root);
+    writeSpecFile(root, "fm-spec.md", "changed title", "accepted", "Body content.");
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/fm-spec.md",
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.extensions_check_required).toBe(true);
+  });
+
+  it("TS-011c: REQ frontmatter title change → requirements_readme_update_required=true", () => {
+    const root = join(TEMP_ROOT, "issue1784-fm-req");
+    mkdirp(root);
+    writeReqFile(root, "REQ-9002.md", "REQ-9002", "original title", "Body content.");
+    setupGitFixture(root);
+    writeReqFile(root, "REQ-9002.md", "REQ-9002", "changed title", "Body content.");
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "req-save",
+      "--files",
+      "docs/requirements/REQ-9002.md",
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.requirements_readme_update_required).toBe(true);
+    expect(parsed.extensions_check_required).toBe(true);
+  });
+
+  it("TS-011d: SPEC status change (draft→accepted) → spec_readme_update_required=true", () => {
+    const root = join(TEMP_ROOT, "issue1784-status");
+    mkdirp(root);
+    writeSpecFile(root, "status-spec.md", "status spec", "draft", "Body content.");
+    setupGitFixture(root);
+    writeSpecFile(root, "status-spec.md", "status spec", "accepted", "Body content.");
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/status-spec.md",
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(true);
+  });
+
+  it("TS-011e: deleted SPEC (--base-ref) → spec_readme_update_required=true", () => {
+    const root = join(TEMP_ROOT, "issue1784-delete");
+    mkdirp(root);
+    writeSpecFile(root, "del-spec.md", "delete spec", "accepted", "Body content.");
+    const sha1 = setupGitFixture(root);
+    rmSync(join(root, "docs", "specs", "del-spec.md"));
+    commitAll(root, "delete spec");
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--base-ref",
+      sha1,
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.files_checked).toContain("docs/specs/del-spec.md");
+    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.extensions_check_required).toBe(true);
+  });
+
+  it("TS-011f: body-only change does NOT trigger (negative cross-check)", () => {
+    const root = join(TEMP_ROOT, "issue1784-body-only-pos");
+    mkdirp(root);
+    writeSpecFile(root, "body-spec.md", "body spec", "accepted", "Original body.");
+    setupGitFixture(root);
+    writeSpecFile(root, "body-spec.md", "body spec", "accepted", "Updated body with typo fix.");
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/body-spec.md",
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.extensions_check_required).toBe(false);
+  });
+});
