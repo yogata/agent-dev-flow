@@ -6251,12 +6251,24 @@ function checkPrTemplateCaptureSection(root: string): CheckResult[] {
 
 function checkCommandCaptureDuties(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
+  // Issue #1769 / AG-002: CaptureBoundary 検査の例外判定は capture 責務表
+  // （docs/specs/workflows/capture-boundaries.md「各コマンドの capture 責務」セクション）
+  // を起点とした一般規則で判定する。command ごとの固定例外リストは持たない。
+  //
+  // 一般規則（同 SPEC「CaptureBoundary 検査の例外判定規則」セクション）:
+  // - intake または learning 列が「各工程の責務を継承」もしくは「非関与」の command は
+  //   capture-boundaries 参照を個別に持たなくてよい（検出対象外）。
+  //   該当: req-define, spec-save, case-open, case-auto, case-update, backlog-review
+  // - intake または learning 列が具体的な責務記述（PR 本文記録、回収、REQ再構成 intake
+  //   生成等）である command は capture-boundaries 参照を個別に持ち、対応する capture
+  //   導線を実装する（検出対象）。
+  //
+  // 下記 duties は具体的 capture 責務を持つ command の正例集合（capture 責務表から導出）。
+  // リスト外の command は一般規則により検出対象外となる。
   const duties: Record<string, { dutyKeyword: string; dutyLabel: string }> = {
     "case-run.md": { dutyKeyword: "記録のみ", dutyLabel: "record only" },
     "case-close.md": { dutyKeyword: "回収・保存", dutyLabel: "recover and save" },
     "req-save.md": { dutyKeyword: "原則非関与", dutyLabel: "principle: non-involvement" },
-    "case-open.md": { dutyKeyword: "非関与", dutyLabel: "non-involvement" },
-    "case-auto.md": { dutyKeyword: "委譲", dutyLabel: "delegation" },
   };
 
   for (const [filename, { dutyKeyword, dutyLabel }] of Object.entries(duties)) {
