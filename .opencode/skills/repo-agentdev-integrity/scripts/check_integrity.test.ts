@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
-import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync } from "fs";
+import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readdirSync } from "fs";
 import { join } from "path";
 
 const SCRIPT_DIR = import.meta.dir;
@@ -49,6 +49,8 @@ function writeFile(p: string, content: string): void {
 // baseline ファイル（baselines/ir-055-baseline.json）はコピーしないことで、
 // valid fixture は本番の baseline 既知違反から独立し、既知違反の変更が
 // valid fixture 系の成否に影響しない。
+// check_integrity.ts は generate_indexes.ts 等 scripts/ 配下の他の .ts を
+// 静的 import するため、テスト対象の .ts（.test.ts 除く）は全てコピーする。
 function copyScripts(fixtureRoot: string): void {
   const dest = join(
     fixtureRoot,
@@ -58,8 +60,11 @@ function copyScripts(fixtureRoot: string): void {
     "scripts",
   );
   mkdirp(dest);
-  copyFileSync(SCRIPT_FILE, join(dest, "check_integrity.ts"));
-  copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
+  for (const f of readdirSync(SCRIPT_DIR)) {
+    if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+      copyFileSync(join(SCRIPT_DIR, f), join(dest, f));
+    }
+  }
 }
 
 function buildValidFixture(root: string): void {
@@ -2223,5 +2228,110 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
         (res.message ?? "").includes("ADR-0134"),
     );
     expect(promotionMessage).toBeDefined();
+  });
+});
+
+const REFPATH_ROOT = join(TEMP_ROOT, "refpath-placeholder");
+
+function buildRefPathFixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "REQ-9401.md"),
+    [
+      "---",
+      "id: REQ-9401",
+      "title: ReferencePath placeholder fixture",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "Body.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "README.md"),
+    [
+      "# Requirements",
+      "",
+      "| ID | Title |",
+      "|----|-------|",
+      "| REQ-9401 | ReferencePath placeholder fixture |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  mkdirp(join(root, "docs", "specs"));
+  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+  writeFileSync(
+    join(root, "docs", "DOC-MAP.md"),
+    "# DOC-MAP\n\n| 分類 | パス |\n|------|------|\n| REQ | docs/requirements/REQ-9401.md |\n",
+    "utf-8",
+  );
+
+  const cmdDir = join(root, ".opencode", "commands", "agentdev");
+  mkdirp(cmdDir);
+  writeFileSync(
+    join(cmdDir, "placeholder-cmd.md"),
+    [
+      "---",
+      "description: placeholder regression command",
+      "agent: oracle",
+      "---",
+      "",
+      "起動手段は references/<harness>.md 参照。",
+      "See references/concrete-missing.md for the missing logic.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("ReferencePath placeholder regression (REQ-0144-020, Issue #1779)", () => {
+  beforeAll(() => {
+    rmSync(REFPATH_ROOT, { recursive: true, force: true });
+    mkdirp(REFPATH_ROOT);
+    buildRefPathFixture(REFPATH_ROOT);
+    copyScripts(REFPATH_ROOT);
+  });
+
+  afterAll(() => {
+    rmSync(REFPATH_ROOT, { recursive: true, force: true });
+  });
+
+  it("does not flag <...> placeholder path as ReferencePath NG (正例)", () => {
+    const r = runScript(REFPATH_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const placeholderNg = parsed.results.filter(
+      (res: {
+        category: string;
+        level: string;
+        evidence?: string;
+      }) =>
+        res.category === "ReferencePath" &&
+        res.level === "ng" &&
+        (res.evidence ?? "").includes("<harness>"),
+    );
+    expect(placeholderNg.length).toBe(0);
+  });
+
+  it("reports ReferencePath NG for concrete unresolved path (負例)", () => {
+    const r = runScript(REFPATH_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const missingNg = parsed.results.filter(
+      (res: {
+        category: string;
+        level: string;
+        evidence?: string;
+      }) =>
+        res.category === "ReferencePath" &&
+        res.level === "ng" &&
+        (res.evidence ?? "").includes("concrete-missing.md"),
+    );
+    expect(missingNg.length).toBeGreaterThanOrEqual(1);
   });
 });
