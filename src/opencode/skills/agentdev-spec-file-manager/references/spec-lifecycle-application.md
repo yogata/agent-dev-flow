@@ -1,6 +1,6 @@
 # SPEC ライフサイクル適用
 
-本資料は SKILL.md「SPEC ライフサイクル適用」「ファイル操作モード」セクションの補完であり、SPEC frontmatter の `status`（`draft` / `accepted` / `superseded`、ADR-0123 定義）を SPEC 操作（CREATE/APPEND/UPDATE）で適用する規則を記述する。
+本資料は SKILL.md「SPEC ライフサイクル適用」「ファイル操作モード」セクションの補完であり、SPEC frontmatter の `status`（`draft` / `accepted` / `superseded`）を SPEC 操作（CREATE/APPEND/UPDATE）で適用する規則を記述する。
 
 ## status 値と遷移契機
 
@@ -22,11 +22,11 @@ frontmatter 完全性（4フィールド）:
 - `created`: 作成日（`YYYY-MM-DD`）
 - `updated`: 作成日（`YYYY-MM-DD`、`created` と同値）
 
-`accepted` を付与しないこと。`draft` から `accepted` への昇格は case-close の責務（REQ-0136-024、G11）。
+`accepted` を付与しないこと。`draft` から `accepted` への昇格は case-close の責務（G11）。
 
 ## APPEND / UPDATE 時の status 扱い
 
-既存 SPEC へ追記（APPEND）またはセクション置換（UPDATE）の場合、当該 SPEC の `status` を変更しない（G06、ADR-0123 Decision #1）。既存 SPEC の成熟度を尊重する。
+既存 SPEC へ追記（APPEND）またはセクション置換（UPDATE）の場合、当該 SPEC の `status` を変更しない（G06）。既存 SPEC の成熟度を尊重する。
 
 - `status: draft` の SPEC へ追記 → `status: draft` を維持
 - `status: accepted` の SPEC へ追記 → `status: accepted` を維持
@@ -41,9 +41,9 @@ frontmatter 完全性（4フィールド）:
 
 `superseded_by` を持つ SPEC は通常内容検査の対象から除外する。
 
-## docs/specs/README.md 一覧表登録
+## SPEC 一覧表（docs/specs/README.md 相当）登録
 
-新規 SPEC 作成時（CREATE）は `docs/specs/README.md` の該当一覧表へ当該 SPEC の行を登録する（REQ-0154-004）。
+新規 SPEC 作成時（CREATE）は SPEC 一覧表へ当該 SPEC の行を登録する。
 
 登録内容:
 - SPEC パス（相対リンク）
@@ -51,4 +51,4 @@ frontmatter 完全性（4フィールド）:
 - タイトル
 - 責務の概要
 
-既存 SPEC へ追記（APPEND/UPDATE）の場合は一覧表の `status` 列のみ更新し、行を追加しない。SPEC のドメイン間移送が発生した場合は旧ドメイン表から行を削除し、新ドメイン表へ登録する（REQ-0156-006）。
+既存 SPEC へ追記（APPEND/UPDATE）の場合は一覧表の `status` 列のみ更新し、行を追加しない。SPEC のドメイン間移送が発生した場合は旧ドメイン表から行を削除し、新ドメイン表へ登録する。

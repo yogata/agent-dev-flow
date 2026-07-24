@@ -177,7 +177,7 @@ case-close が使用する検査ツール（[integrity-contracts.md](../../../..
 `agentdev-gh-cli` の「squash merge 前の mergeable UNKNOWN ポーリング」手続き（REQ）に従い、対象 PR の `mergeable` 状態事前確認、`UNKNOWN` ポーリング待機、上限超過時の構造化エラー停止、待機中の `CONFLICTING` 遷移検出を自動分岐させ、コンフリクト解消パス（Step 4-2）へ即時接続する。ポーリング間隔・上限値は gh-cli 手続き側が所有する（REQ-0103-163、AG-001）。
 
   - PR merge 手続き（squash 方式、`agentdev-gh-cli`）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）
-  - **Squash merge 失敗時のリトライ**: `agentdev-gh-cli` の「squash merge リトライ手続き」に従う。待機間隔・最大試行回数は gh-cli 手続き側が所有する（REQ-0103-163、AG-001）。各試行のログ記録、全試行失敗時のフォールバック（template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）も同手続きに従う
+  - **Squash merge 失敗時のリトライ**: `agentdev-gh-cli` の「squash merge リトライ手続き」に従う。待機間隔・最大試行回数は gh-cli 手続き側が所有する（AG-001）。各試行のログ記録、全試行失敗時のフォールバック（template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）も同手続きに従う
   - 対応記録コメントをIssueに追加 → テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Readして `agentdev-gh-cli` の VERIFY 操作に従って内容検証
   - **`--delete-branch` 使用禁止**: PR マージ時に `--delete-branch` オプションを使用しない。アクティブ worktree に checkout されたブランチで `--delete-branch` を使用すると local 削除が失敗し remote 削除フェーズへ到達しない。ブランチ削除は Step 7 で独立実施する（REQ）
 
@@ -201,7 +201,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）
 `agentdev-git-worktree` の worktree削除手順に従う:
  - 未コミット変更検出（`agentdev-git-worktree` skill に従い）
  - squash merge 済みの場合 → 当該 worktree が隔離されている（専用 worktree + branch で index が独立）場合のみ `git checkout .` で破棄可。**共有作業ツリー（main worktree）では `git checkout .` は禁止**（他セッション変更の無差別破壊）。本 Step は worktree 削除フェーズ内の隔離 worktree でのみ実行する
-  - runtime workspace のクリーンアップは harness の責務（REQ-0162-002）。case-close は関与しない
+  - runtime workspace のクリーンアップは harness の責務。case-close は関与しない
  - worktree remove → Permission denied 時は停止（リトライは skill 定義に従う）
  - ローカルブランチ削除（squash merge 後の条件付き `-D` は skill 定義に従う）
  - リモートブランチ削除
@@ -282,7 +282,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）
 - G24: Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する（単一書き手制約）。case-run は Epic Issue 本文を読み取るのみで書き込まない。case-auto は Wave 反復制御のみ行い Epic Issue 本文に直接書き込まない。last-write-wins 競合防止は case-close の単一書き手で維持される
 - G25: Epic Wave クローズ（Step E1〜E6）は Epic Issue番号入力時（ステータス追跡テーブル存在時）のみ実行。単一 Issue番号入力時は従来フロー（単一 Issue クローズ Step 1-1〜）を維持する（後方互換）
 - G26: Epic Wave クローズ時の PR マージ、子Issue クローズは現在 Wave の `running` 子Issue のみを対象とする。`pending`/ `ready`/ `blocked`/ `failed` は対象外。`blocked`/ `failed` を `completed` に上書きしない（べき等性、`agentdev-epic-tracker` 準拠）
-- G27: squash merge 実行前に PR の mergeable 状態を事前確認し、UNKNOWN の場合は mergeable になるまでポーリング待機すること（REQ-0131-028）。待機間隔・上限は `agentdev-gh-cli` の mergeable UNKNOWN ポーリング手続きが所有する（REQ-0103-163、AG-001）。上限超過時はマージを中止し構造化エラーで停止する。ポーリングを省略して UNKNOWN 状態のままマージを試行してはならない
+- G27: squash merge 実行前に PR の mergeable 状態を事前確認し、UNKNOWN の場合は mergeable になるまでポーリング待機すること。待機間隔・上限は `agentdev-gh-cli` の mergeable UNKNOWN ポーリング手続きが所有する（AG-001）。上限超過時はマージを中止し構造化エラーで停止する。ポーリングを省略して UNKNOWN 状態のままマージを試行してはならない
 - G28: `git pull --ff-only` 実行前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出し、検出時に安全な代替同期手順を選択すること（REQ）。暗黙の手順順序依存で pull を継続してはならない
 
 

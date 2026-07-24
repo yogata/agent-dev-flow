@@ -1,6 +1,6 @@
 # `agentdev-spec-file-manager` scripts
 
-SPEC 固有の決定的処理スクリプト群（REQ-0136-029/032、AG-002/006、design-principles.md 第5節）。
+SPEC 固有の決定的処理スクリプト群（AG-002/006、design-principles.md 第5節）。
 
 ## 構成
 
@@ -19,7 +19,7 @@ scripts/
 
 ## 対象範囲
 
-本ディレクトリは SPEC 固有スクリプトのみを配置する（REQ-0136-029）。
+本ディレクトリは SPEC 固有スクリプトのみを配置する。
 共通検証スクリプト（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `agentdev-artifact-validation` が所有し、本スキルは公開検証契約経由で委譲する。REQ/ADR 番号採番スクリプトは `agentdev-req-file-manager` 配下に存続する。
 
 ## I/O 契約（REQ）
