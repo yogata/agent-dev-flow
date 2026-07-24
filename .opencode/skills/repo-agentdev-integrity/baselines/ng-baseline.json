@@ -8,2345 +8,3015 @@
       "check": "accepted-adr-only-citation",
       "file": "README.md",
       "evidence": "ADR-0134",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "ADR",
       "check": "accepted-adr-only-citation",
       "file": "docs/specs/integrity/rules/IR-058-distribution-untracked-skill-reference.md",
       "evidence": "ADR-0134",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "ADR",
       "check": "accepted-adr-only-citation",
       "file": "docs/specs/local/runtime-package-boundary.md",
       "evidence": "ADR-0134",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "ADR",
       "check": "adr-req-crossref",
       "file": null,
       "evidence": null,
-      "count": 11
+      "count": 11,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "Canonical",
       "check": "req-range-staleness",
       "file": "docs/guides/project-docs-and-specs.md",
       "evidence": "REQ-0101 から REQ-0162",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "gh-direct-invocation",
       "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "gh pr view",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0108.md",
       "evidence": "REQ-0108-268: docs-check 回帰テストの valid fixture は baseline 登録済みの既知違反の影響を受けず、安定して通過するテストデータ構成であること。既知違反と valid fixture の分離が不十分な場合はテストデータ構成を見直すこと（REQ-0108-055、REQ-0108-258 関連）",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0114.md",
       "evidence": "REQ-0114-102: case-auto は、Phase 1 で case-open を順次実行し、Phase 2 で case-run を並列実行し、Phase 3 で case-close を順次実行する Phase 分離モデルを採用すること。各 Phase は前 Phase の対象処理の完了後に開始すること。",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0114.md",
       "evidence": "REQ-0114-103: case-auto は Phase 2 で case-run を bg task として起動し、各 bg task の結果または破棄を収集すること。bg task の起動 API と引数仕様は `references/<harness>.md` に配置し、case-auto は規定しないこと。",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0114.md",
       "evidence": "REQ-0114-104: case-auto は Phase 1 と Phase 3 を直列集約ポイントとし、main push、capture、commit を並列実行区間の外で処理すること。",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0114.md",
       "evidence": "REQ-0114-106: case-auto の Phase 2 における case-run の同時起動数は固定値5とすること。固定値は AgentDevFlow 側で規定し、REQ-0130-026 と同一の実行安全境界として扱うこと。",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0140.md",
       "evidence": "REQ-0140-028: docs/requirements/REQ-*.md の要件行は操作主体（command 名、skill 名、ユーザー、システム）を明示すること。ただし enum 定義、派生ルール、システム側判断ルールなど主体明示が不要な場合はこの限りでないこと",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0144.md",
       "evidence": "REQ-0144-009: システムは copyScripts 本採用環境下で fixture drift を自動検出する仕組みを提供すること",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0148.md",
       "evidence": "REQ-0148-018: case-auto レベルでのグローバル並列上限は設定せず、case-run 単位の並列上限（REQ-0130-026、SPEC `epic-wave-model.md` 参照）のみを制御対象とすること（REQ-0101-069 安定契約例外: 安全境界。並列実行数上限は実行安全境界）。Phase 分離モデル（REQ-0114-102）では、Phase 2 の同時起動数に固定値5を適用すること。",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0149.md",
       "evidence": "REQ-0149-009: agentdev-gh-cli の WRITE 手続きは Windows 環境においてコンソールエンコーディング初期化（standard-procedures Section2 Step0）を必須前置すること。UTF-8 BOM なしファイルの編集結果の mojibake 化を排除すること",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "CanonicalConflict",
       "check": "req-spec-boundary-violation",
       "file": "docs/requirements/REQ-0153.md",
       "evidence": "REQ-0153-001: case-run は機械的テキスト置換または複数ディレクトリ横断の是正を含む PR について、置換対象パターンの再 grep 結果が 0 件であることを完了証拠とすること。ただし「0 件」は意味論的に正しい置換対象範囲（自然言語記述）での 0 件を指し、構造データ（YAML frontmatter、fenced code block 内字句等）への誤付与による 0 件は完了証拠として無効とする（PR #1334 事例）",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "Inventory",
       "check": "adr-readme-index",
       "file": null,
       "evidence": null,
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0101.md",
       "evidence": "ADR-0005",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0101.md",
       "evidence": "ADR-0004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0102.md",
       "evidence": "ADR-0013",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0103.md",
       "evidence": "ADR-0014",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0103.md",
       "evidence": "ADR-0017",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0104.md",
       "evidence": "ADR-0015",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0104.md",
       "evidence": "ADR-0016",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0104.md",
       "evidence": "ADR-0018",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0105.md",
       "evidence": "ADR-0019",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0106.md",
       "evidence": "ADR-0020",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0107.md",
       "evidence": "ADR-0001",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0108.md",
       "evidence": "ADR-0002",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0109.md",
       "evidence": "ADR-0006",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/adr/ADR-0111.md",
       "evidence": "ADR-0011",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/requirements/REQ-0112.md",
       "evidence": "ADR-0001",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/requirements/REQ-0112.md",
       "evidence": "ADR-0023",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/requirements/REQ-0112.md",
       "evidence": "ADR-0004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/requirements/REQ-0112.md",
       "evidence": "ADR-0007",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/requirements/REQ-0112.md",
       "evidence": "ADR-0009",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/requirements/REQ-0112.md",
       "evidence": "ADR-0014",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/requirements/REQ-0112.md",
       "evidence": "ADR-0015",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-adr-ref",
       "file": "docs/requirements/REQ-0112.md",
       "evidence": "ADR-0018",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-file-link",
       "file": "docs/specs/quality/quality-gates.md",
       "evidence": "../../src/opencode/skills/agentdev-quality-gates/SKILL.md",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/README.md",
       "evidence": "REQ-0001",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/README.md",
       "evidence": "REQ-0050",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/README.md",
       "evidence": "REQ-0111",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/README.md",
       "evidence": "REQ-0121",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/adr/ADR-0101.md",
       "evidence": "REQ-0115",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/adr/ADR-0113.md",
       "evidence": "REQ-0115",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/REQ-0110.md",
       "evidence": "REQ-0117",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/REQ-0119.md",
       "evidence": "REQ-0111",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/REQ-0124.md",
       "evidence": "REQ-0115",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/REQ-0124.md",
       "evidence": "REQ-0116",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/REQ-0144.md",
       "evidence": "REQ-0122",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/REQ-0161.md",
       "evidence": "REQ-0041",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/REQ-0161.md",
       "evidence": "REQ-0004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0001",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0050",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0111",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0115",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0116",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0117",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0118",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0120",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0121",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0122",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0002",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0003",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0005",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0006",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0007",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0008",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0009",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0010",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0011",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0012",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0013",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0014",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0015",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0016",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0017",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0018",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0019",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0020",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0021",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0022",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0023",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0024",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0025",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0026",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0027",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0028",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0029",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0030",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0031",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0032",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0033",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0034",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0035",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0036",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0037",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0038",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0039",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0040",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0041",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0042",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0043",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0044",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0045",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0046",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0047",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0048",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "LinkIntegrity",
       "check": "broken-req-ref",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0049",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0001",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0002",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0003",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0005",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0006",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0007",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0008",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0009",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0010",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0011",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0012",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0013",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0014",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0015",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0016",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0017",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0018",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0019",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0020",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0021",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0022",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0023",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0024",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0025",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0026",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0027",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0028",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0029",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0030",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0031",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0032",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0033",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0034",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0035",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0036",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0037",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0038",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0039",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0040",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0041",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0042",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0043",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0044",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0045",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0046",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0047",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0048",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0049",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0050",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0111",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0122",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0116",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0118",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0120",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0121",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0115",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "MappingTable",
       "check": "mapping-table-completeness",
       "file": "docs/requirements/mapping-table.md",
       "evidence": "REQ-0117",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114",
-      "count": 30
+      "count": 30,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-064",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-053",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0130-026",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0148-014",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0130",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0148",
-      "count": 3
+      "count": 3,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-065",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-067",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-066",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-088",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-093",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-060",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0162-003",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0162",
-      "count": 5
+      "count": 5,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0162-002",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-073",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-098",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0162-004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0163",
-      "count": 7
+      "count": 7,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0163-001",
-      "count": 3
+      "count": 3,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0163-002",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0163-003",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-102",
-      "count": 4
+      "count": 4,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "ADR-0138",
-      "count": 4
+      "count": 4,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-006",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151",
-      "count": 10
+      "count": 10,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "ADR-0132",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-082",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-008",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-049",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-100",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-001",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-002",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-095",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-003",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0148-015",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0151-005",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "ADR-0137",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-097",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-085",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-106",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-105",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-104",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-101",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-auto.md",
       "evidence": "REQ-0114-107",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-open.md",
       "evidence": "REQ-0132-025",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-open.md",
       "evidence": "REQ-0132",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-run.md",
       "evidence": "REQ-0162-002",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/commands/agentdev/case-run.md",
       "evidence": "REQ-0162",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-adr-file-manager/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-adr-file-manager/SKILL.md",
       "evidence": "REQ-0112-048",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-adr-file-manager/SKILL.md",
       "evidence": "REQ-0112",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-adr-guidelines/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-architecture-advisory/references/architecture-review-delegation.md",
       "evidence": "REQ-0162-002",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-architecture-advisory/references/architecture-review-delegation.md",
       "evidence": "REQ-0162",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-architecture-advisory/references/architecture-review-delegation.md",
       "evidence": "ADR-0136",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-backlog-integration/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0162-002",
-      "count": 3
+      "count": 3,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0162",
-      "count": 4
+      "count": 4,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0162-004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0163",
-      "count": 5
+      "count": 5,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0163-001",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0163-002",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0163-003",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0149-012",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
       "evidence": "REQ-0149",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
       "evidence": "REQ-0162-002",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
       "evidence": "REQ-0162",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
       "evidence": "REQ-0162-004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-command-authoring/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-command-creator/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-conventional-commits/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-doc-map/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-033",
-      "count": 5
+      "count": 5,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140",
-      "count": 12
+      "count": 12,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-026",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-034",
-      "count": 4
+      "count": 4,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "repo-local",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-035",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
       "evidence": "REQ-0140-036",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-epic-tracker/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/SKILL.md",
       "evidence": "REQ-0149-011",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/references/contracts.md",
       "evidence": "REQ-0149-002",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/references/contracts.md",
       "evidence": "REQ-0149-011",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/references/contracts.md",
       "evidence": "REQ-0149-004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/references/contracts.md",
       "evidence": "REQ-0149",
-      "count": 3
+      "count": 3,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md",
       "evidence": "REQ-0149-009",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md",
       "evidence": "REQ-0149-011",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md",
       "evidence": "REQ-0149",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/references/verify.md",
       "evidence": "REQ-0149-010",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-gh-cli/references/verify.md",
       "evidence": "REQ-0149",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-git-worktree/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "src/opencode/",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0125-003",
-      "count": 6
+      "count": 6,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0119-034",
-      "count": 3
+      "count": 3,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0125",
-      "count": 6
+      "count": 6,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0119",
-      "count": 4
+      "count": 4,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0119-033",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
       "evidence": "REQ-0125-005",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119-033",
-      "count": 7
+      "count": 7,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119-034",
-      "count": 8
+      "count": 8,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119",
-      "count": 17
+      "count": 17,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0125-003",
-      "count": 7
+      "count": 7,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0125-004",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0125",
-      "count": 10
+      "count": 10,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "ADR-0107",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "src/opencode/",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0125-005",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119-035",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
       "evidence": "REQ-0119-036",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-intake-pipeline/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-issue-management/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-issue-management/references/issue-operation-safety.md",
       "evidence": "REQ-0132-024",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-learning-capture/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-learning-pipeline/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "REQ-0147-001",
-      "count": 5
+      "count": 5,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "REQ-0147",
-      "count": 5
+      "count": 5,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "REQ-0119-034",
-      "count": 5
+      "count": 5,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
       "evidence": "REQ-0119",
-      "count": 5
+      "count": 5,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-quality-gates/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md",
       "evidence": "REQ-0131-031",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md",
       "evidence": "REQ-0131",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "REQ-0146-015",
-      "count": 3
+      "count": 3,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "src/opencode/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "REQ-0146-011",
-      "count": 4
+      "count": 4,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
       "evidence": "REQ-0146",
-      "count": 6
+      "count": 6,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-analysis/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-analysis/references/investigation-scope-refinement.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
       "evidence": "REQ-0131-031",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
       "evidence": "REQ-0131",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
       "evidence": "src/opencode/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-file-manager/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-file-manager/references/create-append-update-flow.md",
       "evidence": "REQ-0113-010",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-file-manager/references/create-append-update-flow.md",
       "evidence": "REQ-0113",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-file-manager/references/matching-and-merge.md",
       "evidence": "REQ-0113-010",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-file-manager/references/matching-and-merge.md",
       "evidence": "REQ-0113",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
       "evidence": "REQ-0113-010",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
       "evidence": "REQ-0113",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
       "evidence": "src/opencode/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-req-structure-diagnostics/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
       "evidence": "REQ-0113-010",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
       "evidence": "REQ-0113",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/references/design-principles.md",
       "evidence": "REQ-0113-010",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/references/design-principles.md",
       "evidence": "REQ-0113",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/references/development-workflow.md",
       "evidence": "REQ-0113-010",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/references/development-workflow.md",
       "evidence": "REQ-0113",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/references/review-protocol.md",
       "evidence": "REQ-0113-010",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/references/review-protocol.md",
       "evidence": "REQ-0113",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-skill-authoring/references/review-protocol.md",
       "evidence": "src/opencode/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-lifecycle/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-orchestration/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0163-002",
-      "count": 2
+      "count": 2,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0163",
-      "count": 3
+      "count": 3,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0163-001",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0149-012",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
       "evidence": "REQ-0149",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-routing/SKILL.md",
       "evidence": "docs/specs/",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-templates/SKILL.md",
       "evidence": "REQ-0132-025",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
       "category": "RuntimeReference",
       "check": "runtime-unresolved-reference",
       "file": "src/opencode/skills/agentdev-workflow-templates/SKILL.md",
       "evidence": "REQ-0132",
-      "count": 1
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     }
   ]
 }

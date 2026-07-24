@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
-import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync } from "fs";
+import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync } from "fs";
 import { join } from "path";
 
 const SCRIPT_DIR = import.meta.dir;
@@ -2223,5 +2223,387 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
         (res.message ?? "").includes("ADR-0134"),
     );
     expect(promotionMessage).toBeDefined();
+  });
+});
+
+// ─── NG baseline aggregation / provenance / classification (Issue #1780, REQ-0161-005) ──
+// TS-003: baseline 既知 NG と新規 NG の件数を別々に示し、新規 NG だけが非ゼロ終了の原因になる
+// TS-004: --update-ng-baseline が承認済み由来ラベル付き差分だけを baseline へ追加し、未管理 NG を取り込まない
+// TS-005: baseline 既知 NG、承認済み追加分、新規かつ未管理 NG が報告で区別される
+
+const NGBASELINE_ROOT = join(TEMP_ROOT, "ngbaseline1780");
+const GENERATE_INDEXES_FILE = join(SCRIPT_DIR, "generate_indexes.ts");
+
+function copyScriptsComplete(fixtureRoot: string): void {
+  const dest = join(
+    fixtureRoot,
+    ".opencode",
+    "skills",
+    "repo-agentdev-integrity",
+    "scripts",
+  );
+  mkdirp(dest);
+  copyFileSync(SCRIPT_FILE, join(dest, "check_integrity.ts"));
+  copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
+  // generate_indexes.ts is imported by check_integrity.ts; copy it so the
+  // fixture is self-contained (the pre-existing copyScripts omits it).
+  if (existsSync(GENERATE_INDEXES_FILE)) {
+    copyFileSync(GENERATE_INDEXES_FILE, join(dest, "generate_indexes.ts"));
+  }
+}
+
+function buildNgBaselineFixture(root: string): void {
+  const reqDir = join(root, "docs", "requirements");
+  mkdirp(reqDir);
+  writeFileSync(
+    join(reqDir, "README.md"),
+    [
+      "# Requirements",
+      "",
+      "| ID | Title |",
+      "|----|-------|",
+      "| REQ-0001 | fixture anchor |",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+  writeFileSync(
+    join(reqDir, "REQ-0001.md"),
+    [
+      "---",
+      "id: REQ-0001",
+      "title: fixture anchor",
+      "created: 2025-01-01",
+      "updated: 2025-01-01",
+      "---",
+      "",
+      "Body.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+
+  mkdirp(join(root, "docs", "specs"));
+  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
+
+  // Guide file referencing three non-existent REQ IDs. Each unique ref emits
+  // one broken-req-ref NG with evidence = "REQ-NNNN".
+  const guidesDir = join(root, "docs", "guides");
+  mkdirp(guidesDir);
+  writeFileSync(
+    join(guidesDir, "ng-baseline-test.md"),
+    [
+      "# NG Baseline Test Guide",
+      "",
+      "Reference A: REQ-9001.",
+      "Reference B: REQ-9002.",
+      "Reference C: REQ-9003.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+function writeNgBaselineFile(
+  root: string,
+  entries: Array<{
+    category: string;
+    check: string;
+    file: string | null;
+    evidence: string | null;
+    count: number;
+    provenance: string;
+    reason: string;
+  }>,
+): void {
+  const baselineDir = join(
+    root,
+    ".opencode",
+    "skills",
+    "repo-agentdev-integrity",
+    "baselines",
+  );
+  mkdirp(baselineDir);
+  writeFileSync(
+    join(baselineDir, "ng-baseline.json"),
+    JSON.stringify(
+      {
+        version: 1,
+        rule_id: "NG-BASELINE",
+        generated_at: "2026-07-24",
+        entries,
+      },
+      null,
+      2,
+    ) + "\n",
+    "utf-8",
+  );
+}
+
+function readNgBaselineFile(root: string): {
+  entries: Array<{
+    category: string;
+    check: string;
+    file: string | null;
+    evidence: string | null;
+    count: number;
+    provenance?: string;
+    reason?: string;
+  }>;
+} {
+  const p = join(
+    root,
+    ".opencode",
+    "skills",
+    "repo-agentdev-integrity",
+    "baselines",
+    "ng-baseline.json",
+  );
+  return JSON.parse(readFileSync(p, "utf-8") as string);
+}
+
+const NGBASELINE_GUIDE = "docs/guides/ng-baseline-test.md";
+
+describe("NG baseline aggregation / provenance / classification (Issue #1780, REQ-0161-005)", () => {
+  beforeAll(() => {
+    rmSync(NGBASELINE_ROOT, { recursive: true, force: true });
+    buildNgBaselineFixture(NGBASELINE_ROOT);
+    copyScriptsComplete(NGBASELINE_ROOT);
+    // Seed baseline: REQ-9001 (legacy) + REQ-9002 (approved). REQ-9003 stays
+    // unmanaged so it remains a new-NG driver.
+    writeNgBaselineFile(NGBASELINE_ROOT, [
+      {
+        category: "LinkIntegrity",
+        check: "broken-req-ref",
+        file: NGBASELINE_GUIDE,
+        evidence: "REQ-9001",
+        count: 1,
+        provenance: "legacy",
+        reason: "pre-existing baseline entry (fixture)",
+      },
+      {
+        category: "LinkIntegrity",
+        check: "broken-req-ref",
+        file: NGBASELINE_GUIDE,
+        evidence: "REQ-9002",
+        count: 1,
+        provenance: "approved-fixture",
+        reason: "approved addition (fixture)",
+      },
+    ]);
+  });
+
+  afterAll(() => {
+    rmSync(NGBASELINE_ROOT, { recursive: true, force: true });
+  });
+
+  it("TS-003: separates baseline-known from new NG counts; only new NG drives non-zero exit", () => {
+    const r = runScript(NGBASELINE_ROOT, ["--json"]);
+    expect(r.exitCode).not.toBe(0);
+
+    const parsed = JSON.parse(r.stdout);
+    const brokenReqRefs = parsed.results.filter(
+      (res: { check: string; evidence?: string }) =>
+        res.check === "broken-req-ref",
+    );
+
+    // REQ-9001 (legacy baseline) → demoted to info with [baseline-known] tag.
+    const req9001 = brokenReqRefs.find(
+      (res: { evidence?: string }) => res.evidence === "REQ-9001",
+    );
+    expect(req9001).toBeDefined();
+    expect(req9001.level).toBe("info");
+    expect(req9001.message).toContain("[baseline-known]");
+    expect(req9001.message).not.toContain("provenance=");
+
+    // REQ-9002 (approved baseline) → demoted to info with provenance tag.
+    const req9002 = brokenReqRefs.find(
+      (res: { evidence?: string }) => res.evidence === "REQ-9002",
+    );
+    expect(req9002).toBeDefined();
+    expect(req9002.level).toBe("info");
+    expect(req9002.message).toContain("[baseline-known provenance=approved-fixture]");
+
+    // REQ-9003 (unmanaged) → stays ng; drives non-zero exit.
+    const req9003 = brokenReqRefs.find(
+      (res: { evidence?: string }) => res.evidence === "REQ-9003",
+    );
+    expect(req9003).toBeDefined();
+    expect(req9003.level).toBe("ng");
+  });
+
+  it("TS-005: report distinguishes baseline-known, approved additions, and new unmanaged NG", () => {
+    const r = runScript(NGBASELINE_ROOT, ["--json"]);
+    // The 3-category summary is emitted on stderr.
+    expect(r.stderr).toContain("baseline-known (demoted to info)");
+    expect(r.stderr).toContain("approved additions (provenance-tracked");
+    expect(r.stderr).toContain("new unmanaged NG (delta, exit code driver)");
+
+    // And the three classes are distinguishable in the JSON results.
+    const parsed = JSON.parse(r.stdout);
+    const legacyDemoted = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "broken-req-ref" &&
+        res.level === "info" &&
+        (res.message ?? "").startsWith("[baseline-known] ") &&
+        !(res.message ?? "").includes("provenance="),
+    );
+    const approvedDemoted = parsed.results.filter(
+      (res: { check: string; level: string; message?: string }) =>
+        res.check === "broken-req-ref" &&
+        res.level === "info" &&
+        (res.message ?? "").includes("[baseline-known provenance="),
+    );
+    const newNg = parsed.results.filter(
+      (res: { check: string; level: string }) =>
+        res.check === "broken-req-ref" && res.level === "ng",
+    );
+    expect(legacyDemoted.length).toBeGreaterThanOrEqual(1);
+    expect(approvedDemoted.length).toBeGreaterThanOrEqual(1);
+    expect(newNg.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("TS-004: --update-ng-baseline adds only approved deltas with provenance/reason; unmanaged NGs are not absorbed", () => {
+    // Additions manifest: approve REQ-9003 only. Do NOT include the other
+    // fixture NGs (e.g. command-readme-sync, skill-prefix) — those must stay
+    // out of the baseline per SPEC.
+    const manifestPath = join(NGBASELINE_ROOT, "additions-manifest.json");
+    writeFileSync(
+      manifestPath,
+      JSON.stringify(
+        {
+          additions: [
+            {
+              category: "LinkIntegrity",
+              check: "broken-req-ref",
+              file: NGBASELINE_GUIDE,
+              evidence: "REQ-9003",
+              count: 1,
+              provenance: "ts-004-approval",
+              reason: "TS-004: approving REQ-9003 reference in test fixture",
+            },
+          ],
+        },
+        null,
+        2,
+      ),
+      "utf-8",
+    );
+
+    const updateProc = Bun.spawnSync(
+      [
+        "bun",
+        "run",
+        join(
+          NGBASELINE_ROOT,
+          ".opencode",
+          "skills",
+          "repo-agentdev-integrity",
+          "scripts",
+          "check_integrity.ts",
+        ),
+        "--update-ng-baseline",
+        "--ng-baseline-additions",
+        manifestPath,
+      ],
+      { cwd: NGBASELINE_ROOT, stdout: "pipe", stderr: "pipe" },
+    );
+    expect(updateProc.exitCode).toBe(0);
+
+    // Baseline now has 3 entries; REQ-9003 carries the approved provenance.
+    const baseline = readNgBaselineFile(NGBASELINE_ROOT);
+    const req9003Entry = baseline.entries.find(
+      (e: { evidence?: string }) => e.evidence === "REQ-9003",
+    );
+    expect(req9003Entry).toBeDefined();
+    expect(req9003Entry.provenance).toBe("ts-004-approval");
+    expect(req9003Entry.reason).toContain("TS-004");
+
+    // Unmanaged NG categories were NOT absorbed: the baseline must contain no
+    // entry for command-readme-sync / skill-prefix / etc.
+    const absorbedOtherChecks = baseline.entries.filter(
+      (e: { check: string }) =>
+        e.check !== "broken-req-ref",
+    );
+    expect(absorbedOtherChecks.length).toBe(0);
+
+    // Re-run: REQ-9003 is now demoted as an approved addition.
+    const r = runScript(NGBASELINE_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const req9003After = parsed.results.find(
+      (res: { check: string; evidence?: string }) =>
+        res.check === "broken-req-ref" && res.evidence === "REQ-9003",
+    );
+    expect(req9003After).toBeDefined();
+    expect(req9003After.level).toBe("info");
+    expect(req9003After.message).toContain(
+      "[baseline-known provenance=ts-004-approval]",
+    );
+  });
+
+  it("TS-004 (negative): --update-ng-baseline without additions manifest is rejected", () => {
+    const proc = Bun.spawnSync(
+      [
+        "bun",
+        "run",
+        join(
+          NGBASELINE_ROOT,
+          ".opencode",
+          "skills",
+          "repo-agentdev-integrity",
+          "scripts",
+          "check_integrity.ts",
+        ),
+        "--update-ng-baseline",
+      ],
+      { cwd: NGBASELINE_ROOT, stdout: "pipe", stderr: "pipe" },
+    );
+    expect(proc.exitCode).toBe(2);
+    expect(proc.stderr.toString("utf-8")).toContain(
+      "--ng-baseline-additions",
+    );
+  });
+
+  it("TS-004 (negative): additions manifest missing provenance/reason is rejected", () => {
+    const badManifest = join(NGBASELINE_ROOT, "bad-manifest.json");
+    writeFileSync(
+      badManifest,
+      JSON.stringify({
+        additions: [
+          {
+            category: "LinkIntegrity",
+            check: "broken-req-ref",
+            file: NGBASELINE_GUIDE,
+            evidence: "REQ-9003",
+            count: 1,
+            // provenance and reason intentionally omitted.
+          },
+        ],
+      }),
+      "utf-8",
+    );
+    const proc = Bun.spawnSync(
+      [
+        "bun",
+        "run",
+        join(
+          NGBASELINE_ROOT,
+          ".opencode",
+          "skills",
+          "repo-agentdev-integrity",
+          "scripts",
+          "check_integrity.ts",
+        ),
+        "--update-ng-baseline",
+        "--ng-baseline-additions",
+        badManifest,
+      ],
+      { cwd: NGBASELINE_ROOT, stdout: "pipe", stderr: "pipe" },
+    );
+    expect(proc.exitCode).toBe(2);
+    expect(proc.stderr.toString("utf-8")).toContain("provenance");
   });
 });
