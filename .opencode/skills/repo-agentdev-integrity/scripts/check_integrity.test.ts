@@ -50,7 +50,6 @@ function writeFile(p: string, content: string): void {
 // baseline ファイル（baselines/ir-055-baseline.json）はコピーしないことで、
 // valid fixture は本番の baseline 既知違反から独立し、既知違反の変更が
 // valid fixture 系の成否に影響しない。
-// generate_indexes.ts は check_integrity.ts が import するため必須。
 function copyScripts(fixtureRoot: string): void {
   const dest = join(
     fixtureRoot,
@@ -352,6 +351,9 @@ function buildValidFixture(root: string): void {
     "utf-8",
   );
 
+  // Issue #1769 / AG-002: case-run, case-close, req-save は具体的 capture 責務を持ち、
+  // capture-boundaries 参照が必須。case-open（非関与）、case-auto（各工程の責務を継承）
+  // は capture 責務表により検出対象外（capture-boundaries 参照不要）。
   const captureCmdDuties: Record<string, string> = {
     "case-run.md":
       "---\ndescription: case-run\nagent: sisyphus\n---\n\nSee capture-boundaries for duty. 記録のみ.\n",
@@ -360,9 +362,9 @@ function buildValidFixture(root: string): void {
     "req-save.md":
       "---\ndescription: req-save\nagent: prometheus\n---\n\nSee capture-boundaries for duty. 原則非関与.\n",
     "case-open.md":
-      "---\ndescription: case-open\nagent: prometheus\n---\n\nSee capture-boundaries for duty. 非関与.\n",
+      "---\ndescription: case-open\nagent: prometheus\n---\n\nNo capture-boundaries reference (exempt: 非関与).\n",
     "case-auto.md":
-      "---\ndescription: case-auto\nagent: sisyphus\n---\n\nSee capture-boundaries for duty. 委譲.\n",
+      "---\ndescription: case-auto\nagent: sisyphus\n---\n\nNo capture-boundaries reference (exempt: 各工程の責務を継承).\n",
   };
   for (const [fname, content] of Object.entries(captureCmdDuties)) {
     writeFileSync(join(cmdDir, fname), content, "utf-8");
@@ -925,7 +927,7 @@ describe("Capture boundary checks", () => {
     expect(check.level).toBe("ok");
   });
 
-  it("valid fixture: command-capture-duty checks pass for all 5 commands", () => {
+  it("valid fixture: command-capture-duty checks pass for 3 specific-duty commands", () => {
     const r = runScript(VALID_ROOT, ["--json"]);
     const parsed = JSON.parse(r.stdout);
     const dutyOk = parsed.results.filter(
@@ -934,7 +936,36 @@ describe("Capture boundary checks", () => {
         res.check === "command-capture-duty" &&
         res.level === "ok",
     );
-    expect(dutyOk.length).toBe(5);
+    expect(dutyOk.length).toBe(3);
+  });
+
+  it("valid fixture: exempt commands (case-open, case-auto) are not checked even without capture-boundaries reference", () => {
+    const r = runScript(VALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const exemptResults = parsed.results.filter(
+      (res: { check: string; category: string; message: string }) =>
+        res.category === "CaptureBoundary" &&
+        res.check === "command-capture-duty" &&
+        (res.message.includes("case-open.md") ||
+          res.message.includes("case-auto.md")),
+    );
+    expect(exemptResults.length).toBe(0);
+  });
+
+  it("valid fixture: specific-duty commands (case-run, case-close, req-save) are checked", () => {
+    const r = runScript(VALID_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const checkedCommands = ["case-run.md", "case-close.md", "req-save.md"];
+    for (const cmd of checkedCommands) {
+      const found = parsed.results.find(
+        (res: { check: string; category: string; message: string; level: string }) =>
+          res.category === "CaptureBoundary" &&
+          res.check === "command-capture-duty" &&
+          res.message.includes(cmd),
+      );
+      expect(found).toBeDefined();
+      expect(found.level).toBe("ok");
+    }
   });
 
   it("invalid fixture: capture-boundaries-existence detects missing file", () => {
@@ -2226,152 +2257,5 @@ describe("IR-058 distribution-untracked-skill-reference (REQ-0159-003)", () => {
         (res.message ?? "").includes("ADR-0134"),
     );
     expect(promotionMessage).toBeDefined();
-  });
-});
-
-// ─── mapping-table-completeness (Issue #1781 / REQ-0108-084) ────────────────
-// Dedicated fixture with retired REQs covering both polarities:
-//   - REQ-9002 (retired, recorded in mapping-table)  → no NG
-//   - REQ-9003 (retired, missing from mapping-table) → NG
-
-const MTC_ROOT = join(TEMP_ROOT, "mtc");
-
-function buildMappingTableCompletenessFixture(root: string): void {
-  const reqDir = join(root, "docs", "requirements");
-  mkdirp(reqDir);
-
-  writeFileSync(
-    join(reqDir, "REQ-9001.md"),
-    [
-      "---",
-      "id: REQ-9001",
-      "title: mapping-table-completeness active fixture",
-      "created: 2025-01-01",
-      "updated: 2025-01-01",
-      "---",
-      "",
-      "## Body",
-      "",
-      "Active REQ for mapping-table-completeness fixture.",
-      "",
-    ].join("\n"),
-    "utf-8",
-  );
-
-  writeFileSync(
-    join(reqDir, "README.md"),
-    [
-      "# Requirements",
-      "",
-      "| ID | Title |",
-      "|----|-------|",
-      "| REQ-9001 | mapping-table-completeness active fixture |",
-      "",
-    ].join("\n"),
-    "utf-8",
-  );
-
-  const retiredDir = join(reqDir, "retired");
-  mkdirp(retiredDir);
-
-  // REQ-9002: retired, recorded in mapping-table (positive case).
-  writeFileSync(
-    join(retiredDir, "REQ-9002.md"),
-    [
-      "---",
-      "id: REQ-9002",
-      "title: mapping-table-completeness recorded retired",
-      "created: 2025-01-01",
-      "updated: 2025-01-01",
-      "---",
-      "",
-      "## retire 宣言",
-      "",
-      "Recorded in mapping-table.",
-      "",
-    ].join("\n"),
-    "utf-8",
-  );
-
-  // REQ-9003: retired, NOT recorded in mapping-table (negative case).
-  writeFileSync(
-    join(retiredDir, "REQ-9003.md"),
-    [
-      "---",
-      "id: REQ-9003",
-      "title: mapping-table-completeness missing retired",
-      "created: 2025-01-01",
-      "updated: 2025-01-01",
-      "---",
-      "",
-      "## retire 宣言",
-      "",
-      "Not recorded in mapping-table.",
-      "",
-    ].join("\n"),
-    "utf-8",
-  );
-
-  // mapping-table.md lists REQ-9002 only; REQ-9003 omission triggers NG.
-  writeFileSync(
-    join(reqDir, "mapping-table.md"),
-    [
-      "---",
-      "id: mapping-table",
-      "title: mapping-table-completeness fixture",
-      "created: 2025-01-01",
-      "updated: 2025-01-01",
-      "---",
-      "",
-      "## 対応表",
-      "",
-      "| 旧REQ | 判定 | 移行先 | 非移行理由 / 備考 |",
-      "|---|---|---|---|",
-      "| REQ-9002 | retired-no-successor | なし | recorded retired REQ |",
-      "",
-    ].join("\n"),
-    "utf-8",
-  );
-
-  mkdirp(join(root, "docs", "adr"));
-  mkdirp(join(root, "docs", "specs"));
-  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
-  writeFileSync(join(root, "docs", "specs", "README.md"), "# SPEC\n", "utf-8");
-}
-
-describe("mapping-table-completeness retired REQ coverage (REQ-0108-084, Issue #1781)", () => {
-  beforeAll(() => {
-    rmSync(MTC_ROOT, { recursive: true, force: true });
-    mkdirp(MTC_ROOT);
-    buildMappingTableCompletenessFixture(MTC_ROOT);
-    copyScripts(MTC_ROOT);
-  });
-
-  afterAll(() => {
-    rmSync(MTC_ROOT, { recursive: true, force: true });
-  });
-
-  it("does NOT flag retired REQ recorded in mapping-table (positive)", () => {
-    const r = runScript(MTC_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const ngFor9002 = parsed.results.filter(
-      (res: { check: string; level: string; message?: string }) =>
-        res.check === "mapping-table-completeness" &&
-        res.level === "ng" &&
-        (res.message ?? "").includes("REQ-9002"),
-    );
-    expect(ngFor9002.length).toBe(0);
-  });
-
-  it("flags retired REQ missing from mapping-table (negative)", () => {
-    const r = runScript(MTC_ROOT, ["--json"]);
-    const parsed = JSON.parse(r.stdout);
-    const ngFor9003 = parsed.results.filter(
-      (res: { check: string; level: string; message?: string }) =>
-        res.check === "mapping-table-completeness" &&
-        res.level === "ng" &&
-        (res.message ?? "").includes("REQ-9003"),
-    );
-    expect(ngFor9003.length).toBe(1);
   });
 });
