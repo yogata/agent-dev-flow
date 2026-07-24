@@ -17,6 +17,11 @@ context:
     paths:
       - "docs/specs/commands/case-close.md"
     purpose: "case-close の完了ゲートと QG-4 達成判定の確認"
+  - id: index-auto-generation-spec
+    when: "Step 3-3 AUTOGEN block 索引再生成差分検出（単一 Issue / Epic Wave E5b 前段）参照時"
+    paths:
+      - "docs/specs/integrity/index-auto-generation.md"
+    purpose: "AUTOGEN block 自動生成機構と generate_indexes.ts の契約確認"
   - id: discovery-1
     purpose: "docs/DOC-MAP.md 経由で SPEC 確定対象と整合性ルールを探索してよい"
   - id: discovery-2
@@ -26,7 +31,10 @@ context:
 
 rules: []
 
-checks: []
+checks:
+  - id: autogen-index-regeneration-diff
+    when: "Step 3-3（単一 Issue クローズ）および Step E5b 前段（Epic Wave クローズ）。generate_indexes.ts --dry-run で AUTOGEN block 再生成差分を検出する。差分あり（WOULD UPDATE 行を含む）場合は case-close を停止し case-run へ差戻す（再生成の実 commit は case-run が行う）。差分なしの場合のみ case-close を完了する。case-close 自身は索引ファイルを直接編集・commit しない。契約の詳細は case-close SPEC Step 3-3 参照"
+    skill: repo-agentdev-integrity
 
 acceptance_gates:
   - 完了した Issue/PR の成果物が docs/requirements/, docs/adr/, docs/specs/ のいずれかに存在すること
