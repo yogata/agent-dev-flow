@@ -1,0 +1,656 @@
+{
+  "version": 1,
+  "rule_id": "IR-059",
+  "generated_at": "2026-07-24",
+  "description": "IR-059 distribution reference boundary initial baseline. All entries are pre-existing known violations captured when the delta guard was first established for #1776. New violations (delta) introduced after this baseline must be corrected in body, not added here.",
+  "entries": [
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "ADR-0124",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "ADR-0127",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "ADR-0129",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "ADR-0132",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "ADR-0135",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "ADR-0137",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "ADR-0138",
+      "count": 7
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "REQ-0114",
+      "count": 63
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "REQ-0130",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "REQ-0132",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "REQ-0138",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "REQ-0148",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "REQ-0151",
+      "count": 12
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "REQ-0162",
+      "count": 12
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-id",
+      "matched": "REQ-0163",
+      "count": 7
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-path",
+      "matched": "docs/specs/commands/case-auto.md",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-auto.md",
+      "category": "concrete-path",
+      "matched": "docs/specs/workflows/capture-boundaries.md",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "category": "concrete-id",
+      "matched": "ADR-0114",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "category": "concrete-id",
+      "matched": "REQ-0103",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "category": "concrete-id",
+      "matched": "REQ-0131",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "category": "concrete-id",
+      "matched": "REQ-0144",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "category": "concrete-id",
+      "matched": "REQ-0146",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "category": "concrete-id",
+      "matched": "REQ-0149",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "category": "concrete-id",
+      "matched": "REQ-0158",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "category": "concrete-id",
+      "matched": "REQ-0162",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "category": "concrete-path",
+      "matched": "docs/specs/integrity/integrity-contracts.md",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "category": "concrete-id",
+      "matched": "ADR-0124",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "category": "concrete-id",
+      "matched": "REQ-0104",
+      "count": 8
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "category": "concrete-id",
+      "matched": "REQ-0114",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "category": "concrete-id",
+      "matched": "REQ-0119",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "category": "concrete-id",
+      "matched": "REQ-0130",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "category": "concrete-id",
+      "matched": "REQ-0131",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "category": "concrete-id",
+      "matched": "REQ-0132",
+      "count": 10
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-open.md",
+      "category": "concrete-id",
+      "matched": "REQ-0148",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "category": "concrete-id",
+      "matched": "REQ-0103",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "category": "concrete-id",
+      "matched": "REQ-0130",
+      "count": 7
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "category": "concrete-id",
+      "matched": "REQ-0144",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "category": "concrete-id",
+      "matched": "REQ-0162",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "category": "concrete-path",
+      "matched": "docs/specs/integrity/integrity-contracts.md",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-define.md",
+      "category": "concrete-id",
+      "matched": "ADR-0124",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "category": "concrete-id",
+      "matched": "REQ-0102",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "category": "concrete-id",
+      "matched": "REQ-0124",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/commands/agentdev/req-save.md",
+      "category": "concrete-id",
+      "matched": "REQ-0125",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/spec-save.md",
+      "category": "concrete-id",
+      "matched": "REQ-0124",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/commands/agentdev/spec-save.md",
+      "category": "concrete-id",
+      "matched": "REQ-0125",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/templates/req-define/req-draft.md",
+      "category": "concrete-id",
+      "matched": "ADR-0124",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-adr-file-manager/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0112",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-artifact-validation/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0103",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-artifact-validation/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0113",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0103",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0149",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0162",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0163",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md",
+      "category": "concrete-id",
+      "matched": "REQ-0162",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0103",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0109",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0124",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md",
+      "category": "concrete-id",
+      "matched": "REQ-0109",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md",
+      "category": "concrete-id",
+      "matched": "REQ-0124",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md",
+      "category": "concrete-path",
+      "matched": "docs/requirements/mapping-table.md",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/references/finding-output-contract.md",
+      "category": "concrete-id",
+      "matched": "REQ-0103",
+      "count": 7
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/references/finding-output-contract.md",
+      "category": "concrete-id",
+      "matched": "REQ-0109",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-diagnostics/references/finding-output-contract.md",
+      "category": "concrete-id",
+      "matched": "REQ-0124",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md",
+      "category": "concrete-id",
+      "matched": "REQ-0140",
+      "count": 12
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0149",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/contracts.md",
+      "category": "concrete-id",
+      "matched": "REQ-0149",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md",
+      "category": "concrete-id",
+      "matched": "REQ-0103",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md",
+      "category": "concrete-id",
+      "matched": "REQ-0149",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-gh-cli/references/verify.md",
+      "category": "concrete-id",
+      "matched": "REQ-0149",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0119",
+      "count": 10
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0125",
+      "count": 11
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "category": "concrete-id",
+      "matched": "ADR-0107",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "category": "concrete-id",
+      "matched": "REQ-0119",
+      "count": 19
+    },
+    {
+      "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
+      "category": "concrete-id",
+      "matched": "REQ-0125",
+      "count": 10
+    },
+    {
+      "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0119",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-project-extensions/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0147",
+      "count": 5
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md",
+      "category": "concrete-id",
+      "matched": "REQ-0131",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "category": "concrete-id",
+      "matched": "REQ-0119",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
+      "category": "concrete-id",
+      "matched": "REQ-0146",
+      "count": 8
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md",
+      "category": "concrete-id",
+      "matched": "REQ-0131",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0113",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0136",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/references/create-append-update-flow.md",
+      "category": "concrete-id",
+      "matched": "REQ-0113",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/references/matching-and-merge.md",
+      "category": "concrete-id",
+      "matched": "REQ-0113",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-file-manager/references/numbering-and-validation.md",
+      "category": "concrete-id",
+      "matched": "REQ-0113",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0113",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-skill-authoring/references/design-principles.md",
+      "category": "concrete-id",
+      "matched": "REQ-0113",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/SKILL.md",
+      "category": "concrete-id",
+      "matched": "ADR-0123",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0103",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0113",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0136",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/references/spec-lifecycle-application.md",
+      "category": "concrete-id",
+      "matched": "ADR-0123",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/references/spec-lifecycle-application.md",
+      "category": "concrete-id",
+      "matched": "REQ-0136",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/references/spec-lifecycle-application.md",
+      "category": "concrete-id",
+      "matched": "REQ-0154",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/references/spec-lifecycle-application.md",
+      "category": "concrete-id",
+      "matched": "REQ-0156",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/references/target-area-matching.md",
+      "category": "concrete-id",
+      "matched": "ADR-0123",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/references/target-area-matching.md",
+      "category": "concrete-id",
+      "matched": "REQ-0136",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-spec-file-manager/scripts/README.md",
+      "category": "concrete-id",
+      "matched": "REQ-0136",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
+      "category": "concrete-id",
+      "matched": "REQ-0149",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/capture-boundaries.md",
+      "category": "concrete-id",
+      "matched": "REQ-0163",
+      "count": 3
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/case-auto-recovery.md",
+      "category": "concrete-id",
+      "matched": "ADR-0125",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/case-auto-recovery.md",
+      "category": "concrete-id",
+      "matched": "ADR-0132",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/case-auto-recovery.md",
+      "category": "concrete-id",
+      "matched": "ADR-0137",
+      "count": 2
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/case-auto-recovery.md",
+      "category": "concrete-id",
+      "matched": "ADR-0138",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/case-auto-recovery.md",
+      "category": "concrete-id",
+      "matched": "REQ-0114",
+      "count": 7
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/case-auto-recovery.md",
+      "category": "concrete-id",
+      "matched": "REQ-0162",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-orchestration/references/case-auto-recovery.md",
+      "category": "concrete-path",
+      "matched": "docs/specs/commands/case-auto.md",
+      "count": 4
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-templates/SKILL.md",
+      "category": "concrete-id",
+      "matched": "REQ-0132",
+      "count": 2
+    }
+  ]
+}

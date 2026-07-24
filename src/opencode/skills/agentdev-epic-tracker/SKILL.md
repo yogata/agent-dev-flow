@@ -13,7 +13,7 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は [`agentdev-epic-tracker` SPEC](../../../../docs/specs/skills/agentdev-epic-tracker.md) である。
+本スキルの原本仕様は `agentdev-epic-tracker` SPEC である。
 SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 

@@ -37,6 +37,39 @@ export interface BoundaryReport {
   };
 }
 
+export interface BaselineEntry {
+  file: string;
+  category: BoundaryFailure["category"];
+  matched: string;
+  count: number;
+}
+
+export interface BaselineFile {
+  version: 1;
+  rule_id: "IR-059";
+  generated_at: string;
+  description: string;
+  entries: BaselineEntry[];
+}
+
+export interface DeltaReport {
+  new_failures: BoundaryFailure[];
+  resolved: Array<{
+    file: string;
+    category: BoundaryFailure["category"];
+    matched: string;
+    baseline_count: number;
+    current_count: number;
+  }>;
+  ok: boolean;
+  stats: {
+    current_total: number;
+    baseline_total: number;
+    new_delta: number;
+    resolved_count: number;
+  };
+}
+
 const PUBLIC_COMMAND_DIR = "src/opencode/commands/agentdev";
 const PUBLIC_SKILLS_PARENT = "src/opencode/skills";
 
@@ -240,11 +273,193 @@ export function checkDistributionBoundary(repoRoot: string): BoundaryReport {
   };
 }
 
+function normalizeFileForBaseline(file: string, repoRoot: string): string {
+  const norm = file.replace(/\\/g, "/");
+  const root = repoRoot.replace(/\\/g, "/");
+  if (norm.startsWith(root + "/")) {
+    return norm.slice(root.length + 1);
+  }
+  return norm;
+}
+
+function countBySignature(
+  failures: BoundaryFailure[],
+  repoRoot: string,
+): Map<string, { file: string; category: BoundaryFailure["category"]; matched: string; count: number }> {
+  const map = new Map<string, { file: string; category: BoundaryFailure["category"]; matched: string; count: number }>();
+  for (const f of failures) {
+    const file = normalizeFileForBaseline(f.file, repoRoot);
+    const key = `${file}\u0000${f.category}\u0000${f.matched}`;
+    const existing = map.get(key);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      map.set(key, { file, category: f.category, matched: f.matched, count: 1 });
+    }
+  }
+  return map;
+}
+
+export function buildBaseline(report: BoundaryReport, repoRoot: string, description: string): BaselineFile {
+  const counts = countBySignature(report.failures, repoRoot);
+  const entries = Array.from(counts.values()).sort((a, b) => {
+    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+    if (a.category !== b.category) return a.category < b.category ? -1 : 1;
+    return a.matched < b.matched ? -1 : a.matched > b.matched ? 1 : 0;
+  });
+  return {
+    version: 1,
+    rule_id: "IR-059",
+    generated_at: new Date().toISOString().slice(0, 10),
+    description,
+    entries,
+  };
+}
+
+export function saveBaseline(baseline: BaselineFile, baselinePath: string): void {
+  fs.writeFileSync(baselinePath, JSON.stringify(baseline, null, 2) + "\n", "utf8");
+}
+
+export function loadBaseline(baselinePath: string): BaselineFile | null {
+  const text = readText(baselinePath);
+  if (text === null) return null;
+  try {
+    const parsed = JSON.parse(text) as BaselineFile;
+    if (parsed.version !== 1 || parsed.rule_id !== "IR-059" || !Array.isArray(parsed.entries)) {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function computeDelta(report: BoundaryReport, baseline: BaselineFile, repoRoot: string): DeltaReport {
+  const currentCounts = countBySignature(report.failures, repoRoot);
+  const baselineMap = new Map<string, BaselineEntry>();
+  for (const e of baseline.entries) {
+    baselineMap.set(`${e.file}\u0000${e.category}\u0000${e.matched}`, e);
+  }
+
+  const newFailures: BoundaryFailure[] = [];
+  const resolved: DeltaReport["resolved"] = [];
+
+  for (const [key, current] of currentCounts) {
+    const base = baselineMap.get(key);
+    const baselineCount = base ? base.count : 0;
+    if (current.count > baselineCount) {
+      const overshoot = current.count - baselineCount;
+      const matches = report.failures.filter(
+        (f) =>
+          normalizeFileForBaseline(f.file, repoRoot) === current.file &&
+          f.category === current.category &&
+          f.matched === current.matched,
+      );
+      for (let i = 0; i < overshoot; i++) {
+        const src = matches[baselineCount + i] ?? matches[matches.length - 1];
+        if (src) newFailures.push(src);
+      }
+    } else if (current.count < baselineCount) {
+      resolved.push({
+        file: current.file,
+        category: current.category,
+        matched: current.matched,
+        baseline_count: baselineCount,
+        current_count: current.count,
+      });
+    }
+  }
+
+  for (const [key, base] of baselineMap) {
+    if (!currentCounts.has(key)) {
+      resolved.push({
+        file: base.file,
+        category: base.category,
+        matched: base.matched,
+        baseline_count: base.count,
+        current_count: 0,
+      });
+    }
+  }
+
+  const baselineTotal = baseline.entries.reduce((sum, e) => sum + e.count, 0);
+  return {
+    new_failures: newFailures,
+    resolved: resolved.sort((a, b) => {
+      if (a.file !== b.file) return a.file < b.file ? -1 : 1;
+      if (a.category !== b.category) return a.category < b.category ? -1 : 1;
+      return a.matched < b.matched ? -1 : a.matched > b.matched ? 1 : 0;
+    }),
+    ok: newFailures.length === 0,
+    stats: {
+      current_total: report.failures.length,
+      baseline_total: baselineTotal,
+      new_delta: newFailures.length,
+      resolved_count: resolved.length,
+    },
+  };
+}
+
 if (require.main === module) {
   const args = process.argv.slice(2);
-  const repoRoot = args[0] || process.cwd();
+  const positional = args.filter((a) => !a.startsWith("--"));
+  const repoRoot = positional[0] || process.cwd();
   const json = args.includes("--json");
+
+  const saveBaselineIdx = args.indexOf("--save-baseline");
+  const deltaBaselineIdx = args.indexOf("--delta");
+  const baselinePath = saveBaselineIdx >= 0 ? args[saveBaselineIdx + 1] : deltaBaselineIdx >= 0 ? args[deltaBaselineIdx + 1] : null;
+
   const report = checkDistributionBoundary(repoRoot);
+
+  if (saveBaselineIdx >= 0 && baselinePath) {
+    const baseline = buildBaseline(
+      report,
+      repoRoot,
+      "IR-059 distribution reference boundary known-violations baseline",
+    );
+    saveBaseline(baseline, baselinePath);
+    if (json) {
+      process.stdout.write(JSON.stringify({ saved: baselinePath, entries: baseline.entries.length }, null, 2) + "\n");
+    } else {
+      process.stdout.write(`baseline saved: ${baselinePath}\n`);
+      process.stdout.write(`entries: ${baseline.entries.length}\n`);
+    }
+    process.exit(0);
+  }
+
+  if (deltaBaselineIdx >= 0 && baselinePath) {
+    const baseline = loadBaseline(baselinePath);
+    if (baseline === null) {
+      process.stderr.write(`error: cannot load baseline at ${baselinePath}\n`);
+      process.exit(2);
+    }
+    const delta = computeDelta(report, baseline, repoRoot);
+    if (json) {
+      process.stdout.write(JSON.stringify(delta, null, 2) + "\n");
+    } else {
+      process.stdout.write(`check_distribution_boundary.ts - delta guard\n`);
+      process.stdout.write(`=============================================================\n`);
+      process.stdout.write(`repoRoot: ${repoRoot}\n`);
+      process.stdout.write(`baseline: ${baselinePath}\n`);
+      process.stdout.write(`ok: ${delta.ok}\n`);
+      process.stdout.write(`stats: ${JSON.stringify(delta.stats, null, 2)}\n`);
+      process.stdout.write(`new failures (${delta.new_failures.length}):\n`);
+      for (const f of delta.new_failures) {
+        process.stdout.write(
+          `  [${f.category}] ${f.file}:${f.line} matched=${f.matched}\n    snippet: ${f.snippet}\n`,
+        );
+      }
+      if (delta.resolved.length > 0) {
+        process.stdout.write(`resolved (${delta.resolved.length}):\n`);
+        for (const r of delta.resolved) {
+          process.stdout.write(`  [${r.category}] ${r.file} matched=${r.matched} (${r.baseline_count} -> ${r.current_count})\n`);
+        }
+      }
+    }
+    process.exit(delta.ok ? 0 : 1);
+  }
+
   if (json) {
     process.stdout.write(JSON.stringify(report, null, 2) + "\n");
   } else {

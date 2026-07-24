@@ -7,7 +7,13 @@
  */
 
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
-import { checkDistributionBoundary } from "./check_distribution_boundary.ts";
+import {
+  checkDistributionBoundary,
+  buildBaseline,
+  saveBaseline,
+  loadBaseline,
+  computeDelta,
+} from "./check_distribution_boundary.ts";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -134,5 +140,114 @@ describe("checkDistributionBoundary", () => {
     expect(report.stats.concrete_id_hits).toBeGreaterThan(0);
     expect(report.stats.concrete_path_hits).toBeGreaterThan(0);
     expect(report.stats.fixed_url_hits).toBeGreaterThan(0);
+  });
+});
+
+describe("baseline build / save / load", () => {
+  test("buildBaseline dedupes by (file, category, matched) and counts occurrences", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    const baseline = buildBaseline(report, TMP_ROOT, "test baseline");
+    expect(baseline.version).toBe(1);
+    expect(baseline.rule_id).toBe("IR-059");
+    expect(baseline.description).toBe("test baseline");
+
+    const idEntry = baseline.entries.find(
+      (e) => e.category === "concrete-id" && e.matched === "ADR-0135",
+    );
+    expect(idEntry).toBeDefined();
+    expect(idEntry!.count).toBe(1);
+    expect(idEntry!.file).toBe("src/opencode/commands/agentdev/sample.md");
+
+    const totalCount = baseline.entries.reduce((s, e) => s + e.count, 0);
+    expect(totalCount).toBe(report.failures.length);
+  });
+
+  test("saveBaseline then loadBaseline round-trips", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    const baseline = buildBaseline(report, TMP_ROOT, "roundtrip");
+    const tmpFile = path.join(TMP_ROOT, "baseline.json");
+    saveBaseline(baseline, tmpFile);
+    const reloaded = loadBaseline(tmpFile);
+    expect(reloaded).not.toBeNull();
+    expect(reloaded!.entries.length).toBe(baseline.entries.length);
+    expect(reloaded!.description).toBe("roundtrip");
+    fs.unlinkSync(tmpFile);
+  });
+
+  test("loadBaseline returns null for malformed or wrong-rule files", () => {
+    const bad = path.join(TMP_ROOT, "bad.json");
+    fs.writeFileSync(bad, JSON.stringify({ version: 2, rule_id: "other" }), "utf8");
+    expect(loadBaseline(bad)).toBeNull();
+    fs.writeFileSync(bad, "not json at all", "utf8");
+    expect(loadBaseline(bad)).toBeNull();
+    expect(loadBaseline(path.join(TMP_ROOT, "absent.json"))).toBeNull();
+    fs.unlinkSync(bad);
+  });
+});
+
+describe("computeDelta", () => {
+  test("delta is empty when current matches baseline", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    const baseline = buildBaseline(report, TMP_ROOT, "snapshot");
+    const delta = computeDelta(report, baseline, TMP_ROOT);
+    expect(delta.ok).toBe(true);
+    expect(delta.new_failures.length).toBe(0);
+    expect(delta.resolved.length).toBe(0);
+    expect(delta.stats.new_delta).toBe(0);
+    expect(delta.stats.current_total).toBe(report.failures.length);
+    expect(delta.stats.baseline_total).toBe(report.failures.length);
+  });
+
+  test("delta flags a newly introduced violation", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    const baseline = buildBaseline(report, TMP_ROOT, "snapshot");
+    const newFailure = {
+      category: "concrete-id" as const,
+      file: path.join(TMP_ROOT, "src/opencode/commands/agentdev/sample.md"),
+      line: 99,
+      snippet: "Newly introduced REQ-1234 reference",
+      matched: "REQ-1234",
+    };
+    const reportWithExtra = { ...report, failures: [...report.failures, newFailure] };
+    const delta = computeDelta(reportWithExtra, baseline, TMP_ROOT);
+    expect(delta.ok).toBe(false);
+    expect(delta.new_failures.length).toBe(1);
+    expect(delta.new_failures[0]!.matched).toBe("REQ-1234");
+    expect(delta.stats.new_delta).toBe(1);
+  });
+
+  test("delta reports resolved when a baseline violation disappears", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    const pruned = report.failures.filter((f) => f.matched !== "ADR-0135");
+    const baseline = buildBaseline(report, TMP_ROOT, "snapshot");
+    const delta = computeDelta(
+      { ...report, failures: pruned },
+      baseline,
+      TMP_ROOT,
+    );
+    expect(delta.ok).toBe(true);
+    expect(delta.resolved.length).toBeGreaterThan(0);
+    const resolvedAdr = delta.resolved.find((r) => r.matched === "ADR-0135");
+    expect(resolvedAdr).toBeDefined();
+    expect(resolvedAdr!.baseline_count).toBe(1);
+    expect(resolvedAdr!.current_count).toBe(0);
+  });
+
+  test("delta counts overshoot within the same signature as new violations", () => {
+    const report = checkDistributionBoundary(TMP_ROOT);
+    const baseline = buildBaseline(report, TMP_ROOT, "snapshot");
+    const sameFile = path.join(TMP_ROOT, "src/opencode/commands/agentdev/sample.md");
+    const extra = {
+      category: "concrete-id" as const,
+      file: sameFile,
+      line: 200,
+      snippet: "duplicate ADR-0135",
+      matched: "ADR-0135",
+    };
+    const reportWithExtra = { ...report, failures: [...report.failures, extra] };
+    const delta = computeDelta(reportWithExtra, baseline, TMP_ROOT);
+    expect(delta.ok).toBe(false);
+    expect(delta.stats.new_delta).toBe(1);
+    expect(delta.new_failures[0]!.matched).toBe("ADR-0135");
   });
 });
