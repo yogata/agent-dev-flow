@@ -39,6 +39,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 - **再現性**: 同一 commit 状態に対して grep / parse 集計を行えば誰でも同一結果を得られる。集計ロジックは本 SPEC が定義し、実行は `inspect-docs`、`/repo/docs-check` が担う（本 SPEC 自体は計測ロジックを実装しない）
 
 宣言率指標は警告モードで運用し、不合格閾値を設けない（REQ-0136-035 段階適用、ADR-0124 soft-contract）。新規 SPEC から順次宣言付与を適用し、段階的な宣言率向上を追跡する。
+
 ## 閾値とシグナル
 
 ### SPEC 行数
