@@ -3700,9 +3700,12 @@ function isInsideCodeBlock(lines: string[], lineIndex: number): boolean {
  */
 function isTemplatePlaceholder(refPath: string): boolean {
   if (/\{[^}]*\}/.test(refPath)) return true;
-  // REQ-0144-025 / ADR-0136: <harness> 等の angle-bracket placeholder は
-  // 実ファイルを指さない抽象表記のため検査対象外とする。
-  if (/<[a-zA-Z][a-zA-Z0-9_-]*>/.test(refPath)) return true;
+  // REQ-0144-020: <...> 形式の angle-bracket placeholder は具体パスではなく
+  // 置換対象のパラメータ表現であるため実在確認の対象外とする。
+  // REQ-0144-025 / ADR-0136 由来の <harness> 等の抽象表記を含む。
+  // isTemplatePlaceholder は SCRIPT_TEMPLATE_REF_PATTERNS が捕捉した
+  // パス参照文字列のみを受け取るため、<> は placeholder 以外あり得ない。
+  if (/<[^<>]+>/.test(refPath)) return true;
   return false;
 }
 
