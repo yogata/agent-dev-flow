@@ -22,6 +22,7 @@ import { execSync } from "child_process";
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_changed_docs.ts");
 const CLI_UTILS_FILE = join(SCRIPT_DIR, "cli_utils.ts");
+const IR057_EXEMPTION_FILE = join(SCRIPT_DIR, "ir057_history_exemption.ts");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `changed-docs-test-${crypto.randomUUID().slice(0, 8)}`;
 const TEMP_ROOT = join(TEMP_BASE, RUN_ID);
@@ -68,6 +69,7 @@ function copyScripts(fixtureRoot: string): void {
   mkdirp(dest);
   copyFileSync(SCRIPT_FILE, join(dest, "check_changed_docs.ts"));
   copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
+  copyFileSync(IR057_EXEMPTION_FILE, join(dest, "ir057_history_exemption.ts"));
 }
 
 // Required TargetedDocsReport fields (REQ-0158 Phase 2 / AG-002 / Epic #1515 OU-005 TS-013).
@@ -192,17 +194,281 @@ function addSupersededFixtures(root: string): void {
   );
 }
 
+// Issue #1768 TS-001: IR-057 文書レベル履歴注記 exemption の回帰テスト用 fixture。
+// 正例（文書レベル履歴注記を持つ ADR）・負例（exemption 表未登録で現行機能の記述）・
+// 境界例（frontmatter 後本文の短い/長い、明示的注記ブロックあり/なし）を網羅する。
+function buildIr057ExemptionFixture(root: string): void {
+  const integrityDir = join(root, "docs", "specs", "integrity");
+  mkdirp(integrityDir);
+  writeFileSync(
+    join(integrityDir, "obsolete-path-map.yaml"),
+    [
+      'version: "1"',
+      "",
+      "scope:",
+      "  include:",
+      '    - "docs/**"',
+      '    - "src/**"',
+      "  exclude: []",
+      "",
+      "entries:",
+      '  - old: "docs/specs/system.md"',
+      '    new: "docs/specs/foundations/system.md"',
+      '    severity: "ng"',
+      "",
+      "legacy_local_generation_vocabulary:",
+      '  - term: "直接生成方式"',
+      '    severity: "ng"',
+      '  - term: "transform/generate.md"',
+      '    severity: "ng"',
+      '  - term: "local-opencode-transform"',
+      '    severity: "ng"',
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  const adrDir = join(root, "docs", "adr");
+  mkdirp(adrDir);
+
+  // 正例1: 条件1（frontmatter 後本文）。旧語彙を含むが文書レベル免除される。
+  writeFileSync(
+    join(adrDir, "ADR-09001.md"),
+    [
+      "---",
+      "id: ADR-09001",
+      "title: frontmatter 後本文パターン",
+      'status: "accepted"',
+      'created: "2026-07-24"',
+      'updated: "2026-07-24"',
+      "---",
+      "",
+      "本 ADR は直接生成方式から link mode への移行を記録する。transform/generate.md は廃止した。",
+      "",
+      "# 移行判断",
+      "",
+      "本文。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 正例2: 条件2（> 注記ブロック）。frontmatter 後は見出しへ飛び、> 本文書は歴史的経緯... が続く。
+  writeFileSync(
+    join(adrDir, "ADR-09002.md"),
+    [
+      "---",
+      "id: ADR-09002",
+      "title: blockquote 注記パターン",
+      'status: "accepted"',
+      'created: "2026-07-24"',
+      'updated: "2026-07-24"',
+      "---",
+      "",
+      "# 移行判断",
+      "",
+      "> 本文書は歴史的経緯を記録する。直接生成方式、transform/generate.md は旧資産の引用である。",
+      "",
+      "本文。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 正例3: ADR-0131 相当。> 旧語彙の引用について ブロックで Issue #1768 の3件を含む。
+  writeFileSync(
+    join(adrDir, "ADR-09003.md"),
+    [
+      "---",
+      "id: ADR-09003",
+      "title: ADR-0131 相当",
+      'status: "accepted"',
+      'created: "2026-07-24"',
+      'updated: "2026-07-24"',
+      "---",
+      "",
+      "# ADR-09003: link mode 移行",
+      "",
+      "> **旧語彙の引用について**: 本 ADR は ADR-0090（superseded）から link mode（decision #1）への移行判断を記録する歴史文書である。以下の背景、決定、結果影響において、直接生成方式、transform/generate.md は移行前の状態説明のための引用として使用する。",
+      "",
+      "## 背景",
+      "",
+      "旧直接生成方式と transform/generate.md を廃止した。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 正例4: superseded ADR（条件1）。
+  writeFileSync(
+    join(adrDir, "ADR-09004.md"),
+    [
+      "---",
+      "id: ADR-09004",
+      "title: superseded ADR",
+      'status: "superseded"',
+      "superseded_by: ADR-09999",
+      'created: "2026-07-24"',
+      'updated: "2026-07-24"',
+      "---",
+      "",
+      "本 ADR は直接生成方式を採用していた。transform/generate.md を使用していた。",
+      "",
+      "# タイトル",
+      "",
+      "本文。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 負例1: status=draft。文書レベル免除なし、行レベル marker なし → failure 報告される。
+  writeFileSync(
+    join(adrDir, "ADR-09005.md"),
+    [
+      "---",
+      "id: ADR-09005",
+      "title: draft ADR（exemption 対象外）",
+      'status: "draft"',
+      'created: "2026-07-24"',
+      'updated: "2026-07-24"',
+      "---",
+      "",
+      "本 ADR は直接生成方式を採用している。",
+      "",
+      "# タイトル",
+      "",
+      "本文。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 負例2: command 本文（exemption 表未登録）。旧語彙を現行機能の用語として使用 → failure 報告される。
+  const cmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(cmdDir);
+  writeFileSync(
+    join(cmdDir, "dummy-cmd.md"),
+    [
+      "---",
+      "description: dummy command",
+      "agent: build",
+      "---",
+      "",
+      "# dummy-cmd",
+      "",
+      "直接生成方式で処理する。transform/generate.md を呼び出す。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 境界例1: frontmatter 後本文が短い（1行）。
+  writeFileSync(
+    join(adrDir, "ADR-09006.md"),
+    [
+      "---",
+      "id: ADR-09006",
+      "title: 短い本文パターン",
+      'status: "accepted"',
+      'created: "2026-07-24"',
+      'updated: "2026-07-24"',
+      "---",
+      "",
+      "直接生成方式の歴史メモ。",
+      "",
+      "# タイトル",
+      "",
+      "本文。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 境界例2: frontmatter 後本文が長い（複数段落）。
+  writeFileSync(
+    join(adrDir, "ADR-09007.md"),
+    [
+      "---",
+      "id: ADR-09007",
+      "title: 長い本文パターン",
+      'status: "accepted"',
+      'created: "2026-07-24"',
+      'updated: "2026-07-24"',
+      "---",
+      "",
+      "本 ADR は直接生成方式の歴史経緯を記録する。",
+      "",
+      "前段落。直接生成方式は廃止された。",
+      "",
+      "後段落。transform/generate.md も廃止された。",
+      "",
+      "# タイトル",
+      "",
+      "本文。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 境界例3: 明示的 > 注記ブロックあり、frontmatter 後本文なし。
+  writeFileSync(
+    join(adrDir, "ADR-09008.md"),
+    [
+      "---",
+      "id: ADR-09008",
+      "title: blockquote のみ（frontmatter 後本文なし）",
+      'status: "accepted"',
+      'created: "2026-07-24"',
+      'updated: "2026-07-24"',
+      "---",
+      "",
+      "# タイトル",
+      "",
+      "> 本 ADR は移行履歴を保持する。直接生成方式と transform/generate.md を含む。",
+      "",
+      "本文。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // 境界例4: 注記なし、frontmatter 後本文なし（frontmatter 後即見出し）。failure 報告される。
+  writeFileSync(
+    join(adrDir, "ADR-09009.md"),
+    [
+      "---",
+      "id: ADR-09009",
+      "title: 注記なし",
+      'status: "accepted"',
+      'created: "2026-07-24"',
+      'updated: "2026-07-24"',
+      "---",
+      "",
+      "# タイトル",
+      "",
+      "直接生成方式で処理する。transform/generate.md を呼び出す。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
 const FIXTURE_ROOT = join(TEMP_ROOT, "fixture");
 const GIT_FIXTURE_ROOT = join(TEMP_ROOT, "git-fixture");
+const IR057_FIXTURE_ROOT = join(TEMP_ROOT, "ir057-fixture");
 
 beforeAll(() => {
   mkdirp(FIXTURE_ROOT);
   mkdirp(GIT_FIXTURE_ROOT);
+  mkdirp(IR057_FIXTURE_ROOT);
   buildMinimalFixture(FIXTURE_ROOT);
   buildMinimalFixture(GIT_FIXTURE_ROOT);
   addSupersededFixtures(FIXTURE_ROOT);
+  buildIr057ExemptionFixture(IR057_FIXTURE_ROOT);
   copyScripts(FIXTURE_ROOT);
   copyScripts(GIT_FIXTURE_ROOT);
+  copyScripts(IR057_FIXTURE_ROOT);
   initGitFixture(GIT_FIXTURE_ROOT);
 });
 
@@ -696,5 +962,78 @@ describe("Issue #1671 TS-004: SPEC status superseded_by handling (ADR-0123, REQ-
       (f: { rule_id: string }) => f.rule_id === "SPEC-STATUS",
     );
     expect(statusFailures).toEqual([]);
+  });
+});
+
+// ─── Issue #1768 TS-001: IR-057 文書レベル履歴注記 exemption (targeted guard) ──
+//
+// SPEC IR-057「例外登録（現行ADRの履歴記載）」セクション準拠。targeted guard
+// （check_changed_docs.ts）は full audit（check_integrity.ts）と同じ例外規則を
+// 使用する（REQ-0144-024）。正例は旧語彙を含む文書レベル履歴注記 ADR、負例は
+// exemption 表未登録で現行機能の記述、境界例は注記の長短・有無を検証する。
+
+describe("Issue #1768 TS-001: IR-057 文書レベル履歴注記 exemption (targeted guard)", () => {
+  function ir057FailuresOf(file: string): { rule_id: string; file: string; line: number; message: string }[] {
+    const r = runScript(IR057_FIXTURE_ROOT, [
+      "--workflow", "case-close",
+      "--files", file,
+      "--json",
+    ]);
+    const parsed = JSON.parse(r.stdout);
+    return parsed.failures.filter((f: { rule_id: string }) => f.rule_id === "IR-057");
+  }
+
+  it("正例1: frontmatter 後本文（条件1）→ IR-057 failure なし", () => {
+    const failures = ir057FailuresOf("docs/adr/ADR-09001.md");
+    expect(failures).toEqual([]);
+  });
+
+  it("正例2: 明示的 > 注記ブロック（条件2）→ IR-057 failure なし", () => {
+    const failures = ir057FailuresOf("docs/adr/ADR-09002.md");
+    expect(failures).toEqual([]);
+  });
+
+  it("正例3: ADR-0131 相当（> 旧語彙の引用について）→ IR-057 failure なし（Issue #1768 主訴求事項）", () => {
+    const failures = ir057FailuresOf("docs/adr/ADR-09003.md");
+    expect(failures).toEqual([]);
+  });
+
+  it("正例4: superseded ADR（条件1）→ IR-057 failure なし", () => {
+    const failures = ir057FailuresOf("docs/adr/ADR-09004.md");
+    expect(failures).toEqual([]);
+  });
+
+  it("負例1: status=draft ADR（文書レベル免除対象外）→ IR-057 strict failure 報告", () => {
+    const failures = ir057FailuresOf("docs/adr/ADR-09005.md");
+    expect(failures.length).toBeGreaterThan(0);
+    expect(failures.some((f) => f.message.includes("直接生成方式"))).toBe(true);
+  });
+
+  it("負例2: command 本文（exemption 表未登録）→ IR-057 strict failure 報告", () => {
+    const failures = ir057FailuresOf("src/opencode/commands/agentdev/dummy-cmd.md");
+    expect(failures.length).toBeGreaterThan(0);
+    expect(failures.some((f) => f.message.includes("直接生成方式"))).toBe(true);
+    expect(failures.some((f) => f.message.includes("transform/generate.md"))).toBe(true);
+  });
+
+  it("境界例1: frontmatter 後本文が短い（1行）→ 文書レベル注記として認識し IR-057 failure なし", () => {
+    const failures = ir057FailuresOf("docs/adr/ADR-09006.md");
+    expect(failures).toEqual([]);
+  });
+
+  it("境界例2: frontmatter 後本文が長い（複数段落）→ 文書レベル注記として認識し IR-057 failure なし", () => {
+    const failures = ir057FailuresOf("docs/adr/ADR-09007.md");
+    expect(failures).toEqual([]);
+  });
+
+  it("境界例3: 明示的 > 注記ブロックのみ（frontmatter 後本文なし）→ 条件2で IR-057 failure なし", () => {
+    const failures = ir057FailuresOf("docs/adr/ADR-09008.md");
+    expect(failures).toEqual([]);
+  });
+
+  it("境界例4: 注記なし・frontmatter 後本文なし → 文書レベル免除なし、IR-057 strict failure 報告", () => {
+    const failures = ir057FailuresOf("docs/adr/ADR-09009.md");
+    expect(failures.length).toBeGreaterThan(0);
+    expect(failures.some((f) => f.message.includes("直接生成方式"))).toBe(true);
   });
 });

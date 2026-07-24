@@ -32,6 +32,10 @@ import {
   type FindingCategory,
   findRepoRoot,
 } from "./cli_utils.ts";
+import {
+  isFileLevelHistoryExempt,
+  hasLineLevelHistoryMarker,
+} from "./ir057_history_exemption.ts";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -419,11 +423,13 @@ function checkObsoleteSpecPath(
     if (/docs\/requirements\/REQ-010[12]\.md$/.test(rel)) continue;
     const content = readText(f);
     if (!content) continue;
+    if (isFileLevelHistoryExempt(rel, content)) continue;
     const lines = content.split("\n");
     for (const old of oldPaths) {
       for (let i = 0; i < lines.length; i++) {
         if (!lines[i].includes(old)) continue;
         if (isInsideCodeBlock(lines, i)) continue;
+        if (hasLineLevelHistoryMarker(lines[i])) continue;
         failures.push({
           rule_id: "IR-057",
           severity: "strict",
@@ -463,11 +469,13 @@ function checkLegacyVocab(
     if (/repo-agentdev-integrity\/scripts\/check_integrity\.ts$/.test(rel)) continue;
     const content = readText(f);
     if (!content) continue;
+    if (isFileLevelHistoryExempt(rel, content)) continue;
     const lines = content.split("\n");
     for (const term of vocab) {
       for (let i = 0; i < lines.length; i++) {
         if (!lines[i].includes(term)) continue;
         if (isInsideCodeBlock(lines, i)) continue;
+        if (hasLineLevelHistoryMarker(lines[i])) continue;
         failures.push({
           rule_id: "IR-057",
           severity: "strict",
