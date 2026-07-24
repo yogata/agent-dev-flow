@@ -73,7 +73,7 @@ SPEC 分離候補は要件候補、衝突候補に付随情報として併記し
 
 ## 起動方法
 
-アーキテクチャ助言サブエージェントの具体的起動方法、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-0162-002）。
+アーキテクチャ助言サブエージェントの具体的起動方法、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する。
 配布物（本 SKILL.md）は起動手段を固定せず、相談プロトコル知識のみを提供する。
 起動の具象実装ノートは `references/architecture-review-delegation.md` 参照。
 

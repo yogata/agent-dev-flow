@@ -1,7 +1,7 @@
 # `agentdev-req-file-manager` scripts
 
 REQ/ADR 固有の採番・検索処理のみを扱う決定的処理スクリプト群（REQ/160、AG-002/006、design-principles.md 第5節）。
-`search-target-area.ts` は `agentdev-spec-file-manager` へ移管済み（REQ-0136-029/032）。
+`search-target-area.ts` は `agentdev-spec-file-manager` へ移管済み。
 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-019、RU-20260722-01 合意）。
 
 ## 構成

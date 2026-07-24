@@ -1,6 +1,6 @@
 # `agentdev-artifact-validation` scripts
 
-文書種別横断の決定的検証 script 群と共有 lib（REQ-0103-159/160、AG-003/009/019、design-principles.md 第5節）。
+文書種別横断の決定的検証 script 群と共有 lib（AG-003/009/019、design-principles.md 第5節）。
 
 ## 構成
 
