@@ -132,6 +132,30 @@ DOC-MAP 記載と実際の基準文書（REQ/ADR/SPEC）の構造が不整合で
 
 DOC-MAP の読み方ガイド、ドキュメント探索順序、影響確認ルールは `agentdev-doc-map` が所有する。本スキルは横断スキャンで不整合候補を抽出し、ルーティングする。
 
+## 配布物統合性
+
+配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンに従い、構文健全性、文意保持、責務整合を診断する。docs-spec-rebuild-integrity SPEC が検出パターンを定義し、本スキルが診断カテゴリ、共通証拠構造、finding 出力契約を正規所有する。判定ロジック、検出手順、問題候補出力スキーマは `agentdev-req-structure-diagnostics` が所有し、本スキルは対象範囲の特定とルーティングを行う。
+
+### 構文健全性検査パターン
+
+docs-spec-rebuild-integrity SPEC が定義する5パターンを配布物整合性診断を提供する各 command（inspect-docs、inspect-skills）に共通で適用する。
+
+| パターン | 横断スキャン観点 | 検出対象外 |
+|----------|------------------|------------|
+| frontmatter 重複 | 配布物 Markdown frontmatter の重複、破損 | 許容される重複（テンプレート等） |
+| 見出し重複 | 同一文書内の H1/H2 等の主要見出しの意図せぬ重複 | 許容される重複（手順番号等） |
+| Markdown 構文破損 | 正規表現破損、未対応フェンス、不正インラインコード等 | （該当なし） |
+| 存在しない command 参照 | README listing と command 本文の相互参照で存在しない command を指す参照 | 実在する command 参照 |
+| エンコーディング不整合 | UTF-8 BOM 付きファイル、単一ファイル内の CRLF/LF 混在 | BOM なし UTF-8 かつ単一改行コードで構成されたファイル |
+
+存在しない command 参照の検出は README listing（`src/opencode/commands/agentdev/README.md` の command 一覧）と command 本文（各 `*.md`）の相互参照について `/agentdev/*` 参照を抽出し、実在する command 一覧と照合する。実在確認であった command 参照は検出対象外とする。
+
+エンコーディング不整合の検出は配布物 Markdown の先頭3バイトから UTF-8 BOM（`EF BB BF`）の有無を判定し、当該ファイル内の改行コード出現集合（CRLF、LF のいずれか、または両方）から混在を判定する。BOM なし UTF-8 かつ単一の改行コードで構成されたファイルは検出対象外とする。
+
+### ルーティング先
+
+判定ロジック、検出手順、問題候補出力スキーマ（7フィールド）は `agentdev-req-structure-diagnostics` が所有する。本スキルは配布物統合性を inspect-docs Step 11、inspect-skills Step 3 でルーティングし、検出事項を共通 finding 出力契約（`finding-output-contract.md`）へ正規化する。
+
 ## 安定契約例外の総合判定
 
 複数カテゴリにまたがる安定契約例外候補は、個別カテゴリで確信度を調整した上で横断的に再評価する。
