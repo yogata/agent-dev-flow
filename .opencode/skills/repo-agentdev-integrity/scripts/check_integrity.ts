@@ -74,7 +74,7 @@ import {
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
 const USAGE =
-  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--update-ir055-baseline] [--update-ng-baseline]";
+  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--update-ir055-baseline] [--update-ng-baseline --ng-baseline-additions <manifest.json>]";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -7173,11 +7173,17 @@ function updateIr055Baseline(root: string): void {
 // unreachable while a known baseline of pre-existing NGs exists. REQ-0161-005
 // redefines the pass criterion as delta-aware: baseline-known NGs are demoted
 // to info (report-only), only NGs exceeding the baseline (new, caused by the
-// change under review) cause failure. The baseline is regenerated explicitly
-// via --update-ng-baseline; it is NOT auto-updated on every run.
+// change under review) cause failure. The baseline is updated explicitly via
+// --update-ng-baseline with an approved additions manifest; it is NOT
+// auto-regenerated on every run, and unmanaged NGs are never absorbed.
 //
 // Bucket key: `${category}\t${check}\t${file||''}\t${evidence||''}`. A bucket
 // with current count <= baseline count is fully baseline-known.
+//
+// SPEC: docs/specs/integrity/integrity-contracts.md「NG baseline 運用手順」.
+// Each entry carries `provenance`（由来ラベル）and `reason`（承認理由）. Demoted
+// findings are classified into three report categories: baseline-known,
+// approved additions (provenance-tracked), new unmanaged NG.
 
 const NG_BASELINE_PATH = path.join(
   ".opencode",
@@ -7193,6 +7199,8 @@ interface NgBaselineEntry {
   file: string | null;
   evidence: string | null;
   count: number;
+  provenance: string;
+  reason: string;
 }
 
 interface NgBaseline {
@@ -7200,6 +7208,31 @@ interface NgBaseline {
   rule_id: "NG-BASELINE";
   generated_at: string;
   entries: NgBaselineEntry[];
+}
+
+// Entry in the additions manifest passed to --update-ng-baseline. Each addition
+// must declare a provenance label and a reason; entries without them are
+// rejected so the baseline cannot silently absorb unmanaged NGs.
+interface NgBaselineAddition {
+  category: string;
+  check: string;
+  file: string | null;
+  evidence: string | null;
+  count: number;
+  provenance: string;
+  reason: string;
+}
+
+interface NgBaselineAdditionsManifest {
+  additions: NgBaselineAddition[];
+}
+
+// Report returned by applyNgBaseline: three NG classification counts per SPEC
+// (baseline-known, approved additions, new unmanaged).
+interface NgBaselineReport {
+  baselineKnown: number;
+  approvedAdditions: number;
+  newNg: number;
 }
 
 function ngBaselineKey(
@@ -7211,12 +7244,38 @@ function ngBaselineKey(
   return `${category}\t${check}\t${file ?? ""}\t${evidence ?? ""}`;
 }
 
+// Normalize a parsed entry to fill provenance/reason for backward compat with
+// baseline files written before REQ-0161-005 introduced the fields. Missing
+// values are treated as "legacy" provenance so existing baseline NGs continue
+// to demote to info without forcing a one-shot migration of the JSON file.
+function normalizeNgBaselineEntry(raw: Partial<NgBaselineEntry>): NgBaselineEntry {
+  return {
+    category: String(raw.category ?? ""),
+    check: String(raw.check ?? ""),
+    file: raw.file === null || raw.file === undefined ? null : String(raw.file),
+    evidence:
+      raw.evidence === null || raw.evidence === undefined
+        ? null
+        : String(raw.evidence),
+    count: typeof raw.count === "number" ? raw.count : 0,
+    provenance: raw.provenance ? String(raw.provenance) : "legacy",
+    reason: raw.reason ? String(raw.reason) : "",
+  };
+}
+
 function loadNgBaseline(root: string): NgBaseline | null {
   const baselineAbs = path.join(root, NG_BASELINE_PATH);
   const content = readText(baselineAbs);
   if (!content) return null;
   try {
-    return JSON.parse(content) as NgBaseline;
+    const parsed = JSON.parse(content) as Partial<NgBaseline>;
+    if (!parsed || !Array.isArray(parsed.entries)) return null;
+    return {
+      version: typeof parsed.version === "number" ? parsed.version : 1,
+      rule_id: "NG-BASELINE",
+      generated_at: parsed.generated_at ?? "",
+      entries: parsed.entries.map(normalizeNgBaselineEntry),
+    };
   } catch {
     return null;
   }
@@ -7227,6 +7286,73 @@ function writeNgBaseline(root: string, baseline: NgBaseline): void {
   const dir = path.dirname(baselineAbs);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(baselineAbs, JSON.stringify(baseline, null, 2) + "\n", "utf-8");
+}
+
+// Load the additions manifest from disk. Validates that every addition carries
+// non-empty provenance and reason; throws on a malformed manifest so the CLI
+// surfaces the error rather than silently absorbing unmanaged NGs.
+function loadNgBaselineAdditions(manifestPath: string): NgBaselineAddition[] {
+  const content = readText(manifestPath);
+  if (!content) {
+    throw new Error(
+      `NG baseline additions manifest not found or unreadable: ${manifestPath}`,
+    );
+  }
+  let parsed: Partial<NgBaselineAdditionsManifest>;
+  try {
+    parsed = JSON.parse(content) as Partial<NgBaselineAdditionsManifest>;
+  } catch (e) {
+    throw new Error(
+      `NG baseline additions manifest is not valid JSON: ${manifestPath} (${
+        e instanceof Error ? e.message : String(e)
+      })`,
+    );
+  }
+  if (!parsed || !Array.isArray(parsed.additions)) {
+    throw new Error(
+      `NG baseline additions manifest must have an "additions" array: ${manifestPath}`,
+    );
+  }
+  const additions: NgBaselineAddition[] = [];
+  for (let i = 0; i < parsed.additions.length; i++) {
+    const raw = parsed.additions[i];
+    if (!raw || typeof raw !== "object") {
+      throw new Error(
+        `NG baseline additions[${i}] is not an object in ${manifestPath}`,
+      );
+    }
+    const category = typeof raw.category === "string" ? raw.category : "";
+    const check = typeof raw.check === "string" ? raw.check : "";
+    if (!category || !check) {
+      throw new Error(
+        `NG baseline additions[${i}] missing required category/check in ${manifestPath}`,
+      );
+    }
+    const provenance =
+      typeof raw.provenance === "string" && raw.provenance.length > 0
+        ? raw.provenance
+        : "";
+    const reason =
+      typeof raw.reason === "string" && raw.reason.length > 0 ? raw.reason : "";
+    if (!provenance || !reason) {
+      throw new Error(
+        `NG baseline additions[${i}] (${category}/${check}) missing required provenance or reason in ${manifestPath}`,
+      );
+    }
+    additions.push({
+      category,
+      check,
+      file: raw.file === null || raw.file === undefined ? null : String(raw.file),
+      evidence:
+        raw.evidence === null || raw.evidence === undefined
+          ? null
+          : String(raw.evidence),
+      count: typeof raw.count === "number" && raw.count > 0 ? raw.count : 1,
+      provenance,
+      reason,
+    });
+  }
+  return additions;
 }
 
 function summarizeNgResults(
@@ -7255,63 +7381,136 @@ function summarizeNgResults(
 }
 
 // Demote baseline-known ng/warning to info so the exit code reflects only the
-// delta (new findings) from the baseline. Returns counts for reporting.
+// delta (new findings) exceeding the baseline. Returns counts split into three
+// SPEC categories: baseline-known (legacy entries, no provenance), approved
+// additions (entries with a non-legacy provenance label), and new unmanaged NG
+// (excess over baseline).
 function applyNgBaseline(
   results: CheckResult[],
   baseline: NgBaseline,
-): { demotedToInfo: number; newNg: number } {
-  const baselineIndex = new Map<string, number>();
+): NgBaselineReport {
+  const baselineIndex = new Map<string, { count: number; provenance: string }>();
   for (const entry of baseline.entries) {
     const key = ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
-    baselineIndex.set(key, entry.count);
+    baselineIndex.set(key, { count: entry.count, provenance: entry.provenance });
   }
 
   const currentSummary = summarizeNgResults(results);
   const newBuckets = new Set<string>();
   for (const [key, entry] of currentSummary) {
-    const baselineCount = baselineIndex.get(key) ?? 0;
+    const baselineEntry = baselineIndex.get(key);
+    const baselineCount = baselineEntry?.count ?? 0;
     if (entry.count > baselineCount) newBuckets.add(key);
   }
 
   const emittedPerBucket = new Map<string, number>();
-  let demotedToInfo = 0;
+  let baselineKnown = 0;
+  let approvedAdditions = 0;
   let newNg = 0;
 
   for (const r of results) {
     if (r.level !== "ng" && r.level !== "warning") continue;
     const key = ngBaselineKey(r.category, r.check, r.file ?? null, r.evidence ?? null);
-    const baselineCount = baselineIndex.get(key) ?? 0;
+    const baselineEntry = baselineIndex.get(key);
+    const baselineCount = baselineEntry?.count ?? 0;
+    const provenance = baselineEntry?.provenance ?? "legacy";
     const emitted = emittedPerBucket.get(key) ?? 0;
     emittedPerBucket.set(key, emitted + 1);
     if (emitted < baselineCount && !newBuckets.has(key)) {
       r.level = "info";
       r.finding_level = "observation";
-      r.message = `[baseline-known] ${r.message} (NG baseline, not yet cleaned)`;
-      demotedToInfo++;
+      const tag =
+        provenance === "legacy"
+          ? "[baseline-known]"
+          : `[baseline-known provenance=${provenance}]`;
+      r.message = `${tag} ${r.message} (NG baseline, not yet cleaned)`;
+      if (provenance === "legacy") {
+        baselineKnown++;
+      } else {
+        approvedAdditions++;
+      }
     } else {
       newNg++;
     }
   }
-  return { demotedToInfo, newNg };
+  return { baselineKnown, approvedAdditions, newNg };
 }
 
-function updateNgBaseline(root: string, results: CheckResult[]): void {
-  const summary = summarizeNgResults(results);
-  const baseline: NgBaseline = {
+// Selectively merge approved additions into the baseline. Per SPEC the update
+// does NOT regenerate the whole baseline from current NGs: it merges approved
+// deltas (each carrying provenance + reason) into existing buckets, leaving
+// unmanaged NGs out of the baseline so they remain restoration targets.
+function updateNgBaseline(
+  root: string,
+  results: CheckResult[],
+  additions: NgBaselineAddition[],
+): { addedEntries: number; updatedEntries: number } {
+  const baseline = loadNgBaseline(root) ?? {
     version: 1,
+    rule_id: "NG-BASELINE" as const,
+    generated_at: new Date().toISOString().slice(0, 10),
+    entries: [],
+  };
+
+  const index = new Map<string, NgBaselineEntry>();
+  for (const entry of baseline.entries) {
+    index.set(
+      ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence),
+      entry,
+    );
+  }
+
+  // Current NG counts per bucket — used to cap the merged baseline count so a
+  // provenance label cannot raise the bucket above the observable NG count
+  // (prevents NG隠蔽 via over-counting).
+  const currentCounts = summarizeNgResults(results);
+
+  let addedEntries = 0;
+  let updatedEntries = 0;
+  for (const add of additions) {
+    const key = ngBaselineKey(add.category, add.check, add.file, add.evidence);
+    const current = currentCounts.get(key);
+    const existing = index.get(key);
+    const baseCount = existing ? existing.count : 0;
+    const mergedCount = baseCount + add.count;
+    // Cap at current observable count when current data is available: the
+    // baseline cannot exceed what the checks actually emit.
+    const finalCount = current ? Math.min(mergedCount, current.count) : mergedCount;
+    if (finalCount <= baseCount) {
+      // Nothing to add (current NG count already covered by baseline).
+      continue;
+    }
+    const entry: NgBaselineEntry = {
+      category: add.category,
+      check: add.check,
+      file: add.file,
+      evidence: add.evidence,
+      count: finalCount,
+      provenance: add.provenance,
+      reason: add.reason,
+    };
+    index.set(key, entry);
+    if (existing) updatedEntries++;
+    else addedEntries++;
+  }
+
+  const updated: NgBaseline = {
+    version: baseline.version,
     rule_id: "NG-BASELINE",
     generated_at: new Date().toISOString().slice(0, 10),
-    entries: [...summary.values()].sort((a, b) => {
+    entries: [...index.values()].sort((a, b) => {
       if (a.category !== b.category) return a.category < b.category ? -1 : 1;
       if (a.check !== b.check) return a.check < b.check ? -1 : 1;
-      if ((a.file ?? "") !== (b.file ?? "")) return (a.file ?? "") < (b.file ?? "") ? -1 : 1;
+      if ((a.file ?? "") !== (b.file ?? ""))
+        return (a.file ?? "") < (b.file ?? "") ? -1 : 1;
       return 0;
     }),
   };
-  writeNgBaseline(root, baseline);
+  writeNgBaseline(root, updated);
   console.error(
-    `[integrity] NG baseline regenerated: ${baseline.entries.length} entries (${results.filter((r) => r.level === "ng").length} total NG).`,
+    `[integrity] NG baseline updated: ${addedEntries} added, ${updatedEntries} updated (additions manifest: ${additions.length}).`,
   );
+  return { addedEntries, updatedEntries };
 }
 
 // ===== IR-057: obsolete-spec-path-after-domain-split (REQ-0158-002) =====
@@ -8391,15 +8590,36 @@ async function main(): Promise<void> {
   const processed = processResults(results);
 
   // REQ-0161-005: baseline-aware strict pass. When --update-ng-baseline is
-  // requested, snapshot the current NG set and exit. Otherwise, demote
+  // requested, merge the approved additions manifest into the baseline (the
+  // manifest is required; unmanaged NGs are never absorbed). Otherwise demote
   // baseline-known NGs to info so the exit code reflects only the delta.
   if (args.includes("--update-ng-baseline")) {
-    updateNgBaseline(root, processed);
+    const additionsFlagIdx = args.indexOf("--ng-baseline-additions");
+    const manifestPath =
+      additionsFlagIdx >= 0 ? args[additionsFlagIdx + 1] : undefined;
+    if (!manifestPath) {
+      console.error(
+        "[integrity] --update-ng-baseline requires --ng-baseline-additions <manifest.json> (REQ-0161-005: unmanaged NGs must not be absorbed).",
+      );
+      process.exit(EXIT_ERROR);
+    }
+    let additions: NgBaselineAddition[];
+    try {
+      additions = loadNgBaselineAdditions(manifestPath);
+    } catch (e) {
+      console.error(
+        `[integrity] ${
+          e instanceof Error ? e.message : String(e)
+        }`,
+      );
+      process.exit(EXIT_ERROR);
+    }
+    updateNgBaseline(root, processed, additions);
     process.exit(EXIT_OK);
   }
 
   const ngBaseline = loadNgBaseline(root);
-  let ngBaselineInfo: { demotedToInfo: number; newNg: number } | null = null;
+  let ngBaselineInfo: NgBaselineReport | null = null;
   if (ngBaseline) {
     ngBaselineInfo = applyNgBaseline(processed, ngBaseline);
   }
@@ -8424,7 +8644,7 @@ async function main(): Promise<void> {
   console.error(`Report written to: ${reportPath}`);
   if (ngBaselineInfo) {
     console.error(
-      `[integrity] NG baseline applied: ${ngBaselineInfo.demotedToInfo} baseline-known (demoted to info), ${ngBaselineInfo.newNg} new NG (delta).`,
+      `[integrity] NG baseline applied: ${ngBaselineInfo.baselineKnown} baseline-known (demoted to info), ${ngBaselineInfo.approvedAdditions} approved additions (provenance-tracked, demoted to info), ${ngBaselineInfo.newNg} new unmanaged NG (delta, exit code driver).`,
     );
   }
 
