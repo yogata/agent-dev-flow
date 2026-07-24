@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細
 status: accepted
 created: 2026-07-15
-updated: 2026-07-21
+updated: 2026-07-24
 ---
 
 # Targeted Docs Guard 実装詳細
@@ -113,6 +113,16 @@ case-close では保存工程より広めに以下を確認する。
 case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/spec-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。appliesTo は `docs/specs/**`, `docs/requirements/**`, `docs/adr/**`, `docs/guides/**`, `AGENTS.md`, `README.md`, `docs/DOC-MAP.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
 
 ## full_docs_check_recommended 条件
+
+更新要否フラグ（`requirements_readme_update_required`、`spec_readme_update_required`、`extensions_check_required`、`full_docs_check_recommended`）は、変更ファイルの存在または変更種別名ではなく、行レベル差分が次の導出元へ影響するかで判定する。
+
+- 文書の追加、削除、移動、名称変更
+- 索引に使用される frontmatter 値（id、title、status 等）
+- 公開入口、manifest、一覧に影響する値
+- extension が参照する対象や責務
+- DOC-MAP や README の生成元情報
+
+REQ と SPEC の README 更新要否（`requirements_readme_update_required`、`spec_readme_update_required`）は、対象文書の追加、削除、移動、名称変更、または索引に使用される frontmatter 値の変更で `true` とする。相互参照追記、相対パス是正、表記修正など、上記導出元に影響しない変更では全フラグを `false` にする。
 
 case-close profile の `full_docs_check_recommended` の判定条件（REQ-0158 より移管）。以下の変更を検出した場合に `true` とする。
 

@@ -2,7 +2,7 @@
 title: "配布物整合性検査ルール"
 status: accepted
 created: 2026-06-22
-updated: 2026-07-18
+updated: 2026-07-24
 ---
 
 # 配布物整合性検査ルール
@@ -41,6 +41,14 @@ REQ-0142-006 / REQ-0142-007 の検査観点の詳細を配置する。
 - frontmatter 重複検出パターン
 - 見出し（タイトル、入力、出力、手順）重複検出パターン
 - Markdown 構文破損検出パターン
+- 存在しない command 参照の検出パターン
+- エンコーディング不整合の検出パターン
+
+存在しない command 参照の検出は、README listing と command 本文の相互参照について、存在しない command を指す参照を検出事項として出力する。実在する command を指す参照は検出対象としない。
+
+エンコーディング不整合の検出は、配布物 Markdown の UTF-8 BOM の有無と改行コードの一貫性を検査し、UTF-8 BOM 付きファイルまたは単一ファイル内の CRLF/LF 混在を検出事項とする。BOM なし UTF-8 かつ単一の改行コードで構成されたファイルは検出対象としない。
+
+これらの検出は配布物整合性診断を提供する各 command（inspect-docs、inspect-skills）に共通で適用する。診断カテゴリ、共通証拠構造、finding 出力契約は agentdev-doc-diagnostics skill（`docs/specs/skills/agentdev-doc-diagnostics.md`「検証観点」「See Also」が正規所有箇所）を正規所有者とし、本 SPEC は検出パターンの定義に特化する。
 
 ## 文意保持検査
 
