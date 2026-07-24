@@ -201,12 +201,15 @@ function resolveChangedFiles(
         `git diff --name-only ${baseRef}...HEAD`,
         { cwd: root, encoding: "utf-8" },
       ) as string;
+      // Issue #1784: existsSync filter removed for --base-ref mode.
+      // 削除・移動されたファイルも files_checked に含め、行レベル意味差分で
+      // lifecycle (deleted/renamed) を検出できるようにする。下游の content 系検査は
+      // readText が null を返した場合 skip し、flag 系は git status を見るため安全。
       return out
         .split("\n")
         .map((l) => l.trim())
         .filter((l) => l.length > 0)
-        .map((rel) => path.join(root, rel.replace(/\//g, path.sep)))
-        .filter((f) => fs.existsSync(f));
+        .map((rel) => path.join(root, rel.replace(/\//g, path.sep)));
     } catch (e) {
       throw new Error(
         `git diff against --base-ref ${baseRef} failed: ${e instanceof Error ? e.message : String(e)}`,
@@ -541,6 +544,192 @@ function parseSimpleFrontmatter(content: string): Record<string, string> | null 
   return result;
 }
 
+// ─── Line-level change descriptor (Issue #1784 / OU-007) ────────────────────
+//
+// 更新要否フラグ（requirements_readme_update_required, spec_readme_update_required,
+// extensions_check_required, full_docs_check_recommended）は変更ファイルの存在や
+// 変更種別名ではなく、行レベル差分が導出元（文書 lifecycle, 索引 frontmatter 値、公開入口、
+// extension 参照対象、DOC-MAP/README 生成元）へ影響するかで判定する（SPEC
+// targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節）。
+
+const INDEX_FRONTMATTER_KEYS = new Set([
+  "id",
+  "title",
+  "status",
+  "type",
+  "domain",
+  "scope",
+  "superseded_by",
+]);
+
+interface ChangeDescriptor {
+  absPath: string;
+  relPath: string;
+  // "added" = 新規追加, "deleted" = 削除, "renamed" = 移動/名称変更,
+  // "modified" = 変更（lifecycle 影響なし）, "unknown" = git で判定不可
+  lifecycle: "added" | "deleted" | "renamed" | "modified" | "unknown";
+  previousRelPath?: string;
+  changedFrontmatterKeys: Set<string>;
+}
+
+interface GitNameStatus {
+  status: "A" | "D" | "R" | "M" | null;
+  previousPath?: string;
+}
+
+function gitNameStatusFor(
+  root: string,
+  rel: string,
+  baseRef: string | null,
+): GitNameStatus {
+  const { execSync } = require("child_process") as typeof import("child_process");
+  try {
+    // --base-ref 時は baseRef...HEAD の committed range を見る。
+    // --files 時は HEAD..working-tree を見る（uncommitted 変更）。
+    const diffCmd = baseRef
+      ? `git diff --name-status --diff-filter=ADRMCR ${baseRef}...HEAD -- "${rel}"`
+      : `git diff --name-status --diff-filter=ADRMCR HEAD -- "${rel}"`;
+    const diffOut = execSync(diffCmd, { cwd: root, encoding: "utf-8" }) as string;
+    const parsed = parseGitNameStatusLine(diffOut);
+    if (parsed.status) return parsed;
+
+    // --files モードでは未追跡ファイルを git status で検出
+    if (!baseRef) {
+      try {
+        const statusOut = execSync(`git status --porcelain -- "${rel}"`, {
+          cwd: root,
+          encoding: "utf-8",
+        }) as string;
+        return parseGitStatusPorcelain(statusOut);
+      } catch {
+        return { status: null };
+      }
+    }
+    return { status: null };
+  } catch {
+    return { status: null };
+  }
+}
+
+function parseGitNameStatusLine(out: string): GitNameStatus {
+  const line = out.split("\n").find((l) => l.trim().length > 0);
+  if (!line) return { status: null };
+  const parts = line.split("\t");
+  const statusCode = parts[0];
+  if (statusCode.startsWith("R") || statusCode.startsWith("C")) {
+    return { status: "R", previousPath: parts[2]?.trim() };
+  }
+  if (statusCode === "A") return { status: "A" };
+  if (statusCode === "D") return { status: "D" };
+  if (statusCode === "M") return { status: "M" };
+  return { status: null };
+}
+
+function parseGitStatusPorcelain(out: string): GitNameStatus {
+  const line = out.split("\n").find((l) => l.trim().length > 0);
+  if (!line) return { status: null };
+  const xy = line.slice(0, 2);
+  if (xy === "??") return { status: "A" };
+  // R/C の場合は "XY\told\tnew" 形式を取る
+  if (xy[0] === "R" || xy[0] === "C") {
+    const rest = line.slice(3);
+    const tabIdx = rest.indexOf("\t");
+    if (tabIdx >= 0) {
+      return { status: "R", previousPath: rest.slice(0, tabIdx).trim() };
+    }
+    return { status: "R" };
+  }
+  if (xy.includes("A")) return { status: "A" };
+  if (xy.includes("D")) return { status: "D" };
+  if (xy.includes("M")) return { status: "M" };
+  return { status: null };
+}
+
+function frontmatterAtRef(
+  root: string,
+  ref: string,
+  rel: string,
+): Record<string, string> | null {
+  const { execSync } = require("child_process") as typeof import("child_process");
+  try {
+    const out = execSync(`git show ${ref}:"${rel}"`, {
+      cwd: root,
+      encoding: "utf-8",
+    }) as string;
+    return parseSimpleFrontmatter(out);
+  } catch {
+    return null;
+  }
+}
+
+function changedFrontmatterKeysFor(
+  root: string,
+  rel: string,
+  baseRef: string | null,
+  lifecycle: ChangeDescriptor["lifecycle"],
+): Set<string> {
+  // 追加/削除/リネームは lifecycle のみで判定するため frontmatter 差分は不要
+  if (lifecycle === "added" || lifecycle === "deleted" || lifecycle === "renamed") {
+    return new Set();
+  }
+  const ref = baseRef ?? "HEAD";
+  const oldFm = frontmatterAtRef(root, ref, rel);
+  if (!oldFm) return new Set();
+  const absPath = path.join(root, rel.replace(/\//g, path.sep));
+  const content = readText(absPath);
+  if (!content) return new Set();
+  const newFm = parseSimpleFrontmatter(content) ?? {};
+  const keys = new Set<string>();
+  for (const k of new Set([...Object.keys(oldFm), ...Object.keys(newFm)])) {
+    if (oldFm[k] !== newFm[k]) keys.add(k);
+  }
+  return keys;
+}
+
+function computeChangeDescriptors(
+  root: string,
+  files: string[],
+  baseRef: string | null,
+): ChangeDescriptor[] {
+  return files.map((absPath) => {
+    const rel = path.relative(root, absPath).replace(/\\/g, "/");
+    const status = gitNameStatusFor(root, rel, baseRef);
+    let lifecycle: ChangeDescriptor["lifecycle"] = "unknown";
+    let previousRelPath: string | undefined;
+    if (status.status === "A") lifecycle = "added";
+    else if (status.status === "D") lifecycle = "deleted";
+    else if (status.status === "R") {
+      lifecycle = "renamed";
+      previousRelPath = status.previousPath;
+    } else if (status.status === "M") lifecycle = "modified";
+
+    const changedKeys = changedFrontmatterKeysFor(root, rel, baseRef, lifecycle);
+    return {
+      absPath,
+      relPath: rel,
+      lifecycle,
+      previousRelPath,
+      changedFrontmatterKeys: changedKeys,
+    };
+  });
+}
+
+// 導出元影響判定: lifecycle 変更（追加/削除/リネーム）または索引 frontmatter 値変更で true。
+// SPEC targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節に基づく。
+function isIndexChange(s: ChangeDescriptor): boolean {
+  if (
+    s.lifecycle === "added" ||
+    s.lifecycle === "deleted" ||
+    s.lifecycle === "renamed"
+  ) {
+    return true;
+  }
+  for (const k of s.changedFrontmatterKeys) {
+    if (INDEX_FRONTMATTER_KEYS.has(k)) return true;
+  }
+  return false;
+}
+
 function checkSpecFrontmatter(root: string, files: string[]): Failure[] {
   const failures: Failure[] = [];
   for (const f of files) {
@@ -608,6 +797,7 @@ function runWorkflowChecks(
   coupledFiles: string[],
   obsolete: { oldPaths: string[]; vocab: string[] },
   declaredFiles: string[],
+  changeDescriptors: ChangeDescriptor[],
 ): {
   failures: Failure[];
   warnings: string[];
@@ -646,22 +836,26 @@ function runWorkflowChecks(
         (rel) => rel.includes("REQ-") || rel.includes("docs/specs/"),
       )
     : false;
-  const specReadmeUpdateRequired = profile.rules.includes("spec-readme-update-required") ||
+
+  // Issue #1784 / OU-007: 更新要否フラグを行レベル意味差分（導出元影響）ベースへ限定。
+  // ファイル存在や変更種別名ではなく、文書 lifecycle（追加/削除/移動/名称変更）または
+  // 索引 frontmatter 値（id, title, status 等）の変更でのみ true とする。
+  // SPEC targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節。
+  const specReadmeUpdateRequired =
+    profile.rules.includes("spec-readme-update-required") ||
     profile.rules.includes("spec-readme-status-sync")
-    ? detectUpdateRequired(
-        root,
-        changedFiles,
-        "docs/specs/README.md",
-        (rel) => rel.startsWith("docs/specs/"),
-      )
-    : false;
-  const requirementsReadmeUpdateRequired = profile.rules.includes("requirements-readme-sync")
-    ? detectUpdateRequired(
-        root,
-        changedFiles,
-        "docs/requirements/README.md",
-        (rel) => rel.startsWith("docs/requirements/REQ-"),
-      )
+      ? changeDescriptors.some((d) => {
+          if (!/^docs\/specs\/.*\.md$/.test(d.relPath)) return false;
+          return isIndexChange(d);
+        })
+      : false;
+  const requirementsReadmeUpdateRequired = profile.rules.includes(
+    "requirements-readme-sync",
+  )
+    ? changeDescriptors.some((d) => {
+        if (!/^docs\/requirements\/REQ-.*\.md$/.test(d.relPath)) return false;
+        return isIndexChange(d);
+      })
     : false;
 
   // full_docs_check_recommended: integrity rule 追加/削除、DOC-MAP 構造変更、docs/specs 大規模移動、extensions 変更等
@@ -683,14 +877,12 @@ function runWorkflowChecks(
       })
     : false;
 
-  // extensions_check_required: extensions 機構への影響（REQ/ADR/SPEC の追加・移動・改名）
-  const extensionsCheckRequired = changedFiles.some((f) => {
-    const rel = path.relative(root, f).replace(/\\/g, "/");
-    return (
-      /^docs\/requirements\/REQ-.*\.md$/.test(rel) ||
-      /^docs\/adr\/ADR-.*\.md$/.test(rel) ||
-      /^docs\/specs\/.*\.md$/.test(rel)
-    );
+  // extensions_check_required: extension が参照する対象（REQ/ADR/SPEC）の lifecycle
+  // または索引 frontmatter 値の変更で true。
+  const extensionsCheckRequired = changeDescriptors.some((d) => {
+    if (!/^docs\/(requirements\/REQ-|adr\/ADR-|specs\/).*\.md$/.test(d.relPath))
+      return false;
+    return isIndexChange(d);
   });
 
   // declared_files_check: --declared-files 指定時、宣言ファイルと実変更ファイルの対応を検査
@@ -802,6 +994,12 @@ function main(): void {
 
   const obsolete = loadObsoleteTerms(root);
 
+  const changeDescriptors = computeChangeDescriptors(
+    root,
+    applicable,
+    parsed.baseRef,
+  );
+
   const runResult = runWorkflowChecks(
     root,
     profile,
@@ -809,6 +1007,7 @@ function main(): void {
     coupledFiles,
     obsolete,
     parsed.declaredFiles,
+    changeDescriptors,
   );
 
   const report: TargetedDocsReport = {
