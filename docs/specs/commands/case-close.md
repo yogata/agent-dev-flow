@@ -163,15 +163,17 @@ case-close は targeted docs guard が FAILURE を返した場合、以下を行
 
 verification-only PR（実装差分0件、検証のみで作成された PR）の場合、`files_checked` が空になることが正規の状態として発生する。case-close は次の手順で verification-only 判定を行い、正当と判断された場合に PASS 処理する。要件の SSoT は REQ-0158-002、verification-only PR の定義と case-run 側引継ぎ注意事项は [case-run.md](case-run.md)「verification-only PR（実装差分なし、検証のみ）（REQ-0158-002）」参照。
 
+PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。case-close は PR 本文の verify-only 根拠欄を読み、記載が不十分な場合は PASS としない。
+
 **判定基準（全て満たすこと）**:
 
 1. PR 変更ファイル一覧（`gh pr view <PR> --json files`）が空配列であること
-2. PR 本文に verification-only である旨が明記されていること（「実装差分なし（verification-only）」等の表現）
-3. PR 本文に検証 evidence（`## 完了条件検証`、`## 変更内容` 等）が記録されており、Issue の受け入れ基準が検証のみで充足されたことが確認できること
+2. PR 本文の verify-only 根拠欄に実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果が記録されていること
+3. PR 本文の検証結果から、Issue の受け入れ基準が検証のみで充足されたことが確認できること
 
 **PASS 処理**:
 
-上記3項目を全て満たす場合、case-close は verification-only PR と判定し、files_checked 空の FAILURE を PASS 処理する。判定根拠（PR 本文の verification-only 宣言、検証 evidence の参照、`gh pr view --json files` の空配列確認）を完了報告に記録する。
+上記3項目を全て満たす場合、case-close は verification-only PR と判定し、files_checked 空の FAILURE を PASS 処理する。判定根拠（PR 本文の verify-only 根拠欄の参照、`gh pr view --json files` の空配列確認）を完了報告に記録する。根拠欄の記載が不十分な場合は PASS としない。
 
 **false-clean 3層防御との相互作用**:
 
@@ -183,7 +185,7 @@ REQ-0158「case-close 向け false-clean 予防」節は files_checked 空を si
 | 第2層 | case-close は `--files <PR変更ファイル>` 指定を標準とする | verification-only PR では `--files` が空配列となり、それ自体が verification-only のシグナルとなる |
 | 第3層 | files_checked が空でないことの確認ステップを含める | 本ステップが verification-only 判定基準（3項目）の適用場所となる。3項目を満たさない場合は silent pass を許さず FAILURE を維持する |
 
-verification-only 判定基準3項目を満たさない files_checked 空（例: PR 本文に verification-only 宣言がない、検証 evidence がない）は silent pass を許さず、FAILURE を維持して構造化エラー停止とする。
+verification-only 判定基準3項目を満たさない files_checked 空（例: PR 本文の根拠欄に記載がない、検証 evidence がない）は silent pass を許さず、FAILURE を維持して構造化エラー停止とする。
 
 ## 対象外
 
