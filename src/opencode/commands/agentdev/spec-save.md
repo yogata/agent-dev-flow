@@ -114,6 +114,11 @@ bun .opencode/skills/agentdev-spec-file-manager/scripts/src/search-target-area.t
 同一 SPEC ファイルへの複数 action は順序依存のため直列サブセットとして分離する。
 詳細は後述「case-auto 並列委譲モデル」セクション参照
 
+**Step 5-2**: SPEC 宣言付与（CREATE/UPDATE）。Step 5 の CREATE/UPDATE 各操作に併せ、req-define が `artifact_actions`（`artifact: spec`）の各 entry へ出力した `spec_logical_division` と `canonical_owner` を読み取り、SPEC frontmatter または冒頭宣言節へ宣言として付与する。
+- **CREATE**: 新規 SPEC の frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。宣言なしで CREATE を完了することを禁止する
+- **UPDATE**: 変更対象 SPEC が frontmatter または冒頭宣言節で当該宣言を未宣言の場合、かつ req-define から渡された分類値が `unknown` 以外に確定している場合に、宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落だけを理由に保存拒否しない、ADR-0124 soft-contract）
+- **既存 SPEC の一括更新**: 行わない。未変更 SPEC へ遡及的に宣言を付与しない（REQ-0136-035 段階適用）
+
 ### Step 6: インデックス整合
 
 新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加する。既存 SPEC 追記時は README 更新不要
@@ -188,6 +193,7 @@ Step 8 の status 変更を commit 対象に含める。
 - **品質ゲート（適用結果の整合性検証、AG-004、REQ）**: spec-save の品質ゲートは「適用結果の整合性検証」として実行する。検証項目: `target_area` 置換結果の整合性（Step 5 の `search-target-area.ts` 結果と置換後本体の一致）、SPEC status の整合性（新規作成時 `status: draft` 付与、既存追記時 `status` 変更なし）、インデックスの整合性（`docs/specs/README.md` エントリと新規 SPEC の一致、Step 6 の `check-entry-existence.ts` 結果）、変更範囲の妥当性（Step 9 の `check-change-impact.ts` 結果）。各検証は決定的スクリプトの JSON 結果で機械的に確認する。**REQ**: spec-save の品質ゲートは内容の品質（SPEC 分離基準適合性等）を再検証せず、内容の品質は req-define の QG-1 の責務とする（Step 4 SPEC 分離基準の最終確認は実施するが、これは分離基準の最終チェックであり内容品質の再審査ではない）
 - **SPEC 分離基準適合性（REQ）**: 各 action の `content` が SPEC に置くべき内容か（Step 4）
 - **frontmatter 完全性**: 新規作成時の `title`, `status: draft`, `created`, `updated`（G05）
+- **宣言付与の整合性**: CREATE で `spec_logical_division` と `canonical_owner` が frontmatter または冒頭宣言節へ付与されていること。UPDATE で宣言未宣言かつ分類値が `unknown` 以外の場合に補完されていること（Step 5-2）
 - **配置先解決の正確性**: 既存パス vs `new:{slug}` の判定、重複候補統合（Step 3）
 - **変更範囲検証**: `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を含まないこと（Step 9）
 

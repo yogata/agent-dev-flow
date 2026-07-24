@@ -107,9 +107,13 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 | 正規所有者 | 対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー（REQ-0119-038） |
 | 正規追記先 | 既存 SPEC のどの領域へ追記するか（target_area、target_spec） |
 
+### SPEC action への分類根拠出力
+
+最終分類確定ステップで `artifact: spec` の SPEC action 各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する。出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`spec_logical_division`、`canonical_owner`）と一致し、後続の spec-save が SPEC frontmatter または冒頭宣言節へ宣言を付与するための入力となる。分類値が確定できない場合は `unknown` とし、soft-contract（ADR-0124）に従い spec-save へ警告付きで引き継ぐ。
+
 ### REQ 影響なし時の取扱い
 
-REQ 影響なしと確定した変更からは `artifact_actions` の `artifact: req` エントリを生成しない（REQ-0102-088）。代わりに `artifact: spec` エントリのみを生成し、SPEC への配置のみを行う。
+REQ 影響なしと確定した変更からは `artifact_actions` の `artifact: req` エントリを生成しない（REQ-0102-088）。代わりに `artifact: spec` エントリのみを生成し、SPEC への配置のみを行う。SPEC action には前項「SPEC action への分類根拠出力」を適用する。
 
 ### 分類根拠の引き継ぎ
 
