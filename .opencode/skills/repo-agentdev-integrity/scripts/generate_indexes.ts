@@ -35,8 +35,40 @@ const USAGE =
 //   <!-- AUTOGEN:BEGIN:id=<id> -->
 //   ... 自動生成領域 ...
 //   <!-- AUTOGEN:END -->
-const AUTOGEN_BEGIN_PREFIX = "<!-- AUTOGEN:BEGIN:id=";
-const AUTOGEN_END_MARKER = "<!-- AUTOGEN:END -->";
+//
+// 検出は行全体一致方式（Issue #1771）。説明文中の backtick 囲み（インラインコード）
+// marker 文字列を実 marker と誤認しないため、部分一致（line.includes）ではなく
+// 行全体が正規マーカー形式に一致するかで判定する。backtick 文脈判定のような
+// 部分一致ロジックは併用しない（index-auto-generation.md「AUTOGEN marker 検出契約」）。
+
+/** AUTOGEN:BEGIN マーカー行全体一致パターン。id は非空白文字列。 */
+const AUTOGEN_BEGIN_LINE_RE = /^\s*<!-- AUTOGEN:BEGIN:id=(\S+) -->\s*$/;
+/** AUTOGEN:END マーカー行全体一致パターン。 */
+const AUTOGEN_END_LINE_RE = /^\s*<!-- AUTOGEN:END -->\s*$/;
+
+/**
+ * 行全体が AUTOGEN:BEGIN マーカー形式（`<!-- AUTOGEN:BEGIN:id=<id> -->`）に一致するか判定する。
+ * backtick 囲み等の部分一致は行全体一致判定で自動的に除外される。
+ */
+export function isAutogenBeginLine(line: string): boolean {
+  return AUTOGEN_BEGIN_LINE_RE.test(line);
+}
+
+/**
+ * 行全体が AUTOGEN:END マーカー形式（`<!-- AUTOGEN:END -->`）に一致するか判定する。
+ */
+export function isAutogenEndLine(line: string): boolean {
+  return AUTOGEN_END_LINE_RE.test(line);
+}
+
+/**
+ * AUTOGEN:BEGIN マーカー行から id を抽出する。
+ * 行全体が BEGIN マーカー形式に一致しない場合は null を返す。
+ */
+export function extractAutogenBeginId(line: string): string | null {
+  const match = line.match(AUTOGEN_BEGIN_LINE_RE);
+  return match ? match[1] : null;
+}
 
 // catalog 内の AUTOGEN ブロック ID（IR-045 欠番を挟む2ブロック構成）。
 export const CATALOG_PRE_BLOCK_ID = "catalog-ir-entries-pre-045";
@@ -323,18 +355,12 @@ export function findAutogenBlocks(content: string): AutogenBlock[] {
   let i = 0;
   while (i < lines.length) {
     const line = lines[i];
-    if (line.includes(AUTOGEN_BEGIN_PREFIX)) {
-      const idStart = line.indexOf(AUTOGEN_BEGIN_PREFIX) + AUTOGEN_BEGIN_PREFIX.length;
-      const idEnd = line.indexOf("-->", idStart);
-      if (idEnd === -1) {
-        i++;
-        continue;
-      }
-      const id = line.slice(idStart, idEnd).trim();
+    const beginId = extractAutogenBeginId(line);
+    if (beginId !== null) {
       const startLine = i;
       const body: string[] = [];
       let j = i + 1;
-      while (j < lines.length && !lines[j].includes(AUTOGEN_END_MARKER)) {
+      while (j < lines.length && !isAutogenEndLine(lines[j])) {
         body.push(lines[j]);
         j++;
       }
@@ -344,7 +370,7 @@ export function findAutogenBlocks(content: string): AutogenBlock[] {
         continue;
       }
       blocks.push({
-        id,
+        id: beginId,
         startLine,
         endLine: j,
         currentBody: body,
@@ -361,7 +387,7 @@ export function findAutogenBlocks(content: string): AutogenBlock[] {
  * 指量 id の AUTOGEN ブロック本文を newBody で置換した content を返す。
  * ブロック未検出時は content を unchanged で返す（呼び出し元で検出）。
  */
-function replaceAutogenBlock(
+export function replaceAutogenBlock(
   content: string,
   id: string,
   newBody: string[],
@@ -372,11 +398,7 @@ function replaceAutogenBlock(
   let replaced = false;
   while (i < lines.length) {
     const line = lines[i];
-    if (
-      line.includes(AUTOGEN_BEGIN_PREFIX) &&
-      line.includes(`id=${id}`) &&
-      !replaced
-    ) {
+    if (extractAutogenBeginId(line) === id && !replaced) {
       // 開始マーカー → newBody → 終了マーカーへ置換。
       out.push(line);
       for (const bodyLine of newBody) {
@@ -384,7 +406,7 @@ function replaceAutogenBlock(
       }
       // 終了マーカーまで進める。
       let j = i + 1;
-      while (j < lines.length && !lines[j].includes(AUTOGEN_END_MARKER)) {
+      while (j < lines.length && !isAutogenEndLine(lines[j])) {
         j++;
       }
       if (j < lines.length) {
@@ -824,7 +846,7 @@ export function countSpecBodyLines(content: string): number {
   for (let i = start; i < lines.length; i++) {
     const line = lines[i];
     if (inAutogen) {
-      if (line.includes(AUTOGEN_END_MARKER)) {
+      if (isAutogenEndLine(line)) {
         inAutogen = false;
       }
       continue;
@@ -838,17 +860,14 @@ export function countSpecBodyLines(content: string): number {
       }
       continue;
     }
+    // AUTOGEN 開始マーカー（行全体一致）は AUTOGEN ブロックとして処理。
+    // backtick 囲み等の部分一致は isAutogenBeginLine で自動的に除外される。
+    if (isAutogenBeginLine(line)) {
+      inAutogen = true;
+      continue;
+    }
     const startIdx = line.indexOf("<!--");
     if (startIdx >= 0) {
-      // AUTOGEN 開始マーカーは AUTOGEN ブロックとして処理。
-      if (line.includes(AUTOGEN_BEGIN_PREFIX)) {
-        inAutogen = true;
-        // 同一行に AUTOGEN 終了マーカーがある場合は即終了（空ブロック）。
-        if (line.includes(AUTOGEN_END_MARKER)) {
-          inAutogen = false;
-        }
-        continue;
-      }
       const endIdx = line.indexOf("-->", startIdx + 4);
       if (endIdx >= 0) {
         // 単一行コメント: 前後の本文を残置。
