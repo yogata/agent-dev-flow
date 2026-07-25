@@ -12,7 +12,7 @@ status: accepted
 | category | canonical-conflict |
 | detection_method | SKILL.md の `See Also` セクションから実行判断材料、DO NOT USE FOR 重複、別 SSoT 一覧を検出 |
 | affected_artifacts | [skills] |
-| related_req | [REQ-0108-245] |
+| related_req | [REQ-010-245] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。補助導線として必要な参照は許容 |

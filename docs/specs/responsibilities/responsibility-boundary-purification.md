@@ -7,7 +7,7 @@ updated: 2026-07-24
 
 # 責務境界浄化: 所有/非所有リスト詳細
 
-AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象と非所有対象のリストによって明示化する。原則は REQ-0162 を SSoT とし、本 SPEC は各工程（case-auto, case-run, execution adapter, Project Extensions, タイムスタンプ）ごとの所有/非所有リストの詳細を集約する。判定根拠は ADR-0136（配布物の harness 実行制御分離）。
+AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象と非所有対象のリストによって明示化する。原則は REQ-002 を SSoT とし、本 SPEC は各工程（case-auto, case-run, execution adapter, Project Extensions, タイムスタンプ）ごとの所有/非所有リストの詳細を集約する。判定根拠は v2:ADR-0136（配布物の harness 実行制御分離）。
 
 ## 責務境界浄化: 所有/非所有リスト詳細
 
@@ -32,12 +32,12 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 - plan task監査ログ
 
 ### case-auto所有/非所有リスト
-**所有**: 入力解決、auto_gate確認、artifact_actions基準工程決定、入力引き渡し、永続状態再読込、継続停止再開判定、完了進行未実行報告、壁時計時間計測、Phase 分離（Phase 1 case-open 順次実行、Phase 2 case-run 並列実行、Phase 3 case-close 順次実行、REQ-0114-102）、Phase 2 の固定並列数5（REQ-0114-106）、bg task の状態管理、破棄検知（REQ-0114-105）、状態別回復（commit 済み PR 未作成 / 未コミット変更残存の区別）、Phase 1 と Phase 3 の直列集約ポイント（main push / capture / commit、REQ-0114-104）
+**所有**: 入力解決、auto_gate確認、artifact_actions基準工程決定、入力引き渡し、永続状態再読込、継続停止再開判定、完了進行未実行報告、壁時計時間計測、Phase 分離（Phase 1 case-open 順次実行、Phase 2 case-run 並列実行、Phase 3 case-close 順次実行、REQ-006-102）、Phase 2 の固定並列数5（REQ-006-106）、bg task の状態管理、破棄検知（REQ-006-105）、状態別回復（commit 済み PR 未作成 / 未コミット変更残存の区別）、Phase 1 と Phase 3 の直列集約ポイント（main push / capture / commit、REQ-006-104）
 **非所有**: 工程内部手順再実装、エージェント選定、スケジューリング、エラー解析、context圧縮、retry、QG再評価、capture再実装、bg task API、実行担当サブエージェント内部の実行制御（推論、context 管理、retry、エラー解析等）、heartbeat、plan task監査ログ
 
 > **用語注記**: 「実行担当サブエージェント内部の実行制御」は、推論、context 管理、retry、エラー解析等を含む上位概念として扱う。line 38 限定注記内の表記と一致させる（語彙揺れ是正）。
 
-> **ADR-0138 による ADR-0136 決定2の限定範囲（REQ-0114-102〜107）**: ADR-0136 決定2「配布物は業務ワークフロー契約のみを記述し、実行制御は harness 責務」に対し、case-auto の Phase 分離、Phase 2 の固定並列数、bg task の状態管理と状態別回復、Phase 1 と Phase 3 の直列集約だけを AgentDevFlow 側の業務ワークフロー契約として規定する。bg task API と実行担当サブエージェント内部の実行制御は harness 側に維持し、決定2の本体を変更しない。
+> **v2:ADR-0138 による v2:ADR-0136 決定2の限定範囲（REQ-006-102〜107）**: v2:ADR-0136 決定2「配布物は業務ワークフロー契約のみを記述し、実行制御は harness 責務」に対し、case-auto の Phase 分離、Phase 2 の固定並列数、bg task の状態管理と状態別回復、Phase 1 と Phase 3 の直列集約だけを AgentDevFlow 側の業務ワークフロー契約として規定する。bg task API と実行担当サブエージェント内部の実行制御は harness 側に維持し、決定2の本体を変更しない。
 
 ### case-run所有/分離対象リスト
 **所有**: Issue/実行単位解決、worktree branch準備、Issue+worktree root+branch引き渡し、結果受領状態処理、PR停止情報確認、Findings PR本文引き継ぎ、再開可能状態維持、壁時計時間計測
@@ -61,11 +61,11 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 
 ## 横断的再評価基準
 
-現行 REQ 群、現行 SPEC 群を新基準（ステークホルダー視点、4妥当性基準、SPEC 5区分論理、関心キー所有、分類根拠伝播）で横断的に再評価する基準を定める（ADR-0139）。本節は基準定義までを対象とし、全件再評価の実施は別途 case-open/case-run 工程で行う。
+現行 REQ 群、現行 SPEC 群を新基準（ステークホルダー視点、4妥当性基準、SPEC 5区分論理、関心キー所有、分類根拠伝播）で横断的に再評価する基準を定める（REQ-001）。本節は基準定義までを対象とし、全件再評価の実施は別途 case-open/case-run 工程で行う。
 
 ### REQ 再評価基準（ステークホルダー視点、4妥当性基準）
 
-現行 REQ 全件について、REQ-0101-079（ステークホルダー視点、4妥当性基準）に基づく再評価を実施する。要件行単位で次を判定する:
+現行 REQ 全件について、REQ-001-079（ステークホルダー視点、4妥当性基準）に基づく再評価を実施する。要件行単位で次を判定する:
 
 | 評価観点 | 適合基準 |
 |---|---|
@@ -74,7 +74,7 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 | 内部実装非依存 | 成果物内部を知らなくても達成を観測できる |
 | 要求文存立 | 内部構成を変更しても要求文が成立する |
 
-安定契約例外（REQ-0101-069）に該当する要件行は再評価の対象外とする。
+安定契約例外（REQ-001-069）に該当する要件行は再評価の対象外とする。
 
 ### SPEC 再評価基準（主論理区分、正規所有対象、重複責務、実装/履歴混入）
 
@@ -82,8 +82,8 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 
 | 評価観点 | 適合基準 |
 |---|---|
-| 主論理区分 | REQ-0155-009 の5区分（挙動SPEC、カタログSPEC、横断契約SPEC、パラメータSPEC、実装詳細SPEC）のいずれかが frontmatter または冒頭宣言節で宣言されている |
-| 正規所有対象 | 対象 command、skill、workflow、品質ルール、整合性ルール等の関心キーが宣言されている（REQ-0156-013、REQ-0119-038） |
+| 主論理区分 | v2:REQ-0155-009 の5区分（挙動SPEC、カタログSPEC、横断契約SPEC、パラメータSPEC、実装詳細SPEC）のいずれかが frontmatter または冒頭宣言節で宣言されている |
+| 正規所有対象 | 対象 command、skill、workflow、品質ルール、整合性ルール等の関心キーが宣言されている（REQ-001-013、REQ-003-038） |
 | 重複責務 | 同一関心キーに対する複数 SPEC の正規所有宣言がない |
 | 実装/履歴混入 | 実装計画、マイルストーン、完了履歴が SPEC へ混入していない |
 
@@ -93,9 +93,9 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 
 ### 後方互換運用
 
-分類メタデータ（主論理区分、正規所有対象、分類根拠）の宣言は段階適用とする（REQ-0136-035）。宣言形式未完了の既存 SPEC は警告モードで経過観察し、欠落により拒否しない（soft-contract、ADR-0124）。既存の採用済み成果物、RU、req_draft を宣言欠落により拒否しない。
+分類メタデータ（主論理区分、正規所有対象、分類根拠）の宣言は段階適用とする（REQ-001-035）。宣言形式未完了の既存 SPEC は警告モードで経過観察し、欠落により拒否しない（soft-contract、ADR-003）。既存の採用済み成果物、RU、req_draft を宣言欠落により拒否しない。
 
 ## 関連情報
 
-- **関連REQ**: REQ-0162（配布物の harness 実行制御分離、原則の SSoT）、REQ-0119（コマンド・スキル・サブエージェント責務分界）、REQ-0103（Artifact 責任分界）、REQ-0114（case-auto 最大自走モード）、REQ-0130（case-run 実装パイプライン）、REQ-0139（外部エージェント統合契約）、REQ-0160（Project Extensions 機構と配布物参照境界）、REQ-0151（コンフリクト解消モデルと実行時間観測）
-- **関連ADR**: ADR-0136（配布物の harness 実行制御分離、accepted）、ADR-0138（case-auto オーケストレーション制御の AgentDevFlow 側集約、accepted。ADR-0136 決定2の限定注記）
+- **関連REQ**: REQ-002（配布物の harness 実行制御分離、原則の SSoT）、REQ-003（コマンド・スキル・サブエージェント責務分界）、REQ-002（Artifact 責任分界）、REQ-006（case-auto 最大自走モード）、REQ-006（case-run 実装パイプライン）、REQ-003（外部エージェント統合契約）、REQ-002（Project Extensions 機構と配布物参照境界）、REQ-003（コンフリクト解消モデルと実行時間観測）
+- **関連ADR**: v2:ADR-0136（配布物の harness 実行制御分離、accepted）、v2:ADR-0138（case-auto オーケストレーション制御の AgentDevFlow 側集約、accepted。v2:ADR-0136 決定2の限定注記）

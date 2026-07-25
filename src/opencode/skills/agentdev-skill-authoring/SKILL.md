@@ -25,7 +25,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 1. 設計原則
 
-SKILL.md の設計は、簡潔さ、自由度、トークン予算、行数ガバナンスの4観点で設計する。行数が500行を超える場合は `references/`への抽出が必須となり、抽出後の SKILL.md は400行以下を目標とする（REQ-0113-010）。各原則の詳細、コード例、行数ガバナンス表、抽出ルールと優先順位は [references/design-principles.md](references/design-principles.md) 参照。
+SKILL.md の設計は、簡潔さ、自由度、トークン予算、行数ガバナンスの4観点で設計する。行数が500行を超える場合は `references/`への抽出が必須となり、抽出後の SKILL.md は400行以下を目標とする。各原則の詳細、コード例、行数ガバナンス表、抽出ルールと優先順位は [references/design-principles.md](references/design-principles.md) 参照。
 
 ## 2. スキル仕様
 
@@ -268,7 +268,7 @@ Skill 分割を検討する条件:
 
 ## references 一覧
 
-SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える（REQ-0113-010）。
+SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える。
 
 | ファイル | 内容 |
 |----------|------|

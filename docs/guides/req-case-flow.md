@@ -9,7 +9,7 @@
 /agentdev/req-define → /agentdev/req-save（REQ/ADR 対象 artifact_actions がある場合）→ /agentdev/spec-save（SPEC 対象 artifact_actions がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
 
-> 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（REQ-0138, ADR-0124）。
+> 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138, v2:ADR-0124）。
 > draft は構造化 `draft-data` 形式（緩やかな契約：soft contract）で req-define が生成し、後続コマンドが LLM 推論で消費する。
 
 ## req-define
@@ -31,7 +31,7 @@ AI と対話して要件を整理するコマンド。
 
 要件docを REQ/ADR ファイルとして `docs/` に保存するコマンド。
 REQ/ADR 対象 artifact_actions（`artifact: req` / `artifact: adr`）がある場合に実行する。
-`work_type` による判定は廃止した（REQ-0138-009）。
+`work_type` による判定は廃止した（v2:REQ-0138-009）。
 
 **入力**: 要件doc（REQ/ADR 対象 artifact_actions がある場合）
 
@@ -40,8 +40,8 @@ REQ/ADR 対象 artifact_actions（`artifact: req` / `artifact: adr`）がある�
 ## spec-save
 
 req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を SPEC ファイルとして `docs/specs/` に保存、確定するコマンド。
-SPEC 対象 artifact_actions がある場合に実行する（全 work_type 対象、`work_type` による判定は廃止、REQ-0138-009）。
-req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す（ADR-0123）。
+SPEC 対象 artifact_actions がある場合に実行する（全 work_type 対象、`work_type` による判定は廃止、v2:REQ-0138-009）。
+req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す（v2:ADR-0123）。
 
 **入力**: 要件doc（SPEC 対象 artifact_actions がある場合）
 
@@ -79,7 +79,7 @@ Issue に基づいて実装し、PR を作成するコマンド。
 | 実装 | 実装、テスト、docs/specs 整合性確認 |
 | 提出 | コミット、PR 作成 |
 
-> **完了条件チェックボックスは case-close の責務**: case-run は完了条件チェックボックスの更新を case-close に委ねる（ADR-0114）。
+> **完了条件チェックボックスは case-close の責務**: case-run は完了条件チェックボックスの更新を case-close に委ねる（v2:ADR-0114）。
 > チェックボックスの評価、更新は case-close QG-4 で行う。
 
 ### 自律修正ループ
@@ -119,8 +119,8 @@ PR をマージし、Issue をクローズするコマンド。
 
 ## work_type 分類
 
-Issue の work_type は参考情報であり、パイプライン分岐（`/agentdev/req-save` の要否）は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（REQ-0138-009, ADR-0124）。
-docs 更新責務は全 work_type 共通である（bugfix も含む。REQ-0104-034）。
+Issue の work_type は参考情報であり、パイプライン分岐（`/agentdev/req-save` の要否）は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138-009, v2:ADR-0124）。
+docs 更新責務は全 work_type 共通である（bugfix も含む。v2:REQ-0104-034）。
 
 | work_type | 名称 | ラベル | ブランチ種別 |
 |-----------|------|--------|-------------|
@@ -139,7 +139,7 @@ docs 更新責務は全 work_type 共通である（bugfix も含む。REQ-0104-
 
 ### 実行内容
 
-入力要件docの `draft-data` の `artifact_actions` を読み取り、工程を動的判定する（`work_type` 固定分岐ではなく `artifact_actions` 存在による判定、REQ-0138-009）:
+入力要件docの `draft-data` の `artifact_actions` を読み取り、工程を動的判定する（`work_type` 固定分岐ではなく `artifact_actions` 存在による判定、v2:REQ-0138-009）:
 
 - **REQ/ADR artifact_actions あり**: `/agentdev/req-save` → `/agentdev/spec-save`（SPEC artifact_actions がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
 - **REQ/ADR artifact_actions なし**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` 、 `/agentdev/spec-save` をスキップ）

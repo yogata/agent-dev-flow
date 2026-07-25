@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "NG-BASELINE",
-  "generated_at": "2026-07-20",
+  "generated_at": "2026-07-25",
   "entries": [
     {
       "category": "ADR",
@@ -148,6 +148,69 @@
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
+      "category": "IndexGenerationConsistency",
+      "check": "index-generation-consistency",
+      "file": "adr-baseline-count AUTOGEN block out of sync. first mismatch at line 1 (current=謇ｿ隱肴ｸ医∩繧ｹ繝・・繧ｿ繧ｹ・・ccepted・峨・ ADR-01XX 31莉ｶ縺後」2.11.0 譎らせ縺ｮ繧｢繝ｼ繧ｭ繝・け繝√Ε蛻､譁ｭ縺ｮ蝓ｺ..., expected=謇ｿ隱肴ｸ医∩繧ｹ繝・・繧ｿ繧ｹ・・ccepted・峨・ ADR-01XX 4莉ｶ縺後∫樟蝨ｨ縺ｮ繧｢繝ｼ繧ｭ繝・け繝√Ε蛻､譁ｭ縺ｮ蝓ｺ逶､縺ｧ縺ゅｋ縲・. Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "evidence": "adr-baseline-count AUTOGEN block out of sync. first mismatch at line 1 (current=謇ｿ隱肴ｸ医∩繧ｹ繝・・繧ｿ繧ｹ・・ccepted・峨・ ADR-01XX 31莉ｶ縺後」2.11.0 譎らせ縺ｮ繧｢繝ｼ繧ｭ繝・け繝√Ε蛻､譁ｭ縺ｮ蝓ｺ..., expected=謇ｿ隱肴ｸ医∩繧ｹ繝・・繧ｿ繧ｹ・・ccepted・峨・ ADR-01XX 4莉ｶ縺後∫樟蝨ｨ縺ｮ繧｢繝ｼ繧ｭ繝・け繝√Ε蛻､譁ｭ縺ｮ蝓ｺ逶､縺ｧ縺ゅｋ縲・. Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "IndexGenerationConsistency",
+      "check": "index-generation-consistency",
+      "file": "adr-baseline-table AUTOGEN block out of sync. first mismatch at line 3 (current=| [ADR-001](ADR-001-v3-charter.md) | v3 charter・・gentDevF..., expected=| ADR-0002 | OpenCode 繧ｽ繝ｼ繧ｹ繝ｻ繝励Ο繧ｸ繧ｧ繧ｯ繧ｷ繝ｧ繝ｳ蛻・屬・・3・・| accepted | 202...). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "evidence": "adr-baseline-table AUTOGEN block out of sync. first mismatch at line 3 (current=| [ADR-001](ADR-001-v3-charter.md) | v3 charter・・gentDevF..., expected=| ADR-0002 | OpenCode 繧ｽ繝ｼ繧ｹ繝ｻ繝励Ο繧ｸ繧ｧ繧ｯ繧ｷ繝ｧ繝ｳ蛻・屬・・3・・| accepted | 202...). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "IndexGenerationConsistency",
+      "check": "index-generation-consistency",
+      "file": "adr-status-accepted AUTOGEN block out of sync. first mismatch at line 1 (current=- [ADR-001](ADR-001-v3-charter.md)・・3 charter・・gentDevFlo..., expected=- [ADR-0002](ADR-002.md)・・penCode 繧ｽ繝ｼ繧ｹ繝ｻ繝励Ο繧ｸ繧ｧ繧ｯ繧ｷ繝ｧ繝ｳ蛻・屬・・3・会ｼ・. Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "evidence": "adr-status-accepted AUTOGEN block out of sync. first mismatch at line 1 (current=- [ADR-001](ADR-001-v3-charter.md)・・3 charter・・gentDevFlo..., expected=- [ADR-0002](ADR-002.md)・・penCode 繧ｽ繝ｼ繧ｹ繝ｻ繝励Ο繧ｸ繧ｧ繧ｯ繧ｷ繝ｧ繝ｳ蛻・屬・・3・会ｼ・. Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "IndexGenerationConsistency",
+      "check": "index-generation-consistency",
+      "file": "docmap-inventory AUTOGEN block out of sync. first mismatch at line 2 (current=- ADR: 5莉ｶ・・docs/adr/ADR-*.md`・・ expected=- ADR: 4莉ｶ・・docs/adr/ADR-*.md`・・. Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "evidence": "docmap-inventory AUTOGEN block out of sync. first mismatch at line 2 (current=- ADR: 5莉ｶ・・docs/adr/ADR-*.md`・・ expected=- ADR: 4莉ｶ・・docs/adr/ADR-*.md`・・. Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "IndexGenerationConsistency",
+      "check": "index-generation-consistency",
+      "file": "req-active-table AUTOGEN block out of sync. first mismatch at line 3 (current=| [REQ-001](REQ-001.md) | 譁・嶌菴鍋ｳｻ縺ｨ謖∫ｶ壼庄閭ｽ縺ｪ蝓ｺ貅匁ｧ矩 |, expected=| [REQ-0001](REQ-001.md) | 譁・嶌菴鍋ｳｻ縺ｨ謖∫ｶ壼庄閭ｽ縺ｪ蝓ｺ貅匁ｧ矩 |). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "evidence": "req-active-table AUTOGEN block out of sync. first mismatch at line 3 (current=| [REQ-001](REQ-001.md) | 譁・嶌菴鍋ｳｻ縺ｨ謖∫ｶ壼庄閭ｽ縺ｪ蝓ｺ貅匁ｧ矩 |, expected=| [REQ-0001](REQ-001.md) | 譁・嶌菴鍋ｳｻ縺ｨ謖∫ｶ壼庄閭ｽ縺ｪ蝓ｺ貅匁ｧ矩 |). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "IndexGenerationConsistency",
+      "check": "index-generation-consistency",
+      "file": "req-metrics-measurement-example AUTOGEN block out of sync. first mismatch at line 3 (current=| REQ-006 | 99 | +2 | case-auto縲ゅΛ繧､繝輔し繧､繧ｯ繝ｫ谿ｵ髫取ｷｷ蝨ｨ縺ｧ髢｢蠢・す繧ｰ繝翫Ν霑ｽ蜉 |, expected=| REQ-0001 | 0 | +0 |  |). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "evidence": "req-metrics-measurement-example AUTOGEN block out of sync. first mismatch at line 3 (current=| REQ-006 | 99 | +2 | case-auto縲ゅΛ繧､繝輔し繧､繧ｯ繝ｫ谿ｵ髫取ｷｷ蝨ｨ縺ｧ髢｢蠢・す繧ｰ繝翫Ν霑ｽ蜉 |, expected=| REQ-0001 | 0 | +0 |  |). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "IndexGenerationConsistency",
+      "check": "index-generation-consistency",
+      "file": "spec-metrics-measurement-example AUTOGEN block out of sync. first mismatch at line 3 (current=| foundations/document-model.md | 473 | accepted | founda..., expected=| foundations/document-model.md | 547 | accepted | founda...). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "evidence": "spec-metrics-measurement-example AUTOGEN block out of sync. first mismatch at line 3 (current=| foundations/document-model.md | 473 | accepted | founda..., expected=| foundations/document-model.md | 547 | accepted | founda...). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
       "category": "Inventory",
       "check": "adr-readme-index",
       "file": null,
@@ -155,6 +218,627 @@
       "count": 1,
       "provenance": "legacy",
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-001-v3-charter exists as file but missing from ADR README index",
+      "evidence": "ADR-001-v3-charter exists as file but missing from ADR README index",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-002 exists as file but missing from ADR README index",
+      "evidence": "ADR-002 exists as file but missing from ADR README index",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-003 exists as file but missing from ADR README index",
+      "evidence": "ADR-003 exists as file but missing from ADR README index",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-004 exists as file but missing from ADR README index",
+      "evidence": "ADR-004 exists as file but missing from ADR README index",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-005 exists as file but missing from ADR README index",
+      "evidence": "ADR-005 exists as file but missing from ADR README index",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0101 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0101 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0102 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0102 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0103 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0103 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0104 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0104 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0105 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0105 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0106 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0106 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0107 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0107 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0108 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0108 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0109 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0109 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0110 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0110 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0111 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0111 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0112 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0112 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0114 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0114 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0123 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0123 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0124 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0124 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0125 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0125 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0127 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0127 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0128 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0128 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0129 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0129 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0130 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0130 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0131 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0131 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0132 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0132 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0134 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0134 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0135 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0135 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0136 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0136 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0137 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0137 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0138 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0138 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "adr-readme-index",
+      "file": "ADR-0139 listed in ADR README index but no corresponding file",
+      "evidence": "ADR-0139 listed in ADR README index but no corresponding file",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "Inventory",
+      "check": "docmap-spec-sync",
+      "file": "DOC-MAP links to spec 'local-generation.md' which does not exist",
+      "evidence": "DOC-MAP links to spec 'local-generation.md' which does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LifecycleBoundary",
+      "check": "workflow-status-prohibition",
+      "file": "Workflow status / 6 micro-phase state management pattern detected in REQ/SPEC",
+      "evidence": "Workflow status / 6 micro-phase state management pattern detected in REQ/SPEC",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0001 referenced but ADR file does not exist",
+      "evidence": "ADR-0001 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-001 referenced but ADR file does not exist",
+      "evidence": "ADR-001 referenced but ADR file does not exist",
+      "count": 11,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0101 referenced but ADR file does not exist",
+      "evidence": "ADR-0101 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0102 referenced but ADR file does not exist",
+      "evidence": "ADR-0102 referenced but ADR file does not exist",
+      "count": 3,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0103 referenced but ADR file does not exist",
+      "evidence": "ADR-0103 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0104 referenced but ADR file does not exist",
+      "evidence": "ADR-0104 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0105 referenced but ADR file does not exist",
+      "evidence": "ADR-0105 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0106 referenced but ADR file does not exist",
+      "evidence": "ADR-0106 referenced but ADR file does not exist",
+      "count": 3,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0107 referenced but ADR file does not exist",
+      "evidence": "ADR-0107 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0108 referenced but ADR file does not exist",
+      "evidence": "ADR-0108 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0109 referenced but ADR file does not exist",
+      "evidence": "ADR-0109 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-011 referenced but ADR file does not exist",
+      "evidence": "ADR-011 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0110 referenced but ADR file does not exist",
+      "evidence": "ADR-0110 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0111 referenced but ADR file does not exist",
+      "evidence": "ADR-0111 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0112 referenced but ADR file does not exist",
+      "evidence": "ADR-0112 referenced but ADR file does not exist",
+      "count": 4,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0113 referenced but ADR file does not exist",
+      "evidence": "ADR-0113 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0114 referenced but ADR file does not exist",
+      "evidence": "ADR-0114 referenced but ADR file does not exist",
+      "count": 3,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0123 referenced but ADR file does not exist",
+      "evidence": "ADR-0123 referenced but ADR file does not exist",
+      "count": 8,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0124 referenced but ADR file does not exist",
+      "evidence": "ADR-0124 referenced but ADR file does not exist",
+      "count": 4,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0125 referenced but ADR file does not exist",
+      "evidence": "ADR-0125 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0126 referenced but ADR file does not exist",
+      "evidence": "ADR-0126 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0127 referenced but ADR file does not exist",
+      "evidence": "ADR-0127 referenced but ADR file does not exist",
+      "count": 4,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0128 referenced but ADR file does not exist",
+      "evidence": "ADR-0128 referenced but ADR file does not exist",
+      "count": 4,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0129 referenced but ADR file does not exist",
+      "evidence": "ADR-0129 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0130 referenced but ADR file does not exist",
+      "evidence": "ADR-0130 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0131 referenced but ADR file does not exist",
+      "evidence": "ADR-0131 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0132 referenced but ADR file does not exist",
+      "evidence": "ADR-0132 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0134 referenced but ADR file does not exist",
+      "evidence": "ADR-0134 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0135 referenced but ADR file does not exist",
+      "evidence": "ADR-0135 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0136 referenced but ADR file does not exist",
+      "evidence": "ADR-0136 referenced but ADR file does not exist",
+      "count": 6,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0137 referenced but ADR file does not exist",
+      "evidence": "ADR-0137 referenced but ADR file does not exist",
+      "count": 3,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0138 referenced but ADR file does not exist",
+      "evidence": "ADR-0138 referenced but ADR file does not exist",
+      "count": 3,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0139 referenced but ADR file does not exist",
+      "evidence": "ADR-0139 referenced but ADR file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "ADR-0140 referenced but ADR file does not exist",
+      "evidence": "ADR-0140 referenced but ADR file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
     },
     {
       "category": "LinkIntegrity",
@@ -357,11 +1041,236 @@
     {
       "category": "LinkIntegrity",
       "check": "broken-file-link",
+      "file": "Link target does not exist: ../../.agentdev/v3-migration/decisions.md",
+      "evidence": "Link target does not exist: ../../.agentdev/v3-migration/decisions.md",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-file-link",
+      "file": "Link target does not exist: ../../requirements/v2:REQ-0150.md",
+      "evidence": "Link target does not exist: ../../requirements/v2:REQ-0150.md",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-file-link",
+      "file": "Link target does not exist: local-generation.md",
+      "evidence": "Link target does not exist: local-generation.md",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-file-link",
+      "file": "Link target does not exist: specs/local/local-generation.md",
+      "evidence": "Link target does not exist: specs/local/local-generation.md",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-file-link",
       "file": "docs/specs/quality/quality-gates.md",
       "evidence": "../../src/opencode/skills/agentdev-quality-gates/SKILL.md",
       "count": 1,
       "provenance": "legacy",
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0101 referenced but REQ file does not exist",
+      "evidence": "REQ-0101 referenced but REQ file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0102 referenced but REQ file does not exist",
+      "evidence": "REQ-0102 referenced but REQ file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0104 referenced but REQ file does not exist",
+      "evidence": "REQ-0104 referenced but REQ file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0107 referenced but REQ file does not exist",
+      "evidence": "REQ-0107 referenced but REQ file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0108 referenced but REQ file does not exist",
+      "evidence": "REQ-0108 referenced but REQ file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0109 referenced but REQ file does not exist",
+      "evidence": "REQ-0109 referenced but REQ file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0110 referenced but REQ file does not exist",
+      "evidence": "REQ-0110 referenced but REQ file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0112 referenced but REQ file does not exist",
+      "evidence": "REQ-0112 referenced but REQ file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0113 referenced but REQ file does not exist",
+      "evidence": "REQ-0113 referenced but REQ file does not exist",
+      "count": 3,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0119 referenced but REQ file does not exist",
+      "evidence": "REQ-0119 referenced but REQ file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0136 referenced but REQ file does not exist",
+      "evidence": "REQ-0136 referenced but REQ file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0137 referenced but REQ file does not exist",
+      "evidence": "REQ-0137 referenced but REQ file does not exist",
+      "count": 4,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0138 referenced but REQ file does not exist",
+      "evidence": "REQ-0138 referenced but REQ file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0140 referenced but REQ file does not exist",
+      "evidence": "REQ-0140 referenced but REQ file does not exist",
+      "count": 4,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0143 referenced but REQ file does not exist",
+      "evidence": "REQ-0143 referenced but REQ file does not exist",
+      "count": 4,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0150 referenced but REQ file does not exist",
+      "evidence": "REQ-0150 referenced but REQ file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0152 referenced but REQ file does not exist",
+      "evidence": "REQ-0152 referenced but REQ file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0155 referenced but REQ file does not exist",
+      "evidence": "REQ-0155 referenced but REQ file does not exist",
+      "count": 5,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0158 referenced but REQ file does not exist",
+      "evidence": "REQ-0158 referenced but REQ file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0162 referenced but REQ file does not exist",
+      "evidence": "REQ-0162 referenced but REQ file does not exist",
+      "count": 2,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-req-ref",
+      "file": "REQ-0164 referenced but REQ file does not exist",
+      "evidence": "REQ-0164 referenced but REQ file does not exist",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
     },
     {
       "category": "LinkIntegrity",
@@ -3017,6 +3926,15 @@
       "count": 1,
       "provenance": "legacy",
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
+    },
+    {
+      "category": "Specs",
+      "check": "specs-existence",
+      "file": "local/local-generation.md not found at docs/specs/local/local-generation.md",
+      "evidence": "local/local-generation.md not found at docs/specs/local/local-generation.md",
+      "count": 1,
+      "provenance": "v3-migration",
+      "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
     }
   ]
 }

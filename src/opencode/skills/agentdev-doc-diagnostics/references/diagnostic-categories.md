@@ -35,7 +35,7 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 | agentdev command 群 | 配布物の ID 汚染検出（利用者向け） |
 | agentdev skill 群 | 配布物の ID 汚染検出（利用者向け） |
 
-`docs/requirements/retired/` 配下、`docs/requirements/mapping-table.md` は履歴保持のため対象外とする。
+`docs/requirements/retired/` 配下、要件マッピング表は履歴保持のため対象外とする。
 
 ### 横断スキャン観点
 

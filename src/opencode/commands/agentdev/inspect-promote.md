@@ -1,6 +1,5 @@
 ---
 description: 検出事項を分類、採用し、採用済み成果物として .agentdev/inspect/promoted/ へ出力する。--auto で高確信度の検出事項を .agentdev/intake/promoted/ へ自動投入する
-agent: sisyphus
 ---
 
 # inspect-promote

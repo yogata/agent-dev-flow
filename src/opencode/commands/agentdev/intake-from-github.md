@@ -1,6 +1,5 @@
 ---
 description: クローズ済み GitHub Issue/PR から未回収の変更候補を intake item として保存する
-agent: sisyphus
 ---
 
 # Intake（GitHub 抽出）

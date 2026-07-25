@@ -206,9 +206,9 @@ READ 手続き（Section 3）に従い Node.js `execSync` で取得し、一時�
 - mergeable 状態: `gh pr view {N} --json mergeable,mergeStateStatus`
 - コメント一覧: `gh pr view {N} --json comments`
 
-#### PR 変更ファイル一覧取得 / PR mergeable 状態取得（REQ-0149-011）
+#### PR 変更ファイル一覧取得 / PR mergeable 状態取得
 
-REQ-0149-011 で拡張手続きとして新設された2手続きの標準版（GitHub 版）実装は前段の gh CLI 例を使用する。いずれも READ 手続き（Section 3）に従い Node.js `execSync` で取得する。READ 手続きであるため Windows コンソールエンコーディング初期化（Section 2 Step 0）は不要（REQ-0149-009 対象外）。事後条件は SPEC `agentdev-gh-cli`.md「拡張手続き（REQ-0149-011）」参照。
+拡張手続きとして新設された2手続きの標準版（GitHub 版）実装は前段の gh CLI 例を使用する。いずれも READ 手続き（Section 3）に従い Node.js `execSync` で取得する。READ 手続きであるため Windows コンソールエンコーディング初期化（Section 2 Step 0）は不要。事後条件は SPEC `agentdev-gh-cli`.md「拡張手続き」参照。
 
 - **PR 変更ファイル一覧取得**: `gh pr view {N} --json files` を実行し、`files[].path` を抽出して文字列配列を返す
 - **PR mergeable 状態取得**: `gh pr view {N} --json mergeable,mergeStateStatus` を実行し、`mergeable` 値（`MERGEABLE` / `CONFLICTING` / `UNKNOWN`）をそのまま返す。`UNKNOWN` の取り扱い（squash merge 前のポーリング）は後述「squash merge 前の mergeable UNKNOWN ポーリング」セクション参照

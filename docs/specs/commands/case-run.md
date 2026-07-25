@@ -12,17 +12,17 @@ updated: 2026-07-24
 単一 Issue または単一 Wave（Epic Issue 指定時: 現在 ready な Wave の子Issue を並列実行）を実行担当サブエージェントへ委譲し、result を処理する。
 worktree前提、委譲、結果処理を責務とする。
 3フェーズ構成でべき等性、再開ポイントを提供する。
-case-run 本体は orchestration に専念し、実装実行そのものは行わない（ADR-0114、ADR-0128）。
+case-run 本体は orchestration に専念し、実装実行そのものは行わない（REQ-011、v2:ADR-0128）。
 
 ## 委譲契約
 
 case-run から実行担当サブエージェントへの委譲契約を以下に正規化する。
 
-- **委譲先**: case-run は実行担当サブエージェントへ実装作業を委譲する。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-0162-002）。
+- **委譲先**: case-run は実行担当サブエージェントへ実装作業を委譲する。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
 - **adapter skill**: AgentDevFlow 側の case-run 実行 adapter skill（`agentdev-case-run-execution-adapter`）を指定する。adapter skill は委譲契約、result 契約、worktree 隔離等の case-run 固有知識を提供する。adapter skill 経由で委譲を起動する。
 - **委譲 prompt**: 実行 command を prompt 内に含めて委譲する。実行担当サブエージェントは prompt 内で指定された command を起動する。command の具体名は AGENTS.md および references/<harness>.md 参照。
 - **実行主体分類**: 委譲 prompt 内で実行される command は skill ではなく command である。`load_skills` には command 名を指定せず、adapter skill 名を指定する。
-- **test strategy 項目の test-fix ループ（REQ-0130-029/030）**: Issue 本文のテスト戦略セクションに test strategy 項目（3要素構造: verification / pass_criteria / on_failure）が含まれる場合、委譲契約は各項目の検証、不合格時の処置（実装修正して再検証、または Findings 記録）、全項目処理までの反復を実行担当サブエージェントに要求する。詳細な責務は adapter skill（`agentdev-case-run-execution-adapter`）が定義する。
+- **test strategy 項目の test-fix ループ（REQ-006-029/030）**: Issue 本文のテスト戦略セクションに test strategy 項目（3要素構造: verification / pass_criteria / on_failure）が含まれる場合、委譲契約は各項目の検証、不合格時の処置（実装修正して再検証、または Findings 記録）、全項目処理までの反復を実行担当サブエージェントに要求する。詳細な責務は adapter skill（`agentdev-case-run-execution-adapter`）が定義する。
 
 ## 入力
 
@@ -38,7 +38,7 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 ## 副作用
 
 - worktree 作成: `.worktrees/{N}-{type}/`（`agentdev-git-worktree`）
-- git fetch: Epic Wave 実行時、PR merge 後再開時に worktree 作成前に `git fetch origin` を実行し origin/main 鮮度確認（REQ-0130-023）
+- git fetch: Epic Wave 実行時、PR merge 後再開時に worktree 作成前に `git fetch origin` を実行し origin/main 鮮度確認（REQ-006-023）
 - GitHub API: PR 作成は実行担当サブエージェントが実施。case-run 本体は Issue コメント読取のみ
 - intake / learning capture: PR 本文記録のみ（直接 inbox 変更禁止）
 
@@ -65,33 +65,33 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 
 ### 実行担当サブエージェント委譲フェーズ（Steps 6-7）
 
-- Step 6: 実行担当サブエージェント起動（adapter protocol: `agentdev-case-run-execution-adapter`）（ADR-0128, REQ-0130-016/017）。委譲契約の詳細は前述「委譲契約」セクション参照。起動手段は AGENTS.md および references/<harness>.md 参照（REQ-0162-002）
+- Step 6: 実行担当サブエージェント起動（adapter protocol: `agentdev-case-run-execution-adapter`）（v2:ADR-0128, REQ-006-016/017）。委譲契約の詳細は前述「委譲契約」セクション参照。起動手段は AGENTS.md および references/<harness>.md 参照（REQ-002-002）
  - 委譲プロンプト: 実行 command を prompt 内で指定（command の具体名は AGENTS.md 参照）
- - 実行担当サブエージェント責務: 委譲 prompt 内で指定された command による目標分解、observable evidence 要求、品質ゲート（code review + QA review + gate review）、test strategy 項目の test-fix ループ（各項目ごとの検証、不合格時処置（fix-and-reverify / record-in-findings）、全項目処理までの反復、REQ-0130-030）
- - 委譲起動失敗、異常終了時の扱い: 即 `failed` とせず**実装完了、検証未完了**として扱う（REQ-0130-025）。委譲起動不能の場合は `delegation-unavailable` として報告する（REQ-0162-003/004）
+ - 実行担当サブエージェント責務: 委譲 prompt 内で指定された command による目標分解、observable evidence 要求、品質ゲート（code review + QA review + gate review）、test strategy 項目の test-fix ループ（各項目ごとの検証、不合格時処置（fix-and-reverify / record-in-findings）、全項目処理までの反復、REQ-006-030）
+ - 委譲起動失敗、異常終了時の扱い: 即 `failed` とせず**実装完了、検証未完了**として扱う（REQ-006-025）。委譲起動不能の場合は `delegation-unavailable` として報告する（REQ-002-003/004）
  - case-run が直接行わない（実行担当サブエージェント責務）: work plan生成、実装実行、TDD、乖離検出（QG-3）、specs更新、関連ドキュメント整合性確認、ローカル検証、PR本文作成、PR作成、デプロイ検証
  - PR URL 受領: 実行担当サブエージェントが直接 PR 作成し PR URL を委譲 result として返却
  - Findings / Capture 候補: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` に記録
- - SPEC確定候補: 実行担当サブエージェントが PR 本文の `## SPEC確定候補` セクションに記録（ADR-0123 Decision #4, REQ-0136-015）
+ - SPEC確定候補: 実行担当サブエージェントが PR 本文の `## SPEC確定候補` セクションに記録（v2:ADR-0123 Decision #4, REQ-001-015）
 - Step 7: 実行担当サブエージェント result 処理（`agentdev-case-run-execution-adapter` result 契約の4状態のいずれかを処理）
  - completed-pr: 実装完了、PR作成済み。PR番号を受け取りクリーンアップフェーズへ
  - blocked: 回答可能な blocker。詳細本文は Issue コメントに SSoT として記録済み
  - failed: repository context で回答不能な blocker。詳細本文は Issue コメントに構造化して記録済み
- - delegation-unavailable: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す（REQ-0162-004）
+ - delegation-unavailable: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す（REQ-002-004）
 
 ### Epic Wave 実行モード
 
-ADR-0128 Decision #3 に基づく。
+v2:ADR-0128 Decision #3 に基づく。
 1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。
 同一コマンド再実行で次 Wave に進む（べき等）。
 
-1. Epic Issue 本文読込（子Issue一覧、Wave 構成、ステータス追跡テーブル（永続状態を SSoT とする、ADR-0109））
+1. Epic Issue 本文読込（子Issue一覧、Wave 構成、ステータス追跡テーブル（永続状態を SSoT とする、REQ-006））
 2. 現在 ready な Wave の子Issue 特定（`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択）。前提Issue が blocked/failed の場合は `pending` のまま選択対象外
-3. `git fetch origin` 実行（REQ-0130-023）
+3. `git fetch origin` 実行（REQ-006-023）
 4. 子Issue の worktree 作成（Step 5、Step 5-2 を各子Issue について実行
 ）
 5. 各子Issue を実行担当サブエージェントに並列委譲する（adapter protocol: `agentdev-case-run-execution-adapter`）。
- 委譲の起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-0162-002）。
+ 委譲の起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
  最大5件同時起動
 6. 全委譲完了待機
 7. 結果収集（各子Issue の result（completed-pr / blocked / failed / delegation-unavailable）を収集）
@@ -101,11 +101,11 @@ ADR-0128 Decision #3 に基づく。
 
 - Step 8: worktree クリーンアップ確認 + 完了報告
   - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
-  - 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness の責務であり、case-run は関与しない（REQ-0162-002）
+  - 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness の責務であり、case-run は関与しない（REQ-002-002）
 
 ## QG-3 前置 staleness check 手順（新規セクション）
 
-case-run は実装作業開始前に QG-3 本体とは独立した前置検査として staleness check を実行する（REQ-0130-031〜034）。本検査は QG-3 deviation 分類（spec-bug 等）運用を変更せず、deviation 発生前の予防層として位置づける。
+case-run は実装作業開始前に QG-3 本体とは独立した前置検査として staleness check を実行する（REQ-006-031〜034）。本検査は QG-3 deviation 分類（spec-bug 等）運用を変更せず、deviation 発生前の予防層として位置づける。
 
 ### 検証項目
 
@@ -124,13 +124,13 @@ case-run は実装作業開始前に QG-3 本体とは独立した前置検査�
 
 staleness check は QG-3 本体（PR 作成直前の実装充足・乖離ゲート）とは独立した前置検査である。QG-3 が実装結果に対するゲートであるのに対し、staleness check は実装開始前の入力妥当性検査である。両者は順序依存を持たず、staleness check で差異を検出しても QG-3 本体の実施要否には影響しない。
 
-## docs/** 変更時の targeted docs guard（REQ-0130-035）
+## docs/** 変更時の targeted docs guard（REQ-006-035）
 
-case-run は PR 対象ファイルに docs/** 変更を含む場合、Step 6（実行担当サブエージェント起動）の委譲前に targeted docs guard を実行する（REQ-0130-035）。本検査は QG-3 本体・QG-3 前置 staleness check とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない（REQ-0130-033 準拠）。
+case-run は PR 対象ファイルに docs/** 変更を含む場合、Step 6（実行担当サブエージェント起動）の委譲前に targeted docs guard を実行する（REQ-006-035）。本検査は QG-3 本体・QG-3 前置 staleness check とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない（REQ-006-033 準拠）。
 
 ### 実行条件
 
-- PR 対象ファイルに docs/** 変更を含む場合に実行する。docs/** 変更を含まない PR（コードのみ、SCRIPT のみ等）ではスキップする（REQ-0130-007 の QG-3 限定原則を維持、docs全体grep ではなく変更ファイル限定の targeted 検査）
+- PR 対象ファイルに docs/** 変更を含む場合に実行する。docs/** 変更を含まない PR（コードのみ、SCRIPT のみ等）ではスキップする（REQ-006-007 の QG-3 限定原則を維持、docs全体grep ではなく変更ファイル限定の targeted 検査）
 
 ### 実行コマンド
 
@@ -144,17 +144,17 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
 ### 検出結果の記録と連携
 
 - 検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` セクションに `### docs-integrity` 小見出しで記録する
-- case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない、REQ-0130-034 準拠）
+- case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない、REQ-006-034 準拠）
 
-## verification-only PR（実装差分なし、検証のみ）（REQ-0158-002）
+## verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）
 
-case-run は実行担当サブエージェント委譲の結果、実装差分0件・検証のみで完了する PR（**verification-only PR**）を生成する場合がある。本節は verification-only PR の判定条件、PR 本文の根拠欄記入規則、GitHub の空 PR 取り扱い、case-close への引継ぎ注意事项を定める。要件の SSoT は REQ-0158-002。
+case-run は実行担当サブエージェント委譲の結果、実装差分0件・検証のみで完了する PR（**verification-only PR**）を生成する場合がある。本節は verification-only PR の判定条件、PR 本文の根拠欄記入規則、GitHub の空 PR 取り扱い、case-close への引継ぎ注意事项を定める。要件の SSoT は v2:REQ-0158-002。
 
 PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。pr_desc.md への verify-only 根拠欄追加は workflow-templates SPEC の変更として位置付ける。
 
 ### 定義
 
-verification-only PR は以下を全て満たす PR とする（REQ-0158-002）。
+verification-only PR は以下を全て満たす PR とする（v2:REQ-0158-002）。
 
 - PR の変更ファイル数が0件（`gh pr view --json files` で `files: []`）
 - Issue の受け入れ基準が検証のみで充足された（既存実装・既存文書が要件を満たしており、追加実装を要しなかった）
@@ -174,9 +174,9 @@ GitHub は空 PR（変更ファイル0件）の squash merge を許可し、空 
 
 verification-only PR は case-close Step 3-1 targeted docs guard で files_checked が空になるため、次の注意事项を case-close へ引き継ぐ。
 
-- PR 本文の verify-only 根拠欄に「実装差分を含まない理由」「根拠成果物または commit」「検証対象」「検証結果」が記録されていること（[case-close.md](case-close.md)「verification-only PR の files_checked 空確認（REQ-0158-002）」参照）
-- case-close は files_checked 空を検出した場合、REQ-0158-002 に基づき verification-only 判定ステップを経て PASS 処理する（false-clean 3層防御との相互作用は case-close SPEC 参照）
-- case-run 側は PR 作成までを責務とし、verification-only 判定自体は case-close が行う（単一書き手: case-close、ADR-0114 完了条件チェックボックス専任責務）
+- PR 本文の verify-only 根拠欄に「実装差分を含まない理由」「根拠成果物または commit」「検証対象」「検証結果」が記録されていること（[case-close.md](case-close.md)「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」参照）
+- case-close は files_checked 空を検出した場合、v2:REQ-0158-002 に基づき verification-only 判定ステップを経て PASS 処理する（false-clean 3層防御との相互作用は case-close SPEC 参照）
+- case-run 側は PR 作成までを責務とし、verification-only 判定自体は case-close が行う（単一書き手: case-close、REQ-011 完了条件チェックボックス専任責務）
 
 ## 参照する横断 SPEC
 
@@ -190,13 +190,13 @@ verification-only PR は case-close Step 3-1 targeted docs guard で files_check
 
 case-run が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
 
-- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、Step 6 委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-0130-035）](#docs-変更時の-targeted-docs-guardreq-0130-035) 参照）
+- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、Step 6 委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-006-035）](#docs-変更時の-targeted-docs-guardREQ-006-035) 参照）
 - check_extensions.ts（IR-056）: `src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/SKILL.md`, `src/opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
-- test_strategy: Issue 完了条件検証（REQ-0130-029/030）
+- test_strategy: Issue 完了条件検証（REQ-006-029/030）
 
 case-run は check_integrity.ts（全体監査）を使用しない（case-run は worktree で実行、PR 単位の targeted 検査が責務。全体監査は /repo/docs-check の責務）。
 
-※上記は全て肯定表現である（REQ-0144-002, REQ-0144-003 準拠）。
+※上記は全て肯定表現である（REQ-010-002, REQ-010-003 準拠）。
 
 ## 対象外
 
@@ -209,8 +209,8 @@ case-run は check_integrity.ts（全体監査）を使用しない（case-run �
 - 実行担当サブエージェント result 以外の状態扱い（G23、`agentdev-case-run-execution-adapter` result 契約に従う）
 - 完了条件チェックボックスの評価、更新（G24、case-close QG-4 責務）
 - blocked / failed SSoT の一時会話コンテキスト、中間ファイル使用（G25、Issue コメント、PR 本文が SSoT）
-- 外部実行ハーネス中間成果物の内部構造依存処理、検証（G26、REQ-0139-007）
-- 外部実行手段中間成果物の永続成果物扱い（G29、REQ-0139-007）
+- 外部実行ハーネス中間成果物の内部構造依存処理、検証（G26、REQ-003-007）
+- 外部実行手段中間成果物の永続成果物扱い（G29、REQ-003-007）
 - worktree 未作成時、メインリポジトリでの 実行担当サブエージェント起動（G30、Step 5-2 precondition gate）
 - 実行担当サブエージェントへメインリポジトリパスを渡すこと（G31、worktree root 相対パス指定）
 - Epic Wave 実行モードで1 Wave を超える処理、Wave 境界（PR マージ）の実施（G32、case-close へ委譲）
@@ -220,20 +220,20 @@ case-run は check_integrity.ts（全体監査）を使用しない（case-run �
 
 - Step 5-2 precondition gate: worktree+ブランチ作成済みを検証（`git worktree list` + `git rev-parse --show-toplevel`）。検証失敗時は 実行担当サブエージェント起動禁止
 - 実行担当サブエージェント result 4状態（completed-pr / blocked / failed / delegation-unavailable）の取り扱い正確性（G23）
-- PR URL 受領の確実性（REQ-0130-021 廃止に伴い PR URL フォールバック検索不使用）
+- PR URL 受領の確実性（REQ-006-021 廃止に伴い PR URL フォールバック検索不使用）
 - Epic Wave 実行時の1 Wave のみ処理、べき等性（同コマンド再実行で次 Wave に進む）
 - 出力制約: PR 本文、commit message は verbatim で返す（成果物本文）
 
-## case-auto 並列委譲モデル（REQ-0114-087〜093）
+## case-auto 並列委譲モデル（REQ-006-087〜093）
 
-case-run は同一 Wave 内子Issue 処理を最大5件まで並列委譲する（REQ-0130-026、REQ-0114-087）。
-本機能は Epic Wave モデル（ADR-0128）で既に実装済み。
-case-auto 並列委譲モデル拡張により、Standard flow 起因の独立 OU 自動 Epic 化（REQ-0114-088）でも本機能が適用される。
+case-run は同一 Wave 内子Issue 処理を最大5件まで並列委譲する（REQ-006-026、REQ-006-087）。
+本機能は Epic Wave モデル（v2:ADR-0128）で既に実装済み。
+case-auto 並列委譲モデル拡張により、Standard flow 起因の独立 OU 自動 Epic 化（REQ-006-088）でも本機能が適用される。
 case-run 側の新規機能追加は不要で、入力としての Epic Issue が増えるのみ。
 
 ## L2 タイムスタンプ計測
 
-case-run は実行担当サブエージェント委譲の起動直前、直後にタイムスタンプを記録し、実行担当サブエージェント実行時間および worktree 設定/クリーンアップ時間を result に含める（REQ-0151-009、REQ-0130-028）。
+case-run は実行担当サブエージェント委譲の起動直前、直後にタイムスタンプを記録し、実行担当サブエージェント実行時間および worktree 設定/クリーンアップ時間を result に含める（REQ-003-009、REQ-006-028）。
 
 計測対象は以下のフェーズ前後とする。
 各フェーズは command 定義（src/opencode/commands/agentdev/case-run.md）の L2 タイムスタンプ計測ポイントと対応する（Step 番号によらず、下記フェーズ前後で計測する）。
@@ -242,11 +242,11 @@ case-run は実行担当サブエージェント委譲の起動直前、直後�
 - 委譲（起動直前、直後）
 - worktree クリーンアップ（開始、完了）
 
-検証（test strategy 項目の test-fix ループ、QG-3）は委譲範囲内で実行担当サブエージェントが実行する責務分担（REQ-0130-029/030）であり、case-run 本体から独立した L2 計測ポイントではない。
+検証（test strategy 項目の test-fix ループ、QG-3）は委譲範囲内で実行担当サブエージェントが実行する責務分担（REQ-006-029/030）であり、case-run 本体から独立した L2 計測ポイントではない。
 検証時間は委譲の起動直前、直後のタイムスタンプに含まれる。
 
-記録された L2 タイムスタンプは case-auto の工程別壁時計時間報告（REQ-0151-008）の入力として消費される。
-L3（委譲先内部メトリクス）は対象外とする（REQ-0151-010）。
+記録された L2 タイムスタンプは case-auto の工程別壁時計時間報告（REQ-003-008）の入力として消費される。
+L3（委譲先内部メトリクス）は対象外とする（REQ-003-010）。
 
 ## See Also
 
@@ -259,8 +259,8 @@ L3（委譲先内部メトリクス）は対象外とする（REQ-0151-010）。
 - `agentdev-workflow-lifecycle` skill（work_type 判定）
 - `agentdev-req-analysis` skill（チェックボックス品質基準）
 - `agentdev-epic-tracker` skill（ステータス追跡テーブル）
-- REQ-0130（case-run / 実装パイプライン）
-- REQ-0139（外部エージェント統合契約）
-- ADR-0114（case-auto 最大自走モード）
-- ADR-0128（case-run 外部実行委譲）
+- REQ-006（case-run / 実装パイプライン）
+- REQ-003（外部エージェント統合契約）
+- REQ-011（case-auto 最大自走モード）
+- v2:ADR-0128（case-run 外部実行委譲）
 

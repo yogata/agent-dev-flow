@@ -68,5 +68,5 @@ updated: 2026-07-18
 - [intake-promote.md](intake-promote.md)（後続コマンド（採用判断））
 - [intake-from-github.md](intake-from-github.md)（GitHub からの自動抽出）
 - `agentdev-intake-pipeline` skill（共通手順）
-- REQ-0127（Intake command群）
+- REQ-010（Intake command群）
 

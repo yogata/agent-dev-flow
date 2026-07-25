@@ -12,7 +12,7 @@ status: accepted
 | category | document-drift |
 | detection_method | frontmatter id 抽出 → ファイル名と照合 |
 | affected_artifacts | [現行 REQ] |
-| related_req | [REQ-0108-001, REQ-0101] |
+| related_req | [REQ-010-001, REQ-001] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。id/ファイル名 の不一致は確実な NG |

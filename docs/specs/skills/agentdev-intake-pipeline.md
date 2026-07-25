@@ -36,7 +36,7 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 
 - 抽出と promote の双方のロジックを提供
 - RU 生成は backlog-review に委譲
-- intake 系コマンドは `.agentdev/intake/` 更新前後に git 永続化を実行（REQ-0108）
+- intake 系コマンドは `.agentdev/intake/` 更新前後に git 永続化を実行（REQ-010）
 
 ## 対象外
 
@@ -57,5 +57,5 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 - [commands/intake-from-github.md](../commands/intake-from-github.md)
 - [commands/intake-promote.md](../commands/intake-promote.md)
 - [../workflows/capture-boundaries.md](../workflows/capture-boundaries.md)
-- REQ-0127（Intake command群）
+- REQ-010（Intake command群）
 

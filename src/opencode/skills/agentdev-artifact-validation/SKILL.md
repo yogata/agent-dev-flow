@@ -77,7 +77,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-frontmatter-consistency.ts docs/requirements req
 
 # stdin JSON 入力
-echo '{"id":"REQ-0103","files":["docs/requirements/README.md"]}' | bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-entry-existence.ts
+echo '{"id":"REQ-{NNNN}","files":["docs/requirements/README.md"]}' | bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-entry-existence.ts
 
 # テスト実行
 cd .opencode/skills/agentdev-artifact-validation/scripts && bun test

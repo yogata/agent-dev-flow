@@ -12,7 +12,7 @@ status: accepted
 | category | obsolete-structure |
 | detection_method | `src/opencode/commands/agentdev/*.md` を対象に Step 文脈の `[0-9][a-z]` を検出し、N-M 形式への統一を確認 |
 | affected_artifacts | [commands, command projection, integrity rules] |
-| related_req | [REQ-0119-006, REQ-0119-021] |
+| related_req | [REQ-003-006, REQ-003-021] |
 | related_spec | [artifact-contracts.md, workflow-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。一般語、旧語検出用文字列、projection 側の確認文は除外が必要 |

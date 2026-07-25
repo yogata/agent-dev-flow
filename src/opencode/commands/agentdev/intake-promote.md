@@ -1,6 +1,5 @@
 ---
 description: inbox 内の intake item をレビュー、分類し、採用 item を backlog-review 向けの採用済み成果物に整形する
-agent: sisyphus
 ---
 
 # Intake 昇格

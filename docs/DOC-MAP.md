@@ -6,87 +6,57 @@
 
 | 文書種別 | 基準 | 役割 |
 |---|---|---|
-| 現行 REQ | `requirements/REQ-{NNNN}.md` | 現行要件の永続基準 |
-| ADR | `adr/ADR-{NNNN}.md` | アーキテクチャ決定記録 |
-| SPEC | `specs/**/*.md` | リポジトリ内部の設計文書（現在仕様）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成。実行時配布物の依存先ではない（ADR-0103, ADR-0104） |
-| Guides | `guides/*.md` | 人間向けの案内層。規範的権限を持たない（ADR-0103） |
+| 現行 REQ | `requirements/REQ-{NNN}.md` | 現行要件の永続基準（REQ-001〜011） |
+| ADR | `adr/ADR-{NNN}.md` | アーキテクチャ決定記録（ADR-001〜005） |
+| SPEC | `specs/**/*.md` | リポジトリ内部の設計文書（現在仕様）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成。実行時配布物の依存先ではない（charter 原則、ADR-001） |
+| Guides | `guides/*.md` | 人間向けの案内層。規範的権限を持たない |
 | DOC-MAP | このファイル | 文書探索入口 |
+
+> v3.0.0 移行に伴い、REQ/ADR 番号は `REQ-001〜`、`ADR-001〜` の新枠を採用する（U9）。
+> v2.11.0 時点の `REQ-01XX`、`ADR-01XX` 番号帯は tag 参照とし、`v2:` プレフィックスで区別する。
 
 ## インデックス統計（自動生成）
 
 <!-- AUTOGEN:BEGIN:id=docmap-inventory -->
-- 現行 REQ: 52件（`docs/requirements/REQ-*.md`）
-- 廃止済み REQ: 2件（`docs/requirements/retired/REQ-*.md`）
-- ADR: 30件（`docs/adr/ADR-*.md`）
-- SPEC: 145件（`docs/specs/**/*.md`）
+- 現行 REQ: 11件（`docs/requirements/REQ-*.md`）
+- ADR: 5件（`docs/adr/ADR-*.md`）
+- SPEC: docs/specs/ 配下（3層 + 基盤6ドメイン）。詳細は [specs/README.md](specs/README.md)
 <!-- AUTOGEN:END -->
 
 ## 現行 REQ
 
 | REQ | タイトル | 概要 |
 |---|---|---|
-| [REQ-0101](requirements/REQ-0101.md) | 文書・REQ管理基準 | REQ/廃止済み REQ/ADR/SPEC/DOC-MAP/guides の基準境界 |
-| [REQ-0102](requirements/REQ-0102.md) | 要件定義・保存 | req-define / req-save / 分類ゲート / operation unit / execution_groups / SPEC候補分離（draft-meta.spec-candidates） / SPLIT予兆検知（draft-meta.split-forecast） |
-| [REQ-0103](requirements/REQ-0103.md) | Artifact責任分界 | command / skill / template / script / namespace / frontmatter 規約 / 実行時専用配布制約 / source-projection分離 / sync・migration / namespace予約 / SSOT化 / registry化 / consumer導入モデル / consumer plugin checkout・install script分離 |
-| [REQ-0104](requirements/REQ-0104.md) | Workflow / Command Protocol | ワークフロー、work_type + scale 分類、workflow_route、SSoT、case-open/run/close、前工程からの引き継ぎプロトコル、OU処理モード、Epic候補グループ |
-| [REQ-0105](requirements/REQ-0105.md) | RU lifecycle / Requirement Unit 管理 | intake-promote（review統合）、learning-promote（refine統合）、backlog-review、RU lifecycle |
-| [REQ-0106](requirements/REQ-0106.md) | Case実行オーケストレーション / Epic・Wave | case-run、case-close、Epic/Wave、完了ゲート |
-| [REQ-0107](requirements/REQ-0107.md) | Reporting / Writing Quality | 完了報告、GitHub本文品質、リンク、自然言語成果物品質 |
-| [REQ-0108](requirements/REQ-0108.md) | docs-check / Validation / Tests | 整合性検査、検出事項の分類・振り分け先、レポート出力、ガードレール、体系的テスト、frontmatter 規約検査、artifact collection registry、source/projection scan分離、基準管理、rule catalog、REQ impact map、3層gate、meta-integrity、配布対象外自己監査（/repo/docs-check） |
-| [REQ-0109](requirements/REQ-0109.md) | inspect-docs / REQ体系整合性 | 廃止済みアーカイブ、移行表、REQ再構成intake |
-| [REQ-0110](requirements/REQ-0110.md) | Git worktree cleanup 信頼性 | git-worktree、リトライ、信頼性 |
-| [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル・文書体系基盤・実行時独立性 | ADR status正規化、RU-ID排除、work_type固定、Pattern退場、integrity検査追加、ADR全面改定例外・01XX 基準・廃止済みへの移動 |
-| [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離 | skill references 内 SPEC 相当記述の分離、実行時の自己完束制約 |
-| [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード | case-auto orchestration、入力解決、work_type分岐、自走対象/対象外、停止条件、OU queue処理、連結成分ベース複数Standard/Epic分散（REQ-0114-088破壊的UPDATE） |
-| [REQ-0119](requirements/REQ-0119.md) | コマンド・スキル・サブエージェント責務分界 | command 薄型化 / skill 詳細移管 / sub-agent 委譲境界 / Step 整数化 / verbatim 条件付き / delegation_type SPEC降格 / ADR-0112 承認済み化 |
-| [REQ-0123](requirements/REQ-0123.md) | workflow-lifecycle 宣言的定義責務とコマンド固有手順のスキル分担 | workflow-lifecycle 責務限定実装 / 4新規スキル移管 / Skill粒度基準 / DO NOT USE FOR整合 |
-| [REQ-0124](requirements/REQ-0124.md) | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle | docs-review/skill-review/diagnostics-* 廃止・inspect-* 統一・draft type 廃止 |
-| [REQ-0125](requirements/REQ-0125.md) | inspect-skills / Command/Skill参照妥当性検出 | inspect-skills 検出コマンド定義 |
-| [REQ-0126](requirements/REQ-0126.md) | inspect-promote / 検出事項の分類・昇格 | inspect-promote 昇格コマンド定義 |
-| [REQ-0127](requirements/REQ-0127.md) | Intake command群 (capture / from-github / promote) | intake-capture / intake-from-github / intake-promote 定義 |
-| [REQ-0128](requirements/REQ-0128.md) | Learning-promote | learning-promote コマンド定義 |
-| [REQ-0129](requirements/REQ-0129.md) | Backlog-review | backlog-review コマンド定義 |
-| [REQ-0130](requirements/REQ-0130.md) | case-run / 実装パイプライン | case-run 3フェーズ構成・自律修正ループ |
-| [REQ-0131](requirements/REQ-0131.md) | case-close / 完了処理 | case-close 完了ゲート・QG-4・達成判定 |
-| [REQ-0132](requirements/REQ-0132.md) | case-open / Issue作成 | case-open Epic・子Issue作成、連結成分ベース複数Standard/Epic構成生成・3軸判断・単独根Standard flow |
-| [REQ-0133](requirements/REQ-0133.md) | case-update / Issue更新 | case-update Issue本文更新・コメント追加 |
-| [REQ-0134](requirements/REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install | source/projection layout、sync/migration script、repo type、consumer install |
-| [REQ-0135](requirements/REQ-0135.md) | Drafts配置・Draft Type Registry | `.agentdev/drafts/` 配置ルール、draft type registry |
-| [REQ-0136](requirements/REQ-0136.md) | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設・req-define 強化） | spec-save 新設、req-define SPEC分離強化、case-* SPEC確定フロー、inspect-promote 自動promote、REQ健全性メトリクス、SPEC lifecycle（draft/accepted） |
-| [REQ-0137](requirements/REQ-0137.md) | 並列実行安全 git 操作規律（共有作業ツリーでの case-auto 並行実行支援） | 並列実行安全 git 操作規律、スイープ操作禁止、明示パスステージ&コミット、消費アーティファクト(draft/RU)削除信頼性・Form Zero解消・削除検証 Standard/Epic 全flow適用 |
-| [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 | コマンド間引き継ぎ draft 契約、soft-contract原則、artifact_actions構造、LLM推論消費、depends_on意義拡張（技術的+機能的依存ヒント）・case_open_hints記録 |
-| [REQ-0139](requirements/REQ-0139.md) | 外部エージェント統合契約 | 外部エージェント統合、case-run外部実行委譲、driver adapter契約、req-define分類結果アクション |
-| [REQ-0140](requirements/REQ-0140.md) | 文書品質ゲート | 文書種別責務・要件性・文意品質・粒度の査読、IR-045、ドリフト検出、既存文書への遡及準拠修正 |
-| [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 導入方式とローカルCaseファイル運用 | link mode導入方式、src/opencode-local/ agentdev-gh-cli原本領域、agentdev-gh-cli差し替え、ローカルCaseファイル、GitHub Issue/PR 置換、unlink/relink、link target確認 |
-| [REQ-0142](requirements/REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 | 配布物 ID 除去後の完了条件としての文意保持・構文健全性・責務整合、Markdown 構文破損回避・主要構造重複回避・壊れた参照残骸除去、command / skill / SPEC 間責務説明整合（case-open / case-run / case-close / case-auto）、横断検査観点拡充、NG / false positive 分類明確化、docs-spec-rebuild-integrity.md |
-| [REQ-0143](requirements/REQ-0143.md) | Command 定義ファイルフォーマット標準化 | AgentDevFlow 管理 command 定義ファイル（src/opencode/commands/agentdev/*.md・.opencode/commands/repo/*.md）の command file format 準拠、適用対象限定、consumer project 独自 command 強制対象外 |
-| [REQ-0144](requirements/REQ-0144.md) | docs-check/integrity 運用是正 | 廃止REQ履歴マーク参照・workflow否定表現・RFC2119マーカー・日本語品質・skill-category-gap・コマンド一覧網羅・REQ範囲表記・fixture経年劣化・QG/case-close Step番号・実行主体誤分類表記検出・integrity reports git除外 |
-| [REQ-0145](requirements/REQ-0145.md) | docs-check/integrity 検出設計改善 | IR-044 SPEC詳細混入解消・委譲キーワード境界ケース・catalog↔実装双方向同期・docs-check項目役割範囲・新カテゴリ追加判定フロー・IR-050/051 語彙レジストリ・閾値確定・3層検出構造責務分担・draft SPEC参照リスト・references checker偽陽性・完了条件grep設計 |
-| [REQ-0146](requirements/REQ-0146.md) | 実行契約・委譲・プロセス設計 | 委譲契約・case-open即時push・case-auto委譲契約MUST NOT DO・case-close squash merge後reset・git-common-procedures・実行主体分類表・3層検出構造SPEC化・doc-writing査読観点・前工程完了度3段階・subagent-protocol・command-authoring判断基準・バッチIssue完了判定追跡性 |
-| [REQ-0147](requirements/REQ-0147.md) | 文書化規律・HITL境界 | SKILL↔command同一ルール重複許容基準・新旧REQ適用運用ルール・promote/review系HITL限定・判断確定後自動実行・破壊的変更承認維持・learning-promote prune・intake-promote自動実行・backlog-review矛盾検出時追加判断 |
-| [REQ-0148](requirements/REQ-0148.md) | RU群バッチ処理と複数 execution_unit 並列実行 | 複数RUバッチ統合・連結成分ベース複数Standard/Epic構成・3軸判断（依存強度・Epicサイズ・機能的一貫性）・execution_unit 並列 orchestration・blocked部分停止・REQ-0114-088破壊的UPDATE |
-| [REQ-0149](requirements/REQ-0149.md) | agentdev-gh-cli 手続き委譲基盤 | gh-cli 手続き委譲基盤と I/O 責務分離 |
-| [REQ-0150](requirements/REQ-0150.md) | ローカル版 agentdev-gh-cli 実装 | ローカル版 agentdev-gh-cli と Case ファイル差し替え |
-| [REQ-0151](requirements/REQ-0151.md) | コンフリクト解消モデルと実行時間観測 | 3レベルコンフリクト解消モデルと工程別タイムスタンプ計測 |
-| [REQ-0152](requirements/REQ-0152.md) | gh 直接記述機械検出（IR-053） | gh CLI 直接呼出しの機械検出ルール（IR-053）と inspect-skills 診断観点との協調 |
-| [REQ-0153](requirements/REQ-0153.md) | 機械横断是正の完了証明 | 機械横断是正 PR の再 grep 0 件証拠の完了条件化と PR 本文記載 |
-| [REQ-0154](requirements/REQ-0154.md) | SPEC status 追跡と draft 放置検出 | SPEC status 単一情報源化と draft 放置機械検出 |
-| [REQ-0155](requirements/REQ-0155.md) | 文書粒度モデル | SPEC内部4論理区分・文書7分類モデル・粒度ゲート2点必須化・RU暫定→確定分類・learning自動REQ化禁止・レポジトリ種別非区別・局所物理分離許容 |
-| [REQ-0156](requirements/REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 | docs/specs 直下基盤SPECの6ドメイン分類・段階移送方針・spec-health-metrics・integrity/rules 分離 |
-| [REQ-0159](requirements/REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 | 配布物依存スキルの src 昇格、repo-local 境界、docs-check 未トラックスキル検出 |
-| [REQ-0160](requirements/REQ-0160.md) | Project Extensions 機構と配布物参照境界 | .agentdev/extensions/** によるプロジェクト固有追加・拡張機構、配布物具体参照禁止（ADR-0135） |
-| [REQ-0162](requirements/REQ-0162.md) | 配布物ハーネス境界浄化 | AgentDevFlow と harness の責務境界、4状態結果契約、具象参照抽象化 |
-| [REQ-0163](requirements/REQ-0163.md) | subagent 委譲プロトコル要件（category 選定、MUST NOT DO） | category 選定ガイドライン（事務的手続きは unspecified-high 推奨、writing は執筆作業のみ）、MUST NOT DO セクション必須化、subagent 委譲プロンプトテンプレート要件 |
+| [REQ-001](requirements/REQ-001.md) | 文書体系と持続可能な基準構造 | 文書種別責務、配置基準、ライフサイクル、探索経路 |
+| [REQ-002](requirements/REQ-002.md) | 配布成果物の責務境界 | command/skill/template/script の責務、配布境界、ID・パス除外、Project Extensions との境界 |
+| [REQ-003](requirements/REQ-003.md) | 委譲時の判断・承認・副作用境界 | 委譲時の判断・承認・副作用境界、許容・禁止・承認の境界定義 |
+| [REQ-004](requirements/REQ-004.md) | 要求の形成と合意 | 要求の形成、合意、仕様候補の分離、構造化 req_draft |
+| [REQ-005](requirements/REQ-005.md) | ワークフロープロトコルと工程接続 | work_type、workflow_route、SSoT、case-open/run/close 工程接続 |
+| [REQ-006](requirements/REQ-006.md) | Case実行オーケストレーション | case-run、case-close、Epic/Wave、完了ゲート |
+| [REQ-007](requirements/REQ-007.md) | 完了報告と成果物品質ゲート | 完了報告、GitHub本文品質、自然言語成果物品質 |
+| [REQ-008](requirements/REQ-008.md) | 一時成果物ライフサイクル | intake / learning / backlog / inspect のライフサイクル、RU 管理 |
+| [REQ-009](requirements/REQ-009.md) | 配布基盤と導入モデル | source/projection 分離、同期、リポジトリ種別、導入モデル |
+| [REQ-010](requirements/REQ-010.md) | 自己監査と診断・是正候補抽出 | docs-check、検出事項の分類、是正候補抽出 |
+| [REQ-011](requirements/REQ-011.md) | I/O境界と外部連携手段 | I/O 境界（agentdev-gh-cli）、外部エージェント統合 |
 
-## 廃止済み REQ
+## ADR
 
-旧REQ 50件は2026-07-20に物理削除された。旧REQから新たな現行 REQ への移行履歴は [mapping-table.md](requirements/mapping-table.md) を参照する。
+| ADR | タイトル | 概要 |
+|---|---|---|
+| [ADR-001](adr/ADR-001-v3-charter.md) | v3 charter | v3 憲章、hard governance の限定、新規統制追加原則、cutover 条件 |
+| [ADR-002](adr/ADR-002.md) | OpenCode ソース・プロジェクション分離 | source/projection 分離モデル |
+| [ADR-003](adr/ADR-003.md) | req_draft ソフトコントラクト原則 | req_draft soft-contract、LLM推論消費、厳格スキーマなし |
+| [ADR-004](adr/ADR-004.md) | 差し替え可能な I/O 境界 | agentdev-gh-cli を差し替え可能な I/O 境界として確立 |
+| [ADR-005](adr/ADR-005.md) | Project Extensions Architecture | `.agentdev/extensions/**` によるプロジェクト固有追加・拡張機構 |
+
+詳細は [ADR インデックス](adr/README.md) 参照。
 
 ## 仕様（SPEC）
 
-SPEC は 3 層構造を持つ。横断 SPEC（`specs/workflows/`）は共通契約のみを扱い、個別 command / skill の動作は代替しない。
+SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。
+横断 SPEC（`specs/workflows/`）は共通契約のみを扱い、個別 command / skill の動作は代替しない。
 
-> **SPEC status 追跡**: SPEC の status（draft / accepted、ADR-0123 定義）は [specs/README.md](specs/README.md) が単一の追跡情報源である（REQ-0154-001）。本 DOC-MAP の SPEC 表には status 列を設けず、重複管理しない。draft SPEC 放置検出（IR-054）は [specs/integrity/integrity-rule-catalog.md](specs/integrity/integrity-rule-catalog.md) 参照（REQ-0154-002）。
+> **SPEC status 追跡**: SPEC の status（draft / accepted / superseded）は [specs/README.md](specs/README.md) が単一の追跡情報源である。本 DOC-MAP の SPEC 表には status 列を設けず、重複管理しない。draft SPEC 放置検出（IR-054）は [specs/integrity/integrity-rule-catalog.md](specs/integrity/integrity-rule-catalog.md) 参照。
 
 ### 横断 SPEC（`specs/workflows/`）
 
@@ -94,11 +64,13 @@ SPEC は 3 層構造を持つ。横断 SPEC（`specs/workflows/`）は共通契�
 
 | SPEC | 内容 |
 |---|---|
-| [workflows/workflow-contracts.md](specs/workflows/workflow-contracts.md) | ワークフロー全体像・共通フェーズ・共通状態・artifact lifecycle・実装分類（Pattern Taxonomy） |
+| [workflows/workflow-contracts.md](specs/workflows/workflow-contracts.md) | ワークフロー全体像・共通フェーズ・共通状態・artifact lifecycle・実装分類 |
 | [workflows/delegation-contracts.md](specs/workflows/delegation-contracts.md) | サブエージェント委譲契約（委譲時最小契約・委譲種別・制約・manager-orchestrator 分離） |
 | [workflows/capture-boundaries.md](specs/workflows/capture-boundaries.md) | キャプチャ境界（intake / learning 境界・Split Rule・PR 本文永続チャネル・REQ 再構成 intake） |
 | [workflows/epic-wave-model.md](specs/workflows/epic-wave-model.md) | Epic / Wave / Issue 実行モデル（OU 階層・子Issue 状態 enum・Wave スケジューリング・execution_unit 定義・連結成分アルゴリズム・3軸判断モデル・per-Epic 単一書き手） |
 | [workflows/backlog-artifact-lifecycle.md](specs/workflows/backlog-artifact-lifecycle.md) | RU / 採用済み成果物 / draft ライフサイクル・検出事項プロトコル・artifact_actions 工程分岐 |
+
+詳細アルゴリズム参照として [workflows/references/execution-unit-construction.md](specs/workflows/references/execution-unit-construction.md) を配置する（Wave 3 再構築）。
 
 ### command SPEC（`specs/commands/`）
 
@@ -121,66 +93,64 @@ SPEC は 3 層構造を持つ。横断 SPEC（`specs/workflows/`）は共通契�
 - [commands/inspect-docs.md](specs/commands/inspect-docs.md)：`/agentdev/inspect-docs`
 - [commands/inspect-skills.md](specs/commands/inspect-skills.md)：`/agentdev/inspect-skills`
 - [commands/inspect-promote.md](specs/commands/inspect-promote.md)：`/agentdev/inspect-promote`
-- [commands/inspect-extensions.md](specs/commands/inspect-extensions.md)：`/agentdev/inspect-extensions`（project extensions 機構の整合性診断、読み取り専用。旧 inspect-doc-inputs から統合・改名）
+- [commands/inspect-extensions.md](specs/commands/inspect-extensions.md)：`/agentdev/inspect-extensions`（project extensions 機構の整合性診断、読み取り専用）
 
 ### skill SPEC（`specs/skills/`）
 
 各 `agentdev-*` 配布スキルの現在動作。配布物（`src/opencode/skills/`）の動作を docs 内部から参照する用。
 
 - [skills/_template.md](specs/skills/_template.md)：skill SPEC テンプレート
-- skill SPEC 一覧は `specs/skills/` ディレクトリ配下（27 件）。`repo-agentdev-integrity` は repo-local・配布対象外のため対象外。
+- skill SPEC 一覧は `specs/skills/` ディレクトリ配下。`repo-agentdev-integrity` は repo-local・配布対象外のため対象外。
 
 ### 基盤 SPEC（`specs/` 配下サブディレクトリ）
 
-システム全体の構成・フォーマット・整合性検査など、複数層にまたがる基盤 SPEC。REQ-0156 に基づき6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）へ整理済み。
+システム全体の構成・フォーマット・整合性検査など、複数層にまたがる基盤 SPEC。6 ドメイン（foundations/responsibilities/quality/integrity/local/authoring）へ整理済み。各ドメイン直下に主要 SPEC を配置し、詳細・実装固有事項は `references/` サブディレクトリへ分離する（Wave 3 再構築）。
+
+主要 SPEC の抜粋。全一覧は [specs/README.md](specs/README.md) 参照。
 
 | SPEC | 内容 |
 |---|---|
 | [system.md](specs/foundations/system.md) | コマンドシステムの構成 |
 | [patterns.md](specs/foundations/patterns.md) | 文書フォーマット規約（frontmatter・命名・URL参照形式） |
 | [design-principles.md](specs/foundations/design-principles.md) | 設計原則 |
-| [project-extensions.md](specs/foundations/project-extensions.md) | project extensions 機構（.agentdev/extensions/**、extension schema・実行時読込契約・project-local skill 委譲・配布物具体参照禁止、ADR-0135） |
+| [document-model.md](specs/foundations/document-model.md) | 文書種別マトリックス・文書分類ポリシー・ドメイン別体系化規範 |
+| [harness-separation-model.md](specs/foundations/harness-separation-model.md) | harness 分離モデル。具体抽象化は `references/concrete-abstraction.md` 参照 |
+| [project-extensions.md](specs/foundations/project-extensions.md) | project extensions 機構（ADR-005） |
 | [quality-specs.md](specs/quality/quality-specs.md) | 品質基準・検証ルール |
 | [quality-gates.md](specs/quality/quality-gates.md) | QG-1〜QG-4 品質ゲート定義 |
-| [document-model.md](specs/foundations/document-model.md) | 文書種別マトリックス・文書分類ポリシー・SPEC内部4論理区分・文書7分類・ドメイン別体系化規範 |
 | [document-type-responsibilities.md](specs/responsibilities/document-type-responsibilities.md) | 文書種別責務・配置基準 |
 | [artifact-contracts.md](specs/responsibilities/artifact-contracts.md) | アーティファクト間契約 |
-| [integrity-contracts.md](specs/integrity/integrity-contracts.md) | 整合性検査分類フレームワーク |
-| [runtime-package-boundary.md](specs/local/runtime-package-boundary.md) | 実行時配布物の境界と依存制約 |
-| [local-case-file.md](specs/local/local-case-file.md) | ローカル版 OpenCode の Case ファイルスキーマ・状態遷移・採番・見出し |
-| [local-generation.md](specs/local/local-generation.md) | ローカル版 OpenCode link mode 導入フロー・link target 確認・unlink / relink による更新運用・残存 GitHub 固有参照の違反判定基準・link mode 移行に伴う廃止経緯（ADR-0131, REQ-0141-028/029。local-transform.md から一元化、当該ファイルは case-run で削除済み） |
-| [integrity-rule-catalog.md](specs/integrity/integrity-rule-catalog.md) | 整合性検査ルールのカタログ |
 | [artifact-responsibilities.md](specs/responsibilities/artifact-responsibilities.md) | アーティファクト責務マトリックス |
 | [req-impact-map.md](specs/responsibilities/req-impact-map.md) | REQ 影響マッピング |
-| [req-health-metrics.md](specs/quality/req-health-metrics.md) | REQ 健全性メトリクス（肥大化・関心ズレ閾値） |
+| [responsibility-boundary-purification.md](specs/responsibilities/responsibility-boundary-purification.md) | 責務境界浄化: 所有/非所有リスト詳細 |
+| [integrity-contracts.md](specs/integrity/integrity-contracts.md) | 整合性検査分類フレームワーク |
+| [integrity-rule-catalog.md](specs/integrity/integrity-rule-catalog.md) | 整合性検査ルールのカタログ（個別ルールは `rules/`） |
 | [rule-ownership.md](specs/integrity/rule-ownership.md) | ルール所有権マトリックス |
-| [docs-spec-rebuild-integrity.md](specs/integrity/docs-spec-rebuild-integrity.md) | 配布物 ID 除去後の整合性検査ルール（構文健全性・文意保持・責務整合・NG 分類） |
-| [command-file-format.md](specs/authoring/command-file-format.md) | command 定義ファイルの Markdown 構成標準（Step 形式・ガードレール番号・禁止形式・機械検査対象） |
-| [backticks-identifier-threshold.md](specs/integrity/backticks-identifier-threshold.md) | backticks 識別子（必須）/ 一般名詞（任意）の機械判定閾値（document-type-responsibilities.md 補完 SPEC、mechanical-replacement-rules.md 相互参照先） |
-| [validator-split-criteria.md](specs/integrity/validator-split-criteria.md) | check_changed_docs.ts の内部 validator 構成・分割基準（REQ-0158 Phase 6、実装詳細SPEC） |
-| [targeted-docs-guard-implementation.md](specs/integrity/targeted-docs-guard-implementation.md) | check_changed_docs.ts 変更文書限定検査契約の実装計画（Phase 1-6）・report フィールド一覧（REQ-0158 から HOW を移送） |
+| [validator-split-criteria.md](specs/integrity/validator-split-criteria.md) | validator 分割基準（実装詳細は `references/validator-internal-config.md`） |
+| [targeted-docs-guard-implementation.md](specs/integrity/targeted-docs-guard-implementation.md) | Targeted Docs Guard 実装詳細（移行作業は `references/targeted-docs-guard-implementation-details.md`） |
+| [docs-spec-rebuild-integrity.md](specs/integrity/docs-spec-rebuild-integrity.md) | 配布物 ID 除去後の整合性検査ルール |
+| [backticks-identifier-threshold.md](specs/integrity/backticks-identifier-threshold.md) | backticks 識別子/一般名詞 判定閾値 |
+| [runtime-package-boundary.md](specs/local/runtime-package-boundary.md) | 実行時配布物の境界と依存制約 |
+| [local-case-file.md](specs/local/local-case-file.md) | ローカル版 OpenCode の Case ファイルスキーマ・状態遷移・採番・見出し |
+| [local-generation.md](specs/local/local-generation.md) | ローカル版 OpenCode link mode 導入フロー・link target 確認・unlink / relink による更新運用・残存 GitHub 固有参照の違反判定基準 |
+| [command-file-format.md](specs/authoring/command-file-format.md) | command 定義ファイルの Markdown 構成標準 |
 
 ## SPEC 探索経路ガイド
 
 1. 個別コマンドの現在動作を知りたい → `specs/commands/<command>.md`
 2. 個別スキルの現在動作を知りたい → `specs/skills/<skill-name>.md`
-3. 複数コマンド・スキルにまたがる共通契約 → `specs/workflows/*.md`
-4. 文書フォーマット・設計原則・整合性検査基盤 → `specs/{foundations,responsibilities,quality,integrity,local,authoring}/*.md`（基盤 6 ドメイン配下、REQ-0156-001）
+3. 複数コマンド・スキルにまたがる共通契約 → `specs/workflows/*.md`、`specs/workflows/references/*.md`
+4. 文書フォーマット・設計原則・整合性検査基盤 → `specs/{foundations,responsibilities,quality,integrity,local,authoring}/*.md`（基盤 6 ドメイン、詳細は各 `references/` と `integrity/rules/`）
 
 > workflows/ と foundations/ の使い分け: 正規の横断ワークフロー契約は `workflows/` 配下を参照。
-> DOC-MAP は status の重複管理を行わず、探索導線に留める（status は `docs/specs/README.md` が単一の追跡情報源、REQ-0154-001）。
-
-## ADR
-
-| Index | 内容 |
-|---|---|
-| [ADR インデックス](adr/README.md) | ADR 一覧、Status View、Topic View |
+> DOC-MAP は status の重複管理を行わず、探索導線に留める（status は `docs/specs/README.md` が単一の追跡情報源）。
 
 ## ガイド
 
 | Guide | 内容 |
 |---|---|
 | [ガイド入口](guides/README.md) | ガイド一覧・案内 |
+| [v3 憲章](guides/v3-charter.md) | v3.0.0 の目的、基本原則、管理方式、cutover 条件の要約 |
 | [クイックスタート](guides/quickstart.md) | 5コマンドで機能追加を完了する最小フロー |
 | [コマンド選択](guides/command-selection.md) | 現在の状態から次のコマンドを選ぶ入口表 |
 | [要件定義 → Case実行フロー](guides/req-case-flow.md) | req-define から case-close までの流れ |

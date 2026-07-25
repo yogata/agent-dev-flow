@@ -55,4 +55,4 @@ ADR ファイルの作成、追記、更新を管理する知識ベースとし�
 - [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)
 - [commands/req-save.md](../commands/req-save.md)
-- REQ-0112（ADR ライフサイクル標準化）
+- REQ-001（ADR ライフサイクル標準化）

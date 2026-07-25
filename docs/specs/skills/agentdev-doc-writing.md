@@ -10,7 +10,7 @@ updated: 2026-07-18
 ## 目的
 
 docs 配下の REQ/ADR/SPEC/guides/DOC-MAP/README および関連する command/skill の自然言語記述の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。
-QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける（REQ-0140）。
+QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける（v2:REQ-0140）。
 
 ## 適用対象
 
@@ -38,13 +38,13 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 - `references/execution-subject-classification.md`（実行主体分類（command / skill / subagent / harness）の査読）
 
 配置基準、用語政策の原本は `docs/specs/responsibilities/document-type-responsibilities.md`、執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。
-内容が重複する場合は原本を優先（REQ-0140-023）。
+内容が重複する場合は原本を優先（v2:REQ-0140-023）。
 
 ## 現在の動作
 
-- 静的査読のみを担当。実行時の動的判断（要件分析、ADR 要否判定）は `agentdev-req-analysis`、`agentdev-adr-guidelines` が担う（REQ-0140-024）
-- ファイル保存、commit、push は行わない。査読提案を返すのみ（REQ-0140-022）
-- 未合意事項を確定しない。問題箇所を分類し修正文案または移送先候補として提示する（REQ-0140-021）
+- 静的査読のみを担当。実行時の動的判断（要件分析、ADR 要否判定）は `agentdev-req-analysis`、`agentdev-adr-guidelines` が担う（v2:REQ-0140-024）
+- ファイル保存、commit、push は行わない。査読提案を返すのみ（v2:REQ-0140-022）
+- 未合意事項を確定しない。問題箇所を分類し修正文案または移送先候補として提示する（v2:REQ-0140-021）
 
 ## 対象外
 
@@ -68,5 +68,5 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 - [agentdev-req-analysis.md](agentdev-req-analysis.md)（要件分析（動的判断））
 - [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)（ADR 要否判定（動的判断））
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（配置基準、用語政策 原本 SPEC）
-- REQ-0140（文書品質ゲート）
+- v2:REQ-0140（文書品質ゲート）
 

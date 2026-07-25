@@ -12,7 +12,7 @@ status: accepted
 | category | document-drift |
 | detection_method | 各索引から REQ タイトル抽出 → 対応 REQ ファイル frontmatter title と文字列照合 |
 | affected_artifacts | [DOC-MAP, REQ index, mapping-table, 現行 REQ] |
-| related_req | [REQ-0108-003, REQ-0101-063, REQ-0101] |
+| related_req | [REQ-010-003, REQ-001-063, REQ-001] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。title 文字列の直接比較 |

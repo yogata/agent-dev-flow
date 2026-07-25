@@ -1,6 +1,5 @@
 ---
 description: Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正せずに診断する
-agent: sisyphus
 ---
 
 # inspect-skills
@@ -27,6 +26,23 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 - 診断レポート（セッション内テキスト出力）
 - 検出事項リスト（対象、観点、分類、根拠、推奨 route）
 - `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md`（検出事項ファイル出力）
+
+## inspect-* コマンド選択 routing
+
+変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。
+本コマンド（inspect-skills）と inspect-docs は配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-skills Step 3 配布物構文健全性・責務整合診断、inspect-docs Step 11 配布物整合性検査）。変更範囲に応じて routing することで重複検出を防ぐ。
+
+| 変更ファイル種別 | 実行コマンド |
+|------|------|
+| `docs/requirements/*.md`、`docs/adr/*.md` | inspect-docs |
+| `docs/specs/**/*.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
+| `docs/guides/*.md`、`docs/DOC-MAP.md`、`README.md` | inspect-docs |
+| `src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md` | inspect-skills |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション、ADR-002） | inspect-skills |
+| `docs/specs/commands/**/*.md`、`docs/specs/skills/**/*.md` | inspect-skills |
+| 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
+
+routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。配布物のみの変更時は inspect-skills を優先する。
 
 ## project extensions
 

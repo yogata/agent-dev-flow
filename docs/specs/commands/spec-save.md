@@ -11,7 +11,7 @@ updated: 2026-07-24
 
 req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/**/*.md` に保存、確定する。
 req-save の次、case-open の前に実行する。
-全 work_type 対象であり、`work_type` による判定は廃止する（REQ-0138-009）。
+全 work_type 対象であり、`work_type` による判定は廃止する（REQ-008-009）。
 
 ## 入力
 
@@ -32,8 +32,8 @@ req-save の次、case-open の前に実行する。
 
 - Step 1: 事前チェック（`draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認）。なければ no-op 完了。ドラフト不存在時はエラー中止
 - Step 2: SPEC artifact_actions 読込（`artifact: spec` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は SPEC 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（create/update）、`content` を処理対象とする
-- Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/foundations/patterns.md`）→ update 操作）。`target_spec: {operation, domain, slug}` 構造化 → 新規 SPEC 作成（`docs/specs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-0136-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
-- Step 4: SPEC 分離基準の最終確認（各 action が REQ-0101-055（SPEC に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-0101-069）相当は除外し follow-up に明示
+- Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/foundations/patterns.md`）→ update 操作）。`target_spec: {operation, domain, slug}` 構造化 → 新規 SPEC 作成（`docs/specs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-001-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
+- Step 4: SPEC 分離基準の最終確認（各 action が REQ-001-055（SPEC に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-001-069）相当は除外し follow-up に明示
 - Step 5: SPEC ファイル操作。`target_area` 見出し検索は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行
  - create: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
  - update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
@@ -47,7 +47,7 @@ req-save の次、case-open の前に実行する。
 
 ## 配置一貫性検証
 
-spec-save は SPEC ファイル保存に先立ち、対象 SPEC の主論理区分・正規所有対象と保存内容の整合を「配置一貫性検証」として検証する（REQ-0136-034、ADR-0139）。配置一貫性検証は確定済み分類・所有情報と保存先の整合確認であり、「内容品質の再査読」ではない（REQ-0136-030 との整合）。内容品質は引き続き req-define QG-1 の責務である。
+spec-save は SPEC ファイル保存に先立ち、対象 SPEC の主論理区分・正規所有対象と保存内容の整合を「配置一貫性検証」として検証する（REQ-001-034、REQ-001）。配置一貫性検証は確定済み分類・所有情報と保存先の整合確認であり、「内容品質の再査読」ではない（REQ-001-030 との整合）。内容品質は引き続き req-define QG-1 の責務である。
 
 ### 検証項目
 
@@ -55,24 +55,24 @@ spec-save は SPEC ファイル保存に先立ち、対象 SPEC の主論理区�
 |---|---|---|
 | 論理区分整合 | 変更の論理区分（artifact_action が示す SPEC 論理区分）と対象 SPEC の主論理区分が整合する | 保存を停止し、分類または追記先の再判定へ戻す |
 | 所有対象整合 | 変更の所有対象（artifact_action が示す正規所有対象）と対象 SPEC の正規所有対象が整合する | 同上 |
-| 別所有SPEC 不存在 | 同一関心の別の正規所有 SPEC が存在しない（REQ-0119-038 違反でない） | 同上 |
+| 別所有SPEC 不存在 | 同一関心の別の正規所有 SPEC が存在しない（REQ-003-038 違反でない） | 同上 |
 | 横断SPEC 不当配置 不存在 | command 固有仕様を不当に横断 SPEC へ配置していない | 同上 |
-| パラメータ不当混入 不存在 | パラメータ変更を不当に挙動説明またはカタログへ混入させていない（REQ-0155-009 準拠） | 同上 |
+| パラメータ不当混入 不存在 | パラメータ変更を不当に挙動説明またはカタログへ混入させていない（v2:REQ-0155-009 準拠） | 同上 |
 | accepted 間分界矛盾 不存在 | accepted SPEC 間で責任分界が矛盾しない | 同上 |
 
 不一致を検出した場合、保存せず、分類または追記先の再判定へ戻す。
 
 ### 強制ゲート（保存拒否）の有効化条件
 
-強制ゲート（保存拒否条件: 重複所有、配置不一致）は SPEC 宣言形式（主論理区分、正規所有対象）の定義完了後に有効化する（REQ-0136-035）。宣言形式の定義は `../foundations/document-model.md`「SPEC 宣言形式」を正規所有者とし、`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド名（`spec_logical_division`、`canonical_owner`）と一致させる。
+強制ゲート（保存拒否条件: 重複所有、配置不一致）は SPEC 宣言形式（主論理区分、正規所有対象）の定義完了後に有効化する（REQ-001-035）。宣言形式の定義は `../foundations/document-model.md`「SPEC 宣言形式」を正規所有者とし、`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド名（`spec_logical_division`、`canonical_owner`）と一致させる。
 
 ### 宣言付与フロー（CREATE/UPDATE）
 
 spec-save は req-define が `artifact_actions` の SPEC action へ出力した `spec_logical_division` と `canonical_owner` を読み取り、CREATE/UPDATE 各操作で SPEC frontmatter または冒頭宣言節（`../foundations/document-model.md`「SPEC 宣言形式」が定義する形式）へ宣言を付与する。CREATE と UPDATE で宣言付与要件を一本化する。
 
 - **CREATE**: 新規 SPEC の frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。spec-save が対象 SPEC を宣言なしで完了することを禁止する
-- **UPDATE**: 変更対象 SPEC が frontmatter または冒頭宣言節で当該宣言を未宣言の場合、かつ req-define から渡された分類値が `unknown` 以外に確定している場合に、宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落だけを理由に保存拒否しない、ADR-0124 soft-contract）
-- **既存 SPEC の一括更新**: 行わない。未変更 SPEC へ遡及的に宣言を付与しない（REQ-0136-035 段階適用）。宣言率指標（`../quality/spec-health-metrics.md`「測定対象と計測方法」参照）が段階的な宣言率向上を追跡する
+- **UPDATE**: 変更対象 SPEC が frontmatter または冒頭宣言節で当該宣言を未宣言の場合、かつ req-define から渡された分類値が `unknown` 以外に確定している場合に、宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落だけを理由に保存拒否しない、ADR-003 soft-contract）
+- **既存 SPEC の一括更新**: 行わない。未変更 SPEC へ遡及的に宣言を付与しない（REQ-001-035 段階適用）。宣言率指標（`../quality/spec-health-metrics.md`「測定対象と計測方法」参照）が段階的な宣言率向上を追跡する
 
 宣言形式の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」、伝播フィールドの schema の正規所有者は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」である。本節は宣言付与の実行ステップを定義する。
 
@@ -92,11 +92,11 @@ bootstrap 問題（宣言前に強制すると既存 SPEC 処理不能）を避�
 
 ### 検証と内容品質の責務分離
 
-配置一貫性検証は配置先の整合確認であり、内容品質の再査読ではない。内容品質は req-define QG-1 の責務（REQ-0136-030）。spec-save が配置一貫性検証で不一致を検出した場合、保存を停止するが、内容品質の再評価は実施しない。
+配置一貫性検証は配置先の整合確認であり、内容品質の再査読ではない。内容品質は req-define QG-1 の責務（REQ-001-030）。spec-save が配置一貫性検証で不一致を検出した場合、保存を停止するが、内容品質の再評価は実施しない。
 
 ## target_area ベースのセクション置換ロジック
 
-`operation: update` / `operation: spec-update` において action の `target_area` が指定された場合、spec-save は対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-0136-027）。
+`operation: update` / `operation: spec-update` において action の `target_area` が指定された場合、spec-save は対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-001-027）。
 
 ### マッチング規則
 
@@ -115,7 +115,7 @@ bootstrap 問題（宣言前に強制すると既存 SPEC 処理不能）を避�
 
 ### 後方互換（target_area 未指定）
 
-`target_area` が未指定の draft（旧形式）、または `operation` が create/spec-create の場合は従来の「追記」動作を維持する（REQ-0136-028）。
+`target_area` が未指定の draft（旧形式）、または `operation` が create/spec-create の場合は従来の「追記」動作を維持する（REQ-001-028）。
 `target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
 
 ## 参照する横断 SPEC
@@ -127,7 +127,7 @@ bootstrap 問題（宣言前に強制すると既存 SPEC 処理不能）を避�
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPEC 分離基準との連携）
 - [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)（IR-057 obsolete-spec-path-after-domain-split、targeted docs guard 連携）
 
-## targeted docs guard (REQ-0158-003)
+## targeted docs guard (v2:REQ-0158-003)
 
 SPEC保存工程では、変更されたSPECと連動する`docs/specs/README.md`、`docs/DOC-MAP.md`を`check_changed_docs.ts --workflow spec-save`で検査する。
 
@@ -150,26 +150,26 @@ strict failureが存在する場合は修正して再実行する。
 - 新規 SPEC 作成時の `status: draft` 省略（G05）
 - 既存 SPEC 追記時の `status` 変更（G06、`status: accepted` 昇格は case-close Step 3 責務）
 - SPEC status が `draft` の SPEC を IR-044（REQ/SPEC 境界違反検出）の対象に含めること（G07）
-- REQ-0101-055（SPEC 分離基準）不適合 action の保存（G08、安定契約例外 REQ-0101-069 は follow-up 扱い）
-- 実行時コマンドが SPEC ファイルに依存する記述（G09、ADR-0104 実行時非依存維持）
+- REQ-001-055（SPEC 分離基準）不適合 action の保存（G08、安定契約例外 REQ-001-069 は follow-up 扱い）
+- 実行時コマンドが SPEC ファイルに依存する記述（G09、REQ-001 実行時非依存維持）
 - SPEC artifact_actions の分離根拠、配置先判定の再分類（G10、req-define `agentdev-req-analysis` 結果を尊重）
 - SPEC status 昇格（draft → accepted）の判定（G11、case-close 責務）
 - Issue 作成（G12、case-open 責務）
 
 ## 検証観点
 
-- 品質ゲート（適用結果の整合性検証）: target_area 置換結果の整合性、SPEC status の整合性（新規作成時 `status: draft` 付与）、インデックスの整合性（`docs/specs/README.md` エントリと新規 SPEC の一致）、変更範囲の妥当性を検証。内容の品質は req-define の QG-1 の責務（REQ-0136-030）
-- SPEC 分離基準適合性（REQ-0101-055）: 各 action の content が SPEC に置くべき内容か
+- 品質ゲート（適用結果の整合性検証）: target_area 置換結果の整合性、SPEC status の整合性（新規作成時 `status: draft` 付与）、インデックスの整合性（`docs/specs/README.md` エントリと新規 SPEC の一致）、変更範囲の妥当性を検証。内容の品質は req-define の QG-1 の責務（REQ-001-030）
+- SPEC 分離基準適合性（REQ-001-055）: 各 action の content が SPEC に置くべき内容か
 - frontmatter 完全性: 新規作成時の `title`, `status: draft`, `created`, `updated`
 - 配置先解決の正確性: 既存パス vs `new:{slug}` の判定、重複候補統合
 - 変更範囲検証: `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を含まないこと
 
-## case-auto 並列委譲モデル（REQ-0114-087〜093）
+## case-auto 並列委譲モデル（REQ-006-087〜093）
 
-spec-save は複数 SPEC ファイルの変更案作成、検査を並列化できる（REQ-0114-091）。
+spec-save は複数 SPEC ファイルの変更案作成、検査を並列化できる（REQ-006-091）。
 異なる target パスの SPEC create/update は L0（完全独立）のため並列可能（最大5件）。
 同一 SPEC ファイルへの複数 action のみ順序依存のため直列サブセットとして分離。
-最終的な commit/push は REQ-0137 の明示パス指定で一括実行。
+最終的な commit/push は v2:REQ-0137 の明示パス指定で一括実行。
 
 ## See Also
 
@@ -179,7 +179,7 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 - `agentdev-doc-map` skill（DOC-MAP 影響確認）
 - `agentdev-conventional-commits` skill（コミットメッセージ規約）
 - `agentdev-git-worktree` skill（並列実行安全 git 操作）
-- REQ-0136（REQ/SPEC 責務分離の徹底と spec-save 新設）
-- REQ-0138（構造化 req_draft 契約）
-- ADR-0123（SPEC lifecycle（draft/accepted））
+- REQ-001（REQ/SPEC 責務分離の徹底と spec-save 新設）
+- REQ-008（構造化 req_draft 契約）
+- v2:ADR-0123（SPEC lifecycle（draft/accepted））
 

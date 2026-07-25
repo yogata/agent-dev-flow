@@ -12,7 +12,7 @@ status: accepted
 | category | canonical-conflict |
 | detection_method | 現行 docs 内の 廃止 REQ 参照検出、コンテキスト判定 |
 | affected_artifacts | [REQ, SPEC, guides] |
-| related_req | [REQ-0108-070-074, 136] |
+| related_req | [REQ-010-070-074, 136] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。mapping-table 等の履歴参照は除外 |

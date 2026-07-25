@@ -1,6 +1,5 @@
 ---
 description: 既存Caseの本文更新、コメント追加、またはREQファイル更新を行う
-agent: sisyphus
 ---
 
 # Case更新

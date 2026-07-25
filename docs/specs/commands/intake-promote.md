@@ -15,7 +15,7 @@ GitHub Issue 作成は行わない。
 
 ## 変更種別分類
 
-intake 成果物から RU へ引き継ぐ変更種別を定義する（REQ-0136-033、ADR-0139）。intake-promote は採用 item を採用済み成果物（promoted artifact）へ整形する際、各 item に基づき次の8変更種別のいずれかを付与する。変更種別は分類根拠フィールド `change_nature` として RU へ伝播され、req-define が REQ 拡張可否を判定する入力となる。learning-promote.md「変更種別分類」と整合する。
+intake 成果物から RU へ引き継ぐ変更種別を定義する（REQ-001-033、REQ-001）。intake-promote は採用 item を採用済み成果物（promoted artifact）へ整形する際、各 item に基づき次の8変更種別のいずれかを付与する。変更種別は分類根拠フィールド `change_nature` として RU へ伝播され、req-define が REQ 拡張可否を判定する入力となる。learning-promote.md「変更種別分類」と整合する。
 
 ### 変更種別と REQ 拡張可否
 
@@ -30,17 +30,17 @@ intake 成果物から RU へ引き継ぐ変更種別を定義する（REQ-0136-
 | internal_restructuring（内部再構成） | 外部挙動を変えない内部再構成 | ×（SPEC 再構成） |
 | document_correction（文書訂正） | 文書記述の訂正 | ×（文書修正） |
 
-REQ 拡張を候補とするのは `new_user_requirement` または `external_contract_change` のみ。それ以外は既存 REQ が要求を既に保持している限り REQ を拡張しない（REQ-0136-033）。判定の最終確定は req-define が行う（REQ-0102-087）。
+REQ 拡張を候補とするのは `new_user_requirement` または `external_contract_change` のみ。それ以外は既存 REQ が要求を既に保持している限り REQ を拡張しない（REQ-001-033）。判定の最終確定は req-define が行う（REQ-004-087）。
 
 ### 分類根拠の引き継ぎ
 
-intake-promote は change_nature と併せて、observed_evidence（根拠となる観測事実）、target_stakeholder、user_visible_change 等の分類根拠（`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」参照）を RU へ伝播させる。分類根拠は soft-contract（ADR-0124）とし、欠落時は unknown 既定値で警告する。
+intake-promote は change_nature と併せて、observed_evidence（根拠となる観測事実）、target_stakeholder、user_visible_change 等の分類根拠（`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」参照）を RU へ伝播させる。分類根拠は soft-contract（ADR-003）とし、欠落時は unknown 既定値で警告する。
 
-## HITL 境界、自動実行ルール（REQ-0147-003/004/005/008）
+## HITL 境界、自動実行ルール（REQ-003-003/004/005/008）
 
-- **HITL は「判断の確定」に限定**（REQ-0147-003）: Step 5 の分類承認（採用/保留/却下の確定）のみが HITL 対象。
-- **分類承認後の自動実行**（REQ-0147-004/008）: Step 5 で分類が確定した場合、Step 6〜10（採用 item 整形 / promoted 保存 / 振り分け / inbox 削除 / git pull / commit-push）は追加確認なしで自動実行する。分類未確定、修正中の場合は進まない。
-- **破壊的変更の明示承認維持**（REQ-0147-005）: inbox の大量削除、重要 item の誤分類是正等の破壊的操作は、Step 5 承認とは別に明示的な承認を求める。
+- **HITL は「判断の確定」に限定**（REQ-003-003）: Step 5 の分類承認（採用/保留/却下の確定）のみが HITL 対象。
+- **分類承認後の自動実行**（REQ-003-004/008）: Step 5 で分類が確定した場合、Step 6〜10（採用 item 整形 / promoted 保存 / 振り分け / inbox 削除 / git pull / commit-push）は追加確認なしで自動実行する。分類未確定、修正中の場合は進まない。
+- **破壊的変更の明示承認維持**（REQ-003-005）: inbox の大量削除、重要 item の誤分類是正等の破壊的操作は、Step 5 承認とは別に明示的な承認を求める。
 
 ## 入力
 
@@ -67,11 +67,11 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 - フェーズ1 inbox スキャン: Step 1 inbox 確認、Step 2 item 読込
 - フェーズ2 内部レビュー: Step 3 レビュー評価、Step 4 分類提示
-- フェーズ3 HITL 確定（判断の確定、REQ-0147-003）: Step 5 ユーザー確認（G06: ユーザー明示的承認必須、G07: 分類結果の提示と確認修正機会提供）
-- フェーズ4 振り分け（分類承認後の自動実行、REQ-0147-008）: Step 6 採用 item 整形、Step 7 保存（`.agentdev/intake/promoted/`、フラット構造、frontmatter なし）、Step 8 振り分け（inbox 削除含む）
+- フェーズ3 HITL 確定（判断の確定、REQ-003-003）: Step 5 ユーザー確認（G06: ユーザー明示的承認必須、G07: 分類結果の提示と確認修正機会提供）
+- フェーズ4 振り分け（分類承認後の自動実行、REQ-003-008）: Step 6 採用 item 整形、Step 7 保存（`.agentdev/intake/promoted/`、フラット構造、frontmatter なし）、Step 8 振り分け（inbox 削除含む）
 - フェーズ5 git 操作完了報告（自動実行）: Step 9 git pull、Step 10 commit/push、Step 11 完了報告
 
-**自動実行の前提**（REQ-0147-008）: Step 5 で分類が確定（採用/保留/却下のいずれか）している場合のみ、フェーズ4、5 を自動実行する。
+**自動実行の前提**（REQ-003-008）: Step 5 で分類が確定（採用/保留/却下のいずれか）している場合のみ、フェーズ4、5 を自動実行する。
 分類未確定、修正中は進まない。
 
 ## 参照する横断 SPEC
@@ -88,7 +88,7 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 - learning item 保存、分類、昇華（G05）
 - ユーザー明示的承認なしの採用済み成果物生成（G06）
 - 分類結果の非提示（G07、必ず提示、確認修正機会提供）
-- 分類未確定のままの自動確定、自動進行（G08、REQ-0147-003。確定後の自動進行は REQ-0147-008 で許容）
+- 分類未確定のままの自動確定、自動進行（G08、REQ-003-003。確定後の自動進行は REQ-003-008 で許容）
 - workflow 管理成果物の扱い（G09）
 - 整形結果への frontmatter 含有（G10）
 - 整形結果への重複排除キー、後続成果物参照含有（G11）
@@ -108,5 +108,5 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 - [intake-capture.md](intake-capture.md), [intake-from-github.md](intake-from-github.md)（前段コマンド）
 - [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
 - `agentdev-intake-pipeline` skill（inbox スキャン、レビュー評価、分類提示、整形保存）
-- REQ-0127（Intake command群）
+- REQ-010（Intake command群）
 

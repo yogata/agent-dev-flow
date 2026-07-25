@@ -86,7 +86,7 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 | case-open | **非関与** | Intake/ Learning キャプチャを行わない |
 | case-auto | **委譲** | 構成コマンド（case-run/ case-close）の責務境界に従う。case-auto 固有のキャプチャ振る舞いは持たない |
 
-## Subagent 委譲プロトコルの MUST NOT DO 記載要件（REQ-0163-002）
+## Subagent 委譲プロトコルの MUST NOT DO 記載要件
 
 subagent 委譲を実施する agentdev command（case-auto、case-open、case-run、case-update、case-close）は、委譲 prompt に MUST NOT DO セクションを必須で記載する。キャプチャ境界（`.agentdev/` 直接変更禁止、PR 本文経由の capture 引き継ぎ）も MUST NOT DO に含まれる。
 
@@ -95,12 +95,12 @@ subagent 委譲を実施する agentdev command（case-auto、case-open、case-r
   - `.agentdev/intake/`、`.agentdev/learning/` の直接変更の禁止（case-run/ case-close 責務外の command も含む）
   - 当該 command 責務外のファイル作成、 REQ/ SPEC/ src の直接修正の禁止
   - capture 情報を一時会話コンテキスト、ローカル変数、中間ファイル経由で引き継ぐことの禁止（PR 本文経由のみ許可）
-- **由来**: Issue #1538 で case-open を `category=writing` で委譲した際、MUST NOT DO が未明示で subagent が `.agentdev/drafts/` 配下へ draft を作成した事象（REQ-0163-002）
-- **関連**: category 選定ガイドラインは REQ-0163-001、`case-auto.md` の「Subagent 委譲プロトコル」節、`agentdev-case-run-execution-adapter` SKILL の「委譲プロトコルと category 設計」節参照
+- **由来**: Issue #1538 で case-open を `category=writing` で委譲した際、MUST NOT DO が未明示で subagent が `.agentdev/drafts/` 配下へ draft を作成した事象
+- **関連**: `case-auto.md` の「Subagent 委譲プロトコル」節、`agentdev-case-run-execution-adapter` SKILL の「委譲プロトコルと category 設計」節参照
 
 ## 委譲可否 probe と Inability 記録
 
-case-run は委譲起動前にハーネス能力を probe し、委譲可否を判断する（REQ-0149-012）。
+case-run は委譲起動前にハーネス能力を probe し、委譲可否を判断する。
 probe 手順、委譲可否判定の詳細は `agentdev-case-run-execution-adapter` SKILL「ハーネス制約適応（call_omo_agent schema 制約時）」参照。
 本節は委譲不可時の Inability 記録境界のみを定める。
 

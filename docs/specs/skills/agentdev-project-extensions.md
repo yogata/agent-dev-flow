@@ -68,6 +68,6 @@ updated: 2026-07-18
 
 - [foundations/project-extensions.md](../foundations/project-extensions.md)（project-extensions 機構の基盤 SPEC）
 - [commands/inspect-extensions.md](../commands/inspect-extensions.md)（保守診断 command SPEC）
-- REQ-0160（Project Extensions 機構と配布物参照境界）
-- ADR-0135（Project Extensions Architecture）
+- REQ-002（Project Extensions 機構と配布物参照境界）
+- ADR-005（Project Extensions Architecture）
 

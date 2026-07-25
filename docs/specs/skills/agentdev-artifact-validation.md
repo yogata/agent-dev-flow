@@ -10,7 +10,7 @@ updated: 2026-07-24
 複数文書種別で共有する決定的検証 script、共有ライブラリ、公開検証契約、JSON 結果契約を担う検証 skill の仕様を定める。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
-> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
+> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001, REQ-001）。
 
 ## 目的
 
@@ -53,7 +53,7 @@ REQ/ADR/SPEC 操作で共有される決定的検証 script（frontmatter 整合
 
 - 所有 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `src/opencode/skills/agentdev-artifact-validation/scripts/` 配下に配置する
 - script は決定的（純粋関数）、テスト可能（`tests/*.test.ts`）とする
-- I/O は argv/stdin で入力を受け取り、stdout で JSON 結果を返す（REQ-0103-160）
+- I/O は argv/stdin で入力を受け取り、stdout で JSON 結果を返す（REQ-002-160）
 - 利用側 command、skill（`agentdev-req-file-manager`、`agentdev-adr-file-manager`、`agentdev-spec-file-manager`、`req-save`、`spec-save` 等）は内部 script パスを直接参照せず、本 skill の公開検証契約へ委譲する
 - 同一 script または共有 lib を複数 skill へ複製しない
 
@@ -82,5 +82,5 @@ REQ 固有 script は `agentdev-req-file-manager`、ADR 固有 script は `agent
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)（REQ 操作 skill、REQ 固有 script 所有）
 - [agentdev-adr-file-manager.md](agentdev-adr-file-manager.md)（ADR 操作 skill、ADR 固有 script 所有）
 - [agentdev-spec-file-manager.md](agentdev-spec-file-manager.md)（SPEC 操作 skill、SPEC 固有 script 所有）
-- REQ-0103-159（script 所有権の責務別配置）
-- REQ-0136-029（決定的処理の script 委譲）
+- REQ-002-159（script 所有権の責務別配置）
+- REQ-001-029（決定的処理の script 委譲）

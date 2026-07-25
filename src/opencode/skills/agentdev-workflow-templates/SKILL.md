@@ -122,8 +122,8 @@ feature、bug、child テンプレートでは「テスト戦略」セクショ�
 ### 共通ルール
 
 - テンプレートは Read tool で読み込み、変数部分を置換して使用する
-- 変数置換後の本文は直ちに `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）により UTF-8 BOM なし LF 一時ファイル（`$env:TEMP/agentdev/gh-temp-{timestamp}.md` 等）へ保存し、`gh --body-file`/ `-F` で渡すこと。文字列変数での本文持ち回り、PowerShell の `Out-File`/ `Set-Content`/ `>` リダイレクトによる一時ファイル作成を禁止する（agentdev-gh-cli standard-procedures.md の WRITE 手続き禁止事項に準拠、REQ-0132-024）
-- テンプレートの構造を維持する（セクションの削除、順序変更禁止）。Markdown 行構造（LF、セクション間空行、インデント）の byte 単位保持を含む（REQ-0132-025）
+- 変数置換後の本文は直ちに `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）により UTF-8 BOM なし LF 一時ファイル（`$env:TEMP/agentdev/gh-temp-{timestamp}.md` 等）へ保存し、`gh --body-file`/ `-F` で渡すこと。文字列変数での本文持ち回り、PowerShell の `Out-File`/ `Set-Content`/ `>` リダイレクトによる一時ファイル作成を禁止する（agentdev-gh-cli standard-procedures.md の WRITE 手続き禁止事項に準拠）
+- テンプレートの構造を維持する（セクションの削除、順序変更禁止）。Markdown 行構造（LF、セクション間空行、インデント）の byte 単位保持を含む
 - 変数に該当するデータがない場合、そのセクションに「該当なし」と記載する（セクションごと削除しない）
 - セクション見出しは日本語で記述する
 - `<!-- 【必須】 -->` マーカー付きセクションは省略不可。ただし該当データがない場合は「該当なし」と記載し、セクション自体は残す

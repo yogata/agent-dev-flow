@@ -1,6 +1,5 @@
 ---
 description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て採用済み成果物を生成する
-agent: sisyphus
 ---
 
 # 学びの正規化、評価、昇華判定と採用済み成果物生成

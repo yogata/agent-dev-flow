@@ -1,6 +1,5 @@
 ---
 description: 壁打ち成果物をREQ/ADRファイルとしてdocs/に保存し、コミット、プッシュする
-agent: sisyphus
 ---
 
 # 要件保存（壁打ち→docs永続化）
@@ -65,7 +64,7 @@ REQ/ADR 保存前に対象ドキュメント種別を確認する。
 
 **Step 3-3**: REQ/ADR artifact_actions 処理ゲート。ドラフトの `artifact_actions` から `artifact: req`/ `artifact: adr` の entry を処理対象とする（draft 全体の REQ/ADR artifact_actions を処理し、OU ごとに分割しない）:
 - `artifact_actions` に REQ/ADR entry がない場合 → no-op 完了（Step 1 で判定済み）
-- `operation_units` が存在する場合 → 処理対象 `artifact_actions` を決定する（REQ-0102-039/040/041）:
+- `operation_units` が存在する場合 → 処理対象 `artifact_actions` を決定する:
  - OU ID が指定されている場合 → 指定された OU に属する REQ/ADR 対象 `artifact_actions` だけを処理対象とする
  - OU ID 未指定時 → draft 全体の REQ/ADR 対象 `artifact_actions` を処理対象とする（OU 件数によらず、OU が複数存在することだけを理由に停止しない）
 - `artifact_actions` フィールドがない（旧形式 draft）の場合 → 従来どおり全 req-operation を処理する（後方互換）
@@ -195,7 +194,7 @@ bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-change-impac
 # → stdout: { ok: boolean, errors: string[], warnings: string[], violations: string[] }
 
 # stdin JSON 入力も可能
-echo '{"changed":["docs/requirements/REQ-0102.md"],"allowed":["docs/requirements/**"]}' | \
+echo '{"changed":["docs/requirements/REQ-{NNNN}.md"],"allowed":["docs/requirements/**"]}' | \
   bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-change-impact.ts
 ```
 
@@ -258,7 +257,7 @@ req-save は複数 REQ/ADR ファイルの変更案作成、検査を並列化�
 
 ## 廃止時の下流横断クリーンアップ（追加候補）
 
-本セクションは REQ/ADR 廃止確定時に、下流（配布 Command/Skill 群、Guide 群、SPEC 群）へ残る旧 ID 参照の横断クリーンアップを実行するステップの**追加候補**を記録する。既存の req-save 手順（Step 1〜12）に代わるものではなく、既存フローを破壊しない追加ステップである。本候補は REQ-0124-024（廃止 REQ/SPEC 由来記述残置検出カテゴリ）および integrity-rule-catalog.md の新規 IR 候補（retired-reference-residual）と整合する。本候補の実行可否、タイミングは別途 SPEC 確定を待って確定する。
+本セクションは REQ/ADR 廃止確定時に、下流（配布 Command/Skill 群、Guide 群、SPEC 群）へ残る旧 ID 参照の横断クリーンアップを実行するステップの**追加候補**を記録する。既存の req-save 手順（Step 1〜12）に代わるものではなく、既存フローを破壊しない追加ステップである。本候補は廃止 REQ/SPEC 由来記述残置検出カテゴリおよび integrity-rule-catalog.md の新規 IR 候補（retired-reference-residual）と整合する。本候補の実行可否、タイミングは別途 SPEC 確定を待って確定する。
 
 ### 対象トリガ
 
@@ -268,7 +267,7 @@ req-save は複数 REQ/ADR ファイルの変更案作成、検査を並列化�
 ### クリーンアップ手順（候補）
 
 1. **廃止 ID リスト作成**: 当該 req-save 操作で廃止確定した REQ/ADR ID（例: REQ-NNNN、ADR-NNNN）のリストを作成する
-2. **下流参照検索**: 廃止 ID をソースに配布 Command/Skill 群、Guide 群、SPEC 群を横断検索する。活性 REQ/SPEC への言及は対象外とする（REQ-0124-024 準拠）
+2. **下流参照検索**: 廃止 ID をソースに配布 Command/Skill 群、Guide 群、SPEC 群を横断検索する。活性 REQ/SPEC への言及は対象外とする（廃止 REQ/SPEC 由来記述残置検出カテゴリ準拠）
 3. **参照更新候補の分類**:
    - supersede 元への妥当な文脈参照 → finding 扱い（人間確認）。自動更新しない
    - 廃止 ID のまま残置 → 当該ドキュメントの後継 ID へ更新、または文脈次第で削除
@@ -277,7 +276,7 @@ req-save は複数 REQ/ADR ファイルの変更案作成、検査を並列化�
 
 ### 既存フローとの関係
 
-本ステップは既存の req-save 手順（Step 1〜12）に代わるものではなく、廃止操作時に追加で実行される候補ステップである。本ステップの実行有無、実行タイミングは今後の SPEC 確定（REQ-0124/REQ-0125 関連）を待って確定する。現時点では本候補の記録のみを行い、自動実行は行わない。既存の G02（ファイル操作制約）、G12（Capture 非関与制約）に違反しない範囲で運用される。
+本ステップは既存の req-save 手順（Step 1〜12）に代わるものではなく、廃止操作時に追加で実行される候補ステップである。本ステップの実行有無、実行タイミングは今後の SPEC 確定を待って確定する。現時点では本候補の記録のみを行い、自動実行は行わない。既存の G02（ファイル操作制約）、G12（Capture 非関与制約）に違反しない範囲で運用される。
 
 ## ガードレール
 

@@ -1,6 +1,5 @@
 ---
 description: docs全体の意味整合性を検出し、検出事項を .agentdev/inspect/inbox/ へ出力する
-agent: sisyphus
 ---
 
 # inspect-docs
@@ -24,7 +23,24 @@ docs全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、検�
 ## 出力
 
 - 診断結果（セッション内テキスト出力 + `.agentdev/inspect/inbox/` への検出事項ファイル）
- - 検出事項リスト（観点、対象、根拠、source-of-truth判定、推奨route）
+  - 検出事項リスト（観点、対象、根拠、source-of-truth判定、推奨route）
+
+## inspect-* コマンド選択 routing
+
+変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。
+本コマンド（inspect-docs）と inspect-skills は配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs Step 11 配布物整合性検査、inspect-skills Step 3 配布物構文健全性・責務整合診断）。変更範囲に応じて routing することで重複検出を防ぐ。
+
+| 変更ファイル種別 | 実行コマンド |
+|------|------|
+| `docs/requirements/*.md`、`docs/adr/*.md` | inspect-docs |
+| `docs/specs/**/*.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
+| `docs/guides/*.md`、`docs/DOC-MAP.md`、`README.md` | inspect-docs |
+| `src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md` | inspect-skills |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション、ADR-002） | inspect-skills |
+| `docs/specs/commands/**/*.md`、`docs/specs/skills/**/*.md` | inspect-skills |
+| 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
+
+routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。配布物のみの変更時は inspect-skills を優先する。
 
 ## project extensions
 

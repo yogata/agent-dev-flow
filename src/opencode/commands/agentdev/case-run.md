@@ -1,6 +1,5 @@
 ---
 description: 単一 Issue または単一 Wave（Epic Issue 指定時: 現在 ready な Wave の子Issue を並列実行）を実行担当サブエージェントへ委譲し、result を処理する。worktree前提、委譲、結果処理を責務とする。3フェーズ構成でべき等性、再開ポイントを提供
-agent: sisyphus
 ---
 
 # 実装パイプライン
@@ -104,13 +103,13 @@ workflow_route は都度導出し保存しない
 
 `agentdev-quality-gates` の「case-run 前置 staleness check（REQ〜034）」に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・case-update 連携を実行する。本検査は QG-3 本体（Step 6 委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類運用、QG-3 本体実施要否には影響しない。差異非検出時はそのまま Step 6 へ進む
 
-### Step 5-4: docs/** 変更時の targeted docs guard（REQ-0130-035）
+### Step 5-4: docs/** 変更時の targeted docs guard
 
-PR 対象ファイルに docs/** 変更を含む場合、Step 6（実行担当サブエージェント起動）の委譲前に targeted docs guard を実行する（REQ-0130-035）。本検査は QG-3 本体・QG-3 前置 staleness check（Step 5-3）とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない（REQ-0130-033 準拠）。
+PR 対象ファイルに docs/** 変更を含む場合、Step 6（実行担当サブエージェント起動）の委譲前に targeted docs guard を行う。本検査は QG-3 本体・QG-3 前置 staleness check（Step 5-3）とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない。
 
 **実行条件**:
 
-- PR 対象ファイルに docs/** 変更を含む場合に実行する。docs/** 変更を含まない PR（コードのみ、SCRIPT のみ等）ではスキップする（REQ-0130-007 の QG-3 限定原則を維持、docs全体grep ではなく変更ファイル限定の targeted 検査）
+- PR 対象ファイルに docs/** 変更を含む場合に実行する。docs/** 変更を含まない PR（コードのみ、SCRIPT のみ等）ではスキップする（QG-3 限定原則を維持、docs全体grep ではなく変更ファイル限定の targeted 検査）
 
 **実行コマンド**:
 
@@ -124,21 +123,21 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
 **検出結果の記録、連携**:
 
 - 検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` セクションに `### docs-integrity` 小見出しで記録する（実行担当サブエージェント責務）
-- case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない、REQ-0130-034 準拠）
+- case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない）
 
 ### case-run が使用する検査ツール
 
-case-run が使用する検査ツール（[integrity-contracts.md](../../../../docs/specs/integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
+case-run が使用する検査ツール（integrity 契約 SPEC「Workflow × 使用ツールマトリックス」参照）:
 
-- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、Step 6 委譲前に実行（AG-002、Step 5-4「docs/** 変更時の targeted docs guard（REQ-0130-035）」参照）
+- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、Step 6 委譲前に実行（AG-002、Step 5-4「docs/** 変更時の targeted docs guard」参照）
 - check_extensions.ts（IR-056）: `.opencode/commands/agentdev/**/*.md`, `.opencode/skills/agentdev-*/SKILL.md`, `.opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
-- test_strategy: Issue 完了条件検証（REQ-0130-029/030）
+- test_strategy: Issue 完了条件検証
 
-※上記は全て肯定表現である（REQ-0144-002, REQ-0144-003 準拠）。
+※上記は全て肯定表現である。
 
 ### Step 6: 実行担当サブエージェント起動（委譲）
 
-実装実行を adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲する（委譲 prompt 内で実行 command を指定）。起動手段は AGENTS.md および references/<harness>.md 参照（REQ-0162-002）。
+実装実行を adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲する（委譲 prompt 内で実行 command を指定）。起動手段は AGENTS.md および references/<harness>.md 参照。
 adapter protocol は `agentdev-case-run-execution-adapter` skill 参照。
 
 **L2 タイムスタンプ計測（REQ、REQ）**: 委譲起動直前、直後に壁時計タイムスタンプ（JST、REQ の時刻形式に準拠）を記録し、実行担当サブエージェント実行時間を計測する。
@@ -155,9 +154,9 @@ Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情�
 実行担当サブエージェントの具体的責務は `agentdev-case-run-execution-adapter` スキル（REQ）参照。
 
 **実行担当サブエージェントの責務**: 委譲 prompt 内で指定された実行 command による目標分解（Issue を success criteria に分解）、各 criterion に observable evidence を要求、品質ゲート（code review + QA review + gate review）の実行、test strategy 項目の test-fix ループ（各項目ごとの検証、不合格時処置、全項目処理までの反復、REQ）。
-ランタイム作業領域（実行監査トレイル等）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しの保護（timeout 等）は harness 側が提供し（REQ-0103-163）、配布 command は具体的な待機時間や timeout 値を所有しない。
+ランタイム作業領域（実行監査トレイル等）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しの保護（timeout 等）は harness 側が提供し、配布 command は具体的な待機時間や timeout 値を所有しない。
 
-**委譲起動失敗、異常終了時の扱い**: 実行担当サブエージェントの委譲起動失敗、異常終了時は即 `failed` とせず**実装完了、検証未完了**として扱う。委譲起動不能の場合は `delegation-unavailable` として報告する（REQ-0162-003/004）。
+**委譲起動失敗、異常終了時の扱い**: 実行担当サブエージェントの委譲起動失敗、異常終了時は即 `failed` とせず**実装完了、検証未完了**として扱う。委譲起動不能の場合は `delegation-unavailable` として報告する。
 詳細な事後処理（worktree の `git status` で未コミット変更確認、残留箇所の grep と手動修正）は `agentdev-case-run-execution-adapter` スキル参照。
 
 - **case-run が直接行わない（実行担当サブエージェントの責務）**: work plan生成、実装実行、TDD、乖離検出（QG-3）、specs更新、関連ドキュメント整合性確認、ローカル検証、PR本文作成、PR作成、デプロイ検証

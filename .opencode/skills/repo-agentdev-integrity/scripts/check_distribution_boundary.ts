@@ -74,7 +74,7 @@ const PUBLIC_COMMAND_DIR = "src/opencode/commands/agentdev";
 const PUBLIC_SKILLS_PARENT = "src/opencode/skills";
 
 // Concrete IDs: ADR-1234, REQ-1234 (excludes ADR-{NNNN}, REQ-NNNN, ADR-*, etc.)
-const CONCRETE_ID_PATTERN = /\b(ADR|REQ)-\d{4}\b/g;
+const CONCRETE_ID_PATTERN = /\b(ADR|REQ)-\d{3,4}\b/g;
 
 // Candidate concrete paths. We match any docs/(adr|requirements|specs)/...
 // path token and then decide whether it is a concrete file or a template.

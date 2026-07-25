@@ -12,7 +12,7 @@ status: accepted
 | category | canonical-conflict |
 | detection_method | REQ 内の強制条件、禁止事項の抽出 → 矛盾検出 |
 | affected_artifacts | [現行 REQ] |
-| related_req | [REQ-0108-139, 149] |
+| related_req | [REQ-010-139, 149] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。意味判断が必要な場合あり |

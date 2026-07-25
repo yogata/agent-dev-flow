@@ -2,7 +2,7 @@
 title: "コマンドファイルフォーマット規約"
 status: accepted
 created: 2026-06-22
-updated: 2026-07-24
+updated: 2026-07-25
 ---
 
 # コマンドファイルフォーマット規約
@@ -11,7 +11,7 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 本 SPEC は command 定義ファイルが従うべき詳細なフォーマット規約を定義する。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
-> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
+> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001, REQ-001）。
 
 > **authoring/ ドメインでの配置理由**: 本 SPEC は本文構造・見出し構成・Step 表現・記述形式という執筆規約系の内容を扱うため、共通文書モデル規約（frontmatter・ID 体系・命名規則・URL 参照形式）を扱う `../foundations/patterns.md` と責務分離して `authoring/` ドメインに配置する。
 > `authoring/` は将来 REQ/SPEC/SKILL/guide 執筆規約の集約先として拡張余地を持つ（現状は command のみ）。即時統合・`authoring/` の削除は行わない。
@@ -23,7 +23,7 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 
 ## extensions 手順
 
-command 本文は extensions 手順（ADR-0135、SPEC `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を固定しない。
+command 本文は extensions 手順（ADR-005、SPEC `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を固定しない。
 
 各 command は以下の共通記述を本文に持つ。extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`）を持ち、標準動作に追加・拡張される（上書きではない）。SPEC パス例示、検査対象パス指定は例外として許可する:
 
@@ -90,10 +90,13 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 > **非検出対象（許容形式）**: `**EN.**` lettered prefix（代替フロー内サブステップ表現）は主手順の Step 番号連番とは独立した番号空間を持つため、上記検出項目のいずれにも該当しない。
 > `check_command_format.ts` は `### Step N` 見出しのみを Step 番号連番検査の対象とし、`**EN.**` ボールド段落プレフィックスを検出対象外とする（「代替フロー内サブステップ表現」参照）。
 
-## command SPEC と command 定義の対応付け（REQ-0143-005）
+## command SPEC と command 定義の対応付け
 
-command SPEC（`docs/specs/commands/*.md`）は command 定義ファイル（`src/opencode/commands/agentdev/*.md`）の Step 番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって command 定義と対応付ける（REQ-0143-005）。
-Step 番号一致を要求する旧規則（REQ-0143-004）は2026-07-22に廃止し、成果物、副作用、停止状態、必須順序による対応付け規則へ置き換えた。Step 番号は command 定義の実装詳細属であり、command SPEC が公開契約を独立に記述する構造を維持するため、SPEC 側での複製を求めない。
+command SPEC は command 定義ファイルの Step 番号を複製しない。
+
+command SPEC と command 定義は、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用する skill の責務で対応付ける。
+
+Step 番号は command 定義の内部構造であり、SPEC の公開契約に含めない。
 
 **対応付けの軸**:
 
@@ -105,12 +108,13 @@ Step 番号一致を要求する旧規則（REQ-0143-004）は2026-07-22に廃�
 - **必須順序**: 成果物、安全性、外部契約へ影響する順序（順序を変えると成果物または安全性が変わるもののみ）
 - **利用 skill 責務**: command が利用する skill 名と委譲する責務
 
-**適用対象**: `docs/specs/commands/*.md` の全 command SPEC（`_template.md` を含む）。Step 番号を持たない command SPEC（読み取り専用、分類系の `inspect-skills.md`、`inspect-promote.md`、`inspect-extensions.md` 等で `### Step N` 見出しを使用しない SPEC）は対応付けの対象外とし、その旨を当該 SPEC に文書化する（REQ-0143-005）。これらの SPEC は対応する command 定義ファイルと比較すべき Step 番号構成を持たないため、対応付け検証の対象とならない。
+**適用対象**: `docs/specs/commands/*.md` の全 command SPEC（`_template.md` を含む）。
+
+読み取り専用または分類系で Step を持たない command SPEC は、Step による対応付けの対象外であることを当該 SPEC に明記する。
 
 **検証**: 各 command/SPEC ペアについて、SPEC が公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務の各軸で command 定義と整合することを確認する。Step 番号の不一致は違反として扱わず、公開契約の欠落、相互矛盾を違反として扱う。
 
 ## 他 SPEC との関係
 
 - **`patterns.md`**: frontmatter 規約、テンプレート命名規則を担当。本 SPEC は command 本文構造を担当し、frontmatter 規約は `patterns.md` を参照する。
-- **`docs/specs/commands/*.md`**: 個別 command SPEC の位置づけを維持する。横断フォーマット規約は本 SPEC に集約し、個別 command SPEC には配置しない。各 command SPEC は本 SPEC の「command SPEC と command 定義の Step 番号一致（REQ-0143-004）」節に従い、対応する command 定義ファイル（`src/opencode/commands/agentdev/*.md`）と Step 番号構成を一致させる。
-- **[REQ-0143](../../requirements/REQ-0143.md)**: command 定義ファイルフォーマット標準化の要件定義。REQ-0143-004 が SPEC↔command Step 一致原則を指示し、本 SPEC はその詳細（Step 0 扱い、採番開始位置）を配置する。
+- **`docs/specs/commands/*.md`**: 個別 command SPEC の位置づけを維持する。横断フォーマット規約は本 SPEC に集約し、個別 command SPEC は公開契約の各対応付け軸を定義する。

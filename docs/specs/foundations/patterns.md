@@ -37,7 +37,7 @@ Plan エージェントは読み取り権限のみを持ち、ファイル書込
 
 ### Frontmatter 許可フィールド
 
-command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-0103-015, REQ-0103-044, ADR-0102）。
+command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-002-015, REQ-002-044, REQ-001）。
 
 分類定義は `design-principles.md` を参照。
 
@@ -86,7 +86,7 @@ SPEC frontmatterは`title`、`status`、`created`、`updated`を基本とする�
 
 ## REQ 分類規約
 
-旧 REQ（REQ-0001〜0050 [全て廃止]）は 3 分類で管理する（REQ-0109）:
+旧 REQ（v2:REQ-0001〜0050 [全て廃止]）は 3 分類で管理する（REQ-010）:
 
 | 分類 | 意味 | 取扱い |
 |------|------|--------|
@@ -94,10 +94,10 @@ SPEC frontmatterは`title`、`status`、`created`、`updated`を基本とする�
 | `retired-no-successor` | 最新方針では不要なため新現行 REQ へ移行しない | 履歴参照として保持 |
 | `historical-only` | 当時の判断、経緯として残すが現行要件ではない | 履歴参照として保持 |
 
-**新基準 REQ 群**（REQ-0101〜0133、25 件、REQ-0111, REQ-0115, REQ-0116, REQ-0117, REQ-0118, REQ-0120, REQ-0121, REQ-0122 は廃止）を現行仕様の主参照とする。
+**新基準 REQ 群**（REQ-001〜0133、25 件、v2:REQ-0111, v2:REQ-0115, v2:REQ-0116, v2:REQ-0117, v2:REQ-0118, v2:REQ-0120, v2:REQ-0121, v2:REQ-0122 は廃止）を現行仕様の主参照とする。
 現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とし、本 SPEC では複製しない。
 
-**要件行の記述規約**（REQ-0109, 004）:
+**要件行の記述規約**（REQ-010, 004）:
 - 要件行には振る舞い、制約、状態のみを記述する
 - 反映作業（更新、削除、移動、名称変更等）を要件行に記述しない
 
@@ -137,8 +137,8 @@ Issue/PR/コメント本文にリポジトリ内ファイル、ディレクト�
 
 ### 変換ルール
 
-- `docs/requirements/REQ-0107.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/requirements/REQ-0107.md`
-- `docs/adr/ADR-0101.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/adr/ADR-0101.md`
+- `docs/requirements/v2:REQ-0107.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/requirements/v2:REQ-0107.md`
+- `docs/adr/REQ-001.md` → `https://github.com/yogata/agent-dev-flow/blob/main/docs/adr/REQ-001.md`
 - `src/opencode/skills/agentdev-gh-cli/SKILL.md` → `https://github.com/yogata/agent-dev-flow/blob/main/src/opencode/skills/agentdev-gh-cli/SKILL.md`
 - `src/opencode/skills/` → `https://github.com/yogata/agent-dev-flow/tree/main/src/opencode/skills/`
 

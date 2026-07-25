@@ -24,8 +24,8 @@ describe("nextReqNumber", () => {
 });
 
 describe("formatReqId", () => {
-  test("zero-pads to 4 digits", () => {
-    expect(formatReqId(1)).toBe("REQ-0001");
+  test("zero-pads to 3 digits", () => {
+    expect(formatReqId(1)).toBe("REQ-001");
   });
 
   test("preserves 4-digit numbers", () => {

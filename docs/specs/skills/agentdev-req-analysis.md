@@ -21,7 +21,7 @@ updated: 2026-07-18
 
 - ユーザーストーリー、完了条件、境界条件の展開
 - 状態要件と反映作業の分類基準（分類ゲート）
-- REQ/SPEC 境界判定基準（REQ-0101-067〜069）
+- REQ/SPEC 境界判定基準（REQ-001-067〜069）
 - 壁打ちメソドロジー（未決分岐解消、回答分類: Confirmed / Inferred / Unknown / User Decision / Out of Scope）
 - ADR 閾値判定ブリッジ
 - 複数 RU 入力受付、統合/分離判定、操作単位ごとの出力生成
@@ -52,7 +52,7 @@ updated: 2026-07-18
 - 曖昧な表現を具体化できているか
 - 全ステークホルダー視点で合意形成できているか
 - 要件行が必達要件として記述されているか
-- SPEC 分離基準（REQ-0101-068）違反の残留検出
+- SPEC 分離基準（REQ-001-068）違反の残留検出
 
 ## See Also
 
@@ -61,5 +61,5 @@ updated: 2026-07-18
 - [agentdoc-architecture-advisory.md](agentdev-architecture-advisory.md)
 - [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)
 - [commands/req-define.md](../commands/req-define.md)
-- REQ-0102（要件定義、保存）
+- REQ-004（要件定義、保存）
 

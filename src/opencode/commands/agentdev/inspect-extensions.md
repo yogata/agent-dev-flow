@@ -1,6 +1,5 @@
 ---
 description: project extensions 機構（.agentdev/extensions/**）の整合性を読み取り専用で診断し、検出事項を .agentdev/inspect/inbox/ へ出力する。旧 doc-inputs 残存検出、extension 構造確認、path 実在確認、skill 存在確認を担う
-agent: sisyphus
 ---
 
 # inspect-extensions

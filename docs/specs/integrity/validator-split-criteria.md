@@ -11,11 +11,11 @@ updated: 2026-07-21
 
 ## 目的
 
-check_changed_docs.ts の内部 validator 構成と、validator を分割する基準を実装詳細SPEC として文書化する（targeted-docs-guard-implementation.md Phase 6）。
+check_changed_docs.ts の validator を分割する基準を実装詳細SPEC として文書化する（targeted-docs-guard-implementation.md Phase 6）。内部 validator 構成表は [references/validator-internal-config.md](references/validator-internal-config.md) へ分離した。
 
 ## validator の責務境界
 
-各 validator は単一の検査関心を担う。検査関心が異なる場合は別 validator へ分割する。検査関心と IR ルールの対応は 1:1 を要求せず、1 validator が複数の IR ルールを包括カバーしてよい（REQ-0108-269）。
+各 validator は単一の検査関心を担う。検査関心が異なる場合は別 validator へ分割する。検査関心と IR ルールの対応は 1:1 を要求せず、1 validator が複数の IR ルールを包括カバーしてよい（REQ-010-269）。
 
 ## ファイルサイズ上限
 
@@ -27,14 +27,4 @@ check_changed_docs.ts の内部 validator 構成と、validator を分割する�
 
 ## check_changed_docs.ts の validator 構成
 
-check_changed_docs.ts は以下の処理層（validator）で構成する:
-
-| validator | 責務 |
-|---|---|
-| changed file resolver | --files または --base-ref から files_checked を生成する |
-| workflow profile resolver | --workflow 値に応じた profileFor() 適用と rules 選択を行う |
-| coupled file resolver | 連動ファイル（README、DOC-MAP、mapping-table 等）を特定する |
-| targeted check runner | files_checked と coupled_files_checked に対し profile rules を実行する |
-| JSON/text reporter | TargetedDocsReport 形式で JSON/text 出力を生成する |
-
-各 validator は独立してテスト可能であり、他 validator への実行時依存を持たない。reporter は TargetedDocsReport 型契約（[integrity-contracts.md](integrity-contracts.md) TargetedDocsReport 型契約）に従う。
+check_changed_docs.ts の内部 validator 構成（changed file resolver、workflow profile resolver、coupled file resolver、targeted check runner、JSON/text reporter）は [references/validator-internal-config.md](references/validator-internal-config.md) へ分離した。各 validator は独立してテスト可能であり、他 validator への実行時依存を持たない。reporter は [integrity-contracts.md](integrity-contracts.md) TargetedDocsReport 型契約に従う。

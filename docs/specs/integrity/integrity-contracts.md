@@ -9,7 +9,7 @@ updated: 2026-07-24
 
 ## 目的
 
-整合性検査の分類フレームワークを定義し、検査結果の深刻度と対応フローを規定する（REQ-0108）。
+整合性検査の分類フレームワークを定義し、検査結果の深刻度と対応フローを規定する（REQ-010）。
 
 ## 深刻度分類（Severity Classification）
 
@@ -32,8 +32,8 @@ updated: 2026-07-24
 | workflow-gap | workflow 定義の欠落 | heuristic |
 | integrity-rule-gap | 検査ルール自体の欠落 | observation |
 
-> **REQ/SPEC 境界違反**（REQ-0108-260）: 現行 REQ 要件行の主たる文意が SPEC 詳細（スキーマフィールド、enum 値一覧、テストデータ詳細、チェッカー個別ルール、誤検知抑制方式、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）である場合は canonical-conflict のサブカテゴリとして扱い、IR-044 で heuristic 検出する。
-> REQ-0101-069 の安定契約例外（公開コマンド名、公開入口、ドメイン状態位置づけ、他コマンド接続契約、利用者可視分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外とする。
+> **REQ/SPEC 境界違反**（REQ-010-260）: 現行 REQ 要件行の主たる文意が SPEC 詳細（スキーマフィールド、enum 値一覧、テストデータ詳細、チェッカー個別ルール、誤検知抑制方式、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）である場合は canonical-conflict のサブカテゴリとして扱い、IR-044 で heuristic 検出する。
+> REQ-001-069 の安定契約例外（公開コマンド名、公開入口、ドメイン状態位置づけ、他コマンド接続契約、利用者可視分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外とする。
 
 ## 検出事項経路マップ（Finding Route Map）
 
@@ -53,7 +53,7 @@ updated: 2026-07-24
 | カテゴリ | 検査対象 |
 |---|---|
 | REQ | frontmatter 整合性、ID 一意性、タグ妥当性 |
-| ADR | status 遷移妥当性、参照 REQ 存在確認、現行、廃止コレクション区別（REQ-0112-050） |
+| ADR | status 遷移妥当性、参照 REQ 存在確認、現行、廃止コレクション区別（REQ-001-050） |
 | Skill | USE FOR / DO NOT USE FOR 整合性、`references/` 存在確認 |
 | Command | frontmatter 許可フィールド、Steps 構造 |
 | Template | 必須セクション存在、プレースホルダー妥当性 |
@@ -62,16 +62,16 @@ updated: 2026-07-24
 | Canonical | 正規境界の遵守 |
 | Lifecycle | 状態遷移の妥当性 |
 | Namespace | 旧名前空間残存確認 |
-| ImplementationPattern | frontmatter 禁止フィールド検査（REQ-0108-026〜038 から反転、REQ-0108-109/124 に統合済） |
-| ADRStatusNormalization | ADR status 旧形式検出（REQ-0108-121） |
-| RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-0108-122） |
-| WorkflowStatusProhibition | ワークフロー状態 / 6 マイクロフェーズ検出（REQ-0108-123） |
-| AcceptedAdrCitation | 承認済み以外の ADR 引用検出（REQ-0108-125, 推奨）。廃止 ADR への履歴参照は現行根拠引用 heuristic と区別する（REQ-0112-050） |
-| AbolishedSkillReference | 廃止済み skill への参照検知（REQ-0108-126） |
-| CommandLocalTemplate | command-local template 存在、整合性検査（REQ-0108-127） |
-| SkillSpecDependency | 実行時スキルから docs/specs/ への直接依存検出（REQ-0108-128） |
-| RetiredAdrCitation | 廃止 ADR への現行根拠引用検出（REQ-0112-048, heuristic/observation） |
-| ReqSpecBoundary | 現行 REQ 要件行への SPEC 詳細混入検出（REQ-0108-260, REQ-0101-067〜069。IR-044 としてカタログ定義。REQ-0101-069 安定契約例外は対象外） |
+| ImplementationPattern | frontmatter 禁止フィールド検査（REQ-010-026〜038 から反転、REQ-010-109/124 に統合済） |
+| ADRStatusNormalization | ADR status 旧形式検出（REQ-010-121） |
+| RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-010-122） |
+| WorkflowStatusProhibition | ワークフロー状態 / 6 マイクロフェーズ検出（REQ-010-123） |
+| AcceptedAdrCitation | 承認済み以外の ADR 引用検出（REQ-010-125, 推奨）。廃止 ADR への履歴参照は現行根拠引用 heuristic と区別する（REQ-001-050） |
+| AbolishedSkillReference | 廃止済み skill への参照検知（REQ-010-126） |
+| CommandLocalTemplate | command-local template 存在、整合性検査（REQ-010-127） |
+| SkillSpecDependency | 実行時スキルから docs/specs/ への直接依存検出（REQ-010-128） |
+| RetiredAdrCitation | 廃止 ADR への現行根拠引用検出（REQ-001-048, heuristic/observation） |
+| ReqSpecBoundary | 現行 REQ 要件行への SPEC 詳細混入検出（REQ-010-260, REQ-001-067〜069。IR-044 としてカタログ定義。REQ-001-069 安定契約例外は対象外） |
 
 ## レポート形式（Report Format）
 
@@ -102,9 +102,9 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 
 ## 適用範囲宣言
 
-`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（ADR-0103）。
+`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
 他プロジェクトへの適用を意図しない。
-実行時コマンドは SPEC ファイルに依存しない（ADR-0104）。
+実行時コマンドは SPEC ファイルに依存しない（REQ-001）。
 
 ## ガードレール分類（Guardrails Classification）
 
@@ -131,9 +131,9 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 | `case-run` | worktree 内の全ファイル | worktree 外、`.agentdev/` |
 | `case-close` | GitHub Issue/PR, worktree 削除 | `.agentdev/intake/inbox/` 直接書込 |
 | `case-update` | GitHub Issue のみ | ローカルファイル |
-| `docs-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（実行時。実行自体を承認として扱い、追加のユーザー承認は不要。REQ-0108-225, REQ-0112-059） | 検査対象アーティファクト |
+| `docs-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（実行時。実行自体を承認として扱い、追加のユーザー承認は不要。REQ-010-225, REQ-001-059） | 検査対象アーティファクト |
 
-> **注記**: `docs-check` は `/repo/docs-check` として実行される配布対象外コマンドである（ADR-0106）。
+> **注記**: `docs-check` は `/repo/docs-check` として実行される配布対象外コマンドである（REQ-001）。
 > AgentDevFlow の配布対象外。
 
 | Command | 許可変更 | 禁止 |
@@ -155,26 +155,26 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 - `backlog-review` も検査対象外アーティファクトを変更せず、許可された `.agentdev/` 配下の出力のみを行う
 - 変更が検出された場合は warning として報告
 
-## 3層検出構造の責務分担（REQ-0145-008, REQ-0146-008）
+## 3層検出構造の責務分担（REQ-010-008, REQ-003-008）
 
 整合性検出は以下の3層構造で責務分担する:
 
 | 層 | 担当 | 検出対象 | 検出形式 |
 |---|---|---|---|
 | 機械的検出 | docs-check + IR（[integrity-rule-catalog.md](integrity-rule-catalog.md)） | 文書構造、ID 参照、frontmatter、命名規則等、決定論的検出可能な違反 | strict / heuristic / observation の severity 分類 |
-| 意味的診断 | inspect-skills（REQ-0125） | Command → Skill 参照妥当性、Skill 構造、読み取り専用診断 | finding 出力、推奨 route 提示 |
-| 査読時観点 | doc-writing skill（REQ-0140） | 文書種別責務、要件性、文意品質、粒度 | 査読コメント、follow-up 指摘 |
+| 意味的診断 | inspect-skills（REQ-010） | Command → Skill 参照妥当性、Skill 構造、読み取り専用診断 | finding 出力、推奨 route 提示 |
+| 査読時観点 | doc-writing skill（v2:REQ-0140） | 文書種別責務、要件性、文意品質、粒度 | 査読コメント、follow-up 指摘 |
 
 各層は他層の担当を重複して実施せず、検出内容に応じて適切な層へ委譲する。
 機械的検出で偽陽性となる意味的判断は inspect-skills へ、文書品質の査読は doc-writing skill へ、それぞれ振り分ける。
 
-## IR-050 / IR-051 適用条件（REQ-0145-006/007）
+## IR-050 / IR-051 適用条件（REQ-010-006/007）
 
 IR-050（load_skills 誤指定検出）、IR-051（実行主体 skill 表記誤認検出）は、語彙レジストリ（`.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`）の存在確認、必要語彙の補充後に適用する。
 IR-051 の「一定文字距離内」は語彙レジストリで確定された具体閾値（文字数、行数）を使用する。
 閾値未確定時は heuristic として報告するが auto-promote 対象外とする。
 
-## reference-path-existence 検出における backtick 囲みパスの扱い（REQ-0144-020）
+## reference-path-existence 検出における backtick 囲みパスの扱い（REQ-010-020）
 
 `checkScriptTemplateReferencePaths`（`check_integrity.ts`）は command 定義と SKILL.md から抽出したパス参照（`.opencode/**`、`scripts/*.ts`、`templates/*.md`、`references/*.md`）の実在確認を行う。このとき Markdown backtick で囲まれたパス成分はインラインコード修飾（code formatting）と解釈し、パス解決前に backtick を除去する（例: `.opencode/commands/agentdev/templates/case-close/\`agentdev-push-failed\`.md` → `.opencode/commands/agentdev/templates/case-close/agentdev-push-failed.md`）。backtick 囲みのパス成分を実在確認する既存契約は維持する。
 
@@ -189,9 +189,9 @@ IR-051 の「一定文字距離内」は語彙レジストリで確定された�
 
 本扱いは backtick 囲みをインラインコード表現として検出対象から除外する運用（パス参照として解釈しない運用）と対比した上で、実在確認の価値を維持するためパス参照として解釈する運用を採用した。検出ロジック（`check_integrity.ts`）と本節の記述は整合している。
 
-## RuntimeReference baseline 運用手順（REQ-0144-021）
+## RuntimeReference baseline 運用手順（REQ-010-021）
 
-IR-055（runtime-unresolved-reference）は段階導入（REQ-0108-264）のため、baseline 既知違反と新規違反を区別する。baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json` に格納する。
+IR-055（runtime-unresolved-reference）は段階導入（REQ-010-264）のため、baseline 既知違反と新規違反を区別する。baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json` に格納する。
 
 | 項目 | 定義 |
 |------|------|
@@ -202,9 +202,9 @@ IR-055（runtime-unresolved-reference）は段階導入（REQ-0108-264）のた�
 | 更新実行手順 | `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --update-ir055-baseline` を実行し、生成された baseline ファイルを commit する。更新後は `--json` 実行で new violation が 0 件になることを確認する |
 | 更新非対象 | strict 違反（REQ-NNNN、ADR-NNNN、`src/opencode/`、`/repo/*`、`repo-*`）の新規発生は baseline 更新で解消せず、必ず実装修復を行う。baseline 更新が許容されるのは heuristic 違反（`docs/specs/`、`docs/guides/`、本体 GitHub URL、行番号付き参照）の bucket 再計算のみ |
 
-## NG baseline 運用手順（全カテゴリ strict pass、REQ-0161-005 統合）
+## NG baseline 運用手順（全カテゴリ strict pass、v2:REQ-0161-005 統合）
 
-`check_integrity.ts` と `check_extensions.ts` は、既知の NG 集合を NG baseline として `.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json` へ格納する。各実行は「当該変更起因の新規 NG が 0 件であること」を以て strict pass（exit 0）と判定する。既知 NG が残存する状態でも strict pass が到達可能な構造を提供する（REQ-0161-005）。
+`check_integrity.ts` と `check_extensions.ts` は、既知の NG 集合を NG baseline として `.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json` へ格納する。各実行は「当該変更起因の新規 NG が 0 件であること」を以て strict pass（exit 0）と判定する。既知 NG が残存する状態でも strict pass が到達可能な構造を提供する（v2:REQ-0161-005）。
 
 baseline は `category` / `check` / `file` / `evidence` の4組を bucket key とする集計値（`count`）を持つ。実行結果は同 bucket key で集計し、各 bucket について現在の count が baseline count 以下であれば当該 NG を `info`（observation）へ降格する。現在の count が baseline count を超える bucket に属する NG は新規 NG として `ng` / `warning` レベルを維持し、exit code を非ゼロにする。
 
@@ -221,17 +221,17 @@ baseline は `category` / `check` / `file` / `evidence` の4組を bucket key �
 | 更新実行手順 | `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --update-ng-baseline`（`check_extensions.ts` も同様）は現行 NG 全体を無条件に再生成して取り込まない。承認済み差分に由来ラベル（`provenance`）と理由（`reason`）を付与して baseline entry へ追加する。追加対象でない既存未管理 NG は baseline へ取り込まず実修復対象として残す。更新後は `--json` 実行で新規 NG が 0 件になることを確認する |
 | 更新非対象 | 当該変更に直接起因する新規 NG。これらは baseline 更新で隠蔽せず、必ず実装修復を行う。既存未管理 NG は baseline 更新だけで解決済み扱いとせず、修復候補として追跡可能な状態を維持する |
 
-RuntimeReference baseline（IR-055、前節）は heuristic 違反の段階導入を目的とし、本 NG baseline は strict 違反（`ng` / `warning`）の既知集合を管理して「既知違反の解消」により strict pass を到達可能にすることを目的とする。両 baseline は独立に運用し、相互に影響しない。NG baseline は REQ-0161-005（旧 `docs/requirements/REQ-0161.md`、現 `docs/requirements/retired/REQ-0161.md`）から SPEC 統合された恒久契約である。
+RuntimeReference baseline（IR-055、前節）は heuristic 違反の段階導入を目的とし、本 NG baseline は strict 違反（`ng` / `warning`）の既知集合を管理して「既知違反の解消」により strict pass を到達可能にすることを目的とする。両 baseline は独立に運用し、相互に影響しない。NG baseline は v2:REQ-0161-005（旧 `docs/requirements/v2:REQ-0161.md`、現 `docs/requirements/retired/v2:REQ-0161.md`）から SPEC 統合された恒久契約である。
 
-## docs-check delta 検出における除外設定方針（REQ-0144-022, REQ-0144-015 準拠）
+## docs-check delta 検出における除外設定方針（REQ-010-022, REQ-010-015 準拠）
 
-docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PATH_PATTERNS`）の二系統で検出対象を絞る。両者とも「正当な除外」と「NG 隠蔽」を区別して運用する（REQ-0144-015）。
+docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PATH_PATTERNS`）の二系統で検出対象を絞る。両者とも「正当な除外」と「NG 隠蔽」を区別して運用する（REQ-010-015）。
 
 ### 正当な除外（legitimate exclusions）
 
 | 除外種別 | 対象 | 根拠 |
 |----------|------|------|
-| ルール自己参照 | `vocabulary-registry.md`、`integrity-rule-catalog.md`、`integrity-contracts.md`、`rules/IR-*.md`（全IRルールファイル、REQ-0145-015）、`baselines/ir-055-baseline.json` | 検出ルール自体の記述、正規語彙の対照表はルールを説明するためにパターンを列挙する。これを検出するとルール自身が NG となるため自己参照除外とする。個別 IR ルールファイル（`rules/IR-*.md`）は検出ルールの説明文であり、例示用 ID、廃止 skill 例、廃止 ADR 番号帯例示は自己参照的な説明資料であるため、全検出関数（broken-reference, abolished-skill-references, obsolete-spec-path 等）の検出スコープから除外する（REQ-0145-015） |
+| ルール自己参照 | `vocabulary-registry.md`、`integrity-rule-catalog.md`、`integrity-contracts.md`、`rules/IR-*.md`（全IRルールファイル、REQ-010-015）、`baselines/ir-055-baseline.json` | 検出ルール自体の記述、正規語彙の対照表はルールを説明するためにパターンを列挙する。これを検出するとルール自身が NG となるため自己参照除外とする。個別 IR ルールファイル（`rules/IR-*.md`）は検出ルールの説明文であり、例示用 ID、廃止 skill 例、廃止 ADR 番号帯例示は自己参照的な説明資料であるため、全検出関数（broken-reference, abolished-skill-references, obsolete-spec-path 等）の検出スコープから除外する（REQ-010-015） |
 | コードブロック内部 | ` ``` ` で囲まれた範囲 | 例示、パターン説明は検出対象外（integrity-rule-catalog.md「対象ファイル設計」準拠） |
 | template placeholder | `{xxx}` 形式のプレースホルダーを含む行 | プレースホルダーは実参照ではない |
 
@@ -241,7 +241,7 @@ docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PAT
 |----------|----|------|
 | baseline 過大計上 | 実修復されていない違反を baseline count に含め報告を抑止する | 許容しない。baseline 更新は前節「RuntimeReference baseline 運用手順」の根因特定を経た場合のみ認める |
 | 広域 exemption | 対象を絞らない glob（`docs/**` 等）で検出を回避する | 許容しない。exemption は対象ファイル単位、かつ根拠文書化を必須とする |
-| 検出無効化 | check_integrity.ts の検出関数をコメントアウト、条件付きで回避 | 許容しない。検出の廃止は catalog↔実装双方向同期運用（REQ-0145-003）に従い `baseline_status: resolved` を経て行う |
+| 検出無効化 | check_integrity.ts の検出関数をコメントアウト、条件付きで回避 | 許容しない。検出の廃止は catalog↔実装双方向同期運用（REQ-010-003）に従い `baseline_status: resolved` を経て行う |
 
 ### 除外設定の文書化要件
 
@@ -251,9 +251,9 @@ docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PAT
 2. 当該パスが履歴参照領域（retired 等）であること
 3. 当該パスが検出原理上の技術的除外であること（テスト fixture 等、検出すると恒久的に false となる場合）
 
-根拠なしの exemption 追加は NG 隠蔽（REQ-0144-015 違反）として扱い、レビューで却下する。
+根拠なしの exemption 追加は NG 隠蔽（REQ-010-015 違反）として扱い、レビューで却下する。
 
-## catalog ↔ 実装双方向同期運用（REQ-0145-003/004）
+## catalog ↔ 実装双方向同期運用（REQ-010-003/004）
 
 [integrity-rule-catalog.md](integrity-rule-catalog.md) と `check_integrity.ts` 実装は双方向同期運用を行う。同期ルール:
 
@@ -280,7 +280,7 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 | req-define | — | — | ✓（全体監査、検証手順） | — |
 | /repo/docs-check | ✓ | ✓ | ✓（全体監査） | — |
 
-全セル肯定表現（✓ または —）を使用する（REQ-0144-002, REQ-0144-003 準拠）。check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、他 workflow は — で「使用しない」を暗黙表現する。
+全セル肯定表現（✓ または —）を使用する（REQ-010-002, REQ-010-003 準拠）。check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、他 workflow は — で「使用しない」を暗黙表現する。
 
 参照元 workflow SPEC 一覧（各 SPEC から本マトリックス表を参照）:
 

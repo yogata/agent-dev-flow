@@ -58,5 +58,5 @@ case-run の状態機械、サブエージェントプロトコル、自律修�
 - [commands/case-run.md](../commands/case-run.md)
 - [commands/case-close.md](../commands/case-close.md)
 - [../workflows/capture-boundaries.md](../workflows/capture-boundaries.md)
-- REQ-0130（case-run / 実装パイプライン）
+- REQ-006（case-run / 実装パイプライン）
 

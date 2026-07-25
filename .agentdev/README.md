@@ -1,8 +1,8 @@
 # .agentdev/ — AgentDevFlow Domain State Directory
 
-AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101-022, 023）。
+AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001、REQ-002）。
 
-`.agentdev/` は canonical domain state であり、コマンド間で受け渡される永続的な成果物を保持する（`integrity/reports/` は例外: 非永続・git管理対象外）。agent-dev-flow が管理するドラフトは `.agentdev/drafts/` に配置する（REQ-0103-126〜128）。
+`.agentdev/` は canonical domain state であり、コマンド間で受け渡される永続的な成果物を保持する（`integrity/reports/` は例外: 非永続・git管理対象外）。agent-dev-flow が管理するドラフトは `.agentdev/drafts/` に配置する（REQ-002）。
 
 ## 状態表
 
@@ -55,7 +55,8 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-0101
 
 ## 参照
 
-- [REQ-0101](../docs/requirements/REQ-0101.md): 文書・REQ管理基準（017-026）
-- [REQ-0103](../docs/requirements/REQ-0103.md): Artifact責任分界（drafts配置: 126-128）
-- [REQ-0105](../docs/requirements/REQ-0105.md): Intake / Learning / Backlog lifecycle
-- [ADR-0005](../docs/adr/ADR-0005.md): AgentDevFlow plugin namespace
+- [REQ-001](../docs/requirements/REQ-001.md): 文書体系と持続可能な基準構造（domain state、案内層、基準境界）
+- [REQ-002](../docs/requirements/REQ-002.md): 配布成果物の責務境界（drafts 配置、配布境界）
+- [REQ-008](../docs/requirements/REQ-008.md): 一時成果物ライフサイクル（intake / learning / backlog lifecycle）
+- [ADR-001](../docs/adr/ADR-001-v3-charter.md): v3 charter（namespace、基本原則）
+- [ADR-005](../docs/adr/ADR-005.md): Project Extensions Architecture（`.agentdev/extensions/**`）

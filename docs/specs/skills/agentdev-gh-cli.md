@@ -9,13 +9,13 @@ updated: "2026-07-19"
 
 ## 目的
 
-`agentdev-gh-cli` は AgentDevFlow の GitHub I/O を一箇所に集約する中央集権的な I/O 境界である（REQ-0149, ADR-0130）。
+`agentdev-gh-cli` は AgentDevFlow の GitHub I/O を一箇所に集約する中央集権的な I/O 境界である（REQ-011, ADR-004）。
 command と skill は GitHub CLI（gh）コマンドを直接記述せず、`agentdev-gh-cli` の手続きへ委譲する。
-ローカル版は `agentdev-gh-cli` を差し替えることで GitHub 非依存の運用を実現する（REQ-0150, ADR-0130）。
+ローカル版は `agentdev-gh-cli` を差し替えることで GitHub 非依存の運用を実現する（v2:REQ-0150, ADR-004）。
 
 ## 責務定義
 
-`agentdev-gh-cli` は GitHub Issue / PR に対する I/O 手続きと VERIFY を担当する（REQ-0149, ADR-0130 decision #2）。
+`agentdev-gh-cli` は GitHub Issue / PR に対する I/O 手続きと VERIFY を担当する（REQ-011, ADR-004 decision #2）。
 本文生成、完了判定、Epic 依存判定、capture 分類は担当しない。
 これらは domain skill の責務である。
 
@@ -37,7 +37,7 @@ command と skill は GitHub CLI（gh）コマンドを直接記述せず、`age
 
 ## 操作契約
 
-`agentdev-gh-cli` は以下の手続きを提供する（REQ-0149, ADR-0130 decision #3）。
+`agentdev-gh-cli` は以下の手続きを提供する（REQ-011, ADR-004 decision #3）。
 各手続きの引数、戻り値、エラー扱いの詳細は references を参照。
 
 | 手続き | 入力 | 出力 |
@@ -52,21 +52,21 @@ command と skill は GitHub CLI（gh）コマンドを直接記述せず、`age
 | Issue close | Issue 番号、close 理由（`completed` / `not_planned`、省略時 `completed`） | なし |
 | VERIFY | 操作対象の識別子 | 検証結果（PASS / FAIL、検証観点別結果） |
 
-### 拡張手続き（REQ-0149-011）
+### 拡張手続き（REQ-011-011）
 
-基盤手続き一覧（REQ-0149-002）を UPDATE せず、拡張手続きとして新設する2手続き（REQ-0149-011）。case-close 等、PR のメタデータを読み取る command から委譲される。
+基盤手続き一覧（REQ-011-002）を UPDATE せず、拡張手続きとして新設する2手続き（REQ-011-011）。case-close 等、PR のメタデータを読み取る command から委譲される。
 
 | 手続き | 入力 | 出力 | 事後条件 |
 |---|---|---|---|
 | PR 変更ファイル一覧取得 | PR 番号 | 変更ファイルパス一覧（文字列配列） | 出力配列の各要素が PR の変更ファイルパスと一致すること |
 | PR mergeable 状態取得 | PR 番号 | `MERGEABLE` / `CONFLICTING` / `UNKNOWN` | gh CLI が返した `mergeable` 値をそのまま enum に写すこと |
 
-事後条件は READ 手続き（VERIFY 4観点の対象外）であるため、上記出力検証条件を適用する。本文生成、完了判定を含まない（REQ-0149-004 準拠）。
+事後条件は READ 手続き（VERIFY 4観点の対象外）であるため、上記出力検証条件を適用する。本文生成、完了判定を含まない（REQ-011-004 準拠）。
 標準版（GitHub 版）の gh CLI 実行例、Windows 環境での READ 手続き扱いは `references/standard-procedures.md` 参照。
 
 ### VERIFY の観点
 
-VERIFY は以下の観点で実施する（REQ-0149, REQ-0149-010）。
+VERIFY は以下の観点で実施する（REQ-011, REQ-011-010）。
 
 - エンコーディング（UTF-8 BOM なし、LF）
 - LF 数一致（書き込み元テキストと読み戻しテキストの LF 出現数が一致すること）
@@ -76,9 +76,9 @@ VERIFY は以下の観点で実施する（REQ-0149, REQ-0149-010）。
 
 リポジトリ参照リンク正規化は裸パス、相対パスを検出する。LF 数一致、見出し空行・行頭検証は Markdown 構造破壊（事実上の1行化、見出しの見出しとしての認識消失）を機械検出する。
 
-## WRITE 手続きの Windows encoding 初期化必須化（REQ-0149-009）
+## WRITE 手続きの Windows encoding 初期化必須化（REQ-011-009）
 
-`agentdev-gh-cli` の WRITE 手続き（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成、PR merge、Issue close 等）は、Windows 環境においてコンソールエンコーディング初期化（standard-procedures Section 2 Step 0）を**必須前置**する（REQ-0149-009）。
+`agentdev-gh-cli` の WRITE 手続き（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成、PR merge、Issue close 等）は、Windows 環境においてコンソールエンコーディング初期化（standard-procedures Section 2 Step 0）を**必須前置**する（REQ-011-009）。
 
 ### 要件
 
@@ -99,15 +99,15 @@ cmd /c chcp 65001 | Out-Null
 
 ### 委譲基盤との関係
 
-gh WRITE 操作を行う全 command/ skill（case-open、case-run、case-close、case-update 等）は `agentdev-gh-cli` 手続き（Section 2 標準手順）経由で Step 0 の恩恵を受ける（REQ-0149-001/006/007）。command/ skill 側での個別実装は不要であり、委譲基盤が本要件を一括して担保する。
+gh WRITE 操作を行う全 command/ skill（case-open、case-run、case-close、case-update 等）は `agentdev-gh-cli` 手続き（Section 2 標準手順）経由で Step 0 の恩恵を受ける（REQ-011-001/006/007）。command/ skill 側での個別実装は不要であり、委譲基盤が本要件を一括して担保する。
 
 ### ローカル版の扱い
 
-ローカル版は Case ファイル読み書きへ差し替えるため、本要件の対象外（gh CLI を使用しない）。ローカル版の具体的取扱いは REQ-0150 参照。
+ローカル版は Case ファイル読み書きへ差し替えるため、本要件の対象外（gh CLI を使用しない）。ローカル版の具体的取扱いは v2:REQ-0150 参照。
 
 ## 薄いルーティング入口と references 分離
 
-`agentdev-gh-cli` の SKILL.md は薄いルーティング入口とする（REQ-0149, ADR-0130 decision #3）。
+`agentdev-gh-cli` の SKILL.md は薄いルーティング入口とする（REQ-011, ADR-004 decision #3）。
 操作契約の詳細、標準版（GitHub 版）の具体的実装手順、VERIFY 観点、リトライロジックは references 配下に分離する。
 
 ### references 構成
@@ -126,7 +126,7 @@ SKILL.md は各手続きのルーティングのみを記述する。
 
 ## gh 直接記述の検出スコープ（inspect-skills 連携）
 
-command/skill 配下で gh コマンド直接記述を検出する `/agentdev/inspect-skills` 診断のスキャン対象と除外対象を定義する（REQ-0149, Issue #1104）。
+command/skill 配下で gh コマンド直接記述を検出する `/agentdev/inspect-skills` 診断のスキャン対象と除外対象を定義する（REQ-011, Issue #1104）。
 委譲基盤確立後も新規 command/skill が gh 直接記述を導入しないよう、検出辞書が自動担保する。
 
 ### スキャン対象
@@ -145,7 +145,7 @@ command/skill 配下で gh コマンド直接記述を検出する `/agentdev/in
 
 | 除外ファイル | 理由 | 根拠 |
 |-------------|------|------|
-| `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` | 標準版（GitHub 版）の既定実装として gh コマンド直接実行を保持する唯一のファイル | REQ-0149-003 |
+| `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` | 標準版（GitHub 版）の既定実装として gh コマンド直接実行を保持する唯一のファイル | REQ-011-003 |
 
 `agentdev-gh-cli` は GitHub I/O を集約する I/O 境界であり、その標準版実装が gh コマンドを直接保持することは委譲の目的と矛盾しない。
 standard-procedures.md 以外のファイルが gh 直接記述を保持する場合は委譲漏れとして検出する。
@@ -156,9 +156,9 @@ gh 直接記述を検出した場合、`gh-direct-invocation-leak` 分類で報�
 
 ## 差し替え可能性（ローカル版）
 
-ローカル版は `agentdev-gh-cli` を差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（REQ-0150, ADR-0130 decision #4, #5）。
-PR 関連手続きはスキップせず、Case ファイルの対応セクションで代替する（ADR-0130 decision #5）。
-GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手続き名を保ったまま実装を差し替える方式とする（ADR-0130 decision #6）。
+ローカル版は `agentdev-gh-cli` を差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（v2:REQ-0150, ADR-004 decision #4, #5）。
+PR 関連手続きはスキップせず、Case ファイルの対応セクションで代替する（ADR-004 decision #5）。
+GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手続き名を保ったまま実装を差し替える方式とする（ADR-004 decision #6）。
 
 ### 手続きと Case ファイルセクションの対応
 
@@ -178,7 +178,7 @@ GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手�
 
 ## 適用対象
 
-- GitHub Issue / PR を操作するすべての command と skill（REQ-0149）
+- GitHub Issue / PR を操作するすべての command と skill（REQ-011）
 - Windows PowerShell 環境での gh CLI 実行（標準版）
 - ローカル版での Case ファイル読み書き（ローカル版）
 
@@ -192,6 +192,6 @@ GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手�
 - [agentdev-issue-management.md](agentdev-issue-management.md)
 - [agentdev-inspect-skills.md](agentdev-inspect-skills.md)（gh 直接記述の検出辞書を参照）
 - [ローカル Case ファイル](../local/local-case-file.md)
-- [REQ-0149](../../requirements/REQ-0149.md)（`agentdev-gh-cli` 手続き委譲基盤）
-- [REQ-0150](../../requirements/REQ-0150.md)（ローカル版 `agentdev-gh-cli` 実装）
-- [ADR-0130](../../adr/ADR-0130.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）
+- [REQ-011](../../requirements/REQ-011.md)（`agentdev-gh-cli` 手続き委譲基盤）
+- [v2:REQ-0150](../../requirements/v2:REQ-0150.md)（ローカル版 `agentdev-gh-cli` 実装）
+- [ADR-004](../../adr/ADR-004.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）

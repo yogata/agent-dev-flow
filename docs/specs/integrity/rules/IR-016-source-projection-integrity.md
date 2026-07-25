@@ -12,7 +12,7 @@ status: accepted
 | category | canonical-conflict |
 | detection_method | sync-opencode.ps1 -Mode check 相当の比較 |
 | affected_artifacts | [commands, skills, templates] |
-| related_req | [REQ-0103-048-052, REQ-0108-143-144] |
+| related_req | [REQ-002-048-052, REQ-010-143-144] |
 | related_spec | [system.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。ジャンクション（junction）破損は確実な NG |

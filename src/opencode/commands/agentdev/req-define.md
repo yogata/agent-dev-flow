@@ -1,6 +1,5 @@
 ---
 description: 要件を整理、定義する（機能追加、バグ修正共通）
-agent: sisyphus
 ---
 
 # 要件定義
@@ -125,9 +124,9 @@ REQ/ADR/SPEC への保存対象は成果物別最上位配列に分散させず�
  - **7-3a. target_area / content 形式（`artifact: spec` の場合、REQ/079）**: `artifact: spec` の action は operation 別に以下の出力形式を規定する。`target_area` の形式（Markdown 見出し行）、見出し階層の解釈規則、複数マッチ、未検出時の挙動は spec-save 側に委譲し、req-define 側は出力形式のみを規定する
   - `operation: create / spec-create`: `target_area` は任意（省略時は spec-save が既存セクション構造から追加位置を判断）。`content` は新規セクション本文とする
   - `operation: update / spec-update`: `target_area` は必須（対象セクション見出し、Markdown 見出し行形式。例: `### IR-044`）。`content` は変更後セクション全文（対象セクションの見出し行から次の同レベル見出しの直前までの全内容）とする
-  - **7-3b. SPEC action への分類根拠出力（`artifact: spec` の場合）**: `artifact: spec` の各 action へ `spec_logical_division`（REQ-0155-009 の5区分: `behavior`/`catalog`/`cross_cutting_contract`/`parameter`/`implementation_detail`）と `canonical_owner`（対象 command、skill、workflow 等の関心キー、REQ-0119-038）を最終分類確定値として出力する。出力値は Step 5-2 の最終分類確定ステップで確定した値とし、`artifact-contracts.md`（extension 経由）「分類根拠伝播契約」の伝播フィールド一覧と一致させる。分類値が確定できない場合は `unknown` とし、soft-contract（ADR-0124）に従い後続 spec-save へ警告付きで引き継ぐ。後続 spec-save が SPEC frontmatter または冒頭宣言節へ宣言を付与するための入力となる
+  - **7-3b. SPEC action への分類根拠出力（`artifact: spec` の場合）**: `artifact: spec` の各 action へ `spec_logical_division`（SPEC 論理5区分: `behavior`/`catalog`/`cross_cutting_contract`/`parameter`/`implementation_detail`）と `canonical_owner`（対象 command、skill、workflow 等の関心キー）を最終分類確定値として出力する。出力値は Step 5-2 の最終分類確定ステップで確定した値とし、`artifact-contracts.md`（extension 経由）「分類根拠伝播契約」の伝播フィールド一覧と一致させる。分類値が確定できない場合は `unknown` とし、soft-contract に従い後続 spec-save へ警告付きで引き継ぐ。後続 spec-save が SPEC frontmatter または冒頭宣言節へ宣言を付与するための入力となる
   - **7-4. test_strategy 生成（REQ）**: Step 5-6 で定義した test strategy を `draft-data` の `test_strategy` セクションに格納する。各項目は id（TS-NNN）、target_item（AG-* への参照）、verification、pass_criteria、on_failure の5属性をYAML形式で保持する。`test_strategy` セクションの各項目は Step 5-6 の定義と完全に一致すること
-  - **7-5. review_dispositions 生成（AG-007）**: 壁打ち過程の採否判断（採用しなかった入力、既存要件で充足済みの入力、一部のみ採用した入力）を `draft-data` の `review_dispositions` へ正規YAMLフィールドとして出力する。各エントリは id（`RD-NNN`）、source_ru、source_item、disposition（`covered`/`partially_covered`/`rejected`/`not_applicable`、必要に応じて `superseded`/`stale_target`）、reason_code、reason、evidence（`path`、`section`、`checked_at_commit`）、related_removed_items を持つ。`evidence.checked_at_commit` は生成時 `null` とする（G08 git 禁止）。1 エントリ = 単一 source_ru + 単一 source_item（重複禁止）。未決事項は disposition で代替せず `auto_gate` の `unresolved_questions` 等へ記録する。根拠不足時は `auto_gate.auto_ready: false` とし `stop_reasons` へ記録する。シリアライズ形式の詳細は req-define command SPEC（extension 経由）の「draft-data review_dispositions フィールドスキーマ」を参照。`review_dispositions` は optional soft-contract（ADR-0124）であり、欠落時に後続工程が draft を拒否しない
+  - **7-5. review_dispositions 生成（AG-007）**: 壁打ち過程の採否判断（採用しなかった入力、既存要件で充足済みの入力、一部のみ採用した入力）を `draft-data` の `review_dispositions` へ正規YAMLフィールドとして出力する。各エントリは id（`RD-NNN`）、source_ru、source_item、disposition（`covered`/`partially_covered`/`rejected`/`not_applicable`、必要に応じて `superseded`/`stale_target`）、reason_code、reason、evidence（`path`、`section`、`checked_at_commit`）、related_removed_items を持つ。`evidence.checked_at_commit` は生成時 `null` とする（G08 git 禁止）。1 エントリ = 単一 source_ru + 単一 source_item（重複禁止）。未決事項は disposition で代替せず `auto_gate` の `unresolved_questions` 等へ記録する。根拠不足時は `auto_gate.auto_ready: false` とし `stop_reasons` へ記録する。シリアライズ形式の詳細は req-define command SPEC（extension 経由）の「draft-data review_dispositions フィールドスキーマ」を参照。`review_dispositions` は optional soft-contract であり、欠落時に後続工程が draft を拒否しない
 
 ### Step 8: work_type 判定
 

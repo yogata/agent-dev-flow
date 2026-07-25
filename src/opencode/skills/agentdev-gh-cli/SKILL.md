@@ -51,7 +51,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | PR 変更ファイル一覧取得 | PR 番号 | 変更ファイルパス一覧（文字列配列） |
 | PR mergeable 状態取得 | PR 番号 | `MERGEABLE` / `CONFLICTING` / `UNKNOWN` |
 
-後者2手続き（PR 変更ファイル一覧取得、PR mergeable 状態取得）は基盤手続き一覧（REQ-0149-002）を UPDATE せず拡張手続きとして新設したものである（REQ-0149-011）。詳細は SPEC `agentdev-gh-cli`.md「拡張手続き（REQ-0149-011）」参照。
+後者2手続き（PR 変更ファイル一覧取得、PR mergeable 状態取得）は基盤手続き一覧を UPDATE せず拡張手続きとして新設したものである。詳細は SPEC `agentdev-gh-cli`.md「拡張手続き」参照。
 
 ## VERIFY
 

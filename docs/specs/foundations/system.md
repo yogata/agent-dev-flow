@@ -13,7 +13,7 @@ status: accepted
 ### AgentDevFlow コマンド群
 
 AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプラインで構成され、開発ワークフローを提供する。
-各コマンドの目的、責務、入出力は後述の表および各コマンド専用 SPEC に記述する。実行エージェントの選定、起動方法は harness の責務であり、本 SPEC の対象外（ADR-0136）。
+各コマンドの目的、責務、入出力は後述の表および各コマンド専用 SPEC に記述する。実行エージェントの選定、起動方法は harness の責務であり、本 SPEC の対象外（v2:ADR-0136）。
 
 #### req/case パイプライン
 
@@ -46,7 +46,7 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプライン
 
 #### integrity ワークフロー
 
-docs-check は `/repo/*` コマンド体系の配布対象リポジトリ内コマンドである（ADR-0106、REQ-0108-156）。
+docs-check は `/repo/*` コマンド体系の配布対象リポジトリ内コマンドである（REQ-001、REQ-010-156）。
 AgentDevFlow の配布コマンドではなく、AgentDevFlow 本体リポジトリの自己監査コマンドである。
 
 | コマンド | 役割 |
@@ -90,9 +90,9 @@ case-run が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、ca
 
 ## 適用範囲宣言
 
-`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（ADR-0103）。
+`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
 他プロジェクトへの適用を意図しない。
-実行時コマンドは SPEC ファイルに依存しない（ADR-0104）。
+実行時コマンドは SPEC ファイルに依存しない（REQ-001）。
 
 ## See Also
 

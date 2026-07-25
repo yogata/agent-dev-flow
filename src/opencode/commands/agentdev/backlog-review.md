@@ -1,6 +1,5 @@
 ---
 description: 採用済み成果物を分析、統合し、ユーザー承認後に RU（Requirement Unit）を生成する
-agent: sisyphus
 ---
 
 # Backlog レビュー

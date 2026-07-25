@@ -10,9 +10,9 @@ status: accepted
 | description | Command の最上位 Step 見出し、参照が整数のみであり、`Step N.M` 形式の小数 Step が残存していないこと |
 | severity | strict |
 | category | obsolete-structure |
-| detection_method | `src/opencode/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側または integrity rule 内の旧語検出用文字列は REQ-0119-021 により除外 |
+| detection_method | `src/opencode/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側または integrity rule 内の旧語検出用文字列は REQ-003-021 により除外 |
 | affected_artifacts | [commands, command projection, integrity rules] |
-| related_req | [REQ-0119-005, REQ-0119-007, REQ-0119-021] |
+| related_req | [REQ-003-005, REQ-003-007, REQ-003-021] |
 | related_spec | [artifact-contracts.md, workflow-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。旧語検出用の正規表現文字列と projection 側の残存確認文は除外が必要 |

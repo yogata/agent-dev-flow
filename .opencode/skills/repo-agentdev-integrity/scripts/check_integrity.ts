@@ -151,12 +151,12 @@ function listFiles(dirPath: string): string[] {
   }
 }
 
-// REQ-0158-004: docs/specs/**/*.md 再帰収集ヘルパー。
+// v2:REQ-0158-004: docs/specs/**/*.md 再帰収集ヘルパー。
 // AC-7: collectAllArtifactPaths, checkDocMapSpecSync, checkSpecReadmeIndexSync,
 // checkUpdateNotesInDocs, scanned.Specs, SPEC inventory 照合、DOC-MAP と SPEC の
 // 照合処理は再帰前提へ更新する（docs/specs/*.md 直下のみ前提の廃止）。
 // opts.excludeReadme: docs/specs/README.md は SPEC status の単一追跡情報源
-// （REQ-0154-001/003、REQ-0158-005）であり、SPEC 本文検査では除外する。
+// （v2:REQ-0154-001/003、v2:REQ-0158-005）であり、SPEC 本文検査では除外する。
 // SPEC inventory/status 同期検査と DOC-MAP との照合では対象とするため、
 // 各呼び出し元で明示的に指定する（AC-8）。
 function collectSpecMarkdownRecursively(
@@ -172,7 +172,7 @@ function collectSpecMarkdownRecursively(
   return collected;
 }
 
-// REQ-0158-005: docs/specs/README.md は SPEC status の単一追跡情報源。
+// v2:REQ-0158-005: docs/specs/README.md は SPEC status の単一追跡情報源。
 // SPEC 本文検査では除外し、SPEC inventory/status 同期検査と DOC-MAP 照合では対象とする。
 function isSpecReadme(fullPath: string, specsDir: string): boolean {
   const readmePath = path.join(specsDir, "README.md");
@@ -209,7 +209,7 @@ function resolveRelative(fullPath: string, root: string): string {
   return path.relative(root, fullPath).replace(/\\/g, "/");
 }
 
-// REQ-0108-189: Fall back to src/opencode/ (原本) when runtime projection doesn't exist
+// v2:REQ-0108-189: Fall back to src/opencode/ (原本) when runtime projection doesn't exist
 function resolvePathWithFallback(runtimePath: string): string {
   if (fs.existsSync(runtimePath)) return runtimePath;
   const sourcePath = runtimePath
@@ -275,10 +275,10 @@ const LEGACY_PATTERNS = [
     pattern: /\blearning-capture-skill\b/g,
     name: "learning-capture-skill (old suffix)",
   },
-  // R4: legacy normative keyword markers in active documents (REQ-0102-024~028, REQ-0108-236)
+  // R4: legacy normative keyword markers in active documents (v2:REQ-0102-024~028, v2:REQ-0108-236)
   {
     pattern: new RegExp(["（" + "S" + "HALL）", "（" + "S" + "HOULD）", "（" + "M" + "AY）", "（" + "M" + "UST）"].join("|"), "g"),
-    name: "bracketed legacy normative marker (REQ-0102-028)",
+    name: "bracketed legacy normative marker (v2:REQ-0102-028)",
   },
 ];
 
@@ -487,7 +487,7 @@ function checkReqReadmeIndexSync(reqDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// REQ-0161-004: deletion self-reference exclusion.
+// v2:REQ-0161-004: deletion self-reference exclusion.
 // A REQ that mandates deletion of specific legacy IDs (REQ-NNNN / ADR-NNNN)
 // legitimately mentions those IDs in its requirement rows — the REQ describes
 // what it deletes. Such mentions are self-references, not dangling pointers.
@@ -499,10 +499,12 @@ const DELETION_SELF_REFERENCE_EXCLUSIONS: ReadonlyArray<{
   sourceReq: string;
   deletedIds: string[];
 }> = [
+  // v2: stale — file deleted
   {
     sourceReq: "docs/requirements/REQ-0161.md",
     deletedIds: ["ADR-0133", "REQ-0157"],
   },
+  // v2: stale — file deleted
   {
     sourceReq: "docs/requirements/REQ-0144.md",
     deletedIds: ["ADR-0133", "REQ-0157"],
@@ -518,7 +520,7 @@ function isDeletionSelfReference(
   );
 }
 
-// REQ-0145-015: 検出ルール説明文（IR-*.md）は例示用 ID、廃止 skill 例、廃止 ADR 番号帯を
+// v2:REQ-0145-015: 検出ルール説明文（IR-*.md）は例示用 ID、廃止 skill 例、廃止 ADR 番号帯を
 // 含む自己参照的資料であり、全検出関数のスコープから除外する。
 function isIntegrityRuleDescriptionFile(relPath: string): boolean {
   return /docs\/specs\/integrity\/rules\/IR-\d+/.test(relPath);
@@ -533,7 +535,7 @@ function checkAdrReqCrossReference(
   const reqFiles = listFiles(reqDir).filter((f) => f.startsWith("REQ-"));
   const adrFiles = listFiles(adrDir).filter((f) => f.startsWith("ADR-"));
   const existingAdrIds = new Set(adrFiles.map((f) => f.replace(".md", "")));
-  // REQ-0112-050: include retired ADR IDs as valid references
+  // v2:REQ-0112-050: include retired ADR IDs as valid references
   const retiredAdrDir = path.join(adrDir, "retired");
   const retiredAdrFiles = fs.existsSync(retiredAdrDir)
     ? listFiles(retiredAdrDir).filter((f) => f.startsWith("ADR-"))
@@ -541,7 +543,7 @@ function checkAdrReqCrossReference(
   const retiredAdrIds = new Set(retiredAdrFiles.map((f) => f.replace(".md", "")));
   const allAdrIds = new Set([...existingAdrIds, ...retiredAdrIds]);
   const existingReqIds = new Set(reqFiles.map((f) => f.replace(".md", "")));
-  // REQ-0108-074: include retired REQ IDs as valid references
+  // v2:REQ-0108-074: include retired REQ IDs as valid references
   const retiredDir = path.join(reqDir, "retired");
   const retiredFiles = fs.existsSync(retiredDir)
     ? listFiles(retiredDir).filter((f) => f.startsWith("REQ-"))
@@ -554,10 +556,10 @@ function checkAdrReqCrossReference(
     const content = readText(fullPath);
     if (!content) continue;
     const relPath = resolveRelative(fullPath, root);
-    const references = content.match(/\bADR-\d{4}\b/g) || [];
+    const references = content.match(/\bADR-\d{3,4}\b/g) || [];
     const uniqueRefs = [...new Set(references)];
     for (const ref of uniqueRefs) {
-      // REQ-0161-004: skip deletion self-references (REQ describes its own
+      // v2:REQ-0161-004: skip deletion self-references (REQ describes its own
       // deletion targets; see DELETION_SELF_REFERENCE_EXCLUSIONS).
       if (isDeletionSelfReference(relPath, ref)) continue;
       if (!allAdrIds.has(ref)) {
@@ -576,10 +578,10 @@ function checkAdrReqCrossReference(
     const fullPath = path.join(adrDir, file);
     const content = readText(fullPath);
     if (!content) continue;
-    const references = content.match(/\bREQ-\d{4}\b/g) || [];
+    const references = content.match(/\bREQ-\d{3,4}\b/g) || [];
     const uniqueRefs = [...new Set(references)];
     for (const ref of uniqueRefs) {
-      // REQ-0108-074: active or retired existence check
+      // v2:REQ-0108-074: active or retired existence check
       if (!allReqIds.has(ref)) {
         results.push(
           ng(
@@ -902,7 +904,7 @@ function checkNameCollision(skillsDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// ─── Completion report format validation (REQ-0024-017, REQ-0024-018) ──────
+// ─── Completion report format validation (v2:REQ-0024-017, v2:REQ-0024-018) ──────
 
 function buildCompletionReportSections(
   completionReportsPath: string,
@@ -989,7 +991,7 @@ function checkCompletionReportTemplates(
   return results;
 }
 
-// ─── Variant structure checks (REQ-0107-024~027) ──────────────────────────
+// ─── Variant structure checks (v2:REQ-0107-024~027) ──────────────────────────
 
 function getCompletionReportsDir(completionReportsPath: string): string {
   return path.join(path.dirname(completionReportsPath), "completion-reports");
@@ -1257,7 +1259,7 @@ function checkFragmentPatterns(
   return results;
 }
 
-// ─── Post-completion output checks (REQ-0024-017, REQ-0024-018) ──────
+// ─── Post-completion output checks (v2:REQ-0024-017, v2:REQ-0024-018) ──────
 
 function checkPostCompletionOutput(
   cmdDir: string,
@@ -1348,7 +1350,7 @@ function checkTerminology(cmdDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// SPEC inventory source: docs/specs/README.md (REQ-0154-001/003). Reading the
+// SPEC inventory source: docs/specs/README.md (v2:REQ-0154-001/003). Reading the
 // explicit list (instead of enumerating the directory) keeps missing SPECs
 // detectable. Old direct paths (system.md, patterns.md) are no longer required.
 const SPEC_DOMAINS =
@@ -1414,12 +1416,12 @@ function checkSpecsExistence(specsDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// ─── Link integrity checks (REQ-0108-013) ────────────────────────────────
+// ─── Link integrity checks (v2:REQ-0108-013) ────────────────────────────────
 
 function collectAllArtifactPaths(root: string): string[] {
   const paths: string[] = [];
-  // REQ-0108-188: 8 independent collections aligned with Document Classification Policy
-  // REQ-0158-004: docs/specs/**/*.md 再帰収集に更新
+  // v2:REQ-0108-188: 8 independent collections aligned with Document Classification Policy
+  // v2:REQ-0158-004: docs/specs/**/*.md 再帰収集に更新
   const collections: { dir: string; recursive?: boolean }[] = [
     { dir: path.join(root, "docs", "requirements") }, // 1. active_req
     // 2. retired_req (excluded from active)
@@ -1428,7 +1430,7 @@ function collectAllArtifactPaths(root: string): string[] {
     { dir: path.join(root, "docs", "guides") }, // 5. guide
     // 6. doc_map (single files added below)
     // 7. report: deliberately omitted — generated artifacts; scanning them
-    //    re-detects their own error text (feedback loop, REQ-0108-213).
+    //    re-detects their own error text (feedback loop, v2:REQ-0108-213).
     // 8. runtime (included via .opencode/commands and .opencode/skills elsewhere)
   ];
   for (const { dir, recursive } of collections) {
@@ -1505,7 +1507,7 @@ function resolveLinkTarget(
   return { filePath: resolved, anchor };
 }
 
-// REQ-0108-193: Check if the source ADR is superseded and references its predecessor
+// v2:REQ-0108-193: Check if the source ADR is superseded and references its predecessor
 function isSupersededAdr(sourcePath: string, referencedRef: string): boolean {
   const content = readText(sourcePath);
   if (!content) return false;
@@ -1526,7 +1528,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     const content = readText(filePath);
     if (!content) continue;
     const relPath = resolveRelative(filePath, root);
-    // REQ-0145-015: 検出ルール説明文（IR-*.md）は例示用 ID を含むため除外
+    // v2:REQ-0145-015: 検出ルール説明文（IR-*.md）は例示用 ID を含むため除外
     if (isIntegrityRuleDescriptionFile(relPath)) continue;
     const contentLines = content.split("\n");
 
@@ -1603,15 +1605,15 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     }
 
     // Check REQ-/ADR- text references
-    // REQ-0108-194: Suppress false positives for template placeholders
+    // v2:REQ-0108-194: Suppress false positives for template placeholders
     const isTemplateLike = /\{[a-zA-Z_]+\}/.test(content) || content.includes("🔄") || content.includes("✅") || content.includes("☐");
     const isReqRangeContext = isRangeExpression(content);
-    const reqRefs = content.match(/\bREQ-\d{4}\b/g) || [];
+    const reqRefs = content.match(/\bREQ-\d{3,4}\b/g) || [];
     const uniqueReqRefs = [...new Set(reqRefs)];
     for (const ref of uniqueReqRefs) {
-      // REQ-0108-194: Skip template-like content with placeholders or workflow markers
+      // v2:REQ-0108-194: Skip template-like content with placeholders or workflow markers
       if (isTemplateLike) break;
-      // REQ-0161-004: skip deletion self-references
+      // v2:REQ-0161-004: skip deletion self-references
       if (isDeletionSelfReference(relPath, ref)) continue;
       const activePath = path.join(root, "docs", "requirements", `${ref}.md`);
       const retiredPath = path.join(
@@ -1642,12 +1644,12 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       }
     }
 
-    const adrRefs = content.match(/\bADR-\d{4}\b/g) || [];
+    const adrRefs = content.match(/\bADR-\d{3,4}\b/g) || [];
     const uniqueAdrRefs = [...new Set(adrRefs)];
     for (const ref of uniqueAdrRefs) {
-      // REQ-0108-194: Skip template-like content with placeholders or workflow markers
+      // v2:REQ-0108-194: Skip template-like content with placeholders or workflow markers
       if (isTemplateLike) break;
-      // REQ-0161-004: skip deletion self-references
+      // v2:REQ-0161-004: skip deletion self-references
       if (isDeletionSelfReference(relPath, ref)) continue;
       const adrPath = path.join(root, "docs", "adr", `${ref}.md`);
       const retiredAdrPath = path.join(root, "docs", "adr", "retired", `${ref}.md`);
@@ -1672,7 +1674,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       }
     }
 
-    // REQ-0112-048/050, REQ-0108-193: retired ADR referenced as current baseline
+    // v2:REQ-0112-048/050, v2:REQ-0108-193: retired ADR referenced as current baseline
     // with context-dependent exemptions:
     // - In retired files: historical references are OK
     // - In superseded ADRs: references to predecessor are OK
@@ -1711,7 +1713,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     }
 
     // Check retired REQ referenced as current requirement
-    // REQ-0108-193: In retired files, references to other retired docs are OK (historical)
+    // v2:REQ-0108-193: In retired files, references to other retired docs are OK (historical)
     for (const ref of uniqueReqRefs) {
       const retiredPath = path.join(
         root,
@@ -1732,7 +1734,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
         !relPath.endsWith("mapping-table.md") &&
         !relPath.startsWith("docs/adr/ADR-") && // ADRs discuss REQ reorganization historically
         appearsOutsideRetired &&
-        !isReqRangeContext // REQ-0108-194: REQ range references like "REQ-0101 through REQ-0116"
+        !isReqRangeContext // v2:REQ-0108-194: REQ range references like "REQ-0101 through REQ-0116"
       ) {
         results.push(
           warn(
@@ -1765,7 +1767,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Canonical boundary checks (REQ-0108-014) ────────────────────────────
+// ─── Canonical boundary checks (v2:REQ-0108-014) ────────────────────────────
 
 function checkCanonicalBoundary(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -1861,7 +1863,7 @@ function checkCanonicalBoundary(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Lifecycle boundary checks (REQ-0108-015) ───────────────────────────
+// ─── Lifecycle boundary checks (v2:REQ-0108-015) ───────────────────────────
 
 function checkLifecycleBoundary(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -1933,11 +1935,11 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
     const content = readText(filePath);
     if (!content) continue;
     const contentLines = content.split("\n");
-    const refs = content.match(/\bREQ-\d{4}\b/g) || [];
+    const refs = content.match(/\bREQ-\d{3,4}\b/g) || [];
     const uniqueRefs = [...new Set(refs)];
     for (const ref of uniqueRefs) {
       if (retiredIds.has(ref) && !activeIds.has(ref)) {
-        // REQ-0108-193/AGENTS.md: a retired REQ may be mentioned as historical
+        // v2:REQ-0108-193/AGENTS.md: a retired REQ may be mentioned as historical
         // (retirement identification, changelog, related-info section). Only
         // flag when it appears outside any historical reference context.
         const appearsOutsideHistorical = contentLines.some(
@@ -1974,7 +1976,7 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
   const mappingContent = readText(mappingTablePath);
   if (mappingContent) {
     const allReqIds = new Set([...activeIds, ...retiredIds]);
-    const refs = mappingContent.match(/\bREQ-\d{4}\b/g) || [];
+    const refs = mappingContent.match(/\bREQ-\d{3,4}\b/g) || [];
     const uniqueRefs = [...new Set(refs)];
     for (const ref of uniqueRefs) {
       if (!allReqIds.has(ref)) {
@@ -1998,7 +2000,7 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
 
   // (e) Retired REQ missing from mapping table
   if (mappingContent && retiredIds.size > 0) {
-    const mappingRefs = new Set(mappingContent.match(/\bREQ-\d{4}\b/g) || []);
+    const mappingRefs = new Set(mappingContent.match(/\bREQ-\d{3,4}\b/g) || []);
     for (const id of retiredIds) {
       if (!mappingRefs.has(id)) {
         results.push(
@@ -2034,7 +2036,7 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Expanded legacy namespace check (REQ-0108-016) ──────────────────────
+// ─── Expanded legacy namespace check (v2:REQ-0108-016) ──────────────────────
 
 function checkExpandedLegacyNamespace(
   skillsDir: string,
@@ -2074,7 +2076,7 @@ function checkExpandedLegacyNamespace(
       filesToCheck.push(path.join(guidesDir, f));
   }
 
-  // NEW: docs/specs/**/*.md (REQ-0158-004: recursive)
+  // NEW: docs/specs/**/*.md (v2:REQ-0158-004: recursive)
   const specsDir = path.join(root, "docs", "specs");
   if (fs.existsSync(specsDir)) {
     for (const f of collectSpecMarkdownRecursively(specsDir))
@@ -2148,7 +2150,7 @@ function checkExpandedLegacyNamespace(
   return results;
 }
 
-// ─── Inventory sync checks (REQ-0108-003) ────────────────────────────────
+// ─── Inventory sync checks (v2:REQ-0108-003) ────────────────────────────────
 
 function checkReqRetiredIndexSync(reqDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -2222,7 +2224,7 @@ function checkDocMapReqSync(root: string): CheckResult[] {
   const reqIds = new Set(reqFiles.map((f) => f.replace(".md", "")));
 
   // Check REQ references in DOC-MAP
-  const docMapReqRefs = docMapContent.match(/\bREQ-\d{4}\b/g) || [];
+  const docMapReqRefs = docMapContent.match(/\bREQ-\d{3,4}\b/g) || [];
   const uniqueRefs = [...new Set(docMapReqRefs)];
 
   for (const ref of uniqueRefs) {
@@ -2266,8 +2268,8 @@ function checkDocMapSpecSync(root: string): CheckResult[] {
     return results;
   }
 
-  // REQ-0158-004/005: docs/specs/**/*.md を再帰収集。docs/specs/README.md は
-  // DOC-MAP との照合では対象とする（SPEC status の単一追跡情報源、REQ-0154-001/003）。
+  // v2:REQ-0158-004/005: docs/specs/**/*.md を再帰収集。docs/specs/README.md は
+  // DOC-MAP との照合では対象とする（SPEC status の単一追跡情報源、v2:REQ-0154-001/003）。
   const specsDir = path.join(root, "docs", "specs");
   const specFiles = collectSpecMarkdownRecursively(specsDir);
   const specNames = new Set(specFiles.map((full) => path.basename(full)));
@@ -2423,7 +2425,7 @@ function checkAdrReadmeIndexSync(adrDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// ─── Implementation pattern diagnostics (REQ-0108-026~038) ─────────────────
+// ─── Implementation pattern diagnostics (v2:REQ-0108-026~038) ─────────────────
 
 interface CommandPatternEntry {
   primary: string;
@@ -2612,7 +2614,7 @@ function extractSection(content: string, heading: string): string | null {
   return sectionLines.length > 0 ? sectionLines.join("\n") : null;
 }
 
-// REQ-0108-192: command-map.md may not exist on disk; parseCommandMap returns
+// v2:REQ-0108-192: command-map.md may not exist on disk; parseCommandMap returns
 // empty gracefully and the check emits info-level result (no removal needed).
 function checkCommandMapConsistency(
   cmdDir: string,
@@ -2706,8 +2708,8 @@ function checkCommandMapConsistency(
 function checkSpecReadmeIndexSync(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const specsDir = path.join(root, "docs", "specs");
-  // REQ-0158-004/005: docs/specs/**/*.md を再帰収集。docs/specs/README.md 自身は
-  // SPEC inventory/status 同期検査の追跡情報源（REQ-0154-001/003）として扱うため、
+  // v2:REQ-0158-004/005: docs/specs/**/*.md を再帰収集。docs/specs/README.md 自身は
+  // SPEC inventory/status 同期検査の追跡情報源（v2:REQ-0154-001/003）として扱うため、
   // 収集対象から除外する（自身との照合を避ける）。
   const specFiles = collectSpecMarkdownRecursively(specsDir, {
     excludeReadme: true,
@@ -2725,7 +2727,7 @@ function checkSpecReadmeIndexSync(root: string): CheckResult[] {
     return results;
   }
 
-  // REQ-0158-004: README.md は個別 SPEC ファイル（basename or 相対パス）と
+  // v2:REQ-0158-004: README.md は個別 SPEC ファイル（basename or 相対パス）と
   // ディレクトリ参照（例: `integrity/rules/`）の両方を持つ。ディレクトリ参照は
   // 配下全ファイルを網羅扱いとする。
   const readmeFileRefs = new Set<string>();
@@ -2757,7 +2759,7 @@ function checkSpecReadmeIndexSync(root: string): CheckResult[] {
     }
   }
 
-  // REQ-0158-004: 各 SPEC ファイルについて、basename が個別参照されているか、
+  // v2:REQ-0158-004: 各 SPEC ファイルについて、basename が個別参照されているか、
   // 親ディレクトリパスがディレクトリ参照として README に含まれるかを判定する。
   const missingFromIndex: string[] = [];
   for (const relPath of specRelPaths) {
@@ -2796,7 +2798,7 @@ function checkSpecReadmeIndexSync(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Obsolete reference/ directory detection (REQ-0108-039, 040) ──────────
+// ─── Obsolete reference/ directory detection (v2:REQ-0108-039, 040) ──────────
 
 function checkObsoleteReferenceDirs(
   skillsDir: string,
@@ -2840,7 +2842,7 @@ function checkObsoleteReferenceDirs(
   return results;
 }
 
-// ─── Bare slash check scoped to public command invocation (REQ-0108-076) ────
+// ─── Bare slash check scoped to public command invocation (v2:REQ-0108-076) ────
 
 const BARE_SLASH_COMMAND_PATTERNS = [
   { pattern: /(?<!agentdev)\/case-open\b/g, name: "/case-open" },
@@ -2961,7 +2963,7 @@ function checkBareSlashScoped(
   return results;
 }
 
-// ─── Retired REQ frontmatter/id checks (REQ-0108-080~082) ─────────────────
+// ─── Retired REQ frontmatter/id checks (v2:REQ-0108-080~082) ─────────────────
 
 function checkRetiredFrontmatter(reqDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -3002,7 +3004,7 @@ function checkRetiredFrontmatter(reqDir: string, root: string): CheckResult[] {
       continue;
     }
 
-    // REQ-0108-080: filename ↔ frontmatter id match
+    // v2:REQ-0108-080: filename ↔ frontmatter id match
     const expectedId = file.replace(".md", "");
     const actualId = fm["id"];
     if (typeof actualId !== "string") {
@@ -3025,7 +3027,7 @@ function checkRetiredFrontmatter(reqDir: string, root: string): CheckResult[] {
       );
     }
 
-    // REQ-0108-081: required frontmatter fields
+    // v2:REQ-0108-081: required frontmatter fields
     const missing = required.filter((k) => fm[k] === undefined || fm[k] === "");
     if (missing.length > 0) {
       results.push(
@@ -3039,7 +3041,7 @@ function checkRetiredFrontmatter(reqDir: string, root: string): CheckResult[] {
     }
   }
 
-  // REQ-0108-082: active/retired cross-boundary ID duplication
+  // v2:REQ-0108-082: active/retired cross-boundary ID duplication
   const retiredIds = new Set(retiredFiles.map((f) => f.replace(".md", "")));
   for (const id of activeIds) {
     if (retiredIds.has(id)) {
@@ -3072,7 +3074,7 @@ function checkRetiredFrontmatter(reqDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// ─── Mapping-table checks (REQ-0108-083~088) ──────────────────────────────
+// ─── Mapping-table checks (v2:REQ-0108-083~088) ──────────────────────────────
 
 const VALID_MAPPING_STATUSES = new Set([
   "migrated",
@@ -3166,7 +3168,7 @@ function checkMappingTable(reqDir: string, root: string): CheckResult[] {
 
   const { entries, allOldRefs } = parseMappingTable(mappingPath);
 
-  // REQ-0108-084: all retired REQs recorded in mapping-table
+  // v2:REQ-0108-084: all retired REQs recorded in mapping-table
   for (const id of retiredIds) {
     if (!allOldRefs.has(id)) {
       results.push(
@@ -3186,7 +3188,7 @@ function checkMappingTable(reqDir: string, root: string): CheckResult[] {
     }
   }
 
-  // REQ-0108-085: mapping-table references non-existent old REQ IDs
+  // v2:REQ-0108-085: mapping-table references non-existent old REQ IDs
   for (const oldRef of allOldRefs) {
     if (!allReqIds.has(oldRef)) {
       results.push(
@@ -3206,7 +3208,7 @@ function checkMappingTable(reqDir: string, root: string): CheckResult[] {
     }
   }
 
-  // REQ-0108-086: migrated successor must exist as active REQ
+  // v2:REQ-0108-086: migrated successor must exist as active REQ
   for (const entry of entries) {
     if (entry.status === "migrated" && entry.successor) {
       if (!activeIds.has(entry.successor)) {
@@ -3228,7 +3230,7 @@ function checkMappingTable(reqDir: string, root: string): CheckResult[] {
     }
   }
 
-  // REQ-0108-087: status enum validation
+  // v2:REQ-0108-087: status enum validation
   for (const entry of entries) {
     if (!VALID_MAPPING_STATUSES.has(entry.status)) {
       results.push(
@@ -3248,7 +3250,7 @@ function checkMappingTable(reqDir: string, root: string): CheckResult[] {
     }
   }
 
-  // REQ-0108-088: retired-no-successor / historical-only should not have migration target
+  // v2:REQ-0108-088: retired-no-successor / historical-only should not have migration target
   for (const entry of entries) {
     if (
       (entry.status === "retired-no-successor" ||
@@ -3280,7 +3282,7 @@ function checkMappingTable(reqDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// ─── Variant path existence & registry checks (REQ-0108-089~091) ──────────
+// ─── Variant path existence & registry checks (v2:REQ-0108-089~091) ──────────
 
 function checkVariantPathExistence(
   cmdDir: string,
@@ -3381,7 +3383,7 @@ function checkVariantRegistryRegistered(
   return results;
 }
 
-// ─── Skill frontmatter checks (REQ-0108-092~094) ──────────────────────────
+// ─── Skill frontmatter checks (v2:REQ-0108-092~094) ──────────────────────────
 
 function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -3396,7 +3398,7 @@ function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
     const fm = parseFrontmatter(content);
     if (!fm) continue;
 
-    // REQ-0108-092: name ↔ dir match
+    // v2:REQ-0108-092: name ↔ dir match
     const fmName = fm["name"];
     if (typeof fmName === "string" && fmName !== dir) {
       results.push(
@@ -3415,7 +3417,7 @@ function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
       );
     }
 
-    // REQ-0108-093: USE FOR / DO NOT USE FOR boundary
+    // v2:REQ-0108-093: USE FOR / DO NOT USE FOR boundary
     if (!content.includes("USE FOR") && !content.includes("use for")) {
       results.push(
         warn(
@@ -3446,7 +3448,7 @@ function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
       );
     }
 
-    // REQ-0108-094: reference/ vs references/ (also covered by checkObsoleteReferenceDirs,
+    // v2:REQ-0108-094: reference/ vs references/ (also covered by checkObsoleteReferenceDirs,
     // but check per SKILL.md reference)
     const obsoleteRefDir = path.join(skillsDir, dir, "reference");
     if (fs.existsSync(obsoleteRefDir)) {
@@ -3475,7 +3477,7 @@ function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
   return results;
 }
 
-// ─── Command frontmatter checks (REQ-0108-095~099, inverted: Case 5 / RU-0020) ─
+// ─── Command frontmatter checks (v2:REQ-0108-095~099, inverted: Case 5 / RU-0020) ─
 
 const KNOWN_AGENTS = new Set([
   "sisyphus",
@@ -3487,7 +3489,7 @@ const KNOWN_AGENTS = new Set([
   "test-agent",
 ]);
 
-/** Additional prohibited fields (REQ-0108-124) */
+/** Additional prohibited fields (v2:REQ-0108-124) */
 const EXTRA_PROHIBITED_FIELDS = [
   "pattern",
   "workflow_route",
@@ -3495,7 +3497,7 @@ const EXTRA_PROHIBITED_FIELDS = [
   "labels",
 ] as const;
 
-/** Allowed frontmatter fields for commands (REQ-0108-046, 098) */
+/** Allowed frontmatter fields for commands (v2:REQ-0108-046, 098) */
 const ALLOWED_FRONTMATTER_FIELDS = new Set(["description", "agent"]);
 
 function checkCommandFrontmatterDetailed(
@@ -3514,14 +3516,14 @@ function checkCommandFrontmatterDetailed(
     const relPath = resolveRelative(fullPath, root);
     const cmdName = file.replace(".md", "");
 
-    // REQ-0108-124: additional prohibited fields (pattern, workflow_route, branch_type, labels)
+    // v2:REQ-0108-124: additional prohibited fields (pattern, workflow_route, branch_type, labels)
     for (const field of EXTRA_PROHIBITED_FIELDS) {
       if (fm[field] !== undefined) {
         results.push(
           ng(
             "Command",
             "cmd-extra-prohibited-field",
-            `Command '${cmdName}' has prohibited '${field}' in frontmatter (REQ-0108-124)`,
+            `Command '${cmdName}' has prohibited '${field}' in frontmatter (v2:REQ-0108-124)`,
             relPath,
             undefined,
             {
@@ -3534,7 +3536,7 @@ function checkCommandFrontmatterDetailed(
       }
     }
 
-    // REQ-0108-098: agent must be known
+    // v2:REQ-0108-098: agent must be known
     const agent = fm["agent"];
     if (typeof agent === "string" && !KNOWN_AGENTS.has(agent)) {
       results.push(
@@ -3553,7 +3555,7 @@ function checkCommandFrontmatterDetailed(
       );
     }
 
-    // REQ-0108-099: deprecated command in inventory
+    // v2:REQ-0108-099: deprecated command in inventory
     const desc = typeof fm["description"] === "string" ? fm["description"] : "";
     if (strictVocabMatch(desc, "非推奨") || strictVocabMatch(desc, "deprecated")) {
       const readmePath = path.join(cmdDir, "README.md");
@@ -3590,7 +3592,7 @@ function checkCommandFrontmatterDetailed(
   return results;
 }
 
-// ─── Inline completion report detection tightened (REQ-0108-079) ──────────
+// ─── Inline completion report detection tightened (v2:REQ-0108-079) ──────────
 
 function checkInlineCompletionReportsStrict(
   cmdDir: string,
@@ -3600,7 +3602,7 @@ function checkInlineCompletionReportsStrict(
   const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
   let foundViolation = false;
 
-  // REQ-0108-079: detect only when multiple common required fields appear in same code block
+  // v2:REQ-0108-079: detect only when multiple common required fields appear in same code block
   const REQUIRED_FIELD_INDICATORS = [
     /完了コマンド/,
     /次のコマンド/,
@@ -3666,7 +3668,7 @@ function checkInlineCompletionReportsStrict(
   return results;
 }
 
-// ─── Script / Template / Reference path existence (REQ-0108-115, REQ-0108-116) ─
+// ─── Script / Template / Reference path existence (v2:REQ-0108-115, v2:REQ-0108-116) ─
 
 /**
  * Regex patterns for file path references in command and skill markdown files.
@@ -3700,16 +3702,16 @@ function isInsideCodeBlock(lines: string[], lineIndex: number): boolean {
  */
 function isTemplatePlaceholder(refPath: string): boolean {
   if (/\{[^}]*\}/.test(refPath)) return true;
-  // REQ-0144-020: <...> 形式の angle-bracket placeholder は具体パスではなく
+  // v2:REQ-0144-020: <...> 形式の angle-bracket placeholder は具体パスではなく
   // 置換対象のパラメータ表現であるため実在確認の対象外とする。
-  // REQ-0144-025 / ADR-0136 由来の <harness> 等の抽象表記を含む。
+  // v2:REQ-0144-025 / v2:ADR-0136 由来の <harness> 等の抽象表記を含む。
   // isTemplatePlaceholder は SCRIPT_TEMPLATE_REF_PATTERNS が捕捉した
   // パス参照文字列のみを受け取るため、<> は placeholder 以外あり得ない。
   if (/<[^<>]+>/.test(refPath)) return true;
   return false;
 }
 
-// ─── Context identification helpers (REQ-0108-246~248) ─────────────────────
+// ─── Context identification helpers (v2:REQ-0108-246~248) ─────────────────────
 
 function isInsideCodeSpan(line: string, charIndex: number): boolean {
   let backtickCount = 0;
@@ -3736,7 +3738,7 @@ function isRetiredSection(filePath: string, lineNum: number): boolean {
   return isRetiredSectionInLines(content.split("\n"), lineNum - 1);
 }
 
-// REQ-0108-193/AGENTS.md policy: a retired REQ/ADR mentioned in a non-retired
+// v2:REQ-0108-193/AGENTS.md policy: a retired REQ/ADR mentioned in a non-retired
 // document is acceptable when the reference is explicitly marked historical or
 // points at retirement. This returns true when either (a) the line itself
 // carries retirement-identification vocabulary next to the reference, or (b) the
@@ -3883,7 +3885,7 @@ export function checkScriptTemplateReferencePaths(
         regex.lastIndex = 0;
         let match;
         while ((match = regex.exec(line)) !== null) {
-          // REQ-0144-020: strip Markdown backticks (inline code formatting of
+          // v2:REQ-0144-020: strip Markdown backticks (inline code formatting of
           // path components) before resolving. Backticks are never literal
           // path characters.
           const rawRef = match[1];
@@ -3940,7 +3942,7 @@ export function checkScriptTemplateReferencePaths(
               ),
             );
           } else {
-            // REQ-0145-010: command files referencing bare `references/X.md`
+            // v2:REQ-0145-010: command files referencing bare `references/X.md`
             // are skill-relative. Resolve via nearby skill context, then all skills.
             let contextResolved = false;
             const isSkillRelativeBare =
@@ -4017,7 +4019,7 @@ export function checkScriptTemplateReferencePaths(
             }
             if (contextResolved) continue;
 
-            // Cross-skill bare reference detection (REQ-0108-119)
+            // Cross-skill bare reference detection (v2:REQ-0108-119)
             let crossSkillFound = false;
             if (skillDir && !normalizedRef.startsWith(".opencode/")) {
               const otherSkills = listDirs(skillsDir).filter(
@@ -4083,7 +4085,7 @@ export function checkScriptTemplateReferencePaths(
   return results;
 }
 
-// ─── ADR status normalization check (REQ-0108-121) ──────────────────────────
+// ─── ADR status normalization check (v2:REQ-0108-121) ──────────────────────────
 
 function checkAdrStatusNormalization(
   adrDir: string,
@@ -4138,11 +4140,11 @@ function checkAdrStatusNormalization(
   return results;
 }
 
-// ─── RU-ID ground reference detection (REQ-0108-122) ─────────────────────────
+// ─── RU-ID ground reference detection (v2:REQ-0108-122) ─────────────────────────
 
 function checkRuidGroundReference(root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  // REQ-0158-004: docs/specs/**/*.md 再帰対応。flat dirs (requirements/guides/adr) は
+  // v2:REQ-0158-004: docs/specs/**/*.md 再帰対応。flat dirs (requirements/guides/adr) は
   // listFiles、specs のみ collectSpecMarkdownRecursively で収集する。
   const flatDirs = [
     path.join(root, "docs", "requirements"),
@@ -4169,7 +4171,7 @@ function checkRuidGroundReference(root: string): CheckResult[] {
     const relPath = resolveRelative(fullPath, root);
 
     const lines = content.split("\n");
-    // A RU path listed in an out-of-scope / exclusion context (e.g. REQ-0124
+    // A RU path listed in an out-of-scope / exclusion context (e.g. v2:REQ-0124
     // 適用範囲 "- **対象外**:" naming RU-20260615-01 as edit-exempt) is a scope
     // boundary statement, not a ground reference. Skip such contexts. This
     // covers both "## 対象外" headings and "- **対象外**:" list markers.
@@ -4225,16 +4227,16 @@ function checkRuidGroundReference(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Workflow status / 6 micro-phase detection prohibition (REQ-0108-123) ────
+// ─── Workflow status / 6 micro-phase detection prohibition (v2:REQ-0108-123) ────
 
 function checkWorkflowStatusProhibition(root: string): CheckResult[] {
   const results: CheckResult[] = [];
-  // REQ-0158-004: docs/specs/**/*.md 再帰対応
+  // v2:REQ-0158-004: docs/specs/**/*.md 再帰対応
   const reqDir = path.join(root, "docs", "requirements");
   const specsDir = path.join(root, "docs", "specs");
 
   // "domain state" / "ドメイン状態" denote .agentdev persistent state
-  // (ADR-0105), not workflow status. Exclude them so the 6-micro-phase
+  // (v2:ADR-0105), not workflow status. Exclude them so the 6-micro-phase
   // detector does not fire on REQ/SPEC lines merely mentioning persistent state.
   const stateWord =
     "status|ステータス|マイクロフェーズ|micro.phase|(?<!domain )state|(?<!ドメイン)状態";
@@ -4248,7 +4250,7 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
   );
   let foundViolation = false;
 
-  // REQ-0158-004: flat dirs (requirements) は listFiles、specs のみ再帰収集
+  // v2:REQ-0158-004: flat dirs (requirements) は listFiles、specs のみ再帰収集
   const allFiles: string[] = [];
   if (fs.existsSync(reqDir)) {
     for (const file of listFiles(reqDir)) allFiles.push(path.join(reqDir, file));
@@ -4269,7 +4271,7 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
     const lines = content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       if (isNegationContext(lines[i])) continue;
-      // REQ-0145-002: skip data-model enum rows (e.g. Case file status field
+      // v2:REQ-0145-002: skip data-model enum rows (e.g. Case file status field
       // `open`, `running`, `blocked`, `review`, `closed`, `cancelled`).
       // When a phase word like `review` appears inside backticks it is an
       // enum literal, not workflow status state management.
@@ -4321,7 +4323,7 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Accepted ADR only citation check (REQ-0108-125, advisory) ───────────────
+// ─── Accepted ADR only citation check (v2:REQ-0108-125, advisory) ───────────────
 
 function checkAcceptedAdrOnlyCitation(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -4355,7 +4357,7 @@ function checkAcceptedAdrOnlyCitation(root: string): CheckResult[] {
     return results;
   }
 
-  // REQ-0158-004: docs/specs/**/*.md 再帰対応
+  // v2:REQ-0158-004: docs/specs/**/*.md 再帰対応
   const filesToScan = [
     path.join(root, "docs", "requirements"),
     path.join(root, "docs", "specs"),
@@ -4426,7 +4428,7 @@ function checkNonAcceptedAdrRefsInFile(
     }
   }
 
-  const adrRefs = content.match(/\bADR-\d{4}\b/g) || [];
+  const adrRefs = content.match(/\bADR-\d{3,4}\b/g) || [];
   const uniqueRefs = [...new Set(adrRefs)].filter(
     (ref) => !exemptedRefs.has(ref),
   );
@@ -4452,7 +4454,7 @@ function checkNonAcceptedAdrRefsInFile(
   }
 }
 
-// ─── Pattern A/B/C/D residual detection (REQ-0108-111) ────────────────────
+// ─── Pattern A/B/C/D residual detection (v2:REQ-0108-111) ────────────────────
 
 const PATTERN_RESIDUAL_PATTERNS = [
   { pattern: /\bPattern\s+[ABCD]\b/g, name: "Pattern A/B/C/D label" },
@@ -4463,7 +4465,7 @@ const PATTERN_RESIDUAL_PATTERNS = [
   },
 ];
 
-// ─── Pattern A/B/C/D residual detection (REQ-0108-111) ────────────────────
+// ─── Pattern A/B/C/D residual detection (v2:REQ-0108-111) ────────────────────
 
 function checkPatternResidualDetection(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -4484,7 +4486,9 @@ function checkPatternResidualDetection(root: string): CheckResult[] {
     /integrity-check\.md$/,
     /gate-levels\.md$/,
     /vocabulary-registry\.md$/,
+    // v2: stale — file deleted in Stage 4
     /REQ-0108\.md$/,
+    // v2: stale — file deleted in Stage 4
     /REQ-0112\.md$/,
     /design-principles\.md$/,
     /command-authoring-standards\.md$/,
@@ -4524,7 +4528,7 @@ function checkPatternResidualDetection(root: string): CheckResult[] {
               "pattern-residual-detection",
               "Pattern A/B/C/D label detected in " +
                 relPath +
-                " — classification is deprecated (REQ-0108-111)",
+                " — classification is deprecated (v2:REQ-0108-111)",
               relPath,
               undefined,
               {
@@ -4581,7 +4585,7 @@ function checkPatternResidualDetection(root: string): CheckResult[] {
   return results;
 }
 
-// ─── req-backlog residual detection (REQ-0108-112) ────────────────────────
+// ─── req-backlog residual detection (v2:REQ-0108-112) ────────────────────────
 
 function checkReqBacklogResidualDetection(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -4596,8 +4600,11 @@ function checkReqBacklogResidualDetection(root: string): CheckResult[] {
     /integrity-check\.md$/,
     /gate-levels\.md$/,
     /vocabulary-registry\.md$/,
+    // v2: stale — file deleted in Stage 4
     /REQ-0105\.md$/,
+    // v2: stale — file deleted in Stage 4
     /REQ-0101\.md$/,
+    // v2: stale — file deleted in Stage 4
     /REQ-0108\.md$/,
     /ADR-\d{4}\.md$/,
   ];
@@ -4635,7 +4642,7 @@ function checkReqBacklogResidualDetection(root: string): CheckResult[] {
               "req-backlog-residual-detection",
               "req-backlog reference detected in " +
                 relPath +
-                " — abolished per REQ-0105-038 (REQ-0108-112)",
+                " — abolished per v2:REQ-0105-038 (v2:REQ-0108-112)",
               relPath,
               undefined,
               {
@@ -4665,7 +4672,7 @@ function checkReqBacklogResidualDetection(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Abolished skill references detection (REQ-0108-126, 127) ──────────────
+// ─── Abolished skill references detection (v2:REQ-0108-126, 127) ──────────────
 
 const ABOLISHED_SKILLS_DETECTION_LIST = ["agentdev-workflow-reporting"];
 
@@ -4685,7 +4692,7 @@ function checkAbolishedSkillReferences(root: string): CheckResult[] {
 
   const filesToScan: string[] = [];
 
-  // Scope: .opencode/commands/**/*.md (REQ-0108-127)
+  // Scope: .opencode/commands/**/*.md (v2:REQ-0108-127)
   const cmdDir = path.join(root, ".opencode", "commands");
   if (fs.existsSync(cmdDir)) {
     function collectCmdFiles(dir: string): void {
@@ -4724,7 +4731,7 @@ function checkAbolishedSkillReferences(root: string): CheckResult[] {
     }
   }
 
-  // Scope: docs/specs/**/*.md (runtime guidance) — REQ-0158-004: recursive
+  // Scope: docs/specs/**/*.md (runtime guidance) — v2:REQ-0158-004: recursive
   const specsDir = path.join(root, "docs", "specs");
   if (fs.existsSync(specsDir)) {
     for (const f of collectSpecMarkdownRecursively(specsDir)) {
@@ -4739,7 +4746,7 @@ function checkAbolishedSkillReferences(root: string): CheckResult[] {
   for (const fullPath of filesToScan) {
     const relPath = resolveRelative(fullPath, root);
     if (exemptPatterns.some((p) => p.test(relPath))) continue;
-    // REQ-0145-015: 検出ルール説明文（IR-*.md）は廃止 skill 例を含むため除外
+    // v2:REQ-0145-015: 検出ルール説明文（IR-*.md）は廃止 skill 例を含むため除外
     if (isIntegrityRuleDescriptionFile(relPath)) continue;
     const content = readText(fullPath);
     if (!content) continue;
@@ -4760,7 +4767,7 @@ function checkAbolishedSkillReferences(root: string): CheckResult[] {
             abolished +
             "' detected in " +
             relPath +
-            " (REQ-0108-126)",
+            " (v2:REQ-0108-126)",
           relPath,
           undefined,
           {
@@ -4809,11 +4816,11 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
   const firstId = actualIds[0];
   const lastId = actualIds[actualIds.length - 1];
 
-  // Extract range from text: patterns like "REQ-0101 through REQ-0114", "REQ-0101〜REQ-0114", "REQ-0101~REQ-0114"
+  // Extract range from text: patterns like "v2:REQ-0101 through v2:REQ-0114", "v2:REQ-0101〜v2:REQ-0114", "v2:REQ-0101~v2:REQ-0114"
   const rangePattern =
     /REQ-\d{4}\s*(?:through|〜|~|から|through)\s*REQ-\d{4}/gi;
 
-  // REQ-0144-018: scan docs/guides/*.md and vocabulary-registry.md in addition to core files
+  // v2:REQ-0144-018: scan docs/guides/*.md and vocabulary-registry.md in addition to core files
   const filesToCheck: { absPath: string; label: string }[] = [
     { absPath: path.join(root, "AGENTS.md"), label: "AGENTS.md" },
     {
@@ -4933,7 +4940,7 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
 }
 
 /**
- * REQ-0108-161: SKILL.md categories vs script implementations gap detection
+ * v2:REQ-0108-161: SKILL.md categories vs script implementations gap detection
  * Checks that each category defined in the authoritative SKILL.md has
  * a corresponding implementation in the integrity check scripts.
  */
@@ -5108,7 +5115,7 @@ function checkSkillCategoryGap(
 }
 
 /**
- * REQ-0108-165: Template path integrity check
+ * v2:REQ-0108-165: Template path integrity check
  * Detects non-existent template paths, namespace mismatches, and
  * description inconsistencies as integrity-rule-gap findings.
  */
@@ -5135,7 +5142,7 @@ function checkTemplatePathIntegrity(
 
     for (const ref of uniqueRefs) {
       if (isGlobPattern(ref)) continue;
-      // REQ-0108-189: Fall back to src/opencode/ when runtime projection doesn't exist
+      // v2:REQ-0108-189: Fall back to src/opencode/ when runtime projection doesn't exist
       const resolvedPath = resolvePathWithFallback(
         path.join(root, ref.replace(/\//g, path.sep)),
       );
@@ -5165,7 +5172,7 @@ function checkTemplatePathIntegrity(
     const fm = parseFrontmatter(content);
     if (fm && fm["template_path"]) {
       const templatePath = String(fm["template_path"]);
-      // REQ-0108-189: Fall back to src/opencode/ when runtime projection doesn't exist
+      // v2:REQ-0108-189: Fall back to src/opencode/ when runtime projection doesn't exist
       const resolvedFmPath = resolvePathWithFallback(
         path.join(root, templatePath.replace(/\//g, path.sep)),
       );
@@ -5207,7 +5214,7 @@ function checkTemplatePathIntegrity(
 
 // ─── Source vs Projection consistency check ─────────────────────────────────
 
-// REQ-0108-190: Extended to cover commands AND skills source/projection pairs
+// v2:REQ-0108-190: Extended to cover commands AND skills source/projection pairs
 function isInsideWorktree(root: string): boolean {
   // `git worktree add` creates a `.git` file (not directory) pointing at the
   // main repo's worktree admin path. Junctions under `.opencode/skills/` are
@@ -5224,7 +5231,7 @@ function isInsideWorktree(root: string): boolean {
 function checkSourceProjectionConsistency(root: string): CheckResult[] {
   const results: CheckResult[] = [];
 
-  // REQ-0145-010: skip in worktree (see isInsideWorktree).
+  // v2:REQ-0145-010: skip in worktree (see isInsideWorktree).
   if (isInsideWorktree(root)) {
     results.push(
       info(
@@ -5286,11 +5293,11 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
     const missingSkills = [...sourceSkillDirs].filter(
       (d) => !projectionSkillDirs.has(d),
     );
-    // repo-* skills are repo-local and projection-only (ADR-0020): they
+    // repo-* skills are repo-local and projection-only (v2:ADR-0020): they
     // intentionally have no src/opencode/skills/ counterpart and are excluded
     // from selective-junction sync (sync-self-opencode.ps1 RepoLocalSkillPrefix).
     // Other projection-only skills referenced by distribution must be promoted
-    // to src/opencode/skills/ (ADR-0134/REQ-0159-001); detection is handled by
+    // to src/opencode/skills/ (v2:ADR-0134/v2:REQ-0159-001); detection is handled by
     // checkDistributionUntrackedSkillReference (IR-058).
     const extraSkills = [...projectionSkillDirs].filter(
       (d) =>
@@ -5330,7 +5337,7 @@ function checkSourceProjectionConsistency(root: string): CheckResult[] {
   return results;
 }
 
-// ─── IR-058: distribution-untracked-skill-reference (REQ-0159-003) ──────────
+// ─── IR-058: distribution-untracked-skill-reference (v2:REQ-0159-003) ──────────
 
 // Distribution roots whose .md content is scanned for skill name references.
 const IR058_DISTRIBUTION_DIRS = [
@@ -5401,7 +5408,7 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
   const projectionSkillDirs = listDirs(projectionSkillsDir);
 
   // Projection-only skill names: exist in .opencode/skills/ but not in src/opencode/skills/.
-  // repo-* prefix is repo-local by design (ADR-0106 / REQ-0159-002).
+  // repo-* prefix is repo-local by design (v2:ADR-0106 / v2:REQ-0159-002).
   const projectionOnlySkills = projectionSkillDirs.filter(
     (d) => !sourceSkillDirs.has(d) && !d.startsWith("repo-"),
   );
@@ -5411,7 +5418,7 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
       ok(
         "Inventory",
         "distribution-untracked-skill-reference",
-        "No projection-only skills referenced by distribution (REQ-0159-003)",
+        "No projection-only skills referenced by distribution (v2:REQ-0159-003)",
       ),
     );
     return results;
@@ -5460,7 +5467,7 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
         ng(
           "Inventory",
           "distribution-untracked-skill-reference",
-          `Skill '${skillName}' is referenced by distribution (${evidence!.file}:${evidence!.line}) but exists only in .opencode/skills/. Promote to src/opencode/skills/ (ADR-0134/REQ-0159-001).`,
+          `Skill '${skillName}' is referenced by distribution (${evidence!.file}:${evidence!.line}) but exists only in .opencode/skills/. Promote to src/opencode/skills/ (v2:ADR-0134/v2:REQ-0159-001).`,
           undefined,
           undefined,
           {
@@ -5478,14 +5485,14 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
       ok(
         "Inventory",
         "distribution-untracked-skill-reference",
-        "No projection-only skills referenced by distribution (REQ-0159-003)",
+        "No projection-only skills referenced by distribution (v2:REQ-0159-003)",
       ),
     );
   }
   return results;
 }
 
-// ─── Broken junction / symlink detection (REQ-0108-172, REQ-0108-173) ───────
+// ─── Broken junction / symlink detection (v2:REQ-0108-172, v2:REQ-0108-173) ───────
 
 /**
  * Detect broken junctions (Windows) and broken symlinks (Unix) under the
@@ -5497,12 +5504,12 @@ function checkDistributionUntrackedSkillReference(root: string): CheckResult[] {
  * If a junction target is missing, fs.existsSync returns false for the path,
  * but the junction directory entry still appears in readdir.
  */
-// REQ-0108-191: Extended to scan both skills and commands directories
+// v2:REQ-0108-191: Extended to scan both skills and commands directories
 function checkBrokenJunctions(skillsDir: string, root: string, cmdsDir?: string): CheckResult[] {
   const results: CheckResult[] = [];
   let foundBroken = false;
 
-  // REQ-0108-191: Scan multiple directories for broken junctions
+  // v2:REQ-0108-191: Scan multiple directories for broken junctions
   const dirsToScan = [skillsDir];
   if (cmdsDir && fs.existsSync(path.dirname(cmdsDir))) {
     dirsToScan.push(cmdsDir);
@@ -5592,11 +5599,11 @@ function checkBrokenJunctions(skillsDir: string, root: string, cmdsDir?: string)
   return results;
 }
 
-// ─── Document Classification Policy checks (REQ-0108-196) ─────────────────
+// ─── Document Classification Policy checks (v2:REQ-0108-196) ─────────────────
 
 const DOCUMENT_CLASSIFICATIONS = ["REQ", "ADR", "SPEC", "Guide", "Report", "DOC-MAP"] as const;
 
-function checkDocumentClassificationPolicy(root: string): CheckResult[] { // REQ-0108-196
+function checkDocumentClassificationPolicy(root: string): CheckResult[] { // v2:REQ-0108-196
   const results: CheckResult[] = [];
 
   // Verify 6 document classifications are recognized
@@ -5679,7 +5686,7 @@ function checkDocumentClassificationPolicy(root: string): CheckResult[] { // REQ
   return results;
 }
 
-// ─── REQ-0108-202: Update Notes section detection in non-REQ docs ──────────
+// ─── v2:REQ-0108-202: Update Notes section detection in non-REQ docs ──────────
 
 function checkUpdateNotesInDocs(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -5709,7 +5716,7 @@ function checkUpdateNotesInDocs(root: string): CheckResult[] {
           warn(
             "DocumentDrift",
             "update-notes-in-docs",
-            `Update Notes section found in non-REQ document (REQ-0108-202)`,
+            `Update Notes section found in non-REQ document (v2:REQ-0108-202)`,
             relPath,
             undefined,
             {
@@ -5735,7 +5742,7 @@ function checkUpdateNotesInDocs(root: string): CheckResult[] {
   return results;
 }
 
-// ─── REQ-0108-206: Summary/index REQ range consistency ────────────────────
+// ─── v2:REQ-0108-206: Summary/index REQ range consistency ────────────────────
 // (Extends checkReqRangeStaleness with specific summary/index file focus)
 
 function checkSummaryReqRangeConsistency(root: string): CheckResult[] {
@@ -5760,7 +5767,7 @@ function checkSummaryReqRangeConsistency(root: string): CheckResult[] {
           warn(
             "DocumentDrift",
             "summary-req-range",
-            `README states ${statedCount} active REQs but actual count is ${actualReqIds.size} (REQ-0108-206)`,
+            `README states ${statedCount} active REQs but actual count is ${actualReqIds.size} (v2:REQ-0108-206)`,
             resolveRelative(readmePath, root),
             undefined,
             {
@@ -5786,7 +5793,7 @@ function checkSummaryReqRangeConsistency(root: string): CheckResult[] {
   return results;
 }
 
-// ─── REQ-0108-207: Old status vocabulary detection ─────────────────────────
+// ─── v2:REQ-0108-207: Old status vocabulary detection ─────────────────────────
 
 function checkOldStatusVocabulary(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -5808,6 +5815,7 @@ function checkOldStatusVocabulary(root: string): CheckResult[] {
     /retired\//,
     /mapping-table/,
     /vocabulary-registry\.md$/,
+    // v2: stale — file deleted in Stage 4
     /REQ-0108\.md$/,
   ];
 
@@ -5832,7 +5840,7 @@ function checkOldStatusVocabulary(root: string): CheckResult[] {
               warn(
                 "DocumentDrift",
                 "old-status-vocabulary",
-                `Old status vocabulary detected (REQ-0108-207)`,
+                `Old status vocabulary detected (v2:REQ-0108-207)`,
                 relPath,
                 i + 1,
                 {
@@ -5860,7 +5868,7 @@ function checkOldStatusVocabulary(root: string): CheckResult[] {
   return results;
 }
 
-// ─── REQ-0108-208: Legacy namespace detection in docs ──────────────────────
+// ─── v2:REQ-0108-208: Legacy namespace detection in docs ──────────────────────
 // (Supplements checkExpandedLegacyNamespace with broader doc scope)
 
 function checkLegacyNamespaceInDocs(root: string): CheckResult[] {
@@ -5913,7 +5921,7 @@ function checkLegacyNamespaceInDocs(root: string): CheckResult[] {
               warn(
                 "DocumentDrift",
                 "legacy-namespace-in-docs",
-                `Legacy command namespace detected in docs (REQ-0108-208)`,
+                `Legacy command namespace detected in docs (v2:REQ-0108-208)`,
                 relPath,
                 i + 1,
                 {
@@ -5941,7 +5949,7 @@ function checkLegacyNamespaceInDocs(root: string): CheckResult[] {
   return results;
 }
 
-// ─── REQ-0108-210: Windows junction scan coverage ──────────────────────────
+// ─── v2:REQ-0108-210: Windows junction scan coverage ──────────────────────────
 // Already implemented in checkBrokenJunctions (skillsDir + cmdsDir).
 // This check verifies that junction scanning is enabled for all relevant dirs.
 
@@ -5962,7 +5970,7 @@ function checkJunctionScanCoverage(root: string): CheckResult[] {
         warn(
           "JunctionIntegrity",
           "junction-scan-coverage",
-          `Directory not accessible for junction scanning: ${resolveRelative(dir, root)} (REQ-0108-210)`,
+          `Directory not accessible for junction scanning: ${resolveRelative(dir, root)} (v2:REQ-0108-210)`,
           resolveRelative(dir, root),
           undefined,
           {
@@ -5980,14 +5988,14 @@ function checkJunctionScanCoverage(root: string): CheckResult[] {
       ok(
         "JunctionIntegrity",
         "junction-scan-coverage",
-        "All required directories are accessible for junction scanning (REQ-0108-210)",
+        "All required directories are accessible for junction scanning (v2:REQ-0108-210)",
       ),
     );
   }
   return results;
 }
 
-// ─── REQ-0108-211: .agentdev/ exclusion from false positives ──────────────
+// ─── v2:REQ-0108-211: .agentdev/ exclusion from false positives ──────────────
 
 function checkAgentdevExclusion(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -5999,7 +6007,7 @@ function checkAgentdevExclusion(root: string): CheckResult[] {
       ok(
         "ScanScope",
         "agentdev-exclusion",
-        ".agentdev/ exists and is excluded from docs-check false positive targets (REQ-0108-211)",
+        ".agentdev/ exists and is excluded from docs-check false positive targets (v2:REQ-0108-211)",
       ),
     );
   } else {
@@ -6007,14 +6015,14 @@ function checkAgentdevExclusion(root: string): CheckResult[] {
       info(
         "ScanScope",
         "agentdev-exclusion",
-        ".agentdev/ does not exist — no exclusion needed (REQ-0108-211)",
+        ".agentdev/ does not exist — no exclusion needed (v2:REQ-0108-211)",
       ),
     );
   }
   return results;
 }
 
-// ─── REQ-0108-212: references/ recursive scan ─────────────────────────────
+// ─── v2:REQ-0108-212: references/ recursive scan ─────────────────────────────
 
 function checkReferencesRecursiveScan(skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -6045,13 +6053,13 @@ function checkReferencesRecursiveScan(skillsDir: string, root: string): CheckRes
     ok(
       "ScanScope",
       "references-recursive-scan",
-      `${refCount} files found in references/ directories — all recursively scanned (REQ-0108-212)`,
+      `${refCount} files found in references/ directories — all recursively scanned (v2:REQ-0108-212)`,
     ),
   );
   return results;
 }
 
-// ─── REQ-0108-213: Integrity report self-exclusion ────────────────────────
+// ─── v2:REQ-0108-213: Integrity report self-exclusion ────────────────────────
 
 function checkReportSelfExclusion(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -6063,7 +6071,7 @@ function checkReportSelfExclusion(root: string): CheckResult[] {
       ok(
         "ScanScope",
         "report-self-exclusion",
-        `${reportFiles.length} integrity report(s) exist — excluded from scan targets to prevent self-detection (REQ-0108-213)`,
+        `${reportFiles.length} integrity report(s) exist — excluded from scan targets to prevent self-detection (v2:REQ-0108-213)`,
       ),
     );
   } else {
@@ -6071,14 +6079,14 @@ function checkReportSelfExclusion(root: string): CheckResult[] {
       ok(
         "ScanScope",
         "report-self-exclusion",
-        "No integrity reports directory — no self-exclusion needed (REQ-0108-213)",
+        "No integrity reports directory — no self-exclusion needed (v2:REQ-0108-213)",
       ),
     );
   }
   return results;
 }
 
-// ─── REQ-0108-214: Vocabulary registry sync ────────────────────────────────
+// ─── v2:REQ-0108-214: Vocabulary registry sync ────────────────────────────────
 
 function checkVocabularyRegistrySync(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -6098,7 +6106,7 @@ function checkVocabularyRegistrySync(root: string): CheckResult[] {
       warn(
         "Canonical",
         "vocabulary-registry-sync",
-        "Vocabulary registry not found (REQ-0108-214)",
+        "Vocabulary registry not found (v2:REQ-0108-214)",
         undefined,
         undefined,
         {
@@ -6122,7 +6130,7 @@ function checkVocabularyRegistrySync(root: string): CheckResult[] {
       warn(
         "Canonical",
         "vocabulary-registry-sync",
-        `Vocabulary registry missing sections: ${missingSections.join(", ")} (REQ-0108-214)`,
+        `Vocabulary registry missing sections: ${missingSections.join(", ")} (v2:REQ-0108-214)`,
         resolveRelative(registryPath, root),
         undefined,
         {
@@ -6137,14 +6145,14 @@ function checkVocabularyRegistrySync(root: string): CheckResult[] {
       ok(
         "Canonical",
         "vocabulary-registry-sync",
-        "Vocabulary registry contains all required sections and is synchronized (REQ-0108-214)",
+        "Vocabulary registry contains all required sections and is synchronized (v2:REQ-0108-214)",
       ),
     );
   }
   return results;
 }
 
-// ─── Capture boundary checks (REQ-0105) ─────────────────────────────────
+// ─── Capture boundary checks (v2:REQ-0105) ─────────────────────────────────
 
 function checkCaptureBoundaryReference(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -6384,7 +6392,7 @@ function checkSisyphusJuniorUlwLoopMisclassification(root: string): CheckResult[
         ng(
           "ExecutionSubject",
           "sisyphus-junior-ulw-loop-misclassification",
-          "'Sisyphus-Junior(ulw-loop)' misclassification found: /ulw-loop is a command, not a skill (REQ-0144-012/013)",
+          "'Sisyphus-Junior(ulw-loop)' misclassification found: /ulw-loop is a command, not a skill (v2:REQ-0144-012/013)",
           relPath,
         ),
       );
@@ -6396,7 +6404,7 @@ function checkSisyphusJuniorUlwLoopMisclassification(root: string): CheckResult[
       ok(
         "ExecutionSubject",
         "sisyphus-junior-ulw-loop-misclassification",
-        "No 'Sisyphus-Junior(ulw-loop)' misclassification detected (REQ-0144-013)",
+        "No 'Sisyphus-Junior(ulw-loop)' misclassification detected (v2:REQ-0144-013)",
       ),
     );
   }
@@ -6444,12 +6452,12 @@ function checkMappingTableHistoryLabels(root: string): CheckResult[] {
       ng(
         "Vocabulary",
         "mapping-table-history",
-        `mapping-table.md has ${unlabeledCount} old vocabulary entries without history label (REQ-0108-240)`,
+        `mapping-table.md has ${unlabeledCount} old vocabulary entries without history label (v2:REQ-0108-240)`,
       ),
     );
   } else {
     results.push(
-      ok("Vocabulary", "mapping-table-history", "Old vocabulary in mapping-table.md properly labeled as historical (REQ-0108-240)"),
+      ok("Vocabulary", "mapping-table-history", "Old vocabulary in mapping-table.md properly labeled as historical (v2:REQ-0108-240)"),
     );
   }
   return results;
@@ -6488,7 +6496,7 @@ function checkReqVerificationBasis(root: string): CheckResult[] {
       ng(
         "DocsCheck",
         "req-verification-basis",
-        `${legacyMarkerBasedRows}/${totalReqRows} REQ rows still use legacy markers instead of 必達要件 (REQ-0115-044)`,
+        `${legacyMarkerBasedRows}/${totalReqRows} REQ rows still use legacy markers instead of 必達要件 (v2:REQ-0115-044)`,
       ),
     );
   } else {
@@ -6496,23 +6504,23 @@ function checkReqVerificationBasis(root: string): CheckResult[] {
       ok(
         "DocsCheck",
         "req-verification-basis",
-        `All ${totalReqRows} REQ rows use 必達要件-based verification (REQ-0115-044)`,
+        `All ${totalReqRows} REQ rows use 必達要件-based verification (v2:REQ-0115-044)`,
       ),
     );
   }
   return results;
 }
 
-// ─── IR-044: REQ/SPEC boundary violation detection (REQ-0108-259, REQ-0108-260) ──
+// ─── IR-044: REQ/SPEC boundary violation detection (v2:REQ-0108-259, v2:REQ-0108-260) ──
 // Detects SPEC detail contamination in active REQ requirement lines.
-// 9 SPEC separation criteria violation signals (REQ-0101-067, 068):
+// 9 SPEC separation criteria violation signals (v2:REQ-0101-067, 068):
 //   1. schema field   2. enum value list      3. fixture detail
 //   4. checker individual rule   5. false positive suppression
 //   6. Step number    7. Phase number         8. internal algorithm
 //   9. specific work history
 // Step number signal covers `Step N`, `ステップ N`, `手順 N` direct references
-// (REQ-0136-031). The word "Step 番号" (without digit literal) is NOT matched,
-// preventing META rule declaration lines like REQ-0136-031 itself from being
+// (v2:REQ-0136-031). The word "Step 番号" (without digit literal) is NOT matched,
+// preventing META rule declaration lines like v2:REQ-0136-031 itself from being
 // falsely flagged (mechanical digit-literal distinction, not context exemption).
 // Pure pattern-match detection (no meaning-based context exemption).
 // Severity: heuristic (warn / exit 0).
@@ -6562,15 +6570,15 @@ const IR044_SIGNAL_PATTERNS: ReadonlyArray<{ signal: string; pattern: RegExp }> 
     },
   ];
 
-// REQ-0145-013: 件数・内容規定検出。予防的ガード句の判定根拠。
+// v2:REQ-0145-013: 件数・内容規定検出。予防的ガード句の判定根拠。
 function hasCountOrContentRule(line: string): boolean {
   return /\d+\s*(件|個|本|つ|種類|項目|以上|以下)|最大\s*\d+|最小\s*\d+/.test(
     line,
   );
 }
 
-// REQ-0145-012/013: behavior predicate context 判定。契約・状態・禁止の記述文脈を検出する。
-// REQ-0145-013 予防的ガード句: 件数・内容規定を含む行は exemption を拒否する。
+// v2:REQ-0145-012/013: behavior predicate context 判定。契約・状態・禁止の記述文脈を検出する。
+// v2:REQ-0145-013 予防的ガード句: 件数・内容規定を含む行は exemption を拒否する。
 function isBehaviorPredicateContext(line: string): boolean {
   if (hasCountOrContentRule(line)) {
     return false;
@@ -6578,10 +6586,10 @@ function isBehaviorPredicateContext(line: string): boolean {
   return /が\s*存在\s*すること|を\s*禁止\s*する|を\s*許可\s*しない/.test(line);
 }
 
-// REQ-0145-012: META 規則行 exemption。REQ/SPEC 責務範囲を規定する行（SPEC 種別を
+// v2:REQ-0145-012: META 規則行 exemption。REQ/SPEC 責務範囲を規定する行（SPEC 種別を
 // 名指しして責務境界を宣言する行）を機械的に判定し免除する。件数・内容規定を含む行は
-// 予防的ガード句 (REQ-0145-013) により免除を拒否し、true positive 保護を維持する。
-// 当該行は SPEC 詳細の記述ではなく責務範囲の規定である（REQ-0145-012 準拠）。
+// 予防的ガード句 (v2:REQ-0145-013) により免除を拒否し、true positive 保護を維持する。
+// 当該行は SPEC 詳細の記述ではなく責務範囲の規定である（v2:REQ-0145-012 準拠）。
 function isMetaRuleLine(line: string): boolean {
   if (hasCountOrContentRule(line)) {
     return false;
@@ -6618,7 +6626,7 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
     const content = readText(fullPath);
     if (!content) continue;
     const relPath = resolveRelative(fullPath, root);
-    // REQ-0145-015: 検出ルール説明文（IR-*.md）は phantom REQ 例示を含むため除外
+    // v2:REQ-0145-015: 検出ルール説明文（IR-*.md）は phantom REQ 例示を含むため除外
     if (isIntegrityRuleDescriptionFile(relPath)) continue;
 
     const lines = content.split("\n");
@@ -6642,12 +6650,12 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
 
       for (const { signal, pattern } of IR044_SIGNAL_PATTERNS) {
         if (pattern.test(stripped)) {
-          // REQ-0145-012/013: behavior predicate context は exemption 対象。
+          // v2:REQ-0145-012/013: behavior predicate context は exemption 対象。
           // 件数・内容規定を含む行は isBehaviorPredicateContext が false を返し拒否される。
           if (isBehaviorPredicateContext(stripped)) {
             break;
           }
-          // REQ-0145-012: META 規則行 exemption。REQ/SPEC 責務範囲を規定する行は免除する。
+          // v2:REQ-0145-012: META 規則行 exemption。REQ/SPEC 責務範囲を規定する行は免除する。
           if (isMetaRuleLine(stripped)) {
             break;
           }
@@ -6656,7 +6664,7 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
             warn(
               "CanonicalConflict",
               "req-spec-boundary-violation",
-              `REQ requirement line may contain SPEC detail ("${signal}") — consider moving to SPEC/rule catalog/command reference (IR-044, REQ-0108-259)`,
+              `REQ requirement line may contain SPEC detail ("${signal}") — consider moving to SPEC/rule catalog/command reference (IR-044, v2:REQ-0108-259)`,
               relPath,
               i + 1,
               {
@@ -6678,23 +6686,23 @@ function checkReqSpecBoundaryViolation(root: string): CheckResult[] {
       ok(
         "CanonicalConflict",
         "req-spec-boundary-violation",
-        "No REQ/SPEC boundary violations detected in active REQs (IR-044, REQ-0108-259)",
+        "No REQ/SPEC boundary violations detected in active REQs (IR-044, v2:REQ-0108-259)",
       ),
     );
   }
   return results;
 }
 
-// ─── IR-053: gh direct invocation detection (REQ-0152-001, REQ-0152-002) ──────
+// ─── IR-053: gh direct invocation detection (v2:REQ-0152-001, v2:REQ-0152-002) ──────
 // Detects direct `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)`
 // invocations embedded in command/skill definitions. Direct gh CLI usage bypasses
-// the agentdev-gh-cli delegation base (REQ-0149) and must route through it.
-// Scan targets (REQ-0152-001):
+// the agentdev-gh-cli delegation base (v2:REQ-0149) and must route through it.
+// Scan targets (v2:REQ-0152-001):
 //   src/opencode/commands/agentdev/*.md
 //   src/opencode/skills/agentdev-*/**/*.md
-// Exclusion (REQ-0152-002, REQ-0149-003 permitted file):
+// Exclusion (v2:REQ-0152-002, v2:REQ-0149-003 permitted file):
 //   src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md
-// Code-block contents are exempt (example/pattern description, REQ-0108-254).
+// Code-block contents are exempt (example/pattern description, v2:REQ-0108-254).
 // Severity: heuristic (warn / exit 1).
 
 const IR053_GH_DIRECT_PATTERN =
@@ -6758,13 +6766,13 @@ function checkGhDirectInvocation(root: string): CheckResult[] {
           warn(
             "CanonicalConflict",
             "gh-direct-invocation",
-            `Direct gh CLI invocation 'gh ${match[1]} ${match[2]}' detected — route via agentdev-gh-cli delegation (IR-053, REQ-0152-001)`,
+            `Direct gh CLI invocation 'gh ${match[1]} ${match[2]}' detected — route via agentdev-gh-cli delegation (IR-053, v2:REQ-0152-001)`,
             relPath,
             i + 1,
             {
               evidence: match[0],
               expected:
-                "delegate gh CLI access through agentdev-gh-cli procedures (REQ-0149)",
+                "delegate gh CLI access through agentdev-gh-cli procedures (v2:REQ-0149)",
               route: "intake",
             },
           ),
@@ -6778,14 +6786,14 @@ function checkGhDirectInvocation(root: string): CheckResult[] {
       ok(
         "CanonicalConflict",
         "gh-direct-invocation",
-        "No direct gh CLI invocations detected in command/skill definitions (IR-053, REQ-0152-001)",
+        "No direct gh CLI invocations detected in command/skill definitions (IR-053, v2:REQ-0152-001)",
       ),
     );
   }
   return results;
 }
 
-// ===== IR-054: draft SPEC 放置検出 (REQ-0154-002) =====
+// ===== IR-054: draft SPEC 放置検出 (v2:REQ-0154-002) =====
 // 閾値: 30日（docs/specs/integrity-rule-catalog.md「IR-054 閾値設計」が原本）
 const IR054_DRAFT_STALE_DAYS = 30;
 const IR054_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -6835,7 +6843,7 @@ function checkDraftSpecStaleness(specsDir: string, root: string): CheckResult[] 
         warn(
           "Specs",
           "draft-spec-staleness",
-          `Draft SPEC stale: age=${ageDays}d (threshold=${IR054_DRAFT_STALE_DAYS}d), updated=${updated}. Triage: (a) promote to accepted via case-close SPEC determination, (b) update content and bump updated, or (c) retire (IR-054, REQ-0154-002)`,
+          `Draft SPEC stale: age=${ageDays}d (threshold=${IR054_DRAFT_STALE_DAYS}d), updated=${updated}. Triage: (a) promote to accepted via case-close SPEC determination, (b) update content and bump updated, or (c) retire (IR-054, v2:REQ-0154-002)`,
           resolveRelative(fullPath, root),
           1,
           {
@@ -6853,14 +6861,14 @@ function checkDraftSpecStaleness(specsDir: string, root: string): CheckResult[] 
       ok(
         "Specs",
         "draft-spec-staleness",
-        `No stale draft SPECs detected (checked ${draftCount} draft SPECs, threshold ${IR054_DRAFT_STALE_DAYS}d) (IR-054, REQ-0154-002)`,
+        `No stale draft SPECs detected (checked ${draftCount} draft SPECs, threshold ${IR054_DRAFT_STALE_DAYS}d) (IR-054, v2:REQ-0154-002)`,
       ),
     );
   }
   return results;
 }
 
-// ===== IR-055: runtime-unresolved-reference (REQ-0108-263, REQ-0108-264) =====
+// ===== IR-055: runtime-unresolved-reference (v2:REQ-0108-263, v2:REQ-0108-264) =====
 // Detects references in distribution files (src/opencode/commands/agentdev/**/*.md,
 // src/opencode/skills/agentdev-*/**/*.md) that cannot be resolved in consumer
 // environments: REQ/ADR IDs, src/opencode/ paths, docs/specs/, docs/guides/,
@@ -6868,14 +6876,14 @@ function checkDraftSpecStaleness(specsDir: string, root: string): CheckResult[] 
 // Severity per SPEC docs/specs/integrity/rules/IR-055-runtime-unresolved-reference.md:
 //   strict:    REQ-NNNN, REQ-NNNN-NNN, ADR-NNNN, src/opencode/, /repo/*, repo-*
 //   heuristic: docs/specs/, docs/guides/, main-repo GitHub URL, file.md#L<N>
-// Gradual rollout (REQ-0108-264): baseline-known violations are reported as info
+// Gradual rollout (v2:REQ-0108-264): baseline-known violations are reported as info
 // (no fail). New violations (delta from baseline) are reported as warn/ng and
 // fail in delta guard / impact guard. Full audit fails once baseline reaches 0.
 
 const IR055_STRICT_PATTERNS: ReadonlyArray<{ name: string; pattern: RegExp }> = [
   { name: "REQ-NNNN-NNN", pattern: /\bREQ-\d{4}-\d{3}\b/g },
-  { name: "REQ-NNNN", pattern: /\bREQ-\d{4}\b/g },
-  { name: "ADR-NNNN", pattern: /\bADR-\d{4}\b/g },
+  { name: "REQ-NNNN", pattern: /\bREQ-\d{3,4}\b/g },
+  { name: "ADR-NNNN", pattern: /\bADR-\d{3,4}\b/g },
   { name: "src/opencode/", pattern: /\bsrc\/opencode\//g },
   { name: "/repo/", pattern: /\/repo\//g },
   { name: "repo-*", pattern: /\brepo-[a-z][a-z0-9-]*/g },
@@ -7141,7 +7149,7 @@ function checkRuntimeUnresolvedReference(root: string): CheckResult[] {
       ok(
         "RuntimeReference",
         "runtime-unresolved-reference",
-        `IR-055 runtime-unresolved-reference: ${baselineKnownCount} baseline-known (info), 0 new violations. Full audit report-only mode (REQ-0108-264).`,
+        `IR-055 runtime-unresolved-reference: ${baselineKnownCount} baseline-known (info), 0 new violations. Full audit report-only mode (v2:REQ-0108-264).`,
       ),
     );
   }
@@ -7168,9 +7176,9 @@ function updateIr055Baseline(root: string): void {
   );
 }
 
-// ===== NG baseline (REQ-0161-005): baseline-aware strict pass =====
+// ===== NG baseline (v2:REQ-0161-005): baseline-aware strict pass =====
 // The strict pass criterion ("exit 0 only when zero NG") is structurally
-// unreachable while a known baseline of pre-existing NGs exists. REQ-0161-005
+// unreachable while a known baseline of pre-existing NGs exists. v2:REQ-0161-005
 // redefines the pass criterion as delta-aware: baseline-known NGs are demoted
 // to info (report-only), only NGs exceeding the baseline (new, caused by the
 // change under review) cause failure. The baseline is updated explicitly via
@@ -7245,7 +7253,7 @@ function ngBaselineKey(
 }
 
 // Normalize a parsed entry to fill provenance/reason for backward compat with
-// baseline files written before REQ-0161-005 introduced the fields. Missing
+// baseline files written before v2:REQ-0161-005 introduced the fields. Missing
 // values are treated as "legacy" provenance so existing baseline NGs continue
 // to demote to info without forcing a one-shot migration of the JSON file.
 function normalizeNgBaselineEntry(raw: Partial<NgBaselineEntry>): NgBaselineEntry {
@@ -7360,7 +7368,7 @@ function summarizeNgResults(
 ): Map<string, NgBaselineEntry> {
   const summary = new Map<string, NgBaselineEntry>();
   for (const r of results) {
-    // REQ-0161-005: baseline covers both ng and warning levels so the strict
+    // v2:REQ-0161-005: baseline covers both ng and warning levels so the strict
     // pass criterion (exit 0) is reachable while pre-existing findings remain.
     if (r.level !== "ng" && r.level !== "warning") continue;
     const key = ngBaselineKey(r.category, r.check, r.file ?? null, r.evidence ?? null);
@@ -7513,9 +7521,9 @@ function updateNgBaseline(
   return { addedEntries, updatedEntries };
 }
 
-// ===== IR-057: obsolete-spec-path-after-domain-split (REQ-0158-002) =====
+// ===== IR-057: obsolete-spec-path-after-domain-split (v2:REQ-0158-002) =====
 // Detects残留する旧SPEC直下パス参照 (`docs/specs/<name>.md`) と link mode 統一
-// (ADR-0131) に伴う廃止語彙 (`generation-flow.md`, `transform/`, `local-opencode-transform`,
+// (v2:ADR-0131) に伴う廃止語彙 (`generation-flow.md`, `transform/`, `local-opencode-transform`,
 // 直接生成方式、生成フロー、再生成、上書き保護) を検出する。
 // `generated_by` は `local-opencode-transform` と同一ファイルに共存する場合のみ検出する。
 // 対照表: docs/specs/integrity/obsolete-path-map.yaml
@@ -7717,11 +7725,13 @@ function isIr057ExemptPath(relPath: string): boolean {
   // 検査スクリプト自身のドキュメント参照
   if (/repo-agentdev-integrity.*\/(SKILL|references\/)/.test(relPath)) return true;
   // legacy vocabulary を定義・検出する正当な文書:
-  // - REQ-0158 (IR-057 の要件元。vocabulary を列挙)
-  // - REQ-0141 (link mode 移行に伴う廃止語彙を規定)
+  // - v2:REQ-0158 (IR-057 の要件元。vocabulary を列挙)
+  // - v2:REQ-0141 (link mode 移行に伴う廃止語彙を規定)
   // - local-generation.md (link mode 移行と廃止経緯を記載)
   // - IR-048 (generated_by 識別子整合性ルール)
+  // v2: stale — file deleted in Stage 4
   if (/docs\/requirements\/REQ-0158\.md$/.test(relPath)) return true;
+  // v2: stale — file deleted in Stage 4
   if (/docs\/requirements\/REQ-0141\.md$/.test(relPath)) return true;
   if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) return true;
   if (/docs\/specs\/integrity\/rules\/IR-048-generated-by-identifier-integrity\.md$/.test(relPath)) return true;
@@ -7748,7 +7758,7 @@ function isIr057InCodeBlock(lines: string[], lineIdx: number): boolean {
   return inCode;
 }
 
-// IR-057 文書レベル履歴注記 exemption（Issue #1768、IR-057 SPEC「例外登録」セクション、REQ-0144-024）。
+// IR-057 文書レベル履歴注記 exemption（Issue #1768、IR-057 SPEC「例外登録」セクション、v2:REQ-0144-024）。
 // targeted guard（check_changed_docs.ts）と共通の純粋関数へ集約し、exemption 判定を一致させる。
 const ir057HistoricalFileCache = new Map<string, boolean>();
 
@@ -7878,13 +7888,13 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
             ng(
               "CanonicalConflict",
               "obsolete-spec-path",
-              `Legacy local generation vocabulary '${item.term}' detected (link mode unified, ADR-0131)`,
+              `Legacy local generation vocabulary '${item.term}' detected (link mode unified, v2:ADR-0131)`,
               relPath,
               i + 1,
               {
                 evidence: line.trim(),
                 expected:
-                  "remove legacy vocabulary; use link mode terminology (ADR-0131)",
+                  "remove legacy vocabulary; use link mode terminology (v2:ADR-0131)",
                 route: "intake",
                 finding_category: "broken-reference",
                 finding_level: "strict",
@@ -7922,7 +7932,7 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
           ng(
             "CanonicalConflict",
             "obsolete-spec-path",
-            `Legacy local generation identifier '${trigger}' coexists with '${paired_with}' (link mode unified, ADR-0131)`,
+            `Legacy local generation identifier '${trigger}' coexists with '${paired_with}' (link mode unified, v2:ADR-0131)`,
             relPath,
             i + 1,
             {
@@ -7967,13 +7977,13 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
             ng(
               "CanonicalConflict",
               "obsolete-spec-path",
-              `Legacy local generation conditional vocabulary '${item.term}' detected with context term nearby (link mode unified, ADR-0131)`,
+              `Legacy local generation conditional vocabulary '${item.term}' detected with context term nearby (link mode unified, v2:ADR-0131)`,
               relPath,
               i + 1,
               {
                 evidence: line.trim(),
                 expected:
-                  "remove legacy vocabulary; use link mode terminology (ADR-0131)",
+                  "remove legacy vocabulary; use link mode terminology (v2:ADR-0131)",
                 route: "intake",
                 finding_category: "broken-reference",
                 finding_level: "strict",
@@ -7990,14 +8000,14 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
       ok(
         "CanonicalConflict",
         "obsolete-spec-path",
-        "No obsolete SPEC direct path references or legacy local generation vocabulary detected (IR-057, REQ-0158-002)",
+        "No obsolete SPEC direct path references or legacy local generation vocabulary detected (IR-057, v2:REQ-0158-002)",
       ),
     );
   }
   return results;
 }
 
-// ===== IR-061: 索引類自動生成整合性 (SC-002 Phase C, REQ-0108) =====
+// ===== IR-061: 索引類自動生成整合性 (SC-002 Phase C, v2:REQ-0108) =====
 // catalog（integrity-rule-catalog.md）と rule-ownership.md の AUTOGEN マーカーで
 // 囲まれた領域が、IR-* ファイルから再生成した期待値と一致することを検証する。
 // severity: strict（再現可能な機械的パターンマッチング）。
@@ -8449,7 +8459,7 @@ async function main(): Promise<void> {
   const adrDir = path.join(root, "docs", "adr");
   const specsDir = path.join(root, "docs", "specs");
   const skillsDir = path.join(root, ".opencode", "skills");
-  // REQ-0108-189: Use resolvePathWithFallback for runtime→source fallback
+  // v2:REQ-0108-189: Use resolvePathWithFallback for runtime→source fallback
   const cmdDir = resolvePathWithFallback(
     path.join(root, ".opencode", "commands", "agentdev"),
   );
@@ -8462,7 +8472,7 @@ async function main(): Promise<void> {
     "command-map.md",
   );
 
-  // REQ-0108-188: 8 independent collections aligned with Document Classification Policy
+  // v2:REQ-0108-188: 8 independent collections aligned with Document Classification Policy
   const scanned: Record<string, number> = {
     REQ: listFiles(reqDir).filter((f) => f.startsWith("REQ-")).length,
     ADR: listFiles(adrDir).filter((f) => f.startsWith("ADR-")).length,
@@ -8501,11 +8511,11 @@ async function main(): Promise<void> {
     const targets = [
       `REQ files: ${reqDir} (${scanned.REQ} files)`,
       `ADR files: ${adrDir} (${scanned.ADR} files)`,
-      `Specs: ${specsDir} (existence verified against ${specsDir}/README.md, REQ-0154-001/003)`,
+      `Specs: ${specsDir} (existence verified against ${specsDir}/README.md, v2:REQ-0154-001/003)`,
       `Skills: ${skillsDir} (${scanned.Skill} directories)`,
       `Commands: ${cmdDir} (${scanned.Command} files)`,
-      `Report: .agentdev/integrity/reports/ (${scanned.Report} files)`, // REQ-0108-188
-      `Runtime: .opencode/commands/**/*.md + SKILL.md (${scanned.Runtime} files)`, // REQ-0108-188
+      `Report: .agentdev/integrity/reports/ (${scanned.Report} files)`, // v2:REQ-0108-188
+      `Runtime: .opencode/commands/**/*.md + SKILL.md (${scanned.Runtime} files)`, // v2:REQ-0108-188
     ];
     console.log("Dry run - would check:");
     for (const t of targets) console.log(`  ${t}`);
@@ -8557,7 +8567,7 @@ async function main(): Promise<void> {
     ...checkSkillCategoryGap(root, skillsDir, cmdDir),
     ...checkTemplatePathIntegrity(cmdDir, root),
     ...checkSourceProjectionConsistency(root),
-    ...checkDistributionUntrackedSkillReference(root), // IR-058 (REQ-0159-003)
+    ...checkDistributionUntrackedSkillReference(root), // IR-058 (v2:REQ-0159-003)
     ...checkBrokenJunctions(skillsDir, root, cmdDir),
     ...checkUpdateNotesInDocs(root),
     ...checkSummaryReqRangeConsistency(root),
@@ -8573,23 +8583,23 @@ async function main(): Promise<void> {
     ...checkCommandCaptureDuties(cmdDir, root),
     ...checkMappingTableHistoryLabels(root),
     ...checkReqVerificationBasis(root),
-    ...checkReqSpecBoundaryViolation(root), // IR-044 (REQ-0108-259)
-    ...checkGhDirectInvocation(root), // IR-053 (REQ-0152-001/002)
-    ...checkDraftSpecStaleness(specsDir, root), // IR-054 (REQ-0154-002)
-    ...checkSisyphusJuniorUlwLoopMisclassification(root), // REQ-0144-013
-    ...checkRuntimeUnresolvedReference(root), // IR-055 (REQ-0108-263/264)
-    ...checkObsoleteSpecPath(root), // IR-057 (REQ-0158-002)
+    ...checkReqSpecBoundaryViolation(root), // IR-044 (v2:REQ-0108-259)
+    ...checkGhDirectInvocation(root), // IR-053 (v2:REQ-0152-001/002)
+    ...checkDraftSpecStaleness(specsDir, root), // IR-054 (v2:REQ-0154-002)
+    ...checkSisyphusJuniorUlwLoopMisclassification(root), // v2:REQ-0144-013
+    ...checkRuntimeUnresolvedReference(root), // IR-055 (v2:REQ-0108-263/264)
+    ...checkObsoleteSpecPath(root), // IR-057 (v2:REQ-0158-002)
     ...checkIndexGenerationConsistency(root), // IR-061 (SC-002 Phase C, 索引類自動生成整合性)
   ];
 
-  // REQ-0108-196: classification policy checks (enabled by --classification flag)
+  // v2:REQ-0108-196: classification policy checks (enabled by --classification flag)
   if (options.classification) {
     results.push(...checkDocumentClassificationPolicy(root));
   }
 
   const processed = processResults(results);
 
-  // REQ-0161-005: baseline-aware strict pass. When --update-ng-baseline is
+  // v2:REQ-0161-005: baseline-aware strict pass. When --update-ng-baseline is
   // requested, merge the approved additions manifest into the baseline (the
   // manifest is required; unmanaged NGs are never absorbed). Otherwise demote
   // baseline-known NGs to info so the exit code reflects only the delta.
@@ -8599,7 +8609,7 @@ async function main(): Promise<void> {
       additionsFlagIdx >= 0 ? args[additionsFlagIdx + 1] : undefined;
     if (!manifestPath) {
       console.error(
-        "[integrity] --update-ng-baseline requires --ng-baseline-additions <manifest.json> (REQ-0161-005: unmanaged NGs must not be absorbed).",
+        "[integrity] --update-ng-baseline requires --ng-baseline-additions <manifest.json> (v2:REQ-0161-005: unmanaged NGs must not be absorbed).",
       );
       process.exit(EXIT_ERROR);
     }

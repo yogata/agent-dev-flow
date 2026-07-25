@@ -35,7 +35,7 @@ intake 候補と learning 候補は必ず別々の成果物として扱い、混
 
 ## PR 本文永続チャネル
 
-case-run で発見した本筋外検出事項（Finding）の永続化チャネルとして PR 本文を使用する（REQ-0106）。
+case-run で発見した本筋外検出事項（Finding）の永続化チャネルとして PR 本文を使用する（REQ-006）。
 
 - 書込み元: case-run 経由の実行担当サブエージェント（Step 6 委譲先）
 - 読取り元: case-close（Step 9-2）
@@ -48,7 +48,7 @@ case-run で発見した本筋外検出事項（Finding）の永続化チャネ�
 PR 本文の capture 関連セクションは以下を分離する:
 
 - `## Findings / Capture候補`（本筋外発見（intake/learning 候補））。case-run 経由の実行担当サブエージェントが記録
-- `## SPEC確定候補`（実装で判明した SPEC レベル詳細（schema、enum、判定表、内部アルゴリズム等））。`## Findings / Capture候補` とは別セクション（ADR-0123 Decision #4, REQ-0136-015）
+- `## SPEC確定候補`（実装で判明した SPEC レベル詳細（schema、enum、判定表、内部アルゴリズム等））。`## Findings / Capture候補` とは別セクション（v2:ADR-0123 Decision #4, REQ-001-015）
 
 ## 各コマンドの capture 責務
 
@@ -78,11 +78,11 @@ CaptureBoundary 検査（`check_integrity.ts` の `command-capture-duty`）は�
 - capture 責務表の intake または learning 列が「各工程の責務を継承」または「非関与」と定義する command は、`capture-boundaries` 参照を個別に持たなくても CaptureBoundary 検査の検出対象としない。
 - capture 責務表の intake または learning 列が具体的な責務記述（PR 本文記録、回収、REQ再構成 intake 生成等）である command は、`capture-boundaries` 参照を個別に持ち、対応する capture 導線を実装する。
 
-例外の根拠は本 capture 責務表である。同表は case-auto の intake、learning をともに「各工程の責務を継承」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。ADR-0127（case-auto 構成工程の委譲）と ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
+例外の根拠は本 capture 責務表である。同表は case-auto の intake、learning をともに「各工程の責務を継承」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
 
 ## REQ 再構成 intake
 
-通常intakeとは独立した配置規約（REQ-0109）。
+通常intakeとは独立した配置規約（REQ-010）。
 
 | 状態 | パス |
 |---|---|
@@ -105,5 +105,5 @@ req-define の明示入力としてルーティングする（backlog-review 経
 - [backlog-artifact-lifecycle.md](backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
 - 各 command SPEC（`docs/specs/commands/`）
 - `agentdev-workflow-orchestration` skill（capture 境界の詳細）
-- REQ-0106（Case実行オーケストレーション / Epic、Wave）
-- REQ-0109（REQ 再構成 intake）
+- REQ-006（Case実行オーケストレーション / Epic、Wave）
+- REQ-010（REQ 再構成 intake）

@@ -1,7 +1,7 @@
 # 意味的診断観点の判定基準
 
-> **原本**: REQ-0119-033（正規な定義元の原則）、REQ-0119-034（同一契約再定義抑止の原則）、artifact-responsibilities SPEC（責務分担マッピング、重複許容基準）。
-> 本ファイルは inspect-skills 診断観点「意味的重複」「意味的矛盾」「正規な定義元からの逸脱」「セマンティクス欠落」（REQ-0125-003 根拠明記）の判定基準詳細を集約する運用ビューである（REQ-0125-004 準拠）。
+> **原本**: 正規な定義元の原則、同一契約再定義抑止の原則、artifact-responsibilities SPEC（責務分担マッピング、重複許容基準）。
+> 本ファイルは inspect-skills 診断観点「意味的重複」「意味的矛盾」「正規な定義元からの逸脱」「セマンティクス欠落」の判定基準詳細を集約する運用ビューである。
 > 原本と内容が重複する場合は原本を優先する。
 
 ## 目次
@@ -17,17 +17,17 @@
 
 ## 適用範囲
 
-Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義間の意味的整合性を横断的に検出する。各観点は REQ-0119-033（正規な定義元の原則）および REQ-0119-034（同一契約再定義抑止の原則）に照らして検出する（REQ-0125-003 根拠明記要件）。
+Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義間の意味的整合性を横断的に検出する。各観点は正規な定義元の原則および同一契約再定義抑止の原則に照らして検出する。
 
 従来の構造・参照の妥当性検査（USE FOR 照合、Skill 分割候補、実行主体分類、frontmatter 整合等）と互补関係にあり、本観点は意味段階の重複、矛盾、責務越境、契約欠落を担う。
 
 ## 根拠原則
 
-### REQ-0119-033（正規な定義元の原則）
+### 正規な定義元の原則
 
-配布物種別間で責務ごとに正規な定義元を指定する原則。正規な定義元の候補は配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれかであり、責務ごとに最も安定した最小の定義元を正規とする。詳細な責務分担マッピングは artifact-responsibilities SPEC に委譲する。本原則は ADR-0107（Command/Skill/Template/Script 責任分界）の適用条件の精緻化である。
+配布物種別間で責務ごとに正規な定義元を指定する原則。正規な定義元の候補は配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれかであり、責務ごとに最も安定した最小の定義元を正規とする。詳細な責務分担マッピングは artifact-responsibilities SPEC に委譲する。本原則は Command/Skill/Template/Script 責任分界の適用条件の精緻化である。
 
-### REQ-0119-034（同一契約再定義抑止の原則）
+### 同一契約再定義抑止の原則
 
 同一の契約、手順、判定基準を複数の配布物で再定義しない原則。参照元は正規な定義元の再記述ではなく、参照先への参照と差分のみを保持する。例外として artifact-responsibilities SPEC が定める重複許容基準（SKILL ↔ command 同一ルール等）に該当する場合は、正の情報源を明示した上で重複を認める。例外基準の詳細は SPEC 側で維持する。
 
@@ -35,7 +35,7 @@ Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義�
 
 ### 意味的重複
 
-同一の契約、手順、判定基準が複数の配布物で再定義されている箇所の検出。REQ-0119-034（同一契約再定義抑止の原則）に照らして検出する（REQ-0125-003 根拠明記）。
+同一の契約、手順、判定基準が複数の配布物で再定義されている箇所の検出。同一契約再定義抑止の原則に照らして検出する。
 
 判定基準:
 
@@ -50,7 +50,7 @@ Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義�
 
 ### 意味的矛盾
 
-Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾している検出。REQ-0119-033（正規な定義元の原則）および REQ-0119-034（同一契約再定義抑止の原則）に照らして検出する（REQ-0125-003 根拠明記）。
+Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾している検出。正規な定義元の原則および同一契約再定義抑止の原則に照らして検出する。
 
 判定基準:
 
@@ -64,7 +64,7 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 ### 正規な定義元からの逸脱
 
-各責務が artifact-responsibilities SPEC のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC）に置かれているかの検出。REQ-0119-033（正規な定義元の原則）に照らして検出する（REQ-0125-003 根拠明記）。
+各責務が artifact-responsibilities SPEC のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC）に置かれているかの検出。正規な定義元の原則に照らして検出する。
 
 判定基準:
 
@@ -79,7 +79,7 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 ### セマンティクス欠落
 
-疎結合化、抽象化、縮約により、意味、条件、成果物契約が欠落している検出。REQ-0119-034（同一契約再定義抑止の原則）に照らして検出する（REQ-0125-003 根拠明記）。
+疎結合化、抽象化、縮約により、意味、条件、成果物契約が欠落している検出。同一契約再定義抑止の原則に照らして検出する。
 
 判定基準:
 
@@ -103,7 +103,7 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 複数配布物を横断し、同一の契約・手順・判定基準の重複を探す。検出時は以下を確認する:
 
 - 重複している契約・手順・判定基準の特定（入力、出力、エラー扱い、前提、後続等）
-- 正規な定義元の候補（REQ-0119-033）の特定
+- 正規な定義元の候補の特定
 - artifact-responsibilities SPEC の重複許容基準への合致性（後述「重複許容例外」）
 - 合致する場合、正の情報源が明示されているか
 
@@ -145,7 +145,7 @@ Command と参照先 Skill の対応箇所を突き合わせ、工程・状態�
 
 ## 重複許容例外（artifact-responsibilities SPEC）
 
-artifact-responsibilities SPEC が定める重複許容基準に該当する場合、正の情報源を明示した上で重複を認める（REQ-0119-034 例外）。本診断では該当する場合でも以下を確認する:
+artifact-responsibilities SPEC が定める重複許容基準に該当する場合、正の情報源を明示した上で重複を認める（同一契約再定義抑止の原則の例外）。本診断では該当する場合でも以下を確認する:
 
 - 重複が許容基準に合致すること（SKILL ↔ command 同一ルール等、SPEC が定める基準）
 - 正の情報源が明示されていること（どちらを正とし、どちらを差分として扱うかの明示）
@@ -155,7 +155,7 @@ artifact-responsibilities SPEC が定める重複許容基準に該当する場�
 
 ## 出力形式
 
-検出した事項は SKILL.md「出力形式」セクションの Finding 形式で報告する（REQ-0125-005 形式: 対象・観点・分類・根拠・推奨経路）。Classification には各診断分類（`semantic-duplication` / `semantic-contradiction` / `canonical-definition-deviation` / `semantic-contract-missing`）を使用する。Recommended route には対象配布物の種別と修正方向を提示する。
+検出した事項は SKILL.md「出力形式」セクションの Finding 形式で報告する（対象・観点・分類・根拠・推奨経路）。Classification には各診断分類（`semantic-duplication` / `semantic-contradiction` / `canonical-definition-deviation` / `semantic-contract-missing`）を使用する。Recommended route には対象配布物の種別と修正方向を提示する。
 
 報告例:
 
@@ -164,7 +164,7 @@ artifact-responsibilities SPEC が定める重複許容基準に該当する場�
 - Target: src/opencode/skills/agentdev-XXX/references/foo.md
 - Perspective: 意味的重複
 - Classification: semantic-duplication
-- Evidence: 入力（Issue 番号、本文）と出力（Issue URL）が contracts.md と同一だが、正の情報源が明示されていない。REQ-0119-034 の重複許容例外（artifact-responsibilities SPEC）に合致しない
+- Evidence: 入力（Issue 番号、本文）と出力（Issue URL）が contracts.md と同一だが、正の情報源が明示されていない。同一契約再定義抑止の原則の重複許容例外（artifact-responsibilities SPEC）に合致しない
 - Recommended route: references
 ```
 
@@ -173,7 +173,7 @@ artifact-responsibilities SPEC が定める重複許容基準に該当する場�
 - Target: src/opencode/skills/agentdev-YYY/SKILL.md
 - Perspective: 正規な定義元からの逸脱
 - Classification: canonical-definition-deviation
-- Evidence: SKILL.md「## 手順」に case-open の Phase 2「Issue 作成」という Command 固有記述がある。REQ-0119-033 の正規な定義元の原則に照らし、当該手順は case-open Command が正規な定義元
+- Evidence: SKILL.md「## 手順」に case-open の Phase 2「Issue 作成」という Command 固有記述がある。正規な定義元の原則に照らし、当該手順は case-open Command が正規な定義元
 - Recommended route: command
 ```
 
@@ -182,14 +182,13 @@ artifact-responsibilities SPEC が定める重複許容基準に該当する場�
 - 機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子表記等）は integrity-rule-catalog SPEC（IR-050、IR-051、REQ 準拠）が担う。本観点は意味的・文脈的な検出を担う。
 - SPEC 操作契約テーブルと references/contracts.md のフィールド一致性は別観点（[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)）が担う。本観点は意味段階の重複・矛盾・越境・欠落に限定し、SPEC- contracts.md 間のフィールド単位の突合は含まない。
 - 配布物の Markdown 構文健全性、frontmatter 構文は別観点（配布物 frontmatter 構文健全性等）が担う。
-- 公開契約の維持（横断是正の前後で公開目的・入力・出力・停止条件等を維持すること）は REQ-0119-035 が担う。本観点は静的記述の意味整合性に限定し、是正作業の前後比較は含まない。
-- 横断評価の対象範囲の網羅（全配布 Command/Skill を対象とすること）は REQ-0119-036 が担う。本観点は個別の検出基準を扱う。
+- 公開契約の維持（横断是正の前後で公開目的・入力・出力・停止条件等を維持すること）は公開契約維持原則が担う。本観点は静的記述の意味整合性に限定し、是正作業の前後比較は含まない。
+- 横断評価の対象範囲の網羅（全配布 Command/Skill を対象とすること）は横断評価対象範囲網羅原則が担う。本観点は個別の検出基準を扱う。
 
 ## See Also
 
-- **原本**: REQ-0119-033（正規な定義元の原則）、REQ-0119-034（同一契約再定義抑止の原則）
+- **原本**: 正規な定義元の原則、同一契約再定義抑止の原則
 - **artifact-responsibilities SPEC**: 責務分担マッピング、重複許容基準
-- **REQ-0125-003**: 診断観点列挙と根拠明記要件
-- **REQ-0125-005**: 検出事項の報告形式（対象・観点・分類・根拠・推奨経路）
-- **ADR-0107**: Command/Skill/Template/Script 責任分界
+- **検出事項の報告形式**: 対象・観点・分類・根拠・推奨経路
+- **Command/Skill/Template/Script 責任分界**: 配布物種別間の責務分担基盤
 - **[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)**: SPEC 操作契約テーブルと contracts.md のフィールド一致性（本観点と互补）

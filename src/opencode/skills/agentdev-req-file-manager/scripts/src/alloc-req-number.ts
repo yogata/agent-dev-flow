@@ -10,7 +10,7 @@
  *   エラー: 非ゼロ終了コード + stderr メッセージ
  */
 
-import { listMarkdownFiles, joinPath, readFileContent, pad4, reqNumberFromFilename, safeMax } from "../lib/fs-helpers.ts";
+import { listMarkdownFiles, joinPath, readFileContent, pad3, reqNumberFromFilename, safeMax } from "../lib/fs-helpers.ts";
 import { extractReqNumber } from "../lib/frontmatter.ts";
 import { emitJson, emitError } from "../lib/result.ts";
 
@@ -22,7 +22,7 @@ export function nextReqNumber(existingNumbers: number[]): number {
 
 /** 番号から `REQ-NNNN` 形式の ID を生成する（純粋関数）。 */
 export function formatReqId(n: number): string {
-  return `REQ-${pad4(n)}`;
+  return `REQ-${pad3(n)}`;
 }
 
 async function main(): Promise<void> {

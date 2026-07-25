@@ -32,7 +32,7 @@ case-run (orchestration)
         └── result を case-run へ返却
 ```
 
-- **case-run 本体**: 単一 Issue または単一 Wave（Epic Issue 指定時、最大5件並列）で実行担当サブエージェントを委譲起動し、result を処理する。実装実行そのものは行わない。起動手段は AGENTS.md および references/<harness>.md 参照（REQ-0162-002）。
+- **case-run 本体**: 単一 Issue または単一 Wave（Epic Issue 指定時、最大5件並列）で実行担当サブエージェントを委譲起動し、result を処理する。実装実行そのものは行わない。起動手段は AGENTS.md および references/<harness>.md 参照。
 - **実行担当サブエージェント**: 外部実行基盤（AGENTS.md で選定）が提供するエージェント型。1 Issue あたり1起動。adapter skill（`agentdev-case-run-execution-adapter`）を読み込み、委譲 prompt 内で実行 command を起動する。仕様を再解釈、再設計しないアダプターである。
 - **実行 command（harness が提供）**: 委譲 prompt 内で指定される実行 command（skill ではない）。Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲートを実行する。ランタイム作業領域（実行監査トレイル等）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しの保護（timeout 等）は harness 側が提供する（詳細は AGENTS.md および references/<harness>.md 参照）。command の具体名、起動手段も AGENTS.md および references/<harness>.md 参照。
 - **外部実行基盤**: 実行担当サブエージェントの背後で実行エンジンとして振る舞う。plan artifact 等の中間成果物の内部構造には依存しない。最終結果は **PR URL** で受領する（透明）。
@@ -69,7 +69,7 @@ case-run (orchestration)
 | `completed-pr` | 実装完了、PR作成済み | **PR番号**を伴う。case-run の成功成果は PR 作成である |
 | `blocked` | 回答可能な blocker に遭遇 | 詳細本文は **Issue コメント** に SSoT として記録される |
 | `failed` | repository context で回答不能な blocker | 詳細本文は **Issue コメント** に構造化して記録される |
-| `delegation-unavailable` | 実行インフラが委譲を起動できなかった状態 | 実行未試行のため `pending` に戻す（REQ-0162-004） |
+| `delegation-unavailable` | 実行インフラが委譲を起動できなかった状態 | 実行未試行のため `pending` に戻す |
 
 ### SSoT（信頼できる情報源）
 
@@ -133,15 +133,15 @@ AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ ADR/ SPEC に限
 
 ## 委譲抽象IF
 
-- case-run は adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲を起動する（委譲 prompt 内で実行 command を指定）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-0162-002）。
+- case-run は adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲を起動する（委譲 prompt 内で実行 command を指定）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する。
 - 委譲プロンプト: 実行 command を prompt 内で指定し Issue #N の実装を指示する（command の具体名は AGENTS.md 参照）
 - 委譲起動方式の具体的な実装（実行担当サブエージェント起動、委譲 prompt 構築、evidence 確認、result 受領）は `references/<harness>.md` 参照
 - 実行担当サブエージェントが利用不可の場合は委譲起動失敗として検知される。後述「委譲起動失敗、異常終了時事後処理」に従う
 - Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情報）が含まれ得る。実行担当サブエージェントはこれを参考情報として扱い、束縛されない
 
-## 委譲プロトコルと category 設計（REQ-0163）
+## 委譲プロトコルと category 設計
 
-adapter skill 経由の委譲は、case-run に限らず subagent 委譲する全場面（case-auto/ case-open/ case-run/ case-update/ case-close）で共通する category 設計と MUST NOT DO 記載の要件に従う（REQ-0163-001/002/003、Issue #1538 由来）。本節は委譲プロトコルと category 設計の関係を整理し、事務的手続きで `unspecified-high` を推奨する根拠を明示する。
+adapter skill 経由の委譲は、case-run に限らず subagent 委譲する全場面（case-auto/ case-open/ case-run/ case-update/ case-close）で共通する category 設計と MUST NOT DO 記載の要件に従う（Issue #1538 由来）。本節は委譲プロトコルと category 設計の関係を整理し、事務的手続きで `unspecified-high` を推奨する根拠を明示する。
 
 ### `writing` category の発火スキルとの相互作用
 
@@ -161,60 +161,19 @@ Issue #1538 では case-auto から case-open を `category=writing` で委譲�
 
 adapter skill 経由の委譲（case-run からの実行担当サブエージェント委譲を含む）は、以下を満たす:
 
-- **category 選定（REQ-0163-001）**: 委譲先 command の責務と category 名の意味的距離を評価し、誤誘導しない category を選定する。事務的手続きには `unspecified-high` を推奨し、`writing` は執筆作業のみに限定する
-- **MUST NOT DO 必須（REQ-0163-002）**: 委譲 prompt に MUST NOT DO セクションを必須で記載する。当該 command 責務外のファイル作成、REQ/ SPEC/ src の直接修正、文書監査の実施、capture 境界を超える `.agentdev/` 直接変更等を列挙する
-- **プロンプトテンプレート（REQ-0163-003）**: category 選定基準と MUST NOT DO 記載要件を統合した形式とし、特定 command 名と category 名の意味的距離が大きい場合の注意事項を含む
+- **category 選定**: 委譲先 command の責務と category 名の意味的距離を評価し、誤誘導しない category を選定する。事務的手続きには `unspecified-high` を推奨し、`writing` は執筆作業のみに限定する
+- **MUST NOT DO 必須**: 委譲 prompt に MUST NOT DO セクションを必須で記載する。当該 command 責務外のファイル作成、REQ/ SPEC/ src の直接修正、文書監査の実施、capture 境界を超える `.agentdev/` 直接変更等を列挙する
+- **プロンプトテンプレート**: category 選定基準と MUST NOT DO 記載要件を統合した形式とし、特定 command 名と category 名の意味的距離が大きい場合の注意事項を含む
 
 adapter skill は本要件を宣言的に定義し、case-run からの委譲 prompt 構築時に参照される。詳細な category 選定ガイドラインは `case-auto.md` の「Subagent 委譲プロトコル」節、MUST NOT DO 記載要件は `agentdev-workflow-orchestration/references/capture-boundaries.md` 参照。
 
-## ハーネス制約適応（call_omo_agent schema 制約時）
+## 委譲起動不能時の取扱い
 
-adapter skill は `call_omo_agent` ツール schema が custom agent 型（実行担当サブエージェント型）を許可しないハーネス環境で動作することを前提とする（REQ-0149-012）。
-oh-my-openagent 等のハーネスでは explore/ librarian 型のみが許可され、Epic Wave 並列委譲（最大5件）も機能しない。
+委譲起動不能時（実行担当サブエージェント型が不許可、起動 API 異常等）は、result 契約の `delegation-unavailable` を返し、Issue を `pending` に戻して case-run を停止する（REQ-002-004、SPEC `delegation-contracts.md`「委譲種別」注記）。
 
-### 事前 probe（ハーネス能力検出）
+インラインフォールバック（case-run が自ら実装・検証を実行する逐次パス）は harness 固有の実行制御として配布 SPEC および本 SKILL から除外する。委譲起動手段、能力検出、インライン代替の有無は harness の責務であり、AGENTS.md および `references/<harness>.md` に配置する（REQ-002-002、SPEC `delegation-contracts.md`「委譲種別」注記）。
 
-case-run は委譲起動前にハーネス能力を probe し、実行担当サブエージェント型が起動可能かを判定する。
-
-1. **probe 対象**: `call_omo_agent`（または同等の委譲起動 API）が受け入れる `subagent_type` の一覧
-2. **probe 方法**: harness 固有。AGENTS.md および `references/<harness>.md` 参照（REQ-0162-002）
-3. **判定結果**:
- - 実行担当サブエージェント型が許可される → 通常委譲パス（前節「委譲抽象IF」）
- - 実行担当サブエージェント型が不許可 → 後述「インライン逐次実行」へ移行
-
-### Inability の冒頭明示
-
-probe の結果、委譲が利用不可の場合、case-run はインライン実行へ移行する旨を冒頭で明示する。
-最終的な SSoT は result 契約に従う（completed-pr → PR 本文、blocked/ failed → Issue コメント）。
-
-明示内容は以下の3点である:
-
-- **制約事実**: `call_omo_agent` schema が custom agent 型を許可しないこと
-- **影響範囲**: 1 Issue 単位の委譲不可、Epic Wave 並列委譲不可
-- **採用措置**: インライン逐次実行で adapter protocol に従うこと
-
-### インライン逐次実行時の adapter protocol 遵守
-
-委譲が利用不可の場合、case-run の実行コンテキストが adapter skill を読み込み、インラインで逐次実行する。
-この場合も本スキルの定める adapter protocol に従う:
-
-- worktree root 配下のみ編集（「worktree 隔離の遵守（禁止事項）」）
-- Issue 読込 → context 再確認 → 実装 → 検証 → PR 作成の順序（「実行担当サブエージェントの責務」）
-- test strategy 項目の test-fix ループ（「test strategy 項目の test-fix ループ（REQ）」）
-- result 契約（4状態）の維持（「Result 契約（最小契約）」）。委譲を起動していないため `delegation-unavailable` は返さず、`completed-pr` / `blocked` / `failed` のいずれかを返す
-- Findings / SPEC確定候補の配置規約（「Findings/ Capture 配置」「SPEC確定候補配置」）
-
-### Epic Wave 並列委譲不可時の運用
-
-`#epic` 指定時も本制約により Wave 内の子Issue 並列委譲（最大5件）は機能しない。
-case-run は現在 ready な Wave の子Issue を順次（インライン逐次）処理する。
-Wave 境界（PR マージ）は case-close が担うため本適応の対象外。
-
-### 既存フォールバックパスとの関係
-
-本節は事前 probe による**委譲起動前**の適応である。
-次節「委譲起動失敗、異常終了時事後処理」は**委譲起動後**の異常終了に対する事後処理である。
-両者は対象段階が異なり、重複しない。委譲起動の可否に応じて使い分ける。
+次節「委譲起動失敗、異常終了時事後処理」は**委譲起動後**の異常終了に対する事後処理であり、本節の委譲起動不能（事前判定）とは対象段階が異なる。
 
 ## 委譲起動失敗、異常終了時事後処理
 

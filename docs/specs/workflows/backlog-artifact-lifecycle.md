@@ -25,17 +25,17 @@ updated: 2026-07-20
 | 採用済み成果物（intake） | `intake-promote` | `backlog-review` | RU 化成功時 |
 | 採用済み成果物（learning） | `learning-promote` | `backlog-review` | RU 化成功時 |
 | 採用済み成果物（inspect） | `inspect-promote` | `backlog-review` | RU 化成功時 |
-| RU（Requirement Unit） | `backlog-review` | `req-define`, `req-save`, `case-open` | case-open の Issue作成 + VERIFY 成功時（REQ-0105-012, REQ-0105-015） |
+| RU（Requirement Unit） | `backlog-review` | `req-define`, `req-save`, `case-open` | case-open の Issue作成 + VERIFY 成功時（REQ-008-012, REQ-008-015） |
 | REQ ファイル | `req-save` | `case-open`, `case-run`, `case-close` | なし（永続） |
 | Issue | `case-open` | `case-run`, `case-close` | なし（永続） |
 
 ## RU（Requirement Unit）
 
 - 配置先: `.agentdev/backlog/req-units/RU-*.md`
-- 粒度: N:1（複数 artifact → 1 RU 統合）および 1:N（1 artifact → 複数 RU 分割）を許可（REQ-0105）
-- 採用済み成果物 の単純コピー（パススルー）は禁止（REQ-0105）
+- 粒度: N:1（複数 artifact → 1 RU 統合）および 1:N（1 artifact → 複数 RU 分割）を許可（REQ-008）
+- 採用済み成果物 の単純コピー（パススルー）は禁止（REQ-008）
 - 矛盾検出時: 矛盾する artifact を RU 化せずユーザーに確認。矛盾しない artifact は通常通り RU 化（partial success）
-- `case-open` での Issue作成 + VERIFY 成功後に該当 RU を削除（REQ-0105-012, REQ-0105-015）。`req-save` は RU を削除せず、RU 削除を行う唯一のコマンドは `case-open` である
+- `case-open` での Issue作成 + VERIFY 成功後に該当 RU を削除（REQ-008-012, REQ-008-015）。`req-save` は RU を削除せず、RU 削除を行う唯一のコマンドは `case-open` である
 
 ## 採用済み成果物（Promoted Artifact）
 
@@ -49,7 +49,7 @@ updated: 2026-07-20
 - intake-promote は inbox から直接読み取り、内部でレビュー、HITL確認後に採用済み成果物を `promoted/` へ保存し、元 inbox item を削除する（`archive/promoted/` への移動は行わない）
 - learning-promote は inbox.md + deferred.md から読み取り、内部で normalize/classify/eval、HITL確認後に採用済み成果物を生成
 - inspect-promote は inbox（検出事項）から読み取り、分類（promote/defer/reject）、HITL承認後に採用済み成果物を生成。`--auto` は高確信度の検出事項を HITL 承認なしで自動投入する
-- RU 生成に成功した採用済み成果物は `backlog-review` が削除（REQ-0105）
+- RU 生成に成功した採用済み成果物は `backlog-review` が削除（REQ-008）
 
 ## バックログドラフトプロトコル（Backlog Draft Protocol）
 
@@ -120,7 +120,7 @@ created: "{YYYY-MM-DD}"
 
 ## inspect-promote 自動 promote
 
-`/agentdev/inspect-promote --auto` は、高確信度の検出事項（inspect finding）を HITL 承認を経ずに intake/backlog パイプラインへ流入させる（REQ-0136-016, REQ-0126-010）。
+`/agentdev/inspect-promote --auto` は、高確信度の検出事項（inspect finding）を HITL 承認を経ずに intake/backlog パイプラインへ流入させる（REQ-001-016, REQ-010-010）。
 コマンドは判定表を重複保持しない。
 詳細手順は `docs/specs/commands/inspect-promote.md` 参照。
 
@@ -131,7 +131,7 @@ created: "{YYYY-MM-DD}"
 
 | カテゴリ | 自動 promote 対象 | 自動 promote 対象外（手動分類へ） |
 |---|---|---|
-| SPEC分離基準違反（high-specificity） | 具体的証拠を伴う Step 番号、スキーマフィールド、enum 一覧、テストデータ詳細、作業履歴など、移行先が SPEC/コマンドリファレンス に一意に定まるもの | 安定契約例外（REQ-0101-069）、否定文脈、判定表、内部パラメータなど意味解釈を要するもの |
+| SPEC分離基準違反（high-specificity） | 具体的証拠を伴う Step 番号、スキーマフィールド、enum 一覧、テストデータ詳細、作業履歴など、移行先が SPEC/コマンドリファレンス に一意に定まるもの | 安定契約例外（REQ-001-069）、否定文脈、判定表、内部パラメータなど意味解釈を要するもの |
 | 構造的即時是正 | リンク切れ、旧名前空間（namespace）残存など、正解が一意で破壊的でない修復 | - |
 | 命名、分類の意味判断 | - | SPLIT/MERGE/MOVE/RETIRE/DRIFT 判断、scope 決定、優先度付け（全件手動） |
 | ADR 要否判断 | - | ADR閾値判定を含む finding（全件手動） |
@@ -192,7 +192,7 @@ req-save と case-close で共通利用される REQ ファイル整合性検査
 
 ## DOC-MAP 影響規則
 
-REQ CREATE / APPEND / UPDATE 時に `docs/DOC-MAP.md` への影響を確認する（REQ-0101）。
+REQ CREATE / APPEND / UPDATE 時に `docs/DOC-MAP.md` への影響を確認する（REQ-001）。
 
 ### 影響確認フロー
 
@@ -215,7 +215,7 @@ REQ CREATE / APPEND / UPDATE 時に `docs/DOC-MAP.md` への影響を確認す�
 
 ## REQ 再構成検出
 
-REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成intakeとして保存する（REQ-0109）。
+REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成intakeとして保存する（REQ-010）。
 
 ### 検知カテゴリ
 
@@ -235,7 +235,7 @@ REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成in
 
 ## artifact_actions ベース工程分岐
 
-case-auto / case-open / req-save / spec-save の工程分岐は `work_type` の固定分岐ではなく、req_draft の `artifact_actions` 存在に基づく動的判定とする（ADR-0123, REQ-0136-014）。
+case-auto / case-open / req-save / spec-save の工程分岐は `work_type` の固定分岐ではなく、req_draft の `artifact_actions` 存在に基づく動的判定とする（v2:ADR-0123, REQ-001-014）。
 
 - `req-save` は `artifact_actions` に `artifact: req` または `artifact: adr` の entry が含まれる場合に実行する（`work_type` に依存しない）
 - `spec-save` は `artifact_actions` に `artifact: spec` の entry が含まれる場合に実行する（`work_type` に依存しない）
@@ -262,6 +262,6 @@ one-time 成果物（監査台帳、照合表、一時分析ファイル等）�
 - [capture-boundaries.md](capture-boundaries.md)（キャプチャ境界）
 - 各 command SPEC（`docs/specs/commands/`）
 - `agentdev-backlog-integration` skill（採用済み成果物の統合、RU 生成）
-- REQ-0105（RU lifecycle）
-- REQ-0109（REQ 再構成 intake）
-- REQ-0138（構造化 req_draft 契約）
+- REQ-008（RU lifecycle）
+- REQ-010（REQ 再構成 intake）
+- REQ-008（構造化 req_draft 契約）

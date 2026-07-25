@@ -1,5 +1,5 @@
 /**
- * check_changed_docs.ts — Targeted docs guard (REQ-0158-003).
+ * check_changed_docs.ts — Targeted docs guard (v2:REQ-0158-003).
  *
  * 変更ファイル限定の整合性検査。req-save / spec-save / case-run / case-close / docs-check の
  * 各 workflow で実行する。全体監査 (`check_integrity.ts`) に処理を密結合させず、
@@ -18,10 +18,10 @@
  *   --base-ref <git-ref>          git diff の base ref（worktree 環境向け。--files と排他）
  *   --json                        JSON 出力
  *   --fail-level strict|warning   失敗扱いとする最低レベル（デフォルト strict）
- *   --root <path>                 明示的リポジトリルート（REQ-0145-014: worktree/CI 対応）
+ *   --root <path>                 明示的リポジトリルート（v2:REQ-0145-014: worktree/CI 対応）
  *
  * 責務境界は全体監査と不変。実行タイミングと対象を保存工程内の変更ファイルへ狭めるだけ。
- * 本機構は REQ-0108-153 delta guard の具体化である。
+ * 本機構は v2:REQ-0108-153 delta guard の具体化である。
  */
 
 import {
@@ -42,13 +42,13 @@ const fs = require("fs") as typeof import("fs");
 
 const SCRIPT_NAME = "check_changed_docs.ts";
 const DESCRIPTION =
-  "Targeted docs integrity guard for save workflows (REQ-0158-003)";
+  "Targeted docs integrity guard for save workflows (v2:REQ-0158-003)";
 const USAGE =
   "bun run check_changed_docs.ts --workflow <name> [--files <path...> (space-separated recommended; comma-separated also accepted) | --base-ref <git-ref>] [--json] [--fail-level strict|warning] [--root <path>]";
 const REF_USAGE_NOTES =
   "--files は main 環境（マージ後、case-close 等）で PR 変更ファイルを直接指定するときに使用。" +
   "--base-ref は worktree 環境（マージ前、case-run 等）で git diff により変更ファイル検出するときに使用。";
-// REQ-0158-001: --files の区切り形式（space 区切り推奨、comma 区切りも受入）。後方互換性を担保。
+// v2:REQ-0158-001: --files の区切り形式（space 区切り推奨、comma 区切りも受入）。後方互換性を担保。
 const FILES_DELIMITER_NOTES =
   "--files の区切り形式: space 区切り（推奨、例: --files a.md b.md c.md）、または comma 区切り（例: --files a.md,b.md,c.md）。両形式の混在も可。";
 
@@ -75,7 +75,7 @@ interface TargetedDocsReport {
   requirements_readme_update_required: boolean;
   full_docs_check_recommended: boolean;
   extensions_check_required: boolean;
-  // REQ-0158「check_changed_docs.ts report フィールド」節。
+  // v2:REQ-0158「check_changed_docs.ts report フィールド」節。
   // 検査入力の必要性（boolean）。当該 workflow profile が文書検査入力を
   // 必要とするかを示す。downstream（case-close 等）が silent pass 検出に使用。
   // 現行 5 workflow はすべて文書検査ルールを持つため true。
@@ -91,7 +91,7 @@ interface ParsedArgs {
   failLevel: FailLevel;
   declaredFiles: string[];
   help: boolean;
-  root?: string; // REQ-0145-014
+  root?: string; // v2:REQ-0145-014
 }
 
 function parseArgs(args: string[]): ParsedArgs {
@@ -129,7 +129,7 @@ function parseArgs(args: string[]): ParsedArgs {
     } else if (a === "--files") {
       i++;
       while (i < args.length && !args[i].startsWith("--")) {
-        // REQ-0158-001: comma 区切り（例: --files a.md,b.md）も受入。各 token を split して個別 file として積む。
+        // v2:REQ-0158-001: comma 区切り（例: --files a.md,b.md）も受入。各 token を split して個別 file として積む。
         for (const token of args[i].split(",")) {
           const trimmed = token.trim();
           if (trimmed.length > 0) parsed.files.push(trimmed);
@@ -150,7 +150,7 @@ function parseArgs(args: string[]): ParsedArgs {
       }
       parsed.failLevel = v as FailLevel;
       i++;
-    } else if (a === "--root") { // REQ-0145-014
+    } else if (a === "--root") { // v2:REQ-0145-014
       const v = args[i + 1];
       if (!v) throw new Error("--root requires a value");
       parsed.root = v;
@@ -182,7 +182,7 @@ function printHelp(): void {
   console.error(`  ${REF_USAGE_NOTES}`);
   console.error("  --json              emit JSON report (default: text)");
   console.error("  --fail-level <lvl>  strict (default) | warning");
-  console.error("  --root <path>        explicit repository root (REQ-0145-014: worktree/CI support)");
+  console.error("  --root <path>        explicit repository root (v2:REQ-0145-014: worktree/CI support)");
   console.error("  --declared-files <path...>  declared doc update targets in Issue/PR (optional)");
 }
 
@@ -421,6 +421,7 @@ function checkObsoleteSpecPath(
     if (/docs\/specs\/integrity\/rules\/IR-057-/.test(rel)) continue;
     if (/\.test\.ts$/.test(rel)) continue;
     if (/repo-agentdev-integrity\/scripts\/check_integrity\.ts$/.test(rel)) continue;
+    // v2: stale — file deleted in Stage 4
     if (/docs\/requirements\/REQ-0158\.md$/.test(rel)) continue;
     if (/docs\/adr\/ADR-0(123|110)\.md$/.test(rel)) continue;
     if (/docs\/requirements\/REQ-010[12]\.md$/.test(rel)) continue;
@@ -458,7 +459,9 @@ function checkLegacyVocab(
     if (/^docs\/requirements\/retired\//.test(rel)) continue;
     if (/^docs\/adr\/retired\//.test(rel)) continue;
     // legacy vocabulary を定義・検出する正当な文書は除外
+    // v2: stale — file deleted in Stage 4
     if (/docs\/requirements\/REQ-0158\.md$/.test(rel)) continue;
+    // v2: stale — file deleted in Stage 4
     if (/docs\/requirements\/REQ-0141\.md$/.test(rel)) continue;
     if (/docs\/specs\/local\/local-generation\.md$/.test(rel)) continue;
     if (/docs\/specs\/integrity\/integrity-rule-catalog\.md$/.test(rel)) continue;
@@ -484,8 +487,8 @@ function checkLegacyVocab(
           severity: "strict",
           file: rel,
           line: i + 1,
-          message: `Legacy local generation vocabulary '${term}' detected (link mode unified, ADR-0131)`,
-          expected: "remove legacy vocabulary; use link mode terminology (ADR-0131)",
+          message: `Legacy local generation vocabulary '${term}' detected (link mode unified, v2:ADR-0131)`,
+          expected: "remove legacy vocabulary; use link mode terminology (v2:ADR-0131)",
         });
       }
     }
@@ -750,7 +753,7 @@ function checkSpecFrontmatter(root: string, files: string[]): Failure[] {
     if (!status) continue;
     if (status === "draft" || status === "accepted") continue;
     if (status === "superseded") {
-      // REQ-0101-076: superseded は superseded_by 必須。保持SPECは通常内容検査対象外。
+      // v2:REQ-0101-076: superseded は superseded_by 必須。保持SPECは通常内容検査対象外。
       if (!fm["superseded_by"]) {
         failures.push({
           rule_id: "SPEC-STATUS",
@@ -758,7 +761,7 @@ function checkSpecFrontmatter(root: string, files: string[]): Failure[] {
           file: path.relative(root, f).replace(/\\/g, "/"),
           line: 3,
           message: `SPEC status 'superseded' requires 'superseded_by' frontmatter`,
-          expected: "superseded_by: <後継SPEC id> (ADR-0123, REQ-0101-076)",
+          expected: "superseded_by: <後継SPEC id> (v2:ADR-0123, v2:REQ-0101-076)",
         });
       }
       continue;
@@ -769,7 +772,7 @@ function checkSpecFrontmatter(root: string, files: string[]): Failure[] {
       file: path.relative(root, f).replace(/\\/g, "/"),
       line: 3,
       message: `SPEC status '${status}' is not 'draft', 'accepted', or 'superseded'`,
-      expected: "draft, accepted, or superseded (ADR-0123, REQ-0101-076)",
+      expected: "draft, accepted, or superseded (v2:ADR-0123, v2:REQ-0101-076)",
     });
   }
   return failures;
@@ -818,7 +821,7 @@ function runWorkflowChecks(
 } {
   const failures: Failure[] = [];
   const warnings: string[] = [];
-  // files_checked 空時の分岐判定は main() 側で行う（REQ-0158 Phase 3）。
+  // files_checked 空時の分岐判定は main() 側で行う（v2:REQ-0158 Phase 3）。
   // check_changed_docs.ts は対象選定の十分性を判定せず、対象が空の場合は
   // 「対象ファイルが検出されなかった」旨のメッセージを main() で生成する。
   const allTargets = [...changedFiles, ...coupledFiles];
@@ -1035,7 +1038,7 @@ function main(): void {
     declared_files_check: runResult.declaredFilesCheck,
   };
 
-  // Phase 3（REQ-0158）: 対象確定の命令側移行。
+  // Phase 3（v2:REQ-0158）: 対象確定の命令側移行。
   // --files 指定で files_checked が空の場合は FAILURE、--base-ref 指定で空の場合は WARNING。
   // check_changed_docs.ts は対象選定の十分性を判定せず、対象ファイル未検出のみを報告する。
   if (report.files_checked.length === 0) {

@@ -54,6 +54,6 @@ OpenCode コマンド定義（`.opencode/commands/`）の品質基準とベス�
 
 - [agentdev-skill-authoring.md](agentdev-skill-authoring.md)
 - [agentdev-command-creator.md](agentdev-command-creator.md)
-- REQ-0103（Artifact責任分界）
-- REQ-0119（コマンド、スキル、サブエージェント責務分界）
+- REQ-002（Artifact責任分界）
+- REQ-003（コマンド、スキル、サブエージェント責務分界）
 

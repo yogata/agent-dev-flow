@@ -21,13 +21,13 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - USE FOR / DO NOT USE FOR 照合
 - Skill 分割候補検出
 - Command 固有手順の Skill 流入検出
-- gh 直接記述の委譲漏れ検出（REQ-0149）。スキャン対象、除外対象は [agentdev-gh-cli SPEC](agentdev-gh-cli.md)「gh 直接記述の検出スコープ」参照
+- gh 直接記述の委譲漏れ検出（REQ-011）。スキャン対象、除外対象は [agentdev-gh-cli SPEC](agentdev-gh-cli.md)「gh 直接記述の検出スコープ」参照
 - 出力形式生成（Finding / Classification / Route）
 
 ## 参照する references
 
-- `references/execution-subject-misclassification.md`（実行主体分類誤認の判定基準（REQ-0125-010））
-- `references/spec-operation-contract-consistency.md`（SPEC 操作契約テーブル ↔ references/contracts.md フィールド一致性の判定基準、対象 SPEC 範囲、フィールド対応規則（REQ-0125-011 / REQ-0125-004 準拠））
+- `references/execution-subject-misclassification.md`（実行主体分類誤認の判定基準（REQ-010-010））
+- `references/spec-operation-contract-consistency.md`（SPEC 操作契約テーブル ↔ references/contracts.md フィールド一致性の判定基準、対象 SPEC 範囲、フィールド対応規則（REQ-010-011 / REQ-010-004 準拠））
 
 ## 現在の動作
 
@@ -46,7 +46,7 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - 参照の整合性（Command → Skill 参照妥当性）
 - 粒度の適切性（Skill 分割候補検出）
 - 診断分類の正確性
-- gh 直接記述の委譲漏れ（REQ-0149）。command/skill 配下で `agentdev-gh-cli` へ委譲すべき gh 直接記述が残留していないか。許容ファイル（standard-procedures.md）の除外が正しく機能しているか
+- gh 直接記述の委譲漏れ（REQ-011）。command/skill 配下で `agentdev-gh-cli` へ委譲すべき gh 直接記述が残留していないか。許容ファイル（standard-procedures.md）の除外が正しく機能しているか
 
 ## See Also
 
@@ -54,6 +54,6 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - [agentdev-skill-authoring.md](agentdev-skill-authoring.md)
 - [agentdev-command-authoring.md](agentdev-command-authoring.md)
 - [agentdev-gh-cli.md](agentdev-gh-cli.md)（gh 直接記述の検出スコープ）
-- REQ-0125（inspect-skills / Command/Skill 参照妥当性検出）
-- REQ-0149（`agentdev-gh-cli` 手続き委譲基盤）
+- REQ-010（inspect-skills / Command/Skill 参照妥当性検出）
+- REQ-011（`agentdev-gh-cli` 手続き委譲基盤）
 

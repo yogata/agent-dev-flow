@@ -10,7 +10,7 @@
  *   エラー: 非ゼロ終了コード + stderr メッセージ
  */
 
-import { listMarkdownFiles, joinPath, readFileContent, pad4, adrNumberFromFilename, safeMax } from "../lib/fs-helpers.ts";
+import { listMarkdownFiles, joinPath, readFileContent, pad3, adrNumberFromFilename, safeMax } from "../lib/fs-helpers.ts";
 import { extractAdrNumber } from "../lib/frontmatter.ts";
 import { emitJson, emitError } from "../lib/result.ts";
 
@@ -22,7 +22,7 @@ export function nextAdrNumber(existingNumbers: number[]): number {
 
 /** 番号から `ADR-NNNN` 形式の ID を生成する（純粋関数）。 */
 export function formatAdrId(n: number): string {
-  return `ADR-${pad4(n)}`;
+  return `ADR-${pad3(n)}`;
 }
 
 async function main(): Promise<void> {

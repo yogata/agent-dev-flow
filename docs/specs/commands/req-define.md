@@ -24,7 +24,7 @@ updated: 2026-07-24
 
 ## 出力
 
-- `.agentdev/drafts/req-draft-{topic-slug}.md`（全 work_type 共通、構造化 `draft-data` 形式: REQ-0138, ADR-0124）
+- `.agentdev/drafts/req-draft-{topic-slug}.md`（全 work_type 共通、構造化 `draft-data` 形式: REQ-008, ADR-003）
 
 ## 副作用
 
@@ -43,12 +43,12 @@ updated: 2026-07-24
  - Step 4-2: SPLIT 予兆計測（既存REQの健全性メトリクス計測）
 - Step 5: 要件展開（`agentdev-req-analysis` 分析観点）
  - Step 5-1: 変更影響候補抽出
-  - RU 由来キーワード抽出 + glob/grep 前処理によるサブエージェント調査委譲スコープの絞り込み（REQ-0102-072）。絞り込みはサブエージェント調査委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-0102-002）の完全性は維持する
- - Step 5-2: 分類ゲート（REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/SPEC 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/specs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（REQ-0155-008）」に定める
+  - RU 由来キーワード抽出 + glob/grep 前処理によるサブエージェント調査委譲スコープの絞り込み（REQ-004-072）。絞り込みはサブエージェント調査委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-004-002）の完全性は維持する
+ - Step 5-2: 分類ゲート（v2:REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/SPEC 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/specs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（v2:REQ-0155-008）」に定める
  - Step 5-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
   - Step 5-4: ADR要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
-  - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-0102-073）。ラベル構造は soft-contract（ADR-0124）とし、分類権限は親が保持する
- - Step 5-5: 実行主体分類表（REQ-0146-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
+  - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-073）。ラベル構造は soft-contract（ADR-003）とし、分類権限は親が保持する
+ - Step 5-5: 実行主体分類表（REQ-003-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
  - Step 5-6: Test strategy 定義（要件展開内）
  - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
  - on_failure（不合格時の処置）を持たない検証項目は test strategy に含めない
@@ -76,14 +76,14 @@ updated: 2026-07-24
  - Step 11-1〜11-6: 複数RU受付、統合/分離判定、出力生成、Epic規模検出、Wave候補記録、OU 構造検証
 - Step 12: 完了報告（work_type 別テンプレート選択）
 
-req-define は command 定義（src/opencode/commands/agentdev/req-define.md）と Step 番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって対応付ける（REQ-0143-005）。
-詳細は `command-file-format.md`「command SPEC と command 定義の対応付け（REQ-0143-005）」参照。
+req-define は command 定義（src/opencode/commands/agentdev/req-define.md）と Step 番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって対応付ける（v2:REQ-0143-005）。
+詳細は `command-file-format.md`「command SPEC と command 定義の対応付け（v2:REQ-0143-005）」参照。
 
-### tentative_classification 最終確定のバリデーション（REQ-0155-008）
+### tentative_classification 最終確定のバリデーション（v2:REQ-0155-008）
 
 Step 5-2 が backlog-review 付与の暫定分類（`tentative_classification`）を最終分類として確定（上書き）する際、以下を検証すること:
 
-1. 暫定分類が REQ-0155-003 の7値のいずれかであること。7値以外の場合、確定を停止し理由を提示すること
+1. 暫定分類が v2:REQ-0155-003 の7値のいずれかであること。7値以外の場合、確定を停止し理由を提示すること
 2. フィールドが欠落している場合、暫定分類未付与として確定を停止し、backlog-review への差し戻しを提示すること
 3. 最終分類への上書き値も7値のいずれかであること
 
@@ -91,7 +91,7 @@ Step 5-2 が backlog-review 付与の暫定分類（`tentative_classification`�
 
 ## REQ影響判定とSPEC正規所有者確定
 
-req-define は backlog-review の暫定分類（`tentative_classification`）を暫定入力とし、最終分類を自身で確定する（REQ-0102-087、ADR-0139）。
+req-define は backlog-review の暫定分類（`tentative_classification`）を暫定入力とし、最終分類を自身で確定する（REQ-004-087、REQ-001）。
 
 ### 最終分類確定ステップで判定する項目
 
@@ -103,27 +103,27 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 | 既存REQ が要求を既に保持しているか | 同一関心が既存REQ に存在するか |
 | 利用者から見える外部契約が変わるか | 外部契約変更（change_nature: `external_contract_change`）に該当するか |
 | REQ の作成・更新が必要か | 上記3項目から REQ 作成・更新要否を確定 |
-| SPEC の論理区分 | REQ-0155-009 の5区分（挙動SPEC、カタログSPEC、横断契約SPEC、パラメータSPEC、実装詳細SPEC）のいずれか |
-| 正規所有者 | 対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー（REQ-0119-038） |
+| SPEC の論理区分 | v2:REQ-0155-009 の5区分（挙動SPEC、カタログSPEC、横断契約SPEC、パラメータSPEC、実装詳細SPEC）のいずれか |
+| 正規所有者 | 対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー（REQ-003-038） |
 | 正規追記先 | 既存 SPEC のどの領域へ追記するか（target_area、target_spec） |
 
 ### SPEC action への分類根拠出力
 
-最終分類確定ステップで `artifact: spec` の SPEC action 各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する。出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`spec_logical_division`、`canonical_owner`）と一致し、後続の spec-save が SPEC frontmatter または冒頭宣言節へ宣言を付与するための入力となる。分類値が確定できない場合は `unknown` とし、soft-contract（ADR-0124）に従い spec-save へ警告付きで引き継ぐ。
+最終分類確定ステップで `artifact: spec` の SPEC action 各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する。出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`spec_logical_division`、`canonical_owner`）と一致し、後続の spec-save が SPEC frontmatter または冒頭宣言節へ宣言を付与するための入力となる。分類値が確定できない場合は `unknown` とし、soft-contract（ADR-003）に従い spec-save へ警告付きで引き継ぐ。
 
 ### REQ 影響なし時の取扱い
 
-REQ 影響なしと確定した変更からは `artifact_actions` の `artifact: req` エントリを生成しない（REQ-0102-088）。代わりに `artifact: spec` エントリのみを生成し、SPEC への配置のみを行う。SPEC action には前項「SPEC action への分類根拠出力」を適用する。
+REQ 影響なしと確定した変更からは `artifact_actions` の `artifact: req` エントリを生成しない（REQ-004-088）。代わりに `artifact: spec` エントリのみを生成し、SPEC への配置のみを行う。SPEC action には前項「SPEC action への分類根拠出力」を適用する。
 
 ### 分類根拠の引き継ぎ
 
-req-define は RU から引き継いだ分類根拠（`artifact-contracts.md`「分類根拠伝播契約」参照）を暫定入力とし、最終分類を確定した上で draft-data へ反映する。分類根拠の soft-contract 運用（欠落時 unknown 既定値、警告）は ADR-0124 に従う。
+req-define は RU から引き継いだ分類根拠（`artifact-contracts.md`「分類根拠伝播契約」参照）を暫定入力とし、最終分類を確定した上で draft-data へ反映する。分類根拠の soft-contract 運用（欠落時 unknown 既定値、警告）は ADR-003 に従う。
 
 ### tentative_classification との関係
 
-backlog-review が付与する `tentative_classification`（REQ-0155-003 の7値）は暫定値であり、req-define が最終分類を上書きする。最終分類確定時のバリデーション（7値チェック、フィールド欠落時の停止、上書き値の7値チェック）は前述「tentative_classification 最終確定のバリデーション」に従う。
+backlog-review が付与する `tentative_classification`（v2:REQ-0155-003 の7値）は暫定値であり、req-define が最終分類を上書きする。最終分類確定時のバリデーション（7値チェック、フィールド欠落時の停止、上書き値の7値チェック）は前述「tentative_classification 最終確定のバリデーション」に従う。
 
-### Step 3 構造的分析フレーム先行手順（REQ-0102-083, REQ-0102-084, REQ-0102-085）
+### Step 3 構造的分析フレーム先行手順（REQ-004-083, REQ-004-084, REQ-004-085）
 
 Step 3（壁打ち対話）の開始時に、入力（RU、セッションコンテキスト、明示入力ファイル）の構造を入力データの性質に応じた分析フレームで先行して整理し、個別論点の深掘り前に全体構造をユーザーに提示する。
 
@@ -190,7 +190,7 @@ test_strategy:
 
 ## draft-data artifact_actions フィールド形式
 
-artifact_actions の各 entry が出力する `target_area` と `content` の扱いは operation 別に以下を規定する（REQ-0102-078, REQ-0102-079）。
+artifact_actions の各 entry が出力する `target_area` と `content` の扱いは operation 別に以下を規定する（REQ-004-078, REQ-004-079）。
 
 | operation | target_area | content |
 |-----------|-------------|---------|
@@ -214,7 +214,7 @@ req-define は以下の入力項目について disposition を記録する:
 | 既存要件で充足済みの入力 | 既存 REQ、既存 SPEC、同意済み artifact_actions で既に満たされている項目（disposition: `covered`） |
 | 一部のみ採用した入力 | 項目の一部を採用し、残部を採用しなかったもの（disposition: `partially_covered`） |
 
-`review_dispositions` は optional な soft-contract であり（ADR-0124）、欠落時に後続工程が draft を拒否しない。covered 項目だけで構成される Issue や PR を作成しない方針を維持する。
+`review_dispositions` は optional な soft-contract であり（ADR-003）、欠落時に後続工程が draft を拒否しない。covered 項目だけで構成される Issue や PR を作成しない方針を維持する。
 
 ### 未決事項の取扱い
 
@@ -257,10 +257,10 @@ review_dispositions:
     disposition: covered
     reason_code: already_satisfied
     reason: |
-      REQ-0103 が既に当該要件を保持しているため採用を省略した。
+      REQ-002 が既に当該要件を保持しているため採用を省略した。
     evidence:
-      path: docs/requirements/REQ-0103.md
-      section: REQ-0103-045
+      path: docs/requirements/REQ-002.md
+      section: REQ-002-045
       checked_at_commit: null  # req-define 生成時は null。case-open が確認 commit SHA を記録する
     related_removed_items: []
   - id: RD-002
@@ -283,7 +283,7 @@ review_dispositions:
 
 ### 後方互換性
 
-`review_dispositions` は optional な soft-contract である。本フィールドを持たない旧ドラフトを req-save、case-open は入力として拒否しない（ADR-0124 準拠）。
+`review_dispositions` は optional な soft-contract である。本フィールドを持たない旧ドラフトを req-save、case-open は入力として拒否しない（ADR-003 準拠）。
 
 ## 参照する横断 SPEC
 
@@ -306,9 +306,9 @@ review_dispositions:
 - `git` コマンド実行（G08）
 - Issue 階層決定（G13、case-open 責務）
 - `execution_groups` セクション出力（G14）
-- SPEC 分離基準（REQ-0101-068）該当要件行の REQ 残留（G15、`artifact_actions` へ分離）
-- ADR判断における未確認事項の要件本文混入（G17、REQ-0139-002/004）
-- アーキテクチャ助言サブエージェントによるファイル編集（G18、REQ-0139-003）
+- SPEC 分離基準（REQ-001-068）該当要件行の REQ 残留（G15、`artifact_actions` へ分離）
+- ADR判断における未確認事項の要件本文混入（G17、REQ-003-002/004）
+- アーキテクチャ助言サブエージェントによるファイル編集（G18、REQ-003-003）
 
 ## 検証観点
 
@@ -328,8 +328,8 @@ review_dispositions:
 - `agentdev-adr-guidelines` skill（ADR 判断基準）
 - `agentdev-architecture-advisory` skill（アーキテクチャ助言サブエージェント連携）
 - `agentdev-workflow-lifecycle` skill（work_type、scale 判定）
-- REQ-0102（要件定義、保存）
-- REQ-0138（構造化 req_draft 契約）
-- REQ-0139（外部エージェント統合契約）
-- ADR-0124（構造化 draft-data 形式）
+- REQ-004（要件定義、保存）
+- REQ-008（構造化 req_draft 契約）
+- REQ-003（外部エージェント統合契約）
+- ADR-003（構造化 draft-data 形式）
 

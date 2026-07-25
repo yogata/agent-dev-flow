@@ -32,7 +32,7 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 ## 現在の動作
 
 - `promoted/` 配下の artifact を読み込み、分析、統合、矛盾検出を経て RU を生成
-- 採用済み成果物の単純コピー（パススルー）は禁止（REQ-0105）
+- 採用済み成果物の単純コピー（パススルー）は禁止（REQ-008）
 - 矛盾検出時の自動解決は行わない（ユーザー確認）
 - depends_on に RU-ID のみ許容
 
@@ -55,6 +55,6 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 - [agentdev-learning-pipeline.md](agentdev-learning-pipeline.md)
 - [commands/backlog-review.md](../commands/backlog-review.md)
 - [../workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)
-- REQ-0105（RU lifecycle）
-- REQ-0129（Backlog-review）
+- REQ-008（RU lifecycle）
+- REQ-010（Backlog-review）
 

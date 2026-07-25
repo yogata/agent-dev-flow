@@ -2,7 +2,7 @@
 title: case-close SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-07-25
 ---
 
 # case-close SPEC
@@ -13,12 +13,12 @@ PR をマージし、Case に記録を追記し、クローズ後に worktree �
 レビュー完了フェーズ。
 Epic Issue番号入力時は現在 Wave の PR作成済み子Issue を一括マージ、クローズし、Epic status table を更新する（Epic Wave クローズ）。
 
-**完了条件チェックボックスの評価、更新は case-close の専任責務**（ADR-0114）。
+**完了条件チェックボックスの評価、更新は case-close の専任責務**（REQ-011）。
 case-run / 実行担当サブエージェント / 外部実行バックエンドは完了条件チェックボックスを更新しない。
 
-**Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する**（ADR-0125 単一書き手制約）。
+**Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する**（v2:ADR-0125 単一書き手制約）。
 
-**責務境界（REQ-0151-007）**: 完了処理 + マージ時コンフリクトの機械的解消（rebase のみ、解消不能時は即エスカレーション、実装変更は行わない）。
+**責務境界（REQ-003-007）**: 完了処理 + マージ時コンフリクトの機械的解消（rebase のみ、解消不能時は即エスカレーション、実装変更は行わない）。
 コンフリクト解消の実装変更、オーケストレーション級判断（マージ順序変更、blocked 単位の隔離）は case-auto の責務（`docs/specs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）。
 
 ## 入力
@@ -33,11 +33,25 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 
 ## 副作用
 
-- GitHub API: `gh pr merge --squash`（リトライ最大5回、フォールバック手順あり）、`gh issue close --reason completed`、Issue 本文更新（`--body-file` + VERIFY）、`gh pr view --json mergeable,mergeStateStatus`（squash merge 前の mergeable UNKNOWN ポーリング、REQ-0131-028、最大60秒・10秒間隔）
-- git 操作: `git pull --ff-only`、`git fetch origin main:main`（非 main ブランチ占有時の代替同期、REQ-0131-029）、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング、REQ-0137-002/005）
+- GitHub API: `gh pr merge --squash`（リトライ最大5回、フォールバック手順あり）、`gh issue close --reason completed`、Issue 本文更新（`--body-file` + VERIFY）、`gh pr view --json mergeable,mergeStateStatus`（squash merge 前の mergeable UNKNOWN ポーリング、REQ-006-028、最大60秒・10秒間隔）
+- git 操作: `git pull --ff-only`、`git fetch origin main:main`（非 main ブランチ占有時の代替同期、REQ-006-029）、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング、v2:REQ-0137-002/005）
 - worktree / ブランチ削除: `agentdev-git-worktree` 手順に従う
 - capture 回収: PR 本文から intake / learning を分離回収し `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` へ保存
 - SPEC status 昇格: `docs/specs/**` の `status: draft` → `accepted` 昇格（Step 3-2）
+
+## git 操作と worktree クリーンアップ
+
+共有作業ツリーでのステージ、コミット、削除は、当該コマンドが所有する明示パスだけを対象とする。
+
+`git add -A`、`git add .`、`git commit -a`、`git checkout .`、`git reset --hard`、`git stash` のように他セッションの変更を巻き込む操作は使用しない。
+
+変更と削除は同じ処理単位で明示パスによりステージしてコミットし、未ステージのまま残さない。
+
+worktree を削除する前に、未追跡ファイルだけを対象とする cleanup を実行し、追跡対象ファイルを変更しない。
+
+削除時にファイルハンドルなどの一時的な失敗が起きた場合は、OS に依存しない回数制限付きの再試行を行う。
+
+再試行後も削除できない場合は、必要な `prune` と追跡対象ファイルの復元を実施して状態を確認し、削除失敗を報告して停止する。
 
 ## 現在の動作
 
@@ -46,20 +60,20 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 - Step 1: Issue番号解決（ユーザー入力またはセッション内会話から取得）。`agentdev-gh-cli` 安全読み取り手順で本文取得
  - Epic Issue 判定（ステータス追跡テーブル存在確認）。存在時は Epic Wave クローズ（Step E1〜E6）へ分岐
 
-### Epic Wave クローズ（REQ-0131-021/022/023/027）
+### Epic Wave クローズ（REQ-006-021/022/023/027）
 
 - Step E1: Epic Issue 本文読込（ステータス追跡テーブル（新4列/旧4列形式）を解析）
 - Step E2: 現在 Wave 特定（`running` ステータスの子Issue が属する Wave）。`running` がない場合は Wave 番号昇順で最も若い未完了 Wave
 - Step E3: PR作成済み子Issue 特定（現在 Wave 内の `running` 子Issue）
-- Step E4: 各子Issue のクローズ処理を準並列化する（REQ-0131-027）
+- Step E4: 各子Issue のクローズ処理を準並列化する（REQ-006-027）
  - 並列実行: PR情報取得、PR変更ファイル取得、Issue本文読取、PR本文読取、完了条件チェック事前評価、capture候補抽出、SPEC確定候補確認、worktree/branch削除前チェック
  - 直列集約: squash merge、main pull&hash確認、Epic本文ステータス追跡テーブル更新、.agentdev永続化commit&push、branch/worktree最終削除
- - rebase による機械的コンフリクト解消は停止条件外（REQ-0151-006 Level1）。解消不能時は case-auto へエスカレーション（REQ-0131-025、REQ-0151-002 Level2/3）
-- Step E5: Epic status table 更新（単一書き手: case-close、ADR-0125）（`running` → `completed ([PR#N](URL))` に更新）
+ - rebase による機械的コンフリクト解消は停止条件外（REQ-003-006 Level1）。解消不能時は case-auto へエスカレーション（REQ-006-025、REQ-003-002 Level2/3）
+- Step E5: Epic status table 更新（単一書き手: case-close、v2:ADR-0125）（`running` → `completed ([PR#N](URL))` に更新）
 
 ### Step E5b: Epic Issue 完了条件チェックボックス最終評価・更新
 
-Step E5（Epic status table 更新）の後、Step E6（最終 Wave 判定）の前に実施する。Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（ADR-0114 完了条件チェックボックス評価の case-close 専任責務、G08 Epic Wave 経路への明示適用）。
+Step E5（Epic status table 更新）の後、Step E6（最終 Wave 判定）の前に実施する。Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（REQ-011 完了条件チェックボックス評価の case-close 専任責務、G08 Epic Wave 経路への明示適用）。
 
 #### 評価対象スコープ（QG-4 観点8）
 
@@ -91,18 +105,18 @@ Step E5（Epic status table 更新）の後、Step E6（最終 Wave 判定）の
 - Step 2: 前提確認（達成判定、完了ゲート（QG-4）に従い完了条件チェックボックスを最終評価、更新）。`[x]` 反映事後確認（再読込 VERIFY、最大2回）。未達項目残存時は構造化エラー停止
 - Step 3: docs/ 検証（機能追加固有検証（REQ作成、インデックス、spec更新、ADR）、関連ドキュメント整合性確認、DOC-MAP 整合性）
  - Step 3-1: close 時 SPEC / commands / skills 更新漏れの局所確認
- - Step 3-2: SPEC 確定フロー（ADR-0123 Decision #4, REQ-0136-015）（PR 本文の `## SPEC確定候補` セクション読取、確定判断（(a) 昇格 / (b) spec-save 再起動提案 / (c) 見送り））
- - Step 3-3: AUTOGEN block 索引再生成差分検出（project extension checks 経由）。Step 3（docs/ 検証）の後、generate_indexes.ts --dry-run を実行し AUTOGEN block の再生成差分を検出する。本検証は case-close command 本体（src/opencode/commands/agentdev/case-close.md）の手順を直接編集せず、project extension（.agentdev/extensions/commands/case-close.yaml）の checks セクション経由で導入する（project-extensions SPEC、ADR-0135 準拠）。case-close は dry-run/差分検査で停止し、直接編集・commit しない。差分がある場合は case-run へ差戻し、再生成（実 commit）は case-run が行う。複数 PR 跨ぎでの AUTOGEN block 再生成漏れを防止する。Epic Wave クローズ経路では Step E5b（完了条件チェックボックス最終評価）の前段に同等の dry-run/diff による索引健全性検証を適用する（Epic Issue クローズ時の索引検証は case_open_hints 参照）
+ - Step 3-2: SPEC 確定フロー（v2:ADR-0123 Decision #4, REQ-001-015）（PR 本文の `## SPEC確定候補` セクション読取、確定判断（(a) 昇格 / (b) spec-save 再起動提案 / (c) 見送り））
+ - Step 3-3: AUTOGEN block 索引再生成差分検出（project extension checks 経由）。Step 3（docs/ 検証）の後、generate_indexes.ts --dry-run を実行し AUTOGEN block の再生成差分を検出する。本検証は case-close command 本体（src/opencode/commands/agentdev/case-close.md）の手順を直接編集せず、project extension（.agentdev/extensions/commands/case-close.yaml）の checks セクション経由で導入する（project-extensions SPEC、ADR-005 準拠）。case-close は dry-run/差分検査で停止し、直接編集・commit しない。差分がある場合は case-run へ差戻し、再生成（実 commit）は case-run が行う。複数 PR 跨ぎでの AUTOGEN block 再生成漏れを防止する。Epic Wave クローズ経路では Step E5b（完了条件チェックボックス最終評価）の前段に同等の dry-run/diff による索引健全性検証を適用する（Epic Issue クローズ時の索引検証は case_open_hints 参照）
 - Step 4: PRマージ（`gh pr merge --squash`（リトライ最大5回、フォールバック手順）、対応記録コメント追記）
-- Step 4-0: squash merge 前の mergeable UNKNOWN ポーリング（REQ-0131-028）（PR 補助データ読込（`agentdev-gh-cli`）で `gh pr view {N} --json mergeable,mergeStateStatus` を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時は Step 4-2 へ分岐）
-- Step 4-1: Squash merge 後のローカル先行 commit 検出、処理（REQ-0146-005）（`git log origin/{branch}..HEAD --oneline` で検出、内容重複確認後に `git reset --hard origin/{branch}` で reset（`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順参照））
-- Step 4-2: コンフリクト解消 rebase パス（REQ-0151-001/002、REQ-0131-024/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（Step 4 へ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/specs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
+- Step 4-0: squash merge 前の mergeable UNKNOWN ポーリング（REQ-006-028）（PR 補助データ読込（`agentdev-gh-cli`）で `gh pr view {N} --json mergeable,mergeStateStatus` を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時は Step 4-2 へ分岐）
+- Step 4-1: Squash merge 後のローカル先行 commit 検出、処理（REQ-003-005）（`git log origin/{branch}..HEAD --oneline` で検出、内容重複確認後に `git reset --hard origin/{branch}` で reset（`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順参照））
+- Step 4-2: コンフリクト解消 rebase パス（REQ-003-001/002、REQ-006-024/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（Step 4 へ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/specs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
 - Step 5: Post-merge テスト戦略検証（CI通過等の反映）
 - Step 6: Issueクローズ（`gh issue close --reason completed`）
-- Step 7: ブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（REQ-0137-001）
+- Step 7: ブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（v2:REQ-0137-001）
 - Step 8: 親Epic Issue更新（`agentdev-epic-tracker`、Epic 自動クローズ判定）
 - Step 9: 実行前同期（`git pull --ff-only`、hash 検証）
-- Step 9-2: git main 同期リスク事前検出、代替同期手順選択（REQ-0131-029）（`git pull --ff-only` 直前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出。検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main` による非チェックアウト同期）を選択。`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ参照）
+- Step 9-2: git main 同期リスク事前検出、代替同期手順選択（REQ-006-029）（`git pull --ff-only` 直前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出。検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main` による非チェックアウト同期）を選択。`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ参照）
 - Step 10: 学びの検知、抽出（`agentdev-learning-capture`、ユーザーに学び有無を問わない（G13）、Capture 回収（PR 本文から intake/learning を分離））
 - Step 11: ドメイン状態永続化（`.agentdev/` 配下を commit/push（learning と intake を同一 commit））
 - Step 12: 完了報告（結果状態の分離報告（GitHub側、`.agentdev`、ブランチ削除））
@@ -116,7 +130,7 @@ Step E5（Epic status table 更新）の後、Step E6（最終 Wave 判定）の
 - [quality-gates.md](../quality/quality-gates.md)（QG-4）
 - [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)（IR-057 obsolete-spec-path-after-domain-split、targeted docs guard 連携）
 
-## targeted docs guard (REQ-0158-003)
+## targeted docs guard (v2:REQ-0158-003)
 
 case-close 工程で targeted docs guard を実行する。対象は PR で変更されたファイルと連動ファイル（`docs/DOC-MAP.md`、`docs/README.md`、`docs/specs/README.md`）。
 
@@ -133,17 +147,17 @@ case-close が使用する検査ツール（[integrity-contracts.md](../integrit
 
 - check_changed_docs.ts（--workflow case-close、--files <PR 変更ファイル一覧>）: Step 3-1 targeted docs guard で実行
 - check_extensions.ts（IR-056）: `src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/SKILL.md`, `src/opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行（Step 3-1）
-- test_strategy: QG-4 完了条件確認（REQ-0131-026）
+- test_strategy: QG-4 完了条件確認（REQ-006-026）
 
 case-close は check_integrity.ts（全体監査）を使用しない（case-close はマージ後 main 環境で PR 単位の targeted 検査が責務。全体監査は /repo/docs-check の責務）。
 
-※上記は全て肯定表現である（REQ-0144-002, REQ-0144-003 準拠）。
+※上記は全て肯定表現である（REQ-010-002, REQ-010-003 準拠）。
 
-### files_checked 空時の取扱い（REQ-0131-030, REQ-0158 Phase 3）
+### files_checked 空時の取扱い（REQ-006-030, v2:REQ-0158 Phase 3）
 
 targeted docs guard（check_changed_docs.ts）の実行結果で `files_checked` が空の場合、検査対象ファイルが検出されなかったことを示す。case-close は `--files` で PR 変更ファイル一覧を指定するため、Phase 3 契約により FAILURE（exit code 非ゼロ）として報告される。
 
-#### check_changed_docs.ts 側の出力（REQ-0158 Phase 3）
+#### check_changed_docs.ts 側の出力（v2:REQ-0158 Phase 3）
 
 `--files` 指定で `files_checked` が空の場合、`failures` 配列に severity `strict` の FAILURE を追加する（exit code 非ゼロ）。メッセージは対象ファイルが検出されなかった旨を示す。`--base-ref` 指定で空の場合は WARNING となる（case-close は `--files` を使用するため対象外）。check_changed_docs.ts は対象選定の十分性を判定せず、対象ファイル未検出のみを報告する。
 
@@ -155,13 +169,13 @@ case-close は targeted docs guard が FAILURE を返した場合、以下を行
 2. `--files` 指定の妥当性を確認する（PR 変更ファイル一覧の再取得、パス指定の確認）
 3. 必要に応じて `--files` での再実行、または対象ファイルの手動確認を行う
 4. 空の理由が正当（対象ファイルが本当に変更されていない等）であることを確認してから続行する
-5. PR が verification-only（変更ファイル0件）の場合、後述「verification-only PR の files_checked 空確認（REQ-0158-002）」に従い判定する
+5. PR が verification-only（変更ファイル0件）の場合、後述「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」に従い判定する
 
 上記確認を経ずに `files_checked` 空のまま完了扱いとしない。
 
-#### verification-only PR の files_checked 空確認（REQ-0158-002）
+#### verification-only PR の files_checked 空確認（v2:REQ-0158-002）
 
-verification-only PR（実装差分0件、検証のみで作成された PR）の場合、`files_checked` が空になることが正規の状態として発生する。case-close は次の手順で verification-only 判定を行い、正当と判断された場合に PASS 処理する。要件の SSoT は REQ-0158-002、verification-only PR の定義と case-run 側引継ぎ注意事项は [case-run.md](case-run.md)「verification-only PR（実装差分なし、検証のみ）（REQ-0158-002）」参照。
+verification-only PR（実装差分0件、検証のみで作成された PR）の場合、`files_checked` が空になることが正規の状態として発生する。case-close は次の手順で verification-only 判定を行い、正当と判断された場合に PASS 処理する。要件の SSoT は v2:REQ-0158-002、verification-only PR の定義と case-run 側引継ぎ注意事项は [case-run.md](case-run.md)「verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）」参照。
 
 PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。case-close は PR 本文の verify-only 根拠欄を読み、記載が不十分な場合は PASS としない。
 
@@ -177,9 +191,9 @@ PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-template
 
 **false-clean 3層防御との相互作用**:
 
-REQ-0158「case-close 向け false-clean 予防」節は files_checked 空を silent pass としないための3層防御（対象空時の warning 報告、`--files` 標準化、files_checked 非空の確認ステップ）を定める。REQ-0158-002 はこの3層防御を回避するものではなく、verification-only の正当性確認により3層防御の警告を吸収する経路を追加する。両者の関係は以下の通り:
+v2:REQ-0158「case-close 向け false-clean 予防」節は files_checked 空を silent pass としないための3層防御（対象空時の warning 報告、`--files` 標準化、files_checked 非空の確認ステップ）を定める。v2:REQ-0158-002 はこの3層防御を回避するものではなく、verification-only の正当性確認により3層防御の警告を吸収する経路を追加する。両者の関係は以下の通り:
 
-| 層 | REQ-0158 false-clean 予防節 | REQ-0158-002 による相互作用 |
+| 層 | v2:REQ-0158 false-clean 予防節 | v2:REQ-0158-002 による相互作用 |
 |---|---|---|
 | 第1層 | check_changed_docs.ts が files_checked 空を warning として報告 | warning を検知した case-close が verification-only 判定ステップへ進むトリガーとして扱う（silent pass しない） |
 | 第2層 | case-close は `--files <PR変更ファイル>` 指定を標準とする | verification-only PR では `--files` が空配列となり、それ自体が verification-only のシグナルとなる |
@@ -200,7 +214,7 @@ verification-only 判定基準3項目を満たさない files_checked 空（例:
 - 学び有無のユーザー確認（G13、エージェント自律）
 - intake と learning の混合単一成果物（G15）
 - 今回の完了条件未対応事項の intake への逃がし（G16）
-- 共有作業ツリーでの `git checkout .`（G17、REQ-0137-001、他セッション変更の無差別破壊）
+- 共有作業ツリーでの `git checkout .`（G17、v2:REQ-0137-001、他セッション変更の無差別破壊）
 - 完了条件チェックボックス評価の他コマンド委譲（G20、case-close 専任責務）
 - SPEC status 昇格の他コマンド委譲（G22、case-close 責務、spec-save は accepted を付与しない）
 - Epic Issue 本文ステータス追跡テーブルの他コマンド書き込み（G24、case-close 単一書き手）
@@ -210,8 +224,8 @@ verification-only 判定基準3項目を満たさない files_checked 空（例:
 - QG-4（Final Acceptance Gate）: Step 2 で Issue 本文の完了条件チェックボックスを最終評価、更新
 - チェックボックス事後確認: 更新後に Issue 本文を再読込し全 `- [ ]` が `[x]` に反映されたことを確認（最大2回）
 - Squash merge リトライ: 最大5回（5秒待機付き）
-- mergeable UNKNOWN ポーリング（REQ-0131-028）: squash merge 前に `gh pr view --json mergeable,mergeStateStatus` で事前確認、UNKNOWN 時は最大60秒（10秒間隔）でポーリング、上限超過時はマージ中止・構造化エラー停止
-- git main 同期リスク事前検出（REQ-0131-029）: `git pull --ff-only` 直前に worktree 状態・並列実行 ref lock 競合・非 main ブランチ占有の3リスクを事前検出、検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main`）を選択
+- mergeable UNKNOWN ポーリング（REQ-006-028）: squash merge 前に `gh pr view --json mergeable,mergeStateStatus` で事前確認、UNKNOWN 時は最大60秒（10秒間隔）でポーリング、上限超過時はマージ中止・構造化エラー停止
+- git main 同期リスク事前検出（REQ-006-029）: `git pull --ff-only` 直前に worktree 状態・並列実行 ref lock 競合・非 main ブランチ占有の3リスクを事前検出、検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main`）を選択
 - 出力制約: 成果物本文（PR本文、commit message）は verbatim で返す（G10/G18、別途成果物パス、根拠、親判断事項は圧縮）
 - 結果状態分離報告: GitHub側、`.agentdev` 永続化、ブランチ削除状態を独立して報告（G19）
 
@@ -227,10 +241,9 @@ verification-only 判定基準3項目を満たさない files_checked 空（例:
 - `agentdev-workflow-orchestration` skill（Capture 境界、達成判定プロトコル）
 - `agentdev-gh-cli` skill（gh CLI 安全使用）
 - `agentdev-issue-management` skill（Issue 操作安全性）
-- REQ-0131（case-close / 完了処理）
-- REQ-0137（並列実行安全 git 操作規律）
-- REQ-0151（コンフリクト解消モデルと実行時間観測）
-- ADR-0114（完了条件チェックボックス case-close 専任）
-- ADR-0125（Epic Issue 本文単一書き手）
-- ADR-0132（コンフリクト解消モデル（3レベルエスカレーションと責務割当））
-
+- REQ-006（case-close / 完了処理）
+- v2:REQ-0137（並列実行安全 git 操作規律）
+- REQ-003（コンフリクト解消モデルと実行時間観測）
+- REQ-011（完了条件チェックボックス case-close 専任）
+- v2:ADR-0125（Epic Issue 本文単一書き手）
+- v2:ADR-0132（コンフリクト解消モデル（3レベルエスカレーションと責務割当））

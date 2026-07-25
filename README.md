@@ -83,7 +83,7 @@ AgentDevFlow を外部プロジェクトに導入する手順。
 ./scripts/install-consumer-opencode.ps1 -Mode apply
 ```
 
-ローカル版（ローカル版 OpenCode を利用する環境）のインストール。`-LocalMode` を付けると `agentdev-gh-cli` だけが `src/opencode-local/agentdev-gh-cli/` へ接続され、それ以外の command/skill は通常版と同じ `src/opencode/` 配下へ接続される（REQ-0103-158、ADR-0131）。
+ローカル版（ローカル版 OpenCode を利用する環境）のインストール。`-LocalMode` を付けると `agentdev-gh-cli` だけが `src/opencode-local/agentdev-gh-cli/` へ接続され、それ以外の command/skill は通常版と同じ `src/opencode/` 配下へ接続される（REQ-009、ADR-004）。
 
 ```powershell
 ./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
@@ -108,7 +108,7 @@ cd .agentdev-plugin && git pull && cd ..
 
 ### 推奨 .gitignore 設定
 
-通常版・ローカル版ともに同一。`agentdev-gh-cli` はリンク先が異なるだけなので `.opencode/skills/agentdev-*/` パターンで網羅される。`japanese-tech-writing` は配布物依存スキル（`agentdev-doc-writing` が参照、ADR-0134/REQ-0159-001）のため別途 gitignore に含める。runtime workspace ディレクトリの管理は harness 側の責務であり（ADR-0136）、本 gitignore 推奨には含めない。
+通常版・ローカル版ともに同一。`agentdev-gh-cli` はリンク先が異なるだけなので `.opencode/skills/agentdev-*/` パターンで網羅される。`japanese-tech-writing` は配布物依存スキル（`agentdev-doc-writing` が参照、REQ-002）のため別途 gitignore に含める。runtime workspace ディレクトリの管理は harness 側の責務であり（charter 原則、ADR-001）、本 gitignore 推奨には含めない。
 
 ```gitignore
 .agentdev-plugin/

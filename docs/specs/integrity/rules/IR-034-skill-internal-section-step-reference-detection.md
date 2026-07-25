@@ -12,7 +12,7 @@ status: accepted
 | category | canonical-conflict |
 | detection_method | command 定義本文、SKILL.md 本文から skill 内部 section 名、protocol 名、Step 名への直接参照パターンを検出 |
 | affected_artifacts | [commands, skills] |
-| related_req | [REQ-0108-244] |
+| related_req | [REQ-010-244] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。検出パターン例示、検査ルール自体の記述は対象外 |

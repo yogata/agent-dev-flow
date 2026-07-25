@@ -77,6 +77,6 @@ updated: 2026-07-18
 
 - [inspect-docs.md](inspect-docs.md), [inspect-skills.md](inspect-skills.md)（前段コマンド（検出事項生成））
 - [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
-- REQ-0126（inspect-promote / 検出事項分類、昇格）
-- REQ-0136（inspect-promote 自動 promote（REQ-0136-016））
+- REQ-010（inspect-promote / 検出事項分類、昇格）
+- REQ-001（inspect-promote 自動 promote（REQ-001-016））
 

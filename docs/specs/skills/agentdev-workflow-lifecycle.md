@@ -24,7 +24,7 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 - フェーズ定義（マクロ: 壁打ち、構造的実行、レビュー完了 / マイクロ: requirement、analyzed、created、in_progress、review、done）
 - work_type 分類（4値）
 - スケール判定（feature のみ、3条件: 複数モジュール跨ぎ、PR 肥大化リスク、段階的リリース）
-- 実装スコープシグナル確認（ドラフト内実装詳細セクション検出時の scale: large 昇格判定、REQ-0102-056）
+- 実装スコープシグナル確認（ドラフト内実装詳細セクション検出時の scale: large 昇格判定、REQ-004-056）
 - 前工程からの引き継ぎ判定、停止条件（`agentdev_handoff: true` 検出時）
 - SSoT 遷移
 - ラベル体系
@@ -59,6 +59,6 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 - [agentdev-workflow-routing.md](agentdev-workflow-routing.md)
 - [agentdev-workflow-orchestration.md](agentdev-workflow-orchestration.md)
 - [../workflows/workflow-contracts.md](../workflows/workflow-contracts.md)
-- REQ-0112（ADR ライフサイクル、文書体系基盤）
-- REQ-0123（workflow-lifecycle 宣言的純化）
+- REQ-001（ADR ライフサイクル、文書体系基盤）
+- REQ-005（workflow-lifecycle 宣言的純化）
 

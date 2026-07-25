@@ -12,7 +12,7 @@ status: accepted
 | category | integrity-rule-gap |
 | detection_method | script の検査カテゴリと SKILL.md/SPEC の定義照合 |
 | affected_artifacts | [integrity scripts, SKILL.md, SPEC] |
-| related_req | [REQ-0108-147] |
+| related_req | [REQ-010-147] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit, impact-guard |
 | false_positive_risk | 中 |

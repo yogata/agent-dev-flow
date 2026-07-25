@@ -12,7 +12,7 @@ status: accepted
 | category | document-drift |
 | detection_method | README からコマンド名抽出 → glob と照合 |
 | affected_artifacts | [command README, commands] |
-| related_req | [REQ-0101-026, REQ-0108-003] |
+| related_req | [REQ-001-026, REQ-010-003] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低 |

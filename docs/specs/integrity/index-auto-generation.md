@@ -158,6 +158,6 @@ generate_indexes.ts の AUTOGEN marker 検出は、行全体が正規のHTMLコ�
 
 ## 関連情報
 
-- 関連 REQ: REQ-0101（文書・REQ 管理基準）、REQ-0154（SPEC status 追跡と draft 放置検出）
+- 関連 REQ: REQ-001（文書・REQ 管理基準）、REQ-001（SPEC status 追跡と draft 放置検出）
 - 関連 SPEC: `docs/specs/foundations/numbering-policy.md`（採番管理）、`docs/specs/integrity/integrity-rule-catalog.md`（整合性ルールカタログ）、`docs/specs/integrity/integrity-contracts.md`（整合性契約）
 - 検査契約: IR-061（index generation consistency）、IR-038（ADR index consistency）、IR-039（index REQ title consistency）、IR-042（hardcoded req count）

@@ -55,5 +55,5 @@ schema、分類基準、評価ディメンション、prune 方針を定義す�
 - [agentdev-learning-capture.md](agentdev-learning-capture.md)
 - [agentdev-backlog-integration.md](agentdev-backlog-integration.md)
 - [commands/learning-promote.md](../commands/learning-promote.md)
-- REQ-0128（Learning-promote）
+- REQ-010（Learning-promote）
 

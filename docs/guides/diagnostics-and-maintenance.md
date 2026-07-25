@@ -6,7 +6,7 @@ AgentDevFlow の整合性検査と REQ 体系の健全性診断を説明する�
 
 agent-dev-flow リポジトリの自己監査コマンド。
 ドキュメント、スキル、コマンドの横断的整合性を検証する。
-AgentDevFlow の配布対象外であり、AgentDevFlow 本体リポジトリでのみ利用する（ADR-0106、REQ-0108-156）。
+AgentDevFlow の配布対象外であり、AgentDevFlow 本体リポジトリでのみ利用する（v2:ADR-0106、v2:REQ-0108-156）。
 
 ### 基本フロー
 
@@ -26,7 +26,7 @@ REQ/ADR/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/Imple
 - ライフサイクル境界
 - 旧 namespace 残存
 - 実装分類（Implementation Pattern）の診断
-- ADR の現行/廃止済み番号帯の区別（REQ-0112-050）
+- ADR の現行/廃止済み番号帯の区別（v2:REQ-0112-050）
 
 ### 検出事項の分類
 
@@ -43,7 +43,7 @@ REQ/ADR/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/Imple
 
 ### ADR 関連検査
 
-docs-check は ADR を現行の番号帯と廃止済みの番号帯に区別して検査する（REQ-0112-050）:
+docs-check は ADR を現行の番号帯と廃止済みの番号帯に区別して検査する（v2:REQ-0112-050）:
 
 - **現行 ADR 番号帯**（`docs/adr/ADR-01XX.md`）: status 遷移の妥当性、参照先 REQ の存在確認、誤分類の兆候検出を検査する
 - 再編前の旧番号帯（ADR-00XX）は物理削除済み。Decision Map (`docs/adr/README.md`) で後継関係のみ参照する
@@ -68,7 +68,7 @@ docs-check は ADR を現行の番号帯と廃止済みの番号帯に区別し�
 
 ## inspect-docs
 
-docs 全体の意味整合性と REQ 体系の健全性を検出するコマンド（REQ-0109）。
+docs 全体の意味整合性と REQ 体系の健全性を検出するコマンド（v2:REQ-0109）。
 旧 `req-restructure-review` を統合し、REQ 再構成観点を含む全体意味検出を担う。
 
 ### 基本フロー
@@ -85,7 +85,7 @@ docs 全体の整合性を確認したい → /agentdev/inspect-docs → 検出�
 
 ## 3層ゲートと達成記録先
 
-整合性検査は3層ゲート構造で運用し、検査結果と達成状況は各層、各ルールの正規記録先に配置する（REQ-0101-075、REQ-0108-153）。
+整合性検査は3層ゲート構造で運用し、検査結果と達成状況は各層、各ルールの正規記録先に配置する（v2:REQ-0101-075、v2:REQ-0108-153）。
 
 ### 3層ゲート概念
 
@@ -100,7 +100,7 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 
 ### 達成状況の正規記録先
 
-各達成項目の正規記録先は以下の標準に従う（REQ-0101-075、REQ-0136-026）。
+各達成項目の正規記録先は以下の標準に従う（v2:REQ-0101-075、v2:REQ-0136-026）。
 
 | 達成項目 | 正規記録先 |
 |---------|----------|
@@ -110,8 +110,8 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 
 ### 記録時の遵守事項
 
-- Update Notes セクションは使用しない（REQ-0101-071 遵守）。
-- 変更履歴は frontmatter `updated` フィールドのみで追跡する（REQ-0101-073 遵守）。
+- Update Notes セクションは使用しない（v2:REQ-0101-071 遵守）。
+- 変更履歴は frontmatter `updated` フィールドのみで追跡する（v2:REQ-0101-073 遵守）。
 
 ## 整合性の考え方
 

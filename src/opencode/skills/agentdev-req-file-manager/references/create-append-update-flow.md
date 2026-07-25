@@ -1,6 +1,6 @@
 # CREATE/APPEND/UPDATE 操作と判定フロー
 
-本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、REQファイル操作モード（CREATE、APPEND、UPDATE）の詳細定義、状況判定基準、APPEND/UPDATE判定フロー、廃止宣言 APPEND の precedent 利用を扱う。SKILL.md 本文では3モードの要点のみを提示し、個別の操作条件とフロー詳細は本ファイルを参照する（REQ-0113-010）。
+本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、REQファイル操作モード（CREATE、APPEND、UPDATE）の詳細定義、状況判定基準、APPEND/UPDATE判定フロー、廃止宣言 APPEND の precedent 利用を扱う。SKILL.md 本文では3モードの要点のみを提示し、個別の操作条件とフロー詳細は本ファイルを参照する。
 
 ## ファイル操作モード
 

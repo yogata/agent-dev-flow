@@ -12,7 +12,7 @@ status: accepted
 | category | broken-reference |
 | detection_method | DOC-MAP 内のリンク抽出 → 存在確認 |
 | affected_artifacts | [DOC-MAP] |
-| related_req | [REQ-0108-003] |
+| related_req | [REQ-010-003] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低 |

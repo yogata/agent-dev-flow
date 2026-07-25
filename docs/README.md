@@ -1,74 +1,47 @@
 # ドキュメント入口
 
+AgentDevFlow v3 の基本原則と管理方式は [ADR-001 v3 charter](adr/ADR-001-v3-charter.md) と [v3-charter.md](guides/v3-charter.md) を参照。
+REQ/ADR 番号は `REQ-001〜`、`ADR-001〜` の新枠を採用する。v2.11.0 は tag 参照とし、`v2:` プレフィックスで区別する（U9）。
+
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 52件、廃止済み: 2件
+現行 REQ: 11件
 <!-- AUTOGEN:END -->
 
-現行要件の第一参照先は REQ-0101 から REQ-0163 までの範囲である（範囲内の廃止済み REQ を除く）。過去に存在した旧REQ（REQ-0001〜REQ-0050、REQ-0111〜REQ-0121 の一部）は2026-07-20に物理削除され、移行履歴は [移行表](requirements/mapping-table.md) で参照する。REQ-0134 と REQ-0108 は ADR-0105 に基づく source/projection 分離要件を含む。REQ-0160 は project-extensions 機構（ADR-0135）の要件を定義する。
+現行要件は REQ-001 から REQ-011 の11件である。各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
 |---|---|
-| [REQ-0101](requirements/REQ-0101.md) | 文書・REQ管理基準 |
-| [REQ-0102](requirements/REQ-0102.md) | 要件定義・保存 |
-| [REQ-0103](requirements/REQ-0103.md) | Artifact責任分界 |
-| [REQ-0104](requirements/REQ-0104.md) | Workflow / Command Protocol |
-| [REQ-0105](requirements/REQ-0105.md) | RU lifecycle / Requirement Unit 管理 |
-| [REQ-0106](requirements/REQ-0106.md) | Case実行オーケストレーション / Epic・Wave |
-| [REQ-0107](requirements/REQ-0107.md) | Reporting / Writing Quality |
-| [REQ-0108](requirements/REQ-0108.md) | docs-check / Validation / Tests |
-| [REQ-0109](requirements/REQ-0109.md) | inspect-docs / REQ再構成運用 |
-| [REQ-0110](requirements/REQ-0110.md) | Git worktree cleanup 信頼性 |
-| [REQ-0112](requirements/REQ-0112.md) | ADRライフサイクル標準化・文書体系正規化・実行時独立性 |
-| [REQ-0113](requirements/REQ-0113.md) | Skill References SPEC分離基準 |
-| [REQ-0114](requirements/REQ-0114.md) | /agentdev/case-auto 最大自走モード |
-| [REQ-0119](requirements/REQ-0119.md) | コマンド・スキル・サブエージェント責務分界の再基準化 |
-| [REQ-0123](requirements/REQ-0123.md) | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 |
-| [REQ-0124](requirements/REQ-0124.md) | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle |
-| [REQ-0125](requirements/REQ-0125.md) | inspect-skills / Command/Skill参照妥当性検出 |
-| [REQ-0126](requirements/REQ-0126.md) | inspect-promote / 検出finding分類・昇格 |
-| [REQ-0127](requirements/REQ-0127.md) | Intake command群 (capture / from-github / promote) |
-| [REQ-0128](requirements/REQ-0128.md) | Learning-promote |
-| [REQ-0129](requirements/REQ-0129.md) | Backlog-review |
-| [REQ-0130](requirements/REQ-0130.md) | case-run / 実装パイプライン |
-| [REQ-0131](requirements/REQ-0131.md) | case-close / 完了処理 |
-| [REQ-0132](requirements/REQ-0132.md) | case-open / Issue作成 |
-| [REQ-0133](requirements/REQ-0133.md) | case-update / Issue更新 |
-| [REQ-0134](requirements/REQ-0134.md) | 配布基盤: source/projection・sync・repo type・consumer install |
-| [REQ-0135](requirements/REQ-0135.md) | Drafts配置・Draft Type Registry |
-| [REQ-0136](requirements/REQ-0136.md) | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設・req-define 強化） |
-| [REQ-0137](requirements/REQ-0137.md) | 並列実行安全 git 操作規律（共有作業ツリーでの case-auto 並行実行支援） |
-| [REQ-0138](requirements/REQ-0138.md) | 構造化req_draft契約 |
-| [REQ-0139](requirements/REQ-0139.md) | 外部エージェント統合契約 |
-| [REQ-0140](requirements/REQ-0140.md) | 文書品質ゲート |
-| [REQ-0141](requirements/REQ-0141.md) | ローカル版 OpenCode 導入方式とローカルCaseファイル運用 |
-| [REQ-0142](requirements/REQ-0142.md) | 配布物ID除去後の文意保持・構文健全性・責務整合 |
-| [REQ-0143](requirements/REQ-0143.md) | Command 定義ファイルフォーマット標準化 |
-| [REQ-0144](requirements/REQ-0144.md) | docs-check/integrity 運用是正 |
-| [REQ-0145](requirements/REQ-0145.md) | docs-check/integrity 検出設計改善 |
-| [REQ-0146](requirements/REQ-0146.md) | 実行契約・委譲・プロセス設計 |
-| [REQ-0147](requirements/REQ-0147.md) | 文書化規律・HITL境界 |
-| [REQ-0148](requirements/REQ-0148.md) | RU群バッチ処理と複数 execution_unit 並列実行 |
-| [REQ-0149](requirements/REQ-0149.md) | agentdev-gh-cli 手続き委譲基盤 |
-| [REQ-0150](requirements/REQ-0150.md) | ローカル版 agentdev-gh-cli 実装 |
-| [REQ-0151](requirements/REQ-0151.md) | コンフリクト解消モデルと実行時間観測 |
-| [REQ-0152](requirements/REQ-0152.md) | gh 直接記述機械検出（IR-053） |
-| [REQ-0153](requirements/REQ-0153.md) | 機械横断是正の完了証明 |
-| [REQ-0154](requirements/REQ-0154.md) | SPEC status 追跡と draft 放置検出 |
-| [REQ-0155](requirements/REQ-0155.md) | 文書粒度モデル |
-| [REQ-0156](requirements/REQ-0156.md) | docs/specs 基盤SPECドメイン別体系化 |
-| [REQ-0159](requirements/REQ-0159.md) | 配布物依存スキルの src 昇格方針と未トラックスキル検出 |
-| [REQ-0160](requirements/REQ-0160.md) | Project Extensions 機構と配布物参照境界 |
-| [REQ-0162](requirements/REQ-0162.md) | 配布物の harness 実行制御分離 |
-| [REQ-0163](requirements/REQ-0163.md) | subagent 委譲プロトコル要件（category 選定、MUST NOT DO） |
+| [REQ-001](requirements/REQ-001.md) | 文書体系と持続可能な基準構造 |
+| [REQ-002](requirements/REQ-002.md) | 配布成果物の責務境界 |
+| [REQ-003](requirements/REQ-003.md) | 委譲時の判断・承認・副作用境界 |
+| [REQ-004](requirements/REQ-004.md) | 要求の形成と合意 |
+| [REQ-005](requirements/REQ-005.md) | ワークフロープロトコルと工程接続 |
+| [REQ-006](requirements/REQ-006.md) | Case実行オーケストレーション |
+| [REQ-007](requirements/REQ-007.md) | 完了報告と成果物品質ゲート |
+| [REQ-008](requirements/REQ-008.md) | 一時成果物ライフサイクル |
+| [REQ-009](requirements/REQ-009.md) | 配布基盤と導入モデル |
+| [REQ-010](requirements/REQ-010.md) | 自己監査と診断・是正候補抽出 |
+| [REQ-011](requirements/REQ-011.md) | I/O境界と外部連携手段 |
 
 - [要件インデックス](requirements/README.md)
-- [移行表](requirements/mapping-table.md)
+
+## ADR
+
+現行 ADR は ADR-001 から ADR-005 の5件である。詳細は [ADR インデックス](adr/README.md) 参照。
+
+| ADR | タイトル |
+|---|---|
+| [ADR-001](adr/ADR-001-v3-charter.md) | v3 charter（AgentDevFlow v3 憲章） |
+| [ADR-002](adr/ADR-002.md) | OpenCode ソース・プロジェクション分離（v3） |
+| [ADR-003](adr/ADR-003.md) | req_draft ソフトコントラクト原則（v3） |
+| [ADR-004](adr/ADR-004.md) | 差し替え可能な I/O 境界（v3） |
+| [ADR-005](adr/ADR-005.md) | Project Extensions Architecture（v3） |
 
 ## 仕様（SPEC）
 
-SPEC は 3 層構造を持つ（commands / skills / workflows）。詳細は [SPEC インデックス](specs/README.md) 参照。
+SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。詳細は [SPEC インデックス](specs/README.md) 参照。
 
 ### 横断 SPEC（`specs/workflows/`）
 
@@ -85,33 +58,32 @@ SPEC は 3 層構造を持つ（commands / skills / workflows）。詳細は [SP
 
 ### 基盤 SPEC（`specs/{foundations,responsibilities,quality,integrity,local,authoring}/`）
 
-基盤 SPEC は REQ-0156 に基づき6ドメインへ整理済み。各ドメインの責務は [document-model.md](specs/foundations/document-model.md)「docs/specs/ 直下のドメイン別体系化」参照。
+基盤 SPEC は 6 ドメインへ整理済み。各ドメイン直下に主要 SPEC を置き、詳細・実装固有事項は `references/` サブディレクトリへ分離する（Wave 3 再構築）。
 
 - [システム仕様](specs/foundations/system.md)
 - [文書フォーマット規約](specs/foundations/patterns.md)
 - [設計原則](specs/foundations/design-principles.md)
-- [品質仕様](specs/quality/quality-specs.md)
-- [品質ゲート](specs/quality/quality-gates.md)
 - [文書モデル](specs/foundations/document-model.md)
+- [harness 分離モデル](specs/foundations/harness-separation-model.md)
+- [Project Extensions](specs/foundations/project-extensions.md)
 - [文書種別責務・配置基準](specs/responsibilities/document-type-responsibilities.md)
 - [アーティファクト契約](specs/responsibilities/artifact-contracts.md)
 - [成果物責任表](specs/responsibilities/artifact-responsibilities.md)
+- [品質仕様](specs/quality/quality-specs.md)
+- [品質ゲート](specs/quality/quality-gates.md)
+- [REQ 健全性メトリクス](specs/quality/req-health-metrics.md)
 - [整合性契約](specs/integrity/integrity-contracts.md)
 - [整合性ルールカタログ](specs/integrity/integrity-rule-catalog.md)
+- [ルール所有権マトリックス](specs/integrity/rule-ownership.md)
 - [実行時パッケージ境界](specs/local/runtime-package-boundary.md)
 - [ローカル Case ファイル](specs/local/local-case-file.md)
-- [ローカル版 OpenCode 生成](specs/local/local-generation.md)
-- [ルール所有権マトリックス](specs/integrity/rule-ownership.md)
-- [REQ 影響マップ](specs/responsibilities/req-impact-map.md)
-- [REQ 健全性メトリクス](specs/quality/req-health-metrics.md)
-
-## ADR
-
-- [ADR インデックス](adr/README.md)
+- [ローカル版 OpenCode 生成](specs/local/runtime-package-boundary.md)
+- [コマンドファイルフォーマット規約](specs/authoring/command-file-format.md)
 
 ## ガイド
 
 - [ガイド入口](guides/README.md)
+- [v3 憲章](guides/v3-charter.md)
 - [クイックスタート](guides/quickstart.md)
 - [コマンド選択](guides/command-selection.md)
 - [要件定義 → Case実行フロー](guides/req-case-flow.md)

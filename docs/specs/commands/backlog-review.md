@@ -12,13 +12,13 @@ updated: 2026-07-24
 採用済み成果物を分析、統合し、ユーザー承認後に RU（Requirement Unit）を生成する。
 ユーザー承認は RU 作成承認を兼ねる。
 
-## HITL 境界、自動実行ルール（REQ-0147-003/004/005/009）
+## HITL 境界、自動実行ルール（REQ-003-003/004/005/009）
 
-- **HITL は「判断の確定」に限定**（REQ-0147-003）: Step 5 の統合、分割判定承認が主要な HITL 対象。
-- **矛盾なしの場合の単一承認**（REQ-0147-009）: Step 5 で矛盾が検出されない場合、Step 5 の統合、分割判定承認を RU 生成承認（Step 6/7）としても扱い、単一承認で処理する。追加の HITL は不要。
-- **矛盾検出時の追加判断**（REQ-0147-009）: Step 6 で矛盾が検出された場合のみ、ユーザーに追加判断を求める（矛盾する artifact を RU 化せず確認、矛盾しない artifact は通常通り RU 化）。
-- **承認後の自動実行**（REQ-0147-004）: 承認確定後の RU 生成、採用済み成果物削除、commit/push は自動実行する。
-- **破壊的変更の明示承認維持**（REQ-0147-005）: 矛盾解消、要件仕様スコープ変更、大量成果物削除等の破壊的操作は明示承認を維持する。
+- **HITL は「判断の確定」に限定**（REQ-003-003）: Step 5 の統合、分割判定承認が主要な HITL 対象。
+- **矛盾なしの場合の単一承認**（REQ-003-009）: Step 5 で矛盾が検出されない場合、Step 5 の統合、分割判定承認を RU 生成承認（Step 6/7）としても扱い、単一承認で処理する。追加の HITL は不要。
+- **矛盾検出時の追加判断**（REQ-003-009）: Step 6 で矛盾が検出された場合のみ、ユーザーに追加判断を求める（矛盾する artifact を RU 化せず確認、矛盾しない artifact は通常通り RU 化）。
+- **承認後の自動実行**（REQ-003-004）: 承認確定後の RU 生成、採用済み成果物削除、commit/push は自動実行する。
+- **破壊的変更の明示承認維持**（REQ-003-005）: 矛盾解消、要件仕様スコープ変更、大量成果物削除等の破壊的操作は明示承認を維持する。
 
 ## 入力
 
@@ -34,7 +34,7 @@ updated: 2026-07-24
 
 ## 副作用
 
-- git commit/push: `.agentdev/` 配下（明示パスステージング、REQ-0137-002/005）
+- git commit/push: `.agentdev/` 配下（明示パスステージング、v2:REQ-0137-002/005）
 - 実行前同期: `git pull --ff-only`
 - REQ ファイル保存: 行わない（G01）
 - GitHub Issue 作成: 行わない（G02）
@@ -43,10 +43,10 @@ updated: 2026-07-24
 
 - Step 1: 実行前同期（`git pull --ff-only`）
 - Step 2: 成果物検出（引数有無切り替え（引数あり: 指定ファイルのみ / 引数なし: `promoted/` 全件））
-- Step 3: 成果物読込、分析 + 暫定分類付与（`agentdev-backlog-integration` 参照）。暫定分類は `docs/specs/foundations/document-model.md` の文書7分類モデルを参照して付与し、RU frontmatter `tentative_classification` に記録する（REQ-0155-004）。`tentative_classification` の許容値、7値以外入力時、フィールド欠落時の取り扱いは REQ-0155-008、後述「tentative_classification フィールド仕様」に定める。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本コマンドが確定しない
-- Step 4: 統合分割判定 + depends_on 依存解決 + ユーザー承認（判断の確定、REQ-0147-003）（`agentdev-backlog-integration` 参照）
-- Step 5: 矛盾検出（矛盾検出時のみ追加判断を求める（REQ-0147-009））。矛盾なしの場合、Step 4 の統合、分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない（G05）
-- Step 6: RU 生成（採用済み成果物の単純コピー（パススルー）は禁止（G03、REQ-0105））
+- Step 3: 成果物読込、分析 + 暫定分類付与（`agentdev-backlog-integration` 参照）。暫定分類は `docs/specs/foundations/document-model.md` の文書7分類モデルを参照して付与し、RU frontmatter `tentative_classification` に記録する（v2:REQ-0155-004）。`tentative_classification` の許容値、7値以外入力時、フィールド欠落時の取り扱いは v2:REQ-0155-008、後述「tentative_classification フィールド仕様」に定める。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本コマンドが確定しない
+- Step 4: 統合分割判定 + depends_on 依存解決 + ユーザー承認（判断の確定、REQ-003-003）（`agentdev-backlog-integration` 参照）
+- Step 5: 矛盾検出（矛盾検出時のみ追加判断を求める（REQ-003-009））。矛盾なしの場合、Step 4 の統合、分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない（G05）
+- Step 6: RU 生成（採用済み成果物の単純コピー（パススルー）は禁止（G03、REQ-008））
 - Step 7: 成果成果物削除（RU 生成失敗成果物は削除しない（G06））
 - Step 8: Git 永続化
 - Step 9: 完了報告
@@ -60,7 +60,7 @@ updated: 2026-07-24
 
 - REQ ファイル保存（G01、req-save 責務）
 - GitHub Issue 作成（G02、case-open 責務）
-- 採用済み成果物の単純コピー（パススルー）（G03、REQ-0105）
+- 採用済み成果物の単純コピー（パススルー）（G03、REQ-008）
 - `.agentdev/intake/inbox/`, `.agentdev/learning/inbox.md`, `.agentdev/learning/deferred.md` の更新（G04）
 - 矛盾検出時の自動解決（G05）
 - RU 生成失敗成果物の削除（G06）
@@ -73,7 +73,7 @@ updated: 2026-07-24
 
 ## tentative_classification と分類根拠伝播
 
-backlog-review は採用済み成果物の分析時に tentative_classification（暫定分類）と分類根拠を RU へ付与して伝播させる（REQ-0136-033、ADR-0139）。分類根拠は learning/intake 成果物から後続工程（req-define、spec-save）へ引き継がれる情報であり、本 SPEC は backlog-review での扱いを規定する。
+backlog-review は採用済み成果物の分析時に tentative_classification（暫定分類）と分類根拠を RU へ付与して伝播させる（REQ-001-033、REQ-001）。分類根拠は learning/intake 成果物から後続工程（req-define、spec-save）へ引き継がれる情報であり、本 SPEC は backlog-review での扱いを規定する。
 
 ### 伝播させる分類根拠フィールド
 
@@ -90,23 +90,23 @@ backlog-review は採用済み成果物から読み取った次の分類根拠�
 
 ### tentative_classification との関係
 
-tentative_classification（REQ-0155-003 の7値）は文書種別の暫定分類であり、分類根拠は分類判断の根拠情報である。両者は併存し、req-define が最終分類を確定する際の入力となる。
+tentative_classification（v2:REQ-0155-003 の7値）は文書種別の暫定分類であり、分類根拠は分類判断の根拠情報である。両者は併存し、req-define が最終分類を確定する際の入力となる。
 
 ### 後方互換運用
 
-分類根拠は soft-contract（ADR-0124）として扱い、欠落時は unknown 既定値で警告する後方互換運用をとる。分類根拠が欠落した旧 RU も unknown 既定値で受け入れる。欠落により RU を拒否しない。具体的なシリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」に従う。
+分類根拠は soft-contract（ADR-003）として扱い、欠落時は unknown 既定値で警告する後方互換運用をとる。分類根拠が欠落した旧 RU も unknown 既定値で受け入れる。欠落により RU を拒否しない。具体的なシリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」に従う。
 
 ### 暫定扱いの明記
 
-backlog-review が付与する tentative_classification および分類根拠は暫定（tentative）扱いであり、req-define が最終確定する（REQ-0102-087）。backlog-review 自体は最終分類を確定しない。
+backlog-review が付与する tentative_classification および分類根拠は暫定（tentative）扱いであり、req-define が最終確定する（REQ-004-087）。backlog-review 自体は最終分類を確定しない。
 
 ## tentative_classification フィールド仕様
 
-RU frontmatter の `tentative_classification` フィールドの仕様（REQ-0155-008）。
+RU frontmatter の `tentative_classification` フィールドの仕様（v2:REQ-0155-008）。
 
 ### 許容値
 
-REQ-0155-003 が定義する文書7分類のいずれか1値。
+v2:REQ-0155-003 が定義する文書7分類のいずれか1値。
 
 | 値 | 分類 |
 |---|---|
@@ -133,6 +133,6 @@ backlog-review は全 RU frontmatter に `tentative_classification` を付与す
 - [intake-promote.md](intake-promote.md), [learning-promote.md](learning-promote.md), [inspect-promote.md](inspect-promote.md)（前段コマンド）
 - [req-define.md](req-define.md)（後続コマンド（RU を入力として要件定義））
 - `agentdev-backlog-integration` skill（分析基準、統合分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール）
-- REQ-0105（RU lifecycle）
-- REQ-0129（Backlog-review）
+- REQ-008（RU lifecycle）
+- REQ-010（Backlog-review）
 

@@ -1,6 +1,5 @@
 ---
 description: req-define で分離された SPEC 保存対象を SPEC ファイルに保存、確定する（SPEC 対象 artifact_actions がある場合）
-agent: sisyphus
 ---
 
 # SPEC 保存（SPEC artifact_actions → docs/specs 永続化）
@@ -116,8 +115,8 @@ bun .opencode/skills/agentdev-spec-file-manager/scripts/src/search-target-area.t
 
 **Step 5-2**: SPEC 宣言付与（CREATE/UPDATE）。Step 5 の CREATE/UPDATE 各操作に併せ、req-define が `artifact_actions`（`artifact: spec`）の各 entry へ出力した `spec_logical_division` と `canonical_owner` を読み取り、SPEC frontmatter または冒頭宣言節へ宣言として付与する。
 - **CREATE**: 新規 SPEC の frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。宣言なしで CREATE を完了することを禁止する
-- **UPDATE**: 変更対象 SPEC が frontmatter または冒頭宣言節で当該宣言を未宣言の場合、かつ req-define から渡された分類値が `unknown` 以外に確定している場合に、宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落だけを理由に保存拒否しない、ADR-0124 soft-contract）
-- **既存 SPEC の一括更新**: 行わない。未変更 SPEC へ遡及的に宣言を付与しない（REQ-0136-035 段階適用）
+- **UPDATE**: 変更対象 SPEC が frontmatter または冒頭宣言節で当該宣言を未宣言の場合、かつ req-define から渡された分類値が `unknown` 以外に確定している場合に、宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落だけを理由に保存拒否しない、soft-contract）
+- **既存 SPEC の一括更新**: 行わない。未変更 SPEC へ遡及的に宣言を付与しない（段階適用）
 
 ### Step 6: インデックス整合
 
@@ -232,7 +231,7 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 
 ## 廃止時の下流横断クリーンアップ（追加候補）
 
-本セクションは SPEC 廃止確定時（SPEC ライフサイクルの `superseded` 遷移、または物理削除）に、下流（配布 Command/Skill 群、Guide 群、REQ 群）へ残る旧 SPEC パス、ID 参照の横断クリーンアップを実行するステップの**追加候補**を記録する。既存の spec-save 手順（Step 1〜11）に代わるものではなく、既存フローを破壊しない追加ステップである。本候補は REQ-0124-024（廃止 REQ/SPEC 由来記述残置検出カテゴリ）および integrity-rule-catalog.md の新規 IR 候補（retired-reference-residual）と整合する。本候補の実行可否、タイミングは別途 SPEC 確定を待って確定する。
+本セクションは SPEC 廃止確定時（SPEC ライフサイクルの `superseded` 遷移、または物理削除）に、下流（配布 Command/Skill 群、Guide 群、REQ 群）へ残る旧 SPEC パス、ID 参照の横断クリーンアップを実行するステップの**追加候補**を記録する。既存の spec-save 手順（Step 1〜11）に代わるものではなく、既存フローを破壊しない追加ステップである。本候補は廃止 REQ/SPEC 由来記述残置検出カテゴリおよび integrity-rule-catalog.md の新規 IR 候補（retired-reference-residual）と整合する。本候補の実行可否、タイミングは別途 SPEC 確定を待って確定する。
 
 ### 対象トリガ
 
@@ -242,7 +241,7 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 ### クリーンアップ手順（候補）
 
 1. **廃止 SPEC リスト作成**: 当該 spec-save 操作で廃止確定した SPEC パス、ID のリストを作成する。`superseded_by` frontmatter で後継 SPEC が明示されている場合は後継パスも併記する
-2. **下流参照検索**: 廃止 SPEC パス、ID をソースに配布 Command/Skill 群、Guide 群、REQ 群を横断検索する。活性 SPEC への言及は対象外とする（REQ-0124-024 準拠）
+2. **下流参照検索**: 廃止 SPEC パス、ID をソースに配布 Command/Skill 群、Guide 群、REQ 群を横断検索する。活性 SPEC への言及は対象外とする（廃止 REQ/SPEC 由来記述残置検出カテゴリ準拠）
 3. **参照更新候補の分類**:
    - supersede 元への妥当な文脈参照（`superseded_by` で後継を明示する記述等） → finding 扱い（人間確認）。自動更新しない
    - 廃止 SPEC パスのまま残置 → 当該ドキュメントの後継 SPEC パスへ更新、または文脈次第で削除
@@ -251,7 +250,7 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 
 ### 既存フローとの関係
 
-本ステップは既存の spec-save 手順（Step 1〜11）に代わるものではなく、廃止操作時に追加で実行される候補ステップである。本ステップの実行有無、実行タイミングは今後の SPEC 確定（REQ-0124/REQ-0125 関連）を待って確定する。現時点では本候補の記録のみを行い、自動実行は行わない。既存の G02（ファイル操作制約）、G09（SPEC 実行時非依存）に違反しない範囲で運用される。
+本ステップは既存の spec-save 手順（Step 1〜11）に代わるものではなく、廃止操作時に追加で実行される候補ステップである。本ステップの実行有無、実行タイミングは今後の SPEC 確定を待って確定する。現時点では本候補の記録のみを行い、自動実行は行わない。既存の G02（ファイル操作制約）、G09（SPEC 実行時非依存）に違反しない範囲で運用される。
 
 ## ガードレール
 

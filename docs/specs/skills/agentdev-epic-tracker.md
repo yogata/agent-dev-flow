@@ -32,9 +32,9 @@ updated: 2026-07-18
 ## 現在の動作
 
 - 新4列形式と旧4列形式の両方をサポート
-- `⏭スキップ` は採用しない（前提未達は `pending` のまま選択対象外、REQ-0106-030）
+- `⏭スキップ` は採用しない（前提未達は `pending` のまま選択対象外、REQ-006-030）
 - `ready` / `running` は case-run(#epic) の内部状態であり永続状態には書き込まれない
-- 永続状態に書き込まれるのは `pending` → `completed` / `blocked` / `failed` の遷移のみ（case-close が単一書き手、ADR-0125）
+- 永続状態に書き込まれるのは `pending` → `completed` / `blocked` / `failed` の遷移のみ（case-close が単一書き手、v2:ADR-0125）
 
 ## 対象外
 
@@ -47,7 +47,7 @@ updated: 2026-07-18
 - ステータス値の正確性
 - 正規表現による行特定の精度
 - マージコンフリクト対応パターンの遵守
-- 単一書き手制約（ADR-0125）の遵守
+- 単一書き手制約（v2:ADR-0125）の遵守
 
 ## See Also
 
@@ -55,6 +55,6 @@ updated: 2026-07-18
 - [agentdev-workflow-lifecycle.md](agentdev-workflow-lifecycle.md)
 - [../workflows/epic-wave-model.md](../workflows/epic-wave-model.md)
 - [commands/case-close.md](../commands/case-close.md)
-- REQ-0106（Case実行オーケストレーション / Epic、Wave）
-- ADR-0125（Epic Issue 本文単一書き手）
+- REQ-006（Case実行オーケストレーション / Epic、Wave）
+- v2:ADR-0125（Epic Issue 本文単一書き手）
 

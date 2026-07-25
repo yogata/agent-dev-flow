@@ -47,6 +47,39 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 全 agentdev コマンドの一覧、入出力リファレンスは command README（`commands/agentdev/README.md`）を参照。
 本 skill は全 agentdev コマンドからフェーズ定義、work_type 判定基準の参照元として使用される。
 
+## work_type とコマンド経路
+
+work_type は工程分岐の参照軸である（REQ-005）。
+全 work_type が GitHub Issue と PR を経由する標準経路をとる。Issue/PR をスキップする直接完了経路は存在しない。
+
+`workflow-contracts` SPEC は bugfix, maintenance, docs_chore を `direct_case` に分類する。`direct_case` は req-save と spec-save を経由しないことを指し、Issue/PR を経由しないことを指さない。
+
+### 経路一覧
+
+| work_type | scale | コマンド経路 |
+|---|---|---|
+| bugfix | - | req-define → case-open → case-run → case-close |
+| maintenance | - | req-define → case-open → case-run → case-close |
+| docs_chore | - | req-define → case-open → case-run → case-close |
+| feature | standard | req-define →（req-save → spec-save）→ case-open → case-run → case-close |
+| feature | large | req-define → req-save →（spec-save）→ case-open → case-run → case-close（OU/ 子Issue 構成） |
+
+各コマンドの正式名は `/agentdev/<name>` である（例: `/agentdev/req-define`）。一覧は command README 参照。
+
+feature が経由する req-save と spec-save は req_draft の `artifact_actions` により動的判定する（v2:REQ-0138-009）。該当 entry がない場合は case-open から開始する。feature large の OU/ 子Issue 構成は `agentdev-workflow-orchestration` 参照。
+
+### docs_chore 経路の要素
+
+docs_chore は bugfix, maintenance と同一経路をとる。本節は docs_chore に特有の要素を明記する。
+
+- 入力: ユーザー要件、修正対象ドキュメント
+- SSoT 遷移: req_draft → Issue 本文 → PR 本文 → マージ済み PR + クローズ済み Issue
+- 承認: req-define の要件合意、case-close の完了前検証
+- 完了証拠: マージ済み PR + クローズ済み Issue
+- 停止条件: `agentdev_handoff: true` 検出時、req-define 合意要件からの逸脱、リポジトリ外操作の必要性
+
+docs_chore は REQ, ADR, SPEC を生成しないことが多いため req-save と spec-save を経由しないが、case-open, case-run, case-close は必ず経由する。docs 更新責務は全 work_type 共通である（v2:REQ-0104-034）。
+
 ## スケール判定基準
 
 feature のスケール（standard/ large）判定基準。

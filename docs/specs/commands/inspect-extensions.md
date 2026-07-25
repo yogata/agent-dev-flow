@@ -62,7 +62,7 @@ AgentDevFlow 標準の inspect 責務は構造確認（検査1〜4）、path 実
 - 検査対象の直接修正（G01）
 - Issue 作成、PR 作成（G02）
 - 自動修正（推奨 route 提示に留める）
-- command/skill 本文の具体参照禁止の持続的検査（project-local skill の責務、REQ-0160-046）
+- command/skill 本文の具体参照禁止の持続的検査（project-local skill の責務、REQ-002-046）
 
 ## 検証観点
 
@@ -75,6 +75,6 @@ AgentDevFlow 標準の inspect 責務は構造確認（検査1〜4）、path 実
 - [foundations/project-extensions.md](../foundations/project-extensions.md)（project extensions 基盤 SPEC）
 - [skills/agentdev-project-extensions.md](../skills/agentdev-project-extensions.md)（project extensions 読み込み skill SPEC）
 - [inspect-promote.md](inspect-promote.md)（検出事項分類、昇格）
-- REQ-0160（Project Extensions 機構と配布物参照境界）
-- ADR-0135（Project Extensions Architecture）
+- REQ-002（Project Extensions 機構と配布物参照境界）
+- ADR-005（Project Extensions Architecture）
 

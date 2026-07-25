@@ -68,7 +68,7 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`、REQ）。
 
 > **移管済み script**:
-> - `search-target-area.ts`（SPEC ファイル内 target_area 見出し検索）は `agentdev-spec-file-manager` へ移管済み（REQ-0136-029/032）。SPEC 固有処理は同 skill の公開操作契約経由で呼び出す。
+> - `search-target-area.ts`（SPEC ファイル内 target_area 見出し検索）は `agentdev-spec-file-manager` へ移管済み。SPEC 固有処理は同 skill の公開操作契約経由で呼び出す。
 > - 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-003、AG-009、AG-019、RU-20260722-01 合意）。本スキルは公開検証契約へ委譲し、内部 script パスを直接参照しない。
 
 ### I/O 契約（REQ）
@@ -87,7 +87,7 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 | `alloc-req-number.ts` | REQ番号採番（max+1、欠番埋め禁止） | argv[2]=REQ dir | `{ ok, allocated: "REQ-NNNN", max }` |
 | `alloc-adr-number.ts` | ADR番号採番（max+1、欠番埋め禁止） | argv[2]=ADR dir | `{ ok, allocated: "ADR-NNNN", max }` |
 | `alloc-composite-id.ts` | 要件行ID採番（REQ-NNNN-MMM、max+1） | argv[2]=REQ file, argv[3]=req番号（省略可） | `{ ok, allocated: "REQ-NNNN-MMM", req, max }` |
-> `search-target-area.ts`（SPEC 固有）は `agentdev-spec-file-manager` へ移管済み（REQ-0136-029/032）。target_area 見出し検索は同 skill の公開操作契約経由で呼び出す。
+> `search-target-area.ts`（SPEC 固有）は `agentdev-spec-file-manager` へ移管済み。target_area 見出し検索は同 skill の公開操作契約経由で呼び出す。
 
 > frontmatter id↔ファイル名整合性（`check-frontmatter-consistency`）、エントリ存在確認（`check-entry-existence`）、変更範囲検証（`check-change-impact`）は `agentdev-artifact-validation` へ移管済みであり、同 skill の公開検証契約へ委譲する（AG-019）。詳細は同 SKILL.md 参照。
 
@@ -104,7 +104,7 @@ cd src/opencode/skills/agentdev-req-file-manager/scripts && npm test
 ### req-save / spec-save からの呼び出し
 
 req-save と spec-save は、REQ番号、ADR番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
-target_area 見出し検索は、SPEC 固有処理として `agentdev-spec-file-manager` 配下のスクリプトで実行する（REQ-0136-029/032）。
+target_area 見出し検索は、SPEC 固有処理として `agentdev-spec-file-manager` 配下のスクリプトで実行する。
 frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-019）。詳細は req-save / spec-save command の各 Step 参照。
 
 ---
@@ -164,7 +164,7 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ## references 一覧
 
-SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える（REQ-0113-010）。
+SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える。
 
 | ファイル | 内容 |
 |----------|------|

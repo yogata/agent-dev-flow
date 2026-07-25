@@ -7,7 +7,7 @@ updated: 2026-07-12
 
 # サブエージェント委譲契約（横断）
 
-> 本 SPEC は ADR-0112 で定義されたサブエージェント委譲の一般概念に基づく共通契約を定義する。
+> 本 SPEC は v2:ADR-0112 で定義されたサブエージェント委譲の一般概念に基づく共通契約を定義する。
 > 個別 command / skill の委譲利用は各 SPEC を参照のこと。
 
 ## 目的
@@ -17,7 +17,7 @@ manager-orchestrator 以外のコマンドパターンから保存、更新を�
 
 ## 委譲時最小契約
 
-委譲時の最小契約は ADR-0112 §5 に従い以下の要素を中心に記述する。
+委譲時の最小契約は v2:ADR-0112 §5 に従い以下の要素を中心に記述する。
 `delegation_type` と `on_result` は必須 envelope ではなく、必要な場合のみ参考ラベルまたは親側の扱いとして記述する。
 
 ```yaml
@@ -72,17 +72,17 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 | `extraction` | 候補、論点、未回収事項の抽出 | 禁止 | - |
 | `draft_generation` | Issue本文、PR本文、レポート案などの草案生成 | 禁止 | - |
 | `controlled_case_execution` | case-run Epic / 複数Issue実行 | 条件付き | case-run のみ |
-| `step_execution` | case-auto からの構成工程（req-save / spec-save / case-open / case-close）の実行担当サブエージェント起動 | 許可 | case-auto からの工程委譲のみ。各工程のコマンド定義ガードレールに従う。委譲起動不能時の扱いは `delegation-unavailable` 状態として報告する（REQ-0162-003/004）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md 参照 |
+| `step_execution` | case-auto からの構成工程（req-save / spec-save / case-open / case-close）の実行担当サブエージェント起動 | 許可 | case-auto からの工程委譲のみ。各工程のコマンド定義ガードレールに従う。委譲起動不能時の扱いは `delegation-unavailable` 状態として報告する（REQ-002-003/004）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md 参照 |
 
-※ step_execution の委譲起動手段（起動方法、実行制御パラメータ）は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-0162-002）。委譲起動不能時は `delegation-unavailable` 状態として報告し、インラインフォールバックは harness 固有の実行制御として配布 SPEC から除外する（REQ-0162-004）。
+※ step_execution の委譲起動手段（起動方法、実行制御パラメータ）は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。委譲起動不能時は `delegation-unavailable` 状態として報告し、インラインフォールバックは harness 固有の実行制御として配布 SPEC から除外する（REQ-002-004）。
 
 ## 委譲制約
 
 | 制約 | 説明 |
 |---|---|
 | 対象を直接修正しない委譲（書き込み禁止型） | gate_check / semantic_review / log_analysis / classification / extraction / draft_generation は検査対象アーティファクトを変更せず、許可操作は read_files / inspect_content / return_evidence 等に限定する |
-| 親コマンド最終判断 | サブエージェントは判断の入力を提供し、最終決定は親コマンドが行う（ADR-0112 §4） |
-| 中間成果扱い | サブエージェント出力は中間成果であり、親コマンドは一部を採用、修正、却下できる（ADR-0112 §6） |
+| 親コマンド最終判断 | サブエージェントは判断の入力を提供し、最終決定は親コマンドが行う（v2:ADR-0112 §4） |
+| 中間成果扱い | サブエージェント出力は中間成果であり、親コマンドは一部を採用、修正、却下できる（v2:ADR-0112 §6） |
 | 成果物本文の verbatim | Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物はそのまま（verbatim）返す |
 | 判定結果の圧縮 | 判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す |
 | Script 優先 | 単純な決定的検査は Script 優先。非決定的処理（意味レビュー、分類、抽出等）にサブエージェント委譲を適用 |
@@ -91,10 +91,10 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 
 | 項目 | manager-orchestrator | 軽量委譲 |
 |---|---|---|
-| 適用コマンド | case-run / case-auto | 上記初期適用対象（ADR-0112、case-auto の工程委譲を含む、ADR-0127） |
+| 適用コマンド | case-run / case-auto | 上記初期適用対象（v2:ADR-0112、case-auto の工程委譲を含む、v2:ADR-0127） |
 | 委譲規模 | 複数サブエージェント統制、Wave scheduling、障害伝播 | 単一タスク委譲（case-auto の構成工程委譲は step_execution で各工程単位） |
 | 状態管理 | 大規模な状態機械、自己修復ループ | なし（一方向の入出力） |
-| プロトコル | case-run 専用サブエージェントプロトコル（`agentdev-case-run-execution-adapter`）、case-auto は工程別委譲契約（ADR-0127） | 本汎用サブエージェント委譲契約 |
+| プロトコル | case-run 専用サブエージェントプロトコル（`agentdev-case-run-execution-adapter`）、case-auto は工程別委譲契約（v2:ADR-0127） | 本汎用サブエージェント委譲契約 |
 | 書き込み | すべて許可 | 原則禁止（controlled_case_execution / step_execution のみ条件付き） |
 
 ## 初期適用対象
@@ -106,7 +106,7 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 |---|---|---|
 | req-define | extraction / classification | 入力整理、既存文書照合、関連文書候補抽出 |
 | case-run | gate_check / semantic_review / log_analysis | 検査、解析系ステップ |
-| case-auto | step_execution（ADR-0127） | 構成工程（req-save / spec-save / case-open / case-close）の実行担当サブエージェント起動。各工程のコマンド定義を authoritative source として実行し、結果（Issue/PR番号、pass/warn/fail）を case-auto に返す |
+| case-auto | step_execution（v2:ADR-0127） | 構成工程（req-save / spec-save / case-open / case-close）の実行担当サブエージェント起動。各工程のコマンド定義を authoritative source として実行し、結果（Issue/PR番号、pass/warn/fail）を case-auto に返す |
 | inspect-docs | semantic_review / classification | 意味レビュー、分類一貫性確認 |
 | backlog-review | classification / semantic_review / extraction | artifact分析、統合/分割、矛盾検出 |
 | learning-promote | classification / gate_check | 分類、評価、既存対策確認 |
@@ -119,13 +119,13 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 | 公開API、入力、出力、ガードレール、高レベルStep | Command定義（`src/opencode/commands/agentdev/*.md`） |
 | 再利用可能な判断基準、検査観点の詳細 | Skill references（`references/*.md`） |
 | 委譲インタフェース（共通エンベロープ、delegation_type 分類、制約） | 本 SPEC |
-| 委譲のアーキテクチャ判断（一般概念、manager-orchestrator位置づけ、検査、分類委譲の許容） | ADR-0112 |
+| 委譲のアーキテクチャ判断（一般概念、manager-orchestrator位置づけ、検査、分類委譲の許容） | v2:ADR-0112 |
 | case-run 専用プロトコル（起動仕様、プロンプト構成、Epic Wave 実行/クローズモデル） | `agentdev-case-run-execution-adapter` skill references |
 | 編集安全手順、AST-grep運用、大規模ファイル分割 | `agentdev-case-run-execution-adapter` skill references |
 | 委譲定義の最小構成、delegated_check、中間成果基準 | `agentdev-command-authoring` skill references |
 | 決定的な変換、検証、生成 | Script（`scripts/*.js`） |
 
-## case-auto 並列委譲モデル拡張（REQ-0114-087〜093）
+## case-auto 並列委譲モデル拡張（REQ-006-087〜093）
 
 ### 並列委譲と直列集約の分離
 
@@ -140,10 +140,10 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 
 ### 集約原則
 
-- 並列委譲された単位の成功、失敗は親コマンドが集約し、最終判定に反映する（REQ-0114-092）
-- 直列集約対象は並列委譲の完了を待ってから親コマンドが実行する（REQ-0114-093）
+- 並列委譲された単位の成功、失敗は親コマンドが集約し、最終判定に反映する（REQ-006-092）
+- 直列集約対象は並列委譲の完了を待ってから親コマンドが実行する（REQ-006-093）
 
-## case-auto 委譲契約 MUST NOT DO 精密化（REQ-0146-004）
+## case-auto 委譲契約 MUST NOT DO 精密化（REQ-003-004）
 
 case-auto の MUST NOT DO を「実質的 SPEC / REQ / ADR 内容編集禁止（lifecycle 状態遷移 `draft`→`accepted` は除く）」へ精密化する。状態遷移操作と内容編集操作の分類判定表:
 
@@ -155,10 +155,10 @@ case-auto の MUST NOT DO を「実質的 SPEC / REQ / ADR 内容編集禁止（
 | 既存 SPEC frontmatter `updated` 日付更新 | 許可（lifecycle メタデータ） |
 | `.agentdev/drafts/**` の status 更新 | 許可（ハンドオフ状態管理） |
 
-## 実行主体分類表（委譲契約必須項目、REQ-0146-007）
+## 実行主体分類表（委譲契約必須項目、REQ-003-007）
 
 req-define の委譲契約セクションは、各委譲について実行主体分類表を必須テンプレートとして含む。
-本分類軸は ADR-0107 の成果物種別（command / skill / template / script）とは直交する。
+本分類軸は v2:ADR-0107 の成果物種別（command / skill / template / script）とは直交する。
 
 | 分類 | 意味 | 例 |
 |---|---|---|
@@ -167,24 +167,24 @@ req-define の委譲契約セクションは、各委譲について実行主体
 | subagent | 委譲で起動されるエージェント型 | 実行担当サブエージェント（AGENTS.md で選定） |
 | harness | case-run 実行ハーネス（外部実行基盤） | 外部実行基盤（AGENTS.md で選定） |
 
-## case-open push タイミング（REQ-0146-003）
+## case-open push タイミング（REQ-003-003）
 
 case-open は draft / RU 削除 commit を作成した直後に push する。
 case-run 引き継ぎ時の `git pull` 失敗を防止するため、削除 commit と Issue 作成の中間で作業ツリー状態を確定させる。
 `.agentdev/drafts/` 配下と `.agentdev/backlog/req-units/` 配下の削除はいずれも即時 push 対象とする。
 
-## 前工程完了度属性（REQ-0146-011）
+## 前工程完了度属性（REQ-003-011）
 
 case-open は子 Issue 本文に「前工程完了度」属性を埋め込む。
 分類定義は [epic-wave-model.md](epic-wave-model.md) の「前工程完了度3段階分類」セクション参照。
-subagent は当該属性に応じた振る舞い指針（検証のみでも acceptance criteria 順位検証は必須等）に従う（REQ-0146-012）。
+subagent は当該属性に応じた振る舞い指針（検証のみでも acceptance criteria 順位検証は必須等）に従う（REQ-003-012）。
 
 ## See Also
 
 - [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
 - [epic-wave-model.md](epic-wave-model.md)（Epic Wave 実行モデル）
-- ADR-0112（サブエージェント委譲の一般概念）
-- ADR-0127（case-auto の工程委譲）
-- ADR-0128（case-run 外部実行委譲）
+- v2:ADR-0112（サブエージェント委譲の一般概念）
+- v2:ADR-0127（case-auto の工程委譲）
+- v2:ADR-0128（case-run 外部実行委譲）
 - `agentdev-case-run-execution-adapter` skill（case-run 外部実行 adapter）
 - `agentdev-command-authoring` skill（委譲定義記述標準）

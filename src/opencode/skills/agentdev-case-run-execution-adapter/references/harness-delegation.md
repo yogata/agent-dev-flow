@@ -3,7 +3,7 @@
 AgentDevFlow 側（case-run）から実行担当サブエージェントを委譲起動するための実装ノート。
 読者は AgentDevFlow の case-run 実装者。
 抽象IF（ハーネス非依存）は親の `SKILL.md` 参照。
-本ファイルは harness 固有の委譲起動仕様を扱う。具体的な harness の選定は AGENTS.md 参照（REQ-0162-002）。
+本ファイルは harness 固有の委譲起動仕様を扱う。具体的な harness の選定は AGENTS.md 参照。
 
 case-run は AGENTS.md で選定された外部実行基盤のエージェント型（実行担当サブエージェント）へ、adapter skill（`agentdev-case-run-execution-adapter`）を読み込んで委譲を起動する（委譲 prompt 内で実行 command を指定）。
 起動手段、実行制御パラメータの詳細は本ファイルおよび AGENTS.md 参照。
@@ -45,7 +45,7 @@ case-run は result から PR URL（PR番号）を取り出す。
 - **`completed-pr`**: PR番号/ PR URL を含む。case-run は PR URL を受け取りクリーンアップフェーズへ
 - **`blocked`**: 回答可能な blocker の内容。実行担当サブエージェントが Issue コメントに SSoT として詳細本文を記録済み。case-run はエラー処理に従い停止、ユーザー報告
 - **`failed`**: repository context で回答不能な blocker の内容。実行担当サブエージェントが Issue コメントに構造化記録済み。case-run はエラー処理に従い停止、ユーザー報告
-- **`delegation-unavailable`**: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す（REQ-0162-004）
+- **`delegation-unavailable`**: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す
 
 ### 終了コード、異常終了の活用
 

@@ -1,6 +1,6 @@
 # 既存REQ照合、整合性チェック、マージ競合対応
 
-本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、req-define での既存REQ照合方法論、Issue/ADR/README との整合性チェック、REQ更新失敗時のマージ競合対応パターンを扱う。SKILL.md 本文では要点のみを提示し、照合の判定要素、操作分類の5軸評価、マージ競合パターン別解決方法は本ファイルを参照する（REQ-0113-010）。
+本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、req-define での既存REQ照合方法論、Issue/ADR/README との整合性チェック、REQ更新失敗時のマージ競合対応パターンを扱う。SKILL.md 本文では要点のみを提示し、照合の判定要素、操作分類の5軸評価、マージ競合パターン別解決方法は本ファイルを参照する。
 
 ## 既存REQ照合方法論
 

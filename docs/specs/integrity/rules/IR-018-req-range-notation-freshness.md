@@ -12,7 +12,7 @@ status: accepted
 | category | document-drift |
 | detection_method | N件、through 等の表記と glob 結果の照合 |
 | affected_artifacts | [AGENTS.md, SPEC, guides] |
-| related_req | [REQ-0108-140] |
+| related_req | [REQ-010-140] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。表記揺れの判定に注意 |

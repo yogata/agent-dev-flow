@@ -41,7 +41,7 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 - description にトリガー埋め込み（USE FOR / DO NOT USE FOR）
 - 実行時パス（`.opencode/skills/`）と source path（`src/opencode/skills/`）の区別
 - サブエージェント編集安全性
-- スキル本文と references の project docs 参照は skill extension に集約する（ADR-0135、SPEC `../foundations/project-extensions.md`）
+- スキル本文と references の project docs 参照は skill extension に集約する（ADR-005、SPEC `../foundations/project-extensions.md`）
   - スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
   - 実行時に読むべき docs は `.agentdev/extensions/skills/<skill>.yaml` の `context` へ移す
   - skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
@@ -49,7 +49,7 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 
 ## project docs 参照
 
-スキル本文と references の project docs 参照は skill extension（`.agentdev/extensions/skills/<skill>.yaml`）に集約する（ADR-0135、REQ-0160、SPEC `../foundations/project-extensions.md`）。各 SKILL.md には extension 参照方針（4項目）を配置する:
+スキル本文と references の project docs 参照は skill extension（`.agentdev/extensions/skills/<skill>.yaml`）に集約する（ADR-005、REQ-002、SPEC `../foundations/project-extensions.md`）。各 SKILL.md には extension 参照方針（4項目）を配置する:
 
 1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/<skill>.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
@@ -74,6 +74,6 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 
 - [agentdev-command-authoring.md](agentdev-command-authoring.md)
 - [agentdev-inspect-skills.md](agentdev-inspect-skills.md)
-- REQ-0113（Skill References SPEC 分離基準）
-- REQ-0119（コマンド、スキル、サブエージェント責務分界）
+- v2:REQ-0113（Skill References SPEC 分離基準）
+- REQ-003（コマンド、スキル、サブエージェント責務分界）
 

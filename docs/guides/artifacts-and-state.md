@@ -30,8 +30,8 @@ DOC-MAP と guides は基準への導線を提供する。
 | Skill | `src/opencode/skills/agentdev-*`（実行時: `.opencode/skills/agentdev-*`） | 判定基準、共通知識、宣言的ルールの一次参照 |
 | Template | Skill 配下 `templates/` | Issue/PR 本文の出力構造とプレースホルダー |
 | Script | Skill 配下 `scripts/` | ガードレール、検査、補助処理の実行可能ロジック |
-| リポジトリ専用 Command | `.opencode/commands/repo/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用コマンド（ADR-0106）。配布対象外 |
-| リポジトリ専用 Skill | `.opencode/skills/repo-*/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用スキル（ADR-0106）。配布対象外 |
+| リポジトリ専用 Command | `.opencode/commands/repo/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用コマンド（ADR-001）。配布対象外 |
+| リポジトリ専用 Skill | `.opencode/skills/repo-*/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用スキル（ADR-001）。配布対象外 |
 
 Command は判定ロジックを Skill の参照先に委ねる。
 Skill は Command の Step 番号やファイルパスは Command 側で管理する。
@@ -69,9 +69,9 @@ docs/
   integrity/                     # 整合性検証レポート
 .opencode/                        # 実行時の配置先（ジャンクション → src/opencode/）
   commands/agentdev/             # Command 定義（AgentDevFlow 配布対象）
-  commands/repo/                 # AgentDevFlow 本体リポジトリ専用コマンド（ADR-0106、配布対象外）
+  commands/repo/                 # AgentDevFlow 本体リポジトリ専用コマンド（ADR-001、配布対象外）
   skills/agentdev-*/             # Skill 定義（AgentDevFlow 配布対象）
-  skills/repo-*/                 # AgentDevFlow 本体リポジトリ専用スキル（ADR-0106、配布対象外）
+  skills/repo-*/                 # AgentDevFlow 本体リポジトリ専用スキル（ADR-001、配布対象外）
 src/opencode/                     # 原本（正規の定義ファイル）
   commands/agentdev/             # Command 原本
   skills/agentdev-*/             # Skill 原本
@@ -106,8 +106,8 @@ scripts/
 
 ### ディレクトリ責務の補足
 
-- `.agentdev/`: AgentDevFlow のドメイン状態。Intake / Learning / Backlog / 整合性の永続データを管理する。配布物ではなく、リポジトリの動作状態を保持する（ADR-0103）。AgentDevFlow 本体リポジトリ / 適用プロジェクトの双方で使用される。
-- `.agentdev-plugin/`: 適用プロジェクトにおける agent-dev-flow の git clone 先（REQ-0103-072~077）。AgentDevFlow 本体リポジトリでは直接 `.agentdev/` を使用する。`.gitignore` で管理対象外とする。
+- `.agentdev/`: AgentDevFlow のドメイン状態。Intake / Learning / Backlog / 整合性の永続データを管理する。配布物ではなく、リポジトリの動作状態を保持する（ADR-001）。AgentDevFlow 本体リポジトリ / 適用プロジェクトの双方で使用される。
+- `.agentdev-plugin/`: 適用プロジェクトにおける agent-dev-flow の git clone 先（v2:REQ-0103-072~077）。AgentDevFlow 本体リポジトリでは直接 `.agentdev/` を使用する。`.gitignore` で管理対象外とする。
 - `.agentdev/drafts/`: コマンドワークフローでのみ明示的に定義された作業中ドラフトの引き継ぎに使用する一時領域。
 
 ## 成果物ライフサイクル
@@ -143,20 +143,20 @@ RU 削除は `/agentdev/case-open` の永続化成功に限定する。
 | `review` | PR 作成済み、レビュー中 | レビュー完了 |
 | `done` | 完了（post-run capture 含む） | レビュー完了 |
 
-6 マイクロフェーズは説明用ラベルであり、AgentDevFlow は全体横断の状態遷移モデルではなく、各コマンドの入出力契約とディレクトリ配置が実際の状態表現である（REQ-0112-023）。
+6 マイクロフェーズは説明用ラベルであり、AgentDevFlow は全体横断の状態遷移モデルではなく、各コマンドの入出力契約とディレクトリ配置が実際の状態表現である（v2:REQ-0112-023）。
 
-## 状態モデル制約（REQ-0112）
+## 状態モデル制約（v2:REQ-0112）
 
 以下の制約を AgentDevFlow の状態モデルに適用する。
 
-- REQ / SPEC の状態管理は Issue ラベル、GitHub Project で行う（REQ-0112-027）
-- intake promoted の route / status はディレクトリ配置で表現する（REQ-0112-028）
-- Issue / PR の状態を docs に複製しない（REQ-0112-029）
-- command-map を状態遷移エンジン化しない（REQ-0112-030）
+- REQ / SPEC の状態管理は Issue ラベル、GitHub Project で行う（v2:REQ-0112-027）
+- intake promoted の route / status はディレクトリ配置で表現する（v2:REQ-0112-028）
+- Issue / PR の状態を docs に複製しない（v2:REQ-0112-029）
+- command-map を状態遷移エンジン化しない（v2:REQ-0112-030）
 
 ## .agentdev/ の位置づけ
 
-`.agentdev/` は AgentDevFlow の正規のドメイン状態（永続的な管理情報）である（REQ-0112-024）。
+`.agentdev/` は AgentDevFlow の正規のドメイン状態（永続的な管理情報）である（v2:REQ-0112-024）。
 
 - **ドメイン状態**: Intake / Learning / Backlog / 整合性のパイプライン状態を保持する
 - **配布物ではない**: 実行時配布物の一部ではなく、agent-dev-flow リポジトリ内の作業領域である

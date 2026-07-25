@@ -29,7 +29,7 @@
 |-----------|-------------|------|
 | ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート |
 
-> これらのコマンドは配布対象外（ADR-0106）であり、AgentDevFlow 本体リポジトリでのみ利用する。
+> これらのコマンドは配布対象外（v2:ADR-0106）であり、AgentDevFlow 本体リポジトリでのみ利用する。
 
 ## 使い方
 
@@ -39,7 +39,7 @@
 
 ## 補足
 
-- 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（REQ-0138, ADR-0124）。REQ/ADR 対象 artifact_actions があれば req-save、SPEC 対象 artifact_actions があれば spec-save を実行する
+- 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138, v2:ADR-0124）。REQ/ADR 対象 artifact_actions があれば req-save、SPEC 対象 artifact_actions があれば spec-save を実行する
 - Intake / Learning パイプラインの詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) を参照
 - 各コマンドの入出力の詳細は [要件定義 → Case実行フロー](req-case-flow.md) を参照
 - `/agentdev/case-auto` は明示指定時のみ使用する追加入口。標準ワークフローを置き換えない

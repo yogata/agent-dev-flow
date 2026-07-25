@@ -31,8 +31,8 @@ ADR 作成の必要性判定基準、作成ガイドライン、ライフサイ�
 
 - Architecturally Significant な決定に対してのみ ADR を作成
 - accepted 後は不変、変更時は新規 ADR 作成
-- 単なる廃止、削除、移行は新規 ADR ではなく `retire` / `supersede` で処理（REQ-0101-044/045）
-- 既存 ADR との意味的重複確認（REQ-0101-051、重複時は UPDATE 推奨）
+- 単なる廃止、削除、移行は新規 ADR ではなく `retire` / `supersede` で処理（REQ-001-044/045）
+- 既存 ADR との意味的重複確認（REQ-001-051、重複時は UPDATE 推奨）
 
 ## 対象外
 
@@ -53,6 +53,6 @@ ADR 作成の必要性判定基準、作成ガイドライン、ライフサイ�
 - [agentdev-architecture-advisory.md](agentdev-architecture-advisory.md)
 - [agentdev-req-analysis.md](agentdev-req-analysis.md)
 - [commands/req-define.md](../commands/req-define.md)
-- REQ-0101（文書、REQ 管理基準）
-- REQ-0112（ADR ライフサイクル標準化）
+- REQ-001（文書、REQ 管理基準）
+- REQ-001（ADR ライフサイクル標準化）
 

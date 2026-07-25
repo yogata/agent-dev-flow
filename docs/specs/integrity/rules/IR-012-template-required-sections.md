@@ -12,7 +12,7 @@ status: accepted
 | category | document-drift |
 | detection_method | template ファイルの構造検証 |
 | affected_artifacts | [templates] |
-| related_req | [REQ-0108 (workflow template 構造)] |
+| related_req | [REQ-010 (workflow template 構造)] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低 |

@@ -7,13 +7,13 @@ updated: 2026-07-24
 
 # 配布物整合性検査ルール
 
-REQ-0142-006 / REQ-0142-007 の検査観点の詳細を配置する。
+REQ-002-006 / REQ-002-007 の検査観点の詳細を配置する。
 配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）から内部管理 ID を除去した後の完了条件として、構文健全性、文意保持、責務整合を検査するための検出パターンと NG 分類を定義する。
 
 ## 検査バックエンド責務分担（check_integrity.ts vs inspect-* skills）
 
 配布物整合性検査（本 SPEC が定義する構文健全性、文意保持、責務整合の検出パターン）の実行バックエンドを以下の通り確定する。
-`docs-check` バックエンド（`check_integrity.ts`）と inspect-* skills の責務分担を明確化し、検出漏れと NG 汚染を防ぐ（REQ-0145-004）。
+`docs-check` バックエンド（`check_integrity.ts`）と inspect-* skills の責務分担を明確化し、検出漏れと NG 汚染を防ぐ（REQ-010-004）。
 
 ### 責務分担（決定論的 vs 意味的診断）
 
@@ -29,7 +29,7 @@ REQ-0142-006 / REQ-0142-007 の検査観点の詳細を配置する。
 
 - **`check_integrity.ts`（docs-check バックエンド）の扱い**: 配布物に対して REQ/SPEC/reference 整合性（frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存等、IR ルールカタログ既定の決定論的検出）を実施する。本 SPEC が定義する配布物整合性検査（構文健全性の重複検出、文意保持の意味解析、責務整合の照合）は `check_integrity.ts` に追加**しない**。
 - **inspect-* skills の扱い**: 配布物整合性検査（本 SPEC）は inspect-docs（Step 11: 配布物整合性検査）、inspect-skills（配布物 frontmatter 構文健全性、見出し構文健全性、Markdown 構文破損、壊れた括弧/参照残骸、command-skill 責務説明矛盾）のみで運用する。
-- **`skill-category-gap` ルールとの整合**: 配布物整合性検査を `check_integrity.ts` に新カテゴリとして追加しないことにより、`check_integrity.ts` の `categoryToCheckPattern` map と SKILL.md カテゴリ定義の不一致（skill-category-gap、REQ-0108-161/171、REQ-0144-005）による NG 汚染を生じない。新カテゴリ導入に伴うターゲットング隠退化を防ぐため、配布物整合性検査は inspect-* skills（意味的診断層）に集約する。
+- **`skill-category-gap` ルールとの整合**: 配布物整合性検査を `check_integrity.ts` に新カテゴリとして追加しないことにより、`check_integrity.ts` の `categoryToCheckPattern` map と SKILL.md カテゴリ定義の不一致（skill-category-gap、REQ-010-161/171、REQ-010-005）による NG 汚染を生じない。新カテゴリ導入に伴うターゲットング隠退化を防ぐため、配布物整合性検査は inspect-* skills（意味的診断層）に集約する。
 
 ### 根拠
 

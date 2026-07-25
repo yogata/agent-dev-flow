@@ -5,10 +5,10 @@ updated: 2026-07-24
 
 # 品質ゲート
 
-AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-0108）。
+AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-010）。
 各ゲートの判定基準、機械化境界、実装マッピングを示す。
 
-> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリの設計文書であり、実行時配布対象ではない（ADR-0103, ADR-0104）。
+> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリの設計文書であり、実行時配布対象ではない（REQ-001, REQ-001）。
 > 実行時コマンドは本 SPEC に依存せず、`agentdev-quality-gates` スキルの参照ファイルを実行時参照先とする。
 
 ## 適用範囲
@@ -133,16 +133,16 @@ Issue 完了条件チェックボックスの全達成、CI 通過、ドキュ�
 ### 完了条件チェックボックス評価
 
 QG-4 は Issue 本文の完了条件セクションのチェックボックスを品質ゲートとして評価する。
-識別子中心評価（REQ-0146-011）を主評価値とし、件数や行数などの実測値は補助値として扱う。
+識別子中心評価（REQ-003-011）を主評価値とし、件数や行数などの実測値は補助値として扱う。
 未達項目は case-run への差し戻し（G08）、または intake への逃がし禁止（G16）として扱う。
 
-verify-only PR（実装差分0件、検証のみ）の場合、QG-4 の完了条件評価は PR 本文の verify-only 根拠欄（実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果）を証拠ソースとして認める。verify-only PR は実装差分を含まないため、根拠欄の記載で完了条件を評価する。verify-only PR では case-close Step 3-1 targeted docs guard の `files_checked` が空配列となるが、根拠欄の記載により空の `files_checked` が無根拠にならない。verify-only PR の判定基準（PR 変更ファイル一覧が空配列、根拠欄の記載十分性、受け入れ基準の検証充足）は [case-close.md](../commands/case-close.md)「verification-only PR の files_checked 空確認（REQ-0158-002）」が定め、QG-4 は当該判定を経た PR のみを PASS とする。
+verify-only PR（実装差分0件、検証のみ）の場合、QG-4 の完了条件評価は PR 本文の verify-only 根拠欄（実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果）を証拠ソースとして認める。verify-only PR は実装差分を含まないため、根拠欄の記載で完了条件を評価する。verify-only PR では case-close Step 3-1 targeted docs guard の `files_checked` が空配列となるが、根拠欄の記載により空の `files_checked` が無根拠にならない。verify-only PR の判定基準（PR 変更ファイル一覧が空配列、根拠欄の記載十分性、受け入れ基準の検証充足）は [case-close.md](../commands/case-close.md)「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」が定め、QG-4 は当該判定を経た PR のみを PASS とする。
 
 PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。verify-only 根拠欄の記入規則は [case-run.md](../commands/case-run.md)「verify-only 根拠欄の記入規則」参照。
 
 ### 詳細
 
-判定基準、検査観点の詳細は `agentdev-quality-gates` スキルの `references/qg-4-final-acceptance.md` を参照。識別子中心評価の運用実例集は同 reference が蓄積し、REQ-0146-011 と意味を一致させる。
+判定基準、検査観点の詳細は `agentdev-quality-gates` スキルの `references/qg-4-final-acceptance.md` を参照。識別子中心評価の運用実例集は同 reference が蓄積し、REQ-003-011 と意味を一致させる。
 
 #### test strategy 処理完了確認
 

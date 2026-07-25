@@ -47,7 +47,7 @@ agreed_items:
 # 1 action = 1 artifact × 1 editing concern（REQ-ID 単位でも箇条書き1行単位でもない）
 # 同一関心の複数 agreed items は単一 action に複数段落の content としてまとめる
 artifact_actions:
-  - id: ACT-REQ-001             # ACT-{ARTIFACT}-{NNN}
+  - id: ACT-REQ-{NNN}           # ACT-{ARTIFACT}-{NNN}
     artifact: req               # req / adr / spec
     operation: create           # REQ/ADR: create / append / update、SPEC: create / update
     target: new:{topic-slug}    # REQ/ADR: file path または new:{slug}。SPEC は target_spec 構造化推奨
@@ -55,7 +55,7 @@ artifact_actions:
     source_items: [AG-001, AG-002] # 対応する agreed_item ID の list
     content: |                  # 保存対象の full text
       {保存対象の本文}
-  - id: ACT-ADR-001
+  - id: ACT-ADR-{NNN}
     artifact: adr
     operation: create
     target: new:{topic-slug}
@@ -108,7 +108,7 @@ test_strategy:
     on_failure: |              # 不合格時の処置（fix-and-reverify / record-in-findings の選択理由を含む）
       {不合格時の処置の本文}
 
-# review_dispositions: 採否判断（covered / rejected 等）の記録。optional soft-contract（ADR-0124）
+# review_dispositions: 採否判断（covered / rejected 等）の記録。optional soft-contract
 # 欠落時に後続工程は draft を拒否しない（後方互換）。covered 項目だけで Issue/PR を作成しない方針を維持する
 # 1 エントリ = 単一 source_ru + 単一 source_item（重複禁止）
 # evidence.checked_at_commit は req-define 生成時 null（G08 git 禁止）。case-open が default branch 最新化後に再確認し確認 commit SHA を記録する

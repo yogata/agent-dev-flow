@@ -28,9 +28,9 @@ req-define が要件を確定する前にアーキテクチャ上の影響を確
 
 ## 現在の動作（oracle 抽象化後）
 
-- アーキテクチャ助言サブエージェントの助言のみを根拠にドラフト本文へ確定事項を混入させない（REQ-0139-002/004）
+- アーキテクチャ助言サブエージェントの助言のみを根拠にドラフト本文へ確定事項を混入させない（REQ-003-002/004）
 - 外部助言エージェントが利用できない場合はブロッカーとして報告
-- アーキテクチャ助言サブエージェントはファイル編集主体ではない（REQ-0139-003）
+- アーキテクチャ助言サブエージェントはファイル編集主体ではない（REQ-003-003）
 - 相談入力: 要件候補、既存 REQ/ADR/SPEC の矛盾候補、ADR 候補、SPEC 候補、責務境界変更、未解決分岐、具体質問
 - 助言出力: 推奨方向、主要な設計リスク、ADR create/update/unnecessary 判断、SPEC 分離候補、矛盾解消提案、根拠参照、確信度
 
@@ -52,5 +52,5 @@ req-define が要件を確定する前にアーキテクチャ上の影響を確
 - [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)
 - [agentdev-req-analysis.md](agentdev-req-analysis.md)
 - [commands/req-define.md](../commands/req-define.md)
-- REQ-0139（外部エージェント統合契約）
+- REQ-003（外部エージェント統合契約）
 

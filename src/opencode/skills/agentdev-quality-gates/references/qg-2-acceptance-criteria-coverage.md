@@ -49,7 +49,7 @@ Issue 本文がテンプレート（`issue_desc_*.md`）の【必須】セクシ
 
 - **fail**: `完了条件` セクションの欠落、または【必須】セクションの欠落。
 
-### 6. 数値閾値到達可能性検証（REQ-0131-031）
+### 6. 数値閾値到達可能性検証
 
 完了条件に数値閾値（LF 数、行数、ファイル数、件数等の定量化基準）を設定する場合、当該閾値が対象成果物の自然な構造で到達可能であることを事前検証する（境界ケース #1538/TS-007 由来）。
 
@@ -66,7 +66,7 @@ Issue 本文がテンプレート（`issue_desc_*.md`）の【必須】セクシ
 - **warn**: 閾値は到達可能だが根拠が曖昧。設定根拠の明示を推奨。
 - **pass**: 閾値が到達可能、または数値閾値を含まない。
 
-test strategy 策定時の具体的な閾値設定手順は `agentdev-req-analysis` の [test-strategy-numeric-threshold-guide.md](../../../agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md) を参照。REQ-0131-031 と整合する。
+test strategy 策定時の具体的な閾値設定手順は `agentdev-req-analysis` の [test-strategy-numeric-threshold-guide.md](../../../agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md) を参照。
 
 ### 7. テスト戦略 vs Epic 対象外 整合性検証
 

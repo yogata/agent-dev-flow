@@ -14,7 +14,7 @@ Project Extensionsのschema、配置、ID、参照path、委譲先skill、上書
 | category | broken-reference |
 | detection_method | `check_extensions.ts`によるschema検証、配置・ID整合、path実在、委譲先skill存在、旧機構残存、上書き意図の検査 |
 | affected_artifacts | `.agentdev/extensions/commands/*.yaml`, `.agentdev/extensions/skills/*.yaml` |
-| related_req | REQ-0160 |
+| related_req | REQ-002 |
 | related_spec | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | テンプレート例、検査対象宣言、repo-local領域をexemptionで抑制する |

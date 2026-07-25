@@ -5,10 +5,10 @@ status: accepted
 
 # 整合性ルールカタログ
 
-整合性検査の全ルールのスキーマ定義とルールインデックスを維持するカタログ（REQ-0108-150, 151, REQ-0156-008）。
-各ルールの15フィールド詳細は [rules/](rules/) サブディレクトリの個別ファイル `IR-NNN-{slug}.md` に配置する（REQ-0155-007 局所物理分離）。
+整合性検査の全ルールのスキーマ定義とルールインデックスを維持するカタログ（REQ-010-150, 151, REQ-001-008）。
+各ルールの15フィールド詳細は [rules/](rules/) サブディレクトリの個別ファイル `IR-NNN-{slug}.md` に配置する（v2:REQ-0155-007 局所物理分離）。
 
-> **リポジトリローカル文脈**: 整合性検査は `/repo/docs-check` コマンドと `repo-agentdev-integrity` skill により実行されるリポジトリローカル自己監査である（ADR-0106）。
+> **リポジトリローカル文脈**: 整合性検査は `/repo/docs-check` コマンドと `repo-agentdev-integrity` skill により実行されるリポジトリローカル自己監査である（REQ-001）。
 > AgentDevFlow の consumer 配布対象外。
 > 語彙レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` に配置する。
 
@@ -50,7 +50,7 @@ IR-NNN（個別 integrity rule）の `regression_test` フィールドは以下�
 
 ## ルールインデックス
 
-各ルールの15フィールド詳細は [rules/](rules/) サブディレクトリの個別ファイル `IR-NNN-{slug}.md` を参照（REQ-0155-007 局所物理分離、REQ-0156-008）。
+各ルールの15フィールド詳細は [rules/](rules/) サブディレクトリの個別ファイル `IR-NNN-{slug}.md` を参照（v2:REQ-0155-007 局所物理分離、REQ-001-008）。
 catalog はスキーマ定義とインデックスを維持する。
 
 IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 から `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。直接編集は行わない。
@@ -104,11 +104,11 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 
 ### IR-045: （削除）docs 日本語表現、文意整合検査
 
-> **削除済み（REQ-0108-255/256, REQ-0108-262）**: IR-045 の検査は docs-check の機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲した。
-> docs-check は意味判断を要する文意整合検査を保持しない（機械化原則 REQ-0108-056/254/261/262）。
-> catalog↔実装双方向同期運用手順（REQ-0145-003）に従い baseline_status: resolved の上で本エントリを削除した。
-> IR-045 識別子は REQ-0108-255/256、`vocabulary-registry.md`「文意品質検出対象語（IR-045）」で文意品質検出対象語の参照として残る。
-> 新規検出時の復活運用（REQ-0145-003）に従い、必要に応じて docs-check 検出対象への復活を検討する。
+> **削除済み（REQ-010-255/256, REQ-010-262）**: IR-045 の検査は docs-check の機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲した。
+> docs-check は意味判断を要する文意整合検査を保持しない（機械化原則 REQ-010-056/254/261/262）。
+> catalog↔実装双方向同期運用手順（REQ-010-003）に従い baseline_status: resolved の上で本エントリを削除した。
+> IR-045 識別子は REQ-010-255/256、`vocabulary-registry.md`「文意品質検出対象語（IR-045）」で文意品質検出対象語の参照として残る。
+> 新規検出時の復活運用（REQ-010-003）に従い、必要に応じて docs-check 検出対象への復活を検討する。
 
 IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。直接編集は行わない。
 
@@ -119,7 +119,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 - [IR-049: Command file format violation](rules/IR-049-command-file-format-violation.md)
 - [IR-050: load_skills command 誤指定検出](rules/IR-050-load-skills-command-mis-specification.md)
 - [IR-051: 実行主体の skill 表記誤認検出](rules/IR-051-executor-skill-notation-misrecognition.md)
-- [IR-052: 完了条件 grep パターン設計（REQ-0145-011）](rules/IR-052-completion-grep-pattern-design.md)
+- [IR-052: 完了条件 grep パターン設計（REQ-010-011）](rules/IR-052-completion-grep-pattern-design.md)
 - [IR-053: gh 直接記述検出](rules/IR-053-gh-direct-invocation-detection.md)
 - [IR-054: draft SPEC 放置検出](rules/IR-054-draft-spec-abandonment-detection.md)
 - [IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）](rules/IR-055-runtime-unresolved-reference.md)
@@ -133,7 +133,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 
 ### 新規 IR 候補（baseline_status: candidate）
 
-以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。REQ-0145-005 の新規 IR 追加フロー（6ステップ）に従い確定する。
+以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。REQ-010-005 の新規 IR 追加フロー（6ステップ）に従い確定する。
 
 | Field | 値 |
 |-------|------|
@@ -143,7 +143,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 | category | document-drift |
 | detection_method | retired REQ/SPEC ID リストをソースとした本文横断検索。活性 REQ/SPEC への言及は対象外。supersede 元への言及は文脈判定で finding 扱い |
 | affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**`, `docs/guides/**` |
-| related_req | REQ-0124, REQ-0125 |
+| related_req | REQ-010, REQ-010 |
 | related_spec | `docs/specs/foundations/document-model.md`（SPEC ライフサイクル superseded） |
 | gate_level | full-audit |
 | false_positive_risk | supersede 元への妥当な文脈参照。finding 扱いで人間確認を挟む |
@@ -163,9 +163,9 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 
 check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（req-save/spec-save/case-run/case-close）に必要なルールサブセットを適用する。catalog は IR ルールの正典であり、check_changed_docs.ts の profileFor() が返す rules は catalog IR のサブセット参照である。check_integrity.ts は全 IR ルール（full-audit gate_level）を実装する。check_changed_docs.ts と check_integrity.ts の二系統で IR ルールを共有し、検出ロジックを重複実装しない。
 
-詳細な IR-*.md の追加・更新内容は後続の spec-save / case-run 工程で確定する。check_changed_docs.ts の profile rules と SPEC 記載項目の対応関係は REQ-0108-269（1:1 対応不要、包括カバー許容）に従う。
+詳細な IR-*.md の追加・更新内容は後続の spec-save / case-run 工程で確定する。check_changed_docs.ts の profile rules と SPEC 記載項目の対応関係は REQ-010-269（1:1 対応不要、包括カバー許容）に従う。
 
-### IR-055 heuristic 行内複数パターン集計仕様（REQ-0108-263/264）
+### IR-055 heuristic 行内複数パターン集計仕様（REQ-010-263/264）
 
 IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/specs/`、`docs/guides/`、`docs/adr/` 等）が存在する場合の集計規則を以下のとおり定める。本節は `check_integrity.ts` 実装が従うべき契約であり、実装詳細は対象外とする。
 
@@ -179,7 +179,7 @@ IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複�
 
 実装側（`check_integrity.ts`）の集計ロジックは本仕様に従うことが期待される。仕様と実装の不整合が観察された場合は intake / inspect 経由で本 SPEC の更新または実装の修正を提案する。
 
-## docs-check 項目役割範囲（REQ-0145-004）
+## docs-check 項目役割範囲（REQ-010-004）
 
 docs-check（`/repo/docs-check`、`check_integrity.ts`）と skill 定義（SKILL.md、references/）の責務分担。
 検出ルールは docs-check が機械的検出を担い、skill 定義は判定基準、運用手順の説明を担う。
@@ -210,28 +210,28 @@ docs-check（`/repo/docs-check`、`check_integrity.ts`）と skill 定義（SKIL
 あるルールの修正が他ルールに影響する場合の参照用。
 
 ```
-checkReferencePathIntegrity (REQ-0145-010)
+checkReferencePathIntegrity (REQ-010-010)
 ├── depends on → SCRIPT_TEMPLATE_REF_PATTERNS（正規表現定義）
 ├── depends on → resolveReferencePath（パス解決・src fallback）
 └── affects → checkObsoleteReferenceDirs（reference/ vs references/）
 
 checkSourceProjectionConsistency
-├── depends on → isInsideWorktree（worktree skip・REQ-0145-010）
+├── depends on → isInsideWorktree（worktree skip・REQ-010-010）
 ├── depends on → listDirs（junction 対応付きディレクトリ一覧）
 └── affects → checkBrokenJunctions（projection 側 junction 健全性）
 
 checkReqSpecBoundaryViolation (IR-044)
 ├── depends on → IR044_SIGNAL_PATTERNS（SPEC 詳細キーワード）
-├── depends on → META 規則行 exemption（行構造マッチ・REQ-0145-012）
-└── affects → なし（独立ルール）。文脈 exemption は inspect-docs へ委譲（REQ-0108-259/262）
+├── depends on → META 規則行 exemption（行構造マッチ・REQ-010-012）
+└── affects → なし（独立ルール）。文脈 exemption は inspect-docs へ委譲（REQ-010-259/262）
 
 checkWorkflowStatusProhibition
 ├── depends on → sixPhasePattern（6-phase + stateWord）
-├── depends on → isInsideCodeSpan（enum リテラル除外・REQ-0145-002）
+├── depends on → isInsideCodeSpan（enum リテラル除外・REQ-010-002）
 └── affects → なし（独立ルール）
 ```
 
-### 新規カテゴリ追加判定フロー（REQ-0145-005）
+### 新規カテゴリ追加判定フロー（REQ-010-005）
 
 新規 NG ルール、検査カテゴリを追加する際の副作用評価フロー。
 `repo-agentdev-integrity` SKILL.md が主体となり、以下を満たしてから追加する。
@@ -241,26 +241,26 @@ checkWorkflowStatusProhibition
 3. **実装追加**: `check_integrity.ts` に検出関数を実装する。exemption 条件、false_positive_risk を実装に反映する
 4. **テストデータ更新**: `check_integrity.test.ts` の有効なテストデータ（valid fixture）が新ルールで NG とならないことを確認する（drift detection smoke test）
 5. **vocabulary-registry 同期**: 新ルールが語彙検出に関わる場合、`vocabulary-registry.md` を更新する
-6. **categoryToCheckPattern map 更新**: `check_integrity.ts` の category-to-check-pattern map に新カテゴリを追加する（skill-category-gap 解消、REQ-0144-005）
+6. **categoryToCheckPattern map 更新**: `check_integrity.ts` の category-to-check-pattern map に新カテゴリを追加する（skill-category-gap 解消、REQ-010-005）
 
 追加可否判定: 上記 1-6 全て満たす場合のみ追加可。
 副作用が確認できない場合は追加を見送り、別途 inspect-docs / inspect-skills で評価する。
 
-### docs-check バックエンド適用範囲（REQ-0145-004）
+### docs-check バックエンド適用範囲（REQ-010-004）
 
 `check_integrity.ts`（docs-check バックエンド）と inspect-* skills の項目役割範囲を以下の通り確定する。
 対象ファイル設計（`.md` のみ）、NG ルール間依存関係マップと合わせて明文化する。
 
 | バックエンド | 適用範囲 | 根拠 |
 |--------------|----------|------|
-| `check_integrity.ts`（docs-check + IR ルール） | REQ/SPEC/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft SPEC 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-0108-056/254/261/262、REQ-0103-079/080/081） |
-| inspect-* skills（inspect-docs / inspect-skills） | 配布物整合性検査（REQ-0142-006/007）。構文健全性の重複検出、文意保持の意味解析、責務説明照合など意味判断を含む診断 | 意味的診断層。詳細は [docs-spec-rebuild-integrity.md](docs-spec-rebuild-integrity.md)「検査バックエンド責務分担」参照 |
+| `check_integrity.ts`（docs-check + IR ルール） | REQ/SPEC/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft SPEC 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-010-056/254/261/262、REQ-002-079/080/081） |
+| inspect-* skills（inspect-docs / inspect-skills） | 配布物整合性検査（REQ-002-006/007）。構文健全性の重複検出、文意保持の意味解析、責務説明照合など意味判断を含む診断 | 意味的診断層。詳細は [docs-spec-rebuild-integrity.md](docs-spec-rebuild-integrity.md)「検査バックエンド責務分担」参照 |
 
-**配布物整合性検査（REQ-0142-006/007: 文意保持・構文健全性・責務整合などの意味的観点）は `check_integrity.ts` に追加せず、inspect-* skills に集約する**。
-配布物に対する決定論的検出（IR ルール）は既存カテゴリおよび REQ-0103-079/080/081 に基づく機械検出（IR-055 runtime-unresolved-reference）で構成し、機械的検出層（docs-check + IR）と意味的診断層（inspect-* skills）の責務境界は 3層検出構造（[integrity-contracts.md](integrity-contracts.md)）に従う。
-これにより `categoryToCheckPattern` map への新カテゴリ追加（skill-category-gap、REQ-0108-161/171、REQ-0144-005）を不要とし、ターゲットング隠退化を防ぐ。
+**配布物整合性検査（REQ-002-006/007: 文意保持・構文健全性・責務整合などの意味的観点）は `check_integrity.ts` に追加せず、inspect-* skills に集約する**。
+配布物に対する決定論的検出（IR ルール）は既存カテゴリおよび REQ-002-079/080/081 に基づく機械検出（IR-055 runtime-unresolved-reference）で構成し、機械的検出層（docs-check + IR）と意味的診断層（inspect-* skills）の責務境界は 3層検出構造（[integrity-contracts.md](integrity-contracts.md)）に従う。
+これにより `categoryToCheckPattern` map への新カテゴリ追加（skill-category-gap、REQ-010-161/171、REQ-010-005）を不要とし、ターゲットング隠退化を防ぐ。
 
-### check_changed_docs.ts profile rules と SPEC 記載項目の対応関係（REQ-0108-269）
+### check_changed_docs.ts profile rules と SPEC 記載項目の対応関係（REQ-010-269）
 
 req-save / spec-save / case-close 各 SPEC が記載する検査項目と、`check_changed_docs.ts` の `profileFor()` が返す `rules`（profile rules）の対応関係は 1:1 を要求しない。
 1 つの SPEC 記載項目に対して専用 profile rule を実装しなくても、既存 rule 群による包括カバーを許容する。
@@ -270,7 +270,7 @@ req-save / spec-save / case-close 各 SPEC が記載する検査項目と、`che
 
 1. 既存 profile rules が当該項目を包括カバーするかを `profileFor()` の各 rule 実装で確認する
 2. 包括カバーされる場合、専用 rule の追加を省略する
-3. 既存 rules でカバーできない検出漏れが実用上発生した場合のみ、新規 profile rule を追加する。追加時は本カタログ「新規カテゴリ追加判定フロー（REQ-0145-005）」に準拠する
+3. 既存 rules でカバーできない検出漏れが実用上発生した場合のみ、新規 profile rule を追加する。追加時は本カタログ「新規カテゴリ追加判定フロー（REQ-010-005）」に準拠する
 
 SPEC 記載項目と profile rules の厳密な 1:1 対応を維持するための機械検証（drift detection 等）は設けない。
 両者の乖離が実用上の検出漏れを招かない限り、文書と実装の差分を許容する。
@@ -278,18 +278,18 @@ SPEC 記載項目と profile rules の厳密な 1:1 対応を維持するため�
 **背景**: `check_changed_docs.ts` は限定変更ファイルに対する delta guard であり、全 SPEC 記載項目を個別 rule で再実装すると検査重複と保守負荷増大を招く。
 包括カバーにより実用上十分な検出精度を保ちつつ、SPEC と実装の過剰な結合を避ける。
 
-### check_integrity test suite 責務分担（REQ-0144-008/009）
+### check_integrity test suite 責務分担（REQ-010-008/009）
 
 check_integrity に関わる test suite 2系統の責務分担。
 
 | test file | 責務 | 根拠 |
 |-----------|------|------|
-| scripts/tests/check_integrity.test.ts | fixture drift detection、Issue #657 regression 専用、copyScripts 環境下の drift 自動検出 | REQ-0144-009 |
-| scripts/check_integrity.test.ts | IR-044 正規スイート、check_integrity.ts ルール適合検証 | REQ-0144-008 |
+| scripts/tests/check_integrity.test.ts | fixture drift detection、Issue #657 regression 専用、copyScripts 環境下の drift 自動検出 | REQ-010-009 |
+| scripts/check_integrity.test.ts | IR-044 正規スイート、check_integrity.ts ルール適合検証 | REQ-010-008 |
 
 両ファイルの使い分け基準（regression 検出 vs ルール適合検証）を明文化し、後続エージェントが誤ったファイルを編集するリスクを排除する。
 
-**regression test fixture mirroring 方式（REQ-0108-258 実装詳細）**:
+**regression test fixture mirroring 方式（REQ-010-258 実装詳細）**:
 
 regression test の fixture copy は実ファイル構成の完全ミラーリング（全 `.ts` ファイルコピー）を行う。手動 copy 対象更新運用は禁止し、新規モジュール追加時に `copyScripts()` が自動的に全ファイルをコピーすることで追従する。実装は `check_integrity.test.ts` の `copyScripts()` 関数が担う。
 

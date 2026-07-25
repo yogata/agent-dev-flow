@@ -1,6 +1,5 @@
 ---
 description: 要件定義をもとにGitHub Issueを作成する
-agent: sisyphus
 ---
 
 # Case登録
@@ -38,30 +37,30 @@ draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処�
 agent-dev-flow repository への手動取り込み対象として報告。
 判定は `agentdev-workflow-lifecycle` に従う
 
-**Step 1-1**: OU 選択ゲート（ドラフトに `operation_units` セクションがある場合、処理対象 OU を決定する、REQ-0104-035/036/037）:
-- OU ID 指定あり → 当該 OU のみを処理対象とする例外経路（REQ-0104-035）。指定された OU の req-save result を読み取り、その OU だけを Issue 化する
-- OU ID 指定なし → draft 全体の OU 群を処理対象とする既定経路（REQ-0104-035）
-  - OU 1 件 → 当該 OU を自動選択して処理（REQ-0104-036）
-  - OU 2 件以上 → draft 全体の OU 群から execution_unit 構成を生成し、複数 Standard Issue / 複数 Epic Issue / 混在を生成する（REQ-0104-037、Step 3-1 の自律構成生成へ分岐）。旧「OU 一覧表示停止」は廃止
+**Step 1-1**: OU 選択ゲート（ドラフトに `operation_units` セクションがある場合、処理対象 OU を決定する）:
+- OU ID 指定あり → 当該 OU のみを処理対象とする例外経路。指定された OU の req-save result を読み取り、その OU だけを Issue 化する
+- OU ID 指定なし → draft 全体の OU 群を処理対象とする既定経路
+  - OU 1 件 → 当該 OU を自動選択して処理
+  - OU 2 件以上 → draft 全体の OU 群から execution_unit 構成を生成し、複数 Standard Issue / 複数 Epic Issue / 混在を生成する（Step 3-1 の自律構成生成へ分岐）。旧「OU 一覧表示停止」は廃止
 - `operation_units` セクションがない場合 → 従来どおり全要件docを処理する（後方互換）
 
 ### Step 2: 要件docからIssue本文を生成
 
-詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントはREQ読解、テンプレート充足検査、完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う。本文候補の受け渡しは `agentdev-issue-management` の「委譲接続点と本文受け渡し」セクションに従いファイルパス経由で行う（REQ-0132-024/025/026、G25）
+詳細は `agentdev-issue-management` を参照。委譲接続点: サブエージェントはREQ読解、テンプレート充足検査、完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成を行う。本文候補の受け渡しは `agentdev-issue-management` の「委譲接続点と本文受け渡し」セクションに従いファイルパス経由で行う（G25）
 
 **Step 2-1**: 完了条件網羅性検証（QG-2）。
 Issue本文生成後、Issue作成前に、`agentdev-quality-gates` の QG-2（Acceptance Criteria Coverage Gate）に従い、完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する。
 判定基準、検査観点は同スキル（`agentdev-quality-gates`）の QG-2 を参照。
 fail 時は Issue 作成前に req-define 差し戻しを推奨
 
-**Step 2-1a**: 完了条件の数値閾値到達可能性検証（REQ-0131-031、QG-2 観点6）。
+**Step 2-1a**: 完了条件の数値閾値到達可能性検証（QG-2 観点6）。
 完了条件に数値閾値（LF 数、行数、ファイル数、件数等）を含む場合、当該閾値が同種既存成果物の実測値と比較して対象成果物の自然な構造で到達可能であることを検証する。
 test strategy 策定ガイド（`agentdev-req-analysis` の「test strategy 数値閾値ガイド」）に基づく策定が前提。境界ケース #1538/TS-007 由来。
 - 検出時点で閾値の根拠（同種既存例の実測値、中央値/最小値/最大値）が記載されていない場合、要件定義者に根拠明示を確認する
 - case-open は自動推論を行わず、要件定義者が明示した閾値のみを受け付ける
 
 **Step 2-1b**: 完了条件のスコープ明示（本 Issue 対象範囲 vs 全体）。
-完了条件が横断評価（REQ-0119-036 等、全成果物を横断する評価）を含む場合、各完了条件の評価スコープ（本 Issue 対象範囲 or リポジトリ全体/当該 SPEC/REQ 全体）を要件定義者が明示したかを確認する。QG-4 の「PR 対象範囲 vs 全体 判定マトリクス」（`qg-4-final-acceptance.md` 観点8）に対応する入力前提。境界ケース #1532/TS-006 由来。
+完了条件が横断評価（全成果物を横断する評価）を含む場合、各完了条件の評価スコープ（本 Issue 対象範囲 or リポジトリ全体/当該 SPEC/REQ 全体）を要件定義者が明示したかを確認する。QG-4 の「PR 対象範囲 vs 全体 判定マトリクス」（`qg-4-final-acceptance.md` 観点8）に対応する入力前提。境界ケース #1532/TS-006 由来。
 - スコープ明示がない場合、case-open は要件定義者に確認する（自動推論しない）
 - スコープは識別子中心（ファイルパス、REQ ID、NG ID、IR ID）で明示する（Step 2-3 記載粒度ガイドライン準拠）
 - 横断評価の完了条件は「全体（再 grep、再検査）」をスコープとすることをデフォルトとする
@@ -102,7 +101,7 @@ Step 2 の Issue 本文生成（完了条件展開）に先立ち、対象パス
 **Step 2-5**: review_dispositions の読取、evidence 再確認、証跡転記（AG-008）。
 draft-data の `review_dispositions` を読み取り、default branch 最新化後に各 disposition の evidence（`path`、`section`）の実在性と最新性を再確認する。本手順は review_dispositions の consumer 契約（case-open command SPEC（extension 経由）の「review_dispositions の consumer 契約」節参照）に従う。
 
-- **読取**: draft-data の `review_dispositions` を読み取る。フィールド欠落時は後方互換（AG-001、ADR-0124）として処理を継続する
+- **読取**: draft-data の `review_dispositions` を読み取る。フィールド欠落時は後方互換（AG-001）として処理を継続する
 - **evidence 再確認**: default branch 最新化後に各 disposition の `evidence.path` と `evidence.section` の実在性を再確認する。再確認時の commit SHA を当該 disposition の `evidence.checked_at_commit` へ記録する
 - **停止条件**: evidence の path または section が存在しない場合（失効）、Issue を作成せず停止する。当該 disposition を `stale_target` へ更新するか再評価対象として扱い、ユーザーへ停止理由を報告する。`covered` のまま失効した根拠で起票しない
 - **証跡転記**: 再確認した disposition を Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。転記規則（単一 Standard Issue / Epic flow / 複数 Standard Issue）は case-open command SPEC（extension 経由）の「review_dispositions の消費と証跡転記」節に従う
@@ -174,7 +173,7 @@ Step 3-1 の自律構成分析結果（Epic/ Wave/ Issue 構造、依存関係�
 
 ### Step 8: 子Issueを作成（Epic flow）
 
-Issue 化単位は REQ doc 単位ではなく OU 単位とする（REQ-0104-042、G14、G21）。各子 Issue は対応 OU 経由で REQ/ADR/SPEC へのトレーサビリティを保持する。子Issue 本文に `Parent: #{epic_number}`（G03）、対象 OU ID、紐づく REQ/ADR/SPEC 識別子を記載し、OU 単位でトレーサビリティを確保する。
+Issue 化単位は REQ doc 単位ではなく OU 単位とする（G14、G21）。各子 Issue は対応 OU 経由で REQ/ADR/SPEC へのトレーサビリティを保持する。子Issue 本文に `Parent: #{epic_number}`（G03）、対象 OU ID、紐づく REQ/ADR/SPEC 識別子を記載し、OU 単位でトレーサビリティを確保する。
 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化できる。この「5件」は case-run Wave 内子 Issue 並列上限と同一の実行安全境界であり、Phase 2 同時起動数、execution_unit 全体並列上限なしとは別文脈である（「並列上限と3つの『5件』文脈」セクション参照）。
 Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約する（REQ）。
 G04「全子Issue 作成完了後にテーブル更新（部分更新禁止）」は集約更新で維持する。

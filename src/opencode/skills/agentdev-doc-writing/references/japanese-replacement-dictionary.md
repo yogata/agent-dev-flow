@@ -6,8 +6,8 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 
 # 日本語置換辞書（agentdev-doc-writing 運用資料）
 
-`agentdev-doc-writing` スキルの查読観点（REQ-0140-033）と docs-check / inspect-docs の forbidden 語機械検出（IR-060）が参照する、不自然な日本語表現の置換辞書。
-REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの参照資料で管理」に準拠する配置先。
+`agentdev-doc-writing` スキルの查読観点と docs-check / inspect-docs の forbidden 語機械検出（IR-060）が参照する、不自然な日本語表現の置換辞書。
+個別用語の正誤表を `agentdev-doc-writing` スキルの参照資料で管理する方針に準拠する配置先。
 
 ## 運用区分
 
@@ -16,9 +16,9 @@ REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの�
 | 区分 | 機械検出 | 查読 | 取扱 |
 |---|---|---|---|
 | forbidden | 対象（IR-060） | 不要 | 横断置換で即時是正 |
-| review | 対象外 | 対象（REQ-0140-033） | 文脈で推奨訳を選択 |
+| review | 対象外 | 対象 | 文脈で推奨訳を選択 |
 | allowed_identifier | 対象外 | 対象外 | 識別子・コード・YAML・パスでは許容 |
-| reconstruct | 対象外 | 対象（REQ-0140-034 D） | 作成元 PR・commit・旧版から復元 |
+| reconstruct | 対象外 | 対象（是正方式 D） | 作成元 PR・commit・旧版から復元 |
 
 ## forbidden（禁止語、即時横断置換）
 
@@ -64,7 +64,7 @@ REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの�
 
 ## review（文脈確認、查読で推奨訳を選択）
 
-文脈によって推奨訳が変わるため、機械検出対象外。`agentdev-doc-writing` 查読（REQ-0140-033）で人手確認する。
+文脈によって推奨訳が変わるため、機械検出対象外。`agentdev-doc-writing` 查読で人手確認する。
 
 | 語 | 推奨訳（文脈別） | 備考 |
 |---|---|---|
@@ -91,7 +91,7 @@ REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの�
 
 ## reconstruct（原文復元、作成元から復元）
 
-機械的な置換が困難な語。作成元の PR・commit・旧版から原文を復元する（REQ-0140-034 D）。推測による置換は禁止する。
+機械的な置換が困難な語。作成元の PR・commit・旧版から原文を復元する（是正方式 D）。推測による置換は禁止する。
 
 | 語 | 復元方法 | 備考 |
 |---|---|---|
@@ -103,7 +103,7 @@ REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの�
 
 ## 修正方式（A〜D）
 
-検出された不自然表現の是正方式は以下の4種（REQ-0140-034）。
+検出された不自然表現の是正方式は以下の4種。
 
 | 方式 | 内容 | 対象区分 |
 |---|---|---|
@@ -114,7 +114,7 @@ REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの�
 
 ## 検出分類（P0〜P4）
 
-検出分類の原本は `document-type-responsibilities.md`「不自然表現検出分類（REQ-0140-033）」節を参照。本辞書の forbidden / review / reconstruct 区分が P0〜P4 の各分類に対応する。
+検出分類の原本は `document-type-responsibilities.md`「不自然表現検出分類」節を参照。本辞書の forbidden / review / reconstruct 区分が P0〜P4 の各分類に対応する。
 
 ## 更新運用
 
@@ -127,9 +127,9 @@ REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの�
 
 ## 関連情報
 
-- REQ-0140-033: 不自然表現検出分類（P0〜P4）
-- REQ-0140-034: 是正方式（A〜D）
-- REQ-0140-035: 置換辞書運用区分
-- REQ-0140-036: 横断置換時の誤置換防止
+- 不自然表現検出分類（P0〜P4）
+- 是正方式（A〜D）
+- 置換辞書運用区分
+- 横断置換時の誤置換防止
 - `document-type-responsibilities.md`「不自然表現検出分類」節
 - `integrity-rule-catalog.md`「IR-060 forbidden Japanese word detection」

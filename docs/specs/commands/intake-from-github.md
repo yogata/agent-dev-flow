@@ -71,5 +71,5 @@ updated: 2026-07-18
 - [intake-capture.md](intake-capture.md)（手動 capture）
 - [intake-promote.md](intake-promote.md)（後続コマンド（採用判断））
 - `agentdev-intake-pipeline` skill（抽出アルゴリズム）
-- REQ-0127（Intake command群）
+- REQ-010（Intake command群）
 

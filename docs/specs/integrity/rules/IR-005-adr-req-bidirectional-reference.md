@@ -12,7 +12,7 @@ status: accepted
 | category | broken-reference |
 | detection_method | ADR から REQ ID 抽出 → 存在確認、逆方向も確認 |
 | affected_artifacts | [ADR, REQ, ADR index] |
-| related_req | [REQ-0108-005] |
+| related_req | [REQ-010-005] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。廃止 REQ 参照は別 rule で判定 |

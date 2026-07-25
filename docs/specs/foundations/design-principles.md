@@ -5,12 +5,12 @@ updated: 2026-07-24
 
 # 設計原則
 
-> **SPEC と ADR の境界（REQ-0101-043/044/050）**: 本 SPEC は現行仕様として機能する分類表、導出表（work_type / scale / workflow_route 等）、適用基準を扱う。
+> **SPEC と ADR の境界（REQ-001-043/044/050）**: 本 SPEC は現行仕様として機能する分類表、導出表（work_type / scale / workflow_route 等）、適用基準を扱う。
 > 判断理由、歴史的経緯、設計意図、トレードオフ説明の正本は以下の ADR 群を参照すること（新規 ADR は作成しない、既存 ADR で覆えない内容は本 SPEC の範囲外として報告）。
-> - ADR-0103（文書種別責務境界、記述対象境界）
-> - ADR-0102（実行時配布物と執筆時関心の分離）
-> - ADR-0104（Skill references SPEC 分離基準）
-> - ADR-0101（AgentDevFlow プラグイン名前空間の統一）
+> - REQ-001（文書種別責務境界、記述対象境界）
+> - REQ-001（実行時配布物と執筆時関心の分離）
+> - REQ-001（Skill references SPEC 分離基準）
+> - REQ-001（AgentDevFlow プラグイン名前空間の統一）
 > **artifact-contracts.md との責任分界**: `../responsibilities/artifact-contracts.md` が Command/Skill/Template/Script の詳細契約（入出力、依存方向）を扱うのに対し、本 SPEC は上位原則と分類規則に限定する。詳細契約の参照先は artifact-contracts.md を優先する。
 
 本プロジェクトの設計判断の根拠を集約した前方視の指針。
@@ -21,11 +21,11 @@ updated: 2026-07-24
 ## 1. work_type 分類の存在理由
 
 Issue の種別に応じて異なるワークフローを適用する。
-work_type と scale の組み合わせで workflow_route を導出する（REQ-0104）。
+work_type と scale の組み合わせで workflow_route を導出する（REQ-005）。
 
 **bugfix** は既存機能の不具合修正であり、要件定義書（REQ）の作成を不要とする。
 バグ修正は観察可能な事実（再現手順、期待動作、実際動作）に基づいて完結するため、壁打ちによる要件形成が不要である。
-ただし影響を受ける docs（REQ/ADR/SPEC/guide）の更新は完了条件に含まれる（REQ-0104-034）。
+ただし影響を受ける docs（REQ/ADR/SPEC/guide）の更新は完了条件に含まれる（REQ-005-034）。
 最小限の経路（req-define → case-open → case-run → case-close）で処理する。
 
 **feature** は新しい振る舞いをシステムに導入するため、WHAT（要件）と HOW（実装）の分離が必要である。
@@ -58,11 +58,11 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 システムの構造（system.md）、アーティファクト規約（patterns.md）、品質基準（quality-specs.md）、設計方針（design-principles.md）で構成する。
 仕様は実装とともに変化する「生きた文書」である。
 
-分離の判断理由、歴史的経緯は ADR-0103（文書種別責務境界）を参照。
+分離の判断理由、歴史的経緯は REQ-001（文書種別責務境界）を参照。
 
 ### ADR 判断漏れ（false negative）基準
 
-ADR 対象となる判断を REQ/SPEC/guide のみとして扱う判断漏れ（false negative）を防ぐため、以下のリスク指標に該当する内容は ADR 必要性を再評価すること（推奨、REQ-0112-058）。
+ADR 対象となる判断を REQ/SPEC/guide のみとして扱う判断漏れ（false negative）を防ぐため、以下のリスク指標に該当する内容は ADR 必要性を再評価すること（推奨、REQ-001-058）。
 
 - REQ/SPEC 境界の曖昧な内容: WHAT と HOW の分離だけでは判断理由が保存されず、後続変更で根拠が失われる可能性がある
 - 複数モジュールにまたがる判断: command / skill / script / docs など複数の責務境界に影響し、局所仕様だけではトレードオフを説明できない
@@ -98,9 +98,9 @@ frontmatter でエージェント指定、スキル参照を宣言し、本文�
 宣言的定義（フェーズ体系、判定基準、命名規則等）を提供し、手続き的ロジックは含まない。
 複数コマンドから参照可能な唯一の情報源として機能する。
 
-Command / Skill の責任分界の判断理由、詳細契約は ADR-0107（コマンド・スキル・テンプレート・スクリプト責任分界の正式定義）、`../responsibilities/artifact-contracts.md` を参照。
+Command / Skill の責任分界の判断理由、詳細契約は v2:ADR-0107（コマンド・スキル・テンプレート・スクリプト責任分界の正式定義）、`../responsibilities/artifact-contracts.md` を参照。
 
-**gh CLI 安全性**: Windows PowerShell 環境では、WRITE 操作は `--body-file` 経由、READ 操作は一時ファイル経由で Read tool を使用する安全手順を強制する（`agentdev-gh-cli` skill、ADR-0130）。
+**gh CLI 安全性**: Windows PowerShell 環境では、WRITE 操作は `--body-file` 経由、READ 操作は一時ファイル経由で Read tool を使用する安全手順を強制する（`agentdev-gh-cli` skill、ADR-004）。
 
 **git worktree**: Issue 番号ベースの命名規則（`.worktrees/{N}-{type}`）で複数 Issue の同時進行を管理する（`agentdev-git-worktree` skill）。
 
@@ -115,28 +115,28 @@ Command / Skill の責任分界の判断理由、詳細契約は ADR-0107（コ�
 - **Template**: 出力構造とプレースホルダー。変数置換で使用し、ロジックは含まない。
 - **Script**: 決定的でテスト可能な処理。validation、transformation、generation、formatting 等の決定的処理に限定する。
 
-**決定的処理の Script 委譲原則**: Command は決定的処理（採番、整合性確認、エントリ存在確認、変更範囲検証、target_area 見出し検索等）を LLM 推論で実行せず、Script へ委譲する（REQ-0136-029）。
+**決定的処理の Script 委譲原則**: Command は決定的処理（採番、整合性確認、エントリ存在確認、変更範囲検証、target_area 見出し検索等）を LLM 推論で実行せず、Script へ委譲する（REQ-001-029）。
 
 各アーティファクトの詳細契約（入出力、依存方向、サイズ制約、スキル粒度、スキル参照妥当性、サブエージェント委譲、テンプレート配置）、統率スキル（Orchestration skill）作成判断基準は `../responsibilities/artifact-contracts.md` を参照。
-責任分界、統率スキル作成基準の判断理由はそれぞれ ADR-0107（コマンド・スキル・テンプレート・スクリプト責任分界の正式定義）、ADR-0108（オーケストレーションスキル作成基準の導入）を参照。
+責任分界、統率スキル作成基準の判断理由はそれぞれ v2:ADR-0107（コマンド・スキル・テンプレート・スクリプト責任分界の正式定義）、v2:ADR-0108（オーケストレーションスキル作成基準の導入）を参照。
 
 ---
 
 ## 6. 実行時、執筆関心分離（Runtime / Authoring）
 
-AgentDevFlow の配布物は実行時（runtime: 個別プロジェクトで実行可能）と執筆（authoring: agent-dev-flow リポジトリ開発用）に明確に分離する（ADR-0102）。
+AgentDevFlow の配布物は実行時（runtime: 個別プロジェクトで実行可能）と執筆（authoring: agent-dev-flow リポジトリ開発用）に明確に分離する（REQ-001）。
 
 **実行時配布物**は自己完結し、agent-dev-flow リポジトリの dev メタデータに依存しないことを保証する:
-- Command frontmatter は `description` と `agent` のみ（REQ-0103-015, ADR-0102）
-- Skill `references/` は実行時配布物のみを含める（ADR-0104）
-- `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書であり、実行時配布物の依存先ではない（ADR-0103, ADR-0104）
+- Command frontmatter は `description` と `agent` のみ（REQ-002-015, REQ-001）
+- Skill `references/` は実行時配布物のみを含める（REQ-001）
+- `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書であり、実行時配布物の依存先ではない（REQ-001, REQ-001）
 
 **執筆専用物**は agent-dev-flow リポジトリ内でのみ参照される:
 
 - command-authoring / skill-authoring ガイド
 - docs-check の検査ルール定義
 
-分離の判断理由、歴史的経緯は ADR-0102（実行時 / 編集時 関心分離）を参照。
+分離の判断理由、歴史的経緯は REQ-001（実行時 / 編集時 関心分離）を参照。
 
 ---
 
@@ -154,8 +154,8 @@ skill、reference、script、REQ、SPEC の配置原則を、正規所有者、�
 | reference | 詳細な判定表、スキーマ、例、失敗時手順は必要な場合に限り当該 skill 自身の reference へ配置 |
 | script | 決定的処理（採番、構文解析、見出し検索、整合性検査）を所有。操作責任を持つ skill の配下に配置し、同一 script を複数 skill へ複製しない |
 | REQ | 外部から観測できる振る舞い、公開成果物、ドメイン状態、安全境界、承認境界、停止条件、後続工程との安定した接続契約、ハーネス非依存の恒久的制約へ限定 |
-| SPEC | 現在の振る舞い、スキーマ、判定規則、状態遷移、実装上必要な順序とパラメータを所有。command SPEC は command の Step 番号を複製せず、成果物、副作用、停止状態、必須順序によって command と対応付ける（REQ-0143-005） |
+| SPEC | 現在の振る舞い、スキーマ、判定規則、状態遷移、実装上必要な順序とパラメータを所有。command SPEC は command の Step 番号を複製せず、成果物、副作用、停止状態、必須順序によって command と対応付ける（v2:REQ-0143-005） |
 
 ### ハーネス純化の回帰基準
 
-REQ-0162、ADR-0136、REQ-0103-163 が定めるハーネス責務と配布物責務の分離を回帰基準として維持する。配布 command、skill、reference、docs にハーネス固有の待機時間、並列度、再試行、起動引数を残さない。実行エージェントの選定、起動方法、実行制御パラメータはハーネス側文書（`AGENTS.md`、`references/<harness>.md`）が所有する。
+REQ-002、v2:ADR-0136、REQ-002-163 が定めるハーネス責務と配布物責務の分離を回帰基準として維持する。配布 command、skill、reference、docs にハーネス固有の待機時間、並列度、再試行、起動引数を残さない。実行エージェントの選定、起動方法、実行制御パラメータはハーネス側文書（`AGENTS.md`、`references/<harness>.md`）が所有する。

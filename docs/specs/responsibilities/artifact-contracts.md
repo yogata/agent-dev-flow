@@ -9,7 +9,7 @@ status: accepted
 
 ## 目的
 
-Command / Skill / Template / Script の入出力契約と依存方向を定義し、アーティファクト間の責務境界を明確にする（REQ-0103）。
+Command / Skill / Template / Script の入出力契約と依存方向を定義し、アーティファクト間の責務境界を明確にする（REQ-002）。
 
 ## アーティファクト種別
 
@@ -19,8 +19,8 @@ Command / Skill / Template / Script の入出力契約と依存方向を定義�
 | Skill | `src/opencode/skills/`（実行時: `.opencode/skills/`） | 再利用可能な判断基準、ドメイン知識 | Command からの参照 | 判断結果の参照提供 |
 | Template | `src/opencode/skills/*/templates/` または `src/opencode/commands/agentdev/templates/`（実行時: `.opencode/` 経由） | 出力構造とプレースホルダー | 変数バインド | Issue/PR 本文、コメント |
 | Script | `src/opencode/skills/*/scripts/`（実行時: `.opencode/` 経由） | 決定的でテスト可能な実行ロジック | コマンドライン引数 | 標準出力（JSON/Markdown） |
-| リポジトリローカル Command | `.opencode/commands/repo/`（原本なし） | 本体リポジトリ専用入口（ADR-0106） | ユーザー起動 | レポート、成果物 |
-| リポジトリローカル Skill | `.opencode/skills/repo-*/`（原本なし） | 本体リポジトリ専用判断基準（ADR-0106） | Command からの参照 | 判断結果の参照提供 |
+| リポジトリローカル Command | `.opencode/commands/repo/`（原本なし） | 本体リポジトリ専用入口（REQ-001） | ユーザー起動 | レポート、成果物 |
+| リポジトリローカル Skill | `.opencode/skills/repo-*/`（原本なし） | 本体リポジトリ専用判断基準（REQ-001） | Command からの参照 | 判断結果の参照提供 |
 
 ## 依存方向
 
@@ -54,7 +54,7 @@ agent: prometheus | sisyphus
 ```
 
 許可フィールドは `description` と `agent` のみ。
-dev メタデータは含めない（REQ-0103-015, REQ-0103-044）。
+dev メタデータは含めない（REQ-002-015, REQ-002-044）。
 
 ## スキル構造契約
 
@@ -68,11 +68,11 @@ dev メタデータは含めない（REQ-0103-015, REQ-0103-044）。
 
 - `SKILL.md` は段階的開示（progressive disclosure）の入口。200 行超で分割を検討。
 - `references/`（複数形）を正規ディレクトリ名として使用する。
-- `references/` は実行時配布物のみを含める。執筆専用資料は含めない（REQ-0103-045）。
+- `references/` は実行時配布物のみを含める。執筆専用資料は含めない（REQ-002-045）。
 
 ## スキル粒度契約
 
-Skill は以下の条件を全て満たす単位とする（REQ-0103-100）。
+Skill は以下の条件を全て満たす単位とする（REQ-002-100）。
 
 | 条件 | 説明 |
 |------|------|
@@ -81,26 +81,26 @@ Skill は以下の条件を全て満たす単位とする（REQ-0103-100）。
 | 同一判断モデル | 判断の仕組み、基準が同一 |
 | 矛盾しない `USE FOR` / `DO NOT USE FOR` | 全ての `USE FOR` が同一判断モデルに属し、`DO NOT USE FOR` と矛盾しない |
 
-- 複数の `USE FOR` があっても、同一判断モデル、同一責任境界に属する場合は同一 Skill として扱う（REQ-0103-101）。
-- 複数の `USE FOR` が異なる判断モデル、入力、出力、責任境界を持つ場合は、`DO NOT USE FOR` が同じであっても Skill 分割候補とする（REQ-0103-102）。
+- 複数の `USE FOR` があっても、同一判断モデル、同一責任境界に属する場合は同一 Skill として扱う（REQ-002-101）。
+- 複数の `USE FOR` が異なる判断モデル、入力、出力、責任境界を持つ場合は、`DO NOT USE FOR` が同じであっても Skill 分割候補とする（REQ-002-102）。
 - 異なる判断モデル、入力、出力、責任境界を持つ内容は Skill 分割候補として扱うこと。
 
-### SKILL.md サイズと内容基準（REQ-0103-037）
+### SKILL.md サイズと内容基準（REQ-002-037）
 
 - 200行を超える SKILL.md は責務集中、不要な手順、例、作業履歴の混入について確認すること
 - 200行を超えることだけを不合格理由にしないこと。責務上の根拠があれば維持を認める
 - SKILL.md に移動済み Step、統合済み Step、将来候補、作業履歴を示す節を残さないこと
-- 詳細な判定表、スキーマ、例、失敗時手順は必要な場合に限り当該 skill 自身の reference へ配置すること（REQ-0103-036）
+- 詳細な判定表、スキーマ、例、失敗時手順は必要な場合に限り当該 skill 自身の reference へ配置すること（REQ-002-036）
 
 ## スキル参照妥当性契約
 
-`references/*` は同一 Skill 内の段階的開示であり、小さい Skill ではない（REQ-0103-103）。
+`references/*` は同一 Skill 内の段階的開示であり、小さい Skill ではない（REQ-002-103）。
 
 - `references/*` は SKILL.md の入口カードから必要に応じて読み込まれる詳細参照ファイル。
-- `references/*` ごとに独自の `USE FOR` / `DO NOT USE FOR` が必要になる場合は Skill 分割候補とする（REQ-0103-104）。
-- `references/*` に抽出するのは実行時配布物のみ（REQ-0103-045）。
+- `references/*` ごとに独自の `USE FOR` / `DO NOT USE FOR` が必要になる場合は Skill 分割候補とする（REQ-002-104）。
+- `references/*` に抽出するのは実行時配布物のみ（REQ-002-045）。
 
-Command 固有の実行順序、Issue 作成、保存、更新、削除、完了報告は Skill 化せず、以下に配置する（REQ-0103-105）。
+Command 固有の実行順序、Issue 作成、保存、更新、削除、完了報告は Skill 化せず、以下に配置する（REQ-002-105）。
 
 | 配置先 | 対象 |
 |--------|------|
@@ -111,7 +111,7 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 
 ## Script 所有権と委譲契約
 
-各 script の正規所有者を文書種別ごとに定義する（REQ-0103-159、REQ-0136-029）。同一 script または共有 lib を複数 skill へ複製せず、正規所有者を一つに定める。
+各 script の正規所有者を文書種別ごとに定義する（REQ-002-159、REQ-001-029）。同一 script または共有 lib を複数 skill へ複製せず、正規所有者を一つに定める。
 
 | script 種別 | 正規所有者 skill | 対象 |
 |---|---|---|
@@ -125,14 +125,14 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 - 兄弟 skill と command は所有者 skill の内部 script パスを直接 import またはパス参照しない
 - 利用側は所有者 skill の公開操作契約（操作名、入力、JSON 結果契約、エラー契約）へ委譲する
 - 所有者 skill の SPEC または reference のみが内部 script の物理パスと I/O 詳細を保持する
-- 同一 script または共有 lib を複製しない（REQ-0103-006「Script は決定的: テスト可能、再現可能」の延長）
+- 同一 script または共有 lib を複製しない（REQ-002-006「Script は決定的: テスト可能、再現可能」の延長）
 - 新規 script 追加時は所有者候補を文書種別で判定し、既存所有者との重複を確認する
 
-本契約は Command → Skill → Script の依存方向を維持し、新規 ADR を作成せず ADR-0107（Command/Skill/Template/Script 責任分界）の適用条件の精緻化として扱う（REQ-0119-033 準拠）。
+本契約は Command → Skill → Script の依存方向を維持し、新規 ADR を作成せず v2:ADR-0107（Command/Skill/Template/Script 責任分界）の適用条件の精緻化として扱う（REQ-003-033 準拠）。
 
 ## 分類根拠伝播契約
 
-learning/intake → RU → req-define → spec-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-0136-033、ADR-0139）。SPEC ファイルが主論理区分・正規所有対象を宣言する形式（frontmatter フィールド名、冒頭宣言節フォーマット）の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」とし、本節は工程間伝播フィールドの schema と req-define から spec-save へのシリアライズ位置を正規所有する。両者は `spec_logical_division`、`canonical_owner` のフィールド名を共有し、工程間で同一の名前を用いる。req-define は SPEC action の `artifact_actions` と `operation_units` へ分類根拠を出力し、spec-save はこれを読み取って CREATE/UPDATE 各操作で SPEC frontmatter または冒頭宣言節へ宣言を付与する。
+learning/intake → RU → req-define → spec-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。SPEC ファイルが主論理区分・正規所有対象を宣言する形式（frontmatter フィールド名、冒頭宣言節フォーマット）の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」とし、本節は工程間伝播フィールドの schema と req-define から spec-save へのシリアライズ位置を正規所有する。両者は `spec_logical_division`、`canonical_owner` のフィールド名を共有し、工程間で同一の名前を用いる。req-define は SPEC action の `artifact_actions` と `operation_units` へ分類根拠を出力し、spec-save はこれを読み取って CREATE/UPDATE 各操作で SPEC frontmatter または冒頭宣言節へ宣言を付与する。
 
 ### 伝播フィールド一覧
 
@@ -147,9 +147,9 @@ learning/intake → RU → req-define → spec-save の各工程間で引き継�
 | destination_selection_reason | string | 追記先を選択した理由 | 欠落時は `unknown` で警告 |
 | observed_evidence | string | 根拠となる観測事実（CI 失敗、誤検出、エッジケース発見等） | 欠落時は `unknown` で警告 |
 
-### soft-contract 運用（ADR-0124 準拠）
+### soft-contract 運用（ADR-003 準拠）
 
-- 分類根拠は soft-contract（ADR-0124）として追加情報扱いとする
+- 分類根拠は soft-contract（ADR-003）として追加情報扱いとする
 - 厳格なスキーマ検証、JSON Schema、バリデータを導入しない
 - 欠落時は `unknown` 既定値で警告を出し、処理を継続する（後方互換）
 - 既存の採用済み成果物、RU、req_draft を欠落により拒否しない
@@ -163,11 +163,11 @@ learning/intake → RU → req-define → spec-save の各工程間で引き継�
 | intake-promote | inbox item から change_nature、observed_evidence を推定 | 採用済み成果物に分類根拠を添付 |
 | backlog-review | 採用済み成果物から読取、`tentative_classification` と併せて RU frontmatter へ記録 | RU frontmatter に `tentative_classification` と分類根拠を記録 |
 | req-define | RU の分類根拠を暫定入力とし、最終分類を自身で確定。SPEC action（`artifact: spec`）の各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する | draft-data の `artifact_actions`（各 SPEC action）と `operation_units` へ最終分類根拠を反映 |
-| spec-save | draft-data の `artifact_actions`（各 SPEC action）から分類根拠を読取、配置一貫性検証の入力とする。CREATE 操作では新規 SPEC frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。UPDATE 操作では変更対象 SPEC に宣言がなく分類値が `unknown` 以外に確定している場合に宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落を理由に保存拒否しない、ADR-0124 soft-contract） | 配置一貫性検証結果を commit message、完了報告に反映。宣言付与結果を SPEC ファイルへ反映 |
+| spec-save | draft-data の `artifact_actions`（各 SPEC action）から分類根拠を読取、配置一貫性検証の入力とする。CREATE 操作では新規 SPEC frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。UPDATE 操作では変更対象 SPEC に宣言がなく分類値が `unknown` 以外に確定している場合に宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落を理由に保存拒否しない、ADR-003 soft-contract） | 配置一貫性検証結果を commit message、完了報告に反映。宣言付与結果を SPEC ファイルへ反映 |
 
 ### REQ 拡張可否判定ルール
 
-change_nature が `new_user_requirement` または `external_contract_change` の場合のみ、REQ の作成または拡張を候補とする（REQ-0136-033）。それ以外の change_nature は、既存 REQ が要求を既に保持している限り REQ を拡張せず、SPEC 等への配置を検討する。
+change_nature が `new_user_requirement` または `external_contract_change` の場合のみ、REQ の作成または拡張を候補とする（REQ-001-033）。それ以外の change_nature は、既存 REQ が要求を既に保持している限り REQ を拡張せず、SPEC 等への配置を検討する。
 
 ## サイズ制約
 
@@ -180,7 +180,7 @@ change_nature が `new_user_requirement` または `external_contract_change` �
 ## サブエージェント委譲契約
 
 サブエージェント委譲は、Command の詳細手順を増やさず、探索、検査、分類、候補抽出を独立した文脈へ分離するために使用する。
-親エージェントは最終判断と副作用を保持し、サブエージェントは判断材料だけを返す（ADR-0112, REQ-0119）。
+親エージェントは最終判断と副作用を保持し、サブエージェントは判断材料だけを返す（v2:ADR-0112, REQ-003）。
 
 ### 委譲時最小契約
 
@@ -189,7 +189,7 @@ change_nature が `new_user_requirement` または `external_contract_change` �
 | 要素 | 説明 |
 |---|---|
 | `inputs` | 委譲先に渡す限定された入力範囲。対象ファイル、Issue/PR、ログ、参照基準、除外対象を含む |
-| `side_effect_boundary`（副作用境界） | 委譲先の副作用境界。許可操作は `read_files`（ファイル読み取り）/ `inspect_content`（内容検査）/ `return_evidence`（根拠返却）等に限定し、保存、Issue/PR 更新、commit、push、ユーザー確認は禁止。包括値 `read_only` は使用しない（REQ-0140-011） |
+| `side_effect_boundary`（副作用境界） | 委譲先の副作用境界。許可操作は `read_files`（ファイル読み取り）/ `inspect_content`（内容検査）/ `return_evidence`（根拠返却）等に限定し、保存、Issue/PR 更新、commit、push、ユーザー確認は禁止。包括値 `read_only` は使用しない（v2:REQ-0140-011） |
 | `output_contract`（出力契約） | 返却形式。`pass` / `warn` / `fail` / `partial` を基本とし、要約、根拠、成果物パス、親判断事項、副作用なしの明示を含む |
 | `capture_handoff`（キャプチャ引き継ぎ） | intake / learning 候補を保存せず、capture 候補として親エージェントへ返す形式 |
 
@@ -215,7 +215,7 @@ Command 本文では分類ラベルより、実際の `inputs`、`side_effect_bo
 
 ## テンプレート配置契約
 
-Template の配置先は以下の 2 種類を定義する（REQ-0103-046）。
+Template の配置先は以下の 2 種類を定義する（REQ-002-046）。
 
 ### Skill-local templates
 
@@ -244,7 +244,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-0103-046）。
 
 ## 完了報告契約
 
-全 agentdev コマンドの完了報告に適用する共通契約を定義する（REQ-0107-012, REQ-0107-013）。
+全 agentdev コマンドの完了報告に適用する共通契約を定義する（v2:REQ-0107-012, v2:REQ-0107-013）。
 
 ### 共通必須フィールド
 
@@ -292,38 +292,38 @@ Template の配置先は以下の 2 種類を定義する（REQ-0103-046）。
 
 ## 適用範囲宣言
 
-`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（ADR-0103）。
+`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
 他プロジェクトへの適用を意図しない。
-実行時コマンドは SPEC ファイルに依存しない（ADR-0104）。
+実行時コマンドは SPEC ファイルに依存しない（REQ-001）。
 
-## リポジトリローカルアーティファクト（ADR-0106）
+## リポジトリローカルアーティファクト（REQ-001）
 
 配布対象外コマンド/スキルは AgentDevFlow の配布対象外である:
 - `.opencode/commands/repo/`（AgentDevFlow 本体リポジトリ専用コマンド）。`src/opencode/` に原本を持たず、sync-opencode.ps1 のジャンクション管理対象外
 - `.opencode/skills/repo-*/`（AgentDevFlow 本体リポジトリ専用スキル）。同上
 - `repo-*` プレフィックスは AgentDevFlow 配布コマンド体系（`agentdev-*`）とは独立に管理される
 
-## ドラフトアーティファクト契約（REQ-0103-129〜139）
+## ドラフトアーティファクト契約（REQ-002-129〜139）
 
 `.agentdev/drafts/` 配下の中間成果物（draft file）の契約を定義する。
-draft file は原本アーティファクト（REQ/ADR/SPEC/RU）ではなく、コマンド間で受け渡す中間成果物である（REQ-0103-126-128）。
+draft file は原本アーティファクト（REQ/ADR/SPEC/RU）ではなく、コマンド間で受け渡す中間成果物である（REQ-002-126-128）。
 
 ### ドラフト種別レジストリ（Draft Type Registry）
 
-各 draft type（ドラフト種別）はレジストリ側で生成元（producer）、許可消費元（allowed consumers）、ライフサイクルを定義する（REQ-0103-130, REQ-0103-136）。
+各 draft type（ドラフト種別）はレジストリ側で生成元（producer）、許可消費元（allowed consumers）、ライフサイクルを定義する（REQ-002-130, REQ-002-136）。
 個別 draft file の frontmatter にはこれらを記述せず、レジストリを唯一の定義源とする。
 
 | draft_type | file pattern | producer | allowed consumers | 位置づけ | lifecycle |
 |---|---|---|---|---|---|
 | `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `req-save`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
 
-標準 draft type は `req_draft` の 1 種のみとする（REQ-0103-132）。
+標準 draft type は `req_draft` の 1 種のみとする（REQ-002-132）。
 `requirements-review-finding` および旧 `skill_review_finding` は標準 draft type に含めない。
-Skill/Command 参照妥当性の検出結果は inspect lifecycle（`.agentdev/inspect/inbox/`、REQ-0103-140-151）へ出力する。
+Skill/Command 参照妥当性の検出結果は inspect lifecycle（`.agentdev/inspect/inbox/`、REQ-002-140-151）へ出力する。
 
 ### ドラフトファイルフロントマター
 
-`.agentdev/drafts/` 配下の draft file は、以下の frontmatter を基本とする（REQ-0103-135）:
+`.agentdev/drafts/` 配下の draft file は、以下の frontmatter を基本とする（REQ-002-135）:
 
 ```yaml
 ---
@@ -334,11 +334,11 @@ created_at: 2026-06-14T19:36:47+09:00
 ---
 ```
 
-frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`created_at` とし、producer、allowed consumers、lifecycle は registry 側で `draft_type` ごとに定義する（REQ-0103-135, REQ-0103-136）。
+frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`created_at` とし、producer、allowed consumers、lifecycle は registry 側で `draft_type` ごとに定義する（REQ-002-135, REQ-002-136）。
 
 ### Command 側 draft_type 検証
 
-各コマンドは、入力 draft の `draft_type` とレジストリ上の許可消費元（allowed consumers）を照合して受理可否を判定する（REQ-0103-131, REQ-0103-136）。
+各コマンドは、入力 draft の `draft_type` とレジストリ上の許可消費元（allowed consumers）を照合して受理可否を判定する（REQ-002-131, REQ-002-136）。
 
 | command | 受け付ける draft_type |
 |---|---|
@@ -348,7 +348,7 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 ### inspect-skills 副作用境界
 
 `inspect-skills` は検査対象（Command/Skill 定義ファイル）を直接修正しない診断コマンドとする。
-許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/ADR/SPEC 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-0103-140-151、REQ-0125-007）。
+許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/ADR/SPEC 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-002-140-151、REQ-010-007）。
 最終判断（promote / defer / reject）は `inspect-promote` が行う。
 検出事項（inspect finding）は `inspect-promote` による promote/defer/reject ライフサイクルの対象となる。
 
@@ -356,7 +356,7 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 
 `req_draft`（`.agentdev/drafts/req-draft-{topic}.md`）は req-define が生成する一時的な構造化ハンドオフ成果物であり、req-save / spec-save / case-open / case-auto / case-run / case-close が消費する。
 
-- req_draft は API 契約ではなく、生成元（producer）側の標準（緩やかな契約: soft contract）である。LLM 推論経由で消費され、機械的パースを前提としない（ADR-0124）
+- req_draft は API 契約ではなく、生成元（producer）側の標準（緩やかな契約: soft contract）である。LLM 推論経由で消費され、機械的パースを前提としない（ADR-003）
 - スキーマバージョン、JSON Schema、バリデータは導入しない
 - 後続工程の権威ある情報源は `draft-data` YAML block であり、人間可読 Markdown セクションではない
 - 標準データモデル fields: `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `review_dispositions`, `case_open_hints`
@@ -381,7 +381,7 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 
 ### review_dispositions 構造
 
-`review_dispositions` は req-define が壁打ち過程で記録した採否判断（covered、rejected 等）を後続工程へ引き継ぐ optional な soft-contract である（ADR-0124）。
+`review_dispositions` は req-define が壁打ち過程で記録した採否判断（covered、rejected 等）を後続工程へ引き継ぐ optional な soft-contract である（ADR-003）。
 
 - **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `review_dispositions` の schema を正規所有する
 - **producer**: req-define（`docs/specs/commands/req-define.md`、`src/opencode/commands/agentdev/req-define.md`、`src/opencode/commands/agentdev/templates/req-define/req-draft.md`）
@@ -414,7 +414,7 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 | `superseded` | 入力項目がより新しい判断へ置き換えられた（必要に応じて追加） |
 | `stale_target` | 根拠の参照先が失効し、covered のまま起票できない（必要に応じて追加） |
 
-#### optional soft-contract 運用（ADR-0124 準拠）
+#### optional soft-contract 運用（ADR-003 準拠）
 
 - `review_dispositions` は optional な soft-contract であり、欠落時に既存 req_draft、RU、promoted artifact を拒否しない（後方互換）
 - 厳格なスキーマ検証、JSON Schema、バリデータを導入しない

@@ -1,6 +1,6 @@
 # REQ 番号採番とバリデーション規約
 
-本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、REQ番号採番、要件行ID、ファイル配置、frontmatterバリデーション、分類ゲート、HOW 除去後の acceptance criteria 順位検証の詳細規約を扱う。SKILL.md 本文では要点とスクリプト呼出しのみを提示し、個別規定は本ファイルを参照する（REQ-0113-010）。
+本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、REQ番号採番、要件行ID、ファイル配置、frontmatterバリデーション、分類ゲート、HOW 除去後の acceptance criteria 順位検証の詳細規約を扱う。SKILL.md 本文では要点とスクリプト呼出しのみを提示し、個別規定は本ファイルを参照する。
 
 ## REQ番号採番ルール
 

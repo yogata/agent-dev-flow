@@ -63,5 +63,5 @@ spec-save は独自 QG を持たず QG-1、QG-4 で担保される。
 
 - [quality-gates.md](../quality/quality-gates.md)（SPEC 定義）
 - [commands/req-define.md](../commands/req-define.md), [commands/req-save.md](../commands/req-save.md), [commands/case-open.md](../commands/case-open.md), [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（適用先）
-- REQ-0136（REQ/SPEC 責務分離の徹底）
+- REQ-001（REQ/SPEC 責務分離の徹底）
 

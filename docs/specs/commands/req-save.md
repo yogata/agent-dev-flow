@@ -60,7 +60,7 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（REQ/ADR/SPEC body 品質検査）
 - [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)（IR-057 obsolete-spec-path-after-domain-split、targeted docs guard 連携）
 
-## targeted docs guard (REQ-0158-003)
+## targeted docs guard (v2:REQ-0158-003)
 
 REQ 保存工程で targeted docs guard を実行する。対象は保存工程で変更された REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/DOC-MAP.md`、`docs/README.md`、`AGENTS.md`）。
 
@@ -75,11 +75,11 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failure
 
 req-save が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
 
-- check_changed_docs.ts（--workflow req-save、REQ files 変更時）: REQ 保存工程で実行（[targeted docs guard (REQ-0158-003)](#targeted-docs-guard-req-0158-003) 参照）
+- check_changed_docs.ts（--workflow req-save、REQ files 変更時）: REQ 保存工程で実行（[targeted docs guard (v2:REQ-0158-003)](#targeted-docs-guard-req-0158-003) 参照）
 
 req-save は check_integrity.ts（全体監査）を使用しない（保存工程は変更ファイル限定の targeted 検査が責務。全体監査は /repo/docs-check の責務）。
 
-※肯定表現のみ（REQ-0144-002, REQ-0144-003 準拠）。
+※肯定表現のみ（REQ-010-002, REQ-010-003 準拠）。
 
 ## 対象外
 
@@ -97,14 +97,14 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 
 ## 検証観点
 
-- QG-1（Definition Integrity Gate）: Step 4 の前置条件として「適用結果の整合性検証」を実行（採番結果の整合性、マージ結果の整合性、インデックスの整合性、変更範囲の妥当性）。内容の品質は req-define の QG-1 の責務（REQ-0102-081/082）
+- QG-1（Definition Integrity Gate）: Step 4 の前置条件として「適用結果の整合性検証」を実行（採番結果の整合性、マージ結果の整合性、インデックスの整合性、変更範囲の妥当性）。内容の品質は req-define の QG-1 の責務（REQ-004-081/082）
 - ADR 妥当性再検証ゲート: ADR 保存直前に技術判断含有確認、REQ/SPEC 相当の内容のみなら停止
 - ADR 採番: `agentdev-adr-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定番号を付与
 - 出力制約: 成果物本文（REQ/ADR ファイル本文、commit message）は verbatim で返す（G10）
 
-## case-auto 並列委譲モデル（REQ-0114-087〜093）
+## case-auto 並列委譲モデル（REQ-006-087〜093）
 
-req-save は複数 REQ/ADR ファイルの変更案作成、検査を並列化できる（REQ-0114-090）。3 フェーズ分離で実現する:
+req-save は複数 REQ/ADR ファイルの変更案作成、検査を並列化できる（REQ-006-090）。3 フェーズ分離で実現する:
 
 | フェーズ | 操作 | 実行方法 |
 |---|---|---|
@@ -125,7 +125,7 @@ G07（commit 前 status 更新）は フェーズ3 で維持。
 - `agentdev-conventional-commits` skill（コミットメッセージ規約）
 - `agentdev-git-worktree` skill（並列実行安全 git 操作）
 - `agentdev-quality-gates` skill（QG-1）
-- REQ-0102（要件定義、保存）
-- REQ-0138（構造化 req_draft 契約）
-- REQ-0137（並列実行安全 git 操作規律）
+- REQ-004（要件定義、保存）
+- REQ-008（構造化 req_draft 契約）
+- v2:REQ-0137（並列実行安全 git 操作規律）
 

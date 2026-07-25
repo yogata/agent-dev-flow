@@ -10,11 +10,11 @@ updated: 2026-07-24
 docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを担う診断判断 skill の仕様を定める。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
-> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（ADR-0103, ADR-0104）。
+> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001, REQ-001）。
 
 ## 目的
 
-`inspect-docs` command の実行時に docs 横断診断の実行を担う診断判断 skill の責務、対象外、境界を定義する。REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`）との責務重複を防ぎ、docs 横断診断の正規所有者を一つに定める。名称は REQ-0124-025 の diagnostics 許容例外境界に基づき `agentdev-doc-diagnostics` を維持する（CR-001）。
+`inspect-docs` command の実行時に docs 横断診断の実行を担う診断判断 skill の責務、対象外、境界を定義する。REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`）との責務重複を防ぎ、docs 横断診断の正規所有者を一つに定める。名称は REQ-010-025 の diagnostics 許容例外境界に基づき `agentdev-doc-diagnostics` を維持する（CR-001）。
 
 ## 適用対象
 
@@ -54,14 +54,14 @@ docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契
 
 ## 現在の動作
 
-- inspect-docs command は診断の実行と finding 出力を担い、診断カテゴリ、証拠構造、出力契約、ルーティングは本 skill が一次所有する（REQ-0109-048）
+- inspect-docs command は診断の実行と finding 出力を担い、診断カテゴリ、証拠構造、出力契約、ルーティングは本 skill が一次所有する（REQ-010-048）
 - REQ 固有診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）は `agentdev-req-structure-diagnostics`、文意品質は `agentdev-doc-writing`、探索順は `agentdev-doc-map` が残留する
 - 本 skill は横断編成と結果統合のみを所有し、専門診断の再定義を行わない
-- 診断対象は読み取り専用とし、許可される副作用は `.agentdev/inspect/inbox/*.md` の生成と `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ（REQ-0103-140-151、inspect lifecycle 準拠）
+- 診断対象は読み取り専用とし、許可される副作用は `.agentdev/inspect/inbox/*.md` の生成と `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ（REQ-002-140-151、inspect lifecycle 準拠）
 
 ## 境界
 
-`agentdev-doc-writing`（文意品質）、`agentdev-doc-map`（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）との責務重複がないこと。docs 横断診断は本 skill が正規の所有者となる（REQ-0124-025 の diagnostics 許容例外境界、CR-001）。
+`agentdev-doc-writing`（文意品質）、`agentdev-doc-map`（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）との責務重複がないこと。docs 横断診断は本 skill が正規の所有者となる（REQ-010-025 の diagnostics 許容例外境界、CR-001）。
 
 ## 対象外
 
@@ -84,5 +84,5 @@ docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契
 - [agentdev-req-structure-diagnostics.md](agentdev-req-structure-diagnostics.md)（REQ 固有診断 skill）
 - [agentdev-doc-writing.md](agentdev-doc-writing.md)（文意品質 skill）
 - [agentdev-doc-map.md](agentdev-doc-map.md)（探索順 skill）
-- REQ-0124-025（diagnostics 命名許容例外境界）
-- REQ-0109-048（inspect-docs と diagnostics skill の責務分離）
+- REQ-010-025（diagnostics 命名許容例外境界）
+- REQ-010-048（inspect-docs と diagnostics skill の責務分離）

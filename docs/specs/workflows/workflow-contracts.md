@@ -2,7 +2,7 @@
 title: ワークフロー契約（横断）
 status: accepted
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-25
 ---
 
 # ワークフロー契約（横断）
@@ -13,7 +13,7 @@ updated: 2026-06-21
 
 ## 目的
 
-ワークフロー全体像、共通フェーズ、共通状態、artifact lifecycle など、複数コマンド、スキルにまたがる契約を定義する（REQ-0104）。
+ワークフロー全体像、共通フェーズ、共通状態、artifact lifecycle など、複数コマンド、スキルにまたがる契約を定義する（REQ-005）。
 
 ## パイプライン概要
 
@@ -27,17 +27,17 @@ AgentDevFlow は 3 つのパイプラインで構成される:
 
 ## コマンド分類
 
-AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する（REQ-0104-048）。
+AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する（REQ-005-048）。
 
 | 分類 | コマンド | 目的 |
 |---|---|---|
 | 主フロー | req-define → req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close → case-update | 要件定義から実装完了までの標準ワークフロー |
-| 最大自走入口 | case-auto | req-define 完了後の後続工程を一括自走する追加入口。標準フローを置換しない（REQ-0104-049） |
+| 最大自走入口 | case-auto | req-define 完了後の後続工程を一括自走する追加入口。標準フローを置換しない（REQ-005-049） |
 | 補助フロー | intake-capture, intake-from-github, intake-promote, learning-promote, backlog-review | 改善候補収集、学び蓄積、RU化。主フローを補完 |
 | 検出フロー | inspect-docs, inspect-skills, inspect-promote | 文書、スキルの意味検出、分類、昇格 |
 | リポジトリローカル検査 | /repo/docs-check | AgentDevFlow 本体リポジトリ内の機械的整合性検査 |
 
-- case-auto は標準フロー（req-save → spec-save → case-open → case-run → case-close）を内部的に呼び出す追加入口であり、標準フローを置換、廃止しない（REQ-0114-017）。spec-save は `artifact_actions` に `artifact: spec` entry が含まれる場合に実行し、旧形式 draft（同フィールドなし）は後方互換で従来順序で実行する（ADR-0123, REQ-0136-014）。
+- case-auto は標準フロー（req-save → spec-save → case-open → case-run → case-close）を内部的に呼び出す追加入口であり、標準フローを置換、廃止しない（REQ-006-017）。spec-save は `artifact_actions` に `artifact: spec` entry が含まれる場合に実行し、旧形式 draft（同フィールドなし）は後方互換で従来順序で実行する（v2:ADR-0123, REQ-001-014）。
 - 補助フロー、検出フロー、リポジトリローカル検査は、主フロー、最大自走入口とは独立して実行可能である。
 - 検出フローの出力（検出事項: inspect finding）は、inspect-promote → backlog-review を経て RU 化され、req-define の入力となる。
 
@@ -55,7 +55,7 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 
 ### マイクロフェーズ
 
-> **注意**: 以下の6マイクロフェーズは説明用ラベルであり、状態管理モデルではない（REQ-0112-023）。
+> **注意**: 以下の6マイクロフェーズは説明用ラベルであり、状態管理モデルではない（REQ-001-023）。
 > 実際の状態管理は Issue ラベル、GitHub Project で行う。
 
 | フェーズ | 状態 | マクロフェーズ |
@@ -69,7 +69,7 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 
 ### ワークフロー状態管理
 
-ワークフロー状態（例: "要件定義", "実装", "テスト" 等）は Issue ラベル、GitHub Project で管理する（REQ-0108-123、REQ-0101-037）。
+ワークフロー状態（例: "要件定義", "実装", "テスト" 等）は Issue ラベル、GitHub Project で管理する（REQ-010-123、REQ-001-037）。
 REQ/SPEC 文書内には状態として埋め込まず、上記マイクロフェーズは説明目的でのみ使用する。
 
 ## SSoT 遷移規則
@@ -96,7 +96,7 @@ draft（`.agentdev/drafts/req-draft-*.md`）は壁打ちフェーズ内の一時
 
 ### Local backend の SSoT 位置づけ
 
-Local backend（ローカル版 OpenCode）では、構造的実行以降の SSoT は GitHub Issue / PR ではなくローカル Case ファイル（`.agentdev/cases/case-{NNNN}.md`）である（REQ-0141-021〜023）。
+Local backend（ローカル版 OpenCode）では、構造的実行以降の SSoT は GitHub Issue / PR ではなくローカル Case ファイル（`.agentdev/cases/case-{NNNN}.md`）である（REQ-009-021〜023）。
 
 | マクロフェーズ | Local backend の SSoT |
 |---|---|
@@ -127,8 +127,8 @@ Local backend（ローカル版 OpenCode）では、構造的実行以降の SSo
 ## ワークフロー経路制御
 
 work_type と scale により workflow_route を決定する。
-work_type は bugfix / feature / maintenance / docs_chore の 4 値である（REQ-0112-011, REQ-0104-014）。
-scale は feature のみ standard / large をとる（REQ-0112-011）。
+work_type は bugfix / feature / maintenance / docs_chore の 4 値である（REQ-001-011, REQ-005-014）。
+scale は feature のみ standard / large をとる（REQ-001-011）。
 
 | work_type | scale | workflow_route |
 |---|---|---|
@@ -142,7 +142,7 @@ scale は feature のみ standard / large をとる（REQ-0112-011）。
 
 ## 実装分類（Implementation Pattern Taxonomy）
 
-コマンドの内部構造に基づく分類軸（REQ-0103-016）。
+コマンドの内部構造に基づく分類軸（REQ-002-016）。
 work_type とは直交する概念である。
 
 | Pattern | 日本語名称 | 主責務 |
@@ -155,14 +155,61 @@ work_type とは直交する概念である。
 
 各コマンドがどの Pattern に属するかは各 command SPEC を参照。
 
+## case-auto / case-run 委譲モデル
+
+AgentDevFlow は case-auto と case-run の2階層委譲構造で大規模自走を実現する。
+委譲 chain 破綻を避けるため、case-run は case-auto 内でインライン実行し、実行担当サブエージェントへの委譲起点を case-auto に集約する（委譲起点の折りたたみ）。
+
+### case-auto 構成工程委譲
+
+case-auto は構成工程（req-save、spec-save、case-open、case-close）を各コマンド定義を権威情報源として読み込む委譲起動で実行する。
+case-auto 本体は薄いオーケストレータに専念し、入力解決、工程分岐、工程間状態引き継ぎ、停止条件検出、完了報告、OU と子Issue ループ制御、クリーンアップ検証ゲートのみを保持し、工程内部ロジックを実行しない。
+
+case-run は case-auto 内でインライン実行する（構成工程委譲の対象外）。
+実行担当サブエージェントへの委譲を case-auto から直接行う。
+
+各工程の委譲契約は委譲時最小契約（inputs、side_effect_boundary、output_contract）に従う。
+詳細は [delegation-contracts.md](delegation-contracts.md) 参照。
+
+委譲起動が失敗（ツール不在、ハードリジェクト）、または結果が delegation-unavailable、blocked/failed で委譲 chain 破綻に起因する場合は当該工程をインライン実行へフォールバックする。
+genuine blocker（実装上の問題、スコープ外操作等）はフォールバック対象外とし停止条件として扱う。
+
+Epic Issue 本文の単一書き手は case-close が担う。
+case-auto は Epic Issue 本文の更新責務を持たない。
+
+### case-run 実行担当サブエージェント委譲
+
+case-run は実装作業を実行担当サブエージェントへ委譲する。
+実行担当サブエージェントの選定、起動方式、timeout、retry 等の実行制御は harness 側の責務であり、配布物である case-run 本文には依存させない。
+
+実行担当サブエージェントは委譲 prompt 内で指定された command を使用し、Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲート（code review、QA review、gate review）を実行する。
+監査トレイルは worktree 配下に配置され、worktree 削除時に破棄する。
+
+case-run のスコープは単一 Issue または単一 Wave である。
+Epic 全体（複数 Wave）は Wave 境界で PR マージ（case-close 責務）が必要なため扱わない。
+
+### result 4状態契約
+
+実行担当サブエージェントの result 契約は次の4状態を取る。
+
+| 状態 | 意味 | 後続アクション |
+|---|---|---|
+| `completed-pr` | 実装、検証、PR 作成が完了 | case-close へ |
+| `blocked` | 要件曖昧性、外部副作用、権限不足等で自動継続不能 | 停止理由を報告し再開可能コマンドを提示 |
+| `failed` | 実装、検証、CI、PR 作成等の実行結果として失敗 | 正常完了した他 Issue のみ case-close 対象とする |
+| `delegation-unavailable` | 実行インフラが委譲を起動できなかった状態。実行が試行されていない | インフラ修正後に再実行可能。`pending` へ戻す |
+
+詳細な状態遷移と case-auto アクションは [epic-wave-model.md](epic-wave-model.md)「結果状態遷移と出力契約」参照。
+
 ## 適用範囲宣言
 
-`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（ADR-0103）。
+`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
 他プロジェクトへの適用を意図しない。
-実行時コマンドは SPEC ファイルに依存しない（ADR-0104）。
+実行時コマンドは SPEC ファイルに依存しない（REQ-001）。
 
 ## See Also
 
+- [REQ-006](../../requirements/REQ-006.md)（Case実行オーケストレーション: case-open/case-run/case-close/case-auto 親 REQ）
 - [delegation-contracts.md](delegation-contracts.md)（サブエージェント委譲契約）
 - [capture-boundaries.md](capture-boundaries.md)（キャプチャ境界）
 - [epic-wave-model.md](epic-wave-model.md)（Epic / Wave / Issue 実行モデル）

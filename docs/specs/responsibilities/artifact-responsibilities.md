@@ -1,11 +1,11 @@
 ---
 status: accepted
-updated: 2026-07-24
+updated: 2026-07-25
 ---
 
 # 成果物責任表
 
-各成果物種別の原本所有者（`canonical owner`）と責務を定義する（REQ-0103-057）。
+各成果物種別の原本所有者（`canonical owner`）と責務を定義する（REQ-002-057）。
 
 ## 成果物責任表
 
@@ -23,22 +23,22 @@ updated: 2026-07-24
 | DOC-MAP | `docs/DOC-MAP.md` | - | - | 文書探索入口（非基準） |
 | Guide | `docs/guides/*.md` | - | - | 参照用読み物（ナビゲーション層） |
 | ドメイン状態 | `.agentdev/` | - | - | Intake / Learning / Backlog / Integrity 永続状態 |
-| リポジトリローカル Command | `.opencode/commands/repo/` | - | - | 本体リポジトリ専用コマンド（ADR-0106）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
-| リポジトリローカル Skill | `.opencode/skills/repo-*/` | - | - | 本体リポジトリ専用スキル（ADR-0106）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
-| リポジトリローカルレジストリ | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | - | - | リポジトリローカル語彙レジストリ。`.agentdev/` には配置しない（ADR-0106） |
+| リポジトリローカル Command | `.opencode/commands/repo/` | - | - | 本体リポジトリ専用コマンド（REQ-001）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
+| リポジトリローカル Skill | `.opencode/skills/repo-*/` | - | - | 本体リポジトリ専用スキル（REQ-001）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
+| リポジトリローカルレジストリ | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | - | - | リポジトリローカル語彙レジストリ。`.agentdev/` には配置しない（REQ-001） |
 
 ### 操作 skill 正規所有者台帳
 
 各操作 skill の責務と対象外を正規所有者台帳として定義する。REQ/ADR/SPEC 操作と文書種別横断検証の正規所有者を一つに定め、責務重複を防ぐ。
 
-正規所有の単位は「安定した関心キー」である（REQ-0119-038、ADR-0139）。REQ-0119-033「責務ごとに最も安定した最小の定義元を正規とする」の延長であり、適用条件を精緻化する。1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない。
+正規所有の単位は「安定した関心キー」である（REQ-003-038、REQ-001）。REQ-003-033「責務ごとに最も安定した最小の定義元を正規とする」の延長であり、適用条件を精緻化する。1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない。
 
-#### 関心キーの定義（ADR-0139）
+#### 関心キーの定義（REQ-001）
 
 | 項目 | 内容 |
 |---|---|
 | 関心キー | SPEC が正規所有する仕様関心を一意に識別する文字列。command 名、skill 名、workflow 名、品質ルール名、整合性ルール名等の所有責務に基づく |
-| 安定性基準 | 最も安定した最小の定義元を選定する（REQ-0119-033）。仕様変更時に限定された影響範囲で済む所有責務単位を選ぶ |
+| 安定性基準 | 最も安定した最小の定義元を選定する（REQ-003-033）。仕様変更時に限定された影響範囲で済む所有責務単位を選ぶ |
 | 重複検出 | 同一関心キーに対する複数 SPEC の正規所有宣言を重複として検出する。重複検出は frontmatter または冒頭宣言節で宣言された関心キーを横断検索することで機械判定可能とする |
 | 命名規則 | 関心キーは所有責務に基づく安定した名前とする。内部的な実装ファイル名、一時的な作業名は関心キーに使用しない |
 
@@ -48,7 +48,7 @@ updated: 2026-07-24
 |---|---|---|
 | `agentdev-req-file-manager` | REQ 作成、APPEND、UPDATE、REQ 番号採番、要件行 ID 採番、REQ 固有整合性確認、REQ 固有 script 呼出契約 | ADR 操作、SPEC 操作、内容推論、ファイル編集を実行しない（所有者の案内のみ） |
 | `agentdev-adr-file-manager` | ADR 作成、APPEND、UPDATE、ADR 番号採番、ADR 固有整合性確認、ADR 固有 script 呼出契約 | REQ 操作、SPEC 操作、内容推論 |
-| `agentdev-spec-file-manager` | SPEC 作成、更新、配置先判断、target_area による更新判断、SPEC ライフサイクル規則の適用と整合性確認、SPEC 固有 script の選択と呼出契約 | REQ 操作、ADR 操作、SPEC 内容の新規推論、accepted 昇格判断（case-close 責務、ADR-0123 / REQ-0136-024 準拠）、ユーザー承認、commit、push、共通 script の重複実行 |
+| `agentdev-spec-file-manager` | SPEC 作成、更新、配置先判断、target_area による更新判断、SPEC ライフサイクル規則の適用と整合性確認、SPEC 固有 script の選択と呼出契約 | REQ 操作、ADR 操作、SPEC 内容の新規推論、accepted 昇格判断（case-close 責務、v2:ADR-0123 / REQ-001-024 準拠）、ユーザー承認、commit、push、共通 script の重複実行 |
 | `agentdev-doc-diagnostics` | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティング | 診断対象の修正、promote 判断、REQ/SPEC/RU 保存、commit、push、Issue/PR 操作、REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（`agentdev-req-structure-diagnostics`）、文意品質診断（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`） |
 | `agentdev-artifact-validation` | 文書種別横断の決定的検証 script、共有 lib、公開検証契約、JSON 結果契約（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact` とそれらが利用する共有 lib、対応 test） | REQ/ADR/SPEC 固有の内容判断、ファイル編集、保存、ユーザー承認、commit、push、REQ 番号/ADR 番号/要件行 ID の採番、target_area の検索 |
 
@@ -60,15 +60,23 @@ updated: 2026-07-24
 
 ## 責務境界原則
 
-1. **Command は薄い**: 入口、入出力、ガードレール、高レベル Steps のみ（REQ-0103-001）
-2. **Skill は再利用可能**: 共通判断基準、ドメイン知識（REQ-0103-003）
-3. **Template は構造のみ**: 出力フォーマット、プレースホルダー（REQ-0103-005）
-4. **Script は決定的**: テスト可能、再現可能（REQ-0103-006）
-5. **原本優先（Source first）**: 原本（`canonical source`）は `src/opencode/`、実行時は `.opencode/` 配置先（`projection`）（ADR-0105）
+**Command** は利用者が起動する公開入口であり、入力、出力、ガードレール、高水準の実行順序を定義する。
+
+**Skill** は複数の command が参照できる判断基準、ドメイン知識、状態遷移を定義する。
+
+**Template** は成果物本文の構造と埋め込み箇所を定義し、判断や副作用を持たない。
+
+**Script** は入力から出力を決定でき、テストで再現可能な処理を実装する。
+
+Command は Skill を参照して判断を利用し、Skill は必要な詳細を references、決定的処理を scripts、出力構造を templates へ分離する。
+
+同一の判断基準、出力構造、決定的処理を Command と Skill、Template、Script の複数箇所で正規定義しない。
+
+原本は `src/opencode/` に置き、`.opencode/` は実行時配置先として原本を投影する。
 
 ## 親エージェント / サブエージェント責務
 
-サブエージェント委譲時の責務境界は ADR-0112 と REQ-0119 に従う。
+サブエージェント委譲時の責務境界は v2:ADR-0112 と REQ-003 に従う。
 
 | 主体 | 保持する責務 | 禁止される責務 |
 |---|---|---|
@@ -78,7 +86,7 @@ updated: 2026-07-24
 サブエージェントは副作用なしを返却に明示する。
 成果物本文がある場合はそのまま（verbatim）返し、判定結果、調査過程、中間ログ、読解メモは要約、根拠、親判断事項、capture 候補へ圧縮して返す。
 
-## SKILL ↔ command 同一ルール重複許容基準（REQ-0147-001）
+## SKILL ↔ command 同一ルール重複許容基準（REQ-003-001）
 
 SKILL と command の間で同一ルールを両方に記載することが正当な場合の許容条件:
 
@@ -101,10 +109,10 @@ SKILL と command の間で同一ルールを両方に記載することが正�
 - 正の情報源を一方に固定し、他方は「<canonical> に準拠（重複掲載の理由: <許容条件>）」と明記
 - 正の情報源の変更時は同期側の更新を必須項目として扱う（docs-check / inspect-skills で追跡）
 
-## 重複許容基準（REQ-0147-001）適用例集
+## 重複許容基準（REQ-003-001）適用例集
 
-本セクションは REQ-0147-001（SPEC 重複許容基準）の具体的適用事例を蓄積し、
-REQ-0119-034（同一契約再定義抑止）との両立関係を運用面で明確にする。
+本セクションは REQ-003-001（SPEC 重複許容基準）の具体的適用事例を蓄積し、
+REQ-003-034（同一契約再定義抑止）との両立関係を運用面で明確にする。
 
 ### 適用パターン1: project extensions boilerplate
 
@@ -118,12 +126,12 @@ REQ-0119-034（同一契約再定義抑止）との両立関係を運用面で�
 2. 公開契約宣言は配布 command 本文に直接記載を許容する（上限: 宣言4行まで）
 3. 詳細契約は skill 参照（agentdev-project-extensions SKILL 等）に集約し、
    command 本文には公開契約宣言のみを残す
-4. 公開契約宣言の範囲を超える重複は REQ-0119-034 違反として扱う
+4. 公開契約宣言の範囲を超える重複は REQ-003-034 違反として扱う
 
 ### 適用パターン2: inspect-skills references 重複
 
 複数 SKILL で同一の references 内容（検査手順等）が重複する場合、下記条件を全て満たす
-とき REQ-0147-001 の重複許容基準に該当する:
+とき REQ-003-001 の重複許容基準に該当する:
 
 1. 重複する references が複数 SKILL の共通基盤（検査方法論等）であること
 2. 各 SKILL 固有の判断基準が明確に分離されていること

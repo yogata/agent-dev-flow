@@ -1,6 +1,5 @@
 ---
 description: PRをマージし、対応記録を追記し、Caseをクローズしてブランチを削除する。Epic Issue番号入力時は現在 Wave の一括クローズ（Epic Wave クローズ）を行う
-agent: sisyphus
 ---
 
 # 完了処理
@@ -73,17 +72,17 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 **E5. Epic status table 更新（単一書き手: case-close）**: E4 でクローズした各子Issue のステータスを `running` → `completed ([PR#N](URL))` に更新。`agentdev-epic-tracker` スキルの正規表現パターン（running → completed）に従い、`agentdev-issue-management` の安全手順、`agentdev-gh-cli` の VERIFY 操作で本文を再取得し検証
  - **Epic Issue 本文ステータス追跡テーブルの更新は case-close のみが実施する**（単一書き手制約）。case-run は読み取るのみ（書き込まない）。case-auto は Wave 反復制御のみ（直接書き込まない）
 
-**E5b. Epic Issue 完了条件チェックボックス最終評価・更新**: E5（Epic status table 更新）の後、E6（最終 Wave 判定）の前に実施する。Epic Issue 本文の `## 完了条件` セクションを読み込み、完了条件チェックボックスを QG-4 に従い評価・更新する（REQ-0131-032、ADR-0114 完了条件チェックボックス評価の case-close 専任責務、G08 Epic Wave 経路への明示適用）。単一 Issue クローズ（Step 2）の QG-4 手順と同等の評価・更新手順を Epic Issue 本文に対して実行する
- - **評価対象スコープ（QG-4 観点8、REQ-0131-032）**: Wave 種別に応じて評価スコープを切り替える
-   - **中間 Wave**: 当該 Wave でマージされた PR の対象範囲に属する完了条件のみ `[ ]` → `[x]` に更新する（PR 対象範囲スコープ）。他 Wave の完了条件は `[ ]` のまま残す（対象外 Wave の完了条件は評価対象外）。PR 対象範囲の判定は Step 2「PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8、REQ-0146-015）」と同一の QG-4 観点8 判定マトリクスに従う。E3 で特定した当該 Wave の子Issue の PR 変更ファイル一覧（PR 変更ファイル一覧取得、`agentdev-gh-cli`、REQ-0149-011）を入力とする
+**E5b. Epic Issue 完了条件チェックボックス最終評価・更新**: E5（Epic status table 更新）の後、E6（最終 Wave 判定）の前に実施する。Epic Issue 本文の `## 完了条件` セクションを読み込み、完了条件チェックボックスを QG-4 に従い評価・更新する（完了条件チェックボックス評価の case-close 専任責務、G08 Epic Wave 経路への明示適用）。単一 Issue クローズ（Step 2）の QG-4 手順と同等の評価・更新手順を Epic Issue 本文に対して実行する
+  - **評価対象スコープ（QG-4 観点8）**: Wave 種別に応じて評価スコープを切り替える
+    - **中間 Wave**: 当該 Wave でマージされた PR の対象範囲に属する完了条件のみ `[ ]` → `[x]` に更新する（PR 対象範囲スコープ）。他 Wave の完了条件は `[ ]` のまま残す（対象外 Wave の完了条件は評価対象外）。PR 対象範囲の判定は Step 2「PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8）」と同一の QG-4 観点8 判定マトリクスに従う。E3 で特定した当該 Wave の子Issue の PR 変更ファイル一覧（PR 変更ファイル一覧取得、`agentdev-gh-cli`）を入力とする
    - **最終 Wave**: Epic Issue 本文の全完了条件を評価する（全体評価スコープ）。実装完了している完了条件を `[ ]` → `[x]` に更新する。各完了条件の評価スコープ（PR 対象範囲 or 全体）は Step 2 の QG-4 観点8 判定マトリクスに従い決定し、「全体」スコープの完了条件は再 grep/ 再検査/ 再計測を実施し最新証拠を取得する
  - **未達項目の自律解決判定**: 達成不可項目（実装完了していない完了条件）は Step 2 の「達成不可項目を自律解決判定（変更対象分類×検証種別分類）」に準じて処理する。中間 Wave で他 Wave 由来の未達は評価対象外のため自律解決の対象としない
  - **Epic Issue 本文更新手続き（`agentdev-gh-cli`）**: 評価結果を Epic Issue 本文へ反映 → VERIFY。Windows 環境の WRITE 手続きではコンソールエンコーディング初期化（`agentdev-gh-cli` の「Windows 環境 WRITE 手続き」）を必須前置する（REQ）
- - **再読込 VERIFY（REQ-0131-033）**: Epic Issue 本文更新後に本文を再読込し、対象完了条件（評価スコープに属する完了条件）の `- [ ]` が0件であることを確認する。最大2回まで実施する
+  - **再読込 VERIFY**: Epic Issue 本文更新後に本文を再読込し、対象完了条件（評価スコープに属する完了条件）の `- [ ]` が0件であることを確認する。最大2回まで実施する
    1. 1回目の再読込で対象完了条件の `- [ ]` が0件なら Step E6（最終 Wave 判定）へ進む
    2. 1回目で `- [ ]` が残る場合は更新を再試行し、再度再読込（2回目）する
    3. 2回目でも `- [ ]` が残る場合は構造化エラーで停止する（後述「未達項目残存時の停止」）
- - **未達項目残存時の停止（REQ-0131-034、G08 Epic Wave 経路への明示適用）**: 最終 Wave で実装完了していない完了条件（`- [ ]`）が残る場合、case-close は構造化エラーで停止する。中間 Wave で他 Wave の完了条件が `[ ]` のまま残ることは停止条件ではない（対象外 Wave の完了条件は評価対象外のため）。停止時の出力に以下を含める:
+  - **未達項目残存時の停止（G08 Epic Wave 経路への明示適用）**: 最終 Wave で実装完了していない完了条件（`- [ ]`）が残る場合、case-close は構造化エラーで停止する。中間 Wave で他 Wave の完了条件が `[ ]` のまま残ることは停止条件ではない（対象外 Wave の完了条件は評価対象外のため）。停止時の出力に以下を含める:
    - 残存する未達完了条件の一覧（`- [ ]` の完了条件テキスト）
    - 対応する子Issue のステータス（`completed` / `blocked` / `failed`）。Epic Issue 本文のステータス追跡テーブルから読み取る
    - 再開コマンド候補（未達完了条件を完遂するための次アクション。例: 未対応子Issue の `/agentdev/case-run #N`、blocked 子Issue の `/agentdev/case-update #N`、要件再検討時の `/agentdev/req-define`）
@@ -103,9 +102,9 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 
 達成判定、完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価、更新する。判定基準、検査観点は同スキル（`agentdev-quality-gates`）の QG-4 を参照:
   - **完了条件チェックボックス評価、更新は case-close の責務**（QG-4）。case-run、実行担当サブエージェント、外部実行バックエンドは完了条件チェックボックスを更新しない。case-close は case-run/ 実行担当サブエージェントとは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
-  - **PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8、REQ-0146-015）**: unchecked 完了条件を達成判定する前に、各完了条件の評価スコープ（PR 対象範囲 or 全体）を QG-4 観点8「PR 対象範囲 vs 全体 判定マトリクス」に従い決定する。境界ケース #1532/TS-006 由来。手順:
+  - **PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8）**: unchecked 完了条件を達成判定する前に、各完了条件の評価スコープ（PR 対象範囲 or 全体）を QG-4 観点8「PR 対象範囲 vs 全体 判定マトリクス」に従い決定する。境界ケース #1532/TS-006 由来。手順:
     1. Issue 本文の完了条件チェックボックスから評価対象（ファイル/ ID/ 集計値/ 横断是正/ SPEC）を分類する
-    2. PR 変更ファイル一覧取得手続き（`agentdev-gh-cli`、REQ-0149-011）で PR 変更ファイル一覧を取得する
+    2. PR 変更ファイル一覧取得手続き（`agentdev-gh-cli`）で PR 変更ファイル一覧を取得する
     3. QG-4 観点8 の判定マトリクスを適用し、各完了条件の評価スコープ（PR 対象範囲 or 全体）を決定する
     4. スコープが「全体」の完了条件は、再 grep/ 再検査/ 再計測を実施し最新証拠を取得する
     5. Issue 本文にスコープ明示がない場合、case-open 起票時点（Step 2-1b）で明示されていることを前提とする。未明示の場合はユーザー判断を仰ぐ
@@ -139,7 +138,7 @@ PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（
       --workflow case-close --files <PR 変更ファイル一覧> --json
     ```
 
-   `<PR 変更ファイル一覧>` の区切り形式は space 区切り（推奨、例: `--files docs/a.md docs/b.md docs/c.md`）、または comma 区切り（例: `--files docs/a.md,docs/b.md,docs/c.md`、REQ-0158-001）。両形式の混在も可。
+   `<PR 変更ファイル一覧>` の区切り形式は space 区切り（推奨、例: `--files docs/a.md docs/b.md docs/c.md`）、または comma 区切り（例: `--files docs/a.md,docs/b.md,docs/c.md`）。両形式の混在も可。
 
    JSON 出力の `failures` に strict severity が含まれる場合はマージを停止し、対象ファイルを修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行をユーザーに提案する。draft→accepted 等の SPEC status 変更時は `spec_readme_update_required` を Step 3-2 SPEC 確定フローに反映する
    - **files_checked 空時の確認（REQ）**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱う。`warnings` 配列に検査対象ファイル未検出の警告が出力されるため、以下を確認する。確認を経ずに `files_checked` 空のまま完了扱いとしない:
@@ -163,18 +162,18 @@ PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録�
 
 ### case-close が使用する検査ツール
 
-case-close が使用する検査ツール（[integrity-contracts.md](../../../../docs/specs/integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
+case-close が使用する検査ツール（integrity 契約 SPEC「Workflow × 使用ツールマトリックス」参照）:
 
 - check_changed_docs.ts（--workflow case-close、--files <PR 変更ファイル一覧>）: Step 3-1 targeted docs guard で実行（AG-003）
 - check_extensions.ts（IR-056）: `.opencode/commands/agentdev/**/*.md`, `.opencode/skills/agentdev-*/SKILL.md`, `.opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行（Step 3-1）
-- test_strategy: QG-4 完了条件確認（REQ-0131-026）
+- test_strategy: QG-4 完了条件確認
 
-※上記は全て肯定表現である（REQ-0144-002, REQ-0144-003 準拠）。
+※上記は全て肯定表現である。
 
 ### Step 4: PRマージ
 
-**Step 4-0: squash merge 前の mergeable UNKNOWN ポーリング（REQ）**。
-`agentdev-gh-cli` の「squash merge 前の mergeable UNKNOWN ポーリング」手続き（REQ）に従い、対象 PR の `mergeable` 状態事前確認、`UNKNOWN` ポーリング待機、上限超過時の構造化エラー停止、待機中の `CONFLICTING` 遷移検出を自動分岐させ、コンフリクト解消パス（Step 4-2）へ即時接続する。ポーリング間隔・上限値は gh-cli 手続き側が所有する（REQ-0103-163、AG-001）。
+**Step 4-0: squash merge 前の mergeable UNKNOWN ポーリング**。
+`agentdev-gh-cli` の「squash merge 前の mergeable UNKNOWN ポーリング」手続きに従い、対象 PR の `mergeable` 状態事前確認、`UNKNOWN` ポーリング待機、上限超過時の構造化エラー停止、待機中の `CONFLICTING` 遷移検出を自動分岐させ、コンフリクト解消パス（Step 4-2）へ即時接続する。ポーリング間隔・上限値は gh-cli 手続き側が所有する（AG-001）。
 
   - PR merge 手続き（squash 方式、`agentdev-gh-cli`）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）
   - **Squash merge 失敗時のリトライ**: `agentdev-gh-cli` の「squash merge リトライ手続き」に従う。待機間隔・最大試行回数は gh-cli 手続き側が所有する（AG-001）。各試行のログ記録、全試行失敗時のフォールバック（template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）も同手続きに従う

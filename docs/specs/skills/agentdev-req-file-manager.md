@@ -39,7 +39,7 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 - 要件行は「変更後に満たすべき振る舞い、制約、状態」のみ記述
 - 実装指示は要件行に含めない
 - bugfix では REQ ファイルを作成しない
-- 旧 REQ 群（REQ-0001〜0050）は2026-07-20に物理削除済みであり、mapping-table.md の対応表で移行履歴を参照できる。現行判断の根拠としない
+- 旧 REQ 群（v2:REQ-0001〜0050）は2026-07-20に物理削除済みであり、mapping-table.md の対応表で移行履歴を参照できる。現行判断の根拠としない
 
 ## 対象外
 
@@ -62,5 +62,5 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 - [agentdev-adr-file-manager.md](agentdev-adr-file-manager.md)
 - [agentdev-doc-map.md](agentdev-doc-map.md)
 - [commands/req-save.md](../commands/req-save.md)
-- REQ-0101（文書、REQ 管理基準）
-- REQ-0102（要件定義、保存）
+- REQ-001（文書、REQ 管理基準）
+- REQ-004（要件定義、保存）

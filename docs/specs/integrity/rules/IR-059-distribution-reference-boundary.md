@@ -14,7 +14,7 @@ status: accepted
 | category | canonical-conflict |
 | detection_method | 具体ID、具体パス、固定URLのパターン検出とテンプレートプレースホルダーexemption判定 |
 | affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**` |
-| related_req | REQ-0160 |
+| related_req | REQ-002 |
 | related_spec | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | gate_level | full-audit |
 | false_positive_risk | テンプレート例、検査対象宣言、索引参照をexemptionで抑制する |

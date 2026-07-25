@@ -20,11 +20,11 @@ describe("nextAdrNumber", () => {
 });
 
 describe("formatAdrId", () => {
-  test("zero-pads to 4 digits", () => {
-    expect(formatAdrId(1)).toBe("ADR-0001");
+  test("zero-pads to 3 digits", () => {
+    expect(formatAdrId(1)).toBe("ADR-001");
   });
 
-  test("preserves 4-digit numbers", () => {
-    expect(formatAdrId(131)).toBe("ADR-0131");
+  test("preserves numbers already at or above 3 digits", () => {
+    expect(formatAdrId(131)).toBe("ADR-131");
   });
 });

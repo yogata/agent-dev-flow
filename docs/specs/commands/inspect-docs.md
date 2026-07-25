@@ -40,8 +40,8 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 - Step 4: 現行/廃止/世代境界確認（`agentdev-req-structure-diagnostics`）
 - Step 5: SPEC 意味診断（SPEC が REQ/ADR/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認）
 - Step 6: ADR 意味診断（承認済み ADR のみを現行判断の根拠として扱っているか確認）
-- Step 7: guides 意味診断（guides が navigation layer の範囲を超えていないか確認）。履歴混入検出時は route 追加（REQ-0115-041）
-- Step 8: DOC-MAP 意味診断（DOC-MAP が索引の範囲を超えていないか確認）。内容過多検出時は分割誘導（REQ-0115-042）
+- Step 7: guides 意味診断（guides が navigation layer の範囲を超えていないか確認）。履歴混入検出時は route 追加（v2:REQ-0115-041）
+- Step 8: DOC-MAP 意味診断（DOC-MAP が索引の範囲を超えていないか確認）。内容過多検出時は分割誘導（v2:REQ-0115-042）
 - Step 9: REQ structure review（6観点）（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT（`agentdev-req-structure-diagnostics`））
 - Step 10: 文書分類一貫性検査（`docs/specs/foundations/document-model.md` の classification policy への適合確認）。REQ 要件行への SPEC 分離基準違反残留（schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出
 - Step 11: 配布物整合性検査。配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/specs/integrity/docs-spec-rebuild-integrity.md` が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する（`agentdev-req-structure-diagnostics` 参照）
@@ -85,6 +85,6 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 - [inspect-skills.md](inspect-skills.md)（Command/Skill 参照妥当性検出）
 - [inspect-promote.md](inspect-promote.md)（検出事項分類、昇格）
 - `agentdev-req-structure-diagnostics` skill（REQ 構造検査ロジック）
-- REQ-0109（inspect-docs / REQ 再構成運用）
-- REQ-0124（inspect-* 検出コマンド群）
+- REQ-010（inspect-docs / REQ 再構成運用）
+- REQ-010（inspect-* 検出コマンド群）
 

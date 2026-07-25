@@ -67,7 +67,7 @@ REQ 固有診断、文意品質診断等の専門診断からルーティング�
 
 ### 出力先
 
-`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`（REQ-0124-004、REQ-0124-015、REQ-0103-140 準拠）。
+`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`。
 ファイル名の `{timestamp}` は ISO 8601 形式（`YYYYMMDDTHHMMSSZ` 等のタイムゾーン付き）。
 
 ### 出力構成
