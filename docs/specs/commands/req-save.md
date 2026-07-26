@@ -2,7 +2,7 @@
 title: req-save SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-26
 ---
 
 # req-save SPEC
@@ -18,10 +18,10 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
 
 ## 出力
 
-- `docs/requirements/REQ-{NNNN}.md`（新規/追記/更新）
+- `docs/requirements/REQ-{NNN}.md`（新規/追記/更新）
 - `docs/requirements/README.md`（インデックス更新）
 - `docs/README.md`（ドキュメントハブ更新）
-- `docs/adr/ADR-{NNNN}.md`（ADR判断がある場合のみ）
+- `docs/adr/ADR-{NNN}.md`（ADR判断がある場合のみ）
 - `.agentdev/drafts/requirements-review-finding-{topic-slug}.md`（SPLIT検出時のみ）
 - `.agentdev/intake/inbox/req-restructure/*.md`（REQ再構成候補検知時のみ）
 - ドラフト frontmatter `status: saved` 更新
@@ -128,4 +128,3 @@ G07（commit 前 status 更新）は フェーズ3 で維持。
 - REQ-004（要件定義、保存）
 - REQ-008（構造化 req_draft 契約）
 - v2:REQ-0137（並列実行安全 git 操作規律）
-
