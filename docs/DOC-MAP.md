@@ -94,7 +94,7 @@ SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン�
 - [commands/inspect-docs.md](specs/commands/inspect-docs.md)：`/agentdev/inspect-docs`
 - [commands/inspect-skills.md](specs/commands/inspect-skills.md)：`/agentdev/inspect-skills`
 - [commands/inspect-promote.md](specs/commands/inspect-promote.md)：`/agentdev/inspect-promote`
-- [commands/inspect-extensions.md](specs/commands/inspect-extensions.md)：`/agentdev/inspect-extensions`（project extensions 機構の整合性診断、読み取り専用）
+- [commands/inspect-extensions.md](specs/commands/inspect-extensions.md)：`/agentdev/inspect-extensions`（ADR-006 により廃止、status: superseded。後継は docs-check / inspect-skills / inspect-promote の3層責務分離）
 
 ### skill SPEC（`specs/skills/`）
 

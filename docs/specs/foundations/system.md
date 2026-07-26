@@ -59,7 +59,6 @@ AgentDevFlow の配布コマンドではなく、AgentDevFlow 本体リポジト
 |---|---|---|
 | `/agentdev/inspect-docs` | docs 全体の意味整合レビューと REQ 再構成診断 | [commands/inspect-docs.md](../commands/inspect-docs.md) |
 | `/agentdev/inspect-skills` | Command/Skill 参照妥当性、構造の検出 | [commands/inspect-skills.md](../commands/inspect-skills.md) |
-| `/agentdev/inspect-extensions` | project extensions 機構の整合性検出 | [commands/inspect-extensions.md](../commands/inspect-extensions.md) |
 | `/agentdev/inspect-promote` | 検出事項（finding）の分類、昇格 | [commands/inspect-promote.md](../commands/inspect-promote.md) |
 
 ### 品質ゲート

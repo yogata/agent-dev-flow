@@ -26,7 +26,6 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 | `/agentdev/inspect-docs` | docs全体の意味整合検出 | 検出事項 | `/agentdev/inspect-promote` → `/agentdev/backlog-review` |
 | `/agentdev/inspect-skills` | Command/Skill 参照妥当性検出 | 検出事項 | `/agentdev/inspect-promote` → `/agentdev/backlog-review` |
 | `/agentdev/inspect-promote` | 検出事項の分類、採用（`--auto` で高確信度の検出事項を intake/promoted/ へ自動投入） | 採用済み成果物 | `/agentdev/backlog-review` |
-| `/agentdev/inspect-extensions` | project extensions 整合性検出 | 検出事項 | `/agentdev/inspect-promote` → `/agentdev/backlog-review` |
 
 ## 各コマンドの定義ファイル
 
@@ -46,5 +45,4 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 - [inspect-docs.md](./inspect-docs.md)
 - [inspect-skills.md](./inspect-skills.md)
 - [inspect-promote.md](./inspect-promote.md)
-- [inspect-extensions.md](./inspect-extensions.md)
 
