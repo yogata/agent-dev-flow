@@ -74,7 +74,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | SPEC | SPEC 行数 | status | ドメイン分類 |
 |---|---|---|---|
 | foundations/document-model.md | 628 | accepted | foundations |
-| responsibilities/artifact-contracts.md | 427 | accepted | responsibilities |
+| responsibilities/artifact-contracts.md | 447 | accepted | responsibilities |
 | integrity/integrity-contracts.md | 361 | accepted | integrity |
 | responsibilities/document-type-responsibilities.md | 349 | accepted | responsibilities |
 | commands/req-define.md | 330 | accepted | commands |

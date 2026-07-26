@@ -1,5 +1,5 @@
 ---
-updated: 2026-07-24
+updated: 2026-07-27
 status: accepted
 ---
 
@@ -315,7 +315,7 @@ draft file は原本アーティファクト（REQ/ADR/SPEC/RU）ではなく、
 
 | draft_type | file pattern | producer | allowed consumers | 位置づけ | lifecycle |
 |---|---|---|---|---|---|
-| `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `req-save`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
+| `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `req-save`, `spec-save`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
 
 標準 draft type は `req_draft` の 1 種のみとする（REQ-002-132）。
 `requirements-review-finding` および旧 `skill_review_finding` は標準 draft type に含めない。
@@ -343,6 +343,7 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 | command | 受け付ける draft_type |
 |---|---|
 | `req-save` | `req_draft` |
+| `spec-save` | `req_draft` |
 | `case-open` | `req_draft` |
 
 ### inspect-skills 副作用境界
@@ -351,6 +352,25 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/ADR/SPEC 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-002-140-151、REQ-010-007）。
 最終判断（promote / defer / reject）は `inspect-promote` が行う。
 検出事項（inspect finding）は `inspect-promote` による promote/defer/reject ライフサイクルの対象となる。
+
+### req_draft consumer 4 集合
+
+req_draft（`.agentdev/drafts/req-draft-{topic}.md`）の consumer 境界を次の 4 集合で確定する（REQ-008、REQ-006-083）。
+draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document-model の req_draft 説明、各 command 実体から抽出した 4 集合がすべて一致すること。
+
+| 集合 | 要素 | 役割 |
+|---|---|---|
+| producer | `{req-define}` | req_draft を生成する唯一の command |
+| direct consumer | `{req-save, spec-save, case-open}` | req_draft を主入力として消費し、REQ/ADR/SPEC/Issue を生成する command 群 |
+| orchestration pre-reader | `{case-auto}` | case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command |
+| invalid post-case reader | `{case-auto, case-run, case-close}` | case-open 成功後に req_draft を参照してはならない command 群 |
+
+#### case-open 成功後の SSoT 遷移
+
+- case-open 成功後は Issue と Epic を SSoT とし、req_draft は削除されてよい一時成果物となる
+- case-auto は case-open 成功後の停止、再開、完了処理を Issue と Epic だけで成立させる
+- case-run、case-close は case-open 成功後に req_draft を参照しない
+- draft type registry の allowed consumers 列は `{req-save, spec-save, case-open}` とする（従来の `{req-save, case-open}` から spec-save を追加）
 
 ## req_draft 出力構造
 
