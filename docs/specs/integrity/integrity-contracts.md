@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # 整合性契約
@@ -167,6 +167,79 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 
 各層は他層の担当を重複して実施せず、検出内容に応じて適切な層へ委譲する。
 機械的検出で偽陽性となる意味的判断は inspect-skills へ、文書品質の査読は doc-writing skill へ、それぞれ振り分ける。
+
+## IR lifecycle と enforcement_mode
+
+IR の現在性を `lifecycle_state`、実行可能性を `enforcement_mode` で表す（REQ-010）。
+`enforcement_mode` は独立した強制度ではなく、detector 有無と `severity` から導出する実行経路である。
+本節は IR の active、superseded、deleted を一つの登録集合で追跡し、廃止済み IR が checker や gate へ残る状態を防ぐ。
+
+### lifecycle_state と enforcement_mode の定義
+
+| field | 値 | 内容 |
+|---|---|---|
+| `lifecycle_state` | `active` / `superseded` / `deleted` | IR の現在性 |
+| `enforcement_mode` | `enforcement` / `observation` / `none` | IR の実行可能性 |
+
+### 有効組合せと不正組合せ
+
+有効組合せは次の5件とし、他の組合せを受理しない。
+
+| lifecycle_state | enforcement_mode |
+|---|---|
+| active | enforcement |
+| active | observation |
+| active | none |
+| superseded | none |
+| deleted | none |
+
+不正組合せとして次の4件を拒否する。
+
+- superseded + enforcement
+- superseded + observation
+- deleted + enforcement
+- deleted + observation
+
+### 全登録IR ID の排他的分割
+
+- 全登録IR ID は file-backed ID 集合と catalog-only deleted ID 集合の和集合とし、両集合を排他的にする（積集合が空）
+- superseded は file-backed または catalog-only のいずれか
+- deleted は原則 catalog-only とする
+- IR-011 型の file-backed tombstone と IR-045 型の catalog-only tombstone を区別して記録する
+
+### enforcement_mode の導出規則
+
+`enforcement_mode` は次の規則で機械的に導出する。
+
+- executable detector があり `severity: strict` なら `active + enforcement`
+- executable detector があり `severity: heuristic` または `severity: observation` なら `active + observation`
+- executable detector がなければ `active + none` とし、保持した `severity` を運用上参照しない
+- `lifecycle_state` が superseded または deleted なら `none` だけを許可する
+
+`lifecycle_state` が現在性を所有する。
+実行可能な detector が結果を生成した場合の影響度と blocking は `severity` が所有する。
+`enforcement_mode` は `severity` の判定を上書きしない。
+
+### enforcement_mode: none の IR の4面除外
+
+`enforcement_mode: none` の IR を次の4面すべてから除外する。
+
+1. checker registry
+2. gate routing
+3. finding generation
+4. baseline execution
+
+### 既存軸の維持
+
+- `severity`、`gate_level`、`baseline_status` は既存軸として維持し、削除または同義化しない
+- `enforcement_mode` はこれら既存軸を置換しない
+- `enforcement_mode` で `severity` の判定を上書きしない
+
+### 関連 SPEC（参照レベル、別途 spec-save 対象）
+
+- `integrity-rule-catalog.md`: IR スキーマへ `lifecycle_state`、`enforcement_mode` フィールド追加
+- `rule-ownership.md`: 所有権マトリックスの lifecycle 軸追加
+- `rules/IR-011-mapping-table-full-coverage.md`: IR-011 型 file-backed tombstone の lifecycle 扱い明記
 
 ## IR-050 / IR-051 適用条件（REQ-010-006/007）
 

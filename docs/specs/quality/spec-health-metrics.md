@@ -75,11 +75,11 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 |---|---|---|---|
 | foundations/document-model.md | 567 | accepted | foundations |
 | responsibilities/artifact-contracts.md | 427 | accepted | responsibilities |
+| integrity/integrity-contracts.md | 361 | accepted | integrity |
 | commands/req-define.md | 330 | accepted | commands |
 | responsibilities/document-type-responsibilities.md | 326 | accepted | responsibilities |
 | local/runtime-package-boundary.md | 316 | accepted | local |
 | workflows/epic-wave-model.md | 314 | accepted | workflows |
-| integrity/integrity-contracts.md | 288 | accepted | integrity |
 | workflows/backlog-artifact-lifecycle.md | 262 | accepted | workflows |
 | commands/case-auto.md | 261 | accepted | commands |
 | commands/case-run.md | 261 | accepted | commands |
