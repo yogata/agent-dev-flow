@@ -135,6 +135,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/intake-capture.md | 67 | accepted | commands |
 | integrity/docs-spec-rebuild-integrity.md | 67 | accepted | integrity |
 | skills/agentdev-doc-writing.md | 67 | accepted | skills |
+| integrity/rules/IR-056-project-extensions-integrity.md | 66 | accepted | integrity |
 | skills/agentdev-issue-management.md | 65 | accepted | skills |
 | foundations/numbering-policy.md | 64 | accepted | foundations |
 | integrity/rules/IR-055-runtime-unresolved-reference.md | 63 | accepted | integrity |
@@ -162,7 +163,6 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-doc-map.md | 51 | accepted | skills |
 | skills/agentdev-learning-capture.md | 51 | accepted | skills |
 | skills/agentdev-command-creator.md | 48 | accepted | skills |
-| integrity/rules/IR-056-project-extensions-integrity.md | 44 | accepted | integrity |
 | integrity/rules/IR-052-completion-grep-pattern-design.md | 40 | accepted | integrity |
 | integrity/rules/IR-036-adr-work-means-detection.md | 39 | accepted | integrity |
 | integrity/rules/IR-061-index-generation-consistency.md | 39 | accepted | integrity |

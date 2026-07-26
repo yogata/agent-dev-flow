@@ -7,7 +7,7 @@
 | 文書種別 | 基準 | 役割 |
 |---|---|---|
 | 現行 REQ | `requirements/REQ-{NNN}.md` | 現行要件の永続基準（REQ-001〜011） |
-| ADR | `adr/ADR-{NNN}.md` | アーキテクチャ決定記録（ADR-001〜005） |
+| ADR | `adr/ADR-{NNN}.md` | アーキテクチャ決定記録（ADR-001〜006） |
 | SPEC | `specs/**/*.md` | リポジトリ内部の設計文書（現在仕様）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成。実行時配布物の依存先ではない（charter 原則、ADR-001） |
 | Guides | `guides/*.md` | 人間向けの案内層。規範的権限を持たない |
 | DOC-MAP | このファイル | 文書探索入口 |
@@ -19,7 +19,7 @@
 
 <!-- AUTOGEN:BEGIN:id=docmap-inventory -->
 - 現行 REQ: 11件（`docs/requirements/REQ-*.md`）
-- ADR: 5件（`docs/adr/ADR-*.md`）
+- ADR: 6件（`docs/adr/ADR-*.md`）
 - SPEC: 148件（`docs/specs/**/*.md`）
 <!-- AUTOGEN:END -->
 
@@ -47,7 +47,8 @@
 | [ADR-002](adr/ADR-002.md) | OpenCode ソース・プロジェクション分離 | source/projection 分離モデル |
 | [ADR-003](adr/ADR-003.md) | req_draft ソフトコントラクト原則 | req_draft soft-contract、LLM推論消費、厳格スキーマなし |
 | [ADR-004](adr/ADR-004.md) | 差し替え可能な I/O 境界 | agentdev-gh-cli を差し替え可能な I/O 境界として確立 |
-| [ADR-005](adr/ADR-005.md) | Project Extensions Architecture | `.agentdev/extensions/**` によるプロジェクト固有追加・拡張機構 |
+| [ADR-005](adr/ADR-005.md) | Project Extensions Architecture | `.agentdev/extensions/**` によるプロジェクト固有追加・拡張機構（ADR-006 により superseded） |
+| [ADR-006](adr/ADR-006.md) | inspect 3-command 構成への正規化 | inspect-extensions 廃止と extension 検査の3層責務分離（deterministic check、semantic diagnosis、finding disposition） |
 
 詳細は [ADR インデックス](adr/README.md) 参照。
 

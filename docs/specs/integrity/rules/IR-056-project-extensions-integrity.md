@@ -1,5 +1,7 @@
 ---
 status: accepted
+spec_logical_division: behavior
+canonical_owner: IR-056
 ---
 
 # IR-056: project-extensions-integrity
@@ -44,3 +46,25 @@ Project Extensionsのschema、配置、ID、参照path、委譲先skill、上書
 ## IR-059との関係
 
 IR-056はProject Extensions構造を検査し、IR-059は配布物本文の具体参照を検査する。両者は独立した検出対象である。
+
+## IR-056 起動契約（self-hosting と consumer）
+
+IR-056（project-extensions integrity）は次の2経路で起動する（REQ-010、ADR-006: inspect-command-normalization）。
+
+### self-hosting full audit
+
+- docs-check が self-hosting full audit で .agentdev/extensions/{commands,skills}/*.yaml を走査する
+- 走査対象は全 extension ファイル（*.yaml）
+- 検査内容は IR-056 の検出項目（extension一覧、YAML構文、必須セクションとfield、kindと配置、IDと対象command/skill対応、context path実在、委譲先skill実在、旧.agentdev/doc-inputs/** 残存）
+
+### consumer changed-path routing
+
+- case-run と case-close の changed-path routing が .agentdev/extensions/** 変更を検出した場合、IR-056 を起動する
+- 変更ファイルが .agentdev/extensions/{commands,skills}/*.yaml に該当する場合に起動する
+- 検査結果は PR 本文の Findings セクションへ記録する
+
+### 検出事項の処分
+
+- IR-056 / docs-check の検出事項（deterministic check 群）は機械的検査結果として報告する
+- 検出事項の意味診断（extension 責務境界、上書き意図）は inspect-skills へ委譲する
+- 検出事項の promote、defer、reject は inspect-promote へ委譲する

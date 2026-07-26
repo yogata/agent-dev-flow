@@ -19,7 +19,7 @@
 | ADR-002 | OpenCode ソース・プロジェクション分離 | accepted | 2026-07-25 |
 | ADR-003 | req_draft ソフトコントラクト原則 | accepted | 2026-07-25 |
 | ADR-004 | 差し替え可能な I/O 境界 | accepted | 2026-07-25 |
-| ADR-005 | Project Extensions Architecture | accepted | 2026-07-25 |
+| ADR-006 | inspect 3-command 構成への正規化 | accepted | 2026-07-27 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -36,7 +36,7 @@
 - [ADR-002](ADR-002.md)（OpenCode ソース・プロジェクション分離）
 - [ADR-003](ADR-003.md)（req_draft ソフトコントラクト原則）
 - [ADR-004](ADR-004.md)（差し替え可能な I/O 境界）
-- [ADR-005](ADR-005.md)（Project Extensions Architecture）
+- [ADR-006](ADR-006.md)（inspect 3-command 構成への正規化）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
@@ -47,6 +47,7 @@
 ### 置き換え済み（superseded）
 
 <!-- AUTOGEN:BEGIN:id=adr-status-superseded -->
+- [ADR-005](ADR-005.md)（Project Extensions Architecture）
 <!-- AUTOGEN:END -->
 
 ### 非推奨（deprecated）
@@ -64,7 +65,8 @@
 
 - [ADR-002](ADR-002.md)（OpenCode ソース・プロジェクション分離）
 - [ADR-004](ADR-004.md)（差し替え可能な I/O 境界）
-- [ADR-005](ADR-005.md)（Project Extensions Architecture）
+- [ADR-005](ADR-005.md)（Project Extensions Architecture、superseded by ADR-006）
+- [ADR-006](ADR-006.md)（inspect 3-command 構成への正規化、extension 検査の3層責務分離）
 
 ### ワークフロー・委譲契約
 
@@ -78,6 +80,8 @@ Decision Map（現行 ADR と過去版 ADR の履歴上の関連）。
 | ADR-003 | relates-to | v2:ADR-0124 | req_draft ソフトコントラクトに関する過去版の決定 |
 | ADR-004 | relates-to | v2:ADR-0130 | 差し替え可能な I/O 境界に関する過去版の決定 |
 | ADR-005 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定 |
+| ADR-006 | supersedes | ADR-005 | inspect-extensions 廃止と extension 検査の3層責務分離を確定し、ADR-005 を置換 |
+| ADR-006 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定（inspect-extensions 廃止後の責務移管先） |
 
 ## 関連 REQ
 
@@ -87,7 +91,8 @@ Decision Map（現行 ADR と過去版 ADR の履歴上の関連）。
 | ADR-002 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | 配布成果物のソース・プロジェクション分離 |
 | ADR-003 | [REQ-004](../requirements/REQ-004.md), [REQ-008](../requirements/REQ-008.md) | req_draft soft-contract 原則（LLM推論消費、厳格schemaなし） |
 | ADR-004 | [REQ-011](../requirements/REQ-011.md), [REQ-009](../requirements/REQ-009.md) | 差し替え可能な I/O 境界（agentdev-gh-cli、Local backend） |
-| ADR-005 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Project Extensions Architecture（.agentdev/extensions/** によるプロジェクト固有追加） |
+| ADR-005 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Project Extensions Architecture（.agentdev/extensions/** によるプロジェクト固有追加）。ADR-006 により superseded |
+| ADR-006 | [REQ-010](../requirements/REQ-010.md), [REQ-002](../requirements/REQ-002.md) | inspect 3-command 構成への正規化（inspect-extensions 廃止、extension 検査の3層責務分離） |
 
 ## 過去版の履歴基盤
 
