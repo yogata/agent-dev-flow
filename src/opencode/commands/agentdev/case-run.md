@@ -36,7 +36,9 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - 成功: 実装済みブランチ + GitHub PR（実行担当サブエージェントが作成）。**case-run の成功成果は PR 作成である**。Epic Wave 実行時は子Issue ごとに PR が作成される
 - blocked / failed / delegation-unavailable: blocker 詳細は Issue コメントに SSoT として記録される（実行担当サブエージェント責務）
 
-## フェーズ構成
+## フェーズ構成（case-run internal lifecycle）
+
+本節の「フェーズ」は case-run internal lifecycle（REQ-006-022: 単一 Issue または Wave 内の準備、実装、提出）を指す。case-auto が管理する orchestration stage（command 間進行、stage 1 case-open / stage 2 case-run / stage 3 case-close）とは別の概念である（REQ-006、SPEC `responsibility-boundary-purification.md`「case 実行責務の 4 用語と所有者」参照）。case-run は case-run internal lifecycle のみを所有し、orchestration stage を複製しない。
 
 | フェーズ | Steps | 再開条件 |
 |---|---|---|

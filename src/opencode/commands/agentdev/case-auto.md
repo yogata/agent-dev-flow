@@ -106,7 +106,7 @@ Epic Issue 番号を記録。Epic Issue 本文（SSoT）から Wave 構成・各
 #### OU 処理順序
 
 - 必須依存（`depends_on`）で結合した execution_unit 群は順次処理
-- 必須依存のない execution_unit 群は並列実行。本並列は3つの「5件」文脈のうち **execution_unit 全体並列（上限なし）** に該当し、**case-run Wave 内子 Issue 並列上限（最大5件）** および **Phase 2 同時起動数（最大5件）** とは別文脈である。3つの「5件」は混同しない（文脈別の区別は epic-wave-model SPEC「並列上限と停止条件の整理」セクション参照）。ファイル衝突等の技術的依存（L0-L3）は並列判定軸から外し直列化要因としない
+- 必須依存のない execution_unit 群は並列実行。本並列は3つの「5件」文脈のうち **execution_unit 全体並列（上限なし）** に該当し、**case-run Wave 内子 Issue 並列上限（最大5件）** および **orchestration stage 2 同時起動数（最大5件）** とは別文脈である。3つの「5件」は混同しない（文脈別の区別は epic-wave-model SPEC「並列上限と停止条件の整理」セクション参照）。ファイル衝突等の技術的依存（L0-L3）は並列判定軸から外し直列化要因としない
 - `recommended_order` は処理順序のヒントであり直列化ゲートではない
 - Standard flow でも Epic flow でも適用。Standard flow で case-close完了後に未処理 OU が残れば、当該 OU の `artifact_actions` に応じた工程分岐で Step 2 に戻り次 OU の処理を開始。全 OU 処理完了でのみ全体完了報告。次 OU の draft ファイル不在時は停止し報告
 - 複数の必須依存のない execution_unit を case-open 委譲が自動的に Epic Issue 化し Wave 1 に全 OU を配置（G21）。並列実行完了後、残りに必須依存のある execution_unit があれば順次処理
@@ -168,21 +168,21 @@ case-auto が各工程を subagent へ委譲する際、委譲 prompt の catego
 - case-auto、case-open、case-run、case-update、case-close の全委譲場面で共通適用可能な形とし、特定 command 名と category 名の意味的距離が大きい場合の注意事項を含む
 - case-auto は各工程の委譲 prompt 構築時に本要件を適用する（case-run インライン実行時の実行担当サブエージェント委譲も含む）。委譲プロトコルと category 設計の関係整理は `agentdev-case-run-execution-adapter` スキル参照
 
-#### Phase 分離モデル
+#### orchestration stage モデル
 
-case-auto が複数対象を処理する場合、Phase 分離モデルを採用する。
+case-auto が複数対象を処理する場合、orchestration stage モデルを採用する。orchestration stage は case-auto が管理する command 間進行であり、case-run internal lifecycle（単一 Issue または Wave 内の準備、実行、提出）とは別の概念である（REQ-006、SPEC `responsibility-boundary-purification.md`「case 実行責務の 4 用語と所有者」参照）。
 
-- **Phase 1**: 全対象の case-open を順次実行する
-- **Phase 2**: case-run を bg task として最大5件ずつ並列実行し、結果と破棄を収集する
-- **Phase 3**: case-close を順次実行する
+- **orchestration stage 1**: 全対象の case-open を順次実行する
+- **orchestration stage 2**: case-run を bg task として最大5件ずつ並列実行し、結果と破棄を収集する
+- **orchestration stage 3**: case-close を順次実行する
 
-各 Phase は前 Phase の対象処理の完了後に開始する。Phase 1 と Phase 3 を main push と capture の直列集約ポイントとし、commit も並列実行区間の外で処理する。
+各 orchestration stage は前 stage の対象処理の完了後に開始する。orchestration stage 1 と 3 を main push と capture の直列集約ポイントとし、commit も並列実行区間の外で処理する。
 
 並列実行はデフォルト挙動とし、bg task を利用できない場合のみ順次フォールバックへ切り替え、フォールバック理由を完了報告（Step 8）に含める。実行担当サブエージェント内部の制御と bg task API の具体は harness 側に維持し、case-auto は起動 API と引数仕様を規定しない（`references/<harness>.md` 参照）。
 
 #### 子 task bg task 破棄検知時の回復（AG-001〜AG-004）
 
-Phase 2 で起動した子 task の bg task がシステムにより破棄されたことを検知した場合、case-auto 親ループが当該子 task の状態を回復する。回復契約の詳細は SPEC `case-auto SPEC`「子 task 中断回復パス」セクションを正とし、本節はその実行指示を記載する。
+orchestration stage 2 で起動した子 task の bg task がシステムにより破棄されたことを検知した場合、case-auto 親ループが当該子 task の状態を回復する。回復契約の詳細は SPEC `case-auto SPEC`「子 task 中断回復パス」セクションを正とし、本節はその実行指示を記載する。
 
 **中断検知と3状態分類（AG-001）**: 子 task の bg task 破棄を検知した場合、当該子 task の worktree で `git status` を実行し、以下の3状態のいずれかに分類する。
 
@@ -278,7 +278,7 @@ execution_unit 分割可能性があるにもかかわらず case-open が停止
 
 **OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（OU処理順序は Step 4「OU処理順序」サブセクションに準拠）。全 OU の処理が完了した場合のみ全体完了報告を出力する。OU処理中に停止条件（Step 7）を検出した場合も完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する
 
-**Phase 別結果・フォールバック理由・破棄回復記録**: 完了報告には Phase 1（case-open 順次実行）、Phase 2（case-run 並列実行）、Phase 3（case-close 順次実行）の各 Phase の実行結果を含める。Phase 2 を順次フォールバックで実行した場合はその理由を記録する。Phase 2 の bg task 破棄を検知して回復した場合は、検知した状態区分（commit 済みで PR 未作成、未コミット変更残存）と回復結果を記録する。
+**orchestration stage 別結果・フォールバック理由・破棄回復記録**: 完了報告には orchestration stage 1（case-open 順次実行）、stage 2（case-run 並列実行）、stage 3（case-close 順次実行）の各 orchestration stage の実行結果を含める。orchestration stage 2 を順次フォールバックで実行した場合はその理由を記録する。orchestration stage 2 の bg task 破棄を検知して回復した場合は、検知した状態区分（commit 済みで PR 未作成、未コミット変更残存）と回復結果を記録する。
 
 ## コンフリクト解消モデル（3レベルエスカレーション）
 
@@ -336,10 +336,10 @@ Level 1（case-close rebase）→ Level 2（case-auto インライン case-run �
 - G21: case-auto は Epic Issue 化の判定に関与しないこと。case-open の判定結果に従うこと
 - G27: 各工程の起動は工程別契約（Step 4 の契約表）に従うこと。inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領する
 - G28: case-auto は委譲工程の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持し、委譲工程内部の調査過程、中間ログ、読解メモを親コンテキストに累積しないこと。case-run インライン実行時のコンテキスト管理は harness の機能で対応し、親コンテキスト非累積は case-run インライン実行時の例外として取り扱う
-- G29: case-auto の所有対象は入力解決、auto_gate確認、artifact_actions基準工程決定、入力引き渡し、永続状態再読込、継続停止再開判定、完了進行未実行報告、壁時計時間計測、case-run インライン実行時の準備/クリーンアップフェーズのオーケストレーション手順、Phase 分離、Phase 2 の固定並列数、bg task の状態管理、破棄検知、状態別回復、Phase 1 と Phase 3 の直列集約に限定する。bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness の責務とする
+- G29: case-auto の所有対象は入力解決、auto_gate確認、artifact_actions基準工程決定、入力引き渡し、永続状態再読込、継続停止再開判定、完了進行未実行報告、壁時計時間計測、case-run インライン実行時の準備/クリーンアップフェーズのオーケストレーション手順、orchestration stage 分離、orchestration stage 2 の固定並列数、bg task の状態管理、破棄検知、状態別回復、orchestration stage 1 と 3 の直列集約に限定する。bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness の責務とする
 - G30: subagent 委譲時の category 選定は委譲先 command の責務と category 名の意味的距離を評価して決定すること。事務的手続き（Issue 作成、VERIFY、状態遷移等）には `unspecified-high` を推奨し、`writing` category は執筆作業（docs 記述、REQ/ ADR/ SPEC 本文執筆等）のみに限定すること
 - G31: 全ての subagent 委譲 prompt に MUST NOT DO セクションを必須とすること。スコープ外作業（当該 command 責務外のファイル作成、REQ/ SPEC/ src の直接修正、文書監査、capture 境界を超える `.agentdev/` 直接変更等）を明示的に列挙し、subagent がスコープ境界を推定せずに従えるようにすること
-- G32: case-auto は Phase 2 だけで case-run を並列起動する。Phase 1 と Phase 3 で case-run を並列起動せず、並列実行を利用できない場合だけ順次フォールバックへ切り替える
+- G32: case-auto は orchestration stage 2 だけで case-run を並列起動する。orchestration stage 1 と 3 で case-run を並列起動せず、並列実行を利用できない場合だけ順次フォールバックへ切り替える
 
 ### 出力制約
 - G10: 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）はverbatimで返す。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
