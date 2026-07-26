@@ -6,6 +6,12 @@
  * 純粋関数群。targeted guard（check_changed_docs.ts）と full audit
  * （check_integrity.ts）で同じ例外規則を使用する（REQ-0144-024）。
  *
+ * 本モジュールは2層の免除判定を提供する:
+ *   1. パス単位免除 `isIr057PathExempt` — SPEC exemption 表に基づくファイル単位の免除。
+ *      旧SPEC直下パス検出と legacy vocabulary 検出の両方で共通使用する。
+ *   2. コンテンツ単位免除 `isFileLevelHistoryExempt` / `isIr057LineExempt` —
+ *      ADR 文書レベル履歴注記、行レベル履歴マーカーによる免除。
+ *
  * 依存: なし（純粋関数のみ）。fs, path への依存を持たない。
  */
 
@@ -212,4 +218,70 @@ export function isIr057LineExempt(
 ): boolean {
   if (isFileLevelHistoryExempt(relPath, content)) return true;
   return hasLineLevelHistoryMarker(line);
+}
+
+// ===== パス単位免除（IR-057 SPEC exemption 表、REQ-0144-024）=====
+//
+// SPEC docs/specs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md
+// 「exemption（検出対象外）」セクションが列挙するファイルを免除する。
+// targeted guard（check_changed_docs.ts）と full audit（check_integrity.ts）で
+// 同一の免除集合を使用し、検出器間の判定乖離を防ぐ。
+
+// IR-046 / IR-048 / IR-057 ルールファイル。SPEC exemption 表が「IR-046、IR-048
+// ルールファイル」「IR-057 ルール説明としての旧パス例」として列挙する。
+// ワイルドカードではなく正確なファイル名で列挙し、near-name が免除されないことを保証する。
+const IR_057_EXEMPT_RULE_FILES: ReadonlySet<string> = new Set([
+  "docs/specs/integrity/rules/IR-046-consumer-generated-repo-type-fp-prevention.md",
+  "docs/specs/integrity/rules/IR-048-generated-by-identifier-integrity.md",
+  "docs/specs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md",
+]);
+
+// SPEC exemption 表が正規の参照文書として列挙する repo-relative exact paths。
+const IR_057_EXEMPT_EXACT_PATHS: ReadonlySet<string> = new Set([
+  "docs/specs/integrity/obsolete-path-map.yaml",
+  "docs/specs/integrity/integrity-rule-catalog.md",
+  "docs/specs/integrity/rule-ownership.md",
+  "docs/requirements/REQ-009.md",
+  "docs/specs/local/runtime-package-boundary.md",
+  "docs/guides/glossary.md",
+  ".opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts",
+]);
+
+// 検査スクリプトの skill ドキュメント・参照資料。
+// vocabulary-registry.md は SPEC exemption 表が明示する。SKILL.md および references/
+// は検出ルールの説明・語彙対照表を含む正当な参照文書。
+const IR_057_EXEMPT_DETECTOR_DOCS = /^\.opencode\/skills\/repo-agentdev-integrity\/(SKILL\.md|references\/[^/]+\.md)$/;
+
+/**
+ * IR-057 SPEC exemption 表に基づくパス単位免除判定（REQ-0144-024）。
+ *
+ * `relPath`: repo-relative path。Windows 区切り (`\`) は正規化して受け取る。
+ *
+ * 以下を免除する（SPEC exemption 表に基づく）:
+ *   - `docs/requirements/retired/`, `docs/adr/retired/` 配下（履歴参照領域）
+ *   - テスト fixture（`*.test.ts`）
+ *   - `IR_057_EXEMPT_EXACT_PATHS` に列挙された正規参照文書
+ *   - `IR_057_EXEMPT_RULE_FILES` に列挙された IR-046/048/057 ルールファイル（正確名）
+ *   - `vocabulary-registry.md`（正規語彙対照表）
+ *   - 検査スクリプト skill ドキュメント・参照資料（SKILL.md, references/*.md）
+ *
+ * これら以外は免除しない。削除済みの旧 local 生成 SPEC と旧 REQ は、
+ * SPEC exemption 表に存在しないため免除対象外。
+ */
+export function isIr057PathExempt(relPath: string): boolean {
+  const p = relPath.replace(/\\/g, "/");
+  // 履歴参照領域（retired 配下）
+  if (p.startsWith("docs/requirements/retired/")) return true;
+  if (p.startsWith("docs/adr/retired/")) return true;
+  // テスト fixture
+  if (p.endsWith(".test.ts")) return true;
+  // SPEC 列挙の exact path
+  if (IR_057_EXEMPT_EXACT_PATHS.has(p)) return true;
+  // IR-046 / IR-048 / IR-057 ルールファイル（正確名、ワイルドカードなし）
+  if (IR_057_EXEMPT_RULE_FILES.has(p)) return true;
+  // vocabulary-registry.md（正規語彙対照表）
+  if (p.endsWith("/vocabulary-registry.md")) return true;
+  // 検査スクリプト skill ドキュメント・参照資料
+  if (IR_057_EXEMPT_DETECTOR_DOCS.test(p)) return true;
+  return false;
 }

@@ -69,6 +69,7 @@ import {
 import {
   isFileLevelHistoryExempt,
   hasLineLevelHistoryMarker,
+  isIr057PathExempt,
 } from "./ir057_history_exemption.ts";
 import {
   extractCurrentAdrReadmeInventory,
@@ -7706,29 +7707,9 @@ function loadObsoletePathMap(root: string): ObsoletePathMap | null {
 }
 
 function isIr057ExemptPath(relPath: string): boolean {
-  // 履歴参照領域
-  if (/docs\/requirements\/retired\//.test(relPath)) return true;
-  if (/docs\/adr\/retired\//.test(relPath)) return true;
-  // 対照表・カタログ自身の参照は正当
-  if (/docs\/specs\/integrity\/obsolete-path-map\.yaml$/.test(relPath)) return true;
-  if (/docs\/specs\/integrity\/rules\/IR-057-obsolete-spec-path-after-domain-split\.md$/.test(relPath)) return true;
-  if (/docs\/specs\/integrity\/integrity-rule-catalog\.md$/.test(relPath)) return true;
-  if (/vocabulary-registry\.md$/.test(relPath)) return true;
-  if (/docs\/specs\/integrity\/rule-ownership\.md$/.test(relPath)) return true;
-  // 検査スクリプト自身のドキュメント参照
-  if (/repo-agentdev-integrity.*\/(SKILL|references\/)/.test(relPath)) return true;
-  // legacy vocabulary を定義・検出する正当な文書:
-  // - v2:REQ-0158 (IR-057 の要件元。vocabulary を列挙)
-  // - v2:REQ-0141 (link mode 移行に伴う廃止語彙を規定)
-  // - local-generation.md (link mode 移行と廃止経緯を記載)
-  // - IR-046/IR-048 (generated_by 識別子の検出・整合性ルール)
-  // v2: stale — file deleted in Stage 4
-  if (/docs\/requirements\/REQ-0158\.md$/.test(relPath)) return true;
-  // v2: stale — file deleted in Stage 4
-  if (/docs\/requirements\/REQ-0141\.md$/.test(relPath)) return true;
-  if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) return true;
-  if (/docs\/specs\/integrity\/rules\/IR-0(46-consumer-generated-repo-type-fp-prevention|48-generated-by-identifier-integrity)\.md$/.test(relPath)) return true;
-  return false;
+  // IR-057 SPEC exemption 表に基づくパス単位免除は共有純粋関数へ委譲（REQ-0144-024）。
+  // targeted guard（check_changed_docs.ts）と同一の免除集合を使用する。
+  return isIr057PathExempt(relPath);
 }
 
 function isIr057InCodeBlock(lines: string[], lineIdx: number): boolean {
@@ -7862,8 +7843,6 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
       const relPath = resolveRelative(fullPath, root);
       if (isIr057ExemptPath(relPath)) continue;
       if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-      // local-generation.md は廃止経緯を説明する正当な文書
-      if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) continue;
 
       const content = readText(fullPath);
       if (!content) continue;
@@ -7906,7 +7885,6 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
       const relPath = resolveRelative(fullPath, root);
       if (isIr057ExemptPath(relPath)) continue;
       if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-      if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) continue;
 
       const content = readText(fullPath);
       if (!content) continue;
@@ -7950,7 +7928,6 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
       const relPath = resolveRelative(fullPath, root);
       if (isIr057ExemptPath(relPath)) continue;
       if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-      if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) continue;
 
       const content = readText(fullPath);
       if (!content) continue;
