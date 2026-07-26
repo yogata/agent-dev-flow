@@ -89,9 +89,9 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/integrity-rule-catalog.md | 241 | accepted | integrity |
 | local/local-case-file.md | 240 | accepted | local |
 | workflows/workflow-contracts.md | 214 | accepted | workflows |
+| workflows/delegation-contracts.md | 210 | accepted | workflows |
 | skills/agentdev-gh-cli.md | 192 | accepted | skills |
 | quality/quality-gates.md | 186 | accepted | quality |
-| workflows/delegation-contracts.md | 185 | accepted | workflows |
 | commands/spec-save.md | 180 | accepted | commands |
 | foundations/design-principles.md | 158 | accepted | foundations |
 | integrity/index-auto-generation.md | 156 | accepted | integrity |
@@ -99,6 +99,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | foundations/patterns.md | 147 | accepted | foundations |
 | responsibilities/artifact-responsibilities.md | 145 | accepted | responsibilities |
 | commands/backlog-review.md | 133 | accepted | commands |
+| responsibilities/responsibility-boundary-purification.md | 128 | accepted | responsibilities |
 | quality/req-health-metrics.md | 127 | accepted | quality |
 | commands/req-save.md | 125 | accepted | commands |
 | foundations/project-extensions.md | 125 | accepted | foundations |
@@ -113,7 +114,6 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-044-req-spec-boundary-violation-detection.md | 105 | accepted | integrity |
 | workflows/capture-boundaries.md | 104 | accepted | workflows |
 | foundations/system.md | 99 | accepted | foundations |
-| responsibilities/responsibility-boundary-purification.md | 96 | accepted | responsibilities |
 | skills/agentdev-adr-guidelines.md | 96 | accepted | skills |
 | skills/agentdev-spec-file-manager.md | 88 | draft | skills |
 | integrity/references/targeted-docs-guard-implementation-details.md | 87 | - | integrity |

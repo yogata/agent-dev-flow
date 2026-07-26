@@ -2,7 +2,7 @@
 title: サブエージェント委譲契約
 status: accepted
 created: 2026-06-21
-updated: 2026-07-12
+updated: 2026-07-27
 ---
 
 # サブエージェント委譲契約（横断）
@@ -86,6 +86,30 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 | 成果物本文の verbatim | Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物はそのまま（verbatim）返す |
 | 判定結果の圧縮 | 判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す |
 | Script 優先 | 単純な決定的検査は Script 優先。非決定的処理（意味レビュー、分類、抽出等）にサブエージェント委譲を適用 |
+
+## case 実行責務の 4 用語と委譲（REQ-006、REQ-011-017、REQ-011-018）
+
+case 実行に関わる責務は 4 用語へ分解され、各委譲種別は対応する用語の所有権に従う。
+用語の正規定義と所有者は [responsibility-boundary-purification.md](../responsibilities/responsibility-boundary-purification.md)「case 実行責務の 4 用語と所有者」を SSoT とする。本節は委譲契約からの参照レベルに留まる。
+
+| 用語 | 定義 | 正規所有者 | 関連する委譲種別 |
+|---|---|---|---|
+| orchestration stage | case-auto が管理する command 間進行 | REQ-006 / case-auto | `step_execution`、case-auto からの工程委譲 |
+| case-run internal lifecycle | 単一 Issue または Wave 内の準備、実行、提出 | REQ-006 / case-run | `controlled_case_execution` |
+| harness execution mechanism | agent 起動、background task、並列実行、context 管理 | harness 責務（ADF 規範所有対象外、REQ-011-018） | なし（委譲対象外、配布物から抽象化） |
+| external execution boundary | REQ-011 が所有する外部バックエンド接続 | REQ-011（REQ-011-017） | `controlled_case_execution`、`step_execution` 経由で REQ-011 へ委譲 |
+
+### external execution boundary 委譲（REQ-011-017）
+
+`controlled_case_execution`（case-run）と `step_execution`（case-auto）は外部バックエンド接続を自身で所有せず REQ-011 へ委譲し、自身は所有しない。
+case-run は adapter skill（`agentdev-case-run-execution-adapter`）経由で external execution boundary への委譲契約を使用し、実行担当サブエージェントの起動と result 受領を外部実行境界として取り扱う。
+adapter skill が規定する result 4状態（completed-pr / blocked / failed / delegation-unavailable）、worktree 隔離、PR URL 受領、Findings / SPEC確定候補の PR 本文引き継ぎは external execution boundary 委譲契約の構成要素である。
+
+### harness execution mechanism の ADF 規範所有対象外（REQ-011-018）
+
+agent 起動、background task、並列実行、context 管理は ADF 配布物の規範所有対象外とし、harness 責務とする。
+委譲起動手段（起動方法、実行制御パラメータ）、能力検出、インラインフォールバックの有無は AGENTS.md および `references/<harness>.md` に配置し、本 SPEC では規範を持たない。
+「委譲種別」の注記に既述のとおり step_execution の起動手段も harness 責務であり、本 SPEC から除外する。
 
 ## manager-orchestrator と軽量委譲の分離
 
@@ -183,6 +207,7 @@ subagent は当該属性に応じた振る舞い指針（検証のみでも acce
 
 - [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
 - [epic-wave-model.md](epic-wave-model.md)（Epic Wave 実行モデル）
+- [../responsibilities/responsibility-boundary-purification.md](../responsibilities/responsibility-boundary-purification.md)（case 実行責務の 4 用語と所有者 SSoT、external execution boundary / harness execution mechanism の所有権）
 - v2:ADR-0112（サブエージェント委譲の一般概念）
 - v2:ADR-0127（case-auto の工程委譲）
 - v2:ADR-0128（case-run 外部実行委譲）
