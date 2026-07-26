@@ -484,7 +484,9 @@ function extractAdrInfo(
   const idMatch = filename.match(/^ADR-(\d+)\.md$/);
   if (!idMatch) return null;
   const num = Number(idMatch[1]);
-  const id = `ADR-${String(num).padStart(4, "0")}`;
+  // 桁数をそのまま維持する。現行契約は3桁（ADR-001..ADR-999）、履歴 v2 は4桁（ADR-0001..）。
+  // padStart(4) で揃えると ADR-001 が ADR-0001 へ書き換わり契約衝突する。
+  const id = `ADR-${idMatch[1]}`;
 
   const fm = parseFrontmatter(content);
   let title = "";
@@ -549,7 +551,7 @@ function extractReqInfo(
   const idMatch = filename.match(/^REQ-(\d+)\.md$/);
   if (!idMatch) return null;
   const num = Number(idMatch[1]);
-  const id = `REQ-${String(num).padStart(4, "0")}`;
+  const id = `REQ-${idMatch[1]}`;
 
   const fm = parseFrontmatter(content);
   let title = "";
@@ -614,13 +616,15 @@ function sanitizeTableCell(text: string): string {
 
 /**
  * 現行基盤ビューの件数表明キャプション（1行）。
- * 形式: "承認済みステータス（accepted）の ADR-01XX N件が、現在のアーキテクチャ判断の基盤である。"
+ * 形式: "現行の承認済み ADR はN件である。"
+ * バージョン中立（v2 の ADR-01XX 番号帯を前提としない）。現行 ADR 数は
+ * 引数 acceptedAdrs の length から導出する。
  */
 export function generateAdrBaselineCaption(
   acceptedAdrs: AdrInfo[],
 ): string[] {
   return [
-    `承認済みステータス（accepted）の ADR-01XX ${acceptedAdrs.length}件が、現在のアーキテクチャ判断の基盤である。`,
+    `現行の承認済み ADR は${acceptedAdrs.length}件である。`,
   ];
 }
 
