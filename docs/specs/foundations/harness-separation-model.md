@@ -2,7 +2,7 @@
 title: harness 分離モデル
 status: accepted
 created: 2026-07-12
-updated: 2026-07-25
+updated: 2026-07-26
 ---
 
 # harness 分離モデル
@@ -13,7 +13,7 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 配布物は業務ワークフロー契約のみで完結し、harness 依存の具体を限定された場所へ集約する。
 本 SPEC は配布物が固定してはならない harness 委譲領域と、配布物が定義してよい範囲を現行契約として確定する。
 
-原本原則は ADR-001 v3 charter 決定2（ADF が所有しない領域）に由来する。
+原本原則は ADR-001（AgentDevFlow 憲章）決定2（ADF が所有しない領域）に由来する。
 本 SPEC は決定2を SPEC として具体化し、配布成果物の責務境界（REQ-002）と協調して配布物の harness 非依存を担保する。
 
 ## 配布物の harness 非依存性
@@ -117,7 +117,7 @@ runtime workspace 管理は harness 側の責務とする。
 
 ## 関連
 
-- ADR-001（v3 charter）: 決定2（ADF が所有しない領域）が本 SPEC の原本原則。
+- ADR-001（AgentDevFlow 憲章）: 決定2（ADF が所有しない領域）が本 SPEC の原本原則。
 - ADR-002（OpenCode ソース・プロジェクション分離）: 本 SPEC の harness 非依存原則を原本とプロジェクションの分離によって物理層で担保する。
 - REQ-002（配布成果物の責務境界）: 配布成果物側の正規所有者。本 SPEC は交叉参照として所有内容を重複しない。
 - v2:ADR-0136（配布物の harness 実行制御分離）: 吸収元。決定本質は charter 決定2 に先駆的適用として含まれる。
@@ -125,4 +125,3 @@ runtime workspace 管理は harness 側の責務とする。
 - v2:ADR-0114（case-run 実行責務の外部実行バックエンド委譲）: 吸収元。harness 選定領域に降格された実行制御側の知見を取り込み、result 4状態契約の前身である委譲モデルを本 SPEC の前段として位置づける。
 - `docs/specs/workflows/delegation-contracts.md`: 委譲契約詳細（result state machine、launch mechanism、delegation envelope）の正規所有者。
 - `docs/specs/responsibilities/responsibility-boundary-purification.md`: 工程別（case-auto、case-run、execution adapter、Project Extensions、タイムスタンプ）の所有/非所有リスト詳細。
-

@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-24
+updated: 2026-07-26
 ---
 
 # 文書モデル
@@ -267,7 +267,7 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 | 規則 | 内容 |
 |---|---|
 | REQ ID | 4桁ゼロ埋めの安定ID。現行・廃止を問わず再利用しない |
-| ADR ID | 4桁ゼロ埋め。状態はfrontmatterで管理する |
+| ADR ID | 3桁ゼロ埋め。状態はfrontmatterで管理する |
 | SPEC配置 | `docs/specs/**/*.md` |
 | SPEC status | `draft`、`accepted`、`superseded`。status欠落は`accepted`相当。`superseded`は`superseded_by`を必須とする |
 | Guides配置 | `docs/guides/*.md` |
@@ -319,10 +319,10 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 
 文書間の参照形式と引用ルールを定義する。
 
-- **REQ 参照**: `REQ-{NNNN}` 形式（例: `REQ-001`）。個別要件は `REQ-{NNNN}-{SSS}` 形式（例: `REQ-001-002`）
-- **ADR 参照**: `ADR-{NNNN}` 形式（例: `REQ-001`）
+- **REQ 参照**: `REQ-{NNN}` 形式（例: `REQ-001`）。個別要件は `REQ-{NNN}-{SSS}` 形式（例: `REQ-001-002`）
+- **ADR 参照**: `ADR-{NNN}` 形式（例: `ADR-001`）
 - **リンク形式**: Markdown リンクで `[REQ-001](../requirements/REQ-001.md)` のように相対パスで記述
-- **引用ルール**: 安定 ID（`REQ-{NNNN}`、`ADR-{NNNN}`）で参照し、セクションタイトルのみでの参照は禁止。セクション参照が必要な場合は `REQ-001-002` や `REQ-001 決定セクション` のように ID を併記する
+- **引用ルール**: 安定 ID（`REQ-{NNN}`、`ADR-{NNN}`）で参照し、セクションタイトルのみでの参照は禁止。セクション参照が必要な場合は `REQ-001-002` や `REQ-001 決定セクション` のように ID を併記する
 - **廃止文書の参照**: 廃止文書を参照する場合は `(retired)` 注記を付与し、現行の後継文書も併記する（REQ-001-048）
 
 ### ライフサイクル規則 <!-- REQ-001 -->
@@ -522,7 +522,7 @@ agent-dev-flow リポジトリの docs/specs/ 直下の基盤SPECは、既存の
 | responsibilities/ | 文書種別責務、成果物責任、アーティファクト契約、REQ影響マップ | document-type-responsibilities.md, artifact-responsibilities.md, artifact-contracts.md, req-impact-map.md |
 | quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/SPEC 双方向） | quality-specs.md, quality-gates.md, req-health-metrics.md, spec-health-metrics.md |
 | integrity/ | 整合性契約、整合性ルールカタログ、ルール所有権、配布物整合性、backticks 判定閾値 | integrity-contracts.md, integrity-rule-catalog.md, rule-ownership.md, docs-spec-rebuild-integrity.md, backticks-identifier-threshold.md |
-| local/ | ローカル版 SPEC 群（実行時パッケージ境界、Case ファイル、生成） | runtime-package-boundary.md, local-case-file.md, local-generation.md（local-transform.md は local-generation.md へ一本化、削除済み: REQ-009-028/029） |
+| local/ | ローカル版 SPEC 群（実行時パッケージ境界、link mode、Case ファイル） | runtime-package-boundary.md, local-case-file.md |
 | authoring/ | コマンドファイル執筆規約 | command-file-format.md |
 
 ### 分類確定ファイル（親エージェント確認済み）
