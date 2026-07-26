@@ -12,15 +12,15 @@
 | Guides | `guides/*.md` | 人間向けの案内層。規範的権限を持たない |
 | DOC-MAP | このファイル | 文書探索入口 |
 
-> v3.0.0 移行に伴い、REQ/ADR 番号は `REQ-001〜`、`ADR-001〜` の新枠を採用する（U9）。
-> v2.11.0 時点の `REQ-01XX`、`ADR-01XX` 番号帯は tag 参照とし、`v2:` プレフィックスで区別する。
+> 現行の REQ/ADR は `REQ-001〜`、`ADR-001〜` の3桁IDを使用する。
+> 過去版の `REQ-01XX`、`ADR-01XX` 番号帯は tag `v2.11.0` を参照し、`v2:` プレフィックスで区別する。
 
 ## インデックス統計（自動生成）
 
 <!-- AUTOGEN:BEGIN:id=docmap-inventory -->
 - 現行 REQ: 11件（`docs/requirements/REQ-*.md`）
 - ADR: 5件（`docs/adr/ADR-*.md`）
-- SPEC: docs/specs/ 配下（3層 + 基盤6ドメイン）。詳細は [specs/README.md](specs/README.md)
+- SPEC: 147件（`docs/specs/**/*.md`）
 <!-- AUTOGEN:END -->
 
 ## 現行 REQ
@@ -43,7 +43,7 @@
 
 | ADR | タイトル | 概要 |
 |---|---|---|
-| [ADR-001](adr/ADR-001-v3-charter.md) | v3 charter | v3 憲章、hard governance の限定、新規統制追加原則、cutover 条件 |
+| [ADR-001](adr/ADR-001.md) | AgentDevFlow 憲章 | 目的、責務境界、hard governance の限定、新規統制追加原則 |
 | [ADR-002](adr/ADR-002.md) | OpenCode ソース・プロジェクション分離 | source/projection 分離モデル |
 | [ADR-003](adr/ADR-003.md) | req_draft ソフトコントラクト原則 | req_draft soft-contract、LLM推論消費、厳格スキーマなし |
 | [ADR-004](adr/ADR-004.md) | 差し替え可能な I/O 境界 | agentdev-gh-cli を差し替え可能な I/O 境界として確立 |
@@ -130,9 +130,8 @@ SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン�
 | [targeted-docs-guard-implementation.md](specs/integrity/targeted-docs-guard-implementation.md) | Targeted Docs Guard 実装詳細（移行作業は `references/targeted-docs-guard-implementation-details.md`） |
 | [docs-spec-rebuild-integrity.md](specs/integrity/docs-spec-rebuild-integrity.md) | 配布物 ID 除去後の整合性検査ルール |
 | [backticks-identifier-threshold.md](specs/integrity/backticks-identifier-threshold.md) | backticks 識別子/一般名詞 判定閾値 |
-| [runtime-package-boundary.md](specs/local/runtime-package-boundary.md) | 実行時配布物の境界と依存制約 |
+| [runtime-package-boundary.md](specs/local/runtime-package-boundary.md) | 実行時配布物の境界、link mode 導入フロー、link target 確認、更新運用 |
 | [local-case-file.md](specs/local/local-case-file.md) | ローカル版 OpenCode の Case ファイルスキーマ・状態遷移・採番・見出し |
-| [local-generation.md](specs/local/local-generation.md) | ローカル版 OpenCode link mode 導入フロー・link target 確認・unlink / relink による更新運用・残存 GitHub 固有参照の違反判定基準 |
 | [command-file-format.md](specs/authoring/command-file-format.md) | command 定義ファイルの Markdown 構成標準 |
 
 ## SPEC 探索経路ガイド
@@ -150,7 +149,7 @@ SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン�
 | Guide | 内容 |
 |---|---|
 | [ガイド入口](guides/README.md) | ガイド一覧・案内 |
-| [v3 憲章](guides/v3-charter.md) | v3.0.0 の目的、基本原則、管理方式、cutover 条件の要約 |
+| [憲章](guides/charter.md) | 目的、責務境界、hard governance の限定、新規統制追加原則 |
 | [クイックスタート](guides/quickstart.md) | 5コマンドで機能追加を完了する最小フロー |
 | [コマンド選択](guides/command-selection.md) | 現在の状態から次のコマンドを選ぶ入口表 |
 | [要件定義 → Case実行フロー](guides/req-case-flow.md) | req-define から case-close までの流れ |

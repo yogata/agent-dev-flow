@@ -44,7 +44,6 @@ docs-check から削除された検査（IR-045 文意整合、語彙コンプ�
 | `obsolete-reference-dir` | `reference/` の残存 | REQ-0108-039 |
 | `reference-path-existence` | 参照パスが存在しない | REQ-0108-115 |
 | `retired-frontmatter` | retired REQ frontmatter 不備 | REQ-0108-080~082 |
-| `mapping-table-*` | mapping-table 整合性 | REQ-0108-083~088 |
 | `variant-path-existence` | variant パスが存在しない | REQ-0108-089 |
 | `variant-registry-registered` | command が registry に未登録 | REQ-0108-090 |
 | `adr-status-normalization` | 旧 ADR status 形式 | REQ-0108-121 |
@@ -110,7 +109,7 @@ False positive（偽陽性）は、integrity-check が NG/Warning として報�
 | パターン | 対象 | 原因 | 扱い |
 |----------|------|------|------|
 | `workflow-status-prohibition` の禁止文検出 | `patterns.md:53` | 「status フィールドは持たない」という禁止文自体が status + フィールド名を含む | 検出パターンの negative context 追加で対応（INC-0021） |
-| `retired-req-as-current` の ADR 履歴参照 | ADR-0003, ADR-0009 等 | accepted ADR が廃止経緯として retired REQ を引用 | mapping-table 同様の除外コンテキスト追加を検討（INC-0016） |
+| `retired-req-as-current` の ADR 履歴参照 | 歴史的 ADR 履歴記述 | ADR が廃止経緯として retired REQ を引用 | retired REQ の履歴参照として扱う。mapping-table 契約は廃止済みであり、現行の除外候補ではない |
 | `legacy-namespace` の self-describing list | vocabulary-registry.md | 検出語彙リスト自体が旧語彙を列挙 | vocabulary-registry.md を exempt に設定（REQ-0108-174） |
 | `bare-slash-scoped` の template path | completion-reports path | variant path 内のコマンド名に `/cmd-name` が含まれる | path exemption で除外済み |
 | `workflow-status-prohibition` の自己参照 | REQ-0108-123 | 検出ルール自体が 6 マイクロフェーズ名を含む | 自己参照免除条項で対応済み（INC-0020） |

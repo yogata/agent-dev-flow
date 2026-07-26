@@ -13,11 +13,11 @@ status: accepted
 | detection_method | `.opencode/commands/agentdev/**/*.md` と `.opencode/skills/agentdev-*/**/*.md` から frontmatter またはメタ識別子中の `generated_by` を抽出し、`local-opencode-transform` と一致することを確認。同名ファイル上書き時の識別子整合性はローカル版生成プロセスが `## 変換仕様` ガードレールで検証 |
 | affected_artifacts | [.opencode/commands/agentdev/, .opencode/skills/agentdev-*/] |
 | related_req | [REQ-009-011, REQ-009-012, REQ-009-013] |
-| related_spec | [local-generation.md] |
+| related_spec | [runtime-package-boundary.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。生成物への識別子付与方式（frontmatter vs ヘッダコメント）の揺れ、AgentDevFlow 本体原本（識別子なし）との混同に注意 |
 | regression_test | (未実装) |
 | baseline_status | new |
 | finding_route | intake |
-| triage_action | 識別子付与方式を `local-generation.md` の定義に統一。競合ファイルは手動マージまたは識別子付与後に再生成 |
+| triage_action | 識別子付与方式を `runtime-package-boundary.md` の定義に統一。競合ファイルは手動マージまたは識別子付与後に再生成 |
 | last_verified | 2026-06-20 |

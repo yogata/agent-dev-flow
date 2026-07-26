@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-21
+updated: 2026-07-26
 ---
 
 # ルール所有権マトリックス
@@ -38,7 +38,7 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 13 | Integrity 検査カテゴリ | REQ-010 (001-021) | integrity-contracts.md | 18 集合、strict/heuristic/observation |
 | 14 | Finding 分類 | REQ-010 (017, 018) | integrity-contracts.md | 6 カテゴリ + 経路 |
 | 15 | Frontmatter dev metadata 禁止 | REQ-010 (022-024, 095-098) | integrity-contracts.md | dev メタデータ禁止 |
-| 16 | Retired REQ 管理 | REQ-010 (070-088) | integrity-contracts.md | mapping-table、注記、参照区別 |
+| 16 | Retired REQ 管理 | REQ-010 (070-088) | integrity-contracts.md | 注記、参照区別 |
 | 17 | Link 整合性 | REQ-010 (013) | integrity-contracts.md | Markdown リンク先存在確認 |
 | 18 | Namespace legacy 残存 | REQ-010 (016) | integrity-contracts.md | 旧コマンド名、旧パス検出 |
 | 19 | REQ/ADR 相互参照 | REQ-010 (005) | integrity-contracts.md | 双方向参照確認 |
@@ -51,15 +51,14 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 26 | lightweight-delegation 位置付け | REQ-003 (015, 016) | workflow-contracts.md | 主要パターン（`primary pattern`）ではなく重ねる委譲として扱う |
 | 27 | 語彙ポリシー横断検出 | REQ-004 (024-028), REQ-010 (236, 237) | integrity-contracts.md | 現行対象範囲の語彙ポリシー違反検出 |
 | 28 | Cross-REQ 語彙矛盾 | REQ-010 (239) | integrity-contracts.md | 現行 REQ 間の語彙矛盾検出 |
-| 29 | mapping-table 履歴名明示 | REQ-010 (240) | integrity-contracts.md | 旧語彙に履歴名を明示 |
-| 30 | REQ 検証基準（必達要件） | REQ-010 | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証（v2:REQ-0115-044 から REQ-010 に移管） |
-| 31 | Quality Gates | REQ-010 | quality-gates.md | QG-1〜QG-4 定義、機械化境界、実装マッピング（v2:REQ-0115 から REQ-010 に移管） |
-| 32 | docs 日本語表現、文意整合 | v2:REQ-0140, REQ-010 (255-257) | integrity-rule-catalog.md (IR-045) | 英字混じり抽象用語、読取専用セマンティクスの検出。文書表記、文意品質ゲート（付帯品質ゲート）の機械検査担当 |
-| 33 | local-case-file（ローカル Case ファイルスキーマ） | REQ-009 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode の Case ファイル YAML 前書き、status enum、labels 値域、見出し一覧、マージ結果記録 |
-| 34 | local-generation（ローカル版生成フロー、安全ゲート） | REQ-009 (001-015) | local-generation.md | ローカル版生成フロー Step、`generated_by: local-opencode-transform` 識別子、ジャンクション検出安全ゲート、上書き許可条件 |
-| 35 | local-transform（ローカル版変換資産） | REQ-009 (028, 029, 032) | local-generation.md（local-transform.md から一元化） | **確定廃止**（PR#1195 で transform/ 完全削除、REQ-009-004/009/028 確定廃止昇格、local-transform.md ファイル削除済み）。変換用プロンプト、レビュー用プロンプト、変換仕様の要件は全て廃止済み。残存 GitHub 固有参照の違反判定基準と link mode 移行に伴う廃止経緯は `local-generation.md` へ一元化済み（REQ-009-028/029） |
-| 36 | obsolete-spec-path（旧SPEC直下パス参照検出） | REQ-010 (280, 282) | integrity-rule-catalog.md (IR-057) | docs/specs/ 基盤SPEC ドメイン別体系化（REQ-001）以前の直下パス参照を検出。`obsolete-path-map.yaml` を対照表として IR-057 が検証。link mode 統一（REQ-009）に伴う廃止語彙を「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離し検出。例外条件: obsolete-path-map.yaml 自体、IR-057 ルール説明、retired 配下、テスト fixture、コードブロック内検査 fixture。v2:REQ-0158 は Issue #1713 で retire 完了（要件は REQ-010-280/282 へ統合） |
-| 37 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003), REQ-010 (263) | integrity-rule-catalog.md (IR-056) | project extensions 機構（ADR-005）の整合性検査。extension schema（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
+| 29 | REQ 検証基準（必達要件） | REQ-010 | integrity-contracts.md | 規範語ではなく必達要件判定に基づく検証（v2:REQ-0115-044 から REQ-010 に移管） |
+| 30 | Quality Gates | REQ-010 | quality-gates.md | QG-1〜QG-4 定義、機械化境界、実装マッピング（v2:REQ-0115 から REQ-010 に移管） |
+| 31 | docs 日本語表現、文意整合 | v2:REQ-0140, REQ-010 (255-257) | integrity-rule-catalog.md (IR-045) | 英字混じり抽象用語、読取専用セマンティクスの検出。文書表記、文意品質ゲート（付帯品質ゲート）の機械検査担当 |
+| 32 | local-case-file（ローカル Case ファイルスキーマ） | REQ-009 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode の Case ファイル YAML 前書き、status enum、labels 値域、見出し一覧、マージ結果記録 |
+| 33 | ローカル版 link mode 導入フロー、安全ゲート | REQ-009 (001-015) | runtime-package-boundary.md | link mode 接続手順、link target 確認、ジャンクション検出安全ゲート |
+| 34 | local-transform（ローカル版変換資産） | REQ-009 (028, 029, 032) | runtime-package-boundary.md | **確定廃止**（PR#1195 で transform/ 完全削除、REQ-009-004/009/028 確定廃止昇格）。変換用プロンプト、レビュー用プロンプト、変換仕様の要件は全て廃止済み。link mode の現行契約は `runtime-package-boundary.md` が所有する |
+| 35 | obsolete-spec-path（旧SPEC直下パス参照検出） | REQ-010 (280, 282) | integrity-rule-catalog.md (IR-057) | docs/specs/ 基盤SPEC ドメイン別体系化（REQ-001）以前の直下パス参照を検出。`obsolete-path-map.yaml` を対照表として IR-057 が検証。link mode 統一（REQ-009）に伴う廃止語彙を「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離し検出。例外条件: obsolete-path-map.yaml 自体、IR-057 ルール説明、retired 配下、テスト fixture、コードブロック内検査 fixture。v2:REQ-0158 は Issue #1713 で retire 完了（要件は REQ-010-280/282 へ統合） |
+| 36 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003), REQ-010 (263) | integrity-rule-catalog.md (IR-056) | project extensions 機構（ADR-005）の整合性検査。extension schema（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
 
 ## IR 別関連マッピング（自動生成）
 
@@ -81,7 +80,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-008 | Skill references/ 存在 | REQ-010-110, 115-120, REQ-010-020 | integrity-contracts.md |
 | IR-009 | 旧 namespace 残存 | REQ-010-016 | integrity-contracts.md |
 | IR-010 | ADR status 正規化 | REQ-010-121 | integrity-contracts.md |
-| IR-011 | Mapping table 全件記録 | REQ-010-083-088 | integrity-contracts.md |
+| IR-011 | Mapping table 全件記録（廃止済み） | v2:REQ-0108-083〜088 | integrity-contracts.md |
 | IR-012 | Template 必須セクション | REQ-010 (workflow template 構造) | integrity-contracts.md |
 | IR-013 | 完了報告種別実在 | REQ-010-089-091, REQ-010-020 | integrity-contracts.md |
 | IR-014 | reference/ 残存検出 | REQ-002-013, 039, REQ-010-039, 040, 094 | artifact-responsibilities.md |
@@ -115,9 +114,9 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-042 | hardcoded-req-count | REQ-010-140, REQ-001 | integrity-contracts.md |
 | IR-043 | retired-readme-coverage | REQ-010-083, REQ-001 | integrity-contracts.md |
 | IR-044 | REQ/SPEC 境界違反検出 | REQ-010-259, REQ-010-260, REQ-010-262, REQ-001-067, REQ-001-068, REQ-001-069, REQ-010-002, REQ-010-012, REQ-001-031 | integrity-contracts.md, document-model.md |
-| IR-046 | consumer-generated リポジトリ種別誤検知防止 | REQ-009-007, REQ-009-011, REQ-009-014 | runtime-package-boundary.md, local-generation.md |
-| IR-047 | src/opencode-local/ link 先原本領域ディレクトリ構成 | REQ-009-003, REQ-009-004, REQ-009-005, REQ-009 | local-generation.md |
-| IR-048 | generated_by 識別子整合性 | REQ-009-011, REQ-009-012, REQ-009-013 | local-generation.md |
+| IR-046 | consumer-generated リポジトリ種別誤検知防止 | REQ-009-007, REQ-009-011, REQ-009-014 | runtime-package-boundary.md |
+| IR-047 | src/opencode-local/ link 先原本領域ディレクトリ構成 | REQ-009-003, REQ-009-004, REQ-009-005, REQ-009 | runtime-package-boundary.md |
+| IR-048 | generated_by 識別子整合性 | REQ-009-011, REQ-009-012, REQ-009-013 | runtime-package-boundary.md |
 | IR-049 | Command file format violation | v2:REQ-0143, REQ-010 | command-file-format.md, integrity-contracts.md |
 | IR-050 | load_skills command 誤指定検出 | REQ-010-261, v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
 | IR-051 | 実行主体の skill 表記誤認検出 | REQ-010-261, v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
@@ -126,7 +125,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-054 | draft SPEC 放置検出 | REQ-001-002, REQ-010-150, REQ-010-151 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-002-079, REQ-002-080, REQ-002-081, REQ-010-056, REQ-010-263, REQ-010-264 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-056 | project-extensions-integrity | REQ-002 | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
-| IR-057 | obsolete-spec-path-after-domain-split | REQ-010-280, REQ-010-282, REQ-001-006, REQ-009-004, REQ-010-265, REQ-010-024 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/local-generation.md |
+| IR-057 | obsolete-spec-path-after-domain-split | REQ-010-280, REQ-010-282, REQ-001-006, REQ-009-004, REQ-010-265, REQ-010-024 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md |
 | IR-058 | distribution-untracked-skill-reference | REQ-002-001, REQ-002-002, REQ-002-003 | ../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md |
 | IR-059 | distribution-reference-boundary | REQ-002 | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | IR-060 | forbidden Japanese word detection | v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（REQ-010-256 文意判断は docs-check 対象外、本ルールは完全一致検出に限定） | ../responsibilities/document-type-responsibilities.md（不自然表現検出分類 P0〜P4）, ../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md（forbidden 語リスト正）, integrity-rule-catalog.md |

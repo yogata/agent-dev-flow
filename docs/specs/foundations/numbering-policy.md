@@ -2,7 +2,7 @@
 title: 採番管理 SPEC
 status: accepted
 created: 2026-07-19
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # 採番管理 SPEC
@@ -12,17 +12,17 @@ REQ、ADR、IR の識別子採番規則を統一し、欠番の扱いを採番�
 ## 適用範囲
 
 - **対象**: `docs/requirements/REQ-*.md`、`docs/adr/ADR-*.md`、`docs/specs/integrity/rules/IR-*.md` の識別子採番
-- **対象外**: 各 REQ の要件行 ID（`REQ-{NNNN}-{MMM}` 形式）の採番詳細（`agentdev-req-file-manager` SKILL 参照）、`agentdev-req-file-manager/scripts/` の実装詳細
+- **対象外**: 各 REQ の要件行 ID（`REQ-{NNN}-{MMM}` 形式）の採番詳細（`agentdev-req-file-manager` SKILL 参照）、`agentdev-req-file-manager/scripts/` の実装詳細
 
 ## 識別子形式
 
 | 種別 | 形式 | 桁数 | 接頭辞 |
 |------|------|------|--------|
-| REQ | `REQ-{NNNN}` | 4桁ゼロ埋め | `REQ-` |
-| ADR | `ADR-{NNNN}` | 4桁ゼロ埋め | `ADR-` |
+| REQ | `REQ-{NNN}` | 3桁ゼロ埋め | `REQ-` |
+| ADR | `ADR-{NNN}` | 3桁ゼロ埋め | `ADR-` |
 | IR | `IR-{NNN}` | 3桁ゼロ埋め | `IR-` |
 
-要件行 ID（`REQ-{NNNN}-{MMM}`）は REQ 識別子を前置し、REQ 内の要件行連番を付ける。詳細は `agentdev-req-file-manager` SKILL が定める。
+要件行 ID（`REQ-{NNN}-{MMM}`）は REQ 識別子を前置し、REQ 内の要件行連番を付ける。詳細は `agentdev-req-file-manager` SKILL が定める。
 
 ## 採番規則
 

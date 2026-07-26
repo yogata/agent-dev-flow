@@ -11,7 +11,7 @@
 
 | ガイド | 内容 |
 |--------|------|
-| [v3 憲章](v3-charter.md) | v3.0.0 の目的、基本原則、管理方式、cutover 条件の要約 |
+| [憲章](charter.md) | 目的、責務境界、hard governance の限定、新規統制追加原則 |
 | [クイックスタート](quickstart.md) | 5コマンドで機能追加を完了する最小フロー |
 | [コマンド選択](command-selection.md) | 現在の状態から次のコマンドを選ぶ入口表 |
 | [要件定義 → Case実行フロー](req-case-flow.md) | req-define から case-close までの流れ |

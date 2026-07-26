@@ -6,6 +6,8 @@ const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_integrity.ts");
 const CLI_UTILS_FILE = join(SCRIPT_DIR, "cli_utils.ts");
 const GEN_INDEXES_FILE = join(SCRIPT_DIR, "generate_indexes.ts");
+const HISTORY_EXEMPTION_FILE = join(SCRIPT_DIR, "ir057_history_exemption.ts");
+const CURRENT_REFS_FILE = join(SCRIPT_DIR, "current_refs.ts");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `integrity-test-${crypto.randomUUID().slice(0, 8)}`;
 const TEMP_ROOT = join(TEMP_BASE, RUN_ID);
@@ -46,10 +48,6 @@ function writeFile(p: string, content: string): void {
   writeFileSync(p, content, "utf-8");
 }
 
-// REQ-0108-268: fixture には check_integrity.ts と cli_utils.ts のみコピーする。
-// baseline ファイル（baselines/ir-055-baseline.json）はコピーしないことで、
-// valid fixture は本番の baseline 既知違反から独立し、既知違反の変更が
-// valid fixture 系の成否に影響しない。
 function copyScripts(fixtureRoot: string): void {
   const dest = join(
     fixtureRoot,
@@ -62,6 +60,8 @@ function copyScripts(fixtureRoot: string): void {
   copyFileSync(SCRIPT_FILE, join(dest, "check_integrity.ts"));
   copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
   copyFileSync(GEN_INDEXES_FILE, join(dest, "generate_indexes.ts"));
+  copyFileSync(HISTORY_EXEMPTION_FILE, join(dest, "ir057_history_exemption.ts"));
+  copyFileSync(CURRENT_REFS_FILE, join(dest, "current_refs.ts"));
 }
 
 function buildValidFixture(root: string): void {
@@ -2279,11 +2279,11 @@ function copyScriptsComplete(fixtureRoot: string): void {
   mkdirp(dest);
   copyFileSync(SCRIPT_FILE, join(dest, "check_integrity.ts"));
   copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
-  // generate_indexes.ts is imported by check_integrity.ts; copy it so the
-  // fixture is self-contained (the pre-existing copyScripts omits it).
   if (existsSync(GENERATE_INDEXES_FILE)) {
     copyFileSync(GENERATE_INDEXES_FILE, join(dest, "generate_indexes.ts"));
   }
+  copyFileSync(HISTORY_EXEMPTION_FILE, join(dest, "ir057_history_exemption.ts"));
+  copyFileSync(CURRENT_REFS_FILE, join(dest, "current_refs.ts"));
 }
 
 function buildNgBaselineFixture(root: string): void {

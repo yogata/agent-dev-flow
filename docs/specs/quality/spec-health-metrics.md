@@ -73,53 +73,53 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 <!-- AUTOGEN:BEGIN:id=spec-metrics-measurement-example -->
 | SPEC | SPEC 行数 | status | ドメイン分類 |
 |---|---|---|---|
-| foundations/document-model.md | 473 | accepted | foundations |
-| responsibilities/artifact-contracts.md | 385 | accepted | responsibilities |
-| workflows/epic-wave-model.md | 340 | accepted | workflows |
-| responsibilities/document-type-responsibilities.md | 324 | accepted | responsibilities |
-| local/runtime-package-boundary.md | 291 | accepted | local |
-| integrity/integrity-contracts.md | 284 | accepted | integrity |
+| foundations/document-model.md | 547 | accepted | foundations |
+| responsibilities/artifact-contracts.md | 427 | accepted | responsibilities |
+| commands/req-define.md | 330 | accepted | commands |
+| responsibilities/document-type-responsibilities.md | 326 | accepted | responsibilities |
+| local/runtime-package-boundary.md | 316 | accepted | local |
+| workflows/epic-wave-model.md | 314 | accepted | workflows |
+| integrity/integrity-contracts.md | 288 | accepted | integrity |
 | workflows/backlog-artifact-lifecycle.md | 262 | accepted | workflows |
-| commands/case-run.md | 255 | accepted | commands |
-| commands/req-define.md | 241 | accepted | commands |
+| commands/case-auto.md | 261 | accepted | commands |
+| commands/case-run.md | 261 | accepted | commands |
+| commands/case-open.md | 254 | accepted | commands |
+| commands/case-close.md | 244 | accepted | commands |
+| README.md | 241 | - | uncategorized |
 | integrity/integrity-rule-catalog.md | 241 | accepted | integrity |
-| local/local-case-file.md | 241 | accepted | local |
-| README.md | 231 | - | uncategorized |
-| commands/case-close.md | 228 | accepted | commands |
-| local/local-generation.md | 217 | accepted | local |
-| commands/case-auto.md | 210 | accepted | commands |
-| integrity/targeted-docs-guard-implementation.md | 208 | accepted | integrity |
-| commands/case-open.md | 207 | accepted | commands |
+| local/local-case-file.md | 240 | accepted | local |
+| workflows/workflow-contracts.md | 214 | accepted | workflows |
 | skills/agentdev-gh-cli.md | 192 | accepted | skills |
+| quality/quality-gates.md | 186 | accepted | quality |
 | workflows/delegation-contracts.md | 185 | accepted | workflows |
-| quality/quality-gates.md | 181 | accepted | quality |
-| commands/spec-save.md | 170 | accepted | commands |
-| workflows/workflow-contracts.md | 167 | accepted | workflows |
+| commands/spec-save.md | 180 | accepted | commands |
 | foundations/design-principles.md | 158 | accepted | foundations |
-| integrity/index-auto-generation.md | 152 | accepted | integrity |
+| integrity/index-auto-generation.md | 156 | accepted | integrity |
+| integrity/targeted-docs-guard-implementation.md | 151 | accepted | integrity |
 | foundations/patterns.md | 147 | accepted | foundations |
-| responsibilities/artifact-responsibilities.md | 137 | accepted | responsibilities |
+| responsibilities/artifact-responsibilities.md | 145 | accepted | responsibilities |
 | commands/backlog-review.md | 133 | accepted | commands |
 | quality/req-health-metrics.md | 127 | accepted | quality |
-| commands/req-save.md | 126 | accepted | commands |
+| commands/req-save.md | 125 | accepted | commands |
 | foundations/project-extensions.md | 125 | accepted | foundations |
-| foundations/harness-separation-model.md | 121 | accepted | foundations |
+| foundations/harness-separation-model.md | 122 | accepted | foundations |
+| integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md | 118 | accepted | integrity |
+| authoring/command-file-format.md | 115 | accepted | authoring |
 | responsibilities/req-impact-map.md | 115 | accepted | responsibilities |
-| authoring/command-file-format.md | 111 | accepted | authoring |
+| quality/spec-health-metrics.md | 113 | accepted | quality |
 | commands/learning-promote.md | 111 | accepted | commands |
-| integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md | 110 | accepted | integrity |
+| skills/agentdev-workflow-templates.md | 109 | accepted | skills |
 | commands/intake-promote.md | 107 | accepted | commands |
 | integrity/rules/IR-044-req-spec-boundary-violation-detection.md | 105 | accepted | integrity |
+| workflows/capture-boundaries.md | 104 | accepted | workflows |
 | foundations/system.md | 99 | accepted | foundations |
-| quality/spec-health-metrics.md | 97 | accepted | quality |
 | responsibilities/responsibility-boundary-purification.md | 96 | accepted | responsibilities |
-| workflows/capture-boundaries.md | 93 | accepted | workflows |
 | skills/agentdev-spec-file-manager.md | 88 | draft | skills |
+| integrity/references/targeted-docs-guard-implementation-details.md | 87 | - | integrity |
 | commands/inspect-docs.md | 85 | accepted | commands |
-| local/audit-ledger-lifecycle.md | 85 | superseded | local |
 | skills/agentdev-doc-diagnostics.md | 83 | draft | skills |
-| skills/agentdev-artifact-validation.md | 82 | draft | skills |
-| integrity/rule-ownership.md | 79 | accepted | integrity |
+| skills/agentdev-artifact-validation.md | 81 | draft | skills |
+| integrity/rule-ownership.md | 78 | accepted | integrity |
 | commands/inspect-promote.md | 77 | accepted | commands |
 | commands/inspect-extensions.md | 75 | accepted | commands |
 | commands/inspect-skills.md | 75 | accepted | commands |
@@ -130,16 +130,17 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/case-update.md | 68 | accepted | commands |
 | skills/agentdev-project-extensions.md | 68 | accepted | skills |
 | commands/intake-capture.md | 67 | accepted | commands |
+| integrity/docs-spec-rebuild-integrity.md | 67 | accepted | integrity |
 | skills/agentdev-doc-writing.md | 67 | accepted | skills |
-| skills/agentdev-workflow-templates.md | 66 | accepted | skills |
 | skills/agentdev-issue-management.md | 65 | accepted | skills |
 | foundations/numbering-policy.md | 64 | accepted | foundations |
 | integrity/rules/IR-055-runtime-unresolved-reference.md | 63 | accepted | integrity |
 | skills/agentdev-quality-gates.md | 62 | accepted | skills |
+| foundations/references/concrete-abstraction.md | 61 | accepted | foundations |
 | skills/agentdev-req-file-manager.md | 61 | accepted | skills |
+| workflows/references/execution-unit-construction.md | 61 | accepted | workflows |
 | integrity/rules/IR-060-forbidden-japanese-word-detection.md | 60 | accepted | integrity |
 | skills/agentdev-req-analysis.md | 60 | accepted | skills |
-| integrity/docs-spec-rebuild-integrity.md | 59 | accepted | integrity |
 | skills/agentdev-git-worktree.md | 59 | accepted | skills |
 | skills/agentdev-workflow-lifecycle.md | 59 | accepted | skills |
 | skills/agentdev-case-run-execution-adapter.md | 57 | accepted | skills |
@@ -165,9 +166,10 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-036-adr-work-means-detection.md | 39 | accepted | integrity |
 | integrity/rules/IR-061-index-generation-consistency.md | 39 | accepted | integrity |
 | integrity/rules/IR-059-distribution-reference-boundary.md | 37 | accepted | integrity |
-| integrity/validator-split-criteria.md | 35 | accepted | integrity |
-| integrity/rules/IR-025-retired-adr-path-rule.md | 31 | accepted | integrity |
+| integrity/rules/IR-025-retired-adr-path-rule.md | 35 | accepted | integrity |
+| integrity/rules/IR-011-mapping-table-full-coverage.md | 31 | superseded | integrity |
 | quality/quality-specs.md | 27 | accepted | quality |
+| integrity/validator-split-criteria.md | 25 | accepted | integrity |
 | integrity/rules/IR-001-req-frontmatter-id-filename.md | 21 | accepted | integrity |
 | integrity/rules/IR-002-req-required-frontmatter.md | 21 | accepted | integrity |
 | integrity/rules/IR-003-active-retired-req-id-conflict.md | 21 | accepted | integrity |
@@ -178,7 +180,6 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-008-skill-references-existence.md | 21 | accepted | integrity |
 | integrity/rules/IR-009-obsolete-namespace-residual.md | 21 | accepted | integrity |
 | integrity/rules/IR-010-adr-status-normalization.md | 21 | accepted | integrity |
-| integrity/rules/IR-011-mapping-table-full-coverage.md | 21 | accepted | integrity |
 | integrity/rules/IR-012-template-required-sections.md | 21 | accepted | integrity |
 | integrity/rules/IR-013-variant-path-existence.md | 21 | accepted | integrity |
 | integrity/rules/IR-014-singular-reference-dir-residual.md | 21 | accepted | integrity |
@@ -216,8 +217,9 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-050-load-skills-command-mis-specification.md | 21 | accepted | integrity |
 | integrity/rules/IR-051-executor-skill-notation-misrecognition.md | 21 | accepted | integrity |
 | integrity/rules/IR-053-gh-direct-invocation-detection.md | 21 | accepted | integrity |
+| integrity/references/validator-internal-config.md | 20 | - | integrity |
 
-計測日: 2026-07-23。
+計測日: 2026-07-26。
 <!-- AUTOGEN:END -->
 
 SPEC 行数は frontmatter、HTML コメントを除く本文行数。

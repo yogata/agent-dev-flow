@@ -210,7 +210,7 @@ baseline は `category` / `check` / `file` / `evidence` の4組を bucket key �
 
 | 項目 | 定義 |
 |------|------|
-| 適用対象 | `check_integrity.ts` と `check_extensions.ts` の出力全カテゴリ（ADR、Canonical、CanonicalConflict、Inventory、LinkIntegrity、MappingTable、RuntimeReference 等）。`level` が `ng` または `warning` の結果を対象とする |
+| 適用対象 | `check_integrity.ts` と `check_extensions.ts` の出力全カテゴリ（ADR、Canonical、CanonicalConflict、Inventory、LinkIntegrity、RuntimeReference 等）。`level` が `ng` または `warning` の結果を対象とする |
 | baseline 形式 | `version`, `rule_id: "NG-BASELINE"`, `generated_at`, `entries[]`（各 entry は `category` / `check` / `file`（null 許容）/ `evidence`（null 許容）/ `count` / `provenance`（由来ラベル）/ `reason`（承認理由）を持つ）|
 | bucket key | `${category}\t${check}\t${file||""}\t${evidence||""}` の4組。同一 bucket 内の複数結果は `count` で集計する |
 | pass 判定 | 全 bucket で現在 count ≤ baseline count を満たす場合に strict pass（exit 0）。1 bucket でも超過があれば非 pass（exit 非ゼロ）|

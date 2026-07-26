@@ -25,14 +25,21 @@
 | [REQ-011](REQ-011.md) | I/O境界と外部連携手段 |
 <!-- AUTOGEN:END -->
 
+## 廃止済み要件
+
+<!-- AUTOGEN:BEGIN:id=req-retired-table -->
+| REQ ID | タイトル |
+|---|---|
+<!-- AUTOGEN:END -->
+
 ## 基準構造
 
 - 現行 REQ: `docs/requirements/REQ-{NNN}.md`
 - 廃止済み REQ のIDは再利用しない
 - 文書間に矛盾がある場合は現行 REQ を優先する
 
-## v2 との関係
+## 過去版との関係
 
-v3.0.0 移行に伴い、REQ 番号は `REQ-001〜` の新枠へ移行した。
-v2.11.0 時点の REQ（`REQ-01XX` 番号帯）は tag v2.11.0 参照とし、`v2:REQ-01XX` の表記で区別する（U9）。
-旧REQ から新REQ への個別対応表は廃止した（U9）。
+現行 REQ は `REQ-001〜` の3桁IDを使用する。
+過去版の REQ（`REQ-01XX` 番号帯）は tag `v2.11.0` を参照し、`v2:REQ-01XX` の表記で区別する。
+過去版と現行 REQ の対応関係は、現行要件の根拠にせず版管理履歴で確認する。

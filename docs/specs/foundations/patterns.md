@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # 文書フォーマット規約
@@ -47,7 +47,7 @@ REQ文書のfrontmatterは以下のフィールドを持つ。
 
 ```yaml
 ---
-id: REQ-{NNNN}
+id: REQ-{NNN}
 title: {領域タイトル}
 created: {YYYY-MM-DD}
 updated: {YYYY-MM-DD}
@@ -55,7 +55,7 @@ updated: {YYYY-MM-DD}
 ```
 
 - 許可フィールドは`id`、`title`、`created`、`updated`だけとする。
-- `id`は`REQ-{NNNN}`、要件行IDは`REQ-{NNNN}-{MMM}`形式とする。
+- `id`は`REQ-{NNN}`、要件行IDは`REQ-{NNN}-{MMM}`形式とする。
 
 ### REQ セクション構成
 
@@ -68,7 +68,7 @@ updated: {YYYY-MM-DD}
 
 | ID | 要件 |
 |---|---|
-| REQ-{NNNN}-001 | {検証可能な要件} |
+| REQ-{NNN}-001 | {検証可能な要件} |
 
 ## 適用範囲
 
@@ -90,7 +90,7 @@ SPEC frontmatterは`title`、`status`、`created`、`updated`を基本とする�
 
 | 分類 | 意味 | 取扱い |
 |------|------|--------|
-| `migrated` | 新現行 REQ へ要件内容を移行した | 履歴参照として保持。後継 REQ は mapping-table.md で追跡 |
+| `migrated` | 新現行 REQ へ要件内容を移行した | 現行 REQ は `docs/requirements/README.md`、履歴資料は tag `v2.11.0` で参照する |
 | `retired-no-successor` | 最新方針では不要なため新現行 REQ へ移行しない | 履歴参照として保持 |
 | `historical-only` | 当時の判断、経緯として残すが現行要件ではない | 履歴参照として保持 |
 

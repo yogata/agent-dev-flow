@@ -69,7 +69,13 @@ import {
 import {
   isFileLevelHistoryExempt,
   hasLineLevelHistoryMarker,
+  isIr057PathExempt,
 } from "./ir057_history_exemption.ts";
+import {
+  extractCurrentAdrReadmeInventory,
+  extractCurrentAdrRefs,
+  extractCurrentReqRefs,
+} from "./current_refs.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
@@ -556,8 +562,7 @@ function checkAdrReqCrossReference(
     const content = readText(fullPath);
     if (!content) continue;
     const relPath = resolveRelative(fullPath, root);
-    const references = content.match(/\bADR-\d{3,4}\b/g) || [];
-    const uniqueRefs = [...new Set(references)];
+    const uniqueRefs = extractCurrentAdrRefs(content);
     for (const ref of uniqueRefs) {
       // v2:REQ-0161-004: skip deletion self-references (REQ describes its own
       // deletion targets; see DELETION_SELF_REFERENCE_EXCLUSIONS).
@@ -578,8 +583,7 @@ function checkAdrReqCrossReference(
     const fullPath = path.join(adrDir, file);
     const content = readText(fullPath);
     if (!content) continue;
-    const references = content.match(/\bREQ-\d{3,4}\b/g) || [];
-    const uniqueRefs = [...new Set(references)];
+    const uniqueRefs = extractCurrentReqRefs(content);
     for (const ref of uniqueRefs) {
       // v2:REQ-0108-074: active or retired existence check
       if (!allReqIds.has(ref)) {
@@ -1608,8 +1612,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     // v2:REQ-0108-194: Suppress false positives for template placeholders
     const isTemplateLike = /\{[a-zA-Z_]+\}/.test(content) || content.includes("🔄") || content.includes("✅") || content.includes("☐");
     const isReqRangeContext = isRangeExpression(content);
-    const reqRefs = content.match(/\bREQ-\d{3,4}\b/g) || [];
-    const uniqueReqRefs = [...new Set(reqRefs)];
+    const uniqueReqRefs = extractCurrentReqRefs(content);
     for (const ref of uniqueReqRefs) {
       // v2:REQ-0108-194: Skip template-like content with placeholders or workflow markers
       if (isTemplateLike) break;
@@ -1644,8 +1647,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       }
     }
 
-    const adrRefs = content.match(/\bADR-\d{3,4}\b/g) || [];
-    const uniqueAdrRefs = [...new Set(adrRefs)];
+    const uniqueAdrRefs = extractCurrentAdrRefs(content);
     for (const ref of uniqueAdrRefs) {
       // v2:REQ-0108-194: Skip template-like content with placeholders or workflow markers
       if (isTemplateLike) break;
@@ -1731,7 +1733,6 @@ function checkLinkIntegrity(root: string): CheckResult[] {
         fs.existsSync(retiredPath) &&
         !fs.existsSync(activePath) &&
         !relPath.startsWith("docs/requirements/retired/") &&
-        !relPath.endsWith("mapping-table.md") &&
         !relPath.startsWith("docs/adr/ADR-") && // ADRs discuss REQ reorganization historically
         appearsOutsideRetired &&
         !isReqRangeContext // v2:REQ-0108-194: REQ range references like "REQ-0101 through REQ-0116"
@@ -1930,7 +1931,6 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
   for (const filePath of allDocFiles) {
     const relPath = resolveRelative(filePath, root);
     if (relPath.startsWith("docs/requirements/retired/")) continue;
-    if (relPath.endsWith("mapping-table.md")) continue;
     if (relPath.startsWith("docs/adr/ADR-")) continue; // ADRs discuss REQ reorganization historically
     const content = readText(filePath);
     if (!content) continue;
@@ -1957,62 +1957,6 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
             {
               evidence: ref,
               expected: "retired REQs should not be primary references",
-              route: "intake",
-            },
-          ),
-        );
-      }
-    }
-  }
-
-  // (d) mapping-table.md referencing non-existent old REQ IDs
-  const mappingTablePath = path.join(
-    root,
-    "docs",
-    "requirements",
-    "retired",
-    "mapping-table.md",
-  );
-  const mappingContent = readText(mappingTablePath);
-  if (mappingContent) {
-    const allReqIds = new Set([...activeIds, ...retiredIds]);
-    const refs = mappingContent.match(/\bREQ-\d{3,4}\b/g) || [];
-    const uniqueRefs = [...new Set(refs)];
-    for (const ref of uniqueRefs) {
-      if (!allReqIds.has(ref)) {
-        results.push(
-          ng(
-            "LifecycleBoundary",
-            "mapping-table-nonexistent",
-            `${ref} referenced in mapping-table.md does not exist`,
-            resolveRelative(mappingTablePath, root),
-            undefined,
-            {
-              evidence: ref,
-              expected: "all REQ references in mapping table must exist",
-              route: "intake",
-            },
-          ),
-        );
-      }
-    }
-  }
-
-  // (e) Retired REQ missing from mapping table
-  if (mappingContent && retiredIds.size > 0) {
-    const mappingRefs = new Set(mappingContent.match(/\bREQ-\d{3,4}\b/g) || []);
-    for (const id of retiredIds) {
-      if (!mappingRefs.has(id)) {
-        results.push(
-          warn(
-            "LifecycleBoundary",
-            "retired-missing-from-mapping",
-            `${id} is retired but not listed in mapping-table.md`,
-            undefined,
-            undefined,
-            {
-              evidence: id,
-              expected: "all retired REQs should be in mapping table",
               route: "intake",
             },
           ),
@@ -2224,8 +2168,7 @@ function checkDocMapReqSync(root: string): CheckResult[] {
   const reqIds = new Set(reqFiles.map((f) => f.replace(".md", "")));
 
   // Check REQ references in DOC-MAP
-  const docMapReqRefs = docMapContent.match(/\bREQ-\d{3,4}\b/g) || [];
-  const uniqueRefs = [...new Set(docMapReqRefs)];
+  const uniqueRefs = extractCurrentReqRefs(docMapContent);
 
   for (const ref of uniqueRefs) {
     if (!reqIds.has(ref)) {
@@ -2383,13 +2326,7 @@ function checkAdrReadmeIndexSync(adrDir: string, root: string): CheckResult[] {
     return results;
   }
 
-  const indexedIds = new Set<string>();
-  const readmeLines = readmeContent.split("\n");
-  for (let i = 0; i < readmeLines.length; i++) {
-    if (isRetiredSectionInLines(readmeLines, i)) continue;
-    const match = readmeLines[i].match(/\b(ADR-\d{4})\b/);
-    if (match) indexedIds.add(match[1]);
-  }
+  const indexedIds = extractCurrentAdrReadmeInventory(readmeContent);
 
   const missingFromIndex = [...adrIds].filter((id) => !indexedIds.has(id));
   const phantomEntries = [...indexedIds].filter((id) => !adrIds.has(id));
@@ -3069,214 +3006,6 @@ function checkRetiredFrontmatter(reqDir: string, root: string): CheckResult[] {
         "retired-frontmatter-filename",
         "All retired REQ frontmatter and IDs are valid",
       ),
-    );
-  }
-  return results;
-}
-
-// ─── Mapping-table checks (v2:REQ-0108-083~088) ──────────────────────────────
-
-const VALID_MAPPING_STATUSES = new Set([
-  "migrated",
-  "retired-no-successor",
-  "historical-only",
-]);
-
-function parseMappingTable(mappingPath: string): {
-  entries: Array<{ oldReq: string; status: string; successor: string | null }>;
-  allOldRefs: Set<string>;
-} {
-  const entries: Array<{
-    oldReq: string;
-    status: string;
-    successor: string | null;
-  }> = [];
-  const allOldRefs = new Set<string>();
-  const content = readText(mappingPath);
-  if (!content) return { entries, allOldRefs };
-
-  const lines = content.split("\n");
-  let inMigrationSection = false;
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (/^##\s/.test(trimmed)) {
-      inMigrationSection = /^##\s+対応表/.test(trimmed);
-      continue;
-    }
-    if (!inMigrationSection) continue;
-    if (!trimmed.startsWith("|")) continue;
-    if (/^[\s|:-]+$/.test(trimmed)) continue;
-    const cells = trimmed
-      .split("|")
-      .map((c) => c.trim())
-      .filter((c) => c.length > 0);
-    if (cells.length >= 2 && /REQ-\d{4}/.test(cells[0])) {
-      const oldReqMatch = cells[0].match(/(REQ-\d{4})/);
-      const statusMatch = cells[1]?.trim();
-      const successorText = cells.length >= 3 ? cells[2]?.trim() : "";
-      if (oldReqMatch) {
-        allOldRefs.add(oldReqMatch[1]);
-        let successor: string | null = null;
-        if (
-          successorText &&
-          successorText !== "なし" &&
-          successorText !== "—"
-        ) {
-          const successorMatches = successorText.match(/REQ-\d{4}/g);
-          if (successorMatches && successorMatches.length === 1) {
-            successor = successorMatches[0];
-          }
-        }
-        entries.push({
-          oldReq: oldReqMatch[1],
-          status: statusMatch || "",
-          successor,
-        });
-      }
-    }
-  }
-
-  return { entries, allOldRefs };
-}
-
-function checkMappingTable(reqDir: string, root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  const mappingPath = path.join(reqDir, "mapping-table.md");
-  const mappingContent = readText(mappingPath);
-
-  if (!mappingContent) {
-    results.push(
-      info(
-        "MappingTable",
-        "mapping-table-checks",
-        "mapping-table.md not found",
-      ),
-    );
-    return results;
-  }
-
-  const retiredDir = path.join(reqDir, "retired");
-  const activeFiles = listFiles(reqDir).filter(
-    (f) => f.startsWith("REQ-") && f !== "README.md",
-  );
-  const activeIds = new Set(activeFiles.map((f) => f.replace(".md", "")));
-  const retiredFiles = fs.existsSync(retiredDir)
-    ? listFiles(retiredDir).filter((f) => f.startsWith("REQ-"))
-    : [];
-  const retiredIds = new Set(retiredFiles.map((f) => f.replace(".md", "")));
-  const allReqIds = new Set([...activeIds, ...retiredIds]);
-
-  const { entries, allOldRefs } = parseMappingTable(mappingPath);
-
-  // v2:REQ-0108-084: all retired REQs recorded in mapping-table
-  for (const id of retiredIds) {
-    if (!allOldRefs.has(id)) {
-      results.push(
-        ng(
-          "MappingTable",
-          "mapping-table-completeness",
-          `Retired REQ ${id} not found in mapping-table`,
-          resolveRelative(mappingPath, root),
-          undefined,
-          {
-            evidence: id,
-            expected: "all retired REQs must be in mapping table",
-            route: "intake",
-          },
-        ),
-      );
-    }
-  }
-
-  // v2:REQ-0108-085: mapping-table references non-existent old REQ IDs
-  for (const oldRef of allOldRefs) {
-    if (!allReqIds.has(oldRef)) {
-      results.push(
-        ng(
-          "MappingTable",
-          "mapping-table-completeness",
-          `mapping-table references ${oldRef} but REQ does not exist in active or retired`,
-          resolveRelative(mappingPath, root),
-          undefined,
-          {
-            evidence: oldRef,
-            expected: "all old REQ refs must exist",
-            route: "intake",
-          },
-        ),
-      );
-    }
-  }
-
-  // v2:REQ-0108-086: migrated successor must exist as active REQ
-  for (const entry of entries) {
-    if (entry.status === "migrated" && entry.successor) {
-      if (!activeIds.has(entry.successor)) {
-        results.push(
-          ng(
-            "MappingTable",
-            "mapping-table-migration-target",
-            `${entry.oldReq} migrated to ${entry.successor} but target is not an active REQ`,
-            resolveRelative(mappingPath, root),
-            undefined,
-            {
-              evidence: entry.successor,
-              expected: "migration target must be active REQ",
-              route: "intake",
-            },
-          ),
-        );
-      }
-    }
-  }
-
-  // v2:REQ-0108-087: status enum validation
-  for (const entry of entries) {
-    if (!VALID_MAPPING_STATUSES.has(entry.status)) {
-      results.push(
-        ng(
-          "MappingTable",
-          "mapping-table-status-enum",
-          `${entry.oldReq} has unknown status '${entry.status}'`,
-          resolveRelative(mappingPath, root),
-          undefined,
-          {
-            evidence: entry.status,
-            expected: `one of: ${[...VALID_MAPPING_STATUSES].join(", ")}`,
-            route: "intake",
-          },
-        ),
-      );
-    }
-  }
-
-  // v2:REQ-0108-088: retired-no-successor / historical-only should not have migration target
-  for (const entry of entries) {
-    if (
-      (entry.status === "retired-no-successor" ||
-        entry.status === "historical-only") &&
-      entry.successor
-    ) {
-      results.push(
-        warn(
-          "MappingTable",
-          "mapping-table-status-enum",
-          `${entry.oldReq} has status '${entry.status}' but migration target '${entry.successor}' is set`,
-          resolveRelative(mappingPath, root),
-          undefined,
-          {
-            evidence: `${entry.status} → ${entry.successor}`,
-            expected: "no migration target for this status",
-            route: "intake",
-          },
-        ),
-      );
-    }
-  }
-
-  if (results.filter((r) => r.level === "ng").length === 0) {
-    results.push(
-      ok("MappingTable", "mapping-table-checks", "Mapping-table is consistent"),
     );
   }
   return results;
@@ -4428,8 +4157,7 @@ function checkNonAcceptedAdrRefsInFile(
     }
   }
 
-  const adrRefs = content.match(/\bADR-\d{3,4}\b/g) || [];
-  const uniqueRefs = [...new Set(adrRefs)].filter(
+  const uniqueRefs = extractCurrentAdrRefs(content).filter(
     (ref) => !exemptedRefs.has(ref),
   );
 
@@ -4480,7 +4208,6 @@ function checkPatternResidualDetection(root: string): CheckResult[] {
 
   const exemptPatterns = [
     /retired\//,
-    /mapping-table/,
     /\.test\./,
     /_test\./,
     /integrity-check\.md$/,
@@ -4594,7 +4321,6 @@ function checkReqBacklogResidualDetection(root: string): CheckResult[] {
 
   const exemptPatterns = [
     /retired\//,
-    /mapping-table/,
     /\.test\./,
     /_test\./,
     /integrity-check\.md$/,
@@ -5036,7 +4762,6 @@ function checkSkillCategoryGap(
     ["旧 namespace 残存", ["LegacyNamespace", "BareSlashScoped"]],
     ["完了報告フォーマット", ["CompletionReport", "InlineCompletion"]],
     ["Variant report", ["VariantExistence"]],
-    ["Mapping table", ["MappingTable"]],
     ["ADR status 正規化", ["AdrStatusNormalization"]],
     ["RU-ID 根拠参照", ["RuidGroundReference"]],
     ["Workflow status 禁止", ["WorkflowStatusProhibition"]],
@@ -5045,7 +4770,6 @@ function checkSkillCategoryGap(
     ["Skill 構造", ["lintSkill"]],
     ["Junction 整合性", ["BrokenJunctions"]],
     ["Capture boundary", ["CaptureBoundaryReference", "PrTemplateCaptureSection", "CommandCaptureDuties"]],
-    ["Mapping table history", ["MappingTableHistoryLabels"]],
     ["REQ verification basis", ["ReqVerificationBasis"]],
     ["Runtime reference", ["RuntimeUnresolvedReference"]],
     ["Distribution untracked skill", ["DistributionUntrackedSkillReference"]],
@@ -5813,7 +5537,6 @@ function checkOldStatusVocabulary(root: string): CheckResult[] {
 
   const exemptPatterns = [
     /retired\//,
-    /mapping-table/,
     /vocabulary-registry\.md$/,
     // v2: stale — file deleted in Stage 4
     /REQ-0108\.md$/,
@@ -6349,7 +6072,6 @@ const SJ_ULWLOOP_PATTERN = /Sisyphus-Junior[\s]*[(（]\s*ulw-loop\s*[)）]/;
 const SJ_ULWLOOP_EXEMPT_PATHS: RegExp[] = [
   /retired\/REQ-/,
   /docs[\\/]+requirements[\\/]+REQ-/,
-  /mapping-table\.md$/,
   /integrity-rule-catalog\.md$/,
   /\.test\.ts$/,
   /check_integrity\.ts$/,
@@ -6406,58 +6128,6 @@ function checkSisyphusJuniorUlwLoopMisclassification(root: string): CheckResult[
         "sisyphus-junior-ulw-loop-misclassification",
         "No 'Sisyphus-Junior(ulw-loop)' misclassification detected (v2:REQ-0144-013)",
       ),
-    );
-  }
-  return results;
-}
-
-function checkMappingTableHistoryLabels(root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  const mappingTablePath = path.join(root, "docs", "requirements", "mapping-table.md");
-  if (!fs.existsSync(mappingTablePath)) {
-    results.push(ok("Vocabulary", "mapping-table-history", "mapping-table.md not found, skip"));
-    return results;
-  }
-
-  const content = readText(mappingTablePath);
-  if (!content) {
-    results.push(ok("Vocabulary", "mapping-table-history", "mapping-table.md empty, skip"));
-    return results;
-  }
-
-  const oldVocabPatterns = [
-    /retained/g,
-    /partially superseded/g,
-  ];
-
-  let unlabeledCount = 0;
-  const lines = content.split("\n");
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.startsWith("|") && line.includes("status")) continue;
-    if (!line.startsWith("|")) continue;
-    for (const pat of oldVocabPatterns) {
-      pat.lastIndex = 0;
-      if (pat.test(line)) {
-        const hasHistoryLabel = line.includes("履歴") || line.includes("historical") || line.includes("旧");
-        if (!hasHistoryLabel) {
-          unlabeledCount++;
-        }
-      }
-    }
-  }
-
-  if (unlabeledCount > 0) {
-    results.push(
-      ng(
-        "Vocabulary",
-        "mapping-table-history",
-        `mapping-table.md has ${unlabeledCount} old vocabulary entries without history label (v2:REQ-0108-240)`,
-      ),
-    );
-  } else {
-    results.push(
-      ok("Vocabulary", "mapping-table-history", "Old vocabulary in mapping-table.md properly labeled as historical (v2:REQ-0108-240)"),
     );
   }
   return results;
@@ -7713,29 +7383,9 @@ function loadObsoletePathMap(root: string): ObsoletePathMap | null {
 }
 
 function isIr057ExemptPath(relPath: string): boolean {
-  // 履歴参照領域
-  if (/docs\/requirements\/retired\//.test(relPath)) return true;
-  if (/docs\/adr\/retired\//.test(relPath)) return true;
-  // 対照表・カタログ自身の参照は正当
-  if (/docs\/specs\/integrity\/obsolete-path-map\.yaml$/.test(relPath)) return true;
-  if (/docs\/specs\/integrity\/rules\/IR-057-obsolete-spec-path-after-domain-split\.md$/.test(relPath)) return true;
-  if (/docs\/specs\/integrity\/integrity-rule-catalog\.md$/.test(relPath)) return true;
-  if (/vocabulary-registry\.md$/.test(relPath)) return true;
-  if (/docs\/specs\/integrity\/rule-ownership\.md$/.test(relPath)) return true;
-  // 検査スクリプト自身のドキュメント参照
-  if (/repo-agentdev-integrity.*\/(SKILL|references\/)/.test(relPath)) return true;
-  // legacy vocabulary を定義・検出する正当な文書:
-  // - v2:REQ-0158 (IR-057 の要件元。vocabulary を列挙)
-  // - v2:REQ-0141 (link mode 移行に伴う廃止語彙を規定)
-  // - local-generation.md (link mode 移行と廃止経緯を記載)
-  // - IR-048 (generated_by 識別子整合性ルール)
-  // v2: stale — file deleted in Stage 4
-  if (/docs\/requirements\/REQ-0158\.md$/.test(relPath)) return true;
-  // v2: stale — file deleted in Stage 4
-  if (/docs\/requirements\/REQ-0141\.md$/.test(relPath)) return true;
-  if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) return true;
-  if (/docs\/specs\/integrity\/rules\/IR-048-generated-by-identifier-integrity\.md$/.test(relPath)) return true;
-  return false;
+  // IR-057 SPEC exemption 表に基づくパス単位免除は共有純粋関数へ委譲（REQ-0144-024）。
+  // targeted guard（check_changed_docs.ts）と同一の免除集合を使用する。
+  return isIr057PathExempt(relPath);
 }
 
 function isIr057InCodeBlock(lines: string[], lineIdx: number): boolean {
@@ -7869,8 +7519,6 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
       const relPath = resolveRelative(fullPath, root);
       if (isIr057ExemptPath(relPath)) continue;
       if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-      // local-generation.md は廃止経緯を説明する正当な文書
-      if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) continue;
 
       const content = readText(fullPath);
       if (!content) continue;
@@ -7913,7 +7561,6 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
       const relPath = resolveRelative(fullPath, root);
       if (isIr057ExemptPath(relPath)) continue;
       if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-      if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) continue;
 
       const content = readText(fullPath);
       if (!content) continue;
@@ -7957,7 +7604,6 @@ function checkObsoleteSpecPath(root: string): CheckResult[] {
       const relPath = resolveRelative(fullPath, root);
       if (isIr057ExemptPath(relPath)) continue;
       if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-      if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) continue;
 
       const content = readText(fullPath);
       if (!content) continue;
@@ -8552,7 +8198,6 @@ async function main(): Promise<void> {
     ...checkSpecReadmeIndexSync(root),
     ...checkCommandMapConsistency(cmdDir, root, commandMapPath),
     ...checkObsoleteReferenceDirs(skillsDir, root),
-    ...checkMappingTable(reqDir, root),
     ...checkSkillFrontmatter(skillsDir, root),
     ...checkCommandFrontmatterDetailed(cmdDir, root),
     ...checkScriptTemplateReferencePaths(cmdDir, skillsDir, root),
@@ -8581,7 +8226,6 @@ async function main(): Promise<void> {
     ...checkCaptureBoundaryReference(root),
     ...checkPrTemplateCaptureSection(root),
     ...checkCommandCaptureDuties(cmdDir, root),
-    ...checkMappingTableHistoryLabels(root),
     ...checkReqVerificationBasis(root),
     ...checkReqSpecBoundaryViolation(root), // IR-044 (v2:REQ-0108-259)
     ...checkGhDirectInvocation(root), // IR-053 (v2:REQ-0152-001/002)

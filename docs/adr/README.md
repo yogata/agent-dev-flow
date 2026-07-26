@@ -1,25 +1,28 @@
 # アーキテクチャ決定記録（ADR）
 
 アーキテクチャ決定記録（ADR）のインデックス。
-v3 は `ADR-001〜` の新枠を採用し、v2.11.0 時点の `ADR-01XX` 番号帯は tag 参照とする（U9）。
+現行 ADR は `ADR-001〜` の3桁IDを使用し、過去版の ADR は tag `v2.11.0` で参照する。
 
-## 現行 ADR（v3）
+## 現行 ADR
 
-v3 の基本原則、管理方式、cutover 条件は ADR-001 を基準とする。
-個別 REQ/SPEC は charter 原則へ照らして位置づく。
+基本原則、管理方式、リリース条件は ADR-001 を基準とする。
+個別 REQ/SPEC は憲章の原則へ照らして位置づく。
+
+<!-- AUTOGEN:BEGIN:id=adr-baseline-count -->
+現行の承認済み ADR は5件である。
+<!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=adr-baseline-table -->
 | ADR番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|
-| [ADR-001](ADR-001-v3-charter.md) | v3 charter（AgentDevFlow v3 憲章） | accepted | 2026-07-24 |
-| [ADR-002](ADR-002.md) | OpenCode ソース・プロジェクション分離（v3） | accepted | 2026-07-25 |
-| [ADR-003](ADR-003.md) | req_draft ソフトコントラクト原則（v3） | accepted | 2026-07-25 |
-| [ADR-004](ADR-004.md) | 差し替え可能な I/O 境界（v3） | accepted | 2026-07-25 |
-| [ADR-005](ADR-005.md) | Project Extensions Architecture（v3） | accepted | 2026-07-25 |
+| ADR-001 | AgentDevFlow 憲章 | accepted | 2026-07-24 |
+| ADR-002 | OpenCode ソース・プロジェクション分離 | accepted | 2026-07-25 |
+| ADR-003 | req_draft ソフトコントラクト原則 | accepted | 2026-07-25 |
+| ADR-004 | 差し替え可能な I/O 境界 | accepted | 2026-07-25 |
+| ADR-005 | Project Extensions Architecture | accepted | 2026-07-25 |
 <!-- AUTOGEN:END -->
 
-- [利用者向け要約（v3-charter.md）](../guides/v3-charter.md)
-- v3 移行の進行状況は [`.agentdev/v3-migration/decisions.md`](../../.agentdev/v3-migration/decisions.md) を参照
+- [利用者向け要約（charter.md）](../guides/charter.md)
 
 > この README は分類ビューであり、ADR本文のSSoTではない。
 > 基準は各 ADR ファイルである（REQ-001）。
@@ -29,11 +32,11 @@ v3 の基本原則、管理方式、cutover 条件は ADR-001 を基準とする
 ### 承認済み（accepted）
 
 <!-- AUTOGEN:BEGIN:id=adr-status-accepted -->
-- [ADR-001](ADR-001-v3-charter.md)（v3 charter（AgentDevFlow v3 憲章））
-- [ADR-002](ADR-002.md)（OpenCode ソース・プロジェクション分離（v3））
-- [ADR-003](ADR-003.md)（req_draft ソフトコントラクト原則（v3））
-- [ADR-004](ADR-004.md)（差し替え可能な I/O 境界（v3））
-- [ADR-005](ADR-005.md)（Project Extensions Architecture（v3））
+- [ADR-001](ADR-001.md)（AgentDevFlow 憲章）
+- [ADR-002](ADR-002.md)（OpenCode ソース・プロジェクション分離）
+- [ADR-003](ADR-003.md)（req_draft ソフトコントラクト原則）
+- [ADR-004](ADR-004.md)（差し替え可能な I/O 境界）
+- [ADR-005](ADR-005.md)（Project Extensions Architecture）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
@@ -55,7 +58,7 @@ v3 の基本原則、管理方式、cutover 条件は ADR-001 を基準とする
 
 ### 憲章・基本原則
 
-- [ADR-001](ADR-001-v3-charter.md)（v3 charter、hard governance の限定、新規統制追加原則）
+- [ADR-001](ADR-001.md)（AgentDevFlow 憲章、hard governance の限定、新規統制追加原則）
 
 ### 配布基盤・ソースモデル
 
@@ -67,37 +70,32 @@ v3 の基本原則、管理方式、cutover 条件は ADR-001 を基準とする
 
 - [ADR-003](ADR-003.md)（req_draft ソフトコントラクト原則）
 
-Decision Map（ADR 間の supersedes / relates-to / superseded-by 関係）。
+Decision Map（現行 ADR と過去版 ADR の履歴上の関連）。
 
 | ADR | 関係 | 対象 | 説明 |
 |-----|------|------|------|
-| ADR-002 | supersedes | v2:ADR-0105 | source/projection 分離を v3 charter 原則へ再定義 |
-| ADR-003 | supersedes | v2:ADR-0124 | req_draft soft-contract 原則を v3 charter 原則へ再定義 |
-| ADR-004 | supersedes | v2:ADR-0130 | 差し替え可能な I/O 境界を v3 charter 原則へ再定義 |
-| ADR-005 | supersedes | v2:ADR-0135 | Project Extensions Architecture を v3 charter 原則へ再定義 |
+| ADR-002 | relates-to | v2:ADR-0105 | source/projection 分離に関する過去版の決定 |
+| ADR-003 | relates-to | v2:ADR-0124 | req_draft ソフトコントラクトに関する過去版の決定 |
+| ADR-004 | relates-to | v2:ADR-0130 | 差し替え可能な I/O 境界に関する過去版の決定 |
+| ADR-005 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定 |
 
 ## 関連 REQ
 
 | ADR | 関連REQ | 説明 |
 |-----|---------|------|
-| ADR-001 | [REQ-001](../requirements/REQ-001.md), [REQ-002](../requirements/REQ-002.md), [REQ-003](../requirements/REQ-003.md), [REQ-004](../requirements/REQ-004.md), [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md), [REQ-007](../requirements/REQ-007.md), [REQ-008](../requirements/REQ-008.md), [REQ-009](../requirements/REQ-009.md), [REQ-010](../requirements/REQ-010.md), [REQ-011](../requirements/REQ-011.md) | v3 charter 全体原則（hard governance 8点、新規統制追加7条件、cutover 条件） |
+| ADR-001 | [REQ-001](../requirements/REQ-001.md), [REQ-002](../requirements/REQ-002.md), [REQ-003](../requirements/REQ-003.md), [REQ-004](../requirements/REQ-004.md), [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md), [REQ-007](../requirements/REQ-007.md), [REQ-008](../requirements/REQ-008.md), [REQ-009](../requirements/REQ-009.md), [REQ-010](../requirements/REQ-010.md), [REQ-011](../requirements/REQ-011.md) | AgentDevFlow 憲章の全体原則（hard governance 8点、新規統制追加7条件、リリース条件） |
 | ADR-002 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | 配布成果物のソース・プロジェクション分離 |
 | ADR-003 | [REQ-004](../requirements/REQ-004.md), [REQ-008](../requirements/REQ-008.md) | req_draft soft-contract 原則（LLM推論消費、厳格schemaなし） |
 | ADR-004 | [REQ-011](../requirements/REQ-011.md), [REQ-009](../requirements/REQ-009.md) | 差し替え可能な I/O 境界（agentdev-gh-cli、Local backend） |
 | ADR-005 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Project Extensions Architecture（.agentdev/extensions/** によるプロジェクト固有追加） |
 
-## v2 履歴基盤（tag v2.11.0 参照のみ）
+## 過去版の履歴基盤
 
-次の ADR-01XX 群は v2.11.0 時点のアーキテクチャ基盤である。
-v3 文脈で参照する場合は `v2:ADR-01XX` の表記で区別する（U9）。
-v3.0.0 cutover 後は v2 保守を停止するため、tag 参照のみとする。
-後継関係は上記 Decision Map の通り、主要な v2 ADR は v3 ADR-002〜005 へ再定義された。
+次の ADR-01XX 群は tag `v2.11.0` 時点のアーキテクチャ基盤である。
+現行文書から参照する場合は `v2:ADR-01XX` の表記で区別し、本文は tag を参照する。
+現行 ADR との関係は上記 Decision Map に示す。
 
-### v2 現行基盤ビュー（tag v2.11.0 時点）
-
-<!-- AUTOGEN:BEGIN:id=adr-baseline-count -->
-承認済みステータス（accepted）の ADR-01XX 31件が、v2.11.0 時点のアーキテクチャ判断の基盤である。
-<!-- AUTOGEN:END -->
+### tag v2.11.0 基盤ビュー
 
 | ADR番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|

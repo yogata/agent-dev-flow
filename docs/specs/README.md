@@ -206,9 +206,8 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 
 | SPEC | status | タイトル | 責務 |
 |------|--------|---------|------|
-| local/runtime-package-boundary.md | accepted | 実行時パッケージ境界 | リポジトリ種別別 .opencode/ 定義、命名規約 |
+| local/runtime-package-boundary.md | accepted | 実行時パッケージ境界 | リポジトリ種別別 .opencode/ 定義、命名規約、link mode 導入フロー、更新運用 |
 | local/local-case-file.md | accepted | ローカル Case ファイル | ローカル版 Case ファイルスキーマ、状態遷移 |
-| local/local-generation.md | accepted | ローカル版 OpenCode 生成 | link mode 導入フロー、更新運用、残存 GitHub 固有参照の違反判定基準、link mode 移行に伴う廃止経緯（ADR-004）。local-transform.md から一元化、当該ファイルは case-run で削除済み |
 
 #### authoring/（執筆規約）
 

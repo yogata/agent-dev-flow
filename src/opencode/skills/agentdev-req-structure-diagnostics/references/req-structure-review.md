@@ -23,7 +23,7 @@ REQ体系の第一参照導線を確認する:
 
 REQ の現行/廃止/世代境界の整合性を確認する:
 
-- **(a) 廃止側にのみ存在する ID**: mapping-table に記録されているか
+- **(a) 廃止側にのみ存在する ID**: 現行の retired ディレクトリとその README（存在する場合）、または履歴の v2.11.0 タグで確認できるか
 - **(b) 現行/廃止の二重存在**: 同一 ID が両方に存在していないか
 - **(c) 100s番台境界**: 世代変更（例: 0100番台→0200番台）が基準に従っているか
 
@@ -252,5 +252,3 @@ SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC�
 | 確信度 | high/ medium/ low のいずれか |
 | 推奨アクション | SPLIT/ MERGE/ MOVE/ RETIRE/ UPDATE/ APPEND/ no-action のいずれか |
 | req-define入力案 | req-define での壁打ち内容のドラフト（不要な場合は「—」） |
-
-

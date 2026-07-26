@@ -11,7 +11,7 @@ check_changed_docs.ts は以下の処理層（validator）で構成する。
 |---|---|
 | changed file resolver | --files または --base-ref から files_checked を生成する |
 | workflow profile resolver | --workflow 値に応じた profileFor() 適用と rules 選択を行う |
-| coupled file resolver | 連動ファイル（README、DOC-MAP、mapping-table 等）を特定する |
+| coupled file resolver | 連動ファイル（README、DOC-MAP 等）を特定する |
 | targeted check runner | files_checked と coupled_files_checked に対し profile rules を実行する |
 | JSON/text reporter | TargetedDocsReport 形式で JSON/text 出力を生成する |
 

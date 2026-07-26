@@ -96,7 +96,7 @@ bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-frontmatter-
 
 **Step 4-0**: QG-1（適用結果の整合性検証、REQ/082、AG-003）。
 REQ/ADR ファイル保存前に、`agentdev-quality-gates` の QG-1（Definition Integrity Gate）を「適用結果の整合性検証」として実行する。
-検証項目: 採番結果の整合性（`new:{slug}` → 確定番号の置換漏れなし）、マージ結果の整合性（要件テーブル構造、番号重複なし）、インデックスの整合性（README/DOC-MAP/mapping-table エントリと採番結果の一致）、変更範囲の妥当性（Step 9 で検証）。
+検証項目: 採番結果の整合性（`new:{slug}` → 確定番号の置換漏れなし）、マージ結果の整合性（要件テーブル構造、番号重複なし）、インデックスの整合性（README/DOC-MAP エントリと採番結果の一致）、変更範囲の妥当性（Step 9 で検証）。
 各検証は決定的スクリプトの JSON 結果で機械的に確認する。
 判定基準、検査観点は同スキル（`agentdev-quality-gates`）の QG-1 を参照。
 fail 時は保存を停止し req-define へ差し戻しを推奨。
@@ -118,12 +118,12 @@ req-save 自身は `docs/specs/` 配下を直接編集しない（G02 制約）
 
 詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが `docs/` ファイルを更新する
 
-**エントリ存在確認のスクリプト呼出（REQ、AG-002、AG-019）**: README/DOC-MAP/mapping-table へのエントリ追加後に、当該エントリが正しく登録されたかを決定的スクリプトで検証する。`check-entry-existence` は `agentdev-artifact-validation` の公開検証契約（RU-20260722-01 合意）:
+**エントリ存在確認のスクリプト呼出（REQ、AG-002、AG-019）**: README/DOC-MAP へのエントリ追加後に、当該エントリが正しく登録されたかを決定的スクリプトで検証する。`check-entry-existence` は `agentdev-artifact-validation` の公開検証契約（RU-20260722-01 合意）:
 
 ```bash
-# REQ エントリが README/DOC-MAP/mapping-table に存在するか確認
+# REQ エントリが README/DOC-MAP に存在するか確認
 bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-entry-existence.ts REQ-NNNN \
-  docs/requirements/README.md docs/DOC-MAP.md docs/requirements/<mapping-table>.md
+  docs/requirements/README.md docs/DOC-MAP.md
 # → stdout: { ok: boolean, errors: string[], warnings: string[], found: string[] }
 
 # stdin JSON 入力（複数 ID 一括確認）も可能

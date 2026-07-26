@@ -1,6 +1,6 @@
 # 適用プロジェクトへの導入モデル
 
-AgentDevFlow を適用プロジェクトに導入する際のモデルを定義する（ADR-011-061~065, ADR-011-072~077）。
+AgentDevFlow を適用プロジェクトに導入する際のモデルを定義する（v2:ADR-011-061~065, v2:ADR-011-072~077）。
 
 ## リポジトリ種別（Repo Type）
 
@@ -67,7 +67,7 @@ scripts/
 ### ローカル版 OpenCode 導入（consumer-generated）
 
 GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別。
-通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入し、`agentdev-gh-cli` だけを `src/opencode-local/agentdev-gh-cli/` から差し替える（ADR-011, ADR-009）。
+通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入し、`agentdev-gh-cli` だけを `src/opencode-local/agentdev-gh-cli/` から差し替える（v2:ADR-011, v2:ADR-009）。
 詳細な接続フロー、link target 確認は SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md) を参照。
 
 ```
@@ -84,12 +84,12 @@ GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別�
   cases/                         → ローカル Case ファイル（Issue / PR 相当の永続情報）
 ```
 
-- **link による接続**: command/skill を生成せず、`.opencode/` 配下を src 配下へ link で接続する（ADR-009 decision #1, #2, #3）
-- **agentdev-gh-cli の差し替え**: `agentdev-gh-cli` 以外は通常版と同じ `src/opencode/` 配下へ接続し、`agentdev-gh-cli` だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（ADR-009 decision #3）
-- **link target 確認**: link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認し、意図しない target の場合は link 設定を停止する（ADR-011-010, ADR-009 decision #6）
-- **リポジトリ管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` はリポジトリ管理対象外（ADR-011-008）
-- **リポジトリ管理対象**: `.agentdev/cases/` 配下のローカル Case ファイルは Issue/PR 相当の永続情報としてリポジトリ管理対象（ADR-011-016）
-- **更新方式**: unlink / relink により行う。`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す方式は採らない（ADR-011-033, ADR-009 decision #4）
+- **link による接続**: command/skill を生成せず、`.opencode/` 配下を src 配下へ link で接続する（v2:ADR-009 decision #1, #2, #3）
+- **agentdev-gh-cli の差し替え**: `agentdev-gh-cli` 以外は通常版と同じ `src/opencode/` 配下へ接続し、`agentdev-gh-cli` だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（v2:ADR-009 decision #3）
+- **link target 確認**: link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認し、意図しない target の場合は link 設定を停止する（v2:ADR-011-010, v2:ADR-009 decision #6）
+- **リポジトリ管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` はリポジトリ管理対象外（v2:ADR-011-008）
+- **リポジトリ管理対象**: `.agentdev/cases/` 配下のローカル Case ファイルは Issue/PR 相当の永続情報としてリポジトリ管理対象（v2:ADR-011-016）
+- **更新方式**: unlink / relink により行う。`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す方式は採らない（v2:ADR-011-033, v2:ADR-009 decision #4）
 - **判定基準**: `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合に consumer-generated と判定される（SPEC runtime-package-boundary.md）
 
 #### ローカル版セットアップ手順
@@ -122,10 +122,10 @@ cd .agentdev-plugin && git pull && cd ..
 | `.agentdev-plugin/` | 適用プロジェクトの clone 先 | `consumer-with-agentdev`, `consumer-generated` |
 
 **禁止事項**:
-- consumer-local での `agentdev` 名前空間の使用（ADR-011-056）
+- consumer-local での `agentdev` 名前空間の使用（v2:ADR-011-056）
 - consumer-with-agentdev での AgentDevFlow 提供ファイルの直接編集（上書きされる可能性）
 - `.agentdev-plugin/` を `.agentdev/` として使用すること（ドメイン状態と競合）
-- consumer-generated で link target が意図した src 配下以外へ解決される環境での link 設定実行（ADR-011-010, ADR-009 decision #6）
+- consumer-generated で link target が意図した src 配下以外へ解決される環境での link 設定実行（v2:ADR-011-010, v2:ADR-009 decision #6）
 
 `agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-001）。
 docs-check は `repo-agentdev-integrity`（配布対象外スキル）として AgentDevFlow 本体リポジトリでのみ実行される。
@@ -138,7 +138,7 @@ docs-check は `repo-agentdev-integrity`（配布対象外スキル）として 
 | ジャンクション + clone（`.agentdev-plugin/`） | ✅ | **推奨** | 更新が自動反映、原本が単一 |
 | 直接コピー | ⚠️ | 非推奨 | 手動更新が必要、乖離のリスク |
 | Git サブモジュール | ⚠️ | 検討可能 | 複雑性が増す |
-| プラグイン/npm/package | ❌ | 将来対応 | ADR-011-064 で将来の選択肢扱い |
+| プラグイン/npm/package | ❌ | 将来対応 | v2:ADR-011-064 で将来の選択肢扱い |
 
 ### ジャンクションと clone によるインストール（推奨）
 
@@ -177,7 +177,7 @@ cd .agentdev-plugin && git pull && cd ..
 | `scripts/sync-self-opencode.ps1` | `self-hosting` | `src/opencode/` ↔ `.opencode/` の同期 |
 | `scripts/install-consumer-opencode.ps1` | `consumer-with-agentdev` | `.agentdev-plugin/` clone + ジャンクション作成 |
 | `scripts/check-consumer-opencode.ps1` | `consumer-with-agentdev` | インストール状態の検証 |
-| （link 設定スクリプト: `-LocalMode`） | `consumer-generated` | `install-consumer-opencode.ps1 -Mode apply -LocalMode` が `agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/` へ接続し、それ以外を `src/opencode/` 配下へ接続する（ADR-011-032, ADR-009）。決定的な変換ロジックを実装したスクリプトは使用しない |
+| （link 設定スクリプト: `-LocalMode`） | `consumer-generated` | `install-consumer-opencode.ps1 -Mode apply -LocalMode` が `agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/` へ接続し、それ以外を `src/opencode/` 配下へ接続する（v2:ADR-011-032, v2:ADR-009）。決定的な変換ロジックを実装したスクリプトは使用しない |
 
 ### 本体リポジトリ（self-hosting）での同期
 
@@ -203,7 +203,7 @@ cd .agentdev-plugin && git pull && cd ..
 | ルール | 説明 |
 |------|------|
 | 名前空間の衝突回避 | `agentdev` および `agentdev-*` は使用不可 |
-| kebab-case | skill 名は小文字、数字、ハイフンのみ（ADR-011-011） |
+| kebab-case | skill 名は小文字、数字、ハイフンのみ（v2:ADR-011-011） |
 | 意味に基づく命名 | プロジェクト名やドメイン名をプレフィックスに含めることを推奨 |
 | 独自ディレクトリ | 独自 skill は `.opencode/skills/{project}-*/` に配置 |
 

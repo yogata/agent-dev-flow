@@ -44,7 +44,7 @@ export interface CheckResult {
   expected?: string;
   route?: FindingRoute;
   finding_level?: FindingLevel;
-  /** Type of artifact: "req", "adr", "skill", "command", "spec", "template", "guide", "docmap", "retired", "mapping-table" */
+  /** Type of artifact: "req", "adr", "skill", "command", "spec", "template", "guide", "docmap", "retired" */
   artifact_type?: string;
   finding_category?: FindingCategory;
 }
@@ -232,7 +232,6 @@ export function classifyFindingLevel(
     "broken-adr-ref",
     "active-retired-duplication",
     "retired-in-active-index",
-    "mapping-table-nonexistent",
     "implementation-pattern",
     "pattern-prohibitions",
     "command-map-consistency",
@@ -242,9 +241,6 @@ export function classifyFindingLevel(
     "fragment-patterns",
     "retired-frontmatter-filename",
     "retired-required-fields",
-    "mapping-table-completeness",
-    "mapping-table-migration-target",
-    "mapping-table-status-enum",
     "variant-path-existence",
     "variant-registry-registered",
     "skill-name-dir-match",
@@ -447,11 +443,6 @@ const CHECK_TO_FINDING_CATEGORY: Record<string, FindingCategory> = {
   "missing-load-skills": "workflow-gap",
   "use-for-consistency": "workflow-gap",
   "name-collision": "workflow-gap",
-  "mapping-table-nonexistent": "workflow-gap",
-  "mapping-table-completeness": "workflow-gap",
-  "mapping-table-migration-target": "workflow-gap",
-  "mapping-table-status-enum": "workflow-gap",
-  "mapping-table": "workflow-gap",
   "bare-slash-scoped": "workflow-gap",
   "ruid-ground-reference": "workflow-gap",
   "accepted-adr-only-citation": "workflow-gap",
@@ -473,7 +464,6 @@ function classifyArtifactType(category: string): string {
   if (lower.includes("docmap")) return "docmap";
   if (lower.includes("retired")) return "retired";
   if (lower.includes("report")) return "report"; // REQ-0108-188
-  if (lower.includes("mapping")) return "mapping-table";
   if (lower.includes("legacy") || lower.includes("namespace")) return "command";
   if (lower.includes("terminology")) return "command";
   return "unknown";

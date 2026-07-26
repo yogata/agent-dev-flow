@@ -51,7 +51,7 @@ check_changed_docs.ts の report JSON に含まれる全フィールドを列挙
 |---|---|---|
 | `workflow` | string | 実行された workflow profile 名 |
 | `files_checked` | string[] | 検査対象ファイル一覧 |
-| `coupled_files_checked` | string[] | 連動ファイル（README、DOC-MAP、mapping-table 等）一覧 |
+| `coupled_files_checked` | string[] | 連動ファイル（README、DOC-MAP 等）一覧 |
 | `failures` | Failure[] | 検出された違反一覧。各 failure は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ |
 | `warnings` | string[] | 警告一覧。`files_checked` 空の場合は理由（`--files` 指定の不備、PR 変更ファイル取得の失敗、検査対象パスの誤り等）の確認を促す内容を含む |
 | `doc_map_update_required` | boolean | DOC-MAP 更新要否 |

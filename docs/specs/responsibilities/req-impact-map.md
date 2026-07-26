@@ -32,7 +32,7 @@ updated: 2026-06-28
 | REQ-005 | Workflow/Command Protocol | IR-006, IR-024 | commands |
 | REQ-008 | RU lifecycle / Requirement Unit 管理 | IR-016 | ドメイン状態 |
 | REQ-006 | Case 実行オーケストレーション / Epic、Wave | IR-006, IR-013, IR-016 | commands, templates |
-| REQ-010 | REQ 再構成運用 | IR-004, IR-011, IR-015 | REQ, mapping-table, 廃止 REQ |
+| REQ-010 | REQ 再構成運用 | IR-004, IR-011, IR-015 | REQ, 廃止 REQ |
 | REQ-001 | ADR status 正規化 | IR-005, IR-010 | ADR, ADR index |
 | v2:REQ-0113 | Skill References SPEC 分離 | IR-008, IR-014 | skills, skill references |
 | REQ-006 | case-auto 最大自走モード | IR-006, IR-016 | commands |

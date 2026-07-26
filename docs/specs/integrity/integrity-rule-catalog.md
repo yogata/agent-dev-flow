@@ -66,7 +66,7 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-008: Skill references/ 存在](rules/IR-008-skill-references-existence.md)
 - [IR-009: 旧 namespace 残存](rules/IR-009-obsolete-namespace-residual.md)
 - [IR-010: ADR status 正規化](rules/IR-010-adr-status-normalization.md)
-- [IR-011: Mapping table 全件記録](rules/IR-011-mapping-table-full-coverage.md)
+- [IR-011: Mapping table 全件記録（廃止済み）](rules/IR-011-mapping-table-full-coverage.md)
 - [IR-012: Template 必須セクション](rules/IR-012-template-required-sections.md)
 - [IR-013: 完了報告種別実在](rules/IR-013-variant-path-existence.md)
 - [IR-014: reference/ 残存検出](rules/IR-014-singular-reference-dir-residual.md)

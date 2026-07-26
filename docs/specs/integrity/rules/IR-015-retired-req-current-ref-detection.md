@@ -15,7 +15,7 @@ status: accepted
 | related_req | [REQ-010-070-074, 136] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
-| false_positive_risk | 中。mapping-table 等の履歴参照は除外 |
+| false_positive_risk | 中 |
 | regression_test | commands_e2e.test.ts |
 | baseline_status | resolved |
 | finding_route | intake |
