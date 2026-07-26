@@ -18,7 +18,7 @@ DOC-MAP（文書探索入口：索引）
 
 ## REQ（要件定義）
 
-**格納先**: `docs/requirements/REQ-{NNNN}.md`
+**格納先**: `docs/requirements/REQ-{NNN}.md`
 
 要件定義の永続基準。
 システムが満たすべき要件を記述する。
