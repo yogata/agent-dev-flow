@@ -40,4 +40,4 @@ AgentDevFlow v3.0.0 は、過剰統制の削減、責務の限定と明確化、
 - 基準 commit: `v2.11.0` (`d1b4699c5fbc1b85f959e332d05e8b1ccec9c1cf`)
 - 移行ブランチ: `v3/rebuild`
 
-詳細は [ADR-001 v3 charter](docs/adr/ADR-001-v3-charter.md) を参照。
+詳細は [ADR-001](docs/adr/ADR-001.md) を参照。
