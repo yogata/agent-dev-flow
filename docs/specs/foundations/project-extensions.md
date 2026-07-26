@@ -2,12 +2,12 @@
 title: Project Extensions
 status: accepted
 created: 2026-07-04
-updated: 2026-07-18
+updated: 2026-07-27
 ---
 
 # Project Extensions
 
-実行時のプロジェクト固有追加・拡張機構としての project extensions を定義する（ADR-005: Project Extensions Architecture）。
+実行時のプロジェクト固有追加・拡張機構としての project extensions を定義する（ADR-006: inspect 3-command 構成への正規化、ADR-005 を supersede）。
 配布 command/skill 本文をプロジェクト非依存とし、プロジェクト固有の文脈、規約、検査、受け入れゲート、禁止事項を .agentdev/extensions/** 経由で追加・拡張する仕組みを規定する。
 従来の .agentdev/doc-inputs/**（参照リスト機構）に替わる設定層である。
 
@@ -62,7 +62,7 @@ command/skill は実行時に自分に対応する extension だけを読む。
 - 対応 extension が破損している場合はエラーを表示し、当該 extension を無視して標準動作で続行する。
 - extension は標準 command/skill の上書きではなく、追加・拡張としてのみ扱う。
 
-対応 extension が存在しない command/skill は正常動作であり、異常状態ではない。command が project 非依存で単体動作する正当な状態である。例として /agentdev/inspect-extensions は SPEC 直接参照を持たず project 非依存で動作するため extension 不要である。
+対応 extension が存在しない command/skill は正常動作であり、異常状態ではない。command が project 非依存で単体動作する正当な状態である。例として `/agentdev/inspect-skills` は SPEC 直接参照を持たず project 非依存で動作するため extension 不要である。
 
 ## project-local skill 委譲
 
@@ -99,24 +99,22 @@ REQ/ADR/SPEC 本文内の参照も許容する。
 
 ## 検査、診断
 
-/agentdev/inspect-extensions は読み取り専用診断コマンドとして以下を検査する。
+extension 検査は ADR-006（inspect 3-command 構成への正規化）に基づき、deterministic check、semantic diagnosis、finding disposition の3層へ分離される。各層は重複しない。
 
-1. .agentdev/extensions/** の一覧化
-2. extension YAML の構造確認
-3. kind と配置の整合確認
-4. id と対象 command/skill の対応確認
-5. context.paths の実在確認
-6. rules.skill / checks.skill に記述された project-local skill の存在確認
-7. 旧 .agentdev/doc-inputs/** の残存検出
-8. extension が標準 command/skill の上書きとして記述されていないことの確認
+| 層 | 正規所有者 | 検査内容 |
+|---|---|---|
+| deterministic check | IR-056 / `/repo/docs-check`（self-hosting）、`/agentdev/case-run`・`/agentdev/case-close` の changed-path routing（consumer） | extension 一覧化、YAML 構文、必須セクションと field、kind と配置、ID と対象 command/skill の対応、context path 実在、委譲先 skill 実在、旧 `.agentdev/doc-inputs/**` 残存 |
+| semantic diagnosis | `/agentdev/inspect-skills` | extension 責務境界、標準 command/skill を上書きする意図の意味診断 |
+| finding disposition | `/agentdev/inspect-promote` | finding の promote、defer、reject |
 
 AgentDevFlow 標準の inspect 責務は上記構造確認・path 実在確認・skill 存在確認までとする。
 command/skill 本文の ADR/REQ/SPEC 具体参照禁止の持続的検査は、各適用プロジェクトが project-local skill により実装する（AgentDevFlow 標準の対象外）。
 agent-dev-flow リポジトリ自身は適用プロジェクトの1つとして repo-local skill により検査を実装するが、これは標準仕様ではなくローカル運用である。
+`/agentdev/inspect-docs` へ extension の意味診断を追加しない（三層非重複）。
 
 ## ハイブリッド方式
 
-extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は初期テンプレート、schema、検査、/agentdev/inspect-extensions コマンドを提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。AgentDevFlow 本体リポジトリの .agentdev/extensions/** には本体固有 SPEC パスを記述してよい。
+extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は初期テンプレート、schema、検査（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層）を提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。AgentDevFlow 本体リポジトリの .agentdev/extensions/** には本体固有 SPEC パスを記述してよい。
 
 ## 配布物参照境界の責務分担
 
@@ -125,6 +123,6 @@ extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は
 配布物参照境界の検出結果はgeneric表記への是正とextensionによるtraceability補完へ接続する。
 ## 関連
 
-- ADR-005: Project Extensions Architecture
+- ADR-006: inspect 3-command 構成への正規化（ADR-005 を supersede、extension 検査の3層責務分離を確定）
 - REQ-001: 実行時独立性（本 SPEC は具体化機構を提供）
 
