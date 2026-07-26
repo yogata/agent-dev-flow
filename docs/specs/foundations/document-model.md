@@ -1,6 +1,8 @@
 ---
 status: accepted
-updated: 2026-07-26
+spec_logical_division: cross_cutting_contract
+canonical_owner: document-model
+updated: 2026-07-27
 ---
 
 # 文書モデル
@@ -277,6 +279,26 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 
 - 承認済み ADR の決定内容を意味変更してはならない（REQ-001-045）。変更が必要な場合は新規 ADR を作成し、旧 ADR を superseded/deprecated とする
 - ADR 体系の全面改定時は例外として、ユーザー承認済みの範囲で deprecated/superseded ADR の最小限を超える編集を許可する（REQ-001-044）。ただし、編集目的、対象、変更種別、移管先、現行根拠として残す ADR を明示すること
+
+## accepted ADR の意味的不変
+
+accepted ADR は意味的に不変とする（REQ-001）。
+詳細プロトコルは agentdev-adr-guidelines「accepted ADR の更新規則」、agentdev-adr-file-manager「accepted ADR 直接編集チェックリスト」を参照。
+
+### 原則
+
+- accepted ADR を意味的に不変とする
+- 直接更新可能な非意味修正は6件、後継 ADR を必要とする意味変更は6件
+- 直接更新前に明示承認記録が存在する
+- accepted ADR の過去版を無言で書き換えない
+- 意味変更を表記修正として扱わない
+- Report へ規範要件または必達条件を移さない
+
+### 正規所有
+
+- 意味不変原則: REQ-001（核心契約）、agentdev-adr-guidelines SPEC（詳細プロトコル）
+- 直接編集チェックリスト: agentdev-adr-file-manager SPEC
+- accepted ADR の扱い: 本節（document-model.md）
 
 ## 文書分類ポリシー
 

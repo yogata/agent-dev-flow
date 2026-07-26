@@ -1,8 +1,10 @@
 ---
 title: `agentdev-adr-file-manager` SPEC
 status: accepted
+spec_logical_division: cross_cutting_contract
+canonical_owner: agentdev-adr-file-manager
 created: 2026-06-21
-updated: 2026-07-26
+updated: 2026-07-27
 ---
 
 # `agentdev-adr-file-manager` SPEC
@@ -49,6 +51,35 @@ ADR ファイルの作成、追記、更新を管理する知識ベースとし�
 - ID とファイル名の一致
 - 日付フォーマットの正当性
 - ステータス遷移が許容遷移に従っているか
+
+## accepted ADR 直接編集チェックリスト
+
+accepted ADR へ直接編集を実施する場合、次のチェックリストを全て満たすことを確認する（REQ-001、agentdev-adr-guidelines「accepted ADR の更新規則」準拠）。
+
+### 事前確認
+
+- [ ] 対象 ADR の status が `accepted` である
+- [ ] 当該編集が非意味修正6件のいずれかに該当する
+- [ ] 当該編集が意味変更6件のいずれにも該当しない
+- [ ] 明示承認記録が存在する
+
+### 事後確認
+
+- [ ] 決定内容、適用範囲、必須条件、制約、正規所有者、採用方式、観測可能結果が変更されていない
+- [ ] 意味変更を表記修正として扱っていない
+- [ ] accepted ADR の過去版を無言で書き換えていない
+- [ ] Report（Release Report 等）へ規範要件または必達条件を移していない
+
+### 非意味修正6件の確認
+
+編集内容が次のいずれかに該当することを確認する。
+
+1. 誤字または文字化けの修正
+2. 壊れたリンクまたは誤ったファイルパスの修正
+3. タイトルと本文の不一致修正
+4. 意味を変えない表記統一
+5. 決定内容でも制約でもない移行時ラベルの除去
+6. 履歴注記、関連リンク、日付などの補助情報修正
 
 ## See Also
 
