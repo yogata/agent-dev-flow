@@ -118,12 +118,12 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-spec-file-manager.md | 88 | draft | skills |
 | integrity/references/targeted-docs-guard-implementation-details.md | 87 | - | integrity |
 | commands/inspect-docs.md | 85 | accepted | commands |
+| commands/inspect-extensions.md | 84 | superseded | commands |
 | skills/agentdev-doc-diagnostics.md | 83 | draft | skills |
 | skills/agentdev-adr-file-manager.md | 82 | accepted | skills |
 | skills/agentdev-artifact-validation.md | 81 | draft | skills |
 | integrity/rule-ownership.md | 78 | accepted | integrity |
 | commands/inspect-promote.md | 77 | accepted | commands |
-| commands/inspect-extensions.md | 75 | accepted | commands |
 | commands/inspect-skills.md | 75 | accepted | commands |
 | skills/agentdev-skill-authoring.md | 74 | accepted | skills |
 | commands/intake-from-github.md | 70 | accepted | commands |

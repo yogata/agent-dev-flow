@@ -1,11 +1,21 @@
 ---
 title: inspect-extensions command SPEC
-status: accepted
+status: superseded
+superseded_by: ADR-006
 created: 2026-07-04
-updated: 2026-07-18
+updated: 2026-07-27
 ---
 
 # inspect-extensions command SPEC
+
+> **Retire notice**: 本 SPEC は [ADR-006](../../adr/ADR-006.md)（inspect 3-command 構成への正規化）により superseded となった。
+> inspect-extensions command は独立公開 command として廃止され、extension 検査責務は次の3層へ移管済みである。
+>
+> - deterministic check（YAML 構文、必須 field、配置規則等）: `/repo/docs-check`（IR-056 と self-hosting full audit、[IR-056 起動契約](../integrity/rules/IR-056-project-extensions-integrity.md) 参照）
+> - semantic diagnosis（extension 責務境界、上書き意図の意味診断）: `/agentdev/inspect-skills`
+> - finding disposition（promote、defer、reject）: `/agentdev/inspect-promote`
+>
+> 後継契約の詳細は ADR-006 と IR-056 SPEC を参照。本文書は歴史的参照として残置する（status: superseded に伴い通常内容検査の対象外）。
 
 ## 目的
 
