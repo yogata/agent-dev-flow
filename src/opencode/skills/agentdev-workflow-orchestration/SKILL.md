@@ -28,7 +28,9 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 case-run は単一 Issue または単一 Wave（`#epic` 指定時: 現在 ready な Wave の子Issue を 実行担当サブエージェント（adapter skill 経由、委譲 prompt 内で実行 command を指定）に並列委譲、最大5件）を処理し、Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
 Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の反復制御を担い、Wave 内の子Issue 選択、並列委譲は case-run(#epic) が、Wave 境界クローズ、Epic Issue 本文ステータス追跡テーブル更新は case-close(#epic) が担う（単一書き手: ADR、epic-wave-model SPEC、ADR）。
 
-### フェーズ構成
+### case-run internal lifecycle フェーズ構成
+
+case-run は orchestration stage（case-auto が管理する command 間進行、REQ-006 / case-auto 所有）と区別し、単一 Issue または Wave 内の case-run internal lifecycle（REQ-006 / case-run 所有）として次のフェーズを管理する。本節のフェーズは case-run internal lifecycle に属し、orchestration stage とは混同しない（`docs/specs/responsibilities/responsibility-boundary-purification.md`「case 実行責務の 4 用語と所有者」参照）。
 
 | フェーズ | Steps | 再開条件 |
 |----------|-------|----------|

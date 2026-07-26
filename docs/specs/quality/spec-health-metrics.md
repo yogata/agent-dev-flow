@@ -103,7 +103,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | quality/req-health-metrics.md | 127 | accepted | quality |
 | commands/req-save.md | 125 | accepted | commands |
 | foundations/project-extensions.md | 125 | accepted | foundations |
-| foundations/harness-separation-model.md | 122 | accepted | foundations |
+| foundations/harness-separation-model.md | 124 | accepted | foundations |
 | integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md | 118 | accepted | integrity |
 | authoring/command-file-format.md | 115 | accepted | authoring |
 | responsibilities/req-impact-map.md | 115 | accepted | responsibilities |
