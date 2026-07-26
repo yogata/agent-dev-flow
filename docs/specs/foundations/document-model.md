@@ -247,8 +247,13 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 
 ### draft の位置づけ（REQ-008, ADR-003）
 
-`.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成し req-save / spec-save / case-open / case-auto / case-run / case-close が消費する一時的な構造化ハンドオフ成果物である。永久文書（REQ/ADR/SPEC/guides/DOC-MAP）ではなく、以下の性質を持つ:
+`.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成する一時的な構造化ハンドオフ成果物である。consumer 境界は producer、direct consumer、orchestration pre-reader、invalid post-case reader の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）。4 集合の正規定義は `docs/specs/responsibilities/artifact-contracts.md`「req_draft consumer 4 集合」節を SSoT とし、本節は同じ 4 集合を抽出元として一致させる。永久文書（REQ/ADR/SPEC/guides/DOC-MAP）ではなく、以下の性質を持つ:
 
+- **consumer 4 集合**: req_draft の consumer 境界は次の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）
+  - producer: `{req-define}` — req_draft を生成する唯一の command
+  - direct consumer: `{req-save, spec-save, case-open}` — req_draft を主入力として消費し、REQ/ADR/SPEC/Issue を生成する command 群。draft type registry の allowed consumers 列と同一
+  - orchestration pre-reader: `{case-auto}` — case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command
+  - invalid post-case reader: `{case-auto, case-run, case-close}` — case-open 成功後に req_draft を参照してはならない command 群。case-open 成功後は Issue と Epic を SSoT として単独成立する
 - **緩やかな契約（soft contract）**: API 契約ではなく生成側（producer）の標準。LLM 推論経由で消費され、機械的パースを前提としない（ADR-003）。厳格なスキーマバージョン、JSON Schema、バリデータは導入しない
 - **構造化データが正**: 後続工程の権威ある情報源は `# draft-data` fenced YAML block であり、人間可読 Markdown セクション（`# summary` 等）は補助的である（REQ-008-001, REQ-008-002）
 - **一時成果物**: case-open 成功後（Issue/Epic 作成 + VERIFY）は削除されてよい。case-open 成功後は Issue/Epic を SSoT とし、req_draft は存在しない一時成果物となる（REQ-008-015, REQ-008-016）

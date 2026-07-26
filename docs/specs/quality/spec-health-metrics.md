@@ -73,7 +73,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 <!-- AUTOGEN:BEGIN:id=spec-metrics-measurement-example -->
 | SPEC | SPEC 行数 | status | ドメイン分類 |
 |---|---|---|---|
-| foundations/document-model.md | 628 | accepted | foundations |
+| foundations/document-model.md | 633 | accepted | foundations |
 | responsibilities/artifact-contracts.md | 447 | accepted | responsibilities |
 | integrity/integrity-contracts.md | 361 | accepted | integrity |
 | responsibilities/document-type-responsibilities.md | 349 | accepted | responsibilities |
