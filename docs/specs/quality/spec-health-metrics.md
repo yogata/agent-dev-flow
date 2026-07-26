@@ -73,7 +73,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 <!-- AUTOGEN:BEGIN:id=spec-metrics-measurement-example -->
 | SPEC | SPEC 行数 | status | ドメイン分類 |
 |---|---|---|---|
-| foundations/document-model.md | 547 | accepted | foundations |
+| foundations/document-model.md | 567 | accepted | foundations |
 | responsibilities/artifact-contracts.md | 427 | accepted | responsibilities |
 | commands/req-define.md | 330 | accepted | commands |
 | responsibilities/document-type-responsibilities.md | 326 | accepted | responsibilities |
@@ -114,10 +114,12 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | workflows/capture-boundaries.md | 104 | accepted | workflows |
 | foundations/system.md | 99 | accepted | foundations |
 | responsibilities/responsibility-boundary-purification.md | 96 | accepted | responsibilities |
+| skills/agentdev-adr-guidelines.md | 96 | accepted | skills |
 | skills/agentdev-spec-file-manager.md | 88 | draft | skills |
 | integrity/references/targeted-docs-guard-implementation-details.md | 87 | - | integrity |
 | commands/inspect-docs.md | 85 | accepted | commands |
 | skills/agentdev-doc-diagnostics.md | 83 | draft | skills |
+| skills/agentdev-adr-file-manager.md | 82 | accepted | skills |
 | skills/agentdev-artifact-validation.md | 81 | draft | skills |
 | integrity/rule-ownership.md | 78 | accepted | integrity |
 | commands/inspect-promote.md | 77 | accepted | commands |
@@ -153,8 +155,6 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-learning-pipeline.md | 54 | accepted | skills |
 | skills/agentdev-req-structure-diagnostics.md | 54 | accepted | skills |
 | integrity/backticks-identifier-threshold.md | 53 | accepted | integrity |
-| skills/agentdev-adr-file-manager.md | 53 | accepted | skills |
-| skills/agentdev-adr-guidelines.md | 53 | accepted | skills |
 | skills/agentdev-workflow-routing.md | 52 | accepted | skills |
 | skills/agentdev-architecture-advisory.md | 51 | accepted | skills |
 | skills/agentdev-conventional-commits.md | 51 | accepted | skills |
@@ -219,7 +219,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-053-gh-direct-invocation-detection.md | 21 | accepted | integrity |
 | integrity/references/validator-internal-config.md | 20 | - | integrity |
 
-計測日: 2026-07-26。
+計測日: 2026-07-27。
 <!-- AUTOGEN:END -->
 
 SPEC 行数は frontmatter、HTML コメントを除く本文行数。
