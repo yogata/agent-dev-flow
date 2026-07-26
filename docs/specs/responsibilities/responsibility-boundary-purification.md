@@ -2,7 +2,9 @@
 title: 責務境界浄化: 所有/非所有リスト詳細
 status: accepted
 created: 2026-07-14
-updated: 2026-07-24
+updated: 2026-07-27
+spec_logical_division: cross_cutting_contract
+canonical_owner: responsibility-boundary-purification
 ---
 
 # 責務境界浄化: 所有/非所有リスト詳細
@@ -58,6 +60,38 @@ AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象�
 ### タイムスタンプ境界
 **ADF可観測（所有）**: case-auto全体開始終了停止、構成工程開始終了所要、case-run worktree準備実行依頼結果受領後処理、結果状態確定時刻、停止時点工程別経過
 **ADF非管理**: harness内部timeout、サブエージェント内部フェーズ、推論時間、queue待機、retry単位、context圧縮時間、監視間隔
+
+## case 実行責務の 4 用語と所有者
+
+case 実行に関わる責務を 4 用語へ分解し、正規所有者を固定する（REQ-006、REQ-011）。
+修飾なしの Phase を永続文書と配布物の規範記述から除去し、次の 4 用語へ置き換える。
+
+| 用語 | 定義 | 正規所有者 |
+|---|---|---|
+| orchestration stage | case-auto が管理する command 間進行 | REQ-006 / case-auto |
+| case-run internal lifecycle | 単一 Issue または Wave 内の準備、実行、提出 | REQ-006 / case-run |
+| harness execution mechanism | agent 起動、background task、並列実行、context 管理 | harness 責務（ADF 規範所有対象外） |
+| external execution boundary | REQ-011 が所有する外部バックエンド接続 | REQ-011 |
+
+### 責務分離原則
+
+- case-auto は orchestration stage のみを所有し、case-run internal lifecycle を複製しない
+- case-run は case-run internal lifecycle を所有し、orchestration stage を複製しない
+- harness execution mechanism は ADF 配布物から抽象化し、references/へ集約する（foundations/references/concrete-abstraction.md 参照）
+- external execution boundary は REQ-011 へ一意に解決し、case-auto と case-run から委譲可能とする
+
+### 修飾なし Phase の除去
+
+- 永続文書（REQ、ADR、SPEC、guide）の規範記述で修飾なしの「Phase」を使用しない
+- 「Phase」は orchestration stage、case-run internal lifecycle など修飾付きの用語へ置き換える
+- 既存の「Phase 1 case-open 順次、Phase 2 case-run 並列、Phase 3 case-close 順次」は「orchestration stage 1 case-open 順次、stage 2 case-run 並列、stage 3 case-close 順次」へ置き換える
+
+### 関連 SPEC（参照レベル、別途 spec-save 対象）
+
+- `workflows/delegation-contracts.md`: 委譲契約で 4 用語を使用
+- `foundations/harness-separation-model.md`: harness execution mechanism の ADF 規範所有対象外を明記
+- `skills/agentdev-workflow-orchestration.md`: orchestration stage と case-run internal lifecycle の区別を使用
+- `skills/agentdev-case-run-execution-adapter.md`: external execution boundary への委譲契約を使用
 
 ## 横断的再評価基準
 
