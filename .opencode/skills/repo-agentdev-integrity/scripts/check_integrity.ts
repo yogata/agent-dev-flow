@@ -70,6 +70,11 @@ import {
   isFileLevelHistoryExempt,
   hasLineLevelHistoryMarker,
 } from "./ir057_history_exemption.ts";
+import {
+  extractCurrentAdrReadmeInventory,
+  extractCurrentAdrRefs,
+  extractCurrentReqRefs,
+} from "./current_refs.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
@@ -556,8 +561,7 @@ function checkAdrReqCrossReference(
     const content = readText(fullPath);
     if (!content) continue;
     const relPath = resolveRelative(fullPath, root);
-    const references = content.match(/\bADR-\d{3,4}\b/g) || [];
-    const uniqueRefs = [...new Set(references)];
+    const uniqueRefs = extractCurrentAdrRefs(content);
     for (const ref of uniqueRefs) {
       // v2:REQ-0161-004: skip deletion self-references (REQ describes its own
       // deletion targets; see DELETION_SELF_REFERENCE_EXCLUSIONS).
@@ -578,8 +582,7 @@ function checkAdrReqCrossReference(
     const fullPath = path.join(adrDir, file);
     const content = readText(fullPath);
     if (!content) continue;
-    const references = content.match(/\bREQ-\d{3,4}\b/g) || [];
-    const uniqueRefs = [...new Set(references)];
+    const uniqueRefs = extractCurrentReqRefs(content);
     for (const ref of uniqueRefs) {
       // v2:REQ-0108-074: active or retired existence check
       if (!allReqIds.has(ref)) {
@@ -1608,8 +1611,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
     // v2:REQ-0108-194: Suppress false positives for template placeholders
     const isTemplateLike = /\{[a-zA-Z_]+\}/.test(content) || content.includes("🔄") || content.includes("✅") || content.includes("☐");
     const isReqRangeContext = isRangeExpression(content);
-    const reqRefs = content.match(/\bREQ-\d{3,4}\b/g) || [];
-    const uniqueReqRefs = [...new Set(reqRefs)];
+    const uniqueReqRefs = extractCurrentReqRefs(content);
     for (const ref of uniqueReqRefs) {
       // v2:REQ-0108-194: Skip template-like content with placeholders or workflow markers
       if (isTemplateLike) break;
@@ -1644,8 +1646,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
       }
     }
 
-    const adrRefs = content.match(/\bADR-\d{3,4}\b/g) || [];
-    const uniqueAdrRefs = [...new Set(adrRefs)];
+    const uniqueAdrRefs = extractCurrentAdrRefs(content);
     for (const ref of uniqueAdrRefs) {
       // v2:REQ-0108-194: Skip template-like content with placeholders or workflow markers
       if (isTemplateLike) break;
@@ -2224,8 +2225,7 @@ function checkDocMapReqSync(root: string): CheckResult[] {
   const reqIds = new Set(reqFiles.map((f) => f.replace(".md", "")));
 
   // Check REQ references in DOC-MAP
-  const docMapReqRefs = docMapContent.match(/\bREQ-\d{3,4}\b/g) || [];
-  const uniqueRefs = [...new Set(docMapReqRefs)];
+  const uniqueRefs = extractCurrentReqRefs(docMapContent);
 
   for (const ref of uniqueRefs) {
     if (!reqIds.has(ref)) {
@@ -2383,13 +2383,7 @@ function checkAdrReadmeIndexSync(adrDir: string, root: string): CheckResult[] {
     return results;
   }
 
-  const indexedIds = new Set<string>();
-  const readmeLines = readmeContent.split("\n");
-  for (let i = 0; i < readmeLines.length; i++) {
-    if (isRetiredSectionInLines(readmeLines, i)) continue;
-    const match = readmeLines[i].match(/\b(ADR-\d{4})\b/);
-    if (match) indexedIds.add(match[1]);
-  }
+  const indexedIds = extractCurrentAdrReadmeInventory(readmeContent);
 
   const missingFromIndex = [...adrIds].filter((id) => !indexedIds.has(id));
   const phantomEntries = [...indexedIds].filter((id) => !adrIds.has(id));
@@ -4428,8 +4422,7 @@ function checkNonAcceptedAdrRefsInFile(
     }
   }
 
-  const adrRefs = content.match(/\bADR-\d{3,4}\b/g) || [];
-  const uniqueRefs = [...new Set(adrRefs)].filter(
+  const uniqueRefs = extractCurrentAdrRefs(content).filter(
     (ref) => !exemptedRefs.has(ref),
   );
 
@@ -7728,13 +7721,13 @@ function isIr057ExemptPath(relPath: string): boolean {
   // - v2:REQ-0158 (IR-057 の要件元。vocabulary を列挙)
   // - v2:REQ-0141 (link mode 移行に伴う廃止語彙を規定)
   // - local-generation.md (link mode 移行と廃止経緯を記載)
-  // - IR-048 (generated_by 識別子整合性ルール)
+  // - IR-046/IR-048 (generated_by 識別子の検出・整合性ルール)
   // v2: stale — file deleted in Stage 4
   if (/docs\/requirements\/REQ-0158\.md$/.test(relPath)) return true;
   // v2: stale — file deleted in Stage 4
   if (/docs\/requirements\/REQ-0141\.md$/.test(relPath)) return true;
   if (/docs\/specs\/local\/local-generation\.md$/.test(relPath)) return true;
-  if (/docs\/specs\/integrity\/rules\/IR-048-generated-by-identifier-integrity\.md$/.test(relPath)) return true;
+  if (/docs\/specs\/integrity\/rules\/IR-0(46-consumer-generated-repo-type-fp-prevention|48-generated-by-identifier-integrity)\.md$/.test(relPath)) return true;
   return false;
 }
 

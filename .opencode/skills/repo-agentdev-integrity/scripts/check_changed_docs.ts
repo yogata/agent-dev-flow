@@ -467,7 +467,7 @@ function checkLegacyVocab(
     if (/docs\/specs\/integrity\/integrity-rule-catalog\.md$/.test(rel)) continue;
     if (/docs\/specs\/integrity\/rule-ownership\.md$/.test(rel)) continue;
     if (/docs\/specs\/integrity\/rules\/IR-057-/.test(rel)) continue;
-    if (/docs\/specs\/integrity\/rules\/IR-048-/.test(rel)) continue;
+    if (/docs\/specs\/integrity\/rules\/IR-0(46|48)-/.test(rel)) continue;
     if (/docs\/specs\/integrity\/obsolete-path-map\.yaml$/.test(rel)) continue;
     if (/vocabulary-registry\.md$/.test(rel)) continue;
     if (/docs\/guides\/glossary\.md$/.test(rel)) continue;
