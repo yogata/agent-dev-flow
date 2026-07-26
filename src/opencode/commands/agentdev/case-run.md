@@ -167,7 +167,7 @@ Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情�
 - 外部実行ハーネスの plan artifact 等の中間成果物の内部構造に依存した処理、検証を行わない。最終結果は PR URL で受領する
 - 実行担当サブエージェントが Issue 完了条件チェックボックスを更新しない（case-close QG-4 の責務）
 - Findings/ Capture 候補は実行担当サブエージェントが PR 本文の `## Findings / Capture候補` に記録する
-- **外部実行手段の中間成果物**: 外部実行手段の plan artifact 等の中間成果物を AgentDevFlow の永続成果物（draft/Issue/PR/REQ/ADR/SPEC）として扱わない
+- **外部実行手段の中間成果物**: 外部実行手段の plan artifact 等の中間成果物を AgentDevFlow の永続成果物（Issue/PR/REQ/ADR/SPEC）として扱わない。draft は一時成果物であり（REQ-008-001）、case-open 成功後は invalid post-case reader として参照しない（REQ-008-036）
 - **SPEC確定候補**: 実装時に発見された SPEC レベルの詳細（SPEC に記載すべき schema、enum、判定表、内部アルゴリズム等、実装で判明した仕様詳細）は、実行担当サブエージェントが PR 本文の `## SPEC確定候補` セクションに記録する。`## Findings / Capture候補`（本筋外発見、intake/learning 候補）とは別セクションとし、混在させない。SPEC確定候補は case-close Step 3 で SPEC 確定チェックの入力となり、draft → accepted 昇格または spec-save 再起動の判断材料となる
 
 ### Step 7: 実行担当サブエージェント result 処理
