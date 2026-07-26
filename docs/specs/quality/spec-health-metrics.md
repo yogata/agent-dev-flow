@@ -89,9 +89,9 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/integrity-rule-catalog.md | 241 | accepted | integrity |
 | local/local-case-file.md | 240 | accepted | local |
 | workflows/workflow-contracts.md | 214 | accepted | workflows |
+| workflows/delegation-contracts.md | 210 | accepted | workflows |
 | skills/agentdev-gh-cli.md | 192 | accepted | skills |
 | quality/quality-gates.md | 186 | accepted | quality |
-| workflows/delegation-contracts.md | 185 | accepted | workflows |
 | commands/spec-save.md | 180 | accepted | commands |
 | foundations/design-principles.md | 158 | accepted | foundations |
 | integrity/index-auto-generation.md | 156 | accepted | integrity |
