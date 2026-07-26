@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-25
+updated: 2026-07-26
 ---
 
 # 実行時パッケージ境界
@@ -26,7 +26,7 @@ AgentDevFlow の実行時パッケージ境界を定義し、本体リポジト�
 
 `consumer-generated` はローカル版 OpenCode を link mode で導入する利用側リポジトリである（REQ-009, REQ-009, REQ-009）。
 `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（`agentdev-gh-cli` 以外）を `src/opencode/` 配下へ接続し、`.opencode/skills/agentdev-gh-cli/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続する。
-詳細は [ローカル版 OpenCode 生成](local-generation.md) を参照。
+詳細は本 SPEC の「link mode 接続手順技術詳細」を参照。
 
 ### リポジトリ種別判定基準
 
@@ -309,7 +309,6 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 
 - [Consumer Project Setup Guide](../../guides/consumer-project-setup.md)（Consumer 向け導入手順）
 - [Artifact Contracts](../responsibilities/artifact-contracts.md)（Command/Skill/Template/Script の責務境界）
-- [ローカル版 OpenCode 生成](local-generation.md)（`consumer-generated` リポジトリ種別の link mode 接続フロー、link target 確認）
 - [ローカル Case ファイル](local-case-file.md)（`consumer-generated` リポジトリ種別の Case ファイルスキーマ）
 - [整合性ルールカタログ](../integrity/integrity-rule-catalog.md)（IR-058 distribution-untracked-skill-reference）
 - REQ-002-061~065（リポジトリ種別 / `.opencode/` 意味 / 命名 / 導入 / 同期範囲の要件定義）
