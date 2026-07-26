@@ -92,7 +92,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | [commands/inspect-docs.md](commands/inspect-docs.md) | accepted | `/agentdev/inspect-docs` |
 | [commands/inspect-skills.md](commands/inspect-skills.md) | accepted | `/agentdev/inspect-skills` |
 | [commands/inspect-promote.md](commands/inspect-promote.md) | accepted | `/agentdev/inspect-promote` |
-| [commands/inspect-extensions.md](commands/inspect-extensions.md) | accepted | `/agentdev/inspect-extensions`（project extensions 機構の整合性診断、読み取り専用。旧 inspect-doc-inputs から統合・改名） |
+| [commands/inspect-extensions.md](commands/inspect-extensions.md) | superseded | `/agentdev/inspect-extensions`（ADR-006 により廃止。extension 検査は docs-check / inspect-skills / inspect-promote の3層責務分離へ移管） |
 
 `/repo/docs-check` は repo-local、配布対象外のため対象外。
 

@@ -35,7 +35,6 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | docs 全体の意味整合性を検出したい | `/agentdev/inspect-docs` | 検出事項（finding） |
 | Command/Skill 参照妥当性を検出したい | `/agentdev/inspect-skills` | 検出事項（finding） |
-| project extensions 機構の整合性を検出したい | `/agentdev/inspect-extensions` | 検出事項（finding） |
 | 検出事項を分類したい | `/agentdev/inspect-promote` | 採用済み成果物 |
 | ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート（自己ホストリポジトリ専用） |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |

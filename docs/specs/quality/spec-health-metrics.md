@@ -113,7 +113,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/intake-promote.md | 107 | accepted | commands |
 | integrity/rules/IR-044-req-spec-boundary-violation-detection.md | 105 | accepted | integrity |
 | workflows/capture-boundaries.md | 104 | accepted | workflows |
-| foundations/system.md | 99 | accepted | foundations |
+| foundations/system.md | 98 | accepted | foundations |
 | skills/agentdev-adr-guidelines.md | 96 | accepted | skills |
 | skills/agentdev-spec-file-manager.md | 88 | draft | skills |
 | integrity/references/targeted-docs-guard-implementation-details.md | 87 | - | integrity |
