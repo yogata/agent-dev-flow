@@ -448,3 +448,69 @@ req_draft の frontmatter は最小限のメタデータのみとする。
 
 - 最小 frontmatter fields: `draft_type`, `topic_slug`, `status`, `created_at`、optional で `source_rus`
 - frontmatter は lightweight metadata のみ。後続工程の主入力は `# draft-data` fenced YAML であり、frontmatter ではない
+
+## RU アーティファクト契約（session由来RU）
+
+session由来RU（`source_type: chat`、`generated_by: session`）の生成、承認、保存、永続化の追跡可能な二段階手続きを定義する。本節は REQ-008 に基づき session 経路に不足する契約を追加し、既存の `source_type: chat` と7値の `tentative_classification` を維持する。
+
+### 生成主体と生成時点
+
+- 生成主体: `req-define` 親エージェント（`generation_actor: req-define-parent`）
+- 生成時点: チャット内合意成立後、req-define 開始前（`generation_stage: pre-req-define`）
+- `agreement_confirmed_at` と `generated_at` は ISO 8601 形式とし、`generated_at >= agreement_confirmed_at` を満たすこと
+- 保存完了前に req-define を開始しないこと
+
+### 二段階承認
+
+- 第1承認: 論理キー（`logical_key`）で特定したRU案の内容のみを対象とする。採番、保存、commit、push を行わない
+- 第2承認: 採番、保存、commit、push を許可する。第1承認のみではファイル作成、commit、push を行わない
+- 第1承認記録は対象RUの `logical_key` を列挙する
+
+### 保存先と永続ID
+
+- 保存先: `.agentdev/backlog/req-units/`
+- 永続ID: 保存時に既存最大番号+1で割り当て（RU-NNNN 形式）
+- 保存後の `depends_on` は RU-ID で記録する
+
+### session 論理URI
+
+- `sources[].type: chat` の場合だけ、`sources[].path` へ `session:...` を解決しない論理URIとして許可する
+- `type: chat` 以外の source で `session:...` を使用しない
+- `session:...` をファイル取得、URL取得、外部セッション取得の解決処理へ渡さない
+
+### frontmatter 必須フィールド
+
+session由来RU の frontmatter は次を必須とする。
+
+| field | 値 |
+|---|---|
+| `source_type` | `chat` |
+| `generated_by` | `session` |
+| `generation_actor` | `req-define-parent` |
+| `agreement_confirmed_at` | ISO 8601 形式の合意成立時刻 |
+| `generation_stage` | `pre-req-define` |
+| `generated_at` | ISO 8601 形式の生成時刻（`>= agreement_confirmed_at`） |
+| `logical_key` | RU を一意に特定する論理キー |
+| `tentative_classification` | 既存7値のいずれか（欠落時は生成停止） |
+| `agentdev_handoff` | 配布物改善の場合 `true` |
+| `depends_on` | 依存先 RU-ID のリスト（保存後） |
+| `sources` | `type: chat`、`path: session:...` 形式 |
+| `status` | `draft` |
+
+### RU 本文必須8セクション
+
+各RU本文は次の8セクションを必須とする。session 論理URI の解決なしに後工程が RU 内容を判断できる自足性を保つこと。
+
+1. 目的
+2. 対象
+3. 対象外
+4. 正規所有者とアンカー
+5. 依存関係
+6. 要件化の方向
+7. 決定的受け入れ条件
+8. Source Summary
+
+### req-define による最終分類の扱い
+
+`tentative_classification` は暫定値であり、req-define による最終分類を先取りしない。
+req-define は `tentative_classification` を入力とし、document-model SPEC の文書7分類モデルへ照らして最終分類を確定する。
