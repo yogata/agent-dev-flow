@@ -132,6 +132,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | [skills/agentdev-skill-authoring.md](skills/agentdev-skill-authoring.md) | accepted | 補助 | skill authoring |
 | [skills/agentdev-backlog-integration.md](skills/agentdev-backlog-integration.md) | accepted | 補助 | backlog integration |
 | [skills/agentdev-project-extensions.md](skills/agentdev-project-extensions.md) | accepted | 補助 | project extensions 読み込み |
+| [skills/agentdev-deep-review.md](skills/agentdev-deep-review.md) | draft | 補助 | 敵対的審議型レビュー（Deep Review）の振る舞い契約 |
 
 `repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
 

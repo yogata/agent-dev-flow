@@ -85,7 +85,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/case-run.md | 261 | accepted | commands |
 | commands/case-open.md | 254 | accepted | commands |
 | commands/case-close.md | 244 | accepted | commands |
-| README.md | 241 | - | uncategorized |
+| README.md | 242 | - | uncategorized |
 | integrity/integrity-rule-catalog.md | 241 | accepted | integrity |
 | local/local-case-file.md | 240 | accepted | local |
 | workflows/workflow-contracts.md | 214 | accepted | workflows |
@@ -129,6 +129,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/intake-from-github.md | 70 | accepted | commands |
 | integrity/rules/IR-054-draft-spec-abandonment-detection.md | 69 | accepted | integrity |
 | integrity/rules/IR-058-distribution-untracked-skill-reference.md | 69 | accepted | integrity |
+| skills/agentdev-deep-review.md | 69 | draft | skills |
 | commands/case-update.md | 68 | accepted | commands |
 | skills/agentdev-project-extensions.md | 68 | accepted | skills |
 | commands/intake-capture.md | 67 | accepted | commands |

@@ -20,7 +20,7 @@
 <!-- AUTOGEN:BEGIN:id=docmap-inventory -->
 - 現行 REQ: 11件（`docs/requirements/REQ-*.md`）
 - ADR: 5件（`docs/adr/ADR-*.md`）
-- SPEC: 147件（`docs/specs/**/*.md`）
+- SPEC: 148件（`docs/specs/**/*.md`）
 <!-- AUTOGEN:END -->
 
 ## 現行 REQ
