@@ -1,12 +1,12 @@
 # ドキュメント入口
 
-AgentDevFlow v3 の基本原則と管理方式は [ADR-001 v3 charter](adr/ADR-001-v3-charter.md) と [v3-charter.md](guides/v3-charter.md) を参照。
-REQ/ADR 番号は `REQ-001〜`、`ADR-001〜` の新枠を採用する。v2.11.0 は tag 参照とし、`v2:` プレフィックスで区別する（U9）。
+AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [憲章](guides/charter.md) を参照。
+現行の REQ/ADR は `REQ-001〜`、`ADR-001〜` の3桁IDを使用し、過去版は tag `v2.11.0` と `v2:` プレフィックスで区別する。
 
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 11件
+現行 REQ: 11件、廃止済み: 0件
 <!-- AUTOGEN:END -->
 
 現行要件は REQ-001 から REQ-011 の11件である。各 REQ の詳細は各 REQ ファイル本文を参照。
@@ -33,7 +33,7 @@ REQ/ADR 番号は `REQ-001〜`、`ADR-001〜` の新枠を採用する。v2.11.0
 
 | ADR | タイトル |
 |---|---|
-| [ADR-001](adr/ADR-001-v3-charter.md) | v3 charter（AgentDevFlow v3 憲章） |
+| [ADR-001](adr/ADR-001.md) | AgentDevFlow 憲章 |
 | [ADR-002](adr/ADR-002.md) | OpenCode ソース・プロジェクション分離（v3） |
 | [ADR-003](adr/ADR-003.md) | req_draft ソフトコントラクト原則（v3） |
 | [ADR-004](adr/ADR-004.md) | 差し替え可能な I/O 境界（v3） |
@@ -83,7 +83,7 @@ SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン�
 ## ガイド
 
 - [ガイド入口](guides/README.md)
-- [v3 憲章](guides/v3-charter.md)
+- [憲章](guides/charter.md)
 - [クイックスタート](guides/quickstart.md)
 - [コマンド選択](guides/command-selection.md)
 - [要件定義 → Case実行フロー](guides/req-case-flow.md)
