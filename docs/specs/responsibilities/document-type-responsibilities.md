@@ -1,8 +1,10 @@
 ---
 title: 文書種別責務・配置基準
 status: accepted
+spec_logical_division: cross_cutting_contract
+canonical_owner: document-type-responsibilities
 created: 2026-06-23
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # 文書種別責務、配置基準
@@ -329,3 +331,26 @@ guides/README のみ全規範を適用する。
 | command | 整形、LLM表現禁止、冗長排除、見出しの付け方、用語政策 | 演出、パラグラフライティング |
 | skill | 整形、LLM表現禁止、冗長排除、論証の厳密さ、用語政策 | 演出 |
 | guides/README | japanese-tech-writing 全規範 | なし |
+
+## 規範情報と非規範情報の配置基準
+
+恒久基準文書（ADR、REQ、SPEC）と非規範 Report（Release Report 等）の配置基準を明確化する（document-model「恒久基準と非規範情報の整理」準拠）。
+
+### 規範情報（ADR、REQ、SPEC）
+
+- 決定内容、適用範囲、必須条件、制約、正規所有者、採用方式、観測可能結果（含义変更相当）
+- 安定的な仕様記述、契約、プロトコル
+- 現行アーキテクチャの基準
+
+### 非規範情報（Release Report 等）
+
+- 移行結果、リリース証跡、実行結果
+- 一時的な作業記録、履歴注記の一部
+- 具体的な実行スナップショット
+
+### 配置原則
+
+- 現行 ADR、REQ、SPEC へ移行結果またはリリース証跡を規範内容として配置しない
+- 非規範 Report へ規範要件または必達条件を移さない
+- 配置判定は document-model の 6 処置モデル（KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）で行う
+- ADR-001 の 10シナリオの実行結果は Release Report、定義は SPEC へ配置する（RU-0026 準拠）

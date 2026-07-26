@@ -73,11 +73,11 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 <!-- AUTOGEN:BEGIN:id=spec-metrics-measurement-example -->
 | SPEC | SPEC 行数 | status | ドメイン分類 |
 |---|---|---|---|
-| foundations/document-model.md | 567 | accepted | foundations |
+| foundations/document-model.md | 628 | accepted | foundations |
 | responsibilities/artifact-contracts.md | 427 | accepted | responsibilities |
 | integrity/integrity-contracts.md | 361 | accepted | integrity |
+| responsibilities/document-type-responsibilities.md | 349 | accepted | responsibilities |
 | commands/req-define.md | 330 | accepted | commands |
-| responsibilities/document-type-responsibilities.md | 326 | accepted | responsibilities |
 | local/runtime-package-boundary.md | 316 | accepted | local |
 | workflows/epic-wave-model.md | 314 | accepted | workflows |
 | workflows/backlog-artifact-lifecycle.md | 262 | accepted | workflows |

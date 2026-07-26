@@ -576,3 +576,64 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 
 新規SPEC作成時は、本セクションのドメイン分類に従って該当ディレクトリに配置する（REQ-001-004）。
 本体系化は既存 SPEC 文書種別内でのディレクトリ整理であり、CATALOG 等の新規文書種別を新設しない（REQ-001-009）。
+
+## 恒久基準と非規範情報の整理
+
+恒久基準（ADR、REQ、SPEC）と非規範情報（移行情報、内部実装方式、fixture、regex、内部関数、テスト構成、
+未宣言 reference、draft SPEC、移行証跡、リリース証跡）を整理するための 6 処置モデルを定義する。
+処置の実行は inspect-docs / inspect-skills / 専用の cleanup 作業で行い、本節はモデルと契約を所有する。
+
+### 対象カテゴリ
+
+次の6カテゴリを走査の対象とする。
+
+1. ADR 内の移行時情報
+2. REQ 内の内部実装方式
+3. SPEC 内の fixture、regex、内部関数、テストファイル構成
+4. 規範または非規範の地位が未宣言の references
+5. 未決着の draft SPEC
+6. 移行結果またはリリース証跡
+
+### inventory item 識別子
+
+各 inventory item は次の3要素で識別する。重複 key を許可しない。
+
+| 要素 | 内容 |
+|---|---|
+| `artifact_path` | 対象ファイルの相対パス |
+| `target_area` | 見出し、field、rule row の識別子 |
+| `statement_key` | 正規化した対象記述の stable hash |
+
+### 6 処置モデル
+
+各 inventory item へ次のいずれか一つを割り当てる。同一 item へ複数処置を割り当てない。
+
+| 処置 | 内容 | 必須記録事項 |
+|---|---|---|
+| KEEP | 現位置で保持する | 正規所有者 |
+| MERGE | 同一関心の他記述へ統合する | 統合先、統合根拠 |
+| REFERENCE | 他文書へ参照を張る | 参照先 |
+| MOVE | 別の正規所有者へ移動する | 移動先、正規所有者 |
+| RETIRE | 廃止し履歴保持先へ記録する | 廃止理由、履歴保持先 |
+| INFERENCE | 推論により正規所有者を補完する | 推論根拠、補完先 |
+
+- MOVE または REFERENCE には解決可能な移動先または参照先が存在すること
+- RETIRE または INFERENCE には理由と履歴保持先が記録されること
+
+### 処置後の記録と再検証
+
+- 処置後は正規所有者、移動先、履歴保持先を記録する
+- 処置の影響レーンだけを再検証する（全文再検証ではなく影響レーン局限）
+- 現行 ADR、REQ、SPEC に移行結果またはリリース証跡が規範内容として残らないこと
+- 移行結果とリリース証跡は非規範の Report（Release Report 等）へ移す
+
+### draft SPEC の扱い
+
+- draft SPEC ごとに accepted 化、統合、supersede、retire のいずれかを確定する
+- 未決着の draft SPEC を放置しない
+- draft status の SPEC が一定期間更新されず放置されることを検出するルール（IR-054）と連動する
+
+### accepted ADR の意味変更
+
+- accepted ADR の意味変更は RU-0026 契約（後継 ADR 必須）に従い、直接適用しない
+- 履歴証拠を削除して追跠不能にしない
