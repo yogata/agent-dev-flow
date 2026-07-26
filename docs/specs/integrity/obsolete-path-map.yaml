@@ -117,7 +117,7 @@ entries:
     new: "docs/specs/local/local-case-file.md"
     severity: "ng"
   - old: "docs/specs/local-generation.md"
-    new: "docs/specs/local/local-generation.md"
+    new: "docs/specs/local/runtime-package-boundary.md"
     severity: "ng"
 
   # authoring/（執筆規約）

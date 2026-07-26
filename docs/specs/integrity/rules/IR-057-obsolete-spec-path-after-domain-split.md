@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-24
+updated: 2026-07-26
 ---
 
 # IR-057: obsolete-spec-path-after-domain-split
@@ -14,7 +14,7 @@ updated: 2026-07-24
 | detection_method | `check_integrity.ts` による `obsolete-path-map.yaml` ロード、各エントリ `old` パターンの正規表現マッチング（行単位走査）。`scope.include`、`scope.exclude` で検査対象を絞り込む。語彙検出は `legacy_local_generation_vocabulary`（単独検出語: severity=ng）と `legacy_local_generation_conditional_vocabulary`（近接条件つき検出語: proximity_required=true）に分離し、後者は同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ検出する。`generated_by` + `local-opencode-transform` の組み合わせ検出は `generated_by_combination_rule` で維持する |
 | affected_artifacts | [AGENTS.md, README.md, docs/requirements/**/*.md, docs/adr/**/*.md, docs/specs/**/*.md, src/opencode/**/*.md, src/opencode-local/**/*.md, .opencode/skills/**/*.md, .opencode/commands/**/*.md] |
 | related_req | [REQ-010-280, REQ-010-282, REQ-001-006, REQ-009-004, REQ-010-265, REQ-010-024] |
-| related_spec | [../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/local-generation.md] |
+| related_spec | [../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。`scope.exclude` で履歴参照領域（`docs/requirements/retired/**`、`docs/adr/retired/**`）を除外する。現行ADRに歴史的経緯として旧パスを記載する場合は rule 側で例外登録を明示する（後述「例外登録」）。コードブロック内の例示は exemption とする |
 | regression_test | (未実装)。`obsolete-path-map.yaml` の全エントリについて、旧パスを含む fixture と含まない fixture を用意し、`check_integrity.ts` が正しく fail/pass を報告することを検証する |
@@ -59,7 +59,7 @@ updated: 2026-07-24
 | `docs/guides/glossary.md` | 用語集。廃止語彙の歴史的識別子値を定義する語彙参照文書 |
 | `retired/` 配下 | 履歴参照領域 |
 | テスト fixture（`*.test.ts` 等） | 検査ロジックのテストデータは検出対象外 |
-| `local/local-generation.md` | link mode 移行 SPEC。廃止経緯、削除資産、移行手順の正本文書であり、廃止語彙を歴史的経緯として記載する正当なファイル（REQ-009-028/029） |
+| `local/runtime-package-boundary.md` | link mode の現行契約と廃止済み生成方式の境界を定義する正本文書であり、廃止語彙を歴史的経緯として記載する正当なファイル（REQ-009-028/029） |
 | `IR-046`、`IR-048` ルールファイル | 廃止識別子（`generated_by: local-opencode-transform`）を検出対象とする整合性ルール。検出対象語彙をルール定義として参照する正当なファイル |
 | `REQ-009` | link mode 移行に伴う廃止確定を定義する REQ。廃止対象資産のパス、語彙を要件文として記載する正当なファイル |
 | `v2:REQ-0158` | IR-057 検出を定義していた旧 REQ（retired）。検出対象語彙一覧、検出仕様を要件文として記載する正当なファイル（現在は `docs/requirements/retired/v2:REQ-0158.md` へ移動） |
