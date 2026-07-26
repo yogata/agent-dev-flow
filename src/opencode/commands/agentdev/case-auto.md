@@ -87,6 +87,8 @@ case-open 委譲の完了後、出力を確認して以下のいずれかに分�
 - **Standard flow（単一 Issue）**: case-open 委譲が共通終了処理（コメント追加、ドラフト削除、RU削除、完了報告）を完了していることを確認 → クリーンアップ検証ゲート（後述）→ 既存の直列フロー（case-run → case-close）
 - **Epic Issue flow（マルチREQ または 単一REQ Epic flow）**: 同上の確認 → クリーンアップ検証ゲート → Wave 反復制御（後述）
 
+**req_draft reader lifecycle（REQ-006-083）**: case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込む。case-open 成功後は invalid post-case reader として req_draft を読まず、停止、再開、完了処理は Issue と Epic だけで成立させる（G19）。クリーンアップ検証ゲートでドラフト削除を検証するのもこの lifecycle に由来する。
+
 #### Wave 反復制御（case-auto 直接制御、AG-003）
 
 Epic Issue 番号を記録。Epic Issue 本文（SSoT）から Wave 構成・各子Issue ステータスを読み取る（**読み取りのみ、Epic Issue 本文の書き込みは case-close の単一書き手責務**、G16）。case-run(#epic) への委譲は行わない。各子Issue ごとにインライン case-run を実行。以下の反復ループを実行:
@@ -331,7 +333,7 @@ Level 1（case-close rebase）→ Level 2（case-auto インライン case-run �
 - G15: case-auto は Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、子Issue 並列委譲（最大5件）を直接担当する（AG-003）。case-run(#epic) への委譲は行わない。各子Issue ごとにインライン case-run を実行する。Wave 境界のクローズは case-close(#epic) に委譲する
 - G16: case-auto は独自の操作単位ステータス追跡を持ってはならない。Epic Issue のステータス追跡テーブルを使用する。**Epic Issue 本文の書き込みは case-close の単一書き手責務。case-auto は読み取るのみで書き込まない**
 - G18: case-auto は操作単位キューの管理、制御のみを担い、OU 本文の抽出、変換、REQ 操作解釈を行わないこと
-- G19: case-auto は req-save 段階（case-open 完了前）のみ draft を OU 情報の SSoT として扱うこと。case-open 完了後は子Issue（Epic Issue のステータス追跡テーブル含む）が SSoT となること。クリーンアップ検証ゲート（ドラフト削除検証）は case-open 完了後に実行すること。独自の OU 状態管理を持たないこと
+- G19: case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込み、case-open 成功後は invalid post-case reader として req_draft を読まないこと（REQ-006-083）。case-open 成功後の停止、再開、完了処理は Issue と Epic（Epic Issue のステータス追跡テーブル含む）だけで成立させること。クリーンアップ検証ゲート（ドラフト削除検証）は case-open 完了後に実行すること。独自の OU 状態管理を持たないこと
 - G20: OU 間依存は queue dependency として扱い、依存関係があるだけでは Epic Issue 化しないこと
 - G21: case-auto は Epic Issue 化の判定に関与しないこと。case-open の判定結果に従うこと
 - G27: 各工程の起動は工程別契約（Step 4 の契約表）に従うこと。inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領する
