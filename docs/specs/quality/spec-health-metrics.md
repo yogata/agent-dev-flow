@@ -84,9 +84,9 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/case-auto.md | 261 | accepted | commands |
 | commands/case-run.md | 261 | accepted | commands |
 | commands/case-open.md | 254 | accepted | commands |
+| integrity/integrity-rule-catalog.md | 251 | accepted | integrity |
 | commands/case-close.md | 244 | accepted | commands |
 | README.md | 242 | - | uncategorized |
-| integrity/integrity-rule-catalog.md | 241 | accepted | integrity |
 | local/local-case-file.md | 240 | accepted | local |
 | workflows/workflow-contracts.md | 214 | accepted | workflows |
 | workflows/delegation-contracts.md | 210 | accepted | workflows |
@@ -122,7 +122,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-doc-diagnostics.md | 83 | draft | skills |
 | skills/agentdev-adr-file-manager.md | 82 | accepted | skills |
 | skills/agentdev-artifact-validation.md | 81 | draft | skills |
-| integrity/rule-ownership.md | 78 | accepted | integrity |
+| integrity/rule-ownership.md | 79 | accepted | integrity |
 | commands/inspect-promote.md | 77 | accepted | commands |
 | commands/inspect-skills.md | 75 | accepted | commands |
 | skills/agentdev-skill-authoring.md | 74 | accepted | skills |
@@ -163,12 +163,12 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-doc-map.md | 51 | accepted | skills |
 | skills/agentdev-learning-capture.md | 51 | accepted | skills |
 | skills/agentdev-command-creator.md | 48 | accepted | skills |
+| integrity/rules/IR-011-mapping-table-full-coverage.md | 46 | superseded | integrity |
 | integrity/rules/IR-052-completion-grep-pattern-design.md | 40 | accepted | integrity |
 | integrity/rules/IR-036-adr-work-means-detection.md | 39 | accepted | integrity |
 | integrity/rules/IR-061-index-generation-consistency.md | 39 | accepted | integrity |
 | integrity/rules/IR-059-distribution-reference-boundary.md | 37 | accepted | integrity |
 | integrity/rules/IR-025-retired-adr-path-rule.md | 35 | accepted | integrity |
-| integrity/rules/IR-011-mapping-table-full-coverage.md | 31 | superseded | integrity |
 | quality/quality-specs.md | 27 | accepted | quality |
 | integrity/validator-split-criteria.md | 25 | accepted | integrity |
 | integrity/rules/IR-001-req-frontmatter-id-filename.md | 21 | accepted | integrity |
