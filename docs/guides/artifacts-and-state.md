@@ -6,7 +6,7 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 
 | 種別 | 格納先 | 役割 |
 |------|--------|------|
-| REQ | `docs/requirements/REQ-{NNNN}.md` | 要件定義の永続基準 |
+| REQ | `docs/requirements/REQ-{NNN}.md` | 要件定義の永続基準 |
 | ADR（現行） | `docs/adr/ADR-01XX.md` | 現行基準の技術判断記録 |
 | SPEC | `docs/specs/**/*.md` | 実装者が参照する現在仕様（commands/skills/workflows の3層と基盤6ドメイン） |
 | DOC-MAP | `docs/DOC-MAP.md` | 文書探索、参照経路の入口（索引） |
@@ -51,7 +51,7 @@ Script は決定的で単体テスト可能な処理に限定する。
 
 ```
 docs/
-  requirements/REQ-{NNNN}.md    # 要件定義（基準）
+requirements/REQ-{NNN}.md     # 要件定義（基準）
   adr/
     ADR-01XX.md              # 現行基準の ADR（基準）
     retired/
