@@ -2,7 +2,7 @@
 title: harness 分離モデル
 status: accepted
 created: 2026-07-12
-updated: 2026-07-26
+updated: 2026-07-27
 ---
 
 # harness 分離モデル
@@ -60,6 +60,8 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 - プロジェクトルート `AGENTS.md`: harness 選定、エージェント型指定
 - 各 skill の `references/<topic>.md`: skill 固有の実行制御具体（エージェント型名、起動方法、timeout、並列度、再試行等）
 
+上記 harness 側の実行制御は、`responsibility-boundary-purification.md` が定義する「harness execution mechanism」（agent 起動、background task、並列実行、context 管理）として ADF 規範所有対象外である（REQ-011-018）。本 SPEC は harness execution mechanism の境界宣言のみを所有し、起動 API、並列数、timeout 等の具体は各 skill の `references/` へ集約する。external execution boundary（外部バックエンド接続）は REQ-011 が正規所有する（REQ-011-017）。
+
 ## 実行結果契約
 
 case-run、case-auto の実行結果契約は次の4状態を区別する。
@@ -72,13 +74,13 @@ case-run、case-auto の実行結果契約は次の4状態を区別する。
 `failed` と `delegation-unavailable` は異なる回復アクションを要する独立の結果状態として扱う。
 結果状態の遷移機械、委譲契約、ラベル構造の詳細は `docs/specs/workflows/delegation-contracts.md` を正規所有者とし、本 SPEC は境界宣言へ縮約する。
 
-## case-auto の Phase 分離と bg task 管理
+## case-auto の orchestration stage と bg task 管理
 
-case-auto の Phase 分離、Phase 2 の固定並列数、bg task の状態管理、破棄検知時の状態別回復（commit 済み PR 未作成、未コミット変更残存の区別）は AgentDevFlow 側の業務ワークフロー契約として所有する。
+case-auto の orchestration stage（stage 1 case-open 順次、stage 2 case-run 並列、stage 3 case-close 順次）、stage 2 の固定並列数、bg task の状態管理、破棄検知時の状態別回復（commit 済み PR 未作成、未コミット変更残存の区別）は AgentDevFlow 側の業務ワークフロー契約として所有する。
 これらは後続工程が依存する安全境界と回復契約であり、配布物で共有する。
 
-bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness 側の所有とする。
-Phase 1 と Phase 3 の直列集約ポイントは main push、capture、commit を並列実行区間の外で処理する AgentDevFlow 側の契約とし、bg task API 経由の実行制御は harness 側の責務として維持する。
+bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness 側の所有とする（harness execution mechanism、ADF 規範所有対象外、REQ-011-018）。
+stage 1 と stage 3 の直列集約ポイントは main push、capture、commit を並列実行区間の外で処理する AgentDevFlow 側の契約とし、bg task API 経由の実行制御は harness 側の責務として維持する。
 
 工程別の所有対象、非所有対象の詳細リストは `docs/specs/responsibilities/responsibility-boundary-purification.md` を正規所有者とする。
 

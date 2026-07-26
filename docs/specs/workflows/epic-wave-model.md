@@ -2,7 +2,7 @@
 title: Epic / Wave / Issue 実行モデル
 status: accepted
 created: 2026-06-21
-updated: 2026-07-25
+updated: 2026-07-27
 ---
 
 # Epic / Wave / Issue 実行モデル
@@ -228,7 +228,7 @@ case-open、case-auto、case-run で参照される並列上限と停止条件�
 | 文脈 | 上限 | 根拠 |
 |---|---|---|
 | case-run Wave 内子 Issue 並列 | 5件 | REQ-006-026（同一 Wave 内の case-run サブエージェント並列起動上限） |
-| case-auto Phase 2 同時起動数 | 5件 | REQ-006-106（Phase 分離モデルにおける case-run bg task 同時起動数） |
+| case-auto orchestration stage 2 同時起動数 | 5件 | REQ-006-091（orchestration stage における case-run bg task 同時起動数） |
 | execution_unit 全体並列 | 上限なし | REQ-006-018（必須依存がない execution_unit 群は全て並列実行可能） |
 
 3つの「5件」は別文脈であり、混同しない。
@@ -255,13 +255,13 @@ case-auto は停止時に停止理由を以下の分類で報告する（REQ-006
 
 分類は再開コマンド選択とユーザー通知の精度向上が目的であり、HITL 境界の変更ではない。
 
-## ドラフト間並列実行モデル（REQ-006-102〜107）
+## ドラフト間並列実行モデル（REQ-006-089〜093）
 
-case-auto が複数の対象を処理する場合、Phase 分離モデルを適用する。Phase 1 は case-open を順次実行し、Phase 2 は case-run を bg task として最大5件ずつ並列実行し、Phase 3 は case-close を順次実行する。Phase 1 と Phase 3 を main push と capture の直列集約ポイントとし、commit も並列実行区間の外で処理する。
+case-auto が複数の対象を処理する場合、orchestration stage モデルを適用する。stage 1 は case-open を順次実行し、stage 2 は case-run を bg task として最大5件ずつ並列実行し、stage 3 は case-close を順次実行する。stage 1 と stage 3 を main push と capture の直列集約ポイントとし、commit も並列実行区間の外で処理する。
 
-Phase 分離、Phase 2 の同時起動数固定値5、bg task の状態管理、破棄検知時の状態別回復、Phase 1 と Phase 3 の直列集約は AgentDevFlow 側の制御点である。bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness 側に維持する。
+orchestration stage（stage 1〜3）、stage 2 の同時起動数固定値5、bg task の状態管理、破棄検知時の状態別回復、stage 1 と stage 3 の直列集約は AgentDevFlow 側の制御点である。bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness 側に維持する（harness execution mechanism、ADF 規範所有対象外、REQ-011-018）。
 
-Phase 2 の bg task がシステムにより破棄されたことを検知した場合、commit 済みで PR 未作成の状態と未コミット変更が残る状態を区別し、それぞれの状態に対応する回復パターンを適用する。並列実行が利用できない場合だけ順次フォールバックを使用し、理由を完了報告に残す。
+stage 2 の bg task がシステムにより破棄されたことを検知した場合、commit 済みで PR 未作成の状態と未コミット変更が残る状態を区別し、それぞれの状態に対応する回復パターンを適用する。並列実行が利用できない場合だけ順次フォールバックを使用し、理由を完了報告に残す。
 
 ## 前工程完了度3段階分類（REQ-003-010）
 
