@@ -2,7 +2,7 @@
 title: `agentdev-gh-cli` SPEC
 status: accepted
 created: 2026-06-21
-updated: "2026-07-19"
+updated: "2026-07-26"
 ---
 
 # `agentdev-gh-cli` SPEC
@@ -193,5 +193,5 @@ GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手�
 - [agentdev-inspect-skills.md](agentdev-inspect-skills.md)（gh 直接記述の検出辞書を参照）
 - [ローカル Case ファイル](../local/local-case-file.md)
 - [REQ-011](../../requirements/REQ-011.md)（`agentdev-gh-cli` 手続き委譲基盤）
-- [v2:REQ-0150](../../requirements/v2:REQ-0150.md)（ローカル版 `agentdev-gh-cli` 実装）
+- v2:REQ-0150（tag `v2.11.0`、ローカル版 `agentdev-gh-cli` 実装）
 - [ADR-004](../../adr/ADR-004.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）

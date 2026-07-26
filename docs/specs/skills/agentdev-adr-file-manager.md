@@ -2,7 +2,7 @@
 title: `agentdev-adr-file-manager` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # `agentdev-adr-file-manager` SPEC
@@ -23,7 +23,7 @@ ADR ファイルの作成、追記、更新を管理する知識ベースとし�
 - CREATE / APPEND / UPDATE 操作モード選択
 - ステータス遷移ルール（proposed → accepted → deprecated / superseded）
 - 整合性チェック（frontmatter、ID、日付フォーマット、ステータス遷移）
-- 現行 ADR（`docs/adr/ADR-01XX.md`）と廃止 ADR（物理削除、または各 retired/ ディレクトリへの移動）の区別
+- 現行 ADR（`docs/adr/ADR-{NNN}.md`）と廃止 ADR（物理削除、または各 retired/ ディレクトリへの移動）の区別
 
 ## 参照する references
 
@@ -31,7 +31,7 @@ ADR ファイルの作成、追記、更新を管理する知識ベースとし�
 
 ## 現在の動作
 
-- ADR-{NNNN} 形式で4桁ゼロ埋め採番
+- ADR-{NNN} 形式で3桁ゼロ埋め採番
 - 初期ステータスは `proposed`（req-save で作成時）
 - 単なる廃止、削除、移行は新規 ADR ではなく `retire` / `supersede` で処理
 - accepted 後は非セマンティックな軽微修正のみ許可

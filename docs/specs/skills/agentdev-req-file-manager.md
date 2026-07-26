@@ -2,7 +2,7 @@
 title: `agentdev-req-file-manager` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # `agentdev-req-file-manager` SPEC
@@ -35,7 +35,7 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 
 ## 現在の動作
 
-- REQ-{NNNN} 形式で4桁ゼロ埋め採番
+- REQ-{NNN} 形式で3桁ゼロ埋め採番
 - 要件行は「変更後に満たすべき振る舞い、制約、状態」のみ記述
 - 実装指示は要件行に含めない
 - bugfix では REQ ファイルを作成しない
