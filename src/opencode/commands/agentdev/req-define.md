@@ -30,6 +30,17 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
 - 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
+## session由来RU 消費契約（参照）
+
+`source_type: chat` かつ `generated_by: session` のRU（session由来RU）を受領した場合、REQ-008-051..057 および `docs/specs/responsibilities/artifact-contracts.md`「RU アーティファクト契約（session由来RU）」セクションを正規原本として以下を扱う。本コマンドは同契約を再定義しない。
+
+- `logical_key` によるRU案特定: 第1承認済みのRU案を読み込む。第1承認は内容のみを対象とし、第2承認が採番、保存、commit、push を許可する（REQ-008-052、SPEC「二段階承認」）
+- `session:...` 論理URI の非解決: `sources[].type: chat` で `sources[].path` が `session:...` の場合、ファイル取得、URL取得、外部セッション取得の解決処理へ渡さない（REQ-008-054、SPEC「session 論理URI」）
+- 必須8セクション読み取り契約: RU 本文8セクション（目的、対象、対象外、正規所有者とアンカー、依存関係、要件化の方向、決定的受け入れ条件、Source Summary）は session 論理URI の解決なしに後工程が判断可能な自足性を前提とする（REQ-008-057、SPEC「RU 本文必須8セクション」）
+- `tentative_classification` → 最終分類: 暫定値を入力とし、Step 5-2 で document-model SPEC（extension 経由）の文書7分類モデルへ照らして最終分類を確定し、暫定分類を上書きする（REQ-008-056、SPEC「req-define による最終分類の扱い」）。`tentative_classification` は既存7値のいずれかであり、欠落時は受領しない
+
+各項目の判定基準、検証観点は正規原本（REQ-008 + artifact-contracts SPEC）へ委譲する。
+
 ## 手順
 
 ### Step 1: セッションコンテキスト検知（引数なし単体実行時のみ）
@@ -51,6 +62,8 @@ Read tool で読み込み、壁打ちの初期コンテキストとして扱う�
 0件なら Step 3 へ。
 2件以上なら候補一覧を表示し自動選択しない。
 セッション履歴、現在コンテキストおよび RU のいずれからも有効な入力を構成できない場合、壁打ち対話を開始する
+
+ **2-1. session由来RU 受領時（REQ-008）**: 読み込んだRU が `source_type: chat`、`generated_by: session` の場合、「session由来RU 消費契約（参照）」セクションに従う。`session:...` 論理URI の解決、必須8セクション読み取り契約、`tentative_classification` → 最終分類の扱いは正規原本（REQ-008-051..057、artifact-contracts SPEC）へ委譲する
 
 ### Step 3: 壁打ち対話
 
