@@ -13,7 +13,7 @@ status: accepted
 | detection_method | `src/opencode-local/` 配下のディレクトリ、ファイル一覧を取得し、許容リスト（`README.md`, `agentdev-gh-cli/`）外のトップレベルパスを検出。`agentdev-gh-cli/case-schema/` は `agentdev-gh-cli/` 配下の許容ディレクトリとして扱う |
 | affected_artifacts | [src/opencode-local/] |
 | related_req | [REQ-009-003, REQ-009-004, REQ-009-005, REQ-009] |
-| related_spec | [local-generation.md] |
+| related_spec | [runtime-package-boundary.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | なし。パスの直接比較による機械的検出 |
 | regression_test | (未実装) |
