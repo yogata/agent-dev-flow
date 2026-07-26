@@ -13,7 +13,6 @@ AgentDevFlow 管理下の文書で使用する正規語彙と旧語彙の対照�
 以下の文脈では旧語彙の言及が許容される（検出対象外）:
 
 - `docs/requirements/retired/` 配下の retired REQ
-- `docs/requirements/mapping-table.md` の移行表
 - `docs/adr/` 内の ADR 履歴記述（廃止経緯の説明を含む）
 - code block（` ``` ` で囲まれた領域）内の例示
 - 検出ルール自体の記述（正規表現パターンの説明等）
@@ -218,9 +217,9 @@ REQ の現行件数・番号範囲は `docs/requirements/README.md` を正とす
 
 | 旧語彙 | 現行語彙 | 備考 |
 |--------|----------|------|
-| `retained` | `migrated` / `retired-no-successor` / `historical-only` | 旧 REQ 分類（mapping-table.md の status） |
-| `partially superseded` | `migrated` | mapping-table.md の正規 status |
-| `superseded` | `migrated` / `retired-no-successor` | 旧分類 |
+| `retained` | `migrated` / `retired-no-successor` / `historical-only` | 廃止済み mapping-table.md に由来する旧 REQ 分類（歴史的用法） |
+| `partially superseded` | `migrated` | 廃止済み mapping-table.md に由来する旧分類（歴史的用法） |
+| `superseded` | `migrated` / `retired-no-successor` | 廃止済み mapping-table.md に由来する旧分類（歴史的用法） |
 
 ## Capture 語彙
 

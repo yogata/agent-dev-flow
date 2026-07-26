@@ -43,7 +43,7 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
   - OU ID未指定時はdraft全体のREQ/ADR対象actionを処理する。
   - OUが複数存在することだけを理由に停止しない。
 - Step 4: REQ/ADR actionを保存し、要件表、ID、frontmatter、採番結果を検証する。
-- Step 5: README、DOC-MAP、mapping-tableへの影響を確認し、派生文書を整合させる。
+- Step 5: README、DOC-MAPへの影響を確認し、派生文書を整合させる。
 - Step 6: ADR actionを保存する。
 - Step 7: changed-docs検査を実行する。
 - Step 8: DOC-MAP影響を確認する。

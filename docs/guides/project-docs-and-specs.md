@@ -24,7 +24,7 @@ DOC-MAP（文書探索入口：索引）
 システムが満たすべき要件を記述する。
 
 - 現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とする
-- 旧 REQ の移行履歴は `docs/requirements/mapping-table.md` を参照
+- v2 歴史的 REQ の移行履歴は tag `v2.11.0` で参照する
 
 > 本ガイドでは REQ の件数・番号範囲を複製しない（REQ の増減に追従しないため）。
 

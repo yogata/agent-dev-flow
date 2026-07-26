@@ -36,7 +36,7 @@ REQ/ADR/SPEC 操作で共有される決定的検証 script（frontmatter 整合
 ## 提供する判断・操作
 
 - `check-frontmatter-consistency.ts`（frontmatter id ↔ ファイル名整合性確認、REQ/ADR 横断）の所有
-- `check-entry-existence.ts`（README/DOC-MAP/mapping-table エントリ存在確認）の所有
+- `check-entry-existence.ts`（README/DOC-MAP エントリ存在確認）の所有
 - `check-change-impact.ts`（変更範囲検証、許可パスリストとの照合）の所有
 - 上記 script が利用する共有 lib の所有
 - 対応 test（`tests/*.test.ts`）の所有

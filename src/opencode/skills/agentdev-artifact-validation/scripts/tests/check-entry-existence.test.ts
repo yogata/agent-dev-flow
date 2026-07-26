@@ -40,7 +40,7 @@ describe("checkIdInFiles", () => {
     const files = [
       { path: "README.md", content: "REQ-0103" },
       { path: "DOC-MAP.md", content: "REQ-0103 here too" },
-      { path: "mapping-table.md", content: "no match" },
+      { path: "other-index.md", content: "no match" },
     ];
     const result = checkIdInFiles("REQ-0103", files);
     expect(result.found).toEqual(["README.md", "DOC-MAP.md"]);

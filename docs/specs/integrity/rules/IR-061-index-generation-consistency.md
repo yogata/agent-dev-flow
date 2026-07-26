@@ -20,7 +20,6 @@ SC-002 SPEC（`docs/specs/integrity/index-auto-generation.md`）が定める索�
 - `docs/README.md`
 - `docs/adr/README.md`
 - `docs/requirements/README.md`
-- `docs/requirements/mapping-table.md`
 - `docs/specs/README.md`
 - `docs/DOC-MAP.md`
 - `docs/specs/integrity/integrity-rule-catalog.md`

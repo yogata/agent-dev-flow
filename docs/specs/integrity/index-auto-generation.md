@@ -27,7 +27,6 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 | `docs/adr/README.md`のトピック別ビュー・Decision Map・関連REQ表 | 人手管理 | ADR本文と人手判断 |
 | `docs/specs/README.md`のSPEC一覧・status列 | 現行実装に従う混合管理 | SPEC frontmatterと人手管理列 |
 | `docs/DOC-MAP.md`のインベントリ | 自動生成 | 実ファイル一覧 |
-| `docs/requirements/mapping-table.md`の移行判定 | 人手管理 | 旧REQから現行REQへの移行判断 |
 | integrity rule catalogとrule ownershipのAUTOGENブロック | 自動生成 | 個別IR文書 |
 | REQ/SPECメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
 
@@ -38,7 +37,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 件数表明は実ファイル frontmatter 値を集計した結果と一致すること。人手で件数を記述せず、自動生成マーカーで囲んだ領域へスクリプトが集計結果を出力する。
 
-例: `docs/adr/README.md` のキャプション「承認済みステータス（accepted）の ADR-01XX 25件」は、`docs/adr/ADR-*.md` のうち `status: accepted` を集計した結果でなければならない。
+例: `docs/adr/README.md` のキャプション「承認済みステータス（accepted）の ADR-001〜ADR-{NNN} Y件」は、`docs/adr/ADR-*.md` のうち `status: accepted` を集計した結果でなければならない。
 
 ### 一覧の網羅性
 
@@ -146,15 +145,14 @@ docs-check は G01 原則（検査対象を直接修正しない）を維持し�
 
 generate_indexes.ts の AUTOGEN marker 検出は、行全体が正規のHTMLコメントマーカー形式（`<!-- AUTOGEN:BEGIN:id=xxx -->` または `<!-- AUTOGEN:END -->`）に一致するかで判定する。説明文中の backtick 囲み（インラインコード）AUTOGEN marker 記述を実 marker と誤認せず、行全体一致判定で自動的に除外する。backtick 文脈判定のような部分一致ロジックは併用しない。これにより正常な AUTOGEN block 認識の失敗と索引再生成の途中停止を防止する（PR #1718 の HTML コメント構文抽象化による暫定対応と置換）。正例（正規マーカー行）、負例（backtick 囲み marker 文字列を含む説明文）、境界例（マーカー行に backtick が隣接する場合）を含む回帰テストが生成スクリプトに付属する。
 
-### 現在人手管理領域の5領域
+### 現在人手管理領域の4領域
 
-以下5領域は現在契約上の自動生成対象外（人手管理領域）として確定する。これは「永久に自動化しない」決定ではなく、「現在実装されていない機能を実装済み契約として扱わない」決定である。将来、導出規則と生成機構を別要件で確定すれば本 SPEC を更新できる自動生成拡張ポイントである。
+以下4領域は現在契約上の自動生成対象外（人手管理領域）として確定する。これは「永久に自動化しない」決定ではなく、「現在実装されていない機能を実装済み契約として扱わない」決定である。将来、導出規則と生成機構を別要件で確定すれば本 SPEC を更新できる自動生成拡張ポイントである。
 
 - **ADR README トピック別ビュー**: 人手管理。導出規則未確定のため。
 - **ADR README Decision Map**: 人手管理。各 ADR 本文の宣言から導出するが、導出規則が未確定のため。
 - **ADR README 関連 REQ 表**: 人手管理。各 ADR の関連宣言から導出するが、導出規則が未確定のため。
 - **docs/specs/README.md**: 人手管理または既存生成部分のみ AUTOGEN。status 列は AUTOGEN 可能だが、責務列等の混合領域が大半のため、現状では一部列のみ AUTOGEN または人手管理。
-- **docs/requirements/mapping-table.md**: 人手判断（migrated/retired-no-successor/historical-only 判定）を含むため人手管理。
 
 ## 関連情報
 

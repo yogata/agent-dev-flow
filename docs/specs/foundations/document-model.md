@@ -329,7 +329,7 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 
 | 文書種別 | 状態遷移 | 備考 |
 |---|---|---|
-| REQ | created → active → superseded / partially superseded | APPEND/UPDATEで拡張し、旧REQから現行REQへの移行関係はmapping-tableで追跡する |
+| REQ | created → active → superseded / partially superseded | APPEND/UPDATEで拡張する。現行 REQ は `docs/requirements/README.md`、旧世代の履歴資料は tag `v2.11.0` で参照する |
 | ADR | proposed → accepted → superseded / deprecated | acceptedだけを現行判断の根拠とする |
 | SPEC | draft → accepted → superseded | 後継SPECへの移行表示は`superseded_by`で保持する |
 | Guide | active → outdated → removed | 規範的権限を持たない |

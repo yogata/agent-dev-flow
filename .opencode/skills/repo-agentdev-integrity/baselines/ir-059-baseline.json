@@ -359,12 +359,6 @@
       "count": 1
     },
     {
-      "file": "src/opencode/skills/agentdev-doc-diagnostics/references/diagnostic-categories.md",
-      "category": "concrete-path",
-      "matched": "docs/requirements/mapping-table.md",
-      "count": 1
-    },
-    {
       "file": "src/opencode/skills/agentdev-doc-diagnostics/references/finding-output-contract.md",
       "category": "concrete-id",
       "matched": "REQ-0103",

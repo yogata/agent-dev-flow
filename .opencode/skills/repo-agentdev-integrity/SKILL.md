@@ -60,7 +60,6 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | 旧 namespace 残存 | `check_integrity.ts` | 旧コマンド名、旧パス、二重 prefix、bare slash (scoped) |
 | 完了報告フォーマット | `check_integrity.ts` | completion-reports.md テンプレート存在、インライン完了報告、完了後追加出力、旧 terminology（REQ-0107） |
 | Variant report | `check_integrity.ts` | variant 実在確認、registry 登録確認、必須フィールド、fragment 合成パターン (REQ-0108-089~091) |
-| Mapping table | `check_integrity.ts` | 全件記録・存在確認・移行先確認・status enum 検査 (REQ-0108-083~088) |
 | ADR status 正規化 | `check_integrity.ts` | 旧形式 `superseded-by:[ADR-XXXX]` 検出 (REQ-0108-121) |
 | RU-ID 根拠参照 | `check_integrity.ts` | docs 永続文書内の RU-ID パターン検出 (REQ-0108-122) |
 | Workflow status 禁止 | `check_integrity.ts` | REQ/SPEC 内の workflow status / 6 マイクロフェーズ検出 (REQ-0108-123) |
@@ -69,7 +68,6 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | Skill 構造 | `lint_skills.ts` | frontmatter name ↔ dir、USE FOR / DO NOT USE FOR、See Also |
 | Junction 整合性 | `check_integrity.ts` | broken junction / symlink 検出（Windows junction / Unix symlink のリンク先不存在） |
 | Capture boundary | `check_integrity.ts` | capture-boundaries.md 存在確認、PR template セクション名検証、command capture 責務記述確認（REQ-0105） |
-| Mapping table history | `check_integrity.ts` | mapping-table 旧語彙の履歴名明示検査（REQ-0108-240） |
 | REQ verification basis | `check_integrity.ts` | REQ 要件行の検証基準が 規範語ではなく必達要件判定であること（REQ-0115-044） |
 | Runtime reference | `check_integrity.ts` | 配布物（src/opencode/commands/agentdev、src/opencode/skills/agentdev-*/**/*.md）内の導入先未解決参照検出。baseline 既知と新規区別、段階導入（IR-055, REQ-0108-263/264） |
 | Distribution untracked skill | `check_integrity.ts` | 配布物が `.opencode/skills/` 配下にのみ存在するスキルを参照した場合の src 昇格漏れ検出（IR-058, REQ-0159-003） |

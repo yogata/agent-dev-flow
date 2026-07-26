@@ -90,7 +90,7 @@ SPEC frontmatterは`title`、`status`、`created`、`updated`を基本とする�
 
 | 分類 | 意味 | 取扱い |
 |------|------|--------|
-| `migrated` | 新現行 REQ へ要件内容を移行した | 履歴参照として保持。後継 REQ は mapping-table.md で追跡 |
+| `migrated` | 新現行 REQ へ要件内容を移行した | 現行 REQ は `docs/requirements/README.md`、履歴資料は tag `v2.11.0` で参照する |
 | `retired-no-successor` | 最新方針では不要なため新現行 REQ へ移行しない | 履歴参照として保持 |
 | `historical-only` | 当時の判断、経緯として残すが現行要件ではない | 履歴参照として保持 |
 

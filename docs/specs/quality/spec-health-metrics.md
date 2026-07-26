@@ -94,7 +94,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | workflows/delegation-contracts.md | 185 | accepted | workflows |
 | commands/spec-save.md | 180 | accepted | commands |
 | foundations/design-principles.md | 158 | accepted | foundations |
-| integrity/index-auto-generation.md | 158 | accepted | integrity |
+| integrity/index-auto-generation.md | 156 | accepted | integrity |
 | integrity/targeted-docs-guard-implementation.md | 151 | accepted | integrity |
 | foundations/patterns.md | 147 | accepted | foundations |
 | responsibilities/artifact-responsibilities.md | 145 | accepted | responsibilities |
@@ -119,7 +119,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/inspect-docs.md | 85 | accepted | commands |
 | skills/agentdev-doc-diagnostics.md | 83 | draft | skills |
 | skills/agentdev-artifact-validation.md | 81 | draft | skills |
-| integrity/rule-ownership.md | 79 | accepted | integrity |
+| integrity/rule-ownership.md | 78 | accepted | integrity |
 | commands/inspect-promote.md | 77 | accepted | commands |
 | commands/inspect-extensions.md | 75 | accepted | commands |
 | commands/inspect-skills.md | 75 | accepted | commands |
@@ -163,10 +163,11 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-command-creator.md | 48 | accepted | skills |
 | integrity/rules/IR-056-project-extensions-integrity.md | 44 | accepted | integrity |
 | integrity/rules/IR-052-completion-grep-pattern-design.md | 40 | accepted | integrity |
-| integrity/rules/IR-061-index-generation-consistency.md | 40 | accepted | integrity |
 | integrity/rules/IR-036-adr-work-means-detection.md | 39 | accepted | integrity |
+| integrity/rules/IR-061-index-generation-consistency.md | 39 | accepted | integrity |
 | integrity/rules/IR-059-distribution-reference-boundary.md | 37 | accepted | integrity |
-| integrity/rules/IR-025-retired-adr-path-rule.md | 31 | accepted | integrity |
+| integrity/rules/IR-025-retired-adr-path-rule.md | 35 | accepted | integrity |
+| integrity/rules/IR-011-mapping-table-full-coverage.md | 31 | superseded | integrity |
 | quality/quality-specs.md | 27 | accepted | quality |
 | integrity/validator-split-criteria.md | 25 | accepted | integrity |
 | integrity/rules/IR-001-req-frontmatter-id-filename.md | 21 | accepted | integrity |
@@ -179,7 +180,6 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-008-skill-references-existence.md | 21 | accepted | integrity |
 | integrity/rules/IR-009-obsolete-namespace-residual.md | 21 | accepted | integrity |
 | integrity/rules/IR-010-adr-status-normalization.md | 21 | accepted | integrity |
-| integrity/rules/IR-011-mapping-table-full-coverage.md | 21 | accepted | integrity |
 | integrity/rules/IR-012-template-required-sections.md | 21 | accepted | integrity |
 | integrity/rules/IR-013-variant-path-existence.md | 21 | accepted | integrity |
 | integrity/rules/IR-014-singular-reference-dir-residual.md | 21 | accepted | integrity |
