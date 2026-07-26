@@ -1,20 +1,20 @@
 # obsolete-path-map.yaml
 #
-# 旧SPEC直下パス → 現行ドメイン分割パス対応表（REQ-0158-002、IR-057）。
-# docs/specs/ 基盤SPEC ドメイン別体系化（REQ-0156）以前は SPEC ファイルが
+# 旧SPEC直下パス → 現行ドメイン分割パス対応表（v2:REQ-0158-002、IR-057）。
+# docs/specs/ 基盤SPEC ドメイン別体系化（v2:REQ-0156）以前は SPEC ファイルが
 # docs/specs/ 直下に配置されていた。本 map はその旧パスを現行パスへmapし、
 # IR-057 obsolete-spec-path-after-domain-split が現行文書、原本、配置先、
 # 検査スクリプトに旧パスが残っていないことを検証するための参照データである。
 #
-# ファイル構成（REQ-0156-011 スキーマ）:
+# ファイル構成（v2:REQ-0156-011 スキーマ）:
 #   scope          : 検査対象範囲。全エントリで共有する top-level フィールド。
 #                    include / exclude は glob リスト。
 #   entries[]      : 旧→新パス対応エントリのリスト。各エントリは以下を持つ:
 #     old          : 旧SPEC直下パス（docs/specs/<name>.md 形式）
 #     new          : 現行ドメイン分割パス（docs/specs/<domain>/<name>.md 形式）
 #     severity     : ng（旧直下パス参照は不整合として扱う）
-#   legacy_local_generation_vocabulary[] : link mode 統一（ADR-0131）で廃止された
-#                    直接生成方式語彙の検出リスト（REQ-0141-004）。
+#   legacy_local_generation_vocabulary[] : link mode 統一（v2:ADR-0131）で廃止された
+#                    直接生成方式語彙の検出リスト（v2:REQ-0141-004）。
 #   generated_by_combination_rule        : generated_by と local-opencode-transform
 #                    の組み合わせ検出ルール。
 #
@@ -22,13 +22,13 @@
 # 現行ADRに歴史的経緯として旧パスを記載する場合は rule 側で例外登録する
 # （IR-057 rule ファイル参照）。
 #
-# 運用手順（REQ-0156-010、REQ-0156-006 の具体化）:
+# 運用手順（v2:REQ-0156-010、v2:REQ-0156-006 の具体化）:
 #   docs/specs/ 配下でドメイン分割による移送が発生した場合、移送実行者は
 #   移送単位（移動したファイルごと）で entries へ旧パスと新パスの対応を追記する。
 #   手順:
 #     1. 移送対象ファイルの docs/specs/ 直下パス（old）と移送先ドメインパス（new）を確認
 #     2. entries へ old / new / severity="ng" のエントリを追加
-#     3. check_integrity.ts（IR-057）を実行し、旧パス混入が検出できることを確認（REQ-0156-012）
+#     3. check_integrity.ts（IR-057）を実行し、旧パス混入が検出できることを確認（v2:REQ-0156-012）
 #     4. scope.exclude の内容が現行の検査対象外定義と一致することを確認
 #   追記漏れを防ぐため、移送 PR のレビューで本 yaml の追記有無を必ず確認する。
 
@@ -125,7 +125,7 @@ entries:
     new: "docs/specs/authoring/command-file-format.md"
     severity: "ng"
 
-# local 版旧生成方式語彙。link mode 統一（ADR-0131）に伴い廃止確定。
+# local 版旧生成方式語彙。link mode 統一（v2:ADR-0131）に伴い廃止確定。
 # 語彙は「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離する。
 # 単独検出語は出現だけで即 ng。近接条件つき検出語は同一ファイル内または近接行に
 # 旧 local 生成方式文脈語（単独検出語のいずれか）がある場合のみ ng とする。
