@@ -2,7 +2,7 @@
 title: RU / 採用済み成果物 / draft ライフサイクル
 status: accepted
 created: 2026-06-21
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # RU / 採用済み成果物 / draft ライフサイクル
@@ -100,7 +100,7 @@ sources:
 ```yaml
 ---
 finding_type: SPLIT | MOVE | RETIRE | DUPLICATE | OBSOLETE | DRIFT
-source_req: REQ-{NNNN} | null
+source_req: REQ-{NNN} | null
 source_command: req-save
 topic_slug: {topic-slug}
 created: "{YYYY-MM-DD}"
