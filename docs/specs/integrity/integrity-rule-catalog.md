@@ -28,9 +28,19 @@ status: accepted
 | false_positive_risk | string | 誤検知リスクと対策 |
 | regression_test | string | 回帰テストの有無、ID |
 | baseline_status | enum | known / new / resolved |
+| lifecycle_state | enum | active / superseded / deleted（IR の現在性。詳細は [integrity-contracts.md](integrity-contracts.md)「IR lifecycle と enforcement_mode」） |
+| enforcement_mode | enum | enforcement / observation / none（IR の実行可能性。detector 有無と `severity` から導出する派生軸） |
 | finding_route | enum | intake / intake+learning / req-define / learning / none |
 | triage_action | string | 新規検出時の対応アクション |
 | last_verified | date | 最終検証日 |
+
+### lifecycle_state / enforcement_mode の運用（REQ-010-053..058）
+
+IR スキーマへ `lifecycle_state`、`enforcement_mode` を追加する。両 field の正式な定義、有効組合せ（5件）、不正組合せ（4件）、排他的分割（file-backed と catalog-only deleted）、IR-011型 file-backed tombstone と IR-045型 catalog-only tombstone の区別、導出規則（4件）、`enforcement_mode: none` の4面除外（checker registry、gate routing、finding generation、baseline execution）、既存 severity/gate_level/baseline_status の維持と上書き禁止は [integrity-contracts.md](integrity-contracts.md)「IR lifecycle と enforcement_mode」を SSoT とする。本カタログは schema 定義のみを重複所有し、判定規則を再定義しない。
+
+派生性のため、active な IR は `lifecycle_state: active` を既定値として暗黙に満たす。`enforcement_mode` は detector 有無と `severity` から機械的に導出するため、IR ファイルで明示的に記載しなくても catalog 上の整合性は保持する。tombstone（superseded / deleted）の IR は両 field を明示的に記載し、IR-011 型 file-backed tombstone と IR-045 型 catalog-only tombstone の区別を表現する。
+
+> **フィールド数**: `lifecycle_state`、`enforcement_mode` は追加 field である。既存 IR ファイル（IR-001〜IR-061）が 15 field を満たすことは維持し、新 field を暗黙的に満たす。本カタログ「メタ整合性」の `フィールド数 ≥ 15` は変更せず、新 field は派生軸として扱う。
 
 ## regression_test フィールド運用方針
 
