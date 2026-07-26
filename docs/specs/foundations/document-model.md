@@ -282,7 +282,7 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 
 ## accepted ADR の意味的不変
 
-accepted ADR は意味的に不変とする（REQ-001）。
+accepted ADR は意味的に不変とする（REQ-001-056〜060）。
 詳細プロトコルは agentdev-adr-guidelines「accepted ADR の更新規則」、agentdev-adr-file-manager「accepted ADR 直接編集チェックリスト」を参照。
 
 ### 原則
