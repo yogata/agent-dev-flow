@@ -34,10 +34,10 @@ AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [�
 | ADR | タイトル |
 |---|---|
 | [ADR-001](adr/ADR-001.md) | AgentDevFlow 憲章 |
-| [ADR-002](adr/ADR-002.md) | OpenCode ソース・プロジェクション分離（v3） |
-| [ADR-003](adr/ADR-003.md) | req_draft ソフトコントラクト原則（v3） |
-| [ADR-004](adr/ADR-004.md) | 差し替え可能な I/O 境界（v3） |
-| [ADR-005](adr/ADR-005.md) | Project Extensions Architecture（v3） |
+| [ADR-002](adr/ADR-002.md) | OpenCode ソース・プロジェクション分離 |
+| [ADR-003](adr/ADR-003.md) | req_draft ソフトコントラクト原則 |
+| [ADR-004](adr/ADR-004.md) | 差し替え可能な I/O 境界 |
+| [ADR-005](adr/ADR-005.md) | Project Extensions Architecture |
 
 ## 仕様（SPEC）
 
