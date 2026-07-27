@@ -2,7 +2,7 @@
 title: `agentdev-req-analysis` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-27
 ---
 
 # `agentdev-req-analysis` SPEC
@@ -53,6 +53,40 @@ updated: 2026-07-18
 - 全ステークホルダー視点で合意形成できているか
 - 要件行が必達要件として記述されているか
 - SPEC 分離基準（REQ-001-068）違反の残留検出
+
+## pass_criteria 記述基準
+
+test strategy の pass_criteria 記述時、REQ content と pass_criteria 表現の食い違いが QG-4 最終評価で問題化することを防ぐための記述基準（AG-007）。req-define は test_strategy 策定時に本基準を適用する。
+
+### 意味的等価許容
+
+REQ content が pipeline stage（draft、Issue 本文、PR 本文等）によって表現を変える場合、pass_criteria は意味的等価性で判定する。文字列一致を機械的に要求しない。
+
+- pass_criteria は対象 REQ content の核心（対象、状態、振る舞い）を過不足なく表現する
+- 文字列表現の差異（見出し表記、助詞、句読点、句の順序）は意味的等価性を妨げない
+- 識別子（REQ ID、ファイルパス、セクション名）は一致を必須とする
+
+QG-4 は意味的等価性で pass_criteria 充足を判定する。
+
+### 「存在しないこと」と「変更されていないこと」の使い分け
+
+pass_criteria が「存在」「変更」を検証する場合、対象に応じて表現を使い分ける。
+
+| pass_criteria 表現 | 適用対象 | 検証方法 |
+|---|---|---|
+| 「存在しないこと」 | 新規作成禁止（例: REQ-0164 が存在しないこと、新規ファイルが存在しないこと） | 当該識別子、ファイルが存在しないことを確認（`glob`、`grep` で0件、`test -f` で偽） |
+| 「変更されていないこと」 | 既存 REQ、既存ファイルの変更がないこと | 当該ファイルに diff がないことを確認（`git diff --quiet` で終了コード0） |
+
+誤用例:
+
+- ❌「REQ-001 が存在しないこと」（REQ-001 は既存のため、検証が常に偽となり有意でない。「変更されていないこと」を使用する）
+- ❌「新規ファイル X が変更されていないこと」（存在しないファイルは diff 対象にならない。「存在しないこと」を使用する）
+- ✅「REQ-0164 が存在しないこと」（新規作成禁止の検証として有意）
+- ✅「REQ-001 が変更されていないこと」（既存 REQ の diff がないことの検証として有意）
+
+### 共通 pass_criteria と正規所有
+
+複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は [agentdev-workflow-templates.md](agentdev-workflow-templates.md)「test strategy 記述ガイドライン」を正規所有とする。本 SPEC は意味的等価許容、存在確認と diff 確認の使い分けに限定する。
 
 ## See Also
 
