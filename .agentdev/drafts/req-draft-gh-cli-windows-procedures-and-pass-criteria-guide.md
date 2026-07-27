@@ -1,12 +1,13 @@
 ---
 draft_type: req_draft
 topic_slug: gh-cli-windows-procedures-and-pass-criteria-guide
-status: draft
+status: saved
 created_at: 2026-07-27T00:00:00+09:00
 source_rus:
   - RU-0005
   - RU-0006
 agentdev_handoff: true
+spec_actions_consumed: true
 ---
 
 <!-- 本ドラフトは AgentDevFlow 本体の不具合・改善点を扱う前工程引き継ぎドラフトである（agentdev_handoff: true）。 -->
