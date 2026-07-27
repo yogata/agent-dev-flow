@@ -2,7 +2,7 @@
 title: req-save SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # req-save SPEC
@@ -96,7 +96,7 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 - push 後の status 更新（G07、commit 対象に status 変更を含めること）
 - Step 9-1 の hash 一致検証省略（G08）
 - Issue 作成（G11、case-open 責務）
-- intake / learning capture の実施（G12、例外: REQ 再構成 intake のみ）
+- intake / learning capture の直接実施（G12）。deviation capture は Skill 委譲で実施（「副作用」セクション参照）
 - SPEC artifact_actions の処理（spec-save 責務）
 - `work_type` 固定分岐による工程判定（G09、`artifact_actions` 有無で判定）
 
