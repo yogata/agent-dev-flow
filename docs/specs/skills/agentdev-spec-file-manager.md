@@ -2,7 +2,7 @@
 title: agentdev-spec-file-manager SPEC
 status: draft
 created: 2026-07-22
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # agentdev-spec-file-manager SPEC
@@ -47,6 +47,22 @@ SPEC operation の公式 enum は `create` / `update` であり、本 skill は�
 - SPEC 固有整合性確認（frontmatter 完全性、target_area マッチング規則、SPEC status ライフサイクル）
 - `search-target-area.ts`（SPEC 固有 script）の呼出契約。同 script は見出し行全体との完全一致のみを受け付け、前方一致、後方一致、部分一致を受け付けない（正規入力 `### IR-044` は見出し行 `### IR-044 - 題` とはマッチしない）。この契約は `target_area` マッチング規則と `spec-append` の anchor マッチング規則の双方に適用される
 - 共通検証（frontmatter 整合性、エントリ存在、変更範囲）は `agentdev-artifact-validation` の公開検証契約へ委譲
+
+### APPEND 操作（spec-append）
+
+`spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `../commands/spec-save.md`「spec-append 操作時のセクション追加ロジック」が正規所有する。
+
+- `content` は新規見出し行から始まる
+- `placement`: `tail`（既定）/ `after_anchor` / `before_anchor` のいずれか
+- `anchor`: `placement` が `tail` 以外の場合は必須。見出し行全体で指定する
+- 同名見出し時: `target_area` と完全一致する見出しが既存 SPEC ファイルに存在する場合、追加をスキップし follow-up 報告を行う（重複追加防止、全体中止しない）
+- anchor 未検出時: `placement` が `tail` 以外で `anchor` 見出し行が存在しない場合、当該 action をスキップし follow-up 報告を行う（全体中止しない）
+- follow-up 報告は「operation を `spec-create` へ切り替えを推奨」を含む
+- 合格基準: 追加後の SPEC ファイルに `target_area` と完全一致する見出しが1つだけ存在すること
+
+### search-target-area.ts 契約
+
+`search-target-area.ts` は見出し行全体との完全一致のみを受け付ける。前方一致、後方一致、部分一致を受け付けない（前方一致廃止）。正規入力（例: `### IR-044`）で回帰テストを維持する。この契約は `target_area` マッチング規則と `spec-append` の anchor マッチング規則の双方に適用される。
 
 ## 参照する references
 
