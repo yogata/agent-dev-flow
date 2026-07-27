@@ -1,8 +1,10 @@
 ---
 title: spec-save SPEC
 status: accepted
+spec_logical_division: behavior
+canonical_owner: spec-save
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # spec-save SPEC
@@ -117,6 +119,21 @@ bootstrap 問題（宣言前に強制すると既存 SPEC 処理不能）を避�
 
 `target_area` が未指定の draft（旧形式）、または `operation` が create/spec-create の場合は従来の「追記」動作を維持する（REQ-001-028）。
 `target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
+
+### spec-append operation の処理
+
+operation: spec-append の場合:
+- target_area と完全一致する見出し行が既存する場合は追加スキップ + follow-up 報告（全体中止しない）
+- placement: tail（既定）の場合は SPEC ファイル末尾へ新規セクションを追加
+- placement: after_anchor / before_anchor の場合は anchor で指定された見出し行の前後へ追加。
+  anchor が未検出の場合は action スキップ + follow-up 報告
+- 合格基準: 追加後の SPEC ファイルに target_area と完全一致する見出しが1つだけ存在すること
+
+### search-target-area.ts 契約
+
+search-target-area.ts は見出し行全体との完全一致のみを受け付ける。
+前方一致や見出し本文のみの抽出は行わない。
+正規入力（例: `### IR-044`）での回帰テストを維持する。
 
 ## 参照する横断 SPEC
 

@@ -1,8 +1,10 @@
 ---
 title: req-define SPEC
 status: accepted
+spec_logical_division: behavior
+canonical_owner: req-define
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # req-define SPEC
@@ -199,6 +201,17 @@ artifact_actions の各 entry が出力する `target_area` と `content` の扱
 
 req-define 側は出力形式のみを規定する。
 `target_area` の形式（Markdown 見出し行）、見出し階層の解釈規則、複数マッチ、未検出時の挙動は [spec-save.md](spec-save.md) 側に配置する。
+
+## artifact_actions 生成
+
+req-define は新規セクション追加を operation: spec-append として出力する。
+- target: 既存 SPEC パス
+- target_area: 新規セクション見出し
+- content: 新規セクション全文（見出し行から始まる）
+- placement: tail（既定）/ after_anchor / before_anchor（必要時）
+- anchor: placement が tail 以外の場合は必須（必要時）
+
+これにより意図的な新規セクション追加と target_area の誤字・古い見出し名・参照先間違いを機械的に区別できる。
 
 ## review_dispositions の producer 契約
 

@@ -1,8 +1,10 @@
 ---
 title: agentdev-spec-file-manager SPEC
 status: draft
+spec_logical_division: behavior
+canonical_owner: agentdev-spec-file-manager
 created: 2026-07-22
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # agentdev-spec-file-manager SPEC
@@ -44,6 +46,20 @@ SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPE
 - SPEC 固有整合性確認（frontmatter 完全性、target_area マッチング規則、SPEC status ライフサイクル）
 - `search-target-area.ts`（SPEC 固有 script）の呼出契約
 - 共通検証（frontmatter 整合性、エントリ存在、変更範囲）は `agentdev-artifact-validation` の公開検証契約へ委譲
+
+### APPEND 操作（spec-append）
+
+- content は新規見出し行から始まる
+- 同名見出し（target_area と完全一致）が既存の場合は追加スキップ + follow-up 報告
+- placement: tail（既定）/ after_anchor / before_anchor
+- anchor: placement が tail 以外の場合は必須、見出し行全体で指定
+- anchor 未検出時: action スキップ + follow-up 報告
+- 合格基準: 追加後の SPEC ファイルに target_area と完全一致する見出しが1つだけ存在すること
+
+### search-target-area.ts 契約
+
+search-target-area.ts は見出し行全体との完全一致のみを受け付ける（前方一致廃止）。
+正規入力（例: `### IR-044`）で回帰テストを維持する。
 
 ## 参照する references
 
