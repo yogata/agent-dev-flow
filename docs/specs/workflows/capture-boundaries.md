@@ -80,6 +80,52 @@ CaptureBoundary 検査（`check_integrity.ts` の `command-capture-duty`）は�
 
 例外の根拠は本 capture 責務表である。同表は case-auto の intake、learning をともに「各工程の保存結果参照と件数集計のみ」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
 
+## 工程別 capture 責務
+
+主ワークフロー構成 6 工程（req-save / spec-save / case-open / case-run / case-close / case-auto）の capture 責務、保存先、git 永続化担当を工程別に定義する。各工程分散型（選択肢A、REQ-006-021 / REQ-006-105〜108）に従う。
+
+### 工程別 capture 責務表
+
+| 工程 | capture 責務 | 保存先 | git 永続化担当 |
+|---|---|---|---|
+| req-save | REQ 再構成 intake + 自工程 deviation capture（REQ-006-106） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | req-save command |
+| spec-save | 自工程 deviation capture（REQ-006-107） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | spec-save command |
+| case-open | 自工程 deviation capture（case-close への委譲を廃止、REQ-006-021） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | case-open command |
+| case-run | PR 本文記録のみ（`.agentdev/` 直接変更禁止） | PR 本文 `## Findings / Capture候補` | 実行担当サブエージェント（PR 作成時） |
+| case-close | PR 本文から回収 + 自工程 deviation capture（REQ-006-105、Epic 横断回収含む） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | case-close command |
+| case-auto | 各工程の保存結果参照と件数集計のみ（REQ-006-108）。capture 本文の再分類、再保存は行わない | （保存しない） | （git 永続化なし） |
+
+### 委譲契約（Command→Skill 依存方向）
+
+各 command は Command→Skill 依存方向（`docs/specs/responsibilities/artifact-contracts.md`「依存方向」参照）に従い、capture 成果物の生成を Skill へ委譲する。command は `intake-capture` 等の他 command を呼び出さない。
+
+| 種別 | 委譲先 Skill | 役割 |
+|---|---|---|
+| learning | `agentdev-learning-capture` skill | 失敗、回避、修正、判断ミスの知見抽出と `inbox.md` エントリ生成 |
+| intake | `agentdev-intake-pipeline` skill | 作業候補、不整合、規約違反の item 生成操作 |
+
+git 永続化（commit、push）は呼出元 command が担う。Skill は候補生成と file 書き込みまでを担い、commit 実行は委譲しない。
+
+### Epic Issue 単一書き手制約（case-close 経由）
+
+Epic Issue 本文（ステータス追跡テーブル）の更新は `case-close(#epic)` のみが行う（REQ-006-021、`docs/specs/workflows/epic-wave-model.md`「Epic Issue 本文の単一書き手制約」参照）。
+
+- `case-run(#epic)` は Epic Issue 本文を読み取るのみで書き込まない
+- `case-auto` 自身は Epic Issue を更新せず、case-close 経由で更新する
+- 複数 execution_unit 並列実行時も per-Epic-Issue-body の単一書き手が維持される（REQ-006-021）
+
+### 完了報告（Capture結果）
+
+各 command の完了報告には `Capture結果` 小節を含める。共通意味契約は `docs/specs/responsibilities/artifact-contracts.md`「Capture結果 小節（共通意味契約）」が正規所有する。
+
+記載内容:
+
+- 保存先パス（`.agentdev/intake/inbox/*.md`、`.agentdev/learning/inbox.md`）
+- 分類（intake / learning）
+- 保存結果（成功/失敗、件数、コミットハッシュ等）
+
+capture 本文は完了報告に含めない。具体的な表示構造は各 command-local Template が正規所有する。
+
 ## REQ 再構成 intake
 
 通常intakeとは独立した配置規約（REQ-010）。
@@ -102,8 +148,11 @@ req-define の明示入力としてルーティングする（backlog-review 経
 ## See Also
 
 - [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
+- [epic-wave-model.md](epic-wave-model.md)（Epic Issue 本文の単一書き手制約）
 - [backlog-artifact-lifecycle.md](backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
+- [../responsibilities/artifact-contracts.md](../responsibilities/artifact-contracts.md)（Command→Skill 依存方向、`Capture結果` 小節の共通意味契約）
 - 各 command SPEC（`docs/specs/commands/`）
 - `agentdev-workflow-orchestration` skill（capture 境界の詳細）
-- REQ-006（Case実行オーケストレーション / Epic、Wave）
+- `agentdev-learning-capture` skill、`agentdev-intake-pipeline` skill（capture 成果物の生成委譲先）
+- REQ-006（Case実行オーケストレーション / Epic、Wave、各工程分散型 capture 責務 REQ-006-021/105〜108）
 - REQ-010（REQ 再構成 intake）
