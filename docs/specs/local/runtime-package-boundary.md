@@ -1,6 +1,8 @@
 ---
 status: accepted
-updated: 2026-07-26
+spec_logical_division: catalog
+canonical_owner: runtime-package-boundary
+updated: 2026-07-27
 ---
 
 # 実行時パッケージ境界
@@ -303,7 +305,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 |--------|------|------|
 | `agentdev-*` 全 27 件 | 配布物依存 | `src/opencode/skills/` 配下、`agentdev-*` グロブで自動 junction |
 | `japanese-tech-writing` | 配布物依存 | `agentdev-doc-writing` が執筆規範 SSoT として参照（PR #1385 で昇格）。`agentdev-*` 非準拠のため install script で個別 junction 対象 |
-| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` 卡out 対象。配布物（`agentdev-*` 以外）が実行時参照する一部コマンド（`req-save`, `spec-save`, `case-close`, `inspect-extensions`）が `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 SPEC の対象外） |
+| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` 卡out 対象。配布物（`agentdev-*` 以外）が実行時参照する一部コマンド（`req-save`, `spec-save`, `case-close`, `docs-check`, `inspect-skills`, `inspect-promote`）が `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 SPEC の対象外）。ADR-006 により `inspect-extensions` は廃止され、後継3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ移管済み |
 
 ## 関連項目（See Also）
 
