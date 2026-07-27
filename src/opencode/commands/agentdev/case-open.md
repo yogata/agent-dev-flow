@@ -243,6 +243,8 @@ push 失敗時は構造化エラーメッセージを表示して停止する
 - 単一REQ Epic → `templates/case-open/epic.md`
 - マルチREQ Epic → `templates/case-open/multi-req-epic.md`
 
+**Capture結果 小節（REQ-006-109）**: 完了報告テンプレートの `結果` 内に `Capture結果` 小節を含める。case-open 実行中に実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存した場合、保存した capture 成果物のパス・分類（intake/learning）・保存結果（成功/失敗、失敗時は理由）のみを含める。capture 本体は含めない。capture 成果物が無い場合は `Capture結果` 小節を省略する（共通意味契約は `artifact-contracts` SPEC「Capture結果 小節（共通意味契約）」節参照）
+
 ## ガードレール
 
 ### フェーズ制約
@@ -274,14 +276,14 @@ push 失敗時は構造化エラーメッセージを表示して停止する
 ### 出力制約
 - G17: 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）はverbatimで返す。「verbatim」とはLF・空行・インデントを含む行構造をbyte単位で保持することを指し、文字列の正規化、改行圧縮、空白挿入・削除をすべて禁止する。委譲接続点（Step 2/6/8/9）と最終 gh CLI 渡し（Step 12/13）の双方に適用する。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
 
- ### Capture 非関与制約
-- G18: case-open は intake/ learning capture を行わない。capture 境界（capture-boundaries）の詳細は `agentdev-workflow-orchestration` を参照
+ ### deviation capture 制約
+- G18: case-open は自工程で実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存する。保存先は Split Rule（`agentdev-workflow-orchestration` 参照）に従う。`intake-capture` command 等、別 command を直接呼ばない（REQ-006-021、REQ-006-109）
 
 ### OU 処理制約
 - G19: case-open は自律的な要件分析に基づいて Epic Issue を作成すること。ただし機能要件、非機能要件、対象外、受け入れ条件を新規に作成しないこと
 - G20: case-open は複数 OU が存在する場合、要件分析に基づいて Epic Issue および子 Issue 構造を生成すること。単一 Issue で完結する場合は Epic を作成しないこと
 - G21: case-open の Issue 化単位は REQ doc 単位ではなく OU 単位とすること
-- G22: case-open の capture 責務は非関与。intake/ learning capture を行わない。境界の詳細は `agentdev-workflow-orchestration` 参照
+- G22: case-open の capture 責務は自工程 deviation capture のみ。`agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）への委譲で保存し、capture 本文は完了報告に含めず保存した成果物のパス・分類・保存結果のみを `Capture結果` 小節へ含める（REQ-006-021、REQ-006-109）。境界の詳細は `agentdev-workflow-orchestration` 参照
 
 ### 並列実行安全 git 操作制約
 - G23: 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）を実行しないこと。`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従うこと
