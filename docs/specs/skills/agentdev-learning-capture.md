@@ -1,8 +1,10 @@
 ---
 title: `agentdev-learning-capture` SPEC
 status: accepted
+spec_logical_division: cross_cutting_contract
+canonical_owner: agentdev-learning-capture
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-07-27
 ---
 
 # `agentdev-learning-capture` SPEC
@@ -22,6 +24,10 @@ updated: 2026-07-18
 - 13フィールド形式でのエントリ生成（問題事象、発生局面、検知方法、根本原因、自律対応内容、ユーザー確認有無、ADR/REQ/spec 影響、横展開観点、再発条件、予防策候補、想定反映先、関連、タグ）
 - Split Rule（learning vs intake 分離）
 - 閾値チェック（15件以上で promote 提案）
+
+## 呼出元 command 契約
+
+自動 capture 向け呼出: 各工程 command（req-save/spec-save/case-open/case-close）は、自工程で実観測した deviation のうち learning 該当分を agentdev-learning-capture skill へ委譲する。本 skill は inbox.md への追記と extraction を担い、git 永続化は呼出元 command が担当する（現行契約維持）。
 
 ## 参照する references
 

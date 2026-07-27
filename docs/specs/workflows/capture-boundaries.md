@@ -1,8 +1,10 @@
 ---
 title: キャプチャ境界
 status: accepted
+spec_logical_division: cross_cutting_contract
+canonical_owner: capture-boundaries
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # キャプチャ境界（Capture Boundaries）
@@ -79,6 +81,33 @@ CaptureBoundary 検査（`check_integrity.ts` の `command-capture-duty`）は�
 - capture 責務表の intake または learning 列が具体的な責務記述（PR 本文記録、回収、REQ再構成 intake 生成等）である command は、`capture-boundaries` 参照を個別に持ち、対応する capture 導線を実装する。
 
 例外の根拠は本 capture 責務表である。同表は case-auto の intake、learning をともに「各工程の責務を継承」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
+
+## 工程別 capture 責務
+
+各工程 command は自工程で実観測した deviation を Split Rule で分類し、intake/learning のいずれかへ保存する。
+
+| Command | capture 責務 | 保存先 | git 永続化 |
+|---------|------------|--------|-----------|
+| req-save | REQ 再構成 intake（現行維持）+ 自工程 deviation の capture | intake/inbox/ または learning/inbox.md | req-save 自身 |
+| spec-save | 自工程 deviation の capture（現行非関与から変更） | intake/inbox/ または learning/inbox.md | spec-save 自身 |
+| case-open | 自工程 deviation の capture（現行非関与から変更）。case-close への委譲は廃止 | intake/inbox/ または learning/inbox.md | case-open 自身 |
+| case-run | PR Findings 経由（現行維持） | PR 本文 | case-run 自身 |
+| case-close | PR 本文からの回収（現行維持）+ 自工程 deviation の capture | intake/inbox/ または learning/inbox.md | case-close 自身 |
+| case-auto | 各工程の保存結果参照と件数のみ集計。capture 本文の再分類・再保存は行わない | （集計のみ） | （集計のみ） |
+
+### 委譲契約
+
+- learning 保存: agentdev-learning-capture skill へ委譲
+- intake 保存: agentdev-intake-pipeline へ自動capture向け item 生成操作を追加して委譲
+- command から別 command（intake-capture 等）は呼ばない（Command→Skill 依存方向）
+
+### Epic Issue 単一書き手制約
+
+Epic Issue への記録は case-close 経由。case-auto 自身は Epic Issue を更新しない（per-Epic 単一書き手 = case-close）。
+
+### 完了報告
+
+各 command の完了報告には保存した capture 成果物のパス・分類・保存結果のみを含める。capture 本文は含めない。
 
 ## REQ 再構成 intake
 

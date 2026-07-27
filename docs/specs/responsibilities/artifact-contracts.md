@@ -292,6 +292,16 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-046）。
 完了報告がコマンドの最終出力である。
 完了報告テキストを出力した後は、追加のテキスト、説明、サマリーを出力しない。
 
+### `Capture結果` 小節（共通意味契約）
+
+`結果` 内に任意の `Capture結果` 小節を定義する（新規トップレベルフィールドは追加しない）。`Capture結果` 小節の共通意味契約を本 SPEC で定義する。
+
+- 保存した capture 成果物のパス（intake/inbox/*.md または learning/inbox.md への相対パス）
+- 分類（intake/learning）
+- 保存結果（成功/失敗、失敗時は理由）
+
+具体的な `Capture結果` 小節の表示構造は各 command-local Template が正規所有する。
+
 ## 適用範囲宣言
 
 `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。

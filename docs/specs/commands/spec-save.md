@@ -29,6 +29,9 @@ req-save の次、case-open の前に実行する。
 - ファイル作成/更新: `docs/specs/**`, `.agentdev/drafts/**`（status 更新用）。`docs/specs/README.md`, `docs/DOC-MAP.md` は SPEC 操作に付随する更新のみ許可
 - git 操作: commit + push（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
 - Issue 作成: 行わない（G12、case-open 責務）
+- deviation capture: spec-save 実行中に実観測した deviation を agentdev-learning-capture skill または agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。保存先は capture-boundaries.md の Split Rule に従う
+- git 永続化: capture 成果物を spec-save 自身の既存 commit/push 処理内で永続化
+- 完了報告: 保存した capture 成果物のパス・分類・保存結果を `Capture結果` 小節（`結果` 内）に含める
 
 ## 現在の動作
 

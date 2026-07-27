@@ -1,8 +1,10 @@
 ---
 title: case-close SPEC
 status: accepted
+spec_logical_division: behavior
+canonical_owner: case-close
 created: 2026-06-21
-updated: 2026-07-25
+updated: 2026-07-27
 ---
 
 # case-close SPEC
@@ -38,6 +40,10 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 - worktree / ブランチ削除: `agentdev-git-worktree` 手順に従う
 - capture 回収: PR 本文から intake / learning を分離回収し `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` へ保存
 - SPEC status 昇格: `docs/specs/**` の `status: draft` → `accepted` 昇格（Step 3-2）
+- deviation capture: case-close 実行中に実観測した deviation を agentdev-learning-capture skill または agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。保存先は capture-boundaries.md の Split Rule に従う（PR 本文からの回収に加えて実施）
+- git 永続化: capture 成果物を case-close 自身の既存 commit/push 処理内で永続化
+- 完了報告: 保存した capture 成果物のパス・分類・保存結果を `Capture結果` 小節（`結果` 内）に含める
+- Epic Issue 単一書き手: case-close は Epic Issue への記録を一手に担う（per-Epic 単一書き手制約）
 
 ## git 操作と worktree クリーンアップ
 
