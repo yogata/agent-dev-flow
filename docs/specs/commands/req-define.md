@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # req-define SPEC
@@ -187,6 +187,49 @@ test_strategy:
 |------|------|---------|
 | fix-and-reverify | 実装を修正して再検証する | 修正可能な実装不良の場合 |
 | record-in-findings | Findings に out-of-scope として記録する | スコープ外または修正困難な事象の場合 |
+
+## artifact_actions 生成
+
+req-define は `artifact_actions` の producer である。Step 7-3 で要件展開の結果を `draft-data` の `artifact_actions` へ出力する。本節は req-define 側の生成契約（operation の選択基準、`spec-append` の生成、誤記との機械的区別、後方互換）を規定する。各 operation の `target_area` と `content` の出力形式は後段「[draft-data artifact_actions フィールド形式](#draft-data-artifact_actions-フィールド形式)」を参照。
+
+### operation の選択基準
+
+req-define は変更の性質に応じて SPEC operation を選択する。SPEC operation の公式 enum、非正規 alias、alias から公式 enum への映射、consumer 側の後方互換は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「artifact_actions operation」が正規所有する。
+
+| 変更の性質 | operation | 意図 |
+|---|---|---|
+| 新規 SPEC ファイル作成 | `create` / `spec-create` | SPEC ファイルを新規作成する |
+| 既存 SPEC ファイルの既存セクション置換 | `update` / `spec-update` | 既存セクション全体を新しい内容で置換する |
+| 既存 SPEC ファイルへの新規セクション追加 | `spec-append` | 既存 SPEC ファイルへ新規セクションを追加する |
+
+`create` / `update` は公式 enum であり、`spec-create` / `spec-update` / `spec-append` は非正規 alias である。
+
+### spec-append の生成契約
+
+req-define は既存 SPEC ファイルへ新規セクションを追加する場合、`operation: spec-append` として action を出力する。入力フィールドは以下の通り。
+
+| field | 必須性 | 形式 |
+|---|---|---|
+| `target` | 必須 | 既存 SPEC ファイルパス |
+| `target_area` | 必須 | 追加する新規セクションの見出し（Markdown 見出し行形式。例: `### IR-044`） |
+| `content` | 必須 | 追加する新規セクション全文（見出し行から始まる） |
+| `placement` | 任意（省略時 `tail`） | `tail` / `after_anchor` / `before_anchor` のいずれか |
+| `anchor` | `placement` が `tail` 以外は必須 | 挿入位置の基準となる見出し行（`target_area` と同一形式） |
+
+`placement` 別の追加位置、`anchor` マッチング規則、anchor 未検出時の挙動、同名見出し時の挙動、合格基準は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「spec-append operation」および [spec-save.md](spec-save.md)「spec-append 操作時のセクション追加ロジック」が正規所有する。req-define 側は入力フィールドの選択と値の生成のみを規定し、配置実行の詳細は規定しない。
+
+### 新規セクション追加と target_area 誤記の機械的区別
+
+`spec-append` を用いることで、意図的な新規セクション追加と `target_area` の誤字・古い見出し名・参照先間違いを機械的に区別できる。
+
+- `update` / `spec-update`: 既存セクションを置換する意図。`target_area` に一致する見出しが存在しない場合、consumer（spec-save）は未検出として follow-up 報告を行う。`target_area` の誤字、古い見出し名、参照先間違いはこの経路で検出される
+- `spec-append`: 新規セクションを追加する意図。`target_area` は追加する新規セクションの見出しを示し、既存見出しとの一致を前提としない。配置位置は `placement` と `anchor` で指示する
+
+両者を operation で明示することで、consumer 側は `target_area` が既存見出しと一致しない事象を「置換対象の誤記」と「新規セクション追加の意図」で区別して処理できる。
+
+### 後方互換
+
+既存の `create` / `update` および alias `spec-create` / `spec-update` は従来通り出力可能であり、consumer（spec-save）は `create` / `update` / `spec-create` / `spec-update` / `spec-append` の全てを受理する（後方互換）。`target_area`、`placement`、`anchor` 等のフィールドを持たない旧形式 draft も consumer は入力として拒否しない。後方互換の正規定義は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「SPEC operation enum と非正規 alias」を参照。
 
 ## draft-data artifact_actions フィールド形式
 
