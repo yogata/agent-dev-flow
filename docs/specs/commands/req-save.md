@@ -2,7 +2,7 @@
 title: req-save SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-26
+updated: 2026-07-27
 ---
 
 # req-save SPEC
@@ -32,7 +32,12 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
 - git 操作: commit + push（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
 - 読込時 hash 記録 → Step 9-1 で `git pull --ff-only` 後 hash 一致検証（G08）
 - Issue 作成: 行わない（G11、case-open 責務）
-- intake / learning capture: 原則非関与（G12、例外: REQ 再構成 intake のみ生成可能）
+- deviation capture: req-save 実行中に実観測した deviation を agentdev-learning-capture skill または
+  agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。
+  保存先は capture-boundaries.md の Split Rule に従う。
+  REQ 再構成 intake のみ（現行維持）も本責務に含む。
+- git 永続化: capture 成果物を req-save 自身の既存 commit/push 処理内で永続化。
+- 完了報告: 保存した capture 成果物のパス・分類・保存結果を `Capture結果` 小節（`結果` 内）に含める。
 
 ## 現在の動作
 
