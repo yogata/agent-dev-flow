@@ -33,9 +33,12 @@ draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処�
 
 ### Step 1: 前工程からの引き継ぎ停止判定
 
-要件docまたは RU に `agentdev_handoff: true` が含まれる場合、Issue を作成せず停止。
-agent-dev-flow repository への手動取り込み対象として報告。
-判定は `agentdev-workflow-lifecycle` に従う
+要件docまたは RU に `agentdev_handoff: true` が含まれる場合、リポジトリ種別に応じて以下の判定を行う（REQ-005-021, REQ-005-022）:
+
+- **self-hosting リポジトリ**（`src/opencode/` が存在）: `agentdev_handoff: true` を取り込み元の履歴メタデータとして扱い、通常の req/case workflow 入力として処理を継続する（停止しない）
+- **consumer リポジトリ**（`src/opencode/` が不在）: Issue を作成せず停止し、agent-dev-flow repository への手動取り込み対象として報告する
+
+リポジトリ種別の判定基準は `agentdev-workflow-lifecycle`（runtime-package-boundary 参照）に従う
 
 **Step 1-1**: OU 選択ゲート（ドラフトに `operation_units` セクションがある場合、処理対象 OU を決定する）:
 - OU ID 指定あり → 当該 OU のみを処理対象とする例外経路。指定された OU の req-save result を読み取り、その OU だけを Issue 化する

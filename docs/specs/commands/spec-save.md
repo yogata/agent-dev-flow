@@ -34,7 +34,7 @@ req-save の次、case-open の前に実行する。
 - Step 2: SPEC artifact_actions 読込（`artifact: spec` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は SPEC 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（create/update）、`content` を処理対象とする
 - Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/foundations/patterns.md`）→ update 操作）。`target_spec: {operation, domain, slug}` 構造化 → 新規 SPEC 作成（`docs/specs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-001-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
 - Step 4: SPEC 分離基準の最終確認（各 action が REQ-001-055（SPEC に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-001-069）相当は除外し follow-up に明示
-- Step 5: SPEC ファイル操作。`target_area` 見出し検索は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行
+- Step 5: SPEC ファイル操作。`target_area` 見出し検索は `agentdev-spec-file-manager/scripts/` の決定的スクリプトで実行
  - create: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
  - update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
  - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
@@ -100,9 +100,10 @@ bootstrap 問題（宣言前に強制すると既存 SPEC 処理不能）を避�
 
 ### マッチング規則
 
-- 対象 SPEC ファイル内の見出し行を走査し、`target_area` と完全一致する見出し行を検索する
+- 対象 SPEC ファイル内の見出し行を走査し、`target_area` に一致する見出し行を検索する
+- **入力正規化**: `target_area` に Markdown 見出しプレフィックス（`##`、`###` 等）が含まれる場合、比較前にプレフィックスを除去して見出しテキスト部分へ正規化する。`## セクション名` と `セクション名` のいずれの形式でも同じ結果となる
 - 当該見出し行から次の同レベル（または上位レベル）見出し行の直前までを「セクション」として特定する
- - 例: `### X` で検索した場合、次の `###` または `##` または `#` 見出しの直前までを範囲とする
+  - 例: `### X` で検索した場合、次の `###` または `##` または `#` 見出しの直前までを範囲とする
 - 特定したセクションを action の `content` で置換する
 
 ### 複数マッチ時の挙動

@@ -8,8 +8,10 @@
  * （REQ-0136-029: SPEC 固有 script は agentdev-spec-file-manager 配下）。
  *
  * マッチ規約（spec-save command SPEC の target_area ベースのセクション置換ロジックに準拠）:
- *   - 完全一致: 見出しテキストが target_area に完全一致
- *   - 前方一致: 見出しテキストが target_area で始まる
+ *   - 入力正規化: target_area に Markdown 見出しプレフィックス（#{1,6}\s+）が含まれる場合、
+ *     比較前にプレフィックスを除去して見出しテキスト部分へ正規化する
+ *   - 完全一致: 正規化後の target_area と見出しテキストが完全一致
+ *   - 前方一致: 見出しテキストが正規化後の target_area で始まる
  *   - 複数マッチ時は warning（spec-save G09 で置換拒否の根拠）
  *   - 未検出時は空配列（spec-save でスキップ判定）
  *
@@ -31,14 +33,26 @@ export type Match = {
 };
 
 /**
+ * target_area から Markdown 見出しプレフィックス（#{1,6}\s+）を除去する。
+ * ドラフトが `## Windows 環境...` 形式で target_area を指定した場合でも、
+ * 見出しテキスト部分のみを抽出した headingText と正しく比較できるようにする。
+ */
+export function normalizeTargetArea(targetArea: string): string {
+  const match = /^#{1,6}\s+(.*)$/.exec(targetArea);
+  return match && match[1] ? match[1].trim() : targetArea.trim();
+}
+
+/**
  * 1ファイルの本文から target_area にマッチする見出しを抽出する（純粋関数）。
  * 見出し行（# で始まる行）のみを対象とする。
+ * target_area に見出しプレフィックス（## 等）が含まれる場合は比較前に正規化する。
  */
 export function findTargetAreaHeadings(
   targetArea: string,
   content: string,
   filePath: string,
 ): Match[] {
+  const normalizedTargetArea = normalizeTargetArea(targetArea);
   const matches: Match[] = [];
   const lines = content.split(/\r?\n/);
   for (let i = 0; i < lines.length; i++) {
@@ -46,7 +60,7 @@ export function findTargetAreaHeadings(
     const headingMatch = /^(#{1,6})\s+(.*)$/.exec(line);
     if (!headingMatch || headingMatch[2] === undefined) continue;
     const headingText = headingMatch[2].trim();
-    if (headingMatchesTarget(headingText, targetArea)) {
+    if (headingMatchesTarget(headingText, normalizedTargetArea)) {
       matches.push({ file: filePath, line: i + 1, text: line });
     }
   }

@@ -3,6 +3,7 @@ import {
   headingMatchesTarget,
   findTargetAreaHeadings,
   searchTargetArea,
+  normalizeTargetArea,
 } from "../src/search-target-area.ts";
 
 describe("headingMatchesTarget", () => {
@@ -46,6 +47,47 @@ more text`;
     const content = `本文中に 目的 という単語があっても`;
     const matches = findTargetAreaHeadings("目的", content, "spec.md");
     expect(matches).toEqual([]);
+  });
+
+  test("normalizes ## prefix in target_area before matching", () => {
+    const content = "## 目的\n\nbody";
+    const matches = findTargetAreaHeadings("## 目的", content, "spec.md");
+    expect(matches).toHaveLength(1);
+    expect(matches[0]!.line).toBe(1);
+  });
+
+  test("normalizes ### prefix in target_area before matching", () => {
+    const content = "### IR-044\n\nbody";
+    const matches = findTargetAreaHeadings("### IR-044", content, "spec.md");
+    expect(matches).toHaveLength(1);
+  });
+
+  test("prefix-less target_area still works (backward compat)", () => {
+    const content = "## 目的\n\nbody";
+    const matches = findTargetAreaHeadings("目的", content, "spec.md");
+    expect(matches).toHaveLength(1);
+  });
+});
+
+describe("normalizeTargetArea", () => {
+  test("strips ## prefix", () => {
+    expect(normalizeTargetArea("## 目的")).toBe("目的");
+  });
+
+  test("strips ### prefix", () => {
+    expect(normalizeTargetArea("### IR-044")).toBe("IR-044");
+  });
+
+  test("strips # prefix", () => {
+    expect(normalizeTargetArea("# Title")).toBe("Title");
+  });
+
+  test("passes through text without prefix", () => {
+    expect(normalizeTargetArea("目的")).toBe("目的");
+  });
+
+  test("trims whitespace", () => {
+    expect(normalizeTargetArea("  目的  ")).toBe("目的");
   });
 });
 

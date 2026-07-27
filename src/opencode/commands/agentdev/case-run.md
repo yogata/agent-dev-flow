@@ -65,9 +65,11 @@ Epic Issue 本文から現在 ready な Wave の子Issue を特定し、各子Is
 
 いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
 
-**前工程からの引き継ぎ停止判定**: Issue 本文、要件doc本文に `agentdev_handoff: true` が含まれる場合、実装を開始せず停止する。
-agent-dev-flow repository への手動取り込み対象として報告する。
-判定は `agentdev-workflow-lifecycle` に従う
+**前工程からの引き継ぎ停止判定**: Issue 本文、要件doc本文に `agentdev_handoff: true` が含まれる場合、リポジトリ種別に応じて分岐する（REQ-005-021, REQ-005-022）:
+- **self-hosting リポジトリ**（`src/opencode/` が存在）: 停止せず、履歴メタデータとして通常の case workflow として実装を開始する
+- **consumer リポジトリ**（`src/opencode/` が不在）: 実装を開始せず停止し、agent-dev-flow repository への手動取り込み対象として報告する
+
+リポジトリ種別の判定基準は `agentdev-workflow-lifecycle`（runtime-package-boundary 参照）に従う
 
 ### Step 2: Issue本文から要件docと受け入れ基準を抽出
 
