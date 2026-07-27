@@ -177,6 +177,8 @@ INFERENCE は「明文化を残す KEEP」とも「別成果物に残す MOVE」
 
 処置の判定根拠は非排他的な情報として記録する。観測事実、適用した既存規則、意味判断、ユーザー合意、機械検出結果等が併存し得る。判定根拠の伝播は REQ-001-033 が定義する分類根拠フィールドへ統合し、INFERENCE/MANUAL/RULE のような排他的 enum は導入しない。
 
+本節の6処置は昇格前の適格性判定に適用する。「6 処置モデル」節（「恒久基準と非規範情報の整理」配下）も同名の KEEP/MERGE/REFERENCE/MOVE/RETIRE/INFERENCE を定義するが、cleanup 実行モデルの処置であり、適用フェーズと参照する正規所有契約が異なる。両者は独立した正規所有契約であり、統合しない。
+
 #### intake・learning 昇格分類との違い
 
 intake・learning パイプラインの対応要否分類（action-required / covered / duplicate / verification-only / deferred / rejected）と対応形態分類（local-fix / example-or-test / knowledge-only / permanent-contract-candidate）は、本節の6処置とは別の分類である。昇格分類は採用済み成果物をどう処理するかの前段階判定であり、既存成果物を実際に変更する段階で必要に応じて6処置を適用する。
@@ -624,6 +626,8 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 
 - MOVE または REFERENCE には解決可能な移動先または参照先が存在すること
 - RETIRE または INFERENCE には理由と履歴保持先が記録されること
+
+本節の6処置は cleanup 実行モデルに適用する。「既存成果物の6処置」節（「恒久契約適格性と既存成果物処置分類」配下）も同名の KEEP/MERGE/REFERENCE/MOVE/RETIRE/INFERENCE を定義するが、昇格前の適格性判定に適用する。両者は独立した正規所有契約であり、統合しない。
 
 ### 処置後の記録と再検証
 
