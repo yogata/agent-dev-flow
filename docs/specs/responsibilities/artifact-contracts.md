@@ -460,6 +460,57 @@ req_draft の frontmatter は最小限のメタデータのみとする。
 - 最小 frontmatter fields: `draft_type`, `topic_slug`, `status`, `created_at`、optional で `source_rus`
 - frontmatter は lightweight metadata のみ。後続工程の主入力は `# draft-data` fenced YAML であり、frontmatter ではない
 
+## artifact_actions operation
+
+`artifact_actions` の `operation` フィールドは REQ/ADR 操作と SPEC 操作で扱う値が異なる。REQ/ADR 操作（`create` / `append` / `update`）は従来通り維持する。本節は SPEC 操作の公式 enum、非正規 alias、consumer 側の後方互換、および `spec-append` operation の契約を正規所有する。各 action の field 構成は「req_draft 出力構造」節の「artifact_actions 詳細構造」を参照。
+
+### SPEC operation enum と非正規 alias
+
+- SPEC operation の公式 enum は `create` / `update` の2値とする（REQ-008-058）
+- 各 SPEC（req-define / spec-save）は非正規 alias として `spec-create` / `spec-update` / `spec-append` を受け付ける
+- alias から公式 enum への映射: `spec-create` → `create`、`spec-update` → `update`、`spec-append` → `update`（既存 SPEC ファイルへ新規セクションを追加する操作）
+- consumer（spec-save）は `create` / `update` / `spec-create` / `spec-update` / `spec-append` の全てを受理する（後方互換）
+
+### spec-append operation
+
+`spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。
+
+#### 意味
+
+既存 SPEC ファイルへ `target_area` と `placement` で指示した位置へ新規セクションを追加する。
+
+#### 入力フィールド
+
+| field | 必須性 | 形式 |
+|---|---|---|
+| `target` | 必須 | 既存 SPEC ファイルパス |
+| `target_area` | 必須 | 追加対象の見出し行全体（Markdown 見出し行形式。例: `### IR-044`）。見出しプレフィックス（`##`、`###` 等）の有無は正規化により吸収する |
+| `content` | 必須 | 追加する新規セクション本文（見出し行から始まる） |
+| `placement` | 任意（省略時 `tail`） | `tail` / `after_anchor` / `before_anchor` のいずれか |
+| `anchor` | `placement` が `tail` 以外は必須 | 挿入位置の基準となる見出し行（`target_area` と同一形式） |
+
+`placement` 別の追加位置は次の通り。
+
+| placement | 追加位置 |
+|---|---|
+| `tail`（既定） | `target_area` セクションの末尾（次の同レベルまたは上位レベル見出し行の直前） |
+| `after_anchor` | `anchor` 見出し行の直後 |
+| `before_anchor` | `anchor` 見出し行の直前 |
+
+#### 挙動
+
+- **同名見出し時**: `target_area` と完全一致する見出しが既存 SPEC ファイルに存在する場合、追加をスキップし follow-up 報告を行う（重複追加防止、全体中止しない）
+- **anchor 未検出時**: `placement` が `tail` 以外で `anchor` 見出し行が存在しない場合、当該 action をスキップし follow-up 報告を行う（全体中止しない）
+- follow-up 報告は「operation を `spec-create` へ切り替えを推奨」を含む
+
+#### 合格基準
+
+- 追加後の SPEC ファイルに `target_area` と完全一致する見出しが1つだけ存在すること
+- frontmatter `updated` を更新していること
+- `status` は変更しないこと（G06）
+
+配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `specs/commands/spec-save.md`「spec-append 操作時のセクション追加ロジック」が正規所有する。
+
 ## RU アーティファクト契約（session由来RU）
 
 session由来RU（`source_type: chat`、`generated_by: session`）の生成、承認、保存、永続化の追跡可能な二段階手続きを定義する。本節は REQ-008 に基づき session 経路に不足する契約を追加し、既存の `source_type: chat` と7値の `tentative_classification` を維持する。
