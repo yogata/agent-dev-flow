@@ -36,13 +36,14 @@ req-save の次、case-open の前に実行する。
 ## 現在の動作
 
 - Step 1: 事前チェック（`draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認）。なければ no-op 完了。ドラフト不存在時はエラー中止
-- Step 2: SPEC artifact_actions 読込（`artifact: spec` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は SPEC 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（create/update）、`content` を処理対象とする
+- Step 2: SPEC artifact_actions 読込（`artifact: spec` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は SPEC 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（公式 enum: create/update、非正規 alias: spec-create/spec-update/spec-append、REQ-008-058）、`content` を処理対象とする
 - Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/foundations/patterns.md`）→ update 操作）。`target_spec: {operation, domain, slug}` 構造化 → 新規 SPEC 作成（`docs/specs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-001-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
 - Step 4: SPEC 分離基準の最終確認（各 action が REQ-001-055（SPEC に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-001-069）相当は除外し follow-up に明示
 - Step 5: SPEC ファイル操作。`target_area` 見出し検索は `agentdev-spec-file-manager/scripts/` の決定的スクリプトで実行
- - create: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
- - update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
- - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
+  - create / spec-create: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
+  - update / spec-update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
+  - spec-append: 既存 SPEC ファイルへ `target_area`（anchor）と `placement` に基づき `content` を新規セクションとして追加。frontmatter `updated` を更新。`status` は変更しない。詳細は「spec-append 操作時のセクション追加ロジック」セクション参照
+  - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
 - Step 6: インデックス整合（新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加）。既存 SPEC 追記時は README 更新不要。エントリ存在確認は決定的スクリプトで実行
 - Step 7: DOC-MAP 影響確認（SPEC 操作が `docs/DOC-MAP.md` に影響するか確認し、影響がある場合は更新（`agentdev-doc-map`））
 - Step 8: ドラフト status 更新（`draft-data` に SPEC 消費済みフラグを付与）。commit/push より前に更新し commit 対象に含める
@@ -101,12 +102,15 @@ bootstrap 問題（宣言前に強制すると既存 SPEC 処理不能）を避�
 
 ## target_area ベースのセクション置換ロジック
 
-`operation: update` / `operation: spec-update` において action の `target_area` が指定された場合、spec-save は対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-001-027）。
+`operation: update` / `operation: spec-update` において action の `target_area` が指定された場合、spec-save は対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-001-027、REQ-008-058）。
+
+SPEC operation の公式 enum は `create` / `update` であり、`spec-append` は既存 SPEC ファイルへ新規セクションを追加する alias として `update` へ映射される（REQ-008-058）。`spec-append` の配置契約は後段「spec-append 操作時のセクション追加ロジック」に定める。
 
 ### マッチング規則
 
 - 対象 SPEC ファイル内の見出し行を走査し、`target_area` に一致する見出し行を検索する
 - **入力正規化**: `target_area` に Markdown 見出しプレフィックス（`##`、`###` 等）が含まれる場合、比較前にプレフィックスを除去して見出しテキスト部分へ正規化する。`## セクション名` と `セクション名` のいずれの形式でも同じ結果となる
+- **見出し行全体完全一致**: 正規化後の見出しテキストが見出し行全体と完全一致する場合のみマッチとする。前方一致、後方一致、部分一致は受け付けない（例: 正規入力 `### IR-044` は見出し行 `### IR-044 - 題` とはマッチしない）。この規則は `search-target-area.ts` が正規契約に従うことを要求する
 - 当該見出し行から次の同レベル（または上位レベル）見出し行の直前までを「セクション」として特定する
   - 例: `### X` で検索した場合、次の `###` または `##` または `#` 見出しの直前までを範囲とする
 - 特定したセクションを action の `content` で置換する
@@ -123,6 +127,52 @@ bootstrap 問題（宣言前に強制すると既存 SPEC 処理不能）を避�
 
 `target_area` が未指定の draft（旧形式）、または `operation` が create/spec-create の場合は従来の「追記」動作を維持する（REQ-001-028）。
 `target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
+
+## spec-append 操作時のセクション追加ロジック
+
+`operation: spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。`target_area`（anchor）と `placement` を用いて追加位置を明示する。
+
+### 入力契約
+
+| field | 必須性 | 形式 |
+|---|---|---|
+| `target_area` | 必須 | anchor 見出し行（Markdown 見出し行形式。例: `### IR-044`） |
+| `placement` | 任意（省略時 `tail`） | `tail` / `after_anchor` / `before_anchor` のいずれか |
+| `content` | 必須 | 追加する新規セクション本文（見出し行を含む） |
+
+### placement 別挙動
+
+| placement | 追加位置 |
+|---|---|
+| `tail`（既定） | anchor セクションの末尾（次の同レベルまたは上位レベル見出し行の直前） |
+| `after_anchor` | anchor 見出し行の直後（anchor セクション本文の先頭） |
+| `before_anchor` | anchor 見出し行の直前 |
+
+`tail` は anchor セクション全体の末尾へ新規セクションを追加する。`after_anchor` は anchor セクション本文の先頭へ挿入する。`before_anchor` は anchor セクションの前に新規セクションを挿入する。
+
+### anchor マッチング規則
+
+- 「target_area ベースのセクション置換ロジック」の「マッチング規則」と同一の規則を適用する（入力正規化、見出し行全体完全一致）
+- anchor 見出し行が複数存在する場合、最初のマッチを採用し warn を出力する
+
+### anchor 未検出時の挙動
+
+anchor 見出し行が存在しない場合、当該 action をスキップし、follow-up として「anchor 未検出、operation を spec-create へ切り替えを推奨」を報告する（全体中止しない）。
+
+### 同名見出し時の挙動
+
+`content` の見出し行と同名の見出しが既存 SPEC ファイルに存在する場合、spec-save は warn を出力し、追加処理は継続する（重複防止のための事前拒否は行わない）。重複見出しの整理は別工程（inspect-docs 等）で扱う。
+
+### 合格基準
+
+- anchor が特定でき、`placement` に従った位置へ `content` が挿入されていること
+- 挿入結果の SPEC ファイルが Markdown 構造として破損しないこと（見出し階層の不整合がないこと）
+- frontmatter `updated` が更新されていること
+- `status` は変更しないこと（G06）
+
+### 後方互換（create / spec-create / update / spec-update）
+
+`spec-append` は新規 alias であり、既存の `create` / `spec-create` / `update` / `spec-update` 動作は従来通り維持する。`spec-append` が指定された場合のみ本節のロジックを適用する。
 
 ## 参照する横断 SPEC
 
