@@ -1,171 +1,213 @@
 # 評価レポート
 
 ## メタデータ
-- **実行日時**: 2026-07-23 (実行タイムゾーン: Etc/GMT-9)
-- **対象エントリ数**: 4件（inbox: 4件、deferred: 44件参照）
-- **問題クラス数**: 4（全て未分類クラスタ。inbox 4エントリは根本原因・再発条件・予防策が相互に異なり、同一問題クラスにグループ化不可）
-- **inbox フォーマット**: 全エントリ旧フォーマット（由来/問題/再発防止候補/影響/検出元/日付）。正規化マッピング（状況/事象 → 問題事象、原因 → 根本原因、対策/解決策/教訓 → 自律対応内容/予防策候補）を解析時適用。元ファイルは書き換えず。
+- **実行日時**: 2026-07-27 (タイムゾーン: Etc/GMT-9)
+- **対象エントリ数**: 5件（inbox: 5件、deferred: 既存多数は参照せず）
+- **問題クラス数**: 5（全て未分類クラスタ。inbox 5エントリは根本原因・再発条件・予防策が相互に異なり、同一問題クラスにグループ化不可）
+- **inbox フォーマット**: 全エントリ新13項目フォーマット準拠。正規化不要
 
 ## 問題クラス一覧
 
-### 問題クラス1: QG-3 誤検知パターン（spec_readme_update_required / extensions_check_required / requirements_readme_update_required）
+### 問題クラス1: PowerShell regex MatchEvaluator 内 -replace 演算子で全件置換されない
 
-- **根本原因**: `check_changed_docs.ts` のフラグ判定が「変更ファイルパス・差分有無」ベースであり、変更の意味内容（REQ 相互参照追加のみ、SPEC 内参照表記是正のみ等の軽微変更）を考慮しない。判定ロジックが意味的差分ではなく機械的差分に基づく。
-- **再発条件**: SPEC 一覧表や extensions 配下を含む（または過去に含んでいた）ファイルに対し、README 更新や extensions への影響を生まない軽微な変更を行った場合。
-- **予防策**: フラグ判定を行レベル差分ベースへ変更、または README 更新必須判定を frontmatter 変更時に限定、または false positive 抑止フラグ追加。
+- **根本原因**: PowerShell の `[regex]::Replace` の MatchEvaluator（ScriptBlock）内で `-replace` 演算子を使用した際、.NET Regex.Replace と PowerShell -replace の相互作用により全件置換が期待通り動作しない（正確なメカニズムは未特定だが、ScriptBlock スコープ、-replace の置換文字列解釈、MatchEvaluator 呼び出し回数のいずれかが関与）
+- **再発条件**: PowerShell で gh CLI から取得した本文を `[regex]::Replace` + ScriptBlock 内 `-replace` で処理し、セクション内の複数件を置換しようとする際
+- **予防策**: 本文置換に Node.js（`String.split/join`）または PowerShell の `String.Replace`（.NET メソッド、regex 非使用）を使用し、MatchEvaluator 内 `-replace` を避ける
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 2/5 | 同一問題クラスで2件（Wave 1 PR #1745、Wave 2 PR #1746 で同一誤検知が再発）。基準「2件=2」。 |
-| 影響度 | 3/5 | 中。QG-3 信頼性低下、agent の判断負荷増大。誤って不合格扱いされるわけではないが、agent が毎回誤検知を解釈・処理する負荷が累積する。 |
-| 横展開性 | 4/5 | 高い。他の `check_*.ts` 系フラグ判定（case-close targeted docs guard 等）でも同パターンが再発済み。変更差分ベースでフラグを立てる判定ロジック全般に適用可能。 |
-| 反映先明確度 | 5/5 | 特定済み。`scripts/check_changed_docs.ts` のフラグ判定ロジック。予防策候補3案も inbox に明示済み。 |
-| 自動化適性 | 4/5 | 容易。行レベル差分ベース判定への切替は技術的に確立されており、CI で自動実行可能。 |
-| プロジェクト固有知識再利用性 | 4/5 | 高い。AgentDevFlow docs check 固有だが、機械判定ベースのフラグ設計一般に適用可能な知見。 |
-| 再発可能性 | 4/5 | 高い。Wave 1→2 で連続再発中。対策しない限り毎 Wave の軽微変更で継続再発。 |
-| 費用対効果 | 4/5 | 良い。行レベル差分判定の実装コストは中程度だが、毎 Wave の agent 負荷削減効果が大きい。 |
-| **加重合計** | **30/40** | |
+| 発生件数 | 1/5 | inbox 1件、deferred に類似なし |
+| 影響度 | 3/5 | 中。完了条件チェックボックス 7個中1個しか置換されず、VERIFY で検知したが手戻り発生 |
+| 横展開性 | 4/5 | 高い。Windows PowerShell 環境全般。gh-cli に限らず PowerShell regex 利用全般で発生 |
+| 反映先明確度 | 5/5 | 特定済み。`agentdev-gh-cli` references/standard-procedures.md（本文置換手続き） |
+| 自動化適性 | 4/5 | 容易。standard-procedures.md の手続きで MatchEvaluator 内 -replace 使用を禁止し、Node.js/String.Replace を推奨すれば予防可能 |
+| プロジェクト固有知識再利用性 | 4/5 | 高い。AgentDevFlow 全体で PowerShell + gh-cli を使う場面で有効 |
+| 再発可能性 | 3/5 | 中程度。PowerShell regex を使い続ける限り発生し得る |
+| 費用対効果 | 4/5 | 良い。standard-procedures.md への注意喚起追記で済む |
+| **加重合計** | **28/40** | |
 
-- **推奨処分案**: **staged**（既存 command へ反映）。`docs-check` command および `check_changed_docs.ts` 改善。ただし `check_changed_docs.ts` は `src/scripts/` 配下の配布物であるため、昇華経路（promoted → backlog-review → req-define → req-save → case-open → case-run）を経て改修が必要。promoted 成果物は「QG-3 フラグ判定の意味差分考慮要件」として扱う。
+- **推奨処分案**: **staged**（既存 skill へ反映）。`agentdev-gh-cli` references/standard-procedures.md へ MatchEvaluator 内 -replace 演算子の使用注意と回避策（Node.js / String.Replace）を追記
 
 #### エントリ一覧
-- 2026-07-23: QG-3 誤検知パターン: spec_readme_update_required / extensions_check_required [inbox]（Wave 1 PR #1745、Wave 2 PR #1746 で再発追記済み）
+- 2026-07-27: PowerShell regex MatchEvaluator 内の -replace 演算子で全件置換されず Node.js で回避した事象 [inbox]
 
 ---
 
-### 問題クラス2: Phase 1 一括 commit 運用パターンにおける子Issue 完了判定の case-close への偏在
+### 問題クラス2: case-close QG-4 で pass_criteria 文言違いを意味的等価として承認（REQ-0129-012）
 
-- **根本原因**: Phase 1（RU 一括 commit 保存）と Phase 2（case-open による子Issue 分割）の分離基準が明文化されておらず、Phase 1 で8 AG を一括保存すると子Issue case-run は実装追加でなく acceptance criteria 順位検証と小改善が主体となる。結果、子Issue の実質的完了判定が case-close に集中する。
-- **再発条件**: Epic で Phase 1 一括 commit 運用を採用し、Phase 2 case-open で子Issue を分割した場合。Wave 1〜3 で同パターン再発済み。
-- **予防策**: Phase 1 一括保存と Phase 2 case-open の分離基準の明文化。acceptance criteria 順位検証のみの子Issue と実装追加の子Issue の完了条件テンプレート分離。
+- **根本原因**: 複数 REQ への共通 pass_criteria を起票する場合、各 REQ の pipeline stage の違い（promote 系 vs review 系等）を吸収せず文字列一致を要求する表現を起票。REQ-0129-012 は backlog-review 専用で pipeline stage が異なるため、REQ-0127-023/0128-010 と共通化された pass_criteria 期待文字列と content 表現が食い違う
+- **再発条件**: 複数 REQ で共通の観測可能振る舞いを追加する Issue の test_strategy で、pass_criteria を共通化して文字列一致を要求した場合
+- **予防策**: case-open 時の test strategy 起票で、複数 REQ の共通 pass_criteria を避け REQ ごとの個別期待値を記述する、または pass_criteria に「意味的等価を許容」旨を明記する
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 4/5 | Wave 1（#1737, #1738）、Wave 2（#1739, #1740）、Wave 3（#1741）で同パターン再発。実質3-4件。 |
-| 影響度 | 2/5 | 小。子Issue の完了条件評価が case-close で都度行う負荷。プロジェクト進行を止める程ではなく、acceptance criteria 順位検証自体は子Issue の正当な役割。 |
-| 横展開性 | 2/5 | 限定。Phase 1 一括 commit + Phase 2 case-open の運用を採用する Epic に限定。他プロジェクト運用では発生しない。 |
-| 反映先明確度 | 3/5 | 候補あり。`agentdev-workflow-lifecycle` skill または `case-open` command。ただし具体手順（分離基準、完了条件テンプレート）はまだ曖昧。 |
-| 自動化適性 | 2/5 | 低い。acceptance criteria 順位検証のみか実装追加かの判断は人間の運用判断が必要。機械化困難。 |
-| プロジェクト固有知識再利用性 | 3/5 | 中程度。AgentDevFlow の Epic 実行運用固有の知見。 |
-| 再発可能性 | 4/5 | 高い。運用基準が明文化されない限り、Phase 1 一括 commit 運用の Epic で継続再発。 |
-| 費用対効果 | 3/5 | 妥当。分離基準の明文化コストは中、効果は case-close 負荷の軽減。 |
+| 発生件数 | 1/5 | inbox 1件 |
+| 影響度 | 2/5 | 小。QG-4 評価で意味的等価性確認の上 F-001「意味的等価・承認」として処理。実害限定的 |
+| 横展開性 | 3/5 | 中程度。複数 REQ への共通 pass_criteria を書く全ケース |
+| 反映先明確度 | 4/5 | 明確。`agentdev-workflow-templates`（issue_desc_*.md テンプレートの test strategy 記述ガイド）、`agentdev-req-analysis`（pass_criteria 記述基準） |
+| 自動化適性 | 3/5 | 可能。テンプレートガイドへの追記で予防 |
+| プロジェクト固有知識再利用性 | 3/5 | 中程度。AgentDevFlow 固有の pipeline stage 別表現問題 |
+| 再発可能性 | 3/5 | 中程度。共通化の誘因は常在 |
+| 費用対効果 | 4/5 | 良い。ガイド追記で済む |
 | **加重合計** | **23/40** | |
 
-- **推奨処分案**: **deferred**（運用論に近く、具体手順が曖昧。`workflow-lifecycle` skill への反映候補だが、出現2件以上でも即時昇華には至らない。次回再評価対象として living pool で維持）。
+- **推奨処分案**: **staged**（既存 skill へ反映）。`agentdev-workflow-templates` と `agentdev-req-analysis` へ pass_criteria 記述ガイド（共通化回避、意味的等価許容）を追記
 
 #### エントリ一覧
-- 2026-07-23: Phase 1 一括 commit 運用パターン: 子Issue case-run が acceptance criteria 確認主体 [inbox]
+- 2026-07-27: case-close QG-4 で pass_criteria 文言違いを意味的等価として承認した事象（REQ-0129-012） [inbox]
 
 ---
 
-### 問題クラス3: SPEC 起票時の用語表記揺れ横断確認不足
+### 問題クラス3: pass_criteria の「存在しないこと」が「変更されていないこと」を意図した誤表現（REQ-0147-010）
 
-- **根本原因**: SPEC 起票時に用語統一チェックが不十分。`spec-health-metrics.md` 「SPEC 横断診断」節に「論理区分不当混成」（機械化境界段落）と「論理区分不当混在」（検出パターンテーブル行）の表記揺れが同一節内に残留。REQ-0108-285（「論理区分の不当な混在」）、Issue #1742 完了条件 #6（「不当混在」）とも矛盾。
-- **再発条件**: SPEC 起票時に用語統一を意識しない場合。Phase 1 commit 起票時の揺れが SPEC merge 後も残存し得る。
-- **予防策**: SPEC 起票時の用語統一チェック強化。`inspect-docs` への用語揺れ検出パターン追加の検討。
+- **根本原因**: test strategy 起票時に「変更対象外 REQ の変更がないこと」を「存在しないこと」と誤表現。検証の意図（diff がないこと）と検証の表現（存在確認）がずれた
+- **再発条件**: 変更対象外 REQ を pass_criteria で検証する際、「存在しないこと」と誤って記述した場合
+- **予防策**: case-open 時の test strategy 起票で、変更対象外 REQ の検証は「diff がないこと」「変更されていないこと」で表現する。存在確認は新規作成禁止（「REQ-0164 が存在しないこと」等）の場合のみ使用する
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | 1件（spec-health-metrics.md の揺れ）。基準「1件=1」。 |
-| 影響度 | 2/5 | 小。同一 SPEC 内の用語不統一、REQ と SPEC の表記矛盾。読手の負荷はあるが、実害（機能破壊等）はない。 |
-| 横展開性 | 4/5 | 高い。他 SPEC でも用語揺れは発生し得る。SPEC 全般に適用可能な汎用課題。 |
-| 反映先明確度 | 3/5 | 候補あり。`inspect-docs` command への用語揺れ検出パターン追加、または `agentdev-doc-writing` skill の SPEC 起票時チェック強化。 |
-| 自動化適性 | 4/5 | 容易。機械的な用語揺れ検出は既存技術で可能（grep ベース、形態素解析ベース）。 |
-| プロジェクト固有知識再利用性 | 3/5 | 中程度。SPEC 起票時の用語統一という汎用課題だが、AgentDevFlow 固有の用語体系に依存。 |
-| 再発可能性 | 3/5 | 中程度。SPEC 起票時に用語統一を意識すれば回避可能だが、人的ミスの余地あり。 |
-| 費用対効果 | 3/5 | 妥当。用語揺れ検出パターンの実装コストは中、効果は SPEC 品質向上。 |
+| 発生件数 | 1/5 | inbox 1件 |
+| 影響度 | 2/5 | 小。REQ-0147-010 は変更されていないことが正しい状態。F-002 として記録処理 |
+| 横展開性 | 3/5 | 中程度。変更対象外 REQ の検証全般 |
+| 反映先明確度 | 4/5 | 明確。`agentdev-workflow-templates`（issue_desc_*.md テンプレートの test strategy 記述ガイド）、`agentdev-req-analysis`（pass_criteria 記述基準） |
+| 自動化適性 | 3/5 | 可能。ガイド追記で予防 |
+| プロジェクト固有知識再利用性 | 3/5 | 中程度。test strategy 記述の汎用ガイドライン |
+| 再発可能性 | 3/5 | 中程度。表現ミスの誘因は常在 |
+| 費用対効果 | 4/5 | 良い。ガイド追記で済む |
 | **加重合計** | **23/40** | |
 
-- **推奨処分案**: **deferred**（出現1件。横断チェック需要は明白だが、即時昇華には具体性不足。`inspect-docs` へのパターン追加は次回の inspect 系知見蓄積時に再評価。deferred.md に類似事例（duty keyword 中黒化、SUB-D gloss 形式）あり）。
+- **推奨処分案**: **staged**（既存 skill へ反映）。`agentdev-workflow-templates` と `agentdev-req-analysis` へ pass_criteria 表現ガイド（存在確認 vs diff 確認の使い分け）を追記
 
 #### エントリ一覧
-- 2026-07-23: 用語表記揺れの横断確認不足: SPEC 起票時の揺れが同一文書内に残留 [inbox]
+- 2026-07-27: pass_criteria の「存在しないこと」が「変更されていないこと」を意図した誤表現（REQ-0147-010） [inbox]
 
 ---
 
-### 問題クラス4: SPEC 主論理区分・正規所有対象 frontmatter 宣言の運用未整備
+### 問題クラス4: gh-cli 一時ファイル lifecycle（$env:TEMP 並列非安全 + cleanup 非一体化）
 
-- **根本原因**: SPEC 再評価基準（主論理区分、正規所有対象）の frontmatter 宣言状況を全現行 SPEC 142ファイルで横断確認した結果、`foundations/document-model.md`（L399, 401 で規定を述べる）のみ `spec_logical_division` / `canonical_owner` フィールド宣言を持ち、他 141 SPEC ファイルは未宣言。OU-007 で責務境界浄化の基準を規定した段階で、宣言形式の運用は「後方互換運用（REQ-0136-035、ADR-0124 soft-contract）」に従い段階適用・警告モード扱い。不合格理由ではないが、宣言付与の運用フローが未整備。
-- **再発条件**: spec-save 工程で新規 SPEC を作成する際、宣言形式の参考がない状態で起票される場合。既存 SPEC は spec-save UPDATE 機会で順次宣言付与が必要。
-- **予防策**: spec-save 工程で新規 SPEC から段階的に宣言付与を適用する手順の整備。既存 SPEC は spec-save UPDATE 機会で順次宣言付与。spec-health-metrics で宣言率を指標化し、検知の機械化を検討。
+- **根本原因**: (1) standard-procedures.md で `$env:TEMP/agentdev/` を指定するが、Windows で `$env:TEMP` が `C:\WINDOWS\TEMP`（システム共有）へ解決し並列タスクが cp932 で同名ファイルを上書きする問題、(2) cleanup が I/O 手続きと一体化しておらず後段注記のみで省略可能
+- **再発条件**: 並列 case-open/case-close 実行時、または `$env:TEMP` が共有領域へ解決される環境での gh WRITE 操作
+- **予防策**: (1) 配置場所を `.agentdev/tmp/`（workspace-local）へ変更、(2) create → gh実行 → VERIFY → cleanup を1手順ユニットとし cleanup を省略不可ステップにする
 
 #### 8軸評価スコア
 
 | 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 5/5 | 142 SPEC 中 141 ファイルが宣言未対応（大規模）。基準「8件以上=5」を大幅に超過。 |
-| 影響度 | 2/5 | 小。「不合格理由ではない」。後方互換運用で段階適用・警告モード扱い。実害は限定的。 |
-| 横展開性 | 2/5 | 限定。AgentDevFlow SPEC frontmatter 固有の宣言形式。他プロジェクトへの横展開は限定的。 |
-| 反映先明確度 | 4/5 | 明確。`spec-save` command の手順、`spec-health-metrics` SPEC の指標化。 |
-| 自動化適性 | 3/5 | 可能。spec-health-metrics での宣言率指標化は機械化可能。ただし宣言付与自体は人手。 |
-| プロジェクト固有知識再利用性 | 4/5 | 高い。AgentDevFlow SPEC 運用固有の知見。SPEC frontmatter 運用フロー設計の参考。 |
-| 再発可能性 | 3/5 | 中程度。運用フローが整備されれば減少するが、新規 SPEC 起票時に都度判断が必要。 |
-| 費用対効果 | 3/5 | 妥当。宣言付与手順の整備コストは中、効果は SPEC 運用品質向上。ただし141ファイルを一括更新するコストは高い（段階適用前提）。 |
-| **加重合計** | **26/40** | |
+| 発生件数 | 1/5 | inbox 1件（case-auto run で23件の残存ファイル） |
+| 影響度 | 3/5 | 中。23件の不要ファイル残存。並列実行時の暫定配置逸脱発生 |
+| 横展開性 | 4/5 | 高い。全 gh WRITE 操作。Windows で特に顕著。非 Windows でも cleanup 漏れは発生し得る |
+| 反映先明確度 | 5/5 | 特定済み。`agentdev-gh-cli` references/standard-procedures.md（L45, L62-64, L83, L96, L111 周辺） |
+| 自動化適性 | 4/5 | 容易。cleanup を省略不可ステップに組み込める |
+| プロジェクト固有知識再利用性 | 4/5 | 高い。AgentDevFlow 全体で gh WRITE 操作を行う場面で有効 |
+| 再発可能性 | 4/5 | 高い。並列実行時や Windows 環境で常在 |
+| 費用対効果 | 4/5 | 良い。手続き追記で済む |
+| **加重合計** | **29/40** | |
 
-- **推奨処分案**: **staged**（既存 command へ反映）。`spec-save` command の手順整備、新規 SPEC 起票時の frontmatter 宣言付与フロー。規模大（141ファイル）だが段階適用が前提。promoted 成果物は「新規 SPEC 作成時の frontmatter 宣言付与手順要件」として扱う。
+- **推奨処分案**: **staged**（既存 skill へ反映）。`agentdev-gh-cli` references/standard-procedures.md へ `.agentdev/tmp/` 配置と cleanup 省略不可化を追記
 
 #### エントリ一覧
-- 2026-07-23: SPEC 主論理区分・正規所有対象宣言の未宣言: spec-save 段階適用の準備状態 [inbox]
+- 2026-07-27: gh-cli 一時ファイル lifecycle（$env:TEMP 並列非安全 + cleanup 非一体化） [inbox]
+
+---
+
+### 問題クラス5: gh CLI --title 引数の Windows cp932 化けと REST API PATCH 回避策
+
+- **根本原因**: gh CLI の `--title` / inline `--input` 引数パーサーが Windows ACP（cp932）で文字列を decode する仕様。PowerShell 側の Console encoding 設定（Step 0 の3行初期化）では gh CLI 内部の引数 decode に影響しない
+- **再発条件**: Windows 環境で gh CLI の `--title` / inline `--input` 引数へ日本語を渡す全操作
+- **予防策**: (1) Windows 環境では `--title` / inline `--input` を使用せず、`--body-file` または `gh api --input <utf8-file>` を使用、(2) title 修正が必要な場合は REST API PATCH（`gh api -X PATCH /repos/{owner}/{repo}/issues/{N}` へ UTF-8 JSON body を `--input` file 経由で送信）を標準手続き化
+
+#### 8軸評価スコア
+
+| 軸 | スコア | 判定理由 |
+|---|---|---|
+| 発生件数 | 1/5 | Draft 6 Epic #1845 mojibake 事象 1件（Draft 7-8 で標準運用化済み） |
+| 影響度 | 3/5 | 中。Issue/PR タイトルの mojibake。GitHub 上の表示が日本語読解不能になる |
+| 横展開性 | 4/5 | 高い。全 gh WRITE 操作で `--title` / inline `--input` を使用する手続き。Windows 環境全般 |
+| 反映先明確度 | 5/5 | 特定済み。`agentdev-gh-cli` references/standard-procedures.md Section 2, Section 4 の各操作手続き |
+| 自動化適性 | 4/5 | 容易。`--body-file` や REST API PATCH を使う手続きを標準化すれば予防可能 |
+| プロジェクト固有知識再利用性 | 4/5 | 高い。Windows 環境での gh CLI 運用知見 |
+| 再発可能性 | 4/5 | 高い。Windows 環境で継続的に発生し得る |
+| 費用対効果 | 4/5 | 良い。手続き追記で済む |
+| **加重合計** | **29/40** | |
+
+- **推奨処分案**: **staged**（既存 skill へ反映）。`agentdev-gh-cli` references/standard-procedures.md Section 2, 4 へ `--title` / inline `--input` 使用制限と REST API PATCH 標準手続き化を追記
+
+#### エントリ一覧
+- 2026-07-27: gh CLI --title 引数の Windows cp932 化けと REST API PATCH 回避策 [inbox]
 
 ---
 
 ## 全体傾向
 
-- **高頻出・高影響の問題クラス**: 問題クラス4（SPEC frontmatter 宣言、141ファイル規模）。問題クラス1（QG-3 誤検知、Wave 単位で再発中）。
-- **横展開性が高い問題クラス**: 問題クラス1（4/5、他 check_*.ts 系にも適用可能）、問題クラス3（4/5、SPEC 全般の用語揺れ）。
-- **自動化適性が高い問題クラス**: 問題クラス1（4/5、行レベル差分判定）、問題クラス3（4/5、用語揺れ検出）。
-- **全体的な観察所見**: Epic #1736 Wave 1〜4 の case-close から回収された4エントリは、AgentDevFlow の「機械判定ロジック（QG-3 / docs check）」と「SPEC 運用フロー（spec-save / spec-health-metrics）」の2領域に集中。両領域とも段階的改善が可能で、昇華経路（promoted → backlog-review → req-define → req-save → case-open → case-run）での対応が適する。Wave 単位で同種の問題（QG-3 誤検知、Phase 1 運用）が再発していることから、Epic 実行の属害管理としての学習回路が機能している。
+- **高頻出・高影響の問題クラス**: 5件中3件（問題クラス1, 4, 5）が Windows 環境での gh-cli / PowerShell 取り扱いに関する知見。AgentDevFlow を Windows 環境で運用する場合の固有の落とし穴が集中。全て `agentdev-gh-cli` references/standard-procedures.md への反映対象
+- **横展開性が高い問題クラス**: 問題クラス1, 4, 5（4/5）。Windows 環境全般、gh WRITE 操作全般で発生し得る
+- **自動化適性が高い問題クラス**: 全5件とも標準的な手続き書類（references, templates, SKILL.md）への追記で予防可能
+- **全体的な観察所見**: 5件中3件が `agentdev-gh-cli` references/standard-procedures.md への反映対象。Windows 環境運用に関する手続き強化が直近で必要。残り2件（問題クラス2, 3）は test strategy の pass_criteria 記述品質ガイドの拡充で対応可能。Epic #1758 Wave 2（PR #1762, #1763）の case-close から回収された知見群で、実装・レビュー局面の Windows 環境固有問題と test strategy 記述品質問題に大別される
 
 ## ADR候補除外記録
 
-全4問題クラスについて `agentdev-adr-guidelines` の除外基準を適用:
+全5問題クラスについて `agentdev-adr-guidelines` の除外基準を適用:
 
-### 問題クラス1（QG-3 誤検知パターン）
-- **除外理由**: 仕様変更のみ（QG-3 判定ロジックの改善）。技術選定・アーキテクチャ判断を含まない。
-- **根拠事実**: 予防策が「行レベル差分ベース判定」「README 更新必須判定の frontmatter 変更時限定」「false positive 抑止フラグ追加」のいずれも、既存 `check_changed_docs.ts` のロジック改善であり、新技術導入や設計判断ではない。
-- **代替反映先候補**: SPEC（`docs/specs/integrity/` 配下、`check_changed_docs.ts` 関連 SPEC）および command（`docs-check`）。
+### 問題クラス1（PowerShell regex MatchEvaluator 内 -replace）
+- **除外理由**: 運用ルール（standard-procedures.md の手続き追記）。技術的トレードオフを含まない
+- **根拠事実**: 予防策が「MatchEvaluator 内 -replace 使用禁止」「Node.js / String.Replace 推奨」のいずれも、既存 references の手続き追記であり、新技術導入や設計判断ではない
+- **代替反映先候補**: skill（`agentdev-gh-cli` references/standard-procedures.md）
 
-### 問題クラス2（Phase 1 一括 commit 運用パターン）
-- **除外理由**: 運用ルール（Phase 1/2 分離基準の明文化）。技術的トレードオフを含まない。
-- **根拠事実**: 予防策が「Phase 1 一括保存と Phase 2 case-open の分離基準の明文化」「子Issue 完了条件テンプレートの分離」のいずれも、作業手順・運用制約の定義であり、技術判断ではない。
-- **代替反映先候補**: skill（`agentdev-workflow-lifecycle`）または command（`case-open`）。
+### 問題クラス2（pass_criteria 共通化による文字列一致要求）
+- **除外理由**: 運用ルール（test strategy 記述ガイド）。技術的トレードオフを含まない
+- **根拠事実**: 予防策が「REQ ごとの個別期待値記述」「意味的等価許容の明記」のいずれも、作業手順・運用制約の定義であり、技術判断ではない
+- **代替反映先候補**: skill（`agentdev-workflow-templates` issue_desc_*.md テンプレート、`agentdev-req-analysis` pass_criteria 記述基準）
 
-### 問題クラス3（用語表記揺れ横断確認不足）
-- **除外理由**: 仕様変更のみ（用語揺れ検出パターンの追加）。技術判断を含まない。
-- **根拠事実**: 予防策が「SPEC 起票時の用語統一チェック強化」「`inspect-docs` への用語揺れ検出パターン追加」のいずれも、既存 command/skill の機能拡張であり、新技術導入や設計判断ではない。
-- **代替反映先候補**: command（`inspect-docs`）または skill（`agentdev-doc-writing`）。
+### 問題クラス3（pass_criteria「存在しないこと」誤表現）
+- **除外理由**: 運用ルール（test strategy 記述ガイド）。技術的トレードオフを含まない
+- **根拠事実**: 予防策が「変更対象外 REQ 検証は diff がないことで表現」「存在確認は新規作成禁止の場合のみ使用」のいずれも、作業手順・運用制約の定義であり、技術判断ではない
+- **代替反映先候補**: skill（`agentdev-workflow-templates` issue_desc_*.md テンプレート、`agentdev-req-analysis` pass_criteria 記述基準）
 
-### 問題クラス4（SPEC frontmatter 宣言運用未整備）
-- **除外理由**: 運用ルール（宣言付与フローの整備）。技術的トレードオフを含まない。
-- **根拠事実**: 予防策が「spec-save 工程での宣言付与手順整備」「既存 SPEC の spec-save UPDATE 機会で順次宣言付与」「spec-health-metrics での宣言率指標化」のいずれも、作業手順・運用制約の定義であり、技術判断ではない。
-- **代替反映先候補**: command（`spec-save`）および SPEC（`docs/specs/skills/spec-health-metrics.md` の指標化）。
+### 問題クラス4（gh-cli 一時ファイル lifecycle）
+- **除外理由**: 運用ルール（standard-procedures.md の手続き追記）。技術的トレードオフを含まない
+- **根拠事実**: 予防策が「配置場所を .agentdev/tmp/ へ変更」「cleanup 省略不可ステップ化」のいずれも、既存 references の手続き追記であり、新技術導入や設計判断ではない
+- **代替反映先候補**: skill（`agentdev-gh-cli` references/standard-procedures.md）
+
+### 問題クラス5（gh CLI --title cp932 化け）
+- **除外理由**: 運用ルール（standard-procedures.md の手続き追記）。技術的トレードオフを含まない
+- **根拠事実**: 予防策が「--title / inline --input 使用制限」「REST API PATCH 標準手続き化」のいずれも、既存 references の手続き追記であり、新技術導入や設計判断ではない
+- **代替反映先候補**: skill（`agentdev-gh-cli` references/standard-procedures.md）
 
 ## promote 時prune結果
 
-- **対象エントリ数**: 0件（本レポート時点では inbox からの新規移動エントリに対する prune は未実施。Step 14 で staged/rejected/duplicate エントリが発生した場合に実施）
-- **prune実施**: なし（Step 14 で実施予定）
+- **対象エントリ数**: 5件（全件 staged 判定のため、Step 14 で prune 対象）
+- **prune実施**: あり（Step 13 で deferred.md へ移動後、Step 14 で staged 5件を除外。採用済み成果物の「元learning item / 根拠」セクションに証拠保存済み）
+- **prune候補**: 5件
+- **prune却下**: 0件
 
 ## 既存対策照合サマリ
 
+must_not「実装本文（src/opencode/**）は読まない」に従い、既存対策確認は `docs/specs/skills/` 配下の SPEC のみで実施（`agentdev-gh-cli.md`、`agentdev-workflow-templates.md`、`agentdev-req-analysis.md`）。learning item 自身の記述と SPEC の突き合わせで判定。
+
 | 問題クラス | 既存対策確認結果 | 該当ファイル | ギャップ分類 | ギャップ詳細 |
 |---|---|---|---|---|
-| 1（QG-3 誤検知） | 既存対策あり（不完全） | `scripts/check_changed_docs.ts`、`docs-check` command、`case-close` QG-3、targeted docs guard (case-close workflow) | fix gap | フラグ判定がファイルパス・差分有無ベースであり、行レベル意味差分を考慮しない。Wave 1/2 で誤検知再発。 |
-| 2（Phase 1 一括 commit 運用） | 既存対策なし | （該当なし） | fix gap | `agentdev-workflow-lifecycle` skill に Phase 1 一括保存と Phase 2 case-open の分離基準が未規定。子Issue 完了条件テンプレートの分離も未規定。 |
-| 3（用語表記揺れ横断確認不足） | 既存対策あり（不完全） | `inspect-docs` command、`agentdev-doc-writing` skill | fix gap | 用語揺れ検出パターンが未実装。SPEC 起票時の用語統一チェック手順が明示的でない。deferred.md に類似事例（duty keyword 中黒化、SUB-D gloss 形式）あり。 |
-| 4（SPEC frontmatter 宣言運用未整備） | 既存対策あり（不完全） | `spec-save` command、`docs/specs/foundations/document-model.md` L399/401、`docs/specs/skills/spec-health-metrics.md` | fix gap | `foundations/document-model.md` で宣言形式規定を述べるが実運用手順が未整備。`spec-save` に宣言付与フロー未規定。`spec-health-metrics` に宣言率指標未実装。 |
+| 1（MatchEvaluator 内 -replace） | 既存対策なし | `docs/specs/skills/agentdev-gh-cli.md`、同 references/standard-procedures.md | fix gap | MatchEvaluator 内 -replace 演算子で全件置換されない問題と回避策（Node.js / String.Replace）が未記載。既存の PowerShell regex backreference `$N` 対策（L31-37 相当）は別問題 |
+| 2（pass_criteria 共通化） | 既存対策なし | `docs/specs/skills/agentdev-workflow-templates.md`、`docs/specs/skills/agentdev-req-analysis.md` | fix gap | 複数 REQ 共通 pass_criteria の文字列一致要求に対するガイド未記載。req-analysis SPEC はチェックボックス品質基準（測定可能、一意、実装可能）のみ規定で、共通化・意味的等価は未規定 |
+| 3（pass_criteria 誤表現） | 既存対策なし | `docs/specs/skills/agentdev-workflow-templates.md`、`docs/specs/skills/agentdev-req-analysis.md` | fix gap | 変更対象外 REQ 検証の表現（「存在しないこと」vs「変更されていないこと（diff がないこと）」）に対するガイド未記載 |
+| 4（gh-cli 一時ファイル lifecycle） | 既存対策一部あり（不完全） | `docs/specs/skills/agentdev-gh-cli.md` L65（references 参照）、同 references/standard-procedures.md | fix gap + guardrail insufficiency | `$env:TEMP/agentdev/` 配置と cleanup は既規定。ただしユーザー確定事項「`.agentdev/tmp/` 配置」が未反映。cleanup が後段注記のみで省略可能 |
+| 5（gh CLI --title cp932） | 既存対策一部あり（不完全） | `docs/specs/skills/agentdev-gh-cli.md` L79-106（WRITE 手続きの Windows encoding 初期化必須化、REQ-011-009）、同 references/standard-procedures.md | fix gap | Step 0 コンソールエンコーディング初期化は規定済みだが、Step 0 では --title cp932 化けが解消しない境界ケースが未記載。`--body-file` / REST API PATCH 標準手続き化も未記載 |
 
 ## 判定結果サマリ（Step 9 提示用）
 
 | 問題クラス | 加重合計 | 推奨処分案 | 主な理由 |
 |---|---|---|---|
-| 1（QG-3 誤検知パターン） | 30/40 | **staged**（既存 command 反映: `docs-check` / `check_changed_docs.ts` 改修） | 高スコア、Wave 単位再発中、反映先特定済み。配布物（`src/scripts/`）改修を含むため昇華経路経由。 |
-| 2（Phase 1 一括 commit 運用） | 23/40 | **deferred** | 運用論、自動化適性低（人間判断前提）、具体手順曖昧。次回再評価。 |
-| 3（用語表記揺れ横断確認不足） | 23/40 | **deferred** | 出現1件、即時昇華には具体性不足。`inspect-docs` パターン追加は次回再評価。 |
-| 4（SPEC frontmatter 宣言運用未整備） | 26/40 | **staged**（既存 command 反映: `spec-save` 宣言付与フロー整備） | 規模大（141ファイル）、運用フロー未整備が明白。段階適用前提で手順化が必要。 |
+| 1（MatchEvaluator 内 -replace） | 28/40 | **staged**（既存 skill 反映: `agentdev-gh-cli` standard-procedures.md） | 高スコア、Windows 環境で汎用、反映先特定済み |
+| 2（pass_criteria 共通化） | 23/40 | **staged**（既存 skill 反映: `agentdev-workflow-templates` + `agentdev-req-analysis`） | 中スコアだが具体的、test strategy 品質向上で汎用 |
+| 3（pass_criteria 誤表現） | 23/40 | **staged**（既存 skill 反映: `agentdev-workflow-templates` + `agentdev-req-analysis`） | 中スコアだが具体的、test strategy 品質向上で汎用 |
+| 4（gh-cli 一時ファイル lifecycle） | 29/40 | **staged**（既存 skill 反映: `agentdev-gh-cli` standard-procedures.md） | 高スコア、並列実行時の cp932 衝突回避と cleanup 必須化で確実な予防 |
+| 5（gh CLI --title cp932） | 29/40 | **staged**（既存 skill 反映: `agentdev-gh-cli` standard-procedures.md） | 高スコア、Windows 環境で継続再発、REST API PATCH 標準化で予防 |
+
+## 後続ルート
+
+全5件の採用済み成果物は `.agentdev/learning/promoted/` へ生成後、`/agentdev/backlog-review` が読み込み、RU 化を経て `/agentdev/req-define` に合流する。`.opencode/` 直接反映、`case-run` への直接受け渡しは行わない。
