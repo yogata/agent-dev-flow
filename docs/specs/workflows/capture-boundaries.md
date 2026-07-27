@@ -2,7 +2,7 @@
 title: キャプチャ境界
 status: accepted
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # キャプチャ境界（Capture Boundaries）
@@ -55,12 +55,12 @@ PR 本文の capture 関連セクションは以下を分離する:
 | コマンド | intake | learning | 備考 |
 |---|---|---|---|
 | req-define | 非関与 | 非関与 | - |
-| req-save | REQ再構成 intake（`.agentdev/intake/inbox/req-restructure/`）のみ生成可能 | 非関与 | 例外のみ許可 |
-| spec-save | 非関与 | 非関与 | - |
-| case-open | 非関与 | 非関与 | - |
+| req-save | REQ 再構成 intake に加え自工程 deviation capture | 自工程 deviation capture | Split Rule で分類、Skill 委譲で保存（REQ-006-106） |
+| spec-save | 自工程 deviation capture | 自工程 deviation capture | 従来非関与から変更（REQ-006-107） |
+| case-open | 自工程 deviation capture | 自工程 deviation capture | case-close への委譲を廃止（REQ-006-021） |
 | case-run | PR 本文記録のみ（直接 inbox 変更禁止） | PR 本文記録のみ（直接 inbox.md 変更禁止） | 実行担当サブエージェント経由 |
-| case-close | PR 本文から回収し inbox へ保存 | PR 本文から回収し inbox.md へ保存 | Epic 横断回収含む |
-| case-auto | 各工程の責務を継承 | 各工程の責務を継承 | - |
+| case-close | PR 本文から回収 + 自工程 deviation capture | PR 本文から回収 + 自工程 deviation capture | Epic 横断回収含む（REQ-006-105） |
+| case-auto | 各工程の保存結果参照と件数集計のみ | 各工程の保存結果参照と件数集計のみ | capture 本文の再分類・再保存は行わない（REQ-006-108） |
 | case-update | 非関与 | 非関与 | REQ 更新、レビュー NG コメント、Issue 本文更新のみ |
 | intake-* | 各コマンド責務（各 command SPEC 参照） | - | - |
 | learning-promote | - | 各コマンド責務（command SPEC 参照） | - |
@@ -75,10 +75,10 @@ CaptureBoundary 検査（`check_integrity.ts` の `command-capture-duty`）は�
 
 判定規則は次のとおり。
 
-- capture 責務表の intake または learning 列が「各工程の責務を継承」または「非関与」と定義する command は、`capture-boundaries` 参照を個別に持たなくても CaptureBoundary 検査の検出対象としない。
-- capture 責務表の intake または learning 列が具体的な責務記述（PR 本文記録、回収、REQ再構成 intake 生成等）である command は、`capture-boundaries` 参照を個別に持ち、対応する capture 導線を実装する。
+- capture 責務表の intake または learning 列が「各工程の保存結果参照と件数集計のみ」または「非関与」と定義する command は、`capture-boundaries` 参照を個別に持たなくても CaptureBoundary 検査の検出対象としない。
+- capture 責務表の intake または learning 列が具体的な責務記述（PR 本文記録、回収、自工程 deviation capture、REQ 再構成 intake 生成等）である command は、`capture-boundaries` 参照を個別に持ち、対応する capture 導線を実装する。
 
-例外の根拠は本 capture 責務表である。同表は case-auto の intake、learning をともに「各工程の責務を継承」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
+例外の根拠は本 capture 責務表である。同表は case-auto の intake、learning をともに「各工程の保存結果参照と件数集計のみ」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
 
 ## REQ 再構成 intake
 
