@@ -25,5 +25,4 @@ checks: []
 acceptance_gates:
   - 保存した SPEC が docs/specs/README.md のインデックスに存在すること
 
-must_not:
-  - 実装本文（src/opencode/**）は読まない
+must_not: []

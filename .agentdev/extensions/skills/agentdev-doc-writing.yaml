@@ -20,5 +20,4 @@ checks: []
 
 acceptance_gates: []
 
-must_not:
-  - 実装本文（src/opencode/**）は読まない
+must_not: []

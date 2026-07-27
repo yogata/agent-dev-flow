@@ -47,5 +47,4 @@ checks: []
 acceptance_gates:
   - "要件doc（draft）が .agentdev/drafts/req-draft-*.md に存在すること"
 
-must_not:
-  - 実装本文（src/opencode/**）は読まない
+must_not: []
