@@ -7,12 +7,11 @@ source_rus:
   - RU-0005
   - RU-0006
 agentdev_handoff: true
-spec_actions_consumed: true
-spec_saved_at: 2026-07-27T00:00:00+09:00
 ---
 
-<!-- 譛ｬ繝峨Λ繝輔ヨ縺ｯ AgentDevFlow 譛ｬ菴薙・荳榊・蜷医・謾ｹ蝟・せ繧呈桶縺・燕蟾･遞句ｼ輔″邯吶℃繝峨Λ繝輔ヨ縺ｧ縺ゅｋ・・gentdev_handoff: true・峨・-->
-<!-- 2 RU・・U-0005: gh-cli Windows 迺ｰ蠅・撫鬘・莉ｶ縲ヽU-0006: pass_criteria 險倩ｿｰ繧ｬ繧､繝会ｼ峨ｒ蜷ｫ繧縲・     荳｡ RU 縺ｯ迢ｬ遶矩未蠢・□縺後碁・蟶・せ繧ｭ繝ｫ驕狗畑繧ｬ繧､繝峨・謨ｴ蛯吶阪→縺・≧蜈ｱ騾壽ｧ縺ｧ繧ｰ繝ｫ繝ｼ繝唯縺ｨ縺励※1繝峨Λ繝輔ヨ縺ｫ縺ｾ縺ｨ繧√◆縲・-->
+<!-- 本ドラフトは AgentDevFlow 本体の不具合・改善点を扱う前工程引き継ぎドラフトである（agentdev_handoff: true）。 -->
+<!-- 2 RU（RU-0005: gh-cli Windows 環境問題3件、RU-0006: pass_criteria 記述ガイド）を含む。
+     両 RU は独立関心だが「配布スキル運用ガイドの整備」という共通性でグループBとして1ドラフトにまとめた。 -->
 
 # draft-data
 
@@ -22,9 +21,14 @@ work_type: maintenance
 scale: standard
 
 summary: |
-  RU-0005・・gentdev-gh-cli skill 縺ｮ Windows 迺ｰ蠅・崋譛牙撫鬘・莉ｶ・峨→ RU-0006・・gentdev-workflow-templates 縺ｨ
-  agentdev-req-analysis 縺ｮ pass_criteria 險倩ｿｰ繧ｬ繧､繝会ｼ峨ｒ蜃ｦ逅・☆繧九・  RU-0005 縺ｯ cp932 --title 蛹悶￠縲∽ｸ譎ゅヵ繧｡繧､繝ｫ驟咲ｽｮ繝ｻcleanup 髱樔ｸ菴灘喧縲￣owerShell MatchEvaluator 蜀・-replace 縺ｮ鄂縺ｮ3莉ｶ繧・  standard-procedures.md 縺ｸ謇狗ｶ壹″霑ｽ險倥〒蟇ｾ蠢懊☆繧九ゅΘ繝ｼ繧ｶ繝ｼ遒ｺ螳壻ｺ矩・・agentdev/tmp/ 驟咲ｽｮ縲…leanup 蠢・医阪ｒ蜿肴丐縲・  RU-0006 縺ｯ test strategy 縺ｮ pass_criteria 險倩ｿｰ蜩∬ｳｪ繧ｬ繧､繝峨ｒ agentdev-workflow-templates 縺ｨ agentdev-req-analysis 縺ｸ霑ｽ險倥☆繧九・  譁ｰ隕・ADR 荳崎ｦ√∵眠隕・REQ 螟画峩縺ｪ縺励・ SPEC・・gentdev-gh-cli.md, agentdev-workflow-templates.md, agentdev-req-analysis.md・峨∈縺ｮ
-  蜿り・ｿｽ險倥→ case-run 蟾･遞九〒縺ｮ skill reference 繝輔ぃ繧､繝ｫ譖ｴ譁ｰ繧堤ｵ・∩蜷医ｏ縺帙ｋ縲・
+  RU-0005（agentdev-gh-cli skill の Windows 環境固有問題3件）と RU-0006（agentdev-workflow-templates と
+  agentdev-req-analysis の pass_criteria 記述ガイド）を処理する。
+  RU-0005 は cp932 --title 化け、一時ファイル配置・cleanup 非一体化、PowerShell MatchEvaluator 内 -replace の罠の3件を
+  standard-procedures.md へ手続き追記で対応する。ユーザー確定事項「.agentdev/tmp/ 配置、cleanup 必須」を反映。
+  RU-0006 は test strategy の pass_criteria 記述品質ガイドを agentdev-workflow-templates と agentdev-req-analysis へ追記する。
+  新規 ADR 不要、新規 REQ 変更なし。3 SPEC（agentdev-gh-cli.md, agentdev-workflow-templates.md, agentdev-req-analysis.md）への
+  参考追記と case-run 工程での skill reference ファイル更新を組み合わせる。
+
 auto_gate:
   auto_ready: true
   unresolved_questions: []
@@ -35,26 +39,50 @@ auto_gate:
 agreed_items:
   - id: AG-001
     content: |
-      RU-0005: src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md 縺ｧ
-      Windows 迺ｰ蠅・・ --title / inline --input 蠑墓焚縺ｮ菴ｿ逕ｨ繧堤ｦ∵ｭ｢縺励・-body-file 縺ｾ縺溘・ gh api --input・・ile bytes 繧・UTF-8 縺ｨ縺励※謇ｱ縺・ｼ峨ｒ
-      謗ｨ螂ｨ縺吶ｋ譌ｨ繧呈・險倥☆繧九４ection 2 Step 0 縺ｮ繧ｳ繝ｳ繧ｽ繝ｼ繝ｫ繧ｨ繝ｳ繧ｳ繝ｼ繝・ぅ繝ｳ繧ｰ蛻晄悄蛹厄ｼ・陦鯉ｼ峨・譛ｬ譁・I/O 縺ｧ譛牙柑縺縺・      --title 蠑墓焚 decode 縺ｫ縺ｯ蠖ｱ髻ｿ縺励↑縺・挨蝠城｡後→縺励※譏守､ｺ縺吶ｋ縲・  - id: AG-002
+      RU-0005: src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md で
+      Windows 環境の --title / inline --input 引数の使用を禁止し、--body-file または gh api --input（file bytes を UTF-8 として扱う）を
+      推奨する旨を明記する。Section 2 Step 0 のコンソールエンコーディング初期化（3行）は本文 I/O で有効だが
+      --title 引数 decode には影響しない別問題として明示する。
+  - id: AG-002
     content: |
-      RU-0005: title 菫ｮ豁｣縺悟ｿ・ｦ√↑蝣ｴ蜷医・ REST API PATCH 讓呎ｺ匁焔邯壹″繧呈・險倥☆繧九・      gh api -X PATCH /repos/{owner}/{repo}/issues/{N} + UTF-8 JSON --input file 縺ｮ蠖｢蠑上・      Draft 6 Epic #1845 繧ｿ繧､繝医Ν蛹悶￠縺ｮ螳溽ｸｾ縺ｫ蝓ｺ縺･縺丞屓驕ｿ遲悶・  - id: AG-003
+      RU-0005: title 修正が必要な場合の REST API PATCH 標準手続きを明記する。
+      gh api -X PATCH /repos/{owner}/{repo}/issues/{N} + UTF-8 JSON --input file の形式。
+      Draft 6 Epic #1845 タイトル化けの実績に基づく回避策。
+  - id: AG-003
     content: |
-      RU-0005: 荳譎ゅヵ繧｡繧､繝ｫ驟咲ｽｮ繧・$env:TEMP/agentdev/・・indows 縺ｧ C:\WINDOWS\TEMP 縺ｸ隗｣豎ｺ縺嶺ｸｦ蛻励ち繧ｹ繧ｯ縺・cp932 縺ｧ蜷悟錐繝輔ぃ繧､繝ｫ荳頑嶌縺榊撫鬘鯉ｼ・      縺九ｉ .agentdev/tmp/・・orkspace-local・峨∈螟画峩縺吶ｋ縲Ｄleanup 繧・create 竊・gh螳溯｡・竊・VERIFY 竊・cleanup 縺ｮ1謇矩・Θ繝九ャ繝医↓邨・∩霎ｼ縺ｿ縲・      逵∫払荳榊庄繧ｹ繝・ャ繝怜喧縺吶ｋ縲Ｄase-auto run 8 draft 荳ｦ蛻怜・逅・〒23莉ｶ谿句ｭ倥＠縺溷ｮ溽ｸｾ縺ｮ蜀咲匱髦ｲ豁｢縲・      繝ｦ繝ｼ繧ｶ繝ｼ遒ｺ螳壻ｺ矩・・agentdev/tmp/ 驟咲ｽｮ縲…leanup 蠢・医阪ｒ蜿肴丐縲・  - id: AG-004
+      RU-0005: 一時ファイル配置を $env:TEMP/agentdev/（Windows で C:\WINDOWS\TEMP へ解決し並列タスクが cp932 で同名ファイル上書き問題）
+      から .agentdev/tmp/（workspace-local）へ変更する。cleanup を create → gh実行 → VERIFY → cleanup の1手順ユニットに組み込み、
+      省略不可ステップ化する。case-auto run 8 draft 並列処理で23件残存した実績の再発防止。
+      ユーザー確定事項「.agentdev/tmp/ 配置、cleanup 必須」を反映。
+  - id: AG-004
     content: |
-      RU-0005: 譛ｬ譁・ｽｮ謠帶焔邯壹″縺ｸ PowerShell regex MatchEvaluator 蜀・-replace 菴ｿ逕ｨ豕ｨ諢上→蝗樣∩遲悶ｒ霑ｽ險倥☆繧九・      [regex]::Replace + ScriptBlock 蜀・〒 -replace 貍皮ｮ怜ｭ舌ｒ菴ｿ逕ｨ縺吶ｋ縺ｨ蜈ｨ莉ｶ鄂ｮ謠帙′譛溷ｾ・壹ｊ蜍穂ｽ懊＠縺ｪ縺・・      蝗樣∩遲悶・ Node.js・・tring.split/join・峨∪縺溘・ PowerShell String.Replace・・NET 繝｡繧ｽ繝・ラ縲〉egex 髱樔ｽｿ逕ｨ・峨・      譌｢蟄倥・ backreference $N 蟇ｾ遲厄ｼ・31-37・峨→蛹ｺ蛻･縺励※險倩ｼ峨☆繧九Ｄase-close(#epic) QG-4 縺ｧ螳御ｺ・擅莉ｶ繝√ぉ繝・け繝懊ャ繧ｯ繧ｹ7蛟倶ｸｭ1蛟九＠縺・      鄂ｮ謠帙＆繧後↑縺九▲縺溷ｮ溽ｸｾ縺ｫ蝓ｺ縺･縺上・  - id: AG-005
+      RU-0005: 本文置換手続きへ PowerShell regex MatchEvaluator 内 -replace 使用注意と回避策を追記する。
+      [regex]::Replace + ScriptBlock 内で -replace 演算子を使用すると全件置換が期待通り動作しない。
+      回避策は Node.js（String.split/join）または PowerShell String.Replace（.NET メソッド、regex 非使用）。
+      既存の backreference $N 対策（L31-37）と区別して記載する。case-close(#epic) QG-4 で完了条件チェックボックス7個中1個しか
+      置換されなかった実績に基づく。
+  - id: AG-005
     content: |
-      RU-0005: docs/specs/skills/agentdev-gh-cli.md 縺ｸ Windows 迺ｰ蠅・崋譛画焔邯壹″縺ｮ蜿ら・霑ｽ險倥ｒ陦後≧縲・      standard-procedures.md 縺・Windows 迺ｰ蠅・崋譛画焔邯壹″・・p932 蛹悶￠蟇ｾ遲悶・agentdev/tmp/ 驟咲ｽｮ縲…leanup 荳菴灘喧縲・      MatchEvaluator 蜀・-replace 鄂・峨ｒ謇譛峨☆繧九％縺ｨ繧呈・險倥☆繧九・  - id: AG-006
+      RU-0005: docs/specs/skills/agentdev-gh-cli.md へ Windows 環境固有手続きの参照追記を行う。
+      standard-procedures.md が Windows 環境固有手続き（cp932 化け対策、.agentdev/tmp/ 配置、cleanup 一体化、
+      MatchEvaluator 内 -replace 罠）を所有することを明記する。
+  - id: AG-006
     content: |
-      RU-0006: src/opencode/skills/agentdev-workflow-templates/ 縺ｮ issue_desc_*.md 繝・Φ繝励Ξ繝ｼ繝医↓
-      test strategy 險倩ｿｰ繧ｬ繧､繝峨ｒ霑ｽ險倥☆繧・
-      - 隍・焚 REQ 蜈ｱ騾・pass_criteria 縺ｮ繝ｪ繧ｹ繧ｯ・亥推 REQ 縺ｮ pipeline stage 驕輔＞繧貞精蜿弱○縺壽枚蟄怜・荳閾ｴ繧定ｦ∵ｱゅ☆繧九→ QG-4 隧穂ｾ｡譎ゅ↓鬟溘＞驕輔≧・・      - REQ 蛟句挨譛溷ｾ・､險倩ｿｰ縺ｮ謗ｨ螂ｨ
-      - 螟画峩蟇ｾ雎｡螟・REQ 讀懆ｨｼ縺ｮ豁｣縺励＞陦ｨ迴ｾ・・iff 縺後↑縺・％縺ｨ・・      - 蟄伜惠遒ｺ隱阪・菴ｿ逕ｨ譚｡莉ｶ・域眠隕丈ｽ懈・遖∵ｭ｢縺ｮ蝣ｴ蜷医・縺ｿ・・      Issue #1760 QG-4 縺ｧ REQ-0129-012 content 縺ｨ譁・ｭ怜・荳堺ｸ閾ｴ縲：-001縲梧э蜻ｳ逧・ｭ我ｾ｡繝ｻ謇ｿ隱阪阪〒蜃ｦ逅・＠縺溷ｮ溽ｸｾ縺ｫ蝓ｺ縺･縺上・  - id: AG-007
+      RU-0006: src/opencode/skills/agentdev-workflow-templates/ の issue_desc_*.md テンプレートに
+      test strategy 記述ガイドを追記する:
+      - 複数 REQ 共通 pass_criteria のリスク（各 REQ の pipeline stage 違いを吸収せず文字列一致を要求すると QG-4 評価時に食い違う）
+      - REQ 個別期待値記述の推奨
+      - 変更対象外 REQ 検証の正しい表現（diff がないこと）
+      - 存在確認の使用条件（新規作成禁止の場合のみ）
+      Issue #1760 QG-4 で REQ-0129-012 content と文字列不一致、F-001「意味的等価・承認」で処理した実績に基づく。
+  - id: AG-007
     content: |
-      RU-0006: src/opencode/skills/agentdev-req-analysis/ 縺ｸ pass_criteria 險倩ｿｰ蝓ｺ貅悶ｒ霑ｽ險倥☆繧・
-      - pipeline stage 蛻･縺ｮ content 陦ｨ迴ｾ蟾ｮ逡ｰ繧貞精蜿弱☆繧九梧э蜻ｳ逧・ｭ我ｾ｡險ｱ螳ｹ縲阪ぎ繧､繝峨Λ繧､繝ｳ
-      - 縲悟ｭ伜惠縺励↑縺・％縺ｨ縲阪→縲悟､画峩縺輔ｌ縺ｦ縺・↑縺・％縺ｨ縲阪・菴ｿ縺・・縺大渕貅・      Issue #1760 TS-003 縺ｧ REQ-0147-010 繧偵悟ｭ伜惠縺励↑縺・％縺ｨ縲阪→隱､陦ｨ迴ｾ縺励◆螳溽ｸｾ縺ｫ蝓ｺ縺･縺上・      蟄伜惠遒ｺ隱阪・譁ｰ隕丈ｽ懈・遖∵ｭ｢・・EQ-0164 縺悟ｭ伜惠縺励↑縺・％縺ｨ遲会ｼ峨・蝣ｴ蜷医・縺ｿ菴ｿ逕ｨ縺吶∋縺阪・
+      RU-0006: src/opencode/skills/agentdev-req-analysis/ へ pass_criteria 記述基準を追記する:
+      - pipeline stage 別の content 表現差異を吸収する「意味的等価許容」ガイドライン
+      - 「存在しないこと」と「変更されていないこと」の使い分け基準
+      Issue #1760 TS-003 で REQ-0147-010 を「存在しないこと」と誤表現した実績に基づく。
+      存在確認は新規作成禁止（REQ-0164 が存在しないこと等）の場合のみ使用すべき。
+
 artifact_actions:
   - id: ACT-SPEC-001
     artifact: spec
@@ -63,76 +91,101 @@ artifact_actions:
       operation: update
       domain: skills
       slug: agentdev-gh-cli
-    target_area: "## Windows 迺ｰ蠅・崋譛画焔邯壹″"
+    target_area: "## Windows 環境固有手続き"
     source_items: [AG-001, AG-002, AG-003, AG-004, AG-005]
     spec_logical_division: cross_cutting_contract
     canonical_owner: agentdev-gh-cli
     content: |
-      ## Windows 迺ｰ蠅・崋譛画焔邯壹″
+      ## Windows 環境固有手続き
 
-      Windows 迺ｰ蠅・崋譛峨・謇狗ｶ壹″縺ｯ `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` 縺梧ｭ｣隕乗園譛峨☆繧九・      譛ｬ SPEC 縺ｯ Windows 迺ｰ蠅・崋譛画焔邯壹″縺ｮ蟄伜惠縺ｨ蜿ら・髢｢菫ゅ・縺ｿ繧貞ｮ壹ａ縲∬ｩｳ邏ｰ謇狗ｶ壹″縺ｯ reference 繝輔ぃ繧､繝ｫ縺ｸ蟋碑ｭｲ縺吶ｋ縲・
-      ### 蟇ｾ雎｡謇狗ｶ壹″
+      Windows 環境固有の手続きは `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` が正規所有する。
+      本 SPEC は Windows 環境固有手続きの存在と参照関係のみを定め、詳細手続きは reference ファイルへ委譲する。
 
-      - cp932 蛹悶￠蟇ｾ遲厄ｼ・-title / inline --input 蠑墓焚縺ｮ菴ｿ逕ｨ遖∵ｭ｢縲・-body-file / gh api --input 謗ｨ螂ｨ・・      - title 菫ｮ豁｣縺悟ｿ・ｦ√↑蝣ｴ蜷医・ REST API PATCH 讓呎ｺ匁焔邯壹″
-      - 荳譎ゅヵ繧｡繧､繝ｫ驟咲ｽｮ・・agentdev/tmp/ workspace-local・峨→ cleanup 荳菴灘喧・・reate 竊・gh螳溯｡・竊・VERIFY 竊・cleanup 縺ｮ逵∫払荳榊庄繧ｹ繝・ャ繝怜喧・・      - PowerShell regex MatchEvaluator 蜀・-replace 菴ｿ逕ｨ豕ｨ諢上→蝗樣∩遲厄ｼ・ode.js / String.Replace・・      - 荳願ｨ倥→譌｢蟄倥・ backreference $N 蟇ｾ遲悶→縺ｮ蛹ｺ蛻･
+      ### 対象手続き
 
-      隧ｳ邏ｰ縺ｯ standard-procedures.md 縺ｮ隧ｲ蠖薙そ繧ｯ繧ｷ繝ｧ繝ｳ繧貞盾辣ｧ縲・  - id: ACT-SPEC-002
+      - cp932 化け対策（--title / inline --input 引数の使用禁止、--body-file / gh api --input 推奨）
+      - title 修正が必要な場合の REST API PATCH 標準手続き
+      - 一時ファイル配置（.agentdev/tmp/ workspace-local）と cleanup 一体化（create → gh実行 → VERIFY → cleanup の省略不可ステップ化）
+      - PowerShell regex MatchEvaluator 内 -replace 使用注意と回避策（Node.js / String.Replace）
+      - 上記と既存の backreference $N 対策との区別
+
+      詳細は standard-procedures.md の該当セクションを参照。
+  - id: ACT-SPEC-002
     artifact: spec
     operation: spec-update
     target_spec:
       operation: update
       domain: skills
       slug: agentdev-workflow-templates
-    target_area: "## test strategy 險倩ｿｰ繧ｬ繧､繝峨Λ繧､繝ｳ"
+    target_area: "## test strategy 記述ガイドライン"
     source_items: [AG-006]
     spec_logical_division: cross_cutting_contract
     canonical_owner: agentdev-workflow-templates
     content: |
-      ## test strategy 險倩ｿｰ繧ｬ繧､繝峨Λ繧､繝ｳ
+      ## test strategy 記述ガイドライン
 
-      issue_desc_*.md 繝・Φ繝励Ξ繝ｼ繝医〒 test strategy 繧定ｵｷ逾ｨ縺吶ｋ髫帙・ pass_criteria 險倩ｿｰ繧ｬ繧､繝峨Λ繧､繝ｳ:
+      issue_desc_*.md テンプレートで test strategy を起票する際の pass_criteria 記述ガイドライン:
 
-      ### 蜈ｱ騾・pass_criteria 縺ｮ繝ｪ繧ｹ繧ｯ
+      ### 共通 pass_criteria のリスク
 
-      隍・焚 REQ 縺ｸ縺ｮ蜈ｱ騾・pass_criteria 繧定ｵｷ逾ｨ縺吶ｋ蝣ｴ蜷医∝推 REQ 縺ｮ pipeline stage・・romote 邉ｻ縲〉eview 邉ｻ遲会ｼ峨・驕輔＞繧・      蜷ｸ蜿弱○縺壽枚蟄怜・荳閾ｴ繧定ｦ∵ｱゅ☆繧九→縲＿G-4 隧穂ｾ｡譎ゅ↓ REQ content 縺ｨ pass_criteria 譛溷ｾ・､縺碁｣溘＞驕輔≧蜿ｯ閭ｽ諤ｧ縺後≠繧九・      REQ 蛟句挨譛溷ｾ・､縺ｮ險倩ｿｰ繧呈耳螂ｨ縺吶ｋ縲・
-      ### 螟画峩蟇ｾ雎｡螟・REQ 讀懆ｨｼ縺ｮ豁｣縺励＞陦ｨ迴ｾ
+      複数 REQ への共通 pass_criteria を起票する場合、各 REQ の pipeline stage（promote 系、review 系等）の違いを
+      吸収せず文字列一致を要求すると、QG-4 評価時に REQ content と pass_criteria 期待値が食い違う可能性がある。
+      REQ 個別期待値の記述を推奨する。
 
-      縲悟､画峩蟇ｾ雎｡螟・REQ 縺ｮ螟画峩縺後↑縺・％縺ｨ縲阪・ diff 縺後↑縺・％縺ｨ縺ｨ縺励※陦ｨ迴ｾ縺吶ｋ縲・      縲悟ｭ伜惠縺励↑縺・％縺ｨ縲阪→隱､陦ｨ迴ｾ縺吶ｋ縺ｨ縲∵､懆ｨｼ諢丞峙・・iff 縺後↑縺・％縺ｨ・峨→讀懆ｨｼ陦ｨ迴ｾ・亥ｭ伜惠遒ｺ隱搾ｼ峨′縺壹ｌ繧九・
-      ### 蟄伜惠遒ｺ隱阪・菴ｿ逕ｨ譚｡莉ｶ
+      ### 変更対象外 REQ 検証の正しい表現
 
-      縲悟ｭ伜惠縺励↑縺・％縺ｨ縲阪・譁ｰ隕丈ｽ懈・遖∵ｭ｢・井ｾ・ REQ-0164 縺悟ｭ伜惠縺励↑縺・％縺ｨ・峨・蝣ｴ蜷医・縺ｿ菴ｿ逕ｨ縺吶ｋ縲・      譌｢蟄・REQ 縺ｮ螟画峩縺後↑縺・％縺ｨ繧呈､懆ｨｼ縺吶ｋ蝣ｴ蜷医・縲悟､画峩縺輔ｌ縺ｦ縺・↑縺・％縺ｨ縲搾ｼ・iff 縺後↑縺・％縺ｨ・峨ｒ菴ｿ逕ｨ縺吶ｋ縲・  - id: ACT-SPEC-003
+      「変更対象外 REQ の変更がないこと」は diff がないこととして表現する。
+      「存在しないこと」と誤表現すると、検証意図（diff がないこと）と検証表現（存在確認）がずれる。
+
+      ### 存在確認の使用条件
+
+      「存在しないこと」は新規作成禁止（例: REQ-0164 が存在しないこと）の場合のみ使用する。
+      既存 REQ の変更がないことを検証する場合は「変更されていないこと」（diff がないこと）を使用する。
+  - id: ACT-SPEC-003
     artifact: spec
     operation: spec-update
     target_spec:
       operation: update
       domain: skills
       slug: agentdev-req-analysis
-    target_area: "## pass_criteria 險倩ｿｰ蝓ｺ貅・
+    target_area: "## pass_criteria 記述基準"
     source_items: [AG-007]
     spec_logical_division: cross_cutting_contract
     canonical_owner: agentdev-req-analysis
     content: |
-      ## pass_criteria 險倩ｿｰ蝓ｺ貅・
-      pass_criteria 險倩ｿｰ譎ゅ・蜩∬ｳｪ蝓ｺ貅・
+      ## pass_criteria 記述基準
 
-      ### 諢丞袖逧・ｭ我ｾ｡險ｱ螳ｹ
+      pass_criteria 記述時の品質基準:
 
-      pipeline stage 蛻･縺ｮ content 陦ｨ迴ｾ蟾ｮ逡ｰ繧貞精蜿弱☆繧九梧э蜻ｳ逧・ｭ我ｾ｡險ｱ螳ｹ縲阪ぎ繧､繝峨Λ繧､繝ｳ縲・      REQ content 縺・pipeline stage 縺ｫ繧医▲縺ｦ陦ｨ迴ｾ繧貞､峨∴繧句ｴ蜷医｝ass_criteria 縺ｯ諢丞袖逧・ｭ我ｾ｡諤ｧ縺ｧ蛻､螳壹☆繧九・      譁・ｭ怜・荳閾ｴ繧呈ｩ滓｢ｰ逧・↓隕∵ｱゅ＠縺ｪ縺・・
-      ### 縲悟ｭ伜惠縺励↑縺・％縺ｨ縲阪→縲悟､画峩縺輔ｌ縺ｦ縺・↑縺・％縺ｨ縲阪・菴ｿ縺・・縺・
-      - 縲悟ｭ伜惠縺励↑縺・％縺ｨ縲・ 譁ｰ隕丈ｽ懈・遖∵ｭ｢・井ｾ・ REQ-0164 縺悟ｭ伜惠縺励↑縺・％縺ｨ・峨・蝣ｴ蜷医・縺ｿ菴ｿ逕ｨ
-      - 縲悟､画峩縺輔ｌ縺ｦ縺・↑縺・％縺ｨ縲・ 譌｢蟄・REQ 縺ｮ螟画峩縺後↑縺・％縺ｨ・・iff 縺後↑縺・％縺ｨ・峨ｒ讀懆ｨｼ縺吶ｋ蝣ｴ蜷医↓菴ｿ逕ｨ
+      ### 意味的等価許容
 
-      縺薙ｌ繧峨ｒ隱､縺｣縺ｦ豺ｷ逕ｨ縺吶ｋ縺ｨ縲∵､懆ｨｼ諢丞峙縺ｨ讀懆ｨｼ陦ｨ迴ｾ縺後★繧後＿G-4 隧穂ｾ｡譎ゅ↓荳肴ｭ｣遒ｺ縺ｪ蛻､螳壹ｒ逕溘§繧九・
+      pipeline stage 別の content 表現差異を吸収する「意味的等価許容」ガイドライン。
+      REQ content が pipeline stage によって表現を変える場合、pass_criteria は意味的等価性で判定する。
+      文字列一致を機械的に要求しない。
+
+      ### 「存在しないこと」と「変更されていないこと」の使い分け
+
+      - 「存在しないこと」: 新規作成禁止（例: REQ-0164 が存在しないこと）の場合のみ使用
+      - 「変更されていないこと」: 既存 REQ の変更がないこと（diff がないこと）を検証する場合に使用
+
+      これらを誤って混用すると、検証意図と検証表現がずれ、QG-4 評価時に不正確な判定を生じる。
+
 conflict_resolutions:
   - id: CR-001
-    conflict: 荳譎ゅヵ繧｡繧､繝ｫ驟咲ｽｮ・・env:TEMP/agentdev/ vs .agentdev/tmp/・・    resolution: |
-      .agentdev/tmp/・・orkspace-local・峨ｒ謗｡逕ｨ縲ゅΘ繝ｼ繧ｶ繝ｼ遒ｺ螳壻ｺ矩・・      $env:TEMP 縺ｯ Windows 縺ｧ C:\WINDOWS\TEMP 縺ｸ隗｣豎ｺ縺嶺ｸｦ蛻励ち繧ｹ繧ｯ縺・cp932 縺ｧ蜷悟錐繝輔ぃ繧､繝ｫ荳頑嶌縺榊撫鬘後・縺溘ａ荳肴治逕ｨ縲・  - id: CR-002
-    conflict: cleanup 縺ｮ逵∫払蜿ｯ蜷ｦ
+    conflict: 一時ファイル配置（$env:TEMP/agentdev/ vs .agentdev/tmp/）
     resolution: |
-      cleanup 繧・create 竊・gh螳溯｡・竊・VERIFY 竊・cleanup 縺ｮ1謇矩・Θ繝九ャ繝医↓邨・∩霎ｼ縺ｿ縲∫怐逡･荳榊庄繧ｹ繝・ャ繝怜喧縺吶ｋ縲・      case-auto run 8 draft 荳ｦ蛻怜・逅・〒23莉ｶ谿句ｭ倥＠縺溷ｮ溽ｸｾ縺ｮ蜀咲匱髦ｲ豁｢縲ゅΘ繝ｼ繧ｶ繝ｼ遒ｺ螳壻ｺ矩・・  - id: CR-003
-    conflict: ADR 隕∝凄
+      .agentdev/tmp/（workspace-local）を採用。ユーザー確定事項。
+      $env:TEMP は Windows で C:\WINDOWS\TEMP へ解決し並列タスクが cp932 で同名ファイル上書き問題のため不採用。
+  - id: CR-002
+    conflict: cleanup の省略可否
     resolution: |
-      譁ｰ隕・ADR 荳崎ｦ√ゅせ繧ｭ繝ｫ驕狗畑謇狗ｶ壹″縺ｮ霑ｽ險倥〒縺ゅｊ縲√い繝ｼ繧ｭ繝・け繝√Ε蛻､譁ｭ繧貞性縺ｾ縺ｪ縺・◆繧√・
+      cleanup を create → gh実行 → VERIFY → cleanup の1手順ユニットに組み込み、省略不可ステップ化する。
+      case-auto run 8 draft 並列処理で23件残存した実績の再発防止。ユーザー確定事項。
+  - id: CR-003
+    conflict: ADR 要否
+    resolution: |
+      新規 ADR 不要。スキル運用手続きの追記であり、アーキテクチャ判断を含まないため。
+
 operation_units:
   - ou_id: OU-001
     source_ru: RU-0005
@@ -166,43 +219,72 @@ test_strategy:
   - id: TS-001
     target_item: AG-001
     verification: |
-      src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md 縺ｧ
-      Windows 迺ｰ蠅・・ --title / inline --input 菴ｿ逕ｨ遖∵ｭ｢縲・-body-file / gh api --input 謗ｨ螂ｨ縺梧・險倥＆繧後※縺・ｋ縺薙→繧堤｢ｺ隱阪☆繧九・      Section 2 Step 0 縺ｮ繧ｳ繝ｳ繧ｽ繝ｼ繝ｫ繧ｨ繝ｳ繧ｳ繝ｼ繝・ぅ繝ｳ繧ｰ蛻晄悄蛹悶→ --title 蠑墓焚 decode 縺ｮ蛻･蝠城｡梧ｧ縺梧・遉ｺ縺輔ｌ縺ｦ縺・ｋ縺薙→縲・    pass_criteria: |
-      standard-procedures.md 縺ｫ Windows 迺ｰ蠅・--title / inline --input 菴ｿ逕ｨ遖∵ｭ｢縺ｨ --body-file / gh api --input 謗ｨ螂ｨ縺梧・險倥＆繧後※縺・ｋ縺薙→縲・    on_failure: |
-      fix-and-reverify・亥ｮ溯｣・ｸ崎憶縺ｮ蝣ｴ蜷茨ｼ峨・  - id: TS-002
+      src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md で
+      Windows 環境の --title / inline --input 使用禁止、--body-file / gh api --input 推奨が明記されていることを確認する。
+      Section 2 Step 0 のコンソールエンコーディング初期化と --title 引数 decode の別問題性が明示されていること。
+    pass_criteria: |
+      standard-procedures.md に Windows 環境 --title / inline --input 使用禁止と --body-file / gh api --input 推奨が明記されていること。
+    on_failure: |
+      fix-and-reverify（実装不良の場合）。
+  - id: TS-002
     target_item: AG-002
     verification: |
-      standard-procedures.md 縺ｫ title 菫ｮ豁｣縺悟ｿ・ｦ√↑蝣ｴ蜷医・ REST API PATCH 讓呎ｺ匁焔邯壹″
-      ・・h api -X PATCH /repos/{owner}/{repo}/issues/{N} + UTF-8 JSON --input file・峨′譏手ｨ倥＆繧後※縺・ｋ縺薙→繧堤｢ｺ隱阪☆繧九・    pass_criteria: |
-      讓呎ｺ匁焔邯壹″縺悟ｮ溯｡悟庄閭ｽ縺ｪ蠖｢蠑上〒險倩ｼ峨＆繧後※縺・ｋ縺薙→縲・    on_failure: |
-      fix-and-reverify・亥ｮ溯｣・ｸ崎憶縺ｮ蝣ｴ蜷茨ｼ峨・  - id: TS-003
+      standard-procedures.md に title 修正が必要な場合の REST API PATCH 標準手続き
+      （gh api -X PATCH /repos/{owner}/{repo}/issues/{N} + UTF-8 JSON --input file）が明記されていることを確認する。
+    pass_criteria: |
+      標準手続きが実行可能な形式で記載されていること。
+    on_failure: |
+      fix-and-reverify（実装不良の場合）。
+  - id: TS-003
     target_item: AG-003
     verification: |
-      standard-procedures.md 縺ｧ荳譎ゅヵ繧｡繧､繝ｫ驟咲ｽｮ縺・.agentdev/tmp/・・orkspace-local・峨∈螟画峩縺輔ｌ縺ｦ縺・ｋ縺薙→繧堤｢ｺ隱阪☆繧九・      cleanup 縺・create 竊・gh螳溯｡・竊・VERIFY 竊・cleanup 縺ｮ1謇矩・Θ繝九ャ繝医〒逵∫払荳榊庄繧ｹ繝・ャ繝怜喧縺輔ｌ縺ｦ縺・ｋ縺薙→繧堤｢ｺ隱阪☆繧九・    pass_criteria: |
-      .agentdev/tmp/ 驟咲ｽｮ縺ｨ cleanup 逵∫払荳榊庄繧ｹ繝・ャ繝怜喧縺瑚ｨ倩ｼ峨＆繧後※縺・ｋ縺薙→縲・    on_failure: |
-      fix-and-reverify・亥ｮ溯｣・ｸ崎憶縺ｮ蝣ｴ蜷茨ｼ峨・  - id: TS-004
+      standard-procedures.md で一時ファイル配置が .agentdev/tmp/（workspace-local）へ変更されていることを確認する。
+      cleanup が create → gh実行 → VERIFY → cleanup の1手順ユニットで省略不可ステップ化されていることを確認する。
+    pass_criteria: |
+      .agentdev/tmp/ 配置と cleanup 省略不可ステップ化が記載されていること。
+    on_failure: |
+      fix-and-reverify（実装不良の場合）。
+  - id: TS-004
     target_item: AG-004
     verification: |
-      standard-procedures.md 縺ｫ PowerShell regex MatchEvaluator 蜀・-replace 菴ｿ逕ｨ豕ｨ諢上→蝗樣∩遲・      ・・ode.js String.split/join 縺ｾ縺溘・ PowerShell String.Replace・峨′霑ｽ險倥＆繧後※縺・ｋ縺薙→繧堤｢ｺ隱阪☆繧九・      譌｢蟄倥・ backreference $N 蟇ｾ遲厄ｼ・31-37・峨→蛹ｺ蛻･縺励※險倩ｼ峨＆繧後※縺・ｋ縺薙→縲・    pass_criteria: |
-      MatchEvaluator 蜀・-replace 豕ｨ諢上→蝗樣∩遲悶′ backreference $N 蟇ｾ遲悶→蛹ｺ蛻･縺輔ｌ縺ｦ險倩ｼ峨＆繧後※縺・ｋ縺薙→縲・    on_failure: |
-      fix-and-reverify・亥ｮ溯｣・ｸ崎憶縺ｮ蝣ｴ蜷茨ｼ峨・  - id: TS-005
+      standard-procedures.md に PowerShell regex MatchEvaluator 内 -replace 使用注意と回避策
+      （Node.js String.split/join または PowerShell String.Replace）が追記されていることを確認する。
+      既存の backreference $N 対策（L31-37）と区別して記載されていること。
+    pass_criteria: |
+      MatchEvaluator 内 -replace 注意と回避策が backreference $N 対策と区別されて記載されていること。
+    on_failure: |
+      fix-and-reverify（実装不良の場合）。
+  - id: TS-005
     target_item: AG-005
     verification: |
-      docs/specs/skills/agentdev-gh-cli.md 縺ｫ Windows 迺ｰ蠅・崋譛画焔邯壹″縺ｮ蜿ら・霑ｽ險倥′縺ゅｋ縺薙→繧堤｢ｺ隱阪☆繧九・      standard-procedures.md 縺ｸ縺ｮ蜿ら・髢｢菫ゅ′譏守､ｺ縺輔ｌ縺ｦ縺・ｋ縺薙→縲・    pass_criteria: |
-      agentdev-gh-cli.md SPEC 縺ｫ Windows 迺ｰ蠅・崋譛画焔邯壹″縺ｮ蟄伜惠縺ｨ standard-procedures.md 縺ｸ縺ｮ蜿ら・縺瑚ｨ倩ｼ峨＆繧後※縺・ｋ縺薙→縲・    on_failure: |
-      fix-and-reverify・亥ｮ溯｣・ｸ崎憶縺ｮ蝣ｴ蜷茨ｼ峨・  - id: TS-006
+      docs/specs/skills/agentdev-gh-cli.md に Windows 環境固有手続きの参照追記があることを確認する。
+      standard-procedures.md への参照関係が明示されていること。
+    pass_criteria: |
+      agentdev-gh-cli.md SPEC に Windows 環境固有手続きの存在と standard-procedures.md への参照が記載されていること。
+    on_failure: |
+      fix-and-reverify（実装不良の場合）。
+  - id: TS-006
     target_item: AG-006
     verification: |
-      src/opencode/skills/agentdev-workflow-templates/ 縺ｮ issue_desc_*.md 繝・Φ繝励Ξ繝ｼ繝医↓
-      test strategy 險倩ｿｰ繧ｬ繧､繝会ｼ亥・騾・pass_criteria 繝ｪ繧ｹ繧ｯ縲ヽEQ 蛟句挨譛溷ｾ・､謗ｨ螂ｨ縲∝､画峩蟇ｾ雎｡螟・REQ 讀懆ｨｼ縲∝ｭ伜惠遒ｺ隱堺ｽｿ逕ｨ譚｡莉ｶ・峨′
-      霑ｽ險倥＆繧後※縺・ｋ縺薙→繧堤｢ｺ隱阪☆繧九・      docs/specs/skills/agentdev-workflow-templates.md 縺ｫ縲荊est strategy 險倩ｿｰ繧ｬ繧､繝峨Λ繧､繝ｳ縲阪そ繧ｯ繧ｷ繝ｧ繝ｳ縺瑚ｿｽ蜉縺輔ｌ縺ｦ縺・ｋ縺薙→縲・    pass_criteria: |
-      issue_desc_*.md 繝・Φ繝励Ξ繝ｼ繝医→ workflow-templates.md SPEC 縺ｮ荳｡譁ｹ縺ｫ繧ｬ繧､繝峨Λ繧､繝ｳ縺瑚ｨ倩ｼ峨＆繧後※縺・ｋ縺薙→縲・    on_failure: |
-      fix-and-reverify・亥ｮ溯｣・ｸ崎憶縺ｮ蝣ｴ蜷茨ｼ峨・  - id: TS-007
+      src/opencode/skills/agentdev-workflow-templates/ の issue_desc_*.md テンプレートに
+      test strategy 記述ガイド（共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証、存在確認使用条件）が
+      追記されていることを確認する。
+      docs/specs/skills/agentdev-workflow-templates.md に「test strategy 記述ガイドライン」セクションが追加されていること。
+    pass_criteria: |
+      issue_desc_*.md テンプレートと workflow-templates.md SPEC の両方にガイドラインが記載されていること。
+    on_failure: |
+      fix-and-reverify（実装不良の場合）。
+  - id: TS-007
     target_item: AG-007
     verification: |
-      src/opencode/skills/agentdev-req-analysis/ 縺ｫ pass_criteria 險倩ｿｰ蝓ｺ貅・      ・域э蜻ｳ逧・ｭ我ｾ｡險ｱ螳ｹ縲∝ｭ伜惠遒ｺ隱阪→ diff 遒ｺ隱阪・菴ｿ縺・・縺托ｼ峨′霑ｽ險倥＆繧後※縺・ｋ縺薙→繧堤｢ｺ隱阪☆繧九・      docs/specs/skills/agentdev-req-analysis.md 縺ｫ縲継ass_criteria 險倩ｿｰ蝓ｺ貅悶阪そ繧ｯ繧ｷ繝ｧ繝ｳ縺瑚ｿｽ蜉縺輔ｌ縺ｦ縺・ｋ縺薙→縲・    pass_criteria: |
-      req-analysis skill 縺ｨ SPEC 縺ｮ荳｡譁ｹ縺ｫ險倩ｿｰ蝓ｺ貅悶′險倩ｼ峨＆繧後※縺・ｋ縺薙→縲・    on_failure: |
-      fix-and-reverify・亥ｮ溯｣・ｸ崎憶縺ｮ蝣ｴ蜷茨ｼ峨・
+      src/opencode/skills/agentdev-req-analysis/ に pass_criteria 記述基準
+      （意味的等価許容、存在確認と diff 確認の使い分け）が追記されていることを確認する。
+      docs/specs/skills/agentdev-req-analysis.md に「pass_criteria 記述基準」セクションが追加されていること。
+    pass_criteria: |
+      req-analysis skill と SPEC の両方に記述基準が記載されていること。
+    on_failure: |
+      fix-and-reverify（実装不良の場合）。
+
 review_dispositions:
   - id: RD-001
     source_ru: RU-0005
@@ -210,8 +292,9 @@ review_dispositions:
     disposition: covered
     reason_code: fully_integrated
     reason: |
-      RU-0005 縺ｮ Source Summary 縺梧欠鞫倥☆繧九径gentdev-gh-cli skill 縺ｮ Windows 迺ｰ蠅・崋譛牙撫鬘・莉ｶ縲阪・
-      AG-001縲廣G-005 縺ｧ螳悟・縺ｫ邨ｱ蜷医＆繧後◆縲Ｄp932 蛹悶￠縲∽ｸ譎ゅヵ繧｡繧､繝ｫ驟咲ｽｮ繝ｻcleanup縲｀atchEvaluator 鄂繧貞・縺ｦ蜿肴丐縲・    evidence:
+      RU-0005 の Source Summary が指摘する「agentdev-gh-cli skill の Windows 環境固有問題3件」は
+      AG-001〜AG-005 で完全に統合された。cp932 化け、一時ファイル配置・cleanup、MatchEvaluator 罠を全て反映。
+    evidence:
       path: .agentdev/backlog/req-units/RU-0005.md
       section: Source Summary
       checked_at_commit: null
@@ -222,7 +305,9 @@ review_dispositions:
     disposition: covered
     reason_code: fully_integrated
     reason: |
-      RU-0006 縺ｮ Source Summary 縺梧欠鞫倥☆繧九継ass_criteria 險倩ｿｰ繧ｬ繧､繝画悴謨ｴ蛯吶阪・ AG-006/AG-007 縺ｧ螳悟・縺ｫ邨ｱ蜷医＆繧後◆縲・      workflow-templates 縺ｨ req-analysis 縺ｮ荳｡ skill 縺ｸ縺ｮ繧ｬ繧､繝芽ｿｽ險倥ｒ蜿肴丐縲・    evidence:
+      RU-0006 の Source Summary が指摘する「pass_criteria 記述ガイド未整備」は AG-006/AG-007 で完全に統合された。
+      workflow-templates と req-analysis の両 skill へのガイド追記を反映。
+    evidence:
       path: .agentdev/backlog/req-units/RU-0006.md
       section: Source Summary
       checked_at_commit: null
@@ -231,33 +316,49 @@ review_dispositions:
 case_open_hints:
   epic_needed: false
   decomposition: |
-    scale: standard縲・ SPEC 縺ｸ縺ｮ蜿り・ｿｽ險・+ 3 skill reference 繝輔ぃ繧､繝ｫ譖ｴ譁ｰ縺ｮ縺溘ａ蜊倅ｸ Issue 縺ｧ螳檎ｵ舌☆繧九・    OU-001・・gentdev-gh-cli.md・俄・ OU-002・・gentdev-workflow-templates.md・俄・ OU-003・・gentdev-req-analysis.md・峨・鬆・〒螳滓命縲・    case-run 蟾･遞九〒蜷・skill 縺ｮ reference 繝輔ぃ繧､繝ｫ・・tandard-procedures.md, issue_desc_*.md 遲会ｼ峨ｒ譖ｴ譁ｰ縲・  wave_hints:
+    scale: standard、3 SPEC への参考追記 + 3 skill reference ファイル更新のため単一 Issue で完結する。
+    OU-001（agentdev-gh-cli.md）→ OU-002（agentdev-workflow-templates.md）→ OU-003（agentdev-req-analysis.md）の順で実施。
+    case-run 工程で各 skill の reference ファイル（standard-procedures.md, issue_desc_*.md 等）を更新。
+  wave_hints:
     - wave: 1
       units: [OU-001, OU-002, OU-003]
-      rationale: 3 SPEC 縺ｯ迢ｬ遶九＠縺ｦ縺翫ｊ荳ｦ蛻怜ｮ溯｡悟庄閭ｽ縲・```
+      rationale: 3 SPEC は独立しており並列実行可能。
+```
 
 # implementation_details
 
-譛ｬ繧ｻ繧ｯ繧ｷ繝ｧ繝ｳ縺ｯ case-run 蟾･遞九〒螳滓命縺吶ｋ螳溯｣・ｩｳ邏ｰ・・tep 10-1 繧ｬ繧､繝峨Λ繧､繝ｳ縺ｫ蝓ｺ縺･縺丞・髮｢・峨・
-## RU-0005 螳溯｣・ standard-procedures.md
+本セクションは case-run 工程で実施する実装詳細（Step 10-1 ガイドラインに基づく分離）。
 
-- 繝輔ぃ繧､繝ｫ: `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md`
-- 霑ｽ險伜・螳ｹ:
-  - Windows 迺ｰ蠅・・ --title / inline --input 菴ｿ逕ｨ遖∵ｭ｢縲・-body-file / gh api --input 謗ｨ螂ｨ
-  - title 菫ｮ豁｣逕ｨ REST API PATCH 讓呎ｺ匁焔邯壹″
-  - 荳譎ゅヵ繧｡繧､繝ｫ驟咲ｽｮ繧・.agentdev/tmp/・・orkspace-local・峨∈螟画峩
-  - cleanup 繧・create 竊・gh螳溯｡・竊・VERIFY 竊・cleanup 縺ｮ1謇矩・Θ繝九ャ繝医〒逵∫払荳榊庄繧ｹ繝・ャ繝怜喧
-  - PowerShell regex MatchEvaluator 蜀・-replace 菴ｿ逕ｨ豕ｨ諢上→蝗樣∩遲厄ｼ・ode.js / String.Replace・・  - 譌｢蟄・backreference $N 蟇ｾ遲厄ｼ・31-37・峨→縺ｮ蛹ｺ蛻･險倩ｼ・
-## RU-0006 螳溯｣・ workflow-templates 縺ｨ req-analysis
+## RU-0005 実装: standard-procedures.md
 
-- 繝輔ぃ繧､繝ｫ1: `src/opencode/skills/agentdev-workflow-templates/` 縺ｮ issue_desc_*.md 繝・Φ繝励Ξ繝ｼ繝・- 繝輔ぃ繧､繝ｫ2: `src/opencode/skills/agentdev-req-analysis/` 縺ｮ skill reference
-- 霑ｽ險伜・螳ｹ:
-  - test strategy 險倩ｿｰ繧ｬ繧､繝峨Λ繧､繝ｳ・亥・騾・pass_criteria 繝ｪ繧ｹ繧ｯ縲ヽEQ 蛟句挨譛溷ｾ・､謗ｨ螂ｨ・・  - 螟画峩蟇ｾ雎｡螟・REQ 讀懆ｨｼ縺ｮ豁｣縺励＞陦ｨ迴ｾ・・iff 縺後↑縺・％縺ｨ・・  - 蟄伜惠遒ｺ隱阪・菴ｿ逕ｨ譚｡莉ｶ・域眠隕丈ｽ懈・遖∵ｭ｢・・  - pipeline stage 蛻･ content 陦ｨ迴ｾ蟾ｮ逡ｰ縺ｮ諢丞袖逧・ｭ我ｾ｡險ｱ螳ｹ
+- ファイル: `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md`
+- 追記内容:
+  - Windows 環境の --title / inline --input 使用禁止、--body-file / gh api --input 推奨
+  - title 修正用 REST API PATCH 標準手続き
+  - 一時ファイル配置を .agentdev/tmp/（workspace-local）へ変更
+  - cleanup を create → gh実行 → VERIFY → cleanup の1手順ユニットで省略不可ステップ化
+  - PowerShell regex MatchEvaluator 内 -replace 使用注意と回避策（Node.js / String.Replace）
+  - 既存 backreference $N 対策（L31-37）との区別記載
 
-## 螳溯｣・せ繧ｳ繝ｼ繝励∈縺ｮ豕ｨ諢・
-螳溯｣・ｩｳ邏ｰ縺ｯ譛ｬ繝峨Λ繝輔ヨ縺ｮ隕∽ｻｶ螳夂ｾｩ譛ｬ菴薙〒縺ｯ縺ｪ縺上…ase-run 蟾･遞九〒縺ｮ蜿ら・諠・ｱ縺ｧ縺ゅｋ縲・隕∽ｻｶ螳夂ｾｩ縺ｨ縺励※縺ｮ蜴滓悽縺ｯ荳願ｨ・`# draft-data` YAML 繝悶Ο繝・け縲・
+## RU-0006 実装: workflow-templates と req-analysis
+
+- ファイル1: `src/opencode/skills/agentdev-workflow-templates/` の issue_desc_*.md テンプレート
+- ファイル2: `src/opencode/skills/agentdev-req-analysis/` の skill reference
+- 追記内容:
+  - test strategy 記述ガイドライン（共通 pass_criteria リスク、REQ 個別期待値推奨）
+  - 変更対象外 REQ 検証の正しい表現（diff がないこと）
+  - 存在確認の使用条件（新規作成禁止）
+  - pipeline stage 別 content 表現差異の意味的等価許容
+
+## 実装スコープへの注意
+
+実装詳細は本ドラフトの要件定義本体ではなく、case-run 工程での参照情報である。
+要件定義としての原本は上記 `# draft-data` YAML ブロック。
+
 # summary
 
-譛ｬ繝峨Λ繝輔ヨ縺ｯ RU-0005・・h-cli Windows 迺ｰ蠅・撫鬘・莉ｶ・峨→ RU-0006・・ass_criteria 險倩ｿｰ繧ｬ繧､繝会ｼ峨ｒ蜃ｦ逅・☆繧玖ｦ∽ｻｶ螳夂ｾｩ縺ｧ縺ゅｋ縲・gentDevFlow 譛ｬ菴薙・謾ｹ蝟・ｼ・gentdev_handoff: true・峨・
-荳ｻ隕√↑螟画峩蟇ｾ雎｡縺ｯ3縺､縺ｮ SPEC・・gentdev-gh-cli.md, agentdev-workflow-templates.md, agentdev-req-analysis.md・峨∈縺ｮ蜿り・ｿｽ險倥→縲∝推 skill 縺ｮ reference 繝輔ぃ繧､繝ｫ譖ｴ譁ｰ・・ase-run 蟾･遞具ｼ峨Ｔcale: standard縲・
-蠕檎ｶ壹さ繝槭Φ繝峨・ req-save・・EQ/ADR 螟画峩縺ｪ縺励√せ繧ｭ繝・・蜿ｯ・俄・ spec-save・・ SPEC 蜿り・ｿｽ險假ｼ俄・ case-open 竊・case-run・亥推 skill reference 繝輔ぃ繧､繝ｫ譖ｴ譁ｰ・峨ｒ諠ｳ螳壹・
+本ドラフトは RU-0005（gh-cli Windows 環境問題3件）と RU-0006（pass_criteria 記述ガイド）を処理する要件定義である。AgentDevFlow 本体の改善（agentdev_handoff: true）。
+
+主要な変更対象は3つの SPEC（agentdev-gh-cli.md, agentdev-workflow-templates.md, agentdev-req-analysis.md）への参考追記と、各 skill の reference ファイル更新（case-run 工程）。scale: standard。
+
+後続コマンドは req-save（REQ/ADR 変更なし、スキップ可）→ spec-save（3 SPEC 参考追記）→ case-open → case-run（各 skill reference ファイル更新）を想定。
