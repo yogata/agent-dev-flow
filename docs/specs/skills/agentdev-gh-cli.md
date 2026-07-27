@@ -2,7 +2,7 @@
 title: `agentdev-gh-cli` SPEC
 status: accepted
 created: 2026-06-21
-updated: "2026-07-26"
+updated: "2026-07-27"
 ---
 
 # `agentdev-gh-cli` SPEC
@@ -104,6 +104,28 @@ gh WRITE 操作を行う全 command/ skill（case-open、case-run、case-close�
 ### ローカル版の扱い
 
 ローカル版は Case ファイル読み書きへ差し替えるため、本要件の対象外（gh CLI を使用しない）。ローカル版の具体的取扱いは v2:REQ-0150 参照。
+
+## Windows 環境固有手続き
+
+Windows 環境（Windows PowerShell 5.x / pwsh 7）での gh CLI 実行に特有の手続きを以下5項目として定義する（RU-0005）。
+本 SPEC は各手続きの存在と `references/standard-procedures.md` への参照関係のみを定め、詳細実装（gh CLI フラグ、PowerShell 式、ファイル配置、cleanup 手順）は同ファイルへ委譲する（REQ-011、ADR-004 decision #3）。
+ローカル版は Case ファイル読み書きへ差し替えるため本要件の対象外（gh CLI を使用しない）。
+
+### 対象手続き（5項目）
+
+| # | 項目 | 概要 | 詳細参照 |
+|---|------|------|---------|
+| 1 | cp932 化け対策 | Windows 環境での `--title` / inline `--input` 引数の使用禁止、`--body-file` / `gh api --input` 推奨。コンソールエンコーディング初期化（Section 2 Step 0）と `--title` 引数 decode を別問題として扱う | `references/standard-procedures.md`「共通制約」「Section 2 Step 0」。REQ-011-009 詳細は前節「WRITE 手続きの Windows encoding 初期化必須化」参照 |
+| 2 | title 修正 REST API PATCH 標準手続き | title 修正が必要な場合の `gh api -X PATCH /repos/{owner}/{repo}/issues/{N}` + UTF-8 JSON `--input` file 標準手続き | `references/standard-procedures.md`「title 修正 REST API PATCH 標準手続き」 |
+| 3 | 一時ファイル配置（`.agentdev/tmp/`）と cleanup 一体化 | 一時ファイル配置を `.agentdev/tmp/`（workspace-local）へ統一。create → gh 実行 → VERIFY → cleanup を1手順ユニットとし、cleanup を省略不可ステップ化 | `references/standard-procedures.md`「Section 2 標準手順」「Section 3 安全な読み取り手順」 |
+| 4 | PowerShell regex MatchEvaluator 内 -replace 注意と回避策 | PowerShell regex MatchEvaluator 内での `-replace` 演算子使用による意図しない置換破壊と回避策（Node.js `String.split/join` または PowerShell `[String]::Replace`） | `references/standard-procedures.md`「PowerShell regex MatchEvaluator 内 -replace 使用注意」 |
+| 5 | backreference `$N` 対策との区別 | 項目4とは別件。`-replace` 演算子右辺での regex backreference `$N` を PowerShell 変数補間から守るシングルクォート囲み規則 | `references/standard-procedures.md`「PowerShell 変数補間（regex backreference `$N`）」 |
+
+### cp932 化け対策と「WRITE 手続きの Windows encoding 初期化必須化」の関係
+
+前節「WRITE 手続きの Windows encoding 初期化必須化（REQ-011-009）」は項目1（cp932 化け対策）のうちコンソールエンコーディング初期化を REQ-011-009 として正規化した詳細要件である。
+本節は5項目カタログの文脈で cp932 化け対策の全体像（`--title` / inline `--input` 使用禁止、`--body-file` / `gh api --input` 推奨、コンソール初期化）を整理し、REQ-011-009 節と両立する。
+項目1が指す「コンソールエンコーディング初期化と `--title` 引数 decode の別問題性」とは、Section 2 Step 0（コンソールコードページ切替）が `--title` 引数の文字列出力経路とは独立していることを指す。Step 0 を実行しても `--title` の inline 渡しは cp932 経路のリスクを完全に除去しないため、`--title` / inline `--input` は原則使用禁止とし、title 修正は項目2の REST API PATCH 経由を標準とする。
 
 ## 薄いルーティング入口と references 分離
 
