@@ -404,7 +404,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 |---|---|
 | `id` | `ACT-REQ-NNN` / `ACT-ADR-NNN` / `ACT-SPEC-NNN` |
 | `artifact` | `req` / `adr` / `spec` |
-| `operation` | REQ/ADR: `create` / `append` / `update`、SPEC: `create` / `update` |
+| `operation` | REQ/ADR: `create` / `append` / `update`、SPEC: `create` / `update`（公式 enum）。各 SPEC は非正規 alias（`spec-create`, `spec-update`, `spec-append`）を受け付ける（REQ-008-058）。alias から公式 enum への映射、alias 固有の契約（target_area 形式、placement、anchor、未検出時挙動等）は各 SPEC が定める |
 | `target` | file path または `new:{slug}` |
 | `target_area` | optional: section / area 指定 |
 | `source_items` | 対応する agreed_item ID の list |

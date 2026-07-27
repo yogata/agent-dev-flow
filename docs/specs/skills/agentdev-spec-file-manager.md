@@ -2,7 +2,7 @@
 title: agentdev-spec-file-manager SPEC
 status: draft
 created: 2026-07-22
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # agentdev-spec-file-manager SPEC
@@ -37,12 +37,15 @@ SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPE
 
 ## 提供する判断・操作
 
-- SPEC 作成、追記、target_area 置換の配置先解決
-- 新規 SPEC 作成時の frontmatter（`title`、`status: draft`、`created`、`updated`）付与
-- 既存 SPEC 追記時の `status` 維持（変更しない）
-- target_area が指定された update/spec-update 操作におけるセクション置換ロジック（REQ-001-027/028）
+SPEC operation の公式 enum は `create` / `update` であり、本 skill は非正規 alias（`spec-create`, `spec-update`, `spec-append`）を受け付ける（REQ-008-058）。alias から公式 enum への映射: `spec-create` → `create`、`spec-update` → `update`、`spec-append` → `update`（既存 SPEC ファイルへ新規セクションを追加する操作）。create/update は後方互換のため維持し、alias も同等に受け付ける。
+
+- SPEC 作成、追記、target_area 置換、spec-append 追加の配置先解決
+- 新規 SPEC 作成時（`create` / `spec-create`）の frontmatter（`title`、`status: draft`、`created`、`updated`）付与
+- 既存 SPEC 変更時（`update` / `spec-update` / `spec-append`）の `status` 維持（変更しない）
+- target_area が指定された `update` / `spec-update` 操作におけるセクション置換ロジック（REQ-001-027/028）
+- `spec-append` 操作における新規セクション追加ロジック（anchor と placement に基づく追加、REQ-008-058）。詳細な契約（placement 別挙動、anchor マッチング規則、anchor 未検出時挙動、同名見出し時挙動、合格基準）は `../commands/spec-save.md`「spec-append 操作時のセクション追加ロジック」が正規所有する
 - SPEC 固有整合性確認（frontmatter 完全性、target_area マッチング規則、SPEC status ライフサイクル）
-- `search-target-area.ts`（SPEC 固有 script）の呼出契約
+- `search-target-area.ts`（SPEC 固有 script）の呼出契約。同 script は見出し行全体との完全一致のみを受け付け、前方一致、後方一致、部分一致を受け付けない（正規入力 `### IR-044` は見出し行 `### IR-044 - 題` とはマッチしない）。この契約は `target_area` マッチング規則と `spec-append` の anchor マッチング規則の双方に適用される
 - 共通検証（frontmatter 整合性、エントリ存在、変更範囲）は `agentdev-artifact-validation` の公開検証契約へ委譲
 
 ## 参照する references
@@ -54,9 +57,10 @@ SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPE
 ## 現在の動作
 
 - `spec-save` は `target_area` 指定時、当該 skill の配置先解決、target_area マッチング規則を適用してセクション置換を行う
+- `spec-save` は `operation: spec-append` 指定時、当該 skill の配置先解決、anchor と placement に基づく新規セクション追加を行う（REQ-008-058）
 - 新規 SPEC 作成時は frontmatter `status: draft` を必ず付与する（G05）
-- 既存 SPEC へ追記時は当該 SPEC の `status` を変更しない（G06、v2:ADR-0123 Decision #1）
-- SPEC 固有 script は `search-target-area.ts`（target_area 見出し検索）を正規所有対象とする
+- 既存 SPEC 変更時（`update` / `spec-update` / `spec-append`）は当該 SPEC の `status` を変更しない（G06、v2:ADR-0123 Decision #1）
+- SPEC 固有 script は `search-target-area.ts`（target_area 見出し検索、見出し行全体完全一致）を正規所有対象とする。`spec-update` の target_area マッチングと `spec-append` の anchor マッチングの双方で使用する
 - 共通検証 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `agentdev-artifact-validation` が所有し、本 skill は公開検証契約経由で委譲する
 
 ## 境界
@@ -78,16 +82,18 @@ SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPE
 ## 検証観点
 
 - 新規 SPEC 作成時の frontmatter 完全性（`title`、`status: draft`、`created`、`updated`）
-- 既存 SPEC 追記時の `status` 変更がないこと（G06）
+- 既存 SPEC 変更時（`update` / `spec-update` / `spec-append`）の `status` 変更がないこと（G06）
 - target_area マッチング規則の適用結果（単一マッチ、複数マッチ時の warn、未検出時のスキップ + follow-up）
+- `spec-append` 操作時の anchor マッチング、placement 別挙動の適用結果、挿入後の Markdown 構造破損がないこと
 - 共通検証委譲の結果（`agentdev-artifact-validation` 公開検証契約経由）
 - `docs/specs/README.md` の新規 SPEC エントリ登録（REQ-001-004）
 
 ## See Also
 
+- [spec-save.md](../commands/spec-save.md)（SPEC 操作 command。`spec-append` 操作時のセクション追加ロジック詳細を正規所有）
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)（REQ 操作 skill）
 - [agentdev-adr-file-manager.md](agentdev-adr-file-manager.md)（ADR 操作 skill）
 - [agentdev-artifact-validation.md](agentdev-artifact-validation.md)（共通検証 skill）
 - [agentdev-doc-diagnostics.md](agentdev-doc-diagnostics.md)（docs 横断診断 skill）
 - v2:ADR-0123（SPEC lifecycle と spec-save の導入）
-- REQ-001（REQ/SPEC 責務分離）、REQ-002-159（script 所有権）
+- REQ-001（REQ/SPEC 責務分離）、REQ-002-159（script 所有権）、REQ-008-058（SPEC operation enum 公式契約と alias 受け付け）

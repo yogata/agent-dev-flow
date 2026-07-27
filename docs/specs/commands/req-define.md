@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # req-define SPEC
@@ -190,15 +190,18 @@ test_strategy:
 
 ## draft-data artifact_actions フィールド形式
 
-artifact_actions の各 entry が出力する `target_area` と `content` の扱いは operation 別に以下を規定する（REQ-004-078, REQ-004-079）。
+artifact_actions の各 entry が出力する `target_area` と `content` の扱いは operation 別に以下を規定する（REQ-004-078, REQ-004-079、REQ-008-058）。
+
+SPEC operation の公式 enum は `create` / `update` であり、req-define は非正規 alias（`spec-create`, `spec-update`, `spec-append`）も出力可能とする。alias から公式 enum への映射: `spec-create` → `create`、`spec-update` → `update`、`spec-append` → `update`（既存 SPEC ファイルへ新規セクションを追加する操作）。alias 固有の契約（placement, anchor 等）は後段の表および [spec-save.md](spec-save.md) に従う。
 
 | operation | target_area | content |
 |-----------|-------------|---------|
 | create / spec-create | 任意（省略時は spec-save が既存セクション構造から追加位置を判断） | 新規セクション本文 |
 | update / spec-update | 必須（対象セクション見出し、Markdown 見出し行形式。例: `### IR-044`） | 変更後セクション全文（対象セクションの見出し行から次の同レベル見出しの直前までの全内容） |
+| spec-append | 必須（anchor 見出し、Markdown 見出し行形式。例: `### IR-044`）。anchor 末尾への追加を示す `placement: tail`（既定）、anchor 直後を示す `placement: after_anchor`、anchor 直前を示す `placement: before_anchor` を action へ併せて出力できる（省略時は `tail`） | 追記する新規セクション本文（見出し行を含む） |
 
 req-define 側は出力形式のみを規定する。
-`target_area` の形式（Markdown 見出し行）、見出し階層の解釈規則、複数マッチ、未検出時の挙動は [spec-save.md](spec-save.md) 側に配置する。
+`target_area` の形式（Markdown 見出し行）、見出し階層の解釈規則、複数マッチ、未検出時の挙動、`spec-append` の placement 別挙動は [spec-save.md](spec-save.md) 側に配置する。
 
 ## review_dispositions の producer 契約
 
