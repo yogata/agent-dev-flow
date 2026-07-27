@@ -1,8 +1,10 @@
 ---
 title: `agentdev-workflow-templates` SPEC
 status: accepted
+spec_logical_division: cross_cutting_contract
+canonical_owner: agentdev-workflow-templates
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-07-27
 ---
 
 # `agentdev-workflow-templates` SPEC
@@ -104,6 +106,26 @@ child テンプレートの「レビュー判断」セクションは親 Epic Is
 - テンプレートの構造を維持しているか
 - `<!-- 【必須】 -->` マーカー付きセクションを省略していないか
 - 変数に該当するデータがない場合は「該当なし」と記載しているか
+
+## test strategy 記述ガイドライン
+
+issue_desc_*.md テンプレートで test strategy を起票する際の pass_criteria 記述ガイドライン:
+
+### 共通 pass_criteria のリスク
+
+複数 REQ への共通 pass_criteria を起票する場合、各 REQ の pipeline stage（promote 系、review 系等）の違いを
+吸収せず文字列一致を要求すると、QG-4 評価時に REQ content と pass_criteria 期待値が食い違う可能性がある。
+REQ 個別期待値の記述を推奨する。
+
+### 変更対象外 REQ 検証の正しい表現
+
+「変更対象外 REQ の変更がないこと」は diff がないこととして表現する。
+「存在しないこと」と誤表現すると、検証意図（diff がないこと）と検証表現（存在確認）がずれる。
+
+### 存在確認の使用条件
+
+「存在しないこと」は新規作成禁止（例: REQ-0164 が存在しないこと）の場合のみ使用する。
+既存 REQ の変更がないことを検証する場合は「変更されていないこと」（diff がないこと）を使用する。
 
 ## See Also
 
