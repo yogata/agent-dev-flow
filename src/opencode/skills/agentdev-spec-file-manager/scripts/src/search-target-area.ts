@@ -10,8 +10,7 @@
  * マッチ規約（spec-save command SPEC の target_area ベースのセクション置換ロジックに準拠）:
  *   - 入力正規化: target_area に Markdown 見出しプレフィックス（#{1,6}\s+）が含まれる場合、
  *     比較前にプレフィックスを除去して見出しテキスト部分へ正規化する
- *   - 完全一致: 正規化後の target_area と見出しテキストが完全一致
- *   - 前方一致: 見出しテキストが正規化後の target_area で始まる
+ *   - 完全一致: 正規化後の target_area と見出しテキストが完全一致（見出し行全体完全一致、前方一致は廃止）
  *   - 複数マッチ時は warning（spec-save G09 で置換拒否の根拠）
  *   - 未検出時は空配列（spec-save でスキップ判定）
  *
@@ -67,11 +66,9 @@ export function findTargetAreaHeadings(
   return matches;
 }
 
-/** 完全一致 または 前方一致（target_area で始まる見出し）。 */
+/** 見出し行全体との完全一致のみ（spec-save SPEC「見出し行全体完全一致」準拠）。前方一致は廃止。 */
 export function headingMatchesTarget(headingText: string, targetArea: string): boolean {
-  if (headingText === targetArea) return true;
-  if (headingText.startsWith(targetArea)) return true;
-  return false;
+  return headingText === targetArea;
 }
 
 /**

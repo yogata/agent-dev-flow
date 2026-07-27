@@ -11,8 +11,8 @@ describe("headingMatchesTarget", () => {
     expect(headingMatchesTarget("目的", "目的")).toBe(true);
   });
 
-  test("prefix match (heading starts with target)", () => {
-    expect(headingMatchesTarget("目的と背景", "目的")).toBe(true);
+  test("no prefix match (exact match only per SPEC)", () => {
+    expect(headingMatchesTarget("目的と背景", "目的")).toBe(false);
   });
 
   test("no match when heading does not start with target", () => {
@@ -21,7 +21,7 @@ describe("headingMatchesTarget", () => {
 });
 
 describe("findTargetAreaHeadings", () => {
-  test("finds matching heading lines", () => {
+  test("finds only exact-matching heading lines", () => {
     const content = `# Title
 
 ## 目的
@@ -32,9 +32,8 @@ describe("findTargetAreaHeadings", () => {
 
 more text`;
     const matches = findTargetAreaHeadings("目的", content, "spec.md");
-    expect(matches).toHaveLength(2);
+    expect(matches).toHaveLength(1);
     expect(matches[0]!.line).toBe(3);
-    expect(matches[1]!.line).toBe(7);
   });
 
   test("returns empty when no headings match", () => {
@@ -92,7 +91,7 @@ describe("normalizeTargetArea", () => {
 });
 
 describe("searchTargetArea", () => {
-  test("aggregates matches across multiple files", () => {
+  test("aggregates matches across multiple files (exact match only)", () => {
     const files = [
       { path: "a.md", content: "## 目的\nbody" },
       { path: "b.md", content: "# 目的と概要\nbody" },
@@ -100,9 +99,8 @@ describe("searchTargetArea", () => {
     ];
     const result = searchTargetArea("目的", files);
     expect(result.ok).toBe(true);
-    expect(result.matches).toHaveLength(2);
+    expect(result.matches).toHaveLength(1);
     expect(result.matches[0]!.file).toBe("a.md");
-    expect(result.matches[1]!.file).toBe("b.md");
   });
 
   test("returns empty matches when nothing found (not an error)", () => {
