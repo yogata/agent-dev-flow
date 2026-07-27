@@ -1,10 +1,8 @@
 ---
 title: `agentdev-gh-cli` SPEC
 status: accepted
-spec_logical_division: cross_cutting_contract
-canonical_owner: agentdev-gh-cli
 created: 2026-06-21
-updated: "2026-07-27"
+updated: "2026-07-26"
 ---
 
 # `agentdev-gh-cli` SPEC
@@ -188,21 +186,6 @@ GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手�
 
 - 一般的な git 操作（`agentdev-git-worktree` 担当）
 - 本文生成、完了判定、Epic 依存判定、capture 分類（domain skill 担当）
-
-## Windows 環境固有手続き
-
-Windows 環境固有の手続きは `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` が正規所有する。
-本 SPEC は Windows 環境固有手続きの存在と参照関係のみを定め、詳細手続きは reference ファイルへ委譲する。
-
-### 対象手続き
-
-- cp932 化け対策（--title / inline --input 引数の使用禁止、--body-file / gh api --input 推奨）
-- title 修正が必要な場合の REST API PATCH 標準手続き
-- 一時ファイル配置（.agentdev/tmp/ workspace-local）と cleanup 一体化（create → gh実行 → VERIFY → cleanup の省略不可ステップ化）
-- PowerShell regex MatchEvaluator 内 -replace 使用注意と回避策（Node.js / String.Replace）
-- 上記と既存の backreference $N 対策との区別
-
-詳細は standard-procedures.md の該当セクションを参照。
 
 ## 関連項目
 

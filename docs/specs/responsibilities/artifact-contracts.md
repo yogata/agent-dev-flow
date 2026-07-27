@@ -1,8 +1,6 @@
 ---
 updated: 2026-07-27
 status: accepted
-spec_logical_division: cross_cutting_contract
-canonical_owner: artifact-contracts
 ---
 
 # アーティファクト契約
@@ -292,16 +290,6 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-046）。
 完了報告がコマンドの最終出力である。
 完了報告テキストを出力した後は、追加のテキスト、説明、サマリーを出力しない。
 
-### `Capture結果` 小節（共通意味契約）
-
-`結果` 内に任意の `Capture結果` 小節を定義する（新規トップレベルフィールドは追加しない）。`Capture結果` 小節の共通意味契約を本 SPEC で定義する。
-
-- 保存した capture 成果物のパス（intake/inbox/*.md または learning/inbox.md への相対パス）
-- 分類（intake/learning）
-- 保存結果（成功/失敗、失敗時は理由）
-
-具体的な `Capture結果` 小節の表示構造は各 command-local Template が正規所有する。
-
 ## 適用範囲宣言
 
 `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
@@ -460,26 +448,6 @@ req_draft の frontmatter は最小限のメタデータのみとする。
 
 - 最小 frontmatter fields: `draft_type`, `topic_slug`, `status`, `created_at`、optional で `source_rus`
 - frontmatter は lightweight metadata のみ。後続工程の主入力は `# draft-data` fenced YAML であり、frontmatter ではない
-
-## artifact_actions operation
-
-SPEC operation は create/update の2値を公式 enum とする。
-各 SPEC（req-define/spec-save）は非正規 alias として spec-create/spec-update/spec-append を受け付けることができる。
-consumer（spec-save）は create/update/spec-create/spec-update/spec-append の全てを受理する（後方互換）。
-
-### spec-append operation
-
-- 意味: 既存 SPEC ファイルへ新規セクションを追加する
-- 入力フィールド:
-  - target: 既存 SPEC パス（必須）
-  - target_area: 新規セクション見出し行（必須、見出し行全体形式、例: `### IR-044`）
-  - content: 新規セクション全文（必須、見出し行から始まる）
-  - placement: tail（既定）/ after_anchor / before_anchor
-  - anchor: placement が tail 以外の場合は必須。見出し行全体で指定
-- 挙動:
-  - 同名見出し（target_area と完全一致）が既存の場合は追加スキップ + follow-up 報告
-  - placement が tail 以外で anchor が未検出の場合は action スキップ + follow-up 報告
-  - 合格基準: 追加後の SPEC ファイルに target_area と完全一致する見出しが1つだけ存在すること
 
 ## RU アーティファクト契約（session由来RU）
 

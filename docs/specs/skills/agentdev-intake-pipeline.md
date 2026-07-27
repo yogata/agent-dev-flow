@@ -1,10 +1,8 @@
 ---
 title: `agentdev-intake-pipeline` SPEC
 status: accepted
-spec_logical_division: behavior
-canonical_owner: agentdev-intake-pipeline
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-07-18
 ---
 
 # `agentdev-intake-pipeline` SPEC
@@ -28,12 +26,6 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 - Review 観点、採用/保留/却下判定
 - Split Rule（intake / learning 分離）
 - Git 永続化手順
-
-## 操作一覧
-
-### 自動 capture 向け item 生成操作
-
-各工程 command（req-save/spec-save/case-open/case-close）からの自動 deviation capture 要求を受ける item 生成操作。本操作は intake/inbox/*.md への item 保存を担い、git 永続化は呼出元 command が担当する。intake-capture command（ユーザー手動入力用）とは別操作であり、入力形式も異なる。
 
 ## 参照する references
 

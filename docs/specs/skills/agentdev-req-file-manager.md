@@ -1,10 +1,8 @@
 ---
 title: `agentdev-req-file-manager` SPEC
 status: accepted
-spec_logical_division: implementation_detail
-canonical_owner: agentdev-req-file-manager
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-07-26
 ---
 
 # `agentdev-req-file-manager` SPEC
@@ -42,17 +40,6 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 - 実装指示は要件行に含めない
 - bugfix では REQ ファイルを作成しない
 - 旧 REQ 群（v2:REQ-0001〜0050）は2026-07-20に物理削除済みであり、履歴資料は tag `v2.11.0` で参照する。現行判断の根拠としない
-
-## 実装詳細
-
-### REQ-ID 形式契約の一律性
-
-alloc-composite-id.ts が提供する全関数（extractAllCompositeIds, extractCompositeIdNumbers 等）は、
-REQ-ID 形式として3桁（REQ-001-NNN）と4桁（REQ-0011-NNN）の両方を一貫して認識すること。
-関数間で正規表現形式契約が不一致しないこと。
-
-採番検証テストは3桁 REQ 群（REQ-001, REQ-003, REQ-006, REQ-008, REQ-010）と
-4桁 REQ 群（REQ-0011）が混在する入力で正しく max を返すことを検証すること。
 
 ## 対象外
 

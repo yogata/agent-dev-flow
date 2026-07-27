@@ -1,10 +1,8 @@
 ---
 title: case-open SPEC
 status: accepted
-spec_logical_division: behavior
-canonical_owner: case-open
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-07-24
 ---
 
 # case-open SPEC
@@ -36,9 +34,6 @@ Epic + 子 Issue 一括作成に対応する。
 - git 操作: `git rm <path>` + `git commit -- <paths>` の即時ステージ、コミット（並列実行安全ステージング）
 - GitHub API: `gh issue create`, `gh issue edit`, `gh issue comment`（`agentdev-gh-cli` VERIFY 付き）
 - intake / learning capture: 非関与（G18, G22）
-- deviation capture: case-open 実行中に実観測した deviation を agentdev-learning-capture skill または agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。保存先は capture-boundaries.md の Split Rule に従う
-- git 永続化: capture 成果物を case-open 自身の既存 commit/push 処理内で永続化
-- 完了報告: 保存した capture 成果物のパス・分類・保存結果を `Capture結果` 小節（`結果` 内）に含める
 
 ## 現在の動作
 

@@ -1,10 +1,8 @@
 ---
 title: `agentdev-req-analysis` SPEC
 status: accepted
-spec_logical_division: cross_cutting_contract
-canonical_owner: agentdev-req-analysis
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-07-18
 ---
 
 # `agentdev-req-analysis` SPEC
@@ -55,23 +53,6 @@ updated: 2026-07-27
 - 全ステークホルダー視点で合意形成できているか
 - 要件行が必達要件として記述されているか
 - SPEC 分離基準（REQ-001-068）違反の残留検出
-
-## pass_criteria 記述基準
-
-pass_criteria 記述時の品質基準:
-
-### 意味的等価許容
-
-pipeline stage 別の content 表現差異を吸収する「意味的等価許容」ガイドライン。
-REQ content が pipeline stage によって表現を変える場合、pass_criteria は意味的等価性で判定する。
-文字列一致を機械的に要求しない。
-
-### 「存在しないこと」と「変更されていないこと」の使い分け
-
-- 「存在しないこと」: 新規作成禁止（例: REQ-0164 が存在しないこと）の場合のみ使用
-- 「変更されていないこと」: 既存 REQ の変更がないこと（diff がないこと）を検証する場合に使用
-
-これらを誤って混用すると、検証意図と検証表現がずれ、QG-4 評価時に不正確な判定を生じる。
 
 ## See Also
 
