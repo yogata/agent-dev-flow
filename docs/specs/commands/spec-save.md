@@ -2,7 +2,7 @@
 title: spec-save SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-07-28
 ---
 
 # spec-save SPEC
@@ -128,44 +128,66 @@ SPEC operation の公式 enum は `create` / `update` であり、`spec-append` 
 `target_area` が未指定の draft（旧形式）、または `operation` が create/spec-create の場合は従来の「追記」動作を維持する（REQ-001-028）。
 `target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
 
+### spec-append operation の処理
+
+`operation: spec-append` の場合、spec-save は既存 SPEC ファイルへ新規セクションを追加する（REQ-008-058）。本操作は `target_area`（追加対象の見出し行全体）と `placement`（追加位置指示）で追加対象を特定し、`placement` が `tail` 以外の場合は `anchor` 見出し行を基準に挿入位置を算出する。
+
+主な処理（配置契約の実行詳細は後段「spec-append 操作時のセクション追加ロジック」セクションが正規所有する）:
+
+- `target_area` と完全一致する見出しが既存 SPEC ファイルに存在する場合は追加をスキップし、follow-up 報告を行う（重複追加防止、全体中止しない）
+- `placement: tail`（既定）の場合は SPEC ファイル末尾へ新規セクションを追加する
+- `placement: after_anchor` / `before_anchor` の場合は `anchor` で指定された見出し行の前後へ追加する。`anchor` が未検出の場合は action をスキップし、follow-up 報告を行う（全体中止しない）
+- 合格基準: 追加後の SPEC ファイルに `target_area` と完全一致する見出しが1つだけ存在すること
+
+### search-target-area.ts 契約
+
+target_area 見出し検索は `agentdev-spec-file-manager/scripts/src/search-target-area.ts`（SPEC 固有決定的処理）へ委譲する（REQ-0136-029）。本 script は次の契約に従う。
+
+- 見出し行全体との完全一致のみを受け付ける。前方一致、後方一致、部分一致は受け付けない
+- 入力正規化: `target_area` に Markdown 見出しプレフィックス（`##`、`###` 等）が含まれる場合、比較前にプレフィックスを除去して見出しテキスト部分へ正規化する（`## セクション名` と `セクション名` は同一に扱う）
+- 正規入力（例: `### IR-044`）での回帰テストを維持する。正規入力 `### IR-044` は見出し行 `### IR-044 - 題` とはマッチしない（見出し行全体との完全一致のみ許容）
+- 本契約は `operation: update` / `operation: spec-update` の `target_area` マッチングと、`operation: spec-append` の `anchor` マッチングの双方に適用される
+
 ## spec-append 操作時のセクション追加ロジック
 
-`operation: spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。`target_area`（anchor）と `placement` を用いて追加位置を明示する。
+`operation: spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。`target_area`（追加対象の見出し行全体）で追加対象の見出しを特定し、`placement` と `anchor` で挿入位置を指示する。契約の正規所有は `../responsibilities/artifact-contracts.md`「spec-append operation」、本節は配置契約の実行詳細を正規所有する。
 
 ### 入力契約
 
 | field | 必須性 | 形式 |
 |---|---|---|
-| `target_area` | 必須 | anchor 見出し行（Markdown 見出し行形式。例: `### IR-044`） |
+| `target_area` | 必須 | 追加対象の見出し行全体（Markdown 見出し行形式。例: `### IR-044`）。見出しプレフィックス（`##`、`###` 等）の有無は正規化により吸収する |
+| `content` | 必須 | 追加する新規セクション本文（見出し行から始まる） |
 | `placement` | 任意（省略時 `tail`） | `tail` / `after_anchor` / `before_anchor` のいずれか |
-| `content` | 必須 | 追加する新規セクション本文（見出し行を含む） |
+| `anchor` | `placement` が `tail` 以外は必須 | 挿入位置の基準となる見出し行（`target_area` と同一形式） |
 
 ### placement 別挙動
 
 | placement | 追加位置 |
 |---|---|
-| `tail`（既定） | anchor セクションの末尾（次の同レベルまたは上位レベル見出し行の直前） |
-| `after_anchor` | anchor 見出し行の直後（anchor セクション本文の先頭） |
-| `before_anchor` | anchor 見出し行の直前 |
+| `tail`（既定） | SPEC ファイル末尾へ新規セクションを追加する（`anchor` 不要） |
+| `after_anchor` | `anchor` 見出し行の直後（`anchor` セクション本文の先頭） |
+| `before_anchor` | `anchor` 見出し行の直前 |
 
-`tail` は anchor セクション全体の末尾へ新規セクションを追加する。`after_anchor` は anchor セクション本文の先頭へ挿入する。`before_anchor` は anchor セクションの前に新規セクションを挿入する。
+`tail` は `anchor` を参照せず SPEC ファイル末尾へ新規セクションを追加する。`after_anchor` は `anchor` セクション本文の先頭へ挿入する。`before_anchor` は `anchor` セクションの前に新規セクションを挿入する。
 
 ### anchor マッチング規則
 
-- 「target_area ベースのセクション置換ロジック」の「マッチング規則」と同一の規則を適用する（入力正規化、見出し行全体完全一致）
+- 「target_area ベースのセクション置換ロジック」の「マッチング規則」と同一の規則を適用する（入力正規化、見出し行全体完全一致）。正規契約の詳細は同セクション「search-target-area.ts 契約」参照
 - anchor 見出し行が複数存在する場合、最初のマッチを採用し warn を出力する
 
 ### anchor 未検出時の挙動
 
-anchor 見出し行が存在しない場合、当該 action をスキップし、follow-up として「anchor 未検出、operation を spec-create へ切り替えを推奨」を報告する（全体中止しない）。
+`placement` が `tail` 以外で `anchor` 見出し行が存在しない場合、当該 action をスキップし、follow-up として「anchor 未検出、operation を spec-create へ切り替えを推奨」を報告する（全体中止しない）。
 
 ### 同名見出し時の挙動
 
-`content` の見出し行と同名の見出しが既存 SPEC ファイルに存在する場合、spec-save は warn を出力し、追加処理は継続する（重複防止のための事前拒否は行わない）。重複見出しの整理は別工程（inspect-docs 等）で扱う。
+`target_area` と完全一致する見出しが既存 SPEC ファイルに存在する場合、spec-save は当該 action の追加をスキップし、follow-up として「同名見出し既存、operation を spec-create へ切り替えを推奨、または `target_area` を変更して再指定を推奨」を報告する（重複追加防止、全体中止しない）。
 
 ### 合格基準
 
-- anchor が特定でき、`placement` に従った位置へ `content` が挿入されていること
+- 追加後の SPEC ファイルに `target_area` と完全一致する見出しが1つだけ存在すること
+- `placement` が `tail` の場合は SPEC ファイル末尾へ、`after_anchor` / `before_anchor` の場合は `anchor` 見出し行の前後へ `content` が挿入されていること
 - 挿入結果の SPEC ファイルが Markdown 構造として破損しないこと（見出し階層の不整合がないこと）
 - frontmatter `updated` が更新されていること
 - `status` は変更しないこと（G06）
