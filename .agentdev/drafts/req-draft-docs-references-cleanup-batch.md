@@ -1,7 +1,8 @@
 ---
 draft_type: req_draft
 topic_slug: docs-references-cleanup-batch
-status: draft
+status: saved
+spec_actions_consumed: true
 created_at: 2026-07-27T00:00:00+09:00
 source_rus:
   - RU-0001
