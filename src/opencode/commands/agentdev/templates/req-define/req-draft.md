@@ -29,11 +29,14 @@ summary: {合意内容の1段落要約}
 # auto_gate: case-auto 自走可否の判定材料
 auto_gate:
   # auto_ready が false の場合、または未解決 item が残る場合、後続コマンドは停止する
+  # 未確定内容抑止: agreed_items/artifact_actions の content に TBD/TODO/未定/後続工程で確定/case-run で確定
+  #   のいずれかを含む場合、auto_ready: false とし該当 AG-ID/ACT-ID と理由を stop_reasons へ記録する
+  #   （引用・禁止事例の言及は誤検知対象外）。QG-1 意味判定（必須フィールド欠落等）も併用する
   auto_ready: true
   unresolved_questions: []      # 未解決質問が残る場合は停止理由として列挙
   unresolved_conflicts: []      # 未解決衝突が残る場合は停止理由として列挙
   out_of_repo_operations: []    # repo 外操作が必要な場合は停止理由として列挙
-  stop_reasons: []              # その他の停止理由
+  stop_reasons: []              # その他の停止理由（未確定内容抑止時の AG-ID/ACT-ID と理由を含む）
 
 # agreed_items: 合意された個別項目。artifact_actions.source_items から ID 参照される
 # 必要十分な長文として保持し、項目数を増やして短い値を多数並べない
