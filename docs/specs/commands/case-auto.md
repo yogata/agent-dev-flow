@@ -44,6 +44,7 @@ updated: 2026-07-23
 - Step 4: 各工程の実行
   - 委譲工程（req-save / spec-save / case-open / case-close）: 実行担当サブエージェントとして起動（v2:ADR-0127, REQ-006-006/084/085）。req-save / spec-save 統合委譲で順次実行、case-open / case-close は各コマンド委譲契約に従い起動。委譲起動不能時に delegation-unavailable 報告（REQ-002-003/004）
   - case-run（インライン実行）: case-auto が case-run.md を authoritative source として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
+  - 結果状態の4次元集約（REQ-006-110）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-006-110）」セクション
 - Step 4-1: Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
   - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、REQ-006-026 踏襲）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
@@ -53,7 +54,7 @@ updated: 2026-07-23
 - Step 5: 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
 - Step 6: 複数REQ対応（req-save 委譲の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）
 - Step 7: 停止条件の検出（停止時タイミング情報の追記。10項目の停止条件いずれかを検出時、実行停止）
-- Step 8: 完了報告（タイミング情報追記。インライン実行の適用を記録）
+- Step 8: 完了報告（タイミング情報追記。インライン実行の適用を記録。結果状態の4次元報告（REQ-006-110）を含める）
 
 ### 委譲起動不能時の扱い（REQ-002-003/004）
 
@@ -99,6 +100,27 @@ context 管理:
 - クリーンアップ検証ゲート（Standard / Epic Issue flow 双方）: ドラフトファイル、RU ファイルの残存がないこと
 - 出力制約: 成果物本文 verbatim、調査過程等は圧縮（G10）
 - タイミング情報: 開始時刻、終了時刻、所要時間を人間が読みやすい形式で報告（REQ-006-082/083）
+- 結果状態の4次元集約（REQ-006-110）: 後述「結果状態の4次元集約（REQ-006-110）」セクションの4状態次元と集約規則に従い、warn を pass へ変換しない
+
+## 結果状態の4次元集約（REQ-006-110）
+
+case-auto は各工程の結果を次の4状態次元で保持し、集約報告で次元を混同しない。各工程の output_contract（`src/opencode/commands/agentdev/case-auto.md` Step 4 工程別契約表）が情報源となる。
+
+| 次元 | 取得元 | 値 |
+|---|---|---|
+| (1) 工程結果 | 全工程（req-save+spec-save / case-open / case-run / case-close）の pass/warn/fail | pass / warn / fail |
+| (2) artifact_action 適用結果 | req-save+spec-save 統合委譲の action id ごとの適用結果 | applied / skipped / failed / no-op |
+| (3) 定義適用工程の完了状態 | (1)(2) の組み合わせから導出 | 定義適用完了 / 警告付き工程完了 / 定義適用未完了 |
+| (4) OU ライフサイクル完了状態 | case-open（Issue 作成）、case-run（PR 作成）、case-close（PR マージ、Issue クローズ）の各成否 | 各ライフサイクル事象ごとに 完了 / 未完了 |
+
+集約規則:
+
+- (3) の導出: 全必須 action が applied または正当な no-op で工程結果 (1) が pass → 定義適用完了。同条件で (1) が warn → 警告付き工程完了（warn を pass へ変換しない）。必須 action に skipped または failed が1件以上ある → 定義適用未完了（この場合は定義適用完了/警告付き工程完了と報告しない）。正当な no-op とは、対象外 artifact（例: spec-save における `artifact: spec` entry 不存在、後方互換の `artifact_actions` フィールド不存在）による action 不実施を指す。正当な理由なく必須 action を飛ばした場合は skipped として扱う
+- (4) の独立性: OU ライフサイクル完了状態は (3) と独立して扱う。(3) が定義適用完了/警告付き工程完了であっても case-open（Issue 作成）が未実行なら OU ライフサイクルは未完了と報告する
+- Phase 0 と OU 完了の分離: Phase 0 成功（(3) の定義適用完了/警告付き工程完了）と OU 完了（(4) の全ライフサイクル事象完了）を別々に報告する。一方を他方へすり替えて報告しない
+- warn 変換禁止: (1) が warn の工程を pass として集約しない。完了報告には warn を warn のまま残す
+
+完了報告（停止時フォーマットを含む）には上記4状態次元を工程別・action id 別・ライフサイクル事象別に列挙する。実行定義は `src/opencode/commands/agentdev/case-auto.md` Step 4「結果状態の4次元集約（REQ-006-110）」および Step 8「結果状態の4次元報告（REQ-006-110）」を正とする。
 
 ## 複数 execution_unit 並列 orchestration（REQ-006, v2:ADR-0129）
 
