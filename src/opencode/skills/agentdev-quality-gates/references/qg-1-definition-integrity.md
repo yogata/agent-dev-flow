@@ -83,10 +83,16 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 
 要件doc draft の `auto_gate` フィールドが、req-define の完了条件として妥当に設定されているか（REQ, REQ）。
 `auto_ready:false` の場合は `stop_reasons` が記録され、かつユーザー承認（合意による解消、または明示的な false 選択）が得られているか。
+未確定内容抑止（決定的マーカー検査 + 意味判定の組み合わせ）が `agreed_items`/ `artifact_actions` へ適用済みか（REQ）。
 
-- **fail**: `auto_gate` フィールドが不在、または `auto_ready:false` で `stop_reasons` が空。
+未確定内容抑止適用時の検査内容:
+- **決定的マーカー検査**: `agreed_items`/ `artifact_actions` 各 `content` に `TBD`/`TODO`/`未定`/`後続工程で確定`/`case-run で確定` の5マーカーが含まれないか。引用・禁止事例（例: 「TBD を残さないこと」）としての言及は検出対象外とする
+- **意味判定の併用**: 必須フィールド欠落、曖昧要件、測定不能条件に該当するエントリがないか
+- **stop_reasons 記録**: 抑止時に該当 AG-ID または ACT-ID と理由が `auto_gate.stop_reasons` へ記録されているか
+
+- **fail**: `auto_gate` フィールドが不在、または `auto_ready:false` で `stop_reasons` が空。未確定内容抑止対象（未確定マーカー、必須フィールド欠落等）が `agreed_items`/ `artifact_actions` に残るのに `auto_ready: true` となっている。
 - **warn**: `auto_ready:false` で `stop_reasons` が記載されているが、ユーザー承認（合意による解消、または明示的 false 選択の `conflict_resolutions` 記録）が未確認。
-- **pass**: `auto_ready:true`、または `auto_ready:false` で `stop_reasons` がユーザー承認済み（`conflict_resolutions` 記録済み）。
+- **pass**: `auto_ready:true`（未確定内容抑止の決定的マーカー検査と意味判定をいずれも通過）、または `auto_ready:false` で `stop_reasons` がユーザー承認済み（`conflict_resolutions` 記録済み）。
 
 ### 10. test_strategy 3要素完全性（REQ）
 

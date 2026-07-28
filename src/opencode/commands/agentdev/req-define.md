@@ -163,7 +163,13 @@ Step 7 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で
 
  - **10-1. 実装詳細の分離**: ドラフトに実装詳細（個別ファイルの編集指示、修正候補リスト、検出事項カタログ等）が含まれる場合、当該内容を `artifact_actions` の `content` とは分離されたセクションに配置し、合意内容の判読性を確保すること。実装詳細がドラフト全体の過半を占める場合は、完了条件チェックボックスへの要約をユーザーに提案すること
 
- - **10-2. auto_gate完了ゲート**: ドラフト保存後、`auto_gate.auto_ready` を確認する。`auto_ready:true` の場合は Step 11 へ進む。`auto_ready:false` または未解決 item（`unresolved_questions`/`unresolved_conflicts`/`out_of_repo_operations`/`stop_reasons`）が残る場合、`stop_reasons` をユーザーに提示し、解消方策（作業分散、対象絞り込み、スコープ削除等）を壁打ち（Step 3）で合意する。合意により解消された場合は `auto_ready:true` に更新して Step 11 へ進む。ユーザーが「`auto_ready:false` のまま標準フローで手動実行する」と明示的に選択した場合、当該選択を `conflict_resolutions` に記録して Step 11 へ進む（REQ）。上記いずれにも該当しない（未解決のまま）場合は Step 3（壁打ち）へ差し戻す（REQ）
+ - **10-2. auto_gate完了ゲート**: ドラフト保存後、`auto_gate.auto_ready` を確認する。`auto_ready:true` の場合は Step 11 へ進む。`auto_ready:false` または未解決 item（`unresolved_questions`/`unresolved_conflicts`/`out_of_repo_operations`/`stop_reasons`）が残る場合、`stop_reasons` をユーザーに提示し、解消方策（作業分散、対象絞り込み、スコープ削除等）を壁打ち（Step 3）で合意する。合意により解消された場合は `auto_ready:true` に更新して Step 11 へ進む。ユーザーが「`auto_ready:false` のまま標準フローで手動実行する」と明示的に選択した場合、当該選択を `conflict_resolutions` に記録して Step 11 へ進む（REQ）。上記いずれにも該当しない（未解決のまま）場合は Step 3（壁打ち）へ差し戻し（REQ）
+
+ - **10-2a. 未確定内容の auto_ready 抑止**: Step 10-2 の判定前に、`agreed_items` 各エントリの `content`、`artifact_actions` 各エントリの `content` について未確定内容の有無を検査し、`auto_gate.auto_ready` と `auto_gate.stop_reasons` を確定すること（REQ）。検査は req-define command SPEC（extension 経由）「未確定内容の auto_ready 抑止」節に従う。以下の手順を機械的に実行する:
+  - **(A) 決定的マーカー検査**: `agreed_items`/`artifact_actions` の各 `content` 文字列に対し、`TBD`/`TODO`/`未定`/`後続工程で確定`/`case-run で確定` の5マーカーを大文字小文字区別なしで部分文字列検索する。いずれかを検出した場合、当該 AG-ID または ACT-ID と検出マーカーを `auto_gate.stop_reasons` へ追加し、`auto_gate.auto_ready: false` とする
+  - **(A') 引用・禁止事例の誤検知除外**: マーカーを含む文が「禁止事項や過去事例の引用」（例: 「TBD を残さないこと」「TODO を含めないこと」「未定のまま保存しないこと」「TBD/ TODO/ 未定 を検出する」等）である場合、当該文のマーカーは検出扱いとしない。同一 ID 内に引用以外の未確定マーカーが残る場合は抑止を維持する
+  - **(B) QG-1 意味判定の併用**: (A) の結果に加え、QG-1（Definition Integrity Gate）の意味判定観点（必須フィールド欠落、曖昧要件、測定不能条件）を `agreed_items`/`artifact_actions` 各エントリへ適用する。QG-1 が fail となるエントリがある場合、該当 AG-ID/ ACT-ID と QG-1 該当観点を `auto_gate.stop_reasons` へ追加し、`auto_gate.auto_ready: false` とする
+  - **stop_reasons 記録**: 抑止時の `stop_reasons` 各エントリは、対象 ID（`AG-NNN` または `ACT-{ARTIFACT}-NNN`）、抑止理由（検出マーカーまたは QG-1 該当観点）、該当箇所の要約を含むこと。詳細な記録形式、代表 fixture、引用誤検知除外パターンは req-define command SPEC（extension 経由）「未確定内容の auto_ready 抑止」節を参照
 
 ### Step 11: 要件doc確認
 
