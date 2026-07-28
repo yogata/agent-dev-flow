@@ -69,16 +69,38 @@ case-auto は各工程を以下の契約で起動する:
 
 | 工程 | 起動方式 | inputs | output_contract |
 |---|---|---|---|
-| req-save + spec-save | 委譲（1 統合委譲、AG-005） | draft path, OU ID | 保存済みREQ/ADRリスト, 保存済みSPECリスト, draft status=saved, SPEC消費済みフラグ, pass/warn/fail |
-| case-open | 委譲 | draft path, OU ID | Issue番号(Epic含む), pass/warn/fail |
-| case-run | インライン実行（case-run.md を authoritative source として読み込み、case-auto が準備/クリーンアップフェーズを自ら実行、実行担当サブエージェントへ直接委譲、AG-001/002） | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の子Issue を case-auto が並列委譲、最大5件） | completed-pr/blocked/failed/delegation-unavailable（Epic Wave 実行時は子Issue ごとの結果集合） |
-| case-close | 委譲 | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の一括クローズ） | マージ結果, Capture保存結果, 削除済みブランチ, pass/warn/fail, Epic 最終 Wave 判定結果 |
+| req-save + spec-save | 委譲（1 統合委譲、AG-005） | draft path, OU ID | 保存済みREQ/ADRリスト, 保存済みSPECリスト, draft status=saved, SPEC消費済みフラグ, pass/warn/fail, **artifact_action 適用結果（action id ごとに applied/skipped/failed/no-op、REQ-006-110）** |
+| case-open | 委譲 | draft path, OU ID | Issue番号(Epic含む), pass/warn/fail, **OU lifecycle: Issue 作成 完了/未完了（REQ-006-110）** |
+| case-run | インライン実行（case-run.md を authoritative source として読み込み、case-auto が準備/クリーンアップフェーズを自ら実行、実行担当サブエージェントへ直接委譲、AG-001/002） | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の子Issue を case-auto が並列委譲、最大5件） | completed-pr/blocked/failed/delegation-unavailable（Epic Wave 実行時は子Issue ごとの結果集合）, **OU lifecycle: PR 作成 完了/未完了（completed-pr のみ完了、REQ-006-110）** |
+| case-close | 委譲 | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の一括クローズ） | マージ結果, Capture保存結果, 削除済みブランチ, pass/warn/fail, Epic 最終 Wave 判定結果, **OU lifecycle: PR マージ完了/未完了、Issue クローズ完了/未完了（REQ-006-110）** |
 
 各工程の side_effect_boundary は対応するコマンド定義のガードレールに従う。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture、.agentdev/ commit/push 等）は各コマンド定義に従う（case-run インライン実行時の worktree クリーンアップは case-auto が case-run.md に従って実行）。
 
 case-auto は req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
 
 case-auto は各工程の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。
+
+#### 結果状態の4次元集約（REQ-006-110）
+
+case-auto は各工程の結果を以下の4状態次元で保持し、集約時に混同しない。各工程の `output_contract`（工程別契約表）がこれらの情報源となる。warn を pass へ変換する集約は禁止する。
+
+| 次元 | 取得元 | 値 |
+|---|---|---|
+| (1) 工程結果 | 全工程の `pass/warn/fail`（工程別契約表） | pass / warn / fail |
+| (2) artifact_action 適用結果 | req-save+spec-save 統合委譲の `artifact_action 適用結果`（action id ごと） | applied / skipped / failed / no-op |
+| (3) 定義適用工程の完了状態 | (1)(2) の組み合わせから導出 | 定義適用完了 / 警告付き工程完了 / 定義適用未完了 |
+| (4) OU ライフサイクル完了状態 | case-open（Issue 作成）、case-run（PR 作成）、case-close（PR マージ、Issue クローズ）の各成否 | 各ライフサイクル事象ごとに 完了 / 未完了 |
+
+集約規則:
+
+- **(3) 定義適用工程完了状態の導出**: 定義適用工程（req-save + spec-save）の完了状態は次で導出する:
+  - 全必須 action が `applied` または正当な `no-op` で、工程結果 (1) が `pass` → **定義適用完了**
+  - 全必須 action が `applied` または正当な `no-op` で、工程結果 (1) が `warn` → **警告付き工程完了**（warn を pass へ変換しない）
+  - 必須 action に `skipped` または `failed` が1件以上ある → **定義適用未完了**（この場合は「定義適用完了」または「警告付き工程完了」と報告しない）
+  - 「正当な no-op」とは、対象外 artifact（例: spec-save における `artifact: spec` entry 不存在、後方互換の `artifact_actions` フィールド不存在）による action 不実施を指す。正当な理由なく必須 action を飛ばした場合は `skipped` として扱う
+- **(4) OU ライフサイクル完了状態の独立性**: OU ライフサイクル完了状態は (3) の完了状態と独立して扱う。req-save/spec-save が成功（(3) が定義適用完了/警告付き工程完了）していても case-open（Issue 作成）が未実行なら OU ライフサイクルは未完了と報告する
+- **Phase 0 と OU 完了の分離**: Phase 0 成功（artifact_actions 適用完了 = (3) が定義適用完了/警告付き工程完了）と OU 完了（Issue/PR/Case 完了 = (4) の全ライフサイクル事象完了）を別々に報告する。一方を他方へすり替えて報告しない
+- **warn 変換禁止**: (1) が warn の工程を pass として集約しない。完了報告には warn を warn のまま残す
 
 #### case-open 完了後の分岐
 
@@ -281,6 +303,15 @@ execution_unit 分割可能性があるにもかかわらず case-open が停止
 **OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（OU処理順序は Step 4「OU処理順序」サブセクションに準拠）。全 OU の処理が完了した場合のみ全体完了報告を出力する。OU処理中に停止条件（Step 7）を検出した場合も完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する
 
 **orchestration stage 別結果・フォールバック理由・破棄回復記録**: 完了報告には orchestration stage 1（case-open 順次実行）、stage 2（case-run 並列実行）、stage 3（case-close 順次実行）の各 orchestration stage の実行結果を含める。orchestration stage 2 を順次フォールバックで実行した場合はその理由を記録する。orchestration stage 2 の bg task 破棄を検知して回復した場合は、検知した状態区分（commit 済みで PR 未作成、未コミット変更残存）と回復結果を記録する。
+
+**結果状態の4次元報告（REQ-006-110）**: 完了報告（停止時フォーマットを含む）には Step 4「結果状態の4次元集約」の4状態次元を次の形式で含めること。warn を pass へ変換して集約しないこと。
+
+- **(1) 工程結果**: 各工程（req-save+spec-save / case-open / case-run / case-close）の `pass/warn/fail` を工程別に列挙
+- **(2) artifact_action 適用結果**: 定義適用工程（req-save+spec-save）の action id ごとに `applied/skipped/failed/no-op` を列挙
+- **(3) 定義適用工程の完了状態**: `定義適用完了` / `警告付き工程完了` / `定義適用未完了` のいずれかとその根拠（warn の有無、必須 action の skipped/failed 有無）。必須 action に `skipped/failed` が1件以上ある場合は `定義適用未完了` と報告し、`定義適用完了`/`警告付き工程完了` と報告しない
+- **(4) OU ライフサイクル完了状態**: Issue 作成、PR 作成、PR マージ、Issue クローズの各事象ごとに `完了/未完了` を列挙。(3) が定義適用完了/警告付き工程完了であっても (4) のいずれかが未完了なら OU 完了とは報告しない
+
+Phase 0 成功（(3) の定義適用完了/警告付き工程完了）と OU 完了（(4) の全ライフサイクル事象完了）は別々に報告する。一方を他方へすり替えて報告しない。
 
 ## コンフリクト解消モデル（3レベルエスカレーション）
 
