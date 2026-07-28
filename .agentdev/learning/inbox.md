@@ -39,3 +39,22 @@
 - **関連**: Epic #1888、Issue #1890 (OU-002)、PR #1900、Phase 0 commit `0176a0ac`
 - **タグ**: `#learning` `#phase-0` `#commit-hygiene` `#tracking-pr` `#scope-separation`
 
+
+---
+
+## Windows 環境での git commit メッセージ encoding 手順
+
+- **問題事象**: Windows 環境で git commit メッセージに日本語を含める際、PowerShell の `Out-File -Encoding utf8` でメッセージファイルを作成すると BOM 付き UTF-8 となり、コミットメッセージ先頭に BOM 文字が混入して化けが発生する
+- **発生局面**: 実装（commit 作成時）
+- **検知方法**: PR #1921 case-run 実装中の自己申告（PR 本文 Findings / Capture候補 learning セクション）
+- **根本原因**: PowerShell の `Out-File -Encoding utf8` は Windows PowerShell 5.x で BOM 付き UTF-8 を生成する。agentdev-gh-cli WRITE 標準手続きは `[System.IO.File]::WriteAllText` + `UTF8Encoding($false)` を規定するが、commit メッセージ作成時は同手続きの対象外として運用されていた
+- **自律対応内容**: `node -e` + `fs.writeFileSync(path, content, 'utf-8')` で commit メッセージファイルを作成後、`git commit -F <file>` でコミットする手法へ切替えて安定化した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり（agentdev-gh-cli standard-procedures.md の WRITE 手続き対象へ git commit メッセージ作成を含めるか否かが検討課題。現状は Issue/PR 本文へ限定）
+- **横展開観点**: Windows 環境で `git commit`、`git tag`、その他ネイティブコマンドへ日本語ファイルを渡す全ケースで BOM 付き UTF-8 化けが発生し得る
+- **再発条件**: Windows 環境で PowerShell の `Out-File`/ `Set-Content`/ `>` リダイレクトで commit メッセージファイルを作成する場合
+- **予防策候補**: agentdev-gh-cli standard-procedures.md の WRITE 標準手順（Section 2 Step 1）を git commit メッセージ作成時へも拡張適用する旨を明文化する。または別セクション「git commit メッセージ作成時」を新設し `[System.IO.File]::WriteAllText` + `UTF8Encoding($false)` を規定する
+- **想定反映先**: `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md`（既存 WRITE 標準手順の対象拡張または新規セクション）
+- **関連**: PR #1921、Issue #1918、agentdev-gh-cli WRITE 標準手順
+- **タグ**: `#learning` `#windows` `#encoding` `#git-commit` `#powershell-bom`
+
