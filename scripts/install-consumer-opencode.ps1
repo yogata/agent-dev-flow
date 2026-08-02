@@ -4,10 +4,10 @@
     Install AgentDevFlow runtime artifacts into a consumer repository.
 
 .DESCRIPTION
-    Three modes:
-    - dry-run : Show what would change without making changes
-    - check   : Report divergence between expected and actual state
-    - apply   : Clone/update agent-dev-flow and create selective junctions
+    導入系スクリプト。3つのモードの技術的差は以下の通り:
+    - check   : clone しない軽量確認（検証のみ、ファイル変更なし）
+    - dry-run : clone して予測（ファイル変更なし）
+    - apply   : clone して実行（ファイル変更あり）
 
     Creates junctions for public runtime artifacts ONLY:
     - .opencode/commands/agentdev/  = junction -> .agentdev-plugin/src/opencode/commands/agentdev/
@@ -25,23 +25,33 @@
 
 .PARAMETER Mode
     One of: dry-run, check, apply
+    省略可能。引数なし起動時（-Mode 未指定）は対話ウィザードが起動し、Mode と環境を問う（REQ-009-040）。
 
 .PARAMETER LocalMode
     Switch. When set, agentdev-gh-cli is junctioned to src/opencode-local/agentdev-gh-cli/
     instead of src/opencode/skills/agentdev-gh-cli/. All other agentdev-* command/skill
     junctions target src/opencode/ as normal (REQ-0103-158, ADR-0131 decision #3).
 
+    判断基準: GitHub Issue/PR を使わずローカルファイル（.agentdev/cases/）で運用する環境
+    （ローカル版 OpenCode）では -LocalMode を指定する。
+
 .PARAMETER PluginDir
     Directory name for the agent-dev-flow checkout (default: .agentdev-plugin).
     This directory is created relative to the consumer repo root.
+    上級者向け: clone 先ディレクトリ名を変更する場合のみ指定。通常は既定値を使用する。
 
 .PARAMETER RepoUrl
     Git remote URL for agent-dev-flow (default: https://github.com/yogata/agent-dev-flow.git)
+    上級者向け: clone 元リポジトリ URL を変更する場合（フォーク等）のみ指定。通常は既定値を使用する。
 
 .PARAMETER Branch
     Branch to checkout from agent-dev-flow (default: main)
+    上級者向け: clone 元ブランチを変更する場合のみ指定。通常は既定値を使用する。
 
 .EXAMPLE
+    ./scripts/install-consumer-opencode.ps1
+    引数なし起動時は対話ウィザードが Mode と環境を問う（REQ-009-040）。
+
     ./scripts/install-consumer-opencode.ps1 -Mode dry-run
     ./scripts/install-consumer-opencode.ps1 -Mode check
     ./scripts/install-consumer-opencode.ps1 -Mode apply
@@ -50,7 +60,7 @@
 #>
 
 param(
-    [Parameter(Mandatory)]
+    [Parameter()]
     [ValidateSet('dry-run', 'check', 'apply')]
     [string]$Mode,
 
@@ -64,6 +74,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
 $RepoRoot = $PWD.Path
 $PluginPath = Join-Path $RepoRoot $PluginDir
 $SourceDir = Join-Path $PluginPath 'src\opencode'
@@ -80,6 +91,79 @@ $RepoLocalSkillPrefix = 'repo-'
 $LocalModeRedirectSkill = 'agentdev-gh-cli'
 
 # --- Helper Functions ---
+
+function Assert-ValidConsumerCwd {
+    <#
+    .SYNOPSIS
+        実行ディレクトリが AgentDevFlow 導入先として適切か検査する。
+        想定外ディレクトリの場合、即座に停止する（REQ-009-041）。
+    #>
+    $cwd = $PWD.Path
+
+    # 1. .agentdev-plugin/ 配下（clone 先）
+    if ($cwd -match '[\\/]\.agentdev-plugin([\\/]|$)') {
+        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow の clone 先です。1つ上のフォルダへ移動してください。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        exit 1
+    }
+
+    # 2. src/opencode/ 配下（原本領域）
+    if ($cwd -match '[\\/]src[\\/]opencode([\\/]|$)') {
+        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow の原本領域です。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        exit 1
+    }
+
+    # 3. .opencode/ 配下（実行時領域）
+    if ($cwd -match '[\\/]\.opencode([\\/]|$)') {
+        Write-Host "現在のフォルダ: $cwd。このフォルダは OpenCode の実行時領域です。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        exit 1
+    }
+
+    # 4. .git 無し（Git リポジトリでない）
+    if (-not (Test-Path -LiteralPath (Join-Path $cwd '.git'))) {
+        Write-Host "現在のフォルダ: $cwd。このフォルダは Git リポジトリではありません。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        exit 1
+    }
+}
+
+function Invoke-InstallWizard {
+    <#
+    .SYNOPSIS
+        引数なし起動時（-Mode 未指定）の対話ウィザード。Mode と環境を問う（REQ-009-040）。
+    #>
+    Write-Host '=== AgentDevFlow 導入ウィザード ==='
+    Write-Host ''
+    Write-Host 'Q1. 目的を選んでください（番号を入力）:'
+    Write-Host '  1) 新規インストール（apply: clone して実行）'
+    Write-Host '  2) 更新・再同期（apply: clone して実行）'
+    Write-Host '  3) 状態確認（check: clone しない軽量確認、ファイル変更なし）'
+    Write-Host '  4) 変更予測（dry-run: clone するがファイル変更なし）'
+    $modeChoice = Read-Host '番号'
+    switch ($modeChoice) {
+        '1' { $script:Mode = 'apply' }
+        '2' { $script:Mode = 'apply' }
+        '3' { $script:Mode = 'check' }
+        '4' { $script:Mode = 'dry-run' }
+        default {
+            Write-Host "無効な選択です: $modeChoice"
+            exit 1
+        }
+    }
+
+    Write-Host ''
+    Write-Host 'Q2. 環境を選んでください（番号を入力）:'
+    Write-Host '  1) GitHub 版（通常）'
+    Write-Host '  2) ローカル版（GitHub Issue/PR を使わずローカルファイルで運用）'
+    $envChoice = Read-Host '番号'
+    switch ($envChoice) {
+        '1' { }
+        '2' { $script:LocalMode = $true }
+        default {
+            Write-Host "無効な選択です: $envChoice"
+            exit 1
+        }
+    }
+    Write-Host ''
+}
 
 function Test-Junction {
     param([string]$Path)
@@ -173,6 +257,14 @@ function Initialize-PluginCheckout {
 }
 
 # --- Main ---
+
+# cwd 安全化（REQ-009-041）。ウィザードの前に通過すること。
+Assert-ValidConsumerCwd
+
+# 引数なし起動時（-Mode 未指定）の対話ウィザード（REQ-009-040）
+if (-not $Mode) {
+    Invoke-InstallWizard
+}
 
 # Clone/update first for all modes (need source to enumerate targets)
 if ($Mode -ne 'check') {
