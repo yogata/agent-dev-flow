@@ -209,6 +209,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 |------|--------|---------|------|
 | local/runtime-package-boundary.md | accepted | 実行時パッケージ境界 | リポジトリ種別別 .opencode/ 定義、命名規約、link mode 導入フロー、更新運用 |
 | local/local-case-file.md | accepted | ローカル Case ファイル | ローカル版 Case ファイルスキーマ、状態遷移 |
+| local/install-script-usability.md | draft | 導入スクリプトの使いやすさ詳細 | install/check/sync-self の使いやすさ詳細（対話ウィザード、cwd 安全化、ヘルプ、上級者向けオプション） |
 
 #### authoring/（執筆規約）
 

@@ -1,0 +1,119 @@
+---
+title: 導入スクリプトの使いやすさ詳細
+status: draft
+created: 2026-08-02
+updated: 2026-08-02
+spec_logical_division: behavior
+canonical_owner: install-script
+---
+
+# 導入スクリプトの使いやすさ詳細
+
+本 SPEC は REQ-009（配布基盤と導入モデル）の要件行 REQ-009-040〜043 を具体化する、
+導入系スクリプト（install-consumer-opencode.ps1、check-consumer-opencode.ps1、
+sync-self-opencode.ps1）の使いやすさ詳細を定義する。
+
+## 対話ウィザード
+
+### install-consumer-opencode.ps1
+
+引数なし起動時（-Mode 未指定）に以下のウィザードを起動する。Q1 目的は dry-run/check/apply
+の違いを併記する。
+
+- Q1 目的:
+  - 1) 新規インストール → apply
+  - 2) 更新・再同期 → apply
+  - 3) 状態確認（clone しない軽量確認）→ check
+  - 4) 変更予測（clone するが変更しない）→ dry-run
+- Q2 環境:
+  - 1) GitHub 版（通常）→ $LocalMode = $false
+  - 2) ローカル版（GitHub Issue/PR を使わずローカルファイルで運用）→ $LocalMode = $true
+
+### sync-self-opencode.ps1
+
+引数なし起動時に以下のウィザードを起動する。
+
+- Q1 目的:
+  - 1) 同期実行 → apply
+  - 2) 乖離確認 → check
+  - 3) 変更予測 → dry-run
+
+### check-consumer-opencode.ps1
+
+Mode を持たないため対象外。
+
+## dry-run/check/apply の技術的差
+
+| モード | clone | ファイル変更 |
+|---|---|---|
+| check | しない | しない（検証のみ） |
+| dry-run | する | しない（予測のみ） |
+| apply | する | する |
+
+## cwd 安全化
+
+### 停止条件
+
+install-consumer-opencode.ps1 と check-consumer-opencode.ps1 は、実行ディレクトリが
+以下のいずれかの場合、即座に停止する。
+
+1. .git が存在しない（Git リポジトリでない）
+2. .agentdev-plugin/ 配下（clone 先）
+3. src/opencode/ 配下（原本領域）
+4. .opencode/ 配下（実行時領域）
+
+sync-self-opencode.ps1 は $PSScriptRoot の親に src/opencode が存在しない場合、
+本体リポジトリ外での誤実行として停止する。
+
+### 停止メッセージ形式
+
+install と check の停止メッセージ形式:
+
+```
+現在のフォルダ: <cwd の絶対パス>。<理由>。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。
+```
+
+理由の具体文:
+
+| 条件 | 理由文 |
+|---|---|
+| .git 無し | このフォルダは Git リポジトリではありません |
+| .agentdev-plugin/ 内 | このフォルダは agent-dev-flow の clone 先です。1つ上のフォルダへ移動してください |
+| src/opencode/ 内 | このフォルダは agent-dev-flow の原本領域です |
+| .opencode/ 内 | このフォルダは OpenCode の実行時領域です |
+
+sync-self の停止メッセージ:
+
+```
+このスクリプトは AgentDevFlow 本体リポジトリ専用です。<cwd> には src\opencode がありません。導入先リポジトリでは install-consumer-opencode.ps1 を使ってください。
+```
+
+## -LocalMode の判断基準
+
+GitHub Issue/PR を使わずローカルファイル（.agentdev/cases/）で運用する環境
+（ローカル版 OpenCode）では -LocalMode を指定する。
+
+## 上級者向けオプション
+
+以下のオプションは clone 先・clone 元を変更する上級者向けであり、通常は指定不要。
+
+### install-consumer-opencode.ps1
+
+- -PluginDir: clone 先ディレクトリ名（既定: .agentdev-plugin）
+- -RepoUrl: clone 元リポジトリ URL
+- -Branch: clone 元ブランチ
+
+### check-consumer-opencode.ps1
+
+- -PluginDir: clone 先ディレクトリ名
+
+### sync-self-opencode.ps1
+
+上級者向けオプションは現在なし（本スクリプトは本体専用のため）。
+
+## 適用範囲
+
+- 対象: install-consumer-opencode.ps1、check-consumer-opencode.ps1、
+  sync-self-opencode.ps1 の使いやすさ詳細（ウィザード、cwd 検査、ヘルプ、上級者向けオプション）
+- 対象外: junction 作成、clone、orphan 検出、VERIFY 等の核心ロジック
+  （runtime-package-boundary.md 参照）
