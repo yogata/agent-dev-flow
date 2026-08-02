@@ -4,6 +4,22 @@
     Check consumer repository AgentDevFlow installation status.
 
 .DESCRIPTION
+    導入先リポジトリの AgentDevFlow インストール状態を確認する。clone しない軽量確認
+    （検証のみ、ファイル変更なし）。既存の .agentdev-plugin/ と junction を検証し、
+    乖離を報告する。
+
+    関連3モードの技術的差（参考）:
+    - check（当スクリプト / install -Mode check）: clone せず既存状態を検証
+    - install -Mode check                      : clone して検証（ファイル変更なし）
+    - install -Mode dry-run                    : clone して予測（ファイル変更なし）
+    - install -Mode apply                      : clone して実行（ファイル変更あり）
+
+    当スクリプトと install -Mode check の使い分け:
+    - 当スクリプト（check-consumer-opencode.ps1）: clone しない軽量確認。.agentdev-plugin/
+      が未インストールや破損時でも速く確認できる。orphan 検出を含む。
+    - install -Mode check: clone（または更新）した上で検証する。初回導入時や、原本側の最新を
+      取り込んでから検証したい場合に使う。
+
     Verifies that the consumer repository's AgentDevFlow installation is healthy:
     - .agentdev-plugin/ exists and is a git repository
     - All expected junctions exist and point to correct targets
@@ -17,6 +33,7 @@
 
 .PARAMETER PluginDir
     Directory name for the agent-dev-flow checkout (default: .agentdev-plugin).
+    上級者向け: clone 先ディレクトリ名を変更した環境でのみ指定。通常は既定値を使用する。
 
 .EXAMPLE
     ./scripts/check-consumer-opencode.ps1
@@ -28,6 +45,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
 $RepoRoot = $PWD.Path
 $PluginPath = Join-Path $RepoRoot $PluginDir
 $SourceDir = Join-Path $PluginPath 'src\opencode'
@@ -40,6 +58,39 @@ $SkillsDir = Join-Path $ProjectionDir 'skills'
 $LocalModeRedirectSkill = 'agentdev-gh-cli'
 
 # --- Helper Functions ---
+
+function Assert-ValidConsumerCwd {
+    <#
+    .SYNOPSIS
+        実行ディレクトリが AgentDevFlow 導入先として適切か検査する。
+        想定外ディレクトリの場合、即座に停止する（REQ-009-041）。
+    #>
+    $cwd = $PWD.Path
+
+    # 1. .agentdev-plugin/ 配下（clone 先）
+    if ($cwd -match '[\\/]\.agentdev-plugin([\\/]|$)') {
+        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow の clone 先です。1つ上のフォルダへ移動してください。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        exit 1
+    }
+
+    # 2. src/opencode/ 配下（原本領域）
+    if ($cwd -match '[\\/]src[\\/]opencode([\\/]|$)') {
+        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow の原本領域です。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        exit 1
+    }
+
+    # 3. .opencode/ 配下（実行時領域）
+    if ($cwd -match '[\\/]\.opencode([\\/]|$)') {
+        Write-Host "現在のフォルダ: $cwd。このフォルダは OpenCode の実行時領域です。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        exit 1
+    }
+
+    # 4. .git 無し（Git リポジトリでない）
+    if (-not (Test-Path -LiteralPath (Join-Path $cwd '.git'))) {
+        Write-Host "現在のフォルダ: $cwd。このフォルダは Git リポジトリではありません。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        exit 1
+    }
+}
 
 function Test-Junction {
     param([string]$Path)
@@ -71,6 +122,9 @@ function Get-TargetSourcePath {
 }
 
 # --- Main ---
+
+# cwd 安全化（REQ-009-041）
+Assert-ValidConsumerCwd
 
 Write-Host '=== Consumer Install Status Check ==='
 $divergences = 0

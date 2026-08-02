@@ -4,10 +4,16 @@
     Sync .opencode/ projection with selective junctions from src/opencode/ (self-hosting repo).
 
 .DESCRIPTION
-    Three modes:
-    - dry-run : Show what would change without making changes
-    - check   : Report divergence between source and projection
-    - apply   : Sync projection to match source
+    本体（agent-dev-flow 自己ホスト）リポジトリ専用の同期スクリプト。導入先リポジトリでは
+    install-consumer-opencode.ps1 を使うこと。
+
+    関連3モードの技術的差は以下の通り:
+    - check   : clone しない軽量確認（検証のみ、ファイル変更なし）。当スクリプトは clone せず、
+                src/opencode/ と .opencode/ の乖離を報告する。
+    - dry-run : clone して予測（ファイル変更なし）。当スクリプトは原本ディレクトリを直接参照する
+                ため clone 相当の取得は不要、変更内容の予測のみを行う。
+    - apply   : clone して実行（ファイル変更あり）。当スクリプトは原本ディレクトリから junction
+                を再作成し、.opencode/ を同期する。
 
     Uses selective junctions instead of whole-directory junction:
     - .opencode/             = real directory (not a junction)
@@ -23,15 +29,19 @@
 
 .PARAMETER Mode
     One of: dry-run, check, apply
+    省略可能。引数なし起動時（-Mode 未指定）は対話ウィザードが起動し、Mode を問う（REQ-009-040）。
 
 .EXAMPLE
+    ./scripts/sync-self-opencode.ps1
+    引数なし起動時は対話ウィザードが Mode を問う（REQ-009-040）。
+
     ./scripts/sync-self-opencode.ps1 -Mode dry-run
     ./scripts/sync-self-opencode.ps1 -Mode check
     ./scripts/sync-self-opencode.ps1 -Mode apply
 #>
 
 param(
-    [Parameter(Mandatory)]
+    [Parameter()]
     [ValidateSet('dry-run', 'check', 'apply')]
     [string]$Mode
 )
@@ -48,6 +58,42 @@ $RepoLocalCommandNames = @('repo')
 $RepoLocalSkillPrefix = 'repo-'
 
 # --- Helper Functions ---
+
+function Assert-SelfHostRepo {
+    <#
+    .SYNOPSIS
+        本スクリプトが agent-dev-flow 本体リポジトリ配下で実行されているか検査する。
+        本体以外（導入先リポジトリ等）へコピーして実行された場合、停止する（REQ-009-041）。
+    #>
+    if (-not (Test-Path -LiteralPath $SourceDir)) {
+        Write-Host "このスクリプトは AgentDevFlow 本体リポジトリ専用です。$RepoRoot には src\opencode がありません。導入先リポジトリでは install-consumer-opencode.ps1 を使ってください。"
+        exit 1
+    }
+}
+
+function Invoke-SyncSelfWizard {
+    <#
+    .SYNOPSIS
+        引数なし起動時（-Mode 未指定）の対話ウィザード。Mode を問う（REQ-009-040）。
+    #>
+    Write-Host '=== AgentDevFlow 本体同期ウィザード ==='
+    Write-Host ''
+    Write-Host 'Q1. 目的を選んでください（番号を入力）:'
+    Write-Host '  1) 同期実行（apply: ファイル変更あり）'
+    Write-Host '  2) 乖離確認（check: ファイル変更なし）'
+    Write-Host '  3) 変更予測（dry-run: ファイル変更なし）'
+    $modeChoice = Read-Host '番号'
+    switch ($modeChoice) {
+        '1' { $script:Mode = 'apply' }
+        '2' { $script:Mode = 'check' }
+        '3' { $script:Mode = 'dry-run' }
+        default {
+            Write-Host "無効な選択です: $modeChoice"
+            exit 1
+        }
+    }
+    Write-Host ''
+}
 
 function Test-Junction {
     param([string]$Path)
@@ -95,9 +141,12 @@ function Get-SelectiveJunctionTargets {
 
 # --- Main ---
 
-if (-not (Test-Path -LiteralPath $SourceDir)) {
-    Write-Error "[ERROR] Source directory not found: $SourceDir"
-    exit 1
+# 本体リポジトリ外（src/opencode が存在しない）での実行を検出して停止（REQ-009-041）
+Assert-SelfHostRepo
+
+# 引数なし起動時（-Mode 未指定）の対話ウィザード（REQ-009-040）
+if (-not $Mode) {
+    Invoke-SyncSelfWizard
 }
 
 $targets = Get-SelectiveJunctionTargets
