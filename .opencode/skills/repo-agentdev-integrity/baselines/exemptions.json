@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "description": "IR-059 explicit exemptions (§6.4.1). Each entry must carry an accepted rationale_ref pointing at docs/adr/** or an accepted SPEC. review_status must be 'accepted' for the exemption to apply. Distinct from ir-059-baseline.json (which tracks unresolved debt).",
+  "entries": []
+}

@@ -3,7 +3,7 @@
 test strategy 策定時に pass_criteria を記述する際の指針。
 REQ content が pipeline stage によって表現を変えることに起因する QG-4 評価時の食い違いを防ぐ（AG-007）。
 
-SPEC [agentdev-req-analysis.md](../../../../../docs/specs/skills/agentdev-req-analysis.md)「pass_criteria 記述基準」を正規原本とし、本ファイルは詳細、実例を補完する。
+agentdev-req-analysis SPEC「pass_criteria 記述基準」を正規原本とし、本ファイルは詳細、実例を補完する。
 
 ## 適用範囲
 
@@ -15,7 +15,7 @@ SPEC [agentdev-req-analysis.md](../../../../../docs/specs/skills/agentdev-req-an
 
 ## pipeline stage モデル
 
-AgentDevFlow では REQ content が以下の pipeline stage 間で表現を変える（[workflow-contracts.md](../../../../../docs/specs/workflows/workflow-contracts.md)「マクロフェーズ」参照）:
+AgentDevFlow では REQ content が以下の pipeline stage 間で表現を変える（ワークフロー契約 SPEC「マクロフェーズ」参照）:
 
 | pipeline stage | REQ content の表現 |
 |---|---|
@@ -66,34 +66,34 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 
 | pass_criteria 表現 | 適用対象 | 検証方法 | 典型例 |
 |---|---|---|---|
-| 「存在しないこと」 | 新規作成禁止 | 当該識別子、ファイルが存在しないことを確認（`glob`、`grep` で0件、`test -f` で偽） | 「REQ-0164 が存在しないこと」「新規ファイル X が存在しないこと」 |
-| 「変更されていないこと」 | 既存 REQ、既存ファイルの変更がないこと | 当該ファイルに diff がないことを確認（`git diff --quiet` で終了コード0） | 「REQ-001 が変更されていないこと」「docs/specs/X.md が変更されていないこと」 |
+| 「存在しないこと」 | 新規作成禁止 | 当該識別子、ファイルが存在しないことを確認（`glob`、`grep` で0件、`test -f` で偽） | 「REQ-{NNNN} が存在しないこと」「新規ファイル X が存在しないこと」 |
+| 「変更されていないこと」 | 既存 REQ、既存ファイルの変更がないこと | 当該ファイルに diff がないことを確認（`git diff --quiet` で終了コード0） | 「REQ-{NNNN} が変更されていないこと」「既存 SPEC ファイル X が変更されていないこと」 |
 
 ### 誤用例
 
-- ❌「REQ-001 が存在しないこと」
-  - REQ-001 は既存のため、検証が常に偽となり有意でない
-  - 意図が「REQ-001 を変更しないこと」であれば「変更されていないこと」を使用する
+- ❌「既存 REQ-{NNNN} が存在しないこと」
+  - 既存 REQ は存在するため、検証が常に偽となり有意でない
+  - 意図が「当該 REQ を変更しないこと」であれば「変更されていないこと」を使用する
 - ❌「新規ファイル X が変更されていないこと」
   - 存在しないファイルは diff 対象にならない
   - 意図が「X を新規作成しないこと」であれば「存在しないこと」を使用する
 
 ### 正用例
 
-- ✅「REQ-0164 が存在しないこと」
-  - REQ-0164 を新規作成しないことの検証として有意
-  - 検証: `glob docs/requirements/REQ-0164.md` が0件
-- ✅「REQ-001 が変更されていないこと」
-  - 既存 REQ-001 に diff がないことの検証として有意
-  - 検証: `git diff --quiet docs/requirements/REQ-001.md` で終了コード0
+- ✅「新規予定 REQ-{NNNN} が存在しないこと」
+  - 当該 REQ を新規作成しないことの検証として有意
+  - 検証: `glob docs/requirements/REQ-{NNNN}.md` が0件
+- ✅「既存 REQ-{NNNN} が変更されていないこと」
+  - 既存 REQ に diff がないことの検証として有意
+  - 検証: `git diff --quiet docs/requirements/REQ-{NNNN}.md` で終了コード0
 
 ## 共通 pass_criteria と正規所有
 
-複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は [agentdev-workflow-templates.md](../../../../../docs/specs/skills/agentdev-workflow-templates.md)「test strategy 記述ガイドライン」を正規所有とする。本ガイドは意味的等価許容、存在確認と diff 確認の使い分けに限定する。
+複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は agentdev-workflow-templates SPEC「test strategy 記述ガイドライン」を正規所有とする。本ガイドは意味的等価許容、存在確認と diff 確認の使い分けに限定する。
 
 ## See Also
 
-- [agentdev-req-analysis.md SPEC](../../../../../docs/specs/skills/agentdev-req-analysis.md)「pass_criteria 記述基準」（正規原本）
+- agentdev-req-analysis SPEC「pass_criteria 記述基準」（正規原本）
 - [test-strategy-numeric-threshold-guide.md](test-strategy-numeric-threshold-guide.md)（数値閾値策定ガイド）
 - [qg-4-final-acceptance.md](../../agentdev-quality-gates/references/qg-4-final-acceptance.md)（QG-4 最終受け入れゲート）
 - [qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md)（QG-2 完了条件網羅性）

@@ -30,15 +30,15 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 ## inspect-* コマンド選択 routing
 
 変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。
-本コマンド（inspect-skills）と inspect-docs は配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-skills Step 3 配布物構文健全性・責務整合診断、inspect-docs Step 11 配布物整合性検査）。変更範囲に応じて routing することで重複検出を防ぐ。
+本コマンド（inspect-skills）と inspect-docs は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-skills Step 3 配布物構文健全性・責務整合診断、inspect-docs Step 11 配布物整合性検査）。変更範囲に応じて routing することで重複検出を防ぐ。
 
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
 | `docs/requirements/*.md`、`docs/adr/*.md` | inspect-docs |
 | `docs/specs/**/*.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
 | `docs/guides/*.md`、`docs/DOC-MAP.md`、`README.md` | inspect-docs |
-| `src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md` | inspect-skills |
-| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション、ADR-002） | inspect-skills |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
 | `docs/specs/commands/**/*.md`、`docs/specs/skills/**/*.md` | inspect-skills |
 | 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
 
@@ -63,7 +63,7 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 `agentdev-inspect-skills` に従い、参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存を評価する
 ### Step 3: 配布物構文健全性、責務整合診断
 
-配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合、壊れた括弧、command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する
+配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合、壊れた括弧、command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する
 
 存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity SPEC 構文健全性検査準拠）。
 

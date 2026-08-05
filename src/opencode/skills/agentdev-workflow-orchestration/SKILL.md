@@ -30,7 +30,7 @@ Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の�
 
 ### case-run internal lifecycle フェーズ構成
 
-case-run は orchestration stage（case-auto が管理する command 間進行、REQ-006 / case-auto 所有）と区別し、単一 Issue または Wave 内の case-run internal lifecycle（REQ-006 / case-run 所有）として次のフェーズを管理する。本節のフェーズは case-run internal lifecycle に属し、orchestration stage とは混同しない（`docs/specs/responsibilities/responsibility-boundary-purification.md`「case 実行責務の 4 用語と所有者」参照）。
+case-run は orchestration stage（case-auto が管理する command 間進行、Case 実行オーケストレーション要件 / case-auto 所有）と区別し、単一 Issue または Wave 内の case-run internal lifecycle（Case 実行オーケストレーション要件 / case-run 所有）として次のフェーズを管理する。本節のフェーズは case-run internal lifecycle に属し、orchestration stage とは混同しない（responsibility-boundary-purification SPEC「case 実行責務の 4 用語と所有者」参照）。
 
 | フェーズ | Steps | 再開条件 |
 |----------|-------|----------|

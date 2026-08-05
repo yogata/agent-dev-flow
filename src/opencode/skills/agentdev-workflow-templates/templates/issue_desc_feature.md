@@ -43,7 +43,7 @@ labels: enhancement
   - 共通 pass_criteria は複数 REQ の pipeline stage 違いで QG-4 食い違いを生むため、REQ 単位の個別期待値を推奨
   - 「変更対象外 REQ の変更がないこと」は「diff がないこと」として表現し、「存在しないこと」とは書かない
   - 「存在しないこと」は新規作成禁止（例: REQ-NNNN が存在しないこと）の場合のみ使用。既存 REQ の変更有無検証には使用しない
-  - 詳細は docs/specs/skills/agentdev-workflow-templates.md「test strategy 記述ガイドライン」参照 -->
+  - 詳細は agentdev-workflow-templates SPEC「test strategy 記述ガイドライン」参照 -->
 - id: TS-001
  target_item: [検証対象]
  verification: |

@@ -39,14 +39,14 @@ RU 本文に現在プロジェクトでは実装しない前工程からの引�
 ### case-open
 
 要件docまたは RU に `agentdev_handoff: true` がある場合、リポジトリ種別に応じて分岐する:
-- **self-hosting リポジトリ**: 停止せず、履歴メタデータとして通常の req/case workflow 入力として処理する（REQ-005-022）
-- **consumer リポジトリ**: Issue を作成せず停止し、agent-dev-flow repository への手動取り込み対象として報告する（REQ-005-021）
+- **self-hosting リポジトリ**: 停止せず、履歴メタデータとして通常の req/case workflow 入力として処理する
+- **consumer リポジトリ**: Issue を作成せず停止し、agent-dev-flow repository への手動取り込み対象として報告する
 
 ### case-run
 
 Issue 本文、要件doc本文に `agentdev_handoff: true` がある場合、リポジトリ種別に応じて分岐する:
-- **self-hosting リポジトリ**: 停止せず、通常の case workflow として実装を開始する（REQ-005-022）
-- **consumer リポジトリ**: 実装を開始せず停止し、agent-dev-flow repository への手動取り込み対象として報告する（REQ-005-021）
+- **self-hosting リポジトリ**: 停止せず、通常の case workflow として実装を開始する
+- **consumer リポジトリ**: 実装を開始せず停止し、agent-dev-flow repository への手動取り込み対象として報告する
 
 ## 参照
 

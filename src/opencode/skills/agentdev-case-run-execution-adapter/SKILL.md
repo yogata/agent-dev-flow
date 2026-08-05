@@ -35,19 +35,19 @@ case-run (orchestration)
 - **case-run 本体**: 単一 Issue または単一 Wave（Epic Issue 指定時、最大5件並列）で実行担当サブエージェントを委譲起動し、result を処理する。実装実行そのものは行わない。起動手段は AGENTS.md および references/<harness>.md 参照。
 - **実行担当サブエージェント**: 外部実行基盤（AGENTS.md で選定）が提供するエージェント型。1 Issue あたり1起動。adapter skill（`agentdev-case-run-execution-adapter`）を読み込み、委譲 prompt 内で実行 command を起動する。仕様を再解釈、再設計しないアダプターである。
 - **実行 command（harness が提供）**: 委譲 prompt 内で指定される実行 command（skill ではない）。Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲートを実行する。ランタイム作業領域（実行監査トレイル等）は worktree 配下に配置され、worktree 削除時に破棄される。各ツール呼び出しの保護（timeout 等）は harness 側が提供する（詳細は AGENTS.md および references/<harness>.md 参照）。command の具体名、起動手段も AGENTS.md および references/<harness>.md 参照。
-- **外部実行基盤（external execution boundary）**: 実行担当サブエージェントの背後で実行エンジンとして振る舞う外部実行境界。本境界は REQ-011-017 により REQ-011 が正規所有し、case-run は自身で所有せず REQ-011 へ委譲する。plan artifact 等の中間成果物の内部構造には依存しない。最終結果は **PR URL** で受領する（透明）。
+- **外部実行基盤（external execution boundary）**: 実行担当サブエージェントの背後で実行エンジンとして振る舞う外部実行境界。本境界は I/O 境界要件により I/O 境界 SPEC が正規所有し、case-run は自身で所有せず I/O 境界 SPEC へ委譲する。plan artifact 等の中間成果物の内部構造には依存しない。最終結果は **PR URL** で受領する（透明）。
 
-## external execution boundary と harness execution mechanism（REQ-011-017、REQ-011-018）
+## external execution boundary と harness execution mechanism
 
 本 adapter skill は external execution boundary への委譲契約を使用し、harness execution mechanism を ADF 規範所有対象外として扱う。両者の責務帰属を以下に示す。
 
 | 区分 | 内容 | 正規所有者 |
 |---|---|---|
-| external execution boundary | 外部バックエンド接続（実行担当サブエージェント起動、result 受領、PR URL 受領）。adapter skill 経由の委譲契約、result 4状態契約、worktree 隔離、Findings / SPEC確定候補の PR 本文引き継ぎを含む | REQ-011（REQ-011-017）。case-run は REQ-011 へ委譲し、自身は所有しない |
-| harness execution mechanism | agent 起動 API、background task、並列実行、context 管理、timeout、retry、queue、heartbeat | harness 責務（ADF 規範所有対象外、REQ-011-018）。AGENTS.md および `references/<harness>.md` に配置 |
+| external execution boundary | 外部バックエンド接続（実行担当サブエージェント起動、result 受領、PR URL 受領）。adapter skill 経由の委譲契約、result 4状態契約、worktree 隔離、Findings / SPEC確定候補の PR 本文引き継ぎを含む | I/O 境界 SPEC。case-run は I/O 境界 SPEC へ委譲し、自身は所有しない |
+| harness execution mechanism | agent 起動 API、background task、並列実行、context 管理、timeout、retry、queue、heartbeat | harness 責務（ADF 規範所有対象外）。AGENTS.md および `references/<harness>.md` に配置 |
 
 adapter skill は external execution boundary の委譲契約（adapter skill 経由での委譲起動、委譲 prompt 内で実行 command を指定、result 4状態、worktree 隔離）を宣言的に定義する。
-harness execution mechanism は本 SKILL の規範対象外とし、`references/<harness>.md` へ集約する。用語の正規定義と所有者は `docs/specs/responsibilities/responsibility-boundary-purification.md`「case 実行責務の 4 用語と所有者」を SSoT とする。
+harness execution mechanism は本 SKILL の規範対象外とし、`references/<harness>.md` へ集約する。用語の正規定義と所有者は responsibility-boundary-purification SPEC「case 実行責務の 4 用語と所有者」を SSoT とする。
 
 ## 実行担当サブエージェントの責務
 
@@ -181,9 +181,9 @@ adapter skill は本要件を宣言的に定義し、case-run からの委譲 pr
 
 ## 委譲起動不能時の取扱い
 
-委譲起動不能時（実行担当サブエージェント型が不許可、起動 API 異常等）は、result 契約の `delegation-unavailable` を返し、Issue を `pending` に戻して case-run を停止する（REQ-002-004、SPEC `delegation-contracts.md`「委譲種別」注記）。
+委譲起動不能時（実行担当サブエージェント型が不許可、起動 API 異常等）は、result 契約の `delegation-unavailable` を返し、Issue を `pending` に戻して case-run を停止する（委譲契約 SPEC「委譲種別」注記）。
 
-インラインフォールバック（case-run が自ら実装・検証を実行する逐次パス）は harness 固有の実行制御として配布 SPEC および本 SKILL から除外する。委譲起動手段、能力検出、インライン代替の有無は harness execution mechanism に属し（REQ-011-018）、harness の責務として AGENTS.md および `references/<harness>.md` に配置する（REQ-002-002、SPEC `delegation-contracts.md`「委譲種別」注記）。
+インラインフォールバック（case-run が自ら実装・検証を実行する逐次パス）は harness 固有の実行制御として配布 SPEC および本 SKILL から除外する。委譲起動手段、能力検出、インライン代替の有無は harness execution mechanism に属し、harness の責務として AGENTS.md および `references/<harness>.md` に配置する（委譲契約 SPEC「委譲種別」注記）。
 
 次節「委譲起動失敗、異常終了時事後処理」は**委譲起動後**の異常終了に対する事後処理であり、本節の委譲起動不能（事前判定）とは対象段階が異なる。
 
@@ -210,7 +210,7 @@ adapter skill は本要件を宣言的に定義し、case-run からの委譲 pr
 
 - **agentdev-workflow-orchestration**: サブエージェントプロトコル、capture 境界
 - **agentdev-workflow-templates**: PR 本文、コメント SSoT のテンプレート構造
-- **SPEC `delegation-contracts.md`**: 委譲契約横断 SPEC、case 実行責務の 4 用語（REQ-011-017、REQ-011-018）
+- **SPEC `delegation-contracts.md`**: 委譲契約横断 SPEC、case 実行責務の 4 用語
 - **SPEC `responsibility-boundary-purification.md`**: case 実行責務の 4 用語と所有者 SSoT
 - **references/<harness>.md**: 委譲起動の具象実装ノート
 
