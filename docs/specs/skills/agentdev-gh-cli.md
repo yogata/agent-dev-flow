@@ -107,7 +107,7 @@ gh WRITE 操作を行う全 command/ skill（case-open、case-run、case-close�
 
 ## Windows 環境固有手続き
 
-Windows 環境（Windows PowerShell 5.x / pwsh 7）での gh CLI 実行に特有の手続きを以下5項目として定義する（RU-0005）。
+Windows 環境（Windows PowerShell 5.x / pwsh 7）での gh CLI 実行に特有の手続きを以下5項目として定義する。
 本 SPEC は各手続きの存在と `references/standard-procedures.md` への参照関係のみを定め、詳細実装（gh CLI フラグ、PowerShell 式、ファイル配置、cleanup 手順）は同ファイルへ委譲する（REQ-011、ADR-004 decision #3）。
 ローカル版は Case ファイル読み書きへ差し替えるため本要件の対象外（gh CLI を使用しない）。
 

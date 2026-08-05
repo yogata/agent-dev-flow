@@ -644,5 +644,5 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 
 ### accepted ADR の意味変更
 
-- accepted ADR の意味変更は RU-0026 契約（後継 ADR 必須）に従い、直接適用しない
+- accepted ADR の意味変更は後継 ADR を必須とし、直接適用しない
 - 履歴証拠を削除して追跠不能にしない

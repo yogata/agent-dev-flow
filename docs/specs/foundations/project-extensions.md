@@ -7,7 +7,7 @@ updated: 2026-07-27
 
 # Project Extensions
 
-実行時のプロジェクト固有追加・拡張機構としての project extensions を定義する（ADR-006: inspect 3-command 構成への正規化、ADR-005 を supersede）。
+実行時のプロジェクト固有追加・拡張機構としての project extensions を定義する（関連: ADR-006 inspect 3-command 構成への正規化）。
 配布 command/skill 本文をプロジェクト非依存とし、プロジェクト固有の文脈、規約、検査、受け入れゲート、禁止事項を .agentdev/extensions/** 経由で追加・拡張する仕組みを規定する。
 従来の .agentdev/doc-inputs/**（参照リスト機構）に替わる設定層である。
 
@@ -123,6 +123,6 @@ extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は
 配布物参照境界の検出結果はgeneric表記への是正とextensionによるtraceability補完へ接続する。
 ## 関連
 
-- ADR-006: inspect 3-command 構成への正規化（ADR-005 を supersede、extension 検査の3層責務分離を確定）
+- ADR-006: inspect 3-command 構成への正規化（extension 検査の3層責務分離を確定）
 - REQ-001: 実行時独立性（本 SPEC は具体化機構を提供）
 

@@ -353,4 +353,4 @@ guides/README のみ全規範を適用する。
 - 現行 ADR、REQ、SPEC へ移行結果またはリリース証跡を規範内容として配置しない
 - 非規範 Report へ規範要件または必達条件を移さない
 - 配置判定は document-model の 6 処置モデル（KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）で行う
-- ADR-001 の 10シナリオの実行結果は Release Report、定義は SPEC へ配置する（RU-0026 準拠）
+- ADR-001 の 10シナリオの実行結果は Release Report、定義は SPEC へ配置する

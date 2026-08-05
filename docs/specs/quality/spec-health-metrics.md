@@ -29,7 +29,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 
 ### 宣言率指標の定義
 
-宣言率は SPEC の主論理区分（`spec_logical_division`）、正規所有対象（`canonical_owner`）の宣言状況を機械的に集計する指標である（REQ-001-013、REQ-001-035、RU-0025、REQ-001）。
+宣言率は SPEC の主論理区分（`spec_logical_division`）、正規所有対象（`canonical_owner`）の宣言状況を機械的に集計する指標である（REQ-001-013、REQ-001-035、REQ-001）。
 
 - **分子**: 宣言対象フィールド（`spec_logical_division` または `canonical_owner`）を frontmatter または冒頭宣言節のいずれかで宣言している SPEC ファイル数
 - **分母**: `docs/specs/**/*.md` に存在する全 SPEC ファイル数（`_template.md` を除く）

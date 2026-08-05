@@ -3940,6 +3940,12 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
   // detector does not fire on REQ/SPEC lines merely mentioning persistent state.
   const stateWord =
     "status|ステータス|マイクロフェーズ|micro.phase|(?<!domain )state|(?<!ドメイン)状態";
+  // §5.4: `review` は現行 Case 状態（open/running/blocked/review/closed/cancelled）
+  // と旧6状態モデルの両方に現れる。`review` 単独の語一致では誤検知するため、
+  // 旧状態モデルに特有の語（requirement/analyzed/created/in_progress/done）を
+  // 検出した場合のみ violation とする。
+  const legacyOnlyPhasePattern =
+    /\b(requirement|analyzed|created|in_progress|done)\b/i;
   const sixPhasePattern = new RegExp(
     "\\b(requirement|analyzed|created|in_progress|review|done)\\b.*\\b(" +
       stateWord +
@@ -3989,7 +3995,7 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
           break;
         }
       }
-      if (phaseInNarrative) {
+      if (phaseInNarrative && legacyOnlyPhasePattern.test(lines[i])) {
         foundViolation = true;
         results.push(
           ng(
