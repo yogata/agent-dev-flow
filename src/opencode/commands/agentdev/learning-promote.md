@@ -120,11 +120,7 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 
 ### Step 16: 完了報告
 
-template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`。以下を含める:
-- 8軸評価サマリ（加重合計スコア分布）
-- 判定結果（promote/defer/reject/duplicate 件数）
-- 後続ルート（`/agentdev/backlog-review`）
-- git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）
+template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`。8軸評価サマリ、判定結果（promote/defer/reject/duplicate 件数）、後続ルート（`/agentdev/backlog-review`）、git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）を含める
 
 ## ガードレール
 
@@ -139,33 +135,14 @@ template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`�
 - G09: 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は Step 10 承認とは別に明示承認を維持する（REQ）
 - G10: 無条件の自動REQ化禁止（REQ）: 学びを直接 REQ 化しない。恒久契約（REQ/ADR/SPEC）への昇華可能性を Step 7 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
 
-## ユーザー確認ポイント
+## ユーザー確認ポイント、エラー処理
 
-1. **Step 9-10**: 廃棄判定結果、8軸評価スコアの確認、修正、承認（判断の確定、REQ）
+ユーザー確認ポイント、エラー処理表、各成果物のライフサイクル詳細は `agentdev-learning-pipeline` を参照。主要項目のみ本節に抜粋する:
 
-2. **Step 14**: prune は Step 10 承認と同時に承認済みとみなし自動実行（REQ）。
-staged/rejected/duplicate の追加確認は不要。
-
-## エラー処理
-
-| エラー | 対処 |
-|--------|------|
-| inbox.md が存在しない | エラー終了。「先に `agentdev-learning-capture` skill で学びを追加してください」 |
-| 学びが0件 | 「分析対象の学びがありません」と報告して終了 |
-| クラスタが0件 | 「昇華対象のクラスタがありません」と報告して終了 |
-| ユーザーが承認しない | 「昇華をキャンセルしました」と報告して終了 |
-| 旧フォーマットパース失敗 | 当該エントリをスキップし警告出力、処理継続 |
-| staging領域書込失敗 | エラー内容を報告 |
-| deferred.md prune 失敗 | 採用済み成果物は保持。prune エラー報告し手動 prune 案内 |
-| deferred.md 書込失敗 | inbox.md は変更しない。エラー内容を報告 |
-| git pull --ff-only 失敗 | 構造化エラー表示して停止。自動解消しない |
-| git push 失敗 | 構造化エラー表示。完了扱いにしない |
-
-## 成果物ライフサイクル
-
-各成果物の役割、性格、ライフサイクル詳細は `agentdev-learning-pipeline` を参照。
-
-**learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → 採用済み成果物生成 → archive move → prune。
-採用済み成果物は `/agentdev/backlog-review` 経由で RU 化後に `/agentdev/req-define` に合流する。
+- **Step 9-10**: 廃棄判定結果、8軸評価スコアの確認、修正、承認（判断の確定、REQ）
+- **Step 14**: prune は Step 10 承認と同時に承認済みとみなし自動実行（REQ）。staged/rejected/duplicate の追加確認は不要
+- **inbox.md 不在**: エラー終了。「先に `agentdev-learning-capture` skill で学びを追加してください」
+- **git pull/push 失敗**: 構造化エラー表示して停止（push 失敗時は完了扱いにしない）
+- **learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → 採用済み成果物生成 → archive move → prune。採用済み成果物は `/agentdev/backlog-review` 経由で RU 化後に `/agentdev/req-define` に合流する
 
 

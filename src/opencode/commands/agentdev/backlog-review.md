@@ -33,51 +33,11 @@ description: 採用済み成果物を分析、統合し、ユーザー承認後�
 
 ## RU フォーマット
 
-RU-*.md は以下の構造に従う:
-
-```markdown
----
-source_type: {intake | learning | inspect | mixed | chat}
-generated_by: backlog-review
-generated_at: {ISO 8601 timestamp}
-status: draft
-  depends_on: [RU-{NNNN}] (optional)
-  tentative_classification: {REQ | 挙動SPEC | カタログSPEC | guide | learning維持 | 作業記録 | 対象外} (REQ)
-  sources:
-  - path: {.agentdev/intake/promoted/xxx.md | .agentdev/learning/promoted/xxx.md | .agentdev/inspect/promoted/xxx.md}
-    type: {intake | learning | inspect}
----
-
-## Sources
-
-{各 source artifact の要点抽出。パススルー禁止}
-
-## Source Summary
-
-{全 source の共通テーマ・論点の統合サマリ}
-
-## 統合理由
-
-{N:1 統合または 1:N 分割の理由}
-
-## 要件化の方向
-
-{req-define に渡す要件化の方向性}
-```
+RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）は `agentdev-backlog-integration` を正とする。`tentative_classification` は document-model SPEC（extension 経由）の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）のいずれかを記録する（REQ）。
 
 ## session由来RU 生成形式（参照）
 
-`source_type: chat` かつ `generated_by: session` のRU（session由来RU）の生成形式は、一時成果物ライフサイクル要件と artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」セクションを正規原本とする。本コマンドは同契約を再定義せず、以下を参照ポイントとして扱う。
-
-- frontmatter 必須フィールド: 通常のRU フィールドに加え `generation_actor`、`agreement_confirmed_at`、`generation_stage`、`logical_key` を必須とする（SPEC「frontmatter 必須フィールド」表）
-- 二段階承認: 第1承認はRU案内容のみを対象とし、第2承認のみが採番、保存、commit、push を許可する（SPEC「二段階承認」）
-- `agreement_confirmed_at` と `generated_at`: ISO 8601 形式で `generated_at >= agreement_confirmed_at` を満たし、保存完了前に req-define を開始しない
-- session 論理URI: `sources[].type: chat` の場合のみ `sources[].path` へ `session:...` を解決しない論理URIとして許可する（SPEC「session 論理URI」）
-- RU 本文必須8セクション: 目的、対象、対象外、正規所有者とアンカー、依存関係、要件化の方向、決定的受け入れ条件、Source Summary（SPEC「RU 本文必須8セクション」）
-- 永続ID 採番: 保存時に既存最大番号+1で割り当て、保存後の `depends_on` は RU-ID で記録する（SPEC「保存先と永続ID」）
-- `tentative_classification`: 既存7値のいずれか。欠落時はRU 生成を停止する
-
-各項目の判定基準、検証観点は正規原本（一時成果物ライフサイクル要件 + artifact-contracts SPEC）へ委譲する。
+`source_type: chat` かつ `generated_by: session` のRU（session由来RU）の生成形式は、一時成果物ライフサイクル要件と artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」セクションを正規原本とする。本コマンドは frontmatter 必須フィールド、二段階承認、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番、`tentative_classification` の各要件を同 SPEC へ委譲し、再定義しない
 
 ## 手順
 

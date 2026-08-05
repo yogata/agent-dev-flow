@@ -56,13 +56,11 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### Step 2: item の読み込み
 
-各 intake item を読み込み、内容を把握する。委譲接続点: サブエージェントは読解メモ、分類候補、根拠、capture候補のみを返し、親エージェントが分類提示と保存判断を行う
+各 intake item を読み込み、内容を把握する。委譲接続点の詳細は `agentdev-intake-pipeline` を参照
 
 ### Step 3: レビュー、評価
 
-各 item を評価する。
-詳細は `agentdev-intake-pipeline` を参照。
-委譲接続点: サブエージェントは採用/ 保留/ 却下の候補と根拠を pass/warn/fail/partial で返し、親エージェントが最終分類を決める
+各 item を評価する。詳細、委譲接続点は `agentdev-intake-pipeline` を参照
 
 ### Step 4: 分類の提示
 
@@ -99,15 +97,11 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### Step 9: 実行前同期（git pull）
 
-`git pull --ff-only` を実行する。
-失敗時の扱いは `agentdev-intake-pipeline` を参照。
-委譲接続点: 親エージェントのみが git 操作を行う
+`git pull --ff-only` を実行する。失敗時の扱い、親エージェントのみが git 操作を行う点は `agentdev-intake-pipeline` を参照
 
 ### Step 10: .agentdev/intake 変更の commit と push
 
-`.agentdev/intake/` 配下の変更のみを commit/push する（分類承認後の自動実行、REQ）。
-詳細は `agentdev-intake-pipeline` を参照。
-委譲接続点: 親エージェントのみが commit/push を行う
+`.agentdev/intake/` 配下の変更のみを commit/push する（分類承認後の自動実行、REQ）。詳細、親エージェントのみが commit/push を行う点は `agentdev-intake-pipeline` を参照
 
 
 ### Step 11: 完了報告
@@ -119,10 +113,7 @@ template: .opencode/commands/agentdev/templates/intake-promote/standard.md。
 
 ## エラー処理
 
-| エラー | 対処 |
-|--------|------|
-| git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
-| git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
+主要なエラー処理（git pull --ff-only 失敗時の停止、git push 失敗時の完了扱い禁止等）は `agentdev-intake-pipeline` を参照。構造化エラーメッセージを表示して停止し、自動解消しない。
 
 ## ガードレール
 

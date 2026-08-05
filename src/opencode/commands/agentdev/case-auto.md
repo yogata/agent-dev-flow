@@ -8,12 +8,7 @@ description: req-save→spec-save→case-open→case-run→case-closeを順次�
 
 ## project extensions
 
-本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/case-auto.yaml`）を読み込む。
-
-- extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
-- extension が存在しない場合は標準動作で続行する
-- extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
-- 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
+本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/case-auto.yaml`）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## 入力
 
@@ -46,196 +41,14 @@ description: req-save→spec-save→case-open→case-run→case-closeを順次�
 ### Step 3: 工程分岐（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定）
 
 - **Issue番号/URL入力**: case-run → case-close（req-save、spec-save、case-open、work_type読取をスキップ）。Step 1 で解決した Issue番号/URL を case-run にそのまま渡す。draft-data の読取は行わない
-- **artifact_actions ベース分岐**:
-  - `artifact: req` または `artifact: adr` entry → req-save を実行
-  - `artifact: spec` entry → spec-save を実行（req-save の後）。entry が空ならスキップ。`artifact_actions` フィールド不存在（旧形式 draft）は後方互換で spec-save スキップ
-  - 常に → case-open → case-run → case-close
+- **artifact_actions ベース分岐**: `artifact: req` または `artifact: adr` entry → req-save を実行。`artifact: spec` entry → spec-save を実行（req-save の後、entry が空ならスキップ、`artifact_actions` フィールド不存在は後方互換で spec-save スキップ）。常に → case-open → case-run → case-close
 - **auto_gate preflight**: `draft-data` の `auto_gate.auto_ready` が false または未解決 item（unresolved_questions/ unresolved_conflicts/ out_of_repo_operations/ stop_reasons）が残る場合は停止
+
 ### Step 4: 各工程の実行
 
-#### 実行モデル原則
+実行モデル原則、工程別契約（req-save+spec-save 統合委譲 AG-005、case-open、case-run インライン実行 AG-001/002、case-close）、QG-1〜QG-4 の継承、タイムスタンプ計測（L1）、インライン実行時のコンテキスト管理、結果状態の4次元集約（工程結果 / artifact_action 適用結果 / 定義適用工程の完了状態 / OU ライフサイクル完了状態、warn 変換禁止）、case-open 完了後の分岐（Standard flow / Epic Issue flow、クリーンアップ検証ゲート）、Wave 反復制御（case-auto 直接制御 AG-003、Epic Issue 本文読み取りのみ、子Issue インライン case-run 並列実行 最大5件、委譲→case-close(#epic)、次 Wave 判定、blocked/failed の扱い）、OU 処理順序（必須依存で結合した execution_unit 群は順次、必須依存のない execution_unit 群は並列、3つの「5件」文脈の区別）、クリーンアップ検証ゲート（ドラフト/RU 削除検証）、委譲起動判定（AG-004、delegation-unavailable 停止条件）、Subagent 委譲プロトコル（category 選定ガイドライン、MUST NOT DO 必須化）、orchestration stage モデル（stage 1 case-open / stage 2 case-run bg task 最大5件 / stage 3 case-close）、子 task bg task 破棄検知時の回復（AG-001〜AG-004、3状態分類、ライフサイクル分離）の各詳細は `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各対応 skill を参照。case-run インライン実行時も case-run.md を authoritative source として読み込む
 
-- **委譲工程**（req-save / spec-save / case-open / case-close）: 各コマンドの委譲契約に従い起動。**インライン実行は原則禁止**（コンテキスト枯渇防止）。委譲起動不能時は後述「委譲起動判定」に従い `delegation-unavailable` として報告（AG-004）
-- **case-run**: **インライン実行**（標準動作、AG-001）。case-run.md を authoritative source として読み込み、準備フェーズ（worktree 作成、委譲 prompt 構築等）とクリーンアップフェーズ（worktree 削除、result 処理等）を case-auto が自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接委譲し、委譲チェーンを case-auto → 実行担当サブエージェントの1段階に圧縮（委譲起点の折りたたみ、AG-002）。adapter skill（`agentdev-case-run-execution-adapter`）を case-auto が読み込む
-- **case-auto 自らは実装を行わない**: case-run インライン実行といえども、case-auto は実装実行・PR作成を自ら行わない。実装は実行担当サブエージェントへ委譲。インライン実行は case-run の準備/クリーンアップフェーズのオーケストレーションを case-auto が自ら実行することを指す
-- **req-save + spec-save 統合委譲（AG-005）**: req-save と spec-save を1つの統合委譲で順次実行。委譲内では両コマンドの定義（req-save.md, spec-save.md）を順次読み込み、draft を1回読み込み、req-save の手順を実行した後に引き続き spec-save の手順を実行。commit/push は1回に統合（REQ と SPEC の変更を1コミットにまとめる）。統合委譲に両コマンドのガードレールを適用（req-save G02: `docs/requirements/**`, `docs/adr/**`, `docs/README.md`, `.agentdev/drafts/**`、spec-save G02: `docs/specs/**`, `.agentdev/drafts/**`）。req-save/spec-save のコマンド定義・責務・ガードレール自体は変更しない（CR-002）
-- **QG-1〜QG-4 の継承**: case-auto は QG を独自実装しない。構成コマンド（req-save: QG-1, case-open: QG-2, case-run: QG-3, case-close: QG-4）がそれぞれ `agentdev-quality-gates` スキルを参照して Gate を適用。case-run インライン実行時、QG-3 前置 staleness check、targeted docs guard は case-auto が case-run.md に従って実行（G07, G09）
-- **タイムスタンプ計測（L1）**: 各工程（req-save+spec-save 統合委譲 / case-open / case-run / case-close）の起動直前・直後に壁時計タイムスタンプ（JST）を記録。Step 8 完了報告・Step 7 停止報告の工程別内訳として使用。全体開始・終了時刻記録を廃止せず工程別内訳を併記。ハーネス内部メトリクス（L3）は対象外。case-run 内の L2 計測は case-run result に含まれ、case-auto は case-run インライン実行の壁時計時間（L1）として扱う
-- **インライン実行時のコンテキスト管理**: harness の機能（compress 等）で対応し、AGENTS.md / references/<harness>.md に配置。親コンテキスト非累積は case-run インライン実行時の例外として取り扱う。インライン実行の適用を完了報告（Step 8）に記録
-
-#### 工程別契約
-
-case-auto は各工程を以下の契約で起動する:
-
-| 工程 | 起動方式 | inputs | output_contract |
-|---|---|---|---|
-| req-save + spec-save | 委譲（1 統合委譲、AG-005） | draft path, OU ID | 保存済みREQ/ADRリスト, 保存済みSPECリスト, draft status=saved, SPEC消費済みフラグ, pass/warn/fail, **artifact_action 適用結果（action id ごとに applied/skipped/failed/no-op）** |
-| case-open | 委譲 | draft path, OU ID | Issue番号(Epic含む), pass/warn/fail, **OU lifecycle: Issue 作成 完了/未完了** |
-| case-run | インライン実行（case-run.md を authoritative source として読み込み、case-auto が準備/クリーンアップフェーズを自ら実行、実行担当サブエージェントへ直接委譲、AG-001/002） | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の子Issue を case-auto が並列委譲、最大5件） | completed-pr/blocked/failed/delegation-unavailable（Epic Wave 実行時は子Issue ごとの結果集合）, **OU lifecycle: PR 作成 完了/未完了（completed-pr のみ完了）** |
-| case-close | 委譲 | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の一括クローズ） | マージ結果, Capture保存結果, 削除済みブランチ, pass/warn/fail, Epic 最終 Wave 判定結果, **OU lifecycle: PR マージ完了/未完了、Issue クローズ完了/未完了** |
-
-各工程の side_effect_boundary は対応するコマンド定義のガードレールに従う。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture、.agentdev/ commit/push 等）は各コマンド定義に従う（case-run インライン実行時の worktree クリーンアップは case-auto が case-run.md に従って実行）。
-
-case-auto は req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
-
-case-auto は各工程の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。
-
-#### 結果状態の4次元集約
-
-case-auto は各工程の結果を以下の4状態次元で保持し、集約時に混同しない。各工程の `output_contract`（工程別契約表）がこれらの情報源となる。warn を pass へ変換する集約は禁止する。
-
-| 次元 | 取得元 | 値 |
-|---|---|---|
-| (1) 工程結果 | 全工程の `pass/warn/fail`（工程別契約表） | pass / warn / fail |
-| (2) artifact_action 適用結果 | req-save+spec-save 統合委譲の `artifact_action 適用結果`（action id ごと） | applied / skipped / failed / no-op |
-| (3) 定義適用工程の完了状態 | (1)(2) の組み合わせから導出 | 定義適用完了 / 警告付き工程完了 / 定義適用未完了 |
-| (4) OU ライフサイクル完了状態 | case-open（Issue 作成）、case-run（PR 作成）、case-close（PR マージ、Issue クローズ）の各成否 | 各ライフサイクル事象ごとに 完了 / 未完了 |
-
-集約規則:
-
-- **(3) 定義適用工程完了状態の導出**: 定義適用工程（req-save + spec-save）の完了状態は次で導出する:
-  - 全必須 action が `applied` または正当な `no-op` で、工程結果 (1) が `pass` → **定義適用完了**
-  - 全必須 action が `applied` または正当な `no-op` で、工程結果 (1) が `warn` → **警告付き工程完了**（warn を pass へ変換しない）
-  - 必須 action に `skipped` または `failed` が1件以上ある → **定義適用未完了**（この場合は「定義適用完了」または「警告付き工程完了」と報告しない）
-  - 「正当な no-op」とは、対象外 artifact（例: spec-save における `artifact: spec` entry 不存在、後方互換の `artifact_actions` フィールド不存在）による action 不実施を指す。正当な理由なく必須 action を飛ばした場合は `skipped` として扱う
-- **(4) OU ライフサイクル完了状態の独立性**: OU ライフサイクル完了状態は (3) の完了状態と独立して扱う。req-save/spec-save が成功（(3) が定義適用完了/警告付き工程完了）していても case-open（Issue 作成）が未実行なら OU ライフサイクルは未完了と報告する
-- **Phase 0 と OU 完了の分離**: Phase 0 成功（artifact_actions 適用完了 = (3) が定義適用完了/警告付き工程完了）と OU 完了（Issue/PR/Case 完了 = (4) の全ライフサイクル事象完了）を別々に報告する。一方を他方へすり替えて報告しない
-- **warn 変換禁止**: (1) が warn の工程を pass として集約しない。完了報告には warn を warn のまま残す
-
-#### case-open 完了後の分岐
-
-case-open 委譲の完了後、出力を確認して以下のいずれかに分岐:
-
-- **Standard flow（単一 Issue）**: case-open 委譲が共通終了処理（コメント追加、ドラフト削除、RU削除、完了報告）を完了していることを確認 → クリーンアップ検証ゲート（後述）→ 既存の直列フロー（case-run → case-close）
-- **Epic Issue flow（マルチREQ または 単一REQ Epic flow）**: 同上の確認 → クリーンアップ検証ゲート → Wave 反復制御（後述）
-
-**req_draft reader lifecycle**: case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込む。case-open 成功後は invalid post-case reader として req_draft を読まず、停止、再開、完了処理は Issue と Epic だけで成立させる（G19）。クリーンアップ検証ゲートでドラフト削除を検証するのもこの lifecycle に由来する。
-
-#### Wave 反復制御（case-auto 直接制御、AG-003）
-
-Epic Issue 番号を記録。Epic Issue 本文（SSoT）から Wave 構成・各子Issue ステータスを読み取る（**読み取りのみ、Epic Issue 本文の書き込みは case-close の単一書き手責務**、G16）。case-run(#epic) への委譲は行わない。各子Issue ごとにインライン case-run を実行。以下の反復ループを実行:
-
-1. **現在 Wave の ready 子Issue 選択**: Epic Issue 本文（ステータス追跡テーブル）から現在 ready な Wave の子Issue を特定。`ready` がない場合、依存が満たされた `pending` Issue を `ready` に遷移させて選択。前提Issue が blocked/failed の場合は `pending` のまま選択対象外。各子Issue の worktree 作成前に `git fetch origin` を実行し、origin/main の鮮度を確認（`agentdev-git-worktree` 参照）
-
-2. **各子Issue のインライン case-run 並列実行**（最大5件）: 各 ready 子Issue を adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ case-auto から直接並列委譲。各子Issue ごとに case-run.md に従い準備フェーズ（worktree 作成、委譲 prompt 構築、QG-3 前置 staleness check、targeted docs guard）を case-auto が実行し、実行担当サブエージェントへ委譲、result 処理、クリーンアップフェーズを実行。委譲の起動手段・実行制御パラメータは AGENTS.md / references/<harness>.md 参照。1 Wave の実行（PR作成まで）で次工程へ進む
-
-3. **委譲→case-close(#epic)**: インライン case-run の結果（子Issue ごとの completed-pr/blocked/failed/delegation-unavailable）を確認。completed-pr の子Issue がある場合、Epic Issue 番号を case-close 委譲に渡す。case-close は現在 Wave の PR作成済み子Issue を一括マージ・クローズし、Epic status table を更新（単一書き手）、最終 Wave 判定を行う
-
-4. **次 Wave 判定**: case-close 委譲の結果から Epic 全 Wave 完了可否を判定:
-   - **全 Wave 完了（Epic クローズ済み）**: Epic 完了報告（Step 8）へ進む
-   - **残 Wave あり**: 手順 1（現在 Wave の ready 子Issue 選択）に戻り次 Wave を実行（べき等、Epic Issue 本文から進行状況判定）
-
-5. **blocked/failed の扱い**: インライン case-run が blocked/failed を返した子Issue は case-close 対象外。一部 completed-pr がある場合は case-close(#epic) で completed-pr のみ処理し、その後停止条件（Step 7）の判定へ。全子Issue が blocked/failed の場合は Wave 反復を停止し部分完了報告（Step 8）へ。停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告
-
-#### OU 処理順序
-
-- 必須依存（`depends_on`）で結合した execution_unit 群は順次処理
-- 必須依存のない execution_unit 群は並列実行。本並列は3つの「5件」文脈のうち **execution_unit 全体並列（上限なし）** に該当し、**case-run Wave 内子 Issue 並列上限（最大5件）** および **orchestration stage 2 同時起動数（最大5件）** とは別文脈である。3つの「5件」は混同しない（文脈別の区別は epic-wave-model SPEC「並列上限と停止条件の整理」セクション参照）。ファイル衝突等の技術的依存（L0-L3）は並列判定軸から外し直列化要因としない
-- `recommended_order` は処理順序のヒントであり直列化ゲートではない
-- Standard flow でも Epic flow でも適用。Standard flow で case-close完了後に未処理 OU が残れば、当該 OU の `artifact_actions` に応じた工程分岐で Step 2 に戻り次 OU の処理を開始。全 OU 処理完了でのみ全体完了報告。次 OU の draft ファイル不在時は停止し報告
-- 複数の必須依存のない execution_unit を case-open 委譲が自動的に Epic Issue 化し Wave 1 に全 OU を配置（G21）。並列実行完了後、残りに必須依存のある execution_unit があれば順次処理
-- 採番・index 更新・draft 更新・commit・push・Epic 本文更新は各工程が対応するコマンド定義に従い、並列実行の完了を待ってから実行（直列集約）
-
-#### クリーンアップ検証ゲート
-
-Standard flow の case-run 移行前、Epic Issue flow の Wave 反復制御開始前の双方で以下を検証:
-
-- ドラフトファイル（`.agentdev/drafts/req-draft-*.md`）が削除されていること。残存時は停止し手動削除を依頼
-- 当該ケースで消費した RU ファイル（`.agentdev/backlog/req-units/RU-*.md`）が削除されていること。残存時は停止し手動削除を依頼
-- 検証結果（成功、残存ファイル一覧）を case-auto 完了報告（Step 8）に含める
-
-#### 委譲起動判定（AG-004）
-
-委譲工程（req-save / spec-save / case-open / case-close）の委譲起動後または起動失敗時に委譲起動可否を判定。本判定は委譲工程のみに適用し、case-run インライン実行時の実行担当サブエージェントへの委譲失敗には適用しない（後述）。
-
-**委譲起動不能トリガー**:
-1. 委譲起動失敗（ツール不在、ハードリジェクト、agent type 拒否）
-2. 委譲結果が blocked/failed で、理由が委譲 chain 破綾（起動失敗、ネスト委譲制限等）
-
-genuine blocker（実装上の問題、スコープ外操作、コンフリクト解消不能等）は `delegation-unavailable` 対象外。Step 7 停止条件として扱う。
-
-**判定材料**: 委譲工程 result 本文、Issue コメント（SSoT）、エラーメッセージのパターンマッチ（"Invalid agent type", "Only explore, librarian are allowed", "delegation not available" 等）。パターンに合致しない blocked/failed は genuine blocker として扱い、`delegation-unavailable` とはしない（安全側に倒す）。
-
-**委譲起動不能時の扱い**:
-- 当該工程を `delegation-unavailable` として報告。委譲工程のインライン実行への切替えは行わない
-- context 管理（compress 等）は harness の責務として AGENTS.md / references/<harness>.md に配置
-- 親コンテキスト非累積は委譲起動不能時の例外として取り扱う
-- `delegation-unavailable` 発生を完了報告（Step 8）に記録
-
-**case-run インライン実行時の実行担当サブエージェント委譲失敗の扱い（AG-004）**: 本節の `delegation-unavailable` 停止条件には該当しない。case-run result 契約（completed-pr / blocked / failed / delegation-unavailable）に従い処理。`delegation-unavailable` を返した場合は当該子Issue を `pending` に戻す。詳細な事後処理（worktree の `git status` 確認、残留箇所の grep、手動修正または PR 化）は `agentdev-case-run-execution-adapter` スキル参照
-
-#### Subagent 委譲プロトコル（category 選定、MUST NOT DO 必須）
-
-case-auto が各工程を subagent へ委譲する際、委譲 prompt の category と MUST NOT DO セクションは以下の要件を満たす（Issue #1538 由来）。本要件は case-auto 委譲時に限定せず、subagent 委譲する全場面（case-auto/ case-open/ case-run/ case-update/ case-close）に共通適用する。case-run インライン実行時の実行担当サブエージェント委譲も本要件に従う。
-
-**category 選定ガイドライン**:
-
-- 委譲先 command の責務（事務的手続き、実装作業、執筆作業等）と category 名の意味的距離を評価し、subagent の振る舞いを誤誘導しない category を選定する
-- command 名と category 名の意味的距離が大きい場合、subagent が関連スキルを発火させ本来責務から逸脱するリスクがある。Issue #1538 では case-open を `category=writing` で委譲した際、`japanese-tech-writing` 等の発火スキルと相互作用して subagent が文書監査ファイル生成や draft 作成へ逸脱した
-- category 別の推奨用途:
-  - **`unspecified-high`**: 事務的手続き（Issue 作成、VERIFY、ラベル設定、状態遷移、コメント追加、ファイル移動等）の委譲。既定の category であり特定の発火スキルと結合しないため事務的手続きに適する
-  - **`writing`**: 執筆作業（docs 記述、article 作成、REQ/ ADR/ SPEC 本文執筆等）の委譲のみに限定する。事務的手続き委譲に `writing` を使用してはならない
-
-**MUST NOT DO セクション必須化**:
-
-- 全ての委譲 prompt に MUST NOT DO セクションを必須とする。スコープ外作業を明示的に列挙し、subagent がスコープ境界を推定せずに従えるようにする
-- MUST NOT DO に列挙すべき代表的項目:
-  - 当該 command 責務外のファイル作成（例: case-open 委譲での文書監査ファイル、draft、replacement-dictionary 等の生成）
-  - REQ/ SPEC/ src の直接修正（当該 command に許可されていない場合）
-  - 文書監査の実施（`japanese-audit` 等の監査ファイル生成、`japanese-tech-writing` 等の発火スキルによる監査的振る舞い）
-  - スコープ外調査、スコープ外実装、capture 境界を超える `.agentdev/` 直接変更
-- MUST NOT DO の記載は特定 command に限定せず、subagent 委譲する全場面で共通適用可能な形とする
-
-**subagent 委譲プロンプトテンプレート要件**:
-
-- 委譲 prompt の標準テンプレートは category 選定基準と MUST NOT DO 記載要件を統合した形式をとる
-- case-auto、case-open、case-run、case-update、case-close の全委譲場面で共通適用可能な形とし、特定 command 名と category 名の意味的距離が大きい場合の注意事項を含む
-- case-auto は各工程の委譲 prompt 構築時に本要件を適用する（case-run インライン実行時の実行担当サブエージェント委譲も含む）。委譲プロトコルと category 設計の関係整理は `agentdev-case-run-execution-adapter` スキル参照
-
-#### orchestration stage モデル
-
-case-auto が複数対象を処理する場合、orchestration stage モデルを採用する。orchestration stage は case-auto が管理する command 間進行であり、case-run internal lifecycle（単一 Issue または Wave 内の準備、実行、提出）とは別の概念である（responsibility-boundary-purification SPEC「case 実行責務の 4 用語と所有者」参照）。
-
-- **orchestration stage 1**: 全対象の case-open を順次実行する
-- **orchestration stage 2**: case-run を bg task として最大5件ずつ並列実行し、結果と破棄を収集する
-- **orchestration stage 3**: case-close を順次実行する
-
-各 orchestration stage は前 stage の対象処理の完了後に開始する。orchestration stage 1 と 3 を main push と capture の直列集約ポイントとし、commit も並列実行区間の外で処理する。
-
-並列実行はデフォルト挙動とし、bg task を利用できない場合のみ順次フォールバックへ切り替え、フォールバック理由を完了報告（Step 8）に含める。実行担当サブエージェント内部の制御と bg task API の具体は harness 側に維持し、case-auto は起動 API と引数仕様を規定しない（`references/<harness>.md` 参照）。
-
-#### 子 task bg task 破棄検知時の回復（AG-001〜AG-004）
-
-orchestration stage 2 で起動した子 task の bg task がシステムにより破棄されたことを検知した場合、case-auto 親ループが当該子 task の状態を回復する。回復契約の詳細は SPEC `case-auto SPEC`「子 task 中断回復パス」セクションを正とし、本節はその実行指示を記載する。
-
-**中断検知と3状態分類（AG-001）**: 子 task の bg task 破棄を検知した場合、当該子 task の worktree で `git status` を実行し、以下の3状態のいずれかに分類する。
-
-| 状態 | 判定条件 |
-|---|---|
-| (a) commit 済み、PR 未作成 | commit 履歴があるが PR が未作成 |
-| (b) 未コミット変更あり | worktree に未コミット変更が残留 |
-| (c) クリーン | commit 履歴も未コミット変更もない |
-
-状態 (c) クリーンの場合は回復対象がないため回復処理をスキップし、当該子 task を pending へ戻す。状態 (a) (b) はそれぞれ後述の手順へ進む。
-
-**状態 (a) の回復（commit 済み、PR 未作成、AG-002）**: case-auto 親ループが当該 worktree で回復処理を代行する。
-
-1. `git rebase origin/main` で最新の main へ追従する（必要時）。rebase で解消できないコンフリクトは「コンフリクト解消モデル（3レベルエスカレーション）」の Level 2/3 へ委譲する
-2. `git push` でリモートへ反映する
-3. PR 作成を代行する。PR の base branch、タイトル、本文は子 task の Issue 紐づく情報（Issue 番号、Issue タイトル、受け入れ条件、work_type）から生成する
-4. 作成した PR 番号を子 task の result に `completed-pr` として記録する
-5. 通常の case-close フローへ合流させる
-
-回復時の PR 作成代行は case-auto 親ループの責務であり、子 task 側で再び委譲を起こさない。
-
-**状態 (b) の回復（未コミット変更あり、AG-003）**: 未コミット変更の帰属は安全上の懸念となるため、作業意図整合確認ステップを必須とする。安全のため未確認の変更を強制 commit しない。強制 commit は帰属不明の変更を本流へ持ち込む原因となる。
-
-1. worktree の変更内容（`git diff`、`git status`）を確認する
-2. 変更内容が子 task の case-run 作業意図（Issue の受け入れ条件、実装計画）と整合するかを確認する
-3. 整合確認ができた場合のみ commit、push、PR 作成を代行する（PR 生成情報の Issue 紐づけは状態 (a) と同じ）
-4. 整合確認できない場合（別 Issue 由来の変更混入、意図不明の変更等）は当該子 task を `blocked` とし、停止理由を「未コミット変更の帰属不明」（Step 7 停止条件 (10)）として報告する
-
-**子 task ライフサイクルと成果物ライフサイクルの分離（AG-004）**: 子 task の bg task 破棄は子 task のライフサイクル事象であり、当該子 task が作成中の成果物（commit、PR）のライフサイクルとは独立に扱う。回復処理はこの分離を維持し、子 task の状態（pending 戻し、blocked 報告等）と成果物の状態（PR 作成済み、未作成等）を別々に管理する。bg task 破棄が子 task の成果物へ意図せぬ影響を与えることをこの分離によって防ぐ。
+case-auto は各工程の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）
 
 ### Step 5: 工程間の状態引き継ぎ
 
@@ -247,103 +60,23 @@ req-save 委譲の出力から複数 REQ doc または scale:large を検出し�
 
 ### Step 7: 停止条件の検出
 
-以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する（11項目）:
+以下のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する（11項目）: (1) req-define合意要件からの逸脱、(2) 要件未合意のscope拡大、(3) repo外実体変更の必要性、(4) DB migration実行の必要性、(5) deploy/applyの必要性、(6) 認証・秘密・権限変更の必要性、(7) CI/test/lint失敗がself-healing不能、(8) コンフリクト解消モデル Level 1〜3 全てを試行しても解消不能なコンフリクト（Level 2 インライン case-run 再実行を上限回数 2回試行しても解消しない場合、機械的競合 Level 1 で自動解決可能は停止条件外、remote hash 不一致は停止条件）、(9) 作成元不明branch/user-owned branch/他作業branchの削除検出、(10) 未コミット変更の帰属不明、(11) command 契約・実装不整合（execution_unit へ分割可能にも関わらず case-open が単一 Epic 子 Issue 上限により停止した場合を含む）
 
-- (1) req-define合意要件からの逸脱（合意済み要件、対象外、受け入れ条件の変更、合意されていない機能要件または制約の追加、合意済み OU の欠落・統合・分割による要件の意味変更のみに限定）
-- (2) 要件未合意のscope拡大
-- (3) repo外実体変更の必要性
-- (4) DB migration実行の必要性
-- (5) deploy/applyの必要性
-- (6) 認証、秘密、権限変更の必要性
-- (7) CI/test/lint失敗がself-healing不能
-- (8) コンフリクト解消モデル（後述）の Level 1〜3 すべてを試行しても解消不能なコンフリクト。操作的定義: Level 2 のインライン case-run 再実行を上限回数（2回、元の並列実行を含む計3回の case-run 実行）試行してもコンフリクトが解消しない場合。機械的競合（Level 1 rebase で自動解決可能）は停止条件に含めない。remote hash 不一致は従来通り停止条件
-- (9) 作成元不明branch / user-owned branch / 他作業branchの削除検出
-- (10) 未コミット変更の帰属不明
-- (11) command 契約・実装不整合（case-open または後続工程の契約と実装が整合しない場合、execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合を含む）
-
-**停止時タイミング情報の追記**: 停止報告に `case_auto_started_at`（開始時刻）、停止時刻（JST、人間が読みやすい形式: 例 `2026-06-21 15:30:00 JST`）、経過時間（停止時刻 − 開始時刻、人間が読みやすい形式: 例 `12分34秒`、全体合計）、Step 4 で記録した工程別タイムスタンプ内訳（停止時点までの工程分）を含めること
+**停止時タイミング情報の追記**: 停止報告に `case_auto_started_at`、停止時刻（JST、人間が読みやすい形式）、経過時間、Step 4 で記録した工程別タイムスタンプ内訳（停止時点までの工程分）を含める
 
 ### Step 7-1: 停止理由分類
 
-Step 7 の停止条件を検出した場合、停止理由を以下の分類で報告する。分類は再開コマンド選択とユーザー通知の精度向上が目的であり、HITL 境界の変更ではない。停止条件11項目を以下の分類軸へ整理する:
-
-| 分類 | 対応停止条件 | 定義 |
-|---|---|---|
-| req-define 合意要件からの逸脱 | (1) | case-open または後続工程が合意済み要件、対象外、受け入れ条件を変更した場合、合意されていない機能要件または制約を追加した場合、合意済み OU を欠落・統合・分割して要件の意味を変更した場合 |
-| command 契約・実装不整合 | (11) | execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証が実装されていない場合 |
-| 要件未合意のスコープ拡大 | (2) | 合意されていないスコープが実行中に追加された場合 |
-| repo 外実体変更 | (3)(4)(5)(6) | DB マイグレーション実行、デプロイ/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更が必要な場合 |
-| CI/test/lint 失敗 | (7)(8) | コンフリクト解消モデルの Level 2 まで試行しても自己修復不能な場合 |
-| branch 削除検出 | (9) | 作成元不明 branch / user-owned branch / 他作業 branch の削除を検出した場合 |
-| 未コミット変更の帰属不明 | (10) | 変更の由来が不明で安全に続行できない場合 |
-
-execution_unit 分割可能性があるにもかかわらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する。これは case-open の契約・実装不整合であり、要件doc 側の問題ではない。
+Step 7 の停止条件を以下の分類軸で報告する（HITL 境界の変更ではなく、再開コマンド選択とユーザー通知の精度向上が目的）: req-define 合意要件からの逸脱 ((1))、command 契約・実装不整合 ((11))、要件未合意のスコープ拡大 ((2))、repo 外実体変更 ((3)(4)(5)(6))、CI/test/lint 失敗 ((7)(8))、branch 削除検出 ((9))、未コミット変更の帰属不明 ((10))。execution_unit 分割可能性があるにも関わらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する（case-open の契約・実装不整合であり要件doc 側の問題ではない）。各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-orchestration` を参照
 
 ### Step 8: 完了報告
 
 最終工程（case-close 委譲）の完了報告をそのまま出力する。Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、G16）。停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する
 
-**停止理由分類の完了報告テンプレート拡張**: Step 7 経由で停止した場合、停止報告（完了報告の停止時フォーマット）に Step 7-1 の停止理由分類を含める。停止報告テンプレートに以下の項目を拡張する:
-
-- 停止理由分類
-- 該当停止条件番号（11項目のいずれか）
-- 分類の根拠（具体的な発生状況、対象ファイル、対象 Issue 等の識別子）
-- 再開コマンド候補（分類に基づく推奨再開手段）
-
-**タイミング情報の追記**: 完了報告生成時刻（Step 8 開始時点）を JST で記録する。case-close の完了報告（テンプレート）は変更せず、case-auto が以下を追記すること:
-
-- 開始時刻: Step 1 で記録した `case_auto_started_at`
-- 終了時刻: 完了報告生成時刻
-- 所要時間: 終了時刻 − 開始時刻（人間が読みやすい形式: 例 `12分34秒`、全体合計）
-- **工程別タイムスタンプ内訳（L1）**: Step 4 で記録した工程別（req-save+spec-save 統合委譲 / case-open / case-run / case-close）の起動前後タイムスタンプ・工程別所要時間。スキップした工程（例: SPEC artifact_actions がない場合の spec-save スキップ時、統合委譲は req-save 単体で実行）は除外可。case-run の L2 内訳は case-run result から読み取って含める
-- **インライン実行の記録**: case-run をインライン実行した旨を実行結果に記録
-
-停止条件による中断時（Step 7 経由）の報告にも、上記と同じ形式で開始時刻・停止時刻・経過時間・工程別タイムスタンプ内訳を含めること（停止時刻を終了時刻として扱う、停止時点までの工程別内訳のみ）
-
-**OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（OU処理順序は Step 4「OU処理順序」サブセクションに準拠）。全 OU の処理が完了した場合のみ全体完了報告を出力する。OU処理中に停止条件（Step 7）を検出した場合も完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する
-
-**orchestration stage 別結果・フォールバック理由・破棄回復記録**: 完了報告には orchestration stage 1（case-open 順次実行）、stage 2（case-run 並列実行）、stage 3（case-close 順次実行）の各 orchestration stage の実行結果を含める。orchestration stage 2 を順次フォールバックで実行した場合はその理由を記録する。orchestration stage 2 の bg task 破棄を検知して回復した場合は、検知した状態区分（commit 済みで PR 未作成、未コミット変更残存）と回復結果を記録する。
-
-**結果状態の4次元報告**: 完了報告（停止時フォーマットを含む）には Step 4「結果状態の4次元集約」の4状態次元を次の形式で含めること。warn を pass へ変換して集約しないこと。
-
-- **(1) 工程結果**: 各工程（req-save+spec-save / case-open / case-run / case-close）の `pass/warn/fail` を工程別に列挙
-- **(2) artifact_action 適用結果**: 定義適用工程（req-save+spec-save）の action id ごとに `applied/skipped/failed/no-op` を列挙
-- **(3) 定義適用工程の完了状態**: `定義適用完了` / `警告付き工程完了` / `定義適用未完了` のいずれかとその根拠（warn の有無、必須 action の skipped/failed 有無）。必須 action に `skipped/failed` が1件以上ある場合は `定義適用未完了` と報告し、`定義適用完了`/`警告付き工程完了` と報告しない
-- **(4) OU ライフサイクル完了状態**: Issue 作成、PR 作成、PR マージ、Issue クローズの各事象ごとに `完了/未完了` を列挙。(3) が定義適用完了/警告付き工程完了であっても (4) のいずれかが未完了なら OU 完了とは報告しない
-
-Phase 0 成功（(3) の定義適用完了/警告付き工程完了）と OU 完了（(4) の全ライフサイクル事象完了）は別々に報告する。一方を他方へすり替えて報告しない。
+完了報告には以下を含める（停止時フォーマットを含む）: 停止理由分類（Step 7-1 経由）、開始時刻・終了時刻・所要時間（人間が読みやすい形式）、工程別タイムスタンプ内訳（L1、req-save+spec-save 統合委譲 / case-open / case-run / case-close、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める）、インライン実行の記録（case-run をインライン実行した旨）、orchestration stage 別結果・フォールバック理由・破棄回復記録（stage 1 case-open / stage 2 case-run / stage 3 case-close、stage 2 を順次フォールバック時は理由、bg task 破棄を検知して回復した場合は状態区分と回復結果）、結果状態の4次元報告（(1) 工程結果 pass/warn/fail / (2) artifact_action 適用結果 applied/skipped/failed/no-op / (3) 定義適用工程の完了状態: 定義適用完了・警告付き工程完了・定義適用未完了 / (4) OU ライフサイクル完了状態: Issue 作成・PR 作成・PR マージ・Issue クローズ の各完了/未完了、warn を pass へ変換して集約しない、Phase 0 成功と OU 完了は別々に報告）。**OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（全 OU 処理完了時のみ全体完了報告）
 
 ## コンフリクト解消モデル（3レベルエスカレーション）
 
-PR マージコンフリクト発生時（case-close Step 4-2 からのエスカレーション受領時）は、以下3レベルのエスカレーションで解消を図る。各レベルを試行しても解消できない場合のみ次のレベルへ進む。**機械的競合（rebase で自動解決可能）は停止条件に含まず**、Level 1 で case-close が解消する（Level 1 は case-close Step 4-2 の責務、本節では Level 2/3 の case-auto 責務を定義する）。
-
-| Level | 実行主体 | 解消手法 | 失敗時 |
-|---|---|---|---|
-| Level 1 | case-close | `git rebase` による機械的解消。自動解決時は再マージ | case-auto へエスカレーション |
-| Level 2 | case-auto | 両PRのdiffを読み取りコンフリクト箇所を特定し、コンフリクト文脈を付けてインライン case-run を再実行。最大2回（元の並列実行を含む計3回の case-run 実行、AG-005） | Level 3 へ |
-| Level 3 | case-auto | マージ順序変更、blocked 単位の隔離 | 停止 |
-
-### Level 2: コンフリクト文脈付きインライン case-run 再実行（AG-005）
-
-case-close（Step 4-2）からのエスカレーションを受領した場合、以下を実行する:
-
-1. **コンフリクト箇所特定**: コンフリクト発生した両PR（先にマージされたPR、コンフリクトしたPR）の diff を読み取り、コンフリクト箇所（ファイル、行、変更意図）を特定する
-2. **コンフリクト文脈の構築**: コンフリクト箇所、両PRの変更意図、解消方向性のヒントを「コンフリクト文脈」として構築する。実装の正解を与えず、解消に必要な情報を提供する
-3. **インライン case-run 再実行**: コンフリクト文脈を付けてインライン case-run を再実行する（case-run への再委譲ではなく、AG-005）。委譲 prompt にコンフリクト文脈を明示し、当該 Issue の再実装を実行担当サブエージェントへ委譲する
-4. **再実行上限カウンタ**: 再実行回数をカウントする。**最大2回**（元の並列実行を含む計3回の case-run 実行）を上限とする。上限到達時は Level 3 へ進む
-
-**発生元非依存**: case-auto はコンフリクト解消に対して常に全力で解消を図る。コンフリクトの発生元（同一 case-auto 内の並列実行、別 case-auto 跨ぎ）に関わらず、アクセス可能な文脈（両PRのdiff、Issue本文、PR本文、関連REQ/ADR/SPEC）を総動員してコンフリクト文脈を構築する
-
-### Level 3: オーケストレーション級判断
-
-Level 2 のインライン case-run 再実行を上限回数試行してもコンフリクトが解消しない場合、以下のオーケストレーション級判断を試みる:
-
-- **マージ順序変更**: コンフリクトしている複数 PR のマージ順序を変更し、コンフリクトを回避できるか検討する
-- **blocked 単位の隔離**: コンフリクト解消不能な execution_unit を blocked として隔離し、他の ready execution_unit は継続実行する
-
-### 停止条件の段階化
-
-Level 1（case-close rebase）→ Level 2（case-auto インライン case-run 再実行、最大2回）→ Level 3（オーケストレーション級判断）の順に試行し、**すべてを試行しても解消できない場合のみ停止**する。操作的定義: Level 2 のインライン case-run 再実行を上限回数（2回）試行してもコンフリクトが解消しない場合。Level 1 で解消できる機械的競合は case-auto の停止条件から除外する（Step 7(8) の停止条件参照）
+PR マージコンフリクト発生時（case-close Step 4-2 からのエスカレーション受領時）は、以下3レベルのエスカレーションで解消を図る。各レベルを試行しても解消できない場合のみ次のレベルへ進む。**機械的競合（rebase で自動解決可能）は停止条件に含まず**、Level 1 で case-close が解消する（Level 1 は case-close Step 4-2 の責務、本節では Level 2/3 の case-auto 責務を定義する）。Level 1（case-close、`git rebase` による機械的解消、自動解決時は再マージ、失敗時 case-auto へエスカレーション）、Level 2（case-auto、両PRのdiffを読み取りコンフリクト箇所を特定しコンフリクト文脈を付けてインライン case-run を再実行、最大2回＝元の並列実行を含む計3回の case-run 実行 AG-005、失敗時 Level 3 へ）、Level 3（case-auto、マージ順序変更、blocked 単位の隔離、失敗時停止）。Level 2 コンフリクト文脈付きインライン case-run 再実行（AG-005）、Level 3 オーケストレーション級判断、発生元非依存、停止条件の段階化の詳細は `agentdev-workflow-orchestration` を参照
 
 ## ガードレール
 
