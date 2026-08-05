@@ -58,3 +58,41 @@
 - **関連**: PR #1921、Issue #1918、agentdev-gh-cli WRITE 標準手順
 - **タグ**: `#learning` `#windows` `#encoding` `#git-commit` `#powershell-bom`
 
+
+---
+
+## worktree-per-WP モデルでの gitignore 対象ファイルの受け渡し判断基準
+
+- **問題事象**: worktree-per-WP モデル（case-auto が各 WP ごとに独立 worktree を作成）で、gitignore 対象ディレクトリ（`.omo/`）配下のファイルを後続 WP へ受け渡す必要がある場合、各 worktree は独立した working tree を持つため local-only の gitignore 対象ファイルは後続 WP の worktree から参照できない
+- **発生局面**: 実装（WP-0 case-run、移行証拠ファイル永続化時）
+- **検知方法**: PR #1932 case-run 実装中、`.omo/` が gitignore 対象のため `git add` で追跡できず、`git add -f` で強制追加する必要を確認。worktree-per-WP モデルで後続 WP への受け渡し要件と照合し判断基準の検討課題として PR 本文 Findings へ記録
+- **根本原因**: worktree は独立した working tree を持つため、親 worktree の untracked / gitignore 対象ファイルは子 worktree へ引き継がれない。gitignore 対象を追跡対象へ昇格しない限り、commit 経由でしか受け渡せない
+- **自律対応内容**: WP-0 では `.gitignore` を変更せず（SPEC 変更スコープ外）、`git add -f .omo/plans/agentdev-migration-2026-08-05.*` で証拠ファイルのみ明示追加。`.gitignore` の `.omo/` エントリは維持し、証拠ファイルのみ例外的に追跡対象化
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（本件は運用方針の判断基準であり、REQ/ADR/SPEC の変更を要さない。`.gitignore` 運用はプロジェクト固有）
+- **横展開観点**: worktree-per-feature / worktree-per-issue 等の worktree 分割モデル全般で、gitignore 対象のビルド成果物・証拠ファイル・キャッシュを後続 worktree へ受け渡す際に同問題が発生し得る
+- **再発条件**: worktree-per-WP / worktree-per-issue モデルで、gitignore 対象ディレクトリ配下のファイルを複数 worktree 間で共有する必要がある場合
+- **予防策候補**: (a) `.gitignore` に `!<path>` 例外を追加して追跡対象化（堅牢、忘却リスク低）、(b) 各 case-run の完了条件へ「gitignore 対象証拠ファイルが main へ反映済み」を明示（運用でカバー）、(c) 証拠ファイル配置先を gitignore 対象外へ変更（構造変更）。ワークフロー特性に応じて選択
+- **想定反映先**: 移行計画 `.omo/plans/agentdev-migration-2026-08-05.md`（WP-1 で方針確定時）、agentdev-git-worktree skill references（worktree-per-issue モデルの注意点として一般化可能）
+- **関連**: PR #1932、Issue #1925（WP-0）、Epic #1924、`.gitignore` L11
+- **タグ**: `#learning` `#worktree` `#gitignore` `#worktree-per-wp` `#evidence-persistence` `#git-add-force`
+
+
+---
+
+## worktree 環境で junction 依存 checker が skip される制約
+
+- **問題事象**: Integrity Checker の `source-projection-sync` チェックは git worktree 環境で「Skipped inside git worktree（junctions not recreated）」となり、junction 整合性が検証されない。worktree では junction（Windows のディレクトリシンボリックリンク）が再作成されないため、原本リポジトリの `src/opencode/` と配布先（`.opencode/commands/agentdev/` 等）の接続整合性を検証できない
+- **発生局面**: 実装（WP-0 case-run、変更前検査実行時）
+- **検知方法**: WP-0 case-run で `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --json --root .` を worktree 内で実行した際、`source-projection-sync` 結果が info「Skipped inside git worktree」となることを確認
+- **根本原因**: git worktree は `.git` ディレクトリを共有するが working tree は独立しており、post-checkout / post-merge フック等で再作成される前提の junction が worktree では作成されない。checker 側は worktree 検出時に skip する安全側に倒れている
+- **自律対応内容**: worktree 環境での検査結果は「skip」として記録し、メインリポジトリでの再評価を WP-6 の作業候補として PR 本文 Findings へ記録。WP-0 のスコープでは junction 再作成を試みず、変更前状態の記録として保持
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（checker の既知の制約の記録であり、REQ/ADR/SPEC 変更を要さない）
+- **横展開観点**: worktree 運用全般で、junction / symlink / post-checkout フック依存の checker・ビルドツールは同様に skip または不完全な結果を返す可能性がある。CI と worktree で結果が乖離するリスク
+- **再発条件**: git worktree 環境で junction 依存の checker（source-projection-sync 等）を実行する場合
+- **予防策候補**: (a) 統合検証・最終検査はメインリポジトリで実行することをワークフローへ明示、(b) checker 側で worktree 検出時に警告レベルを上げて skip 理由を明示、(c) worktree でも junction 再作成を試みる option 追加（実装コスト要）
+- **想定反映先**: agentdev-git-worktree skill references（worktree での checker 制約として）、repo-agentdev-integrity SPEC / check_integrity.ts（skip 時の警告レベル調整候補）
+- **関連**: PR #1932、Issue #1925（WP-0）、Epic #1924、`.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`
+- **タグ**: `#learning` `#worktree` `#junction` `#source-projection` `#integrity-checker` `#skip-constraint`
+
