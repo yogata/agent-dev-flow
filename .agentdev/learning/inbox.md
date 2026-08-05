@@ -115,3 +115,22 @@
 - **関連**: Epic #1924、Issue #1926（WP-1）、PR #1933、移行計画 `.omo/plans/agentdev-migration-2026-08-05.md` §5.3
 - **タグ**: `#learning` `#migration-plan` `#fixture-repair` `#scope-precision` `#horizontal-expansion`
 
+
+---
+
+## command 薄型化による既存参照の行移動で baseline 比較が新規 delta を生む制約
+
+- **問題事象**: WP-4 command 薄型化で `case-run.md`、`case-close.md` 内の `repo-agentdev-integrity` スクリプト呼出し参照行が、周辺行の大規模削除に伴って元の行位置から別行へ移動した。IR-055 RuntimeReference baseline は行位置で既知参照を管理しているため、機能的に同一の参照が baseline 比較で新規 delta（unmanaged NG）として検出された。check_integrity.ts の NG 件数が 3件（IR-061 既知）から 5件（IR-061 既知3 + IR-055 delta 2）へ増加した
+- **発生局面**: 実装（WP-4 case-run、command 薄型化による大規模行削除・移動時）
+- **検知方法**: WP-4 case-run で check_integrity.ts の before（HEAD: 18002bfe）と after（HEAD: 90592b53）delta を比較し、NG +2件が IR-055 RuntimeReference delta であることを特定。PR #1936 本文「## 残リスク / follow-up」へ記録
+- **根本原因**: IR-055 RuntimeReference baseline が参照の「存在」ではなく「行位置」で既知性を管理している。command 薄型化のように行数を大幅に削減するリファクタでは、内容が同一でも参照行が移動し baseline との不一致が生じる。baseline は commit 単位で更新される前提だが、TASK MUST NOT DO「baseline を修正しない」により薄型化 PR 内で解消できない
+- **自律対応内容**: PR #1936 では baseline を更新せず（MUST NOT DO 拘束）、IR-055 delta 2件を PR 本文「残リスク / follow-up」へ明示的に記録し、WP-6（#1931 索引再生成・統合検証）での一括解消または独立 baseline メンテナンス Issue へ委譲することを推奨。機能的変更ではないことを PR 本文で証明（WP-2 PR #1934 で対応済みの `repo-*` 参照の行移動のみ）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（baseline 運用設計の改善候補。REQ/ADR/SPEC 本文の変更は伴わない。IR-055 baseline の管理粒度＝行位置ベースか内容ベースかは checker 実装の設計事項）
+- **横展開観点**: 行位置ベースで既知参照を管理する checker（RuntimeReference baseline 等）全般で、大規模リファクタ・縮約を実施すると既存参照の行移動が delta として検出される。command 薄型化、skill 統合、ファイル分割・マージ等の構造変更を伴う作業で同様の制約が顕在化する
+- **再発条件**: 行位置ベースの baseline で参照を管理する checker が存在する状態で、当該 baseline 対象ファイルの行数を大幅に削減・再構成するリファクタを実施する場合
+- **予防策候補**: (a) baseline の管理粒度を「行位置」から「参照識別子（ファイルパス + 参照名）」へ移行し行移動に鈍感にする、(b) 大規模リファクタ PR の完了条件へ「baseline 更新または delta 許容の明示」を含める、(c) checker 側で行移動のみの delta を info/warning へ再分類する option を追加する
+- **想定反映先**: repo-agentdev-integrity SPEC / check_integrity.ts（baseline 管理粒度の見直し候補）、agentdev-workflow-lifecycle（大規模リファクタ時の baseline 取扱手順）、移行計画 `.omo/plans/agentdev-migration-2026-08-05.md` §10.6（baseline 新規追加 0件 の運用解釈）
+- **関連**: Epic #1924、Issue #1929（WP-4）、PR #1936、`src/integrity/baselines/*.json`、`.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`
+- **タグ**: `#learning` `#baseline` `#integrity-checker` `#command-thinning` `#line-position-tracking` `#refactor-delta` `#wp-4` `#migration-2026-08`
+
