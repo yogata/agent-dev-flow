@@ -9,7 +9,7 @@ learning-promote コマンドの Step 13 で実行する deferred 移動（inbox
 ## 前提
 
 - Step 12（採用済み成果物生成）が完了していること
-- inbox.md、deferred.md が `agentdev-learning-pipeline` skill の「Inbox Entry Schema」に従うこと
+- inbox.md、deferred.md が `agentdev-learning-pipeline` skill の `references/inbox-and-evaluation-schema.md`（Inbox Entry Schema）に従うこと
 
 ## 手順
 
