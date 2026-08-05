@@ -10,12 +10,6 @@
       "count": 1
     },
     {
-      "file": "src/opencode/commands/agentdev/case-auto.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 1
-    },
-    {
       "file": "src/opencode/commands/agentdev/case-close.md",
       "pattern": "/repo/",
       "severity": "strict",
@@ -28,9 +22,15 @@
       "count": 1
     },
     {
-      "file": "src/opencode/commands/agentdev/case-open.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "pattern": "repo-*",
+      "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/commands/agentdev/case-run.md",
+      "pattern": "repo-*",
+      "severity": "strict",
       "count": 1
     },
     {
@@ -79,7 +79,7 @@
       "file": "src/opencode/commands/agentdev/spec-save.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
-      "count": 10
+      "count": 9
     },
     {
       "file": "src/opencode/skills/agentdev-backlog-integration/SKILL.md",
@@ -208,7 +208,7 @@
       "count": 1
     },
     {
-      "file": "src/opencode/skills/agentdev-learning-pipeline/SKILL.md",
+      "file": "src/opencode/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
       "count": 4
@@ -229,7 +229,13 @@
       "file": "src/opencode/skills/agentdev-req-analysis/SKILL.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
-      "count": 2
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-req-analysis/references/analysis-viewpoints.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
     },
     {
       "file": "src/opencode/skills/agentdev-req-analysis/references/investigation-scope-refinement.md",
@@ -307,12 +313,6 @@
       "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
-      "pattern": "repo-*",
-      "severity": "strict",
       "count": 1
     },
     {
