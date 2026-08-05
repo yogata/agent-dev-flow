@@ -23,7 +23,7 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 
 | # | Domain | Canonical REQ | Canonical SPEC | 補足 |
 |---|--------|--------------|----------------|------|
-| 1 | Command frontmatter | REQ-002 (015, 044) | artifact-contracts.md | description + agent のみ |
+| 1 | Command frontmatter | REQ-002 (015, 044) | artifact-contracts.md | description 単一 |
 | 2 | Skill frontmatter | REQ-002 (012, 013) | artifact-contracts.md | name + description |
 | 3 | Command 行数上限 | REQ-002 (022-024) | quality-specs.md | 100 行目標、150 行上限、200 行以内 |
 | 4 | Skill 行数上限 | REQ-002 (037) | quality-specs.md | 200 行超で分割候補報告 |

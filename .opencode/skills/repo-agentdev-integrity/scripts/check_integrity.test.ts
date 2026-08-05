@@ -496,11 +496,9 @@ function buildInvalidFixture(root: string): void {
   writeFileSync(
     join(cmdDir, "bad-cmd.md"),
     [
-      "---",
-      "description: Bad command",
-      "---",
+      "# Bad Command",
       "",
-      "Missing agent.",
+      "No frontmatter at all (missing required description).",
       "",
     ].join("\n"),
     "utf-8",

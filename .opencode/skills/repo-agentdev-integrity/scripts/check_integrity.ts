@@ -754,7 +754,7 @@ function checkExpandedReadmeSync(cmdDir: string, root: string): CheckResult[] {
 function checkCommandInventory(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-  const required = ["description", "agent"];
+  const required = ["description"];
 
   for (const file of cmdFiles) {
     const fullPath = path.join(cmdDir, file);
@@ -3208,16 +3208,6 @@ function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
 
 // ─── Command frontmatter checks (v2:REQ-0108-095~099, inverted: Case 5 / RU-0020) ─
 
-const KNOWN_AGENTS = new Set([
-  "sisyphus",
-  "prometheus",
-  "oracle",
-  "metis",
-  "hephaestus",
-  "momus",
-  "test-agent",
-]);
-
 /** Additional prohibited fields (v2:REQ-0108-124) */
 const EXTRA_PROHIBITED_FIELDS = [
   "pattern",
@@ -3226,8 +3216,8 @@ const EXTRA_PROHIBITED_FIELDS = [
   "labels",
 ] as const;
 
-/** Allowed frontmatter fields for commands (v2:REQ-0108-046, 098) */
-const ALLOWED_FRONTMATTER_FIELDS = new Set(["description", "agent"]);
+/** Allowed frontmatter fields for commands (description 単一、移行計画 §5.2) */
+const ALLOWED_FRONTMATTER_FIELDS = new Set(["description"]);
 
 function checkCommandFrontmatterDetailed(
   cmdDir: string,
@@ -3263,25 +3253,6 @@ function checkCommandFrontmatterDetailed(
           ),
         );
       }
-    }
-
-    // v2:REQ-0108-098: agent must be known
-    const agent = fm["agent"];
-    if (typeof agent === "string" && !KNOWN_AGENTS.has(agent)) {
-      results.push(
-        warn(
-          "Command",
-          "cmd-agent-name",
-          `Command '${cmdName}' has unknown agent '${agent}'`,
-          relPath,
-          undefined,
-          {
-            evidence: agent,
-            expected: `one of: ${[...KNOWN_AGENTS].join(", ")}`,
-            route: "req-define",
-          },
-        ),
-      );
     }
 
     // v2:REQ-0108-099: deprecated command in inventory
