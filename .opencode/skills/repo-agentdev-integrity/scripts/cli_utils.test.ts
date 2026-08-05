@@ -86,7 +86,38 @@ describe("parseArgs", () => {
       dryRun: true,
       classification: false,
       paths: ["path/a", "path/b"],
+      profile: "source",
     });
+  });
+
+  it("defaults profile to 'source' (WP-3 / Issue #1928)", () => {
+    expect(parseArgs([]).profile).toBe("source");
+  });
+
+  it("parses --profile installed", () => {
+    expect(parseArgs(["--profile", "installed"]).profile).toBe("installed");
+  });
+
+  it("parses --profile release with --archive", () => {
+    const opts = parseArgs(["--profile", "release", "--archive", "/tmp/x.zip"]);
+    expect(opts.profile).toBe("release");
+    expect(opts.archive).toBe("/tmp/x.zip");
+  });
+
+  it("rejects unknown --profile value", () => {
+    expect(() => parseArgs(["--profile", "nope"])).toThrow(/--profile must be one of/);
+  });
+
+  it("requires --archive when --profile release", () => {
+    expect(() => parseArgs(["--profile", "release"])).toThrow(/requires --archive/);
+  });
+
+  it("throws when --profile has no value", () => {
+    expect(() => parseArgs(["--profile"])).toThrow(/--profile requires a value/);
+  });
+
+  it("throws when --archive has no value", () => {
+    expect(() => parseArgs(["--archive"])).toThrow(/--archive requires a value/);
   });
 });
 
@@ -200,6 +231,7 @@ describe("formatJsonReport", () => {
   const report: IntegrityReport = {
     timestamp: "2025-01-01T00:00:00Z",
     script: "test-script",
+    profile: "source",
     scanned: { docs: 5, skills: 3 },
     summary: { ok: 3, ng: 1, warning: 1, info: 0 },
     results: [
@@ -229,6 +261,7 @@ describe("formatMarkdownReport", () => {
   const report: IntegrityReport = {
     timestamp: "2025-01-01T00:00:00Z",
     script: "integrity-check",
+    profile: "source",
     scanned: { docs: 2 },
     summary: { ok: 1, ng: 1, warning: 0, info: 0 },
     results: [
@@ -240,6 +273,22 @@ describe("formatMarkdownReport", () => {
   it("contains title header with script name", () => {
     const md = formatMarkdownReport(report);
     expect(md).toContain("# integrity-check Report");
+  });
+
+  it("records the execution profile in the header (WP-3)", () => {
+    const md = formatMarkdownReport(report);
+    expect(md).toContain("**プロファイル**: source");
+  });
+
+  it("records the archive path in the header when release profile", () => {
+    const releaseReport: IntegrityReport = {
+      ...report,
+      profile: "release",
+      archive: "/tmp/agentdev-release-abc123.zip",
+    };
+    const md = formatMarkdownReport(releaseReport);
+    expect(md).toContain("**プロファイル**: release");
+    expect(md).toContain("**アーカイブ**: /tmp/agentdev-release-abc123.zip");
   });
 
   it("contains summary table", () => {
@@ -264,6 +313,7 @@ describe("formatMarkdownReport", () => {
     const okReport: IntegrityReport = {
       timestamp: "2025-01-01T00:00:00Z",
       script: "test",
+      profile: "source",
       scanned: { all: 1 },
       summary: { ok: 1, ng: 0, warning: 0, info: 0 },
       results: [ok("cat", "check", "fine")],

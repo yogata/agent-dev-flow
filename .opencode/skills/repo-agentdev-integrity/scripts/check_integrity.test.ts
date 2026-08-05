@@ -213,6 +213,12 @@ function buildValidFixture(root: string): void {
   mkdirp(join(root, "src", "opencode", "skills", "agentdev-test-skill"));
   mkdirp(join(root, "src", "opencode", "skills", "agentdev-workflow-templates"));
 
+  // WP-3 (Issue #1928): src/opencode/commands/agentdev and src/opencode/skills
+  // are required by checkSourceRequiredDirs.
+  const srcCmdDir = join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(srcCmdDir);
+  writeFileSync(join(srcCmdDir, "README.md"), "# agentdev commands\n", "utf-8");
+
   const integritySkillDir = join(
     root,
     ".opencode",
@@ -2702,5 +2708,201 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
     );
     // 修復完了時点の実績値。将来の削減を許容し、増加を拒否する。
     expect(baselineKnown.length).toBeLessThanOrEqual(548);
+  });
+});
+
+// ─── WP-3 (Issue #1928): execution profile separation ───────────────────────
+// §7 exit-code contracts for source/installed/release.
+
+describe("WP-3 execution profiles (Issue #1928)", () => {
+  const PROFILE_TMP = join(TEMP_BASE, `profile-${RUN_ID}`);
+  let profileRoot: string;
+
+  function writeSourceCmd(root: string, name: string, body: string): void {
+    const dir = join(root, "src", "opencode", "commands", "agentdev");
+    writeFile(join(dir, name), body);
+  }
+  function writeSourceSkill(root: string, skill: string, body: string): void {
+    const dir = join(root, "src", "opencode", "skills", skill);
+    writeFile(join(dir, "SKILL.md"), body);
+  }
+  function writeProjectionCmd(root: string, name: string, body: string): void {
+    const dir = join(root, ".opencode", "commands", "agentdev");
+    writeFile(join(dir, name), body);
+  }
+  function writeProjectionSkill(root: string, skill: string, body: string): void {
+    const dir = join(root, ".opencode", "skills", skill);
+    writeFile(join(dir, "SKILL.md"), body);
+  }
+
+  beforeAll(() => {
+    profileRoot = join(PROFILE_TMP, "repo");
+    mkdirp(profileRoot);
+    copyScripts(profileRoot);
+
+    writeSourceCmd(profileRoot, "demo-cmd.md", "---\ndescription: demo\n---\n# demo\n");
+    writeSourceSkill(
+      profileRoot,
+      "agentdev-demo",
+      "---\nname: agentdev-demo\ndescription: demo skill\n---\n# agentdev-demo\n## USE FOR\n- x\n## DO NOT USE FOR\n- y\n",
+    );
+
+    // Healthy baseline: .opencode/ mirrors src/opencode/.
+    writeProjectionCmd(profileRoot, "demo-cmd.md", "---\ndescription: demo\n---\n# demo\n");
+    writeProjectionSkill(
+      profileRoot,
+      "agentdev-demo",
+      "---\nname: agentdev-demo\ndescription: demo skill\n---\n# agentdev-demo\n## USE FOR\n- x\n## DO NOT USE FOR\n- y\n",
+    );
+
+    const specsDir = join(profileRoot, "docs", "specs");
+    mkdirp(specsDir);
+    writeFileSync(
+      join(specsDir, "README.md"),
+      [
+        "# SPEC index",
+        "",
+        "| SPEC | status | 責務 |",
+        "|------|--------|------|",
+        "| foundations/system.md | accepted | system |",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const sysDir = join(specsDir, "foundations");
+    mkdirp(sysDir);
+    writeFileSync(join(sysDir, "system.md"), "# System\n", "utf-8");
+  });
+
+  afterAll(() => {
+    rmSync(PROFILE_TMP, { recursive: true, force: true });
+  });
+
+  it("source profile (default) records profile=source and skips projection checks", () => {
+    const result = runScript(profileRoot, ["--json"]);
+    expect(result.exitCode).toBeGreaterThanOrEqual(0);
+    const parsed = JSON.parse(result.stdout) as {
+      profile: string;
+      results: Array<{ category: string; check: string; level: string }>;
+    };
+    expect(parsed.profile).toBe("source");
+    const scopeMsg = parsed.results.find(
+      (r) => r.category === "ProfileScope" && r.check === "projection-check-scope",
+    );
+    expect(scopeMsg).toBeDefined();
+    expect(
+      parsed.results.some((r) => r.category === "InstalledProfile"),
+    ).toBe(false);
+  });
+
+  it("installed profile fails with projection_missing when projection dir is absent", () => {
+    const brokenRoot = join(PROFILE_TMP, "no-projection");
+    mkdirp(brokenRoot);
+    copyScripts(brokenRoot);
+    writeSourceCmd(brokenRoot, "demo-cmd.md", "---\ndescription: demo\n---\n# demo\n");
+    writeSourceSkill(
+      brokenRoot,
+      "agentdev-demo",
+      "---\nname: agentdev-demo\ndescription: demo skill\n---\n# agentdev-demo\n## USE FOR\n- x\n## DO NOT USE FOR\n- y\n",
+    );
+
+    const result = runScript(brokenRoot, ["--profile", "installed", "--json"]);
+    expect(result.exitCode).toBe(1);
+    const parsed = JSON.parse(result.stdout) as {
+      profile: string;
+      results: Array<{ category: string; check: string; level: string }>;
+    };
+    expect(parsed.profile).toBe("installed");
+    expect(
+      parsed.results.some(
+        (r) =>
+          r.category === "InstalledProfile" &&
+          r.check === "projection_missing" &&
+          r.level === "ng",
+      ),
+    ).toBe(true);
+  });
+
+  it("installed profile detects content_mismatch on divergent projection", () => {
+    const mismatchRoot = join(PROFILE_TMP, "mismatch");
+    mkdirp(mismatchRoot);
+    copyScripts(mismatchRoot);
+    writeSourceCmd(mismatchRoot, "demo-cmd.md", "---\ndescription: demo\n---\n# demo source\n");
+    writeSourceSkill(
+      mismatchRoot,
+      "agentdev-demo",
+      "---\nname: agentdev-demo\ndescription: demo skill\n---\n# agentdev-demo\n## USE FOR\n- x\n## DO NOT USE FOR\n- y\n",
+    );
+    writeProjectionCmd(mismatchRoot, "demo-cmd.md", "---\ndescription: demo\n---\n# demo projection (drift)\n");
+    writeProjectionSkill(
+      mismatchRoot,
+      "agentdev-demo",
+      "---\nname: agentdev-demo\ndescription: demo skill\n---\n# agentdev-demo\n## USE FOR\n- x\n## DO NOT USE FOR\n- y\n",
+    );
+
+    const result = runScript(mismatchRoot, ["--profile", "installed", "--json"]);
+    expect(result.exitCode).toBe(1);
+    const parsed = JSON.parse(result.stdout) as {
+      results: Array<{ category: string; check: string; level: string }>;
+    };
+    expect(
+      parsed.results.some(
+        (r) =>
+          r.category === "InstalledProfile" &&
+          r.check === "content_mismatch" &&
+          r.level === "ng",
+      ),
+    ).toBe(true);
+  });
+
+  it("installed profile detects projection_extra for unexpected agentdev- skill", () => {
+    const extraRoot = join(PROFILE_TMP, "extra");
+    mkdirp(extraRoot);
+    copyScripts(extraRoot);
+    writeSourceCmd(extraRoot, "demo-cmd.md", "---\ndescription: demo\n---\n# demo\n");
+    writeSourceSkill(
+      extraRoot,
+      "agentdev-demo",
+      "---\nname: agentdev-demo\ndescription: demo skill\n---\n# agentdev-demo\n## USE FOR\n- x\n## DO NOT USE FOR\n- y\n",
+    );
+    writeProjectionCmd(extraRoot, "demo-cmd.md", "---\ndescription: demo\n---\n# demo\n");
+    writeProjectionSkill(
+      extraRoot,
+      "agentdev-demo",
+      "---\nname: agentdev-demo\ndescription: demo skill\n---\n# agentdev-demo\n## USE FOR\n- x\n## DO NOT USE FOR\n- y\n",
+    );
+    writeProjectionSkill(
+      extraRoot,
+      "agentdev-foreign",
+      "---\nname: agentdev-foreign\ndescription: foreign\n---\n# agentdev-foreign\n",
+    );
+
+    const result = runScript(extraRoot, ["--profile", "installed", "--json"]);
+    expect(result.exitCode).toBe(1);
+    const parsed = JSON.parse(result.stdout) as {
+      results: Array<{ category: string; check: string; level: string; evidence?: string }>;
+    };
+    expect(
+      parsed.results.some(
+        (r) =>
+          r.category === "InstalledProfile" &&
+          r.check === "projection_extra" &&
+          r.level === "ng" &&
+          r.evidence === "agentdev-foreign",
+      ),
+    ).toBe(true);
+  });
+
+  it("installed profile reports 0 InstalledProfile NG when projection mirrors source", () => {
+    const result = runScript(profileRoot, ["--profile", "installed", "--json"]);
+    const parsed = JSON.parse(result.stdout) as {
+      profile: string;
+      results: Array<{ category: string; check: string; level: string }>;
+    };
+    expect(parsed.profile).toBe("installed");
+    const installedNg = parsed.results.filter(
+      (r) => r.category === "InstalledProfile" && r.level === "ng",
+    );
+    expect(installedNg.length).toBe(0);
   });
 });

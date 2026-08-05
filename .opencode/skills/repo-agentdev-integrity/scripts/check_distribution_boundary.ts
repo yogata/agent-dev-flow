@@ -481,6 +481,21 @@ if (require.main === module) {
   const repoRoot = positional[0] || process.cwd();
   const json = args.includes("--json");
 
+  // WP-3 (Issue #1928): --profile is accepted for symmetry. Source is the
+  // canonical inspection target; .opencode/ mirrors it, so widening the scope
+  // would only duplicate findings.
+  let profile = "source";
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--profile" && i + 1 < args.length) {
+      profile = args[i + 1];
+      i++;
+    }
+  }
+  if (profile !== "source" && profile !== "installed" && profile !== "release") {
+    process.stderr.write(`error: --profile must be source|installed|release (got '${profile}')\n`);
+    process.exit(2);
+  }
+
   const saveBaselineIdx = args.indexOf("--save-baseline");
   const deltaBaselineIdx = args.indexOf("--delta");
   const exemptionsIdx = args.indexOf("--exemptions");
@@ -534,6 +549,7 @@ if (require.main === module) {
     } else {
       process.stdout.write(`check_distribution_boundary.ts - delta guard\n`);
       process.stdout.write(`=============================================================\n`);
+      process.stdout.write(`profile: ${profile}\n`);
       process.stdout.write(`repoRoot: ${repoRoot}\n`);
       process.stdout.write(`baseline: ${baselinePath}\n`);
       if (exemptionsPath) {
@@ -562,6 +578,7 @@ if (require.main === module) {
   } else {
     process.stdout.write(`check_distribution_boundary.ts - distribution reference boundary\n`);
     process.stdout.write(`=============================================================\n`);
+    process.stdout.write(`profile: ${profile}\n`);
     process.stdout.write(`repoRoot: ${repoRoot}\n`);
     process.stdout.write(`ok: ${report.ok}\n`);
     process.stdout.write(`stats: ${JSON.stringify(report.stats, null, 2)}\n`);

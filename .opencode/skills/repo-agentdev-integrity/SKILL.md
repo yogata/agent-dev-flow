@@ -163,7 +163,13 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 - `--help`: 使用方法を表示
 - `--json`: JSON 形式で出力
 - `--dry-run`: 検査を実行せず対象一覧を表示
-- exit code: 0（問題なし）、1（検査NG）、2（入力不正・実行エラー）
+- `--profile source|installed|release`: 実行 profile（既定 `source`、Issue #1928 / WP-3）。詳細は `docs/specs/integrity/integrity-contracts.md`「実行プロファイル分離」
+  - `source`: 原本（`src/opencode/`、docs、repo-local checker）を直接検査。projection 検査は対象外
+  - `installed`: 原本と配置先（`.opencode/`）を比較し、配置漏れ（`projection_missing` / `projection_extra` / `content_mismatch` / `broken_junction` / `missing_required_dir`）を検出
+  - `release`: `--archive <zip>` 必須。archive 展開→`install-from-archive.ps1`→`installed` profile を `--root` 付きで host 側 checker が実行
+- `--archive <zip>`: `--profile release` のとき必須。それ以外では無視
+- `--root <path>`: リポジトリルート（REQ-0145-014、worktree/CI support）
+- exit code: 0（問題なし）、1（検査NG/warning）、2（入力不正・実行エラー）
 - 非対話実行
 - 破壊的変更を行わない
 
