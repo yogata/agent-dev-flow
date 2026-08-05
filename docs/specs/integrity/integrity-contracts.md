@@ -363,6 +363,70 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 - [commands/case-run.md](../commands/case-run.md)
 - [commands/case-close.md](../commands/case-close.md)
 
-## 実行プロファイル分離（source/installed/release）
+## 実行プロファイル分離
 
-check_integrity.ts の実行 profile（source/installed/release）分離契約を明記する。source は配置先不在をNGとせず projection 検査を対象外、installed は原本/配置先集合・内容比較で配置漏れ検出、release は archive 展開→install→installed profile を host 側 checker（--root）で実行、ZIP 非同梱 checker は host 起点とする。integrity-rule-catalog.md の該当 AUTOGEN 領域も整合させる。詳細 normative は移行計画 §7。
+check_integrity.ts は3つの実行 profile（source/installed/release）を取り、原本検査、配置後検査、配布アーカイブ検査を区別する。詳細 normative は移行計画 §7（`.omo/plans/agentdev-migration-2026-08-05.md`）を正とする。
+
+### CLI
+
+```text
+bun run check_integrity.ts --profile source
+bun run check_integrity.ts --profile installed
+bun run check_integrity.ts --profile release --archive <zip-path>
+```
+
+`--profile` 未指定時は `source` とする。`release` は `--archive` 必須。各 profile と `archive` パスは report（JSON / Markdown）へ記録する。
+
+### source profile
+
+原本（`src/opencode/`、docs、repo-local checker/tests）を直接検査する。
+
+- `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*` が存在しないことを NG にしない（worktree 等）
+- 原本ディレクトリや必須ファイルが欠落している場合は NG
+- source/projection 一致検査、IR-058（distribution-untracked-skill）、broken-junction、junction-scan-coverage は対象外。report へ `ProfileScope` info として明示する
+- runtime 参照検査は原本を直接対象とし、配置先からの fallback によって欠落を隠さない（`resolvePathWithFallback` は source profile 既定の挙動を保つ）
+
+### installed profile
+
+原本（`src/opencode/`）と配置先（`.opencode/`）を比較し、配置漏れを検出する。
+
+- `cmdDir` を `.opencode/commands/agentdev` へ直接解決し、原本 fallback を無効化する
+- 次を NG として報告する: `projection_missing`（原本に有て配置先に無い）、`projection_extra`（配置先に有て原本に無い、`repo-*` repo-local skill は除く）、`content_mismatch`（原本と配置先で内容が異なる）、`broken_junction`（配置先の junction/symlink が解決不能）、`missing_required_dir`（原本必須ディレクトリ欠落）
+- 配置先が存在しない場合は NG とし、原本 fallback だけで成功扱いにしない
+- Windows junction は `realpath` で実体を比較する（健康な junction で `content_mismatch` が発火しないようにする）
+
+### release profile
+
+host 側 checker を起点とし、archive を展開→install→installed profile を `--root` 付きで実行する。archive は配布物の自己完結を保証するが、checker（`repo-agentdev-integrity`）は archive に同梱せず host 側のものを使う（archive 自己完結と検査実行の分離、REQ-0145-014）。
+
+処理順序:
+
+1. `--archive` で指定された ZIP を一時ディレクトリ `<temp>` へ展開する
+2. `<temp>/<root>/scripts/install-from-archive.ps1 -Source <temp>/<root>/src/opencode -Target <temp>/<root>/.opencode -Mode copy` を実行する
+3. host 側 checker を `--profile installed --root <temp>/<root> --json` で起動し、installed profile を実行する
+4. archive は docs/ を含まないため、exit code は `InstalledProfile` カテゴリ（projection_missing/extra/content_mismatch/broken_junction/missing_required_dir）の結果のみで判定する。全文結果は report へ転送する
+5. 成功・失敗の双方で `<temp>` を削除する（cleanup 失敗は warning、exit code は変えない）
+
+ZIP 自体に junction が保存されていなくても install 後に配置できれば通過する。install 後も配置先が欠落する場合は NG とする。
+
+### archive 生成・導入コマンド（§7.5.1, §7.5.2）
+
+archive 生成: `scripts/package-release-archive.ps1`（原本 `src/opencode/` 配下を junction 解決済み実ファイルとして ZIP へ格納）。出力は `dist/agentdev-release-<commit-short>.zip`。archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`src/opencode/skills/japanese-tech-writing/**`、`scripts/install-from-archive.ps1`、`README-INSTALL.md` を格納する。
+
+| 実行結果 | exit code |
+|---|---|
+| 成功（`dist/*.zip` 生成、archive パスを標準出力へ1行出力） | 0 |
+| 原本欠落・必須ファイル不在 | 2 |
+| 既存 dist 上書き検出（`-Force` 無し） | 3 |
+
+archive 展開・install: `scripts/install-from-archive.ps1 -Source <src/opencode> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/skills/japanese-tech-writing/` 配下へ配置する。junction は作成しない。
+
+| 実行結果 | exit code |
+|---|---|
+| 成功（全配置完了、内容一致） | 0 |
+| 配置先既存ファイルとの不一致（上書きせず停止） | 4 |
+| 必須ディレクトリ作成失敗、または Source 不在 | 5 |
+
+### 検出力回帰マトリクス（§7.7.1）
+
+profile 分離によって検出力が低下していないことを保証するため、意図的 violation を各 profile へ投入し、期待する NG が必ず発生することを baseline 更新前に照合する。このマトリクスは baseline 更新前の必須ゲートであり、いずれかのセルで期待 NG が発生しなければ baseline を更新せず WP-3 を完了扱いにしない。実行結果は `.omo/plans/agentdev-migration-2026-08-05.regression.md` へ記録する。

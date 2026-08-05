@@ -80,7 +80,7 @@ import {
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
 const USAGE =
-  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--update-ir055-baseline] [--update-ng-baseline --ng-baseline-additions <manifest.json>]";
+  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--profile source|installed|release] [--archive <zip>] [--root <path>] [--update-ir055-baseline] [--update-ng-baseline --ng-baseline-additions <manifest.json>]";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -5300,6 +5300,362 @@ function checkBrokenJunctions(skillsDir: string, root: string, cmdsDir?: string)
   return results;
 }
 
+// ─── Installed profile: strict projection comparison (Issue #1928 / WP-3 §7.4) ──
+
+// `realpath` follows Windows junctions, so a healthy projection compares equal
+// to its source. Without this, content_mismatch would fire on every junction.
+function collectMarkdownTree(dirRoot: string): string[] {
+  if (!fs.existsSync(dirRoot)) return [];
+  const acc: string[] = [];
+  function walk(d: string): void {
+    let entries: import("fs").Dirent[];
+    try {
+      entries = fs.readdirSync(d, { withFileTypes: true }) as import("fs").Dirent[];
+    } catch {
+      return;
+    }
+    for (const ent of entries) {
+      const full = path.join(d, ent.name);
+      if (ent.isDirectory()) {
+        walk(full);
+      } else if (ent.isFile() && ent.name.endsWith(".md")) {
+        acc.push(full);
+      }
+    }
+  }
+  walk(dirRoot);
+  return acc;
+}
+
+function readRealPath(filePath: string): string | null {
+  try {
+    return fs.realpathSync(filePath) ? fs.readFileSync(filePath, "utf-8") as string : null;
+  } catch {
+    return null;
+  }
+}
+
+// §7.3/§7.4: source dirs the installed profile cannot run without.
+const INSTALLED_REQUIRED_SOURCE_DIRS = [
+  "src/opencode/commands/agentdev",
+  "src/opencode/skills",
+];
+
+const PROJECTION_ONLY_EXEMPT_PREFIX = "repo-";
+
+// WP-3 (Issue #1928) §7.3: source profile fails when required source dirs are
+// missing. Uses the same finding name as checkInstalledProjection so §7.7.1
+// regression-matrix rows read consistently across profiles.
+function checkSourceRequiredDirs(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  for (const rel of INSTALLED_REQUIRED_SOURCE_DIRS) {
+    const abs = path.join(root, ...rel.split("/"));
+    if (!fs.existsSync(abs)) {
+      results.push(
+        ng(
+          "SourceProfile",
+          "missing_required_dir",
+          `Required source directory missing: ${rel}`,
+          rel,
+          undefined,
+          {
+            evidence: rel,
+            expected: "source directory must exist",
+            route: determineRoute("obsolete-structure", 1),
+          },
+        ),
+      );
+    }
+  }
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(
+      ok(
+        "SourceProfile",
+        "source-required-dirs",
+        "All required source directories present",
+      ),
+    );
+  }
+  return results;
+}
+
+function checkInstalledProjection(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const projectionCmdDir = path.join(root, ".opencode", "commands", "agentdev");
+  const sourceCmdDir = path.join(root, "src", "opencode", "commands", "agentdev");
+  const projectionSkillsDir = path.join(root, ".opencode", "skills");
+  const sourceSkillsDir = path.join(root, "src", "opencode", "skills");
+
+  for (const rel of INSTALLED_REQUIRED_SOURCE_DIRS) {
+    const abs = path.join(root, ...rel.split("/"));
+    if (!fs.existsSync(abs)) {
+      results.push(
+        ng(
+          "InstalledProfile",
+          "missing_required_dir",
+          `Required source directory missing: ${rel}`,
+          rel,
+          undefined,
+          {
+            evidence: rel,
+            expected: "source directory must exist",
+            route: determineRoute("obsolete-structure", 1),
+          },
+        ),
+      );
+    }
+  }
+
+  const projectionRoots = [
+    { kind: "command", abs: projectionCmdDir, sourceAbs: sourceCmdDir },
+    { kind: "skill", abs: projectionSkillsDir, sourceAbs: sourceSkillsDir },
+  ];
+  for (const { kind, abs, sourceAbs } of projectionRoots) {
+    if (!fs.existsSync(abs)) {
+      results.push(
+        ng(
+          "InstalledProfile",
+          "projection_missing",
+          `${kind} projection directory does not exist: ${resolveRelative(abs, root)}`,
+          resolveRelative(abs, root),
+          undefined,
+          {
+            evidence: resolveRelative(abs, root),
+            expected: `${kind} projection must exist under .opencode/`,
+            route: determineRoute("obsolete-structure", 1),
+          },
+        ),
+      );
+    }
+    if (!fs.existsSync(sourceAbs)) continue;
+
+    if (kind === "command") {
+      const sourceFiles = listFiles(sourceAbs).filter((f) => f !== "README.md");
+      const projectionFiles = listFiles(abs).filter((f) => f !== "README.md");
+      const sourceSet = new Set(sourceFiles);
+      const projectionSet = new Set(projectionFiles);
+
+      for (const f of sourceFiles) {
+        if (!projectionSet.has(f)) {
+          results.push(
+            ng(
+              "InstalledProfile",
+              "projection_missing",
+              `Command '${f}' exists in source but missing from projection`,
+              `.opencode/commands/agentdev/${f}`,
+              undefined,
+              {
+                evidence: f,
+                expected: "projection must mirror src/opencode/commands/agentdev/",
+                route: determineRoute("broken-reference", 1),
+              },
+            ),
+          );
+        }
+      }
+      for (const f of projectionFiles) {
+        if (!sourceSet.has(f)) {
+          results.push(
+            ng(
+              "InstalledProfile",
+              "projection_extra",
+              `Command '${f}' exists in projection but missing from source`,
+              `.opencode/commands/agentdev/${f}`,
+              undefined,
+              {
+                evidence: f,
+                expected: "projection must not contain commands absent from source",
+                route: determineRoute("broken-reference", 1),
+              },
+            ),
+          );
+        }
+      }
+      for (const f of sourceFiles) {
+        if (!projectionSet.has(f)) continue;
+        const srcText = readText(path.join(sourceAbs, f));
+        const projText = readRealPath(path.join(abs, f));
+        if (srcText === null || projText === null) continue;
+        if (srcText !== projText) {
+          results.push(
+            ng(
+              "InstalledProfile",
+              "content_mismatch",
+              `Command '${f}' content differs between source and projection`,
+              `.opencode/commands/agentdev/${f}`,
+              undefined,
+              {
+                evidence: f,
+                expected: "projection content must match source byte-for-byte",
+                route: determineRoute("document-drift", 1),
+              },
+            ),
+          );
+        }
+      }
+    } else {
+      const sourceSkillDirs = new Set(listDirs(sourceAbs));
+      const projectionSkillDirs = new Set(listDirs(abs));
+
+      for (const d of sourceSkillDirs) {
+        if (!projectionSkillDirs.has(d)) {
+          results.push(
+            ng(
+              "InstalledProfile",
+              "projection_missing",
+              `Skill '${d}' exists in source but missing from projection`,
+              `.opencode/skills/${d}`,
+              undefined,
+              {
+                evidence: d,
+                expected: "projection must mirror src/opencode/skills/",
+                route: determineRoute("broken-reference", 1),
+              },
+            ),
+          );
+        }
+      }
+      for (const d of projectionSkillDirs) {
+        if (sourceSkillDirs.has(d)) continue;
+        if (d.startsWith(PROJECTION_ONLY_EXEMPT_PREFIX)) continue;
+        results.push(
+          ng(
+            "InstalledProfile",
+            "projection_extra",
+            `Skill '${d}' exists in projection but missing from source`,
+            `.opencode/skills/${d}`,
+            undefined,
+            {
+              evidence: d,
+              expected: `projection must not contain skills absent from source (except ${PROJECTION_ONLY_EXEMPT_PREFIX}* repo-local)`,
+              route: determineRoute("broken-reference", 1),
+            },
+          ),
+        );
+      }
+
+      for (const d of sourceSkillDirs) {
+        if (!projectionSkillDirs.has(d)) continue;
+        const srcTree = collectMarkdownTree(path.join(sourceAbs, d));
+        const projTree = collectMarkdownTree(path.join(abs, d));
+        const srcRel = new Set(
+          srcTree.map((full) => path.relative(path.join(sourceAbs, d), full).replace(/\\/g, "/")),
+        );
+        const projRel = new Map(
+          projTree.map((full) => [
+            path.relative(path.join(abs, d), full).replace(/\\/g, "/"),
+            full,
+          ]),
+        );
+        for (const relPath of srcRel) {
+          const srcFull = path.join(sourceAbs, d, ...relPath.split("/"));
+          const projFull = projRel.get(relPath);
+          if (!projFull) {
+            results.push(
+              ng(
+                "InstalledProfile",
+                "projection_missing",
+                `Skill '${d}' file '${relPath}' missing from projection`,
+                `.opencode/skills/${d}/${relPath}`,
+                undefined,
+                {
+                  evidence: `${d}/${relPath}`,
+                  expected: "projection skill must mirror source files",
+                  route: determineRoute("broken-reference", 1),
+                },
+              ),
+            );
+            continue;
+          }
+          const srcText = readText(srcFull);
+          const projText = readRealPath(projFull);
+          if (srcText === null || projText === null) continue;
+          if (srcText !== projText) {
+            results.push(
+              ng(
+                "InstalledProfile",
+                "content_mismatch",
+                `Skill '${d}' file '${relPath}' content differs between source and projection`,
+                `.opencode/skills/${d}/${relPath}`,
+                undefined,
+                {
+                  evidence: `${d}/${relPath}`,
+                  expected: "projection skill content must match source byte-for-byte",
+                  route: determineRoute("document-drift", 1),
+                },
+              ),
+            );
+          }
+        }
+        for (const relPath of projRel.keys()) {
+          if (!srcRel.has(relPath)) {
+            results.push(
+              ng(
+                "InstalledProfile",
+                "projection_extra",
+                `Skill '${d}' file '${relPath}' exists in projection but missing from source`,
+                `.opencode/skills/${d}/${relPath}`,
+                undefined,
+                {
+                  evidence: `${d}/${relPath}`,
+                  expected: "projection skill must not contain files absent from source",
+                  route: determineRoute("broken-reference", 1),
+                },
+              ),
+            );
+          }
+        }
+      }
+    }
+  }
+
+  // §7.4 broken_junction: projection entries that look like directories but
+  // cannot be stat'd (junction target missing). Same shape as
+  // checkBrokenJunctions, scoped to the installed profile.
+  for (const scanDir of [projectionSkillsDir, projectionCmdDir]) {
+    if (!fs.existsSync(scanDir)) continue;
+    let entries: import("fs").Dirent[];
+    try {
+      entries = fs.readdirSync(scanDir, { withFileTypes: true }) as import("fs").Dirent[];
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const fullPath = path.join(scanDir, entry.name);
+      try {
+        fs.statSync(fullPath);
+      } catch {
+        results.push(
+          ng(
+            "InstalledProfile",
+            "broken_junction",
+            `Broken junction/symlink in projection: '${entry.name}' target unreachable`,
+            resolveRelative(fullPath, root),
+            undefined,
+            {
+              evidence: entry.name,
+              expected: "projection entry must resolve to a real directory",
+              route: determineRoute("broken-reference", 1),
+            },
+          ),
+        );
+      }
+    }
+  }
+
+  if (results.filter((r) => r.level === "ng").length === 0) {
+    results.push(
+      ok(
+        "InstalledProfile",
+        "installed-projection",
+        "Projection mirrors source for commands and skills (no missing/extra/mismatch/broken)",
+      ),
+    );
+  }
+  return results;
+}
+
 // ─── Document Classification Policy checks (v2:REQ-0108-196) ─────────────────
 
 const DOCUMENT_CLASSIFICATIONS = ["REQ", "ADR", "SPEC", "Guide", "Report", "DOC-MAP"] as const;
@@ -8052,6 +8408,234 @@ function walkAllFiles(dirPath: string, acc: string[]): void {
   }
 }
 
+// ─── Release profile (Issue #1928 / WP-3 §7.5) ──────────────────────────────
+// Pipeline: expand archive → run install-from-archive.ps1 (-Mode copy) →
+// re-invoke the host checker with `--profile installed --root <temp>/<root>`
+// → forward the integrated report → cleanup `<temp>` on success AND failure.
+// The checker stays on the host (REQ-0145-014 `--root`); the archive must
+// not embed it (§7.5 boundary: archive self-containment vs check execution).
+function findArchiveRoot(tempDir: string): string | null {
+  const entries = fs.readdirSync(tempDir, { withFileTypes: true });
+  const dir = entries.find((e) => e.isDirectory());
+  return dir ? path.join(tempDir, dir.name) : null;
+}
+
+function runCommand(
+  exe: string,
+  exeArgs: string[],
+): { status: number | null; stdout: string; stderr: string; error?: Error } {
+  const { spawnSync } = require("child_process") as typeof import("child_process");
+  const result = spawnSync(exe, exeArgs, {
+    encoding: "utf-8",
+    windowsHide: true,
+  });
+  return {
+    status: result.status,
+    stdout: typeof result.stdout === "string" ? result.stdout : "",
+    stderr: typeof result.stderr === "string" ? result.stderr : "",
+    error: result.error ?? undefined,
+  };
+}
+
+function runPowerShellScript(
+  scriptPath: string,
+  scriptArgs: string[],
+): { status: number | null; stdout: string; stderr: string } {
+  const candidates =
+    process.platform === "win32" ? ["pwsh.exe", "powershell.exe"] : ["pwsh"];
+  for (const exe of candidates) {
+    const result = runCommand(exe, [
+      "-NoProfile",
+      "-NonInteractive",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      scriptPath,
+      ...scriptArgs,
+    ]);
+    if (result.error === undefined) {
+      return result;
+    }
+  }
+  return { status: null, stdout: "", stderr: "no PowerShell interpreter found" };
+}
+
+function expandArchive(zipPath: string, destDir: string): string | null {
+  if (process.platform === "win32") {
+    const candidates = ["pwsh.exe", "powershell.exe"];
+    for (const exe of candidates) {
+      const result = runCommand(exe, [
+        "-NoProfile",
+        "-NonInteractive",
+        "-Command",
+        `Expand-Archive -LiteralPath '${zipPath}' -DestinationPath '${destDir}' -Force`,
+      ]);
+      if (result.error === undefined) {
+        if (result.status !== 0) {
+          return `Expand-Archive exit ${result.status}: ${result.stderr || result.stdout}`;
+        }
+        return null;
+      }
+    }
+    return "no PowerShell interpreter found for Expand-Archive";
+  }
+  const result = runCommand("unzip", ["-o", zipPath, "-d", destDir]);
+  if (result.status !== 0) {
+    return `unzip exit ${result.status}: ${result.stderr || result.stdout}`;
+  }
+  return null;
+}
+
+async function runReleaseProfile(
+  options: CliOptions,
+  hostRoot: string,
+): Promise<number> {
+  if (!options.archive) {
+    console.error("[integrity] --profile release requires --archive <zip>");
+    return EXIT_ERROR;
+  }
+  const archivePath = path.resolve(options.archive);
+  if (!fs.existsSync(archivePath)) {
+    console.error(`[integrity] release archive not found: ${archivePath}`);
+    return EXIT_ERROR;
+  }
+  if (!archivePath.toLowerCase().endsWith(".zip")) {
+    console.error(`[integrity] release archive must be .zip: ${archivePath}`);
+    return EXIT_ERROR;
+  }
+
+  const os = require("os") as typeof import("os");
+  const tempBase = fs.mkdtempSync(path.join(os.tmpdir(), "agentdev-release-"));
+
+  try {
+    const expandError = expandArchive(archivePath, tempBase);
+    if (expandError !== null) {
+      console.error(`[integrity] archive expand failed: ${expandError}`);
+      return EXIT_ERROR;
+    }
+
+    const unpackedRoot = findArchiveRoot(tempBase);
+    if (unpackedRoot === null) {
+      console.error(
+        `[integrity] archive root directory not found in ${tempBase}`,
+      );
+      return EXIT_ERROR;
+    }
+
+    const installerPath = path.join(
+      unpackedRoot,
+      "scripts",
+      "install-from-archive.ps1",
+    );
+    if (!fs.existsSync(installerPath)) {
+      console.error(
+        `[integrity] install-from-archive.ps1 missing from archive: ${installerPath}`,
+      );
+      return EXIT_ERROR;
+    }
+
+    const sourceDir = path.join(unpackedRoot, "src", "opencode");
+    const targetDir = path.join(unpackedRoot, ".opencode");
+    const installResult = runPowerShellScript(installerPath, [
+      "-Source",
+      sourceDir,
+      "-Target",
+      targetDir,
+      "-Mode",
+      "copy",
+    ]);
+    if (installResult.status !== 0) {
+      console.error(
+        `[integrity] install-from-archive.ps1 failed (exit ${installResult.status}): ${installResult.stderr || installResult.stdout}`,
+      );
+      return EXIT_ERROR;
+    }
+
+    const checkerPath = path.join(
+      hostRoot,
+      ".opencode",
+      "skills",
+      "repo-agentdev-integrity",
+      "scripts",
+      "check_integrity.ts",
+    );
+    if (!fs.existsSync(checkerPath)) {
+      console.error(`[integrity] host checker not found: ${checkerPath}`);
+      return EXIT_ERROR;
+    }
+    const bunExe = process.execPath;
+    const childResult = runCommand(bunExe, [
+      checkerPath,
+      "--profile",
+      "installed",
+      "--root",
+      unpackedRoot,
+      "--json",
+    ]);
+    if (childResult.status === null) {
+      console.error(
+        `[integrity] child checker invocation failed: ${childResult.error?.message ?? "unknown"}`,
+      );
+      return EXIT_ERROR;
+    }
+
+    let childReport: IntegrityReport;
+    try {
+      childReport = JSON.parse(childResult.stdout) as IntegrityReport;
+    } catch (e) {
+      console.error(
+        `[integrity] child checker produced non-JSON output: ${e instanceof Error ? e.message : String(e)}`,
+      );
+      console.error(`[integrity] child stdout (first 2KB):\n${childResult.stdout.slice(0, 2048)}`);
+      console.error(`[integrity] child stderr (first 2KB):\n${childResult.stderr.slice(0, 2048)}`);
+      return EXIT_ERROR;
+    }
+
+    // §7.5/§7.7.1: archive carries no docs/, so exit code is driven by
+    // InstalledProfile findings only. Full child report is still forwarded.
+    const projectionSummary = computeSummary(
+      childReport.results.filter((r) => r.category === "InstalledProfile"),
+    );
+    const releaseExit = determineExitCode(projectionSummary);
+
+    const releaseReport: IntegrityReport = {
+      ...childReport,
+      profile: "release",
+      archive: archivePath,
+      summary: {
+        ...childReport.summary,
+        ng: projectionSummary.ng,
+        warning: projectionSummary.warning,
+      },
+    };
+
+    if (options.json) {
+      console.log(formatJsonReport(releaseReport));
+    } else {
+      console.log(formatMarkdownReport(releaseReport));
+    }
+    if (releaseExit !== EXIT_OK) {
+      console.error(
+        `[integrity] release profile: ${projectionSummary.ng} projection NG, ${projectionSummary.warning} projection warning (exit ${releaseExit})`,
+      );
+    } else {
+      console.error(
+        `[integrity] release profile: projection checks passed (archive=${archivePath})`,
+      );
+    }
+
+    return releaseExit;
+  } finally {
+    try {
+      fs.rmSync(tempBase, { recursive: true, force: true });
+    } catch (e) {
+      console.error(
+        `[integrity] cleanup warning: could not remove ${tempBase}: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -8078,14 +8662,29 @@ async function main(): Promise<void> {
     process.exit(EXIT_OK);
   }
 
+  // WP-3 (Issue #1928): release profile expands the archive, installs it, and
+  // re-invokes the installed profile against the unpacked tree via --root.
+  if (options.profile === "release") {
+    const exitCode = await runReleaseProfile(options, root);
+    process.exit(exitCode);
+  }
+
+  const profile = options.profile;
+
   const reqDir = path.join(root, "docs", "requirements");
   const adrDir = path.join(root, "docs", "adr");
   const specsDir = path.join(root, "docs", "specs");
   const skillsDir = path.join(root, ".opencode", "skills");
-  // v2:REQ-0108-189: Use resolvePathWithFallback for runtime→source fallback
-  const cmdDir = resolvePathWithFallback(
-    path.join(root, ".opencode", "commands", "agentdev"),
-  );
+  // §7.3 (source): fallback `.opencode/` → `src/opencode/` preserves the
+  // legacy behavior so worktrees and existing callers see no regression.
+  // §7.4 (installed): inspect the projection directly. Source fallback would
+  // hide projection gaps, which is exactly what this profile must detect.
+  const cmdDir =
+    profile === "installed"
+      ? path.join(root, ".opencode", "commands", "agentdev")
+      : resolvePathWithFallback(
+          path.join(root, ".opencode", "commands", "agentdev"),
+        );
   const commandMapPath = path.join(
     root,
     ".opencode",
@@ -8146,6 +8745,7 @@ async function main(): Promise<void> {
   }
 
   const results: CheckResult[] = [
+    ...checkSourceRequiredDirs(root),
     ...checkReqFrontmatterFilename(reqDir, root),
     ...checkReqRequiredFields(reqDir, root),
     ...checkReqReadmeIndexSync(reqDir, root),
@@ -8188,14 +8788,11 @@ async function main(): Promise<void> {
     ...checkReqRangeStaleness(root),
     ...checkSkillCategoryGap(root, skillsDir, cmdDir),
     ...checkTemplatePathIntegrity(cmdDir, root),
-    ...checkSourceProjectionConsistency(root),
-    ...checkDistributionUntrackedSkillReference(root), // IR-058 (v2:REQ-0159-003)
-    ...checkBrokenJunctions(skillsDir, root, cmdDir),
+    ...checkDistributionUntrackedSkillReference(root), // IR-058 (v2:REQ-0159-003) — source/installed both run; no-op when projection absent
     ...checkUpdateNotesInDocs(root),
     ...checkSummaryReqRangeConsistency(root),
     ...checkOldStatusVocabulary(root),
     ...checkLegacyNamespaceInDocs(root),
-    ...checkJunctionScanCoverage(root),
     ...checkAgentdevExclusion(root),
     ...checkReferencesRecursiveScan(skillsDir, root),
     ...checkReportSelfExclusion(root),
@@ -8212,6 +8809,27 @@ async function main(): Promise<void> {
     ...checkObsoleteSpecPath(root), // IR-057 (v2:REQ-0158-002)
     ...checkIndexGenerationConsistency(root), // IR-061 (SC-002 Phase C, 索引類自動生成整合性)
   ];
+
+  // WP-3 (Issue #1928): profile-gated projection checks. §7.3 source skips
+  // projection sync / broken-junction / junction-coverage. IR-058 above stays
+  // enabled for both profiles — it no-ops when the projection dir is absent,
+  // so it cannot fire false positives in a worktree.
+  // §7.4 installed runs all projection checks AND the strict
+  // checkInstalledProjection (projection_missing/extra/content_mismatch/broken_junction).
+  if (profile === "source") {
+    results.push(
+      info(
+        "ProfileScope",
+        "projection-check-scope",
+        "source profile: projection sync, broken-junction, junction-coverage checks are out of scope (Issue #1928 §7.3)",
+      ),
+    );
+  } else {
+    results.push(...checkSourceProjectionConsistency(root));
+    results.push(...checkBrokenJunctions(skillsDir, root, cmdDir));
+    results.push(...checkJunctionScanCoverage(root));
+    results.push(...checkInstalledProjection(root));
+  }
 
   // v2:REQ-0108-196: classification policy checks (enabled by --classification flag)
   if (options.classification) {
@@ -8260,6 +8878,7 @@ async function main(): Promise<void> {
   const report: IntegrityReport = {
     timestamp: new Date().toISOString(),
     script: SCRIPT_NAME,
+    profile: options.profile,
     scanned,
     summary,
     results: processed,

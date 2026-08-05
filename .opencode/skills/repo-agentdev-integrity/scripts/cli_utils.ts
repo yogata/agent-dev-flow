@@ -14,6 +14,20 @@ export const EXIT_OK = 0;
 export const EXIT_NG = 1;
 export const EXIT_ERROR = 2;
 
+// WP-3 (Issue #1928): integrity checker execution profiles.
+// Normative: .omo/plans/agentdev-migration-2026-08-05.md §7.
+// `installed` must not use source fallback; `release` keeps the checker on the
+// host (REQ-0145-014 `--root`) and never embeds it in the archive.
+export type IntegrityProfile = "source" | "installed" | "release";
+
+export const DEFAULT_PROFILE: IntegrityProfile = "source";
+
+export const PROFILE_VALUES: readonly IntegrityProfile[] = [
+  "source",
+  "installed",
+  "release",
+] as const;
+
 export type CheckLevel = "ok" | "ng" | "warning" | "info";
 
 export type FindingCategory =
@@ -59,6 +73,8 @@ export interface ScanSummary {
 export interface IntegrityReport {
   timestamp: string;
   script: string;
+  profile: IntegrityProfile;
+  archive?: string;
   scanned: Record<string, number>;
   summary: ScanSummary;
   results: CheckResult[];
@@ -73,6 +89,8 @@ export interface CliOptions {
   classification: boolean; // REQ-0108-196
   paths: string[];
   root?: string; // REQ-0145-014: explicit repo root for worktree/CI
+  profile: IntegrityProfile; // WP-3 (Issue #1928): source|installed|release
+  archive?: string; // WP-3: required when profile=release
 }
 
 export function parseArgs(args: string[]): CliOptions {
@@ -82,6 +100,7 @@ export function parseArgs(args: string[]): CliOptions {
     dryRun: false,
     classification: false, // REQ-0108-196
     paths: [],
+    profile: DEFAULT_PROFILE,
   };
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -98,9 +117,27 @@ export function parseArgs(args: string[]): CliOptions {
       if (!v) throw new Error("--root requires a value");
       options.root = v;
       i++;
+    } else if (arg === "--profile") { // WP-3 (Issue #1928)
+      const v = args[i + 1];
+      if (!v) throw new Error("--profile requires a value (source|installed|release)");
+      if (!PROFILE_VALUES.includes(v as IntegrityProfile)) {
+        throw new Error(
+          `--profile must be one of: ${PROFILE_VALUES.join(", ")} (got '${v}')`,
+        );
+      }
+      options.profile = v as IntegrityProfile;
+      i++;
+    } else if (arg === "--archive") { // WP-3 (Issue #1928): release profile
+      const v = args[i + 1];
+      if (!v) throw new Error("--archive requires a value (path to release zip)");
+      options.archive = v;
+      i++;
     } else if (!arg.startsWith("-")) {
       options.paths.push(arg);
     }
+  }
+  if (options.profile === "release" && !options.archive) {
+    throw new Error("--profile release requires --archive <zip-path>");
   }
   return options;
 }
@@ -121,6 +158,9 @@ OPTIONS:
   --dry-run         Show what would be checked without running checks
   --classification  Enable document classification policy checks (REQ-0108-196)
   --root <path>     Explicit repository root (REQ-0145-014: worktree/CI support)
+  --profile <p>     Execution profile: source (default), installed, release (Issue #1928 / WP-3)
+  --archive <zip>   Path to release archive. Required when --profile=release.
+                    Ignored for source/installed.
   --update-ir055-baseline  Regenerate IR-055 baseline file from current violations
   --update-ng-baseline     Regenerate NG baseline file from current NG set (REQ-0161-005)
 
@@ -267,6 +307,10 @@ export function formatMarkdownReport(report: IntegrityReport): string {
   lines.push(`# ${report.script} Report`);
   lines.push("");
   lines.push(`- **実行日時**: ${now}`);
+  lines.push(`- **プロファイル**: ${report.profile}`);
+  if (report.archive) {
+    lines.push(`- **アーカイブ**: ${report.archive}`);
+  }
   lines.push(
     `- **スキャン対象**: ${Object.entries(report.scanned)
       .map(([k, v]) => `${k} ${v}件`)
