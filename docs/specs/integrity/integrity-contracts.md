@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-27
+updated: 2026-08-06
 ---
 
 # 整合性契約
@@ -362,3 +362,7 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 - [commands/case-open.md](../commands/case-open.md)
 - [commands/case-run.md](../commands/case-run.md)
 - [commands/case-close.md](../commands/case-close.md)
+
+## 実行プロファイル分離（source/installed/release）
+
+check_integrity.ts の実行 profile（source/installed/release）分離契約を明記する。source は配置先不在をNGとせず projection 検査を対象外、installed は原本/配置先集合・内容比較で配置漏れ検出、release は archive 展開→install→installed profile を host 側 checker（--root）で実行、ZIP 非同梱 checker は host 起点とする。integrity-rule-catalog.md の該当 AUTOGEN 領域も整合させる。詳細 normative は移行計画 §7。

@@ -2,7 +2,7 @@
 title: `agentdev-command-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-06
 ---
 
 # `agentdev-command-authoring` SPEC
@@ -56,4 +56,8 @@ OpenCode コマンド定義（`.opencode/commands/`）の品質基準とベス�
 - [agentdev-command-creator.md](agentdev-command-creator.md)
 - REQ-002（Artifact責任分界）
 - REQ-003（コマンド、スキル、サブエージェント責務分界）
+
+## command authoring 基準
+
+command authoring SPEC の frontmatter 例、DoD、fixture 指針を description 単一契約へ更新する。command 薄型化の基準（入力/出力/高レベル工程/副作用境界/QG/停止条件/承認境界/委譲境界は command 残置、詳細分類表/script CLI例/正規表現/prompt 全文/未採用候補は skill/reference 移管、150行以内・主要7command は100〜140行）を REQ-002-001..004 と整合して明記する。詳細 normative は移行計画 §5.2, §8.1。
 

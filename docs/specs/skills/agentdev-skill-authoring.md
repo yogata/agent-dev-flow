@@ -2,7 +2,7 @@
 title: `agentdev-skill-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-06
 ---
 
 # `agentdev-skill-authoring` SPEC
@@ -76,4 +76,8 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 - [agentdev-inspect-skills.md](agentdev-inspect-skills.md)
 - v2:REQ-0113（Skill References SPEC 分離基準）
 - REQ-003（コマンド、スキル、サブエージェント責務分界）
+
+## skill authoring 段階的開示基準
+
+skill 段階的開示の基準（SKILL.md は目的/USE FOR/入出力/副作用/責任境界/不変条件/判断順序/reference 選択条件/script-template 入口を保持、詳細 schema/判定表/正規表現/具体例/例外回復/harness 起動は references へ分離、原則200行以内、reference 選択表の必須配置、通常経路で全 reference 無条件読込しない）を REQ-002-014/015 と整合して明記する。詳細 normative は移行計画 §9.2, §9.3, §9.5, §9.6。
 

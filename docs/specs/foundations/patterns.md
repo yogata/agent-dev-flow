@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-26
+updated: 2026-08-06
 ---
 
 # 文書フォーマット規約
@@ -10,36 +10,7 @@ updated: 2026-07-26
 
 ## コマンド frontmatter 規約
 
-### エージェント指定
-
-コマンドの frontmatter で agent を指定する。
-対話系コマンド（req-define）は `agent: prometheus`、ファイル操作系コマンド（req-save, case-open 等）は `agent: sisyphus` を使用する。
-
-**対話系コマンド（req-define）:**
-```yaml
----
-description: ...
-agent: prometheus
----
-```
-
-**ファイル操作系コマンド（req-save, case-open 等）:**
-```yaml
----
-description: ...
-agent: sisyphus
----
-```
-
-**理由**: デフォルトエージェント（Plan/Prometheus）の誤用を防止するため。
-Plan エージェントは読み取り権限のみを持ち、ファイル書込やコマンド実行ができない。
-対話系、ファイル操作系いずれも Sisyphus 系（書込、実行可能）を要求するため、明示指定が必要。
-
-### Frontmatter 許可フィールド
-
-command frontmatter の許可フィールドは `description` と `agent` のみ（REQ-002-015, REQ-002-044, REQ-001）。
-
-分類定義は `design-principles.md` を参照。
+command frontmatter の正規契約を description 単一へ変更する。agent を必須フィールド・許可フィールド・有効値検査の全てから除外する。REQ-002-022（配布command は harness 固有詳細を含まない）および ADR-001（harness 分離）に基づき、実行エージェント固定は harness 側設定へ移管し command frontmatter から除去する。詳細 normative は移行計画 §5.2。
 
 ## REQ frontmatter 規約
 
