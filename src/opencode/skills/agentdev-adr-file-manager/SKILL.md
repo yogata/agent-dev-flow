@@ -315,7 +315,7 @@ ADR の `status` を変更した場合、`docs/adr/README.md` の全ビューが
 
 ## accepted ADR 直接編集チェックリスト
 
-accepted status の ADR へ直接編集（UPDATE）を実施する場合、SPEC `agentdev-adr-file-manager` の「accepted ADR 直接編集チェックリスト」セクションに従い、以下の全てを満たすことを確認する（REQ-001、`agentdev-adr-guidelines`「accepted ADR の更新規則」準拠）。本節は実行入口の要約であり、正規原本は SPEC とする。
+accepted status の ADR へ直接編集（UPDATE）を実施する場合、SPEC `agentdev-adr-file-manager` の「accepted ADR 直接編集チェックリスト」セクションに従い、以下の全てを満たすことを確認する（`agentdev-adr-guidelines`「accepted ADR の更新規則」準拠）。本節は実行入口の要約であり、正規原本は SPEC とする。
 
 ### 事前確認
 

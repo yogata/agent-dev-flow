@@ -28,15 +28,15 @@ docs全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、検�
 ## inspect-* コマンド選択 routing
 
 変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。
-本コマンド（inspect-docs）と inspect-skills は配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs Step 11 配布物整合性検査、inspect-skills Step 3 配布物構文健全性・責務整合診断）。変更範囲に応じて routing することで重複検出を防ぐ。
+本コマンド（inspect-docs）と inspect-skills は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs Step 11 配布物整合性検査、inspect-skills Step 3 配布物構文健全性・責務整合診断）。変更範囲に応じて routing することで重複検出を防ぐ。
 
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
 | `docs/requirements/*.md`、`docs/adr/*.md` | inspect-docs |
 | `docs/specs/**/*.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
 | `docs/guides/*.md`、`docs/DOC-MAP.md`、`README.md` | inspect-docs |
-| `src/opencode/commands/**/*.md`、`src/opencode/skills/**/*.md` | inspect-skills |
-| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション、ADR-002） | inspect-skills |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
 | `docs/specs/commands/**/*.md`、`docs/specs/skills/**/*.md` | inspect-skills |
 | 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
 
@@ -85,7 +85,7 @@ SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT。`agentdev-req-structure-diagnostics` �
 document-model SPEC（extension 経由）の classification policy への適合確認。REQ 要件行に schema field、enum 値一覧、route/category/status 判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等の SPEC分離基準違反が残留していないかを `agentdev-req-structure-diagnostics` に従って自動検出する
 ### Step 11: 配布物整合性検査
 
-配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する。`agentdev-req-structure-diagnostics` 参照
+配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する。`agentdev-req-structure-diagnostics` 参照
 
 存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity SPEC 構文健全性検査準拠）。
 

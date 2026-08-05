@@ -38,7 +38,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 ## フェーズ構成（case-run internal lifecycle）
 
-本節の「フェーズ」は case-run internal lifecycle（REQ-006-022: 単一 Issue または Wave 内の準備、実装、提出）を指す。case-auto が管理する orchestration stage（command 間進行、stage 1 case-open / stage 2 case-run / stage 3 case-close）とは別の概念である（REQ-006、SPEC `responsibility-boundary-purification.md`「case 実行責務の 4 用語と所有者」参照）。case-run は case-run internal lifecycle のみを所有し、orchestration stage を複製しない。
+本節の「フェーズ」は case-run internal lifecycle（単一 Issue または Wave 内の準備、実装、提出）を指す。case-auto が管理する orchestration stage（command 間進行、stage 1 case-open / stage 2 case-run / stage 3 case-close）とは別の概念である（responsibility-boundary-purification SPEC「case 実行責務の 4 用語と所有者」参照）。case-run は case-run internal lifecycle のみを所有し、orchestration stage を複製しない。
 
 | フェーズ | Steps | 再開条件 |
 |---|---|---|
@@ -65,9 +65,9 @@ Epic Issue 本文から現在 ready な Wave の子Issue を特定し、各子Is
 
 いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
 
-**前工程からの引き継ぎ停止判定**: Issue 本文、要件doc本文に `agentdev_handoff: true` が含まれる場合、リポジトリ種別に応じて分岐する（REQ-005-021, REQ-005-022）:
-- **self-hosting リポジトリ**（`src/opencode/` が存在）: 停止せず、履歴メタデータとして通常の case workflow として実装を開始する
-- **consumer リポジトリ**（`src/opencode/` が不在）: 実装を開始せず停止し、agent-dev-flow repository への手動取り込み対象として報告する
+**前工程からの引き継ぎ停止判定**: Issue 本文、要件doc本文に `agentdev_handoff: true` が含まれる場合、リポジトリ種別に応じて分岐する:
+- **self-hosting リポジトリ**（`.opencode/commands/agentdev/` がジャンクションまたは実ディレクトリ）: 停止せず、履歴メタデータとして通常の case workflow として実装を開始する
+- **consumer リポジトリ**（ジャンクションではなくコピー配置等）: 実装を開始せず停止し、agent-dev-flow repository への手動取り込み対象として報告する
 
 リポジトリ種別の判定基準は `agentdev-workflow-lifecycle`（runtime-package-boundary 参照）に従う
 
@@ -169,7 +169,7 @@ Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情�
 - 外部実行ハーネスの plan artifact 等の中間成果物の内部構造に依存した処理、検証を行わない。最終結果は PR URL で受領する
 - 実行担当サブエージェントが Issue 完了条件チェックボックスを更新しない（case-close QG-4 の責務）
 - Findings/ Capture 候補は実行担当サブエージェントが PR 本文の `## Findings / Capture候補` に記録する
-- **外部実行手段の中間成果物**: 外部実行手段の plan artifact 等の中間成果物を AgentDevFlow の永続成果物（Issue/PR/REQ/ADR/SPEC）として扱わない。draft は一時成果物であり（REQ-008-001）、case-open 成功後は invalid post-case reader として参照しない（REQ-008-036）
+- **外部実行手段の中間成果物**: 外部実行手段の plan artifact 等の中間成果物を AgentDevFlow の永続成果物（Issue/PR/REQ/ADR/SPEC）として扱わない。draft は一時成果物であり、case-open 成功後は invalid post-case reader として参照しない
 - **SPEC確定候補**: 実装時に発見された SPEC レベルの詳細（SPEC に記載すべき schema、enum、判定表、内部アルゴリズム等、実装で判明した仕様詳細）は、実行担当サブエージェントが PR 本文の `## SPEC確定候補` セクションに記録する。`## Findings / Capture候補`（本筋外発見、intake/learning 候補）とは別セクションとし、混在させない。SPEC確定候補は case-close Step 3 で SPEC 確定チェックの入力となり、draft → accepted 昇格または spec-save 再起動の判断材料となる
 
 ### Step 7: 実行担当サブエージェント result 処理

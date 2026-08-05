@@ -67,17 +67,17 @@ status: draft
 
 ## session由来RU 生成形式（参照）
 
-`source_type: chat` かつ `generated_by: session` のRU（session由来RU）の生成形式は、REQ-008-051..057 および `docs/specs/responsibilities/artifact-contracts.md`「RU アーティファクト契約（session由来RU）」セクションを正規原本とする。本コマンドは同契約を再定義せず、以下を参照ポイントとして扱う。
+`source_type: chat` かつ `generated_by: session` のRU（session由来RU）の生成形式は、一時成果物ライフサイクル要件と artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」セクションを正規原本とする。本コマンドは同契約を再定義せず、以下を参照ポイントとして扱う。
 
-- frontmatter 必須フィールド: 通常のRU フィールドに加え `generation_actor`、`agreement_confirmed_at`、`generation_stage`、`logical_key` を必須とする（REQ-008-051、SPEC「frontmatter 必須フィールド」表）
-- 二段階承認: 第1承認はRU案内容のみを対象とし、第2承認のみが採番、保存、commit、push を許可する（REQ-008-052、SPEC「二段階承認」）
-- `agreement_confirmed_at` と `generated_at`: ISO 8601 形式で `generated_at >= agreement_confirmed_at` を満たし、保存完了前に req-define を開始しない（REQ-008-053）
-- session 論理URI: `sources[].type: chat` の場合のみ `sources[].path` へ `session:...` を解決しない論理URIとして許可する（REQ-008-054、SPEC「session 論理URI」）
-- RU 本文必須8セクション: 目的、対象、対象外、正規所有者とアンカー、依存関係、要件化の方向、決定的受け入れ条件、Source Summary（REQ-008-057、SPEC「RU 本文必須8セクション」）
-- 永続ID 採番: 保存時に既存最大番号+1で割り当て、保存後の `depends_on` は RU-ID で記録する（REQ-008-055、SPEC「保存先と永続ID」）
-- `tentative_classification`: 既存7値のいずれか。欠落時はRU 生成を停止する（REQ-008-056）
+- frontmatter 必須フィールド: 通常のRU フィールドに加え `generation_actor`、`agreement_confirmed_at`、`generation_stage`、`logical_key` を必須とする（SPEC「frontmatter 必須フィールド」表）
+- 二段階承認: 第1承認はRU案内容のみを対象とし、第2承認のみが採番、保存、commit、push を許可する（SPEC「二段階承認」）
+- `agreement_confirmed_at` と `generated_at`: ISO 8601 形式で `generated_at >= agreement_confirmed_at` を満たし、保存完了前に req-define を開始しない
+- session 論理URI: `sources[].type: chat` の場合のみ `sources[].path` へ `session:...` を解決しない論理URIとして許可する（SPEC「session 論理URI」）
+- RU 本文必須8セクション: 目的、対象、対象外、正規所有者とアンカー、依存関係、要件化の方向、決定的受け入れ条件、Source Summary（SPEC「RU 本文必須8セクション」）
+- 永続ID 採番: 保存時に既存最大番号+1で割り当て、保存後の `depends_on` は RU-ID で記録する（SPEC「保存先と永続ID」）
+- `tentative_classification`: 既存7値のいずれか。欠落時はRU 生成を停止する
 
-各項目の判定基準、検証観点は正規原本（REQ-008 + artifact-contracts SPEC）へ委譲する。
+各項目の判定基準、検証観点は正規原本（一時成果物ライフサイクル要件 + artifact-contracts SPEC）へ委譲する。
 
 ## 手順
 
@@ -129,7 +129,7 @@ status: draft
 
 RU 生成ルール、frontmatter スキーマ、depends_on 検証は `agentdev-backlog-integration` を参照
 
-**session由来RU の場合（REQ-008）**: `source_type: chat`、`generated_by: session` のRU は「session由来RU 生成形式（参照）」セクションに従う。二段階承認、frontmatter 必須フィールド、session 論理URI、RU 本文必須8セクション、採番、保存手続きは正規原本（REQ-008-051..057、artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」）へ委譲する
+**session由来RU の場合**: `source_type: chat`、`generated_by: session` のRU は「session由来RU 生成形式（参照）」セクションに従う。二段階承認、frontmatter 必須フィールド、session 論理URI、RU 本文必須8セクション、採番、保存手続きは正規原本（一時成果物ライフサイクル要件、artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」）へ委譲する
 
 ### Step 7: 成功成果物の削除
 

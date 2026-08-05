@@ -69,10 +69,10 @@ case-auto は各工程を以下の契約で起動する:
 
 | 工程 | 起動方式 | inputs | output_contract |
 |---|---|---|---|
-| req-save + spec-save | 委譲（1 統合委譲、AG-005） | draft path, OU ID | 保存済みREQ/ADRリスト, 保存済みSPECリスト, draft status=saved, SPEC消費済みフラグ, pass/warn/fail, **artifact_action 適用結果（action id ごとに applied/skipped/failed/no-op、REQ-006-110）** |
-| case-open | 委譲 | draft path, OU ID | Issue番号(Epic含む), pass/warn/fail, **OU lifecycle: Issue 作成 完了/未完了（REQ-006-110）** |
-| case-run | インライン実行（case-run.md を authoritative source として読み込み、case-auto が準備/クリーンアップフェーズを自ら実行、実行担当サブエージェントへ直接委譲、AG-001/002） | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の子Issue を case-auto が並列委譲、最大5件） | completed-pr/blocked/failed/delegation-unavailable（Epic Wave 実行時は子Issue ごとの結果集合）, **OU lifecycle: PR 作成 完了/未完了（completed-pr のみ完了、REQ-006-110）** |
-| case-close | 委譲 | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の一括クローズ） | マージ結果, Capture保存結果, 削除済みブランチ, pass/warn/fail, Epic 最終 Wave 判定結果, **OU lifecycle: PR マージ完了/未完了、Issue クローズ完了/未完了（REQ-006-110）** |
+| req-save + spec-save | 委譲（1 統合委譲、AG-005） | draft path, OU ID | 保存済みREQ/ADRリスト, 保存済みSPECリスト, draft status=saved, SPEC消費済みフラグ, pass/warn/fail, **artifact_action 適用結果（action id ごとに applied/skipped/failed/no-op）** |
+| case-open | 委譲 | draft path, OU ID | Issue番号(Epic含む), pass/warn/fail, **OU lifecycle: Issue 作成 完了/未完了** |
+| case-run | インライン実行（case-run.md を authoritative source として読み込み、case-auto が準備/クリーンアップフェーズを自ら実行、実行担当サブエージェントへ直接委譲、AG-001/002） | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の子Issue を case-auto が並列委譲、最大5件） | completed-pr/blocked/failed/delegation-unavailable（Epic Wave 実行時は子Issue ごとの結果集合）, **OU lifecycle: PR 作成 完了/未完了（completed-pr のみ完了）** |
+| case-close | 委譲 | 単一 Issue番号 または Epic Issue番号（`#epic`、現在 Wave の一括クローズ） | マージ結果, Capture保存結果, 削除済みブランチ, pass/warn/fail, Epic 最終 Wave 判定結果, **OU lifecycle: PR マージ完了/未完了、Issue クローズ完了/未完了** |
 
 各工程の side_effect_boundary は対応するコマンド定義のガードレールに従う。各工程の後段処理（case-open の RU 削除、case-close の learning/intake capture、.agentdev/ commit/push 等）は各コマンド定義に従う（case-run インライン実行時の worktree クリーンアップは case-auto が case-run.md に従って実行）。
 
@@ -80,7 +80,7 @@ case-auto は req-save/case-open の委譲に draft path と OU ID のみを渡�
 
 case-auto は各工程の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。
 
-#### 結果状態の4次元集約（REQ-006-110）
+#### 結果状態の4次元集約
 
 case-auto は各工程の結果を以下の4状態次元で保持し、集約時に混同しない。各工程の `output_contract`（工程別契約表）がこれらの情報源となる。warn を pass へ変換する集約は禁止する。
 
@@ -109,7 +109,7 @@ case-open 委譲の完了後、出力を確認して以下のいずれかに分�
 - **Standard flow（単一 Issue）**: case-open 委譲が共通終了処理（コメント追加、ドラフト削除、RU削除、完了報告）を完了していることを確認 → クリーンアップ検証ゲート（後述）→ 既存の直列フロー（case-run → case-close）
 - **Epic Issue flow（マルチREQ または 単一REQ Epic flow）**: 同上の確認 → クリーンアップ検証ゲート → Wave 反復制御（後述）
 
-**req_draft reader lifecycle（REQ-006-083）**: case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込む。case-open 成功後は invalid post-case reader として req_draft を読まず、停止、再開、完了処理は Issue と Epic だけで成立させる（G19）。クリーンアップ検証ゲートでドラフト削除を検証するのもこの lifecycle に由来する。
+**req_draft reader lifecycle**: case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込む。case-open 成功後は invalid post-case reader として req_draft を読まず、停止、再開、完了処理は Issue と Epic だけで成立させる（G19）。クリーンアップ検証ゲートでドラフト削除を検証するのもこの lifecycle に由来する。
 
 #### Wave 反復制御（case-auto 直接制御、AG-003）
 
@@ -194,7 +194,7 @@ case-auto が各工程を subagent へ委譲する際、委譲 prompt の catego
 
 #### orchestration stage モデル
 
-case-auto が複数対象を処理する場合、orchestration stage モデルを採用する。orchestration stage は case-auto が管理する command 間進行であり、case-run internal lifecycle（単一 Issue または Wave 内の準備、実行、提出）とは別の概念である（REQ-006、SPEC `responsibility-boundary-purification.md`「case 実行責務の 4 用語と所有者」参照）。
+case-auto が複数対象を処理する場合、orchestration stage モデルを採用する。orchestration stage は case-auto が管理する command 間進行であり、case-run internal lifecycle（単一 Issue または Wave 内の準備、実行、提出）とは別の概念である（responsibility-boundary-purification SPEC「case 実行責務の 4 用語と所有者」参照）。
 
 - **orchestration stage 1**: 全対象の case-open を順次実行する
 - **orchestration stage 2**: case-run を bg task として最大5件ずつ並列実行し、結果と破棄を収集する
@@ -304,7 +304,7 @@ execution_unit 分割可能性があるにもかかわらず case-open が停止
 
 **orchestration stage 別結果・フォールバック理由・破棄回復記録**: 完了報告には orchestration stage 1（case-open 順次実行）、stage 2（case-run 並列実行）、stage 3（case-close 順次実行）の各 orchestration stage の実行結果を含める。orchestration stage 2 を順次フォールバックで実行した場合はその理由を記録する。orchestration stage 2 の bg task 破棄を検知して回復した場合は、検知した状態区分（commit 済みで PR 未作成、未コミット変更残存）と回復結果を記録する。
 
-**結果状態の4次元報告（REQ-006-110）**: 完了報告（停止時フォーマットを含む）には Step 4「結果状態の4次元集約」の4状態次元を次の形式で含めること。warn を pass へ変換して集約しないこと。
+**結果状態の4次元報告**: 完了報告（停止時フォーマットを含む）には Step 4「結果状態の4次元集約」の4状態次元を次の形式で含めること。warn を pass へ変換して集約しないこと。
 
 - **(1) 工程結果**: 各工程（req-save+spec-save / case-open / case-run / case-close）の `pass/warn/fail` を工程別に列挙
 - **(2) artifact_action 適用結果**: 定義適用工程（req-save+spec-save）の action id ごとに `applied/skipped/failed/no-op` を列挙
@@ -364,7 +364,7 @@ Level 1（case-close rebase）→ Level 2（case-auto インライン case-run �
 - G15: case-auto は Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、子Issue 並列委譲（最大5件）を直接担当する（AG-003）。case-run(#epic) への委譲は行わない。各子Issue ごとにインライン case-run を実行する。Wave 境界のクローズは case-close(#epic) に委譲する
 - G16: case-auto は独自の操作単位ステータス追跡を持ってはならない。Epic Issue のステータス追跡テーブルを使用する。**Epic Issue 本文の書き込みは case-close の単一書き手責務。case-auto は読み取るのみで書き込まない**
 - G18: case-auto は操作単位キューの管理、制御のみを担い、OU 本文の抽出、変換、REQ 操作解釈を行わないこと
-- G19: case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込み、case-open 成功後は invalid post-case reader として req_draft を読まないこと（REQ-006-083）。case-open 成功後の停止、再開、完了処理は Issue と Epic（Epic Issue のステータス追跡テーブル含む）だけで成立させること。クリーンアップ検証ゲート（ドラフト削除検証）は case-open 完了後に実行すること。独自の OU 状態管理を持たないこと
+- G19: case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込み、case-open 成功後は invalid post-case reader として req_draft を読まないこと。case-open 成功後の停止、再開、完了処理は Issue と Epic（Epic Issue のステータス追跡テーブル含む）だけで成立させること。クリーンアップ検証ゲート（ドラフト削除検証）は case-open 完了後に実行すること。独自の OU 状態管理を持たないこと
 - G20: OU 間依存は queue dependency として扱い、依存関係があるだけでは Epic Issue 化しないこと
 - G21: case-auto は Epic Issue 化の判定に関与しないこと。case-open の判定結果に従うこと
 - G27: 各工程の起動は工程別契約（Step 4 の契約表）に従うこと。inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領する

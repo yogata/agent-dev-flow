@@ -52,6 +52,34 @@ export interface BaselineFile {
   entries: BaselineEntry[];
 }
 
+// §6.4.1 explicit exemption mechanism (B3).
+// Exemptions are approval-backed exceptions, distinct from the baseline
+// (which is unresolved debt). Only entries with review_status="accepted"
+// are applied. rationale_ref must point at docs/adr/** or an accepted SPEC.
+export type ExemptionRationaleCategory =
+  | "harness_reference"
+  | "accepted_canonical_doc"
+  | "historical_context";
+
+export type ExemptionReviewStatus = "accepted" | "rejected" | "pending";
+
+export interface ExemptionEntry {
+  id: string;
+  rule: string;
+  file: string;
+  matched: string;
+  rationale_category: ExemptionRationaleCategory;
+  rationale_ref: string;
+  added_at_commit: string;
+  review_status: ExemptionReviewStatus;
+}
+
+export interface ExemptionFile {
+  version: 1;
+  description: string;
+  entries: ExemptionEntry[];
+}
+
 export interface DeltaReport {
   new_failures: BoundaryFailure[];
   resolved: Array<{
@@ -334,6 +362,53 @@ export function loadBaseline(baselinePath: string): BaselineFile | null {
   }
 }
 
+export function loadExemptions(exemptionsPath: string): ExemptionFile | null {
+  const text = readText(exemptionsPath);
+  if (text === null) return null;
+  try {
+    const parsed = JSON.parse(text) as ExemptionFile;
+    if (parsed.version !== 1 || !Array.isArray(parsed.entries)) {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export interface ExemptionMatchResult {
+  exempted: BoundaryFailure[];
+  remaining: BoundaryFailure[];
+}
+
+export function applyExemptions(
+  failures: BoundaryFailure[],
+  exemptions: ExemptionFile | null,
+  repoRoot: string,
+): ExemptionMatchResult {
+  if (exemptions === null || exemptions.entries.length === 0) {
+    return { exempted: [], remaining: failures };
+  }
+  const accepted = exemptions.entries.filter((e) => e.review_status === "accepted");
+  if (accepted.length === 0) {
+    return { exempted: [], remaining: failures };
+  }
+  const exempted: BoundaryFailure[] = [];
+  const remaining: BoundaryFailure[] = [];
+  for (const f of failures) {
+    const normalizedFile = normalizeFileForBaseline(f.file, repoRoot);
+    const hit = accepted.find(
+      (e) => e.file === normalizedFile && e.matched === f.matched,
+    );
+    if (hit) {
+      exempted.push(f);
+    } else {
+      remaining.push(f);
+    }
+  }
+  return { exempted, remaining };
+}
+
 export function computeDelta(report: BoundaryReport, baseline: BaselineFile, repoRoot: string): DeltaReport {
   const currentCounts = countBySignature(report.failures, repoRoot);
   const baselineMap = new Map<string, BaselineEntry>();
@@ -408,13 +483,28 @@ if (require.main === module) {
 
   const saveBaselineIdx = args.indexOf("--save-baseline");
   const deltaBaselineIdx = args.indexOf("--delta");
+  const exemptionsIdx = args.indexOf("--exemptions");
   const baselinePath = saveBaselineIdx >= 0 ? args[saveBaselineIdx + 1] : deltaBaselineIdx >= 0 ? args[deltaBaselineIdx + 1] : null;
+  const exemptionsPath = exemptionsIdx >= 0 ? args[exemptionsIdx + 1] : null;
 
-  const report = checkDistributionBoundary(repoRoot);
+  const rawReport = checkDistributionBoundary(repoRoot);
+
+  const exemptions = exemptionsPath ? loadExemptions(exemptionsPath) : null;
+  const exemptionResult = applyExemptions(rawReport.failures, exemptions, repoRoot);
+  const report: BoundaryReport = {
+    ok: exemptionResult.remaining.length === 0,
+    failures: exemptionResult.remaining,
+    stats: {
+      scanned_files: rawReport.stats.scanned_files,
+      concrete_id_hits: countCategory(exemptionResult.remaining, "concrete-id"),
+      concrete_path_hits: countCategory(exemptionResult.remaining, "concrete-path"),
+      fixed_url_hits: countCategory(exemptionResult.remaining, "fixed-url"),
+    },
+  };
 
   if (saveBaselineIdx >= 0 && baselinePath) {
     const baseline = buildBaseline(
-      report,
+      rawReport,
       repoRoot,
       "IR-059 distribution reference boundary known-violations baseline",
     );
@@ -436,12 +526,19 @@ if (require.main === module) {
     }
     const delta = computeDelta(report, baseline, repoRoot);
     if (json) {
-      process.stdout.write(JSON.stringify(delta, null, 2) + "\n");
+      const payload = {
+        ...delta,
+        exempted_count: exemptionResult.exempted.length,
+      };
+      process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
     } else {
       process.stdout.write(`check_distribution_boundary.ts - delta guard\n`);
       process.stdout.write(`=============================================================\n`);
       process.stdout.write(`repoRoot: ${repoRoot}\n`);
       process.stdout.write(`baseline: ${baselinePath}\n`);
+      if (exemptionsPath) {
+        process.stdout.write(`exemptions: ${exemptionsPath} (${exemptionResult.exempted.length} exempted)\n`);
+      }
       process.stdout.write(`ok: ${delta.ok}\n`);
       process.stdout.write(`stats: ${JSON.stringify(delta.stats, null, 2)}\n`);
       process.stdout.write(`new failures (${delta.new_failures.length}):\n`);
@@ -476,4 +573,8 @@ if (require.main === module) {
     }
   }
   process.exit(report.ok ? 0 : 1);
+}
+
+function countCategory(failures: BoundaryFailure[], cat: BoundaryFailure["category"]): number {
+  return failures.filter((f) => f.category === cat).length;
 }
