@@ -37,7 +37,7 @@ Command定義（`.opencode/commands/`）の行数目安、Steps数目安、書�
 
 ### 除外対象
 
-- YAML frontmatter の `agent`/ `description` は必須フィールドとして扱い、行数削減のために削除しない
+- YAML frontmatter の `description` は必須フィールドとして扱い、行数削減のために削除しない
 - dev メタデータは frontmatter に記述禁止（Case 5/ RU-0020, 規定の行番号範囲）
 
 ## Steps 数目安
@@ -311,7 +311,7 @@ Command作成、改定時に確認する項目:
 
 - [ ] 総行数が150行以内か（超過する場合は分割計画が存在するか）
 - [ ] Stepsが5〜12個か
-- [ ] frontmatterが description + agent のみか（dev メタデータ禁止: pattern/ workflow_route/ branch_type/ labels）
+- [ ] frontmatterが description 単一か（dev メタデータ禁止: agent/ pattern/ workflow_route/ branch_type/ labels）
 
 ### Token 確認
 

@@ -23,7 +23,7 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 
 ## extensions 手順
 
-command 本文は extensions 手順（ADR-005、SPEC `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を固定しない。
+command 本文は extensions 手順（SPEC `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を固定しない。
 
 各 command は以下の共通記述を本文に持つ。extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`）を持ち、標準動作に追加・拡張される（上書きではない）。SPEC パス例示、検査対象パス指定は例外として許可する:
 

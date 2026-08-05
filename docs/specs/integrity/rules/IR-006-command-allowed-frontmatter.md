@@ -8,7 +8,7 @@ updated: 2026-08-06
 | Field | Value |
 |-------|-------|
 | rule_id | IR-006 |
-| description | Command frontmatter に description と agent のみが存在すること。pattern, workflow_route, branch_type, labels は禁止 |
+| description | Command frontmatter に description 単一のみが存在すること。agent, pattern, workflow_route, branch_type, labels は禁止 |
 | severity | strict |
 | category | document-drift |
 | detection_method | frontmatter field 列挙 → 許可リストと照合 |

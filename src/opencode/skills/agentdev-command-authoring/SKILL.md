@@ -25,16 +25,16 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## Frontmatter 規約
 
-command frontmatter の許可フィールドは `description` と `agent` のみ:
+command frontmatter の許可フィールドは `description` 単一。実行エージェントの固定は harness 側設定へ移管し、command frontmatter には記述しない。
 
 ```yaml
 ---
 description: コマンドの簡潔な説明
-agent: prometheus | sisyphus
 ---
 ```
 
 **禁止フィールド**（frontmatter への記述は error として検出される）:
+- `agent`（harness 側設定へ移管）
 - `pattern`（追加禁止フィールド）
 - `workflow_route`（追加禁止フィールド）
 - `branch_type`（追加禁止フィールド）
@@ -88,7 +88,7 @@ command 定義の内容を追加、更新する際、サブセクション化（
 
 command/ skill 変更時の完了定義。以下の全項目を満たすこと:
 
-- **Frontmatter**: description + agent のみ。dev メタデータ禁止
+- **Frontmatter**: description 単一。dev メタデータ禁止
 - **行数**: 100行以内が目標。150行実運用上限。200行超は例外状態
 - **Steps数**: 5〜12個
 - **共通処理重複**: 共通処理は共通 skill/ script に集約
@@ -126,7 +126,7 @@ Command/ skill 定義内のパス参照は記述された通りに解釈し、so
 
 Command作成、改定時に以下を確認する:
 
-- [ ] Frontmatter が description + agent のみか（dev メタデータなし）
+- [ ] Frontmatter が description 単一か（dev メタデータなし）
 - [ ] 行数が150行以内か（超過する場合は分割検討）
 - [ ] Stepsが5〜12個か
 - [ ] 詳細な判定表、分類表がSkillに移されているか

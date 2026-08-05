@@ -23,7 +23,7 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 
 | # | Domain | Canonical REQ | Canonical SPEC | 補足 |
 |---|--------|--------------|----------------|------|
-| 1 | Command frontmatter | REQ-002 (015, 044) | artifact-contracts.md | description + agent のみ |
+| 1 | Command frontmatter | REQ-002 (015, 044) | artifact-contracts.md | description 単一 |
 | 2 | Skill frontmatter | REQ-002 (012, 013) | artifact-contracts.md | name + description |
 | 3 | Command 行数上限 | REQ-002 (022-024) | quality-specs.md | 100 行目標、150 行上限、200 行以内 |
 | 4 | Skill 行数上限 | REQ-002 (037) | quality-specs.md | 200 行超で分割候補報告 |
@@ -58,7 +58,7 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 33 | ローカル版 link mode 導入フロー、安全ゲート | REQ-009 (001-015) | runtime-package-boundary.md | link mode 接続手順、link target 確認、ジャンクション検出安全ゲート |
 | 34 | local-transform（ローカル版変換資産） | REQ-009 (028, 029, 032) | runtime-package-boundary.md | **確定廃止**（PR#1195 で transform/ 完全削除、REQ-009-004/009/028 確定廃止昇格）。変換用プロンプト、レビュー用プロンプト、変換仕様の要件は全て廃止済み。link mode の現行契約は `runtime-package-boundary.md` が所有する |
 | 35 | obsolete-spec-path（旧SPEC直下パス参照検出） | REQ-010 (280, 282) | integrity-rule-catalog.md (IR-057) | docs/specs/ 基盤SPEC ドメイン別体系化（REQ-001）以前の直下パス参照を検出。`obsolete-path-map.yaml` を対照表として IR-057 が検証。link mode 統一（REQ-009）に伴う廃止語彙を「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離し検出。例外条件: obsolete-path-map.yaml 自体、IR-057 ルール説明、retired 配下、テスト fixture、コードブロック内検査 fixture。v2:REQ-0158 は Issue #1713 で retire 完了（要件は REQ-010-280/282 へ統合） |
-| 36 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003), REQ-010 (263) | integrity-rule-catalog.md (IR-056) | project extensions 機構（ADR-005）の整合性検査。extension schema（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
+| 36 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003), REQ-010 (263) | integrity-rule-catalog.md (IR-056) | project extensions 機構（SPEC `../foundations/project-extensions.md`）の整合性検査。extension schema（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
 | 37 | IR lifecycle / enforcement_mode 状態モデル | REQ-010 (053-058) | integrity-contracts.md | IR の `lifecycle_state`（active / superseded / deleted）と `enforcement_mode`（enforcement / observation / none）の状態モデルを所有。有効組合せ5件、不正組合せ4件、全登録IR ID の排他的分割（file-backed と catalog-only deleted）、IR-011 型 file-backed tombstone と IR-045 型 catalog-only tombstone の区別、導出規則4件、`enforcement_mode: none` の4面除外、既存 severity/gate_level/baseline_status の維持と上書き禁止を正規所有する。catalog（[integrity-rule-catalog.md](integrity-rule-catalog.md)）は schema 定義のみ重複所有し、判定規則は本ドメインへ委譲する |
 
 ## IR 別関連マッピング（自動生成）

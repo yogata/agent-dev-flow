@@ -754,7 +754,7 @@ function checkExpandedReadmeSync(cmdDir: string, root: string): CheckResult[] {
 function checkCommandInventory(cmdDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const cmdFiles = listFiles(cmdDir).filter((f) => f !== "README.md");
-  const required = ["description", "agent"];
+  const required = ["description"];
 
   for (const file of cmdFiles) {
     const fullPath = path.join(cmdDir, file);
@@ -3208,16 +3208,6 @@ function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
 
 // ─── Command frontmatter checks (v2:REQ-0108-095~099, inverted: Case 5 / RU-0020) ─
 
-const KNOWN_AGENTS = new Set([
-  "sisyphus",
-  "prometheus",
-  "oracle",
-  "metis",
-  "hephaestus",
-  "momus",
-  "test-agent",
-]);
-
 /** Additional prohibited fields (v2:REQ-0108-124) */
 const EXTRA_PROHIBITED_FIELDS = [
   "pattern",
@@ -3226,8 +3216,8 @@ const EXTRA_PROHIBITED_FIELDS = [
   "labels",
 ] as const;
 
-/** Allowed frontmatter fields for commands (v2:REQ-0108-046, 098) */
-const ALLOWED_FRONTMATTER_FIELDS = new Set(["description", "agent"]);
+/** Allowed frontmatter fields for commands (description 単一、移行計画 §5.2) */
+const ALLOWED_FRONTMATTER_FIELDS = new Set(["description"]);
 
 function checkCommandFrontmatterDetailed(
   cmdDir: string,
@@ -3263,25 +3253,6 @@ function checkCommandFrontmatterDetailed(
           ),
         );
       }
-    }
-
-    // v2:REQ-0108-098: agent must be known
-    const agent = fm["agent"];
-    if (typeof agent === "string" && !KNOWN_AGENTS.has(agent)) {
-      results.push(
-        warn(
-          "Command",
-          "cmd-agent-name",
-          `Command '${cmdName}' has unknown agent '${agent}'`,
-          relPath,
-          undefined,
-          {
-            evidence: agent,
-            expected: `one of: ${[...KNOWN_AGENTS].join(", ")}`,
-            route: "req-define",
-          },
-        ),
-      );
     }
 
     // v2:REQ-0108-099: deprecated command in inventory
@@ -3969,6 +3940,12 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
   // detector does not fire on REQ/SPEC lines merely mentioning persistent state.
   const stateWord =
     "status|ステータス|マイクロフェーズ|micro.phase|(?<!domain )state|(?<!ドメイン)状態";
+  // §5.4: `review` は現行 Case 状態（open/running/blocked/review/closed/cancelled）
+  // と旧6状態モデルの両方に現れる。`review` 単独の語一致では誤検知するため、
+  // 旧状態モデルに特有の語（requirement/analyzed/created/in_progress/done）を
+  // 検出した場合のみ violation とする。
+  const legacyOnlyPhasePattern =
+    /\b(requirement|analyzed|created|in_progress|done)\b/i;
   const sixPhasePattern = new RegExp(
     "\\b(requirement|analyzed|created|in_progress|review|done)\\b.*\\b(" +
       stateWord +
@@ -4018,7 +3995,7 @@ function checkWorkflowStatusProhibition(root: string): CheckResult[] {
           break;
         }
       }
-      if (phaseInNarrative) {
+      if (phaseInNarrative && legacyOnlyPhasePattern.test(lines[i])) {
         foundViolation = true;
         results.push(
           ng(

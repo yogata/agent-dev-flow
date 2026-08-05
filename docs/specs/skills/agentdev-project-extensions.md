@@ -69,5 +69,5 @@ updated: 2026-07-27
 - [foundations/project-extensions.md](../foundations/project-extensions.md)（project-extensions 機構の基盤 SPEC）
 - [foundations/system.md](../foundations/system.md)（システム仕様、公開 command 一覧）
 - REQ-002（Project Extensions 機構と配布物参照境界）
-- ADR-006（inspect 3-command 構成への正規化、ADR-005 を supersede）
+- ADR-006（inspect 3-command 構成への正規化）
 

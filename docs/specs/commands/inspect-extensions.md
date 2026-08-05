@@ -86,5 +86,5 @@ AgentDevFlow 標準の inspect 責務は構造確認（検査1〜4）、path 実
 - [skills/agentdev-project-extensions.md](../skills/agentdev-project-extensions.md)（project extensions 読み込み skill SPEC）
 - [inspect-promote.md](inspect-promote.md)（検出事項分類、昇格）
 - REQ-002（Project Extensions 機構と配布物参照境界）
-- ADR-005（Project Extensions Architecture）
+- ADR-006（inspect 3-command 構成への正規化、本 command は廃止済み）
 
