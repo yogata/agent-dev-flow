@@ -96,3 +96,22 @@
 - **関連**: PR #1932、Issue #1925（WP-0）、Epic #1924、`.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`
 - **タグ**: `#learning` `#worktree` `#junction` `#source-projection` `#integrity-checker` `#skip-constraint`
 
+
+---
+
+## 移行計画 §5.3 の明示対象不足による壊れた fixture 修復見送りリスク
+
+- **問題事象**: 移行計画 §5.3 で `commands_error_cases.test.ts` の修復を明示したが、`commands_structure.test.ts` と `command_fixtures.test.ts` も同様の文字化け・改行崩壊があった。§5.3 は前者のみを明示対象としたが、壊れた fixture の修復としては後者2件も含めて対処すべきだった
+- **発生局面**: 実装（Wave 2 WP-1 case-run、PR #1933 作成時）
+- **検知方法**: PR #1933 本文「Findings / Capture候補」セクション learning の自己申告。実装修復中に §5.3 明示対象外の fixture にも同種の文字化け・改行崩壊を発見
+- **根本原因**: 移行計画の事前調査が壊れた fixture を網羅せず、代表例のみを明示対象とした。同種の問題を持つファイルの横展開確認が計画段階で実施されなかった
+- **自律対応内容**: PR #1933 で §5.3 明示対象外の `commands_structure.test.ts`、`command_fixtures.test.ts` も併せて修復し、新 frontmatter 契約（description 単一）へ適合させた
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（移行計画の記載精度の改善候補。SPEC/REQ 本文の変更は伴わない）
+- **横展開観点**: 移行計画や要件定義で「代表例を明示」する全ケースで、同種の問題を持つ対象の横展開確認を計画段階で実施すべき。明示対象を「例示」として扱い、同種調査を暗黙に含意させる記述が有効
+- **再発条件**: 移行計画や要件定義で、同種の問題を持つ複数対象のうち代表例のみを明示し、横展開確認を省いた場合
+- **予防策候補**: 移行計画の対象一覧に「同種問題の横展開確認」を暗黙の前提とする旨を記載、または明示対象を「例示」と注記する運用ルールを定める
+- **想定反映先**: 移行計画テンプレート（`.omo/plans/` 配下）の対象一覧記述ガイドライン、または `docs/guides/` の計画策定解説文書
+- **関連**: Epic #1924、Issue #1926（WP-1）、PR #1933、移行計画 `.omo/plans/agentdev-migration-2026-08-05.md` §5.3
+- **タグ**: `#learning` `#migration-plan` `#fixture-repair` `#scope-precision` `#horizontal-expansion`
+
