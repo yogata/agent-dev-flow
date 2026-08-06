@@ -1,0 +1,21 @@
+version: 1
+kind: skill-extension
+id: agentdev-deep-review
+
+context:
+  - id: artifact-graph-spec
+    when: Artifact Graphを論点候補の探索に使用するとき
+    paths:
+      - "docs/specs/local/artifact-graph.md"
+    purpose: 派生索引の利用上の防護と障害耐性の確認
+
+rules:
+  - id: artifact-graph-deliberation-candidates
+    when: 複数規範関係、循環、集中ノード、孤立候補、複数経路から審議論点の候補を探索するとき。利用不能時は従来の探索手段で続行する
+    skill: repo-agentdev-artifact-graph
+
+checks: []
+
+acceptance_gates: []
+
+must_not: []

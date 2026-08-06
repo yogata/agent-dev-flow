@@ -29,7 +29,10 @@ context:
   - id: discovery-3
     purpose: "docs/specs/integrity/integrity-rule-catalog.md 経由で関連 IR を確認してよい"
 
-rules: []
+rules:
+  - id: artifact-graph-closure-observation
+    when: 鮮度、未解決参照、存在しないノードへの関係、根拠欠落、関係閉包の候補を観測するとき。利用不能時は従来の検査手段で続行する
+    skill: repo-agentdev-artifact-graph
 
 checks:
   - id: autogen-index-regeneration-diff
