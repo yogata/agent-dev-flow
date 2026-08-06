@@ -87,11 +87,12 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/spec-save.md | 258 | accepted | commands |
 | integrity/integrity-rule-catalog.md | 251 | accepted | integrity |
 | commands/case-close.md | 250 | accepted | commands |
-| README.md | 243 | - | uncategorized |
+| README.md | 244 | - | uncategorized |
 | local/local-case-file.md | 240 | accepted | local |
 | skills/agentdev-gh-cli.md | 214 | accepted | skills |
 | workflows/workflow-contracts.md | 214 | accepted | workflows |
 | workflows/delegation-contracts.md | 210 | accepted | workflows |
+| local/artifact-graph.md | 192 | draft | local |
 | quality/quality-gates.md | 186 | accepted | quality |
 | foundations/design-principles.md | 158 | accepted | foundations |
 | integrity/index-auto-generation.md | 156 | accepted | integrity |

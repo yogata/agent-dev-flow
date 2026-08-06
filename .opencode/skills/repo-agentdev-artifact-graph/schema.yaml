@@ -1,0 +1,39 @@
+schema_version: "1.0.0"
+node_types:
+  - requirement
+  - adr
+  - specification
+  - integrity_rule
+  - command
+  - skill
+  - extension
+  - source_file
+relation_types:
+  - references
+  - supersedes
+  - defined_in
+  - contains
+  - extends
+  - delegates_to
+  - governs
+relation_categories:
+  generated:
+    - declared
+    - derived
+  reserved:
+    - inferred
+provenance_fields:
+  - path
+  - heading
+  - element_id
+  - matched_text
+  - matched_text_hash
+  - line_start
+  - line_end
+  - extraction_rule
+outputs:
+  - manifest.json
+  - nodes.jsonl
+  - edges.jsonl
+  - provenance.jsonl
+  - diagnostics.json

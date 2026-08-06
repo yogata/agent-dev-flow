@@ -10,6 +10,7 @@
 .worktrees/
 .omo/
 .agentdev/integrity/reports/
+.agentdev/graph/
 AGENTS.md
 outputs/
 dist/
