@@ -18,7 +18,10 @@ context:
   - id: discovery-3
     purpose: "docs/specs/foundations/document-model.md で SPEC ドメイン分類規則を確認してよい"
 
-rules: []
+rules:
+  - id: artifact-graph-candidate-discovery
+    when: 対応REQ、同じ正規所有対象のSPEC、関連command・skill・整合性ルールの候補を探索するとき。利用不能時は従来の探索手段で続行する
+    skill: repo-agentdev-artifact-graph
 
 checks: []
 
