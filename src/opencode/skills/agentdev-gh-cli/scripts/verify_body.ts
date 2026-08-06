@@ -12,7 +12,7 @@ import {
   formatMarkdownReport,
   determineExitCode,
   findRepoRoot,
-} from "../../agentdev-integrity/scripts/cli_utils";
+} from "./cli_utils.ts";
 
 const SCRIPT_NAME = "verify_body.ts";
 const DESCRIPTION = "GitHub Issue/PR body verifier - validates encoding, markdown structure, and required sections";

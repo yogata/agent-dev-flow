@@ -167,6 +167,7 @@ $ghCliLocalSource = Join-Path $LocalSourceDir $LocalModeRedirectSkill
 if (Test-Junction -Path $ghCliProjection) {
     $ghCliTarget = Get-JunctionTarget -Path $ghCliProjection
     if ($ghCliTarget -and (Test-Path -LiteralPath $ghCliTarget) -and
+        (Test-Path -LiteralPath $ghCliLocalSource) -and
         ((Resolve-Path -LiteralPath $ghCliTarget).Path -eq (Resolve-Path -LiteralPath $ghCliLocalSource).Path)) {
         $DetectedLocalMode = $true
     }
@@ -228,6 +229,9 @@ if (Test-Path -LiteralPath $SourceDir) {
     if (Test-Path -LiteralPath $skillsSource) {
         Get-ChildItem -LiteralPath $skillsSource -Directory -Filter 'agentdev-*' |
             ForEach-Object { $targets.Add("skills\$($_.Name)") }
+        if (Test-Path -LiteralPath (Join-Path $skillsSource 'japanese-tech-writing')) {
+            $targets.Add('skills\japanese-tech-writing')
+        }
     }
 
     Write-Host ''
@@ -268,6 +272,7 @@ if (Test-Path -LiteralPath $SourceDir) {
                 if ($junctionRel -notin $targets) {
                     Write-Host "[ORPHAN] Junction not from current source: $junctionRel"
                     $orphansFound = $true
+                    $divergences++
                 }
             }
     }

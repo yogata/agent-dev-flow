@@ -15,6 +15,8 @@ param(
 #   5  required directory creation failed / source missing
 
 $ErrorActionPreference = "Stop"
+$Source = [System.IO.Path]::GetFullPath($Source)
+$Target = [System.IO.Path]::GetFullPath($Target)
 
 function Ensure-Directory {
     param([string]$Path)
@@ -22,7 +24,7 @@ function Ensure-Directory {
         try {
             New-Item -ItemType Directory -Path $Path -Force | Out-Null
         } catch {
-            Write-Error "install-from-archive: failed to create directory '$Path': $($_.Exception.Message)"
+            Write-Host "install-from-archive: failed to create directory '$Path': $($_.Exception.Message)" -ForegroundColor Red
             exit 5
         }
     }
@@ -34,7 +36,7 @@ function Place-File {
         $srcHash = (Get-FileHash -LiteralPath $SrcFile -Algorithm SHA256).Hash
         $dstHash = (Get-FileHash -LiteralPath $DstFile -Algorithm SHA256).Hash
         if ($srcHash -ne $dstHash) {
-            Write-Error "install-from-archive: content mismatch (exit 4). Destination file differs from source: $DstFile"
+            Write-Host "install-from-archive: content mismatch (exit 4). Destination file differs from source: $DstFile" -ForegroundColor Red
             exit 4
         }
         return
@@ -44,13 +46,13 @@ function Place-File {
     try {
         Copy-Item -LiteralPath $SrcFile -Destination $DstFile -Force
     } catch {
-        Write-Error "install-from-archive: copy failed '$SrcFile' -> '$DstFile': $($_.Exception.Message)"
+        Write-Host "install-from-archive: copy failed '$SrcFile' -> '$DstFile': $($_.Exception.Message)" -ForegroundColor Red
         exit 5
     }
 }
 
 if (-not (Test-Path -LiteralPath $Source)) {
-    Write-Error "install-from-archive: source directory not found: $Source"
+    Write-Host "install-from-archive: source directory not found: $Source" -ForegroundColor Red
     exit 5
 }
 
@@ -58,11 +60,11 @@ $commandsSrc = Join-Path $Source "commands\agentdev"
 $skillsSrc = Join-Path $Source "skills"
 
 if (-not (Test-Path -LiteralPath $commandsSrc)) {
-    Write-Error "install-from-archive: required source directory missing: $commandsSrc"
+    Write-Host "install-from-archive: required source directory missing: $commandsSrc" -ForegroundColor Red
     exit 5
 }
 if (-not (Test-Path -LiteralPath $skillsSrc)) {
-    Write-Error "install-from-archive: required source directory missing: $skillsSrc"
+    Write-Host "install-from-archive: required source directory missing: $skillsSrc" -ForegroundColor Red
     exit 5
 }
 

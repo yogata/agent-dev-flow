@@ -262,7 +262,6 @@ function buildValidFixture(root: string): void {
     [
       "---",
       "description: Test command",
-      "agent: test-agent",
       "---",
       "",
       "Test command body.",
@@ -285,7 +284,6 @@ function buildValidFixture(root: string): void {
       [
         "---",
         `description: ${filename} capture duty stub`,
-        "agent: sisyphus",
         "---",
         "",
         `capture-boundaries 参照。duty: ${body}`,
@@ -293,6 +291,14 @@ function buildValidFixture(root: string): void {
       ].join("\n"),
       "utf-8",
     );
+  }
+
+  const sourceCommandDir = join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(sourceCommandDir);
+  for (const filename of readdirSync(cmdDir)) {
+    if (filename.endsWith(".md")) {
+      copyFileSync(join(cmdDir, filename), join(sourceCommandDir, filename));
+    }
   }
 
   writeFileSync(
@@ -501,6 +507,9 @@ describe("Issue #657 regression: CLI execution verification", () => {
   describe("valid fixture with 10 guides", () => {
     it("exits with code 0 for valid fixture", () => {
       const r = runCli(VALID_ROOT, ["--json"]);
+      if (r.exitCode !== 0) {
+        console.error(r.stdout || r.stderr);
+      }
       expect(r.exitCode).toBe(0);
     });
 

@@ -29,7 +29,7 @@ const COMMAND_DIRS = [
 
 const STEP_ZERO_HEADING = /^###\s+Step\s+0\b/;
 const STEP_ZERO_REF = /\bStep\s+0\b/;
-const STEP_HEADING = /^###\s+Step\s+(\d+)(?:-(\d+))?\s*:/;
+const STEP_HEADING = /^###\s+Step\s+(\d+)(?:〜(\d+))?(?:-(\d+))?\s*:/;
 const NUMBERED_LIST_MAIN = /^\d+\.\s/;
 const GUARDRAIL_LINE = /^-\s+(G\d+):/;
 const G01_FORMAT = /^G\d{2}$/;
@@ -110,18 +110,20 @@ export function checkCommandFile(
     }
 
     // Check for non-sequential Step numbers
-    const stepNumbers: { num: number; line: number }[] = [];
+    const stepNumbers: { start: number; end: number; line: number }[] = [];
     for (let i = proc.start; i < proc.end; i++) {
       const match = lines[i].match(STEP_HEADING);
-      if (match && !match[2]) {
+      if (match && !match[3]) {
         // Main step only (no substep)
-        stepNumbers.push({ num: parseInt(match[1]), line: i + 1 });
+        const start = parseInt(match[1], 10);
+        const end = match[2] ? parseInt(match[2], 10) : start;
+        stepNumbers.push({ start, end, line: i + 1 });
       }
     }
     // Check sequential: each step should be prev + 1
     for (let i = 1; i < stepNumbers.length; i++) {
-      const prev = stepNumbers[i - 1].num;
-      const curr = stepNumbers[i].num;
+      const prev = stepNumbers[i - 1].end;
+      const curr = stepNumbers[i].start;
       if (curr !== prev + 1) {
         violations.push({
           file: filePath,
@@ -210,13 +212,15 @@ function globMarkdown(dir: string): string[] {
     .map((f: string) => path.join(dir, f));
 }
 
-export function runCheckCommandFormat(): FormatViolation[] {
+export function runCheckCommandFormat(explicitRoot?: string): FormatViolation[] {
   const allViolations: FormatViolation[] = [];
 
   // Find repo root by looking for .git
-  let repoRoot = process.cwd();
-  while (repoRoot !== "/" && !fs.existsSync(path.join(repoRoot, ".git"))) {
-    repoRoot = path.dirname(repoRoot);
+  let repoRoot = explicitRoot ? path.resolve(explicitRoot) : process.cwd();
+  while (!fs.existsSync(path.join(repoRoot, ".git"))) {
+    const parent = path.dirname(repoRoot);
+    if (parent === repoRoot) break;
+    repoRoot = parent;
   }
 
   for (const dir of COMMAND_DIRS) {
@@ -230,4 +234,29 @@ export function runCheckCommandFormat(): FormatViolation[] {
   }
 
   return allViolations;
+}
+
+if (import.meta.main) {
+  const args = process.argv.slice(2);
+  if (args.includes("--help") || args.includes("-h")) {
+    console.log("usage: bun run check_command_format.ts [--root <path>] [--json]");
+    process.exit(0);
+  }
+  const rootIndex = args.indexOf("--root");
+  const explicitRoot = rootIndex >= 0 ? args[rootIndex + 1] : undefined;
+  if (rootIndex >= 0 && !explicitRoot) {
+    console.error("check_command_format.ts: --root requires a path");
+    process.exit(2);
+  }
+  const violations = runCheckCommandFormat(explicitRoot);
+  if (args.includes("--json")) {
+    console.log(JSON.stringify({ ok: violations.length === 0, violations }, null, 2));
+  } else if (violations.length === 0) {
+    console.log("check_command_format.ts: OK");
+  } else {
+    for (const violation of violations) {
+      console.log(`${violation.severity} ${violation.file}:${violation.line} ${violation.rule} ${violation.description}`);
+    }
+  }
+  process.exit(violations.length === 0 ? 0 : 1);
 }
