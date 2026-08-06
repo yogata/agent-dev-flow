@@ -121,6 +121,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-adr-guidelines.md | 96 | accepted | skills |
 | skills/agentdev-req-analysis.md | 94 | accepted | skills |
 | skills/agentdev-deep-review.md | 93 | draft | skills |
+| local/references/artifact-graph-effect-evaluation.md | 91 | - | local |
 | integrity/references/targeted-docs-guard-implementation-details.md | 87 | - | integrity |
 | commands/inspect-docs.md | 85 | accepted | commands |
 | commands/inspect-extensions.md | 84 | superseded | commands |
