@@ -20,7 +20,7 @@
 <!-- AUTOGEN:BEGIN:id=docmap-inventory -->
 - 現行 REQ: 11件（`docs/requirements/REQ-*.md`）
 - ADR: 6件（`docs/adr/ADR-*.md`）
-- SPEC: 149件（`docs/specs/**/*.md`）
+- SPEC: 150件（`docs/specs/**/*.md`）
 <!-- AUTOGEN:END -->
 
 ## 現行 REQ
@@ -133,6 +133,7 @@ SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン�
 | [backticks-identifier-threshold.md](specs/integrity/backticks-identifier-threshold.md) | backticks 識別子/一般名詞 判定閾値 |
 | [runtime-package-boundary.md](specs/local/runtime-package-boundary.md) | 実行時配布物の境界、link mode 導入フロー、link target 確認、更新運用 |
 | [local-case-file.md](specs/local/local-case-file.md) | ローカル版 OpenCode の Case ファイルスキーマ・状態遷移・採番・見出し |
+| [artifact-graph.md](specs/local/artifact-graph.md) | 本体リポジトリ固有の成果物間明示関係を検索する派生索引の生成、検査、問い合わせ契約 |
 | [command-file-format.md](specs/authoring/command-file-format.md) | command 定義ファイルの Markdown 構成標準 |
 
 ## SPEC 探索経路ガイド
