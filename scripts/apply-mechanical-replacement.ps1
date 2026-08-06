@@ -224,3 +224,5 @@ if ($changedFileNames.Count -gt 0) {
     Write-Output "---"
     foreach ($n in $changedFileNames) { Write-Output "  $n" }
 }
+
+exit 0

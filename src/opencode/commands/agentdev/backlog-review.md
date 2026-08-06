@@ -50,9 +50,10 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 引数の有無に応じて対象を切り替える:
 
-**引数なしの場合**: 両ディレクトリから採用済み成果物を検出:
+**引数なしの場合**: 三ディレクトリから採用済み成果物を検出:
 - `.agentdev/intake/promoted/*.md`
 - `.agentdev/learning/promoted/*.md`
+- `.agentdev/inspect/promoted/*.md`
 
 **引数ありの場合**: 指定されたファイルパスのみを対象。
 存在しないパスはエラー報告してスキップ。
