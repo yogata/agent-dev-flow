@@ -18,7 +18,10 @@ context:
       - "docs/specs/commands/req-define.md"
     purpose: Issue 本文の test strategy 項目構造の確認
 
-rules: []
+rules:
+  - id: artifact-graph-impact-candidates
+    when: 起点成果物から変更影響、廃止参照、未解決参照の候補を探索するとき。利用不能時は従来の探索手段で続行する
+    skill: repo-agentdev-artifact-graph
 
 checks: []
 
