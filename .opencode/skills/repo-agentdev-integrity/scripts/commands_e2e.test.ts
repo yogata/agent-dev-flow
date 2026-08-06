@@ -273,7 +273,7 @@ const commands = getCommandFiles();
 const skillDirs = getSkillDirs();
 const templateFiles = getTemplateFiles();
 
-// Current 17 public agentdev commands (aligns with commands/agentdev/README.md listing)
+// Current 16 public agentdev commands (aligns with commands/agentdev/README.md listing)
 const EXPECTED_COMMANDS = [
   "backlog-review",
   "case-auto",
@@ -282,7 +282,6 @@ const EXPECTED_COMMANDS = [
   "case-run",
   "case-update",
   "inspect-docs",
-  "inspect-extensions",
   "inspect-promote",
   "inspect-skills",
   "intake-capture",
@@ -306,9 +305,6 @@ const COMMAND_COUNT = EXPECTED_COMMANDS.length;
 const REQ_CASE_PIPELINE = ["req-define", "req-save", "spec-save", "case-open", "case-run", "case-update", "case-close"];
 const LEARNING_PIPELINE = ["learning-promote"];
 const INTAKE_PIPELINE = ["intake-capture", "intake-from-github", "intake-promote"];
-
-// Valid agent types
-const VALID_AGENTS = new Set(["sisyphus", "prometheus", "oracle", "metis", "hephaestus", "momus"]);
 
 // ─── REQ-0030-009: Normal-path E2E tests ───────────────────────────────────
 
@@ -347,11 +343,10 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
         expect(hasSteps).toBe(true);
       });
 
-      it("has valid agent type in frontmatter", () => {
+      it("has description-only frontmatter", () => {
         expect(fm).not.toBeNull();
         if (fm) {
-          const agent = fm["agent"] as string;
-          expect(VALID_AGENTS.has(agent)).toBe(true);
+          expect(Object.keys(fm)).toEqual(["description"]);
         }
       });
 
@@ -516,16 +511,16 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
     });
   });
 
-  // ─── Agent type consistency ──────────────────────────────────────────────
+  // ─── Harness separation ──────────────────────────────────────────────────
 
-  describe("Agent type consistency per pipeline", () => {
-    it("all agentdev commands use sisyphus agent", () => {
+  describe("Harness separation per pipeline", () => {
+    it("agentdev commands do not bind a harness-specific agent", () => {
       for (const cmd of EXPECTED_COMMANDS) {
         const content = commands.get(cmd);
         expect(content).toBeDefined();
         if (content) {
           const fm = parseFrontmatter(content);
-          expect(fm?.["agent"]).toBe("sisyphus");
+          expect(fm?.["agent"]).toBeUndefined();
         }
       }
     });

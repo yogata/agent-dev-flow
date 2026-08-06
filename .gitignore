@@ -11,3 +11,5 @@
 .omo/
 .agentdev/integrity/reports/
 AGENTS.md
+outputs/
+dist/

@@ -185,9 +185,13 @@ export function ok(
   category: string,
   check: string,
   message: string,
-  opts?: CheckResultOptions,
+  file?: string | CheckResultOptions,
+  line?: number,
 ): CheckResult {
-  return { category, check, level: "ok", message, ...opts };
+  if (typeof file === "object") {
+    return { category, check, level: "ok", message, ...file };
+  }
+  return { category, check, level: "ok", message, file, line };
 }
 
 export function ng(
