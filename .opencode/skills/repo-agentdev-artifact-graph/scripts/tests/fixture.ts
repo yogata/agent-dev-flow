@@ -61,9 +61,11 @@ context:
   paths:
     - docs/specs/feature.md
 rules:
-  skill: sample-skill
+  - id: sample-rule
+    skill: sample-skill
 checks:
-  skill: sample-skill
+  - id: sample-check
+    skill: sample-skill
 `,
   "scripts/sample.ts": "export const sample = true\n",
 } as const

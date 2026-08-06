@@ -54,6 +54,11 @@ describe("TS-003 and TS-004: graph generation", () => {
       "references", "supersedes", "defined_in", "contains",
       "extends", "delegates_to", "governs",
     ]))
+    expect(edges.some((edge) => (
+      edge["source"] === "extension:sample-extension"
+      && edge["target"] === "skill:sample-skill"
+      && edge["type"] === "delegates_to"
+    ))).toBe(true)
     expect(edges.some((edge) => edge["category"] === "inferred")).toBe(false)
   })
 })
