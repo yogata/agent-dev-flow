@@ -134,3 +134,20 @@
 - **関連**: Epic #1924、Issue #1929（WP-4）、PR #1936、`src/integrity/baselines/*.json`、`.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`
 - **タグ**: `#learning` `#baseline` `#integrity-checker` `#command-thinning` `#line-position-tracking` `#refactor-delta` `#wp-4` `#migration-2026-08`
 
+---
+
+## TypeScript世代差によりno-excuse検査器を実行できない場合の代替検証
+
+- **問題事象**: no-excuse検査器がTypeScript 7の`typescript/unstable/*`を要求した一方、Artifact Graphの新規スクリプトはリポジトリ標準設定によりTypeScript 5.9を解決したため、検査器を起動できなかった
+- **発生局面**: 実装
+- **検知方法**: PR #1945の実装検証でno-excuse検査器を起動し、解決済みTypeScriptの世代不一致を確認した
+- **根本原因**: 検査器が要求するTypeScript世代と、検査対象パッケージがロックファイルから解決するTypeScript世代が一致していなかった
+- **自律対応内容**: 型検査、LSP診断、対象限定の禁止構文走査を実行し、検査器が確認する項目を代替手段で検証した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。実装検証手段の互換性に関する運用知見であり、今回の正規仕様は変更しない
+- **横展開観点**: 独立したpackage.jsonとロックファイルを持つTypeScriptスクリプト群では、共有検査器のTypeScript要求世代との不一致が発生し得る
+- **再発条件**: 検査対象がTypeScript 6以前を解決し、共有検査器がTypeScript 7の不安定APIを直接読み込む場合
+- **予防策候補**: 検査器を対象パッケージのTypeScript世代に依存しない実行環境へ分離するか、起動不能時の代替検証項目を手順として定義する
+- **想定反映先**: no-excuse検査器の実行手順、TypeScriptスクリプトの検証ガイド
+- **関連**: Issue #1942、PR #1945、`.opencode/skills/repo-agentdev-artifact-graph/scripts/package.json`
+- **タグ**: `#learning` `#typescript` `#toolchain` `#no-excuse` `#validation-fallback`
