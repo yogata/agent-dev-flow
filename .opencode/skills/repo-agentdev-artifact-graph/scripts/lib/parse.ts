@@ -70,7 +70,16 @@ export function parseExtensionFields(content: string): readonly ParsedField[] {
     if (listMatch?.[1] !== undefined) {
       const parent = parents.get(indent - 2)
       if (parent !== undefined) {
-        fields.push({ key: parent, values: [stripQuotes(listMatch[1])], line: index + 1, text: line })
+        const mapping = /^([A-Za-z_][A-Za-z0-9_.-]*):\s*(.*)$/.exec(listMatch[1])
+        if (mapping?.[1] !== undefined && mapping[2] !== undefined) {
+          for (const depth of [...parents.keys()]) {
+            if (depth >= indent) parents.delete(depth)
+          }
+          parents.set(indent, parent)
+          fields.push({ key: `${parent}.${mapping[1]}`, values: parseValues(mapping[2]), line: index + 1, text: line })
+        } else {
+          fields.push({ key: parent, values: [stripQuotes(listMatch[1])], line: index + 1, text: line })
+        }
       }
       continue
     }
