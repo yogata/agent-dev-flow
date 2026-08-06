@@ -151,3 +151,21 @@
 - **想定反映先**: no-excuse検査器の実行手順、TypeScriptスクリプトの検証ガイド
 - **関連**: Issue #1942、PR #1945、`.opencode/skills/repo-agentdev-artifact-graph/scripts/package.json`
 - **タグ**: `#learning` `#typescript` `#toolchain` `#no-excuse` `#validation-fallback`
+
+---
+
+## 実入力に合わないfixtureが関係抽出漏れを隠す
+
+- **問題事象**: 単純化したテストデータが実際のProject Extensionの配列形式を再現しておらず、既存テストが`rules.skill`と`context.paths`の関係抽出漏れを検出できなかった
+- **発生局面**: 実装
+- **検知方法**: Issue #1944のTS-013で代表質問10件を従来探索と比較し、初回結果の10件中8件に重大な見逃しがあることを確認した
+- **根本原因**: fixtureがmapping中心の入力だけを表現し、`- id: ...`から始まる配列要素と後続fieldの親文脈を再現していなかった
+- **自律対応内容**: 配列要素の親文脈を保持するよう解析処理を修正し、実際の拡張定義と同じ配列形式のfixtureと回帰検査を追加して代表質問を再評価した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。Artifact Graphの実装検証方法に関する知見であり、正規仕様の要件は変更しない
+- **横展開観点**: 構造化設定を独自解析するテストでは、最小fixtureだけでなく実入力と同じ入れ子、配列、親子関係を含むfixtureと実入力検証を併用する
+- **再発条件**: 実入力が配列内mappingを含む一方、fixtureが平坦なmappingだけを表現する場合
+- **予防策候補**: 対応する入力構造ごとに実例由来のfixtureを置き、代表入力を使う横断回帰検証で局所fixtureの不足を補う
+- **想定反映先**: repo-agentdev-artifact-graphのテスト設計と実入力回帰検証手順
+- **関連**: Epic #1941、Issue #1944、PR #1947、`.opencode/skills/repo-agentdev-artifact-graph/scripts/lib/parse.ts`
+- **タグ**: `#learning` `#artifact-graph` `#fixture` `#yaml` `#regression-test` `#real-input`
