@@ -62,7 +62,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 差し替え可能性（ローカル版）
 
-ローカル版は本スキルを差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（REQ-0150, ADR-0130 decision #4, #5）。
+ローカル版は本スキルを差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（根拠は次段落の SPEC 参照）。
 PR 関連手続きはスキップせず、Case ファイルの対応セクションで代替する。
 手続きと Case ファイルセクションの対応は SPEC `agentdev-gh-cli`.md 参照。
 

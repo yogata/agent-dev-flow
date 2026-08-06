@@ -165,6 +165,8 @@ function listMarkdownFiles(dirPath: string, recursive: boolean): string[] {
   for (const ent of entries) {
     const full = path.join(dirPath, ent.name);
     if (ent.isDirectory() && recursive) {
+      // node_modules サブツリーは third-party README の fixed_url false positive を防ぐためスキップ
+      if (ent.name === "node_modules") continue;
       result.push(...listMarkdownFiles(full, true));
     } else if (ent.isFile() && ent.name.endsWith(".md")) {
       result.push(full.replace(/\\/g, "/"));
@@ -257,10 +259,7 @@ export function checkDistributionBoundary(repoRoot: string): BoundaryReport {
         }
       }
 
-      // Template lines skip id and path checks.
-      if (isLineExempt(line)) continue;
-
-      // Concrete ID check.
+      // Concrete ID check は常時実行 (旧 LINE_EXEMPTION は同行の実 ID見逃しを生むため廃止、REQ-{NNNN} 等は正規表現が元々非マッチ)
       const idMatches = line.match(CONCRETE_ID_PATTERN);
       if (idMatches && idMatches.length > 0) {
         for (const m of idMatches) {
@@ -275,7 +274,7 @@ export function checkDistributionBoundary(repoRoot: string): BoundaryReport {
         }
       }
 
-      // Concrete docs path check.
+      // Concrete docs path check (isConcreteDocsPath が template/README/glob を弾く)
       const pathCandidates = line.match(DOCS_PATH_PATTERN);
       if (pathCandidates && pathCandidates.length > 0) {
         for (const candidate of pathCandidates) {

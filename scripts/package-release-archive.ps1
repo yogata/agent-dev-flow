@@ -87,6 +87,10 @@ foreach ($d in $skillDirs) {
     Copy-Item -Path (Join-Path $d.FullName "*") -Destination $stageSkillDir -Recurse -Force
 }
 
+# node_modules は配布アーカイブに含めない (サイズ増大・consumer側のnpm installで解決)
+Get-ChildItem -LiteralPath $stageSkills -Recurse -Directory -Filter "node_modules" -ErrorAction SilentlyContinue |
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+
 # install-from-archive.ps1 must travel inside the archive.
 Copy-Item -LiteralPath $installScript -Destination (Join-Path $stageScripts "install-from-archive.ps1") -Force
 
