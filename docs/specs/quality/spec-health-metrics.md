@@ -223,7 +223,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-053-gh-direct-invocation-detection.md | 21 | accepted | integrity |
 | integrity/references/validator-internal-config.md | 20 | - | integrity |
 
-計測日: 2026-08-06。
+計測日: 2026-08-07。
 <!-- AUTOGEN:END -->
 
 SPEC 行数は frontmatter、HTML コメントを除く本文行数。
