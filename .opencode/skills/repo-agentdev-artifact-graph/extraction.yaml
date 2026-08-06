@@ -1,0 +1,41 @@
+schema_version: "1.0.0"
+indexed_paths:
+  - docs/requirements
+  - docs/adr
+  - docs/specs
+  - src/opencode
+  - .opencode
+  - .agentdev/extensions
+  - scripts
+  - tests
+excluded_paths:
+  - .agentdev/graph/**
+  - .git/**
+  - .worktrees/**
+  - node_modules/**
+  - dist/**
+  - outputs/**
+  - .cache/**
+  - .omo/**
+  - .sisyphus/**
+  - '**/*.tmp'
+mandatory_sources:
+  - frontmatter
+  - structured_field
+  - markdown_link
+  - extension_field
+structured_fields:
+  references:
+    - related_req
+    - related_spec
+    - canonical_owner
+    - context.paths
+  supersedes:
+    - superseded_by
+  delegates_to:
+    - delegates_to
+    - rules.skill
+    - checks.skill
+  governs:
+    - governed_by
+inferred_relations: false
