@@ -205,3 +205,21 @@
 - **想定反映先**: agentdev-artifact-graph のテスト設計、Bun.spawnSync を用いる CLI テストのマルチプラットフォーム対応手順
 - **関連**: Epic #1948、Issue #1949、PR #1955、`src/opencode/skills/agentdev-artifact-graph/scripts/tests/`
 - **タグ**: `#learning` `#bun` `#bun-test` `#windows` `#cli-args` `#cross-platform`
+
+---
+
+## SPEC rename/supersede 時の historical 参照と check_extensions warning は TS-001 と既存パターンで許容される
+
+- **問題事象**: SPEC の物理改名移行（`agentdev-deep-review` → `agentdev-adversarial-review`）に伴い、他 SPEC 内に残る旧名称参照の扱いと `check_extensions.ts` の warning 6件をどう扱うかが発生した。`docs/specs/local/artifact-graph.md`（status: superseded）内の `agentdev-deep-review` 参照は残置し、`check_extensions.ts` の warning は `ok: true` として受け入れた
+- **発生局面**: レビュー（case-run driver が PR #1961 の `## Findings / Capture候補` へ記録、case-close にて capture 回収）
+- **検知方法**: case-run driver が TS-001 grep 検証と `check_extensions.ts` 実行で旧名称残存と warning を観測し、Findings セクションへ自己申告した
+- **根本原因**: SPEC が改名・superseded 化される際、他 SPEC 内の歴史参照は TS-001 on_failure 例外（superseded 境界内の歴史参照は修正対象外）で許容される。また `check_extensions.ts` は repo-local skill（`repo-agentdev-artifact-graph` 等）が known skill locations に含まれないことを warning するが、`ok: true` を保つ設計である
+- **自律対応内容**: 修正不要と判断し残置。historical 参照は TS-001 on_failure 例外へ合致、warning は既存パターンとして受け入れ
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。TS-001 pass_criteria と check_extensions.ts の既存仕様（`severity: warning`）が扱いを規定しており、正規仕様の変更は発生しない
+- **横展開観点**: SPEC rename/supersede 操作時に他 SPEC 中の旧名称参照を発見した場合、参照元 SPEC の status（superseded vs accepted）と TS-001 on_failure 例外を確認してから修正可否を判断する。`check_extensions.ts` の `severity: warning` は即時修正対象ではなく `ok: true` と併せて読む
+- **再発条件**: SPEC の物理改名移行、または SPEC supersede を伴う操作で他 SPEC 中に旧名称参照が残る場合
+- **予防策候補**: SPEC rename を実施する case-run は driver が TS-001 grep と `check_extensions.ts` を必ず実行し、Findings セクションへ観測事実と TS-001 例外の適用根拠を明示する。case-close の capture 回収は stale-reference（AUTOGEN 等、修正対象）と docs-integrity（policy 準拠の判断記録）を分離して routing する
+- **想定反映先**: agentdev-quality-gates の QG-3 完了条件解説、capture-boundaries SPEC の intake/learning 分離実例
+- **関連**: Issue #1960、PR #1961、`docs/specs/local/artifact-graph.md`、`docs/specs/quality/spec-health-metrics.md`、`docs/specs/skills/agentdev-deep-review.md`（superseded）
+- **タグ**: `#learning` `#spec-lifecycle` `#superseded` `#ts-001` `#check-extensions` `#historical-reference` `#capture-boundaries`
