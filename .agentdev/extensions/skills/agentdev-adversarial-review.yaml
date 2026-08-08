@@ -1,6 +1,6 @@
 version: 1
 kind: skill-extension
-id: agentdev-deep-review
+id: agentdev-adversarial-review
 
 context:
   - id: artifact-graph-spec
