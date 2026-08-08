@@ -169,3 +169,39 @@
 - **想定反映先**: repo-agentdev-artifact-graphのテスト設計と実入力回帰検証手順
 - **関連**: Epic #1941、Issue #1944、PR #1947、`.opencode/skills/repo-agentdev-artifact-graph/scripts/lib/parse.ts`
 - **タグ**: `#learning` `#artifact-graph` `#fixture` `#yaml` `#regression-test` `#real-input`
+
+---
+
+## zod v4 の .refine(fn, messageFn) 第2引数が文字列または静的オブジェクトのみ受け付ける（zod v3 とは非互換）
+
+- **問題事象**: agentdev-artifact-graph 標準配布スキルの model.ts で zod schema を定義する際、zod v3 で許容されていた `.refine(fn, messageFn)` 形式（第2引数へ関数を渡す）が zod v4 ではエラーになる。第2引数は文字列または静的オブジェクトのみ受け付ける仕様へ変更された
+- **発生局面**: 実装（標準スキル新設、model.ts の open extension point zod schema 定義時）
+- **検知方法**: PR #1955 実装者が型チェック（tsc --noEmit）と実装中に zod v4 の型エラーへ遭遇し Findings セクションへ自己申告した
+- **根本原因**: zod v3 から v4 へのメジャーバージョンアップで `.refine` の第2引数型が狭まり、関数形式のメッセージ生成が排除された。パッケージ側で zod v4 を採用したため表面化した
+- **自律対応内容**: 第2引数へ関数を渡さない形式（文字列または静的オブジェクト）へ書き換えて対応
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。実装依存知見であり、正規仕様の要件は変更しない
+- **横展開観点**: zod を schema 定義に用いる他の標準配布スキル、独立 package.json を持つスクリプト群でも zod バージョンと refine API の互換性を確認する必要がある
+- **再発条件**: zod v3 由来のコードを zod v4 環境へ移植する場合、または zod のメジャーアップデートを追従する場合
+- **予防策候補**: zod schema を新規実装する際は対象 zod バージョンの `.refine` 第2引数型を先に確認する。zod v3→v4 移行では refine 以外にも非互換 API（`.passthrough`、`.partial` 等）を一括スキャンする
+- **想定反映先**: zod を利用する標準配布スキルの実装ガイド、agentdev-artifact-graph 以外の zod schema 移行手順
+- **関連**: Epic #1948、Issue #1949、PR #1955、`src/opencode/skills/agentdev-artifact-graph/scripts/lib/model.ts`
+- **タグ**: `#learning` `#zod` `#zod-v4` `#schema` `#breaking-change` `#type-safety`
+
+---
+
+## bun test の Bun.spawnSync は Windows 環境で CLI 引数パース順序に注意が必要
+
+- **問題事象**: bun test で CLI 引数をパースするテストを Bun.spawnSync 経由で実行した際、Windows 環境でフラグと値のペアをスキップする順序が期待と異なり、テストが意図した引数を認識しなかった
+- **発生局面**: 実装（agentdev-artifact-graph 標準スキルのテスト作成時、CLI エントリポイント build_graph/check_graph/query_graph の引数解釈を検証するテスト）
+- **検知方法**: PR #1955 実装者が Windows 環境でテストを実行し引数スキップ挙動の差異へ遭遇、Findings セクションへ自己申告した
+- **根本原因**: Bun.spawnSync の引数配列処理が Windows ではプラットフォーム固有の挙動を持ち、フラグ+値のペアを正しくスキップするためにパース順序を明示する必要があった
+- **自律対応内容**: フラグ+値のペアを正しくスキップするようパース処理を修正し対応
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。実装・テスト環境依存知見であり、正規仕様の要件は変更しない
+- **横展開観点**: Bun.spawnSync 経由で CLI の引数処理を検証するテスト全般で、Windows と POSIX で引数スキップ順序の差異を考慮する必要がある
+- **再発条件**: bun test で CLI 引数解釈を検証し、かつ実行環境が Windows の場合
+- **予防策候補**: Bun.spawnSync の引数処理テストは Windows と POSIX 両方で実行し差異を検出する。フラグ+値のペアスキップは位置ではなくトークン種別で判定する
+- **想定反映先**: agentdev-artifact-graph のテスト設計、Bun.spawnSync を用いる CLI テストのマルチプラットフォーム対応手順
+- **関連**: Epic #1948、Issue #1949、PR #1955、`src/opencode/skills/agentdev-artifact-graph/scripts/tests/`
+- **タグ**: `#learning` `#bun` `#bun-test` `#windows` `#cli-args` `#cross-platform`
