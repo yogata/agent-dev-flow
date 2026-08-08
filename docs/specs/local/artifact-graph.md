@@ -1,11 +1,16 @@
 ---
 title: Artifact Graph（本体リポジトリ固有派生索引）
-status: draft
+status: superseded
+superseded_by: skills/agentdev-artifact-graph.md
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-08-08
 spec_logical_division: behavior
 canonical_owner: repo-agentdev-artifact-graph
 ---
+
+> 本 SPEC は ADR-007「Artifact Graph 標準化と配布スキル昇格」により superseded された。
+> 後継 SPEC は `docs/specs/skills/agentdev-artifact-graph.md`（skills ドメイン）。
+> 本文件は履歴参照として現状維持する。
 
 # Artifact Graph（本体リポジトリ固有派生索引）
 

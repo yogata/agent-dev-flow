@@ -82,7 +82,6 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-014: reference/ 残存検出](rules/IR-014-singular-reference-dir-residual.md)
 - [IR-015: 廃止 REQ 現行参照検出](rules/IR-015-retired-req-current-ref-detection.md)
 - [IR-016: Source/projection 整合性](rules/IR-016-source-projection-integrity.md)
-- [IR-017: DOC-MAP ↔ 実体整合性](rules/IR-017-docmap-actual-consistency.md)
 - [IR-018: REQ 範囲表記鮮度](rules/IR-018-req-range-notation-freshness.md)
 - [IR-019: Guide 要件定義、契約記述検出](rules/IR-019-guide-req-contract-content-detection.md)
 - [IR-020: 基準既知（baseline-known）と新規 finding の区別](rules/IR-020-baseline-known-vs-new-finding.md)

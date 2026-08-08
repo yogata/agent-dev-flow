@@ -72,7 +72,7 @@ updated: 2026-07-26
 - command 本文の実行手順
 - skill 本文 / references 参照先
 - docs 現行本文の通常説明
-- README / DOC-MAP 探索導線
+- README 探索導線
 - 保存工程テンプレートの生成実パス例
 
 ## link mode 廃止旧語彙の分類基準（REQ-010-024）
@@ -82,7 +82,7 @@ link mode 統一（REQ-009）に伴い廃止確定となった旧語彙（直接
 | 分類 | 判定基準 | 処理 |
 |------|----------|------|
 | 歴史経緯（免除） | 廃止機能の経緯、移行手順、検出ルール定義、廃止確定要件の記述文脈で旧語彙を参照している。上記 exemption 表に該当するファイル、または ADR の履歴記載 exemption に該当する | exemption 適用（baseline 免除）。文脈明示が不要なファイルは exemption 表へ登録済み |
-| 現行機能の記述（修正） | command 本文、skill 本文、README、DOC-MAP 等の現行動線で旧語彙を現行機能の用語として使用している | 旧語彙を現行語彙（link mode、`.opencode/` 接続等）に置換 |
+| 現行機能の記述（修正） | command 本文、skill 本文、README 等の現行動線で旧語彙を現行機能の用語として使用している | 旧語彙を現行語彙（link mode、`.opencode/` 接続等）に置換 |
 
 **判定手順**:
 1. 検出箇所のファイルが exemption 表に登録されているか確認する

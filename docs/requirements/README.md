@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下11件を第一参照先とする。
+現在の要件判断では、以下13件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -23,6 +23,8 @@
 | [REQ-009](REQ-009.md) | 配布基盤と導入モデル |
 | [REQ-010](REQ-010.md) | 自己監査と診断・是正候補抽出 |
 | [REQ-011](REQ-011.md) | I/O境界と外部連携手段 |
+| [REQ-012](REQ-012.md) | Artifact Graph 標準化 |
+| [REQ-013](REQ-013.md) | DOC-MAP 依存除去 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件

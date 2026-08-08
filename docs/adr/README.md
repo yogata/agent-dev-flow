@@ -12,6 +12,8 @@
 現行の承認済み ADR は5件である。
 <!-- AUTOGEN:END -->
 
+> 備考: ADR-007 は proposed であり、accepted になるまでは現行判断の根拠として引用しない。
+
 <!-- AUTOGEN:BEGIN:id=adr-baseline-table -->
 | ADR番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|
@@ -20,6 +22,7 @@
 | ADR-003 | req_draft ソフトコントラクト原則 | accepted | 2026-07-25 |
 | ADR-004 | 差し替え可能な I/O 境界 | accepted | 2026-07-25 |
 | ADR-006 | inspect 3-command 構成への正規化 | accepted | 2026-07-27 |
+| ADR-007 | Artifact Graph 標準化と配布スキル昇格 | proposed | 2026-08-08 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -42,6 +45,7 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=adr-status-proposed -->
+- [ADR-007](ADR-007.md)（Artifact Graph 標準化と配布スキル昇格）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -67,6 +71,7 @@
 - [ADR-004](ADR-004.md)（差し替え可能な I/O 境界）
 - [ADR-005](ADR-005.md)（Project Extensions Architecture、superseded by ADR-006）
 - [ADR-006](ADR-006.md)（inspect 3-command 構成への正規化、extension 検査の3層責務分離）
+- [ADR-007](ADR-007.md)（Artifact Graph 標準化と配布スキル昇格、proposed）
 
 ### ワークフロー・委譲契約
 
@@ -82,6 +87,8 @@ Decision Map（現行 ADR と過去版 ADR の履歴上の関連）。
 | ADR-005 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定 |
 | ADR-006 | supersedes | ADR-005 | inspect-extensions 廃止と extension 検査の3層責務分離を確定し、ADR-005 を置換 |
 | ADR-006 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定（inspect-extensions 廃止後の責務移管先） |
+| ADR-007 | supersedes-spec | docs/specs/local/artifact-graph.md | 現行 SPEC「対象外」節を撤回し、標準配布スキルへ昇格。後継 SPEC は docs/specs/skills/agentdev-artifact-graph.md |
+| ADR-007 | relates-to | ADR-002 | 配布物原本は src/opencode/ へ配置する原則に従う |
 
 ## 関連 REQ
 
@@ -93,6 +100,7 @@ Decision Map（現行 ADR と過去版 ADR の履歴上の関連）。
 | ADR-004 | [REQ-011](../requirements/REQ-011.md), [REQ-009](../requirements/REQ-009.md) | 差し替え可能な I/O 境界（agentdev-gh-cli、Local backend） |
 | ADR-005 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Project Extensions Architecture（.agentdev/extensions/** によるプロジェクト固有追加）。ADR-006 により superseded |
 | ADR-006 | [REQ-010](../requirements/REQ-010.md), [REQ-002](../requirements/REQ-002.md) | inspect 3-command 構成への正規化（inspect-extensions 廃止、extension 検査の3層責務分離） |
+| ADR-007 | [REQ-012](../requirements/REQ-012.md), [REQ-013](../requirements/REQ-013.md), [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Artifact Graph 標準化と配布スキル昇格（open extensibility、project/self-hosting augmentation、fail-open、決定論性） |
 
 ## 過去版の履歴基盤
 

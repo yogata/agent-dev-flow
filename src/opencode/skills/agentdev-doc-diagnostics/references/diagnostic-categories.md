@@ -11,9 +11,8 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 | 廃止 REQ/SPEC 由来記述残置 | retired REQ/SPEC ID をソースとした記述が活性文書に残置していないか | `agentdev-req-structure-diagnostics`（REQ 体系境界、配布物 ID 汚染） |
 | REQ/SPEC 境界違反 | HOW 詳細が現行 REQ 要件行に残留しているか（document-model SPEC Separation Criteria 準拠） | `agentdev-req-structure-diagnostics`（MOVE 観点） |
 | REQ 粒度過小 | 1 REQ に複数関心、成果物種別、command family、lifecycle 段階が混在しているか | `agentdev-req-structure-diagnostics`（SPLIT 観点） |
-| 横断契約矛盾 | REQ/ADR/SPEC/guides/DOC-MAP 間で source-of-truth priority に基づく矛盾があるか | `agentdev-req-structure-diagnostics`（DRIFT 等）、`agentdev-doc-writing`（文意品質） |
+| 横断契約矛盾 | REQ/ADR/SPEC/guides 間で source-of-truth priority に基づく矛盾があるか | `agentdev-req-structure-diagnostics`（DRIFT 等）、`agentdev-doc-writing`（文意品質） |
 | 文意品質候補 | LLM っぽい表現、空虚語、英語混じり表現、実行主体分類の誤認が残存しているか | `agentdev-doc-writing` |
-| 探索順と索引の不整合 | DOC-MAP 記載と実際の基準文書構造が不整合でないか | `agentdev-doc-map` |
 
 各カテゴリの検出シグナル、シグナル閾値、判定ルールの詳細はルーティング先の専門 skill が所有する。
 本スキルは「どのカテゴリを横断的にスキャンするか」「どの専門 skill へルーティングするか」のみを定義する。
@@ -31,7 +30,6 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 | `docs/adr/**/*.md` | 現行 ADR の参照整合性保持 |
 | SPEC ファイル群 | 現行 SPEC の参照整合性保持 |
 | ガイドファイル群 | ガイドの参照整合性保持 |
-| `docs/DOC-MAP.md` | 探索経路インデックスの整合性保持 |
 | agentdev command 群 | 配布物の ID 汚染検出（利用者向け） |
 | agentdev skill 群 | 配布物の ID 汚染検出（利用者向け） |
 
@@ -87,14 +85,14 @@ SPLIT 観点の判定ロジック、シグナル閾値（1シグナルは觀察�
 
 ## 横断契約矛盾
 
-REQ/ADR/SPEC/guides/DOC-MAP 間で、source-of-truth priority に基づく矛盾の有無を検出する。
-source-of-truth priority: 現行 REQ > 承認済み ADR > SPEC > DOC-MAP/guides。
+REQ/ADR/SPEC/guides 間で、source-of-truth priority に基づく矛盾の有無を検出する。
+source-of-truth priority: 現行 REQ > 承認済み ADR > SPEC > guides。
 
 ### 横断スキャン観点
 
 | シグナル | 内容 |
 |----------|------|
-| 下位文書の上位文書への矛盾 | DOC-MAP/guides の記述が現行 REQ/承認済み ADR と矛盾する |
+| 下位文書の上位文書への矛盾 | guides の記述が現行 REQ/承認済み ADR と矛盾する |
 | SPEC と REQ の責務説明矛盾 | SPEC の責務記述が現行 REQ の要件と矛盾する |
 | 旧名称、旧概念の残存 | 改名、廃止済みの概念が活性文書に残存している（DRIFT 的観点の横断適用） |
 
@@ -117,20 +115,6 @@ LLM っぽい表現、空虚な形容/動詞、英語混じり表現、実行主
 ### ルーティング先
 
 判定辞書（置換辞書、LLM 表現辞書、英語抽象語書き換え辞書）、機械的置換ルール、査読出力形式は `agentdev-doc-writing` が所有する。本スキルは横断スキャンで候補を抽出し、ルーティングする。
-
-## 探索順と索引の不整合
-
-DOC-MAP 記載と実際の基準文書（REQ/ADR/SPEC）の構造が不整合でないかを横断的にスキャンする。
-
-### 横断スキャン観点
-
-- DOC-MAP の対象領域セクションに列挙された基準文書パスが実在するか
-- DOC-MAP の要約と基準文書の内容が矛盾していないか
-- 索引の範囲を超えて DOC-MAP が要件、判断、仕様を記述していないか
-
-### ルーティング先
-
-DOC-MAP の読み方ガイド、ドキュメント探索順序、影響確認ルールは `agentdev-doc-map` が所有する。本スキルは横断スキャンで不整合候補を抽出し、ルーティングする。
 
 ## 配布物統合性
 

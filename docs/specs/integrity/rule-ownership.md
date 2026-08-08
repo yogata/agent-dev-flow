@@ -87,7 +87,6 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-014 | reference/ 残存検出 | REQ-002-013, 039, REQ-010-039, 040, 094 | artifact-responsibilities.md |
 | IR-015 | 廃止 REQ 現行参照検出 | REQ-010-070-074, 136 | integrity-contracts.md |
 | IR-016 | Source/projection 整合性 | REQ-002-048-052, REQ-010-143-144 | system.md |
-| IR-017 | DOC-MAP ↔ 実体整合性 | REQ-010-003 | integrity-contracts.md |
 | IR-018 | REQ 範囲表記鮮度 | REQ-010-140 | integrity-contracts.md |
 | IR-019 | Guide 要件定義、契約記述検出 | REQ-010-138, REQ-001 | document-model.md |
 | IR-020 | 基準既知（baseline-known）と新規 finding の区別 | REQ-010-145, 148 | integrity-contracts.md |

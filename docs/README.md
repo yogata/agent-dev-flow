@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [�
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 11件、廃止済み: 0件
+現行 REQ: 13件、廃止済み: 0件
 <!-- AUTOGEN:END -->
 
-現行要件は REQ-001 から REQ-011 の11件である。各 REQ の詳細は各 REQ ファイル本文を参照。
+現行要件は REQ-001 から REQ-013 の13件である。各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
 |---|---|
@@ -24,12 +24,14 @@ AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [�
 | [REQ-009](requirements/REQ-009.md) | 配布基盤と導入モデル |
 | [REQ-010](requirements/REQ-010.md) | 自己監査と診断・是正候補抽出 |
 | [REQ-011](requirements/REQ-011.md) | I/O境界と外部連携手段 |
+| [REQ-012](requirements/REQ-012.md) | Artifact Graph 標準化 |
+| [REQ-013](requirements/REQ-013.md) | DOC-MAP 依存除去 |
 
 - [要件インデックス](requirements/README.md)
 
 ## ADR
 
-現行 ADR は ADR-001 から ADR-006 の6件である。詳細は [ADR インデックス](adr/README.md) 参照。
+現行 ADR は ADR-001 から ADR-007 の7件である（ADR-007 は proposed）。詳細は [ADR インデックス](adr/README.md) 参照。
 
 | ADR | タイトル |
 |---|---|
@@ -39,6 +41,7 @@ AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [�
 | [ADR-004](adr/ADR-004.md) | 差し替え可能な I/O 境界 |
 | [ADR-005](adr/ADR-005.md) | Project Extensions Architecture（superseded by ADR-006） |
 | [ADR-006](adr/ADR-006.md) | inspect 3-command 構成への正規化 |
+| [ADR-007](adr/ADR-007.md) | Artifact Graph 標準化と配布スキル昇格（proposed） |
 
 ## 仕様（SPEC）
 

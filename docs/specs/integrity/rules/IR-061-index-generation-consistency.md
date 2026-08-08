@@ -21,7 +21,6 @@ SC-002 SPEC（`docs/specs/integrity/index-auto-generation.md`）が定める索�
 - `docs/adr/README.md`
 - `docs/requirements/README.md`
 - `docs/specs/README.md`
-- `docs/DOC-MAP.md`
 - `docs/specs/integrity/integrity-rule-catalog.md`
 - `docs/specs/integrity/rule-ownership.md`
 - `docs/specs/quality/req-health-metrics.md`
@@ -47,4 +46,4 @@ strict（再現可能な機械的パターンマッチングで判定可能）
 - SC-002 SPEC: `docs/specs/integrity/index-auto-generation.md`
 - 生成スクリプト: `.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`
 - 関連 REQ: REQ-010（docs-check）
-- 関連 IR: IR-004（REQ index）、IR-017（DOC-MAP）、IR-038（ADR index）、IR-039（index REQ title）、IR-042（hardcoded req count）
+- 関連 IR: IR-004（REQ index）、IR-038（ADR index）、IR-039（index REQ title）、IR-042（hardcoded req count）

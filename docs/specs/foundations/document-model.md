@@ -2,7 +2,7 @@
 status: accepted
 spec_logical_division: cross_cutting_contract
 canonical_owner: document-model
-updated: 2026-07-27
+updated: 2026-08-08
 ---
 
 # 文書モデル
@@ -11,7 +11,7 @@ updated: 2026-07-27
 
 ## 目的
 
-REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスを定義し、各文書種別が何を記述し、何を記述しないかを明確にする（REQ-001）。
+REQ/ADR/SPEC/guides の責務マトリックスを定義し、各文書種別が何を記述し、何を記述しないかを明確にする（REQ-001）。
 
 ### 他 SPEC との役割分担
 
@@ -19,7 +19,7 @@ REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスを定義し、各文書�
 
 | 関心 | 主に扱う SPEC |
 |---|---|
-| 文書種別の基準境界（REQ/ADR/SPEC/guides/DOC-MAP の役割定義、ライフサイクル、優先順位、参照規則、投影方向） | 本 SPEC |
+| 文書種別の基準境界（REQ/ADR/SPEC/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向） | 本 SPEC |
 | SPEC 内部論理区分、文書7分類、局所物理分離、docs/specs/ 直下のドメイン別体系化規範 | 本 SPEC |
 | 文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策 | `../responsibilities/document-type-responsibilities.md` |
 | 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約） | `patterns.md`（本 SPEC は文書種別マトリックスを扱い、`patterns.md` は共通フォーマット規約を扱う） |
@@ -33,7 +33,6 @@ REQ/ADR/SPEC/guides/DOC-MAP の責務マトリックスを定義し、各文書�
 | REQ | 現行要件（WHAT: 何を満たすべきか） | 実装詳細、HOW、現在の動作記述 |
 | ADR | 将来の設計、運用、文書システムを制約する決定とその理由（WHY）<!-- REQ-001 --> | 可逆的な運用手順、状態遷移、形式定義 |
 | SPEC | 現在のアーキテクチャ基準（現在どう動作しているか）※リポジトリ内部設計文書。実行時配布物の依存先ではない（REQ-001, REQ-001） | 新規要件、将来計画、判断根拠（ADR の管轄） |
-| DOC-MAP | 文書探索、参照経路の入口 | 基準内容の代替、要件定義 |
 | Guides | 人間向けナビゲーション層。規範的権限を持たない（REQ-001） | 要件本文、契約本文、REQ/ADR/SPEC 内容の重複 |
 
 ### ワークフロー状態管理
@@ -61,7 +60,7 @@ REQ 文書の各セクションが保持すべき内容の契約（REQ-004-006, 
 
 | 分類 | 説明 | 代表例 |
 |---|---|---|
-| 文書統治 REQ | REQ/ADR/SPEC/guides/DOC-MAP の基準境界、文書分類ポリシー、ID 規約 | REQ-001 |
+| 文書統治 REQ | REQ/ADR/SPEC/guides の基準境界、文書分類ポリシー、ID 規約 | REQ-001 |
 | ワークフロー全体 REQ | 開発ワークフロー、コマンド間データフロー、work_type 分類、SSoT 遷移 | REQ-005 |
 | コマンド級 REQ | 公開コマンドの入力、出力、副作用境界、停止条件、他コマンドとの接続 | REQ-004, REQ-008, REQ-006 |
 | 成果物、実行時、スキル責務 REQ | Command/Skill/Template/Script の責務境界、配布制約、原本、配置先分離 | REQ-002, REQ-003 |
@@ -211,13 +210,12 @@ ADR（決定記録）<!-- REQ-001 -->
   ↓ 判断に基づく実装
 SPEC（現在仕様記述）
   ↓ 探索支援
-DOC-MAP（索引）/ Guides（案内）
+Guides（案内）
 ```
 
 - REQ は領域別の総体として管理する。変更の都度 REQ を作成せず、既存 REQ への APPEND / UPDATE で対応する。
 - ADR は `proposed` → `accepted` / `superseded` / `deprecated` の状態遷移を持つ。現行基準（`baseline`）は REQ-001 以降（現行 ADR コレクション）。v2:ADR-0001〜0099 は過去に存在した履歴番号帯である（実体は2026-07-20に物理削除）（REQ-001-047, 048）。
 - SPEC は実装とともに変化する「生きた文書」である。REQ や ADR の判断内容を代替しない。
-- DOC-MAP は非正規索引であり、REQ/ADR/SPEC の内容を代替しない。
 - Guides はナビゲーション層であり、規範文書ではない。
 
 ### SPEC ライフサイクル（v2:ADR-0123）
@@ -249,7 +247,7 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 
 ### draft の位置づけ（REQ-008, ADR-003）
 
-`.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成する一時的な構造化ハンドオフ成果物である。consumer 境界は producer、direct consumer、orchestration pre-reader、invalid post-case reader の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）。4 集合の正規定義は `docs/specs/responsibilities/artifact-contracts.md`「req_draft consumer 4 集合」節を SSoT とし、本節は同じ 4 集合を抽出元として一致させる。永久文書（REQ/ADR/SPEC/guides/DOC-MAP）ではなく、以下の性質を持つ:
+`.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成する一時的な構造化ハンドオフ成果物である。consumer 境界は producer、direct consumer、orchestration pre-reader、invalid post-case reader の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）。4 集合の正規定義は `docs/specs/responsibilities/artifact-contracts.md`「req_draft consumer 4 集合」節を SSoT とし、本節は同じ 4 集合を抽出元として一致させる。永久文書（REQ/ADR/SPEC/guides）ではなく、以下の性質を持つ:
 
 - **consumer 4 集合**: req_draft の consumer 境界は次の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）
   - producer: `{req-define}` — req_draft を生成する唯一の command
@@ -269,7 +267,7 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 1. 現行 REQ
 2. ADR（承認済み）
 3. SPEC
-4. DOC-MAP / guides
+4. guides
 
 ## 設定規則
 
@@ -325,7 +323,6 @@ accepted ADR は意味的に不変とする（REQ-001-056〜060）。
 | SPEC | 実装に伴う更新 | SPEC は「現在仕様」の記録のため、実装完了に伴い更新 | エージェント（実装後の SPEC 更新） |
 | Guide | inspect-docs / 手動更新 | 規範的権限なし。情報正確性の確認のみ | エージェント / ユーザー |
 | Report | 整合性コマンド等の自動生成、または手動作成 | 公開時の事実確認 | エージェント（自動生成）、ユーザー（手動作成） |
-| DOC-MAP | 文書追加、移動に伴う更新 | 非正規索引のため、承認不要 | エージェント / ユーザー |
 | 廃止 | 編集不可（履歴参照専用） | なし | なし |
 
 ### 分類判断ツリーの配置
@@ -363,7 +360,6 @@ accepted ADR は意味的に不変とする（REQ-001-056〜060）。
 | SPEC | draft → accepted → superseded | 後継SPECへの移行表示は`superseded_by`で保持する |
 | Guide | active → outdated → removed | 規範的権限を持たない |
 | Report | published → archived | 事実記録として扱う |
-| DOC-MAP | always active | 探索索引として更新だけを行う |
 ### 基準再設定規則 <!-- REQ-001 -->
 
 文書体系の全面改訂時の取り扱いを定義する。
@@ -510,7 +506,7 @@ canonical_owner: {正規所有対象の関心キー}
 
 frontmatter と冒頭宣言節の両方が存在する場合は frontmatter を優先する。spec-save の配置一貫性検証は frontmatter、冒頭宣言節のいずれかから宣言値を読み取る。
 
-索引文書（DOC-MAP.md、specs/README.md）は文書探索、参照経路の入口を担うが、SPEC 内部論理区分には含まれない。索引文書は既存文書種別（DOC-MAP.md = 探索経路インデックス、specs/README.md = SPEC マニフェスト）の役割表現であり、新文書種別ではない。
+索引文書（specs/README.md）は文書探索、参照経路の入口を担うが、SPEC 内部論理区分には含まれない。索引文書は既存文書種別（specs/README.md = SPEC マニフェスト）の役割表現であり、新文書種別ではない。
 
 ## 文書7分類モデル
 
@@ -579,7 +575,7 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 既存直下SPECのドメインディレクトリへの移送は、inspect/backlog 経由で段階的かつ個別に行う（REQ-001-005）。
 一括移送を禁止する。
 移送の優先順位は inspect/backlog で決定する。
-移送時、旧パスを参照する文書（README.md、DOC-MAP.md、他SPEC内の相対リンク等）の参照先を移送単位で更新する（REQ-001-006）。
+移送時、旧パスを参照する文書（README.md、他SPEC内の相対リンク等）の参照先を移送単位で更新する（REQ-001-006）。
 
 新規SPEC作成時は、本セクションのドメイン分類に従って該当ディレクトリに配置する（REQ-001-004）。
 本体系化は既存 SPEC 文書種別内でのディレクトリ整理であり、CATALOG 等の新規文書種別を新設しない（REQ-001-009）。
