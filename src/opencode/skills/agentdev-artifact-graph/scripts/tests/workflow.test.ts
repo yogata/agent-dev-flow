@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from "bun:test"
-import { mkdtemp, rm, writeFile } from "node:fs/promises"
+import { mkdtemp, readdir, rename, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
-import { buildGraph } from "../lib/graph.ts"
+import { buildGraph, loadGraph } from "../lib/graph.ts"
 import { prepareWorkflowGraph } from "../lib/workflow.ts"
 import { createFixture } from "./fixture.ts"
 
@@ -100,5 +100,68 @@ describe("fail-open: Graph missing/stale/failure does not halt workflow (REQ-012
 
     expect(exitCode).toBe(0)
     expect(isRecord(output) ? output["status"] : undefined).toBe("unavailable")
+  })
+})
+
+describe("TS-007 (AG-006): Graph missing does not halt workflow; fallback discovery works", () => {
+  it("renaming .agentdev/graph/ away lets prepare_graph regenerate (workflow continues)", async () => {
+    const fixture = await setup()
+    await buildGraph(fixture)
+
+    await rename(fixture.output, `${fixture.output}.bak`)
+    const graphDirExists = await readdir(join(fixture.root, ".agentdev")).then(
+      (entries) => entries.includes("graph"),
+      () => false,
+    )
+    expect(graphDirExists).toBe(false)
+
+    const result = await prepareWorkflowGraph(fixture)
+    expect(result.status).toBe("ready")
+    if (result.status !== "ready") throw new TypeError("expected ready")
+    expect(result.freshness).toBe("regenerated")
+
+    await rm(`${fixture.output}.bak`, { recursive: true, force: true })
+  })
+
+  it("discover CLI finds canonical docs via filesystem when no graph exists", async () => {
+    const root = await mkdtemp(join(tmpdir(), "ag-ts007-discover-"))
+    roots.push(root)
+    await createFixture(root)
+
+    const graphExists = await readdir(join(root, ".agentdev")).then(
+      (entries) => entries.includes("graph"),
+      () => false,
+    )
+    expect(graphExists).toBe(false)
+
+    const cli = resolve(import.meta.dir, "..", "src", "query_graph.ts")
+    const proc = Bun.spawn(
+      ["bun", cli, "--root", root, "discover", "sample requirement", "--roots", "docs/requirements"],
+      { stdout: "pipe", stderr: "pipe" },
+    )
+    const exitCode = await proc.exited
+    const output = JSON.parse(await new Response(proc.stdout).text())
+
+    expect(exitCode).toBe(0)
+    expect(isRecord(output) ? output["discovered"] : undefined).toContain("docs/requirements/REQ-001.md")
+  })
+
+  it("consumer not adopting ADF: prepare_graph returns ready with empty but valid graph (REQ-012-014)", async () => {
+    const root = await mkdtemp(join(tmpdir(), "ag-ts007-noadf-"))
+    roots.push(root)
+    await writeFile(join(root, "README.md"), "# Not an ADF project\n", "utf8")
+
+    const output = join(root, ".agentdev", "graph")
+    const result = await prepareWorkflowGraph({ root, output })
+    expect(result.status).toBe("ready")
+
+    const graph = await loadGraph(output)
+    expect(graph.nodes).toEqual([])
+    expect(graph.edges).toEqual([])
+    expect(graph.manifest.indexed_paths).toEqual([
+      "docs/requirements",
+      "docs/adr",
+      "docs/specs",
+    ])
   })
 })
