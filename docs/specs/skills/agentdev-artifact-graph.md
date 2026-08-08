@@ -174,7 +174,7 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 - `case-open`: 起点成果物から到達できる変更影響、廃止参照、未解決参照の候補取得
 - `case-run`: 実装対象に関係するREQ、SPEC、整合性ルール、周辺成果物の候補取得
 - `case-close`: 鮮度、未解決参照、存在しないノードへの関係、根拠欠落、関係閉包候補の観測
-- `agentdev-deep-review`: 複数規範関係、循環、集中ノード、孤立候補、複数経路の論点抽出
+- `agentdev-adversarial-review`: 複数規範関係、循環、集中ノード、孤立候補、複数経路の論点抽出
 
 ### 利用上の防護
 

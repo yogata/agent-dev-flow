@@ -1,0 +1,81 @@
+---
+name: agentdev-adversarial-review
+description: "対論型レビューの実行入口。Orchestrator、Reviewer、Reviewee の3論理的役割で構成される審議を通じて本質的争点を抽出する。評価前に対象依存の動的レビュー戦略を構成し、対称的相互反証、戦略メタ反証、合意候補形成後の再検証（convergence audit）を行う。USE FOR: 要件案、設計案、規格・仕様案、計画案、実装案の本質的合意形成、動的レビュー戦略の構成、対称的な批判と反論による審議、合意候補の再検証、未解決争点のユーザー質問化。DO NOT USE FOR: QG-1〜QG-4 の代替、通常のコードレビューやテストや機械的検査、inspect-docs/inspect-skills 診断、実装実行やファイル保存やcommitやpushやIssue・PR更新、ユーザー承認代行、強制的統制ゲート、固定観点全実行を前提とするレビュー。"
+---
+
+# 対論型レビュー（agentdev-adversarial-review）
+
+本スキルは、Orchestrator、Reviewer、Reviewee の3論理的役割で構成される審議を通じて、本質的争点を抽出し合意を形成する助言プロトコルの実行入口である。
+審議結果は判断材料であり、ユーザー承認、実装実行、強制的統制判定のいずれにもならない。
+
+- **参照元**: ユーザーまたは呼び出し元コマンドの明示的選択
+- **特性**: 審議プロトコルの振る舞い契約を実行入口として提供する。実装実行、ファイル編集、外部状態変更は本スキルの対象外
+
+## 原本（SSoT）
+
+本スキルの原本仕様は `docs/specs/skills/agentdev-adversarial-review.md` である。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
+
+## 発動契約
+
+ユーザーまたは呼び出し元が明示的に選択する任意のレビュー手段である。
+すべての要件定義や計画作成で自動発動する強制工程ではなく、QG を代替する品質ゲートではなく、ユーザー承認を代行する承認ゲートではなく、実装開始または変更反映を停止する統制ゲートではない。
+発動契約の詳細は SPEC「発動契約」を正とする。
+
+## 審議上の3論理的役割
+
+審議は Orchestrator、Reviewer、Reviewee の3論理的役割で構成する。論理役割は物理エージェント構成を固定しない。
+
+- **Orchestrator**: 審議全体の進行、状態管理、合意候補管理、完了判断を担う。ただし Orchestrator 自身は本質的争点の正解を判断せず、Reviewer と Reviewee の相互反証が収束する状態を確認する。
+- **Reviewer**: 対象案を正しいと仮定せず、未発見の破綻条件、欠落、矛盾、不成立な前提、問題のある設計判断、実装方針、トレードオフを探索し反証を試みる。
+- **Reviewee**: Reviewer の finding を未検証の主張として扱い、根拠、前提、対象理解、適用範囲、影響、方法論を反証する。
+
+Reviewer と Reviewee の双方が自身の以前の主張を撤回、限定、修正できる。一方に恒常的な正解権限を与えない。
+
+## 対象領域
+
+要件、設計、規格・仕様、計画、実装を標準対象とする。完成済み文書に限定せず、ドラフト、構造化提案、検討中の選択肢を含む。
+
+## 動的レビュー戦略
+
+評価前に対象、目的、制約、技術領域、想定失敗条件に応じたレビュー戦略を構成する。固定された観点集合の全項目実行をレビュー成立条件、完了条件としない。戦略の構成要素（何を疑うか、どの立場から評価するか、どの既存知見・方法論を使うか、何を証拠とするか、どの意味単位へ分解して検証するか）は SPEC「動的レビュー戦略」が所有する。
+
+レビュー戦略自体も未検証の判断として扱い、Reviewer と Reviewee が不足、過剰、誤適用、前提不成立を指摘できる（戦略メタ反証）。審議中に新しい証拠や争点が生じた場合、観点、立場、方法論を追加、削除、再構成できる。
+
+OpenAI/Codex adversarial-review 等の外部知見を観点、問い、failure mode、検証方法を構成する知識源として活用する。実行時の外部サービス・外部リポジトリへの必須依存にせず、必要な知見を ADF 側の配布可能なレビュー知識として保持する。
+
+## 振る舞いプロトコルと合意候補再検証
+
+審議は strategy → challenge → counter-challenge → convergence → convergence audit の状態遷移で進行する。合意候補を形成しただけでは完了とせず、Reviewer と Reviewee が合意候補とその成立根拠を再度対論的に検証する（convergence audit）。再検証で新しい本質的争点が見つかった場合、当該争点について対論を再開する。
+
+対称的相互反証、戦略メタ反証、争点状態遷移、finding と正規結果の形式、本質的争点と非本質的批判の判定、自律審議とユーザー質問、サブエージェント利用と重複統合、完了条件、出力契約の詳細手続きは [references/adversarial-review-protocol.md](references/adversarial-review-protocol.md) に置く。
+
+審議状態の物理的保存形式、スキーマ、最大ラウンド数、並列数、タイムアウトは SPEC 所有対象外とし、配布スキル実装へ委譲する。
+
+## 副作用境界と責務分界
+
+本スキルはファイル保存、commit、push、merge、Issue・PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認代行を行わない。レビュー結果保存用の新しい正規成果物種別を導入しない。
+QG-1〜QG-4 を代替せず、通常のコードレビュー、テスト、機械的検査を代替せず、inspect-docs/inspect-skills の診断を代替しない。すべての要件作成工程、計画作成工程への強制適用を行わない。
+詳細は SPEC「副作用境界」「QG、通常レビュー、診断との責務分界」を正とする。
+
+## 非対象
+
+本スキルは以下を扱わない:
+
+| 非対象 | 責務主体 |
+|--------|----------|
+| QG-1〜QG-4 品質ゲート | 各工程のコマンド、`agentdev-quality-gates` |
+| 通常のコードレビュー、テスト、機械的検査 | 実装担当、CI |
+| inspect-docs/inspect-skills 診断 | `agentdev-doc-diagnostics`、`agentdev-inspect-skills` |
+| 実装実行、ファイル編集、commit、push、merge、Issue・PR更新 | case-run、各コマンド |
+| ユーザー承認の代行 | ユーザー |
+
+## See Also
+
+- **agentdev-architecture-advisory**: アーキテクチャ助言の整理（req-define 事前確認）
+- **agentdev-quality-gates**: QG-1〜QG-4 品質ゲート基準
+- **agentdev-doc-diagnostics**: 証拠付き finding の診断
+- **agentdev-skill-authoring**: スキル設計とレビュー規約
+- **SPEC `docs/specs/skills/agentdev-adversarial-review.md`**: 振る舞い契約の正典
+- **references/adversarial-review-protocol.md**: 審議プロトコルの詳細手続き

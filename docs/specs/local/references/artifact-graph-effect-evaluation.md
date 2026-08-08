@@ -35,13 +35,13 @@ Issue のテスト戦略にある `fix-and-reverify` に従い、配列内の対
 | No. | 代表質問 | README 索引と `rg` による基準結果 | Artifact Graph の結果 | 従来操作数 | Graph操作数 | 判定 |
 |---|---|---|---|---:|---:|---|
 | 1 | Artifact Graph の正規仕様はどこか | README 索引から `docs/specs/local/artifact-graph.md` へ到達 | `provenance specification:docs/specs/local/artifact-graph.md` が同ファイル2行目を返却 | 2 | 1 | 一致 |
-| 2 | Artifact Graph SPEC の直接関係と正規所有者は何か | SPEC の `canonical_owner` と SPEC 索引のリンクから `repo-agentdev-artifact-graph` および関連ファイルを確認 | `neighbors specification:docs/specs/local/artifact-graph.md --depth 1` が正規所有スキル、SPEC 索引、根拠ファイル、deep-review 拡張定義を返却 | 2 | 1 | 一致 |
+| 2 | Artifact Graph SPEC の直接関係と正規所有者は何か | SPEC の `canonical_owner` と SPEC 索引のリンクから `repo-agentdev-artifact-graph` および関連ファイルを確認 | `neighbors specification:docs/specs/local/artifact-graph.md --depth 1` が正規所有スキル、SPEC 索引、根拠ファイル、agentdev-adversarial-review 拡張定義を返却 | 2 | 1 | 一致 |
 | 3 | req-define 拡張定義の直接関係候補は何か | 拡張定義内の7 SPEC、対象コマンド、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:/agentdev/req-define --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
 | 4 | spec-save 拡張定義の直接関係候補は何か | 拡張定義内の2 SPEC、対象コマンド、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:/agentdev/spec-save --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
 | 5 | case-open 拡張定義の直接関係候補は何か | 拡張定義内の3 SPEC、対象コマンド、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:/agentdev/case-open --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
 | 6 | case-run 拡張定義の直接関係候補は何か | 拡張定義内の2 SPEC、対象コマンド、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:/agentdev/case-run --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
 | 7 | case-close 拡張定義の直接関係候補は何か | 拡張定義内の4 SPEC、対象コマンド、定義ファイル、2スキルを確認 | `neighbors extension:/agentdev/case-close --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
-| 8 | deep-review 拡張定義の直接関係候補は何か | 拡張定義内のArtifact Graph SPEC、対象スキル、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:agentdev-deep-review --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
+| 8 | agentdev-adversarial-review 拡張定義の直接関係候補は何か | 拡張定義内のArtifact Graph SPEC、対象スキル、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:agentdev-adversarial-review --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
 | 9 | case-run コマンドから Artifact Graph スキルへ到達する経路は何か | README 索引、コマンドの拡張定義読込記述、拡張定義の `rules.skill` を順に確認 | `path command:case-run skill:repo-agentdev-artifact-graph --max-depth 4` がコマンド、拡張定義、スキルの3ノード経路を返却 | 3 | 1 | 一致 |
 | 10 | case-run 拡張定義の委譲関係を示す根拠箇所はどこか | `rg -n -C 2` が `.agentdev/extensions/commands/case-run.yaml` 19行目を返却 | 質問6の委譲関係に対する `provenance` が同ファイル19行目と `field:rules.skill` を返却 | 2 | 2 | 一致 |
 
