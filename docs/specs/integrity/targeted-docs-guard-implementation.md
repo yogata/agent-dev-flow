@@ -38,7 +38,7 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - 要件行ID形式の妥当性
 - WHAT/HOW境界の逸脱検出
 - 新規REQ・タイトル変更時の `docs/requirements/README.md` 同期
-- DOC-MAP更新要否判定
+- README 索引更新要否判定
 - ADR参照がある場合の相互参照更新要否判定
 - 関連SPEC候補がある場合の `docs/specs/README.md` 更新要否判定
 - 旧SPEC直下パス混入検出（IR-057）
@@ -53,7 +53,7 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - status 値の妥当性
 - `docs/specs/README.md` のstatus表との同期
 - SPECドメイン分類の妥当性
-- 新規SPEC、移動、改名、主要入口変更時の DOC-MAP 更新要否判定
+- 新規SPEC、移動、改名、主要入口変更時の README 索引更新要否判定
 - 変更SPECと近接リンクのリンク整合
 - 旧SPEC直下パス混入検出（IR-057）
 - local版旧生成方式語彙混入検出（IR-057）
@@ -75,7 +75,7 @@ case-close では保存工程より広めに以下を確認する。
 
 ### case-run 向け検査
 
-case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/spec-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。appliesTo は `docs/specs/**`, `docs/requirements/**`, `docs/adr/**`, `docs/guides/**`, `AGENTS.md`, `README.md`, `docs/DOC-MAP.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
+case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/spec-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。appliesTo は `docs/specs/**`, `docs/requirements/**`, `docs/adr/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
 
 ## full_docs_check_recommended 条件
 
@@ -85,18 +85,18 @@ case-run プロファイルは docs/** 変更ファイルを対象とし、req-s
 - 索引に使用される frontmatter 値（id、title、status 等）
 - 公開入口、manifest、一覧に影響する値
 - extension が参照する対象や責務
-- DOC-MAP や README の生成元情報
+- README 索引の生成元情報
 
 REQ と SPEC の README 更新要否（`requirements_readme_update_required`、`spec_readme_update_required`）は、対象文書の追加、削除、移動、名称変更、または索引に使用される frontmatter 値の変更で `true` とする。相互参照追記、相対パス是正、表記修正など、上記導出元に影響しない変更では全フラグを `false` にする。
 
 case-close profile の `full_docs_check_recommended` の判定条件（v2:REQ-0158 より移管）。以下の変更を検出した場合に `true` とする。
 
 - integrity rule追加・削除・大幅変更
-- DOC-MAP構造変更
+- README 索引構造変更
 - `docs/specs/` の大規模移動・改名
 - `repo-agentdev-integrity` の検査スコープ変更
 - 文書分類・責務境界の基準変更
-- `docs/specs/integrity/rules/**`、`integrity-rule-catalog.md`、`rule-ownership.md`、`document-model.md`、`document-type-responsibilities.md`、`docs/DOC-MAP.md`、`docs/specs/README.md`、`.agentdev/doc-inputs/**` の変更
+- `docs/specs/integrity/rules/**`、`integrity-rule-catalog.md`、`rule-ownership.md`、`document-model.md`、`document-type-responsibilities.md`、`docs/specs/README.md`、`.agentdev/doc-inputs/**` の変更
 
 ## false-clean 予防（REQ-010-281 詳細）
 

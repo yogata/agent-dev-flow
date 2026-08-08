@@ -19,7 +19,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 本スキルは以下の方針に従う（ADR）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-req-structure-diagnostics.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
 3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
@@ -27,7 +27,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 ## USE FOR
 
 - REQ参照ID整合性確認（frontmatter `id` 一意性、ファイル名整合、相互参照の存在）
-- 第一参照導線確認（DOC-MAP、README、requirements/README 導線）
+- 第一参照導線確認（README、requirements/README 導線）
 - 現行/廃止/世代境界確認（廃止専有 ID、二重存在、100s番台境界）
 - SPEC分離基準違反検出（REQ 要件行に残留した schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ）
 - 配布物 ID 汚染検出（`src/opencode/commands/`、`src/opencode/skills/` への `REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等の内部 ID 残留）
@@ -59,5 +59,4 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 ## See Also
 
 - **agentdev-workflow-lifecycle**: work_type 判定、フェーズ定義
-- **agentdev-doc-map**: DOC-MAP 索引構造、summary/index 文書の分量基準
 

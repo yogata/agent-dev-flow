@@ -36,7 +36,7 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 |------|------|
 | `docs/requirements/*.md`、`docs/adr/*.md` | inspect-docs |
 | `docs/specs/**/*.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
-| `docs/guides/*.md`、`docs/DOC-MAP.md`、`README.md` | inspect-docs |
+| `docs/guides/*.md`、`README.md` | inspect-docs |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
 | `docs/specs/commands/**/*.md`、`docs/specs/skills/**/*.md` | inspect-skills |

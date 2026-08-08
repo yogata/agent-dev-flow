@@ -10,12 +10,12 @@ updated: 2026-07-27
 # 文書種別責務、配置基準
 
 > **他 SPEC との役割分担**: 本 SPEC と `../foundations/document-model.md` は補完関係にある。
-> 文書種別の基準境界（REQ/ADR/SPEC/guides/DOC-MAP の役割定義、ライフサイクル、優先順位、参照規則、投影方向、SPEC内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の正本を参照する。
+> 文書種別の基準境界（REQ/ADR/SPEC/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向、SPEC内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の正本を参照する。
 > 本 SPEC は文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策を扱う。
 > 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）は `../foundations/patterns.md` を参照する。
 > 新規ファイル分割は行わず、既存2ファイル（本 SPEC と document-model.md）間の重複削除で運用する。両 SPEC の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
 
-docs/ 配下の文書（REQ/ADR/SPEC/guides/DOC-MAP/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
+docs/ 配下の文書（REQ/ADR/SPEC/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
 v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）であり、`agentdev-doc-writing` スキルの参照先である。
 REQ-001-061、REQ-002-032 の詳細参照先。
 
@@ -27,9 +27,9 @@ REQ-001-061、REQ-002-032 の詳細参照先。
 
 ## 文書種別の基準境界（参照）
 
-REQ/ADR/SPEC/guides/DOC-MAP の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。本 SPEC は基準境界を再定義せず、執筆時の配置判定のみを扱う。
+REQ/ADR/SPEC/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。本 SPEC は基準境界を再定義せず、執筆時の配置判定のみを扱う。
 
-README は agent-dev-flow リポジトリの構成要素（identity、入口表、参照先リンク、最小限のクイックスタート）であり、REQ/ADR/SPEC/guide/DOC-MAP と並ぶ基準境界対象ではなく README.md の構造要件に従う。
+README は agent-dev-flow リポジトリの構成要素（identity、入口表、参照先リンク、最小限のクイックスタート）であり、REQ/ADR/SPEC/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
 
 ### 新規文書作成時の分類判断ツリー <!-- REQ-001 -->
 
@@ -43,7 +43,6 @@ README は agent-dev-flow リポジトリの構成要素（identity、入口表�
 | 現在のアーキテクチャ、システム動作の記述か? | YES → | **SPEC** |
 | 分析結果、監査所見、インシデント記録か? | YES → | **Report** |
 | 人間向けのナビゲーション、案内か? | YES → | **Guide** |
-| 文書探索の索引か? | YES → | **DOC-MAP** |
 | 上記のいずれにも該当しない → | 既存文書の APPEND/UPDATE で対応できないか確認。新規文書が必要な場合は REQ として要件化 |
 
 判断の結果が複数の文書種別にまたがる場合、それぞれの責務に応じて分割する。単一文書に複数種別の内容を混在させない。

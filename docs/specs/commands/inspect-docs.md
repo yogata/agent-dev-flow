@@ -9,9 +9,9 @@ updated: 2026-07-18
 
 ## 目的
 
-docs 全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力する。
+docs 全体（REQ/ADR/SPEC/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力する。
 検査対象を直接修正しない診断専用コマンド。
-REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、ADR、guides、DOC-MAP の意味診断を含む。
+REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、ADR、guides、README の意味診断を含む。
 
 ## 入力
 
@@ -34,20 +34,20 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 
 ## 現在の動作
 
-- Step 1: スキャン対象の収集（`docs/requirements/`, `docs/adr/`, `docs/specs/`, `docs/guides/`, `docs/DOC-MAP.md`, `README.md`, `.opencode/`）
+- Step 1: スキャン対象の収集（`docs/requirements/`, `docs/adr/`, `docs/specs/`, `docs/guides/`, `README.md`, `.opencode/`）
 - Step 2: REQ 参照 ID 整合性確認（`agentdev-req-structure-diagnostics`）
 - Step 3: 第一参照導線確認（`agentdev-req-structure-diagnostics`）
 - Step 4: 現行/廃止/世代境界確認（`agentdev-req-structure-diagnostics`）
 - Step 5: SPEC 意味診断（SPEC が REQ/ADR/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認）
 - Step 6: ADR 意味診断（承認済み ADR のみを現行判断の根拠として扱っているか確認）
 - Step 7: guides 意味診断（guides が navigation layer の範囲を超えていないか確認）。履歴混入検出時は route 追加（v2:REQ-0115-041）
-- Step 8: DOC-MAP 意味診断（DOC-MAP が索引の範囲を超えていないか確認）。内容過多検出時は分割誘導（v2:REQ-0115-042）
+- Step 8: README 索引診断（README 索引が導線の範囲を超えていないか確認）。内容過多検出時は分割誘導
 - Step 9: REQ structure review（6観点）（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT（`agentdev-req-structure-diagnostics`））
 - Step 10: 文書分類一貫性検査（`docs/specs/foundations/document-model.md` の classification policy への適合確認）。REQ 要件行への SPEC 分離基準違反残留（schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出
 - Step 11: 配布物整合性検査。配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/specs/integrity/docs-spec-rebuild-integrity.md` が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する（`agentdev-req-structure-diagnostics` 参照）
 - Step 12: docs-check route 判定（意味的疑いのうち機械的検査に落とせるものを docs-check ルール／検査データ候補として提示）
 - Step 13: 未処理 artifact 確認（`agentdev-req-structure-diagnostics`）
-- Step 14: 検出事項出力（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）。source-of-truth priority: 現行 REQ > 承認済み ADR > SPEC > DOC-MAP/guides
+- Step 14: 検出事項出力（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）。source-of-truth priority: 現行 REQ > 承認済み ADR > SPEC > guides
 - Step 15: 実行前同期（`git pull --ff-only`、失敗時は git-error-messages template で停止）
 - Step 16: `.agentdev/inspect/` 変更の commit と push（変更なし時は commit/push せず「変更なし」報告、変更あり時は `.agentdev/inspect/` のみ `git add`、commit、push、push 失敗時は停止）
 - Step 17: 完了報告
@@ -63,7 +63,7 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 - GitHub Issue/PR 作成、更新（G02）
 - worktree/ブランチ作成（G03）
 - intake/learning/RU 処理（G04）
-- source-of-truth priority 違反（G05、現行 REQ > 承認済み ADR > SPEC > DOC-MAP/guides）
+- source-of-truth priority 違反（G05、現行 REQ > 承認済み ADR > SPEC > guides）
 
 ## 検証観点
 
@@ -78,7 +78,6 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 |--------|------|
 | スキャン対象ディレクトリが存在しない | 該当カテゴリを空として扱い、警告を出力 |
 | ファイル読込失敗 | 該当ファイルをスキップし、警告を出力 |
-| DOC-MAP が存在しない | 該当 step をスキップし、警告を出力 |
 
 ## See Also
 

@@ -18,7 +18,7 @@
 | [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) | 作業候補、学びの収集から RU 生成まで |
 | [診断、メンテナンス](diagnostics-and-maintenance.md) | docs-check / inspect-docs |
 | [成果物、状態モデル](artifacts-and-state.md) | 成果物の種別、配置、ライフサイクル |
-| [プロジェクトドキュメントと SPEC](project-docs-and-specs.md) | REQ / ADR / SPEC / DOC-MAP の関係 |
+| [プロジェクトドキュメントと SPEC](project-docs-and-specs.md) | REQ / ADR / SPEC の関係 |
 | [Consumer Project 導入](consumer-project-setup.md) | AgentDevFlow の適用プロジェクト導入手順 |
 | [トラブルシューティング](troubleshooting.md) | よくある問題と対処法 |
 | [用語集](glossary.md) | AgentDevFlow の用語定義 |

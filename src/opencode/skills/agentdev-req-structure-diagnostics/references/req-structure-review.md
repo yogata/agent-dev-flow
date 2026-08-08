@@ -15,9 +15,8 @@ REQ 構造レビューの判定ロジック（REQ参照ID整合性、第一参�
 
 REQ体系の第一参照導線を確認する:
 
-- **(a) DOC-MAP 導線**: `docs/DOC-MAP.md` から現行 REQ への導線が正しいか
-- **(b) README 導線**: `README.md` のワークフロー入口テーブルが現行コマンドと一致するか
-- **(c) requirements/README.md 導線**: REQ インデックスが現行/廃止の実体と一致するか
+- **(a) README 導線**: `docs/README.md` のワークフロー入口テーブルから現行 REQ への導線が正しいか
+- **(b) requirements/README.md 導線**: REQ インデックスが現行/廃止の実体と一致するか
 
 ## 現行/廃止/世代境界確認
 

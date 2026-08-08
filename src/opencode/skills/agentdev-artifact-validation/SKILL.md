@@ -1,6 +1,6 @@
 ---
 name: agentdev-artifact-validation
-description: Owns document-type-crosscutting deterministic verification scripts (check-frontmatter-consistency, check-entry-existence, check-change-impact), their shared lib, and the public verification contract (AG-003/009/019, RU-20260722-01). USE FOR: invoking the public verification contract for REQ/ADR frontmatter id↔filename consistency, README/DOC-MAP entry existence, or change-scope validation against an allowed path list. DO NOT USE FOR: REQ/ADR/SPEC content judgment, file editing, save, user approval, commit, push, REQ/ADR/row ID allocation, or target_area search.
+description: Owns document-type-crosscutting deterministic verification scripts (check-frontmatter-consistency, check-entry-existence, check-change-impact), their shared lib, and the public verification contract (AG-003/009/019, RU-20260722-01). USE FOR: invoking the public verification contract for REQ/ADR frontmatter id↔filename consistency, README entry existence, or change-scope validation against an allowed path list. DO NOT USE FOR: REQ/ADR/SPEC content judgment, file editing, save, user approval, commit, push, REQ/ADR/row ID allocation, or target_area search.
 ---
 
 # 文書種別横断検証（artifact-validation）
@@ -65,7 +65,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | スクリプト | 役割 | 入力 | 出力 JSON |
 |-----------|------|------|-----------|
 | `check-frontmatter-consistency.ts` | frontmatter id ↔ ファイル名整合性（REQ/ADR 横断） | argv[2]=dir, argv[3]=kind(req\|adr) | `{ ok, errors[], warnings[] }` |
-| `check-entry-existence.ts` | README/DOC-MAP エントリ存在 | argv[2]=id, argv[3..]=files、または stdin JSON | `{ ok, errors[], warnings[], found[] }` |
+| `check-entry-existence.ts` | README エントリ存在 | argv[2]=id, argv[3..]=files、または stdin JSON | `{ ok, errors[], warnings[], found[] }` |
 | `check-change-impact.ts` | 変更範囲検証（許可パスリストとの積集合） | argv[2]=changed-list-file, argv[3]=allowed-list-file、または stdin JSON | `{ ok, errors[], warnings[], violations[] }` |
 
 利用側 command、skill は内部 lib パスを直接参照せず、上記公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（AG-009、AG-019）。同一 script または共有 lib を複数 skill へ複製しない（AG-003）。

@@ -14,7 +14,7 @@ scripts/
 │   └── fs-helpers.ts                # ファイル名/番号/ゼロ埋めヘルパー
 ├── src/
 │   ├── check-frontmatter-consistency.ts  # frontmatter id ↔ ファイル名整合性（REQ/ADR 横断）
-│   ├── check-entry-existence.ts     # README/DOC-MAP エントリ存在
+│   ├── check-entry-existence.ts     # README エントリ存在
 │   └── check-change-impact.ts       # 変更範囲検証（許可パスリストとの積集合）
 └── tests/
     └── *.test.ts                    # 各スクリプトの core 純粋関数テスト

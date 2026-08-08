@@ -48,10 +48,10 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
   - OU ID未指定時はdraft全体のREQ/ADR対象actionを処理する。
   - OUが複数存在することだけを理由に停止しない。
 - Step 4: REQ/ADR actionを保存し、要件表、ID、frontmatter、採番結果を検証する。
-- Step 5: README、DOC-MAPへの影響を確認し、派生文書を整合させる。
+- Step 5: README への影響を確認し、派生文書を整合させる。
 - Step 6: ADR actionを保存する。
 - Step 7: changed-docs検査を実行する。
-- Step 8: DOC-MAP影響を確認する。
+- Step 8: README 索引影響を確認する。
 - Step 9: 許可パスとリモート同期を検証する。
 - Step 10: draftの保存状態とOU resultを更新する。
 - Step 11: commit、pushする。
@@ -59,7 +59,7 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
 ## 参照する横断 SPEC
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、コマンド分類）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ ファイル整合性検査、DOC-MAP 影響規則、REQ 再構成検出、artifact_actions 工程分岐）
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ ファイル整合性検査、README 索引影響規則、REQ 再構成検出、artifact_actions 工程分岐）
 - [quality-gates.md](../quality/quality-gates.md)（QG-1）
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPLIT 検出基準）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（REQ/ADR/SPEC body 品質検査）
@@ -67,12 +67,12 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
 
 ## targeted docs guard (v2:REQ-0158-003)
 
-REQ 保存工程で targeted docs guard を実行する。対象は保存工程で変更された REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/DOC-MAP.md`、`docs/README.md`、`AGENTS.md`）。
+REQ 保存工程で targeted docs guard を実行する。対象は保存工程で変更された REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）。
 
-- 実行タイミング: Step 7（docs 変更整合性検証）の直後、Step 8（DOC-MAP 影響確認）の前
+- 実行タイミング: Step 7（docs 変更整合性検証）の直後、Step 8（README 索引影響確認）の前
 - 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow req-save --files <changed REQ files> --json`
-- 検査項目: REQ frontmatter 必須項目、ファイル名・ID の一致、要件行 ID 形式の妥当性、WHAT/HOW 境界逸脱検出、`docs/requirements/README.md` 同期、DOC-MAP 更新要否判定、ADR 参照相互参照更新要否判定、関連 SPEC 候補時の `docs/specs/README.md` 更新要否判定、旧SPEC直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、文書種別責務と日本語執筆規範の機械化可能範囲の検査
-- 失敗時: 検査対象文書（REQ ファイル、`docs/requirements/README.md`、`docs/DOC-MAP.md`、`docs/README.md`、`AGENTS.md`）を修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行を検討する
+- 検査項目: REQ frontmatter 必須項目、ファイル名・ID の一致、要件行 ID 形式の妥当性、WHAT/HOW 境界逸脱検出、`docs/requirements/README.md` 同期、README 索引更新要否判定、ADR 参照相互参照更新要否判定、関連 SPEC 候補時の `docs/specs/README.md` 更新要否判定、旧SPEC直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、文書種別責務と日本語執筆規範の機械化可能範囲の検査
+- 失敗時: 検査対象文書（REQ ファイル、`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）を修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行を検討する
 
 JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。`failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
 
@@ -126,7 +126,7 @@ G07（commit 前 status 更新）は フェーズ3 で維持。
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
 - `agentdev-req-file-manager` skill（REQ ファイル管理、採番）
 - `agentdev-adr-file-manager` skill（ADR ファイル管理、採番）
-- `agentdev-doc-map` skill（DOC-MAP 影響確認）
+- `agentdev-artifact-validation` skill（README エントリ存在確認）
 - `agentdev-conventional-commits` skill（コミットメッセージ規約）
 - `agentdev-git-worktree` skill（並列実行安全 git 操作）
 - `agentdev-quality-gates` skill（QG-1）

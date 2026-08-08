@@ -55,8 +55,6 @@ docs/requirements/
 └── REQ-{NNNN}.md
 ```
 
-`docs/DOC-MAP.md`（ドキュメント探索経路インデックス）は `docs/` 直下に配置する。
-
 **バグ修正、軽微変更除外**: bugfixではREQファイルを作成しない。
 Issue本文のみで要件を管理する。
 REQファイルの修正が必要なバグ修正は、featureに昇格して扱う。

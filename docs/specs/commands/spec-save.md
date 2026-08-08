@@ -24,7 +24,7 @@ req-save の次、case-open の前に実行する。
 
 ## 副作用
 
-- ファイル作成/更新: `docs/specs/**`, `.agentdev/drafts/**`（status 更新用）。`docs/specs/README.md`, `docs/DOC-MAP.md` は SPEC 操作に付随する更新のみ許可
+- ファイル作成/更新: `docs/specs/**`, `.agentdev/drafts/**`（status 更新用）。`docs/specs/README.md` は SPEC 操作に付随する更新のみ許可
 - git 操作: commit + push（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
 - Issue 作成: 行わない（G12、case-open 責務）
 - deviation capture: spec-save 実行中に実観測した deviation を agentdev-learning-capture skill または
@@ -45,7 +45,7 @@ req-save の次、case-open の前に実行する。
   - spec-append: 既存 SPEC ファイルへ `target_area`（anchor）と `placement` に基づき `content` を新規セクションとして追加。frontmatter `updated` を更新。`status` は変更しない。詳細は「spec-append 操作時のセクション追加ロジック」セクション参照
   - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
 - Step 6: インデックス整合（新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加）。既存 SPEC 追記時は README 更新不要。エントリ存在確認は決定的スクリプトで実行
-- Step 7: DOC-MAP 影響確認（SPEC 操作が `docs/DOC-MAP.md` に影響するか確認し、影響がある場合は更新（`agentdev-doc-map`））
+- Step 7: SPEC 一覧整合確認（SPEC 操作が `docs/specs/README.md` の SPEC 一覧に影響するか確認し、影響がある場合は更新）
 - Step 8: ドラフト status 更新（`draft-data` に SPEC 消費済みフラグを付与）。commit/push より前に更新し commit 対象に含める
 - Step 9: 変更範囲検証（許可パス照合は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行。`git diff --name-only` で `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を検出したらエラー報告、指示待ち（自動破棄しない））
 - Step 10: コミット、プッシュ（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
@@ -199,7 +199,7 @@ target_area 見出し検索は `agentdev-spec-file-manager/scripts/src/search-ta
 ## 参照する横断 SPEC
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、コマンド分類）
-- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（artifact_actions 工程分岐、DOC-MAP 影響規則）
+- [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（artifact_actions 工程分岐、README 索引影響規則）
 - [quality-gates.md](../quality/quality-gates.md)（SPEC lifecycle 連携（QG-4 で accepted 昇格））
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（SPEC body 品質検査）
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPEC 分離基準との連携）
@@ -207,7 +207,7 @@ target_area 見出し検索は `agentdev-spec-file-manager/scripts/src/search-ta
 
 ## targeted docs guard (v2:REQ-0158-003)
 
-SPEC保存工程では、変更されたSPECと連動する`docs/specs/README.md`、`docs/DOC-MAP.md`を`check_changed_docs.ts --workflow spec-save`で検査する。
+SPEC保存工程では、変更されたSPECと連動する`docs/specs/README.md`を`check_changed_docs.ts --workflow spec-save`で検査する。
 
 検査は以下を含む。
 
@@ -216,14 +216,14 @@ SPEC保存工程では、変更されたSPECと連動する`docs/specs/README.md
 - `superseded`時の`superseded_by`必須性
 - `superseded_by`保持SPECの通常内容検査対象外判定
 - SPEC READMEのstatus同期
-- SPECドメイン分類、リンク、DOC-MAP更新要否
+- SPECドメイン分類、リンク、SPEC 一覧更新要否
 - command/skill/integrity SPECと対応原本・catalog・rule file・scriptの整合
 
 strict failureが存在する場合は修正して再実行する。
 ## 対象外
 
 - SPEC 対象 artifact_actions（`artifact: spec`）がない場合の SPEC ファイル作成、編集（G01、G04、no-op）
-- `docs/specs/**`, `.agentdev/drafts/**`, `docs/specs/README.md`, `docs/DOC-MAP.md` 以外のファイル作成、編集（G02、G03）。REQ ファイル（`docs/requirements/**`）、ADR（`docs/adr/**`）、コマンド、スキル、テンプレート編集禁止
+- `docs/specs/**`, `.agentdev/drafts/**`, `docs/specs/README.md` 以外のファイル作成、編集（G02、G03）。REQ ファイル（`docs/requirements/**`）、ADR（`docs/adr/**`）、コマンド、スキル、テンプレート編集禁止
 - SPEC 対象 artifact_actions がない場合の SPEC ファイル作成、編集（G04）
 - 新規 SPEC 作成時の `status: draft` 省略（G05）
 - 既存 SPEC 追記時の `status` 変更（G06、`status: accepted` 昇格は case-close Step 3 責務）
@@ -254,7 +254,7 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 - [req-define.md](req-define.md)（前段コマンド（SPEC 候補分離））
 - [req-save.md](req-save.md)（前段コマンド（REQ/ADR 保存））
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
-- `agentdev-doc-map` skill（DOC-MAP 影響確認）
+- `agentdev-artifact-validation` skill（README エントリ存在確認）
 - `agentdev-conventional-commits` skill（コミットメッセージ規約）
 - `agentdev-git-worktree` skill（並列実行安全 git 操作）
 - REQ-001（REQ/SPEC 責務分離の徹底と spec-save 新設）

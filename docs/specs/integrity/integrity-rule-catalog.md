@@ -208,7 +208,7 @@ docs-check（`/repo/docs-check`、`check_integrity.ts`）と skill 定義（SKIL
 
 | 対象 | 拡張子 | 備考 |
 |------|--------|------|
-| 検査対象 | `.md` のみ | Markdown 形式の永続文書（REQ/ADR/SPEC/guides/DOC-MAP/SKILL.md/command 定義） |
+| 検査対象 | `.md` のみ | Markdown 形式の永続文書（REQ/ADR/SPEC/guides/SKILL.md/command 定義） |
 | 除外 | `retired/` 配下 | 履歴参照用、検出対象外 |
 | 除外 | code block 内部 | 例示、パターン説明は検出対象外 |
 | 正当使用例外 | vocabulary-registry.md / integrity-rule-catalog.md / gate-levels.md / remediation-routing.md | 検出ルール自体の記述、正規語彙の対照表 |

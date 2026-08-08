@@ -13,7 +13,7 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスで�
 ## 適用範囲
 
 - **対象**: docs/specs/ 配下の SPEC ファイル（commands/, skills/, workflows/, ドメインディレクトリ配下）
-- **対象外**: REQ, ADR, guides, DOC-MAP, .agentdev/ 配下のドラフト
+- **対象外**: REQ, ADR, guides, .agentdev/ 配下のドラフト
 
 ## 測定対象と計測方法
 

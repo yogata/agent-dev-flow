@@ -4,8 +4,8 @@ description: docs全体の意味整合性を検出し、検出事項を .agentde
 
 # inspect-docs
 
-docs全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力するコマンド。
-検査対象を直接修正しない診断を行い、REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、ADR、guides、DOC-MAP の意味診断を含む。
+docs全体（REQ/ADR/SPEC/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力するコマンド。
+検査対象を直接修正しない診断を行い、REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、ADR、guides、README の意味診断を含む。
 
 ## 基本原則: 診断専用（検査対象を直接修正しない）
 
@@ -34,7 +34,7 @@ docs全体（REQ/ADR/SPEC/guides/DOC-MAP）の意味整合性を診断し、検�
 |------|------|
 | `docs/requirements/*.md`、`docs/adr/*.md` | inspect-docs |
 | `docs/specs/**/*.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
-| `docs/guides/*.md`、`docs/DOC-MAP.md`、`README.md` | inspect-docs |
+| `docs/guides/*.md`、`README.md` | inspect-docs |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
 | `docs/specs/commands/**/*.md`、`docs/specs/skills/**/*.md` | inspect-skills |
@@ -55,7 +55,7 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 
 ### Step 1: スキャン対象の収集
 
-`docs/requirements/`、`docs/adr/`、`docs/specs/`、`docs/guides/`、`docs/DOC-MAP.md`、`README.md`、`.opencode/` を収集
+`docs/requirements/`、`docs/adr/`、`docs/specs/`、`docs/guides/`、`README.md`、`.opencode/` を収集
 ### Step 2: REQ参照ID整合性確認
 
 `agentdev-req-structure-diagnostics` 参照
@@ -74,9 +74,9 @@ SPEC が REQ/ADR/guides の代替、将来計画の混入、実行時依存先�
 ### Step 7: guides意味診断
 
 guides が navigation layer の範囲を超えていないか確認。履歴混入を検出した場合 route を追加
-### Step 8: DOC-MAP意味診断
+### Step 8: README 索引診断
 
-DOC-MAP が索引の範囲を超えていないか確認。内容過多を検出した場合分割を誘導
+README 索引が導線の範囲を超えていないか確認。内容過多を検出した場合分割を誘導
 ### Step 9: REQ structure review（6観点）
 
 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT。`agentdev-req-structure-diagnostics` 参照
@@ -99,7 +99,7 @@ document-model SPEC（extension 経由）の classification policy への適合�
 ### Step 14: 検出事項出力
 
 検出事項を `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md` へ出力。
-source-of-truth priority: 現行 REQ > 承認済み ADR > SPEC > DOC-MAP/guides。
+source-of-truth priority: 現行 REQ > 承認済み ADR > SPEC > guides。
 NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける
 ### Step 15: 実行前同期（git pull --ff-only）
 
@@ -118,7 +118,7 @@ NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-reb
 - G02: GitHub Issue/PR を作成、更新しない
 - G03: worktree/ブランチを作成しない
 - G04: intake/learning/RU の処理を行わない
-- G05: source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > DOC-MAP/guides）に従って矛盾を判定する
+- G05: source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾を判定する
 
 ## エラー処理
 
@@ -126,6 +126,5 @@ NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-reb
 |--------|------|
 | スキャン対象ディレクトリが存在しない | 該当カテゴリを空として扱い、警告を出力 |
 | ファイル読込失敗 | 該当ファイルをスキップし、警告を出力 |
-| DOC-MAP が存在しない | 該当 step をスキップし、警告を出力 |
 
 

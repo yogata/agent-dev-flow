@@ -18,7 +18,7 @@ docs-check / docs-review の finding を適切な是正ルートに振り分け�
 | gate-level 不整合 | gate-levels.md 更新 | 検査カテゴリ・根拠 REQ の追加・修正 |
 | fixture 追加が必要なパターン | regression fixture 追加 | テスト fixture ディレクトリに代表パターンを追加 |
 | source / projection 不整合 | source / projection 修正 | `src/` 側ソースと `.opencode/` 側投影の同期 |
-| template / inventory 不整合 | template / inventory 同期 | command template の更新、README / DOC-MAP の inventory 同期 |
+| template / inventory 不整合 | template / inventory 同期 | command template の更新、README の inventory 同期 |
 
 ### docs-check → docs-review Route
 

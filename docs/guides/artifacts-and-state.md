@@ -9,11 +9,10 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 | REQ | `docs/requirements/REQ-{NNN}.md` | 要件定義の永続基準 |
 | ADR（現行） | `docs/adr/ADR-{NNN}.md` | 現行基準の技術判断記録 |
 | SPEC | `docs/specs/**/*.md` | 実装者が参照する現在仕様（commands/skills/workflows の3層と基盤6ドメイン） |
-| DOC-MAP | `docs/DOC-MAP.md` | 文書探索、参照経路の入口（索引） |
 | guides | `docs/guides/*.md` | 利用者向けの参照用読み物 |
 
 **優先順位**: REQ > ADR > SPEC。
-DOC-MAP と guides は基準への導線を提供する。
+guides は基準への導線を提供する。
 基準文書と矛盾する記述がある場合は基準を優先する。
 
 ### 参照ルール
@@ -56,7 +55,6 @@ requirements/REQ-{NNN}.md     # 要件定義（基準）
     ADR-{NNN}.md            # 現行 ADR（基準）
     README.md               # ADR 索引
   specs/**/*.md                   # 現在仕様（commands/skills/workflows の3層 + 基盤6ドメイン、リポジトリ内部の設計文書、基準）
-  DOC-MAP.md                     # 文書探索入口（非基準）
   guides/*.md                    # 参照用読み物（案内層、非基準）
 .agentdev/
   intake/                        # Intake パイプラインのドメイン状態

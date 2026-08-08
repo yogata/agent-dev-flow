@@ -19,7 +19,7 @@ describe("checkIdInFiles", () => {
   test("ok when id is found in at least one file", () => {
     const files = [
       { path: "README.md", content: "# Index\nREQ-0103\n" },
-      { path: "DOC-MAP.md", content: "Other content" },
+      { path: "other-index.md", content: "Other content" },
     ];
     const result = checkIdInFiles("REQ-0103", files);
     expect(result.ok).toBe(true);
@@ -39,10 +39,10 @@ describe("checkIdInFiles", () => {
   test("returns all files where id is found", () => {
     const files = [
       { path: "README.md", content: "REQ-0103" },
-      { path: "DOC-MAP.md", content: "REQ-0103 here too" },
+      { path: "index-2.md", content: "REQ-0103 here too" },
       { path: "other-index.md", content: "no match" },
     ];
     const result = checkIdInFiles("REQ-0103", files);
-    expect(result.found).toEqual(["README.md", "DOC-MAP.md"]);
+    expect(result.found).toEqual(["README.md", "index-2.md"]);
   });
 });
