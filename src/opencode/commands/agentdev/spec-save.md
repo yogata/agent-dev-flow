@@ -68,13 +68,13 @@ SPEC ファイル frontmatter の `status`（`draft` / `accepted` / `superseded`
 
 新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加する。既存 SPEC 追記時は README 更新不要。新規 SPEC 作成後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`、RU-20260722-01 合意）で登録を検証する。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
 
-### Step 7: DOC-MAP 影響確認
+### Step 7: SPEC 一覧整合確認
 
-SPEC 操作が `docs/DOC-MAP.md` に影響するか確認し、影響がある場合は更新する（`agentdev-doc-map` スキル参照）。SPEC 新規作成は探索経路の更新対象
+SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済みであることを確認する（Step 6 で実施済みの場合は重複確認）。SPEC 一覧表の整合は SPEC 探索導線の維持に必要な更新のみを対象とし、要件、判断、仕様の更新は含まない。
 
 **extension 更新要否の確認（REQ）**: SPEC の追加、移動、分割が `.agentdev/extensions/**` に影響するか確認する。移動または分割により extension 参照先 SPEC パスが変わる場合、当該 extension の context paths を更新する。extension 参照先 SPEC を移動した場合はエラーとし、spec-save 自身は移動を完了させずユーザー判断を仰ぐ（IR-056 check #5 strict 違反を防止）。SPEC 新規作成で既存 command/skill の実行時参照が増える場合、対応 extension の `context` への追加をユーザーに提案する（直接編集しない）
 
-**targeted docs guard（REQ）**: 変更 SPEC ファイルと連動ファイル（`docs/specs/README.md`、`docs/DOC-MAP.md`）に対し `check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json` を実行。`failures` に strict severity を含む場合は保存工程を継続せず修正して再実行。`spec_readme_update_required` または `doc_map_update_required` が true の場合は Step 6/7 の更新要否判定に反映。`full_docs_check_recommended` が true の場合は `/repo/docs-check` をユーザーに提案
+**targeted docs guard（REQ）**: 変更 SPEC ファイルと連動ファイル（`docs/specs/README.md`）に対し `check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json` を実行。`failures` に strict severity を含む場合は保存工程を継続せず修正して再実行。`spec_readme_update_required` が true の場合は Step 6 の更新要否判定に反映。`full_docs_check_recommended` が true の場合は `/repo/docs-check` をユーザーに提案
 
 ### Step 8: ドラフト status 更新
 
@@ -115,7 +115,7 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 - G01: SPEC 対象 artifact_actions（`artifact: spec`）の有無で判定する（全 work_type 対象）。`work_type` による判定は廃止
 
 ### ファイル操作制約
-- G02: ファイル編集スコープ: 以下のパスのみ作成、編集を許可: `docs/specs/**`（SPEC ファイル）、`.agentdev/drafts/**`（ドラフト status 更新用）。`docs/specs/README.md`, `docs/DOC-MAP.md` は SPEC 操作に付随する更新のみ許可
+- G02: ファイル編集スコープ: 以下のパスのみ作成、編集を許可: `docs/specs/**`（SPEC ファイル）、`.agentdev/drafts/**`（ドラフト status 更新用）。`docs/specs/README.md` は SPEC 操作に付随する更新のみ許可
 - G03: 上記以外のファイル作成、編集は禁止。REQ ファイル（`docs/requirements/**`）、ADR（`docs/adr/**`）、コマンド、スキル、テンプレートは編集禁止
 - G04: SPEC 対象 artifact_actions がない場合は SPEC ファイルを一切作成、編集しない（no-op）
 

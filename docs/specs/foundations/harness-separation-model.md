@@ -45,7 +45,7 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 
 ### 配布物側（業務ワークフロー契約）
 
-配布物の大多数（SKILL.md 本体、command .md 本体、docs/REQ、docs/ADR、docs/SPEC、docs/guides、README、DOC-MAP）は業務ワークフロー契約のみで完結する。
+配布物の大多数（SKILL.md 本体、command .md 本体、docs/REQ、docs/ADR、docs/SPEC、docs/guides、README）は業務ワークフロー契約のみで完結する。
 
 - 工程の進行条件、停止条件
 - 永続成果物（REQ/ADR/SPEC/Issue/PR/`.agentdev/`）
@@ -106,7 +106,7 @@ stage 1 と stage 3 の直列集約ポイントは main push、capture、commit 
 
 ## 配布 docs の制約
 
-配布 docs（REQ/ADR/SPEC/guides/README/DOC-MAP）は runtime workspace ディレクトリ（`.sisyphus/` 等）の管理を扱わず、業務ワークフロー契約のみを記述する。
+配布 docs（REQ/ADR/SPEC/guides/README）は runtime workspace ディレクトリ（`.sisyphus/` 等）の管理を扱わず、業務ワークフロー契約のみを記述する。
 runtime workspace 管理は harness 側の責務とする。
 
 ## 具象参照抽象化

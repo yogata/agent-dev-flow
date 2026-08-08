@@ -11,7 +11,7 @@ canonical_owner: agentdev-artifact-graph
 
 ## 目的
 
-AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果物（REQ/ADR/SPEC）間の明示関係を検索できる Artifact Graph を生成、検査、問い合わせる。consumer と self-hosting の両環境で動作し、標準コアと augmentation を分離することで self-hosting 固有知識を標準契約から除外する。DOC-MAP 廃止後の標準探索モデルとして機能する。
+AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果物（REQ/ADR/SPEC）間の明示関係を検索できる Artifact Graph を生成、検査、問い合わせる。consumer と self-hosting の両環境で動作し、標準コアと augmentation を分離することで self-hosting 固有知識を標準契約から除外する。AgentDevFlow 標準の成果物間探索モデルとして機能する。
 
 本 SPEC は `agentdev-artifact-graph` 配布スキルの振る舞い契約を定義する。実行時スキル（`src/opencode/skills/agentdev-artifact-graph/SKILL.md`）は本 SPEC に依存しない（REQ-001）。
 
@@ -223,6 +223,6 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 - [../local/artifact-graph.md](../local/artifact-graph.md)（旧 repo-local 仕様、superseded）
 - [../foundations/document-model.md](../foundations/document-model.md)（文書モデル）
 - [../../requirements/REQ-012.md](../../requirements/REQ-012.md)（Artifact Graph 標準化 REQ）
-- [../../requirements/REQ-013.md](../../requirements/REQ-013.md)（DOC-MAP 依存除去 REQ）
+- [../../requirements/REQ-013.md](../../requirements/REQ-013.md)（旧文書探索経路インデックス依存除去 REQ）
 - [../../adr/ADR-007.md](../../adr/ADR-007.md)（Artifact Graph 標準化と配布スキル昇格 ADR）
 - ADR-002（OpenCode ソース・プロジェクション分離）

@@ -11,12 +11,12 @@
 ## 比較方法
 
 代表質問は、正規仕様の所在、正規所有者、6つの Project Extension の直接関係、2ノード間の経路、および根拠箇所の取得を含む10件とした。
-従来手段では、DOC-MAP で探索領域を決める操作を1回、`rg` の実行を1回として数えた。
+従来手段では、README 索引で探索領域を決める操作を1回、`rg` の実行を1回として数えた。
 複数ファイルの関係を結ぶ質問では、追加の `rg` 実行を1回として数えた。
 Artifact Graph では、`query_graph.ts` の実行を1回として数えた。
 問い合わせ結果に含まれる根拠情報の確認は、同じ問い合わせ結果の読取りであるため追加操作に数えていない。
 誤候補は、質問が求める明示関係に該当しない返却ノードまたは返却関係とした。
-重大な見逃しは、DOC-MAP と `rg` で確認できる明示関係がグラフ結果に存在しない状態とした。
+重大な見逃しは、README 索引と `rg` で確認できる明示関係がグラフ結果に存在しない状態とした。
 
 ## 生成結果
 
@@ -32,9 +32,9 @@ Issue のテスト戦略にある `fix-and-reverify` に従い、配列内の対
 
 ## 代表質問の比較
 
-| No. | 代表質問 | DOC-MAP と `rg` による基準結果 | Artifact Graph の結果 | 従来操作数 | Graph操作数 | 判定 |
+| No. | 代表質問 | README 索引と `rg` による基準結果 | Artifact Graph の結果 | 従来操作数 | Graph操作数 | 判定 |
 |---|---|---|---|---:|---:|---|
-| 1 | Artifact Graph の正規仕様はどこか | DOC-MAP 136行目から `docs/specs/local/artifact-graph.md` へ到達 | `provenance specification:docs/specs/local/artifact-graph.md` が同ファイル2行目を返却 | 2 | 1 | 一致 |
+| 1 | Artifact Graph の正規仕様はどこか | README 索引から `docs/specs/local/artifact-graph.md` へ到達 | `provenance specification:docs/specs/local/artifact-graph.md` が同ファイル2行目を返却 | 2 | 1 | 一致 |
 | 2 | Artifact Graph SPEC の直接関係と正規所有者は何か | SPEC の `canonical_owner` と SPEC 索引のリンクから `repo-agentdev-artifact-graph` および関連ファイルを確認 | `neighbors specification:docs/specs/local/artifact-graph.md --depth 1` が正規所有スキル、SPEC 索引、根拠ファイル、deep-review 拡張定義を返却 | 2 | 1 | 一致 |
 | 3 | req-define 拡張定義の直接関係候補は何か | 拡張定義内の7 SPEC、対象コマンド、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:/agentdev/req-define --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
 | 4 | spec-save 拡張定義の直接関係候補は何か | 拡張定義内の2 SPEC、対象コマンド、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:/agentdev/spec-save --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
@@ -42,7 +42,7 @@ Issue のテスト戦略にある `fix-and-reverify` に従い、配列内の対
 | 6 | case-run 拡張定義の直接関係候補は何か | 拡張定義内の2 SPEC、対象コマンド、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:/agentdev/case-run --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
 | 7 | case-close 拡張定義の直接関係候補は何か | 拡張定義内の4 SPEC、対象コマンド、定義ファイル、2スキルを確認 | `neighbors extension:/agentdev/case-close --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
 | 8 | deep-review 拡張定義の直接関係候補は何か | 拡張定義内のArtifact Graph SPEC、対象スキル、定義ファイル、Artifact Graph スキルを確認 | `neighbors extension:agentdev-deep-review --depth 1` が同じ直接関係候補を返却 | 2 | 1 | 一致 |
-| 9 | case-run コマンドから Artifact Graph スキルへ到達する経路は何か | DOC-MAP、コマンドの拡張定義読込記述、拡張定義の `rules.skill` を順に確認 | `path command:case-run skill:repo-agentdev-artifact-graph --max-depth 4` がコマンド、拡張定義、スキルの3ノード経路を返却 | 3 | 1 | 一致 |
+| 9 | case-run コマンドから Artifact Graph スキルへ到達する経路は何か | README 索引、コマンドの拡張定義読込記述、拡張定義の `rules.skill` を順に確認 | `path command:case-run skill:repo-agentdev-artifact-graph --max-depth 4` がコマンド、拡張定義、スキルの3ノード経路を返却 | 3 | 1 | 一致 |
 | 10 | case-run 拡張定義の委譲関係を示す根拠箇所はどこか | `rg -n -C 2` が `.agentdev/extensions/commands/case-run.yaml` 19行目を返却 | 質問6の委譲関係に対する `provenance` が同ファイル19行目と `field:rules.skill` を返却 | 2 | 2 | 一致 |
 
 ## 定量結果

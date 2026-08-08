@@ -98,7 +98,3 @@ SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン�
 - [Consumer Project 導入](guides/consumer-project-setup.md)
 - [トラブルシューティング](guides/troubleshooting.md)
 - [用語集](guides/glossary.md)
-
-## DOC-MAP
-
-- [DOC-MAP](DOC-MAP.md)

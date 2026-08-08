@@ -17,7 +17,6 @@ inspect-docs command が実行する docs 横断診断のうち、専門診断�
 | SPEC 三層構造違反（commands/skills/workflows 層分離） | `agentdev-req-structure-diagnostics` | 横断的に SPEC を比較、シグナル抽出、ルーティング | 該当なし（常に委譲） |
 | 文意品質（LLM っぽい表現、空虚な形容/動詞、英語混じり表現） | `agentdev-doc-writing` | 横断スキャンで検出、ルーティング | 該当なし（常に委譲） |
 | 実行主体分類の誤認（command を skill と呼ぶ等） | `agentdev-doc-writing`（doc-writing 査読観点） | 横断スキャンで検出、ルーティング | 該当なし（常に委譲） |
-| DOC-MAP 探索順、関連文書探索 | `agentdev-doc-map` | 横断スキャンで DOC-MAP 記載との整合性を確認、ルーティング | 該当なし（常に委譲） |
 | Command/Skill 参照妥当性、Skill 構造 | `agentdev-inspect-skills`（独立 inspect-* 対象） | ルーティングしない（独立コマンド `inspect-skills` の対象） | inspect-docs からはルーティングせず、独立実行を促す |
 
 ## 委譲規則
@@ -59,8 +58,8 @@ inspect-docs command の各 Step は次のように本スキルと専門 skill �
 | Step 4: 現行/廃止/世代境界確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
 | Step 5: SPEC 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-req-structure-diagnostics`（詳細は委譲） |
 | Step 6: ADR 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-req-structure-diagnostics`（詳細は委譲） |
-| Step 7: guides 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-doc-writing`（文意品質）、`agentdev-doc-map`（探索順） |
-| Step 8: DOC-MAP 意味診断 | 索引の範囲超過の抽出（本スキル直接判定） | `agentdev-doc-map` |
+| Step 7: guides 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-doc-writing`（文意品質） |
+| Step 8: README 索引診断 | 索引の範囲超過の抽出（本スキル直接判定） | 該当なし（本スキル直接判定） |
 | Step 9: REQ structure review（6観点） | 横断比較でシグナル抽出 | `agentdev-req-structure-diagnostics` |
 | Step 10: 文書分類一貫性検査 | 横断スキャンで SPEC 分離基準違反シグナル抽出 | `agentdev-req-structure-diagnostics`（MOVE 観点） |
 | Step 11: 配布物整合性検査 | 対象範囲特定、ルーティング | `agentdev-req-structure-diagnostics` |
@@ -74,6 +73,5 @@ inspect-docs command の各 Step は次のように本スキルと専門 skill �
 |-------|----------|------------------|
 | `agentdev-req-structure-diagnostics` | REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、REQ 参照 ID 整合性、配布物統合性、SPEC 三層構造 | 本スキルは横断スキャン、シグナル抽出、ルーティングのみ。判定ロジック、シグナル閾値、出力 schema（7フィールド）は再定義しない |
 | `agentdev-doc-writing` | 文意品質（LLM 表現、空虚語、英語混じり）、実行主体分類、機械的置換辞書 | 本スキルは横断スキャンで検出、ルーティングのみ。判定辞書、書き換え辞書は再定義しない |
-| `agentdev-doc-map` | DOC-MAP 読み方ガイド、ドキュメント探索順序、影響確認ルール | 本スキルは横断スキャンで DOC-MAP との整合性を確認、ルーティングのみ。探索順、影響確認フローは再定義しない |
 
 境界違反を検出した場合（本スキルが専門診断を再定義している、専門 skill が横断編成を所有している等）は stop-and-fix で即時修正する。

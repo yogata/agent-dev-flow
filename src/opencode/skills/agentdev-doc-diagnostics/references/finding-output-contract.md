@@ -119,7 +119,7 @@ NG 分類は recommended_route とは別軸で付ける。
 1. 現行 REQ（`docs/requirements/REQ-*.md`、retired/ 配下を除く）
 2. 承認済み ADR（`status: accepted` の ADR）
 3. SPEC（`* SPEC`）
-4. DOC-MAP / guides（補助文書）
+4. guides（補助文書）
 
 下位文書が上位文書と矛盾する場合、下位文書の記述を検出事項とする。
 

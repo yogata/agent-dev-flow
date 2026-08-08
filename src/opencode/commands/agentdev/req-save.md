@@ -58,7 +58,7 @@ REQ/ADR 対象 artifact_actions がない場合は no-op 完了（後続の case
 
 詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが `docs/` ファイルを更新する
 
-**エントリ存在確認のスクリプト呼出（REQ、AG-002、AG-019）**: README/DOC-MAP へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（RU-20260722-01 合意、`check-entry-existence`）で登録を検証する。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+**エントリ存在確認のスクリプト呼出（REQ、AG-002、AG-019）**: README へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（RU-20260722-01 合意、`check-entry-existence`）で登録を検証する。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
 
 ### Step 6: ADR ファイル作成
 
@@ -68,15 +68,15 @@ REQ/ADR 対象 artifact_actions がない場合は no-op 完了（後続の case
 
 REQ番号の連続性確認、frontmatter の `id` とファイル名の一致を確認。frontmatter id ↔ ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約で決定的スクリプトを実行（REQ/ADR 保存時）。CLI 形式は同 SKILL.md を参照
 
-### Step 8: DOC-MAP 影響確認
+### Step 8: README 索引影響確認
 
-REQ/ADR/SPEC操作が `docs/DOC-MAP.md` に影響するか確認。影響がある場合は更新、ない場合は「DOC-MAP更新なし」。DOC-MAP更新は探索経路の更新であり、要件、判断、仕様の更新ではない。影響確認ルールの詳細は `agentdev-doc-map` スキルを参照
+REQ/ADR/SPEC操作が `docs/README.md`、各 README（`docs/requirements/README.md`、`docs/adr/README.md`、`docs/specs/README.md`）の索引に影響するか確認。影響がある場合は更新、ない場合は「README 索引更新なし」。README 索引更新は導線の更新であり、要件、判断、仕様の更新ではない。
 
-**targeted docs guard（REQ）**: 変更 REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/DOC-MAP.md`、`docs/README.md`、`AGENTS.md`）に対し `check_changed_docs.ts --workflow req-save --files <changed REQ files> --json` を実行。`failures` に strict severity を含む場合は修正して再実行。`doc_map_update_required` true 時は Step 8 更新要否判定へ反映、`full_docs_check_recommended` true 時は `/repo/docs-check` をユーザーに提案
+**targeted docs guard（REQ）**: 変更 REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）に対し `check_changed_docs.ts --workflow req-save --files <changed REQ files> --json` を実行。`failures` に strict severity を含む場合は修正して再実行。`full_docs_check_recommended` true 時は `/repo/docs-check` をユーザーに提案
 
 **extension 更新要否（REQ）**: REQ/ADR 追加/移動/削除が `.agentdev/extensions/**` へ影響するか確認。該当 REQ/ADR を context に列挙している extension がある場合、paths も更新対象。必要時はユーザーへ指示を仰ぐ（直接編集しない）
 
-**エントリ存在確認（REQ、AG-019）**: DOC-MAP 更新の有無によらず `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で REQ/ADR エントリの DOC-MAP 存在を確認する
+**エントリ存在確認（REQ、AG-019）**: `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で REQ/ADR エントリの README 索引への存在を確認する
 
 ### Step 9: 変更範囲検証
 
@@ -100,7 +100,7 @@ REQ/ADR/SPEC操作が `docs/DOC-MAP.md` に影響するか確認。影響があ�
 
 ### Step 12: 完了報告
 
-完了報告 template に従って出力。実行結果に応じて `templates/req-save/` 配下の種別（`split-detected.md` / `docmap-updated.md` / `docmap-not-needed.md` / `epic.md` / `standard.md`）を選択
+完了報告 template に従って出力。実行結果に応じて `templates/req-save/` 配下の種別（`split-detected.md` / `epic.md` / `standard.md`）を選択
 
 ## case-auto 並列委譲モデル（REQ/093）
 

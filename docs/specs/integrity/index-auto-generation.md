@@ -26,7 +26,6 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 | `docs/adr/README.md`の基盤一覧・status別一覧・件数 | 自動生成 | ADR frontmatter |
 | `docs/adr/README.md`のトピック別ビュー・Decision Map・関連REQ表 | 人手管理 | ADR本文と人手判断 |
 | `docs/specs/README.md`のSPEC一覧・status列 | 現行実装に従う混合管理 | SPEC frontmatterと人手管理列 |
-| `docs/DOC-MAP.md`のインベントリ | 自動生成 | 実ファイル一覧 |
 | integrity rule catalogとrule ownershipのAUTOGENブロック | 自動生成 | 個別IR文書 |
 | REQ/SPECメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
 
@@ -71,7 +70,6 @@ AUTOGEN block ID は `{target}-{section}-{subsection}` 形式に従う。各要�
 | `adr-status-accepted` 等（proposed/superseded/deprecated） | adr/README.md |
 | `adr-retired-table` | adr/README.md |
 | `req-active-count`, `req-active-table`, `req-retired-table` | requirements/README.md |
-| `docmap-inventory` | DOC-MAP.md |
 | `req-metrics-measurement-example` | quality/req-health-metrics.md |
 | `spec-metrics-measurement-example` | quality/spec-health-metrics.md |
 | `readme-req-summary-count` | README.md |

@@ -4,7 +4,7 @@ LLM が生成しがちな表現パターンの検出と書き換え辞書。`age
 
 ## 対象読者
 
-docs/ 配下の REQ/ADR/SPEC/guides/DOC-MAP/README、および docs を生成・編集する command/skill の自然言語記述を査読する `agentdev-doc-writing` スキル利用者。
+docs/ 配下の REQ/ADR/SPEC/guides/README、および docs を生成・編集する command/skill の自然言語記述を査読する `agentdev-doc-writing` スキル利用者。
 
 ## パターン分類
 

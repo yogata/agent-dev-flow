@@ -190,13 +190,13 @@ req-save と case-close で共通利用される REQ ファイル整合性検査
 - `req-save` Step 7: 自動修正あり
 - `case-close` Step 3: 検証のみ（自動修正は行わない）
 
-## DOC-MAP 影響規則
+## README 索引影響規則
 
-REQ CREATE / APPEND / UPDATE 時に `docs/DOC-MAP.md` への影響を確認する（REQ-001）。
+REQ CREATE / APPEND / UPDATE 時に各 README（`docs/README.md`、`docs/requirements/README.md` 等）への索引影響を確認する（REQ-001）。
 
 ### 影響確認フロー
 
-1. REQ操作実行時、`docs/DOC-MAP.md` に該当領域のセクションが存在するか確認
+1. REQ操作実行時、対応する README 索引に該当エントリが存在するか確認
 2. 影響がある場合は同一変更内で更新
 3. 影響がない場合は更新不要
 4. 更新が必要だが作業範囲を超える場合、REQ保存は中止せず後追い課題（follow-up）として明示
@@ -205,13 +205,13 @@ REQ CREATE / APPEND / UPDATE 時に `docs/DOC-MAP.md` への影響を確認す�
 
 | 操作 | 確認対象 |
 |---|---|
-| REQ追加時 | `docs/requirements/README.md`, `docs/DOC-MAP.md` |
-| ADR追加時 | `docs/adr/README.md`, `docs/DOC-MAP.md` |
-| SPEC追加/分割/削除時 | `docs/specs/README.md`, `docs/DOC-MAP.md` |
+| REQ追加時 | `docs/requirements/README.md`, `docs/README.md` |
+| ADR追加時 | `docs/adr/README.md`, `docs/README.md` |
+| SPEC追加/分割/削除時 | `docs/specs/README.md` |
 
 ### 矛盾時の優先順位
 
-`docs/DOC-MAP.md` と基準（REQ/ADR/SPEC）が矛盾する場合、基準を優先し DOC-MAP を修正対象とする。
+README 索引と基準（REQ/ADR/SPEC）が矛盾する場合、基準を優先し README 索引を修正対象とする。
 
 ## REQ 再構成検出
 

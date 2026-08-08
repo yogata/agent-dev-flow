@@ -20,7 +20,7 @@ inspect-docs コマンドの REQ 構造診断ロジックの知識ベースと�
 ## 提供する判断、操作
 
 - REQ 参照 ID 整合性確認（frontmatter `id` の一意性、ファイル名整合、相互参照の存在）
-- 第一参照導線確認（DOC-MAP、README、requirements/README 導線）
+- 第一参照導線確認（README、requirements/README 導線）
 - 現行/廃止/世代境界確認（廃止専有 ID、二重存在、100s 番台境界）
 - SPEC 分離基準違反検出
 - 6観点診断: SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT
@@ -47,7 +47,7 @@ inspect-docs コマンドの REQ 構造診断ロジックの知識ベースと�
 - frontmatter `id` の一意性
 - ファイル名整合
 - 相互参照の存在
-- DOC-MAP、README、requirements/README 導線
+- README、requirements/README 導線
 - 廃止専有 ID、二重存在、100s 番台境界
 
 ## See Also

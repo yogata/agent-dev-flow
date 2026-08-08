@@ -1,6 +1,6 @@
 ---
 name: agentdev-doc-writing
-description: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度、japanese-tech-writing規範適合、配布物 ID 汚染検出、実行主体分類）。USE FOR: docs配下のREQ/ADR/SPEC/guides/DOC-MAP/READMEの査読、docsを生成、編集するcommand/skillの自然言語記述の査読、japanese-tech-writing規範（LLM っぽい表現の禁止、空虚な形容、空虚な動詞等）への適合査読、read-only/advisor/architecture-affecting系表現の分解、英文混じり表現の検出、配布物（src/opencode/commands/、skills/）への内部 ID（REQ/ADR/SPEC-ID/IR）残留の検出、実行主体（command/skill/subagent/harness）の誤認検出。DO NOT USE FOR: コード実装、テスト実行、REQ/ADR番号付与、APPEND/UPDATE/CREATE判定、ADR必要性判定、command手順設計、Issue/PR CRUD、要件分析（req-analysis担当）、ADR要否動的判断（adr-guidelines担当）、ファイル保存、commit、push。
+description: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度、japanese-tech-writing規範適合、配布物 ID 汚染検出、実行主体分類）。USE FOR: docs配下のREQ/ADR/SPEC/guides/READMEの査読、docsを生成、編集するcommand/skillの自然言語記述の査読、japanese-tech-writing規範（LLM っぽい表現の禁止、空虚な形容、空虚な動詞等）への適合査読、read-only/advisor/architecture-affecting系表現の分解、英文混じり表現の検出、配布物（src/opencode/commands/、skills/）への内部 ID（REQ/ADR/SPEC-ID/IR）残留の検出、実行主体（command/skill/subagent/harness）の誤認検出。DO NOT USE FOR: コード実装、テスト実行、REQ/ADR番号付与、APPEND/UPDATE/CREATE判定、ADR必要性判定、command手順設計、Issue/PR CRUD、要件分析（req-analysis担当）、ADR要否動的判断（adr-guidelines担当）、ファイル保存、commit、push。
 ---
 
 # 文書品質ゲート（doc-writing）
@@ -9,7 +9,7 @@ description: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責�
 
 本スキルは以下の方針に従う（ADR）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-doc-writing.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
 3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
@@ -17,7 +17,7 @@ description: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責�
 ## 目的
 
 書かれた文書の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。
-対象は `docs/` 配下の REQ/ADR/SPEC/guides/DOC-MAP/README、および docs を生成、編集する command/skill の自然言語記述である。
+対象は `docs/` 配下の REQ/ADR/SPEC/guides/README、および docs を生成、編集する command/skill の自然言語記述である。
 QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける。
 
 
@@ -45,7 +45,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 **対象:**
 
-- `docs/**`（REQ, ADR, SPEC, guides, DOC-MAP, README）
+- `docs/**`（REQ, ADR, SPEC, guides, README）
 - docs を生成、編集する command/ skill の自然言語記述（req-define, req-save, spec-save, case-run, case-close, case-auto, inspect-docs, docs-check が扱う docs 成果物とその記述）
 - Issue 本文, PR 本文, 完了報告, 設計説明, intake/learning 中間成果物
 
@@ -101,7 +101,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 ## Trigger conditions
 
-- docs/** の REQ、ADR、SPEC、guides、DOC-MAP、README を作成、編集、レビューする場合
+- docs/** の REQ、ADR、SPEC、guides、README を作成、編集、レビューする場合
 - docs を生成、編集する command/ skill の本文、description、参照記述を執筆、編集する場合
 - ユーザーが「AIっぽい」「薄い」「抽象的」「意味不明」「ビジネス文書として直せ」と指示した場合
 - Issue/PR 本文、完了報告、設計説明を執筆またはレビューする場合

@@ -107,7 +107,7 @@ PR をマージし、Issue をクローズするコマンド。
 ### 完了前検証
 
 1. 未チェック項目の達成判定（達成済みなら `[x]` 更新）
-2. 要件、SPEC、DOC-MAP の整合性確認
+2. 要件、SPEC、README 索引の整合性確認
 3. ADR 作成済みかの確認
 4. マージ済み PR 本文から検出事項/Intake 候補を回収し、Intake / Learning に分離して保存
 5. PR 本文の `## SPEC確定候補` から SPEC 確定フローを実行（SPEC status の draft → accepted 昇格、または spec-save 再起動の提案）

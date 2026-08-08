@@ -44,7 +44,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | Skill references (canonical) | `.opencode/skills/**/references/*.md` | glob |
 | Command ファイル | `.opencode/commands/**/*.md`（README.md 含む） | glob |
 | Root README | `README.md` | Read |
-| Specs ファイル | `docs/specs/**/*.md`（再帰。README.md は SPEC inventory/status 同期検査と DOC-MAP 照合でのみ対象、SPEC本文検査では除外） | glob (walkMarkdown) |
+| Specs ファイル | `docs/specs/**/*.md`（再帰。README.md は SPEC inventory/status 同期検査でのみ対象、SPEC本文検査では除外） | glob (walkMarkdown) |
 | Workflow templates | `.opencode/skills/agentdev-workflow-templates/templates/*.md` | glob |
 
 ### 検査カテゴリ

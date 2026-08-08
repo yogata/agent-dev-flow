@@ -199,7 +199,7 @@ Q6: 将来の設計・運用・文書システムを制約する決定の記録�
   → Yes: ADR（docs/adr/） / No: Q7 へ
 
 Q7: 人間向けナビゲーション・案内か？
-  → Yes: Guide（docs/guides/） / No: DOC-MAP または適切な分類先を再検討
+  → Yes: Guide（docs/guides/） / No: 適切な分類先を再検討
 ```
 
 各分岐の判定基準:

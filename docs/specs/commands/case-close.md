@@ -109,7 +109,7 @@ Step E5（Epic status table 更新）の後、Step E6（最終 Wave 判定）の
 
 - Step 1-1: 重複ファイルチェック（`git status --short` と `gh pr view --json files` で重複検出）
 - Step 2: 前提確認（達成判定、完了ゲート（QG-4）に従い完了条件チェックボックスを最終評価、更新）。`[x]` 反映事後確認（再読込 VERIFY、最大2回）。未達項目残存時は構造化エラー停止
-- Step 3: docs/ 検証（機能追加固有検証（REQ作成、インデックス、spec更新、ADR）、関連ドキュメント整合性確認、DOC-MAP 整合性）
+- Step 3: docs/ 検証（機能追加固有検証（REQ作成、インデックス、spec更新、ADR）、関連ドキュメント整合性確認、README 索引整合性）
  - Step 3-1: close 時 SPEC / commands / skills 更新漏れの局所確認
  - Step 3-2: SPEC 確定フロー（v2:ADR-0123 Decision #4, REQ-001-015）（PR 本文の `## SPEC確定候補` セクション読取、確定判断（(a) 昇格 / (b) spec-save 再起動提案 / (c) 見送り））
  - Step 3-3: AUTOGEN block 索引再生成差分検出（project extension checks 経由）。Step 3（docs/ 検証）の後、generate_indexes.ts --dry-run を実行し AUTOGEN block の再生成差分を検出する。本検証は case-close command 本体（src/opencode/commands/agentdev/case-close.md）の手順を直接編集せず、project extension（.agentdev/extensions/commands/case-close.yaml）の checks セクション経由で導入する（project-extensions SPEC 準拠）。case-close は dry-run/差分検査で停止し、直接編集・commit しない。差分がある場合は case-run へ差戻し、再生成（実 commit）は case-run が行う。複数 PR 跨ぎでの AUTOGEN block 再生成漏れを防止する。Epic Wave クローズ経路では Step E5b（完了条件チェックボックス最終評価）の前段に同等の dry-run/diff による索引健全性検証を適用する（Epic Issue クローズ時の索引検証は case_open_hints 参照）
@@ -138,12 +138,12 @@ Step E5（Epic status table 更新）の後、Step E6（最終 Wave 判定）の
 
 ## targeted docs guard (v2:REQ-0158-003)
 
-case-close 工程で targeted docs guard を実行する。対象は PR で変更されたファイルと連動ファイル（`docs/DOC-MAP.md`、`docs/README.md`、`docs/specs/README.md`）。
+case-close 工程で targeted docs guard を実行する。対象は PR で変更されたファイルと連動ファイル（`docs/README.md`、`docs/specs/README.md`）。
 
 - 実行タイミング: Step 3（docs/ 検証）の一部。変更ファイル対象の targeted docs guard を実行し、draft→accepted 等の SPEC status 変更時の `docs/specs/README.md` 同期、Issue/PR で宣言した文書更新対象と実変更ファイルの対応、旧SPEC直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、full docs-check 実行要否判定を行う
 - 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`。PR 変更ファイル一覧は PR 補助データ読込手続き（`agentdev-gh-cli`）で `gh pr view <PR> --json files` から取得する（case-close はマージ後 main 環境で実行されるため `--files` を使用。`--base-ref` は worktree 環境（マージ前、case-run 等）向け）
-- `full_docs_check_recommended` が true の場合: case-close 完了判定の追加確認として扱う。integrity rule 追加・削除・大幅変更、DOC-MAP 構造変更、docs/specs の大規模移動・改名、repo-agentdev-integrity の検査スコープ変更、文書分類・責務境界の基準変更を検出した場合は `/repo/docs-check`（全体監査）の実行を推奨する
-- 失敗時: 検査対象文書（PR 変更ファイル、`docs/DOC-MAP.md`、`docs/specs/README.md`、`docs/README.md`）を修正して再実行する
+- `full_docs_check_recommended` が true の場合: case-close 完了判定の追加確認として扱う。integrity rule 追加・削除・大幅変更、docs/specs の大規模移動・改名、repo-agentdev-integrity の検査スコープ変更、文書分類・責務境界の基準変更を検出した場合は `/repo/docs-check`（全体監査）の実行を推奨する
+- 失敗時: 検査対象文書（PR 変更ファイル、`docs/specs/README.md`、`docs/README.md`）を修正して再実行する
 
 JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。`failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
 

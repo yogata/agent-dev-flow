@@ -7,7 +7,7 @@ description: Builds and inspects the Artifact Graph (derived index of explicit a
 
 AgentDevFlow 標準配布スキル。正規成果物（REQ/ADR/SPEC）間の明示関係を検索する派生索引（Artifact Graph）を生成、検査、問い合わせる（REQ-012、ADR-007）。
 
-consumer と self-hosting の両環境で動作する。標準コアと augmentation を分離し、open extensibility によって self-hosting 固有知識を標準契約から除外する。DOC-MAP 廃止後の標準探索モデルとして機能する。
+consumer と self-hosting の両環境で動作する。標準コアと augmentation を分離し、open extensibility によって self-hosting 固有知識を標準契約から除外する。AgentDevFlow 標準の成果物間探索モデルとして機能する。
 
 ## 原本（SSoT）
 

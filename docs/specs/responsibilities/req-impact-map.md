@@ -25,7 +25,7 @@ updated: 2026-06-28
 
 | REQ | タイトル | 影響する Rule IDs | 影響する Artifact |
 |-----|---------|------------------|------------------|
-| REQ-001 | 文書、REQ 管理基準 | IR-001, IR-002, IR-003, IR-004, IR-017, IR-018, IR-022 | REQ, REQ index, DOC-MAP |
+| REQ-001 | 文書、REQ 管理基準 | IR-001, IR-002, IR-003, IR-004, IR-017, IR-018, IR-022 | REQ, REQ index |
 | REQ-002 | Artifact 責任分界 | IR-006, IR-008, IR-014, IR-016, IR-024 | commands, skills, templates, SPEC |
 | REQ-010 | Integrity/Validation/Tests | IR-001~IR-024 (全件) | 全アーティファクト |
 | v2:REQ-0107 | Reporting/Writing Quality | IR-013, IR-019 | templates, guides |

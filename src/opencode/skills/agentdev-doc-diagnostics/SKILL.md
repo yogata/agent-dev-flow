@@ -20,7 +20,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 本スキルは以下の方針に従う（ADR）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）と DOC-MAP.md のみを前提とし、`SPEC 配下` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`SPEC 配下` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-doc-diagnostics.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
 3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
@@ -39,13 +39,13 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
   - REQ 粒度過小（関心対象、成果物種別、command family、lifecycle 段階の混在）
   - 横断契約矛盾（source-of-truth priority に基づく矛盾）
   - 文意品質候補（LLM っぽい表現、空虚語、英語混じり、実行主体分類の誤認）
-  - 探索順と索引の不整合（DOC-MAP と基準文書の不整合）
+  - 探索順と索引の不整合（README 索引と基準文書の不整合）
 - docs 横断スキャン観点とルーティング先の定義（専門診断のシグナルカタログ、閾値は再定義しない）
 - 共通証拠構造（finding schema、severity、信頼度）
 - 共通 finding 出力契約（`.agentdev/inspect/inbox/*.md`、severity 分類、信頼度）
 - 診断に必要な reference または script の選択条件
 - 文書種別別診断へのルーティング（REQ 固有、文意品質、探索順の各専門 skill への委譲）
-- source-of-truth priority に基づく矛盾判定（現行 REQ > 承認済み ADR > SPEC > DOC-MAP/guides）
+- source-of-truth priority に基づく矛盾判定（現行 REQ > 承認済み ADR > SPEC > guides）
 - NG 分類（false positive / pre-existing / 今回修正対象）の付与
 
 ## DO NOT USE FOR
@@ -57,7 +57,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 - Issue/PR 操作: case-* command の責務
 - REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断: `agentdev-req-structure-diagnostics` の責務（本スキルはルーティングのみ）
 - 文意品質診断（LLM っぽい表現、空虚な形容/動詞、英語混じり表現）: `agentdev-doc-writing` の責務（本スキルはルーティングのみ）
-- 探索順（DOC-MAP 読み方ガイド、ドキュメント探索順序）: `agentdev-doc-map` の責務（本スキルはルーティングのみ）
+- 探索順（README 索引、ドキュメント探索順序）: README 索引の整合性は本スキルが、探索順序の詳細は README 群が担う
 
 ## 対象コマンド
 
@@ -74,7 +74,6 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 |----------|------------------|----------------|
 | REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT | `agentdev-req-structure-diagnostics` | ルーティングのみ（判定ロジックを再定義しない） |
 | 文意品質（LLM 表現、空虚語、英語混じり、実行主体分類） | `agentdev-doc-writing` | ルーティングのみ |
-| 探索順（DOC-MAP、ドキュメント探索経路） | `agentdev-doc-map` | ルーティングのみ |
 | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約 | `agentdev-doc-diagnostics`（本スキル） | 一次所有 |
 
 ## references/ 構成一覧
@@ -89,5 +88,4 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 - **agentdev-req-structure-diagnostics**: REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、配布物 ID 汚染検出、配布物統合性検出、SPEC 三層構造検出（ルーティング先）
 - **agentdev-doc-writing**: 文意品質、実行主体分類（ルーティング先）
-- **agentdev-doc-map**: 探索順、DOC-MAP 読み方ガイド（ルーティング先）
 - **agentdev-inspect-skills**: Command/Skill 参照妥当性診断（独立した inspect-* 対象、本スキルのルーティング先ではない）
