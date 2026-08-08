@@ -185,4 +185,4 @@ project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ�
 - **REQ-012**: Artifact Graph 標準化
 - **ADR-007**: Artifact Graph 標準化と配布スキル昇格
 - **ADR-002**: OpenCode ソース・プロジェクション分離（配布物原本は src/opencode/ へ）
-- **旧 repo-local 実装**: `.opencode/skills/repo-agentdev-artifact-graph/`（self-hosting 固有、Issue #1951 で augmentation へ移行予定）
+- **self-hosting augmentation**: `.agentdev/artifact-graph.yaml`（Issue #1951 で移行、旧 repo-local 実装を廃止）
