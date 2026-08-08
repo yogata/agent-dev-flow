@@ -7,7 +7,7 @@ import type {
   Provenance,
 } from "./model.ts"
 import type { RelationTypeRule, ResolvedConfig } from "./config.ts"
-import { extractMarkdownLinks, headingAt, parseFrontmatter, type ParsedField } from "./parse.ts"
+import { extractMarkdownLinks, headingAt, parseExtensionFields, parseFrontmatter, type ParsedField } from "./parse.ts"
 import { makeProvenance, sha256 } from "./provenance.ts"
 import type { NodeIndex } from "./nodes.ts"
 
@@ -96,9 +96,11 @@ function structuredSeeds(
   readonly diagnostics: readonly Diagnostic[]
 } {
   const source = currentNode(index, input.path)
-  if (source === undefined) return { seeds: [], diagnostics: [] }
+  if (source === undefined || source.startsWith("source_file:")) return { seeds: [], diagnostics: [] }
 
-  const fields = parseFrontmatter(input.content)
+  const isExtension = input.path.startsWith(".agentdev/extensions/")
+  const fields = isExtension ? parseExtensionFields(input.content) : parseFrontmatter(input.content)
+  const rule: ExtractionRule = isExtension ? "extension_field" : "structured_field"
   const seeds: EdgeSeed[] = []
   const diagnostics: Diagnostic[] = []
 
@@ -119,7 +121,7 @@ function structuredSeeds(
           target: source,
           input,
           field: f,
-          rule: "structured_field",
+          rule,
         })
       } else {
         seeds.push({
@@ -129,13 +131,63 @@ function structuredSeeds(
           target,
           input,
           field: f,
-          rule: "structured_field",
+          rule,
         })
       }
     }
   }
 
   return { seeds, diagnostics }
+}
+
+function containmentSeeds(
+  inputs: readonly InputFile[],
+  index: NodeIndex,
+  config: ResolvedConfig,
+): readonly EdgeSeed[] {
+  if (!config.node_type_vocabulary.includes("source_file")) return []
+  const provenanceById = new Map(index.provenance.map((entry) => [entry.id, entry]))
+  const inputByPath = new Map(inputs.map((input) => [input.path, input]))
+  const seeds: EdgeSeed[] = []
+  for (const node of index.nodes) {
+    if (node.type === "source_file") continue
+    const sourceEvidence = provenanceById.get(node.provenance_id)
+    if (sourceEvidence === undefined) continue
+    const input = inputByPath.get(sourceEvidence.path)
+    if (input === undefined) continue
+    const sourceFileId = `source_file:${sourceEvidence.path}`
+    const f = { key: "file", values: [sourceEvidence.path], line: 1, text: sourceEvidence.path }
+    seeds.push({ type: "defined_in", category: "derived", source: node.id, target: sourceFileId, input, field: f, rule: "filesystem" })
+    seeds.push({ type: "contains", category: "derived", source: sourceFileId, target: node.id, input, field: f, rule: "filesystem" })
+  }
+  return seeds
+}
+
+function extensionSeeds(
+  inputs: readonly InputFile[],
+  index: NodeIndex,
+  config: ResolvedConfig,
+): readonly EdgeSeed[] {
+  if (!config.node_type_vocabulary.includes("extension")) return []
+  if (!config.indexed_paths.includes(".agentdev/extensions")) return []
+  const seeds: EdgeSeed[] = []
+  for (const input of inputs) {
+    if (!input.path.startsWith(".agentdev/extensions/")) continue
+    const source = index.nodeByPath.get(input.path)
+    if (source === undefined || !source.startsWith("extension:")) continue
+    const parts = input.path.split("/")
+    const subject = parts[2]
+    const name = parts.at(-1)?.replace(/\.ya?ml$/, "")
+    if (subject === undefined || name === undefined) continue
+    const targetType = subject === "commands" ? "command" : "skill"
+    const target = index.aliases.get(`${targetType}:${name}`)
+    if (target === undefined) continue
+    const line = input.content.split(/\r?\n/).findIndex((candidate) => candidate.startsWith("id:")) + 1
+    const safeLine = line > 0 ? line : 1
+    const f = { key: "extension_path", values: [name], line: safeLine, text: input.path }
+    seeds.push({ type: "extends", category: "derived", source, target, input, field: f, rule: "extension_field" })
+  }
+  return seeds
 }
 
 function markdownSeeds(root: string, input: InputFile, index: NodeIndex): {
@@ -178,7 +230,7 @@ export function extractEdges(
   config: ResolvedConfig,
 ): EdgeIndex {
   const fieldMap = buildFieldToRelationMap(config.relation_type_rules)
-  const seeds: EdgeSeed[] = []
+  const seeds: EdgeSeed[] = [...containmentSeeds(inputs, index, config), ...extensionSeeds(inputs, index, config)]
   const diagnostics: Diagnostic[] = []
 
   for (const input of inputs) {

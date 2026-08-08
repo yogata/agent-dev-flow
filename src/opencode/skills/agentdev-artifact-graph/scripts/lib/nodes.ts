@@ -103,6 +103,35 @@ export function extractNodes(inputs: readonly InputFile[], config: ResolvedConfi
   const nodeTypeByName = new Map<string, string>()
   const rules = config.node_type_rules
 
+  // Source file nodes: generated for every input when source_file is in the
+  // vocabulary (containment logic, REQ-012-009 self-hosting augmentation).
+  // Enables defined_in/contains edges between artifact and source_file nodes.
+  const hasSourceFileVocab = config.node_type_vocabulary.includes("source_file")
+  if (hasSourceFileVocab) {
+    for (const input of inputs) {
+      const sourceProvenance = makeProvenance({
+        path: input.path,
+        heading: "",
+        elementId: "file",
+        matchedText: input.path,
+        lineStart: 1,
+        lineEnd: 1,
+        extractionRule: "filesystem",
+      })
+      const sourceId = `source_file:${input.path}`
+      nodes.push({
+        id: sourceId,
+        type: "source_file",
+        label: input.path,
+        provenance_id: sourceProvenance.id,
+      })
+      provenance.push(sourceProvenance)
+      nodeByPath.set(input.path, sourceId)
+      nodeTypeByName.set(sourceId, "source_file")
+      addAlias(aliases, input.path, sourceId)
+    }
+  }
+
   for (const input of inputs) {
     const identity = extractIdentity(input, rules)
     if (identity === undefined) continue

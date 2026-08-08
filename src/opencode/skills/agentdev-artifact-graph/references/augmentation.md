@@ -71,12 +71,12 @@ steps は配列の先頭から順に試し、最初に空でない値を採用�
 
 `defined_in`、`contains`、`extends` は語彙に含まれるが、デフォルトコアではフィールドベース抽出を持たない。これらは containment/extension ロジックで、対応するノード型が augmentation で追加された場合に生成される。
 
-## self-hosting augmentation（Issue #1951 で実装予定）
+## self-hosting augmentation（REQ-012-009）
 
-self-hosting augmentation は次を追加することで現行 repo-local と同等の探索能力を維持する（REQ-012-009、ADR-007 decision 7）。
+self-hosting augmentation は次を追加することで現行 repo-local と同等の探索能力を維持する（REQ-012-009、ADR-007 decision 7）。実装は `.agentdev/artifact-graph.yaml`（Issue #1951）を参照。
 
 - node_type: `command`, `skill`, `integrity_rule`, `extension`, `source_file`
 - relation_type: `delegates_to`, `governs`
 - indexed_paths: `src/opencode`, `.opencode`, `.agentdev/extensions`, `scripts`, `tests`
 
-self-hosting augmentation の実装は本 Issue（#1949）の対象外である。
+`source_file` は containment logic が全入力ファイルへ対してノードを生成し、`defined_in`/`contains` edge を介して artifact node と双方向に接続する。`extension` は `.agentdev/extensions/` 配下の YAML ファイルから node を生成し、path 構造から推定した対象 command または skill へ `extends` edge を生成する。

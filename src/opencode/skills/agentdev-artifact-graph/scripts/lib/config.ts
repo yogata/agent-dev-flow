@@ -227,16 +227,17 @@ export function resolveConfig(augmentation: AugmentationFile | undefined): Resol
   const base = defaultConfig()
   if (augmentation === undefined) return base
 
-  const nodeRules: NodeTypeRule[] = [...base.node_type_rules]
+  const baseNodeRules: NodeTypeRule[] = [...base.node_type_rules]
   const nodeVocab = new Set(base.node_type_vocabulary)
+  const augmentedNodeRules: NodeTypeRule[] = []
   for (const raw of augmentation.node_types ?? []) {
     if (raw.name === undefined || raw.name.length === 0) {
       throw new TypeError("augmentation node_type requires name")
     }
     nodeVocab.add(raw.name)
-    const existing = nodeRules.find((r) => r.name === raw.name)
+    const existing = baseNodeRules.find((r) => r.name === raw.name)
     if (existing === undefined) {
-      nodeRules.push({
+      augmentedNodeRules.push({
         name: raw.name,
         path_pattern: raw.path_pattern,
         id_template: raw.id_template ?? `${raw.name}:{path}`,
@@ -244,9 +245,8 @@ export function resolveConfig(augmentation: AugmentationFile | undefined): Resol
         extraction_rule: raw.extraction_rule ?? "frontmatter",
       })
     } else if (raw.path_pattern !== existing.path_pattern) {
-      // Replace rule if pattern changed
-      const idx = nodeRules.indexOf(existing)
-      nodeRules[idx] = {
+      const idx = baseNodeRules.indexOf(existing)
+      baseNodeRules[idx] = {
         name: raw.name,
         path_pattern: raw.path_pattern,
         id_template: raw.id_template ?? existing.id_template,
@@ -255,6 +255,9 @@ export function resolveConfig(augmentation: AugmentationFile | undefined): Resol
       }
     }
   }
+  // Augmentation rules take priority over defaults: more specific project patterns
+  // are tried before general standard patterns (e.g., integrity_rule before specification).
+  const nodeRules = [...augmentedNodeRules, ...baseNodeRules]
 
   const relRules: RelationTypeRule[] = [...base.relation_type_rules]
   const relVocab = new Set(base.relation_type_vocabulary)
