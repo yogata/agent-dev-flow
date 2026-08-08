@@ -22,6 +22,9 @@ agentdev_handoff: true
 # work_type: feature（既存 agentdev-deep-review スキルの大幅再構成と新機能追加）
 work_type: feature
 
+# spec_actions_consumed: spec-save が artifact: spec を消費済み（integrated delegation AG-005）
+spec_actions_consumed: true
+
 # scale: large（影響ファイル11件 > 10、変更件数30件超のシグナル）
 scale: large
 
@@ -424,6 +427,25 @@ operation_units:
           - ACT-SPEC-001
           - ACT-SPEC-002
         next_command_hint: /agentdev/spec-save
+      spec_save_result:
+        saved_spec_docs:
+          created:
+            - docs/specs/skills/agentdev-adversarial-review.md
+          updated:
+            - docs/specs/skills/agentdev-deep-review.md
+        spec_actions_consumed:
+          - act_id: ACT-SPEC-001
+            kind: create
+            target: docs/specs/skills/agentdev-adversarial-review.md
+            status: draft
+          - act_id: ACT-SPEC-002
+            kind: update
+            target: docs/specs/skills/agentdev-deep-review.md
+            target_area: frontmatter
+            transition: draft -> superseded
+            superseded_by: agentdev-adversarial-review.md
+        specs_index_updated: true
+        next_command_hint: /agentdev/case-open
 
 # test_strategy: 各合意項目の検証方法。3要素（verification / pass_criteria / on_failure）を必須
 test_strategy:

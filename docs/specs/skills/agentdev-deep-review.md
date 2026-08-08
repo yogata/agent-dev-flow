@@ -1,10 +1,11 @@
 ---
 title: `agentdev-deep-review` SPEC
-status: draft
+status: superseded
 spec_logical_division: behavior
 canonical_owner: agentdev-deep-review
+superseded_by: agentdev-adversarial-review.md
 created: 2026-07-27
-updated: 2026-07-27
+updated: 2026-08-09
 ---
 
 # agentdev-deep-review SPEC
