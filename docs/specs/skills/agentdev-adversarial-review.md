@@ -1,6 +1,6 @@
 ---
 title: agentdev-adversarial-review SPEC
-status: draft
+status: accepted
 spec_logical_division: behavior
 canonical_owner: agentdev-adversarial-review
 created: 2026-08-09

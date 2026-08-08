@@ -133,7 +133,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | [skills/agentdev-backlog-integration.md](skills/agentdev-backlog-integration.md) | accepted | 補助 | backlog integration |
 | [skills/agentdev-project-extensions.md](skills/agentdev-project-extensions.md) | accepted | 補助 | project extensions 読み込み |
 | [skills/agentdev-deep-review.md](skills/agentdev-deep-review.md) | superseded | 補助 | 敵対的審議型レビュー（Deep Review）の振る舞い契約。agentdev-adversarial-review SPEC へ後継移行済み（superseded_by: agentdev-adversarial-review.md） |
-| [skills/agentdev-adversarial-review.md](skills/agentdev-adversarial-review.md) | draft | 補助 | 対論型レビュー（adversarial review）の振る舞い契約、レビュー手続き、責務構造。3論理役割、動的レビュー戦略、対称的相互反証、戦略メタ反証、合意候補再検証、read-only 境界を所有 |
+| [skills/agentdev-adversarial-review.md](skills/agentdev-adversarial-review.md) | accepted | 補助 | 対論型レビュー（adversarial review）の振る舞い契約、レビュー手続き、責務構造。3論理役割、動的レビュー戦略、対称的相互反証、戦略メタ反証、合意候補再検証、read-only 境界を所有 |
 
 `repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
 
