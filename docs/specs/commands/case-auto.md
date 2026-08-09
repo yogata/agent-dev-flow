@@ -183,8 +183,12 @@ case-auto は停止時に停止理由を以下の分類で報告する。分類�
 | repo 外実体変更 | DB マイグレーション実行、デプロイ/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更が必要な場合 |
 | CI/test/lint 失敗 | コンフリクト解消モデル（v2:ADR-0132）の Level 2 まで試行しても自己修復不能な場合 |
 | 未コミット変更の帰属不明 | 変更の由来が不明で安全に続行できない場合 |
+| 上位合意矛盾 | case-auto が受領した decision_context が現行正規成果物（REQ/ADR/SPEC/Issue）間の矛盾に起因する場合。当該矛盾そのものが finding の対象であり、case-auto が一方を勝手に採用できない（REQ-006-114、ADR-008 決定3） |
+| 新規ユーザー判断事項 | case-auto が受領した decision_context が新しいユーザー価値判断、対象範囲変更、外部契約変更を必要とし、現行正規成果物から一意に回答できない場合（REQ-006-114、ADR-008 決定4） |
 
 execution_unit 分割可能性があるにもかかわらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する。これは case-open の契約・実装不整合であり、要件doc側の問題ではない。
+
+「上位合意矛盾」「新規ユーザー判断事項」は bounded parent decision resolution（REQ-006-112〜114、ADR-008）で case-auto が decision_context を自律解決できない場合の停止理由分類である。case-auto は現行正規成果物から一意に回答可能な decision_context を自律解決するが、解決できないものは本2分類のいずれかへ分類してユーザーへ返す。詳細は後述「bounded parent decision resolution（REQ-006-112〜114、ADR-008）」節を参照。
 
 詳細な停止条件の全量は REQ-006-016（本拡張で11項目）を参照。
 
@@ -358,4 +362,35 @@ case-auto は停止伝播において以下を行わない。これらは下位 
 - **再評価**: review 対象の再評価を行わない（再 review 条件の判定は adversarial-review SPEC、REQ-014-007）
 
 case-auto は経路H において純粋な伝播経路として機能し、adversarial-review の意味的処理には関与しない。
+
+## bounded parent decision resolution（REQ-006-112〜114、ADR-008）
+
+本節は case-auto が下位 command から受領した decision_context をどの範囲まで自律解決し、どこでユーザーへ返すかの境界を規定する。default-on + skip policy（REQ-014-013、REQ-015-002）により各 caller command で adversarial-review が原則実行される前提と、case-auto が中央集約 review engine とはならない前提（REQ-015-012）を両立するための限定的親判断解決である。
+
+### 解決範囲
+
+case-auto は下位 command から受領した decision_context について、現行正規成果物（REQ、ADR、SPEC、Issue その他合意済み情報）から一意に回答可能な場合はユーザー停止せず回答して下位 command を resume させる（REQ-006-112、ADR-008 決定1）。
+
+| 解決可否 | 条件 | case-auto の挙動 |
+|---|---|---|
+| 自律解決可能 | 現行正規成果物から一意に回答可能 | 回答を下位 command へ返し resume させる（REQ-006-112） |
+| 作業仮定で継続可能 | 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細であり、既存契約で許容された範囲 | 作業仮定と根拠を明示した上で自走継続し、下位 command を resume させる（REQ-006-113、ADR-008 決定2） |
+| ユーザー停止（上位合意矛盾） | decision_context が現行正規成果物間の矛盾に起因し、当該矛盾そのものが finding の対象 | 一方を勝手に採用せず停止し、停止理由分類「上位合意矛盾」でユーザーへ返す（REQ-006-114、ADR-008 決定3） |
+| ユーザー停止（新規ユーザー判断事項） | 新しいユーザー価値判断、対象範囲変更、外部契約変更が必要 | 既存停止経路で停止し、停止理由分類「新規ユーザー判断事項」でユーザーへ返す（REQ-006-114、ADR-008 決定4） |
+
+### 作業仮定の明示要件（REQ-006-113）
+
+可逆的内部詳細を作業仮定で継続する場合、case-auto は作業仮定と根拠を明示する。明示内容は下位 command への回答に含め、ユーザーが事後確認できる形とする。外部仕様、互換性、データ保持、セキュリティ、対象範囲、受け入れ条件の変更は作業仮定の対象外であり、これらを変更する場合はユーザー停止（新規ユーザー判断事項）へ分類する。
+
+### resume 機構（ADR-008 決定5）
+
+case-auto は回答、根拠、または作業仮定を下位 command へ返し、既存 resume point（REQ-006-085）から処理を継続する。新規の永続結果型を導入しない。resume point の仕様は workflow-contracts SPEC「case-auto への伝播と resume point」節、delegation-contracts SPEC「review 経路での parent_decision_required / decision_context 適用」節に従う。adversarial-review の再実行要否は adversarial-review 側の再 review 契約（REQ-014-007/008）に従い、case-auto は独自の再 review 条件を持たない。
+
+### case-auto が行わないこと（REQ-015-012 維持、ADR-008 決定6）
+
+bounded parent decision resolution においても、case-auto は中央集約 review engine とはならず、raw finding を解釈、採否、候補反映しない（REQ-015-012 維持、ADR-008 決定6）。case-auto が解決対象とするのは下位 command が構造化した decision_context のみであり、下位 command が raw finding を case-auto へそのまま渡すことはない（REQ-006-112、AG-006）。各 caller command は自身が所有する候補について finding の意味解釈、採否、候補への反映を維持する（REQ-014-006、REQ-015 caller integration）。
+
+### 停止理由分類との関係
+
+本節の「上位合意矛盾」「新規ユーザー判断事項」は前述「停止理由分類（REQ-006-016/108 拡張）」節の分類軸へ統合される。case-auto が decision_context を自律解決できずユーザー停止へ分類する場合、本2分類のいずれかを停止理由として報告する。HITL 境界の変更ではなく、既存停止経路（REQ-006-086）の分類精度向上である。
 
