@@ -110,3 +110,7 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 - `agentdev-intake-pipeline` skill（inbox スキャン、レビュー評価、分類提示、整形保存）
 - REQ-010（Intake command群）
 
+## adversarial-review 挿入境界（経路C）
+
+経路C の review 挿入境界: 発動条件（暫定分類生成後・ユーザ提示前）を規定する。
+

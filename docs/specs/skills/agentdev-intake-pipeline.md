@@ -105,3 +105,8 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 - [../workflows/capture-boundaries.md](../workflows/capture-boundaries.md)
 - REQ-010（Intake command群）
 
+## adversarial-review 候補判断と内部挿入
+
+intake-promote 経路C における review 候補判断基準と内部手続き（候補確定位置、
+呼出タイミング、結果反映先）を規定する。
+

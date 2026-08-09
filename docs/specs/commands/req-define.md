@@ -439,3 +439,9 @@ auto_gate:
 - REQ-003（外部エージェント統合契約）
 - ADR-003（構造化 draft-data 形式）
 
+## adversarial-review 挿入境界（経路A）
+
+経路A の review 挿入境界: 発動条件（Scale 判断後・ADR判断前・要件doc生成前）、
+review 対象確定位置、採用後戻り先（ADR finding は Step 6 へ）、
+最初の副作用（要件doc保存）との順序を規定する。
+

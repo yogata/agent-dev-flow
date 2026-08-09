@@ -58,3 +58,8 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 - REQ-008（RU lifecycle）
 - REQ-010（Backlog-review）
 
+## adversarial-review 候補判断と内部挿入
+
+backlog-review 経路E における review 候補判断基準と内部手続き（候補確定位置、
+呼出タイミング、矛盾検出への引き渡し）を規定する。
+

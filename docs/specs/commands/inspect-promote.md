@@ -80,3 +80,8 @@ updated: 2026-07-18
 - REQ-010（inspect-promote / 検出事項分類、昇格）
 - REQ-001（inspect-promote 自動 promote（REQ-001-016））
 
+## adversarial-review 挿入境界（経路B）
+
+経路B の review 挿入境界: 発動条件（暫定分類後・HITL 前）、--auto 経路の review 挿入迂回
+（fast path）を規定する。
+

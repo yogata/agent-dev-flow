@@ -213,3 +213,8 @@ subagent は当該属性に応じた振る舞い指針（検証のみでも acce
 - v2:ADR-0128（case-run 外部実行委譲）
 - `agentdev-case-run-execution-adapter` skill（case-run 外部実行 adapter）
 - `agentdev-command-authoring` skill（委譲定義記述標準）
+
+## adversarial-review との委譲契約接続
+
+review 経路での parent_decision_required / decision_context の適用、副作用境界を規定する。
+REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持する。

@@ -114,3 +114,8 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 - `agentdev-learning-capture` skill（capture 層（独立スキル））
 - REQ-010（Learning-promote）
 
+## adversarial-review 挿入境界（経路D）
+
+経路D の review 挿入境界: 発動条件（既存対策確認後・判定結果提示前）、
+review 反映時の evaluation-report 更新へ戻し、関連 Step 再実行ループを規定する。
+

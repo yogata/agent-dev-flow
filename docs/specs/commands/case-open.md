@@ -261,3 +261,8 @@ case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_ope
 - v2:REQ-0137（並列実行安全 git 操作規律）
 - REQ-006（RU群バッチ処理と複数 execution_unit 並列実行）
 
+## adversarial-review 挿入境界（経路F）
+
+経路F の review 挿入境界: 発動条件（execution structure / Issue 本文候補 / 完了条件構成後・
+最初の Issue 作成前）、変更影響別の QG-2 / preflight / 両方 / 不要 再実行ルールを規定する。
+

@@ -264,3 +264,9 @@ L3（委譲先内部メトリクス）は対象外とする（REQ-003-010）。
 - REQ-011（case-auto 最大自走モード）
 - v2:ADR-0128（case-run 外部実行委譲）
 
+## adversarial-review 挿入境界（経路G: adapter 委譲内）
+
+経路G の review 挿入境界: adapter 委譲内の実装方針形成 → review → 結果反映、
+実装方針限定（既確定 Issue/REQ/ADR/SPEC を実現する内部選択）、blocked 遷移を規定する。
+case-run 本体は実装方針を生成・審査せず、agentdev-case-run-execution-adapter へ委譲する。
+

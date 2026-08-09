@@ -60,3 +60,8 @@ case-run が Issue 実装を実行担当サブエージェントへ委譲する�
 - REQ-011（case-auto 最大自走モード）
 - v2:ADR-0128（case-run 外部実行委譲）
 
+## adversarial-review 統合（実装方針→review→結果反映）
+
+case-run 経路G の adapter 委譲内における実装方針形成、adversarial-review 呼出、
+結果反映、blocked 遷移の内部手続きを規定する。
+

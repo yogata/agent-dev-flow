@@ -217,3 +217,8 @@ Epic 全体（複数 Wave）は Wave 境界で PR マージ（case-close 責務�
 - 各 command SPEC（`docs/specs/commands/`）、各 skill SPEC（`docs/specs/skills/`）
 - `agentdev-workflow-routing` skill（work_type ルーティング詳細）
 - `agentdev-workflow-lifecycle` skill（work_type 判定、scale 昇格）
+
+## adversarial-review 由来の停止信号
+
+user-decision-required 停止理由分類の正規化、case-auto への伝播、resume point を規定する。
+user-decision-required は case-run result enum の第5状態ではなく、停止理由分類である。

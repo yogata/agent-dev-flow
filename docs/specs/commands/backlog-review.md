@@ -136,3 +136,8 @@ backlog-review は全 RU frontmatter に `tentative_classification` を付与す
 - REQ-008（RU lifecycle）
 - REQ-010（Backlog-review）
 
+## adversarial-review 挿入境界（経路E）
+
+経路E の review 挿入境界: 構成 → review → 承認の順序、矛盾は既存矛盾検出へ渡す、
+review 内で自動解決しないことを規定する。
+

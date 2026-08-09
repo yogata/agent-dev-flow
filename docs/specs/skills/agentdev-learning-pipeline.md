@@ -57,3 +57,8 @@ schema、分類基準、評価ディメンション、prune 方針を定義す�
 - [commands/learning-promote.md](../commands/learning-promote.md)
 - REQ-010（Learning-promote）
 
+## adversarial-review 候補判断と内部挿入
+
+learning-promote 経路D における review 候補判断基準と内部手続き（候補確定位置、
+呼出タイミング、evaluation-report 反映、Step 6 戻しループ）を規定する。
+

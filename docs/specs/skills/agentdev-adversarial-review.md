@@ -152,3 +152,10 @@ agentdev-adversarial-review 自身による対象ファイル変更、レビュ�
 - 通常のコードレビュー、テスト、機械的検査を代替しない。
 - inspect-docs、inspect-skills の診断を代替しない。
 - すべての要件作成工程、計画作成工程への強制適用を行わない。
+
+## adversarial-review caller integration 共通契約
+
+caller integration（7コマンド + case-auto からの呼出）の共通契約層を正典として所有する。
+入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件と停止条件4点、任意性、
+副作用禁止、QG/HITL 非代替、正規所有者マトリックスを規定する。
+詳細パラメータ・入力フィールド構成は本 SPEC の参照節へ配置する。

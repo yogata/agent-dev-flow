@@ -286,3 +286,8 @@ case-auto は各工程（req-save / spec-save / case-open / case-run / case-clos
 - v2:ADR-0137（case-auto における case-run インライン実行（多重委譲回避））
 - v2:ADR-0138（case-auto オーケストレーション制御の AgentDevFlow 側集約）
 
+## adversarial-review 由来の停止伝播（経路H）
+
+経路H の停止伝播: user-decision-required + decision_context 受領、自走停止、
+resume point、review 直接起動・finding 解釈・採否・再評価を行わないことを規定する。
+
