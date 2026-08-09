@@ -143,14 +143,14 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 | `intake-promote` | `.agentdev/intake/promoted/` | 他パス |
 | `learning-promote` | `.agentdev/learning/promoted/` | 他パス |
 | `backlog-review` | `.agentdev/backlog/req-units/`, `.agentdev/intake/promoted/`, `.agentdev/learning/promoted/` | `.opencode/`, 検査対象外アーティファクト |
-| `inspect-docs` | `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、`.agentdev/inspect/` 配下の git 永続化（commit / push） | 検査対象アーティファクト（docs/、REQ/ADR/SPEC/guides、Command/Skill/Template/Script）の変更、許可範囲外 commit/push、Issue/PR 作成、更新 |
+| `inspect-docs` | `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、`.agentdev/inspect/` 配下の git 永続化（commit / push） | 検査対象アーティファクト（docs/、REQ/Decision/SPEC/guides、Command/Skill/Template/Script）の変更、許可範囲外 commit/push、Issue/PR 作成、更新 |
 
 ## 実行後差分検査（Postflight Diff Checking）
 
 実行後差分検査（postflight diff checking）は検査対象を直接修正しないコマンドから段階導入する:
 
 **検査対象を直接修正しないコマンド検証**:
-- `inspect-docs` は実行後に検査対象アーティファクト（docs/、REQ/ADR/SPEC/guides、Command/Skill/Template/Script）に変更がないことを確認。許可出力（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、`.agentdev/inspect/` 配下の commit/push）以外の変更を warning として報告する
+- `inspect-docs` は実行後に検査対象アーティファクト（docs/、REQ/Decision/SPEC/guides、Command/Skill/Template/Script）に変更がないことを確認。許可出力（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、`.agentdev/inspect/` 配下の commit/push）以外の変更を warning として報告する
 - `docs-check`（配布対象外 `/repo/docs-check`）は検査対象アーティファクトを変更しないが、許可された出力（`.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`）を生成する。実行後差分検査は「検査対象アーティファクトへの変更がないこと」を確認し、許可出力範囲外の変更を warning として報告する
 - `backlog-review` も検査対象外アーティファクトを変更せず、許可された `.agentdev/` 配下の出力のみを行う
 - 変更が検出された場合は warning として報告

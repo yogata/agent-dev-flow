@@ -7,7 +7,7 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 読み方 | 定義 |
 |------|--------|------|
 | req-define | レキ、ディファイン | AI と対話して要件を整理するコマンド |
-| req-save | レキ、セーブ | 要件doc を REQ/ADR ファイルとして保存するコマンド（機能追加のみ） |
+| req-save | レキ、セーブ | 要件doc を REQ/Decision ファイルとして保存するコマンド（機能追加のみ） |
 | case-open | ケース、オープン | 要件から GitHub Issue を作成するコマンド |
 | case-run | ケース、ラン | Issue に基づいて実装し、PR を作成するコマンド |
 | case-close | ケース、クローズ | PR をマージし、Issue をクローズするコマンド |
@@ -17,7 +17,7 @@ AgentDevFlow で使う用語の定義。
 | intake-promote | インテイク、プロモート | inbox の項目をレビュー、採用、却下、保留判定し、採用済み成果物に整形するコマンド |
 | learning-promote | ラーニング、プロモート | Learning エントリを分析、分類、昇華判定し、採用済み成果物を生成するコマンド |
 | backlog-review | バックログ、レビュー | 採用済み成果物を分析、統合し、ユーザー承認後に RU を生成するコマンド |
-| docs-check | ドックス、チェック | ドキュメント、スキル、コマンドの整合性を検証するコマンド（旧称: integrity-check）。配布対象外コマンド `/repo/docs-check` に配置し、`/agentdev/*` コマンド体系とは区別する（ADR-001, v2:ADR-011-156） |
+| docs-check | ドックス、チェック | ドキュメント、スキル、コマンドの整合性を検証するコマンド（旧称: integrity-check）。配布対象外コマンド `/repo/docs-check` に配置し、`/agentdev/*` コマンド体系とは区別する（DEC-001, v2:ADR-011-156） |
 | inspect-docs | インスペクト、ドックス | docs 全体の意味整合性を検出し、検出事項（finding）を出力するコマンド（旧称: req-restructure-review, docs-review, diagnostics-docs） |
 | case-auto | ケース、オート | 最大自走モード。req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close を順次実行するコマンド |
 

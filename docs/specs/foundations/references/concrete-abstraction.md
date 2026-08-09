@@ -24,7 +24,7 @@ updated: 2026-07-25
 除去された識別子のトレーサビリティは次で担保する。
 
 - git 履歴（コミットメッセージ、diff）
-- 原本側 docs/（REQ、ADR、IR カタログ）
+- 原本側 docs/（REQ、Decision、IR カタログ）
 
 ## baseline 既知違反
 
@@ -62,5 +62,5 @@ baseline 件数は次の2軸で明記する。
 ## 関連
 
 - 親 SPEC: [../harness-separation-model.md](../harness-separation-model.md)
-- 関連 ADR（v2）: v2:ADR-0136（配布物の harness 実行制御分離）
+- 関連 Decision（v2）: v2:ADR-0136（配布物の harness 実行制御分離）
 - 関連 REQ（v2）: v2:REQ-0162（配布物の harness 実行制御分離）

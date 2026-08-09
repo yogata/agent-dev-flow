@@ -129,7 +129,7 @@ Issue 本文に次のセクションを必須とする（新規作成時）。
 ### 必須品質統制
 - （artifact-quality-control-routing SPEC に基づく能力キーと検証項目）
 
-### 関連 ADR 拘束条件
+### 関連 Decision 拘束条件
 - （該当 ADR と完了条件/test strategy への反映）
 
 ### scope-affecting impact candidate

@@ -26,7 +26,7 @@ updated: "2026-08-09"
 | 種別 | 判定規則 |
 |------|----------|
 | `rename` | AUTOGEN block の行数が期待値と異なる（ソースファイル追加・削除・rename を起因とする行増減） |
-| `status_change` | 同一 id の行で status 列のみ変化（SPEC / ADR の status frontmatter 変更に起因） |
+| `status_change` | 同一 id の行で status 列のみ変化（SPEC / Decision の status frontmatter 変更に起因） |
 | `content_change` | 上記以外の不一致（行数値、タイトル、キャプション、リンク等の変化） |
 
 ## 不合格時の処置

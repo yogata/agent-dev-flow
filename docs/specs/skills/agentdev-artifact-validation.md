@@ -14,7 +14,7 @@ updated: 2026-07-24
 
 ## 目的
 
-REQ/ADR/SPEC 操作で共有される決定的検証 script（frontmatter 整合性、エントリ存在確認、変更範囲検証）と共有ライブラリの正規所有者を一つに定め、兄弟 skill、command からの内部 script 直接参照を禁止し、公開検証契約への委譲を促す。REQ、ADR、SPEC 固有の内容判断を行わず、決定的検証のみを所有する検証 skill の責務、対象外、境界を定義する。
+REQ/Decision/SPEC 操作で共有される決定的検証 script（frontmatter 整合性、エントリ存在確認、変更範囲検証）と共有ライブラリの正規所有者を一つに定め、兄弟 skill、command からの内部 script 直接参照を禁止し、公開検証契約への委譲を促す。REQ、Decision、SPEC 固有の内容判断を行わず、決定的検証のみを所有する検証 skill の責務、対象外、境界を定義する。
 
 ## 適用対象
 

@@ -19,7 +19,7 @@ updated: 2026-08-09
 
 ## 出力
 
-- REQ/ADR artifact_actions がある場合: REQ/ADRファイル + GitHub Issue + 実装済みブランチ + PR + マージ済み + クローズ済み
+- REQ/Decision artifact_actions がある場合: REQ/Decisionファイル + GitHub Issue + 実装済みブランチ + PR + マージ済み + クローズ済み
 - artifact_actions に応じた各工程の出力（工程分岐は Step 3 参照）
 
 ## 副作用
@@ -271,7 +271,7 @@ case-auto は各工程（req-save / spec-save / case-open / case-run / case-clos
 
 ## Phase 0 commit スコープ設計運用
 
-Phase 0（枝PR作成フェーズ）の commit スコープ設計運用を明示する。Phase 0 は定義層（req-save / spec-save）で確定した REQ/ADR/SPEC をコミットし、枝PR を作成するフェーズである。本節は Phase 0 の commit 構成と、後続する case-run（実装フェーズ）の委譲内 commit に適用するスコープ設計運用を規定する。case-run SPEC（`docs/specs/commands/case-run.md`）の同名節と整合する内容を維持する（OU-013a / OU-013b）。
+Phase 0（枝PR作成フェーズ）の commit スコープ設計運用を明示する。Phase 0 は定義層（req-save / spec-save）で確定した REQ/Decision/SPEC をコミットし、枝PR を作成するフェーズである。本節は Phase 0 の commit 構成と、後続する case-run（実装フェーズ）の委譲内 commit に適用するスコープ設計運用を規定する。case-run SPEC（`docs/specs/commands/case-run.md`）の同名節と整合する内容を維持する（OU-013a / OU-013b）。
 
 ### 孫 Issue 間 SPEC スコープ交差時の扱い
 

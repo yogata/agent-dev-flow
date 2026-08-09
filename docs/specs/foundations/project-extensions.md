@@ -13,9 +13,9 @@ updated: 2026-07-27
 
 ## 背景、目的
 
-AgentDevFlow 配布 command/skill 本文（src/opencode/commands/**, src/opencode/skills/**）は、AgentDevFlow 本体固有の ADR/REQ/SPEC への具体参照を持つと、利用先プロジェクトで解決不能な参照が混入する。
+AgentDevFlow 配布 command/skill 本文（src/opencode/commands/**, src/opencode/skills/**）は、AgentDevFlow 本体固有の Decision/REQ/SPEC への具体参照を持つと、利用先プロジェクトで解決不能な参照が混入する。
 
-project extensions 機構は、プロジェクト固有の追加・拡張を配布コードから分離し、プロジェクト別に与える。実装本文はプロジェクト非依存・単体利用可能とし、ADR/REQ/SPEC の具体ID、具体パス、固定URLを持たない。extensions（.agentdev/extensions/**）はプロジェクト固有情報を対象とし、そのプロジェクトの ADR/REQ/SPEC を具体的に参照してよい。
+project extensions 機構は、プロジェクト固有の追加・拡張を配布コードから分離し、プロジェクト別に与える。実装本文はプロジェクト非依存・単体利用可能とし、Decision/REQ/SPEC の具体ID、具体パス、固定URLを持たない。extensions（.agentdev/extensions/**）はプロジェクト固有情報を対象とし、そのプロジェクトの Decision/REQ/SPEC を具体的に参照してよい。
 
 ## 標準配置
 
@@ -90,12 +90,12 @@ checks:
 
 ## command/skill 本文の参照禁止
 
-command/skill 本文には、ADR/REQ/SPEC の具体ID、具体パス、固定URLを記述しない。
+command/skill 本文には、Decision/REQ/SPEC の具体ID、具体パス、固定URLを記述しない。
 
 禁止対象は文書種別名としての ADR, REQ, SPEC ではなく、プロジェクト固有文書を直接指す具体参照である。
 
-.agentdev/extensions/** は、そのプロジェクトの ADR/REQ/SPEC 参照を許可する。
-REQ/ADR/SPEC 本文内の参照も許容する。
+.agentdev/extensions/** は、そのプロジェクトの Decision/REQ/SPEC 参照を許可する。
+REQ/Decision/SPEC 本文内の参照も許容する。
 
 ## 検査、診断
 
@@ -108,7 +108,7 @@ extension 検査は DEC-006（inspect 3-command 構成への正規化）に基�
 | finding disposition | `/agentdev/inspect-promote` | finding の promote、defer、reject |
 
 AgentDevFlow 標準の inspect 責務は上記構造確認・path 実在確認・skill 存在確認までとする。
-command/skill 本文の ADR/REQ/SPEC 具体参照禁止の持続的検査は、各適用プロジェクトが project-local skill により実装する（AgentDevFlow 標準の対象外）。
+command/skill 本文の Decision/REQ/SPEC 具体参照禁止の持続的検査は、各適用プロジェクトが project-local skill により実装する（AgentDevFlow 標準の対象外）。
 agent-dev-flow リポジトリ自身は適用プロジェクトの1つとして repo-local skill により検査を実装するが、これは標準仕様ではなくローカル運用である。
 `/agentdev/inspect-docs` へ extension の意味診断を追加しない（三層非重複）。
 

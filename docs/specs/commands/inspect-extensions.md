@@ -78,7 +78,7 @@ AgentDevFlow 標準の inspect 責務は構造確認（検査1〜4）、path 実
 
 - ファイル変更禁止（G01、`.agentdev/inspect/inbox/inspect-extensions-finding-*.md` 生成は例外）
 - 8項目の検査が全て定義されていること
-- 配布物参照境界（command 定義本文に具体 ADR/REQ/SPEC ID を持たせない）が遵守されていること
+- 配布物参照境界（command 定義本文に具体 Decision/REQ/SPEC ID を持たせない）が遵守されていること
 
 ## See Also
 

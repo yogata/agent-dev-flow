@@ -9,7 +9,7 @@ updated: 2026-07-18
 
 ## 目的
 
-docs 配下の REQ/ADR/SPEC/guides/README および関連する command/skill の自然言語記述の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。
+docs 配下の REQ/Decision/SPEC/guides/README および関連する command/skill の自然言語記述の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。
 QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける（v2:REQ-0140）。
 
 ## 適用対象

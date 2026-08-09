@@ -59,7 +59,7 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 
 ## 対象外
 
-- 正規文書変更、REQ/ADR/SPEC 変更、Command/Skill/Template/Script 変更（G01）
+- 正規文書変更、REQ/Decision/SPEC 変更、Command/Skill/Template/Script 変更（G01）
 - Issue 作成、PR 作成、RU 保存（G02, G03）
 - branch、worktree 操作（G04）
 - 自動修正（G05、推奨 route 提示に留める）

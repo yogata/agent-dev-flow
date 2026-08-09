@@ -5,8 +5,8 @@ updated: 2026-07-24
 
 # 設計原則
 
-> **SPEC と ADR の境界（REQ-001-043/044/050）**: 本 SPEC は現行仕様として機能する分類表、導出表（work_type / scale / workflow_route 等）、適用基準を扱う。
-> 判断理由、歴史的経緯、設計意図、トレードオフ説明の正本は以下の ADR 群を参照すること（新規 ADR は作成しない、既存 ADR で覆えない内容は本 SPEC の範囲外として報告）。
+> **SPEC と Decision の境界（REQ-001-043/044/050）**: 本 SPEC は現行仕様として機能する分類表、導出表（work_type / scale / workflow_route 等）、適用基準を扱う。
+> 判断理由、歴史的経緯、設計意図、トレードオフ説明の正本は以下の Decision 群を参照すること（新規 Decision は作成しない、既存 Decision で覆えない内容は本 SPEC の範囲外として報告）。
 > - REQ-001（文書種別責務境界、記述対象境界）
 > - REQ-001（実行時配布物と執筆時関心の分離）
 > - REQ-001（Skill references SPEC 分離基準）
@@ -25,11 +25,11 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 
 **bugfix** は既存機能の不具合修正であり、要件定義書（REQ）の作成を不要とする。
 バグ修正は観察可能な事実（再現手順、期待動作、実際動作）に基づいて完結するため、壁打ちによる要件形成が不要である。
-ただし影響を受ける docs（REQ/ADR/SPEC/guide）の更新は完了条件に含まれる（REQ-005-034）。
+ただし影響を受ける docs（REQ/Decision/SPEC/guide）の更新は完了条件に含まれる（REQ-005-034）。
 最小限の経路（req-define → case-open → case-run → case-close）で処理する。
 
 **feature** は新しい振る舞いをシステムに導入するため、WHAT（要件）と HOW（実装）の分離が必要である。
-壁打ちフェーズでの要件形成、REQ/ADR ファイルの保存、specs 更新など、複数の確認ポイントを経由する経路（req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close）を辿る。
+壁打ちフェーズでの要件形成、REQ/Decision ファイルの保存、specs 更新など、複数の確認ポイントを経由する経路（req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close）を辿る。
 
 **maintenance** はリファクタリング、保守作業向けの軽量経路である。
 **docs_chore** はドキュメント、雑務向けの軽量経路である。

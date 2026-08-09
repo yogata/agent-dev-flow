@@ -30,7 +30,7 @@ REQ、Decision、IR の識別子採番規則を統一し、欠番の扱いを採
 
 新規識別子は、当該種別の現行ファイル群（retired/ を含む）の最大番号に 1 を加えた値とする。欠番が存在する場合でも欠番を埋めず、最大番号をもって決定する。
 
-採番の判断は人間または LLM が行わず、`agentdev-req-file-manager/scripts/` が提供する決定的スクリプト（`alloc-req-number.ts`、`alloc-adr-number.ts`、`alloc-composite-id.ts`）が機械的に確定する（design-principles.md 第5節）。req-save、spec-save は当該スクリプトを bash 経由で呼び出す。Decision 移行完了後は `alloc-dec-number.ts`（case-run OU-002 で命名確定）へ差し替える。
+採番の判断は人間または LLM が行わず、`agentdev-req-file-manager/scripts/`（REQ、複合 ID）と `agentdev-decision-file-manager/scripts/`（Decision）が提供する決定的スクリプト（`alloc-req-number.ts`、`alloc-decision-number.ts`、`alloc-composite-id.ts`）が機械的に確定する（design-principles.md 第5節）。req-save、spec-save は当該スクリプトを bash 経由で呼び出す。
 
 ### 廃止時の扱い
 
