@@ -29,7 +29,7 @@
 8. `regression_mapping_table_contract_removed.test.ts`
 9. `regression_req_id_width.test.ts`
 
-行レベルマッチ総数は 109 件、論理ユニット（関数、定数、ブロック単位の集合）は 51 件である。Issue #1996 が挙げる「45件」は主スクリプト群（テスト除く）の論理ユニット概算と解釈し、本監査は過不足なく全件を扱う。
+行レベルマッチはパターン（`DOC-MAP`、`docmap`、`DocMap`、`DOC_MAP`）の組合せで 100 件超、論理ユニット（関数、定数、ブロック単位の集合）は 44 件である。Issue #1996 が挙げる「45件」は主スクリプト群（テスト除く）の論理ユニット概算と解釈し、本監査は過不足なく全件を扱う。
 
 対象外。
 
@@ -52,28 +52,36 @@
 
 ## 判定結果サマリ
 
-論理ユニット 51 件の分類集計。
+論理ユニット 44 件の分類集計。
 
 | 分類 | 件数 | 内訳 |
 |------|------|------|
-| `LIVE` | 1 | DOC-MAP 除去後に「分類なし」を表現する `scanned.DocMap` の `0` 固定値（参照 51）。現行の inventory 出力互換性のため一時維持。Phase 2 で inventory 出力項目自体を削除する候補 |
-| `DEAD-FN` | 30 | checkDocMap* 関数群、generateDocMapInventory、AG-013 AUTOGEN 検証、docmap-update-required ルール、結合解決、分類ポリシー、テストフィクスチャ |
-| `DEAD-REDIRECT` | 7 | `fs.existsSync` で保護された到達不能スキャン対象、`rel ===` ガード、存在しないパスの正規表現 |
-| `DEAD-DOC` | 13 | コメント、エラーメッセージ、ログ文字列、OK メッセージ中の言及 |
+| `LIVE` | 1 | DOC-MAP 除去後に「分類なし」を表現する `scanned.DocMap` の `0` 固定値（参照 31）。現行の inventory 出力互換性のため一時維持。Phase 2 で inventory 出力項目自体を削除する候補 |
+| `DEAD-FN` | 27 | checkDocMap* 関数群、generateDocMapInventory、AG-013 AUTOGEN 検証、docmap-update-required ルール、結合解決、分類ポリシー、テストフィクスチャ |
+| `DEAD-REDIRECT` | 8 | `fs.existsSync` で保護された到達不能スキャン対象、`rel ===` ガード、存在しないパスの正規表現 |
+| `DEAD-DOC` | 8 | コメント、エラーメッセージ、ログ文字列、OK メッセージ中の言及 |
+
+Phase 別集計（除去 Roadmap対応）。
+
+| Phase | 件数 | 概要 |
+|-------|------|------|
+| Phase 1（高優先） | 27 | 機能的 dead code（`DEAD-FN`） |
+| Phase 2（中優先） | 9 | 到達不能パス整理（`DEAD-REDIRECT` 8件 + `LIVE` 1件の再評価候補） |
+| Phase 3（低優先） | 8 | コメント・メッセージ整理（`DEAD-DOC`） |
 
 ファイル別件数。
 
 | ファイル | 件数 | 主分類 |
 |----------|------|--------|
-| `check_integrity.ts` | 17 | `DEAD-FN`（関数群）、`DEAD-REDIRECT`（スキャンリスト）、`LIVE`（inventory 出力） |
-| `generate_indexes.ts` | 10 | `DEAD-FN`（生成関数、更新セクション）、`DEAD-DOC`（コメント） |
-| `check_changed_docs.ts` | 13 | `DEAD-FN`（ルール、結合解決）、`DEAD-REDIRECT`（appliesTo）、`DEAD-DOC`（コメント） |
-| `check_autogen_freshness.ts` | 4 | `DEAD-FN`（検証ブロック） |
-| `cli_utils.ts` | 4 | `DEAD-FN`（分類マップ、判定分岐） |
+| `check_integrity.ts` | 18 | `DEAD-FN`（関数群、分類ポリシー、AUTOGEN 検証、呼び出し）、`DEAD-REDIRECT`（スキャンリスト）、`LIVE`（inventory 出力）、`DEAD-DOC`（コメント、メッセージ） |
+| `check_changed_docs.ts` | 8 | `DEAD-FN`（ルール、結合解決、ロジック）、`DEAD-REDIRECT`（appliesTo、正規表現）、`DEAD-DOC`（コメント） |
+| `generate_indexes.ts` | 5 | `DEAD-FN`（生成関数、更新セクション）、`DEAD-DOC`（コメント） |
 | `check_integrity.test.ts` | 4 | `DEAD-FN`（フィクスチャ、分類件数検査） |
-| `regression_*.test.ts`（3 ファイル） | 5 | `DEAD-FN`（フィクスチャ） |
+| `check_autogen_freshness.ts` | 3 | `DEAD-FN`（検証ブロック、import、パス定数） |
+| `cli_utils.ts` | 3 | `DEAD-FN`（分類マップ、判定分岐）、`DEAD-DOC`（JSDoc） |
+| `regression_*.test.ts`（3 ファイル） | 3 | `DEAD-FN`（フィクスチャ、assertion） |
 
-生存 1 件は後段「参照 51」で詳述する。生存が 1 件のみにとどまる理由は、DOC-MAP が完全除去（REQ-013-001）された結果、DOC-MAP を読む全コードが到達不能になったためである。生存 1 件も「参照しないと inventory 出力形式が変わり下遊互換性が壊れる」だけであり、本質的には DOC-MAP を必要としていない。
+生存 1 件は後段「参照 31」で詳述する。生存が 1 件のみにとどまる理由は、DOC-MAP が完全除去（REQ-013-001）された結果、DOC-MAP を読む全コードが到達不能になったためである。生存 1 件も「参照しないと inventory 出力形式が変わり下遊互換性が壊れる」だけであり、本質的には DOC-MAP を必要としていない。
 
 ## 個別判定
 
@@ -522,7 +530,7 @@ const docMapUpdateRequired = profile.rules.includes("docmap-update-required")
 
 ### Phase 1: 機能的 dead code 除去（高優先）
 
-対象 30 件（`DEAD-FN`）。checkDocMap* 関数群、generateDocMapInventory、AG-013 AUTOGEN 検証、docmap-update-required ルール、結合解決、分類ポリシー、テストフィクスチャ。実施にあたっての注意点を以下に示す。
+対象 27 件（`DEAD-FN`）。checkDocMap* 関数群、generateDocMapInventory、AG-013 AUTOGEN 検証、docmap-update-required ルール、結合解決、分類ポリシー、テストフィクスチャ。実施にあたっての注意点を以下に示す。
 
 - **check_integrity.ts**: 参照 9-17（関数群）、21-22（分類ポリシー）、24-30（呼び出し、AUTOGEN 検証、inventory）を一括削除。参照 21 で `DOCUMENT_CLASSIFICATIONS` を 5 分類へ縮退、参照 70-71 のテスト件数を 6 → 5 へ更新。参照 31（`scanned.DocMap`）は Phase 2 で扱うため Phase 1 では残置。
 - **generate_indexes.ts**: 参照 39-43 の DOC-MAP 更新セクションが `process.exit(EXIT_ERROR)` を呼ぶため、本セクション除去が最優先。現行 repo で `generate_indexes.ts` の全面起動を妨げている。参照 33-38 も併せて削除。
@@ -538,7 +546,7 @@ const docMapUpdateRequired = profile.rules.includes("docmap-update-required")
 
 ### Phase 2: 到達不能パスと inventory 形状の整理（中優先）
 
-対象 8 件（`DEAD-REDIRECT` 7 件 + `LIVE` 1 件）。`fs.existsSync` 等で保護された到達不能スキャン対象、`scanned.DocMap` 出力項目。
+対象 9 件（`DEAD-REDIRECT` 8 件 + `LIVE` 1 件）。`fs.existsSync` 等で保護された到達不能スキャン対象、`scanned.DocMap` 出力項目。
 
 Phase 1 完了後に実施する。Phase 1 で checkDocMap* 関数を除去した時点で、それらが参照していた DOC-MAP パス定数も未使用になるため、Phase 2 で残存スキャンリスト（参照 7、8、18、19、20、23、48、56）を整理する。
 
@@ -546,7 +554,7 @@ Phase 1 完了後に実施する。Phase 1 で checkDocMap* 関数を除去し�
 
 ### Phase 3: コメント・メッセージ整理（低優先）
 
-対象 13 件（`DEAD-DOC`）。コメント、エラーメッセージ、ログ文字列、OK メッセージ中の DOC-MAP 言及。Phase 1-2 完了後に実施し、コードの意図と発言を一致させる。
+対象 8 件（`DEAD-DOC`）。コメント、エラーメッセージ、ログ文字列、OK メッセージ中の DOC-MAP 言及。Phase 1-2 完了後に実施し、コードの意図と発言を一致させる。
 
 ## 判定結果の記録様式
 
