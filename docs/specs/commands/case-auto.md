@@ -265,6 +265,19 @@ case-auto は各工程（req-save / spec-save / case-open / case-run / case-clos
 - 記録先: case-auto 完了報告への工程別内訳追記。永続化は必要になった段階で別途検討
 - 対象外: 委譲先内部メトリクス（L3）は harness 依存が強すぎるため対象外（REQ-003-010）。case-run 内の L2 計測は case-run result に含まれる（REQ-003-009、REQ-006-028）
 
+## Phase 0 commit スコープ設計運用
+
+Phase 0（枝PR作成フェーズ）の commit スコープ設計運用を明示する。
+
+### 孫 Issue 間 SPEC スコープ交差時の扱い
+
+- 孫 Issue 間で SPEC スコープが交差する場合、`on_failure` で SPEC 修正を許容するかどうかを明確化する
+
+### ドメイン state 更新と成果物変更の同一コミット混在
+
+- ドメイン state 更新（`.agentdev/` 配下）と成果物変更（`docs/` 配下等）の同一コミット混在の扱いを明確化する
+- 禁止・許容・2分割運用のいずれかを SPEC として明示する
+
 ## See Also
 
 - [req-save.md](req-save.md), [spec-save.md](spec-save.md), [case-open.md](case-open.md), [case-run.md](case-run.md), [case-close.md](case-close.md)（構成工程）

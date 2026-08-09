@@ -164,6 +164,16 @@ execution contract 責務が軽量なため）。
 - `<!-- 【必須】 -->` マーカー付きセクションを省略していないか
 - 変数に該当するデータがない場合は「該当なし」と記載しているか
 
+## backlog 系テンプレート列挙の整理
+
+references セクションに列挙された backlog 系テンプレート2ファイル（`issue_desc_backlog_child.md`、`issue_desc_backlog_epic.md`）は不要（ユーザー判断確定）。
+
+### 整理内容
+
+- 当該2ファイルの列挙を references セクションから削除する
+- カタログ SPEC としての整合性を列挙削除により確保する
+- 原本ドラフトが挙げていた L34-35 は references セクション内の列挙行の近似であり、実施時に正確な行を再特定する
+
 ## See Also
 
 - [agentdev-workflow-lifecycle.md](agentdev-workflow-lifecycle.md)

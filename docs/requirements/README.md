@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下17件を第一参照先とする。
+現在の要件判断では、以下19件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -29,6 +29,8 @@
 | [REQ-015](REQ-015.md) | adversarial-review caller integration 7経路+case-auto |
 | [REQ-016](REQ-016.md) | adversarial-review caller integration 横断整合 |
 | [REQ-017](REQ-017.md) | Issue Execution Contract |
+| [REQ-018](REQ-018.md) | worktree 構造的制約とテスト fallback |
+| [REQ-019](REQ-019.md) | テスト影響範囲検出 gate |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件

@@ -209,6 +209,17 @@ GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手�
 - 一般的な git 操作（`agentdev-git-worktree` 担当）
 - 本文生成、完了判定、Epic 依存判定、capture 分類（domain skill 担当）
 
+## commit メッセージ作成の BOM なし UTF-8 契約
+
+WRITE 標準手順（Windows encoding 指定必須、REQ-011-009）を commit メッセージ作成へ拡張する。
+
+### 契約
+
+- Windows 環境で commit メッセージ作成時に `Out-File -Encoding utf8` が BOM 付き UTF-8 を生成し化ける問題へ対処する
+- BOM なし UTF-8 書き出しを契約として明示する
+- 実装手段: `node fs.writeFileSync` 等の BOM なし UTF-8 書き出し機能を使用する
+- commit メッセージ作成時にも WRITE 標準手順と同等の encoding 制御を適用する
+
 ## 関連項目
 
 - [agentdev-issue-management.md](agentdev-issue-management.md)

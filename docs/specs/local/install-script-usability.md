@@ -111,6 +111,19 @@ GitHub Issue/PR を使わずローカルファイル（.agentdev/cases/）で運
 
 上級者向けオプションは現在なし（本スクリプトは本体専用のため）。
 
+## #Requires と comment-based help の両立
+
+install.ps1、check.ps1、sync-self.ps1 の `#Requires` ディレクティブ配置と comment-based help 解析位置の両立仕様を明示する。
+
+### 課題
+
+運用スクリプト3本（install.ps1、check.ps1、sync-self.ps1）の `#Requires` ディレクティブが comment-based help 解析を阻害する問題がある。
+
+### 両立仕様
+
+- `#Requires` ディレクティブの配置を comment-based help 解析位置と両立させる
+- 配置位置、解析順序、検証方法は実装固有の詳細として skill references 側で保持する
+
 ## 適用範囲
 
 - 対象: install-consumer-opencode.ps1、check-consumer-opencode.ps1、

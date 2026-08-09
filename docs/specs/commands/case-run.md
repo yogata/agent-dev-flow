@@ -290,6 +290,18 @@ case-run は実行担当サブエージェント委譲の起動直前、直後�
 記録された L2 タイムスタンプは case-auto の工程別壁時計時間報告（REQ-003-008）の入力として消費される。
 L3（委譲先内部メトリクス）は対象外とする（REQ-003-010）。
 
+## Phase 0 commit スコープ設計運用
+
+Phase 0（枝PR作成フェーズ）の commit スコープ設計運用を明示する。case-auto SPEC（`docs/specs/commands/case-auto.md`）の Phase 0 commit スコープ設計運用と整合する内容を維持する。
+
+### 孫 Issue 間 SPEC スコープ交差時の扱い
+
+- 孫 Issue 間で SPEC スコープが交差する場合、`on_failure` で SPEC 修正を許容するかどうかを case-auto SPEC と整合させる
+
+### ドメイン state 更新と成果物変更の同一コミット混在
+
+- ドメイン state 更新（`.agentdev/` 配下）と成果物変更（`docs/` 配下等）の同一コミット混在の扱いを case-auto SPEC と整合させる
+
 ## See Also
 
 - [case-open.md](case-open.md)（前段コマンド（Issue 作成））

@@ -134,6 +134,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | [skills/agentdev-project-extensions.md](skills/agentdev-project-extensions.md) | accepted | 補助 | project extensions 読み込み |
 | [skills/agentdev-deep-review.md](skills/agentdev-deep-review.md) | superseded | 補助 | 敵対的審議型レビュー（Deep Review）の振る舞い契約。agentdev-adversarial-review SPEC へ後継移行済み（superseded_by: agentdev-adversarial-review.md） |
 | [skills/agentdev-adversarial-review.md](skills/agentdev-adversarial-review.md) | accepted | 補助 | 対論型レビュー（adversarial review）の振る舞い契約、レビュー手続き、責務構造。3論理役割、動的レビュー戦略、対称的相互反証、戦略メタ反証、合意候補再検証、read-only 境界を所有 |
+| [skills/agentdev-git-worktree-test-fallback.md](skills/agentdev-git-worktree-test-fallback.md) | draft | 補助 | worktree 構造系テスト fallback 契約（junction 未設定時の src/opencode/ fallback、構造的制約の明示） |
 
 `repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
 
@@ -204,6 +205,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | integrity/backticks-identifier-threshold.md | accepted | backticks 識別子/一般名詞 判定閾値 | backticks 必須と任意の機械判定閾値 |
 | integrity/validator-split-criteria.md | accepted | validator 分割基準 | check_changed_docs.ts の validator 分割基準（責務境界、ファイルサイズ上限、関心分離ルール）。内部 validator 構成は `references/validator-internal-config.md` へ分離 |
 | integrity/targeted-docs-guard-implementation.md | accepted | Targeted Docs Guard 実装詳細 | check_changed_docs.ts 変更文書限定検査契約（CLI 引数、workflow 別検査項目、判定条件、false-clean 予防）。Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業は `references/targeted-docs-guard-implementation-details.md` へ分離 |
+| integrity/autogen-freshness-gate.md | draft | AUTOGEN ブロック鮮度検出 gate | AUTOGEN ブロック（spec-health-metrics.md 等）の鮮度検出、rename/status 変更時の再生成必要性判定、不合格時の処置 |
 
 #### local/（ローカル版 SPEC）
 
