@@ -116,6 +116,48 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 ## adversarial-review 挿入境界（経路D）
 
-経路D の review 挿入境界: 発動条件（既存対策確認後・判定結果提示前）、
-review 反映時の evaluation-report 更新へ戻し、関連 Step 再実行ループを規定する。
+本節は learning-promote 経路D の review 挿入境界を正典として所有する（REQ-015-007）。共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件と停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が正規所有し、本節は再定義しない。本節は経路D 固有の発動条件、挿入位置、戻り先、Step 6 戻しループのみを所有する。
+
+### 発動条件判定 Step と review 呼出 Step の分離（REQ-015-001/002/003）
+
+経路D は発動条件判定 Step と review 呼出 Step を分離する。両 Step を分離することで、条件非該当時は review 呼出を迂回して従来フロー（Step 8 → Step 9）を維持する（REQ-015-003）。
+
+#### 発動条件判定 Step
+
+発動条件は Step 8（既存対策確認）の完了直後、Step 9（ユーザーへの判定結果提示）の前に判定する（REQ-015-007）。この位置は inbox → deferred 移動（Step 13）、prune（Step 14）、commit/push（Step 15）等の不可逆処理に先立つ。
+
+発動条件は次のいずれも満たすこととする。
+
+- ユーザーが review を明示的に要求していること（REQ-015-002）。明示要求がない場合は発動しない
+- 判定対象（正規化済エントリ、問題クラス分類、8軸評価、廃棄判定、既存対策照合結果）が evaluation-report.md へ反映済みであること
+
+明示要求のない限り review は発動せず、従来フローを維持する（REQ-014-001、REQ-015-003）。adversarial-review を新規必須工程、QG、承認ゲートとして扱わない。
+
+#### review 呼出 Step
+
+発動条件が成立した場合のみ、Step 8 と Step 9 の間に review 呼出 Step を実行する。呼出 Step は evaluation-report.md の判定結果（正規化、問題クラス分類、8軸評価、廃棄判定、既存対策照合）を review 対象として渡す。呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
+
+### review 反映時の evaluation-report 更新戻しと関連 Step 再実行（REQ-015-007）
+
+review で accepted finding が提示され、呼出元が判定対象へ反映した場合、意味内容が変更されたときは evaluation-report.md の更新へ戻し、関連 Step を再実行する。手続きは次のとおり。
+
+1. accepted finding を判定対象（正規化結果、問題クラス分類、8軸評価、廃棄判定、既存対策照合）へ反映する（REQ-014-006）。反映は呼出元の責務であり、adversarial-review 自身は行わない
+2. 反映結果で evaluation-report.md を更新するため Step 6 へ戻る
+3. Step 6（evaluation-report 生成、更新）→ Step 7（廃棄判定）→ Step 8（既存対策確認）→ 発動条件判定 Step → review 呼出 Step の順に再実行する
+
+再 review の発動は、反映により review 対象の意味内容が変更され、新たな本質的争点が生じ得る場合にのみ許容する（REQ-014-007）。新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。再 review の停止条件（REQ-014-008）を満たした時点でループを離脱し、Step 9 へ進む。
+
+unresolved な本質的争点またはユーザー判断事項が残る場合、Step 9（判定結果提示）、Step 10（ユーザー承認）、Step 13（deferred 移動）、Step 14（prune）、Step 15（commit/push）等の不可逆処理へ進まない（REQ-014-009）。ただし adversarial-review 自体を恒久的な統制ゲートとしない。unresolved は既存の HITL（Step 10 ユーザー承認）または blocker 扱いへ振り向ける。
+
+### 挿入位置の一意特定（REQ-015-007）
+
+経路D の review 挿入位置は Step 8（既存対策確認）完了直後、Step 9（ユーザーへの判定結果提示）前である。最初の不可逆副作用は Step 11（git pull）以降（Step 13 deferred 移動、Step 14 prune、Step 15 commit/push）であり、review 挿入位置は全不可逆処理に先立つ。handoff.md、promoted/ 等の成果物は review より後の Step で生成されるため、review 時点では存在せず、review 対象は evaluation-report.md のみとなる。
+
+### 正規所有者と参照関係
+
+| 意味 | 正規所有者 |
+|---|---|
+| 経路D の発動条件、挿入位置、戻り先、Step 6 戻しループ | 本 SPEC（learning-promote command SPEC） |
+| 候補判断基準、内部手続き（候補確定位置、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細） | `agentdev-learning-pipeline` domain skill SPEC（ACT-SPEC-013） |
+| 共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件、停止条件、呼出失敗時取扱い） | `agentdev-adversarial-review` SPEC（REQ-014） |
 
