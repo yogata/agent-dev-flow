@@ -9,7 +9,7 @@
 個別 REQ/SPEC は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=adr-baseline-count -->
-現行の承認済み ADR は6件である。
+現行の承認済み ADR は6件、提案中の ADR は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=adr-baseline-table -->
@@ -21,6 +21,7 @@
 | ADR-004 | 差し替え可能な I/O 境界 | accepted | 2026-07-25 |
 | ADR-006 | inspect 3-command 構成への正規化 | accepted | 2026-07-27 |
 | ADR-007 | Artifact Graph 標準化と配布スキル昇格 | accepted | 2026-08-08 |
+| ADR-008 | case-auto の限定的親判断解決（bounded parent decision resolution） | proposed | 2026-08-09 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -44,6 +45,7 @@
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=adr-status-proposed -->
+- [ADR-008](ADR-008.md)（case-auto の限定的親判断解決（bounded parent decision resolution））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -74,6 +76,7 @@
 ### ワークフロー・委譲契約
 
 - [ADR-003](ADR-003.md)（req_draft ソフトコントラクト原則）
+- [ADR-008](ADR-008.md)（case-auto の限定的親判断解決、bounded parent decision resolution）
 
 Decision Map（現行 ADR と過去版 ADR の履歴上の関連）。
 
@@ -87,6 +90,8 @@ Decision Map（現行 ADR と過去版 ADR の履歴上の関連）。
 | ADR-006 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定（inspect-extensions 廃止後の責務移管先） |
 | ADR-007 | supersedes-spec | docs/specs/local/artifact-graph.md | 現行 SPEC「対象外」節を撤回し、標準配布スキルへ昇格。後継 SPEC は docs/specs/skills/agentdev-artifact-graph.md |
 | ADR-007 | relates-to | ADR-002 | 配布物原本は src/opencode/ へ配置する原則に従う |
+| ADR-008 | relates-to | ADR-001 | case-auto 自走境界（決定4）の適用範囲内で bounded parent decision resolution を確定 |
+| ADR-008 | relates-to | v2:ADR-0112, v2:ADR-0138 | case-auto 判断委譲に関する過去版合意履歴 |
 
 ## 関連 REQ
 
@@ -99,6 +104,7 @@ Decision Map（現行 ADR と過去版 ADR の履歴上の関連）。
 | ADR-005 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Project Extensions Architecture（.agentdev/extensions/** によるプロジェクト固有追加）。ADR-006 により superseded |
 | ADR-006 | [REQ-010](../requirements/REQ-010.md), [REQ-002](../requirements/REQ-002.md) | inspect 3-command 構成への正規化（inspect-extensions 廃止、extension 検査の3層責務分離） |
 | ADR-007 | [REQ-012](../requirements/REQ-012.md), [REQ-013](../requirements/REQ-013.md), [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Artifact Graph 標準化と配布スキル昇格（open extensibility、project/self-hosting augmentation、fail-open、決定論性） |
+| ADR-008 | [REQ-006](../requirements/REQ-006.md), [REQ-014](../requirements/REQ-014.md), [REQ-003](../requirements/REQ-003.md) | case-auto の限定的親判断解決（bounded parent decision resolution、REQ-006-112〜114、REQ-014-009/010、REQ-003-008/009/010 と整合） |
 
 ## 過去版の履歴基盤
 

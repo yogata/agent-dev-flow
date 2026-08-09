@@ -38,7 +38,7 @@ AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [�
 
 ## ADR
 
-現行 ADR は ADR-001 から ADR-007 の7件である。詳細は [ADR インデックス](adr/README.md) 参照。
+現行 ADR は ADR-001 から ADR-008 の8件である（ADR-008 は proposed）。詳細は [ADR インデックス](adr/README.md) 参照。
 
 | ADR | タイトル |
 |---|---|
@@ -49,6 +49,7 @@ AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [�
 | [ADR-005](adr/ADR-005.md) | Project Extensions Architecture（superseded by ADR-006） |
 | [ADR-006](adr/ADR-006.md) | inspect 3-command 構成への正規化 |
 | [ADR-007](adr/ADR-007.md) | Artifact Graph 標準化と配布スキル昇格 |
+| [ADR-008](adr/ADR-008.md) | case-auto の限定的親判断解決（bounded parent decision resolution）（proposed） |
 
 ## 仕様（SPEC）
 
