@@ -162,6 +162,27 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 | 委譲起動の具象実装（起動方式、worktree 取り扱い、PR 作成と URL 受領、result 受領、evidence 確認、timeout/ 中断、委譲プロンプト構築例、委譲プロンプト雛形）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
 | 委譲プロトコルと category 設計（`writing` category と発火スキルの相互作用、`unspecified-high` 推奨根拠、category 選定ガイドライン、MUST NOT DO 必須化）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
 | 委譲起動失敗、異常終了時の事後処理（worktree git status 確認、変更残留時の分類、残留箇所の grep 検出、手動修正または PR 化）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
+| 経路G の adapter 委譲内 adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移の実行時詳細手順、候補判断基準、呼出失敗時の取扱い）が必要な場合 | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
+
+## adversarial-review 統合（経路G: adapter 委譲内）
+
+本スキルは case-run 経路G（REQ-015）における adapter 委譲内の adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。正規原本は `agentdev-case-run-execution-adapter` SPEC「adversarial-review 統合（実装方針→review→結果反映）」節である（REQ-014-003、REQ-014-011）。本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`「adversarial-review 統合（経路G）」節を参照。
+
+呼出元（case-run command）と本スキルの主な契約（詳細は SPEC と reference を正とする）:
+
+| 契約 | 要件 | 概要 |
+|---|---|---|
+| 実装方針の形成と限定 | REQ-015-010 | 委譲内で既確定 Issue/REQ/ADR/SPEC を実現する内部選択として実装方針を形成する。case-run 本体は形成しない |
+| 実施位置 | REQ-015-010 | 最初の実装変更前に実施する（実装、検証、PR 作成より前） |
+| 委譲内 review 呼出 | REQ-015-001/002 | adapter 委譲内で実行担当サブエージェントが発動条件判定（ユーザー明示指定）と review 呼出を分離して実施する |
+| blocked 遷移（実装方針限定違反） | REQ-015-010 | 実装方針が既確定文書の変更、追加、撤回を必要とする場合は blocked へ遷移する |
+| blocked 遷移（要件/仕様問題） | REQ-015-011 | 要件、仕様問題を検出した場合は勝手に仕様変更せず blocked へ遷移する |
+| blocked 遷移（unresolved 残存） | REQ-014-009 | unresolved な本質的争点またはユーザー判断事項が残る場合は実装の最初の変更へ進まず blocked へ遷移する |
+| 従来フロー維持 | REQ-015-003 | 発動条件非該当時、呼出失敗時は委譲内の従来フロー（実装方針形成、実装、検証、PR 作成）を維持する |
+| accepted finding 反映 | REQ-014-006 | accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務 |
+| 再 review 条件 | REQ-014-007 | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review SPEC） |
+| 呼出失敗時の扱い | REQ-014-010 | silent skip 禁止、従来フロー維持（正は adversarial-review SPEC） |
+| 副作用境界 | REQ-014-004/005 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review SPEC、delegation-contracts SPEC） |
 
 ## See Also
 

@@ -79,6 +79,22 @@ case-run が使用する検査ツール（integrity 契約 SPEC「Workflow × �
 
 **case-run が直接行わない（実行担当サブエージェントの責務）**: work plan生成、実装実行、TDD、乖離検出（QG-3）、specs更新、関連ドキュメント整合性確認、ローカル検証、PR本文作成、PR作成、デプロイ検証。**実行担当サブエージェントへの引き渡し**: 割り当てられた1 Issue の Issue番号、worktree root（相対パス指定、worktree内制約）、ブランチ名。**PR URL 受領**: 実行担当サブエージェントが直接 PR 作成を行い、PR URL を委譲 result として返却する（PR URL フォールバック検索は使用しない）。**外部実行ハーネスの中間成果物**: plan artifact 等の中間成果物を AgentDevFlow の永続成果物として扱わない、最終結果は PR URL で受領する。**完了条件チェックボックス**: 実行担当サブエージェントは完了条件チェックボックスを更新しない（case-close QG-4 の責務）。**Findings/Capture 候補**: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` に記録する。**SPEC確定候補**: 実装時に発見された SPEC レベルの詳細（schema、enum、判定表、内部アルゴリズム等）は、実行担当サブエージェントが PR 本文の `## SPEC確定候補` セクションに記録する（`## Findings / Capture候補` とは別セクション、混在させない）。SPEC確定候補は case-close Step 3 で SPEC 確定チェックの入力となる
 
+### Step 6-1: adapter 委譲内 adversarial-review 統合（経路G、REQ-015-010/011）
+
+case-run 経路G の adversarial-review 挿入境界。本 Step は case-run 本体の Step 構造へ review 呼出を直接挿入せず、Step 6 委譲内で実施される review 統合を宣言する。挿入境界、委譲内実施、実装方針限定、blocked 遷移の正規所有者は case-run command SPEC「adversarial-review 挿入境界（経路G: adapter 委譲内）」節であり、本 Step は実行時投影先である。adapter 委譲内の内部手続き（実装方針形成、review 呼出、結果反映、blocked 遷移）の詳細は `agentdev-case-run-execution-adapter` スキル（SPEC「adversarial-review 統合（実装方針→review→結果反映）」節、references/adversarial-review-integration.md）を参照。
+
+**case-run 本体は実装方針を生成・審査しない（REQ-015-010）**: 実装方針の形成、adversarial-review 呼出、結果反映は Step 6 委譲内で agentdev-case-run-execution-adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体（Step 1〜8 の orchestration）が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで adapter 委譲内の結果を受領する。
+
+**実装方針限定（REQ-015-010）**: adapter 委譲内で形成する実装方針は、既確定 Issue 本文、REQ、ADR、SPEC を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順等）に限定する。実装方針は既確定文書へ矛盾しない内部選択の範囲内で review 審議対象となる。実装方針が既確定 Issue/REQ/ADR/SPEC の変更、追加、撤回を必要とする場合、実行担当サブエージェントは実装を開始せず blocked へ遷移する。
+
+**blocked 遷移（REQ-015-010、REQ-015-011）**: adapter 委譲内で次のいずれかに該当する場合、実行担当サブエージェントは result を `blocked` として返却する。(1) 実装方針が既確定 Issue/REQ/ADR/SPEC の変更、追加、撤回を必要とする（REQ-015-010）。(2) 要件、仕様に問題（欠落、矛盾、曖昧さ、実現不可能な条件等）を検出した（REQ-015-011）。(3) adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない（REQ-014-009）。blocked 詳細本文は Issue コメントに SSoT として記録され、Step 7 で処理される。実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず、必ず blocked 経路へ入る（G02）。
+
+**発動条件（REQ-015-002）**: adversarial-review は任意助言手段であり、ユーザーが明示的に指定した場合にのみ発動する（REQ-014-001、REQ-015-002）。発動条件判定は adapter 委譲内で実行担当サブエージェントが行う。case-run 本体は発動条件の有無を判定、伝達しない。
+
+**従来フロー維持（REQ-015-003）**: 発動条件非該当時（ユーザー明示指定なし）、呼出失敗時（REQ-014-010）のいずれの場合も、adapter 委譲内の従来フロー（実装方針形成、実装、検証、PR 作成）を維持する。review 呼出を行わず、実装方針形成から直接実装、検証、PR 作成へ進む。case-run 本体の従来フロー（Step 1〜8）も維持し、Step 6 委譲の結果は Step 7 で4状態として受領する。
+
+**accepted finding 反映と再 review（REQ-014-006/007）**: accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務である。反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証を再実行し、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる。同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない。
+
 ### Step 7: 実行担当サブエージェント result 処理
 
 実行担当サブエージェントが返す4状態（`agentdev-case-run-execution-adapter` の result 契約）のいずれかを処理する:
