@@ -997,3 +997,63 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
+---
+
+## 2026-08-09: 移行計画 §5.3 の明示対象不足による壊れた fixture 修復見送りリスク
+
+- **問題事象**: 移行計画 §5.3 で `commands_error_cases.test.ts` の修復を明示したが、`commands_structure.test.ts` と `command_fixtures.test.ts` も同様の文字化け・改行崩壊があった。§5.3 は前者のみを明示対象としたが、壊れた fixture の修復としては後者2件も含めて対処すべきだった
+- **発生局面**: 実装（Wave 2 WP-1 case-run、PR #1933 作成時）
+- **検知方法**: PR #1933 本文「Findings / Capture候補」セクション learning の自己申告。実装修復中に §5.3 明示対象外の fixture にも同種の文字化け・改行崩壊を発見
+- **根本原因**: 移行計画の事前調査が壊れた fixture を網羅せず、代表例のみを明示対象とした。同種の問題を持つファイルの横展開確認が計画段階で実施されなかった
+- **自律対応内容**: PR #1933 で §5.3 明示対象外の `commands_structure.test.ts`、`command_fixtures.test.ts` も併せて修復し、新 frontmatter 契約（description 単一）へ適合させた
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（移行計画の記載精度の改善候補。SPEC/REQ 本文の変更は伴わない）
+- **横展開観点**: 移行計画や要件定義で「代表例を明示」する全ケースで、同種の問題を持つ対象の横展開確認を計画段階で実施すべき。明示対象を「例示」として扱い、同種調査を暗黙に含意させる記述が有効
+- **再発条件**: 移行計画や要件定義で、同種の問題を持つ複数対象のうち代表例のみを明示し、横展開確認を省いた場合
+- **予防策候補**: 移行計画の対象一覧に「同種問題の横展開確認」を暗黙の前提とする旨を記載、または明示対象を「例示」と注記する運用ルールを定める
+- **想定反映先**: 移行計画テンプレート（`.omo/plans/` 配下）の対象一覧記述ガイドライン、または `docs/guides/` の計画策定解説文書
+- **関連**: Epic #1924、Issue #1926（WP-1）、PR #1933、移行計画 `.omo/plans/agentdev-migration-2026-08-05.md` §5.3
+- **タグ**: `#learning` `#migration-plan` `#fixture-repair` `#scope-precision` `#horizontal-expansion`
+- **移動日**: 2026-08-09
+- **処分判定**: deferred（出現1件・反映先曖昧・移行一回限り・情報断片的。次回 learning-promote で再評価）
+
+---
+
+## 2026-08-09: command 薄型化による既存参照の行移動で baseline 比較が新規 delta を生む制約
+
+- **問題事象**: WP-4 command 薄型化で `case-run.md`、`case-close.md` 内の `repo-agentdev-integrity` スクリプト呼出し参照行が、周辺行の大規模削除に伴って元の行位置から別行へ移動した。IR-055 RuntimeReference baseline は行位置で既知参照を管理しているため、機能的に同一の参照が baseline 比較で新規 delta（unmanaged NG）として検出された。check_integrity.ts の NG 件数が 3件（IR-061 既知）から 5件（IR-061 既知3 + IR-055 delta 2）へ増加した
+- **発生局面**: 実装（WP-4 case-run、command 薄型化による大規模行削除・移動時）
+- **検知方法**: WP-4 case-run で check_integrity.ts の before（HEAD: 18002bfe）と after（HEAD: 90592b53）delta を比較し、NG +2件が IR-055 RuntimeReference delta であることを特定。PR #1936 本文「## 残リスク / follow-up」へ記録
+- **根本原因**: IR-055 RuntimeReference baseline が参照の「存在」ではなく「行位置」で既知性を管理している。command 薄型化のように行数を大幅に削減するリファクタでは、内容が同一でも参照行が移動し baseline との不一致が生じる。baseline は commit 単位で更新される前提だが、TASK MUST NOT DO「baseline を修正しない」により薄型化 PR 内で解消できない
+- **自律対応内容**: PR #1936 では baseline を更新せず（MUST NOT DO 拘束）、IR-055 delta 2件を PR 本文「残リスク / follow-up」へ明示的に記録し、WP-6（#1931 索引再生成・統合検証）での一括解消または独立 baseline メンテナンス Issue へ委譲することを推奨。機能的変更ではないことを PR 本文で証明（WP-2 PR #1934 で対応済みの `repo-*` 参照の行移動のみ）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（baseline 運用設計の改善候補。REQ/ADR/SPEC 本文の変更は伴わない。IR-055 baseline の管理粒度＝行位置ベースか内容ベースかは checker 実装の設計事項）
+- **横展開観点**: 行位置ベースで既知参照を管理する checker（RuntimeReference baseline 等）全般で、大規模リファクタ・縮約を実施すると既存参照の行移動が delta として検出される。command 薄型化、skill 統合、ファイル分割・マージ等の構造変更を伴う作業で同様の制約が顕在化する
+- **再発条件**: 行位置ベースの baseline で参照を管理する checker が存在する状態で、当該 baseline 対象ファイルの行数を大幅に削減・再構成するリファクタを実施する場合
+- **予防策候補**: (a) baseline の管理粒度を「行位置」から「参照識別子（ファイルパス + 参照名）」へ移行し行移動に鈍感にする、(b) 大規模リファクタ PR の完了条件へ「baseline 更新または delta 許容の明示」を含める、(c) checker 側で行移動のみの delta を info/warning へ再分類する option を追加する
+- **想定反映先**: repo-agentdev-integrity SPEC / check_integrity.ts（baseline 管理粒度の見直し候補）、agentdev-workflow-lifecycle（大規模リファクタ時の baseline 取扱手順）、移行計画 `.omo/plans/agentdev-migration-2026-08-05.md` §10.6（baseline 新規追加 0件 の運用解釈）
+- **関連**: Epic #1924、Issue #1929（WP-4）、PR #1936、`src/integrity/baselines/*.json`、`.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`
+- **タグ**: `#learning` `#baseline` `#integrity-checker` `#command-thinning` `#line-position-tracking` `#refactor-delta` `#wp-4` `#migration-2026-08`
+- **移動日**: 2026-08-09
+- **処分判定**: deferred（出現1件・費用対効果やや割高・技術判断含むが未成熟。大規模リファクタ再発時に再評価。ADR 候補は具体性不足で見送り）
+
+---
+
+## 2026-08-09: bun test の Bun.spawnSync は Windows 環境で CLI 引数パース順序に注意が必要
+
+- **問題事象**: bun test で CLI 引数をパースするテストを Bun.spawnSync 経由で実行した際、Windows 環境でフラグと値のペアをスキップする順序が期待と異なり、テストが意図した引数を認識しなかった
+- **発生局面**: 実装（agentdev-artifact-graph 標準スキルのテスト作成時、CLI エントリポイント build_graph/check_graph/query_graph の引数解釈を検証するテスト）
+- **検知方法**: PR #1955 実装者が Windows 環境でテストを実行し引数スキップ挙動の差異へ遭遇、Findings セクションへ自己申告した
+- **根本原因**: Bun.spawnSync の引数配列処理が Windows ではプラットフォーム固有の挙動を持ち、フラグ+値のペアを正しくスキップするためにパース順序を明示する必要があった
+- **自律対応内容**: フラグ+値のペアを正しくスキップするようパース処理を修正し対応
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし。実装・テスト環境依存知見であり、正規仕様の要件は変更しない
+- **横展開観点**: Bun.spawnSync 経由で CLI の引数処理を検証するテスト全般で、Windows と POSIX で引数スキップ順序の差異を考慮する必要がある
+- **再発条件**: bun test で CLI 引数解釈を検証し、かつ実行環境が Windows の場合
+- **予防策候補**: Bun.spawnSync の引数処理テストは Windows と POSIX 両方で実行し差異を検出する。フラグ+値のペアスキップは位置ではなくトークン種別で判定する
+- **想定反映先**: agentdev-artifact-graph のテスト設計、Bun.spawnSync を用いる CLI テストのマルチプラットフォーム対応手順
+- **関連**: Epic #1948、Issue #1949、PR #1955、`src/opencode/skills/agentdev-artifact-graph/scripts/tests/`
+- **タグ**: `#learning` `#bun` `#bun-test` `#windows` `#cli-args` `#cross-platform`
+- **移動日**: 2026-08-09
+- **処分判定**: deferred（出現1件・環境依存・具体性やや不足。Bun.spawnSync CLI テスト再発時に具体化）
