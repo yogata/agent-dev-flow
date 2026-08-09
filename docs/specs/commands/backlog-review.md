@@ -138,6 +138,40 @@ backlog-review は全 RU frontmatter に `tentative_classification` を付与す
 
 ## adversarial-review 挿入境界（経路E）
 
-経路E の review 挿入境界: 構成 → review → 承認の順序、矛盾は既存矛盾検出へ渡す、
-review 内で自動解決しないことを規定する。
+本節は backlog-review における adversarial-review caller integration（REQ-015 経路E）の挿入境界を正典として所有する（REQ-014-011）。共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は経路E 固有の挿入位置、発動条件、順序、矛盾取扱いのみを所有する。adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review SPEC を正とし、本節で再定義しない。候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の正規所有者は agentdev-backlog-integration SPEC とし、本節は参照する。
+
+### 挿入境界と Step 構造（REQ-015-001）
+
+backlog-review の現行 Step 構造へ review 挿入境界を次のとおり一意に特定する。発動条件判定 Step と review 呼出 Step を分離する（REQ-015-001）。本節は挿入境界の正典であり、`.opencode/commands/agentdev/backlog-review.md` の Step 4-1 が実行時投影先となる。
+
+| 段階 | 対応 Step | 役割 |
+|---|---|---|
+| 構成 | Step 3（分析 + 暫定分類付与）、Step 4（統合・分割判定 + depends_on 依存解決） | review 対象となる RU 構成案を確定する |
+| 発動条件判定 | Step 4 完了直後、Step 5 開始前（Step 4-1） | ユーザー明示指定の有無を判定する |
+| review 呼出 | 発動条件該当時、Step 5 開始前（Step 4-1） | adversarial-review を起動し、RU 構成案を審議対象へ渡す |
+| 承認 | Step 4 承認（矛盾なし時の単一承認）、Step 5（矛盾検出時の追加判断） | review 結果を踏まえユーザー承認を確定する |
+
+### 構成、review、承認の順序（REQ-015-008）
+
+経路E は構成、review、承認の順で進む（REQ-015-008）。review は構成（Step 3、Step 4）の完了後、承認（Step 4 承認、Step 5 追加判断）の前に挿入する。review を構成前に、または承認後に挿入しない。
+
+### 発動条件（REQ-015-002）
+
+adversarial-review は任意助言手段であり、ユーザーが明示的に指定した場合にのみ発動する（REQ-014-001、REQ-015-002）。backlog-review は review 発動を前提とせず、明示指定がない場合は review 呼出 Step を経由せず従来フロー（Step 5 以降）へ進む。
+
+### 従来フロー維持（REQ-015-003）
+
+発動条件非該当時（ユーザー明示指定なし）、呼出失敗時（REQ-014-010）のいずれの場合も、従来フロー（Step 1〜9）を維持する（REQ-015-003）。review 挿入境界は既存 Step を追加、削除、並べ替えせず、発動条件判定と review 呼出 Step を分離した形で現行 Step 構造へ挿入する。
+
+### 矛盾の扱い（REQ-015-008）
+
+adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は backlog-review の既存矛盾検出（Step 5、agentdev-backlog-integration 矛盾検出ロジック）へ渡す。adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛盾の解決、採用、却下、partial success 扱いは既存矛盾検出と HITL（REQ-003-009）へ委ねる。review 内で矛盾が発生したことを理由に対象 RU を自動除外、自動承認しない。
+
+### 戻り先と反映責務
+
+accepted finding の RU 構成案への反映は backlog-review 呼出元の責務である（REQ-014-006）。adversarial-review は finding を提示し、合意候補を形成するが、RU 本文、frontmatter、統合判定への反映を自身では行わない。反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出の再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。unresolved な本質的争点またはユーザー判断事項が残る場合、RU 生成（Step 6）、採用済み成果物削除（Step 7）、Git 永続化（Step 8）等の後続不可逆処理へ進まない（REQ-014-009）。
+
+### 正規所有者マトリックス参照
+
+本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、agentdev-backlog-integration SPEC「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。backlog-review command 固有の挿入境界（発動条件、Step 構造、順序、矛盾取扱い）のみを本節が所有し、候補判断基準、内部手続きの詳細は agentdev-backlog-integration SPEC を正とする。
 
