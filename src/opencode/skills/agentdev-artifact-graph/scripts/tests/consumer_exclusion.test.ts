@@ -48,10 +48,10 @@ status: accepted
 ---
 # Consumer feature
 
-See [decision](../adr/ADR-001.md).
+See [decision](../decisions/DEC-001.md).
 `,
-    "docs/adr/ADR-001.md": `---
-id: ADR-001
+    "docs/decisions/DEC-001.md": `---
+id: DEC-001
 title: Consumer architecture
 status: accepted
 ---
@@ -93,7 +93,7 @@ name: agentdev-artifact-graph
 description: Build Artifact Graph
 ---
 # agentdev-artifact-graph
-Refs: REQ-012, ADR-007
+Refs: REQ-012, DEC-007
 `,
     ".opencode/skills/agentdev-doc-writing/SKILL.md": `---
 name: agentdev-doc-writing
@@ -249,7 +249,7 @@ describe("TS-006 (AG-005): consumer Graph excludes all distribution artifact pat
 
     expect(graph.manifest.indexed_paths).toEqual([
       "docs/requirements",
-      "docs/adr",
+      "docs/decisions",
       "docs/specs",
     ])
     for (const indexed of graph.manifest.indexed_paths) {
@@ -268,7 +268,7 @@ describe("TS-006 (AG-005): consumer Graph excludes all distribution artifact pat
     const nodes = await jsonLines(join(output, "nodes.jsonl"))
     const nodeIds = nodes.map((node) => String(node["id"] ?? ""))
     expect(nodeIds).toContain("requirement:REQ-001")
-    expect(nodeIds).toContain("adr:ADR-001")
+    expect(nodeIds).toContain("decision:DEC-001")
     expect(nodeIds).toContain("specification:docs/specs/feature.md")
     expect(nodeIds.some((id) => id.includes("command:"))).toBe(false)
     expect(nodeIds.some((id) => id.includes("skill:"))).toBe(false)

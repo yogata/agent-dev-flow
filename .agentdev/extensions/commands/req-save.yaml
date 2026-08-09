@@ -27,6 +27,6 @@ rules: []
 checks: []
 
 acceptance_gates:
-  - 保存した REQ/ADR が docs/requirements/, docs/adr/ のインデックスに存在すること
+  - 保存した REQ/Decision が docs/requirements/, docs/decisions/ のインデックスに存在すること
 
 must_not: []

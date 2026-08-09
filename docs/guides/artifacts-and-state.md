@@ -6,19 +6,19 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 
 | 種別 | 格納先 | 役割 |
 |------|--------|------|
-| REQ | `docs/requirements/REQ-{NNN}.md` | 要件定義の永続基準 |
-| ADR（現行） | `docs/adr/ADR-{NNN}.md` | 現行基準の技術判断記録 |
+| REQ | `docs/requirements/REQ-{NNNN}.md` | 要件定義の永続基準 |
+| Decision（現行） | `docs/decisions/DEC-{NNN}.md` | 現行基準の技術判断記録 |
 | SPEC | `docs/specs/**/*.md` | 実装者が参照する現在仕様（commands/skills/workflows の3層と基盤6ドメイン） |
 | guides | `docs/guides/*.md` | 利用者向けの参照用読み物 |
 
-**優先順位**: REQ > ADR > SPEC。
+**優先順位**: REQ > Decision > SPEC。
 guides は基準への導線を提供する。
 基準文書と矛盾する記述がある場合は基準を優先する。
 
 ### 参照ルール
 
-- REQ → ADR、ADR → ADR、Issue → ADR の参照を許可
-- ADR → Issue の逆参照は不可
+- REQ → Decision、Decision → Decision、Issue → Decision の参照を許可
+- Decision → Issue の逆参照は不可
 - 文書間矛盾時は REQ を優先
 
 ## コマンド、スキル体系
@@ -42,7 +42,7 @@ Script は決定的で単体テスト可能な処理に限定する。
 |------|--------|
 | Issue/コメント/PR | `agentdev-workflow-templates/templates/` |
 | REQ | `agentdev-req-file-manager/templates/` |
-| ADR | `agentdev-adr-file-manager/templates/` |
+| Decision | `agentdev-decision-file-manager/templates/` |
 
 ## ディレクトリ構造
 

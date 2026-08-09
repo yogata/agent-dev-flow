@@ -1,6 +1,6 @@
 # verification feedback 機構
 
-Artifact Graph と独立確認結果の差異を検出、分類、是正、回帰検証する機構（REQ-012-011、REQ-012-012、ADR-007 decision 8, 11）。
+Artifact Graph と独立確認結果の差異を検出、分類、是正、回帰検証する機構（REQ-012-011、REQ-012-012、DEC-007 decision 8, 11）。
 
 ## 原則
 
@@ -64,7 +64,7 @@ bun .opencode/skills/agentdev-artifact-graph/scripts/src/verify_graph.ts --root 
       "classification": "canonical_defect",
       "kind": "unresolved_link",
       "path": "docs/requirements/REQ-002.md",
-      "detail": "Markdown link target does not exist on filesystem: ../adr/ADR-999.md (line 5)"
+      "detail": "Markdown link target does not exist on filesystem: ../decisions/DEC-099.md (line 5)"
     }
   ]
 }

@@ -94,7 +94,7 @@ tentative_classification（v2:REQ-0155-003 の7値）は文書種別の暫定分
 
 ### 後方互換運用
 
-分類根拠は soft-contract（ADR-003）として扱い、欠落時は unknown 既定値で警告する後方互換運用をとる。分類根拠が欠落した旧 RU も unknown 既定値で受け入れる。欠落により RU を拒否しない。具体的なシリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」に従う。
+分類根拠は soft-contract（DEC-003）として扱い、欠落時は unknown 既定値で警告する後方互換運用をとる。分類根拠が欠落した旧 RU も unknown 既定値で受け入れる。欠落により RU を拒否しない。具体的なシリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」に従う。
 
 ### 暫定扱いの明記
 

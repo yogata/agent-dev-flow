@@ -245,7 +245,7 @@ function profileFor(workflow: Workflow): WorkflowProfile {
         "req-what-how-boundary",
         "requirements-readme-sync",
         "docmap-update-required",
-        "adr-crossref-update-required",
+        "decision-crossref-update-required",
         "spec-readme-update-required",
         "obsolete-spec-path",
         "legacy-local-generation-vocab",
@@ -276,7 +276,7 @@ function profileFor(workflow: Workflow): WorkflowProfile {
       appliesTo: (rel) =>
         /^docs\/specs\//.test(rel) ||
         /^docs\/requirements\//.test(rel) ||
-        /^docs\/adr\//.test(rel) ||
+        /^docs\/decisions\//.test(rel) ||
         /^docs\/guides\//.test(rel) ||
         rel === "AGENTS.md" ||
         rel === "README.md" ||
@@ -867,7 +867,7 @@ function runWorkflowChecks(
   // extensions_check_required: extension が参照する対象（REQ/ADR/SPEC）の lifecycle
   // または索引 frontmatter 値の変更で true。
   const extensionsCheckRequired = changeDescriptors.some((d) => {
-    if (!/^docs\/(requirements\/REQ-|adr\/ADR-|specs\/).*\.md$/.test(d.relPath))
+    if (!/^docs\/(requirements\/REQ-|decisions\/DEC-|specs\/).*\.md$/.test(d.relPath))
       return false;
     return isIndexChange(d);
   });

@@ -31,7 +31,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 - `references/document-boundaries.md`（文書種別責務）
 - `references/req-line-quality.md`（要件行の品質）
-- `references/adr-writing-quality.md`（ADR 本文の品質）
+- `references/decision-writing-quality.md`（Decision 本文の品質）
 - `references/spec-writing-quality.md`（SPEC 本文の品質）
 - `references/rewrite-patterns.md`（検出→書き換え）
 - `references/review-output.md`（査読出力形式）
@@ -42,31 +42,31 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 ## 現在の動作
 
-- 静的査読のみを担当。実行時の動的判断（要件分析、ADR 要否判定）は `agentdev-req-analysis`、`agentdev-adr-guidelines` が担う（v2:REQ-0140-024）
+- 静的査読のみを担当。実行時の動的判断（要件分析、Decision 要否判定）は `agentdev-req-analysis`、`agentdev-decision-guidelines` が担う（v2:REQ-0140-024）
 - ファイル保存、commit、push は行わない。査読提案を返すのみ（v2:REQ-0140-022）
 - 未合意事項を確定しない。問題箇所を分類し修正文案または移送先候補として提示する（v2:REQ-0140-021）
 
 ## 対象外
 
 - コード実装、テスト実行
-- REQ/ADR 番号付与、APPEND/UPDATE/CREATE 判定（`agentdev-req-file-manager` / `agentdev-adr-file-manager` 担当）
-- ADR 必要性判定（`agentdev-adr-guidelines` 担当）
+- REQ/Decision 番号付与、APPEND/UPDATE/CREATE 判定（`agentdev-req-file-manager` / `agentdev-decision-file-manager` 担当）
+- Decision 必要性判定（`agentdev-decision-guidelines` 担当）
 - command 手順設計、Issue/PR CRUD
 - 要件分析（`agentdev-req-analysis` 担当）
 - カジュアルな文章、広告、詩
 
 ## 検証観点
 
-- 文書種別責務が妥当か（REQ/ADR/SPEC/guide/README の配置）
+- 文書種別責務が妥当か（REQ/Decision/SPEC/guide/README の配置）
 - 要件行が主語、対象、状態、検証可能性、独立性、肯定文主文を満たすか
-- ADR 本文が意思決定文書として成立しているか
+- Decision 本文が意思決定文書として成立しているか
 - SPEC 本文が詳細仕様の置き場として成立しているか
 - `japanese-tech-writing` 規範（LLM っぽい表現の禁止、空虚な形容、空虚な動詞等）への適合
 
 ## See Also
 
 - [agentdev-req-analysis.md](agentdev-req-analysis.md)（要件分析（動的判断））
-- [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)（ADR 要否判定（動的判断））
+- [agentdev-decision-guidelines.md](agentdev-decision-guidelines.md)（Decision 要否判定（動的判断））
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（配置基準、用語政策 原本 SPEC）
 - v2:REQ-0140（文書品質ゲート）
 

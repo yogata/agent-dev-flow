@@ -9,13 +9,13 @@ updated: "2026-07-27"
 
 ## 目的
 
-`agentdev-gh-cli` は AgentDevFlow の GitHub I/O を一箇所に集約する中央集権的な I/O 境界である（REQ-011, ADR-004）。
+`agentdev-gh-cli` は AgentDevFlow の GitHub I/O を一箇所に集約する中央集権的な I/O 境界である（REQ-011, DEC-004）。
 command と skill は GitHub CLI（gh）コマンドを直接記述せず、`agentdev-gh-cli` の手続きへ委譲する。
-ローカル版は `agentdev-gh-cli` を差し替えることで GitHub 非依存の運用を実現する（v2:REQ-0150, ADR-004）。
+ローカル版は `agentdev-gh-cli` を差し替えることで GitHub 非依存の運用を実現する（v2:REQ-0150, DEC-004）。
 
 ## 責務定義
 
-`agentdev-gh-cli` は GitHub Issue / PR に対する I/O 手続きと VERIFY を担当する（REQ-011, ADR-004 decision #2）。
+`agentdev-gh-cli` は GitHub Issue / PR に対する I/O 手続きと VERIFY を担当する（REQ-011, DEC-004 decision #2）。
 本文生成、完了判定、Epic 依存判定、capture 分類は担当しない。
 これらは domain skill の責務である。
 
@@ -37,7 +37,7 @@ command と skill は GitHub CLI（gh）コマンドを直接記述せず、`age
 
 ## 操作契約
 
-`agentdev-gh-cli` は以下の手続きを提供する（REQ-011, ADR-004 decision #3）。
+`agentdev-gh-cli` は以下の手続きを提供する（REQ-011, DEC-004 decision #3）。
 各手続きの引数、戻り値、エラー扱いの詳細は references を参照。
 
 | 手続き | 入力 | 出力 |
@@ -108,7 +108,7 @@ gh WRITE 操作を行う全 command/ skill（case-open、case-run、case-close�
 ## Windows 環境固有手続き
 
 Windows 環境（Windows PowerShell 5.x / pwsh 7）での gh CLI 実行に特有の手続きを以下5項目として定義する。
-本 SPEC は各手続きの存在と `references/standard-procedures.md` への参照関係のみを定め、詳細実装（gh CLI フラグ、PowerShell 式、ファイル配置、cleanup 手順）は同ファイルへ委譲する（REQ-011、ADR-004 decision #3）。
+本 SPEC は各手続きの存在と `references/standard-procedures.md` への参照関係のみを定め、詳細実装（gh CLI フラグ、PowerShell 式、ファイル配置、cleanup 手順）は同ファイルへ委譲する（REQ-011、DEC-004 decision #3）。
 ローカル版は Case ファイル読み書きへ差し替えるため本要件の対象外（gh CLI を使用しない）。
 
 ### 対象手続き（5項目）
@@ -129,7 +129,7 @@ Windows 環境（Windows PowerShell 5.x / pwsh 7）での gh CLI 実行に特有
 
 ## 薄いルーティング入口と references 分離
 
-`agentdev-gh-cli` の SKILL.md は薄いルーティング入口とする（REQ-011, ADR-004 decision #3）。
+`agentdev-gh-cli` の SKILL.md は薄いルーティング入口とする（REQ-011, DEC-004 decision #3）。
 操作契約の詳細、標準版（GitHub 版）の具体的実装手順、VERIFY 観点、リトライロジックは references 配下に分離する。
 
 ### references 構成
@@ -178,9 +178,9 @@ gh 直接記述を検出した場合、`gh-direct-invocation-leak` 分類で報�
 
 ## 差し替え可能性（ローカル版）
 
-ローカル版は `agentdev-gh-cli` を差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（v2:REQ-0150, ADR-004 decision #4, #5）。
-PR 関連手続きはスキップせず、Case ファイルの対応セクションで代替する（ADR-004 decision #5）。
-GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手続き名を保ったまま実装を差し替える方式とする（ADR-004 decision #6）。
+ローカル版は `agentdev-gh-cli` を差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（v2:REQ-0150, DEC-004 decision #4, #5）。
+PR 関連手続きはスキップせず、Case ファイルの対応セクションで代替する（DEC-004 decision #5）。
+GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手続き名を保ったまま実装を差し替える方式とする（DEC-004 decision #6）。
 
 ### 手続きと Case ファイルセクションの対応
 
@@ -227,4 +227,4 @@ WRITE 標準手順（Windows encoding 指定必須、REQ-011-009）を commit �
 - [ローカル Case ファイル](../local/local-case-file.md)
 - [REQ-011](../../requirements/REQ-011.md)（`agentdev-gh-cli` 手続き委譲基盤）
 - v2:REQ-0150（tag `v2.11.0`、ローカル版 `agentdev-gh-cli` 実装）
-- [ADR-004](../../adr/ADR-004.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）
+- [DEC-004](../../decisions/DEC-004.md)（`agentdev-gh-cli` を差し替え可能な I/O 境界として確立）

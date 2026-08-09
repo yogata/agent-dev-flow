@@ -53,8 +53,8 @@ learning-promote が各クラスタに対して判定する廃棄カテゴリ。
 - `.opencode/commands/` 配下の全コマンド
 - `.opencode/skills/` 配下の全スキル
 - `.opencode/skills/agentdev-workflow-templates/templates/` 配下
-- `.opencode/skills/agentdev-req-file-manager/templates/`, `agentdev-adr-file-manager/templates/`, `agentdev-spec-compliance/templates/` 配下
-- `docs/specs/`, `docs/adr/`, `docs/requirements/` 配下
+- `.opencode/skills/agentdev-req-file-manager/templates/`, `agentdev-decision-file-manager/templates/`, `agentdev-spec-compliance/templates/` 配下
+- `docs/specs/`, `docs/decisions/`, `docs/requirements/` 配下
 
 ギャップ分類:
 - **fix gap**: 対策内容に不備、欠落がある
@@ -141,7 +141,7 @@ learning-promote が出力する採用済み成果物の形式。
 | 新規 skill 化 | `.opencode/skills/{new-skill}/SKILL.md` |
 | 新規 command 化 | `.opencode/commands/{new-command}.md` |
 | template 反映 | `.opencode/skills/agentdev-workflow-templates/templates/{template}.md` |
-| ADR 候補 | `docs/adr/ADR-{NNNN}-{name}.md` |
+| Decision 候補 | `docs/decisions/DEC-{NNN}-{name}.md` |
 | spec 候補 | `docs/specs/{domain}/{spec-name}.md` |
 | REQ 候補 | `docs/requirements/REQ-{NNNN}.md` |
 | project-local knowledge | 内容に応じた振り分け（後述参照） |
@@ -156,7 +156,7 @@ project-local knowledge を一律 `.agentdev/learning/project-knowledge.md` に�
 | 作業種別に応じて必要な知識 | `.opencode/skills/<domain>/SKILL.md` |
 | 長い詳細 | `.opencode/skills/<domain>/references/*.md` |
 | 仕様として固定すべき内容 | `docs/specs/**/*.md` |
-| 設計判断 | `docs/adr/*.md` |
+| 設計判断 | `docs/decisions/*.md` |
 | 要件変更 | `docs/requirements/*.md` |
 
 ## Prune 方針

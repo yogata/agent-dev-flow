@@ -22,7 +22,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 
 本スキルは**静的査読**を担う。
-実行時の動的判断（要件分析、ADR要否判定）は `agentdev-req-analysis`、`agentdev-adr-guidelines` が担う。
+実行時の動的判断（要件分析、Decision要否判定）は `agentdev-req-analysis`、`agentdev-decision-guidelines` が担う。
 
 
 ## 原本
@@ -62,9 +62,9 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 | 観点 | 内容 | 参照 |
 |---|---|---|
-| 文書種別責務 | REQ/ADR/SPEC/guide/README の配置が妥当か | [document-boundaries.md](references/document-boundaries.md) |
+| 文書種別責務 | REQ/Decision/SPEC/guide/README の配置が妥当か | [document-boundaries.md](references/document-boundaries.md) |
 | 要件行の品質 | 主語、対象、状態、検証可能性、独立性、肯定文主文 | [req-line-quality.md](references/req-line-quality.md) |
-| ADR 本文の品質 | 意思決定文書として成立しているか | [adr-writing-quality.md](references/adr-writing-quality.md) |
+| Decision 本文の品質 | 意思決定文書として成立しているか | [decision-writing-quality.md](references/decision-writing-quality.md) |
 | SPEC 本文の品質 | 詳細仕様の置き場として成立しているか | [spec-writing-quality.md](references/spec-writing-quality.md) |
 | SKILL.md 構造 | SKILL.md の概要節（description frontmatter）と機能節（`##` セクション群）の重複を検出する。REQ の優先度軸（重複度合い、文書の影響度）に基づき、優先度高位から順に查読する。詳細は SPEC「SKILL 構造」「SKILL.md概要節と機能節の役割分担」参照 | document-type-responsibilities SPEC |
 | 実行主体分類 | 文書内で言及される実行主体（command / skill / subagent / harness）の分類が正確か。誤認（command を skill と呼ぶ、harness を skill と呼ぶ、subagent を skill と呼ぶ）を検出する | [execution-subject-classification.md](references/execution-subject-classification.md) |
@@ -123,9 +123,9 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 ### See Also
 
 - `agentdev-req-analysis`（要件分析、動的判断。doc-writing と責務重複しない）
-- `agentdev-adr-guidelines`（ADR要否判定、動的判断。doc-writing と責務重複しない）
+- `agentdev-decision-guidelines`（Decision要否判定、動的判断。doc-writing と責務重複しない）
 - `agentdev-req-file-manager`（REQファイル管理。番号採番、CREATE/APPEND/UPDATE）
-- `agentdev-adr-file-manager`（ADRファイル管理。番号採番、ライフサイクル）
+- `agentdev-decision-file-manager`（Decisionファイル管理。番号採番、ライフサイクル）
 - `agentdev-skill-authoring`（スキル構造、配置判断）
 - `agentdev-workflow-templates`（ワークフローテンプレート）
 

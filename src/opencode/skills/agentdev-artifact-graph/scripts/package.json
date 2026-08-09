@@ -2,7 +2,7 @@
   "name": "agentdev-artifact-graph-scripts",
   "version": "0.1.0",
   "private": true,
-  "description": "Deterministic Artifact Graph engine: build, check, query, prepare, verify (REQ-012, ADR-007). Pure functions, argv input, stdout JSON output.",
+  "description": "Deterministic Artifact Graph engine: build, check, query, prepare, verify (REQ-012, DEC-007). Pure functions, argv input, stdout JSON output.",
   "type": "module",
   "scripts": {
     "test": "bun test",

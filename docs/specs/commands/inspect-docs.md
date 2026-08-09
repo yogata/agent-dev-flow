@@ -34,7 +34,7 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 
 ## 現在の動作
 
-- Step 1: スキャン対象の収集（`docs/requirements/`, `docs/adr/`, `docs/specs/`, `docs/guides/`, `README.md`, `.opencode/`）
+- Step 1: スキャン対象の収集（`docs/requirements/`, `docs/decisions/`, `docs/specs/`, `docs/guides/`, `README.md`, `.opencode/`）
 - Step 2: REQ 参照 ID 整合性確認（`agentdev-req-structure-diagnostics`）
 - Step 3: 第一参照導線確認（`agentdev-req-structure-diagnostics`）
 - Step 4: 現行/廃止/世代境界確認（`agentdev-req-structure-diagnostics`）

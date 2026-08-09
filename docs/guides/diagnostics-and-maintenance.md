@@ -16,7 +16,7 @@ AgentDevFlow の配布対象外であり、AgentDevFlow 本体リポジトリで
 
 ### 検査対象
 
-REQ/ADR/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/ImplementationPattern 等の検査集合をスキャンする。
+REQ/Decision/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/ImplementationPattern 等の検査集合をスキャンする。
 
 ### 検査内容
 
@@ -26,7 +26,7 @@ REQ/ADR/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/Imple
 - ライフサイクル境界
 - 旧 namespace 残存
 - 実装分類（Implementation Pattern）の診断
-- ADR の現行/廃止済み番号帯の区別（v2:REQ-0112-050）
+- Decision の現行/廃止済み番号帯の区別（v2:REQ-0112-050）
 
 ### 検出事項の分類
 
@@ -41,13 +41,13 @@ REQ/ADR/Skill/Command/Template/Workflow/Link/Canonical/Lifecycle/Namespace/Imple
 | `workflow-gap` | ワークフロー定義の欠落 |
 | `integrity-rule-gap` | 整合性ルール自体の欠落 |
 
-### ADR 関連検査
+### Decision 関連検査
 
-docs-check は ADR を現行の番号帯と廃止済みの番号帯に区別して検査する（v2:REQ-0112-050）:
+docs-check は Decision を現行の番号帯と廃止済みの番号帯に区別して検査する（v2:REQ-0112-050）:
 
-- **現行 ADR**（`docs/adr/ADR-001.md`〜`ADR-{NNN}.md`）: 3桁ID形式。status 遷移の妥当性、参照先 REQ の存在確認、誤分類の兆候検出を検査する
-- v2 歴史的 ADR（`v2:ADR-0001`〜`v2:ADR-0099`）: 4桁ID形式。履歴参照用。`v2:` プレフィックスで明示的に区別し、tag v2.11.0 で参照。Decision Map（`docs/adr/README.md`）で後継関係のみ参照する
-- 廃止済み ADR への履歴参照は、現行根拠としての引用による警告とは区別して扱う
+- **現行 Decision**（`docs/decisions/DEC-001.md`〜`DEC-{NNN}.md`）: 3桁ID形式。status 遷移の妥当性、参照先 REQ の存在確認、誤分類の兆候検出を検査する
+- v2 歴史的 ADR（`v2:ADR-0001`〜`v2:ADR-0099`）: 4桁ID形式。履歴参照用。`v2:` プレフィックスで明示的に区別し、tag v2.11.0 で参照。Decision Map（`docs/decisions/README.md`）で後継関係のみ参照する
+- 廃止済み Decision への履歴参照は、現行根拠としての引用による警告とは区別して扱う
 
 ### 振り分け先の判定
 
@@ -117,7 +117,7 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 
 AgentDevFlow では以下の整合性レイヤーを意識する。
 
-1. **文書間整合性**: REQ → ADR → SPEC → guides の間で矛盾がないこと
+1. **文書間整合性**: REQ → Decision → SPEC → guides の間で矛盾がないこと
 2. **実装整合性**: 実装コード、設定が SPEC と一致していること
 3. **ドメイン状態整合性**: `.agentdev/` 内の成果物がパイプライン境界を守っていること
 

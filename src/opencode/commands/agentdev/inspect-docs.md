@@ -4,7 +4,7 @@ description: docs全体の意味整合性を検出し、検出事項を .agentde
 
 # inspect-docs
 
-docs全体（REQ/ADR/SPEC/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力するコマンド。
+docs全体（REQ/Decision/SPEC/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力するコマンド。
 検査対象を直接修正しない診断を行い、REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、ADR、guides、README の意味診断を含む。
 
 ## 基本原則: 診断専用（検査対象を直接修正しない）
@@ -32,7 +32,7 @@ docs全体（REQ/ADR/SPEC/guides）の意味整合性を診断し、検出事項
 
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
-| `docs/requirements/*.md`、`docs/adr/*.md` | inspect-docs |
+| `docs/requirements/*.md`、`docs/decisions/*.md` | inspect-docs |
 | `docs/specs/**/*.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
 | `docs/guides/*.md`、`README.md` | inspect-docs |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
@@ -55,7 +55,7 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 
 ### Step 1: スキャン対象の収集
 
-`docs/requirements/`、`docs/adr/`、`docs/specs/`、`docs/guides/`、`README.md`、`.opencode/` を収集
+`docs/requirements/`、`docs/decisions/`、`docs/specs/`、`docs/guides/`、`README.md`、`.opencode/` を収集
 ### Step 2: REQ参照ID整合性確認
 
 `agentdev-req-structure-diagnostics` 参照
@@ -67,8 +67,8 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 `agentdev-req-structure-diagnostics` 参照
 ### Step 5: SPEC意味診断
 
-SPEC が REQ/ADR/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認
-### Step 6: ADR意味診断
+SPEC が REQ/Decision/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認
+### Step 6: Decision意味診断
 
 承認済み ADR のみを現行判断の根拠として扱っているか確認
 ### Step 7: guides意味診断

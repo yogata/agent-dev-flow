@@ -23,8 +23,8 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 | 索引類 | 現在の管理 | 生成元 |
 |---|---|---|
 | `docs/requirements/README.md`のREQ一覧・件数 | 自動生成 | REQ frontmatter |
-| `docs/adr/README.md`の基盤一覧・status別一覧・件数 | 自動生成 | ADR frontmatter |
-| `docs/adr/README.md`のトピック別ビュー・Decision Map・関連REQ表 | 人手管理 | ADR本文と人手判断 |
+| `docs/decisions/README.md`の基盤一覧・status別一覧・件数 | 自動生成 | Decision frontmatter |
+| `docs/decisions/README.md`のトピック別ビュー・Decision Map・関連REQ表 | 人手管理 | Decision本文と人手判断 |
 | `docs/specs/README.md`のSPEC一覧・status列 | 現行実装に従う混合管理 | SPEC frontmatterと人手管理列 |
 | integrity rule catalogとrule ownershipのAUTOGENブロック | 自動生成 | 個別IR文書 |
 | REQ/SPECメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
@@ -36,13 +36,13 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 件数表明は実ファイル frontmatter 値を集計した結果と一致すること。人手で件数を記述せず、自動生成マーカーで囲んだ領域へスクリプトが集計結果を出力する。
 
-例: `docs/adr/README.md` のキャプション「承認済みステータス（accepted）の ADR-001〜ADR-{NNN} Y件」は、`docs/adr/ADR-*.md` のうち `status: accepted` を集計した結果でなければならない。
+例: `docs/decisions/README.md` のキャプション「承認済みステータス（accepted）の DEC-001〜DEC-{NNN} Y件」は、`docs/decisions/DEC-*.md` のうち `status: accepted` を集計した結果でなければならない。
 
 ### 一覧の網羅性
 
 各一覧表は実ファイル全体を網羅する。追加、廃止、移動が発生した場合は生成タイミングで自動的に一覧へ反映される。人手による一覧行の追加、削除は原則として行わない（自動生成マーカー外の編集領域のみ人手編集を許容する）。
 
-例: `docs/adr/README.md` のステータス別ビュー「承認済み（accepted）」リストは、`docs/adr/ADR-*.md` のうち `status: accepted` の全 ADR を漏れなく網羅しなければならない。新規 ADR 追加時にリストだけが更新されない事態を構造的に防ぐ。
+例: `docs/decisions/README.md` のステータス別ビュー「承認済み（accepted）」リストは、`docs/decisions/DEC-*.md` のうち `status: accepted` の全 Decision を漏れなく網羅しなければならない。新規 Decision 追加時にリストだけが更新されない事態を構造的に防ぐ。
 
 ### ステータス別ビュー、トピック別ビュー
 

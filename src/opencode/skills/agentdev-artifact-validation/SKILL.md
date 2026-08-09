@@ -36,8 +36,8 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | 共通検証 script の所有と運用 | ✓ | — |
 | 公開検証契約の提供 | ✓ | — |
 | 共有 lib と対応 test の所有 | ✓ | — |
-| REQ/ADR/SPEC 内容判断 | — | `agentdev-req-file-manager`、`agentdev-adr-file-manager`、`agentdev-spec-file-manager` |
-| REQ/ADR 番号、要件行 ID 採番 | — | `agentdev-req-file-manager`、`agentdev-adr-file-manager` |
+| REQ/Decision/SPEC 内容判断 | — | `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-spec-file-manager` |
+| REQ/Decision 番号、要件行 ID 採番 | — | `agentdev-req-file-manager`、`agentdev-decision-file-manager` |
 | target_area 検索 | — | `agentdev-spec-file-manager` |
 | 文書作成、更新、削除 | — | 各 file-manager skill |
 | 保存、commit、push、承認 | — | 各 command |
@@ -87,7 +87,7 @@ cd .opencode/skills/agentdev-artifact-validation/scripts && bun test
 
 `req-save` と `spec-save` は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う。これにより frontmatter id↔ファイル名整合性確認、エントリ存在確認、変更範囲検証を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
 
-REQ/ADR 番号採番、要件行 ID 採番、target_area 検索は本スキルの対象外（それぞれ `agentdev-req-file-manager`、`agentdev-adr-file-manager`、`agentdev-spec-file-manager` の責務）。
+REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキルの対象外（それぞれ `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-spec-file-manager` の責務）。
 
 ---
 
@@ -107,6 +107,6 @@ REQ/ADR 番号採番、要件行 ID 採番、target_area 検索は本スキル�
 ## See Also
 
 - **agentdev-req-file-manager**: REQ ファイル管理、REQ 番号/要件行 ID 採番（REQ 固有 script 所有）
-- **agentdev-adr-file-manager**: ADR ファイル管理、ADR 番号採番（ADR 固有 script 所有）
+- **agentdev-decision-file-manager**: Decision ファイル管理、Decision 番号採番（Decision 固有 script 所有）
 - **agentdev-spec-file-manager**: SPEC ファイル管理、target_area 検索（SPEC 固有 script 所有）
 - **req-save** / **spec-save**: 共通検証 script 呼出 Step を持つ command

@@ -77,7 +77,7 @@ spec-save は SPEC ファイル保存に先立ち、対象 SPEC の主論理区�
 spec-save は req-define が `artifact_actions` の SPEC action へ出力した `spec_logical_division` と `canonical_owner` を読み取り、CREATE/UPDATE 各操作で SPEC frontmatter または冒頭宣言節（`../foundations/document-model.md`「SPEC 宣言形式」が定義する形式）へ宣言を付与する。CREATE と UPDATE で宣言付与要件を一本化する。
 
 - **CREATE**: 新規 SPEC の frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。spec-save が対象 SPEC を宣言なしで完了することを禁止する
-- **UPDATE**: 変更対象 SPEC が frontmatter または冒頭宣言節で当該宣言を未宣言の場合、かつ req-define から渡された分類値が `unknown` 以外に確定している場合に、宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落だけを理由に保存拒否しない、ADR-003 soft-contract）
+- **UPDATE**: 変更対象 SPEC が frontmatter または冒頭宣言節で当該宣言を未宣言の場合、かつ req-define から渡された分類値が `unknown` 以外に確定している場合に、宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落だけを理由に保存拒否しない、DEC-003 soft-contract）
 - **既存 SPEC の一括更新**: 行わない。未変更 SPEC へ遡及的に宣言を付与しない（REQ-001-035 段階適用）。宣言率指標（`../quality/spec-health-metrics.md`「測定対象と計測方法」参照）が段階的な宣言率向上を追跡する
 
 宣言形式の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」、伝播フィールドの schema の正規所有者は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」である。本節は宣言付与の実行ステップを定義する。
@@ -223,7 +223,7 @@ strict failureが存在する場合は修正して再実行する。
 ## 対象外
 
 - SPEC 対象 artifact_actions（`artifact: spec`）がない場合の SPEC ファイル作成、編集（G01、G04、no-op）
-- `docs/specs/**`, `.agentdev/drafts/**`, `docs/specs/README.md` 以外のファイル作成、編集（G02、G03）。REQ ファイル（`docs/requirements/**`）、ADR（`docs/adr/**`）、コマンド、スキル、テンプレート編集禁止
+- `docs/specs/**`, `.agentdev/drafts/**`, `docs/specs/README.md` 以外のファイル作成、編集（G02、G03）。REQ ファイル（`docs/requirements/**`）、Decision（`docs/decisions/**`）、コマンド、スキル、テンプレート編集禁止
 - SPEC 対象 artifact_actions がない場合の SPEC ファイル作成、編集（G04）
 - 新規 SPEC 作成時の `status: draft` 省略（G05）
 - 既存 SPEC 追記時の `status` 変更（G06、`status: accepted` 昇格は case-close Step 3 責務）

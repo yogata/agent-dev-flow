@@ -12,11 +12,11 @@ updated: 2026-07-26
 | severity | strict |
 | category | broken-reference |
 | detection_method | `check_integrity.ts` による `obsolete-path-map.yaml` ロード、各エントリ `old` パターンの正規表現マッチング（行単位走査）。`scope.include`、`scope.exclude` で検査対象を絞り込む。語彙検出は `legacy_local_generation_vocabulary`（単独検出語: severity=ng）と `legacy_local_generation_conditional_vocabulary`（近接条件つき検出語: proximity_required=true）に分離し、後者は同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ検出する。`generated_by` + `local-opencode-transform` の組み合わせ検出は `generated_by_combination_rule` で維持する |
-| affected_artifacts | [AGENTS.md, README.md, docs/requirements/**/*.md, docs/adr/**/*.md, docs/specs/**/*.md, src/opencode/**/*.md, src/opencode-local/**/*.md, .opencode/skills/**/*.md, .opencode/commands/**/*.md] |
+| affected_artifacts | [AGENTS.md, README.md, docs/requirements/**/*.md, docs/decisions/**/*.md, docs/specs/**/*.md, src/opencode/**/*.md, src/opencode-local/**/*.md, .opencode/skills/**/*.md, .opencode/commands/**/*.md] |
 | related_req | [REQ-010-280, REQ-010-282, REQ-001-006, REQ-009-004, REQ-010-265, REQ-010-024] |
 | related_spec | [../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
-| false_positive_risk | 低。`scope.exclude` で履歴参照領域（`docs/requirements/retired/**`、`docs/adr/retired/**`）を除外する。現行ADRに歴史的経緯として旧パスを記載する場合は rule 側で例外登録を明示する（後述「例外登録」）。コードブロック内の例示は exemption とする |
+| false_positive_risk | 低。`scope.exclude` で履歴参照領域（`docs/requirements/retired/**`、`docs/decisions/retired/**`）を除外する。現行Decisionに歴史的経緯として旧パスを記載する場合は rule 側で例外登録を明示する（後述「例外登録」）。コードブロック内の例示は exemption とする |
 | regression_test | (未実装)。`obsolete-path-map.yaml` の全エントリについて、旧パスを含む fixture と含まない fixture を用意し、`check_integrity.ts` が正しく fail/pass を報告することを検証する |
 | baseline_status | new |
 | finding_route | intake（既知違反の段階解消は別途処理） |
@@ -40,7 +40,7 @@ updated: 2026-07-26
 | 区分 | パターン |
 |------|----------|
 | include | `AGENTS.md`、`README.md`、`docs/**`、`src/**`、`.opencode/**` |
-| exclude | `docs/requirements/retired/**`、`docs/adr/retired/**` |
+| exclude | `docs/requirements/retired/**`、`docs/decisions/retired/**` |
 
 `scope.include` / `scope.exclude` は `obsolete-path-map.yaml` の `scope` フィールドで宣言し、`check_integrity.ts` はこれを読み込んで検査対象を絞り込む。
 
@@ -92,11 +92,11 @@ link mode 統一（REQ-009）に伴い廃止確定となった旧語彙（直接
 
 現在のリポジトリでは、旧語彙の出現は全て歴史経緯（免除対象）に該当する。`src/opencode/`、`.opencode/` 配下の現行 command、skill に旧語彙の残存はない（link mode への移行完了済み）。
 
-## 例外登録（現行ADRの履歴記載）
+## 例外登録（現行Decisionの履歴記載）
 
-現行 ADR（`docs/adr/ADR-*.md`、retired を除く）が移行経緯を説明するために旧SPEC直下パス、廃止語彙を記載する場合は exemption とする。`check_integrity.ts`（full audit）と `check_changed_docs.ts`（targeted guard の `checkLegacyVocab`、`checkObsoleteSpecPath`）は同じ例外規則を使用する。`superseded` ADR は後継 ADR へ置き換えられた履歴文書であり、旧パス、廃止語彙を含むことが前提であるため免除対象に含める。
+現行 Decision（`docs/decisions/DEC-*.md`、retired を除く）が移行経緯を説明するために旧SPEC直下パス、廃止語彙を記載する場合は exemption とする。`check_integrity.ts`（full audit）と `check_changed_docs.ts`（targeted guard の `checkLegacyVocab`、`checkObsoleteSpecPath`）は同じ例外規則を使用する。`superseded` Decision は後継 Decision へ置き換えられた履歴文書であり、旧パス、廃止語彙を含むことが前提であるため免除対象に含める。
 
-免除対象は frontmatter `status` が `accepted` または `superseded` であり、かつ次の文書レベル履歴注記条件をいずれか満たす ADR ファイルである。
+免除対象は frontmatter `status` が `accepted` または `superseded` であり、かつ次の文書レベル履歴注記条件をいずれか満たす Decision ファイルである。
 
 第一の条件は frontmatter 終了直後から最初の見出し（`#` または `##`）までの本文が存在することである。当該本文は文書レベル履歴注記として扱い、文書全体が歴史経緯の記録であるとみなす。
 

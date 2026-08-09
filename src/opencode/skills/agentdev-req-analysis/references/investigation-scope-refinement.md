@@ -43,9 +43,9 @@ command/skill 名、REQ/ADR/SPEC ID、固有名詞に限定する。
 glob docs/requirements/REQ-*.md
 grep -l "<keyword>" docs/requirements/REQ-*.md
 
-# 関連 ADR 候補
-glob docs/adr/ADR-*.md
-grep -l "<keyword>" docs/adr/ADR-*.md
+# 関連 Decision 候補
+glob docs/decisions/DEC-*.md
+grep -l "<keyword>" docs/decisions/DEC-*.md
 
 # 関連 SPEC 候補
 grep -rl "<keyword>" docs/specs/

@@ -176,7 +176,7 @@ check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（req-sa
 
 ### IR-055 heuristic 行内複数パターン集計仕様（REQ-010-263/264）
 
-IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/specs/`、`docs/guides/`、`docs/adr/` 等）が存在する場合の集計規則を以下のとおり定める。本節は `check_integrity.ts` 実装が従うべき契約であり、実装詳細は対象外とする。
+IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/specs/`、`docs/guides/`、`docs/decisions/` 等）が存在する場合の集計規則を以下のとおり定める。本節は `check_integrity.ts` 実装が従うべき契約であり、実装詳細は対象外とする。
 
 **集計単位**: 行内に複数パターンがマッチした場合、パターン種別ごとに1件を検出件数へ計上する。同一パターンの複数回マッチは1件に集約し、異なるパターン種別のマッチは別件として計上する。
 

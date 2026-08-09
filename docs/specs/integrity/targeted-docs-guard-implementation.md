@@ -75,7 +75,7 @@ case-close では保存工程より広めに以下を確認する。
 
 ### case-run 向け検査
 
-case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/spec-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。appliesTo は `docs/specs/**`, `docs/requirements/**`, `docs/adr/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
+case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/spec-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。appliesTo は `docs/specs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
 
 ## full_docs_check_recommended 条件
 
@@ -140,7 +140,7 @@ report JSON の必須フィールド一覧、`failure` オブジェクトの構�
 - 各エントリは `old`、`new`、`severity`、`scope`（`include`、`exclude`）を持つ
 - `severity` は旧直下パス参照を `ng` とする
 - `scope.include` は `AGENTS.md`、`README.md`、`docs/**`、`src/**`、`.opencode/**` とする
-- `scope.exclude` は `docs/requirements/retired/**` と `docs/adr/retired/**` とする
+- `scope.exclude` は `docs/requirements/retired/**` と `docs/decisions/retired/**` とする
 - ドメイン分割による移送が発生した場合は、移送単位で旧パスと新パスの対応を追記する（REQ-001-010）
 
 検出語彙の分類（単独検出語 / 近接条件つき検出語）は IR-057（`rules/IR-057-obsolete-spec-path-after-domain-split.md`）ならびに `obsolete-path-map.yaml` を SSoT とする。

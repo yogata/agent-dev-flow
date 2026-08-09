@@ -160,7 +160,7 @@ describe("TS-007 (AG-006): Graph missing does not halt workflow; fallback discov
     expect(graph.edges).toEqual([])
     expect(graph.manifest.indexed_paths).toEqual([
       "docs/requirements",
-      "docs/adr",
+      "docs/decisions",
       "docs/specs",
     ])
   })

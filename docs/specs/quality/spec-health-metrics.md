@@ -118,7 +118,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-044-req-spec-boundary-violation-detection.md | 105 | accepted | integrity |
 | skills/agentdev-intake-pipeline.md | 102 | accepted | skills |
 | foundations/system.md | 98 | accepted | foundations |
-| skills/agentdev-adr-guidelines.md | 96 | accepted | skills |
+| skills/agentdev-decision-guidelines.md | 96 | accepted | skills |
 | skills/agentdev-req-analysis.md | 94 | accepted | skills |
 | skills/agentdev-deep-review.md | 93 | draft | skills |
 | local/references/artifact-graph-effect-evaluation.md | 91 | - | local |
@@ -126,7 +126,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/inspect-docs.md | 85 | accepted | commands |
 | commands/inspect-extensions.md | 84 | superseded | commands |
 | skills/agentdev-doc-diagnostics.md | 83 | draft | skills |
-| skills/agentdev-adr-file-manager.md | 82 | accepted | skills |
+| skills/agentdev-decision-file-manager.md | 82 | accepted | skills |
 | skills/agentdev-artifact-validation.md | 81 | draft | skills |
 | integrity/rule-ownership.md | 79 | accepted | integrity |
 | skills/agentdev-learning-capture.md | 79 | accepted | skills |

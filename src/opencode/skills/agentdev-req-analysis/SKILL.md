@@ -39,15 +39,15 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 副作用
 
-- なし（知識ベース）。REQ/ADR ファイル操作は `agentdev-req-file-manager`、`agentdev-adr-file-manager` が担当する
+- なし（知識ベース）。REQ/Decision ファイル操作は `agentdev-req-file-manager`、`agentdev-decision-file-manager` が担当する
 
 ## 責任境界
 
-- **扱う**: 分析観点、品質基準、壁打ちメソドロジー、REQ/SPEC 境界判定基準、ADR 閾値判定ブリッジ
+- **扱う**: 分析観点、品質基準、壁打ちメソドロジー、REQ/SPEC 境界判定基準、Decision 閾値判定ブリッジ
 - **扱わない**:
   - REQファイルの採番、CREATE/APPEND/UPDATE、frontmatter更新、README更新（→ `agentdev-req-file-manager`）
   - 実装計画、タスク分割、コード変更方針の確定（→ `/agentdev/case-run` の work plan）
-  - ADRファイルの作成、更新（→ `agentdev-adr-file-manager`）。ADR閾値に達する判断候補の抽出は行うが、ファイル操作は扱わない
+  - Decisionファイルの作成、更新（→ `agentdev-decision-file-manager`）。Decision閾値に達する判断候補の抽出は行うが、ファイル操作は扱わない
 
 ## 常に守る不変条件
 
@@ -93,5 +93,5 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 ## See Also
 
 - **agentdev-req-file-manager**: REQファイルの作成、追記、更新、分割操作とバリデーション
-- **agentdev-adr-guidelines**: ADR作成の必要性判定基準、ライフサイクル定義
+- **agentdev-decision-guidelines**: Decision作成の必要性判定基準、ライフサイクル定義
 - **agentdev-workflow-lifecycle**: agentdev-*ワークフロー統括ハブ（フェーズ定義、SSoT遷移、パターン判定）

@@ -21,14 +21,14 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
 - `docs/requirements/REQ-{NNN}.md`（新規/追記/更新）
 - `docs/requirements/README.md`（インデックス更新）
 - `docs/README.md`（ドキュメントハブ更新）
-- `docs/adr/ADR-{NNN}.md`（ADR判断がある場合のみ）
+- `docs/decisions/DEC-{NNN}.md`（Decision判断がある場合のみ）
 - `.agentdev/drafts/requirements-review-finding-{topic-slug}.md`（SPLIT検出時のみ）
 - `.agentdev/intake/inbox/req-restructure/*.md`（REQ再構成候補検知時のみ）
 - ドラフト frontmatter `status: saved` 更新
 
 ## 副作用
 
-- ファイル作成/更新: `docs/requirements/**`, `docs/adr/**`, `docs/README.md`, `.agentdev/drafts/**`
+- ファイル作成/更新: `docs/requirements/**`, `docs/decisions/**`, `docs/README.md`, `.agentdev/drafts/**`
 - git 操作: commit + push（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
 - 読込時 hash 記録 → Step 9-1 で `git pull --ff-only` 後 hash 一致検証（G08）
 - Issue 作成: 行わない（G11、case-open 責務）
@@ -88,8 +88,8 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 
 ## 対象外
 
-- REQ/ADR 対象 artifact_actions がない場合の SPEC ファイル作成、編集（G01、no-op 完了）
-- `docs/requirements/**`、`docs/adr/**`、`docs/README.md`、`.agentdev/drafts/**` 以外のファイル作成、編集（G02、G03）
+- REQ/Decision 対象 artifact_actions がない場合の SPEC ファイル作成、編集（G01、no-op 完了）
+- `docs/requirements/**`、`docs/decisions/**`、`docs/README.md`、`.agentdev/drafts/**` 以外のファイル作成、編集（G02、G03）
 - ドラフトファイル不存在時の実行（G04、エラー中止）
 - REQ番号の空き番号再利用（G05、`agentdev-req-file-manager` 採番ルール遵守）
 - `doc_requirement.md` テンプレート必須セクションの欠落（G06）
@@ -103,9 +103,9 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 ## 検証観点
 
 - QG-1（Definition Integrity Gate）: Step 4 の前置条件として「適用結果の整合性検証」を実行（採番結果の整合性、マージ結果の整合性、インデックスの整合性、変更範囲の妥当性）。内容の品質は req-define の QG-1 の責務（REQ-004-081/082）
-- ADR 妥当性再検証ゲート: ADR 保存直前に技術判断含有確認、REQ/SPEC 相当の内容のみなら停止
-- ADR 採番: `agentdev-adr-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定番号を付与
-- 出力制約: 成果物本文（REQ/ADR ファイル本文、commit message）は verbatim で返す（G10）
+- Decision 妥当性再検証ゲート: Decision 保存直前に技術判断含有確認、REQ/SPEC 相当の内容のみなら停止
+- Decision 採番: `agentdev-decision-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定番号を付与
+- 出力制約: 成果物本文（REQ/Decision ファイル本文、commit message）は verbatim で返す（G10）
 
 ## case-auto 並列委譲モデル（REQ-006-087〜093）
 
@@ -125,7 +125,7 @@ G07（commit 前 status 更新）は フェーズ3 で維持。
 - [spec-save.md](spec-save.md)（後続コマンド（SPEC 候補がある場合））
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
 - `agentdev-req-file-manager` skill（REQ ファイル管理、採番）
-- `agentdev-adr-file-manager` skill（ADR ファイル管理、採番）
+- `agentdev-decision-file-manager` skill（Decision ファイル管理、採番）
 - `agentdev-artifact-validation` skill（README エントリ存在確認）
 - `agentdev-conventional-commits` skill（コミットメッセージ規約）
 - `agentdev-git-worktree` skill（並列実行安全 git 操作）

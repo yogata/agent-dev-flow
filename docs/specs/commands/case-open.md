@@ -15,7 +15,7 @@ Epic + 子 Issue 一括作成に対応する。
 
 ## 入力
 
-- req-define で生成された要件doc（構造化 `draft-data` 形式: REQ-008, ADR-003、チェックボックス付き）
+- req-define で生成された要件doc（構造化 `draft-data` 形式: REQ-008, DEC-003、チェックボックス付き）
 - draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処理対象。OU ごとにスライスせず draft 全体を取り扱う（REQ-008-009）
 - `auto_gate.auto_ready` が false、または未解決質問、未解決衝突、repo外操作、停止理由が残る場合は停止（REQ-008-013）
 - `conflict_resolutions` に記録済みの衝突は同じ内容をユーザーへ再確認しない（REQ-008-014）
@@ -121,7 +121,7 @@ case-open は完了条件を Issue 本文に展開する前に、対象パスで
 
 以下のタイミングで完了条件展開前の再確認を必須とする:
 
-- **同日内複数 PR マージ後の Issue 起票**: 同一日内に複数 PR がマージされた後、当該マージにより `docs/requirements/REQ-*.md`、`docs/adr/ADR-*.md`、`docs/specs/**/*.md` の内容が変動する可能性があるため、起票前に最新状態を再確認する
+- **同日内複数 PR マージ後の Issue 起票**: 同一日内に複数 PR がマージされた後、当該マージにより `docs/requirements/REQ-*.md`、`docs/decisions/DEC-*.md`、`docs/specs/**/*.md` の内容が変動する可能性があるため、起票前に最新状態を再確認する
 - **順次 Wave 実行時**: 複数 Wave が順次実行される場合、先行 Wave のマージ完了後に後続 Wave の Issue を起票する際、件数等の実測値が変動している可能性があるため再確認する
 
 再確認は識別子（ファイルパス、REQ ID、NG ID、IR ID）の存在確認を主軸とし、件数等の実測値は補助値として扱う（既存「完了条件・事前状態記載ガイドライン」準拠）。
@@ -171,7 +171,7 @@ child Issue テンプレートの「レビュー判断」セクションは親 E
 
 ### 後方互換（AG-001）
 
-`review_dispositions` を持たない旧ドラフトを case-open は入力として拒否しない（ADR-003 準拠）。フィールド欠落時は「レビュー判断」セクションへ「該当なし」と記載する。
+`review_dispositions` を持たない旧ドラフトを case-open は入力として拒否しない（DEC-003 準拠）。フィールド欠落時は「レビュー判断」セクションへ「該当なし」と記載する。
 
 ## 参照する横断 SPEC
 

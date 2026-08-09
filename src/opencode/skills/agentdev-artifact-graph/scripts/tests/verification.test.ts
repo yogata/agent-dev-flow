@@ -25,7 +25,7 @@ describe("REQ-012-011: verification feedback (detect/classify/correct)", () => {
     // Add a file with a broken link
     await writeFile(
       join(fixture.root, "docs/requirements/REQ-002.md"),
-      "---\nid: REQ-002\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../adr/ADR-999.md).\n",
+      "---\nid: REQ-002\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../decisions/DEC-099.md).\n",
       "utf8",
     )
     await buildGraph(fixture)
@@ -42,7 +42,7 @@ describe("REQ-012-011: verification feedback (detect/classify/correct)", () => {
     const fixture = await setup()
     await writeFile(
       join(fixture.root, "docs/requirements/REQ-002.md"),
-      "---\nid: REQ-002\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../adr/ADR-999.md).\n",
+      "---\nid: REQ-002\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../decisions/DEC-099.md).\n",
       "utf8",
     )
     await buildGraph(fixture)
@@ -74,7 +74,7 @@ describe("REQ-012-011: verification feedback (detect/classify/correct)", () => {
     const reqPath = join(fixture.root, "docs/requirements/REQ-002.md")
     await writeFile(
       reqPath,
-      "---\nid: REQ-002\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../adr/ADR-999.md).\n",
+      "---\nid: REQ-002\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../decisions/DEC-099.md).\n",
       "utf8",
     )
     await buildGraph(fixture)
@@ -85,8 +85,8 @@ describe("REQ-012-011: verification feedback (detect/classify/correct)", () => {
 
     // Fix: create the missing file
     await writeFile(
-      join(fixture.root, "docs/adr/ADR-999.md"),
-      "---\nid: ADR-999\ntitle: Now exists\n---\n# Now exists\n",
+      join(fixture.root, "docs/decisions/DEC-099.md"),
+      "---\nid: DEC-099\ntitle: Now exists\n---\n# Now exists\n",
       "utf8",
     )
     await buildGraph(fixture)

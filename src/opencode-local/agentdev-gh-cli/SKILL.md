@@ -79,5 +79,5 @@ Case ファイルの YAML 前書き、status enum、labels 値域、見出し一
 - SPEC [agentdev-gh-cli.md](../../../../../docs/specs/skills/agentdev-gh-cli.md)（手続きと Case ファイルセクションの対応表の正本）
 - SPEC [local/local-case-file.md](../../../../../docs/specs/local/local-case-file.md)（Case ファイルスキーマの正本）
 - [REQ-0150](../../../../../docs/requirements/REQ-0150.md)（ローカル版 agentdev-gh-cli 実装）
-- [ADR-0130](../../../../../docs/adr/ADR-0130.md)（agentdev-gh-cli を差し替え可能な I/O 境界として確立）
+- v2:ADR-0130（tag v2.11.0）:agentdev-gh-cli を差し替え可能な I/O 境界として確立（現行相当: DEC-004）
 - 標準版 [../../skills/agentdev-gh-cli/SKILL.md](../../skills/agentdev-gh-cli/SKILL.md)（GitHub 版の原本。差し替え元）

@@ -1,6 +1,6 @@
 # `agentdev-artifact-graph` scripts
 
-Artifact Graph 標準配布スキルの決定的エンジン（REQ-012、ADR-007）。
+Artifact Graph 標準配布スキルの決定的エンジン（REQ-012、DEC-007）。
 
 ## 構成
 

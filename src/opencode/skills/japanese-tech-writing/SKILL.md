@@ -20,7 +20,7 @@ description: "日本語の技術文書・書籍原稿の文章規範。整形（
 - コード実装、テスト実行
 - REQ/ADR/SPEC の品質査読（→ `agentdev-doc-writing` が担当。本スキルは執筆規範の原本であり、査読ゲートではない）
 - 文書種別の配置基準、用語政策（→ `docs/specs/responsibilities/document-type-responsibilities.md`）
-- 要件分析、ADR 要否判定（→ `agentdev-req-analysis`、`agentdev-adr-guidelines`）
+- 要件分析、Decision 要否判定（→ `agentdev-req-analysis`、`agentdev-decision-guidelines`）
 
 ## 整形
 

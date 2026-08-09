@@ -139,5 +139,5 @@ link による接続であるため、上書き問題が発生しない。
 - `docs/specs/local/local-generation.md`：link mode 接続フロー、link target 確認、更新運用の正本 SPEC
 - `docs/specs/local/local-case-file.md`：Case ファイルスキーマの正本 SPEC
 - `docs/specs/local/runtime-package-boundary.md`：`consumer_generated` リポジトリ種別、`.opencode/` 構成
-- `docs/adr/ADR-0131.md`：ローカル版導入方式を link mode へ統一し生成方式を廃止（ADR-0126 を supersede）
-- `docs/adr/ADR-0126.md`：ローカル版 OpenCode 生成基盤（superseded by ADR-0131、歴史参照）
+- v2:ADR-0131（tag v2.11.0）:ローカル版導入方式を link mode へ統一し生成方式を廃止（v2:ADR-0126 を supersede）
+- v2:ADR-0126（tag v2.11.0）:ローカル版 OpenCode 生成基盤（superseded by v2:ADR-0131、歴史参照）

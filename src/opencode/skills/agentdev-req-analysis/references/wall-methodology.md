@@ -129,7 +129,7 @@ req-define Step1 のセッションコンテキスト検知の詳細手順は `r
 
 **列挙コマンド**:
 - `glob docs/requirements/REQ-*.md`（現行 REQ ファイルを列挙）
-- `glob docs/adr/ADR-*.md`（ADR ファイルを列挙）
+- `glob docs/decisions/DEC-*.md`（Decision ファイルを列挙）
 
 **乖離解消手順**:
 1. 文書レンジと実ファイル一覧に乖離がある場合、原因を調査する

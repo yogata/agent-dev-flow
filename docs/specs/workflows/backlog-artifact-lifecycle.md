@@ -237,7 +237,7 @@ REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成in
 
 case-auto / case-open / req-save / spec-save の工程分岐は `work_type` の固定分岐ではなく、req_draft の `artifact_actions` 存在に基づく動的判定とする（v2:ADR-0123, REQ-001-014）。
 
-- `req-save` は `artifact_actions` に `artifact: req` または `artifact: adr` の entry が含まれる場合に実行する（`work_type` に依存しない）
+- `req-save` は `artifact_actions` に `artifact: req` または `artifact: decision` の entry が含まれる場合に実行する（`work_type` に依存しない）
 - `spec-save` は `artifact_actions` に `artifact: spec` の entry が含まれる場合に実行する（`work_type` に依存しない）
 - `case-open` は `req-save` / `spec-save` の後に常に実行する
 - `case-auto` はパイプラインの各工程を `work_type` の固定分岐ではなく `artifact_actions` の存在から決定する

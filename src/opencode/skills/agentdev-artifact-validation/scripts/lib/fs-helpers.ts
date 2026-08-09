@@ -19,6 +19,12 @@ export function adrNumberFromFilename(filename: string): number | null {
   return m && m[1] ? parseInt(m[1], 10) : null;
 }
 
+/** ファイル名 `DEC-NNN.md`（3桁ゼロ埋め）から番号を取り出す。 */
+export function decisionNumberFromFilename(filename: string): number | null {
+  const m = /^DEC-(\d{3})\.md$/.exec(filename);
+  return m && m[1] ? parseInt(m[1], 10) : null;
+}
+
 /** 指定ディレクトリ直下の `.md` ファイル名一覧（非再帰）。存在しない場合は空配列。 */
 export function listMarkdownFiles(dir: string): string[] {
   try {

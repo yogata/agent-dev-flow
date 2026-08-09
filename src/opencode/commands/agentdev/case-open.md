@@ -32,7 +32,7 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 詳細、委譲接続点（サブエージェントはREQ読解、テンプレート充足検査、完了条件候補抽出のみを返し、親エージェントが本文確定とIssue作成）は `agentdev-issue-management` を参照。本文候補の受け渡しは `agentdev-issue-management` の「委譲接続点と本文受け渡し」セクションに従いファイルパス経由で行う（G25）
 
-**Step 2-1/2-1a/2-1b**: QG-2 完了条件網羅性検証。Issue本文生成後、Issue作成前に `agentdev-quality-gates` の QG-2 に従い完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証（fail 時は req-define 差し戻し推奨）。**2-1a**: 数値閾値到達可能性検証（QG-2 観点6、#1538/TS-007 由来、要件定義者が明示した閾値のみ受け付け、自動推論しない）。**2-1b**: スコープ明示（本 Issue 対象範囲 vs 全体、#1532/TS-006 由来、QG-4 観点8 判定マトリクスの入力前提、識別子中心、横断評価は「全体」デフォルト）
+**Step 2-1/2-1a/2-1b**: QG-2 完了条件網羅性検証。Issue本文生成後、Issue作成前に `agentdev-quality-gates` の QG-2 に従い完了条件が対象 REQ/Decision/SPEC の必達要件を網羅しているかを検証（fail 時は req-define 差し戻し推奨）。**2-1a**: 数値閾値到達可能性検証（QG-2 観点6、#1538/TS-007 由来、要件定義者が明示した閾値のみ受け付け、自動推論しない）。**2-1b**: スコープ明示（本 Issue 対象範囲 vs 全体、#1532/TS-006 由来、QG-4 観点8 判定マトリクスの入力前提、識別子中心、横断評価は「全体」デフォルト）
 
 **Step 2-2**: test_strategy 埋め込み（REQ）。draft-data の `test_strategy` を読み取り、Issue 本文の「テスト戦略」セクションに 3 要素構造（`verification` / `pass_criteria` / `on_failure`）で反映（スキーマは req-define command SPEC extension 経由）。未定義の場合はテンプレートのプレースホルダをそのまま残す
 
@@ -80,12 +80,12 @@ execution structure、Issue 本文候補、完了条件を構成した後、最�
 
 - **Step 6**: Epic Issue本文を生成。Step 3-1 の自律構成分析結果に基づき Epic 本文を構築。詳細、委譲接続点は `agentdev-issue-management` を参照
 - **Step 7**: Epic Issueを作成。ラベル `enhancement`, `feature`, `epic`。Issue 作成手続き（`agentdev-gh-cli`）で本文を書き込み → VERIFY。Issue番号を `{epic_number}` として記録
-- **Step 8**: 子Issueを作成。Issue 化単位は OU 単位（G14、G21）。子Issue 本文に `Parent: #{epic_number}`（G03）、対象 OU ID、紐づく REQ/ADR/SPEC 識別子を記載。子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化（3つの「5件」文脈のうち case-run Wave 内子 Issue 並列上限と同一、後述）。Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（REQ、G04 集約更新で維持）。詳細、委譲接続点は `agentdev-issue-management` を参照。**前工程完了度属性の埋め込み（REQ）**: 各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（3段階: 完全完了/ 検証のみ/ 補完あり、epic-wave-model SPEC extension 経由）
+- **Step 8**: 子Issueを作成。Issue 化単位は OU 単位（G14、G21）。子Issue 本文に `Parent: #{epic_number}`（G03）、対象 OU ID、紐づく REQ/Decision/SPEC 識別子を記載。子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化（3つの「5件」文脈のうち case-run Wave 内子 Issue 並列上限と同一、後述）。Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（REQ、G04 集約更新で維持）。詳細、委譲接続点は `agentdev-issue-management` を参照。**前工程完了度属性の埋め込み（REQ）**: 各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（3段階: 完全完了/ 検証のみ/ 補完あり、epic-wave-model SPEC extension 経由）
 - **Step 9**: Epic Issue本文を更新。詳細、委譲接続点は `agentdev-issue-management` を参照。**Step 9-1**: OU 結果の書き戻し（`operation_units` セクションがある場合、作成した Issue/Epic 番号を当該 OU の `result` に書き戻す）。**Epic flow 完了後、共通終了処理（Step 13〜15）を必ず実行すること**
 
 ### Step 10〜12: Standard flow（Step 4 通過後）
 
-- **Step 10**: 関連ADR特定（`docs/adr/README.md` から、単一REQ Epic flow の内容反映にも活用）
+- **Step 10**: 関連Decision特定（`docs/decisions/README.md` から、単一REQ Epic flow の内容反映にも活用）
 - **Step 11**: ラベル付与（`agentdev-workflow-lifecycle` に従う）
 - **Step 12**: GitHub Issue作成。Issue 作成手続き（`agentdev-gh-cli`）→ VERIFY。**Step 12-1**: OU 結果の書き戻し（`operation_units` セクションがある場合、作成した Issue 番号を当該 OU の `result` に書き戻す）
 
@@ -116,7 +116,7 @@ execution structure、Issue 本文候補、完了条件を構成した後、最�
 - G03: 子Issue本文の先頭行に `Parent: #{epic_number}` を必ず含める（親子関係の追跡用）
 - G04: 全子Issueの作成完了後にEpic本文のステータス追跡テーブルを更新する（部分更新は禁止）
 - G05: 子Issueは最大10件まで（Epic 1件あたり）。Step 8 で子Issue数を確認し、超過時はEpic、子Issueいずれも作成せずエラーで停止
-- G14: Wave単位のみの子Issue構造を作成してはならない。子Issue は OU 単位で作成し、対応 OU 経由で REQ/ADR/SPEC へのトレーサビリティを保持すること
+- G14: Wave単位のみの子Issue構造を作成してはならない。子Issue は OU 単位で作成し、対応 OU 経由で REQ/Decision/SPEC へのトレーサビリティを保持すること
 - G15/G16: マルチREQ Epic flow は複数REQドキュメント入力時または draft-meta に `scale: large` 設定時のみ実行。単一REQ Epic flow は `scale: large` 明示時のみ
 
 ### 品質ゲート

@@ -8,7 +8,7 @@ spec_logical_division: behavior
 canonical_owner: repo-agentdev-artifact-graph
 ---
 
-> 本 SPEC は ADR-007「Artifact Graph 標準化と配布スキル昇格」により superseded された。
+> 本 SPEC は DEC-007「Artifact Graph 標準化と配布スキル昇格」により superseded された。
 > 後継 SPEC は `docs/specs/skills/agentdev-artifact-graph.md`（skills ドメイン）。
 > 本文件は履歴参照として現状維持する。
 
@@ -36,7 +36,7 @@ AgentDevFlow 本体リポジトリに限って、成果物間の明示関係を�
 次を正規情報として入力する。
 
 - `docs/requirements/`
-- `docs/adr/`
+- `docs/decisions/`
 - `docs/specs/`
 - `src/opencode/`
 - `.opencode/`
@@ -58,7 +58,7 @@ AgentDevFlow 本体リポジトリに限って、成果物間の明示関係を�
 ### 初期対象ノード
 
 - requirement
-- adr
+- decision
 - specification
 - integrity_rule
 - command
@@ -151,7 +151,7 @@ AgentDevFlow 本体リポジトリに限って、成果物間の明示関係を�
 
 各コマンド、skill は次の候補取得に Artifact Graph を利用できる。
 
-- `req-define`: 既存REQ、関連ADRとSPEC、構造的所有者重複の候補取得
+- `req-define`: 既存REQ、関連DecisionとSPEC、構造的所有者重複の候補取得
 - `spec-save`: 対応REQ、同じ正規所有対象を持つSPEC、関連command、skill、整合性ルールの候補取得
 - `case-open`: 起点成果物から到達できる変更影響、廃止参照、未解決参照の候補取得
 - `case-run`: 実装対象に関係するREQ、SPEC、整合性ルール、周辺成果物の候補取得
