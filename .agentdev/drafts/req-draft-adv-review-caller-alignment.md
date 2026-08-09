@@ -6,6 +6,28 @@ created_at: 2026-08-09T19:00:00+09:00
 saved_at: 2026-08-10T00:40:21+09:00
 source_rus:
   - RU-0015
+spec_saved_at: 2026-08-10
+spec_save_result:
+  applied: []
+  skipped:
+    - id: ACT-SPEC-001
+      target: docs/specs/skills/agentdev-adversarial-review.md
+      target_area: "caller integration 対象経路"
+      reason: target_area_not_found
+    - id: ACT-SPEC-002
+      target: docs/specs/commands/case-auto.md
+      target_area: "adversarial-review 呼出・停止伝播表現"
+      reason: target_area_not_found
+    - id: ACT-SPEC-003
+      target: docs/specs/workflows/workflow-contracts.md
+      target_area: "caller / orchestration 表現"
+      reason: target_area_not_found
+    - id: ACT-SPEC-004
+      target: docs/specs/workflows/delegation-contracts.md
+      target_area: "caller 表現"
+      reason: target_area_not_found
+  follow_ups:
+    - "ACT-SPEC-001〜004: 全4件の target_area が既存見出しと完全一致せず（search-target-area.ts matches 空）。各 action の target_area は抽象的なトピック群（『caller integration 対象経路』『adversarial-review 呼出・停止伝播表現』『caller / orchestration 表現』『caller 表現』）であり、SPEC 内の実在見出しテキストではない。target-area-matching.md（見出し行全体完全一致、前方一致廃止）に従い全件スキップ。operation を spec-create（新規セクション追加）へ切り替えるか、target_area を実在見出しへ修正して再実行を推奨。各 content は『具体的な修正箇所は case-run で特定』『具体的な修正箇所は case-run で探索・特定し、REQ-015 の7経路と意味一致させる』を明示しており、case-run で SPEC への反映を実施することを想定。"
 ---
 
 # draft-data
