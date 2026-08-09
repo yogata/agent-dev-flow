@@ -82,6 +82,65 @@ updated: 2026-07-18
 
 ## adversarial-review 挿入境界（経路B）
 
-経路B の review 挿入境界: 発動条件（暫定分類後・HITL 前）、--auto 経路の review 挿入迂回
-（fast path）を規定する。
+本節は inspect-promote からの adversarial-review 呼出統合（REQ-015 経路B）を正典として所有する。共通契約（任意性、副作用禁止、QG/HITL 非代替、呼出失敗時取扱い、再 review 条件、停止条件4点、accepted finding 反映責務、正規所有者マトリックス）は adversarial-review SPEC「adversarial-review caller integration 共通契約」節を正とし、本節は再定義しない（REQ-014-011）。本節は経路B 固有の挿入位置、発動条件判定 Step、review 呼出 Step、--auto fast path を所有する。
+
+### review 挿入位置（REQ-015-005）
+
+review 挿入位置は現行 Step 構造へ一意に特定する。「暫定分類後・HITL 前」とは、Step 4（自動 promote、`--auto` opt-in 時のみ）の完了時点から Step 5（HITL 確定、手動分類対象）の開始前までを指す。
+
+| 境界 | 直前 Step | 直後 Step |
+|---|---|---|
+| 暫定分類後・HITL 前 | Step 4（自動 promote、`--auto` opt-in 時のみ） | Step 5（HITL 確定） |
+
+- 「暫定分類後」: Step 3（検出事項分類）の暫定分類結果を前提とし、Step 4（`--auto` による自動 promote 対象の抽出、投入）が完了した時点
+- 「HITL 前」: Step 5（HITL 確定）によるユーザー承認を得る前の時点
+- review 対象: 自動 promote 対象外で Step 5（HITL 確定）へ進む手動分類対象の検出事項。当該検出事項の暫定分類結果（promote/ defer/ reject 判定と根拠）を入力コンテキストとする
+
+### --auto 経路の review 挿入迂回（fast path）（REQ-015-005）
+
+`--auto` opt-in により Step 4 で自動 promote された検出事項は HITL を経由しない fast path となり、review 挿入境界を迂回する。当該検出事項は `.agentdev/intake/promoted/inspect-auto-*.md` へ直接投入され、adversarial-review の対象外となる。
+
+- fast path 対象: Step 4 で自動 promote された検出事項（高確信度、自動 promote 対象カテゴリ合致）
+- review 対象（fast path 外）: 自動 promote 対象外で手動分類へ回された検出事項
+
+`--auto` opt-in の有無と review 挿入境界の発動関係は次のとおり。
+
+| `--auto` opt-in | 自動 promote 対象 | 手動分類対象 | review 挿入境界 |
+|---|---|---|---|
+| あり | あり | あり | 手動分類対象について発動条件を満たせば発動（fast path 対象は迂回） |
+| あり | あり | なし | 発動しない（全件 fast path 完了、HITL 対象なし） |
+| あり | なし | あり | 手動分類対象について発動条件を満たせば発動 |
+| なし | — | あり | 手動分類対象について発動条件を満たせば発動 |
+| なし | — | なし | 発動しない（inbox 空、Step 2 で終了） |
+
+### 発動条件判定 Step（REQ-015-001）
+
+発動条件判定 Step と review 呼出 Step は分離する（REQ-015-001）。発動条件判定 Step は review 挿入位置（暫定分類後・HITL 前）で次の3条件を全て満たす場合にのみ review 呼出 Step へ進む。
+
+1. Step 4（自動 promote、`--auto` opt-in 時のみ）が完了していること
+2. 手動分類対象の検出事項（review 対象）が1件以上存在すること
+3. ユーザー明示指定（本コマンド起動時の adversarial-review への明示要求）があること（REQ-015-002）
+
+### review 呼出 Step（REQ-015-001）
+
+review 呼出 Step は review 対象（手動分類対象の検出事項、暫定分類結果）を入力コンテキストとして adversarial-review を呼び出す。入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 停止条件は adversarial-review SPEC を正とする。
+
+呼出結果の取扱い:
+
+- accepted finding は本コマンドの責務で暫定分類結果へ反映する（REQ-014-006）。adversarial-review 自身は反映を行わない（REQ-014-004）
+- finding 反映で暫定分類の意味内容が変更された場合、Step 3（検出事項分類）へ戻し再分類する。再 review 条件と停止条件4点は adversarial-review SPEC に従う（REQ-014-007/008）
+- unresolved な本質的争点が残る場合、Step 5（HITL 確定）へ進まず、ユーザー判断事項として停止する（REQ-014-009）。ただし adversarial-review 自体を恒久的な統制ゲートとしない
+- 呼出失敗時は silent skip を禁止し、利用不能を報告した上で Step 5（HITL 確定）の従来フローを維持する（REQ-014-010）
+
+### ユーザー明示指定時の発動（REQ-015-002）
+
+adversarial-review は任意助言手段であり（REQ-014-001）、本コマンド起動時にユーザーが adversarial-review を明示的に要求した場合にのみ発動する。自動発動、全件強制発動を行わない。明示要求のない場合は後述「条件非該当時の従来フロー維持」に従う。
+
+### 条件非該当時の従来フロー維持（REQ-015-003）
+
+発動条件判定 Step の3条件のいずれかを満たさない場合、review 呼出 Step を実行せず Step 5（HITL 確定）へ従来フローを維持する（REQ-015-003）。従来フロー（Step 5 HITL 確定以降の Step 6〜10）は変更せず、adversarial-review 由来の新規統制ゲートを作らない（REQ-014-009）。
+
+### 正規所有者宣言
+
+review 挿入境界（経路B の発動条件、挿入位置、戻り先、--auto fast path）は本 SPEC が正規所有する（REQ-014-011、REQ-015-005）。共通 caller integration 契約は adversarial-review SPEC を正とし、本節は再定義しない。user-decision-required の停止理由分類は workflow-contracts SPEC、review 経路での parent_decision_required / decision_context 適用は delegation-contracts SPEC をそれぞれ正とする。
 
