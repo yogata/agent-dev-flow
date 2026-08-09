@@ -33,7 +33,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | case-run | レビューNG対応フロー参照 |
 | case-update | レビューNGコメント投稿フロー参照 |
 
-## references/ 構成一覧
+## 参考文献
 
 | ファイル | 内容 |
 |---------|------|

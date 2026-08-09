@@ -40,7 +40,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | `case-close` | Issue 本文更新時の前後内容比較、コメント追記後の VERIFY、Parent Issue 本文更新の安全手順 |
 | `case-update` | Issue 本文更新、コメント追加後の通常検証、前後内容比較 |
 
-## references/ 構成一覧
+## 参考文献
 
 | トピック | 参照先 |
 |----------|--------|

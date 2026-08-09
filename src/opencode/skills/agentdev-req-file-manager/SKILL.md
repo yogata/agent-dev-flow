@@ -162,7 +162,7 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 - **agentdev-adr-guidelines**: ADR作成の必要性判定基準
 - **agentdev-doc-writing**: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
 
-## references 一覧
+## 参考文献
 
 SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える。
 
