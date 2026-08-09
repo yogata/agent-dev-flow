@@ -220,5 +220,22 @@ Epic 全体（複数 Wave）は Wave 境界で PR マージ（case-close 責務�
 
 ## adversarial-review 由来の停止信号
 
-user-decision-required 停止理由分類の正規化、case-auto への伝播、resume point を規定する。
-user-decision-required は case-run result enum の第5状態ではなく、停止理由分類である。
+本節は adversarial-review caller integration（REQ-014）に由来する停止信号の正規化を所有する。result 4状態契約（completed-pr/blocked/failed/delegation-unavailable）は「result 4状態契約」節が正であり、本節は変更しない。
+
+### user-decision-required の位置づけ（REQ-014-012）
+
+user-decision-required は case-run result enum の第5状態ではなく、既存結果に付随する case-auto の停止理由分類である（REQ-014-012）。adversarial-review 由来の unresolved なユーザー判断事項は、result 4状態のいずれかへ折り畳んで伝播し、新規状態を増やさない。
+
+| 起源 | 扱う状態 | 補足情報 |
+|---|---|---|
+| case-run 起源 | `blocked` | adversarial-review の unresolved ユーザー判断事項は blocked の停止理由へ正規化する |
+| その他の委譲（req-define、case-open、case-close 等の工程委譲） | 既存 status（pass/warn/fail/partial）+ `parent_decision_required` | delegation-contracts SPEC の review 経路での parent_decision_required / decision_context 適用に従う |
+
+### case-auto への伝播と resume point
+
+case-auto は user-decision-required を停止理由分類として受領した場合、対象 Issue の処理を停止し、ユーザー判断を待機する。resume point は次のいずれかとする。
+
+- case-run 起源の場合: 当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）
+- 工程委譲起源の場合: 当該工程の委譲起点
+
+ユーザー判断の解決後、case-auto は resume point から処理を再開し、adversarial-review の再発動要否は adversarial-review SPEC「再 review 条件」「再 review 停止条件」の各節に従う。adversarial-review 自体を恒久的な統制ゲートとしない（REQ-014-009、adversarial-review SPEC「unresolved 時の不可逆処理回避」節参照）。
