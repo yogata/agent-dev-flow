@@ -292,15 +292,39 @@ L3（委譲先内部メトリクス）は対象外とする（REQ-003-010）。
 
 ## Phase 0 commit スコープ設計運用
 
-Phase 0（枝PR作成フェーズ）の commit スコープ設計運用を明示する。case-auto SPEC（`docs/specs/commands/case-auto.md`）の Phase 0 commit スコープ設計運用と整合する内容を維持する。
+Phase 0（枝PR作成フェーズ）の case-run 委譲内で実行担当サブエージェントが作成する commit に適用するスコープ設計運用を規定する。Phase 0 全体の commit 構成（定義層で確定した REQ/ADR/SPEC のコミット、枝PR 作成）は case-auto SPEC（`docs/specs/commands/case-auto.md`）の同名節を正とし、本節は case-run 委譲内の commit スコープに焦点を当てる。case-auto SPEC と整合する内容を維持する（OU-013b / OU-013a）。
 
 ### 孫 Issue 間 SPEC スコープ交差時の扱い
 
-- 孫 Issue 間で SPEC スコープが交差する場合、`on_failure` で SPEC 修正を許容するかどうかを case-auto SPEC と整合させる
+Phase 0 で複数孫 Issue（Epic Wave 内の子Issue、または並列 execution_unit 内の個別 Issue）の実装が同一 SPEC ファイルに触れる場合の扱いを以下で規定する。
+
+**SPEC 本文修正の非許容**: 実行担当サブエージェントは test strategy が `on_failure: fix-and-reverify` を指示する場合でも、case-run 委譲内で SPEC 本文（`docs/specs/**`）を修正しない。Phase 0 の SPEC 成果物は spec-save 工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。SPEC 修正が必要と判明した場合は `record-in-findings` で PR 本文の `## SPEC確定候補` セクションへ記録し、case-close Step 3 の SPEC 確定チェックへ引き継ぐ（`agentdev-case-run-execution-adapter` SKILL の SPEC確定候補配置契約に従う）。
+
+**target_area の重複判定と並列制御**:
+
+- 同一 SPEC ファイルの異なる target_area を複数孫 Issue が編集する場合: git diff が競合しないため並列マージを許容する。並列判定軸は REQ-006-014 の連結成分ベースに従い、ファイル衝突（L2）は並列許容、PR マージコンフリクトは後続 PR の rebase で解決する
+- 同一 SPEC ファイルの同一 target_area を複数孫 Issue が編集する場合: case-open 構成生成時に必須依存（depends_on）として連結させ、直列化する。Wave 構成で同一 Wave へ割り当てない
+
+case-run は case-open が生成した Wave 構成と depends_on を前提として受け取り、委譲内で並列制御を新たに判定しない。
 
 ### ドメイン state 更新と成果物変更の同一コミット混在
 
-- ドメイン state 更新（`.agentdev/` 配下）と成果物変更（`docs/` 配下等）の同一コミット混在の扱いを case-auto SPEC と整合させる
+case-run 委譲内で作成する commit の構成運用を規定する。原則として **2分割運用** を採用し、実行担当サブエージェントはドメイン state 更新と成果物変更を同一コミットへ混在させない。
+
+**対象ディレクトリ**:
+
+- 成果物変更: `docs/`、`src/opencode/`、`src/opencode-local/` 等、配布対象の永続状態
+- ドメイン state 更新: `.agentdev/` 配下（intake、learning、drafts、cases 等のケース固有の一時状態）
+
+**2分割運用の理由**:
+
+- 永続性の違い: 成果物は配布対象の永続状態、ドメイン state はケース固有の一時状態。同一コミットに混在すると revert、cherry-pick の単位が曖昧になる
+- レビュー単位の分離: 成果物変更は SPEC 品質査読の対象、ドメイン state はキャプチャ境界（intake/learning）の対象。査読観点が異なるため分離する
+- capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（G15/G16/G17、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
+
+**例外**: `.agentdev/drafts/` の削除（req-save / spec-save 完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。本運用が禁止する同一コミット混在には該当しない。当該クリーンアップは req-save / spec-save 工程の責務であり、Phase 0 の case-run 委譲内では発生しない。
+
+**commit 分割手順**: 実行担当サブエージェントは成果物変更を先にコミットする。ドメイン state に触れる必要がある場合は別コミットへ分離するが、前述の通り case-run 委譲内では原則として `.agentdev/` 配下を編集せず、PR 本文経由で case-close へ引き継ぐ。
 
 ## See Also
 
