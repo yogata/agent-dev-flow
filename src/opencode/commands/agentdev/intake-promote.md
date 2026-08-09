@@ -68,6 +68,31 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 見出しは `## Findings / Capture候補` とする。
 詳細は `agentdev-intake-pipeline` を参照
 
+### Step 4a: 発動条件判定（経路C、任意）
+
+暫定分類生成後、ユーザ提示前に adversarial-review を発動するかを判定する（REQ-015-001、REQ-015-006）。本 Step は review 呼出（Step 4b）と分離された発動条件判定 Step であり、review 呼出そのものは行わない。
+
+判定基準:
+
+- ユーザー明示指定がある場合: 必ず「発動」とする（REQ-015-002）。明示指定は起動時引数、対話中の指示、extension（`.agentdev/extensions/commands/intake-promote.yaml`）の `rules` により表明される
+- ユーザー明示指定がない場合: 自動発動しない（任意助言手段、REQ-014-001）。「非発動」とする
+
+判定結果が「非発動」の場合は Step 4b をスキップし、Step 4 の暫定分類をそのまま Step 5 へ渡し従来フローを維持する（REQ-015-003）。既存の HITL（G06, G07, G08）、自動実行ルール（REQ-003-008）、破壊的変更制約（G18）は変更しない。
+
+詳細な候補判断基準は `agentdev-intake-pipeline` を参照。
+
+### Step 4b: adversarial-review 呼出（経路C、任意）
+
+Step 4a で「発動」と判定された場合に限り adversarial-review を呼び出す（REQ-015-001）。本 Step は発動条件判定（Step 4a）と分離された review 呼出 Step であり、発動条件の再判定は行わない。
+
+review 対象は Step 4 で生成された暫定分類（各 item の採用/保留/却下、変更種別、根拠）とする。呼出タイミングは Step 5「ユーザー確認」開始前、結果反映先は intake-promote 本体とする（詳細は `agentdev-intake-pipeline` 参照）。
+
+- accepted finding を得た場合: 呼出元（intake-promote 本体）が暫定分類へ finding を反映し、反映後の分類を Step 5 へ渡す（REQ-014-006）。adversarial-review 自身は反映を行わない
+- unresolved な本質的争点が残る場合: Step 5 のユーザー確認で既存 HITL 経由で扱い、後続の保存、inbox 削除等の不可逆処理へは進まない（REQ-014-009）
+- 呼出失敗時（スキル不在、起動異常、timeout 等）: silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）
+
+共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）の正規所有者は adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）であり、本 command 定義は再定義しない。
+
 ### Step 5: ユーザー確認
 
 評価、分類結果をユーザーに提示し、明示的な承認を得る（判断の確定、REQ）。

@@ -107,6 +107,29 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 
 ## adversarial-review 候補判断と内部挿入
 
-intake-promote 経路C における review 候補判断基準と内部手続き（候補確定位置、
-呼出タイミング、結果反映先）を規定する。
+本節は intake-promote 経路C における review 候補判断基準と内部手続き（候補確定位置、呼出タイミング、結果反映先）を正典として所有する（REQ-015-006）。挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、本節は domain skill 側の候補判断と内部手続きのみを所有する。
+
+### 候補判断基準
+
+intake-promote が review 候補を確定する基準は次のとおり。
+
+| 基準 | 内容 |
+|---|---|
+| 暫定分類の意味的完成度 | Step 3「レビュー、評価」と Step 4「分類の提示」を経て各 item の採用/保留/却下、変更種別、根拠が提示済みであること |
+| review 対象の存在 | 暫定分類結果のうち、意味的争点（分類の妥当性、変更種別の適合、優先度、後続ルートの適切さ）を持ち得る item が少なくとも1件存在すること |
+| ユーザー明示指定 | ユーザーが明示的に review を指定した場合は上記基準に関わらず候補確定とする（REQ-015-002） |
+
+候補確定後、review 呼出 Step へ進む。候補非該当時は従来フローを維持する（REQ-015-003）。
+
+### 内部手続き
+
+| 項目 | 内容 |
+|---|---|
+| 候補確定位置 | Step 4「分類の提示」完了直後。暫定分類表が生成された時点 |
+| 呼出タイミング | Step 5「ユーザー確認」開始前。暫定分類をユーザへ提示する前 |
+| 結果反映先 | intake-promote 本体。accepted finding を暫定分類表へ反映し、反映後の分類を Step 5 へ渡す |
+
+### 参照契約
+
+副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱いは adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）を正とし、本 SPEC は再定義しない。intake-promote 本体は本節に従い候補判断と内部手続きを実行する。
 

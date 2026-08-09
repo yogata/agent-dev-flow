@@ -112,5 +112,32 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 ## adversarial-review 挿入境界（経路C）
 
-経路C の review 挿入境界: 発動条件（暫定分類生成後・ユーザ提示前）を規定する。
+本節は intake-promote における経路C の review 挿入境界を正典として所有する（REQ-015-006）。共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が正規所有し、本節は経路C 固有の挿入位置、発動条件、戻り先のみを所有する。
+
+### 挿入位置（REQ-015-006）
+
+review 挿入位置は現行 Step 構造へ一意に特定可能である。Step 4「分類の提示」（暫定分類生成）の完了後、Step 5「ユーザー確認」（ユーザ提示）の開始前とする。Step 4 で生成された暫定分類を review 対象とし、Step 5 でユーザへ提示する前に review を経た分類を提示する。候補判断基準と内部手続きの詳細は `agentdev-intake-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節を参照する。
+
+### 発動条件判定 Step と review 呼出 Step の分離（REQ-015-001）
+
+経路C の review 挿入境界は次の2 Step を分離して構成する。
+
+| Step | 役割 |
+|---|---|
+| 発動条件判定 Step | ユーザーの明示指定、暫定分類の意味的完成度、review 対象の存在を判定する |
+| review 呼出 Step | 発動条件を満たす場合に限り adversarial-review を呼び出す |
+
+発動条件判定 Step を満たさない場合は review 呼出 Step へ進まない。command 定義（`.opencode/commands/agentdev/intake-promote.md`）は両 Step を独立した手順（Step 4a, Step 4b）として保持する。
+
+### ユーザー明示指定時の発動（REQ-015-002）
+
+ユーザーが明示的に review を指定した場合、発動条件判定 Step は必ず「発動」と判定し、review 呼出 Step を実行する。明示指定はコマンド起動時の引数、対話中の指示、または extension（`.agentdev/extensions/commands/intake-promote.yaml`）の `rules` により表明される。adversarial-review は任意助言手段であり、明示指定がない限り自動発動しない（REQ-014-001）。
+
+### 条件非該当時の従来フロー維持（REQ-015-003）
+
+発動条件判定 Step で「非発動」と判定された場合、review 呼出 Step をスキップし、Step 4 で生成した暫定分類をそのまま Step 5「ユーザー確認」へ渡す従来フローを維持する。既存の HITL（G06, G07, G08）、自動実行ルール（REQ-003-008）、破壊的変更制約（G18）は変更しない。
+
+### accepted finding の反映と戻り先
+
+review 呼出 Step で accepted finding が得られた場合、呼出元（intake-promote 本体）が暫定分類へ finding を反映し、反映後の分類を Step 5「ユーザー確認」へ渡す（REQ-014-006）。adversarial-review 自身は反映を行わない。unresolved な本質的争点が残る場合、Step 5 のユーザー確認で既存 HITL 経由で扱い、後続の保存、inbox 削除等の不可逆処理へは進まない（REQ-014-009）。呼出失敗時は silent skip を禁止し、利用不能を報告した上で従来フローを維持する（REQ-014-010）。
 
