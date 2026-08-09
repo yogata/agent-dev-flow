@@ -240,9 +240,9 @@ case-auto は user-decision-required を停止理由分類として受領した�
 
 ユーザー判断の解決後、case-auto は resume point から処理を再開し、adversarial-review の再発動要否は adversarial-review SPEC「再 review 条件」「再 review 停止条件」の各節に従う。adversarial-review 自体を恒久的な統制ゲートとしない（REQ-014-009、adversarial-review SPEC「unresolved 時の不可逆処理回避」節参照）。
 
-### bounded parent decision resolution と停止・resume 伝播（REQ-006-112〜114、ADR-008）
+### bounded parent decision resolution と停止・resume 伝播（REQ-006-112〜114、DEC-008）
 
-case-auto は user-decision-required + decision_context を受領した際、bounded parent decision resolution により decision_context を自律解決できる場合はユーザー停止せずに下位 command を resume させる。本節は case-auto と下位 command 間の停止・resume 伝播契約の整合のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto SPEC「bounded parent decision resolution（REQ-006-112〜114、ADR-008）」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節が正である。
+case-auto は user-decision-required + decision_context を受領した際、bounded parent decision resolution により decision_context を自律解決できる場合はユーザー停止せずに下位 command を resume させる。本節は case-auto と下位 command 間の停止・resume 伝播契約の整合のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto SPEC「bounded parent decision resolution（REQ-006-112〜114、DEC-008）」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節が正である。
 
 **自律解決時の resume 伝播**:
 
@@ -251,6 +251,6 @@ case-auto は user-decision-required + decision_context を受領した際、bou
 | case-run 起源 | case-auto は回答または作業仮定を case-run へ返し、当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）から resume させる |
 | 工程委譲起源 | case-auto は回答または作業仮定を当該工程へ返し、当該工程の委譲起点から resume させる |
 
-**ユーザー停止時の伝播**: case-auto が decision_context を自律解決できない場合（上位合意矛盾、新規ユーザー判断事項）、対象 execution_unit の処理を停止し、前節「case-auto への伝播と resume point」の resume point 仕様に従い resume point を記録する。ユーザー判断の解決後、resume point から処理を再開する点は従来の user-decision-required 停止と同一である。bounded parent decision resolution は新規の永続結果型を導入せず、既存 resume point 機構（REQ-006-085）を再利用する（ADR-008 決定5）。
+**ユーザー停止時の伝播**: case-auto が decision_context を自律解決できない場合（上位合意矛盾、新規ユーザー判断事項）、対象 execution_unit の処理を停止し、前節「case-auto への伝播と resume point」の resume point 仕様に従い resume point を記録する。ユーザー判断の解決後、resume point から処理を再開する点は従来の user-decision-required 停止と同一である。bounded parent decision resolution は新規の永続結果型を導入せず、既存 resume point 機構（REQ-006-085）を再利用する（DEC-008 決定5）。
 
 **他 execution_unit への影響**: bounded parent decision resolution による停止は部分停止（REQ-006-015/016）であり、他の ready 対象の execution_unit がある場合は継続する。ある execution_unit の decision_context 解決で他 execution_unit がブロックされることはない。

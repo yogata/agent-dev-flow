@@ -4,7 +4,7 @@ SPEC ファイルは現行アーキテクチャの正規文書である（REQ-00
 システムが現在「どうなっているか」を記述し、満たすべき成果を定義する REQ ファイルとは対比される。
 
 > **リポジトリ内部設計文書**: SPEC ファイルは agent-dev-flow リポジトリのリポジトリ内部設計文書である。
-> 実行時配布対象ではなく、実行時コマンドは本ファイル群に依存しない（charter 原則、ADR-001）。
+> 実行時配布対象ではなく、実行時コマンドは本ファイル群に依存しない（charter 原則、DEC-001）。
 
 ## SPEC status 追跡情報源
 
@@ -92,7 +92,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | [commands/inspect-docs.md](commands/inspect-docs.md) | accepted | `/agentdev/inspect-docs` |
 | [commands/inspect-skills.md](commands/inspect-skills.md) | accepted | `/agentdev/inspect-skills` |
 | [commands/inspect-promote.md](commands/inspect-promote.md) | accepted | `/agentdev/inspect-promote` |
-| [commands/inspect-extensions.md](commands/inspect-extensions.md) | superseded | `/agentdev/inspect-extensions`（ADR-006 により廃止。extension 検査は docs-check / inspect-skills / inspect-promote の3層責務分離へ移管） |
+| [commands/inspect-extensions.md](commands/inspect-extensions.md) | superseded | `/agentdev/inspect-extensions`（DEC-006 により廃止。extension 検査は docs-check / inspect-skills / inspect-promote の3層責務分離へ移管） |
 
 `/repo/docs-check` は repo-local、配布対象外のため対象外。
 
@@ -216,7 +216,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | local/runtime-package-boundary.md | accepted | 実行時パッケージ境界 | リポジトリ種別別 .opencode/ 定義、命名規約、link mode 導入フロー、更新運用 |
 | local/local-case-file.md | accepted | ローカル Case ファイル | ローカル版 Case ファイルスキーマ、状態遷移 |
 | local/install-script-usability.md | draft | 導入スクリプトの使いやすさ詳細 | install/check/sync-self の使いやすさ詳細（対話ウィザード、cwd 安全化、ヘルプ、上級者向けオプション） |
-| [local/artifact-graph.md](local/artifact-graph.md) | superseded | Artifact Graph（本体リポジトリ固有派生索引） | 成果物間の明示関係を検索する派生索引の生成、検査、問い合わせ契約。ADR-007 により標準配布スキル `agentdev-artifact-graph` へ移行（後継: [skills/agentdev-artifact-graph.md](skills/agentdev-artifact-graph.md)）。詳細は[効果検証判断資料](local/references/artifact-graph-effect-evaluation.md)を参照 |
+| [local/artifact-graph.md](local/artifact-graph.md) | superseded | Artifact Graph（本体リポジトリ固有派生索引） | 成果物間の明示関係を検索する派生索引の生成、検査、問い合わせ契約。DEC-007 により標準配布スキル `agentdev-artifact-graph` へ移行（後継: [skills/agentdev-artifact-graph.md](skills/agentdev-artifact-graph.md)）。詳細は[効果検証判断資料](local/references/artifact-graph-effect-evaluation.md)を参照 |
 
 #### authoring/（執筆規約）
 
@@ -235,7 +235,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 REQ (requirements/REQ-*.md)    -- 要件定義（満たすべき成果）
   |
   v
-ADR (adr/ADR-*.md)            -- アーキテクチャ決定記録（判断根拠）
+Decision (decisions/DEC-*.md) -- 意思決定記録（判断根拠）
   |
   v
 SPEC (specs/**/*.md)           -- 現行アーキテクチャ基準（現在どうなっているか）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成
@@ -245,6 +245,6 @@ Guides (guides/*.md)           -- 人間向けナビゲーション（規範的�
 ```
 
 - **REQ** ファイルは要件を定義する。システムが満たすべき成果の信頼できる情報源である。
-- **ADR** ファイルはアーキテクチャ決定とその判断根拠を記録する。
+- **Decision** ファイルは意思決定記録とその判断根拠を記録する。
 - **SPEC** ファイルは実装された現行アーキテクチャを記述する。「現在どう動作しているか」の基準となる。3 層構造（commands / skills / workflows）と基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。3 層は個別 command/skill と共通契約を扱い、基盤 6 ドメインはシステム全体の構成・フォーマット・整合性検査等を扱う（両系統を混同しない）。横断 SPEC は個別 SPEC の代替ではない。
 - **Guides** は人間向けナビゲーション層である。規範的権限を持たない。

@@ -28,7 +28,7 @@ authoring Skill/SPEC がそれぞれ担当する。
 ## 能力キー定義
 
 artifact type から必須品質能力への対応表。ルーティング先は能力キーで表現し、
-現在の提供 skill を参照情報として扱う（ADR-001 憲章：ADF core は具体的 skill 名や
+現在の提供 skill を参照情報として扱う（DEC-001 憲章：ADF core は具体的 skill 名や
 呼出順を固定しない）。
 
 | artifact type | 必須品質能力キー | 現在の提供 skill（参照） |

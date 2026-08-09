@@ -1,7 +1,7 @@
 # ドキュメント入口
 
-AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [憲章](guides/charter.md) を参照。
-現行の REQ/ADR は `REQ-001〜`、`ADR-001〜` の3桁IDを使用し、過去版は tag `v2.11.0` と `v2:` プレフィックスで区別する。
+AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) と [憲章](guides/charter.md) を参照。
+現行の REQ/Decision は `REQ-001〜`、`DEC-NNN`（3桁ゼロ埋め）のIDを使用し、過去版は tag `v2.11.0` と `v2:` プレフィックスで区別する。
 
 ## 要件
 
@@ -36,20 +36,21 @@ AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [�
 
 - [要件インデックス](requirements/README.md)
 
-## ADR
+## Decision
 
-現行 ADR は ADR-001 から ADR-008 の8件である（ADR-008 は proposed）。詳細は [ADR インデックス](adr/README.md) 参照。
+現行 Decision は DEC-001 から DEC-009 の9件である（DEC-008 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
 
-| ADR | タイトル |
+| Decision | タイトル |
 |---|---|
-| [ADR-001](adr/ADR-001.md) | AgentDevFlow 憲章 |
-| [ADR-002](adr/ADR-002.md) | OpenCode ソース・プロジェクション分離 |
-| [ADR-003](adr/ADR-003.md) | req_draft ソフトコントラクト原則 |
-| [ADR-004](adr/ADR-004.md) | 差し替え可能な I/O 境界 |
-| [ADR-005](adr/ADR-005.md) | Project Extensions Architecture（superseded by ADR-006） |
-| [ADR-006](adr/ADR-006.md) | inspect 3-command 構成への正規化 |
-| [ADR-007](adr/ADR-007.md) | Artifact Graph 標準化と配布スキル昇格 |
-| [ADR-008](adr/ADR-008.md) | case-auto の限定的親判断解決（bounded parent decision resolution）（proposed） |
+| [DEC-001](decisions/DEC-001.md) | AgentDevFlow 憲章 |
+| [DEC-002](decisions/DEC-002.md) | OpenCode ソース・プロジェクション分離 |
+| [DEC-003](decisions/DEC-003.md) | req_draft ソフトコントラクト原則 |
+| [DEC-004](decisions/DEC-004.md) | 差し替え可能な I/O 境界 |
+| [DEC-005](decisions/DEC-005.md) | Project Extensions Architecture（superseded by DEC-006） |
+| [DEC-006](decisions/DEC-006.md) | inspect 3-command 構成への正規化 |
+| [DEC-007](decisions/DEC-007.md) | Artifact Graph 標準化と配布スキル昇格 |
+| [DEC-008](decisions/DEC-008.md) | case-auto の限定的親判断解決（bounded parent decision resolution）（proposed） |
+| [DEC-009](decisions/DEC-009.md) | ADR から Decision への正規成果物モデル移行 |
 
 ## 仕様（SPEC）
 

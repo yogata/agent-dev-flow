@@ -206,7 +206,7 @@ REQ CREATE / APPEND / UPDATE 時に各 README（`docs/README.md`、`docs/require
 | 操作 | 確認対象 |
 |---|---|
 | REQ追加時 | `docs/requirements/README.md`, `docs/README.md` |
-| ADR追加時 | `docs/adr/README.md`, `docs/README.md` |
+| Decision追加時 | `docs/decisions/README.md`, `docs/README.md` |
 | SPEC追加/分割/削除時 | `docs/specs/README.md` |
 
 ### 矛盾時の優先順位

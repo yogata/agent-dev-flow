@@ -34,11 +34,11 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 - **分子**: 宣言対象フィールド（`spec_logical_division` または `canonical_owner`）を frontmatter または冒頭宣言節のいずれかで宣言している SPEC ファイル数
 - **分母**: `docs/specs/**/*.md` に存在する全 SPEC ファイル数（`_template.md` を除く）
 - **計算方法**: 各 SPEC ファイルの frontmatter と冒頭宣言節を grep / parse し、対象フィールドの宣言有無を判定する。frontmatter 形式（YAML frontmatter 内の当該フィールド）と冒頭宣言節形式（`../foundations/document-model.md`「SPEC 宣言形式」が定義する冒頭宣言節内の当該フィールド）の両方を計測対象とし、いずれか一方でも宣言されていれば宣言済みと数える
-- **unknown 扱い**: フィールド値が `unknown`、または欠落している SPEC は「未宣言」として扱い、分子に含めない（分母には含める）。警告モード運用（ADR-003 soft-contract）と整合し、欠落を理由に SPEC を拒否しない
+- **unknown 扱い**: フィールド値が `unknown`、または欠落している SPEC は「未宣言」として扱い、分子に含めない（分母には含める）。警告モード運用（DEC-003 soft-contract）と整合し、欠落を理由に SPEC を拒否しない
 - **閾値**: 設けない（警告モード）。不合格による保存拒否、配置一貫性検証の強制を行わない。段階適用（REQ-001-035）に従い、新規 SPEC から順次宣言付与を適用し、宣言率の推移を追跡する
 - **再現性**: 同一 commit 状態に対して grep / parse 集計を行えば誰でも同一結果を得られる。集計ロジックは本 SPEC が定義し、実行は `inspect-docs`、`/repo/docs-check` が担う（本 SPEC 自体は計測ロジックを実装しない）
 
-宣言率指標は警告モードで運用し、不合格閾値を設けない（REQ-001-035 段階適用、ADR-003 soft-contract）。新規 SPEC から順次宣言付与を適用し、段階的な宣言率向上を追跡する。
+宣言率指標は警告モードで運用し、不合格閾値を設けない（REQ-001-035 段階適用、DEC-003 soft-contract）。新規 SPEC から順次宣言付与を適用し、段階的な宣言率向上を追跡する。
 
 ## 閾値とシグナル
 
