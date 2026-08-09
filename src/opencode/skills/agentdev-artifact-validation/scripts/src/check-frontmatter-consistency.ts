@@ -1,18 +1,18 @@
 /**
  * frontmatter id ↔ ファイル名整合性確認スクリプト（AG-002、AG-006、REQ-0103-159/160）。
  *
- * 指定ディレクトリ配下の `REQ-NNNN.md` / `ADR-NNNN.md` について、
+ * 指定ディレクトリ配下の `REQ-NNNN.md` / `ADR-NNNN.md` / `DEC-NNN.md` について、
  * frontmatter の `id:` とファイル名が一致するか検証する。
  *
  * I/O:
  *   入力: argv[2] = 検証対象ディレクトリパス
- *         argv[3] = kind（"req" | "adr"、デフォルト: ファイル名から推定）
+ *         argv[3] = kind（"req" | "adr" | "decision"、デフォルト: ファイル名から推定）
  *   出力: stdout に JSON { ok: boolean, errors: string[], warnings: string[] }
  *   エラー時: ok: false, errors に理由。致命的I/Oエラーは非ゼロ終了コード + stderr
  */
 
-import { listMarkdownFiles, joinPath, readFileContent, reqNumberFromFilename, adrNumberFromFilename } from "../lib/fs-helpers.ts";
-import { parseFrontmatter, extractReqNumber, extractAdrNumber } from "../lib/frontmatter.ts";
+import { listMarkdownFiles, joinPath, readFileContent, reqNumberFromFilename, adrNumberFromFilename, decisionNumberFromFilename } from "../lib/fs-helpers.ts";
+import { parseFrontmatter, extractReqNumber, extractAdrNumber, extractDecisionNumber } from "../lib/frontmatter.ts";
 import { emitJson, emitError } from "../lib/result.ts";
 
 export type ConsistencyIssue = {
@@ -26,16 +26,24 @@ export type ConsistencyIssue = {
 export function checkSingleFile(
   filename: string,
   content: string,
-  kind: "req" | "adr",
+  kind: "req" | "adr" | "decision",
 ): { ok: boolean; issues: ConsistencyIssue } {
   const filenameNumber =
-    kind === "req" ? reqNumberFromFilename(filename) : adrNumberFromFilename(filename);
+    kind === "req"
+      ? reqNumberFromFilename(filename)
+      : kind === "adr"
+        ? adrNumberFromFilename(filename)
+        : decisionNumberFromFilename(filename);
   const fm = parseFrontmatter(content);
   const frontmatterId = fm?.id ?? null;
   let frontmatterNumber: number | null = null;
   if (frontmatterId !== null) {
     frontmatterNumber =
-      kind === "req" ? extractReqNumber(frontmatterId) : extractAdrNumber(frontmatterId);
+      kind === "req"
+        ? extractReqNumber(frontmatterId)
+        : kind === "adr"
+          ? extractAdrNumber(frontmatterId)
+          : extractDecisionNumber(frontmatterId);
   }
 
   const ok =
@@ -56,12 +64,12 @@ export function checkSingleFile(
 
 async function main(): Promise<void> {
   const dir = process.argv[2];
-  const kind = (process.argv[3] as "req" | "adr" | undefined) ?? "req";
+  const kind = (process.argv[3] as "req" | "adr" | "decision" | undefined) ?? "req";
   if (!dir) {
-    emitError("Usage: check-frontmatter-consistency <dir> [req|adr]");
+    emitError("Usage: check-frontmatter-consistency <dir> [req|adr|decision]");
   }
-  if (kind !== "req" && kind !== "adr") {
-    emitError(`kind must be "req" or "adr", got: ${kind}`);
+  if (kind !== "req" && kind !== "adr" && kind !== "decision") {
+    emitError(`kind must be "req", "adr", or "decision", got: ${kind}`);
   }
 
   const files = listMarkdownFiles(dir!);
@@ -69,17 +77,20 @@ async function main(): Promise<void> {
   const warnings: string[] = [];
 
   for (const filename of files) {
-    // REQ/ADR 以外の .md（README.md 等）はスキップ
+    // REQ/ADR/DEC 以外の .md（README.md 等）はスキップ
     const isTarget =
       (kind === "req" && /^REQ-\d{4}\.md$/.test(filename)) ||
-      (kind === "adr" && /^ADR-\d{4}\.md$/.test(filename));
+      (kind === "adr" && /^ADR-\d{4}\.md$/.test(filename)) ||
+      (kind === "decision" && /^DEC-\d{3}\.md$/.test(filename));
     if (!isTarget) continue;
 
     const content = readFileContent(joinPath(dir!, filename));
     const result = checkSingleFile(filename, content, kind);
     if (!result.ok) {
       const i = result.issues;
-      const expected = i.filenameNumber !== null ? `${kind.toUpperCase()}-${String(i.filenameNumber).padStart(4, "0")}` : "(no filename number)";
+      const prefix = kind === "req" ? "REQ" : kind === "adr" ? "ADR" : "DEC";
+      const width = kind === "decision" ? 3 : 4;
+      const expected = i.filenameNumber !== null ? `${prefix}-${String(i.filenameNumber).padStart(width, "0")}` : "(no filename number)";
       errors.push(
         `${filename}: frontmatter id "${i.frontmatterId ?? "(missing)"}" does not match expected "${expected}"`,
       );

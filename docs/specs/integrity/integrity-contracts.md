@@ -126,7 +126,7 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 | Command | 許可変更 | 禁止 |
 |---|---|---|
 | `req-define` | `.agentdev/drafts/req-draft-*.md` の生成（対話セッションで合意形成し、原本文書は変更しない） | 原本文書（`docs/`、`.opencode/`）の変更、Issue/PR 作成、更新、commit/push |
-| `req-save` | `docs/requirements/`, `docs/adr/`, `.agentdev/intake/inbox/req-restructure/`（REQ 再構成 intake のみ） | `.agentdev/`（req-restructure 除く）, `.opencode/` |
+| `req-save` | `docs/requirements/`, `docs/decisions/`, `.agentdev/intake/inbox/req-restructure/`（REQ 再構成 intake のみ） | `.agentdev/`（req-restructure 除く）, `.opencode/` |
 | `case-open` | GitHub Issue/PR のみ | ローカルファイル |
 | `case-run` | worktree 内の全ファイル | worktree 外、`.agentdev/` |
 | `case-close` | GitHub Issue/PR, worktree 削除 | `.agentdev/intake/inbox/` 直接書込 |

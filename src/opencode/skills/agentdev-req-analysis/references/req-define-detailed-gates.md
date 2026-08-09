@@ -20,7 +20,7 @@ req-define が要件 doc を生成する際の詳細ゲートを定義する。
 1. 変更種別を判定する。
 2. キーワードを抽出する。
 3. 限定探索を行う。
-対象は `docs/specs/**`、`docs/requirements/**`、`docs/adr/**`、`docs/README.md`、`.opencode/commands/**`、`.opencode/skills/**` とする。
+対象は `docs/specs/**`、`docs/requirements/**`、`docs/decisions/**`、`docs/README.md`、`.opencode/commands/**`、`.opencode/skills/**` とする。
 4. 探索結果を直接矛盾/ 更新候補/ 影響なしに分類する。
 5. REQ だけでなく ADR/ SPEC/ guides/ commands/ skills への影響候補を明示する。
 6. 結果をドラフトに保持する。

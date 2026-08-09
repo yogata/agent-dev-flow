@@ -116,7 +116,7 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 
 ### ファイル操作制約
 - G02: ファイル編集スコープ: 以下のパスのみ作成、編集を許可: `docs/specs/**`（SPEC ファイル）、`.agentdev/drafts/**`（ドラフト status 更新用）。`docs/specs/README.md` は SPEC 操作に付随する更新のみ許可
-- G03: 上記以外のファイル作成、編集は禁止。REQ ファイル（`docs/requirements/**`）、ADR（`docs/adr/**`）、コマンド、スキル、テンプレートは編集禁止
+- G03: 上記以外のファイル作成、編集は禁止。REQ ファイル（`docs/requirements/**`）、Decision（`docs/decisions/**`）、コマンド、スキル、テンプレートは編集禁止
 - G04: SPEC 対象 artifact_actions がない場合は SPEC ファイルを一切作成、編集しない（no-op）
 
 ### SPEC ライフサイクル制約

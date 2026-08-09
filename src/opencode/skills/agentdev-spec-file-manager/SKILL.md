@@ -29,7 +29,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | SPEC ライフサイクル適用（draft 付与、status 维持） | ✓ | |
 | `search-target-area.ts` 呼出契約 | ✓ | |
 | REQ 番号採番、REQ ファイル操作 | | `agentdev-req-file-manager` |
-| ADR 番号採番、ADR ファイル操作 | | `agentdev-adr-file-manager` |
+| Decision 番号採番、Decision ファイル操作 | | `agentdev-decision-file-manager` |
 | SPEC 内容の新規推論 | | `agentdev-req-analysis`（req-define 経由） |
 | accepted 昇格判断 | | `case-close` |
 | 共通検証（frontmatter 整合性、エントリ存在、変更範囲） | | `agentdev-artifact-validation` の公開検証契約へ委譲 |
@@ -133,7 +133,7 @@ spec-save は本スクリプト群を bash 経由で呼び出し、JSON 結果�
 ## See Also
 
 - **agentdev-req-file-manager**: REQ ファイル管理（REQ ↔ SPEC 整合性の境界）
-- **agentdev-adr-file-manager**: ADR ファイル管理
+- **agentdev-decision-file-manager**: Decision ファイル管理
 - **agentdev-artifact-validation**: 共通検証 script の公開検証契約（委譲先）
 - **agentdev-doc-diagnostics**: docs 横断診断
 - **agentdev-doc-writing**: SPEC 横断の文書品質査読ゲート

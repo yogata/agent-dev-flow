@@ -38,7 +38,7 @@ Case に対して実装実行を実行担当サブエージェント経由で委
 ### Step 2〜4: 抽出・確認・判定
 
 - **Step 2**: Issue本文から要件docと受け入れ基準を抽出（べき等性: worktreeとブランチが既に存在する場合、Step 5をスキップして Step 6 へ移行）。`agentdev-req-analysis` のチェックボックス品質基準で検証
-- **Step 3**: 関連ADR特定（`docs/adr/README.md` を読み込み、関連ADRがあれば個別に読み込み、実装がADRの決定事項に矛盾しないことを確認）
+- **Step 3**: 関連Decision特定（`docs/decisions/README.md` を読み込み、関連Decisionがあれば個別に読み込み、実装がDecisionの決定事項に矛盾しないことを確認）
 - **Step 4**: work_type 判定（`agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定、scale は feature のみ standard/large、workflow_route は都度導出し保存しない）
 
 ### Step 4-1: execution contract 消費境界（REQ-017）
@@ -95,9 +95,9 @@ case-run 経路G の adversarial-review 挿入境界。本 Step は case-run 本
 
 **case-run 本体は実装方針を生成・審査しない（REQ-015-010）**: 実装方針の形成、adversarial-review 呼出、結果反映は Step 6 委譲内で agentdev-case-run-execution-adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体（Step 1〜8 の orchestration）が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで adapter 委譲内の結果を受領する。
 
-**実装方針限定（REQ-015-010）**: adapter 委譲内で形成する実装方針は、既確定 Issue 本文、REQ、ADR、SPEC を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順等）に限定する。実装方針は既確定文書へ矛盾しない内部選択の範囲内で review 審議対象となる。実装方針が既確定 Issue/REQ/ADR/SPEC の変更、追加、撤回を必要とする場合、実行担当サブエージェントは実装を開始せず blocked へ遷移する。
+**実装方針限定（REQ-015-010）**: adapter 委譲内で形成する実装方針は、既確定 Issue 本文、REQ、Decision、SPEC を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順等）に限定する。実装方針は既確定文書へ矛盾しない内部選択の範囲内で review 審議対象となる。実装方針が既確定 Issue/REQ/Decision/SPEC の変更、追加、撤回を必要とする場合、実行担当サブエージェントは実装を開始せず blocked へ遷移する。
 
-**blocked 遷移（REQ-015-010、REQ-015-011）**: adapter 委譲内で次のいずれかに該当する場合、実行担当サブエージェントは result を `blocked` として返却する。(1) 実装方針が既確定 Issue/REQ/ADR/SPEC の変更、追加、撤回を必要とする（REQ-015-010）。(2) 要件、仕様に問題（欠落、矛盾、曖昧さ、実現不可能な条件等）を検出した（REQ-015-011）。(3) adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない（REQ-014-009）。blocked 詳細本文は Issue コメントに SSoT として記録され、Step 7 で処理される。実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず、必ず blocked 経路へ入る（G02）。
+**blocked 遷移（REQ-015-010、REQ-015-011）**: adapter 委譲内で次のいずれかに該当する場合、実行担当サブエージェントは result を `blocked` として返却する。(1) 実装方針が既確定 Issue/REQ/Decision/SPEC の変更、追加、撤回を必要とする（REQ-015-010）。(2) 要件、仕様に問題（欠落、矛盾、曖昧さ、実現不可能な条件等）を検出した（REQ-015-011）。(3) adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない（REQ-014-009）。blocked 詳細本文は Issue コメントに SSoT として記録され、Step 7 で処理される。実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、Decision 再解釈を行わず、必ず blocked 経路へ入る（G02）。
 
 **発動条件（REQ-015-002、REQ-015-003）**: case-run は adversarial-review を原則実行する（default-on、REQ-015-002）。発動条件判定は adapter 委譲内で実行担当サブエージェントが行う。skip 条件（実装方針が自明: 既確定 SPEC の機械的反映、単一ファイル編集等、意味的決定なし）該当時は省略して従来フローを継続できる（REQ-015-003）。ユーザー明示指定時は skip 条件にかかわらず必ず発動する（REQ-015-002）。case-run 本体は発動条件の有無を判定、伝達しない。
 

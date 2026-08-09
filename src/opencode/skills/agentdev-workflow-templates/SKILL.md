@@ -148,7 +148,7 @@ feature、bug、child テンプレートでは「テスト戦略」セクショ�
 ## See Also
 
 - [agentdev-req-file-manager](../agentdev-req-file-manager/SKILL.md)（REQファイル管理。doc_requirement.md テンプレート）
-- [agentdev-adr-file-manager](../agentdev-adr-file-manager/SKILL.md)（ADRファイル管理。doc_adr.md テンプレート）
+- [agentdev-decision-file-manager](../agentdev-decision-file-manager/SKILL.md)（Decisionファイル管理。doc_decision.md テンプレート）
 - **agentdev-doc-writing**: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
 
 

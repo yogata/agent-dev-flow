@@ -182,6 +182,6 @@ Issue本文のチェックボックスが満たすべき品質条件。
 - ライブラリのマイナーバージョン選択
 - コーディングスタイル、命名規約
 
-### ADR参照
+### Decision参照
 
-ADRが必要と判定された場合 → `agentdev-adr-guidelines` スキルを参照する。ADR候補記録までを責務とし、ADRファイル作成は req-save + `agentdev-adr-file-manager` に委譲する。
+Decisionが必要と判定された場合 → `agentdev-decision-guidelines` スキルを参照する。Decision候補記録までを責務とし、Decisionファイル作成は req-save + `agentdev-decision-file-manager` に委譲する。

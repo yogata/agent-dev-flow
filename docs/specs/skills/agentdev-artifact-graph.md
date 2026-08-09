@@ -11,7 +11,7 @@ canonical_owner: agentdev-artifact-graph
 
 ## 目的
 
-AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果物（REQ/ADR/SPEC）間の明示関係を検索できる Artifact Graph を生成、検査、問い合わせる。consumer と self-hosting の両環境で動作し、標準コアと augmentation を分離することで self-hosting 固有知識を標準契約から除外する。AgentDevFlow 標準の成果物間探索モデルとして機能する。
+AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果物（REQ/Decision/SPEC）間の明示関係を検索できる Artifact Graph を生成、検査、問い合わせる。consumer と self-hosting の両環境で動作し、標準コアと augmentation を分離することで self-hosting 固有知識を標準契約から除外する。AgentDevFlow 標準の成果物間探索モデルとして機能する。
 
 本 SPEC は `agentdev-artifact-graph` 配布スキルの振る舞い契約を定義する。実行時スキル（`src/opencode/skills/agentdev-artifact-graph/SKILL.md`）は本 SPEC に依存しない（REQ-001）。
 
@@ -46,7 +46,7 @@ AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果�
 
 標準コア デフォルト `indexed_paths`:
 - `docs/requirements/`
-- `docs/adr/`
+- `docs/decisions/`
 - `docs/specs/`
 
 self-hosting augmentation が追加する `indexed_paths`:
@@ -75,7 +75,7 @@ consumer 環境では AgentDevFlow 配布物（`.opencode/commands/agentdev/`、
 ### 標準コア node_types（デフォルト）
 
 - `requirement`
-- `adr`
+- `decision`
 - `specification`
 
 ### 標準コア relation_types（デフォルト）
@@ -158,7 +158,7 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 - **選定基準の明示**: 各 fixture がどの代表質問、経路クラス、入力パターンを代表するかをメタデータとして保持する
 - **配置先**: fixture は標準スキル配下の所定ディレクトリ（例: `tests/fixtures/`）へ配置し、配布物と明確に区別する
 - **再現性**: 同一 fixture から同一の Graph 結果が得られること。`manifest.json` の `input_digest` 等の決定論性条件を満たす
-- **機密情報除去**: 実プロジェクト由来の入力を fixture 化する場合は、REQ/ADR/SPEC の具体内容を抽象化またはダミー化し、機密情報を含めない
+- **機密情報除去**: 実プロジェクト由来の入力を fixture 化する場合は、REQ/Decision/SPEC の具体内容を抽象化またはダミー化し、機密情報を含めない
 - **版管理**: fixture の追加、変更、廃止は SPEC 更新で明示し、暗黙に変更しない
 
 ## 根拠追跡
@@ -198,7 +198,7 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 
 consumer は project 固有正規成果物を `node_types`, `relation_types` へ追加できる。project augmentation が存在しなくても標準スキルは動作する（fail-open）。
 
-consumer が AgentDevFlow 運用（REQ/ADR/SPEC）を採用しない場合、Graph は空で生成されるが正常状態とする。
+consumer が AgentDevFlow 運用（REQ/Decision/SPEC）を採用しない場合、Graph は空で生成されるが正常状態とする。
 
 project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ含めず、project augmentation の `discovery_roots`（明示参照起点リスト）と query 時の `rg`/filesystem 補完で必要時探索する。標準スキルは固定 directory 知識を埋め込まない。
 
@@ -214,7 +214,7 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 
 各 command, skill は次の候補取得に Artifact Graph を利用できる。
 
-- `req-define`: 既存REQ、関連ADRとSPEC、構造的所有者重複の候補取得
+- `req-define`: 既存REQ、関連DecisionとSPEC、構造的所有者重複の候補取得
 - `spec-save`: 対応REQ、同じ正規所有対象を持つSPEC、関連command、skill、整合性ルールの候補取得
 - `case-open`: 起点成果物から到達できる変更影響、廃止参照、未解決参照の候補取得
 - `case-run`: 実装対象に関係するREQ、SPEC、整合性ルール、周辺成果物の候補取得
@@ -255,7 +255,7 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 ## 検証観点
 
 - **consumer 環境での標準動作**: project augmentation なしでビルド、検査、クエリが動作すること（REQ-012-005）
-- **標準コア不変条件**: デフォルト `indexed_paths` が3種（`docs/requirements`, `docs/adr`, `docs/specs`）のみ、デフォルト `node_types` が3種（`requirement`, `adr`, `specification`）のみであること（REQ-012-002, REQ-012-003）
+- **標準コア不変条件**: デフォルト `indexed_paths` が3種（`docs/requirements`, `docs/decisions`, `docs/specs`）のみ、デフォルト `node_types` が3種（`requirement`, `decision`, `specification`）のみであること（REQ-012-002, REQ-012-003）
 - **consumer 配布物除外**: consumer 環境で生成 Graph に配布物パターンのノードが0件であること（REQ-012-008）
 - **open extensibility**: augmentation で追加した `node_type`, `relation_type` が Graph へ反映されること（REQ-012-004, REQ-012-006）
 - **fail-open**: Graph 不在で workflow が停止しないこと（REQ-012-010）
@@ -274,5 +274,5 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 - [../../requirements/REQ-012.md](../../requirements/REQ-012.md)（Artifact Graph 標準化 REQ）
 - [../../requirements/REQ-013.md](../../requirements/REQ-013.md)（旧文書探索経路インデックス依存除去 REQ）
 - [../../requirements/REQ-020.md](../../requirements/REQ-020.md)（Artifact Graph 解析品質と検証 REQ）
-- [../../adr/ADR-007.md](../../adr/ADR-007.md)（Artifact Graph 標準化と配布スキル昇格 ADR）
-- ADR-002（OpenCode ソース・プロジェクション分離）
+- [../../decisions/DEC-007.md](../../decisions/DEC-007.md)（Artifact Graph 標準化と配布スキル昇格 Decision）
+- DEC-002（OpenCode ソース・プロジェクション分離）

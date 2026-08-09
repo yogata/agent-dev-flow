@@ -7,7 +7,7 @@ status: accepted
 | Field | Value |
 |-------|-------|
 | rule_id | IR-037 |
-| description | 廃止 ADR（`docs/adr/retired/`）が現行基準（current baseline）として参照、案内されていないこと（REQ-010-250）。Current Baseline View、後継ADRの Related Decisions、REQ/SPEC の現行根拠で 廃止 ADR が現行扱いされていないかを検査する |
+| description | 廃止 Decision（`docs/decisions/retired/`）が現行基準（current baseline）として参照、案内されていないこと（REQ-010-250）。Current Baseline View、後継Decisionの Related Decisions、REQ/SPEC の現行根拠で 廃止 Decision が現行扱いされていないかを検査する |
 | severity | strict |
 | category | canonical-conflict |
 | detection_method | 廃止 ADR 番号が現行基準文脈（Current Baseline View、現行根拠引用、後継指定なしの参照）に出現していないかを検出 |

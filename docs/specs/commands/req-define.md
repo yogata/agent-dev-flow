@@ -24,7 +24,7 @@ updated: 2026-07-28
 
 ## 出力
 
-- `.agentdev/drafts/req-draft-{topic-slug}.md`（全 work_type 共通、構造化 `draft-data` 形式: REQ-008, ADR-003）
+- `.agentdev/drafts/req-draft-{topic-slug}.md`（全 work_type 共通、構造化 `draft-data` 形式: REQ-008, DEC-003）
 
 ## 副作用
 
@@ -47,7 +47,7 @@ updated: 2026-07-28
  - Step 5-2: 分類ゲート（v2:REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/SPEC 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/specs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（v2:REQ-0155-008）」に定める
  - Step 5-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
   - Step 5-4: ADR要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
-  - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-073）。ラベル構造は soft-contract（ADR-003）とし、分類権限は親が保持する
+  - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-073）。ラベル構造は soft-contract（DEC-003）とし、分類権限は親が保持する
  - Step 5-5: 実行主体分類表（REQ-003-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
  - Step 5-6: Test strategy 定義（要件展開内）
  - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
@@ -55,12 +55,12 @@ updated: 2026-07-28
  - 項目識別子: TS-NNN 形式（NNNは3桁ゼロ埋め連番）
  - 各項目属性: id（TS-NNN）、target_item（AG-* への参照）、verification、pass_criteria、on_failure
  - on_failure アクション種別: fix-and-reverify（実装を修正して再検証）/ record-in-findings（Findings に out-of-scope として記録）の2値
-- Step 6: ADR判断（`agentdev-adr-guidelines`）
- - Step 6-1: 既存ADR重複確認
- - Step 6-2: ADR禁止ゲート
- - Step 6-3: ADR判断根拠記録
- - Step 6-4: 作業手段ADR拒否ゲート
- - Step 6-5: ADR 番号指定形式（`new:{topic-slug}` 形式）
+- Step 6: Decision判断（`agentdev-decision-guidelines`）
+ - Step 6-1: 既存Decision重複確認
+ - Step 6-2: Decision禁止ゲート
+ - Step 6-3: Decision判断根拠記録
+ - Step 6-4: 作業手段Decision拒否ゲート
+ - Step 6-5: Decision 番号指定形式（`new:{topic-slug}` 形式）
 - Step 7: 要件doc生成（テンプレート: `templates/req-define/req-draft.md`）
  - Step 7-1: 定義完全性ゲート（QG-1）
  - Step 7-2: operation_units 生成
@@ -109,7 +109,7 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 
 ### SPEC action への分類根拠出力
 
-最終分類確定ステップで `artifact: spec` の SPEC action 各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する。出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`spec_logical_division`、`canonical_owner`）と一致し、後続の spec-save が SPEC frontmatter または冒頭宣言節へ宣言を付与するための入力となる。分類値が確定できない場合は `unknown` とし、soft-contract（ADR-003）に従い spec-save へ警告付きで引き継ぐ。
+最終分類確定ステップで `artifact: spec` の SPEC action 各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する。出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`spec_logical_division`、`canonical_owner`）と一致し、後続の spec-save が SPEC frontmatter または冒頭宣言節へ宣言を付与するための入力となる。分類値が確定できない場合は `unknown` とし、soft-contract（DEC-003）に従い spec-save へ警告付きで引き継ぐ。
 
 ### REQ 影響なし時の取扱い
 
@@ -117,7 +117,7 @@ REQ 影響なしと確定した変更からは `artifact_actions` の `artifact:
 
 ### 分類根拠の引き継ぎ
 
-req-define は RU から引き継いだ分類根拠（`artifact-contracts.md`「分類根拠伝播契約」参照）を暫定入力とし、最終分類を確定した上で draft-data へ反映する。分類根拠の soft-contract 運用（欠落時 unknown 既定値、警告）は ADR-003 に従う。
+req-define は RU から引き継いだ分類根拠（`artifact-contracts.md`「分類根拠伝播契約」参照）を暫定入力とし、最終分類を確定した上で draft-data へ反映する。分類根拠の soft-contract 運用（欠落時 unknown 既定値、警告）は DEC-003 に従う。
 
 ### tentative_classification との関係
 
@@ -260,7 +260,7 @@ req-define は以下の入力項目について disposition を記録する:
 | 既存要件で充足済みの入力 | 既存 REQ、既存 SPEC、同意済み artifact_actions で既に満たされている項目（disposition: `covered`） |
 | 一部のみ採用した入力 | 項目の一部を採用し、残部を採用しなかったもの（disposition: `partially_covered`） |
 
-`review_dispositions` は optional な soft-contract であり（ADR-003）、欠落時に後続工程が draft を拒否しない。covered 項目だけで構成される Issue や PR を作成しない方針を維持する。
+`review_dispositions` は optional な soft-contract であり（DEC-003）、欠落時に後続工程が draft を拒否しない。covered 項目だけで構成される Issue や PR を作成しない方針を維持する。
 
 ### 未決事項の取扱い
 
@@ -329,7 +329,7 @@ review_dispositions:
 
 ### 後方互換性
 
-`review_dispositions` は optional な soft-contract である。本フィールドを持たない旧ドラフトを req-save、case-open は入力として拒否しない（ADR-003 準拠）。
+`review_dispositions` は optional な soft-contract である。本フィールドを持たない旧ドラフトを req-save、case-open は入力として拒否しない（DEC-003 準拠）。
 
 ## 未確定内容の auto_ready 抑止（REQ-008-059）
 
@@ -371,7 +371,7 @@ Step 10-2（auto_gate完了ゲート）の判定前に、以下の2系統の検�
 
 ### stop_reasons 記録形式
 
-抑止時に `auto_gate.stop_reasons` へ記録する各エントリは、対象 ID と理由を含む文字列とする。形式は soft-contract（ADR-003）とし厳格スキーマ検証を導入しないが、少なくとも以下の情報を含むこと。
+抑止時に `auto_gate.stop_reasons` へ記録する各エントリは、対象 ID と理由を含む文字列とする。形式は soft-contract（DEC-003）とし厳格スキーマ検証を導入しないが、少なくとも以下の情報を含むこと。
 
 - 対象 ID（`AG-NNN` または `ACT-{ARTIFACT}-NNN`）
 - 抑止理由（検出マーカー、または QG-1 該当観点）
@@ -431,13 +431,13 @@ auto_gate:
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
 - `agentdev-req-analysis` skill（要件分析手法）
 - `agentdev-req-file-manager` skill（REQ ファイル管理、照合）
-- `agentdev-adr-guidelines` skill（ADR 判断基準）
+- `agentdev-decision-guidelines` skill（Decision 判断基準）
 - `agentdev-architecture-advisory` skill（アーキテクチャ助言サブエージェント連携）
 - `agentdev-workflow-lifecycle` skill（work_type、scale 判定）
 - REQ-004（要件定義、保存）
 - REQ-008（構造化 req_draft 契約）
 - REQ-003（外部エージェント統合契約）
-- ADR-003（構造化 draft-data 形式）
+- DEC-003（構造化 draft-data 形式）
 
 ## adversarial-review 挿入境界（経路A）
 

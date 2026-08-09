@@ -196,7 +196,7 @@ Q5: 現在仕様の記述か？
   → Yes: SPEC（docs/specs/） / No: Q6 へ
 
 Q6: 将来の設計・運用・文書システムを制約する決定の記録か？
-  → Yes: ADR（docs/adr/） / No: Q7 へ
+  → Yes: Decision（docs/decisions/） / No: Q7 へ
 
 Q7: 人間向けナビゲーション・案内か？
   → Yes: Guide（docs/guides/） / No: 適切な分類先を再検討

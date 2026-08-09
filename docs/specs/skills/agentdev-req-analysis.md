@@ -44,7 +44,7 @@ updated: 2026-07-27
 
 - REQ ファイルの採番、CREATE/APPEND/UPDATE、frontmatter 更新、README 更新（`agentdev-req-file-manager` 担当）
 - 実装計画、タスク分割、コード変更方針の確定
-- ADR ファイルの作成、更新（`agentdev-adr-file-manager` 担当）
+- Decision ファイルの作成、更新（`agentdev-decision-file-manager` 担当）
 
 ## 検証観点
 
@@ -93,7 +93,7 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)
 - [agentdev-req-structure-diagnostics.md](agentdev-req-structure-diagnostics.md)
 - [agentdoc-architecture-advisory.md](agentdev-architecture-advisory.md)
-- [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)
+- [agentdev-decision-guidelines.md](agentdev-decision-guidelines.md)
 - [commands/req-define.md](../commands/req-define.md)
 - REQ-004（要件定義、保存）
 

@@ -11,12 +11,12 @@ updated: "2026-08-09"
 
 ## 検出対象
 
-- 変更 SPEC ファイル（`docs/specs/**/*.md`、`docs/requirements/REQ-*.md`、`docs/adr/ADR-*.md`）。PR diff（`git diff --name-only <base-ref>...HEAD`）から抽出する
+- 変更 SPEC ファイル（`docs/specs/**/*.md`、`docs/requirements/REQ-*.md`、`docs/decisions/DEC-*.md`）。PR diff（`git diff --name-only <base-ref>...HEAD`）から抽出する
 - 上記 SPEC を参照するテストファイル（`**/*.test.ts`）。参照の検出は次のいずれかの契機で成立する:
   - SPEC 相対パス（例: `docs/specs/integrity/test-impact-detection-gate.md`）の文字列参照
   - SPEC basename（例: `test-impact-detection-gate.md`）の文字列参照
-  - REQ ID（例: `REQ-019`）、ADR ID（例: `ADR-001`）の文字列参照（当該 ID を frontmatter に持つ REQ/ADR が変更対象に含まれる場合）
-- 検出対象外: node_modules/、`.worktrees/`、`.agentdev-plugin/`、`docs/requirements/retired/`、`docs/adr/retired/`
+  - REQ ID（例: `REQ-019`）、Decision ID（例: `DEC-001`）の文字列参照（当該 ID を frontmatter に持つ REQ/Decision が変更対象に含まれる場合）
+- 検出対象外: node_modules/、`.worktrees/`、`.agentdev-plugin/`、`docs/requirements/retired/`、`docs/decisions/retired/`
 
 ## 検出契機
 

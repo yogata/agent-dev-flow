@@ -97,7 +97,7 @@ beforeAll(() => {
   // Link normalization fixtures
   writeFileSync(
     join(TEMP_DIR, "actual_relative_link.md"),
-    VALID_BODY + "\n\n## References\n\n- [REQ-0031](docs/requirements/REQ-0031.md)\n- [ADR-0001](../docs/adr/ADR-0001.md)\n",
+    VALID_BODY + "\n\n## References\n\n- [REQ-0031](docs/requirements/REQ-0031.md)\n- [DEC-001](../docs/decisions/DEC-001.md)\n",
     "utf-8",
   );
   writeFileSync(

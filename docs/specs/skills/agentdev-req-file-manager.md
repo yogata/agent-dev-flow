@@ -44,7 +44,7 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 ## 対象外
 
 - 要件分析手法（`agentdev-req-analysis` 担当）
-- ADR ファイル作成、更新（`agentdev-adr-file-manager` 担当）
+- Decision ファイル作成、更新（`agentdev-decision-file-manager` 担当）
 - 文書品質査読（`agentdev-doc-writing` 担当）
 - 要件収集
 
@@ -71,7 +71,7 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 ## See Also
 
 - [agentdev-req-analysis.md](agentdev-req-analysis.md)
-- [agentdev-adr-file-manager.md](agentdev-adr-file-manager.md)
+- [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)
 - [agentdev-doc-map.md](agentdev-doc-map.md)
 - [commands/req-save.md](../commands/req-save.md)
 - REQ-001（文書、REQ 管理基準）

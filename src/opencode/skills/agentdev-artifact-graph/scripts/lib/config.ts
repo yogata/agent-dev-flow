@@ -1,7 +1,7 @@
 import { join } from "node:path"
 import type { ExtractionRule } from "./model.ts"
 
-// ─── Default vocabulary (REQ-012-002, REQ-012-003, ADR-007 decision 3) ───────
+// ─── Default vocabulary (REQ-012-002, REQ-012-003, DEC-007 decision 3) ───────
 
 /**
  * Standard core default indexed_paths: 3 only.
@@ -11,7 +11,7 @@ import type { ExtractionRule } from "./model.ts"
  */
 export const DEFAULT_INDEXED_PATHS = [
   "docs/requirements",
-  "docs/adr",
+  "docs/decisions",
   "docs/specs",
 ] as const
 
@@ -22,13 +22,13 @@ export const DEFAULT_INDEXED_PATHS = [
  */
 export const DEFAULT_NODE_TYPE_VOCABULARY = [
   "requirement",
-  "adr",
+  "decision",
   "specification",
 ] as const
 
 /**
  * Standard core default relation_types vocabulary: 5.
- * delegates_to, governs are added by augmentation (ADR-007 decision 3).
+ * delegates_to, governs are added by augmentation (DEC-007 decision 3).
  */
 export const DEFAULT_RELATION_TYPE_VOCABULARY = [
   "references",
@@ -75,7 +75,7 @@ export function isInputFile(path: string): boolean {
   return dot >= 0 && INPUT_EXTENSIONS.has(path.slice(dot).toLowerCase())
 }
 
-// ─── Open extension point: rules and config (REQ-012-004, ADR-007 decision 2) ─
+// ─── Open extension point: rules and config (REQ-012-004, DEC-007 decision 2) ─
 
 export type LabelSourceStep =
   | { readonly kind: "frontmatter_field"; readonly field: string }
@@ -126,9 +126,9 @@ export const DEFAULT_NODE_TYPE_RULES: readonly NodeTypeRule[] = [
     extraction_rule: "frontmatter",
   },
   {
-    name: "adr",
-    path_pattern: "^docs/adr/(?:retired/)?(ADR-\\d+)\\.md$",
-    id_template: "adr:{match1}",
+    name: "decision",
+    path_pattern: "^docs/decisions/(?:retired/)?(DEC-\\d+)\\.md$",
+    id_template: "decision:{match1}",
     label_source: FALLBACK_LABEL,
     extraction_rule: "frontmatter",
   },

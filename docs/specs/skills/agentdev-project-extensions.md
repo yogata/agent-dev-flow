@@ -24,7 +24,7 @@ updated: 2026-07-27
 ### DO NOT USE FOR
 
 - extension schema の定義（基盤 SPEC `foundations/project-extensions.md` の責務）
-- extension 構造の診断、検査（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層責務、ADR-006）
+- extension 構造の診断、検査（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層責務、DEC-006）
 - 配布 command/skill 本文の変更
 - project-local skill の実装（各適用プロジェクトの責務）
 
@@ -55,7 +55,7 @@ updated: 2026-07-27
 ## 対象外
 
 - extension schema、配置、命名の定義（基盤 SPEC `foundations/project-extensions.md`）
-- extension 構造の診断（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層、ADR-006）
+- extension 構造の診断（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層、DEC-006）
 - project-local skill の実装（各適用プロジェクトの責務）
 - extension 自体の作成、編集（プロジェクト側の責務）
 
@@ -69,5 +69,5 @@ updated: 2026-07-27
 - [foundations/project-extensions.md](../foundations/project-extensions.md)（project-extensions 機構の基盤 SPEC）
 - [foundations/system.md](../foundations/system.md)（システム仕様、公開 command 一覧）
 - REQ-002（Project Extensions 機構と配布物参照境界）
-- ADR-006（inspect 3-command 構成への正規化）
+- DEC-006（inspect 3-command 構成への正規化）
 

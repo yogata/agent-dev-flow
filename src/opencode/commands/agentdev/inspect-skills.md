@@ -13,7 +13,7 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 
 - 診断結果の提示
 - 根拠と推奨 route の提示
-- 正規文書変更、REQ/ADR/SPEC 変更、Command/Skill/Template/Script 変更、Issue作成、PR作成、RU保存、branch、worktree 操作の禁止
+- 正規文書変更、REQ/Decision/SPEC 変更、Command/Skill/Template/Script 変更、Issue作成、PR作成、RU保存、branch、worktree 操作の禁止
 
 ## 入力
 
@@ -34,7 +34,7 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
-| `docs/requirements/*.md`、`docs/adr/*.md` | inspect-docs |
+| `docs/requirements/*.md`、`docs/decisions/*.md` | inspect-docs |
 | `docs/specs/**/*.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
 | `docs/guides/*.md`、`README.md` | inspect-docs |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |

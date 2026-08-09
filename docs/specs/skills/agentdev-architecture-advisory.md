@@ -49,7 +49,7 @@ req-define が要件を確定する前にアーキテクチャ上の影響を確
 
 ## See Also
 
-- [agentdev-adr-guidelines.md](agentdev-adr-guidelines.md)
+- [agentdev-decision-guidelines.md](agentdev-decision-guidelines.md)
 - [agentdev-req-analysis.md](agentdev-req-analysis.md)
 - [commands/req-define.md](../commands/req-define.md)
 - REQ-003（外部エージェント統合契約）

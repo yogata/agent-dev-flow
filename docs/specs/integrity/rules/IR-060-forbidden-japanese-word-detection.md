@@ -13,7 +13,7 @@ status: accepted
 | severity | heuristic |
 | category | document-drift |
 | detection_method | 完全一致検出（forbidden 語リスト正: `src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md` の forbidden 区分）。backticks 内、fenced code block 内、YAML frontmatter、ファイルパス、識別子（enum 値、コマンド名、スキル名、YAMLキー）は文脈除外対象 |
-| affected_artifacts | [docs/**/*.md（docs/requirements/retired/, docs/adr/retired/ を除く）, src/opencode/{commands,skills}/**/*.md, AGENTS.md] |
+| affected_artifacts | [docs/**/*.md（docs/requirements/retired/, docs/decisions/retired/ を除く）, src/opencode/{commands,skills}/**/*.md, AGENTS.md] |
 | related_req | [v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（REQ-010-256 文意判断は docs-check 対象外、本ルールは完全一致検出に限定）] |
 | related_spec | [../responsibilities/document-type-responsibilities.md（不自然表現検出分類 P0〜P4）, ../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md（forbidden 語リスト正）, integrity-rule-catalog.md] |
 | gate_level | delta-guard |

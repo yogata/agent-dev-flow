@@ -14,7 +14,7 @@ SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPE
 
 ## 目的
 
-`spec-save` command の実行時に SPEC 操作（SPEC 作成、更新、配置判断、target_area による更新判断、SPEC 固有整合性確認、SPEC 固有 script 呼出契約）を担う操作用 skill の責務、対象外、境界を定義する。REQ/ADR 操作 skill（`agentdev-req-file-manager`、`agentdev-adr-file-manager`）との責務重複を防ぎ、SPEC 操作の正規所有者を一つに定める。
+`spec-save` command の実行時に SPEC 操作（SPEC 作成、更新、配置判断、target_area による更新判断、SPEC 固有整合性確認、SPEC 固有 script 呼出契約）を担う操作用 skill の責務、対象外、境界を定義する。REQ/Decision 操作 skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`）との責務重複を防ぎ、SPEC 操作の正規所有者を一つに定める。
 
 ## 適用対象
 
@@ -28,7 +28,7 @@ SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPE
 
 **DO NOT USE FOR**:
 
-- REQ 操作、ADR 操作（`agentdev-req-file-manager`、`agentdev-adr-file-manager` の責務）
+- REQ 操作、Decision 操作（`agentdev-req-file-manager`、`agentdev-decision-file-manager` の責務）
 - SPEC 内容の新規推論（req-define、`agentdev-req-analysis` の責務）
 - accepted 昇格判断（case-close の責務、v2:ADR-0123 / REQ-001-024 準拠）
 - ユーザー承認（親エージェントの責務）
@@ -81,7 +81,7 @@ SPEC operation の公式 enum は `create` / `update` であり、本 skill は�
 
 ## 境界
 
-`agentdev-req-file-manager`（REQ 操作）および `agentdev-adr-file-manager`（ADR 操作）との責務重複がないこと。SPEC 操作は本 skill が正規の所有者となる。
+`agentdev-req-file-manager`（REQ 操作）および `agentdev-decision-file-manager`（Decision 操作）との責務重複がないこと。SPEC 操作は本 skill が正規の所有者となる。
 
 `agentdev-artifact-validation` との責務重複がないこと。共通検証 script は `agentdev-artifact-validation` が所有し、本 skill は内部 script パスを直接参照せず公開検証契約へ委譲する。
 
@@ -108,7 +108,7 @@ SPEC operation の公式 enum は `create` / `update` であり、本 skill は�
 
 - [spec-save.md](../commands/spec-save.md)（SPEC 操作 command。`spec-append` 操作時のセクション追加ロジック詳細を正規所有）
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)（REQ 操作 skill）
-- [agentdev-adr-file-manager.md](agentdev-adr-file-manager.md)（ADR 操作 skill）
+- [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)（Decision 操作 skill）
 - [agentdev-artifact-validation.md](agentdev-artifact-validation.md)（共通検証 skill）
 - [agentdev-doc-diagnostics.md](agentdev-doc-diagnostics.md)（docs 横断診断 skill）
 - v2:ADR-0123（SPEC lifecycle と spec-save の導入）

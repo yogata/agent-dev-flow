@@ -85,15 +85,15 @@ SPEC 分離候補は要件候補、衝突候補に付随情報として併記し
 |--------|----------|
 | 実装実行 | case-run（`agentdev-case-run-execution-adapter`） |
 | 実行計画確認（実装開始前） | 外部実行基盤（利用時） |
-| ADR 判断の確定、記録 | req-define 親エージェント（`agentdev-adr-guidelines`） |
+| Decision 判断の確定、記録 | req-define 親エージェント（`agentdev-decision-guidelines`） |
 | ファイル編集 | 親エージェント、各コマンド |
 
 アーキテクチャ助言サブエージェントはファイル編集主体ではない。
-ドラフト、REQ、ADR、SPEC、Issue、PR を直接更新しない。
+ドラフト、REQ、Decision、SPEC、Issue、PR を直接更新しない。
 
 ## See Also
 
-- **agentdev-adr-guidelines**: ADR 判断基準、記録（本スキルは ADR 判断前の事前確認）
+- **agentdev-decision-guidelines**: Decision 判断基準、記録（本スキルは Decision 判断前の事前確認）
 - **agentdev-req-analysis**: 要件展開、分類ゲート、SPEC 分離候補抽出
 - **references/architecture-review-delegation.md**: アーキテクチャ助言サブエージェントの具体的起動方法、相談プロトコル具象
 

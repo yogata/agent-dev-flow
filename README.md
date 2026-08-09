@@ -20,8 +20,8 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 | 現在の状態 | 次のコマンド | 出力 |
 |-----------|-------------|------|
 | 要件を整理したい | `/agentdev/req-define` | 要件doc（draft） |
-| 要件docがあり、機能追加の場合 | `/agentdev/req-save` | REQ/ADR ファイル |
-| REQ/ADR ファイルがあり、SPEC候補がある場合 | `/agentdev/spec-save` | SPEC ファイル（`docs/specs/`） |
+| 要件docがあり、機能追加の場合 | `/agentdev/req-save` | REQ/Decision ファイル |
+| REQ/Decision ファイルがあり、SPEC候補がある場合 | `/agentdev/spec-save` | SPEC ファイル（`docs/specs/`） |
 | REQ ファイルまたは要件docがある | `/agentdev/case-open` | GitHub Issue |
 | Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
@@ -55,7 +55,7 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 
 ```
 /agentdev/req-define    # 要件を壁打ちする
-/agentdev/req-save      # REQ/ADR ファイルとして保存（機能追加のみ）
+/agentdev/req-save      # REQ/Decision ファイルとして保存（機能追加のみ）
 /agentdev/spec-save     # SPEC候補を docs/specs/ に保存（SPEC候補がある場合・機能追加のみ）
 /agentdev/case-open     # Issue を作成
 /agentdev/case-run      # 実装して PR を作成
@@ -82,7 +82,7 @@ AgentDevFlow を外部プロジェクトに導入する手順。
 ./scripts/install-consumer-opencode.ps1 -Mode apply
 ```
 
-ローカル版（ローカル版 OpenCode を利用する環境）のインストール。`-LocalMode` を付けると `agentdev-gh-cli` だけが `src/opencode-local/agentdev-gh-cli/` へ接続され、それ以外の command/skill は通常版と同じ `src/opencode/` 配下へ接続される（REQ-009、ADR-004）。
+ローカル版（ローカル版 OpenCode を利用する環境）のインストール。`-LocalMode` を付けると `agentdev-gh-cli` だけが `src/opencode-local/agentdev-gh-cli/` へ接続され、それ以外の command/skill は通常版と同じ `src/opencode/` 配下へ接続される（REQ-009、DEC-004）。
 
 ```powershell
 ./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
@@ -107,7 +107,7 @@ cd .agentdev-plugin && git pull && cd ..
 
 ### 推奨 .gitignore 設定
 
-通常版・ローカル版ともに同一。`agentdev-gh-cli` はリンク先が異なるだけなので `.opencode/skills/agentdev-*/` パターンで網羅される。`japanese-tech-writing` は配布物依存スキル（`agentdev-doc-writing` が参照、REQ-002）のため別途 gitignore に含める。runtime workspace ディレクトリの管理は harness 側の責務であり（charter 原則、ADR-001）、本 gitignore 推奨には含めない。
+通常版・ローカル版ともに同一。`agentdev-gh-cli` はリンク先が異なるだけなので `.opencode/skills/agentdev-*/` パターンで網羅される。`japanese-tech-writing` は配布物依存スキル（`agentdev-doc-writing` が参照、REQ-002）のため別途 gitignore に含める。runtime workspace ディレクトリの管理は harness 側の責務であり（charter 原則、DEC-001）、本 gitignore 推奨には含めない。
 
 ```gitignore
 .agentdev-plugin/

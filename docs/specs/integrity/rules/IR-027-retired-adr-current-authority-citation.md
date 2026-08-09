@@ -7,7 +7,7 @@ status: accepted
 | Field | Value |
 |-------|-------|
 | rule_id | IR-027 |
-| description | 現行 docs 内で 廃止 ADR（`docs/adr/retired/`）が現行根拠として引用されていないこと。履歴参照には廃止パス（`retired/`）と [retired] 注記を必須とする（REQ-001-048） |
+| description | 現行 docs 内で 廃止 Decision（`docs/decisions/retired/`）が現行根拠として引用されていないこと。履歴参照には廃止パス（`retired/`）と [retired] 注記を必須とする（REQ-001-048） |
 | severity | heuristic |
 | category | canonical-conflict |
 | detection_method | 現行 docs 内の 廃止 ADR 参照検出、コンテキスト判定 |

@@ -49,7 +49,7 @@ IR-056はProject Extensions構造を検査し、IR-059は配布物本文の具�
 
 ## IR-056 起動契約（self-hosting と consumer）
 
-IR-056（project-extensions integrity）は次の2経路で起動する（REQ-010、ADR-006: inspect-command-normalization）。
+IR-056（project-extensions integrity）は次の2経路で起動する（REQ-010、DEC-006: inspect-command-normalization）。
 
 ### self-hosting full audit
 

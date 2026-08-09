@@ -86,7 +86,7 @@
 
 ## 禁止条件フィルタリングゲート
 
-ADR 候補分類の前に、`agentdev-adr-guidelines` の除外基準を適用すること（必達）。
+Decision 候補分類の前に、`agentdev-decision-guidelines` の除外基準を適用すること（必達）。
 以下に該当する item は ADR 候補から除外し、REQ/SPEC/guide/command 等の適切な反映先候補として扱う。
 
 - 技術判断不在: アーキテクチャ上の決定、技術選定、設計判断を含まない

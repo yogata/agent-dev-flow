@@ -4,8 +4,8 @@ import { join } from "node:path"
 /**
  * Minimal consumer fixture with only the 3 default indexed_paths populated.
  * No AgentDevFlow distribution artifacts, no self-hosting paths.
- * REQ-012-002: default indexed_paths = docs/requirements, docs/adr, docs/specs only.
- * REQ-012-003: default node_types = requirement, adr, specification only.
+ * REQ-012-002: default indexed_paths = docs/requirements, docs/decisions, docs/specs only.
+ * REQ-012-003: default node_types = requirement, decision, specification only.
  */
 const FILES = {
   "docs/requirements/REQ-001.md": `---
@@ -15,18 +15,18 @@ status: accepted
 ---
 # Sample requirement
 
-See [decision](../adr/ADR-001.md) and [spec](../specs/feature.md).
+See [decision](../decisions/DEC-001.md) and [spec](../specs/feature.md).
 `,
-  "docs/adr/ADR-001.md": `---
-id: ADR-001
+  "docs/decisions/DEC-001.md": `---
+id: DEC-001
 title: Old decision
 status: superseded
-superseded_by: ADR-002
+superseded_by: DEC-002
 ---
 # Old decision
 `,
-  "docs/adr/ADR-002.md": `---
-id: ADR-002
+  "docs/decisions/DEC-002.md": `---
+id: DEC-002
 title: Current decision
 status: accepted
 ---

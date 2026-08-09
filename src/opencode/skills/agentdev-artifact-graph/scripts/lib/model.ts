@@ -24,7 +24,7 @@ export type ExtractionRule = (typeof EXTRACTION_RULES)[number]
 /**
  * Open extension point: node types and relation types are validated against a
  * runtime-resolved vocabulary (defaults + augmentation). They are NOT closed
- * enums (REQ-012-004, ADR-007 decision 2).
+ * enums (REQ-012-004, DEC-007 decision 2).
  */
 export type NodeType = string
 export type RelationType = string

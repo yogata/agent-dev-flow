@@ -38,7 +38,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 - 特定コマンドの実行ロジック、手順記述
 - 要件分析手法や壁打ちメソドロジー（`agentdev-req-analysis`参照）
 - 仕様適合性検出、ループバック判定（`agentdev-quality-gates`、`agentdev-workflow-routing`参照）
-- ADR/REQファイルの具体的作成、更新操作（`agentdev-adr-file-manager`/`agentdev-req-file-manager`参照）
+- Decision/REQファイルの具体的作成、更新操作（`agentdev-decision-file-manager`/`agentdev-req-file-manager`参照）
 - レビューNG時の対応フロー（`agentdev-workflow-routing`参照）
 - 完了報告フォーマット、チェックボックス更新
 

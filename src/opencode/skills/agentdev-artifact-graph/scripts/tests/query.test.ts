@@ -25,7 +25,7 @@ describe("graph queries", () => {
   it("neighbors returns depth-limited relations", async () => {
     const { graph } = await graphFixture()
     const result = await queryGraph(graph, { kind: "neighbors", node: "requirement:REQ-001", depth: 2 })
-    expect(result.nodes).toContain("adr:ADR-001")
+    expect(result.nodes).toContain("decision:DEC-001")
     expect(result.edges.length).toBeGreaterThan(0)
     expect(result.provenance.length).toBeGreaterThan(0)
   })
@@ -82,6 +82,6 @@ describe("CLI surface (TS-001)", () => {
       "neighbors", "requirement:REQ-001", "--depth", "1",
     ])
     expect(query.exitCode).toBe(0)
-    expect(JSON.parse(query.stdout.toString()).nodes).toContain("adr:ADR-001")
+    expect(JSON.parse(query.stdout.toString()).nodes).toContain("decision:DEC-001")
   })
 })

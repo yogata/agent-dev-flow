@@ -18,7 +18,7 @@ SC-002 SPEC（`docs/specs/integrity/index-auto-generation.md`）が定める索�
 
 対象ファイル:
 - `docs/README.md`
-- `docs/adr/README.md`
+- `docs/decisions/README.md`
 - `docs/requirements/README.md`
 - `docs/specs/README.md`
 - `docs/specs/integrity/integrity-rule-catalog.md`

@@ -11,7 +11,7 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 | Command | Primary Input | Primary Output | Next |
 |---------|--------------|----------------|------|
 | `/agentdev/req-define` | セッション会話/ RU | 要件doc（draft） | feature: `/agentdev/req-save`、bugfix/maintenance/docs_chore: `/agentdev/case-open` |
-| `/agentdev/req-save` | 要件doc（feature のみ） | REQ/ADR ファイル | `/agentdev/spec-save`（SPEC候補がある場合）/ `/agentdev/case-open` |
+| `/agentdev/req-save` | 要件doc（feature のみ） | REQ/Decision ファイル | `/agentdev/spec-save`（SPEC候補がある場合）/ `/agentdev/case-open` |
 | `/agentdev/spec-save` | 要件doc（feature のみ、SPEC候補あり） | SPEC ファイル（`docs/specs/`） | `/agentdev/case-open` |
 | `/agentdev/case-open` | REQ ファイル/ 要件doc | GitHub Issue | `/agentdev/case-run` |
 | `/agentdev/case-run` | Issue | 実装済みブランチ + PR | レビュー後: `/agentdev/case-close` |

@@ -58,5 +58,5 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 - [REQ-001](../docs/requirements/REQ-001.md): 文書体系と持続可能な基準構造（domain state、案内層、基準境界）
 - [REQ-002](../docs/requirements/REQ-002.md): 配布成果物の責務境界（drafts 配置、配布境界）
 - [REQ-008](../docs/requirements/REQ-008.md): 一時成果物ライフサイクル（intake / learning / backlog lifecycle）
-- [ADR-001](../docs/adr/ADR-001.md): AgentDevFlow 憲章（namespace、基本原則）
-- [ADR-005](../docs/adr/ADR-005.md): Project Extensions Architecture（`.agentdev/extensions/**`）
+- [DEC-001](../docs/decisions/DEC-001.md): AgentDevFlow 憲章（namespace、基本原則）
+- [DEC-005](../docs/decisions/DEC-005.md): Project Extensions Architecture（`.agentdev/extensions/**`）

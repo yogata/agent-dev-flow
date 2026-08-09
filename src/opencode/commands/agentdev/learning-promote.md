@@ -61,7 +61,7 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 
 `agentdev-learning-pipeline` を参照
 
-**昇華可能性評価、無条件自動REQ化禁止（REQ）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。
+**昇華可能性評価、無条件自動REQ化禁止（REQ）**: 各問題クラスについて恒久契約（REQ/Decision/SPEC）への昇華可能性を評価する。
 8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に昇華可否を判定する。
 **無条件の自動REQ化は禁止する**。
 学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save`）を経て初めて REQ 化される。
@@ -171,7 +171,7 @@ template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`�
 - G07: 管理用ファイル（`elevation-ledger.md` 等）は生成しない
 - G08: `learning-refine` への依存禁止: 本コマンドは旧機能を内包し事前実行を前提としない
 - G09: 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は Step 10 承認とは別に明示承認を維持する（REQ）
-- G10: 無条件の自動REQ化禁止（REQ）: 学びを直接 REQ 化しない。恒久契約（REQ/ADR/SPEC）への昇華可能性を Step 7 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
+- G10: 無条件の自動REQ化禁止（REQ）: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/SPEC）への昇華可能性を Step 7 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
 - G11: adversarial-review は default-on（経路D、REQ-015-002）: Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は Step 9 へ従来フローを維持する（REQ-015-003）。ユーザー明示要求時は skip 条件にかかわらず必ず発動する。review 反映時は Step 6 へ戻し関連 Step を再実行する（REQ-015-007）。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-014）が正規所有する
 
 ## ユーザー確認ポイント、エラー処理

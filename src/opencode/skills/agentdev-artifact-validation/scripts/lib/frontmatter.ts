@@ -56,6 +56,12 @@ export function extractAdrNumber(id: string): number | null {
   return m && m[1] ? parseInt(m[1], 10) : null;
 }
 
+/** `DEC-NNN`（3桁ゼロ埋め）形式から数値を取り出す。未整形式は null。 */
+export function extractDecisionNumber(id: string): number | null {
+  const m = /^DEC-(\d{3})$/.exec(id);
+  return m && m[1] ? parseInt(m[1], 10) : null;
+}
+
 /** `REQ-NNNN-MMM` 形式から { req, row } を取り出す。未整形式は null。 */
 export function extractCompositeIdNumbers(
   id: string,

@@ -106,8 +106,8 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | [skills/agentdev-req-file-manager.md](skills/agentdev-req-file-manager.md) | accepted | 中核 | REQ ファイル管理 |
 | [skills/agentdev-req-structure-diagnostics.md](skills/agentdev-req-structure-diagnostics.md) | accepted | 中核 | REQ 構造診断 |
 | [skills/agentdev-artifact-graph.md](skills/agentdev-artifact-graph.md) | draft | 中核 | Artifact Graph 標準配布スキル（生成、検査、問い合わせ、open extensibility、augmentation） |
-| [skills/agentdev-adr-file-manager.md](skills/agentdev-adr-file-manager.md) | accepted | 中核 | ADR ファイル管理 |
-| [skills/agentdev-adr-guidelines.md](skills/agentdev-adr-guidelines.md) | accepted | 中核 | ADR 要否判定 |
+| [skills/agentdev-decision-file-manager.md](skills/agentdev-decision-file-manager.md) | accepted | 中核 | Decision ファイル管理 |
+| [skills/agentdev-decision-guidelines.md](skills/agentdev-decision-guidelines.md) | accepted | 中核 | Decision 要否判定 |
 | [skills/agentdev-architecture-advisory.md](skills/agentdev-architecture-advisory.md) | accepted | 中核 | アーキテクチャ助言 |
 | [skills/agentdev-workflow-orchestration.md](skills/agentdev-workflow-orchestration.md) | accepted | 中核 | ワークフロー orchestration |
 | [skills/agentdev-workflow-routing.md](skills/agentdev-workflow-routing.md) | accepted | 中核 | ワークフロー routing |
@@ -161,9 +161,9 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 
 | SPEC | status | タイトル | 責務 |
 |------|--------|---------|------|
-| foundations/numbering-policy.md | accepted | 採番管理 SPEC | REQ/ADR/IR の識別子採番規則、欠番維持、決定的採番スクリプトとの協調 |
+| foundations/numbering-policy.md | accepted | 採番管理 SPEC | REQ/Decision/IR の識別子採番規則、欠番維持、決定的採番スクリプトとの協調 |
 | foundations/system.md | accepted | システム仕様 | コマンドシステムの構成定義、運用モデル |
-| foundations/document-model.md | accepted | 文書モデル | REQ/ADR/SPEC/guides の責務マトリックス、ドメイン別体系化規範 |
+| foundations/document-model.md | accepted | 文書モデル | REQ/Decision/SPEC/guides の責務マトリックス、ドメイン別体系化規範 |
 | foundations/decision-lifecycle.md | draft | Decision Lifecycle | Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理規則、健全性評価モデル。document-model.md「Decision ライフサイクル詳細」から参照される詳細を正規所有 |
 | foundations/patterns.md | accepted | 文書フォーマット規約 | frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約（本文構造・執筆規約寄り内容は authoring/ への移管候補、実移管は case-run で判断） |
 | foundations/design-principles.md | accepted | 設計原則 | アーキテクチャ設計原則 |

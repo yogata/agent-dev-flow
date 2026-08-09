@@ -5,7 +5,7 @@ description: Builds and inspects the Artifact Graph (derived index of explicit a
 
 # agentdev-artifact-graph
 
-AgentDevFlow 標準配布スキル。正規成果物（REQ/ADR/SPEC）間の明示関係を検索する派生索引（Artifact Graph）を生成、検査、問い合わせる（REQ-012、ADR-007）。
+AgentDevFlow 標準配布スキル。正規成果物（REQ/Decision/SPEC）間の明示関係を検索する派生索引（Artifact Graph）を生成、検査、問い合わせる（REQ-012、DEC-007）。
 
 consumer と self-hosting の両環境で動作する。標準コアと augmentation を分離し、open extensibility によって self-hosting 固有知識を標準契約から除外する。AgentDevFlow 標準の成果物間探索モデルとして機能する。
 
@@ -15,16 +15,16 @@ consumer と self-hosting の両環境で動作する。標準コアと augmenta
 
 ## 標準コア（デフォルト）
 
-標準コアは self-hosting 固有知識を持たない（REQ-012-001、REQ-012-002、ADR-007 decision 3）。
+標準コアは self-hosting 固有知識を持たない（REQ-012-001、REQ-012-002、DEC-007 decision 3）。
 
 | 項目 | デフォルト値 |
 |---|---|
-| indexed_paths | `docs/requirements`, `docs/adr`, `docs/specs`（3種） |
-| node_types | `requirement`, `adr`, `specification`（3種） |
+| indexed_paths | `docs/requirements`, `docs/decisions`, `docs/specs`（3種） |
+| node_types | `requirement`, `decision`, `specification`（3種） |
 | relation_types | `references`, `supersedes`, `defined_in`, `contains`, `extends`（5種） |
 | discovery_roots | 空（augmentation で追加） |
 
-node_types と relation_types は closed-enum ではなく、augmentation から追加可能な open extension point である（REQ-012-004、ADR-007 decision 2）。
+node_types と relation_types は closed-enum ではなく、augmentation から追加可能な open extension point である（REQ-012-004、DEC-007 decision 2）。
 
 ## 入力と出力
 
@@ -156,7 +156,7 @@ Graph 不在・stale・生成失敗でも代替探索へ fallback し、標準 w
 
 consumer 環境では AgentDevFlow 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.agentdev-plugin/**`）を `indexed_paths` に含めない。デフォルト設定ではこれらのパスは indexed_paths に含まれないため、生成 Graph にこれらのパターンのノードは0件となる。
 
-consumer が AgentDevFlow運用（REQ/ADR/SPEC）を採用しない場合、Graph は空で生成されるが正常状態である（REQ-012-014）。
+consumer が AgentDevFlow運用（REQ/Decision/SPEC）を採用しない場合、Graph は空で生成されるが正常状態である（REQ-012-014）。
 
 ## discovery_roots（REQ-012-007）
 
@@ -183,6 +183,6 @@ project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ�
 
 - **SPEC**: `agentdev-artifact-graph` SPEC（`docs/specs/skills/agentdev-artifact-graph.md`）
 - **REQ-012**: Artifact Graph 標準化
-- **ADR-007**: Artifact Graph 標準化と配布スキル昇格
-- **ADR-002**: OpenCode ソース・プロジェクション分離（配布物原本は src/opencode/ へ）
+- **DEC-007**: Artifact Graph 標準化と配布スキル昇格
+- **DEC-002**: OpenCode ソース・プロジェクション分離（配布物原本は src/opencode/ へ）
 - **self-hosting augmentation**: `.agentdev/artifact-graph.yaml`（Issue #1951 で移行、旧 repo-local 実装を廃止）

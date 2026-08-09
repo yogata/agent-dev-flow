@@ -6,7 +6,7 @@
 ## 全体の流れ
 
 ```
-/agentdev/req-define → /agentdev/req-save（REQ/ADR 対象 artifact_actions がある場合）→ /agentdev/spec-save（SPEC 対象 artifact_actions がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
+/agentdev/req-define → /agentdev/req-save（REQ/Decision 対象 artifact_actions がある場合）→ /agentdev/spec-save（SPEC 対象 artifact_actions がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
 
 > 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138, v2:ADR-0124）。
@@ -29,13 +29,13 @@ AI と対話して要件を整理するコマンド。
 
 ## req-save
 
-要件docを REQ/ADR ファイルとして `docs/` に保存するコマンド。
-REQ/ADR 対象 artifact_actions（`artifact: req` / `artifact: adr`）がある場合に実行する。
+要件docを REQ/Decision ファイルとして `docs/` に保存するコマンド。
+REQ/Decision 対象 artifact_actions（`artifact: req` / `artifact: decision`）がある場合に実行する。
 `work_type` による判定は廃止した（v2:REQ-0138-009）。
 
-**入力**: 要件doc（REQ/ADR 対象 artifact_actions がある場合）
+**入力**: 要件doc（REQ/Decision 対象 artifact_actions がある場合）
 
-**出力**: REQ/ADR ファイル（commit/push まで実行）
+**出力**: REQ/Decision ファイル（commit/push まで実行）
 
 ## spec-save
 
@@ -89,7 +89,7 @@ Step 11-1（ローカル検証）と Step 11-3（CI/CD検証）で検証失敗�
 
 停止条件（いずれかに該当で即座停止）:
 - 要件、仕様、スコープの変更が必要
-- REQ/ADR/specs の変更判断が必要
+- REQ/Decision/specs の変更判断が必要
 - 既存仕様からの逸脱
 - 破壊的変更が必要
 - 外部サービス、CI環境、権限不足
@@ -108,7 +108,7 @@ PR をマージし、Issue をクローズするコマンド。
 
 1. 未チェック項目の達成判定（達成済みなら `[x]` 更新）
 2. 要件、SPEC、README 索引の整合性確認
-3. ADR 作成済みかの確認
+3. Decision 作成済みかの確認
 4. マージ済み PR 本文から検出事項/Intake 候補を回収し、Intake / Learning に分離して保存
 5. PR 本文の `## SPEC確定候補` から SPEC 確定フローを実行（SPEC status の draft → accepted 昇格、または spec-save 再起動の提案）
 
@@ -129,7 +129,7 @@ docs 更新責務は全 work_type 共通である（bugfix も含む。v2:REQ-01
 | maintenance | リファクタリング、保守作業 | `refactor`, `maintenance` | `refactor` |
 | docs_chore | ドキュメント、雑務 | `docs`, `chore` | `chore` |
 
-**工程分岐**: req_draft の `artifact_actions` に `artifact: req` / `artifact: adr` entry が含まれれば req-save が実行され、`artifact: spec` entry が含まれれば spec-save が実行される。
+**工程分岐**: req_draft の `artifact_actions` に `artifact: req` / `artifact: decision` entry が含まれれば req-save が実行され、`artifact: spec` entry が含まれれば spec-save が実行される。
 いずれの artifact_actions もない場合は case-open から開始する。
 
 ## 最大自走モード
@@ -141,13 +141,13 @@ docs 更新責務は全 work_type 共通である（bugfix も含む。v2:REQ-01
 
 入力要件docの `draft-data` の `artifact_actions` を読み取り、工程を動的判定する（`work_type` 固定分岐ではなく `artifact_actions` 存在による判定、v2:REQ-0138-009）:
 
-- **REQ/ADR artifact_actions あり**: `/agentdev/req-save` → `/agentdev/spec-save`（SPEC artifact_actions がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
-- **REQ/ADR artifact_actions なし**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` 、 `/agentdev/spec-save` をスキップ）
+- **REQ/Decision artifact_actions あり**: `/agentdev/req-save` → `/agentdev/spec-save`（SPEC artifact_actions がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
+- **REQ/Decision artifact_actions なし**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` 、 `/agentdev/spec-save` をスキップ）
 
 ### 自走対象
 
 リポジトリにファイルとして残る変更に限定する。
-GitHub Issue / PR / comment / merge / close、docs / REQ / ADR / SPEC / command reference / guide の更新を含む。
+GitHub Issue / PR / comment / merge / close、docs / REQ / Decision / SPEC / command reference / guide の更新を含む。
 migration ファイル、IaC ファイルの作成、修正も対象。
 
 

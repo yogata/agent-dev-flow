@@ -61,6 +61,43 @@ title: "Decision"
     expect(result.issues.filenameNumber).toBe(128);
   });
 
+  test("ok when DEC filename matches frontmatter id (3-digit)", () => {
+    const content = `---
+id: DEC-007
+title: "Decision"
+---
+
+# Body`;
+    const result = checkSingleFile("DEC-007.md", content, "decision");
+    expect(result.ok).toBe(true);
+    expect(result.issues.filenameNumber).toBe(7);
+    expect(result.issues.frontmatterNumber).toBe(7);
+  });
+
+  test("not ok when DEC filename does not match frontmatter id", () => {
+    const content = `---
+id: DEC-006
+title: "Mismatch"
+---
+
+Body`;
+    const result = checkSingleFile("DEC-007.md", content, "decision");
+    expect(result.ok).toBe(false);
+    expect(result.issues.filenameNumber).toBe(7);
+    expect(result.issues.frontmatterNumber).toBe(6);
+  });
+
+  test("DEC requires 3-digit padding (DEC-1 rejected)", () => {
+    const content = `---
+id: DEC-1
+---
+
+Body`;
+    const result = checkSingleFile("DEC-001.md", content, "decision");
+    expect(result.ok).toBe(false);
+    expect(result.issues.frontmatterNumber).toBeNull();
+  });
+
   test("strips quotes from frontmatter id value", () => {
     const content = `---
 id: "REQ-0103"

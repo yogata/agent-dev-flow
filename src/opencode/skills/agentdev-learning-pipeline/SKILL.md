@@ -65,7 +65,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 - **無条件の自動REQ化は禁止する**（REQ）。学びは `promoted/` → backlog-review → req-define → req-save の昇華経路を経て初めて REQ 化される
 - **living pool 維持**: 昇華不能な知見（deferred 判定、情報断片、出現回数少）は `deferred.md` で維持し REQ 化しない（REQ）
 - raw learning item を実行時コマンド/ skill の直接参照対象にしない
-- ADR 候補分類の前に `agentdev-adr-guidelines` の除外基準（禁止条件フィルタリングゲート）を必須適用する
+- Decision 候補分類の前に `agentdev-decision-guidelines` の除外基準（禁止条件フィルタリングゲート）を必須適用する
 - `case-run` への直接受け渡しは禁止（`backlog-review` → `req-define` を経由すること）
 - **adversarial-review は任意助言手段（経路D、REQ）**: ユーザー明示要求時のみ Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て発動する。明示要求がない場合は Phase 5 へ従来フローを維持する（REQ-015-002/003）。共通 caller integration 契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-014）が正規所有する。本 skill は経路D 固有の候補判断、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細のみを提供する
 

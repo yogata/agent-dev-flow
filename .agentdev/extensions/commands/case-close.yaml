@@ -40,7 +40,7 @@ checks:
     skill: repo-agentdev-integrity
 
 acceptance_gates:
-  - 完了した Issue/PR の成果物が docs/requirements/, docs/adr/, docs/specs/ のいずれかに存在すること
+  - 完了した Issue/PR の成果物が docs/requirements/, docs/decisions/, docs/specs/ のいずれかに存在すること
   - PR 対象ファイルに src/opencode/commands/** または src/opencode/skills/** の変更を含む場合、当該変更ファイルが配布物参照境界（IR-059）に違反しないこと
 
 must_not: []

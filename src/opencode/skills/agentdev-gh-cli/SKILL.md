@@ -92,4 +92,4 @@ gh WRITE 操作を行う全 command/ skill は本手続き経由でコンソー�
 ## 関連項目
 
 - SPEC `agentdev-gh-cli`.md
-- 関連 REQ / ADR 一覧は各インデックス（`docs/requirements/README.md`, `docs/adr/README.md`）を参照
+- 関連 REQ / Decision 一覧は各インデックス（`docs/requirements/README.md`, `docs/decisions/README.md`）を参照
