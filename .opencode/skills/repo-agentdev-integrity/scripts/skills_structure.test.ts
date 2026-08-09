@@ -6,6 +6,7 @@ function findRepoRoot(start: string): string {
   let dir = path.resolve(start);
   for (let i = 0; i < 20; i++) {
     if (fs.existsSync(path.join(dir, ".opencode"))) return dir;
+    if (fs.existsSync(path.join(dir, "src", "opencode"))) return dir;
     const parent = path.dirname(dir);
     if (parent === dir) break;
     dir = parent;
@@ -13,7 +14,12 @@ function findRepoRoot(start: string): string {
   return path.resolve(start);
 }
 const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
-const SKILLS_DIR = path.join(REPO_ROOT, ".opencode", "skills");
+const PROJECTION_SKILLS_DIR = path.join(REPO_ROOT, ".opencode", "skills");
+const SOURCE_SKILLS_DIR = path.join(REPO_ROOT, "src", "opencode", "skills");
+// worktree junction 未設定環境では projection に配布スキルが存在しないため src/opencode/ へ fallback する（REQ-018-001）。
+const SKILLS_DIR = fs.existsSync(path.join(PROJECTION_SKILLS_DIR, "agentdev-workflow-templates"))
+  ? PROJECTION_SKILLS_DIR
+  : SOURCE_SKILLS_DIR;
 function getSkillDirs(): string[] {
   if (!fs.existsSync(SKILLS_DIR)) return [];
   return fs
