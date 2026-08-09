@@ -39,7 +39,20 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | ファイル | 内容 |
 |----------|------|
 | `references/intake-extraction.md` | GitHub残課題抽出ロジック: 期間解釈、データ取得、構造検出、LLM全文解析、intake item生成 |
-| `references/intake-promotion.md` | intake-promote詳細手順: Inbox確認、Review観点、分類提示、ユーザー確認、採用item整形、保存と振り分け、Git永続化 |
+| `references/intake-promotion.md` | intake-promote詳細手順: Inbox確認、Review観点、分類提示、ユーザー確認、採用item整形、保存と振り分け、Git永続化、adversarial-review候補判断と内部手続き（経路C） |
+
+## adversarial-review 候補判断と内部手続き（経路C）
+
+本スキルは intake-promote 経路C の review 候補判断と内部手続きの参照実装を `references/intake-promotion.md` に保持する。正典は `agentdev-intake-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節（REQ-015-006）であり、本 SKILL.md は重複定義しない（REQ-014-011）。
+
+| 項目 | 要件 | 概要 |
+|---|---|---|
+| 挿入位置 | REQ-015-006 | Step 4（暫定分類生成）完了後、Step 5（ユーザ提示）開始前 |
+| 発動条件判定 / review 呼出 Step 分離 | REQ-015-001 | 発動条件判定 Step と review 呼出 Step を独立手順として分離 |
+| ユーザー明示指定時の発動 | REQ-015-002 | ユーザー明示指定時は必ず発動 |
+| 条件非該当時の従来フロー維持 | REQ-015-003 | 条件非該当時は従来フローを維持 |
+
+挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が正とする。
 
 ## See Also
 

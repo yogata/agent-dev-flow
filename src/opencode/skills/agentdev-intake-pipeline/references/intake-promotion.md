@@ -72,7 +72,37 @@ learning 分岐は `agentdev-workflow-orchestration` の intake/learning 境界�
 3. `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する。
 4. 変更なしの場合は commit/push せず、完了報告で「変更なし」と報告する。
 5. 変更ありの場合、`git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする。
-6. commit message は採用・保留のみの場合 `chore(agentdev): review and promote intake items` とする。reject item を含む場合は当該 item の却下理由を commit message に含める（AG-006、監査証跠の補強）。
+6. commit message は採用・保留のみの場合 `chore(agentdev): review and promote intake items` とする。reject item を含む場合は当該 item の却下理由を commit message に含める（AG-006、監査証跡の補強）。
 7. `git push` を実行する。
 8. push が失敗した場合は構造化エラーメッセージを表示し、完了扱いにしない。
+
+## adversarial-review 候補判断と内部手続き（経路C）
+
+本節は intake-promote 経路C における adversarial-review 候補判断と内部手続きの参照実装を提供する。正典は `agentdev-intake-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節（REQ-015-006）であり、本ファイルは SPEC を補完する実行手続きのみを保持する。
+
+### 候補判断基準
+
+intake-promote は Step 4「分類の提示」完了直後に候補判断を行う。判断基準は SPEC「候補判断基準」節が正である。
+
+- 暫定分類の意味的完成度: 各 item の採用/保留/却下、変更種別、根拠が Step 3 と Step 4 を経て提示済みであること
+- review 対象の存在: 暫定分類結果のうち、意味的争点（分類の妥当性、変更種別の適合、優先度、後続ルートの適切さ）を持ち得る item が少なくとも1件存在すること
+- ユーザー明示指定: ユーザー明示指定時は上記基準に関わらず候補確定とする（REQ-015-002）
+
+ユーザー明示指定がない限り自動発動しない（REQ-014-001）。
+
+### 内部手続き
+
+| 項目 | 内容 |
+|---|---|
+| 候補確定位置 | Step 4「分類の提示」完了直後。暫定分類表が生成された時点 |
+| 呼出タイミング | Step 5「ユーザー確認」開始前。暫定分類をユーザへ提示する前 |
+| 結果反映先 | intake-promote 本体。accepted finding を暫定分類表へ反映し、反映後の分類を Step 5 へ渡す |
+
+### 呼出失敗時の扱い
+
+adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止する（REQ-014-010）。intake-promote は利用不能を報告した上で従来フローと既存 QG/HITL を維持する。呼出失敗を理由に暫定分類を自動承認、自動棄却、または既存 QG を飛ばしてはならない。
+
+### 参照契約
+
+挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が正とする。本ファイルはこれらを再定義しない（REQ-014-011）。
 
