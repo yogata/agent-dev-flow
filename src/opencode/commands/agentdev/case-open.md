@@ -50,6 +50,17 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 **共通ルール**（全Step適用）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、テンプレート準拠（テンプレート読込後は毎回【必須】セクションの完備を確認、【任意】は内容がある場合のみ含める、欠落時は再生成）
 
+### adversarial-review 挿入境界（経路F、REQ-015-009）
+
+execution structure、Issue 本文候補、完了条件を構成した後、最初の GitHub Issue 作成の前に挿入する。Epic flow の場合は Step 5（テンプレート読込）、Step 6（Epic Issue 本文生成）完了後、Step 7（Epic Issue 作成）の前。Standard flow の場合は Step 4-1（preflight）完了後、Step 10（関連ADR特定）の前。adversarial-review は任意助言手段であり（REQ-014-001）、標準フローへ自動発動しない。発動条件判定と review 呼出を分離する（REQ-015-001）。詳細な挿入境界、Step 構造対応付け、変更影響別再実行ルールは case-open command SPEC（extension 経由）「adversarial-review 挿入境界（経路F）」節を正とする。
+
+- **発動条件判定（REQ-015-002、REQ-015-003）**: ユーザーが adversarial-review の実施を明示的に指定した場合に発動する（REQ-015-002）。指定がない場合は従来フロー（review を挿入せず最初の GitHub Issue 作成 Step へ進む）を維持する（REQ-015-003）。Epic flow は Step 7、Standard flow は Step 12 へそのまま進む。
+- **review 呼出（REQ-015-001）**: 発動条件判定で発動と判定された場合、execution structure（Step 3-1 または Step 4-1 で確定）、Issue 本文候補（Epic flow は Step 6 Epic Issue 本文、Standard flow は Step 2 Issue 本文）、完了条件（Step 2-1 の QG-2 で検証済み）の3者を対象に adversarial-review を呼び出す。委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う。
+  - execution structure に関わる finding は Step 3-1（自律構成生成）または Step 4（規模判定）へ戻し再評価する。Issue 本文、完了条件に関わる finding は該当 Step へ戻す。accepted finding の反映は呼出元の責務である（REQ-014-006）。
+  - **変更影響別の再実行ルール（REQ-015-009）**: review の結果反映で review 対象の意味内容が変更された場合、変更影響範囲に応じて4パターンのいずれかを実行する。完了条件のみ変更 → QG-2（Step 2-1）を再実行。execution structure のみ変更 → preflight（Step 4-1）を再実行。両方が変更 → QG-2、preflight 両方を再実行（順序は QG-2 → preflight）。意味内容変更なし → 再実行不要、最初の GitHub Issue 作成 Step へ進む。
+  - 未解決のユーザー判断事項が残る場合、最初の GitHub Issue 作成 Step へ進まない（REQ-014-009）。工程委譲起源であるため既存 status に unresolved 判断事項を付加する（REQ-014-012）。
+  - 呼出失敗時は silent skip を禁止し、従来フローを維持する（REQ-014-010）。
+
 ### Step 5: テンプレート読込（Epic flow）
 
 `agentdev-workflow-templates` の選定ルールに従いテンプレートを読み込む。詳細は `agentdev-issue-management` を参照。Epic flow は Step 3 または Step 4 のルーティングにより開始。マルチREQ/ 単一REQ の差分（分解ソース、Waveテーブル列、子Issue数上限、子Issue内容ソース、子Issue追加要素）の詳細は `agentdev-epic-tracker` を参照
