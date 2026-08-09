@@ -46,20 +46,20 @@ agreed_items:
   - id: AG-002
     content: {合意された要件内容の本文}
 
-# artifact_actions: REQ/ADR/SPEC への保存対象を成果物別ではなく1つの配列に統合
+# artifact_actions: REQ/Decision/SPEC への保存対象を成果物別ではなく1つの配列に統合
 # 1 action = 1 artifact × 1 editing concern（REQ-ID 単位でも箇条書き1行単位でもない）
 # 同一関心の複数 agreed items は単一 action に複数段落の content としてまとめる
 artifact_actions:
   - id: ACT-REQ-{NNN}           # ACT-{ARTIFACT}-{NNN}
-    artifact: req               # req / adr / spec
-    operation: create           # REQ/ADR: create / append / update、SPEC: create / update
-    target: new:{topic-slug}    # REQ/ADR: file path または new:{slug}。SPEC は target_spec 構造化推奨
-    target_area: # artifact: spec の場合、operation: update/spec-update では必須（対象セクション見出し）。operation: create/spec-create および req/adr では任意
+    artifact: req               # req / decision / spec
+    operation: create           # REQ/Decision: create / append / update、SPEC: create / update
+    target: new:{topic-slug}    # REQ/Decision: file path または new:{slug}。SPEC は target_spec 構造化推奨
+    target_area: # artifact: spec の場合、operation: update/spec-update では必須（対象セクション見出し）。operation: create/spec-create および req/decision では任意
     source_items: [AG-001, AG-002] # 対応する agreed_item ID の list
     content: |                  # 保存対象の full text
       {保存対象の本文}
-  - id: ACT-ADR-{NNN}
-    artifact: adr
+  - id: ACT-DEC-{NNN}
+    artifact: decision
     operation: create
     target: new:{topic-slug}
     source_items: [AG-003]

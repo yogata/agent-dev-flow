@@ -85,9 +85,9 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 | スクリプト | 役割 | 入力 | 出力 JSON |
 |-----------|------|------|-----------|
 | `alloc-req-number.ts` | REQ番号採番（max+1、欠番埋め禁止） | argv[2]=REQ dir | `{ ok, allocated: "REQ-NNNN", max }` |
-| `alloc-adr-number.ts` | ADR番号採番（max+1、欠番埋め禁止） | argv[2]=ADR dir | `{ ok, allocated: "ADR-NNNN", max }` |
 | `alloc-composite-id.ts` | 要件行ID採番（REQ-NNNN-MMM、max+1） | argv[2]=REQ file, argv[3]=req番号（省略可） | `{ ok, allocated: "REQ-NNNN-MMM", req, max }` |
 > `search-target-area.ts`（SPEC 固有）は `agentdev-spec-file-manager` へ移管済み。target_area 見出し検索は同 skill の公開操作契約経由で呼び出す。
+> `alloc-decision-number.ts`（Decision 固有）は `agentdev-decision-file-manager` へ移管済み（OU-002）。Decision 番号採番は同 skill の公開操作契約経由で呼び出す。
 
 > frontmatter id↔ファイル名整合性（`check-frontmatter-consistency`）、エントリ存在確認（`check-entry-existence`）、変更範囲検証（`check-change-impact`）は `agentdev-artifact-validation` へ移管済みであり、同 skill の公開検証契約へ委譲する（AG-019）。詳細は同 SKILL.md 参照。
 

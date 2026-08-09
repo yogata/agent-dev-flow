@@ -1,12 +1,12 @@
 ---
-id: ADR-{NNNN}
+id: DEC-NNN
 title: ""
 status: proposed
 created: "YYYY-MM-DD"
 updated: "YYYY-MM-DD"
 ---
 
-# ADR-{NNNN}: {タイトル}
+# DEC-NNN: {タイトル}
 
 ## 背景
 
@@ -26,4 +26,4 @@ updated: "YYYY-MM-DD"
 
 ## 関連する決定
 
-{関連するADR（番号、タイトル、関係性）}
+{関連するDecision（番号、タイトル、関係性）}
