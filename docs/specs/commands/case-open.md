@@ -288,8 +288,8 @@ case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_ope
 
 ### 子Issue 作成の並列化
 
-- 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化できる（REQ-006-089）
-- Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（REQ-006-093）
+- 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化できる。最大5件は SPEC 所有の実行安全境界の数値であり（REQ-006 目的「実行安全境界の数値は SPEC を正規所有者とし、本 REQ は境界宣言へ縮約する」）、case-open 実装が遵守する。旧 v2 参照の REQ-006-089 は case-auto orchestration stage モデルを規定する別要件であり、本並列化上限の根拠ではないため参照を除去した（OU-008 整合）
+- Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は Epic Issue 本文の単一書き手原則（REQ-006-095, REQ-006-101）に基づく親の直列集約である。旧 v2 参照の REQ-006-093 は case-auto background task 回復パターンを規定する別要件であり、本直列集約の根拠ではないため参照を除去した（OU-008 整合）
 - G04「全子Issue 作成完了後にテーブル更新（部分更新禁止）」は集約更新で維持
 
 ## See Also
