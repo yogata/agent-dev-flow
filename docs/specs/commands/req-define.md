@@ -457,10 +457,12 @@ review は Step 9（feature 以外は Step 8）完了後、Step 10（ドラフ�
 
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
-発動条件判定と review 呼出を分離する（REQ-015-001）。発動条件判定 Step は次の条件を評価する。
+発動条件判定と review 呼出を分離する（REQ-015-001）。発動条件判定 Step は default-on 原則（REQ-015-002）と skip 条件（REQ-015-003）を評価する。
 
-- **ユーザー明示指定時発動**: ユーザーが req-define 実行中に adversarial-review の実施を明示的に指定した場合に発動する（REQ-015-002）。adversarial-review は任意助言手段であり（REQ-014-001）、req-define の標準フローへ自動発動しない。
-- **条件非該当時の従来フロー維持**: ユーザー明示指定がない場合、従来フロー（review を挿入せず Step 10 へ進む）を維持する（REQ-015-003）。
+- **default-on（原則実行）**: req-define は adversarial-review を原則実行する（REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、review 対象の意味的決定（要件展開、ADR要否判定、Scale判断）が存在する場合に発動する。
+- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（review を挿入せず Step 10 へ進む）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+  - Scale が L0（独立、自明）で ADR判断対象が存在せず、review 対象となる意味的決定が存在しない場合
+- **ユーザー明示指定時の必須実行**: ユーザーが req-define 実行中に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
 
 ### review 呼出 Step（REQ-015-001）
 

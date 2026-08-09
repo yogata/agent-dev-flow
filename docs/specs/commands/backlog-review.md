@@ -147,7 +147,7 @@ backlog-review の現行 Step 構造へ review 挿入境界を次のとおり一
 | 段階 | 対応 Step | 役割 |
 |---|---|---|
 | 構成 | Step 3（分析 + 暫定分類付与）、Step 4（統合・分割判定 + depends_on 依存解決） | review 対象となる RU 構成案を確定する |
-| 発動条件判定 | Step 4 完了直後、Step 5 開始前（Step 4-1） | ユーザー明示指定の有無を判定する |
+| 発動条件判定 | Step 4 完了直後、Step 5 開始前（Step 4-1） | default-on 原則と skip 条件を判定する |
 | review 呼出 | 発動条件該当時、Step 5 開始前（Step 4-1） | adversarial-review を起動し、RU 構成案を審議対象へ渡す |
 | 承認 | Step 4 承認（矛盾なし時の単一承認）、Step 5（矛盾検出時の追加判断） | review 結果を踏まえユーザー承認を確定する |
 
@@ -155,13 +155,17 @@ backlog-review の現行 Step 構造へ review 挿入境界を次のとおり一
 
 経路E は構成、review、承認の順で進む（REQ-015-008）。review は構成（Step 3、Step 4）の完了後、承認（Step 4 承認、Step 5 追加判断）の前に挿入する。review を構成前に、または承認後に挿入しない。
 
-### 発動条件（REQ-015-002）
+### 発動条件（REQ-015-002、REQ-015-003）
 
-adversarial-review は任意助言手段であり、ユーザーが明示的に指定した場合にのみ発動する（REQ-014-001、REQ-015-002）。backlog-review は review 発動を前提とせず、明示指定がない場合は review 呼出 Step を経由せず従来フロー（Step 5 以降）へ進む。
+backlog-review は adversarial-review を原則実行する（default-on、REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、RU 構成案（統合・分割判定、depends_on 依存解決）に意味的決定が存在する場合に発動する。
+
+- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（Step 5 以降）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+  - RU 構成要素が1件のみ（統合・分割判定不要、depends_on 解決不要）で矛盾検出対象が存在しない場合
+- **ユーザー明示指定時の必須実行**: ユーザーが backlog-review 実行中に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
 
 ### 従来フロー維持（REQ-015-003）
 
-発動条件非該当時（ユーザー明示指定なし）、呼出失敗時（REQ-014-010）のいずれの場合も、従来フロー（Step 1〜9）を維持する（REQ-015-003）。review 挿入境界は既存 Step を追加、削除、並べ替えせず、発動条件判定と review 呼出 Step を分離した形で現行 Step 構造へ挿入する。
+skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、従来フロー（Step 1〜9）を維持する（REQ-015-003）。review 挿入境界は既存 Step を追加、削除、並べ替えせず、発動条件判定と review 呼出 Step を分離した形で現行 Step 構造へ挿入する。
 
 ### 矛盾の扱い（REQ-015-008）
 

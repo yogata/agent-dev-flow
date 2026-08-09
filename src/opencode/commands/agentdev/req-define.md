@@ -99,9 +99,9 @@ CREATE 前に APPEND/UPDATE 候補を必ず評価すること。
 
 ### adversarial-review 挿入境界（経路A、REQ-015-004）
 
-Step 9（Scale判断: feature）または Step 8（work_type 判定: feature 以外）完了後、Step 10（ドラフト保存）の前に挿入する。adversarial-review は任意助言手段であり（REQ-014-001）、標準フローへ自動発動しない。発動条件判定と review 呼出を分離する（REQ-015-001）。
+Step 9（Scale判断: feature）または Step 8（work_type 判定: feature 以外）完了後、Step 10（ドラフト保存）の前に挿入する。req-define は adversarial-review を原則実行する（default-on、REQ-015-002）。発動条件判定と review 呼出を分離する（REQ-015-001）。
 
-- **発動条件判定（REQ-015-002、REQ-015-003）**: ユーザーが adversarial-review の実施を明示的に指定した場合に発動する（REQ-015-002）。指定がない場合は従来フロー（review を挿入せず Step 10 へ進む）を維持する（REQ-015-003）。
+- **発動条件判定（REQ-015-002、REQ-015-003）**: default-on で発動する。skip 条件（Scale=L0 で ADR判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず Step 10 へ進む）を継続できる（REQ-015-003）。ユーザー明示指定時は skip 条件にかかわらず必ず発動する（REQ-015-002）。skip 判断のためだけの新規 HITL、承認点は追加しない。
 - **review 呼出（REQ-015-001）**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、ADR判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う。
   - ADR finding は Step 6（ADR判断）へ戻し再評価する。要件展開に関わる finding は該当 Step へ戻す。accepted finding の反映は呼出元の責務である（REQ-014-006）。
   - 未解決のユーザー判断事項が残る場合、Step 10（ドラフト保存）へ進まない（REQ-014-009）。工程委譲起源であるため既存 status に unresolved 判断事項を付加する（REQ-014-012）。

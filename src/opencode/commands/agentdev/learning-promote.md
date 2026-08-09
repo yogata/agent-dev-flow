@@ -77,12 +77,15 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 
 `agentdev-learning-pipeline` の「adversarial-review 候補判断と内部挿入」節（経路D）を参照。本 Step は発動条件判定のみを行い、review 呼出（Step 8-R2）と分離する（REQ-015-001）。
 
-発動条件は次のいずれも満たすこと。
+learning-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。発動条件は次のいずれも満たすこと。
 
-- ユーザーが adversarial-review を明示的に要求していること（REQ-015-002）。明示要求がない場合は発動せず、Step 9 へ進む（REQ-015-003）
 - evaluation-report.md が Step 6 で生成・更新済みであり、Step 7（廃棄判定）と Step 8（既存対策確認）の結果が反映されていること
+- skip 条件（後述）に該当しないこと
 
-明示要求がない限り review は発動せず、従来フローを維持する。adversarial-review は任意助言手段であり、新規必須工程、QG、承認ゲートとして導入しない（REQ-014-001）。共通 caller integration 契約の正規所有者は `agentdev-adversarial-review` SPEC（REQ-014）である。
+- **skip 条件（REQ-015-003）**: inbox.md エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）、または inbox.md 空（処理対象なし）の場合、省略して従来フローを継続できる。skip 判断のためだけの新規 HITL、承認点は追加しない
+- **ユーザー明示指定時の必須実行（REQ-015-002）**: ユーザーが adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する。ただし evaluation-report.md 反映済みは引き続き必須とする
+
+adversarial-review は新規必須工程、QG、承認ゲートとして導入しない（REQ-014-001）。共通 caller integration 契約の正規所有者は `agentdev-adversarial-review` SPEC（REQ-014）である。
 
 発動条件成立時は Step 8-R2 へ進む。非成立時は Step 8-R2 を迂回し Step 9 へ進む。
 
@@ -169,7 +172,7 @@ template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`�
 - G08: `learning-refine` への依存禁止: 本コマンドは旧機能を内包し事前実行を前提としない
 - G09: 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は Step 10 承認とは別に明示承認を維持する（REQ）
 - G10: 無条件の自動REQ化禁止（REQ）: 学びを直接 REQ 化しない。恒久契約（REQ/ADR/SPEC）への昇華可能性を Step 7 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
-- G11: adversarial-review は任意助言手段（経路D、REQ）: ユーザー明示要求時のみ Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て発動する。明示要求時以外は Step 9 へ従来フローを維持する。review 反映時は Step 6 へ戻し関連 Step を再実行する（REQ-015-007）。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-014）が正規所有する
+- G11: adversarial-review は default-on（経路D、REQ-015-002）: Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は Step 9 へ従来フローを維持する（REQ-015-003）。ユーザー明示要求時は skip 条件にかかわらず必ず発動する。review 反映時は Step 6 へ戻し関連 Step を再実行する（REQ-015-007）。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-014）が正規所有する
 
 ## ユーザー確認ポイント、エラー処理
 

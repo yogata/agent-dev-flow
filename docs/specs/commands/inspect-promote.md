@@ -107,19 +107,21 @@ review 挿入位置は現行 Step 構造へ一意に特定する。「暫定分�
 
 | `--auto` opt-in | 自動 promote 対象 | 手動分類対象 | review 挿入境界 |
 |---|---|---|---|
-| あり | あり | あり | 手動分類対象について発動条件を満たせば発動（fast path 対象は迂回） |
-| あり | あり | なし | 発動しない（全件 fast path 完了、HITL 対象なし） |
-| あり | なし | あり | 手動分類対象について発動条件を満たせば発動 |
-| なし | — | あり | 手動分類対象について発動条件を満たせば発動 |
-| なし | — | なし | 発動しない（inbox 空、Step 2 で終了） |
+| あり | あり | あり | 手動分類対象について default-on で発動（fast path 対象は迂回） |
+| あり | あり | なし | skip（review 対象なし、全件 fast path 完了） |
+| あり | なし | あり | 手動分類対象について default-on で発動 |
+| なし | — | あり | 手動分類対象について default-on で発動 |
+| なし | — | なし | skip（inbox 空、Step 2 で終了） |
 
-### 発動条件判定 Step（REQ-015-001）
+### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
-発動条件判定 Step と review 呼出 Step は分離する（REQ-015-001）。発動条件判定 Step は review 挿入位置（暫定分類後・HITL 前）で次の3条件を全て満たす場合にのみ review 呼出 Step へ進む。
+発動条件判定 Step と review 呼出 Step は分離する（REQ-015-001）。inspect-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。発動条件判定 Step は review 挿入位置（暫定分類後・HITL 前）で review 対象の存在を確認し、skip 条件を評価する。
 
-1. Step 4（自動 promote、`--auto` opt-in 時のみ）が完了していること
-2. 手動分類対象の検出事項（review 対象）が1件以上存在すること
-3. ユーザー明示指定（本コマンド起動時の adversarial-review への明示要求）があること（REQ-015-002）
+- **default-on（原則実行）**: 手動分類対象の検出事項（review 対象）が1件以上存在する場合、発動する（REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではない。
+- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（Step 5 HITL 確定）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+  - `--auto` 経路（fast path、REQ-015-005 既存の迂回条件）の場合
+  - 手動分類対象の検出事項が0件（inbox 空、全件 fast path 完了）の場合
+- **ユーザー明示指定時の必須実行**: ユーザーが本コマンド起動時に adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。ただし review 対象（手動分類対象）が存在しない場合は発動しない。
 
 ### review 呼出 Step（REQ-015-001）
 
@@ -132,13 +134,13 @@ review 呼出 Step は review 対象（手動分類対象の検出事項、暫�
 - unresolved な本質的争点が残る場合、Step 5（HITL 確定）へ進まず、ユーザー判断事項として停止する（REQ-014-009）。ただし adversarial-review 自体を恒久的な統制ゲートとしない
 - 呼出失敗時は silent skip を禁止し、利用不能を報告した上で Step 5（HITL 確定）の従来フローを維持する（REQ-014-010）
 
-### ユーザー明示指定時の発動（REQ-015-002）
+### ユーザー明示指定時の必須実行（REQ-015-002）
 
-adversarial-review は任意助言手段であり（REQ-014-001）、本コマンド起動時にユーザーが adversarial-review を明示的に要求した場合にのみ発動する。自動発動、全件強制発動を行わない。明示要求のない場合は後述「条件非該当時の従来フロー維持」に従う。
+ユーザーが inspect-promote 起動時に adversarial-review を明示的に要求した場合、skip 条件（`--auto` 経路、review 対象なし）の該当にかかわらず必ず発動する。明示要求はコマンド起動時の引数、対話中の指示、または extension（`.agentdev/extensions/commands/inspect-promote.yaml`）の `rules` により表明される。review 対象（手動分類対象の検出事項）が存在しない場合は発動しない。
 
 ### 条件非該当時の従来フロー維持（REQ-015-003）
 
-発動条件判定 Step の3条件のいずれかを満たさない場合、review 呼出 Step を実行せず Step 5（HITL 確定）へ従来フローを維持する（REQ-015-003）。従来フロー（Step 5 HITL 確定以降の Step 6〜10）は変更せず、adversarial-review 由来の新規統制ゲートを作らない（REQ-014-009）。
+skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、review 呼出 Step を実行せず Step 5（HITL 確定）へ従来フローを維持する（REQ-015-003）。従来フロー（Step 5 HITL 確定以降の Step 6〜10）は変更せず、adversarial-review 由来の新規統制ゲートを作らない（REQ-014-009）。
 
 ### 正規所有者宣言
 
