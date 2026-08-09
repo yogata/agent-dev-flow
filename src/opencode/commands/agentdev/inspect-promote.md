@@ -58,13 +58,12 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ### Step 4-1: adversarial-review 発動条件判定（経路B）
 
-review 挿入境界（暫定分類後・HITL 前）で発動条件を判定する（REQ-015-001、REQ-015-005、詳細は inspect-promote SPEC「adversarial-review 挿入境界（経路B）」節参照）。次の3条件を全て満たす場合のみ Step 4-2（review 呼出）へ進む。
+review 挿入境界（暫定分類後・HITL 前）で発動条件を判定する（REQ-015-001、REQ-015-005、詳細は inspect-promote SPEC「adversarial-review 挿入境界（経路B）」節参照）。inspect-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。手動分類対象の検出事項（review 対象）が1件以上存在する場合に発動する。ユーザー明示指定は通常発動の必須条件ではない。
 
-1. Step 4（自動 promote、`--auto` opt-in 時のみ）が完了していること
-2. 手動分類対象の検出事項（Step 5 HITL 確定へ進む対象）が1件以上存在すること
-3. ユーザー明示指定（本コマンド起動時の adversarial-review への明示要求）があること（REQ-015-002）
+- **skip 条件**: `--auto` 経路（fast path、REQ-015-005）、または手動分類対象の検出事項が0件（inbox 空、全件 fast path 完了）の場合、省略して従来フロー（Step 5 HITL 確定）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+- **ユーザー明示指定時の必須実行**: ユーザーが本コマンド起動時に adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。ただし review 対象（手動分類対象）が存在しない場合は発動しない。
 
-`--auto` により Step 4 で自動 promote された検出事項は HITL を経由しない fast path であり、本判定、Step 4-2 の対象外とする（REQ-015-005、review 挿入迂回）。3条件のいずれかを満たさない場合、Step 4-2 を実行せず Step 5（HITL 確定）へ従来フローを維持する（REQ-015-003）
+`--auto` により Step 4 で自動 promote された検出事項は HITL を経由しない fast path であり、本判定、Step 4-2 の対象外とする（REQ-015-005、review 挿入迂回）。skip 条件該当時、呼出失敗時（REQ-014-010）は Step 4-2 を実行せず Step 5（HITL 確定）へ従来フローを維持する（REQ-015-003）。
 
 ### Step 4-2: adversarial-review 呼出（経路B）
 

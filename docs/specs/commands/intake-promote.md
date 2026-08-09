@@ -124,18 +124,23 @@ review 挿入位置は現行 Step 構造へ一意に特定可能である。Step
 
 | Step | 役割 |
 |---|---|
-| 発動条件判定 Step | ユーザーの明示指定、暫定分類の意味的完成度、review 対象の存在を判定する |
+| 発動条件判定 Step | default-on 原則、暫定分類の意味的完成度、review 対象の存在、skip 条件を判定する |
 | review 呼出 Step | 発動条件を満たす場合に限り adversarial-review を呼び出す |
 
 発動条件判定 Step を満たさない場合は review 呼出 Step へ進まない。command 定義（`.opencode/commands/agentdev/intake-promote.md`）は両 Step を独立した手順（Step 4a, Step 4b）として保持する。
 
-### ユーザー明示指定時の発動（REQ-015-002）
+### default-on と skip 条件（REQ-015-002、REQ-015-003）
 
-ユーザーが明示的に review を指定した場合、発動条件判定 Step は必ず「発動」と判定し、review 呼出 Step を実行する。明示指定はコマンド起動時の引数、対話中の指示、または extension（`.agentdev/extensions/commands/intake-promote.yaml`）の `rules` により表明される。adversarial-review は任意助言手段であり、明示指定がない限り自動発動しない（REQ-014-001）。
+intake-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、暫定分類の意味的決定が存在する場合に発動する。明示指定はコマンド起動時の引数、対話中の指示、または extension（`.agentdev/extensions/commands/intake-promote.yaml`）の `rules` により表明される。
+
+- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+  - inbox 項目が1件のみで暫定分類が自明（単一区分確定、意味的決定なし）の場合
+  - inbox 空（Step 2 で終了）の場合
+- **ユーザー明示指定時の必須実行**: ユーザーが明示的に review を指定した場合、発動条件判定 Step は skip 条件の該当にかかわらず必ず「発動」と判定し、review 呼出 Step を実行する（REQ-015-002）。ただし review 対象（暫定分類）が存在しない場合は発動しない。
 
 ### 条件非該当時の従来フロー維持（REQ-015-003）
 
-発動条件判定 Step で「非発動」と判定された場合、review 呼出 Step をスキップし、Step 4 で生成した暫定分類をそのまま Step 5「ユーザー確認」へ渡す従来フローを維持する。既存の HITL（G06, G07, G08）、自動実行ルール（REQ-003-008）、破壊的変更制約（G18）は変更しない。
+skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、review 呼出 Step をスキップし、Step 4 で生成した暫定分類をそのまま Step 5「ユーザー確認」へ渡す従来フローを維持する（REQ-015-003）。既存の HITL（G06, G07, G08）、自動実行ルール（REQ-003-008）、破壊的変更制約（G18）は変更しない。
 
 ### accepted finding の反映と戻り先
 

@@ -74,7 +74,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 統合、分割判定基準、depends_on 依存解決ルールは `agentdev-backlog-integration` を参照
 
-**構成、review、承認の順序（REQ-015-008）**: Step 4 前半（統合、分割判定、depends_on 依存解決）で RU 構成案を確定し、続く Step 4-1（adversarial-review 呼出、ユーザー明示指定時のみ発動）を経て、Step 4 後半（ユーザー承認）で承認を確定する。構成、review、承認の順序の正規所有者は backlog-review command SPEC「adversarial-review 挿入境界（経路E）」節である。
+**構成、review、承認の順序（REQ-015-008）**: Step 4 前半（統合、分割判定、depends_on 依存解決）で RU 構成案を確定し、続く Step 4-1（adversarial-review 呼出、default-on）を経て、Step 4 後半（ユーザー承認）で承認を確定する。構成、review、承認の順序の正規所有者は backlog-review command SPEC「adversarial-review 挿入境界（経路E）」節である。
 
 **矛盾なしの場合の単一承認（REQ）**: 後続の Step 5 で矛盾が検出されない場合、本 Step 4 の統合、分割判定承認を RU 生成承認（Step 5/6）としても扱う。
 単一承認で処理し、追加の HITL は不要。
@@ -83,13 +83,16 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 backlog-review 経路E の adversarial-review 挿入境界。Step 4 前半（構成）完了後、Step 4 後半（承認）前に挿入する。挿入境界、発動条件、順序、矛盾取扱いの正規所有者は backlog-review command SPEC「adversarial-review 挿入境界（経路E）」節であり、本 Step は実行時投影先である。候補判断基準、内部手続きの詳細は `agentdev-backlog-integration` を参照。
 
-**発動条件判定（REQ-015-001/002）**: ユーザーが明示的に adversarial-review を指定した場合にのみ発動する（REQ-014-001、REQ-015-002）。明示指定がない場合は本 Step をスキップし、Step 4 後半（ユーザー承認）へ進む。発動条件判定 Step と review 呼出 Step を分離する（REQ-015-001）。
+**発動条件判定（REQ-015-001/002/003）**: backlog-review は adversarial-review を原則実行する（default-on、REQ-015-002）。RU 構成案（統合・分割判定、depends_on 依存解決）に意味的決定が存在する場合に発動する。ユーザー明示指定は通常発動の必須条件ではない。発動条件判定 Step と review 呼出 Step を分離する（REQ-015-001）。
+
+- **skip 条件**: RU 構成要素が1件のみ（統合・分割判定不要、depends_on 解決不要）で矛盾検出対象が存在しない場合、省略して従来フロー（Step 4 後半以降）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない
+- **ユーザー明示指定時の必須実行**: ユーザーが明示的に adversarial-review を指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）
 
 **review 呼出（REQ-015-001）**: 発動条件該当時、`agentdev-adversarial-review` を起動する。審議対象は Step 4 前半で確定した RU 構成案（統合・分割判定結果、depends_on 解決結果、暫定分類付与結果）。呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と delegation-contracts SPEC（`semantic_review`、書き込み禁止型）を正とする。
 
 **矛盾の扱い（REQ-015-008）**: review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は Step 5（既存矛盾検出）へ引き渡す。adversarial-review 自身は矛盾を自動解決せず、矛盾の判定、partial success 扱い、ユーザー追加判断への委ねは Step 5 の既存矛盾検出ロジックが正である。
 
-**従来フロー維持（REQ-015-003）**: 発動条件非該当時、呼出失敗時（REQ-014-010）のいずれの場合も、従来フロー（Step 4 後半以降）を維持する。review 挿入境界は既存 Step を追加、削除、並べ替えしない。
+**従来フロー維持（REQ-015-003）**: skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、従来フロー（Step 4 後半以降）を維持する。review 挿入境界は既存 Step を追加、削除、並べ替えしない。
 
 **accepted finding 反映と再 review（REQ-014-006/007）**: accepted finding の RU 構成案への反映は本コマンド（呼出元）の責務である。反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる。同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない。
 

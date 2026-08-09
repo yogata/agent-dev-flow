@@ -120,18 +120,25 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 ### 発動条件判定 Step と review 呼出 Step の分離（REQ-015-001/002/003）
 
-経路D は発動条件判定 Step と review 呼出 Step を分離する。両 Step を分離することで、条件非該当時は review 呼出を迂回して従来フロー（Step 8 → Step 9）を維持する（REQ-015-003）。
+経路D は発動条件判定 Step と review 呼出 Step を分離する。両 Step を分離することで、skip 条件該当時は review 呼出を迂回して従来フロー（Step 8 → Step 9）を維持する（REQ-015-003）。
 
 #### 発動条件判定 Step
 
 発動条件は Step 8（既存対策確認）の完了直後、Step 9（ユーザーへの判定結果提示）の前に判定する（REQ-015-007）。この位置は inbox → deferred 移動（Step 13）、prune（Step 14）、commit/push（Step 15）等の不可逆処理に先立つ。
 
-発動条件は次のいずれも満たすこととする。
+learning-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。発動条件は次のいずれも満たすこととする。
 
-- ユーザーが review を明示的に要求していること（REQ-015-002）。明示要求がない場合は発動しない
 - 判定対象（正規化済エントリ、問題クラス分類、8軸評価、廃棄判定、既存対策照合結果）が evaluation-report.md へ反映済みであること
+- skip 条件（後述）に該当しないこと
 
-明示要求のない限り review は発動せず、従来フローを維持する（REQ-014-001、REQ-015-003）。adversarial-review を新規必須工程、QG、承認ゲートとして扱わない。
+#### skip 条件とユーザー明示指定（REQ-015-002、REQ-015-003）
+
+- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+  - inbox.md エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）の場合
+  - inbox.md 空（処理対象なし、Step 2 等で終了）の場合
+- **ユーザー明示指定時の必須実行**: ユーザーが review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。ただし判定対象が evaluation-report.md へ反映済みであることは引き続き必須とする。
+
+adversarial-review を新規必須工程、QG、承認ゲートとして扱わない。skip 条件該当時は従来フローを維持する（REQ-015-003）。
 
 #### review 呼出 Step
 
