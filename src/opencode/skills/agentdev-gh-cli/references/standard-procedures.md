@@ -371,6 +371,79 @@ intake-from-github 等の検索系操作で使用する。
 
 新規作成と PATCH を分離することで、Windows 環境の `--title` cp932 化けを構造的に回避する。
 
+## commit メッセージ作成（BOM なし UTF-8 契約）
+
+git commit メッセージ作成時にも WRITE 標準手順（Section 2）と同等の BOM なし UTF-8 encoding 制御を適用する。SPEC `agentdev-gh-cli`.md「commit メッセージ作成の BOM なし UTF-8 契約」節の標準実装を本節に置く。gh CLI を経由しない git 操作でありながら、commit メッセージファイルの書き出しは WRITE 手続きと同じ cp932 化けリスクを持つため、Section 2 の文件書き出し規定を拡張適用する。
+
+### 適用条件
+
+- Windows 環境で commit メッセージを作成する場合（既定の Shift-JIS コンソール、`chcp 932`）
+- コンソールエンコーディング初期化（Section 2 Step 0）を実施せずに `git commit -m "..."` で日本語を含むメッセージを渡すと、PowerShell → git の引数渡し経路で cp932 化けが発生する
+- Linux/ macOS/ WSL 等の Windows 以外の環境では既定で UTF-8 コンソールのため、本節のファイル経由手順は必須ではない（`-m` inline 渡しも許容）。ただし emoji や特殊文字を含む場合はファイル経由を推奨する
+
+### 問題事象
+
+Windows PowerShell 5.x では `Out-File -Encoding utf8` が BOM 付き UTF-8 を生成する。BOM 付き UTF-8 で書き出した commit メッセージファイルを `git commit -F` で渡すと、git が BOM をメッセージ先頭の文字（`U+FEFF`、zero-width no-break space）として解釈し、commit メッセージの先頭に不可視文字が残留する。GitHub 上でも化けとして観察される。
+
+### 標準手順
+
+1. **コンソールエンコーディング初期化（Windows 環境では必須、Windows 以外では不要）**: Section 2 Step 0 と同一の3行を実行する（`git commit` でも git がコンソールコードページを参照するため必須）:
+
+ ```powershell
+ [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+ $OutputEncoding = [System.Text.Encoding]::UTF8
+ cmd /c chcp 65001 | Out-Null
+ ```
+
+2. **commit メッセージファイル作成（BOM なし UTF-8、LF）**: メッセージ本文を `.agentdev/tmp/commit-msg-{timestamp}.txt`（workspace-local）へ書き出す。実装手段は次のいずれかを使用する。
+
+ **実装手段A（Node.js `fs.writeFileSync`、推奨）**:
+
+ ```
+ node -e "require('fs').writeFileSync('.agentdev/tmp/commit-msg-{timestamp}.txt', messageText, 'utf8')"
+ ```
+
+ Node.js `fs.writeFileSync` の第3引数に `'utf8'` を指定すると BOM なし UTF-8 で書き出す。Windows PowerShell 5.x の `Out-File -Encoding utf8` が BOM 付きになる問題を構造的に回避するため推奨。
+
+ **実装手段B（PowerShell `[System.IO.File]::WriteAllText` + `UTF8Encoding($false)`）**:
+
+ ```powershell
+ [System.IO.File]::WriteAllText(".agentdev/tmp/commit-msg-{timestamp}.txt", $content, (New-Object System.Text.UTF8Encoding($false)))
+ ```
+
+ Section 2 Step 1 と同一規定。`UTF8Encoding($false)` により BOM なしを明示的に指定する。
+
+ **配置場所**: `.agentdev/tmp/`（workspace-local）。Section 2 Step 1 の配置規定と同一。
+
+3. **commit 実行**: `git commit` に `-F`（`--file`）オプションでファイルパスを指定する:
+
+ ```
+ git commit -F .agentdev/tmp/commit-msg-{timestamp}.txt
+ ```
+
+ git はファイルをバイト列として読み込み、コンソールエンコーディングを参照しない。`-F` で BOM なし UTF-8 ファイルを渡すことで、コンソール経路の cp932 化けを完全に回避する。
+
+4. **VERIFY**: commit 後、`git log -1 --pretty=%B` でメッセージを読み戻し、ファイル書き出し時のメッセージと一致することを確認する（READ 手続き Section 3 に従い Node.js `execSync` で取得）。BOM が残留していないことをバイト列検査で確認することを推奨:
+
+ ```
+ node -e "const{execSync}=require('child_process');const{writeFileSync}=require('fs');const r=execSync('git log -1 --pretty=%B',{encoding:'utf-8'});writeFileSync('.agentdev/tmp/commit-verify-{timestamp}.txt',r)"
+ ```
+
+ 読み戻したメッセージの先頭1バイトが `0xEF`（UTF-8 BOM `EF BB BF` の先頭）でないことを確認する。
+
+5. **cleanup**: VERIFY が PASS した後に `.agentdev/tmp/commit-msg-{timestamp}.txt`、`.agentdev/tmp/commit-verify-{timestamp}.txt` を削除する（WRITE ユニット cleanup 規定、RU-0005 AG-003 と同一）。VERIFY が FAIL の場合は cleanup を実行せず、一時ファイルを残して原因調査へ移行する。
+
+### 禁止事項
+
+- **`git commit -m "..."` の inline 使用禁止（Windows 環境、日本語・emoji・特殊文字を含む場合）**: PowerShell から git への引数渡し経路で cp932 化けが発生する。ASCII 限定の1行メッセージに限り inline `-m` を許容する
+- **`Out-File -Encoding utf8` 使用禁止**: Windows PowerShell 5.x で BOM 付き UTF-8 を生成する
+- **`Set-Content`、`>` リダイレクト、`>>` 追記リダイレクト使用禁止**: システムデフォルトエンコーディング（Shift-JIS 等）で書き出す可能性がある（Section 1 禁止事項と同一）
+- **`-F` で BOM 付き UTF-8 ファイルを渡すこと**: git が BOM をメッセージ先頭の不可視文字として残留させる
+
+### HEREDOC 構文の取扱い
+
+bash 系シェルの `git commit -m "$(cat <<'EOF' ... EOF)"` 等の HEREDOC 構文は POSIX 環境では妥当だが、Windows PowerShell 環境ではクォート階層が競合し cp932 化けリスクが残るため、本節のファイル経由手順を優先する。
+
 ## Merge Conflict 対応パターン
 
 ### gh CLI操作中のmerge関連エラー対応
