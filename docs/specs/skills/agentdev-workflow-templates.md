@@ -19,7 +19,7 @@ agentdev 系コマンドで使用する Issue/PR 本文、コメントテンプ�
 
 ## 提供する判断、操作
 
-- Issue 本文テンプレート（feature / bug / epic / child / backlog_child / backlog_epic）
+- Issue 本文テンプレート（feature / bug / epic / child）
 - コメントテンプレート（bug_analysis / feature_technical / update / review_ng / feature_implementation / bug_record）
 - PR 本文テンプレート（`## Findings / Capture候補`、`## SPEC確定候補` セクション含む）
 - テンプレート選定ルール（work_type、Issue 種別、フロー種別）
@@ -31,8 +31,6 @@ agentdev 系コマンドで使用する Issue/PR 本文、コメントテンプ�
 - `templates/issue_desc_bug.md`
 - `templates/issue_desc_epic.md`
 - `templates/issue_desc_child.md`
-- `templates/issue_desc_backlog_child.md`
-- `templates/issue_desc_backlog_epic.md`
 - `templates/issue_comment_bug_analysis.md`
 - `templates/issue_comment_feature_technical.md`
 - `templates/issue_comment_update.md`
@@ -150,8 +148,7 @@ case-open は新規 Issue 作成時および case-update による新契約更�
 
 本変更以前の Issue テンプレートは廃止せず、履歴として維持する。既存の
 issue_desc_feature.md、issue_desc_child.md は新テンプレートへ移行する。
-issue_desc_bug.md、issue_desc_epic.md、issue_desc_backlog_child.md、
-issue_desc_backlog_epic.md は bugfix/maintenance/docs_chore または backlog 由来であり、
+issue_desc_bug.md、issue_desc_epic.md は bugfix/maintenance/docs_chore または backlog 由来であり、
 execution contract セクションの付加を検討するが必須とはしない（work_type により
 execution contract 責務が軽量なため）。
 
