@@ -164,6 +164,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | foundations/numbering-policy.md | accepted | 採番管理 SPEC | REQ/ADR/IR の識別子採番規則、欠番維持、決定的採番スクリプトとの協調 |
 | foundations/system.md | accepted | システム仕様 | コマンドシステムの構成定義、運用モデル |
 | foundations/document-model.md | accepted | 文書モデル | REQ/ADR/SPEC/guides の責務マトリックス、ドメイン別体系化規範 |
+| foundations/decision-lifecycle.md | draft | Decision Lifecycle | Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理規則、健全性評価モデル。document-model.md「Decision ライフサイクル詳細」から参照される詳細を正規所有 |
 | foundations/patterns.md | accepted | 文書フォーマット規約 | frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約（本文構造・執筆規約寄り内容は authoring/ への移管候補、実移管は case-run で判断） |
 | foundations/design-principles.md | accepted | 設計原則 | アーキテクチャ設計原則 |
 | foundations/project-extensions.md | accepted | Project Extensions | 実行時プロジェクト固有追加・拡張機構（`.agentdev/extensions/**`）、extension schema、実行時読み込み契約、project-local skill 委譲、配布物具体参照禁止（REQ-002） |

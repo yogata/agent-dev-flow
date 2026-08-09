@@ -4,18 +4,18 @@ status: accepted
 spec_logical_division: cross_cutting_contract
 canonical_owner: document-type-responsibilities
 created: 2026-06-23
-updated: 2026-07-27
+updated: 2026-08-10
 ---
 
 # 文書種別責務、配置基準
 
 > **他 SPEC との役割分担**: 本 SPEC と `../foundations/document-model.md` は補完関係にある。
-> 文書種別の基準境界（REQ/ADR/SPEC/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向、SPEC内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の正本を参照する。
+> 文書種別の基準境界（REQ/Decision/SPEC/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向、SPEC内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の正本を参照する。
 > 本 SPEC は文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策を扱う。
 > 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）は `../foundations/patterns.md` を参照する。
 > 新規ファイル分割は行わず、既存2ファイル（本 SPEC と document-model.md）間の重複削除で運用する。両 SPEC の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
 
-docs/ 配下の文書（REQ/ADR/SPEC/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
+docs/ 配下の文書（REQ/Decision/SPEC/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
 v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）であり、`agentdev-doc-writing` スキルの参照先である。
 REQ-001-061、REQ-002-032 の詳細参照先。
 
@@ -27,9 +27,9 @@ REQ-001-061、REQ-002-032 の詳細参照先。
 
 ## 文書種別の基準境界（参照）
 
-REQ/ADR/SPEC/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。本 SPEC は基準境界を再定義せず、執筆時の配置判定のみを扱う。
+REQ/Decision/SPEC/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。本 SPEC は基準境界を再定義せず、執筆時の配置判定のみを扱う。
 
-README は agent-dev-flow リポジトリの構成要素（identity、入口表、参照先リンク、最小限のクイックスタート）であり、REQ/ADR/SPEC/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
+README は agent-dev-flow リポジトリの構成要素（identity、入口表、参照先リンク、最小限のクイックスタート）であり、REQ/Decision/SPEC/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
 
 ### 新規文書作成時の分類判断ツリー <!-- REQ-001 -->
 
@@ -39,7 +39,7 @@ README は agent-dev-flow リポジトリの構成要素（identity、入口表�
 |---|---|---|
 | 満たすべき振る舞い、制約、状態の定義か? | YES → | **REQ** |
 | 可逆的な運用上の判断か? | YES → | Guide または workflow 内の判断として扱い、独立文書不要 |
-| 将来の設計、運用、文書システムを制約する決定か? | YES → | **ADR** |
+| 将来の設計、運用、文書システムを制約する決定か? | YES → | **Decision** |
 | 現在のアーキテクチャ、システム動作の記述か? | YES → | **SPEC** |
 | 分析結果、監査所見、インシデント記録か? | YES → | **Report** |
 | 人間向けのナビゲーション、案内か? | YES → | **Guide** |
@@ -102,7 +102,7 @@ learning/intake 成果物から後続工程（RU、req-define、spec-save）へ�
 | 追記先を選択した理由 | 当該追記先を選んだ根拠 |
 | 根拠となる観測事実 | 変更が必要となった観測事実（CI 失敗、誤検出、エッジケース発見等） |
 
-分類根拠は soft-contract（ADR-003）として追加情報扱いとし、欠落時は unknown 既定値で警告する後方互換運用をとる。具体的なフィールド名、enum 表現、シリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」で定義する。
+分類根拠は soft-contract（DEC-003）として追加情報扱いとし、欠落時は unknown 既定値で警告する後方互換運用をとる。具体的なフィールド名、enum 表現、シリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」で定義する。
 
 ## 実行主体分類の査読基準
 
@@ -171,7 +171,7 @@ learning/intake 成果物から後続工程（RU、req-define、spec-save）へ�
 |---|---|
 | 残す | 現在の文書種別、位置が適切。文章品質の修正のみで対応可能 |
 | 分割 | 1行に複数関心が混在。関心ごとに別行へ分割 |
-| 移送 | 別の文書種別（REQ↔SPEC↔ADR↔guide↔skill reference）への移動が必要 |
+| 移送 | 別の文書種別（REQ↔SPEC↔Decision↔guide↔skill reference）への移動が必要 |
 | 削除候補 | 作業記録、移行結果、現状構成の詳細説明、変更履歴等、要件として不要な内容 |
 
 ## 硬直的固定記述の回避
@@ -225,7 +225,7 @@ japanese-tech-writing は「術語の扱い方の一般論」を管理する。
 
 ### 英語のまま残す語（固有名詞、識別子）
 
-製品名（AgentDevFlow, OpenCode）、ID（REQ-008 等）、略語（REQ/ADR/SPEC/RU/OU/PR/SSoT/HITL）、コマンド名、ファイルパス、YAMLフィールド名（説明文では日本語訳を併記）、パイプライン名（Intake/Learning/Backlog）。
+製品名（AgentDevFlow, OpenCode）、ID（REQ-008 等）、略語（REQ/Decision/SPEC/RU/OU/PR/SSoT/HITL）、コマンド名、ファイルパス、YAMLフィールド名（説明文では日本語訳を併記）、パイプライン名（Intake/Learning/Backlog）。
 
 ### 修飾語の日本語化の方向性
 
@@ -325,7 +325,7 @@ guides/README のみ全規範を適用する。
 | 文書種別 | 適用サブセット | 非適用 |
 |---|---|---|
 | REQ | 整形、LLM表現禁止、冗長排除、演出抑制、用語政策 | パラグラフライティング、山場の演出 |
-| ADR | 整形、LLM表現禁止、冗長排除、論証の厳密さ（因果の機構、譲歩の処理）、用語政策 | 演出 |
+| Decision | 整形、LLM表現禁止、冗長排除、論証の厳密さ（因果の機構、譲歩の処理）、用語政策 | 演出 |
 | SPEC | 整形、LLM表現禁止、冗長排除、識別子と散文の区別、用語政策 | 演出、パラグラフライティング |
 | command | 整形、LLM表現禁止、冗長排除、見出しの付け方、用語政策 | 演出、パラグラフライティング |
 | skill | 整形、LLM表現禁止、冗長排除、論証の厳密さ、用語政策 | 演出 |
@@ -333,9 +333,9 @@ guides/README のみ全規範を適用する。
 
 ## 規範情報と非規範情報の配置基準
 
-恒久基準文書（ADR、REQ、SPEC）と非規範 Report（Release Report 等）の配置基準を明確化する（document-model「恒久基準と非規範情報の整理」準拠）。
+恒久基準文書（Decision、REQ、SPEC）と非規範 Report（Release Report 等）の配置基準を明確化する（document-model「恒久基準と非規範情報の整理」準拠）。
 
-### 規範情報（ADR、REQ、SPEC）
+### 規範情報（Decision、REQ、SPEC）
 
 - 決定内容、適用範囲、必須条件、制約、正規所有者、採用方式、観測可能結果（含义変更相当）
 - 安定的な仕様記述、契約、プロトコル
@@ -349,10 +349,10 @@ guides/README のみ全規範を適用する。
 
 ### 配置原則
 
-- 現行 ADR、REQ、SPEC へ移行結果またはリリース証跡を規範内容として配置しない
+- 現行 Decision、REQ、SPEC へ移行結果またはリリース証跡を規範内容として配置しない
 - 非規範 Report へ規範要件または必達条件を移さない
 - 配置判定は document-model の 6 処置モデル（KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）で行う
-- ADR-001 の 10シナリオの実行結果は Release Report、定義は SPEC へ配置する
+- DEC-001 の 10シナリオの実行結果は Release Report、定義は SPEC へ配置する
 
 ## SKILL.md 見出し言語方針
 

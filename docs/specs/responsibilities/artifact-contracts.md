@@ -1,5 +1,5 @@
 ---
-updated: 2026-08-06
+updated: 2026-08-10
 status: accepted
 ---
 
@@ -108,7 +108,7 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 | script 種別 | 正規所有者 skill | 対象 |
 |---|---|---|
 | REQ 番号採番、要件行 ID 採番、REQ 固有検証 | `agentdev-req-file-manager` | REQ 操作に固有の決定的処理 |
-| ADR 番号採番、ADR 固有検証 | `agentdev-adr-file-manager` | ADR 操作に固有の決定的処理 |
+| Decision 番号採番、Decision 固有検証 | `agentdev-decision-file-manager` | Decision 操作に固有の決定的処理 |
 | SPEC 固有処理（target_area 見出し検索、SPEC 固有整合性確認） | `agentdev-spec-file-manager` | SPEC 操作に固有の決定的処理 |
 | 文書種別横断の共通検証（frontmatter 整合性、エントリ存在確認、変更範囲検証）と共有 lib | `agentdev-artifact-validation` | 複数文書種別で共有する決定的検証と共有ライブラリ、対応 test |
 
@@ -120,7 +120,7 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 - 同一 script または共有 lib を複製しない（REQ-002-006「Script は決定的: テスト可能、再現可能」の延長）
 - 新規 script 追加時は所有者候補を文書種別で判定し、既存所有者との重複を確認する
 
-本契約は Command → Skill → Script の依存方向を維持し、新規 ADR を作成せず v2:ADR-0107（Command/Skill/Template/Script 責任分界）の適用条件の精緻化として扱う（REQ-003-033 準拠）。
+本契約は Command → Skill → Script の依存方向を維持し、新規 Decision を作成せず v2:ADR-0107（Command/Skill/Template/Script 責任分界）の適用条件の精緻化として扱う（REQ-003-033 準拠）。
 
 ## 分類根拠伝播契約
 
@@ -139,9 +139,9 @@ learning/intake → RU → req-define → spec-save の各工程間で引き継�
 | destination_selection_reason | string | 追記先を選択した理由 | 欠落時は `unknown` で警告 |
 | observed_evidence | string | 根拠となる観測事実（CI 失敗、誤検出、エッジケース発見等） | 欠落時は `unknown` で警告 |
 
-### soft-contract 運用（ADR-003 準拠）
+### soft-contract 運用（DEC-003 準拠）
 
-- 分類根拠は soft-contract（ADR-003）として追加情報扱いとする
+- 分類根拠は soft-contract（DEC-003）として追加情報扱いとする
 - 厳格なスキーマ検証、JSON Schema、バリデータを導入しない
 - 欠落時は `unknown` 既定値で警告を出し、処理を継続する（後方互換）
 - 既存の採用済み成果物、RU、req_draft を欠落により拒否しない
@@ -155,7 +155,7 @@ learning/intake → RU → req-define → spec-save の各工程間で引き継�
 | intake-promote | inbox item から change_nature、observed_evidence を推定 | 採用済み成果物に分類根拠を添付 |
 | backlog-review | 採用済み成果物から読取、`tentative_classification` と併せて RU frontmatter へ記録 | RU frontmatter に `tentative_classification` と分類根拠を記録 |
 | req-define | RU の分類根拠を暫定入力とし、最終分類を自身で確定。SPEC action（`artifact: spec`）の各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する | draft-data の `artifact_actions`（各 SPEC action）と `operation_units` へ最終分類根拠を反映 |
-| spec-save | draft-data の `artifact_actions`（各 SPEC action）から分類根拠を読取、配置一貫性検証の入力とする。CREATE 操作では新規 SPEC frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。UPDATE 操作では変更対象 SPEC に宣言がなく分類値が `unknown` 以外に確定している場合に宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落を理由に保存拒否しない、ADR-003 soft-contract） | 配置一貫性検証結果を commit message、完了報告に反映。宣言付与結果を SPEC ファイルへ反映 |
+| spec-save | draft-data の `artifact_actions`（各 SPEC action）から分類根拠を読取、配置一貫性検証の入力とする。CREATE 操作では新規 SPEC frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。UPDATE 操作では変更対象 SPEC に宣言がなく分類値が `unknown` 以外に確定している場合に宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落を理由に保存拒否しない、DEC-003 soft-contract） | 配置一貫性検証結果を commit message、完了報告に反映。宣言付与結果を SPEC ファイルへ反映 |
 
 ### REQ 拡張可否判定ルール
 
@@ -196,7 +196,7 @@ change_nature が `new_user_requirement` または `external_contract_change` �
 | delegation_type | 用途 | 副作用 |
 |---|---|---|
 | `gate_check`（ゲート検査） | 完了判定、ガードレール充足確認、保存前/close 前検査 | 禁止 |
-| `semantic_review`（意味レビュー） | 文書、差分、REQ/ADR/SPEC の意味レビュー | 禁止 |
+| `semantic_review`（意味レビュー） | 文書、差分、REQ/Decision/SPEC の意味レビュー | 禁止 |
 | `log_analysis`（ログ解析） | テストログ、CI ログ、review 結果解析 | 禁止 |
 | `classification`（分類） | アーティファクト / 検出事項 / intake / learning の分類 | 禁止 |
 | `extraction`（抽出） | 候補、論点、未回収事項の抽出 | 禁止 |
@@ -246,7 +246,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-046）。
 |---|-----------|------|
 | 1 | 完了コマンド | 実行したコマンドのフルパス（例: `/agentdev/case-close`） |
 | 2 | 対象 | 操作対象の識別子（Issue 番号、PR 番号、ファイルパス等） |
-| 3 | 結果 | ユーザー視点、ドメイン視点の成果（Issue 作成、PR 作成、REQ/ADR 保存等）。commit hash、push 成否、HEAD 同期確認等の git 操作結果は含めない |
+| 3 | 結果 | ユーザー視点、ドメイン視点の成果（Issue 作成、PR 作成、REQ/Decision 保存等）。commit hash、push 成否、HEAD 同期確認等の git 操作結果は含めない |
 | 4 | 検証結果 | `✅ OK` / `⚠️ 注意` / `❌ NG` のいずれか |
 | 5 | git 永続化 | git 操作結果のみ。記載形式: `該当なし` / `変更なし（commit/push スキップ）` / `✅ OK（commit {hash}, push 済み）` 等 |
 | 6 | 次のコマンド | 後続コマンドのフルパス、または「なし」（終端コマンドの場合） |
@@ -309,7 +309,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-046）。
 ## ドラフトアーティファクト契約（REQ-002-129〜139）
 
 `.agentdev/drafts/` 配下の中間成果物（draft file）の契約を定義する。
-draft file は原本アーティファクト（REQ/ADR/SPEC/RU）ではなく、コマンド間で受け渡す中間成果物である（REQ-002-126-128）。
+draft file は原本アーティファクト（REQ/Decision/SPEC/RU）ではなく、コマンド間で受け渡す中間成果物である（REQ-002-126-128）。
 
 ### ドラフト種別レジストリ（Draft Type Registry）
 
@@ -352,7 +352,7 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 ### inspect-skills 副作用境界
 
 `inspect-skills` は検査対象（Command/Skill 定義ファイル）を直接修正しない診断コマンドとする。
-許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/ADR/SPEC 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-002-140-151、REQ-010-007）。
+許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/Decision/SPEC 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-002-140-151、REQ-010-007）。
 最終判断（promote / defer / reject）は `inspect-promote` が行う。
 検出事項（inspect finding）は `inspect-promote` による promote/defer/reject ライフサイクルの対象となる。
 
@@ -364,7 +364,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 | 集合 | 要素 | 役割 |
 |---|---|---|
 | producer | `{req-define}` | req_draft を生成する唯一の command |
-| direct consumer | `{req-save, spec-save, case-open}` | req_draft を主入力として消費し、REQ/ADR/SPEC/Issue を生成する command 群 |
+| direct consumer | `{req-save, spec-save, case-open}` | req_draft を主入力として消費し、REQ/Decision/SPEC/Issue を生成する command 群 |
 | orchestration pre-reader | `{case-auto}` | case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command |
 | invalid post-case reader | `{case-auto, case-run, case-close}` | case-open 成功後に req_draft を参照してはならない command 群 |
 
@@ -379,7 +379,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 
 `req_draft`（`.agentdev/drafts/req-draft-{topic}.md`）は req-define が生成する一時的な構造化ハンドオフ成果物であり、req-save / spec-save / case-open / case-auto / case-run / case-close が消費する。
 
-- req_draft は API 契約ではなく、生成元（producer）側の標準（緩やかな契約: soft contract）である。LLM 推論経由で消費され、機械的パースを前提としない（ADR-003）
+- req_draft は API 契約ではなく、生成元（producer）側の標準（緩やかな契約: soft contract）である。LLM 推論経由で消費され、機械的パースを前提としない（DEC-003）
 - スキーマバージョン、JSON Schema、バリデータは導入しない
 - 後続工程の権威ある情報源は `draft-data` YAML block であり、人間可読 Markdown セクションではない
 - 標準データモデル fields: `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `review_dispositions`, `case_open_hints`
@@ -394,9 +394,9 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 
 | field | 説明 |
 |---|---|
-| `id` | `ACT-REQ-NNN` / `ACT-ADR-NNN` / `ACT-SPEC-NNN` |
-| `artifact` | `req` / `adr` / `spec` |
-| `operation` | REQ/ADR: `create` / `append` / `update`、SPEC: `create` / `update`（公式 enum）。各 SPEC は非正規 alias（`spec-create`, `spec-update`, `spec-append`）を受け付ける（REQ-008-058）。alias から公式 enum への映射、alias 固有の契約（target_area 形式、placement、anchor、未検出時挙動等）は各 SPEC が定める |
+| `id` | `ACT-REQ-NNN` / `ACT-DEC-NNN` / `ACT-SPEC-NNN` |
+| `artifact` | `req` / `decision` / `spec` |
+| `operation` | REQ/Decision: `create` / `append` / `update`、SPEC: `create` / `update`（公式 enum）。各 SPEC は非正規 alias（`spec-create`, `spec-update`, `spec-append`）を受け付ける（REQ-008-058）。alias から公式 enum への映射、alias 固有の契約（target_area 形式、placement、anchor、未検出時挙動等）は各 SPEC が定める |
 | `target` | file path または `new:{slug}` |
 | `target_area` | optional: section / area 指定 |
 | `source_items` | 対応する agreed_item ID の list |
@@ -404,7 +404,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 
 ### review_dispositions 構造
 
-`review_dispositions` は req-define が壁打ち過程で記録した採否判断（covered、rejected 等）を後続工程へ引き継ぐ optional な soft-contract である（ADR-003）。
+`review_dispositions` は req-define が壁打ち過程で記録した採否判断（covered、rejected 等）を後続工程へ引き継ぐ optional な soft-contract である（DEC-003）。
 
 - **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `review_dispositions` の schema を正規所有する
 - **producer**: req-define（`docs/specs/commands/req-define.md`、`src/opencode/commands/agentdev/req-define.md`、`src/opencode/commands/agentdev/templates/req-define/req-draft.md`）
@@ -437,7 +437,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 | `superseded` | 入力項目がより新しい判断へ置き換えられた（必要に応じて追加） |
 | `stale_target` | 根拠の参照先が失効し、covered のまま起票できない（必要に応じて追加） |
 
-#### optional soft-contract 運用（ADR-003 準拠）
+#### optional soft-contract 運用（DEC-003 準拠）
 
 - `review_dispositions` は optional な soft-contract であり、欠落時に既存 req_draft、RU、promoted artifact を拒否しない（後方互換）
 - 厳格なスキーマ検証、JSON Schema、バリデータを導入しない
@@ -454,7 +454,7 @@ req_draft の frontmatter は最小限のメタデータのみとする。
 
 ## artifact_actions operation
 
-`artifact_actions` の `operation` フィールドは REQ/ADR 操作と SPEC 操作で扱う値が異なる。REQ/ADR 操作（`create` / `append` / `update`）は従来通り維持する。本節は SPEC 操作の公式 enum、非正規 alias、consumer 側の後方互換、および `spec-append` operation の契約を正規所有する。各 action の field 構成は「req_draft 出力構造」節の「artifact_actions 詳細構造」を参照。
+`artifact_actions` の `operation` フィールドは REQ/Decision 操作と SPEC 操作で扱う値が異なる。REQ/Decision 操作（`create` / `append` / `update`）は従来通り維持する。本節は SPEC 操作の公式 enum、非正規 alias、consumer 側の後方互換、および `spec-append` operation の契約を正規所有する。各 action の field 構成は「req_draft 出力構造」節の「artifact_actions 詳細構造」を参照。
 
 ### SPEC operation enum と非正規 alias
 

@@ -2,7 +2,7 @@
 status: accepted
 spec_logical_division: cross_cutting_contract
 canonical_owner: document-model
-updated: 2026-08-08
+updated: 2026-08-10
 ---
 
 # 文書モデル
@@ -11,7 +11,7 @@ updated: 2026-08-08
 
 ## 目的
 
-REQ/ADR/SPEC/guides の責務マトリックスを定義し、各文書種別が何を記述し、何を記述しないかを明確にする（REQ-001）。
+REQ/Decision/SPEC/guides の責務マトリックスを定義し、各文書種別が何を記述し、何を記述しないかを明確にする（REQ-001）。
 
 ### 他 SPEC との役割分担
 
@@ -19,7 +19,7 @@ REQ/ADR/SPEC/guides の責務マトリックスを定義し、各文書種別が
 
 | 関心 | 主に扱う SPEC |
 |---|---|
-| 文書種別の基準境界（REQ/ADR/SPEC/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向） | 本 SPEC |
+| 文書種別の基準境界（REQ/Decision/SPEC/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向） | 本 SPEC |
 | SPEC 内部論理区分、文書7分類、局所物理分離、docs/specs/ 直下のドメイン別体系化規範 | 本 SPEC |
 | 文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策 | `../responsibilities/document-type-responsibilities.md` |
 | 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約） | `patterns.md`（本 SPEC は文書種別マトリックスを扱い、`patterns.md` は共通フォーマット規約を扱う） |
@@ -31,9 +31,9 @@ REQ/ADR/SPEC/guides の責務マトリックスを定義し、各文書種別が
 | 文書種別 | 記述するもの | 記述しないもの |
 |---|---|---|
 | REQ | 現行要件（WHAT: 何を満たすべきか） | 実装詳細、HOW、現在の動作記述 |
-| ADR | 将来の設計、運用、文書システムを制約する決定とその理由（WHY）<!-- REQ-001 --> | 可逆的な運用手順、状態遷移、形式定義 |
-| SPEC | 現在のアーキテクチャ基準（現在どう動作しているか）※リポジトリ内部設計文書。実行時配布物の依存先ではない（REQ-001, REQ-001） | 新規要件、将来計画、判断根拠（ADR の管轄） |
-| Guides | 人間向けナビゲーション層。規範的権限を持たない（REQ-001） | 要件本文、契約本文、REQ/ADR/SPEC 内容の重複 |
+| Decision | 将来の設計、運用、文書システムを制約する決定とその理由（WHY）<!-- REQ-001 --> | 可逆的な運用手順、状態遷移、形式定義 |
+| SPEC | 現在のアーキテクチャ基準（現在どう動作しているか）※リポジトリ内部設計文書。実行時配布物の依存先ではない（REQ-001, REQ-001） | 新規要件、将来計画、判断根拠（Decision の管轄） |
+| Guides | 人間向けナビゲーション層。規範的権限を持たない（REQ-001） | 要件本文、契約本文、REQ/Decision/SPEC 内容の重複 |
 
 ### ワークフロー状態管理
 
@@ -60,12 +60,12 @@ REQ 文書の各セクションが保持すべき内容の契約（REQ-004-006, 
 
 | 分類 | 説明 | 代表例 |
 |---|---|---|
-| 文書統治 REQ | REQ/ADR/SPEC/guides の基準境界、文書分類ポリシー、ID 規約 | REQ-001 |
+| 文書統治 REQ | REQ/Decision/SPEC/guides の基準境界、文書分類ポリシー、ID 規約 | REQ-001 |
 | ワークフロー全体 REQ | 開発ワークフロー、コマンド間データフロー、work_type 分類、SSoT 遷移 | REQ-005 |
 | コマンド級 REQ | 公開コマンドの入力、出力、副作用境界、停止条件、他コマンドとの接続 | REQ-004, REQ-008, REQ-006 |
 | 成果物、実行時、スキル責務 REQ | Command/Skill/Template/Script の責務境界、配布制約、原本、配置先分離 | REQ-002, REQ-003 |
 | 検証、検査 REQ | 整合性検査、検出事項分類、docs-check、inspect-docs の検査責務 | REQ-010, REQ-010 |
-| ADR ライフサイクル REQ | ADR 状態の正規化、ADR 運用品質維持 | REQ-001 |
+| Decision ライフサイクル REQ | Decision 状態の正規化、Decision 運用品質維持 | REQ-001 |
 
 ### コマンド級 REQ 定義
 
@@ -151,7 +151,7 @@ REQ 体系の健全性を維持するため、これらの観点で定期的に 
 
 ### 恒久契約適格性と既存成果物処置分類 <!-- v2:REQ-0155-005, REQ-010-047, v2:REQ-0140-021 -->
 
-本節は intake / learning / diagnostics の採用済み成果物を恒久契約（REQ/ADR/SPEC/command/skill）へ昇格させる前の共通基準と、既存成果物の見直し処置の定義を正規所有する。適格性基準は v2:ADR-0112（過剰適用防止）、REQ-001決定4（REQ拡張は2種別に限定）、v2:REQ-0155-005（無条件自動REQ化禁止）を具体化する。
+本節は intake / learning / diagnostics の採用済み成果物を恒久契約（REQ/Decision/SPEC/command/skill）へ昇格させる前の共通基準と、既存成果物の見直し処置の定義を正規所有する。適格性基準は v2:ADR-0112（過剰適用防止）、REQ-001決定4（REQ拡張は2種別に限定）、v2:REQ-0155-005（無条件自動REQ化禁止）を具体化する。
 
 #### 恒久契約適格性
 
@@ -161,7 +161,7 @@ intake、learning、inspect 由来の知見は、既存契約で未充足の新�
 
 #### 既存成果物の6処置
 
-既存REQ、ADR、SPEC、guide、command、skill の記述を見直す際の処置は以下の6区分とする。各処置は相互排他的であり、1つの記述に対して1処置を適用する。
+既存REQ、Decision、SPEC、guide、command、skill の記述を見直す際の処置は以下の6区分とする。各処置は相互排他的であり、1つの記述に対して1処置を適用する。
 
 | 処置 | 意味 |
 |---|---|
@@ -206,7 +206,7 @@ document-model.md は共通定義のみを正規所有し、工程固有手順�
 ```
 REQ（要件定義）
   ↓ 判断が必要な場合
-ADR（決定記録）<!-- REQ-001 -->
+Decision（決定記録）<!-- REQ-001 -->
   ↓ 判断に基づく実装
 SPEC（現在仕様記述）
   ↓ 探索支援
@@ -214,8 +214,8 @@ Guides（案内）
 ```
 
 - REQ は領域別の総体として管理する。変更の都度 REQ を作成せず、既存 REQ への APPEND / UPDATE で対応する。
-- ADR は `proposed` → `accepted` / `superseded` / `deprecated` の状態遷移を持つ。現行基準（`baseline`）は REQ-001 以降（現行 ADR コレクション）。v2:ADR-0001〜0099 は過去に存在した履歴番号帯である（実体は2026-07-20に物理削除）（REQ-001-047, 048）。
-- SPEC は実装とともに変化する「生きた文書」である。REQ や ADR の判断内容を代替しない。
+- Decision は `proposed` → `accepted` / `superseded` / `deprecated` の状態遷移を持つ。現行基準（`baseline`）は REQ-001 以降（現行 Decision コレクション）。v2:ADR-0001〜0099 は過去に存在した履歴番号帯である（実体は2026-07-20に物理削除）（REQ-001-047, 048）。
+- SPEC は実装とともに変化する「生きた文書」である。REQ や Decision の判断内容を代替しない。
 - Guides はナビゲーション層であり、規範文書ではない。
 
 ### SPEC ライフサイクル（v2:ADR-0123）
@@ -232,6 +232,10 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 - `superseded`は元位置を維持し、`superseded_by`で後継SPECを示す。
 - `superseded_by`の存在を通常検査対象外判定に使用する。
 - `draft`から`accepted`への昇格はcase-close、後継移行時の`superseded`設定はspec-saveまたはcase-closeの確定処理が扱う。
+### Decision ライフサイクル詳細
+
+Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理、健全性評価モデルの詳細は `decision-lifecycle.md` が正規所有する。本節は参照関係を示し、内容を複製しない。Decision は REQ と管理特性を分離し（AG-004）、固定件数ではなく意味的健全性で粒度を評価し（AG-006）、REQ 重複・分割モデルと分離された健全性評価を持つ（AG-017）。
+
 ## 適用範囲宣言
 
 `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
@@ -245,27 +249,27 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 | `.agentdev/` | AgentDevFlow の原本ドメイン状態（intake / learning / backlog / integrity） | 永続的なドメイン状態。配布物ではない |
 | `.agentdev/drafts/` | コマンドワークフローでの作業用一時領域 | 現行コマンドの明示的な作業用ドラフト引き継ぎでのみ使用 |
 
-### draft の位置づけ（REQ-008, ADR-003）
+### draft の位置づけ（REQ-008, DEC-003）
 
-`.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成する一時的な構造化ハンドオフ成果物である。consumer 境界は producer、direct consumer、orchestration pre-reader、invalid post-case reader の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）。4 集合の正規定義は `docs/specs/responsibilities/artifact-contracts.md`「req_draft consumer 4 集合」節を SSoT とし、本節は同じ 4 集合を抽出元として一致させる。永久文書（REQ/ADR/SPEC/guides）ではなく、以下の性質を持つ:
+`.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成する一時的な構造化ハンドオフ成果物である。consumer 境界は producer、direct consumer、orchestration pre-reader、invalid post-case reader の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）。4 集合の正規定義は `docs/specs/responsibilities/artifact-contracts.md`「req_draft consumer 4 集合」節を SSoT とし、本節は同じ 4 集合を抽出元として一致させる。永久文書（REQ/Decision/SPEC/guides）ではなく、以下の性質を持つ:
 
 - **consumer 4 集合**: req_draft の consumer 境界は次の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）
   - producer: `{req-define}` — req_draft を生成する唯一の command
-  - direct consumer: `{req-save, spec-save, case-open}` — req_draft を主入力として消費し、REQ/ADR/SPEC/Issue を生成する command 群。draft type registry の allowed consumers 列と同一
+  - direct consumer: `{req-save, spec-save, case-open}` — req_draft を主入力として消費し、REQ/Decision/SPEC/Issue を生成する command 群。draft type registry の allowed consumers 列と同一
   - orchestration pre-reader: `{case-auto}` — case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command
   - invalid post-case reader: `{case-auto, case-run, case-close}` — case-open 成功後に req_draft を参照してはならない command 群。case-open 成功後は Issue と Epic を SSoT として単独成立する
-- **緩やかな契約（soft contract）**: API 契約ではなく生成側（producer）の標準。LLM 推論経由で消費され、機械的パースを前提としない（ADR-003）。厳格なスキーマバージョン、JSON Schema、バリデータは導入しない
+- **緩やかな契約（soft contract）**: API 契約ではなく生成側（producer）の標準。LLM 推論経由で消費され、機械的パースを前提としない（DEC-003）。厳格なスキーマバージョン、JSON Schema、バリデータは導入しない
 - **構造化データが正**: 後続工程の権威ある情報源は `# draft-data` fenced YAML block であり、人間可読 Markdown セクション（`# summary` 等）は補助的である（REQ-008-001, REQ-008-002）
 - **一時成果物**: case-open 成功後（Issue/Epic 作成 + VERIFY）は削除されてよい。case-open 成功後は Issue/Epic を SSoT とし、req_draft は存在しない一時成果物となる（REQ-008-015, REQ-008-016）
 - **標準データモデル**: `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `case_open_hints` を中心フィールドとする（REQ-008-011）。詳細構造は `docs/specs/responsibilities/artifact-contracts.md` の「req_draft 出力構造」を参照
-- **artifact_actions 統合**: REQ/ADR/SPEC への保存対象は成果物別配列に分散させず、単一の `artifact_actions` 配列に統合する（REQ-008-009）。後続コマンドの工程分岐は `work_type` 固定分岐ではなく `artifact_actions` の存在で判定する
+- **artifact_actions 統合**: REQ/Decision/SPEC への保存対象は成果物別配列に分散させず、単一の `artifact_actions` 配列に統合する（REQ-008-009）。後続コマンドの工程分岐は `work_type` 固定分岐ではなく `artifact_actions` の存在で判定する
 
 ## 信頼できる情報源の優先順位
 
 文書間に矛盾がある場合の優先順位（REQ-001-011）:
 
 1. 現行 REQ
-2. ADR（承認済み）
+2. Decision（承認済み）
 3. SPEC
 4. guides
 
@@ -274,36 +278,36 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 | 規則 | 内容 |
 |---|---|
 | REQ ID | 4桁ゼロ埋めの安定ID。現行・廃止を問わず再利用しない |
-| ADR ID | 3桁ゼロ埋め。状態はfrontmatterで管理する |
+| Decision ID | 3桁ゼロ埋め。状態はfrontmatterで管理する |
 | SPEC配置 | `docs/specs/**/*.md` |
 | SPEC status | `draft`、`accepted`、`superseded`。status欠落は`accepted`相当。`superseded`は`superseded_by`を必須とする |
 | Guides配置 | `docs/guides/*.md` |
 | 廃止REQ | 物理削除を第一選択とし、履歴参照用途に限定してretired配下への移動も選択できる |
-| 廃止ADR | 物理削除を第一選択とし、履歴参照用途に限定してretired配下への移動も選択できる |
-## ADR 編集制約
+| 廃止Decision | 物理削除を第一選択とし、履歴参照用途に限定してretired配下への移動も選択できる |
+## Decision 編集制約
 
-- 承認済み ADR の決定内容を意味変更してはならない（REQ-001-045）。変更が必要な場合は新規 ADR を作成し、旧 ADR を superseded/deprecated とする
-- ADR 体系の全面改定時は例外として、ユーザー承認済みの範囲で deprecated/superseded ADR の最小限を超える編集を許可する（REQ-001-044）。ただし、編集目的、対象、変更種別、移管先、現行根拠として残す ADR を明示すること
+- 承認済み Decision の決定内容を意味変更してはならない（REQ-001-045）。変更が必要な場合は新規 Decision を作成し、旧 Decision を superseded/deprecated とする
+- Decision 体系の全面改定時は例外として、ユーザー承認済みの範囲で deprecated/superseded Decision の最小限を超える編集を許可する（REQ-001-044）。ただし、編集目的、対象、変更種別、移管先、現行根拠として残す Decision を明示すること
 
-## accepted ADR の意味的不変
+## accepted Decision の意味的不変
 
-accepted ADR は意味的に不変とする（REQ-001-056〜060）。
-詳細プロトコルは agentdev-adr-guidelines「accepted ADR の更新規則」、agentdev-adr-file-manager「accepted ADR 直接編集チェックリスト」を参照。
+accepted Decision は意味的に不変とする（REQ-001-056〜060）。
+詳細プロトコルは agentdev-decision-guidelines「accepted Decision の更新規則」、agentdev-decision-file-manager「accepted Decision 直接編集チェックリスト」を参照。
 
 ### 原則
 
-- accepted ADR を意味的に不変とする
-- 直接更新可能な非意味修正は6件、後継 ADR を必要とする意味変更は6件
+- accepted Decision を意味的に不変とする
+- 直接更新可能な非意味修正は6件、後継 Decision を必要とする意味変更は6件
 - 直接更新前に明示承認記録が存在する
-- accepted ADR の過去版を無言で書き換えない
+- accepted Decision の過去版を無言で書き換えない
 - 意味変更を表記修正として扱わない
 - Report へ規範要件または必達条件を移さない
 
 ### 正規所有
 
-- 意味不変原則: REQ-001（核心契約）、agentdev-adr-guidelines SPEC（詳細プロトコル）
-- 直接編集チェックリスト: agentdev-adr-file-manager SPEC
-- accepted ADR の扱い: 本節（document-model.md）
+- 意味不変原則: REQ-001（核心契約）、agentdev-decision-guidelines SPEC（詳細プロトコル）
+- 直接編集チェックリスト: agentdev-decision-file-manager SPEC
+- accepted Decision の扱い: 本節（document-model.md）
 
 ## 文書分類ポリシー
 
@@ -319,7 +323,7 @@ accepted ADR は意味的に不変とする（REQ-001-056〜060）。
 | 文書種別 | 編集権限 | 承認フロー | 変更主体 |
 |---|---|---|---|
 | REQ | req-define / req-save コマンド経由 | ユーザー承認（req-save） | エージェント（draft 作成）、ユーザー（最終承認） |
-| ADR | req-save / 手動作成 | ユーザー承認 | エージェント（draft 作成）、ユーザー（最終承認） |
+| Decision | req-save / 手動作成 | ユーザー承認 | エージェント（draft 作成）、ユーザー（最終承認） |
 | SPEC | 実装に伴う更新 | SPEC は「現在仕様」の記録のため、実装完了に伴い更新 | エージェント（実装後の SPEC 更新） |
 | Guide | inspect-docs / 手動更新 | 規範的権限なし。情報正確性の確認のみ | エージェント / ユーザー |
 | Report | 整合性コマンド等の自動生成、または手動作成 | 公開時の事実確認 | エージェント（自動生成）、ユーザー（手動作成） |
@@ -339,16 +343,16 @@ accepted ADR は意味的に不変とする（REQ-001-056〜060）。
 | **配置先 (projection)** | 実行時環境への投影先 | `.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/` |
 
 **投影方向**: 原本 → 配置先 のみ（逆方向の投影は行わない）。
-配置先での直接編集は禁止し、原本を変更後に同期スクリプトで配置先を更新する（ADR-002）。
+配置先での直接編集は禁止し、原本を変更後に同期スクリプトで配置先を更新する（DEC-002）。
 
 ### 参照規則 <!-- REQ-001 -->
 
 文書間の参照形式と引用ルールを定義する。
 
 - **REQ 参照**: `REQ-{NNN}` 形式（例: `REQ-001`）。個別要件は `REQ-{NNN}-{SSS}` 形式（例: `REQ-001-002`）
-- **ADR 参照**: `ADR-{NNN}` 形式（例: `ADR-001`）
+- **Decision 参照**: `DEC-{NNN}` 形式（例: `DEC-001`）
 - **リンク形式**: Markdown リンクで `[REQ-001](../requirements/REQ-001.md)` のように相対パスで記述
-- **引用ルール**: 安定 ID（`REQ-{NNN}`、`ADR-{NNN}`）で参照し、セクションタイトルのみでの参照は禁止。セクション参照が必要な場合は `REQ-001-002` や `REQ-001 決定セクション` のように ID を併記する
+- **引用ルール**: 安定 ID（`REQ-{NNN}`、`DEC-{NNN}`）で参照し、セクションタイトルのみでの参照は禁止。セクション参照が必要な場合は `REQ-001-002` や `REQ-001 決定セクション` のように ID を併記する
 - **廃止文書の参照**: 廃止文書を参照する場合は `(retired)` 注記を付与し、現行の後継文書も併記する（REQ-001-048）
 
 ### ライフサイクル規則 <!-- REQ-001 -->
@@ -356,7 +360,7 @@ accepted ADR は意味的に不変とする（REQ-001-056〜060）。
 | 文書種別 | 状態遷移 | 備考 |
 |---|---|---|
 | REQ | created → active → superseded / partially superseded | APPEND/UPDATEで拡張する。現行 REQ は `docs/requirements/README.md`、旧世代の履歴資料は tag `v2.11.0` で参照する |
-| ADR | proposed → accepted → superseded / deprecated | acceptedだけを現行判断の根拠とする |
+| Decision | proposed → accepted → superseded / deprecated | acceptedだけを現行判断の根拠とする |
 | SPEC | draft → accepted → superseded | 後継SPECへの移行表示は`superseded_by`で保持する |
 | Guide | active → outdated → removed | 規範的権限を持たない |
 | Report | published → archived | 事実記録として扱う |
@@ -375,7 +379,7 @@ accepted ADR は意味的に不変とする（REQ-001-056〜060）。
 
 - **APPEND/UPDATE が正しい操作である。同期不足が問題である。**
 - REQ の変更は APPEND（要件追加）または UPDATE（既存要件の修正）で行う。既存 REQ を新規 REQ で上書きしない
-- ADR の変更は新規 ADR の作成により行い、旧 ADR を superseded/deprecated とする
+- Decision の変更は新規 Decision の作成により行い、旧 Decision を superseded/deprecated とする
 - SPEC の更新は実装完了後に反映し、REQ と SPEC 間の同期ズレを放置しない
 - docs-check / inspect-docs が同期不足を検出可能であること
 
@@ -390,30 +394,30 @@ SPEC とは独立した種別である。
 - **変更**: 公開後の修正は事実確認の範囲に限定。事実関係の誤りのみ修正可能
 - **SPEC との違い**: SPEC は現在のアーキテクチャ基準（現在どう動作しているか）を記述する。Report は特定の時点での分析、監査、診断結果を記録する
 
-### ADR 定義拡張 <!-- REQ-001 -->
+### Decision 定義拡張 <!-- REQ-001 -->
 
-ADR の適用範囲を拡張する。
+Decision の適用範囲を拡張する。
 
 - **従来の定義**: 「取り返しのつかない技術判断の記録」
 - **拡張後の定義**: 「将来の設計、運用、文書システムを制約する決定の記録」
-- 技術判断に限定されず、文書システムの運用ルールや、プロジェクトの組織的決定も ADR の対象となる
+- 技術判断に限定されず、文書システムの運用ルールや、プロジェクトの組織的決定も Decision の対象となる
 - この拡張は REQ-001 の決定セクションにも反映される
 
-### 内容境界規則（ADR/REQ 主題妥当性）<!-- REQ-001-043〜051 -->
+### 内容境界規則（Decision/REQ 主題妥当性）<!-- REQ-001-043〜051 -->
 
-ADR と REQ の主題として記述してよい内容の境界を定義する。
-作業手段（HOW）が ADR/REQ の主題に混入することを防ぐ。
+Decision と REQ の主題として記述してよい内容の境界を定義する。
+作業手段（HOW）が Decision/REQ の主題に混入することを防ぐ。
 
-- **ADR**: 意思決定と理由のみを記録する。削除、廃止、移行、統合、再構築、完全削除そのものを主題にしない（REQ-001-044）。過去判断を現行基盤から外すだけの場合は新規 ADR ではなく廃止、supersede で処理する（REQ-001-045）
+- **Decision**: 意思決定と理由のみを記録する。削除、廃止、移行、統合、再構築、完全削除そのものを主題にしない（REQ-001-044）。過去判断を現行基盤から外すだけの場合は新規 Decision ではなく廃止、supersede で処理する（REQ-001-045）
 - **REQ**: 現在満たすべき状態、振る舞い、制約のみを定義する。作業手段を要件行として含めない
-- **作業手段の取り扱い**: 削除、廃止、移行、統合、再構築、完全削除等の作業手段は case/Issue/PR/作業記録で扱い、ADR/REQ の主題としない
+- **作業手段の取り扱い**: 削除、廃止、移行、統合、再構築、完全削除等の作業手段は case/Issue/PR/作業記録で扱い、Decision/REQ の主題としない
 
 ### SPEC 責務境界 <!-- REQ-001 -->
 
 SPEC の記述範囲を責務境界として定義する。
 
 - **SPEC に新規要件を置かない**。将来要件は REQ に記述する
-- **SPEC は現在仕様、契約記述に限定する**。判断根拠は ADR に記述する
+- **SPEC は現在仕様、契約記述に限定する**。判断根拠は Decision に記述する
 - SPEC は現在システムがどう動作しているか（現在どう動作しているか）を記述し、どう動作すべきか（WHAT）を記述しない
 
 ### アンチパターン <!-- REQ-001 -->
@@ -424,8 +428,8 @@ SPEC の記述範囲を責務境界として定義する。
 | 誤りパターン | 正しい分類 | 修正方針 |
 |---|---|---|
 | SPEC に新規要件が含まれている | REQ | 要件部分を REQ に切り出し、SPEC は現在仕様の記述に留める |
-| ADR が現在の動作を記述している | SPEC | 動作記述部分を SPEC に移動し、ADR は判断とその根拠に絞る |
-| Guide に要件本文、契約本文が含まれている | REQ/ADR/SPEC 参照 | 要件、契約内容を REQ/ADR/SPEC への参照に置き換える |
+| Decision が現在の動作を記述している | SPEC | 動作記述部分を SPEC に移動し、Decision は判断とその根拠に絞る |
+| Guide に要件本文、契約本文が含まれている | REQ/Decision/SPEC 参照 | 要件、契約内容を REQ/Decision/SPEC への参照に置き換える |
 | REQ に実装詳細が含まれている | SPEC | 実装詳細を SPEC に移動し、REQ は WHAT に絞る |
 | Report の内容が SPEC に混入している | Report（独立文書） | Report を独立文書として分離する |
 | 廃止文書が現行判断の根拠として引用されている | 現行後継文書 | 引用先を現行の後継文書に更新する |
@@ -438,20 +442,20 @@ SPEC の記述範囲を責務境界として定義する。
 |---|---|---|---|
 | 責務境界（SPEC に要件混入） | SPEC-REQ-mix 検査 | 意味整合性レビュー | SPEC 内の 必達要件 が現在仕様の記述か判定 |
 | 責務境界（Guide の要件本文混入） | Guide-intrusion 検査 | 要件本文検出 | Guide が要件本文、契約本文を保持していないか検出 |
-| ADR 状態管理 | ADR-status 検査 | ADR 整合性レビュー | proposed/accepted/superseded/deprecated の一貫性 |
+| Decision 状態管理 | Decision-status 検査 | Decision 整合性レビュー | proposed/accepted/superseded/deprecated の一貫性 |
 | 廃止引用 | Retired-reference 検査 | 文書間参照整合性 | 廃止文書の現行引用を検出 |
 | 原本、配置先 同期 | Source-projection sync 検査 | 同期ズレ検出 | 原本と配置先の内容差異を検出 |
 | REQ ID 一意性 | REQ-ID-uniqueness 検査 | ID 衝突検出 | REQ ID の再利用を検出 |
 | Report 規範表現 | Report-normative 検査 | 必達要件 混入検出 | Report 内の規範表現を検出 |
 
-### 廃止 ADR 参照更新 <!-- REQ-001 -->
+### 廃止 Decision 参照更新 <!-- REQ-001 -->
 
-廃止 ADR の参照更新ルールを定義する。
+廃止 Decision の参照更新ルールを定義する。
 
-- 廃止 ADR が現行判断の根拠として引用されている場合、現行の後継 ADR または REQ に参照を更新する
-- 履歴参照として廃止 ADR 番号を保持する場合は、`(retired)` 注記を付与する
+- 廃止 Decision が現行判断の根拠として引用されている場合、現行の後継 Decision または REQ に参照を更新する
+- 履歴参照として廃止 Decision 番号を保持する場合は、`(retired)` 注記を付与する
 - 例: `v2:ADR-0017` → `REQ-001 (後継)`。`v2:ADR-0017 (retired)` は履歴参照として許容
-- docs-check / inspect-docs が廃止 ADR の現行引用を検出した場合は警告を出力する
+- docs-check / inspect-docs が廃止 Decision の現行引用を検出した場合は警告を出力する
 
 ### 用語: 原本、配置先 <!-- REQ-001 -->
 
@@ -491,7 +495,7 @@ SPEC frontmatter に以下のフィールドを宣言する。フィールド名
 | `spec_logical_division` | enum | 主論理区分: `behavior`、`catalog`、`cross_cutting_contract`、`parameter`、`implementation_detail`、`unknown` のいずれか |
 | `canonical_owner` | string | 正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー） |
 
-両フィールドとも soft-contract（ADR-003）とし、欠落時は `unknown` で警告を出し処理を継続する（REQ-001-033）。欠落により既存 SPEC、req_draft、RU を拒否しない。
+両フィールドとも soft-contract（DEC-003）とし、欠落時は `unknown` で警告を出し処理を継続する（REQ-001-033）。欠落により既存 SPEC、req_draft、RU を拒否しない。
 
 #### 冒頭宣言節形式
 
@@ -582,7 +586,7 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 
 ## 恒久基準と非規範情報の整理
 
-恒久基準（ADR、REQ、SPEC）と非規範情報（移行情報、内部実装方式、fixture、regex、内部関数、テスト構成、
+恒久基準（Decision、REQ、SPEC）と非規範情報（移行情報、内部実装方式、fixture、regex、内部関数、テスト構成、
 未宣言 reference、draft SPEC、移行証跡、リリース証跡）を整理するための 6 処置モデルを定義する。
 処置の実行は inspect-docs / inspect-skills / 専用の cleanup 作業で行い、本節はモデルと契約を所有する。
 
@@ -590,7 +594,7 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 
 次の6カテゴリを走査の対象とする。
 
-1. ADR 内の移行時情報
+1. Decision 内の移行時情報
 2. REQ 内の内部実装方式
 3. SPEC 内の fixture、regex、内部関数、テストファイル構成
 4. 規範または非規範の地位が未宣言の references
@@ -629,7 +633,7 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 
 - 処置後は正規所有者、移動先、履歴保持先を記録する
 - 処置の影響レーンだけを再検証する（全文再検証ではなく影響レーン局限）
-- 現行 ADR、REQ、SPEC に移行結果またはリリース証跡が規範内容として残らないこと
+- 現行 Decision、REQ、SPEC に移行結果またはリリース証跡が規範内容として残らないこと
 - 移行結果とリリース証跡は非規範の Report（Release Report 等）へ移す
 
 ### draft SPEC の扱い
@@ -638,7 +642,7 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 - 未決着の draft SPEC を放置しない
 - draft status の SPEC が一定期間更新されず放置されることを検出するルール（IR-054）と連動する
 
-### accepted ADR の意味変更
+### accepted Decision の意味変更
 
-- accepted ADR の意味変更は後継 ADR を必須とし、直接適用しない
+- accepted Decision の意味変更は後継 Decision を必須とし、直接適用しない
 - 履歴証拠を削除して追跠不能にしない

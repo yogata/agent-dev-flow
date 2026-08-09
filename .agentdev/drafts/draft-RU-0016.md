@@ -1,7 +1,7 @@
 ---
 draft_type: req_draft
 topic_slug: RU-0016
-status: saved
+status: spec_saved
 created_at: 2026-08-10T02:12:00+09:00
 source_rus: [RU-0016]
 ---
@@ -496,6 +496,31 @@ req_save_result:
   source_ru_to_req_ops:
     RU-0016: [ACT-REQ-001, ACT-REQ-002, ACT-REQ-003, ACT-REQ-004, ACT-REQ-005, ACT-REQ-006, ACT-REQ-007, ACT-REQ-008, ACT-REQ-009, ACT-REQ-010, ACT-REQ-011, ACT-REQ-012]
   case_open_consumable: true
+
+# spec-save 実行結果（OU-001 SPEC 部分、5 actions を保存。ACT-SPEC-006 は case-run 責務のため対象外）
+spec_save_result:
+  saved_at: 2026-08-10
+  applied_artifact_actions:
+    - ACT-SPEC-001  # document-model.md UPDATE
+    - ACT-SPEC-002  # document-type-responsibilities.md UPDATE
+    - ACT-SPEC-003  # patterns.md + numbering-policy.md UPDATE
+    - ACT-SPEC-004  # artifact-contracts.md UPDATE
+    - ACT-SPEC-005  # decision-lifecycle.md CREATE
+  saved_spec_files:
+    update:
+      - docs/specs/foundations/document-model.md
+      - docs/specs/responsibilities/document-type-responsibilities.md
+      - docs/specs/foundations/patterns.md
+      - docs/specs/foundations/numbering-policy.md
+      - docs/specs/responsibilities/artifact-contracts.md
+    create:
+      - docs/specs/foundations/decision-lifecycle.md
+  index_updated: docs/specs/README.md
+  skipped_actions:
+    - id: ACT-SPEC-006
+      reason: target が src/opencode/commands/agentdev/templates/ 配下のため G02（docs/specs/** ファイル編集スコープ）違反。case-run OU-002 責務
+  adr_reference_classification: CR-005
+  historical_v2_adr_preserved: AG-010
 ```
 
 ## draft-meta

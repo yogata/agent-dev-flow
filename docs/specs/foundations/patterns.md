@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-08-06
+updated: 2026-08-10
 ---
 
 # 文書フォーマット規約
@@ -10,7 +10,7 @@ updated: 2026-08-06
 
 ## コマンド frontmatter 規約
 
-command frontmatter の正規契約を description 単一へ変更する。agent を必須フィールド・許可フィールド・有効値検査の全てから除外する。REQ-002-022（配布command は harness 固有詳細を含まない）および ADR-001（harness 分離）に基づき、実行エージェント固定は harness 側設定へ移管し command frontmatter から除去する。詳細 normative は移行計画 §5.2。
+command frontmatter の正規契約を description 単一へ変更する。agent を必須フィールド・許可フィールド・有効値検査の全てから除外する。REQ-002-022（配布command は harness 固有詳細を含まない）および DEC-001（harness 分離）に基づき、実行エージェント固定は harness 側設定へ移管し command frontmatter から除去する。詳細 normative は移行計画 §5.2。
 
 ## REQ frontmatter 規約
 
