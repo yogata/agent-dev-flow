@@ -198,6 +198,48 @@ case-run は check_integrity.ts（全体監査）を使用しない（case-run �
 
 ※上記は全て肯定表現である（REQ-010-002, REQ-010-003 準拠）。
 
+## execution contract 消費境界（新規セクション）
+
+case-run は REQ-017 に定義される execution contract を消費境界として扱う。
+
+### 契約消費原則
+
+- case-run は Issue に確定済みの完了条件、test strategy、必須品質統制を実行契約として扱う
+- 完了条件の不足、曖昧さ、矛盾、実現不能を検出した場合は自律補完せず blocked とする
+- test strategy を新規設計せず、記録済み項目を実行する
+- 必須品質統制の適用要否を再判断せず、記録済み test strategy を実行する
+- work_type/scale/Issue structure を再分類して実行契約を変更しない
+
+### runtime-only 判断の維持
+
+次は case-run の安全検査として維持し、execution contract 確定へ移管しない。
+- worktree 状態確認（REQ-006-023）
+- QG-3 前置 staleness check（REQ-006-030）
+- 実 diff 検査
+- 実装結果、test 実行結果
+
+### blocked 遷移と case-update 連携
+
+次の場合、case-run は blocked とし、Issue 更新は case-update へ委譲する。
+- 完了条件の不足、曖昧さ、矛盾、実現不能の検出
+- scope-affecting impact candidate の発見（既存 scope 内を超える変更が必要）
+- 関連 ADR への適合確認で新たな拘束 ADR の必要性が判明した場合
+- 必須品質統制の追加変更が必要な場合
+- Issue metadata、構造、実態の矛盾検出時
+
+### 新旧 Issue 互換運用
+
+case-run は Issue 本文の execution contract 必須セクション存在有無により新旧 Issue
+を識別する（presence-based 判定）。
+- 必須セクション存在: 新契約 Issue として扱い、上記契約消費原則を適用
+- 必須セクション不存在: legacy Issue として扱い、新契約項目欠落のみを理由に
+  一律 blocked にしない（AG-010、REQ-017-013）
+
+### work_type/scale 確認の縮約
+
+現状の準備フェーズ work_type 確認ステップは、再分類ではなく metadata 整合確認へ
+縮約して維持する（AG-008、REQ-017-011）。
+
 ## 対象外
 
 - 壁打ち（G01、構造的実行フェーズ、実装は 実行担当サブエージェント経由）

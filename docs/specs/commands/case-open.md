@@ -189,6 +189,54 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 
 ※肯定表現のみ（REQ-010-002, REQ-010-003 準拠）。
 
+## execution contract 確定ステップ（新規セクション）
+
+case-open は Issue 本文生成前に次の execution contract 確定ステップを実行する。
+
+### EC-1: 変更対象成果物の確定
+
+合意済み要件doc の artifact_actions から変更予定成果物を抽出し、Issue 本文の
+「対象範囲」セクションへ確定する。
+
+### EC-2: 必須品質統制の導出と test strategy 投影
+
+artifact-quality-control-routing SPEC の合成規則に従い、変更予定成果物の種別から
+必須品質能力を導出する。各能力について test strategy 項目を生成し、Issue 本文の
+test strategy セクションへ投影する。
+
+### EC-3: 完了条件の確定
+
+合意内容から成果状態を抽出し、Issue 本文の完了条件セクションへ確定する。
+実行手段、検証手段は test strategy へ分離する。必須品質能力の呼出自体が利用者要求
+でない限り、Skill 呼出を完了条件化しない。
+
+### EC-4: 関連 ADR 拘束条件の特定と反映
+
+Issue の実装を拘束する関連 ADR を特定し、必要な制約を完了条件または test strategy
+へ反映する。
+
+### EC-5: 予定変更内容から事前判定可能な追加検証条件の展開
+
+「関数削除時は全利用箇所を検査する」等、予定変更内容から事前判定可能な検証条件を
+test strategy へ展開する。case-open が追加できる test strategy は合意済み変更対象と
+共通ルールから決定的に導ける必須検証に限定し、新しい利用者要求を生成しない。
+
+### EC-6: scope-affecting impact candidate の探索と反映
+
+Issue 作成前に変更影響候補を探索し、scope、完了条件、test strategy に影響する候補を
+execution contract へ反映する。
+
+### EC-7: adversarial-review 発動契約の永続化
+
+ユーザー明示指定による adversarial-review 発動契約が Issue 作成前に判明している場合、
+Issue 本文の契約セクションへ永続化する（経路F 拡張）。
+
+### EC-8: execution contract 必須セクションの付与
+
+新規 Issue 作成時、新契約識別用の必須セクション（execution contract セクション、
+必須品質統制セクション）を Issue 本文へ付与する。presence-based 判定により
+新旧 Issue を識別する（AG-012、REQ-017-014）。
+
 ## 対象外
 
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（G19、REQ-006-009）

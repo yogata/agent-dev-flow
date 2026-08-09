@@ -113,6 +113,48 @@ issue_desc_*.md テンプレートの「テスト戦略」セクションに記�
 
 feature、bug、child の各 issue_desc テンプレートは「テスト戦略」セクションへ本ガイドラインの要点を HTML コメントとして埋め込む。起票者が pass_criteria を記述する際に参照できるようにする。epic テンプレートは「テスト戦略」セクションを持たないため対象外とする。
 
+## execution contract セクション（Issue template 拡張）
+
+feature Issue、child Issue テンプレートに execution contract セクションを追加する。
+このセクションの存在が presence-based 判定の識別子となる（AG-012、REQ-017-014）。
+
+### 追加セクション構成
+
+Issue 本文に次のセクションを必須とする（新規作成時）。
+
+```markdown
+## Execution Contract
+
+### 変更対象成果物
+- （artifact type と対象パスのリスト）
+
+### 必須品質統制
+- （artifact-quality-control-routing SPEC に基づく能力キーと検証項目）
+
+### 関連 ADR 拘束条件
+- （該当 ADR と完了条件/test strategy への反映）
+
+### scope-affecting impact candidate
+- （case-open が事前探索した候補）
+
+### adversarial-review 発動契約（任意）
+- （ユーザー明示指定時のみ記録）
+```
+
+### presence-based 判定
+
+case-open は新規 Issue 作成時および case-update による新契約更新時に「Execution Contract」
+セクションを必ず付与する。case-run は当該セクションの存在有無により新旧 Issue を識別する。
+
+### legacy Issue テンプレート
+
+本変更以前の Issue テンプレートは廃止せず、履歴として維持する。既存の
+issue_desc_feature.md、issue_desc_child.md は新テンプレートへ移行する。
+issue_desc_bug.md、issue_desc_epic.md、issue_desc_backlog_child.md、
+issue_desc_backlog_epic.md は bugfix/maintenance/docs_chore または backlog 由来であり、
+execution contract セクションの付加を検討するが必須とはしない（work_type により
+execution contract 責務が軽量なため）。
+
 ## 対象外
 
 - ワークフローのフェーズ定義や遷移ロジック（`agentdev-workflow-lifecycle` 担当）
