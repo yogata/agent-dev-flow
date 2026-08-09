@@ -4,7 +4,7 @@ status: accepted
 spec_logical_division: behavior
 canonical_owner: agentdev-adversarial-review
 created: 2026-08-09
-updated: 2026-08-09
+updated: 2026-08-10
 ---
 
 # agentdev-adversarial-review SPEC
@@ -16,10 +16,11 @@ updated: 2026-08-09
 - 完成済み文書に限定せず、ドラフト、構造化提案、検討中の選択肢を含む。
 
 ## 発動契約
-- 原則適用・skip 可能な助言手段とする（REQ-014-001）。
+- 原則適用・skip 可能な助言手段（対論型レビュー）とする（REQ-014-001、REQ-003-035）。呼出元コマンドは原則として発動契機に組み込むが、ユーザーが明示的に skip 可能とする。
 - REQ-015 で定義される caller 対象 command では adversarial-review を原則実行し、ユーザー明示指定を通常発動の必須条件としない（default-on、REQ-014-013）。
 - skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義し、skip 判断のためだけに新しい HITL / 承認点を追加せず、skip 対象でもユーザーが明示的に adversarial-review を要求した場合は実行する（REQ-014-014）。
-- 新規必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替せず、新しい恒久統制ゲートとしない（REQ-014-001/002、REQ-014-013）。
+- すべての要件定義や計画作成で自動発動する強制工程ではなく、新規必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替せず、新しい恒久統制ゲートとしない（REQ-014-001/002、REQ-014-013）。
+- 副作用権限（commit、push、merge、ファイル保存、Issue と PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認）を代行しない。完了時に結果の反映、ファイル保存等を必要に応じて追加指示できることをユーザーへ明示的に促す。ただしその促し自体を理由に Skill が後続操作を実行しない（REQ-003-035）。
 
 ## 論理的役割
 審議は Orchestrator、Reviewer、Reviewee の3論理役割で構成する。論理役割は物理エージェント構成を固定しない。
@@ -62,6 +63,8 @@ Orchestrator が対象、目的、制約、技術領域、想定失敗条件を�
 ### challenge 段階
 Reviewer が対象案を正しいと仮定せず、未発見の破綻条件、欠落、矛盾、不成立な前提、問題のある設計判断、実装方針、トレードオフを探索する。finding は判定、根拠、前提、適用範囲、適用条件を伴う。単なる懸念や指摘を finding としない。
 
+初期 challenge は最低2系統の独立した論理 review stream で実施する。独立性は物理 agent 差やモデル差ではなく、初期 finding 生成時の兄弟 stream の finding 非共有によって定義する。各 stream は初期 finding 生成完了前に兄弟 stream の finding を参照しない。対象・目的・制約・確定済み review strategy は stream 間で共有を許容する。初期 challenge 完了後に各 stream の finding を統合し、duplicate を整理して既存 counter-challenge / convergence へ進む。
+
 ### counter-challenge 段階
 Reviewee が finding を未検証の主張として扱い、根拠、前提、対象理解、適用範囲、影響、方法論を反証する。Reviewer は反論を再評価し、自身の finding を撤回、維持、限定、修正、部分合意、解決不能のいずれかを判断する。
 
@@ -70,6 +73,29 @@ Reviewee が finding を未検証の主張として扱い、根拠、前提、�
 
 ### convergence audit 段階
 Reviewer と Reviewee が合意候補とその成立根拠を再度対論的に検証する。合意候補を形成しただけでは完了としない。再検証で新しい本質的争点が見つかった場合、当該争点について対論を再開する。
+
+## 審議進展の意味状態判定と semantic stagnation 制御
+審議の進展を文章表現や単純 round 数ではなく、finding の意味状態の変化で判定する。
+
+進展なしと判定する条件:
+- 言い換え: 同一の主張、根拠、前提を異なる表現で反復しただけの場合
+- 同一 evidence 反復: 既に提示済の evidence を再提示しただけの場合
+- 根拠のない同一 finding 再起票: 新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票
+
+意味状態の進展として認識する条件:
+- 新 evidence の提示
+- scope / applicability の変更（対象範囲の拡大、縮小、限定）
+- assumption（前提）の変更
+- falsification condition の変更
+- finding の撤回、限定、修正による状態遷移
+
+stagnation（進展なし状態）を検出した場合、直ちにユーザー質問へ遷移せず、次の自律解決を試みる。
+1. duplicate 統合: 同一実質の finding を統合し、重複を解消する
+2. 非本質論点の終了: 本質的争点に該当しない finding を閉じる
+3. 追加 evidence 探索: 関連コンテキストから未参照の証拠を取り出す
+4. scope 限定: finding の適用範囲を限定し、限定的な妥当性を確認する
+
+固定 round 数を収束条件としない。timeout や最大 round は実装詳細として設定可能とする。
 
 ## 争点状態
 争点は次の状態を持つ。状態遷移の物理的保存形式、スキーマは本 SPEC の所有対象外とし、配布スキル実装へ委譲する。
@@ -83,6 +109,21 @@ Reviewer と Reviewee が合意候補とその成立根拠を再度対論的に�
 - 完了: convergence audit を経て最終的に閉じた状態。
 
 重複する反証は同一争点へ統合する。解決済み争点は、新しい証拠、新しい前提、異なる具体的破綻条件、未評価の適用範囲が示されない限り再開しない。
+
+## finding lifecycle
+各 finding を個別に識別し、次の要素を意味的に区別して追跡する。
+
+- 主張: finding が主張する判定内容
+- evidence: 判定を支える証拠、参照先
+- assumptions: finding が依存する前提条件
+- scope / applicability: 対象案のどの部分、要件、設計、判断に対するものか
+- falsification condition: どのような条件が示されれば finding を撤回、限定、修正するか
+- 現在状態: 起原型、審議中、合意候補、撤回、限定合意、ユーザー質問中、完了のいずれか
+- 直近 disposition: Reviewer の再評価結果（撤回、維持、限定、修正、部分合意、解決不能）
+- 解決根拠: finding が閉じた場合の成立根拠または撤回根拠
+- duplicate 関係: 他 finding との重複、統合元、統合先の関係
+
+finding 状態は審議中の一時状態とし、新しい正規 artifact または永続 schema を導入しない。具体的 field 名、保存形式、内部データ構造は配布スキルの実装詳細とする。
 
 ## 本質的争点と非本質的批判の判定
 具体的破綻、実害を示せない指摘、目的、制約、対象範囲と無関係な改善、好み、理想論のみの指摘、過剰要求、スコープ外、解決済みの再提出、表現変更のみの同一批判、反証条件を持たない抽象的懸念、継続目的化した指摘は、原則として本質的争点としない。Reviewee が一方的に本質的でないと確定せず、反論と Reviewer の再検討を経て争点を閉じる。
