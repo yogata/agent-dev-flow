@@ -1,8 +1,8 @@
 # AgentDevFlow 憲章
 
 AgentDevFlow の目的、責務境界、基本原則、管理方式を要約する。
-基準は [ADR-001](../adr/ADR-001.md) であり、本ガイドは基準への導線を提供する。
-基準と矛盾する記述がある場合は ADR-001 を優先する。
+基準は [DEC-001](../decisions/DEC-001.md) であり、本ガイドは基準への導線を提供する。
+基準と矛盾する記述がある場合は DEC-001 を優先する。
 
 ## 目的
 
@@ -15,11 +15,11 @@ harness、AI モデル、適用プロジェクトとの責任分界を明確に�
 
 ### ADF が所有する領域
 
-AgentDevFlow は次を所有する（ADR-001 決定1）。
+AgentDevFlow は次を所有する（DEC-001 決定1）。
 
 要求の形成と合意。
 事実調査とユーザー意思決定の分離。
-REQ/ADR/SPEC 等の成果物責任分界。
+REQ/Decision/SPEC 等の成果物責任分界。
 実行可能な作業単位の形成。
 Issue/PR/Case 間の工程接続。
 SSoT の移行。
@@ -32,7 +32,7 @@ SSoT の移行。
 
 ### ADF が所有しない領域
 
-次の具体的実現方法は harness、AI モデル、適用プロジェクトが決定する（ADR-001 決定2）。
+次の具体的実現方法は harness、AI モデル、適用プロジェクトが決定する（DEC-001 決定2）。
 
 モデル選定、エージェント選定、サブエージェント階層。
 skill の具体的な呼出し。
@@ -47,7 +47,7 @@ AgentDevFlow は必要能力と標準方針を定義できる。
 
 ### hard governance の限定
 
-工程を停止する機械的強制は、次の8点に限定する（ADR-001 決定3）。
+工程を停止する機械的強制は、次の8点に限定する（DEC-001 決定3）。
 
 状態破壊。
 権限逸脱。
@@ -62,7 +62,7 @@ AgentDevFlow は必要能力と標準方針を定義できる。
 
 ### 新規統制追加の原則
 
-新しい REQ/ADR/SPEC/command/skill/state/schema/gate/必須 field/checker を追加しないことを既定とする（ADR-001 決定4）。
+新しい REQ/Decision/SPEC/command/skill/state/schema/gate/必須 field/checker を追加しないことを既定とする（DEC-001 決定4）。
 追加を提案する場合は、次の7条件を全て立証する。
 
 再現可能または複数回観測された問題がある。
@@ -77,6 +77,6 @@ AgentDevFlow は必要能力と標準方針を定義できる。
 
 ## 利用者の読み方
 
-個別の REQ/ADR/SPEC/command/skill/template/script は、本 charter の原則へ照らして位置づく。
+個別の REQ/Decision/SPEC/command/skill/template/script は、本 charter の原則へ照らして位置づく。
 「この統制は本当に必要か」を判断する際は、まず hard governance の8点に該当するか、次に新規統制追加の7条件を立証できるかを検討する。
 該当しない場合は guidance・finding・reference へ降格する候補とする。

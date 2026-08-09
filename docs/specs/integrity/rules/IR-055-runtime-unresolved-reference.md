@@ -7,8 +7,8 @@ status: accepted
 | Field | Value |
 |-------|-------|
 | rule_id | IR-055 |
-| description | 配布物（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`、`references/` 配下、`SKILL.md` 含む）内の導入先未解決参照（REQ/ADR ID、`src/opencode/`、`docs/specs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き内部参照）を機械的パターンマッチングで検出すること（REQ-010-263）。REQ-002-079/080/081 で既に要件化された「配布物は導入先で解決可能な参照のみを含む」原則の機械検出であり、意味的診断（文意保持・構文健全性・責務整合）は対象外（3層検出構造: [integrity-contracts.md](../integrity-contracts.md)） |
-| severity | strict（REQ/ADR ID、`src/opencode/`、`/repo/*`、`repo-*`）、heuristic または observation（`docs/specs/`、`docs/guides/`、本体 docs URL、line number 付き参照）。パターンごとの分類は後述「IR-055 検出パターンと severity」参照 |
+| description | 配布物（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`、`references/` 配下、`SKILL.md` 含む）内の導入先未解決参照（REQ/Decision ID、`src/opencode/`、`docs/specs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き内部参照）を機械的パターンマッチングで検出すること（REQ-010-263）。REQ-002-079/080/081 で既に要件化された「配布物は導入先で解決可能な参照のみを含む」原則の機械検出であり、意味的診断（文意保持・構文健全性・責務整合）は対象外（3層検出構造: [integrity-contracts.md](../integrity-contracts.md)） |
+| severity | strict（REQ/Decision ID、`src/opencode/`、`/repo/*`、`repo-*`）、heuristic または observation（`docs/specs/`、`docs/guides/`、本体 docs URL、line number 付き参照）。パターンごとの分類は後述「IR-055 検出パターンと severity」参照 |
 | category | broken-reference |
 | detection_method | 正規表現パターンマッチング（walkMarkdown / collectAgentdevSkillMarkdown による走査）。code block 内部、template placeholder（`{xxx}`）、vocabulary-registry.md / integrity-rule-catalog.md / rules/IR-055-*.md 自身等の正当使用例外パスは exemption 対象とする |
 | affected_artifacts | [src/opencode/commands/agentdev/**/*.md, src/opencode/skills/agentdev-*/**/*.md, src/opencode/skills/agentdev-*/references/**/*.md, src/opencode/skills/agentdev-*/SKILL.md] |
@@ -30,7 +30,7 @@ status: accepted
 
 | パターン | 根拠 |
 |----------|------|
-| REQ/ADR ID 固定参照（`REQ-\d{4}`、`REQ-\d{4}-\d{3}`、`ADR-\d{4}`） | REQ/ADR は agent-dev-flow 本体内部 ID であり、consumer 配布物に残らない（REQ-002-079/080/081） |
+| REQ/Decision ID 固定参照（`REQ-\d{4}`、`REQ-\d{4}-\d{3}`、`ADR-\d{4}`） | REQ/Decision は agent-dev-flow 本体内部 ID であり、consumer 配布物に残らない（REQ-002-079/080/081） |
 | `src/opencode/` パス参照 | 原本側リポジトリパスであり、consumer 環境に存在しない |
 | `/repo/*` 参照 | repo-local command 参照であり、consumer 環境に存在しない |
 | `repo-*` 参照 | repo-local skill 参照であり、consumer 環境に存在しない |

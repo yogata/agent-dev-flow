@@ -82,7 +82,7 @@ case 実行に関わる責務を 4 用語へ分解し、正規所有者を固定
 
 ### 修飾なし Phase の除去
 
-- 永続文書（REQ、ADR、SPEC、guide）の規範記述で修飾なしの「Phase」を使用しない
+- 永続文書（REQ、Decision、SPEC、guide）の規範記述で修飾なしの「Phase」を使用しない
 - 「Phase」は orchestration stage、case-run internal lifecycle など修飾付きの用語へ置き換える
 - 既存の「Phase 1 case-open 順次、Phase 2 case-run 並列、Phase 3 case-close 順次」は「orchestration stage 1 case-open 順次、stage 2 case-run 並列、stage 3 case-close 順次」へ置き換える
 
@@ -132,4 +132,4 @@ case 実行に関わる責務を 4 用語へ分解し、正規所有者を固定
 ## 関連情報
 
 - **関連REQ**: REQ-002（配布物の harness 実行制御分離、原則の SSoT）、REQ-003（コマンド・スキル・サブエージェント責務分界）、REQ-002（Artifact 責任分界）、REQ-006（case-auto 最大自走モード）、REQ-006（case-run 実装パイプライン）、REQ-003（外部エージェント統合契約）、REQ-002（Project Extensions 機構と配布物参照境界）、REQ-003（コンフリクト解消モデルと実行時間観測）
-- **関連ADR**: v2:ADR-0136（配布物の harness 実行制御分離、accepted）、v2:ADR-0138（case-auto オーケストレーション制御の AgentDevFlow 側集約、accepted。v2:ADR-0136 決定2の限定注記）
+- **関連Decision**: v2:ADR-0136（配布物の harness 実行制御分離、accepted）、v2:ADR-0138（case-auto オーケストレーション制御の AgentDevFlow 側集約、accepted。v2:ADR-0136 決定2の限定注記）

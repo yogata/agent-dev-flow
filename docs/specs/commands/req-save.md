@@ -9,8 +9,8 @@ updated: 2026-07-28
 
 ## 目的
 
-req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ に保存し、コミット、プッシュする。
-壁打ちフェーズで使用（REQ/ADR 対象 artifact_actions がある場合）。
+req-define で壁打ちした成果物を REQ/Decision ファイルとして docs/ に保存し、コミット、プッシュする。
+壁打ちフェーズで使用（REQ/Decision 対象 artifact_actions がある場合）。
 
 ## 入力
 
@@ -41,15 +41,15 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
 
 ## 現在の動作
 
-- Step 1: draft-dataの`artifact_actions`にREQ/ADR対象actionがあるか確認し、存在しない場合はno-opとして完了する。
+- Step 1: draft-dataの`artifact_actions`にREQ/Decision対象actionがあるか確認し、存在しない場合はno-opとして完了する。
 - Step 2: draftを読み、必須フィールドと入力hashを記録する。
 - Step 3: draft構造、文書分類、許可範囲を検証する。
-  - OU ID指定時は指定OUに属するREQ/ADR対象actionだけを処理する。
-  - OU ID未指定時はdraft全体のREQ/ADR対象actionを処理する。
+  - OU ID指定時は指定OUに属するREQ/Decision対象actionだけを処理する。
+  - OU ID未指定時はdraft全体のREQ/Decision対象actionを処理する。
   - OUが複数存在することだけを理由に停止しない。
-- Step 4: REQ/ADR actionを保存し、要件表、ID、frontmatter、採番結果を検証する。
+- Step 4: REQ/Decision actionを保存し、要件表、ID、frontmatter、採番結果を検証する。
 - Step 5: README への影響を確認し、派生文書を整合させる。
-- Step 6: ADR actionを保存する。
+- Step 6: Decision actionを保存する。
 - Step 7: changed-docs検査を実行する。
 - Step 8: README 索引影響を確認する。
 - Step 9: 許可パスとリモート同期を検証する。
@@ -62,7 +62,7 @@ req-define で壁打ちした成果物を REQ/ADR ファイルとして docs/ �
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ ファイル整合性検査、README 索引影響規則、REQ 再構成検出、artifact_actions 工程分岐）
 - [quality-gates.md](../quality/quality-gates.md)（QG-1）
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPLIT 検出基準）
-- [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（REQ/ADR/SPEC body 品質検査）
+- [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（REQ/Decision/SPEC body 品質検査）
 - [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)（IR-057 obsolete-spec-path-after-domain-split、targeted docs guard 連携）
 
 ## targeted docs guard (v2:REQ-0158-003)
@@ -109,12 +109,12 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 
 ## case-auto 並列委譲モデル（REQ-006-087〜093）
 
-req-save は複数 REQ/ADR ファイルの変更案作成、検査を並列化できる（REQ-006-090）。3 フェーズ分離で実現する:
+req-save は複数 REQ/Decision ファイルの変更案作成、検査を並列化できる（REQ-006-090）。3 フェーズ分離で実現する:
 
 | フェーズ | 操作 | 実行方法 |
 |---|---|---|
 | 1. 採番バッチ | 最大番号+N を一括確保（G05 一意性維持） | 直列 |
-| 2. ファイル作成 | 各 REQ/ADR ファイル作成、変更（独立パス） | 並列（最大5件） |
+| 2. ファイル作成 | 各 REQ/Decision ファイル作成、変更（独立パス） | 並列（最大5件） |
 | 3. インデックス更新 | README.md への順序挿入、draft status 更新、commit/push | 直列 |
 
 G07（commit 前 status 更新）は フェーズ3 で維持。

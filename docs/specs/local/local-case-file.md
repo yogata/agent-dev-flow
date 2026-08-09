@@ -238,7 +238,7 @@ GitHub PR 取り込みは実行しない。
 
 ## 関連項目
 
-- **関連 ADR**: REQ-009（ローカル版導入方式を link mode へ統一し生成方式を廃止。v2:ADR-0126 を supersede）
+- **関連 Decision**: REQ-009（ローカル版導入方式を link mode へ統一し生成方式を廃止。v2:ADR-0126 を supersede）
 - **関連 REQ**: REQ-009（ローカル版 OpenCode 導入方式とローカルCaseファイル運用）、v2:REQ-0150（ローカル版 `agentdev-gh-cli` 実装）
 - **関連 SPEC**: runtime-package-boundary.md
 

@@ -57,7 +57,7 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 べき等性: worktreeとブランチが既に存在する場合、Step 5をスキップして委譲フェーズへ移行
 
 - Step 2: Issue本文から要件docと受け入れ基準を抽出 → `agentdev-req-analysis` チェックボックス品質基準で検証
-- Step 3: 関連ADR特定、実装がADR決定事項に矛盾しないことを確認
+- Step 3: 関連Decision特定、実装がADR決定事項に矛盾しないことを確認
 - Step 4: work_type 判定（`agentdev-workflow-lifecycle`）
 - Step 5: Worktree作成、ブランチ準備（`agentdev-git-worktree`）（`origin/main` ベース明示指定、べき等チェック）
  - Step 5-1: 親Epicステータス更新（`agentdev-epic-tracker`）
@@ -223,7 +223,7 @@ case-run は REQ-017 に定義される execution contract を消費境界とし
 次の場合、case-run は blocked とし、Issue 更新は case-update へ委譲する。
 - 完了条件の不足、曖昧さ、矛盾、実現不能の検出
 - scope-affecting impact candidate の発見（既存 scope 内を超える変更が必要）
-- 関連 ADR への適合確認で新たな拘束 ADR の必要性が判明した場合
+- 関連 Decision への適合確認で新たな拘束 Decision の必要性が判明した場合
 - 必須品質統制の追加変更が必要な場合
 - Issue metadata、構造、実態の矛盾検出時
 
@@ -292,7 +292,7 @@ L3（委譲先内部メトリクス）は対象外とする（REQ-003-010）。
 
 ## Phase 0 commit スコープ設計運用
 
-Phase 0（枝PR作成フェーズ）の case-run 委譲内で実行担当サブエージェントが作成する commit に適用するスコープ設計運用を規定する。Phase 0 全体の commit 構成（定義層で確定した REQ/ADR/SPEC のコミット、枝PR 作成）は case-auto SPEC（`docs/specs/commands/case-auto.md`）の同名節を正とし、本節は case-run 委譲内の commit スコープに焦点を当てる。case-auto SPEC と整合する内容を維持する（OU-013b / OU-013a）。
+Phase 0（枝PR作成フェーズ）の case-run 委譲内で実行担当サブエージェントが作成する commit に適用するスコープ設計運用を規定する。Phase 0 全体の commit 構成（定義層で確定した REQ/Decision/SPEC のコミット、枝PR 作成）は case-auto SPEC（`docs/specs/commands/case-auto.md`）の同名節を正とし、本節は case-run 委譲内の commit スコープに焦点を当てる。case-auto SPEC と整合する内容を維持する（OU-013b / OU-013a）。
 
 ### 孫 Issue 間 SPEC スコープ交差時の扱い
 
@@ -364,13 +364,13 @@ case-run 本体（Step 1〜8 の orchestration）は実装方針の生成、審�
 
 ### 実装方針限定（REQ-015-010）
 
-adapter 委譲内で形成する実装方針は、既確定 Issue 本文、REQ、ADR、SPEC を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順等）に限定する（REQ-015-010）。実装方針は既確定文書へ矛盾しない内部選択の範囲内で review 審議対象となる。実装方針が既確定 Issue/REQ/ADR/SPEC の変更、追加、撤回を必要とする場合、実行担当サブエージェントは実装を開始せず blocked へ遷移する。
+adapter 委譲内で形成する実装方針は、既確定 Issue 本文、REQ、Decision、SPEC を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順等）に限定する（REQ-015-010）。実装方針は既確定文書へ矛盾しない内部選択の範囲内で review 審議対象となる。実装方針が既確定 Issue/REQ/Decision/SPEC の変更、追加、撤回を必要とする場合、実行担当サブエージェントは実装を開始せず blocked へ遷移する。
 
 ### blocked 遷移（REQ-015-010、REQ-015-011）
 
 adapter 委譲内で次のいずれかに該当する場合、実行担当サブエージェントは result を `blocked` として case-run へ返却する（REQ-015-010、REQ-015-011）。
 
-- 実装方針が既確定 Issue/REQ/ADR/SPEC の変更、追加、撤回を必要とする（REQ-015-010）
+- 実装方針が既確定 Issue/REQ/Decision/SPEC の変更、追加、撤回を必要とする（REQ-015-010）
 - 要件、仕様に問題（欠落、矛盾、曖昧さ、実現不可能な条件等）を検出した（REQ-015-011）
 - adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない（REQ-014-009）
 
@@ -389,7 +389,7 @@ skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も�
 
 ### 戻り先と反映責務
 
-accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務である（REQ-014-006）。adversarial-review は finding を提示し、合意候補を形成するが、実装方針、実装ファイル、PR 本文への反映を自身では行わない。反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/ADR/SPEC 整合性再確認、targeted docs guard、QG-3 等）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動できる（REQ-014-007）。unresolved な本質的争点またはユーザー判断事項が残る場合、実装の最初の変更（不可逆処理）へ進まず blocked へ遷移する（REQ-014-009、前述「blocked 遷移」節）。
+accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務である（REQ-014-006）。adversarial-review は finding を提示し、合意候補を形成するが、実装方針、実装ファイル、PR 本文への反映を自身では行わない。反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/Decision/SPEC 整合性再確認、targeted docs guard、QG-3 等）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動できる（REQ-014-007）。unresolved な本質的争点またはユーザー判断事項が残る場合、実装の最初の変更（不可逆処理）へ進まず blocked へ遷移する（REQ-014-009、前述「blocked 遷移」節）。
 
 ### 正規所有者マトリックス参照
 

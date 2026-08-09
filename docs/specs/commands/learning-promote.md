@@ -13,7 +13,7 @@ inbox.md から正規化、分類、8軸評価、廃棄判定、既存対策確�
 `.opencode/` 直接反映は禁止。
 backlog-review 経由で RU 化する。
 
-**昇華可能性評価、無条件自動REQ化禁止（v2:REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
+**昇華可能性評価、無条件自動REQ化禁止（v2:REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/Decision/SPEC）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
 無条件の自動REQ化は禁止し、学びは backlog-review → req-define → req-save の昇華経路を経て初めて REQ 化される。
 昇華不能な知見は `deferred.md` の living pool で維持する。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
 

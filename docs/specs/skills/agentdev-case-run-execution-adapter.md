@@ -66,7 +66,7 @@ case-run が Issue 実装を実行担当サブエージェントへ委譲する�
 
 ### 実装方針の形成と限定（REQ-015-010）
 
-実行担当サブエージェントは委譲 prompt で指定された実行 command に従い、Issue 本文、受け入れ基準、ADR、REQ、SPEC、docs、repository context を再確認した上で、実装方針を形成する。実装方針は既確定 Issue/REQ/ADR/SPEC を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順、使用ライブラリ選択等の実現手段）に限定する（REQ-015-010）。実装方針は新規要件の創出、既存 REQ/ADR/SPEC の変更、撤回、再解釈を含まない。
+実行担当サブエージェントは委譲 prompt で指定された実行 command に従い、Issue 本文、受け入れ基準、Decision、REQ、SPEC、docs、repository context を再確認した上で、実装方針を形成する。実装方針は既確定 Issue/REQ/Decision/SPEC を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順、使用ライブラリ選択等の実現手段）に限定する（REQ-015-010）。実装方針は新規要件の創出、既存 REQ/Decision/SPEC の変更、撤回、再解釈を含まない。
 
 実装方針は最初の実装変更（ファイル編集、コード生成等の不可逆処理）前に形成、確定する。実装方針の生成、審査は case-run 本体（委譲元）ではなく adapter 委譲内の実行担当サブエージェント責務である（REQ-015-010、case-run command SPEC「case-run 本体は実装方針を生成・審査しない」節参照）。
 
@@ -78,7 +78,7 @@ case-run が Issue 実装を実行担当サブエージェントへ委譲する�
 
 ### 結果反映（REQ-014-006/007）
 
-accepted finding の実装方針への反映は実行担当サブエージェント（呼出元）の責務である（REQ-014-006）。反映は最初の実装変更前に行う。反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/ADR/SPEC 整合性再確認、targeted docs guard、QG-3 等）を再実行する。意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動でき（REQ-014-007）、新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。再 review 停止条件4点（REQ-014-008）は adversarial-review SPEC を正とする。
+accepted finding の実装方針への反映は実行担当サブエージェント（呼出元）の責務である（REQ-014-006）。反映は最初の実装変更前に行う。反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/Decision/SPEC 整合性再確認、targeted docs guard、QG-3 等）を再実行する。意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動でき（REQ-014-007）、新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。再 review 停止条件4点（REQ-014-008）は adversarial-review SPEC を正とする。
 
 ### blocked 遷移の内部手続き（REQ-015-010/011）
 
@@ -86,11 +86,11 @@ accepted finding の実装方針への反映は実行担当サブエージェン
 
 | blocked 要因 | 要件 | 詳細 |
 |---|---|---|
-| 実装方針が既確定文書の変更を必要とする | REQ-015-010 | 実装方針が既確定 Issue/REQ/ADR/SPEC の変更、追加、撤回を要求する場合、実装を開始せず blocked へ遷移する |
+| 実装方針が既確定文書の変更を必要とする | REQ-015-010 | 実装方針が既確定 Issue/REQ/Decision/SPEC の変更、追加、撤回を要求する場合、実装を開始せず blocked へ遷移する |
 | 要件、仕様問題の検出 | REQ-015-011 | 要件、仕様に欠落、矛盾、曖昧さ、実現不可能な条件等を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず blocked へ遷移する |
 | unresolved 争点の残存 | REQ-014-009 | adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない場合、blocked へ遷移する |
 
-blocked 詳細本文（検出理由、対象 REQ/ADR/SPEC、想定される修正方向等）は Issue コメントに SSoT として構造化して記録する（result 契約「SSoT」節、case-run command SPEC Step 7 参照）。実行担当サブエージェントは blocked 遷移時に実装ファイル、PR、commit を残さず、worktree を実装前の状態に保つ。
+blocked 詳細本文（検出理由、対象 REQ/Decision/SPEC、想定される修正方向等）は Issue コメントに SSoT として構造化して記録する（result 契約「SSoT」節、case-run command SPEC Step 7 参照）。実行担当サブエージェントは blocked 遷移時に実装ファイル、PR、commit を残さず、worktree を実装前の状態に保つ。
 
 ### 従来フロー維持（REQ-015-003）
 

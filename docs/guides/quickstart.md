@@ -5,7 +5,7 @@
 
 ```
 /agentdev/req-define    # 要件を壁打ちする
-/agentdev/req-save      # REQ/ADR ファイルとして保存する
+/agentdev/req-save      # REQ/Decision ファイルとして保存する
 /agentdev/case-open     # Issue を作成する
 /agentdev/case-run      # 実装して PR を作成する
 /agentdev/case-close    # PR をマージして Issue をクローズする
@@ -27,7 +27,7 @@
 | コマンド | やること | 入力 | 出力 |
 |----------|---------|------|------|
 | `/agentdev/req-define` | AI と対話して要件を整理 | セッション会話 / RU | 要件doc（draft） |
-| `/agentdev/req-save` | REQ/ADR ファイルを docs/ に保存 | 要件doc（feature のみ） | REQ/ADR ファイル |
+| `/agentdev/req-save` | REQ/Decision ファイルを docs/ に保存 | 要件doc（feature のみ） | REQ/Decision ファイル |
 | `/agentdev/case-open` | GitHub Issue を作成 | REQ ファイル / 要件doc | Issue |
 | `/agentdev/case-run` | 実装して PR を作成 | Issue | 実装済みブランチ + PR |
 | `/agentdev/case-close` | PR をマージして Issue をクローズ | PR | マージ済み + クローズ済み |

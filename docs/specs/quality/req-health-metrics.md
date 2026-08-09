@@ -11,7 +11,7 @@ REQ の肥大化、関心ズレを定量的に検出するための閾値を定�
 ## 適用範囲
 
 - **対象**: 現行 REQ ファイル（`docs/requirements/REQ-NNNN.md`）の要件テーブル行（`| REQ-NNNN-MMM | ... |`）。目的、適用範囲セクションの散文は計測対象外
-- **対象外**: 廃止 REQ、draft、SPEC、ADR、guides
+- **対象外**: 廃止 REQ、draft、SPEC、Decision、guides
 
 ## 測定対象と計測方法
 

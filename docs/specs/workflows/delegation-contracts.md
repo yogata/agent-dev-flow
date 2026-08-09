@@ -66,7 +66,7 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 | delegation_type | 用途 | 書き込み | 書き込み許可条件 |
 |---|---|---:|---|
 | `gate_check` | 完了判定、ガードレール充足確認、保存前/close前検査 | 禁止 | - |
-| `semantic_review` | 文書、差分、REQ/ADR/SPECの意味レビュー | 禁止 | - |
+| `semantic_review` | 文書、差分、REQ/Decision/SPECの意味レビュー | 禁止 | - |
 | `log_analysis` | テストログ、CIログ、review結果解析 | 禁止 | - |
 | `classification` | 成果物 / 検出事項 / intake / learning の分類 | 禁止 | - |
 | `extraction` | 候補、論点、未回収事項の抽出 | 禁止 | - |
@@ -159,7 +159,7 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 |---|---|---|
 | case-open | 子Issue 本文案作成、検査、Issue 作成 | Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新 |
 | case-run | 同一 Wave 内子Issue の実装委譲 | Wave 結果集約 |
-| req-save | 複数 REQ/ADR ファイルの変更案作成、検査 | 採番、index 更新、draft 更新、commit、push |
+| req-save | 複数 REQ/Decision ファイルの変更案作成、検査 | 採番、index 更新、draft 更新、commit、push |
 | spec-save | 複数 SPEC ファイルの変更案作成、検査 | 採番、index 更新、draft 更新、commit、push |
 
 ### 集約原則

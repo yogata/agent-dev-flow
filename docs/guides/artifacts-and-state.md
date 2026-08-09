@@ -29,8 +29,8 @@ guides は基準への導線を提供する。
 | Skill | `src/opencode/skills/agentdev-*`（実行時: `.opencode/skills/agentdev-*`） | 判定基準、共通知識、宣言的ルールの一次参照 |
 | Template | Skill 配下 `templates/` | Issue/PR 本文の出力構造とプレースホルダー |
 | Script | Skill 配下 `scripts/` | ガードレール、検査、補助処理の実行可能ロジック |
-| リポジトリ専用 Command | `.opencode/commands/repo/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用コマンド（ADR-001）。配布対象外 |
-| リポジトリ専用 Skill | `.opencode/skills/repo-*/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用スキル（ADR-001）。配布対象外 |
+| リポジトリ専用 Command | `.opencode/commands/repo/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用コマンド（DEC-001）。配布対象外 |
+| リポジトリ専用 Skill | `.opencode/skills/repo-*/`（原本なし、配置先のみ） | AgentDevFlow 本体リポジトリ専用スキル（DEC-001）。配布対象外 |
 
 Command は判定ロジックを Skill の参照先に委ねる。
 Skill は Command の Step 番号やファイルパスは Command 側で管理する。
@@ -51,9 +51,9 @@ Script は決定的で単体テスト可能な処理に限定する。
 ```
 docs/
 requirements/REQ-{NNN}.md     # 要件定義（基準）
-  adr/
-    ADR-{NNN}.md            # 現行 ADR（基準）
-    README.md               # ADR 索引
+  decisions/
+    DEC-{NNN}.md            # 現行 Decision（基準）
+    README.md               # Decision 索引
   specs/**/*.md                   # 現在仕様（commands/skills/workflows の3層 + 基盤6ドメイン、リポジトリ内部の設計文書、基準）
   guides/*.md                    # 参照用読み物（案内層、非基準）
 .agentdev/
@@ -65,9 +65,10 @@ requirements/REQ-{NNN}.md     # 要件定義（基準）
   integrity/                     # 整合性検証レポート
 .opencode/                        # 実行時の配置先（ジャンクション → src/opencode/）
   commands/agentdev/             # Command 定義（AgentDevFlow 配布対象）
-  commands/repo/                 # AgentDevFlow 本体リポジトリ専用コマンド（ADR-001、配布対象外）
+  commands/repo/                 # AgentDevFlow 本体リポジトリ専用コマンド（DEC-001、配布対象外）
+  commands/agentdev/             # Command 定義（AgentDevFlow 配布対象）
   skills/agentdev-*/             # Skill 定義（AgentDevFlow 配布対象）
-  skills/repo-*/                 # AgentDevFlow 本体リポジトリ専用スキル（ADR-001、配布対象外）
+  skills/repo-*/                 # AgentDevFlow 本体リポジトリ専用スキル（DEC-001、配布対象外）
 src/opencode/                     # 原本（正規の定義ファイル）
   commands/agentdev/             # Command 原本
   skills/agentdev-*/             # Skill 原本
@@ -102,7 +103,7 @@ scripts/
 
 ### ディレクトリ責務の補足
 
-- `.agentdev/`: AgentDevFlow のドメイン状態。Intake / Learning / Backlog / 整合性の永続データを管理する。配布物ではなく、リポジトリの動作状態を保持する（ADR-001）。AgentDevFlow 本体リポジトリ / 適用プロジェクトの双方で使用される。
+- `.agentdev/`: AgentDevFlow のドメイン状態。Intake / Learning / Backlog / 整合性の永続データを管理する。配布物ではなく、リポジトリの動作状態を保持する（DEC-001）。AgentDevFlow 本体リポジトリ / 適用プロジェクトの双方で使用される。
 - `.agentdev-plugin/`: 適用プロジェクトにおける agent-dev-flow の git clone 先（v2:REQ-0103-072~077）。AgentDevFlow 本体リポジトリでは直接 `.agentdev/` を使用する。`.gitignore` で管理対象外とする。
 - `.agentdev/drafts/`: コマンドワークフローでのみ明示的に定義された作業中ドラフトの引き継ぎに使用する一時領域。
 

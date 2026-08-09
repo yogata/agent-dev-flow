@@ -127,7 +127,7 @@ cd .agentdev-plugin && git pull && cd ..
 - `.agentdev-plugin/` を `.agentdev/` として使用すること（ドメイン状態と競合）
 - consumer-generated で link target が意図した src 配下以外へ解決される環境での link 設定実行（v2:ADR-011-010, v2:ADR-009 decision #6）
 
-`agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（ADR-001）。
+`agentdev-integrity`（旧 integrity skill）は AgentDevFlow 配布対象外となった（DEC-001）。
 docs-check は `repo-agentdev-integrity`（配布対象外スキル）として AgentDevFlow 本体リポジトリでのみ実行される。
 適用プロジェクトには配布されない。
 

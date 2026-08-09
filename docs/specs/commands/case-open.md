@@ -44,7 +44,7 @@ Epic + 子 Issue 一括作成に対応する。
 - Step 1: 前工程からの引き継ぎ停止判定（`agentdev_handoff: true` 含まれる場合は Issue 作成せず停止）
 - Step 1-1: OU 選択ゲート（`operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止））
 - Step 2: 要件docからIssue本文生成（`agentdev-issue-management`）（REQ読解、テンプレート充足検査、完了条件候補抽出）
- - Step 2-1: 完了条件網羅性検証（QG-2）（Issue作成前に REQ/ADR/SPEC 必達要件の網羅性を検証）
+ - Step 2-1: 完了条件網羅性検証（QG-2）（Issue作成前に REQ/Decision/SPEC 必達要件の網羅性を検証）
 - Step 3: マルチREQ入力判定（単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐）
  - Step 3-1: 自律構成生成（OU モード、複数REQ時）（`operation_units` から Epic / Wave / Issue 構造を自律生成）
 - Step 4: 規模判定（単一REQの場合）（`scale: large` → Epic flow / `scale: standard` → Standard flow）
@@ -56,7 +56,7 @@ Epic + 子 Issue 一括作成に対応する。
  - Step 9: Epic Issue本文更新（ステータス追跡テーブル更新）
  - Step 9-1: OU `result` 書き戻し（Issue / Epic 番号）
 - Standard flow（Steps 10-12-1）:
-  - Step 10: 関連ADR特定
+  - Step 10: 関連Decision特定
   - Step 11: ラベル付与（`agentdev-workflow-lifecycle`）
   - Step 12: GitHub Issue作成（VERIFY）
   - Step 12-1: OU `result` 書き戻し（Issue 番号）
@@ -210,9 +210,9 @@ test strategy セクションへ投影する。
 実行手段、検証手段は test strategy へ分離する。必須品質能力の呼出自体が利用者要求
 でない限り、Skill 呼出を完了条件化しない。
 
-### EC-4: 関連 ADR 拘束条件の特定と反映
+### EC-4: 関連 Decision 拘束条件の特定と反映
 
-Issue の実装を拘束する関連 ADR を特定し、必要な制約を完了条件または test strategy
+Issue の実装を拘束する関連 Decision を特定し、必要な制約を完了条件または test strategy
 へ反映する。
 
 ### EC-5: 予定変更内容から事前判定可能な追加検証条件の展開
@@ -242,7 +242,7 @@ Issue 本文の契約セクションへ永続化する（経路F 拡張）。
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（G19、REQ-006-009）
 - 実装順序、Issue分解についてのユーザー確認要求（G20、REQ-006-008）
 - 単一 Issue で完結する場合の Epic 作成（G20、REQ-005-041）
-- Wave単位のみの子Issue構造（G14、子Issue は OU 単位で作成し、対応 OU 経由で REQ/ADR/SPEC トレーサビリティを保持。子Issue を REQ 文書単位で対応付ける規定は廃止、REQ-005-042 準拠）
+- Wave単位のみの子Issue構造（G14、子Issue は OU 単位で作成し、対応 OU 経由で REQ/Decision/SPEC トレーサビリティを保持。子Issue を REQ 文書単位で対応付ける規定は廃止、REQ-005-042 準拠）
 - 子Issue最大10件超過時の作成続行（G05、エラー停止、REQ-006-028）
 - 構成生成事前検証を GitHub Issue 作成後に行う扱い（G05、REQ-006-027）
 - intake / learning capture の実施（G18, G22）
@@ -254,7 +254,7 @@ Issue 本文の契約セクションへ永続化する（経路F 拡張）。
 
 ## 検証観点
 
-- QG-2（Acceptance Criteria Coverage Gate）: Step 2-1 で完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
+- QG-2（Acceptance Criteria Coverage Gate）: Step 2-1 で完了条件が対象 REQ/Decision/SPEC の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
 - 子Issue 先頭行 `Parent: #{epic_number}` 含有（G03、親子関係追跡用）
 - 全子Issue作成完了後の Epic 本文ステータス追跡テーブル更新（G04、部分更新禁止）
 - 子Issue数上限（G05、最大10件、Epic 1件あたり）
@@ -309,7 +309,7 @@ case-open SPEC 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ-0
 ## See Also
 
 - [req-define.md](req-define.md)（前段コマンド）
-- [req-save.md](req-save.md)（前段コマンド（REQ/ADR 保存））
+- [req-save.md](req-save.md)（前段コマンド（REQ/Decision 保存））
 - [spec-save.md](spec-save.md)（前段コマンド（SPEC 保存））
 - [case-run.md](case-run.md)（後続コマンド（実装））
 - `agentdev-issue-management` skill（Issue 本文生成、テンプレート充足）
@@ -363,7 +363,7 @@ review の結果反映で review 対象の意味内容が変更された場合�
 
 | 変更影響 | 再実行対象 | 戻り先 Step | 根拠 |
 |---|---|---|---|
-| 完了条件のみ変更 | QG-2 | Step 2-1 | 完了条件網羅性検証を再実行し、REQ/ADR/SPEC 必達要件の網羅性を再確認する |
+| 完了条件のみ変更 | QG-2 | Step 2-1 | 完了条件網羅性検証を再実行し、REQ/Decision/SPEC 必達要件の網羅性を再確認する |
 | execution structure のみ変更 | preflight | Step 4-1 | 構成生成事前検証（子 Issue 数上限、Wave 同時実行上限、OU 対応、必須依存関係維持、OU 割当網羅）を再実行する |
 | 完了条件と execution structure の両方が変更 | QG-2 + preflight | Step 2-1、Step 4-1 | 両方を再実行する。実行順序は QG-2（Step 2-1）→ preflight（Step 4-1）を維持する |
 | 意味内容変更なし | 再実行不要 | （なし） | review 対象の意味内容に変更がないため、既存検証結果をそのまま使用し、最初の GitHub Issue 作成 Step へ進む |

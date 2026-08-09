@@ -211,7 +211,7 @@ REQ CREATE / APPEND / UPDATE 時に各 README（`docs/README.md`、`docs/require
 
 ### 矛盾時の優先順位
 
-README 索引と基準（REQ/ADR/SPEC）が矛盾する場合、基準を優先し README 索引を修正対象とする。
+README 索引と基準（REQ/Decision/SPEC）が矛盾する場合、基準を優先し README 索引を修正対象とする。
 
 ## REQ 再構成検出
 

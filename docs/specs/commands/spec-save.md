@@ -252,7 +252,7 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 ## See Also
 
 - [req-define.md](req-define.md)（前段コマンド（SPEC 候補分離））
-- [req-save.md](req-save.md)（前段コマンド（REQ/ADR 保存））
+- [req-save.md](req-save.md)（前段コマンド（REQ/Decision 保存））
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
 - `agentdev-artifact-validation` skill（README エントリ存在確認）
 - `agentdev-conventional-commits` skill（コミットメッセージ規約）

@@ -41,7 +41,7 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 16 | Retired REQ 管理 | REQ-010 (070-088) | integrity-contracts.md | 注記、参照区別 |
 | 17 | Link 整合性 | REQ-010 (013) | integrity-contracts.md | Markdown リンク先存在確認 |
 | 18 | Namespace legacy 残存 | REQ-010 (016) | integrity-contracts.md | 旧コマンド名、旧パス検出 |
-| 19 | REQ/ADR 相互参照 | REQ-010 (005) | integrity-contracts.md | 双方向参照確認 |
+| 19 | REQ/Decision 相互参照 | REQ-010 (005) | integrity-contracts.md | 双方向参照確認 |
 | 20 | Authoring DoD | REQ-010 (060-064) | quality-specs.md | 行数、Steps、共通化、正規パス（`canonical path`） |
 | 21 | Command Step 整数化 | REQ-003 (005, 007) | artifact-contracts.md | 最上位 Step は整数のみ。小数 Step を禁止 |
 | 22 | Command サブステップ表記 | REQ-003 (006) | artifact-contracts.md | サブステップは N-M 形式のみ許容。英字サブステップを禁止 |

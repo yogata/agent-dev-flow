@@ -46,7 +46,7 @@ updated: 2026-07-28
   - RU 由来キーワード抽出 + glob/grep 前処理によるサブエージェント調査委譲スコープの絞り込み（REQ-004-072）。絞り込みはサブエージェント調査委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-004-002）の完全性は維持する
  - Step 5-2: 分類ゲート（v2:REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/SPEC 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/specs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（v2:REQ-0155-008）」に定める
  - Step 5-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
-  - Step 5-4: ADR要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
+  - Step 5-4: Decision要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
   - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-073）。ラベル構造は soft-contract（DEC-003）とし、分類権限は親が保持する
  - Step 5-5: 実行主体分類表（REQ-003-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
  - Step 5-6: Test strategy 定義（要件展開内）
@@ -413,20 +413,20 @@ auto_gate:
 - Issue 階層決定（G13、case-open 責務）
 - `execution_groups` セクション出力（G14）
 - SPEC 分離基準（REQ-001-068）該当要件行の REQ 残留（G15、`artifact_actions` へ分離）
-- ADR判断における未確認事項の要件本文混入（G17、REQ-003-002/004）
+- Decision判断における未確認事項の要件本文混入（G17、REQ-003-002/004）
 - アーキテクチャ助言サブエージェントによるファイル編集（G18、REQ-003-003）
 
 ## 検証観点
 
-- QG-1（Definition Integrity Gate）: Step 7-1 で要件doc構造的完全性を検証（REQ/SPEC 分類、ADR ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成妥当性）
+- QG-1（Definition Integrity Gate）: Step 7-1 で要件doc構造的完全性を検証（REQ/SPEC 分類、Decision ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成妥当性）
  - test_strategy 3要素完全性検査: 各 test strategy 項目が verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持すること。いずれかが欠落する項目を検出した場合、fail とする
 - チェックボックス品質基準: `agentdev-req-analysis` に従い測定可能で一意（G09）
-- artifact_actions 構成: REQ/ADR/SPEC 別 action が適切に統合されているか
+- artifact_actions 構成: REQ/Decision/SPEC 別 action が適切に統合されているか
 - OU 構造検証: Step 11-6 で ou_id、operation、target_req/target_spec、depends_on、result 整合性
 
 ## See Also（oracle 抽象化後）
 
-- [req-save.md](req-save.md)（後続コマンド（REQ/ADR 保存））
+- [req-save.md](req-save.md)（後続コマンド（REQ/Decision 保存））
 - [spec-save.md](spec-save.md)（後続コマンド（SPEC 保存））
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
 - `agentdev-req-analysis` skill（要件分析手法）
@@ -445,23 +445,23 @@ auto_gate:
 
 ### 挿入位置（REQ-015-004）
 
-review 挿入位置は「Scale 判断後・ADR判断前・要件doc生成前」と一意に特定可能である。現行 Step 構造への対応付けを次に示す。
+review 挿入位置は「Scale 判断後・Decision判断前・要件doc生成前」と一意に特定可能である。現行 Step 構造への対応付けを次に示す。
 
 | 条件 | feature の場合 | feature 以外（bugfix, maintenance, docs_chore）の場合 |
 |---|---|---|
 | Scale 判断後 | Step 9（Scale判断）完了後 | Step 8（work_type 判定）完了後。Scale判断 は feature のみ実行するため、work_type 判定完了をもって意味的完成とする |
-| ADR判断前 | Step 6（ADR判断）の判断結果が Step 10（ドラフト保存）で永続化される前 | 同左 |
+| Decision判断前 | Step 6（Decision判断）の判断結果が Step 10（ドラフト保存）で永続化される前 | 同左 |
 | 要件doc生成前 | Step 7（要件doc生成）の成果物が Step 10（ドラフト保存）で永続化される前 | 同左 |
 
-review は Step 9（feature 以外は Step 8）完了後、Step 10（ドラフト保存）の前に挿入する。Step 6（ADR判断）および Step 7（要件doc生成）は当該時点で実行済みであるが、その成果物は Step 10 で永続化されるまで確定扱いとならない。review の finding は Step 6、Step 7 の成果物へ反映可能であり、ADR finding は Step 6（ADR判断）へ戻す。
+review は Step 9（feature 以外は Step 8）完了後、Step 10（ドラフト保存）の前に挿入する。Step 6（Decision判断）および Step 7（要件doc生成）は当該時点で実行済みであるが、その成果物は Step 10 で永続化されるまで確定扱いとならない。review の finding は Step 6、Step 7 の成果物へ反映可能であり、ADR finding は Step 6（Decision判断）へ戻す。
 
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
 発動条件判定と review 呼出を分離する（REQ-015-001）。発動条件判定 Step は default-on 原則（REQ-015-002）と skip 条件（REQ-015-003）を評価する。
 
-- **default-on（原則実行）**: req-define は adversarial-review を原則実行する（REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、review 対象の意味的決定（要件展開、ADR要否判定、Scale判断）が存在する場合に発動する。
+- **default-on（原則実行）**: req-define は adversarial-review を原則実行する（REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、review 対象の意味的決定（要件展開、Decision要否判定、Scale判断）が存在する場合に発動する。
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（review を挿入せず Step 10 へ進む）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-  - Scale が L0（独立、自明）で ADR判断対象が存在せず、review 対象となる意味的決定が存在しない場合
+  - Scale が L0（独立、自明）で Decision判断対象が存在せず、review 対象となる意味的決定が存在しない場合
 - **ユーザー明示指定時の必須実行**: ユーザーが req-define 実行中に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
 
 ### review 呼出 Step（REQ-015-001）
@@ -469,8 +469,8 @@ review は Step 9（feature 以外は Step 8）完了後、Step 10（ドラフ�
 発動条件判定 Step で発動と判定された場合、review 呼出 Step で adversarial-review を呼び出す（REQ-015-001）。
 
 - **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts SPEC](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
-- **review 対象**: 当該 req-define で生成した要件候補（draft-data、`agreed_items`、`artifact_actions`、ADR判断結果、Scale判断結果）。
-- **採用後戻り先**: accepted finding のうち ADR 関連の finding は Step 6（ADR判断）へ戻し再評価する。要件展開に関わる finding は該当 Step（Step 5 以降）へ戻す。accepted finding の対象候補への反映は req-define（呼出元）の責務である（REQ-014-006）。
+- **review 対象**: 当該 req-define で生成した要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）。
+- **採用後戻り先**: accepted finding のうち ADR 関連の finding は Step 6（Decision判断）へ戻し再評価する。要件展開に関わる finding は該当 Step（Step 5 以降）へ戻す。accepted finding の対象候補への反映は req-define（呼出元）の責務である（REQ-014-006）。
 - **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、Step 10（ドラフト保存）へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[workflow-contracts SPEC](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節）。
 - **呼出失敗時**: adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
 

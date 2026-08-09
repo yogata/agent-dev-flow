@@ -28,7 +28,7 @@ runtime-package-boundary.md「5 種のリポジトリ種別」表の Type ID 列
 以下のいずれかに該当する語句は識別子とし、backticks で囲むことを必須とする。
 
 - コマンド名、スキル名、ファイル名、ディレクトリパス（`/agentdev/req-define`、`agentdev-doc-writing`、`docs/specs/foundations/system.md`）
-- REQ/ADR/SPEC/RU/OU/IR 等の成果物 ID（`REQ-001`、`REQ-001`、`RU-0005`）
+- REQ/Decision/SPEC/RU/OU/IR 等の成果物 ID（`REQ-001`、`REQ-001`、`RU-0005`）
 - frontmatter キー、YAML フィールド名、enum 値、code block 内字句
 - 英字 kebab-case / snake_case / CamelCase の技術識別子（`self-hosting`、`work_type`、`auto_ready`）
 

@@ -21,7 +21,7 @@ AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPE
 
 | Gate | 名称 | 配置コマンド | 対象成果物 | 判定結果 |
 |------|------|-------------|-----------|---------|
-| QG-1 | Definition Integrity Gate | req-define / req-save | 要件 doc draft / REQ、ADR ファイル | pass / warn / fail |
+| QG-1 | Definition Integrity Gate | req-define / req-save | 要件 doc draft / REQ、Decision ファイル | pass / warn / fail |
 | QG-2 | Acceptance Criteria Coverage Gate | case-open | Issue 本文（完了条件） | pass / warn / fail |
 | QG-3 | Implementation Deviation Gate | case-run | git diff（実装差分） | pass / warn / fail（乖離分類付き） |
 | QG-4 | Final Acceptance Gate | case-close | PR / CI / Issue チェックボックス | pass / fail |
@@ -37,8 +37,8 @@ AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPE
 
 ### 配置
 
-- **req-define**: 要件 doc draft 生成時（Step 6〜9）。REQ/SPEC 分類、ADR ゲート、チェックボックス測可能性を検証。
-- **req-save**: REQ/ADR ファイル保存時（Step 3〜4）。保存前の最終構造検証。
+- **req-define**: 要件 doc draft 生成時（Step 6〜9）。REQ/SPEC 分類、Decision ゲート、チェックボックス測可能性を検証。
+- **req-save**: REQ/Decision ファイル保存時（Step 3〜4）。保存前の最終構造検証。
 
 ### pass / warn / fail 基準
 
@@ -60,7 +60,7 @@ AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPE
 
 ### 目的
 
-case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/ADR/SPEC の必達要件を網羅していることを確認する。
+case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/Decision/SPEC の必達要件を網羅していることを確認する。
 受け入れ基準の漏れをフェーズ内で検出する。
 
 ### 配置
@@ -99,7 +99,7 @@ case-run で PR 作成前に、実装が Issue / REQ / ADR / SPEC / work plan �
 
 ### pass / warn / fail 基準
 
-- **pass**: no-deviation。実装は Issue/REQ/ADR/SPEC/work plan に整合。
+- **pass**: no-deviation。実装は Issue/REQ/Decision/SPEC/work plan に整合。
 - **warn**: 軽微乖離のみ（scope-creep 等）。そのまま進行可能（乖離内容を実装記録に併記）。
 - **fail**: 重大乖離あり（impl-bug / spec-bug）。ユーザー指示待機（自動修正禁止）。重大乖離 ≥2 件で壁打ちフェーズ全体への差し戻しを推奨。
 
@@ -186,4 +186,4 @@ case-auto は構成コマンド（req-save / case-open / case-run / case-close�
 
 - [agentdev-quality-gates](../../src/opencode/skills/agentdev-quality-gates/SKILL.md)（QG-1〜QG-4 の判定基準、検査観点を提供する実行時ナレッジベース）
 - [quality-specs.md](quality-specs.md)（品質基準（行数上限、執筆完了基準 等））
-- [document-model.md](../foundations/document-model.md)（REQ/ADR/SPEC/guides の責務マトリックス、文書分類ポリシー）
+- [document-model.md](../foundations/document-model.md)（REQ/Decision/SPEC/guides の責務マトリックス、文書分類ポリシー）
