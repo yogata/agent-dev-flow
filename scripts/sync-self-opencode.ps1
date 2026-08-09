@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
     Sync .opencode/ projection with selective junctions from src/opencode/ (self-hosting repo).
@@ -39,6 +38,8 @@
     ./scripts/sync-self-opencode.ps1 -Mode check
     ./scripts/sync-self-opencode.ps1 -Mode apply
 #>
+
+#Requires -Version 7.0
 
 param(
     [Parameter()]
