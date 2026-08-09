@@ -195,7 +195,7 @@ agentdev-adversarial-review 自身による対象ファイル変更、レビュ�
 
 ## adversarial-review caller integration 共通契約
 
-本節は req-define、req-save、spec-save、case-open、case-run、case-close、case-update の7コマンドおよび case-auto からの呼出（caller integration）が共通に依拠する契約を正典として所有する（REQ-014-003）。caller integration 用の新規永続 schema を作成せず、本 SPEC が共通契約の正規所有者となる。詳細パラメータ、入力フィールド構成、enum 値は本 SPEC の対象外とし、各 command SPEC（REQ-015）が個別呼出統合を所有する。
+本節は REQ-015 が定める7コマンド（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）および case-auto（停止伝播のみ、REQ-015-012）からの caller integration が共通に依拠する契約を正典として所有する（REQ-014-003）。caller integration 用の新規永続 schema を作成せず、本 SPEC が共通契約の正規所有者となる。詳細パラメータ、入力フィールド構成、enum 値は本 SPEC の対象外とし、各 command SPEC（REQ-015）が個別呼出統合を所有する。
 
 ### 原則適用・skip 可能と QG/HITL 非代替
 

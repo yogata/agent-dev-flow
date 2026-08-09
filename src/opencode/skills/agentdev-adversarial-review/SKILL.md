@@ -62,7 +62,7 @@ QG-1〜QG-4 を代替せず、通常のコードレビュー、テスト、機�
 
 ## caller integration 共通契約
 
-本スキルは req-define、req-save、spec-save、case-open、case-run、case-close、case-update の7コマンドおよび case-auto からの呼出（caller integration）に対し、SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が定める共通契約に従う。共通契約の正規所有者は SPEC であり、本 SKILL.md は重複定義しない（REQ-014-003、REQ-014-011）。
+本スキルは REQ-015 が定める7コマンド（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）および case-auto（停止伝播のみ、REQ-015-012）からの caller integration に対し、SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が定める共通契約に従う。共通契約の正規所有者は SPEC であり、本 SKILL.md は重複定義しない（REQ-014-003、REQ-014-011）。
 
 呼出元と本スキルの主な契約（詳細は SPEC を正とする）:
 
