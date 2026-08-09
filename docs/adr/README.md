@@ -9,10 +9,8 @@
 個別 REQ/SPEC は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=adr-baseline-count -->
-現行の承認済み ADR は5件である。
+現行の承認済み ADR は6件である。
 <!-- AUTOGEN:END -->
-
-> 備考: ADR-007 は proposed であり、accepted になるまでは現行判断の根拠として引用しない。
 
 <!-- AUTOGEN:BEGIN:id=adr-baseline-table -->
 | ADR番号 | タイトル | ステータス | 作成日 |
@@ -22,7 +20,7 @@
 | ADR-003 | req_draft ソフトコントラクト原則 | accepted | 2026-07-25 |
 | ADR-004 | 差し替え可能な I/O 境界 | accepted | 2026-07-25 |
 | ADR-006 | inspect 3-command 構成への正規化 | accepted | 2026-07-27 |
-| ADR-007 | Artifact Graph 標準化と配布スキル昇格 | proposed | 2026-08-08 |
+| ADR-007 | Artifact Graph 標準化と配布スキル昇格 | accepted | 2026-08-08 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -40,12 +38,12 @@
 - [ADR-003](ADR-003.md)（req_draft ソフトコントラクト原則）
 - [ADR-004](ADR-004.md)（差し替え可能な I/O 境界）
 - [ADR-006](ADR-006.md)（inspect 3-command 構成への正規化）
+- [ADR-007](ADR-007.md)（Artifact Graph 標準化と配布スキル昇格）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=adr-status-proposed -->
-- [ADR-007](ADR-007.md)（Artifact Graph 標準化と配布スキル昇格）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -71,7 +69,7 @@
 - [ADR-004](ADR-004.md)（差し替え可能な I/O 境界）
 - [ADR-005](ADR-005.md)（Project Extensions Architecture、superseded by ADR-006）
 - [ADR-006](ADR-006.md)（inspect 3-command 構成への正規化、extension 検査の3層責務分離）
-- [ADR-007](ADR-007.md)（Artifact Graph 標準化と配布スキル昇格、proposed）
+- [ADR-007](ADR-007.md)（Artifact Graph 標準化と配布スキル昇格）
 
 ### ワークフロー・委譲契約
 
