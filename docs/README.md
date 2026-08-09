@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [�
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 13件、廃止済み: 0件
+現行 REQ: 16件、廃止済み: 0件
 <!-- AUTOGEN:END -->
 
-現行要件は REQ-001 から REQ-013 の13件である。各 REQ の詳細は各 REQ ファイル本文を参照。
+現行要件は REQ-001 から REQ-016 の16件である。各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
 |---|---|
@@ -26,6 +26,9 @@ AgentDevFlow の基本原則と管理方式は [ADR-001](adr/ADR-001.md) と [�
 | [REQ-011](requirements/REQ-011.md) | I/O境界と外部連携手段 |
 | [REQ-012](requirements/REQ-012.md) | Artifact Graph 標準化 |
 | [REQ-013](requirements/REQ-013.md) | DOC-MAP 依存除去 |
+| [REQ-014](requirements/REQ-014.md) | adversarial-review caller integration 共通契約 |
+| [REQ-015](requirements/REQ-015.md) | adversarial-review caller integration 7経路+case-auto |
+| [REQ-016](requirements/REQ-016.md) | adversarial-review caller integration 横断整合 |
 
 - [要件インデックス](requirements/README.md)
 

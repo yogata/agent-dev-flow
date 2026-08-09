@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下13件を第一参照先とする。
+現在の要件判断では、以下16件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -25,6 +25,9 @@
 | [REQ-011](REQ-011.md) | I/O境界と外部連携手段 |
 | [REQ-012](REQ-012.md) | Artifact Graph 標準化 |
 | [REQ-013](REQ-013.md) | DOC-MAP 依存除去 |
+| [REQ-014](REQ-014.md) | adversarial-review caller integration 共通契約 |
+| [REQ-015](REQ-015.md) | adversarial-review caller integration 7経路+case-auto |
+| [REQ-016](REQ-016.md) | adversarial-review caller integration 横断整合 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
