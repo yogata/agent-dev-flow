@@ -8,7 +8,7 @@ description: "対論型レビューの実行入口。Orchestrator、Reviewer、R
 本スキルは、Orchestrator、Reviewer、Reviewee の3論理的役割で構成される審議を通じて、本質的争点を抽出し合意を形成する助言プロトコルの実行入口である。
 審議結果は判断材料であり、ユーザー承認、実装実行、強制的統制判定のいずれにもならない。
 
-- **参照元**: 呼び出し元コマンド（default-on + skip policy、REQ-014-013/014）、ユーザー明示的選択
+- **参照元**: 呼出元コマンド（default-on + skip policy、REQ-014-013/014）、ユーザー明示的選択
 - **特性**: 審議プロトコルの振る舞い契約を実行入口として提供する。実装実行、ファイル編集、外部状態変更は本スキルの対象外
 
 ## 原本（SSoT）
@@ -19,8 +19,8 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 発動契約
 
-原則適用・skip 可能な助言手段である（REQ-014-001）。REQ-015 で定義される caller 対象 command では adversarial-review を原則実行し、ユーザー明示指定を通常発動の必須条件としない（default-on、REQ-014-013）。skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義し、skip 判断のためだけに新規 HITL / 承認点を追加せず、skip 対象でもユーザー明示要求時は実行する（REQ-014-014）。
-ただし新規必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替せず、新しい恒久統制ゲートとしない（REQ-014-001/002、REQ-014-013）。発動契約の詳細は SPEC「発動契約」を正とする。
+原則適用・skip 可能な助言手段（対論型レビュー）である（REQ-014-001）。REQ-015 で定義される caller 対象 command では adversarial-review を原則実行し、ユーザー明示指定を通常発動の必須条件としない（default-on、REQ-014-013）。skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義し、skip 判断のためだけに新規 HITL / 承認点を追加せず、skip 対象でもユーザー明示要求時は実行する（REQ-014-014）。
+ただし新規必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替せず、新しい恒久統制ゲートとしない（REQ-014-001/002、REQ-014-013）。副作用権限（commit、push、merge、ファイル保存、Issue と PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認）を代行しない（REQ-003-035）。発動契約の詳細は SPEC「発動契約」を正とする。
 
 ## 審議上の3論理的役割
 
@@ -47,6 +47,8 @@ OpenAI/Codex adversarial-review 等の外部知見を観点、問い、failure m
 ## 振る舞いプロトコルと合意候補再検証
 
 審議は strategy → challenge → counter-challenge → convergence → convergence audit の状態遷移で進行する。合意候補を形成しただけでは完了とせず、Reviewer と Reviewee が合意候補とその成立根拠を再度対論的に検証する（convergence audit）。再検証で新しい本質的争点が見つかった場合、当該争点について対論を再開する。
+
+初期 challenge は最低2系統の独立した論理 review stream で実施する。各 stream は初期 finding 生成完了前に兄弟 stream の finding を参照しない。対象・目的・制約・確定済み review strategy は共有を許容する。初期 challenge 完了後に finding を統合し、duplicate を整理して counter-challenge / convergence へ進む。独立 stream、finding lifecycle、semantic stagnation 制御の詳細は SPEC「challenge 段階」「finding lifecycle」「審議進展の意味状態判定と semantic stagnation 制御」を正とする。
 
 対称的相互反証、戦略メタ反証、争点状態遷移、finding と正規結果の形式、本質的争点と非本質的批判の判定、自律審議とユーザー質問、サブエージェント利用と重複統合、完了条件、出力契約の詳細手続きは [references/adversarial-review-protocol.md](references/adversarial-review-protocol.md) に置く。
 
