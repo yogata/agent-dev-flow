@@ -219,6 +219,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | SPEC | status | タイトル | 責務 |
 |------|--------|---------|------|
 | authoring/command-file-format.md | accepted | コマンドファイルフォーマット規約 | command 定義ファイルの Markdown 構成標準。本文構造・見出し構成・Step 表現・記述形式を扱い、`foundations/patterns.md`（共通文書モデル規約）と責務分離。authoring/ は REQ/SPEC/SKILL/guide 執筆規約の集約先として将来拡張余地あり（即時統合・authoring/ 削除は行わない） |
+| authoring/dependency-version-compatibility.md | draft | 外部依存メジャーバージョン互換性管理ガイド | 外部依存のメジャーバージョン互換性事前確認手順、影響範囲スキャン方法、検査器と対象コードの TypeScript バージョン整合要件 |
 
 > 上記分類は段階的に適用する。
 > 既存直下SPECの移送は inspect/backlog 経由で個別に行い、一括移送しない。
