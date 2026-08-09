@@ -34,7 +34,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | `/agentdev/intake-from-github` | クローズ済み Issue/PR から残課題を抽出し inbox item を生成する |
 | `/agentdev/intake-promote` | inbox item を review、分類、整形、振り分けし promoted/ に保存する |
 
-## references/ 構成一覧
+## 参考文献
 
 | ファイル | 内容 |
 |----------|------|

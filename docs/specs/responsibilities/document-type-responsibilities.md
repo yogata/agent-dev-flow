@@ -353,3 +353,12 @@ guides/README のみ全規範を適用する。
 - 非規範 Report へ規範要件または必達条件を移さない
 - 配置判定は document-model の 6 処置モデル（KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）で行う
 - ADR-001 の 10シナリオの実行結果は Release Report、定義は SPEC へ配置する
+
+## SKILL.md 見出し言語方針
+
+SKILL.md の見出し言語は日本語に統一する（ユーザー判断確定）。
+
+### 方針
+
+- 英語見出し `## references/` を使用する9件を `## 参考文献` へ修正する
+- 新規 SKILL.md は日本語見出しをデフォルトとし、運用を標準化する

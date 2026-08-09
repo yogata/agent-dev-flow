@@ -140,7 +140,7 @@ spec-save は本スクリプト群を bash 経由で呼び出し、JSON 結果�
 - SPEC lifecycle と spec-save の導入（本体 ADR 参照）
 - REQ/SPEC 責務分離、script 所有権（本体 REQ 参照）
 
-## references 一覧
+## 参考文献
 
 SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える。
 

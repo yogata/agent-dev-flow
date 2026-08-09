@@ -69,7 +69,7 @@ Skill の品質基準は本スキルの範囲とする。
 Command に何を置き、何を置かないかの境界定義は `artifact-contracts.md`（artifact-contracts SPEC）を参照。
 Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
 
-## references 一覧
+## 参考文献
 
 SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える。
 

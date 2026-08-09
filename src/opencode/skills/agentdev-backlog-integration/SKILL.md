@@ -43,7 +43,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 |----------|------|
 | `.opencode/commands/agentdev/backlog-review.md` | 採用済み成果物を読み込み、分析し、統合、分割判定、矛盾検出を経て RU を生成する |
 
-## references/ 構成一覧
+## 参考文献
 
 | ファイル | 内容 |
 |----------|------|

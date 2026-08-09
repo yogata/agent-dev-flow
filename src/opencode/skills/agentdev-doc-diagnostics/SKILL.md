@@ -76,7 +76,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | 文意品質（LLM 表現、空虚語、英語混じり、実行主体分類） | `agentdev-doc-writing` | ルーティングのみ |
 | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約 | `agentdev-doc-diagnostics`（本スキル） | 一次所有 |
 
-## references/ 構成一覧
+## 参考文献
 
 | ファイル | 内容 |
 |----------|------|
