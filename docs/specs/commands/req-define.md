@@ -441,7 +441,38 @@ auto_gate:
 
 ## adversarial-review 挿入境界（経路A）
 
-経路A の review 挿入境界: 発動条件（Scale 判断後・ADR判断前・要件doc生成前）、
-review 対象確定位置、採用後戻り先（ADR finding は Step 6 へ）、
-最初の副作用（要件doc保存）との順序を規定する。
+本節は req-define への adversarial-review caller integration（経路A、REQ-015-004）の挿入境界を正典として所有する。共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review SPEC](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は経路A 固有の発動条件、review 対象確定位置、採用後戻り先、最初の副作用との順序のみを規定する（REQ-014-011）。
+
+### 挿入位置（REQ-015-004）
+
+review 挿入位置は「Scale 判断後・ADR判断前・要件doc生成前」と一意に特定可能である。現行 Step 構造への対応付けを次に示す。
+
+| 条件 | feature の場合 | feature 以外（bugfix, maintenance, docs_chore）の場合 |
+|---|---|---|
+| Scale 判断後 | Step 9（Scale判断）完了後 | Step 8（work_type 判定）完了後。Scale判断 は feature のみ実行するため、work_type 判定完了をもって意味的完成とする |
+| ADR判断前 | Step 6（ADR判断）の判断結果が Step 10（ドラフト保存）で永続化される前 | 同左 |
+| 要件doc生成前 | Step 7（要件doc生成）の成果物が Step 10（ドラフト保存）で永続化される前 | 同左 |
+
+review は Step 9（feature 以外は Step 8）完了後、Step 10（ドラフト保存）の前に挿入する。Step 6（ADR判断）および Step 7（要件doc生成）は当該時点で実行済みであるが、その成果物は Step 10 で永続化されるまで確定扱いとならない。review の finding は Step 6、Step 7 の成果物へ反映可能であり、ADR finding は Step 6（ADR判断）へ戻す。
+
+### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
+
+発動条件判定と review 呼出を分離する（REQ-015-001）。発動条件判定 Step は次の条件を評価する。
+
+- **ユーザー明示指定時発動**: ユーザーが req-define 実行中に adversarial-review の実施を明示的に指定した場合に発動する（REQ-015-002）。adversarial-review は任意助言手段であり（REQ-014-001）、req-define の標準フローへ自動発動しない。
+- **条件非該当時の従来フロー維持**: ユーザー明示指定がない場合、従来フロー（review を挿入せず Step 10 へ進む）を維持する（REQ-015-003）。
+
+### review 呼出 Step（REQ-015-001）
+
+発動条件判定 Step で発動と判定された場合、review 呼出 Step で adversarial-review を呼び出す（REQ-015-001）。
+
+- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts SPEC](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
+- **review 対象**: 当該 req-define で生成した要件候補（draft-data、`agreed_items`、`artifact_actions`、ADR判断結果、Scale判断結果）。
+- **採用後戻り先**: accepted finding のうち ADR 関連の finding は Step 6（ADR判断）へ戻し再評価する。要件展開に関わる finding は該当 Step（Step 5 以降）へ戻す。accepted finding の対象候補への反映は req-define（呼出元）の責務である（REQ-014-006）。
+- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、Step 10（ドラフト保存）へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[workflow-contracts SPEC](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節）。
+- **呼出失敗時**: adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
+
+### 最初の副作用（要件doc保存）との順序
+
+review は Step 10（ドラフト保存）より前に実行する。ドラフト保存が req-define の最初の副作用（`.agentdev/drafts/req-draft-{topic-slug}.md` のファイル作成）であるため、review は最初の副作用の前に挿入される。review の結果、要件候補が変更された場合は、Step 10 で保存されるドラフトへ反映する。
 
