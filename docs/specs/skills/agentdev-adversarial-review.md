@@ -201,3 +201,7 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 | review 経路での parent_decision_required / decision_context 適用、副作用境界 | delegation-contracts SPEC |
 | 各 command の個別呼出統合（発動条件、挿入境界、戻り先） | 各 command SPEC（REQ-015） |
 | caller integration 関連の domain skill 振る舞い | 各 domain skill SPEC（REQ-015） |
+
+### 横断整合検証状態（REQ-016）
+
+本マトリックスの遵守状態は REQ-016（横断整合）により検証済みである（#1972）。7経路（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）+ case-auto 統合後について、QG 重複（REQ-016-001）、HITL 重複（REQ-016-002）、新規永続成果物混入（REQ-016-003）、case-auto 伝播 regression（REQ-016-004）、責務重複（REQ-016-005）、command 定義本体と SPEC の Step 表現整合（REQ-016-006）のいずれも不整合なし。共通契約節（REQ-014-006〜011）の具体性も精査済みで補完不要。
