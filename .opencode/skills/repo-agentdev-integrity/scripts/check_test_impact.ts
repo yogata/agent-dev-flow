@@ -47,6 +47,17 @@ const SCAN_EXCLUDE_DIRS = [
   "docs/adr/retired/",
 ];
 
+// basename 照合の停止リスト。汎用名称は basename 単独では照合しない
+// （full-path 照合は継続して有効）。REQ/ADR ID 照合にも影響しない。
+const BASENAME_STOPLIST = new Set([
+  "README.md",
+  "_template.md",
+  "CHANGELOG.md",
+  "LICENSE",
+  "package.json",
+  "tsconfig.json",
+]);
+
 // REQ/ADR ID 抽出用正規表現。
 const REQ_ID_PATTERN = /\b(REQ-\d{3})\b/g;
 const ADR_ID_PATTERN = /\b(ADR-\d{3})\b/g;
@@ -354,8 +365,9 @@ function findReferencesInTest(
         }
       }
     }
-    // 2. SPEC basename 参照
+    // 2. SPEC basename 参照（汎用名称は stoplist で除外、full-path は別途照合）
     for (const [basename, scs] of basenameSet) {
+      if (BASENAME_STOPLIST.has(basename)) continue;
       if (line.includes(basename)) {
         for (const sc of scs) {
           const key = `${sc.relPath}|basename|${lineNumber}`;
