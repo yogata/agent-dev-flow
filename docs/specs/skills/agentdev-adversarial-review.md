@@ -187,6 +187,14 @@ Reviewer と Reviewee は双方とも、必要に応じて複数のサブエー�
 ## 副作用境界
 agentdev-adversarial-review 自身による対象ファイル変更、レビュー結果のファイル保存、commit、push、merge、Issue と PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認代行を行わない。レビュー結果保存用の新しい正規成果物種別を導入しない。
 
+## Artifact Graph 利用
+
+agentdev-adversarial-review は Artifact Graph をレビュー対象候補, evidence の探索に利用する。論点候補には複数の規範的成果物から到達する対象, 複数経路, cycle, relation 集中ノード, isolated node, 複数 owner または governing relation を持つ候補を含む。
+
+Graph から得た情報は未検証 evidence として扱い、Reviewer または Reviewee の対論, 正規成果物確認を経ずに finding を確定しない。Graph はレビュー結論の確定ではなく evidence 探索に利用する。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+
+Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来のレビュー経路で継続し、review を停止しない（fail-open）。
+
 ## QG、通常レビュー、診断との責務分界
 - QG-1〜QG-4 を代替しない。
 - 通常のコードレビュー、テスト、機械的検査を代替しない。

@@ -2,7 +2,7 @@
 title: backlog-review SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-08-10
 ---
 
 # backlog-review SPEC
@@ -50,6 +50,14 @@ updated: 2026-07-24
 - Step 7: 成果成果物削除（RU 生成失敗成果物は削除しない（G06））
 - Step 8: Git 永続化
 - Step 9: 完了報告
+
+## Artifact Graph 利用
+
+backlog-review は入力成果物に含まれる REQ, Decision, SPEC, canonical owner 等の明示情報を起点として既存正規成果物との関係候補を Artifact Graph 経由で取得できる。候補には統合, 分割, depends_on 解決の補助 evidence を含む。
+
+Graph は候補提供者であり、統合, 分割, depends_on, 意味的重複の最終判断は正規成果物本文と独立探索手段での確認後に下す。promoted artifact 自体を Graph の正規 node とすることは必須でない。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+
+Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 
 ## 参照する横断 SPEC
 

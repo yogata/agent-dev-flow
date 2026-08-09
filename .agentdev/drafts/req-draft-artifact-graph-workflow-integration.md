@@ -557,7 +557,18 @@ operation_units:
     depends_on: [OU-002]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      status: saved
+      saved_spec_docs:
+        - path: docs/specs/skills/agentdev-artifact-graph.md
+          operation: update
+          target_areas: [ワークフロー利用, 効果検証]
+      action_to_spec_mapping:
+        ACT-SPEC-001: docs/specs/skills/agentdev-artifact-graph.md (target_area: ワークフロー利用)
+        ACT-SPEC-002: docs/specs/skills/agentdev-artifact-graph.md (target_area: 効果検証)
+      case_open_input:
+        target_spec: docs/specs/skills/agentdev-artifact-graph.md
+        operation: spec-update
 
   - ou_id: OU-004
     source_ru: RU-20260810-01
@@ -581,7 +592,58 @@ operation_units:
       各 consumer の権威動作（利用タイミング、判断基準、fallback）を当該 SPEC へ配置する。
       ACT-SPEC-003〜011 が対応。中央 agentdev-artifact-graph SPEC (OU-003) の共通利用原則を
       参照しつつ、consumer 固有の動作仕様を各 SPEC が所有する。
-    result: {}
+    result:
+      status: saved
+      saved_spec_docs:
+        - path: docs/specs/commands/req-define.md
+          operation: spec-update
+          target_area: Artifact Graph 利用 (new section)
+          action_id: ACT-SPEC-003
+        - path: docs/specs/commands/spec-save.md
+          operation: spec-update
+          target_area: Artifact Graph 利用 (new section)
+          action_id: ACT-SPEC-004
+        - path: docs/specs/commands/case-open.md
+          operation: spec-update
+          target_area: Artifact Graph 利用 (new section)
+          action_id: ACT-SPEC-005
+        - path: docs/specs/commands/case-run.md
+          operation: spec-update
+          target_area: Artifact Graph 利用 (new section)
+          action_id: ACT-SPEC-006
+        - path: docs/specs/commands/case-close.md
+          operation: spec-update
+          target_area: Artifact Graph 利用 (new section)
+          action_id: ACT-SPEC-007
+        - path: docs/specs/commands/backlog-review.md
+          operation: spec-update
+          target_area: Artifact Graph 利用 (new section)
+          action_id: ACT-SPEC-008
+        - path: docs/specs/commands/inspect-docs.md
+          operation: spec-update
+          target_area: Artifact Graph 利用 (new section)
+          action_id: ACT-SPEC-009
+        - path: docs/specs/commands/inspect-skills.md
+          operation: spec-update
+          target_area: Artifact Graph 利用 (new section)
+          action_id: ACT-SPEC-010
+        - path: docs/specs/skills/agentdev-adversarial-review.md
+          operation: spec-update
+          target_area: Artifact Graph 利用 (new section)
+          action_id: ACT-SPEC-011
+      action_to_spec_mapping:
+        ACT-SPEC-003: docs/specs/commands/req-define.md
+        ACT-SPEC-004: docs/specs/commands/spec-save.md
+        ACT-SPEC-005: docs/specs/commands/case-open.md
+        ACT-SPEC-006: docs/specs/commands/case-run.md
+        ACT-SPEC-007: docs/specs/commands/case-close.md
+        ACT-SPEC-008: docs/specs/commands/backlog-review.md
+        ACT-SPEC-009: docs/specs/commands/inspect-docs.md
+        ACT-SPEC-010: docs/specs/commands/inspect-skills.md
+        ACT-SPEC-011: docs/specs/skills/agentdev-adversarial-review.md
+      case_open_input:
+        target_specs: [9 consumer command/skill SPECs]
+        operation: spec-update
 
 test_strategy:
   - id: TS-001

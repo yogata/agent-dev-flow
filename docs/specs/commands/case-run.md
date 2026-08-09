@@ -2,7 +2,7 @@
 title: case-run SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-08-10
 ---
 
 # case-run SPEC
@@ -177,6 +177,14 @@ verification-only PR は case-close Step 3-1 targeted docs guard で files_check
 - PR 本文の verify-only 根拠欄に「実装差分を含まない理由」「根拠成果物または commit」「検証対象」「検証結果」が記録されていること（[case-close.md](case-close.md)「verification-only PR の files_checked 空確認（v2:REQ-0158-002）」参照）
 - case-close は files_checked 空を検出した場合、v2:REQ-0158-002 に基づき verification-only 判定ステップを経て PASS 処理する（false-clean 3層防御との相互作用は case-close SPEC 参照）
 - case-run 側は PR 作成までを責務とし、verification-only 判定自体は case-close が行う（単一書き手: case-close、REQ-011 完了条件チェックボックス専任責務）
+
+## Artifact Graph 利用
+
+case-run での Artifact Graph 利用は REQ-017-010 が定める境界内で補助用途に限定する。補助用途は Issue に記録された対象から予期しない依存または参照が見つかった場合の補助探索, acceptance criteria の検証根拠への到達, case-open 時点からの関係差異確認を含む。
+
+Graph で発見した候補のうち Issue scope 内の内部実装影響は case-run が自律処理する。scope, 完了条件, REQ, Decision, SPEC, 必須品質統制の変更が必要な場合は blocked として case-update 連携とする。証拠源（Graph, rg, filesystem scan の別）にかかわらず case-run は既存 scope を超える変更を自律拡大しない。本制限は REQ-017-010 の境界を変更せず、Graph 利用時の適用を明確化する。
+
+Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 
 ## 参照する横断 SPEC
 

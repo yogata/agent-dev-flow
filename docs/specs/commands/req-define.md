@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-28
+updated: 2026-08-10
 ---
 
 # req-define SPEC
@@ -390,6 +390,12 @@ auto_gate:
 ### 後続ステップへの引き継ぎ
 
 抑止により `auto_ready: false` となった場合、Step 10-2（auto_gate完了ゲート）の既存手順に従い `stop_reasons` をユーザーへ提示し、壁打ち（Step 3）で解消方策を合意する。合意により未確定事項が解消され、(A)(B) いずれの検査も該当しなくなった場合に限り `auto_ready: true` へ更新する。ユーザーが「`auto_ready: false` のまま標準フローで手動実行する」と明示的に選択した場合は `conflict_resolutions` へ記録して継続する（REQ-004-048）。
+
+## Artifact Graph 利用
+
+req-define は既存 REQ、関連 Decision と SPEC、canonical owner、構造的所有者重複、downstream 変更影響候補の探索に Artifact Graph を利用できる。Graph は候補提供者であり、CREATE, APPEND, UPDATE, SPLIT, MERGE, 意味的重複, canonical owner の最終判断は正規成果物本文と独立探索手段（`glob`, `grep`, `rg` 等）での確認後に下す。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+
+Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 
 ## 参照する横断 SPEC
 

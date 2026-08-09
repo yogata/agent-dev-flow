@@ -2,7 +2,7 @@
 title: case-close SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-08-10
 ---
 
 # case-close SPEC
@@ -126,6 +126,12 @@ Step E5（Epic status table 更新）の後、Step E6（最終 Wave 判定）の
 - Step 10: 学びの検知、抽出（`agentdev-learning-capture`、ユーザーに学び有無を問わない（G13）、Capture 回収（PR 本文から intake/learning を分離））
 - Step 11: ドメイン状態永続化（`.agentdev/` 配下を commit/push（learning と intake を同一 commit））
 - Step 12: 完了報告（結果状態の分離報告（GitHub側、`.agentdev`、ブランチ削除））
+
+## Artifact Graph 利用
+
+case-close は Artifact Graph を変更後の関係整合性検証に利用する。確認対象は Graph の生成と鮮度, Graph integrity, unresolved relation, dangling relation, provenance defect, Graph と独立確認結果との差異である。Graph defect と canonical defect を区別する。
+
+Graph 自体の生成または問い合わせ失敗のみを理由に case-close を失敗させず、fail-open して従来の検証経路で継続する。正規成果物側の実不整合が確認された場合は既存の品質ゲート, 受け入れ条件に従って fail とする。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
 
 ## 参照する横断 SPEC
 

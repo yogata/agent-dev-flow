@@ -2,7 +2,7 @@
 title: agentdev-artifact-graph SPEC
 status: draft
 created: 2026-08-08
-updated: 2026-08-09
+updated: 2026-08-10
 spec_logical_division: behavior
 canonical_owner: agentdev-artifact-graph
 ---
@@ -212,18 +212,44 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 
 ## ワークフロー利用
 
-各 command, skill は次の候補取得に Artifact Graph を利用できる。
-
-- `req-define`: 既存REQ、関連DecisionとSPEC、構造的所有者重複の候補取得
-- `spec-save`: 対応REQ、同じ正規所有対象を持つSPEC、関連command、skill、整合性ルールの候補取得
-- `case-open`: 起点成果物から到達できる変更影響、廃止参照、未解決参照の候補取得
-- `case-run`: 実装対象に関係するREQ、SPEC、整合性ルール、周辺成果物の候補取得
-- `case-close`: 鮮度、未解決参照、存在しないノードへの関係、根拠欠落、関係閉包候補の観測
-- `agentdev-adversarial-review`: 複数規範関係、循環、集中ノード、孤立候補、複数経路の論点抽出
+Artifact Graph は以下の4用途で AgentDevFlow workflow に統合する。Graph はすべての用途で候補提供者であり、決定的検査、意味診断、最終判断は各正規所有者が行う。
 
 ### 利用上の防護
 
-グラフ結果を変更対象、操作単位、要件充足、責務重複の確定根拠として使用しない。グラフから候補を取得した後、根拠ファイルを読み、`rg` などの別手段で補完、反証してから判断する。構造的重複候補と意味的な責務重複を区別する。グラフ不在を「影響なし」とする判断を行わない。
+すべての consumer は以下を守る。
+
+- Graph は派生索引であり SSoT ではない。
+- Graph の結果から変更対象、要件充足、責務重複を単独で確定しない。
+- Graph 取得結果の根拠となる canonical source を確認可能とする。
+- 必要に応じて rg, filesystem scan 等の独立手段で補完・反証する。
+- Graph 不在を関連なし、影響なしの根拠にしない。
+- 意味的類似、意味的責務重複を Graph の明示関係と同一視しない。
+
+### Discovery / Impact
+
+req-define, spec-save, backlog-review は関連成果物候補の探索に Artifact Graph を利用する。候補取得後に正規成果物本文および独立探索手段で確認してから最終判断する。
+
+case-open は Issue 対象範囲, 完了条件, test strategy の確定前に Artifact Graph による変更影響候補を評価する。候補は正規成果物または独立した探索手段で確認した上で in scope, verification only, out of scope に分類する。必須品質能力の導出は artifact-quality-control-routing SPEC に従い、Graph の関係から必須 skill を直接決定しない。
+
+### Diagnostics
+
+inspect-docs は Artifact Graph を構造診断候補の探索に利用する。候補には unresolved reference, superseded artifact への現行参照, dangling relation, provenance 欠落, orphan candidate, 不自然な relation path, structural duplicate candidate を含む。決定的検査（参照実在、委譲先 skill 実在等）は ADR-006 が定める通り docs-check, IR-056 が所有し、inspect-docs は意味診断を担当する。構造候補は未検証 evidence として意味診断の入力に利用する。SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を Graph の構造情報だけから確定しない。
+
+inspect-skills は self-hosting augmentation が利用可能な場合、command と skill 関係, command と extension と skill 関係, 予期しない delegation, orphan skill candidate の候補を探索する。委譲先 skill 実在の決定的検査は docs-check, IR-056 が所有する。consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
+
+### Review Evidence
+
+agentdev-adversarial-review は Artifact Graph をレビュー対象候補, evidence の探索に利用する。論点候補は複数の規範的成果物から到達する対象, 複数経路, cycle, relation 集中ノード, isolated node, 複数 owner または governing relation を持つ候補である。Graph から得た情報は未検証 evidence として扱い、対論または正規成果物確認を経ずに finding を確定しない。
+
+### Verification
+
+case-close は Artifact Graph を変更後の関係整合性検証に利用する。確認対象は Graph の生成と鮮度, Graph integrity, unresolved relation, dangling relation, provenance defect, Graph と独立確認結果との差異である。Graph defect と canonical defect を区別する。Graph 自体の生成または問い合わせ失敗のみを理由に case-close を失敗させず、fail-open する。
+
+### case-run の利用制限
+
+case-run での Artifact Graph 利用は REQ-017-010 が定める境界内で補助用途に限定する。補助用途は予期しない依存または参照が見つかった場合の補助探索, acceptance criteria の検証根拠への到達, case-open 時点からの関係差異確認を含む。Graph で発見した候補のうち Issue scope 内の内部実装影響は case-run が自律処理し、scope, 完了条件, REQ, Decision, SPEC, 必須品質統制の変更が必要な場合は blocked として case-update 連携とする。証拠源にかかわらず case-run は既存 scope を超える変更を自律拡大しない。本制限は REQ-017-010 の境界を変更せず、Graph 利用時の適用を明確化する。
+
+各 consumer の権威的な動作仕様（利用タイミング、判断基準、fallback 動作）は各 command/skill SPEC が所有し、本 SPEC は Graph 提供能力と共通利用原則の概要を提供する。
 
 ## 障害耐性
 
@@ -231,7 +257,33 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 
 ## 効果検証
 
-標準スキルは Graph と `rg` 等の独立確認結果の差異を検出、分類、是正、回帰検証する verification feedback 機構を持つ。差異は原因分類（canonical defect / graph defect）し、Graph 側を直接手編集せず原因側を修正して再生成する。
+Artifact Graph の検証を2種類に分離する。
+
+### Parser / Graph regression
+
+Graph parser, augmentation, relation extraction, provenance の正確性を検証する。本層は REQ-020 が所有し、既存 extension 構造等を用いた代表 fixture で維持する。詳細は REQ-020 および対応 SPEC を参照。
+
+### Workflow effectiveness
+
+実際の AgentDevFlow workflow で発生する質問を対象とする。対象質問は以下を含む。
+
+- REQ の変更影響候補
+- 同一 owner の SPEC
+- 関連 command, skill, integrity rule
+- command から実際に委譲される skill
+- superseded artifact への現行参照
+- 変更後の dangling relation
+
+representative query suite と ground truth を用意し、Graph 利用時と独立探索時を以下の観点で比較する。
+
+- 必要候補の recall
+- false candidate
+- canonical source 到達可否
+- Graph-only miss
+- independent-search-only miss
+- 探索操作量
+
+Artifact Graph 自身の接続確認のみを workflow effectiveness の成立根拠としない。
 
 ## Git管理
 
