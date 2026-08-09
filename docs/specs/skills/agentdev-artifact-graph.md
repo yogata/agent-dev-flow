@@ -2,7 +2,7 @@
 title: agentdev-artifact-graph SPEC
 status: draft
 created: 2026-08-08
-updated: 2026-08-08
+updated: 2026-08-09
 spec_logical_division: behavior
 canonical_owner: agentdev-artifact-graph
 ---
@@ -116,6 +116,51 @@ augmentation が追加可能な relation_type 例: `delegates_to`, `governs`
 
 現行成果物、廃止済み成果物、`v2:` で識別される過去版、コードブロック内の例示、検出規則を説明する識別子を区別する。
 
+## 解析品質と回帰検証
+
+### 解析スクリプトの対応 YAML 構造の明示契約
+
+agentdev-artifact-graph の解析スクリプト群（parse.ts 等）は対応する YAML 構造を明示する（REQ-020-001）。対応構造は次を含む。
+
+- frontmatter（`id`, `title`, `status`, `created`, `updated`, `superseded_by` 等）
+- 既知の構造化 field（`spec_logical_division`, `canonical_owner` 等）
+- extension 仕様の構造化 field（`context.paths`, `rules.skill`, `checks.skill` 等）
+- その他抽出順序で明示した構造（Markdown リンク、既知の見出し、表内識別子）
+
+対応構造の追加、変更は SPEC 更新で明示し、スクリプトの内部実装へ暗黙に埋め込まない。
+
+### 未対応 YAML 構造の診断契約
+
+解析スクリプトは入力 YAML に未対応構造を検出した場合、構造の種別と出現位置（path、見出し、行範囲）を診断情報として `diagnostics.json` または標準エラー出力へ出す（REQ-020-002）。診断は抽出失敗ではなく、抽出範囲外の入力が存在することの報告である。fail-open 原則に従い、未対応構造の存在だけでグラフ生成を停止しない。
+
+### 代表質問回帰検証への実入力組込み契約
+
+agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリプトへの実入力として組み込む（REQ-020-003）。実行契約は次のとおり。
+
+- **入力**: 実入力 fixture（後述の設計原則に従ってキャプチャした10件の代表質問）
+- **実行契機**: 解析スクリプト、抽出ルールの変更時、および定期回帰検証
+- **期待出力**: 各代表質問に対して Graph が返すノード、関係、経路、根拠
+- **合格基準**: 過去の期待出力とバイト単位または要素単位で一致すること。差異がある場合は変更影響を文書化し、期待出力を更新した上で再検証する
+
+### 代表質問10件の選定基準
+
+代表質問10件は次のいずれかの基準で選定し、合計10件を上限とする（REQ-020-005）。
+
+1. **高頻度運用質問**: 過去運用での高頻度質問上位10件。頻度は問い合わせ履歴、利用ログ、Issue 等の実績データから集計する
+2. **経路クラス別代表サンプル**: Artifact Graph 経路クラス別（隣接、パス、プロベナンス、発見的抽出）の代表サンプルを合計10件上限で抽出
+
+選定基準の採用、差し替えは SPEC 更新で明示し、実装に埋め込まない。
+
+### 実入力 fixture 設計原則
+
+実入力 fixture は次の設計原則に従う（REQ-020-004）。
+
+- **選定基準の明示**: 各 fixture がどの代表質問、経路クラス、入力パターンを代表するかをメタデータとして保持する
+- **配置先**: fixture は標準スキル配下の所定ディレクトリ（例: `tests/fixtures/`）へ配置し、配布物と明確に区別する
+- **再現性**: 同一 fixture から同一の Graph 結果が得られること。`manifest.json` の `input_digest` 等の決定論性条件を満たす
+- **機密情報除去**: 実プロジェクト由来の入力を fixture 化する場合は、REQ/ADR/SPEC の具体内容を抽象化またはダミー化し、機密情報を含めない
+- **版管理**: fixture の追加、変更、廃止は SPEC 更新で明示し、暗黙に変更しない
+
 ## 根拠追跡
 
 すべてのノードと関係から、次の根拠情報を取得できるようにする。
@@ -217,6 +262,10 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 - **決定論性**: 同一入力から生成した5ファイルがバイト単位で同一であること（REQ-012-013）
 - **provenance 完全性**: 全ノード、関係から根拠情報が取得できること
 - **verification feedback**: Graph と独立確認結果の差異検出、分類、是正、回帰検証が動作すること（REQ-012-011）
+- **対応 YAML 構造の明示**: 解析スクリプト群（parse.ts 等）が対応する YAML 構造を明示していること（REQ-020-001）
+- **未対応構造の診断**: 解析スクリプトが未対応 YAML 構造を検出し、構造種別と出現位置を診断情報として出力すること（REQ-020-002）
+- **代表質問回帰検証**: 実入力 fixture（10件）を解析スクリプトへの入力として組み込み、過去期待出力との一致を検証すること（REQ-020-003、REQ-020-005）
+- **fixture 設計原則の遵守**: 実入力 fixture が選定基準明示、配置先、再現性、機密情報除去、版管理の各原則を満たすこと（REQ-020-004）
 
 ## See Also
 
@@ -224,5 +273,6 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 - [../foundations/document-model.md](../foundations/document-model.md)（文書モデル）
 - [../../requirements/REQ-012.md](../../requirements/REQ-012.md)（Artifact Graph 標準化 REQ）
 - [../../requirements/REQ-013.md](../../requirements/REQ-013.md)（旧文書探索経路インデックス依存除去 REQ）
+- [../../requirements/REQ-020.md](../../requirements/REQ-020.md)（Artifact Graph 解析品質と検証 REQ）
 - [../../adr/ADR-007.md](../../adr/ADR-007.md)（Artifact Graph 標準化と配布スキル昇格 ADR）
 - ADR-002（OpenCode ソース・プロジェクション分離）
