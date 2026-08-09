@@ -1,7 +1,7 @@
 ---
 draft_type: req_draft
 topic_slug: adv-review-caller-alignment
-status: saved
+status: case_opened
 created_at: 2026-08-09T19:00:00+09:00
 saved_at: 2026-08-10T00:40:21+09:00
 source_rus:
