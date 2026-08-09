@@ -97,6 +97,18 @@ CREATE 前に APPEND/UPDATE 候補を必ず評価すること。
 
 `agentdev-workflow-lifecycle` で standard/large を判定。large 時はユーザーと分解計画を協議。9-1 実装スコープシグナル確認（ドラフト内に修正候補リスト、検出事項カタログ、影響ファイル一覧等の実装詳細セクション存在時に large 昇格判定、昇格理由をユーザー提示）の詳細は `agentdev-workflow-lifecycle` を参照
 
+### adversarial-review 挿入境界（経路A、REQ-015-004）
+
+Step 9（Scale判断: feature）または Step 8（work_type 判定: feature 以外）完了後、Step 10（ドラフト保存）の前に挿入する。adversarial-review は任意助言手段であり（REQ-014-001）、標準フローへ自動発動しない。発動条件判定と review 呼出を分離する（REQ-015-001）。
+
+- **発動条件判定（REQ-015-002、REQ-015-003）**: ユーザーが adversarial-review の実施を明示的に指定した場合に発動する（REQ-015-002）。指定がない場合は従来フロー（review を挿入せず Step 10 へ進む）を維持する（REQ-015-003）。
+- **review 呼出（REQ-015-001）**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、ADR判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う。
+  - ADR finding は Step 6（ADR判断）へ戻し再評価する。要件展開に関わる finding は該当 Step へ戻す。accepted finding の反映は呼出元の責務である（REQ-014-006）。
+  - 未解決のユーザー判断事項が残る場合、Step 10（ドラフト保存）へ進まない（REQ-014-009）。工程委譲起源であるため既存 status に unresolved 判断事項を付加する（REQ-014-012）。
+  - 呼出失敗時は silent skip を禁止し、従来フローを維持する（REQ-014-010）。
+
+詳細な挿入境界は req-define command SPEC（extension 経由）「adversarial-review 挿入境界（経路A）」節を正とする。
+
 ### Step 10: ドラフト保存
 
 全 work_type（feature/ bugfix/ maintenance/ docs_chore）で `.agentdev/drafts/req-draft-{topic-slug}.md` に保存。Step 7 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で保存する。標準データモデル fields（`work_type`, `scale`, `summary`, `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `test_strategy`, `review_dispositions`, `case_open_hints`）を保持する。`workflow_route` は派生値として保存しない。後続工程の分岐は `artifact_actions` の存在で決定する（`artifact: req`/`adr` → req-save、`artifact: spec` → spec-save）。`operation_units` を含め、`execution_groups` は出力しない。`summary` 等の人間可読セクションは補助的であり下流処理の正として扱われない
