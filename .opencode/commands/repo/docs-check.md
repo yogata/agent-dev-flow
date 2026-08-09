@@ -26,7 +26,7 @@ agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理�
 
 ### Step 1: スクリプト実行
 
-**実行ランナー（REQ-0108-054）**: 本 command が呼び出す検査スクリプト群（`check_integrity.ts`、`check_command_format.ts`、`check_extensions.ts`、`check_distribution_boundary.ts`、`check_changed_docs.ts`、`check_templates.ts`、`lint_skills.ts`）は TypeScript 直接実行と `require()` / `import` 混在構文、併設テストの `bun:test` 依存を前提とするため、実行ランナーは **Bun** とする。`node` 等の Bun 以外のランナーで直接起動すると `ReferenceError: require is not defined` 等 ESM 解釈エラーが発生する。スクリプトは `bun run <script-path>` 形式で起動すること。
+**実行ランナー（REQ-0108-054）**: 本 command が呼び出す検査スクリプト群（`check_integrity.ts`、`check_command_format.ts`、`check_extensions.ts`、`check_distribution_boundary.ts`、`check_changed_docs.ts`、`check_templates.ts`、`lint_skills.ts`、`check_autogen_freshness.ts`）は TypeScript 直接実行と `require()` / `import` 混在構文、併設テストの `bun:test` 依存を前提とするため、実行ランナーは **Bun** とする。`node` 等の Bun 以外のランナーで直接起動すると `ReferenceError: require is not defined` 等 ESM 解釈エラーが発生する。スクリプトは `bun run <script-path>` 形式で起動すること。
 
 `repo-agentdev-integrity` の検査スクリプト（`.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`）を `bun run` で実行。検査カテゴリ・対象パス・検出結果の分類は SKILL.md（.opencode/skills/repo-agentdev-integrity/SKILL.md）の検査カテゴリ定義を authoritative source とする
 - **コマンド形式検査（IR-049）**: `check_command_format.ts` を `bun run` で併せて実行する。`--root` にリポジトリルートを指定し、終了コード1は docs-check 全体の失敗として扱う
@@ -34,6 +34,7 @@ agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理�
 - **実行 profile（Issue #1928 / WP-3）**: `check_integrity.ts` は `--profile source|installed|release` を取り、既定は `source`。docs-check は明示しない限り `source`（既定）で実行する。`installed` は配置後検査、`release` は配布アーカイブ検査（`--archive <zip>` 必須）で、いずれも `docs/specs/integrity/integrity-contracts.md`「実行プロファイル分離」と `scripts/package-release-archive.ps1` / `scripts/install-from-archive.ps1` を参照
 - **IR-056（project extensions 整合性）**: `check_extensions.ts`（`.opencode/skills/repo-agentdev-integrity/scripts/check_extensions.ts`）を `bun run` で併せて実行し、IR-056 として strict に取り扱う（project extensions SPEC、project extensions 読み込み標準 skill）。check_extensions.ts の strict failure は docs-check 全体を fail とする
 - **配布物参照境界（配布 command/skill 本文の具体参照禁止）**: `check_distribution_boundary.ts`（`.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts`）を `bun run` で併せて実行する。配布 command/skill 本文（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`）に含まれる具体ID（`ADR-NNNN`、`REQ-NNNN`）、具体パス（`docs/(adr|requirements|specs)/<file>.md`、但し README.md とテンプレート表記は除外）、固定URL（blob/raw）を検出し、厳格に取り扱う。check_distribution_boundary.ts の failure は docs-check 全体を fail とする
+- **AUTOGEN ブロック鮮度検出 gate（REQ-010-059、autogen-freshness-gate SPEC）**: `check_autogen_freshness.ts`（`.opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.ts`）を `bun run` で併せて実行する。AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->`〜`<!-- AUTOGEN:END -->`）を含む索引ファイル群について、ソース（frontmatter / ファイル名 / status）の rename や status 変更後に AUTOGEN ブロックが陳腐化しているかを検出し、鮮度種別（rename / status_change / content_change）を分類して報告する。check_autogen_freshness.ts の strict failure（stale blocks 検出）は docs-check 全体を fail とする。不合格時は `bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` で AUTOGEN ブロックを再生成すること（自動修復は行わない、SPEC「不合格時の処置」）。IR-061（check_integrity.ts）と同一不整合を検出し得るが、両検査は独立して実施し、いずれか単独の実施要否にも他方の結果は影響しない
 
 ### Step 2: レポート確認・Finding整理
 
