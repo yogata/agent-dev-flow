@@ -53,6 +53,25 @@ REQ-{req_number}
   on_failure: |
  [不合格時の処置]
 
+## Execution Contract
+<!-- 【必須】 -->
+
+<!-- Execution Contract: REQ-017 Issue Execution Contract。case-open が新規 Issue 作成時に付与する必須セクション。本セクションの存在有無が presence-based 判定の識別子となる（AG-012、REQ-017-014）。case-run は本セクション存在有無で新旧 Issue を識別する -->
+### 変更対象成果物
+- （artifact type と対象パスのリスト）
+
+### 必須品質統制
+- （artifact-quality-control-routing SPEC に基づく能力キーと検証項目）
+
+### 関連 ADR 拘束条件
+- （該当 ADR と完了条件/test strategy への反映）
+
+### scope-affecting impact candidate
+- （case-open が事前探索した候補）
+
+### adversarial-review 発動契約（任意）
+- （ユーザー明示指定時のみ記録）
+
 ## レビュー判断
 <!-- 【必須】 -->
 
