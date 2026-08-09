@@ -41,6 +41,16 @@ Case に対して実装実行を実行担当サブエージェント経由で委
 - **Step 3**: 関連ADR特定（`docs/adr/README.md` を読み込み、関連ADRがあれば個別に読み込み、実装がADRの決定事項に矛盾しないことを確認）
 - **Step 4**: work_type 判定（`agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定、scale は feature のみ standard/large、workflow_route は都度導出し保存しない）
 
+### Step 4-1: execution contract 消費境界（REQ-017）
+
+case-run は Issue に確定済みの execution contract を消費境界として扱う。消費原則、runtime-only 判断の維持、blocked 遷移と case-update 連携、新旧 Issue 互換運用、work_type/scale 確認の縮約は case-run command SPEC（extension 経由）「execution contract 消費境界」節を正とする。本 Step は消費原則を Step 2〜4 の読取・確認結果へ適用することを宣言する。
+
+- **契約消費原則**: 完了条件、test strategy、必須品質統制を実行契約として扱う。完了条件の不足、曖昧さ、矛盾、実現不能を検出した場合は自律補完せず blocked とする。test strategy を新規設計せず記録済み項目を実行する。必須品質統制の適用要否を再判断せず記録済み test strategy を実行する。work_type/scale/Issue structure を再分類して実行契約を変更しない
+- **runtime-only 判断の維持**: worktree 状態確認（REQ-006-023）、QG-3 前置 staleness check（Step 5-3、REQ-006-030）、実 diff 検査、実装結果・test 実行結果は case-run の安全検査として維持し、execution contract 確定へ移管しない
+- **blocked 遷移と case-update 連携**: 完了条件の不足・曖昧さ・矛盾・実現不能の検出、scope-affecting impact candidate の発見（既存 scope 内を超える変更が必要）、関連 ADR への適合確認で新たな拘束 ADR の必要性が判明した場合、必須品質統制の追加変更が必要な場合、Issue metadata・構造・実態の矛盾検出時は blocked とし、Issue 更新は case-update へ委譲する（case-run 単独では Issue 本文を書き換えない）
+- **新旧 Issue 互換運用**: Issue 本文の execution contract 必須セクション（Execution Contract セクション、必須品質統制セクション）存在有無により新旧 Issue を識別する（presence-based 判定）。必須セクション存在: 新契約 Issue として扱い上記契約消費原則を適用。必須セクション不存在: legacy Issue として扱い、新契約項目欠落のみを理由に一律 blocked にしない（AG-010、REQ-017-013）
+- **work_type/scale 確認の縮約**: Step 4 の work_type 確認は再分類ではなく metadata 整合確認へ縮約して維持する（AG-008、REQ-017-011）
+
 ### Step 5: Worktree作成、ブランチ準備
 
 `agentdev-git-worktree` に従って実行。`origin/main` をベースとして明示的に指定。べき等チェック: worktree既存時は作成スキップ。**Wave 実行時、PR merge 後再開時は worktree 作成前に `git fetch origin` を実行し origin/main の鮮度を確認すること**。詳細手順は `agentdev-git-worktree` 参照

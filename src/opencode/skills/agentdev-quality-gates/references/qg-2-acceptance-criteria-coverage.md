@@ -87,11 +87,33 @@ Epic Issue の場合、テスト戦略が Epic の「対象外」記述と矛盾
 - **warn**: テスト戦略と対象外の関係が曖昧。QG-4 での再検出リスクとして警告。
 - **pass**: Epic 対象外とテスト戦略が整合している、または Epic でない（対象外セクション不存在）。
 
+### 8. artifact-specific quality control 投影検証（REQ-017 拡張）
+
+REQ-017 execution contract 確定を支援するため、artifact-specific quality control の test strategy への投影を検証する（AG-002、REQ-017-003）。対応表は artifact-quality-control-routing SPEC を正とする。
+
+検証項目:
+
+- (a) 変更予定成果物から導出される全ての必須品質能力が test strategy へ反映されていること
+- (b) 各 test strategy 項目が3要素（verification、pass_criteria、on_failure）を持つこと（REQ-008-048 の維持）
+- (c) 完了条件が成果状態であり、必須品質能力の呼出自体が完了状態とされていないこと（AG-002、REQ-017-003）
+
+適用範囲:
+
+- 新規 Issue 作成時（case-open Step 1、Step 5、Step 15 で実行）
+- case-update による新契約更新時
+- legacy Issue（Execution Contract 必須セクション不存在）には適用しない（presence-based 判定、AG-010、REQ-017-013）
+
+判定:
+
+- **fail**: 変更予定成果物から導出される必須品質能力が test strategy に反映されていない、または完了条件が必須能力の呼出自体を完了状態としている。
+- **warn**: 必須品質能力の反映はあるが、一部の test strategy 項目で3要素構造が崩れている。
+- **pass**: 全ての必須品質能力が test strategy へ反映され、各項目が3要素を持ち、完了条件が成果状態として記述されている。legacy Issue は本観点の対象外（pass と同等扱い）。
+
 ## pass/ warn/ fail 基準
 
-- **pass**: 上記 1〜7 の全てを満たす。全必達要件が完了条件に traceable に対応づけられ、数値閾値と対象外整合性も確認済み。
+- **pass**: 上記 1〜8 の全てを満たす。全必達要件が完了条件に traceable に対応づけられ、数値閾値と対象外整合性も確認済み、artifact-specific quality control の投影も検証済み。legacy Issue（Execution Contract 必須セクション不存在）は観点8を適用せず観点1〜7で判定する。
 - **warn**: 対応づけはあるが表現が曖昧、または一部網羅性に疑義がある、閾値根拠が曖昧。Issue 作成可能（警告併記）。
-- **fail**: 必達要件の完了条件への対応が欠落している、完了条件セクション自体が欠けている、到達不能な数値閾値が設定されている、対象外と矛盾するテスト戦略が含まれる。Issue 作成前に req-define 差し戻しを推奨。
+- **fail**: 必達要件の完了条件への対応が欠落している、完了条件セクション自体が欠けている、到達不能な数値閾値が設定されている、対象外と矛盾するテスト戦略が含まれる、必須品質能力が test strategy に反映されていない、完了条件が必須能力の呼出自体を完了状態としている。Issue 作成前に req-define 差し戻しを推奨。
 
 ## Epic flow での適用
 

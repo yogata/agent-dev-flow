@@ -38,6 +38,17 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 **Step 2-3/2-4/2-5**: 識別子中心の記載粒度ガイドライン（2-3、case-run の QG-3 前置 staleness check の入力前提、詳細・記載例は `agentdev-issue-management` 参照）、完了条件展開前の最新状態再確認（2-4、同日内複数 PR マージ後・順次 Wave 実行時の後続 Wave Issue 起票で必須、識別子存在確認を主軸）、review_dispositions の読取・evidence 再確認・証跡転記（2-5、AG-008、consumer 契約は case-open command SPEC extension 経由、evidence 失効時は停止し `stale_target` へ更新）の各詳細は `agentdev-issue-management`、case-open command SPEC（extension 経由）を参照
 
+**Step 2-6: execution contract 確定ステップ（EC-1〜EC-8、REQ-017）**: Issue 本文生成前に次の確定ステップを実行し、結果を Issue 本文の対応セクション（対象範囲、test strategy、完了条件、Execution Contract セクション）へ反映する。詳細な判定規則、対応表は case-open command SPEC（extension 経由）「execution contract 確定ステップ」節、artifact-quality-control-routing SPEC（extension 経由）を正とする。
+
+- **EC-1: 変更対象成果物の確定** — 合意済み要件doc の `artifact_actions` から変更予定成果物を抽出し、Issue 本文の「対象範囲」セクションへ確定する
+- **EC-2: 必須品質統制の導出と test strategy 投影** — artifact-quality-control-routing SPEC の合成規則に従い変更予定成果物の種別から必須品質能力を導出する。各能力について test strategy 項目を生成し、Issue 本文の test strategy セクションへ投影する
+- **EC-3: 完了条件の確定** — 合意内容から成果状態を抽出し、Issue 本文の完了条件セクションへ確定する。実行手段、検証手段は test strategy へ分離する。必須品質能力の呼出自体が利用者要求でない限り、Skill 呼出を完了条件化しない（AG-002、REQ-017-003）
+- **EC-4: 関連 ADR 拘束条件の特定と反映** — Issue の実装を拘束する関連 ADR を特定し、必要な制約を完了条件または test strategy へ反映する
+- **EC-5: 予定変更内容から事前判定可能な追加検証条件の展開** — 「関数削除時は全利用箇所を検査する」等、予定変更内容から事前判定可能な検証条件を test strategy へ展開する。case-open が追加できる test strategy は合意済み変更対象と共通ルールから決定的に導ける必須検証に限定し、新しい利用者要求を生成しない
+- **EC-6: scope-affecting impact candidate の探索と反映** — Issue 作成前に変更影響候補を探索し、scope、完了条件、test strategy に影響する候補を execution contract へ反映する
+- **EC-7: adversarial-review 発動契約の永続化** — ユーザー明示指定による adversarial-review 発動契約が Issue 作成前に判明している場合、Issue 本文の契約セクションへ永続化する（経路F 拡張）
+- **EC-8: execution contract 必須セクションの付与** — 新規 Issue 作成時、新契約識別用の必須セクション（Execution Contract セクション、必須品質統制セクション）を Issue 本文へ付与する。presence-based 判定により新旧 Issue を識別する（AG-012、REQ-017-014）。テンプレート（`issue_desc_feature.md`、`issue_desc_child.md`）の Execution Contract セクション構造は `agentdev-workflow-templates` を参照
+
 ### Step 3: マルチREQ入力判定
 
 入力要件doc数を確認。単一REQ → Step 4。複数REQ または draft-meta `scale: large` → **マルチREQ Epic flow**（Step 5〜）。OU モード時: Step 1-1 で選択した OU が複数または `scale: large` を含む場合 → Epic flow に分岐（Step 3-1 へ）
