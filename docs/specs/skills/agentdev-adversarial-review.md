@@ -155,7 +155,49 @@ agentdev-adversarial-review 自身による対象ファイル変更、レビュ�
 
 ## adversarial-review caller integration 共通契約
 
-caller integration（7コマンド + case-auto からの呼出）の共通契約層を正典として所有する。
-入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件と停止条件4点、任意性、
-副作用禁止、QG/HITL 非代替、正規所有者マトリックスを規定する。
-詳細パラメータ・入力フィールド構成は本 SPEC の参照節へ配置する。
+本節は req-define、req-save、spec-save、case-open、case-run、case-close、case-update の7コマンドおよび case-auto からの呼出（caller integration）が共通に依拠する契約を正典として所有する（REQ-014-003）。caller integration 用の新規永続 schema を作成せず、本 SPEC が共通契約の正規所有者となる。詳細パラメータ、入力フィールド構成、enum 値は本 SPEC の対象外とし、各 command SPEC（REQ-015）が個別呼出統合を所有する。
+
+### 任意性と QG/HITL 非代替
+
+adversarial-review は任意助言手段であり、新規必須工程、QG、承認ゲート、統制ゲートとして導入しない（REQ-014-001）。QG-1〜QG-4 および既存の HITL（ユーザー承認、確認、ゲート）を代替しない（REQ-014-002）。任意性、QG 非代替、承認ゲート非代行、統制ゲート非停止の詳細は「発動契約」「QG、通常レビュー、診断との責務分界」の各節を正とし、本節はそれらを caller integration 側から再確認する。
+
+### 副作用禁止と新規 artifact 非生成
+
+adversarial-review 自身は対象ファイル、Issue、PR、git 操作（commit、push、merge、branch 操作）を行わない（REQ-014-004）。レビュー結果保存用の新規正規 artifact 種別を導入しない（REQ-014-005）。審議結果は呼出元へ返却される中間成果物であり、新規永続成果物として扱わない。副作用境界の詳細は「副作用境界」節を正とする。
+
+### accepted finding の反映責務
+
+accepted finding の対象候補（要件案、設計案、SPEC 案、計画案、実装案）への反映は呼出元の責務である（REQ-014-006）。adversarial-review は finding を提示し、合意候補を形成するが、対象への反映、保存、commit を自身では行わない。呼出元は accepted finding を反映した後に必要に応じて既存の検証、QG、HITL を再実行する。
+
+### 再 review 条件と同一 finding 再起票禁止
+
+finding 反映の結果、review 対象の意味内容が変更された場合、呼出元は必要な既存検証を再実行する。その変更から新たな本質的争点が生じ得る場合にのみ adversarial-review を再発動できる（REQ-014-007）。新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。争点状態の「解決済み争点の再開条件」は「争点状態」節を正とし、caller integration 側でも同一基準を適用する。
+
+### 再 review 停止条件
+
+再 review の停止条件は次の4点とする（REQ-014-008）。
+
+1. 新しい本質的 finding がないこと
+2. 新たに提示された finding が全て撤回、解決、限定合意のいずれかで処理済みであること
+3. 残った争点がユーザー判断を必要とするため既存の HITL または blocker 扱いへ移行したこと
+4. 変更後も候補の意味内容が変化しておらず、再 review の対象がないこと
+
+### unresolved 時の不可逆処理回避
+
+unresolved な本質的争点またはユーザー判断事項が残る場合、呼出元は保存、削除、Issue 作成、実装開始等の後続不可逆処理へ進まない（REQ-014-009）。ただし adversarial-review 自体を新しい恒久的な統制ゲートとしない。unresolved は既存の HITL、blocker、case-auto 停止理由分類のいずれかへ振り向けられ、adversarial-review 由来の新規統制ゲートは作らない。
+
+### 呼出失敗時の取扱い
+
+adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止する（REQ-014-010）。呼出元は利用不能を報告した上で従来フローと既存 QG/HITL を維持する。呼出失敗を理由に対象案を自動承認、自動棄却、または既存 QG を飛ばしてはならない。
+
+### 正規所有者マトリックス
+
+共通 caller integration 契約の意味は次の5 SPEC 群へ分散所有し、一つの意味を一つの SPEC だけが規範定義する（REQ-014-011）。重複規範、矛盾を生じないため、各 SPEC は他 SPEC の正規領域を再定義しない。
+
+| 意味 | 正規所有者 SPEC |
+|---|---|
+| adversarial-review 自身の振る舞い契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件4点、任意性、副作用禁止、QG/HITL 非代替、正規所有者マトリックス） | 本 SPEC（agentdev-adversarial-review） |
+| user-decision-required 停止理由分類、case-auto 伝播、resume point | workflow-contracts SPEC、case-auto command SPEC |
+| review 経路での parent_decision_required / decision_context 適用、副作用境界 | delegation-contracts SPEC |
+| 各 command の個別呼出統合（発動条件、挿入境界、戻り先） | 各 command SPEC（REQ-015） |
+| caller integration 関連の domain skill 振る舞い | 各 domain skill SPEC（REQ-015） |

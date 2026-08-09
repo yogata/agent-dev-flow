@@ -59,6 +59,24 @@ OpenAI/Codex adversarial-review 等の外部知見を観点、問い、failure m
 QG-1〜QG-4 を代替せず、通常のコードレビュー、テスト、機械的検査を代替せず、inspect-docs/inspect-skills の診断を代替しない。すべての要件作成工程、計画作成工程への強制適用を行わない。
 詳細は SPEC「副作用境界」「QG、通常レビュー、診断との責務分界」を正とする。
 
+## caller integration 共通契約
+
+本スキルは req-define、req-save、spec-save、case-open、case-run、case-close、case-update の7コマンドおよび case-auto からの呼出（caller integration）に対し、SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が定める共通契約に従う。共通契約の正規所有者は SPEC であり、本 SKILL.md は重複定義しない（REQ-014-003、REQ-014-011）。
+
+呼出元と本スキルの主な契約（詳細は SPEC を正とする）:
+
+| 契約 | 要件 | 概要 |
+|---|---|---|
+| 任意性 | REQ-014-001/002 | 必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替しない |
+| 副作用禁止 | REQ-014-004/005 | ファイル、Issue、PR、git 操作を行わず、レビュー結果用の新規正規 artifact を生成しない |
+| accepted finding 反映 | REQ-014-006 | accepted finding の対象候補への反映は呼出元の責務 |
+| 再 review 条件 | REQ-014-007 | 対象の意味内容変更時のみ再発動可能、同一 finding の再起票禁止 |
+| 再 review 停止条件 | REQ-014-008 | 新 finding なし、全 finding 処理済み、HITL/blocker 移行、意味内容変化なしの4点 |
+| unresolved 時の扱い | REQ-014-009 | unresolved 残時は不可逆処理へ進まず、adversarial-review 自体を恒久統制ゲート化しない |
+| 呼出失敗時の扱い | REQ-014-010 | silent skip 禁止、利用不能報告後に従来フローと既存 QG/HITL を維持 |
+
+user-decision-required の位置づけ（case-run result enum の第5状態ではなく case-auto の停止理由分類）は workflow-contracts SPEC「adversarial-review 由来の停止信号」節、review 経路での parent_decision_required / decision_context 適用は delegation-contracts SPEC「adversarial-review との委譲契約接続」節をそれぞれ正とする（REQ-014-012）。
+
 ## 非対象
 
 本スキルは以下を扱わない:

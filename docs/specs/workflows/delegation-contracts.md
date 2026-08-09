@@ -216,5 +216,27 @@ subagent は当該属性に応じた振る舞い指針（検証のみでも acce
 
 ## adversarial-review との委譲契約接続
 
-review 経路での parent_decision_required / decision_context の適用、副作用境界を規定する。
-REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持する。
+本節は adversarial-review caller integration（REQ-014）が委譲契約へ接続する際の適用を所有する。共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は重複定義せず、委譲契約側からの接続のみを規定する。REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持し、adversarial-review 由来の結果は第5状態を増やさず既存状態へ折り畳む（REQ-014-012、workflow-contracts SPEC「adversarial-review 由来の停止信号」節参照）。
+
+### 委譲種別と副作用境界
+
+adversarial-review は「委譲種別」の `semantic_review`（書き込み禁止型）として適用する。許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする（REQ-014-004）。レビュー結果保存用の新規正規 artifact 種別を導入せず、審議結果は呼出元へ中間成果として返却する（REQ-014-005、adversarial-review SPEC「副作用禁止と新規 artifact 非生成」節参照）。
+
+### review 経路での parent_decision_required / decision_context 適用
+
+呼出元は adversarial-review の出力（合意候補、未解決争点、残留リスク、未解決事項）を `parent_decision_required` および `decision_context` を通じて受領する。未解決のユーザー判断事項は次のように扱う。
+
+| 起源 | parent_decision_required の扱い |
+|---|---|
+| case-run 起源 | result enum の `blocked` に折り畳み、停止理由として user-decision-required 分類を付与する |
+| 工程委譲起源（req-define、case-open、case-close 等） | 既存 status（pass/warn/fail/partial）を維持し、`parent_decision_required` へ unresolved 判断事項を列挙する |
+
+`decision_context` には対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断を含める。呼出元は accepted finding の反映を自身の責務で行い（REQ-014-006）、adversarial-review へ反映を委譲しない。
+
+### 呼出失敗時の扱い
+
+adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し（REQ-014-010）、呼出元は利用不能を報告した上で従来フローと既存 QG/HITL を維持する。呼出失敗を delegation_type の `delegation-unavailable` とは別個に扱う場合、呼出元は従来フローへのフォールバックを記録する。
+
+### 正規所有者マトリックス参照
+
+本節と adversarial-review SPEC「正規所有者マトリックス」節（REQ-014-011）との間で意味の重複、矛盾を生じない。委譲契約の一般概念（委譲時最小契約、委譲種別、制約）は本 SPEC の既存節が正であり、adversarial-review 固有の適用のみを本節が所有する。
