@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
     Check consumer repository AgentDevFlow installation status.
@@ -39,6 +38,8 @@
     ./scripts/check-consumer-opencode.ps1
     ./scripts/check-consumer-opencode.ps1 -PluginDir .agentdev-plugin
 #>
+
+#Requires -Version 7.0
 
 param(
     [string]$PluginDir = '.agentdev-plugin'

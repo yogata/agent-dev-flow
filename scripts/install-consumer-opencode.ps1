@@ -1,4 +1,3 @@
-#Requires -Version 7.0
 <#
 .SYNOPSIS
     Install AgentDevFlow runtime artifacts into a consumer repository.
@@ -58,6 +57,8 @@
     ./scripts/install-consumer-opencode.ps1 -Mode apply -PluginDir .agentdev-plugin
     ./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
 #>
+
+#Requires -Version 7.0
 
 param(
     [Parameter()]

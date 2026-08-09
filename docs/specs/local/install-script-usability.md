@@ -2,7 +2,7 @@
 title: 導入スクリプトの使いやすさ詳細
 status: draft
 created: 2026-08-02
-updated: 2026-08-02
+updated: 2026-08-09
 spec_logical_division: behavior
 canonical_owner: install-script
 ---
@@ -113,16 +113,60 @@ GitHub Issue/PR を使わずローカルファイル（.agentdev/cases/）で運
 
 ## #Requires と comment-based help の両立
 
-install.ps1、check.ps1、sync-self.ps1 の `#Requires` ディレクティブ配置と comment-based help 解析位置の両立仕様を明示する。
+install-consumer-opencode.ps1、check-consumer-opencode.ps1、sync-self-opencode.ps1 の
+`#Requires` ディレクティブ配置と comment-based help 解析位置の両立仕様を明示する。
+REQ-009-044 で要求される「#Requires ディレクティブと comment-based help 解析を両立すること」を実現する。
 
 ### 課題
 
-運用スクリプト3本（install.ps1、check.ps1、sync-self.ps1）の `#Requires` ディレクティブが comment-based help 解析を阻害する問題がある。
+運用スクリプト3本の `#Requires` ディレクティブが comment-based help 解析を阻害する問題がある。
+PowerShell の comment-based help はスクリプトファイル先頭に配置する必要があり、先頭行に
+`#Requires` ディレクティブを置くとヘルプ解析位置が「ファイル先頭」の条件を満たさず、
+`Get-Help` が comment-based help を検出しない（Synopsis がパラメータ署名のフォールバック表示になり、
+Description、Parameters、Examples が全て空になる）。
 
 ### 両立仕様
 
-- `#Requires` ディレクティブの配置を comment-based help 解析位置と両立させる
-- 配置位置、解析順序、検証方法は実装固有の詳細として skill references 側で保持する
+スクリプトファイルの先頭要素の配置順序を以下の通り定める。
+
+1. comment-based help ブロック（`<# .SYNOPSIS ... #>`）をファイル先頭に配置する
+2. comment-based help ブロックの直後に `#Requires` ディレクティブを配置する
+3. `#Requires` の直後に `param(...)` ブロックを配置する
+
+```
+<#
+.SYNOPSIS
+    ...
+.DESCRIPTION
+    ...
+#>
+
+#Requires -Version 7.0
+
+param(
+    ...
+)
+```
+
+### 根拠
+
+PowerShell の comment-based help 仕様は、スクリプトヘルプが「スクリプトファイルの先頭」に
+配置され、前方に許容されるのはコメントと空行のみと定めている。`#Requires` は directive であり
+コメントではないため、comment-based help より前に置くとヘルプ解析位置の条件を満たさなくなる。
+一方 `#Requires` は行頭にあればスクリプト内の任意の位置に配置可能であり、comment-based help の
+後に置いても runtime の version 要求、module 要求等の効力は変わらない。両立のための最小の
+配置変更は「comment-based help を先頭に移動し、`#Requires` をその直後に置く」である。
+
+### 検証方法
+
+各スクリプトで `Get-Help <script-path> -Detailed` を実行し、以下を確認する。
+
+- Synopsis に `.SYNOPSIS` の内容が表示される（パラメータ署名のフォールバック表示ではない）
+- Description、Parameters、Examples の各セクションが空でない
+
+あわせて `#Requires` の runtime 効力が維持されていることを確認する。具体的には `#Requires -Version`
+のバージョン番号を現行 PowerShell より高い値に一時置換したコピーを実行し、PowerShell の
+「requires PowerShell version ...」エラーが発生することを確認する（本番ファイルは `7.0` を維持）。
 
 ## 適用範囲
 
