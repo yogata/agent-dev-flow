@@ -72,7 +72,19 @@ Step 7 の停止条件を以下の分類軸で報告する（HITL 境界の変�
 
 最終工程（case-close 委譲）の完了報告をそのまま出力する。Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、G16）。停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する
 
-完了報告には以下を含める（停止時フォーマットを含む）: 停止理由分類（Step 7-1 経由）、開始時刻・終了時刻・所要時間（人間が読みやすい形式）、工程別タイムスタンプ内訳（L1、req-save+spec-save 統合委譲 / case-open / case-run / case-close、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める）、インライン実行の記録（case-run をインライン実行した旨）、orchestration stage 別結果・フォールバック理由・破棄回復記録（stage 1 case-open / stage 2 case-run / stage 3 case-close、stage 2 を順次フォールバック時は理由、bg task 破棄を検知して回復した場合は状態区分と回復結果）、結果状態の4次元報告（(1) 工程結果 pass/warn/fail / (2) artifact_action 適用結果 applied/skipped/failed/no-op / (3) 定義適用工程の完了状態: 定義適用完了・警告付き工程完了・定義適用未完了 / (4) OU ライフサイクル完了状態: Issue 作成・PR 作成・PR マージ・Issue クローズ の各完了/未完了、warn を pass へ変換して集約しない、Phase 0 成功と OU 完了は別々に報告）。**OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（全 OU 処理完了時のみ全体完了報告）
+完了報告には以下を含める（停止時フォーマットを含む）: 停止理由分類（Step 7-1 経由、または経路H の user-decision-required（REQ-015-012、「adversarial-review 由来の停止伝播（経路H）」節参照））、開始時刻・終了時刻・所要時間（人間が読みやすい形式）、工程別タイムスタンプ内訳（L1、req-save+spec-save 統合委譲 / case-open / case-run / case-close、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める）、インライン実行の記録（case-run をインライン実行した旨）、orchestration stage 別結果・フォールバック理由・破棄回復記録（stage 1 case-open / stage 2 case-run / stage 3 case-close、stage 2 を順次フォールバック時は理由、bg task 破棄を検知して回復した場合は状態区分と回復結果）、結果状態の4次元報告（(1) 工程結果 pass/warn/fail / (2) artifact_action 適用結果 applied/skipped/failed/no-op / (3) 定義適用工程の完了状態: 定義適用完了・警告付き工程完了・定義適用未完了 / (4) OU ライフサイクル完了状態: Issue 作成・PR 作成・PR マージ・Issue クローズ の各完了/未完了、warn を pass へ変換して集約しない、Phase 0 成功と OU 完了は別々に報告）。**OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（全 OU 処理完了時のみ全体完了報告）
+
+## adversarial-review 由来の停止伝播（経路H）
+
+Step 4（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する（REQ-015-012）。停止伝播契約の詳細は `docs/specs/commands/case-auto.md`「adversarial-review 由来の停止伝播（経路H）」節を正とする。
+
+- **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（REQ-014-012、workflow-contracts SPEC「adversarial-review 由来の停止信号」節、delegation-contracts SPEC「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
+- **自走停止**: 当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、Step 4-1 Wave 反復制御、REQ-006-015/016）
+- **ユーザー提示**: decision_context をユーザーへ提示し判断を待機
+- **resume point**: case-run 起源は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源は当該工程の委譲起点（workflow-contracts SPEC「case-auto への伝播と resume point」節）
+- **再開**: ユーザー判断解決後、resume point から再開。adversarial-review 再発動要否は adversarial-review SPEC「再 review 条件」「再 review 停止条件」に従い case-auto は独自判断しない（REQ-014-007）
+
+case-auto は経路H において review 直接起動、finding 解釈、採否、再評価を行わない（REQ-015-012）。これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。user-decision-required は Step 7-1 の HITL 境界停止条件分類（REQ-006-016/108）とは独立する停止理由分類である（REQ-014-012）。停止報告（Step 8）には user-decision-required を停止理由分類として含める
 
 ## コンフリクト解消モデル（3レベルエスカレーション）
 
