@@ -43,7 +43,7 @@ context:
 rules:
   - id: artifact-graph-candidate-discovery
     when: 既存REQ、関連ADR・SPEC、構造的所有者重複の候補を探索するとき。利用不能時は従来の探索手段で続行する
-    skill: repo-agentdev-artifact-graph
+    skill: agentdev-artifact-graph
 
 checks: []
 
