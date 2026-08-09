@@ -100,7 +100,7 @@ frontmatter でエージェント指定、スキル参照を宣言し、本文�
 
 Command / Skill の責任分界の判断理由、詳細契約は v2:ADR-0107（コマンド・スキル・テンプレート・スクリプト責任分界の正式定義）、`../responsibilities/artifact-contracts.md` を参照。
 
-**gh CLI 安全性**: Windows PowerShell 環境では、WRITE 操作は `--body-file` 経由、READ 操作は一時ファイル経由で Read tool を使用する安全手順を強制する（`agentdev-gh-cli` skill、ADR-004）。
+**gh CLI 安全性**: Windows PowerShell 環境では、WRITE 操作は `--body-file` 経由、READ 操作は一時ファイル経由で Read tool を使用する安全手順を強制する（`agentdev-gh-cli` skill、DEC-004）。
 
 **git worktree**: Issue 番号ベースの命名規則（`.worktrees/{N}-{type}`）で複数 Issue の同時進行を管理する（`agentdev-git-worktree` skill）。
 
@@ -127,7 +127,7 @@ Command / Skill の責任分界の判断理由、詳細契約は v2:ADR-0107（�
 AgentDevFlow の配布物は実行時（runtime: 個別プロジェクトで実行可能）と執筆（authoring: agent-dev-flow リポジトリ開発用）に明確に分離する（REQ-001）。
 
 **実行時配布物**は自己完結し、agent-dev-flow リポジトリの dev メタデータに依存しないことを保証する:
-- Command の YAML フロントマターは `description` 単一とする（REQ-002-022、ADR-001）
+- Command の YAML フロントマターは `description` 単一とする（REQ-002-022、DEC-001）
 - Skill `references/` は実行時配布物のみを含める（REQ-001）
 - `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書であり、実行時配布物の依存先ではない（REQ-001, REQ-001）
 

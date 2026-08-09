@@ -233,9 +233,9 @@ adversarial-review は「委譲種別」の `semantic_review`（書き込み禁�
 
 `decision_context` には対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断を含める。呼出元は accepted finding の反映を自身の責務で行い（REQ-014-006）、adversarial-review へ反映を委譲しない。
 
-### case-auto による decision_context の限定的親判断解決（REQ-006-112〜114、ADR-008）
+### case-auto による decision_context の限定的親判断解決（REQ-006-112〜114、DEC-008）
 
-case-auto は下位 command（case-run インライン実行、工程委譲）から受領した decision_context を bounded parent decision resolution で処理する。本節は委譲契約側からの接続のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto SPEC「bounded parent decision resolution（REQ-006-112〜114、ADR-008）」節が正である。
+case-auto は下位 command（case-run インライン実行、工程委譲）から受領した decision_context を bounded parent decision resolution で処理する。本節は委譲契約側からの接続のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto SPEC「bounded parent decision resolution（REQ-006-112〜114、DEC-008）」節が正である。
 
 **decision_context の消費契約**:
 
@@ -246,7 +246,7 @@ case-auto は下位 command（case-run インライン実行、工程委譲）�
 
 **parent_decision_required の解決拡張**: case-auto は `parent_decision_required` へ列挙された unresolved 判断事項について、現行正規成果物から一意に回答可能なものを自律解決する（REQ-006-112）。外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細は、既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続できる（REQ-006-113）。
 
-**resume point の拡張利用**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、既存 resume point（REQ-006-085）から処理を継続する。新規の永続結果型を導入せず、既存 resume point 機構を再利用する（ADR-008 決定5）。resume point の仕様は workflow-contracts SPEC「case-auto への伝播と resume point」節が正である。
+**resume point の拡張利用**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、既存 resume point（REQ-006-085）から処理を継続する。新規の永続結果型を導入せず、既存 resume point 機構を再利用する（DEC-008 決定5）。resume point の仕様は workflow-contracts SPEC「case-auto への伝播と resume point」節が正である。
 
 **非対象（REQ-015-012 維持）**: case-auto は decision_context の解決において raw finding を解釈、採否、候補反映しない。各 caller command は自身が所有する候補について finding の意味解釈、採否、候補への反映を維持し（REQ-014-006）、raw finding を case-auto へそのまま渡さない（REQ-006-112、AG-006）。
 
