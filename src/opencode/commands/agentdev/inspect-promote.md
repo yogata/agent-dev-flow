@@ -55,6 +55,27 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 `--auto` が指定された場合、分類結果のうち workflow-contracts SPEC（extension 経由）の自動 promote 対象カテゴリに合致し、かつ安定契約例外および否定文脈を満たさない高確信度検出事項を HITL 承認なしで `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md` へ投入する。
 各投入を `.agentdev/inspect/promoted/auto-promote-log.md` に追記する（対象検出事項、カテゴリ、投入先ファイル、根拠）。
 `--auto` 未指定時は本 step をスキップし、自動投入を行わない
+
+### Step 4-1: adversarial-review 発動条件判定（経路B）
+
+review 挿入境界（暫定分類後・HITL 前）で発動条件を判定する（REQ-015-001、REQ-015-005、詳細は inspect-promote SPEC「adversarial-review 挿入境界（経路B）」節参照）。次の3条件を全て満たす場合のみ Step 4-2（review 呼出）へ進む。
+
+1. Step 4（自動 promote、`--auto` opt-in 時のみ）が完了していること
+2. 手動分類対象の検出事項（Step 5 HITL 確定へ進む対象）が1件以上存在すること
+3. ユーザー明示指定（本コマンド起動時の adversarial-review への明示要求）があること（REQ-015-002）
+
+`--auto` により Step 4 で自動 promote された検出事項は HITL を経由しない fast path であり、本判定、Step 4-2 の対象外とする（REQ-015-005、review 挿入迂回）。3条件のいずれかを満たさない場合、Step 4-2 を実行せず Step 5（HITL 確定）へ従来フローを維持する（REQ-015-003）
+
+### Step 4-2: adversarial-review 呼出（経路B）
+
+Step 4-1 の発動条件を満たした場合、手動分類対象の検出事項とその暫定分類結果（promote/ defer/ reject 判定と根拠）を入力コンテキストとして adversarial-review を呼び出す（REQ-015-001、REQ-015-002）。adversarial-review は任意助言手段であり、必須工程、QG、承認ゲート、統制ゲートとして導入しない（REQ-014-001）。共通契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件4点）は adversarial-review SPEC を正とし、本 step は再定義しない
+
+呼出結果の取扱い:
+
+- accepted finding を暫定分類結果へ反映する（REQ-014-006、本コマンドの責務）。反映で暫定分類の意味内容が変更された場合、Step 3（検出事項分類）へ戻し再分類する
+- unresolved な本質的争点が残る場合、Step 5（HITL 確定）へ進まず、ユーザー判断事項として停止する（REQ-014-009）。adversarial-review 自体を恒久的な統制ゲートとしない
+- 呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で Step 5（HITL 確定）の従来フローを維持する（REQ-014-010、REQ-015-003）
+
 ### Step 5: HITL 確定（手動分類対象）
 
 自動 promote 対象外の検出事項はユーザーの明示的な承認なしに採用済み成果物を生成しない。分類結果を提示し、承認を得る
