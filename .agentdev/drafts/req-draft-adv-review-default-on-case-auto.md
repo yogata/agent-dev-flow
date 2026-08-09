@@ -6,6 +6,56 @@ created_at: 2026-08-09T19:00:00+09:00
 saved_at: 2026-08-09
 source_rus:
   - RU-0014
+spec_saved_at: 2026-08-09
+spec_save_result:
+  applied: []
+  skipped:
+    - id: ACT-SPEC-001
+      target: docs/specs/skills/agentdev-adversarial-review.md
+      target_area: "初期 challenge / finding lifecycle / 収束判定 / 発動契約"
+      reason: target_area_not_found
+    - id: ACT-SPEC-002
+      target: docs/specs/commands/case-auto.md
+      target_area: "bounded parent decision resolution / 停止理由分類"
+      reason: target_area_not_found
+    - id: ACT-SPEC-003
+      target: docs/specs/workflows/delegation-contracts.md
+      target_area: "decision_context / parent_decision_required / resume point"
+      reason: target_area_not_found
+    - id: ACT-SPEC-004
+      target: docs/specs/workflows/workflow-contracts.md
+      target_area: "case-auto 停止・resume 伝播"
+      reason: target_area_not_found
+    - id: ACT-SPEC-005
+      target: docs/specs/commands/req-define.md
+      target_area: "adversarial-review 挿入境界 / default-on / skip 条件"
+      reason: target_area_not_found
+    - id: ACT-SPEC-006
+      target: docs/specs/commands/case-open.md
+      target_area: "adversarial-review 挿入境界 / skip 条件"
+      reason: target_area_not_found
+    - id: ACT-SPEC-007
+      target: docs/specs/commands/case-run.md
+      target_area: "adversarial-review 挿入境界 / skip 条件"
+      reason: target_area_not_found
+    - id: ACT-SPEC-008
+      target: docs/specs/commands/inspect-promote.md
+      target_area: "adversarial-review 挿入境界 / skip 条件"
+      reason: target_area_not_found
+    - id: ACT-SPEC-009
+      target: docs/specs/commands/intake-promote.md
+      target_area: "adversarial-review 挿入境界 / skip 条件"
+      reason: target_area_not_found
+    - id: ACT-SPEC-010
+      target: docs/specs/commands/learning-promote.md
+      target_area: "adversarial-review 挿入境界 / skip 条件"
+      reason: target_area_not_found
+    - id: ACT-SPEC-011
+      target: docs/specs/commands/backlog-review.md
+      target_area: "adversarial-review 挿入境界 / skip 条件"
+      reason: target_area_not_found
+  follow_ups:
+    - "ACT-SPEC-001〜011: 全11件の target_area が既存見出しと完全一致せず（search-target-area.ts matches 空）。各 action の target_area は抽象的なトピック群（例: 『初期 challenge / finding lifecycle / 収束判定 / 発動契機』）であり、SPEC 内の実在見出しテキストではない。target-area-matching.md（見出し行全体完全一致、前方一致廃止）に従い全件スキップ。operation を spec-create（新規セクション追加）へ切り替えるか、target_area を実在見出しへ修正して再実行を推奨。各 content は『具体的な修正箇所は case-run で特定』を明示しており、case-run で SPEC への反映を実施することを想定。"
 ---
 
 # draft-data
