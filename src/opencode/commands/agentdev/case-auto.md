@@ -66,36 +66,36 @@ req-save 委譲の出力から複数 REQ doc または scale:large を検出し�
 
 ### Step 7-1: 停止理由分類
 
-Step 7 の停止条件を以下の分類軸で報告する（HITL 境界の変更ではなく、再開コマンド選択とユーザー通知の精度向上が目的）: req-define 合意要件からの逸脱 ((1))、command 契約・実装不整合 ((11))、要件未合意のスコープ拡大 ((2))、repo 外実体変更 ((3)(4)(5)(6))、CI/test/lint 失敗 ((7)(8))、branch 削除検出 ((9))、未コミット変更の帰属不明 ((10))、上位合意矛盾（bounded parent decision resolution で decision_context が現行正規成果物間の矛盾に起因する場合、REQ-006-114、DEC-008）、新規ユーザー判断事項（同 decision_context が新しいユーザー価値判断・対象範囲変更・外部契約変更を必要とする場合、REQ-006-114、DEC-008）。execution_unit 分割可能性があるにも関わらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する（case-open の契約・実装不整合であり要件doc 側の問題ではない）。各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-orchestration` を参照
+Step 7 の停止条件を以下の分類軸で報告する（HITL 境界の変更ではなく、再開コマンド選択とユーザー通知の精度向上が目的）: req-define 合意要件からの逸脱 ((1))、command 契約・実装不整合 ((11))、要件未合意のスコープ拡大 ((2))、repo 外実体変更 ((3)(4)(5)(6))、CI/test/lint 失敗 ((7)(8))、branch 削除検出 ((9))、未コミット変更の帰属不明 ((10))、上位合意矛盾（bounded parent decision resolution で decision_context が現行正規成果物間の矛盾に起因する場合）、新規ユーザー判断事項（同 decision_context が新しいユーザー価値判断・対象範囲変更・外部契約変更を必要とする場合）。execution_unit 分割可能性があるにも関わらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する（case-open の契約・実装不整合であり要件doc 側の問題ではない）。各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-orchestration` を参照
 
 ### Step 8: 完了報告
 
 最終工程（case-close 委譲）の完了報告をそのまま出力する。Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、G16）。停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する
 
-完了報告には以下を含める（停止時フォーマットを含む）: 停止理由分類（Step 7-1 経由、または経路H の user-decision-required（REQ-015-012、「adversarial-review 由来の停止伝播（経路H）」節参照））、開始時刻・終了時刻・所要時間（人間が読みやすい形式）、工程別タイムスタンプ内訳（L1、req-save+spec-save 統合委譲 / case-open / case-run / case-close、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める）、インライン実行の記録（case-run をインライン実行した旨）、orchestration stage 別結果・フォールバック理由・破棄回復記録（stage 1 case-open / stage 2 case-run / stage 3 case-close、stage 2 を順次フォールバック時は理由、bg task 破棄を検知して回復した場合は状態区分と回復結果）、結果状態の4次元報告（(1) 工程結果 pass/warn/fail / (2) artifact_action 適用結果 applied/skipped/failed/no-op / (3) 定義適用工程の完了状態: 定義適用完了・警告付き工程完了・定義適用未完了 / (4) OU ライフサイクル完了状態: Issue 作成・PR 作成・PR マージ・Issue クローズ の各完了/未完了、warn を pass へ変換して集約しない、Phase 0 成功と OU 完了は別々に報告）。**OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（全 OU 処理完了時のみ全体完了報告）
+完了報告には以下を含める（停止時フォーマットを含む）: 停止理由分類（Step 7-1 経由、または経路H の user-decision-required（「adversarial-review 由来の停止伝播（経路H）」節参照））、開始時刻・終了時刻・所要時間（人間が読みやすい形式）、工程別タイムスタンプ内訳（L1、req-save+spec-save 統合委譲 / case-open / case-run / case-close、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める）、インライン実行の記録（case-run をインライン実行した旨）、orchestration stage 別結果・フォールバック理由・破棄回復記録（stage 1 case-open / stage 2 case-run / stage 3 case-close、stage 2 を順次フォールバック時は理由、bg task 破棄を検知して回復した場合は状態区分と回復結果）、結果状態の4次元報告（(1) 工程結果 pass/warn/fail / (2) artifact_action 適用結果 applied/skipped/failed/no-op / (3) 定義適用工程の完了状態: 定義適用完了・警告付き工程完了・定義適用未完了 / (4) OU ライフサイクル完了状態: Issue 作成・PR 作成・PR マージ・Issue クローズ の各完了/未完了、warn を pass へ変換して集約しない、Phase 0 成功と OU 完了は別々に報告）。**OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（全 OU 処理完了時のみ全体完了報告）
 
 ## adversarial-review 由来の停止伝播（経路H）
 
-Step 4（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する（REQ-015-012）。停止伝播契約の詳細は `docs/specs/commands/case-auto.md`「adversarial-review 由来の停止伝播（経路H）」節を正とする。
+Step 4（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。停止伝播契約の詳細は本コマンド SPEC（project extension 経由参照）「adversarial-review 由来の停止伝播（経路H）」節を正とする。
 
-- **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（REQ-014-012、workflow-contracts SPEC「adversarial-review 由来の停止信号」節、delegation-contracts SPEC「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
-- **自走停止**: 当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、Step 4-1 Wave 反復制御、REQ-006-015/016）
+- **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（workflow-contracts SPEC「adversarial-review 由来の停止信号」節、delegation-contracts SPEC「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
+- **自走停止**: 当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、Step 4-1 Wave 反復制御）
 - **ユーザー提示**: decision_context をユーザーへ提示し判断を待機
 - **resume point**: case-run 起源は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源は当該工程の委譲起点（workflow-contracts SPEC「case-auto への伝播と resume point」節）
-- **再開**: ユーザー判断解決後、resume point から再開。adversarial-review 再発動要否は adversarial-review SPEC「再 review 条件」「再 review 停止条件」に従い case-auto は独自判断しない（REQ-014-007）
+- **再開**: ユーザー判断解決後、resume point から再開。adversarial-review 再発動要否は adversarial-review SPEC「再 review 条件」「再 review 停止条件」に従い case-auto は独自判断しない
 
-case-auto は経路H において review 直接起動、finding 解釈、採否、再評価を行わない（REQ-015-012）。これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。user-decision-required は Step 7-1 の HITL 境界停止条件分類（REQ-006-016/108）とは独立する停止理由分類である（REQ-014-012）。停止報告（Step 8）には user-decision-required を停止理由分類として含める
+case-auto は経路H において review 直接起動、finding 解釈、採否、再評価を行わない。これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。user-decision-required は Step 7-1 の HITL 境界停止条件分類とは独立する停止理由分類である。停止報告（Step 8）には user-decision-required を停止理由分類として含める
 
-## bounded parent decision resolution（REQ-006-112〜114、DEC-008）
+## bounded parent decision resolution
 
-case-auto は下位 command から受領した decision_context を限定的に自律解決する。default-on + skip policy（REQ-014-013、REQ-015-002）と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。解決範囲、作業仮定の明示要件、停止理由分類の詳細は `docs/specs/commands/case-auto.md`「bounded parent decision resolution（REQ-006-112〜114、DEC-008）」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節、workflow-contracts SPEC「bounded parent decision resolution と停止・resume 伝播」節が正である
+case-auto は下位 command から受領した decision_context を限定的に自律解決する。default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。解決範囲、作業仮定の明示要件、停止理由分類の詳細は本コマンド SPEC（project extension 経由参照）「bounded parent decision resolution」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節、workflow-contracts SPEC「bounded parent decision resolution と停止・resume 伝播」節が正である
 
-- **自律解決（REQ-006-112）**: decision_context が現行正規成果物（REQ、Decision、SPEC、Issue その他合意済み情報）から一意に回答可能な場合、ユーザー停止せず回答して下位 command を resume させる
-- **作業仮定で継続（REQ-006-113）**: 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細は、既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続できる
-- **上位合意矛盾（REQ-006-114、DEC-008 決定3）**: decision_context が現行正規成果物間の矛盾に起因する場合、当該矛盾そのものが finding の対象であり一方を勝手に採用せず停止する（Step 7-1 停止理由分類「上位合意矛盾」）
-- **新規ユーザー判断事項（REQ-006-114、DEC-008 決定4）**: 新しいユーザー価値判断、対象範囲変更、外部契約変更が必要な場合、既存停止経路でユーザーへ返す（Step 7-1 停止理由分類「新規ユーザー判断事項」）
-- **resume（DEC-008 決定5）**: 回答、根拠、作業仮定を下位 command へ返し、既存 resume point（REQ-006-085）から処理を継続する。新規永続結果型は導入しない。adversarial-review 再実行要否は adversarial-review 側の再 review 契約（REQ-014-007/008）に従い case-auto は独自判断しない
-- **中央集約 review engine とはならない（REQ-015-012 維持、DEC-008 決定6）**: case-auto は raw finding を解釈、採否、候補反映しない。下位 command が構造化した decision_context のみを解決対象とし、raw finding を case-auto へそのまま渡さない（REQ-006-112、AG-006）
+- **自律解決**: decision_context が現行正規成果物（REQ、Decision、SPEC、Issue その他合意済み情報）から一意に回答可能な場合、ユーザー停止せず回答して下位 command を resume させる
+- **作業仮定で継続**: 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細は、既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続できる
+- **上位合意矛盾**: decision_context が現行正規成果物間の矛盾に起因する場合、当該矛盾そのものが finding の対象であり一方を勝手に採用せず停止する（Step 7-1 停止理由分類「上位合意矛盾」）
+- **新規ユーザー判断事項**: 新しいユーザー価値判断、対象範囲変更、外部契約変更が必要な場合、既存停止経路でユーザーへ返す（Step 7-1 停止理由分類「新規ユーザー判断事項」）
+- **resume**: 回答、根拠、作業仮定を下位 command へ返し、既存 resume point から処理を継続する。新規永続結果型は導入しない。adversarial-review 再実行要否は adversarial-review 側の再 review 契約に従い case-auto は独自判断しない
+- **中央集約 review engine とはならない**: case-auto は raw finding を解釈、採否、候補反映しない。下位 command が構造化した decision_context のみを解決対象とし、raw finding を case-auto へそのまま渡さない（AG-006）
 
 ## コンフリクト解消モデル（3レベルエスカレーション）
 
