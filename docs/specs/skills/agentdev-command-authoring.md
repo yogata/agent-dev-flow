@@ -2,7 +2,7 @@
 title: `agentdev-command-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-06
+updated: 2026-08-10
 ---
 
 # `agentdev-command-authoring` SPEC
@@ -56,6 +56,12 @@ OpenCode コマンド定義（`.opencode/commands/`）の品質基準とベス�
 - [agentdev-command-creator.md](agentdev-command-creator.md)
 - REQ-002（Artifact責任分界）
 - REQ-003（コマンド、スキル、サブエージェント責務分界）
+
+## 公開IF と dispatch
+
+Command authoring は公開interface と workflow dispatch のみを Command に記述する
+（DEC-010）。workflow 実装本体は Workflow Skill が所有する。Command は Workflow Skill 名レベルで
+参照し、STEP 内部パスへ直接依存しない（REQ-002-017）。
 
 ## command authoring 基準
 

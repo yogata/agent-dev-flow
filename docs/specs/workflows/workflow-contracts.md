@@ -2,7 +2,7 @@
 title: ワークフロー契約（横断）
 status: accepted
 created: 2026-06-21
-updated: 2026-07-25
+updated: 2026-08-10
 ---
 
 # ワークフロー契約（横断）
@@ -105,6 +105,18 @@ Local backend（ローカル版 OpenCode）では、構造的実行以降の SSo
 | レビュー完了 | Case ファイル `## マージ結果` |
 
 詳細は `docs/specs/local/local-case-file.md` を参照。
+
+## STEP model
+
+workflow は STEP（resume point）単位で構成する（DEC-011）。各STEP の構造・開始条件・完了判定は
+step-reference-contract.md が正規所有者。Input Resolution と durable state 優先順位は
+input-resolution-and-durable-state.md が正規所有者。
+
+### 状態遷移
+
+workflow は正常系・blocked・failed・resume の状態遷移を持つ。blocked / failed で未完了STEP を
+completed と誤認しない。中断再実行時は current STEP から安全に再開する。外部依存取得失敗時は
+状態推測せず blocked / failed 扱いとする。no-op / empty state の外部挙動を維持する。
 
 ## コマンド I/O 契約（共通）
 

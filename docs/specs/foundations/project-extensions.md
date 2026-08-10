@@ -2,7 +2,7 @@
 title: Project Extensions
 status: accepted
 created: 2026-07-04
-updated: 2026-07-27
+updated: 2026-08-10
 ---
 
 # Project Extensions
@@ -24,33 +24,49 @@ project extensions 機構は、プロジェクト固有の追加・拡張を配�
 .agentdev/extensions/skills/<skill>.yaml
 ```
 
-## extension の基本構造
+## Extension 種別
 
-extension は以下の基本構造を持つ。
+Extension を workflow / capability responsibility 中心の3種へ再編する（DEC-012）。
 
-```yaml
-version: 1
-kind: command-extension  # または skill-extension
-id: /agentdev/<command>  # または <skill>
+### Workflow Extension
 
-context: []
-rules: []
-checks: []
-acceptance_gates: []
-must_not: []
-```
+公開Workflow Skill への追加・拡張。internal workflow / STEP 全体を拘束する。
+配置: .agentdev/extensions/skills/{workflow-skill-name}.yaml。
 
-各セクションの意味:
+### internal Workflow Extension
 
-| セクション | 意味 |
-|---|---|
-| context | command/skill に追加で与える文脈 |
-| rules | command/skill に追加で守らせる規約 |
-| checks | command/skill に追加で実行させる検査 |
-| acceptance_gates | command/skill extension が追加する実行完了前ゲート |
-| must_not | command/skill に追加で課す禁止事項 |
+Workflow Skill の内部動作への追加・拡張。Workflow Skill のみが読む。command は直接読まない。
+配置: .agentdev/extensions/skills/{workflow-skill-name}/internal.yaml。
 
-acceptance_gates は REQ の受け入れ条件ではなく、case-close / QG 本体でもない。command/skill extension によって追加される実行完了前ゲートである。
+### Capability Skill Extension
+
+Capability Skill への追加・拡張。
+配置: .agentdev/extensions/skills/{capability-skill-name}.yaml。
+
+### 適用順序
+
+Workflow Extension → internal Workflow Extension → Capability Skill Extension。
+public Workflow Extension が Capability Skill extension へ暗黙コピーしない。
+後方互換性のためだけの二重extension model を正規状態として残存させない（DEC-012）。
+
+### 旧kind からの移行（breaking migration）
+
+旧kind（command-extension / skill-extension）は完全廃止。runtime後方互換なし。
+consumer プロジェクトも新kindへの移行対象。旧kind残存時は deterministic check で検出し
+migration-required として停止（silent ignore しない）。
+
+#### mapping 表
+
+| 旧kind | 新kind | 備考 |
+|---|---|---|
+| command-extension | Workflow Extension | 公開Workflow Skill への追加・拡張 |
+| skill-extension（workflow skill対象） | Workflow Extension / internal Workflow Extension | Workflow Skill への追加・拡張 |
+| skill-extension（capability skill対象） | Capability Skill Extension | Capability Skill への追加・拡張 |
+
+#### migration-required 検出
+
+extension 読込時に旧kind を検出した場合、migration-required エラーとして停止する。
+エラーメッセージは mapping 表へ誘導し、新kind への移行手順を提示する。
 
 ## 実行時読み込み契約
 

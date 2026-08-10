@@ -2,7 +2,7 @@
 title: "コマンドファイルフォーマット規約"
 status: accepted
 created: 2026-06-22
-updated: 2026-07-25
+updated: 2026-08-10
 ---
 
 # コマンドファイルフォーマット規約
@@ -20,6 +20,12 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 
 - **対象**: `src/opencode/commands/agentdev/*.md`（AgentDevFlow 配布 command 原本）、`.opencode/commands/repo/*.md`（repo-local command）
 - **対象外**: AgentDevFlow 適用プロジェクト（consumer project）の独自 command
+
+## Command 構造
+
+Command は公開interface（入出力契約・ガードレール）と workflow dispatch を中心とする
+（DEC-010）。workflow 手順本体は Workflow Skill へ移行し、Command に重複残存しない。
+workflow への参照は Workflow Skill 名レベルとする（REQ-002-017）。
 
 ## extensions 手順
 

@@ -2,7 +2,7 @@
 title: harness 分離モデル
 status: accepted
 created: 2026-07-12
-updated: 2026-07-27
+updated: 2026-08-10
 ---
 
 # harness 分離モデル
@@ -116,6 +116,13 @@ runtime workspace 管理は harness 側の責務とする。
 
 除去対象の核心は、配布物本文にプロジェクト固有識別子（REQ-ID、ADR-ID、IR-ID 形式）と消費プロジェクトの文書ディレクトリ内部パス（`docs/specs/**`、`docs/guides/**` 等）を残置しないことである。
 識別子、パスを除去した後のトレーサビリティは git 履歴と原本側 docs/ で担保し、配布物には残置しない。
+
+## ToDo と compaction 復元
+
+AgentDevFlow 配布契約は STEP 識別子と永続情報から再開点を決定できる契約を所有する（DEC-011）。
+ToDo の使用・compaction 検出・current STEP 選択の実処理は harness 固有機能とする。
+AgentDevFlow 配布command / Workflow Skill / SPEC は ToDo を必須機構として規定しない
+（DEC-001 context管理harness委譲、REQ-002-022 harness固有詳細禁止）。
 
 ## 関連
 

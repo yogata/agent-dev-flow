@@ -1,5 +1,5 @@
 ---
-updated: 2026-06-21
+updated: 2026-08-10
 status: accepted
 ---
 
@@ -86,6 +86,12 @@ case-run が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、ca
 | .opencode/ ディレクトリ責務、スクリプト配置方針、テスト配布方針 | [runtime-package-boundary.md](../local/runtime-package-boundary.md) |
 | 安全性スキル（gh-cli） | [skills/agentdev-gh-cli.md](../skills/agentdev-gh-cli.md) |
 | 整合性検査スキル（repo-`agentdev-integrity`） | (repo-local、配布対象外、SPEC 対象外) |
+
+## Workflow Architecture Inventory
+
+全公開Command（16件）の Workflow Architecture Inventory を恒久カタログとして統合する。
+各Command の公開契約・主要処理段階・分岐・副作用・HITL・並列性・resume・durable state・
+Harness依存・Capability依存・内部workflow候補を記載する。個別Workflow Skill 移行時に参照する。
 
 ## 適用範囲宣言
 
