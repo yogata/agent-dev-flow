@@ -1057,3 +1057,63 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: `#learning` `#bun` `#bun-test` `#windows` `#cli-args` `#cross-platform`
 - **移動日**: 2026-08-09
 - **処分判定**: deferred（出現1件・環境依存・具体性やや不足。Bun.spawnSync CLI テスト再発時に具体化）
+## 2026-08-10: Windows PowerShell で gh pr create --body-file が多重エンコード化け、gh api PATCH で修復した事象
+
+- **問題事象**: Windows PowerShell 環境で gh pr create --body-file に UTF-8 BOM なしファイルを渡して PR を作成したところ、PR 本文が多重エンコード化け（UTF-8 バイト列を ASCII 数字文字列として展開した状態）になった。chcp 65001 + PYTHONIOENCODING=utf-8 のコンソールエンコーディング初期化を実施しても防止できなかった。
+- **発生局面**: 実装（case-run インライン実行での PR 作成、PR #1976 経路D learning-promote）
+- **検知方法**: PR 作成後に PR 本文を目視確認した際、日本語が数値列へ破損していることを発見
+- **根本原因**: agentdev-gh-cli standard-procedures.md「コンソールエンコーディング初期化」（Section 2 Step 0 の3行）は gh CLI の stdout/引数渡し経路の一部を保護するが、gh pr create --body-file の本文読み込み経路において Windows 環境固有の多重エンコード変換を完全には防止できない。ファイル本文の decode 経路が Step 0 のコンソールコードページ切替えとは独立して cp932 影響を受ける場合がある。
+- **自律対応内容**: gh pr create で一旦 PR を作成した後、Node.js で本文を UTF-8 JSON ファイルへ書き出し、gh api -X PATCH /repos/{owner}/{repo}/pulls/{N} --input <JSON> 経由で PR 本文を上書き修復した。
+- **ユーザー確認有無**: なし（エージェント自律で検知・修復）
+- **ADR/REQ/spec影響**: あり。agentdev-gh-cli SPEC / standard-procedures.md の WRITE 手続き（PR 作成）において、--body-file のみで本文化けが残るリスクと gh api PATCH による修復経路の標準化が必要。RU-0005 AG-001（--title inline 禁止、title 修正は REST API PATCH 標準手続き）と同種の経路分離問題だが本文側。
+- **横展開観点**: Windows 環境で gh CLI の WRITE 操作（Issue 作成、Issue 本文更新、PR 作成、コメント追加）全般で、--body-file 指定でも本文 decode 経路の cp932 影響を完全排除できない可能性。Step 0 実施を前提としつつ、作成後の本文 VERIFY（読み戻し）で化け検出を必須化すべき。
+- **再発条件**: Windows PowerShell/pwsh 環境で gh pr create --body-file（または gh issue create --body-file）を日本語本文付きで実行し、コンソールエンコーディング初期化後でも本文 decode 経路が cp932 影響を受ける条件。
+- **予防策候補**: (1) WRITE 後 VERIFY で本文を読み戻し mojibake 検出を必須化、(2) 本文化け検出時は gh api -X PATCH --input <JSON>（Node.js UTF-8 書き出し）で修復する標準手順を standard-procedures.md へ追記、(3) title 修正 REST API PATCH 標準手続きと対になる本文修正手順の整備。
+- **想定反映先**: .opencode/skills/agentdev-gh-cli/references/standard-procedures.md（WRITE 手続きセクション、VERIFY セクション）、verify.md（mojibake 検出観点）
+- **関連**: PR #1976（経路D learning-promote）、PR #1973（Wave 1、本件発生時は観測されず本文正常を確認済み）、agentdev-gh-cli standard-procedures.md Section 2 Step 0、RU-0005 AG-001/AG-002
+- **タグ**: `#windows` `#encoding` `#gh-cli` `#write-procedure` `#verify`
+- **移動日**: 2026-08-10
+- **処分判定**: deferred（現行 retry.md 維持、再発時再評価。VERIFY で検出可能、retry.md は自動代替禁止・停止報告を要求）
+
+---
+
+## 2026-08-10: docs/adr/ 削除時の guides/ 配下参照更新スコープの初期漏れ
+
+- **問題事象**: docs/adr/ 配下を DEC-001..008 移行後に削除した際（Wave 3a #2035）、参照更新スコープの初期設計で docs/guides/ 配下（artifacts-and-state.md, diagnostics-and-maintenance.md, glossary.md, project-docs-and-specs.md の4ファイル）からの docs/adr/ パス参照を見落とすリスクがあった。docs/guides/ は案内層（REQ-001）であり SPEC 層とは別物のため、SPEC 移行スコープに暗黙に含まれなかった。
+- **発生局面**: 実装（Wave 3a #2035 ADR-001..008 → DEC-001..008 移行、docs/adr/ 削除、PR #2040）
+- **検知方法**: Wave 3b #2036 consumer・検証基盤移行、Wave 4 #2037 E2E 検証時の残骸検査 grep により docs/adr/ 参照残存を確認。現在は docs/guides/ 配下で docs/adr/ 参照は0件、docs/decisions/ 参照4ファイルへ更新完了済み
+- **根本原因**: 移行スコープを「SPEC と検証基盤」として設計した際、案内層（docs/guides/）を独立 consumer として明示的にスコープに入れていなかった。docs/guides/ はREQ-001 の案内層に属し SPEC 体系とは別階層のため、横断 grep の対象ディレクトリリストから漏れやすい
+- **自律対応内容**: Wave 3b で consumer 一括更新、Wave 4 で残骸検査により docs/guides/ 配下の docs/adr/ → docs/decisions/ 参照更新を完了。最終的に broken link 0件を確認
+- **ユーザー確認有無**: なし（Epic 完了判定内で自律完結）
+- **ADR/REQ/spec影響**: あり。REQ-001（文書体系、案内層・基準境界）において、ディレクトリ削除・rename を伴う横断変更時の案内層（docs/guides/）スコープ明示要件、または agentdev-artifact-validation の change-impact チェック対象へ docs/guides/ を含める検討が必要
+- **横展開観点**: ディレクトリ削除・大量 rename を伴う変更全般で、SPEC/REQ/ADR の基準層だけでなく案内層（guides）、README、AGENTS.md も独立 consumer としてスコープ管理すべき。将来の document-type 移行（例: SPEC → 別体系）でも同様
+- **再発条件**: docs/ 配下のディレクトリ削除・rename を伴う変更において、案内層（docs/guides/）や README を参照更新スコープから漏らす場合
+- **予防策候補**: (1) agentdev-artifact-validation check-change-impact の対象ディレクトリへ docs/guides/ を明示追加、(2) ディレクトリ削除前の broken link 一括検査プロセス標準化（grep -r "docs/{old_dir}/" docs/）、(3) case-open の Wave 分解時に案内層 consumer を明示スコープに含める基準の整備
+- **想定反映先**: `agentdev-artifact-validation` スキル、REQ-001 文書体系 SPEC、`agentdev-workflow-lifecycle` スキル（Wave スコープ設計基準）
+- **関連**: Epic #2032, #2035 (PR #2040, 9ea67084), #2036 (PR #2041), #2037 (PR #2042), docs/guides/artifacts-and-state.md, docs/guides/glossary.md, docs/guides/project-docs-and-specs.md, docs/guides/diagnostics-and-maintenance.md
+- **タグ**: `#broken-link` `#guides-scope` `#案内層` `#change-impact` `#migration`
+- **移動日**: 2026-08-10
+- **処分判定**: deferred（IR-057 拡張で対応候補、再評価時まで保留。check-change-impact.ts では未変更 path 検出不可）
+
+---
+
+## 2026-08-10: v2: 履歴参照保護の運用成功（AG-010、大規模 rename 移行事例）
+
+- **問題事象**: ADR → Decision 移行は大規模 rename（766件の ADR 参照、Artifact Graph 776 nodes が対象）であり、Git history rewrite や文字列一括置換で v2:ADR-* 歴史参照を破壊するリスクがあった。AG-010（v2:ADR-* 履歴参照は維持、文字列一括置換禁止、AG-016）を運用基準として採用し、52件の v2:ADR-* 歴史参照を破壊なく維持して移行を完遂した。これは「v2: prefix による履歴参照保護」運用の成功事例である。
+- **発生局面**: 実装（Wave 3a/3b/4 #2035, #2036, #2037、移行全行程）
+- **検知方法**: Wave 4 #2037 E2E 検証・残骸検査で v2:ADR-* 歴史参照52件が維持されていることを確認。Artifact Graph で decision node 9件、adr node 0件、valid=true を確認。DEC-009 が AG-010 関連を明記し relates-to で v2:ADR-* を参照
+- **根本原因**: （成功事例のため根本原因ではなく成功要因）成功要因は3点: (a) v2: prefix による履歴参照と現行参照の構文的分離が事前に確立されていた、(b) 文字列一括置換を禁止し8分類で個別対応する方針（AG-016, CR-005）を厳格運用、(c) Artifact Graph が node_type で移行前後を区別し破壊的変更を検知可能だった
+- **自律対応内容**: Wave 3a/3b で v2:ADR-* 参照を一括置換対象から明示除外し、現行 ADR-NNNN 参照のみ DEC-NNN へ個別更新。Wave 4 で v2: 参照件数維持を E2E 検証項目に含め回帰確認
+- **ユーザー確認有無**: なし（AG-010 は case-open 時に合意済みの運用基準）
+- **ADR/REQ/spec影響**: あり（肯定的影響）。AG-010 運用成功事例として、REQ-001（識別子不変原則、056-064）と DEC-009 に v2: 履歴参照保護パターンの成功実績が記録された。将来の大規模 rename 移行（SPEC 体系変更、RU ID 形式変更等）で同パターンを再利用すべき
+- **横展開観点**: v2: prefix による履歴参照保護パターンは ADR → Decision に限定されず、あらゆる ID 形式変更を伴う移行で適用可能。成功の3要因（構文的分離、個別対応方針、Graph による検知）をセットで将来移行に適用すべき
+- **再発条件**: （成功事例のため再発ではなく再適用条件）ID 形式変更を伴う大規模 rename 移行で、(a) v2: prefix 等の履歴参照構文が事前確立、(b) 文字列一括置換禁止と個別分類対応の方針採用、(c) Artifact Graph 等の破壊検知基盤存在、の3条件が揃う場合
+- **予防策候補**: （成功事例のため予防策ではなく再利用提案）(1) REQ-001 または guides に「大規模 rename 移行時の v2: 履歴参照保護パターン」を成功実績として明記、(2) 将来の ID 形式変更を伴う RU（SPEC 体系変更等）で AG-010 相当の運用基準を case-open の合意事項に標準組み込み、(3) inspect-docs / artifact-validation に「v2: 参照件数の移行前後比較」チェック観点を追加
+- **想定反映先**: docs/guides/artifacts-and-state.md（v2: 履歴参照の運用解説）, REQ-001 文書体系 SPEC（識別子不変原則・056-064 補強）, `agentdev-workflow-lifecycle` スキル（大規模 rename 移行の Wave 設計基準）
+- **関連**: Epic #2032, #2035 (PR #2040), #2036 (PR #2041), #2037 (PR #2042), DEC-009（AG-010 relates-to 明記）, AG-010, AG-016, CR-005（8分類）, REQ-001-056〜064
+- **タグ**: `#v2-history` `#ag-010` `#rename-migration` `#成功事例` `#artifact-graph`
+- **移動日**: 2026-08-10
+- **処分判定**: deferred（理由修正: REQ-001-008/012〜015 + DEC-009 AG-010/016 で本質カバー。playbook 未整備は low-pri）
+
+---
+
