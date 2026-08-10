@@ -138,6 +138,18 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 
 外部実行基盤の結果は **PR URL** で受領する（透明）。plan artifact 等の中間成果物の内部構造には依存しない。実行担当サブエージェントは中間成果物の内部構造に依存した処理、検証を行わず、result 契約（4状態）のみで接合する。AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ ADR/ SPEC に限定し、中間成果物を永続状態として扱わない。
 
+## STEP model 連携（REQ-005-024、DEC-011）
+
+本スキルは Capability Skill として、case-run Workflow Skill の `execute` STEP（`agentdev-workflow-orchestration` 参照）から委譲起動される（`docs/specs/workflows/workflow-skill-model.md`）。本スキル自身は case-run workflow の STEP を所有せず、委譲契約（4状態 result）で case-run 側 STEP へ接合する。
+
+### 委譲コンテキストと Input Resolution
+
+委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、 durable state 優先順位（`docs/specs/workflows/input-resolution-and-durable-state.md`）に従って case-run `execute` STEP の Input Resolution で解決された入力である。実行担当サブエージェントは委譲内で Issue 本文、REQ/Decision/SPEC を SSoT 再構成（最上位優先）で再取得・再検証し、自然言語の前STEP result のみに依存しない。
+
+### 委譲内シーケンスと result 接合
+
+実行担当サブエージェントの責務（Issue 読込、context 再確認、実装・検証・PR 作成、blocker 処理、result 返却）は adapter 委譲内の内部シーケンスであり、case-run 側からは result 4状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）のみで観測される。内部シーケンスの STEP 遷移を case-run workflow の STEP model へ投影せず、PR URL（成功時）または Issue コメント（blocked/failed時）を SSoT として扱う。STEP reference 8 要素は `docs/specs/workflows/step-reference-contract.md` 参照。
+
 ## 委譲抽象IF
 
 - case-run は adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲を起動する（委譲 prompt 内で実行 command を指定）。起動手段、実行制御パラメータは AGENTS.md および references/harness-delegation.md に配置する。
