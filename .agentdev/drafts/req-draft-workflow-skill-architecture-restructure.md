@@ -5,6 +5,7 @@ status: saved
 created_at: 2026-08-10T16:50:00+09:00
 source_rus: [RU-0006]
 agentdev_handoff: true
+spec_actions_consumed: true
 ---
 
 <!-- req_draft: AgentDevFlow Command/Workflow Skill/Capability Skill/Extension
