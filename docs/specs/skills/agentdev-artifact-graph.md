@@ -210,6 +210,31 @@ self-hosting augmentation は次を追加することで現行 repo-local と同
 - relation_type: `delegates_to`, `governs`
 - indexed_paths デフォルトへ: `src/opencode`, `.opencode`, `.agentdev/extensions`, `scripts`, `tests`
 
+## augmentation 配置先
+
+Artifact Graph 標準配布スキルの augmentation は専用配置
+（.agentdev/artifact-graph.yaml）を正規配置とする。
+
+### 選定根拠
+
+- augmentation は Artifact Graph の relation 追加データを担う独立関心であり、
+  project-extensions 機構が担う「標準配布スキルの挙動に対する project 固有拡張
+  （context/rules/checks/acceptance_gates/must_not）」とは責務が異なる
+- 専用配置により、augmentation データ形式と project-extensions 拡張データの
+  競合・混同を防ぐ
+
+### project-extensions 機構（DEC-005）との使い分け
+
+| 配置先 | 用途 | 対象 |
+|--------|------|------|
+| .agentdev/artifact-graph.yaml | Artifact Graph relation 追加データ | augmentation |
+| .agentdev/extensions/skills/agentdev-artifact-graph.yaml | 標準配布スキル挙動への project 固有拡張 | context/rules/checks/acceptance_gates/must_not |
+
+### 今後の評価
+
+段階3 Issue #1951（Self-hosting 移行）で project-extensions 機構との
+整合性を再評価する予定である。
+
 ## ワークフロー利用
 
 Artifact Graph は以下の4用途で AgentDevFlow workflow に統合する。Graph はすべての用途で候補提供者であり、決定的検査、意味診断、最終判断は各正規所有者が行う。
