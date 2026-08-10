@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "effectiveness": "bun effectiveness/run.ts",
+    "effectiveness:json": "bun effectiveness/run.ts --json"
   },
   "devDependencies": {
     "typescript": "^5.6.0",
