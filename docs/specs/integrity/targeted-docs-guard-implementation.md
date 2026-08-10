@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細
 status: accepted
 created: 2026-07-15
-updated: 2026-07-24
+updated: 2026-08-10
 ---
 
 # Targeted Docs Guard 実装詳細
@@ -144,6 +144,29 @@ report JSON の必須フィールド一覧、`failure` オブジェクトの構�
 - ドメイン分割による移送が発生した場合は、移送単位で旧パスと新パスの対応を追記する（REQ-001-010）
 
 検出語彙の分類（単独検出語 / 近接条件つき検出語）は IR-057（`rules/IR-057-obsolete-spec-path-after-domain-split.md`）ならびに `obsolete-path-map.yaml` を SSoT とする。
+
+## skill rename 対称性検査観点
+
+skill rename を伴う作業手順において、以下の対称性検査を deterministic に実施する。
+
+### 物理 path 一致検査
+
+src/opencode/skills/{name} と docs/specs/skills/{name} の物理 path が
+一致することを検証する。rename 後に両者が同一 name であることが必須。
+
+### frontmatter id 一致検査
+
+SPEC ファイルの frontmatter id が物理 path と一致することを検証する。
+不一致の場合は warn または error として報告する。
+
+### Artifact Graph node 関係整合検査
+
+rename 後に旧 name の node が Artifact Graph に残存していないこと、
+新 name への関係が更新されていることを検証する。
+
+### 実装
+
+3 検査は `.opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts` が deterministic に実行する。対象は配布 skill `agentdev-*`（`src/opencode/skills/` 配下）とし、repo-local skill (`repo-agentdev-*`) および `agentdev-` prefix を持たない skill は対象外（REQ-002 配布物境界）。`status: superseded` の SPEC に対応する skill dir 欠落は許容し、`status: draft` の場合は warning とする。Artifact Graph が未生成（`.agentdev/graph/nodes.jsonl` 不在）の場合は graph-node 検査を info として扱い、阻断しない。
 
 ## 関連
 
