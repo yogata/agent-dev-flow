@@ -58,6 +58,55 @@ describe("graph queries", () => {
       maxDepth: 2,
     })
     expect(result.nodes).toEqual([])
+    expect(result.edges).toEqual([])
+    expect(result.relations).toEqual([])
+  })
+})
+
+describe("query result relations (REQ-023-001/002)", () => {
+  it("neighbors exposes relations with id/type/source/target for every edge", async () => {
+    const { graph } = await graphFixture()
+    const result = await queryGraph(graph, { kind: "neighbors", node: "requirement:REQ-001", depth: 2 })
+    expect(result.edges.length).toBeGreaterThan(0)
+    for (const edge of result.edges) {
+      expect(typeof edge).toBe("string")
+    }
+    expect(result.relations).toHaveLength(result.edges.length)
+    const edgeIdSet = new Set(result.edges)
+    for (const relation of result.relations) {
+      expect(edgeIdSet.has(relation.id)).toBe(true)
+      expect(relation.type.length).toBeGreaterThan(0)
+      expect(relation.source.length).toBeGreaterThan(0)
+      expect(relation.target.length).toBeGreaterThan(0)
+      const match = graph.edges.find((edge) => edge.id === relation.id)
+      expect(match).toBeDefined()
+      expect(match?.type).toBe(relation.type)
+      expect(match?.source).toBe(relation.source)
+      expect(match?.target).toBe(relation.target)
+    }
+  })
+
+  it("path exposes relations matching its edges", async () => {
+    const { graph } = await graphFixture()
+    const result = await queryGraph(graph, {
+      kind: "path",
+      source: "requirement:REQ-001",
+      target: "specification:docs/specs/feature.md",
+      maxDepth: 4,
+    })
+    expect(result.edges.length).toBeGreaterThan(0)
+    expect(result.relations).toHaveLength(result.edges.length)
+    const relationSources = new Set(result.relations.map((r) => r.source))
+    const relationTargets = new Set(result.relations.map((r) => r.target))
+    expect(relationSources.has("requirement:REQ-001")).toBe(true)
+    expect(relationTargets.has("specification:docs/specs/feature.md")).toBe(true)
+  })
+
+  it("provenance for a node has empty relations (no edges in scope)", async () => {
+    const { graph } = await graphFixture()
+    const result = await queryGraph(graph, { kind: "provenance", id: "requirement:REQ-001" })
+    expect(result.edges).toEqual([])
+    expect(result.relations).toEqual([])
   })
 })
 

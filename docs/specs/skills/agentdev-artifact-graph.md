@@ -70,6 +70,18 @@ consumer 環境では AgentDevFlow 配布物（`.opencode/commands/agentdev/`、
 
 `.agentdev/graph/` は手編集せず、正規情報として扱わない。
 
+## 問い合わせ結果の出力形式
+
+query_graph.ts の問い合わせ結果は、各関係について以下の情報を含める。
+
+- 関係ID（既存）
+- 関係 type（関係種別、例: depends_on、derived_from）
+- source（接続元ノード）
+- target（接続先ノード）
+- 根拠 evidence（既存）
+
+既存のノードID、関係ID、根拠情報との互換性を維持し、新規フィールドを追加する形式とする。
+
 ## グラフモデル（open extensibility を含む）
 
 ### 標準コア node_types（デフォルト）
