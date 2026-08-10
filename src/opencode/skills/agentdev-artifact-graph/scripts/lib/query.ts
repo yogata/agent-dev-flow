@@ -9,11 +9,27 @@ export type GraphQuery =
   | { readonly kind: "provenance"; readonly id: string }
   | { readonly kind: "discover"; readonly term: string; readonly roots: readonly string[]; readonly rootDir: string }
 
+export type QueryRelation = {
+  readonly id: string
+  readonly type: string
+  readonly source: string
+  readonly target: string
+}
+
 export type QueryResult = {
   readonly nodes: readonly string[]
   readonly edges: readonly string[]
+  readonly relations: readonly QueryRelation[]
   readonly provenance: readonly Provenance[]
   readonly discovered?: readonly string[]
+}
+
+function relationsFor(graph: GraphData, edgeIds: readonly string[]): readonly QueryRelation[] {
+  const idSet = new Set(edgeIds)
+  return graph.edges
+    .filter((edge) => idSet.has(edge.id))
+    .map((edge) => ({ id: edge.id, type: edge.type, source: edge.source, target: edge.target }))
+    .sort((left, right) => left.id.localeCompare(right.id))
 }
 
 function evidenceFor(graph: GraphData, nodeIds: readonly string[], edgeIds: readonly string[]): readonly Provenance[] {
@@ -38,9 +54,11 @@ function provenanceResult(graph: GraphData, id: string): QueryResult {
   const node = graph.nodes.find((candidate) => candidate.id === id)
   const edge = graph.edges.find((candidate) => candidate.id === id)
   const provenanceId = node?.provenance_id ?? edge?.provenance_id
+  const edgeIds = edge === undefined ? [] : [edge.id]
   return {
     nodes: node === undefined ? [] : [node.id],
-    edges: edge === undefined ? [] : [edge.id],
+    edges: edgeIds,
+    relations: relationsFor(graph, edgeIds),
     provenance: provenanceId === undefined ? [] : graph.provenance.filter((entry) => entry.id === provenanceId),
   }
 }
@@ -62,7 +80,7 @@ function neighborResult(graph: GraphData, start: string, maxDepth: number): Quer
   }
   const nodes = [...visited].sort()
   const edges = [...edgeIds].sort()
-  return { nodes, edges, provenance: evidenceFor(graph, nodes, edges) }
+  return { nodes, edges, relations: relationsFor(graph, edges), provenance: evidenceFor(graph, nodes, edges) }
 }
 
 function pathResult(graph: GraphData, source: string, target: string, maxDepth: number): QueryResult {
@@ -74,7 +92,7 @@ function pathResult(graph: GraphData, source: string, target: string, maxDepth: 
     const current = queue.shift()
     if (current === undefined) break
     if (current.node === target) {
-      return { nodes: current.nodes, edges: current.edges, provenance: evidenceFor(graph, current.nodes, current.edges) }
+      return { nodes: current.nodes, edges: current.edges, relations: relationsFor(graph, current.edges), provenance: evidenceFor(graph, current.nodes, current.edges) }
     }
     if (current.edges.length >= maxDepth) continue
     for (const neighbor of adjacent(graph.edges, current.node)) {
@@ -87,7 +105,7 @@ function pathResult(graph: GraphData, source: string, target: string, maxDepth: 
       })
     }
   }
-  return { nodes: [], edges: [], provenance: [] }
+  return { nodes: [], edges: [], relations: [], provenance: [] }
 }
 
 async function walkDir(root: string, dir: string, results: string[]): Promise<void> {
@@ -133,7 +151,7 @@ async function discoverResult(query: { readonly term: string; readonly roots: re
       }
     }
   }
-  return { nodes: [], edges: [], provenance: [], discovered: matches.sort() }
+  return { nodes: [], edges: [], relations: [], provenance: [], discovered: matches.sort() }
 }
 
 export async function queryGraph(graph: GraphData, query: GraphQuery): Promise<QueryResult> {
