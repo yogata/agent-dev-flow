@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 21件、廃止済み: 0件
+現行 REQ: 22件、廃止済み: 0件
 <!-- AUTOGEN:END -->
 
-現行要件は REQ-001 から REQ-021 の21件である。各 REQ の詳細は各 REQ ファイル本文を参照。
+現行要件は REQ-001 から REQ-022 の22件である。各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
 |---|---|
@@ -34,6 +34,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-019](requirements/REQ-019.md) | テスト影響範囲検出 gate |
 | [REQ-020](requirements/REQ-020.md) | Artifact Graph 解析品質と検証 |
 | [REQ-021](requirements/REQ-021.md) | Artifact Graph ワークフロー統合 |
+| [REQ-022](requirements/REQ-022.md) | Artifact Graph augmentation 配置先正規化 |
 
 - [要件インデックス](requirements/README.md)
 
