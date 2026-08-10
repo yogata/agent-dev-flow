@@ -71,6 +71,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | REQ verification basis | `check_integrity.ts` | REQ 要件行の検証基準が 規範語ではなく必達要件判定であること（REQ-0115-044） |
 | Runtime reference | `check_integrity.ts` | 配布物（src/opencode/commands/agentdev、src/opencode/skills/agentdev-*/**/*.md）内の導入先未解決参照検出。baseline 既知と新規区別、段階導入（IR-055, REQ-0108-263/264） |
 | Distribution untracked skill | `check_integrity.ts` | 配布物が `.opencode/skills/` 配下にのみ存在するスキルを参照した場合の src 昇格漏れ検出（IR-058, REQ-0159-003） |
+| Skill rename 対称性 | `check_skill_rename_symmetry.ts` | 配布 skill `agentdev-*` と SPEC `docs/specs/skills/{X}.md` の物理 path 一致、SKILL.md frontmatter `name` ↔ 親 dir、SPEC title token ↔ filename stem、Artifact Graph skill node ↔ skill dir の整合（REQ-026）。`status: superseded` SPEC の skill dir 欠落は許容 |
 
 ### 補助検査スクリプト（categoryToCheckPattern 対象外）
 
