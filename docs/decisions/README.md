@@ -9,7 +9,7 @@
 個別 REQ/SPEC は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は7件、提案中の Decision は1件である。
+現行の承認済み Decision は10件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -24,6 +24,9 @@
 | DEC-007 | Artifact Graph 標準化と配布スキル昇格 | accepted | 2026-08-08 |
 | DEC-008 | case-auto の限定的親判断解決（bounded parent decision resolution） | proposed | 2026-08-09 |
 | DEC-009 | ADR から Decision への正規成果物モデル移行 | accepted | 2026-08-10 |
+| DEC-010 | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則 | accepted | 2026-08-10 |
+| DEC-011 | STEP resume point と会話記憶非依存 | accepted | 2026-08-10 |
+| DEC-012 | Extension を file-kind から workflow/capability responsibility へ再編 | accepted | 2026-08-10 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -43,6 +46,9 @@
 - [DEC-006](DEC-006.md)（inspect 3-command 構成への正規化）
 - [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
 - [DEC-009](DEC-009.md)（ADR から Decision への正規成果物モデル移行）
+- [DEC-010](DEC-010.md)（Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則）
+- [DEC-011](DEC-011.md)（STEP resume point と会話記憶非依存）
+- [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
@@ -68,6 +74,7 @@
 
 - [DEC-001](DEC-001.md)（AgentDevFlow 憲章、hard governance の限定、新規統制追加原則）
 - [DEC-009](DEC-009.md)（ADR から Decision への正規成果物モデル移行）
+- [DEC-010](DEC-010.md)（Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則）
 
 ### 配布基盤・ソースモデル
 
@@ -76,11 +83,13 @@
 - [DEC-005](DEC-005.md)（Project Extensions Architecture、superseded by DEC-006）
 - [DEC-006](DEC-006.md)（inspect 3-command 構成への正規化、extension 検査の3層責務分離）
 - [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
+- [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
 
 ### ワークフロー・委譲契約
 
 - [DEC-003](DEC-003.md)（req_draft ソフトコントラクト原則）
 - [DEC-008](DEC-008.md)（case-auto の限定的親判断解決、bounded parent decision resolution）
+- [DEC-011](DEC-011.md)（STEP resume point と会話記憶非依存）
 
 Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 
@@ -111,6 +120,9 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-007 | [REQ-012](../requirements/REQ-012.md), [REQ-013](../requirements/REQ-013.md), [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Artifact Graph 標準化と配布スキル昇格（open extensibility、project/self-hosting augmentation、fail-open、決定論性） |
 | DEC-008 | [REQ-006](../requirements/REQ-006.md), [REQ-014](../requirements/REQ-014.md), [REQ-003](../requirements/REQ-003.md) | case-auto の限定的親判断解決（bounded parent decision resolution、REQ-006-112〜114、REQ-014-009/010、REQ-003-008/009/010 と整合） |
 | DEC-009 | [REQ-001](../requirements/REQ-001.md) | ADR から Decision への正規成果物モデル移行（AG-001〜017、REQ-001-056〜064） |
+| DEC-010 | [REQ-002](../requirements/REQ-002.md), [REQ-027](../requirements/REQ-027.md) | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則（AG-003、AG-007、REQ-002-001〜004 意味変更） |
+| DEC-011 | [REQ-005](../requirements/REQ-005.md) | STEP resume point と会話記憶非依存（AG-004、AG-005、REQ-005-024 追記） |
+| DEC-012 | [REQ-002](../requirements/REQ-002.md) | Extension を file-kind から workflow/capability responsibility へ再編（AG-008、REQ-002-030/031 意味変更） |
 
 ## 過去版の履歴基盤
 

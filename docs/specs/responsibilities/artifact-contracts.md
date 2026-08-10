@@ -64,25 +64,13 @@ command frontmatter 契約を description 単一へ同期する（ACT-SPEC-001 �
 
 ## スキル粒度契約
 
-Skill は以下の条件を全て満たす単位とする（REQ-002-100）。
+Command・skill の粒度基本契約は本SPEC が正規所有者とする。
+Workflow Skill・Capability Skill 固有の責務・配置・1:N分割基準・依存方向は
+workflow-skill-model.md が正規所有者。本節は workflow-skill-model.md へ委譲済みの
+Workflow Skill 固有契約を重複所有しない。
 
-| 条件 | 説明 |
-|------|------|
-| 同一関心 | 解決対象の問題領域が同一 |
-| 同一責任境界 | 担う責任の範囲が同一 |
-| 同一判断モデル | 判断の仕組み、基準が同一 |
-| 矛盾しない `USE FOR` / `DO NOT USE FOR` | 全ての `USE FOR` が同一判断モデルに属し、`DO NOT USE FOR` と矛盾しない |
-
-- 複数の `USE FOR` があっても、同一判断モデル、同一責任境界に属する場合は同一 Skill として扱う（REQ-002-101）。
-- 複数の `USE FOR` が異なる判断モデル、入力、出力、責任境界を持つ場合は、`DO NOT USE FOR` が同じであっても Skill 分割候補とする（REQ-002-102）。
-- 異なる判断モデル、入力、出力、責任境界を持つ内容は Skill 分割候補として扱うこと。
-
-### SKILL.md サイズと内容基準（REQ-002-037）
-
-- 200行を超える SKILL.md は責務集中、不要な手順、例、作業履歴の混入について確認すること
-- 200行を超えることだけを不合格理由にしないこと。責務上の根拠があれば維持を認める
-- SKILL.md に移動済み Step、統合済み Step、将来候補、作業履歴を示す節を残さないこと
-- 詳細な判定表、スキーマ、例、失敗時手順は必要な場合に限り当該 skill 自身の reference へ配置すること（REQ-002-036）
+skill の段階的開示、reference 分離原則、USE FOR / DO NOT USE FOR の整合性は
+REQ-002-015・017・018 に従い本SPEC が維持する。
 
 ## スキル参照妥当性契約
 

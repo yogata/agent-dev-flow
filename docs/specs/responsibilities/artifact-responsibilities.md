@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-25
+updated: 2026-08-10
 ---
 
 # 成果物責任表
@@ -72,6 +72,18 @@ Command は Skill を参照して判断を利用し、Skill は必要な詳細�
 同一の判断基準、出力構造、決定的処理を Command と Skill、Template、Script の複数箇所で正規定義しない。
 
 原本は `src/opencode/` に置き、`.opencode/` は実行時配置先として原本を投影する。
+
+## 成果物責務表（Workflow Architecture 追加）
+
+| 成果物種別 | 責務 | 正規所有者 |
+|---|---|---|
+| Command | 公開interface・dispatch | REQ-002・各command固有REQ |
+| Workflow Skill | workflow実装本体・STEP transition | REQ-005・workflow-skill-model.md |
+| STEP reference | STEP詳細・resume point | REQ-005・step-reference-contract.md |
+| Capability Skill | 共通能力 | REQ-027・workflow-skill-model.md |
+| Workflow Extension | 公開Workflow Skill 拡張 | REQ-002・project-extensions.md |
+| internal Workflow Extension | Workflow Skill 内部拡張 | REQ-002・project-extensions.md |
+| Capability Skill Extension | Capability Skill 拡張 | REQ-002・project-extensions.md |
 
 ## 親エージェント / サブエージェント責務
 

@@ -2,7 +2,7 @@
 title: `agentdev-skill-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-06
+updated: 2026-08-10
 ---
 
 # `agentdev-skill-authoring` SPEC
@@ -76,6 +76,13 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 - [agentdev-inspect-skills.md](agentdev-inspect-skills.md)
 - v2:REQ-0113（Skill References SPEC 分離基準）
 - REQ-003（コマンド、スキル、サブエージェント責務分界）
+
+## Workflow Skill と Capability Skill
+
+Skill authoring は Workflow Skill と Capability Skill の責務差を区別する（DEC-010）。
+Workflow Skill の SKILL.md は control plane（STEP transition・STEP間参照）を所有する。
+STEP reference は references/ 配下に配置し、resume point として自足する（DEC-011）。
+Capability Skill は複数workflow 共通能力を所有し、workflow 固有STEP と混在させない（REQ-002-018）。
 
 ## skill authoring 段階的開示基準
 
