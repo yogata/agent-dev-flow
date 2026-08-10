@@ -38,6 +38,39 @@ case-run は orchestration stage（case-auto が管理する command 間進行�
 | 実装フェーズ | 5-6 | work planが未完了 または チェックボックス未完了 |
 | 提出フェーズ | 7-11 | PRが未作成 |
 
+## STEP model（REQ-005-024、DEC-011）
+
+本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（control plane）。STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `docs/specs/workflows/step-reference-contract.md` に従う。STEP 識別子と durable state から current STEP を復元する契約は `docs/specs/workflows/input-resolution-and-durable-state.md` に従う。
+
+### STEP 識別子（case-run workflow）
+
+case-run internal lifecycle フェーズ構成の各フェーズが STEP resume point に対応する。STEP 識別子は command 固定番号（Step 1, Step 2 等）とは区別する。
+
+| STEP 識別子 | 対応フェーズ | 再開条件（precondition） |
+|---|---|---|
+| `prepare` | 準備フェーズ（Steps 1-4） | worktree+ブランチが存在しない |
+| `execute` | 実装フェーズ（Steps 5-6） | work plan未完了 または チェックボックス未完了 |
+| `submit` | 提出フェーズ（Steps 7-11） | PR未作成 |
+
+### durable state（case-run workflow）
+
+compaction や中断再開後に current STEP と必要入力を復元するための durable state。優先順位は `docs/specs/workflows/input-resolution-and-durable-state.md` に従う。
+
+1. **SSoT 再構成**: Issue 本文、要件doc、REQ/Decision/SPEC から再取得・再検証
+2. **identifier 保持**: Issue 番号、PR 番号、worktree ブランチ名、STEP 識別子
+3. **最小 scalar**: なし（case-run は scalar 状態を保持しない）
+4. **runtime artifact**: 要件doc draft、検出事項（REQ-008 lifecycle に従う）
+
+### Input Resolution（case-run workflow）
+
+各 STEP の開始時に入力を解決する。自然言語の前STEP result のみに依存せず、durable state 優先順位に従って入力を再構成する。compaction 後も STEP 識別子と durable state から current STEP を決定し、必要入力を復元できる。
+
+AgentDevFlow 配布契約は「STEP 識別子と durable state から current STEP を復元できる契約」のみを所有する。ToDo 使用、compaction 検出、current STEP 選択の実処理は harness 固有（AGENTS.md、harness reference）であり、本スキルでは規定しない。
+
+### 並列child task 復元（Epic Wave 実行時）
+
+Epic Wave 実行モードでは child identity（子Issue 番号）と status（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）を Harness から復元し、完了済み child 状態を durable domain state と再構成して fan-in 判定を行う。fan-in 判定モデルの詳細は `agentdev-epic-tracker` 参照。
+
 ### 準備フェーズの既知の制約（Windows + ジャンクション環境）
 
 - メインリポジトリで `sync-self-opencode.ps1`/ `install-consumer-opencode.ps1` が作成する `.opencode/` 配下のジャンクションリンクは、git worktree（`.worktrees/{N}`）へ伝播しない。worktree 作成後に個別に再作成が必要になる場合がある。

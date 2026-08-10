@@ -33,6 +33,16 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | case-run | レビューNG対応フロー参照 |
 | case-update | レビューNGコメント投稿フロー参照 |
 
+## STEP model 連携（REQ-005-024、DEC-011）
+
+本スキルは Workflow Skill としてレビュー後ルーティングルールを提供する。本スキル自身は workflow STEP を所有せず、case-run / case-update の各 Workflow Skill が所有する STEP から参照される（`docs/specs/workflows/workflow-skill-model.md`）。
+
+### ルーティング結果と Input Resolution
+
+レビュー NG 時の次コマンド推論結果は、呼出元 STEP から次 STEP への遷移入力として扱われる。Input Resolution は durable state 優先順位（`docs/specs/workflows/input-resolution-and-durable-state.md`）に従い、ルーティング結果は自然言語の引き継ぎのみに依存せず、Issue ラベル、PR 番号等の identifier と組み合わせて復元される。
+
+STEP reference 8 要素、STEP 識別子、durable state 復元契約は `docs/specs/workflows/step-reference-contract.md` に従う。compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
+
 ## 参考文献
 
 | ファイル | 内容 |

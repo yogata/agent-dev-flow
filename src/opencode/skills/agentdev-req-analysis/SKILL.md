@@ -90,6 +90,16 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 - **必須セクション**: `目的`, `要件`（テーブル形式）, `適用範囲`（対象/対象外）
 - **補助セクション（任意）**: `SPEC候補`（req-define が分離した SPEC 相当行と想定配置先 SPEC を記載。req-save が REQ ファイル保存時に除去し、spec-save が消費する）
 
+## STEP model 連携（REQ-005-024、DEC-011）
+
+本スキルは Capability Skill として、req-define / case-run 等の Workflow Skill が所有する STEP から呼び出される（`docs/specs/workflows/workflow-skill-model.md`）。本スキル自身は STEP を所有しない。
+
+### 呼出元 STEP と Input Resolution
+
+呼出元 STEP は本スキルへの入力（RU、セッションコンテキスト、明示入力ファイル）を Input Resolution（`docs/specs/workflows/input-resolution-and-durable-state.md`）に従って解決する。優先順位: (1) SSoT 再構成（docs/ 配下の永続文書）、(2) identifier 保持（RU-ID、REQ-ID、Issue番号）、(3) 最小 scalar、(4) runtime artifact（要件doc draft、検出事項等、REQ-008 lifecycle）。
+
+本スキルの出力（要件doc候補、壁打ち出力）は runtime artifact に分類され、呼出元 STEP の result evidence および次 STEP の Input Resolution 入力として扱われる。STEP reference 8 要素は `docs/specs/workflows/step-reference-contract.md` 参照。
+
 ## See Also
 
 - **agentdev-req-file-manager**: REQファイルの作成、追記、更新、分割操作とバリデーション

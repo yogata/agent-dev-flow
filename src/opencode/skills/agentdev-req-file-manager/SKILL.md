@@ -155,6 +155,16 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ---
 
+## STEP model 連携（REQ-005-024、DEC-011）
+
+本スキルは Capability Skill として、req-save / case-open / case-update / case-close 等の Workflow Skill が所有する STEP から呼び出される（`docs/specs/workflows/workflow-skill-model.md`）。本スキル自身は STEP を所有しない。
+
+### 永続成果物と Input Resolution
+
+本スキルが操作する REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）は durable state の最上位（SSoT 再構成）に位置する。REQ-ID（`REQ-{NNNN}`）は identifier 保持として安定 ID として扱う。優先順位の詳細は `docs/specs/workflows/input-resolution-and-durable-state.md` 参照。
+
+呼出元 STEP は本スキルの操作結果（REQ ファイル更新、要件行 ID 採番結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成または identifier 保持から再取得できる。STEP reference 8 要素は `docs/specs/workflows/step-reference-contract.md` 参照。
+
 ## See Also
 
 - **agentdev-req-analysis**: 要件分析手法（要件の展開観点、必達要件記述ガイダンス、壁打ちメソドロジー）
