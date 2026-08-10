@@ -16,7 +16,7 @@ context:
 rules:
   - id: artifact-graph-implementation-context
     when: 実装対象に関係するREQ、SPEC、整合性ルール、周辺成果物の候補を探索するとき。利用不能時は従来の探索手段で続行する
-    skill: repo-agentdev-artifact-graph
+    skill: agentdev-artifact-graph
 
 checks: []
 
