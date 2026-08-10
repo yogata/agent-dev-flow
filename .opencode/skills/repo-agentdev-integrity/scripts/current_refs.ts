@@ -2,6 +2,7 @@ const V2_PREFIX = "v2:";
 const CURRENT_REQ_REF_RE = /\bREQ-\d{3,4}\b/g;
 const CURRENT_ADR_REF_RE = /\bADR-\d{3,4}\b/g;
 const CURRENT_ADR_INVENTORY_REF_RE = /\bADR-\d{3}\b/g;
+const CURRENT_DEC_REF_RE = /\bDEC-\d{3}\b/g;
 const HISTORICAL_HEADING_RE =
   /\b(retired|historical)\b|履歴|過去経緯|retired-no-successor|historical-only/i;
 
@@ -28,6 +29,10 @@ export function extractCurrentReqRefs(content: string): string[] {
 
 export function extractCurrentAdrRefs(content: string): string[] {
   return extractRefsWithoutV2Prefix(content, CURRENT_ADR_REF_RE);
+}
+
+export function extractCurrentDecRefs(content: string): string[] {
+  return extractRefsWithoutV2Prefix(content, CURRENT_DEC_REF_RE);
 }
 
 export function extractCurrentAdrReadmeInventory(content: string): Set<string> {

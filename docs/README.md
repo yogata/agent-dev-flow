@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 24件、廃止済み: 0件
+現行 REQ: 25件、廃止済み: 0件
 <!-- AUTOGEN:END -->
 
-現行要件は REQ-001 から REQ-024 の24件である。各 REQ の詳細は各 REQ ファイル本文を参照。
+現行要件は REQ-001 から REQ-025 の25件である。各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
 |---|---|
@@ -37,6 +37,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-022](requirements/REQ-022.md) | Artifact Graph augmentation 配置先正規化 |
 | [REQ-023](requirements/REQ-023.md) | Artifact Graph 問い合わせ結果の関係情報拡張 |
 | [REQ-024](requirements/REQ-024.md) | Artifact Graph 未解決参照 warning の分類と抽出規則改善 |
+| [REQ-025](requirements/REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
 
 - [要件インデックス](requirements/README.md)
 
