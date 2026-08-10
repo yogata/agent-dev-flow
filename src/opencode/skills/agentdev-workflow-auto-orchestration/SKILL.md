@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-auto-orchestration
-description: case-auto コマンドの workflow 実装本体（最大自走モード orchestration）。USE FOR: case-auto Step 1〜8 の実装詳細（入力解決、工程分岐、委譲起動、インライン case-run、Wave 反復制御、L1 タイムスタンプ計測、結果状態の4次元集約、停止条件判定、停止理由分類、完了報告）、bounded parent decision resolution、コンフリクト解消モデル Level 2/3、adversarial-review 停止伝播（経路H）、子 task bg task 破棄検知時の回復、orchestration stage モデル。DO NOT USE FOR: case-auto Command 公開契約（入出力、ガードレール）の所有（case-auto.md command 定義参照）、case-run 単位の orchestration（`agentdev-workflow-orchestration` 参照）、work_type 判定（`agentdev-workflow-lifecycle` 参照）、Capture 境界詳細（`agentdev-workflow-orchestration` 参照）、委譲起動の具象実装（AGENTS.md および harness delegation 参照）
+description: case-auto コマンドの workflow 実装本体（最大自走モード orchestration）。USE FOR: case-auto Step 1〜8 の実装詳細（入力解決、工程分岐、委譲起動、インライン case-run、Wave 反復制御、L1 タイムスタンプ計測、結果状態の4次元集約、停止条件判定、停止理由分類、完了報告）、bounded parent decision resolution、コンフリクト解消モデル Level 2/3、adversarial-review 停止伝播（経路H）、子 task bg task 破棄検知時の回復、orchestration stage モデル。DO NOT USE FOR: case-auto Command 公開契約（入出力、ガードレール）の所有（case-auto.md command 定義参照）、case-run 単位の orchestration（`agentdev-workflow-orchestration` 参照）、work_type 判定（`agentdev-workflow-lifecycle` 参照）、Capture 境界詳細（`agentdev-workflow-orchestration` 参照）、委譲起動の具象実装（AGENTS.md および harness delegation 参照）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-027-002 soft guard で抑制）
 ---
 
 # case-auto workflow orchestration 実装本体
