@@ -74,6 +74,7 @@ import {
 import {
   extractCurrentAdrReadmeInventory,
   extractCurrentAdrRefs,
+  extractCurrentDecRefs,
   extractCurrentReqRefs,
 } from "./current_refs.ts";
 
@@ -557,13 +558,31 @@ function checkAdrReqCrossReference(
   const retiredReqIds = new Set(retiredFiles.map((f) => f.replace(".md", "")));
   const allReqIds = new Set([...existingReqIds, ...retiredReqIds]);
 
+  // DEC-009 (Decision migration): also resolve Decision IDs (docs/decisions/).
+  // Decision IDs (`DEC-NNN`) are the post-migration canonical form. Legacy
+  // `ADR-NNN` references in `docs/adr/` continue to resolve via allAdrIds for
+  // backward compatibility with fixtures and historical directories.
+  const decDir = path.join(root, "docs", "decisions");
+  const decFiles = fs.existsSync(decDir)
+    ? listFiles(decDir).filter((f) => f.startsWith("DEC-") && f !== "README.md")
+    : [];
+  const existingDecIds = new Set(decFiles.map((f) => f.replace(".md", "")));
+  const retiredDecDir = path.join(decDir, "retired");
+  const retiredDecFiles = fs.existsSync(retiredDecDir)
+    ? listFiles(retiredDecDir).filter((f) => f.startsWith("DEC-"))
+    : [];
+  const retiredDecIds = new Set(
+    retiredDecFiles.map((f) => f.replace(".md", "")),
+  );
+  const allDecIds = new Set([...existingDecIds, ...retiredDecIds]);
+
   for (const file of reqFiles) {
     const fullPath = path.join(reqDir, file);
     const content = readText(fullPath);
     if (!content) continue;
     const relPath = resolveRelative(fullPath, root);
-    const uniqueRefs = extractCurrentAdrRefs(content);
-    for (const ref of uniqueRefs) {
+    const uniqueAdrRefs = extractCurrentAdrRefs(content);
+    for (const ref of uniqueAdrRefs) {
       // v2:REQ-0161-004: skip deletion self-references (REQ describes its own
       // deletion targets; see DELETION_SELF_REFERENCE_EXCLUSIONS).
       if (isDeletionSelfReference(relPath, ref)) continue;
@@ -573,6 +592,19 @@ function checkAdrReqCrossReference(
             "ADR",
             "adr-req-crossref",
             `${ref} referenced in ${file} but ADR file does not exist`,
+          ),
+        );
+      }
+    }
+    const uniqueDecRefs = extractCurrentDecRefs(content);
+    for (const ref of uniqueDecRefs) {
+      if (isDeletionSelfReference(relPath, ref)) continue;
+      if (!allDecIds.has(ref)) {
+        results.push(
+          ng(
+            "Decision",
+            "adr-req-crossref",
+            `${ref} referenced in ${file} but Decision file does not exist`,
           ),
         );
       }
@@ -598,10 +630,28 @@ function checkAdrReqCrossReference(
     }
   }
 
+  for (const file of decFiles) {
+    const fullPath = path.join(decDir, file);
+    const content = readText(fullPath);
+    if (!content) continue;
+    const uniqueRefs = extractCurrentReqRefs(content);
+    for (const ref of uniqueRefs) {
+      if (!allReqIds.has(ref)) {
+        results.push(
+          ng(
+            "Decision",
+            "adr-req-crossref",
+            `${ref} referenced in ${file} but REQ file does not exist`,
+          ),
+        );
+      }
+    }
+  }
+
   const reqRefErrors = results.filter((r) => r.level === "ng").length;
   if (reqRefErrors === 0) {
     results.push(
-      ok("ADR", "adr-req-crossref", "All ADR ↔ REQ cross-references are valid"),
+      ok("ADR", "adr-req-crossref", "All Decision ↔ REQ cross-references are valid"),
     );
   }
   return results;
@@ -4038,31 +4088,74 @@ function checkAcceptedAdrOnlyCitation(root: string): CheckResult[] {
     (f) => f.startsWith("ADR-") && f !== "README.md",
   );
 
-  const nonAcceptedAdrs = new Map<string, string>();
-  for (const file of adrFiles) {
-    const fullPath = path.join(adrDir, file);
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
-    const status =
-      typeof fm["status"] === "string" ? fm["status"].toLowerCase() : "";
-    if (status && status !== "accepted") {
-      nonAcceptedAdrs.set(file.replace(".md", ""), status);
+  // DEC-009 (Decision migration): scan `docs/decisions/` as the canonical
+  // Decision directory. ADRs under `docs/adr/` are still scanned for fixtures
+  // and any legacy directory that has not been migrated yet.
+  const decDir = path.join(root, "docs", "decisions");
+  const decFiles = fs.existsSync(decDir)
+    ? listFiles(decDir).filter(
+        (f) => f.startsWith("DEC-") && f !== "README.md",
+      )
+    : [];
+
+  type ArtifactSpec = { dir: string; files: string[]; idPrefix: "ADR" | "Decision" };
+  const specs: ArtifactSpec[] = [
+    { dir: adrDir, files: adrFiles, idPrefix: "ADR" },
+    { dir: decDir, files: decFiles, idPrefix: "Decision" },
+  ];
+
+  let totalNonAccepted = 0;
+  for (const spec of specs) {
+    if (spec.files.length === 0) continue;
+    const nonAccepted = new Map<string, string>();
+    for (const file of spec.files) {
+      const fullPath = path.join(spec.dir, file);
+      const content = readText(fullPath);
+      if (!content) continue;
+      const fm = parseFrontmatter(content);
+      if (!fm) continue;
+      const status =
+        typeof fm["status"] === "string" ? fm["status"].toLowerCase() : "";
+      if (status && status !== "accepted") {
+        nonAccepted.set(file.replace(".md", ""), status);
+      }
     }
+
+    if (nonAccepted.size === 0) {
+      results.push(
+        ok(
+          spec.idPrefix,
+          "accepted-adr-only-citation",
+          spec.idPrefix === "ADR"
+            ? "All ADRs are accepted or no non-accepted ADRs exist"
+            : "All Decisions are accepted or no non-accepted Decisions exist",
+        ),
+      );
+      continue;
+    }
+
+    totalNonAccepted += nonAccepted.size;
+    checkNonAcceptedArtifactRefsInFiles(root, nonAccepted, spec.idPrefix, results);
   }
 
-  if (nonAcceptedAdrs.size === 0) {
+  if (totalNonAccepted === 0) {
     results.push(
       ok(
         "ADR",
         "accepted-adr-only-citation",
-        "All ADRs are accepted or no non-accepted ADRs exist",
+        "All Decisions are accepted or no non-accepted Decisions exist",
       ),
     );
-    return results;
   }
+  return results;
+}
 
+function checkNonAcceptedArtifactRefsInFiles(
+  root: string,
+  nonAcceptedIds: Map<string, string>,
+  idPrefix: "ADR" | "Decision",
+  results: CheckResult[],
+): void {
   // v2:REQ-0158-004: docs/specs/**/*.md 再帰対応
   const filesToScan = [
     path.join(root, "docs", "requirements"),
@@ -4082,29 +4175,46 @@ function checkAcceptedAdrOnlyCitation(root: string): CheckResult[] {
         ? collectSpecMarkdownRecursively(scanTarget)
         : listFiles(scanTarget).map((f) => path.join(scanTarget, f));
       for (const fullPath of fileList) {
-        checkNonAcceptedAdrRefsInFile(fullPath, root, nonAcceptedAdrs, results);
+        checkNonAcceptedArtifactRefsInFile(
+          fullPath,
+          root,
+          nonAcceptedIds,
+          idPrefix,
+          results,
+        );
       }
     } else {
-      checkNonAcceptedAdrRefsInFile(scanTarget, root, nonAcceptedAdrs, results);
+      checkNonAcceptedArtifactRefsInFile(
+        scanTarget,
+        root,
+        nonAcceptedIds,
+        idPrefix,
+        results,
+      );
     }
   }
-
-  if (results.filter((r) => r.level === "warning").length === 0) {
-    results.push(
-      ok(
-        "ADR",
-        "accepted-adr-only-citation",
-        "Only accepted ADRs are cited as current basis",
-      ),
-    );
-  }
-  return results;
 }
 
 function checkNonAcceptedAdrRefsInFile(
   filePath: string,
   root: string,
   nonAcceptedAdrs: Map<string, string>,
+  results: CheckResult[],
+): void {
+  checkNonAcceptedArtifactRefsInFile(
+    filePath,
+    root,
+    nonAcceptedAdrs,
+    "ADR",
+    results,
+  );
+}
+
+function checkNonAcceptedArtifactRefsInFile(
+  filePath: string,
+  root: string,
+  nonAcceptedIds: Map<string, string>,
+  idPrefix: "ADR" | "Decision",
   results: CheckResult[],
 ): void {
   const content = readText(filePath);
@@ -4123,7 +4233,7 @@ function checkNonAcceptedAdrRefsInFile(
   const lines = content.split("\n");
   const exemptedRefs = new Set<string>();
   for (let i = 0; i < lines.length; i++) {
-    for (const ref of nonAcceptedAdrs.keys()) {
+    for (const ref of nonAcceptedIds.keys()) {
       if (
         lines[i].includes(ref) &&
         (contextExemptPatterns.some((p) => p.test(lines[i])) ||
@@ -4134,23 +4244,24 @@ function checkNonAcceptedAdrRefsInFile(
     }
   }
 
-  const uniqueRefs = extractCurrentAdrRefs(content).filter(
-    (ref) => !exemptedRefs.has(ref),
-  );
+  const extractFn =
+    idPrefix === "Decision" ? extractCurrentDecRefs : extractCurrentAdrRefs;
+  const uniqueRefs = extractFn(content).filter((ref) => !exemptedRefs.has(ref));
 
+  const label = idPrefix === "Decision" ? "Decision" : "ADR";
   for (const ref of uniqueRefs) {
-    const status = nonAcceptedAdrs.get(ref);
+    const status = nonAcceptedIds.get(ref);
     if (status) {
       results.push(
         warn(
-          "ADR",
+          idPrefix,
           "accepted-adr-only-citation",
-          `Non-accepted ADR ${ref} (status: ${status}) cited in ${relPath}`,
+          `Non-accepted ${label} ${ref} (status: ${status}) cited in ${relPath}`,
           relPath,
           undefined,
           {
             evidence: ref,
-            expected: "only accepted ADRs should be cited as current basis",
+            expected: `only accepted ${label}s should be cited as current basis`,
             route: "intake",
           },
         ),
@@ -6874,11 +6985,16 @@ function checkDraftSpecStaleness(specsDir: string, root: string): CheckResult[] 
 // ===== IR-055: runtime-unresolved-reference (v2:REQ-0108-263, v2:REQ-0108-264) =====
 // Detects references in distribution files (src/opencode/commands/agentdev/**/*.md,
 // src/opencode/skills/agentdev-*/**/*.md) that cannot be resolved in consumer
-// environments: REQ/ADR IDs, src/opencode/ paths, docs/specs/, docs/guides/,
+// environments: REQ/Decision IDs, src/opencode/ paths, docs/specs/, docs/guides/,
 // /repo/*, repo-*, main-repo GitHub URLs, line-number-qualified internal refs.
 // Severity per SPEC docs/specs/integrity/rules/IR-055-runtime-unresolved-reference.md:
-//   strict:    REQ-NNNN, REQ-NNNN-NNN, ADR-NNNN, src/opencode/, /repo/*, repo-*
+//   strict:    REQ-NNNN, REQ-NNNN-NNN, DEC-NNN (current), ADR-NNNN (residual),
+//              src/opencode/, /repo/*, repo-*
 //   heuristic: docs/specs/, docs/guides/, main-repo GitHub URL, file.md#L<N>
+// DEC-009 (Decision migration): DEC-NNN is the current canonical form. Legacy
+// ADR-NNNN references are flagged as residual (migration leftover).
+// AG-010 (historical reference protection): v2:ADR-NNNN is exempted via the
+// v2: prefix filter in extractRefsWithoutV2Prefix-equivalent line scans.
 // Gradual rollout (v2:REQ-0108-264): baseline-known violations are reported as info
 // (no fail). New violations (delta from baseline) are reported as warn/ng and
 // fail in delta guard / impact guard. Full audit fails once baseline reaches 0.
@@ -6886,6 +7002,7 @@ function checkDraftSpecStaleness(specsDir: string, root: string): CheckResult[] 
 const IR055_STRICT_PATTERNS: ReadonlyArray<{ name: string; pattern: RegExp }> = [
   { name: "REQ-NNNN-NNN", pattern: /\bREQ-\d{4}-\d{3}\b/g },
   { name: "REQ-NNNN", pattern: /\bREQ-\d{3,4}\b/g },
+  { name: "DEC-NNN", pattern: /\bDEC-\d{3}\b/g },
   { name: "ADR-NNNN", pattern: /\bADR-\d{3,4}\b/g },
   { name: "src/opencode/", pattern: /\bsrc\/opencode\//g },
   { name: "/repo/", pattern: /\/repo\//g },
@@ -7010,6 +7127,15 @@ function collectIr055Violations(root: string): Ir055RawViolation[] {
         pattern.lastIndex = 0;
         let match;
         while ((match = pattern.exec(line)) !== null) {
+          // AG-010 (DEC-009 historical reference protection): skip ADR-NNNN
+          // matches immediately preceded by `v2:` (legacy historical refs).
+          if (
+            name === "ADR-NNNN" &&
+            match.index >= 3 &&
+            line.slice(match.index - 3, match.index) === "v2:"
+          ) {
+            continue;
+          }
           violations.push({
             file: relPath,
             line: i + 1,
