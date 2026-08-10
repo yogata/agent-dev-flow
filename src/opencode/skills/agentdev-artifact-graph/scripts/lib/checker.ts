@@ -4,6 +4,7 @@ export type CheckReport = {
   readonly valid: boolean
   readonly errors: readonly string[]
   readonly warnings: readonly string[]
+  readonly info: readonly string[]
 }
 
 function duplicateIds(ids: readonly string[], kind: string): readonly string[] {
@@ -40,12 +41,15 @@ export function checkGraph(graph: GraphData): CheckReport {
     }
   }
   const warnings = graph.diagnostics
-    .filter((entry) => entry.severity !== "error")
+    .filter((entry) => entry.severity === "warning")
+    .map((entry) => `${entry.code}: ${entry.message}`)
+  const info = graph.diagnostics
+    .filter((entry) => entry.severity === "observation")
     .map((entry) => `${entry.code}: ${entry.message}`)
   errors.push(
     ...graph.diagnostics
       .filter((entry) => entry.severity === "error")
       .map((entry) => `${entry.code}: ${entry.message}`),
   )
-  return { valid: errors.length === 0, errors: errors.sort(), warnings: warnings.sort() }
+  return { valid: errors.length === 0, errors: errors.sort(), warnings: warnings.sort(), info: info.sort() }
 }
