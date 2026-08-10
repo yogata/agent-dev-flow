@@ -8,7 +8,7 @@ description: req-save→spec-save→case-open→case-run→case-closeを順次�
 
 ## workflow 実装の権威情報源
 
-本コマンドの workflow 実装本体（Step 1〜8 の詳細、Wave 反復制御、bounded parent decision resolution、コンフリクト解消モデル Level 2/3、adversarial-review 停止伝播 経路H、結果状態の4次元集約、L1 タイムスタンプ計測、orchestration stage モデル、子 task bg task 破棄検知時の回復）は `agentdev-workflow-auto-orchestration` Workflow Skill を権威情報源とする（責務3層分化、workflow-skill-model SPEC 準拠）。本コマンド定義は公開 interface / dispatch のみを所有し、workflow 実装本体を複製しない。case-auto は下位 workflow（req-save / spec-save / case-open / case-run / case-close）の契約確定後に上位 orchestrator として振る舞う。
+本コマンドの workflow 実装本体（Step 1〜8 の詳細、Wave 反復制御、bounded parent decision resolution、コンフリクト解消モデル Level 2/3、adversarial-review 停止伝播 経路H、結果状態の4次元集約、L1 タイムスタンプ計測、orchestration stage モデル、子 task bg task 破棄検知時の回復）は `agentdev-workflow-case-auto` Workflow Skill を権威情報源とする（責務3層分化、workflow-skill-model SPEC 準拠）。本コマンド定義は公開 interface / dispatch のみを所有し、workflow 実装本体を複製しない。case-auto は下位 workflow（req-save / spec-save / case-open / case-run / case-close）の契約確定後に上位 orchestrator として振る舞う。
 
 ## project extensions
 
@@ -26,11 +26,11 @@ description: req-save→spec-save→case-open→case-run→case-closeを順次�
 
 ## 手順（Step 概要）
 
-各 Step の実装詳細、判定基準、状態遷移、入力モード分岐、停止条件、停止理由分類、完了報告フォーマットは `agentdev-workflow-auto-orchestration` を参照。本コマンド定義は Step 名と公開契約のみを列挙する。
+各 Step の実装詳細、判定基準、状態遷移、入力モード分岐、停止条件、停止理由分類、完了報告フォーマットは `agentdev-workflow-case-auto` を参照。本コマンド定義は Step 名と公開契約のみを列挙する。
 
 ### Step 1: 入力解決
 
-実行開始時刻（JST）を `case_auto_started_at` に記録し、入力モード（Issue番号/URL 入力モード または 要件doc入力モード）を分岐する。要件doc入力モードのサブ分岐（引数なしデフォルト、明示パス指定、セッション指定キーワード、特定不可）と複数draft読み込み時の順序制御の詳細は `agentdev-workflow-auto-orchestration` 参照。
+実行開始時刻（JST）を `case_auto_started_at` に記録し、入力モード（Issue番号/URL 入力モード または 要件doc入力モード）を分岐する。要件doc入力モードのサブ分岐（引数なしデフォルト、明示パス指定、セッション指定キーワード、特定不可）と複数draft読み込み時の順序制御の詳細は `agentdev-workflow-case-auto` 参照。
 
 ### Step 2: work_type 読取
 
@@ -38,11 +38,11 @@ description: req-save→spec-save→case-open→case-run→case-closeを順次�
 
 ### Step 3: 工程分岐（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定）
 
-Issue番号/URL 入力時は case-run → case-close へ分岐（req-save、spec-save、case-open、work_type読取スキップ）。要件doc入力時は `artifact_actions` 存在による動的判定で req-save / spec-save / case-open / case-run / case-close へ分岐する。`auto_gate preflight`（`auto_gate.auto_ready` が false または未解決 item 残る場合の停止）の詳細は `agentdev-workflow-auto-orchestration` 参照。
+Issue番号/URL 入力時は case-run → case-close へ分岐（req-save、spec-save、case-open、work_type読取スキップ）。要件doc入力時は `artifact_actions` 存在による動的判定で req-save / spec-save / case-open / case-run / case-close へ分岐する。`auto_gate preflight`（`auto_gate.auto_ready` が false または未解決 item 残る場合の停止）の詳細は `agentdev-workflow-case-auto` 参照。
 
 ### Step 4: 各工程の実行
 
-各工程を委譲起動（req-save / spec-save / case-open / case-close）またはインライン実行（case-run、AG-001/002）する。実行モデル原則、工程別契約、QG-1〜QG-4 の継承、L1 タイムスタンプ計測、インライン実行時のコンテキスト管理、結果状態の4次元集約、Wave 反復制御（Step 4-1）、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定、Subagent 委譲プロトコル、orchestration stage モデル、子 task bg task 破棄検知時の回復の各詳細は `agentdev-workflow-auto-orchestration` を参照。case-run インライン実行時も case-run.md を authoritative source として読み込む。各工程の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
+各工程を委譲起動（req-save / spec-save / case-open / case-close）またはインライン実行（case-run、AG-001/002）する。実行モデル原則、工程別契約、QG-1〜QG-4 の継承、L1 タイムスタンプ計測、インライン実行時のコンテキスト管理、結果状態の4次元集約、Wave 反復制御（Step 4-1）、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定、Subagent 委譲プロトコル、orchestration stage モデル、子 task bg task 破棄検知時の回復の各詳細は `agentdev-workflow-case-auto` を参照。case-run インライン実行時も case-run.md を authoritative source として読み込む。各工程の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
 
 ### Step 5: 工程間の状態引き継ぎ
 
@@ -54,27 +54,27 @@ req-save 委譲の出力から複数 REQ doc または scale:large を検出し�
 
 ### Step 7: 停止条件の検出
 
-11項目の停止条件のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する。停止時タイミング情報の追記（`case_auto_started_at`、停止時刻、経過時間、工程別タイムスタンプ内訳）を含める。停止条件の全量、停止時タイミング情報フォーマットの詳細は `agentdev-workflow-auto-orchestration` 参照。
+11項目の停止条件のいずれかを検出した場合、実行を停止し停止理由・現在地点・再開可能な次コマンドを報告する。停止時タイミング情報の追記（`case_auto_started_at`、停止時刻、経過時間、工程別タイムスタンプ内訳）を含める。停止条件の全量、停止時タイミング情報フォーマットの詳細は `agentdev-workflow-case-auto` 参照。
 
 ### Step 7-1: 停止理由分類
 
-Step 7 の停止条件を8分類軸で報告する（HITL 境界の変更ではなく、再開コマンド選択とユーザー通知の精度向上が目的）。各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-auto-orchestration` 参照。
+Step 7 の停止条件を8分類軸で報告する（HITL 境界の変更ではなく、再開コマンド選択とユーザー通知の精度向上が目的）。各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-case-auto` 参照。
 
 ### Step 8: 完了報告
 
-最終工程（case-close 委譲）の完了報告をそのまま出力する。Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、G16）。停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する。完了報告の全項目（停止理由分類、タイムスタンプ内訳、インライン実行記録、orchestration stage 別結果、結果状態の4次元報告）の詳細は `agentdev-workflow-auto-orchestration` 参照。**OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（全 OU 処理完了時のみ全体完了報告）。
+最終工程（case-close 委譲）の完了報告をそのまま出力する。Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、G16）。停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する。完了報告の全項目（停止理由分類、タイムスタンプ内訳、インライン実行記録、orchestration stage 別結果、結果状態の4次元報告）の詳細は `agentdev-workflow-case-auto` 参照。**OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を Step 2 から開始（全 OU 処理完了時のみ全体完了報告）。
 
 ## adversarial-review 由来の停止伝播（経路H）
 
-Step 4（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。受領形式、自走停止、ユーザー提示、resume point、再開、case-auto が行わないこと（review 直接起動、finding 解釈、採否、再評価の禁止）の実装詳細は `agentdev-workflow-auto-orchestration`「adversarial-review 停止伝播（経路H）」節を参照。停止伝播契約の SSoT は case-auto command SPEC「adversarial-review 由来の停止伝播（経路H）」節、workflow-contracts SPEC、delegation-contracts SPEC が正である。user-decision-required は Step 7-1 の HITL 境界停止条件分類とは独立する停止理由分類である。停止報告（Step 8）には user-decision-required を停止理由分類として含める。
+Step 4（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。受領形式、自走停止、ユーザー提示、resume point、再開、case-auto が行わないこと（review 直接起動、finding 解釈、採否、再評価の禁止）の実装詳細は `agentdev-workflow-case-auto` の `references/stop-and-decision-resolution.md`（STEP-5）を参照。停止伝播契約の SSoT は case-auto command SPEC「adversarial-review 由来の停止伝播（経路H）」節、workflow-contracts SPEC、delegation-contracts SPEC が正である。user-decision-required は Step 7-1 の HITL 境界停止条件分類とは独立する停止理由分類である。停止報告（Step 8）には user-decision-required を停止理由分類として含める。
 
 ## bounded parent decision resolution
 
-case-auto は下位 command から受領した decision_context を限定的に自律解決する。default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。自律解決、作業仮定で継続、上位合意矛盾、新規ユーザー判断事項、resume 機構、中央集約 review engine 非化の実装詳細は `agentdev-workflow-auto-orchestration`「bounded parent decision resolution」節を参照。解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command SPEC「bounded parent decision resolution」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節、workflow-contracts SPEC「bounded parent decision resolution と停止・resume 伝播」節が正である。case-auto は raw finding を解釈、採否、候補反映しない（AG-006）。
+case-auto は下位 command から受領した decision_context を限定的に自律解決する。default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。自律解決、作業仮定で継続、上位合意矛盾、新規ユーザー判断事項、resume 機構、中央集約 review engine 非化の実装詳細は `agentdev-workflow-case-auto` の `references/stop-and-decision-resolution.md`（STEP-6）を参照。解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command SPEC「bounded parent decision resolution」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節、workflow-contracts SPEC「bounded parent decision resolution と停止・resume 伝播」節が正である。case-auto は raw finding を解釈、採否、候補反映しない（AG-006）。
 
 ## コンフリクト解消モデル（3レベルエスカレーション）
 
-PR マージコンフリクト発生時（case-close Step 4-2 からのエスカレーション受領時）は、3レベルのエスカレーションで解消を図る。Level 1（case-close、`git rebase` による機械的解消）は case-close Step 4-2 の責務。Level 2（case-auto、コンフリクト文脈付きインライン case-run 再実行 AG-005、最大2回）、Level 3（case-auto、マージ順序変更、blocked 単位の隔離）の実装詳細は `agentdev-workflow-auto-orchestration`「コンフリクト解消モデル（3レベルエスカレーション）」節を参照。機械的競合（rebase で自動解決可能）は停止条件に含まず、Level 1 で case-close が解消する。停止条件の段階化（Level 2 再委譲上限回数試行後停止、発生元非依存でアクセス可能文脈を総動員）の詳細も同節参照。
+PR マージコンフリクト発生時（case-close Step 4-2 からのエスカレーション受領時）は、3レベルのエスカレーションで解消を図る。Level 1（case-close、`git rebase` による機械的解消）は case-close Step 4-2 の責務。Level 2（case-auto、コンフリクト文脈付きインライン case-run 再実行 AG-005、最大2回）、Level 3（case-auto、マージ順序変更、blocked 単位の隔離）の実装詳細は `agentdev-workflow-case-auto` の `references/conflict-resolution-and-reporting.md`（STEP-7）を参照。機械的競合（rebase で自動解決可能）は停止条件に含まず、Level 1 で case-close が解消する。停止条件の段階化（Level 2 再委譲上限回数試行後停止、発生元非依存でアクセス可能文脈を総動員）の詳細も同節参照。
 
 ## ガードレール
 
