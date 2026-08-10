@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下23件を第一参照先とする。
+現在の要件判断では、以下24件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -35,6 +35,7 @@
 | [REQ-021](REQ-021.md) | Artifact Graph ワークフロー統合 |
 | [REQ-022](REQ-022.md) | Artifact Graph augmentation 配置先正規化 |
 | [REQ-023](REQ-023.md) | Artifact Graph 問い合わせ結果の関係情報拡張 |
+| [REQ-024](REQ-024.md) | Artifact Graph 未解決参照 warning の分類と抽出規則改善 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件

@@ -1,4 +1,5 @@
-import { dirname, normalize, relative, resolve } from "node:path"
+import { existsSync } from "node:fs"
+import { dirname, join, normalize, relative, resolve } from "node:path"
 import type {
   Diagnostic,
   ExtractionRule,
@@ -40,6 +41,73 @@ function resolveAlias(index: NodeIndex, raw: string): string | undefined {
   return index.aliases.get(cleaned) ?? index.aliases.get(cleaned.replace(/^\.\//, ""))
 }
 
+// ─── Unresolved reference classification (REQ-024-001/002) ───────────────────
+
+type ReferenceKind =
+  | "relative_path"
+  | "directory_path"
+  | "explicit_id"
+  | "bare_filename"
+  | "description_word"
+
+type SourceFileType =
+  | "REQ"
+  | "DEC"
+  | "SPEC/command"
+  | "SPEC/skill"
+  | "SPEC/workflow"
+  | "SPEC/foundation"
+  | "COMMAND"
+  | "SKILL"
+  | "SKILL/repo-local"
+  | "other"
+
+function classifyReference(value: string): ReferenceKind {
+  const cleaned = value.replace(/^`|`$/g, "").replace(/^v2:/, "").trim()
+  if (cleaned.endsWith("/")) return "directory_path"
+  if (/^(REQ|DEC|IR|ADR|SPEC|RU|AG)-\d+/i.test(cleaned)) return "explicit_id"
+  if (cleaned.includes("/")) return "relative_path"
+  if (/\.[a-z0-9]{1,10}$/i.test(cleaned)) return "bare_filename"
+  return "description_word"
+}
+
+function classifySourceFile(path: string): SourceFileType {
+  if (/^docs\/requirements\/REQ-/.test(path)) return "REQ"
+  if (/^docs\/decisions\//.test(path)) return "DEC"
+  if (/^docs\/specs\/commands\//.test(path)) return "SPEC/command"
+  if (/^docs\/specs\/skills\//.test(path)) return "SPEC/skill"
+  if (/^docs\/specs\/workflows\//.test(path)) return "SPEC/workflow"
+  if (/^docs\/specs\//.test(path)) return "SPEC/foundation"
+  if (/^src\/opencode\/commands\//.test(path)) return "COMMAND"
+  if (/^\.opencode\/commands\//.test(path)) return "COMMAND"
+  if (/^src\/opencode\/skills\//.test(path)) return "SKILL"
+  if (/^\.opencode\/skills\//.test(path)) return "SKILL/repo-local"
+  return "other"
+}
+
+/**
+ * Check whether a candidate file exists for a path-form reference, even when
+ * the relative path escapes the repository root (too many ../). Returns true
+ * when a resolvable candidate is identifiable on the filesystem.
+ */
+function candidateExists(root: string, sourcePath: string, target: string): boolean {
+  const stripped = target.split("#")[0] ?? ""
+  if (stripped === "") return false
+  const sourceDir = dirname(sourcePath)
+  const resolved = resolve(root, sourceDir, stripped)
+  const rel = normalize(relative(root, resolved)).replaceAll("\\", "/")
+  if (!rel.startsWith("..") && rel !== "") {
+    return existsSync(join(root, rel))
+  }
+  // Path escapes root: strip leading ../ segments and look for candidate under root.
+  const parts = rel.split("/")
+  let i = 0
+  while (i < parts.length && (parts[i] === ".." || parts[i] === ".")) i += 1
+  if (i >= parts.length) return false
+  const candidate = parts.slice(i).join("/")
+  return candidate !== "" && existsSync(join(root, candidate))
+}
+
 function makeEdge(seed: EdgeSeed): { readonly edge: GraphEdge; readonly provenance: Provenance } {
   const provenance = makeProvenance({
     path: seed.input.path,
@@ -65,11 +133,22 @@ function makeEdge(seed: EdgeSeed): { readonly edge: GraphEdge; readonly provenan
   }
 }
 
-function unresolved(input: InputFile, field: ParsedField, value: string): Diagnostic {
+function unresolved(root: string, input: InputFile, field: ParsedField, value: string): Diagnostic {
+  const kind = classifyReference(value)
+  const sourceType = classifySourceFile(input.path)
+  let severity: Diagnostic["severity"] = "warning"
+  let suffix: string = kind
+  if (kind === "relative_path") {
+    const resolvable = candidateExists(root, input.path, value)
+    suffix = resolvable ? "relative_path:resolvable" : "relative_path:unresolved"
+    if (resolvable) severity = "observation"
+  } else {
+    severity = "observation"
+  }
   return {
-    severity: "warning",
-    code: "unresolved_reference",
-    message: `Reference does not resolve: ${value}`,
+    severity,
+    code: `unresolved_reference:${suffix}`,
+    message: `Reference does not resolve (${kind} from ${sourceType}): ${value}`,
     path: input.path,
     element_id: `field:${field.key}`,
   }
@@ -88,6 +167,7 @@ function buildFieldToRelationMap(
 }
 
 function structuredSeeds(
+  root: string,
   input: InputFile,
   index: NodeIndex,
   fieldMap: Map<string, { type: string; reverse: boolean }>,
@@ -110,7 +190,7 @@ function structuredSeeds(
     for (const value of f.values) {
       const target = resolveAlias(index, value)
       if (target === undefined) {
-        diagnostics.push(unresolved(input, f, value))
+        diagnostics.push(unresolved(root, input, f, value))
         continue
       }
       if (mapping.reverse) {
@@ -207,7 +287,7 @@ function markdownSeeds(root: string, input: InputFile, index: NodeIndex): {
     const target = resolveAlias(index, targetPath)
     const f = { key: "markdown_link", values: [link.target], line: link.line, text: link.text }
     if (target === undefined) {
-      diagnostics.push(unresolved(input, f, link.target))
+      diagnostics.push(unresolved(root, input, f, link.target))
       continue
     }
     seeds.push({
@@ -234,7 +314,7 @@ export function extractEdges(
   const diagnostics: Diagnostic[] = []
 
   for (const input of inputs) {
-    const structured = structuredSeeds(input, index, fieldMap)
+    const structured = structuredSeeds(root, input, index, fieldMap)
     const markdown = markdownSeeds(root, input, index)
     seeds.push(...structured.seeds, ...markdown.seeds)
     diagnostics.push(...structured.diagnostics, ...markdown.diagnostics)
