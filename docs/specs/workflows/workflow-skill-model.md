@@ -15,6 +15,7 @@ canonical_owner: workflow-skill-model
 
 Command / Workflow Skill / Capability Skill の責務、依存方向、1:N分割基準、配置契約を定義する。
 DEC-010（責務3層分化と1:N分割原則）の実装詳細を正規所有する。
+本 SPEC は REQ-027-001 に基づき Capability Skill model（定義・配置・参照契約・1:N分割基準・依存方向）の正規所有者となる。REQ-027 は境界宣言のみを持ち、本節が詳細実装を正規所有する。
 
 ## Command 責務
 
@@ -26,14 +27,121 @@ workflow 実装本体。SKILL.md = control plane（STEP transition・STEP間参�
 1:1 または 1:N で Command に対応する。1:N 分割基準: 制御構造に実質差異がある場合に分割評価。
 operation 差だけの不必要分割は回避。
 
+Workflow Skill は workflow STEP を所有し、特定 Command の制御構造を持つ（REQ-002-001、REQ-002-002）。
+
 ## Capability Skill 責務
 
-複数workflow 共通能力。workflow 固有STEP から横断抽出。配置・参照契約は REQ-002-017 に従う。
+複数workflow で共通する能力を一次情報として所有する。workflow 固有STEP から横断抽出し、workflow 制御構造を持たない（REQ-002-003、REQ-027-001、DEC-010）。
+
+Capability Skill は workflow STEP を所有しない。各 Workflow Skill が所有する STEP から名レベルで参照される宣言的定義、判断基準、決定的処理を提供する。
+
+### Capability Skill の判定基準
+
+ある skill が以下の3要件を全て満たす場合、Capability Skill として分類する。
+
+1. **workflow STEP 非所有**: workflow の STEP transition、resume point、control plane を所有しない
+2. **複数 workflow からの参照**: 2つ以上の Workflow Skill から参照される、または参照予定である
+3. **workflow 制御構造からの分離**: workflow 制御（STEP 順序、分岐、停止条件）から独立して記述できる能力である
+
+要件 1 は Workflow Skill との区別（REQ-002-018）を担保する。要件 2 は1Workflow で完結する能力を Workflow Skill 内 `references/` 配下へ配置する基準との区別を担保する。要件 3 は workflow 制御と混在しない単一責務境界を担保する。
+
+### Capability Skill の配置と命名
+
+- **配置**: `src/opencode/skills/agentdev-*/` 配下（REQ-002-008、REQ-002-019）
+- **原本と投影**: 原本は `src/opencode/skills/`、実行時投影先は `.opencode/skills/`（REQ-002-007、DEC-002）
+- **命名**: `agentdev-{機能領域名}` 形式を推奨する。`agentdev-workflow-*` プレフィックスは歴史的経緯で Capability Skill にも残存する（後述「workflow-* プレフィックスを持つ Capability Skill 的スキル」）。Workflow/Capability 区別は命名ではなく本節の判定基準に基づく。新規作成は機能領域名（`req-*`、`spec-*`、`intake-*`、`learning-*`、`git-*`、`gh-*`、`quality-gates` 等）を推奨する
+
+### Capability Skill の参照契約（過剰共通 reference 化の回避）
+
+Workflow Skill は Capability Skill を**名レベルで参照**する（REQ-002-017）。Capability Skill の内部構造（`references/` 配下のファイル、`scripts/` 配下、protocol 名、Step 名、Section 名、見出し名）へ**直接依存しない**。
+
+この制約は、workflow 固有STEP が過剰に共通 reference を import することを回避する（REQ-027-001）。workflow 側は Capability Skill 名とその用途のみを知り、Capability Skill 内部の再構成は Capability Skill 側へ委ねる。
+
+許容される参照:
+
+- Capability Skill 名（`agentdev-req-file-manager` 等）と USE FOR に基づく起動
+- Capability Skill の公開操作契約（入力、出力、停止条件）の参照
+
+禁止される参照:
+
+- Capability Skill の `references/*.md` 内部パスへの直接依存
+- Capability Skill 内部の見出し、セクション、テーブル名への直接依存
+- Capability Skill 間の内部構造結合（Capability Skill 間も名レベル参照）
+
+Workflow Skill は主要 Capability Skill 連携セクション（`## 主要 Capability Skill 連携` 等）を通じて参照先 Capability Skill 名とその用途を公開する。このセクションは名レベル参照契約の履行証拠となる。
+
+### Capability Skill 間の依存
+
+Capability Skill 同士の依存も名レベル参照とし、循環依存を禁止する。複数 Capability Skill を協調させる workflow は Workflow Skill 側が制御する。Capability Skill は他 Capability Skill を直接呼び出さず、呼出元 Workflow Skill が協調順序を決定する。
+
+## Capability Skill と Workflow Skill の責務境界（REQ-002-018）
+
+Capability Skill と Workflow Skill は異なる責務境界・判断モデルを持ち、同一 skill として混在させない（REQ-002-003、REQ-002-018）。
+
+| 側面 | Workflow Skill | Capability Skill |
+|---|---|---|
+| workflow STEP | 所有する（resume point、control plane） | 所有しない |
+| 対応 Command | 1:1 または 1:N | N:N（複数 Workflow Skill から参照） |
+| 制御構造 | STEP 順序、分岐、停止条件 | なし（宣言的定義、判断基準、決定的処理） |
+| 責務境界 | 特定 workflow の実装本体 | 複数 workflow 共通能力 |
+| 判断モデル | workflow 状態遷移に基づく制御判断 | 宣言的ルール、分類基準、決定的変換 |
+
+1つの skill が両側面を持つ場合、責務境界を明示的に分離し、2つの skill へ分割する。新規に作成する skill は作成時にどちらの層へ属するかを判定基準（「Capability Skill の判定基準」節）に照らして確定する。
+
+## Capability Skill 横断抽出（DEC-010 Inventory に基づく）
+
+DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候補を裏付ける（AG-001）。本節は候補の分類と既存 Capability Skill との対応を正規所有する。
+
+### 共通 Capability 領域と既存 Capability Skill
+
+複数 workflow 共通能力は既存 Capability Skill として既に集約されている領域が大半である。新規 Capability Skill 抽出を検討する前に、既存 Capability Skill の再利用を優先する。
+
+| 共通領域 | 既存 Capability Skill | 利用 Workflow Skill |
+|---|---|---|
+| git worktree 並列実行安全ステージング | `agentdev-git-worktree` | case-open、case-close、case-auto、case-run |
+| project extension 読込（5セクション、fail-open） | `agentdev-project-extensions` | 全 Workflow Skill |
+| commit message 規約 | `agentdev-conventional-commits` | case-close、case-run を含む全 commit 発行 workflow |
+| REQ/Decision ファイル管理 | `agentdev-req-file-manager`、`agentdev-decision-file-manager` | case-open、case-close（RU 削除、Form Zero）、req-define、req-save |
+| SPEC ファイル管理 | `agentdev-spec-file-manager` | case-close（SPEC status 昇格）、spec-save |
+| 決定的検証スクリプト | `agentdev-artifact-validation` | req-save、spec-save、inspect-docs を含む品質検証 workflow |
+| Issue/PR I/O 境界 | `agentdev-gh-cli` | 全 GitHub 操作を行う workflow |
+| Issue 操作の安全手続き | `agentdev-issue-management` | case-open、case-update、case-close |
+| Epic 進捗・Wave 構成 | `agentdev-epic-tracker` | case-open、case-close、case-auto |
+| 品質ゲート | `agentdev-quality-gates` | case-open（QG-2）、case-close（QG-4）、req-define |
+| Capture 境界・学び検知 | `agentdev-intake-pipeline`、`agentdev-learning-capture`、`agentdev-learning-pipeline` | case-close、case-auto、intake-from-github、intake-promote |
+| 対論型レビュー | `agentdev-adversarial-review` | case-open（経路F）、case-auto（経路H伝播）、req-define 等 |
+| case-run 外部実行 adapter | `agentdev-case-run-execution-adapter` | case-run、case-auto |
+
+### workflow-* プレフィックスを持つ Capability Skill 的スキル
+
+以下のスキルは `agentdev-workflow-*` プレフィックスを持つが、実態は Capability Skill の判定基準（workflow STEP 非所有、複数 workflow からの参照、workflow 制御構造からの分離）を満たす。各スキルは本文で「本スキル自身は workflow STEP を所有せず、各 command の Workflow Skill が所有する STEP から参照される」と宣言する。命名は歴史的経緯で維持し、Capability Skill として運用する。将来の rename は別 Issue スコープとする。
+
+| スキル | 提供能力 | 参照元 Workflow Skill |
+|---|---|---|
+| `agentdev-workflow-lifecycle` | work_type/scale 判定、SSoT 遷移、上位引き継ぎ停止判定 | req-define、case-open、case-run、case-close、case-auto |
+| `agentdev-workflow-routing` | review NG 時の次コマンド推論、拒否タイプ分類 | case-run、case-update |
+| `agentdev-workflow-orchestration` | case-run 状態機械、自律修正ループ、Capture 境界、Subagent 委譲プロトコル | case-run、case-close、case-auto |
+| `agentdev-workflow-templates` | Issue/PR/comment template 選定とセクション規約 | case-open、case-close、case-update |
+
+### 新規 Capability Skill 抽出候補（将来対応）
+
+DEC-010 Inventory が挙げる新規 Capability Skill 候補。本 SPEC は候補の記録のみを所有し、個別抽出実装は別 Issue が担う。新規 Capability Skill は「Capability Skill の判定基準」を満たす場合にのみ作成し、既存 Capability Skill の再利用を優先する。
+
+- test strategy 定義（`req-define` Step 5-6 相当）
+- EC-2 必須品質統制導出（`case-open` execution contract）
+- EC-6 scope-affecting impact 探索（`case-open` execution contract）
+- コンフリクト Level 1 解消判断（`case-close`）
+- SPEC status 昇格判断（`case-close`、`spec-save`）
+- bounded parent decision resolution 詳細（`case-auto`、DEC-008）
+- Wave 反復制御詳細（`case-auto`）
+
+抽出優先度低の workflow（`intake-capture`、`intake-from-github`、`case-update`、`inspect-skills`、`inspect-promote`）は workflow 実装が単純、または既存 Capability Skill（`agentdev-intake-pipeline`、`agentdev-workflow-routing`、`agentdev-inspect-skills`）でカバーされており、1:N 分割・新規 Capability 抽出ともに優先度が低い（DEC-010 Inventory）。
 
 ## 依存方向
 
 Command → Workflow Skill（名レベル参照）→ STEP reference（references/ 配下）。
 Workflow Skill → Capability Skill（名レベル参照）。循環依存禁止。
+Capability Skill → Capability Skill（名レベル参照、循環依存禁止）。
 
 ## artifact-contracts.md からの委譲
 
