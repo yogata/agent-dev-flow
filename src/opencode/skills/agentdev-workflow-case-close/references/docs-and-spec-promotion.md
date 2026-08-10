@@ -1,0 +1,87 @@
+# STEP-3: docs 検証・SPEC 確定（docs-and-spec-promotion）
+
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-3 詳細である。docs/ 検証、targeted docs guard、IR-056 check_extensions.ts、SPEC 確定フロー（draft → accepted 昇格）を提供する。
+
+## 開始条件
+
+- 単一 Issue クローズ ルート
+- STEP-2 で QG-4 合格
+
+## 結果
+
+- docs/ 検証合格（targeted docs guard、IR-056）
+- SPEC 確定フロー処理完了（昇格 / spec-save 提案 / 見送り）
+
+## 手順
+
+### docs/ 検証
+
+機能追加固有の検証（REQ作成、インデックス記載、spec更新、ADR作成）および全 work_type 共通の関連ドキュメント整合性確認、README 索引整合性確認。不足時は警告表示してユーザー判断を仰ぐ。PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（Step 3-2）を実行する。
+
+**文書分類ポリシー適合確認**: document-model SPEC（extension 経由）の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する。
+
+### Step 3-1: close 時 SPEC/ commands/ skills 更新漏れの局所確認
+
+実装完了、PR マージ前に、SPEC 本文と実装の最終矛盾確認、command 定義の更新漏れ、skill 責務境界の変更漏れを確認。更新漏れ検出時は警告表示してユーザー判断。局所予防の範囲で `/agentdev/inspect-docs` の全体意味レビューの代替ではない。
+
+#### extensions 整合性検査（IR-056、REQ）
+
+当該 PR が次のいずれかを変更した場合、`check_extensions.ts` を strict 実行し、IR-056 違反がないことを確認する。
+
+- `.opencode/commands/agentdev/**/*.md`
+- `.opencode/skills/agentdev-*/SKILL.md`
+- `.opencode/skills/agentdev-*/references/**/*.md`
+- `.agentdev/extensions/**`
+
+違反時はマージを停止しユーザー判断を仰ぐ。
+
+#### targeted docs guard（REQ）
+
+変更ファイルと連動ファイルに対し targeted docs guard を実行（case-close はマージ後 main 環境で実行されるため `--files` を使用）。
+
+- **実行コマンド**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`
+- **`<PR 変更ファイル一覧>`**: space 区切り推奨、comma 区切り、混在も可
+- **JSON 出力の `failures`**: strict severity が含まれる場合はマージを停止し対象ファイルを修正して再実行
+- **`full_docs_check_recommended`**: true の場合は `/repo/docs-check`（全体監査）の実行をユーザーに提案
+- **draft → accepted 等の SPEC status 変更時**: `spec_readme_update_required` を Step 3-2 SPEC 確定フローに反映
+- **`files_checked` 空時の確認（REQ）**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する
+
+### Step 3-2: SPEC 確定フロー
+
+PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録）を読み取り、SPEC の確定、昇格を処理する。セクション不存在・空の場合はスキップ。
+
+| 処理パターン | 条件 | アクション |
+|---|---|---|
+| (a) case-close 内で SPEC 昇格 | 対象 SPEC の `status` が `draft`、実装が SPEC 内容を検証済み | 対象 SPEC の `status` を `draft` → `accepted` に昇格（編集スコープ: `docs/specs/**`） |
+| (b) spec-save 再起動の提案 | SPEC 確定候補が SPEC ファイル未保存 | `/agentdev/spec-save` の再実行を提案し case-close は完了させる |
+| (c) 見送り | 確定不要と判断 | 候補を Findings/ Capture候補 に準じて記録し後続へ委ねる |
+
+SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter `status` と `updated` の更新、SPEC 確定候補処理の詳細は `agentdev-spec-file-manager/references/spec-lifecycle-application.md` を参照。
+
+## case-close が使用する検査ツール
+
+- `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行、AG-003）
+- `check_extensions.ts`（IR-056、配布物パターンのいずれかを変更した場合に実行）
+- test_strategy（QG-4 完了条件確認）
+
+## resume point
+
+- docs/ 検証結果（targeted docs guard、IR-056 check_extensions.ts）
+- SPEC 確定フロー処理結果（昇格 a / 提案 b / 見送り c）
+- `spec_readme_update_required` 状態
+
+## 関連 STEP
+
+- 前: STEP-2（issue-resolution-and-qg4）
+- 次: STEP-4（pr-merge-and-conflict）
+
+## 関連 Capability Skill
+
+- `agentdev-spec-file-manager`: SPEC status 昇格、spec-lifecycle-application
+- `repo-agentdev-integrity`: check_changed_docs.ts、check_extensions.ts
+- `agentdev-project-extensions`: document-model SPEC extension 経由（Document Classification Policy）
+
+## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
+
+- G09（機能追加で docs/ 更新がない場合の警告表示と停止確認）
+- G21/G22/G23（SPEC status 昇格は case-close の責務、SPEC 確定候補の処理は PR 本文の `## SPEC確定候補` を入力とし `## Findings / Capture候補` とは区別）

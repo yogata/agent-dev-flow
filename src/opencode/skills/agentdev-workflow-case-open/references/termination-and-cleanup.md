@@ -1,0 +1,77 @@
+# STEP-6: 終了処理・クリーンアップ（termination-and-cleanup）
+
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-6 詳細である。コメント追加、draft/RU 削除（Form Zero）、完了報告を提供する。
+
+## 開始条件
+
+- STEP-5 で GitHub Issue 作成が完了している
+
+## 結果
+
+- Issue へのコメント追加完了（テンプレート準拠）
+- draft/RU 削除完了（Form Zero、即時 commit + push）
+- draft/RU 削除残存検証合格
+- 完了報告出力
+
+## 手順
+
+### Step 13: コメント追加（共通終了処理）
+
+`agentdev-workflow-templates` の選定ルールに従いコメント用テンプレートを読み込む（Epic flow では Epic Issue にコメント追加）→ VERIFY。
+
+### Step 14: ドラフト削除（共通終了処理）
+
+ドラフトが存在する場合、`.agentdev/drafts/req-draft-{topic-slug}.md` を削除（Standard/Epic 全フロー共通）。
+
+**Form Zero**: 削除は並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、`git rm <draft-path>` で明示パスをステージし、同一ステップ内で `git commit -- <draft-path>` により即時コミットする。未ステージの削除を作業ツリーに残存させないこと。
+
+### Step 14-1: RU ファイル削除（共通終了処理）
+
+詳細、委譲接続点は `agentdev-req-file-manager` を参照。削除は並列実行安全ステージングプロシージャに従い `git rm <RU-path>` で明示パスをステージし、同一ステップ内で `git commit -- <RU-path>` により即時コミットする（Form Zero）。
+
+### Step 14-2: draft/RU 削除残存検証（共通終了処理）
+
+Step 14/14-1 の削除後、当該ファイルが作業ツリー、index に残存していないことを検証。
+
+- 検証コマンド: `git status --porcelain -- <draft-path> <RU-path>` が空、またはファイル非存在確認
+- 残存を検出した場合: 即座に停止し残存ファイル一覧を報告
+- Standard flow と Epic flow の双方で実施
+
+### Step 14-3: draft/RU 削除 commit 後の即時 push（REQ）
+
+Step 14/14-1 の削除コミット後に `git push` を即時実行（case-run 引き継ぎ時の `git pull --ff-only` 失敗を防止するため）。push 失敗時は構造化エラーメッセージを表示して停止する。
+
+### Step 15: 完了報告（共通終了処理）
+
+テンプレート種別:
+
+- Standard → `templates/case-open/standard.md`
+- 単一REQ Epic → `templates/case-open/epic.md`
+- マルチREQ Epic → `templates/case-open/multi-req-epic.md`
+
+**Capture結果 小節**: case-open 実行中に実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存した場合、保存した capture 成果物のパス・分類・保存結果のみを含める（capture 本体は含めない、成果物が無い場合は省略、共通意味契約は `artifact-contracts` SPEC「Capture結果 小節」節参照）。
+
+## resume point
+
+- コメント追加状態
+- draft/RU 削除状態（各パス、commit hash、push 成功）
+- 削除残存検証結果
+- 完了報告出力状態
+
+## 関連 STEP
+
+- 前: STEP-5（issue-creation-flows）
+- 次: なし（workflow 終了）
+
+## 関連 Capability Skill
+
+- `agentdev-workflow-templates`: コメント用テンプレート、完了報告テンプレート
+- `agentdev-req-file-manager`: RU ファイル削除
+- `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（Form Zero）
+- `agentdev-gh-cli`: コメント追加・VERIFY
+- `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲
+
+## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
+
+- G18/G22（自工程で実観測した deviation を learning-capture または intake-pipeline へ委譲保存、`intake-capture` command 等の別 command を直接呼ばない、capture 本体は完了報告に含めず保存した成果物のパス・分類・保存結果のみを `Capture結果` 小節へ含める）
+- G23/G24（並列実行安全 git 操作、明示パス指定 + `git commit -- <paths>` の --only pathspec 形式、`git add -A`/`git add .`/`git add --all`/`git commit -a` 等のスイープ操作禁止、Form Zero、`.agentdev/` 全体一括スコープではなく明示パス限定）
