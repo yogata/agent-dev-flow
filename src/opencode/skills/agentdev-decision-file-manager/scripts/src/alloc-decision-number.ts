@@ -1,5 +1,5 @@
 /**
- * Decision番号採番スクリプト（AG-002、AG-006、REQ-0103-159/160、OU-002 移行）。
+ * Decision番号採番スクリプト（AG-002、AG-006、REQ-{NNNN}-{NNN}/160、OU-002 移行）。
  *
  * 既存の Decision ファイル群から最大番号を特定し、その +1 を採番する。
  * 欠番埋め禁止（agentdev-decision-file-manager 採番ルール）。

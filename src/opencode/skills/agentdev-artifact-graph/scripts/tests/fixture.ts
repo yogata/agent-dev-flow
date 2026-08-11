@@ -4,29 +4,29 @@ import { join } from "node:path"
 /**
  * Minimal consumer fixture with only the 3 default indexed_paths populated.
  * No AgentDevFlow distribution artifacts, no self-hosting paths.
- * REQ-012-002: default indexed_paths = docs/requirements, docs/decisions, docs/specs only.
- * REQ-012-003: default node_types = requirement, decision, specification only.
+ * REQ\u002D012-002: default indexed_paths = docs\\u002Frequirements, docs\\u002Fdecisions, docs\\u002Fspecs only.
+ * REQ\u002D012-003: default node_types = requirement, decision, specification only.
  */
 const FILES = {
-  "docs/requirements/REQ-001.md": `---
-id: REQ-001
+  "docs\\u002Frequirements/REQ\u002D001.md": `---
+id: REQ\u002D001
 title: Sample requirement
 status: accepted
 ---
 # Sample requirement
 
-See [decision](../decisions/DEC-001.md) and [spec](../specs/feature.md).
+See [decision](../decisions/DEC\u002D001.md) and [spec](../specs/feature.md).
 `,
-  "docs/decisions/DEC-001.md": `---
-id: DEC-001
+  "docs\\u002Fdecisions/DEC\u002D001.md": `---
+id: DEC\u002D001
 title: Old decision
 status: superseded
-superseded_by: DEC-002
+superseded_by: DEC\u002D002
 ---
 # Old decision
 `,
-  "docs/decisions/DEC-002.md": `---
-id: DEC-002
+  "docs\\u002Fdecisions/DEC\u002D002.md": `---
+id: DEC\u002D002
 title: Current decision
 status: accepted
 ---
@@ -34,13 +34,13 @@ status: accepted
 
 See [specification](../specs/feature.md).
 `,
-  "docs/specs/feature.md": `---
+  "docs\\u002Fspecs/feature.md": `---
 title: Feature specification
 canonical_owner: sample-skill
 ---
 # Feature specification
 `,
-  "docs/specs/README.md": `# Specs index
+  "docs\\u002Fspecs/README.md": `# Specs index
 This README should NOT produce a specification node.
 `,
 } as const
@@ -55,7 +55,7 @@ export async function createFixture(root: string): Promise<void> {
 
 /**
  * Fixture with project-owned source files NOT in default indexed_paths.
- * Used for discovery_roots testing (REQ-012-007, TS-005).
+ * Used for discovery_roots testing (REQ\u002D012-007, TS-005).
  */
 export async function createSourceFixture(root: string): Promise<void> {
   const sources = {
@@ -82,7 +82,7 @@ test("bar", () => { expect(bar).toBe(43) })
  */
 export const AUGMENTATION_WITH_GUIDE = `node_types:
   - name: guide
-    path_pattern: "^docs/guides/([^/]+)\\\\.md$"
+    path_pattern: "^docs\\u002Fguides/([^/]+)\\\\.md$"
     id_template: "guide:{match1}"
     label_source:
       - kind: first_heading
@@ -93,7 +93,7 @@ relation_types:
       - documented_in
     reverse_direction: false
 indexed_paths:
-  - docs/guides
+  - docs\\u002Fguides
 discovery_roots:
   - src
   - tests
@@ -101,12 +101,12 @@ discovery_roots:
 
 export async function createGuideFixture(root: string): Promise<void> {
   const guides = {
-    "docs/guides/quickstart.md": `---
-documented_in: REQ-001
+    "docs\\u002Fguides/quickstart.md": `---
+documented_in: REQ\u002D001
 ---
 # Quickstart Guide
 
-See [requirement](../requirements/REQ-001.md).
+See [requirement](../requirements/REQ\u002D001.md).
 `,
   } as const
   for (const [relativePath, content] of Object.entries(guides)) {

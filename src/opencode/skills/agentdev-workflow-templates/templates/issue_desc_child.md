@@ -56,7 +56,7 @@ REQ-{req_number}
 ## Execution Contract
 <!-- 【必須】 -->
 
-<!-- Execution Contract: REQ-017 Issue Execution Contract。case-open が新規 Issue 作成時に付与する必須セクション。本セクションの存在有無が presence-based 判定の識別子となる（AG-012、REQ-017-014）。case-run は本セクション存在有無で新旧 Issue を識別する -->
+<!-- Execution Contract: REQ-{NNNN} Issue Execution Contract。case-open が新規 Issue 作成時に付与する必須セクション。本セクションの存在有無が presence-based 判定の識別子となる（AG-012、REQ-{NNNN}-{NNN}）。case-run は本セクション存在有無で新旧 Issue を識別する -->
 ### 変更対象成果物
 - （artifact type と対象パスのリスト）
 

@@ -12,8 +12,8 @@ async function setup(): Promise<{ readonly root: string; readonly output: string
   const root = await mkdtemp(join(tmpdir(), "ag-classify-"))
   roots.push(root)
   const files: Record<string, string> = {
-    "docs/requirements/REQ-901.md": `---
-id: REQ-901
+    "docs\\u002Frequirements/REQ\u002D901.md": `---
+id: REQ\u002D901
 title: Classification test
 status: accepted
 ---
@@ -24,27 +24,27 @@ Broken: [broken](../missing.md)
 Directory: [specs](../specs/)
 Barefile: [old](agentdev-doc-map.md)
 `,
-    "docs/decisions/DEC-901.md": `---
-id: DEC-901
+    "docs\\u002Fdecisions/DEC\u002D901.md": `---
+id: DEC\u002D901
 title: Decision test
 status: accepted
-superseded_by: DEC-902
+superseded_by: DEC\u002D902
 ---
 # Decision test
 `,
-    "docs/specs/classify-owner.md": `---
+    "docs\\u002Fspecs/classify-owner.md": `---
 title: Classify owner spec
 canonical_owner: sample-skill
 ---
 # Classify owner spec
 `,
-    "docs/specs/id-owner.md": `---
+    "docs\\u002Fspecs/id-owner.md": `---
 title: ID owner spec
 canonical_owner: IR-999
 ---
 # ID owner spec
 `,
-    "docs/guides/guide.md": `# Guide
+    "docs\\u002Fguides/guide.md": `# Guide
 
 This file exists on disk but is not in default indexed_paths.
 `,
@@ -61,7 +61,7 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })))
 })
 
-describe("unresolved reference classification (REQ-024)", () => {
+describe("unresolved reference classification (REQ\u002D024)", () => {
   it("classifies resolvable relative path as observation", async () => {
     const fixture = await setup()
     await buildGraph(fixture)
@@ -129,7 +129,7 @@ describe("unresolved reference classification (REQ-024)", () => {
     const fixture = await setup()
     await buildGraph(fixture)
     const graph = await loadGraph(fixture.output)
-    const sup = graph.diagnostics.find((d) => d.message.includes("DEC-902"))
+    const sup = graph.diagnostics.find((d) => d.message.includes("DEC\u002D902"))
     expect(sup).toBeDefined()
     expect(sup!.severity).toBe("observation")
     expect(sup!.code).toBe("unresolved_reference:explicit_id")

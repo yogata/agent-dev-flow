@@ -1,11 +1,11 @@
 // effectiveness/types.ts — Workflow effectiveness comparison harness types.
 //
-// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-021-006, TS-010）。
-// Parser/Graph regression は REQ-020 が所有し、本 harness は取り扱わない。
+// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS-010）。
+// Parser/Graph regression は REQ-{NNNN} が所有し、本 harness は取り扱わない。
 // Graph 固有の parser/augmentation/extraction 回帰検証は effectiveness/ ではなく
-// 既存の tests/*.test.ts および REQ-020 傘下の検証層が独立に判断可能である。
+// 既存の tests/*.test.ts および REQ-{NNNN} 傘下の検証層が独立に判断可能である。
 //
-// 6 つの比較観点（REQ-021-006）:
+// 6 つの比較観点（REQ-{NNNN}-{NNN}）:
 //   1. recall                 — ground truth に対する発見率（Graph / 独立探索 それぞれ）
 //   2. falseCandidate         — ground truth 以外の候補数
 //   3. canonicalSourceReach   — 結果が canonical source へ到達可能か（割合）
@@ -16,7 +16,7 @@
 import type { GraphQuery } from "../lib/query.ts"
 
 /**
- * REQ-021-006 が定める 6 つの workflow question category。
+ * REQ-{NNNN}-{NNN} が定める 6 つの workflow question category。
  *SPEC「効果検証 › Workflow effectiveness」節と 1:1 で対応する。
  */
 export const QUERY_CATEGORIES = [
@@ -53,7 +53,7 @@ export type IndependentSearchSpec =
     readonly kind: "grep"
     /**
      * JavaScript 正規表現。単語境界等は明示的に指定すること。
-     * 例: "\\bREQ-012\\b" — "REQ-0120" 等への誤ヒットを防ぐ。
+     * 例: "\\bREQ-012\\b" — "REQ-{NNNN}" 等への誤ヒットを防ぐ。
      */
     readonly pattern: string
     /** 検索対象ルート（repo root 相対）。再帰的に .md/.yaml/.ts 等を走査する。 */

@@ -4,7 +4,7 @@ import type { GraphData } from "./model.ts"
 import type { ResolvedConfig } from "./config.ts"
 
 /**
- * Verification feedback mechanism (REQ-012-011).
+ * Verification feedback mechanism (REQ-{NNNN}-{NNN}).
  *
  * Detects, classifies, and reports differences between the Graph and an
  * independent confirmation scan. The independent scan uses DIFFERENT

@@ -1,18 +1,18 @@
 ---
 name: agentdev-workflow-case-auto
-description: "case-auto command の workflow 実装本体。req-save → spec-save → case-open → case-run → case-close の自走 orchestration、orchestration stage モデル（stage 1 case-open / stage 2 case-run bg task 最大5件 / stage 3 case-close）、Wave 反復制御、bounded parent decision resolution（decision_context の限定的親判断解決）、コンフリクト解消 Level 2/3（インライン case-run 再実行、オーケストレーション級判断）、停止理由分類（11項目、7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 経路H 停止伝播、L1 タイムスタンプ計測・4次元結果集約を所有する。USE FOR: case-auto command 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類・bounded parent decision resolution・経路H伝播・コンフリクト Level 2/3・完了報告）。DO NOT USE FOR: 要件doc 作成（req-define）、REQ/Decision 保存（req-save）、SPEC 保存（spec-save）、Issue 作成・execution contract 確定（case-open）、Issue 実装・実行担当サブエージェント委譲（case-run）、PR マージ・Issue close・Capture 回収（case-close）、work_type 判定（agentdev-workflow-lifecycle）、gh CLI I/O 手続き（agentdev-gh-cli）、Wave 構成・Epic 進捗追跡・Epic status table（agentdev-epic-tracker、case-close 単一書き手）、git worktree 操作（agentdev-git-worktree）、orchestration 詳細プロトコル（agentdev-workflow-orchestration）、adversarial-review 呼出（agentdev-adversarial-review、case-auto は直接起動しない）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-027-002 soft guard で抑制）。"
+description: "case-auto command の workflow 実装本体。req-save → spec-save → case-open → case-run → case-close の自走 orchestration、orchestration stage モデル（stage 1 case-open / stage 2 case-run bg task 最大5件 / stage 3 case-close）、Wave 反復制御、bounded parent decision resolution（decision_context の限定的親判断解決）、コンフリクト解消 Level 2/3（インライン case-run 再実行、オーケストレーション級判断）、停止理由分類（11項目、7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 経路H 停止伝播、L1 タイムスタンプ計測・4次元結果集約を所有する。USE FOR: case-auto command 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類・bounded parent decision resolution・経路H伝播・コンフリクト Level 2/3・完了報告）。DO NOT USE FOR: 要件doc 作成（req-define）、REQ/Decision 保存（req-save）、SPEC 保存（spec-save）、Issue 作成・execution contract 確定（case-open）、Issue 実装・実行担当サブエージェント委譲（case-run）、PR マージ・Issue close・Capture 回収（case-close）、work_type 判定（agentdev-workflow-lifecycle）、gh CLI I/O 手続き（agentdev-gh-cli）、Wave 構成・Epic 進捗追跡・Epic status table（agentdev-epic-tracker、case-close 単一書き手）、git worktree 操作（agentdev-git-worktree）、orchestration 詳細プロトコル（agentdev-workflow-orchestration）、adversarial-review 呼出（agentdev-adversarial-review、case-auto は直接起動しない）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
 ---
 
 # case-auto workflow スキル
 
 case-auto command の workflow 実装本体。要件doc または Issue番号から req-save → spec-save → case-open → case-run → case-close を順次自走し、repo 内変更に限りマージまで完了する制御構造を所有する。orchestration stage モデル、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 経路H 停止伝播を統合する。
 
-case-auto command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-010、REQ-002-001〜004）。
+case-auto command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
 ## 原本（SSoT）
 
 本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `docs/specs/workflows/workflow-skill-model.md` SPEC が正規所有する。
+Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `docs/specs/<workflows/workflow-skill-model>.md` SPEC が正規所有する。
 extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -72,7 +72,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）は
 
 ## Control Plane（STEP 一覧）
 
-case-auto workflow は次の8 STEP で構成する。各 STEP は resume point を持つ（DEC-011、`docs/specs/workflows/step-reference-contract.md`）。会話コンテキストに依存せず、durable state（`case_auto_started_at`、L1 タイムスタンプ、orchestration stage 別結果、bg task 状態、結果状態4次元）から再開点を再構成する。
+case-auto workflow は次の8 STEP で構成する。各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。会話コンテキストに依存せず、durable state（`case_auto_started_at`、L1 タイムスタンプ、orchestration stage 別結果、bg task 状態、結果状態4次元）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -95,7 +95,7 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-002-017）。
+本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
 - `agentdev-workflow-orchestration`: orchestration 詳細プロトコル、bg task 破棄検知・状態別回復、capture 境界、Subagent 委譲プロトコル、停止理由分類詳細、コンフリクト解消 Level 2/3 詳細
 - `agentdev-case-run-execution-adapter`: case-run 委譲契約（インライン実行時）
@@ -109,7 +109,7 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 
 ## internal Workflow Extension 読込
 
-本スキルは internal Workflow Extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）を読み込む場合がある（REQ-002-031、DEC-012）。Workflow Skill のみが読み、case-auto command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは internal Workflow Extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。Workflow Skill のみが読み、case-auto command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
 
 ## 共通制約
 
@@ -122,9 +122,9 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 
 ## See Also
 
-- **`docs/specs/workflows/workflow-skill-model.md`**: Workflow Skill 固有契約の正規所有者
-- **`docs/specs/workflows/step-reference-contract.md`**: STEP reference 構造、resume point
-- **`docs/decisions/DEC-010.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
-- **`docs/decisions/DEC-011.md`**: STEP resume point と会話記憶非依存
-- **`docs/decisions/DEC-008.md`**: case-auto の限定的親判断解決（bounded parent decision resolution）
+- **`docs/specs/<workflows/workflow-skill-model>.md`**: Workflow Skill 固有契約の正規所有者
+- **`docs/specs/<workflows/step-reference-contract>.md`**: STEP reference 構造、resume point
+- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
+- **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
+- **`docs/decisions/DEC-{N}.md`**: case-auto の限定的親判断解決（bounded parent decision resolution）
 - **case-auto command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

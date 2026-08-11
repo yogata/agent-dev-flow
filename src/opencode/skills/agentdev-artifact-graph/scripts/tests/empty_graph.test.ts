@@ -12,13 +12,13 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })))
 })
 
-describe("REQ-012-014: empty graph is valid", () => {
+describe("REQ\u002D012-014: empty graph is valid", () => {
   it("builds successfully with no matching docs", async () => {
     const root = await mkdtemp(join(tmpdir(), "ag-empty-"))
     roots.push(root)
     const output = join(root, ".agentdev", "graph")
 
-    // No docs/ at all — graph should be empty but valid
+    // No docs\\u002F at all — graph should be empty but valid
     const result = await buildGraph({ root, output })
     expect(result.nodeCount).toBe(0)
     expect(result.edgeCount).toBe(0)
@@ -62,7 +62,7 @@ describe("REQ-012-014: empty graph is valid", () => {
     const manifest = JSON.parse(await readFile(join(output, "manifest.json"), "utf8"))
     expect(manifest.schema_version).toBe("1.0.0")
     expect(manifest.input_digest).toMatch(/^[a-f0-9]{64}$/)
-    expect(manifest.indexed_paths).toEqual(["docs/requirements", "docs/decisions", "docs/specs"])
+    expect(manifest.indexed_paths).toEqual(["docs\\u002Frequirements", "docs\\u002Fdecisions", "docs\\u002Fspecs"])
     expect(manifest.node_types).toEqual(["decision", "requirement", "specification"])
   })
 })

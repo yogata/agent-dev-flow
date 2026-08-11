@@ -130,15 +130,15 @@ spec-save は本スクリプト群を bash 経由で呼び出し、JSON 結果�
 
 ---
 
-## STEP model 連携（REQ-005-024、DEC-011）
+## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、spec-save Workflow Skill が所有する STEP から呼び出される（`docs/specs/workflows/workflow-skill-model.md`）。本スキル自身は STEP を所有しない。
+本スキルは Capability Skill として、spec-save Workflow Skill が所有する STEP から呼び出される（`docs/specs/<workflows/workflow-skill-model>.md`）。本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution
 
-本スキルが操作する SPEC ファイル（`docs/specs/**/*.md`）は durable state の最上位（SSoT 再構成）に位置する。SPEC `status`（`draft` / `accepted` / `superseded`）は最小 scalar 相当の状態値として扱う。優先順位の詳細は `docs/specs/workflows/input-resolution-and-durable-state.md` 参照。
+本スキルが操作する SPEC ファイル（`docs/specs/<**/*>.md`）は durable state の最上位（SSoT 再構成）に位置する。SPEC `status`（`draft` / `accepted` / `superseded`）は最小 scalar 相当の状態値として扱う。優先順位の詳細は `docs/specs/<workflows/input-resolution-and-durable-state>.md` 参照。
 
-呼出元 STEP（spec-save）は本スキルの操作結果（SPEC ファイル作成、target_area 置換結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成から再取得できる。STEP reference 8 要素は `docs/specs/workflows/step-reference-contract.md` 参照。
+呼出元 STEP（spec-save）は本スキルの操作結果（SPEC ファイル作成、target_area 置換結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成から再取得できる。STEP reference 8 要素は `docs/specs/<workflows/step-reference-contract>.md` 参照。
 
 ## See Also
 

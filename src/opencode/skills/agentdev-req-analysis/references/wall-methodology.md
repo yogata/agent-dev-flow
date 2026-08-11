@@ -128,8 +128,8 @@ req-define Step1 のセッションコンテキスト検知の詳細手順は `r
 文書記載の番号レンジ（例: AGENTS.md の "〜"）を鵜呑みにせず、実ファイル列挙により現行 REQ/ADR を照合する。文書記載のみに依存すると、Issue #786（行数前提の誤り）等の見落やしのリスクを生む。
 
 **列挙コマンド**:
-- `glob docs/requirements/REQ-*.md`（現行 REQ ファイルを列挙）
-- `glob docs/decisions/DEC-*.md`（Decision ファイルを列挙）
+- `glob docs/requirements/<REQ-*>.md`（現行 REQ ファイルを列挙）
+- `glob docs/decisions/<DEC-*>.md`（Decision ファイルを列挙）
 
 **乖離解消手順**:
 1. 文書レンジと実ファイル一覧に乖離がある場合、原因を調査する

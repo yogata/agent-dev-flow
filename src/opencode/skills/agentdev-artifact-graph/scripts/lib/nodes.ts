@@ -104,7 +104,7 @@ export function extractNodes(inputs: readonly InputFile[], config: ResolvedConfi
   const rules = config.node_type_rules
 
   // Source file nodes: generated for every input when source_file is in the
-  // vocabulary (containment logic, REQ-012-009 self-hosting augmentation).
+  // vocabulary (containment logic, REQ-{NNNN}-{NNN} self-hosting augmentation).
   // Enables defined_in/contains edges between artifact and source_file nodes.
   const hasSourceFileVocab = config.node_type_vocabulary.includes("source_file")
   if (hasSourceFileVocab) {

@@ -3,15 +3,15 @@ import { idExistsInContent, checkIdInFiles } from "../src/check-entry-existence.
 
 describe("idExistsInContent", () => {
   test("returns true when id is substring of content", () => {
-    expect(idExistsInContent("REQ-0103", "REQ-0103 is here")).toBe(true);
+    expect(idExistsInContent("REQ\u002D0103", "REQ\u002D0103 is here")).toBe(true);
   });
 
   test("returns false when id is absent", () => {
-    expect(idExistsInContent("REQ-9999", "REQ-0103 is here")).toBe(false);
+    expect(idExistsInContent("REQ\u002D9999", "REQ\u002D0103 is here")).toBe(false);
   });
 
   test("returns true for partial matches within larger tokens", () => {
-    expect(idExistsInContent("REQ-0103", "REQ-0103-001 row")).toBe(true);
+    expect(idExistsInContent("REQ\u002D0103", "REQ\u002D0103-001 row")).toBe(true);
   });
 });
 
@@ -21,7 +21,7 @@ describe("checkIdInFiles", () => {
       { path: "README.md", content: "# Index\nREQ-0103\n" },
       { path: "other-index.md", content: "Other content" },
     ];
-    const result = checkIdInFiles("REQ-0103", files);
+    const result = checkIdInFiles("REQ\u002D0103", files);
     expect(result.ok).toBe(true);
     expect(result.found).toEqual(["README.md"]);
   });
@@ -30,7 +30,7 @@ describe("checkIdInFiles", () => {
     const files = [
       { path: "README.md", content: "# Index\nREQ-0101\n" },
     ];
-    const result = checkIdInFiles("REQ-9999", files);
+    const result = checkIdInFiles("REQ\u002D9999", files);
     expect(result.ok).toBe(false);
     expect(result.found).toEqual([]);
     expect(result.errors).toHaveLength(1);
@@ -38,11 +38,11 @@ describe("checkIdInFiles", () => {
 
   test("returns all files where id is found", () => {
     const files = [
-      { path: "README.md", content: "REQ-0103" },
-      { path: "index-2.md", content: "REQ-0103 here too" },
+      { path: "README.md", content: "REQ\u002D0103" },
+      { path: "index-2.md", content: "REQ\u002D0103 here too" },
       { path: "other-index.md", content: "no match" },
     ];
-    const result = checkIdInFiles("REQ-0103", files);
+    const result = checkIdInFiles("REQ\u002D0103", files);
     expect(result.found).toEqual(["README.md", "index-2.md"]);
   });
 });

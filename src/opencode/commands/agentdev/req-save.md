@@ -17,7 +17,7 @@ req-defineで生成された壁打ち成果物をREQ/Decisionファイルとし�
 - `docs/requirements/REQ-{NNNN}.md`（新規/追記/更新）
 - `docs/requirements/README.md`（インデックス更新）
 - `docs/README.md`（ドキュメントハブ更新）
-- `docs/decisions/DEC-NNN.md`（Decision判断がある場合のみ）
+- `docs/decisions/<DEC-NNN>.md`（Decision判断がある場合のみ）
 - `.agentdev/drafts/requirements-review-finding-{topic-slug}.md`（SPLIT検出時のみ。要件の膨張、関心分離によるSPLIT候補の詳細）
 - `.agentdev/intake/inbox/req-restructure/*.md`（REQ再構成候補検知時のみ）
 
@@ -133,7 +133,7 @@ Decision保存の直前に、以下の妥当性を再検証すること: Decisio
 - G10: 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）はverbatimで返す。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
 
 ### Capture 非関与制約
-- G12: req-save の capture 責務は原則非関与。req-save は intake/ learning capture を直接行わない。例外: REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能。deviation capture（req-save 実行中に実観測した deviation）は Skill（`agentdev-learning-capture` または `agentdev-intake-pipeline`）への委譲で実施し、req-save が直接 capture しない（REQ-006-106、REQ-006-111）。capture 境界（capture-boundaries）の詳細は `agentdev-workflow-orchestration` 参照
+- G12: req-save の capture 責務は原則非関与。req-save は intake/ learning capture を直接行わない。例外: REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能。deviation capture（req-save 実行中に実観測した deviation）は Skill（`agentdev-learning-capture` または `agentdev-intake-pipeline`）への委譲で実施し、req-save が直接 capture しない（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。capture 境界（capture-boundaries）の詳細は `agentdev-workflow-orchestration` 参照
 
 ### Issue作成制約
 - G11: req-saveはIssueを作成してはならない。Issue作成はcase-openの責任範囲である

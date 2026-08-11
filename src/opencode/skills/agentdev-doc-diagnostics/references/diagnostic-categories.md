@@ -26,8 +26,8 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 
 | 対象 | 理由 |
 |------|------|
-| `docs/requirements/**/*.md`（retired/ 配下は除く） | 現行要件の参照整合性保持 |
-| `docs/decisions/**/*.md` | 現行 Decision の参照整合性保持 |
+| `docs/requirements/<**/*>.md`（retired/ 配下は除く） | 現行要件の参照整合性保持 |
+| `docs/decisions/<**/*>.md` | 現行 Decision の参照整合性保持 |
 | SPEC ファイル群 | 現行 SPEC の参照整合性保持 |
 | ガイドファイル群 | ガイドの参照整合性保持 |
 | agentdev command 群 | 配布物の ID 汚染検出（利用者向け） |

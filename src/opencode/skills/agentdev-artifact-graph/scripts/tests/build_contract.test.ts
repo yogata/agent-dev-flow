@@ -52,12 +52,12 @@ describe("TS-001: fixture repo → build → check → query", () => {
 
     const neighbors = await queryGraph(graph, {
       kind: "neighbors",
-      node: "requirement:REQ-001",
+      node: "requirement:REQ\u002D001",
       depth: 2,
     })
-    expect(neighbors.nodes).toContain("decision:DEC-001")
+    expect(neighbors.nodes).toContain("decision:DEC\u002D001")
 
-    const provenance = await queryGraph(graph, { kind: "provenance", id: "requirement:REQ-001" })
+    const provenance = await queryGraph(graph, { kind: "provenance", id: "requirement:REQ\u002D001" })
     expect(provenance.provenance.length).toBe(1)
   })
 })
@@ -122,12 +122,12 @@ describe("TS-004: works without project augmentation", () => {
 
     const path = await queryGraph(graph, {
       kind: "path",
-      source: "requirement:REQ-001",
-      target: "specification:docs/specs/feature.md",
+      source: "requirement:REQ\u002D001",
+      target: "specification:docs\\u002Fspecs/feature.md",
       maxDepth: 4,
     })
-    expect(path.nodes[0]).toBe("requirement:REQ-001")
-    expect(path.nodes.at(-1)).toBe("specification:docs/specs/feature.md")
+    expect(path.nodes[0]).toBe("requirement:REQ\u002D001")
+    expect(path.nodes.at(-1)).toBe("specification:docs\\u002Fspecs/feature.md")
   })
 })
 

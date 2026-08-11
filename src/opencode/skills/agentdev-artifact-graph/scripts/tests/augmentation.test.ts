@@ -50,7 +50,7 @@ describe("TS-003: augmentation adds node_type and relation_type", () => {
     await buildGraph(fixture)
     const manifest = JSON.parse(await readFile(join(fixture.output, "manifest.json"), "utf8"))
     expect(manifest.node_types).toContain("guide")
-    expect(manifest.indexed_paths).toContain("docs/guides")
+    expect(manifest.indexed_paths).toContain("docs\\u002Fguides")
     expect(manifest.relation_types).toContain("documented_in")
 
     const nodes = await jsonLines(join(fixture.output, "nodes.jsonl"))

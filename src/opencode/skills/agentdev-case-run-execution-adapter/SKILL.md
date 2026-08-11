@@ -138,17 +138,17 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 
 外部実行基盤の結果は **PR URL** で受領する（透明）。plan artifact 等の中間成果物の内部構造には依存しない。実行担当サブエージェントは中間成果物の内部構造に依存した処理、検証を行わず、result 契約（4状態）のみで接合する。AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ ADR/ SPEC に限定し、中間成果物を永続状態として扱わない。
 
-## STEP model 連携（REQ-005-024、DEC-011）
+## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、case-run Workflow Skill の `execute` STEP（`agentdev-workflow-orchestration` 参照）から委譲起動される（`docs/specs/workflows/workflow-skill-model.md`）。本スキル自身は case-run workflow の STEP を所有せず、委譲契約（4状態 result）で case-run 側 STEP へ接合する。
+本スキルは Capability Skill として、case-run Workflow Skill の `execute` STEP（`agentdev-workflow-orchestration` 参照）から委譲起動される（`docs/specs/<workflows/workflow-skill-model>.md`）。本スキル自身は case-run workflow の STEP を所有せず、委譲契約（4状態 result）で case-run 側 STEP へ接合する。
 
 ### 委譲コンテキストと Input Resolution
 
-委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、 durable state 優先順位（`docs/specs/workflows/input-resolution-and-durable-state.md`）に従って case-run `execute` STEP の Input Resolution で解決された入力である。実行担当サブエージェントは委譲内で Issue 本文、REQ/Decision/SPEC を SSoT 再構成（最上位優先）で再取得・再検証し、自然言語の前STEP result のみに依存しない。
+委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、 durable state 優先順位（`docs/specs/<workflows/input-resolution-and-durable-state>.md`）に従って case-run `execute` STEP の Input Resolution で解決された入力である。実行担当サブエージェントは委譲内で Issue 本文、REQ/Decision/SPEC を SSoT 再構成（最上位優先）で再取得・再検証し、自然言語の前STEP result のみに依存しない。
 
 ### 委譲内シーケンスと result 接合
 
-実行担当サブエージェントの責務（Issue 読込、context 再確認、実装・検証・PR 作成、blocker 処理、result 返却）は adapter 委譲内の内部シーケンスであり、case-run 側からは result 4状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）のみで観測される。内部シーケンスの STEP 遷移を case-run workflow の STEP model へ投影せず、PR URL（成功時）または Issue コメント（blocked/failed時）を SSoT として扱う。STEP reference 8 要素は `docs/specs/workflows/step-reference-contract.md` 参照。
+実行担当サブエージェントの責務（Issue 読込、context 再確認、実装・検証・PR 作成、blocker 処理、result 返却）は adapter 委譲内の内部シーケンスであり、case-run 側からは result 4状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）のみで観測される。内部シーケンスの STEP 遷移を case-run workflow の STEP model へ投影せず、PR URL（成功時）または Issue コメント（blocked/failed時）を SSoT として扱う。STEP reference 8 要素は `docs/specs/<workflows/step-reference-contract>.md` 参照。
 
 ## 委譲抽象IF
 
@@ -178,23 +178,23 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 
 ## adversarial-review 統合（経路G: adapter 委譲内）
 
-本スキルは case-run 経路G（REQ-015）における adapter 委譲内の adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。正規原本は `agentdev-case-run-execution-adapter` SPEC「adversarial-review 統合（実装方針→review→結果反映）」節である（REQ-014-003、REQ-014-011）。本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`「adversarial-review 統合（経路G）」節を参照。
+本スキルは case-run 経路G（REQ-{NNNN}）における adapter 委譲内の adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。正規原本は `agentdev-case-run-execution-adapter` SPEC「adversarial-review 統合（実装方針→review→結果反映）」節である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`「adversarial-review 統合（経路G）」節を参照。
 
 呼出元（case-run command）と本スキルの主な契約（詳細は SPEC と reference を正とする）:
 
 | 契約 | 要件 | 概要 |
 |---|---|---|
-| 実装方針の形成と限定 | REQ-015-010 | 委譲内で既確定 Issue/REQ/ADR/SPEC を実現する内部選択として実装方針を形成する。case-run 本体は形成しない |
-| 実施位置 | REQ-015-010 | 最初の実装変更前に実施する（実装、検証、PR 作成より前） |
-| 委譲内 review 呼出 | REQ-015-001/002 | adapter 委譲内で実行担当サブエージェントが発動条件判定（ユーザー明示指定）と review 呼出を分離して実施する |
-| blocked 遷移（実装方針限定違反） | REQ-015-010 | 実装方針が既確定文書の変更、追加、撤回を必要とする場合は blocked へ遷移する |
-| blocked 遷移（要件/仕様問題） | REQ-015-011 | 要件、仕様問題を検出した場合は勝手に仕様変更せず blocked へ遷移する |
-| blocked 遷移（unresolved 残存） | REQ-014-009 | unresolved な本質的争点またはユーザー判断事項が残る場合は実装の最初の変更へ進まず blocked へ遷移する |
-| 従来フロー維持 | REQ-015-003 | 発動条件非該当時、呼出失敗時は委譲内の従来フロー（実装方針形成、実装、検証、PR 作成）を維持する |
-| accepted finding 反映 | REQ-014-006 | accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務 |
-| 再 review 条件 | REQ-014-007 | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review SPEC） |
-| 呼出失敗時の扱い | REQ-014-010 | silent skip 禁止、従来フロー維持（正は adversarial-review SPEC） |
-| 副作用境界 | REQ-014-004/005 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review SPEC、delegation-contracts SPEC） |
+| 実装方針の形成と限定 | REQ-{NNNN}-{NNN} | 委譲内で既確定 Issue/REQ/ADR/SPEC を実現する内部選択として実装方針を形成する。case-run 本体は形成しない |
+| 実施位置 | REQ-{NNNN}-{NNN} | 最初の実装変更前に実施する（実装、検証、PR 作成より前） |
+| 委譲内 review 呼出 | REQ-{NNNN}-{NNN}/002 | adapter 委譲内で実行担当サブエージェントが発動条件判定（ユーザー明示指定）と review 呼出を分離して実施する |
+| blocked 遷移（実装方針限定違反） | REQ-{NNNN}-{NNN} | 実装方針が既確定文書の変更、追加、撤回を必要とする場合は blocked へ遷移する |
+| blocked 遷移（要件/仕様問題） | REQ-{NNNN}-{NNN} | 要件、仕様問題を検出した場合は勝手に仕様変更せず blocked へ遷移する |
+| blocked 遷移（unresolved 残存） | REQ-{NNNN}-{NNN} | unresolved な本質的争点またはユーザー判断事項が残る場合は実装の最初の変更へ進まず blocked へ遷移する |
+| 従来フロー維持 | REQ-{NNNN}-{NNN} | 発動条件非該当時、呼出失敗時は委譲内の従来フロー（実装方針形成、実装、検証、PR 作成）を維持する |
+| accepted finding 反映 | REQ-{NNNN}-{NNN} | accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務 |
+| 再 review 条件 | REQ-{NNNN}-{NNN} | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review SPEC） |
+| 呼出失敗時の扱い | REQ-{NNNN}-{NNN} | silent skip 禁止、従来フロー維持（正は adversarial-review SPEC） |
+| 副作用境界 | REQ-{NNNN}-{NNN}/005 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review SPEC、delegation-contracts SPEC） |
 
 ## See Also
 

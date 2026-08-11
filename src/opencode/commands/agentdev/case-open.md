@@ -22,7 +22,7 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-010、REQ-002-001）。同スキルが6 STEP の control plane として制御構造を所有する。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。
 
 - **STEP-1** 引き継ぎ・OU 選択 — `agentdev_handoff: true` 判定、OU モード時は OU 選択ゲート
 - **STEP-2** Issue 本文生成・execution contract 確定 — QG-2 検証、test_strategy 埋め込み、EC-1〜EC-8 確定
@@ -31,7 +31,7 @@ description: 要件定義をもとにGitHub Issueを作成する
 - **STEP-5** Issue 作成（Epic flow / Standard flow）— Epic Issue + 子Issue（OU単位、最大5件並列）、または Standard Issue、OU 結果書き戻し
 - **STEP-6** 終了処理・クリーンアップ — コメント追加、draft/RU 削除（Form Zero、即時 commit/push）、削除残存検証、完了報告
 
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-case-open` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-002-017）。
+各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-case-open` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
 
 **共通ルール**（全 STEP 適用、詳細は workflow skill 参照）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、テンプレート準拠（テンプレート読込後は毎回【必須】セクションの完備を確認、【任意】は内容がある場合のみ含める、欠落時は再生成）。並列上限と3つの「5件」文脈（case-open の Step 8 子Issue 並列は case-run Wave 内子 Issue 並列と同一上限、5件）の詳細も workflow skill 参照
 

@@ -32,7 +32,7 @@ Decision要否の判定は `agentdev-decision-guidelines` スキルが行う。
 
 ## 出力
 
-- 作成/更新された `docs/decisions/DEC-NNN.md`、更新された `docs/decisions/README.md`
+- 作成/更新された `docs/decisions/<DEC-NNN>.md`、更新された `docs/decisions/README.md`
 
 ## 副作用
 

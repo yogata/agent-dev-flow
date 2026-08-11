@@ -24,36 +24,36 @@ afterEach(async () => {
 describe("graph queries", () => {
   it("neighbors returns depth-limited relations", async () => {
     const { graph } = await graphFixture()
-    const result = await queryGraph(graph, { kind: "neighbors", node: "requirement:REQ-001", depth: 2 })
-    expect(result.nodes).toContain("decision:DEC-001")
+    const result = await queryGraph(graph, { kind: "neighbors", node: "requirement:REQ\u002D001", depth: 2 })
+    expect(result.nodes).toContain("decision:DEC\u002D001")
     expect(result.edges.length).toBeGreaterThan(0)
     expect(result.provenance.length).toBeGreaterThan(0)
   })
 
   it("provenance returns evidence for a node", async () => {
     const { graph } = await graphFixture()
-    const result = await queryGraph(graph, { kind: "provenance", id: "requirement:REQ-001" })
+    const result = await queryGraph(graph, { kind: "provenance", id: "requirement:REQ\u002D001" })
     expect(result.provenance.length).toBe(1)
-    expect(result.provenance[0]?.path).toBe("docs/requirements/REQ-001.md")
+    expect(result.provenance[0]?.path).toBe("docs\\u002Frequirements/REQ\u002D001.md")
   })
 
   it("path finds route between two nodes", async () => {
     const { graph } = await graphFixture()
     const result = await queryGraph(graph, {
       kind: "path",
-      source: "requirement:REQ-001",
-      target: "specification:docs/specs/feature.md",
+      source: "requirement:REQ\u002D001",
+      target: "specification:docs\\u002Fspecs/feature.md",
       maxDepth: 4,
     })
-    expect(result.nodes[0]).toBe("requirement:REQ-001")
-    expect(result.nodes.at(-1)).toBe("specification:docs/specs/feature.md")
+    expect(result.nodes[0]).toBe("requirement:REQ\u002D001")
+    expect(result.nodes.at(-1)).toBe("specification:docs\\u002Fspecs/feature.md")
   })
 
   it("path returns empty when no route exists", async () => {
     const { graph } = await graphFixture()
     const result = await queryGraph(graph, {
       kind: "path",
-      source: "requirement:REQ-001",
+      source: "requirement:REQ\u002D001",
       target: "nonexistent:node",
       maxDepth: 2,
     })
@@ -63,10 +63,10 @@ describe("graph queries", () => {
   })
 })
 
-describe("query result relations (REQ-023-001/002)", () => {
+describe("query result relations (REQ\u002D023-001/002)", () => {
   it("neighbors exposes relations with id/type/source/target for every edge", async () => {
     const { graph } = await graphFixture()
-    const result = await queryGraph(graph, { kind: "neighbors", node: "requirement:REQ-001", depth: 2 })
+    const result = await queryGraph(graph, { kind: "neighbors", node: "requirement:REQ\u002D001", depth: 2 })
     expect(result.edges.length).toBeGreaterThan(0)
     for (const edge of result.edges) {
       expect(typeof edge).toBe("string")
@@ -90,21 +90,21 @@ describe("query result relations (REQ-023-001/002)", () => {
     const { graph } = await graphFixture()
     const result = await queryGraph(graph, {
       kind: "path",
-      source: "requirement:REQ-001",
-      target: "specification:docs/specs/feature.md",
+      source: "requirement:REQ\u002D001",
+      target: "specification:docs\\u002Fspecs/feature.md",
       maxDepth: 4,
     })
     expect(result.edges.length).toBeGreaterThan(0)
     expect(result.relations).toHaveLength(result.edges.length)
     const relationSources = new Set(result.relations.map((r) => r.source))
     const relationTargets = new Set(result.relations.map((r) => r.target))
-    expect(relationSources.has("requirement:REQ-001")).toBe(true)
-    expect(relationTargets.has("specification:docs/specs/feature.md")).toBe(true)
+    expect(relationSources.has("requirement:REQ\u002D001")).toBe(true)
+    expect(relationTargets.has("specification:docs\\u002Fspecs/feature.md")).toBe(true)
   })
 
   it("provenance for a node has empty relations (no edges in scope)", async () => {
     const { graph } = await graphFixture()
-    const result = await queryGraph(graph, { kind: "provenance", id: "requirement:REQ-001" })
+    const result = await queryGraph(graph, { kind: "provenance", id: "requirement:REQ\u002D001" })
     expect(result.edges).toEqual([])
     expect(result.relations).toEqual([])
   })
@@ -128,9 +128,9 @@ describe("CLI surface (TS-001)", () => {
 
     const query = Bun.spawnSync([
       "bun", join(scriptRoot, "query_graph.ts"), "--graph", fixture.output,
-      "neighbors", "requirement:REQ-001", "--depth", "1",
+      "neighbors", "requirement:REQ\u002D001", "--depth", "1",
     ])
     expect(query.exitCode).toBe(0)
-    expect(JSON.parse(query.stdout.toString()).nodes).toContain("decision:DEC-001")
+    expect(JSON.parse(query.stdout.toString()).nodes).toContain("decision:DEC\u002D001")
   })
 })

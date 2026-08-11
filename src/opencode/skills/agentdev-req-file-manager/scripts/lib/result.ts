@@ -1,5 +1,5 @@
 /**
- * 共通結果型と stdout/stderr 出力ヘルパー（REQ-0103-160 I/O 契約）。
+ * 共通結果型と stdout/stderr 出力ヘルパー（REQ-{NNNN}-{NNN} I/O 契約）。
  *
  * 全スクリプトの出力 JSON は成功時は ok: true を含み、
  * エラー時は非ゼロ終了コード + stderr メッセージとする。

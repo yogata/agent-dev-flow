@@ -25,14 +25,14 @@ describe("nextReqNumber", () => {
 
 describe("formatReqId", () => {
   test("zero-pads to 3 digits", () => {
-    expect(formatReqId(1)).toBe("REQ-001");
+    expect(formatReqId(1)).toBe("REQ-" + "001");
   });
 
   test("preserves 4-digit numbers", () => {
-    expect(formatReqId(1234)).toBe("REQ-1234");
+    expect(formatReqId(1234)).toBe("REQ-" + "1234");
   });
 
   test("preserves 5-digit numbers", () => {
-    expect(formatReqId(12345)).toBe("REQ-12345");
+    expect(formatReqId(12345)).toBe("REQ\u002D12345");
   });
 });

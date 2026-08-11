@@ -116,7 +116,7 @@ NG 分類は recommended_route とは別軸で付ける。
 
 矛盾判定時の優先順位。
 
-1. 現行 REQ（`docs/requirements/REQ-*.md`、retired/ 配下を除く）
+1. 現行 REQ（`docs/requirements/<REQ-*>.md`、retired/ 配下を除く）
 2. 承認済み ADR（`status: accepted` の ADR）
 3. SPEC（`* SPEC`）
 4. guides（補助文書）

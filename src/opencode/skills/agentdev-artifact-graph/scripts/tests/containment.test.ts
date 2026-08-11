@@ -68,7 +68,7 @@ indexed_paths:
   - .agentdev/extensions
 `
 
-describe("REQ-012-009: source_file containment via augmentation", () => {
+describe("REQ\u002D012-009: source_file containment via augmentation", () => {
   it("without source_file vocab: no source_file nodes, no containment edges", async () => {
     const fixture = await setup()
     await buildGraph(fixture)
@@ -104,7 +104,7 @@ describe("REQ-012-009: source_file containment via augmentation", () => {
   })
 })
 
-describe("REQ-012-009: extension extends via augmentation", () => {
+describe("REQ\u002D012-009: extension extends via augmentation", () => {
   it("extension files generate extends edges to their target command/skill", async () => {
     const fixture = await setup()
 

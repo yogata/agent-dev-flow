@@ -155,9 +155,9 @@ project-local knowledge を一律 `.agentdev/learning/project-knowledge.md` に�
 | 常時必要な短いルール | `AGENTS.md` |
 | 作業種別に応じて必要な知識 | `.opencode/skills/<domain>/SKILL.md` |
 | 長い詳細 | `.opencode/skills/<domain>/references/*.md` |
-| 仕様として固定すべき内容 | `docs/specs/**/*.md` |
-| 設計判断 | `docs/decisions/*.md` |
-| 要件変更 | `docs/requirements/*.md` |
+| 仕様として固定すべき内容 | `docs/specs/<**/*>.md` |
+| 設計判断 | `docs/decisions/<*>.md` |
+| 要件変更 | `docs/requirements/<*>.md` |
 
 ## Prune 方針
 

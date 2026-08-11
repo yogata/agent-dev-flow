@@ -1,13 +1,13 @@
 import { join } from "node:path"
 import type { ExtractionRule } from "./model.ts"
 
-// ─── Default vocabulary (REQ-012-002, REQ-012-003, DEC-007 decision 3) ───────
+// ─── Default vocabulary (REQ-{NNNN}-{NNN}, REQ-{NNNN}-{NNN}, DEC-{N} decision 3) ───────
 
 /**
  * Standard core default indexed_paths: 3 only.
  * Self-hosting-specific paths (src/opencode, .opencode, .agentdev/extensions,
  * scripts, tests) are NOT included — they belong in self-hosting augmentation
- * (Issue #1951 scope, REQ-012-002).
+ * (Issue #1951 scope, REQ-{NNNN}-{NNN}).
  */
 export const DEFAULT_INDEXED_PATHS = [
   "docs/requirements",
@@ -18,7 +18,7 @@ export const DEFAULT_INDEXED_PATHS = [
 /**
  * Standard core default node_types vocabulary: 3 only.
  * command, skill, integrity_rule, extension, source_file are added by
- * augmentation (REQ-012-003).
+ * augmentation (REQ-{NNNN}-{NNN}).
  */
 export const DEFAULT_NODE_TYPE_VOCABULARY = [
   "requirement",
@@ -28,7 +28,7 @@ export const DEFAULT_NODE_TYPE_VOCABULARY = [
 
 /**
  * Standard core default relation_types vocabulary: 5.
- * delegates_to, governs are added by augmentation (DEC-007 decision 3).
+ * delegates_to, governs are added by augmentation (DEC-{N} decision 3).
  */
 export const DEFAULT_RELATION_TYPE_VOCABULARY = [
   "references",
@@ -75,7 +75,7 @@ export function isInputFile(path: string): boolean {
   return dot >= 0 && INPUT_EXTENSIONS.has(path.slice(dot).toLowerCase())
 }
 
-// ─── Open extension point: rules and config (REQ-012-004, DEC-007 decision 2) ─
+// ─── Open extension point: rules and config (REQ-{NNNN}-{NNN}, DEC-{N} decision 2) ─
 
 export type LabelSourceStep =
   | { readonly kind: "frontmatter_field"; readonly field: string }
@@ -134,7 +134,7 @@ export const DEFAULT_NODE_TYPE_RULES: readonly NodeTypeRule[] = [
   },
   {
     name: "specification",
-    path_pattern: "^docs/specs/(?!.*README\\.md$).+\\.md$",
+    path_pattern: "^docs/specs/<(?!.*README\\>.md$).+\\.md$",
     id_template: "specification:{path}",
     label_source: [
       { kind: "frontmatter_field", field: "title" },

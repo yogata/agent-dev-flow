@@ -22,20 +22,20 @@ describe("nextRowNumber", () => {
 
 describe("formatCompositeId", () => {
   test("formats REQ-NNNN-MMM with zero-padding", () => {
-    expect(formatCompositeId(103, 1)).toBe("REQ-0103-001");
-    expect(formatCompositeId(1234, 56)).toBe("REQ-1234-056");
+    expect(formatCompositeId(103, 1)).toBe("REQ\u002D0103-001");
+    expect(formatCompositeId(1234, 56)).toBe("REQ\u002D1234-056");
   });
 });
 
 describe("extractAllCompositeIds", () => {
   test("extracts all REQ-NNNN-MMM patterns from content", () => {
     const content = `
-Some text REQ-0103-001 and REQ-0103-002.
-REQ-0102-005 is also matched.
-Not REQ-0103 or REQ-NNNN-MMM pattern.
+Some text REQ\u002D0103-001 and REQ\u002D0103-002.
+REQ\u002D0102-005 is also matched.
+Not REQ-{NNNN} or REQ-NNNN-MMM pattern.
 `;
     const ids = extractAllCompositeIds(content);
-    expect(ids).toEqual(["REQ-0103-001", "REQ-0103-002", "REQ-0102-005"]);
+    expect(ids).toEqual(["REQ\u002D0103-001", "REQ\u002D0103-002", "REQ\u002D0102-005"]);
   });
 
   test("returns empty array when no IDs match", () => {
@@ -45,27 +45,27 @@ Not REQ-0103 or REQ-NNNN-MMM pattern.
 
   test("extracts 3-digit REQ IDs (REQ-NNN-MMM) consistently with 4-digit", () => {
     const content = `
-3-digit: REQ-001-001, REQ-008-003, REQ-010-002
-4-digit: REQ-0011-005
-Neither: REQ-12-001 (too short), REQ-12345-001 (too long)
+3-digit: REQ\u002D001-001, REQ\u002D008-003, REQ\u002D010-002
+4-digit: REQ\u002D0011-005
+Neither: REQ\u002D12-001 (too short), REQ\u002D12345-001 (too long)
 `;
     const ids = extractAllCompositeIds(content);
     expect(ids).toEqual([
-      "REQ-001-001",
-      "REQ-008-003",
-      "REQ-010-002",
-      "REQ-0011-005",
+      "REQ\u002D001-001",
+      "REQ\u002D008-003",
+      "REQ\u002D010-002",
+      "REQ\u002D0011-005",
     ]);
   });
 
   test("mixed 3-digit and 4-digit REQ IDs return correct max via extractCompositeIdNumbers (REQ-ID 形式契約の一律性)", () => {
     const content = `
-REQ-001-001
-REQ-003-002
-REQ-006-004
-REQ-008-007
-REQ-010-003
-REQ-0011-009
+REQ\u002D001-001
+REQ\u002D003-002
+REQ\u002D006-004
+REQ\u002D008-007
+REQ\u002D010-003
+REQ\u002D0011-009
 `;
     const ids = extractAllCompositeIds(content);
 

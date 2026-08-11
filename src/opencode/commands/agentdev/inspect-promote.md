@@ -58,22 +58,22 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ### Step 4-1: adversarial-review 発動条件判定（経路B）
 
-review 挿入境界（暫定分類後・HITL 前）で発動条件を判定する（REQ-015-001、REQ-015-005、詳細は inspect-promote SPEC「adversarial-review 挿入境界（経路B）」節参照）。inspect-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。手動分類対象の検出事項（review 対象）が1件以上存在する場合に発動する。ユーザー明示指定は通常発動の必須条件ではない。
+review 挿入境界（暫定分類後・HITL 前）で発動条件を判定する（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}、詳細は inspect-promote SPEC「adversarial-review 挿入境界（経路B）」節参照）。inspect-promote は adversarial-review を原則実行する（default-on、REQ-{NNNN}-{NNN}）。手動分類対象の検出事項（review 対象）が1件以上存在する場合に発動する。ユーザー明示指定は通常発動の必須条件ではない。
 
-- **skip 条件**: `--auto` 経路（fast path、REQ-015-005）、または手動分類対象の検出事項が0件（inbox 空、全件 fast path 完了）の場合、省略して従来フロー（Step 5 HITL 確定）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-- **ユーザー明示指定時の必須実行**: ユーザーが本コマンド起動時に adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。ただし review 対象（手動分類対象）が存在しない場合は発動しない。
+- **skip 条件**: `--auto` 経路（fast path、REQ-{NNNN}-{NNN}）、または手動分類対象の検出事項が0件（inbox 空、全件 fast path 完了）の場合、省略して従来フロー（Step 5 HITL 確定）を継続できる（REQ-{NNNN}-{NNN}）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+- **ユーザー明示指定時の必須実行**: ユーザーが本コマンド起動時に adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する（REQ-{NNNN}-{NNN}）。ただし review 対象（手動分類対象）が存在しない場合は発動しない。
 
-`--auto` により Step 4 で自動 promote された検出事項は HITL を経由しない fast path であり、本判定、Step 4-2 の対象外とする（REQ-015-005、review 挿入迂回）。skip 条件該当時、呼出失敗時（REQ-014-010）は Step 4-2 を実行せず Step 5（HITL 確定）へ従来フローを維持する（REQ-015-003）。
+`--auto` により Step 4 で自動 promote された検出事項は HITL を経由しない fast path であり、本判定、Step 4-2 の対象外とする（REQ-{NNNN}-{NNN}、review 挿入迂回）。skip 条件該当時、呼出失敗時（REQ-{NNNN}-{NNN}）は Step 4-2 を実行せず Step 5（HITL 確定）へ従来フローを維持する（REQ-{NNNN}-{NNN}）。
 
 ### Step 4-2: adversarial-review 呼出（経路B）
 
-Step 4-1 の発動条件を満たした場合、手動分類対象の検出事項とその暫定分類結果（promote/ defer/ reject 判定と根拠）を入力コンテキストとして adversarial-review を呼び出す（REQ-015-001、REQ-015-002）。adversarial-review は任意助言手段であり、必須工程、QG、承認ゲート、統制ゲートとして導入しない（REQ-014-001）。共通契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件4点）は adversarial-review SPEC を正とし、本 step は再定義しない
+Step 4-1 の発動条件を満たした場合、手動分類対象の検出事項とその暫定分類結果（promote/ defer/ reject 判定と根拠）を入力コンテキストとして adversarial-review を呼び出す（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。adversarial-review は任意助言手段であり、必須工程、QG、承認ゲート、統制ゲートとして導入しない（REQ-{NNNN}-{NNN}）。共通契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件4点）は adversarial-review SPEC を正とし、本 step は再定義しない
 
 呼出結果の取扱い:
 
-- accepted finding を暫定分類結果へ反映する（REQ-014-006、本コマンドの責務）。反映で暫定分類の意味内容が変更された場合、Step 3（検出事項分類）へ戻し再分類する
-- unresolved な本質的争点が残る場合、Step 5（HITL 確定）へ進まず、ユーザー判断事項として停止する（REQ-014-009）。adversarial-review 自体を恒久的な統制ゲートとしない
-- 呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で Step 5（HITL 確定）の従来フローを維持する（REQ-014-010、REQ-015-003）
+- accepted finding を暫定分類結果へ反映する（REQ-{NNNN}-{NNN}、本コマンドの責務）。反映で暫定分類の意味内容が変更された場合、Step 3（検出事項分類）へ戻し再分類する
+- unresolved な本質的争点が残る場合、Step 5（HITL 確定）へ進まず、ユーザー判断事項として停止する（REQ-{NNNN}-{NNN}）。adversarial-review 自体を恒久的な統制ゲートとしない
+- 呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で Step 5（HITL 確定）の従来フローを維持する（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）
 
 ### Step 5: HITL 確定（手動分類対象）
 

@@ -83,7 +83,7 @@ proposed → deprecated
 
 ### README ↔ Decision
 
-- `docs/decisions/README.md` の現行基準ビュー（Current Baseline View）に `docs/decisions/DEC-*.md` の全Decisionが記載されているか確認
+- `docs/decisions/README.md` の現行基準ビュー（Current Baseline View）に `docs/decisions/<DEC-*>.md` の全Decisionが記載されているか確認
 - 廃止済み Decision は物理削除を第一選択肢とする。実体が各 retired/ ディレクトリへ移動された場合は README の Retired/ Historical View に全 Decision が記載されているか確認する
 - Current View に記載されているがファイルが存在しないDecisionを検出
 - ファイルが存在するが Current/Retired View いずれにも未記載のDecisionを検出
@@ -112,7 +112,7 @@ proposed → deprecated
 
 `docs/decisions/README.md` に以下の分類ビューを設ける:
 
-- **現行基準ビュー（Current Baseline View）**: 現行の基準Decision（`docs/decisions/DEC-*.md`）の基本情報テーブル（番号、タイトル、ステータス、作成日）
+- **現行基準ビュー（Current Baseline View）**: 現行の基準Decision（`docs/decisions/<DEC-*>.md`）の基本情報テーブル（番号、タイトル、ステータス、作成日）
 - **廃止履歴ビュー（Retired/ Historical View）**: retired Decision（各 retired/ ディレクトリ配下、運用上移動された場合）のテーブル（番号、タイトル、retired時ステータス、引き継ぎ先）。物理削除が第一選択肢
 - **状態別ビュー（Status View）**: ステータス別の分類（proposed/ accepted/ superseded）
 - **主題別ビュー（Topic View）**: 対象領域別の分類

@@ -13,7 +13,7 @@ const REPO_ROOT = resolve(import.meta.dir, "..", "..", "..", "..", "..", "..")
 const SKILLS_SOURCE = join(REPO_ROOT, "src", "opencode", "skills")
 const INSTALL_SCRIPT = join(REPO_ROOT, "scripts", "install-consumer-opencode.ps1")
 
-describe("install-consumer-opencode.ps1: agentdev-artifact-graph consumer junction (REQ-012-001)", () => {
+describe("install-consumer-opencode.ps1: agentdev-artifact-graph consumer junction (REQ\u002D012-001)", () => {
   it("standard skill directory exists at src/opencode/skills/agentdev-artifact-graph/", async () => {
     const skillExists = await Bun.file(join(SKILLS_SOURCE, "agentdev-artifact-graph", "SKILL.md")).exists()
     expect(skillExists).toBe(true)

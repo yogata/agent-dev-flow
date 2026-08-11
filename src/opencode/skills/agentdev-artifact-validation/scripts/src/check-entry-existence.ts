@@ -1,12 +1,12 @@
 /**
  * README のエントリ存在確認スクリプト
- * （AG-002、AG-006、REQ-0103-159/160）。
+ * （AG-002、AG-006、REQ-{NNNN}-{NNN}/160）。
  *
- * 指定 ID（例: REQ-0103、ADR-0128）が、対象インデックスファイル本文に
+ * 指定 ID（例: REQ-{NNNN}、ADR-{NNNN}）が、対象インデックスファイル本文に
  * 出現するかを確認する。出現しない場合はエラーとして報告する。
  *
  * I/O:
- *   入力: argv[2] = 検索対象 ID（例: REQ-0103）
+ *   入力: argv[2] = 検索対象 ID（例: REQ-{NNNN}）
  *         argv[3..] = インデックスファイルパス群（可変長）
  *         または stdin に JSON { id: string, files: string[] }
  *   出力: stdout に JSON { ok: boolean, errors: string[], warnings: string[], found: string[] }

@@ -1,5 +1,5 @@
 /**
- * frontmatter id ↔ ファイル名整合性確認スクリプト（AG-002、AG-006、REQ-0103-159/160）。
+ * frontmatter id ↔ ファイル名整合性確認スクリプト（AG-002、AG-006、REQ-{NNNN}-{NNN}/160）。
  *
  * 指定ディレクトリ配下の `REQ-NNNN.md` / `ADR-NNNN.md` / `DEC-NNN.md` について、
  * frontmatter の `id:` とファイル名が一致するか検証する。

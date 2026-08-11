@@ -4,7 +4,7 @@ description: req-define で分離された SPEC 保存対象を SPEC ファイ�
 
 # SPEC 保存（SPEC artifact_actions → docs/specs 永続化）
 
-req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/**/*.md` に保存、確定する。
+req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/<**/*>.md` に保存、確定する。
 req-save の次、case-open の前に実行する。
 req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す。
 全 work_type 対象であり、`work_type` による判定は廃止する。
@@ -15,7 +15,7 @@ req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 
 
 ## 出力
 
-- `docs/specs/**/*.md`（既存 SPEC への追記 or 新規 SPEC 作成）
+- `docs/specs/<**/*>.md`（既存 SPEC への追記 or 新規 SPEC 作成）
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（SPEC artifact_actions 消費済みフラグの status 更新、Step 8 で実施）
 
 ## SPEC ライフサイクル

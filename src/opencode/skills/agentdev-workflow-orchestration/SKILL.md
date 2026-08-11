@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-orchestration
-description: case-run の状態機械、サブエージェント protocol、self-healing loop、CI 対応 loop、1 Issue オーケストレーションの知識ベース。USE FOR: case-run の再開ポイント判定、自律修正ループ判定、CI 対応、subagent起動、障害伝播。DO NOT USE FOR: 単一Issue の基本的な Step 実行手順（case-run コマンド定義を参照）、work_type 判定（`agentdev-workflow-lifecycle` を参照）、乖離検出（`agentdev-quality-gates` を参照）、子Issue 選択、Wave 構成生成（case-open/ case-auto を参照）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-027-002 soft guard で抑制）
+description: case-run の状態機械、サブエージェント protocol、self-healing loop、CI 対応 loop、1 Issue オーケストレーションの知識ベース。USE FOR: case-run の再開ポイント判定、自律修正ループ判定、CI 対応、subagent起動、障害伝播。DO NOT USE FOR: 単一Issue の基本的な Step 実行手順（case-run コマンド定義を参照）、work_type 判定（`agentdev-workflow-lifecycle` を参照）、乖離検出（`agentdev-quality-gates` を参照）、子Issue 選択、Wave 構成生成（case-open/ case-auto を参照）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）
 ---
 
 # case-run オーケストレーションナレッジベース
@@ -38,9 +38,9 @@ case-run は orchestration stage（case-auto が管理する command 間進行�
 | 実装フェーズ | 5-6 | work planが未完了 または チェックボックス未完了 |
 | 提出フェーズ | 7-11 | PRが未作成 |
 
-## STEP model（REQ-005-024、DEC-011）
+## STEP model（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（control plane）。STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `docs/specs/workflows/step-reference-contract.md` に従う。STEP 識別子と durable state から current STEP を復元する契約は `docs/specs/workflows/input-resolution-and-durable-state.md` に従う。
+本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（control plane）。STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `docs/specs/<workflows/step-reference-contract>.md` に従う。STEP 識別子と durable state から current STEP を復元する契約は `docs/specs/<workflows/input-resolution-and-durable-state>.md` に従う。
 
 ### STEP 識別子（case-run workflow）
 
@@ -54,12 +54,12 @@ case-run internal lifecycle フェーズ構成の各フェーズが STEP resume 
 
 ### durable state（case-run workflow）
 
-compaction や中断再開後に current STEP と必要入力を復元するための durable state。優先順位は `docs/specs/workflows/input-resolution-and-durable-state.md` に従う。
+compaction や中断再開後に current STEP と必要入力を復元するための durable state。優先順位は `docs/specs/<workflows/input-resolution-and-durable-state>.md` に従う。
 
 1. **SSoT 再構成**: Issue 本文、要件doc、REQ/Decision/SPEC から再取得・再検証
 2. **identifier 保持**: Issue 番号、PR 番号、worktree ブランチ名、STEP 識別子
 3. **最小 scalar**: なし（case-run は scalar 状態を保持しない）
-4. **runtime artifact**: 要件doc draft、検出事項（REQ-008 lifecycle に従う）
+4. **runtime artifact**: 要件doc draft、検出事項（REQ-{NNNN} lifecycle に従う）
 
 ### Input Resolution（case-run workflow）
 

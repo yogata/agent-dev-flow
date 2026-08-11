@@ -329,7 +329,7 @@ function checkLinkNormalization(actual: string, results: CheckResult[]): void {
     }
     
     // Also detect bare backtick-wrapped paths that are NOT inside Markdown links
-    // e.g., `docs/requirements/REQ-0031.md` without a link wrapper
+    // e.g., `docs/requirements/REQ-{NNNN}.md` without a link wrapper
     const backtickPathPattern = /`([^`]*\.(md|ts|js|json|yaml|yml)[^`]*)`/g;
     let btMatch: RegExpExecArray | null;
     while ((btMatch = backtickPathPattern.exec(line)) !== null) {

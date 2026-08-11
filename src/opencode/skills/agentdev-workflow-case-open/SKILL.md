@@ -1,18 +1,18 @@
 ---
 name: agentdev-workflow-case-open
-description: "case-open command の workflow 実装本体。要件定義から GitHub Issue（Epic flow / Standard flow）作成までの制御構造、execution contract 確定、execution_unit 構成、draft/RU 削除クリーンアップを所有する。USE FOR: case-open command 実行時の workflow 制御（Issue本文生成・execution contract 確定・execution_unit 構成・preflight・Epic flow/Standard flow・draft/RU 削除・Form Zero）。DO NOT USE FOR: 要件doc 作成（req-define）、REQ/Decision 保存（req-save）、Issue 実装（case-run）、PR マージ・Issue close（case-close）、work_type 判定・フェーズ定義（agentdev-workflow-lifecycle）、gh CLI I/O 手続き（agentdev-gh-cli）、Issue 操作の安全手続き（agentdev-issue-management）、Epic 進捗追跡・Wave 構成（agentdev-epic-tracker）、品質ゲート QG-2（agentdev-quality-gates）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-027-002 soft guard で抑制）。"
+description: "case-open command の workflow 実装本体。要件定義から GitHub Issue（Epic flow / Standard flow）作成までの制御構造、execution contract 確定、execution_unit 構成、draft/RU 削除クリーンアップを所有する。USE FOR: case-open command 実行時の workflow 制御（Issue本文生成・execution contract 確定・execution_unit 構成・preflight・Epic flow/Standard flow・draft/RU 削除・Form Zero）。DO NOT USE FOR: 要件doc 作成（req-define）、REQ/Decision 保存（req-save）、Issue 実装（case-run）、PR マージ・Issue close（case-close）、work_type 判定・フェーズ定義（agentdev-workflow-lifecycle）、gh CLI I/O 手続き（agentdev-gh-cli）、Issue 操作の安全手続き（agentdev-issue-management）、Epic 進捗追跡・Wave 構成（agentdev-epic-tracker）、品質ゲート QG-2（agentdev-quality-gates）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
 ---
 
 # case-open workflow スキル
 
 case-open command の workflow 実装本体。要件doc（構造化 `draft-data`）から GitHub Issue（Epic flow または Standard flow）を作成する制御構造、execution contract 確定（EC-1〜EC-8）、execution_unit 構成（連結成分アルゴリズム + 3軸判断 + preflight）、draft/RU 削除クリーンアップ（Form Zero）を所有する。
 
-case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-010、REQ-002-001〜004）。
+case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
 ## 原本（SSoT）
 
 本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `docs/specs/workflows/workflow-skill-model.md` SPEC が正規所有する。
+Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `docs/specs/<workflows/workflow-skill-model>.md` SPEC が正規所有する。
 extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -68,7 +68,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）は
 
 ## Control Plane（STEP 一覧）
 
-case-open workflow は次の6 STEP で構成する。各 STEP は resume point を持つ（DEC-011、`docs/specs/workflows/step-reference-contract.md`）。会話コンテキストに依存せず、durable state（draft-data、GitHub Issue、commit hash）から再開点を再構成する。
+case-open workflow は次の6 STEP で構成する。各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。会話コンテキストに依存せず、durable state（draft-data、GitHub Issue、commit hash）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -83,11 +83,11 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 
 - **Standard flow**: STEP-1 → STEP-2 → STEP-3（Standard ルート）→ STEP-4（skip 条件該当時は省略）→ STEP-5（Standard flow）→ STEP-6
 - **Epic flow（単一REQ `scale: large`、マルチREQ、複数 OU）**: STEP-1 → STEP-2 → STEP-3（Epic ルート、execution_unit 構成）→ STEP-4 → STEP-5（Epic flow、子Issue 並列作成）→ STEP-6
-- **adversarial-review skip 条件**: Standard flow で単一 OU の機械的確定、Wave 分割なし（REQ-015-003）。ユーザー明示指定時は強制発動（REQ-015-002）
+- **adversarial-review skip 条件**: Standard flow で単一 OU の機械的確定、Wave 分割なし（REQ-{NNNN}-{NNN}）。ユーザー明示指定時は強制発動（REQ-{NNNN}-{NNN}）
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-002-017）。
+本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
 - `agentdev-issue-management`: Issue 操作の安全手続き、テンプレート選定、委譲接続点
 - `agentdev-epic-tracker`: Epic 進捗追跡、Wave 構成、自律構成生成、子Issue 数上限
@@ -103,7 +103,7 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 
 ## internal Workflow Extension 読込
 
-本スキルは internal Workflow Extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）を読み込む場合がある（REQ-002-031、DEC-012）。Workflow Skill のみが読み、case-open command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは internal Workflow Extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。Workflow Skill のみが読み、case-open command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
 
 ## 共通制約
 
@@ -115,8 +115,8 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 
 ## See Also
 
-- **`docs/specs/workflows/workflow-skill-model.md`**: Workflow Skill 固有契約の正規所有者
-- **`docs/specs/workflows/step-reference-contract.md`**: STEP reference 構造、resume point
-- **`docs/decisions/DEC-010.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
-- **`docs/decisions/DEC-011.md`**: STEP resume point と会話記憶非依存
+- **`docs/specs/<workflows/workflow-skill-model>.md`**: Workflow Skill 固有契約の正規所有者
+- **`docs/specs/<workflows/step-reference-contract>.md`**: STEP reference 構造、resume point
+- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
+- **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **case-open command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

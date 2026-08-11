@@ -37,7 +37,7 @@ draft-data の `test_strategy` を読み取り、Issue 本文の「テスト戦�
 
 各詳細は `agentdev-issue-management`、case-open command SPEC（extension 経由）を参照。
 
-### execution contract 確定ステップ（2-6、EC-1〜EC-8、REQ-017）
+### execution contract 確定ステップ（2-6、EC-1〜EC-8、REQ-{NNNN}）
 
 Issue 本文生成前に次の確定ステップを実行し、結果を Issue 本文の対応セクション（対象範囲、test strategy、完了条件、Execution Contract セクション）へ反映する。詳細な判定規則、対応表は case-open command SPEC（extension 経由）「execution contract 確定ステップ」節、artifact-quality-control-routing SPEC（extension 経由）を正とする。
 
@@ -51,7 +51,7 @@ artifact-quality-control-routing SPEC の合成規則に従い変更予定成果
 
 #### EC-3: 完了条件の確定
 
-合意内容から成果状態を抽出し、Issue 本文の完了条件セクションへ確定する。実行手段、検証手段は test strategy へ分離する。必須品質能力の呼出自体が利用者要求でない限り、Skill 呼出を完了条件化しない（AG-002、REQ-017-003）。
+合意内容から成果状態を抽出し、Issue 本文の完了条件セクションへ確定する。実行手段、検証手段は test strategy へ分離する。必須品質能力の呼出自体が利用者要求でない限り、Skill 呼出を完了条件化しない（AG-002、REQ-{NNNN}-{NNN}）。
 
 #### EC-4: 関連 ADR 拘束条件の特定と反映
 
@@ -71,7 +71,7 @@ Issue 作成前に変更影響候補を探索し、scope、完了条件、test s
 
 #### EC-8: execution contract 必須セクションの付与
 
-新規 Issue 作成時、新契約識別用の必須セクション（Execution Contract セクション、必須品質統制セクション）を Issue 本文へ付与する。presence-based 判定により新旧 Issue を識別する（AG-012、REQ-017-014）。テンプレート（`issue_desc_feature.md`、`issue_desc_child.md`）の Execution Contract セクション構造は `agentdev-workflow-templates` を参照。
+新規 Issue 作成時、新契約識別用の必須セクション（Execution Contract セクション、必須品質統制セクション）を Issue 本文へ付与する。presence-based 判定により新旧 Issue を識別する（AG-012、REQ-{NNNN}-{NNN}）。テンプレート（`issue_desc_feature.md`、`issue_desc_child.md`）の Execution Contract セクション構造は `agentdev-workflow-templates` を参照。
 
 ## 共通ルール（STEP 全体適用）
 

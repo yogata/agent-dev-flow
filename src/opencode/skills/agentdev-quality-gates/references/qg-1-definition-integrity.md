@@ -9,7 +9,7 @@
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
 | req-define | Step 3（既存REQ照合、SPLIT予兆計測）〜Step 10（要件doc確認、ドラフトSPLIT予兆計測） | 要件doc draft（`.agentdev/drafts/req-draft-*.md`） |
-| req-save | Step 3（ドラフト検証）〜Step 4（REQ 操作） | REQ ファイル（`docs/requirements/REQ-*.md`）、Decision ファイル（`docs/decisions/DEC-*.md`） |
+| req-save | Step 3（ドラフト検証）〜Step 4（REQ 操作） | REQ ファイル（`docs/requirements/<REQ-*>.md`）、Decision ファイル（`docs/decisions/<DEC-*>.md`） |
 
 ## 検査観点
 
