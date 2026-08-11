@@ -85,3 +85,35 @@
 - **関連**: PR #2084 Findings docs-integrity セクション, `docs/specs/integrity/baselines/pre-audit-baseline-20260811.md`, Epic #2076 OU-001 Phase 0
 - **タグ**: `#docs-check` `#spec-readme` `#targeted-docs-guard` `#false-positive` `#spec-gap`
 
+## 廃止 IR 識別子の歴史参照を監査文書・baseline に残置する運用（DEC-013 AG-008 履歴担保原則の適用事例）
+
+- **問題事象**: OU-006 Phase 5 で DELETE 対象となった IR-019/022/026/036 の識別子が、監査文書（`docs/specs/integrity/audits/*.md`）、pre-audit baseline（`docs/specs/integrity/baselines/pre-audit-baseline-20260811.md`）、`docs/specs/quality/spec-health-metrics.md`、`docs/requirements/REQ-025.md`、`docs/specs/integrity/rules/IR-025-retired-adr-path-rule.md` に歴史的理由で言及されていた。TS-017（DELETE IR 残存参照 全 repository 検索）で該当5件を検出したが、削除すべきか残置すべきかの判定基準が DEC-013 AG-008 で明文化されていない
+- **発生局面**: 実装（case-run Phase 5、DELETE IR 残存物除去）、完了処理（case-close QG-4 完了条件評価、TS-017 評価）
+- **検知方法**: TS-017 で catalog/rule-ownership AUTOGEN から除外後に `src/` 配下で 0 件、docs 配下で既知履歴参照5件を検出
+- **根本原因**: DEC-013 AG-008 は「tombstone 廃止、交叉参照は req-impact-map/retired/ へ再配置、履歴性は Git で担保」を謳うが、監査文書・baseline 等の「歴史記録ファイル」に言及される識別子の取り扱いが規定されていない。AG-008 の「履歴性は Git で担保」原則をどう適用するか（文言削除 vs 残置）の運用基準が不明確
+- **自律対応内容**: 監査文書・baseline は「時点 snapshot」であり、編集すると歴史価値を損なうため、識別子言及をそのまま残置。REQ-025・IR-025 rule ファイルは依然として現行 IR として参照されるため残置（IR-025 は Phase 5 で新 detector `check_retired_artifact_residual.ts` の検出対象として存続）。Phase 5 の完了条件（TS-017「残存参照が存在しない」）は「現行 IR としての機能的残存参照」を意味し、歴史記録としての言及は合格と解釈して QG-4 判定
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり（DEC-013 AG-008「履歴性は Git で担保」の適用範囲が監査文書・baseline 等の歴史記録ファイルを含むか明示されていない）。learning-promote で SPEC 改修要否を評価する対象。候補: (a) AG-008 へ「時点 snapshot の歴史記録ファイルは削除対象外」を明記、(b) TS-017 の pass_criteria へ「歴史記録由来の言及は除外」を追記、(c) `docs/specs/integrity/audits/` と `baselines/` を対象外ディレクトリとして明示
+- **横展開観点**: 将来の IR 廃止・MERGE 作業で同様の時点 snapshot 与する参照が発生するたびに判定が必要になる。REQ-028 以外の IR 整理（Phase 6 #2083 全体再検証、将来の IR 廃止）でも再発
+- **再発条件**: IR DELETE/MERGE 作業で、識別子が監査文書・baseline・history 系ドキュメントに歴史的経緯で言及されている場合
+- **予防策候補**: DEC-013 AG-008 または TS-017 SPEC へ「歴史記録ファイル（`docs/specs/integrity/audits/`、`docs/specs/integrity/baselines/`、git history 由来の参照）は残存参照判定の対象外」を明文化。targeted docs guard（`check_changed_docs.ts`）が history 系ディレクトリを除外リストで扱うよう拡張
+- **想定反映先**: `docs/decisions/DEC-013.md`（AG-008 適用範囲の明確化）、`docs/specs/integrity/integrity-contracts.md` または同等の IR 運用 SPEC（TS-017 判定基準の拡張）、`src/opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts`（history 系ディレクトリ除外）
+- **関連**: PR #2089 Findings TS-017 / 履歴参照の整理 セクション, Epic #2076 OU-006 Phase 5, IR-019/022/026/036, DEC-013 AG-008
+- **タグ**: `#ir-lifecycle` `#delete-residual` `#history-keeping` `#spec-gap` `#dec-013`
+
+## baseline 未反映による check_integrity.test.ts IR-055 pre-existing failure（Phase 6 #2083 委譲）
+
+- **問題事象**: main HEAD `8c6c1897` で `check_integrity.test.ts` の IR-055 runtime-unresolved-reference テストが 1件 fail する。Phase 4（OU-005 #2081）で追加された `docs/specs/**` への参照が baseline へ未反映のため。本 PR #2089 起因でないことを `git stash` で本 PR 変更を退避した状態で同一 failure が再現することで確認した。Phase 5（OU-006 #2082）の完了条件 TS-022（regression なし）への影響は「本 PR 起因でない pre-existing」として合格判定したが、Epic #2076 完了前に対処が必要
+- **発生局面**: 完了処理（case-close QG-4 TS-022 評価、test suite 実行）
+- **検知方法**: `bun test .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts` で 83 pass / 1 fail。fail は IR-055 runtime-unresolved-reference。`git stash` で Phase 5 変更退避後も同一 failure 再現
+- **根本原因**: Phase 4（OU-005 #2081）で `docs/specs/**` への新規参照が追加されたが、IR-055 が参照する baseline（runtime reference snapshot）へ反映されていない。Phase 4 case-close（PR #2088）で baseline 更新が漏れた、または baseline 更新タイミングが Phase 6（全体再検証）を想定していた可能性
+- **自律対応内容**: 本 PR 起因でないため Phase 5 完了条件 TS-022 は合格と判定。Phase 6 (#2083) 委譲事項として PR本文「Phase 6 (#2083) への委譲事項」項目2「IR-055 baseline 更新または実体修正」へ明記。Phase 6 全体再検証で対処予定
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし直接影響なし。ただし Phase 4 case-close（PR #2088）で baseline 更新を漏れた可能性があり、case-close の docs 検証 STEP-3 で baseline 整合性を確認する手続きの有無が課題。learning-promote で評価対象
+- **横展開観点**: `docs/specs/**` への新規参照を伴う Phase（Phase 4 以降、Phase 6）で同様の baseline 未反映が再発しうる。特に docs-check 系 checker の baseline は `docs/specs/**` の構成変化へ追随する必要がある
+- **再発条件**: `docs/specs/**` への新規参照を伴う実装を行った Phase で、IR-055 baseline の再生成をスキップした場合
+- **予防策候補**: case-close の docs 検証 STEP-3 で、PR 対象ファイルに `docs/specs/**` が含まれる場合、IR-055 baseline 再生成を必須チェックとして追加。または IR-055 テスト failure 時の case-close マニュアル判定（pre-existing vs 本 PR 起因）手順を文書化
+- **想定反映先**: `src/opencode/skills/agentdev-workflow-case-close/references/`（docs 検証 STEP-3 の baseline チェック拡張候補）、`docs/specs/integrity/baselines/`（IR-055 baseline 運用規約）
+- **関連**: PR #2089 Findings IR-055 pre-existing failure セクション, PR #2088 Phase 4 (OU-005 #2081), Epic #2076 OU-006 Phase 5 / OU-007 Phase 6 (#2083) 委譲事項
+- **タグ**: `#baseline` `#ir-055` `#pre-existing-failure` `#regression-detection` `#phase-handoff`
+
