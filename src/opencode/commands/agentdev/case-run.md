@@ -75,9 +75,19 @@ PR 対象ファイルに docs/** 変更を含む場合、Step 6（実行担当�
 
 **検出結果の記録、連携**: 検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` セクションに `### docs-integrity` 小見出しで記録する（実行担当サブエージェント責務）。case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない）
 
+### Step 5-5: 配布依存境界の最終変更経路 gate（REQ-010-012 再利用、REQ-010-060、DEC-014）
+
+PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合、Step 6（実行担当サブエージェント起動）の委譲前に配布依存境界の最終 gate を実行する。本 gate は共用 detector（`.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、REQ-010-012 の最終 gate 基底を再利用する（REQ-010-060、DEC-014 決定4）。adapter が bypass されても最終 gate で停止する（DEC-014 決定3、4）
+
+**実行条件**: PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合に実行する。当該変更を含まない PR（docs のみ、`.opencode/plugins/**` のみ等）ではスキップする
+
+**実行コマンド**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts --profile source --json`。case-run は worktree 環境（マージ前）であり、原本領域 `src/opencode/` を直接検査するため `--profile source` を使用する
+
+**検出結果の分類、連携**: 検査エラー（読込不能、未分類エントリ、adapter 起動失敗）は全て gate-not-passed として扱う（DEC-014 決定5、TS-009）。clean として通過させない。検出事項は case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない）。検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（実行担当サブエージェント責務）
+
 ### case-run が使用する検査ツール
 
-case-run が使用する検査ツール（integrity 契約 SPEC「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、PR 対象ファイルに docs/** 変更を含む場合に Step 6 委譲前に実行、AG-002）、check_extensions.ts（IR-056、`.opencode/commands/agentdev/**/*.md`, `.opencode/skills/agentdev-*/SKILL.md`, `.opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行）、test_strategy（Issue 完了条件検証）。上記は全て肯定表現である
+case-run が使用する検査ツール（integrity 契約 SPEC「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、PR 対象ファイルに docs/** 変更を含む場合に Step 6 委譲前に実行、AG-002）、check_extensions.ts（IR-056、`.opencode/commands/agentdev/**/*.md`, `.opencode/skills/agentdev-*/SKILL.md`, `.opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source、PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合に Step 6 委譲前に実行、DEC-014 決定4、REQ-010-012 最終 gate 基底再利用）、test_strategy（Issue 完了条件検証）。上記は全て肯定表現である
 
 ### Step 6: 実行担当サブエージェント起動（委譲）
 

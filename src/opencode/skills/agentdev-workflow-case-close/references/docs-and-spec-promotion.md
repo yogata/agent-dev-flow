@@ -46,6 +46,15 @@
 - **draft → accepted 等の SPEC status 変更時**: `spec_readme_update_required` を Step 3-2 SPEC 確定フローに反映
 - **`files_checked` 空時の確認（REQ）**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する
 
+#### 配布依存境界の最終変更経路 gate（REQ-010-012 再利用、REQ-010-060、DEC-014）
+
+PR 変更ファイルに `src/opencode/{commands,skills}/**` を含む場合、配布依存境界の最終 gate を実行する。本 gate は共用 detector（`.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、REQ-010-012 の最終 gate 基底を再利用する（REQ-010-060、DEC-014 決定4）。adapter が bypass されても最終 gate で停止する（DEC-014 決定3、4）
+
+- **実行コマンド**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts --profile source --json`
+- **`--profile source`**: case-close はマージ後 main 環境であり、原本領域 `src/opencode/` を直接検査するため `source` を使用する（link/archive/archive-installed projection は package-release-archive.ps1 / `/repo/docs-check` が担う）
+- **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う（DEC-014 決定5、TS-009）。clean として通過させない。違反時はマージを停止しユーザー判断を仰ぐ
+- **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run Step 5-5 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
+
 ### Step 3-2: SPEC 確定フロー
 
 PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録）を読み取り、SPEC の確定、昇格を処理する。セクション不存在・空の場合はスキップ。
@@ -62,6 +71,7 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 
 - `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行、AG-003）
 - `check_extensions.ts`（IR-056、配布物パターンのいずれかを変更した場合に実行）
+- `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルに `src/opencode/{commands,skills}/**` を含む場合に実行、DEC-014 決定4、REQ-010-012 最終 gate 基底再利用）
 - test_strategy（QG-4 完了条件確認）
 
 ## resume point

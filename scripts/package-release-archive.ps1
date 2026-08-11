@@ -12,10 +12,20 @@ param(
 #     README-INSTALL.md
 # Junctions are resolved to real file content so the archive is self-contained.
 #
+# DEC-014 decision 7 / TS-008 / TS-010 (Issue #2092): before publishing the
+# final archive, two projection boundary inspections are run against the
+# canonical distribution-boundary adapter:
+#   1. archive projection on the staged content (before Compress-Archive)
+#   2. archive-installed projection on the extracted+installed content
+# Either failure removes the final archive and exits non-zero so no success
+# path is left behind on violation.
+#
 # Exit codes:
 #   0  success (archive written, path printed to stdout)
 #   2  required source dir or file missing
 #   3  archive already exists and -Force was not supplied
+#   6  archive projection boundary check failed (no final archive produced)
+#   7  archive-installed projection boundary check failed (final archive removed)
 
 $ErrorActionPreference = "Stop"
 
@@ -101,10 +111,74 @@ if (Test-Path -LiteralPath $readmeInstall) {
     Write-Warning "package-release-archive: README-INSTALL.md missing at repo root; archive will omit it."
 }
 
+# DEC-014 decision 7 / REQ-009-045: pre-publication boundary inspection.
+# The staged content mirrors src/opencode/ (archive projection = source
+# projection for boundary purposes). If the boundary check finds any
+# producer-internal reference in the staged text artifacts, we MUST NOT
+# produce a final archive. Cleanup is unconditional on failure.
+$boundaryChecker = Join-Path $repoRoot ".opencode\skills\repo-agentdev-integrity\scripts\check_distribution_boundary.ts"
+if (Test-Path -LiteralPath $boundaryChecker) {
+    Write-Host "package-release-archive: running archive projection boundary check on staged content"
+    & bun run $boundaryChecker --profile archive $archiveRoot --json 2>&1 | Tee-Object -Variable archiveCheckOut | Out-Host
+    $archiveCheckExit = $LASTEXITCODE
+    if ($archiveCheckExit -ne 0) {
+        Write-Warning "package-release-archive: archive projection boundary check failed (exit $archiveCheckExit). Removing staging; no final archive will be produced."
+        Remove-Item -LiteralPath $archiveRoot -Recurse -Force -ErrorAction SilentlyContinue
+        exit 6
+    }
+} else {
+    Write-Warning "package-release-archive: boundary checker not found at $boundaryChecker; skipping archive projection check."
+}
+
 if (Test-Path -LiteralPath $archiveZip) {
     Remove-Item -LiteralPath $archiveZip -Force
 }
 Compress-Archive -Path $archiveRoot -DestinationPath $archiveZip -Force
+
+# DEC-014 decision 7 / TS-008 / TS-010: archive-installed projection check.
+# Extract the just-built archive to a temporary consumer location, run
+# install-from-archive.ps1 to materialise the .opencode/ tree, and run the
+# boundary check against that installed projection. If this fails, the final
+# archive is removed and no success path is left behind.
+$archiveStagingExtract = Join-Path $env:TEMP "agentdev-release-archive-staging-$commitShort"
+$archiveInstalledRoot = Join-Path $env:TEMP "agentdev-release-archive-installed-$commitShort"
+if (Test-Path -LiteralPath $archiveStagingExtract) {
+    Remove-Item -LiteralPath $archiveStagingExtract -Recurse -Force
+}
+if (Test-Path -LiteralPath $archiveInstalledRoot) {
+    Remove-Item -LiteralPath $archiveInstalledRoot -Recurse -Force
+}
+New-Item -ItemType Directory -Path $archiveStagingExtract -Force | Out-Null
+New-Item -ItemType Directory -Path $archiveInstalledRoot -Force | Out-Null
+
+try {
+    Expand-Archive -LiteralPath $archiveZip -DestinationPath $archiveStagingExtract -Force
+    # The archive contains agentdev-release-<sha>/ as its root directory.
+    $extractedRoot = Get-ChildItem -LiteralPath $archiveStagingExtract -Directory | Select-Object -First 1
+    if (-not $extractedRoot) {
+        throw "archive extraction produced no root directory"
+    }
+    $extractedRootPath = $extractedRoot.FullName
+    $installedSrc = Join-Path $extractedRootPath "src\opencode"
+    $installedTarget = Join-Path $archiveInstalledRoot ".opencode"
+    $installFromArchive = Join-Path $extractedRootPath "scripts\install-from-archive.ps1"
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $installFromArchive -Source $installedSrc -Target $installedTarget -Mode copy
+    if ($LASTEXITCODE -ne 0) {
+        throw "install-from-archive.ps1 exited with $LASTEXITCODE"
+    }
+    Write-Host "package-release-archive: running archive-installed projection boundary check"
+    & bun run $boundaryChecker --profile archive-installed $archiveInstalledRoot --json 2>&1 | Tee-Object -Variable archiveInstalledOut | Out-Host
+    $installedCheckExit = $LASTEXITCODE
+    if ($installedCheckExit -ne 0) {
+        Write-Warning "package-release-archive: archive-installed projection boundary check failed (exit $installedCheckExit). Removing final archive; no success path will be left."
+        Remove-Item -LiteralPath $archiveZip -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $archiveRoot -Recurse -Force -ErrorAction SilentlyContinue
+        exit 7
+    }
+} finally {
+    Remove-Item -LiteralPath $archiveStagingExtract -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $archiveInstalledRoot -Recurse -Force -ErrorAction SilentlyContinue
+}
 
 # Remove staging directory; only the .zip is shipped.
 Remove-Item -LiteralPath $archiveRoot -Recurse -Force
