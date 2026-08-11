@@ -1,0 +1,72 @@
+# command-format-rules.yaml
+#
+# Detection-view derived from docs/specs/authoring/command-file-format.md per
+# Phase 3 §6.2 of cross-cutting-integration-design-20260811.md.
+#
+# Canonical source (SPEC is authoritative; this YAML is a detection view):
+#   - docs/specs/authoring/command-file-format.md
+#
+# Consumed by:
+#   - check_command_format.ts (extended for IR-028, IR-029, IR-030, IR-031)
+#
+# Phase 5 (OU-006 #2082) implementation. The detector loads these patterns to
+# emit findings; severities/gate_levels remain owned by the individual IR files.
+
+schema_version: 1
+generated_at: 2026-08-11
+canonical_source: docs/specs/authoring/command-file-format.md
+
+# IR-028 (Command top-level Step integer-only): top-level Step headings under
+# ## 手順 must use integer numbering (### Step N:). Ranges (Step N〜M) and
+# integer substeps (Step N-M) are permitted per command-file-format.md.
+top_level_step_rules:
+  description: |
+    Top-level Step headings must be integer-based. Heading forms that mix
+    alphabet letters or non-integer tokens at the top level are forbidden.
+  scan_dirs:
+    - src/opencode/commands/agentdev
+    - .opencode/commands/repo
+  heading_regex: "^###\\s+Step\\s+(\\d+)(?:[〜-](\\d+))?\\s*:"
+  forbidden_heading_regex: "^###\\s+Step\\s+[A-Za-z]"
+
+# IR-029 (Command alphabet substep prohibition): substep form is Step N-M
+# only. Alphabet suffixes (Step 1-a, Step 1-b) are forbidden.
+alphabet_substep_rules:
+  description: |
+    Substep numbering must use integer form (Step N-M). Alphabet-suffixed
+    substeps (Step N-a, Step N-b) are forbidden.
+  forbidden_substep_regex: "\\bStep\\s+\\d+-[A-Za-z]\\b"
+
+# IR-030 (Subagent verbatim conditional return): delegation bodies that demand
+# unconditional verbatim return (「verbatim で返却」「verbatim 必須」 without
+# conditional gating) are forbidden. Verbatim must be conditional.
+subagent_verbatim_rules:
+  description: |
+    Unconditional verbatim return requirements in delegation bodies are
+    forbidden. Verbatim constraints must be conditional (e.g., "成果物本文のみ
+    verbatim" rather than bare "verbatim で返却").
+  forbidden_unconditional_patterns:
+    # Bare unconditional phrasing; conditional phrasing (成果物本文のみ,
+    # verbatim 区切子内, 等) is exempt.
+    - "verbatim\\s+で返却"
+    - "verbatim\\s+必須"
+  exemption_hints:
+    - "成果物本文のみ"
+    - "verbatim 区切子"
+    - "conditional"
+
+# IR-031 (Findings / Capture候補 heading unification): PR-body Findings
+# heading must use the unified form `## Findings / Capture候補`. Legacy
+# synonyms (`## Capture`, `## Learning 候補`, `## Intake 候補` as the primary
+# findings heading) are forbidden as the primary heading. Legacy search terms
+# inside body text remain valid for detection purposes.
+findings_capture_heading_rules:
+  description: |
+    The primary PR findings heading must be `## Findings / Capture候補`.
+    Legacy synonyms are allowed as in-body detection vocabulary but not as
+    the primary heading.
+  required_primary_heading: "^##\\s+Findings\\s*/\\s*Capture候補\\s*$"
+  forbidden_primary_headings:
+    - "^##\\s+Capture\\s*$"
+    - "^##\\s+Intake\\s+候補\\s*$"
+    - "^##\\s+Learning\\s+候補\\s*$"

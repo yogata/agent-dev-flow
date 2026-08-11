@@ -81,14 +81,11 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-015: 廃止 REQ 現行参照検出](rules/IR-015-retired-req-current-ref-detection.md)
 - [IR-016: Source/projection 整合性](rules/IR-016-source-projection-integrity.md)
 - [IR-018: REQ 範囲表記鮮度](rules/IR-018-req-range-notation-freshness.md)
-- [IR-019: Guide 要件定義、契約記述検出](rules/IR-019-guide-req-contract-content-detection.md)
 - [IR-020: 基準既知（baseline-known）と新規 finding の区別](rules/IR-020-baseline-known-vs-new-finding.md)
 - [IR-021: 廃止済み skill 参照検出](rules/IR-021-retired-skill-reference-detection.md)
-- [IR-022: REQ 内部整合性](rules/IR-022-req-internal-consistency.md)
 - [IR-023: Integrity artifact validator drift](rules/IR-023-integrity-artifact-validator-drift.md)
 - [IR-024: Command README ↔ 実体](rules/IR-024-command-readme-actual.md)
 - [IR-025: 廃止 ADR path 規則](rules/IR-025-retired-adr-path-rule.md)
-- [IR-026: ADR 誤分類兆候検出](rules/IR-026-adr-misclassification-sign.md)
 - [IR-027: 廃止 ADR 現行根拠引用検出](rules/IR-027-retired-adr-current-authority-citation.md)
 - [IR-028: Command 最上位 Step 整数化](rules/IR-028-command-top-step-int-only.md)
 - [IR-029: Command 英字サブステップ禁止](rules/IR-029-command-alphabet-substep-prohibition.md)
@@ -98,7 +95,6 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-033: lightweight-delegation primary pattern 禁止](rules/IR-033-lightweight-delegation-primary-pattern-prohibition.md)
 - [IR-034: Skill 内部 section / protocol / Step 参照検出](rules/IR-034-skill-internal-section-step-reference-detection.md)
 - [IR-035: Skill See Also 検出観点](rules/IR-035-skill-see-also-detection-perspective.md)
-- [IR-036: ADR-work-means-detection](rules/IR-036-adr-work-means-detection.md)
 - [IR-037: retired-ADR-current-baseline-ref](rules/IR-037-retired-adr-current-baseline-ref.md)
 - [IR-038: ADR-index-consistency](rules/IR-038-adr-index-consistency.md)
 - [IR-039: index-req-title-consistency](rules/IR-039-index-req-title-consistency.md)
@@ -108,6 +104,21 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-043: retired-readme-coverage](rules/IR-043-retired-readme-coverage.md)
 - [IR-044: REQ/SPEC 境界違反検出](rules/IR-044-req-spec-boundary-violation-detection.md)
 <!-- AUTOGEN:END -->
+
+### IR-019, IR-022, IR-026, IR-036: inspect-docs 移管（REQ-028-007、OU-006 Phase 5）
+
+> **docs-check 除外・inspect-docs 移管（2026-08-11）**: 4件の意味判断系 IR を docs-check（機械検出層）から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（REQ-028-007、DEC-006、Phase 3 §5.2、§4.3）。
+> 意味判断・文脈判断を必要とする検査は機械検出層が保持せず、意味的診断層が担う（3層検出構造、`integrity-contracts.md`「3層検出構造の責務分担」）。
+> catalog↔実装双方向同期運用手順（REQ-010-003）に従い、当該 IR エントリを物理削除した。
+
+| IR | 旧タイトル | 移管先 | 根拠 |
+|---|---|---|---|
+| IR-019 | Guide 要件定義、契約記述検出 | inspect-docs（Guide 責務侵害観点） | Phase 3 §4.3、REQ-028-007 |
+| IR-022 | REQ 内部整合性 | inspect-docs（REQ 内部整合観点） | Phase 3 §4.3、REQ-028-007 |
+| IR-026 | ADR 誤分類兆候検出 | inspect-docs（Decision 誤分類観点） | Phase 3 §4.3、REQ-028-007 |
+| IR-036 | Decision-work-means-detection | inspect-docs（Decision work-means 観点） | Phase 3 §4.3、REQ-028-007 |
+
+> 識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する（DEC-013 AG-008）。
 
 ### IR-045: （削除）docs 日本語表現、文意整合検査
 
