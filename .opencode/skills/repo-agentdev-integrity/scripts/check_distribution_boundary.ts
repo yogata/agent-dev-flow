@@ -572,8 +572,13 @@ if (require.main === module) {
     process.exit(delta.ok ? 0 : 1);
   }
 
+  // IR-046/047/048 観点を正規実行経路へ統合（AC-04/05: detector 到達可能性）
+  const rulesResult = checkDistributionRules(repoRoot);
+  const combinedOk = report.ok && rulesResult.ok;
+
   if (json) {
-    process.stdout.write(JSON.stringify(report, null, 2) + "\n");
+    const payload = { ...report, rules: rulesResult };
+    process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
   } else {
     process.stdout.write(`check_distribution_boundary.ts - distribution reference boundary\n`);
     process.stdout.write(`=============================================================\n`);
@@ -587,10 +592,127 @@ if (require.main === module) {
         `  [${f.category}] ${f.file}:${f.line} matched=${f.matched}\n    snippet: ${f.snippet}\n`,
       );
     }
+    process.stdout.write(`\nrules findings (IR-046/047/048, scanned=${rulesResult.stats.scanned_files}):\n`);
+    for (const f of rulesResult.findings) {
+      process.stdout.write(
+        `  [${f.rule}] ${f.file}:${f.line} matched=${f.matched}\n    ${f.description}\n`,
+      );
+    }
   }
-  process.exit(report.ok ? 0 : 1);
+  process.exit(combinedOk ? 0 : 1);
 }
 
 function countCategory(failures: BoundaryFailure[], cat: BoundaryFailure["category"]): number {
   return failures.filter((f) => f.category === cat).length;
+}
+
+// ---- IR-046/047/048 観点集約（Phase 3 §6.3 / Phase 6 委譲事項） ----
+// declarative data は data/distribution-targets.yaml（Wave 6 作成）。
+// 自己ホスト環境で検出可能な観点を最小限実装し、consumer 環境固有の検出は
+// 別途 install-consumer-opencode.ps1 実行後の検証で担う。
+
+export interface DistributionRuleFinding {
+  rule: "ir046" | "ir047" | "ir048";
+  file: string;
+  line: number;
+  matched: string;
+  description: string;
+}
+
+export function checkDistributionRules(repoRoot: string): {
+  ok: boolean;
+  findings: DistributionRuleFinding[];
+  stats: { ir046_hits: number; ir047_hits: number; ir048_hits: number; scanned_files: number };
+} {
+  const IR046_MARKERS = [
+    "AgentDevFlow プラグインの設定を管理するリポジトリ",
+  ];
+  const IR047_ALLOWED = ["agentdev-gh-cli"];
+  const IR048_PREFIX = "generated_by:";
+  const findings: DistributionRuleFinding[] = [];
+  const stats = { ir046_hits: 0, ir047_hits: 0, ir048_hits: 0, scanned_files: 0 };
+
+  // IR-046: src/opencode/ 配下の markdown に self-hosting-only marker が含まれないこと。
+  // これらの marker は README.md 等の自己ホスト向けファイルでは正当だが、配布物
+  // （src/opencode/）には混入しない。
+  const publicCmd = path.join(repoRoot, "src", "opencode", "commands", "agentdev");
+  const publicSkills = path.join(repoRoot, "src", "opencode", "skills");
+  const publicTargets: string[] = [
+    ...listMarkdownFiles(publicCmd, true),
+  ];
+  if (dirExists(publicSkills)) {
+    for (const ent of fs.readdirSync(publicSkills, { withFileTypes: true }) as any[]) {
+      if (ent.isDirectory() && ent.name.startsWith("agentdev-")) {
+        publicTargets.push(...listMarkdownFiles(path.join(publicSkills, ent.name), true));
+      }
+    }
+  }
+  stats.scanned_files += publicTargets.length;
+  for (const file of publicTargets) {
+    const text = readText(file);
+    if (text === null) continue;
+    const lines = text.split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+      for (const marker of IR046_MARKERS) {
+        if (lines[i].includes(marker)) {
+          stats.ir046_hits += 1;
+          findings.push({
+            rule: "ir046",
+            file,
+            line: i + 1,
+            matched: marker,
+            description: "self-hosting-only marker detected in distributed content",
+          });
+        }
+      }
+    }
+  }
+
+  // IR-047: src/opencode-local/ 配下のサブディレクトリは allowed set のみ。
+  const localRoot = path.join(repoRoot, "src", "opencode-local");
+  if (dirExists(localRoot)) {
+    const subs = (fs.readdirSync(localRoot, { withFileTypes: true }) as any[])
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name);
+    for (const sub of subs) {
+      if (!IR047_ALLOWED.includes(sub)) {
+        stats.ir047_hits += 1;
+        findings.push({
+          rule: "ir047",
+          file: path.join(localRoot, sub).replace(/\\/g, "/"),
+          line: 0,
+          matched: sub,
+          description: `src/opencode-local/ subdir not in allowed set ${JSON.stringify(IR047_ALLOWED)}`,
+        });
+      }
+    }
+  }
+
+  // IR-048: src/opencode-local/agentdev-gh-cli/ の hand-maintained files が
+  // generated_by marker を誤って主張していないこと。local mode では
+  // agentdev-gh-cli は link 対象であり、機械生成物ではない。
+  const localGhCli = path.join(repoRoot, "src", "opencode-local", "agentdev-gh-cli");
+  if (dirExists(localGhCli)) {
+    const files = listMarkdownFiles(localGhCli, true);
+    stats.scanned_files += files.length;
+    for (const file of files) {
+      const text = readText(file);
+      if (text === null) continue;
+      const lines = text.split(/\r?\n/);
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes(IR048_PREFIX)) {
+          stats.ir048_hits += 1;
+          findings.push({
+            rule: "ir048",
+            file,
+            line: i + 1,
+            matched: IR048_PREFIX,
+            description: "local-mode link target must not declare generated_by marker",
+          });
+        }
+      }
+    }
+  }
+
+  return { ok: findings.length === 0, findings, stats };
 }
