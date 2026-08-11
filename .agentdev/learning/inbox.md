@@ -117,3 +117,35 @@
 - **関連**: PR #2089 Findings IR-055 pre-existing failure セクション, PR #2088 Phase 4 (OU-005 #2081), Epic #2076 OU-006 Phase 5 / OU-007 Phase 6 (#2083) 委譲事項
 - **タグ**: `#baseline` `#ir-055` `#pre-existing-failure` `#regression-detection` `#phase-handoff`
 
+## detector 個別 unit test 拡充不足パターン（file-scope violation 検出 vs detector 単位カバレッジ）
+
+- **問題事象**: Phase 6 (OU-007 #2083) で Phase 3 §5.1 残り7件 detector（IR-028/029/030/031/034/035/046/047/048）を集約実装した。全ファイルスキャン（`check_command_format.ts`/`check_distribution_boundary.ts`/`check_integrity.ts`）で violation 0件、test suite pass を確認したが、各 detector の violation 検出ロジックを個別に検証する unit test（violation を含む fixture を与えて当該 detector が正しく検出するかを検証するテスト）が拡充不足。TS-006（現存全 IR に regression test が存在する）は file-scope violation 検出なしで合格だが、detector 単位のカバレッジ品質は warn 事項として記録
+- **発生局面**: 実装（case-run Phase 3 §5.1 detector 集約）、完了処理（case-close QG-4 AC-06/TS-006 評価）
+- **検知方法**: PR #2090 の Phase 6 最終検証レポート（`docs/specs/integrity/audits/final-reverification-20260811.md`）で AC-06 = TS-006 を warn 評価。pass_criteria「violation 検出なし」は満たすが、detector 単位の violation 含み fixture を用いた unit test が網羅されていないことを検知
+- **根本原因**: detector 実装時、(a) 既存ファイルに対する violation 検出がないことの確認（file-scope）は実施するが、(b) 意図的に violation を含む fixture を与えて当該 detector の検出ロジックを直接検証する unit test の実装を detector 集約時に組み込む運用が明文化されていない。REQ-028-006「detector 単位 regression test」の運用基準が SPEC で不明確
+- **自律対応内容**: TS-006 pass_criteria「violation 検出なし、regression test 存在」は満たすため AC-06 を warn（継続課題）として合格判定。file-scope の regression test は既存 test suite で担保されているため REQ-028 全要件成立を妨げない。detector 単位 unit test 拡充は intake inbox（Wave 7）へ課題記録
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり（REQ-028-006 detector 単位 regression test の運用基準、AC-06/TS-006 pass_criteria の明確化）。learning-promote で SPEC 改修要否を評価する対象
+- **横展開観点**: 将来 detector を追加実装する全 IR 対応（Phase 3 §5.1 以降の拡張、新規 IR登録 gate での detector 実装）で同様の detector 単位 unit test 拡充不足が再発する可能性
+- **再発条件**: detector を集約実装・追加実装する際、file-scope violation 検出テストのみで detector 単位の violation 含み fixture テストを省略した場合
+- **予防策候補**: detector 実装時の必須 deliverable として「violation 含み fixture を用いた unit test」を文書化。REQ-028-006 SPEC へ detector 単位テストの運用基準を追記
+- **想定反映先**: `docs/specs/integrity/integrity-contracts.md`（REQ-028-006 detector 単位 regression test 基準）、`src/opencode/skills/repo-agentdev-integrity/scripts/`（detector unit test 拡充）、`docs/requirements/REQ-028.md`（REQ-028-006 運用基準明記）
+- **関連**: PR #2090 Findings AC-06 warn, Epic #2076 OU-007 Phase 6, IR-028/029/030/031/034/035/046/047/048
+- **タグ**: `#detector` `#unit-test` `#regression-test` `#coverage` `#req-028-006`
+
+## Windows + ジャンクション環境 worktree での check_templates.ts worktree 固有 false positive（.opencode/skills/agentdev-* 空洞化）
+
+- **問題事象**: Phase 6 (OU-007 #2083) の regression テスト（TS-022）で、worktree `.worktrees/2083-feature` 上で `check_templates.ts` の `--dry-run` flag 関連 3件 が fail する事象を観測。うち 2件（`TS-009 encoding 記述豺麗` と `See Also agentdev-adr-guidelines`）は worktree 固有の non-applicable false positive、1件は無害。worktree では `.opencode/skills/agentdev-*` が空（ジャンクション未伝播）のため、template 参照解決ができず false positive が発生。main リポジトリ merge 後に解消されるため実害はないが、TS-022 regression 評価でノイズとなる
+- **発生局面**: 実装（case-run Phase 6 worktree での regression テスト実行）、完了処理（case-close QG-4 TS-022 regression 評価）
+- **検知方法**: PR #2090 Test Strategy 結果セクションで Phase 6 worktree 12 fail / main baseline 11 fail の差分 1件 を分析。うち check_templates.ts `--dry-run` flag 関連が worktree 固有と特定
+- **根本原因**: Windows + ジャンクション環境の worktree では `.opencode/skills/agentdev-*`、`.opencode/commands/agentdev/` が空になる（ジャンクション未伝播）。agentdev-workflow-orchestration SKILL.md「準備フェーズの既知の制約」に記載の制約。check_templates.ts が `.opencode/skills/` 配下の template 参照を解決する際、worktree では template が存在せず false positive が発生
+- **自律対応内容**: main リポジトリ merge 後に false positive が解消されるため実害なし。TS-022「Phase 6 変更起因 regression 0件」は worktree 固有 false positive を除外して判定（main baseline 11 fail は pre-existing、worktree 追加 1件は worktree 環境固有）。AC-22 pass 判定
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（agentdev-workflow-orchestration SKILL.md「準備フェーズの既知の制約」既知事象の具体的事例記録。SPEC 改修不要、運用遵守の事例化）
+- **横展開観点**: Windows + ジャンクション環境の worktree で `.opencode/skills/agentdev-*` 配下を参照する checker（check_templates.ts 以外にも発生しうる）で同様の worktree 固有 false positive が発生しうる
+- **再発条件**: Windows + ジャンクション環境で worktree を作成し、`.opencode/skills/agentdev-*` 配下を参照する checker を worktree 上で実行した場合
+- **予防策候補**: worktree 上で実行する checker が `.opencode/skills/` の空洞化を検知した場合、当該 checker の結果を warning 扱いとするフラグ、または worktree での checker 実行時に main リポジトリの projection を参照するフォールバック機構
+- **想定反映先**: `src/opencode/skills/repo-agentdev-integrity/scripts/check_templates.ts`（worktree 環境検出時の skip/warning ロジック候補）、`src/opencode/skills/agentdev-workflow-orchestration/SKILL.md`（準備フェーズの既知の制約の具体的事例追記候補）
+- **関連**: PR #2090 Test Strategy TS-022 regression 結果, Epic #2076 OU-007 Phase 6, agentdev-workflow-orchestration SKILL.md 準備フェーズの既知の制約
+- **タグ**: `#windows` `#junction` `#worktree` `#false-positive` `#check-templates`
+
