@@ -1264,7 +1264,12 @@ operation_units:
       - package release 検査（実際の archive テキスト成果物へ適用）
       - fresh consumer での link projection 検査と archive-installed projection 検査の分離
     non_overlap_boundary: "実装詳細のみ。REQ/Decision/SPEC の正規本文は OU-001..007 が所有。check-consumer-opencode.ps1 への責務追加は行わない。"
-    result: {}
+    result:
+      parent_epic: 2091
+      child_issue: 2092
+      child_issue_url: https://github.com/yogata/agent-dev-flow/issues/2092
+      wave: 1
+      case_open_completed_at: 2026-08-11T00:00:00+09:00
 
   - ou_id: OU-009
     operation: verify-only
@@ -1273,7 +1278,12 @@ operation_units:
     recommended_order: 6
     issue_policy: epic
     target: "TS-001..TS-012 を含む全 Acceptance を実成果物で再検証"
-    result: {}
+    result:
+      parent_epic: 2091
+      child_issue: 2093
+      child_issue_url: https://github.com/yogata/agent-dev-flow/issues/2093
+      wave: 2
+      case_open_completed_at: 2026-08-11T00:00:00+09:00
 
 test_strategy:
   - id: TS-001
