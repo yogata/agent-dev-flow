@@ -10,8 +10,6 @@ updated: 2026-07-24
 REQ-002-006 / REQ-002-007 の検査観点の詳細を配置する。
 配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）から内部管理 ID を除去した後の完了条件として、構文健全性、文意保持、責務整合を検査するための検出パターンと NG 分類を定義する。
 
-> **正規根拠の集約（REQ-002-028/029/035 RETIRE 対応）**: 従来 REQ-002-028（構文健全性）と REQ-002-029（責務整合）が保有していた移行・作業由来品質検査の正規根拠は、本 SPEC と `responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md` の既存品質契約へ集約した（REQ-007 行は新設しない）。REQ-002-035 が保有していた case-auto.md 段階解消（移行・作業由来品質検査行）の正規根拠は、Epic 完了条件と IR-059 検出へ集約した。配布依存境界の意味モデルと検出契約は `integrity/distribution-boundary.md` が正規所有する。
-
 ## 検査バックエンド責務分担（check_integrity.ts vs inspect-* skills）
 
 配布物整合性検査（本 SPEC が定義する構文健全性、文意保持、責務整合の検出パターン）の実行バックエンドを以下の通り確定する。
@@ -71,4 +69,12 @@ REQ-002-006 / REQ-002-007 の検査観点の詳細を配置する。
 | false positive | 検査ルールの誤検知 | 検査ルールの修正 |
 | pre-existing | 今回の変更以前から存在する既知の問題 | 別途要件化 |
 | 今回修正対象 | 今回の変更で導入、残存した問題 | 今回の Issue で修正 |
+
+## REQ-002-028/029/035 RETIRE 後の正規根拠
+
+REQ-002-028 と REQ-002-029 が保有していた構文健全性検査と責務整合検査（移行・作業由来品質検査行）の正規根拠は、本 SPEC（docs-spec-rebuild-integrity.md）と `responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md` の既存品質契約へ集約する。REQ-007 行は新設しない。
+
+REQ-002-035 が保有していた case-auto.md 段階解消（移行・作業由来品質検査行）の正規根拠は、Epic 完了条件と IR-059 検出へ集約する。
+
+配布依存境界の意味モデルの正規所有者は `integrity/distribution-boundary.md` である。本 SPEC は意味モデルを再定義せず、同 SPEC を参照する。
 

@@ -5,7 +5,7 @@ status: saved
 spec_consumed: true
 created_at: 2026-08-11T00:00:00+09:00
 saved_at: 2026-08-11T22:03:56.403+09:00
-spec_saved_at: 2026-08-11T22:03:56.403+09:00
+spec_saved_at: 2026-08-11T23:06:41.308+09:00
 source_rus: []
 ---
 
@@ -778,18 +778,47 @@ artifact_actions:
     artifact: spec
     operation: update
     target: docs/specs/integrity/rules/IR-059-distribution-reference-boundary.md
-    target_area: "検知対象、exemption、IR-056 との関係"
+    target_area: "IR-059: distribution-reference-boundary"
     source_items: [AG-009]
     content: |
-      docs/specs/integrity/rules/IR-059-distribution-reference-boundary.md を更新
-      する。ルール固有の検知シグナル、許容、個別例外、severity、gate と実行
-      経路、finding 経路を更新する。affected_artifacts の意味を更新し、配布テキスト
-      成果物全般へ拡張する意味境界を明示する。意味モデルと検出パイプラインの正規
-      参照先を docs/specs/integrity/distribution-boundary.md へ変更する。IR-056 との
-      関係節は DEC-006 と DEC-014 の両決定を参照し、IR-056 の Project Extensions
-      検査分離を維持しつつ、DEC-014 が IR-059 の affected_artifact 範囲と
-      source/save/complete/release の各 enforcement 経路を変更する後続決定である
-      ことを明示する。DEC-006 全体を置換せず、IR-059 を IR-056 へ統合しない。
+      # IR-059: distribution-reference-boundary
+
+      配布テキスト成果物に含まれるプロジェクト固有の具体ID、具体パス、固定URLを検出する。本IR文書を検知パターン、exemption、severity、false-positive条件の正本とする。意味モデルと検出パイプラインの正規参照先は `distribution-boundary.md` である。
+
+      | Field | Value |
+      |---|---|
+      | rule_id | IR-059 |
+      | description | 配布テキスト成果物の具体ID、具体パス、固定URLを検出する |
+      | severity | strict |
+      | category | canonical-conflict |
+      | detection_method | 具体ID、具体パス、固定URLのパターン検出と generic/template 許容、個別承認例外判定 |
+      | affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**`, template, script ソースなど配布対象テキスト成果物全般 |
+      | related_req | REQ-029 |
+      | related_spec | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
+      | gate_level | full-audit |
+      | false_positive_risk | テンプレートプレースホルダー、検査対象宣言、索引参照を exemption で抑制する |
+      | regression_test | 具体ID、具体パス、固定URL、各 exemption、generic/template 許容、個別承認例外の正常・異常 fixture を検証する |
+      | finding_route | intake |
+      | triage_action | generic 表記へ是正し、traceability を extension で補完する |
+
+      ## 検知対象
+
+      - 具体ID: `ADR-NNNN`、`REQ-NNNN`、`REQ-NNNN-NNN`
+      - 具体パス: `docs/decisions/`、`docs/requirements/`、`docs/specs/`配下の具体ファイル
+      - 固定URL: 特定owner/repositoryを含むGitHub blob、raw URL
+
+      ## exemption
+
+      - `{NNNN}`、`<NNNN>`、`<existing-spec>`、`<domain>`、`<command>`、`<spec>`、`<rule>`等のテンプレートプレースホルダー
+      - 検査対象を説明するためのパターン定義と検査対象path宣言
+      - 索引として許可されたREADME参照
+      - producer 内部へ解決しない generic または template 参照（REQ-029-004）
+
+      個別承認例外は特定の検出事項に付与する承認であり、ルールレベルの許容とは区別する。個別承認例外はルール一般を書き換えず、最終状態で件数0を受け入れ条件とする。
+
+      ## IR-056との関係
+
+      IR-056はProject Extensions構造と配置を検査し、IR-059は配布テキスト成果物の具体参照を検査する。両者は独立した検出対象である。DEC-006が確立したinspect 3-command正規化とIR-056のProject Extensions検査分離を維持しつつ、DEC-014がIR-059の affected_artifact 範囲と source/save/complete/release の各 enforcement 経路を変更する後続決定である。DEC-006全体を置換せず、IR-059をIR-056へ統合しない。
 
   - id: ACT-SPEC-007
     artifact: spec
@@ -842,20 +871,20 @@ artifact_actions:
 
   - id: ACT-SPEC-010
     artifact: spec
-    operation: update
+    operation: append
     target_spec:
       operation: update
       domain: integrity
       slug: docs-spec-rebuild-integrity
-    target_area: "構文健全性検査、文意保持検査、責務整合検査"
     source_items: [AG-009]
     content: |
-      docs/specs/integrity/docs-spec-rebuild-integrity.md を更新する。REQ-002-028
-      と REQ-002-029 が保有していた構文健全性と責務整合検査（移行・作業由来品質
-      検査行）の正規根拠を、本 SPEC と document-type-responsibilities.md、
-      req-health-metrics.md へ集約する旨を明示する。REQ-002-035 が保有していた
-      case-auto.md 段階解消（移行・作業由来品質検査行）の正規根拠を、Epic 完了
-      条件と IR-059 検出へ集約する。REQ-007 行は新設しない。
+      ## REQ-002-028/029/035 RETIRE 後の正規根拠
+
+      REQ-002-028 と REQ-002-029 が保有していた構文健全性検査と責務整合検査（移行・作業由来品質検査行）の正規根拠は、本 SPEC（docs-spec-rebuild-integrity.md）と `responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md` の既存品質契約へ集約する。REQ-007 行は新設しない。
+
+      REQ-002-035 が保有していた case-auto.md 段階解消（移行・作業由来品質検査行）の正規根拠は、Epic 完了条件と IR-059 検出へ集約する。
+
+      配布依存境界の意味モデルの正規所有者は `integrity/distribution-boundary.md` である。本 SPEC は意味モデルを再定義せず、同 SPEC を参照する。
 
   - id: ACT-SPEC-011
     artifact: spec
@@ -1216,8 +1245,7 @@ operation_units:
         ACT-SPEC-017: docs/specs/foundations/design-principles.md
         ACT-SPEC-018: docs/specs/foundations/patterns.md
       target_area_resolution:
-        single_match: 15
-        no_match_added_note: 2  # ACT-SPEC-006 (IR-059 combined sections) and ACT-SPEC-010 (docs-spec-rebuild combined sections) target_area combined multiple headings; applied to closest matching section / top-of-file note
+        single_match: 16
       ir059_related_req_updated: REQ-002 -> REQ-029
       ir059_related_spec_updated: added distribution-boundary.md
       index_readme_updated: docs/specs/README.md
