@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, impact-guard |
 | false_positive_risk | 中 |
 | regression_test | prevention_gates.test.ts |
-| baseline_status | resolved |
 | finding_route | intake+learning |
 | triage_action | drift を解消 |
 | last_verified | 2026-06-06 |

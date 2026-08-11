@@ -14,7 +14,7 @@ updated: 2026-06-28
 本ファイルと `rule-ownership.md` は逆方向の対応表であるため、以下の場合に両ファイルの同期更新が必要:
 
 - 新規 IR 追加時: 両ファイルの対応行列を同期更新する
-- IR の `baseline_status` 変更時（new / resolved 等）: 両ファイルで整合を確認する
+- IR の物理削除時（AG-008、REQ-028-008）: 両ファイルで対応行を削除し、本ファイルの `## Retired cross-references` 節へ交叉参照を再配置する
 - canonical owner 変更時: 両ファイルで参照先を更新する
 - 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、影響先ルールドメインと rule-ownership.md の整合を確認する
 
@@ -111,8 +111,35 @@ REQ 全体ではなく要件行粒度で境界基準、検出観点の影響を�
 1. **検出**: 検出事項が基準既知（baseline-known）に存在するか確認
 2. **分類**: known (基準済み) vs new
 3. **再発判定**: known 検出事項が再度検出された場合:
- - ルール、検出器の誤検知 → ルールを修正（false positive）
- - 真の再発 → 検出器を強化、または検出ルールを追加
- - 基準判定ミス → 基準（baseline）を更新
+  - ルール、検出器の誤検知 → ルールを修正（false positive）
+  - 真の再発 → 検出器を強化、または検出ルールを追加
+  - 基準判定ミス → 基準（baseline）を更新
 4. **改善ループ**: ルールカタログ / 基準 / 影響マップ / 例外を更新
 5. **記録**: トリアージ結果を整合性レポートに記録
+
+## IR → REQ 逆方向参照（ACT-SPEC-006、REQ-028-008）
+
+本ファイル（REQ → 影響するルール/アーティファクト）と `../integrity/rule-ownership.md`（ルールドメイン → canonical REQ/SPEC）は逆方向の対応マップである（REQ-010-152）。両者の整合性維持運用は前節「同期更新が必要なケース」に従う。
+
+個別 IR（IR-NNN）の対応 REQ / SPEC は `../integrity/rule-ownership.md` の AUTOGEN ブロック（`rule-ownership-ir-crossref`）が IR-* ファイルの frontmatter / Field/Value 表から自動生成する（SC-002 Phase C、IR-061）。本節は直接編集せず、`rule-ownership.md` の AUTOGEN ブロックを正とする。
+
+DEC-013 AG-008 適用により file-backed tombstone（IR-011 型）を物理削除する。廃止 IR の交叉参照は次節 `## Retired cross-references` へ再配置し、欠番管理は `../foundations/numbering-policy.md` が保持する。
+
+## Retired cross-references
+
+廃止 IR の交叉参照（v2:REQ-NNN 等）を再配置する節。AG-008（REQ-028-008）に基づき、file-backed tombstone の物理削除時に交叉参照を本節へ移行する。各エントリは廃止 IR ID、旧交叉参照、再配置日、後続 REQ 等のメタデータを持つ（Phase 3 §7.3、`docs/specs/integrity/audits/cross-cutting-integration-design-20260811.md`）。
+
+### IR-011 削除に伴う交叉参照再配置
+
+IR-011（Mapping table 全件記録、file-backed tombstone）の物理削除に伴い、交叉参照 `v2:REQ-0108-083`〜`v2:REQ-0108-088`（6件）を再配置する。当該 v2 要件群は tag `v2.4.0` 時点の mapping-table 全件記録契約を担い、現行 v3（REQ-001〜REQ-028）には該当しない。後続要件は存在しない（mapping-table 廃止済み、tombstone 廃止済み）。欠番管理は `../foundations/numbering-policy.md` の既知の欠番表が保持する。
+
+| 旧交叉参照 | 旧タイトル（tag v2.4.0） | 再配置元 | 再配置日 | 後続 REQ |
+|---|---|---|---|---|
+| `v2:REQ-0108-083` | mapping-table 全件記録契約（v2） | IR-011 file-backed tombstone | 2026-08-11 | なし（mapping-table 廃止済み） |
+| `v2:REQ-0108-084` | mapping-table 全件記録契約（v2） | IR-011 file-backed tombstone | 2026-08-11 | なし |
+| `v2:REQ-0108-085` | mapping-table 全件記録契約（v2） | IR-011 file-backed tombstone | 2026-08-11 | なし |
+| `v2:REQ-0108-086` | mapping-table 全件記録契約（v2） | IR-011 file-backed tombstone | 2026-08-11 | なし |
+| `v2:REQ-0108-087` | mapping-table 全件記録契約（v2） | IR-011 file-backed tombstone | 2026-08-11 | なし |
+| `v2:REQ-0108-088` | mapping-table 全件記録契約（v2） | IR-011 file-backed tombstone | 2026-08-11 | なし |
+
+> 旧タイトルの復元は tag `v2.4.0` で確認可能。Phase 4 では交叉参照の保存と再配置を責務とし、旧タイトル詳細の復元は別途歴史参照作業とする。

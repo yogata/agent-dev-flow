@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, impact-guard |
 | false_positive_risk | 中。基準（baseline）の陳腐化判定に注意 |
 | regression_test | (手動確認) |
-| baseline_status | resolved |
 | finding_route | none |
 | triage_action | 基準（baseline）を更新 |
 | last_verified | 2026-06-06 |

@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 中。表記揺れの判定に注意 |
 | regression_test | (手動確認) |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | 表記を実際の REQ 数に更新 |
 | last_verified | 2026-06-06 |

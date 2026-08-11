@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 中。表記揺れ、retired 除外の判定に注意 |
 | regression_test | (手動確認) |
-| baseline_status | new |
 | finding_route | intake |
 | triage_action | 固定表記を実際の REQ ファイル数、範囲に更新 |
 | last_verified | 2026-06-17 |

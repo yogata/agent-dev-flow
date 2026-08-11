@@ -7,7 +7,6 @@ category: index-consistency
 severity: strict
 detection_method: pattern-matching
 false_positive_risk: low
-baseline_status: new
 ---
 
 # IR-061: 索引類自動生成整合性

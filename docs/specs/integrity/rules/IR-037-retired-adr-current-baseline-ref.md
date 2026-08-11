@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 中。履歴参照 `(retired)` 注記付きの言及は除外 |
 | regression_test | (未実装) |
-| baseline_status | new |
 | finding_route | intake |
 | triage_action | 廃止 ADR への現行参照を後継 ADR へ更新、または `(retired)` 注記を付与 |
 | last_verified | 2026-06-16 |

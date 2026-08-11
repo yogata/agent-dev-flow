@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。生成物への識別子付与方式（frontmatter vs ヘッダコメント）の揺れ、AgentDevFlow 本体原本（識別子なし）との混同に注意 |
 | regression_test | (未実装) |
-| baseline_status | new |
 | finding_route | intake |
 | triage_action | 識別子付与方式を `runtime-package-boundary.md` の定義に統一。競合ファイルは手動マージまたは識別子付与後に再生成 |
 | last_verified | 2026-06-20 |

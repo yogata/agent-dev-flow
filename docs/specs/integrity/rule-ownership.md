@@ -13,7 +13,7 @@ updated: 2026-07-26
 本ファイル（ルールドメイン → canonical REQ/SPEC）と `../responsibilities/req-impact-map.md`（REQ → 影響するルール/アーティファクト）は逆方向の対応マップである。両者の整合性維持運用:
 
 - 新規 IR 追加時: 両ファイルの対応行列を同期更新する
-- IR の `baseline_status` 変更時（new / resolved 等）: 両ファイルで整合を確認する
+- IR の物理削除時（AG-008、REQ-028-008）: 両ファイルで対応行を削除し、交叉参照は `../responsibilities/req-impact-map.md` の Retired cross-references 節へ再配置する
 - canonical owner 変更時: 両ファイルで参照先を更新する
 - 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、`req-impact-map.md` で影響先ルールドメインの整合を確認する
 
@@ -59,7 +59,7 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 34 | local-transform（ローカル版変換資産） | REQ-009 (028, 029, 032) | runtime-package-boundary.md | **確定廃止**（PR#1195 で transform/ 完全削除、REQ-009-004/009/028 確定廃止昇格）。変換用プロンプト、レビュー用プロンプト、変換仕様の要件は全て廃止済み。link mode の現行契約は `runtime-package-boundary.md` が所有する |
 | 35 | obsolete-spec-path（旧SPEC直下パス参照検出） | REQ-010 (280, 282) | integrity-rule-catalog.md (IR-057) | docs/specs/ 基盤SPEC ドメイン別体系化（REQ-001）以前の直下パス参照を検出。`obsolete-path-map.yaml` を対照表として IR-057 が検証。link mode 統一（REQ-009）に伴う廃止語彙を「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離し検出。例外条件: obsolete-path-map.yaml 自体、IR-057 ルール説明、retired 配下、テスト fixture、コードブロック内検査 fixture。v2:REQ-0158 は Issue #1713 で retire 完了（要件は REQ-010-280/282 へ統合） |
 | 36 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003), REQ-010 (263) | integrity-rule-catalog.md (IR-056) | project extensions 機構（SPEC `../foundations/project-extensions.md`）の整合性検査。extension schema（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
-| 37 | IR lifecycle / enforcement_mode 状態モデル | REQ-010 (053-058) | integrity-contracts.md | IR の `lifecycle_state`（active / superseded / deleted）と `enforcement_mode`（enforcement / observation / none）の状態モデルを所有。有効組合せ5件、不正組合せ4件、全登録IR ID の排他的分割（file-backed と catalog-only deleted）、IR-011 型 file-backed tombstone と IR-045 型 catalog-only tombstone の区別、導出規則4件、`enforcement_mode: none` の4面除外、既存 severity/gate_level/baseline_status の維持と上書き禁止を正規所有する。catalog（[integrity-rule-catalog.md](integrity-rule-catalog.md)）は schema 定義のみ重複所有し、判定規則は本ドメインへ委譲する |
+| 37 | IR 存在条件モデル（DEC-013 適用） | REQ-028 (008, 009, 010, 012), REQ-010 (058) | integrity-contracts.md | DEC-013 AG-008/009 適用後の IR モデルを所有。`lifecycle_state`、`enforcement_mode`、`baseline_status` を現行 IR 属性から削除し、「現存 IR = 現行 = executable detector」へ統一。8項目存在条件、finding-baseline 分類（finding 側）、新規 IR 登録 gate (a)/(b)、一時移行検査 registry を正規所有する。catalog（[integrity-rule-catalog.md](integrity-rule-catalog.md)）は schema 定義のみ重複所有し、判定規則は本ドメインへ委譲する |
 
 ## IR 別関連マッピング（自動生成）
 
@@ -81,7 +81,6 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-008 | Skill references/ 存在 | REQ-010-110, 115-120, REQ-010-020 | integrity-contracts.md |
 | IR-009 | 旧 namespace 残存 | REQ-010-016 | integrity-contracts.md |
 | IR-010 | ADR status 正規化 | REQ-010-121 | integrity-contracts.md |
-| IR-011 | Mapping table 全件記録（廃止済み） | v2:REQ-0108-083〜088 | integrity-contracts.md |
 | IR-012 | Template 必須セクション | REQ-010 (workflow template 構造) | integrity-contracts.md |
 | IR-013 | 完了報告種別実在 | REQ-010-089-091, REQ-010-020 | integrity-contracts.md |
 | IR-014 | reference/ 残存検出 | REQ-002-013, 039, REQ-010-039, 040, 094 | artifact-responsibilities.md |

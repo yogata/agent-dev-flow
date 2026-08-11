@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 中。検出対象外パスの設定に注意 |
 | regression_test | commands_e2e.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | 旧 namespace を更新 |
 | last_verified | 2026-06-06 |

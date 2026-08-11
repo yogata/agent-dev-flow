@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。スキル名は kebab-case であり語境界マッチで偽陽性は限定的。`repo-*` プレフィックスは REQ-001 により repo-local として除外。ルールカタログ・vocabulary-registry・IR-058 ルールファイル自体・runtime-package-boundary SPEC は検出語を正当に含むため exemption 対象とする |
 | regression_test | `check_integrity.test.ts` の `IR-058 distribution-untracked-skill-reference` ブロック。projection-only かつ配布物から参照されるスキルを置いた fixture で NG が出力されること、参照無し fixture で OK が出力されること、`repo-*` スキルは参照されても検出されないことを検証する |
-| baseline_status | new |
 | finding_route | intake |
 | triage_action | 新規検出時は対象スキルを `src/opencode/skills/` へ昇格（REQ-002-001）。昇格基準、手順は `runtime-package-boundary.md`「配布物依存スキルの src 昇格」セクション参照。repo-local 専用スキルとして扱う場合は `repo-*` プレフィックスへ rename するか、IR-058 exemption 登録の正当性を別途確認する |
 | last_verified | 2026-07-03 |

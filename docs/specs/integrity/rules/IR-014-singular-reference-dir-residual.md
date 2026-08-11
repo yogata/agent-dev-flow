@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | なし |
 | regression_test | lint_skills.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | reference/ を references/ にリネーム |
 | last_verified | 2026-06-06 |

@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 中 |
 | regression_test | commands_e2e.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | 参照に [retired] 注記を追加 |
 | last_verified | 2026-06-06 |

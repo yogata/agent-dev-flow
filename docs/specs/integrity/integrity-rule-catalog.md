@@ -27,20 +27,19 @@ status: accepted
 | gate_level | enum | full-audit / delta-guard / impact-guard |
 | false_positive_risk | string | 誤検知リスクと対策 |
 | regression_test | string | 回帰テストの有無、ID |
-| baseline_status | enum | known / new / resolved |
-| lifecycle_state | enum | active / superseded / deleted（IR の現在性。詳細は [integrity-contracts.md](integrity-contracts.md)「IR lifecycle と enforcement_mode」） |
-| enforcement_mode | enum | enforcement / observation / none（IR の実行可能性。detector 有無と `severity` から導出する派生軸） |
 | finding_route | enum | intake / intake+learning / req-define / learning / none |
 | triage_action | string | 新規検出時の対応アクション |
 | last_verified | date | 最終検証日 |
 
-### lifecycle_state / enforcement_mode の運用（REQ-010-053..058）
+### IR 属性モデル（DEC-013 適用、REQ-028-009/010）
 
-IR スキーマへ `lifecycle_state`、`enforcement_mode` を追加する。両 field の正式な定義、有効組合せ（5件）、不正組合せ（4件）、排他的分割（file-backed と catalog-only deleted）、IR-011型 file-backed tombstone と IR-045型 catalog-only tombstone の区別、導出規則（4件）、`enforcement_mode: none` の4面除外（checker registry、gate routing、finding generation、baseline execution）、既存 severity/gate_level/baseline_status の維持と上書き禁止は [integrity-contracts.md](integrity-contracts.md)「IR lifecycle と enforcement_mode」を SSoT とする。本カタログは schema 定義のみを重複所有し、判定規則を再定義しない。
+DEC-013 AG-009 により、`lifecycle_state`、`enforcement_mode`、`baseline_status` は現行 IR 属性から削除した。「現存 IR = 現行 = executable detector」を成立させ、`active+none` の恒久状態を禁止する。廃止済み IR の file-backed tombstone（IR-011 型）は AG-008 により物理削除し、`lifecycle_state: superseded` 等の表現を使わない。識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する。
 
-派生性のため、active な IR は `lifecycle_state: active` を既定値として暗黙に満たす。`enforcement_mode` は detector 有無と `severity` から機械的に導出するため、IR ファイルで明示的に記載しなくても catalog 上の整合性は保持する。tombstone（superseded / deleted）の IR は両 field を明示的に記載し、IR-011 型 file-backed tombstone と IR-045 型 catalog-only tombstone の区別を表現する。
+finding-baseline 分類（new/known/resolved）は IR schema から分離し、finding 側の状態として [integrity-contracts.md](integrity-contracts.md)「finding-baseline 分類」で定義する。本カタログは finding-baseline 分類を再定義しない。
 
-> **フィールド数**: `lifecycle_state`、`enforcement_mode` は追加 field である。既存 IR ファイル（IR-001〜IR-061）が 15 field を満たすことは維持し、新 field を暗黙的に満たす。本カタログ「メタ整合性」の `フィールド数 ≥ 15` は変更せず、新 field は派生軸として扱う。
+`severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-010-058、REQ-028-009 決定7）。IR lifecycle の代替とせず、実行可能 detector を持つ現行 IR の実行特性を表す。
+
+> **フィールド数**: 15 field から 12 field へ縮約した（`lifecycle_state`、`enforcement_mode`、`baseline_status` を削除）。本カタログ「メタ整合性」の `フィールド数 ≥ 15` は DEC-013 適用後の実態へ更新する。
 
 ## regression_test フィールド運用方針
 
@@ -76,7 +75,6 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-008: Skill references/ 存在](rules/IR-008-skill-references-existence.md)
 - [IR-009: 旧 namespace 残存](rules/IR-009-obsolete-namespace-residual.md)
 - [IR-010: ADR status 正規化](rules/IR-010-adr-status-normalization.md)
-- [IR-011: Mapping table 全件記録（廃止済み）](rules/IR-011-mapping-table-full-coverage.md)
 - [IR-012: Template 必須セクション](rules/IR-012-template-required-sections.md)
 - [IR-013: 完了報告種別実在](rules/IR-013-variant-path-existence.md)
 - [IR-014: reference/ 残存検出](rules/IR-014-singular-reference-dir-residual.md)
@@ -140,9 +138,9 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 - [IR-061: 索引類自動生成整合性](rules/IR-061-index-generation-consistency.md)
 <!-- AUTOGEN:END -->
 
-### 新規 IR 候補（baseline_status: candidate）
+### 新規 IR 候補（candidate state、新規 IR 登録 gate 前）
 
-以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。REQ-010-005 の新規 IR 追加フロー（6ステップ）に従い確定する。
+以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。REQ-028-012 が定める新規 IR 登録 gate（(a) 存在資格 gate、(b) hard governance 追加 gate）に従い確定する。candidate 状態の IR は catalog への本エントリ追加を含まず、別途 SPEC または作業記録で管理する。
 
 | Field | 値 |
 |-------|------|
@@ -157,7 +155,6 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 | gate_level | full-audit |
 | false_positive_risk | supersede 元への妥当な文脈参照。finding 扱いで人間確認を挟む |
 | regression_test | （未実装） |
-| baseline_status | candidate |
 | finding_route | intake / req-define |
 | triage_action | finding を inspect-promote で分類し、廃止 ID の参照先を現行後継文書へ更新する |
 | last_verified | （未検証） |
@@ -246,7 +243,7 @@ checkWorkflowStatusProhibition
 `repo-agentdev-integrity` SKILL.md が主体となり、以下を満たしてから追加する。
 
 1. **既存 NG への副作用評価**: 新ルールが既存ルールの誤検知を増加させないか。特に exemption 条件、baseline_status、severity 分類の整合性を確認する
-2. **catalog エントリ追加**: `integrity-rule-catalog.md` に 15 フィールド以上の IR エントリを `baseline_status: new` で追加する
+2. **catalog エントリ追加**: `integrity-rule-catalog.md` に12フィールド以上の IR エントリを追加する（DEC-013 適用後、field 数 ≥ 12）。新規 IR 登録 gate（REQ-028-012 (a)/(b)）の確認を必須とする
 3. **実装追加**: `check_integrity.ts` に検出関数を実装する。exemption 条件、false_positive_risk を実装に反映する
 4. **テストデータ更新**: `check_integrity.test.ts` の有効なテストデータ（valid fixture）が新ルールで NG とならないことを確認する（drift detection smoke test）
 5. **vocabulary-registry 同期**: 新ルールが語彙検出に関わる場合、`vocabulary-registry.md` を更新する
@@ -311,7 +308,7 @@ regression test の fixture copy は実ファイル構成の完全ミラーリ�
 ## メタ整合性
 
 本カタログ自体の整合性を以下で担保する:
-- 各ルールのフィールド数 ≥ 15
+- 各ルールのフィールド数 ≥ 12（DEC-013 適用: `lifecycle_state`、`enforcement_mode`、`baseline_status` 削除）
 - 全ルールに related_req を持つ
 - gate_level が 3 層のいずれか
 - severity が strict/heuristic/observation のいずれか

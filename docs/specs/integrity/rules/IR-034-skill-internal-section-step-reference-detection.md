@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 中。検出パターン例示、検査ルール自体の記述は対象外 |
 | regression_test | (未実装) |
-| baseline_status | new |
 | finding_route | req-define |
 | triage_action | 参照先を正規の公開 API（SKILL.md description / USE FOR）に置き換える |
 | last_verified | 2026-06-14 |

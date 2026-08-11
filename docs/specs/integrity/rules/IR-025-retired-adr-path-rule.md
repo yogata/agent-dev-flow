@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | なし。番号帯マッチングは確実 |
 | regression_test | (未実装) |
-| baseline_status | known |
 | finding_route | intake |
 | triage_action | v2 参照を `v2:` プレフィックス付き履歴参照形式へ修正、または現行3桁IDの Decision 参照へ置換 |
 | last_verified | 2026-06-08 |

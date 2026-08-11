@@ -18,7 +18,6 @@ updated: 2026-07-25
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。`agentdev-gh-cli` の標準手続き参照を除外しないと、正規の I/O 実装を違反として検出する。 |
 | regression_test | gh 直接呼出しを含む fixture を検出し、標準手続き参照を検出しない検証を実施する。 |
-| baseline_status | new |
 | finding_route | intake |
 | triage_action | 検出箇所を `agentdev-gh-cli` の公開手続きへの委譲へ置き換える。 |
 | last_verified | 2026-07-25 |

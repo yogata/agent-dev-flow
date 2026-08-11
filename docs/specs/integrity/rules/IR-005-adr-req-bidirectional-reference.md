@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 中。廃止 REQ 参照は別 rule で判定 |
 | regression_test | check_integrity.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | 参照を追加/修正 |
 | last_verified | 2026-08-10 |

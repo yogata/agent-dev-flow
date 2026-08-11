@@ -18,7 +18,6 @@ updated: 2026-08-06
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低 |
 | regression_test | command_fixtures.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | 禁止 field を frontmatter から削除 |
 | last_verified | 2026-06-06 |

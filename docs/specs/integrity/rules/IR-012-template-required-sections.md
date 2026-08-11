@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低 |
 | regression_test | check_templates.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | 必須セクションを追加 |
 | last_verified | 2026-06-06 |

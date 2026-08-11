@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 高。意味判断が必要なため observation として報告 |
 | regression_test | (手動確認) |
-| baseline_status | known |
 | finding_route | req-define |
 | triage_action | ADR 誤分類兆候を確認し、必要に応じて REQ/SPEC 移管を検討 |
 | last_verified | 2026-06-08 |

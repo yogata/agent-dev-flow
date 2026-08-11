@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 中。引用、メタ文の除外に注意 |
 | regression_test | (手動確認) |
-| baseline_status | resolved |
 | finding_route | intake+learning |
 | triage_action | guide から要件本文、契約本文を削除し、REQ/Decision/SPEC への参照に置き換える |
 | last_verified | 2026-06-06 |

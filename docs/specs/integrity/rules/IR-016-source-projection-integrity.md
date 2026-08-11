@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。ジャンクション（junction）破損は確実な NG |
 | regression_test | (sync script で検証) |
-| baseline_status | known |
 | finding_route | intake |
 | triage_action | sync-opencode.ps1 -Mode apply を実行 |
 | last_verified | 2026-06-06 |
