@@ -566,7 +566,7 @@ agent-dev-flow リポジトリの docs/specs/ 直下の基盤SPECは、既存の
 ### 整合性ルールの局所物理分離
 
 integrity-rule-catalog.md の個別ルール（IR-NNN）は integrity/rules/ サブディレクトリに分離する（REQ-001-008, v2:REQ-0155-007）。
-integrity-rule-catalog.md はスキーマ定義とルールインデックスを維持し、各ルールの15フィールド詳細は integrity/rules/IR-NNN-{slug}.md に配置する。
+integrity-rule-catalog.md はスキーマ定義とルールインデックスを維持し、各ルールの12フィールド詳細は integrity/rules/IR-NNN-{slug}.md に配置する（DEC-013 適用: `lifecycle_state`、`enforcement_mode`、`baseline_status` 削除、REQ-028-009/010）。
 
 ### SPEC 健全性メトリクス
 

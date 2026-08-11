@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 中。意味判断が必要な場合あり |
 | regression_test | (手動確認) |
-| baseline_status | resolved |
 | finding_route | req-define |
 | triage_action | REQ の矛盾を解消 |
 | last_verified | 2026-06-06 |

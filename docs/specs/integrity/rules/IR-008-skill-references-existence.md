@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。裸参照の解決ルールに注意。backtick 囲みパス成分は code formatting として扱いパス解決前に除去するため、backtick 起因の偽陽性は発生しない（REQ-010-020） |
 | regression_test | check_reference_paths.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | 参照先を作成または参照を修正 |
 | last_verified | 2026-07-03 |

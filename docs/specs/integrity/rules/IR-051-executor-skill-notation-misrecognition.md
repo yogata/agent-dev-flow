@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 高。文脈判断が必要（例: 「`agentdev-doc-writing` skill」は正当、command 名を skill と表記は誤認）。意味判断を要する境界ケースは inspect-skills（REQ-010-010）、doc-writing（v2:REQ-0140-027）が意味的診断を担う。本ルールは機械的パターンマッチングで判定可能な範囲（既知名 + 近接 skill 表記）に限定 |
 | regression_test | (未実装)。既知 true positive として過去の委譲契約バグ周辺の skill 表記を回帰テストで検証 |
-| baseline_status | new |
 | finding_route | intake |
 | triage_action | command/harness/subagent 名の「スキル」「skill」表記を正しい分類名（command / harness / subagent）に修正 |
 | last_verified | 2026-06-22 |

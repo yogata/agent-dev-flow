@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。正規表現による機械的検出。`## 手順` 配下判定、ガードレール行（`- G\d+:`）の形式照合により誤検知リスクを最小化 |
 | regression_test | check_command_format.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | 対象 command ファイルのフォーマット違反を修正（Step 0 → Step 1、numbered list → ### Step N 見出し、ゼロ起点サブステップ → Step N-1、非 G01 ガードレール番号 → G01 形式） |
 | last_verified | 2026-06-22 |

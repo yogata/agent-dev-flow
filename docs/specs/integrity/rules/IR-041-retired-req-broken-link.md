@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 低。廃止 REQ ID 集合とリンク先パスの照合 |
 | regression_test | (未実装) |
-| baseline_status | new |
 | finding_route | intake |
 | triage_action | 廃止 REQ へのリンク先を `retired/` パスに修正 |
 | last_verified | 2026-06-17 |

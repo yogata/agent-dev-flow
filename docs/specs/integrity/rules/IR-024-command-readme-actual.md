@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 低 |
 | regression_test | commands_structure.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | README にコマンド追加/削除 |
 | last_verified | 2026-06-06 |

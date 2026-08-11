@@ -19,7 +19,6 @@ status: accepted
 | gate_level | delta-guard |
 | false_positive_risk | backticks 内、コードブロック内、frontmatter、YAMLキー、ファイルパス、識別子（enum 値、コマンド名、スキル名）での forbidden 語出現は正当使用。文脈除外ロジックで対応。例: `` `source-of-trought` `` が backticks 内で例示される場合は検出対象外 |
 | regression_test | (未実装) |
-| baseline_status | new |
 | finding_route | req-define |
 | triage_action | forbidden 語を推奨訳へ置換。文脈で推奨訳が変わる場合は `agentdev-doc-writing` 查読（v2:REQ-0140-033）で確定。review 区分語は本ルールの対象外とし、查読観点へ振り向ける |
 | last_verified | (未検証) |

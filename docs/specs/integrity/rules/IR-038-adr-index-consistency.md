@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。ファイル一覧と index の差分は確実 |
 | regression_test | (未実装) |
-| baseline_status | new |
 | finding_route | intake |
 | triage_action | README.md の該当 View に Decision を追加/削除 |
 | last_verified | 2026-06-16 |

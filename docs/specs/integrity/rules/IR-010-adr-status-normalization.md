@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 低 |
 | regression_test | check_integrity.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | ADR status を正規形式に更新 |
 | last_verified | 2026-06-06 |

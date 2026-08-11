@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 低。必須 field 欠落は確実な NG |
 | regression_test | commands_structure.test.ts |
-| baseline_status | resolved |
 | finding_route | intake |
 | triage_action | 欠落 field を追加 |
 | last_verified | 2026-06-06 |

@@ -18,7 +18,6 @@ updated: 2026-07-26
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。`scope.exclude` で履歴参照領域（`docs/requirements/retired/**`、`docs/decisions/retired/**`）を除外する。現行Decisionに歴史的経緯として旧パスを記載する場合は rule 側で例外登録を明示する（後述「例外登録」）。コードブロック内の例示は exemption とする |
 | regression_test | (未実装)。`obsolete-path-map.yaml` の全エントリについて、旧パスを含む fixture と含まない fixture を用意し、`check_integrity.ts` が正しく fail/pass を報告することを検証する |
-| baseline_status | new |
 | finding_route | intake（既知違反の段階解消は別途処理） |
 | triage_action | 新規検出時は baseline に追加し、delta guard で新規増加を fail 対象とする。本ルールは新規導入のため baseline 0 で開始し、full audit を即 fail gate 化する |
 | last_verified | 2026-07-03 |

@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit |
 | false_positive_risk | 高。Context（背景）セクションでの作業手段言及は許容されるため、Decision セクションの主題判定に注意。非承認ステータス Decision（例: v2:ADR-0113 `status: deprecated`）は frontmatter `status` フラグで確実に除外されるため、当該 Decision の作業手段言及は検出対象外となる（履歴参照として扱う） |
 | regression_test | (未実装)。`status: deprecated` Decision が除外されること、`status: accepted` Decision の作業手段主題が検出されることを検証する |
-| baseline_status | resolved |
 | finding_route | req-define |
 | triage_action | 作業手段を主題とする Decision を retire/supersede または REQ/case へ移管 |
 | last_verified | 2026-08-10 |

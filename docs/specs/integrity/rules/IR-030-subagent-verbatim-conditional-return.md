@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 高。検出用文字列、REQ本文、旧語説明、成果物本文の正当な verbatim 指示を文脈判定する必要がある |
 | regression_test | (未実装) |
-| baseline_status | new |
 | finding_route | intake+learning |
 | triage_action | 一律 verbatim 指示を、成果物本文のみ verbatim、その他は要約/根拠/capture候補へ圧縮する表現に更新 |
 | last_verified | 2026-06-12 |

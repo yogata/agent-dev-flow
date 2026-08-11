@@ -17,7 +17,6 @@ status: accepted
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。HTMLコメント構文に限定した機械的検出 |
 | regression_test | (未実装) |
-| baseline_status | new |
 | finding_route | intake |
 | triage_action | 廃止 REQ の HTMLコメント参照を後継 現行 REQ へ置換 |
 | last_verified | 2026-06-17 |
