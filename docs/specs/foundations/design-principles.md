@@ -127,9 +127,9 @@ Command / Skill の責任分界の判断理由、詳細契約は v2:ADR-0107（�
 AgentDevFlow の配布物は実行時（runtime: 個別プロジェクトで実行可能）と執筆（authoring: agent-dev-flow リポジトリ開発用）に明確に分離する（REQ-001）。
 
 **実行時配布物**は自己完結し、agent-dev-flow リポジトリの dev メタデータに依存しないことを保証する:
-- Command の YAML フロントマターは `description` 単一とする（REQ-002-022、DEC-001）
+- Command の YAML フロントマターは `description` 単一とする（REQ-029-007、DEC-001）
 - Skill `references/` は実行時配布物のみを含める（REQ-001）
-- `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書であり、実行時配布物の依存先ではない（REQ-001, REQ-001）
+- `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書であり、実行時配布物の依存先ではない（REQ-001, REQ-029-003）
 
 **執筆専用物**は agent-dev-flow リポジトリ内でのみ参照される:
 

@@ -134,9 +134,9 @@ extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は
 
 ## 配布物参照境界の責務分担
 
-本SPECはProject Extensionsのschema、配置、読込、標準診断、責務境界を所有する。配布command/skill本文の具体ID、具体パス、固定URLに対する検知パターン、exemption、severity、false-positive条件はIR-059個別文書が所有する。
+配布成果物と producer 内部成果物の間の意味依存境界の正規所有は REQ-029 および `integrity/distribution-boundary.md` が担う。本 SPEC は Project Extensions の schema、配置、読込、標準診断、責務境界を所有し、配布 command/skill 本文の具体 ID、具体パス、固定 URL に対する検知パターン、exemption、severity、false-positive 条件は IR-059 個別文書が所有する。
 
-配布物参照境界の検出結果はgeneric表記への是正とextensionによるtraceability補完へ接続する。
+配布物参照境界の検出結果は generic 表記への是正へ接続する。extension はトレーサビリティを補完する手段の一つであり得るが、意味境界の唯一の解決手段ではない（REQ-029-003、REQ-029-004）。extension 機構自体は追加・拡張・非上書き原則を維持して残置する。
 ## 関連
 
 - DEC-006: inspect 3-command 構成への正規化（extension 検査の3層責務分離を確定）

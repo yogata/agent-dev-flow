@@ -18,7 +18,7 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 
 ## 配布物の harness 非依存性
 
-配布物（command、skill、SPEC、template、script）は次の harness 委譲領域を固定してはならない。
+配布物（command、skill、SPEC、template、script）は次の harness 委譲領域を固定してはならない。本節の意味境界の正規所有者は REQ-029（REQ-029-007）および `integrity/distribution-boundary.md` である。本 SPEC は検出モデルの参照先をこれらへ更新済みであり、従来 REQ-002-021..026、032 へ分散していた参照は MOVE 先（REQ-029-001..008）へ、REQ-002-028/029/035 への作業由来品質検査参照は RETIRE 扱いへ集約済みである。
 
 - エージェント名
 - モデル名
