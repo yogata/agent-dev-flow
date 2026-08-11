@@ -8762,6 +8762,80 @@ async function runReleaseProfile(
   }
 }
 
+// IR-034: SKILL.md が参照する references/<file>.md の存在確認（heuristic, grep-based）
+// Phase 3 §4.6 Skill 参照系クラスタ観点集約（OU-007 Phase 6 委譲事項）
+function checkSkillInternalSectionReference(skillsDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  if (!fs.existsSync(skillsDir)) return results;
+  const skillDirs = fs
+    .readdirSync(skillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name);
+  const refLinkPattern = /\[[^\]]+\]\((references\/[^)\s]+\.md)(#[^\s)]+)?\)/g;
+  for (const skillDirName of skillDirs) {
+    const skillMdPath = path.join(skillsDir, skillDirName, "SKILL.md");
+    const content = readText(skillMdPath);
+    if (!content) continue;
+    let match: RegExpExecArray | null;
+    refLinkPattern.lastIndex = 0;
+    while ((match = refLinkPattern.exec(content)) !== null) {
+      const refRelPath = match[1];
+      const refFullPath = path.join(skillsDir, skillDirName, refRelPath);
+      if (!fs.existsSync(refFullPath)) {
+        results.push(
+          warn(
+            "SKILL",
+            "ir034-skill-internal-section-reference",
+            `referenced file not found: ${refRelPath}`,
+            resolveRelative(skillMdPath, root),
+          ),
+        );
+      }
+    }
+  }
+  return results;
+}
+
+// IR-035: SKILL.md See Also セクションの参照先スキルディレクトリ存在確認（heuristic, grep-based）
+// Phase 3 §4.6 Skill 参照系クラスタ観点集約（OU-007 Phase 6 委譲事項）
+function checkSkillSeeAlsoReference(skillsDir: string, root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  if (!fs.existsSync(skillsDir)) return results;
+  const skillDirs = fs
+    .readdirSync(skillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name);
+  for (const skillDirName of skillDirs) {
+    const skillMdPath = path.join(skillsDir, skillDirName, "SKILL.md");
+    const content = readText(skillMdPath);
+    if (!content) continue;
+    const seeAlsoIdx = content.indexOf("## See Also");
+    if (seeAlsoIdx < 0) continue;
+    const afterSeeAlso = content.slice(seeAlsoIdx);
+    const nextSection = afterSeeAlso.indexOf("## ", 3);
+    const seeAlsoSection = nextSection > 0 ? afterSeeAlso.slice(0, nextSection) : afterSeeAlso;
+    const seeAlsoPattern = /\*\*([a-z][a-z0-9-]+)\*\*/g;
+    let m: RegExpExecArray | null;
+    seeAlsoPattern.lastIndex = 0;
+    while ((m = seeAlsoPattern.exec(seeAlsoSection)) !== null) {
+      const refName = m[1];
+      if (!refName.startsWith("agentdev-")) continue;
+      const refDir = path.join(skillsDir, refName);
+      if (!fs.existsSync(refDir)) {
+        results.push(
+          warn(
+            "SKILL",
+            "ir035-skill-see-also-reference",
+            `See Also skill directory not found: ${refName}`,
+            resolveRelative(skillMdPath, root),
+          ),
+        );
+      }
+    }
+  }
+  return results;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -8921,6 +8995,8 @@ async function main(): Promise<void> {
     ...checkLegacyNamespaceInDocs(root),
     ...checkAgentdevExclusion(root),
     ...checkReferencesRecursiveScan(skillsDir, root),
+    ...checkSkillInternalSectionReference(skillsDir, root), // IR-034 (Phase 6 §4.6)
+    ...checkSkillSeeAlsoReference(skillsDir, root), // IR-035 (Phase 6 §4.6)
     ...checkReportSelfExclusion(root),
     ...checkVocabularyRegistrySync(root),
     ...checkCaptureBoundaryReference(root),

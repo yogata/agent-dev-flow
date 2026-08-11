@@ -1,12 +1,5 @@
 /**
- * Command file format violation checker.
- *
- * Detects violations per docs/specs/command-file-format.md:
- * - Step 0 usage (### Step 0 heading or body "Step 0" reference)
- * - Non-sequential Step numbers under ## 手順
- * - Zero-based substeps (Step N-0)
- * - Numbered list main steps directly under ## 手順
- * - Non-G01 guardrail numbers (not G + 2-digit zero-padded)
+ * Command file format violation checker (IR-049 + IR-028/029/030/031).
  *
  * Scope: src/opencode/commands/agentdev/*.md and .opencode/commands/repo/*.md
  */
@@ -21,6 +14,16 @@ export interface FormatViolation {
   description: string;
   severity: "NG" | "WARNING";
 }
+
+// IR-028: ### Step <letter>: 禁止
+const IR028_FORBIDDEN_HEADING = /^###\s+Step\s+[A-Za-z]/;
+// IR-029: Step 1-a, Step 1-b 禁止
+const IR029_FORBIDDEN_SUBSTEP = /\bStep\s+\d+-[A-Za-z]\b/;
+// IR-030: 無条件 verbatim 禁止（条件付き verbatim は許容）
+const IR030_FORBIDDEN_VERBATIM = /verbatim\s+で返却|verbatim\s+必須/;
+const IR030_EXEMPTION_HINTS = ["成果物本文のみ", "verbatim 区切子", "conditional"];
+// IR-031: 非統一 Findings 見出し禁止（正統は ## Findings / Capture候補）
+const IR031_FORBIDDEN_PRIMARY_HEADING = /^##\s+(Capture|Intake\s+候補|Learning\s+候補)\s*$/;
 
 const COMMAND_DIRS = [
   "src/opencode/commands/agentdev",
@@ -197,6 +200,60 @@ export function checkCommandFile(
         rule: "command-format-guardrail-number",
         description: `ガードレール番号 ${match[1]} は G01 形式（G + ゼロ埋め2桁）に不一致`,
         severity: "NG",
+      });
+    }
+  }
+
+  // IR-028: alphabet 混在 Step 見出し検出
+  for (let i = 0; i < lines.length; i++) {
+    if (IR028_FORBIDDEN_HEADING.test(lines[i])) {
+      violations.push({
+        file: filePath,
+        line: i + 1,
+        rule: "ir028-command-top-step-alphabet",
+        description: "Step 見出しに英字混在は禁止（### Step N: 整数形式を使用）",
+        severity: "NG",
+      });
+    }
+  }
+
+  // IR-029: 英字サブステップ検出
+  for (let i = 0; i < lines.length; i++) {
+    if (IR029_FORBIDDEN_SUBSTEP.test(lines[i])) {
+      violations.push({
+        file: filePath,
+        line: i + 1,
+        rule: "ir029-command-alphabet-substep",
+        description: "英字サブステップ（Step N-a 等）は禁止（Step N-M 整数形式を使用）",
+        severity: "NG",
+      });
+    }
+  }
+
+  // IR-030: 無条件 verbatim 検出（exemption hint がある行は skip）
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!IR030_FORBIDDEN_VERBATIM.test(line)) continue;
+    const hasExemption = IR030_EXEMPTION_HINTS.some((h) => line.includes(h));
+    if (hasExemption) continue;
+    violations.push({
+      file: filePath,
+      line: i + 1,
+      rule: "ir030-subagent-unconditional-verbatim",
+      description: "無条件 verbatim 要求は禁止（条件付き verbatim のみ許容）",
+      severity: "NG",
+    });
+  }
+
+  // IR-031: 非統一 Findings 見出し検出（command 本文内の指導記述）
+  for (let i = 0; i < lines.length; i++) {
+    if (IR031_FORBIDDEN_PRIMARY_HEADING.test(lines[i])) {
+      violations.push({
+        file: filePath,
+        line: i + 1,
+        rule: "ir031-findings-capture-heading-unification",
+        description: "Findings 見出しは ## Findings / Capture候補 形式を使用",
+        severity: "WARNING",
       });
     }
   }
