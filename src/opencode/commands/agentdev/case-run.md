@@ -75,19 +75,13 @@ PR 対象ファイルに docs/** 変更を含む場合、Step 6（実行担当�
 
 **検出結果の記録、連携**: 検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` セクションに `### docs-integrity` 小見出しで記録する（実行担当サブエージェント責務）。case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない）
 
-### Step 5-5: 配布依存境界の最終変更経路 gate（REQ-{NNNN}-{NNN} 再利用、REQ-{NNNN}-{NNN}、DEC-{N}）
+### Step 5-5: 配布依存境界の事前委譲チェック（オプション）
 
-PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合、Step 6（実行担当サブエージェント起動）の委譲前に配布依存境界の最終 gate を実行する。本 gate は共用 detector（`.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、REQ-{NNNN}-{NNN} の最終 gate 基底を再利用する（REQ-{NNNN}-{NNN}、DEC-{N} 決定4）。adapter が bypass されても最終 gate で停止する（DEC-{N} 決定3、4）
-
-**実行条件**: PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合に実行する。当該変更を含まない PR（docs のみ、`.opencode/plugins/**` のみ等）ではスキップする
-
-**実行コマンド**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts --profile source --json`。case-run は worktree 環境（マージ前）であり、原本領域 `src/opencode/` を直接検査するため `--profile source` を使用する
-
-**検出結果の分類、連携**: 検査エラー（読込不能、未分類エントリ、adapter 起動失敗）は全て gate-not-passed として扱う（DEC-{N} 決定5、TS-009）。clean として通過させない。検出事項は case-update へ連携し、Issue 本文の更新を委譲する（case-run 単独では Issue 本文を書き換えない）。検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（実行担当サブエージェント責務）
+PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合、Step 6（実行担当サブエージェント起動）の委譲前に配布依存境界の事前チェックを実施できる。本チェックは予備的であり、本式の最終 gate は Step 7-1（実装後）で実行される。事前チェックで違反を検出した場合は委譲プロンプトで実行担当サブエージェントに引き渡す
 
 ### case-run が使用する検査ツール
 
-case-run が使用する検査ツール（integrity 契約 SPEC「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、PR 対象ファイルに docs/** 変更を含む場合に Step 6 委譲前に実行、AG-002）、check_extensions.ts（IR-056、`.opencode/commands/agentdev/**/*.md`, `.opencode/skills/agentdev-*/SKILL.md`, `.opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source、PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合に Step 6 委譲前に実行、DEC-{N} 決定4、REQ-{NNNN}-{NNN} 最終 gate 基底再利用）、test_strategy（Issue 完了条件検証）。上記は全て肯定表現である
+case-run が使用する検査ツール（integrity 契約 SPEC「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、PR 対象ファイルに docs/** 変更を含む場合に Step 6 委譲前に実行、AG-002）、check_extensions.ts（IR-056、`.opencode/commands/agentdev/**/*.md`, `.opencode/skills/agentdev-*/SKILL.md`, `.opencode/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source、Step 7-1 で実装後 worktree の実際の src/opencode/ を検査、DEC-{N} 決定4、REQ-{NNNN}-{NNN} 最終 gate 基底再利用）、test_strategy（Issue 完了条件検証）。上記は全て肯定表現である
 
 ### Step 6: 実行担当サブエージェント起動（委譲）
 
@@ -125,6 +119,16 @@ case-run 経路G の adversarial-review 挿入境界。本 Step は case-run 本
 - **delegation-unavailable**: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す
 
 **L2 タイムスタンプ受け渡し（REQ）**: result 状態（completed-pr/blocked/failed）にかかわらず、Step 5（worktree 設定）、Step 6（実行担当サブエージェント実行）で計測した L2 タイムスタンプを result に含める。case-auto は本 L2 内訳を case-run 委譲の L1 壁時計時間の内訳として読み取る
+
+### Step 7-1: 配布依存境界の最終変更経路 gate（実装後、REQ-{NNNN}-{NNN} 再利用、DEC-{N}）
+
+result が `completed-pr` の場合、Step 8（クリーンアップ）に進む前に、実装後の実際の worktree src/opencode/ に対して配布依存境界の最終 gate を実行する。本 gate は実装担当サブエージェントが追加した変更も含めて実際の worktree HEAD で検査する（Oracle finding 5: post-implementation gate）。
+
+**実行条件**: result が `completed-pr` であり、PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合に実行する。当該変更を含まない PR（docs のみ等）ではスキップする
+
+**実行コマンド**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts --profile source --json`。現在の worktree（実装後 HEAD）の `src/opencode/` を検査する
+
+**検出結果の分類**: 検査エラー（読込不能、未分類エントリ、adapter 起動失敗）は全て gate-not-passed として扱う（DEC-{N} 決定5、TS-009）。clean として通過させない。違反検出時は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録し、Step 8 へ進まず blocked として報告する
 
 ### Step 8: worktree クリーンアップ確認 + 完了報告
 

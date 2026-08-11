@@ -48,12 +48,13 @@
 
 #### 配布依存境界の最終変更経路 gate（REQ-{NNNN}-{NNN} 再利用、REQ-{NNNN}-{NNN}、DEC-{N}）
 
-PR 変更ファイルに `src/opencode/{commands,skills}/**` を含む場合、配布依存境界の最終 gate を実行する。本 gate は共用 detector（`.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、REQ-{NNNN}-{NNN} の最終 gate 基底を再利用する（REQ-{NNNN}-{NNN}、DEC-{N} 決定4）。adapter が bypass されても最終 gate で停止する（DEC-{N} 決定3、4）
+PR 変更ファイルに `src/opencode/{commands,skills}/**` を含む場合、PR マージ前に配布依存境界の最終 gate を実行する。本 gate は共用 detector（`.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、REQ-{NNNN}-{NNN} の最終 gate 基底を再利用する（REQ-{NNNN}-{NNN}、DEC-{N} 決定4）。adapter が bypass されても最終 gate で停止する（DEC-{N} 決定3、4）
 
 - **実行コマンド**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts --profile source --json`
-- **`--profile source`**: case-close はマージ後 main 環境であり、原本領域 `src/opencode/` を直接検査するため `source` を使用する（link/archive/archive-installed projection は package-release-archive.ps1 / `/repo/docs-check` が担う）
+- **検査対象**: PR HEAD の worktree（マージ前の実際の PR ブランチ内容）を検査する。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査対象とする（Oracle finding 5: inspect PR head before merge）
+- **`--profile source`**: case-close は PR マージ前に実行され、原本領域 `src/opencode/` を直接検査するため `source` を使用する
 - **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う（DEC-{N} 決定5、TS-009）。clean として通過させない。違反時はマージを停止しユーザー判断を仰ぐ
-- **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run Step 5-5 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
+- **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run Step 7-1 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
 
 ### Step 3-2: SPEC 確定フロー
 

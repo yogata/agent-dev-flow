@@ -134,6 +134,45 @@ describe("evaluateEdit - edit tool gate", () => {
     });
     expect(r.ok).toBe(false);
   });
+
+  test("reconstructs full post-edit content (Oracle finding 4)", () => {
+    // Edit that splits a reference across old and new content:
+    // currentContent has "docs/adr/" and edit adds "DEC-014.md"
+    const r = evaluateEdit({
+      filePath: "src/opencode/commands/agentdev/sample.md",
+      currentContent: "see docs/adr/",
+      oldString: "docs/adr/",
+      newString: "docs/adr/DEC-014.md",
+    });
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      const pathHit = r.detections.find((d) => d.category === "concrete-path");
+      expect(pathHit).toBeDefined();
+    }
+  });
+
+  test("fails closed when oldString not found (Oracle finding 4)", () => {
+    const r = evaluateEdit({
+      filePath: "src/opencode/commands/agentdev/sample.md",
+      currentContent: "existing content",
+      oldString: "not present",
+      newString: "clean content",
+    });
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+
+  test("normalizes Windows backslash paths (Oracle finding 4)", () => {
+    const r = evaluateEdit({
+      filePath: "src\\opencode\\commands\\agentdev\\sample.md",
+      currentContent: "body",
+      oldString: "body",
+      newString: "ref ADR-0001",
+    });
+    expect(r.ok).toBe(false);
+  });
 });
 
 describe("evaluateApplyPatch - apply_patch tool gate", () => {

@@ -80,11 +80,17 @@ export function shouldInspectTool(tool: string): boolean {
 // Distributed text artifact paths. Matches either src/opencode/... source
 // projection (the only path the pre-write gate needs to defend; consumer-side
 // link/archive projections are checked by the final gate / release pipeline).
+// Path is normalized to POSIX before matching so Windows backslash paths
+// are handled correctly (Oracle finding 4: path normalization).
 const DISTRIBUTED_PATH_RE =
   /src\/opencode\/commands\/agentdev\/|src\/opencode\/skills\/agentdev-[^/]+\//;
 
+export function normalizePath(p: string): string {
+  return p.replace(/\\/g, "/");
+}
+
 export function isDistributedPath(filePath: string): boolean {
-  return DISTRIBUTED_PATH_RE.test(filePath);
+  return DISTRIBUTED_PATH_RE.test(normalizePath(filePath));
 }
 
 function emptyOk(): GuardDetectionsResult {
@@ -121,24 +127,30 @@ export function evaluateEdit(args: {
   projection?: Projection;
 }): GuardDetectionsResult {
   if (!isDistributedPath(args.filePath)) return emptyOk();
-  // The edit replaces oldString with newString. Classify what the edit
-  // introduces by classifying the prospective newString (the lines the agent
-  // is adding). Existing pre-existing refs in currentContent are owned by
-  // the final gate; the pre-write gate only blocks writes that themselves
-  // carry new producer-internal references.
-  const introduced = splitAddedLinesFromNewString(args.newString);
-  if (introduced.length === 0) return emptyOk();
-  const detections: Detection[] = [];
-  for (let i = 0; i < introduced.length; i++) {
-    const lineDetections = classifyLineVirtual(
-      introduced[i]!,
-      i + 1,
-      args.filePath,
-      args.projection ?? "source",
-    );
-    for (const d of lineDetections) detections.push(d);
+  // Oracle finding 4: reconstruct full post-edit content and classify it.
+  // This catches cases where the edit combines with existing content to
+  // form a violation (e.g. "docs/adr/" + edit adds "DEC-014.md").
+  // If oldString is not found in currentContent, fail closed (gate error).
+  let prospective: string;
+  if (args.replaceAll) {
+    const parts = args.currentContent.split(args.oldString);
+    if (parts.length === 1 && !args.currentContent.includes(args.oldString)) {
+      // oldString not found at all - fail closed
+      return { ok: false, detections: [], errorKind: "inspection-error" };
+    }
+    prospective = parts.join(args.newString);
+  } else {
+    const idx = args.currentContent.indexOf(args.oldString);
+    if (idx < 0) {
+      // oldString not found - fail closed per Oracle finding 4
+      return { ok: false, detections: [], errorKind: "inspection-error" };
+    }
+    prospective =
+      args.currentContent.slice(0, idx) +
+      args.newString +
+      args.currentContent.slice(idx + args.oldString.length);
   }
-  return fromDetections(detections);
+  return fromDetections(classifyContent(prospective, args.filePath, args.projection ?? "source"));
 }
 
 export function evaluateApplyPatch(patchText: string, projection: Projection = "source"): GuardDetectionsResult {
