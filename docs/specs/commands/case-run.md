@@ -128,6 +128,8 @@ staleness check は QG-3 本体（PR 作成直前の実装充足・乖離ゲー�
 
 case-run は PR 対象ファイルに docs/** 変更を含む場合、Step 6（実行担当サブエージェント起動）の委譲前に targeted docs guard を実行する（REQ-006-035）。本検査は QG-3 本体・QG-3 前置 staleness check とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない（REQ-006-033 準拠）。
 
+changed-path routing と配布依存境界の検出経路は共有境界 adapter へ接続する（DEC-014）。最終 gate 基底は REQ-010-012 を再利用し、検査エラー（検査対象欠落、読込不能、未分類エントリ、adapter 起動失敗）は gate-not-passed として扱い、clean として通過させない（DEC-014 決定5、`integrity/distribution-boundary.md`「検査エラーの意味」）。
+
 ### 実行条件
 
 - PR 対象ファイルに docs/** 変更を含む場合に実行する。docs/** 変更を含まない PR（コードのみ、SCRIPT のみ等）ではスキップする（REQ-006-007 の QG-3 限定原則を維持、docs全体grep ではなく変更ファイル限定の targeted 検査）
