@@ -46,7 +46,7 @@ Command ──→ Skill ──→ Reference (references/)
 
 ## コマンドフロントマター契約
 
-command frontmatter 契約を description 単一へ同期する（ACT-SPEC-001 と整合）。配布物自己完結と内部ID/内部パス排除の境界宣言を REQ-001-031/032、REQ-002-021..029 と整合させ、「不一致時は本体SPECを正とする」実行時契約を廃止し開発時 checker が SPEC と配布物の適合を保証する構造へ変更する旨を明記する。詳細 normative は移行計画 §5.2, §6.2。
+command frontmatter 契約を description 単一へ同期する（ACT-SPEC-001 と整合）。配布物自己完結と内部ID/内部パス排除の境界宣言を REQ-001-031/032 と整合させ、配布物の producer 内部依存・harness 固有詳細非依存は REQ-029-003..007 へ参照を分ける（REQ-002-021..029 の範囲参照は RETIRE/MOVE 済み）。「不一致時は本体SPECを正とする」実行時契約を廃止し開発時 checker が SPEC と配布物の適合を保証する構造へ変更する旨を明記する。詳細 normative は移行計画 §5.2, §6.2。
 
 ## スキル構造契約
 

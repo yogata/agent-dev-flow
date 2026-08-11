@@ -17,7 +17,7 @@ updated: 2026-08-10
 
 docs/ 配下の文書（REQ/Decision/SPEC/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
 v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）であり、`agentdev-doc-writing` スキルの参照先である。
-REQ-001-061、REQ-002-032 の詳細参照先。
+配布 command/skill 本文のプロジェクト固有 Decision、REQ、SPEC 具体 ID、具体パス、固定 URL への非依存は REQ-029-003、REQ-029-004 が正規所有し、traceability 補完は extension 機構（`../foundations/project-extensions.md`）と協調する。意味境界の検出契約は `../integrity/distribution-boundary.md` を参照する。
 
 > **執筆規範の SSoT は japanese-tech-writing スキル**: 基本原則、術語の平易化、文体基準、不自然な日本語の典型は AGENTS.md 経由で japanese-tech-writing スキルを参照する。
 > 本 SPEC は文書種別の配置基準とリポジトリ固有の用語政策に特化し、japanese-tech-writing の内容を複製しない。

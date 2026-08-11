@@ -72,6 +72,8 @@ updated: 2026-06-28
 REQ 全体ではなく要件行粒度で境界基準、検出観点の影響を追跡する必要がある場合に使用する。
 これらの要件行はすべて IR-044（REQ/SPEC 境界違反検出）を通じてカタログに紐づく。
 
+従来 REQ-002-021、022、023、024、025、026、032 に紐づいていた配布依存境界の影響エントリは MOVE 先（REQ-029-001..008）へ差し替え済みである。REQ-002-027 は更新後の意味（実行時依存として使用するパスは導入先環境で解決可能）へ差し替えた。REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文健全性、責務整合、case-auto.md 段階解消）は既存品質契約（`integrity/docs-spec-rebuild-integrity.md`、`responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md`）と Epic 完了条件へ集約した（REQ-007 行は新設しない）。詳細は Retired cross-references 節へ追記する。
+
 | 要件行 | 影響するアーティファクト / スキル / コマンド | 経由 |
 |--------|-------------------------------------|------|
 | REQ-001-067〜069 | document-model.md, `agentdev-req-analysis` skill, `agentdev-quality-gates` skill, docs-check command (REQ-010-260 経由), inspect-docs command (REQ-010-047 経由) | IR-044 |
