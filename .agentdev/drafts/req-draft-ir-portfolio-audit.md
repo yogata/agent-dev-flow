@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: ir-portfolio-audit
 status: saved
+spec_artifact_actions_consumed: true
 created_at: 2026-08-11T00:00:00+09:00
 source_rus: []
 ---
