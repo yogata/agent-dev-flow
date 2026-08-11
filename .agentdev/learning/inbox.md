@@ -53,3 +53,35 @@
 - **関連**: PR #2059, Issue #2058, RU-0007 OU-006 case-run, OU2 capture entry（PR #2051, Step 0 省略で `--body-file` mojibake）, OU4 capture entry（PR #2055, git commit -F 省略で mojibake）, `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` Section 2 Step 0, RU-0005 AG-001/AG-002
 - **タグ**: `#encoding` `#gh-cli` `#windows` `#mojibake` `#pr-create` `#spec-gap`
 
+## Epic ステータス追跡テーブル形式の契約不一致（agentdev-epic-tracker 新4列/旧4列 vs case-open 件数テーブル）
+
+- **問題事象**: Epic #2076 のステータス追跡テーブルが `agentdev-epic-tracker` SKILL.md および `references/regex-and-merge-conflict.md` の定義形式（新4列 `#/Issue/ステータス/内容` または旧4列 `#/Issue/タイトル/ステータス`）ではなく、「状態別件数テーブル（`pending/running/completed/blocked/failed` × 件数）」+「Wave テーブル（`Wave/Issue/実行方法/前提`、ステータス列なし）」形式であった。`agentdev-workflow-case-close` SKILL.md の STEP-1「テーブル存在時: Epic Wave クローズ、テーブル不存在時: 単一 Issue クローズ」ルーティング判定に照らすと形式不一致だが、Epic である事実（label: epic、子Issue #2077..#2083）と競合する。task MUST「#2077 を pending→completed に更新」と形式定義が合致しない事象を観測。
+- **発生局面**: 完了処理（case-close Epic Wave クローズ STEP-E1/E5）
+- **検知方法**: Epic #2076 本文読込後、`agentdev-epic-tracker` の正規表現パターン `(\| \d+-\d+ \| #2077 \| )pending (\|)`（新4列）および `(\| \d+ \| #2077 \| [^|]* \| )pending (\|)`（旧4列）を適用し、いずれも合致しないことを検知
+- **根本原因**: `case-open` テンプレート（`.opencode/commands/agentdev/templates/issue_desc_epic.md` 等または draft-data 生成ロジック）と `agentdev-epic-tracker` SKILL.md で定義する Epic Issue 本文ステータス追跡テーブル形式の契約不一致。case-open 側が件数テーブル形式を採用し、agentdev-epic-tracker 側が新4列/旧4列形式を前提としている。両者の SSoT 整合性が取れていない
+- **自律対応内容**: 厳密仕様（テーブル不存在 → 単一 Issue クローズ）に従うと Epic #2076 自体をクローズしようとするが、子Issue #2078..#2083 が未完了のため OPEN 維持が必要。task MUST「件数テーブルで #2077 の pending→completed を反映」を達成するため、件数テーブルの数値を更新（`pending 7 → 6`、`completed 0 → 1`）して実質的な進捗反映を実施。`agentdev-epic-tracker` の正規表現契約からの逸脱は case-close 完了報告で user へ明記し、形式標準化を別途検討課題として提示
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり（`agentdev-epic-tracker` SKILL.md「新4列/旧4列形式」と case-open の Epic テンプレート形式の不一致。learning-promote で SPEC 改修要否を評価する対象。候補: (a) case-open テンプレートを新4列形式へ移行、(b) agentdev-epic-tracker を件数テーブル形式へ対応拡張、(c) 両者が一致する別形式へ統一）
+- **横展開観点**: 既存の全 Epic Issue で同様の形式不一致が潜在。case-close Epic Wave クローズ（STEP-E1〜E6）の agentsdev-epic-tracker 正規表現ベースの更新が、件数テーブル形式 Epic では機能しない。Wave テーブルからの running 子Issue 特定も機能しない（ステータス列無いため）
+- **再発条件**: case-open が件数テーブル形式で Epic Issue を作成し、case-close Epic Wave クローズが agentdev-epic-tracker の新4列/旧4列正規表現を前提に動作する場合
+- **予防策候補**: case-open テンプレート形式と agentdev-epic-tracker 形式契約の SSoT 統一。具体的には (a) case-open が agentdev-epic-tracker の新4列形式（子Issue 行にステータス列を持つ）を採用、(b) agentdev-epic-tracker が件数テーブル + Wave テーブル形式へ対応拡張、(c) 新4列と件数テーブルの両方をサポートするハイブリッド形式の定義、いずれかの統一
+- **想定反映先**: `src/opencode/skills/agentdev-epic-tracker/SKILL.md`（テーブル形式定義）、`src/opencode/skills/agentdev-epic-tracker/references/regex-and-merge-conflict.md`（正規表現パターン）、`src/opencode/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md`（テーブル存在判定ロジック）、`src/opencode/commands/agentdev/templates/issue_desc_epic.md`（Epic テンプレート形式）
+- **関連**: Epic #2076, 子Issue #2077, PR #2084, REQ-028 OU-001 Phase 0 case-close
+- **タグ**: `#epic-tracker` `#case-open` `#template-mismatch` `#spec-gap` `#form-standardization`
+
+## docs/specs/ 配下の非 SPEC ファイル（baseline snapshot）の SPEC README 登録対象判定
+
+- **問題事象**: Phase 0 baseline ファイル `docs/specs/integrity/baselines/pre-audit-baseline-20260811.md` を作成した際、`check_changed_docs.ts --workflow case-run`（targeted docs guard）が `spec_readme_update_required: true` フラグを検出した。本ファイルは SPEC ではなく参照用 baseline スナップショットであるため、`docs/specs/README.md` への登録要否が case-close で判断対象となった。`docs/specs/` 配下に配置されるが SPEC schema を持たないファイル群の README 登録判定基準が明示的に文書化されていない
+- **発生局面**: 完了処理（case-close docs 検証 STEP-3、targeted docs guard）
+- **検知方法**: PR #2084 の `## Findings / Capture候補` > `### docs-integrity` セクションに `spec_readme_update_required: true` フラグ検出の記録あり。case-close で該当フラグの取り扱いを判断
+- **根本原因**: `docs/specs/` 配下に SPEC 以外のファイル（baseline snapshot、参照用メモ、analysis 結果等）が配置される場合の SPEC README 登録対象判定基準が明文化されていない。targeted docs guard は `docs/specs/` 配下の新規ファイルを機械的に SPEC README 登録候補とするが、ファイルの役割（SPEC schema 準拠 vs 非 SPEC）を意味判断していない
+- **自律対応内容**: 本 baseline ファイルは SPEC ではなく参照用 snapshot であるため SPEC README 登録対象外と判断。case-close 完了報告で user へ明記。targeted docs guard のフラグは warning 扱いで継続
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり（`docs/specs/README.md` の登録対象基準、または targeted docs guard の判定ロジック）。learning-promote で SPEC 改修要否を評価する対象。候補: (a) `docs/specs/README.md` の登録対象を「SPEC schema 準拠ファイルのみ」と明記、(b) targeted docs guard が frontmatter で SPEC か否かを判定して `spec_readme_update_required` フラグを制御、(c) `docs/specs/baselines/` 等の非 SPEC サブディレクトリを README 対象外とする規約策定
+- **横展開観点**: 将来 `docs/specs/` 配下に配置される非 SPEC ファイル（analysis 結果、参照用メモ、過去ログ等）で同様の false positive が発生する可能性
+- **再発条件**: `docs/specs/` 配下に SPEC schema を持たないファイルを新規作成し、targeted docs guard を実行した場合
+- **予防策候補**: targeted docs guard（`check_changed_docs.ts`）が frontmatter または配置ディレクトリに基づき SPEC 判定を行い、非 SPEC ファイルは `spec_readme_update_required` フラグを抑止。または `docs/specs/README.md` の登録対象基準を SPEC ファイルのみに限定する規約を docs に明記
+- **想定反映先**: `src/opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts`（targeted docs guard の判定ロジック）、`docs/specs/README.md`（登録対象基準の明文化）、`docs/specs/foundations/document-model.md`（文書種別と配置基準の補強）
+- **関連**: PR #2084 Findings docs-integrity セクション, `docs/specs/integrity/baselines/pre-audit-baseline-20260811.md`, Epic #2076 OU-001 Phase 0
+- **タグ**: `#docs-check` `#spec-readme` `#targeted-docs-guard` `#false-positive` `#spec-gap`
+
