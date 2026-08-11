@@ -1,22 +1,26 @@
-// Distribution reference boundary checker.
+// Distribution reference boundary checker (adapter).
 //
-// Distributed command/skill bodies must not contain concrete references
-// (specific IDs, specific file paths, fixed URLs) to project-local ADR or
-// REQ or SPEC documents. Project-specific context must flow through the
-// project extension layer instead.
+// This file is the adapter over the canonical side-effect-free detector at
+// ./lib/distribution-boundary.ts. Per docs/specs/integrity/distribution-boundary.md
+// (stable implementation contract) the canonical detector owns classification;
+// this adapter adds filesystem scanning, baseline/exemption/delta bookkeeping,
+// the repo-self-hosting-specific IR-046/047/048 rules, and the CLI.
 //
-// Detection is line-based:
-//   1. Concrete IDs matching \b(ADR|REQ)-\d{4}\b
-//   2. Concrete docs paths under docs/(adr,requirements,specs) that are
-//      individual .md files (README.md and template forms are exempt)
-//   3. Fixed blob/raw URLs that pin a specific revision
+// Detection behaviour (patterns, template allowance, README allowance) is
+// owned by the lib module. This adapter only translates lib Detection records
+// into the legacy BoundaryFailure shape and applies baseline/exemption policy.
 //
-// Lines containing template placeholders ({NNNN}, <...>, glob '*') are
-// skipped for the ID and path checks so templates remain valid.
 // Exit codes: 0 ok, 1 violation, 2 error.
 
-const path = require("path") as typeof import("path");
-const fs = require("fs") as typeof import("fs");
+import * as path from "path";
+import * as fs from "fs";
+import {
+  classifyContent,
+  decideGate,
+  PROJECTIONS,
+  type Projection,
+  type Detection,
+} from "./lib/distribution-boundary.ts";
 
 export interface BoundaryFailure {
   category: "concrete-id" | "concrete-path" | "fixed-url";
@@ -98,49 +102,37 @@ export interface DeltaReport {
   };
 }
 
+// Re-export the patterns so any downstream tooling that imported them from
+// this adapter continues to work.
+export {
+  CONCRETE_ID_PATTERN,
+  DOCS_PATH_PATTERN,
+  FIXED_URL_PATTERN,
+  RAW_FIXED_URL_PATTERN,
+  isConcreteDocsPath,
+} from "./lib/distribution-boundary.ts";
+
+// Repository layout constants used to enumerate scan targets. Both the
+// adapter's collectTargets and the IR-046/047/048 rules reference these.
 const PUBLIC_COMMAND_DIR = "src/opencode/commands/agentdev";
 const PUBLIC_SKILLS_PARENT = "src/opencode/skills";
 
-// Concrete IDs: ADR-1234, REQ-1234 (excludes ADR-{NNNN}, REQ-NNNN, ADR-*, etc.)
-const CONCRETE_ID_PATTERN = /\b(ADR|REQ)-\d{3,4}\b/g;
-
-// Candidate concrete paths. We match any docs/(adr|requirements|specs)/...
-// path token and then decide whether it is a concrete file or a template.
-const DOCS_PATH_PATTERN =
-  /docs\/(adr|requirements|specs)\/[^\s)\]\|\\"'`<>{}]+/g;
-
-// Fixed URLs that point to a specific blob/raw of this repo. Owner/repo
-// kept generic so the rule travels if the self-host repo is renamed.
-const FIXED_URL_PATTERN =
-  /github\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/(blob|raw)\//g;
-const RAW_FIXED_URL_PATTERN =
-  /raw\.githubusercontent\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\//g;
-
-// Whole-line exemption hints. If any of these substrings appear on the line,
-// the line is skipped entirely for both concrete-id and concrete-path checks.
-// Fixed-URL check is never exempted (URLs are never templated this way).
-const LINE_EXEMPTION_HINTS = [
-  "{NNNN}",
-  "<NNNN>",
-  "<existing-spec>",
-  "<domain>",
-  "<command>",
-  "<spec>",
-  "<rule>",
-  "docs/specs/<",
-  "docs/specs/{",
-  "docs/specs/**",
-  "docs/adr/<",
-  "docs/adr/{",
-  "docs/adr/**",
-  "docs/requirements/<",
-  "docs/requirements/{",
-  "docs/requirements/**",
-  "ADR-{NNNN}",
-  "REQ-{NNNN}",
-  "ADR-*",
-  "REQ-*",
-];
+function normalizeProfileToProjection(profile: string): Projection | null {
+  switch (profile) {
+    case "source":
+      return "source";
+    case "link":
+    case "installed":
+      return "link";
+    case "archive":
+      return "archive";
+    case "archive-installed":
+    case "release":
+      return "archive-installed";
+    default:
+      return null;
+  }
+}
 
 function dirExists(p: string): boolean {
   try {
@@ -175,39 +167,34 @@ function listMarkdownFiles(dirPath: string, recursive: boolean): string[] {
   return result;
 }
 
-function isLineExempt(line: string): boolean {
-  for (const hint of LINE_EXEMPTION_HINTS) {
-    if (line.includes(hint)) return true;
-  }
+function isLineExempt(_line: string): boolean {
+  // Deprecated: line-level exemption hints were removed because they hid real
+  // IDs on the same line. Template/glob forms are excluded by the lib patterns
+  // themselves. Retained as a no-op for any external caller.
   return false;
 }
 
-/**
- * Decide whether a candidate docs path token (already stripped of surrounding
- * punctuation) is a concrete file reference or a template.
- *
- * Returns true when the token is a CONCRETE reference (i.e. a violation).
- */
-function isConcreteDocsPath(token: string): boolean {
-  // README.md is an index, not an individual document. Always allowed.
-  if (token.endsWith("/README.md")) return false;
-  // Template placeholders anywhere in the token mean it is not concrete.
-  if (/[<>{}]/.test(token)) return false;
-  // Glob wildcard means it is not concrete.
-  if (token.includes("*")) return false;
-  // Must end with .md to be a doc reference at all.
-  if (!token.endsWith(".md")) return false;
-  return true;
-}
-
-function collectTargets(repoRoot: string): string[] {
+function collectTargets(repoRoot: string, projection: Projection): string[] {
   const targets: string[] = [];
+  // source/archive projections inspect the producer source tree (src/opencode/).
+  // link/archive-installed projections inspect the consumer-side installed tree
+  // (.opencode/), per docs/specs/integrity/distribution-boundary.md
+  // "projection の分離". The directory contents are expected to be equivalent
+  // (consumer install copies src/opencode/** -> .opencode/**).
+  const isInstalledProjection =
+    projection === "link" || projection === "archive-installed";
+  const commandRel = isInstalledProjection
+    ? path.join(".opencode", "commands", "agentdev")
+    : PUBLIC_COMMAND_DIR;
+  const skillsRel = isInstalledProjection
+    ? path.join(".opencode", "skills")
+    : PUBLIC_SKILLS_PARENT;
   // Public commands
-  targets.push(...listMarkdownFiles(path.join(repoRoot, PUBLIC_COMMAND_DIR), true));
+  targets.push(...listMarkdownFiles(path.join(repoRoot, commandRel), true));
   // Public skills (agentdev-* only)
-  const skillsParent = path.join(repoRoot, PUBLIC_SKILLS_PARENT);
+  const skillsParent = path.join(repoRoot, skillsRel);
   if (dirExists(skillsParent)) {
-    const entries = fs.readdirSync(skillsParent, { withFileTypes: true }) as any[];
+    const entries = fs.readdirSync(skillsParent, { withFileTypes: true }) as Array<fs.Dirent>;
     for (const ent of entries) {
       if (!ent.isDirectory()) continue;
       if (!ent.name.startsWith("agentdev-")) continue;
@@ -218,7 +205,17 @@ function collectTargets(repoRoot: string): string[] {
   return targets;
 }
 
-export function checkDistributionBoundary(repoRoot: string): BoundaryReport {
+function detectionToFailure(d: Detection): BoundaryFailure {
+  return {
+    category: d.category as BoundaryFailure["category"],
+    file: d.file,
+    line: d.line,
+    snippet: d.snippet,
+    matched: d.matched,
+  };
+}
+
+export function checkDistributionBoundary(repoRoot: string, projection: Projection = "source"): BoundaryReport {
   const failures: BoundaryFailure[] = [];
   const stats = {
     scanned_files: 0,
@@ -227,69 +224,19 @@ export function checkDistributionBoundary(repoRoot: string): BoundaryReport {
     fixed_url_hits: 0,
   };
 
-  const targets = collectTargets(repoRoot);
+  const targets = collectTargets(repoRoot, projection);
   stats.scanned_files = targets.length;
 
   for (const file of targets) {
     const text = readText(file);
     if (text === null) continue;
-    const lines = text.split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-      if (trimmed.startsWith("#")) {
-        // Comments in scripts are .ts only; .md headings may still contain
-        // refs, so we do NOT skip markdown headings.
-      }
-
-      // Fixed URL check is never exempted by template hints.
-      const urlMatches =
-        line.match(FIXED_URL_PATTERN) || line.match(RAW_FIXED_URL_PATTERN);
-      if (urlMatches && urlMatches.length > 0) {
-        for (const m of urlMatches) {
-          stats.fixed_url_hits += 1;
-          failures.push({
-            category: "fixed-url",
-            file,
-            line: i + 1,
-            snippet: trimmed.substring(0, 200),
-            matched: m,
-          });
-        }
-      }
-
-      // Concrete ID check は常時実行 (旧 LINE_EXEMPTION は同行の実 ID見逃しを生むため廃止、REQ-{NNNN} 等は正規表現が元々非マッチ)
-      const idMatches = line.match(CONCRETE_ID_PATTERN);
-      if (idMatches && idMatches.length > 0) {
-        for (const m of idMatches) {
-          stats.concrete_id_hits += 1;
-          failures.push({
-            category: "concrete-id",
-            file,
-            line: i + 1,
-            snippet: trimmed.substring(0, 200),
-            matched: m,
-          });
-        }
-      }
-
-      // Concrete docs path check (isConcreteDocsPath が template/README/glob を弾く)
-      const pathCandidates = line.match(DOCS_PATH_PATTERN);
-      if (pathCandidates && pathCandidates.length > 0) {
-        for (const candidate of pathCandidates) {
-          if (isConcreteDocsPath(candidate)) {
-            stats.concrete_path_hits += 1;
-            failures.push({
-              category: "concrete-path",
-              file,
-              line: i + 1,
-              snippet: trimmed.substring(0, 200),
-              matched: candidate,
-            });
-          }
-        }
-      }
+    const detections = classifyContent(text, file, projection);
+    for (const d of detections) {
+      const f = detectionToFailure(d);
+      if (f.category === "concrete-id") stats.concrete_id_hits += 1;
+      else if (f.category === "concrete-path") stats.concrete_path_hits += 1;
+      else if (f.category === "fixed-url") stats.fixed_url_hits += 1;
+      failures.push(f);
     }
   }
 
@@ -475,14 +422,26 @@ export function computeDelta(report: BoundaryReport, baseline: BaselineFile, rep
 }
 
 if (require.main === module) {
-  const args = process.argv.slice(2);
-  const positional = args.filter((a) => !a.startsWith("--"));
-  const repoRoot = positional[0] || process.cwd();
-  const json = args.includes("--json");
+const args = process.argv.slice(2);
+// Strip `--flag value` pairs before computing positional args so that a
+// profile value like "archive-installed" is not mistaken for a path.
+const STRIP_VALUE_FLAGS = new Set(["--profile", "--save-baseline", "--delta", "--exemptions"]);
+const positional: string[] = [];
+for (let i = 0; i < args.length; i++) {
+  if (STRIP_VALUE_FLAGS.has(args[i]!)) {
+    i++; // skip the value too
+    continue;
+  }
+  if (args[i]!.startsWith("--")) continue;
+  positional.push(args[i]!);
+}
+const repoRoot = positional[0] || process.cwd();
+const json = args.includes("--json");
 
-  // WP-3 (Issue #1928): --profile is accepted for symmetry. Source is the
-  // canonical inspection target; .opencode/ mirrors it, so widening the scope
-  // would only duplicate findings.
+  // Profile maps to lib Projection (source/link/archive/archive-installed per
+  // docs/specs/integrity/distribution-boundary.md "projection の分離"). Legacy
+  // installed/release values are accepted as aliases for link/archive-installed
+  // so existing invocations continue to work.
   let profile = "source";
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--profile" && i + 1 < args.length) {
@@ -490,8 +449,11 @@ if (require.main === module) {
       i++;
     }
   }
-  if (profile !== "source" && profile !== "installed" && profile !== "release") {
-    process.stderr.write(`error: --profile must be source|installed|release (got '${profile}')\n`);
+  const projection = normalizeProfileToProjection(profile);
+  if (projection === null) {
+    process.stderr.write(
+      `error: --profile must be source|link|archive|archive-installed (or legacy installed|release) (got '${profile}')\n`,
+    );
     process.exit(2);
   }
 
@@ -501,7 +463,7 @@ if (require.main === module) {
   const baselinePath = saveBaselineIdx >= 0 ? args[saveBaselineIdx + 1] : deltaBaselineIdx >= 0 ? args[deltaBaselineIdx + 1] : null;
   const exemptionsPath = exemptionsIdx >= 0 ? args[exemptionsIdx + 1] : null;
 
-  const rawReport = checkDistributionBoundary(repoRoot);
+  const rawReport = checkDistributionBoundary(repoRoot, projection);
 
   const exemptions = exemptionsPath ? loadExemptions(exemptionsPath) : null;
   const exemptionResult = applyExemptions(rawReport.failures, exemptions, repoRoot);
