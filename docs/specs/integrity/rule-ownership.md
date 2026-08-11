@@ -87,14 +87,11 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-015 | 廃止 REQ 現行参照検出 | REQ-010-070-074, 136 | integrity-contracts.md |
 | IR-016 | Source/projection 整合性 | REQ-002-048-052, REQ-010-143-144 | system.md |
 | IR-018 | REQ 範囲表記鮮度 | REQ-010-140 | integrity-contracts.md |
-| IR-019 | Guide 要件定義、契約記述検出 | REQ-010-138, REQ-001 | document-model.md |
 | IR-020 | 基準既知（baseline-known）と新規 finding の区別 | REQ-010-145, 148 | integrity-contracts.md |
 | IR-021 | 廃止済み skill 参照検出 | REQ-010-126-128 | integrity-contracts.md |
-| IR-022 | REQ 内部整合性 | REQ-010-139, 149 | integrity-contracts.md |
 | IR-023 | Integrity artifact validator drift | REQ-010-147 | integrity-contracts.md |
 | IR-024 | Command README ↔ 実体 | REQ-001-026, REQ-010-003 | integrity-contracts.md |
 | IR-025 | 廃止 ADR path 規則 | REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
-| IR-026 | ADR 誤分類兆候検出 | REQ-001-043, REQ-001-031, REQ-001-032, REQ-001-033 | integrity-contracts.md, document-model.md |
 | IR-027 | 廃止 ADR 現行根拠引用検出 | REQ-001-048, REQ-001-050 | integrity-contracts.md, document-model.md |
 | IR-028 | Command 最上位 Step 整数化 | REQ-003-005, REQ-003-007, REQ-003-021 | artifact-contracts.md, workflow-contracts.md |
 | IR-029 | Command 英字サブステップ禁止 | REQ-003-006, REQ-003-021 | artifact-contracts.md, workflow-contracts.md |
@@ -104,7 +101,6 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-033 | lightweight-delegation primary pattern 禁止 | REQ-003-015, REQ-003-016 | workflow-contracts.md, artifact-contracts.md |
 | IR-034 | Skill 内部 section / protocol / Step 参照検出 | REQ-010-244 | integrity-contracts.md |
 | IR-035 | Skill See Also 検出観点 | REQ-010-245 | integrity-contracts.md |
-| IR-036 | ADR-work-means-detection | REQ-010-249, REQ-001-043, REQ-001-044, REQ-001-045 | integrity-contracts.md, document-model.md |
 | IR-037 | retired-ADR-current-baseline-ref | REQ-010-250, REQ-001-048 | integrity-contracts.md, document-model.md |
 | IR-038 | ADR-index-consistency | REQ-010-251, REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
 | IR-039 | index-req-title-consistency | REQ-010-003, REQ-001-063, REQ-001 | integrity-contracts.md |
@@ -130,6 +126,8 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-060 | forbidden Japanese word detection | v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（REQ-010-256 文意判断は docs-check 対象外、本ルールは完全一致検出に限定） | ../responsibilities/document-type-responsibilities.md（不自然表現検出分類 P0〜P4）, ../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md（forbidden 語リスト正）, integrity-rule-catalog.md |
 | IR-061 | 索引類自動生成整合性 | - | - |
 <!-- AUTOGEN:END -->
+
+> **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（REQ-028-007、DEC-006、Phase 3 §5.2）。詳細は `integrity-rule-catalog.md`「IR-019, IR-022, IR-026, IR-036: inspect-docs 移管」節を参照。
 
 ## 重複ルールの解消状況
 

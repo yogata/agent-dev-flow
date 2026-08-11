@@ -1,0 +1,70 @@
+# retired-artifact-registry.yaml
+#
+# Retired artifact registry for checkRetiredArtifactResidual detector.
+# Detection-view derived from canonical sources per Phase 3 §6.1 of
+# cross-cutting-integration-design-20260811.md.
+#
+# Canonical sources (SPEC is authoritative; this YAML is a detection view):
+#   - docs/specs/responsibilities/req-impact-map.md (## Retired cross-references)
+#   - docs/specs/foundations/numbering-policy.md (欠番表)
+#   - docs/decisions/DEC-013.md (AG-008 tombstone abolition)
+#
+# Consumed by:
+#   - check_retired_artifact_residual.ts (IR-025, IR-037, IR-043)
+#
+# Phase 5 (OU-006 #2082) implementation. Each entry class drives one facet of
+# the common detector; severities/gate_levels are owned by the individual IR
+# files in docs/specs/integrity/rules/.
+
+schema_version: 1
+generated_at: 2026-08-11
+canonical_sources:
+  - docs/specs/responsibilities/req-impact-map.md
+  - docs/specs/foundations/numbering-policy.md
+  - docs/decisions/DEC-013.md
+
+# IR-025 (retired ADR path rule): 4-digit v2:ADR-NNNN filenames must NOT exist
+# under docs/decisions/. Current Decision scheme is DEC-NNN (3-digit).
+retired_adr_path_patterns:
+  description: |
+    Forbidden 4-digit ADR filename pattern under docs/decisions/.
+    v2 historical ADRs (v2:ADR-0001..v2:ADR-0099) are referenced only with
+    explicit `v2:` prefix and do not exist as files.
+  forbidden_filename_regex: "^ADR-\\d{4,}\\.md$"
+  scan_directory: docs/decisions
+  allowed_filename_regex: "^DEC-\\d{3}\\.md$"
+
+# IR-037 (retired-ADR-current-baseline-ref): current baseline documents must
+# not cite retired ADRs as authoritative current basis.
+retired_decisions_as_current_baseline:
+  description: |
+    Retired/superseded Decision IDs that must not be cited as current
+    authoritative baseline in active REQ/SPEC/guide bodies. Historical
+    references with explicit `v2:` prefix or inside retired/ sections are
+    exempt.
+  retired_ids:
+    # Track only ids acknowledged as retired by DEC-013 / numbering-policy.
+    # Populated from numbering-policy.md 欠番表 (empty set at Phase 5 baseline
+    # because no current DEC-NNN has been retired yet; v2:ADR-NNNN historical
+    # ids are covered by the v2_prefix_exemption rule below).
+    []
+  v2_prefix_exemption: "v2:"
+
+# IR-043 (retired-readme-coverage): README indexes that enumerate artifacts
+# must cover all active artifacts. Entries listed here are README files whose
+# coverage is verified by the detector.
+retired_readme_coverage_targets:
+  description: |
+    README inventory files that must remain consistent with the active
+    artifact set. Retired artifacts must NOT appear in active indexes,
+    and active artifacts must NOT be missing from their canonical index.
+  targets:
+    - path: docs/requirements/README.md
+      artifact_kind: req
+      rule_refs: [IR-039, IR-042, IR-061]
+    - path: docs/decisions/README.md
+      artifact_kind: decision
+      rule_refs: [IR-038, IR-061]
+    - path: docs/specs/README.md
+      artifact_kind: spec
+      rule_refs: [IR-054, IR-061]

@@ -1,0 +1,61 @@
+# delegation-contract-patterns.yaml
+#
+# Detection-view derived from docs/specs/workflows/delegation-contracts.md per
+# Phase 3 §6.4 of cross-cutting-integration-design-20260811.md.
+#
+# Canonical source (SPEC is authoritative; this YAML is a detection view):
+#   - docs/specs/workflows/delegation-contracts.md
+#
+# Consumed by:
+#   - check_delegation_contract_residual.ts (IR-032, IR-033)
+#
+# Phase 5 (OU-006 #2082) implementation. The detector scans command/skill
+# definitions for forbidden delegation anti-patterns; severities/gate_levels
+# remain owned by IR-032 and IR-033 rule files.
+
+schema_version: 1
+generated_at: 2026-08-11
+canonical_source: docs/specs/workflows/delegation-contracts.md
+
+# IR-032 (delegation_type / on_result required-envelope prohibition):
+# Command/skill bodies must not treat `delegation_type` or `on_result` as
+# required envelope fields. They are optional delegation metadata, not
+# mandatory envelope contracts.
+required_envelope_prohibition:
+  description: |
+    Forbidden phrasing that elevates delegation_type or on_result to required
+    envelope fields. Detection is line-based over command/skill definitions.
+  forbidden_patterns:
+    # Phrasing that declares these fields as required envelopes.
+    - "delegation_type\\s+は必須"
+    - "on_result\\s+は必須"
+    - "必須\\s+envelope.*delegation_type"
+    - "必須\\s+envelope.*on_result"
+  scan_targets:
+    - src/opencode/commands/agentdev
+    - src/opencode/skills
+  exemption_hints:
+    # Discussion of the prohibition itself (e.g., this rule's own description)
+    # is exempt.
+    - "必須 envelope 禁止"
+    - "required envelope prohibition"
+
+# IR-033 (lightweight-delegation primary-pattern prohibition): command/skill
+# bodies must not describe lightweight-delegation as the primary delegation
+# pattern. lightweight-delegation is a secondary overlay, not a primary form.
+lightweight_delegation_primary_prohibition:
+  description: |
+    Forbidden phrasing that elevates lightweight-delegation to the primary
+    delegation pattern. Detection is line-based over command/skill definitions.
+  forbidden_patterns:
+    # Phrasing that declares lightweight-delegation as the primary pattern.
+    - "lightweight-delegation\\s+は主要"
+    - "lightweight-delegation\\s+はプライマリ"
+    - "lightweight-delegation\\s+を主要パターン"
+    - "primary\\s+pattern.*lightweight-delegation"
+  scan_targets:
+    - src/opencode/commands/agentdev
+    - src/opencode/skills
+  exemption_hints:
+    - "lightweight-delegation primary pattern 禁止"
+    - "lightweight-delegation は主要パターンではない"
