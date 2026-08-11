@@ -17,13 +17,14 @@ import * as fs from "fs";
 import {
   classifyContent,
   decideGate,
+  isTextFile,
   PROJECTIONS,
   type Projection,
   type Detection,
 } from "./lib/distribution-boundary.ts";
 
 export interface BoundaryFailure {
-  category: "concrete-id" | "concrete-path" | "fixed-url";
+  category: Detection["category"];
   file: string;
   line: number;
   snippet: string;
@@ -150,17 +151,16 @@ function readText(p: string): string | null {
   }
 }
 
-function listMarkdownFiles(dirPath: string, recursive: boolean): string[] {
+function listTextArtifacts(dirPath: string, recursive: boolean): string[] {
   const result: string[] = [];
   if (!dirExists(dirPath)) return result;
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true }) as any[];
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true }) as Array<fs.Dirent>;
   for (const ent of entries) {
     const full = path.join(dirPath, ent.name);
     if (ent.isDirectory() && recursive) {
-      // node_modules サブツリーは third-party README の fixed_url false positive を防ぐためスキップ
       if (ent.name === "node_modules") continue;
-      result.push(...listMarkdownFiles(full, true));
-    } else if (ent.isFile() && ent.name.endsWith(".md")) {
+      result.push(...listTextArtifacts(full, true));
+    } else if (ent.isFile() && isTextFile(ent.name)) {
       result.push(full.replace(/\\/g, "/"));
     }
   }
@@ -190,16 +190,17 @@ function collectTargets(repoRoot: string, projection: Projection): string[] {
     ? path.join(".opencode", "skills")
     : PUBLIC_SKILLS_PARENT;
   // Public commands
-  targets.push(...listMarkdownFiles(path.join(repoRoot, commandRel), true));
+  targets.push(...listTextArtifacts(path.join(repoRoot, commandRel), true));
   // Public skills (agentdev-* only)
   const skillsParent = path.join(repoRoot, skillsRel);
   if (dirExists(skillsParent)) {
     const entries = fs.readdirSync(skillsParent, { withFileTypes: true }) as Array<fs.Dirent>;
     for (const ent of entries) {
       if (!ent.isDirectory()) continue;
-      if (!ent.name.startsWith("agentdev-")) continue;
+      // Scan agentdev-* and japanese-tech-writing (both shipped in archive).
+      if (!ent.name.startsWith("agentdev-") && ent.name !== "japanese-tech-writing") continue;
       const skillDir = path.join(skillsParent, ent.name);
-      targets.push(...listMarkdownFiles(skillDir, true));
+      targets.push(...listTextArtifacts(skillDir, true));
     }
   }
   return targets;
@@ -207,7 +208,7 @@ function collectTargets(repoRoot: string, projection: Projection): string[] {
 
 function detectionToFailure(d: Detection): BoundaryFailure {
   return {
-    category: d.category as BoundaryFailure["category"],
+    category: d.category,
     file: d.file,
     line: d.line,
     snippet: d.snippet,
@@ -227,9 +228,32 @@ export function checkDistributionBoundary(repoRoot: string, projection: Projecti
   const targets = collectTargets(repoRoot, projection);
   stats.scanned_files = targets.length;
 
+  // Oracle finding 2: zero targets is a gate error (missing/unreachable
+  // projection), not clean. Per DEC-014 decision 5, inspection errors are
+  // gate-not-passed.
+  if (targets.length === 0) {
+    failures.push({
+      category: "adapter-failure",
+      file: repoRoot,
+      line: 0,
+      snippet: `zero scan targets found for projection '${projection}'`,
+      matched: `zero-targets:${projection}`,
+    });
+  }
+
   for (const file of targets) {
     const text = readText(file);
-    if (text === null) continue;
+    if (text === null) {
+      // Oracle finding 2: read failure is a gate error, not silently skipped.
+      failures.push({
+        category: "adapter-failure",
+        file,
+        line: 0,
+        snippet: "file read failed",
+        matched: `read-failure:${file}`,
+      });
+      continue;
+    }
     const detections = classifyContent(text, file, projection);
     for (const d of detections) {
       const f = detectionToFailure(d);
@@ -600,12 +624,12 @@ export function checkDistributionRules(repoRoot: string): {
   const publicCmd = path.join(repoRoot, "src", "opencode", "commands", "agentdev");
   const publicSkills = path.join(repoRoot, "src", "opencode", "skills");
   const publicTargets: string[] = [
-    ...listMarkdownFiles(publicCmd, true),
+    ...listTextArtifacts(publicCmd, true),
   ];
   if (dirExists(publicSkills)) {
-    for (const ent of fs.readdirSync(publicSkills, { withFileTypes: true }) as any[]) {
-      if (ent.isDirectory() && ent.name.startsWith("agentdev-")) {
-        publicTargets.push(...listMarkdownFiles(path.join(publicSkills, ent.name), true));
+    for (const ent of fs.readdirSync(publicSkills, { withFileTypes: true }) as Array<fs.Dirent>) {
+      if (ent.isDirectory() && (ent.name.startsWith("agentdev-") || ent.name === "japanese-tech-writing")) {
+        publicTargets.push(...listTextArtifacts(path.join(publicSkills, ent.name), true));
       }
     }
   }
@@ -655,7 +679,7 @@ export function checkDistributionRules(repoRoot: string): {
   // agentdev-gh-cli は link 対象であり、機械生成物ではない。
   const localGhCli = path.join(repoRoot, "src", "opencode-local", "agentdev-gh-cli");
   if (dirExists(localGhCli)) {
-    const files = listMarkdownFiles(localGhCli, true);
+    const files = listTextArtifacts(localGhCli, true);
     stats.scanned_files += files.length;
     for (const file of files) {
       const text = readText(file);

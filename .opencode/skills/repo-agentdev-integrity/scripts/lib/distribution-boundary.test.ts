@@ -13,7 +13,11 @@ import {
   classifyContent,
   decideGate,
   PROJECTIONS,
+  resolveCandidate,
+  isTextFile,
+  TEXT_EXTENSIONS,
   type Projection,
+  type Detection,
 } from "./distribution-boundary.ts";
 
 describe("classifyLine - concrete-id detection", () => {
@@ -123,9 +127,9 @@ describe("classifyLine - concrete-path detection", () => {
 });
 
 describe("classifyLine - fixed-url detection", () => {
-  test("flags github.com blob URLs", () => {
+  test("flags github.com blob URLs pointing to docs/", () => {
     const d = classifyLine({
-      text: "Bad: <https://github.com/yogata/agent-dev-flow/blob/main/docs/foo.md>",
+      text: "Bad: <https://github.com/yogata/agent-dev-flow/blob/main/docs/specs/foo.md>",
       lineNumber: 1,
       filePath: "src/opencode/commands/agentdev/sample.md",
       projection: "source",
@@ -135,15 +139,37 @@ describe("classifyLine - fixed-url detection", () => {
     expect(urls[0]!.classification).toBe("producer-internal");
   });
 
-  test("flags raw.githubusercontent.com URLs", () => {
+  test("flags raw.githubusercontent.com URLs pointing to docs/", () => {
     const d = classifyLine({
-      text: "Bad: raw.githubusercontent.com/yogata/agent-dev-flow/main/x.md",
+      text: "Bad: raw.githubusercontent.com/yogata/agent-dev-flow/main/docs/requirements/x.md",
       lineNumber: 1,
       filePath: "src/opencode/commands/agentdev/sample.md",
       projection: "source",
     });
     const urls = d.filter((x) => x.category === "fixed-url");
     expect(urls.length).toBe(1);
+  });
+
+  test("does NOT flag external GitHub URLs (non-docs paths)", () => {
+    const d = classifyLine({
+      text: "See https://github.com/sst/opencode/blob/main/packages/plugin/src/index.ts for API",
+      lineNumber: 1,
+      filePath: "src/opencode/commands/agentdev/sample.md",
+      projection: "source",
+    });
+    const urls = d.filter((x) => x.category === "fixed-url");
+    expect(urls.length).toBe(0);
+  });
+
+  test("does NOT flag raw.githubusercontent.com URLs to non-docs paths", () => {
+    const d = classifyLine({
+      text: "ref raw.githubusercontent.com/yogata/agent-dev-flow/main/scripts/foo.ps1",
+      lineNumber: 1,
+      filePath: "src/opencode/commands/agentdev/sample.md",
+      projection: "source",
+    });
+    const urls = d.filter((x) => x.category === "fixed-url");
+    expect(urls.length).toBe(0);
   });
 });
 
@@ -233,7 +259,9 @@ describe("decideGate - gate decision", () => {
 
   test("fails on unclassified classification", () => {
     // Synthesize an unclassified detection (e.g. adapter-failure scenario)
-    const fake: ReturnType<typeof classifyLine>[number] = {
+    // decideGate accepts the wider Detection type; construct a valid
+    // unclassified Detection without type suppression.
+    const fake: Detection = {
       text: "",
       lineNumber: 0,
       filePath: "x.md",
@@ -245,8 +273,7 @@ describe("decideGate - gate decision", () => {
       file: "x.md",
       category: "unclassified-entry",
     };
-    // decideGate accepts the wider Detection type
-    const r = decideGate([fake as any]);
+    const r = decideGate([fake]);
     expect(r.pass).toBe(false);
     expect(r.errors.length).toBe(1);
   });
@@ -319,5 +346,118 @@ describe("TS-007/008: projection separation", () => {
       expect(d[0]!.classification).toBe("producer-internal");
       expect(d[0]!.projection).toBe(p);
     }
+  });
+});
+
+describe("DEC-NNN detection (Oracle finding 3)", () => {
+  test("flags DEC-014 as producer-internal", () => {
+    const d = classifyLine({
+      text: "per DEC-014 decision 2",
+      lineNumber: 1,
+      filePath: "src/opencode/commands/agentdev/sample.md",
+      projection: "source",
+    });
+    const ids = d.filter((x) => x.category === "concrete-id");
+    expect(ids.length).toBe(1);
+    expect(ids[0]!.matched).toBe("DEC-014");
+    expect(ids[0]!.classification).toBe("producer-internal");
+  });
+
+  test("flags DEC-001, DEC-006, DEC-014 alike", () => {
+    for (const dec of ["DEC-001", "DEC-006", "DEC-014"]) {
+      const d = classifyLine({
+        text: `ref ${dec} here`,
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      });
+      const ids = d.filter((x) => x.matched === dec);
+      expect(ids.length).toBe(1);
+    }
+  });
+
+  test("does not flag DEC-{N} template form", () => {
+    const d = classifyLine({
+      text: "template DEC-{N} form",
+      lineNumber: 1,
+      filePath: "x.md",
+      projection: "source",
+    });
+    const ids = d.filter((x) => x.category === "concrete-id");
+    expect(ids.length).toBe(0);
+  });
+});
+
+describe("docs/decisions/ path detection", () => {
+  test("flags concrete docs/decisions/DEC-014.md path", () => {
+    const d = classifyLine({
+      text: "see docs/decisions/DEC-014.md",
+      lineNumber: 1,
+      filePath: "x.md",
+      projection: "source",
+    });
+    const paths = d.filter((x) => x.category === "concrete-path");
+    expect(paths.length).toBe(1);
+    expect(paths[0]!.matched).toBe("docs/decisions/DEC-014.md");
+  });
+});
+
+describe("resolveCandidate pipeline (Oracle finding 3)", () => {
+  test("ID candidates resolve to producer-internal", () => {
+    const r = resolveCandidate({ type: "id", value: "REQ-015" });
+    expect(r.classification).toBe("producer-internal");
+    expect(r.category).toBe("concrete-id");
+  });
+
+  test("concrete path candidates resolve to producer-internal", () => {
+    const r = resolveCandidate({ type: "path", value: "docs/specs/foo.md" });
+    expect(r.classification).toBe("producer-internal");
+  });
+
+  test("template path candidates resolve to generic-or-template", () => {
+    const r = resolveCandidate({ type: "path", value: "docs/specs/<x>.md" });
+    expect(r.classification).toBe("generic-or-template");
+  });
+
+  test("docs URL resolves to producer-internal", () => {
+    const r = resolveCandidate({
+      type: "url",
+      value: "github.com/yogata/agent-dev-flow/blob/main/docs/specs/foo.md",
+    });
+    expect(r.classification).toBe("producer-internal");
+  });
+
+  test("external URL resolves to consumer-resolvable", () => {
+    const r = resolveCandidate({
+      type: "url",
+      value: "github.com/sst/opencode/blob/main/packages/foo.ts",
+    });
+    expect(r.classification).toBe("consumer-resolvable");
+  });
+});
+
+describe("isTextFile (Oracle finding 2: all text artifacts)", () => {
+  test("recognizes .md as text", () => {
+    expect(isTextFile("foo.md")).toBe(true);
+  });
+  test("recognizes .yaml, .json, .ps1, .ts as text", () => {
+    expect(isTextFile("data.yaml")).toBe(true);
+    expect(isTextFile("config.json")).toBe(true);
+    expect(isTextFile("install.ps1")).toBe(true);
+    expect(isTextFile("script.ts")).toBe(true);
+  });
+  test("recognizes extensionless files as text (README, LICENSE)", () => {
+    expect(isTextFile("README")).toBe(true);
+    expect(isTextFile("LICENSE")).toBe(true);
+  });
+  test("recognizes binary extensions", () => {
+    expect(isTextFile("logo.png")).toBe(false);
+    expect(isTextFile("archive.zip")).toBe(false);
+    expect(isTextFile("data.lockb")).toBe(false);
+  });
+  test("TEXT_EXTENSIONS includes key types", () => {
+    expect(TEXT_EXTENSIONS.has(".md")).toBe(true);
+    expect(TEXT_EXTENSIONS.has(".yaml")).toBe(true);
+    expect(TEXT_EXTENSIONS.has(".ps1")).toBe(true);
   });
 });

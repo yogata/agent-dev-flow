@@ -56,10 +56,10 @@ describe("evaluateWriteContent - write tool gate", () => {
       expect(pathHit!.matched).toBe("docs/requirements/REQ-0149.md");
     }
   });
-  test("blocks write introducing fixed URL", () => {
+  test("blocks write introducing producer-internal docs URL", () => {
     const r = evaluateWriteContent(
       "src/opencode/commands/agentdev/sample.md",
-      "see https://github.com/yogata/agent-dev-flow/blob/main/x.md",
+      "see https://github.com/yogata/agent-dev-flow/blob/main/docs/specs/foo.md",
     );
     expect(r.ok).toBe(false);
   });

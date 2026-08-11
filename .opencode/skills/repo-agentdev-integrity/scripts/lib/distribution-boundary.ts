@@ -96,21 +96,30 @@ export interface GateResult {
 // Detection patterns (shared with the legacy checker via re-export/adapter)
 // ---------------------------------------------------------------------------
 
-// Concrete IDs: ADR-NNNN, REQ-NNNN (3 or 4 digits). Excludes ADR-{NNNN},
-// REQ-{NNNN}, ADR-*, etc. via the negative-shape of the digit class.
-export const CONCRETE_ID_PATTERN = /\b(ADR|REQ)-\d{3,4}\b/g;
+// Pipeline-stage 1 patterns: candidate extraction. These broad patterns
+// capture everything that MIGHT be a producer-internal reference. The
+// resolution stage (resolveCandidate) decides the actual classification.
+//
+// IDs: ADR-NNNN, REQ-NNNN, DEC-NNN (1-4 digits). Template/glob forms
+// ({NNNN}, <NNNN>, *) do not match because \d requires actual digits.
+export const CONCRETE_ID_PATTERN = /\b(ADR|REQ|DEC)-\d{1,4}\b/g;
 
-// Candidate concrete docs paths. We match any docs/{adr,requirements,specs}/...
-// path token and then decide whether it is a concrete file or a template.
+// Candidate docs paths. We extract any docs/(adr|requirements|specs|decisions)
+// path token, then the resolution stage decides concrete vs template/glob.
 export const DOCS_PATH_PATTERN =
-  /docs\/(adr|requirements|specs)\/[^\s)\]\|\\"'`<>{}]+/g;
+  /docs\/(adr|requirements|specs|decisions)\/[^\s)\]\|\\"'`<>{}]+/g;
 
-// Fixed URLs that point at a specific blob/raw of this repo. Owner/repo kept
-// generic so the rule travels if the self-host repo is renamed.
-export const FIXED_URL_PATTERN =
-  /github\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/(blob|raw)\//g;
-export const RAW_FIXED_URL_PATTERN =
-  /raw\.githubusercontent\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\//g;
+// Candidate GitHub URLs (blob/raw). ALL such URLs are extracted as candidates;
+// the resolution stage checks whether the URL path contains /docs/ to
+// distinguish producer-internal (points at this repo's docs) from
+// consumer-resolvable (external reference). Per Oracle finding 3: do not
+// classify unrelated external GitHub blob URLs as producer-internal.
+export const URL_CANDIDATE_PATTERN =
+  /(?:github\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/(?:blob|raw)\/|raw\.githubusercontent\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/)[^\s)\]\\"'`<>{}]+/g;
+
+// Backward-compat re-exports (legacy code may import these names).
+export const FIXED_URL_PATTERN = URL_CANDIDATE_PATTERN;
+export const RAW_FIXED_URL_PATTERN = URL_CANDIDATE_PATTERN;
 
 // ---------------------------------------------------------------------------
 // Helpers (pure)
@@ -140,7 +149,53 @@ function trimSnippet(line: string, maxLen: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// Classification
+// Pipeline: extract → resolve → classify
+// ---------------------------------------------------------------------------
+
+export type CandidateType = "id" | "path" | "url";
+
+export interface Candidate {
+  readonly type: CandidateType;
+  readonly value: string;
+}
+
+// Pipeline-stage 2: resolve a single candidate in consumer context.
+// Returns the classification and detection category for gate decision.
+export function resolveCandidate(c: Candidate): {
+  classification: DependencyClass;
+  category: DetectionCategory;
+} {
+  if (c.type === "id") {
+    return { classification: "producer-internal", category: "concrete-id" };
+  }
+  if (c.type === "path") {
+    if (isConcreteDocsPath(c.value)) {
+      return { classification: "producer-internal", category: "concrete-path" };
+    }
+    return { classification: "generic-or-template", category: "concrete-path" };
+  }
+  // url: only producer-internal if the URL path contains /docs/.
+  // External GitHub URLs (to other repos, code paths, etc.) are
+  // consumer-resolvable (Oracle finding 3).
+  if (/\/docs\//.test(c.value)) {
+    return { classification: "producer-internal", category: "fixed-url" };
+  }
+  return { classification: "consumer-resolvable", category: "fixed-url" };
+}
+
+function extractCandidates(line: string): Candidate[] {
+  const out: Candidate[] = [];
+  const idMatches = line.match(CONCRETE_ID_PATTERN);
+  if (idMatches) for (const m of idMatches) out.push({ type: "id", value: m });
+  const pathMatches = line.match(DOCS_PATH_PATTERN);
+  if (pathMatches) for (const m of pathMatches) out.push({ type: "path", value: m });
+  const urlMatches = line.match(URL_CANDIDATE_PATTERN);
+  if (urlMatches) for (const m of urlMatches) out.push({ type: "url", value: m });
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Classification (public API: uses pipeline internally)
 // ---------------------------------------------------------------------------
 
 /**
@@ -162,44 +217,19 @@ export function classifyLine(input: LineInput): readonly Detection[] {
     snippet: trimSnippet(line, 200),
   };
 
-  // Fixed URL check (never exempted by template hints; URLs are not templated).
-  const urlMatches = line.match(FIXED_URL_PATTERN) || line.match(RAW_FIXED_URL_PATTERN);
-  if (urlMatches) {
-    for (const m of urlMatches) {
+  const candidates = extractCandidates(line);
+  for (const c of candidates) {
+    const resolved = resolveCandidate(c);
+    // Only emit detections for non-allowed classifications.
+    // consumer-resolvable and generic-or-template do not produce Detection
+    // records (they pass the gate silently).
+    if (resolved.classification === "producer-internal") {
       out.push({
         ...base,
-        classification: "producer-internal",
-        matched: m,
-        category: "fixed-url",
+        classification: resolved.classification,
+        matched: c.value,
+        category: resolved.category,
       });
-    }
-  }
-
-  // Concrete ID check.
-  const idMatches = line.match(CONCRETE_ID_PATTERN);
-  if (idMatches) {
-    for (const m of idMatches) {
-      out.push({
-        ...base,
-        classification: "producer-internal",
-        matched: m,
-        category: "concrete-id",
-      });
-    }
-  }
-
-  // Concrete docs path check.
-  const pathCandidates = line.match(DOCS_PATH_PATTERN);
-  if (pathCandidates) {
-    for (const candidate of pathCandidates) {
-      if (isConcreteDocsPath(candidate)) {
-        out.push({
-          ...base,
-          classification: "producer-internal",
-          matched: candidate,
-          category: "concrete-path",
-        });
-      }
     }
   }
 
@@ -259,4 +289,51 @@ export function decideGate(detections: readonly Detection[]): GateResult {
     errors,
     projection,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Text/binary distinction (Oracle finding 2: scan ALL text artifacts, not
+// just .md). Deterministic extension-based classification. Files with unknown
+// or missing extensions are treated as text (conservative: scan rather than
+// skip, per DEC-014 decision 5 "errors are gate-not-passed, not clean").
+// ---------------------------------------------------------------------------
+
+export const TEXT_EXTENSIONS = new Set([
+  ".md", ".markdown", ".txt", ".text",
+  ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts",
+  ".yaml", ".yml",
+  ".json", ".jsonc",
+  ".ps1", ".psm1", ".psd1",
+  ".sh", ".bash", ".zsh",
+  ".py",
+  ".rs",
+  ".go",
+  ".xml", ".html", ".htm", ".css", ".scss", ".sass",
+  ".toml", ".ini", ".cfg", ".conf",
+  ".gitignore", ".gitattributes",
+  ".env",
+]);
+
+export const BINARY_EXTENSIONS = new Set([
+  ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".tiff", ".svgz",
+  ".pdf",
+  ".zip", ".gz", ".tar", ".tgz", ".bz2", ".7z", ".rar",
+  ".exe", ".dll", ".so", ".dylib", ".bin",
+  ".class", ".jar",
+  ".woff", ".woff2", ".ttf", ".otf", ".eot",
+  ".mp3", ".mp4", ".avi", ".mov", ".webm",
+  ".lockb", ".bin",
+  ".DS_Store",
+]);
+
+export function isTextFile(filename: string): boolean {
+  const lower = filename.toLowerCase();
+  // Files with no extension: treat as text (README, LICENSE, Makefile, etc.)
+  const lastDot = lower.lastIndexOf(".");
+  if (lastDot < 0) return true;
+  const ext = lower.slice(lastDot);
+  if (BINARY_EXTENSIONS.has(ext)) return false;
+  if (TEXT_EXTENSIONS.has(ext)) return true;
+  // Unknown extension: treat as text (conservative scan per DEC-014 D5).
+  return true;
 }
