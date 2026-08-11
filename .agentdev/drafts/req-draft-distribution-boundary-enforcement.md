@@ -2,8 +2,10 @@
 draft_type: req_draft
 topic_slug: distribution-boundary-enforcement
 status: saved
+spec_consumed: true
 created_at: 2026-08-11T00:00:00+09:00
 saved_at: 2026-08-11T22:03:56.403+09:00
+spec_saved_at: 2026-08-11T22:03:56.403+09:00
 source_rus: []
 ---
 
@@ -1142,7 +1144,14 @@ operation_units:
     depends_on: [OU-001, OU-005]
     recommended_order: 3
     issue_policy: single
-    result: {}
+    result:
+      saved_docs:
+        - docs/specs/integrity/distribution-boundary.md
+      action_mapping:
+        ACT-SPEC-001: docs/specs/integrity/distribution-boundary.md
+      initial_status: draft
+      spec_logical_division: 規範
+      canonical_owner_declared: true
 
   - ou_id: OU-007
     target_spec:
@@ -1169,7 +1178,49 @@ operation_units:
     recommended_order: 4
     issue_policy: single
     non_overlap_boundary: "全 UPDATE 対象は OU-006 で作成した新 SPEC を参照する。既存節を実ファイルから解決して UPDATE する。"
-    result: {}
+    result:
+      saved_docs:
+        - docs/specs/foundations/project-extensions.md
+        - docs/specs/foundations/harness-separation-model.md
+        - docs/specs/local/runtime-package-boundary.md
+        - docs/specs/integrity/integrity-contracts.md
+        - docs/specs/integrity/rules/IR-059-distribution-reference-boundary.md
+        - docs/specs/integrity/integrity-rule-catalog.md
+        - docs/specs/integrity/rule-ownership.md
+        - docs/specs/responsibilities/req-impact-map.md
+        - docs/specs/integrity/docs-spec-rebuild-integrity.md
+        - docs/specs/skills/agentdev-skill-authoring.md
+        - docs/specs/skills/agentdev-command-authoring.md
+        - docs/specs/commands/case-run.md
+        - docs/specs/commands/case-close.md
+        - docs/specs/responsibilities/document-type-responsibilities.md
+        - docs/specs/responsibilities/artifact-contracts.md
+        - docs/specs/foundations/design-principles.md
+        - docs/specs/foundations/patterns.md
+      action_mapping:
+        ACT-SPEC-002: docs/specs/foundations/project-extensions.md
+        ACT-SPEC-003: docs/specs/foundations/harness-separation-model.md
+        ACT-SPEC-004: docs/specs/local/runtime-package-boundary.md
+        ACT-SPEC-005: docs/specs/integrity/integrity-contracts.md
+        ACT-SPEC-006: docs/specs/integrity/rules/IR-059-distribution-reference-boundary.md
+        ACT-SPEC-007: docs/specs/integrity/integrity-rule-catalog.md
+        ACT-SPEC-008: docs/specs/integrity/rule-ownership.md
+        ACT-SPEC-009: docs/specs/responsibilities/req-impact-map.md
+        ACT-SPEC-010: docs/specs/integrity/docs-spec-rebuild-integrity.md
+        ACT-SPEC-011: docs/specs/skills/agentdev-skill-authoring.md
+        ACT-SPEC-012: docs/specs/skills/agentdev-command-authoring.md
+        ACT-SPEC-013: docs/specs/commands/case-run.md
+        ACT-SPEC-014: docs/specs/commands/case-close.md
+        ACT-SPEC-015: docs/specs/responsibilities/document-type-responsibilities.md
+        ACT-SPEC-016: docs/specs/responsibilities/artifact-contracts.md
+        ACT-SPEC-017: docs/specs/foundations/design-principles.md
+        ACT-SPEC-018: docs/specs/foundations/patterns.md
+      target_area_resolution:
+        single_match: 15
+        no_match_added_note: 2  # ACT-SPEC-006 (IR-059 combined sections) and ACT-SPEC-010 (docs-spec-rebuild combined sections) target_area combined multiple headings; applied to closest matching section / top-of-file note
+      ir059_related_req_updated: REQ-002 -> REQ-029
+      ir059_related_spec_updated: added distribution-boundary.md
+      index_readme_updated: docs/specs/README.md
 
   - ou_id: OU-008
     operation: implementation
