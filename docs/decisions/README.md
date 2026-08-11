@@ -9,7 +9,7 @@
 個別 REQ/SPEC は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は11件、提案中の Decision は1件である。
+現行の承認済み Decision は11件、提案中の Decision は2件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -28,6 +28,7 @@
 | DEC-011 | STEP resume point と会話記憶非依存 | accepted | 2026-08-10 |
 | DEC-012 | Extension を file-kind から workflow/capability responsibility へ再編 | accepted | 2026-08-10 |
 | DEC-013 | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 | accepted | 2026-08-11 |
+| DEC-014 | 配布依存境界の多層 enforcement | proposed | 2026-08-11 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -57,6 +58,7 @@
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
 - [DEC-008](DEC-008.md)（case-auto の限定的親判断解決（bounded parent decision resolution））
+- [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -86,6 +88,7 @@
 - [DEC-006](DEC-006.md)（inspect 3-command 構成への正規化、extension 検査の3層責務分離）
 - [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
 - [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
+- [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement、IR-059 範囲と enforcement 経路の変更）
 
 ### ワークフロー・委譲契約
 
@@ -115,6 +118,9 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-013 | relates-to | DEC-001 | 新規統制追加原則（決定4）との整合。本 Decision は lifecycle/enforcement の削除と新規存在条件の導入を伴う |
 | DEC-013 | relates-to | DEC-006 | 意味検査移管（RU-IR-007）は DEC-006 の適用範囲拡張ではなく REQ-010-003/004/018..028 の一般原則の適用 |
 | DEC-013 | relates-to | DEC-009 | REQ-010-053..057 RETIRE は DEC-009 CR-001（ADR→Decision 移行の ID 変更例外）の適用外、欠番維持 |
+| DEC-014 | relates-to | DEC-001 決定4 | 配布依存境界の多層 enforcement に対する新規統制追加原則の7条件立証 |
+| DEC-014 | relates-to | DEC-006 | DEC-006 の inspect 3-command 正規化と IR-056 の Project Extensions 検査分離を維持しつつ、IR-059 の範囲と経路を変更する後続決定。DEC-006 全体を置換しない |
+| DEC-014 | relates-to | DEC-013 | IR 存在条件モデルに従い、IR-059 の範囲変更を本 Decision で確定 |
 
 ## 関連 REQ
 
@@ -133,6 +139,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-011 | [REQ-005](../requirements/REQ-005.md) | STEP resume point と会話記憶非依存（AG-004、AG-005、REQ-005-024 追記） |
 | DEC-012 | [REQ-002](../requirements/REQ-002.md) | Extension を file-kind から workflow/capability responsibility へ再編（AG-008、REQ-002-030/031 意味変更） |
 | DEC-013 | [REQ-028](../requirements/REQ-028.md), [REQ-010](../requirements/REQ-010.md) | IR 登録モデルの簡素化（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化、REQ-010-053..057 RETIRE、REQ-010-058 UPDATE） |
+| DEC-014 | [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-010](../requirements/REQ-010.md), [REQ-009](../requirements/REQ-009.md) | 配布依存境界の多層 enforcement（REQ-029 新設、REQ-002 縮約、REQ-010-060 最終保証 gate、REQ-009-045 release artifact 境界、IR-059 範囲と source/save/complete/release 経路変更） |
 
 ## 過去版の履歴基盤
 
