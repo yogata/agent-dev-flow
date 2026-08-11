@@ -26,6 +26,7 @@ param(
 #   3  archive already exists and -Force was not supplied
 #   6  archive projection boundary check failed (no final archive produced)
 #   7  archive-installed projection boundary check failed (final archive removed)
+#   8  boundary checker missing (fail-closed, Oracle finding 6)
 
 $ErrorActionPreference = "Stop"
 
@@ -117,17 +118,18 @@ if (Test-Path -LiteralPath $readmeInstall) {
 # producer-internal reference in the staged text artifacts, we MUST NOT
 # produce a final archive. Cleanup is unconditional on failure.
 $boundaryChecker = Join-Path $repoRoot ".opencode\skills\repo-agentdev-integrity\scripts\check_distribution_boundary.ts"
-if (Test-Path -LiteralPath $boundaryChecker) {
-    Write-Host "package-release-archive: running archive projection boundary check on staged content"
-    & bun run $boundaryChecker --profile archive $archiveRoot --json 2>&1 | Tee-Object -Variable archiveCheckOut | Out-Host
-    $archiveCheckExit = $LASTEXITCODE
-    if ($archiveCheckExit -ne 0) {
-        Write-Warning "package-release-archive: archive projection boundary check failed (exit $archiveCheckExit). Removing staging; no final archive will be produced."
-        Remove-Item -LiteralPath $archiveRoot -Recurse -Force -ErrorAction SilentlyContinue
-        exit 6
-    }
-} else {
-    Write-Warning "package-release-archive: boundary checker not found at $boundaryChecker; skipping archive projection check."
+if (-not (Test-Path -LiteralPath $boundaryChecker)) {
+    Write-Warning "package-release-archive: boundary checker not found at $boundaryChecker. Fail-closed per Oracle finding 6."
+    Remove-Item -LiteralPath $archiveRoot -Recurse -Force -ErrorAction SilentlyContinue
+    exit 8
+}
+Write-Host "package-release-archive: running archive projection boundary check on staged content"
+& bun run $boundaryChecker --profile archive $archiveRoot --json 2>&1 | Tee-Object -Variable archiveCheckOut | Out-Host
+$archiveCheckExit = $LASTEXITCODE
+if ($archiveCheckExit -ne 0) {
+    Write-Warning "package-release-archive: archive projection boundary check failed (exit $archiveCheckExit). Removing staging; no final archive will be produced."
+    Remove-Item -LiteralPath $archiveRoot -Recurse -Force -ErrorAction SilentlyContinue
+    exit 6
 }
 
 if (Test-Path -LiteralPath $archiveZip) {
