@@ -143,12 +143,17 @@ Consumer プロジェクトで独自 command/skill を追加する際の命名�
 
 ## 導入方式ポリシー（Installation Method Policy）
 
+通常の consumer 導入は symlink または junction ベースの link mode を推奨する（REQ-009-009）。具体化された release archive は別個の配布および検証 projection であり、REQ-009-045 が別途正規所有する。copy 型インストールと npm/package 化は対象外を維持し、release archive を通常の copy インストールの延長として扱わない。
+
+配布依存境界の検出契約（link projection と archive projection の区別、projection ごとの検査、検査エラーの取扱い）は `integrity/distribution-boundary.md` が正規所有する（REQ-029、DEC-014）。
+
 | 方式 | 状態 | 推奨度 | 備考 |
 |--------|--------|--------|------|
 | Symlink / ジャンクション | 対応済み | **推奨** | 更新自動反映、原本単一管理 |
 | Copy | 対応済み | 非推奨 | 手動更新必要、乖離リスク |
 | Git submodule | 検討可能 | 実験的 | 複雑性増加 |
 | Plugin / npm / package | 未対応 | - | REQ-002-064 参照 |
+| Release archive projection | 別投影 | 別投影 | REQ-009-045、copy インストールの延長ではない |
 
 ### Symlink / ジャンクションの制約
 
