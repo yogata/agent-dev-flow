@@ -62,6 +62,8 @@ IR-NNN（個別 integrity rule）の `regression_test` フィールドは以下�
 各ルールの15フィールド詳細は [rules/](rules/) サブディレクトリの個別ファイル `IR-NNN-{slug}.md` を参照（v2:REQ-0155-007 局所物理分離、REQ-001-008）。
 catalog はスキーマ定義とインデックスを維持する。
 
+IR-059（distribution-reference-boundary）の canonical 参照は REQ-029 と `integrity/distribution-boundary.md` へ更新済みである。従来 REQ-002-021..026、032 に紐づいていた配布物参照境界の検出脈絡は MOVE 先（REQ-029-001..008）へ集約し、REQ-002-028、029、035 の作業由来品質検査参照は RETIRE 扱いとして catalog から除去した。
+
 IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 から `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。直接編集は行わない。
 
 <!-- AUTOGEN:BEGIN:id=catalog-ir-entries-pre-045 -->
