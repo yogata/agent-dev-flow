@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 27件、廃止済み: 0件
+現行 REQ: 28件、廃止済み: 0件
 <!-- AUTOGEN:END -->
 
-現行要件は REQ-001 から REQ-027 の27件である。各 REQ の詳細は各 REQ ファイル本文を参照。
+現行要件は REQ-001 から REQ-028 の28件である。各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
 |---|---|
@@ -40,12 +40,13 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-025](requirements/REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
 | [REQ-026](requirements/REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
 | [REQ-027](requirements/REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
+| [REQ-028](requirements/REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
 
 - [要件インデックス](requirements/README.md)
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-012 の12件である（DEC-008 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
+現行 Decision は DEC-001 から DEC-013 の13件である（DEC-008 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
 |---|---|
@@ -61,6 +62,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-010](decisions/DEC-010.md) | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則 |
 | [DEC-011](decisions/DEC-011.md) | STEP resume point と会話記憶非依存 |
 | [DEC-012](decisions/DEC-012.md) | Extension を file-kind から workflow/capability responsibility へ再編 |
+| [DEC-013](decisions/DEC-013.md) | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 |
 
 ## 仕様（SPEC）
 

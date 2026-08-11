@@ -9,7 +9,7 @@
 個別 REQ/SPEC は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は10件、提案中の Decision は1件である。
+現行の承認済み Decision は11件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -27,6 +27,7 @@
 | DEC-010 | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則 | accepted | 2026-08-10 |
 | DEC-011 | STEP resume point と会話記憶非依存 | accepted | 2026-08-10 |
 | DEC-012 | Extension を file-kind から workflow/capability responsibility へ再編 | accepted | 2026-08-10 |
+| DEC-013 | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 | accepted | 2026-08-11 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -49,6 +50,7 @@
 - [DEC-010](DEC-010.md)（Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則）
 - [DEC-011](DEC-011.md)（STEP resume point と会話記憶非依存）
 - [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
+- [DEC-013](DEC-013.md)（IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
@@ -91,6 +93,10 @@
 - [DEC-008](DEC-008.md)（case-auto の限定的親判断解決、bounded parent decision resolution）
 - [DEC-011](DEC-011.md)（STEP resume point と会話記憶非依存）
 
+### 整合性・IR 体系
+
+- [DEC-013](DEC-013.md)（IR 登録モデルの簡素化、tombstone 廃止 + lifecycle/enforcement/baseline_status 除去）
+
 Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 
 | Decision | 関係 | 対象 | 説明 |
@@ -106,6 +112,9 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-008 | relates-to | DEC-001 | case-auto 自走境界（決定4）の適用範囲内で bounded parent decision resolution を確定 |
 | DEC-008 | relates-to | v2:ADR-0112, v2:ADR-0138 | case-auto 判断委譲に関する過去版合意履歴 |
 | DEC-009 | relates-to | v2:ADR-* | ADR から Decision への正規成果物モデル移行。過去版参照は v2:ADR-* のまま維持（AG-010） |
+| DEC-013 | relates-to | DEC-001 | 新規統制追加原則（決定4）との整合。本 Decision は lifecycle/enforcement の削除と新規存在条件の導入を伴う |
+| DEC-013 | relates-to | DEC-006 | 意味検査移管（RU-IR-007）は DEC-006 の適用範囲拡張ではなく REQ-010-003/004/018..028 の一般原則の適用 |
+| DEC-013 | relates-to | DEC-009 | REQ-010-053..057 RETIRE は DEC-009 CR-001（ADR→Decision 移行の ID 変更例外）の適用外、欠番維持 |
 
 ## 関連 REQ
 
@@ -123,6 +132,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-010 | [REQ-002](../requirements/REQ-002.md), [REQ-027](../requirements/REQ-027.md) | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則（AG-003、AG-007、REQ-002-001〜004 意味変更） |
 | DEC-011 | [REQ-005](../requirements/REQ-005.md) | STEP resume point と会話記憶非依存（AG-004、AG-005、REQ-005-024 追記） |
 | DEC-012 | [REQ-002](../requirements/REQ-002.md) | Extension を file-kind から workflow/capability responsibility へ再編（AG-008、REQ-002-030/031 意味変更） |
+| DEC-013 | [REQ-028](../requirements/REQ-028.md), [REQ-010](../requirements/REQ-010.md) | IR 登録モデルの簡素化（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化、REQ-010-053..057 RETIRE、REQ-010-058 UPDATE） |
 
 ## 過去版の履歴基盤
 

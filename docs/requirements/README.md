@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下27件を第一参照先とする。
+現在の要件判断では、以下28件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -39,6 +39,7 @@
 | [REQ-025](REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
 | [REQ-026](REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
 | [REQ-027](REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
+| [REQ-028](REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
