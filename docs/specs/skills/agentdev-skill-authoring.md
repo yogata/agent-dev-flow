@@ -139,3 +139,7 @@ consumer が soft guard より強い制御を望む場合、`opencode.json` の 
 
 skill 段階的開示の基準（SKILL.md は目的/USE FOR/入出力/副作用/責任境界/不変条件/判断順序/reference 選択条件/script-template 入口を保持、詳細 schema/判定表/正規表現/具体例/例外回復/harness 起動は references へ分離、原則200行以内、reference 選択表の必須配置、通常経路で全 reference 無条件読込しない）を REQ-002-014/015 と整合して明記する。詳細 normative は移行計画 §9.2, §9.3, §9.5, §9.6。
 
+### 執筆時 prevention（配布依存境界）
+
+skill authoring は producer 内部参照、docs 内部パス、具体 ID（`REQ-NNNN`、`DEC-NNN`、`IR-NN`）の配布物本文への混入を未然に防ぐことを執筆時 prevention として案内する（REQ-029、`integrity/distribution-boundary.md`）。本 prevention は新規 REQ 行を新設せず、既存の skill 構造基準と協調して機能する。検出契約と最終 gate は REQ-010-060 を参照する。
+

@@ -67,3 +67,7 @@ Command authoring は公開interface と workflow dispatch のみを Command に
 
 command authoring SPEC の frontmatter 例、DoD、fixture 指針を description 単一契約へ更新する。command 薄型化の基準（入力/出力/高レベル工程/副作用境界/QG/停止条件/承認境界/委譲境界は command 残置、詳細分類表/script CLI例/正規表現/prompt 全文/未採用候補は skill/reference 移管、150行以内・主要7command は100〜140行）を REQ-002-001..004 と整合して明記する。詳細 normative は移行計画 §5.2, §8.1。
 
+### 執筆時 prevention（配布依存境界）
+
+command authoring は producer 内部参照、docs 内部パス、具体 ID（`REQ-NNNN`、`DEC-NNN`、`IR-NN`）の配布物本文への混入を未然に防ぐことを執筆時 prevention として案内する（REQ-029、`integrity/distribution-boundary.md`）。本 prevention は新規 REQ 行を新設せず、既存の command 構造基準と協調して機能する。検出契約と最終 gate は REQ-010-060 を参照する。
+
