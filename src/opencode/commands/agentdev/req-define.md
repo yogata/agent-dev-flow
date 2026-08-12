@@ -87,7 +87,7 @@ CREATE 前に APPEND/UPDATE 候補を必ず評価すること。
 
 テンプレート: `.opencode/commands/agentdev/templates/req-define/req-draft.md` を Read → 構造化 `draft-data` 形式に従って生成。原本は構造化された `# draft-data` fenced YAML block。Step 6-2/5-3 で分離した SPEC 候補は `artifact_actions`（`artifact: spec`）として統合し `## SPEC候補` 補助セクションは出力しない。保存対象は単一の `artifact_actions` 配列に統合する
 
-各副ステップ（7-1: 定義完全性ゲート QG-1、7-2: operation_units 生成、7-2a: depends_on/recommended_order 定義、7-3: artifact_actions 生成、7-3a: target_area/content 形式、7-3b: SPEC action 分類根拠出力、7-4: test_strategy 生成、7-5: review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command SPEC（extension 経由）の各フィールドスキーマを参照。`target_spec`、`spec_logical_division`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 SPEC を正とする
+各副ステップ（7-1: 定義完全性ゲート QG-{N}、7-2: operation_units 生成、7-2a: depends_on/recommended_order 定義、7-3: artifact_actions 生成、7-3a: target_area/content 形式、7-3b: SPEC action 分類根拠出力、7-4: test_strategy 生成、7-5: review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command SPEC（extension 経由）の各フィールドスキーマを参照。`target_spec`、`spec_logical_division`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 SPEC を正とする
 
 ### Step 8: work_type 判定
 
@@ -147,6 +147,6 @@ Step 9（Scale判断: feature）または Step 8（work_type 判定: feature 以
 - G15: SPEC 分離基準に該当する要件行候選は REQ 要件行に残留させず、`draft-data` の `artifact_actions`（`artifact: spec`）へ分離すること。安定契約例外は分離対象外
 - G16: Decision判断が必要な変更（Decision要否確認ゲート）では Decision 判断前に `agentdev-architecture-advisory` を参照する。アーキテクチャ助言サブエージェントは Decision 要否、推奨方向、設計リスク、根拠を返し、最終的な Decision 作成判断は親エージェントが行う
 - G17: アーキテクチャ助言サブエージェントの助言は親エージェントが分類し、未確認事項を要件本文へ混入させない。同サブエージェントはファイル編集主体ではない
-- G19: test strategy 項目は verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に持つこと（REQ）。on_failure（不合格時の処置）を持たない検証項目は test strategy に含めないこと（REQ）。3要素のいずれかが欠落する項目を検出した場合、保存前に QG-1 が fail として扱う（REQ）
+- G19: test strategy 項目は verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に持つこと（REQ）。on_failure（不合格時の処置）を持たない検証項目は test strategy に含めないこと（REQ）。3要素のいずれかが欠落する項目を検出した場合、保存前に QG-{N} が fail として扱う（REQ）
 
 
