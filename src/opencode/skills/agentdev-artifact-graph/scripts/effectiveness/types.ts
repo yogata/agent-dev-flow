@@ -1,6 +1,6 @@
 // effectiveness/types.ts — Workflow effectiveness comparison harness types.
 //
-// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS-010）。
+// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS\u002D010）。
 // Parser/Graph regression は REQ-{NNNN} が所有し、本 harness は取り扱わない。
 // Graph 固有の parser/augmentation/extraction 回帰検証は effectiveness/ ではなく
 // 既存の tests/*.test.ts および REQ-{NNNN} 傘下の検証層が独立に判断可能である。

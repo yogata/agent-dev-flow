@@ -134,7 +134,7 @@ export const DEFAULT_NODE_TYPE_RULES: readonly NodeTypeRule[] = [
   },
   {
     name: "specification",
-    path_pattern: "^docs/specs/<(?!.*README\\>.md$).+\\.md$",
+    path_pattern: "^docs/specs/(?!.*README\\.md$).+\\.md$",
     id_template: "specification:{path}",
     label_source: [
       { kind: "frontmatter_field", field: "title" },
