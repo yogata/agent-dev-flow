@@ -12,6 +12,9 @@ export {
   ExitCode,
   assertGitOid,
   InvalidOidError,
+  PathSafetyError,
+  GitBlobMissingError,
+  GitAdapterError,
 } from "./types.ts";
 export type {
   GitOid,
@@ -23,6 +26,7 @@ export type {
   ManifestEntry,
   ManifestSet,
   Projection,
+  SourceSubset,
   GitTreeEntry,
   TreeMode,
   Detection,
@@ -31,10 +35,12 @@ export type {
   DetectionCategory,
   TrustedFileDigest,
   ExitCodeValue,
+  PathSafetyReason,
 } from "./types.ts";
 
 export {
   TRUST_ROOT_DIRECT_PATHS,
+  TRUST_ROOT_DIR_REL,
   DEFAULT_PROTECTED_PATH_SET,
   listAllProtectedPaths,
   isProtectedPath,
@@ -60,15 +66,18 @@ export type {
 } from "./boundary-pipeline.ts";
 
 export {
-  buildSourceRuntimeManifest,
-  buildSourceBootstrapManifest,
+  buildSourceManifest,
   buildLinkManifest,
   buildArchiveManifest,
   buildArchiveInstalledManifest,
   diffManifests,
+  manifestEntryEquals,
   isRequiredRuntimePath,
   isRequiredBootstrapPath,
+  isRequiredArchiveExtraPath,
+  classifySourceSubset,
   mapRuntimeToLinkPath,
+  ManifestError,
 } from "./manifest.ts";
 export type { ManifestEntryInput, ManifestDiff } from "./manifest.ts";
 
@@ -79,16 +88,33 @@ export {
   parseLsTreeOutput,
   listTreeEntries,
   readBlob,
+  readBlobsBatched,
   makeProductionAdapter,
-  GitAdapterError,
 } from "./git-blob-reader.ts";
-export type { RawGitAdapter } from "./git-blob-reader.ts";
+export type { RawGitAdapter, BatchedReadResult } from "./git-blob-reader.ts";
 
 export {
-  buildArchiveFromBlobs,
-  verifyArchive,
-  publishArchiveAtomically,
-  computeSha256,
-  ArchiveBuilderError,
-} from "./archive-builder.ts";
+  prepareStagedArchive,
+  publishStagedArchive,
+  assertOutputContained,
+} from "./archive-publish.ts";
 export type { BlobSource, ExpectedEntry, VerifyResult } from "./archive-builder.ts";
+
+export { verifyArchiveInstalled } from "./archive-installed-verifier.ts";
+export type { VerifyInstalledInput, VerifyInstalledResult } from "./archive-installed-verifier.ts";
+
+export {
+  evaluateProtectedPolicy,
+  isBoundaryFailureFatal,
+} from "./launcher-policy.ts";
+export type { LauncherMode, PolicyDecision } from "./launcher-policy.ts";
+
+export {
+  checkProtectedPaths,
+} from "./protected-check.ts";
+export type {
+  ProtectedCheckResult,
+  ProtectedCheckAggregated,
+  ProtectedPathOutcome,
+  PerPathStatus,
+} from "./protected-check.ts";
