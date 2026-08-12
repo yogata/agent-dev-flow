@@ -55,7 +55,7 @@ $ProjectionDir = Join-Path $RepoRoot '.opencode'
 $CommandsDir = Join-Path $ProjectionDir 'commands'
 $SkillsDir = Join-Path $ProjectionDir 'skills'
 
-# Skill redirected to src/opencode-local/ in local mode (REQ-{NNNN}-{NNN}, ADR-{NNNN} decision #3)
+# Skill redirected to src/opencode-local/ in local mode (REQ-0103-158, ADR-0131 decision #3)
 $LocalModeRedirectSkill = 'agentdev-gh-cli'
 
 # --- Helper Functions ---
@@ -64,7 +64,7 @@ function Assert-ValidConsumerCwd {
     <#
     .SYNOPSIS
         実行ディレクトリが AgentDevFlow 導入先として適切か検査する。
-        想定外ディレクトリの場合、即座に停止する（REQ-{NNNN}-{NNN}）。
+        想定外ディレクトリの場合、即座に停止する（REQ-009-041）。
     #>
     $cwd = $PWD.Path
 
@@ -113,7 +113,7 @@ function Get-TargetSourcePath {
     .SYNOPSIS
         Resolve the absolute source path backing a projection relative path.
         When $DetectedLocalMode is true, skills\<LocalModeRedirectSkill> is redirected
-        to src/opencode-local/<LocalModeRedirectSkill>/ (REQ-{NNNN}-{NNN}, ADR-{NNNN} decision #3).
+        to src/opencode-local/<LocalModeRedirectSkill>/ (REQ-0103-158, ADR-0131 decision #3).
     #>
     param([string]$RelPath, [bool]$LocalMode)
     if ($LocalMode -and $RelPath -eq "skills\$LocalModeRedirectSkill") {
@@ -124,7 +124,7 @@ function Get-TargetSourcePath {
 
 # --- Main ---
 
-# cwd 安全化（REQ-{NNNN}-{NNN}）
+# cwd 安全化（REQ-009-041）
 Assert-ValidConsumerCwd
 
 Write-Host '=== Consumer Install Status Check ==='
