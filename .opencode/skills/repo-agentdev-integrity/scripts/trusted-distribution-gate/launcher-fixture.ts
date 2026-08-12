@@ -2,20 +2,33 @@
 //
 // Extracted from launcher.test.ts to keep that file under the 250 pure LOC
 // ceiling (parent defect #12). Each launcher test file imports from here.
+//
+// Test isolation (parent defect #11): all fixtures live under unique
+// os.tmpdir() mkdtemp directories, NEVER under process.cwd(). Each test
+// creates its own mkdtemp and cleans it up in finally. Tests must NEVER
+// create commits, gitlinks, or files in the parent worktree.
 
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import { execFileSync } from "child_process";
 
-export const TMP_ROOT = path.join(process.cwd(), ".worktrees-tmp-test-launcher");
-
-export function ensureTmpRoot(): void {
-  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
-  fs.mkdirSync(TMP_ROOT, { recursive: true });
+export interface FixtureRepo {
+  readonly repo: string;
+  /** Function to clean up the repo. Idempotent. */
+  readonly cleanup: () => void;
 }
 
-export function cleanupTmpRoot(): void {
-  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
+function rm(p: string): void {
+  try {
+    fs.rmSync(p, { recursive: true, force: true });
+  } catch {
+    /* already gone */
+  }
+}
+
+export function makeTmpDir(prefix: string): string {
+  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 
 export function writeFix(repo: string, rel: string, content: string): void {
@@ -42,19 +55,38 @@ export function deleteAndCommit(repo: string, rel: string): string {
   return headOid(repo);
 }
 
+// Trust-root modules committed in the fixture. Kept in sync with the
+// auto-enumeration in protected-paths.ts by ALSO auto-discovering at test
+// setup time, so a newly added module automatically appears here.
+const TRUST_DIR_REL =
+  ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate";
+const REPO_ROOT_FOR_DISCOVERY = path.resolve(
+  __dirname, "..", "..", "..", "..", "..",
+);
+
+function listTrustRootModules(): string[] {
+  const abs = path.join(REPO_ROOT_FOR_DISCOVERY, TRUST_DIR_REL);
+  const out: string[] = [];
+  for (const ent of fs.readdirSync(abs, { withFileTypes: true })) {
+    if (!ent.isFile()) continue;
+    if (!ent.name.endsWith(".ts")) continue;
+    if (ent.name.endsWith(".test.ts")) continue;
+    if (ent.name.endsWith(".d.ts")) continue;
+    out.push(ent.name);
+  }
+  return out.sort();
+}
+
 /**
  * Build a fixture repo mirroring the real repo's trust-root layout. Each
  * trust-root path mentioned in TRUST_ROOT_DIRECT_PATHS must be present at
  * the base commit so the launcher's protected-paths check finds them.
  */
 export function makeFixtureRepo(): string {
-  const repo = path.join(TMP_ROOT, `repo-${Math.random().toString(36).slice(2, 8)}`);
-  fs.mkdirSync(repo, { recursive: true });
+  const repo = makeTmpDir("trust-test-repo-");
   execFileSync("git", ["init", "-q", "-b", "main"], { cwd: repo });
   execFileSync("git", ["config", "user.email", "t@t"], { cwd: repo });
   execFileSync("git", ["config", "user.name", "t"], { cwd: repo });
-  // The fixture mirrors the real repo's deep trust-root path; on Windows
-  // the path length exceeds MAX_PATH unless core.longpaths is enabled.
   if (process.platform === "win32") {
     execFileSync("git", ["config", "core.longpaths", "true"], { cwd: repo });
   }
@@ -64,19 +96,40 @@ export function makeFixtureRepo(): string {
   writeFix(repo, "src/opencode/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
   writeFix(repo, "scripts/install-consumer-opencode.ps1", "# install\n");
   writeFix(repo, "scripts/check-consumer-opencode.ps1", "# check\n");
-  writeFix(repo, "scripts/install-from-archive.ps1", "# install-from-archive\n");
+  // install-from-archive.ps1 is needed by the archive-installed physical
+  // verifier (read from BASE oid) but is NOT a protected Stage A path
+  // (Stage B owns it). A minimal real installer works for the verifier.
+  writeFix(
+    repo,
+    "scripts/install-from-archive.ps1",
+    [
+      "[CmdletBinding()]",
+      "param(",
+      "  [Parameter(Mandatory=$true)][string]$Source,",
+      "  [Parameter(Mandatory=$true)][string]$Target,",
+      "  [Parameter(Mandatory=$true)][ValidateSet('copy')][string]$Mode",
+      ")",
+      "$ErrorActionPreference='Stop'",
+      "function Place($src,$dst){ $p=Split-Path -Parent $dst; if(-not(Test-Path $p)){New-Item -ItemType Directory -Path $p -Force|Out-Null} Copy-Item -LiteralPath $src -Destination $dst -Force }",
+      "$cmds=Join-Path $Source 'commands\\agentdev'; $skills=Join-Path $Source 'skills'",
+      "$cDst=Join-Path $Target 'commands\\agentdev'; $sDst=Join-Path $Target 'skills'",
+      "New-Item -ItemType Directory -Path $cDst -Force|Out-Null",
+      "New-Item -ItemType Directory -Path $sDst -Force|Out-Null",
+      "Get-ChildItem -LiteralPath $cmds -Recurse -File | ForEach-Object { $r=$_.FullName.Substring($cmds.Length).TrimStart('\\','/'); Place $_.FullName (Join-Path $cDst $r) }",
+      "Get-ChildItem -LiteralPath $skills -Directory | Where-Object { $_.Name -like 'agentdev-*' -or $_.Name -eq 'japanese-tech-writing' } | ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Recurse -File | ForEach-Object { $r=$_.FullName.Substring($skills.Length).TrimStart('\\','/'); Place $_.FullName (Join-Path $sDst $r) } }",
+      "exit 0",
+      "",
+    ].join("\n"),
+  );
   writeFix(repo, "README-INSTALL.md", "# install readme\n");
 
-  // Trust-root files: keep in sync with protected-paths.ts TRUST_ROOT_DIRECT_PATHS.
-  const trustDir = ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate";
-  const trustFiles = [
-    "types.ts", "boundary-pipeline.ts", "text-binary.ts", "protected-paths.ts",
-    "git-blob-reader.ts", "manifest.ts", "archive-builder.ts", "launcher.ts",
-    "index.ts", "protected-check.ts", "blob-loader.ts", "boundary-runner.ts",
-    "cli.ts", "bootstrap-report.ts", "tsconfig.json", "package.json", "bun.lock", ".gitignore",
-  ];
-  for (const f of trustFiles) {
-    writeFix(repo, `${trustDir}/${f}`, `// ${f}\n`);
+  // Trust-root modules: auto-discover to match production exactly.
+  for (const f of listTrustRootModules()) {
+    writeFix(repo, `${TRUST_DIR_REL}/${f}`, `// ${f}\n`);
+  }
+  // Trust-root config files.
+  for (const f of ["tsconfig.json", "package.json", "bun.lock", ".gitignore"]) {
+    writeFix(repo, `${TRUST_DIR_REL}/${f}`, `# ${f}\n`);
   }
   writeFix(repo, "scripts/trusted-distribution-gate.ps1", "# placeholder\n");
   writeFix(repo, "scripts/package-release-archive.ps1", "# placeholder\n");
@@ -84,4 +137,8 @@ export function makeFixtureRepo(): string {
   execFileSync("git", ["add", "-A"], { cwd: repo });
   execFileSync("git", ["commit", "-q", "-m", "fixture"], { cwd: repo });
   return repo;
+}
+
+export function disposeRepo(repo: string): void {
+  rm(repo);
 }
