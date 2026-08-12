@@ -39,12 +39,12 @@ labels: enhancement
 <!-- 【必須】 -->
 
 <!-- テスト戦略: 各項目を verification（検証手順）/ pass_criteria（合格基準）/ on_failure（不合格時の処置）の3要素構造で記述 -->
-<!-- pass_criteria 記述ガイド（AG-006）:
-  - 共通 pass_criteria は複数 REQ の pipeline stage 違いで QG-4 食い違いを生むため、REQ 単位の個別期待値を推奨
+<!-- pass_criteria 記述ガイド（AG-{NNN}）:
+  - 共通 pass_criteria は複数 REQ の pipeline stage 違いで QG-{N} 食い違いを生むため、REQ 単位の個別期待値を推奨
   - 「変更対象外 REQ の変更がないこと」は「diff がないこと」として表現し、「存在しないこと」とは書かない
   - 「存在しないこと」は新規作成禁止（例: REQ-NNNN が存在しないこと）の場合のみ使用。既存 REQ の変更有無検証には使用しない
   - 詳細は agentdev-workflow-templates SPEC「test strategy 記述ガイドライン」参照 -->
-- id: TS-001
+- id: TS-{NNN}
  target_item: [検証対象]
  verification: |
  [検証手順]
@@ -56,7 +56,7 @@ labels: enhancement
 ## Execution Contract
 <!-- 【必須】 -->
 
-<!-- Execution Contract: REQ-{NNNN} Issue Execution Contract。case-open が新規 Issue 作成時に付与する必須セクション。本セクションの存在有無が presence-based 判定の識別子となる（AG-012、REQ-{NNNN}-{NNN}）。case-run は本セクション存在有無で新旧 Issue を識別する -->
+<!-- Execution Contract: REQ-{NNNN} Issue Execution Contract。case-open が新規 Issue 作成時に付与する必須セクション。本セクションの存在有無が presence-based 判定の識別子となる（AG-{NNN}、REQ-{NNNN}-{NNN}）。case-run は本セクション存在有無で新旧 Issue を識別する -->
 ### 変更対象成果物
 - （artifact type と対象パスのリスト）
 
