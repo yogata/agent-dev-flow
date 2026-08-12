@@ -35,8 +35,13 @@
     Default branch name used in producer URLs (default: `main`).
 
 .PARAMETER BootstrapMode
-    Switch. Permits trust-root files that exist at candidate but not at base
-    (the bootstrap-PR case). The output still records the asymmetry.
+    Switch. Alias of -SeedMode. Permits candidate-added trust-root paths
+    (the bootstrap-PR case) and records boundary findings / unclassified
+    entries as non-fatal evidence. Modified/deleted protected paths remain
+    fatal.
+
+.PARAMETER SeedMode
+    Switch. Alias of -BootstrapMode.
 
 .PARAMETER BootstrapReport
     Switch. Emits a JSON digest report of trust-root files at -BaseOid and
@@ -49,13 +54,18 @@
     Exit codes (stable under $ErrorActionPreference='Stop'):
         0  Ok                         — archive published, all checks passed
         1  ProtectedPathViolation     — trust-root file modified/deleted/added
+                                        (in final mode; in seed mode only
+                                        modified/deleted)
         2  ManifestMismatch           — required manifest entry missing
         3  DigestMismatch             — archive-installed digest mismatch or
                                         pre-existing final archive collision
         4  BoundaryViolation          — producer-internal reference detected
+                                        (fatal only in final mode)
         5  PathSafetyViolation        — symlink/gitlink/unknown mode/traversal
+                                        / unsafe archive path
         6  EncodingViolation          — invalid UTF-8 / NUL byte in text artifact
         7  UnclassifiedEntry          — unknown ID family / adapter failure
+                                        (fatal only in final mode)
         8  InputContract              — invalid OID / missing repository identity
         9  Unexpected                 — any uncaught exception (fail-closed)
 #>
@@ -71,6 +81,7 @@ param(
     [string]$RepositoryIdentity,
     [string]$DefaultBranch = 'main',
     [switch]$BootstrapMode,
+    [switch]$SeedMode,
     [switch]$BootstrapReport
 )
 
@@ -133,7 +144,7 @@ if ($BootstrapReport) {
     $bunArgs.Add('--output-dir');     $bunArgs.Add($OutputDir)
     $bunArgs.Add('--repository-identity'); $bunArgs.Add($RepositoryIdentity)
     $bunArgs.Add('--default-branch'); $bunArgs.Add($DefaultBranch)
-    if ($BootstrapMode) { $bunArgs.Add('--bootstrap-mode') }
+    if ($BootstrapMode -or $SeedMode) { $bunArgs.Add('--bootstrap-mode') }
 }
 
 # Invoke bun directly. The exit code from bun is the launcher's exit code.

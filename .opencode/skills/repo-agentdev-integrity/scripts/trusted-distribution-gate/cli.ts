@@ -56,6 +56,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
       case "--repository-identity": result.repository_identity = argv[++i]; break;
       case "--default-branch": result.default_branch = argv[++i] ?? "main"; break;
       case "--bootstrap-mode": result.bootstrap_mode = true; break;
+      case "--seed-mode": result.bootstrap_mode = true; break;
       case "--bootstrap-report": result.mode = "report"; result.base_oid = argv[++i]; break;
       case "--help": case "-h":
         printUsage();
@@ -73,12 +74,26 @@ function printUsage(): void {
   process.stdout.write(
     `usage: bun cli.ts --base-oid <oid> --candidate-oid <oid> --repo-root <path>\n` +
     `                   --output-dir <path> --repository-identity <owner/name>\n` +
-    `                   [--default-branch main] [--bootstrap-mode]\n` +
+    `                   [--default-branch main] [--bootstrap-mode|--seed-mode]\n` +
     `   or: bun cli.ts --bootstrap-report <oid> --repo-root <path>\n`,
   );
 }
 
 function main(): void {
+  try {
+    mainInner();
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    const fallback = {
+      exit_code: ExitCode.Unexpected,
+      error: `cli.ts unhandled: ${msg}`,
+    };
+    process.stdout.write(JSON.stringify(fallback, null, 2) + "\n");
+    process.exit(ExitCode.Unexpected);
+  }
+}
+
+function mainInner(): void {
   const parsed = parseArgs(process.argv.slice(2));
 
   if (parsed.mode === "report") {
