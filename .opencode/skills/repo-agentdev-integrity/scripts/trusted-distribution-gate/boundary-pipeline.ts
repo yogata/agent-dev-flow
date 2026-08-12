@@ -65,10 +65,52 @@ export const DOCS_PATH_PATTERN = /docs[\\/](?:adr|requirements|specs|decisions)[
 // Also capture percent-encoded forms: docs%2F...
 export const DOCS_PATH_PERCENT_PATTERN = /docs%2[Ff](?:adr|requirements|specs|decisions)%2[Ff][^\s)\]\|\\"'`<>{}]+/g;
 
-// Candidate GitHub blob/raw URLs. The resolution stage checks `/docs/` to
-// classify producer-internal vs external.
+// Candidate GitHub blob/raw URLs. The resolution stage parses owner/repo
+// from each candidate URL and compares to the configured repository
+// identity. URLs pointing into the producer repo (any path) are
+// producer-internal; URLs into a different repo (including docs paths of
+// external projects) are consumer-resolvable.
 export const URL_CANDIDATE_PATTERN =
   /(?:github\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/(?:blob|raw)\/|raw\.githubusercontent\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/)[^\s)\]\\"'`<>{}]+/g;
+
+// ---------------------------------------------------------------------------
+// URL ownership: parse the `owner/repo` segment from a GitHub blob/raw URL
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract the `owner/repo` segment from a GitHub blob/raw URL. Returns null
+ * when the URL does not match the expected shape (in which case the caller
+ * fail-closes by treating the URL as unclassified).
+ *
+ * Examples:
+ *   https://github.com/yogata/agent-dev-flow/blob/main/docs/foo.md
+ *     -> "yogata/agent-dev-flow"
+ *   raw.githubusercontent.com/yogata/agent-dev-flow/main/x.md
+ *     -> "yogata/agent-dev-flow"
+ *   https://github.com/vercel/next.js/blob/main/src/index.ts
+ *     -> "vercel/next.js"
+ */
+export function extractOwnerRepo(url: string): string | null {
+  const m = /(?:github\.com\/|raw\.githubusercontent\.com\/)([A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+)\//.exec(url);
+  if (!m) return null;
+  return m[1] ?? null;
+}
+
+/**
+ * Decide whether a candidate URL points into the producer's own repository
+ * (any path), based on the configured repository identity. Pure: same input
+ * and config => same output. Returns false when identity is empty (caller
+ * must fail-closed upstream).
+ */
+export function isProducerOwnedUrl(url: string, identity: RepositoryIdentity): boolean {
+  if (identity.owner_slash_name.length === 0) return false;
+  const ownerRepo = extractOwnerRepo(url);
+  if (ownerRepo === null) return false;
+  // Case-insensitive compare: GitHub owner/repo names are case-insensitive
+  // (legacy). We lowercase both sides so `Yogata/Agent-Dev-Flow` matches
+  // `yogata/agent-dev-flow`.
+  return ownerRepo.toLowerCase() === identity.owner_slash_name.toLowerCase();
+}
 
 // ---------------------------------------------------------------------------
 // Helpers (pure)
@@ -197,8 +239,15 @@ export function resolveCandidate(c: Candidate, cfg: DetectorConfig): {
     return { classification: "generic-or-template", category: "concrete-path" };
   }
 
-  // url
-  if (c.value.includes("/docs/")) {
+  // url: classify by repository identity, NOT by path content. A URL into
+  // the producer repo is producer-internal at any path (docs, scripts, src).
+  // A URL into a different repo is consumer-resolvable, even if it points
+  // at that project's docs. An empty identity means the caller did not pin
+  // a producer; the resolution stage fail-closes by returning unclassified.
+  if (cfg.repository_identity.owner_slash_name.length === 0) {
+    return { classification: "unclassified", category: "unclassified-entry" };
+  }
+  if (isProducerOwnedUrl(c.value, cfg.repository_identity)) {
     return { classification: "producer-internal", category: "fixed-url" };
   }
   return { classification: "consumer-resolvable", category: "fixed-url" };

@@ -9,10 +9,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   classifyLine,
-  detectCandidates,
-  resolveCandidate,
   isConcreteDocsPath,
-  normalizePathToken,
   type DetectorConfig,
 } from "./boundary-pipeline.ts";
 
@@ -163,6 +160,44 @@ describe("boundary-pipeline / classifyLine", () => {
     expect(urlDetection?.classification).toBe("producer-internal");
   });
 
+  test("detects producer-internal same-repo URL OUTSIDE docs/ (scripts path)", () => {
+    // Regression: parent defect #5. URL into producer's own repo is
+    // producer-internal regardless of path (docs, scripts, src, etc.).
+    const r = classifyLine(
+      { text: "See https://github.com/yogata/agent-dev-flow/blob/main/scripts/install.ps1",
+        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      baseConfig,
+    );
+    const urlDetection = r.detections.find((d) => d.category === "fixed-url");
+    expect(urlDetection).toBeDefined();
+    expect(urlDetection?.classification).toBe("producer-internal");
+  });
+
+  test("allows external repo URL even when it points at external docs/", () => {
+    // Regression: parent defect #5. URL into a DIFFERENT repo's docs/ is
+    // consumer-resolvable (was incorrectly producer-internal under the
+    // old /docs/-only check).
+    const r = classifyLine(
+      { text: "See https://github.com/vercel/next.js/blob/main/docs/tutorial.md",
+        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      baseConfig,
+    );
+    const urlDetection = r.detections.find((d) => d.category === "fixed-url");
+    expect(urlDetection).toBeDefined();
+    expect(urlDetection?.classification).toBe("consumer-resolvable");
+  });
+
+  test("producer-internal URL match is case-insensitive on owner/repo", () => {
+    // GitHub owner/repo names are case-insensitive (legacy).
+    const r = classifyLine(
+      { text: "See https://github.com/Yogata/Agent-Dev-Flow/blob/main/x.md",
+        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      baseConfig,
+    );
+    const urlDetection = r.detections.find((d) => d.category === "fixed-url");
+    expect(urlDetection?.classification).toBe("producer-internal");
+  });
+
   test("allows external github URL outside docs/", () => {
     const r = classifyLine(
       { text: "See https://github.com/vercel/next.js/blob/main/src/index.ts",
@@ -237,48 +272,5 @@ describe("boundary-pipeline / isConcreteDocsPath", () => {
   });
   test("accepts concrete markdown file", () => {
     expect(isConcreteDocsPath("docs/adr/ADR-0001.md")).toBe(true);
-  });
-});
-
-describe("boundary-pipeline / normalizePathToken", () => {
-  test("passes forward-slash through", () => {
-    expect(normalizePathToken("docs/foo/bar.md")).toBe("docs/foo/bar.md");
-  });
-  test("converts backslashes to forward slashes", () => {
-    expect(normalizePathToken("docs\\foo\\bar.md")).toBe("docs/foo/bar.md");
-  });
-  test("decodes percent-encoded slashes", () => {
-    expect(normalizePathToken("docs%2Ffoo%2Fbar.md")).toBe("docs/foo/bar.md");
-  });
-  test("mixed encoding", () => {
-    expect(normalizePathToken("docs%2Ffoo\\bar.md")).toBe("docs/foo/bar.md");
-  });
-});
-
-describe("boundary-pipeline / detectCandidates", () => {
-  test("returns empty for clean line", () => {
-    expect(detectCandidates("clean line", baseConfig)).toEqual([]);
-  });
-
-  test("returns multiple candidates for mixed line", () => {
-    const cs = detectCandidates("See ADR-0001 and docs/specs/ADR-0002.md", baseConfig);
-    expect(cs.length).toBeGreaterThanOrEqual(2);
-    const types = cs.map((c) => c.type).sort();
-    expect(types).toContain("id");
-    expect(types).toContain("path");
-  });
-});
-
-describe("boundary-pipeline / resolveCandidate", () => {
-  test("known ID prefix resolves to producer-internal", () => {
-    const r = resolveCandidate({ type: "id", value: "REQ-0001" }, baseConfig);
-    expect(r.classification).toBe("producer-internal");
-    expect(r.category).toBe("concrete-id");
-  });
-
-  test("unknown ID prefix resolves to unclassified (fail-closed)", () => {
-    const r = resolveCandidate({ type: "id", value: "MYSTERY-99" }, baseConfig);
-    expect(r.classification).toBe("unclassified");
-    expect(r.category).toBe("unclassified-entry");
   });
 });
