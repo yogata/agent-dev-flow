@@ -4,20 +4,15 @@
 
 .DESCRIPTION
     Trusted entry point that inspects an immutable candidate Git OID WITHOUT
-    executing candidate code, rejects protected-path changes, builds and
-    verifies the five canonical manifest sets (source-runtime, source-bootstrap,
-    link, archive, archive-installed), runs the side-effect-free boundary
-    detector, and publishes a ZIP archive only from candidate Git blobs.
+    executing candidate code. Invokes the protected TypeScript CLI
+    (cli.ts) via `bun` with array-form arguments (no shell interpolation,
+    no temporary script files).
 
     The launcher runs under $ErrorActionPreference='Stop'. Failures exit with
-    stable documented codes. The launcher never imports code from the
-    candidate tree; it only reads blobs via `git ls-tree -r -z` and
-    `git cat-file blob <oid>:<path>`.
-
-    Stage A counterpart to PR #2094 (Stage B in-process detector). This
-    launcher is the trust root: it must remain runnable even when the
-    candidate tree has been tampered with, because it never executes
-    candidate code.
+    stable documented codes. Guard clauses use [Console]::Error.WriteLine +
+    `exit <code>` rather than `Write-Error` so that the exact exit code is
+    preserved (Write-Error would be promoted to a terminating error and
+    produce exit 1 regardless of the documented code).
 
 .PARAMETER BaseOid
     Trusted baseline Git OID (40-char SHA-1 or 64-char SHA-256 hex).
@@ -29,7 +24,8 @@
     Absolute path to the repository root (.git lives here).
 
 .PARAMETER OutputDir
-    Absolute path to the output directory for the final archive.
+    Absolute path to the output directory for the final archive. Must be
+    trusted; the launcher refuses to write archives outside this root.
 
 .PARAMETER RepositoryIdentity
     Producer repository identity in `owner/name` form (e.g. `yogata/agent-dev-flow`).
@@ -38,17 +34,16 @@
 .PARAMETER DefaultBranch
     Default branch name used in producer URLs (default: `main`).
 
-.OUTPUTS
-    JSON result on stdout with: exit_code, base_oid, candidate_oid, manifests,
-    protected_paths, boundary_results, archive_path, summary.
+.PARAMETER BootstrapMode
+    Switch. Permits trust-root files that exist at candidate but not at base
+    (the bootstrap-PR case). The output still records the asymmetry.
 
-.EXAMPLE
-    ./scripts/trusted-distribution-gate.ps1
-        -BaseOid 507d376d99da4eefccbe3c6a179745aff79a7c30
-        -CandidateOid 83da2056a1b2c3d4...
-        -RepoRoot C:\path\to\agent-dev-flow
-        -OutputDir C:\path\to\dist
-        -RepositoryIdentity yogata/agent-dev-flow
+.PARAMETER BootstrapReport
+    Switch. Emits a JSON digest report of trust-root files at -BaseOid and
+    exits, WITHOUT running the launcher pipeline. For PR review evidence.
+
+.OUTPUTS
+    JSON result on stdout (LauncherResult or BootstrapReport).
 
 .NOTES
     Exit codes (stable under $ErrorActionPreference='Stop'):
@@ -69,61 +64,79 @@
 
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)][string]$BaseOid,
-    [Parameter(Mandatory = $true)][string]$CandidateOid,
-    [Parameter(Mandatory = $true)][string]$RepoRoot,
-    [Parameter(Mandatory = $true)][string]$OutputDir,
-    [Parameter(Mandatory = $true)][string]$RepositoryIdentity,
-    [string]$DefaultBranch = 'main'
+    [string]$BaseOid,
+    [string]$CandidateOid,
+    [string]$RepoRoot,
+    [string]$OutputDir,
+    [string]$RepositoryIdentity,
+    [string]$DefaultBranch = 'main',
+    [switch]$BootstrapMode,
+    [switch]$BootstrapReport
 )
 
 $ErrorActionPreference = 'Stop'
 
-$scriptRoot = $PSScriptRoot
-$trustRootTs = Join-Path $scriptRoot '..\.opencode\skills\repo-agentdev-integrity\scripts\trusted-distribution-gate\launcher.ts'
-$resolvedTrustRoot = (Resolve-Path -LiteralPath $trustRootTs).Path
-
-if (-not (Test-Path -LiteralPath $resolvedTrustRoot)) {
-    Write-Error "trusted-distribution-gate: launcher.ts missing at $resolvedTrustRoot"
+# Resolve the protected CLI entry next to this script. We do NOT honor any
+# override path: the CLI must be the committed protected file.
+$cliTs = Join-Path $PSScriptRoot '..\.opencode\skills\repo-agentdev-integrity\scripts\trusted-distribution-gate\cli.ts'
+if (-not (Test-Path -LiteralPath $cliTs)) {
+    [Console]::Error.WriteLine("trusted-distribution-gate: protected cli.ts missing at $cliTs")
     exit 9
 }
+$cliTs = (Resolve-Path -LiteralPath $cliTs).Path
 
-if (-not (Test-Path -LiteralPath $RepoRoot)) {
-    Write-Error "trusted-distribution-gate: RepoRoot does not exist: $RepoRoot"
-    exit 8
+# Build argument array. Array form: each path/value is passed to bun as a
+# literal argv element, so metacharacters in user input cannot inject shell
+# commands (parent defect #2).
+$bunArgs = [System.Collections.Generic.List[string]]::new()
+$bunArgs.Add($cliTs)
+
+if ($BootstrapReport) {
+    if (-not $BaseOid) {
+        [Console]::Error.WriteLine('trusted-distribution-gate: -BootstrapReport requires -BaseOid')
+        exit 8
+    }
+    if (-not $RepoRoot) {
+        [Console]::Error.WriteLine('trusted-distribution-gate: -BootstrapReport requires -RepoRoot')
+        exit 8
+    }
+    $bunArgs.Add('--bootstrap-report')
+    $bunArgs.Add($BaseOid)
+    $bunArgs.Add('--repo-root')
+    $bunArgs.Add($RepoRoot)
+} else {
+    # Required-argument guard: explicit error + exact exit code (do NOT use
+    # Write-Error which would be promoted to a terminating error and force
+    # exit 1 regardless of the documented exit code).
+    foreach ($pair in @(
+        @('-BaseOid', $BaseOid),
+        @('-CandidateOid', $CandidateOid),
+        @('-RepoRoot', $RepoRoot),
+        @('-OutputDir', $OutputDir),
+        @('-RepositoryIdentity', $RepositoryIdentity)
+    )) {
+        if (-not $pair[1]) {
+            [Console]::Error.WriteLine("trusted-distribution-gate: missing required parameter $($pair[0])")
+            exit 8
+        }
+    }
+    if (-not (Test-Path -LiteralPath $RepoRoot)) {
+        [Console]::Error.WriteLine("trusted-distribution-gate: RepoRoot does not exist: $RepoRoot")
+        exit 8
+    }
+    if (-not (Test-Path -LiteralPath $OutputDir)) {
+        New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+    }
+    $bunArgs.Add('--base-oid');       $bunArgs.Add($BaseOid)
+    $bunArgs.Add('--candidate-oid');  $bunArgs.Add($CandidateOid)
+    $bunArgs.Add('--repo-root');      $bunArgs.Add($RepoRoot)
+    $bunArgs.Add('--output-dir');     $bunArgs.Add($OutputDir)
+    $bunArgs.Add('--repository-identity'); $bunArgs.Add($RepositoryIdentity)
+    $bunArgs.Add('--default-branch'); $bunArgs.Add($DefaultBranch)
+    if ($BootstrapMode) { $bunArgs.Add('--bootstrap-mode') }
 }
 
-if (-not (Test-Path -LiteralPath $OutputDir)) {
-    New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
-}
-
-$argsArray = @(
-    'eval',
-    "--eval",
-    @"
-const m = await import(`"file:///$($resolvedTrustRoot -replace '\\','/')`");
-const opts = {
-  repo_root: $(ConvertTo-Json $RepoRoot),
-  base_oid: $(ConvertTo-Json $BaseOid),
-  candidate_oid: $(ConvertTo-Json $CandidateOid),
-  output_dir: $(ConvertTo-Json $OutputDir),
-  repository_identity: {
-    owner_slash_name: $(ConvertTo-Json $RepositoryIdentity),
-    default_branch: $(ConvertTo-Json $DefaultBranch),
-  },
-};
-const result = m.runLauncher(opts);
-console.log(JSON.stringify(result, null, 2));
-process.exit(result.exit_code);
-"@
-)
-
-try {
-    $stdout = & bun @argsArray 2>&1
-    $exit = $LASTEXITCODE
-    Write-Output $stdout
-    exit $exit
-} catch {
-    Write-Error "trusted-distribution-gate: launcher invocation failed: $($_.Exception.Message)"
-    exit 9
-}
+# Invoke bun directly. The exit code from bun is the launcher's exit code.
+# Stdout/stderr are passed through verbatim.
+& bun @bunArgs
+exit $LASTEXITCODE
