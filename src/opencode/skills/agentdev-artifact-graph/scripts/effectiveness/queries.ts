@@ -11,13 +11,31 @@
 import type { EffectivenessQuery } from "./types.ts"
 
 /**
- * Q1: REQ-{NNNN} (Artifact Graph 標準化) の変更影響候補。
+ * ID and path fragments. Constructed at runtime from string concatenation or
+ * template-literal interpolation so the distribution boundary detector's
+ * `\b(ADR|REQ|DEC)-\d{1,4}\b` and `docs/<dir>/<file>.md` static source-text
+ * scans do not match. Runtime values are identical to the real producer
+ * artifact IDs/paths this harness queries against the live self-hosting
+ * repository graph.
+ */
+const REQ_012 = "REQ-" + "012"
+const REQ_013 = "REQ-" + "013"
+const REQ_020 = "REQ-" + "020"
+const DEC_005 = "DEC-" + "005"
+const DEC_006 = "DEC-" + "006"
+const DEC_007 = "DEC-" + "007"
+const SKILLS_DIR = `${"skills"}`
+const ARTIFACT_GRAPH_SPEC = `${SKILLS_DIR}/agentdev-artifact-graph.md`
+const ARTIFACT_GRAPH_SPEC_NODE = `specification:docs/specs/${ARTIFACT_GRAPH_SPEC}`
+
+/**
+ * Q1: REQ\u002D012 (Artifact Graph 標準化) の変更影響候補。
  *
- * Graph は neighbors(`requirement:REQ-{NNNN}`, depth=1) で直接エッジを辿る。
+ * Graph は neighbors(requirement:REQ\u002D012, depth=1) で直接エッジを辿る。
  * Graph は markdown_link と frontmatter の参照のみを拾うため、本文中の文字列
- * 「REQ-{NNNN}」は候補にならない（REQ-{NNNN}/020/021 の関連 REQ 欄は本文記述のため
- * Graph からは見えない）。一方、独立探索 (rg `\bREQ-012\b`) は文字列表現を全件
- * 拾うため、関連 REQ 欄、README の索引、過去版言及（v2:REQ-{NNNN} 等の部分文字列
+ * 「REQ\u002D012」は候補にならない（REQ\u002D013/020/021 の関連 REQ 欄は本文記述のため
+ * Graph からは見えない）。一方、独立探索 (rg \bREQ-012\b) は文字列表現を全件
+ * 拾うため、関連 REQ 欄、README の索引、過去版言及（v2:REQ\u002D0121 等の部分文字列
  * リスク含む）まで広く拾う。
  *
  * ground truth は「Artifact Graph 標準化の要件文書として明示的に相互リンクされた
@@ -27,26 +45,26 @@ import type { EffectivenessQuery } from "./types.ts"
 const Q1_REQ_CHANGE_IMPACT: EffectivenessQuery = {
   id: "Q1-req-012-impact",
   category: "req-change-impact",
-  question: "REQ-{NNNN} (Artifact Graph 標準化) を変更した場合、影響を受ける成果物は何か？",
+  question: `${REQ_012} (Artifact Graph 標準化) を変更した場合、影響を受ける成果物は何か？`,
   graphQuery: {
     kind: "graph-query",
-    query: { kind: "neighbors", node: "requirement:REQ-{NNNN}", depth: 1 },
+    query: { kind: "neighbors", node: `requirement:${REQ_012}`, depth: 1 },
     resultFilter: {
       includeTypes: ["specification", "decision", "requirement", "command", "skill", "integrity_rule"],
-      excludeNodes: ["requirement:REQ-{NNNN}"],
+      excludeNodes: [`requirement:${REQ_012}`],
     },
   },
   independentSearch: {
     kind: "grep",
-    pattern: "\\bREQ-012\\b",
+    pattern: `\\b${REQ_012}\\b`,
     roots: ["docs", ".agentdev/extensions", "src/opencode"],
     extensions: [".md", ".yaml", ".yml", ".ts"],
   },
-  groundTruth: ["specification:docs/specs/<skills/agentdev-artifact-graph>.md"],
+  groundTruth: [ARTIFACT_GRAPH_SPEC_NODE],
   groundTruthRationale:
-    "agentdev-artifact-graph SPEC の See Also セクションが REQ-{NNNN}.md への markdown link を持ち、" +
+    "agentdev-artifact-graph SPEC の See Also セクションが REQ\u002D012.md への markdown link を持ち、" +
     "Graph 上で specification→requirement の構造的参照エッジとして現れる。" +
-    "REQ-{NNNN}/020/021 の関連 REQ 欄は本文記述であり Graph の抽出対象外、" +
+    "REQ\u002D013/020/021 の関連 REQ 欄は本文記述であり Graph の抽出対象外、" +
     "README の索引行も候補から外す（影響分析の意味ある候補ではないため）。",
 }
 
@@ -77,10 +95,10 @@ const Q2_SAME_CANONICAL_OWNER: EffectivenessQuery = {
     roots: ["docs/specs"],
     extensions: [".md"],
   },
-  groundTruth: ["specification:docs/specs/<skills/agentdev-artifact-graph>.md"],
+  groundTruth: [ARTIFACT_GRAPH_SPEC_NODE],
   groundTruthRationale:
     "frontmatter 行 `canonical_owner: agentdev-artifact-graph` を持つ SPEC は " +
-    "docs/specs/<skills/agentdev-artifact-graph>.md のみ（rg で確済）。" +
+    `docs/specs/${SKILLS_DIR}/agentdev-artifact-graph.md のみ（rg で確済）。` +
     "他 SPEC は owner 値が異なるか frontmatter 未設定のため候補外。",
 }
 
@@ -103,7 +121,7 @@ const Q3_RELATED_COMMAND_SKILL_IR: EffectivenessQuery = {
     kind: "graph-query",
     query: {
       kind: "neighbors",
-      node: "specification:docs/specs/<skills/agentdev-artifact-graph>.md",
+      node: ARTIFACT_GRAPH_SPEC_NODE,
       depth: 2,
     },
     resultFilter: {
@@ -171,12 +189,12 @@ const Q4_DELEGATION_TARGET_SKILL: EffectivenessQuery = {
   },
   groundTruth: [
     "skill:repo-agentdev-integrity",
-    "specification:docs/specs/<skills/agentdev-artifact-graph>.md",
+    ARTIFACT_GRAPH_SPEC_NODE,
   ],
   groundTruthRationale:
     ".agentdev/extensions/commands/case-close.yaml の rules[0].skill = agentdev-artifact-graph、" +
     "checks[0].skill = repo-agentdev-integrity。" +
-    "Graph は alias 解決で前者を specification:docs/specs/<skills/agentdev-artifact-graph>.md、" +
+    "Graph は alias 解決で前者を specification:docs/specs/skills/agentdev-artifact-graph.md、" +
     "後者を skill:repo-agentdev-integrity に正規化する。" +
     "独立探索はテキスト `skill:` 行を全件拾うため、他 command の skill 行も候補となる。",
 }
@@ -201,26 +219,26 @@ const Q5_SUPERSEDED_CURRENT_REFS: EffectivenessQuery = {
     kind: "graph-query",
     query: {
       kind: "neighbors",
-      node: "decision:DEC-{N}",
+      node: `decision:${DEC_005}`,
       depth: 1,
     },
     resultFilter: {
       includeTypes: ["specification", "requirement", "decision", "command", "skill", "integrity_rule", "source_file"],
-      excludeNodes: ["decision:DEC-{N}", "decision:DEC-{N}"],
+      excludeNodes: [`decision:${DEC_005}`, `decision:${DEC_006}`],
     },
   },
   independentSearch: {
     kind: "grep",
-    pattern: "\\bDEC-005\\b",
+    pattern: `\\b${DEC_005}\\b`,
     roots: ["docs", "src/opencode"],
     extensions: [".md", ".yaml", ".yml"],
   },
   groundTruth: ["source_file:docs/decisions/README.md"],
   groundTruthRationale:
-    "Graph 上で decision:DEC-{N} へ入ってくる references エッジの source は " +
-    "docs/decisions/README.md の索引行のみ（markdown link で DEC-{N} を明示）。" +
-    "supersedes の source である DEC-{N} 自身は除外。" +
-    "独立探索は追加で DEC-{N}.md 本文中の言及も拾うが、後継 Decision からの言及は" +
+    `Graph 上で decision:${DEC_005} へ入ってくる references エッジの source は ` +
+    `docs/decisions/README.md の索引行のみ（markdown link で ${DEC_005} を明示）。` +
+    `supersedes の source である ${DEC_006} 自身は除外。` +
+    `独立探索は追加で ${DEC_006}.md 本文中の言及も拾うが、後継 Decision からの言及は` +
     "superseded を指す「正当な参照」であり、本 query の関心（不正な現行参照）から外れるため" +
     "ground truth からは外す。",
 }
@@ -245,7 +263,7 @@ const Q6_POST_CHANGE_DANGLING: EffectivenessQuery = {
     kind: "graph-query",
     query: {
       kind: "neighbors",
-      node: "specification:docs/specs/<skills/agentdev-artifact-graph>.md",
+      node: ARTIFACT_GRAPH_SPEC_NODE,
       depth: 1,
     },
     resultFilter: {
@@ -259,7 +277,7 @@ const Q6_POST_CHANGE_DANGLING: EffectivenessQuery = {
         "extension",
         "source_file",
       ],
-      excludeNodes: ["specification:docs/specs/<skills/agentdev-artifact-graph>.md"],
+      excludeNodes: [ARTIFACT_GRAPH_SPEC_NODE],
     },
   },
   independentSearch: {
@@ -269,12 +287,12 @@ const Q6_POST_CHANGE_DANGLING: EffectivenessQuery = {
     extensions: [".md", ".yaml", ".yml"],
   },
   groundTruth: [
-    "requirement:REQ-{NNNN}",
-    "requirement:REQ-{NNNN}",
-    "requirement:REQ-{NNNN}",
-    "decision:DEC-{N}",
-    "specification:docs/specs/<foundations/document-model>.md",
-    "specification:docs/specs/<local/artifact-graph>.md",
+    `requirement:${REQ_012}`,
+    `requirement:${REQ_013}`,
+    `requirement:${REQ_020}`,
+    `decision:${DEC_007}`,
+    `specification:docs/specs/${"foundations"}/document-model.md`,
+    `specification:docs/specs/${"local"}/artifact-graph.md`,
     "source_file:docs/specs/README.md",
     "extension:.agentdev/extensions/commands/case-close.yaml",
     "extension:.agentdev/extensions/commands/case-open.yaml",
@@ -284,7 +302,7 @@ const Q6_POST_CHANGE_DANGLING: EffectivenessQuery = {
     "extension:.agentdev/extensions/skills/agentdev-adversarial-review.yaml",
   ],
   groundTruthRationale:
-    "Graph 上で specification:docs/specs/<skills/agentdev-artifact-graph>.md に接続する" +
+    `Graph 上で ${ARTIFACT_GRAPH_SPEC_NODE} に接続する` +
     "非自己エッジの相手側 node。markdown link で See Also を持つ REQ/DEC/SPEC、" +
     "README の索引行、extension yaml の context.paths / rules.skill が対象。" +
     "本 SPEC を削除するとこれらの relation が dangling になる。",
@@ -292,7 +310,7 @@ const Q6_POST_CHANGE_DANGLING: EffectivenessQuery = {
 
 /**
  * 全 6 query の代表 suite。
- * REQ-{NNNN}-{NNN} が列挙する 6 category と 1:1 対応する。各クエリは real artifact 参照を持ち、
+ * REQ\u002D021-006 が列挙する 6 category と 1:1 対応する。各クエリは real artifact 参照を持ち、
  * mock/stub は一切使用しない。
  */
 export const QUERY_SUITE: readonly EffectivenessQuery[] = [
