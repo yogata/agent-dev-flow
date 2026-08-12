@@ -1,9 +1,11 @@
 // Protected-paths: trust-root file enumeration and matching.
 //
 // The trust root is the set of files whose integrity MUST be preserved
-// between base_oid and candidate_oid. If a candidate modifies, deletes, or
-// adds to any of these files, the launcher fails closed with
-// ExitCode.ProtectedPathViolation.
+// between base_oid and candidate_oid. If a candidate modifies or deletes
+// any of these files, the launcher fails closed with
+// ExitCode.ProtectedPathViolation. In bootstrap/seed mode, candidate-ADDED
+// trust-root files are permitted (the bootstrap-PR case); modified or
+// deleted protected files remain fatal in every mode (parent defect #4).
 //
 // Two categories:
 //   1. direct_paths  — trust-root launcher, checker, packager, and the
@@ -20,6 +22,17 @@
 //   - Path traversal (`..`) is never matched, even when normalization would
 //     resolve to a protected path. The check is string-prefix based on the
 //     normalized form, with explicit rejection of `..` segments.
+//
+// Stage A/B boundary (parent defect #3):
+//   Stage A protects its own runtime closure plus the trusted launcher
+//   script and the consumer install/check scripts. Stage B canonically
+//   owns and modifies the archive packager (package-release-archive.ps1)
+//   and the archive installer (install-from-archive.ps1); they are NOT
+//   protected by Stage A. Stage B's modifications to those two scripts
+//   must not re-trigger Stage A protected-path violation.
+
+import * as fs from "fs";
+import * as path from "path";
 
 export interface ProtectedPathSet {
   /** Repo-relative paths with forward slashes. */
@@ -32,55 +45,65 @@ export interface ProtectedPathSet {
 // Direct trust-root paths
 // ---------------------------------------------------------------------------
 
-const TRUST_ROOT_DIR =
+export const TRUST_ROOT_DIR_REL =
   ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate";
 
-// Trust-root TypeScript runtime modules. Every module imported (directly
-// or transitively) by launcher.ts at execution time MUST be listed here.
-// Test files (*.test.ts) are NOT runtime imports — they are not loaded
-// when the launcher runs in production — so they are deliberately omitted
-// from the protected set. Their digests are recorded separately in the
-// bootstrap digest report for review.
-const TRUST_ROOT_TS_MODULES: readonly string[] = [
-  `${TRUST_ROOT_DIR}/types.ts`,
-  `${TRUST_ROOT_DIR}/boundary-pipeline.ts`,
-  `${TRUST_ROOT_DIR}/text-binary.ts`,
-  `${TRUST_ROOT_DIR}/protected-paths.ts`,
-  `${TRUST_ROOT_DIR}/git-blob-reader.ts`,
-  `${TRUST_ROOT_DIR}/manifest.ts`,
-  `${TRUST_ROOT_DIR}/archive-builder.ts`,
-  `${TRUST_ROOT_DIR}/launcher.ts`,
-  `${TRUST_ROOT_DIR}/index.ts`,
-  // Runtime helpers imported by launcher.ts.
-  `${TRUST_ROOT_DIR}/protected-check.ts`,
-  `${TRUST_ROOT_DIR}/blob-loader.ts`,
-  `${TRUST_ROOT_DIR}/boundary-runner.ts`,
-  // CLI entry invoked by scripts/trusted-distribution-gate.ps1.
-  `${TRUST_ROOT_DIR}/cli.ts`,
-];
+// Trust-root TypeScript runtime modules. The runtime closure is enumerated
+// at module load time by scanning the trust-root directory for non-test
+// .ts files. This guarantees that any new runtime module added to the
+// directory is automatically protected — closing the previous gap where
+// adding a new helper module required manually updating this list
+// (parent defect #2).
+//
+// Test files (*.test.ts) and declaration files (*.d.ts) are NOT runtime
+// imports — they are not loaded when the launcher runs in production — so
+// they are deliberately excluded. Their digests are recorded separately
+// in the bootstrap digest report for review.
+function enumerateRuntimeModules(repoRootForTestOnly?: string): readonly string[] {
+  const repoRoot = repoRootForTestOnly ?? resolveRepoRoot();
+  const abs = path.join(repoRoot, TRUST_ROOT_DIR_REL);
+  if (!fs.existsSync(abs)) return [];
+  const out: string[] = [];
+  for (const ent of fs.readdirSync(abs, { withFileTypes: true })) {
+    if (!ent.isFile()) continue;
+    if (!ent.name.endsWith(".ts")) continue;
+    if (ent.name.endsWith(".test.ts")) continue;
+    if (ent.name.endsWith(".test-worker.ts")) continue;
+    if (ent.name.endsWith(".d.ts")) continue;
+    out.push(`${TRUST_ROOT_DIR_REL}/${ent.name}`);
+  }
+  return out.sort();
+}
+
+function resolveRepoRoot(): string {
+  // Trust-root module lives at <repoRoot>/.opencode/skills/repo-agentdev-integrity/
+  // scripts/trusted-distribution-gate/protected-paths.ts. Walk up five dirs.
+  let dir = path.dirname(__filename);
+  for (let i = 0; i < 5; i++) dir = path.dirname(dir);
+  return dir;
+}
 
 const TRUST_ROOT_CONFIG: readonly string[] = [
-  `${TRUST_ROOT_DIR}/tsconfig.json`,
-  `${TRUST_ROOT_DIR}/package.json`,
+  `${TRUST_ROOT_DIR_REL}/tsconfig.json`,
+  `${TRUST_ROOT_DIR_REL}/package.json`,
   // Lockfile pins transitive dependency versions; tampering with it
   // could swap a dependency for a malicious one.
-  `${TRUST_ROOT_DIR}/bun.lock`,
+  `${TRUST_ROOT_DIR_REL}/bun.lock`,
   // Local .gitignore controls what gets tracked; tampering could
   // quietly exclude a future trust-root file from version control.
-  `${TRUST_ROOT_DIR}/.gitignore`,
+  `${TRUST_ROOT_DIR_REL}/.gitignore`,
 ];
 
 const TRUSTED_INSTALLATION_SCRIPTS: readonly string[] = [
-  // The trusted launcher entry scripts (PowerShell + Bash companions, when
-  // committed). The PowerShell entry is the documented primary; the Bash
+  // The trusted launcher entry script (PowerShell primary). The Bash
   // companion, if any, would also be protected.
   "scripts/trusted-distribution-gate.ps1",
-  // Trusted installation mapping scripts (consumer-facing bootstrap).
+  // Trusted consumer install/check scripts (consumer-facing bootstrap).
   "scripts/install-consumer-opencode.ps1",
   "scripts/check-consumer-opencode.ps1",
-  // Trusted archive installer/packager (run by consumers, not by launcher).
-  "scripts/install-from-archive.ps1",
-  "scripts/package-release-archive.ps1",
+  // NOTE: scripts/install-from-archive.ps1 and scripts/package-release-archive.ps1
+  // are Stage B canonical scripts and are intentionally NOT protected by
+  // Stage A (parent defect #3).
 ];
 
 /**
@@ -89,15 +112,9 @@ const TRUSTED_INSTALLATION_SCRIPTS: readonly string[] = [
  */
 export const TRUST_ROOT_DIRECT_PATHS: readonly string[] = [
   ...TRUSTED_INSTALLATION_SCRIPTS,
-  ...TRUST_ROOT_DIR_FILES(),
+  ...TRUST_ROOT_CONFIG,
+  ...enumerateRuntimeModules(),
 ];
-
-function TRUST_ROOT_DIR_FILES(): readonly string[] {
-  return [
-    ...TRUST_ROOT_TS_MODULES,
-    ...TRUST_ROOT_CONFIG,
-  ];
-}
 
 // ---------------------------------------------------------------------------
 // Path normalization and matching

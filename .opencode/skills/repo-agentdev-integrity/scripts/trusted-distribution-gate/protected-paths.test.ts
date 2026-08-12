@@ -26,11 +26,13 @@ describe("protected-paths / TRUST_ROOT_DIRECT_PATHS", () => {
     expect(matched.length).toBeGreaterThan(0);
   });
 
-  test("includes the trusted installation scripts", () => {
+  test("includes the trusted installation scripts (Stage A only — Stage B scripts excluded, parent defect #3)", () => {
     expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/install-consumer-opencode.ps1");
     expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/check-consumer-opencode.ps1");
-    expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/install-from-archive.ps1");
-    expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/package-release-archive.ps1");
+    // scripts/install-from-archive.ps1 and scripts/package-release-archive.ps1
+    // are Stage B canonical scripts and are intentionally NOT protected.
+    expect(TRUST_ROOT_DIRECT_PATHS).not.toContain("scripts/install-from-archive.ps1");
+    expect(TRUST_ROOT_DIRECT_PATHS).not.toContain("scripts/package-release-archive.ps1");
   });
 
   test("protects runtime helpers blob-loader, boundary-runner, protected-check (parent defect #9)", () => {

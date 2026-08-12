@@ -1,110 +1,128 @@
 // Protected-path verification stage.
 //
-// Reads each trust-root file at base and candidate OIDs via git-blob-reader
-// and reports the first modification, deletion, or addition. Returns null
-// when no protected path differs between the two OIDs.
+// Reads each trust-root file at base and candidate OIDs via the git adapter
+// and reports a structured per-path outcome for EVERY protected path. The
+// launcher applies mode-aware policy (strict / bootstrap / seed) on the
+// aggregated result; this layer reports raw facts only.
 //
-// Distinct failure semantics (parent defect #10):
-//   - read error from git (distinct from "missing") → Unexpected, surfaced
-//   - missing in base → "bootstrap required" (reviewer must seed base)
-//   - missing in candidate (present in base) → "protected path deleted"
-//   - digest mismatch → "protected path modified"
-// The previous implementation caught all git errors as "missing" and
-// permitted missing-on-both, which let tampering or bootstrap gaps pass.
+// Distinct typed-error semantics (parent defect #10):
+//   - GitBlobMissingError → structured "missing" outcome (no message parsing)
+//   - GitAdapterError → surfaced as a stage error (caller fails closed)
+//   - PathSafetyError → surfaced as a stage error (caller fails closed)
+//
+// Aggregation contract (parent defect #4):
+//   Earlier implementations returned the FIRST violation, which let a real
+//   modification hide behind a benign bootstrap-only add. This layer always
+//   scans every protected path and returns the full outcome list so the
+//   launcher's policy can distinguish modified/deleted (fatal in every mode)
+//   from candidate-added (permitted in bootstrap/seed mode).
 
 import type { GitOid, TrustedFileDigest } from "./types.ts";
 import type { RawGitAdapter } from "./git-blob-reader.ts";
-import { GitAdapterError, readBlob } from "./git-blob-reader.ts";
+import { GitAdapterError, readBlobsBatched } from "./git-blob-reader.ts";
 import {
   DEFAULT_PROTECTED_PATH_SET,
   listAllProtectedPaths,
 } from "./protected-paths.ts";
 import { computeSha256 } from "./archive-builder.ts";
 
+export type PerPathStatus =
+  | "both-present-same"
+  | "both-present-differ"
+  | "base-only"
+  | "candidate-only"
+  | "both-missing";
+
+export interface ProtectedPathOutcome {
+  readonly path: string;
+  readonly status: PerPathStatus;
+  readonly base_digest: string | null;
+  readonly candidate_digest: string | null;
+}
+
+export interface ProtectedCheckAggregated {
+  readonly outcomes: readonly ProtectedPathOutcome[];
+  readonly base_digests: readonly TrustedFileDigest[];
+}
+
 export type ProtectedCheckResult =
-  | { readonly kind: "ok"; readonly base_digests: readonly TrustedFileDigest[] }
-  | { readonly kind: "violation"; readonly message: string }
+  | { readonly kind: "ok"; readonly aggregated: ProtectedCheckAggregated }
   | { readonly kind: "error"; readonly code: 9; readonly message: string };
 
+/**
+ * Aggregate per-path protected-check outcomes in O(1) git subprocesses.
+ * All base and candidate requests are batched into a SINGLE
+ * `git cat-file --batch` call per OID (parent blocker #4). The batched
+ * result distinguishes missing (typed) from adapter failure (typed
+ * throw), so infrastructure/permission errors are NOT silently downgraded
+ * to "missing" (parent blocker #5).
+ */
 export function checkProtectedPaths(
   adapter: RawGitAdapter,
   baseOid: GitOid,
   candidateOid: GitOid,
 ): ProtectedCheckResult {
   const protectedSet = listAllProtectedPaths(DEFAULT_PROTECTED_PATH_SET);
+  const baseReqs = protectedSet.map((p) => `${baseOid}:${p}`);
+  const candReqs = protectedSet.map((p) => `${candidateOid}:${p}`);
+
+  let baseBatch, candBatch;
+  try {
+    baseBatch = readBlobsBatched(adapter, baseReqs);
+  } catch (e) {
+    return { kind: "error", code: 9, message: `protected-path batched read failed at base: ${errMsg(e)}` };
+  }
+  try {
+    candBatch = readBlobsBatched(adapter, candReqs);
+  } catch (e) {
+    return { kind: "error", code: 9, message: `protected-path batched read failed at candidate: ${errMsg(e)}` };
+  }
+
+  const outcomes: ProtectedPathOutcome[] = [];
   const baseDigests: TrustedFileDigest[] = [];
+  for (let i = 0; i < protectedSet.length; i++) {
+    const p = protectedSet[i]!;
+    const baseReq = baseReqs[i]!;
+    const candReq = candReqs[i]!;
+    const baseBytes = baseBatch.found.get(baseReq);
+    const candBytes = candBatch.found.get(candReq);
+    const baseMissing = baseBatch.missing.includes(baseReq);
+    const candMissing = candBatch.missing.includes(candReq);
 
-  for (const p of protectedSet) {
-    const baseRead = readBlobAt(adapter, baseOid, p);
-    if (baseRead.kind === "error") {
-      return { kind: "error", code: 9, message: `protected-path read failed at base for ${p}: ${baseRead.message}` };
+    // If neither found nor explicitly missing, the batched protocol is
+    // broken — surface as error (fail-closed) rather than guessing.
+    if (baseBytes === undefined && !baseMissing) {
+      return { kind: "error", code: 9, message: `protected-path indeterminate at base for ${p}` };
     }
-    const candRead = readBlobAt(adapter, candidateOid, p);
-    if (candRead.kind === "error") {
-      return { kind: "error", code: 9, message: `protected-path read failed at candidate for ${p}: ${candRead.message}` };
+    if (candBytes === undefined && !candMissing) {
+      return { kind: "error", code: 9, message: `protected-path indeterminate at candidate for ${p}` };
     }
 
-    const baseDigest = baseRead.kind === "present" ? baseRead.digest : null;
-    const candDigest = candRead.kind === "present" ? candRead.digest : null;
-
+    const baseDigest = baseBytes ? computeSha256(baseBytes) : null;
+    const candDigest = candBytes ? computeSha256(candBytes) : null;
     if (baseDigest !== null) {
       baseDigests.push({ path: p, sha256: baseDigest, kind: "direct" });
     }
-
-    if (baseDigest !== null && candDigest === null) {
-      return { kind: "violation", message: `protected path deleted: ${p}` };
-    }
-    if (baseDigest !== null && candDigest !== null && baseDigest !== candDigest) {
-      return {
-        kind: "violation",
-        message: `protected path modified: ${p} (base=${baseDigest.substring(0, 12)} candidate=${candDigest.substring(0, 12)})`,
-      };
-    }
-    if (baseDigest === null && candDigest !== null) {
-      // For the bootstrap PR's own first commit, base_oid may legitimately
-      // not yet contain trust-root files (they exist only at candidate).
-      // The launcher treats this as a violation UNLESS the caller passes
-      // base_oid === candidate_oid (bootstrap-mode). The launcher caller
-      // makes that policy decision; this layer reports the raw fact.
-      return { kind: "violation", message: `protected path added in candidate but missing in base: ${p} (bootstrap-required)` };
-    }
-    // both null → not present in either (e.g. trust-root file added in a
-    // future commit not yet at base). The launcher caller decides whether
-    // that is acceptable for the current invocation mode.
+    outcomes.push({
+      path: p,
+      status: classifyOutcome(baseDigest, candDigest),
+      base_digest: baseDigest,
+      candidate_digest: candDigest,
+    });
   }
-  return { kind: "ok", base_digests: baseDigests };
+  return { kind: "ok", aggregated: { outcomes, base_digests: baseDigests } };
 }
 
-type ReadResult =
-  | { readonly kind: "present"; readonly digest: string }
-  | { readonly kind: "missing" }
-  | { readonly kind: "error"; readonly message: string };
-
-function readBlobAt(
-  adapter: RawGitAdapter,
-  oid: GitOid,
-  filePath: string,
-): ReadResult {
-  try {
-    const bytes = readBlob(adapter, oid, "protected", filePath);
-    return { kind: "present", digest: computeSha256(bytes) };
-  } catch (e) {
-    // git cat-file exits non-zero when the path is absent at the OID.
-    // We surface a distinct "missing" result so the launcher can react
-    // differently from real I/O or git errors. GitAdapterError is the
-    // error type thrown by the production adapter for any failure; we
-    // inspect the message to distinguish "does not exist" from other.
-    if (e instanceof GitAdapterError) {
-      const msg = e.message;
-      // git emits: "fatal: path '...' does not exist in '<oid>'"
-      // We treat that signature as missing; anything else is an error.
-      if (msg.includes("does not exist") || msg.includes("exit status")) {
-        return { kind: "missing" };
-      }
-      return { kind: "error", message: msg };
-    }
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg.includes("does not exist")) return { kind: "missing" };
-    return { kind: "error", message: msg };
+function classifyOutcome(baseDigest: string | null, candDigest: string | null): PerPathStatus {
+  if (baseDigest !== null && candDigest !== null) {
+    return baseDigest === candDigest ? "both-present-same" : "both-present-differ";
   }
+  if (baseDigest !== null && candDigest === null) return "base-only";
+  if (baseDigest === null && candDigest !== null) return "candidate-only";
+  return "both-missing";
+}
+
+function errMsg(e: unknown): string {
+  if (e instanceof GitAdapterError) return e.message;
+  return e instanceof Error ? e.message : String(e);
 }
