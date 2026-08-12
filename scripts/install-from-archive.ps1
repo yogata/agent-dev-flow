@@ -5,7 +5,7 @@ param(
     [Parameter(Mandatory = $true)][ValidateSet("copy")][string]$Mode
 )
 
-# WP-3 (Issue #1928) §7.5.2: install the unpacked release archive's src/opencode/
+# WP-{N} (Issue #1928) §7.5.2: install the unpacked release archive's src/opencode/
 # tree into the projection directory (.opencode/) as real files.
 # Junctions are NOT created; release archives must be junction-free.
 #
@@ -82,7 +82,7 @@ foreach ($f in $commandFiles) {
     Place-File -SrcFile $f.FullName -DstFile $dst
 }
 
-# Skills: agentdev-* and the japanese-tech-writing dependency (REQ-002).
+# Skills: agentdev-* and the japanese-tech-writing dependency (REQ-{NNNN}).
 $skillDirs = Get-ChildItem -LiteralPath $skillsSrc -Directory | Where-Object {
     $_.Name -like "agentdev-*" -or $_.Name -eq "japanese-tech-writing"
 }
