@@ -1,0 +1,15 @@
+{
+  "name": "trusted-distribution-gate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stage A trust-root launcher/checker/packager. Inspects an immutable candidate Git OID without executing candidate code, rejects protected-path changes, builds/verifies canonical manifest sets (source runtime, source bootstrap, link, archive, archive-installed), and fails closed. Side-effect-free detector is separated from git/archive I/O adapters.",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0"
+  }
+}
