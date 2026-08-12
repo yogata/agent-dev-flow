@@ -1,24 +1,26 @@
 // Tests for the manifest builder.
 //
-// The manifest builder produces the five canonical manifest sets defined in
-// the accepted package contract: source-runtime, source-bootstrap, link,
-// archive, archive-installed. Each manifest entry records path + SHA-256 +
-// size. The builder consumes the candidate tree's git tree entries and
-// classifies each entry into the projection(s) it belongs to.
+// The manifest builder produces the four canonical manifest projections
+// defined in docs/specs/integrity/distribution-boundary.md §58-67:
+// source, link, archive, archive-installed. Each manifest entry records
+// path + SHA-256 + size. The builder consumes the candidate tree's git
+// tree entries and classifies each entry into the projection(s) it
+// belongs to. Source has two internal subsets (runtime, bootstrap) and
+// archive has one extra subset (archive-extra); these subsets are not
+// public projection labels.
 
 import { describe, expect, test } from "bun:test";
 import {
-  buildSourceRuntimeManifest,
-  buildSourceBootstrapManifest,
+  buildSourceManifest,
   buildLinkManifest,
   buildArchiveManifest,
   buildArchiveInstalledManifest,
-  manifestEntryEquals,
   isRequiredRuntimePath,
   isRequiredBootstrapPath,
-  diffManifests,
+  classifySourceSubset,
   type ManifestEntryInput,
 } from "./manifest.ts";
+import { manifestEntryEquals, diffManifests } from "./manifest-diff.ts";
 
 function entry(path: string, sha: string, size: number): ManifestEntryInput {
   return { path, sha256: sha, size };
@@ -59,72 +61,55 @@ describe("manifest / isRequiredBootstrapPath", () => {
   });
 });
 
-describe("manifest / buildSourceRuntimeManifest", () => {
-  test("includes only source-runtime entries", () => {
+describe("manifest / classifySourceSubset", () => {
+  test("runtime for src/opencode/** paths", () => {
+    expect(classifySourceSubset("src/opencode/commands/agentdev/x.md")).toBe("runtime");
+    expect(classifySourceSubset("src/opencode/skills/agentdev-foo/SKILL.md")).toBe("runtime");
+  });
+  test("bootstrap for install/check scripts", () => {
+    expect(classifySourceSubset("scripts/install-consumer-opencode.ps1")).toBe("bootstrap");
+    expect(classifySourceSubset("scripts/check-consumer-opencode.ps1")).toBe("bootstrap");
+  });
+  test("archive-extra for install-from-archive and README-INSTALL", () => {
+    expect(classifySourceSubset("scripts/install-from-archive.ps1")).toBe("archive-extra");
+    expect(classifySourceSubset("README-INSTALL.md")).toBe("archive-extra");
+  });
+  test("null for unrelated paths", () => {
+    expect(classifySourceSubset("docs/specs/foo.md")).toBeNull();
+    expect(classifySourceSubset("README.md")).toBeNull();
+  });
+});
+
+describe("manifest / buildSourceManifest", () => {
+  test("includes runtime + bootstrap entries", () => {
     const inputs: ManifestEntryInput[] = [
       entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
       entry("src/opencode/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
       entry("src/opencode/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
-      entry("README.md", "d".repeat(64), 40),
+      entry("scripts/install-consumer-opencode.ps1", "d".repeat(64), 40),
+      entry("scripts/check-consumer-opencode.ps1", "e".repeat(64), 50),
+      entry("README.md", "f".repeat(64), 60),
     ];
-    const m = buildSourceRuntimeManifest(inputs);
-    expect(m.projection).toBe("source-runtime");
+    const m = buildSourceManifest(inputs);
+    expect(m.projection).toBe("source");
     expect(m.entries.map((e) => e.path).sort()).toEqual([
+      "scripts/check-consumer-opencode.ps1",
+      "scripts/install-consumer-opencode.ps1",
       "src/opencode/commands/agentdev/case-run.md",
       "src/opencode/skills/agentdev-foo/SKILL.md",
       "src/opencode/skills/japanese-tech-writing/SKILL.md",
     ]);
   });
 
-  test("sorts entries by path", () => {
-    const inputs: ManifestEntryInput[] = [
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", "a".repeat(64), 1),
-      entry("src/opencode/commands/agentdev/case-run.md", "b".repeat(64), 2),
-    ];
-    const m = buildSourceRuntimeManifest(inputs);
-    expect(m.entries[0]?.path).toBe("src/opencode/commands/agentdev/case-run.md");
-    expect(m.entries[1]?.path).toBe("src/opencode/skills/agentdev-foo/SKILL.md");
-  });
-
-  test("rejects duplicate paths in same projection", () => {
-    const inputs: ManifestEntryInput[] = [
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", "a".repeat(64), 1),
-      entry("src/opencode/skills/agentdev-foo/SKILL.md", "b".repeat(64), 2),
-    ];
-    expect(() => buildSourceRuntimeManifest(inputs)).toThrow();
-  });
-
   test("rejects zero-target manifest (no entries)", () => {
-    expect(() => buildSourceRuntimeManifest([])).toThrow();
+    expect(() => buildSourceManifest([])).toThrow();
   });
 
   test("rejects invalid sha256", () => {
     const inputs: ManifestEntryInput[] = [
       entry("src/opencode/skills/agentdev-foo/SKILL.md", "short", 1),
     ];
-    expect(() => buildSourceRuntimeManifest(inputs)).toThrow();
-  });
-});
-
-describe("manifest / buildSourceBootstrapManifest", () => {
-  test("includes the two bootstrap scripts", () => {
-    const inputs: ManifestEntryInput[] = [
-      entry("scripts/install-consumer-opencode.ps1", "a".repeat(64), 100),
-      entry("scripts/check-consumer-opencode.ps1", "b".repeat(64), 100),
-      entry("scripts/other.ps1", "c".repeat(64), 100),
-    ];
-    const m = buildSourceBootstrapManifest(inputs);
-    expect(m.entries.map((e) => e.path).sort()).toEqual([
-      "scripts/check-consumer-opencode.ps1",
-      "scripts/install-consumer-opencode.ps1",
-    ]);
-  });
-
-  test("rejects when a required bootstrap script is missing", () => {
-    const inputs: ManifestEntryInput[] = [
-      entry("scripts/install-consumer-opencode.ps1", "a".repeat(64), 100),
-    ];
-    expect(() => buildSourceBootstrapManifest(inputs)).toThrow();
+    expect(() => buildSourceManifest(inputs)).toThrow();
   });
 });
 

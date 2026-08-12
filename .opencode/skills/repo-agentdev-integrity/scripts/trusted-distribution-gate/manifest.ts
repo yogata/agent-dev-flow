@@ -1,34 +1,41 @@
 // Canonical manifest builder for the accepted package contract.
 //
-// Five projections are defined per the contract:
+// Four canonical projections per docs/specs/integrity/distribution-boundary.md
+// §58-67:
 //
-//   source-runtime    — every tracked regular file under
-//                       src/opencode/commands/agentdev/**,
-//                       src/opencode/skills/agentdev-*/**,
-//                       src/opencode/skills/japanese-tech-writing/**
-//                       (including tests, fixtures, README, package.json,
-//                       tsconfig, lockfiles, and metadata — none excluded).
+//   source           — every tracked regular file under
+//                      src/opencode/commands/agentdev/**,
+//                      src/opencode/skills/agentdev-*/**,
+//                      src/opencode/skills/japanese-tech-writing/**
+//                      (including tests, fixtures, README, package.json,
+//                      tsconfig, lockfiles, and metadata — none excluded)
+//                      PLUS the trusted consumer bootstrap scripts
+//                      scripts/install-consumer-opencode.ps1 and
+//                      scripts/check-consumer-opencode.ps1.
 //
-//   source-bootstrap  — consumer-facing scripts/install-consumer-opencode.ps1
-//                       and scripts/check-consumer-opencode.ps1.
+//   link             — deterministic .opencode/** mapping of source-runtime
+//                      with identical blob digests.
 //
-//   link              — deterministic .opencode/** mapping of source-runtime
-//                       with identical blob digests.
-//
-//   archive           — source-runtime plus scripts/install-from-archive.ps1
-//                       and README-INSTALL.md.
+//   archive          — source-runtime plus scripts/install-from-archive.ps1
+//                      and README-INSTALL.md, wrapped under
+//                      agentdev-release-<short>/ at archive root.
 //
 //   archive-installed — deterministic .opencode/** mapping of source-runtime
-//                       (no install-from-archive.ps1, no README-INSTALL.md;
-//                       the installer is verified separately by trusted
-//                       deterministic mapping/digest comparison, never by
-//                       execution).
+//                      (no install-from-archive.ps1, no README-INSTALL.md;
+//                      the installer is verified separately by trusted
+//                      deterministic mapping/digest comparison, never by
+//                      execution).
+//
+// Runtime and bootstrap are internal source subsets (SourceSubset), not
+// public projection labels. They exist only so the manifest builder can
+// route paths into the correct projection (e.g. bootstrap is in `source`
+// but excluded from `link`/`archive-installed`).
 //
 // The builder is pure: it does not read git, the filesystem, or the network.
 // The launcher feeds it the candidate tree's git entries plus their
 // digests.
 
-import type { ManifestEntry, ManifestSet, Projection } from "./types.ts";
+import type { ManifestEntry, ManifestSet, Projection, SourceSubset } from "./types.ts";
 
 export interface ManifestEntryInput {
   readonly path: string;
@@ -37,7 +44,7 @@ export interface ManifestEntryInput {
 }
 
 // ---------------------------------------------------------------------------
-// Source path predicates
+// Source path predicates (internal subsets)
 // ---------------------------------------------------------------------------
 
 const RUNTIME_PREFIXES: readonly string[] = [
@@ -66,6 +73,13 @@ export function isRequiredBootstrapPath(path: string): boolean {
 
 export function isRequiredArchiveExtraPath(path: string): boolean {
   return ARCHIVE_EXTRA_REQUIRED.includes(path);
+}
+
+export function classifySourceSubset(path: string): SourceSubset | null {
+  if (isRequiredRuntimePath(path)) return "runtime";
+  if (isRequiredBootstrapPath(path)) return "bootstrap";
+  if (isRequiredArchiveExtraPath(path)) return "archive-extra";
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -122,30 +136,29 @@ function dedupeAndSort(
   return [...entries].sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
 }
 
-export function buildSourceRuntimeManifest(
+/**
+ * Build the canonical `source` projection. Source includes runtime
+ * (src/opencode/**) AND bootstrap scripts (install-consumer-opencode.ps1,
+ * check-consumer-opencode.ps1). Both are producer-authored text shipped to
+ * the consumer.
+ */
+export function buildSourceManifest(
   inputs: readonly ManifestEntryInput[],
 ): ManifestSet {
-  const filtered = inputs.filter((i) => isRequiredRuntimePath(i.path));
+  const filtered = inputs.filter(
+    (i) => isRequiredRuntimePath(i.path) || isRequiredBootstrapPath(i.path),
+  );
   if (filtered.length === 0) {
-    throw new ManifestError("source-runtime", "zero target entries");
+    throw new ManifestError("source", "zero target entries");
   }
-  for (const e of filtered) assertValidEntry(e, "source-runtime");
-  const entries = dedupeAndSort("source-runtime", filtered.map(toManifestEntry));
-  return { projection: "source-runtime", entries };
-}
-
-export function buildSourceBootstrapManifest(
-  inputs: readonly ManifestEntryInput[],
-): ManifestSet {
-  const filtered = inputs.filter((i) => isRequiredBootstrapPath(i.path));
   for (const required of BOOTSTRAP_PATHS) {
     if (!filtered.some((f) => f.path === required)) {
-      throw new ManifestError("source-bootstrap", `missing required entry: ${required}`);
+      throw new ManifestError("source", `missing required bootstrap script: ${required}`);
     }
   }
-  for (const e of filtered) assertValidEntry(e, "source-bootstrap");
-  const entries = dedupeAndSort("source-bootstrap", filtered.map(toManifestEntry));
-  return { projection: "source-bootstrap", entries };
+  for (const e of filtered) assertValidEntry(e, "source");
+  const entries = dedupeAndSort("source", filtered.map(toManifestEntry));
+  return { projection: "source", entries };
 }
 
 /**
@@ -157,9 +170,6 @@ export function mapRuntimeToLinkPath(runtimePath: string): string {
   if (!prefix) {
     throw new ManifestError("link", `not a runtime path: ${runtimePath}`);
   }
-  // src/opencode/commands/agentdev/foo.md -> .opencode/commands/agentdev/foo.md
-  // src/opencode/skills/agentdev-foo/bar.md -> .opencode/skills/agentdev-foo/bar.md
-  // src/opencode/skills/japanese-tech-writing/bar.md -> .opencode/skills/japanese-tech-writing/bar.md
   return ".opencode/" + runtimePath.substring("src/opencode/".length);
 }
 
@@ -203,15 +213,12 @@ export function buildArchiveInstalledManifest(
   if (runtimeInputs.length === 0) {
     throw new ManifestError("archive-installed", "zero target entries");
   }
-  // Same .opencode/** path mapping as the link projection, but the
-  // projection label MUST be archive-installed (parent defect #7).
   const mapped: ManifestEntry[] = runtimeInputs.map((i) => {
     assertValidEntry(i, "archive-installed");
     return { path: mapRuntimeToLinkPath(i.path), sha256: i.sha256, size: i.size };
   });
   const entries = dedupeAndSort("archive-installed", mapped);
   const result: ManifestSet = { projection: "archive-installed", entries };
-  // Defensive assertion: catch any future refactor that breaks the label.
   if (result.projection !== "archive-installed") {
     throw new ManifestError("archive-installed", `projection label corrupted: ${result.projection}`);
   }
@@ -219,43 +226,8 @@ export function buildArchiveInstalledManifest(
 }
 
 // ---------------------------------------------------------------------------
-// Equality / diff
+// Equality / diff — delegated to manifest-diff.ts (split for LOC ceiling)
 // ---------------------------------------------------------------------------
 
-export function manifestEntryEquals(a: ManifestEntry, b: ManifestEntry): boolean {
-  return a.path === b.path && a.sha256 === b.sha256 && a.size === b.size;
-}
-
-export interface ManifestDiff {
-  readonly extra: readonly ManifestEntry[];
-  readonly missing: readonly ManifestEntry[];
-  readonly digest_mismatches: readonly ManifestEntry[];
-}
-
-export function diffManifests(
-  expected: readonly ManifestEntry[],
-  actual: readonly ManifestEntry[],
-): ManifestDiff {
-  const expectedMap = new Map(expected.map((e) => [e.path, e]));
-  const actualMap = new Map(actual.map((e) => [e.path, e]));
-  const extra: ManifestEntry[] = [];
-  const missing: ManifestEntry[] = [];
-  const digestMismatches: ManifestEntry[] = [];
-
-  for (const [path, e] of actualMap) {
-    if (!expectedMap.has(path)) extra.push(e);
-  }
-  for (const [path, e] of expectedMap) {
-    const a = actualMap.get(path);
-    if (!a) {
-      missing.push(e);
-    } else if (a.sha256 !== e.sha256 || a.size !== e.size) {
-      digestMismatches.push(e);
-    }
-  }
-  return {
-    extra: extra.sort((x, y) => x.path.localeCompare(y.path)),
-    missing: missing.sort((x, y) => x.path.localeCompare(y.path)),
-    digest_mismatches: digestMismatches.sort((x, y) => x.path.localeCompare(y.path)),
-  };
-}
+export { manifestEntryEquals, diffManifests } from "./manifest-diff.ts";
+export type { ManifestDiff } from "./manifest-diff.ts";
