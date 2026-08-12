@@ -25,7 +25,7 @@ description: 要件定義をもとにGitHub Issueを作成する
 本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。
 
 - **STEP-1** 引き継ぎ・OU 選択 — `agentdev_handoff: true` 判定、OU モード時は OU 選択ゲート
-- **STEP-2** Issue 本文生成・execution contract 確定 — QG-2 検証、test_strategy 埋め込み、EC-1〜EC-8 確定
+- **STEP-2** Issue 本文生成・execution contract 確定 — QG-{N} 検証、test_strategy 埋め込み、EC-{N}〜EC-{N} 確定
 - **STEP-3** 構成判定・preflight — 単一REQ → Standard flow、複数REQ/`scale: large`/複数 OU → Epic flow、execution_unit 構成、preflight 5項目
 - **STEP-4** adversarial-review（経路F）— default-on、skip 条件（Standard flow で単一 OU 機械的確定）該当時は省略、ユーザー明示指定時は強制発動、4パターン再実行ルール
 - **STEP-5** Issue 作成（Epic flow / Standard flow）— Epic Issue + 子Issue（OU単位、最大5件並列）、または Standard Issue、OU 結果書き戻し
@@ -72,7 +72,7 @@ description: 要件定義をもとにGitHub Issueを作成する
 - G23/G24: 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）を実行せず、`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従う。ステージ・コミットは明示パス指定（`git add <path>`/ `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）で行い共有 index の他セッション変更を排出しない。draft/RU 削除は同一ステップで即時ステージ・コミットし未ステージ残存を許さない（Form Zero）。`git add` は `.agentdev/` 全体の一括スコープではなく明示パスに限定
 
 ### 本文 verbatim・ファイル経由制約
-- G25: Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）は文字列変数で持ち回らず `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでファイル経由で固定し、親エージェントの本文再構成を禁止
+- G25: Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）は文字列変数で持ち回らず `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-{N} BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでファイル経由で固定し、親エージェントの本文再構成を禁止
 
 
 
