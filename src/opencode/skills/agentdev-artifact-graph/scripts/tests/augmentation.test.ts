@@ -25,7 +25,7 @@ async function jsonLines(path: string): Promise<readonly Record<string, unknown>
   return content.trim().split("\n").filter(Boolean).map((line) => JSON.parse(line))
 }
 
-describe("TS-003: augmentation adds node_type and relation_type", () => {
+describe("TS\u002D003: augmentation adds node_type and relation_type", () => {
   it("without augmentation: guide type absent, only 3 default node types", async () => {
     const fixture = await setup()
     await createGuideFixture(fixture.root)
@@ -50,7 +50,7 @@ describe("TS-003: augmentation adds node_type and relation_type", () => {
     await buildGraph(fixture)
     const manifest = JSON.parse(await readFile(join(fixture.output, "manifest.json"), "utf8"))
     expect(manifest.node_types).toContain("guide")
-    expect(manifest.indexed_paths).toContain("docs\\u002Fguides")
+    expect(manifest.indexed_paths).toContain("docs/guides")
     expect(manifest.relation_types).toContain("documented_in")
 
     const nodes = await jsonLines(join(fixture.output, "nodes.jsonl"))
