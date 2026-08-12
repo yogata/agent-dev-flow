@@ -8,7 +8,7 @@
 //   - stdout: diagnostic report（人間可読テキスト）
 //   - --json を付けた場合は JSON 形式の HarnessReport のみを出力
 //
-// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS-010）。
+// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS\u002D010）。
 // parser/graph regression は REQ-{NNNN} 傘下の tests/*.test.ts が独立に判断する。
 // 本コマンドは終了コード 0 で終了する（diagnostic のため）。
 
@@ -84,7 +84,7 @@ function renderHumanReport(report: HarnessReport): string {
   const lines: string[] = []
   lines.push("# Artifact Graph Workflow Effectiveness Report")
   lines.push("")
-  lines.push("**本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS-010）。**")
+  lines.push("**本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS\u002D010）。**")
   lines.push("**Parser/Graph regression は REQ-{NNNN} 傘下の検証層が独立に判断する。**")
   lines.push("")
   lines.push(`- root: ${report.rootDir}`)
