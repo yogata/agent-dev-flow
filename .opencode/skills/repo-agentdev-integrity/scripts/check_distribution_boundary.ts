@@ -15,12 +15,12 @@
 import * as path from "path";
 import * as fs from "fs";
 import {
-  classifyContent,
-  decideGate,
+  classifyContentConfig,
+  DEFAULT_DETECTOR_CONFIG,
   isTextFile,
-  PROJECTIONS,
-  type Projection,
+  type DetectorConfig,
   type Detection,
+  type Projection,
 } from "./lib/distribution-boundary.ts";
 
 export interface BoundaryFailure {
@@ -145,7 +145,7 @@ function dirExists(p: string): boolean {
 
 function readText(p: string): string | null {
   try {
-    return fs.readFileSync(p, "utf-8") as string;
+    return fs.readFileSync(p, "utf-8");
   } catch {
     return null;
   }
@@ -165,13 +165,6 @@ function listTextArtifacts(dirPath: string, recursive: boolean): string[] {
     }
   }
   return result;
-}
-
-function isLineExempt(_line: string): boolean {
-  // Deprecated: line-level exemption hints were removed because they hid real
-  // IDs on the same line. Template/glob forms are excluded by the lib patterns
-  // themselves. Retained as a no-op for any external caller.
-  return false;
 }
 
 function collectTargets(repoRoot: string, projection: Projection): string[] {
@@ -216,7 +209,11 @@ function detectionToFailure(d: Detection): BoundaryFailure {
   };
 }
 
-export function checkDistributionBoundary(repoRoot: string, projection: Projection = "source"): BoundaryReport {
+export function checkDistributionBoundary(
+  repoRoot: string,
+  projection: Projection = "source",
+  detectorConfig: DetectorConfig = DEFAULT_DETECTOR_CONFIG,
+): BoundaryReport {
   const failures: BoundaryFailure[] = [];
   const stats = {
     scanned_files: 0,
@@ -254,7 +251,7 @@ export function checkDistributionBoundary(repoRoot: string, projection: Projecti
       });
       continue;
     }
-    const detections = classifyContent(text, file, projection);
+    const detections = classifyContentConfig(text, file, projection, detectorConfig);
     for (const d of detections) {
       const f = detectionToFailure(d);
       if (f.category === "concrete-id") stats.concrete_id_hits += 1;
@@ -469,7 +466,8 @@ const json = args.includes("--json");
   let profile = "source";
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--profile" && i + 1 < args.length) {
-      profile = args[i + 1];
+      const next = args[i + 1];
+      if (next !== undefined) profile = next;
       i++;
     }
   }
@@ -640,7 +638,8 @@ export function checkDistributionRules(repoRoot: string): {
     const lines = text.split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
       for (const marker of IR046_MARKERS) {
-        if (lines[i].includes(marker)) {
+        const line = lines[i];
+        if (line !== undefined && line.includes(marker)) {
           stats.ir046_hits += 1;
           findings.push({
             rule: "ir046",
@@ -657,7 +656,8 @@ export function checkDistributionRules(repoRoot: string): {
   // IR-047: src/opencode-local/ 配下のサブディレクトリは allowed set のみ。
   const localRoot = path.join(repoRoot, "src", "opencode-local");
   if (dirExists(localRoot)) {
-    const subs = (fs.readdirSync(localRoot, { withFileTypes: true }) as any[])
+    const subs = fs
+      .readdirSync(localRoot, { withFileTypes: true })
       .filter((e) => e.isDirectory())
       .map((e) => e.name);
     for (const sub of subs) {
@@ -686,7 +686,8 @@ export function checkDistributionRules(repoRoot: string): {
       if (text === null) continue;
       const lines = text.split(/\r?\n/);
       for (let i = 0; i < lines.length; i++) {
-        if (lines[i].includes(IR048_PREFIX)) {
+        const line = lines[i];
+        if (line !== undefined && line.includes(IR048_PREFIX)) {
           stats.ir048_hits += 1;
           findings.push({
             rule: "ir048",
