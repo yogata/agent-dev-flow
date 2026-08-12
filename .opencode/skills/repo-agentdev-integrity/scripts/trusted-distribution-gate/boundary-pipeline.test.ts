@@ -1,4 +1,4 @@
-// Tests for the side-effect-free boundary detector pipeline.
+﻿// Tests for the side-effect-free boundary detector pipeline.
 //
 // The detector must NOT be a closed (REQ|ADR|DEC) list. It must classify
 // arbitrary producer-internal ID families, concrete docs paths (slash,
@@ -9,7 +9,6 @@
 import { describe, expect, test } from "bun:test";
 import {
   classifyLine,
-  isConcreteDocsPath,
   type DetectorConfig,
 } from "./boundary-pipeline.ts";
 
@@ -38,7 +37,7 @@ const baseConfig: DetectorConfig = {
 describe("boundary-pipeline / classifyLine", () => {
   test("accepts a clean line with no references", () => {
     const r = classifyLine(
-      { text: "Just prose, no references.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "Just prose, no references.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     expect(r.detections).toEqual([]);
@@ -46,7 +45,7 @@ describe("boundary-pipeline / classifyLine", () => {
 
   test("classifies known producer-internal concrete ID as violation", () => {
     const r = classifyLine(
-      { text: "See ADR-0135 for the decision.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "See ADR-0135 for the decision.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     expect(r.detections).toHaveLength(1);
@@ -57,7 +56,7 @@ describe("boundary-pipeline / classifyLine", () => {
 
   test("rejects 5+ digit IDs (extended width)", () => {
     const r = classifyLine(
-      { text: "REQ-100002 is the future.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "REQ-100002 is the future.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     expect(r.detections).toHaveLength(1);
@@ -70,7 +69,7 @@ describe("boundary-pipeline / classifyLine", () => {
       producer_internal_id_prefixes: [...baseConfig.producer_internal_id_prefixes, "FOO"],
     };
     const r = classifyLine(
-      { text: "Track via FOO-42.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "Track via FOO-42.", lineNumber: 1, filePath: "f.md", projection: "source" },
       cfg,
     );
     expect(r.detections[0]?.classification).toBe("producer-internal");
@@ -80,7 +79,7 @@ describe("boundary-pipeline / classifyLine", () => {
   test("fails closed on unknown ID family (unclassified, not consumer-resolvable)", () => {
     // JIRA-123 has an unknown prefix; pipeline must NOT silently allow it.
     const r = classifyLine(
-      { text: "Track via JIRA-123.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "Track via JIRA-123.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     expect(r.detections).toHaveLength(1);
@@ -90,7 +89,7 @@ describe("boundary-pipeline / classifyLine", () => {
 
   test("allows ID template placeholders", () => {
     const r = classifyLine(
-      { text: "Pattern REQ-{NNNN} is fine.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "Pattern REQ-{NNNN} is fine.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     expect(r.detections).toEqual([]);
@@ -98,7 +97,7 @@ describe("boundary-pipeline / classifyLine", () => {
 
   test("allows ID glob placeholders", () => {
     const r = classifyLine(
-      { text: "Pattern REQ-* matches all.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "Pattern REQ-* matches all.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     expect(r.detections).toEqual([]);
@@ -106,7 +105,7 @@ describe("boundary-pipeline / classifyLine", () => {
 
   test("allows ID angle-bracket placeholders", () => {
     const r = classifyLine(
-      { text: "Pattern <REQ-NNNN> placeholder.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "Pattern <REQ-NNNN> placeholder.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     expect(r.detections).toEqual([]);
@@ -114,7 +113,7 @@ describe("boundary-pipeline / classifyLine", () => {
 
   test("detects concrete docs path under requirements", () => {
     const r = classifyLine(
-      { text: "Bad: docs/requirements/REQ-0149.md is concrete.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "Bad: docs/requirements/REQ-0149.md is concrete.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const pathDetection = r.detections.find((d) => d.category === "concrete-path");
@@ -124,7 +123,7 @@ describe("boundary-pipeline / classifyLine", () => {
 
   test("allows docs README index", () => {
     const r = classifyLine(
-      { text: "See docs/adr/README.md for the index.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "See docs/adr/README.md for the index.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const pathDetection = r.detections.find((d) => d.category === "concrete-path");
@@ -133,7 +132,7 @@ describe("boundary-pipeline / classifyLine", () => {
 
   test("allows docs path template (no producer-internal detection)", () => {
     const r = classifyLine(
-      { text: "Pattern docs/specs/<domain>/<spec>.md is fine.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "Pattern docs/specs/<domain>/<spec>.md is fine.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const producerInternal = r.detections.find((d) => d.classification === "producer-internal");
@@ -142,7 +141,7 @@ describe("boundary-pipeline / classifyLine", () => {
 
   test("allows docs path glob (no producer-internal detection)", () => {
     const r = classifyLine(
-      { text: "Glob docs/requirements/REQ-*.md is fine.", lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+      { text: "Glob docs/requirements/REQ-*.md is fine.", lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const producerInternal = r.detections.find((d) => d.classification === "producer-internal");
@@ -152,7 +151,7 @@ describe("boundary-pipeline / classifyLine", () => {
   test("detects producer-internal fixed URL (github blob path under docs/)", () => {
     const r = classifyLine(
       { text: "See https://github.com/yogata/agent-dev-flow/blob/main/docs/foo.md",
-        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+        lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const urlDetection = r.detections.find((d) => d.category === "fixed-url");
@@ -165,7 +164,7 @@ describe("boundary-pipeline / classifyLine", () => {
     // producer-internal regardless of path (docs, scripts, src, etc.).
     const r = classifyLine(
       { text: "See https://github.com/yogata/agent-dev-flow/blob/main/scripts/install.ps1",
-        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+        lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const urlDetection = r.detections.find((d) => d.category === "fixed-url");
@@ -179,7 +178,7 @@ describe("boundary-pipeline / classifyLine", () => {
     // old /docs/-only check).
     const r = classifyLine(
       { text: "See https://github.com/vercel/next.js/blob/main/docs/tutorial.md",
-        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+        lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const urlDetection = r.detections.find((d) => d.category === "fixed-url");
@@ -191,7 +190,7 @@ describe("boundary-pipeline / classifyLine", () => {
     // GitHub owner/repo names are case-insensitive (legacy).
     const r = classifyLine(
       { text: "See https://github.com/Yogata/Agent-Dev-Flow/blob/main/x.md",
-        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+        lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const urlDetection = r.detections.find((d) => d.category === "fixed-url");
@@ -201,7 +200,7 @@ describe("boundary-pipeline / classifyLine", () => {
   test("allows external github URL outside docs/", () => {
     const r = classifyLine(
       { text: "See https://github.com/vercel/next.js/blob/main/src/index.ts",
-        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+        lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const urlDetection = r.detections.find((d) => d.category === "fixed-url");
@@ -211,7 +210,7 @@ describe("boundary-pipeline / classifyLine", () => {
   test("detects raw.githubusercontent producer-internal URL", () => {
     const r = classifyLine(
       { text: "Raw: raw.githubusercontent.com/yogata/agent-dev-flow/main/docs/specs/system.md",
-        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+        lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const urlDetection = r.detections.find((d) => d.category === "fixed-url");
@@ -221,7 +220,7 @@ describe("boundary-pipeline / classifyLine", () => {
   test("normalizes backslash path token before classification", () => {
     const r = classifyLine(
       { text: "Bad: docs\\requirements\\REQ-0001.md is concrete on Windows.",
-        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+        lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const pathDetection = r.detections.find((d) => d.category === "concrete-path");
@@ -230,10 +229,10 @@ describe("boundary-pipeline / classifyLine", () => {
   });
 
   test("normalizes percent-encoded path before classification", () => {
-    // docs%2Frequirements%2FREQ-0001.md — URI-encoded slashes
+    // docs%2Frequirements%2FREQ-0001.md 窶・URI-encoded slashes
     const r = classifyLine(
       { text: "Bad: docs%2Frequirements%2FREQ-0001.md is encoded.",
-        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+        lineNumber: 1, filePath: "f.md", projection: "source" },
       baseConfig,
     );
     const pathDetection = r.detections.find((d) => d.category === "concrete-path");
@@ -247,30 +246,12 @@ describe("boundary-pipeline / classifyLine", () => {
     };
     const r = classifyLine(
       { text: "See https://github.com/yogata/agent-dev-flow/blob/main/docs/foo.md",
-        lineNumber: 1, filePath: "f.md", projection: "source-runtime" },
+        lineNumber: 1, filePath: "f.md", projection: "source" },
       cfg,
     );
     const urlDetection = r.detections.find((d) => d.category === "fixed-url");
     // No identity configured: URL extraction itself is suppressed to avoid
     // false positives. fail-closed is via the empty identity contract.
     expect(urlDetection).toBeUndefined();
-  });
-});
-
-describe("boundary-pipeline / isConcreteDocsPath", () => {
-  test("rejects README index", () => {
-    expect(isConcreteDocsPath("docs/adr/README.md")).toBe(false);
-  });
-  test("rejects template", () => {
-    expect(isConcreteDocsPath("docs/specs/<domain>/<spec>.md")).toBe(false);
-  });
-  test("rejects glob", () => {
-    expect(isConcreteDocsPath("docs/requirements/REQ-*.md")).toBe(false);
-  });
-  test("rejects non-markdown", () => {
-    expect(isConcreteDocsPath("docs/adr/ADR-0001.txt")).toBe(false);
-  });
-  test("accepts concrete markdown file", () => {
-    expect(isConcreteDocsPath("docs/adr/ADR-0001.md")).toBe(true);
   });
 });

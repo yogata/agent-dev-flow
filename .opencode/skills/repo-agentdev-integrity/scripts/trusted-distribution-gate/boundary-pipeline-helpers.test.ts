@@ -6,6 +6,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   detectCandidates,
+  isConcreteDocsPath,
   normalizePathToken,
   resolveCandidate,
   type DetectorConfig,
@@ -96,5 +97,23 @@ describe("boundary-pipeline helpers / resolveCandidate", () => {
     );
     expect(r.classification).toBe("consumer-resolvable");
     expect(r.category).toBe("fixed-url");
+  });
+});
+
+describe("boundary-pipeline helpers / isConcreteDocsPath", () => {
+  test("rejects README index", () => {
+    expect(isConcreteDocsPath("docs/adr/README.md")).toBe(false);
+  });
+  test("rejects template", () => {
+    expect(isConcreteDocsPath("docs/specs/<domain>/<spec>.md")).toBe(false);
+  });
+  test("rejects glob", () => {
+    expect(isConcreteDocsPath("docs/requirements/REQ-*.md")).toBe(false);
+  });
+  test("rejects non-markdown", () => {
+    expect(isConcreteDocsPath("docs/adr/ADR-0001.txt")).toBe(false);
+  });
+  test("accepts concrete markdown file", () => {
+    expect(isConcreteDocsPath("docs/adr/ADR-0001.md")).toBe(true);
   });
 });
