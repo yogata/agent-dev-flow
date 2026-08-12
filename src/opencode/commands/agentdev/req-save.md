@@ -50,15 +50,15 @@ REQ/Decision 対象 artifact_actions がない場合は no-op 完了（後続の
 
 `agentdev-req-file-manager` の判定ロジックと採番ルールに従って実行。Step 3-3 で処理対象とした `artifact_actions`（`artifact: req`/`artifact: decision`）の全 entry を処理する（draft 全体を処理し、OU ごとの消費は行わない）。`artifact_actions` フィールドがない場合は従来どおり全 req-operation を処理する（後方互換）。委譲接続点: サブエージェントはCREATE/APPEND/UPDATE候補、SPLIT候補、REQ再構成候補を返し、親エージェントがファイル保存を行う。詳細は `agentdev-req-file-manager` を参照
 
-**決定的処理のスクリプト呼出（REQ、AG-002）**: REQ番号採番、要件行ID採番、frontmatter id↔ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約（RU-20260722-01 合意）および `agentdev-req-file-manager` SKILL.md「Scripts（決定的処理）」で規定する決定的スクリプトを bash 経由で呼び出して実行する。LLM 推論で代替しない。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+**決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: REQ番号採番、要件行ID採番、frontmatter id↔ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約（RU-{NNNNNNNN}-01 合意）および `agentdev-req-file-manager` SKILL.md「Scripts（決定的処理）」で規定する決定的スクリプトを bash 経由で呼び出して実行する。LLM 推論で代替しない。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
 
-**Step 4-0**: QG-1（適用結果の整合性検証、REQ/082、AG-003）。REQ/Decision ファイル保存前に `agentdev-quality-gates` の QG-1 を「適用結果の整合性検証」として実行。採番結果、マージ結果、インデックス、変更範囲の妥当性を決定的スクリプトの JSON 結果で機械的に確認。fail 時は保存を停止し req-define へ差し戻し。**REQ**: req-save の QG-1 は内容の品質を再検証せず、それは req-define の QG-1 の責務。**Step 4-1**: 語彙、責務、runtime境界矛盾の防止（Step 4 完了後に既知の矛盾を検出可能な範囲で防止）。**Step 4-2**: Catalog entry 確認（APPEND 時。関連 integrity-rule-catalog SPEC（extension 経由）の catalog entry 有無を確認、未記載時はユーザーへ追記を促す、`docs/specs/` 配下は直接編集しない G02）。**Step 4-3**: 複数 REQ/Decision ファイルの3フェーズ分離（REQ/093、後述「case-auto 並列委譲モデル」参照）。Step 4-1/4-2 の詳細は `agentdev-req-file-manager` を参照
+**Step 4-0**: QG-{N}（適用結果の整合性検証、REQ/082、AG-{NNN}）。REQ/Decision ファイル保存前に `agentdev-quality-gates` の QG-{N} を「適用結果の整合性検証」として実行。採番結果、マージ結果、インデックス、変更範囲の妥当性を決定的スクリプトの JSON 結果で機械的に確認。fail 時は保存を停止し req-define へ差し戻し。**REQ**: req-save の QG-{N} は内容の品質を再検証せず、それは req-define の QG-{N} の責務。**Step 4-1**: 語彙、責務、runtime境界矛盾の防止（Step 4 完了後に既知の矛盾を検出可能な範囲で防止）。**Step 4-2**: Catalog entry 確認（APPEND 時。関連 integrity-rule-catalog SPEC（extension 経由）の catalog entry 有無を確認、未記載時はユーザーへ追記を促す、`docs/specs/` 配下は直接編集しない G02）。**Step 4-3**: 複数 REQ/Decision ファイルの3フェーズ分離（REQ/093、後述「case-auto 並列委譲モデル」参照）。Step 4-1/4-2 の詳細は `agentdev-req-file-manager` を参照
 
 ### Step 5: インデックス、ハブ更新
 
 詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが `docs/` ファイルを更新する
 
-**エントリ存在確認のスクリプト呼出（REQ、AG-002、AG-019）**: README へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（RU-20260722-01 合意、`check-entry-existence`）で登録を検証する。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+**エントリ存在確認のスクリプト呼出（REQ、AG-{NNN}、AG-{NNN}）**: README へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（RU-{NNNNNNNN}-01 合意、`check-entry-existence`）で登録を検証する。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
 
 ### Step 6: Decision ファイル作成
 
@@ -76,11 +76,11 @@ REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/RE
 
 **extension 更新要否（REQ）**: REQ/Decision 追加/移動/削除が `.agentdev/extensions/**` へ影響するか確認。該当 REQ/Decision を context に列挙している extension がある場合、paths も更新対象。必要時はユーザーへ指示を仰ぐ（直接編集しない）
 
-**エントリ存在確認（REQ、AG-019）**: `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で REQ/Decision エントリの README 索引への存在を確認する
+**エントリ存在確認（REQ、AG-{NNN}）**: `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で REQ/Decision エントリの README 索引への存在を確認する
 
 ### Step 9: 変更範囲検証
 
-**決定的処理のスクリプト呼出（REQ、AG-019）**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`、RU-20260722-01 合意）で実行。許可範囲外の変更を検出したらエラー内容をユーザーに報告して指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ
+**決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`、RU-{NNNNNNNN}-01 合意）で実行。許可範囲外の変更を検出したらエラー内容をユーザーに報告して指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ
 
 **Step 9-1**: リモート同期と hash 検証。**Step 9-2**: RU パス保存禁止。詳細、委譲接続点は `agentdev-req-file-manager` を参照
 
