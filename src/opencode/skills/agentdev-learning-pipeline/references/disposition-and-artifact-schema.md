@@ -18,7 +18,7 @@ learning-promote が各クラスタに対して判定する廃棄カテゴリ。
 
 **昇華可能性評価、無条件自動REQ化禁止（REQ）**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。**無条件の自動REQ化は禁止する**。学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` の昇華経路を経て初めて REQ 化される。
 
-**living pool 維持（REQ）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-005）。
+**living pool 維持（REQ）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-{NNN}）。
 
 | # | カテゴリ | 判定基準 |
 |---|---|---|
