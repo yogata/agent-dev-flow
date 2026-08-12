@@ -36,6 +36,40 @@ function makeAdapter(blobs: Record<string, Uint8Array>): RawGitAdapter {
       }
       return Buffer.from(bytes);
     },
+    spawnGitWithInput(args: readonly string[], input: Buffer): Buffer {
+      // Support both `cat-file --batch` and `--batch-check`.
+      const cmd = args[1];
+      const lines = input.toString("utf-8").split("\n").filter((l) => l.length > 0);
+      if (cmd === "--batch-check") {
+        const out: string[] = [];
+        for (const line of lines) {
+          const colon = line.indexOf(":");
+          const p = colon >= 0 ? line.substring(colon + 1) : line;
+          const bytes = blobs[p];
+          if (bytes) {
+            out.push(`${line.substring(0, colon)} blob ${bytes.length}`);
+          } else {
+            out.push(`${line} missing`);
+          }
+        }
+        return Buffer.from(out.join("\n") + "\n", "utf-8");
+      }
+      // --batch: emit header + body + newline for present; missing line otherwise.
+      const chunks: Buffer[] = [];
+      for (const line of lines) {
+        const colon = line.indexOf(":");
+        const p = colon >= 0 ? line.substring(colon + 1) : line;
+        const bytes = blobs[p];
+        if (bytes) {
+          chunks.push(Buffer.from(`${line.substring(0, colon)} blob ${bytes.length}\n`, "utf-8"));
+          chunks.push(Buffer.from(bytes));
+          chunks.push(Buffer.from("\n"));
+        } else {
+          chunks.push(Buffer.from(`${line} missing\n`));
+        }
+      }
+      return Buffer.concat(chunks);
+    },
   };
 }
 
@@ -50,7 +84,7 @@ describe("blob-loader / loadAndClassify text", () => {
     expect(r.blobs).toHaveLength(1);
     const b: LoadedBlob = r.blobs[0]!;
     expect(b.text).toBe("# case-run\n");
-    expect(b.projection).toBe("source-runtime");
+    expect(b.subset).toBe("runtime");
   });
 
   test("skips entries outside known projections", () => {

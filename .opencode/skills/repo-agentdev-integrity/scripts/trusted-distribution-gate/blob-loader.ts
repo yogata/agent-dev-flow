@@ -1,32 +1,32 @@
 // Blob loading + classification stage.
 //
-// Reads every candidate-tree blob, classifies it as text or binary (strict
-// UTF-8), and projects it into one of source-runtime / source-bootstrap /
-// extra (archive extras). Files outside these projections are skipped —
-// the manifest builder only consumes projected entries.
+// Reads every candidate-tree blob in a SINGLE git subprocess via
+// `git cat-file --batch` (parent defect #12), classifies it as text or
+// binary (strict UTF-8), and projects it into one of the internal source
+// subsets: runtime, bootstrap, or archive-extra. Files outside these
+// subsets are skipped — the manifest builder only consumes projected
+// entries.
 //
-// Fail-closed contract for shipped projection entries (parent defect #4):
+// Fail-closed contract for shipped subset entries (parent defect #4):
 //   - Strict UTF-8 validation. Invalid UTF-8 / NUL byte is EncodingViolation.
 //   - Binary is allowed ONLY by explicit extension allowlist. Unknown
 //     extension with binary bytes is UnclassifiedEntry (fail-closed).
 //   - We never silently treat a shipped artifact as "binary, skip scan".
 
-import type { GitOid, Projection } from "./types.ts";
+import type { GitOid, SourceSubset } from "./types.ts";
 import { ExitCode } from "./types.ts";
 import type { RawGitAdapter } from "./git-blob-reader.ts";
-import { readBlob } from "./git-blob-reader.ts";
+import { readBlobsBatched } from "./git-blob-reader.ts";
 import type { GitTreeEntry } from "./types.ts";
 import { classifyBytes } from "./text-binary.ts";
 import {
-  isRequiredArchiveExtraPath,
-  isRequiredBootstrapPath,
-  isRequiredRuntimePath,
+  classifySourceSubset,
   type ManifestEntryInput,
 } from "./manifest.ts";
 import { computeSha256 } from "./archive-builder.ts";
 
 export interface LoadedBlob {
-  readonly projection: Projection | "extra";
+  readonly subset: SourceSubset;
   readonly entry: ManifestEntryInput;
   readonly bytes: Uint8Array;
   /** Text content; null means binary (allowlisted) — not scannable. */
@@ -41,8 +41,6 @@ export type LoadResult =
       readonly message: string;
     };
 
-// Extensions whose binary content is allowed in shipped projections.
-// Adding a new binary kind is a trust-root change (review required).
 const BINARY_EXTENSION_ALLOWLIST: readonly string[] = [
   ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico",
   ".zip", ".gz", ".tar", ".tgz",
@@ -66,61 +64,56 @@ export function loadAndClassify(
   candidateOid: GitOid,
   entries: readonly GitTreeEntry[],
 ): LoadResult {
+  const candidates = entries.filter((e) => classifySourceSubset(e.path) !== null);
+  if (candidates.length === 0) return { kind: "ok", blobs: [] };
+
+  // Single batched read: one subprocess for all blobs (parent defect #12).
+  // Catch protocol/adapter failures and convert to typed LoadResult so
+  // runLauncher always returns a JSON-shaped LauncherResult (blocker #2).
+  const requests = candidates.map((e) => `${candidateOid}:${e.path}`);
+  let batched;
+  try {
+    batched = readBlobsBatched(adapter, requests);
+  } catch (e) {
+    return {
+      kind: "error",
+      code: ExitCode.Unexpected,
+      message: `git cat-file --batch failed during blob load: ${e instanceof Error ? e.message : String(e)}`,
+    };
+  }
+
   const blobs: LoadedBlob[] = [];
-  for (const e of entries) {
-    let bytes: Uint8Array;
-    try {
-      bytes = readBlob(adapter, candidateOid, "candidate", e.path);
-    } catch (err_) {
+  for (const e of candidates) {
+    const req = `${candidateOid}:${e.path}`;
+    const bytes = batched.found.get(req);
+    if (!bytes) {
       return {
         kind: "error",
-        code: ExitCode.Unexpected,
-        message: `git cat-file failed for ${e.path}: ${errMsg(err_)}`,
+        code: ExitCode.UnclassifiedEntry,
+        message: `git cat-file missing for ${e.path}`,
       };
     }
-    const projection: Projection | "extra" | null = pickProjection(e.path);
-    if (projection === null) continue;
-
+    const subset = classifySourceSubset(e.path)!;
     const classification = classifyBytes(bytes);
     let text: string | null;
     if (classification.kind === "text") {
       text = classification.text ?? "";
     } else {
-      // Binary bytes. Allow ONLY if the path's extension is on the
-      // explicit allowlist. Anything else fails closed: invalid UTF-8/NUL
-      // in a shipped projection is either tampering or an unclassified
-      // new binary kind — both block the gate.
       if (!isAllowlistedBinaryPath(e.path)) {
         return {
           kind: "error",
           code: ExitCode.EncodingViolation,
-          message: `binary content (reason: ${classification.reason ?? "unknown"}) in non-allowlisted shipped projection entry: ${e.path}`,
+          message: `binary content (reason: ${classification.reason ?? "unknown"}) in non-allowlisted shipped subset entry: ${e.path}`,
         };
       }
       text = null;
     }
-
     blobs.push({
-      projection,
-      entry: {
-        path: e.path,
-        sha256: computeSha256(bytes),
-        size: bytes.length,
-      },
+      subset,
+      entry: { path: e.path, sha256: computeSha256(bytes), size: bytes.length },
       bytes,
       text,
     });
   }
   return { kind: "ok", blobs };
-}
-
-function pickProjection(path: string): Projection | "extra" | null {
-  if (isRequiredRuntimePath(path)) return "source-runtime";
-  if (isRequiredBootstrapPath(path)) return "source-bootstrap";
-  if (isRequiredArchiveExtraPath(path)) return "extra";
-  return null;
-}
-
-function errMsg(e: unknown): string {
-  return e instanceof Error ? e.message : String(e);
 }
