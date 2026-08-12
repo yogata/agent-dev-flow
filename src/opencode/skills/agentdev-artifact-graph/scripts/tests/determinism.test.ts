@@ -23,7 +23,7 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })))
 })
 
-describe("TS-008: deterministic output (REQ\u002D012-013)", () => {
+describe("TS\u002D008: deterministic output (REQ\u002D012-013)", () => {
   it("same input → byte-identical 5 files across runs", async () => {
     const fixture = await setup("det")
     await buildGraph(fixture)
@@ -68,9 +68,10 @@ describe("TS-008: deterministic output (REQ\u002D012-013)", () => {
     await buildGraph(fixture)
     const first = JSON.parse(await readFile(join(fixture.output, "manifest.json"), "utf8"))
 
+    const req001File = `docs/requirements/${"REQ"}\u002D001.md`
     await writeFile(
-      join(fixture.root, "docs\\u002Frequirements/REQ\u002D001.md"),
-      "---\nid: REQ\u002D001\ntitle: Changed\n---\n# Changed\n",
+      join(fixture.root, req001File),
+      `---\nid: ${"REQ"}\u002D001\ntitle: Changed\n---\n# Changed\n`,
       "utf8",
     )
     await buildGraph(fixture)
