@@ -31,7 +31,7 @@ auto_gate:
   # auto_ready が false の場合、または未解決 item が残る場合、後続コマンドは停止する
   # 未確定内容抑止: agreed_items/artifact_actions の content に TBD/TODO/未定/後続工程で確定/case-run で確定
   #   のいずれかを含む場合、auto_ready: false とし該当 AG-ID/ACT-ID と理由を stop_reasons へ記録する
-  #   （引用・禁止事例の言及は誤検知対象外）。QG-1 意味判定（必須フィールド欠落等）も併用する
+  #   （引用・禁止事例の言及は誤検知対象外）。QG-{N} 意味判定（必須フィールド欠落等）も併用する
   auto_ready: true
   unresolved_questions: []      # 未解決質問が残る場合は停止理由として列挙
   unresolved_conflicts: []      # 未解決衝突が残る場合は停止理由として列挙
@@ -41,9 +41,9 @@ auto_gate:
 # agreed_items: 合意された個別項目。artifact_actions.source_items から ID 参照される
 # 必要十分な長文として保持し、項目数を増やして短い値を多数並べない
 agreed_items:
-  - id: AG-001
+  - id: AG-{NNN}
     content: {合意された要件内容の本文}
-  - id: AG-002
+  - id: AG-{NNN}
     content: {合意された要件内容の本文}
 
 # artifact_actions: REQ/Decision/SPEC への保存対象を成果物別ではなく1つの配列に統合
@@ -55,17 +55,17 @@ artifact_actions:
     operation: create           # REQ/Decision: create / append / update、SPEC: create / update
     target: new:{topic-slug}    # REQ/Decision: file path または new:{slug}。SPEC は target_spec 構造化推奨
     target_area: # artifact: spec の場合、operation: update/spec-update では必須（対象セクション見出し）。operation: create/spec-create および req/decision では任意
-    source_items: [AG-001, AG-002] # 対応する agreed_item ID の list
+    source_items: [AG-{NNN}, AG-{NNN}] # 対応する agreed_item ID の list
     content: |                  # 保存対象の full text
       {保存対象の本文}
   - id: ACT-DEC-{NNN}
     artifact: decision
     operation: create
     target: new:{topic-slug}
-    source_items: [AG-003]
+    source_items: [AG-{NNN}]
     content: |
       {保存対象の本文}
-  - id: ACT-SPEC-001            # SPEC 保存対象（artifact: spec）が含まれる場合 spec-save が実行される
+  - id: ACT-SPEC-{NNN}            # SPEC 保存対象（artifact: spec）が含まれる場合 spec-save が実行される
     artifact: spec
     operation: create           # SPEC: create / update
     target_spec:                # SPEC 操作は target_spec 構造化推奨（operation, domain, slug）。target: file path との併用も可
@@ -73,20 +73,20 @@ artifact_actions:
       domain: foundations       # docs/specs/{domain}/ の domain（foundations/responsibilities/quality/integrity/local/authoring/commands/skills/workflows）
       slug: {topic-slug}        # ファイル名 slug（docs/specs/{domain}/{slug}.md を作成）
     target_area: # operation: create/spec-create では任意、operation: update/spec-update では必須（対象セクション見出し）
-    source_items: [AG-004]
+    source_items: [AG-{NNN}]
     content: |
       {保存対象の本文}
 
 # conflict_resolutions: 壁打ちで解消された衝突の記録
 # 記録済みの衝突について、後続コマンドは同じ内容をユーザーへ再確認しない
 conflict_resolutions:
-  - id: CR-001
+  - id: CR-{NNN}
     conflict: {検出された衝突内容}
     resolution: {解消方針と根拠}
 
 # operation_units: 複数RU入力時の統合/分離結果。単一REQ操作の場合も1件の OU として出力
 operation_units:
-  - ou_id: OU-001
+  - ou_id: OU-{NNN}
     source_ru: # optional: 元 RU-ID
     target_req: REQ-{NNNN}      # REQ 操作の対象 REQ
     target_spec: # optional: SPEC 操作の対象 SPEC パス（例: docs/specs/{domain}/<existing-spec>.md、新規は target_spec: {operation, domain, slug} 構造化）
@@ -102,8 +102,8 @@ operation_units:
 # 項目識別子: TS-NNN 形式（NNNは3桁ゼロ埋め連番）
 # on_failure アクション種別: fix-and-reverify（実装を修正して再検証）/ record-in-findings（Findings に out-of-scope として記録）
 test_strategy:
-  - id: TS-001                 # TS-NNN（3桁ゼロ埋め連番）
-    target_item: AG-001        # agreed_items の id（AG-*）への参照
+  - id: TS-{NNN}                 # TS-NNN（3桁ゼロ埋め連番）
+    target_item: AG-{NNN}        # agreed_items の id（AG-*）への参照
     verification: |            # 検証手順
       {検証手順の本文}
     pass_criteria: |           # 合格基準
@@ -116,7 +116,7 @@ test_strategy:
 # 1 エントリ = 単一 source_ru + 単一 source_item（重複禁止）
 # evidence.checked_at_commit は req-define 生成時 null（G08 git 禁止）。case-open が default branch 最新化後に再確認し確認 commit SHA を記録する
 review_dispositions:
-  - id: RD-001                 # RD-NNN 形式の識別子
+  - id: RD-{NNN}                 # RD-NNN 形式の識別子
     source_ru: {RU-ID}         # optional: 単一の元 RU-ID（RU 入力でない場合は省略可）
     source_item: {item-id}     # 単一の元 item 識別子（複数指定不可）
     disposition: covered       # covered / partially_covered / rejected / not_applicable（必要に応じて superseded / stale_target）
