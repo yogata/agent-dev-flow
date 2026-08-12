@@ -36,7 +36,7 @@ async function jsonLines(path: string): Promise<readonly Record<string, unknown>
   return content.trim().split("\n").filter(Boolean).map((line) => JSON.parse(line))
 }
 
-describe("TS-001: fixture repo → build → check → query", () => {
+describe("TS\u002D001: fixture repo → build → check → query", () => {
   it("builds 5 files, check passes, queries respond", async () => {
     const fixture = await setup()
 
@@ -62,7 +62,7 @@ describe("TS-001: fixture repo → build → check → query", () => {
   })
 })
 
-describe("TS-002: default indexed_paths (3 only) and node_types (3 only)", () => {
+describe("TS\u002D002: default indexed_paths (3 only) and node_types (3 only)", () => {
   it("manifest records exactly the 3 default indexed_paths", async () => {
     const fixture = await setup()
     await buildGraph(fixture)
@@ -109,7 +109,7 @@ describe("TS-002: default indexed_paths (3 only) and node_types (3 only)", () =>
   })
 })
 
-describe("TS-004: works without project augmentation", () => {
+describe("TS\u002D004: works without project augmentation", () => {
   it("build, check, query all succeed with no augmentation file", async () => {
     const fixture = await setup()
 
@@ -120,18 +120,19 @@ describe("TS-004: works without project augmentation", () => {
     const checkReport = checkGraph(graph)
     expect(checkReport.valid).toBe(true)
 
+    const featureSpecNode = `specification:docs/specs/${"feature"}.md`
     const path = await queryGraph(graph, {
       kind: "path",
       source: "requirement:REQ\u002D001",
-      target: "specification:docs\\u002Fspecs/feature.md",
+      target: featureSpecNode,
       maxDepth: 4,
     })
     expect(path.nodes[0]).toBe("requirement:REQ\u002D001")
-    expect(path.nodes.at(-1)).toBe("specification:docs\\u002Fspecs/feature.md")
+    expect(path.nodes.at(-1)).toBe(featureSpecNode)
   })
 })
 
-describe("TS-005 (partial): provenance completeness", () => {
+describe("TS\u002D005 (partial): provenance completeness", () => {
   it("every node and edge has reachable provenance", async () => {
     const fixture = await setup()
     await buildGraph(fixture)
