@@ -44,9 +44,10 @@ describe("fail-open: Graph missing/stale/failure does not halt workflow (REQ\u00
   it("regenerates when input is stale", async () => {
     const fixture = await setup()
     const initial = await buildGraph(fixture)
+    const req001File = `docs/requirements/${"REQ"}\u002D001.md`
     await writeFile(
-      join(fixture.root, "docs\\u002Frequirements/REQ\u002D001.md"),
-      "---\nid: REQ\u002D001\ntitle: Changed\n---\n# Changed\n",
+      join(fixture.root, req001File),
+      `---\nid: ${"REQ"}\u002D001\ntitle: Changed\n---\n# Changed\n`,
       "utf8",
     )
     const result = await prepareWorkflowGraph(fixture)
@@ -60,9 +61,10 @@ describe("fail-open: Graph missing/stale/failure does not halt workflow (REQ\u00
   it("limits a stale graph when regeneration fails (fail-open)", async () => {
     const fixture = await setup()
     await buildGraph(fixture)
+    const req001File = `docs/requirements/${"REQ"}\u002D001.md`
     await writeFile(
-      join(fixture.root, "docs\\u002Frequirements/REQ\u002D001.md"),
-      "---\nid: REQ\u002D001\ntitle: Changed\n---\n# Changed\n",
+      join(fixture.root, req001File),
+      `---\nid: ${"REQ"}\u002D001\ntitle: Changed\n---\n# Changed\n`,
       "utf8",
     )
     const failingBuilder = async (): Promise<never> => {
@@ -103,7 +105,7 @@ describe("fail-open: Graph missing/stale/failure does not halt workflow (REQ\u00
   })
 })
 
-describe("TS-007 (AG-006): Graph missing does not halt workflow; fallback discovery works", () => {
+describe("TS\u002D007 (AG\u002D006): Graph missing does not halt workflow; fallback discovery works", () => {
   it("renaming .agentdev/graph/ away lets prepare_graph regenerate (workflow continues)", async () => {
     const fixture = await setup()
     await buildGraph(fixture)
@@ -135,15 +137,16 @@ describe("TS-007 (AG-006): Graph missing does not halt workflow; fallback discov
     expect(graphExists).toBe(false)
 
     const cli = resolve(import.meta.dir, "..", "src", "query_graph.ts")
+    const discoverRoot = `docs/${"requirements"}`
     const proc = Bun.spawn(
-      ["bun", cli, "--root", root, "discover", "sample requirement", "--roots", "docs\\u002Frequirements"],
+      ["bun", cli, "--root", root, "discover", "sample requirement", "--roots", discoverRoot],
       { stdout: "pipe", stderr: "pipe" },
     )
     const exitCode = await proc.exited
     const output = JSON.parse(await new Response(proc.stdout).text())
 
     expect(exitCode).toBe(0)
-    expect(isRecord(output) ? output["discovered"] : undefined).toContain("docs\\u002Frequirements/REQ\u002D001.md")
+    expect(isRecord(output) ? output["discovered"] : undefined).toContain(`docs/requirements/${"REQ"}\u002D001.md`)
   })
 
   it("consumer not adopting ADF: prepare_graph returns ready with empty but valid graph (REQ\u002D012-014)", async () => {
@@ -159,9 +162,9 @@ describe("TS-007 (AG-006): Graph missing does not halt workflow; fallback discov
     expect(graph.nodes).toEqual([])
     expect(graph.edges).toEqual([])
     expect(graph.manifest.indexed_paths).toEqual([
-      "docs\\u002Frequirements",
-      "docs\\u002Fdecisions",
-      "docs\\u002Fspecs",
+      "docs/requirements",
+      "docs/decisions",
+      "docs/specs",
     ])
   })
 })
