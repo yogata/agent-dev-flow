@@ -1,6 +1,6 @@
 ---
 name: agentdev-adversarial-review
-description: "対論型レビューの実行入口。Orchestrator、Reviewer、Reviewee の3論理的役割で構成される審議を通じて本質的争点を抽出する。評価前に対象依存の動的レビュー戦略を構成し、対称的相互反証、戦略メタ反証、合意候補形成後の再検証（convergence audit）を行う。USE FOR: 要件案、設計案、規格・仕様案、計画案、実装案の本質的合意形成、動的レビュー戦略の構成、対称的な批判と反論による審議、合意候補の再検証、未解決争点のユーザー質問化。DO NOT USE FOR: QG-1〜QG-4 の代替、通常のコードレビューやテストや機械的検査、inspect-docs/inspect-skills 診断、実装実行やファイル保存やcommitやpushやIssue・PR更新、ユーザー承認代行、強制的統制ゲート、固定観点全実行を前提とするレビュー。"
+description: "対論型レビューの実行入口。Orchestrator、Reviewer、Reviewee の3論理的役割で構成される審議を通じて本質的争点を抽出する。評価前に対象依存の動的レビュー戦略を構成し、対称的相互反証、戦略メタ反証、合意候補形成後の再検証（convergence audit）を行う。USE FOR: 要件案、設計案、規格・仕様案、計画案、実装案の本質的合意形成、動的レビュー戦略の構成、対称的な批判と反論による審議、合意候補の再検証、未解決争点のユーザー質問化。DO NOT USE FOR: QG-{N}〜QG-{N} の代替、通常のコードレビューやテストや機械的検査、inspect-docs/inspect-skills 診断、実装実行やファイル保存やcommitやpushやIssue・PR更新、ユーザー承認代行、強制的統制ゲート、固定観点全実行を前提とするレビュー。"
 ---
 
 # 対論型レビュー（agentdev-adversarial-review）
@@ -20,7 +20,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 ## 発動契約
 
 原則適用・skip 可能な助言手段（対論型レビュー）である（REQ-{NNNN}-{NNN}）。REQ-{NNNN} で定義される caller 対象 command では adversarial-review を原則実行し、ユーザー明示指定を通常発動の必須条件としない（default-on、REQ-{NNNN}-{NNN}）。skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義し、skip 判断のためだけに新規 HITL / 承認点を追加せず、skip 対象でもユーザー明示要求時は実行する（REQ-{NNNN}-{NNN}）。
-ただし新規必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替せず、新しい恒久統制ゲートとしない（REQ-{NNNN}-{NNN}/002、REQ-{NNNN}-{NNN}）。副作用権限（commit、push、merge、ファイル保存、Issue と PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認）を代行しない（REQ-{NNNN}-{NNN}）。発動契約の詳細は SPEC「発動契約」を正とする。
+ただし新規必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-{N}〜QG-{N}、既存 HITL を代替せず、新しい恒久統制ゲートとしない（REQ-{NNNN}-{NNN}/002、REQ-{NNNN}-{NNN}）。副作用権限（commit、push、merge、ファイル保存、Issue と PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認）を代行しない（REQ-{NNNN}-{NNN}）。発動契約の詳細は SPEC「発動契約」を正とする。
 
 ## 審議上の3論理的役割
 
@@ -57,7 +57,7 @@ OpenAI/Codex adversarial-review 等の外部知見を観点、問い、failure m
 ## 副作用境界と責務分界
 
 本スキルはファイル保存、commit、push、merge、Issue・PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認代行を行わない。レビュー結果保存用の新しい正規成果物種別を導入しない。
-QG-1〜QG-4 を代替せず、通常のコードレビュー、テスト、機械的検査を代替せず、inspect-docs/inspect-skills の診断を代替しない。すべての要件作成工程、計画作成工程への強制適用を行わない。
+QG-{N}〜QG-{N} を代替せず、通常のコードレビュー、テスト、機械的検査を代替せず、inspect-docs/inspect-skills の診断を代替しない。すべての要件作成工程、計画作成工程への強制適用を行わない。
 詳細は SPEC「副作用境界」「QG、通常レビュー、診断との責務分界」を正とする。
 
 ## caller integration 共通契約
@@ -68,7 +68,7 @@ QG-1〜QG-4 を代替せず、通常のコードレビュー、テスト、機�
 
 | 契約 | 要件 | 概要 |
 |---|---|---|
-| 原則適用・skip 可能 | REQ-{NNNN}-{NNN}/002 | 必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替しない |
+| 原則適用・skip 可能 | REQ-{NNNN}-{NNN}/002 | 必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-{N}〜QG-{N}、既存 HITL を代替しない |
 | default-on | REQ-{NNNN}-{NNN} | REQ-{NNNN} caller 対象 command では原則実行し、ユーザー明示指定を通常発動の必須条件としない。QG/HITL 代替、新規恒久統制ゲート化禁止は維持 |
 | skip policy | REQ-{NNNN}-{NNN} | skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義。skip 判断のみの新規 HITL/承認点追加禁止。skip 対象でもユーザー明示要求時は実行 |
 | 副作用禁止 | REQ-{NNNN}-{NNN}/005 | ファイル、Issue、PR、git 操作を行わず、レビュー結果用の新規正規 artifact を生成しない |
@@ -86,7 +86,7 @@ user-decision-required の位置づけ（case-run result enum の第5状態で�
 
 | 非対象 | 責務主体 |
 |--------|----------|
-| QG-1〜QG-4 品質ゲート | 各工程のコマンド、`agentdev-quality-gates` |
+| QG-{N}〜QG-{N} 品質ゲート | 各工程のコマンド、`agentdev-quality-gates` |
 | 通常のコードレビュー、テスト、機械的検査 | 実装担当、CI |
 | inspect-docs/inspect-skills 診断 | `agentdev-doc-diagnostics`、`agentdev-inspect-skills` |
 | 実装実行、ファイル編集、commit、push、merge、Issue・PR更新 | case-run、各コマンド |
@@ -95,7 +95,7 @@ user-decision-required の位置づけ（case-run result enum の第5状態で�
 ## See Also
 
 - **agentdev-architecture-advisory**: アーキテクチャ助言の整理（req-define 事前確認）
-- **agentdev-quality-gates**: QG-1〜QG-4 品質ゲート基準
+- **agentdev-quality-gates**: QG-{N}〜QG-{N} 品質ゲート基準
 - **agentdev-doc-diagnostics**: 証拠付き finding の診断
 - **agentdev-skill-authoring**: スキル設計とレビュー規約
 - **SPEC `docs/specs/<skills/agentdev-adversarial-review>.md`**: 振る舞い契約の正典
