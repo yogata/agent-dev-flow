@@ -200,7 +200,22 @@ export function buildArchiveManifest(
 export function buildArchiveInstalledManifest(
   runtimeInputs: readonly ManifestEntryInput[],
 ): ManifestSet {
-  return buildLinkManifest(runtimeInputs); // same .opencode/** mapping
+  if (runtimeInputs.length === 0) {
+    throw new ManifestError("archive-installed", "zero target entries");
+  }
+  // Same .opencode/** path mapping as the link projection, but the
+  // projection label MUST be archive-installed (parent defect #7).
+  const mapped: ManifestEntry[] = runtimeInputs.map((i) => {
+    assertValidEntry(i, "archive-installed");
+    return { path: mapRuntimeToLinkPath(i.path), sha256: i.sha256, size: i.size };
+  });
+  const entries = dedupeAndSort("archive-installed", mapped);
+  const result: ManifestSet = { projection: "archive-installed", entries };
+  // Defensive assertion: catch any future refactor that breaks the label.
+  if (result.projection !== "archive-installed") {
+    throw new ManifestError("archive-installed", `projection label corrupted: ${result.projection}`);
+  }
+  return result;
 }
 
 // ---------------------------------------------------------------------------

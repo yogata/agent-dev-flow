@@ -43,11 +43,8 @@ describe("manifest / isRequiredRuntimePath", () => {
   test("rejects unrelated skills", () => {
     expect(isRequiredRuntimePath("src/opencode/skills/repo-integrity/SKILL.md")).toBe(false);
   });
-  test("rejects tests", () => {
+  test("includes tests, fixtures, README, package.json, tsconfig, lockfiles, and metadata", () => {
     expect(isRequiredRuntimePath("src/opencode/skills/agentdev-foo/scripts/x.test.ts")).toBe(true);
-    // NOTE: tests, fixtures, README, package.json, tsconfig, lockfiles, and
-    // metadata MUST be included per MUST DO item 4. isRequiredRuntimePath
-    // returns true for everything under the three source roots.
   });
 });
 
@@ -190,6 +187,20 @@ describe("manifest / buildArchiveInstalledManifest", () => {
       ".opencode/commands/agentdev/case-run.md",
       ".opencode/skills/agentdev-foo/SKILL.md",
     ]);
+  });
+
+  test("projection label is archive-installed (regression for parent defect #7)", () => {
+    // Previous implementation returned buildLinkManifest() whose projection
+    // label was 'link'. Manifest identity MUST match its constructor name.
+    const runtime = [
+      entry("src/opencode/commands/agentdev/case-run.md", "a".repeat(64), 10),
+    ];
+    const m = buildArchiveInstalledManifest(runtime);
+    expect(m.projection).toBe("archive-installed");
+  });
+
+  test("rejects zero target entries", () => {
+    expect(() => buildArchiveInstalledManifest([])).toThrow();
   });
 });
 
