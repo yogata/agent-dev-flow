@@ -7,19 +7,19 @@
 
 import { describe, expect, test, beforeAll, afterAll } from "bun:test";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import { execFileSync } from "child_process";
 import { bootstrapDigestReport } from "./bootstrap-report.ts";
 
-const TMP_ROOT = path.join(process.cwd(), ".worktrees-tmp-test-bootstrap-report");
+const TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "trust-br-"));
 
 beforeAll(() => {
-  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
-  fs.mkdirSync(TMP_ROOT, { recursive: true });
+  void TMP_ROOT;
 });
 
 afterAll(() => {
-  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
+  try { fs.rmSync(TMP_ROOT, { recursive: true, force: true }); } catch (e) { void e; }
 });
 
 function makeRepo(): { repo: string; head: string } {

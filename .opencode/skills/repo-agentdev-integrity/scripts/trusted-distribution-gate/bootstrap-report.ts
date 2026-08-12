@@ -11,7 +11,7 @@
 
 import type { GitOid, RepoPath } from "./types.ts";
 import { assertGitOid } from "./types.ts";
-import { makeProductionAdapter, GitAdapterError } from "./git-blob-reader.ts";
+import { makeProductionAdapter } from "./git-blob-reader.ts";
 import {
   DEFAULT_PROTECTED_PATH_SET,
   listAllProtectedPaths,
@@ -62,13 +62,9 @@ export function bootstrapDigestReport(
         status: "present",
       });
     } catch (e) {
-      if (e instanceof GitAdapterError && /does not exist/.test(e.message)) {
-        entries.push({ path: p, sha256: null, size: 0, status: "missing" });
-        allPresent = false;
-      } else {
-        entries.push({ path: p, sha256: null, size: 0, status: "missing" });
-        allPresent = false;
-      }
+      void e;
+      entries.push({ path: p, sha256: null, size: 0, status: "missing" });
+      allPresent = false;
     }
   }
   return {
