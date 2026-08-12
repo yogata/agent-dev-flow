@@ -56,13 +56,13 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、intake-from-github / intake-promote command の各 STEP から呼び出される（`docs/specs/<workflows/workflow-skill-model>.md`）。本スキル自身は STEP を所有しない。
+本スキルは Capability Skill として、intake-from-github / intake-promote command の各 STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution
 
-本スキルが扱う intake item（`.agentdev/intake/inbox/*.md`）、採用済み成果物（`.agentdev/intake/promoted/*.md`）は durable state 優先順位に従う。(1) SSoT 再構成（inbox/ promoted/ 配下の永続ファイル、REQ/Decision/SPEC は docs/ 配下）、(2) identifier 保持（item path、promoted item path）、(3) 最小 scalar、(4) runtime artifact（暫定分類、評価結果、adversarial-review findings、REQ-{NNNN} lifecycle）。優先順位の詳細は `docs/specs/<workflows/input-resolution-and-durable-state>.md` 参照。
+本スキルが扱う intake item（`.agentdev/intake/inbox/*.md`）、採用済み成果物（`.agentdev/intake/promoted/*.md`）は durable state 優先順位に従う。(1) SSoT 再構成（inbox/ promoted/ 配下の永続ファイル、REQ/Decision/SPEC は docs/ 配下）、(2) identifier 保持（item path、promoted item path）、(3) 最小 scalar、(4) runtime artifact（暫定分類、評価結果、adversarial-review findings、REQ-{NNNN} lifecycle）。優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
 
-呼出元 STEP は本スキルの出力（採用済み成果物、分類結果レポート）を STEP の result evidence として扱い、次 STEP の Input Resolution で再取得できる。STEP reference 8 要素は `docs/specs/<workflows/step-reference-contract>.md` 参照。
+呼出元 STEP は本スキルの出力（採用済み成果物、分類結果レポート）を STEP の result evidence として扱い、次 STEP の Input Resolution で再取得できる。STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
 
 ## See Also
 
