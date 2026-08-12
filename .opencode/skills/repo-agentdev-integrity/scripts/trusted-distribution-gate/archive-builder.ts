@@ -18,6 +18,7 @@ import * as crypto from "crypto";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import { collectActualEntries, compressStage, extractZip } from "./archive-zip.ts";
 
 // ---------------------------------------------------------------------------
 // Blob source
@@ -71,6 +72,16 @@ function assertSafeArchivePath(archivePath: string): void {
   }
   if (normalized.includes("/../") || normalized.startsWith("../")) {
     throw new ArchiveBuilderError(`path traversal rejected: ${archivePath}`);
+  }
+  // Defense-in-depth: archive paths come from candidate git tree paths and
+  // must be safe filenames. Allow letters, digits, dots, dashes,
+  // underscores, slashes. Reject shell metacharacters even though
+  // execFileSync (array form) makes injection impossible — this catches
+  // hostile candidate trees early with a clear error.
+  if (!/^[A-Za-z0-9._\-\\/]+$/.test(archivePath)) {
+    throw new ArchiveBuilderError(
+      `archive path contains forbidden characters: ${archivePath}`,
+    );
   }
 }
 
@@ -163,44 +174,58 @@ export function verifyArchive(
   }
 }
 
-interface ActualEntry {
-  readonly path: string;
-  readonly sha256: string;
-  readonly size: number;
-}
-
-function collectActualEntries(root: string): ActualEntry[] {
-  const out: ActualEntry[] = [];
-  const walk = (dir: string): void => {
-    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, ent.name);
-      if (ent.isDirectory()) {
-        walk(full);
-      } else if (ent.isFile()) {
-        const rel = path.relative(root, full).replace(/\\/g, "/");
-        const bytes = fs.readFileSync(full);
-        out.push({
-          path: rel,
-          sha256: computeSha256(new Uint8Array(bytes)),
-          size: bytes.length,
-        });
-      }
-    }
-  };
-  walk(root);
-  return out;
-}
-
-function extractZip(zipPath: string, dst: string): void {
-  fs.mkdirSync(dst, { recursive: true });
-  if (process.platform === "win32") {
-    const { execSync } = require("child_process") as typeof import("child_process");
-    execSync(
-      `powershell -NoProfile -Command "Expand-Archive -LiteralPath '${zipPath}' -DestinationPath '${dst}' -Force"`,
+/**
+ * Refuse to write a final archive path that escapes the trusted output
+ * root. Caller supplies the trusted root explicitly; we resolve both
+ * paths absolutely and require finalPath to be at-or-under outputRoot.
+ */
+export function assertOutputContained(finalPath: string, outputRoot: string): void {
+  const resolvedFinal = path.resolve(finalPath);
+  const resolvedRoot = path.resolve(outputRoot);
+  const rel = path.relative(resolvedRoot, resolvedFinal);
+  if (rel === "" || rel === ".") {
+    throw new ArchiveBuilderError(
+      `final archive path equals output root (would replace directory): ${finalPath}`,
     );
-  } else {
-    const { execSync } = require("child_process") as typeof import("child_process");
-    execSync(`unzip -o -q '${zipPath}' -d '${dst}'`);
+  }
+  if (rel.startsWith("..") || path.isAbsolute(rel)) {
+    throw new ArchiveBuilderError(
+      `final archive path escapes output root: ${finalPath} (relative: ${rel})`,
+    );
+  }
+}
+
+/**
+ * Atomic publish with cross-device safety. fs.renameSync throws EXDEV
+ * across filesystems; fall back to copy+unlink. The destination must not
+ * already exist (we never overwrite an existing final archive).
+ */
+function atomicRename(src: string, dst: string): void {
+  if (fs.existsSync(dst)) {
+    throw new ArchiveBuilderError(
+      `atomicRename: destination exists, refusing overwrite: ${dst}`,
+    );
+  }
+  try {
+    fs.renameSync(src, dst);
+    return;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (!msg.includes("EXDEV")) {
+      throw new ArchiveBuilderError(`atomicRename: rename failed: ${msg}`);
+    }
+  }
+  // EXDEV fallback: copy bytes, then remove source. Partial destination
+  // is removed before re-throwing so the caller's "no unrelated file left
+  // behind" contract holds.
+  try {
+    const bytes = fs.readFileSync(src);
+    fs.writeFileSync(dst, bytes);
+    fs.rmSync(src, { force: true });
+  } catch (e2) {
+    const m2 = e2 instanceof Error ? e2.message : String(e2);
+    try { fs.rmSync(dst, { force: true }); } catch { /* caller sees real error */ }
+    throw new ArchiveBuilderError(`atomicRename: cross-device copy failed: ${m2}`);
   }
 }
 
@@ -216,7 +241,9 @@ function extractZip(zipPath: string, dst: string): void {
 export function publishArchiveAtomically(
   blobs: readonly BlobSource[],
   finalPath: string,
+  outputRoot: string,
 ): void {
+  assertOutputContained(finalPath, outputRoot);
   if (fs.existsSync(finalPath)) {
     throw new ArchiveBuilderError(
       `pre-existing final archive would be overwritten: ${finalPath}`,
@@ -231,11 +258,8 @@ export function publishArchiveAtomically(
 
   try {
     buildArchiveFromBlobs(blobs, stageDir);
-
-    // Compress stage dir into tmpZip.
     compressStage(stageDir, tmpZip);
 
-    // Verify.
     const expected: ExpectedEntry[] = blobs.map((b) => ({
       path: b.archivePath,
       sha256: computeSha256(b.bytes),
@@ -248,24 +272,8 @@ export function publishArchiveAtomically(
       );
     }
 
-    // Atomic rename into place.
-    fs.renameSync(tmpZip, finalPath);
+    atomicRename(tmpZip, finalPath);
   } finally {
     fs.rmSync(tmpBase, { recursive: true, force: true });
-  }
-}
-
-function compressStage(stageDir: string, zipPath: string): void {
-  fs.rmSync(zipPath, { force: true });
-  if (process.platform === "win32") {
-    const { execSync } = require("child_process") as typeof import("child_process");
-    // Compress contents only (`stageDir\*`), so entries do not carry the
-    // stage directory name as a prefix.
-    execSync(
-      `powershell -NoProfile -Command "Compress-Archive -Path '${stageDir}\\*' -DestinationPath '${zipPath}' -Force"`,
-    );
-  } else {
-    const { execSync } = require("child_process") as typeof import("child_process");
-    execSync(`cd '${stageDir}' && zip -r -q '${zipPath}' .`);
   }
 }

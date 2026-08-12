@@ -162,7 +162,7 @@ describe("archive-builder / publishArchiveAtomically", () => {
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
     const finalPath = path.join(TMP_ROOT, "final.zip");
-    publishArchiveAtomically(blobs, finalPath);
+    publishArchiveAtomically(blobs, finalPath, TMP_ROOT);
     expect(fs.existsSync(finalPath)).toBe(true);
   });
 
@@ -172,7 +172,7 @@ describe("archive-builder / publishArchiveAtomically", () => {
     const blobs: BlobSource[] = [
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
-    expect(() => publishArchiveAtomically(blobs, finalPath)).toThrow();
+    expect(() => publishArchiveAtomically(blobs, finalPath, TMP_ROOT)).toThrow();
     expect(fs.readFileSync(finalPath, "utf-8")).toBe("PRE-EXISTING");
   });
 
@@ -183,26 +183,75 @@ describe("archive-builder / publishArchiveAtomically", () => {
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
     try {
-      publishArchiveAtomically(blobs, finalPath);
+      publishArchiveAtomically(blobs, finalPath, TMP_ROOT);
     } catch {
       // expected
     }
-    // No leftover temp dirs/files besides the pre-existing final.
     const entries = fs.readdirSync(TMP_ROOT).sort();
     expect(entries).toEqual(["final.zip"]);
   });
 });
 
-// Helper: zip a directory's CONTENTS (not the dir itself) using the same
-// scheme as the production compressStage. Tests need a real .zip file with
-// the expected entry paths.
+describe("archive-builder / output containment (parent defect #11)", () => {
+  test("rejects final path outside output root", () => {
+    const blobs: BlobSource[] = [
+      { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
+    ];
+    const outside = path.join(os.tmpdir(), `outside-${Math.random().toString(36).slice(2, 6)}.zip`);
+    expect(() => publishArchiveAtomically(blobs, outside, TMP_ROOT)).toThrow();
+    expect(fs.existsSync(outside)).toBe(false);
+  });
+
+  test("rejects final path equal to output root", () => {
+    const blobs: BlobSource[] = [
+      { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
+    ];
+    expect(() => publishArchiveAtomically(blobs, TMP_ROOT, TMP_ROOT)).toThrow();
+  });
+
+  test("rejects traversal in final path that escapes root", () => {
+    const blobs: BlobSource[] = [
+      { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
+    ];
+    const escape = path.join(TMP_ROOT, "..", "escape.zip");
+    expect(() => publishArchiveAtomically(blobs, escape, TMP_ROOT)).toThrow();
+  });
+});
+
+describe("archive-builder / shell-injection resistance (parent defect #2)", () => {
+  test("metacharacters in archive path are rejected before any subprocess", () => {
+    // An attacker-controlled archive path with shell metacharacters must
+    // not reach compress/extract. buildArchiveFromBlobs throws before
+    // any zip subprocess is spawned.
+    const malicious: BlobSource[] = [
+      { archivePath: "a'; $(rm -rf ~); '.md", bytes: new TextEncoder().encode("x") },
+    ];
+    expect(() => buildArchiveFromBlobs(malicious, path.join(TMP_ROOT, "inj-stage"))).toThrow();
+  });
+
+  test("backtick / $() in archive path rejected", () => {
+    const malicious: BlobSource[] = [
+      { archivePath: "$(whoami).md", bytes: new TextEncoder().encode("x") },
+    ];
+    expect(() => buildArchiveFromBlobs(malicious, path.join(TMP_ROOT, "inj-stage-2"))).toThrow();
+  });
+});
+
+import * as os from "os";
+
+// Helper: zip a directory's CONTENTS (not the dir itself) for the
+// verifyArchive tests. Uses execFileSync with array args (matches the
+// production compressStage style; no shell injection surface).
+import { execFileSync } from "child_process";
 function compressDir(src: string, dst: string): void {
   fs.rmSync(dst, { force: true });
   if (process.platform === "win32") {
-    const { execSync } = require("child_process") as typeof import("child_process");
-    execSync(`powershell -NoProfile -Command "Compress-Archive -Path '${src}\\*' -DestinationPath '${dst}' -Force"`);
+    const script =
+      `Compress-Archive -Path (Join-Path $env:TRUST_SRC '*') -DestinationPath $env:TRUST_DST -Force`;
+    execFileSync("powershell", ["-NoProfile", "-Command", script], {
+      env: { ...process.env, TRUST_SRC: src, TRUST_DST: dst },
+    });
   } else {
-    const { execSync } = require("child_process") as typeof import("child_process");
-    execSync(`cd '${src}' && zip -r -q '${dst}' .`);
+    execFileSync("zip", ["-r", "-q", dst, "."], { cwd: src });
   }
 }

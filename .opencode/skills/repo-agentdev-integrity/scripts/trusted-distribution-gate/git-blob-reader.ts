@@ -35,16 +35,22 @@ export class GitAdapterError extends Error {
 // Production adapter
 // ---------------------------------------------------------------------------
 
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 
 export function makeProductionAdapter(repoRoot: RepoPath): RawGitAdapter {
   return {
     cwd: repoRoot,
     spawnGit(args: readonly string[]): Buffer {
+      // Pass args as an array (parent defect #2). execFileSync does NOT
+      // spawn a shell, so interpolated paths/args cannot inject commands.
       try {
-        return execSync(`git ${args.map(shellQuote).join(" ")}`, {
+        return execFileSync("git", [...args], {
           cwd: repoRoot,
           maxBuffer: 256 * 1024 * 1024,
+          // We treat non-zero exit as an error and surface GitAdapterError
+          // so callers can react to "path does not exist" distinctly from
+          // real I/O failures (see protected-check.ts).
+          encoding: "buffer",
         }) as Buffer;
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
@@ -52,12 +58,6 @@ export function makeProductionAdapter(repoRoot: RepoPath): RawGitAdapter {
       }
     },
   };
-}
-
-function shellQuote(arg: string): string {
-  // Conservative shell quoting. Adapter runs on Windows (pwsh/cmd) and
-  // POSIX shells. Double-quoting with internal-quote escape is portable.
-  return `"${arg.replace(/(["\\])/g, "\\$1")}"`;
 }
 
 // ---------------------------------------------------------------------------
