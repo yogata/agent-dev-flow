@@ -1,55 +1,35 @@
-// Stage A trust-root archive builder.
+// Stage A trust-root archive builder primitives.
 //
-// Builds a ZIP archive ONLY from candidate Git blobs (never working-tree
-// files). The archive is published atomically: stage to a unique temp dir,
-// compress to a temp zip, verify entry set + digests, then rename to the
-// final path. On any failure, only this run's temp artifacts are removed;
-// pre-existing final archives are NEVER overwritten or removed.
+// Path safety, hashing, and the stage-directory build. The atomic publish
+// transaction lives in archive-publish.ts; archive entry verification
+// lives in archive-verify.ts. Both were extracted to keep this module
+// under the 250 pure LOC ceiling.
 //
 // Trust contract:
 //   - Blob sources must originate from `git cat-file blob <oid>:<path>`,
 //     never from working-tree reads. The launcher enforces this.
 //   - Path traversal, absolute paths, drive letters, and duplicate paths
 //     in archive paths are rejected before any file is written.
-//   - The archive is verified against the expected manifest BEFORE the
-//     atomic rename. A mismatch removes only this run's temp artifacts.
+//   - Path safety violations throw PathSafetyError (exit 5), not the
+//     generic ArchiveBuilderError (parent defect #10).
 
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as path from "path";
-import * as os from "os";
-import { collectActualEntries, compressStage, extractZip } from "./archive-zip.ts";
-
-// ---------------------------------------------------------------------------
-// Blob source
-// ---------------------------------------------------------------------------
+import { PathSafetyError } from "./types.ts";
 
 export interface BlobSource {
-  /** Archive-relative path with forward slashes. */
+  /** Archive-relative path with forward slashes (under the wrapped root). */
   readonly archivePath: string;
   /** Blob bytes (already read via git cat-file). */
   readonly bytes: Uint8Array;
 }
-
-export interface ExpectedEntry {
-  readonly path: string;
-  readonly sha256: string;
-  readonly size: number;
-}
-
-// ---------------------------------------------------------------------------
-// Hashing
-// ---------------------------------------------------------------------------
 
 export function computeSha256(bytes: Uint8Array): string {
   const h = crypto.createHash("sha256");
   h.update(bytes);
   return h.digest("hex");
 }
-
-// ---------------------------------------------------------------------------
-// Path safety
-// ---------------------------------------------------------------------------
 
 export class ArchiveBuilderError extends Error {
   constructor(message: string) {
@@ -58,36 +38,36 @@ export class ArchiveBuilderError extends Error {
   }
 }
 
-function assertSafeArchivePath(archivePath: string): void {
+/**
+ * Pre-write path safety check. Throws PathSafetyError (caller maps to exit
+ * 5) for traversal, absolute, drive-letter, or unsafe-character archive
+ * paths.
+ *
+ * Segment matching is EXACT: `..` as a complete path segment is a
+ * traversal; `foo..bar.md` (double-dot inside a filename) is a legitimate
+ * leaf and is NOT rejected (parent blocker #6).
+ */
+export function assertSafeArchivePath(archivePath: string): void {
   if (path.isAbsolute(archivePath)) {
-    throw new ArchiveBuilderError(`absolute archive path rejected: ${archivePath}`);
+    throw new PathSafetyError("path-traversal", `absolute archive path rejected: ${archivePath}`);
   }
-  // Reject Windows drive letters like C:/ or C:\ at the start.
   if (/^[A-Za-z]:[\\/]/.test(archivePath)) {
-    throw new ArchiveBuilderError(`drive-letter archive path rejected: ${archivePath}`);
+    throw new PathSafetyError("path-traversal", `drive-letter archive path rejected: ${archivePath}`);
   }
-  const normalized = path.normalize(archivePath).replace(/\\/g, "/");
-  if (normalized.startsWith("../") || normalized === "..") {
-    throw new ArchiveBuilderError(`path traversal rejected: ${archivePath}`);
+  const normalized = archivePath.replace(/\\/g, "/");
+  const segments = normalized.split("/");
+  for (const seg of segments) {
+    if (seg === "..") {
+      throw new PathSafetyError("path-traversal", `path traversal segment rejected: ${archivePath}`);
+    }
   }
-  if (normalized.includes("/../") || normalized.startsWith("../")) {
-    throw new ArchiveBuilderError(`path traversal rejected: ${archivePath}`);
-  }
-  // Defense-in-depth: archive paths come from candidate git tree paths and
-  // must be safe filenames. Allow letters, digits, dots, dashes,
-  // underscores, slashes. Reject shell metacharacters even though
-  // execFileSync (array form) makes injection impossible — this catches
-  // hostile candidate trees early with a clear error.
   if (!/^[A-Za-z0-9._\-\\/]+$/.test(archivePath)) {
-    throw new ArchiveBuilderError(
+    throw new PathSafetyError(
+      "unsafe-archive-path",
       `archive path contains forbidden characters: ${archivePath}`,
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Stage directory build
-// ---------------------------------------------------------------------------
 
 /**
  * Build a staging directory containing the blob bytes laid out at their
@@ -98,7 +78,6 @@ export function buildArchiveFromBlobs(
   blobs: readonly BlobSource[],
   stageRoot: string,
 ): string {
-  // Reject duplicates and unsafe paths BEFORE writing anything.
   const seen = new Set<string>();
   for (const b of blobs) {
     assertSafeArchivePath(b.archivePath);
@@ -120,160 +99,11 @@ export function buildArchiveFromBlobs(
   return stageRoot;
 }
 
-// ---------------------------------------------------------------------------
-// ZIP verification
-// ---------------------------------------------------------------------------
-
-export interface VerifyResult {
-  readonly ok: boolean;
-  readonly missing: readonly string[];
-  readonly extra: readonly string[];
-  readonly digest_mismatches: readonly string[];
-}
-
-/**
- * Verify a zip file's entries against an expected set. The unzip step uses
- * Expand-Archive (Windows) or unzip (POSIX) into a temp dir, then computes
- * SHA-256 of every extracted file.
- */
-export function verifyArchive(
-  zipPath: string,
-  expected: readonly ExpectedEntry[],
-): VerifyResult {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "trust-archive-verify-"));
-  try {
-    extractZip(zipPath, tmpDir);
-    const actualEntries = collectActualEntries(tmpDir);
-    const expectedMap = new Map(expected.map((e) => [e.path, e]));
-    const actualMap = new Map(actualEntries.map((e) => [e.path, e]));
-
-    const missing: string[] = [];
-    const extra: string[] = [];
-    const digestMismatches: string[] = [];
-
-    for (const [p] of expectedMap) {
-      if (!actualMap.has(p)) missing.push(p);
-    }
-    for (const [p] of actualMap) {
-      if (!expectedMap.has(p)) extra.push(p);
-    }
-    for (const [path, expectedEntry] of expectedMap) {
-      const a = actualMap.get(path);
-      if (a && (a.sha256 !== expectedEntry.sha256 || a.size !== expectedEntry.size)) {
-        digestMismatches.push(path);
-      }
-    }
-    return {
-      ok: missing.length === 0 && extra.length === 0 && digestMismatches.length === 0,
-      missing: missing.sort(),
-      extra: extra.sort(),
-      digest_mismatches: digestMismatches.sort(),
-    };
-  } finally {
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-  }
-}
-
-/**
- * Refuse to write a final archive path that escapes the trusted output
- * root. Caller supplies the trusted root explicitly; we resolve both
- * paths absolutely and require finalPath to be at-or-under outputRoot.
- */
-export function assertOutputContained(finalPath: string, outputRoot: string): void {
-  const resolvedFinal = path.resolve(finalPath);
-  const resolvedRoot = path.resolve(outputRoot);
-  const rel = path.relative(resolvedRoot, resolvedFinal);
-  if (rel === "" || rel === ".") {
-    throw new ArchiveBuilderError(
-      `final archive path equals output root (would replace directory): ${finalPath}`,
-    );
-  }
-  if (rel.startsWith("..") || path.isAbsolute(rel)) {
-    throw new ArchiveBuilderError(
-      `final archive path escapes output root: ${finalPath} (relative: ${rel})`,
-    );
-  }
-}
-
-/**
- * Atomic publish with cross-device safety. fs.renameSync throws EXDEV
- * across filesystems; fall back to copy+unlink. The destination must not
- * already exist (we never overwrite an existing final archive).
- */
-function atomicRename(src: string, dst: string): void {
-  if (fs.existsSync(dst)) {
-    throw new ArchiveBuilderError(
-      `atomicRename: destination exists, refusing overwrite: ${dst}`,
-    );
-  }
-  try {
-    fs.renameSync(src, dst);
-    return;
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (!msg.includes("EXDEV")) {
-      throw new ArchiveBuilderError(`atomicRename: rename failed: ${msg}`);
-    }
-  }
-  // EXDEV fallback: copy bytes, then remove source. Partial destination
-  // is removed before re-throwing so the caller's "no unrelated file left
-  // behind" contract holds.
-  try {
-    const bytes = fs.readFileSync(src);
-    fs.writeFileSync(dst, bytes);
-    fs.rmSync(src, { force: true });
-  } catch (e2) {
-    const m2 = e2 instanceof Error ? e2.message : String(e2);
-    try { fs.rmSync(dst, { force: true }); } catch { /* caller sees real error */ }
-    throw new ArchiveBuilderError(`atomicRename: cross-device copy failed: ${m2}`);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Atomic publish
-// ---------------------------------------------------------------------------
-
-/**
- * Build, compress, verify, and atomically publish a zip archive. Refuses
- * to overwrite a pre-existing final archive. On any failure (including
- * verification mismatch), removes only this run's temp artifacts.
- */
-export function publishArchiveAtomically(
-  blobs: readonly BlobSource[],
-  finalPath: string,
-  outputRoot: string,
-): void {
-  assertOutputContained(finalPath, outputRoot);
-  if (fs.existsSync(finalPath)) {
-    throw new ArchiveBuilderError(
-      `pre-existing final archive would be overwritten: ${finalPath}`,
-    );
-  }
-
-  const runId = crypto.randomBytes(8).toString("hex");
-  const tmpBase = path.join(os.tmpdir(), `trust-archive-${runId}`);
-  fs.mkdirSync(tmpBase, { recursive: true });
-  const stageDir = path.join(tmpBase, "stage");
-  const tmpZip = path.join(tmpBase, "archive.zip");
-
-  try {
-    buildArchiveFromBlobs(blobs, stageDir);
-    compressStage(stageDir, tmpZip);
-
-    const expected: ExpectedEntry[] = blobs.map((b) => ({
-      path: b.archivePath,
-      sha256: computeSha256(b.bytes),
-      size: b.bytes.length,
-    }));
-    const result = verifyArchive(tmpZip, expected);
-    if (!result.ok) {
-      throw new ArchiveBuilderError(
-        `archive verification failed: missing=${JSON.stringify(result.missing)} extra=${JSON.stringify(result.extra)} digest_mismatches=${JSON.stringify(result.digest_mismatches)}`,
-      );
-    }
-
-    atomicRename(tmpZip, finalPath);
-  } finally {
-    fs.rmSync(tmpBase, { recursive: true, force: true });
-  }
-}
+export {
+  prepareStagedArchive,
+  publishStagedArchive,
+  assertOutputContained,
+} from "./archive-publish.ts";
+export type { StagedArchive, PublishOutcome } from "./archive-publish.ts";
+export { verifyArchive } from "./archive-verify.ts";
+export type { ExpectedEntry, VerifyResult } from "./archive-verify.ts";

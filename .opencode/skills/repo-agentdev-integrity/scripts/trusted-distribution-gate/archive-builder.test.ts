@@ -1,8 +1,8 @@
-// Tests for the archive builder.
+﻿// Tests for the archive builder.
 //
 // Stage A trust-root archive builder:
 //   - ZIP entries come ONLY from candidate Git blobs (never working tree).
-//   - Final archive is published atomically (write-temp then rename).
+//   - Final archive is published via atomic hard-link publication.
 //   - Pre-existing final archive is never overwritten/removed.
 //   - On any failure, only this run's temp artifacts are removed.
 //   - Archive entry set + digests are verified before publish.
@@ -10,27 +10,27 @@
 
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import {
   computeSha256,
   buildArchiveFromBlobs,
-  verifyArchive,
-  publishArchiveAtomically,
   type BlobSource,
 } from "./archive-builder.ts";
+import { verifyArchive } from "./archive-verify.ts";
+import {
+  prepareStagedArchive,
+  publishStagedArchive,
+} from "./archive-publish.ts";
 
-const TMP_ROOT = path.join(
-  process.cwd(),
-  ".worktrees-tmp-test-archive-builder",
-);
+let TMP_ROOT: string;
 
 beforeEach(() => {
-  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
-  fs.mkdirSync(TMP_ROOT, { recursive: true });
+  TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "trust-ab-"));
 });
 
 afterEach(() => {
-  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
+  try { fs.rmSync(TMP_ROOT, { recursive: true, force: true }); } catch { /* */ }
 });
 
 describe("archive-builder / computeSha256", () => {
@@ -156,13 +156,13 @@ describe("archive-builder / verifyArchive", () => {
   });
 });
 
-describe("archive-builder / publishArchiveAtomically", () => {
-  test("writes final zip via temp rename", () => {
+describe("archive-builder / prepareStagedArchive + publishStagedArchive", () => {
+  test("writes final zip via hard-link publication", () => {
     const blobs: BlobSource[] = [
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
     const finalPath = path.join(TMP_ROOT, "final.zip");
-    publishArchiveAtomically(blobs, finalPath, TMP_ROOT);
+    publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), finalPath, TMP_ROOT);
     expect(fs.existsSync(finalPath)).toBe(true);
   });
 
@@ -172,7 +172,7 @@ describe("archive-builder / publishArchiveAtomically", () => {
     const blobs: BlobSource[] = [
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
-    expect(() => publishArchiveAtomically(blobs, finalPath, TMP_ROOT)).toThrow();
+    expect(() => publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), finalPath, TMP_ROOT)).toThrow();
     expect(fs.readFileSync(finalPath, "utf-8")).toBe("PRE-EXISTING");
   });
 
@@ -182,10 +182,11 @@ describe("archive-builder / publishArchiveAtomically", () => {
     const blobs: BlobSource[] = [
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
+    const stage = prepareStagedArchive(blobs, TMP_ROOT);
     try {
-      publishArchiveAtomically(blobs, finalPath, TMP_ROOT);
+      publishStagedArchive(stage, finalPath, TMP_ROOT);
     } catch {
-      // expected
+      stage.cleanup();
     }
     const entries = fs.readdirSync(TMP_ROOT).sort();
     expect(entries).toEqual(["final.zip"]);
@@ -198,7 +199,7 @@ describe("archive-builder / output containment (parent defect #11)", () => {
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
     const outside = path.join(os.tmpdir(), `outside-${Math.random().toString(36).slice(2, 6)}.zip`);
-    expect(() => publishArchiveAtomically(blobs, outside, TMP_ROOT)).toThrow();
+    expect(() => publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), outside, TMP_ROOT)).toThrow();
     expect(fs.existsSync(outside)).toBe(false);
   });
 
@@ -206,7 +207,7 @@ describe("archive-builder / output containment (parent defect #11)", () => {
     const blobs: BlobSource[] = [
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
-    expect(() => publishArchiveAtomically(blobs, TMP_ROOT, TMP_ROOT)).toThrow();
+    expect(() => publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), TMP_ROOT, TMP_ROOT)).toThrow();
   });
 
   test("rejects traversal in final path that escapes root", () => {
@@ -214,7 +215,7 @@ describe("archive-builder / output containment (parent defect #11)", () => {
       { archivePath: "a.md", bytes: new TextEncoder().encode("# a\n") },
     ];
     const escape = path.join(TMP_ROOT, "..", "escape.zip");
-    expect(() => publishArchiveAtomically(blobs, escape, TMP_ROOT)).toThrow();
+    expect(() => publishStagedArchive(prepareStagedArchive(blobs, TMP_ROOT), escape, TMP_ROOT)).toThrow();
   });
 });
 
@@ -236,8 +237,6 @@ describe("archive-builder / shell-injection resistance (parent defect #2)", () =
     expect(() => buildArchiveFromBlobs(malicious, path.join(TMP_ROOT, "inj-stage-2"))).toThrow();
   });
 });
-
-import * as os from "os";
 
 // Helper: zip a directory's CONTENTS (not the dir itself) for the
 // verifyArchive tests. Uses execFileSync with array args (matches the
