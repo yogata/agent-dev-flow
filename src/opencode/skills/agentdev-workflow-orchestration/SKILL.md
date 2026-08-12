@@ -40,7 +40,7 @@ case-run は orchestration stage（case-auto が管理する command 間進行�
 
 ## STEP model（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（control plane）。STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `docs/specs/<workflows/step-reference-contract>.md` に従う。STEP 識別子と durable state から current STEP を復元する契約は `docs/specs/<workflows/input-resolution-and-durable-state>.md` に従う。
+本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（control plane）。STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `<workflows/step-reference-contract>` SPEC に従う。STEP 識別子と durable state から current STEP を復元する契約は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
 
 ### STEP 識別子（case-run workflow）
 
@@ -54,7 +54,7 @@ case-run internal lifecycle フェーズ構成の各フェーズが STEP resume 
 
 ### durable state（case-run workflow）
 
-compaction や中断再開後に current STEP と必要入力を復元するための durable state。優先順位は `docs/specs/<workflows/input-resolution-and-durable-state>.md` に従う。
+compaction や中断再開後に current STEP と必要入力を復元するための durable state。優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
 
 1. **SSoT 再構成**: Issue 本文、要件doc、REQ/Decision/SPEC から再取得・再検証
 2. **identifier 保持**: Issue 番号、PR 番号、worktree ブランチ名、STEP 識別子
