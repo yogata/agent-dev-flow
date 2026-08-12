@@ -67,7 +67,7 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 
 存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity SPEC 構文健全性検査準拠）。
 
-エンコーディング不整合の検出は、配布物 Markdown の UTF-8 BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-8 かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
+エンコーディング不整合の検出は、配布物 Markdown の UTF-{N} BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-{N} かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
 ### Step 4: 分類
 
 検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける
