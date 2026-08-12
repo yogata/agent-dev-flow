@@ -71,8 +71,8 @@ PR 関連手続きはスキップせず、Case ファイルの対応セクショ
 Windows 環境（Windows PowerShell 5.x / pwsh 7）では、全 WRITE 手続き（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成、PR merge、Issue close 等）の実行前にコンソールエンコーディング初期化を**必須前置**する。
 
 - **対象外**: READ 手続き（読み取りには Node.js `execSync` を使用し、コンソールエンコーディングに依存しない）
-- **対象外環境**: Linux/ macOS/ WSL 等（既定で UTF-8 コンソールのため実行不要）
-- **理由**: 既定の Shift-JIS コンソール（`chcp 932`）では gh CLI が `--title` の日本語引数やメタデータを Shift-JIS として扱い、UTF-8 BOM なしファイルを `--body-file` で指定しても mojibake が発生する
+- **対象外環境**: Linux/ macOS/ WSL 等（既定で UTF‑8 コンソールのため実行不要）
+- **理由**: 既定の Shift-JIS コンソール（`chcp 932`）では gh CLI が `--title` の日本語引数やメタデータを Shift-JIS として扱い、UTF‑8 BOM なしファイルを `--body-file` で指定しても mojibake が発生する
 - **手続き位置**: [references/standard-procedures.md](references/standard-procedures.md) の WRITE 標準手順（冒頭「コンソールエンコーディング初期化」）。全 WRITE 手続きは WRITE 標準手順に従うため、当該初期化を経由して本要件の恩恵を受ける
 - **VERIFY 連携**: encoding 初期化実行確認は [references/verify.md](references/verify.md) の「encoding 初期化実行確認」セクション参照
 
@@ -92,4 +92,4 @@ gh WRITE 操作を行う全 command/ skill は本手続き経由でコンソー�
 ## 関連項目
 
 - SPEC `agentdev-gh-cli`.md
-- 関連 REQ / Decision 一覧は各インデックス（`docs/requirements/README.md`, `docs/decisions/README.md`）を参照
+- 関連 REQ / Decision 一覧は各インデックス（`docs/requirements<README>.md`, `docs/decisions<README>.md`）を参照
