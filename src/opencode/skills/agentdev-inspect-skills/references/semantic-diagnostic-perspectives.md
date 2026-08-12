@@ -179,7 +179,7 @@ artifact-responsibilities SPEC が定める重複許容基準に該当する場�
 
 ## 対象外
 
-- 機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子表記等）は integrity-rule-catalog SPEC（IR-050、IR-051、REQ 準拠）が担う。本観点は意味的・文脈的な検出を担う。
+- 機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子表記等）は integrity-rule-catalog SPEC（IR-{NNN}、IR-{NNN}、REQ 準拠）が担う。本観点は意味的・文脈的な検出を担う。
 - SPEC 操作契約テーブルと references/contracts.md のフィールド一致性は別観点（[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)）が担う。本観点は意味段階の重複・矛盾・越境・欠落に限定し、SPEC- contracts.md 間のフィールド単位の突合は含まない。
 - 配布物の Markdown 構文健全性、frontmatter 構文は別観点（配布物 frontmatter 構文健全性等）が担う。
 - 公開契約の維持（横断是正の前後で公開目的・入力・出力・停止条件等を維持すること）は公開契約維持原則が担う。本観点は静的記述の意味整合性に限定し、是正作業の前後比較は含まない。
