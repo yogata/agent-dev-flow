@@ -1,6 +1,6 @@
 # `agentdev-spec-file-manager` scripts
 
-SPEC 固有の決定的処理スクリプト群（AG-002/006、design-principles.md 第5節）。
+SPEC 固有の決定的処理スクリプト群（AG-{NNN}/006、design-principles.md 第5節）。
 
 ## 構成
 
