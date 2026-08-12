@@ -1,11 +1,11 @@
-# STEP-5: Issue 作成（Epic flow / Standard flow、issue-creation-flows）
+# STEP-{N}: Issue 作成（Epic flow / Standard flow、issue-creation-flows）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-5 詳細である。Epic flow（Step 5-9）と Standard flow（Step 10-12）の制御、GitHub Issue 作成手続きを提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。Epic flow（Step 5-9）と Standard flow（Step 10-12）の制御、GitHub Issue 作成手続きを提供する。
 
 ## 開始条件
 
-- STEP-3 で execution structure が確定している
-- STEP-4 で adversarial-review skip または review 完了（unresolved なし）
+- STEP-{N} で execution structure が確定している
+- STEP-{N} で adversarial-review skip または review 完了（unresolved なし）
 
 ## 結果
 
@@ -16,11 +16,11 @@
 
 ### Step 5: テンプレート読込
 
-`agentdev-workflow-templates` の選定ルールに従いテンプレートを読み込む。詳細は `agentdev-issue-management` を参照。Epic flow は STEP-3 のルーティングにより開始。マルチREQ/ 単一REQ の差分（分解ソース、Wave テーブル列、子Issue 数上限、子Issue 内容ソース、子Issue 追加要素）の詳細は `agentdev-epic-tracker` を参照。
+`agentdev-workflow-templates` の選定ルールに従いテンプレートを読み込む。詳細は `agentdev-issue-management` を参照。Epic flow は STEP-{N} のルーティングにより開始。マルチREQ/ 単一REQ の差分（分解ソース、Wave テーブル列、子Issue 数上限、子Issue 内容ソース、子Issue 追加要素）の詳細は `agentdev-epic-tracker` を参照。
 
 ### Step 6: Epic Issue 本文生成
 
-STEP-3 の自律構成分析結果に基づき Epic 本文を構築。詳細、委譲接続点は `agentdev-issue-management` を参照。
+STEP-{N} の自律構成分析結果に基づき Epic 本文を構築。詳細、委譲接続点は `agentdev-issue-management` を参照。
 
 ### Step 7: Epic Issue 作成
 
@@ -44,13 +44,13 @@ STEP-3 の自律構成分析結果に基づき Epic 本文を構築。詳細、�
 
 `operation_units` セクションがある場合、作成した Issue/Epic 番号を当該 OU の `result` に書き戻す。
 
-**Epic flow 完了後、共通終了処理（STEP-6 termination-and-cleanup）を必ず実行すること。**
+**Epic flow 完了後、共通終了処理（STEP-{N} termination-and-cleanup）を必ず実行すること。**
 
 ## Standard flow（Step 10-12、`scale: standard` またはフィールドなし、単一 OU）
 
 ### Step 10: 関連Decision特定
 
-`docs/decisions/README.md` から、単一REQ Epic flow の内容反映にも活用。
+`docs/decisions<README>.md` から、単一REQ Epic flow の内容反映にも活用。
 
 ### Step 11: ラベル付与
 
@@ -85,8 +85,8 @@ case-open の Step 8「子 Issue 作成の並列化」は **(1) に該当**。3�
 
 ## 関連 STEP
 
-- 前: STEP-4（adversarial-review-integration）
-- 次: STEP-6（termination-and-cleanup）
+- 前: STEP-{N}（adversarial-review-integration）
+- 次: STEP-{N}（termination-and-cleanup）
 
 ## 関連 Capability Skill
 

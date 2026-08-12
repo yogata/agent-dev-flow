@@ -1,6 +1,6 @@
-# STEP-1: 引き継ぎ・OU 選択（handoff-and-ou-gate）
+# STEP-{N}: 引き継ぎ・OU 選択（handoff-and-ou-gate）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-1 詳細である。SKILL.md は control plane として STEP 遷移を管理し、本 reference は STEP-1 の実行詳細を提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。SKILL.md は control plane として STEP 遷移を管理し、本 reference は STEP-{N} の実行詳細を提供する。
 
 ## 開始条件
 
@@ -25,7 +25,7 @@
 - **OU ID 指定あり**: 当該 OU のみを処理対象とする例外経路
 - **OU ID 指定なし**:
   - OU 1件なら自動選択
-  - 2件以上なら execution_unit 構成を生成し、STEP-3（execution-unit-and-preflight）へ分岐
+  - 2件以上なら execution_unit 構成を生成し、STEP-{N}（execution-unit-and-preflight）へ分岐
 - **`operation_units` セクションがない場合**: 従来どおり全要件docを処理（後方互換）
 
 ## resume point
@@ -34,7 +34,7 @@
 
 ## 関連 STEP
 
-- 次: STEP-2（issue-body-and-execution-contract）
+- 次: STEP-{N}（issue-body-and-execution-contract）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
