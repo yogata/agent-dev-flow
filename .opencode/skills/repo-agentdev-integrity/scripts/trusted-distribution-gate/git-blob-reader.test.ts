@@ -7,8 +7,9 @@
 
 import { describe, expect, test, beforeAll, afterAll } from "bun:test";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
-import { execSync } from "child_process";
+import { execFileSync, execSync } from "child_process";
 import {
   parseGitLsTreeLine,
   parseLsTreeOutput,
@@ -17,25 +18,17 @@ import {
   type RawGitAdapter,
   GitAdapterError,
 } from "./git-blob-reader.ts";
-import { assertGitOid } from "./types.ts";
+import { PathSafetyError, assertGitOid } from "./types.ts";
 
-// Build a real local git fixture repo so the adapter exercises real git.
-const TMP_ROOT = path.join(
-  process.cwd(),
-  ".worktrees-tmp-test-trusted-distribution-gate",
-);
+const TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "trust-gbr-"));
 
 beforeAll(() => {
-  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
-  fs.mkdirSync(TMP_ROOT, { recursive: true });
-  // Init a fixture repo with one regular file and one symlink target.
   execSync("git init -q -b main", { cwd: TMP_ROOT });
   execSync('git config user.email "t@t"', { cwd: TMP_ROOT });
   execSync('git config user.name "t"', { cwd: TMP_ROOT });
   fs.writeFileSync(path.join(TMP_ROOT, "regular.md"), "# hi\n");
   fs.mkdirSync(path.join(TMP_ROOT, "sub"), { recursive: true });
   fs.writeFileSync(path.join(TMP_ROOT, "sub", "deep.md"), "deep\n");
-  // Symlink: skip on Windows.
   if (process.platform !== "win32") {
     fs.symlinkSync("regular.md", path.join(TMP_ROOT, "link.md"));
   }
@@ -44,7 +37,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
+  try { fs.rmSync(TMP_ROOT, { recursive: true, force: true }); } catch (e) { void e; }
 });
 
 function headOid(): string {
@@ -68,24 +61,24 @@ describe("git-blob-reader / parseGitLsTreeLine", () => {
     expect(e?.mode).toBe("100755");
   });
 
-  test("rejects symlink mode (120000)", () => {
+  test("rejects symlink mode (120000) as PathSafetyError (parent defect #10)", () => {
     const line = "120000 blob aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tlink.md";
-    expect(() => parseGitLsTreeLine(line)).toThrow(GitAdapterError);
+    expect(() => parseGitLsTreeLine(line)).toThrow(PathSafetyError);
   });
 
-  test("rejects gitlink mode (160000)", () => {
+  test("rejects gitlink mode (160000) as PathSafetyError (parent defect #10)", () => {
     const line = "160000 commit aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tsubmodule";
-    expect(() => parseGitLsTreeLine(line)).toThrow(GitAdapterError);
+    expect(() => parseGitLsTreeLine(line)).toThrow(PathSafetyError);
   });
 
-  test("rejects tree kind", () => {
+  test("rejects tree kind as PathSafetyError (parent defect #10)", () => {
     const line = "040000 tree aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tsubdir";
-    expect(() => parseGitLsTreeLine(line)).toThrow(GitAdapterError);
+    expect(() => parseGitLsTreeLine(line)).toThrow(PathSafetyError);
   });
 
-  test("rejects unknown mode", () => {
+  test("rejects unknown mode as PathSafetyError (parent defect #10)", () => {
     const line = "100645 blob aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tweird.md";
-    expect(() => parseGitLsTreeLine(line)).toThrow(GitAdapterError);
+    expect(() => parseGitLsTreeLine(line)).toThrow(PathSafetyError);
   });
 
   test("rejects malformed line (no tab)", () => {
@@ -131,11 +124,11 @@ describe("git-blob-reader / listTreeEntries (real git)", () => {
     expect(paths).toContain("sub/deep.md");
   });
 
-  test("rejects symlink mode at runtime", () => {
+  test("rejects symlink mode at runtime (PathSafetyError, parent defect #10)", () => {
     if (process.platform === "win32") return; // skip symlink test on Windows
     const oid = assertGitOid(headOid());
     const adapter = makeRealAdapter();
-    expect(() => listTreeEntries(adapter, oid, "HEAD")).toThrow(GitAdapterError);
+    expect(() => listTreeEntries(adapter, oid, "HEAD")).toThrow(PathSafetyError);
   });
 });
 
@@ -159,6 +152,13 @@ function makeRealAdapter(): RawGitAdapter {
     cwd: TMP_ROOT,
     spawnGit(args: readonly string[]): Buffer {
       return execSync(`git ${args.join(" ")}`, { cwd: TMP_ROOT }) as Buffer;
+    },
+    spawnGitWithInput(args: readonly string[], input: Buffer): Buffer {
+      return execFileSync("git", [...args], {
+        cwd: TMP_ROOT,
+        input,
+        maxBuffer: 256 * 1024 * 1024,
+      }) as Buffer;
     },
   };
 }

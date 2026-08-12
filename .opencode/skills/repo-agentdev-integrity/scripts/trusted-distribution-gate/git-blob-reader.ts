@@ -1,9 +1,9 @@
-// Git blob reader adapter.
+// Git tree-listing adapter.
 //
-// This is the ONLY module in the trust root that performs I/O. It spawns
-// `git ls-tree` and `git cat-file` against a fixed candidate OID. The
-// boundary detector (boundary-pipeline.ts) is side-effect-free and consumes
-// bytes this adapter returns.
+// This module performs `git ls-tree` against a fixed candidate OID and
+// parses the result. Per-blob and batched blob reads live in
+// git-blob-batch.ts. Both modules share the typed-error taxonomy from
+// types.ts.
 //
 // Safety contract:
 //   - Modes other than `100644` and `100755` are rejected (no symlinks
@@ -14,21 +14,23 @@
 //     bytes via `git cat-file`.
 
 import type { GitOid, GitTreeEntry, RepoPath, TreeMode } from "./types.ts";
+import { GitAdapterError, PathSafetyError } from "./types.ts";
 
-// ---------------------------------------------------------------------------
-// Adapter interface (seam for testing)
-// ---------------------------------------------------------------------------
+// Re-export typed errors so callers can import everything from this module.
+export { GitAdapterError, GitBlobMissingError, PathSafetyError } from "./types.ts";
 
 export interface RawGitAdapter {
   readonly cwd: string;
   spawnGit(args: readonly string[]): Buffer;
-}
-
-export class GitAdapterError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "GitAdapterError";
-  }
+  /**
+   * Spawn git with binary stdin. REQUIRED — used by `git cat-file --batch`
+   * to read many blobs in a single subprocess (parent defect #12), and
+   * by `git cat-file --batch-check` for structured existence probing
+   * (parent blocker round 3 #3). Adapters that cannot feed stdin MUST
+   * throw; the reader no longer falls back to `cat-file -e` because that
+   * fallback silently downgrades every infrastructure error to "missing".
+   */
+  spawnGitWithInput(args: readonly string[], input: Buffer): Buffer;
 }
 
 // ---------------------------------------------------------------------------
@@ -41,20 +43,28 @@ export function makeProductionAdapter(repoRoot: RepoPath): RawGitAdapter {
   return {
     cwd: repoRoot,
     spawnGit(args: readonly string[]): Buffer {
-      // Pass args as an array (parent defect #2). execFileSync does NOT
-      // spawn a shell, so interpolated paths/args cannot inject commands.
       try {
         return execFileSync("git", [...args], {
           cwd: repoRoot,
           maxBuffer: 256 * 1024 * 1024,
-          // We treat non-zero exit as an error and surface GitAdapterError
-          // so callers can react to "path does not exist" distinctly from
-          // real I/O failures (see protected-check.ts).
           encoding: "buffer",
         }) as Buffer;
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        throw new GitAdapterError(`git ${args[0]} failed: ${msg}`);
+        throw new GitAdapterError(`git ${args[0] ?? ""} failed: ${msg}`);
+      }
+    },
+    spawnGitWithInput(args: readonly string[], input: Buffer): Buffer {
+      try {
+        return execFileSync("git", [...args], {
+          cwd: repoRoot,
+          maxBuffer: 256 * 1024 * 1024,
+          encoding: "buffer",
+          input,
+        }) as Buffer;
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        throw new GitAdapterError(`git ${args[0] ?? ""} failed: ${msg}`);
       }
     },
   };
@@ -64,15 +74,17 @@ export function makeProductionAdapter(repoRoot: RepoPath): RawGitAdapter {
 // ls-tree parsing
 // ---------------------------------------------------------------------------
 
-const VALID_MODES: readonly TreeMode[] = ["100644", "100755"];
+const REGULAR_MODES: readonly TreeMode[] = ["100644", "100755"];
 
 /**
  * Parse a single `git ls-tree -z` line (without the trailing NUL).
  *
- * Throws GitAdapterError when:
- *   - mode is not 100644 or 100755 (rejects symlinks/gitlinks/trees)
- *   - object kind is not `blob` (rejects `tree` and `commit`)
- *   - line is malformed (no tab, wrong field count)
+ * Throws PathSafetyError when mode is a symlink (120000), gitlink (160000),
+ * tree (040000), or any other non-regular mode.
+ * Throws PathSafetyError when object kind is `tree` or `commit` rather than blob.
+ * Throws GitAdapterError only when the line itself is malformed (no tab, bad
+ * header) — the line-shape problem is a git protocol error, not a path
+ * safety issue.
  */
 export function parseGitLsTreeLine(line: string): GitTreeEntry {
   const tabIdx = line.indexOf("\t");
@@ -86,14 +98,26 @@ export function parseGitLsTreeLine(line: string): GitTreeEntry {
     throw new GitAdapterError(`malformed ls-tree header: ${before}`);
   }
   const [modeRaw, kindRaw, oidRaw] = parts as [string, string, string];
-  if (!VALID_MODES.includes(modeRaw as TreeMode)) {
-    throw new GitAdapterError(
-      `rejected ls-tree mode ${modeRaw} for path ${pathPart} (only regular blobs allowed)`,
+
+  if (modeRaw === "120000") {
+    throw new PathSafetyError("symlink", `symlink mode rejected for path ${pathPart}`);
+  }
+  if (modeRaw === "160000") {
+    throw new PathSafetyError("gitlink", `gitlink mode rejected for path ${pathPart}`);
+  }
+  if (modeRaw === "040000") {
+    throw new PathSafetyError("non-blob", `tree kind rejected for path ${pathPart}`);
+  }
+  if (!REGULAR_MODES.includes(modeRaw as TreeMode)) {
+    throw new PathSafetyError(
+      "unsupported-mode",
+      `unsupported mode ${modeRaw} for path ${pathPart} (only 100644/100755 regular blobs allowed)`,
     );
   }
   if (kindRaw !== "blob") {
-    throw new GitAdapterError(
-      `rejected ls-tree kind ${kindRaw} for path ${pathPart} (only blob allowed)`,
+    throw new PathSafetyError(
+      "non-blob",
+      `non-blob kind ${kindRaw} rejected for path ${pathPart}`,
     );
   }
   if (!/^[0-9a-f]{40}$|^[0-9a-f]{64}$/.test(oidRaw)) {
@@ -109,7 +133,8 @@ export function parseGitLsTreeLine(line: string): GitTreeEntry {
 
 /**
  * Parse the full NUL-separated `git ls-tree -r -z` output. Rejects duplicate
- * paths (collision attack).
+ * paths (collision attack). Path-safety errors surface the first offending
+ * entry rather than silently dropping it.
  */
 export function parseLsTreeOutput(output: string): readonly GitTreeEntry[] {
   const lines = output.split("\0").filter((l) => l.length > 0);
@@ -123,10 +148,6 @@ export function parseLsTreeOutput(output: string): readonly GitTreeEntry[] {
   }
   return entries;
 }
-
-// ---------------------------------------------------------------------------
-// Operations
-// ---------------------------------------------------------------------------
 
 /**
  * List every regular blob under the given OID. Uses `git ls-tree -r -z` so
@@ -143,17 +164,7 @@ export function listTreeEntries(
   return parseLsTreeOutput(output);
 }
 
-/**
- * Read a single blob's bytes via `git cat-file blob <oid>:<path>`. The path
- * is the repo-relative path as observed in ls-tree; no globbing.
- */
-export function readBlob(
-  adapter: RawGitAdapter,
-  oid: GitOid,
-  _label: string,
-  filePath: string,
-): Uint8Array {
-  const buf = adapter.spawnGit(["cat-file", "blob", `${oid}:${filePath}`]);
-  // Copy into a fresh Uint8Array to avoid Buffer's Node-specific view.
-  return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
-}
+// Back-compat re-exports. Per-blob and batched reads live in
+// git-blob-batch.ts (split for the 250 pure LOC ceiling).
+export { readBlob, readBlobsBatched } from "./git-blob-batch.ts";
+export type { BatchedReadResult } from "./git-blob-batch.ts";
