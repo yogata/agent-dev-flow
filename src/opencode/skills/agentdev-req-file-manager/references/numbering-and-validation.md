@@ -101,7 +101,7 @@ REQ単位の関連情報は frontmatter フィールドとして管理せず、�
 - `REQ-{NNNN}.md` → frontmatter `id: REQ-{NNNN}`（必須、ファイル名と ID の一致）
 - 不一致の場合はエラーとして扱う
 
-整合性確認は `agentdev-artifact-validation` が所有する決定的スクリプト `check-frontmatter-consistency.ts` が担当する（AG-019、RU-20260722-01 合意）。本 skill は公開検証契約へ委譲する。
+整合性確認は `agentdev-artifact-validation` が所有する決定的スクリプト `check-frontmatter-consistency.ts` が担当する（AG-{NNN}、RU-{NNNN}-01 合意）。本 skill は公開検証契約へ委譲する。
 
 ### 日付フォーマット検証
 
@@ -140,7 +140,7 @@ REQ単位の関連情報は frontmatter フィールドとして管理せず、�
 ### HOW 除去後の acceptance-criteria 順位検証
 
 機械的（単パス）な HOW 除去を実施した後、必ず acceptance criteria 順位による再検証を行う。
-前工程で機械的に HOW を除去しても、完了条件を順位順に再照合しないと残余 violation が残る（OU-008/Wave 4 学習: 機械的除去後に8件の残余 violation を検出）。
+前工程で機械的に HOW を除去しても、完了条件を順位順に再照合しないと残余 violation が残る（OU-{NNN}/Wave 4 学習: 機械的除去後に8件の残余 violation を検出）。
 
 #### 適用タイミング
 
