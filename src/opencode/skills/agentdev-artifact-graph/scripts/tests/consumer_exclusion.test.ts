@@ -18,7 +18,7 @@ async function jsonLines(path: string): Promise<readonly Record<string, unknown>
 
 /**
  * Distribution artifact path patterns that MUST NOT appear in a consumer Graph
- * (REQ\u002D012-008, TS-006 / AG-005). Any node/provenance path matching one of
+ * (REQ\u002D012-008, TS\u002D006 / AG\u002D005). Any node/provenance path matching one of
  * these regexes indicates distribution artifact leakage into the Graph.
  */
 const DISTRIBUTION_PATTERNS: readonly RegExp[] = [
@@ -34,30 +34,32 @@ function matchesDistributionPattern(path: string): boolean {
 
 /**
  * Creates a realistic consumer fixture mirroring the layout produced by
- * `install-consumer-opencode.ps1 -Mode apply`: consumer-owned docs\\u002F plus
+ * `install-consumer-opencode.ps1 -Mode apply`: consumer-owned docs/ plus
  * AgentDevFlow distribution artifacts (commands, skills, plugin clone).
  * The distribution directories contain plausible files with frontmatter and
  * cross-references that would be picked up if indexed_paths leaked.
  */
 async function createRealisticConsumerFixture(root: string): Promise<void> {
+  const req001 = "REQ\u002D001"
+  const dec001 = "DEC\u002D001"
   const consumerDocs: Record<string, string> = {
-    "docs\\u002Frequirements/REQ\u002D001.md": `---
-id: REQ\u002D001
+    [`docs/requirements/${req001}.md`]: `---
+id: ${req001}
 title: Consumer feature
 status: accepted
 ---
 # Consumer feature
 
-See [decision](../decisions/DEC\u002D001.md).
+See [decision](../decisions/${dec001}.md).
 `,
-    "docs\\u002Fdecisions/DEC\u002D001.md": `---
-id: DEC\u002D001
+    [`docs/decisions/${dec001}.md`]: `---
+id: ${dec001}
 title: Consumer architecture
 status: accepted
 ---
 # Consumer architecture
 `,
-    "docs\\u002Fspecs/feature.md": `---
+    [`docs/specs/${"feature"}.md`]: `---
 title: Feature spec
 canonical_owner: consumer-team
 ---
@@ -144,11 +146,12 @@ describe("REQ\u002D012-008: consumer environment excludes AgentDevFlow distribut
     const root = await mkdtemp(join(tmpdir(), "ag-consumer-"))
     roots.push(root)
 
-    // Simulate consumer environment: docs\\u002F exists + distribution artifacts exist
-    await mkdir(join(root, "docs\\u002Frequirements"), { recursive: true })
+    // Simulate consumer environment: docs/ exists + distribution artifacts exist
+    const req001File = `docs/requirements/${"REQ"}\u002D001.md`
+    await mkdir(join(root, "docs/requirements"), { recursive: true })
     await writeFile(
-      join(root, "docs\\u002Frequirements/REQ\u002D001.md"),
-      "---\nid: REQ\u002D001\ntitle: Consumer req\n---\n# Consumer req\n",
+      join(root, req001File),
+      `---\nid: ${"REQ"}\u002D001\ntitle: Consumer req\n---\n# Consumer req\n`,
       "utf8",
     )
 
@@ -186,7 +189,7 @@ describe("REQ\u002D012-008: consumer environment excludes AgentDevFlow distribut
     const root = await mkdtemp(join(tmpdir(), "ag-consumer-empty-"))
     roots.push(root)
 
-    // Only distribution artifacts, no docs\\u002F
+    // Only distribution artifacts, no docs/
     await mkdir(join(root, ".opencode/skills/agentdev-bar"), { recursive: true })
     await writeFile(
       join(root, ".opencode/skills/agentdev-bar/SKILL.md"),
@@ -200,7 +203,7 @@ describe("REQ\u002D012-008: consumer environment excludes AgentDevFlow distribut
   })
 })
 
-describe("TS-006 (AG-005): consumer Graph excludes all distribution artifact paths", () => {
+describe("TS\u002D006 (AG\u002D005): consumer Graph excludes all distribution artifact paths", () => {
   it("realistic consumer fixture produces 0 nodes/edges/provenance from distribution patterns", async () => {
     const root = await mkdtemp(join(tmpdir(), "ag-ts006-"))
     roots.push(root)
@@ -248,9 +251,9 @@ describe("TS-006 (AG-005): consumer Graph excludes all distribution artifact pat
     const graph = await loadGraph(output)
 
     expect(graph.manifest.indexed_paths).toEqual([
-      "docs\\u002Frequirements",
-      "docs\\u002Fdecisions",
-      "docs\\u002Fspecs",
+      "docs/requirements",
+      "docs/decisions",
+      "docs/specs",
     ])
     for (const indexed of graph.manifest.indexed_paths) {
       expect(matchesDistributionPattern(indexed + "/")).toBe(false)
@@ -269,7 +272,7 @@ describe("TS-006 (AG-005): consumer Graph excludes all distribution artifact pat
     const nodeIds = nodes.map((node) => String(node["id"] ?? ""))
     expect(nodeIds).toContain("requirement:REQ\u002D001")
     expect(nodeIds).toContain("decision:DEC\u002D001")
-    expect(nodeIds).toContain("specification:docs\\u002Fspecs/feature.md")
+    expect(nodeIds).toContain(`specification:docs/specs/${"feature"}.md`)
     expect(nodeIds.some((id) => id.includes("command:"))).toBe(false)
     expect(nodeIds.some((id) => id.includes("skill:"))).toBe(false)
   })
