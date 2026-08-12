@@ -12,7 +12,7 @@
     - .opencode/commands/agentdev/  = junction -> .agentdev-plugin/src/opencode/commands/agentdev/
     - .opencode/skills/agentdev-*/  = individual junctions -> .agentdev-plugin/src/opencode/skills/agentdev-*/
     - .opencode/skills/japanese-tech-writing/ = junction -> .agentdev-plugin/src/opencode/skills/japanese-tech-writing/
-      (distribution-dependent skill referenced by agentdev-doc-writing, ADR-0134/REQ-0159-001)
+      (distribution-dependent skill referenced by agentdev-doc-writing, ADR-{NNNN}/REQ-{NNNN}-{NNN})
 
     Does NOT touch repo-local commands/skills:
     - .opencode/commands/repo/      = real directory (repo-local only)
@@ -24,12 +24,12 @@
 
 .PARAMETER Mode
     One of: dry-run, check, apply
-    省略可能。引数なし起動時（-Mode 未指定）は対話ウィザードが起動し、Mode と環境を問う（REQ-009-040）。
+    省略可能。引数なし起動時（-Mode 未指定）は対話ウィザードが起動し、Mode と環境を問う（REQ-{NNNN}-{NNN}）。
 
 .PARAMETER LocalMode
     Switch. When set, agentdev-gh-cli is junctioned to src/opencode-local/agentdev-gh-cli/
     instead of src/opencode/skills/agentdev-gh-cli/. All other agentdev-* command/skill
-    junctions target src/opencode/ as normal (REQ-0103-158, ADR-0131 decision #3).
+    junctions target src/opencode/ as normal (REQ-{NNNN}-{NNN}, ADR-{NNNN} decision #3).
 
     判断基準: GitHub Issue/PR を使わずローカルファイル（.agentdev/cases/）で運用する環境
     （ローカル版 OpenCode）では -LocalMode を指定する。
@@ -49,7 +49,7 @@
 
 .EXAMPLE
     ./scripts/install-consumer-opencode.ps1
-    引数なし起動時は対話ウィザードが Mode と環境を問う（REQ-009-040）。
+    引数なし起動時は対話ウィザードが Mode と環境を問う（REQ-{NNNN}-{NNN}）。
 
     ./scripts/install-consumer-opencode.ps1 -Mode dry-run
     ./scripts/install-consumer-opencode.ps1 -Mode check
@@ -88,7 +88,7 @@ $SkillsDir = Join-Path $ProjectionDir 'skills'
 $RepoLocalCommandNames = @('repo')
 $RepoLocalSkillPrefix = 'repo-'
 
-# In LocalMode this skill is redirected from src/opencode-local/ (REQ-0103-158, ADR-0131 decision #3)
+# In LocalMode this skill is redirected from src/opencode-local/ (REQ-{NNNN}-{NNN}, ADR-{NNNN} decision #3)
 $LocalModeRedirectSkill = 'agentdev-gh-cli'
 
 # --- Helper Functions ---
@@ -97,7 +97,7 @@ function Assert-ValidConsumerCwd {
     <#
     .SYNOPSIS
         実行ディレクトリが AgentDevFlow 導入先として適切か検査する。
-        想定外ディレクトリの場合、即座に停止する（REQ-009-041）。
+        想定外ディレクトリの場合、即座に停止する（REQ-{NNNN}-{NNN}）。
     #>
     $cwd = $PWD.Path
 
@@ -129,7 +129,7 @@ function Assert-ValidConsumerCwd {
 function Invoke-InstallWizard {
     <#
     .SYNOPSIS
-        引数なし起動時（-Mode 未指定）の対話ウィザード。Mode と環境を問う（REQ-009-040）。
+        引数なし起動時（-Mode 未指定）の対話ウィザード。Mode と環境を問う（REQ-{NNNN}-{NNN}）。
     #>
     Write-Host '=== AgentDevFlow 導入ウィザード ==='
     Write-Host ''
@@ -196,12 +196,12 @@ function Get-ConsumerJunctionTargets {
     }
 
     # skills\agentdev-* (dynamic enumeration) plus japanese-tech-writing
-    # (distribution-dependent skill referenced by agentdev-doc-writing, ADR-0134/REQ-0159-001).
+    # (distribution-dependent skill referenced by agentdev-doc-writing, ADR-{NNNN}/REQ-{NNNN}-{NNN}).
     $skillsSource = Join-Path $SourceDir 'skills'
     if (Test-Path -LiteralPath $skillsSource) {
         Get-ChildItem -LiteralPath $skillsSource -Directory -Filter 'agentdev-*' |
             ForEach-Object { $targets.Add("skills\$($_.Name)") }
-        # japanese-tech-writing is promoted to src/ but lacks agentdev-* prefix (ADR-0134).
+        # japanese-tech-writing is promoted to src/ but lacks agentdev-* prefix (ADR-{NNNN}).
         if (Test-Path -LiteralPath (Join-Path $skillsSource 'japanese-tech-writing')) {
             $targets.Add('skills\japanese-tech-writing')
         }
@@ -215,7 +215,7 @@ function Get-TargetSourcePath {
     .SYNOPSIS
         Resolve the absolute source path backing a projection relative path.
         In LocalMode, skills\<LocalModeRedirectSkill> is redirected to
-        src/opencode-local/<LocalModeRedirectSkill>/ (REQ-0103-158, ADR-0131 decision #3).
+        src/opencode-local/<LocalModeRedirectSkill>/ (REQ-{NNNN}-{NNN}, ADR-{NNNN} decision #3).
         All other targets back to src/opencode/ as normal.
     #>
     param([string]$RelPath)
@@ -259,10 +259,10 @@ function Initialize-PluginCheckout {
 
 # --- Main ---
 
-# cwd 安全化（REQ-009-041）。ウィザードの前に通過すること。
+# cwd 安全化（REQ-{NNNN}-{NNN}）。ウィザードの前に通過すること。
 Assert-ValidConsumerCwd
 
-# 引数なし起動時（-Mode 未指定）の対話ウィザード（REQ-009-040）
+# 引数なし起動時（-Mode 未指定）の対話ウィザード（REQ-{NNNN}-{NNN}）
 if (-not $Mode) {
     Invoke-InstallWizard
 }
