@@ -4,7 +4,7 @@ import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 import { buildGraph, loadGraph } from "../lib/graph.ts"
 import { queryGraph } from "../lib/query.ts"
-import { createFixture } from "./fixture.ts"
+import { createFixture, REQ_001_PATH, FEATURE_SPEC_NODE } from "./fixture.ts"
 
 const roots: string[] = []
 
@@ -34,7 +34,7 @@ describe("graph queries", () => {
     const { graph } = await graphFixture()
     const result = await queryGraph(graph, { kind: "provenance", id: "requirement:REQ\u002D001" })
     expect(result.provenance.length).toBe(1)
-    expect(result.provenance[0]?.path).toBe("docs\\u002Frequirements/REQ\u002D001.md")
+    expect(result.provenance[0]?.path).toBe(REQ_001_PATH)
   })
 
   it("path finds route between two nodes", async () => {
@@ -42,11 +42,11 @@ describe("graph queries", () => {
     const result = await queryGraph(graph, {
       kind: "path",
       source: "requirement:REQ\u002D001",
-      target: "specification:docs\\u002Fspecs/feature.md",
+      target: FEATURE_SPEC_NODE,
       maxDepth: 4,
     })
     expect(result.nodes[0]).toBe("requirement:REQ\u002D001")
-    expect(result.nodes.at(-1)).toBe("specification:docs\\u002Fspecs/feature.md")
+    expect(result.nodes.at(-1)).toBe(FEATURE_SPEC_NODE)
   })
 
   it("path returns empty when no route exists", async () => {
@@ -91,7 +91,7 @@ describe("query result relations (REQ\u002D023-001/002)", () => {
     const result = await queryGraph(graph, {
       kind: "path",
       source: "requirement:REQ\u002D001",
-      target: "specification:docs\\u002Fspecs/feature.md",
+      target: FEATURE_SPEC_NODE,
       maxDepth: 4,
     })
     expect(result.edges.length).toBeGreaterThan(0)
@@ -99,7 +99,7 @@ describe("query result relations (REQ\u002D023-001/002)", () => {
     const relationSources = new Set(result.relations.map((r) => r.source))
     const relationTargets = new Set(result.relations.map((r) => r.target))
     expect(relationSources.has("requirement:REQ\u002D001")).toBe(true)
-    expect(relationTargets.has("specification:docs\\u002Fspecs/feature.md")).toBe(true)
+    expect(relationTargets.has(FEATURE_SPEC_NODE)).toBe(true)
   })
 
   it("provenance for a node has empty relations (no edges in scope)", async () => {
@@ -110,7 +110,7 @@ describe("query result relations (REQ\u002D023-001/002)", () => {
   })
 })
 
-describe("CLI surface (TS-001)", () => {
+describe("CLI surface (TS\u002D001)", () => {
   it("build, check, query through Bun CLIs", async () => {
     const fixture = await graphFixture()
     const scriptRoot = resolve(import.meta.dir, "..", "src")
