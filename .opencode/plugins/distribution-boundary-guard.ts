@@ -1,51 +1,73 @@
-// Distribution boundary guard plugin (TS-005 fail-fast pre-write gate).
+// Distribution boundary guard plugin — Stage B orchestrator.
 //
 // Wires the canonical side-effect-free detector
 // (../skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts)
 // into OpenCode's tool.execute.before hook for the write, edit, and
 // apply_patch tools. When a write would introduce a producer-internal
-// reference (concrete ADR/REQ ID, concrete docs path, fixed blob/raw URL)
-// into a distributed text artifact under src/opencode/{commands,skills}/**,
-// the hook throws to block the write before it lands on disk.
+// reference (concrete ADR/REQ/DEC ID, concrete docs path, producer-repo
+// fixed URL, or any unclassified UPPER-DIGITS family) into a distributed
+// text artifact under src/opencode/{commands,skills}/**, the hook throws
+// to block the write before it lands on disk.
 //
-// API contract per docs/specs/integrity/distribution-boundary.md:
-//   * Pre-write gate is a fail-fast adapter (DEC-014 decision 3).
+// Stage B regression (PR #2092):
+//   * Pre-write gate is fail-fast (DEC-014 decision 3).
 //   * Inspection errors (read failure, malformed patch input, adapter
-//     failure) are gate-not-passed, NOT clean (DEC-014 decision 5).
-//   * The plugin does NOT degrade to final-gate-only. If the official hook
-//     API cannot satisfy the contract, this file MUST be removed or the
-//     contract MUST be re-opened; silent fallback is forbidden (TS-005).
+//     failure, unclassified entry) are gate-not-passed, NOT clean
+//     (DEC-014 decision 5).
+//   * Repository identity is explicit at the boundary
+//     (DEFAULT_PLUGIN_REPOSITORY_IDENTITY for the self-hosting repo;
+//     override via makeGuardEnv).
+//   * Distributed paths include japanese-tech-writing.
+//   * Path matching is case-insensitive (Windows filesystem semantics).
+//   * Edit and apply_patch Update reconstruct the prospective full-file
+//     content. apply_patch Move inspects source content at the destination.
+//   * Argument parsing is typed (no `as string`, no broad catch swallow).
+//
+// Evaluation logic lives in distribution-boundary-guard-evaluators.ts;
+// argument parsing in distribution-boundary-guard-parser.ts; full-file
+// reconstruction in distribution-boundary-guard-reconstruction.ts. This
+// file owns the plugin shell, the GuardEnv, the distributed-path predicate,
+// and the default-export wiring.
 
 import {
-  classifyContent,
-  classifyLine,
-  decideGate,
-  type Detection,
+  DEFAULT_DETECTOR_CONFIG,
+  DEFAULT_REPOSITORY_IDENTITY,
+  type DetectorConfig,
   type Projection,
+  type RepositoryIdentity,
 } from "../skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
 import * as fs from "fs";
+import {
+  parseApplyPatchArgs as parserParseApplyPatchArgs,
+  parseApplyPatchText,
+  parseEditArgs as parserParseEditArgs,
+  parseWriteArgs as parserParseWriteArgs,
+  type ParsedApplyPatch,
+  type ParsedEdit,
+} from "./distribution-boundary-guard-parser.ts";
+import type { FileReader } from "./distribution-boundary-guard-reconstruction.ts";
+import {
+  emptyOk,
+  evaluateApplyPatchEnv as evaluatorsEvaluateApplyPatchEnv,
+  evaluateEditEnv as evaluatorsEvaluateEditEnv,
+  evaluateWriteContentEnv as evaluatorsEvaluateWriteContentEnv,
+  fromDetections,
+  inspectionError,
+  type GuardDetectionsResult,
+} from "./distribution-boundary-guard-evaluators.ts";
 
 // ---------------------------------------------------------------------------
-// Minimal local types for OpenCode plugin plumbing.
-//
-// The canonical @opencode-ai/plugin package is not a runtime dependency of
-// this repo. The shapes here mirror the official Hooks/plugin type as of the
-// 2026 OpenCode release (see
-// packages/plugin/src/index.ts in the opencode repo). Only the subset this
-// plugin actually consumes is mirrored; widening the official type does not
-// break us because tool.execute.before is keyed by string.
+// Minimal local types for OpenCode plugin plumbing (mirror @opencode-ai/plugin).
 // ---------------------------------------------------------------------------
 
 export type ToolExecuteBeforeInput = {
-  tool: string;
-  sessionID: string;
-  callID: string;
+  readonly tool: string;
+  readonly sessionID: string;
+  readonly callID: string;
 };
 
 export type ToolExecuteBeforeOutput = {
-  // The official type is `{ args: any }`. We mirror it as a record of unknown
-  // so consumers do not need @types/node-style any.
-  args: Record<string, unknown>;
+  readonly args: Record<string, unknown>;
 };
 
 export type PluginHooks = {
@@ -55,20 +77,58 @@ export type PluginHooks = {
   ): Promise<void>;
 };
 
-export type PluginInput = {
-  // Reserved for future use (client, project, etc.). We only need the
-  // hook wiring surface.
-};
+export type PluginInput = Record<string, unknown>;
 
 export type Plugin = (input: PluginInput) => Promise<PluginHooks>;
 
 // ---------------------------------------------------------------------------
-// Public helper API (exported for unit tests).
+// Guard environment
 // ---------------------------------------------------------------------------
 
-export type GuardDetectionsResult =
-  | { ok: true; detections: readonly Detection[] }
-  | { ok: false; detections: readonly Detection[]; errorKind: "violation" | "inspection-error" };
+export const DEFAULT_PLUGIN_REPOSITORY_IDENTITY: RepositoryIdentity =
+  DEFAULT_REPOSITORY_IDENTITY;
+
+export interface GuardEnv {
+  readonly detector_config: DetectorConfig;
+  readonly readFile: FileReader;
+  readonly projection: Projection;
+}
+
+export interface MakeGuardEnvOptions {
+  readonly repository_identity?: RepositoryIdentity;
+  readonly producer_internal_id_prefixes?: readonly string[];
+  readonly readFile?: FileReader;
+  projection?: Projection;
+}
+
+function defaultReadFile(path: string): string | null {
+  try {
+    return fs.readFileSync(path, "utf-8");
+  } catch {
+    return null;
+  }
+}
+
+export function makeGuardEnv(opts: MakeGuardEnvOptions = {}): GuardEnv {
+  const identity = opts.repository_identity ?? DEFAULT_REPOSITORY_IDENTITY;
+  const prefixes =
+    opts.producer_internal_id_prefixes ??
+    DEFAULT_DETECTOR_CONFIG.producer_internal_id_prefixes;
+  return {
+    detector_config: {
+      repository_identity: identity,
+      producer_internal_id_prefixes: prefixes,
+    },
+    readFile: opts.readFile ?? defaultReadFile,
+    projection: opts.projection ?? "source",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Public helper API (exported for unit tests)
+// ---------------------------------------------------------------------------
+
+export { type GuardDetectionsResult } from "./distribution-boundary-guard-evaluators.ts";
 
 export const SUPPORTED_TOOLS = ["write", "edit", "apply_patch"] as const;
 export type SupportedTool = (typeof SUPPORTED_TOOLS)[number];
@@ -80,10 +140,9 @@ export function shouldInspectTool(tool: string): boolean {
 // Distributed text artifact paths. Matches either src/opencode/... source
 // projection (the only path the pre-write gate needs to defend; consumer-side
 // link/archive projections are checked by the final gate / release pipeline).
-// Path is normalized to POSIX before matching so Windows backslash paths
-// are handled correctly (Oracle finding 4: path normalization).
+// Case-insensitive: Windows filesystem is case-insensitive at runtime.
 const DISTRIBUTED_PATH_RE =
-  /src\/opencode\/commands\/agentdev\/|src\/opencode\/skills\/agentdev-[^/]+\//;
+  /^src\/opencode\/commands\/agentdev\/|^src\/opencode\/skills\/(?:agentdev-[^\/]+|japanese-tech-writing)\//i;
 
 export function normalizePath(p: string): string {
   return p.replace(/\\/g, "/");
@@ -93,29 +152,46 @@ export function isDistributedPath(filePath: string): boolean {
   return DISTRIBUTED_PATH_RE.test(normalizePath(filePath));
 }
 
-function emptyOk(): GuardDetectionsResult {
-  return { ok: true, detections: [] };
-}
+// ---------------------------------------------------------------------------
+// Argument parsing re-exports (typed entries into the orchestrator)
+// ---------------------------------------------------------------------------
 
-function fromDetections(detections: readonly Detection[]): GuardDetectionsResult {
-  if (detections.length === 0) return { ok: true, detections };
-  const gate = decideGate(detections);
-  if (gate.pass) return { ok: true, detections };
-  const hasErrors = gate.errors.length > 0;
-  return {
-    ok: false,
-    detections,
-    errorKind: hasErrors ? "inspection-error" : "violation",
-  };
-}
+export const parseWriteArgs = parserParseWriteArgs;
+export const parseEditArgs = parserParseEditArgs;
+export const parseApplyPatchArgs = parserParseApplyPatchArgs;
+
+export type {
+  ParsedWrite,
+  ParsedEdit,
+  ParsedApplyPatch,
+  PatchEntry,
+  PatchOpKind,
+  ParsedPatch,
+} from "./distribution-boundary-guard-parser.ts";
+export {
+  reconstructEdit,
+  reconstructAddFile,
+  reconstructUpdateFile,
+  resolveMoveSource,
+  safeRead,
+  type FileReader,
+  type ReconstructResult,
+} from "./distribution-boundary-guard-reconstruction.ts";
+
+// ---------------------------------------------------------------------------
+// Public evaluate API (legacy non-env shims for backward compat)
+// ---------------------------------------------------------------------------
 
 export function evaluateWriteContent(
   filePath: string,
   content: string,
   projection: Projection = "source",
 ): GuardDetectionsResult {
-  if (!isDistributedPath(filePath)) return emptyOk();
-  return fromDetections(classifyContent(content, filePath, projection));
+  return evaluateWriteContentEnv(
+    filePath,
+    content,
+    makeGuardEnv({ projection }),
+  );
 }
 
 export function evaluateEdit(args: {
@@ -126,69 +202,76 @@ export function evaluateEdit(args: {
   replaceAll?: boolean;
   projection?: Projection;
 }): GuardDetectionsResult {
-  if (!isDistributedPath(args.filePath)) return emptyOk();
-  // Oracle finding 4: reconstruct full post-edit content and classify it.
-  // This catches cases where the edit combines with existing content to
-  // form a violation (e.g. "docs/adr/" + edit adds "DEC-014.md").
-  // If oldString is not found in currentContent, fail closed (gate error).
-  let prospective: string;
-  if (args.replaceAll) {
-    const parts = args.currentContent.split(args.oldString);
-    if (parts.length === 1 && !args.currentContent.includes(args.oldString)) {
-      // oldString not found at all - fail closed
-      return { ok: false, detections: [], errorKind: "inspection-error" };
-    }
-    prospective = parts.join(args.newString);
-  } else {
-    const idx = args.currentContent.indexOf(args.oldString);
-    if (idx < 0) {
-      // oldString not found - fail closed per Oracle finding 4
-      return { ok: false, detections: [], errorKind: "inspection-error" };
-    }
-    prospective =
-      args.currentContent.slice(0, idx) +
-      args.newString +
-      args.currentContent.slice(idx + args.oldString.length);
+  const opts: MakeGuardEnvOptions = {};
+  if (args.projection !== undefined) {
+    opts.projection = args.projection;
   }
-  return fromDetections(classifyContent(prospective, args.filePath, args.projection ?? "source"));
+  const env = makeGuardEnv(opts);
+  return evaluatorsEvaluateEditEnv(
+    {
+      filePath: args.filePath,
+      oldString: args.oldString,
+      newString: args.newString,
+      replaceAll: args.replaceAll ?? false,
+    },
+    env,
+    isDistributedPath,
+    args.currentContent,
+  );
 }
 
-export function evaluateApplyPatch(patchText: string, projection: Projection = "source"): GuardDetectionsResult {
-  // Parse the OpenCode apply_patch text format. We extract (path, added-lines)
-  // pairs and classify each added line. Lines being removed ("-") are not
-  // inspected; only additions can introduce new violations.
-  const parsed = parseApplyPatch(patchText);
-  if (parsed.kind === "malformed") {
-    // Per SPEC: inspection error is gate-not-passed, not clean.
-    return {
-      ok: false,
-      detections: [],
-      errorKind: "inspection-error",
-    };
-  }
-  const detections: Detection[] = [];
-  for (const entry of parsed.entries) {
-    if (!isDistributedPath(entry.path)) continue;
-    for (let i = 0; i < entry.addedLines.length; i++) {
-      const lineDetections = classifyLineVirtual(
-        entry.addedLines[i]!,
-        i + 1,
-        entry.path,
-        projection,
-      );
-      for (const d of lineDetections) detections.push(d);
-    }
-  }
-  return fromDetections(detections);
+export function evaluateApplyPatch(
+  patchText: string,
+  projection: Projection = "source",
+): GuardDetectionsResult {
+  return evaluatorsEvaluateApplyPatchEnv(
+    { patchText },
+    makeGuardEnv({ projection }),
+    isDistributedPath,
+  );
 }
 
-export function formatBlockMessage(tool: string, result: GuardDetectionsResult): string {
+// Env-aware variants used by the plugin shell and by tests.
+export function evaluateWriteContentEnv(
+  filePath: string,
+  content: string,
+  env: GuardEnv,
+): GuardDetectionsResult {
+  return evaluatorsEvaluateWriteContentEnv(filePath, content, env, isDistributedPath);
+}
+
+export function evaluateEditEnv(
+  args: ParsedEdit,
+  env: GuardEnv,
+  currentContentOverride?: string,
+): GuardDetectionsResult {
+  return evaluatorsEvaluateEditEnv(args, env, isDistributedPath, currentContentOverride);
+}
+
+export function evaluateApplyPatchEnv(
+  args: ParsedApplyPatch,
+  env: GuardEnv,
+): GuardDetectionsResult {
+  return evaluatorsEvaluateApplyPatchEnv(args, env, isDistributedPath);
+}
+
+// Re-export internals for tests that need them.
+export { emptyOk, fromDetections, inspectionError, parseApplyPatchText };
+
+// ---------------------------------------------------------------------------
+// Error message formatting
+// ---------------------------------------------------------------------------
+
+export function formatBlockMessage(
+  tool: string,
+  result: GuardDetectionsResult,
+): string {
   const header = `distribution-boundary-guard: blocked ${tool} (producer-internal reference in distributed text artifact)`;
   if (result.ok) {
     return `${header}\nno violation detected (internal call site should not have thrown)`;
   }
   if (result.errorKind === "inspection-error") {
-    return `${header}\ninspection error: malformed input or unclassified entry; gate-not-passed per DEC-014 decision 5`;
+    return `${header}\ninspection error: malformed input, read failure, or unclassified entry; gate-not-passed per DEC-014 decision 5`;
   }
   const lines = [header];
   for (const d of result.detections) {
@@ -200,94 +283,27 @@ export function formatBlockMessage(tool: string, result: GuardDetectionsResult):
 }
 
 // ---------------------------------------------------------------------------
-// Internal: virtual line classification (mirrors classifyLine from lib but
-// inlined here to avoid an extra export). We import classifyContent from the
-// lib for file-level scans and use classifyLine for single-line checks.
-// ---------------------------------------------------------------------------
-
-function classifyLineVirtual(
-  text: string,
-  lineNumber: number,
-  filePath: string,
-  projection: Projection,
-): readonly Detection[] {
-  return classifyLine({ text, lineNumber, filePath, projection });
-}
-
-function splitAddedLinesFromNewString(newString: string): string[] {
-  if (newString.length === 0) return [];
-  return newString.split(/\r?\n/).filter((l) => l.length > 0);
-}
-
-type ParsedPatch =
-  | { kind: "ok"; entries: Array<{ path: string; addedLines: string[] }> }
-  | { kind: "malformed" };
-
-function parseApplyPatch(patchText: string): ParsedPatch {
-  if (typeof patchText !== "string" || patchText.length === 0) {
-    return { kind: "malformed" };
-  }
-  // Heuristic: an apply_patch text contains one or more "*** <Op> File: <path>"
-  // marker lines. If none are present, we cannot extract any file context and
-  // treat the input as malformed (gate-not-passed per SPEC).
-  if (!/\*\*\* (Add|Update|Delete|Move) File: /.test(patchText)) {
-    return { kind: "malformed" };
-  }
-  const lines = patchText.split(/\r?\n/);
-  const entries: Array<{ path: string; addedLines: string[] }> = [];
-  let current: { path: string; addedLines: string[] } | null = null;
-  for (const raw of lines) {
-    const m = raw.match(/^\*\*\* (?:Add|Update) File: (.+)$/);
-    if (m) {
-      if (current) entries.push(current);
-      current = { path: m[1]!.trim(), addedLines: [] };
-      continue;
-    }
-    if (raw.match(/^\*\*\* (?:Delete|Move) File: /)) {
-      if (current) {
-        entries.push(current);
-        current = null;
-      }
-      continue;
-    }
-    if (raw.match(/^\*\*\* (?:Begin|End) Patch/)) continue;
-    if (current && raw.startsWith("+")) {
-      current.addedLines.push(raw.slice(1));
-    }
-  }
-  if (current) entries.push(current);
-  return { kind: "ok", entries };
-}
-
-// ---------------------------------------------------------------------------
-// Plugin wiring (default export).
+// Plugin wiring (default export)
 // ---------------------------------------------------------------------------
 
 const plugin: Plugin = async () => {
+  const env = makeGuardEnv();
   return {
     "tool.execute.before": async (input, output) => {
       if (!shouldInspectTool(input.tool)) return;
       let result: GuardDetectionsResult;
       if (input.tool === "write") {
-        const filePath = String(output.args.filePath ?? "");
-        const content = String(output.args.content ?? "");
-        result = evaluateWriteContent(filePath, content);
+        const parsed = parserParseWriteArgs(output.args);
+        if (parsed === null) return;
+        result = evaluateWriteContentEnv(parsed.filePath, parsed.content, env);
       } else if (input.tool === "edit") {
-        const filePath = String(output.args.filePath ?? "");
-        const oldString = String(output.args.oldString ?? "");
-        const newString = String(output.args.newString ?? "");
-        const replaceAll = Boolean(output.args.replaceAll);
-        const currentContent = readCurrentForEdit(filePath);
-        result = evaluateEdit({
-          filePath,
-          currentContent,
-          oldString,
-          newString,
-          replaceAll,
-        });
+        const parsed = parserParseEditArgs(output.args);
+        if (parsed === null) return;
+        result = evaluateEditEnv(parsed, env);
       } else if (input.tool === "apply_patch") {
-        const patchText = String(output.args.patchText ?? "");
-        result = evaluateApplyPatch(patchText);
+        const parsed = parserParseApplyPatchArgs(output.args);
+        if (parsed === null) return;
+        result = evaluateApplyPatchEnv(parsed, env);
       } else {
         return;
       }
@@ -297,17 +313,5 @@ const plugin: Plugin = async () => {
     },
   };
 };
-
-function readCurrentForEdit(filePath: string): string {
-  // Best-effort read of the current file content for edit inspection. The
-  // pre-write gate primarily inspects the newString (what is being added);
-  // currentContent is read so future refinements can reconstruct the full
-  // post-edit file. If the read fails we still classify newString.
-  try {
-    return fs.readFileSync(filePath, "utf-8") as string;
-  } catch {
-    return "";
-  }
-}
 
 export default plugin;

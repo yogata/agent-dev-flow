@@ -5,6 +5,15 @@
  * introduce producer-internal references into distributed text artifacts are
  * blocked. The helpers are pure functions; the plugin shell wires them into
  * OpenCode's tool.execute.before hook.
+ *
+ * Stage B regression (PR #2092): the plugin now reads current file content
+ * for edit and apply_patch Update, reconstructs prospective full-file content,
+ * parses external args into typed values (no `as string`, no broad catch),
+ * classifies URLs by explicit repository identity, treats unknown bytes as
+ * fail-closed, matches distributed paths case-insensitively on Windows, and
+ * covers all distributed source paths including japanese-tech-writing. The
+ * parser and reconstruction are split into focused modules so the plugin
+ * orchestrator stays under the 250 pure-LOC ceiling.
  */
 
 import { expect, test, describe } from "bun:test";
@@ -14,7 +23,17 @@ import {
   evaluateApplyPatch,
   shouldInspectTool,
   formatBlockMessage,
+  parseWriteArgs,
+  parseEditArgs,
+  parseApplyPatchArgs,
+  makeGuardEnv,
+  isDistributedPath,
+  evaluateWriteContentEnv,
+  evaluateEditEnv,
+  evaluateApplyPatchEnv,
+  DEFAULT_PLUGIN_REPOSITORY_IDENTITY,
   type GuardDetectionsResult,
+  type GuardEnv,
 } from "./distribution-boundary-guard.ts";
 
 describe("shouldInspectTool - tool allowlist", () => {
@@ -53,7 +72,9 @@ describe("evaluateWriteContent - write tool gate", () => {
     if (!r.ok) {
       const pathHit = r.detections.find((d) => d.category === "concrete-path");
       expect(pathHit).toBeDefined();
-      expect(pathHit!.matched).toBe("docs/requirements/REQ-0149.md");
+      if (pathHit) {
+        expect(pathHit.matched).toBe("docs/requirements/REQ-0149.md");
+      }
     }
   });
   test("blocks write introducing producer-internal docs URL", () => {
@@ -192,19 +213,31 @@ describe("evaluateApplyPatch - apply_patch tool gate", () => {
     }
   });
   test("blocks Update File whose additions introduce a concrete path", () => {
+    // Stage B regression: Update now reconstructs against current file
+    // content. Use evaluateApplyPatchEnv with a readFile that returns content
+    // matching the patch context so reconstruction succeeds and the added
+    // concrete path is detected.
+    const currentContent = "title\n";
+    const env = makeGuardEnv({
+      readFile: (p: string) =>
+        p === "src/opencode/commands/agentdev/sample.md" ? currentContent : null,
+    });
     const patchText = [
       "*** Begin Patch",
       "*** Update File: src/opencode/commands/agentdev/sample.md",
-      "@@ ...",
+      "@@ ctx",
+      " title",
       "+ref docs/requirements/REQ-0149.md",
       "*** End Patch",
     ].join("\n");
-    const r = evaluateApplyPatch(patchText);
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patchText })!, env);
     expect(r.ok).toBe(false);
     if (!r.ok) {
       const pathHit = r.detections.find((d) => d.category === "concrete-path");
       expect(pathHit).toBeDefined();
-      expect(pathHit!.matched).toBe("docs/requirements/REQ-0149.md");
+      if (pathHit) {
+        expect(pathHit.matched).toBe("docs/requirements/REQ-0149.md");
+      }
     }
   });
   test("allows Add File with clean content", () => {
@@ -218,16 +251,24 @@ describe("evaluateApplyPatch - apply_patch tool gate", () => {
     const r = evaluateApplyPatch(patchText);
     expect(r.ok).toBe(true);
   });
-  test("allows Update File whose additions are clean (only - lines have refs)", () => {
+  test("allows Update File that removes a ref and adds a clean line", () => {
+    // Stage B regression: reconstruction reads current content. The patch
+    // removes the offending line and adds a clean one. After reconstruction
+    // the resulting content has no violations.
+    const currentContent = "ref ADR-0135\n";
+    const env = makeGuardEnv({
+      readFile: (p: string) =>
+        p === "src/opencode/commands/agentdev/sample.md" ? currentContent : null,
+    });
     const patchText = [
       "*** Begin Patch",
       "*** Update File: src/opencode/commands/agentdev/sample.md",
-      "@@ ...",
+      "@@ ctx",
       "-ref ADR-0135",
       "+clean line",
       "*** End Patch",
     ].join("\n");
-    const r = evaluateApplyPatch(patchText);
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patchText })!, env);
     expect(r.ok).toBe(true);
   });
   test("skips non-distributed file paths in patch", () => {
@@ -256,6 +297,7 @@ describe("formatBlockMessage - error message", () => {
   test("includes rule id and violation count", () => {
     const fake: GuardDetectionsResult = {
       ok: false,
+      errorKind: "violation",
       detections: [
         {
           text: "x",
@@ -273,5 +315,381 @@ describe("formatBlockMessage - error message", () => {
     expect(msg).toContain("distribution-boundary-guard");
     expect(msg).toContain("ADR-0135");
     expect(msg).toContain("producer-internal");
+  });
+});
+
+// =============================================================================
+// Stage B regression (PR #2092).
+// =============================================================================
+
+describe("Stage B regression: distributed path coverage", () => {
+  test("src/opencode/commands/agentdev/ is distributed", () => {
+    expect(isDistributedPath("src/opencode/commands/agentdev/foo.md")).toBe(true);
+  });
+  test("src/opencode/skills/agentdev-* is distributed", () => {
+    expect(isDistributedPath("src/opencode/skills/agentdev-foo/SKILL.md")).toBe(true);
+  });
+  test("src/opencode/skills/japanese-tech-writing/ is distributed", () => {
+    expect(
+      isDistributedPath("src/opencode/skills/japanese-tech-writing/SKILL.md"),
+    ).toBe(true);
+  });
+  test("non-distributed paths are skipped", () => {
+    expect(isDistributedPath("docs/specs/foo.md")).toBe(false);
+    expect(isDistributedPath("scripts/install.ps1")).toBe(false);
+    expect(isDistributedPath("README.md")).toBe(false);
+  });
+  test("Windows backslash distributed path matches case-insensitively", () => {
+    expect(
+      isDistributedPath("SRC\\OpenCode\\Commands\\AgentDev\\sample.md"),
+    ).toBe(true);
+    expect(
+      isDistributedPath("src\\opencode\\skills\\Japanese-Tech-Writing\\SKILL.md"),
+    ).toBe(true);
+  });
+});
+
+describe("Stage B regression: typed argument parsing", () => {
+  test("parseWriteArgs extracts filePath and content as strings", () => {
+    const r = parseWriteArgs({
+      filePath: "src/opencode/commands/agentdev/x.md",
+      content: "ADR-0001",
+    });
+    expect(r).not.toBeNull();
+    if (r) {
+      expect(r.filePath).toBe("src/opencode/commands/agentdev/x.md");
+      expect(r.content).toBe("ADR-0001");
+    }
+  });
+  test("parseWriteArgs returns null when filePath missing or non-string", () => {
+    expect(parseWriteArgs({})).toBeNull();
+    expect(parseWriteArgs({ filePath: 42, content: "x" })).toBeNull();
+    expect(parseWriteArgs({ filePath: "x", content: 42 })).toBeNull();
+  });
+  test("parseEditArgs extracts filePath/oldString/newString/replaceAll", () => {
+    const r = parseEditArgs({
+      filePath: "x.md",
+      oldString: "a",
+      newString: "b",
+      replaceAll: true,
+    });
+    expect(r).not.toBeNull();
+    if (r) {
+      expect(r.filePath).toBe("x.md");
+      expect(r.oldString).toBe("a");
+      expect(r.newString).toBe("b");
+      expect(r.replaceAll).toBe(true);
+    }
+  });
+  test("parseEditArgs treats missing oldString/newString as empty string (edit tool contract)", () => {
+    const r = parseEditArgs({ filePath: "x.md" });
+    expect(r).not.toBeNull();
+    if (r) {
+      expect(r.oldString).toBe("");
+      expect(r.newString).toBe("");
+      expect(r.replaceAll).toBe(false);
+    }
+  });
+  test("parseEditArgs returns null when filePath is not a string", () => {
+    expect(parseEditArgs({ filePath: 1 })).toBeNull();
+  });
+  test("parseApplyPatchArgs extracts patchText", () => {
+    const r = parseApplyPatchArgs({ patchText: "*** Begin Patch\n*** End Patch" });
+    expect(r).not.toBeNull();
+    if (r) expect(r.patchText).toBe("*** Begin Patch\n*** End Patch");
+  });
+  test("parseApplyPatchArgs returns null when patchText missing or non-string", () => {
+    expect(parseApplyPatchArgs({})).toBeNull();
+    expect(parseApplyPatchArgs({ patchText: 1 })).toBeNull();
+  });
+});
+
+describe("Stage B regression: edit read failure must fail closed", () => {
+  test("edit tool fails closed when current file cannot be read", () => {
+    const env: GuardEnv = makeGuardEnv({
+      readFile: () => null,
+    });
+    const r = evaluateEditEnv(
+      {
+        filePath: "src/opencode/commands/agentdev/sample.md",
+        oldString: "x",
+        newString: "ADR-0001",
+        replaceAll: false,
+      },
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+  test("edit tool fails closed when read throws (no swallow to clean)", () => {
+    const env: GuardEnv = makeGuardEnv({
+      readFile: () => {
+        throw new Error("permission denied");
+      },
+    });
+    const r = evaluateEditEnv(
+      {
+        filePath: "src/opencode/commands/agentdev/sample.md",
+        oldString: "x",
+        newString: "ADR-0001",
+        replaceAll: false,
+      },
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+});
+
+describe("Stage B regression: apply_patch Add/Update/Move full-file reconstruction", () => {
+  test("Add File: classify new content at destination path", () => {
+    const env = makeGuardEnv();
+    const patch = [
+      "*** Begin Patch",
+      "*** Add File: src/opencode/commands/agentdev/new.md",
+      "+ref ADR-0001",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.detections.some((d) => d.matched === "ADR-0001")).toBe(true);
+    }
+  });
+
+  test("Update File: classify reconstructed full content (current + additions)", () => {
+    const env = makeGuardEnv({
+      readFile: (p: string) =>
+        p === "src/opencode/commands/agentdev/sample.md" ? "title\nbody\n" : null,
+    });
+    // OpenCode apply_patch Update format: space prefix = context, `-` = remove, `+` = add.
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/commands/agentdev/sample.md",
+      "@@ ctx",
+      " title",
+      "+ref ADR-0001",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.detections.some((d) => d.matched === "ADR-0001")).toBe(true);
+    }
+  });
+
+  test("Update File: existing content + addition combines to form a violation", () => {
+    const env = makeGuardEnv({
+      readFile: (p: string) =>
+        p === "src/opencode/commands/agentdev/sample.md" ? "see docs/adr/\n" : null,
+    });
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/commands/agentdev/sample.md",
+      "@@ ctx",
+      " see docs/adr/",
+      "-",
+      "+DEC-014.md",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(false);
+  });
+
+  test("Move File: source content is inspected at the destination distributed path", () => {
+    const env = makeGuardEnv({
+      readFile: (p: string) =>
+        p === "src/opencode/skills/agentdev-old/SKILL.md"
+          ? "# old skill\nref ADR-9999 here\n"
+          : null,
+    });
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.detections.some((d) => d.matched === "ADR-9999")).toBe(true);
+    }
+  });
+
+  test("Move File: fail closed when source cannot be read", () => {
+    const env = makeGuardEnv({
+      readFile: () => null,
+    });
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+
+  test("Update File: fail closed when current file cannot be read", () => {
+    const env = makeGuardEnv({
+      readFile: () => null,
+    });
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/commands/agentdev/sample.md",
+      "@@ ctx",
+      "+ref ADR-0001",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+});
+
+describe("Stage B regression: malformed / incomplete patches fail closed", () => {
+  test("patch missing Begin Patch marker fails closed", () => {
+    const env = makeGuardEnv();
+    const r = evaluateApplyPatchEnv(
+      parseApplyPatchArgs({ patchText: "*** Add File: x\n+ref ADR-0001" })!,
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+  test("patch missing End Patch marker fails closed", () => {
+    const env = makeGuardEnv();
+    const r = evaluateApplyPatchEnv(
+      parseApplyPatchArgs({
+        patchText: "*** Begin Patch\n*** Add File: x\n+ref ADR-0001",
+      })!,
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+  test("patch with no recognized operation marker fails closed", () => {
+    const env = makeGuardEnv();
+    const r = evaluateApplyPatchEnv(
+      parseApplyPatchArgs({
+        patchText: "*** Begin Patch\ngarbage\n*** End Patch",
+      })!,
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+  test("empty patch text fails closed (not silently clean)", () => {
+    const env = makeGuardEnv();
+    const r = evaluateApplyPatchEnv(
+      parseApplyPatchArgs({ patchText: "" })!,
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+  test("patch with Add File missing file path fails closed", () => {
+    const env = makeGuardEnv();
+    const r = evaluateApplyPatchEnv(
+      parseApplyPatchArgs({
+        patchText: "*** Begin Patch\n*** Add File:\n+ref ADR-0001\n*** End Patch",
+      })!,
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+});
+
+describe("Stage B regression: repository identity at boundary", () => {
+  test("DEFAULT_PLUGIN_REPOSITORY_IDENTITY is yogata/agent-dev-flow on main", () => {
+    expect(DEFAULT_PLUGIN_REPOSITORY_IDENTITY.owner_slash_name).toBe(
+      "yogata/agent-dev-flow",
+    );
+    expect(DEFAULT_PLUGIN_REPOSITORY_IDENTITY.default_branch).toBe("main");
+  });
+  test("producer-repo URL at non-docs path is blocked (path-content-independent)", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "ref https://github.com/yogata/agent-dev-flow/blob/main/scripts/install.ps1",
+      env,
+    );
+    expect(r.ok).toBe(false);
+  });
+  test("external-repo URL is allowed (not silently blocked, not silently passed as violation)", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "ref https://github.com/sst/opencode/blob/main/packages/plugin/src/index.ts",
+      env,
+    );
+    expect(r.ok).toBe(true);
+  });
+  test("custom repository identity via makeGuardEnv is honored", () => {
+    const env = makeGuardEnv({
+      repository_identity: {
+        owner_slash_name: "myorg/myrepo",
+        default_branch: "develop",
+      },
+    });
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "ref https://github.com/yogata/agent-dev-flow/blob/main/docs/x.md",
+      env,
+    );
+    expect(r.ok).toBe(true);
+    const r2 = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "ref https://github.com/myorg/myrepo/blob/develop/scripts/install.ps1",
+      env,
+    );
+    expect(r2.ok).toBe(false);
+  });
+});
+
+describe("Stage B regression: unclassified IDs do not silently pass", () => {
+  test("write introducing OU-1 fails closed (not in default producer set)", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "see OU-1",
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+  test("write introducing a known producer ID is a violation (not inspection-error)", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "see ADR-0001",
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("violation");
+    }
   });
 });
