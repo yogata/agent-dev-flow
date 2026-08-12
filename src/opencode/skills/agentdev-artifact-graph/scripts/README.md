@@ -28,7 +28,7 @@ scripts/
 │   ├── prepare_graph.ts   # CLI: ワークフロー統合
 │   └── verify_graph.ts    # CLI: verification feedback
 └── tests/
-    └── *.test.ts          # テスト戦略 TS-001〜TS-008 + REQ 項目
+    └── *.test.ts          # テスト戦略 TS-{NNN} + REQ 項目
 ```
 
 ## I/O 契約（共通）
