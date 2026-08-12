@@ -6,7 +6,7 @@ description: docs 横断診断カテゴリ、共通証拠構造、共通 finding
 # docs 横断診断知識ベース（doc-diagnostics）
 
 inspect-docs command から呼ばれる docs 横断診断の判断基盤。
-横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを一次所有する（AG-008、RU-20260722-01 合意）。
+横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを一次所有する（AG-{NNN}、RU-{NNNN}-01 合意）。
 REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、文意品質、探索順は再定義せず、各専門 skill へルーティングする。
 検査対象を直接修正しない診断専用であり、本スキルは判定ロジックとルーティング表の提供のみを行う。
 
@@ -65,7 +65,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 |----------|------|
 | inspect-docs | docs全体の意味整合性診断における横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングの提供 |
 
-## 責務境界（AC-014）
+## 責務境界（AC-{NNN}）
 
 本スキルは横断編成と結果統合のみを所有し、専門診断の再定義を行わない。
 `diagnostics` 命名は例外境界に基づき inspect-* 系 command と区別して skill 名でのみ許容される。
@@ -82,7 +82,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 |----------|------|
 | `references/diagnostic-categories.md` | docs 横断診断カテゴリ（廃止 REQ/SPEC 由来記述残置、REQ/SPEC 境界違反、REQ 粒度過小、横断契約矛盾、文意品質候補、探索順と索引の不整合、配布物統合性）の定義、横断スキャン観点、ルーティング先、安定契約例外候補の抽出方針。配布物統合性には docs-spec-rebuild-integrity SPEC が定義する構文健全性5パターン（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持、責務整合を含む |
 | `references/finding-output-contract.md` | 共通証拠構造（finding schema フィールド）、severity 分類、信頼度、出力ファイル契約（`.agentdev/inspect/inbox/`）、NG 分類、source-of-truth priority、許可される副作用 |
-| `references/diagnostic-routing.md` | 文書種別別診断へのルーティング表（REQ 固有、文意品質、探索順、配布物整合性、SPEC 三層構造）、専門 skill 委譲規則、委譲時の入力引き渡し契約、責務重複なしの保証（AC-014） |
+| `references/diagnostic-routing.md` | 文書種別別診断へのルーティング表（REQ 固有、文意品質、探索順、配布物整合性、SPEC 三層構造）、専門 skill 委譲規則、委譲時の入力引き渡し契約、責務重複なしの保証（AC-{NNN}） |
 
 ## See Also
 
