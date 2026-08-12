@@ -63,7 +63,7 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 
 ### review_dispositions 証跡セクション（Issue本文テンプレート）
 
-case-open が draft-data の `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する（AG-002、AG-009）。
+case-open が draft-data の `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する（AG-{NNN}、AG-{NNN}）。
 
 #### 対象テンプレートと内容
 
@@ -84,7 +84,7 @@ case-open が draft-data の `review_dispositions` を読み取り、Issue 本�
 
 feature、bug、child テンプレートでは「テスト戦略」セクションの直後、「補足情報」セクションの前に配置する。epic テンプレートでは「完了条件」セクションの直後、「補足情報」セクションの前に配置する。
 
-#### 転記規則（AG-011）
+#### 転記規則（AG-{NNN}）
 
 - 単一 Standard Issue: 全 disposition を当該 Issue へ転記
 - Epic flow: 全 disposition を Epic Issue へ転記。子 Issue へは重複転記しない
@@ -122,7 +122,7 @@ feature、bug、child テンプレートでは「テスト戦略」セクショ�
 ### 共通ルール
 
 - テンプレートは Read tool で読み込み、変数部分を置換して使用する
-- 変数置換後の本文は直ちに `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）により UTF-8 BOM なし LF 一時ファイル（`$env:TEMP/agentdev/gh-temp-{timestamp}.md` 等）へ保存し、`gh --body-file`/ `-F` で渡すこと。文字列変数での本文持ち回り、PowerShell の `Out-File`/ `Set-Content`/ `>` リダイレクトによる一時ファイル作成を禁止する（agentdev-gh-cli standard-procedures.md の WRITE 手続き禁止事項に準拠）
+- 変数置換後の本文は直ちに `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）により UTF‑8 BOM なし LF 一時ファイル（`$env:TEMP/agentdev/gh-temp-{timestamp}.md` 等）へ保存し、`gh --body-file`/ `-F` で渡すこと。文字列変数での本文持ち回り、PowerShell の `Out-File`/ `Set-Content`/ `>` リダイレクトによる一時ファイル作成を禁止する（agentdev-gh-cli standard-procedures.md の WRITE 手続き禁止事項に準拠）
 - テンプレートの構造を維持する（セクションの削除、順序変更禁止）。Markdown 行構造（LF、セクション間空行、インデント）の byte 単位保持を含む
 - 変数に該当するデータがない場合、そのセクションに「該当なし」と記載する（セクションごと削除しない）
 - セクション見出しは日本語で記述する
@@ -141,7 +141,7 @@ feature、bug、child テンプレートでは「テスト戦略」セクショ�
 関数削除を要求する完了条件の書き方標準。
 共用関数の包括的削除による破壊的変更を防止する（L-014、PR #1140 / #1139 Epic #1138 由来）。
 
-- 関数削除を要求する完了条件は対象スコープ（例: 「from checkX」「IR-044 由来の context exemption」）を明記すること
+- 関数削除を要求する完了条件は対象スコープ（例: 「from checkX」「IR-{NNN} 由来の context exemption」）を明記すること
 - 関数名列挙による完全削除の代用を禁止する。共用関数、cross-cutting helper は複数 checker から参照される可能性があり、定義削除前に全使用箇所を確認すること
 - 完了条件の checkbox は「対象スコープの明示」と「全使用箇所の確認証拠」を含むこと
 
