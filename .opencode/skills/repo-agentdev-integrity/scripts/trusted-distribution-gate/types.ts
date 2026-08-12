@@ -72,21 +72,34 @@ export interface GitTreeEntry {
 // Manifest entries
 // ---------------------------------------------------------------------------
 
-/** Projection the manifest entry belongs to. */
+/**
+ * Canonical projection labels per docs/specs/integrity/distribution-boundary.md
+ * §58-67. The public manifest model exposes exactly these four projections;
+ * runtime/bootstrap are internal source subsets and never appear as a public
+ * projection label.
+ */
 export type Projection =
-  | "source-runtime"
-  | "source-bootstrap"
+  | "source"
   | "link"
   | "archive"
   | "archive-installed";
 
 export const PROJECTIONS: readonly Projection[] = [
-  "source-runtime",
-  "source-bootstrap",
+  "source",
   "link",
   "archive",
   "archive-installed",
 ] as const;
+
+/**
+ * Internal source-subset classification. Not a public projection. Used by
+ * the manifest builder to filter the canonical `source` projection into the
+ * subsets that feed `link`, `archive`, and `archive-installed`.
+ */
+export type SourceSubset =
+  | "runtime" // src/opencode/{commands/agentdev,skills/agentdev-*,skills/japanese-tech-writing}/**
+  | "bootstrap" // scripts/install-consumer-opencode.ps1, scripts/check-consumer-opencode.ps1
+  | "archive-extra"; // scripts/install-from-archive.ps1, README-INSTALL.md
 
 /** Single manifest entry: tracked path + blob digest. */
 export interface ManifestEntry {
@@ -210,5 +223,63 @@ export class InvalidOidError extends Error {
   constructor(public readonly value: string) {
     super(`Invalid Git OID: ${value}`);
     this.name = "InvalidOidError";
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Typed error taxonomy (parent defect #10)
+// ---------------------------------------------------------------------------
+//
+// Stable, programmatically distinguishable errors. Stage A used to route
+// behavior by substring-matching exception messages (e.g. `.includes("does
+// not exist")`), which broke when git changed wording or when an unrelated
+// error happened to contain a similar phrase. These typed classes replace
+// that brittleness with `instanceof` checks. The launcher maps each class
+// to a stable exit code without ever inspecting the message.
+
+export type PathSafetyReason =
+  | "symlink" // git mode 120000
+  | "gitlink" // git mode 160000 (submodule)
+  | "unsupported-mode" // git mode outside 100644/100755/120000/160000/040000
+  | "non-blob" // tree/commit object kind where blob required
+  | "path-traversal" // archive/path input contains `..` or escapes root
+  | "unsafe-archive-path"; // archive path fails safety character/range check
+
+/**
+ * Raised when a candidate tree entry or archive path violates path safety.
+ * The launcher maps this to ExitCode.PathSafetyViolation (5). Replaces the
+ * previous routing where these conditions threw generic GitAdapterError and
+ * were surfaced as ExitCode.Unexpected (9).
+ */
+export class PathSafetyError extends Error {
+  constructor(public readonly reason: PathSafetyReason, message: string) {
+    super(message);
+    this.name = "PathSafetyError";
+  }
+}
+
+/**
+ * Raised by the git adapter when `git cat-file` reports that the requested
+ * path does not exist at the given OID. The launcher treats this as a
+ * structured signal (path missing → bootstrap candidate-added check) rather
+ * than parsing the git error message string.
+ */
+export class GitBlobMissingError extends Error {
+  constructor(public readonly oid: string, public readonly path: string) {
+    super(`path '${path}' does not exist at oid ${oid}`);
+    this.name = "GitBlobMissingError";
+  }
+}
+
+/**
+ * Raised by the git adapter for any OTHER git failure (subprocess crash,
+ * unknown revision, network push, lock file, etc.). Distinct from
+ * GitBlobMissingError so callers can branch on the typed class rather than
+ * substring-matching.
+ */
+export class GitAdapterError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "GitAdapterError";
   }
 }
