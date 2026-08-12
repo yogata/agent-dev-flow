@@ -67,7 +67,7 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save`）を経て初めて REQ 化される。
 学びを直接 REQ 化しない。
 
-**living pool 維持（REQ）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-005）。終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
+**living pool 維持（REQ）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-{NNN}）。終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
 
 ### Step 8: 既存対策確認
 
