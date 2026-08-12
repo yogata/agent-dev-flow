@@ -1,7 +1,7 @@
 # pass_criteria 記述基準
 
 test strategy 策定時に pass_criteria を記述する際の指針。
-REQ content が pipeline stage によって表現を変えることに起因する QG-4 評価時の食い違いを防ぐ（AG-007）。
+REQ content が pipeline stage によって表現を変えることに起因する QG-{N} 評価時の食い違いを防ぐ（AG-{NNN}）。
 
 agentdev-req-analysis SPEC「pass_criteria 記述基準」を正規原本とし、本ファイルは詳細、実例を補完する。
 
@@ -54,13 +54,13 @@ pass_criteria: |
   # "pass_criteria" が識別子から外れ、対象セクションが特定できない
 ```
 
-### QG-4 との連動
+### QG-{N} との連動
 
-QG-4 は意味的等価性で pass_criteria 充足を判定する（[qg-4-final-acceptance.md](../../agentdev-quality-gates/references/qg-4-final-acceptance.md) 観点6「test strategy 処理完了」、観点9「識別子中心評価の運用実例集」）。req-define は意味的等価を許容する表現で pass_criteria を策定することで、QG-4 評価時の食い違いを未然に防ぐ。
+QG-{N} は意味的等価性で pass_criteria 充足を判定する（[qg-4-final-acceptance.md](../../agentdev-quality-gates/references/qg-4-final-acceptance.md) 観点6「test strategy 処理完了」、観点9「識別子中心評価の運用実例集」）。req-define は意味的等価を許容する表現で pass_criteria を策定することで、QG-{N} 評価時の食い違いを未然に防ぐ。
 
 ## 「存在しないこと」と「変更されていないこと」の使い分け
 
-pass_criteria が「存在」「変更」を検証する場合、対象に応じて表現を使い分ける。誤用は QG-4 評価で検証不能、または無意味な検証となる。
+pass_criteria が「存在」「変更」を検証する場合、対象に応じて表現を使い分ける。誤用は QG-{N} 評価で検証不能、または無意味な検証となる。
 
 ### 使い分け表
 
@@ -95,5 +95,5 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 
 - agentdev-req-analysis SPEC「pass_criteria 記述基準」（正規原本）
 - [test-strategy-numeric-threshold-guide.md](test-strategy-numeric-threshold-guide.md)（数値閾値策定ガイド）
-- [qg-4-final-acceptance.md](../../agentdev-quality-gates/references/qg-4-final-acceptance.md)（QG-4 最終受け入れゲート）
-- [qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md)（QG-2 完了条件網羅性）
+- [qg-4-final-acceptance.md](../../agentdev-quality-gates/references/qg-4-final-acceptance.md)（QG-{N} 最終受け入れゲート）
+- [qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md)（QG-{N} 完了条件網羅性）
