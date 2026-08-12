@@ -76,15 +76,15 @@ function checkBOMFromBytes(buffer: ArrayBuffer): boolean {
 function checkEncoding(actual: string, hasBOM: boolean, results: CheckResult[]): void {
   if (actual.includes("\r\n")) {
     const crlfCount = (actual.match(/\r\n/g) || []).length;
-    results.push(ng("Encoding", "UTF-8 / LF", `Actual text contains ${crlfCount} CRLF line ending(s)`));
+    results.push(ng("Encoding", "UTF\u002D8 / LF", `Actual text contains ${crlfCount} CRLF line ending(s)`));
   } else {
-    results.push(ok("Encoding", "UTF-8 / LF", "No CRLF line endings detected"));
+    results.push(ok("Encoding", "UTF\u002D8 / LF", "No CRLF line endings detected"));
   }
 
   if (hasBOM) {
-    results.push(ng("Encoding", "UTF-8 / LF", "Actual file starts with UTF-8 BOM (EF BB BF)"));
+    results.push(ng("Encoding", "UTF\u002D8 / LF", "Actual file starts with UTF\u002D8 BOM (EF BB BF)"));
   } else {
-    results.push(ok("Encoding", "UTF-8 / LF", "No BOM marker detected"));
+    results.push(ok("Encoding", "UTF\u002D8 / LF", "No BOM marker detected"));
   }
 
   const controlPattern = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/;
@@ -430,7 +430,7 @@ async function main(): Promise<void> {
 
   if (opts.dryRun) {
     console.log(`Would verify ${expectedPath} against ${actualPath}`);
-    console.log("Checks: Encoding (UTF-8/LF, BOM, control chars, Japanese), Markdown (tables, checkboxes, code blocks, lists), RequiredSections, LinkNormalization");
+    console.log("Checks: Encoding (UTF\u002D8/LF, BOM, control chars, Japanese), Markdown (tables, checkboxes, code blocks, lists), RequiredSections, LinkNormalization");
     process.exit(EXIT_OK);
   }
 
