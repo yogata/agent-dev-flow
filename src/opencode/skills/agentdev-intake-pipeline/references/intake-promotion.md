@@ -63,7 +63,7 @@ learning 分岐は `agentdev-workflow-orchestration` の intake/learning 境界�
 元 item 名を維持するか、束ねた内容に応じた名前にする。
 3. 採用 item の元 inbox item は削除する（`.agentdev/intake/archive/promoted/` への移動を廃止）。
 4. 保留 item は `.agentdev/intake/inbox/` に残す。
-5. 却下 item は即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（AG-006、監査証跠の補強）。
+5. 却下 item は即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跠の補強）。
 
 ## Git 永続化
 
@@ -72,7 +72,7 @@ learning 分岐は `agentdev-workflow-orchestration` の intake/learning 境界�
 3. `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する。
 4. 変更なしの場合は commit/push せず、完了報告で「変更なし」と報告する。
 5. 変更ありの場合、`git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする。
-6. commit message は採用・保留のみの場合 `chore(agentdev): review and promote intake items` とする。reject item を含む場合は当該 item の却下理由を commit message に含める（AG-006、監査証跡の補強）。
+6. commit message は採用・保留のみの場合 `chore(agentdev): review and promote intake items` とする。reject item を含む場合は当該 item の却下理由を commit message に含める（AG-{NNN}、監査証跡の補強）。
 7. `git push` を実行する。
 8. push が失敗した場合は構造化エラーメッセージを表示し、完了扱いにしない。
 
