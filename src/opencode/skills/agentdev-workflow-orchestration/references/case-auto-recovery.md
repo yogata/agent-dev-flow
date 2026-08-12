@@ -3,11 +3,11 @@
 case-auto 最大自走モードから起動した case-run 子 task（実行担当サブエージェント）がハーネスの bg task 機能で破棄された際の回復パスを解説する。
 状態分類と各状態の回復手順の詳細は case-auto SPEC「子 task 中断回復パス」を正とし、command case-auto「子 task bg task 破棄検知時の回復」がその実行指示を記載する。
 本ファイルは SPEC と command 本文が既に更新済みであることを前提とし、両者が依拠する設計原則（ライフサイクル分離）と拡張可能性（Epic Wave 並列委譲）の解説を担う。
-references 単独の作成で本件（OU-003）を完了扱いしない。
+references 単独の作成で本件（OU-{NNN}）を完了扱いしない。
 
 ## ライフサイクル分離原則
 
-子 task の bg task 破棄は子 task のライフサイクル事象である（AG-004）。
+子 task の bg task 破棄は子 task のライフサイクル事象である（AG-{NNN}）。
 子 task が作成中の成果物（commit、working tree 変更、PR）のライフサイクルとは独立に扱う。
 
 サブエージェントが破棄されても成果物は worktree に残留する。
@@ -31,17 +31,17 @@ case-auto 親ループは当該子 task の worktree で `git status` を実行�
 | (b) 未コミット変更あり | worktree に未コミット変更が残留 | SPEC「状態 (b) の回復」 |
 | (c) クリーン | commit 履歴も未コミット変更もない | 後述「状態 (c) の取扱い」 |
 
-状態 (a) は rebase、push、PR 作成代行、`completed-pr` 記録、case-close 合流の順に進む（AG-002）。
+状態 (a) は rebase、push、PR 作成代行、`completed-pr` 記録、case-close 合流の順に進む（AG-{NNN}）。
 PR 作成代行は case-auto 親ループの責務であり、子 task 側で再び委譲を起こさない。
 
-状態 (b) は作業意図整合確認ステップを必須とする（AG-003）。
+状態 (b) は作業意図整合確認ステップを必須とする（AG-{NNN}）。
 未コミット変更の帰属は安全上の懸念になるため、変更内容が子 task の case-run 作業意図（Issue の受け入れ条件、実装計画）と整合するかを確認する。
 整合確認ができた場合のみ commit、push、PR 作成を代行する。
 整合確認できない場合は当該子 task を `blocked` とし、「未コミット変更の帰属不明」として報告する。
 未確認の変更を強制 commit しない。
 強制 commit は帰属不明の変更を本流へ持ち込む原因になる。
 
-状態 (c) は回復対象がないため回復処理をスキップし、当該子 task を pending へ戻す（AG-001）。
+状態 (c) は回復対象がないため回復処理をスキップし、当該子 task を pending へ戻す（AG-{NNN}）。
 
 rebase で解消できないコンフリクトは SPEC が定めるコンフリクト解消モデル（3レベルエスカレーション）Level 2/3 へ委譲する。
 bg task 破棄時の状態別回復とコンフリクト解消モデルは協調関係にあり、rebase 失敗を境に後者へ委譲する。
@@ -61,10 +61,10 @@ Epic Wave 並列委譲では複数の子 task が同時に起動し、それぞ�
 
 本ファイルは以下を前提とする。
 
-- SPEC case-auto「子 task 中断回復パス」が既に記述済みであること（OU-001 成果物、Wave 1）
-- command case-auto「子 task bg task 破棄検知時の回復」が既に実装済みであること（OU-002 成果物、Wave 2）
+- SPEC case-auto「子 task 中断回復パス」が既に記述済みであること（OU-{NNN} 成果物、Wave 1）
+- command case-auto「子 task bg task 破棄検知時の回復」が既に実装済みであること（OU-{NNN} 成果物、Wave 2）
 
-references 単独の作成で本件（OU-003）を完了扱いしない。
+references 単独の作成で本件（OU-{NNN}）を完了扱いしない。
 SPEC と command 本文が更新済みであることを前提とし、本 references は分離原則と拡張可能性の解説のみを担う。
 
 ## See Also
