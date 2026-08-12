@@ -61,7 +61,7 @@ bugfix ではREQファイルを作成せず Issue 本文のみで要件管理す
 
 ## Scripts（決定的処理）
 
-`scripts/` 配下の決定的スクリプトが、本スキルが規定する REQ/ADR 採番、要件行 ID 採番を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、REQ/160、AG-002/006）。
+`scripts/` 配下の決定的スクリプトが、本スキルが規定する REQ/ADR 採番、要件行 ID 採番を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、REQ/160、AG-{NNN}/006）。
 LLM 推論で実行していた決定的処理をスクリプトへ委譲することで、番号の重複、欠番埋めを確実に防止する。
 
 配置先: `src/opencode/skills/agentdev-req-file-manager/scripts/`（REQ/ADR 固有採番）。
@@ -69,7 +69,7 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 
 > **移管済み script**:
 > - `search-target-area.ts`（SPEC ファイル内 target_area 見出し検索）は `agentdev-spec-file-manager` へ移管済み。SPEC 固有処理は同 skill の公開操作契約経由で呼び出す。
-> - 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-003、AG-009、AG-019、RU-20260722-01 合意）。本スキルは公開検証契約へ委譲し、内部 script パスを直接参照しない。
+> - 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-{NNN}、AG-{NNN}、AG-{NNN}、RU-{NNNN}-01 合意）。本スキルは公開検証契約へ委譲し、内部 script パスを直接参照しない。
 
 ### I/O 契約（REQ）
 
@@ -87,9 +87,9 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 | `alloc-req-number.ts` | REQ番号採番（max+1、欠番埋め禁止） | argv[2]=REQ dir | `{ ok, allocated: "REQ-NNNN", max }` |
 | `alloc-composite-id.ts` | 要件行ID採番（REQ-NNNN-MMM、max+1） | argv[2]=REQ file, argv[3]=req番号（省略可） | `{ ok, allocated: "REQ-NNNN-MMM", req, max }` |
 > `search-target-area.ts`（SPEC 固有）は `agentdev-spec-file-manager` へ移管済み。target_area 見出し検索は同 skill の公開操作契約経由で呼び出す。
-> `alloc-decision-number.ts`（Decision 固有）は `agentdev-decision-file-manager` へ移管済み（OU-002）。Decision 番号採番は同 skill の公開操作契約経由で呼び出す。
+> `alloc-decision-number.ts`（Decision 固有）は `agentdev-decision-file-manager` へ移管済み（OU-{NNN}）。Decision 番号採番は同 skill の公開操作契約経由で呼び出す。
 
-> frontmatter id↔ファイル名整合性（`check-frontmatter-consistency`）、エントリ存在確認（`check-entry-existence`）、変更範囲検証（`check-change-impact`）は `agentdev-artifact-validation` へ移管済みであり、同 skill の公開検証契約へ委譲する（AG-019）。詳細は同 SKILL.md 参照。
+> frontmatter id↔ファイル名整合性（`check-frontmatter-consistency`）、エントリ存在確認（`check-entry-existence`）、変更範囲検証（`check-change-impact`）は `agentdev-artifact-validation` へ移管済みであり、同 skill の公開検証契約へ委譲する（AG-{NNN}）。詳細は同 SKILL.md 参照。
 
 ### 実行方法
 
@@ -105,7 +105,7 @@ cd src/opencode/skills/agentdev-req-file-manager/scripts && npm test
 
 req-save と spec-save は、REQ番号、ADR番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
 target_area 見出し検索は、SPEC 固有処理として `agentdev-spec-file-manager` 配下のスクリプトで実行する。
-frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-019）。詳細は req-save / spec-save command の各 Step 参照。
+frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-{NNN}）。詳細は req-save / spec-save command の各 Step 参照。
 
 ---
 
@@ -157,13 +157,13 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、req-save / case-open / case-update / case-close 等の Workflow Skill が所有する STEP から呼び出される（`docs/specs/<workflows/workflow-skill-model>.md`）。本スキル自身は STEP を所有しない。
+本スキルは Capability Skill として、req-save / case-open / case-update / case-close 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution
 
-本スキルが操作する REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）は durable state の最上位（SSoT 再構成）に位置する。REQ-ID（`REQ-{NNNN}`）は identifier 保持として安定 ID として扱う。優先順位の詳細は `docs/specs/<workflows/input-resolution-and-durable-state>.md` 参照。
+本スキルが操作する REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）は durable state の最上位（SSoT 再構成）に位置する。REQ-ID（`REQ-{NNNN}`）は identifier 保持として安定 ID として扱う。優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
 
-呼出元 STEP は本スキルの操作結果（REQ ファイル更新、要件行 ID 採番結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成または identifier 保持から再取得できる。STEP reference 8 要素は `docs/specs/<workflows/step-reference-contract>.md` 参照。
+呼出元 STEP は本スキルの操作結果（REQ ファイル更新、要件行 ID 採番結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成または identifier 保持から再取得できる。STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
 
 ## See Also
 
