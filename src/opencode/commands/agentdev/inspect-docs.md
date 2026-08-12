@@ -89,7 +89,7 @@ document-model SPEC（extension 経由）の classification policy への適合�
 
 存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity SPEC 構文健全性検査準拠）。
 
-エンコーディング不整合の検出は、配布物 Markdown の UTF-8 BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-8 かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
+エンコーディング不整合の検出は、配布物 Markdown の UTF-{N} BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-{N} かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
 ### Step 12: docs-check route判定
 
 意味的疑いのうち機械的検査に落とせるものを docs-check ルール／検査データ候補として提示
