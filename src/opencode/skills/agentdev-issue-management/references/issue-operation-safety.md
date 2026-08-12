@@ -8,7 +8,7 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
 
 case-open がサブエージェントへ本文生成を委譲する接続点（Step 2/6/8/9）では、本文候補をメッセージ本文ではなくファイルパスで受け渡す。
 
-- サブエージェントは生成した本文候補を `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）により UTF-8 BOM なし LF 一時ファイル（`$env:TEMP/agentdev/case-open-body-{ou_id}-{timestamp}.md` 等）へ保存し、親エージェントへはファイルパスを返す
+- サブエージェントは生成した本文候補を `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）により UTF‑8 BOM なし LF 一時ファイル（`$env:TEMP/agentdev/case-open-body-{ou_id}-{timestamp}.md` 等）へ保存し、親エージェントへはファイルパスを返す
 - 親エージェントは受領したファイルパスを `gh --body-file` で直接渡す。本文テキストをメッセージ本文で再送、再構成（空行圧縮、見出し前後のスペース化、改行正規化）してはならない
 - これにより、サブエージェント→親エージェント間のメッセージ本文圧縮、Markdown レンダリング正規化による LF・空行欠損を構造的に排除する
 - 親エージェントが本文修正（変数置換漏れ、前工程完了度属性の埋め込み等）を行う場合も、修正後の本文を改めてファイル保存し、そのファイルを `gh --body-file` で渡す
