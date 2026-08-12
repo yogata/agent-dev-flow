@@ -15,7 +15,7 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 ## 出力
 
 - `.agentdev/inspect/promoted/*.md`（手動 promote 採用済み、RU 化対象）
-- reject 検出事項は即時削除（`archive/rejected/` 廃止）。reject 時の commit message に却下理由を含める（AG-006、監査証跡の補強）
+- reject 検出事項は即時削除（`archive/rejected/` 廃止）。reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跡の補強）
 - `.agentdev/intake/promoted/inspect-auto-*.md`（`--auto` 時の自動 promote 成果物。backlog-review へ流入）
 - `.agentdev/inspect/promoted/auto-promote-log.md`（`--auto` 実行ログ。append-only）
 - セッション内完了報告
@@ -83,7 +83,7 @@ Step 4-1 の発動条件を満たした場合、手動分類対象の検出事�
 承認された promote 対象検出事項を `.agentdev/inspect/promoted/` へ保存。元の inbox file は削除
 ### Step 7: reject 処理
 
-承認された reject 対象検出事項は即時削除する。reject 時の commit message に却下理由を含める（AG-006、監査証跠の補強）
+承認された reject 対象検出事項は即時削除する。reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跠の補強）
 ### Step 8: defer 処理
 
 defer となった検出事項は `.agentdev/inspect/inbox/` に残置。intake/ learning 送付の推奨を報告
