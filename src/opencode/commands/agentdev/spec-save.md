@@ -45,7 +45,7 @@ SPEC ファイル frontmatter の `status`（`draft` / `accepted` / `superseded`
 
 各 SPEC action の `target`（または `target_spec: {operation, domain, slug}` 構造化）から配置先 SPEC を解決する。既存 SPEC パス（例: `docs/specs/{domain}/<existing-spec>.md`、または `target_spec: {operation: update, domain, slug}`）→ 当該 SPEC へ追記（`update` 操作）。`target_spec: {operation: create, domain, slug}` → 新規 SPEC 作成（`create` 操作、ファイル名 `docs/specs/{domain}/{slug}.md`）。同一 `target` の action は1つの SPEC へ集約する
 
-**決定的処理のスクリプト呼出（REQ、AG-002）**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は `agentdev-spec-file-manager` SKILL.md「Scripts（決定的処理）」が規定する決定的スクリプト（`search-target-area.ts`）を bash 経由で呼び出して実行する（LLM 推論で代替しない）。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md および `agentdev-spec-file-manager/references/target-area-matching.md` を参照
+**決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は `agentdev-spec-file-manager` SKILL.md「Scripts（決定的処理）」が規定する決定的スクリプト（`search-target-area.ts`）を bash 経由で呼び出して実行する（LLM 推論で代替しない）。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md および `agentdev-spec-file-manager/references/target-area-matching.md` を参照
 
 ### Step 4: SPEC 分離基準の最終確認
 
@@ -58,7 +58,7 @@ SPEC ファイル frontmatter の `status`（`draft` / `accepted` / `superseded`
 - **create**: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
 - **update**: `target_area` 指定時（operation が `update`/`spec-update`）は `agentdev-spec-file-manager/references/target-area-matching.md` のセクション置換ロジックで対象セクションを `content` で置換（REQ）。`target_area` 未指定時は既存 SPEC ファイルの該当セクションへ `content` を追記（後方互換、REQ）。frontmatter `updated` を更新、`status` は変更しない
 
-**target_area 見出し検索のスクリプト呼出（REQ、AG-002）**: `update` 操作における `target_area` 見出し検索は `search-target-area.ts` で実行する。Step 3 の結果（`matches`）を用いてセクション範囲を特定し `content` で置換。`matches` 空 → スキップし follow-up 記録、複数マッチ → G09 に従い置換拒否。CLI 形式、stdin JSON 入力、stdout schema は `agentdev-spec-file-manager` SKILL.md、`agentdev-spec-file-manager/references/target-area-matching.md` を参照
+**target_area 見出し検索のスクリプト呼出（REQ、AG-{NNN}）**: `update` 操作における `target_area` 見出し検索は `search-target-area.ts` で実行する。Step 3 の結果（`matches`）を用いてセクション範囲を特定し `content` で置換。`matches` 空 → スキップし follow-up 記録、複数マッチ → G09 に従い置換拒否。CLI 形式、stdin JSON 入力、stdout schema は `agentdev-spec-file-manager` SKILL.md、`agentdev-spec-file-manager/references/target-area-matching.md` を参照
 
 **Step 5-1**: 複数 SPEC action の並列化（REQ/093）。異なる `target` パスの SPEC create/update は並列化可能（最大5件）。同一 SPEC ファイルへの複数 action は順序依存のため直列サブセットとして分離する。詳細は `agentdev-spec-file-manager` を参照
 
@@ -66,13 +66,13 @@ SPEC ファイル frontmatter の `status`（`draft` / `accepted` / `superseded`
 
 ### Step 6: インデックス整合
 
-新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加する。既存 SPEC 追記時は README 更新不要。新規 SPEC 作成後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`、RU-20260722-01 合意）で登録を検証する。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加する。既存 SPEC 追記時は README 更新不要。新規 SPEC 作成後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`、RU-{NNNNNNNN}-01 合意）で登録を検証する。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
 
 ### Step 7: SPEC 一覧整合確認
 
 SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済みであることを確認する（Step 6 で実施済みの場合は重複確認）。SPEC 一覧表の整合は SPEC 探索導線の維持に必要な更新のみを対象とし、要件、判断、仕様の更新は含まない。
 
-**extension 更新要否の確認（REQ）**: SPEC の追加、移動、分割が `.agentdev/extensions/**` に影響するか確認する。移動または分割により extension 参照先 SPEC パスが変わる場合、当該 extension の context paths を更新する。extension 参照先 SPEC を移動した場合はエラーとし、spec-save 自身は移動を完了させずユーザー判断を仰ぐ（IR-056 check #5 strict 違反を防止）。SPEC 新規作成で既存 command/skill の実行時参照が増える場合、対応 extension の `context` への追加をユーザーに提案する（直接編集しない）
+**extension 更新要否の確認（REQ）**: SPEC の追加、移動、分割が `.agentdev/extensions/**` に影響するか確認する。移動または分割により extension 参照先 SPEC パスが変わる場合、当該 extension の context paths を更新する。extension 参照先 SPEC を移動した場合はエラーとし、spec-save 自身は移動を完了させずユーザー判断を仰ぐ（IR-{NNN} check #5 strict 違反を防止）。SPEC 新規作成で既存 command/skill の実行時参照が増える場合、対応 extension の `context` への追加をユーザーに提案する（直接編集しない）
 
 **targeted docs guard（REQ）**: 変更 SPEC ファイルと連動ファイル（`docs/specs/README.md`）に対し `check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json` を実行。`failures` に strict severity を含む場合は保存工程を継続せず修正して再実行。`spec_readme_update_required` が true の場合は Step 6 の更新要否判定に反映。`full_docs_check_recommended` が true の場合は `/repo/docs-check` をユーザーに提案
 
@@ -82,7 +82,7 @@ SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済み
 
 ### Step 9: 変更範囲検証
 
-**決定的処理のスクリプト呼出（REQ、AG-019）**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`、RU-20260722-01 合意）で実行。許可範囲外の変更を検出したらエラーで報告し指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+**決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`、RU-{NNNNNNNN}-01 合意）で実行。許可範囲外の変更を検出したらエラーで報告し指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
 
 ### Step 10: コミット、プッシュ
 
@@ -94,7 +94,7 @@ SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済み
 
 ## 検証観点
 
-- **品質ゲート（適用結果の整合性検証、AG-004、REQ）**: `target_area` 置換結果の整合性（Step 5 の `search-target-area.ts` 結果と置換後本体の一致）、SPEC status の整合性（新規作成時 `status: draft`、既存追記時 `status` 変更なし）、インデックスの整合性（`docs/specs/README.md` エントリと新規 SPEC の一致、Step 6 の `check-entry-existence.ts` 結果）、変更範囲の妥当性（Step 9 の `check-change-impact.ts` 結果）を各決定的スクリプトの JSON 結果で機械的に確認。**REQ**: spec-save の品質ゲートは内容の品質（SPEC 分離基準適合性等）を再検証せず、それは req-define の QG-1 の責務（Step 4 SPEC 分離基準の最終確認は実施するが、これは分離基準の最終チェックであり内容品質の再審査ではない）
+- **品質ゲート（適用結果の整合性検証、AG-{NNN}、REQ）**: `target_area` 置換結果の整合性（Step 5 の `search-target-area.ts` 結果と置換後本体の一致）、SPEC status の整合性（新規作成時 `status: draft`、既存追記時 `status` 変更なし）、インデックスの整合性（`docs/specs/README.md` エントリと新規 SPEC の一致、Step 6 の `check-entry-existence.ts` 結果）、変更範囲の妥当性（Step 9 の `check-change-impact.ts` 結果）を各決定的スクリプトの JSON 結果で機械的に確認。**REQ**: spec-save の品質ゲートは内容の品質（SPEC 分離基準適合性等）を再検証せず、それは req-define の QG-{N} の責務（Step 4 SPEC 分離基準の最終確認は実施するが、これは分離基準の最終チェックであり内容品質の再審査ではない）
 - **SPEC 分離基準適合性（REQ）**: 各 action の `content` が SPEC に置くべき内容か（Step 4）
 - **frontmatter 完全性**: 新規作成時の `title`, `status: draft`, `created`, `updated`（G05）
 - **宣言付与の整合性**: CREATE で `spec_logical_division` と `canonical_owner` が frontmatter または冒頭宣言節へ付与されていること。UPDATE で宣言未宣言かつ分類値が `unknown` 以外の場合に補完されていること（Step 5-2）
