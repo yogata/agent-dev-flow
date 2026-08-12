@@ -1,5 +1,5 @@
 /**
- * target_area 見出し検索スクリプト（AG-002、AG-006、REQ-{NNNN}-{NNN}/160、REQ-{NNNN}-{NNN}/032）。
+ * target_area 見出し検索スクリプト（AG-{NNN}、AG-{NNN}、REQ-{NNNN}-{NNN}/160、REQ-{NNNN}-{NNN}/032）。
  *
  * 指定 SPEC ファイル群から、target_area（Markdown 見出し行）を検索する。
  * spec-save の update 操作で、target_area に一致するセクションを特定するために使用する。

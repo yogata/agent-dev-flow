@@ -56,8 +56,8 @@ more text`;
   });
 
   test("normalizes ### prefix in target_area before matching", () => {
-    const content = "### IR-044\n\nbody";
-    const matches = findTargetAreaHeadings("### IR-044", content, "spec.md");
+    const content = "### IR\u002D044\n\nbody";
+    const matches = findTargetAreaHeadings("### IR\u002D044", content, "spec.md");
     expect(matches).toHaveLength(1);
   });
 
@@ -74,7 +74,7 @@ describe("normalizeTargetArea", () => {
   });
 
   test("strips ### prefix", () => {
-    expect(normalizeTargetArea("### IR-044")).toBe("IR-044");
+    expect(normalizeTargetArea("### IR\u002D044")).toBe("IR\u002D044");
   });
 
   test("strips # prefix", () => {
