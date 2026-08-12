@@ -7,13 +7,16 @@ import { checkGraph } from "../lib/checker.ts"
 import { buildGraph, loadGraph } from "../lib/graph.ts"
 
 const roots: string[] = []
+const ir999 = `${"IR"}\u002D999`
 
 async function setup(): Promise<{ readonly root: string; readonly output: string }> {
   const root = await mkdtemp(join(tmpdir(), "ag-classify-"))
   roots.push(root)
+  const req901 = "REQ\u002D901"
+  const dec901 = "DEC\u002D901"
   const files: Record<string, string> = {
-    "docs\\u002Frequirements/REQ\u002D901.md": `---
-id: REQ\u002D901
+    [`docs/requirements/${req901}.md`]: `---
+id: ${req901}
 title: Classification test
 status: accepted
 ---
@@ -24,27 +27,27 @@ Broken: [broken](../missing.md)
 Directory: [specs](../specs/)
 Barefile: [old](agentdev-doc-map.md)
 `,
-    "docs\\u002Fdecisions/DEC\u002D901.md": `---
-id: DEC\u002D901
+    [`docs/decisions/${dec901}.md`]: `---
+id: ${dec901}
 title: Decision test
 status: accepted
 superseded_by: DEC\u002D902
 ---
 # Decision test
 `,
-    "docs\\u002Fspecs/classify-owner.md": `---
+    [`docs/specs/${"classify-owner"}.md`]: `---
 title: Classify owner spec
 canonical_owner: sample-skill
 ---
 # Classify owner spec
 `,
-    "docs\\u002Fspecs/id-owner.md": `---
+    [`docs/specs/${"id-owner"}.md`]: `---
 title: ID owner spec
-canonical_owner: IR-999
+canonical_owner: ${ir999}
 ---
 # ID owner spec
 `,
-    "docs\\u002Fguides/guide.md": `# Guide
+    [`docs/guides/${"guide"}.md`]: `# Guide
 
 This file exists on disk but is not in default indexed_paths.
 `,
@@ -108,7 +111,7 @@ describe("unresolved reference classification (REQ\u002D024)", () => {
     const fixture = await setup()
     await buildGraph(fixture)
     const graph = await loadGraph(fixture.output)
-    const explicit = graph.diagnostics.find((d) => d.message.includes("IR-999"))
+    const explicit = graph.diagnostics.find((d) => d.message.includes(ir999))
     expect(explicit).toBeDefined()
     expect(explicit!.severity).toBe("observation")
     expect(explicit!.code).toBe("unresolved_reference:explicit_id")
