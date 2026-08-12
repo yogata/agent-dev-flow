@@ -36,8 +36,8 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 本コマンドは workflow 実装本体を `agentdev-workflow-case-close` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP（+ Epic Wave クローズ E1〜E6）の control plane として制御構造を所有する。
 
 - **STEP-1** Issue 番号解決・ルーティング — ユーザー入力・セッション会話から番号取得、Epic Issue 判定（ステータス追跡テーブル存在時は Epic Wave ルートへ）、単一 Issue ルートでは重複ファイルチェック（merge/pull 実行前）
-- **STEP-2** QG-4 達成判定 — 完了条件チェックボックス評価・更新（case-close 専任責務）、観点8 PR対象範囲 vs 全体 評価スコープ判定、test strategy 処理完了確認
-- **STEP-3** docs 検証・SPEC 確定 — 機能追加・共通検証、targeted docs guard（`--workflow case-close --files`）、IR-056 check_extensions.ts、SPEC 確定フロー（昇格 / spec-save 提案 / 見送り）
+- **STEP-2** QG-{N} 達成判定 — 完了条件チェックボックス評価・更新（case-close 専任責務）、観点8 PR対象範囲 vs 全体 評価スコープ判定、test strategy 処理完了確認
+- **STEP-3** docs 検証・SPEC 確定 — 機能追加・共通検証、targeted docs guard（`--workflow case-close --files`）、IR-{NNN} check_extensions.ts、SPEC 確定フロー（昇格 / spec-save 提案 / 見送り）
 - **STEP-4** PR マージ・コンフリクト解消 — mergeable UNKNOWN ポーリング、squash merge、先行 commit 検出（REQ）、コンフリクト Level 1 rebase パス（実装変更せず rebase のみ、Level 2/3 は case-auto エスカレーション）、`--delete-branch` 使用禁止
 - **STEP-5** Post-merge・Issue クローズ — CI 通過確認、Issue 本文更新、Issue close（理由: completed）
 - **STEP-6** クリーンアップ・Capture 回収・永続化 — worktree/branch 削除（隔離 worktree のみ `git checkout .` 可、main worktree は禁止）、親Epic 自動クローズ判定（全子Issue CLOSED）、実行前同期（重複ファイルチェック再実行、git main 同期リスク事前検出）、学び検知（エージェント自律）、Capture 回収（PR 本文→intake/learning 分離、Epic 横断回収）、`.agentdev/` commit/push、完了報告（結果状態の分離報告）
@@ -67,7 +67,7 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 - G19: 完了報告 STEP は結果状態を分離して報告。`.agentdev` push失敗時は完了扱いにしない
 - G21/G22/G23: case-close の capture 責務は「回収・保存」（PR 本文から intake/ learning を分離回収しドメイン状態に保存、capture 境界は `agentdev-workflow-orchestration` 参照）。SPEC status 昇格（draft → accepted）は case-close の責務（対象 SPEC が `draft` かつ今回の実装が SPEC 内容を検証済みの場合のみ、spec-save は accepted を付与しない）。SPEC確定候補の処理（docs 検証・SPEC 確定 STEP 内の SPEC 確定フロー）は PR 本文の `## SPEC確定候補` を入力とし `## Findings / Capture候補` とは区別
 - G24/G25/G26: Epic Issue 本文ステータス追跡テーブルの更新は case-close のみ（単一書き手制約、case-run は読み取りのみ、case-auto は Wave 反復制御のみ直接書き込まない、last-write-wins 競合防止は case-close の単一書き手で維持）。Epic Wave クローズ（Step E1〜E6）は Epic Issue番号入力時（ステータス追跡テーブル存在時）のみ実行、単一 Issue番号入力時は従来フローを維持（後方互換）。Epic Wave クローズ時の PR マージ・子Issue クローズは現在 Wave の `running` 子Issue のみ対象（`pending`/ `ready`/ `blocked`/ `failed` は対象外、`blocked`/ `failed` を `completed` に上書きしない、べき等性、`agentdev-epic-tracker` 準拠）
-- G27/G28: squash merge 実行前に PR の mergeable 状態を事前確認し UNKNOWN の場合は mergeable になるまでポーリング待機（待機間隔・上限は `agentdev-gh-cli` の mergeable UNKNOWN ポーリング手続きが所有、AG-001、上限超過時はマージ中止し構造化エラーで停止、ポーリング省略して UNKNOWN 状態のままマージ試行禁止）。`git pull --ff-only` 実行前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出し、検出時に安全な代替同期手順を選択（REQ、暗黙の手順順序依存で pull を継続しない）
+- G27/G28: squash merge 実行前に PR の mergeable 状態を事前確認し UNKNOWN の場合は mergeable になるまでポーリング待機（待機間隔・上限は `agentdev-gh-cli` の mergeable UNKNOWN ポーリング手続きが所有、AG-{NNN}、上限超過時はマージ中止し構造化エラーで停止、ポーリング省略して UNKNOWN 状態のままマージ試行禁止）。`git pull --ff-only` 実行前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出し、検出時に安全な代替同期手順を選択（REQ、暗黙の手順順序依存で pull を継続しない）
 
 
 
