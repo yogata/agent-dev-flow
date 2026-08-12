@@ -32,6 +32,31 @@ describe("protected-paths / TRUST_ROOT_DIRECT_PATHS", () => {
     expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/install-from-archive.ps1");
     expect(TRUST_ROOT_DIRECT_PATHS).toContain("scripts/package-release-archive.ps1");
   });
+
+  test("protects runtime helpers blob-loader, boundary-runner, protected-check (parent defect #9)", () => {
+    const dir = ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate";
+    expect(TRUST_ROOT_DIRECT_PATHS).toContain(`${dir}/blob-loader.ts`);
+    expect(TRUST_ROOT_DIRECT_PATHS).toContain(`${dir}/boundary-runner.ts`);
+    expect(TRUST_ROOT_DIRECT_PATHS).toContain(`${dir}/protected-check.ts`);
+  });
+
+  test("protects CLI entry invoked by PS launcher (parent defect #9)", () => {
+    const cli = ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/cli.ts";
+    expect(TRUST_ROOT_DIRECT_PATHS).toContain(cli);
+  });
+
+  test("protects bun.lock (dependency pin, parent defect #9)", () => {
+    const lock = ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/bun.lock";
+    expect(TRUST_ROOT_DIRECT_PATHS).toContain(lock);
+  });
+
+  test("does NOT protect test files (parent defect #9)", () => {
+    // Tests are not runtime imports; protecting them would conflate
+    // runtime-tamper detection with test-edit noise. Test digests are
+    // recorded separately in the bootstrap digest report.
+    const testFiles = TRUST_ROOT_DIRECT_PATHS.filter((p) => p.endsWith(".test.ts"));
+    expect(testFiles).toEqual([]);
+  });
 });
 
 describe("protected-paths / listAllProtectedPaths", () => {

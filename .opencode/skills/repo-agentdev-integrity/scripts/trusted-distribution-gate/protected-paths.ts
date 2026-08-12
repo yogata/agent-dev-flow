@@ -35,8 +35,12 @@ export interface ProtectedPathSet {
 const TRUST_ROOT_DIR =
   ".opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate";
 
-// Trust-root TypeScript modules (transitive imports are tracked here so the
-// launcher can detect tampering with any module the launcher depends on).
+// Trust-root TypeScript runtime modules. Every module imported (directly
+// or transitively) by launcher.ts at execution time MUST be listed here.
+// Test files (*.test.ts) are NOT runtime imports — they are not loaded
+// when the launcher runs in production — so they are deliberately omitted
+// from the protected set. Their digests are recorded separately in the
+// bootstrap digest report for review.
 const TRUST_ROOT_TS_MODULES: readonly string[] = [
   `${TRUST_ROOT_DIR}/types.ts`,
   `${TRUST_ROOT_DIR}/boundary-pipeline.ts`,
@@ -47,29 +51,34 @@ const TRUST_ROOT_TS_MODULES: readonly string[] = [
   `${TRUST_ROOT_DIR}/archive-builder.ts`,
   `${TRUST_ROOT_DIR}/launcher.ts`,
   `${TRUST_ROOT_DIR}/index.ts`,
-];
-
-const TRUST_ROOT_TS_TESTS: readonly string[] = [
-  `${TRUST_ROOT_DIR}/boundary-pipeline.test.ts`,
-  `${TRUST_ROOT_DIR}/text-binary.test.ts`,
-  `${TRUST_ROOT_DIR}/protected-paths.test.ts`,
-  `${TRUST_ROOT_DIR}/git-blob-reader.test.ts`,
-  `${TRUST_ROOT_DIR}/manifest.test.ts`,
-  `${TRUST_ROOT_DIR}/archive-builder.test.ts`,
-  `${TRUST_ROOT_DIR}/launcher.test.ts`,
+  // Runtime helpers imported by launcher.ts.
+  `${TRUST_ROOT_DIR}/protected-check.ts`,
+  `${TRUST_ROOT_DIR}/blob-loader.ts`,
+  `${TRUST_ROOT_DIR}/boundary-runner.ts`,
+  // CLI entry invoked by scripts/trusted-distribution-gate.ps1.
+  `${TRUST_ROOT_DIR}/cli.ts`,
 ];
 
 const TRUST_ROOT_CONFIG: readonly string[] = [
   `${TRUST_ROOT_DIR}/tsconfig.json`,
   `${TRUST_ROOT_DIR}/package.json`,
+  // Lockfile pins transitive dependency versions; tampering with it
+  // could swap a dependency for a malicious one.
+  `${TRUST_ROOT_DIR}/bun.lock`,
+  // Local .gitignore controls what gets tracked; tampering could
+  // quietly exclude a future trust-root file from version control.
+  `${TRUST_ROOT_DIR}/.gitignore`,
 ];
 
 const TRUSTED_INSTALLATION_SCRIPTS: readonly string[] = [
-  // The trusted launcher entry script (root-level).
+  // The trusted launcher entry scripts (PowerShell + Bash companions, when
+  // committed). The PowerShell entry is the documented primary; the Bash
+  // companion, if any, would also be protected.
   "scripts/trusted-distribution-gate.ps1",
-  // Trusted installation mapping scripts.
+  // Trusted installation mapping scripts (consumer-facing bootstrap).
   "scripts/install-consumer-opencode.ps1",
   "scripts/check-consumer-opencode.ps1",
+  // Trusted archive installer/packager (run by consumers, not by launcher).
   "scripts/install-from-archive.ps1",
   "scripts/package-release-archive.ps1",
 ];
@@ -86,7 +95,6 @@ export const TRUST_ROOT_DIRECT_PATHS: readonly string[] = [
 function TRUST_ROOT_DIR_FILES(): readonly string[] {
   return [
     ...TRUST_ROOT_TS_MODULES,
-    ...TRUST_ROOT_TS_TESTS,
     ...TRUST_ROOT_CONFIG,
   ];
 }
