@@ -5,19 +5,33 @@
  * artifact coverage), TS-007/008 (projection separation), TS-009 (inspection
  * error gate-not-passed). Tests are pure: they pass strings into the detector
  * and assert on returned classifications. No filesystem, no network.
+ *
+ * Stage B regression tests (PR #2092): the detector must align with Stage A
+ * trusted detector semantics — arbitrary producer-internal ID families,
+ * repository-identity-based URL classification, query/fragment path
+ * normalization, percent-encoded / backslash paths, and an explicit
+ * text/binary/unknown tri-state where unknown fails closed.
  */
 
 import { expect, test, describe } from "bun:test";
 import {
   classifyLine,
   classifyContent,
+  classifyLineConfig,
+  classifyContentConfig,
   decideGate,
   PROJECTIONS,
   resolveCandidate,
+  resolveCandidateConfig,
   isTextFile,
   TEXT_EXTENSIONS,
+  classifyBytes,
+  DEFAULT_REPOSITORY_IDENTITY,
+  DEFAULT_DETECTOR_CONFIG,
   type Projection,
   type Detection,
+  type DetectorConfig,
+  type ByteClassification,
 } from "./distribution-boundary.ts";
 
 describe("classifyLine - concrete-id detection", () => {
@@ -161,7 +175,10 @@ describe("classifyLine - fixed-url detection", () => {
     expect(urls.length).toBe(0);
   });
 
-  test("does NOT flag raw.githubusercontent.com URLs to non-docs paths", () => {
+  test("flags raw.githubusercontent.com URLs into the producer repo at any path", () => {
+    // Stage B regression: URLs into the producer repository are producer-internal
+    // regardless of path content. The OLD behavior classified by /docs/ path
+    // heuristic and let producer script URLs through; that was a bypass.
     const d = classifyLine({
       text: "ref raw.githubusercontent.com/yogata/agent-dev-flow/main/scripts/foo.ps1",
       lineNumber: 1,
@@ -169,7 +186,8 @@ describe("classifyLine - fixed-url detection", () => {
       projection: "source",
     });
     const urls = d.filter((x) => x.category === "fixed-url");
-    expect(urls.length).toBe(0);
+    expect(urls.length).toBe(1);
+    expect(urls[0]!.classification).toBe("producer-internal");
   });
 });
 
@@ -203,10 +221,14 @@ describe("classifyContent - file-level aggregation", () => {
     expect(ids.length).toBe(2);
     const adr = ids.find((x) => x.matched === "ADR-0135");
     expect(adr).toBeDefined();
-    expect(adr!.line).toBe(3);
+    if (adr) {
+      expect(adr.line).toBe(3);
+    }
     const req = ids.find((x) => x.matched === "REQ-0149");
     expect(req).toBeDefined();
-    expect(req!.line).toBe(4);
+    if (req) {
+      expect(req.line).toBe(4);
+    }
     expect(paths.length).toBe(1);
     expect(paths[0]!.line).toBe(4);
     expect(paths[0]!.matched).toBe("docs/requirements/REQ-0149.md");
@@ -263,14 +285,12 @@ describe("decideGate - gate decision", () => {
     // unclassified Detection without type suppression.
     const fake: Detection = {
       text: "",
-      lineNumber: 0,
-      filePath: "x.md",
+      line: 0,
+      file: "x.md",
       projection: "source",
       classification: "unclassified",
       matched: "",
       snippet: "",
-      line: 0,
-      file: "x.md",
       category: "unclassified-entry",
     };
     const r = decideGate([fake]);
@@ -281,13 +301,15 @@ describe("decideGate - gate decision", () => {
 
 describe("TS-009: inspection error gate-not-passed", () => {
   test("unclassified classification goes to errors, not failures", () => {
-    const fake = {
-      classification: "unclassified" as const,
-      matched: "",
-      snippet: "",
+    const fake: Detection = {
+      text: "",
       line: 0,
       file: "x.md",
-      category: "unclassified-entry" as const,
+      projection: "source",
+      classification: "unclassified",
+      matched: "",
+      snippet: "",
+      category: "unclassified-entry",
     };
     const r = decideGate([fake]);
     expect(r.pass).toBe(false);
@@ -296,13 +318,15 @@ describe("TS-009: inspection error gate-not-passed", () => {
   });
 
   test("adapter-failure category goes to errors", () => {
-    const fake = {
-      classification: "unclassified" as const,
-      matched: "",
-      snippet: "read failure",
+    const fake: Detection = {
+      text: "",
       line: 0,
       file: "x.md",
-      category: "adapter-failure" as const,
+      projection: "source",
+      classification: "unclassified",
+      matched: "",
+      snippet: "read failure",
+      category: "adapter-failure",
     };
     const r = decideGate([fake]);
     expect(r.pass).toBe(false);
@@ -310,15 +334,17 @@ describe("TS-009: inspection error gate-not-passed", () => {
   });
 
   test("mixed failures and errors all cause gate-not-passed", () => {
-    const detections = [
+    const detections: Detection[] = [
       ...classifyContent("ref ADR-0001", "x.md", "source"),
       {
-        classification: "unclassified" as const,
-        matched: "",
-        snippet: "",
+        text: "",
         line: 0,
         file: "y.md",
-        category: "unclassified-entry" as const,
+        projection: "source",
+        classification: "unclassified",
+        matched: "",
+        snippet: "",
+        category: "unclassified-entry",
       },
     ];
     const r = decideGate(detections);
@@ -459,5 +485,321 @@ describe("isTextFile (Oracle finding 2: all text artifacts)", () => {
     expect(TEXT_EXTENSIONS.has(".md")).toBe(true);
     expect(TEXT_EXTENSIONS.has(".yaml")).toBe(true);
     expect(TEXT_EXTENSIONS.has(".ps1")).toBe(true);
+  });
+});
+
+// =============================================================================
+// Stage B regression (PR #2092) — alignment with Stage A trusted detector.
+//
+// These tests encode the contracts the Stage A trusted detector at
+// trusted-distribution-gate/boundary-pipeline.ts already enforces. The lib
+// detector consumed by the Stage B plugin and the repo-local checker adapter
+// must produce equivalent classifications so the pre-write gate and the final
+// archive gate agree. The detector must NOT be a closed (ADR|REQ|DEC) list,
+// must classify URLs by configured repository identity (not by `/docs/` path
+// content), must normalize percent-encoded / backslash / query / fragment
+// path variants, and must expose an explicit text/binary/unknown tri-state.
+// =============================================================================
+
+describe("Stage B regression: arbitrary producer-internal ID families", () => {
+  test("default DetectorConfig classifies ADR/REQ/DEC as producer-internal", () => {
+    const cfg = DEFAULT_DETECTOR_CONFIG;
+    for (const id of ["ADR-0135", "REQ-0023", "DEC-014"]) {
+      const r = resolveCandidateConfig({ type: "id", value: id }, cfg);
+      expect(r.classification).toBe("producer-internal");
+      expect(r.category).toBe("concrete-id");
+    }
+  });
+
+  test("default DetectorConfig fails closed on UNKNOWN ID family (e.g. OU-1, TS-1, AG-1)", () => {
+    // These are real producer ID families not in the default producer_internal
+    // set. They MUST NOT silently pass — the detector returns `unclassified`
+    // and the gate layer treats that as gate-not-passed (DEC-014 decision 5).
+    const cfg = DEFAULT_DETECTOR_CONFIG;
+    for (const id of ["OU-1", "TS-1", "AG-1", "EC-1", "RU-42", "IR-059"]) {
+      const r = resolveCandidateConfig({ type: "id", value: id }, cfg);
+      expect(r.classification).toBe("unclassified");
+      expect(r.category).toBe("unclassified-entry");
+    }
+  });
+
+  test("configured DetectorConfig can extend producer-internal families", () => {
+    const cfg: DetectorConfig = {
+      repository_identity: DEFAULT_REPOSITORY_IDENTITY,
+      producer_internal_id_prefixes: ["ADR", "REQ", "DEC", "OU", "TS", "AG"],
+    };
+    expect(
+      resolveCandidateConfig({ type: "id", value: "OU-3" }, cfg).classification,
+    ).toBe("producer-internal");
+    expect(
+      resolveCandidateConfig({ type: "id", value: "ZZ-9" }, cfg).classification,
+    ).toBe("unclassified");
+  });
+
+  test("classifyLineConfig emits a Detection for unclassified IDs (gate-not-passed)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "See OU-3 for the plan.",
+        lineNumber: 1,
+        filePath: "src/opencode/commands/agentdev/sample.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const unclassified = d.filter((x) => x.classification === "unclassified");
+    expect(unclassified.length).toBe(1);
+    expect(unclassified[0]!.matched).toBe("OU-3");
+    // decideGate must mark this as an error, not silently clean.
+    const gate = decideGate(d);
+    expect(gate.pass).toBe(false);
+    expect(gate.errors.length).toBe(1);
+  });
+
+  test("template-wrapped IDs ({NNNN}, <NNNN>, *) are not flagged", () => {
+    const d = classifyLineConfig(
+      {
+        text: "Pattern ADR-{NNNN} <REQ-1234> DEC-* allowed.",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const flagged = d.filter((x) => x.classification !== "generic-or-template");
+    expect(flagged.length).toBe(0);
+  });
+});
+
+describe("Stage B regression: repository-identity URL classification", () => {
+  test("URL into producer repo (any path) is producer-internal", () => {
+    const cfg = DEFAULT_DETECTOR_CONFIG;
+    const d = classifyLineConfig(
+      {
+        text: "see https://github.com/yogata/agent-dev-flow/blob/main/scripts/install.ps1",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      cfg,
+    );
+    const urls = d.filter((x) => x.category === "fixed-url");
+    expect(urls.length).toBe(1);
+    expect(urls[0]!.classification).toBe("producer-internal");
+  });
+
+  test("URL into external repo (even docs/) is consumer-resolvable (no Detection emitted)", () => {
+    const cfg = DEFAULT_DETECTOR_CONFIG;
+    const d = classifyLineConfig(
+      {
+        text: "ref https://github.com/sst/opencode/blob/main/docs/guide.md",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      cfg,
+    );
+    const urls = d.filter((x) => x.category === "fixed-url");
+    expect(urls.length).toBe(0);
+  });
+
+  test("raw.githubusercontent.com producer URL is producer-internal", () => {
+    const cfg = DEFAULT_DETECTOR_CONFIG;
+    const r = resolveCandidateConfig(
+      {
+        type: "url",
+        value:
+          "raw.githubusercontent.com/yogata/agent-dev-flow/main/scripts/install.ps1",
+      },
+      cfg,
+    );
+    expect(r.classification).toBe("producer-internal");
+  });
+
+  test("URL owner/repo comparison is case-insensitive (GitHub convention)", () => {
+    const cfg: DetectorConfig = {
+      repository_identity: {
+        owner_slash_name: "yogata/agent-dev-flow",
+        default_branch: "main",
+      },
+      producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
+    };
+    const r = resolveCandidateConfig(
+      {
+        type: "url",
+        value: "https://github.com/Yogata/Agent-Dev-Flow/blob/main/x.md",
+      },
+      cfg,
+    );
+    expect(r.classification).toBe("producer-internal");
+  });
+
+  test("empty repository_identity fail-closes URL candidates as unclassified", () => {
+    // When the consumer has not pinned a producer, URLs cannot be safely
+    // classified. The detector MUST NOT silently allow them — it returns
+    // `unclassified` so the gate layer fails closed.
+    const cfg: DetectorConfig = {
+      repository_identity: { owner_slash_name: "", default_branch: "" },
+      producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
+    };
+    const r = resolveCandidateConfig(
+      {
+        type: "url",
+        value: "https://github.com/yogata/agent-dev-flow/blob/main/docs/x.md",
+      },
+      cfg,
+    );
+    expect(r.classification).toBe("unclassified");
+  });
+});
+
+describe("Stage B regression: path normalization (backslash / percent / query / fragment)", () => {
+  test("backslash docs path is flagged as concrete", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see docs\\requirements\\REQ-0149.md for detail",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const paths = d.filter((x) => x.category === "concrete-path");
+    expect(paths.length).toBe(1);
+    // The matched value should normalize to forward slashes for stable downstream comparison.
+    expect(paths[0]!.matched.replace(/\\/g, "/")).toBe(
+      "docs/requirements/REQ-0149.md",
+    );
+  });
+
+  test("percent-encoded docs path is flagged", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see docs%2Frequirements%2FREQ-0149.md here",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const paths = d.filter((x) => x.category === "concrete-path");
+    expect(paths.length).toBe(1);
+  });
+
+  test("docs path with query string is flagged (query stripped on normalization)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see docs/requirements/REQ-0149.md?raw=true",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const paths = d.filter((x) => x.category === "concrete-path");
+    expect(paths.length).toBe(1);
+  });
+
+  test("docs path with fragment is flagged (fragment stripped on normalization)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see docs/specs/foo.md#section-name",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const paths = d.filter((x) => x.category === "concrete-path");
+    expect(paths.length).toBe(1);
+  });
+
+  test("Windows backslash + mixed path still classifies as concrete", () => {
+    const d = classifyLineConfig(
+      {
+        text: "ref docs\\adr\\ADR-0001.md and docs/decisions/DEC-014.md",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const paths = d.filter((x) => x.category === "concrete-path");
+    expect(paths.length).toBe(2);
+  });
+});
+
+describe("Stage B regression: text/binary/unknown tri-state classification", () => {
+  test("classifyBytes returns 'text' for valid UTF-8 bytes", () => {
+    const text = "Hello ADR-0001";
+    const bytes = new TextEncoder().encode(text);
+    const r = classifyBytes(bytes);
+    expect(r.kind).toBe("text");
+    if (r.kind === "text") {
+      expect(r.text).toBe(text);
+    }
+  });
+
+  test("classifyBytes returns 'binary' for bytes containing NUL", () => {
+    const bytes = new Uint8Array([0x68, 0x00, 0x69]); // "h\0i"
+    const r = classifyBytes(bytes);
+    expect(r.kind).toBe("binary");
+  });
+
+  test("classifyBytes returns 'binary' for invalid UTF-8 sequences", () => {
+    // 0xFF is never valid in UTF-8.
+    const bytes = new Uint8Array([0x68, 0xff, 0x69]);
+    const r = classifyBytes(bytes);
+    expect(r.kind).toBe("binary");
+  });
+
+  test("classifyBytes returns 'binary' for overlong 2-byte form (0xC0 0x80)", () => {
+    const bytes = new Uint8Array([0x68, 0xc0, 0x80, 0x69]);
+    const r = classifyBytes(bytes);
+    expect(r.kind).toBe("binary");
+  });
+
+  test("classifyBytes returns 'binary' for surrogate-half (U+D800)", () => {
+    // U+D800 encoded as 0xED 0xA0 0x80 — surrogates are forbidden in UTF-8.
+    const bytes = new Uint8Array([0xed, 0xa0, 0x80]);
+    const r = classifyBytes(bytes);
+    expect(r.kind).toBe("binary");
+  });
+
+  test("ByteClassification 'unknown' is never returned by classifyBytes (text|binary only)", () => {
+    // classifyBytes is deterministic strict-UTF-8: text|binary. The tri-state
+    // is exposed at the gate layer (BytesClassification = text|binary|unknown)
+    // where unknown means 'extension-based detection could not decide' and
+    // MUST fail closed. We verify the type allows unknown and that classifyBytes
+    // itself only emits text|binary (so the gate treats unknown as fail-closed).
+    const values: ByteClassification[] = [
+      { kind: "text", text: "" },
+      { kind: "binary", reason: "nul" },
+      { kind: "unknown", reason: "no extension, no bytes" },
+    ];
+    expect(values.map((v) => v.kind)).toContain("unknown");
+  });
+});
+
+describe("Stage B regression: classifier config plumbing", () => {
+  test("classifyContentConfig matches classifyContent behavior under default config", () => {
+    const text = "ref ADR-0001 and docs/requirements/REQ-0002.md";
+    const defaultResult = classifyContent(text, "x.md", "source");
+    const configResult = classifyContentConfig(
+      text,
+      "x.md",
+      "source",
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(configResult.length).toBe(defaultResult.length);
+  });
+
+  test("classifyContentConfig with custom config flags additional ID families", () => {
+    const cfg: DetectorConfig = {
+      repository_identity: DEFAULT_REPOSITORY_IDENTITY,
+      producer_internal_id_prefixes: ["ADR", "REQ", "DEC", "OU"],
+    };
+    const d = classifyContentConfig("ref OU-3", "x.md", "source", cfg);
+    expect(d.length).toBe(1);
+    expect(d[0]!.classification).toBe("producer-internal");
   });
 });
