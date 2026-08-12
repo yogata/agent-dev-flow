@@ -38,7 +38,7 @@
 
 accepted finding の実装方針への反映は実行担当サブエージェント（呼出元）の責務である（REQ-{NNNN}-{NNN}）。反映は最初の実装変更前に行う。
 
-反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/ADR/SPEC 整合性再確認、targeted docs guard、QG-3 等）を再実行する。意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動でき（REQ-{NNNN}-{NNN}）、新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。再 review 停止条件4点（REQ-{NNNN}-{NNN}）は adversarial-review SPEC を正とする。
+反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/ADR/SPEC 整合性再確認、targeted docs guard、QG-{N} 等）を再実行する。意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動でき（REQ-{NNNN}-{NNN}）、新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。再 review 停止条件4点（REQ-{NNNN}-{NNN}）は adversarial-review SPEC を正とする。
 
 ## blocked 遷移
 
