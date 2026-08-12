@@ -83,7 +83,7 @@ proposed → deprecated
 
 ### README ↔ Decision
 
-- `docs/decisions/README.md` の現行基準ビュー（Current Baseline View）に `docs/decisions/<DEC-*>.md` の全Decisionが記載されているか確認
+- `docs/decisions<README>.md` の現行基準ビュー（Current Baseline View）に `docs/decisions/<DEC-*>.md` の全Decisionが記載されているか確認
 - 廃止済み Decision は物理削除を第一選択肢とする。実体が各 retired/ ディレクトリへ移動された場合は README の Retired/ Historical View に全 Decision が記載されているか確認する
 - Current View に記載されているがファイルが存在しないDecisionを検出
 - ファイルが存在するが Current/Retired View いずれにも未記載のDecisionを検出
@@ -110,7 +110,7 @@ proposed → deprecated
 
 ## README 分類ビューの運用
 
-`docs/decisions/README.md` に以下の分類ビューを設ける:
+`docs/decisions<README>.md` に以下の分類ビューを設ける:
 
 - **現行基準ビュー（Current Baseline View）**: 現行の基準Decision（`docs/decisions/<DEC-*>.md`）の基本情報テーブル（番号、タイトル、ステータス、作成日）
 - **廃止履歴ビュー（Retired/ Historical View）**: retired Decision（各 retired/ ディレクトリ配下、運用上移動された場合）のテーブル（番号、タイトル、retired時ステータス、引き継ぎ先）。物理削除が第一選択肢
@@ -131,8 +131,8 @@ proposed → deprecated
 
 ## ステータス変更時の README 整合性検証
 
-Decision の `status` を変更した場合、`docs/decisions/README.md` の全ビューが実ファイルと一致していることを検証する。
-ステータス変更と README 更新が同一変更内で行われないと、README と実ファイルの不整合が発生する（OU-010 学習）。
+Decision の `status` を変更した場合、`docs/decisions<README>.md` の全ビューが実ファイルと一致していることを検証する。
+ステータス変更と README 更新が同一変更内で行われないと、README と実ファイルの不整合が発生する（OU-{NNN} 学習）。
 
 ### 検証対象ビュー
 
@@ -147,7 +147,7 @@ Decision の `status` を変更した場合、`docs/decisions/README.md` の全�
 ### 検証手順
 
 1. Decision frontmatter の `status` を読み取る
-2. `docs/decisions/README.md` の各ビューを照合し、実ファイルと一致しているか確認する
+2. `docs/decisions<README>.md` の各ビューを照合し、実ファイルと一致しているか確認する
 3. 不整合を検出した場合、ステータス変更と README 更新を同一変更（同一 PR、同一コミット群）で実施する
 4. 整合性確認を保存前の検証ステップに組み込む（`req-save`、`case-update` での Decision status 変更時）
 
@@ -186,7 +186,7 @@ Decision の `status` を変更した場合、`docs/decisions/README.md` の全�
 
 accepted status の Decision へ直接編集（UPDATE）を実施する場合、SPEC `agentdev-decision-file-manager` の「accepted Decision 直接編集チェックリスト」セクションに従い、以下の全てを満たすことを確認する（`agentdev-decision-guidelines`「accepted Decision の更新規則」準拠）。本節は実行入口の要約であり、正規原本は SPEC とする。
 
-本チェックリストの見出し（`accepted Decision 直接編集チェックリスト`）は歴史的経緯により ADR という語を含まない `accepted Decision` 表記を採用する。これは本スキルが ADR から Decision へ移行した成果物であることによる（AG-010）。v2:ADR-* 形式の過去参照は原本 SPEC 側で保持する。
+本チェックリストの見出し（`accepted Decision 直接編集チェックリスト`）は歴史的経緯により ADR という語を含まない `accepted Decision` 表記を採用する。これは本スキルが ADR から Decision へ移行した成果物であることによる（AG-{NNN}）。v2:ADR-* 形式の過去参照は原本 SPEC 側で保持する。
 
 ### 事前確認
 
@@ -212,7 +212,7 @@ accepted status の Decision へ直接編集（UPDATE）を実施する場合、
 - [ ] 意味変更を表記修正として扱っていない
 - [ ] accepted Decision の過去版を無言で書き換えていない
 - [ ] Report（Release Report 等）へ規範要件または必達条件を移していない
-- [ ] `docs/decisions/README.md` の各ビュー（現行基盤、状態別、関連REQ、意思決定マップ）が変更後の実ファイルと整合している（本ファイル「ステータス変更時の README 整合性検証」参照）
+- [ ] `docs/decisions<README>.md` の各ビュー（現行基盤、状態別、関連REQ、意思決定マップ）が変更後の実ファイルと整合している（本ファイル「ステータス変更時の README 整合性検証」参照）
 - [ ] 対象 Decision を正規根拠として参照する SPEC、REQ への影響がないことを確認する
 
 ### 直接編集と APPEND/UPDATE 操作の判定基準
