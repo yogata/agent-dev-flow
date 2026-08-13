@@ -49,11 +49,21 @@ describe("D7.2 partial overlap does NOT suppress path", () => {
     expect(result.paths[0]?.value).toBe("docs/specs/REQ-0001.md");
   });
 
-  test("path ending after URL span start is not fully contained", () => {
-    const line = "https://github.com/vercel/next.js/docs/specs/REQ-0001.md more text";
-    const { urls: _ } = extractUrls(line, 64);
-    // This line doesn't have a valid URL structure (no owner/repo/blob/main)
-    // So we skip this test - partial overlap is covered by the first test above
+  test("explicit partially overlapping span does NOT suppress path", () => {
+    const line = "See docs/specs/REQ-0001.md and more text";
+    const partialSpan: Span = { start: 10, end: 40 };
+    const result = extractDocsPaths(line, 64, [partialSpan]);
+    expect(result.paths).toHaveLength(1);
+    expect(result.paths[0]?.value).toBe("docs/specs/REQ-0001.md");
+    expect(result.paths[0]?.span).toEqual({ start: 4, end: 26 });
+  });
+
+  test("path ending after owner span start is not fully contained", () => {
+    const lineWithPath = "docs/specs/REQ-0001.md https://github.com/vercel/next.js/blob/main/x.md";
+    const { urls: urlsWithPath } = extractUrls(lineWithPath, 64);
+    const pathResult = extractDocsPaths(lineWithPath, 64, [urlsWithPath[0]?.span ?? { start: 0, end: 1 }]);
+    expect(pathResult.paths).toHaveLength(1);
+    expect(pathResult.paths[0]?.value).toBe("docs/specs/REQ-0001.md");
   });
 });
 

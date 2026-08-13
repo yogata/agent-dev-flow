@@ -103,7 +103,9 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
     const r = extractUrls(line, cap - owners.length);
     for (const u of r.urls) {
       owners.push({ type: "url", value: u.value, span: u.span, malformed: u.malformed });
-      urlSpans.push(u.span);
+      if (!u.malformed) {
+        urlSpans.push(u.span);
+      }
     }
     if (r.overflow) overflowReason = "candidate-cap-exceeded";
   }
