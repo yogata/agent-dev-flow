@@ -30,6 +30,7 @@
 
 import type { Span } from "./boundary-candidate-ownership.ts";
 import {
+  canonicalizeHostEvasion,
   classifyAuthority,
   findAuthorityEnd,
   INITIAL_AUTHORITY_SCAN_CURSOR,
@@ -44,12 +45,19 @@ const REPO_PATTERN = /^[A-Za-z0-9_.-]+$/;
 /** Scan pattern: case-insensitive recognized host followed by `/` or `:`. */
 const HOST_SCAN = /(?:github\.com|raw\.githubusercontent\.com)(?=[/:])/gi;
 
+/** Evasion host scan: bounded run of host-like chars (including percent-encoded
+ * and Unicode dots) followed by `/` or `:`. Bounded to 80 to prevent O(n²)
+ * backtracking on adversarial long runs; longest recognized host fully
+ * percent-encoded is 72 chars. Post-filtered by canonicalization. */
+const EVASION_HOST_TOKEN = /(?:%[0-9A-Fa-f]{2}|[A-Za-z0-9.\u3002\uFF0E-]){1,80}(?=[/:])/g;
+
 /** URL end exclusion set: terminates URL ownership at boundary markers.
- * Includes opening delimiters `(` `[` `{` and full-width colon U+FF1A.
+ * Backslash is NOT here (it sets pathHasBackslash and extends the URL, marking
+ * it malformed). Em dash U+2014 terminates so trailing IDs stay visible.
  * ASCII `:` is conditional (handled in the forward scan): it terminates
  * only in the path component, not in the authority (`:port`) or inside
  * a query (`?...`) / fragment (`#...`). */
-const URL_STOP_CHAR = /[\s()\[\]|\\"'`<>{},;\u3001\u3002\uFF1B\uFF0C\uFF01\uFF1F\uFF1A]/;
+const URL_STOP_CHAR = /[\s()\[\]|"'`<>{},;\u3001\u3002\uFF1B\uFF0C\uFF01\uFF1F\uFF1A\u2014]/;
 
 /** Preceding char rejects the left boundary (host/path/query continuation). */
 const LEFT_REJECT_CHAR = /[A-Za-z0-9._@:?#&=\\/-]/;
@@ -143,10 +151,12 @@ export function extractUrls(line: string, cap: number): {
     let inPath = false;
     let inQueryOrFrag = false;
     let firstQueryOrFrag = -1;
+    let pathHasBackslash = false;
     while (urlEnd < line.length) {
       steps++;
       const c = line.charAt(urlEnd);
       if (URL_STOP_CHAR.test(c)) break;
+      if (c === "\\") { pathHasBackslash = true; urlEnd++; continue; }
       if (c === "?" || c === "#") {
         if (firstQueryOrFrag === -1) firstQueryOrFrag = urlEnd;
         inQueryOrFrag = true;
@@ -161,34 +171,45 @@ export function extractUrls(line: string, cap: number): {
       out.push({ value: line.substring(aStart, authorityEnd), span: { start: aStart, end: authorityEnd }, malformed: true, ownershipSpan: null });
       continue;
     }
-    if (scan.schemeStart !== -1) {
-      if (!isValidLeftBoundary(line, scan.schemeStart, true)) continue;
-      const value = line.substring(scan.schemeStart, urlEnd);
-      const cls = classifyAuthority(value);
-      if (cls.kind === "rejected") continue;
-      if (cls.kind === "malformed") {
-        if (out.length >= cap) return { urls: out, overflow: true, steps };
-        out.push({ value: line.substring(scan.schemeStart, authorityEnd), span: { start: scan.schemeStart, end: authorityEnd }, malformed: true, ownershipSpan: null });
-        continue;
-      }
-      if (extractOwnerRepo(value) === null) continue;
+    if (scan.rejectedSchemeStart !== -1) {
       if (out.length >= cap) return { urls: out, overflow: true, steps };
-      out.push({ value, span: { start: scan.schemeStart, end: urlEnd }, malformed: false, ownershipSpan: ownershipSpanFor(scan.schemeStart, urlEnd, firstQueryOrFrag) });
+      out.push({ value: line.substring(scan.rejectedSchemeStart, urlEnd), span: { start: scan.rejectedSchemeStart, end: urlEnd }, malformed: true, ownershipSpan: null });
       continue;
     }
-    // Scheme-less host.
-    if (!isValidLeftBoundary(line, hostStart, false)) continue;
-    const value = line.substring(hostStart, urlEnd);
+    const urlStart = scan.schemeStart !== -1 ? scan.schemeStart : hostStart;
+    const hasScheme = scan.schemeStart !== -1;
+    if (!isValidLeftBoundary(line, urlStart, hasScheme)) continue;
+    const value = line.substring(urlStart, urlEnd);
     const cls = classifyAuthority(value);
     if (cls.kind === "rejected") continue;
-    if (cls.kind === "malformed") {
+    if (cls.kind === "malformed" || pathHasBackslash || hasDotSegment(value)) {
+      const mEnd = cls.kind === "malformed" ? authorityEnd : urlEnd;
       if (out.length >= cap) return { urls: out, overflow: true, steps };
-      out.push({ value: line.substring(hostStart, authorityEnd), span: { start: hostStart, end: authorityEnd }, malformed: true, ownershipSpan: null });
+      out.push({ value: line.substring(urlStart, mEnd), span: { start: urlStart, end: mEnd }, malformed: true, ownershipSpan: null });
       continue;
     }
     if (extractOwnerRepo(value) === null) continue;
     if (out.length >= cap) return { urls: out, overflow: true, steps };
-    out.push({ value, span: { start: hostStart, end: urlEnd }, malformed: false, ownershipSpan: ownershipSpanFor(hostStart, urlEnd, firstQueryOrFrag) });
+    out.push({ value, span: { start: urlStart, end: urlEnd }, malformed: false, ownershipSpan: ownershipSpanFor(urlStart, urlEnd, firstQueryOrFrag) });
+  }
+  EVASION_HOST_TOKEN.lastIndex = 0;
+  for (let em: RegExpExecArray | null; (em = EVASION_HOST_TOKEN.exec(line)) !== null;) {
+    const raw = em[0];
+    const lower = raw.toLowerCase();
+    if (lower === "github.com" || lower === "raw.githubusercontent.com") continue;
+    const canonical = canonicalizeHostEvasion(raw);
+    if (canonical !== "github.com" && canonical !== "raw.githubusercontent.com") continue;
+    const ts = em.index;
+    if (out.some((u) => u.span.start <= ts && ts < u.span.end)) continue;
+    if (out.length >= cap) return { urls: out, overflow: true, steps };
+    let ue = ts + raw.length;
+    while (ue < line.length) {
+      steps++;
+      const ch = line.charAt(ue);
+      if (URL_STOP_CHAR.test(ch) || ch === "\\") break;
+      ue++;
+    }
+    out.push({ value: line.substring(ts, ue), span: { start: ts, end: ue }, malformed: true, ownershipSpan: null });
   }
   return { urls: out, overflow: false, steps };
 }
@@ -206,4 +227,17 @@ function isValidLeftBoundary(line: string, pos: number, hasScheme: boolean): boo
   // (param separator) so a URL nested in a parent URL's query is detected.
   if (hasScheme && (prev === "=" || prev === "&")) return true;
   return !LEFT_REJECT_CHAR.test(prev);
+}
+
+/** True when the URL path contains a dot-segment (`.`, `..`, `%2e`, `%2E`,
+ * `%2e%2e`, `%2E%2E`) in the owner/repo/tail position. RFC 3986 reserves these
+ * for relative-path resolution; they never appear in a concrete GitHub URL. */
+function hasDotSegment(url: string): boolean {
+  const m = /^([A-Za-z][A-Za-z0-9.+-]*:\/\/)?[^/]+\//.exec(url);
+  if (!m) return false;
+  for (const seg of url.substring(m[0].length).split("/")) {
+    const lower = seg.toLowerCase();
+    if (seg === "." || seg === ".." || lower === "%2e" || lower === "%2e%2e") return true;
+  }
+  return false;
 }

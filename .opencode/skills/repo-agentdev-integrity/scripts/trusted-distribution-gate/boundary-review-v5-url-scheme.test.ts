@@ -76,22 +76,25 @@ describe("C2.2 example.com then bare GitHub host", () => {
   });
 });
 
-// C2.3: unsupported composite scheme git+https cannot own/hide producer refs.
-describe("C2.3 git+https unsupported composite scheme fails closed", () => {
-  test("git+https://github.com/vercel/.../ADR-1.md exposes contained reference (no URL owner, gate fails)", () => {
+// C2.3: unsupported composite scheme git+https emits a malformed candidate
+// (fail-closed). Historical intent was "0 URLs, gate PASS" but per
+// distribution-boundary.md the detector must fail-closed on evasion forms.
+describe("C2.3 git+https unsupported composite scheme emits malformed", () => {
+  test("git+https://github.com/vercel/.../ADR-1.md → 1 malformed URL (ownershipSpan null), ADR visible, gate fails", () => {
     const text = "See git+https://github.com/vercel/next.js/blob/main/docs/ADR-1.md here.";
     const { urls } = extractUrls(text, 64);
-    expect(urls).toHaveLength(0);
+    expect(urls).toHaveLength(1);
+    expect(urls[0]?.malformed).toBe(true);
+    expect(urls[0]?.ownershipSpan).toBeNull();
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const producerFail = g.failures.find((d) => d.classification === "producer-internal");
-    expect(producerFail).toBeDefined();
+    expect(g.errors.find((d) => d.category === "evasion-attempt")).toBeDefined();
   });
 
-  test("detectCandidates yields no url candidate for git+https producer path", () => {
+  test("detectCandidates yields 1 malformed url candidate for git+https producer path", () => {
     const text = "See git+https://github.com/yogata/agent-dev-flow/blob/main/docs/ADR-1.md here.";
     const cs = detectCandidates(text, baseConfig);
-    expect(cs.filter((c) => c.type === "url")).toHaveLength(0);
+    expect(cs.filter((c) => c.type === "url")).toHaveLength(1);
   });
 });
 
@@ -118,9 +121,15 @@ describe("C2.4 regression controls", () => {
     expect(extractUrls(text, 64).urls).toHaveLength(0);
   });
 
-  test("unsupported evil:// and ftp:// are NOT GitHub authorities", () => {
-    expect(extractUrls("See evil://github.com/yogata/agent-dev-flow/blob/main/x.md end.", 64).urls).toHaveLength(0);
-    expect(extractUrls("See ftp://github.com/yogata/agent-dev-flow/blob/main/x.md end.", 64).urls).toHaveLength(0);
+  test("unsupported evil:// and ftp:// emit 1 malformed each (fail-closed per distribution-boundary.md)", () => {
+    const eu = extractUrls("See evil://github.com/yogata/agent-dev-flow/blob/main/x.md end.", 64).urls;
+    expect(eu).toHaveLength(1);
+    expect(eu[0]?.malformed).toBe(true);
+    expect(eu[0]?.ownershipSpan).toBeNull();
+    const fu = extractUrls("See ftp://github.com/yogata/agent-dev-flow/blob/main/x.md end.", 64).urls;
+    expect(fu).toHaveLength(1);
+    expect(fu[0]?.malformed).toBe(true);
+    expect(fu[0]?.ownershipSpan).toBeNull();
   });
 
   test("valid bare scheme-less github.com producer URL is extracted", () => {

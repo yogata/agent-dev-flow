@@ -108,22 +108,28 @@ describe("T1.4 query and fragment / remain inside URL ownership", () => {
   });
 });
 
-// T1.5: unsupported-scheme fallback - evil:// and ftp:// are NOT accepted as scheme-less
-describe("T1.5 unsupported-scheme / evil:// and ftp:// are not scheme-less GitHub owners", () => {
-  test("evil://github.com/... is NOT a GitHub authority (clean, gate passes)", () => {
+// T1.5: unsupported-scheme fallback - evil:// and ftp:// emit malformed
+// candidates (fail-closed per distribution-boundary.md). Historical intent
+// was "clean, gate passes" but evasion forms must never pass clean.
+describe("T1.5 unsupported-scheme / evil:// and ftp:// emit malformed (fail-closed)", () => {
+  test("evil://github.com/... → 1 malformed URL, gate fails (evasion-attempt)", () => {
     const text = "See evil://github.com/yogata/agent-dev-flow/blob/main/x.md end.";
     const g = gateFor(text);
-    expect(g.pass).toBe(true);
+    expect(g.pass).toBe(false);
+    expect(g.errors.find((d) => d.category === "evasion-attempt")).toBeDefined();
     const cs = detectCandidates(text, baseConfig);
-    expect(urls(cs).length).toBe(0);
+    expect(urls(cs).length).toBe(1);
+    expect(urls(cs)[0]?.malformed).toBe(true);
   });
 
-  test("ftp://github.com/... is NOT a GitHub authority (clean, gate passes)", () => {
+  test("ftp://github.com/... → 1 malformed URL, gate fails (evasion-attempt)", () => {
     const text = "See ftp://github.com/yogata/agent-dev-flow/blob/main/x.md end.";
     const g = gateFor(text);
-    expect(g.pass).toBe(true);
+    expect(g.pass).toBe(false);
+    expect(g.errors.find((d) => d.category === "evasion-attempt")).toBeDefined();
     const cs = detectCandidates(text, baseConfig);
-    expect(urls(cs).length).toBe(0);
+    expect(urls(cs).length).toBe(1);
+    expect(urls(cs)[0]?.malformed).toBe(true);
   });
 
   test("normal https:// remains accepted", () => {

@@ -119,6 +119,11 @@ export interface AuthorityScan {
   readonly hasBackslash: boolean;
   /** Leftmost index reached by the walk (start of the authority evidence). */
   readonly authorityLeft: number;
+  /** Start index of a scheme token that cannot serve as a live http(s) scheme
+   * but precedes the host: unsupported scheme (ftp, evil, git+https), or a
+   * valid http(s) scheme invalidated by excessive slashes (`https:////`).
+   * The caller emits a malformed candidate from this index. -1 when none. */
+  readonly rejectedSchemeStart: number;
 }
 
 /**
@@ -135,6 +140,7 @@ export interface AuthorityScanCursor {
   readonly schemeStart: number;
   readonly authorityLeft: number;
   readonly hasBackslash: boolean;
+  readonly rejectedSchemeStart: number;
 }
 
 export const INITIAL_AUTHORITY_SCAN_CURSOR: AuthorityScanCursor = {
@@ -142,6 +148,7 @@ export const INITIAL_AUTHORITY_SCAN_CURSOR: AuthorityScanCursor = {
   schemeStart: -1,
   authorityLeft: 0,
   hasBackslash: false,
+  rejectedSchemeStart: -1,
 };
 
 export interface AuthorityScanResult {
@@ -182,6 +189,7 @@ export function scanAuthorityForward(
   let schemeStart = cursor.schemeStart;
   let authorityLeft = cursor.authorityLeft;
   let hasBackslash = cursor.hasBackslash;
+  let rejectedSchemeStart = cursor.rejectedSchemeStart;
   let steps = 0;
   while (pos + 1 < hostStart) {
     pos++;
@@ -196,24 +204,26 @@ export function scanAuthorityForward(
       const schemeEnd = i - 2;
       let j = schemeEnd - 1;
       if (j < 0 || !ALPHA.test(line.charAt(j))) {
-        schemeStart = -1; authorityLeft = i + 1; hasBackslash = false;
+        schemeStart = -1; authorityLeft = i + 1; hasBackslash = false; rejectedSchemeStart = -1;
         continue;
       }
       while (j > 0 && SCHEME_CHAR.test(line.charAt(j - 1))) j--;
       const scheme = line.substring(j, schemeEnd).toLowerCase();
       if (scheme === "http" || scheme === "https") {
         schemeStart = j; authorityLeft = j; hasBackslash = false;
+        rejectedSchemeStart = (i + 1 < line.length && line.charAt(i + 1) === "/") ? j : -1;
       } else {
-        schemeStart = -1; authorityLeft = i + 1; hasBackslash = false;
+        schemeStart = -1; authorityLeft = i + 1; hasBackslash = false; rejectedSchemeStart = j;
       }
       continue;
     }
     if (!AUTHORITY_CHAR.test(c)) {
       schemeStart = -1; authorityLeft = i + 1; hasBackslash = false;
+      if (c !== "/") rejectedSchemeStart = -1;
     }
   }
-  const nextCursor: AuthorityScanCursor = { pos, schemeStart, authorityLeft, hasBackslash };
-  return { cursor: nextCursor, scan: { schemeStart, hasBackslash, authorityLeft }, steps };
+  const nextCursor: AuthorityScanCursor = { pos, schemeStart, authorityLeft, hasBackslash, rejectedSchemeStart };
+  return { cursor: nextCursor, scan: { schemeStart, hasBackslash, authorityLeft, rejectedSchemeStart }, steps };
 }
 
 /**
@@ -228,4 +238,14 @@ export function findAuthorityEnd(line: string, from: number, urlEnd: number): nu
     end++;
   }
   return end;
+}
+
+/** Canonicalize a host token for evasion detection only: one ASCII
+ * percent-decode pass + Unicode dot (U+3002, U+FF0E) replacement. Used to
+ * detect percent-encoded / Unicode-dot hosts that canonicalize to a
+ * recognized GitHub host. NOT used for producer/external classification. */
+export function canonicalizeHostEvasion(raw: string): string {
+  return raw
+    .replace(/%([0-9A-Fa-f]{2})/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/[\u3002\uFF0E]/g, ".");
 }
