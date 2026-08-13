@@ -89,7 +89,7 @@ describe("boundary-pipeline helpers / resolveCandidate", () => {
 
   test("producer-owned URL resolves to producer-internal (parent defect #5)", () => {
     const r = resolveCandidate(
-      { type: "url", value: "https://github.com/yogata/agent-dev-flow/blob/main/x.md", span: S },
+      { type: "url", value: "https://github.com/yogata/agent-dev-flow/blob/main/x.md", span: S, malformed: false },
       baseConfig,
     );
     expect(r.classification).toBe("producer-internal");
@@ -98,7 +98,7 @@ describe("boundary-pipeline helpers / resolveCandidate", () => {
 
   test("external-repo URL resolves to consumer-resolvable (parent defect #5)", () => {
     const r = resolveCandidate(
-      { type: "url", value: "https://github.com/vercel/next.js/blob/main/docs/x.md", span: S },
+      { type: "url", value: "https://github.com/vercel/next.js/blob/main/docs/x.md", span: S, malformed: false },
       baseConfig,
     );
     expect(r.classification).toBe("consumer-resolvable");

@@ -100,7 +100,7 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
   // Stage 1a: extract bounded URL owners (identity-gated).
   if (cfg.repository_identity.owner_slash_name.length > 0) {
     const r = extractUrls(line, cap - owners.length);
-    for (const u of r.urls) owners.push({ type: "url", value: u.value, span: u.span });
+    for (const u of r.urls) owners.push({ type: "url", value: u.value, span: u.span, malformed: u.malformed });
     if (r.overflow) overflowReason = "candidate-cap-exceeded";
   }
 

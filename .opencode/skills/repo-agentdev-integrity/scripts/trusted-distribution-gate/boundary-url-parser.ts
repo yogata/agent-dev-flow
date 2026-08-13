@@ -1,124 +1,56 @@
 // Authority-aware URL extractor for the distribution boundary detector.
 //
 // Extracted from boundary-candidate-model.ts to keep that module under the
-// 250 pure LOC ceiling and to make the URL lexer independently testable.
-// One responsibility: turn a line into URL candidate spans whose host is
-// exactly `github.com` or `raw.githubusercontent.com`.
+// 250 pure LOC ceiling. One responsibility: turn a line into URL candidate
+// spans whose host is exactly `github.com` or `raw.githubusercontent.com`.
 //
-// Authority model (no URL dependency):
-//   - Scheme form: `https?://[userinfo@]host[:port][/path][?query][#frag]`.
-//     Port is NOT supported: `host:port` is rejected (host with `:` is not
-//     a valid hostname for the GitHub authority).
-//   - Scheme discovery walks only the lexical authority/userinfo region
-//     immediately preceding the host and parses the full RFC 3986 scheme
-//     token. Only exactly `http`/`https` is accepted, so composite schemes
-//     such as `git+https://` are unsupported and cannot own/hide contained
-//     producer references. The walk never crosses whitespace, a path
-//     separator, or another token, so a later bare host never grabs an
-//     earlier URL's scheme.
-//   - Userinfo is stripped via the LAST `@` so `https://github.com@evil.com`
-//     is parsed as userinfo=`github.com`, host=`evil.com` — not a GitHub
-//     authority.
-//   - Host comparison is case-insensitive (host lowercased). Owner/repo
-//     comparison is case-insensitive (GitHub legacy). Directory family
-//     names elsewhere remain case-sensitive (NOT this module's concern).
-//   - Host suffix / subdomain / path lookalikes are rejected: host must
-//     equal `github.com` or `raw.githubusercontent.com` exactly. So
-//     `notgithub.com`, `github.com.evil.com`, `evil.github.com`, and
-//     `example.com/github.com/...` are NOT GitHub authorities.
-//   - Scheme-less `github.com/...` and `raw.githubusercontent.com/...`
-//     are supported only at a valid left boundary: the char before the
-//     host must NOT be a host/path/query/fragment continuation char
-//     (`[A-Za-z0-9._@:?#&=\\/-]`), except the `://` scheme separator is
-//     accepted (so the host of a scheme URL is matched).
+// Authority classification (host/port/backslash malformedness) lives in
+// boundary-url-authority.ts. This module owns the line scan and candidate
+// emission:
+//   - HOST_SCAN finds a recognized host followed by `/` (path) or `:`
+//     (port), so default-port URLs (`https://github.com:443/...`) are seen.
+//   - For each hit, scanAuthorityBackward locates the scheme and detects
+//     backslash malformedness. A backslash in the authority is always
+//     malformed: it makes the host position ambiguous and the URL cannot
+//     own/hide contained producer references.
+//   - Port validation: only the scheme default port is accepted (443 for
+//     https, 80 for http). Any other port, or any port on a scheme-less
+//     URL, is malformed. A malformed authority NEVER silently passes: it
+//     is emitted as a separate candidate whose ownership span covers only
+//     the authority region, so contained path references stay independently
+//     visible, and resolveCandidate classifies it as evasion-attempt.
 //
 // Side-effect-free: pure over inputs.
 
 import type { Span } from "./boundary-candidate-ownership.ts";
-
-/** URL authority hosts the detector recognizes. */
-const GITHUB_HOST = "github.com";
-const RAW_HOST = "raw.githubusercontent.com";
-const RECOGNIZED_HOSTS: ReadonlySet<string> = new Set([GITHUB_HOST, RAW_HOST]);
+import {
+  classifyAuthority,
+  findAuthorityEnd,
+  parseUrlHost,
+  scanAuthorityBackward,
+} from "./boundary-url-authority.ts";
 
 const OWNER_PATTERN = /^[A-Za-z0-9_-]+$/;
 const REPO_PATTERN = /^[A-Za-z0-9_.-]+$/;
 
-/** Scan pattern: case-insensitive `github.com/` or `raw.githubusercontent.com/`. */
-const HOST_SCAN = /(?:github\.com|raw\.githubusercontent\.com)\//gi;
+/** Scan pattern: case-insensitive recognized host followed by `/` or `:`. */
+const HOST_SCAN = /(?:github\.com|raw\.githubusercontent\.com)(?=[/:])/gi;
 
-/** URL end exclusion set (matches the legacy URL_CANDIDATE_PATTERN).
- * Includes comma, semicolon, Japanese punctuation, and full-width punctuation
- * to terminate URL ownership at these boundary markers.
- */
+/** URL end exclusion set: terminates URL ownership at boundary markers. */
 const URL_STOP_CHAR = /[\s)\]|\\"'`<>{},;\u3001\u3002\uFF1B\uFF0C\uFF01\uFF1F]/;
 
 /** Preceding char rejects the left boundary (host/path/query continuation). */
 const LEFT_REJECT_CHAR = /[A-Za-z0-9._@:?#&=\\/-]/;
 
-/** Characters allowed inside a URL authority (userinfo) region (RFC 3986). */
-const AUTHORITY_CHAR = /[A-Za-z0-9._~!$&'()*+,;=:@%]/;
-
-/** One character of an RFC 3986 scheme token: ALPHA / DIGIT / "+" / "-" / ".". */
-const SCHEME_CHAR = /[A-Za-z0-9+\-.]/;
-
 /**
- * Decide whether `hostStart` is a valid left boundary for a scheme-less
- * authority. Returns true when the host begins the URL (start of line,
- * whitespace, opening punctuation, etc.) or is preceded by `://`.
- *
- * When the host is preceded by `://`, the scheme must be http or https.
- * Unsupported schemes (evil://, ftp://, git+https://, etc.) cause rejection.
- *
- * For scheme URLs, we validate the boundary at the scheme start, not at
- * the host start, to correctly handle userinfo.
- */
-function isValidLeftBoundary(line: string, hostStart: number): boolean {
-  if (hostStart === 0) return true;
-  const schemeStart = findSchemeStartBeforeHost(line, hostStart);
-  if (schemeStart !== -1) {
-    // Validate the boundary at the scheme start, not at the host start.
-    if (schemeStart === 0) return true;
-    const prev = line.charAt(schemeStart - 1);
-    return !LEFT_REJECT_CHAR.test(prev);
-  }
-  const prev = line.charAt(hostStart - 1);
-  return !LEFT_REJECT_CHAR.test(prev);
-}
-
-/**
- * Parse the authority of a URL value and return the lowercased host, or
- * null when the URL has a port (unsupported) or no parseable authority.
- *
- * Precondition: caller ensures the URL value starts at a valid boundary
- * (scheme form OR scheme-less host). The host is the part of the authority
- * after the last `@` (userinfo stripped) and before any `:port`.
- */
-export function parseUrlHost(url: string): string | null {
-  const schemeMatch = /^https?:\/\//i.exec(url);
-  const afterScheme = schemeMatch ? url.substring(schemeMatch[0].length) : url;
-  let authorityEnd = afterScheme.length;
-  for (let i = 0; i < afterScheme.length; i++) {
-    const c = afterScheme.charAt(i);
-    if (c === "/" || c === "?" || c === "#") { authorityEnd = i; break; }
-  }
-  const authority = afterScheme.substring(0, authorityEnd);
-  const atIdx = authority.lastIndexOf("@");
-  const hostPort = atIdx === -1 ? authority : authority.substring(atIdx + 1);
-  // Reject port form: a `:` in the host segment is not a valid hostname.
-  if (hostPort.includes(":")) return null;
-  return hostPort.toLowerCase();
-}
-
-/**
- * Extract `owner/repo` from a URL value whose host is a recognized GitHub
- * authority, or null when the URL does not point at GitHub. Authority-aware:
- * the URL must host-match exactly (case-insensitive). Path-lookalike and
- * userinfo-deception URLs return null because their host is not GitHub.
+ * Extract `owner/repo` from a URL value whose authority is a VALID recognized
+ * GitHub authority (default port accepted; malformed port or backslash
+ * authority returns null). Path-lookalike and userinfo-deception URLs return
+ * null because their host is not a recognized GitHub authority.
  */
 export function extractOwnerRepo(url: string): string | null {
   const host = parseUrlHost(url);
-  if (host === null || !RECOGNIZED_HOSTS.has(host)) return null;
+  if (host === null) return null;
   const schemeMatch = /^https?:\/\//i.exec(url);
   const afterScheme = schemeMatch ? url.substring(schemeMatch[0].length) : url;
   const slashIdx = afterScheme.indexOf("/");
@@ -128,7 +60,7 @@ export function extractOwnerRepo(url: string): string | null {
   const repo = segments[1];
   if (owner === undefined || repo === undefined) return null;
   if (!OWNER_PATTERN.test(owner) || !REPO_PATTERN.test(repo)) return null;
-  if (host === GITHUB_HOST) {
+  if (host === "github.com") {
     const action = segments[2];
     const tail = segments[3];
     if ((action !== "blob" && action !== "raw") || tail === undefined || tail.length === 0) return null;
@@ -150,17 +82,23 @@ export function isProducerOwnedUrl(url: string, identity: { readonly owner_slash
 export interface ExtractedUrl {
   readonly value: string;
   readonly span: Span;
+  /** True when the authority is malformed (backslash / bad port). The span
+   * covers ONLY the authority region so contained path references stay
+   * independently visible; resolveCandidate classifies it evasion-attempt. */
+  readonly malformed: boolean;
 }
 
 /**
  * Scan a line for URL candidates whose host is a recognized GitHub
- * authority. Returns at most `cap` entries; the boolean `overflow` flag
- * is set when the cap is reached mid-scan (the caller MUST surface a
- * typed overflow in that case — ownership never suppresses overflow).
+ * authority. Returns at most `cap` entries; `overflow` is set when the cap
+ * is reached mid-scan (ownership never suppresses overflow).
  *
- * For each scan hit, the left boundary is checked. The URL value extends
- * backward to include the scheme prefix when the host is immediately
- * preceded by `://`, and forward until the first URL stop char.
+ * For each host hit, scanAuthorityBackward locates the scheme and detects
+ * backslash malformedness. A backslash in the authority => malformed. A
+ * valid scheme URL with a non-default port => malformed. A scheme-less URL
+ * with any port => malformed. Malformed candidates' spans cover ONLY the
+ * authority region so path references stay independently visible; valid
+ * URLs span the full URL (scheme through stop char) and own their path.
  */
 export function extractUrls(line: string, cap: number): {
   readonly urls: readonly ExtractedUrl[];
@@ -169,50 +107,51 @@ export function extractUrls(line: string, cap: number): {
   const out: ExtractedUrl[] = [];
   HOST_SCAN.lastIndex = 0;
   for (let m: RegExpExecArray | null; (m = HOST_SCAN.exec(line)) !== null;) {
-    const matchEnd = m.index + m[0].length; // index right after the trailing `/`
-    // The host starts at m.index. But the regex may have matched a host
-    // continuation like the `github.com/` inside `notgithub.com/`: the
-    // preceding char rejects the boundary in that case.
     const hostStart = m.index;
+    const hostEnd = hostStart + m[0].length;
+    const scan = scanAuthorityBackward(line, hostStart);
+    let urlEnd = hostEnd;
+    while (urlEnd < line.length && !URL_STOP_CHAR.test(line.charAt(urlEnd))) urlEnd++;
+    const authorityEnd = findAuthorityEnd(line, hostEnd, urlEnd);
+    if (scan.hasBackslash) {
+      const aStart = scan.schemeStart !== -1 ? scan.schemeStart : scan.authorityLeft;
+      if (out.length >= cap) return { urls: out, overflow: true };
+      out.push({ value: line.substring(aStart, authorityEnd), span: { start: aStart, end: authorityEnd }, malformed: true });
+      continue;
+    }
+    if (scan.schemeStart !== -1) {
+      if (!isValidLeftBoundary(line, scan.schemeStart)) continue;
+      const value = line.substring(scan.schemeStart, urlEnd);
+      const cls = classifyAuthority(value);
+      if (cls.kind === "rejected") continue;
+      if (cls.kind === "malformed") {
+        if (out.length >= cap) return { urls: out, overflow: true };
+        out.push({ value: line.substring(scan.schemeStart, authorityEnd), span: { start: scan.schemeStart, end: authorityEnd }, malformed: true });
+        continue;
+      }
+      if (extractOwnerRepo(value) === null) continue;
+      if (out.length >= cap) return { urls: out, overflow: true };
+      out.push({ value, span: { start: scan.schemeStart, end: urlEnd }, malformed: false });
+      continue;
+    }
+    // Scheme-less host.
     if (!isValidLeftBoundary(line, hostStart)) continue;
-    // Extend URL start back to include the scheme prefix when present.
-    let start = hostStart;
-    const schemeStart = findSchemeStartBeforeHost(line, hostStart);
-    if (schemeStart !== -1) start = schemeStart;
-    // Extend URL end forward until the first URL stop char.
-    let end = matchEnd;
-    while (end < line.length && !URL_STOP_CHAR.test(line.charAt(end))) end++;
-    const value = line.substring(start, end);
+    const value = line.substring(hostStart, urlEnd);
+    const cls = classifyAuthority(value);
+    if (cls.kind === "rejected") continue;
+    if (cls.kind === "malformed") {
+      if (out.length >= cap) return { urls: out, overflow: true };
+      out.push({ value: line.substring(hostStart, authorityEnd), span: { start: hostStart, end: authorityEnd }, malformed: true });
+      continue;
+    }
     if (extractOwnerRepo(value) === null) continue;
     if (out.length >= cap) return { urls: out, overflow: true };
-    out.push({ value, span: { start, end } });
+    out.push({ value, span: { start: hostStart, end: urlEnd }, malformed: false });
   }
   return { urls: out, overflow: false };
 }
 
-/**
- * Find the start index of an `http(s)://` scheme whose authority ends at
- * `hostStart`. Walks backward ONLY through the lexical authority/userinfo
- * region, so whitespace, a path separator, or another token halts the walk
- * and yields -1 — a later bare host can never grab an earlier URL's scheme.
- * When `://` is reached, the full RFC-style scheme token is parsed and
- * accepted only when it is exactly `http` or `https`; composite schemes
- * such as `git+https` are unsupported and return -1.
- */
-function findSchemeStartBeforeHost(line: string, hostStart: number): number {
-  let i = hostStart - 1;
-  while (i >= 3) {
-    if (line.substring(i - 2, i + 1) === "://") {
-      const schemeEnd = i - 2;
-      let j = schemeEnd - 1;
-      if (j < 0 || !/[A-Za-z]/.test(line.charAt(j))) return -1;
-      while (j > 0 && SCHEME_CHAR.test(line.charAt(j - 1))) j--;
-      const scheme = line.substring(j, schemeEnd).toLowerCase();
-      if (scheme === "http" || scheme === "https") return j;
-      return -1;
-    }
-    if (!AUTHORITY_CHAR.test(line.charAt(i))) return -1;
-    i--;
-  }
-  return -1;
+function isValidLeftBoundary(line: string, pos: number): boolean {
+  if (pos === 0) return true;
+  return !LEFT_REJECT_CHAR.test(line.charAt(pos - 1));
 }

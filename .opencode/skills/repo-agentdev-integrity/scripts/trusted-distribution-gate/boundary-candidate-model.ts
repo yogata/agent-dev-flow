@@ -73,7 +73,7 @@ export type Candidate =
     readonly span: Span;
   }
   | { readonly type: "path"; readonly value: string; readonly span: Span }
-  | { readonly type: "url"; readonly value: string; readonly span: Span }
+  | { readonly type: "url"; readonly value: string; readonly span: Span; readonly malformed: boolean }
   | { readonly type: "overflow"; readonly reason: OverflowReason };
 
 export type CandidateType = Candidate["type"];
@@ -190,6 +190,9 @@ export function resolveCandidate(c: Candidate, cfg: DetectorConfig): {
       return { classification: "generic-or-template", category: "concrete-path" };
     }
     case "url": {
+      if (c.malformed) {
+        return { classification: "unclassified", category: "evasion-attempt" };
+      }
       // Classify by repository identity, NOT by path content. A URL into
       // the producer repo is producer-internal at any path; a URL into a
       // different repo is consumer-resolvable. An empty identity fails closed.
