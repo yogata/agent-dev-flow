@@ -287,23 +287,25 @@ export function findAuthorityEnd(line: string, from: number, urlEnd: number): nu
 }
 
 /** Canonicalize a host token for evasion detection only: iterative UTF-8
- *  percent-decode (up to 2 rounds, like decodeURIComponent) + Unicode dot
- *  (U+3002, U+FF0E, U+FF61) replacement + ASCII lowercase. Used to detect
- *  percent-encoded / Unicode-dot / double-encoded / case-variant hosts that
- *  canonicalize to a recognized GitHub host. NOT used for producer/external
- *  classification.
+ *  percent-decode (up to 3 rounds, extended from 2 for triple encoding)
+ *  + Unicode dot (U+3002, U+FF0E, U+FF61) replacement + ASCII lowercase.
+ *  Used to detect percent-encoded / Unicode-dot / double-encoded / case-variant
+ *  hosts that canonicalize to a recognized GitHub host. NOT used for
+ *  producer/external classification.
  *
  *  Decode rounds: round 1 resolves single encoding (`%67`->`g`) and exposes
  *  UTF-8 sequences (`%E3%80%82`->U+3002); round 2 resolves double
- *  percent-encoding (`%2567`->`%67`->`g`). Stops early when no `%` remains,
- *  a round yields no change, or decodeURIComponent throws (invalid sequence)
- *  -- the last successful result is kept, so a malformed tail never aborts
- *  an otherwise-recognized host. Unicode-dot replacement and lowercasing
- *  run AFTER decoding so encoded dots (`%E3%80%82`) and case variants
- *  (`GITHUB\u3002COM`) both collapse to the lowercase ASCII form. */
+ *  percent-encoding (`%2567`->`%67`->`g`); round 3 resolves triple
+ *  percent-encoding (`%252567`->`%2567`->`%67`->`g`). Stops early when
+ *  no `%` remains, a round yields no change, or decodeURIComponent throws
+ *  (invalid sequence) -- the last successful result is kept, so a malformed
+ *  tail never aborts an otherwise-recognized host. Unicode-dot replacement
+ *  and lowercasing run AFTER decoding so encoded dots (`%E3%80%82`) and
+ *  case variants (`GITHUB\u3002COM`) both collapse to the lowercase ASCII
+ *  form. */
 export function canonicalizeHostEvasion(raw: string): string {
   let s = raw;
-  for (let round = 0; round < 2 && s.includes("%"); round++) {
+  for (let round = 0; round < 3 && s.includes("%"); round++) {
     let decoded: string;
     try { decoded = decodeURIComponent(s); } catch { break; }
     if (decoded === s) break;
