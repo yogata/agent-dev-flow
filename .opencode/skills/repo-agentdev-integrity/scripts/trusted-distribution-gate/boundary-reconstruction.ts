@@ -175,7 +175,7 @@ export function detectReconstructedIds(
       i += 1;
       continue;
     }
-    
+
     // Skip tokens fully contained in owned spans (owned-span suppression).
     // This prevents owned regions from consuming the token-ids-exceeded cap.
     const tokenStart = i;
@@ -183,7 +183,7 @@ export function detectReconstructedIds(
     const isFullyOwned = ownedSpans.some(
       (owned) => owned.start <= tokenStart && tokenEnd <= owned.end
     );
-    
+
     if (token.hasEscape && !isFullyOwned) {
       const decoded = token.atoms.map((a) => a.char).join("");
       ID_PATTERN.lastIndex = 0;

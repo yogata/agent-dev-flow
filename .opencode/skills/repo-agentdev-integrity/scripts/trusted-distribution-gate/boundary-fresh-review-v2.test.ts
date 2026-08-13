@@ -12,6 +12,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   detectCandidates,
+  detectReconstructedIds,
   type DetectorConfig,
   type Candidate,
 } from "./boundary-pipeline.ts";
@@ -217,8 +218,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
 // containing many escaped IDs must NOT trigger token-ids-exceeded overflow.
 describe("T3 owned-span reconstruction suppression", () => {
   test("single token with 17 reconstructable IDs overflows when standalone", () => {
-    // Use same pattern as existing overflow tests: "STEP-1\\u0032-".repeat(17)
-    const token = "STEP-1\\u0032-".repeat(17);
+    const token = "ADR-0x31-".repeat(17);
     const cs = detectCandidates(token, baseConfig);
     const overflow = cs.find((c) => c.type === "overflow");
     expect(overflow).toBeDefined();
@@ -228,51 +228,92 @@ describe("T3 owned-span reconstruction suppression", () => {
   });
 
   test("17 reconstructable IDs inside external GitHub URL do NOT overflow, gate passes", () => {
-    // Use 17 literal IDs in URL path (these are detected as direct-id, not reconstructed)
-    // but the issue pattern is the same: IDs inside owned span should not cause overflow
-    const ids = "STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1";
-    const text = `See https://github.com/vercel/next.js/blob/main/${ids} here.`;
+    const exploit = "ADR-0x31-".repeat(17);
+    const text = `See https://github.com/vercel/next.js/blob/main/${exploit}.md here.`;
     const cs = detectCandidates(text, baseConfig);
-    // No overflow should be present
+    const g = gateFor(text);
+
+    // Gate passes because URL is external
+    expect(g.pass).toBe(true);
+
+    // Exactly one URL owner, no reconstructed IDs, no overflow
+    const urlCandidates = cs.filter((c) => c.type === "url");
+    expect(urlCandidates.length).toBe(1);
+    const reconstructed = cs.filter((c) => c.type === "reconstructed-id");
+    expect(reconstructed.length).toBe(0);
     const overflow = cs.find((c) => c.type === "overflow");
     expect(overflow).toBeUndefined();
   });
 
   test("17 reconstructable IDs inside producer URL do NOT overflow, gate fails with URL classification", () => {
-    // Use 17 literal IDs in producer URL
-    const ids = "STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1";
-    const text = `See https://github.com/yogata/agent-dev-flow/blob/main/${ids} here.`;
+    const exploit = "ADR-0x31-".repeat(17);
+    const text = `See https://github.com/yogata/agent-dev-flow/blob/main/${exploit}.md here.`;
     const cs = detectCandidates(text, baseConfig);
-    // No overflow should be present
+    const g = gateFor(text);
+
+    // Gate fails because URL is producer-internal
+    expect(g.pass).toBe(false);
+
+    // Exactly one URL, no reconstructed IDs, no overflow
+    const urlCandidates = cs.filter((c) => c.type === "url");
+    expect(urlCandidates.length).toBe(1);
+    const reconstructed = cs.filter((c) => c.type === "reconstructed-id");
+    expect(reconstructed.length).toBe(0);
     const overflow = cs.find((c) => c.type === "overflow");
     expect(overflow).toBeUndefined();
+
+    // Gate failure should be fixed-url (producer-internal)
+    const urlFail = g.failures.find((d: Detection) => d.category === "fixed-url");
+    expect(urlFail?.classification).toBe("producer-internal");
   });
 
   test("17 reconstructable IDs inside docs path do NOT overflow, gate fails with path classification", () => {
-    // Use 17 literal IDs in docs path
-    const ids = "STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1";
-    const text = `See docs/${ids} here.`;
+    const exploit = "ADR-0x31-".repeat(17);
+    const text = `See docs/specs/${exploit}.md here.`;
     const cs = detectCandidates(text, baseConfig);
-    // No overflow should be present
+    const g = gateFor(text);
+
+    // Gate fails because path is producer-internal
+    expect(g.pass).toBe(false);
+
+    // Exactly one valid docs path, no reconstructed IDs, no overflow
+    const pathCandidates = cs.filter((c) => c.type === "path");
+    expect(pathCandidates.length).toBe(1);
+    expect(pathCandidates[0]?.value).toBe(`docs/specs/${exploit}.md`);
+    const reconstructed = cs.filter((c) => c.type === "reconstructed-id");
+    expect(reconstructed.length).toBe(0);
     const overflow = cs.find((c) => c.type === "overflow");
     expect(overflow).toBeUndefined();
+
+    // Gate failure should be concrete-path (producer-internal)
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail?.classification).toBe("producer-internal");
   });
 
-  test("token partially overlapping URL owner is NOT silently skipped, overflow fires", () => {
-    // Token starts before URL but extends past it - NOT fully contained
-    const ids = "STEP-1\\u0032-".repeat(17);
-    const text = `See <https://github.com/vercel/next.js/blob/main/x.md>${ids} here.`;
-    const cs = detectCandidates(text, baseConfig);
-    // Overflow should still fire because token is not fully inside URL
-    const overflow = cs.find((c) => c.type === "overflow");
-    expect(overflow).toBeDefined();
-    if (overflow && overflow.type === "overflow") {
-      expect(overflow.reason).toBe("token-ids-exceeded");
-    }
+  test("token partially overlapping owner is NOT silently skipped, overflow fires", () => {
+    const exploit = "ADR-0x31-".repeat(17);
+    // Test partial overlap directly via detectReconstructedIds with a span that ends one char early
+    const ownedSpan = { start: 0, end: exploit.length - 1 };
+    const result = detectReconstructedIds(exploit, [ownedSpan]);
+
+    // Overflow should fire because token is NOT fully inside the owned span
+    expect(result.overflow).toBe(true);
+    expect(result.overflowReason).toBe("token-ids-exceeded");
+  });
+
+  test("token fully inside owned span emits no IDs and no overflow", () => {
+    const exploit = "ADR-0x31-".repeat(17);
+    // Test full containment
+    const ownedSpan = { start: 0, end: exploit.length };
+    const result = detectReconstructedIds(exploit, [ownedSpan]);
+
+    // No IDs, no overflow when fully owned
+    expect(result.ids.length).toBe(0);
+    expect(result.overflow).toBe(false);
+    expect(result.overflowReason).toBe(null);
   });
 
   test("line-scan overflow remains unchanged when line exceeds MAX_LINE_SCAN", () => {
-    // Create a line longer than MAX_LINE_SCAN (65536)
     const longSegment = "A".repeat(70000);
     const text = `See ${longSegment} ADR-0001 here.`;
     const cs = detectCandidates(text, baseConfig);

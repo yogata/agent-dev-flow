@@ -51,6 +51,10 @@ export {
   isConcreteDocsPath,
   normalizePathToken,
 } from "./boundary-candidate-model.ts";
+export {
+  detectReconstructedIds,
+  MAX_LINE_SCAN,
+} from "./boundary-reconstruction.ts";
 
 // ---------------------------------------------------------------------------
 // Detection patterns (pipeline-local)
