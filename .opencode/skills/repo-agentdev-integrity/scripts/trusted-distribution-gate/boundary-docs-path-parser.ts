@@ -53,6 +53,7 @@ function scanSeparators(line: string, pos: number): number {
       const c1 = line.charAt(p + 1);
       const c2 = line.charAt(p + 2);
       if (c1 === "2" && (c2 === "F" || c2 === "f")) { p += 3; continue; }
+      if (c1 === "5" && (c2 === "C" || c2 === "c")) { p += 3; continue; }
     }
     break;
   }
@@ -92,6 +93,66 @@ function findMdEndpoint(content: string): number {
 }
 
 /**
+ * Scan backwards from `pos` to validate that the prefix consists only of
+ * valid relative path dot-segments (., ..) mixed with separators (/ or \).
+ * Returns true when the prefix is a valid relative path (or empty).
+ * Rejects absolute paths (starts with / or \ at index 0) and identifier prefixes.
+ */
+function isValidRelativePrefix(line: string, pos: number): boolean {
+  if (pos === 0) return true; // docs at line start is valid
+  const beforeDocs = line.charAt(pos - 1);
+  if (beforeDocs === '/' || beforeDocs === '\\') {
+    // Reject absolute paths: separator at index 0 means /docs or \docs
+    if (pos - 1 === 0) return false;
+    // Check for dot-segments before the separator; reject if none found
+    let p = pos - 2;
+    let foundDot = false;
+    while (p >= 0) {
+      const c = line.charAt(p);
+      if (c === '/') {
+        if (p === 0) return false;
+        p -= 1;
+      } else if (c === '\\') {
+        if (p === 0) return false;
+        p -= 1;
+      } else if (c === '.') {
+        foundDot = true;
+        p -= 1;
+      } else if (/[A-Za-z0-9_-]/.test(c)) {
+        return false;
+      } else {
+        break;
+      }
+    }
+    // Valid relative path must have at least one dot-segment (e.g., ./ or ../)
+    return foundDot;
+  }
+  if (beforeDocs === '.' && pos < line.length) {
+    const afterDot = line.charAt(pos);
+    if (afterDot === '/' || afterDot === '\\') {
+      // Check that everything before the dot is valid dot-segments
+      let p = pos - 2;
+      while (p >= 0) {
+        const c = line.charAt(p);
+        if (c === '.' || c === '/' || c === '\\') {
+          p -= 1;
+        } else if (/[A-Za-z0-9_-]/.test(c)) {
+          return false;
+        } else {
+          break;
+        }
+      }
+      return true;
+    }
+  }
+  // Accept boundary characters (space, etc.) before docs
+  if (/\s/.test(beforeDocs) || /[)\]\|'"`<>{},;:#?!。、！]/.test(beforeDocs)) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Scan a line for docs-path candidates. Returns at most `cap` entries;
  * the boolean `overflow` flag is set when the cap is reached mid-scan
  * (caller MUST surface a typed overflow; ownership never suppresses it).
@@ -109,32 +170,9 @@ export function extractDocsPaths(line: string, cap: number): {
     const docsIdx = line.indexOf("docs", searchFrom);
     if (docsIdx < 0) break;
     searchFrom = docsIdx + 1;
-    // Left boundary: accept only clean ./ or ../ prefixes (with / or \ separator) before docs.
-    if (docsIdx > 0) {
-      const beforeDocs = line.charAt(docsIdx - 1);
-      if (beforeDocs === '/' || beforeDocs === '\\') {
-        // Check for ./ or ../ prefix (relative path)
-        if (docsIdx >= 2) {
-          const beforeSlash = line.charAt(docsIdx - 2);
-          if (beforeSlash === '.' && (docsIdx < 3 || !SEPARATOR_OR_DOT.test(line.charAt(docsIdx - 3)))) {
-            // Valid: ./docs or .\docs
-          } else if (beforeSlash === '.' && docsIdx >= 3 && line.charAt(docsIdx - 3) === '.' && (docsIdx < 4 || !SEPARATOR_OR_DOT.test(line.charAt(docsIdx - 4)))) {
-            // Valid: ../docs or ..\docs
-          } else {
-            // Invalid: a/docs, //docs, .//docs, a\docs, \\docs, /docs
-            continue;
-          }
-        } else {
-          // Invalid: /docs at index 1
-          continue;
-        }
-      } else if (IDENT_OR_SEPARATOR_CHAR.test(beforeDocs) || beforeDocs === '.') {
-        // Invalid: adocs, .docs
-        continue;
-      }
-    } else {
-      // docs at line start is valid
-    }
+    // Left boundary: accept only valid relative dot-segment prefixes or docs at start.
+    // Reject: a/../docs, .docs, /docs, identifiers before separators.
+    if (!isValidRelativePrefix(line, docsIdx)) continue;
     // After `docs`, expect one or more separators.
     let pos = scanSeparators(line, docsIdx + 4);
     if (pos === docsIdx + 4) continue;

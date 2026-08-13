@@ -135,7 +135,7 @@ export function isProducerOwnedUrl(url: string, identity: RepositoryIdentity): b
 
 /** Normalize backslashes and percent-encoded slashes to forward slashes. */
 export function normalizePathToken(token: string): string {
-  return token.replace(/\\/g, "/").replace(/%2[fF]/g, "/");
+  return token.replace(/\\/g, "/").replace(/%2[fF]/g, "/").replace(/%5[cC]/g, "/");
 }
 
 /** True when a docs path token is a CONCRETE .md file (not index/template/glob). */
