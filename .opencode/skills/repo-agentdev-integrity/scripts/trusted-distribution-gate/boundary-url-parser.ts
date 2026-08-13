@@ -34,22 +34,28 @@ import {
   classifyAuthority,
   findAuthorityEnd,
   INITIAL_AUTHORITY_SCAN_CURSOR,
-  parseUrlHost,
   scanAuthorityForward,
   type AuthorityScanCursor,
+  type RecognizedHost,
 } from "./boundary-url-authority.ts";
 
 const OWNER_PATTERN = /^[A-Za-z0-9_-]+$/;
 const REPO_PATTERN = /^[A-Za-z0-9_.-]+$/;
 
-/** Scan pattern: case-insensitive recognized host followed by `/` or `:`. */
-const HOST_SCAN = /(?:github\.com|raw\.githubusercontent\.com)(?=[/:])/gi;
+/** Scan pattern: case-insensitive recognized host followed by `/`, `:`,
+ *  or `\`. The backslash terminator catches `github.com\@evil.com/...`
+ *  and `github.com\evil.com/...` — both make the host position ambiguous
+ *  (a backslash is path-like in Win32 but illegal in a URL host) and are
+ *  emitted as malformed rather than skipped (blocker #1, P0). */
+const HOST_SCAN = /(?:github\.com|raw\.githubusercontent\.com)(?=[/:\\])/gi;
 
 /** Evasion host scan: bounded run of host-like chars (including percent-encoded
- * and Unicode dots) followed by `/` or `:`. Bounded to 80 to prevent O(n²)
- * backtracking on adversarial long runs; longest recognized host fully
- * percent-encoded is 72 chars. Post-filtered by canonicalization. */
-const EVASION_HOST_TOKEN = /(?:%[0-9A-Fa-f]{2}|[A-Za-z0-9.\u3002\uFF0E-]){1,80}(?=[/:])/g;
+ *  and Unicode dots) followed by `/`, `:`, or `\`. Bounded to 80 to prevent
+ *  O(n²) backtracking on adversarial long runs; longest recognized host fully
+ *  percent-encoded is 72 chars. Post-filtered by canonicalization. The
+ *  backslash terminator mirrors HOST_SCAN so percent-encoded / Unicode-dot
+ *  hosts followed by a backslash are also caught. */
+const EVASION_HOST_TOKEN = /(?:%[0-9A-Fa-f]{2}|[A-Za-z0-9.\u3002\uFF0E-]){1,80}(?=[/:\\])/g;
 
 /** URL end exclusion set: terminates URL ownership at boundary markers.
  * Backslash is NOT here (it sets pathHasBackslash and extends the URL, marking
@@ -67,10 +73,16 @@ const LEFT_REJECT_CHAR = /[A-Za-z0-9._@:?#&=\\/-]/;
  * GitHub authority (default port accepted; malformed port or backslash
  * authority returns null). Path-lookalike and userinfo-deception URLs return
  * null because their host is not a recognized GitHub authority.
+ *
+ * Calls `classifyAuthority` directly (not `parseUrlHost`) so the host is
+ * typed as `RecognizedHost` and the host branch below is exhaustive:
+ * adding a new recognized host without updating this function is a
+ * compile error via `assertNeverRecognizedHost` (blocker #10).
  */
 export function extractOwnerRepo(url: string): string | null {
-  const host = parseUrlHost(url);
-  if (host === null) return null;
+  const cls = classifyAuthority(url);
+  if (cls.kind !== "valid") return null;
+  const host: RecognizedHost = cls.host;
   const schemeMatch = /^https?:\/\//i.exec(url);
   const afterScheme = schemeMatch ? url.substring(schemeMatch[0].length) : url;
   const slashIdx = afterScheme.indexOf("/");
@@ -84,11 +96,21 @@ export function extractOwnerRepo(url: string): string | null {
     const action = segments[2];
     const tail = segments[3];
     if ((action !== "blob" && action !== "raw") || tail === undefined || tail.length === 0) return null;
-  } else {
+  } else if (host === "raw.githubusercontent.com") {
     const tail = segments[2];
     if (tail === undefined || tail.length === 0) return null;
+  } else {
+    assertNeverRecognizedHost(host);
   }
   return `${owner}/${repo}`;
+}
+
+/** Exhaustiveness guard for the RecognizedHost discriminated branch in
+ *  extractOwnerRepo. If a new host is added to RecognizedHost without
+ *  updating the branch above, the call here fails to typecheck because
+ *  `host` is no longer narrowed to `never` at the call site. */
+function assertNeverRecognizedHost(host: never): never {
+  throw new Error(`unreachable: unrecognized host ${host}`);
 }
 
 /** True when the URL points into the producer's own repo (case-insensitive). */
@@ -178,19 +200,36 @@ export function extractUrls(line: string, cap: number): {
     }
     const urlStart = scan.schemeStart !== -1 ? scan.schemeStart : hostStart;
     const hasScheme = scan.schemeStart !== -1;
-    if (!isValidLeftBoundary(line, urlStart, hasScheme)) continue;
-    const value = line.substring(urlStart, urlEnd);
+    // Scheme-less URL with userinfo before the host (e.g. `user@github.com:443/...`):
+    // extend urlStart back to authorityLeft so the URL value carries the
+    // userinfo+port into classifyAuthority, where the scheme-less port fires
+    // the malformed branch (blocker #9). Without this, `@` in LEFT_REJECT_CHAR
+    // silently rejected the host at the left boundary and the URL vanished.
+    // The deception form `github.com@evil.com/...` is unaffected: HOST_SCAN's
+    // lookahead requires `/`, `:`, or `\` after the host, so `github.com@`
+    // never matches and no candidate is emitted for it.
+    const effectiveUrlStart = !hasScheme && scan.authorityLeft < hostStart && line.substring(scan.authorityLeft, hostStart).includes("@")
+      ? scan.authorityLeft
+      : urlStart;
+    if (!isValidLeftBoundary(line, effectiveUrlStart, hasScheme)) continue;
+    const value = line.substring(effectiveUrlStart, urlEnd);
     const cls = classifyAuthority(value);
-    if (cls.kind === "rejected") continue;
-    if (cls.kind === "malformed" || pathHasBackslash || hasDotSegment(value)) {
+    // Malformed check fires BEFORE the rejected short-circuit: a backslash
+    // in the path makes the host position ambiguous even when classifyAuthority
+    // returns rejected (e.g. `https://github.com\@evil.com/...` classifies as
+    // rejected because the post-`@` host is evil.com, but the backslash still
+    // makes the URL malformed and the gate must fail). Reordering closes the
+    // P0 fail-open hole where the rejected branch hid the path backslash.
+    if (pathHasBackslash || cls.kind === "malformed" || hasDotSegment(value)) {
       const mEnd = cls.kind === "malformed" ? authorityEnd : urlEnd;
       if (out.length >= cap) return { urls: out, overflow: true, steps };
-      out.push({ value: line.substring(urlStart, mEnd), span: { start: urlStart, end: mEnd }, malformed: true, ownershipSpan: null });
+      out.push({ value: line.substring(effectiveUrlStart, mEnd), span: { start: effectiveUrlStart, end: mEnd }, malformed: true, ownershipSpan: null });
       continue;
     }
+    if (cls.kind === "rejected") continue;
     if (extractOwnerRepo(value) === null) continue;
     if (out.length >= cap) return { urls: out, overflow: true, steps };
-    out.push({ value, span: { start: urlStart, end: urlEnd }, malformed: false, ownershipSpan: ownershipSpanFor(urlStart, urlEnd, firstQueryOrFrag) });
+    out.push({ value, span: { start: effectiveUrlStart, end: urlEnd }, malformed: false, ownershipSpan: ownershipSpanFor(effectiveUrlStart, urlEnd, firstQueryOrFrag) });
   }
   EVASION_HOST_TOKEN.lastIndex = 0;
   for (let em: RegExpExecArray | null; (em = EVASION_HOST_TOKEN.exec(line)) !== null;) {

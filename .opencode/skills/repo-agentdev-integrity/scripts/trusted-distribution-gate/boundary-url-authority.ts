@@ -22,10 +22,22 @@
 //
 // Side-effect-free: pure over inputs.
 
-/** Recognized GitHub authority hosts. */
+/** Recognized GitHub authority hosts. The literal set is also the type
+ *  narrow: consumers branch exhaustively on `host === "github.com"` /
+ *  `"raw.githubusercontent.com"` with an `assertNever` final branch, so
+ *  adding a host here is a compile-breaking change surfaced at every
+ *  branch site (blocker #10: closes the silent implicit-else hole). */
 const GITHUB_HOST = "github.com";
 const RAW_HOST = "raw.githubusercontent.com";
-const RECOGNIZED_HOSTS: ReadonlySet<string> = new Set([GITHUB_HOST, RAW_HOST]);
+export type RecognizedHost = "github.com" | "raw.githubusercontent.com";
+
+/** Type guard: narrows `s` to RecognizedHost so the discriminated-union
+ *  variants below carry a typed host rather than `string`. Replaces the
+ *  prior `Set<string>.has` lookup, which left the host typed as `string`
+ *  and let an unreachable third-host branch compile silently. */
+function isRecognizedHost(s: string): s is RecognizedHost {
+  return s === GITHUB_HOST || s === RAW_HOST;
+}
 
 /** Authority terminator: first of these ends the authority region. */
 const AUTHORITY_TERMINATOR = /[/?#]/;
@@ -44,11 +56,15 @@ const ALPHA = /[A-Za-z]/;
 
 export type AuthorityKind = "valid" | "malformed" | "rejected";
 
-export interface AuthorityClassification {
-  readonly kind: AuthorityKind;
-  /** Lowercased recognized host when kind is valid or malformed; null otherwise. */
-  readonly host: string | null;
-}
+/** Discriminated by `kind`. The `valid` and `malformed` variants carry a
+ *  typed `RecognizedHost` (the host is by definition recognized for those
+ *  kinds); the `rejected` variant carries `null`. The narrow host type is
+ *  what makes the implicit-else branch in extractOwnerRepo a compile
+ *  error rather than a silent fallthrough (blocker #10). */
+export type AuthorityClassification =
+  | { readonly kind: "valid"; readonly host: RecognizedHost }
+  | { readonly kind: "malformed"; readonly host: RecognizedHost }
+  | { readonly kind: "rejected"; readonly host: null };
 
 /** Default port for a scheme: 443 for https, 80 for http, null otherwise. */
 function defaultPortForScheme(scheme: string | null): number | null {
@@ -81,7 +97,7 @@ export function classifyAuthority(url: string): AuthorityClassification {
     const colonIdx = seg.indexOf(":");
     const host = colonIdx === -1 ? seg : seg.substring(0, colonIdx);
     const hostLower = host.toLowerCase();
-    if (host.length > 0 && RECOGNIZED_HOSTS.has(hostLower)) {
+    if (host.length > 0 && isRecognizedHost(hostLower)) {
       return { kind: "malformed", host: hostLower };
     }
     return { kind: "rejected", host: null };
@@ -92,7 +108,7 @@ export function classifyAuthority(url: string): AuthorityClassification {
   const host = colonIdx === -1 ? hostPort : hostPort.substring(0, colonIdx);
   const portStr = colonIdx === -1 ? null : hostPort.substring(colonIdx + 1);
   const hostLower = host.toLowerCase();
-  if (!RECOGNIZED_HOSTS.has(hostLower)) return { kind: "rejected", host: null };
+  if (!isRecognizedHost(hostLower)) return { kind: "rejected", host: null };
   if (portStr !== null) {
     if (!PORT_DIGITS.test(portStr)) return { kind: "malformed", host: hostLower };
     const port = parseInt(portStr, 10);
@@ -106,6 +122,11 @@ export function classifyAuthority(url: string): AuthorityClassification {
  * Return the lowercased host of a URL whose authority is VALID, or null.
  * Malformed and rejected authorities return null so legacy callers
  * (extractOwnerRepo, isProducerOwnedUrl) treat them as non-GitHub.
+ *
+ * Kept as `string | null` (not `RecognizedHost | null`) so legacy callers
+ * that compare against `string` literals keep typechecking. New code that
+ * needs the narrow host should call `classifyAuthority` directly and read
+ * `cls.host` from the discriminated union (see extractOwnerRepo).
  */
 export function parseUrlHost(url: string): string | null {
   const cls = classifyAuthority(url);
