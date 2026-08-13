@@ -10,14 +10,9 @@
 //   - unsupported-scheme fallback (evil://, ftp:// are not scheme-less)
 
 import { describe, expect, test } from "bun:test";
-import {
-  detectCandidates,
-  detectReconstructedIds,
-  type DetectorConfig,
-  type Candidate,
-} from "./boundary-pipeline.ts";
+import { detectCandidates, detectReconstructedIds, type DetectorConfig, type Candidate, type OverflowReason } from "./boundary-pipeline.ts";
 import { decideProjection, type ClassifyFileInput } from "./boundary-gate.ts";
-import type { Detection } from "./types.ts";
+import type { Detection, GateResult } from "./types.ts";
 
 const baseConfig: DetectorConfig = {
   repository_identity: { owner_slash_name: "yogata/agent-dev-flow", default_branch: "main" },
@@ -34,13 +29,25 @@ function urls(cs: readonly Candidate[]) {
   return cs.filter((c) => c.type === "url");
 }
 
+function assertOverflowReason(candidates: readonly Candidate[], expectedReason: OverflowReason) {
+  const overflow = candidates.find((c) => c.type === "overflow");
+  expect(overflow).toBeDefined();
+  if (overflow && overflow.type === "overflow") {
+    expect(overflow.reason).toBe(expectedReason);
+  }
+}
+
+function findFailureByCategory(gate: GateResult, category: Detection["category"]): Detection | undefined {
+  return gate.failures.find((d: Detection) => d.category === category);
+}
+
 // T1.1: userinfo extraction - producer URL with userinfo is still producer-internal
 describe("T1.1 userinfo / producer URL with userinfo is producer-internal", () => {
   test("https://user@github.com/yogata/agent-dev-flow/blob/main/src/index.ts extracts one producer URL and gate fails", () => {
     const text = "See https://user@github.com/yogata/agent-dev-flow/blob/main/src/index.ts here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const fail = g.failures.find((d: Detection) => d.category === "fixed-url");
+    const fail = findFailureByCategory(g, "fixed-url");
     expect(fail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
     expect(urls(cs).length).toBe(1);
@@ -65,7 +72,7 @@ describe("T1.3 punctuation termination / URL ends at comma/semicolon/CJK", () =>
     const g = gateFor(text);
     expect(g.pass).toBe(false);
     // docs/specs/foo.md is producer-internal and should trigger failure
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail?.classification).toBe("producer-internal");
   });
 
@@ -73,7 +80,7 @@ describe("T1.3 punctuation termination / URL ends at comma/semicolon/CJK", () =>
     const text = "See https://github.com/vercel/next.js/blob/main/x.md\u3002 ADR-0001 here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const idFail = g.failures.find((d: Detection) => d.category === "concrete-id");
+    const idFail = findFailureByCategory(g, "concrete-id");
     expect(idFail?.classification).toBe("producer-internal");
   });
 
@@ -81,7 +88,7 @@ describe("T1.3 punctuation termination / URL ends at comma/semicolon/CJK", () =>
     const text = "See https://github.com/vercel/next.js/blob/main/x.md\uFF1B ADR-0001 here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const idFail = g.failures.find((d: Detection) => d.category === "concrete-id");
+    const idFail = findFailureByCategory(g, "concrete-id");
     expect(idFail?.classification).toBe("producer-internal");
   });
 });
@@ -92,7 +99,7 @@ describe("T1.4 query and fragment / remain inside URL ownership", () => {
     const text = "See https://github.com/yogata/agent-dev-flow/blob/main/x.md?query=1#fragment here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const fail = g.failures.find((d: Detection) => d.category === "fixed-url");
+    const fail = findFailureByCategory(g, "fixed-url");
     expect(fail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
     expect(urls(cs).length).toBe(1);
@@ -123,7 +130,7 @@ describe("T1.5 unsupported-scheme / evil:// and ftp:// are not scheme-less GitHu
     const text = "See https://github.com/yogata/agent-dev-flow/blob/main/x.md end.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const fail = g.failures.find((d: Detection) => d.category === "fixed-url");
+    const fail = findFailureByCategory(g, "fixed-url");
     expect(fail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
     expect(urls(cs).length).toBe(1);
@@ -144,7 +151,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
     const text = "See ./docs/specs/foo.md here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail?.classification).toBe("producer-internal");
   });
 
@@ -152,7 +159,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
     const text = "See ../docs/specs/foo.md here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail?.classification).toBe("producer-internal");
   });
 
@@ -160,7 +167,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
     const text = "See .\\docs\\specs\\foo.md here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail?.classification).toBe("producer-internal");
   });
 
@@ -168,7 +175,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
     const text = "See ..\\docs\\specs\\foo.md here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail?.classification).toBe("producer-internal");
   });
 
@@ -176,7 +183,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
     const text = "See .docs/specs/foo.md here.";
     const g = gateFor(text);
     expect(g.pass).toBe(true);
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail).toBeUndefined();
   });
 
@@ -184,7 +191,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
     const text = "See /docs/specs/foo.md here.";
     const g = gateFor(text);
     expect(g.pass).toBe(true);
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail).toBeUndefined();
   });
 
@@ -192,7 +199,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
     const text = "See a/../docs/specs/foo.md here.";
     const g = gateFor(text);
     expect(g.pass).toBe(true);
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail).toBeUndefined();
   });
 
@@ -200,7 +207,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
     const text = "See https://evil.docs/specs/x.md here.";
     const g = gateFor(text);
     expect(g.pass).toBe(true);
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail).toBeUndefined();
   });
 
@@ -208,7 +215,7 @@ describe("T2 relative docs-path left-boundary handling", () => {
     const text = "See docs/specs/foo.md here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail?.classification).toBe("producer-internal");
   });
 });
@@ -220,11 +227,7 @@ describe("T3 owned-span reconstruction suppression", () => {
   test("single token with 17 reconstructable IDs overflows when standalone", () => {
     const token = "ADR-0x31-".repeat(17);
     const cs = detectCandidates(token, baseConfig);
-    const overflow = cs.find((c) => c.type === "overflow");
-    expect(overflow).toBeDefined();
-    if (overflow && overflow.type === "overflow") {
-      expect(overflow.reason).toBe("token-ids-exceeded");
-    }
+    assertOverflowReason(cs, "token-ids-exceeded");
   });
 
   test("17 reconstructable IDs inside external GitHub URL do NOT overflow, gate passes", () => {
@@ -263,7 +266,7 @@ describe("T3 owned-span reconstruction suppression", () => {
     expect(overflow).toBeUndefined();
 
     // Gate failure should be fixed-url (producer-internal)
-    const urlFail = g.failures.find((d: Detection) => d.category === "fixed-url");
+    const urlFail = findFailureByCategory(g, "fixed-url");
     expect(urlFail?.classification).toBe("producer-internal");
   });
 
@@ -286,7 +289,7 @@ describe("T3 owned-span reconstruction suppression", () => {
     expect(overflow).toBeUndefined();
 
     // Gate failure should be concrete-path (producer-internal)
-    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    const pathFail = findFailureByCategory(g, "concrete-path");
     expect(pathFail?.classification).toBe("producer-internal");
   });
 
@@ -317,10 +320,6 @@ describe("T3 owned-span reconstruction suppression", () => {
     const longSegment = "A".repeat(70000);
     const text = `See ${longSegment} ADR-0001 here.`;
     const cs = detectCandidates(text, baseConfig);
-    const overflow = cs.find((c) => c.type === "overflow");
-    expect(overflow).toBeDefined();
-    if (overflow && overflow.type === "overflow") {
-      expect(overflow.reason).toBe("line-scan-exceeded");
-    }
+    assertOverflowReason(cs, "line-scan-exceeded");
   });
 });
