@@ -31,7 +31,11 @@
 import type { Span } from "./boundary-candidate-ownership.ts";
 
 const DOCS_FAMILIES: readonly string[] = ["adr", "requirements", "specs", "decisions"];
-const PATH_STOP_CHAR = /[\s)\]\|"'`<>{},;:#?!。 、！]/;
+// Same CJK punctuation set as LEFT_BOUNDARY (U+FF1A, U+FF1B, U+FF0C,
+// U+FF1F, U+2014): when these terminate a docs path's content, the scan
+// must stop so the `.md` endpoint is recognized instead of leaking the
+// path as `foo.md<fullwidth>end` (review-v8 blocker #1).
+const PATH_STOP_CHAR = /[\s)\]\|"'`<>{},;:#?!。 、！\uFF1A\uFF1B\uFF0C\uFF1F\u2014]/;
 
 export interface ExtractedPath {
   readonly value: string;
