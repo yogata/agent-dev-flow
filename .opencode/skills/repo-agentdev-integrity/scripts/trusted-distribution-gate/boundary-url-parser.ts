@@ -46,11 +46,6 @@ const HOST_SCAN = /(?:github\.com|raw\.githubusercontent\.com)\//gi;
  */
 const URL_STOP_CHAR = /[\s)\]|\\"'`<>{},;\u3001\u3002\uFF1B\uFF0C\uFF01\uFF1F]/;
 
-/** Scheme prefix lookbehind: accept when the 3 chars before the host are `://`. */
-function precededBySchemeSeparator(line: string, hostStart: number): boolean {
-  return hostStart >= 3 && line.substring(hostStart - 3, hostStart) === "://";
-}
-
 /** Preceding char rejects the left boundary (host/path/query continuation). */
 const LEFT_REJECT_CHAR = /[A-Za-z0-9._@:?#&=\\/-]/;
 
@@ -160,7 +155,6 @@ export function extractUrls(line: string, cap: number): {
 } {
   const out: ExtractedUrl[] = [];
   HOST_SCAN.lastIndex = 0;
-  let m: RegExpExecArray | null;
   for (let m: RegExpExecArray | null; (m = HOST_SCAN.exec(line)) !== null;) {
     const matchEnd = m.index + m[0].length; // index right after the trailing `/`
     // The host starts at m.index. But the regex may have matched a host
@@ -181,22 +175,6 @@ export function extractUrls(line: string, cap: number): {
     out.push({ value, span: { start, end } });
   }
   return { urls: out, overflow: false };
-}
-
-/** Find the start index of an `http(s)://` scheme ending exactly at `end`. */
-function findSchemeStart(line: string, end: number): number {
-  // `end` points at the `g` of `github.com` (or `r` of `raw.`), so
-  // line.substring(end-3, end) === "://". The scheme name precedes `://`.
-  const schemeSearchEnd = end - 3; // position of `:`
-  // Walk back from schemeSearchEnd-1 over scheme-name chars `[A-Za-z]`.
-  let i = schemeSearchEnd - 1;
-  while (i >= 0 && /[A-Za-z]/.test(line.charAt(i))) i--;
-  // i is now one position before the first scheme char. The scheme is
-  // line.substring(i+1, schemeSearchEnd). Accept only http/https (no
-  // credential-bearing schemes like password://).
-  const scheme = line.substring(i + 1, schemeSearchEnd).toLowerCase();
-  if (scheme === "http" || scheme === "https") return i + 1;
-  return -1;
 }
 
 /** Find the start index of an `http(s)://` scheme before the host position.

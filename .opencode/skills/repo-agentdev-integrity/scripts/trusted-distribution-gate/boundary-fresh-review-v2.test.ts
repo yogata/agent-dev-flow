@@ -11,11 +11,11 @@
 
 import { describe, expect, test } from "bun:test";
 import {
-  classifyLine,
   detectCandidates,
   type DetectorConfig,
 } from "./boundary-pipeline.ts";
 import { decideProjection, type ClassifyFileInput } from "./boundary-gate.ts";
+import type { Detection } from "./types.ts";
 
 const baseConfig: DetectorConfig = {
   repository_identity: { owner_slash_name: "yogata/agent-dev-flow", default_branch: "main" },
@@ -38,7 +38,7 @@ describe("T1.1 userinfo / producer URL with userinfo is producer-internal", () =
     const text = "See https://user@github.com/yogata/agent-dev-flow/blob/main/src/index.ts here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const fail = g.failures.find((d: any) => d.category === "fixed-url");
+    const fail = g.failures.find((d: Detection) => d.category === "fixed-url");
     expect(fail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
     expect(urls(cs).length).toBe(1);
@@ -63,7 +63,7 @@ describe("T1.3 punctuation termination / URL ends at comma/semicolon/CJK", () =>
     const g = gateFor(text);
     expect(g.pass).toBe(false);
     // docs/specs/foo.md is producer-internal and should trigger failure
-    const pathFail = g.failures.find((d: any) => d.category === "concrete-path");
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
     expect(pathFail?.classification).toBe("producer-internal");
   });
 
@@ -71,7 +71,7 @@ describe("T1.3 punctuation termination / URL ends at comma/semicolon/CJK", () =>
     const text = "See https://github.com/vercel/next.js/blob/main/x.md\u3002 ADR-0001 here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const idFail = g.failures.find((d: any) => d.category === "concrete-id");
+    const idFail = g.failures.find((d: Detection) => d.category === "concrete-id");
     expect(idFail?.classification).toBe("producer-internal");
   });
 
@@ -79,7 +79,7 @@ describe("T1.3 punctuation termination / URL ends at comma/semicolon/CJK", () =>
     const text = "See https://github.com/vercel/next.js/blob/main/x.md\uFF1B ADR-0001 here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const idFail = g.failures.find((d: any) => d.category === "concrete-id");
+    const idFail = g.failures.find((d: Detection) => d.category === "concrete-id");
     expect(idFail?.classification).toBe("producer-internal");
   });
 });
@@ -90,7 +90,7 @@ describe("T1.4 query and fragment / remain inside URL ownership", () => {
     const text = "See https://github.com/yogata/agent-dev-flow/blob/main/x.md?query=1#fragment here.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const fail = g.failures.find((d: any) => d.category === "fixed-url");
+    const fail = g.failures.find((d: Detection) => d.category === "fixed-url");
     expect(fail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
     expect(urls(cs).length).toBe(1);
@@ -121,7 +121,7 @@ describe("T1.5 unsupported-scheme / evil:// and ftp:// are not scheme-less GitHu
     const text = "See https://github.com/yogata/agent-dev-flow/blob/main/x.md end.";
     const g = gateFor(text);
     expect(g.pass).toBe(false);
-    const fail = g.failures.find((d: any) => d.category === "fixed-url");
+    const fail = g.failures.find((d: Detection) => d.category === "fixed-url");
     expect(fail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
     expect(urls(cs).length).toBe(1);
