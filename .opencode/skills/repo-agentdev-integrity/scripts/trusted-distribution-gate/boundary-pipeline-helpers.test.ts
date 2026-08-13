@@ -20,6 +20,7 @@ const baseConfig: DetectorConfig = {
   producer_internal_id_prefixes: [
     "ADR", "REQ", "DEC", "SPEC", "IR", "RU", "TS", "AG", "OU", "EC",
   ],
+  distributed_workflow_control_prefixes: ["STEP", "QG"],
 };
 
 describe("boundary-pipeline helpers / normalizePathToken", () => {
@@ -115,5 +116,96 @@ describe("boundary-pipeline helpers / isConcreteDocsPath", () => {
   });
   test("accepts concrete markdown file", () => {
     expect(isConcreteDocsPath("docs/adr/ADR-0001.md")).toBe(true);
+  });
+});
+
+describe("Stage A vocabulary amendment - evasion detection helpers", () => {
+  const cfgWithStepQg: DetectorConfig = {
+    ...baseConfig,
+    distributed_workflow_control_prefixes: ["STEP", "QG"],
+  };
+
+  describe("ID-shaped evasion: \\uXXXX escape patterns", () => {
+    test("detects evasion with \\uXXXX after producer prefix", () => {
+      const r = resolveCandidate({ type: "evasion", value: "ADR-\\u0041" }, cfgWithStepQg);
+      expect(r.classification).toBe("unclassified");
+      expect(r.category).toBe("evasion-attempt");
+    });
+
+    test("detects evasion with \\uXXXX after unknown prefix", () => {
+      const r = resolveCandidate({ type: "evasion", value: "MYSTERY-\\u0041" }, cfgWithStepQg);
+      expect(r.classification).toBe("unclassified");
+      expect(r.category).toBe("evasion-attempt");
+    });
+
+    test("detects evasion with \\uXXXX after STEP/QG prefix", () => {
+      const r1 = resolveCandidate({ type: "evasion", value: "STEP-\\u0031" }, cfgWithStepQg);
+      expect(r1.classification).toBe("unclassified");
+      expect(r1.category).toBe("evasion-attempt");
+
+      const r2 = resolveCandidate({ type: "evasion", value: "QG-\\u0032" }, cfgWithStepQg);
+      expect(r2.classification).toBe("unclassified");
+      expect(r2.category).toBe("evasion-attempt");
+    });
+  });
+
+  describe("ID-shaped evasion: \\xXX escape patterns", () => {
+    test("detects evasion with \\xXX after producer prefix", () => {
+      const r = resolveCandidate({ type: "evasion", value: "REQ-\\x31" }, cfgWithStepQg);
+      expect(r.classification).toBe("unclassified");
+      expect(r.category).toBe("evasion-attempt");
+    });
+
+    test("detects evasion with \\xXX after unknown prefix", () => {
+      const r = resolveCandidate({ type: "evasion", value: "FOO-\\x42" }, cfgWithStepQg);
+      expect(r.classification).toBe("unclassified");
+      expect(r.category).toBe("evasion-attempt");
+    });
+  });
+
+  describe("ID-shaped evasion: 0xXX hex literal patterns", () => {
+    test("detects evasion with 0xXX after producer prefix", () => {
+      const r = resolveCandidate({ type: "evasion", value: "DEC-0x33" }, cfgWithStepQg);
+      expect(r.classification).toBe("unclassified");
+      expect(r.category).toBe("evasion-attempt");
+    });
+
+    test("detects evasion with 0xXX after unknown prefix", () => {
+      const r = resolveCandidate({ type: "evasion", value: "BAR-0x44" }, cfgWithStepQg);
+      expect(r.classification).toBe("unclassified");
+      expect(r.category).toBe("evasion-attempt");
+    });
+
+    test("detects evasion with 0xXXXX (4-digit)", () => {
+      const r = resolveCandidate({ type: "evasion", value: "SPEC-0x1234" }, cfgWithStepQg);
+      expect(r.classification).toBe("unclassified");
+      expect(r.category).toBe("evasion-attempt");
+    });
+  });
+
+  describe("distributed workflow control STEP/QG classification", () => {
+    test("STEP-N resolves to generic-or-template with distributed-control", () => {
+      const r = resolveCandidate({ type: "id", value: "STEP-1" }, cfgWithStepQg);
+      expect(r.classification).toBe("generic-or-template");
+      expect(r.category).toBe("distributed-control");
+    });
+
+    test("QG-N resolves to generic-or-template with distributed-control", () => {
+      const r = resolveCandidate({ type: "id", value: "QG-2" }, cfgWithStepQg);
+      expect(r.classification).toBe("generic-or-template");
+      expect(r.category).toBe("distributed-control");
+    });
+
+    test("unknown prefix remains unclassified (fail-closed)", () => {
+      const r = resolveCandidate({ type: "id", value: "UNKNOWN-99" }, cfgWithStepQg);
+      expect(r.classification).toBe("unclassified");
+      expect(r.category).toBe("unclassified-entry");
+    });
+
+    test("producer prefixes remain concrete violations", () => {
+      const r = resolveCandidate({ type: "id", value: "ADR-0001" }, cfgWithStepQg);
+      expect(r.classification).toBe("producer-internal");
+      expect(r.category).toBe("concrete-id");
+    });
   });
 });

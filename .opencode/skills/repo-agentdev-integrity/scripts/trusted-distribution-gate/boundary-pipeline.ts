@@ -44,6 +44,11 @@ export interface DetectorConfig {
   readonly repository_identity: RepositoryIdentity;
   /** Producer-internal ID prefixes (UPPER-CASE letters only). */
   readonly producer_internal_id_prefixes: readonly string[];
+  /**
+   * Distributed workflow control ID prefixes (e.g. STEP, QG). These are
+   * classified as generic-or-template with category distributed-control.
+   */
+  readonly distributed_workflow_control_prefixes: readonly string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -54,9 +59,16 @@ export interface DetectorConfig {
 // and 1+ digits. Captures ADR/REQ/DEC/SPEC/IR/RU/TS/AG/OU/EC AND any future
 // family. Classification stage decides producer-internal vs unclassified.
 //
+// UTF-8, UTF-16, UTF-32 are encoding labels and must NOT match as IDs.
 // Template placeholders ({NNNN}, <NNNN>, *) do not match because \d requires
 // actual digits and the placeholder wrappers are not uppercase letters.
 export const GENERIC_ID_PATTERN = /\b([A-Z]{2,})-(\d{1,})\b/g;
+
+// ID-shaped evasion patterns: uppercase prefix + hyphen + \uXXXX, \xXX, or 0xXX
+const EVASION_PATTERN = /\b([A-Z]{2,})-(\\u[0-9A-Fa-f]{4}|\\x[0-9A-Fa-f]{2}|0x[0-9A-Fa-f]{2,})\b/g;
+
+// UTF encoding labels that should NOT be treated as ID candidates.
+const UTF_ENCODING_LABELS = new Set(["UTF-8", "UTF-16", "UTF-32"]);
 
 // Candidate docs path token, allowing mixed slash/backslash/percent-encoding.
 // Captures the broad token; resolution normalizes and inspects.
@@ -150,7 +162,7 @@ function trimSnippet(line: string, maxLen: number): string {
 // Pipeline stage 1: extract
 // ---------------------------------------------------------------------------
 
-export type CandidateType = "id" | "path" | "url";
+export type CandidateType = "id" | "path" | "url" | "evasion";
 
 export interface Candidate {
   readonly type: CandidateType;
@@ -183,7 +195,17 @@ export function detectCandidates(line: string, _cfg: DetectorConfig): Candidate[
     const start = m.index ?? 0;
     const end = start + m[0].length;
     if (isTemplateWrappedId(line, start, end)) continue;
+    // UTF-8, UTF-16, UTF-32 are encoding labels, not ID candidates.
+    if (UTF_ENCODING_LABELS.has(m[0])) continue;
     out.push({ type: "id", value: m[0] });
+  }
+
+  // ID-shaped evasion patterns: uppercase prefix + hyphen + \uXXXX, \xXX, or 0xXX
+  for (const m of line.matchAll(EVASION_PATTERN)) {
+    const start = m.index ?? 0;
+    const end = start + m[0].length;
+    if (isTemplateWrappedId(line, start, end)) continue;
+    out.push({ type: "evasion", value: m[0] });
   }
 
   // Docs path (slash and backslash).
@@ -218,6 +240,11 @@ export function resolveCandidate(c: Candidate, cfg: DetectorConfig): {
   classification: DependencyClass;
   category: DetectionCategory;
 } {
+  if (c.type === "evasion") {
+    // Evasion attempts must fail closed as unclassified.
+    return { classification: "unclassified", category: "evasion-attempt" };
+  }
+
   if (c.type === "id") {
     // Extract the UPPER prefix to classify.
     const m = /^([A-Z]{2,})-\d{1,}$/.exec(c.value);
@@ -226,6 +253,12 @@ export function resolveCandidate(c: Candidate, cfg: DetectorConfig): {
       return { classification: "unclassified", category: "unclassified-entry" };
     }
     const prefix = m[1] ?? "";
+
+    // Distributed workflow control: STEP-N, QG-N are generic-or-template.
+    if (cfg.distributed_workflow_control_prefixes.includes(prefix)) {
+      return { classification: "generic-or-template", category: "distributed-control" };
+    }
+
     if (cfg.producer_internal_id_prefixes.includes(prefix)) {
       return { classification: "producer-internal", category: "concrete-id" };
     }
