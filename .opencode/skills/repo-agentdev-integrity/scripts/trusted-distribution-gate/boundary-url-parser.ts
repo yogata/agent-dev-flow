@@ -9,6 +9,13 @@
 //   - Scheme form: `https?://[userinfo@]host[:port][/path][?query][#frag]`.
 //     Port is NOT supported: `host:port` is rejected (host with `:` is not
 //     a valid hostname for the GitHub authority).
+//   - Scheme discovery walks only the lexical authority/userinfo region
+//     immediately preceding the host and parses the full RFC 3986 scheme
+//     token. Only exactly `http`/`https` is accepted, so composite schemes
+//     such as `git+https://` are unsupported and cannot own/hide contained
+//     producer references. The walk never crosses whitespace, a path
+//     separator, or another token, so a later bare host never grabs an
+//     earlier URL's scheme.
 //   - Userinfo is stripped via the LAST `@` so `https://github.com@evil.com`
 //     is parsed as userinfo=`github.com`, host=`evil.com` — not a GitHub
 //     authority.
@@ -49,13 +56,19 @@ const URL_STOP_CHAR = /[\s)\]|\\"'`<>{},;\u3001\u3002\uFF1B\uFF0C\uFF01\uFF1F]/;
 /** Preceding char rejects the left boundary (host/path/query continuation). */
 const LEFT_REJECT_CHAR = /[A-Za-z0-9._@:?#&=\\/-]/;
 
+/** Characters allowed inside a URL authority (userinfo) region (RFC 3986). */
+const AUTHORITY_CHAR = /[A-Za-z0-9._~!$&'()*+,;=:@%]/;
+
+/** One character of an RFC 3986 scheme token: ALPHA / DIGIT / "+" / "-" / ".". */
+const SCHEME_CHAR = /[A-Za-z0-9+\-.]/;
+
 /**
  * Decide whether `hostStart` is a valid left boundary for a scheme-less
  * authority. Returns true when the host begins the URL (start of line,
  * whitespace, opening punctuation, etc.) or is preceded by `://`.
  *
  * When the host is preceded by `://`, the scheme must be http or https.
- * Unsupported schemes (evil://, ftp://, etc.) cause rejection.
+ * Unsupported schemes (evil://, ftp://, git+https://, etc.) cause rejection.
  *
  * For scheme URLs, we validate the boundary at the scheme start, not at
  * the host start, to correctly handle userinfo.
@@ -177,20 +190,29 @@ export function extractUrls(line: string, cap: number): {
   return { urls: out, overflow: false };
 }
 
-/** Find the start index of an `http(s)://` scheme before the host position.
- * Returns -1 if the scheme is not http/https.
+/**
+ * Find the start index of an `http(s)://` scheme whose authority ends at
+ * `hostStart`. Walks backward ONLY through the lexical authority/userinfo
+ * region, so whitespace, a path separator, or another token halts the walk
+ * and yields -1 — a later bare host can never grab an earlier URL's scheme.
+ * When `://` is reached, the full RFC-style scheme token is parsed and
+ * accepted only when it is exactly `http` or `https`; composite schemes
+ * such as `git+https` are unsupported and return -1.
  */
 function findSchemeStartBeforeHost(line: string, hostStart: number): number {
-  // Look for `://` pattern before the host. The scheme is immediately before `://`.
-  for (let i = hostStart - 1; i >= 3; i--) {
+  let i = hostStart - 1;
+  while (i >= 3) {
     if (line.substring(i - 2, i + 1) === "://") {
-      // Found `://` at positions i-2, i-1, i. Check if the preceding chars form http or https.
       const schemeEnd = i - 2;
       let j = schemeEnd - 1;
-      while (j >= 0 && /[A-Za-z]/.test(line.charAt(j))) j--;
-      const scheme = line.substring(j + 1, schemeEnd).toLowerCase();
-      if (scheme === "http" || scheme === "https") return j + 1;
+      if (j < 0 || !/[A-Za-z]/.test(line.charAt(j))) return -1;
+      while (j > 0 && SCHEME_CHAR.test(line.charAt(j - 1))) j--;
+      const scheme = line.substring(j, schemeEnd).toLowerCase();
+      if (scheme === "http" || scheme === "https") return j;
+      return -1;
     }
+    if (!AUTHORITY_CHAR.test(line.charAt(i))) return -1;
+    i--;
   }
   return -1;
 }
