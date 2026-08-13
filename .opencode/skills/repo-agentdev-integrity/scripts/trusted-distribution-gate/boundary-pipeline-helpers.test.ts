@@ -2,6 +2,9 @@
 // detectCandidates, resolveCandidate. Extracted from
 // boundary-pipeline.test.ts to keep that file under the 250 pure LOC
 // ceiling (parent defect #12).
+//
+// Stage A vocabulary amendment / evasion helper coverage lives in
+// boundary-pipeline-evasion.test.ts.
 
 import { describe, expect, test } from "bun:test";
 import {
@@ -47,20 +50,20 @@ describe("boundary-pipeline helpers / detectCandidates", () => {
     const cs = detectCandidates("See ADR-0001 and docs/specs/ADR-0002.md", baseConfig);
     expect(cs.length).toBeGreaterThanOrEqual(2);
     const types = cs.map((c) => c.type).sort();
-    expect(types).toContain("id");
+    expect(types).toContain("direct-id");
     expect(types).toContain("path");
   });
 });
 
 describe("boundary-pipeline helpers / resolveCandidate", () => {
   test("known ID prefix resolves to producer-internal", () => {
-    const r = resolveCandidate({ type: "id", value: "REQ-0001" }, baseConfig);
+    const r = resolveCandidate({ type: "direct-id", value: "REQ-0001" }, baseConfig);
     expect(r.classification).toBe("producer-internal");
     expect(r.category).toBe("concrete-id");
   });
 
   test("unknown ID prefix resolves to unclassified (fail-closed)", () => {
-    const r = resolveCandidate({ type: "id", value: "MYSTERY-99" }, baseConfig);
+    const r = resolveCandidate({ type: "direct-id", value: "MYSTERY-99" }, baseConfig);
     expect(r.classification).toBe("unclassified");
     expect(r.category).toBe("unclassified-entry");
   });
@@ -116,96 +119,5 @@ describe("boundary-pipeline helpers / isConcreteDocsPath", () => {
   });
   test("accepts concrete markdown file", () => {
     expect(isConcreteDocsPath("docs/adr/ADR-0001.md")).toBe(true);
-  });
-});
-
-describe("Stage A vocabulary amendment - evasion detection helpers", () => {
-  const cfgWithStepQg: DetectorConfig = {
-    ...baseConfig,
-    distributed_workflow_control_prefixes: ["STEP", "QG"],
-  };
-
-  describe("ID-shaped evasion: \\uXXXX escape patterns", () => {
-    test("detects evasion with \\uXXXX after producer prefix", () => {
-      const r = resolveCandidate({ type: "evasion", value: "ADR-\\u0041" }, cfgWithStepQg);
-      expect(r.classification).toBe("unclassified");
-      expect(r.category).toBe("evasion-attempt");
-    });
-
-    test("detects evasion with \\uXXXX after unknown prefix", () => {
-      const r = resolveCandidate({ type: "evasion", value: "MYSTERY-\\u0041" }, cfgWithStepQg);
-      expect(r.classification).toBe("unclassified");
-      expect(r.category).toBe("evasion-attempt");
-    });
-
-    test("detects evasion with \\uXXXX after STEP/QG prefix", () => {
-      const r1 = resolveCandidate({ type: "evasion", value: "STEP-\\u0031" }, cfgWithStepQg);
-      expect(r1.classification).toBe("unclassified");
-      expect(r1.category).toBe("evasion-attempt");
-
-      const r2 = resolveCandidate({ type: "evasion", value: "QG-\\u0032" }, cfgWithStepQg);
-      expect(r2.classification).toBe("unclassified");
-      expect(r2.category).toBe("evasion-attempt");
-    });
-  });
-
-  describe("ID-shaped evasion: \\xXX escape patterns", () => {
-    test("detects evasion with \\xXX after producer prefix", () => {
-      const r = resolveCandidate({ type: "evasion", value: "REQ-\\x31" }, cfgWithStepQg);
-      expect(r.classification).toBe("unclassified");
-      expect(r.category).toBe("evasion-attempt");
-    });
-
-    test("detects evasion with \\xXX after unknown prefix", () => {
-      const r = resolveCandidate({ type: "evasion", value: "FOO-\\x42" }, cfgWithStepQg);
-      expect(r.classification).toBe("unclassified");
-      expect(r.category).toBe("evasion-attempt");
-    });
-  });
-
-  describe("ID-shaped evasion: 0xXX hex literal patterns", () => {
-    test("detects evasion with 0xXX after producer prefix", () => {
-      const r = resolveCandidate({ type: "evasion", value: "DEC-0x33" }, cfgWithStepQg);
-      expect(r.classification).toBe("unclassified");
-      expect(r.category).toBe("evasion-attempt");
-    });
-
-    test("detects evasion with 0xXX after unknown prefix", () => {
-      const r = resolveCandidate({ type: "evasion", value: "BAR-0x44" }, cfgWithStepQg);
-      expect(r.classification).toBe("unclassified");
-      expect(r.category).toBe("evasion-attempt");
-    });
-
-    test("detects evasion with 0xXXXX (4-digit)", () => {
-      const r = resolveCandidate({ type: "evasion", value: "SPEC-0x1234" }, cfgWithStepQg);
-      expect(r.classification).toBe("unclassified");
-      expect(r.category).toBe("evasion-attempt");
-    });
-  });
-
-  describe("distributed workflow control STEP/QG classification", () => {
-    test("STEP-N resolves to generic-or-template with distributed-control", () => {
-      const r = resolveCandidate({ type: "id", value: "STEP-1" }, cfgWithStepQg);
-      expect(r.classification).toBe("generic-or-template");
-      expect(r.category).toBe("distributed-control");
-    });
-
-    test("QG-N resolves to generic-or-template with distributed-control", () => {
-      const r = resolveCandidate({ type: "id", value: "QG-2" }, cfgWithStepQg);
-      expect(r.classification).toBe("generic-or-template");
-      expect(r.category).toBe("distributed-control");
-    });
-
-    test("unknown prefix remains unclassified (fail-closed)", () => {
-      const r = resolveCandidate({ type: "id", value: "UNKNOWN-99" }, cfgWithStepQg);
-      expect(r.classification).toBe("unclassified");
-      expect(r.category).toBe("unclassified-entry");
-    });
-
-    test("producer prefixes remain concrete violations", () => {
-      const r = resolveCandidate({ type: "id", value: "ADR-0001" }, cfgWithStepQg);
-      expect(r.classification).toBe("producer-internal");
-      expect(r.category).toBe("concrete-id");
-    });
   });
 });

@@ -29,6 +29,7 @@ import type {
   LineInput,
   Projection,
 } from "./types.ts";
+import { detectReconstructedIds } from "./boundary-reconstruction.ts";
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -63,9 +64,6 @@ export interface DetectorConfig {
 // Template placeholders ({NNNN}, <NNNN>, *) do not match because \d requires
 // actual digits and the placeholder wrappers are not uppercase letters.
 export const GENERIC_ID_PATTERN = /\b([A-Z]{2,})-(\d{1,})\b/g;
-
-// ID-shaped evasion patterns: uppercase prefix + hyphen + \uXXXX, \xXX, or 0xXX
-const EVASION_PATTERN = /\b([A-Z]{2,})-(\\u[0-9A-Fa-f]{4}|\\x[0-9A-Fa-f]{2}|0x[0-9A-Fa-f]{2,})\b/g;
 
 // UTF encoding labels that should NOT be treated as ID candidates.
 const UTF_ENCODING_LABELS = new Set(["UTF-8", "UTF-16", "UTF-32"]);
@@ -162,50 +160,58 @@ function trimSnippet(line: string, maxLen: number): string {
 // Pipeline stage 1: extract
 // ---------------------------------------------------------------------------
 
-export type CandidateType = "id" | "path" | "url" | "evasion";
+// Candidate is a discriminated object union so the resolver can switch
+// exhaustively at compile time. Wrapper characters (`<`, `>`, `{`, `}`, `*`)
+// are token boundaries, never exemptions for reconstructed IDs.
+export type Candidate =
+  | { readonly type: "direct-id"; readonly value: string }
+  | {
+    readonly type: "reconstructed-id";
+    /** Decoded concrete ID form, e.g. "ADR-0001". */
+    readonly value: string;
+    /** Source-form token, e.g. "\\u0041DR-0001". Used as `matched` evidence. */
+    readonly original: string;
+  }
+  | { readonly type: "path"; readonly value: string }
+  | { readonly type: "url"; readonly value: string };
 
-export interface Candidate {
-  readonly type: CandidateType;
-  readonly value: string;
+export type CandidateType = Candidate["type"];
+
+function assertNeverCandidate(c: never): never {
+  throw new Error(`unhandled candidate: ${JSON.stringify(c)}`);
 }
 
-/**
- * Skip line-level extraction for placeholder-only ID forms.
- * `REQ-{NNNN}`, `<REQ-NNNN>`, `REQ-*` etc. are template forms that should
- * not be flagged. We test whether an ID candidate is wrapped in or adjacent
- * to placeholder markers.
- */
-function isTemplateWrappedId(text: string, matchStart: number, matchEnd: number): boolean {
-  // Check immediately before the match for `{` or `<`.
-  const before = text.charAt(matchStart - 1);
-  // Check immediately after the match for `}` or `>`.
-  const after = text.charAt(matchEnd);
-  if (before === "{" && after === "}") return true;
-  if (before === "<" && after === ">") return true;
-  // Glob wildcard immediately after the digits means template.
-  if (after === "*") return true;
-  return false;
+function matchedForCandidate(c: Candidate): string {
+  switch (c.type) {
+    case "direct-id":
+      return c.value;
+    case "reconstructed-id":
+      return c.original;
+    case "path":
+      return c.value;
+    case "url":
+      return c.value;
+    default:
+      return assertNeverCandidate(c);
+  }
 }
 
-export function detectCandidates(line: string, _cfg: DetectorConfig): Candidate[] {
+export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[] {
   const out: Candidate[] = [];
 
-  // IDs: generic UPPER-DIGITS family.
+  // Direct IDs: generic UPPER-DIGITS family. UTF-8/16/32 are encoding labels.
   for (const m of line.matchAll(GENERIC_ID_PATTERN)) {
-    const start = m.index ?? 0;
-    const end = start + m[0].length;
-    if (isTemplateWrappedId(line, start, end)) continue;
-    // UTF-8, UTF-16, UTF-32 are encoding labels, not ID candidates.
     if (UTF_ENCODING_LABELS.has(m[0])) continue;
-    out.push({ type: "id", value: m[0] });
+    out.push({ type: "direct-id", value: m[0] });
   }
 
-  // ID-shaped evasion patterns: uppercase prefix + hyphen + \uXXXX, \xXX, or 0xXX
-  for (const m of line.matchAll(EVASION_PATTERN)) {
-    const start = m.index ?? 0;
-    const end = start + m[0].length;
-    if (isTemplateWrappedId(line, start, end)) continue;
-    out.push({ type: "evasion", value: m[0] });
+  // Reconstructed IDs from bounded escape atoms. Wrappers and `*` are
+  // token boundaries inside detectReconstructedIds; they never exempt a
+  // reconstructed ID. A candidate is emitted for every concrete-ID match
+  // in a decoded token that contains at least one escape atom — including
+  // atoms that reconstruct delimiters exposing adjacent IDs.
+  for (const r of detectReconstructedIds(line)) {
+    out.push({ type: "reconstructed-id", value: r.decoded, original: r.original });
   }
 
   // Docs path (slash and backslash).
@@ -223,7 +229,7 @@ export function detectCandidates(line: string, _cfg: DetectorConfig): Candidate[
   // emit unclassified URL detections that would mask real violations, and
   // we MUST NOT silently allow them either. The contract is: no identity
   // => no URL extraction; the launcher rejects input contract upstream.
-  if (_cfg.repository_identity.owner_slash_name.length > 0) {
+  if (cfg.repository_identity.owner_slash_name.length > 0) {
     for (const m of line.matchAll(URL_CANDIDATE_PATTERN)) {
       out.push({ type: "url", value: m[0] });
     }
@@ -240,50 +246,58 @@ export function resolveCandidate(c: Candidate, cfg: DetectorConfig): {
   classification: DependencyClass;
   category: DetectionCategory;
 } {
-  if (c.type === "evasion") {
-    // Evasion attempts must fail closed as unclassified.
-    return { classification: "unclassified", category: "evasion-attempt" };
-  }
-
-  if (c.type === "id") {
-    // Extract the UPPER prefix to classify.
-    const m = /^([A-Z]{2,})-\d{1,}$/.exec(c.value);
-    if (!m) {
-      // Should not happen because extraction guarantees shape; fail closed.
+  switch (c.type) {
+    case "direct-id": {
+      const m = /^([A-Z]{2,})-\d{1,}$/.exec(c.value);
+      if (!m) {
+        return { classification: "unclassified", category: "unclassified-entry" };
+      }
+      const prefix = m[1] ?? "";
+      // Producer precedence: producer wins over distributed on overlap.
+      if (cfg.producer_internal_id_prefixes.includes(prefix)) {
+        return { classification: "producer-internal", category: "concrete-id" };
+      }
+      if (cfg.distributed_workflow_control_prefixes.includes(prefix)) {
+        return { classification: "generic-or-template", category: "distributed-control" };
+      }
       return { classification: "unclassified", category: "unclassified-entry" };
     }
-    const prefix = m[1] ?? "";
-
-    // Distributed workflow control: STEP-N, QG-N are generic-or-template.
-    if (cfg.distributed_workflow_control_prefixes.includes(prefix)) {
-      return { classification: "generic-or-template", category: "distributed-control" };
+    case "reconstructed-id": {
+      const m = /^([A-Z]{2,})-\d{1,}$/.exec(c.value);
+      if (!m) {
+        return { classification: "unclassified", category: "evasion-attempt" };
+      }
+      const prefix = m[1] ?? "";
+      // Reconstructed producer ID: producer-internal/evasion-attempt.
+      // Producer wins over distributed on overlap.
+      if (cfg.producer_internal_id_prefixes.includes(prefix)) {
+        return { classification: "producer-internal", category: "evasion-attempt" };
+      }
+      // Reconstructed STEP/QG or unknown reconstructed: fail closed.
+      return { classification: "unclassified", category: "evasion-attempt" };
     }
-
-    if (cfg.producer_internal_id_prefixes.includes(prefix)) {
-      return { classification: "producer-internal", category: "concrete-id" };
+    case "path": {
+      if (isConcreteDocsPath(c.value)) {
+        return { classification: "producer-internal", category: "concrete-path" };
+      }
+      return { classification: "generic-or-template", category: "concrete-path" };
     }
-    return { classification: "unclassified", category: "unclassified-entry" };
-  }
-
-  if (c.type === "path") {
-    if (isConcreteDocsPath(c.value)) {
-      return { classification: "producer-internal", category: "concrete-path" };
+    case "url": {
+      // Classify by repository identity, NOT by path content. A URL into
+      // the producer repo is producer-internal at any path (docs, scripts,
+      // src). A URL into a different repo is consumer-resolvable. An empty
+      // identity means the caller did not pin a producer; fail closed.
+      if (cfg.repository_identity.owner_slash_name.length === 0) {
+        return { classification: "unclassified", category: "unclassified-entry" };
+      }
+      if (isProducerOwnedUrl(c.value, cfg.repository_identity)) {
+        return { classification: "producer-internal", category: "fixed-url" };
+      }
+      return { classification: "consumer-resolvable", category: "fixed-url" };
     }
-    return { classification: "generic-or-template", category: "concrete-path" };
+    default:
+      return assertNeverCandidate(c);
   }
-
-  // url: classify by repository identity, NOT by path content. A URL into
-  // the producer repo is producer-internal at any path (docs, scripts, src).
-  // A URL into a different repo is consumer-resolvable, even if it points
-  // at that project's docs. An empty identity means the caller did not pin
-  // a producer; the resolution stage fail-closes by returning unclassified.
-  if (cfg.repository_identity.owner_slash_name.length === 0) {
-    return { classification: "unclassified", category: "unclassified-entry" };
-  }
-  if (isProducerOwnedUrl(c.value, cfg.repository_identity)) {
-    return { classification: "producer-internal", category: "fixed-url" };
-  }
-  return { classification: "consumer-resolvable", category: "fixed-url" };
 }
 
 // ---------------------------------------------------------------------------
@@ -305,7 +319,7 @@ export function classifyLine(line: LineInput, cfg: DetectorConfig): LineClassifi
       file: line.filePath,
       projection: line.projection,
       classification,
-      matched: c.value,
+      matched: matchedForCandidate(c),
       snippet: trimSnippet(line.text, 80),
       category,
     });

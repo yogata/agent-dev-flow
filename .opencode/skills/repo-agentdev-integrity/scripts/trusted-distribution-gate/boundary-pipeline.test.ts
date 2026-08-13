@@ -5,13 +5,14 @@
 // backslash, URI-encoded), producer-repository fixed URLs (by configured
 // identity), generic/template allowances, and fail-closed on unclassified
 // input.
+//
+// Stage A vocabulary amendment / evasion regression coverage lives in
+// boundary-pipeline-evasion.test.ts.
 
 import { describe, expect, test } from "bun:test";
 import {
   classifyLine,
   type DetectorConfig,
-  type ClassifyFileInput,
-  decideProjection,
 } from "./boundary-pipeline.ts";
 
 const baseConfig: DetectorConfig = {
@@ -256,150 +257,5 @@ describe("boundary-pipeline / classifyLine", () => {
     // No identity configured: URL extraction itself is suppressed to avoid
     // false positives. fail-closed is via the empty identity contract.
     expect(urlDetection).toBeUndefined();
-  });
-
-  describe("Stage A vocabulary amendment - UTF-8/16/32 encoding labels", () => {
-    test("does NOT detect UTF-8 as an ID candidate (zero detections)", () => {
-      const r = classifyLine(
-        { text: "File encoded in UTF-8.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        baseConfig,
-      );
-      expect(r.detections).toEqual([]);
-    });
-
-    test("does NOT detect UTF-16 as an ID candidate (zero detections)", () => {
-      const r = classifyLine(
-        { text: "File encoded in UTF-16.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        baseConfig,
-      );
-      expect(r.detections).toEqual([]);
-    });
-
-    test("does NOT detect UTF-32 as an ID candidate (zero detections)", () => {
-      const r = classifyLine(
-        { text: "File encoded in UTF-32.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        baseConfig,
-      );
-      expect(r.detections).toEqual([]);
-    });
-  });
-
-  describe("Stage A vocabulary amendment - distributed workflow control STEP/QG", () => {
-    const cfgWithStepQg: DetectorConfig = {
-      ...baseConfig,
-      distributed_workflow_control_prefixes: ["STEP", "QG"],
-    };
-
-    test("classifies STEP-N as generic-or-template with category distributed-control", () => {
-      const r = classifyLine(
-        { text: "See STEP-1 for requirements.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        cfgWithStepQg,
-      );
-      expect(r.detections).toHaveLength(1);
-      expect(r.detections[0]?.classification).toBe("generic-or-template");
-      expect(r.detections[0]?.category).toBe("distributed-control");
-      expect(r.detections[0]?.matched).toBe("STEP-1");
-    });
-
-    test("classifies QG-N as generic-or-template with category distributed-control", () => {
-      const r = classifyLine(
-        { text: "See QG-2 for quality gate.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        cfgWithStepQg,
-      );
-      expect(r.detections).toHaveLength(1);
-      expect(r.detections[0]?.classification).toBe("generic-or-template");
-      expect(r.detections[0]?.category).toBe("distributed-control");
-      expect(r.detections[0]?.matched).toBe("QG-2");
-    });
-
-    test("unknown ID prefix remains unclassified (fail-closed)", () => {
-      const r = classifyLine(
-        { text: "See MYSTERY-99.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        cfgWithStepQg,
-      );
-      expect(r.detections).toHaveLength(1);
-      expect(r.detections[0]?.classification).toBe("unclassified");
-      expect(r.detections[0]?.category).toBe("unclassified-entry");
-    });
-  });
-
-  describe("Stage A vocabulary amendment - ID-shaped evasion detection", () => {
-    const cfgWithStepQg: DetectorConfig = {
-      ...baseConfig,
-      distributed_workflow_control_prefixes: ["STEP", "QG"],
-    };
-
-    test("detects ID-shaped evasion with \\uXXXX escape after hyphen", () => {
-      const r = classifyLine(
-        { text: "See ADR-\\u0041 for decision.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        cfgWithStepQg,
-      );
-      expect(r.detections).toHaveLength(1);
-      expect(r.detections[0]?.classification).toBe("unclassified");
-      expect(r.detections[0]?.category).toBe("evasion-attempt");
-    });
-
-    test("detects ID-shaped evasion with \\xXX escape after hyphen", () => {
-      const r = classifyLine(
-        { text: "See REQ-\\x00 for details.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        cfgWithStepQg,
-      );
-      expect(r.detections).toHaveLength(1);
-      expect(r.detections[0]?.classification).toBe("unclassified");
-      expect(r.detections[0]?.category).toBe("evasion-attempt");
-    });
-
-    test("detects ID-shaped evasion with 0xXX hex literal after hyphen", () => {
-      const r = classifyLine(
-        { text: "See DEC-0x0032 for context.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        cfgWithStepQg,
-      );
-      expect(r.detections).toHaveLength(1);
-      expect(r.detections[0]?.classification).toBe("unclassified");
-      expect(r.detections[0]?.category).toBe("evasion-attempt");
-    });
-
-    test("does NOT classify unrelated hex prose as evasion", () => {
-      const r = classifyLine(
-        { text: "byte 0x41 represents 'A'", lineNumber: 1, filePath: "f.md", projection: "source" },
-        cfgWithStepQg,
-      );
-      const evasionDetection = r.detections.find((d) => d.category === "evasion-attempt");
-      expect(evasionDetection).toBeUndefined();
-      const idDetection = r.detections.find((d) => d.category === "concrete-id");
-      expect(idDetection).toBeUndefined();
-    });
-
-    test("escaped STEP/QG IDs are detected as evasion-attempt (fail-closed)", () => {
-      const r = classifyLine(
-        { text: "See STEP-\\u0031 and QG-\\x00.", lineNumber: 1, filePath: "f.md", projection: "source" },
-        cfgWithStepQg,
-      );
-      expect(r.detections).toHaveLength(2);
-      expect(r.detections.every((d) => d.category === "evasion-attempt")).toBe(true);
-      expect(r.detections.every((d) => d.classification === "unclassified")).toBe(true);
-    });
-  });
-
-  describe("Stage A vocabulary amendment - evasion gate failure", () => {
-    const cfgWithStepQg: DetectorConfig = {
-      ...baseConfig,
-      distributed_workflow_control_prefixes: ["STEP", "QG"],
-    };
-
-    test("evasion-attempt in errors causes decideProjection gate to fail", () => {
-      const files: ClassifyFileInput[] = [
-        {
-          filePath: "evasion.md",
-          projection: "source",
-          text: "See ADR-\\u0041 for decision.",
-        },
-      ];
-      const result = decideProjection(files, "source", cfgWithStepQg);
-      expect(result.gate.pass).toBe(false);
-      expect(result.gate.errors).toHaveLength(1);
-      expect(result.gate.errors[0]?.category).toBe("evasion-attempt");
-      expect(result.gate.errors[0]?.classification).toBe("unclassified");
-    });
   });
 });
