@@ -31,8 +31,6 @@
 import type { Span } from "./boundary-candidate-ownership.ts";
 
 const DOCS_FAMILIES: readonly string[] = ["adr", "requirements", "specs", "decisions"];
-const IDENT_OR_SEPARATOR_CHAR = /[A-Za-z0-9_\-\\/]/;
-const SEPARATOR_OR_DOT = /[\/\\\.]/;
 const PATH_STOP_CHAR = /[\s)\]\|"'`<>{},;:#?!。 、！]/;
 
 export interface ExtractedPath {
