@@ -25,9 +25,7 @@ import type {
   DependencyClass,
   Detection,
   DetectionCategory,
-  GateResult,
   LineInput,
-  Projection,
 } from "./types.ts";
 import { detectReconstructedIds } from "./boundary-reconstruction.ts";
 
@@ -160,6 +158,15 @@ function trimSnippet(line: string, maxLen: number): string {
 // Pipeline stage 1: extract
 // ---------------------------------------------------------------------------
 
+// Bounding constants. A pathological one-line input (e.g. hundreds of escape
+// tokens) must not amplify per-detection evidence or grow the candidate list
+// without bound. Detection.text is capped so a long line cannot be copied
+// verbatim into every detection; candidate count is capped and an explicit
+// overflow candidate fails the gate closed.
+const MAX_TEXT_LEN = 200;
+const MAX_CANDIDATES_PER_LINE = 64;
+const OVERFLOW_REASON = "[overflow: candidate bound exceeded]";
+
 // Candidate is a discriminated object union so the resolver can switch
 // exhaustively at compile time. Wrapper characters (`<`, `>`, `{`, `}`, `*`)
 // are token boundaries, never exemptions for reconstructed IDs.
@@ -173,7 +180,8 @@ export type Candidate =
     readonly original: string;
   }
   | { readonly type: "path"; readonly value: string }
-  | { readonly type: "url"; readonly value: string };
+  | { readonly type: "url"; readonly value: string }
+  | { readonly type: "overflow"; readonly reason: string };
 
 export type CandidateType = Candidate["type"];
 
@@ -191,6 +199,8 @@ function matchedForCandidate(c: Candidate): string {
       return c.value;
     case "url":
       return c.value;
+    case "overflow":
+      return c.reason;
     default:
       return assertNeverCandidate(c);
   }
@@ -198,30 +208,46 @@ function matchedForCandidate(c: Candidate): string {
 
 export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[] {
   const out: Candidate[] = [];
+  let overflow = false;
+  const cap = MAX_CANDIDATES_PER_LINE - 1;
+
+  const directSpans: Array<{ start: number; end: number }> = [];
 
   // Direct IDs: generic UPPER-DIGITS family. UTF-8/16/32 are encoding labels.
   for (const m of line.matchAll(GENERIC_ID_PATTERN)) {
     if (UTF_ENCODING_LABELS.has(m[0])) continue;
+    if (out.length >= cap) { overflow = true; break; }
+    const idx = m.index ?? 0;
+    directSpans.push({ start: idx, end: idx + m[0].length });
     out.push({ type: "direct-id", value: m[0] });
   }
 
-  // Reconstructed IDs from bounded escape atoms. Wrappers and `*` are
-  // token boundaries inside detectReconstructedIds; they never exempt a
-  // reconstructed ID. A candidate is emitted for every concrete-ID match
-  // in a decoded token that contains at least one escape atom — including
-  // atoms that reconstruct delimiters exposing adjacent IDs.
-  for (const r of detectReconstructedIds(line)) {
-    out.push({ type: "reconstructed-id", value: r.decoded, original: r.original });
+  // Reconstructed IDs from bounded escape atoms. Deduplicated against direct
+  // IDs by overlapping source span so a literal ID is never double-counted as
+  // both direct and reconstructed.
+  if (!overflow) {
+    for (const r of detectReconstructedIds(line)) {
+      if (out.length >= cap) { overflow = true; break; }
+      const overlaps = directSpans.some((s) => r.srcStart < s.end && s.start < r.srcEnd);
+      if (overlaps) continue;
+      out.push({ type: "reconstructed-id", value: r.decoded, original: r.original });
+    }
   }
 
   // Docs path (slash and backslash).
-  for (const m of line.matchAll(DOCS_PATH_PATTERN)) {
-    out.push({ type: "path", value: m[0] });
+  if (!overflow) {
+    for (const m of line.matchAll(DOCS_PATH_PATTERN)) {
+      if (out.length >= cap) { overflow = true; break; }
+      out.push({ type: "path", value: m[0] });
+    }
   }
 
   // Docs path (percent-encoded).
-  for (const m of line.matchAll(DOCS_PATH_PERCENT_PATTERN)) {
-    out.push({ type: "path", value: m[0] });
+  if (!overflow) {
+    for (const m of line.matchAll(DOCS_PATH_PERCENT_PATTERN)) {
+      if (out.length >= cap) { overflow = true; break; }
+      out.push({ type: "path", value: m[0] });
+    }
   }
 
   // URLs — only extract when a repository identity is configured. An empty
@@ -229,12 +255,14 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
   // emit unclassified URL detections that would mask real violations, and
   // we MUST NOT silently allow them either. The contract is: no identity
   // => no URL extraction; the launcher rejects input contract upstream.
-  if (cfg.repository_identity.owner_slash_name.length > 0) {
+  if (!overflow && cfg.repository_identity.owner_slash_name.length > 0) {
     for (const m of line.matchAll(URL_CANDIDATE_PATTERN)) {
+      if (out.length >= cap) { overflow = true; break; }
       out.push({ type: "url", value: m[0] });
     }
   }
 
+  if (overflow) out.push({ type: "overflow", reason: OVERFLOW_REASON });
   return out;
 }
 
@@ -295,6 +323,11 @@ export function resolveCandidate(c: Candidate, cfg: DetectorConfig): {
       }
       return { classification: "consumer-resolvable", category: "fixed-url" };
     }
+    case "overflow": {
+      // Pathological input: fail closed. The overflow marker is a non-ID
+      // string so it cannot accidentally classify as an allowed prefix.
+      return { classification: "unclassified", category: "evasion-attempt" };
+    }
     default:
       return assertNeverCandidate(c);
   }
@@ -311,10 +344,11 @@ export interface LineClassification {
 export function classifyLine(line: LineInput, cfg: DetectorConfig): LineClassification {
   const candidates = detectCandidates(line.text, cfg);
   const detections: Detection[] = [];
+  const boundedText = line.text.length <= MAX_TEXT_LEN ? line.text : line.text.substring(0, MAX_TEXT_LEN);
   for (const c of candidates) {
     const { classification, category } = resolveCandidate(c, cfg);
     detections.push({
-      text: line.text,
+      text: boundedText,
       line: line.lineNumber,
       file: line.filePath,
       projection: line.projection,
@@ -327,52 +361,8 @@ export function classifyLine(line: LineInput, cfg: DetectorConfig): LineClassifi
   return { detections };
 }
 
-// ---------------------------------------------------------------------------
-// Pipeline stage 4: decide (gate over many lines)
-// ---------------------------------------------------------------------------
-
-export interface ClassifyFileInput {
-  readonly filePath: string;
-  readonly projection: Projection;
-  /** Text content (already validated UTF-8 by the text-binary module). */
-  readonly text: string;
-}
-
-export interface DecideResult {
-  readonly gate: GateResult;
-}
-
-export function decideProjection(
-  files: readonly ClassifyFileInput[],
-  projection: Projection,
-  cfg: DetectorConfig,
-): DecideResult {
-  const failures: Detection[] = [];
-  const errors: Detection[] = [];
-
-  for (const file of files) {
-    const lines = file.text.split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-      const lineText = lines[i] ?? "";
-      const lineInput: LineInput = {
-        text: lineText,
-        lineNumber: i + 1,
-        filePath: file.filePath,
-        projection: file.projection,
-      };
-      const cls = classifyLine(lineInput, cfg);
-      for (const d of cls.detections) {
-        if (d.classification === "producer-internal") failures.push(d);
-        else if (d.classification === "unclassified") errors.push(d);
-      }
-    }
-  }
-
-  const gate: GateResult = {
-    pass: failures.length === 0 && errors.length === 0,
-    failures,
-    errors,
-    projection,
-  };
-  return { gate };
-}
+export {
+  decideProjection,
+  type ClassifyFileInput,
+  type DecideResult,
+} from "./boundary-gate.ts";

@@ -116,11 +116,13 @@ describe("B2 wildcard is a token boundary", () => {
   });
 });
 
-// B3-B6: prefix escape, suffix digit concat, escaped hyphen, multiple mixed.
+// B3-B6: prefix escape, escaped hyphen, multiple mixed. (B4 suffix digit
+// concat via \u is now clean per the \uXXXX exact-contract digit-continuation
+// rule — see boundary-span-overflow.test.ts C2. The \x form ADR-\x310 is
+// still caught — see C1.)
 describe("B3-B6 bounded reconstruction of producer IDs", () => {
   const producerCases: Array<[string, string]> = [
     ["\\u0041DR-0001", "B3 prefix escape"],
-    ["ADR-\\u00310", "B4 suffix digit concat"],
     ["ADR\\u002d0001", "B5 escaped hyphen"],
     ["\\u0041DR\\u002d\\u0030\\u0030\\u0030\\u0031", "B6 multiple mixed escapes"],
   ];
@@ -188,7 +190,8 @@ describe("B8 classification precedence through resolveCandidate", () => {
     [{ type: "direct-id", value: "UNKNOWN-99" }, "unclassified", "unclassified-entry"],
   ];
   for (const [c, classification, category] of cases) {
-    test(`${c.type} ${c.value} => ${classification}/${category}`, () => {
+    const label = "value" in c ? c.value : c.type;
+    test(`${c.type} ${label} => ${classification}/${category}`, () => {
       expect(resolveCandidate(c, baseConfig)).toEqual({ classification, category });
     });
   }
@@ -297,7 +300,7 @@ describe("B11 detectCandidates emits reconstructed-id candidates", () => {
 
 // B12: maximal-token adjacency — escaped delimiter exposes adjacent literal ID.
 describe("B12 maximal-token adjacency: escaped delimiter exposes adjacent ID", () => {
-  test("STEP-1\\u0020ADR-0002 fails: escaped space exposes ADR-0002 (producer-internal/evasion-attempt)", () => {
+  test("STEP-1\\u0020ADR-0002 fails: escaped space exposes ADR-0002 (producer-internal/evasion-attempt, minimal span)", () => {
     const files: ClassifyFileInput[] = [
       { filePath: "f.md", projection: "source", text: "See STEP-1\\u0020ADR-0002." },
     ];
@@ -306,6 +309,6 @@ describe("B12 maximal-token adjacency: escaped delimiter exposes adjacent ID", (
     const producerFailure = result.gate.failures.find(
       (d) => d.classification === "producer-internal" && d.category === "evasion-attempt",
     );
-    expect(producerFailure?.matched).toBe("STEP-1\\u0020ADR-0002");
+    expect(producerFailure?.matched).toBe("\\u0020ADR-0002");
   });
 });
