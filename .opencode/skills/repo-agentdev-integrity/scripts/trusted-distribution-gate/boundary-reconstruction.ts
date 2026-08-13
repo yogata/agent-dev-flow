@@ -30,6 +30,8 @@
 // Regex matching uses sticky (`y`) regexes against the full line so there is
 // no per-character `substring(i)` allocation.
 
+import type { Span } from "./boundary-candidate-ownership.ts";
+
 const BOUNDED_LITERAL = /[A-Za-z0-9_-]/;
 // Sticky regexes: match must start exactly at lastIndex. No `^` anchor
 // (sticky already pins the start); the four/two-hex-digit width is exact.
@@ -155,8 +157,15 @@ function tokenizeBoundedToken(line: string, start: number, limit: number): Bound
  * Pure: same input always yields the same output. The typed overflow signal
  * MUST propagate to a fail-closed candidate even if the emitted ids are
  * later deduped or owned by the pipeline.
+ *
+ * @param ownedSpans - Optional readonly structural spans (URL/path owners).
+ * Tokens fully contained in these spans are skipped before reconstruction,
+ * preventing them from consuming the token-ids-exceeded cap.
  */
-export function detectReconstructedIds(line: string): ReconstructionResult {
+export function detectReconstructedIds(
+  line: string,
+  ownedSpans: readonly Span[] = []
+): ReconstructionResult {
   const ids: ReconstructedId[] = [];
   const limit = Math.min(line.length, MAX_LINE_SCAN);
   let i = 0;
@@ -166,7 +175,16 @@ export function detectReconstructedIds(line: string): ReconstructionResult {
       i += 1;
       continue;
     }
-    if (token.hasEscape) {
+    
+    // Skip tokens fully contained in owned spans (owned-span suppression).
+    // This prevents owned regions from consuming the token-ids-exceeded cap.
+    const tokenStart = i;
+    const tokenEnd = i + token.length;
+    const isFullyOwned = ownedSpans.some(
+      (owned) => owned.start <= tokenStart && tokenEnd <= owned.end
+    );
+    
+    if (token.hasEscape && !isFullyOwned) {
       const decoded = token.atoms.map((a) => a.char).join("");
       ID_PATTERN.lastIndex = 0;
       let m: RegExpExecArray | null;

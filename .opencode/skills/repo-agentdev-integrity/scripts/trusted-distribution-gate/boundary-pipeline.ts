@@ -123,7 +123,7 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
   }
 
   if (overflowReason === null) {
-    const recon = detectReconstructedIds(line);
+    const recon = detectReconstructedIds(line, ownedSpans);
     if (recon.overflow) overflowReason = recon.overflowReason ?? "token-ids-exceeded";
     if (overflowReason === null) {
       for (const r of recon.ids) {

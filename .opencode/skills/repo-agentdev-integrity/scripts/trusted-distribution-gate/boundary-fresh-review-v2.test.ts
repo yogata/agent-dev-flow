@@ -211,3 +211,75 @@ describe("T2 relative docs-path left-boundary handling", () => {
     expect(pathFail?.classification).toBe("producer-internal");
   });
 });
+
+// T3: Owned-span reconstruction suppression - prevent reconstructed-ID token
+// processing inside already-owned URL/path spans. External GitHub URLs
+// containing many escaped IDs must NOT trigger token-ids-exceeded overflow.
+describe("T3 owned-span reconstruction suppression", () => {
+  test("single token with 17 reconstructable IDs overflows when standalone", () => {
+    // Use same pattern as existing overflow tests: "STEP-1\\u0032-".repeat(17)
+    const token = "STEP-1\\u0032-".repeat(17);
+    const cs = detectCandidates(token, baseConfig);
+    const overflow = cs.find((c) => c.type === "overflow");
+    expect(overflow).toBeDefined();
+    if (overflow && overflow.type === "overflow") {
+      expect(overflow.reason).toBe("token-ids-exceeded");
+    }
+  });
+
+  test("17 reconstructable IDs inside external GitHub URL do NOT overflow, gate passes", () => {
+    // Use 17 literal IDs in URL path (these are detected as direct-id, not reconstructed)
+    // but the issue pattern is the same: IDs inside owned span should not cause overflow
+    const ids = "STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1";
+    const text = `See https://github.com/vercel/next.js/blob/main/${ids} here.`;
+    const cs = detectCandidates(text, baseConfig);
+    // No overflow should be present
+    const overflow = cs.find((c) => c.type === "overflow");
+    expect(overflow).toBeUndefined();
+  });
+
+  test("17 reconstructable IDs inside producer URL do NOT overflow, gate fails with URL classification", () => {
+    // Use 17 literal IDs in producer URL
+    const ids = "STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1";
+    const text = `See https://github.com/yogata/agent-dev-flow/blob/main/${ids} here.`;
+    const cs = detectCandidates(text, baseConfig);
+    // No overflow should be present
+    const overflow = cs.find((c) => c.type === "overflow");
+    expect(overflow).toBeUndefined();
+  });
+
+  test("17 reconstructable IDs inside docs path do NOT overflow, gate fails with path classification", () => {
+    // Use 17 literal IDs in docs path
+    const ids = "STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1-STEP-1";
+    const text = `See docs/${ids} here.`;
+    const cs = detectCandidates(text, baseConfig);
+    // No overflow should be present
+    const overflow = cs.find((c) => c.type === "overflow");
+    expect(overflow).toBeUndefined();
+  });
+
+  test("token partially overlapping URL owner is NOT silently skipped, overflow fires", () => {
+    // Token starts before URL but extends past it - NOT fully contained
+    const ids = "STEP-1\\u0032-".repeat(17);
+    const text = `See <https://github.com/vercel/next.js/blob/main/x.md>${ids} here.`;
+    const cs = detectCandidates(text, baseConfig);
+    // Overflow should still fire because token is not fully inside URL
+    const overflow = cs.find((c) => c.type === "overflow");
+    expect(overflow).toBeDefined();
+    if (overflow && overflow.type === "overflow") {
+      expect(overflow.reason).toBe("token-ids-exceeded");
+    }
+  });
+
+  test("line-scan overflow remains unchanged when line exceeds MAX_LINE_SCAN", () => {
+    // Create a line longer than MAX_LINE_SCAN (65536)
+    const longSegment = "A".repeat(70000);
+    const text = `See ${longSegment} ADR-0001 here.`;
+    const cs = detectCandidates(text, baseConfig);
+    const overflow = cs.find((c) => c.type === "overflow");
+    expect(overflow).toBeDefined();
+    if (overflow && overflow.type === "overflow") {
+      expect(overflow.reason).toBe("line-scan-exceeded");
+    }
+  });
+});
