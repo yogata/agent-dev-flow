@@ -73,7 +73,7 @@ export type Candidate =
     readonly span: Span;
   }
   | { readonly type: "path"; readonly value: string; readonly span: Span }
-  | { readonly type: "url"; readonly value: string; readonly span: Span; readonly malformed: boolean }
+  | { readonly type: "url"; readonly value: string; readonly span: Span; readonly ownershipSpan: Span | null; readonly malformed: boolean }
   | { readonly type: "overflow"; readonly reason: OverflowReason };
 
 export type CandidateType = Candidate["type"];

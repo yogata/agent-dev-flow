@@ -98,6 +98,13 @@ export interface ExtractedUrl {
    * covers ONLY the authority region so contained path references stay
    * independently visible; resolveCandidate classifies it evasion-attempt. */
   readonly malformed: boolean;
+  /** Suppression scope. For a valid URL: from URL start to the position of
+   * the first `?` or `#` in the URL value (path-only). When the URL has no
+   * `?`/`#`, this equals `span`. For a malformed URL: `null` (malformed
+   * URLs never own/suppress contained references). The full `span` remains
+   * the classification evidence; `ownershipSpan` is the only range that
+   * suppresses lower-precedence candidates. */
+  readonly ownershipSpan: Span | null;
 }
 
 /**
@@ -135,12 +142,15 @@ export function extractUrls(line: string, cap: number): {
     let urlEnd = hostEnd;
     let inPath = false;
     let inQueryOrFrag = false;
+    let firstQueryOrFrag = -1;
     while (urlEnd < line.length) {
       steps++;
       const c = line.charAt(urlEnd);
       if (URL_STOP_CHAR.test(c)) break;
-      if (c === "?" || c === "#") inQueryOrFrag = true;
-      else if (c === "/") { if (!inQueryOrFrag) inPath = true; }
+      if (c === "?" || c === "#") {
+        if (firstQueryOrFrag === -1) firstQueryOrFrag = urlEnd;
+        inQueryOrFrag = true;
+      } else if (c === "/") { if (!inQueryOrFrag) inPath = true; }
       else if (c === ":" && inPath && !inQueryOrFrag) break;
       urlEnd++;
     }
@@ -148,42 +158,52 @@ export function extractUrls(line: string, cap: number): {
     if (scan.hasBackslash) {
       const aStart = scan.schemeStart !== -1 ? scan.schemeStart : scan.authorityLeft;
       if (out.length >= cap) return { urls: out, overflow: true, steps };
-      out.push({ value: line.substring(aStart, authorityEnd), span: { start: aStart, end: authorityEnd }, malformed: true });
+      out.push({ value: line.substring(aStart, authorityEnd), span: { start: aStart, end: authorityEnd }, malformed: true, ownershipSpan: null });
       continue;
     }
     if (scan.schemeStart !== -1) {
-      if (!isValidLeftBoundary(line, scan.schemeStart)) continue;
+      if (!isValidLeftBoundary(line, scan.schemeStart, true)) continue;
       const value = line.substring(scan.schemeStart, urlEnd);
       const cls = classifyAuthority(value);
       if (cls.kind === "rejected") continue;
       if (cls.kind === "malformed") {
         if (out.length >= cap) return { urls: out, overflow: true, steps };
-        out.push({ value: line.substring(scan.schemeStart, authorityEnd), span: { start: scan.schemeStart, end: authorityEnd }, malformed: true });
+        out.push({ value: line.substring(scan.schemeStart, authorityEnd), span: { start: scan.schemeStart, end: authorityEnd }, malformed: true, ownershipSpan: null });
         continue;
       }
       if (extractOwnerRepo(value) === null) continue;
       if (out.length >= cap) return { urls: out, overflow: true, steps };
-      out.push({ value, span: { start: scan.schemeStart, end: urlEnd }, malformed: false });
+      out.push({ value, span: { start: scan.schemeStart, end: urlEnd }, malformed: false, ownershipSpan: ownershipSpanFor(scan.schemeStart, urlEnd, firstQueryOrFrag) });
       continue;
     }
     // Scheme-less host.
-    if (!isValidLeftBoundary(line, hostStart)) continue;
+    if (!isValidLeftBoundary(line, hostStart, false)) continue;
     const value = line.substring(hostStart, urlEnd);
     const cls = classifyAuthority(value);
     if (cls.kind === "rejected") continue;
     if (cls.kind === "malformed") {
       if (out.length >= cap) return { urls: out, overflow: true, steps };
-      out.push({ value: line.substring(hostStart, authorityEnd), span: { start: hostStart, end: authorityEnd }, malformed: true });
+      out.push({ value: line.substring(hostStart, authorityEnd), span: { start: hostStart, end: authorityEnd }, malformed: true, ownershipSpan: null });
       continue;
     }
     if (extractOwnerRepo(value) === null) continue;
     if (out.length >= cap) return { urls: out, overflow: true, steps };
-    out.push({ value, span: { start: hostStart, end: urlEnd }, malformed: false });
+    out.push({ value, span: { start: hostStart, end: urlEnd }, malformed: false, ownershipSpan: ownershipSpanFor(hostStart, urlEnd, firstQueryOrFrag) });
   }
   return { urls: out, overflow: false, steps };
 }
 
-function isValidLeftBoundary(line: string, pos: number): boolean {
+/** Ownership span ends at the first `?` or `#` within `[start, end)`. */
+function ownershipSpanFor(start: number, end: number, firstQueryOrFrag: number): Span {
+  if (firstQueryOrFrag === -1) return { start, end };
+  return { start, end: firstQueryOrFrag };
+}
+
+function isValidLeftBoundary(line: string, pos: number, hasScheme: boolean): boolean {
   if (pos === 0) return true;
-  return !LEFT_REJECT_CHAR.test(line.charAt(pos - 1));
+  const prev = line.charAt(pos - 1);
+  // Scheme URLs are unambiguous; accept `=` (query-param value) and `&`
+  // (param separator) so a URL nested in a parent URL's query is detected.
+  if (hasScheme && (prev === "=" || prev === "&")) return true;
+  return !LEFT_REJECT_CHAR.test(prev);
 }

@@ -75,24 +75,24 @@ describe("URL ownership / standalone ID and path detection preserved", () => {
 describe("ownershipMask / reconstructed suppresses overlapping direct", () => {
   test("direct fully inside reconstructed span is suppressed", () => {
     const entries: OwnershipEntry[] = [
-      { span: { start: 0, end: 10 }, precedence: "reconstructed" },
-      { span: { start: 0, end: 6 }, precedence: "direct" },
+      { span: { start: 0, end: 10 }, ownershipSpan: { start: 0, end: 10 }, precedence: "reconstructed" },
+      { span: { start: 0, end: 6 }, ownershipSpan: { start: 0, end: 6 }, precedence: "direct" },
     ];
     expect(ownershipMask(entries)).toEqual([true, false]);
   });
 
   test("same-value reconstructed and direct (same span) dedup to reconstructed", () => {
     const entries: OwnershipEntry[] = [
-      { span: { start: 0, end: 8 }, precedence: "reconstructed" },
-      { span: { start: 0, end: 8 }, precedence: "direct" },
+      { span: { start: 0, end: 8 }, ownershipSpan: { start: 0, end: 8 }, precedence: "reconstructed" },
+      { span: { start: 0, end: 8 }, ownershipSpan: { start: 0, end: 8 }, precedence: "direct" },
     ];
     expect(ownershipMask(entries)).toEqual([true, false]);
   });
 
   test("non-overlapping direct and reconstructed both survive", () => {
     const entries: OwnershipEntry[] = [
-      { span: { start: 0, end: 6 }, precedence: "direct" },
-      { span: { start: 10, end: 18 }, precedence: "reconstructed" },
+      { span: { start: 0, end: 6 }, ownershipSpan: { start: 0, end: 6 }, precedence: "direct" },
+      { span: { start: 10, end: 18 }, ownershipSpan: { start: 10, end: 18 }, precedence: "reconstructed" },
     ];
     expect(ownershipMask(entries)).toEqual([true, true]);
   });

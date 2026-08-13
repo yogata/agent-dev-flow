@@ -87,7 +87,7 @@ describe("C3.2 non-default ports / fail closed via evasion-attempt", () => {
 
   test("resolveCandidate classifies malformed URL as unclassified/evasion-attempt", () => {
     const r = resolveCandidate(
-      { type: "url", value: "https://github.com:8080", span: SPAN, malformed: true },
+      { type: "url", value: "https://github.com:8080", span: SPAN, ownershipSpan: null, malformed: true },
       baseConfig,
     );
     expect(r.classification).toBe("unclassified");

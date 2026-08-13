@@ -102,17 +102,17 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
   if (cfg.repository_identity.owner_slash_name.length > 0) {
     const r = extractUrls(line, cap - owners.length);
     for (const u of r.urls) {
-      owners.push({ type: "url", value: u.value, span: u.span, malformed: u.malformed });
-      if (!u.malformed) {
-        urlSpans.push(u.span);
+      owners.push({ type: "url", value: u.value, span: u.span, ownershipSpan: u.ownershipSpan, malformed: u.malformed });
+      if (u.ownershipSpan !== null) {
+        urlSpans.push(u.ownershipSpan);
       }
     }
     if (r.overflow) overflowReason = "candidate-cap-exceeded";
   }
 
   // Stage 1b: extract bounded docs-path owners. Overflow never suppressed.
-  // Pass URL spans so docs paths fully contained by valid URLs are skipped
-  // before the cap check (D7: URL ownership prevents cap consumption).
+  // Pass URL ownership spans so docs paths fully contained by valid URLs are
+  // skipped before the cap check (D7: URL ownership prevents cap consumption).
   if (overflowReason === null) {
     const r = extractDocsPaths(line, cap - owners.length, urlSpans);
     for (const p of r.paths) owners.push({ type: "path", value: p.value, span: p.span });
@@ -121,7 +121,9 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
 
   // Stage 1c: contained low-priority candidates (IDs inside owner spans)
   // are skipped so they never consume the candidate cap.
-  const ownedSpans: Span[] = owners.map((o) => o.span);
+  const ownedSpans: Span[] = owners.map((o) =>
+    o.type === "url" ? (o.ownershipSpan ?? null) : o.span,
+  ).filter((s): s is Span => s !== null);
 
   if (overflowReason === null) {
     for (const m of line.matchAll(GENERIC_ID_PATTERN)) {
@@ -150,8 +152,14 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
   // Stage 2: ownership mask resolves recon-vs-direct overlap. Overflow is
   // appended AFTER the mask so ownership never suppresses the typed signal.
   const entries: OwnershipEntry[] = [];
-  for (const o of owners) entries.push({ span: o.span, precedence: precedenceFor(o.type) });
-  for (const c of lows) entries.push({ span: c.span, precedence: precedenceFor(c.type) });
+  for (const o of owners) {
+    entries.push({
+      span: o.span,
+      ownershipSpan: o.type === "url" ? o.ownershipSpan : o.span,
+      precedence: precedenceFor(o.type),
+    });
+  }
+  for (const c of lows) entries.push({ span: c.span, ownershipSpan: c.span, precedence: precedenceFor(c.type) });
   const all = [...owners, ...lows];
   const mask = ownershipMask(entries);
   const out: Candidate[] = [];

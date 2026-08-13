@@ -31,9 +31,17 @@ export type CandidatePrecedence = "url" | "path" | "reconstructed" | "direct";
  * spanned candidate to this shape so this module has no dependency on the
  * Candidate union (keeps the import graph acyclic: types -> reconstruction ->
  * ownership -> pipeline -> gate -> runner).
+ *
+ * `span` is the classification-evidence span (used for the
+ * reconstructed-over-direct overlap rule and for the precedence sort).
+ * `ownershipSpan` is the suppression range used by keepers to contain
+ * lower-precedence entries: `null` means the keeper suppresses nothing
+ * (e.g. malformed URLs); when omitted, defaults to `span` for non-URL
+ * keepers (path/reconstructed).
  */
 export interface OwnershipEntry {
   readonly span: Span;
+  readonly ownershipSpan: Span | null;
   readonly precedence: CandidatePrecedence;
 }
 
@@ -59,9 +67,11 @@ function overlaps(a: Span, b: Span): boolean {
  * `mask[i]` is true. Entries are evaluated in precedence order (url first);
  * among equal precedence, input order is preserved (stable).
  *
- * A direct entry is suppressed when ANY surviving keeper contains it (for
- * url/path keepers) or overlaps it (for reconstructed keepers). All other
- * precedences are suppressed only by containment in a surviving higher keeper.
+ * Keeper containment uses `ownershipSpan`: a URL keeper with `ownershipSpan
+ * === null` (malformed) suppresses nothing; a URL keeper with a path-only
+ * `ownershipSpan` suppresses only entries whose `span` lies fully inside
+ * that path region. The reconstructed-over-direct rule still uses the
+ * reconstructed keeper's `span` (its evidence span).
  */
 export function ownershipMask(entries: readonly OwnershipEntry[]): boolean[] {
   const order = entries
@@ -72,22 +82,22 @@ export function ownershipMask(entries: readonly OwnershipEntry[]): boolean[] {
       return ra !== rb ? ra - rb : a.idx - b.idx;
     });
 
-  const keepers: Array<{ span: Span; precedence: CandidatePrecedence }> = [];
+  const keepers: Array<{ suppressSpan: Span | null; overlapSpan: Span; precedence: CandidatePrecedence }> = [];
   const mask = new Array<boolean>(entries.length).fill(false);
 
   for (const { entry, idx } of order) {
     let suppressed = false;
     for (const k of keepers) {
       if (entry.precedence === "direct" && k.precedence === "reconstructed") {
-        if (overlaps(k.span, entry.span)) { suppressed = true; break; }
-      } else if (contains(k.span, entry.span)) {
+        if (overlaps(k.overlapSpan, entry.span)) { suppressed = true; break; }
+      } else if (k.suppressSpan !== null && contains(k.suppressSpan, entry.span)) {
         suppressed = true;
         break;
       }
     }
     if (!suppressed) {
       mask[idx] = true;
-      keepers.push({ span: entry.span, precedence: entry.precedence });
+      keepers.push({ suppressSpan: entry.ownershipSpan, overlapSpan: entry.span, precedence: entry.precedence });
     }
   }
   return mask;
