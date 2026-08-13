@@ -98,15 +98,21 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
   let overflowReason: OverflowReason | null = null;
 
   // Stage 1a: extract bounded URL owners (identity-gated).
+  const urlSpans: Span[] = [];
   if (cfg.repository_identity.owner_slash_name.length > 0) {
     const r = extractUrls(line, cap - owners.length);
-    for (const u of r.urls) owners.push({ type: "url", value: u.value, span: u.span, malformed: u.malformed });
+    for (const u of r.urls) {
+      owners.push({ type: "url", value: u.value, span: u.span, malformed: u.malformed });
+      urlSpans.push(u.span);
+    }
     if (r.overflow) overflowReason = "candidate-cap-exceeded";
   }
 
   // Stage 1b: extract bounded docs-path owners. Overflow never suppressed.
+  // Pass URL spans so docs paths fully contained by valid URLs are skipped
+  // before the cap check (D7: URL ownership prevents cap consumption).
   if (overflowReason === null) {
-    const r = extractDocsPaths(line, cap - owners.length);
+    const r = extractDocsPaths(line, cap - owners.length, urlSpans);
     for (const p of r.paths) owners.push({ type: "path", value: p.value, span: p.span });
     if (r.overflow) overflowReason = "candidate-cap-exceeded";
   }

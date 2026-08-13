@@ -157,8 +157,16 @@ function isValidRelativePrefix(line: string, pos: number): boolean {
  *
  * Each emitted path's value terminates exactly at `.md` (no trailing
  * query/fragment/punctuation).
+ *
+ * @param ownerSpans - Optional readonly array of owner spans. A docs-path
+ * candidate fully contained by ANY owner span is skipped BEFORE the cap
+ * check. Default is an empty array for backward compatibility.
  */
-export function extractDocsPaths(line: string, cap: number): {
+export function extractDocsPaths(
+  line: string,
+  cap: number,
+  ownerSpans: readonly Span[] = [],
+): {
   readonly paths: readonly ExtractedPath[];
   readonly overflow: boolean;
 } {
@@ -191,8 +199,25 @@ export function extractDocsPaths(line: string, cap: number): {
     const mdIdx = findMdEndpoint(content);
     if (mdIdx < 0) continue;
     const pathEnd = contentStart + mdIdx + 3; // 3 = ".md".length
+    const candidateSpan: Span = { start: docsIdx, end: pathEnd };
+
+    // Skip candidates fully contained by any owner span BEFORE cap check.
+    if (isFullyContained(candidateSpan, ownerSpans)) continue;
+
     if (out.length >= cap) return { paths: out, overflow: true };
-    out.push({ value: line.substring(docsIdx, pathEnd), span: { start: docsIdx, end: pathEnd } });
+    out.push({ value: line.substring(docsIdx, pathEnd), span: candidateSpan });
   }
   return { paths: out, overflow: false };
+}
+
+/**
+ * True when `inner` is fully contained by ANY span in `keepers`.
+ * Uses half-open [start, end) bounds: containment requires
+ * keeper.start <= inner.start AND inner.end <= keeper.end.
+ */
+function isFullyContained(inner: Span, keepers: readonly Span[]): boolean {
+  for (const keeper of keepers) {
+    if (keeper.start <= inner.start && inner.end <= keeper.end) return true;
+  }
+  return false;
 }
