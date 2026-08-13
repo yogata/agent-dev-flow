@@ -1,11 +1,11 @@
-# STEP-{N}: docs 検証・SPEC 確定（docs-and-spec-promotion）
+# STEP-3: docs 検証・SPEC 確定（docs-and-spec-promotion）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-{N} 詳細である。docs/ 検証、targeted docs guard、IR-{NNN} check_extensions.ts、SPEC 確定フロー（draft → accepted 昇格）を提供する。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-3 詳細である。docs/ 検証、targeted docs guard、IR-{NNN} check_extensions.ts、SPEC 確定フロー（draft → accepted 昇格）を提供する。
 
 ## 開始条件
 
 - 単一 Issue クローズ ルート
-- STEP-{N} で QG-{N} 合格
+- STEP-2 で QG-4 合格
 
 ## 結果
 
@@ -48,11 +48,11 @@
 
 #### 配布依存境界の最終変更経路 gate（REQ-{NNNN}-{NNN} 再利用、REQ-{NNNN}-{NNN}、DEC-{N}）
 
-PR 変更ファイルに `.opencode/{commands,skills}/**` を含む場合、PR マージ前に配布依存境界の最終 gate を実行する。本 gate は共用 detector（`.opencode/skills/<integrity-detector-skill>/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、REQ-{NNNN}-{NNN} の最終 gate 基底を再利用する（REQ-{NNNN}-{NNN}、DEC-{N} 決定4）。adapter が bypass されても最終 gate で停止する（DEC-{N} 決定3、4）
+PR 変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、PR マージ前に配布依存境界の最終 gate を実行する。本 gate は共用 detector（`.opencode/skills/<integrity-detector-skill>/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、REQ-{NNNN}-{NNN} の最終 gate 基底を再利用する（REQ-{NNNN}-{NNN}、DEC-{N} 決定4）。adapter が bypass されても最終 gate で停止する（DEC-{N} 決定3、4）。trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run Step 7-1 と同一。junction 領域は git 非追跡のため PR 差分に現れず、junction を trigger にすると gate が不発になる）
 
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`
 - **検査対象**: PR HEAD の worktree（マージ前の実際の PR ブランチ内容）を検査する。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査対象とする（Oracle finding 5: inspect PR head before merge）
-- **`--profile source`**: case-close は PR マージ前に実行され、配布物領域 `.opencode/` を直接検査するため `source` を使用する
+- **`--profile source`**: case-close は PR マージ前に実行され、配布ソース面を検査するため `source` を使用する（junction は原本への鏡像）
 - **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う（DEC-{N} 決定5、TS-{NNN}）。clean として通過させない。違反時はマージを停止しユーザー判断を仰ぐ
 - **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run Step 7-1 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
 
@@ -72,8 +72,8 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 
 - `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行、AG-{NNN}）
 - `check_extensions.ts`（IR-{NNN}、配布物パターンのいずれかを変更した場合に実行）
-- `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルに `.opencode/{commands,skills}/**` を含む場合に実行、DEC-{N} 決定4、REQ-{NNNN}-{NNN} 最終 gate 基底再利用）
-- test_strategy（QG-{N} 完了条件確認）
+- `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルが配布 command/skill ソース面に含まれる場合に実行、DEC-{N} 決定4、REQ-{NNNN}-{NNN} 最終 gate 基底再利用）
+- test_strategy（QG-4 完了条件確認）
 
 ## resume point
 
@@ -83,8 +83,8 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 
 ## 関連 STEP
 
-- 前: STEP-{N}（issue-resolution-and-qg4）
-- 次: STEP-{N}（pr-merge-and-conflict）
+- 前: STEP-2（issue-resolution-and-qg4）
+- 次: STEP-4（pr-merge-and-conflict）
 
 ## 関連 Capability Skill
 

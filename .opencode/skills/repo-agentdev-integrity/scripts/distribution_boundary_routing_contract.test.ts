@@ -212,4 +212,56 @@ describe("distribution-boundary final gate routing contract", () => {
       );
     });
   });
+
+  describe("both case-close trigger paths route through the same detector", () => {
+    const docsContent = readFileIfExists(DOCS_AND_SPEC_PROMOTION) ?? "";
+    const epicContent = readFileIfExists(EPIC_WAVE_CLOSE) ?? "";
+    const caseRunContent = readFileIfExists(CASE_RUN_COMMAND) ?? "";
+
+    const step31 = extractSection(docsContent, "### Step 3-1:");
+    const e40 = extractSection(epicContent, "#### E4-0:");
+    const step71 = extractSection(caseRunContent, "### Step 7-1:");
+
+    it("all three gate sections reference the identical detector entrypoint", () => {
+    expect(step31.section).toContain(DETECTOR_ENTRYPOINT);
+      expect(e40.section).toContain(DETECTOR_ENTRYPOINT);
+      expect(step71.section).toContain(DETECTOR_ENTRYPOINT);
+    });
+
+    it("all three gate sections use the identical --profile source token", () => {
+      expect(step31.section).toContain(PROFILE_TOKEN);
+      expect(e40.section).toContain(PROFILE_TOKEN);
+      expect(step71.section).toContain(PROFILE_TOKEN);
+    });
+
+    it("neither case-close route embeds a producer physical path literal", () => {
+      expect(step31.section).not.toContain("src/opencode/");
+      expect(e40.section).not.toContain("src/opencode/");
+    });
+
+    it("both case-close routes describe the trigger via source-profile vocabulary", () => {
+      expect(step31.section).toMatch(/配布.*ソース面|source.*profile/i);
+      expect(e40.section).toMatch(/配布.*ソース面|source.*profile/i);
+    });
+
+    it("single-Issue and Epic Wave routes both stop merge on gate violation", () => {
+      // E4-0 uses "blocked" state; Step 3-1 uses "gate-not-passed" classification.
+      expect(step31.section).toMatch(/gate/i);
+      expect(e40.section).toContain("blocked");
+    });
+
+    it("SKILL.md control plane declares the final gate in both route rows", () => {
+      const skillContent = readFileIfExists(CASE_CLOSE_SKILL) ?? "";
+      const singleRow = skillContent.match(/\|\s*STEP-3\s*\|[^\n]*docs-and-spec-promotion[^\n]*\n/);
+      const epicRow = skillContent.match(/\|\s*STEP-E1[〜~]E6\s*\|[^\n]*\n/);
+      expect(singleRow).not.toBeNull();
+      expect(epicRow).not.toBeNull();
+      if (singleRow !== null) {
+        expect(singleRow[0]).toContain("docs-and-spec-promotion.md");
+      }
+      if (epicRow !== null) {
+        expect(epicRow[0]).toContain("epic-wave-close.md");
+      }
+    });
+  });
 });

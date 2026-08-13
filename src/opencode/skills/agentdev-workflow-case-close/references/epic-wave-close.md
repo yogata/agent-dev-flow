@@ -4,13 +4,13 @@
 
 ## 開始条件
 
-- STEP-{N} で Epic Issue と判定（ステータス追跡テーブル存在）
+- STEP-1 で Epic Issue と判定（ステータス追跡テーブル存在）
 
 ## 結果
 
 - 現在 Wave の全子Issue マージ、クローズ完了（E4-0 最終 gate 違反子Issue は `blocked` としてマージ対象外、Epic status table へ反映）
 - Epic status table 更新完了（単一書き手 case-close のみ）
-- Epic Issue 完了条件チェックボックス最終評価・更新（QG-{N} 観点8、中間 Wave vs 最終 Wave 評価スコープ切替）
+- Epic Issue 完了条件チェックボックス最終評価・更新（QG-4 観点8、中間 Wave vs 最終 Wave 評価スコープ切替）
 - 最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
 
 ## 手順
@@ -31,14 +31,14 @@ Epic Issue 本文を読み込み、ステータス追跡テーブル（`agentdev
 
 ### E4: 各子Issue の PR マージ・子Issue クローズ・完了条件チェックボックス評価・Capture 回収・コンフリクト解消の準並列化（REQ）
 
-各子Issue について次を**準並列**で実行する。ただし各子Issue の PR マージへ進む前に、当該子Issue の PR HEAD で配布依存境界の最終 gate（STEP-{N} Step 3-1「配布依存境界の最終変更経路 gate」と同一手続き）を必ず実行する。single-Issue ルート（STEP-{N}）と Epic Wave ルート（本 STEP）で同一の最終 gate を経由し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、 配布依存境界 SPEC）。
+各子Issue について次を**準並列**で実行する。ただし各子Issue の PR マージへ進む前に、当該子Issue の PR HEAD で配布依存境界の最終 gate（STEP-3 Step 3-1「配布依存境界の最終変更経路 gate」と同一手続き）を必ず実行する。single-Issue ルート（STEP-3）と Epic Wave ルート（本 STEP）で同一の最終 gate を経由し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、 配布依存境界 SPEC）。
 
-#### E4-0: 各子Issue の配布依存境界 最終 gate（マージ前、single-Issue STEP-{N} Step 3-1 と同一手続き）
+#### E4-0: 各子Issue の配布依存境界 最終 gate（マージ前、single-Issue STEP-3 Step 3-1 と同一手続き）
 
-各子Issue の PR マージへ進む前に、当該 PR の変更ファイルに `.opencode/{commands,skills}/**` を含む場合、配布依存境界の最終 gate を実行する。含まない PR（docs のみ等）ではスキップする。手続きの正規所有者は STEP-{N} Step 3-1（[docs-and-spec-promotion.md](docs-and-spec-promotion.md)）であり、本 STEP は同一手続きを Epic Wave の各子Issue に適用する。
+各子Issue の PR マージへ進む前に、当該 PR の変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、配布依存境界の最終 gate を実行する。含まない PR（docs のみ等）ではスキップする。trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run Step 7-1 と同一）。手続きの正規所有者は STEP-3 Step 3-1（[docs-and-spec-promotion.md](docs-and-spec-promotion.md)）であり、本 STEP は同一手続きを Epic Wave の各子Issue に適用する。
 
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`。検査対象は当該子Issue PR の HEAD（マージ前の実際の PR ブランチ内容）。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査する
-- **`--profile source`**: case-close は PR マージ前に実行され、原本領域 `.opencode/` を直接検査するため `source` を使用する
+- **`--profile source`**: case-close は PR マージ前に実行され、配布ソース面を検査するため `source` を使用する（junction は原本への鏡像）
 - **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う（DEC-{N} 決定5、TS-{NNN}）。clean として通過させない
 - **gate 違反時**: 当該子Issue の PR マージを中止し、PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run Step 7-1 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）。当該子Issue は後続 E4-1 シーケンスへ進めず、E5 Epic status table で `blocked` 状態として記録する（`agentdev-epic-tracker` 準拠、`completed` へ上書きしない、べき等性）
 
@@ -46,9 +46,9 @@ Epic Issue 本文を読み込み、ステータス追跡テーブル（`agentdev
 
 E4-0 を合格した子Issue について次を**準並列**で実行する。gate 違反子Issue は本シーケンスの対象外とする。
 
-- PR マージ（STEP-{N} の PR マージ手続きに準拠、mergeable UNKNOWN ポーリング、squash merge、先行 commit 検出、コンフリクト Level 1 rebase）
+- PR マージ（STEP-4 の PR マージ手続きに準拠、mergeable UNKNOWN ポーリング、squash merge、先行 commit 検出、コンフリクト Level 1 rebase）
 - 子Issue クローズ（Issue close 手続き）
-- 完了条件チェックボックス評価・更新（QG-{N}、観点8 PR対象範囲 vs 全体）
+- 完了条件チェックボックス評価・更新（QG-4、観点8 PR対象範囲 vs 全体）
 - Capture 回収（PR 本文の `## Findings / Capture候補` から intake/learning 分離）
 - コンフリクト解消（Level 1 rebase パス、Level 2/3 は case-auto エスカレーション）
 
@@ -58,7 +58,7 @@ Epic Issue 本文のステータス追跡テーブルを更新。**単一書き�
 
 ### E5b: Epic Issue 完了条件チェックボックス最終評価・更新
 
-QG-{N} 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave）を実施し、Epic Issue の完了条件チェックボックスを最終評価・更新する。
+QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave）を実施し、Epic Issue の完了条件チェックボックスを最終評価・更新する。
 
 ### E6: 最終 Wave 判定
 
@@ -84,7 +84,7 @@ QG-{N} 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave
 
 ## 関連 STEP
 
-- 前: STEP-{N}（issue-resolution-and-qg4、Epic ルート分岐）
+- 前: STEP-1（issue-resolution-and-qg4、Epic ルート分岐）
 - 次: なし（Epic Wave クローズ workflow 終了、または case-auto Wave 反復制御へ戻る）
 
 ## 関連 Capability Skill
@@ -92,10 +92,10 @@ QG-{N} 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave
 - `agentdev-epic-tracker`: E1〜E6 詳細手順、判定基準、子Issue 状態 enum、再読込 VERIFY、未達項目残存時の停止条件
 - `agentdev-gh-cli`: Epic Issue 本文読込・更新、子Issue PR マージ・クローズ、mergeable UNKNOWN ポーリング、対応記録コメント、VERIFY
 - `agentdev-git-worktree`: squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス（Level 1）
-- `agentdev-quality-gates`: QG-{N} 完了条件チェックボックス評価・更新、観点8 評価スコープ切替
+- `agentdev-quality-gates`: QG-4 完了条件チェックボックス評価・更新、観点8 評価スコープ切替
 - `agentdev-workflow-orchestration`: capture 境界（intake/learning 分離、Epic 横断回収）
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: Capture 回収
-- integrity checker skill（repo-local）: E4-0 配布依存境界 最終 gate（check_distribution_boundary.ts、single-Issue STEP-{N} Step 3-1 と同一 detector、IR-{NNN}/046/047/048）
+- integrity checker skill（repo-local）: E4-0 配布依存境界 最終 gate（check_distribution_boundary.ts、single-Issue STEP-3 Step 3-1 と同一 detector、IR-{NNN}）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
