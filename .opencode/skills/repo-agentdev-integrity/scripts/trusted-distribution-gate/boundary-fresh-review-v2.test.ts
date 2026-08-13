@@ -134,3 +134,80 @@ describe("T1.5 unsupported-scheme / evil:// and ftp:// are not scheme-less GitHu
     expect(urls(cs).length).toBe(1);
   });
 });
+
+// T2: Left-boundary handling - only clean ./ or ../ prefixes before docs
+// Relative docs paths with explicit ./ or ../ should be detected as producer-internal
+// but .docs, absolute paths, and hostname .docs should NOT be candidates
+describe("T2 relative docs-path left-boundary handling", () => {
+  test("./docs/specs/foo.md becomes concrete producer path and gate fails", () => {
+    const text = "See ./docs/specs/foo.md here.";
+    const g = gateFor(text);
+    expect(g.pass).toBe(false);
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail?.classification).toBe("producer-internal");
+  });
+
+  test("../docs/specs/foo.md becomes concrete producer path and gate fails", () => {
+    const text = "See ../docs/specs/foo.md here.";
+    const g = gateFor(text);
+    expect(g.pass).toBe(false);
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail?.classification).toBe("producer-internal");
+  });
+
+  test(".\\docs/specs/foo.md (backslash) becomes concrete producer path and gate fails", () => {
+    const text = "See .\\docs\\specs\\foo.md here.";
+    const g = gateFor(text);
+    expect(g.pass).toBe(false);
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail?.classification).toBe("producer-internal");
+  });
+
+  test("..\\docs/specs/foo.md (backslash) becomes concrete producer path and gate fails", () => {
+    const text = "See ..\\docs\\specs\\foo.md here.";
+    const g = gateFor(text);
+    expect(g.pass).toBe(false);
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail?.classification).toBe("producer-internal");
+  });
+
+  test(".docs/specs/foo.md does NOT become a candidate (no prefix separator)", () => {
+    const text = "See .docs/specs/foo.md here.";
+    const g = gateFor(text);
+    expect(g.pass).toBe(true);
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail).toBeUndefined();
+  });
+
+  test("/docs/specs/foo.md does NOT become a candidate (absolute path)", () => {
+    const text = "See /docs/specs/foo.md here.";
+    const g = gateFor(text);
+    expect(g.pass).toBe(true);
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail).toBeUndefined();
+  });
+
+  test("a/../docs/specs/foo.md does NOT become a candidate (identifier before /)", () => {
+    const text = "See a/../docs/specs/foo.md here.";
+    const g = gateFor(text);
+    expect(g.pass).toBe(true);
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail).toBeUndefined();
+  });
+
+  test("https://evil.docs/specs/x.md remains suppressed by URL ownership", () => {
+    const text = "See https://evil.docs/specs/x.md here.";
+    const g = gateFor(text);
+    expect(g.pass).toBe(true);
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail).toBeUndefined();
+  });
+
+  test("plain docs/specs/foo.md remains concrete producer path", () => {
+    const text = "See docs/specs/foo.md here.";
+    const g = gateFor(text);
+    expect(g.pass).toBe(false);
+    const pathFail = g.failures.find((d: Detection) => d.category === "concrete-path");
+    expect(pathFail?.classification).toBe("producer-internal");
+  });
+});

@@ -32,6 +32,7 @@ import type { Span } from "./boundary-candidate-ownership.ts";
 
 const DOCS_FAMILIES: readonly string[] = ["adr", "requirements", "specs", "decisions"];
 const IDENT_OR_SEPARATOR_CHAR = /[A-Za-z0-9_\-\\/]/;
+const SEPARATOR_OR_DOT = /[\/\\\.]/;
 const PATH_STOP_CHAR = /[\s)\]\|"'`<>{},;:#?!。 、！]/;
 
 export interface ExtractedPath {
@@ -108,8 +109,32 @@ export function extractDocsPaths(line: string, cap: number): {
     const docsIdx = line.indexOf("docs", searchFrom);
     if (docsIdx < 0) break;
     searchFrom = docsIdx + 1;
-    // Left boundary: preceding char must NOT be an identifier or path separator.
-    if (docsIdx > 0 && IDENT_OR_SEPARATOR_CHAR.test(line.charAt(docsIdx - 1))) continue;
+    // Left boundary: accept only clean ./ or ../ prefixes (with / or \ separator) before docs.
+    if (docsIdx > 0) {
+      const beforeDocs = line.charAt(docsIdx - 1);
+      if (beforeDocs === '/' || beforeDocs === '\\') {
+        // Check for ./ or ../ prefix (relative path)
+        if (docsIdx >= 2) {
+          const beforeSlash = line.charAt(docsIdx - 2);
+          if (beforeSlash === '.' && (docsIdx < 3 || !SEPARATOR_OR_DOT.test(line.charAt(docsIdx - 3)))) {
+            // Valid: ./docs or .\docs
+          } else if (beforeSlash === '.' && docsIdx >= 3 && line.charAt(docsIdx - 3) === '.' && (docsIdx < 4 || !SEPARATOR_OR_DOT.test(line.charAt(docsIdx - 4)))) {
+            // Valid: ../docs or ..\docs
+          } else {
+            // Invalid: a/docs, //docs, .//docs, a\docs, \\docs, /docs
+            continue;
+          }
+        } else {
+          // Invalid: /docs at index 1
+          continue;
+        }
+      } else if (IDENT_OR_SEPARATOR_CHAR.test(beforeDocs) || beforeDocs === '.') {
+        // Invalid: adocs, .docs
+        continue;
+      }
+    } else {
+      // docs at line start is valid
+    }
     // After `docs`, expect one or more separators.
     let pos = scanSeparators(line, docsIdx + 4);
     if (pos === docsIdx + 4) continue;
