@@ -112,18 +112,26 @@ function isValidRelativePrefix(line: string, pos: number): boolean {
 }
 
 /**
- * Parse the strict relative path prefix grammar: (("."|"..") separator)+
- * scanning backwards from `pos`. Returns true when the grammar matches.
+ * Parse the strict relative path prefix grammar:
+ * (("."|"..") separator+)+ scanning backwards from `pos`.
+ * Consecutive separators (e.g. /\) are allowed between dot-segments.
+ * Returns true when the grammar matches.
  */
 function parseRelativePrefix(line: string, pos: number): boolean {
   let p = pos - 1;
   let hasValidPair = false;
 
   while (p >= 0) {
-    const separatorLen = matchSeparatorBackward(line, p);
+    // Consume one or more consecutive separators.
+    let separatorLen = matchSeparatorBackward(line, p);
     if (separatorLen === 0) break;
 
-    p -= separatorLen;
+    while (separatorLen > 0) {
+      p -= separatorLen;
+      separatorLen = p >= 0 ? matchSeparatorBackward(line, p) : 0;
+    }
+
+    if (p < 0) break;
 
     const dotSegment = matchDotSegmentBackward(line, p);
     if (dotSegment === 0) break;
