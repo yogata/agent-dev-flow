@@ -9,10 +9,12 @@
 // emission:
 //   - HOST_SCAN finds a recognized host followed by `/` (path) or `:`
 //     (port), so default-port URLs (`https://github.com:443/...`) are seen.
-//   - For each hit, scanAuthorityBackward locates the scheme and detects
-//     backslash malformedness. A backslash in the authority is always
-//     malformed: it makes the host position ambiguous and the URL cannot
-//     own/hide contained producer references.
+//   - For each hit, scanAuthorityForward advances a single forward cursor
+//     from the previous hit up to `hostStart`, carrying scheme and
+//     backslash evidence. Total scan cost is O(line.length) regardless of
+//     how many host hits land on the line. A backslash in the authority
+//     is always malformed: it makes the host position ambiguous and the
+//     URL cannot own/hide contained producer references.
 //   - Port validation: only the scheme default port is accepted (443 for
 //     https, 80 for http). Any other port, or any port on a scheme-less
 //     URL, is malformed. A malformed authority NEVER silently passes: it
@@ -20,14 +22,20 @@
 //     the authority region, so contained path references stay independently
 //     visible, and resolveCandidate classifies it as evasion-attempt.
 //
+// `steps` counts the per-character work performed by the scanner (forward
+// authority scan + URL-end walk), exposing a linear-complexity contract:
+// callers can assert `steps <= K * line.length + C`.
+//
 // Side-effect-free: pure over inputs.
 
 import type { Span } from "./boundary-candidate-ownership.ts";
 import {
   classifyAuthority,
   findAuthorityEnd,
+  INITIAL_AUTHORITY_SCAN_CURSOR,
   parseUrlHost,
-  scanAuthorityBackward,
+  scanAuthorityForward,
+  type AuthorityScanCursor,
 } from "./boundary-url-authority.ts";
 
 const OWNER_PATTERN = /^[A-Za-z0-9_-]+$/;
@@ -97,27 +105,38 @@ export interface ExtractedUrl {
  * authority. Returns at most `cap` entries; `overflow` is set when the cap
  * is reached mid-scan (ownership never suppresses overflow).
  *
- * For each host hit, scanAuthorityBackward locates the scheme and detects
- * backslash malformedness. A backslash in the authority => malformed. A
- * valid scheme URL with a non-default port => malformed. A scheme-less URL
- * with any port => malformed. Malformed candidates' spans cover ONLY the
- * authority region so path references stay independently visible; valid
- * URLs span the full URL (scheme through stop char) and own their path.
+ * For each host hit, scanAuthorityForward advances a single forward cursor
+ * from the previous hit up to `hostStart`, carrying scheme and backslash
+ * evidence. A backslash in the authority => malformed. A valid scheme URL
+ * with a non-default port => malformed. A scheme-less URL with any port
+ * => malformed. Malformed candidates' spans cover ONLY the authority
+ * region so path references stay independently visible; valid URLs span
+ * the full URL (scheme through stop char) and own their path.
+ *
+ * `steps` counts per-character scanner operations (forward authority scan
+ * + URL-end walk). It is bounded by a linear function of `line.length`.
  */
 export function extractUrls(line: string, cap: number): {
   readonly urls: readonly ExtractedUrl[];
   readonly overflow: boolean;
+  readonly steps: number;
 } {
   const out: ExtractedUrl[] = [];
+  let cursor: AuthorityScanCursor = INITIAL_AUTHORITY_SCAN_CURSOR;
+  let steps = 0;
   HOST_SCAN.lastIndex = 0;
   for (let m: RegExpExecArray | null; (m = HOST_SCAN.exec(line)) !== null;) {
     const hostStart = m.index;
     const hostEnd = hostStart + m[0].length;
-    const scan = scanAuthorityBackward(line, hostStart);
+    const fwd = scanAuthorityForward(line, hostStart, cursor);
+    cursor = fwd.cursor;
+    steps += fwd.steps;
+    const scan = fwd.scan;
     let urlEnd = hostEnd;
     let inPath = false;
     let inQueryOrFrag = false;
     while (urlEnd < line.length) {
+      steps++;
       const c = line.charAt(urlEnd);
       if (URL_STOP_CHAR.test(c)) break;
       if (c === "?" || c === "#") inQueryOrFrag = true;
@@ -128,7 +147,7 @@ export function extractUrls(line: string, cap: number): {
     const authorityEnd = findAuthorityEnd(line, hostEnd, urlEnd);
     if (scan.hasBackslash) {
       const aStart = scan.schemeStart !== -1 ? scan.schemeStart : scan.authorityLeft;
-      if (out.length >= cap) return { urls: out, overflow: true };
+      if (out.length >= cap) return { urls: out, overflow: true, steps };
       out.push({ value: line.substring(aStart, authorityEnd), span: { start: aStart, end: authorityEnd }, malformed: true });
       continue;
     }
@@ -138,12 +157,12 @@ export function extractUrls(line: string, cap: number): {
       const cls = classifyAuthority(value);
       if (cls.kind === "rejected") continue;
       if (cls.kind === "malformed") {
-        if (out.length >= cap) return { urls: out, overflow: true };
+        if (out.length >= cap) return { urls: out, overflow: true, steps };
         out.push({ value: line.substring(scan.schemeStart, authorityEnd), span: { start: scan.schemeStart, end: authorityEnd }, malformed: true });
         continue;
       }
       if (extractOwnerRepo(value) === null) continue;
-      if (out.length >= cap) return { urls: out, overflow: true };
+      if (out.length >= cap) return { urls: out, overflow: true, steps };
       out.push({ value, span: { start: scan.schemeStart, end: urlEnd }, malformed: false });
       continue;
     }
@@ -153,15 +172,15 @@ export function extractUrls(line: string, cap: number): {
     const cls = classifyAuthority(value);
     if (cls.kind === "rejected") continue;
     if (cls.kind === "malformed") {
-      if (out.length >= cap) return { urls: out, overflow: true };
+      if (out.length >= cap) return { urls: out, overflow: true, steps };
       out.push({ value: line.substring(hostStart, authorityEnd), span: { start: hostStart, end: authorityEnd }, malformed: true });
       continue;
     }
     if (extractOwnerRepo(value) === null) continue;
-    if (out.length >= cap) return { urls: out, overflow: true };
+    if (out.length >= cap) return { urls: out, overflow: true, steps };
     out.push({ value, span: { start: hostStart, end: urlEnd }, malformed: false });
   }
-  return { urls: out, overflow: false };
+  return { urls: out, overflow: false, steps };
 }
 
 function isValidLeftBoundary(line: string, pos: number): boolean {

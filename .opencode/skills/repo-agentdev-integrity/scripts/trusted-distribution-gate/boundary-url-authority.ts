@@ -2,7 +2,7 @@
 //
 // Extracted from boundary-url-parser.ts to keep that module under the 250
 // pure LOC ceiling. One responsibility: classify a URL value's authority
-// as valid / malformed / rejected, and expose the backward authority scan
+// as valid / malformed / rejected, and expose the forward authority scan
 // used to locate the scheme and detect backslash malformedness.
 //
 // Classification rules:
@@ -38,6 +38,9 @@ const AUTHORITY_CHAR = /[A-Za-z0-9._~!$&'()*+,;=:@%]/;
 
 /** One character of an RFC 3986 scheme token: ALPHA / DIGIT / "+" / "-" / ".". */
 const SCHEME_CHAR = /[A-Za-z0-9+\-.]/;
+
+/** First character of a scheme must be ALPHA (RFC 3986). */
+const ALPHA = /[A-Za-z]/;
 
 export type AuthorityKind = "valid" | "malformed" | "rejected";
 
@@ -112,46 +115,105 @@ export function parseUrlHost(url: string): string | null {
 export interface AuthorityScan {
   /** Start index of an http(s):// scheme whose authority ends at hostStart, or -1. */
   readonly schemeStart: number;
-  /** True when a backslash was crossed during the backward walk. */
+  /** True when a backslash was crossed during the forward walk. */
   readonly hasBackslash: boolean;
   /** Leftmost index reached by the walk (start of the authority evidence). */
   readonly authorityLeft: number;
 }
 
 /**
- * Walk backward from `hostStart - 1` through the lexical authority region
- * (RFC 3986 authority chars AND backslash) to locate an http(s):// scheme
- * and detect backslash malformedness. The walk stops at any char that is
- * neither an authority char nor a backslash (whitespace, a path separator
- * from a DIFFERENT token, etc.), so a later bare host never grabs an
- * earlier URL's scheme. Crossing a backslash sets hasBackslash so the
- * caller emits a malformed candidate rather than silently dropping it.
+ * Forward authority-scan cursor. Carries scheme and backslash evidence
+ * accumulated from line start (or the previous host hit) up to `pos`,
+ * so a HOST_SCAN hit at the next `hostStart` can be answered by walking
+ * forward through `(pos, hostStart)` only. Across all calls with
+ * monotonically increasing `hostStart`, total work is O(line.length):
+ * every index is visited at most once.
  */
-export function scanAuthorityBackward(line: string, hostStart: number): AuthorityScan {
-  let i = hostStart - 1;
-  let hasBackslash = false;
-  while (i >= 0) {
+export interface AuthorityScanCursor {
+  /** Last index processed (exclusive lower bound for the next call). */
+  readonly pos: number;
+  readonly schemeStart: number;
+  readonly authorityLeft: number;
+  readonly hasBackslash: boolean;
+}
+
+export const INITIAL_AUTHORITY_SCAN_CURSOR: AuthorityScanCursor = {
+  pos: -1,
+  schemeStart: -1,
+  authorityLeft: 0,
+  hasBackslash: false,
+};
+
+export interface AuthorityScanResult {
+  readonly cursor: AuthorityScanCursor;
+  readonly scan: AuthorityScan;
+  /** Number of characters processed in this call (for step-count bound). */
+  readonly steps: number;
+}
+
+/**
+ * Advance the cursor forward through `(cursor.pos, hostStart)`, updating
+ * scheme and backslash evidence. Returns the cursor state valid at
+ * `hostStart - 1` (the index just before the host), the AuthorityScan
+ * snapshot, and the number of characters processed.
+ *
+ * Per-index transition (let `i` be the index just consumed, `c = line[i]`):
+ *   - `c === "\\"`: a backslash inside the live region sets hasBackslash;
+ *     the walk continues (backslash never terminates the region).
+ *   - `c === "/"` and `line[i-2..i] === "://"`: a scheme terminator. Probe
+ *     backward within the scheme-char run (bounded by scheme length) to
+ *     recover the scheme name; accept only `http` / `https`. The probe is
+ *     short (scheme length ≤ 10), so total work stays linear.
+ *   - any other non-AUTHORITY_CHAR: invalidates the live region (resets
+ *     schemeStart to -1, hasBackslash to false, advances authorityLeft).
+ *   - AUTHORITY_CHAR: state persists.
+ *
+ * The scheme-char probe is the only "backward" piece, and it is bounded
+ * by the scheme token length, not by the authority length, so the per-call
+ * cost is O(distance advanced) + O(scheme length) and the cross-call
+ * total is O(line.length).
+ */
+export function scanAuthorityForward(
+  line: string,
+  hostStart: number,
+  cursor: AuthorityScanCursor,
+): AuthorityScanResult {
+  let pos = cursor.pos;
+  let schemeStart = cursor.schemeStart;
+  let authorityLeft = cursor.authorityLeft;
+  let hasBackslash = cursor.hasBackslash;
+  let steps = 0;
+  while (pos + 1 < hostStart) {
+    pos++;
+    steps++;
+    const i = pos;
     const c = line.charAt(i);
-    if (c === "\\") { hasBackslash = true; i--; continue; }
-    if (i >= 2 && line.substring(i - 2, i + 1) === "://") {
+    if (c === "\\") {
+      hasBackslash = true;
+      continue;
+    }
+    if (c === "/" && i >= 2 && line.charAt(i - 1) === "/" && line.charAt(i - 2) === ":") {
       const schemeEnd = i - 2;
       let j = schemeEnd - 1;
-      if (j < 0 || !/[A-Za-z]/.test(line.charAt(j))) {
-        return { schemeStart: -1, hasBackslash, authorityLeft: i + 1 };
+      if (j < 0 || !ALPHA.test(line.charAt(j))) {
+        schemeStart = -1; authorityLeft = i + 1; hasBackslash = false;
+        continue;
       }
       while (j > 0 && SCHEME_CHAR.test(line.charAt(j - 1))) j--;
       const scheme = line.substring(j, schemeEnd).toLowerCase();
       if (scheme === "http" || scheme === "https") {
-        return { schemeStart: j, hasBackslash, authorityLeft: j };
+        schemeStart = j; authorityLeft = j; hasBackslash = false;
+      } else {
+        schemeStart = -1; authorityLeft = i + 1; hasBackslash = false;
       }
-      return { schemeStart: -1, hasBackslash, authorityLeft: i + 1 };
+      continue;
     }
     if (!AUTHORITY_CHAR.test(c)) {
-      return { schemeStart: -1, hasBackslash, authorityLeft: i + 1 };
+      schemeStart = -1; authorityLeft = i + 1; hasBackslash = false;
     }
-    i--;
   }
-  return { schemeStart: -1, hasBackslash, authorityLeft: 0 };
+  const nextCursor: AuthorityScanCursor = { pos, schemeStart, authorityLeft, hasBackslash };
+  return { cursor: nextCursor, scan: { schemeStart, hasBackslash, authorityLeft }, steps };
 }
 
 /**
