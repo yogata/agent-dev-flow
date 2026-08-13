@@ -5,6 +5,10 @@ import { join } from "node:path"
 import { buildGraph, loadGraph, resolveBuildConfig } from "../lib/graph.ts"
 import { verifyGraph } from "../lib/verification.ts"
 import { createFixture } from "./fixture.ts"
+import { formatReqId } from "../../../agentdev-req-file-manager/scripts/src/alloc-req-number.ts"
+import { formatDecisionId } from "../../../agentdev-decision-file-manager/scripts/src/alloc-decision-number.ts"
+const REQ_002 = formatReqId(2)
+const DEC_099 = formatDecisionId(99)
 
 const roots: string[] = []
 
@@ -19,13 +23,13 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })))
 })
 
-describe("REQ\u002D012-011: verification feedback (detect/classify/correct)", () => {
+describe(`REQ-{NNNN}-011: verification feedback (detect/classify/correct)`, () => {
   it("detects canonical defect: broken markdown link", async () => {
     const fixture = await setup()
-    const req002Path = `docs/requirements/${"REQ"}\u002D002.md`
+    const req002Path = `docs/requirements/${REQ_002}.md`
     await writeFile(
       join(fixture.root, req002Path),
-      `---\nid: ${"REQ"}\u002D002\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../decisions/${"DEC"}\u002D099.md).\n`,
+      `---\nid: ${REQ_002}\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../decisions/${DEC_099}.md).\n`,
       "utf8",
     )
     await buildGraph(fixture)
@@ -40,10 +44,10 @@ describe("REQ\u002D012-011: verification feedback (detect/classify/correct)", ()
 
   it("classifies broken link as canonical_defect", async () => {
     const fixture = await setup()
-    const req002Path = `docs/requirements/${"REQ"}\u002D002.md`
+    const req002Path = `docs/requirements/${REQ_002}.md`
     await writeFile(
       join(fixture.root, req002Path),
-      `---\nid: ${"REQ"}\u002D002\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../decisions/${"DEC"}\u002D099.md).\n`,
+      `---\nid: ${REQ_002}\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../decisions/${DEC_099}.md).\n`,
       "utf8",
     )
     await buildGraph(fixture)
@@ -71,10 +75,10 @@ describe("REQ\u002D012-011: verification feedback (detect/classify/correct)", ()
 
   it("correct + regression-verify: fixing canonical defect removes difference", async () => {
     const fixture = await setup()
-    const req002Path = `docs/requirements/${"REQ"}\u002D002.md`
+    const req002Path = `docs/requirements/${REQ_002}.md`
     await writeFile(
       join(fixture.root, req002Path),
-      `---\nid: ${"REQ"}\u002D002\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../decisions/${"DEC"}\u002D099.md).\n`,
+      `---\nid: ${REQ_002}\ntitle: Broken\n---\n# Broken\n\nSee [nonexistent](../decisions/${DEC_099}.md).\n`,
       "utf8",
     )
     await buildGraph(fixture)
@@ -83,10 +87,10 @@ describe("REQ\u002D012-011: verification feedback (detect/classify/correct)", ()
     let report = await verifyGraph(fixture.root, graph, config)
     expect(report.summary.canonical_defects).toBeGreaterThan(0)
 
-    const dec099Path = `docs/decisions/${"DEC"}\u002D099.md`
+    const dec099Path = `docs/decisions/${DEC_099}.md`
     await writeFile(
       join(fixture.root, dec099Path),
-      `---\nid: ${"DEC"}\u002D099\ntitle: Now exists\n---\n# Now exists\n`,
+      `---\nid: ${DEC_099}\ntitle: Now exists\n---\n# Now exists\n`,
       "utf8",
     )
     await buildGraph(fixture)
