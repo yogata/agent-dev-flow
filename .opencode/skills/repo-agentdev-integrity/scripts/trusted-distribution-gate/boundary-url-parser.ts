@@ -40,8 +40,11 @@ const REPO_PATTERN = /^[A-Za-z0-9_.-]+$/;
 /** Scan pattern: case-insensitive `github.com/` or `raw.githubusercontent.com/`. */
 const HOST_SCAN = /(?:github\.com|raw\.githubusercontent\.com)\//gi;
 
-/** URL end exclusion set (matches the legacy URL_CANDIDATE_PATTERN). */
-const URL_STOP_CHAR = /[\s)\]|\\"'`<>{}]/;
+/** URL end exclusion set (matches the legacy URL_CANDIDATE_PATTERN).
+ * Includes comma, semicolon, Japanese punctuation, and full-width punctuation
+ * to terminate URL ownership at these boundary markers.
+ */
+const URL_STOP_CHAR = /[\s)\]|\\"'`<>{},;\u3001\u3002\uFF1B\uFF0C\uFF01\uFF1F]/;
 
 /** Scheme prefix lookbehind: accept when the 3 chars before the host are `://`. */
 function precededBySchemeSeparator(line: string, hostStart: number): boolean {
@@ -55,10 +58,22 @@ const LEFT_REJECT_CHAR = /[A-Za-z0-9._@:?#&=\\/-]/;
  * Decide whether `hostStart` is a valid left boundary for a scheme-less
  * authority. Returns true when the host begins the URL (start of line,
  * whitespace, opening punctuation, etc.) or is preceded by `://`.
+ *
+ * When the host is preceded by `://`, the scheme must be http or https.
+ * Unsupported schemes (evil://, ftp://, etc.) cause rejection.
+ *
+ * For scheme URLs, we validate the boundary at the scheme start, not at
+ * the host start, to correctly handle userinfo.
  */
 function isValidLeftBoundary(line: string, hostStart: number): boolean {
   if (hostStart === 0) return true;
-  if (precededBySchemeSeparator(line, hostStart)) return true;
+  const schemeStart = findSchemeStartBeforeHost(line, hostStart);
+  if (schemeStart !== -1) {
+    // Validate the boundary at the scheme start, not at the host start.
+    if (schemeStart === 0) return true;
+    const prev = line.charAt(schemeStart - 1);
+    return !LEFT_REJECT_CHAR.test(prev);
+  }
   const prev = line.charAt(hostStart - 1);
   return !LEFT_REJECT_CHAR.test(prev);
 }
@@ -146,7 +161,7 @@ export function extractUrls(line: string, cap: number): {
   const out: ExtractedUrl[] = [];
   HOST_SCAN.lastIndex = 0;
   let m: RegExpExecArray | null;
-  while ((m = HOST_SCAN.exec(line)) !== null) {
+  for (let m: RegExpExecArray | null; (m = HOST_SCAN.exec(line)) !== null;) {
     const matchEnd = m.index + m[0].length; // index right after the trailing `/`
     // The host starts at m.index. But the regex may have matched a host
     // continuation like the `github.com/` inside `notgithub.com/`: the
@@ -155,11 +170,8 @@ export function extractUrls(line: string, cap: number): {
     if (!isValidLeftBoundary(line, hostStart)) continue;
     // Extend URL start back to include the scheme prefix when present.
     let start = hostStart;
-    if (precededBySchemeSeparator(line, hostStart)) {
-      // Find the scheme start: `http://` or `https://` ending at hostStart.
-      const schemeStart = findSchemeStart(line, hostStart);
-      if (schemeStart !== -1) start = schemeStart;
-    }
+    const schemeStart = findSchemeStartBeforeHost(line, hostStart);
+    if (schemeStart !== -1) start = schemeStart;
     // Extend URL end forward until the first URL stop char.
     let end = matchEnd;
     while (end < line.length && !URL_STOP_CHAR.test(line.charAt(end))) end++;
@@ -184,5 +196,23 @@ function findSchemeStart(line: string, end: number): number {
   // credential-bearing schemes like password://).
   const scheme = line.substring(i + 1, schemeSearchEnd).toLowerCase();
   if (scheme === "http" || scheme === "https") return i + 1;
+  return -1;
+}
+
+/** Find the start index of an `http(s)://` scheme before the host position.
+ * Returns -1 if the scheme is not http/https.
+ */
+function findSchemeStartBeforeHost(line: string, hostStart: number): number {
+  // Look for `://` pattern before the host. The scheme is immediately before `://`.
+  for (let i = hostStart - 1; i >= 3; i--) {
+    if (line.substring(i - 2, i + 1) === "://") {
+      // Found `://` at positions i-2, i-1, i. Check if the preceding chars form http or https.
+      const schemeEnd = i - 2;
+      let j = schemeEnd - 1;
+      while (j >= 0 && /[A-Za-z]/.test(line.charAt(j))) j--;
+      const scheme = line.substring(j + 1, schemeEnd).toLowerCase();
+      if (scheme === "http" || scheme === "https") return j + 1;
+    }
+  }
   return -1;
 }
