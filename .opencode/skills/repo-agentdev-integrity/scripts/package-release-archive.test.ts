@@ -460,6 +460,121 @@ describe("package-release-archive.ps1 / publish primitive contract", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Stage B (Issue #2092) / untrusted-execution defense
+//
+// Proves the candidate archive's install-from-archive.ps1 is NEVER executed
+// by the release pipeline. Only the trusted host installer
+// (scripts/install-from-archive.ps1 at the release runner's working tree)
+// runs against the extracted source. A mutated archive's installer can no
+// longer run arbitrary code (in particular, can no longer mutate $stagedZip
+// between Compress-Archive and publication).
+// ---------------------------------------------------------------------------
+
+describe("package-release-archive.ps1 / Stage B untrusted-execution defense", () => {
+  test("invokes the trusted host installer ($installScript), NOT the extracted candidate ($installFromArchive)", () => {
+    // Static contract pin. PowerShell `-File <path>` decides which script
+    // body runs; this must be the trusted host installer, not the path
+    // extracted from the candidate archive.
+    const full = fs.readFileSync(REAL_SCRIPT, "utf-8");
+    const stripped = full
+      .split(/\r?\n/)
+      .filter((l) => !/^\s*#/.test(l))
+      .join("\n");
+    expect(stripped).toMatch(/-File\s+\$installScript\b/);
+    expect(stripped).not.toMatch(/-File\s+\$installFromArchive\b/);
+  });
+
+  test("malicious installer inside the staged archive does NOT run; publish succeeds", () => {
+    // Behavioral probe. The staging step normally copies $installScript
+    // (trusted) into <stageArchiveRoot>/scripts/install-from-archive.ps1.
+    // Patch the staging step to write a MALICIOUS stub there instead. The
+    // trusted installer at repo.installerPath is unchanged. After running
+    // the release script:
+    //   - if the script still invokes the extracted installer, the malicious
+    //     stub runs and drops a probe file (BUG: exit 9 / probe present)
+    //   - if the script invokes the trusted installer, the stub never runs
+    //     and the publish completes normally (CORRECT: exit 0 / no probe).
+    const repo = makeFakeRepo();
+    try {
+      const probePath = path.join(repo.root, "MALICIOUS-INSTALLER-RAN.txt");
+      const stubBody = `New-Item -ItemType File -Path '${probePath.replace(/'/g, "''")}' -Force | Out-Null`;
+      // Function-replacement form avoids $-interpolation of $stageScripts.
+      const stageCopyRe = /Copy-Item -LiteralPath \$installScript -Destination \(Join-Path \$stageScripts "install-from-archive\.ps1"\) -Force/;
+      const txt = fs.readFileSync(repo.scriptPath, "utf-8");
+      const patched = txt.replace(stageCopyRe, () =>
+        `Set-Content -LiteralPath (Join-Path $stageScripts "install-from-archive.ps1") -Value '${stubBody.replace(/'/g, "''")}' -Encoding utf8`,
+      );
+      expect(patched).not.toEqual(txt);
+      fs.writeFileSync(repo.scriptPath, patched);
+
+      const res = runScript(repo);
+      expect(res.exitCode).toBe(0);
+      // CRITICAL: malicious installer MUST NOT have executed.
+      expect(fs.existsSync(probePath)).toBe(false);
+      const report = inspect(repo);
+      expect(report.finalZip).toBe(true);
+      expect(report.trustStageDirs).toEqual([]);
+    } finally {
+      rmrf(repo.root);
+    }
+  }, 120000);
+});
+
+// ---------------------------------------------------------------------------
+// Stage B (Issue #2092) / byte binding through publication
+//
+// Proves the validated staged ZIP bytes are cryptographically bound through
+// the atomic hard-link publication. The host computes SHA-256 of $stagedZip
+// immediately before publication; the trusted publish helper verifies the
+// same digest on the staged bytes (pre-linkSync) AND on the final bytes
+// (post-linkSync). Any mutation of $stagedZip between digest computation
+// and linkSync is detected and fails closed (exit 9, no final published).
+// ---------------------------------------------------------------------------
+
+describe("package-release-archive.ps1 / Stage B byte binding (digest protocol)", () => {
+  test("computes SHA-256 of $stagedZip and passes it to the publish helper", () => {
+    // Static contract pin. The release script must compute the digest
+    // immediately before invocation and pass it as the third argv element.
+    const full = fs.readFileSync(REAL_SCRIPT, "utf-8");
+    const stripped = full
+      .split(/\r?\n/)
+      .filter((l) => !/^\s*#/.test(l))
+      .join("\n");
+    expect(stripped).toMatch(/Get-FileHash\b[^\n#]*\$stagedZip\b/);
+    expect(stripped).toMatch(
+      /&\s*bun\s+run\s+\$publishHelper\s+\$stagedZip\s+\$finalZip\s+\$stagedZipHash\b/,
+    );
+  });
+
+  test("mutated $stagedZip after digest computation fails publish (exit 9), no final, no residue", () => {
+    // Behavioral probe. Inject a mutation between the digest computation
+    // and the helper invocation. The helper MUST detect the digest
+    // mismatch and refuse to publish. This is the byte-binding TOCTOU
+    // defense: no candidate code runs in this window in production, but
+    // if anything (concurrent process, OS race) mutates $stagedZip after
+    // the host computed its digest, the publish fails closed.
+    const repo = makeFakeRepo();
+    try {
+      const helperCallRe = /(&\s*bun\s+run\s+\$publishHelper\s+\$stagedZip\s+\$finalZip\s+\$stagedZipHash)/;
+      const txt = fs.readFileSync(repo.scriptPath, "utf-8");
+      const patched = txt.replace(helperCallRe, (_m, helperCall) =>
+        `Add-Content -LiteralPath $stagedZip -Value "MUTATION-PROBE" -NoNewline\n${helperCall}`,
+      );
+      expect(patched).not.toEqual(txt);
+      fs.writeFileSync(repo.scriptPath, patched);
+
+      const res = runScript(repo);
+      expect(res.exitCode).toBe(9);
+      const report = inspect(repo);
+      expect(report.finalZip).toBe(false);
+      expect(report.trustStageDirs).toEqual([]);
+    } finally {
+      rmrf(repo.root);
+    }
+  }, 120000);
+});
+
+// ---------------------------------------------------------------------------
 // Stage B (Issue #2092) / true two-process concurrent hard-link race
 //
 // Uses test-only race-worker.ts to prove the publish-hard-link primitive's

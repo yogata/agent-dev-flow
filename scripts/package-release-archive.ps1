@@ -221,15 +221,24 @@ try {
     $extractedRootPath = $extractedRoot.FullName
     $installedSrc = Join-Path $extractedRootPath "src\opencode"
     $installedTarget = Join-Path $installedRoot ".opencode"
+    # Verify the candidate archive CONTAINS install-from-archive.ps1 as an
+    # artifact. Presence is required; the file is NOT executed (Stage B
+    # byte-binding / untrusted-execution defense, Issue #2092).
     $installFromArchive = Join-Path $extractedRootPath "scripts\install-from-archive.ps1"
     if (-not (Test-Path -LiteralPath $installFromArchive)) {
         Cleanup-Stage
         Fail-Exit 9 "package-release-archive: install-from-archive.ps1 missing from extracted archive: $installFromArchive"
     }
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $installFromArchive -Source $installedSrc -Target $installedTarget -Mode copy
+    # Run the TRUSTED host installer ($installScript at the release runner's
+    # working tree) against the extracted SOURCE, NOT the candidate copy
+    # extracted from the archive. The candidate archive's installer artifact
+    # is verified present above but never executed, so a mutated archive
+    # cannot run arbitrary code through its installer (in particular it
+    # cannot mutate $stagedZip between Compress-Archive and publication).
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $installScript -Source $installedSrc -Target $installedTarget -Mode copy
     if ($LASTEXITCODE -ne 0) {
         Cleanup-Stage
-        Fail-Exit 9 "package-release-archive: install-from-archive.ps1 exited with $LASTEXITCODE"
+        Fail-Exit 9 "package-release-archive: trusted install-from-archive.ps1 exited with $LASTEXITCODE"
     }
     Write-Host "package-release-archive: running archive-installed projection boundary check"
     & bun run $boundaryChecker --profile archive-installed $installedRoot --json 2>&1 | Out-Host
@@ -247,7 +256,19 @@ try {
     # fallback. The published bytes are the staged ZIP's bytes (hard link
     # shares the inode). On collision the existing final archive is left
     # untouched.
-    & bun run $publishHelper $stagedZip $finalZip 2>&1 | Out-Host
+    #
+    # Byte binding (Issue #2092 Stage B): the host computes SHA-256 of
+    # $stagedZip immediately before publication. The publish helper
+    # verifies this digest on the staged bytes (pre-linkSync) AND on the
+    # final bytes (post-linkSync) within its own linearized operation.
+    # Between this Get-FileHash call and the helper's pre-publish
+    # verification, no candidate-controlled code executes (the trusted
+    # installer already ran above; nothing extracted from the candidate
+    # archive runs in this window). Any external mutation of $stagedZip
+    # after this point is detected by the helper's staged-digest check
+    # and fails closed (exit 9, no final published).
+    $stagedZipHash = (Get-FileHash -LiteralPath $stagedZip -Algorithm SHA256).Hash
+    & bun run $publishHelper $stagedZip $finalZip $stagedZipHash 2>&1 | Out-Host
     $publishExit = $LASTEXITCODE
     if ($publishExit -eq 0) {
         # Publication succeeded. Staged ZIP still references the same inode;
