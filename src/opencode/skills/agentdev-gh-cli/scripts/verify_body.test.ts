@@ -102,7 +102,7 @@ beforeAll(() => {
   );
   writeFileSync(
     join(TEMP_DIR, "actual_github_url.md"),
-    VALID_BODY + "\n\n## References\n\n- [REQ-{NNNN}](https://github.com\u002Fyogata\u002Fagent-dev-flow\u002Fblob/main/<docs>/requirements/REQ-{NNNN}.md)\n",
+    VALID_BODY + "\n\n## References\n\n- [REQ-{NNNN}](https://github.com/example-user/example-repo/blob/main/docs/requirements/REQ-{NNNN}.md)\n",
     "utf-8",
   );
   writeFileSync(
@@ -160,7 +160,7 @@ describe("verify_body.ts", () => {
     expect(result.exitCode).toBe(1);
     const parsed: ReportJson = JSON.parse(result.stdout);
     const hasCrlfNg = parsed.results.some(
-      (r) => r.category === "Encoding" && r.check === "UTF\u002D8 / LF" && r.level === "ng" && r.message.includes("CRLF"),
+      (r) => r.category === "Encoding" && r.check === "UTF-8 / LF" && r.level === "ng" && r.message.includes("CRLF"),
     );
     expect(hasCrlfNg).toBe(true);
   });
@@ -216,7 +216,7 @@ describe("verify_body.ts", () => {
     expect(result.exitCode).toBe(1);
     const parsed: ReportJson = JSON.parse(result.stdout);
     const hasBomNg = parsed.results.some(
-      (r) => r.category === "Encoding" && r.check === "UTF\u002D8 / LF" && r.level === "ng" && r.message.includes("BOM"),
+      (r) => r.category === "Encoding" && r.check === "UTF-8 / LF" && r.level === "ng" && r.message.includes("BOM"),
     );
     expect(hasBomNg).toBe(true);
   });
@@ -230,7 +230,7 @@ describe("verify_body.ts", () => {
     expect(result.exitCode).toBe(0);
     const parsed: ReportJson = JSON.parse(result.stdout);
     const hasBomOk = parsed.results.some(
-      (r) => r.category === "Encoding" && r.check === "UTF\u002D8 / LF" && r.level === "ok" && r.message.includes("No BOM"),
+      (r) => r.category === "Encoding" && r.check === "UTF-8 / LF" && r.level === "ok" && r.message.includes("No BOM"),
     );
     expect(hasBomOk).toBe(true);
   });
