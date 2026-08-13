@@ -12,7 +12,7 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })))
 })
 
-describe("REQ\u002D012-014: empty graph is valid", () => {
+describe(`REQ-{NNNN}-014: empty graph is valid`, () => {
   it("builds successfully with no matching docs", async () => {
     const root = await mkdtemp(join(tmpdir(), "ag-empty-"))
     roots.push(root)

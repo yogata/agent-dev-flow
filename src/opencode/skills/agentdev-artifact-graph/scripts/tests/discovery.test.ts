@@ -23,7 +23,7 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })))
 })
 
-describe("TS\u002D005: discovery_roots with start point → query-time exploration", () => {
+describe("TS-{NNN}: discovery_roots with start point → query-time exploration", () => {
   it("default config has empty discovery_roots", async () => {
     const config = resolveConfig(undefined)
     expect(config.discovery_roots).toEqual([])
