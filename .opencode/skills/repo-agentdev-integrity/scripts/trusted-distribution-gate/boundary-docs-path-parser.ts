@@ -91,63 +91,115 @@ function findMdEndpoint(content: string): number {
 }
 
 /**
- * Scan backwards from `pos` to validate that the prefix consists only of
- * valid relative path dot-segments (., ..) mixed with separators (/ or \).
- * Returns true when the prefix is a valid relative path (or empty).
- * Rejects absolute paths (starts with / or \ at index 0) and identifier prefixes.
+ * Strict grammar check for relative path prefix: (("."|"..") separator)+
+ * where separator is /, \, %2F, %2f, %5C, or %5c.
+ * Accepts empty prefix (docs at line start or after a plain boundary char).
+ * Rejects: .../docs, ..../docs, %2Fdocs (no dot), a/../docs (identifier prefix),
+ * /docs, \docs (absolute paths).
  */
 function isValidRelativePrefix(line: string, pos: number): boolean {
-  if (pos === 0) return true; // docs at line start is valid
+  if (pos === 0) return true;
+
   const beforeDocs = line.charAt(pos - 1);
-  if (beforeDocs === '/' || beforeDocs === '\\') {
-    // Reject absolute paths: separator at index 0 means /docs or \docs
-    if (pos - 1 === 0) return false;
-    // Check for dot-segments before the separator; reject if none found
-    let p = pos - 2;
-    let foundDot = false;
-    while (p >= 0) {
-      const c = line.charAt(p);
-      if (c === '/') {
-        if (p === 0) return false;
-        p -= 1;
-      } else if (c === '\\') {
-        if (p === 0) return false;
-        p -= 1;
-      } else if (c === '.') {
-        foundDot = true;
-        p -= 1;
-      } else if (/[A-Za-z0-9_-]/.test(c)) {
-        return false;
-      } else {
-        break;
-      }
-    }
-    // Valid relative path must have at least one dot-segment (e.g., ./ or ../)
-    return foundDot;
-  }
-  if (beforeDocs === '.' && pos < line.length) {
-    const afterDot = line.charAt(pos);
-    if (afterDot === '/' || afterDot === '\\') {
-      // Check that everything before the dot is valid dot-segments
-      let p = pos - 2;
-      while (p >= 0) {
-        const c = line.charAt(p);
-        if (c === '.' || c === '/' || c === '\\') {
-          p -= 1;
-        } else if (/[A-Za-z0-9_-]/.test(c)) {
-          return false;
-        } else {
-          break;
-        }
-      }
-      return true;
-    }
-  }
-  // Accept boundary characters (space, etc.) before docs
-  if (/\s/.test(beforeDocs) || /[)\]\|'"`<>{},;:#?!。、！]/.test(beforeDocs)) {
+  if (/[\s)\]\|'"`<>{},;:#?!。 、！]/.test(beforeDocs)) {
     return true;
   }
+  if (/\(/.test(beforeDocs) || /\[/.test(beforeDocs) || /=/.test(beforeDocs) || /&/.test(beforeDocs)) {
+    return true;
+  }
+
+  return parseRelativePrefix(line, pos);
+}
+
+/**
+ * Parse the strict relative path prefix grammar: (("."|"..") separator)+
+ * scanning backwards from `pos`. Returns true when the grammar matches.
+ */
+function parseRelativePrefix(line: string, pos: number): boolean {
+  let p = pos - 1;
+  let hasValidPair = false;
+
+  while (p >= 0) {
+    const separatorLen = matchSeparatorBackward(line, p);
+    if (separatorLen === 0) break;
+
+    p -= separatorLen;
+
+    const dotSegment = matchDotSegmentBackward(line, p);
+    if (dotSegment === 0) break;
+
+    p -= dotSegment;
+    hasValidPair = true;
+
+    if (p < 0) break;
+
+    const beforePattern = line.charAt(p);
+    if (/[\s(\[]/.test(beforePattern) || /=/.test(beforePattern) || /&/.test(beforePattern)) {
+      break;
+    }
+
+    if (matchSeparatorBackward(line, p) > 0) {
+      continue;
+    }
+
+    break;
+  }
+
+  if (!hasValidPair) return false;
+
+  if (p < 0) return true;
+
+  const beforePattern = line.charAt(p);
+  if (/[\s(\[]/.test(beforePattern) || /=/.test(beforePattern) || /&/.test(beforePattern)) {
+    return true;
+  }
+
   return false;
+}
+
+/**
+ * Match a separator at position `p` scanning backward.
+ * Returns the length of the separator matched (1-3 chars), or 0 if no match.
+ * Recognizes: /, \, %2F, %2f, %5C, %5c
+ */
+function matchSeparatorBackward(line: string, p: number): number {
+  if (p < 0) return 0;
+
+  const c = line.charAt(p);
+  if (c === '/' || c === '\\') {
+    return 1;
+  }
+
+  if (p >= 2) {
+    const c1 = line.charAt(p - 1);
+    const c2 = line.charAt(p - 2);
+    if (c2 === '%' && ((c1 === '2' && (c === 'F' || c === 'f')) || (c1 === '5' && (c === 'C' || c === 'c')))) {
+      return 3;
+    }
+  }
+
+  return 0;
+}
+
+/**
+ * Match a dot-segment (.) or (..) scanning backward.
+ * Returns the length of the dot-segment matched (1 or 2), or 0 if no match.
+ * Rejects ... and longer dot runs by only matching 1 or 2 dots.
+ */
+function matchDotSegmentBackward(line: string, p: number): number {
+  if (p < 0) return 0;
+
+  const c = line.charAt(p);
+  if (c !== '.') return 0;
+
+  if (p >= 1 && line.charAt(p - 1) === '.') {
+    if (p >= 2 && line.charAt(p - 2) === '.') {
+      return 0;
+    }
+    return 2;
+  }
+
+  return 1;
 }
 
 /**
