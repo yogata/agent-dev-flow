@@ -1,13 +1,13 @@
-# STEP-{N}/6: Post-merge・Issue クローズ・クリーンアップ・Capture 回収・永続化（cleanup-and-capture）
+# STEP-5/6: Post-merge・Issue クローズ・クリーンアップ・Capture 回収・永続化（cleanup-and-capture）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-{N}, STEP-{N} 詳細である。Post-merge テスト戦略検証、Issue クローズ、worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、完了報告を提供する。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-5, STEP-6 詳細である。Post-merge テスト戦略検証、Issue クローズ、worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、完了報告を提供する。
 
-## STEP-{N}: Post-merge テスト戦略検証・Issue クローズ
+## STEP-5: Post-merge テスト戦略検証・Issue クローズ
 
 ### 開始条件
 
 - 単一 Issue クローズ ルート
-- STEP-{N} で PR マージ完了
+- STEP-4 で PR マージ完了
 
 ### Step 5: Post-merge テスト戦略検証
 
@@ -22,12 +22,12 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）。
 - CI 通過確認、Issue 本文更新
 - Issue close 完了
 
-## STEP-{N}: クリーンアップ・Capture 回収・永続化
+## STEP-6: クリーンアップ・Capture 回収・永続化
 
 ### 開始条件
 
 - 単一 Issue クローズ ルート
-- STEP-{N} で Issue クローズ完了
+- STEP-5 で Issue クローズ完了
 
 ### Step 7: ブランチ、worktree 削除
 
@@ -57,7 +57,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）。
 
 #### Step 9-1: 重複ファイルチェック再実行
 
-`git pull --ff-only` 直前に、`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャを再実行する（L-013、PR #1128 由来、共有 main worktree で STEP-{N}-1 実行時点から STEP-{N} 実行までの間に並列セッションが加えた未コミット変更を検知するため）。重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと。
+`git pull --ff-only` 直前に、`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャを再実行する（L-013、PR #1128 由来、共有 main worktree で Step 1-1 実行時点から Step 9-1 実行までの間に並列セッションが加えた未コミット変更を検知するため）。重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと。
 
 #### Step 9-2: git main 同期リスク事前検出・代替同期手順選択（REQ）
 
@@ -121,7 +121,7 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 
 ## 関連 STEP
 
-- 前: STEP-{N}（pr-merge-and-conflict）
+- 前: STEP-4（pr-merge-and-conflict）
 - 次: なし（workflow 終了）
 
 ## 関連 Capability Skill

@@ -1,11 +1,11 @@
-# STEP-{N}: PR マージ・コンフリクト解消（pr-merge-and-conflict）
+# STEP-4: PR マージ・コンフリクト解消（pr-merge-and-conflict）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-{N} 詳細である。PR squash マージ、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを提供する。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-4 詳細である。PR squash マージ、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを提供する。
 
 ## 開始条件
 
 - 単一 Issue クローズ ルート
-- STEP-{N} で docs 検証合格
+- STEP-3 で docs 検証合格
 
 ## 結果
 
@@ -34,7 +34,7 @@ PR merge 手続き（squash 方式、`agentdev-gh-cli`）を実行 → HEAD comm
 
 **対応記録コメント**: Issue に対応記録コメントを追加（テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read して `agentdev-gh-cli` の VERIFY 操作に従って内容検証）。
 
-**`--delete-branch` 使用禁止（REQ）**: PR マージ時に `--delete-branch` オプションを使用しない（アクティブ worktree に checkout されたブランチで local 削除が失敗し remote 削除フェーズへ到達しないため）。ブランチ削除は STEP-{N} で独立実施する。
+**`--delete-branch` 使用禁止（REQ）**: PR マージ時に `--delete-branch` オプションを使用しない（アクティブ worktree に checkout されたブランチで local 削除が失敗し remote 削除フェーズへ到達しないため）。ブランチ削除は STEP-6 で独立実施する。
 
 ### Step 4-1: Squash merge 後のローカル先行 commit 検出・処理（REQ）
 
@@ -59,8 +59,8 @@ squash merge がコンフリクトで失敗した場合（Step 4 のリトライ
 
 ## 関連 STEP
 
-- 前: STEP-{N}（docs-and-spec-promotion）
-- 次: STEP-{N}（cleanup-and-capture）
+- 前: STEP-3（docs-and-spec-promotion）
+- 次: STEP-5（cleanup-and-capture）
 
 ## 関連 Capability Skill
 
