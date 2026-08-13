@@ -45,8 +45,12 @@ const AUTHORITY_TERMINATOR = /[/?#]/;
 /** Port must be all decimal digits (non-digit port => malformed). */
 const PORT_DIGITS = /^[0-9]+$/;
 
-/** Characters allowed inside a URL authority (userinfo) region (RFC 3986). */
-const AUTHORITY_CHAR = /[A-Za-z0-9._~!$&'()*+,;=:@%]/;
+/** Characters allowed inside a URL authority (userinfo) region (RFC 3986
+ *  unreserved + sub-delims + pct-encoded + `:` / `@`). Hyphen is included
+ *  because it is RFC 3986 unreserved: without it, a userinfo like
+ *  `ADR-0001` stops the backward authority scan at the `-` and the scheme
+ *  `://` is never reached (blocker #8). */
+const AUTHORITY_CHAR = /[A-Za-z0-9._~!$&'()*+,;=:@%-]/;
 
 /** One character of an RFC 3986 scheme token: ALPHA / DIGIT / "+" / "-" / ".". */
 const SCHEME_CHAR = /[A-Za-z0-9+\-.]/;

@@ -138,14 +138,20 @@ describe("V6.3 external URL ?next=<producer URL> / nested URL visible, gate fail
 });
 
 // V6.4: external URL without query/fragment — path ownership preserved.
+// After the v7 path-ownership fix, ownershipSpan.start is authorityEnd
+// (the first path slash after the host), not urlStart. The end is still
+// the URL end when no `?`/`#` is present.
 describe("V6.4 external URL without ?/# / path ownership preserved (control)", () => {
-  test("extractUrls ownershipSpan equals span when no ?/#", () => {
+  test("extractUrls ownershipSpan starts at path slash (authorityEnd), end at URL end", () => {
     const text = "See https://github.com/external/repo/blob/main/docs/specs/ADR-0001.md end.";
     const { urls } = extractUrls(text, 64);
     expect(urls).toHaveLength(1);
     const u = urls[0];
     if (u === undefined) throw new Error("expected one url");
-    expect(u.ownershipSpan).toEqual(u.span);
+    expect(u.ownershipSpan).not.toBeNull();
+    const pathSlashIdx = text.indexOf("github.com/") + "github.com".length;
+    expect(u.ownershipSpan?.start).toBe(pathSlashIdx);
+    expect(u.ownershipSpan?.end).toBe(u.span.end);
   });
 
   test("detectCandidates emits only URL (no path, no direct-id)", () => {

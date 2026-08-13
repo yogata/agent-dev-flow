@@ -130,13 +130,17 @@ export interface ExtractedUrl {
    * covers ONLY the authority region so contained path references stay
    * independently visible; resolveCandidate classifies it evasion-attempt. */
   readonly malformed: boolean;
-  /** Suppression scope. For a valid URL: from URL start to the position of
-   * the first `?` or `#` in the URL value (path-only). When the URL has no
-   * `?`/`#`, this equals `span`. For a malformed URL: `null` (malformed
-   * URLs never own/suppress contained references). The full `span` remains
-   * the classification evidence; `ownershipSpan` is the only range that
-   * suppresses lower-precedence candidates. */
-  readonly ownershipSpan: Span | null;
+/** Suppression scope. For a valid URL: from the first path slash after the
+ * authority (authorityEnd) to the first `?` or `#` (path-only). The start
+ * is the path slash, not the URL start, so producer-internal IDs in the
+ * scheme/userinfo (`https://ADR-0001@github.com/...`) are NOT inside the
+ * ownership span and stay independently visible (blocker #8). When the URL
+ * has no path (no slash after the authority), this is `null` (no path to
+ * own). For a malformed URL: `null` (malformed URLs never own/suppress
+ * contained references). The full `span` remains the classification
+ * evidence; `ownershipSpan` is the only range that suppresses
+ * lower-precedence candidates. */
+readonly ownershipSpan: Span | null;
 }
 
 /**
@@ -189,6 +193,14 @@ export function extractUrls(line: string, cap: number): {
       urlEnd++;
     }
     const authorityEnd = findAuthorityEnd(line, hostEnd, urlEnd);
+    // Linear-scan guarantee (blocker #7): advance HOST_SCAN past the URL
+    // value just scanned, so subsequent `github.com/` hits inside the SAME
+    // URL value do not each trigger a fresh urlEnd walk (quadratic on
+    // `"github.com/".repeat(1000)`). When the URL has a `?` or `#`, resume
+    // just after it so nested URLs in the query/fragment are still found.
+    // Placed before any branch so every continue inherits the advancement.
+    const scanResume = firstQueryOrFrag !== -1 ? firstQueryOrFrag + 1 : urlEnd;
+    if (scanResume > HOST_SCAN.lastIndex) HOST_SCAN.lastIndex = scanResume;
     if (scan.hasBackslash) {
       const aStart = scan.schemeStart !== -1 ? scan.schemeStart : scan.authorityLeft;
       if (out.length >= cap) return { urls: out, overflow: true, steps };
@@ -231,7 +243,7 @@ export function extractUrls(line: string, cap: number): {
     if (cls.kind === "rejected") continue;
     if (extractOwnerRepo(value) === null) continue;
     if (out.length >= cap) return { urls: out, overflow: true, steps };
-    out.push({ value, span: { start: effectiveUrlStart, end: urlEnd }, malformed: false, ownershipSpan: ownershipSpanFor(effectiveUrlStart, urlEnd, firstQueryOrFrag) });
+    out.push({ value, span: { start: effectiveUrlStart, end: urlEnd }, malformed: false, ownershipSpan: ownershipSpanFor(authorityEnd, urlEnd, firstQueryOrFrag) });
   }
   EVASION_HOST_TOKEN.lastIndex = 0;
   for (let em: RegExpExecArray | null; (em = EVASION_HOST_TOKEN.exec(line)) !== null;) {
@@ -241,24 +253,38 @@ export function extractUrls(line: string, cap: number): {
     const canonical = canonicalizeHostEvasion(raw);
     if (canonical !== "github.com" && canonical !== "raw.githubusercontent.com") continue;
     const ts = em.index;
-    if (out.some((u) => u.span.start <= ts && ts < u.span.end)) continue;
+    // Blocker #6: dedup against ownershipSpan (path-only), not the full URL
+    // span. An evasion host placed in an external URL's query sits inside
+    // the outer URL's full `span` but OUTSIDE its `ownershipSpan` (which
+    // ends at the first `?`/`#`), so it must be emitted independently.
+    if (out.some((u) => u.ownershipSpan !== null && u.ownershipSpan.start <= ts && ts < u.ownershipSpan.end)) continue;
     if (out.length >= cap) return { urls: out, overflow: true, steps };
     let ue = ts + raw.length;
+    let evasionFirstQueryOrFrag = -1;
     while (ue < line.length) {
       steps++;
       const ch = line.charAt(ue);
       if (URL_STOP_CHAR.test(ch) || ch === "\\") break;
+      if ((ch === "?" || ch === "#") && evasionFirstQueryOrFrag === -1) evasionFirstQueryOrFrag = ue;
       ue++;
     }
     out.push({ value: line.substring(ts, ue), span: { start: ts, end: ue }, malformed: true, ownershipSpan: null });
+    // Same linear-scan guarantee as HOST_SCAN (blocker #7).
+    const evasionResume = evasionFirstQueryOrFrag !== -1 ? evasionFirstQueryOrFrag + 1 : ue;
+    if (evasionResume > EVASION_HOST_TOKEN.lastIndex) EVASION_HOST_TOKEN.lastIndex = evasionResume;
   }
   return { urls: out, overflow: false, steps };
 }
 
-/** Ownership span ends at the first `?` or `#` within `[start, end)`. */
-function ownershipSpanFor(start: number, end: number, firstQueryOrFrag: number): Span {
-  if (firstQueryOrFrag === -1) return { start, end };
-  return { start, end: firstQueryOrFrag };
+/** Ownership span starts at `authorityEnd` (the first path slash after the
+ *  host) and ends at the first `?` or `#` within `[authorityEnd, end)`.
+ *  Returns null when there is no path region to own (authorityEnd >= end,
+ *  or a `?`/`#` precedes the path slash). */
+function ownershipSpanFor(authorityEnd: number, end: number, firstQueryOrFrag: number): Span | null {
+  if (authorityEnd >= end) return null;
+  if (firstQueryOrFrag === -1) return { start: authorityEnd, end };
+  if (firstQueryOrFrag <= authorityEnd) return null;
+  return { start: authorityEnd, end: firstQueryOrFrag };
 }
 
 function isValidLeftBoundary(line: string, pos: number, hasScheme: boolean): boolean {
