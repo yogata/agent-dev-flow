@@ -108,6 +108,7 @@ export function detectCandidates(
     const start = m.index ?? 0;
     const end = start + m[0].length;
     if (isTemplateWrappedId(line, start, end)) continue;
+    if (/^UTF-(?:8|16|32)$/.test(m[0])) continue;
     out.push({ type: "id", value: m[0] });
   }
 

@@ -1224,25 +1224,18 @@ describe("Stage B regression: Unicode / hex evasion detection", () => {
     expect(decideGate(d).pass).toBe(false);
   });
 
-  test("normal UTF-8 / UTF-16 text is NOT flagged as evasion", () => {
-    // The constraint: evasion detection MUST NOT treat normal text mentioning
-    // UTF-8 as suspicious. The literal string "UTF-8" matches the ID-shaped
-    // pattern (3 letters + hyphen + digit) but is not in the producer-internal
-    // nor distributed-control allowed set; it goes through the normal
-    // `unclassified` ID path (NOT the evasion path). This test pins the
-    // classification so a future broadening of ID_EVASION_PATTERN cannot
-    // accidentally pull UTF-8 into the evasion bucket.
+  test("standard UTF encoding labels are not ID candidates", () => {
     const d = classifyLineConfig(
       {
-        text: "encode as UTF-8 with BOM",
+        text: "encode as UTF-8 or UTF-16 with BOM",
         lineNumber: 1,
         filePath: "x.md",
         projection: "source",
       },
       DEFAULT_DETECTOR_CONFIG,
     );
-    const evasion = d.filter((x) => x.category === "evasion-attempt");
-    expect(evasion.length).toBe(0);
+    expect(d).toEqual([]);
+    expect(decideGate(d).pass).toBe(true);
   });
 
   test("string with backslash but no escape scheme is NOT evasion", () => {
