@@ -24,15 +24,24 @@ describe("nextReqNumber", () => {
 });
 
 describe("formatReqId", () => {
-  test("zero-pads to 3 digits", () => {
-    expect(formatReqId(1)).toBe("REQ-" + "001");
+  test("zero-pads single digit to 3 digits", () => {
+    const result = formatReqId(1);
+    expect(result).toStartWith("REQ-");
+    expect(result).toHaveLength(7);
+    expect(result.endsWith("001")).toBe(true);
   });
 
-  test("preserves 4-digit numbers", () => {
-    expect(formatReqId(1234)).toBe("REQ-" + "1234");
+  test("preserves 4-digit numbers without truncation", () => {
+    const result = formatReqId(1234);
+    expect(result).toStartWith("REQ-");
+    expect(result).toHaveLength(8);
+    expect(result.endsWith("1234")).toBe(true);
   });
 
-  test("preserves 5-digit numbers", () => {
-    expect(formatReqId(12345)).toBe("REQ\u002D12345");
+  test("preserves 5-digit numbers without truncation", () => {
+    const result = formatReqId(12345);
+    expect(result).toStartWith("REQ-");
+    expect(result).toHaveLength(9);
+    expect(result.endsWith("12345")).toBe(true);
   });
 });
