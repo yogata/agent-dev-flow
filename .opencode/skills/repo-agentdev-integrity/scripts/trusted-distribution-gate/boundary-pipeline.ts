@@ -62,7 +62,7 @@ export {
 
 // Generic ID family: any UPPER-CASE prefix of 2+ letters, hyphen, 1+ digits.
 // UTF-8, UTF-16, UTF-32 are encoding labels and must NOT match as IDs.
-export const GENERIC_ID_PATTERN = /\b([A-Z]{2,})-(\d{1,})\b/g;
+export const GENERIC_ID_PATTERN = /\b([A-Z]{2,})-(\d{1,})\b/;
 const UTF_ENCODING_LABELS = new Set(["UTF-8", "UTF-16", "UTF-32"]);
 
 function trimSnippet(line: string, maxLen: number): string {
@@ -126,7 +126,7 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
   ).filter((s): s is Span => s !== null);
 
   if (overflowReason === null) {
-    for (const m of line.matchAll(GENERIC_ID_PATTERN)) {
+    for (const m of line.matchAll(new RegExp(GENERIC_ID_PATTERN.source, "g"))) {
       if (UTF_ENCODING_LABELS.has(m[0])) continue;
       const idx = m.index ?? 0;
       const span: Span = { start: idx, end: idx + m[0].length };
