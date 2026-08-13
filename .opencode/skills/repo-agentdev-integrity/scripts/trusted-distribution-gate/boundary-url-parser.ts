@@ -225,6 +225,16 @@ export function extractUrls(line: string, cap: number): {
     const effectiveUrlStart = !hasScheme && scan.authorityLeft < hostStart && line.substring(scan.authorityLeft, hostStart).includes("@")
       ? scan.authorityLeft
       : urlStart;
+    // Scheme-less recognized host after a query-assignment delimiter (`=` or
+    // `&`) is ambiguous: standalone URL or a value nested in a parent URL's
+    // query. Without a scheme the detector cannot tell, so fail closed by
+    // emitting malformed rather than skipping (blocker #2). The `!hasScheme`
+    // guard keeps scheme URLs accepted (`url=https://github.com/...` stays valid).
+    if (!hasScheme && effectiveUrlStart > 0 && (line.charAt(effectiveUrlStart - 1) === "=" || line.charAt(effectiveUrlStart - 1) === "&")) {
+      if (out.length >= cap) return { urls: out, overflow: true, steps };
+      out.push({ value: line.substring(effectiveUrlStart, authorityEnd), span: { start: effectiveUrlStart, end: authorityEnd }, malformed: true, ownershipSpan: null });
+      continue;
+    }
     if (!isValidLeftBoundary(line, effectiveUrlStart, hasScheme)) continue;
     const value = line.substring(effectiveUrlStart, urlEnd);
     const cls = classifyAuthority(value);
