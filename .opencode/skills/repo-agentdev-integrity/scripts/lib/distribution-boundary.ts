@@ -33,6 +33,7 @@ export type DependencyClass =
   | "consumer-resolvable"
   | "generic-or-template"
   | "producer-internal"
+  | "distributed-control"
   | "unclassified";
 
 export type DetectionCategory =
@@ -40,7 +41,9 @@ export type DetectionCategory =
   | "concrete-path"
   | "fixed-url"
   | "unclassified-entry"
-  | "adapter-failure";
+  | "adapter-failure"
+  | "distributed-control"
+  | "evasion-attempt";
 
 export interface LineInput {
   /** Full line text including any trailing newline already stripped by caller. */
@@ -104,6 +107,7 @@ export {
   DOCS_PATH_PATTERN,
   DOCS_PATH_PERCENT_PATTERN,
   URL_CANDIDATE_PATTERN,
+  ID_EVASION_PATTERN,
   FIXED_URL_PATTERN,
   RAW_FIXED_URL_PATTERN,
   DEFAULT_REPOSITORY_IDENTITY,

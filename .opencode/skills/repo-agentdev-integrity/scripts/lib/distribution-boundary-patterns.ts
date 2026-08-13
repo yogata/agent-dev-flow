@@ -39,11 +39,24 @@ export const DOCS_PATH_PERCENT_PATTERN =
 
 // Candidate GitHub blob/raw URLs. The resolution stage parses owner/repo
 // from each candidate URL and compares to the configured repository identity.
+// `i` flag: host names are case-insensitive per RFC 4343 and GitHub itself;
+// GITHUB.COM/... MUST NOT bypass extraction (false-clean risk). Owner/repo
+// and blob/raw are also matched case-insensitively; over-match is fail-closed,
+// under-match is the bypass we guard against.
 export const URL_CANDIDATE_PATTERN =
-  /(?:github\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/(?:blob|raw)\/|raw\.githubusercontent\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/)[^\s)\]\\"'`<>{}]+/g;
+  /(?:github\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/(?:blob|raw)\/|raw\.githubusercontent\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/)[^\s)\]\\"'`<>{}]+/gi;
 
 export const FIXED_URL_PATTERN = URL_CANDIDATE_PATTERN;
 export const RAW_FIXED_URL_PATTERN = URL_CANDIDATE_PATTERN;
+
+// Evasion pattern: catches UPPER-prefix + hyphen followed by an escape
+// sequence (\\uXXXX, \\xXX, or 0xXX) instead of literal digits. The raw-digit
+// form is caught by GENERIC_ID_PATTERN; an author who tries to obscure the
+// digits via Unicode or hex escapes MUST NOT bypass the boundary. Scoped
+// narrowly to escape-shaped tokens so plain text like "UTF-8" cannot land in
+// the evasion bucket.
+export const ID_EVASION_PATTERN =
+  /\b([A-Z]{2,})-(?:\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2}|0x[0-9a-fA-F]{2,})/g;
 
 // ---------------------------------------------------------------------------
 // Path normalization
@@ -87,10 +100,11 @@ export function isConcreteDocsPath(token: string): boolean {
 
 /**
  * Extract the `owner/repo` segment from a GitHub blob/raw URL. Returns null
- * when the URL does not match the expected shape.
+ * when the URL does not match the expected shape. Host is matched
+ * case-insensitively so GITHUB.COM and RAW.GITHUBUSERCONTENT.COM are accepted.
  */
 export function extractOwnerRepo(url: string): string | null {
-  const m = /(?:github\.com\/|raw\.githubusercontent\.com\/)([A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+)\//.exec(
+  const m = /(?:github\.com\/|raw\.githubusercontent\.com\/)([A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+)\//i.exec(
     url,
   );
   if (!m) return null;

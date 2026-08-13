@@ -26,6 +26,10 @@ import {
   isTextFile,
   TEXT_EXTENSIONS,
   classifyBytes,
+  classifyByExtension,
+  detectCandidates,
+  extractOwnerRepo,
+  URL_CANDIDATE_PATTERN,
   DEFAULT_REPOSITORY_IDENTITY,
   DEFAULT_DETECTOR_CONFIG,
   type Projection,
@@ -527,6 +531,7 @@ describe("Stage B regression: arbitrary producer-internal ID families", () => {
     const cfg: DetectorConfig = {
       repository_identity: DEFAULT_REPOSITORY_IDENTITY,
       producer_internal_id_prefixes: ["ADR", "REQ", "DEC", "OU", "TS", "AG"],
+      distributed_workflow_control_prefixes: ["STEP", "QG"],
     };
     expect(
       resolveCandidateConfig({ type: "id", value: "OU-3" }, cfg).classification,
@@ -622,6 +627,7 @@ describe("Stage B regression: repository-identity URL classification", () => {
         default_branch: "main",
       },
       producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
+      distributed_workflow_control_prefixes: ["STEP", "QG"],
     };
     const r = resolveCandidateConfig(
       {
@@ -640,6 +646,7 @@ describe("Stage B regression: repository-identity URL classification", () => {
     const cfg: DetectorConfig = {
       repository_identity: { owner_slash_name: "", default_branch: "" },
       producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
+      distributed_workflow_control_prefixes: ["STEP", "QG"],
     };
     const r = resolveCandidateConfig(
       {
@@ -797,9 +804,461 @@ describe("Stage B regression: classifier config plumbing", () => {
     const cfg: DetectorConfig = {
       repository_identity: DEFAULT_REPOSITORY_IDENTITY,
       producer_internal_id_prefixes: ["ADR", "REQ", "DEC", "OU"],
+      distributed_workflow_control_prefixes: ["STEP", "QG"],
     };
     const d = classifyContentConfig("ref OU-3", "x.md", "source", cfg);
     expect(d.length).toBe(1);
     expect(d[0]!.classification).toBe("producer-internal");
+  });
+});
+
+// =============================================================================
+// Stage B regression: PR #2092 review blockers (false-clean fixes).
+// =============================================================================
+
+describe("Stage B regression: empty repository_identity no longer skips URL extraction", () => {
+  const emptyIdentityCfg: DetectorConfig = {
+    repository_identity: { owner_slash_name: "", default_branch: "" },
+    producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
+    distributed_workflow_control_prefixes: ["STEP", "QG"],
+  };
+
+  test("detectCandidates emits a url candidate even when identity is empty", () => {
+    const candidates = detectCandidates(
+      "see https://github.com/yogata/agent-dev-flow/blob/main/docs/x.md",
+      emptyIdentityCfg,
+    );
+    const urls = candidates.filter((c) => c.type === "url");
+    expect(urls.length).toBe(1);
+  });
+
+  test("classifyLineConfig emits an unclassified Detection for URL when identity is empty", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see https://github.com/yogata/agent-dev-flow/blob/main/docs/x.md",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      emptyIdentityCfg,
+    );
+    expect(d.length).toBe(1);
+    expect(d[0]!.classification).toBe("unclassified");
+    expect(d[0]!.category).toBe("unclassified-entry");
+    expect(d[0]!.matched).toContain("github.com");
+  });
+
+  test("decideGate marks empty-identity URL detection as gate-not-passed", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see https://github.com/yogata/agent-dev-flow/blob/main/docs/x.md",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      emptyIdentityCfg,
+    );
+    const gate = decideGate(d);
+    expect(gate.pass).toBe(false);
+    expect(gate.errors.length).toBe(1);
+  });
+});
+
+describe("Stage B regression: case-insensitive GitHub host matching", () => {
+  test("URL_CANDIDATE_PATTERN matches uppercase GITHUB.COM blob URL", () => {
+    const line = "see https://GITHUB.COM/yogata/agent-dev-flow/blob/main/x.md now";
+    const matches = [...line.matchAll(URL_CANDIDATE_PATTERN)];
+    expect(matches.length).toBe(1);
+  });
+
+  test("URL_CANDIDATE_PATTERN matches mixed-case GitHub.Com raw URL", () => {
+    const line = "see https://GitHub.Com/yogata/agent-dev-flow/raw/main/x.md now";
+    const matches = [...line.matchAll(URL_CANDIDATE_PATTERN)];
+    expect(matches.length).toBe(1);
+  });
+
+  test("URL_CANDIDATE_PATTERN matches uppercase RAW.GITHUBUSERCONTENT.COM", () => {
+    const line = "see https://RAW.GITHUBUSERCONTENT.COM/yogata/agent-dev-flow/main/x.md";
+    const matches = [...line.matchAll(URL_CANDIDATE_PATTERN)];
+    expect(matches.length).toBe(1);
+  });
+
+  test("extractOwnerRepo returns owner/repo for GITHUB.COM URL", () => {
+    expect(
+      extractOwnerRepo("https://GITHUB.COM/yogata/agent-dev-flow/blob/main/x.md"),
+    ).toBe("yogata/agent-dev-flow");
+  });
+
+  test("extractOwnerRepo returns owner/repo for RAW.GITHUBUSERCONTENT.COM URL", () => {
+    expect(
+      extractOwnerRepo("https://RAW.GITHUBUSERCONTENT.COM/yogata/agent-dev-flow/main/x.md"),
+    ).toBe("yogata/agent-dev-flow");
+  });
+
+  test("uppercase-host URL into producer repo resolves to producer-internal", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see https://GITHUB.COM/yogata/agent-dev-flow/blob/main/x.md",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const urls = d.filter((x) => x.category === "fixed-url");
+    expect(urls.length).toBe(1);
+    expect(urls[0]!.classification).toBe("producer-internal");
+  });
+
+  test("uppercase-host URL into external repo stays consumer-resolvable (no Detection)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see https://GITHUB.COM/sst/opencode/blob/main/docs/guide.md",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const urls = d.filter((x) => x.category === "fixed-url");
+    expect(urls.length).toBe(0);
+  });
+});
+
+describe("Stage B regression: extension classification fail-closed on unknown ext", () => {
+  test("extensionless filenames remain text (README, LICENSE convention)", () => {
+    expect(classifyByExtension("README").kind).toBe("text");
+    expect(classifyByExtension("LICENSE").kind).toBe("text");
+  });
+
+  test("unknown extension returns 'unknown' (fail closed at gate)", () => {
+    expect(classifyByExtension("archive.xyz").kind).toBe("unknown");
+    expect(classifyByExtension("data.weirdext").kind).toBe("unknown");
+  });
+
+  test("known text extensions remain 'text'", () => {
+    expect(classifyByExtension("doc.md").kind).toBe("text");
+    expect(classifyByExtension("script.ts").kind).toBe("text");
+  });
+
+  test("known binary extensions remain 'binary'", () => {
+    expect(classifyByExtension("logo.png").kind).toBe("binary");
+    expect(classifyByExtension("archive.zip").kind).toBe("binary");
+  });
+
+  test("isTextFile returns false for unknown extension (gate no longer scans it as text)", () => {
+    expect(isTextFile("archive.xyz")).toBe(false);
+    expect(isTextFile("data.weirdext")).toBe(false);
+  });
+});
+
+// =============================================================================
+// Stage B regression: PR #2092 review fix — distributed workflow control labels.
+//
+// STEP-N and QG-N (and STEP-E variants where applicable) are legitimate
+// distributed workflow control labels used in restored executable docs
+// (case-close references, SKILL.md control plane). They MUST NOT trip the
+// distribution boundary gate. Producer-internal concrete IDs (REQ/ADR/DEC)
+// remain blocked; unclassified families (SPEC/IR/etc.) remain fail-closed.
+// =============================================================================
+
+describe("Stage B regression: distributed workflow control labels (STEP/QG) allowed", () => {
+  test("STEP-1 resolves to distributed-control (allowed, no Detection)", () => {
+    const r = resolveCandidateConfig(
+      { type: "id", value: "STEP-1" },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(r.classification).toBe("distributed-control");
+  });
+
+  test("QG-4 resolves to distributed-control (allowed, no Detection)", () => {
+    const r = resolveCandidateConfig(
+      { type: "id", value: "QG-4" },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(r.classification).toBe("distributed-control");
+  });
+
+  test("STEP-N for N=1..6 all resolve to distributed-control", () => {
+    for (const n of ["STEP-1", "STEP-2", "STEP-3", "STEP-4", "STEP-5", "STEP-6"]) {
+      const r = resolveCandidateConfig(
+        { type: "id", value: n },
+        DEFAULT_DETECTOR_CONFIG,
+      );
+      expect(r.classification).toBe("distributed-control");
+    }
+  });
+
+  test("classifyLineConfig emits NO Detection for STEP-1 line", () => {
+    const d = classifyLineConfig(
+      {
+        text: "- STEP-1 で Epic Issue と判定（ステータス追跡テーブル存在）",
+        lineNumber: 1,
+        filePath: "src/opencode/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(d.length).toBe(0);
+  });
+
+  test("classifyLineConfig emits NO Detection for QG-4 line", () => {
+    const d = classifyLineConfig(
+      {
+        text: "QG-4 観点8 に基づく評価スコープ切替",
+        lineNumber: 1,
+        filePath: "src/opencode/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(d.length).toBe(0);
+  });
+
+  test("decideGate passes for content containing only STEP/QG labels", () => {
+    const content = [
+      "# STEP-E1〜E6: Epic Wave クローズ",
+      "- STEP-1 で Epic Issue と判定",
+      "QG-4 観点8 に基づく評価",
+      "次: STEP-3（docs-and-spec-promotion）",
+    ].join("\n");
+    const d = classifyContentConfig(
+      content,
+      "src/opencode/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
+      "source",
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const gate = decideGate(d);
+    expect(gate.pass).toBe(true);
+    expect(gate.failures.length).toBe(0);
+    expect(gate.errors.length).toBe(0);
+  });
+
+  test("STEP-E4-0 (Epic variant) does NOT match the ID pattern — stays unclassified-token, no Detection", () => {
+    // The Epic Wave E4-0 sub-step is written as "STEP-E4-0" or standalone "E4-0".
+    // Neither shape matches GENERIC_ID_PATTERN (the post-hyphen char is a letter
+    // for STEP-E*, and the standalone form has a 1-letter prefix). The detector
+    // MUST NOT emit a Detection for it; the gate MUST stay clean. This pins the
+    // contract so a future pattern tweak cannot regress Epic Wave docs.
+    const d = classifyLineConfig(
+      {
+        text: "配布依存境界の最終 gate（STEP-E4-0、single-Issue STEP-3 Step 3-1 と同一）",
+        lineNumber: 1,
+        filePath: "src/opencode/skills/agentdev-workflow-case-close/references/epic-wave-close.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    // Only STEP-3 (a plain STEP-N) is in scope; STEP-E4-0 and "E4-0" must NOT
+    // contribute detections.
+    const matched = d.map((x) => x.matched);
+    expect(matched).not.toContain("STEP-E4-0");
+    expect(matched).not.toContain("E4-0");
+    // STEP-3 is allowed too (distributed-control) so the line is fully clean.
+    expect(d.length).toBe(0);
+  });
+});
+
+describe("Stage B regression: concrete producer-internal IDs remain blocked", () => {
+  test("REQ-0103 still resolves to producer-internal (blocked)", () => {
+    const r = resolveCandidateConfig(
+      { type: "id", value: "REQ-0103" },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(r.classification).toBe("producer-internal");
+    expect(r.category).toBe("concrete-id");
+  });
+
+  test("ADR-0128 still resolves to producer-internal (blocked)", () => {
+    const r = resolveCandidateConfig(
+      { type: "id", value: "ADR-0128" },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(r.classification).toBe("producer-internal");
+  });
+
+  test("DEC-010 still resolves to producer-internal (blocked)", () => {
+    const r = resolveCandidateConfig(
+      { type: "id", value: "DEC-010" },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(r.classification).toBe("producer-internal");
+  });
+
+  test("IR-056 still resolves to unclassified (fail-closed, blocked)", () => {
+    // IR is a real producer-internal family NOT in the default allowed set;
+    // the detector returns `unclassified` and the gate treats that as
+    // gate-not-passed (DEC-014 decision 5). STEP/QG being allowed does NOT
+    // relax this.
+    const r = resolveCandidateConfig(
+      { type: "id", value: "IR-056" },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(r.classification).toBe("unclassified");
+    expect(r.category).toBe("unclassified-entry");
+  });
+
+  test("SPEC-012 still resolves to unclassified (fail-closed, blocked)", () => {
+    const r = resolveCandidateConfig(
+      { type: "id", value: "SPEC-012" },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(r.classification).toBe("unclassified");
+  });
+
+  test("classifyLineConfig emits Detection for REQ-0103 line and gate fails", () => {
+    const d = classifyLineConfig(
+      {
+        text: "ref REQ-0103 here",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    expect(d.length).toBe(1);
+    expect(d[0]!.classification).toBe("producer-internal");
+    expect(d[0]!.matched).toBe("REQ-0103");
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("mixed STEP/QG + REQ content: only REQ fails the gate", () => {
+    // Verified end-to-end: STEP/QG labels are allowed AND producer-internal
+    // IDs remain blocked in the same content. The detector must not regress
+    // either side when both shapes coexist.
+    const content = [
+      "# case-close",
+      "- STEP-1 でルーティング",
+      "- ref REQ-0103 と ADR-0128",
+      "QG-4 最終受け入れゲート",
+    ].join("\n");
+    const d = classifyContentConfig(content, "x.md", "source", DEFAULT_DETECTOR_CONFIG);
+    const matched = d.map((x) => x.matched).sort();
+    expect(matched).toEqual(["ADR-0128", "REQ-0103"]);
+    for (const det of d) {
+      expect(det.classification).toBe("producer-internal");
+    }
+    const gate = decideGate(d);
+    expect(gate.pass).toBe(false);
+    expect(gate.failures.length).toBe(2);
+    expect(gate.errors.length).toBe(0);
+  });
+});
+
+// =============================================================================
+// Stage B regression: PR #2092 — Unicode / hex evasion detection.
+//
+// Evasion attempt: an author tries to obscure a producer-internal ID by
+// writing its digits as escape sequences (\uXXXX, \xXX, 0xXX). The detector
+// MUST treat such candidates as `unclassified` so the gate fails closed,
+// rather than silently letting the obscured form through. Normal UTF-8 text
+// (the literal string "UTF-8", "UTF-16", etc.) MUST NOT be flagged as
+// evasion — evasion detection is scoped to escape-sequence patterns only.
+// =============================================================================
+
+describe("Stage B regression: Unicode / hex evasion detection", () => {
+  test("REQ-\\u0030 emits unclassified Detection (gate-not-passed)", () => {
+    // \\u0030 in source text is the literal 6-character escape that would
+    // decode to digit '0' downstream. The raw-digit form REQ-01 is blocked
+    // by the ID rule; the escaped form MUST NOT bypass it.
+    const d = classifyLineConfig(
+      {
+        text: "ref REQ-\\u0030\\u0031 here",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const evasion = d.filter((x) => x.category === "evasion-attempt");
+    expect(evasion.length).toBe(1);
+    expect(evasion[0]!.classification).toBe("unclassified");
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("ADR-\\x30 emits unclassified Detection (gate-not-passed)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see ADR-\\x30\\x31 evasion",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const evasion = d.filter((x) => x.category === "evasion-attempt");
+    expect(evasion.length).toBe(1);
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("DEC-0x30 emits unclassified Detection (gate-not-passed)", () => {
+    const d = classifyLineConfig(
+      {
+        text: "see DEC-0x30 hex evasion",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const evasion = d.filter((x) => x.category === "evasion-attempt");
+    expect(evasion.length).toBe(1);
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("STEP-\\u0030 (distributed-control evasion) still blocked", () => {
+    // Even allowed prefixes (STEP, QG) MUST NOT be allowed when their digits
+    // are obscured. Evasion detection wins over the distributed-control
+    // allowance, because the presence of an escape is itself the signal.
+    const d = classifyLineConfig(
+      {
+        text: "STEP-\\u0030 looks like a step but the digits are hidden",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const evasion = d.filter((x) => x.category === "evasion-attempt");
+    expect(evasion.length).toBe(1);
+    expect(decideGate(d).pass).toBe(false);
+  });
+
+  test("normal UTF-8 / UTF-16 text is NOT flagged as evasion", () => {
+    // The constraint: evasion detection MUST NOT treat normal text mentioning
+    // UTF-8 as suspicious. The literal string "UTF-8" matches the ID-shaped
+    // pattern (3 letters + hyphen + digit) but is not in the producer-internal
+    // nor distributed-control allowed set; it goes through the normal
+    // `unclassified` ID path (NOT the evasion path). This test pins the
+    // classification so a future broadening of ID_EVASION_PATTERN cannot
+    // accidentally pull UTF-8 into the evasion bucket.
+    const d = classifyLineConfig(
+      {
+        text: "encode as UTF-8 with BOM",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const evasion = d.filter((x) => x.category === "evasion-attempt");
+    expect(evasion.length).toBe(0);
+  });
+
+  test("string with backslash but no escape scheme is NOT evasion", () => {
+    // A standalone backslash or random text after a hyphen is not an escape
+    // sequence and MUST NOT trip the evasion rule. Evasion detection is
+    // narrowly scoped to \\uXXXX / \\xXX / 0xXX after an UPPER-prefix hyphen.
+    const d = classifyLineConfig(
+      {
+        text: "path C:\\Users\\name on Windows",
+        lineNumber: 1,
+        filePath: "x.md",
+        projection: "source",
+      },
+      DEFAULT_DETECTOR_CONFIG,
+    );
+    const evasion = d.filter((x) => x.category === "evasion-attempt");
+    expect(evasion.length).toBe(0);
   });
 });

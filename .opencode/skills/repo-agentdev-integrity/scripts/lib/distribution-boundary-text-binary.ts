@@ -31,6 +31,14 @@ export const TEXT_EXTENSIONS = new Set([
   ".toml", ".ini", ".cfg", ".conf",
   ".gitignore", ".gitattributes",
   ".env",
+  // Well-known text formats previously captured by the implicit "unknown =
+  // text" fallback. Now that the fallback is fail-closed, these must be
+  // enumerated so legitimate text artifacts are scanned as text rather than
+  // flagged as unknown-extension adapter-failures.
+  ".lock",
+  ".svg",
+  ".csv",
+  ".map",
 ]);
 
 export const BINARY_EXTENSIONS = new Set([
@@ -52,7 +60,7 @@ export function isTextFile(filename: string): boolean {
   const ext = lower.slice(lastDot);
   if (BINARY_EXTENSIONS.has(ext)) return false;
   if (TEXT_EXTENSIONS.has(ext)) return true;
-  return true;
+  return false;
 }
 
 export function isBinaryFile(filename: string): boolean {
@@ -180,9 +188,9 @@ export function classifyBytes(bytes: ByteSource): ByteClassification {
 
 /**
  * Classify a file by its extension. Binary extensions return binary, known
- * text extensions return text, and unknown / missing extensions return
- * `unknown` so the gate layer fails closed instead of silently scanning or
- * silently skipping.
+ * text extensions and extensionless names (README, LICENSE) return text, and
+ * unrecognized extensions return `unknown` so the gate layer fails closed
+ * instead of silently scanning or silently skipping.
  */
 export function classifyByExtension(filename: string): ByteClassification {
   if (isBinaryFile(filename)) {
@@ -191,7 +199,7 @@ export function classifyByExtension(filename: string): ByteClassification {
   const lower = filename.toLowerCase();
   const lastDot = lower.lastIndexOf(".");
   if (lastDot < 0) {
-    return { kind: "unknown", reason: "no extension" };
+    return { kind: "text" };
   }
   const ext = lower.slice(lastDot);
   if (TEXT_EXTENSIONS.has(ext)) {

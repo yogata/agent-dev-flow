@@ -22,6 +22,7 @@ import {
   DOCS_PATH_PATTERN,
   DOCS_PATH_PERCENT_PATTERN,
   GENERIC_ID_PATTERN,
+  ID_EVASION_PATTERN,
   URL_CANDIDATE_PATTERN,
   isConcreteDocsPath,
   isProducerOwnedUrl,
@@ -35,6 +36,7 @@ export {
   DOCS_PATH_PATTERN,
   DOCS_PATH_PERCENT_PATTERN,
   URL_CANDIDATE_PATTERN,
+  ID_EVASION_PATTERN,
   FIXED_URL_PATTERN,
   RAW_FIXED_URL_PATTERN,
   normalizePathToken,
@@ -59,6 +61,14 @@ export interface DetectorConfig {
   readonly repository_identity: RepositoryIdentity;
   /** Producer-internal ID prefixes (UPPER-CASE letters only, e.g. "ADR"). */
   readonly producer_internal_id_prefixes: readonly string[];
+  /**
+   * Distributed workflow control label prefixes (UPPER-CASE letters only).
+   * These are legitimate workflow vocabulary that ships in restored
+   * executable docs (case-close STEP/QG labels) and MUST NOT trip the
+   * boundary gate. Distinct from producer_internal_id_prefixes so adding
+   * STEP/QG here cannot accidentally relax a real producer-internal family.
+   */
+  readonly distributed_workflow_control_prefixes: readonly string[];
 }
 
 /**
@@ -74,13 +84,14 @@ export const DEFAULT_REPOSITORY_IDENTITY: RepositoryIdentity = {
 export const DEFAULT_DETECTOR_CONFIG: DetectorConfig = {
   repository_identity: DEFAULT_REPOSITORY_IDENTITY,
   producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
+  distributed_workflow_control_prefixes: ["STEP", "QG"],
 };
 
 // ---------------------------------------------------------------------------
 // Pipeline: extract → resolve → classify
 // ---------------------------------------------------------------------------
 
-export type CandidateType = "id" | "path" | "url";
+export type CandidateType = "id" | "path" | "url" | "evasion";
 
 export interface Candidate {
   readonly type: CandidateType;
@@ -89,7 +100,7 @@ export interface Candidate {
 
 export function detectCandidates(
   line: string,
-  cfg: DetectorConfig,
+  _cfg: DetectorConfig,
 ): Candidate[] {
   const out: Candidate[] = [];
 
@@ -108,15 +119,20 @@ export function detectCandidates(
     out.push({ type: "path", value: m[0] });
   }
 
-  // URLs are extracted only when a producer identity is configured. An empty
-  // owner_slash_name means the consumer did not pin a producer; we MUST NOT
-  // emit unclassified URL detections that mask real violations, and we MUST
-  // NOT silently allow them either. The contract is: no identity => no URL
-  // extraction; the gate layer rejects the input contract upstream.
-  if (cfg.repository_identity.owner_slash_name.length > 0) {
-    for (const m of line.matchAll(URL_CANDIDATE_PATTERN)) {
-      out.push({ type: "url", value: m[0] });
-    }
+  // URLs are always extracted. When repository_identity.owner_slash_name is
+  // empty, resolveCandidateConfig returns `unclassified` for them so the gate
+  // fails closed (DEC-014 decision 5). Skipping extraction here was a
+  // false-clean: URLs in unscanned lines passed silently. The adapter layer
+  // additionally enforces non-empty identity at its boundary.
+  for (const m of line.matchAll(URL_CANDIDATE_PATTERN)) {
+    out.push({ type: "url", value: m[0] });
+  }
+
+  // Evasion: an UPPER-prefix followed by an escape sequence (\\uXXXX, \\xXX,
+  // 0xXX) instead of literal digits. Treated as a distinct candidate so
+  // resolveCandidateConfig can fail-closed it regardless of the prefix.
+  for (const m of line.matchAll(ID_EVASION_PATTERN)) {
+    out.push({ type: "evasion", value: m[0] });
   }
 
   return out;
@@ -124,14 +140,21 @@ export function detectCandidates(
 
 /**
  * Resolve a candidate under the configured DetectorConfig. IDs whose prefix
- * is in producer_internal_id_prefixes are producer-internal; all other ID
+ * is in producer_internal_id_prefixes are producer-internal; IDs whose prefix
+ * is in distributed_workflow_control_prefixes are distributed-control (the
+ * gate does not flag legitimate workflow labels like STEP/QG); all other ID
  * families return `unclassified` so the gate layer fails closed. URLs are
- * classified by repository identity (NOT by `/docs/` path content).
+ * classified by repository identity (NOT by `/docs/` path content). Evasion
+ * candidates (escape-sequence IDs) always fail closed.
  */
 export function resolveCandidateConfig(
   c: Candidate,
   cfg: DetectorConfig,
 ): { classification: DependencyClass; category: DetectionCategory } {
+  if (c.type === "evasion") {
+    return { classification: "unclassified", category: "evasion-attempt" };
+  }
+
   if (c.type === "id") {
     const m = /^([A-Z]{2,})-\d{1,}$/.exec(c.value);
     if (!m) {
@@ -140,6 +163,9 @@ export function resolveCandidateConfig(
     const prefix = m[1] ?? "";
     if (cfg.producer_internal_id_prefixes.includes(prefix)) {
       return { classification: "producer-internal", category: "concrete-id" };
+    }
+    if (cfg.distributed_workflow_control_prefixes.includes(prefix)) {
+      return { classification: "distributed-control", category: "distributed-control" };
     }
     return { classification: "unclassified", category: "unclassified-entry" };
   }
