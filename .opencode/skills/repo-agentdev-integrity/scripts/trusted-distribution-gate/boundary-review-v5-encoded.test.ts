@@ -108,13 +108,14 @@ describe("C1.6 percent-encoded backslash separators %5C/%5c", () => {
     expect(paths(cs).length).toBe(0);
   });
 
-  test("a/../../docs%5Cspecs%5Cfoo.md (identifier before) does NOT become a candidate", () => {
+  // dot-segment collapse後に通常segmentが残らず、docsへ解決されるためfail-closedで検出する
+  test("a/../../docs%5Cspecs%5Cfoo.md (identifier before) becomes a candidate", () => {
     const text = "See a/../../docs%5Cspecs%5Cfoo.md here.";
     const g = gateFor(text);
-    expect(g.pass).toBe(true);
+    expect(g.pass).toBe(false);
     const pathFail = findFailureByCategory(g, "concrete-path");
-    expect(pathFail).toBeUndefined();
+    expect(pathFail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
-    expect(paths(cs).length).toBe(0);
+    expect(paths(cs).length).toBe(1);
   });
 });

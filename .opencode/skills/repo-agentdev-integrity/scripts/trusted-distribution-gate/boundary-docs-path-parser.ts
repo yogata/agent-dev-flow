@@ -91,78 +91,74 @@ function findMdEndpoint(content: string): number {
 }
 
 /**
- * Strict grammar check for relative path prefix: (("."|"..") separator)+
- * where separator is /, \, %2F, %2f, %5C, or %5c.
- * Accepts empty prefix (docs at line start or after a plain boundary char).
- * Rejects: .../docs, ..../docs, %2Fdocs (no dot), a/../docs (identifier prefix),
- * /docs, \docs (absolute paths).
+ * Left-boundary character set for the `docs` token. Includes ASCII
+ * whitespace/punctuation, CJK punctuation that also terminates URL
+ * scans (URL_STOP_CHAR parity), and Markdown/URL delimiters (( [ = &).
+ * Excludes path separators (/, \) and ASCII dot so they fall through to
+ * the dot-segment normalization scanner.
+ */
+const LEFT_BOUNDARY = /[\s(),;:#?!"'`<>{}|[\]=&\u3001\u3002\uFF01\uFF1A\uFF1B\uFF0C\uFF1F\u2014]/;
+
+/**
+ * Validate that the text preceding `docs` forms a relative path prefix
+ * that resolves to `docs` after dot-segment normalization. Accepts docs
+ * at position 0, after a plain boundary char, or after a prefix whose
+ * dot-segments collapse to empty (e.g. ./ ../ x/../). Rejects absolute
+ * paths (/docs, \docs, %2Fdocs), hostname form (.docs, mydocs), and
+ * prefixes that do not resolve to docs (a/docs).
  */
 function isValidRelativePrefix(line: string, pos: number): boolean {
   if (pos === 0) return true;
-
   const beforeDocs = line.charAt(pos - 1);
-  if (/[\s)\]\|'"`<>{},;:#?!。 、！]/.test(beforeDocs)) {
-    return true;
-  }
-  if (/\(/.test(beforeDocs) || /\[/.test(beforeDocs) || /=/.test(beforeDocs) || /&/.test(beforeDocs)) {
-    return true;
-  }
-
-  return parseRelativePrefix(line, pos);
+  if (LEFT_BOUNDARY.test(beforeDocs)) return true;
+  return prefixResolvesToDocs(line, pos);
 }
 
 /**
- * Parse the strict relative path prefix grammar:
- * (("."|"..") separator+)+ scanning backwards from `pos`.
- * Consecutive separators (e.g. /\) are allowed between dot-segments.
- * Returns true when the grammar matches.
+ * Path separators for splitting the prefix into segments.
+ * Matches /, \, %2F, %2f, %5C, %5c.
  */
-function parseRelativePrefix(line: string, pos: number): boolean {
+const SEPARATOR_RE = /\/|\\|%2[fF]|%5[cC]/;
+
+/**
+ * Backward path-normalization scanner. Collects the prefix between the
+ * leftmost boundary char (or line start) and `docs`, splits on path
+ * separators, and reduces dot-segments:
+ *   "."  -> skip (no-op)
+ *   ".." -> cancel the previous normal segment, or accumulate as leading
+ *   else -> push as a normal identifier segment
+ * Accepts when no normal identifier remains (prefix resolves to docs).
+ * Rejects absolute paths (prefix begins with a separator), hostname
+ * concatenation (char before `docs` is not a separator), and prefixes
+ * where a normal identifier survives normalization.
+ */
+function prefixResolvesToDocs(line: string, pos: number): boolean {
+  if (matchSeparatorBackward(line, pos - 1) === 0) return false;
+
   let p = pos - 1;
-  let hasValidPair = false;
-
   while (p >= 0) {
-    // Consume one or more consecutive separators.
-    let separatorLen = matchSeparatorBackward(line, p);
-    if (separatorLen === 0) break;
+    const sepLen = matchSeparatorBackward(line, p);
+    if (sepLen > 0) { p -= sepLen; continue; }
+    if (LEFT_BOUNDARY.test(line.charAt(p))) break;
+    p -= 1;
+  }
+  const prefixStart = p + 1;
 
-    while (separatorLen > 0) {
-      p -= separatorLen;
-      separatorLen = p >= 0 ? matchSeparatorBackward(line, p) : 0;
-    }
+  if (prefixStart < pos && scanSeparators(line, prefixStart) > prefixStart) return false;
 
-    if (p < 0) break;
-
-    const dotSegment = matchDotSegmentBackward(line, p);
-    if (dotSegment === 0) break;
-
-    p -= dotSegment;
-    hasValidPair = true;
-
-    if (p < 0) break;
-
-    const beforePattern = line.charAt(p);
-    if (/[\s(\[]/.test(beforePattern) || /=/.test(beforePattern) || /&/.test(beforePattern)) {
-      break;
-    }
-
-    if (matchSeparatorBackward(line, p) > 0) {
+  const prefix = line.substring(prefixStart, pos);
+  const stack: string[] = [];
+  for (const seg of prefix.split(SEPARATOR_RE)) {
+    if (seg === "" || seg === ".") continue;
+    if (seg === "..") {
+      const top = stack.length > 0 ? stack[stack.length - 1] : null;
+      if (top !== null && top !== "..") stack.pop();
+      else stack.push("..");
       continue;
     }
-
-    break;
+    stack.push(seg);
   }
-
-  if (!hasValidPair) return false;
-
-  if (p < 0) return true;
-
-  const beforePattern = line.charAt(p);
-  if (/[\s(\[]/.test(beforePattern) || /=/.test(beforePattern) || /&/.test(beforePattern)) {
-    return true;
-  }
-
-  return false;
+  return stack.every((s) => s === "..");
 }
 
 /**
@@ -187,27 +183,6 @@ function matchSeparatorBackward(line: string, p: number): number {
   }
 
   return 0;
-}
-
-/**
- * Match a dot-segment (.) or (..) scanning backward.
- * Returns the length of the dot-segment matched (1 or 2), or 0 if no match.
- * Rejects ... and longer dot runs by only matching 1 or 2 dots.
- */
-function matchDotSegmentBackward(line: string, p: number): number {
-  if (p < 0) return 0;
-
-  const c = line.charAt(p);
-  if (c !== '.') return 0;
-
-  if (p >= 1 && line.charAt(p - 1) === '.') {
-    if (p >= 2 && line.charAt(p - 2) === '.') {
-      return 0;
-    }
-    return 2;
-  }
-
-  return 1;
 }
 
 /**

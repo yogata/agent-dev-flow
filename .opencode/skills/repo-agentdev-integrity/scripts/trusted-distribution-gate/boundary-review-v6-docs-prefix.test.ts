@@ -50,6 +50,12 @@ describe("boundary-docs-path-parser v6 docs prefix strict grammar", () => {
       expect(result.paths.length).toBeGreaterThan(0);
       expect(result.paths[0]?.value).toBe("docs/specs/foo.md");
     });
+
+    // dot-segment collapse後に通常segmentが残らず、docsへ解決されるためfail-closedで検出する
+    it("should detect a/../docs/... (dot-segment collapse)", () => {
+      const result = extractDocsPaths("a/../docs/specs/foo.md", CAP);
+      expect(result.paths.length).toBe(1);
+    });
   });
 
   describe("Reject invalid dot patterns", () => {
@@ -81,11 +87,6 @@ describe("boundary-docs-path-parser v6 docs prefix strict grammar", () => {
   describe("Reject patterns without dot prefix", () => {
     it("should NOT detect %2Fdocs/... (no dot prefix)", () => {
       const result = extractDocsPaths("%2Fdocs/specs/foo.md", CAP);
-      expect(result.paths.length).toBe(0);
-    });
-
-    it("should NOT detect a/../docs/... (identifier prefix)", () => {
-      const result = extractDocsPaths("a/../docs/specs/foo.md", CAP);
       expect(result.paths.length).toBe(0);
     });
   });

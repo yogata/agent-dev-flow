@@ -3,7 +3,7 @@
 // Part 1 scope (C1.1-C1.3):
 //   - ../../docs/... (arbitrary dot-segment depth) classifies as producer-internal
 //   - Deeper slash/backslash/mixed prefixes classify as producer-internal
-//   - a/../../docs is rejected (identifier before dot-segments)
+//   - a/../../docs is detected (dot-segment collapse resolves to docs)
 
 import { describe, expect, test } from "bun:test";
 import { detectCandidates, type DetectorConfig, type Candidate } from "./boundary-pipeline.ts";
@@ -103,34 +103,36 @@ describe("C1.2 deeper slash/backslash/mixed prefixes classify as producer-intern
   });
 });
 
-describe("C1.3 a/../../docs is rejected (identifier before dot-segments)", () => {
-  test("a/../../docs/specs/foo.md does NOT become a candidate", () => {
+// C1.3: identifier + dot-segment prefix normalizes to docs.
+// dot-segment collapse後に通常segmentが残らず、docsへ解決されるためfail-closedで検出する
+describe("C1.3 identifier + dot-segment prefix normalizes to docs", () => {
+  test("a/../../docs/specs/foo.md becomes a candidate", () => {
     const text = "See a/../../docs/specs/foo.md here.";
     const g = gateFor(text);
-    expect(g.pass).toBe(true);
+    expect(g.pass).toBe(false);
     const pathFail = findFailureByCategory(g, "concrete-path");
-    expect(pathFail).toBeUndefined();
+    expect(pathFail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
-    expect(paths(cs).length).toBe(0);
+    expect(paths(cs).length).toBe(1);
   });
 
-  test("foo/bar/../../docs/specs/foo.md does NOT become a candidate", () => {
+  test("foo/bar/../../docs/specs/foo.md becomes a candidate", () => {
     const text = "See foo/bar/../../docs/specs/foo.md here.";
     const g = gateFor(text);
-    expect(g.pass).toBe(true);
+    expect(g.pass).toBe(false);
     const pathFail = findFailureByCategory(g, "concrete-path");
-    expect(pathFail).toBeUndefined();
+    expect(pathFail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
-    expect(paths(cs).length).toBe(0);
+    expect(paths(cs).length).toBe(1);
   });
 
-  test("x/../../../docs/specs/foo.md does NOT become a candidate", () => {
+  test("x/../../../docs/specs/foo.md becomes a candidate", () => {
     const text = "See x/../../../docs/specs/foo.md here.";
     const g = gateFor(text);
-    expect(g.pass).toBe(true);
+    expect(g.pass).toBe(false);
     const pathFail = findFailureByCategory(g, "concrete-path");
-    expect(pathFail).toBeUndefined();
+    expect(pathFail?.classification).toBe("producer-internal");
     const cs = detectCandidates(text, baseConfig);
-    expect(paths(cs).length).toBe(0);
+    expect(paths(cs).length).toBe(1);
   });
 });

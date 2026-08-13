@@ -201,12 +201,13 @@ describe("T2 relative docs-path left-boundary handling", () => {
     expect(pathFail).toBeUndefined();
   });
 
-  test("a/../docs/specs/foo.md does NOT become a candidate (identifier before /)", () => {
+  // dot-segment collapse後に通常segmentが残らず、docsへ解決されるためfail-closedで検出する
+  test("a/../docs/specs/foo.md becomes a candidate (dot-segment collapse)", () => {
     const text = "See a/../docs/specs/foo.md here.";
     const g = gateFor(text);
-    expect(g.pass).toBe(true);
+    expect(g.pass).toBe(false);
     const pathFail = findFailureByCategory(g, "concrete-path");
-    expect(pathFail).toBeUndefined();
+    expect(pathFail?.classification).toBe("producer-internal");
   });
 
   test("https://evil.docs/specs/x.md remains suppressed by URL ownership", () => {
