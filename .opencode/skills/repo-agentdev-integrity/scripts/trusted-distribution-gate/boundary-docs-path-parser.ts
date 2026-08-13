@@ -104,68 +104,6 @@ function findMdEndpoint(content: string): number {
 const LEFT_BOUNDARY = /[\s(),;:#?!"'`<>{}|[\]=&\u3001\u3002\uFF01\uFF1A\uFF1B\uFF0C\uFF1F\u2014]/;
 
 /**
- * Validate that the text preceding `docs` forms a relative path prefix
- * that resolves to `docs` after dot-segment normalization. Accepts docs
- * at position 0, after a plain boundary char, or after a prefix whose
- * dot-segments collapse to empty (e.g. ./ ../ x/../). Rejects absolute
- * paths (/docs, \docs, %2Fdocs), hostname form (.docs, mydocs), and
- * prefixes that do not resolve to docs (a/docs).
- */
-function isValidRelativePrefix(line: string, pos: number): boolean {
-  if (pos === 0) return true;
-  const beforeDocs = line.charAt(pos - 1);
-  if (LEFT_BOUNDARY.test(beforeDocs)) return true;
-  return prefixResolvesToDocs(line, pos);
-}
-
-/**
- * Path separators for splitting the prefix into segments.
- * Matches /, \, %2F, %2f, %5C, %5c.
- */
-const SEPARATOR_RE = /\/|\\|%2[fF]|%5[cC]/;
-
-/**
- * Backward path-normalization scanner. Collects the prefix between the
- * leftmost boundary char (or line start) and `docs`, splits on path
- * separators, and reduces dot-segments:
- *   "."  -> skip (no-op)
- *   ".." -> cancel the previous normal segment, or accumulate as leading
- *   else -> push as a normal identifier segment
- * Accepts when no normal identifier remains (prefix resolves to docs).
- * Rejects absolute paths (prefix begins with a separator), hostname
- * concatenation (char before `docs` is not a separator), and prefixes
- * where a normal identifier survives normalization.
- */
-function prefixResolvesToDocs(line: string, pos: number): boolean {
-  if (matchSeparatorBackward(line, pos - 1) === 0) return false;
-
-  let p = pos - 1;
-  while (p >= 0) {
-    const sepLen = matchSeparatorBackward(line, p);
-    if (sepLen > 0) { p -= sepLen; continue; }
-    if (LEFT_BOUNDARY.test(line.charAt(p))) break;
-    p -= 1;
-  }
-  const prefixStart = p + 1;
-
-  if (prefixStart < pos && scanSeparators(line, prefixStart) > prefixStart) return false;
-
-  const prefix = line.substring(prefixStart, pos);
-  const stack: string[] = [];
-  for (const seg of prefix.split(SEPARATOR_RE)) {
-    if (seg === "" || seg === ".") continue;
-    if (seg === "..") {
-      const top = stack.length > 0 ? stack[stack.length - 1] : null;
-      if (top !== null && top !== "..") stack.pop();
-      else stack.push("..");
-      continue;
-    }
-    stack.push(seg);
-  }
-  return stack.every((s) => s === "..");
-}
-
-/**
  * Match a separator at position `p` scanning backward.
  * Returns the length of the separator matched (1-3 chars), or 0 if no match.
  * Recognizes: /, \, %2F, %2f, %5C, %5c
@@ -190,6 +128,88 @@ function matchSeparatorBackward(line: string, p: number): number {
 }
 
 /**
+ * Forward linear precompute of prefix validity for every docs candidate
+ * position. prefixValid[i] is true iff a `docs` token at position i has
+ * a valid relative prefix under the same grammar as the original
+ * backward scanner: i === 0, OR the previous char is a LEFT_BOUNDARY,
+ * OR the previous char is a path separator AND the current prefix
+ * region (since the last LEFT_BOUNDARY) does not start with a separator
+ * AND the dot-segment normalization of that prefix leaves zero
+ * surviving normal segments.
+ *
+ * One forward pass maintains `normalCount` (surviving normal segments
+ * after dot-segment reduction), `prefixStart` (start of the current
+ * prefix region), and `prefixAbsolute` (whether the region begins with
+ * a separator). Each docs candidate is answered in O(1) from this
+ * state, giving O(line.length) total. Replaces the per-doc backward
+ * scan that made extractDocsPaths O(n^2) on adversarial input such as
+ * ("a/docs").repeat(n) (review-v8 blocker #4).
+ */
+function precomputePrefixValid(line: string): boolean[] {
+  const prefixValid: boolean[] = new Array(line.length + 1).fill(false);
+  prefixValid[0] = true;
+
+  let normalCount = 0;
+  let segBuf = "";
+  let inSeg = false;
+  let prefixStart = 0;
+  let prefixAbsolute = false;
+
+  let pos = 0;
+  while (pos < line.length) {
+    if (pos > 0) {
+      const prevChar = line.charAt(pos - 1);
+      if (LEFT_BOUNDARY.test(prevChar)) {
+        prefixValid[pos] = true;
+      } else {
+        const sepLenBefore = matchSeparatorBackward(line, pos - 1);
+        prefixValid[pos] = sepLenBefore > 0 && !prefixAbsolute && normalCount === 0;
+      }
+    }
+
+    const c = line.charAt(pos);
+
+    let sepLen = 0;
+    if (c === "/" || c === "\\") {
+      sepLen = 1;
+    } else if (c === "%" && pos + 2 < line.length) {
+      const c1 = line.charAt(pos + 1);
+      const c2 = line.charAt(pos + 2);
+      if ((c1 === "2" && (c2 === "F" || c2 === "f")) || (c1 === "5" && (c2 === "C" || c2 === "c"))) {
+        sepLen = 3;
+      }
+    }
+
+    if (sepLen > 0) {
+      if (inSeg) {
+        if (segBuf === "..") {
+          if (normalCount > 0) normalCount -= 1;
+        } else if (segBuf !== "." && segBuf !== "") {
+          normalCount += 1;
+        }
+      }
+      segBuf = "";
+      inSeg = false;
+      if (pos === prefixStart) prefixAbsolute = true;
+      pos += sepLen;
+    } else if (LEFT_BOUNDARY.test(c)) {
+      normalCount = 0;
+      segBuf = "";
+      inSeg = false;
+      prefixStart = pos + 1;
+      prefixAbsolute = false;
+      pos += 1;
+    } else {
+      segBuf += c;
+      inSeg = true;
+      pos += 1;
+    }
+  }
+
+  return prefixValid;
+}
+
+/**
  * Scan a line for docs-path candidates. Returns at most `cap` entries;
  * the boolean `overflow` flag is set when the cap is reached mid-scan
  * (caller MUST surface a typed overflow; ownership never suppresses it).
@@ -210,6 +230,7 @@ export function extractDocsPaths(
   readonly overflow: boolean;
 } {
   const out: ExtractedPath[] = [];
+  const prefixValid = precomputePrefixValid(line);
   let searchFrom = 0;
   while (true) {
     const docsIdx = line.indexOf("docs", searchFrom);
@@ -217,7 +238,7 @@ export function extractDocsPaths(
     searchFrom = docsIdx + 1;
     // Left boundary: accept only valid relative dot-segment prefixes or docs at start.
     // Reject: a/../docs, .docs, /docs, identifiers before separators.
-    if (!isValidRelativePrefix(line, docsIdx)) continue;
+    if (!prefixValid[docsIdx]) continue;
     // After `docs`, expect one or more separators.
     let pos = scanSeparators(line, docsIdx + 4);
     if (pos === docsIdx + 4) continue;
