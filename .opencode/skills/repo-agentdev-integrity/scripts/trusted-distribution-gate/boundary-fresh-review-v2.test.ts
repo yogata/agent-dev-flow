@@ -13,6 +13,7 @@ import { describe, expect, test } from "bun:test";
 import {
   detectCandidates,
   type DetectorConfig,
+  type Candidate,
 } from "./boundary-pipeline.ts";
 import { decideProjection, type ClassifyFileInput } from "./boundary-gate.ts";
 import type { Detection } from "./types.ts";
@@ -28,7 +29,7 @@ function gateFor(text: string) {
   return decideProjection(files, "source", baseConfig).gate;
 }
 
-function urls(cs: readonly any[]) {
+function urls(cs: readonly Candidate[]) {
   return cs.filter((c) => c.type === "url");
 }
 
