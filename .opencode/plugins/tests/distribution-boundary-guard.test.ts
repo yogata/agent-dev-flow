@@ -34,7 +34,10 @@ import {
   DEFAULT_PLUGIN_REPOSITORY_IDENTITY,
   type GuardDetectionsResult,
   type GuardEnv,
-} from "./distribution-boundary-guard.ts";
+  classifyPath,
+  classifyPathNoRoot,
+  default as pluginDefault,
+} from "../distribution-boundary-guard.ts";
 
 describe("shouldInspectTool - tool allowlist", () => {
   test("inspects write, edit, apply_patch", () => {
@@ -691,5 +694,534 @@ describe("Stage B regression: unclassified IDs do not silently pass", () => {
     if (!r.ok) {
       expect(r.errorKind).toBe("violation");
     }
+  });
+});
+
+// =============================================================================
+// Stage B regression round 2 (PR #2092 review): runtime blockers.
+//
+// These tests cover the four blockers the post-merge review reproduced:
+//   1. Path classifier must resolve absolute paths under the worktree
+//      (native write/edit/apply_patch emit `path`, often absolute).
+//   2. Outside-root absolute paths and traversal escapes must fail closed
+//      (not silently pass as "non-distributed").
+//   3. Malformed supported-tool args must fail closed (parser returns null
+//      -> plugin shell throws inspection-error, does not silently return).
+//   4. apply_patch Move + Update body must inspect the reconstructed
+//      destination content, not just the source bytes.
+// Plus: parser accepts the real OpenCode field name `path` (was `filePath`),
+// and the V2 default export `{ id, server }` loads cleanly under
+// OpenCode 1.18.x (verified end-to-end by `opencode debug config`).
+// =============================================================================
+
+describe("Stage B round 2: classifyPath resolves absolute paths under worktree", () => {
+  test("absolute POSIX path under root, distributed suffix", () => {
+    expect(classifyPath("/home/me/proj/src/opencode/commands/agentdev/x.md", "/home/me/proj")).toBe("distributed");
+  });
+  test("absolute POSIX path under root, non-distributed suffix", () => {
+    expect(classifyPath("/home/me/proj/README.md", "/home/me/proj")).toBe("non-distributed");
+  });
+  test("absolute POSIX path equal to root", () => {
+    expect(classifyPath("/home/me/proj", "/home/me/proj")).toBe("non-distributed");
+  });
+  test("absolute POSIX path with .. that resolves to non-distributed suffix", () => {
+    expect(
+      classifyPath(
+        "/home/me/proj/src/opencode/commands/agentdev/../../../etc/passwd",
+        "/home/me/proj",
+      ),
+    ).toBe("non-distributed");
+  });
+  test("absolute POSIX path with .. that escapes root fails closed", () => {
+    expect(
+      classifyPath("/home/me/proj/foo/../../etc/passwd", "/home/me/proj"),
+    ).toBe("outside-root");
+  });
+  test("absolute POSIX path sibling of root fails closed", () => {
+    expect(classifyPath("/home/me/other-proj/src/x.md", "/home/me/proj")).toBe("outside-root");
+  });
+  test("absolute POSIX path completely unrelated fails closed", () => {
+    expect(classifyPath("/etc/passwd", "/home/me/proj")).toBe("outside-root");
+  });
+  test("absolute Windows path under root (backslashes)", () => {
+    expect(
+      classifyPath(
+        "C:\\Users\\me\\proj\\src\\opencode\\commands\\agentdev\\x.md",
+        "C:/Users/me/proj",
+      ),
+    ).toBe("distributed");
+  });
+  test("absolute Windows path under root (forward slashes)", () => {
+    expect(
+      classifyPath(
+        "C:/Users/me/proj/src/opencode/skills/agentdev-foo/SKILL.md",
+        "C:\\Users\\me\\proj",
+      ),
+    ).toBe("distributed");
+  });
+  test("absolute Windows path outside root fails closed", () => {
+    expect(classifyPath("C:/Windows/System32/drivers/etc/hosts", "C:/Users/me/proj")).toBe("outside-root");
+  });
+  test("drive letter case-insensitive", () => {
+    expect(
+      classifyPath(
+        "c:/Users/me/proj/src/opencode/commands/agentdev/x.md",
+        "C:/Users/me/proj",
+      ),
+    ).toBe("distributed");
+  });
+  test("relative path with leading .. escapes root fails closed", () => {
+    expect(classifyPath("../etc/passwd", "/home/me/proj")).toBe("outside-root");
+  });
+  test("relative path with .. that resolves back into a distributed path", () => {
+    expect(
+      classifyPath(
+        "src/opencode/skills/agentdev-foo/sub/../../agentdev-bar/SKILL.md",
+        "/home/me/proj",
+      ),
+    ).toBe("distributed");
+  });
+  test("relative path with .. that resolves to a non-distributed path", () => {
+    expect(
+      classifyPath("src/opencode/commands/agentdev/../../../etc/passwd", "/home/me/proj"),
+    ).toBe("non-distributed");
+  });
+  test("empty projectRoot: absolute paths fail closed", () => {
+    expect(classifyPathNoRoot("/home/me/proj/src/opencode/commands/agentdev/x.md")).toBe("outside-root");
+  });
+  test("empty projectRoot: relative distributed paths still distribute", () => {
+    expect(classifyPathNoRoot("src/opencode/commands/agentdev/x.md")).toBe("distributed");
+  });
+});
+
+describe("Stage B round 2: evaluate*Env threads projectRoot", () => {
+  test("evaluateWriteContentEnv detects absolute path under worktree", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "/home/me/proj/src/opencode/commands/agentdev/x.md",
+      "ref ADR-0001",
+      env,
+      "/home/me/proj",
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.detections.some((d) => d.matched === "ADR-0001")).toBe(true);
+    }
+  });
+  test("evaluateWriteContentEnv outside-root absolute fails closed", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "/etc/passwd",
+      "ref ADR-0001",
+      env,
+      "/home/me/proj",
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+  test("evaluateWriteContentEnv Windows backslash absolute under worktree", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "C:\\proj\\src\\opencode\\commands\\agentdev\\x.md",
+      "ref ADR-0001",
+      env,
+      "C:/proj",
+    );
+    expect(r.ok).toBe(false);
+  });
+  test("evaluateWriteContentEnv legacy no-projectRoot: absolute fails closed", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "/home/me/proj/src/opencode/commands/agentdev/x.md",
+      "ref ADR-0001",
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+});
+
+describe("Stage B round 2: parser reads OpenCode field name `path`", () => {
+  test("parseWriteArgs reads `path` (canonical OpenCode field)", () => {
+    const r = parseWriteArgs({ path: "src/opencode/commands/agentdev/x.md", content: "ADR-0001" });
+    expect(r).not.toBeNull();
+    if (r) {
+      expect(r.filePath).toBe("src/opencode/commands/agentdev/x.md");
+      expect(r.content).toBe("ADR-0001");
+    }
+  });
+  test("parseWriteArgs accepts `filePath` as legacy alias", () => {
+    const r = parseWriteArgs({ filePath: "x.md", content: "x" });
+    expect(r).not.toBeNull();
+  });
+  test("parseWriteArgs prefers `path` over `filePath` when both present", () => {
+    const r = parseWriteArgs({ path: "from-path.md", filePath: "from-filepath.md", content: "x" });
+    expect(r).not.toBeNull();
+    if (r) expect(r.filePath).toBe("from-path.md");
+  });
+  test("parseEditArgs reads `path`", () => {
+    const r = parseEditArgs({ path: "x.md", oldString: "a", newString: "b" });
+    expect(r).not.toBeNull();
+    if (r) expect(r.filePath).toBe("x.md");
+  });
+  test("parseEditArgs treats empty `path` as malformed (returns null)", () => {
+    expect(parseEditArgs({ path: "" })).toBeNull();
+  });
+  test("parseWriteArgs empty content is valid (empty file write)", () => {
+    const r = parseWriteArgs({ path: "x.md", content: "" });
+    expect(r).not.toBeNull();
+  });
+});
+
+describe("Stage B round 2: plugin shell fail-closes on malformed args", () => {
+  // Direct invocation of the V2 server. Throws when the parser returns null.
+  async function runHook(
+    tool: string,
+    args: Record<string, unknown>,
+    worktree: string,
+  ): Promise<{ threw: boolean; message?: string }> {
+    const hooks = await pluginDefault.server({
+      worktree,
+      directory: "/plugin/dir",
+      project: { worktree },
+    });
+    try {
+      await hooks["tool.execute.before"]!({ tool, sessionID: "s", callID: "c" }, { args });
+      return { threw: false };
+    } catch (e) {
+      return { threw: true, message: e instanceof Error ? e.message : String(e) };
+    }
+  }
+
+  test("write with missing path throws (fail closed)", async () => {
+    const r = await runHook("write", { content: "ADR-0001" }, "/home/me/proj");
+    expect(r.threw).toBe(true);
+    if (r.message) expect(r.message).toContain("blocked write");
+  });
+
+  test("write with non-string path throws", async () => {
+    const r = await runHook("write", { path: 42, content: "x" }, "/home/me/proj");
+    expect(r.threw).toBe(true);
+  });
+
+  test("write with missing content throws", async () => {
+    const r = await runHook("write", { path: "x.md" }, "/home/me/proj");
+    expect(r.threw).toBe(true);
+  });
+
+  test("edit with missing path throws", async () => {
+    const r = await runHook("edit", { oldString: "a", newString: "b" }, "/home/me/proj");
+    expect(r.threw).toBe(true);
+  });
+
+  test("apply_patch with missing patchText throws", async () => {
+    const r = await runHook("apply_patch", {}, "/home/me/proj");
+    expect(r.threw).toBe(true);
+  });
+
+  test("apply_patch with non-string patchText throws", async () => {
+    const r = await runHook("apply_patch", { patchText: 42 }, "/home/me/proj");
+    expect(r.threw).toBe(true);
+  });
+
+  test("non-inspected tool (read) is a no-op even with empty args", async () => {
+    const r = await runHook("read", {}, "/home/me/proj");
+    expect(r.threw).toBe(false);
+  });
+
+  test("write to distributed path with violation throws", async () => {
+    const r = await runHook(
+      "write",
+      { path: "src/opencode/commands/agentdev/x.md", content: "ref ADR-0001" },
+      "/home/me/proj",
+    );
+    expect(r.threw).toBe(true);
+    if (r.message) expect(r.message).toContain("ADR-0001");
+  });
+
+  test("write to absolute path under worktree with violation throws", async () => {
+    const r = await runHook(
+      "write",
+      {
+        path: "/home/me/proj/src/opencode/commands/agentdev/x.md",
+        content: "ref ADR-0001",
+      },
+      "/home/me/proj",
+    );
+    expect(r.threw).toBe(true);
+  });
+
+  test("write to outside-root absolute path throws (fail closed)", async () => {
+    const r = await runHook(
+      "write",
+      { path: "/etc/passwd", content: "ref ADR-0001" },
+      "/home/me/proj",
+    );
+    expect(r.threw).toBe(true);
+    if (r.message) expect(r.message).toContain("inspection error");
+  });
+
+  test("write to non-distributed repo-relative path passes (no throw)", async () => {
+    const r = await runHook(
+      "write",
+      { path: "README.md", content: "ref ADR-0001" },
+      "/home/me/proj",
+    );
+    expect(r.threw).toBe(false);
+  });
+});
+
+describe("Stage B round 2: apply_patch Move + Update body reconstructs destination", () => {
+  test("Move with body that introduces a producer-internal ID at destination is blocked", () => {
+    // Source content is clean. The patch moves the file to a distributed path
+    // AND adds a line that introduces ADR-0001. The destination content is
+    // "<source>\nref ADR-0001" -> inspected at the destination distributed path
+    // -> violation.
+    const env = makeGuardEnv({
+      readFile: (p: string) =>
+        p === "src/opencode/skills/agentdev-old/SKILL.md" ? "# clean source\n" : null,
+    });
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "@@ ctx",
+      " # clean source",
+      "+ref ADR-0001",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.detections.some((d) => d.matched === "ADR-0001")).toBe(true);
+    }
+  });
+
+  test("Move with empty body inspects source at destination (existing behavior preserved)", () => {
+    const env = makeGuardEnv({
+      readFile: (p: string) =>
+        p === "src/opencode/skills/agentdev-old/SKILL.md" ? "# old\nref ADR-9999 here\n" : null,
+    });
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.detections.some((d) => d.matched === "ADR-9999")).toBe(true);
+    }
+  });
+
+  test("Move with body that REMOVES the offending line passes", () => {
+    // Source has ADR-9999. Patch moves to a distributed path AND removes the
+    // offending line. After reconstruction the destination content has no
+    // violation.
+    const env = makeGuardEnv({
+      readFile: (p: string) =>
+        p === "src/opencode/skills/agentdev-old/SKILL.md"
+          ? "# old\nref ADR-9999 here\n"
+          : null,
+    });
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
+      "*** Move to: src/opencode/skills/agentdev-new/SKILL.md",
+      "@@ ctx",
+      " # old",
+      "-ref ADR-9999 here",
+      "+clean",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(true);
+  });
+
+  test("Move to outside-root destination fails closed", () => {
+    const env = makeGuardEnv({
+      readFile: () => "# source\n",
+    });
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
+      "*** Move to: /etc/passwd",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(
+      parseApplyPatchArgs({ patchText: patch })!,
+      env,
+      "/home/me/proj",
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+
+  test("Move to non-distributed destination passes (no inspection)", () => {
+    const env = makeGuardEnv({
+      readFile: (p: string) =>
+        p === "src/opencode/skills/agentdev-old/SKILL.md" ? "ref ADR-0001\n" : null,
+    });
+    const patch = [
+      "*** Begin Patch",
+      "*** Update File: src/opencode/skills/agentdev-old/SKILL.md",
+      "*** Move to: docs/notes.md",
+      "*** End Patch",
+    ].join("\n");
+    const r = evaluateApplyPatchEnv(parseApplyPatchArgs({ patchText: patch })!, env);
+    expect(r.ok).toBe(true);
+  });
+});
+
+describe("Stage B round 2: V2 default export shape", () => {
+  test("default export is V2 shape { id, server }", () => {
+    expect(pluginDefault).toBeDefined();
+    expect(typeof pluginDefault).toBe("object");
+    expect(pluginDefault.id).toBe("distribution-boundary-guard");
+    expect(typeof pluginDefault.server).toBe("function");
+  });
+
+  test("server returns hooks with tool.execute.before", async () => {
+    const hooks = await pluginDefault.server({
+      worktree: "/home/me/proj",
+      directory: "/plugin/dir",
+      project: { worktree: "/home/me/proj" },
+    });
+    expect(typeof hooks["tool.execute.before"]).toBe("function");
+  });
+});
+
+// =============================================================================
+// Stage B round 3: distributed-workflow-control prefixes preserved.
+//
+// The canonical DetectorConfig gained a required `distributed_workflow_
+// control_prefixes` field (default ["STEP","QG"]) so legitimate workflow
+// labels like STEP-1 and QG-4 ship in restored executable docs without
+// tripping the boundary gate, while still-unclassified families (OU-1,
+// TS-1, AG-1) stay fail-closed.
+//
+// These tests prove the plugin's makeGuardEnv preserves DEFAULT_DETECTOR_
+// CONFIG's STEP/QG defaults rather than dropping the field to undefined
+// (which would crash resolveCandidateConfig on every ID candidate).
+// =============================================================================
+
+describe("Stage B round 3: distributed-workflow-control prefixes preserved by makeGuardEnv", () => {
+  test("STEP-1 in distributed content is allowed (no Detection)", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "- STEP-1 で Epic Issue と判定",
+      env,
+    );
+    expect(r.ok).toBe(true);
+  });
+
+  test("QG-4 in distributed content is allowed (no Detection)", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "QG-4 観点8 に基づく評価スコープ切替",
+      env,
+    );
+    expect(r.ok).toBe(true);
+  });
+
+  test("STEP-N for N=1..6 all pass as distributed-control", () => {
+    const env = makeGuardEnv();
+    for (const n of ["STEP-1", "STEP-2", "STEP-3", "STEP-4", "STEP-5", "STEP-6"]) {
+      const r = evaluateWriteContentEnv(
+        "src/opencode/commands/agentdev/x.md",
+        `次: ${n}`,
+        env,
+      );
+      expect(r.ok).toBe(true);
+    }
+  });
+
+  test("OU-1 still fails closed (not in producer set, not in distributed-control set)", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "see OU-1",
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("inspection-error");
+    }
+  });
+
+  test("producer-internal ADR-0001 still flagged as violation (not relaxed)", () => {
+    const env = makeGuardEnv();
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "see ADR-0001",
+      env,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.errorKind).toBe("violation");
+    }
+  });
+
+  test("custom distributed_workflow_control_prefixes can extend the allowed set", () => {
+    const env = makeGuardEnv({
+      distributed_workflow_control_prefixes: ["STEP", "QG", "WP"],
+    });
+    const r = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "see WP-3",
+      env,
+    );
+    expect(r.ok).toBe(true);
+  });
+
+  test("overriding producer_internal_id_prefixes does not drop STEP/QG defaults", () => {
+    const env = makeGuardEnv({
+      producer_internal_id_prefixes: ["IR"],
+    });
+    // STEP-1 still allowed
+    const stepR = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "STEP-1 ok",
+      env,
+    );
+    expect(stepR.ok).toBe(true);
+    // IR-0001 now flagged as producer-internal violation
+    const irR = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "see IR-0001",
+      env,
+    );
+    expect(irR.ok).toBe(false);
+    if (!irR.ok) {
+      expect(irR.errorKind).toBe("violation");
+    }
+    // ADR-0001 is now unclassified (not in IR set) -> fail closed
+    const adrR = evaluateWriteContentEnv(
+      "src/opencode/commands/agentdev/x.md",
+      "see ADR-0001",
+      env,
+    );
+    expect(adrR.ok).toBe(false);
+    if (!adrR.ok) {
+      expect(adrR.errorKind).toBe("inspection-error");
+    }
+  });
+
+  test("detector_config constructed by makeGuardEnv is total (no undefined fields)", () => {
+    const env = makeGuardEnv();
+    expect(Array.isArray(env.detector_config.distributed_workflow_control_prefixes)).toBe(true);
+    expect(env.detector_config.distributed_workflow_control_prefixes).toContain("STEP");
+    expect(env.detector_config.distributed_workflow_control_prefixes).toContain("QG");
+    expect(Array.isArray(env.detector_config.producer_internal_id_prefixes)).toBe(true);
+    expect(env.detector_config.repository_identity).toBeDefined();
   });
 });

@@ -11,23 +11,35 @@
 //
 // Stage B regression (PR #2092):
 //   * Pre-write gate is fail-fast (DEC-014 decision 3).
-//   * Inspection errors (read failure, malformed patch input, adapter
-//     failure, unclassified entry) are gate-not-passed, NOT clean
-//     (DEC-014 decision 5).
+//   * Inspection errors (read failure, malformed patch input, malformed
+//     supported-tool args, outside-root target, unclassified entry) are
+//     gate-not-passed, NOT clean (DEC-014 decision 5).
 //   * Repository identity is explicit at the boundary
 //     (DEFAULT_PLUGIN_REPOSITORY_IDENTITY for the self-hosting repo;
 //     override via makeGuardEnv).
 //   * Distributed paths include japanese-tech-writing.
-//   * Path matching is case-insensitive (Windows filesystem semantics).
+//   * Path classification is project-root-aware: absolute paths under the
+//     worktree are resolved to repo-relative; absolute paths outside the
+//     worktree and traversal escapes fail closed. The worktree root comes
+//     from input.worktree (PluginInput.worktree, verified against
+//     @opencode-ai/plugin 1.3.x).
 //   * Edit and apply_patch Update reconstruct the prospective full-file
-//     content. apply_patch Move inspects source content at the destination.
+//     content. apply_patch Move inspects the reconstructed destination
+//     content (source with body applied when body is non-empty, otherwise
+//     source as-is) so a rename + content edit into a distributed dir is
+//     caught.
+//   * Argument parsing reads the OpenCode field name `path` (not
+//     `filePath`); `filePath` is accepted as a legacy alias.
 //   * Argument parsing is typed (no `as string`, no broad catch swallow).
+//   * Default export is V2 plugin shape `{ id, server }` so OpenCode's
+//     loader detects it via readV1Plugin and skips the legacy iteration
+//     that would throw on this module's non-function exports.
 //
-// Evaluation logic lives in distribution-boundary-guard-evaluators.ts;
-// argument parsing in distribution-boundary-guard-parser.ts; full-file
-// reconstruction in distribution-boundary-guard-reconstruction.ts. This
-// file owns the plugin shell, the GuardEnv, the distributed-path predicate,
-// and the default-export wiring.
+// Evaluation logic lives in lib/distribution-boundary-guard-evaluators.ts;
+// argument parsing in lib/distribution-boundary-guard-parser.ts; full-file
+// reconstruction in lib/distribution-boundary-guard-reconstruction.ts; path
+// classification in lib/distribution-boundary-guard-paths.ts. This file
+// owns the plugin shell, the GuardEnv, and the default-export wiring.
 
 import {
   DEFAULT_DETECTOR_CONFIG,
@@ -44,8 +56,15 @@ import {
   parseWriteArgs as parserParseWriteArgs,
   type ParsedApplyPatch,
   type ParsedEdit,
-} from "./distribution-boundary-guard-parser.ts";
-import type { FileReader } from "./distribution-boundary-guard-reconstruction.ts";
+} from "./lib/distribution-boundary-guard-parser.ts";
+import {
+  classifyPath,
+  classifyPathNoRoot,
+  isDistributedPath,
+  normalizePath,
+  type PathClass,
+} from "./lib/distribution-boundary-guard-paths.ts";
+import type { FileReader } from "./lib/distribution-boundary-guard-reconstruction.ts";
 import {
   emptyOk,
   evaluateApplyPatchEnv as evaluatorsEvaluateApplyPatchEnv,
@@ -54,11 +73,11 @@ import {
   fromDetections,
   inspectionError,
   type GuardDetectionsResult,
-} from "./distribution-boundary-guard-evaluators.ts";
+  type PathClassifier,
+} from "./lib/distribution-boundary-guard-evaluators.ts";
 
-// ---------------------------------------------------------------------------
-// Minimal local types for OpenCode plugin plumbing (mirror @opencode-ai/plugin).
-// ---------------------------------------------------------------------------
+// OpenCode plugin plumbing types (mirror @opencode-ai/plugin 1.3.x).
+// Only the fields this plugin consumes are declared.
 
 export type ToolExecuteBeforeInput = {
   readonly tool: string;
@@ -77,9 +96,14 @@ export type PluginHooks = {
   ): Promise<void>;
 };
 
-export type PluginInput = Record<string, unknown>;
+export type PluginInput = {
+  readonly worktree: string;
+  readonly directory: string;
+  readonly project: { readonly worktree: string };
+  readonly [key: string]: unknown;
+};
 
-export type Plugin = (input: PluginInput) => Promise<PluginHooks>;
+export type PluginServer = (input: PluginInput) => Promise<PluginHooks>;
 
 // ---------------------------------------------------------------------------
 // Guard environment
@@ -97,6 +121,7 @@ export interface GuardEnv {
 export interface MakeGuardEnvOptions {
   readonly repository_identity?: RepositoryIdentity;
   readonly producer_internal_id_prefixes?: readonly string[];
+  readonly distributed_workflow_control_prefixes?: readonly string[];
   readonly readFile?: FileReader;
   projection?: Projection;
 }
@@ -111,13 +136,17 @@ function defaultReadFile(path: string): string | null {
 
 export function makeGuardEnv(opts: MakeGuardEnvOptions = {}): GuardEnv {
   const identity = opts.repository_identity ?? DEFAULT_REPOSITORY_IDENTITY;
-  const prefixes =
+  const producerPrefixes =
     opts.producer_internal_id_prefixes ??
     DEFAULT_DETECTOR_CONFIG.producer_internal_id_prefixes;
+  const workflowPrefixes =
+    opts.distributed_workflow_control_prefixes ??
+    DEFAULT_DETECTOR_CONFIG.distributed_workflow_control_prefixes;
   return {
     detector_config: {
       repository_identity: identity,
-      producer_internal_id_prefixes: prefixes,
+      producer_internal_id_prefixes: producerPrefixes,
+      distributed_workflow_control_prefixes: workflowPrefixes,
     },
     readFile: opts.readFile ?? defaultReadFile,
     projection: opts.projection ?? "source",
@@ -128,7 +157,7 @@ export function makeGuardEnv(opts: MakeGuardEnvOptions = {}): GuardEnv {
 // Public helper API (exported for unit tests)
 // ---------------------------------------------------------------------------
 
-export { type GuardDetectionsResult } from "./distribution-boundary-guard-evaluators.ts";
+export { type GuardDetectionsResult } from "./lib/distribution-boundary-guard-evaluators.ts";
 
 export const SUPPORTED_TOOLS = ["write", "edit", "apply_patch"] as const;
 export type SupportedTool = (typeof SUPPORTED_TOOLS)[number];
@@ -137,24 +166,14 @@ export function shouldInspectTool(tool: string): boolean {
   return (SUPPORTED_TOOLS as readonly string[]).includes(tool);
 }
 
-// Distributed text artifact paths. Matches either src/opencode/... source
-// projection (the only path the pre-write gate needs to defend; consumer-side
-// link/archive projections are checked by the final gate / release pipeline).
-// Case-insensitive: Windows filesystem is case-insensitive at runtime.
-const DISTRIBUTED_PATH_RE =
-  /^src\/opencode\/commands\/agentdev\/|^src\/opencode\/skills\/(?:agentdev-[^\/]+|japanese-tech-writing)\//i;
-
-export function normalizePath(p: string): string {
-  return p.replace(/\\/g, "/");
+function makeClassifier(projectRoot: string | null | undefined): PathClassifier {
+  if (projectRoot === null || projectRoot === undefined || projectRoot.length === 0) {
+    return classifyPathNoRoot;
+  }
+  return (p: string): PathClass => classifyPath(p, projectRoot);
 }
 
-export function isDistributedPath(filePath: string): boolean {
-  return DISTRIBUTED_PATH_RE.test(normalizePath(filePath));
-}
-
-// ---------------------------------------------------------------------------
-// Argument parsing re-exports (typed entries into the orchestrator)
-// ---------------------------------------------------------------------------
+export { classifyPath, classifyPathNoRoot, isDistributedPath, normalizePath, type PathClass };
 
 export const parseWriteArgs = parserParseWriteArgs;
 export const parseEditArgs = parserParseEditArgs;
@@ -167,7 +186,7 @@ export type {
   PatchEntry,
   PatchOpKind,
   ParsedPatch,
-} from "./distribution-boundary-guard-parser.ts";
+} from "./lib/distribution-boundary-guard-parser.ts";
 export {
   reconstructEdit,
   reconstructAddFile,
@@ -176,10 +195,15 @@ export {
   safeRead,
   type FileReader,
   type ReconstructResult,
-} from "./distribution-boundary-guard-reconstruction.ts";
+} from "./lib/distribution-boundary-guard-reconstruction.ts";
 
 // ---------------------------------------------------------------------------
-// Public evaluate API (legacy non-env shims for backward compat)
+// Public evaluate API
+//
+// `evaluateWriteContent` / `evaluateEdit` / `evaluateApplyPatch` are legacy
+// shims with no project root; they use classifyPathNoRoot (absolute paths
+// fail closed). The `*Env` variants accept an optional projectRoot so the
+// plugin shell can resolve absolute paths under the worktree.
 // ---------------------------------------------------------------------------
 
 export function evaluateWriteContent(
@@ -187,11 +211,7 @@ export function evaluateWriteContent(
   content: string,
   projection: Projection = "source",
 ): GuardDetectionsResult {
-  return evaluateWriteContentEnv(
-    filePath,
-    content,
-    makeGuardEnv({ projection }),
-  );
+  return evaluateWriteContentEnv(filePath, content, makeGuardEnv({ projection }));
 }
 
 export function evaluateEdit(args: {
@@ -203,19 +223,16 @@ export function evaluateEdit(args: {
   projection?: Projection;
 }): GuardDetectionsResult {
   const opts: MakeGuardEnvOptions = {};
-  if (args.projection !== undefined) {
-    opts.projection = args.projection;
-  }
-  const env = makeGuardEnv(opts);
-  return evaluatorsEvaluateEditEnv(
+  if (args.projection !== undefined) opts.projection = args.projection;
+  return evaluateEditEnv(
     {
       filePath: args.filePath,
       oldString: args.oldString,
       newString: args.newString,
       replaceAll: args.replaceAll ?? false,
     },
-    env,
-    isDistributedPath,
+    makeGuardEnv(opts),
+    undefined,
     args.currentContent,
   );
 }
@@ -224,38 +241,35 @@ export function evaluateApplyPatch(
   patchText: string,
   projection: Projection = "source",
 ): GuardDetectionsResult {
-  return evaluatorsEvaluateApplyPatchEnv(
-    { patchText },
-    makeGuardEnv({ projection }),
-    isDistributedPath,
-  );
+  return evaluateApplyPatchEnv({ patchText }, makeGuardEnv({ projection }));
 }
 
-// Env-aware variants used by the plugin shell and by tests.
 export function evaluateWriteContentEnv(
   filePath: string,
   content: string,
   env: GuardEnv,
+  projectRoot?: string,
 ): GuardDetectionsResult {
-  return evaluatorsEvaluateWriteContentEnv(filePath, content, env, isDistributedPath);
+  return evaluatorsEvaluateWriteContentEnv(filePath, content, env, makeClassifier(projectRoot));
 }
 
 export function evaluateEditEnv(
   args: ParsedEdit,
   env: GuardEnv,
+  projectRoot?: string,
   currentContentOverride?: string,
 ): GuardDetectionsResult {
-  return evaluatorsEvaluateEditEnv(args, env, isDistributedPath, currentContentOverride);
+  return evaluatorsEvaluateEditEnv(args, env, makeClassifier(projectRoot), currentContentOverride);
 }
 
 export function evaluateApplyPatchEnv(
   args: ParsedApplyPatch,
   env: GuardEnv,
+  projectRoot?: string,
 ): GuardDetectionsResult {
-  return evaluatorsEvaluateApplyPatchEnv(args, env, isDistributedPath);
+  return evaluatorsEvaluateApplyPatchEnv(args, env, makeClassifier(projectRoot));
 }
 
-// Re-export internals for tests that need them.
 export { emptyOk, fromDetections, inspectionError, parseApplyPatchText };
 
 // ---------------------------------------------------------------------------
@@ -271,7 +285,7 @@ export function formatBlockMessage(
     return `${header}\nno violation detected (internal call site should not have thrown)`;
   }
   if (result.errorKind === "inspection-error") {
-    return `${header}\ninspection error: malformed input, read failure, or unclassified entry; gate-not-passed per DEC-014 decision 5`;
+    return `${header}\ninspection error: malformed input, read failure, outside-root target, or unclassified entry; gate-not-passed per DEC-014 decision 5`;
   }
   const lines = [header];
   for (const d of result.detections) {
@@ -283,35 +297,52 @@ export function formatBlockMessage(
 }
 
 // ---------------------------------------------------------------------------
-// Plugin wiring (default export)
+// Plugin wiring (V2 default export)
+//
+// `id` is required for path plugins (resolvePluginId throws otherwise).
+// `server` is the async hook factory. The plugin shell fail-closes on
+// every inspection-error path: malformed supported-tool args (parser
+// returns null), outside-root target, read failure, malformed patch
+// text, and unclassified entry all throw via formatBlockMessage.
 // ---------------------------------------------------------------------------
 
-const plugin: Plugin = async () => {
+const server: PluginServer = async (input) => {
+  const projectRoot =
+    typeof input.worktree === "string" && input.worktree.length > 0
+      ? input.worktree
+      : input.project?.worktree ?? "";
   const env = makeGuardEnv();
   return {
-    "tool.execute.before": async (input, output) => {
-      if (!shouldInspectTool(input.tool)) return;
+    "tool.execute.before": async (hookInput, hookOutput) => {
+      if (!shouldInspectTool(hookInput.tool)) return;
       let result: GuardDetectionsResult;
-      if (input.tool === "write") {
-        const parsed = parserParseWriteArgs(output.args);
-        if (parsed === null) return;
-        result = evaluateWriteContentEnv(parsed.filePath, parsed.content, env);
-      } else if (input.tool === "edit") {
-        const parsed = parserParseEditArgs(output.args);
-        if (parsed === null) return;
-        result = evaluateEditEnv(parsed, env);
-      } else if (input.tool === "apply_patch") {
-        const parsed = parserParseApplyPatchArgs(output.args);
-        if (parsed === null) return;
-        result = evaluateApplyPatchEnv(parsed, env);
+      if (hookInput.tool === "write") {
+        const parsed = parserParseWriteArgs(hookOutput.args);
+        if (parsed === null) {
+          throw new Error(formatBlockMessage("write", inspectionError()));
+        }
+        result = evaluateWriteContentEnv(parsed.filePath, parsed.content, env, projectRoot);
+      } else if (hookInput.tool === "edit") {
+        const parsed = parserParseEditArgs(hookOutput.args);
+        if (parsed === null) {
+          throw new Error(formatBlockMessage("edit", inspectionError()));
+        }
+        result = evaluateEditEnv(parsed, env, projectRoot);
       } else {
-        return;
+        const parsed = parserParseApplyPatchArgs(hookOutput.args);
+        if (parsed === null) {
+          throw new Error(formatBlockMessage("apply_patch", inspectionError()));
+        }
+        result = evaluateApplyPatchEnv(parsed, env, projectRoot);
       }
       if (!result.ok) {
-        throw new Error(formatBlockMessage(input.tool, result));
+        throw new Error(formatBlockMessage(hookInput.tool, result));
       }
     },
   };
 };
 
-export default plugin;
+export default {
+  id: "distribution-boundary-guard",
+  server,
+} as const;

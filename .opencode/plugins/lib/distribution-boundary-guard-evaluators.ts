@@ -4,29 +4,37 @@
 // returns a GuardDetectionsResult. The orchestrator (distribution-boundary-guard.ts)
 // uses these to decide whether to throw and block the write.
 //
+// Path classification is three-valued (distributed / non-distributed /
+// outside-root) so the gate fail-closes when a tool targets a path the
+// plugin cannot classify (absolute path outside the worktree, traversal
+// escape, malformed). See distribution-boundary-guard-paths.ts.
+//
 // Pure except for the injected GuardEnv.readFile: same input + same readFile
 // output => same evaluation result. Inspection failures (read failure,
-// malformed patch input, unclassified entry) fail closed per DEC-014 decision 5.
+// malformed patch input, unclassified entry, outside-root target) fail
+// closed per DEC-014 decision 5.
 
 import {
   classifyContentConfig,
   decideGate,
   type Detection,
-} from "../skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
+} from "../../skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
 import {
   parseApplyPatchText,
   type ParsedApplyPatch,
   type ParsedEdit,
   type PatchEntry,
 } from "./distribution-boundary-guard-parser.ts";
+import type { PathClass } from "./distribution-boundary-guard-paths.ts";
 import {
   reconstructAddFile,
   reconstructEdit,
   reconstructUpdateFile,
-  resolveMoveSource,
   safeRead,
 } from "./distribution-boundary-guard-reconstruction.ts";
-import type { GuardEnv } from "./distribution-boundary-guard.ts";
+import type { GuardEnv } from "../distribution-boundary-guard.ts";
+
+export type PathClassifier = (rawPath: string) => PathClass;
 
 export type GuardDetectionsResult =
   | { ok: true; detections: readonly Detection[] }
@@ -58,6 +66,16 @@ export function fromDetections(
   };
 }
 
+/**
+ * Translate a PathClass into a no-op pass / fail-closed inspection error /
+ * continue signal. Returns "continue" only for distributed paths.
+ */
+function gateOnClass(cls: PathClass): "continue" | GuardDetectionsResult {
+  if (cls === "non-distributed") return emptyOk();
+  if (cls === "outside-root") return inspectionError();
+  return "continue";
+}
+
 // ---------------------------------------------------------------------------
 // evaluateWriteContent
 // ---------------------------------------------------------------------------
@@ -66,9 +84,10 @@ export function evaluateWriteContentEnv(
   filePath: string,
   content: string,
   env: GuardEnv,
-  isDistributed: (p: string) => boolean,
+  classify: PathClassifier,
 ): GuardDetectionsResult {
-  if (!isDistributed(filePath)) return emptyOk();
+  const gate = gateOnClass(classify(filePath));
+  if (gate !== "continue") return gate;
   return fromDetections(
     classifyContentConfig(content, filePath, env.projection, env.detector_config),
   );
@@ -81,10 +100,11 @@ export function evaluateWriteContentEnv(
 export function evaluateEditEnv(
   args: ParsedEdit,
   env: GuardEnv,
-  isDistributed: (p: string) => boolean,
+  classify: PathClassifier,
   currentContentOverride?: string,
 ): GuardDetectionsResult {
-  if (!isDistributed(args.filePath)) return emptyOk();
+  const gate = gateOnClass(classify(args.filePath));
+  if (gate !== "continue") return gate;
   const current =
     currentContentOverride !== undefined
       ? currentContentOverride
@@ -109,14 +129,14 @@ export function evaluateEditEnv(
 export function evaluateApplyPatchEnv(
   args: ParsedApplyPatch,
   env: GuardEnv,
-  isDistributed: (p: string) => boolean,
+  classify: PathClassifier,
 ): GuardDetectionsResult {
   const parsed = parseApplyPatchText(args.patchText);
   if (parsed.kind === "malformed") return inspectionError();
 
   const detections: Detection[] = [];
   for (const entry of parsed.entries) {
-    const entryDetections = inspectPatchEntry(entry, env, isDistributed);
+    const entryDetections = inspectPatchEntry(entry, env, classify);
     if (entryDetections === null) return inspectionError();
     for (const d of entryDetections) detections.push(d);
   }
@@ -124,18 +144,19 @@ export function evaluateApplyPatchEnv(
 }
 
 /**
- * Returns null when inspection itself fails (read failure, apply failure).
- * Returns an array (possibly empty) of detections for a successfully
- * reconstructed entry.
+ * Returns null when inspection itself fails (read failure, apply failure,
+ * outside-root target). Returns an array (possibly empty) of detections for
+ * a successfully reconstructed entry.
  */
 function inspectPatchEntry(
   entry: PatchEntry,
   env: GuardEnv,
-  isDistributed: (p: string) => boolean,
+  classify: PathClassifier,
 ): readonly Detection[] | null {
   if (entry.kind === "delete") return [];
   if (entry.kind === "add") {
-    if (!isDistributed(entry.path)) return [];
+    const gate = gateOnClass(classify(entry.path));
+    if (gate !== "continue") return gate.ok ? [] : null;
     const r = reconstructAddFile(entry);
     if (!r.ok) return null;
     return classifyContentConfig(
@@ -146,7 +167,7 @@ function inspectPatchEntry(
     );
   }
   if (entry.kind === "update") {
-    return inspectUpdateEntry(entry, env, isDistributed);
+    return inspectUpdateEntry(entry, env, classify);
   }
   return null;
 }
@@ -154,20 +175,13 @@ function inspectPatchEntry(
 function inspectUpdateEntry(
   entry: PatchEntry,
   env: GuardEnv,
-  isDistributed: (p: string) => boolean,
+  classify: PathClassifier,
 ): readonly Detection[] | null {
   if (entry.moveTo !== null) {
-    const move = resolveMoveSource(entry, env.readFile);
-    if (!move.ok) return null;
-    if (!isDistributed(move.destinationPath)) return [];
-    return classifyContentConfig(
-      move.sourceContent,
-      move.destinationPath,
-      env.projection,
-      env.detector_config,
-    );
+    return inspectMoveEntry(entry, env, classify);
   }
-  if (!isDistributed(entry.path)) return [];
+  const gate = gateOnClass(classify(entry.path));
+  if (gate !== "continue") return gate.ok ? [] : null;
   const current = safeRead(env.readFile, entry.path);
   if (current === null) return null;
   if (entry.bodyLines.length === 0) return [];
@@ -176,6 +190,46 @@ function inspectUpdateEntry(
   return classifyContentConfig(
     r.content,
     entry.path,
+    env.projection,
+    env.detector_config,
+  );
+}
+
+/**
+ * Inspect a Move (Update File with `*** Move to:`). When the patch carries
+ * body lines, the destination content is the source content with the body
+ * applied (rename + content edit). When the body is empty, the destination
+ * content is the source content unchanged (pure rename). In both cases the
+ * inspected content is classified at the destination path so a rename into
+ * a distributed directory re-runs the detector.
+ *
+ * Outside-root destination (or source read failure / apply failure) returns
+ * null so the orchestrator fail-closes.
+ */
+function inspectMoveEntry(
+  entry: PatchEntry,
+  env: GuardEnv,
+  classify: PathClassifier,
+): readonly Detection[] | null {
+  if (entry.moveTo === null) return null;
+  const destGate = gateOnClass(classify(entry.moveTo));
+  if (destGate !== "continue") {
+    if (destGate.ok) return [];
+    return null;
+  }
+  const source = safeRead(env.readFile, entry.path);
+  if (source === null) return null;
+  let destinationContent: string;
+  if (entry.bodyLines.length === 0) {
+    destinationContent = source;
+  } else {
+    const r = reconstructUpdateFile(entry, source);
+    if (!r.ok) return null;
+    destinationContent = r.content;
+  }
+  return classifyContentConfig(
+    destinationContent,
+    entry.moveTo,
     env.projection,
     env.detector_config,
   );

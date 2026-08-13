@@ -13,6 +13,16 @@
 // ---------------------------------------------------------------------------
 // Argument parsing (from OpenCode tool.execute.before output.args)
 // ---------------------------------------------------------------------------
+//
+// OpenCode 1.18.x tool schemas (verified against @opencode-ai/sdk):
+//   write       -> { path: string,         content: string }
+//   edit        -> { path: string,         oldString: string, newString: string, replaceAll?: boolean }
+//   apply_patch -> { patchText: string }
+//
+// The `path` field is the file path the tool will write; it MAY be repo-
+// relative or absolute (the harness passes whatever the caller supplied).
+// Path classification (distributed / non-distributed / outside-root) is the
+// evaluator's job; the parser only normalises arg shape into typed values.
 
 export interface ParsedWrite {
   readonly filePath: string;
@@ -39,14 +49,19 @@ function isBoolean(v: unknown): v is boolean {
 }
 
 /**
- * Parse the `write` tool args. Returns null when filePath or content is
- * absent or not a string. The plugin caller treats null as "skip tool"
- * (cannot determine target) — actual classification happens downstream.
+ * Parse the `write` tool args. Returns null when `path` or `content` is
+ * absent, non-string, or `path` is empty. Null is interpreted by the plugin
+ * shell as inspection-error (fail closed per DEC-014 decision 5): a write
+ * call we cannot classify must NOT pass silently.
+ *
+ * `filePath` is also accepted as a legacy alias so existing programmatic
+ * callers (and tests) that constructed args before the OpenCode field name
+ * was finalised keep working. At runtime, OpenCode emits `path`.
  */
 export function parseWriteArgs(
   args: Record<string, unknown>,
 ): ParsedWrite | null {
-  const filePath = args["filePath"];
+  const filePath = args["path"] ?? args["filePath"];
   const content = args["content"];
   if (!isString(filePath) || !isString(content)) return null;
   if (filePath.length === 0) return null;
@@ -56,14 +71,14 @@ export function parseWriteArgs(
 /**
  * Parse the `edit` tool args. Missing oldString/newString default to empty
  * string (the edit tool contract: empty oldString means insert at start).
- * replaceAll defaults to false. Returns null only when filePath is absent
- * or not a string.
+ * replaceAll defaults to false. Returns null when `path` is absent, not a
+ * string, or empty; the plugin shell fail-closes on null.
  */
 export function parseEditArgs(
   args: Record<string, unknown>,
 ): ParsedEdit | null {
-  const filePath = args["filePath"];
-  if (!isString(filePath)) return null;
+  const filePath = args["path"] ?? args["filePath"];
+  if (!isString(filePath) || filePath.length === 0) return null;
   const oldString = args["oldString"];
   const newString = args["newString"];
   const replaceAll = args["replaceAll"];
@@ -76,8 +91,8 @@ export function parseEditArgs(
 }
 
 /**
- * Parse the `apply_patch` tool args. Returns null when patchText is absent
- * or not a string.
+ * Parse the `apply_patch` tool args. Returns null when `patchText` is absent
+ * or non-string.
  */
 export function parseApplyPatchArgs(
   args: Record<string, unknown>,
