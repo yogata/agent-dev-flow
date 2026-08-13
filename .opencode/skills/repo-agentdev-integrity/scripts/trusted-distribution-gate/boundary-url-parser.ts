@@ -36,8 +36,12 @@ const REPO_PATTERN = /^[A-Za-z0-9_.-]+$/;
 /** Scan pattern: case-insensitive recognized host followed by `/` or `:`. */
 const HOST_SCAN = /(?:github\.com|raw\.githubusercontent\.com)(?=[/:])/gi;
 
-/** URL end exclusion set: terminates URL ownership at boundary markers. */
-const URL_STOP_CHAR = /[\s)\]|\\"'`<>{},;\u3001\u3002\uFF1B\uFF0C\uFF01\uFF1F]/;
+/** URL end exclusion set: terminates URL ownership at boundary markers.
+ * Includes opening delimiters `(` `[` `{` and full-width colon U+FF1A.
+ * ASCII `:` is conditional (handled in the forward scan): it terminates
+ * only in the path component, not in the authority (`:port`) or inside
+ * a query (`?...`) / fragment (`#...`). */
+const URL_STOP_CHAR = /[\s()\[\]|\\"'`<>{},;\u3001\u3002\uFF1B\uFF0C\uFF01\uFF1F\uFF1A]/;
 
 /** Preceding char rejects the left boundary (host/path/query continuation). */
 const LEFT_REJECT_CHAR = /[A-Za-z0-9._@:?#&=\\/-]/;
@@ -111,7 +115,16 @@ export function extractUrls(line: string, cap: number): {
     const hostEnd = hostStart + m[0].length;
     const scan = scanAuthorityBackward(line, hostStart);
     let urlEnd = hostEnd;
-    while (urlEnd < line.length && !URL_STOP_CHAR.test(line.charAt(urlEnd))) urlEnd++;
+    let inPath = false;
+    let inQueryOrFrag = false;
+    while (urlEnd < line.length) {
+      const c = line.charAt(urlEnd);
+      if (URL_STOP_CHAR.test(c)) break;
+      if (c === "?" || c === "#") inQueryOrFrag = true;
+      else if (c === "/") { if (!inQueryOrFrag) inPath = true; }
+      else if (c === ":" && inPath && !inQueryOrFrag) break;
+      urlEnd++;
+    }
     const authorityEnd = findAuthorityEnd(line, hostEnd, urlEnd);
     if (scan.hasBackslash) {
       const aStart = scan.schemeStart !== -1 ? scan.schemeStart : scan.authorityLeft;
