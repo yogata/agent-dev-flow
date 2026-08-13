@@ -56,21 +56,23 @@ describe("boundary-pipeline helpers / detectCandidates", () => {
 });
 
 describe("boundary-pipeline helpers / resolveCandidate", () => {
+  // resolveCandidate ignores span; placeholder satisfies the typed union.
+  const S = { start: 0, end: 1 };
   test("known ID prefix resolves to producer-internal", () => {
-    const r = resolveCandidate({ type: "direct-id", value: "REQ-0001" }, baseConfig);
+    const r = resolveCandidate({ type: "direct-id", value: "REQ-0001", span: S }, baseConfig);
     expect(r.classification).toBe("producer-internal");
     expect(r.category).toBe("concrete-id");
   });
 
   test("unknown ID prefix resolves to unclassified (fail-closed)", () => {
-    const r = resolveCandidate({ type: "direct-id", value: "MYSTERY-99" }, baseConfig);
+    const r = resolveCandidate({ type: "direct-id", value: "MYSTERY-99", span: S }, baseConfig);
     expect(r.classification).toBe("unclassified");
     expect(r.category).toBe("unclassified-entry");
   });
 
   test("known path resolves to producer-internal (concrete)", () => {
     const r = resolveCandidate(
-      { type: "path", value: "docs/requirements/REQ-0001.md" },
+      { type: "path", value: "docs/requirements/REQ-0001.md", span: S },
       baseConfig,
     );
     expect(r.classification).toBe("producer-internal");
@@ -79,7 +81,7 @@ describe("boundary-pipeline helpers / resolveCandidate", () => {
 
   test("template path resolves to generic-or-template", () => {
     const r = resolveCandidate(
-      { type: "path", value: "docs/specs/<domain>/x.md" },
+      { type: "path", value: "docs/specs/<domain>/x.md", span: S },
       baseConfig,
     );
     expect(r.classification).toBe("generic-or-template");
@@ -87,7 +89,7 @@ describe("boundary-pipeline helpers / resolveCandidate", () => {
 
   test("producer-owned URL resolves to producer-internal (parent defect #5)", () => {
     const r = resolveCandidate(
-      { type: "url", value: "https://github.com/yogata/agent-dev-flow/blob/main/x.md" },
+      { type: "url", value: "https://github.com/yogata/agent-dev-flow/blob/main/x.md", span: S },
       baseConfig,
     );
     expect(r.classification).toBe("producer-internal");
@@ -96,7 +98,7 @@ describe("boundary-pipeline helpers / resolveCandidate", () => {
 
   test("external-repo URL resolves to consumer-resolvable (parent defect #5)", () => {
     const r = resolveCandidate(
-      { type: "url", value: "https://github.com/vercel/next.js/blob/main/docs/x.md" },
+      { type: "url", value: "https://github.com/vercel/next.js/blob/main/docs/x.md", span: S },
       baseConfig,
     );
     expect(r.classification).toBe("consumer-resolvable");

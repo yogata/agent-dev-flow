@@ -9,7 +9,11 @@
 //
 // Supported atoms inside a bounded token:
 //   - literal `[A-Za-z0-9_-]`
-//   - `\uXXXX`  exactly four hex digits (decode to one UTF-16 code unit)
+//   - `\uXXXX`  exactly four hex digits (fixed width; decode to one UTF-16
+//               code unit). The four-hex-digit contract is unconditional:
+//               `\u00310` decodes to '1' and the trailing '0' is a literal,
+//               reconstructing `ADR-10`. There is no digit-continuation
+//               rejection.
 //   - `\xXX`    exactly two hex digits (decode to one byte char)
 //   - `0[xX]HH` exactly two hex digits in ASCII digit range (0x30..0x39)
 //               and NOT part of a longer hex run; decodes to the digit char.
@@ -19,20 +23,35 @@
 // Out-of-scope forms (`\u{XXXX}`, `\uXXXXXX` with 6 hex, malformed
 // escapes) are left as literal text and produce no detection unless a
 // normal direct ID is independently present.
+//
+// Bounding: the scan is capped at MAX_LINE_SCAN UTF-16 code units per line
+// and MAX_IDS_PER_TOKEN reconstructed IDs per token. Either limit turning a
+// typed overflow signal that the pipeline maps to a fail-closed candidate.
+// Regex matching uses sticky (`y`) regexes against the full line so there is
+// no per-character `substring(i)` allocation.
 
 const BOUNDED_LITERAL = /[A-Za-z0-9_-]/;
-const U_ESCAPE = /^\\u([0-9A-Fa-f]{4})/;
-// `\xXX` is fixed width 2: consume exactly two hex digits regardless of what
-// follows. A trailing hex char is a coincidental literal (e.g. the `D` in
-// `\x41DR`), not a longer escape run.
-const X_ESCAPE = /^\\x([0-9A-Fa-f]{2})/;
+// Sticky regexes: match must start exactly at lastIndex. No `^` anchor
+// (sticky already pins the start); the four/two-hex-digit width is exact.
+const U_ESCAPE = /\\u([0-9A-Fa-f]{4})/y;
+const X_ESCAPE = /\\x([0-9A-Fa-f]{2})/y;
 // `0[xX]HH` digit-reconstruction atom: case-insensitive `0x` prefix,
 // exactly two hex digits, value in ASCII digit range (0x30..0x39), and
 // not part of a longer hex run.
-const HEX_DIGIT_ATOM = /^0[xX](3[0-9])(?![0-9A-Fa-f])/;
-const HEX_DIGIT = /[0-9A-Fa-f]/;
+const HEX_DIGIT_ATOM = /0[xX](3[0-9])(?![0-9A-Fa-f])/y;
 const ID_PATTERN = /\b([A-Z]{2,})-(\d{1,})\b/g;
+const UTF_ENCODING_LABELS = new Set(["UTF-8", "UTF-16", "UTF-32"]);
+
+// Per-token cap. Closing the exploit ("STEP-1\u0032-").repeat(16) +
+// "\u0041DR-1": a single token cannot hide its 17th ID behind the cap.
+// When the cap turns, a typed overflow propagates so the gate fails closed
+// even if earlier reconstructed candidates are later deduped/owned.
 const MAX_IDS_PER_TOKEN = 16;
+// Scan budget: bounds per-line work to avoid O(n^2) blowup on pathological
+// input. A line longer than this is scanned up to the limit and then
+// signals line-scan-exceeded overflow (fail-closed). Exported so the
+// pipeline entry and the gate share one authoritative cap.
+export const MAX_LINE_SCAN = 65536;
 
 interface DecodedAtom {
   readonly char: string;
@@ -55,16 +74,15 @@ export interface ReconstructedId {
   readonly srcEnd: number;
 }
 
-// `\uXXXX` exact-contract gate. A digit-valued escape (decodes to '0'..'9')
-// immediately followed by another hex digit is a malformed digit-continuation
-// run (e.g. `\u00310`); it is left as literal text and produces no decode.
-// A non-digit-valued escape is always accepted, so `\u0041D` (decodes to 'A',
-// followed by hex 'D') still decodes and reconstructs `\u0041DR-0001`.
-function uEscapeAccepts(hex: string, line: string, escapeEnd: number): boolean {
-  const decoded = String.fromCharCode(parseInt(hex, 16));
-  if (decoded < "0" || decoded > "9") return true;
-  const nextCh = line.charAt(escapeEnd);
-  return nextCh === "" || !HEX_DIGIT.test(nextCh);
+/** Exhaustive reasons the reconstruction scan turned a typed overflow. */
+export type ReconstructionOverflowReason =
+  | "token-ids-exceeded"
+  | "line-scan-exceeded";
+
+export interface ReconstructionResult {
+  readonly ids: readonly ReconstructedId[];
+  readonly overflow: boolean;
+  readonly overflowReason: ReconstructionOverflowReason | null;
 }
 
 interface BoundedToken {
@@ -74,49 +92,43 @@ interface BoundedToken {
   readonly hasEscape: boolean;
 }
 
-function tokenizeBoundedToken(line: string, start: number): BoundedToken | null {
+function tokenizeBoundedToken(line: string, start: number, limit: number): BoundedToken | null {
   const atoms: DecodedAtom[] = [];
   let hasEscape = false;
   let i = start;
-  while (i < line.length) {
-    const rest = line.substring(i);
-
-    const u = U_ESCAPE.exec(rest);
+  while (i < limit) {
+    U_ESCAPE.lastIndex = i;
+    const u = U_ESCAPE.exec(line);
     if (u && u[0] !== undefined) {
-      const hex = u[1] ?? "";
-      const consumed = u[0].length;
-      if (uEscapeAccepts(hex, line, i + consumed)) {
-        const code = parseInt(hex, 16);
-        atoms.push({ char: String.fromCharCode(code), srcStart: i, srcEnd: i + consumed, fromEscape: true });
-        hasEscape = true;
-        i += consumed;
-        continue;
-      }
-    }
-
-    const x = X_ESCAPE.exec(rest);
-    if (x && x[0] !== undefined) {
-      const hex = x[1] ?? "";
-      const consumed = x[0].length;
-      const code = parseInt(hex, 16);
-      atoms.push({ char: String.fromCharCode(code), srcStart: i, srcEnd: i + consumed, fromEscape: true });
+      const code = parseInt(u[1] ?? "", 16);
+      atoms.push({ char: String.fromCharCode(code), srcStart: i, srcEnd: i + u[0].length, fromEscape: true });
       hasEscape = true;
-      i += consumed;
+      i += u[0].length;
       continue;
     }
 
-    const h = HEX_DIGIT_ATOM.exec(rest);
+    X_ESCAPE.lastIndex = i;
+    const x = X_ESCAPE.exec(line);
+    if (x && x[0] !== undefined) {
+      const code = parseInt(x[1] ?? "", 16);
+      atoms.push({ char: String.fromCharCode(code), srcStart: i, srcEnd: i + x[0].length, fromEscape: true });
+      hasEscape = true;
+      i += x[0].length;
+      continue;
+    }
+
+    HEX_DIGIT_ATOM.lastIndex = i;
+    const h = HEX_DIGIT_ATOM.exec(line);
     if (h && h[1] !== undefined && h[0] !== undefined) {
       const pair = h[1];
-      const consumed = h[0].length;
       // 0[xX]3N -> digit char 'N' (ASCII 0x30..0x39 == '0'..'9')
-      atoms.push({ char: pair.charAt(1), srcStart: i, srcEnd: i + consumed, fromEscape: true });
+      atoms.push({ char: pair.charAt(1), srcStart: i, srcEnd: i + h[0].length, fromEscape: true });
       hasEscape = true;
-      i += consumed;
+      i += h[0].length;
       continue;
     }
 
-    const ch = rest.charAt(0);
+    const ch = line.charAt(i);
     if (BOUNDED_LITERAL.test(ch)) {
       atoms.push({ char: ch, srcStart: i, srcEnd: i + 1, fromEscape: false });
       i += 1;
@@ -131,43 +143,62 @@ function tokenizeBoundedToken(line: string, start: number): BoundedToken | null 
 
 /**
  * Scan a line for bounded tokens that decode to expose concrete IDs. An ID
- * is emitted only when its own decoded span includes an escape atom (the ID
- * is reconstructed from escapes) OR an escape atom creates the word boundary
- * that exposes an adjacent literal ID (e.g. `STEP-1\u0020ADR-0002` exposes
- * ADR-0002 via the escaped space). A literal ID that merely shares a token
- * with an unrelated escape is NOT emitted. `matched`/`original` is the
+ * is emitted when its own decoded span includes an escape atom (ownEscape),
+ * OR an escape atom creates the word boundary that exposes it on either
+ * side — left (escape immediately before the ID) or right (escape
+ * immediately after). Left and right escape-created boundaries are
+ * symmetric. A literal ID that merely shares a token with an unrelated
+ * escape is NOT emitted. UTF-8/16/32 encoding labels are never emitted as
+ * reconstructed IDs (preserved exclusion). `matched`/`original` is the
  * minimal relevant source span, never the maximal token.
  *
- * Pure: same input always yields the same output.
+ * Pure: same input always yields the same output. The typed overflow signal
+ * MUST propagate to a fail-closed candidate even if the emitted ids are
+ * later deduped or owned by the pipeline.
  */
-export function detectReconstructedIds(line: string): ReconstructedId[] {
-  const out: ReconstructedId[] = [];
+export function detectReconstructedIds(line: string): ReconstructionResult {
+  const ids: ReconstructedId[] = [];
+  const limit = Math.min(line.length, MAX_LINE_SCAN);
   let i = 0;
-  while (i < line.length) {
-    const token = tokenizeBoundedToken(line, i);
+  while (i < limit) {
+    const token = tokenizeBoundedToken(line, i, limit);
     if (token === null) {
       i += 1;
       continue;
     }
     if (token.hasEscape) {
       const decoded = token.atoms.map((a) => a.char).join("");
-      const idPattern = new RegExp(ID_PATTERN.source, "g");
+      ID_PATTERN.lastIndex = 0;
       let m: RegExpExecArray | null;
       let emitted = 0;
-      while ((m = idPattern.exec(decoded)) !== null) {
-        if (emitted >= MAX_IDS_PER_TOKEN) break;
+      let tokenOverflow = false;
+      while ((m = ID_PATTERN.exec(decoded)) !== null) {
+        if (UTF_ENCODING_LABELS.has(m[0])) continue;
         const idStart = m.index;
         const idEnd = m.index + m[0].length;
         const startAtom = token.atoms.at(idStart);
         const endAtom = token.atoms.at(idEnd - 1);
         const leftAtom = idStart > 0 ? token.atoms.at(idStart - 1) : undefined;
+        const rightAtom = token.atoms.at(idEnd);
         if (startAtom === undefined || endAtom === undefined) continue;
         const ownEscape = token.atoms.slice(idStart, idEnd).some((a) => a.fromEscape);
-        const boundaryEscape = leftAtom !== undefined && leftAtom.fromEscape;
-        if (!ownEscape && !boundaryEscape) continue;
-        const spanStart = ownEscape ? startAtom.srcStart : (leftAtom?.srcStart ?? startAtom.srcStart);
-        const spanEnd = endAtom.srcEnd;
-        out.push({
+        const leftBoundary = leftAtom !== undefined && leftAtom.fromEscape;
+        const rightBoundary = rightAtom !== undefined && rightAtom.fromEscape;
+        if (!ownEscape && !leftBoundary && !rightBoundary) continue;
+        if (emitted >= MAX_IDS_PER_TOKEN) { tokenOverflow = true; break; }
+        let spanStart: number;
+        let spanEnd: number;
+        if (ownEscape) {
+          spanStart = startAtom.srcStart;
+          spanEnd = endAtom.srcEnd;
+        } else if (leftBoundary) {
+          spanStart = leftAtom?.srcStart ?? startAtom.srcStart;
+          spanEnd = endAtom.srcEnd;
+        } else {
+          spanStart = startAtom.srcStart;
+          spanEnd = rightAtom?.srcEnd ?? endAtom.srcEnd;
+        }
+        ids.push({
           decoded: m[0],
           original: line.substring(spanStart, spanEnd),
           srcStart: spanStart,
@@ -175,8 +206,14 @@ export function detectReconstructedIds(line: string): ReconstructedId[] {
         });
         emitted += 1;
       }
+      if (tokenOverflow) {
+        return { ids, overflow: true, overflowReason: "token-ids-exceeded" };
+      }
     }
     i += token.length;
   }
-  return out;
+  if (line.length > MAX_LINE_SCAN) {
+    return { ids, overflow: true, overflowReason: "line-scan-exceeded" };
+  }
+  return { ids, overflow: false, overflowReason: null };
 }

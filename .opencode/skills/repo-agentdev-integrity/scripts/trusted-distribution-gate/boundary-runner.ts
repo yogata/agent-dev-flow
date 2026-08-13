@@ -23,8 +23,8 @@ import type { LoadedBlob } from "./blob-loader.ts";
 import {
   decideProjection,
   type ClassifyFileInput,
-  type DetectorConfig,
-} from "./boundary-pipeline.ts";
+} from "./boundary-gate.ts";
+import type { DetectorConfig } from "./boundary-pipeline.ts";
 import { mapRuntimeToLinkPath } from "./manifest.ts";
 
 const PROJECTIONS: readonly Projection[] = [

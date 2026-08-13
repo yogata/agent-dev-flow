@@ -24,13 +24,12 @@
 import { describe, expect, test } from "bun:test";
 import {
   classifyLine,
-  decideProjection,
   detectCandidates,
   resolveCandidate,
   type Candidate,
-  type ClassifyFileInput,
   type DetectorConfig,
 } from "./boundary-pipeline.ts";
+import { decideProjection, type ClassifyFileInput } from "./boundary-gate.ts";
 import type { DependencyClass, DetectionCategory } from "./types.ts";
 
 const baseConfig: DetectorConfig = {
@@ -42,6 +41,10 @@ const baseConfig: DetectorConfig = {
 function cls(text: string, cfg: DetectorConfig = baseConfig) {
   return classifyLine({ text, lineNumber: 1, filePath: "f.md", projection: "source" }, cfg);
 }
+
+// resolveCandidate ignores span; tests use a fixed placeholder to satisfy the
+// typed Candidate union (span is exercised by detectCandidates/ownership).
+const SPAN = { start: 0, end: 1 };
 
 describe("Stage A vocabulary / UTF encoding labels remain clean", () => {
   for (const label of ["UTF-8", "UTF-16", "UTF-32"]) {
@@ -116,10 +119,10 @@ describe("B2 wildcard is a token boundary", () => {
   });
 });
 
-// B3-B6: prefix escape, escaped hyphen, multiple mixed. (B4 suffix digit
-// concat via \u is now clean per the \uXXXX exact-contract digit-continuation
-// rule — see boundary-span-overflow.test.ts C2. The \x form ADR-\x310 is
-// still caught — see C1.)
+// B3-B6: prefix escape, escaped hyphen, multiple mixed. The fixed-width
+// \uXXXX contract reconstructs all digit-continuation forms: \u00310
+// decodes to '1' + literal '0' = ADR-10 (see boundary-span-overflow.test.ts
+// C2). The \x form ADR-\x310 is also caught (see C1).
 describe("B3-B6 bounded reconstruction of producer IDs", () => {
   const producerCases: Array<[string, string]> = [
     ["\\u0041DR-0001", "B3 prefix escape"],
@@ -158,14 +161,14 @@ describe("B7 producer and distributed overlap, producer wins", () => {
   };
 
   test("direct STEP-N with overlap => producer-internal/concrete-id", () => {
-    const r = resolveCandidate({ type: "direct-id", value: "STEP-1" }, overlapCfg);
+    const r = resolveCandidate({ type: "direct-id", value: "STEP-1", span: SPAN }, overlapCfg);
     expect(r.classification).toBe("producer-internal");
     expect(r.category).toBe("concrete-id");
   });
 
   test("reconstructed STEP-N with overlap => producer-internal/evasion-attempt", () => {
     const r = resolveCandidate(
-      { type: "reconstructed-id", value: "STEP-1", original: "STEP-\\u0031" },
+      { type: "reconstructed-id", value: "STEP-1", original: "STEP-\\u0031", span: SPAN },
       overlapCfg,
     );
     expect(r.classification).toBe("producer-internal");
@@ -182,12 +185,12 @@ describe("B7 producer and distributed overlap, producer wins", () => {
 // B8: classification precedence through resolveCandidate.
 describe("B8 classification precedence through resolveCandidate", () => {
   const cases: Array<[Candidate, DependencyClass, DetectionCategory]> = [
-    [{ type: "direct-id", value: "ADR-0001" }, "producer-internal", "concrete-id"],
-    [{ type: "reconstructed-id", value: "ADR-0001", original: "ADR-\\u0031" }, "producer-internal", "evasion-attempt"],
-    [{ type: "direct-id", value: "STEP-1" }, "generic-or-template", "distributed-control"],
-    [{ type: "reconstructed-id", value: "STEP-1", original: "STEP-\\u0031" }, "unclassified", "evasion-attempt"],
-    [{ type: "reconstructed-id", value: "MYSTERY-1", original: "MYSTERY-\\u0031" }, "unclassified", "evasion-attempt"],
-    [{ type: "direct-id", value: "UNKNOWN-99" }, "unclassified", "unclassified-entry"],
+    [{ type: "direct-id", value: "ADR-0001", span: SPAN }, "producer-internal", "concrete-id"],
+    [{ type: "reconstructed-id", value: "ADR-0001", original: "ADR-\\u0031", span: SPAN }, "producer-internal", "evasion-attempt"],
+    [{ type: "direct-id", value: "STEP-1", span: SPAN }, "generic-or-template", "distributed-control"],
+    [{ type: "reconstructed-id", value: "STEP-1", original: "STEP-\\u0031", span: SPAN }, "unclassified", "evasion-attempt"],
+    [{ type: "reconstructed-id", value: "MYSTERY-1", original: "MYSTERY-\\u0031", span: SPAN }, "unclassified", "evasion-attempt"],
+    [{ type: "direct-id", value: "UNKNOWN-99", span: SPAN }, "unclassified", "unclassified-entry"],
   ];
   for (const [c, classification, category] of cases) {
     const label = "value" in c ? c.value : c.type;

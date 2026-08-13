@@ -17,7 +17,7 @@ import {
   detectCandidates,
   type DetectorConfig,
 } from "./boundary-pipeline.ts";
-import { decideProjection, type ClassifyFileInput } from "./boundary-pipeline.ts";
+import { decideProjection, type ClassifyFileInput } from "./boundary-gate.ts";
 
 const baseConfig: DetectorConfig = {
   repository_identity: { owner_slash_name: "yogata/agent-dev-flow", default_branch: "main" },
@@ -60,23 +60,28 @@ describe("C1 X fixed-width catches valid fixed-width x escapes", () => {
   });
 
   test("detectReconstructedIds decodes all three X forms", () => {
-    expect(detectReconstructedIds("\\x41DR-0001").map((x) => x.decoded)).toContain("ADR-0001");
-    expect(detectReconstructedIds("ADR\\x2d0001").map((x) => x.decoded)).toContain("ADR-0001");
-    expect(detectReconstructedIds("ADR-\\x310").map((x) => x.decoded)).toContain("ADR-10");
+    expect(detectReconstructedIds("\\x41DR-0001").ids.map((x) => x.decoded)).toContain("ADR-0001");
+    expect(detectReconstructedIds("ADR\\x2d0001").ids.map((x) => x.decoded)).toContain("ADR-0001");
+    expect(detectReconstructedIds("ADR-\\x310").ids.map((x) => x.decoded)).toContain("ADR-10");
   });
 });
 
-// C2: \uXXXX is exact contract. A digit-valued escape immediately followed
-// by another hex digit is a malformed digit-continuation run and must NOT
-// decode (left as literal text -> clean). Non-digit escapes followed by a
-// hex-looking literal still decode.
-describe("C2 U exact-contract rejects malformed digit-continuation", () => {
-  test("ADR-\\u00310 is clean (digit-continuation rejected)", () => {
-    expect(cls("See ADR-\\u00310 here.").detections).toEqual([]);
+// C2: \uXXXX is fixed-width four hex digits. The digit-continuation
+// rejection is removed: \u00310 decodes to '1' and the trailing '0' is a
+// literal, reconstructing ADR-10. \u{...} remains unsupported/clean.
+describe("C2 U fixed-width four-hex reconstruction", () => {
+  test("ADR-\\u00310 reconstructs ADR-10 and fails (producer-internal/evasion-attempt)", () => {
+    const r = cls("See ADR-\\u00310 here.");
+    expect(r.detections).toHaveLength(1);
+    expect(r.detections[0]?.classification).toBe("producer-internal");
+    expect(r.detections[0]?.category).toBe("evasion-attempt");
+    expect(r.detections[0]?.matched).toBe("ADR-\\u00310");
   });
 
-  test("detectReconstructedIds yields nothing for ADR-\\u00310", () => {
-    expect(detectReconstructedIds("ADR-\\u00310")).toEqual([]);
+  test("detectReconstructedIds decodes ADR-\\u00310 to ADR-10", () => {
+    const res = detectReconstructedIds("ADR-\\u00310");
+    expect(res.ids.map((x) => x.decoded)).toEqual(["ADR-10"]);
+    expect(res.overflow).toBe(false);
   });
 
   test("\\u0041DR-0001 still reconstructs (non-digit escape + hex literal)", () => {
@@ -95,35 +100,39 @@ describe("C2 U exact-contract rejects malformed digit-continuation", () => {
     const qg = cls("See QG-\\u0032 here.").detections.find((d) => d.category === "evasion-attempt");
     expect(qg?.classification).toBe("unclassified");
   });
+
+  test("\\u{0031} curly-brace form remains unsupported (clean)", () => {
+    expect(cls("See ADR-\\u{0031} here.").detections).toEqual([]);
+  });
 });
 
-// C3: span-aware reconstruction. An ID is emitted only when its own decoded
-// span includes an escape atom, or an escape atom creates the boundary that
-// exposes it. A literal ID sharing a token with an unrelated escape is NOT
-// emitted as reconstructed. `matched` is the minimal relevant source span.
-describe("C3 span-aware reconstruction", () => {
-  test("STEP-1\\u0020ADR-0002 emits only reconstructed ADR-0002, minimal span", () => {
+// C3: span-aware reconstruction with symmetric escape-created boundaries.
+// An escape atom creates a word boundary on EITHER side of an ID: left
+// (escape immediately before) or right (escape immediately after). Both are
+// evasion-attempt. UTF-8/16/32 labels stay clean. `matched` is minimal.
+describe("C3 span-aware reconstruction, symmetric boundaries", () => {
+  test("STEP-1\\u0020ADR-0002 emits reconstructed STEP-1 (error) and ADR-0002 (failure)", () => {
     const g = gateFor("See STEP-1\\u0020ADR-0002.");
     expect(g.failures).toHaveLength(1);
-    expect(g.errors).toHaveLength(0);
-    const f = g.failures[0];
-    expect(f?.category).toBe("evasion-attempt");
-    expect(f?.matched).toBe("\\u0020ADR-0002");
+    expect(g.errors).toHaveLength(1);
+    expect(g.failures[0]?.category).toBe("evasion-attempt");
+    expect(g.failures[0]?.matched).toBe("\\u0020ADR-0002");
+    expect(g.errors[0]?.matched).toBe("STEP-1\\u0020");
   });
 
-  test("STEP-1\\u0020text stays clean at the gate (direct STEP-1 allowed, no reconstructed false positive)", () => {
+  test("STEP-1\\u0020text fails (right-boundary escape exposes STEP-1)", () => {
     const g = gateFor("See STEP-1\\u0020text here.");
-    expect(g.pass).toBe(true);
-    expect(g.failures).toEqual([]);
-    expect(g.errors).toEqual([]);
+    expect(g.pass).toBe(false);
+    expect(g.errors.some((e) => e.category === "evasion-attempt" && e.matched === "STEP-1\\u0020")).toBe(true);
   });
 
-  test("QG-2\\x20prose stays clean at the gate", () => {
+  test("QG-2\\x20prose fails (right-boundary escape exposes QG-2)", () => {
     const g = gateFor("See QG-2\\x20prose here.");
-    expect(g.pass).toBe(true);
+    expect(g.pass).toBe(false);
+    expect(g.errors.some((e) => e.category === "evasion-attempt" && e.matched === "QG-2\\x20")).toBe(true);
   });
 
-  test("UTF-8\\u0020text stays clean (no detection at all)", () => {
+  test("UTF-8\\u0020text stays clean (UTF label excluded from reconstruction)", () => {
     const g = gateFor("See UTF-8\\u0020text here.");
     expect(g.pass).toBe(true);
     expect(g.failures).toEqual([]);
@@ -171,5 +180,66 @@ describe("C4 bounded evidence and fail-closed overflow", () => {
     const rep = "\\u0041DR-0001 ".repeat(300);
     const cs = detectCandidates(rep, baseConfig);
     expect(cs.length).toBeLessThanOrEqual(65);
+  });
+});
+
+// C5: reconstructed wins over direct on a conflicting overlap. STEP-1\x32
+// reconstructs STEP-12; the shorter direct STEP-1 is dropped, not the
+// reconstructed. Same for QG-2\u0033 -> QG-23.
+describe("C5 reconstructed wins conflicting overlap", () => {
+  test("STEP-1\\x32 reconstructs STEP-12 and fails closed (direct STEP-1 dropped)", () => {
+    const cs = detectCandidates("See STEP-1\\x32 here.", baseConfig);
+    expect(cs.map((c) => c.type)).toContain("reconstructed-id");
+    const recon = cs.find((c): c is Extract<typeof c, { type: "reconstructed-id" }> => c.type === "reconstructed-id");
+    expect(recon?.value).toBe("STEP-12");
+    expect(cs.some((c) => c.type === "direct-id")).toBe(false);
+    const g = gateFor("See STEP-1\\x32 here.");
+    expect(g.pass).toBe(false);
+    expect(g.errors.some((e) => e.category === "evasion-attempt")).toBe(true);
+  });
+
+  test("QG-2\\u0033 reconstructs QG-23 and fails closed", () => {
+    const g = gateFor("See QG-2\\u0033 here.");
+    expect(g.pass).toBe(false);
+    const recon = detectCandidates("See QG-2\\u0033 here.", baseConfig)
+      .find((c): c is Extract<typeof c, { type: "reconstructed-id" }> => c.type === "reconstructed-id");
+    expect(recon?.value).toBe("QG-23");
+  });
+});
+
+// C6: per-token ID cap. 16 IDs in one token are all emitted; a 17th turns a
+// typed overflow that propagates to a fail-closed candidate even if earlier
+// reconstructed candidates are later deduped/owned. Closes the exploit
+// ("STEP-1\u0032-").repeat(16) + "\u0041DR-1".
+describe("C6 per-token ID cap overflow", () => {
+  test("16 IDs in one token: all emitted, no overflow", () => {
+    const token = "STEP-1\\u0032-".repeat(16);
+    const res = detectReconstructedIds(token);
+    expect(res.ids.length).toBe(16);
+    expect(res.overflow).toBe(false);
+  });
+
+  test("exploit (17th hidden ID): overflow propagates, gate fails closed", () => {
+    const exploit = "STEP-1\\u0032-".repeat(16) + "\\u0041DR-1";
+    const g = gateFor(exploit);
+    expect(g.pass).toBe(false);
+    const overflow = g.errors.concat(g.failures).find((d) => d.matched.includes("[overflow"));
+    expect(overflow).toBeDefined();
+  });
+});
+
+// C7: pathological large input is bounded by the scan budget and fails
+// closed (typed line-scan-exceeded overflow).
+describe("C7 pathological large input bounded", () => {
+  test("huge escape run is bounded and fails closed", () => {
+    const huge = "\\x41".repeat(50000);
+    const g = gateFor(huge);
+    expect(g.pass).toBe(false);
+  });
+
+  test("detectReconstructedIds signals line-scan overflow for huge input", () => {
+    const res = detectReconstructedIds("\\x41".repeat(50000));
+    expect(res.overflow).toBe(true);
+    expect(res.overflowReason).toBe("line-scan-exceeded");
   });
 });
