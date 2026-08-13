@@ -1,6 +1,6 @@
 // effectiveness/types.ts — Workflow effectiveness comparison harness types.
 //
-// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS\u002D010）。
+// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS-{NNN}）。
 // Parser/Graph regression は REQ-{NNNN} が所有し、本 harness は取り扱わない。
 // Graph 固有の parser/augmentation/extraction 回帰検証は effectiveness/ ではなく
 // 既存の tests/*.test.ts および REQ-{NNNN} 傘下の検証層が独立に判断可能である。
@@ -53,7 +53,7 @@ export type IndependentSearchSpec =
     readonly kind: "grep"
     /**
      * JavaScript 正規表現。単語境界等は明示的に指定すること。
-     * 例: "\\bREQ-012\\b" — "REQ-{NNNN}" 等への誤ヒットを防ぐ。
+   * 例: "\\bREQ-{NNNN}\\b" — 部分一致による誤ヒットを防ぐ。
      */
     readonly pattern: string
     /** 検索対象ルート（repo root 相対）。再帰的に .md/.yaml/.ts 等を走査する。 */

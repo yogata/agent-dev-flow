@@ -1,6 +1,6 @@
 // effectiveness/harness.ts — Graph と独立探索を走らせ、6 指標を計算する中心処理。
 //
-// 本 harness は diagnostic 目的のみ（REQ-{NNNN}-{NNN}, TS\u002D010）。性能閾値による合否判定は
+// 本 harness は diagnostic 目的のみ（REQ-{NNNN}-{NNN}, TS-{NNN}）。性能閾値による合否判定は
 // 一切行わず、EffectivenessResult を揃えて返すだけである。parser/graph regression は
 // REQ-{NNNN} 傘下の tests/*.test.ts が独立に判断可能であり、本 harness は重複しない。
 //
