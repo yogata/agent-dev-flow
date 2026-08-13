@@ -24,6 +24,10 @@ import type {
   CandidatePrecedence,
   Span,
 } from "./boundary-candidate-ownership.ts";
+import {
+  extractOwnerRepo as authorityExtractOwnerRepo,
+  isProducerOwnedUrl as authorityIsProducerOwnedUrl,
+} from "./boundary-url-parser.ts";
 
 // ---------------------------------------------------------------------------
 // Configuration types
@@ -110,30 +114,24 @@ export function matchedForCandidate(c: Candidate): string {
 // URL classification helpers
 // ---------------------------------------------------------------------------
 
-export const URL_CANDIDATE_PATTERN =
-  /(?:github\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/(?:blob|raw)\/|raw\.githubusercontent\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/)[^\s)\]\\"'`<>{}]+/g;
-
-/** Extract the `owner/repo` segment from a GitHub blob/raw URL, or null. */
+/**
+ * Extract `owner/repo` from a URL whose host is exactly `github.com` or
+ * `raw.githubusercontent.com` (case-insensitive). Authority-aware: strips
+ * userinfo via last `@`, rejects port form, and rejects host suffix /
+ * subdomain / path / userinfo-deception lookalikes by returning null.
+ */
 export function extractOwnerRepo(url: string): string | null {
-  const m = /(?:github\.com\/|raw\.githubusercontent\.com\/)([A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+)\//.exec(url);
-  if (!m) return null;
-  return m[1] ?? null;
+  return authorityExtractOwnerRepo(url);
 }
 
 /** True when the URL points into the producer's own repo (case-insensitive). */
 export function isProducerOwnedUrl(url: string, identity: RepositoryIdentity): boolean {
-  if (identity.owner_slash_name.length === 0) return false;
-  const ownerRepo = extractOwnerRepo(url);
-  if (ownerRepo === null) return false;
-  return ownerRepo.toLowerCase() === identity.owner_slash_name.toLowerCase();
+  return authorityIsProducerOwnedUrl(url, identity);
 }
 
 // ---------------------------------------------------------------------------
 // Path classification helpers
 // ---------------------------------------------------------------------------
-
-export const DOCS_PATH_PATTERN = /docs[\\/](?:adr|requirements|specs|decisions)[\\/][^\s)\]\|\\"'`<>{}]+/g;
-export const DOCS_PATH_PERCENT_PATTERN = /docs%2[Ff](?:adr|requirements|specs|decisions)%2[Ff][^\s)\]\|\\"'`<>{}]+/g;
 
 /** Normalize backslashes and percent-encoded slashes to forward slashes. */
 export function normalizePathToken(token: string): string {

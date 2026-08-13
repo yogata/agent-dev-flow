@@ -21,6 +21,7 @@ import { detectReconstructedIds, MAX_LINE_SCAN } from "./boundary-reconstruction
 import {
   ownershipMask,
   type OwnershipEntry,
+  type Span,
 } from "./boundary-candidate-ownership.ts";
 import {
   matchedForCandidate,
@@ -29,10 +30,9 @@ import {
   type Candidate,
   type DetectorConfig,
   type OverflowReason,
-  DOCS_PATH_PATTERN,
-  DOCS_PATH_PERCENT_PATTERN,
-  URL_CANDIDATE_PATTERN,
 } from "./boundary-candidate-model.ts";
+import { extractUrls } from "./boundary-url-parser.ts";
+import { extractDocsPaths } from "./boundary-docs-path-parser.ts";
 
 // Re-export so consumers import from the pipeline barrel without a cycle.
 export type {
@@ -75,83 +75,79 @@ const MAX_CANDIDATES_PER_LINE = 64;
 
 type SpannedCandidate = Exclude<Candidate, { type: "overflow" }>;
 
-function pushSpanned(
-  raw: Candidate[],
-  entries: OwnershipEntry[],
-  c: SpannedCandidate,
-): void {
-  raw.push(c);
-  entries.push({ span: c.span, precedence: precedenceFor(c.type) });
+function isInsideAnySpan(span: Span, keepers: readonly Span[]): boolean {
+  for (const k of keepers) {
+    if (k.start <= span.start && span.end <= k.end) return true;
+  }
+  return false;
 }
 
 export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[] {
-  // Line-scan cap: checked BEFORE any matchAll/regex extraction so a
-  // pathological >64KiB line cannot accumulate direct/path/url candidates.
-  // Returns only a typed line-scan-exceeded overflow (fail-closed).
+  // Line-scan cap fires BEFORE any extraction (fail-closed contract).
   if (line.length > MAX_LINE_SCAN) {
     return [{ type: "overflow", reason: "line-scan-exceeded" }];
   }
 
-  const raw: Candidate[] = [];
-  const entries: OwnershipEntry[] = [];
-  let overflowReason: OverflowReason | null = null;
   const cap = MAX_CANDIDATES_PER_LINE - 1;
+  const owners: SpannedCandidate[] = [];
+  const lows: SpannedCandidate[] = [];
+  let overflowReason: OverflowReason | null = null;
 
-  for (const m of line.matchAll(GENERIC_ID_PATTERN)) {
-    if (UTF_ENCODING_LABELS.has(m[0])) continue;
-    if (raw.length >= cap) { overflowReason = "candidate-cap-exceeded"; break; }
-    const idx = m.index ?? 0;
-    pushSpanned(raw, entries, {
-      type: "direct-id", value: m[0], span: { start: idx, end: idx + m[0].length },
-    });
+  // Stage 1a: extract bounded URL owners (identity-gated).
+  if (cfg.repository_identity.owner_slash_name.length > 0) {
+    const r = extractUrls(line, cap - owners.length);
+    for (const u of r.urls) owners.push({ type: "url", value: u.value, span: u.span });
+    if (r.overflow) overflowReason = "candidate-cap-exceeded";
+  }
+
+  // Stage 1b: extract bounded docs-path owners. Overflow never suppressed.
+  if (overflowReason === null) {
+    const r = extractDocsPaths(line, cap - owners.length);
+    for (const p of r.paths) owners.push({ type: "path", value: p.value, span: p.span });
+    if (r.overflow) overflowReason = "candidate-cap-exceeded";
+  }
+
+  // Stage 1c: contained low-priority candidates (IDs inside owner spans)
+  // are skipped so they never consume the candidate cap.
+  const ownedSpans: Span[] = owners.map((o) => o.span);
+
+  if (overflowReason === null) {
+    for (const m of line.matchAll(GENERIC_ID_PATTERN)) {
+      if (UTF_ENCODING_LABELS.has(m[0])) continue;
+      const idx = m.index ?? 0;
+      const span: Span = { start: idx, end: idx + m[0].length };
+      if (isInsideAnySpan(span, ownedSpans)) continue;
+      if (owners.length + lows.length >= cap) { overflowReason = "candidate-cap-exceeded"; break; }
+      lows.push({ type: "direct-id", value: m[0], span });
+    }
   }
 
   if (overflowReason === null) {
     const recon = detectReconstructedIds(line);
     if (recon.overflow) overflowReason = recon.overflowReason ?? "token-ids-exceeded";
-    for (const r of recon.ids) {
-      if (raw.length >= cap) { overflowReason = "candidate-cap-exceeded"; break; }
-      pushSpanned(raw, entries, {
-        type: "reconstructed-id", value: r.decoded, original: r.original,
-        span: { start: r.srcStart, end: r.srcEnd },
-      });
-    }
-  }
-
-  if (overflowReason === null) {
-    for (const pat of [DOCS_PATH_PATTERN, DOCS_PATH_PERCENT_PATTERN]) {
-      for (const m of line.matchAll(pat)) {
-        if (raw.length >= cap) { overflowReason = "candidate-cap-exceeded"; break; }
-        const idx = m.index ?? 0;
-        pushSpanned(raw, entries, {
-          type: "path", value: m[0], span: { start: idx, end: idx + m[0].length },
-        });
+    if (overflowReason === null) {
+      for (const r of recon.ids) {
+        const span: Span = { start: r.srcStart, end: r.srcEnd };
+        if (isInsideAnySpan(span, ownedSpans)) continue;
+        if (owners.length + lows.length >= cap) { overflowReason = "candidate-cap-exceeded"; break; }
+        lows.push({ type: "reconstructed-id", value: r.decoded, original: r.original, span });
       }
-      if (overflowReason === "candidate-cap-exceeded") break;
     }
   }
 
-  // URLs only when identity is configured: no identity => no URL extraction.
-  if (overflowReason === null && cfg.repository_identity.owner_slash_name.length > 0) {
-    for (const m of line.matchAll(URL_CANDIDATE_PATTERN)) {
-      if (raw.length >= cap) { overflowReason = "candidate-cap-exceeded"; break; }
-      const idx = m.index ?? 0;
-      pushSpanned(raw, entries, {
-        type: "url", value: m[0], span: { start: idx, end: idx + m[0].length },
-      });
-    }
-  }
-
-  // Ownership: URL > path > reconstructed > direct. Overflow never suppressed.
+  // Stage 2: ownership mask resolves recon-vs-direct overlap. Overflow is
+  // appended AFTER the mask so ownership never suppresses the typed signal.
+  const entries: OwnershipEntry[] = [];
+  for (const o of owners) entries.push({ span: o.span, precedence: precedenceFor(o.type) });
+  for (const c of lows) entries.push({ span: c.span, precedence: precedenceFor(c.type) });
+  const all = [...owners, ...lows];
   const mask = ownershipMask(entries);
   const out: Candidate[] = [];
-  for (let i = 0; i < raw.length; i++) {
-    const c = raw[i];
+  for (let i = 0; i < all.length; i++) {
+    const c = all[i];
     if (c !== undefined && mask[i]) out.push(c);
   }
-  if (overflowReason !== null) {
-    out.push({ type: "overflow", reason: overflowReason });
-  }
+  if (overflowReason !== null) out.push({ type: "overflow", reason: overflowReason });
   return out;
 }
 
