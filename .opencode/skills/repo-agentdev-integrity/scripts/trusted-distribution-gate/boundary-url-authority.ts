@@ -238,6 +238,27 @@ export function scanAuthorityForward(
       }
       continue;
     }
+    // Scheme-terminator colon: WHATWG also accepts `https:` (0 slashes) and
+    // `https:/` (1 slash) as scheme URLs, but those forms hide the scheme
+    // from the "://" detector above and let a producer URL slip through as
+    // scheme-less. Treat 0/1-slash http(s) colons as rejected (malformed) by
+    // pointing rejectedSchemeStart at the scheme token start. The 2-slash
+    // valid case and the 3+-slash malformed case defer to the "://" branch
+    // (slashCount >= 2 falls through; `:` is an AUTHORITY_CHAR so the
+    // generic fallthrough is a no-op for it).
+    if (c === ":" && i >= 1 && ALPHA.test(line.charAt(i - 1))) {
+      let j = i - 1;
+      while (j > 0 && SCHEME_CHAR.test(line.charAt(j - 1))) j--;
+      const scheme = line.substring(j, i).toLowerCase();
+      if (scheme === "http" || scheme === "https") {
+        let slashCount = 0, k = i + 1;
+        while (slashCount < 3 && k < line.length && line.charAt(k) === "/") { slashCount++; k++; }
+        if (slashCount <= 1) {
+          rejectedSchemeStart = j; schemeStart = -1; authorityLeft = i + 1; hasBackslash = false;
+          continue;
+        }
+      }
+    }
     if (!AUTHORITY_CHAR.test(c)) {
       schemeStart = -1; authorityLeft = i + 1; hasBackslash = false;
       if (c !== "/") rejectedSchemeStart = -1;
@@ -261,12 +282,28 @@ export function findAuthorityEnd(line: string, from: number, urlEnd: number): nu
   return end;
 }
 
-/** Canonicalize a host token for evasion detection only: one ASCII
- * percent-decode pass + Unicode dot (U+3002, U+FF0E) replacement. Used to
- * detect percent-encoded / Unicode-dot hosts that canonicalize to a
- * recognized GitHub host. NOT used for producer/external classification. */
+/** Canonicalize a host token for evasion detection only: iterative UTF-8
+ *  percent-decode (up to 2 rounds, like decodeURIComponent) + Unicode dot
+ *  (U+3002, U+FF0E, U+FF61) replacement + ASCII lowercase. Used to detect
+ *  percent-encoded / Unicode-dot / double-encoded / case-variant hosts that
+ *  canonicalize to a recognized GitHub host. NOT used for producer/external
+ *  classification.
+ *
+ *  Decode rounds: round 1 resolves single encoding (`%67`->`g`) and exposes
+ *  UTF-8 sequences (`%E3%80%82`->U+3002); round 2 resolves double
+ *  percent-encoding (`%2567`->`%67`->`g`). Stops early when no `%` remains,
+ *  a round yields no change, or decodeURIComponent throws (invalid sequence)
+ *  -- the last successful result is kept, so a malformed tail never aborts
+ *  an otherwise-recognized host. Unicode-dot replacement and lowercasing
+ *  run AFTER decoding so encoded dots (`%E3%80%82`) and case variants
+ *  (`GITHUB\u3002COM`) both collapse to the lowercase ASCII form. */
 export function canonicalizeHostEvasion(raw: string): string {
-  return raw
-    .replace(/%([0-9A-Fa-f]{2})/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
-    .replace(/[\u3002\uFF0E]/g, ".");
+  let s = raw;
+  for (let round = 0; round < 2 && s.includes("%"); round++) {
+    let decoded: string;
+    try { decoded = decodeURIComponent(s); } catch { break; }
+    if (decoded === s) break;
+    s = decoded;
+  }
+  return s.replace(/[\u3002\uFF0E\uFF61]/g, ".").toLowerCase();
 }

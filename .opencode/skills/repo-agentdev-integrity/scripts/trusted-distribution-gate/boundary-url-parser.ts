@@ -54,8 +54,10 @@ const HOST_SCAN = /(?:github\.com|raw\.githubusercontent\.com)(?=[/:\\])/gi;
  *  O(n²) backtracking on adversarial long runs; longest recognized host fully
  *  percent-encoded is 72 chars. Post-filtered by canonicalization. The
  *  backslash terminator mirrors HOST_SCAN so percent-encoded / Unicode-dot
- *  hosts followed by a backslash are also caught. */
-const EVASION_HOST_TOKEN = /(?:%[0-9A-Fa-f]{2}|[A-Za-z0-9.\u3002\uFF0E-]){1,80}(?=[/:\\])/g;
+ *  hosts followed by a backslash are also caught. The Unicode-dot class
+ *  covers U+3002, U+FF0E, and U+FF61; canonicalizeHostEvasion collapses all
+ *  three to ASCII `.`. */
+const EVASION_HOST_TOKEN = /(?:%[0-9A-Fa-f]{2}|[A-Za-z0-9.\u3002\uFF0E\uFF61-]){1,80}(?=[/:\\])/g;
 
 /** URL end exclusion set: terminates URL ownership at boundary markers.
  * Backslash is NOT here (it sets pathHasBackslash and extends the URL, marking
@@ -268,15 +270,18 @@ function isValidLeftBoundary(line: string, pos: number, hasScheme: boolean): boo
   return !LEFT_REJECT_CHAR.test(prev);
 }
 
-/** True when the URL path contains a dot-segment (`.`, `..`, `%2e`, `%2E`,
- * `%2e%2e`, `%2E%2E`) in the owner/repo/tail position. RFC 3986 reserves these
- * for relative-path resolution; they never appear in a concrete GitHub URL. */
+/** True when the URL path contains a dot-segment in the owner/repo/tail
+ *  position. RFC 3986 reserves `.` and `..` for relative-path resolution;
+ *  they never appear in a concrete GitHub URL. Each segment is normalized
+ *  by case-insensitively replacing `%2e` with `.` first, so mixed
+ *  literal+encoded forms (`.%2e`, `%2e.`) collapse to `..` and are caught
+ *  alongside the pure literal (`..`) and pure-encoded (`%2e%2e`) forms. */
 function hasDotSegment(url: string): boolean {
   const m = /^([A-Za-z][A-Za-z0-9.+-]*:\/\/)?[^/]+\//.exec(url);
   if (!m) return false;
   for (const seg of url.substring(m[0].length).split("/")) {
-    const lower = seg.toLowerCase();
-    if (seg === "." || seg === ".." || lower === "%2e" || lower === "%2e%2e") return true;
+    const norm = seg.replace(/%2e/gi, ".");
+    if (norm === "." || norm === "..") return true;
   }
   return false;
 }
