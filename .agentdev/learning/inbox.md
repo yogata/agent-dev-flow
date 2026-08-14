@@ -229,3 +229,51 @@
 - **想定反映先**: なし（知見記録。規範化の要否は backlog-review で判断）
 - **関連**: PR 2111 Findings learning セクション, Issue 2101（OU-001）, Epic 2099
 - **タグ**: #grep-zero-criteria #remediation-note #machine-check #writing-convention
+
+## 配布物へ Workflow Skill の STEP 表を書く際、具体番号を書ける ID ファミリーは STEP / QG に限定される
+
+- **問題事象**: 配布物（src/opencode/）に Workflow Skill の STEP 表を記述する際、STEP / QG 接頭辞は具体番号付きで配布可能（distributed-control として境界検査を通過）だが、他の全 ID ファミリー（REQ / DEC / ADR / AG / IR / TS / OU / RU / EC 等）は具体番号を書くと配布依存境界検査で違反または未分類エラーになる
+- **発生局面**: 実装（Wave 2 Workflow Skill 作成、OU-002 / OU-003 / OU-004 並列 Wave）
+- **検知方法**: `check_distribution_boundary.ts --profile source --json` の実行（具体番号記述が concrete_id_hits として検出される）
+- **根本原因**: 配布依存境界 SPEC の ID 衛生規則。具体番号は消費者環境で解決不能なプロジェクト内部 ID である一方、STEP / QG は workflow 定義内で閉じた distributed-control の識別子として扱われる
+- **自律対応内容**: 具体番号が必要な場面を STEP / QG に限定し、それ以外はマスク形式（REQ-{NNNN}-{NNN} 等）で統一して Wave 2 の3 Workflow Skill を作成した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（配布依存境界 SPEC の既定運用の明確化事象）
+- **横展開観点**: 並列 Wave での Workflow Skill / Command 作成時、作成段階からマスク形式で書くことで境界検査の手戻りを防げる
+- **再発条件**: 配布物にプロジェクト内部 ID の具体番号を記述した場合
+- **予防策候補**: Workflow Skill / Command の新規作成手順（agentdev-skill-authoring / agentdev-command-authoring）への「具体番号は STEP / QG のみ、他はマスク形式」注意喚起の反映候補
+- **想定反映先**: `src/opencode/skills/agentdev-skill-authoring/**` または agentdev-command-authoring（執筆規範側。要否は learning-promote で判断）
+- **関連**: PR 2112 Findings learning セクション, Issue 2104（OU-004）, Epic 2099, 同時並行 Wave（PR 2113 / PR 2114）
+- **タグ**: `#distribution-boundary` `#id-hygiene` `#mask-form` `#workflow-skill-authoring`
+
+## workflow 実装を command から skill へ移設すると IR-055 baseline 再生成が移設作業の標準手順として機能する
+
+- **問題事象**: workflow 実装を command から skill へ移設すると、同一文言の参照でも移設先ファイルが baseline 未登録のため IR-055 delta 違反になる
+- **発生局面**: 実装（OU-002 core 8 Command の Workflow Skill 移行）
+- **検知方法**: IR-055 delta 検出（移設後の check_integrity 実行）
+- **根本原因**: IR-055 baseline は file 単位の違反登録であるため、参照文言が同一でも移設先の新規 file は baseline に登録されない
+- **自律対応内容**: 正規 CLI（`check_integrity.ts --update-ir055-baseline`）での baseline 再生成を移設作業に組み込み、98 から 61 entries へ純減（thin 化により command 側参照が減少。ratchet として健全）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（IR-055 baseline 運用手順の知見）
+- **横展開観点**: 今後の command → skill 移設・文件移設を伴うすべての変更で、移設完了時に正規 CLI による baseline 再生成を標準手順として実施する
+- **再発条件**: file 移設を伴う変更で baseline を再生成しない場合
+- **予防策候補**: 移設系 PR の手順に baseline 再生成ステップを組み込む（case-run / driver の移設作業ガイドへの反映候補）
+- **想定反映先**: なし（運用知見。規範化の要否は learning-promote で判断）
+- **関連**: PR 2114 Findings learning セクション, Issue 2102（OU-002）, Epic 2099, 既存 entry「baseline 世代交代による check_integrity.test.ts IR-055 pre-existing failure」（別事象: test 側）
+- **タグ**: `#ir-055` `#baseline-regeneration` `#file-migration` `#ratchet`
+
+## 並列 Wave の1つが共有 baseline を再生成すると、兄弟 Wave の変更が merge 後 staging で delta warning を生む
+
+- **問題事象**: Wave 2 の3 PR（2112 / 2113 / 2114）はファイル集合が不整合で merge conflict はないが、PR 2114 が IR-055 baseline を自 HEAD 基準で再生成（98 → 61 entries）したため、先行 merge した PR 2112 / 2113 の新規ファイル（Workflow Skill 配下）が baseline 未登録のまま staging に乗った。merge 後 staging で check_integrity を実行すると IR-055 heuristic delta warning が2件（agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md の docs/specs/ ・ docs/guides/ 参照）増分として検出される（NG 増分なし、warning 増分 +5: IR-055 ×2 と ir035 See Also ×3）
+- **発生局面**: 完了処理（case-close Stage 3、Epic Wave クローズの merge 順序実行）
+- **検知方法**: merge 前シミュレーション（3 worktree のファイル集合を合成した一時ツリーで check_integrity 実行）と staging 単体での control 実行の差分比較
+- **根本原因**: baseline が「単一 PR の HEAD」基準で再生成される一方、merge 順序上の兄弟 Wave 変更はその baseline に含まれない。ファイル不整合でも baseline ratchet の登録集合は波間で相互作用する
+- **自律対応内容**: merge 前にシミュレーション検証で増分を事前特定し、NG 増分がないことを確認してから指示どおりの順序で merge した。warning 増分は Phase 3（OU-005）以降の管轄として報告に記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（baseline 運用と Wave 実行モデルの相互作用の知見）
+- **横展開観点**: 並列 Wave で共有 baseline / 共有 index を再生成する OU を含める場合、(1) Wave 境界（case-auto Stage 3 集約時）での再生成、または (2) merge 順序最後の PR が全兄弟変更を取り込んでから再生成、のいずれかで整列する。case-close の事前シミュレーション（ファイル集合合成 + check_integrity）は増分事前検出に有効
+- **再発条件**: 並列 Wave の一部が共有 baseline を再生成し、兄弟 Wave が新規配布ファイルを追加する場合
+- **予防策候補**: baseline 再生成を行う OU の実行契約に「兄弟 Wave 分を含めた状態での再生成（または Wave 境界での再実行）」を明記する候補
+- **想定反映先**: なし（運用知見。OU-005 / OU-008a 実行時の注意点として報告済み）
+- **関連**: Issue 2102（OU-002）, Issue 2103（OU-003）, Issue 2104（OU-004）, PR 2112 / 2113 / 2114, Epic 2099, 前段 entry「workflow 実装を command から skill へ移設すると IR-055 baseline 再生成が移設作業の標準手順として機能する」
+- **タグ**: `#ir-055` `#baseline` `#parallel-wave` `#merge-order` `#staging-integration`
