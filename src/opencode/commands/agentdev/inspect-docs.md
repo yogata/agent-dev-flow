@@ -28,7 +28,7 @@ docs全体（REQ/Decision/SPEC/guides）の意味整合性を診断し、検出�
 ## inspect-* コマンド選択 routing
 
 変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。
-本コマンド（inspect-docs）と inspect-skills は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs Step 11 配布物整合性検査、inspect-skills Step 3 配布物構文健全性・責務整合診断）。変更範囲に応じて routing することで重複検出を防ぐ。
+本コマンド（inspect-docs）と inspect-skills は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs の配布物整合性検査、inspect-skills の配布物構文健全性・責務整合診断）。変更範囲に応じて routing することで重複検出を防ぐ。
 
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
@@ -51,66 +51,18 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 - extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
 - 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
-## 手順
+## workflow
 
-### Step 1: スキャン対象の収集
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として4工程の control plane を所有する。
 
-`docs/requirements/`、`docs/decisions/`、`docs/specs/`、`docs/guides/`、`README.md`、`.opencode/` を収集
-### Step 2: REQ参照ID整合性確認
+- **STEP-1** スキャン対象の収集 — `docs/requirements/`、`docs/decisions/`、`docs/specs/`、`docs/guides/`、`README.md`、`.opencode/`
+- **STEP-2** REQ 体系・文書種別別意味診断 — REQ 参照ID整合性、第一参照導線、現行/廃止/世代境界、6観点 structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）、文書分類一貫性、SPEC/Decision/guides/README 意味診断
+- **STEP-3** 配布物整合性検査・route 判定 — 構文健全性・文意保持・責務整合診断、docs-check route 候補提示、未処理 artifact 確認
+- **STEP-4** 検出事項出力・永続化・完了報告 — inbox 出力（source-of-truth priority、NG 分類）、実行前同期、`.agentdev/inspect/` commit/push、完了報告
 
-`agentdev-req-structure-diagnostics` 参照
-### Step 3: 第一参照導線確認
+各工程の詳細は `agentdev-workflow-inspect-docs` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
 
-`agentdev-req-structure-diagnostics` 参照
-### Step 4: 現行/廃止/世代境界確認
-
-`agentdev-req-structure-diagnostics` 参照
-### Step 5: SPEC意味診断
-
-SPEC が REQ/Decision/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認
-### Step 6: Decision意味診断
-
-承認済み ADR のみを現行判断の根拠として扱っているか確認
-### Step 7: guides意味診断
-
-guides が navigation layer の範囲を超えていないか確認。履歴混入を検出した場合 route を追加
-### Step 8: README 索引診断
-
-README 索引が導線の範囲を超えていないか確認。内容過多を検出した場合分割を誘導
-### Step 9: REQ structure review（6観点）
-
-SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT。`agentdev-req-structure-diagnostics` 参照
-### Step 10: 文書分類一貫性検査
-
-document-model SPEC（extension 経由）の classification policy への適合確認。REQ 要件行に schema field、enum 値一覧、route/category/status 判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等の SPEC分離基準違反が残留していないかを `agentdev-req-structure-diagnostics` に従って自動検出する
-### Step 11: 配布物整合性検査
-
-配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する。`agentdev-req-structure-diagnostics` 参照
-
-存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity SPEC 構文健全性検査準拠）。
-
-エンコーディング不整合の検出は、配布物 Markdown の UTF-{N} BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-{N} かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
-### Step 12: docs-check route判定
-
-意味的疑いのうち機械的検査に落とせるものを docs-check ルール／検査データ候補として提示
-### Step 13: 未処理artifact確認
-
-`agentdev-req-structure-diagnostics` 参照
-### Step 14: 検出事項出力
-
-検出事項を `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md` へ出力。
-source-of-truth priority: 現行 REQ > 承認済み ADR > SPEC > guides。
-NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける
-### Step 15: 実行前同期（git pull --ff-only）
-
- - `git pull --ff-only` を実行
- - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
-### Step 16: .agentdev/inspect/ 変更の commit と push
-
-`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/inspect/` 配下の変更を commit/ push する。commit message は `chore(agentdev): capture inspect-docs finding`（Conventional Commits 形式）。変更なし時は commit/push せず完了報告で「変更なし」と報告する。push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）
-### Step 17: 完了報告
-
-完了報告 template に従って出力
+**共通ルール**（全工程適用、詳細は workflow skill 参照）: エラー処理（スキャン対象ディレクトリ不存在時は該当カテゴリを空扱い警告、ファイル読込失敗時はスキップ警告）
 
 ## ガードレール
 
@@ -119,12 +71,5 @@ NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-reb
 - G03: worktree/ブランチを作成しない
 - G04: intake/learning/RU の処理を行わない
 - G05: source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾を判定する
-
-## エラー処理
-
-| エラー | 対処 |
-|--------|------|
-| スキャン対象ディレクトリが存在しない | 該当カテゴリを空として扱い、警告を出力 |
-| ファイル読込失敗 | 該当ファイルをスキップし、警告を出力 |
 
 

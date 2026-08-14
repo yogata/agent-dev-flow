@@ -30,7 +30,7 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 ## inspect-* コマンド選択 routing
 
 変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。
-本コマンド（inspect-skills）と inspect-docs は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-skills Step 3 配布物構文健全性・責務整合診断、inspect-docs Step 11 配布物整合性検査）。変更範囲に応じて routing することで重複検出を防ぐ。
+本コマンド（inspect-skills）と inspect-docs は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-skills の配布物構文健全性・責務整合診断、inspect-docs の配布物整合性検査）。変更範囲に応じて routing することで重複検出を防ぐ。
 
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
@@ -53,40 +53,17 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 - extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
 - 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
-## 手順
+## workflow
 
-### Step 1: 診断対象の読込
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-skills` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として3工程の control plane を所有する。
 
-Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatter、本文構造、references 利用、template/ script 参照を把握する
-### Step 2: 各診断観点の評価
+- **STEP-1** 診断対象の読込 — Command/ Skill 定義の把握（Command→Skill 参照、Skill frontmatter、本文構造、references 利用、template/ script 参照）
+- **STEP-2** 診断観点の評価・分類・route 提示 — 参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存の評価、配布物構文健全性・責務整合診断、診断分類ラベル付与、推奨 route 提示（修正は実行しない）
+- **STEP-3** 検出事項出力・永続化・完了報告 — inbox 出力、実行前同期、`.agentdev/inspect/` commit/push、完了報告
 
-`agentdev-inspect-skills` に従い、参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存を評価する
-### Step 3: 配布物構文健全性、責務整合診断
+各工程の詳細は `agentdev-workflow-inspect-skills` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
 
-配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合、壊れた括弧、command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する
-
-存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity SPEC 構文健全性検査準拠）。
-
-エンコーディング不整合の検出は、配布物 Markdown の UTF-{N} BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-{N} かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
-### Step 4: 分類
-
-検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける
-### Step 5: route 提示
-
-修正は実行せず、推奨 route を提示する
-### Step 6: 検出事項出力
-
-検出事項を `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` へ出力
-### Step 7: 実行前同期（git pull --ff-only）
-
- - `git pull --ff-only` を実行
- - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
-### Step 8: .agentdev/inspect/ 変更の commit と push
-
-`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/inspect/` 配下の変更を commit/ push する。commit message は `chore(agentdev): capture inspect-skills finding`（Conventional Commits 形式）。変更なし時は commit/push せず完了報告で「変更なし」と報告する。push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）
-### Step 9: 完了報告
-
-完了報告 template に従って出力
+**共通ルール**（全工程適用、詳細は workflow skill 参照）: エラー処理（対象ファイル不存在時は空扱い警告、読込失敗時はスキップ警告、参照先 Skill 不存在時は検出事項として報告）
 
 ## ガードレール
 
@@ -95,13 +72,5 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 - G03: RU、intake、learning、backlog 成果物を保存しない
 - G04: commit/ push は `.agentdev/inspect/` 配下の永続化のみ許可。branch/ worktree 操作は禁止
 - G05: 自動修正せず、推奨 route の提示に留める
-
-## エラー処理
-
-| エラー | 対処 |
-|--------|------|
-| 対象ファイルが存在しない | 該当カテゴリを空として扱い、警告を出力 |
-| ファイル読込失敗 | 該当ファイルをスキップし、警告を出力 |
-| 参照先 Skill が存在しない | 検出事項として報告し、canonical name の確認を推奨 |
 
 

@@ -34,71 +34,22 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 - extension が破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する
 - 詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
-## 手順
+## workflow
 
-### Step 1: 実行前同期（git pull --ff-only）
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは finding disposition（分類・採用・保留・却下）を独立 resume point とする8 STEP の control plane を所有する。durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から会話記憶に依存せず再開できる。
 
- - `git pull --ff-only` を実行
- - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
-### Step 2: inbox スキャン
+- **STEP-1** 実行前同期 — `git pull --ff-only`（失敗時は git-error-messages template で停止）
+- **STEP-2** inbox スキャン — `.agentdev/inspect/inbox/*.md` 読込（空時は「対象なし」で終了）
+- **STEP-3** 検出事項分類（暫定分類） — promote/ defer/ reject 判定と根拠の確定（finding disposition 入口 resume point）
+- **STEP-4** 自動 promote（`--auto` opt-in 時のみ、fast path） — 高確信度検出事項を `.agentdev/intake/promoted/` へ投入、auto-promote-log 記録
+- **STEP-5** adversarial-review（経路B） — 挿入境界（暫定分類後・HITL 前）での発動条件判定と review 呼出、結果反映、unresolved 停止
+- **STEP-6** HITL 確定（手動分類対象） — 分類結果を提示し、ユーザー承認を得る
+- **STEP-7** 処理実行（promote / reject / defer） — promoted/ 保存 + inbox 削除、即時削除（却下理由を commit message に含める）、inbox 残置（出口 resume point）
+- **STEP-8** 完了報告・永続化 — 判定結果と後続 route の報告、`.agentdev/` 変更の commit/push
 
-`.agentdev/inspect/inbox/*.md` を読み込む。空の場合は「対象なし」と報告して終了
-### Step 3: 検出事項分類
+各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-inspect-promote` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
 
-各検出事項について以下を評価し、promote/ defer/ reject を判定する:
- - 明確な不整合 → promote（RU 化対象）
- - 不整合かどうか、採否、範囲、優先度、正とする情報源が未確定 → defer（intake 送付候補）
- - 誤検知、対応不要 → reject
- - 具体的修正対象を持たない再発防止知見 → defer（learning 送付候補）
-### Step 4: 自動 promote（`--auto` opt-in 時のみ）
-
-`--auto` が指定された場合、分類結果のうち workflow-contracts SPEC（extension 経由）の自動 promote 対象カテゴリに合致し、かつ安定契約例外および否定文脈を満たさない高確信度検出事項を HITL 承認なしで `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md` へ投入する。
-各投入を `.agentdev/inspect/promoted/auto-promote-log.md` に追記する（対象検出事項、カテゴリ、投入先ファイル、根拠）。
-`--auto` 未指定時は本 step をスキップし、自動投入を行わない
-
-### Step 4-1: adversarial-review 発動条件判定（経路B）
-
-review 挿入境界（暫定分類後・HITL 前）で発動条件を判定する（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}、詳細は inspect-promote SPEC「adversarial-review 挿入境界（経路B）」節参照）。inspect-promote は adversarial-review を原則実行する（default-on、REQ-{NNNN}-{NNN}）。手動分類対象の検出事項（review 対象）が1件以上存在する場合に発動する。ユーザー明示指定は通常発動の必須条件ではない。
-
-- **skip 条件**: `--auto` 経路（fast path、REQ-{NNNN}-{NNN}）、または手動分類対象の検出事項が0件（inbox 空、全件 fast path 完了）の場合、省略して従来フロー（Step 5 HITL 確定）を継続できる（REQ-{NNNN}-{NNN}）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-- **ユーザー明示指定時の必須実行**: ユーザーが本コマンド起動時に adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する（REQ-{NNNN}-{NNN}）。ただし review 対象（手動分類対象）が存在しない場合は発動しない。
-
-`--auto` により Step 4 で自動 promote された検出事項は HITL を経由しない fast path であり、本判定、Step 4-2 の対象外とする（REQ-{NNNN}-{NNN}、review 挿入迂回）。skip 条件該当時、呼出失敗時（REQ-{NNNN}-{NNN}）は Step 4-2 を実行せず Step 5（HITL 確定）へ従来フローを維持する（REQ-{NNNN}-{NNN}）。
-
-### Step 4-2: adversarial-review 呼出（経路B）
-
-Step 4-1 の発動条件を満たした場合、手動分類対象の検出事項とその暫定分類結果（promote/ defer/ reject 判定と根拠）を入力コンテキストとして adversarial-review を呼び出す（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。adversarial-review は任意助言手段であり、必須工程、QG、承認ゲート、統制ゲートとして導入しない（REQ-{NNNN}-{NNN}）。共通契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件4点）は adversarial-review SPEC を正とし、本 step は再定義しない
-
-呼出結果の取扱い:
-
-- accepted finding を暫定分類結果へ反映する（REQ-{NNNN}-{NNN}、本コマンドの責務）。反映で暫定分類の意味内容が変更された場合、Step 3（検出事項分類）へ戻し再分類する
-- unresolved な本質的争点が残る場合、Step 5（HITL 確定）へ進まず、ユーザー判断事項として停止する（REQ-{NNNN}-{NNN}）。adversarial-review 自体を恒久的な統制ゲートとしない
-- 呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で Step 5（HITL 確定）の従来フローを維持する（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）
-
-### Step 5: HITL 確定（手動分類対象）
-
-自動 promote 対象外の検出事項はユーザーの明示的な承認なしに採用済み成果物を生成しない。分類結果を提示し、承認を得る
-### Step 6: promote 処理
-
-承認された promote 対象検出事項を `.agentdev/inspect/promoted/` へ保存。元の inbox file は削除
-### Step 7: reject 処理
-
-承認された reject 対象検出事項は即時削除する。reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跠の補強）
-### Step 8: defer 処理
-
-defer となった検出事項は `.agentdev/inspect/inbox/` に残置。intake/ learning 送付の推奨を報告
-### Step 9: 完了報告
-
-promote/ defer/ reject/ auto-promote の判定結果と後続 route を提示。`--auto` 実行時は投入件数、投入先一覧、ログパスを含める
-### Step 10: .agentdev/ 変更の commit と push
-
- - `git diff --name-only` で `.agentdev/inspect/` および `.agentdev/intake/` 配下の変更を確認（auto-promote の intake/promoted/ 投入、promoted/ への保存、reject に伴う inbox 削除、auto-promote-log 更新を含む）
- - **変更なし時**: commit/push せず「変更なし」と報告
- - **変更あり時**:
- 1. `git add` は `.agentdev/inspect/` と `.agentdev/intake/` のみ対象
- 2. commit message: `chore(agentdev): promote inspect findings`
- 3. `git push` 実行
- 4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
+**共通ルール**（全 STEP 適用、詳細は workflow skill 参照）: エラー処理（inbox 空時は「対象なし」終了、読込失敗時はスキップ警告、全件 defer 時は残置報告、push 失敗時は停止）
 
 ## ガードレール
 
@@ -110,13 +61,5 @@ promote/ defer/ reject/ auto-promote の判定結果と後続 route を提示。
 - G06: `--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない
 - G07: `--auto` は自動 promote 対象カテゴリ（workflow-contracts SPEC 参照、extension 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す
 - G08: `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する。誤検知 revoke 手順は同 SPEC 参照
-
-## エラー処理
-
-| エラー | 対処 |
-|--------|------|
-| inbox が空 | 「対象なし」と報告して終了 |
-| 検出事項ファイル読込失敗 | 該当ファイルをスキップし、警告を出力 |
-| ユーザーが全件 defer | inbox に全件残置し、報告 |
 
 
