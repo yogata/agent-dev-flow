@@ -30,76 +30,22 @@ description: クローズ済み GitHub Issue/PR から未回収の変更候補�
 - `.agentdev/intake/inbox/YYYY-MM-DD-{topic-slug}.md` に保存された intake item（候補ごとに1ファイル）
 - 抽出サマリーレポート（ユーザー確認用）
 
-## Intake Item 形式
+## workflow
 
-`intake-capture` と同一の推奨標準形を使用する。
-frontmatter、状態フィールド、重複排除キーは持たない。
-各セクションの見出し名は固定せず、抽出内容に合わせて整理する。
-内容がないセクションを作成しない。
+本コマンドは workflow 実装本体を `agentdev-workflow-intake-from-github` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが保存専用 workflow の実装（期間解釈から抽出、保存、git 永続化、サマリーレポート、完了報告まで）を所有する。
 
-## 手順
+本 workflow は capture-only型であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。resume point / export / import を持たない。工程は逐次実行し、中断時は最初から再実行する。
 
-### Step 1: 期間解釈
+- **工程-1** 期間解釈 — 期間指定または Issue/PR 番号指定の解釈（`agentdev-intake-pipeline`）
+- **工程-2** データ取得 — クローズ済み Issue/PR のデータ取得（gh CLI、`agentdev-gh-cli` 読取手続き）
+- **工程-3** 構造的検出 — 抽出ルールによる残課題候補の検出（`agentdev-intake-pipeline`）
+- **工程-4** LLM 全文解析 — キーワードリスト、コンテキスト付与ルール（`agentdev-intake-pipeline`）
+- **工程-5** intake item 生成・実行前同期 — item 生成ルール、ファイル名規則（`agentdev-intake-pipeline`）、`git pull --ff-only`
+- **工程-6** 保存・永続化 — `.agentdev/intake/inbox/` へ保存、`.agentdev/intake/` 変更の commit/push
+- **工程-7** サマリーレポート提示 — 抽出結果のサマリーのユーザーへの提示
+- **工程-8** 完了報告 — 完了報告 template 出力、git 永続化結果を含める
 
-抽出アルゴリズムは `agentdev-intake-pipeline` を参照
-
-### Step 2: データ取得
-
-取得方法、CLI コマンドは `agentdev-intake-pipeline` を参照
-
-### Step 3: 構造的検出
-
-抽出ルールは `agentdev-intake-pipeline` を参照
-
-### Step 4: LLM 全文解析
-
-キーワードリスト、コンテキスト付与ルールは `agentdev-intake-pipeline` を参照
-
-### Step 5: intake item 生成
-
-item 生成ルール、ファイル名規則は `agentdev-intake-pipeline` を参照
-
-5-1. **実行前同期（git pull）**:
- - `git pull --ff-only` を実行する
- - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git 同期エラー」形式で表示して停止する（自動解消しない）
-
-### Step 6: 保存
-
- - 保存先: `.agentdev/intake/inbox/`
- - ディレクトリが存在しない場合は作成する
- - 同名ファイルが存在する場合は連番を付与する
-
-**Step 6-1**: .agentdev/intake/ 変更の commit と push。
-`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/intake/` 配下の変更を commit/ push する。commit message は `chore(agentdev): capture intake items from github`（Conventional Commits 形式）。変更なし時は commit/push せず Step 8 の完了報告で「変更なし」と報告する。push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）
-
-### Step 7: サマリーレポート提示
-
-抽出結果をサマリーとしてユーザーに提示する:
- ```
- ## Intake from GitHub 抽出サマリー
-
- - 対象期間: {since} 〜 {until}
- - 対象 Issue/PR 数: {N}
- - 抽出候補数: {M}
- - 保存先: .agentdev/intake/inbox/
-
- | # | タイトル | 元 Issue/PR | ファイル |
- |---|----------|-------------|----------|
- | 1 | ... | #XX | YYYY-MM-DD-xxx.md |
- ```
-
-### Step 8: 完了報告
-
-完了報告templateに従って出力。
-template: .opencode/commands/agentdev/templates/intake-from-github/standard.md。
-git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）を含める
-
-## エラー処理
-
-| エラー | 対処 |
-|--------|------|
-| git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
-| git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
+工程の詳細（intake item 形式、サマリーレポート形式、エラー処理、関連 Capability Skill 連携）は `agentdev-workflow-intake-from-github` スキルを参照。本コマンドは同スキルを名レベルで参照し、内部構造へ直接依存しない（REQ-{NNNN}-{NNN}）。
 
 ## ガードレール
 

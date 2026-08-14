@@ -31,134 +31,19 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 - `.agentdev/learning/deferred.md`（inbox からの移動分を追記）
 - `.agentdev/learning/inbox.md`（ヘッダーのみにクリア）
 
-## 手順
+## workflow
 
-### Step 1: inbox.md 読込
+本コマンドは workflow 実装本体を `agentdev-workflow-learning-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが7 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。
 
-ファイルなし → エラー終了（「先に `agentdev-learning-capture` skill で学びを追加してください」）。`---` 区切りエントリをカウント、0件 → 「分析対象の学びがありません」と終了
+- **STEP-1** 入力読込・正規化 — inbox.md 読込（不在時はエラー終了、0件時は終了）、deferred.md 読込、旧フォーマット正規化
+- **STEP-2** 評価 — 問題クラス分類、8軸評価スコアリング、禁止条件フィルタリングゲート、evaluation-report.md 生成・更新
+- **STEP-3** 判定 — 廃棄判定（11カテゴリ + duplicate）、既存対策確認、昇華可能性評価（無条件の自動REQ化禁止、living pool 維持）
+- **STEP-4** review（経路D） — adversarial-review 発動条件判定・review 呼出・accepted finding 反映（evaluation-report 戻しループ、skip 条件該当時は省略）
+- **STEP-5** HITL — 判定結果提示・ユーザー承認（判断の確定、REQ）
+- **STEP-6** 永続化 — `git pull --ff-only`、採用済み成果物生成（staging 領域のみ）、deferred 移動（原子的操作）、prune、commit/push
+- **STEP-7** 完了報告 — 8軸評価サマリ、判定結果、後続ルート、git 永続化結果の報告
 
-### Step 2: deferred.md 読込
-
-存在すれば読込、不存在は空として扱う
-
-### Step 3: 全エントリの読込と旧フォーマット正規化
-
-`agentdev-learning-pipeline` を参照
-
-### Step 4: 問題クラス分類
-
-`agentdev-learning-pipeline` を参照
-
-### Step 5: 8軸評価スコアリング
-
-`agentdev-learning-pipeline` を参照
-
-### Step 6: evaluation-report.md 生成、更新
-
-`agentdev-learning-pipeline` を参照
-
-### Step 7: 廃棄判定（11カテゴリ + duplicate）
-
-`agentdev-learning-pipeline` を参照
-
-**昇華可能性評価、無条件自動REQ化禁止（REQ）**: 各問題クラスについて恒久契約（REQ/Decision/SPEC）への昇華可能性を評価する。
-8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に昇華可否を判定する。
-**無条件の自動REQ化は禁止する**。
-学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save`）を経て初めて REQ 化される。
-学びを直接 REQ 化しない。
-
-**living pool 維持（REQ）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-{NNN}）。終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
-
-### Step 8: 既存対策確認
-
-`agentdev-learning-pipeline` を参照
-
-### Step 8-R1: adversarial-review 発動条件判定（経路D）
-
-`agentdev-learning-pipeline` の「adversarial-review 候補判断と内部挿入」節（経路D）を参照。本 Step は発動条件判定のみを行い、review 呼出（Step 8-R2）と分離する（REQ-{NNNN}-{NNN}）。
-
-learning-promote は adversarial-review を原則実行する（default-on、REQ-{NNNN}-{NNN}）。発動条件は次のいずれも満たすこと。
-
-- evaluation-report.md が Step 6 で生成・更新済みであり、Step 7（廃棄判定）と Step 8（既存対策確認）の結果が反映されていること
-- skip 条件（後述）に該当しないこと
-
-- **skip 条件（REQ-{NNNN}-{NNN}）**: inbox.md エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）、または inbox.md 空（処理対象なし）の場合、省略して従来フローを継続できる。skip 判断のためだけの新規 HITL、承認点は追加しない
-- **ユーザー明示指定時の必須実行（REQ-{NNNN}-{NNN}）**: ユーザーが adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する。ただし evaluation-report.md 反映済みは引き続き必須とする
-
-adversarial-review は新規必須工程、QG、承認ゲートとして導入しない（REQ-{NNNN}-{NNN}）。共通 caller integration 契約の正規所有者は `agentdev-adversarial-review` SPEC（REQ-{NNNN}）である。
-
-発動条件成立時は Step 8-R2 へ進む。非成立時は Step 8-R2 を迂回し Step 9 へ進む。
-
-### Step 8-R2: adversarial-review 呼出（経路D）
-
-`agentdev-learning-pipeline` の「adversarial-review 候補判断と内部挿入」節（経路D）を参照。本 Step は review 呼出のみを行い、発動条件判定（Step 8-R1）と分離する（REQ-{NNNN}-{NNN}）。
-
-review 対象は evaluation-report.md のみとする（正規化結果、問題クラス分類、8軸評価スコア、廃棄判定、既存対策照合結果）。inbox → deferred 移動（Step 13）、prune（Step 14）、commit/push（Step 15）等の不可逆処理は未実行である。
-
-呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し（REQ-{NNNN}-{NNN}）、利用不能を報告した上で従来フロー（Step 9 以降）と既存 HITL（Step 10 ユーザー承認）を維持する。
-
-accepted finding は learning-promote が責任を持って判定対象へ反映する（REQ-{NNNN}-{NNN}）。adversarial-review 自身は反映を行わない。
-
-review 反映時（review 対象の意味内容が変更された場合）は Step 6 へ戻り、次の順で関連 Step を再実行する（REQ-{NNNN}-{NNN}、Step 6 戻しループ）。
-
-1. Step 6（evaluation-report 生成、更新）: accepted finding の反映結果を evaluation-report.md へ集約
-2. Step 7（廃棄判定）: 反映後の判定結果で再判定
-3. Step 8（既存対策確認）: 反映後の対策照合結果で再確認
-4. Step 8-R1（発動条件判定）: 再発動可否を判定
-5. Step 8-R2（review 呼出）: REQ-{NNNN}-{NNN} が定める再 review 発動条件（新たな本質的争点が生じ得る場合）を満たす場合のみ再 review
-
-再 review の停止条件（REQ-{NNNN}-{NNN}、4点）を満たした時点でループを離脱し、Step 9 へ進む。新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する（REQ-{NNNN}-{NNN}）。
-
-unresolved な本質的争点またはユーザー判断事項が残る場合、Step 9（判定結果提示）、Step 10（ユーザー承認）、Step 13（deferred 移動）、Step 14（prune）、Step 15（commit/push）等の不可逆処理へ進まない（REQ-{NNNN}-{NNN}）。unresolved は既存の HITL（Step 10 ユーザー承認）または blocker 扱いへ振り向ける。adversarial-review 自体を恒久的な統制ゲートとしない。
-
-### Step 9: ユーザーへの判定結果提示
-
-`agentdev-learning-pipeline` を参照
-
-### Step 10: ユーザー承認
-
-`agentdev-learning-pipeline` を参照
-
-**判定基準参照**: Step 3〜10 の判定基準、スコアリングルール、提示形式、承認フローは、全て `agentdev-learning-pipeline` の該当 Phase を参照。
-
-### Step 11: 実行前同期（git pull）
-
-- `git pull --ff-only` を実行
-- **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（自動解消しない）
-
-### Step 12: 採用済み成果物生成（staging領域のみ）
-
-- 出力先: `.agentdev/learning/promoted/{disposal-category}-{name}.md`
-- **`.opencode/` 直接書込禁止**/ **`case-run` への直接受け渡し禁止**（`backlog-review` 経由で RU 化）
-- フォーマット: `agentdev-learning-pipeline` を参照
-
-### Step 13: deferred 移動（原子的操作）
-
-`agentdev-learning-pipeline` の「deferred 移動原子的操作プロシージャ」に従い、当該プロシージャが定める inbox.md 全エントリの deferred.md 追記、書込検証、inbox.md クリアを実行する。本手順は原子的操作であり、検証失敗時は inbox.md を変更せずエラー内容を報告する（データ喪失防止）。
-
-### Step 14: 昇華時 prune（deferred.md からの除去）
-
-- **prune 対象**: staged（採用済み成果物生成済み）/ rejected/ duplicate のエントリのみ
-- **prune 非対象**: deferred/ 未処理のエントリは残す（REQ）
-- **証拠保存**: staged エントリ除去時に採用済み成果物の「元learning item/ 根拠」セクションに保存
-- **自動実行**（REQ）: Step 10 のユーザー承認（判定確定）と同時に prune も承認済みとみなす。staged（根拠は採用済み成果物に保存済み）/ rejected / duplicate（判定理由は記録済み）のエントリは追加確認なしで削除する。
-- 詳細は `agentdev-learning-pipeline` を参照
-
-### Step 15: .agentdev 変更の commit と push
-
-- `git diff --name-only` で `.agentdev/` 配下の変更を確認
-- **変更なし時**: commit/push せず完了報告で「変更なし」と報告
-- **変更あり時**:
- 1. `git add` は `.agentdev/learning/` 配下のみを対象とする。
- 並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする。
- `.agentdev/` 全体の一括スコープは禁止し、スイープ操作（`git add -A`/ `git add .` 等）も禁止
- 2. commit message: `chore(agentdev): promote learning findings`
- 3. `git push` 実行
- 4. **push 失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の該当形式で表示して停止する（完了扱いにしない）
-
-### Step 16: 完了報告
-
-template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`。8軸評価サマリ、判定結果（promote/defer/reject/duplicate 件数）、後続ルート（`/agentdev/backlog-review`）、git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）を含める
+各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-learning-promote` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
 
 ## ガードレール
 
@@ -170,16 +55,16 @@ template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`�
 - G06: ユーザー承認必須: 判定、prune ともに承認なしに実行しない
 - G07: 管理用ファイル（`elevation-ledger.md` 等）は生成しない
 - G08: `learning-refine` への依存禁止: 本コマンドは旧機能を内包し事前実行を前提としない
-- G09: 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は Step 10 承認とは別に明示承認を維持する（REQ）
-- G10: 無条件の自動REQ化禁止（REQ）: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/SPEC）への昇華可能性を Step 7 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
-- G11: adversarial-review は default-on（経路D、REQ-{NNNN}-{NNN}）: Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は Step 9 へ従来フローを維持する（REQ-{NNNN}-{NNN}）。ユーザー明示要求時は skip 条件にかかわらず必ず発動する。review 反映時は Step 6 へ戻し関連 Step を再実行する（REQ-{NNNN}-{NNN}）。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-{NNNN}）が正規所有する
+- G09: 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は STEP-5（HITL）承認とは別に明示承認を維持する（REQ）
+- G10: 無条件の自動REQ化禁止（REQ）: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/SPEC）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
+- G11: adversarial-review は default-on（経路D、REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持する（REQ-{NNNN}-{NNN}）。ユーザー明示要求時は skip 条件にかかわらず必ず発動する。review 反映時は evaluation-report 生成 STEP へ戻し関連 STEP を再実行する（REQ-{NNNN}-{NNN}）。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-{NNNN}）が正規所有する
 
 ## ユーザー確認ポイント、エラー処理
 
 ユーザー確認ポイント、エラー処理表、各成果物のライフサイクル詳細は `agentdev-learning-pipeline` を参照。主要項目のみ本節に抜粋する:
 
-- **Step 9-10**: 廃棄判定結果、8軸評価スコアの確認、修正、承認（判断の確定、REQ）
-- **Step 14**: prune は Step 10 承認と同時に承認済みとみなし自動実行（REQ）。staged/rejected/duplicate の追加確認は不要
+- **HITL（workflow STEP-5）**: 廃棄判定結果、8軸評価スコアの確認、修正、承認（判断の確定、REQ）
+- **prune（workflow 永続化 STEP）**: prune は HITL 承認と同時に承認済みとみなし自動実行（REQ）。staged/rejected/duplicate の追加確認は不要
 - **inbox.md 不在**: エラー終了。「先に `agentdev-learning-capture` skill で学びを追加してください」
 - **git pull/push 失敗**: 構造化エラー表示して停止（push 失敗時は完了扱いにしない）
 - **learning-promote の責務**: normalize → classify → 8-axis eval → evaluation-report → disposal judgment → HITL → 採用済み成果物生成 → archive move → prune。採用済み成果物は `/agentdev/backlog-review` 経由で RU 化後に `/agentdev/req-define` に合流する
