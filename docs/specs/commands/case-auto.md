@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # case-auto SPEC
@@ -11,6 +11,11 @@ updated: 2026-08-14
 
 要件doc から req-save → spec-save → case-open → case-run → case-close を順次自走実行する最大自走モード。
 ユーザーが明示的に指定した場合のみ使用する追加入口であり、標準ワークフローを置き換えない。
+
+## 承認・HITL 境界
+
+- ユーザーが case-auto の実行を明示的に指定した場合のみ使用する追加入口である（起動自体が唯一の事前判断）。
+- 自走中に新規の承認点を追加しない。blocked / failed、停止条件検出時は自走を停止し、ユーザー判断を待つ（bounded parent decision resolution による decision_context の限定的親判断を除く）。
 
 ## 入力
 
@@ -31,7 +36,8 @@ updated: 2026-08-14
 
 ## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-auto`）が権威情報源である。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-auto`）が正規情報源である。
 
 - 入力解決
   - 実行開始時刻の記録（REQ-006-082）（JST、人間が読みやすい形式で case_auto_started_at 変数に保持）
@@ -45,7 +51,7 @@ updated: 2026-08-14
   - auto_gate preflight（auto_gate.auto_ready が false または未解決 item 残る場合は停止）
 - 各工程の実行
   - 委譲工程（req-save / spec-save / case-open / case-close）: 実行担当サブエージェントとして起動（v2:ADR-0127, REQ-006-006/084/085）。req-save / spec-save 統合委譲で順次実行、case-open / case-close は各コマンド委譲契約に従い起動。委譲起動不能時に delegation-unavailable 報告（REQ-002-003/004）
-  - case-run（インライン実行）: case-auto が case-run の Workflow Skill（`agentdev-workflow-case-run`）を権威情報源として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
+  - case-run（インライン実行）: case-auto が case-run の Workflow Skill（`agentdev-workflow-case-run`）を正規情報源として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
   - 結果状態の4次元集約（REQ-006-110）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-006-110）」セクション
 - Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
@@ -69,6 +75,14 @@ genuine blocker（実装上の問題、スコープ外操作、コンフリク�
 context 管理:
 - case-run インライン実行時のコンテキスト管理は harness の責務（REQ-002-002）
 - REQ-006-073（親コンテキスト非累積）は case-run インライン実行時の例外として取り扱う
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/case-auto.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（orchestration stage モデル、Wave 反復制御、停止理由分類、reference 構成）は Workflow Skill（`agentdev-workflow-case-auto`）が所有し、本 SPEC はこれらを複製しない。各工程の output_contract（工程別契約表）も Workflow Skill が所有する。
+- case-run（インライン実行）の workflow 実装本体は case-run の Workflow Skill（`agentdev-workflow-case-run`）が所有する（single workflow、epic-wave workflow の分離を含む）。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## 参照する横断 SPEC
 
@@ -305,9 +319,21 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。原則
 
 **commit 分割手順**: 実行担当サブエージェントは成果物変更を先にコミットする。ドメイン state に触れる必要がある場合は別コミットへ分離するが、前述の通り case-run 委譲内では原則として `.agentdev/` 配下を編集せず、PR 本文経由で case-close へ引き継ぐ。
 
+## 停止状態
+
+停止状態の詳細（停止理由分類、伝播契約）は「adversarial-review 由来の停止伝播（経路H）」「bounded parent decision resolution」節、および Workflow Skill（`agentdev-workflow-case-auto`）の停止条件分類が正規所有する。
+主要な停止状態は次のとおり。
+
+- 委譲工程の result が blocked / failed の場合（当該工程で自走停止、ユーザー判断待ち）。
+- 委譲起動不能時（delegation-unavailable 報告、当該工程を停止）。
+- auto_gate preflight の未解決 item 残存時（`auto_gate.auto_ready` が false または未解決 item が残る場合は停止）。
+- 停止条件（10項目の停止条件いずれか）検出時（実行停止、停止時タイミング情報を追記）。
+- user-decision-required（上位合意矛盾、新規ユーザー判断事項）検出時（自走を停止しユーザーへ判断を求める）。
+
 ## See Also
 
 - [req-save.md](req-save.md), [spec-save.md](spec-save.md), [case-open.md](case-open.md), [case-run.md](case-run.md), [case-close.md](case-close.md)（構成工程）
+- `agentdev-workflow-case-auto` skill（workflow 実装本体（orchestration stage モデル、Wave 反復制御、停止理由分類））
 - `agentdev-quality-gates` skill（QG-1〜QG-4（各工程で適用））
 - `agentdev-case-run-execution-adapter` skill（case-run 外部実行委譲）
 - `agentdev-git-worktree` skill（並列実行安全 git 操作）

@@ -2,7 +2,7 @@
 title: req-save SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # req-save SPEC
@@ -11,6 +11,11 @@ updated: 2026-08-14
 
 req-define で壁打ちした成果物を REQ/Decision ファイルとして docs/ に保存し、コミット、プッシュする。
 壁打ちフェーズで使用（REQ/Decision 対象 artifact_actions がある場合）。
+
+## 承認・HITL 境界
+
+- req-save 自身の承認点を持たない（req-define で壁打ち合意済みの draft を入力として保存する）。
+- Decision 保存直前の妥当性再検証で REQ/SPEC 相当の内容のみと判定した場合は、保存せず停止してユーザー判断を求める。
 
 ## 入力
 
@@ -41,7 +46,8 @@ req-define で壁打ちした成果物を REQ/Decision ファイルとして doc
 
 ## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-req-save`）が権威情報源である。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-req-save`）が正規情報源である。
 
 - 事前チェック: draft-data の `artifact_actions` に REQ/Decision 対象 action があるか確認する。存在しない場合は no-op として完了する
 - 読込と検証: draft を読み、必須フィールドと入力 hash を記録する。draft 構造、文書分類、許可範囲を検証する
@@ -52,6 +58,14 @@ req-define で壁打ちした成果物を REQ/Decision ファイルとして doc
 - 検証: changed-docs 検査、README 索引影響確認、許可パスとリモート同期を検証する
 - 永続化: draft の保存状態と OU result を更新し、commit、push する
 - 報告: 保存結果と次工程を報告する
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/req-save.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-req-save`）が所有し、本 SPEC はこれらを複製しない。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
+
 ## 参照する横断 SPEC
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、コマンド分類）
@@ -115,11 +129,19 @@ req-save は複数 REQ/Decision ファイルの変更案作成、検査を並列
 
 G07（commit 前 status 更新）は フェーズ3 で維持。
 
+## 停止状態
+
+- ドラフトファイル不存在時（G04。エラー中止する）。
+- 読込時 hash とリモート同期後 hash の不一致検出時（G08。保存処理を中止し、差異を報告する）。
+- Decision 妥当性再検証で REQ/SPEC 相当と判定した場合（保存せず停止し、ユーザー判断を求める）。
+- targeted docs guard の検査失敗時（検査対象文書を修正して再実行するまで永続化しない）。
+
 ## See Also
 
 - [req-define.md](req-define.md)（前段コマンド）
 - [spec-save.md](spec-save.md)（後続コマンド（SPEC 候補がある場合））
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
+- `agentdev-workflow-req-save` skill（workflow 実装本体（STEP 構成、resume protocol））
 - `agentdev-req-file-manager` skill（REQ ファイル管理、採番）
 - `agentdev-decision-file-manager` skill（Decision ファイル管理、採番）
 - `agentdev-artifact-validation` skill（README エントリ存在確認）

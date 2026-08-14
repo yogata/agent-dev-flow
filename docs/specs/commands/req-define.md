@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # req-define SPEC
@@ -11,6 +11,12 @@ updated: 2026-08-14
 
 機能追加またはバグ修正の要件を壁打ちにより整理、定義し、構造化 `draft-data` 形式の要件 doc（`.agentdev/drafts/req-draft-{topic-slug}.md`）を生成する。
 壁打ちフェーズで使用。
+
+## 承認・HITL 境界
+
+- 壁打ち対話そのものが主要 HITL である（要件の深掘り、合意形成をユーザーとの対話で行う、REQ-004）。
+- auto_gate の未解決 item 解消方策は壁打ちで合意する（解消時は `auto_ready: true` へ更新。ユーザーが明示的に false を選択した場合は `conflict_resolutions` に記録して継続する）。
+- 生成した要件doc は提示のみとし、承認は求めない（後続の req-save / case-open へそのまま渡す）。
 
 ## 入力
 
@@ -32,9 +38,10 @@ updated: 2026-08-14
 - git 操作: 実行しない（G08）
 - Issue 作成: 行わない（後続 case-open 責務）
 
-## 現在の動作（oracle/explore 抽象化後）
+## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-req-define`）が権威情報源である。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-req-define`）が正規情報源である。
 
 - セッションコンテキスト検知（引数なし単体実行時のみ）（当該セッション履歴、現在コンテキストを Requirement Source 候補として評価）
 - 明示入力ファイル読込（指定時）（RU 自動検出を含む）
@@ -393,6 +400,13 @@ auto_gate:
 
 抑止により `auto_ready: false` となった場合、auto_gate完了ゲートの既存手順に従い `stop_reasons` をユーザーへ提示し、壁打ち対話で解消方策を合意する。合意により未確定事項が解消され、(A)(B) いずれの検査も該当しなくなった場合に限り `auto_ready: true` へ更新する。ユーザーが「`auto_ready: false` のまま標準フローで手動実行する」と明示的に選択した場合は `conflict_resolutions` へ記録して継続する（REQ-004-048）。
 
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/req-define.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-req-define`）が所有し、本 SPEC はこれらを複製しない。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
+
 ## Artifact Graph 利用
 
 req-define は既存 REQ、関連 Decision と SPEC、canonical owner、構造的所有者重複、downstream 変更影響候補の探索に Artifact Graph を利用できる。Graph は候補提供者であり、CREATE, APPEND, UPDATE, SPLIT, MERGE, 意味的重複, canonical owner の最終判断は正規成果物本文と独立探索手段（`glob`, `grep`, `rg` 等）での確認後に下す。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
@@ -408,7 +422,7 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 - [quality-gates.md](../quality/quality-gates.md)（QG-1）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（draft body 品質検査）
 
-## 対象外（G18 抽象化後）
+## 対象外
 
 - 実装コードの作成、編集（G01: 壁打ちフェーズのみ）
 - 関連ドキュメントの個別ファイル列挙をユーザーに求める（G02）
@@ -432,11 +446,19 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 - artifact_actions 構成: REQ/Decision/SPEC 別 action が適切に統合されているか
 - OU 構造検証: 要件doc確認工程で ou_id、operation、target_req/target_spec、depends_on、result 整合性
 
-## See Also（oracle 抽象化後）
+## 停止状態
+
+- auto_gate 完了ゲートで未解決 item が残る場合（stop_reasons を提示して解消方策を壁打ちで合意する。未解決のままの場合は壁打ちへ差し戻し、要件doc を確定させない）。
+- tentative_classification の最終確定バリデーションで7値違反、フィールド欠落を検出した場合（確定を停止し、理由を提示、または backlog-review への差し戻しを提示する）。
+- 前工程からの引き継ぎ判定（`agentdev_handoff: true`）検出時（要件展開を開始せず停止する）。
+- adversarial-review 審議で unresolved な本質的争点が残る場合（最初の副作用（要件doc 保存）へ進まず停止する）。
+
+## See Also
 
 - [req-save.md](req-save.md)（後続コマンド（REQ/Decision 保存））
 - [spec-save.md](spec-save.md)（後続コマンド（SPEC 保存））
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
+- `agentdev-workflow-req-define` skill（workflow 実装本体（STEP 構成、resume protocol））
 - `agentdev-req-analysis` skill（要件分析手法）
 - `agentdev-req-file-manager` skill（REQ ファイル管理、照合）
 - `agentdev-decision-guidelines` skill（Decision 判断基準）

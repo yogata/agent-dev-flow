@@ -2,7 +2,7 @@
 title: spec-save SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # spec-save SPEC
@@ -12,6 +12,11 @@ updated: 2026-08-14
 req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/**/*.md` に保存、確定する。
 req-save の次、case-open の前に実行する。
 全 work_type 対象であり、`work_type` による判定は廃止する（REQ-008-009）。
+
+## 承認・HITL 境界
+
+- spec-save 自身の承認点を持たない（req-define で分離済みの SPEC 保存対象を入力として保存する）。
+- 配置一貫性検証の保存拒否、SPEC 分離基準の最終確認で REQ 残留と判定した場合は、保存せず停止してユーザー判断を求める。
 
 ## 入力
 
@@ -35,7 +40,8 @@ req-save の次、case-open の前に実行する。
 
 ## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-spec-save`）が権威情報源である。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-spec-save`）が正規情報源である。
 
 - 事前チェック: `draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認。なければ no-op 完了。ドラフト不存在時はエラー中止
 - SPEC artifact_actions 読込（`artifact: spec` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は SPEC 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（公式 enum: create/update、非正規 alias: spec-create/spec-update/spec-append、REQ-008-058）、`content` を処理対象とする
@@ -52,6 +58,13 @@ req-save の次、case-open の前に実行する。
 - 変更範囲検証（許可パス照合は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行。`git diff --name-only` で `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を検出したらエラー報告、指示待ち（自動破棄しない））
 - コミット、プッシュ（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
 - 完了報告（保存した SPEC 一覧（新規/追記別）、スキップ有無、follow-up（安定契約例外で除外した候補））
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/spec-save.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-spec-save`）が所有し、本 SPEC はこれらを複製しない。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## 配置一貫性検証
 
@@ -257,11 +270,19 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 同一 SPEC ファイルへの複数 action のみ順序依存のため直列サブセットとして分離。
 最終的な commit/push は v2:REQ-0137 の明示パス指定で一括実行。
 
+## 停止状態
+
+- ドラフトファイル不存在時（エラー中止する）。
+- 配置一貫性検証による保存拒否時（対象 action を保存せず停止する）。
+- 変更範囲検証で許可パス外の変更を検出した場合（自動破棄せずエラー報告、指示待ちで停止する）。
+- 実行前同期（`git pull --ff-only`）失敗時、push 失敗時（エラーを報告して停止する）。
+
 ## See Also
 
 - [req-define.md](req-define.md)（前段コマンド（SPEC 候補分離））
 - [req-save.md](req-save.md)（前段コマンド（REQ/Decision 保存））
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
+- `agentdev-workflow-spec-save` skill（workflow 実装本体（STEP 構成、resume protocol））
 - `agentdev-artifact-validation` skill（README エントリ存在確認）
 - `agentdev-conventional-commits` skill（コミットメッセージ規約）
 - `agentdev-git-worktree` skill（並列実行安全 git 操作）

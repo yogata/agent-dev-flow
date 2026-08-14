@@ -2,7 +2,7 @@
 title: case-run SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # case-run SPEC
@@ -24,6 +24,12 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 - **実行主体分類**: 委譲 prompt 内で実行される command は skill ではなく command である。`load_skills` には command 名を指定せず、adapter skill 名を指定する。
 - **test strategy 項目の test-fix ループ（REQ-006-029/030）**: Issue 本文のテスト戦略セクションに test strategy 項目（3要素構造: verification / pass_criteria / on_failure）が含まれる場合、委譲契約は各項目の検証、不合格時の処置（実装修正して再検証、または Findings 記録）、全項目処理までの反復を実行担当サブエージェントに要求する。詳細な責務は adapter skill（`agentdev-case-run-execution-adapter`）が定義する。
 
+## 承認・HITL 境界
+
+- case-run 本体の承認点を持たない（Issue に確定済みの execution contract を再判断せず消費する）。
+- result が blocked / failed の場合はユーザー判断待ちとして扱い、Issue 更新は case-update へ委譲する（自律補完、スコープ拡大をしない）。
+- クリーンアップフェーズで未コミット変更を検出した場合は報告してユーザーの指示に従う（自動的な破棄、コミットを行わない）。
+
 ## 入力
 
 - Issue番号またはURL（要件doc埋め込み済み）（単一 Issue 実行モード）
@@ -44,7 +50,9 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 
 ## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-run`）が権威情報源である。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-run`）が正規情報源である。
+Workflow Skill は単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の2 workflow に分離される（後述「所有関係と委譲」）。
 
 ### フェーズ判定（再開ポイント検出、実行モード分岐）
 
@@ -103,6 +111,14 @@ v2:ADR-0128 Decision #3 に基づく。
 - worktree クリーンアップ確認 + 完了報告
   - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
   - 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness の責務であり、case-run は関与しない（REQ-002-002）
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/case-run.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体は Workflow Skill（`agentdev-workflow-case-run`）が所有し、本 SPEC は内部手順、STEP 構成、reference 構成を複製しない。
+- case-run の Workflow Skill は、単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の2 workflow 構成に分離される（DEC-010 の 1:N 分割基準の適用。operation 差ではなく制御構造の実質差異による分割）。両 workflow の実行契約差異（target cardinality、parallelism、fan-out・fan-in、child task recovery、partial result、Wave-level completion の6軸）は Workflow Skill が所有する。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。case-auto が case-run をインライン実行する場合も同一の Workflow Skill を正規情報源として読み込む。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## QG-3 前置 staleness check 手順（新規セクション）
 
@@ -337,11 +353,21 @@ case-run 委譲内で作成する commit の構成運用を規定する。原則
 
 **commit 分割手順**: 実行担当サブエージェントは成果物変更を先にコミットする。ドメイン state に触れる必要がある場合は別コミットへ分離するが、前述の通り case-run 委譲内では原則として `.agentdev/` 配下を編集せず、PR 本文経由で case-close へ引き継ぐ。
 
+## 停止状態
+
+- result が blocked の場合（回答可能な blocker。詳細は Issue コメント SSoT。ユーザー判断待ちとして case-update 連携）。
+- result が failed の場合（repository context で回答不能な blocker。詳細は Issue コメント SSoT）。
+- result が delegation-unavailable の場合（実行未試行のため Issue を `pending` に戻す、REQ-002-004）。
+- 前工程からの引き継ぎ停止判定（`agentdev_handoff: true`）検出時（実装開始せず停止する）。
+- worktree precondition gate 失敗時（worktree、ブランチ未作成なら実行担当サブエージェントを起動しない、G30）。
+- 完了条件の不足、曖昧さ、矛盾、実現不能の検出時（自律補完せず blocked とする。execution contract 消費境界参照）。
+
 ## See Also
 
 - [case-open.md](case-open.md)（前段コマンド（Issue 作成））
 - [case-close.md](case-close.md)（後続コマンド（PR マージ、Issue クローズ））
 - [case-auto.md](case-auto.md)（自走モード）
+- `agentdev-workflow-case-run` skill（workflow 実装本体（single workflow、epic-wave workflow、6軸実行契約差異））
 - `agentdev-workflow-orchestration` skill（フェーズ判定、エラー処理）
 - `agentdev-case-run-execution-adapter` skill（委譲統合、result 契約）
 - `agentdev-git-worktree` skill（worktree 作成、precondition gate）

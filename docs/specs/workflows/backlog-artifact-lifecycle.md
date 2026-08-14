@@ -2,7 +2,7 @@
 title: RU / 採用済み成果物 / draft ライフサイクル
 status: accepted
 created: 2026-06-21
-updated: 2026-07-26
+updated: 2026-08-15
 ---
 
 # RU / 採用済み成果物 / draft ライフサイクル
@@ -171,6 +171,23 @@ revoke は人間の判断により行う。
 3. 当該ファイルが backlog-review により既に RU 化済みの場合: 生成された RU を `.agentdev/backlog/req-units/` から削除し、要件化されていないことを確認する。要件化（REQ/Issue 化）が既に進行している場合はユーザーに停止を依頼する
 4. `auto-promote-log.md` の該当エントリに `status: revoked` と revoke 理由を追記する
 5. 同種の誤検知が再発しないよう、誤検知となった判定根拠を docs-check rule / IR の false positive 抑制へフィードバックする候補として記録する（intake 経由または PR 本文の Findings セクション）
+
+### 分類確定状態の再構成規則（durable state からの復元）
+
+inspect-promote は会話コンテキストに依存せず、durable state から検出事項ごとの分類確定状態を再構成する。
+再構成規則は次のとおり。
+
+| durable state の観測 | 分類確定状態 | 再開時の取扱い |
+|---|---|---|
+| `.agentdev/inspect/inbox/` に残存 | 未確定 | 暫定分類（STEP-3 相当）から再開する |
+| `.agentdev/inspect/promoted/` に保存済み | promote 確定 | 再保存しない |
+| auto-promote-log に記載済みかつ `.agentdev/intake/promoted/inspect-auto-*.md` が存在 | 自動 promote 確定 | 再投入しない |
+| inbox から削除済み | reject 確定 | 復元しない |
+| inbox 残置かつ処理実行済みの報告がある | defer 確定 | 再分類しない |
+
+HITL 承認状態は処理実行（promote / reject / defer の実行 STEP）の完了状態から逆算して再構成する。
+処理実行が済んでいない検出事項は承認未了と扱い、HITL 確定から再開する。
+自然言語の前 STEP result のみに依存した再開を行わない。
 
 ## REQ ファイル整合性検査（横断）
 

@@ -2,7 +2,7 @@
 title: inspect-skills SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-10
+updated: 2026-08-15
 ---
 
 # inspect-skills SPEC
@@ -11,6 +11,10 @@ updated: 2026-08-10
 
 Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正せずに診断するコマンド。
 検出事項を `.agentdev/inspect/inbox/` へ出力する。
+
+## 承認・HITL 境界
+
+- 承認点を持たない（診断と検出事項出力のみ。採用、分類の判断は `/agentdev/inspect-promote` が担う）。
 
 ## 入力
 
@@ -37,6 +41,9 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 
 ## 現在の動作
 
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-inspect-skills`）が正規情報源である（read-only-diagnostic 型、REQ-027-003 により STEP model 対象外）。
+
 - 診断対象の読込（Command、Skill 群）
 - 各診断観点の評価（`agentdev-inspect-skills`）:
  - Command 参照の妥当性診断
@@ -51,6 +58,13 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 - 実行前同期（`git pull --ff-only`）
 - `.agentdev/inspect/` 変更の commit と push
 - 完了報告
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/inspect-skills.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（工程構成、各診断観点の詳細手順、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-skills`）が所有し、本 SPEC はこれらを複製しない。本 workflow は read-only-diagnostic 型であり、STEP model の対象外である（REQ-027-003）。resume point、export、import を持たず、工程一覧のラベルは順序ラベルである。中断時は先頭から再実行する。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## Artifact Graph 利用
 
@@ -79,10 +93,17 @@ consumer 環境に対応 node type または relation type が存在しない場
 - commit/push スコープ: `.agentdev/inspect/` 配下のみ（G04）
 - 自動修正禁止（G05）
 
+## 停止状態
+
+- 実行前同期（`git pull --ff-only`）失敗時（エラーを報告して停止する。自動解消しない）。
+- `.agentdev/inspect/` 変更の push 失敗時（停止して報告する）。
+- 検査対象ファイルの読込失敗は停止条件としない（該当対象をスキップし警告を出力する）。
+
 ## See Also
 
 - [inspect-docs.md](inspect-docs.md)（docs 全体の意味整合レビュー）
 - [inspect-promote.md](inspect-promote.md)（検出事項分類、昇格）
+- `agentdev-workflow-inspect-skills` skill（workflow 実装本体（工程構成、冪等性、終了条件））
 - `agentdev-inspect-skills` skill（詳細手順、finding 形式、推奨 route）
 - REQ-010（inspect-skills / Command/Skill 参照妥当性検出）
 

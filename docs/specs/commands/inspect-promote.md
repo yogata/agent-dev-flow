@@ -2,7 +2,7 @@
 title: inspect-promote SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # inspect-promote SPEC
@@ -11,6 +11,11 @@ updated: 2026-08-14
 
 `.agentdev/inspect/inbox/` の検出事項を分類、採用し、採用済み成果物として `.agentdev/inspect/promoted/` へ出力する。
 `--auto` オプションで高確信度検出事項の自動 promote を有効化する。
+
+## 承認・HITL 境界
+
+- 手動分類対象の分類確定（HITL 確定）が主要 HITL である（G01。promote / defer / reject のユーザー明示承認必須）。
+- `--auto` による fast path（高確信度検出事項の自動 promote）は HITL を経由しない（G06 の明示 opt-in により有効化）。
 
 ## 入力
 
@@ -33,6 +38,9 @@ updated: 2026-08-14
 
 ## 現在の動作
 
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-inspect-promote`）が正規情報源である。
+
 - 実行前同期（`git pull --ff-only`）
 - inbox スキャン
 - 検出事項分類（promote / defer / reject）
@@ -47,6 +55,13 @@ updated: 2026-08-14
 - defer 処理: `.agentdev/inspect/inbox/` に残す
 - 完了報告
 - `.agentdev/` 変更の commit と push
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/inspect-promote.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-promote`）が所有し、本 SPEC はこれらを複製しない。検出事項ごとの分類確定状態の再構成規則（durable state からの復元）は backlog-artifact-lifecycle SPEC「inspect-promote 自動 promote」節が正規所有する。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## 参照する横断 SPEC
 
@@ -73,10 +88,18 @@ updated: 2026-08-14
 - 自動 promote 対象外の手動分類回し: 命名、分類の意味判断、ADR 要否判断
 - 実行ログ記録の完備（G08）
 
+## 停止状態
+
+- 実行前同期（`git pull --ff-only`）失敗時（エラーを報告して停止する。自動解消しない）。
+- adversarial-review 審議で unresolved な本質的争点が残る場合（HITL 確定へ進まず、ユーザー判断事項として停止する）。
+- `.agentdev/` 変更の push 失敗時（停止して報告する）。
+- inbox 空は停止ではなく終了条件（「対象なし」と報告して完了する）。
+
 ## See Also
 
 - [inspect-docs.md](inspect-docs.md), [inspect-skills.md](inspect-skills.md)（前段コマンド（検出事項生成））
 - [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
+- `agentdev-workflow-inspect-promote` skill（workflow 実装本体（STEP 構成、resume protocol））
 - REQ-010（inspect-promote / 検出事項分類、昇格）
 - REQ-001（inspect-promote 自動 promote（REQ-001-016））
 
