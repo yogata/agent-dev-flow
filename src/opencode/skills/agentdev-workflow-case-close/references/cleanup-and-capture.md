@@ -2,34 +2,77 @@
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-5, STEP-6 詳細である。Post-merge テスト戦略検証、Issue クローズ、worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、完了報告を提供する。
 
+## 目次
+
+- STEP-5: Post-merge テスト戦略検証・Issue クローズ
+- STEP-6: クリーンアップ・Capture 回収・永続化
+
 ## STEP-5: Post-merge テスト戦略検証・Issue クローズ
 
-### 開始条件
+### Purpose
+
+マージ後のみ確認可能な項目（CI 通過等）を反映して Issue 本文を更新し、Issue をクローズする。
+
+### Input Resolution
+
+1. SSoT 再構成: PR の CI 状態、Issue 本文（テスト戦略チェックボックス）
+2. identifier 保持: Issue番号、PR番号
+3. 最小 scalar: なし
+4. runtime artifact: なし
+
+### Preconditions
 
 - 単一 Issue クローズ ルート
 - STEP-4 で PR マージ完了
 
-### Step 5: Post-merge テスト戦略検証
+### Procedure
+
+#### Step 5: Post-merge テスト戦略検証
 
 マージ後のみ確認可能な項目（CI通過等）を反映。Issue 本文更新手続き（`agentdev-gh-cli`）で更新 → VERIFY。
 
-### Step 6: Issue クローズ
+#### Step 6: Issue クローズ
 
 Issue close 手続き（理由: completed、`agentdev-gh-cli`）。
 
-### 結果
+### Result
 
 - CI 通過確認、Issue 本文更新
 - Issue close 完了
 
+### Evidence
+
+- CI 状態確認結果、Issue 本文更新の VERIFY 結果、Issue close 結果
+
+### Completion Verification
+
+- テスト戦略チェックボックスが更新済みであり（G10）、Issue がクローズ済みであること
+
+### Resume-Idempotency
+
+- Issue の OPEN/CLOSED 状態（durable state）で再開点を判定する。クローズ済み Issue の再クローズは行わない
+
 ## STEP-6: クリーンアップ・Capture 回収・永続化
 
-### 開始条件
+### Purpose
+
+worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、完了報告を実施する。
+
+### Input Resolution
+
+1. SSoT 再構成: PR 本文（`## Findings / Capture候補`）、Epic Issue 本文（`Parent: #{N}`、子Issue 状態）、git 状態
+2. identifier 保持: Issue番号、親Epic 番号
+3. 最小 scalar: なし
+4. runtime artifact: なし
+
+### Preconditions
 
 - 単一 Issue クローズ ルート
 - STEP-5 で Issue クローズ完了
 
-### Step 7: ブランチ、worktree 削除
+### Procedure
+
+#### Step 7: ブランチ、worktree 削除
 
 `agentdev-git-worktree` の worktree 削除手順に従う。
 
@@ -43,7 +86,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）。
 - リモートブランチ削除
 - 削除失敗時は警告表示して停止すること
 
-### Step 8: 親Epic Issue 更新
+#### Step 8: 親Epic Issue 更新
 
 `agentdev-epic-tracker` スキル参照。
 
@@ -53,26 +96,26 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）。
 - **子Issue 状態事前取得**: Issue 補助データ読込手続き（`agentdev-gh-cli`）で全子Issue の OPEN/CLOSED 状態を一覧取得しログ出力
 - **Epic 自動クローズ判定**: 全子Issue CLOSED → 自動クローズ。1件以上 OPEN → スキップ
 
-### Step 9: 実行前同期
+#### Step 9: 実行前同期
 
-#### Step 9-1: 重複ファイルチェック再実行
+##### Step 9-1: 重複ファイルチェック再実行
 
 `git pull --ff-only` 直前に、`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャを再実行する（L-013、PR #1128 由来、共有 main worktree で Step 1-1 実行時点から Step 9-1 実行までの間に並列セッションが加えた未コミット変更を検知するため）。重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと。
 
-#### Step 9-2: git main 同期リスク事前検出・代替同期手順選択（REQ）
+##### Step 9-2: git main 同期リスク事前検出・代替同期手順選択（REQ）
 
 `agentdev-git-worktree` の「git main 同期リスク事前検出プロシージャ（REQ）」に従い、worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスク事前検出と代替同期手順選択を実行する。`agentdev-git-worktree` に従い `git pull --ff-only` を実行（ローカル変更事前チェック、hash 検証、不一致時は評価・承認のやり直し）。
 
-### Step 10: 学びの検知・抽出・Capture 回収
+#### Step 10: 学びの検知・抽出・Capture 回収
 
-#### 学び検知
+##### 学び検知
 
 `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断（**ユーザーに学びの有無を問うことは禁止**）。
 
 - 学びあり → `.agentdev/learning/inbox.md` に直接追記 → 通知
 - 採用済み成果物取り込み判定 → `agentdev-learning-pipeline`（manual reference）の deferred ルール
 
-#### Capture 回収責務
+##### Capture 回収責務
 
 PR 本文の `## Findings / Capture候補` セクションから intake/ learning を分離回収する。
 
@@ -82,13 +125,13 @@ PR 本文の `## Findings / Capture候補` セクションから intake/ learnin
 - **Capture 境界**: intake/ learning 境界は `agentdev-workflow-orchestration`（capture-boundaries）を参照。intake と learning を別々の成果物として扱う
 - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数、中間ファイル等）を capture の入力として使用しない。capture 情報の入力源は PR 本文のみ
 
-### Step 11: ドメイン状態永続化
+#### Step 11: ドメイン状態永続化
 
 `agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める。
 
 > **auto-close 回避の留意点**: 本コマンド名 `case-close` は "close" を含む複合語。コミットメッセージに `(case-close #N)` 等のコマンド名と Issue 番号の近接表記を用いると、GitHub が "close" を auto-close キーワードと誤認し Issue を意図せずクローズするリスクがある。コミットメッセージのフォーマットは `agentdev-conventional-commits` skill の「GitHub auto-close 回避ガイドライン」に従い、コマンド名と Issue 番号を分離し `#` 記号による近接参照を避けること（例: `case-close for Issue N`）
 
-### Step 12: 完了報告
+#### Step 12: 完了報告
 
 完了報告 template に従って出力。結果状態に応じた種別を選択。
 
@@ -100,7 +143,7 @@ PR 本文の `## Findings / Capture候補` セクションから intake/ learnin
 
 GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用してはならない。**結果状態の分離報告**: GitHub 側完了状態、`.agentdev` 永続化状態、ブランチ削除状態を独立して報告。
 
-### 結果
+### Result
 
 - worktree/branch 削除完了
 - 親Epic 自動クローズ判定・更新完了
@@ -109,6 +152,18 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 - 学び検知完了
 - `.agentdev/` 永続化完了
 - 完了報告出力
+
+### Evidence
+
+- worktree・ブランチ削除結果、親Epic 更新の VERIFY 結果、重複ファイルチェックとリスク検出結果、Capture 回収ファイル群、`.agentdev/` commit hash と push 結果、完了報告出力
+
+### Completion Verification
+
+- worktree/branch 削除が完了（失敗時は警告表示して停止）していること。Capture 回収が intake/learning 分離済みであること。結果状態の分離報告（GitHub 側、`.agentdev` 永続化、ブランチ削除）がなされていること
+
+### Resume-Idempotency
+
+- worktree・ブランチの非存在、Capture 回収済みファイル、`.agentdev/` の commit/push 状態（durable state）で再開点を判定する。削除済みリソースの再削除、回収済み capture の再回収を行わない
 
 ## resume point
 

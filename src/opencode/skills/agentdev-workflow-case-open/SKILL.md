@@ -85,6 +85,16 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 - **Epic flow（単一REQ `scale: large`、マルチREQ、複数 OU）**: STEP-{N} → STEP-{N} → STEP-{N}（Epic ルート、execution_unit 構成）→ STEP-{N} → STEP-{N}（Epic flow、子Issue 並列作成）→ STEP-{N}
 - **adversarial-review skip 条件**: Standard flow で単一 OU の機械的確定、Wave 分割なし（REQ-{NNNN}-{NNN}）。ユーザー明示指定時は強制発動（REQ-{NNNN}-{NNN}）
 
+### resume protocol
+
+- 再開点は durable state から再構成する: draft-data（`status`、`auto_gate`、`artifact_actions`）、GitHub Issue の存在と本文、RU ファイルの存在、削除 commit（Form Zero の残存検証）
+- 処理済み draft/RU は削除済み（durable state）で判定し、会話コンテキストの記憶に依存しない。Epic/子Issue 作成の進捗は Issue 本文のステータス追跡テーブルが正である
+
+### termination
+
+- 正常終了: 終了処理・クリーンアップ STEP の完了報告出力まで（draft/RU 削除残存検証合格を含む）
+- 停止終了: `auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合。preflight 不合格、子Issue 上限超過、QG-{N} fail
+
 ## 主要 Capability Skill 連携
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。

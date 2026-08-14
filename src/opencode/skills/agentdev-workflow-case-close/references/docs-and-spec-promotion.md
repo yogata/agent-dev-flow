@@ -2,17 +2,28 @@
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-3 詳細である。docs/ 検証、targeted docs guard、IR-{NNN} check_extensions.ts、SPEC 確定フロー（draft → accepted 昇格）を提供する。
 
-## 開始条件
+## Purpose
+
+PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate を実施し、SPEC 確定フロー（draft → accepted 昇格）を処理する。
+
+## Input Resolution
+
+1. SSoT 再構成: PR 変更ファイル一覧、PR 本文（`## SPEC確定候補`）、対象 SPEC frontmatter `status`
+2. identifier 保持: PR番号、Issue番号、SPEC パス
+3. 最小 scalar: なし
+4. runtime artifact: なし
+
+## Preconditions
 
 - 単一 Issue クローズ ルート
 - STEP-2 で QG-4 合格
 
-## 結果
+## Result
 
-- docs/ 検証合格（targeted docs guard、IR-{NNN}）
+- docs/ 検証合格（targeted docs guard、IR-{NNN}、配布依存境界 最終 gate）
 - SPEC 確定フロー処理完了（昇格 / spec-save 提案 / 見送り）
 
-## 手順
+## Procedure
 
 ### docs/ 検証
 
@@ -74,6 +85,18 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 - `check_extensions.ts`（IR-{NNN}、配布物パターンのいずれかを変更した場合に実行）
 - `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルが配布 command/skill ソース面に含まれる場合に実行、DEC-{N} 決定4、REQ-{NNNN}-{NNN} 最終 gate 基底再利用）
 - test_strategy（QG-4 完了条件確認）
+
+## Evidence
+
+- targeted docs guard、check_extensions.ts、check_distribution_boundary.ts の各 JSON 結果、SPEC 確定フローの処理パターン（a/b/c）
+
+## Completion Verification
+
+- targeted docs guard の `failures` に strict severity を含まないこと。check_extensions.ts の IR-{NNN} 違反がないこと。配布依存境界 最終 gate が合格（または違反時はマージ停止）であること
+
+## Resume-Idempotency
+
+- 各検査は読取であり再実行可能。SPEC 昇格は frontmatter `status`（durable state）で判定し、`accepted` 済みの場合は再昇格しない
 
 ## resume point
 

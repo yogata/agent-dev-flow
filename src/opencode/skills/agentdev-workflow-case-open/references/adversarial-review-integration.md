@@ -2,19 +2,32 @@
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。adversarial-review 挿入境界（経路F、REQ-{NNNN}-{NNN}）の発動条件判定と review 呼出、結果反映を提供する。
 
-## 開始条件
+## Purpose
+
+経路F の adversarial-review を原則実行し（default-on）、execution structure・Issue 本文候補・完了条件の本質的争点を Issue 作成前に解消する。
+
+## Input Resolution
+
+1. SSoT 再構成: execution structure、Issue 本文候補、完了条件（QG-{N} 検証済み）
+2. identifier 保持: なし
+3. 最小 scalar: なし
+4. runtime artifact: review 対象の草案（Issue 作成前のため durable state は draft-data）
+
+## Preconditions
 
 - STEP-{N} で execution structure が確定している
 - STEP-{N} で Issue 本文候補・完了条件（QG-{N} 検証済み）が生成されている
 
-## 挿入境界
+## Procedure
+
+### 挿入境界
 
 execution structure、Issue 本文候補、完了条件を構成した後、**最初の GitHub Issue 作成の前**に挿入する。
 
 - **Epic flow の場合**: STEP-{N}（テンプレート読込）、Epic Issue 本文生成完了後、Epic Issue 作成の前
 - **Standard flow の場合**: preflight（STEP-{N}）完了後、関連ADR特定の前
 
-## 発動条件判定（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）
+### 発動条件判定（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）
 
 case-open は adversarial-review を**原則実行する**（default-on、REQ-{NNNN}-{NNN}）。発動条件判定と review 呼出を分離する（REQ-{NNNN}-{NNN}）。
 
@@ -22,7 +35,7 @@ case-open は adversarial-review を**原則実行する**（default-on、REQ-{N
 - **ユーザー明示指定時**: skip 条件にかかわらず必ず発動する（REQ-{NNNN}-{NNN}）
 - **skip 判断のためだけの新規 HITL、承認点は追加しない**
 
-## review 呼出（REQ-{NNNN}-{NNN}）
+### review 呼出（REQ-{NNNN}-{NNN}）
 
 発動条件判定で発動と判定された場合、次の3者を対象に adversarial-review を呼び出す。
 
@@ -32,7 +45,7 @@ case-open は adversarial-review を**原則実行する**（default-on、REQ-{N
 
 委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う。
 
-## 結果反映
+### 結果反映
 
 - execution structure に関わる finding は STEP-{N}（execution-unit-and-preflight）へ戻し再評価
 - Issue 本文、完了条件に関わる finding は該当 STEP へ戻す
@@ -56,6 +69,22 @@ review の結果反映で review 対象の意味内容が変更された場合�
 ### 呼出失敗時の扱い
 
 呼出失敗時は silent skip を禁止し、従来フローを維持する（REQ-{NNNN}-{NNN}）。
+
+## Result
+
+- review 結果反映（発動時: accepted finding 反映、4パターン再実行ルール適用 / skip 時: 従来フロー継続）
+
+## Evidence
+
+- 発動条件判定結果、review 呼出記録、findings と反映結果、4パターン再実行の実行状態
+
+## Completion Verification
+
+- 発動時: unresolved なユーザー判断事項が残っていないこと（残る場合は Issue 作成 STEP へ進まない）。skip 時: skip 条件該当の根拠が記録されていること
+
+## Resume-Idempotency
+
+- review 実行は read-only（書き込み禁止型）であり副作用を持たない。同一 finding を新証拠なしに再起票しない
 
 ## resume point
 

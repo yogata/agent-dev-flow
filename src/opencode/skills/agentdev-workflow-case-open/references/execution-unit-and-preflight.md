@@ -2,16 +2,22 @@
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模判定、構成生成事前検証（preflight）を提供する。
 
-## 開始条件
+## Purpose
+
+execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模判定により実行ルートを確定し、構成生成事前検証（preflight）を実施する。
+
+## Input Resolution
+
+1. SSoT 再構成: 要件doc（`operation_units`、`depends_on`、`scale`）、関連 REQ/Decision
+2. identifier 保持: OU ID、REQ-ID
+3. 最小 scalar: 子Issue 数、Wave 同時実行数（preflight 上限検証）
+4. runtime artifact: なし
+
+## Preconditions
 
 - STEP-{N} で Issue 本文候補（execution contract 確定済み）が生成されている
 
-## 結果
-
-- execution structure 確定（Standard flow / 単一REQ Epic flow / マルチREQ Epic flow、Wave 構成）
-- preflight 5項目 合格
-
-## 手順
+## Procedure
 
 ### マルチREQ 入力判定
 
@@ -48,6 +54,23 @@ Standard/Epic/混在構成の全ルートで GitHub Issue 作成前に共通の�
 5. 全 OU が execution_unit へ割当・欠落重複なし
 
 **検証失敗時**: 上限超過または構成不備を検出した場合は Issue 作成呼び出しを行わず停止する。検証失敗時はドラフト削除、RU ファイル削除を実施せず再開可能な状態で停止。
+
+## Result
+
+- execution structure 確定（Standard flow / 単一REQ Epic flow / マルチREQ Epic flow、Wave 構成）
+- preflight 5項目 合格
+
+## Evidence
+
+- 実行ルート判定根拠（入力要件doc数、`scale`）、execution_unit 構成（OU → Wave → Issue マッピング）、preflight 5項目の検証結果
+
+## Completion Verification
+
+- preflight 5項目が全て合格であること（不合格時は Issue 作成を行わず停止）
+
+## Resume-Idempotency
+
+- 構成判定は draft-data からの読取であり副作用を持たない。検証失敗で停止した場合は同一 draft から再実行できる（ドラフト・RU は削除しないため再開可能）
 
 ## resume point
 

@@ -2,18 +2,29 @@
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。コメント追加、draft/RU 削除（Form Zero）、完了報告を提供する。
 
-## 開始条件
+## Purpose
+
+Issue 作成後の共通終了処理（コメント追加、draft/RU 削除、完了報告）を実施する。
+
+## Input Resolution
+
+1. SSoT 再構成: 作成済み Issue 番号、draft ファイルパス、RU ファイルパス
+2. identifier 保持: Issue番号、topic-slug、RU-ID
+3. 最小 scalar: なし
+4. runtime artifact: なし
+
+## Preconditions
 
 - STEP-{N} で GitHub Issue 作成が完了している
 
-## 結果
+## Result
 
 - Issue へのコメント追加完了（テンプレート準拠）
 - draft/RU 削除完了（Form Zero、即時 commit + push）
 - draft/RU 削除残存検証合格
 - 完了報告出力
 
-## 手順
+## Procedure
 
 ### Step 13: コメント追加（共通終了処理）
 
@@ -50,6 +61,18 @@ Step 14/14-1 の削除コミット後に `git push` を即時実行（case-run �
 - マルチREQ Epic → `templates/case-open/multi-req-epic.md`
 
 **Capture結果 小節**: case-open 実行中に実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存した場合、保存した capture 成果物のパス・分類・保存結果のみを含める（capture 本体は含めない、成果物が無い場合は省略、共通意味契約は `artifact-contracts` SPEC「Capture結果 小節」節参照）。
+
+## Evidence
+
+- コメント追加の VERIFY 結果、削除 commit hash と push 結果、`git status --porcelain` による残存検証結果、完了報告出力
+
+## Completion Verification
+
+- draft/RU 削除残存検証が合格であること（作業ツリー、index に残存なし）。削除 commit の即時 push が成功していること
+
+## Resume-Idempotency
+
+- 削除済みパス（durable state: ファイル非存在、commit history）で再開点を判定する。コメント追加・完了報告は読取冪等であり、未実行分のみ再実行する
 
 ## resume point
 

@@ -25,86 +25,61 @@ req-defineで生成された壁打ち成果物をREQ/Decisionファイルとし�
 
 本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/req-save.yaml`）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
-## 手順
+## workflow
+
+本コマンドは workflow 実装本体を `agentdev-workflow-req-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが12 STEP の control plane として制御構造（事前チェック、REQ ファイル操作、整合性検証、永続化）を所有する。
 
 ### Step 1: 事前チェック
 
-`draft-data` の `artifact_actions` を確認し、`artifact: req` または `artifact: decision` の entry が含まれるか判定する。
-REQ/Decision 対象 artifact_actions がない場合は no-op 完了（後続の case-open へ進むよう完了報告で案内）。
-`work_type` による停止は廃止する。
-旧形式 draft（`artifact_actions` フィールドなし）の場合は従来どおり全 req-operation を処理する（後方互換）
+`artifact_actions` の `artifact: req`/`artifact: decision` 有無判定、no-op 完了、旧形式 draft 後方互換
 
 ### Step 2: ドラフト読込
 
-`.agentdev/drafts/req-draft-*.md` を読み込む → 最新の1件を対象とする。見つからない場合はエラーで中止（先に `/agentdev/req-define` を実行してください）。**読込時 hash 記録**: `git rev-parse HEAD` で読込時点の commit hash を記録する
+最新ドラフト特定、読込時 commit hash 記録
 
-### Step 3: ドラフト検証
+### Step 3: ドラフト検証・処理対象確定
 
-`draft-data` の必須フィールド（artifact_actions, operation_units, topic_slug）が存在することを確認。欠損時はエラーで中止
-
-**Step 3-1**: 分類ゲート検査（CREATE対象REQの要件テーブル検査）、**Step 3-2**: 文書分類適合確認（REQ/Decision 保存前のドキュメント種別確認）。詳細、委譲接続点は `agentdev-req-file-manager` を参照
-
-**Step 3-3**: REQ/Decision artifact_actions 処理ゲート。ドラフトの `artifact_actions` から `artifact: req`/ `artifact: decision` の entry を処理対象とする（draft 全体を処理し、OU ごとに分割しない）。`artifact_actions` に REQ/Decision entry がない場合 → no-op 完了。`operation_units` 存在時は OU ID 指定があれば当該 OU 配下のみ、未指定時は draft 全体を処理対象。`artifact_actions` フィールドがない（旧形式 draft）の場合は従来どおり全 req-operation を処理（後方互換）。`artifact: spec` の entry は spec-save コマンドの対象であり処理しない
+必須フィールド検証、分類ゲート検査、artifact_actions 処理ゲート
 
 ### Step 4: REQ ファイル操作
 
-`agentdev-req-file-manager` の判定ロジックと採番ルールに従って実行。Step 3-3 で処理対象とした `artifact_actions`（`artifact: req`/`artifact: decision`）の全 entry を処理する（draft 全体を処理し、OU ごとの消費は行わない）。`artifact_actions` フィールドがない場合は従来どおり全 req-operation を処理する（後方互換）。委譲接続点: サブエージェントはCREATE/APPEND/UPDATE候補、SPLIT候補、REQ再構成候補を返し、親エージェントがファイル保存を行う。詳細は `agentdev-req-file-manager` を参照
+CREATE/APPEND/UPDATE、決定的スクリプト呼出、QG-{N}（適用結果の整合性検証）、3フェーズ分離
 
-**決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: REQ番号採番、要件行ID採番、frontmatter id↔ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約（RU-{NNNNNNNN}-01 合意）および `agentdev-req-file-manager` SKILL.md「Scripts（決定的処理）」で規定する決定的スクリプトを bash 経由で呼び出して実行する。LLM 推論で代替しない。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+### Step 5: インデックス・ハブ更新
 
-**Step 4-0**: QG-{N}（適用結果の整合性検証、REQ/082、AG-{NNN}）。REQ/Decision ファイル保存前に `agentdev-quality-gates` の QG-{N} を「適用結果の整合性検証」として実行。採番結果、マージ結果、インデックス、変更範囲の妥当性を決定的スクリプトの JSON 結果で機械的に確認。fail 時は保存を停止し req-define へ差し戻し。**REQ**: req-save の QG-{N} は内容の品質を再検証せず、それは req-define の QG-{N} の責務。**Step 4-1**: 語彙、責務、runtime境界矛盾の防止（Step 4 完了後に既知の矛盾を検出可能な範囲で防止）。**Step 4-2**: Catalog entry 確認（APPEND 時。関連 integrity-rule-catalog SPEC（extension 経由）の catalog entry 有無を確認、未記載時はユーザーへ追記を促す、`docs/specs/` 配下は直接編集しない G02）。**Step 4-3**: 複数 REQ/Decision ファイルの3フェーズ分離（REQ/093、後述「case-auto 並列委譲モデル」参照）。Step 4-1/4-2 の詳細は `agentdev-req-file-manager` を参照
-
-### Step 5: インデックス、ハブ更新
-
-詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが `docs/` ファイルを更新する
-
-**エントリ存在確認のスクリプト呼出（REQ、AG-{NNN}、AG-{NNN}）**: README へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（RU-{NNNNNNNN}-01 合意、`check-entry-existence`）で登録を検証する。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+README エントリ登録（check-entry-existence 検証）
 
 ### Step 6: Decision ファイル作成
 
-`artifact_actions` に `artifact: decision` の entry が含まれる場合のみ → `agentdev-decision-file-manager` に従って Decision ファイルを作成。作成後、`docs/README.md` にDecisionセクションが存在しない場合は追加し、Decisionエントリを記載
+`artifact: decision` entry のみ、妥当性再検証ゲート、採番 max+1
 
 ### Step 7: docs 変更整合性検証
 
-REQ番号の連続性確認、frontmatter の `id` とファイル名の一致を確認。frontmatter id ↔ ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約で決定的スクリプトを実行（REQ/Decision 保存時）。CLI 形式は同 SKILL.md を参照
+REQ番号連続性、frontmatter id↔ファイル名整合
 
 ### Step 8: README 索引影響確認
 
-REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/specs/README.md`）の索引に影響するか確認。影響がある場合は更新、ない場合は「README 索引更新なし」。README 索引更新は導線の更新であり、要件、判断、仕様の更新ではない。
+索引更新、targeted docs guard、extension 更新要否確認
 
-**targeted docs guard（REQ）**: 変更 REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）に対し `check_changed_docs.ts --workflow req-save --files <changed REQ files> --json` を実行。`failures` に strict severity を含む場合は修正して再実行。`full_docs_check_recommended` true 時は `/repo/docs-check` をユーザーに提案
+### Step 9: 変更範囲検証・リモート同期
 
-**extension 更新要否（REQ）**: REQ/Decision 追加/移動/削除が `.agentdev/extensions/**` へ影響するか確認。該当 REQ/Decision を context に列挙している extension がある場合、paths も更新対象。必要時はユーザーへ指示を仰ぐ（直接編集しない）
-
-**エントリ存在確認（REQ、AG-{NNN}）**: `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で REQ/Decision エントリの README 索引への存在を確認する
-
-### Step 9: 変更範囲検証
-
-**決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`、RU-{NNNNNNNN}-01 合意）で実行。許可範囲外の変更を検出したらエラー内容をユーザーに報告して指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ
-
-**Step 9-1**: リモート同期と hash 検証。**Step 9-2**: RU パス保存禁止。詳細、委譲接続点は `agentdev-req-file-manager` を参照
+check-change-impact、`git pull --ff-only` 後の hash 一致検証
 
 ### Step 10: ドラフト status 更新
 
-ドラフト `draft-data` の `status`（frontmatter）を `saved` に更新。commit/push より前に更新し commit 対象に含める（push 後の status 更新は永続化されないため禁止）
+`status: saved`（commit 対象に含める）
 
-### Step 11: コミット、プッシュ
+### Step 11: コミット・プッシュ
 
-`agentdev-conventional-commits` に従ってコミットメッセージを生成し、main ブランチに push。Step 10 の status 変更を commit 対象に含める。並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、`git add <path>` で明示パスステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする。スイープ操作（`git add -A`/ `git add .` 等）は禁止
-
-**Step 11-1**: REQ/Decision artifact_actions 処理結果の保存（ドラフトに複数 entry がある場合）。保存する内容: (a) 保存したREQドキュメントのリスト（REQ番号含む）(b) 各 artifact_action から保存したREQドキュメントへのマッピング (c) ソースRUからREQ操作へのマッピング (d) case-open で消費可能な形式での保存結果
-
-**OU 結果の書き戻し**: ドラフトに `operation_units` セクションがある場合、各 OU の `result` に (a) 保存したREQドキュメント一覧 (b) OU 操作と保存先REQ doc の対応 (c) source RUとOU操作の対応 (d) case-open が入力として扱える保存結果 を書き戻す
-
-**Step 11-2**: Issue作成の責任分離。req-save はREQドキュメントの保存中に Issue を作成しない（case-open の責任範囲）
+明示パスステージ、`git commit -- <paths>`、OU 結果書き戻し
 
 ### Step 12: 完了報告
 
-完了報告 template に従って出力。実行結果に応じて `templates/req-save/` 配下の種別（`split-detected.md` / `epic.md` / `standard.md`）を選択
+種別選択（`templates/req-save/` 配下: split-detected / epic / standard）
 
-## case-auto 並列委譲モデル（REQ/093）
+各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-req-save` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
 
-req-save は複数 REQ/Decision ファイルの変更案作成、検査を並列化できる（REQ）。3 フェーズ（1. 採番バッチ[直列] / 2. ファイル作成[並列・最大5件] / 3. インデックス更新[直列]）で分離する。G07（commit 前 status 更新）はフェーズ3で維持し、直列集約対象（採番、index 更新、draft 更新、commit、push）は並列委譲の完了を待ってから実行する（REQ）。詳細は `agentdev-req-file-manager` を参照
+**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-req-save` が所有する。同 Workflow Skill は `/agentdev/req-save` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
 ## ガードレール
 
@@ -119,7 +94,7 @@ req-save は複数 REQ/Decision ファイルの変更案作成、検査を並列
 - G04: ドラフトファイルが存在しない場合は実行不可（エラーで中止）
 - G05: REQ番号は連番、一意であること（空き番号の再利用禁止）→ `agentdev-req-file-manager` に従う
 - G06: 要件doc構造は `doc_requirement.md` テンプレートに厳密に従うこと。【必須】セクションの欠落は禁止
-- G07: ドラフトのstatus更新（`saved`）は commit/push より前に実行し、commit対象に含めること。push後のstatus更新は永続化されないため禁止
+- G07: ドラフトのstatus更新（`saved`）は commit/push より前に実施し、commit対象に含めること。push後のstatus更新は永続化されないため禁止
 - G08: Step 9-1 の `git pull --ff-only` 後、読込時 hash と pull 後 hash の一致検証を必須とすること。一致しない場合は評価、承認をやり直すこと
 
 ### Decision妥当性再検証ゲート
