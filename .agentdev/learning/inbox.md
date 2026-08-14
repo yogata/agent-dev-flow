@@ -149,3 +149,19 @@
 - **関連**: PR #2090 Test Strategy TS-022 regression 結果, Epic #2076 OU-007 Phase 6, agentdev-workflow-orchestration SKILL.md 準備フェーズの既知の制約
 - **タグ**: `#windows` `#junction` `#worktree` `#false-positive` `#check-templates`
 
+## verify-only 検証で MOVE/RETIRE 済み REQ 行の現行根拠参照を grep 検出するパターン
+
+- **問題事象**: OU-009 verify-only 検証の TS-012（参照残骸健全性）で、REQ-002 の MOVE/RETIRE 済み行（021..026, 028, 029, 032, 035）が `docs/specs/**` で現行根拠として参照されていた事例を検出した。TS-012 の現行根拠参照件数が 0 でない状態（1件: `harness-separation-model.md:125` の REQ-002-022）。
+- **発生局面**: 検証（verify-only の参照残骸健全性検査、TS-012）
+- **検知方法**: `grep -rE "REQ-002-(021|022|023|024|025|026|028|029|032|035)" docs/specs/` で MOVE/RETIRE 済み行 ID を検索し、履歴文脈（従来/MOVE先/RETIRE後/保有していた/move/retire/移動/廃止/欠番）を除外して現行根拠参照のみを抽出する。`grep ... | grep -iv "move\|retire\|従来\|移動\|廃止\|欠番\|context分離"` が有効に機能した。
+- **根本原因**: REQ-002 → REQ-029 MOVE 実行時、`docs/specs/**` 内の現行根拠引用の全文洗い替えが 1件漏れていた。MOVE 操作時の cross-reference クリーンアップは原本（REQ ファイル）と SPEC/Decision 両方で必要だが、SPEC 本文内の括弧書き引用まで届いていなかった。
+- **自律対応内容**: case-close QG-4 remediation scope（trivial citation fix）として REQ-002-022 → REQ-029-007 へ更新（commit 5c920055）。TS-012 stale-reference 件数を 0 へ解消し、QG-4 完了条件を達成。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（citation ID のみ修正、意味内容と enforcement は正しく維持。SPEC/REQ 本文変更なし、status frontmatter のみ更新）
+- **横展開観点**: 将来の REQ MOVE/RETIRE 操作（req-save SPLIT/MERGE/MOVE）実行時、`docs/specs/**` と `docs/decisions/**` の現行根拠参照を grep 検査し、stale reference をクリーンアップする手順を検証工程または case-close QG-4 に組み込むことが望ましい。特に括弧書きの補足引用（「DEC-001 context管理harness委譲、REQ-NNN-NNN ...」形式）は機械的検出から漏れやすい。
+- **再発条件**: REQ 行を MOVE/RETIRE する req-save 操作で、cross-reference の全文洗い替え（SPEC 本文内の括弧書き引用含む）が漏れた場合
+- **予防策候補**: req-save MOVE/RETIRE 時、または case-close QG-4 で、MOVE/RETIRE 済み REQ 行 ID の docs 現行根拠参照を grep 検査する gate を検証工程へ導入する候補（別途 backlog-review で判断）。
+- **想定反映先**: なし（本エントリは検証パターン記録。検出 gate の恒久化は別途 backlog-review で判断）
+- **関連**: PR #2098, Issue #2093 (OU-009), Epic #2091, commit 5c920055, TS-012
+- **タグ**: `#stale-reference` `#req-move` `#verify-only` `#grep-detection` `#ts-012` `#case-close-remediation`
+
