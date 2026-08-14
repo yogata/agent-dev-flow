@@ -225,12 +225,12 @@ export function extractUrls(line: string, cap: number): {
     const effectiveUrlStart = !hasScheme && scan.authorityLeft < hostStart && line.substring(scan.authorityLeft, hostStart).includes("@")
       ? scan.authorityLeft
       : urlStart;
-    // Scheme-less recognized host after a query-assignment delimiter (`=` or
-    // `&`) is ambiguous: standalone URL or a value nested in a parent URL's
-    // query. Without a scheme the detector cannot tell, so fail closed by
-    // emitting malformed rather than skipping (blocker #2). The `!hasScheme`
-    // guard keeps scheme URLs accepted (`url=https://github.com/...` stays valid).
-    if (!hasScheme && effectiveUrlStart > 0 && (line.charAt(effectiveUrlStart - 1) === "=" || line.charAt(effectiveUrlStart - 1) === "&")) {
+    // Scheme-less recognized host after a delimiter (`=`, `&`, `:`, `?`, `#`)
+    // is ambiguous: standalone URL or a value nested in a parent URL's
+    // query/fragment. Without a scheme the detector cannot tell, so fail closed
+    // by emitting malformed rather than skipping. The `!hasScheme` guard keeps
+    // scheme URLs accepted (`url=https://github.com/...` stays valid).
+    if (!hasScheme && effectiveUrlStart > 0 && isDelimiterChar(line.charAt(effectiveUrlStart - 1))) {
       if (out.length >= cap) return { urls: out, overflow: true, steps };
       out.push({ value: line.substring(effectiveUrlStart, authorityEnd), span: { start: effectiveUrlStart, end: authorityEnd }, malformed: true, ownershipSpan: null });
       continue;
@@ -300,10 +300,15 @@ function ownershipSpanFor(authorityEnd: number, end: number, firstQueryOrFrag: n
 function isValidLeftBoundary(line: string, pos: number, hasScheme: boolean): boolean {
   if (pos === 0) return true;
   const prev = line.charAt(pos - 1);
-  // Scheme URLs are unambiguous; accept `=` (query-param value) and `&`
-  // (param separator) so a URL nested in a parent URL's query is detected.
-  if (hasScheme && (prev === "=" || prev === "&")) return true;
+  // Scheme URLs are unambiguous; accept delimiter chars (`=`, `&`, `:`, `?`,
+  // `#`) so a URL nested in a parent URL's query, a YAML value, or a fragment
+  // is detected rather than silently skipped.
+  if (hasScheme && isDelimiterChar(prev)) return true;
   return !LEFT_REJECT_CHAR.test(prev);
+}
+
+function isDelimiterChar(ch: string): boolean {
+  return ch === "=" || ch === "&" || ch === ":" || ch === "?" || ch === "#";
 }
 
 /** True when the URL path contains a dot-segment in the owner/repo/tail
