@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/backlog-review
+kind: workflow-extension
+id: agentdev-workflow-backlog-review
 
 context:
   - id: must-1

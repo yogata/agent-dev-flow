@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/req-save
+kind: workflow-extension
+id: agentdev-workflow-req-save
 
 context:
   - id: must-1

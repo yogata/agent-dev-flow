@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/inspect-docs
+kind: workflow-extension
+id: agentdev-workflow-inspect-docs
 
 context:
   - id: must-1

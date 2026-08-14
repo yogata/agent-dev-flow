@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/intake-capture
+kind: workflow-extension
+id: agentdev-workflow-intake-promote
 
 context: []
 

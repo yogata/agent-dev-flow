@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/case-update
+kind: workflow-extension
+id: agentdev-workflow-learning-promote
 
 context: []
 
