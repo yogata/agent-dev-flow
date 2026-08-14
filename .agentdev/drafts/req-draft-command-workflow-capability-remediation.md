@@ -435,7 +435,7 @@ conflict_resolutions:
   - id: CR-003
     conflict: |
       AG-003 の「各 Workflow Skill は各 STEP を独立 resume point として成立させる」は全対象へ
-     適用されるが、REQ-027-003 は capture-only型・read-only-diagnostic型を STEP model 対象外
+      適用されるが、REQ-027-003 は capture-only型・read-only-diagnostic型を STEP model 対象外
       （resume point / export / import を持たない）と定義する。両者の適用範囲が衝突する。
     resolution: |
       REQ-027-003 の例外を優先する。capture-only型（intake-capture / intake-from-github）および
