@@ -2,7 +2,7 @@
 title: case-update SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # case-update SPEC
@@ -11,6 +11,11 @@ updated: 2026-08-14
 
 既存 Case（Issue）の本文更新、コメント追加、または REQ ファイル更新を行う。
 レビュー NG コメント対応を含む。
+
+## 承認・HITL 境界
+
+- ユーザー指示完結型であり、コマンド自身の承認点を持たない（更新対象、更新内容はユーザー指示による）。
+- レビュー NG コメント（`--review-ng`）は QG-3 乖離検出結果（既に提示済みの判断材料）を引用するものであり、新規の HITL を発生させない。
 
 ## 入力
 
@@ -30,7 +35,8 @@ updated: 2026-08-14
 
 ## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-update`）が権威情報源である。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-update`）が正規情報源である。
 
 - Issue番号解決: ユーザー入力またはセッション内会話から取得。`gh issue list` / `gh issue status` 等は禁止（G03）
 - 現在状態取得: Issue 状態を取得し、フェーズ判定（`agentdev-workflow-routing`、`agentdev-workflow-lifecycle`）
@@ -40,6 +46,13 @@ updated: 2026-08-14
   - `--req`（REQ ファイル更新（APPEND/UPDATE 対応）、git commit/push）
   - `--review-ng`（レビュー NG コメント）。**必ず QG-3 の乖離検出結果を引用**（G05）
 - 完了報告
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/case-update.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（制御構造、STEP 遷移、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-update`）が所有し、本 SPEC はこれらを複製しない。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## 参照する横断 SPEC
 
@@ -64,9 +77,16 @@ updated: 2026-08-14
 - フェーズ維持（G01）: 現在のフェーズを変更しない
 - 出力制約（G11）: 成果物本文（Issue 本文、コメント、commit message）は verbatim で返す
 
+## 停止状態
+
+- Issue番号が解決できない場合（G03 の範囲外の手段は使用せず、エラーとして報告して停止する）。
+- テンプレート必須セクションの欠落を検出した場合（G06、G07。投稿前に停止し補完を求める）。
+- gh CLI / git 操作の失敗時（`agentdev-gh-cli` のエラー取扱いに従い、自動リトライ範囲を超えたら停止して報告する）。
+
 ## See Also
 
 - [case-run.md](case-run.md), [case-close.md](case-close.md)（関連コマンド）
+- `agentdev-workflow-case-update` skill（workflow 実装本体）
 - `agentdev-workflow-routing` skill（フェーズ判定、次コマンド推論）
 - `agentdev-workflow-lifecycle` skill（work_type 分岐判定）
 - `agentdev-gh-cli` skill（gh CLI 安全使用）

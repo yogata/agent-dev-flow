@@ -2,7 +2,7 @@
 title: inspect-docs SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # inspect-docs SPEC
@@ -12,6 +12,10 @@ updated: 2026-08-14
 docs 全体（REQ/Decision/SPEC/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力する。
 検査対象を直接修正しない診断専用コマンド。
 REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、Decision、guides、README の意味診断を含む。
+
+## 承認・HITL 境界
+
+- 承認点を持たない（診断と検出事項出力のみ。採用、分類の判断は `/agentdev/inspect-promote` が担う）。
 
 ## 入力
 
@@ -34,7 +38,8 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 
 ## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-inspect-docs`）が権威情報源である（read-only-diagnostic 型、REQ-027-003 により STEP model 対象外）。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-inspect-docs`）が正規情報源である（read-only-diagnostic 型、REQ-027-003 により STEP model 対象外）。
 
 - スキャン対象の収集（`docs/requirements/`, `docs/decisions/`, `docs/specs/`, `docs/guides/`, `README.md`, `.opencode/`）
 - REQ 参照 ID 整合性確認（`agentdev-req-structure-diagnostics`）
@@ -53,6 +58,13 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 - 実行前同期（`git pull --ff-only`、失敗時は git-error-messages template で停止）
 - `.agentdev/inspect/` 変更の commit と push（変更なし時は commit/push せず「変更なし」報告、変更あり時は `.agentdev/inspect/` のみ `git add`、commit、push、push 失敗時は停止）
 - 完了報告
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/inspect-docs.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（工程構成、各診断観点の実行手順、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-docs`）が所有し、本 SPEC はこれらを複製しない。本 workflow は read-only-diagnostic 型であり、STEP model の対象外である（REQ-027-003）。resume point、export、import を持たず、工程一覧のラベルは順序ラベルである。中断時は先頭から再実行する。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## Artifact Graph 利用
 
@@ -89,10 +101,17 @@ consumer 環境に対応 node type または relation type が存在しない場
 | スキャン対象ディレクトリが存在しない | 該当カテゴリを空として扱い、警告を出力 |
 | ファイル読込失敗 | 該当ファイルをスキップし、警告を出力 |
 
+## 停止状態
+
+- 実行前同期（`git pull --ff-only`）失敗時（エラーを報告して停止する）。
+- `.agentdev/inspect/` 変更の push 失敗時（停止して報告する）。
+- スキャン対象ディレクトリ不存在、ファイル読込失敗は停止条件としない（「エラー処理」のとおり空扱い、スキップ継続）。
+
 ## See Also
 
 - [inspect-skills.md](inspect-skills.md)（Command/Skill 参照妥当性検出）
 - [inspect-promote.md](inspect-promote.md)（検出事項分類、昇格）
+- `agentdev-workflow-inspect-docs` skill（workflow 実装本体（工程構成、冪等性、終了条件））
 - `agentdev-req-structure-diagnostics` skill（REQ 構造検査ロジック）
 - REQ-010（inspect-docs / REQ 再構成運用）
 - REQ-010（inspect-* 検出コマンド群）

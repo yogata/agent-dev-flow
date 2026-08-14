@@ -2,7 +2,7 @@
 title: case-close SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # case-close SPEC
@@ -20,6 +20,11 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 
 **責務境界（REQ-003-007）**: 完了処理 + マージ時コンフリクトの機械的解消（rebase のみ、解消不能時は即エスカレーション、実装変更は行わない）。
 コンフリクト解消の実装変更、オーケストレーション級判断（マージ順序変更、blocked 単位の隔離）は case-auto の責務（`docs/specs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）。
+
+## 承認・HITL 境界
+
+- QG-4 合格後の squash merge、Issue close、Capture 回収は自動実行する（case-close 自身の承認点を持たない）。
+- QG-4 不合格、mergeable CONFLICTING の解消不能時はマージせず停止し、ユーザー判断を求める（実装変更による解消は case-auto レベルの判断）。
 
 ## 入力
 
@@ -61,7 +66,8 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 
 ## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-close`）が権威情報源である。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-close`）が正規情報源である。
 
 ### 入力判定
 
@@ -128,6 +134,13 @@ Epic status table 更新の後、最終 Wave 判定の前に実施する。Epic 
 - 学びの検知、抽出（`agentdev-learning-capture`、ユーザーに学び有無を問わない（G13）、Capture 回収（PR 本文から intake/learning を分離））
 - ドメイン状態永続化（`.agentdev/` 配下を commit/push（learning と intake を同一 commit））
 - 完了報告（結果状態の分離報告（GitHub側、`.agentdev`、ブランチ削除））
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/case-close.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（単一 Issue クローズと Epic Wave クローズの STEP 構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-close`）が所有し、本 SPEC はこれらを複製しない。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## Artifact Graph 利用
 
@@ -245,10 +258,19 @@ verification-only 判定基準3項目を満たさない files_checked 空（例:
 - 出力制約: 成果物本文（PR本文、commit message）は verbatim で返す（G10/G18、別途成果物パス、根拠、親判断事項は圧縮）
 - 結果状態分離報告: GitHub側、`.agentdev` 永続化、ブランチ削除状態を独立して報告（G19）
 
+## 停止状態
+
+- QG-4 前提確認で完了条件チェックボックスの未完了（`- [ ]` 残存）を検出した場合（評価エラーで停止する。部分的なチェック済み化は行わない）。
+- mergeable UNKNOWN ポーリング上限超過時（マージ中止、構造化エラー停止）。
+- squash merge のコンフリクトが rebase で解消不能な場合（実装変更を伴う解消は行わず、case-auto レベル判断へエスカレーションして停止）。
+- 最終 Wave で完了条件が残る場合（Epic クローズせずエラー停止、残 Wave 通知へ整理）。
+- worktree、ブランチ削除のリトライ上限超過時（`prune` と復元を実施し、削除失敗を報告して停止）。
+
 ## See Also
 
 - [case-run.md](case-run.md)（前段コマンド）
 - [case-auto.md](case-auto.md)（自走モード）
+- `agentdev-workflow-case-close` skill（workflow 実装本体（単一 Issue クローズ、Epic Wave クローズ））
 - `agentdev-quality-gates` skill（QG-4）
 - `agentdev-git-worktree` skill（worktree、ブランチ削除）
 - `agentdev-epic-tracker` skill（ステータス追跡テーブル）

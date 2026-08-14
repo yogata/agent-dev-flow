@@ -2,7 +2,7 @@
 title: learning-promote SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # learning-promote SPEC
@@ -69,7 +69,8 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 ## 現在の動作
 
-6 フェーズ構成。各フェーズの詳細手順は Workflow Skill（`agentdev-workflow-learning-promote`）が権威情報源である。
+6 フェーズ構成。
+各フェーズの詳細手順は Workflow Skill（`agentdev-workflow-learning-promote`）が正規情報源である。
 
 - フェーズ1 inbox スキャン: inbox.md 読込、deferred.md 読込
 - フェーズ2-5 Normalize→Classify→Evaluate→Dispose→HITL:
@@ -89,6 +90,13 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
   - commit/push
   - 完了報告
 
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/learning-promote.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（フェーズ構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-learning-promote`）が所有し、本 SPEC はこれらを複製しない。
+- Workflow Skill の単独起動防止（soft guard）は Workflow Skill description の DO NOT USE FOR トリガーにより実効する（command 定義本文に soft guard 宣言節を持たない構成である）。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
+
 ## 参照する横断 SPEC
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
@@ -107,9 +115,16 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 - 既存対策優先（G05）: 新規 X 化より既存 X へ反映
 - ユーザー承認必須（G06）: 判定、prune
 
+## 停止状態
+
+- ユーザー承認（判定、prune）を得るまで実行フェーズへ進まない（G06）。
+- adversarial-review 審議で unresolved な本質的争点が残る場合（ユーザー承認、deferred 移動、prune 等の不可逆処理へ進まず停止する、REQ-014-009）。
+- 実行前同期（`git pull --ff-only`）失敗時、push 失敗時（エラーを報告して停止する）。
+
 ## See Also
 
 - [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
+- `agentdev-workflow-learning-promote` skill（workflow 実装本体）
 - `agentdev-learning-pipeline` skill（全判定基準、スコアリングルール、提示形式、承認フロー）
 - `agentdev-learning-capture` skill（capture 層（独立スキル））
 - REQ-010（Learning-promote）

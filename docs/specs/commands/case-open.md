@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # case-open SPEC
@@ -12,6 +12,11 @@ updated: 2026-08-14
 要件定義（req-define）の結果をもとに GitHub Issue を作成する。
 壁打ち→構造的実行フェーズの境界。
 Epic + 子 Issue 一括作成に対応する。
+
+## 承認・HITL 境界
+
+- case-open 自身の承認点を持たない（req-define で壁打ち合意済みの要件 doc を入力とし、Issue 作成を自動実行する）。
+- OU 選択ゲートで処理対象 OU を決定できない場合（OU ID 指定 / 自動選択 / 一覧表示停止のいずれにも該当しないとき）は、一覧を表示してユーザー判断を求める。
 
 ## 入力
 
@@ -41,7 +46,8 @@ Epic + 子 Issue 一括作成に対応する。
 
 ## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-open`）が権威情報源である。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-open`）が正規情報源である。
 
 - 前工程からの引き継ぎ停止判定（`agentdev_handoff: true` 含まれる場合は Issue 作成せず停止）
 - OU 選択ゲート（`operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止））
@@ -69,6 +75,13 @@ Epic + 子 Issue 一括作成に対応する。
   - draft / RU 削除残存検証（`git status --porcelain` で残存検出）
   - draft/RU 削除 commit 後の即時 push（REQ-003-003）（削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
   - 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/case-open.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（STEP 構成、Standard flow / Epic flow の内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-open`）が所有し、本 SPEC はこれらを複製しない。
+- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## 構成生成事前検証（preflight）
 
@@ -316,12 +329,21 @@ case-open SPEC 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ-0
 
 原本ドラフトが挙げていた L239-240 は近似行であり、実施時に正確な行を再特定する。
 
+## 停止状態
+
+- 前工程からの引き継ぎ停止判定（`agentdev_handoff: true`）検出時（Issue 作成せず停止する）。
+- `auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo外操作、停止理由が残る場合（REQ-008-013）。
+- preflight 検証失敗時（Issue 作成呼び出しを実行せず停止する、REQ-006-028）。
+- review_dispositions の evidence 失効検出時（Issue 作成を中止する。`covered` のまま失効した disposition は再利用しない）。
+- adversarial-review 審議で unresolved なユーザー判断事項が残る場合（最初の GitHub Issue 作成へ進まない）。
+
 ## See Also
 
 - [req-define.md](req-define.md)（前段コマンド）
 - [req-save.md](req-save.md)（前段コマンド（REQ/Decision 保存））
 - [spec-save.md](spec-save.md)（前段コマンド（SPEC 保存））
 - [case-run.md](case-run.md)（後続コマンド（実装））
+- `agentdev-workflow-case-open` skill（workflow 実装本体（STEP 構成、resume protocol））
 - `agentdev-issue-management` skill（Issue 本文生成、テンプレート充足）
 - `agentdev-workflow-templates` skill（テンプレート選定）
 - `agentdev-workflow-lifecycle` skill（work_type、scale 判定、ラベル付与）

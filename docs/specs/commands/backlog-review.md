@@ -2,7 +2,7 @@
 title: backlog-review SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # backlog-review SPEC
@@ -41,7 +41,8 @@ updated: 2026-08-14
 
 ## 現在の動作
 
-処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-backlog-review`）が権威情報源である。
+処理段階（外部から意味のある順序）。
+各段階の詳細手順は Workflow Skill（`agentdev-workflow-backlog-review`）が正規情報源である。
 
 - 実行前同期（`git pull --ff-only`）
 - 成果物検出（引数有無切り替え（引数あり: 指定ファイルのみ / 引数なし: `promoted/` 全件））
@@ -52,6 +53,13 @@ updated: 2026-08-14
 - 成果物削除（RU 生成失敗成果物は削除しない（G06））
 - Git 永続化
 - 完了報告
+
+## 所有関係と委譲
+
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/backlog-review.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（工程構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-backlog-review`）が所有し、本 SPEC はこれらを複製しない。
+- Workflow Skill の単独起動防止（soft guard）は Workflow Skill description の DO NOT USE FOR トリガーにより実効する（command 定義本文に soft guard 宣言節を持たない構成である）。
+- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## Artifact Graph 利用
 
@@ -138,10 +146,18 @@ backlog-review が `tentative_classification` に7値以外の値を付与しよ
 backlog-review は全 RU frontmatter に `tentative_classification` を付与すること。
 フィールド欠落の RU は生成しないこと。
 
+## 停止状態
+
+- 矛盾検出時の追加判断をユーザーから得られない場合（REQ-003-009。矛盾する artifact の RU 化を保留し、判断を待つ）。
+- adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残る場合（RU 生成、採用済み成果物削除、Git 永続化等の後続不可逆処理へ進まない、REQ-014-009）。
+- RU frontmatter `tentative_classification` へ7値以外の値を付与しようとした場合（RU 生成を停止し、訂正を求める）。
+- 実行前同期（`git pull --ff-only`）失敗時（エラーを報告して停止する）。
+
 ## See Also
 
 - [intake-promote.md](intake-promote.md), [learning-promote.md](learning-promote.md), [inspect-promote.md](inspect-promote.md)（前段コマンド）
 - [req-define.md](req-define.md)（後続コマンド（RU を入力として要件定義））
+- `agentdev-workflow-backlog-review` skill（workflow 実装本体）
 - `agentdev-backlog-integration` skill（分析基準、統合分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール）
 - REQ-008（RU lifecycle）
 - REQ-010（Backlog-review）

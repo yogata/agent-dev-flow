@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: draft
 created: 2026-08-10
-updated: 2026-08-10
+updated: 2026-08-15
 spec_logical_division: cross_cutting_contract
 canonical_owner: workflow-skill-model
 ---
@@ -21,6 +21,17 @@ DEC-010（責務3層分化と1:N分割原則）の実装詳細を正規所有す
 
 公開interface（入出力契約・ガードレール）、workflow dispatch。workflow 実装本体は所有しない。
 
+### thin Command の workflow 節標準構造
+
+thin Command の workflow 節は次の3要素で構成する。
+
+1. Workflow Skill 名レベルの dispatch 宣言（委譲先 Workflow Skill 名と委譲範囲の宣言。内部構造（STEP ID、reference パス）への直接依存を持たない）
+2. 公開順序の要約（順序ラベル付きの見出し群。Workflow Skill 内部手順の複製ではなく、公開interface としての順序提示）
+3. soft guard 宣言（Workflow Skill の単独起動防止宣言。後述「soft guard の二層様式」）
+
+順序ラベルは現行実装に `### Step N`、`STEP-N`、`工程-N` の3様式が存在する。
+様式の統一基準、記述量の基準といった執筆詳細は `authoring/command-file-format.md` が正規所有し、本節は workflows 側の構成契約のみを記録する。
+
 ## Workflow Skill 責務
 
 workflow 実装本体。SKILL.md = control plane（STEP transition・STEP間参照）、STEP = resume point 単位。
@@ -28,6 +39,39 @@ workflow 実装本体。SKILL.md = control plane（STEP transition・STEP間参�
 operation 差だけの不必要分割は回避。
 
 Workflow Skill は workflow STEP を所有し、特定 Command の制御構造を持つ（REQ-002-001、REQ-002-002）。
+
+### Workflow 型分類と標準構成（STEP model 対象型と対象外型）
+
+Workflow Skill は STEP model の適用有無により次の3型に分類される（REQ-027-003）。
+
+| 型 | 対象 | STEP model | resume point / export / import |
+|---|---|---|---|
+| 標準型 | req-define、req-save、spec-save、case-open、case-run、case-update、case-close、case-auto、intake-promote、learning-promote、backlog-review、inspect-promote | 対象 | 持つ（DEC-011） |
+| capture-only 型 | intake-capture、intake-from-github | 対象外 | 持たない。工程は逐次実行し、中断時は先頭から再実行する |
+| read-only-diagnostic 型 | inspect-docs、inspect-skills | 対象外 | 持たない。工程一覧のラベルは順序ラベルであり、中断時は先頭から再実行する |
+
+read-only-diagnostic 型の SKILL.md は次の標準セクション構成を持つ。
+
+1. 型判定節（read-only-diagnostic 型である旨と、STEP model 対象外である旨の宣言）
+2. 工程一覧（STEP ラベルは順序ラベルであり resume point ではない旨の宣言を伴う）
+3. 冪等性の根拠（診断が読み取りと検出事項ファイル生成のみの副作用であり、中断時は先頭から再実行できる根拠）
+4. 終了条件（termination）
+
+capture-only 型も同様に型判定節と工程一覧を持ち、保存専用 workflow であることを宣言する。
+
+### 1:N 分割基準の適用実例（case-run）
+
+case-run は単一 Issue 実行と Epic Wave 実行で制御構造に実質差異があるため、Workflow Skill を single workflow と epic-wave workflow の2 workflow に分離する。
+両 workflow の実行契約差異は次の6軸で定義され、Workflow Skill（`agentdev-workflow-case-run`）が所有する。
+
+| 契約軸 | single workflow | epic-wave workflow |
+|---|---|---|
+| target cardinality | 1 Issue | 現在 ready な Wave の子Issue 群（1 Wave 分、最大5件） |
+| parallelism | 委譲1件（並列なし） | 子Issue 並列委譲（最大5件） |
+| fan-out / fan-in | fan-out なし。委譲1件の result を直接処理 | fan-out（子Issue ごとの worktree と委譲起動）→ fan-in（全委譲完了待機・結果収集） |
+| child task recovery | 対象外 | 委譲異常終了時の子タスク単位の回復 |
+| partial result | 対象外 | 一部子Issue の blocked / failed と他の completed-pr の混在保持 |
+| Wave-level completion | 対象外 | 1 Wave の完了判定と次 Wave へのべき等遷移（Wave 境界のマージは case-close 責務） |
 
 ## Capability Skill 責務
 
@@ -142,6 +186,19 @@ DEC-010 Inventory が挙げる新規 Capability Skill 候補。本 SPEC は候�
 Command → Workflow Skill（名レベル参照）→ STEP reference（references/ 配下）。
 Workflow Skill → Capability Skill（名レベル参照）。循環依存禁止。
 Capability Skill → Capability Skill（名レベル参照、循環依存禁止）。
+
+## soft guard の二層様式
+
+Workflow Skill の単独起動防止（soft guard）は OpenCode 1.18.15 が skill 直接起動を機械的に防止できないため、宣言による様式で担保する。
+実効層は次の2層である。
+
+| 層 | 実装 | 全 Workflow Skill での実装有無 |
+|---|---|---|
+| Skill 層 | Workflow Skill description の DO NOT USE FOR トリガー（「単独起動を行わない」旨） | 全16 Workflow Skill で実装（実効の主層） |
+| Command 層 | command 定義本文 workflow 節の soft guard 宣言節（grep 可能な `soft guard` マーカー） | core 8 Command（req-define、req-save、spec-save、case-open、case-run、case-update、case-close、case-auto）と inspect 3 Command（inspect-docs、inspect-skills、inspect-promote）で実装。intake / learning / backlog 5 Command（intake-capture、intake-from-github、intake-promote、learning-promote、backlog-review）は command 定義本文に宣言節を持たず、Skill 層のみで実効する |
+
+command 定義本文に宣言節を持たない構成でも Skill 層の DO NOT USE FOR トリガーにより soft guard は実効する。
+Command SPEC の delegated responsibility 記述は、当該 command の実効層構成（二層または Skill 層のみ）を反映する。
 
 ## artifact-contracts.md からの委譲
 
