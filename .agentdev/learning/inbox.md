@@ -165,3 +165,51 @@
 - **関連**: PR #2098, Issue #2093 (OU-009), Epic #2091, commit 5c920055, TS-012
 - **タグ**: `#stale-reference` `#req-move` `#verify-only` `#grep-detection` `#ts-012` `#case-close-remediation`
 
+## Workflow Skill reference が配布テンプレート実ファイルを参照せず「参照のみ存在」状態で運用継続
+
+- **問題事象**: case-open 実行（Epic #2099 Issue 化）で、`agentdev-workflow-case-open/references/termination-and-cleanup.md` Step 15 が完了報告テンプレート `templates/case-open/{standard,epic,multi-req-epic}.md` を参照しているが、`agentdev-workflow-templates` 配布物に当該ディレクトリ・ファイルが一切存在しないことを検出した。参照整合が取れないまま運用されており、完了報告の構造が実行時解釈に委ねられていた（今回の実行は case-auto stage1_result 出力契約が代替）。Epic #2060 false-positive completion と同種の「定義と配布の不整合」パターン。
+- **発生局面**: 運用（case-open terminal STEP、完了報告テンプレート読込）
+- **検知方法**: case-open 実行時に `src/opencode/skills/agentdev-workflow-templates/templates/` の glob 一覧（11ファイル、case-open/ なし）と termination-and-cleanup.md Step 15 の参照パス突合
+- **根本原因**: Workflow Skill reference から配布成果物（テンプレート）への参照追加時に、配布側への実ファイル作成または参照側の実態合わせのいずれも完了しなかった。参照存在と配布存在の突合を authoring / 検査工程で強制していない
+- **自律対応内容**: 今回の実行は case-auto の出力契約（stage1_result 構造）が完了報告の代替となったため blockers なしで継続。具体的不整合は intake item（`intake-2026-08-14-case-open-completion-report-templates-missing.md`）へ分離して記録（Split Rule）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（配布物整合の是正は intake / backlog 経由で判断。本エントリは再発防止知見の記録）
+- **横展開観点**: Workflow Skill / Capability Skill の reference・SKILL.md から配布成果物（テンプレート、scripts、他 skill ファイル）へのパス参照を記述する際、参照先実ファイルの存在を authoring 時に突合する。特に agentdev-skill-authoring の品質軸「参照整合」と inspect-skills の検出対象で網羅されているかの確認が有効
+- **再発条件**: 配布物間参照（テンプレート参照等）を追加するスキル編集で、参照先実ファイルの作成・確認を行わずに merge した場合
+- **予防策候補**: スキル編集時の参照先実ファイル存在確認を agentdev-skill-authoring の査読プロトコルに明示、または check_templates 系 checker に「skill reference から templates/ へのパス参照→実ファイル存在」検査を追加
+- **想定反映先**: `src/opencode/skills/agentdev-skill-authoring/`（参照整合の査読観点）、`src/opencode/skills/repo-agentdev-integrity/scripts/check_templates.ts`（参照→実ファイル存在検査の追加候補。要 backlog-review 判断）
+- **関連**: Epic #2099, intake item `intake-2026-08-14-case-open-completion-report-templates-missing.md`, `src/opencode/skills/agentdev-workflow-case-open/references/termination-and-cleanup.md` Step 15
+- **タグ**: `#missing-template` `#workflow-case-open` `#workflow-templates` `#false-positive-completion` `#reference-integrity`
+
+## G03（子Issue 先頭行 Parent）と issue_desc_child テンプレート構造の突合欠陥（解決時に重複記載で両立）
+
+- **問題事象**: case-open 実行（Epic #2099 子Issue #2100〜#2109 作成）で、ガードレール G03「子Issue本文の先頭行に `Parent: #{epic_number}` を必ず含める」と `issue_desc_child.md` テンプレート構造（本文先頭が `## 親Issue` セクション、`Parent:` 行は本文4行目）が突合しないことを検出した。先行実績（#2092）は本文1行目に `Parent: #2091` を配置し `## 親Issue` セクション自体を持たない形式で、テンプレートとも G03 の文字要件とも異なる第3の状態だった。初回作成時にテンプレート構造のみに従い G03 先頭行要件を満たさず、作成後に全10子Issue を修正（本文1行目に `Parent: #2099` を付与、テンプレートの `## 親Issue` セクションは維持）した。
+- **発生局面**: 実装（case-open Step 8 子Issue 作成、G03 準拠検証）
+- **検知方法**: 子Issue #2100 作成後の VERIFY に続く先行実績突合（#2092 本文先頭行の確認）。テンプレート・ガードレール・実績の3者比較で不一致を特定
+- **根本原因**: テンプレート（`## 親Issue` セクション内に `Parent:` 行）と command ガードレール（本文先頭行）で Parent 配置の正規位置が二重定義されており、テンプレート準拠検証（G09）と G03 検証が独立に存在する。テンプレートが G03 の文字要件を構造的に表現できていない
+- **自律対応内容**: 全10子Issue の本文1行目に `Parent: #2099` を付与する `gh issue edit` を実施し再 VERIFY（テンプレートの `## 親Issue` 【必須】セクションは維持、Parent 行は結果的に二重記載）。G03 と G09 の双方を満たす最小変更とした
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（テンプレート正規形の変更は本 run の範囲外。知見記録のみ）
+- **横展開観点**: テンプレート変数の配置位置がガードレールの文字要件（先頭行等）と突合するかを authoring 時に確認する。テンプレートとガードレールで同一情報の正規位置を二重定義しない
+- **再発条件**: `issue_desc_child.md` テンプレートをそのまま適用して子Issue を作成した場合（G03 先頭行要件を個別確認しない限り毎回）
+- **予防策候補**: テンプレート本文先頭に `Parent: #{epic_number}` 行を置き `## 親Issue` セクションを廃止または参照化するテンプレート改訂（要 backlog-review）。または case-open の G03 検証手順に「本文1行目の文字一致」を明示
+- **想定反映先**: `src/opencode/skills/agentdev-workflow-templates/templates/issue_desc_child.md`（正規形改訂候補）、`src/opencode/commands/agentdev/case-open.md` G03（検証手順の明示候補。いずれも要 backlog-review）
+- **関連**: Epic #2099, 子Issue #2100〜#2109, 先行実績 #2092/#2091, `src/opencode/skills/agentdev-workflow-templates/templates/issue_desc_child.md`
+- **タグ**: `#g03` `#template-mismatch` `#case-open` `#parent-link` `#guardrail-alignment`
+
+
+## Windows + junction worktree で git show 等 READ 系出力が cp932 mojibake（READ 手順でも OutputEncoding 前置が実質必要）
+
+- **問題事象**: Windows + junction 未伝播 worktree 環境で、`git show`、`Select-String`、`Get-Content` 等の READ 系コマンド出力の日本語が PowerShell 既定コンソールエンコーディング（cp932）で mojibake になった。OU-000 baseline 抽出（`git show 49f4db17:<path>` による両ソース抽出）作業中に実際に発生し、`[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` の前置で解消した。case-close Stage 3 でも `.agentdev/learning/inbox.md` の `Get-Content` 読み出しと checker スクリプトの `Select-String` 出力で同現象が再発した
+- **発生局面**: 検証（verify-only OU の baseline 抽出、capture 記録時のファイル読み出し）
+- **検知方法**: 読み出したテキストの日本語が文字化け（U+FFFD 置換や cp932 逆変換文字列）として観測されること
+- **根本原因**: `agentdev-gh-cli` の READ 安全手続き（Node.js execSync でパイプラインをバイパス）は gh CLI 出力を対象としており、PowerShell ネイティブコマンドレット（Get-Content / Select-String）やパイプライン経由の git 出力の decode は `[Console]::OutputEncoding` 既定値（cp932）に依存する。WRITE 手続きの Step 0（コンソールエンコーディング初期化3行）は READ 操作を明示対象外としており、手作業 READ 時の前置は規定されていなかった
+- **自律対応内容**: READ 操作の実行前に `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` を前置して再実行し、正常な日本語出力を確認。以降の READ 操作では Node.js `fs.readFileSync` + `node -e` console.log、または Read tool を使用して mojibake を回避
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（agentdev-gh-cli SPEC Section 2 Step 0 は WRITE 向け規定であり、READ 向け手順の明文化要件は learning-promote で評価する対象とする）
+- **横展開観点**: Windows 環境で PowerShell パイプライン経由で日本語テキストを扱う全 READ 操作（git log / git show / checker スクリプトの出力受取、既存ドキュメントの grep 的読み出し）で同リスクがある。Node.js execSync / fs.readFileSync 経由、または Read tool の使用が構造的に安全
+- **再発条件**: Windows PowerShell/pwsh 環境でコンソールエンコーディング初期化なしに、パイプライン経由で日本語を含むコマンド出力やファイル内容を取得する場合
+- **予防策候補**: READ 操作でも `[Console]::OutputEncoding = UTF8` 前置を習慣化する、または Node.js `fs.readFileSync` 経由に統一する。手作業 READ 手順の明文化要否は learning-promote で判断
+- **想定反映先**: `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` READ 手続き（Node.js execSync 以外の経路を扱う場合の注意喚起候補。現行規定は execSync で安全なため変更必須ではない）
+- **関連**: Issue 2100（OU-000）, PR 2110, Epic 2099, 既存 entry「gh CLI WRITE 操作で Step 0 encoding 初期化を省略し --body-file 本文が mojibake」（WRITE 経路、本 entry は READ 経路で別事象）, 「Windows + ジャンクション環境 worktree での check_templates.ts worktree 固有 false positive」（同環境系だが checker 欠陥側）
+- **タグ**: `#encoding` `#read-procedure` `#windows` `#mojibake` `#junction` `#cp932`
