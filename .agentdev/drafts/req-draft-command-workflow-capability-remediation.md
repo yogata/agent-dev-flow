@@ -1,7 +1,7 @@
 ---
 draft_type: req_draft
 topic_slug: command-workflow-capability-remediation
-status: draft
+status: saved
 created_at: 2026-08-11T00:00:00+09:00
 source_rus: []
 ---
@@ -457,7 +457,18 @@ operation_units:
     depends_on: [OU-000]
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      status: in_progress
+      req_save:
+        completed_at: "2026-08-14"
+        saved_req_docs: [REQ-006]
+        action_mapping:
+          ACT-REQ-001: "REQ-006 要件行 REQ-006-072 / REQ-006-073 を更新（Workflow Skill 権威化 + public contract の Command SPEC 正規化）"
+        source_ru_mapping: {}
+        source_note: "frontmatter source_rus が空のため RU 起点マッピングなし"
+        commit: "0cfa74bf2083d6d1af8d7787fa383b7e490714a9"
+      spec_save:
+        status: pending
 
   - ou_id: OU-002
     operation: implementation
