@@ -277,3 +277,35 @@
 - **想定反映先**: なし（運用知見。OU-005 / OU-008a 実行時の注意点として報告済み）
 - **関連**: Issue 2102（OU-002）, Issue 2103（OU-003）, Issue 2104（OU-004）, PR 2112 / 2113 / 2114, Epic 2099, 前段 entry「workflow 実装を command から skill へ移設すると IR-055 baseline 再生成が移設作業の標準手順として機能する」
 - **タグ**: `#ir-055` `#baseline` `#parallel-wave` `#merge-order` `#staging-integration`
+
+## check_changed_docs.ts --base-ref はコミット前実行だと files_checked 空の warning になり pass 誤認リスクがある
+
+- **問題事象**: コミット前の worktree 上で `check_changed_docs.ts --base-ref <base>` を実行すると、`git diff <base>...HEAD` がコミット済み範囲のみを対象とするため files_checked が空になり「対象ファイルが検出されませんでした」warning となる。空結果を gate pass と誤認できる状態が生じる
+- **発生局面**: 実装（case-run Wave 3、targeted docs gate の実行タイミング運用）
+- **検知方法**: gate 実行時の JSON 出力で files_checked 空配列と warnings の「対象ファイルが検出されませんでした」を観測
+- **根本原因**: --base-ref モードの diff 算出がコミット済み HEAD 基準である一方、case-run の実装作業ではコミット前に gate を実行しうる運用が存在する
+- **自律対応内容**: コミット後に gate を再実行し、実ファイル検査結果（変更19ファイル + coupled 2ファイル、failures 0 / warnings 0）を取得して判定した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（targeted docs guard の CLI 契約どおりの挙動。運用タイミングの知見）
+- **横展開観点**: case-run の gate 実行はコミット後が前提。コミット前実行で空結果を pass 扱いにしない。files_checked 空時の確認規定（targeted-docs-guard-implementation SPEC）と組み合わせて判定する
+- **再発条件**: コミット前に --base-ref 指定で targeted docs guard を実行した場合
+- **予防策候補**: gate 実行手順への「--base-ref はコミット後実行」前提の明記候補（要否は learning-promote で判断）
+- **想定反映先**: なし（運用知見。targeted-docs-guard-implementation SPEC または case-run reference の注意喚起候補）
+- **関連**: PR 2115 Findings learning セクション, Issue 2105（OU-005）, Epic 2099
+- **タグ**: `#targeted-docs-guard` `#base-ref` `#pre-commit` `#empty-result` `#gate-timing`
+
+## ハーネス Write ツールのリポジトリ外 temp 書き込みが distribution-boundary-guard でブロックされる（worktree 内配置で回避）
+
+- **問題事象**: ハーネス（OpenCode）の Write ツールでリポジトリ外 temp（`C:\WINDOWS\TEMP\opencode`）へスクリプトファイルを作成しようとすると、distribution-boundary-guard（`tool.execute.before` フック）にブロックされる事象を確認した。機械一括是正の作業ファイル出力先として同 temp を使用できない
+- **発生局面**: 実装（case-run Wave 3、TS-105 機械判定是正のスクリプト作成時）
+- **検知方法**: Write ツール実行時の distribution-boundary-guard によるブロック通知
+- **根本原因**: 配布依存境界の多層 enforcement（REQ-029、DEC-014）が tool.execute.before フックでリポジトリ外書き込み経路を検出・ブロックする構成として機能している。設計どおりの挙動である
+- **自律対応内容**: edit ツールによる逐次実行、または worktree 内（`.agentdev/tmp` 等、.git 管理領域配下）への作業ファイル配置で回避した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（guard の設計どおり。運用回避策の知見）
+- **横展開観点**: 機械一括是正・スクリプト実行を伴う作業の作業ファイルは worktree 内へ配置する。agentdev-gh-cli 標準手続きの `.agentdev/tmp`（workspace-local）配置規定と同一方向の運用
+- **再発条件**: Write ツールでリポジトリ外 temp へスクリプト等の作業ファイル作成を試みた場合
+- **予防策候補**: 作業ファイルの worktree 内配置（`.agentdev/tmp` 等）の徹底。既存配置規定（RU-{NNNN} AG-{NNN} の workspace-local 配置）との重複確認
+- **想定反映先**: なし（運用知見。規範化の要否は learning-promote で判断）
+- **関連**: PR 2115 Findings learning セクション, Issue 2105（OU-005）, Epic 2099, REQ-029（配布依存境界）, DEC-014（多層 enforcement）
+- **タグ**: `#distribution-boundary-guard` `#write-tool` `#temp-workspace` `#tool-execute-before` `#operations`
