@@ -105,11 +105,11 @@ const Q2_SAME_CANONICAL_OWNER: EffectivenessQuery = {
  * Q3: agentdev-artifact-graph SPEC に関連する command / skill / integrity_rule。
  *
  * Graph は neighbors(spec, depth=2) で関連集合を得る。extension node を経由して
- * command/skill に、references markdown link で他 SPEC に到達する。
+ * Workflow Skill / Capability Skill に、references markdown link で他 SPEC に到達する。
  *
  * ground truth は SPEC 本文または extension yaml が agentdev-artifact-graph を明示的に
- * 参照する成果物（command: case-close, case-open, case-run, req-define, spec-save;
- * skill: agentdev-adversarial-review）。
+ * 参照する成果物（Workflow Skill: agentdev-workflow-{case-close, case-open, case-run,
+ * req-define, spec-save}; Capability Skill: agentdev-adversarial-review）。
  */
 const Q3_RELATED_COMMAND_SKILL_IR: EffectivenessQuery = {
   id: "Q3-related-to-artifact-graph-spec",
@@ -133,47 +133,47 @@ const Q3_RELATED_COMMAND_SKILL_IR: EffectivenessQuery = {
     roots: [
       "src/opencode/commands",
       "src/opencode/skills",
-      ".agentdev/extensions/commands",
       ".agentdev/extensions/skills",
       "docs/specs/integrity/rules",
     ],
     extensions: [".md", ".yaml", ".yml"],
   },
   groundTruth: [
-    "command:case-close",
-    "command:case-open",
-    "command:case-run",
-    "command:req-define",
-    "command:spec-save",
+    "skill:agentdev-workflow-case-close",
+    "skill:agentdev-workflow-case-open",
+    "skill:agentdev-workflow-case-run",
+    "skill:agentdev-workflow-req-define",
+    "skill:agentdev-workflow-spec-save",
     "skill:agentdev-adversarial-review",
   ],
   groundTruthRationale:
-    ".agentdev/extensions 配下の各 command extension yaml が rules.skill: agentdev-artifact-graph を持ち、" +
+    ".agentdev/extensions/skills 配下の各 Workflow Extension yaml が rules.skill: agentdev-artifact-graph を持ち、" +
     "agentdev-adversarial-review extension も同様。" +
     "Graph 上で extension node を介した delegates_to / extends により" +
-    "specification→extension→command/skill と到達可能。" +
+    "specification→extension→Workflow Skill / Capability Skill と到達可能。" +
     "integrity_rule で本 SPEC を直接参照する IR は現時点で存在しない。",
 }
 
 /**
- * Q4: command から委譲される skill（delegates_to）。
+ * Q4: Workflow Skill から委譲される skill（delegates_to）。
  *
- * Graph は「extension node を経由した delegates_to エッジ」で command から委譲先を辿れる。
- * 独立探索は .agentdev/extensions/commands/<name>.yaml の rules.skill / checks.skill を直接 grep。
+ * Graph は「extension node を経由した delegates_to エッジ」で Workflow Skill から
+ * 委譲先を辿れる。独立探索は .agentdev/extensions/skills/<name>.yaml の
+ * rules.skill / checks.skill を直接 grep。
  *
- * ground truth は case-close extension yaml に宣言された 2 つの skill。
- * case-close は agents-dev-flow で数少ない複数 skill 委譲を持つ command であり、
+ * ground truth は case-close の Workflow Extension yaml に宣言された 2 つの skill。
+ * case-close は agents-dev-flow で数少ない複数 skill 委譲を持つ Workflow Skill であり、
  * 単一委譲の典型例 (case-open, case-run 等) より比較の分解能が高い。
  */
 const Q4_DELEGATION_TARGET_SKILL: EffectivenessQuery = {
   id: "Q4-case-close-delegation-targets",
   category: "delegation-target-skill",
-  question: "case-close command が実際に委譲する skill は何か？",
+  question: "case-close Workflow Skill が実際に委譲する skill は何か？",
   graphQuery: {
     kind: "graph-query",
     query: {
       kind: "neighbors",
-      node: "command:case-close",
+      node: "skill:agentdev-workflow-case-close",
       depth: 2,
     },
     resultFilter: {
@@ -183,7 +183,7 @@ const Q4_DELEGATION_TARGET_SKILL: EffectivenessQuery = {
   independentSearch: {
     kind: "grep",
     pattern: "^\\s*skill:\\s*\\S+",
-    roots: [".agentdev/extensions/commands"],
+    roots: [".agentdev/extensions/skills"],
     extensions: [".yaml", ".yml"],
   },
   groundTruth: [
@@ -191,11 +191,11 @@ const Q4_DELEGATION_TARGET_SKILL: EffectivenessQuery = {
     ARTIFACT_GRAPH_SPEC_NODE,
   ],
   groundTruthRationale:
-    ".agentdev/extensions/commands/case-close.yaml の rules[0].skill = agentdev-artifact-graph、" +
+    ".agentdev/extensions/skills/agentdev-workflow-case-close.yaml の rules[0].skill = agentdev-artifact-graph、" +
     "checks[0].skill = repo-agentdev-integrity。" +
     "Graph は alias 解決で前者を specification:docs/specs/skills/agentdev-artifact-graph.md、" +
     "後者を skill:repo-agentdev-integrity に正規化する。" +
-    "独立探索はテキスト `skill:` 行を全件拾うため、他 command の skill 行も候補となる。",
+    "独立探索はテキスト `skill:` 行を全件拾うため、他 Workflow Skill の skill 行も候補となる。",
 }
 
 /**
@@ -293,11 +293,11 @@ const Q6_POST_CHANGE_DANGLING: EffectivenessQuery = {
     `specification:docs/specs/${"foundations"}/document-model.md`,
     `specification:docs/specs/${"local"}/artifact-graph.md`,
     "source_file:docs/specs/README.md",
-    "extension:.agentdev/extensions/commands/case-close.yaml",
-    "extension:.agentdev/extensions/commands/case-open.yaml",
-    "extension:.agentdev/extensions/commands/case-run.yaml",
-    "extension:.agentdev/extensions/commands/req-define.yaml",
-    "extension:.agentdev/extensions/commands/spec-save.yaml",
+    "extension:.agentdev/extensions/skills/agentdev-workflow-case-close.yaml",
+    "extension:.agentdev/extensions/skills/agentdev-workflow-case-open.yaml",
+    "extension:.agentdev/extensions/skills/agentdev-workflow-case-run.yaml",
+    "extension:.agentdev/extensions/skills/agentdev-workflow-req-define.yaml",
+    "extension:.agentdev/extensions/skills/agentdev-workflow-spec-save.yaml",
     "extension:.agentdev/extensions/skills/agentdev-adversarial-review.yaml",
   ],
   groundTruthRationale:
