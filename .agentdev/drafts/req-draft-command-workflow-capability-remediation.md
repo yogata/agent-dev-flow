@@ -45,6 +45,20 @@ auto_gate:
   out_of_repo_operations: []
   stop_reasons: []
 
+spec_save:
+  consumed_at: "2026-08-14"
+  spec_actions_consumed: true
+  action_mapping:
+    ACT-SPEC-001a: "docs/specs/foundations/project-extensions.md「旧kind からの移行（breaking migration）」セクション置換（kind enum / id binding / mapping 表 / 状態分類）"
+    ACT-SPEC-001b: "docs/specs/foundations/project-extensions.md「実行時読み込み契約」セクション置換（新3種 kind 読込契約）"
+    ACT-SPEC-002: "docs/specs/foundations/system.md「Workflow Architecture Inventory」導入部置換（architecture view 化、旧 SSoT 表現除去）"
+    ACT-SPEC-003a: "docs/specs/authoring/command-file-format.md「extensions 手順」セクション置換（新 kind extension 記述）"
+    ACT-SPEC-003b: "docs/specs/authoring/command-file-format.md「機械検査対象」セクション置換（thin Command モデル検査追加）"
+    ACT-SPEC-004: "docs/specs/commands/ 16 SPEC 横断適用（Step 番号複製除去、権威表現の Workflow Skill 参照化、旧 extension path 除去）。inspect-skills.md は検出事項なしのため no-op"
+  notes:
+    - "全 target_area は search-target-area.ts で単一マッチを確認後に置換"
+    - "spec_logical_division / canonical_owner 宣言は draft 側で未出力のため soft-contract 警告付きで継続（既存 SPEC は status: accepted、宣言欠落のみで保存拒否しない）"
+
 agreed_items:
   - id: AG-001
     content: |
@@ -468,7 +482,16 @@ operation_units:
         source_note: "frontmatter source_rus が空のため RU 起点マッピングなし"
         commit: "0cfa74bf2083d6d1af8d7787fa383b7e490714a9"
       spec_save:
-        status: pending
+        status: completed
+        completed_at: "2026-08-14"
+        updated_specs:
+          - docs/specs/foundations/project-extensions.md
+          - docs/specs/foundations/system.md
+          - docs/specs/authoring/command-file-format.md
+        applied_actions: [ACT-SPEC-001a, ACT-SPEC-001b, ACT-SPEC-002, ACT-SPEC-003a, ACT-SPEC-003b]
+        source_ru_mapping: {}
+        source_note: "frontmatter source_rus が空のため RU 起点マッピングなし"
+        outcome: "OU-001 の宣言対象 SPEC 3件すべてに Stage 0 の規範契約更新を適用済み。実装側反映（OU-002〜006）は未実施"
 
   - ou_id: OU-002
     operation: implementation
