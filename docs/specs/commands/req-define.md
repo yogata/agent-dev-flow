@@ -2,7 +2,7 @@
 title: req-define SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-10
+updated: 2026-08-14
 ---
 
 # req-define SPEC
@@ -34,54 +34,56 @@ updated: 2026-08-10
 
 ## 現在の動作（oracle/explore 抽象化後）
 
-- Step 1: セッションコンテキスト検知（引数なし単体実行時のみ）（当該セッション履歴、現在コンテキストを Requirement Source 候補として評価）
-- Step 2: 明示入力ファイル読込（指定時）（RU 自動検出を含む）
-- Step 3: 壁打ち対話（`agentdev-req-analysis` に従い深掘り）
- - Step 3-1: 前工程からの引き継ぎ判定（`agentdev_handoff: true` フラグ処理）
-- Step 4: 既存REQ照合（`agentdev-req-file-manager` 照合方法論）
- - Step 4-1: 定量的データ検証（`glob docs/requirements/REQ-*.md` で AGENTS.md 記載レンジと照合）
- - Step 4-2: SPLIT 予兆計測（既存REQの健全性メトリクス計測）
-- Step 5: 要件展開（`agentdev-req-analysis` 分析観点）
- - Step 5-1: 変更影響候補抽出
-  - RU 由来キーワード抽出 + glob/grep 前処理によるサブエージェント調査委譲スコープの絞り込み（REQ-004-072）。絞り込みはサブエージェント調査委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-004-002）の完全性は維持する
- - Step 5-2: 分類ゲート（v2:REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/SPEC 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/specs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（v2:REQ-0155-008）」に定める
- - Step 5-3: 文書分類妥当性検証（SPEC 分離基準違反残留検出）
-  - Step 5-4: Decision要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
-  - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-073）。ラベル構造は soft-contract（DEC-003）とし、分類権限は親が保持する
- - Step 5-5: 実行主体分類表（REQ-003-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
- - Step 5-6: Test strategy 定義（要件展開内）
- - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
- - on_failure（不合格時の処置）を持たない検証項目は test strategy に含めない
- - 項目識別子: TS-NNN 形式（NNNは3桁ゼロ埋め連番）
- - 各項目属性: id（TS-NNN）、target_item（AG-* への参照）、verification、pass_criteria、on_failure
- - on_failure アクション種別: fix-and-reverify（実装を修正して再検証）/ record-in-findings（Findings に out-of-scope として記録）の2値
-- Step 6: Decision判断（`agentdev-decision-guidelines`）
- - Step 6-1: 既存Decision重複確認
- - Step 6-2: Decision禁止ゲート
- - Step 6-3: Decision判断根拠記録
- - Step 6-4: 作業手段Decision拒否ゲート
- - Step 6-5: Decision 番号指定形式（`new:{topic-slug}` 形式）
-- Step 7: 要件doc生成（テンプレート: `templates/req-define/req-draft.md`）
- - Step 7-1: 定義完全性ゲート（QG-1）
- - Step 7-2: operation_units 生成
- - Step 7-3: artifact_actions 生成
- - Step 7-4: draft-data test_strategy 生成（各項目の5属性をYAML形式で格納）
-- Step 8: work_type 判定（bugfix/feature/maintenance/docs_chore）
-- Step 9: Scale判断（featureのみ、`agentdev-workflow-lifecycle`）
- - Step 9-1: 実装スコープシグナル確認
-- Step 10: ドラフト保存（`.agentdev/drafts/req-draft-{topic-slug}.md`）
- - Step 10-1: 実装詳細の分離
- - Step 10-2: auto_gate完了ゲート（auto_gate.auto_ready:false または未解決 item 残存時、stop_reasons を提示し解消方策を壁打ちで合意）。解消時は auto_ready:true に更新。ユーザーが明示的に false 選択時は conflict_resolutions に記録し継続。未解決のままの場合は壁打ちへ差し戻し。
-- Step 11: 要件doc確認（ユーザー提示のみ、承認は求めない）
- - Step 11-1〜11-6: 複数RU受付、統合/分離判定、出力生成、Epic規模検出、Wave候補記録、OU 構造検証
-- Step 12: 完了報告（work_type 別テンプレート選択）
+処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-req-define`）が権威情報源である。
 
-req-define は command 定義（src/opencode/commands/agentdev/req-define.md）と Step 番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって対応付ける（v2:REQ-0143-005）。
+- セッションコンテキスト検知（引数なし単体実行時のみ）（当該セッション履歴、現在コンテキストを Requirement Source 候補として評価）
+- 明示入力ファイル読込（指定時）（RU 自動検出を含む）
+- 壁打ち対話（`agentdev-req-analysis` に従い深掘り）
+  - 前工程からの引き継ぎ判定（`agentdev_handoff: true` フラグ処理）
+- 既存REQ照合（`agentdev-req-file-manager` 照合方法論）
+  - 定量的データ検証（`glob docs/requirements/REQ-*.md` で AGENTS.md 記載レンジと照合）
+  - SPLIT 予兆計測（既存REQの健全性メトリクス計測）
+- 要件展開（`agentdev-req-analysis` 分析観点）
+  - 変更影響候補抽出
+    - RU 由来キーワード抽出 + glob/grep 前処理によるサブエージェント調査委譲スコープの絞り込み（REQ-004-072）。絞り込みはサブエージェント調査委譲の調査優先対象リストのみに適用（ヒントでありハードフィルタではない）し、実ファイル列挙（REQ-004-002）の完全性は維持する
+  - 分類ゲート（v2:REQ-0155-004 最終分類確定ステップ）（変更後仕様 or 反映作業、REQ/SPEC 境界判定）。RU 入力の暫定分類（backlog-review が `tentative_classification` に付与）が存在する場合、`docs/specs/foundations/document-model.md` の文書7分類モデルに照らして最終分類を確定し暫定分類を上書きする。確定時のバリデーション（暫定分類の7値チェック、フィールド欠落時の停止、最終分類上書き値の7値チェック）は後述「tentative_classification 最終確定のバリデーション（v2:REQ-0155-008）」に定める
+  - 文書分類妥当性検証（SPEC 分離基準違反残留検出）
+    - Decision要否確認ゲート（`agentdev-architecture-advisory` 経由でアーキテクチャ助言サブエージェントへ委譲）
+    - アーキテクチャ助言サブエージェントへの入力標準テンプレート使用 + 出力 4 ラベル構造要求（REQ-004-073）。ラベル構造は soft-contract（DEC-003）とし、分類権限は親が保持する
+  - 実行主体分類表（REQ-003-007）（委譲契約を定義する場合、実行主体分類表（adapter skill / command / subagent / harness）を必須とする（`docs/specs/workflows/delegation-contracts.md` 参照））。委譲を含まない要件では省略可
+  - Test strategy 定義（要件展開内）
+    - 各 test strategy 項目を verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素構造として定義
+    - on_failure（不合格時の処置）を持たない検証項目は test strategy に含めない
+    - 項目識別子: TS-NNN 形式（NNNは3桁ゼロ埋め連番）
+    - 各項目属性: id（TS-NNN）、target_item（AG-* への参照）、verification、pass_criteria、on_failure
+    - on_failure アクション種別: fix-and-reverify（実装を修正して再検証）/ record-in-findings（Findings に out-of-scope として記録）の2値
+- Decision判断（`agentdev-decision-guidelines`）
+  - 既存Decision重複確認
+  - Decision禁止ゲート
+  - Decision判断根拠記録
+  - 作業手段Decision拒否ゲート
+  - Decision 番号指定形式（`new:{topic-slug}` 形式）
+- 要件doc生成（テンプレート: `templates/req-define/req-draft.md`）
+  - 定義完全性ゲート（QG-1）
+  - operation_units 生成
+  - artifact_actions 生成
+  - draft-data test_strategy 生成（各項目の5属性をYAML形式で格納）
+- work_type 判定（bugfix/feature/maintenance/docs_chore）
+- Scale判断（featureのみ、`agentdev-workflow-lifecycle`）
+  - 実装スコープシグナル確認
+- ドラフト保存（`.agentdev/drafts/req-draft-{topic-slug}.md`）
+  - 実装詳細の分離
+  - auto_gate完了ゲート（auto_gate.auto_ready:false または未解決 item 残存時、stop_reasons を提示し解消方策を壁打ちで合意）。解消時は auto_ready:true に更新。ユーザーが明示的に false 選択時は conflict_resolutions に記録し継続。未解決のままの場合は壁打ちへ差し戻し
+- 要件doc確認（ユーザー提示のみ、承認は求めない）
+  - 複数RU受付、統合/分離判定、出力生成、Epic規模検出、Wave候補記録、OU 構造検証
+- 完了報告（work_type 別テンプレート選択）
+
+req-define は Workflow Skill と手順番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって対応付ける（v2:REQ-0143-005）。
 詳細は `command-file-format.md`「command SPEC と command 定義の対応付け（v2:REQ-0143-005）」参照。
 
 ### tentative_classification 最終確定のバリデーション（v2:REQ-0155-008）
 
-Step 5-2 が backlog-review 付与の暫定分類（`tentative_classification`）を最終分類として確定（上書き）する際、以下を検証すること:
+分類ゲート（最終分類確定ステップ）が backlog-review 付与の暫定分類（`tentative_classification`）を最終分類として確定（上書き）する際、以下を検証すること:
 
 1. 暫定分類が v2:REQ-0155-003 の7値のいずれかであること。7値以外の場合、確定を停止し理由を提示すること
 2. フィールドが欠落している場合、暫定分類未付与として確定を停止し、backlog-review への差し戻しを提示すること
@@ -123,9 +125,9 @@ req-define は RU から引き継いだ分類根拠（`artifact-contracts.md`「
 
 backlog-review が付与する `tentative_classification`（v2:REQ-0155-003 の7値）は暫定値であり、req-define が最終分類を上書きする。最終分類確定時のバリデーション（7値チェック、フィールド欠落時の停止、上書き値の7値チェック）は前述「tentative_classification 最終確定のバリデーション」に従う。
 
-### Step 3 構造的分析フレーム先行手順（REQ-004-083, REQ-004-084, REQ-004-085）
+### 壁打ち対話 構造的分析フレーム先行手順（REQ-004-083, REQ-004-084, REQ-004-085）
 
-Step 3（壁打ち対話）の開始時に、入力（RU、セッションコンテキスト、明示入力ファイル）の構造を入力データの性質に応じた分析フレームで先行して整理し、個別論点の深掘り前に全体構造をユーザーに提示する。
+壁打ち対話の開始時に、入力（RU、セッションコンテキスト、明示入力ファイル）の構造を入力データの性質に応じた分析フレームで先行して整理し、個別論点の深掘り前に全体構造をユーザーに提示する。
 
 #### 分析フレームの選択
 
@@ -190,7 +192,7 @@ test_strategy:
 
 ## artifact_actions 生成
 
-req-define は `artifact_actions` の producer である。Step 7-3 で要件展開の結果を `draft-data` の `artifact_actions` へ出力する。本節は req-define 側の生成契約（operation の選択基準、`spec-append` の生成、誤記との機械的区別、後方互換）を規定する。各 operation の `target_area` と `content` の出力形式は後段「[draft-data artifact_actions フィールド形式](#draft-data-artifact_actions-フィールド形式)」を参照。
+req-define は `artifact_actions` の producer である。要件doc生成の artifact_actions 生成で要件展開の結果を `draft-data` の `artifact_actions` へ出力する。本節は req-define 側の生成契約（operation の選択基準、`spec-append` の生成、誤記との機械的区別、後方互換）を規定する。各 operation の `target_area` と `content` の出力形式は後段「[draft-data artifact_actions フィールド形式](#draft-data-artifact_actions-フィールド形式)」を参照。
 
 ### operation の選択基準
 
@@ -248,7 +250,7 @@ req-define 側は出力形式のみを規定する。
 
 ## review_dispositions の producer 契約
 
-req-define は `review_dispositions` の producer である。Step 7-5 で壁打ち過程の採否判断を `draft-data` の `review_dispositions` へ出力する。
+req-define は `review_dispositions` の producer である。要件doc生成で壁打ち過程の採否判断を `draft-data` の `review_dispositions` へ出力する。
 
 ### 出力義務
 
@@ -337,7 +339,7 @@ req-define は、後続工程で決定する必要がある未確定事項、必
 
 ### 抑止条件
 
-Step 10-2（auto_gate完了ゲート）の判定前に、以下の2系統の検査を組み合わせて `auto_gate.auto_ready` を確定する。
+auto_gate完了ゲートの判定前に、以下の2系統の検査を組み合わせて `auto_gate.auto_ready` を確定する。
 
 #### (A) 決定的マーカー検査
 
@@ -389,7 +391,7 @@ auto_gate:
 
 ### 後続ステップへの引き継ぎ
 
-抑止により `auto_ready: false` となった場合、Step 10-2（auto_gate完了ゲート）の既存手順に従い `stop_reasons` をユーザーへ提示し、壁打ち（Step 3）で解消方策を合意する。合意により未確定事項が解消され、(A)(B) いずれの検査も該当しなくなった場合に限り `auto_ready: true` へ更新する。ユーザーが「`auto_ready: false` のまま標準フローで手動実行する」と明示的に選択した場合は `conflict_resolutions` へ記録して継続する（REQ-004-048）。
+抑止により `auto_ready: false` となった場合、auto_gate完了ゲートの既存手順に従い `stop_reasons` をユーザーへ提示し、壁打ち対話で解消方策を合意する。合意により未確定事項が解消され、(A)(B) いずれの検査も該当しなくなった場合に限り `auto_ready: true` へ更新する。ユーザーが「`auto_ready: false` のまま標準フローで手動実行する」と明示的に選択した場合は `conflict_resolutions` へ記録して継続する（REQ-004-048）。
 
 ## Artifact Graph 利用
 
@@ -412,7 +414,7 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 - 関連ドキュメントの個別ファイル列挙をユーザーに求める（G02）
 - `.agentdev/drafts/**` 以外のファイル作成、編集（G03）
 - ユーザー明示入力ファイルの変更、削除、RU 削除（G04）
-- `docs/` 配下の広範な探索（G05。例外: 明示入力ファイル、`docs/requirements/**` 参照、Step 5-1 限定探索）
+- `docs/` 配下の広範な探索（G05。例外: 明示入力ファイル、`docs/requirements/**` 参照、変更影響候補抽出の限定探索）
 - `inbox.md` / `deferred.md` 直接ロード（G06）
 - 採用済み成果物の直読み（G07）
 - `git` コマンド実行（G08）
@@ -424,11 +426,11 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 
 ## 検証観点
 
-- QG-1（Definition Integrity Gate）: Step 7-1 で要件doc構造的完全性を検証（REQ/SPEC 分類、Decision ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成妥当性）
+- QG-1（Definition Integrity Gate）: 定義完全性ゲートで要件doc構造的完全性を検証（REQ/SPEC 分類、Decision ゲート、チェックボックス測可能性、必須フィールド完全性、artifact_actions 構成妥当性）
  - test_strategy 3要素完全性検査: 各 test strategy 項目が verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持すること。いずれかが欠落する項目を検出した場合、fail とする
 - チェックボックス品質基準: `agentdev-req-analysis` に従い測定可能で一意（G09）
 - artifact_actions 構成: REQ/Decision/SPEC 別 action が適切に統合されているか
-- OU 構造検証: Step 11-6 で ou_id、operation、target_req/target_spec、depends_on、result 整合性
+- OU 構造検証: 要件doc確認工程で ou_id、operation、target_req/target_spec、depends_on、result 整合性
 
 ## See Also（oracle 抽象化後）
 
@@ -451,22 +453,22 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 
 ### 挿入位置（REQ-015-004）
 
-review 挿入位置は「Scale 判断後・Decision判断前・要件doc生成前」と一意に特定可能である。現行 Step 構造への対応付けを次に示す。
+review 挿入位置は「Scale 判断後・Decision判断前・要件doc生成前」と一意に特定可能である。処理段階への対応付けを次に示す。
 
 | 条件 | feature の場合 | feature 以外（bugfix, maintenance, docs_chore）の場合 |
 |---|---|---|
-| Scale 判断後 | Step 9（Scale判断）完了後 | Step 8（work_type 判定）完了後。Scale判断 は feature のみ実行するため、work_type 判定完了をもって意味的完成とする |
-| Decision判断前 | Step 6（Decision判断）の判断結果が Step 10（ドラフト保存）で永続化される前 | 同左 |
-| 要件doc生成前 | Step 7（要件doc生成）の成果物が Step 10（ドラフト保存）で永続化される前 | 同左 |
+| Scale 判断後 | Scale判断完了後 | work_type 判定完了後。Scale判断 は feature のみ実行するため、work_type 判定完了をもって意味的完成とする |
+| Decision判断前 | Decision判断の判断結果がドラフト保存で永続化される前 | 同左 |
+| 要件doc生成前 | 要件doc生成の成果物がドラフト保存で永続化される前 | 同左 |
 
-review は Step 9（feature 以外は Step 8）完了後、Step 10（ドラフト保存）の前に挿入する。Step 6（Decision判断）および Step 7（要件doc生成）は当該時点で実行済みであるが、その成果物は Step 10 で永続化されるまで確定扱いとならない。review の finding は Step 6、Step 7 の成果物へ反映可能であり、ADR finding は Step 6（Decision判断）へ戻す。
+review は Scale判断（feature 以外は work_type 判定）完了後、ドラフト保存の前に挿入する。Decision判断および要件doc生成は当該時点で実行済みであるが、その成果物はドラフト保存で永続化されるまで確定扱いとならない。review の finding は Decision判断、要件doc生成の成果物へ反映可能であり、ADR finding は Decision判断へ戻す。
 
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
 発動条件判定と review 呼出を分離する（REQ-015-001）。発動条件判定 Step は default-on 原則（REQ-015-002）と skip 条件（REQ-015-003）を評価する。
 
 - **default-on（原則実行）**: req-define は adversarial-review を原則実行する（REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、review 対象の意味的決定（要件展開、Decision要否判定、Scale判断）が存在する場合に発動する。
-- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（review を挿入せず Step 10 へ進む）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（review を挿入せずドラフト保存へ進む）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - Scale が L0（独立、自明）で Decision判断対象が存在せず、review 対象となる意味的決定が存在しない場合
 - **ユーザー明示指定時の必須実行**: ユーザーが req-define 実行中に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
 
@@ -476,11 +478,11 @@ review は Step 9（feature 以外は Step 8）完了後、Step 10（ドラフ�
 
 - **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts SPEC](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
 - **review 対象**: 当該 req-define で生成した要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）。
-- **採用後戻り先**: accepted finding のうち ADR 関連の finding は Step 6（Decision判断）へ戻し再評価する。要件展開に関わる finding は該当 Step（Step 5 以降）へ戻す。accepted finding の対象候補への反映は req-define（呼出元）の責務である（REQ-014-006）。
-- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、Step 10（ドラフト保存）へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[workflow-contracts SPEC](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節）。
+- **採用後戻り先**: accepted finding のうち ADR 関連の finding は Decision判断へ戻し再評価する。要件展開に関わる finding は該当段階（要件展開以降）へ戻す。accepted finding の対象候補への反映は req-define（呼出元）の責務である（REQ-014-006）。
+- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、ドラフト保存へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[workflow-contracts SPEC](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節）。
 - **呼出失敗時**: adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
 
 ### 最初の副作用（要件doc保存）との順序
 
-review は Step 10（ドラフト保存）より前に実行する。ドラフト保存が req-define の最初の副作用（`.agentdev/drafts/req-draft-{topic-slug}.md` のファイル作成）であるため、review は最初の副作用の前に挿入される。review の結果、要件候補が変更された場合は、Step 10 で保存されるドラフトへ反映する。
+review はドラフト保存より前に実行する。ドラフト保存が req-define の最初の副作用（`.agentdev/drafts/req-draft-{topic-slug}.md` のファイル作成）であるため、review は最初の副作用の前に挿入される。review の結果、要件候補が変更された場合は、ドラフト保存で保存されるドラフトへ反映する。
 

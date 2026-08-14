@@ -1,5 +1,5 @@
 ---
-updated: 2026-08-10
+updated: 2026-08-14
 status: accepted
 ---
 
@@ -93,8 +93,15 @@ case-run が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、ca
 各Command の11分析軸（公開契約・主要処理段階・分岐・副作用・HITL・並列性・resume・durable state・Harness依存・Capability依存・内部workflow候補）を記載する。
 個別Workflow Skill 移行（Wave 2）および Capability Skill 抽出の参照証拠とする。
 
-> 各項目は Command 定義ファイル（`.opencode/commands/agentdev/*.md`）を観測元とする。
-> Command 定義が SSoT であり、本カタログは参照ビューである。
+本カタログは architecture view である。各項目の権威情報源は以下の所有関係に従う。
+
+- public contract（入出力契約、副作用、安全性、承認境界、stop state、ordering contract）
+  → Command SPEC が正規文書、Command 定義はその実行時投影。両者不一致時は Command SPEC を正とする。
+- workflow implementation → Workflow Skill
+- durable state contract → Workflow / STEP SPEC
+
+「Command 定義が SSoT である」という旧表現は workflow 実装の権威情報源が Command にあることを
+含意するため使用しない。
 
 ### 一覧表
 

@@ -2,7 +2,7 @@
 title: case-update SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-14
 ---
 
 # case-update SPEC
@@ -30,14 +30,16 @@ updated: 2026-07-18
 
 ## 現在の動作
 
-- Step 1: Issue番号解決（ユーザー入力またはセッション内会話から取得）。`gh issue list` / `gh issue status` 等は禁止（G03）
-- Step 2: 現在の Issue 状態を取得、フェーズ判定（`agentdev-workflow-routing`、`agentdev-workflow-lifecycle`）
-- Step 3: 更新内容に応じて分岐:
- - `--body`（Issue 本文更新）。Issue 作成時と同じテンプレート構造を維持（G06）。`--body-file` 使用（G08）、`agentdev-gh-cli` VERIFY（G09）
- - `--comment`（コメント追加）。テンプレート【必須】セクション確認（G07）、`--body-file` 使用、VERIFY
- - `--req`（REQ ファイル更新（APPEND/UPDATE 対応）、git commit/push）
- - `--review-ng`（レビュー NG コメント）。**必ず QG-3 の乖離検出結果を引用**（G05）
-- Step 4: 完了報告
+処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-update`）が権威情報源である。
+
+- Issue番号解決: ユーザー入力またはセッション内会話から取得。`gh issue list` / `gh issue status` 等は禁止（G03）
+- 現在状態取得: Issue 状態を取得し、フェーズ判定（`agentdev-workflow-routing`、`agentdev-workflow-lifecycle`）
+- 更新種別ごとの分岐:
+  - `--body`（Issue 本文更新）。Issue 作成時と同じテンプレート構造を維持（G06）。`--body-file` 使用（G08）、`agentdev-gh-cli` VERIFY（G09）
+  - `--comment`（コメント追加）。テンプレート【必須】セクション確認（G07）、`--body-file` 使用、VERIFY
+  - `--req`（REQ ファイル更新（APPEND/UPDATE 対応）、git commit/push）
+  - `--review-ng`（レビュー NG コメント）。**必ず QG-3 の乖離検出結果を引用**（G05）
+- 完了報告
 
 ## 参照する横断 SPEC
 

@@ -2,7 +2,7 @@
 title: req-save SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-28
+updated: 2026-08-14
 ---
 
 # req-save SPEC
@@ -30,7 +30,7 @@ req-define で壁打ちした成果物を REQ/Decision ファイルとして doc
 
 - ファイル作成/更新: `docs/requirements/**`, `docs/decisions/**`, `docs/README.md`, `.agentdev/drafts/**`
 - git 操作: commit + push（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
-- 読込時 hash 記録 → Step 9-1 で `git pull --ff-only` 後 hash 一致検証（G08）
+- 読込時 hash 記録 → リモート同期（`git pull --ff-only`）後の hash 一致検証（G08）
 - Issue 作成: 行わない（G11、case-open 責務）
 - deviation capture: req-save 実行中に実観測した deviation を agentdev-learning-capture skill または
   agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。
@@ -41,21 +41,17 @@ req-define で壁打ちした成果物を REQ/Decision ファイルとして doc
 
 ## 現在の動作
 
-- Step 1: draft-dataの`artifact_actions`にREQ/Decision対象actionがあるか確認し、存在しない場合はno-opとして完了する。
-- Step 2: draftを読み、必須フィールドと入力hashを記録する。
-- Step 3: draft構造、文書分類、許可範囲を検証する。
-  - OU ID指定時は指定OUに属するREQ/Decision対象actionだけを処理する。
-  - OU ID未指定時はdraft全体のREQ/Decision対象actionを処理する。
-  - OUが複数存在することだけを理由に停止しない。
-- Step 4: REQ/Decision actionを保存し、要件表、ID、frontmatter、採番結果を検証する。
-- Step 5: README への影響を確認し、派生文書を整合させる。
-- Step 6: Decision actionを保存する。
-- Step 7: changed-docs検査を実行する。
-- Step 8: README 索引影響を確認する。
-- Step 9: 許可パスとリモート同期を検証する。
-- Step 10: draftの保存状態とOU resultを更新する。
-- Step 11: commit、pushする。
-- Step 12: 保存結果と次工程を報告する。
+処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-req-save`）が権威情報源である。
+
+- 事前チェック: draft-data の `artifact_actions` に REQ/Decision 対象 action があるか確認する。存在しない場合は no-op として完了する
+- 読込と検証: draft を読み、必須フィールドと入力 hash を記録する。draft 構造、文書分類、許可範囲を検証する
+  - OU ID 指定時は指定 OU に属する REQ/Decision 対象 action だけを処理する
+  - OU ID 未指定時は draft 全体の REQ/Decision 対象 action を処理する
+  - OU が複数存在することだけを理由に停止しない
+- 保存: REQ/Decision action を保存し、要件表、ID、frontmatter、採番結果を検証する。README への影響を確認し、派生文書を整合させる
+- 検証: changed-docs 検査、README 索引影響確認、許可パスとリモート同期を検証する
+- 永続化: draft の保存状態と OU result を更新し、commit、push する
+- 報告: 保存結果と次工程を報告する
 ## 参照する横断 SPEC
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、コマンド分類）
@@ -69,7 +65,7 @@ req-define で壁打ちした成果物を REQ/Decision ファイルとして doc
 
 REQ 保存工程で targeted docs guard を実行する。対象は保存工程で変更された REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）。
 
-- 実行タイミング: Step 7（docs 変更整合性検証）の直後、Step 8（README 索引影響確認）の前
+- 実行タイミング: docs 変更整合性検証の直後、README 索引影響確認の前
 - 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow req-save --files <changed REQ files> --json`
 - 検査項目: REQ frontmatter 必須項目、ファイル名・ID の一致、要件行 ID 形式の妥当性、WHAT/HOW 境界逸脱検出、`docs/requirements/README.md` 同期、README 索引更新要否判定、ADR 参照相互参照更新要否判定、関連 SPEC 候補時の `docs/specs/README.md` 更新要否判定、旧SPEC直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、文書種別責務と日本語執筆規範の機械化可能範囲の検査
 - 失敗時: 検査対象文書（REQ ファイル、`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）を修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行を検討する
@@ -94,7 +90,7 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 - REQ番号の空き番号再利用（G05、`agentdev-req-file-manager` 採番ルール遵守）
 - `doc_requirement.md` テンプレート必須セクションの欠落（G06）
 - push 後の status 更新（G07、commit 対象に status 変更を含めること）
-- Step 9-1 の hash 一致検証省略（G08）
+- リモート同期時の hash 一致検証省略（G08）
 - Issue 作成（G11、case-open 責務）
 - intake / learning capture の直接実施（G12）。deviation capture は Skill 委譲で実施（「副作用」セクション参照）
 - SPEC artifact_actions の処理（spec-save 責務）
@@ -102,7 +98,7 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 
 ## 検証観点
 
-- QG-1（Definition Integrity Gate）: Step 4 の前置条件として「適用結果の整合性検証」を実行（採番結果の整合性、マージ結果の整合性、インデックスの整合性、変更範囲の妥当性）。内容の品質は req-define の QG-1 の責務（REQ-004-081/082）
+- QG-1（Definition Integrity Gate）: REQ/Decision ファイル保存の前置条件として「適用結果の整合性検証」を実行（採番結果の整合性、マージ結果の整合性、インデックスの整合性、変更範囲の妥当性）。内容の品質は req-define の QG-1 の責務（REQ-004-081/082）
 - Decision 妥当性再検証ゲート: Decision 保存直前に技術判断含有確認、REQ/SPEC 相当の内容のみなら停止
 - Decision 採番: `agentdev-decision-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定番号を付与
 - 出力制約: 成果物本文（REQ/Decision ファイル本文、commit message）は verbatim で返す（G10）

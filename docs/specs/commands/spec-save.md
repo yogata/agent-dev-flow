@@ -2,7 +2,7 @@
 title: spec-save SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-10
+updated: 2026-08-14
 ---
 
 # spec-save SPEC
@@ -35,21 +35,23 @@ req-save の次、case-open の前に実行する。
 
 ## 現在の動作
 
-- Step 1: 事前チェック（`draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認）。なければ no-op 完了。ドラフト不存在時はエラー中止
-- Step 2: SPEC artifact_actions 読込（`artifact: spec` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は SPEC 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（公式 enum: create/update、非正規 alias: spec-create/spec-update/spec-append、REQ-008-058）、`content` を処理対象とする
-- Step 3: 配置先解決（既存 SPEC パス（例: `docs/specs/foundations/patterns.md`）→ update 操作）。`target_spec: {operation, domain, slug}` 構造化 → 新規 SPEC 作成（`docs/specs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-001-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
-- Step 4: SPEC 分離基準の最終確認（各 action が REQ-001-055（SPEC に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-001-069）相当は除外し follow-up に明示
-- Step 5: SPEC ファイル操作。`target_area` 見出し検索は `agentdev-spec-file-manager/scripts/` の決定的スクリプトで実行
+処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-spec-save`）が権威情報源である。
+
+- 事前チェック: `draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認。なければ no-op 完了。ドラフト不存在時はエラー中止
+- SPEC artifact_actions 読込（`artifact: spec` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は SPEC 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（公式 enum: create/update、非正規 alias: spec-create/spec-update/spec-append、REQ-008-058）、`content` を処理対象とする
+- 配置先解決（既存 SPEC パス（例: `docs/specs/foundations/patterns.md`）→ update 操作）。`target_spec: {operation, domain, slug}` 構造化 → 新規 SPEC 作成（`docs/specs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの SPEC へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-001-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
+- SPEC 分離基準の最終確認（各 action が REQ-001-055（SPEC に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-001-069）相当は除外し follow-up に明示
+- SPEC ファイル操作。`target_area` 見出し検索は `agentdev-spec-file-manager/scripts/` の決定的スクリプトで実行
   - create / spec-create: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
   - update / spec-update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
   - spec-append: 既存 SPEC ファイルへ `target_area`（anchor）と `placement` に基づき `content` を新規セクションとして追加。frontmatter `updated` を更新。`status` は変更しない。詳細は「spec-append 操作時のセクション追加ロジック」セクション参照
   - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
-- Step 6: インデックス整合（新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加）。既存 SPEC 追記時は README 更新不要。エントリ存在確認は決定的スクリプトで実行
-- Step 7: SPEC 一覧整合確認（SPEC 操作が `docs/specs/README.md` の SPEC 一覧に影響するか確認し、影響がある場合は更新）
-- Step 8: ドラフト status 更新（`draft-data` に SPEC 消費済みフラグを付与）。commit/push より前に更新し commit 対象に含める
-- Step 9: 変更範囲検証（許可パス照合は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行。`git diff --name-only` で `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を検出したらエラー報告、指示待ち（自動破棄しない））
-- Step 10: コミット、プッシュ（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
-- Step 11: 完了報告（保存した SPEC 一覧（新規/追記別）、スキップ有無、follow-up（安定契約例外で除外した候補））
+- インデックス整合（新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加）。既存 SPEC 追記時は README 更新不要。エントリ存在確認は決定的スクリプトで実行
+- SPEC 一覧整合確認（SPEC 操作が `docs/specs/README.md` の SPEC 一覧に影響するか確認し、影響がある場合は更新）
+- ドラフト status 更新（`draft-data` に SPEC 消費済みフラグを付与）。commit/push より前に更新し commit 対象に含める
+- 変更範囲検証（許可パス照合は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行。`git diff --name-only` で `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を検出したらエラー報告、指示待ち（自動破棄しない））
+- コミット、プッシュ（`agentdev-conventional-commits` + `agentdev-git-worktree` 並列実行安全ステージング）
+- 完了報告（保存した SPEC 一覧（新規/追記別）、スキップ有無、follow-up（安定契約例外で除外した候補））
 
 ## 配置一貫性検証
 
@@ -232,7 +234,7 @@ strict failureが存在する場合は修正して再実行する。
 - `docs/specs/**`, `.agentdev/drafts/**`, `docs/specs/README.md` 以外のファイル作成、編集（G02、G03）。REQ ファイル（`docs/requirements/**`）、Decision（`docs/decisions/**`）、コマンド、スキル、テンプレート編集禁止
 - SPEC 対象 artifact_actions がない場合の SPEC ファイル作成、編集（G04）
 - 新規 SPEC 作成時の `status: draft` 省略（G05）
-- 既存 SPEC 追記時の `status` 変更（G06、`status: accepted` 昇格は case-close Step 3 責務）
+- 既存 SPEC 追記時の `status` 変更（G06、`status: accepted` 昇格は case-close 責務）
 - SPEC status が `draft` の SPEC を IR-044（REQ/SPEC 境界違反検出）の対象に含めること（G07）
 - REQ-001-055（SPEC 分離基準）不適合 action の保存（G08、安定契約例外 REQ-001-069 は follow-up 扱い）
 - 実行時コマンドが SPEC ファイルに依存する記述（G09、REQ-001 実行時非依存維持）

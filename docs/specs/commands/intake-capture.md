@@ -2,7 +2,7 @@
 title: intake-capture SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-14
 ---
 
 # intake-capture SPEC
@@ -30,13 +30,15 @@ updated: 2026-07-18
 
 ## 現在の動作
 
-- Step 1: 入力受領
-- Step 2: intake item 生成（推奨標準形に整理、ユーザー未指定セクションは省略（G13: 過度補完禁止、G11: 過度解釈禁止））
-- Step 3: ファイル名生成（`YYYY-MM-DD-{topic-slug}.md`）
-- Step 3-1: 実行前同期（`git pull --ff-only`）
-- Step 4: 保存（`.agentdev/intake/inbox/`）。同名時は連番付与
-- Step 4-1: commit/push（`.agentdev/intake/` 配下変更のみ）
-- Step 5: 完了報告
+処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-intake-capture`）が権威情報源である（capture-only 型、REQ-027-003 により STEP model 対象外）。
+
+- 入力受領
+- intake item 生成（推奨標準形に整理、ユーザー未指定セクションは省略（G13: 過度補完禁止、G11: 過度解釈禁止））
+- ファイル名生成（`YYYY-MM-DD-{topic-slug}.md`）
+- 実行前同期（`git pull --ff-only`）
+- 保存（`.agentdev/intake/inbox/`）。同名時は連番付与
+- commit/push（`.agentdev/intake/` 配下変更のみ）
+- 完了報告
 
 ## 参照する横断 SPEC
 

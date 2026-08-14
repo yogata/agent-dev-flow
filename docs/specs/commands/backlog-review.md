@@ -2,7 +2,7 @@
 title: backlog-review SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-10
+updated: 2026-08-14
 ---
 
 # backlog-review SPEC
@@ -14,9 +14,9 @@ updated: 2026-08-10
 
 ## HITL 境界、自動実行ルール（REQ-003-003/004/005/009）
 
-- **HITL は「判断の確定」に限定**（REQ-003-003）: Step 5 の統合、分割判定承認が主要な HITL 対象。
-- **矛盾なしの場合の単一承認**（REQ-003-009）: Step 5 で矛盾が検出されない場合、Step 5 の統合、分割判定承認を RU 生成承認（Step 6/7）としても扱い、単一承認で処理する。追加の HITL は不要。
-- **矛盾検出時の追加判断**（REQ-003-009）: Step 6 で矛盾が検出された場合のみ、ユーザーに追加判断を求める（矛盾する artifact を RU 化せず確認、矛盾しない artifact は通常通り RU 化）。
+- **HITL は「判断の確定」に限定**（REQ-003-003）: 統合、分割判定承認が主要な HITL 対象。
+- **矛盾なしの場合の単一承認**（REQ-003-009）: 矛盾が検出されない場合、統合、分割判定承認を RU 生成承認としても扱い、単一承認で処理する。追加の HITL は不要。
+- **矛盾検出時の追加判断**（REQ-003-009）: 矛盾が検出された場合のみ、ユーザーに追加判断を求める（矛盾する artifact を RU 化せず確認、矛盾しない artifact は通常通り RU 化）。
 - **承認後の自動実行**（REQ-003-004）: 承認確定後の RU 生成、採用済み成果物削除、commit/push は自動実行する。
 - **破壊的変更の明示承認維持**（REQ-003-005）: 矛盾解消、要件仕様スコープ変更、大量成果物削除等の破壊的操作は明示承認を維持する。
 
@@ -41,15 +41,17 @@ updated: 2026-08-10
 
 ## 現在の動作
 
-- Step 1: 実行前同期（`git pull --ff-only`）
-- Step 2: 成果物検出（引数有無切り替え（引数あり: 指定ファイルのみ / 引数なし: `promoted/` 全件））
-- Step 3: 成果物読込、分析 + 暫定分類付与（`agentdev-backlog-integration` 参照）。暫定分類は `docs/specs/foundations/document-model.md` の文書7分類モデルを参照して付与し、RU frontmatter `tentative_classification` に記録する（v2:REQ-0155-004）。`tentative_classification` の許容値、7値以外入力時、フィールド欠落時の取り扱いは v2:REQ-0155-008、後述「tentative_classification フィールド仕様」に定める。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本コマンドが確定しない
-- Step 4: 統合分割判定 + depends_on 依存解決 + ユーザー承認（判断の確定、REQ-003-003）（`agentdev-backlog-integration` 参照）
-- Step 5: 矛盾検出（矛盾検出時のみ追加判断を求める（REQ-003-009））。矛盾なしの場合、Step 4 の統合、分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない（G05）
-- Step 6: RU 生成（採用済み成果物の単純コピー（パススルー）は禁止（G03、REQ-008））
-- Step 7: 成果成果物削除（RU 生成失敗成果物は削除しない（G06））
-- Step 8: Git 永続化
-- Step 9: 完了報告
+処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-backlog-review`）が権威情報源である。
+
+- 実行前同期（`git pull --ff-only`）
+- 成果物検出（引数有無切り替え（引数あり: 指定ファイルのみ / 引数なし: `promoted/` 全件））
+- 成果物読込、分析 + 暫定分類付与（`agentdev-backlog-integration` 参照）。暫定分類は `docs/specs/foundations/document-model.md` の文書7分類モデルを参照して付与し、RU frontmatter `tentative_classification` に記録する（v2:REQ-0155-004）。`tentative_classification` の許容値、7値以外入力時、フィールド欠落時の取り扱いは v2:REQ-0155-008、後述「tentative_classification フィールド仕様」に定める。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本コマンドが確定しない
+- 統合分割判定 + depends_on 依存解決 + ユーザー承認（判断の確定、REQ-003-003）（`agentdev-backlog-integration` 参照）
+- 矛盾検出（矛盾検出時のみ追加判断を求める（REQ-003-009））。矛盾なしの場合、統合、分割判定承認を RU 生成承認として扱い、単一承認で処理する。自動解決しない（G05）
+- RU 生成（採用済み成果物の単純コピー（パススルー）は禁止（G03、REQ-008））
+- 成果物削除（RU 生成失敗成果物は削除しない（G06））
+- Git 永続化
+- 完了報告
 
 ## Artifact Graph 利用
 
@@ -150,40 +152,40 @@ backlog-review は全 RU frontmatter に `tentative_classification` を付与す
 
 ### 挿入境界と Step 構造（REQ-015-001）
 
-backlog-review の現行 Step 構造へ review 挿入境界を次のとおり一意に特定する。発動条件判定 Step と review 呼出 Step を分離する（REQ-015-001）。本節は挿入境界の正典であり、`.opencode/commands/agentdev/backlog-review.md` の Step 4-1 が実行時投影先となる。
+backlog-review の処理段階へ review 挿入境界を次のとおり一意に特定する。発動条件判定と review 呼出を分離する（REQ-015-001）。本節は挿入境界の正典であり、Workflow Skill（`agentdev-workflow-backlog-review`）内の発動条件判定手順が実行時実装先となる。
 
-| 段階 | 対応 Step | 役割 |
+| 段階 | 対応処理 | 役割 |
 |---|---|---|
-| 構成 | Step 3（分析 + 暫定分類付与）、Step 4（統合・分割判定 + depends_on 依存解決） | review 対象となる RU 構成案を確定する |
-| 発動条件判定 | Step 4 完了直後、Step 5 開始前（Step 4-1） | default-on 原則と skip 条件を判定する |
-| review 呼出 | 発動条件該当時、Step 5 開始前（Step 4-1） | adversarial-review を起動し、RU 構成案を審議対象へ渡す |
-| 承認 | Step 4 承認（矛盾なし時の単一承認）、Step 5（矛盾検出時の追加判断） | review 結果を踏まえユーザー承認を確定する |
+| 構成 | 分析 + 暫定分類付与、統合・分割判定 + depends_on 依存解決 | review 対象となる RU 構成案を確定する |
+| 発動条件判定 | 構成完了直後、矛盾検出開始前 | default-on 原則と skip 条件を判定する |
+| review 呼出 | 発動条件該当時、矛盾検出開始前 | adversarial-review を起動し、RU 構成案を審議対象へ渡す |
+| 承認 | 構成承認（矛盾なし時の単一承認）、矛盾検出時の追加判断 | review 結果を踏まえユーザー承認を確定する |
 
 ### 構成、review、承認の順序（REQ-015-008）
 
-経路E は構成、review、承認の順で進む（REQ-015-008）。review は構成（Step 3、Step 4）の完了後、承認（Step 4 承認、Step 5 追加判断）の前に挿入する。review を構成前に、または承認後に挿入しない。
+経路E は構成、review、承認の順で進む（REQ-015-008）。review は構成（分析、統合・分割判定）の完了後、承認（構成承認、矛盾検出時追加判断）の前に挿入する。review を構成前に、または承認後に挿入しない。
 
 ### 発動条件（REQ-015-002、REQ-015-003）
 
 backlog-review は adversarial-review を原則実行する（default-on、REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、RU 構成案（統合・分割判定、depends_on 依存解決）に意味的決定が存在する場合に発動する。
 
-- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（Step 5 以降）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（矛盾検出以降）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - RU 構成要素が1件のみ（統合・分割判定不要、depends_on 解決不要）で矛盾検出対象が存在しない場合
 - **ユーザー明示指定時の必須実行**: ユーザーが backlog-review 実行中に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
 
 ### 従来フロー維持（REQ-015-003）
 
-skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、従来フロー（Step 1〜9）を維持する（REQ-015-003）。review 挿入境界は既存 Step を追加、削除、並べ替えせず、発動条件判定と review 呼出 Step を分離した形で現行 Step 構造へ挿入する。
+skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、従来フロー（実行前同期から完了報告まで）を維持する（REQ-015-003）。review 挿入境界は既存処理段階を追加、削除、並べ替えせず、発動条件判定と review 呼出を分離した形で挿入する。
 
 ### 矛盾の扱い（REQ-015-008）
 
-adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は backlog-review の既存矛盾検出（Step 5、agentdev-backlog-integration 矛盾検出ロジック）へ渡す。adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛盾の解決、採用、却下、partial success 扱いは既存矛盾検出と HITL（REQ-003-009）へ委ねる。review 内で矛盾が発生したことを理由に対象 RU を自動除外、自動承認しない。
+adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は backlog-review の既存矛盾検出（agentdev-backlog-integration 矛盾検出ロジック）へ渡す。adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛盾の解決、採用、却下、partial success 扱いは既存矛盾検出と HITL（REQ-003-009）へ委ねる。review 内で矛盾が発生したことを理由に対象 RU を自動除外、自動承認しない。
 
 ### 戻り先と反映責務
 
-accepted finding の RU 構成案への反映は backlog-review 呼出元の責務である（REQ-014-006）。adversarial-review は finding を提示し、合意候補を形成するが、RU 本文、frontmatter、統合判定への反映を自身では行わない。反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出の再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。unresolved な本質的争点またはユーザー判断事項が残る場合、RU 生成（Step 6）、採用済み成果物削除（Step 7）、Git 永続化（Step 8）等の後続不可逆処理へ進まない（REQ-014-009）。
+accepted finding の RU 構成案への反映は backlog-review 呼出元の責務である（REQ-014-006）。adversarial-review は finding を提示し、合意候補を形成するが、RU 本文、frontmatter、統合判定への反映を自身では行わない。反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出の再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。unresolved な本質的争点またはユーザー判断事項が残る場合、RU 生成、採用済み成果物削除、Git 永続化等の後続不可逆処理へ進まない（REQ-014-009）。
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、agentdev-backlog-integration SPEC「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。backlog-review command 固有の挿入境界（発動条件、Step 構造、順序、矛盾取扱い）のみを本節が所有し、候補判断基準、内部手続きの詳細は agentdev-backlog-integration SPEC を正とする。
+本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、agentdev-backlog-integration SPEC「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。backlog-review command 固有の挿入境界（発動条件、挿入構造、順序、矛盾取扱い）のみを本節が所有し、候補判断基準、内部手続きの詳細は agentdev-backlog-integration SPEC を正とする。
 

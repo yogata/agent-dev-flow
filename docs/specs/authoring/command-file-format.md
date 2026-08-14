@@ -2,7 +2,7 @@
 title: "コマンドファイルフォーマット規約"
 status: accepted
 created: 2026-06-22
-updated: 2026-08-10
+updated: 2026-08-14
 ---
 
 # コマンドファイルフォーマット規約
@@ -29,17 +29,17 @@ workflow への参照は Workflow Skill 名レベルとする（REQ-002-017）�
 
 ## extensions 手順
 
-command 本文は extensions 手順（SPEC `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を固定しない。
+command 本文は extensions 手順（SPEC `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パスを固定しない。
 
-各 command は以下の共通記述を本文に持つ。extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`）を持ち、標準動作に追加・拡張される（上書きではない）。SPEC パス例示、検査対象パス指定は例外として許可する:
+各 command は以下の共通記述を本文に持つ。extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`）を持ち、標準動作に追加・拡張される（上書きではない）。
 
-- 実行時に対応する project extension（`.agentdev/extensions/commands/<command>.yaml`）を読み込む
+- 実行時に対応する project extension を読み込む。Workflow Skill は .agentdev/extensions/skills/{workflow-skill-name}.yaml（kind: workflow-extension）、Capability Skill は .agentdev/extensions/skills/{capability-skill-name}.yaml（kind: capability-skill-extension）を対象とする（詳細は SPEC `../foundations/project-extensions.md` 参照）
 - extension が存在しない場合は標準動作で続行する
-- extension が破損している場合はエラーを表示して無視し、標準動作で続行する
+- extension が破損している場合はエラーを表示して無視し、標準動作で続行する（REQ-002-031 準拠、fail-open）
 
-実行時に読むべき docs 文書への参照は command extension（`.agentdev/extensions/commands/<command>.yaml`）の `context` へ移す。command 本文に直接の docs パスを記述しない。
+実行時に読むべき docs 文書への参照は Workflow Skill extension の `context` へ移す。command 本文に直接の docs パスを記述しない。
 
-command extension はフロントマタ（`version: 1`, `kind: command-extension`, `id: /agentdev/<command>`）と、5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`、各配列）を持つ。`context` entry は `{id, when?, paths?, purpose?}`、`rules`/`checks` entry は `{id, when?, skill?}`、`acceptance_gates`/`must_not` は説明文字列のリストである。schema 詳細は SPEC `../foundations/project-extensions.md` 参照。
+extension はフロントマタ（`version: 1`, `kind:`（公式3値: workflow-extension / internal-workflow-extension / capability-skill-extension）, `id:`）と、5セクションを持つ。schema 詳細は SPEC `../foundations/project-extensions.md` 参照。旧 kind（command-extension / skill-extension）は廃止済みであり、検出時は migration-required として停止する。
 
 ## 手順セクション形式
 
@@ -93,8 +93,19 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 | numbered list 主手順 | `## 手順` 直下の numbered list による手順記述 |
 | `G01` 形式以外のガードレール番号 | `G` + ゼロ埋め2桁に一致しないガードレール識別子 |
 
+### thin Command モデル検査（公開 /agentdev/* Command 対象）
+
+公開 `/agentdev/*` Command について以下を検査対象に追加する。`/repo/*` Command は従来検査を維持し、公開 AgentDev Command と checker 上で区別する。
+
+| 検出項目 | 対象 |
+|----------|------|
+| Workflow Skill dispatch 不存在 | 公開 Command が Workflow Skill への dispatch を持たない |
+| workflow 手順本体の重複残存 | Command 本文に Workflow Skill が所有すべき workflow 手順が機械判定可能な形で残存する |
+| Capability Skill 内部 reference 直接依存 | Command 本文から Skill の references/* 等の内部パスへの直接参照 |
+
+意味的重複（soft contract 判断）は `/agentdev/inspect-skills` が所有する。機械検査は構造的に判定可能な項目のみを対象とする。
+
 > **非検出対象（許容形式）**: `**EN.**` lettered prefix（代替フロー内サブステップ表現）は主手順の Step 番号連番とは独立した番号空間を持つため、上記検出項目のいずれにも該当しない。
-> `check_command_format.ts` は `### Step N` 見出しのみを Step 番号連番検査の対象とし、`**EN.**` ボールド段落プレフィックスを検出対象外とする（「代替フロー内サブステップ表現」参照）。
 
 ## command SPEC と command 定義の対応付け
 

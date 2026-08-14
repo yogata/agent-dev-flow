@@ -2,7 +2,7 @@
 title: intake-promote SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-08-14
 ---
 
 # intake-promote SPEC
@@ -38,9 +38,9 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 ## HITL 境界、自動実行ルール（REQ-003-003/004/005/008）
 
-- **HITL は「判断の確定」に限定**（REQ-003-003）: Step 5 の分類承認（採用/保留/却下の確定）のみが HITL 対象。
-- **分類承認後の自動実行**（REQ-003-004/008）: Step 5 で分類が確定した場合、Step 6〜10（採用 item 整形 / promoted 保存 / 振り分け / inbox 削除 / git pull / commit-push）は追加確認なしで自動実行する。分類未確定、修正中の場合は進まない。
-- **破壊的変更の明示承認維持**（REQ-003-005）: inbox の大量削除、重要 item の誤分類是正等の破壊的操作は、Step 5 承認とは別に明示的な承認を求める。
+- **HITL は「判断の確定」に限定**（REQ-003-003）: 分類承認（採用/保留/却下の確定）のみが HITL 対象。
+- **分類承認後の自動実行**（REQ-003-004/008）: 分類が確定した場合、採用 item 整形 / promoted 保存 / 振り分け / inbox 削除 / git pull / commit-push は追加確認なしで自動実行する。分類未確定、修正中の場合は進まない。
+- **破壊的変更の明示承認維持**（REQ-003-005）: inbox の大量削除、重要 item の誤分類是正等の破壊的操作は、分類承認とは別に明示的な承認を求める。
 
 ## 入力
 
@@ -63,15 +63,15 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 ## 現在の動作
 
-5 フェーズ構成:
+5 フェーズ構成。各フェーズの詳細手順は Workflow Skill（`agentdev-workflow-intake-promote`）が権威情報源である。
 
-- フェーズ1 inbox スキャン: Step 1 inbox 確認、Step 2 item 読込
-- フェーズ2 内部レビュー: Step 3 レビュー評価、Step 4 分類提示
-- フェーズ3 HITL 確定（判断の確定、REQ-003-003）: Step 5 ユーザー確認（G06: ユーザー明示的承認必須、G07: 分類結果の提示と確認修正機会提供）
-- フェーズ4 振り分け（分類承認後の自動実行、REQ-003-008）: Step 6 採用 item 整形、Step 7 保存（`.agentdev/intake/promoted/`、フラット構造、frontmatter なし）、Step 8 振り分け（inbox 削除含む）
-- フェーズ5 git 操作完了報告（自動実行）: Step 9 git pull、Step 10 commit/push、Step 11 完了報告
+- フェーズ1 inbox スキャン: inbox 確認、item 読込
+- フェーズ2 内部レビュー: レビュー評価、暫定分類の生成と提示
+- フェーズ3 HITL 確定（判断の確定、REQ-003-003）: ユーザー確認（G06: ユーザー明示的承認必須、G07: 分類結果の提示と確認修正機会提供）
+- フェーズ4 振り分け（分類承認後の自動実行、REQ-003-008）: 採用 item 整形、保存（`.agentdev/intake/promoted/`、フラット構造、frontmatter なし）、振り分け（inbox 削除含む）
+- フェーズ5 git 操作完了報告（自動実行）: git pull、commit/push、完了報告
 
-**自動実行の前提**（REQ-003-008）: Step 5 で分類が確定（採用/保留/却下のいずれか）している場合のみ、フェーズ4、5 を自動実行する。
+**自動実行の前提**（REQ-003-008）: フェーズ3 で分類が確定（採用/保留/却下のいずれか）している場合のみ、フェーズ4、5 を自動実行する。
 分類未確定、修正中は進まない。
 
 ## 参照する横断 SPEC
@@ -116,7 +116,7 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 ### 挿入位置（REQ-015-006）
 
-review 挿入位置は現行 Step 構造へ一意に特定可能である。Step 4「分類の提示」（暫定分類生成）の完了後、Step 5「ユーザー確認」（ユーザ提示）の開始前とする。Step 4 で生成された暫定分類を review 対象とし、Step 5 でユーザへ提示する前に review を経た分類を提示する。候補判断基準と内部手続きの詳細は `agentdev-intake-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節を参照する。
+review 挿入位置は「暫定分類の生成完了後・ユーザー確認の開始前」へ一意に特定可能である。生成された暫定分類を review 対象とし、ユーザーへ提示する前に review を経た分類を提示する。候補判断基準と内部手続きの詳細は `agentdev-intake-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節を参照する。
 
 ### 発動条件判定 Step と review 呼出 Step の分離（REQ-015-001）
 
@@ -127,22 +127,22 @@ review 挿入位置は現行 Step 構造へ一意に特定可能である。Step
 | 発動条件判定 Step | default-on 原則、暫定分類の意味的完成度、review 対象の存在、skip 条件を判定する |
 | review 呼出 Step | 発動条件を満たす場合に限り adversarial-review を呼び出す |
 
-発動条件判定 Step を満たさない場合は review 呼出 Step へ進まない。command 定義（`.opencode/commands/agentdev/intake-promote.md`）は両 Step を独立した手順（Step 4a, Step 4b）として保持する。
+発動条件判定を満たさない場合は review 呼出を実行しない。Workflow Skill は発動条件判定と review 呼出を独立した手順として保持する。
 
 ### default-on と skip 条件（REQ-015-002、REQ-015-003）
 
-intake-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、暫定分類の意味的決定が存在する場合に発動する。明示指定はコマンド起動時の引数、対話中の指示、または extension（`.agentdev/extensions/commands/intake-promote.yaml`）の `rules` により表明される。
+intake-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、暫定分類の意味的決定が存在する場合に発動する。明示指定はコマンド起動時の引数、対話中の指示、または Workflow Skill extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`）の `rules` により表明される。
 
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - inbox 項目が1件のみで暫定分類が自明（単一区分確定、意味的決定なし）の場合
-  - inbox 空（Step 2 で終了）の場合
+  - inbox 空（inbox スキャンで終了）の場合
 - **ユーザー明示指定時の必須実行**: ユーザーが明示的に review を指定した場合、発動条件判定 Step は skip 条件の該当にかかわらず必ず「発動」と判定し、review 呼出 Step を実行する（REQ-015-002）。ただし review 対象（暫定分類）が存在しない場合は発動しない。
 
 ### 条件非該当時の従来フロー維持（REQ-015-003）
 
-skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、review 呼出 Step をスキップし、Step 4 で生成した暫定分類をそのまま Step 5「ユーザー確認」へ渡す従来フローを維持する（REQ-015-003）。既存の HITL（G06, G07, G08）、自動実行ルール（REQ-003-008）、破壊的変更制約（G18）は変更しない。
+skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、review 呼出をスキップし、生成済みの暫定分類をそのままユーザー確認へ渡す従来フローを維持する（REQ-015-003）。既存の HITL（G06, G07, G08）、自動実行ルール（REQ-003-008）、破壊的変更制約（G18）は変更しない。
 
 ### accepted finding の反映と戻り先
 
-review 呼出 Step で accepted finding が得られた場合、呼出元（intake-promote 本体）が暫定分類へ finding を反映し、反映後の分類を Step 5「ユーザー確認」へ渡す（REQ-014-006）。adversarial-review 自身は反映を行わない。unresolved な本質的争点が残る場合、Step 5 のユーザー確認で既存 HITL 経由で扱い、後続の保存、inbox 削除等の不可逆処理へは進まない（REQ-014-009）。呼出失敗時は silent skip を禁止し、利用不能を報告した上で従来フローを維持する（REQ-014-010）。
+review 呼出で accepted finding が得られた場合、呼出元（intake-promote 本体）が暫定分類へ finding を反映し、反映後の分類をユーザー確認へ渡す（REQ-014-006）。adversarial-review 自身は反映を行わない。unresolved な本質的争点が残る場合、ユーザー確認の既存 HITL 経由で扱い、後続の保存、inbox 削除等の不可逆処理へは進まない（REQ-014-009）。呼出失敗時は silent skip を禁止し、利用不能を報告した上で従来フローを維持する（REQ-014-010）。
 

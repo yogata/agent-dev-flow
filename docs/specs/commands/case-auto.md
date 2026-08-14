@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-09
+updated: 2026-08-14
 ---
 
 # case-auto SPEC
@@ -20,7 +20,7 @@ updated: 2026-08-09
 ## 出力
 
 - REQ/Decision artifact_actions がある場合: REQ/Decisionファイル + GitHub Issue + 実装済みブランチ + PR + マージ済み + クローズ済み
-- artifact_actions に応じた各工程の出力（工程分岐は Step 3 参照）
+- artifact_actions に応じた各工程の出力（工程分岐は「現在の動作」参照）
 
 ## 副作用
 
@@ -31,30 +31,32 @@ updated: 2026-08-09
 
 ## 現在の動作
 
-- Step 1: 入力解決
+処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-auto`）が権威情報源である。
+
+- 入力解決
   - 実行開始時刻の記録（REQ-006-082）（JST、人間が読みやすい形式で case_auto_started_at 変数に保持）
   - Issue番号/URL入力モード（^\d+$ または GitHub Issue URL の場合、case-run移行モードへ分岐）
   - 要件doc入力モード（引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定時は当該draft / セッション指定キーワード時はセッション内要件doc参照、暗黙判断は行わない）
-- Step 2: work_type 読取（draft-data から work_type 取得（参考情報、パイプライン分岐には使用しない、REQ-008-010））
-- Step 3: 工程分岐（work_type 固定分岐ではなく artifact_actions 存在による動的判定、REQ-008-009）
+- work_type 読取（draft-data から work_type 取得（参考情報、パイプライン分岐には使用しない、REQ-008-010））
+- 工程分岐（work_type 固定分岐ではなく artifact_actions 存在による動的判定、REQ-008-009）
   - Issue番号/URL入力: case-run（インライン）→ case-close（req-save、spec-save、case-open、work_type読取スキップ）
   - artifact_actions ベース分岐: artifact: req or artifact: decision → req-save / artifact: spec → spec-save（req-save の後）/ 常に → case-open / その後 → case-run（インライン）→ case-close
   - spec-save 実行判定（v2:ADR-0123 Decision #3, REQ-001-014）（req-save 完了後に artifact: spec entry 確認）
   - auto_gate preflight（auto_gate.auto_ready が false または未解決 item 残る場合は停止）
-- Step 4: 各工程の実行
+- 各工程の実行
   - 委譲工程（req-save / spec-save / case-open / case-close）: 実行担当サブエージェントとして起動（v2:ADR-0127, REQ-006-006/084/085）。req-save / spec-save 統合委譲で順次実行、case-open / case-close は各コマンド委譲契約に従い起動。委譲起動不能時に delegation-unavailable 報告（REQ-002-003/004）
-  - case-run（インライン実行）: case-auto が case-run.md を authoritative source として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
+  - case-run（インライン実行）: case-auto が case-run の Workflow Skill（`agentdev-workflow-case-run`）を権威情報源として読み込み、準備/クリーンアップフェーズを自ら実行。実行担当サブエージェント委譲フェーズでは case-auto から直接実行担当サブエージェントへ委譲（委譲起点の折りたたみ/002）。adapter skill（agentdev-case-run-execution-adapter）を case-auto が読み込む
   - 結果状態の4次元集約（REQ-006-110）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-006-110）」セクション
-- Step 4-1: Wave 反復制御（Epic Issue 指定時）
+- Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文から Wave 構成、各子Issue ステータスを読み取る（読み取りのみ、Epic Issue 本文の書き込みは case-close の責務）
   - case-auto が現在 Wave の ready 子Issue を選択し、各子Issue ごとにインライン case-run を実行（最大5件並列、REQ-006-026 踏襲）。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
   - Wave 内全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機
   - completed-pr の子Issue がある場合、case-close(#epic) へ委譲
   - 残 Wave がある場合、次 Wave を実行（べき等）
-- Step 5: 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
-- Step 6: 複数REQ対応（req-save 委譲の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）
-- Step 7: 停止条件の検出（停止時タイミング情報の追記。10項目の停止条件いずれかを検出時、実行停止）
-- Step 8: 完了報告（タイミング情報追記。インライン実行の適用を記録。結果状態の4次元報告（REQ-006-110）を含める）
+- 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
+- 複数REQ対応（req-save 委譲の出力から複数 REQ doc または scale:large 検出時、case-open の Issue 構造ルールを使用）
+- 停止条件の検出（停止時タイミング情報の追記。10項目の停止条件いずれかを検出時、実行停止）
+- 完了報告（タイミング情報追記。インライン実行の適用を記録。結果状態の4次元報告（REQ-006-110）を含める）
 
 ### 委譲起動不能時の扱い（REQ-002-003/004）
 
@@ -62,7 +64,7 @@ updated: 2026-08-09
 
 case-run インライン実行時の実行担当サブエージェントへの委譲失敗は、case-run result 契約（completed-pr / blocked / failed / delegation-unavailable）に従い処理する。delegation-unavailable の場合は当該子Issue を pending に戻す（REQ-002-004）。
 
-genuine blocker（実装上の問題、スコープ外操作、コンフリクト解消不能等）は Step 7 停止条件として扱う。
+genuine blocker（実装上の問題、スコープ外操作、コンフリクト解消不能等）は停止条件として扱う。
 
 context 管理:
 - case-run インライン実行時のコンテキスト管理は harness の責務（REQ-002-002）
@@ -104,7 +106,7 @@ context 管理:
 
 ## 結果状態の4次元集約（REQ-006-110）
 
-case-auto は各工程の結果を次の4状態次元で保持し、集約報告で次元を混同しない。各工程の output_contract（`src/opencode/commands/agentdev/case-auto.md` Step 4 工程別契約表）が情報源となる。
+case-auto は各工程の結果を次の4状態次元で保持し、集約報告で次元を混同しない。各工程の output_contract（Workflow Skill（`agentdev-workflow-case-auto`）の工程別契約表）が情報源となる。
 
 | 次元 | 取得元 | 値 |
 |---|---|---|
@@ -120,7 +122,7 @@ case-auto は各工程の結果を次の4状態次元で保持し、集約報告
 - Phase 0 と OU 完了の分離: Phase 0 成功（(3) の定義適用完了/警告付き工程完了）と OU 完了（(4) の全ライフサイクル事象完了）を別々に報告する。一方を他方へすり替えて報告しない
 - warn 変換禁止: (1) が warn の工程を pass として集約しない。完了報告には warn を warn のまま残す
 
-完了報告（停止時フォーマットを含む）には上記4状態次元を工程別・action id 別・ライフサイクル事象別に列挙する。実行定義は `src/opencode/commands/agentdev/case-auto.md` Step 4「結果状態の4次元集約（REQ-006-110）」および Step 8「結果状態の4次元報告（REQ-006-110）」を正とする。
+完了報告（停止時フォーマットを含む）には上記4状態次元を工程別・action id 別・ライフサイクル事象別に列挙する。実行定義は Workflow Skill（`agentdev-workflow-case-auto`）の「結果状態の4次元集約（REQ-006-110）」および「結果状態の4次元報告（REQ-006-110）」を正とする。
 
 ## 複数 execution_unit 並列 orchestration（REQ-006, v2:ADR-0129）
 
@@ -209,7 +211,7 @@ PR マージコンフリクト発生時は、以下3レベルのエスカレー�
 停止条件は Level 2 の再委譲を上限回数（2回）試行しても解消しない場合とする（REQ-003-006）。
 Level 1 で解消できる機械的競合は case-auto の停止条件から除外する。
 
-Level 1 の rebase 実行、エスカレーション判定は case-close の責務（`docs/specs/commands/case-close.md` Step 4-2 参照）。
+Level 1 の rebase 実行、エスカレーション判定は case-close の責務（`docs/specs/commands/case-close.md` コンフリクト解消 rebase パス参照）。
 case-auto は Level 2/3 のオーケストレーション級判断を担う。
 
 ## 子 task 中断回復パス（v2:ADR-0138, REQ-002）
@@ -277,7 +279,7 @@ Phase 0（枝PR作成フェーズ）の commit スコープ設計運用を明示
 
 Phase 0 で複数孫 Issue（Epic Wave 内の子Issue、または並列 execution_unit 内の個別 Issue）の実装が同一 SPEC ファイルに触れる場合の扱いを以下で規定する。
 
-**SPEC 本文修正の非許容**: 孫 Issue の test strategy が `on_failure: fix-and-reverify` を指示する場合でも、Phase 0 の case-run 委譲内で SPEC 本文（`docs/specs/**`）を修正しない。Phase 0 の SPEC 成果物は既に spec-save 工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。SPEC 修正が必要と判明した場合は `record-in-findings` で PR 本文の `## SPEC確定候補` セクションへ記録し、case-close Step 3 の SPEC 確定チェックへ引き継ぐ（`agentdev-case-run-execution-adapter` SKILL の SPEC確定候補配置契約に従う）。
+**SPEC 本文修正の非許容**: 孫 Issue の test strategy が `on_failure: fix-and-reverify` を指示する場合でも、Phase 0 の case-run 委譲内で SPEC 本文（`docs/specs/**`）を修正しない。Phase 0 の SPEC 成果物は既に spec-save 工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。SPEC 修正が必要と判明した場合は `record-in-findings` で PR 本文の `## SPEC確定候補` セクションへ記録し、case-close の docs 検証における SPEC 確定チェックへ引き継ぐ（`agentdev-case-run-execution-adapter` SKILL の SPEC確定候補配置契約に従う）。
 
 **target_area の重複判定と並列制御**:
 
@@ -341,7 +343,7 @@ user-decision-required は case-run result enum（completed-pr / blocked / faile
 | case-run 起源 | result enum `blocked` に付随する停止理由として user-decision-required 分類を受領する |
 | 工程委譲起源（req-define、case-open、case-close 等） | 既存 status（pass/warn/fail/partial）+ `parent_decision_required` を通じて受領する |
 
-本節の停止理由分類は Step 7-1「停止理由分類（REQ-006-016/108 拡張）」の分類軸とは独立する。Step 7-1 は case-auto 自身の HITL 境界停止条件（11項目）の分類であり、user-decision-required は下位 command の adversarial-review 由来の停止信号の分類である。両者を混同しない。
+本節の停止理由分類は「停止理由分類（REQ-006-016/108 拡張）」節の分類軸とは独立する。同節は case-auto 自身の HITL 境界停止条件（11項目）の分類であり、user-decision-required は下位 command の adversarial-review 由来の停止信号の分類である。両者を混同しない。
 
 ### 停止伝播契約（REQ-015-012）
 

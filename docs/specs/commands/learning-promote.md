@@ -2,7 +2,7 @@
 title: learning-promote SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-24
+updated: 2026-08-14
 ---
 
 # learning-promote SPEC
@@ -42,10 +42,10 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 ## HITL 境界、自動実行ルール（REQ-003-003/004/005/006/007）
 
-- **HITL は「判断の確定」に限定**（REQ-003-003）: 判定結果の提示（Step 9-10）でのユーザー承認のみが HITL 対象。承認後の保存、移動、prune、commit/push は自動実行する。
-- **判断確定後の自動実行**（REQ-003-004）: Step 10 のユーザー承認後、Step 11〜15（git pull / 採用済み成果物生成 / archive 移動 / prune / commit-push）は追加確認なしで自動実行する。
-- **破壊的変更の明示承認維持**（REQ-003-005）: inbox.md 全体の強制クリア、大量エントリの一括削除等の破壊的操作は、Step 10 承認とは別に明示的な承認を求める。
-- **prune 自動実行条件**（REQ-003-006）: staged（採用済み成果物に根拠保存済み）/ rejected / duplicate のエントリは、Step 10 承認と同時に prune 承認済みとみなし追加確認なしで削除する。
+- **HITL は「判断の確定」に限定**（REQ-003-003）: 判定結果の提示でのユーザー承認のみが HITL 対象。承認後の保存、移動、prune、commit/push は自動実行する。
+- **判断確定後の自動実行**（REQ-003-004）: ユーザー承認後、git pull / 採用済み成果物生成 / deferred 移動 / prune / commit-push は追加確認なしで自動実行する。
+- **破壊的変更の明示承認維持**（REQ-003-005）: inbox.md 全体の強制クリア、大量エントリの一括削除等の破壊的操作は、判定結果承認とは別に明示的な承認を求める。
+- **prune 自動実行条件**（REQ-003-006）: staged（採用済み成果物に根拠保存済み）/ rejected / duplicate のエントリは、ユーザー承認と同時に prune 承認済みとみなし追加確認なしで削除する。
 - **prune 非対象**（REQ-003-007）: deferred / 未処理のエントリは必ず残す。誤削除防止のため auto-prune 対象から除外する。
 
 ## 入力
@@ -69,25 +69,25 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 ## 現在の動作
 
-6 フェーズ構成:
+6 フェーズ構成。各フェーズの詳細手順は Workflow Skill（`agentdev-workflow-learning-promote`）が権威情報源である。
 
-- フェーズ1 inbox スキャン: Step 1 inbox.md 読込、Step 2 deferred.md 読込
+- フェーズ1 inbox スキャン: inbox.md 読込、deferred.md 読込
 - フェーズ2-5 Normalize→Classify→Evaluate→Dispose→HITL:
- - Step 3: 正規化
- - Step 4: 問題クラス分類
- - Step 5: 8軸評価
- - Step 6: evaluation-report 生成
-  - Step 7: 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（v2:REQ-0155-005）。無条件の自動REQ化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
- - Step 8: 既存対策確認（G05: 既存対策優先、新規 X 化より既存 X へ反映）
- - Step 9: 結果提示
- - Step 10: ユーザー承認（G06: 判定、prune にユーザー承認必須）
+  - 正規化
+  - 問題クラス分類
+  - 8軸評価
+  - evaluation-report 生成
+  - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（v2:REQ-0155-005）。無条件の自動REQ化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
+  - 既存対策確認（G05: 既存対策優先、新規 X 化より既存 X へ反映）
+  - 結果提示
+  - ユーザー承認（G06: 判定、prune にユーザー承認必須）
 - フェーズ6 実行 git 操作:
- - Step 11: git pull
- - Step 12: 採用済み成果物生成
-  - Step 13: deferred 移動（原子的）
- - Step 14: 昇華時 prune
- - Step 15: commit/push
- - Step 16: 完了報告
+  - git pull
+  - 採用済み成果物生成
+  - deferred 移動（原子的）
+  - 昇華時 prune
+  - commit/push
+  - 完了報告
 
 ## 参照する横断 SPEC
 
@@ -116,15 +116,15 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 ## adversarial-review 挿入境界（経路D）
 
-本節は learning-promote 経路D の review 挿入境界を正典として所有する（REQ-015-007）。共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件と停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が正規所有し、本節は再定義しない。本節は経路D 固有の発動条件、挿入位置、戻り先、Step 6 戻しループのみを所有する。
+本節は learning-promote 経路D の review 挿入境界を正典として所有する（REQ-015-007）。共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件と停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が正規所有し、本節は再定義しない。本節は経路D 固有の発動条件、挿入位置、戻り先、evaluation-report 更新戻しループのみを所有する。
 
 ### 発動条件判定 Step と review 呼出 Step の分離（REQ-015-001/002/003）
 
-経路D は発動条件判定 Step と review 呼出 Step を分離する。両 Step を分離することで、skip 条件該当時は review 呼出を迂回して従来フロー（Step 8 → Step 9）を維持する（REQ-015-003）。
+経路D は発動条件判定と review 呼出を分離する。分離することで、skip 条件該当時は review 呼出を迂回して従来フロー（既存対策確認 → 判定結果提示）を維持する（REQ-015-003）。
 
 #### 発動条件判定 Step
 
-発動条件は Step 8（既存対策確認）の完了直後、Step 9（ユーザーへの判定結果提示）の前に判定する（REQ-015-007）。この位置は inbox → deferred 移動（Step 13）、prune（Step 14）、commit/push（Step 15）等の不可逆処理に先立つ。
+発動条件は既存対策確認の完了直後、ユーザーへの判定結果提示の前に判定する（REQ-015-007）。この位置は deferred 移動、prune、commit/push 等の不可逆処理に先立つ。
 
 learning-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。発動条件は次のいずれも満たすこととする。
 
@@ -135,36 +135,36 @@ learning-promote は adversarial-review を原則実行する（default-on、REQ
 
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - inbox.md エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）の場合
-  - inbox.md 空（処理対象なし、Step 2 等で終了）の場合
+  - inbox.md 空（処理対象なし、inbox スキャンで終了）の場合
 - **ユーザー明示指定時の必須実行**: ユーザーが review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。ただし判定対象が evaluation-report.md へ反映済みであることは引き続き必須とする。
 
 adversarial-review を新規必須工程、QG、承認ゲートとして扱わない。skip 条件該当時は従来フローを維持する（REQ-015-003）。
 
 #### review 呼出 Step
 
-発動条件が成立した場合のみ、Step 8 と Step 9 の間に review 呼出 Step を実行する。呼出 Step は evaluation-report.md の判定結果（正規化、問題クラス分類、8軸評価、廃棄判定、既存対策照合）を review 対象として渡す。呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
+発動条件が成立した場合のみ、既存対策確認と判定結果提示の間に review 呼出を実行する。review 呼出は evaluation-report.md の判定結果（正規化、問題クラス分類、8軸評価、廃棄判定、既存対策照合）を review 対象として渡す。呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
 
 ### review 反映時の evaluation-report 更新戻しと関連 Step 再実行（REQ-015-007）
 
 review で accepted finding が提示され、呼出元が判定対象へ反映した場合、意味内容が変更されたときは evaluation-report.md の更新へ戻し、関連 Step を再実行する。手続きは次のとおり。
 
 1. accepted finding を判定対象（正規化結果、問題クラス分類、8軸評価、廃棄判定、既存対策照合）へ反映する（REQ-014-006）。反映は呼出元の責務であり、adversarial-review 自身は行わない
-2. 反映結果で evaluation-report.md を更新するため Step 6 へ戻る
-3. Step 6（evaluation-report 生成、更新）→ Step 7（廃棄判定）→ Step 8（既存対策確認）→ 発動条件判定 Step → review 呼出 Step の順に再実行する
+2. 反映結果で evaluation-report.md を更新するため evaluation-report 生成へ戻る
+3. evaluation-report 生成（更新）→ 廃棄判定 → 既存対策確認 → 発動条件判定 → review 呼出の順に再実行する
 
-再 review の発動は、反映により review 対象の意味内容が変更され、新たな本質的争点が生じ得る場合にのみ許容する（REQ-014-007）。新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。再 review の停止条件（REQ-014-008）を満たした時点でループを離脱し、Step 9 へ進む。
+再 review の発動は、反映により review 対象の意味内容が変更され、新たな本質的争点が生じ得る場合にのみ許容する（REQ-014-007）。新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。再 review の停止条件（REQ-014-008）を満たした時点でループを離脱し、判定結果提示へ進む。
 
-unresolved な本質的争点またはユーザー判断事項が残る場合、Step 9（判定結果提示）、Step 10（ユーザー承認）、Step 13（deferred 移動）、Step 14（prune）、Step 15（commit/push）等の不可逆処理へ進まない（REQ-014-009）。ただし adversarial-review 自体を恒久的な統制ゲートとしない。unresolved は既存の HITL（Step 10 ユーザー承認）または blocker 扱いへ振り向ける。
+unresolved な本質的争点またはユーザー判断事項が残る場合、判定結果提示、ユーザー承認、deferred 移動、prune、commit/push 等の不可逆処理へ進まない（REQ-014-009）。ただし adversarial-review 自体を恒久的な統制ゲートとしない。unresolved は既存の HITL（ユーザー承認）または blocker 扱いへ振り向ける。
 
 ### 挿入位置の一意特定（REQ-015-007）
 
-経路D の review 挿入位置は Step 8（既存対策確認）完了直後、Step 9（ユーザーへの判定結果提示）前である。最初の不可逆副作用は Step 11（git pull）以降（Step 13 deferred 移動、Step 14 prune、Step 15 commit/push）であり、review 挿入位置は全不可逆処理に先立つ。handoff.md、promoted/ 等の成果物は review より後の Step で生成されるため、review 時点では存在せず、review 対象は evaluation-report.md のみとなる。
+経路D の review 挿入位置は既存対策確認完了直後、ユーザーへの判定結果提示前である。最初の不可逆副作用は git pull 以降（deferred 移動、prune、commit/push）であり、review 挿入位置は全不可逆処理に先立つ。handoff.md、promoted/ 等の成果物は review より後の工程で生成されるため、review 時点では存在せず、review 対象は evaluation-report.md のみとなる。
 
 ### 正規所有者と参照関係
 
 | 意味 | 正規所有者 |
 |---|---|
-| 経路D の発動条件、挿入位置、戻り先、Step 6 戻しループ | 本 SPEC（learning-promote command SPEC） |
-| 候補判断基準、内部手続き（候補確定位置、呼出タイミング、evaluation-report 反映、Step 6 戻しループの実装詳細） | `agentdev-learning-pipeline` domain skill SPEC（ACT-SPEC-013） |
+| 経路D の発動条件、挿入位置、戻り先、evaluation-report 更新戻しループ | 本 SPEC（learning-promote command SPEC） |
+| 候補判断基準、内部手続き（候補確定位置、呼出タイミング、evaluation-report 反映、evaluation-report 更新戻しループの実装詳細） | `agentdev-learning-pipeline` domain skill SPEC（ACT-SPEC-013） |
 | 共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件、停止条件、呼出失敗時取扱い） | `agentdev-adversarial-review` SPEC（REQ-014） |
 

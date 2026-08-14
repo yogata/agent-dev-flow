@@ -2,7 +2,7 @@
 title: case-open SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-10
+updated: 2026-08-14
 ---
 
 # case-open SPEC
@@ -41,32 +41,34 @@ Epic + 子 Issue 一括作成に対応する。
 
 ## 現在の動作
 
-- Step 1: 前工程からの引き継ぎ停止判定（`agentdev_handoff: true` 含まれる場合は Issue 作成せず停止）
-- Step 1-1: OU 選択ゲート（`operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止））
-- Step 2: 要件docからIssue本文生成（`agentdev-issue-management`）（REQ読解、テンプレート充足検査、完了条件候補抽出）
- - Step 2-1: 完了条件網羅性検証（QG-2）（Issue作成前に REQ/Decision/SPEC 必達要件の網羅性を検証）
-- Step 3: マルチREQ入力判定（単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐）
- - Step 3-1: 自律構成生成（OU モード、複数REQ時）（`operation_units` から Epic / Wave / Issue 構造を自律生成）
-- Step 4: 規模判定（単一REQの場合）（`scale: large` → Epic flow / `scale: standard` → Standard flow）
-- Epic flow（Steps 5-9-1）:
- - Step 5: テンプレート読込（`agentdev-workflow-templates`）
- - Step 6: Epic Issue本文生成（自律構成分析結果に基づき Epic 本文を構築）
- - Step 7: Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）（VERIFY）
- - Step 8: 子Issue作成（OU 単位、順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-005-042））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-003-011、`docs/specs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
- - Step 9: Epic Issue本文更新（ステータス追跡テーブル更新）
- - Step 9-1: OU `result` 書き戻し（Issue / Epic 番号）
-- Standard flow（Steps 10-12-1）:
-  - Step 10: 関連Decision特定
-  - Step 11: ラベル付与（`agentdev-workflow-lifecycle`）
-  - Step 12: GitHub Issue作成（VERIFY）
-  - Step 12-1: OU `result` 書き戻し（Issue 番号）
-- 共通終了処理（Steps 13-15）:
-  - Step 13: コメント追加（`agentdev-workflow-templates`）
-  - Step 14: ドラフト削除（`git rm` + `git commit` Form Zero）
-  - Step 14-1: RU ファイル削除（`git rm` + `git commit` Form Zero）
-- Step 14-2: draft / RU 削除残存検証（`git status --porcelain` で残存検出）
-- Step 14-3: draft/RU 削除 commit 後の即時 push（REQ-003-003）（Step 14 / 14-1 の削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
-- Step 15: 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
+処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-open`）が権威情報源である。
+
+- 前工程からの引き継ぎ停止判定（`agentdev_handoff: true` 含まれる場合は Issue 作成せず停止）
+- OU 選択ゲート（`operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止））
+- 要件docからIssue本文生成（`agentdev-issue-management`）（REQ読解、テンプレート充足検査、完了条件候補抽出）
+  - 完了条件網羅性検証（QG-2）（Issue作成前に REQ/Decision/SPEC 必達要件の網羅性を検証）
+- マルチREQ入力判定（単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐）
+  - 自律構成生成（OU モード、複数REQ時）（`operation_units` から Epic / Wave / Issue 構造を自律生成）
+- 規模判定（単一REQの場合）（`scale: large` → Epic flow / `scale: standard` → Standard flow）
+- Epic flow:
+  - テンプレート読込（`agentdev-workflow-templates`）
+  - Epic Issue本文生成（自律構成分析結果に基づき Epic 本文を構築）
+  - Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）（VERIFY）
+  - 子Issue作成（OU 単位、順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-005-042））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-003-011、`docs/specs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
+  - Epic Issue本文更新（ステータス追跡テーブル更新）
+  - OU `result` 書き戻し（Issue / Epic 番号）
+- Standard flow:
+  - 関連Decision特定
+  - ラベル付与（`agentdev-workflow-lifecycle`）
+  - GitHub Issue作成（VERIFY）
+  - OU `result` 書き戻し（Issue 番号）
+- 共通終了処理:
+  - コメント追加（`agentdev-workflow-templates`）
+  - ドラフト削除（`git rm` + `git commit` Form Zero）
+  - RU ファイル削除（`git rm` + `git commit` Form Zero）
+  - draft / RU 削除残存検証（`git status --porcelain` で残存検出）
+  - draft/RU 削除 commit 後の即時 push（REQ-003-003）（削除コミット後に `git push` を即時実行する）。case-run 引き継ぎ時の `git pull --ff-only` 失敗防止のため
+  - 完了報告（Standard / 単一REQ Epic / マルチREQ Epic テンプレート）
 
 ## 構成生成事前検証（preflight）
 
@@ -86,7 +88,7 @@ case-open は Standard flow、Epic flow、混在構成の全ルートで、GitHu
 
 ### 挿入位置の規範
 
-本セクションは case-open SPEC の手順順序において、構成確定（Epic flow は Step 6、Standard flow は Step 11 相当）の直後、最初の Issue 作成（Epic flow は Step 7、Standard flow は Step 12）の前に挿入される。command reference 側の具体的ステップ番号は case-run 工程で確定する。
+本セクションは case-open の処理順序において、構成確定（Epic flow は Epic Issue 本文確定、Standard flow は規模判定・preflight 相当）の直後、最初の Issue 作成の前に挿入される。Workflow Skill 側の具体的な挿入位置は Workflow Skill が確定する。
 
 ## 完了条件・事前状態記載ガイドライン（新規セクション）
 
@@ -262,13 +264,13 @@ Issue 本文の契約セクションへ永続化する（経路F 拡張）。
 
 ## 検証観点
 
-- QG-2（Acceptance Criteria Coverage Gate）: Step 2-1 で完了条件が対象 REQ/Decision/SPEC の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
+- QG-2（Acceptance Criteria Coverage Gate）: 完了条件網羅性検証で完了条件が対象 REQ/Decision/SPEC の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
 - 子Issue 先頭行 `Parent: #{epic_number}` 含有（G03、親子関係追跡用）
 - 全子Issue作成完了後の Epic 本文ステータス追跡テーブル更新（G04、部分更新禁止）
 - 子Issue数上限（G05、最大10件、Epic 1件あたり）
 - テンプレート必須セクション完備確認（G09、G10、`完了条件` セクション含む）
-- 出力制約: Issue 本文、commit message は verbatim で返す。「verbatim」とは LF・空行・インデントを含む行構造を byte 単位で保持することを指し、文字列の正規化、改行圧縮、空白挿入・削除をすべて禁止する。委譲接続点（Step 2/6/8/9）と最終 gh CLI 渡し（Step 12/13）の双方に適用する。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す（G17）
-- draft / RU 削除残存検証（Step 14-2、`git status --porcelain` で空であること）
+- 出力制約: Issue 本文、commit message は verbatim で返す。「verbatim」とは LF・空行・インデントを含む行構造を byte 単位で保持することを指し、文字列の正規化、改行圧縮、空白挿入・削除をすべて禁止する。委譲接続点（Issue 本文生成、Epic Issue 本文生成、子Issue 本文生成、Epic Issue 本文更新）と最終 gh CLI 渡し（Issue 作成、コメント追加）の双方に適用する。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す（G17）
+- draft / RU 削除残存検証（`git status --porcelain` で空であること）
 
 ## case-auto 並列委譲モデル（REQ-006-087〜093）
 
@@ -337,21 +339,21 @@ case-open SPEC 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ-0
 
 ### 挿入位置（REQ-015-009）
 
-review 挿入位置は「execution structure / Issue 本文候補 / 完了条件構成後・最初の GitHub Issue 作成前」と一意に特定可能である。execution structure（Epic flow の自律構成生成、Standard flow の単一 OU 構成）、Issue 本文候補（Epic Issue 本文、Standard Issue 本文）、完了条件（QG-2 で網羅性検証済み）の3者すべてが確定した後、最初の GitHub Issue 作成呼び出しの前に挿入する。現行 Step 構造への対応付けを次に示す。
+review 挿入位置は「execution structure / Issue 本文候補 / 完了条件構成後・最初の GitHub Issue 作成前」と一意に特定可能である。execution structure（Epic flow の自律構成生成、Standard flow の単一 OU 構成）、Issue 本文候補（Epic Issue 本文、Standard Issue 本文）、完了条件（QG-2 で網羅性検証済み）の3者すべてが確定した後、最初の GitHub Issue 作成呼び出しの前に挿入する。各 flow の対応付けを次に示す。
 
 | flow | execution structure 確定 | Issue 本文候補確定 | 完了条件確定 | 最初の GitHub Issue 作成 | review 挿入位置 |
 |---|---|---|---|---|---|
-| Epic flow（マルチREQ、`scale: large`） | Step 3-1（自律構成生成） | Step 6（Epic Issue 本文生成） | Step 2-1（QG-2） | Step 7（Epic Issue 作成） | Step 6 完了後、Step 7 の前 |
-| Standard flow（`scale: standard`、フィールドなし） | Step 4（規模判定）、Step 4-1（preflight）で単一 OU 構成を確定 | Step 2（Issue 本文生成） | Step 2-1（QG-2） | Step 12（Standard Issue 作成） | Step 4-1（preflight）完了後、Step 12 の前 |
+| Epic flow（マルチREQ、`scale: large`） | 自律構成生成 | Epic Issue 本文生成 | QG-2 | Epic Issue 作成 | Epic Issue 本文生成完了後、Epic Issue 作成の前 |
+| Standard flow（`scale: standard`、フィールドなし） | 規模判定、preflight で単一 OU 構成を確定 | Issue 本文生成 | QG-2 | Standard Issue 作成 | preflight 完了後、Standard Issue 作成の前 |
 
-Epic flow では Step 5（テンプレート読込）、Step 6（Epic Issue 本文生成）の完了後に review を挿入し、Step 7（Epic Issue 作成）の前に実行する。Step 8（子 Issue 本文生成、子 Issue 作成）は Step 7 完了後に実行するため、review 挿入時点では未確定であり review 対象外である。子 Issue 構成は Step 3-1 の execution structure（Epic/Wave/Issue 構成）として Epic Issue 本文に反映済みであるため、execution structure 経由で review 対象となる。Standard flow では Step 2（Issue 本文生成）、Step 2-1（QG-2）、Step 4-1（preflight）の完了後に review を挿入し、Step 12（Standard Issue 作成）の前に実行する。
+Epic flow ではテンプレート読込、Epic Issue 本文生成の完了後に review を挿入し、Epic Issue 作成の前に実行する。子 Issue 本文生成、子 Issue 作成は Epic Issue 作成完了後に実行するため、review 挿入時点では未確定であり review 対象外である。子 Issue 構成は自律構成生成の execution structure（Epic/Wave/Issue 構成）として Epic Issue 本文に反映済みであるため、execution structure 経由で review 対象となる。Standard flow では Issue 本文生成、QG-2、preflight の完了後に review を挿入し、Standard Issue 作成の前に実行する。
 
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
 発動条件判定と review 呼出を分離する（REQ-015-001）。発動条件判定 Step は default-on 原則（REQ-015-002）と skip 条件（REQ-015-003）を評価する。
 
 - **default-on（原則実行）**: case-open は adversarial-review を原則実行する（REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、execution structure、Issue 本文候補、完了条件のいずれかに意味的決定が存在する場合に発動する。
-- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（review を挿入せず最初の GitHub Issue 作成 Step へ進む）を継続できる（REQ-015-003）。Epic flow は Step 7、Standard flow は Step 12 へそのまま進む。skip 判断のためだけの新規 HITL、承認点は追加しない。
+- **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（review を挿入せず最初の GitHub Issue 作成へ進む）を継続できる（REQ-015-003）。Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成へそのまま進む。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - Standard flow（`scale: standard`、単一 OU）で QG-2 必達要件の網羅性に懸念がなく、execution structure が機械的確定（Wave 分割なし、単一 Issue）の場合
 - **ユーザー明示指定時の必須実行**: ユーザーが case-open 実行中に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
 
@@ -360,29 +362,29 @@ Epic flow では Step 5（テンプレート読込）、Step 6（Epic Issue 本�
 発動条件判定 Step で発動と判定された場合、review 呼出 Step で adversarial-review を呼び出す（REQ-015-001）。
 
 - **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts SPEC](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
-- **review 対象**: execution structure（Epic/Wave/Issue 構成、Step 3-1 または Step 4-1 で確定）、Issue 本文候補（Epic Issue 本文、Standard Issue 本文）、完了条件（QG-2 で網羅性検証済み）の3者。
-- **採用後戻り先**: accepted finding のうち execution structure に関わる finding は Step 3-1（自律構成生成）または Step 4（規模判定）へ戻し再評価する。Issue 本文、完了条件に関わる finding は Step 2（Issue 本文生成）、Step 2-1（QG-2）、Step 6（Epic Issue 本文生成）の該当 Step へ戻す。accepted finding の対象候補への反映は case-open（呼出元）の責務である（REQ-014-006）。
-- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、最初の GitHub Issue 作成（Epic flow は Step 7、Standard flow は Step 12）へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[workflow-contracts SPEC](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節）。
+- **review 対象**: execution structure（Epic/Wave/Issue 構成、自律構成生成または規模判定・preflight で確定）、Issue 本文候補（Epic Issue 本文、Standard Issue 本文）、完了条件（QG-2 で網羅性検証済み）の3者。
+- **採用後戻り先**: accepted finding のうち execution structure に関わる finding は自律構成生成または規模判定へ戻し再評価する。Issue 本文、完了条件に関わる finding は Issue 本文生成、QG-2、Epic Issue 本文生成の該当段階へ戻す。accepted finding の対象候補への反映は case-open（呼出元）の責務である（REQ-014-006）。
+- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、最初の GitHub Issue 作成（Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成）へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[workflow-contracts SPEC](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節）。
 - **呼出失敗時**: adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
 
 ### 変更影響別の再実行ルール（REQ-015-009）
 
 review の結果反映で review 対象の意味内容が変更された場合（REQ-014-007）、変更影響範囲に応じて次の4パターンのいずれかを実行する（REQ-015-009）。
 
-| 変更影響 | 再実行対象 | 戻り先 Step | 根拠 |
+| 変更影響 | 再実行対象 | 戻り先 | 根拠 |
 |---|---|---|---|
-| 完了条件のみ変更 | QG-2 | Step 2-1 | 完了条件網羅性検証を再実行し、REQ/Decision/SPEC 必達要件の網羅性を再確認する |
-| execution structure のみ変更 | preflight | Step 4-1 | 構成生成事前検証（子 Issue 数上限、Wave 同時実行上限、OU 対応、必須依存関係維持、OU 割当網羅）を再実行する |
-| 完了条件と execution structure の両方が変更 | QG-2 + preflight | Step 2-1、Step 4-1 | 両方を再実行する。実行順序は QG-2（Step 2-1）→ preflight（Step 4-1）を維持する |
-| 意味内容変更なし | 再実行不要 | （なし） | review 対象の意味内容に変更がないため、既存検証結果をそのまま使用し、最初の GitHub Issue 作成 Step へ進む |
+| 完了条件のみ変更 | QG-2 | 完了条件網羅性検証 | 完了条件網羅性検証を再実行し、REQ/Decision/SPEC 必達要件の網羅性を再確認する |
+| execution structure のみ変更 | preflight | preflight | 構成生成事前検証（子 Issue 数上限、Wave 同時実行上限、OU 対応、必須依存関係維持、OU 割当網羅）を再実行する |
+| 完了条件と execution structure の両方が変更 | QG-2 + preflight | 完了条件網羅性検証、preflight | 両方を再実行する。実行順序は QG-2 → preflight を維持する |
+| 意味内容変更なし | 再実行不要 | （なし） | review 対象の意味内容に変更がないため、既存検証結果をそのまま使用し、最初の GitHub Issue 作成へ進む |
 
-4パターンのいずれかを完了した後、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない。再 review の停止条件（REQ-014-008）を満たした場合、最初の GitHub Issue 作成 Step（Epic flow は Step 7、Standard flow は Step 12）へ進む。
+4パターンのいずれかを完了した後、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない。再 review の停止条件（REQ-014-008）を満たした場合、最初の GitHub Issue 作成（Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成）へ進む。
 
 ### 最初の副作用（GitHub Issue 作成）との順序
 
-review は最初の GitHub Issue 作成呼び出し（Epic flow は Step 7、Standard flow は Step 12）より前に実行する。GitHub Issue 作成が case-open の最初の副作用（GitHub API 呼び出しによる Issue レコード生成）であるため、review は最初の副作用の前に挿入される。review の結果、execution structure、Issue 本文候補、完了条件のいずれかが変更された場合は、変更影響別の再実行ルール（REQ-015-009）に従い、最初の GitHub Issue 作成前に反映を完了する。
+review は最初の GitHub Issue 作成呼び出し（Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成）より前に実行する。GitHub Issue 作成が case-open の最初の副作用（GitHub API 呼び出しによる Issue レコード生成）であるため、review は最初の副作用の前に挿入される。review の結果、execution structure、Issue 本文候補、完了条件のいずれかが変更された場合は、変更影響別の再実行ルール（REQ-015-009）に従い、最初の GitHub Issue 作成前に反映を完了する。
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、workflow-contracts SPEC「adversarial-review 由来の停止信号」節との間で意味の重複、矛盾を生じない。case-open command 固有の挿入境界（発動条件、Step 構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 SPEC を正とする。
+本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、workflow-contracts SPEC「adversarial-review 由来の停止信号」節との間で意味の重複、矛盾を生じない。case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 SPEC を正とする。
 

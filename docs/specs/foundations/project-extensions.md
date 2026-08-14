@@ -2,7 +2,7 @@
 title: Project Extensions
 status: accepted
 created: 2026-07-04
-updated: 2026-08-10
+updated: 2026-08-14
 ---
 
 # Project Extensions
@@ -20,9 +20,12 @@ project extensions 機構は、プロジェクト固有の追加・拡張を配�
 ## 標準配置
 
 ```text
-.agentdev/extensions/commands/<command>.yaml
-.agentdev/extensions/skills/<skill>.yaml
+.agentdev/extensions/skills/{workflow-skill-name}.yaml
+.agentdev/extensions/skills/{workflow-skill-name}/internal.yaml
+.agentdev/extensions/skills/{capability-skill-name}.yaml
 ```
+
+配置と kind literal の対応は「旧kind からの移行（breaking migration）」節の Extension kind enum（公式）が正規定義する。
 
 ## Extension 種別
 
@@ -55,27 +58,59 @@ public Workflow Extension が Capability Skill extension へ暗黙コピーし�
 consumer プロジェクトも新kindへの移行対象。旧kind残存時は deterministic check で検出し
 migration-required として停止（silent ignore しない）。
 
+#### Extension kind enum（公式）
+
+Extension 種別は以下の3値のみを machine-readable `kind` literal として許可する。
+本 enum は runtime resolver / deterministic checker / 全 consumer が正規入力として扱う。
+
+| kind literal                  | 概念名                      | 配置                                                               |
+|-------------------------------|-----------------------------|--------------------------------------------------------------------|
+| `workflow-extension`          | Workflow Extension          | `.agentdev/extensions/skills/{workflow-skill-name}.yaml`           |
+| `internal-workflow-extension` | internal Workflow Extension | `.agentdev/extensions/skills/{workflow-skill-name}/internal.yaml`  |
+| `capability-skill-extension`  | Capability Skill Extension  | `.agentdev/extensions/skills/{capability-skill-name}.yaml`         |
+
+上記3値以外の `kind` はすべて無効値である。
+
+#### id binding
+
+- `workflow-extension` の `id` は対象 Workflow Skill 名と一致すること（必須）。
+- `internal-workflow-extension` の `id` は親ディレクトリの Workflow Skill 名と一致すること（必須）。単独の別 `id` 体系を作らないこと。
+- `capability-skill-extension` の `id` は対象 Capability Skill 名と一致すること（必須）。
+
 #### mapping 表
 
-| 旧kind | 新kind | 備考 |
+| 旧kind | 新kind literal | 備考 |
 |---|---|---|
-| command-extension | Workflow Extension | 公開Workflow Skill への追加・拡張 |
-| skill-extension（workflow skill対象） | Workflow Extension / internal Workflow Extension | Workflow Skill への追加・拡張 |
-| skill-extension（capability skill対象） | Capability Skill Extension | Capability Skill への追加・拡張 |
+| command-extension | workflow-extension | 公開Workflow Skill への追加・拡張 |
+| skill-extension（workflow skill対象） | workflow-extension / internal-workflow-extension | Workflow Skill への追加・拡張 |
+| skill-extension（capability skill対象） | capability-skill-extension | Capability Skill への追加・拡張 |
 
-#### migration-required 検出
+#### 状態分類と停止条件（UC-001 案1）
 
-extension 読込時に旧kind を検出した場合、migration-required エラーとして停止する。
-エラーメッセージは mapping 表へ誘導し、新kind への移行手順を提示する。
+extension 読込時の状態分類と runtime resolver の動作を以下に定める。
+deterministic checker は malformed を NG として報告してよいが、runtime resolver の契約は以下の通りである（REQ-002-031 準拠、fail-open）。
+
+| 状態 | runtime resolver 動作 | 備考 |
+|---|---|---|
+| extension 不在 | 標準動作継続 | 正常状態 |
+| YAML 構文エラー / 必須field欠落 / kind判定以前の破損 | エラー表示 + 当該extension無視 + 標準動作継続 | fail-open（REQ-002-031 準拠） |
+| `kind: command-extension` / `kind: skill-extension`（旧kind） | migration-required + stop | silent ignore しない |
+| 構文上有効だが `kind` が公式3値以外（未知kind） | schema violation + stop | fail-open しない |
+| 有効な新kind | 通常処理 | — |
+
+extension missing と legacy extension exists は別状態であり、前者は標準動作継続、後者は migration-required として停止する。
 
 ## 実行時読み込み契約
 
 command/skill は実行時に自分に対応する extension だけを読む。
 
-- command は .agentdev/extensions/commands/<command>.yaml を対象とする。
-- skill は .agentdev/extensions/skills/<skill>.yaml を対象とする。
+- Workflow Skill は .agentdev/extensions/skills/{workflow-skill-name}.yaml（kind: workflow-extension）を対象とする。
+- Workflow Skill は必要に応じて .agentdev/extensions/skills/{workflow-skill-name}/internal.yaml（kind: internal-workflow-extension）を追加で読む。command は internal Workflow Extension を直接読まない。
+- Capability Skill は .agentdev/extensions/skills/{capability-skill-name}.yaml（kind: capability-skill-extension）を対象とする。
 - 対応 extension が存在しない場合は標準動作で続行する。
-- 対応 extension が破損している場合はエラーを表示し、当該 extension を無視して標準動作で続行する。
+- 対応 extension が破損している場合（YAML 構文エラー、必須field 欠落等）はエラーを表示し、当該 extension を無視して標準動作で続行する（REQ-002-031 準拠、fail-open）。
+- 旧kind（command-extension / skill-extension）を検出した場合は migration-required として停止する。
+- 構文上有効な未知kind を検出した場合は schema violation として停止する。
 - extension は標準 command/skill の上書きではなく、追加・拡張としてのみ扱う。
 
 対応 extension が存在しない command/skill は正常動作であり、異常状態ではない。command が project 非依存で単体動作する正当な状態である。例として `/agentdev/inspect-skills` は SPEC 直接参照を持たず project 非依存で動作するため extension 不要である。

@@ -2,7 +2,7 @@
 title: intake-from-github SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-14
 ---
 
 # intake-from-github SPEC
@@ -32,16 +32,18 @@ updated: 2026-07-18
 
 ## 現在の動作
 
-- Step 1: 期間解釈（`agentdev-intake-pipeline`）
-- Step 2: データ取得（`agentdev-intake-pipeline`）（クローズ済み Issue/PR のみ対象（G10））
-- Step 3: 構造的検出（`agentdev-intake-pipeline`）
-- Step 4: LLM 全文解析（`agentdev-intake-pipeline`）
-- Step 5: intake item 生成（`agentdev-intake-pipeline`）
-- Step 5-1: 実行前同期（`git pull --ff-only`）
-- Step 6: 保存（`.agentdev/intake/inbox/`（同名時連番））
-- Step 6-1: commit/push（`.agentdev/intake/` 配下変更のみ）
-- Step 7: サマリーレポート提示
-- Step 8: 完了報告
+処理段階（外部から意味のある順序）。各段階の詳細手順は Workflow Skill（`agentdev-workflow-intake-from-github`）が権威情報源である（capture-only 型、REQ-027-003 により STEP model 対象外）。
+
+- 期間解釈（`agentdev-intake-pipeline`）
+- データ取得（`agentdev-intake-pipeline`）（クローズ済み Issue/PR のみ対象（G10））
+- 構造的検出（`agentdev-intake-pipeline`）
+- LLM 全文解析（`agentdev-intake-pipeline`）
+- intake item 生成（`agentdev-intake-pipeline`）
+- 実行前同期（`git pull --ff-only`）
+- 保存（`.agentdev/intake/inbox/`（同名時連番））
+- commit/push（`.agentdev/intake/` 配下変更のみ）
+- サマリーレポート提示
+- 完了報告
 
 ## 参照する横断 SPEC
 
