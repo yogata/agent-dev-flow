@@ -206,7 +206,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | integrity/rules/ | accepted | 整合性ルール詳細 | IR-NNN 個別ルールの15フィールド詳細（局所物理分離） |
 | integrity/rule-ownership.md | accepted | ルール所有権マトリックス | ルールドメイン → canonical REQ/SPEC の対応表。`responsibilities/req-impact-map.md`（REQ → 影響するルール/アーティファクト）と逆方向 |
 | integrity/docs-spec-rebuild-integrity.md | accepted | 配布物整合性検査ルール | 配布物 ID 除去後の品質保持 |
-| integrity/distribution-boundary.md | draft | 配布依存境界 | REQ-029 が宣言する意味境界の検証モデル、分類値、検出パイプライン、projection 契約、事前 gate と最終 gate の契約、archive 公開前検査、安定実装契約（モジュールパス、plugin パス、tool.execute.before フック種別、archive 検査呼び出し点）。DEC-014 多層 enforcement の正規参照先 |
+| integrity/distribution-boundary.md | accepted | 配布依存境界 | REQ-029 が宣言する意味境界の検証モデル、分類値、検出パイプライン、projection 契約、事前 gate と最終 gate の契約、archive 公開前検査、安定実装契約（モジュールパス、plugin パス、tool.execute.before フック種別、archive 検査呼び出し点）。DEC-014 多層 enforcement の正規参照先 |
 | integrity/backticks-identifier-threshold.md | accepted | backticks 識別子/一般名詞 判定閾値 | backticks 必須と任意の機械判定閾値 |
 | integrity/validator-split-criteria.md | accepted | validator 分割基準 | check_changed_docs.ts の validator 分割基準（責務境界、ファイルサイズ上限、関心分離ルール）。内部 validator 構成は `references/validator-internal-config.md` へ分離 |
 | integrity/targeted-docs-guard-implementation.md | accepted | Targeted Docs Guard 実装詳細 | check_changed_docs.ts 変更文書限定検査契約（CLI 引数、workflow 別検査項目、判定条件、false-clean 予防）。Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業は `references/targeted-docs-guard-implementation-details.md` へ分離 |

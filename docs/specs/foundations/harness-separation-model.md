@@ -122,7 +122,7 @@ runtime workspace 管理は harness 側の責務とする。
 AgentDevFlow 配布契約は STEP 識別子と永続情報から再開点を決定できる契約を所有する（DEC-011）。
 ToDo の使用・compaction 検出・current STEP 選択の実処理は harness 固有機能とする。
 AgentDevFlow 配布command / Workflow Skill / SPEC は ToDo を必須機構として規定しない
-（DEC-001 context管理harness委譲、REQ-002-022 harness固有詳細禁止）。
+（DEC-001 context管理harness委譲、REQ-029-007 harness固有詳細禁止）。
 
 ## 関連
 

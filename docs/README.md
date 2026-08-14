@@ -47,7 +47,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-014 の14件である（DEC-008 と DEC-014 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
+現行 Decision は DEC-001 から DEC-014 の14件である（DEC-008 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
 |---|---|

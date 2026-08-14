@@ -9,7 +9,7 @@
 個別 REQ/SPEC は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は11件、提案中の Decision は2件である。
+現行の承認済み Decision は12件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -28,7 +28,7 @@
 | DEC-011 | STEP resume point と会話記憶非依存 | accepted | 2026-08-10 |
 | DEC-012 | Extension を file-kind から workflow/capability responsibility へ再編 | accepted | 2026-08-10 |
 | DEC-013 | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 | accepted | 2026-08-11 |
-| DEC-014 | 配布依存境界の多層 enforcement | proposed | 2026-08-11 |
+| DEC-014 | 配布依存境界の多層 enforcement | accepted | 2026-08-11 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -52,13 +52,13 @@
 - [DEC-011](DEC-011.md)（STEP resume point と会話記憶非依存）
 - [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
 - [DEC-013](DEC-013.md)（IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定）
+- [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
 - [DEC-008](DEC-008.md)（case-auto の限定的親判断解決（bounded parent decision resolution））
-- [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）

@@ -1,10 +1,10 @@
 ---
 title: "配布依存境界"
-status: draft
+status: accepted
 spec_logical_division: 規範
 canonical_owner: 本 SPEC が検出モデル、分類値、検出パイプライン、projection 契約、事前 gate と最終 gate の契約、archive 公開前検査、安定実装契約を正規所有する
 created: "2026-08-11"
-updated: "2026-08-11"
+updated: "2026-08-14"
 ---
 
 # 配布依存境界 SPEC
