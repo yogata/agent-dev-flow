@@ -1,10 +1,10 @@
-# STEP-6: 終了処理・クリーンアップ（termination-and-cleanup）
+# STEP-{N}: 終了処理・クリーンアップ（termination-and-cleanup）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-6 詳細である。コメント追加、draft/RU 削除（Form Zero）、完了報告を提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。コメント追加、draft/RU 削除（Form Zero）、完了報告を提供する。
 
 ## 開始条件
 
-- STEP-5 で GitHub Issue 作成が完了している
+- STEP-{N} で GitHub Issue 作成が完了している
 
 ## 結果
 
@@ -60,7 +60,7 @@ Step 14/14-1 の削除コミット後に `git push` を即時実行（case-run �
 
 ## 関連 STEP
 
-- 前: STEP-5（issue-creation-flows）
+- 前: STEP-{N}（issue-creation-flows）
 - 次: なし（workflow 終了）
 
 ## 関連 Capability Skill

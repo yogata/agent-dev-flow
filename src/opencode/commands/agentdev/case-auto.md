@@ -42,7 +42,7 @@ Issue番号/URL 入力時は case-run → case-close へ分岐（req-save、spec
 
 ### Step 4: 各工程の実行
 
-各工程を委譲起動（req-save / spec-save / case-open / case-close）またはインライン実行（case-run、AG-001/002）する。実行モデル原則、工程別契約、QG-1〜QG-4 の継承、L1 タイムスタンプ計測、インライン実行時のコンテキスト管理、結果状態の4次元集約、Wave 反復制御（Step 4-1）、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定、Subagent 委譲プロトコル、orchestration stage モデル、子 task bg task 破棄検知時の回復の各詳細は `agentdev-workflow-case-auto` を参照。case-run インライン実行時も case-run.md を authoritative source として読み込む。各工程の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
+各工程を委譲起動（req-save / spec-save / case-open / case-close）またはインライン実行（case-run、AG-{NNN}/{NNN}）する。実行モデル原則、工程別契約、QG-{N}〜QG-{N} の継承、L1 タイムスタンプ計測、インライン実行時のコンテキスト管理、結果状態の4次元集約、Wave 反復制御（Step 4-1）、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定、Subagent 委譲プロトコル、orchestration stage モデル、子 task bg task 破棄検知時の回復の各詳細は `agentdev-workflow-case-auto` を参照。case-run インライン実行時も case-run.md を authoritative source として読み込む。各工程の結果に基づいて次工程へ進むか停止条件（Step 7）を判定する。req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
 
 ### Step 5: 工程間の状態引き継ぎ
 
@@ -66,15 +66,15 @@ Step 7 の停止条件を8分類軸で報告する（HITL 境界の変更では�
 
 ## adversarial-review 由来の停止伝播（経路H）
 
-Step 4（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。受領形式、自走停止、ユーザー提示、resume point、再開、case-auto が行わないこと（review 直接起動、finding 解釈、採否、再評価の禁止）の実装詳細は `agentdev-workflow-case-auto` の `references/stop-and-decision-resolution.md`（STEP-5）を参照。停止伝播契約の SSoT は case-auto command SPEC「adversarial-review 由来の停止伝播（経路H）」節、workflow-contracts SPEC、delegation-contracts SPEC が正である。user-decision-required は Step 7-1 の HITL 境界停止条件分類とは独立する停止理由分類である。停止報告（Step 8）には user-decision-required を停止理由分類として含める。
+Step 4（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。受領形式、自走停止、ユーザー提示、resume point、再開、case-auto が行わないこと（review 直接起動、finding 解釈、採否、再評価の禁止）の実装詳細は `agentdev-workflow-case-auto` の `references/stop-and-decision-resolution.md`（STEP-{N}）を参照。停止伝播契約の SSoT は case-auto command SPEC「adversarial-review 由来の停止伝播（経路H）」節、workflow-contracts SPEC、delegation-contracts SPEC が正である。user-decision-required は Step 7-1 の HITL 境界停止条件分類とは独立する停止理由分類である。停止報告（Step 8）には user-decision-required を停止理由分類として含める。
 
 ## bounded parent decision resolution
 
-case-auto は下位 command から受領した decision_context を限定的に自律解決する。default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。自律解決、作業仮定で継続、上位合意矛盾、新規ユーザー判断事項、resume 機構、中央集約 review engine 非化の実装詳細は `agentdev-workflow-case-auto` の `references/stop-and-decision-resolution.md`（STEP-6）を参照。解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command SPEC「bounded parent decision resolution」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節、workflow-contracts SPEC「bounded parent decision resolution と停止・resume 伝播」節が正である。case-auto は raw finding を解釈、採否、候補反映しない（AG-006）。
+case-auto は下位 command から受領した decision_context を限定的に自律解決する。default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。自律解決、作業仮定で継続、上位合意矛盾、新規ユーザー判断事項、resume 機構、中央集約 review engine 非化の実装詳細は `agentdev-workflow-case-auto` の `references/stop-and-decision-resolution.md`（STEP-{N}）を参照。解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command SPEC「bounded parent decision resolution」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節、workflow-contracts SPEC「bounded parent decision resolution と停止・resume 伝播」節が正である。case-auto は raw finding を解釈、採否、候補反映しない（AG-{NNN}）。
 
 ## コンフリクト解消モデル（3レベルエスカレーション）
 
-PR マージコンフリクト発生時（case-close Step 4-2 からのエスカレーション受領時）は、3レベルのエスカレーションで解消を図る。Level 1（case-close、`git rebase` による機械的解消）は case-close Step 4-2 の責務。Level 2（case-auto、コンフリクト文脈付きインライン case-run 再実行 AG-005、最大2回）、Level 3（case-auto、マージ順序変更、blocked 単位の隔離）の実装詳細は `agentdev-workflow-case-auto` の `references/conflict-resolution-and-reporting.md`（STEP-7）を参照。機械的競合（rebase で自動解決可能）は停止条件に含まず、Level 1 で case-close が解消する。停止条件の段階化（Level 2 再委譲上限回数試行後停止、発生元非依存でアクセス可能文脈を総動員）の詳細も同節参照。
+PR マージコンフリクト発生時（case-close Step 4-2 からのエスカレーション受領時）は、3レベルのエスカレーションで解消を図る。Level 1（case-close、`git rebase` による機械的解消）は case-close Step 4-2 の責務。Level 2（case-auto、コンフリクト文脈付きインライン case-run 再実行 AG-{NNN}、最大2回）、Level 3（case-auto、マージ順序変更、blocked 単位の隔離）の実装詳細は `agentdev-workflow-case-auto` の `references/conflict-resolution-and-reporting.md`（STEP-{N}）を参照。機械的競合（rebase で自動解決可能）は停止条件に含まず、Level 1 で case-close が解消する。停止条件の段階化（Level 2 再委譲上限回数試行後停止、発生元非依存でアクセス可能文脈を総動員）の詳細も同節参照。
 
 ## ガードレール
 
@@ -87,12 +87,12 @@ PR マージコンフリクト発生時（case-close Step 4-2 からのエスカ
 - G06: docs/ REQ/ ADR/ SPEC/ command reference/ guide の更新を自走対象に含める
 
 ### 委譲・参照制約
-- G07: case-auto は委譲工程（req-save/ spec-save/ case-open/ case-close）を各コマンドの委譲契約に従って委譲起動する。各工程は対応するコマンド定義を authoritative source として実行する（手順の case-auto 定義内再実装は回避）。case-run はインライン実行する（標準動作、AG-001）。**委譲起動不能時**（AG-004）: Step 4「委譲起動判定」に従い `delegation-unavailable` として報告する。委譲工程のインライン実行への切替えは行わない。genuine blocker（実装上の問題、スコープ外操作等）は Step 7 停止条件として扱い、`delegation-unavailable` 対象外とする。case-run インライン実行時の実行担当サブエージェントへの委譲失敗は case-run result 契約に従い処理し、本 `delegation-unavailable` 停止条件には該当しない
+- G07: case-auto は委譲工程（req-save/ spec-save/ case-open/ case-close）を各コマンドの委譲契約に従って委譲起動する。各工程は対応するコマンド定義を authoritative source として実行する（手順の case-auto 定義内再実装は回避）。case-run はインライン実行する（標準動作、AG-{NNN}）。**委譲起動不能時**（AG-{NNN}）: Step 4「委譲起動判定」に従い `delegation-unavailable` として報告する。委譲工程のインライン実行への切替えは行わない。genuine blocker（実装上の問題、スコープ外操作等）は Step 7 停止条件として扱い、`delegation-unavailable` 対象外とする。case-run インライン実行時の実行担当サブエージェントへの委譲失敗は case-run result 契約に従い処理し、本 `delegation-unavailable` 停止条件には該当しない
 - G08: 工程固有の詳細手順とcase-auto定義が矛盾する場合、工程固有処理は既存コマンド定義を優先し、自走境界、入力解決、工程間制御はcase-auto定義を優先する。各工程の実行は対応するコマンド定義に従う（case-run インライン実行時も case-run.md に従う）
 - G09: 既存のreq-save/ spec-save/ case-open/ case-run/ case-closeの責務を変更しない。委譲起動、インライン実行は起動方式の変更であり、各コマンドの責務、ガードレール、成果物を変更しない
 - G13: case-auto は Issue 階層決定ロジックを持ってはならない。複数 REQ doc または scale:large の場合は case-open の Issue 構造ルールに委譲する
 - G14: case-auto は req-save 委譲から case-open 委譲への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価してはならない。保存結果をそのまま渡す
-- G15: case-auto は Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、子Issue 並列委譲（最大5件）を直接担当する（AG-003）。case-run(#epic) への委譲は行わない。各子Issue ごとにインライン case-run を実行する。Wave 境界のクローズは case-close(#epic) に委譲する
+- G15: case-auto は Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、子Issue 並列委譲（最大5件）を直接担当する（AG-{NNN}）。case-run(#epic) への委譲は行わない。各子Issue ごとにインライン case-run を実行する。Wave 境界のクローズは case-close(#epic) に委譲する
 - G16: case-auto は独自の操作単位ステータス追跡を持ってはならない。Epic Issue のステータス追跡テーブルを使用する。**Epic Issue 本文の書き込みは case-close の単一書き手責務。case-auto は読み取るのみで書き込まない**
 - G18: case-auto は操作単位キューの管理、制御のみを担い、OU 本文の抽出、変換、REQ 操作解釈を行わないこと
 - G19: case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込み、case-open 成功後は invalid post-case reader として req_draft を読まないこと。case-open 成功後の停止、再開、完了処理は Issue と Epic（Epic Issue のステータス追跡テーブル含む）だけで成立させること。クリーンアップ検証ゲート（ドラフト削除検証）は case-open 完了後に実行すること。独自の OU 状態管理を持たないこと
@@ -114,7 +114,7 @@ PR マージコンフリクト発生時（case-close Step 4-2 からのエスカ
 ### 実行時パス制約
 - G11: 既存コマンド定義を読み込む際、source path を実行時パスに読み替えてはならない。コマンド定義内のパス参照は記述された通りに解釈し、source path を実行時参照先として使用しない
 - G12: 委譲先コマンドの実行時 Read/ Glob に source path 固定参照を含めない
-- G33: 子 task bg task 破棄検知時の回復で、未コミット変更の帰属が確認できない場合に強制 commit を行わない。整合確認できない場合は当該子 task を `blocked` とし、「未コミット変更の帰属不明」（Step 7 停止条件 (10)）として報告する（AG-003）
+- G33: 子 task bg task 破棄検知時の回復で、未コミット変更の帰属が確認できない場合に強制 commit を行わない。整合確認できない場合は当該子 task を `blocked` とし、「未コミット変更の帰属不明」（Step 7 停止条件 (10)）として報告する（AG-{NNN}）
 
 
 

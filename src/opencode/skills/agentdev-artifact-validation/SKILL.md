@@ -1,11 +1,11 @@
 ---
 name: agentdev-artifact-validation
-description: Owns document-type-crosscutting deterministic verification scripts (check-frontmatter-consistency, check-entry-existence, check-change-impact), their shared lib, and the public verification contract (AG-003/009/019, RU-20260722-01). USE FOR: invoking the public verification contract for REQ/ADR frontmatter id↔filename consistency, README entry existence, or change-scope validation against an allowed path list. DO NOT USE FOR: REQ/ADR/SPEC content judgment, file editing, save, user approval, commit, push, REQ/ADR/row ID allocation, or target_area search.
+description: Owns document-type-crosscutting deterministic verification scripts (check-frontmatter-consistency, check-entry-existence, check-change-impact), their shared lib, and the public verification contract (AG-{NNN}/009/019, RU-{NNNN}-01). USE FOR: invoking the public verification contract for REQ/ADR frontmatter id↔filename consistency, README entry existence, or change-scope validation against an allowed path list. DO NOT USE FOR: REQ/ADR/SPEC content judgment, file editing, save, user approval, commit, push, REQ/ADR/row ID allocation, or target_area search.
 ---
 
 # 文書種別横断検証（artifact-validation）
 
-このスキルは複数文書種別で共有する決定的検証 script と共有 lib の**正規所有者**として機能する（AG-003、AG-009、AG-019、CR-002、RU-20260722-01 合意）。
+このスキルは複数文書種別で共有する決定的検証 script と共有 lib の**正規所有者**として機能する（AG-{NNN}、AG-{NNN}、AG-{NNN}、CR-{NNN}、RU-{NNNN}-01 合意）。
 
 - **このスキル（検証基盤）**: 3つの共通検証 script とそれらが利用する共有 lib、対応 test、公開検証契約、JSON 結果契約
 - **適用先**: `req-save`、`spec-save`（共通検証 script 呼出 Step）、各 file-manager skill（委譲経由）、`agentdev-req-file-manager`（公開検証契約経由）
@@ -46,7 +46,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## Scripts（決定的検証）
 
-`scripts/` 配下の決定的スクリプトが、文書種別横断の検証処理を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、AG-003/009/019）。
+`scripts/` 配下の決定的スクリプトが、文書種別横断の検証処理を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、AG-{NNN}/009/019）。
 
 配置先: `agentdev-artifact-validation skill`。
 実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`）。
@@ -68,7 +68,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | `check-entry-existence.ts` | README エントリ存在 | argv[2]=id, argv[3..]=files、または stdin JSON | `{ ok, errors[], warnings[], found[] }` |
 | `check-change-impact.ts` | 変更範囲検証（許可パスリストとの積集合） | argv[2]=changed-list-file, argv[3]=allowed-list-file、または stdin JSON | `{ ok, errors[], warnings[], violations[] }` |
 
-利用側 command、skill は内部 lib パスを直接参照せず、上記公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（AG-009、AG-019）。同一 script または共有 lib を複数 skill へ複製しない（AG-003）。
+利用側 command、skill は内部 lib パスを直接参照せず、上記公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（AG-{NNN}、AG-{NNN}）。同一 script または共有 lib を複数 skill へ複製しない（AG-{NNN}）。
 
 ### 実行方法
 
@@ -77,7 +77,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-frontmatter-consistency.ts docs/requirements req
 
 # stdin JSON 入力
-echo '{"id":"REQ-{NNNN}","files":["docs/requirements/README.md"]}' | bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-entry-existence.ts
+echo '{"id":"REQ-{NNNN}","files":["docs/requirements<README>.md"]}' | bun .opencode/skills/agentdev-artifact-validation/scripts/src/check-entry-existence.ts
 
 # テスト実行
 cd .opencode/skills/agentdev-artifact-validation/scripts && bun test
@@ -96,7 +96,7 @@ REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキ
 - 全 script は同じ入力に対して同じ結果を返す（決定性）
 - 全 script はファイル I/O を入力読み込みのみに限定し、書き込みやネットワーク通信を行わない（副作用なし）
 - 公開検証契約（操作名、入力、JSON 結果契約、エラー契約）は安定。後方互換性を保持して変更する
-- 共有 lib は本スキル内でのみ所有し、兄弟 skill からの直接 import を受け付けない（AG-009）
+- 共有 lib は本スキル内でのみ所有し、兄弟 skill からの直接 import を受け付けない（AG-{NNN}）
 
 ## 必要な reference の選択条件
 

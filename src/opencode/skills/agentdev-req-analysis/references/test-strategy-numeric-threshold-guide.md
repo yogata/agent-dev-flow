@@ -1,9 +1,9 @@
 # test strategy 数値閾値策定ガイド
 
 test strategy 策定時に完了条件の数値閾値（LF 数、行数、ファイル数、件数等の定量化基準）を設定する際の具体的指針。
-QG-2（[qg-2-acceptance-criteria-coverage.md](../../../agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md) 観点6「数値閾値到達可能性検証」）と連動し、req-define から case-open まで一貫した数値閾値運用を担保する。
+QG-{N}（[qg-2-acceptance-criteria-coverage.md](../../../agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md) 観点6「数値閾値到達可能性検証」）と連動し、req-define から case-open まで一貫した数値閾値運用を担保する。
 
-境界ケース #1538/TS-007（LF 数 200 以上、等の数値閾値が対象成果物の自然な構造で到達可能か事前検証が欠けていた事象）に対応する。
+境界ケース #1538/TS-{NNN}（LF 数 200 以上、等の数値閾値が対象成果物の自然な構造で到達可能か事前検証が欠けていた事象）に対応する。
 
 ## 適用範囲
 
@@ -52,8 +52,8 @@ QG-2（[qg-2-acceptance-criteria-coverage.md](../../../agentdev-quality-gates/re
 記述例:
 
 ```yaml
-- id: TS-001
-  target_item: AG-001
+- id: TS-{NNN}
+  target_item: AG-{NNN}
   verification: |
     対象ファイルの LF 数を wc -l で計測する
   pass_criteria: |
@@ -74,22 +74,22 @@ QG-2（[qg-2-acceptance-criteria-coverage.md](../../../agentdev-quality-gates/re
 | 平均の罠 | 平均値を閾値化したが、外れ値に引っ張られて中央値から乖離 | 中央値（median）ベースを基本 |
 | 範囲無視 | 最小値を下回る閾値で実質意味を持たない | min/max/central の3点を把握 |
 
-## QG-2 観点6 との連動
+## QG-{N} 観点6 との連動
 
-QG-2（case-open 完了条件網羅性検証）の観点6「数値閾値到達可能性検証」は、本ガイドに従って策定された数値閾値を入力とする。本ガイドで根拠が不明確な閾値は QG-2 で fail または warn となる。
+QG-{N}（case-open 完了条件網羅性検証）の観点6「数値閾値到達可能性検証」は、本ガイドに従って策定された数値閾値を入力とする。本ガイドで根拠が不明確な閾値は QG-{N} で fail または warn となる。
 
 連動フロー:
 
 ```
 req-define (本ガイドで数値閾値を策定)
   → req-save (test_strategy に数値閾値を保存)
-    → case-open Step 2-1 (QG-2 観点6 で到達可能性検証)
+    → case-open Step 2-1 (QG-{N} 観点6 で到達可能性検証)
       → case-run (test strategy 項目として検証)
-        → case-close (QG-4 で最終確認)
+        → case-close (QG-{N} で最終確認)
 ```
 
 ## See Also
 
-- [qg-2-acceptance-criteria-coverage.md](../../../agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md)（QG-2 観点6 数値閾値到達可能性検証）
-- [qg-4-final-acceptance.md](../../../agentdev-quality-gates/references/qg-4-final-acceptance.md)（QG-4 観点8 PR 範囲 vs 全体 判定マトリクス、観点9 識別子中心評価）
-- 境界ケース #1538/TS-007（LF 数閾値到達可能性、本ガイド策定の契機）
+- [qg-2-acceptance-criteria-coverage.md](../../../agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md)（QG-{N} 観点6 数値閾値到達可能性検証）
+- [qg-4-final-acceptance.md](../../../agentdev-quality-gates/references/qg-4-final-acceptance.md)（QG-{N} 観点8 PR 範囲 vs 全体 判定マトリクス、観点9 識別子中心評価）
+- 境界ケース #1538/TS-{NNN}（LF 数閾値到達可能性、本ガイド策定の契機）

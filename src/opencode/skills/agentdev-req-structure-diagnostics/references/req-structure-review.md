@@ -66,7 +66,7 @@ document-model SPEC の SPEC Separation Criteria に基づき、現行 REQ の�
 | schema field残留 | report/schema field 名の列挙または field 定義が要件行を占有している | `level/category/route/file/line/evidence`, `field`, `schema` |
 | enum値一覧残留 | enum 値の一覧そのものが要件内容になっている | `promote/defer/reject`, `accepted/superseded/deprecated`, `strict/heuristic/observation` |
 | route判定表残留 | route/category/status の詳細判定表または分岐表が要件行に入っている | `route 判定`, `category 判定`, `status 判定`, `分類表`, `判定表` |
-| file pattern残留 | 具体的な glob/path pattern が要件行の主内容になっている | `docs/requirements/REQ-*.md`, `*.md`, `src/opencode/**/*.md` |
+| file pattern残留 | 具体的な glob/path pattern が要件行の主内容になっている | `docs/requirements/<REQ-*>.md`, `*.md`, `src/opencode/**/*.md` |
 | template variant残留 | テンプレート種別の選択ロジックまたは種別名一覧が要件行を占有している | `standard/compact`, `variant`, `テンプレート種別`, `選択ロジック` |
 | report format残留 | report 出力形式、列、セクション、ファイル名形式の詳細が要件行を占有している | `report format`, `出力形式`, `7フィールド`, `列構成`, `finding-{timestamp}.md` |
 | 内部アルゴリズム残留 | 検査、抽出、検証の内部手順やアルゴリズムが要件行を占有している | `抽出手順`, `検証手順`, `照合順`, `スコアリング`, `正規表現で検出` |
@@ -83,7 +83,7 @@ document-model SPEC の SPEC Separation Criteria に基づき、現行 REQ の�
 ## 配布物 ID 汚染検出
 
 AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等）が配布物に残留していないかを検出する。
-配布物（`src/opencode/commands/`、`src/opencode/skills/`）は AgentDevFlow 利用者が読む成果物であり、内部 ID はノイズとなるため記述しない（OU-009 原則）。
+配布物（`src/opencode/commands/`、`src/opencode/skills/`）は AgentDevFlow 利用者が読む成果物であり、内部 ID はノイズとなるため記述しない（OU-{NNN} 原則）。
 
 ### 検査対象
 
@@ -137,9 +137,9 @@ ID 汚染（前節）が 0 件でも本検査は実施する。
 
 | パターン | 検出対象 | 例 |
 |----------|----------|----|
-| 壊れた括弧 | 全角/半角括弧内が空、スラッシュのみ、内部 ID の prefix/番号のみ | `（OU-012/）`、`（）`、`（/）`、`（REQ-/）` |
+| 壊れた括弧 | 全角/半角括弧内が空、スラッシュのみ、内部 ID の prefix/番号のみ | `（OU-{NNN}/）`、`（）`、`（/）`、`（REQ-/）` |
 | 壊れた参照表現 | 内部 ID 除去後に文脈を失った参照、リンク切れ、行き先不明の代名詞 | `（OU-XXX に基づく）` の ID 部分のみ除去され `（）` 等になった残骸 |
-| 主語/目的語欠落文 | ID 除去により文の主語、目的語が欠落し文意が成立しない | `case-run Step 6 で実行担当サブエージェントへ引き継ぐプロンプトには、以下を必須項目として明記する（OU-012/）。` |
+| 主語/目的語欠落文 | ID 除去により文の主語、目的語が欠落し文意が成立しない | `case-run Step 6 で実行担当サブエージェントへ引き継ぐプロンプトには、以下を必須項目として明記する（OU-{NNN}/）。` |
 
 ### 責務整合検査
 
@@ -176,7 +176,7 @@ NG 分類は推奨アクション（MOVE/ UPDATE 等）とは別軸で付ける�
 
 ## SPEC 三層構造の整合性検出
 
-SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC（workflows）は個別 command/skill の現在動作を含まない（OU-002 原則）。
+SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC（workflows）は個別 command/skill の現在動作を含まない（OU-{NNN} 原則）。
 これに違反する配置を検出する。
 
 ### 検出シグナル
@@ -185,7 +185,7 @@ SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC�
 |------|----------|----------------|
 | 横断 SPEC 中の個別動作 | workflows SPEC に個別 command または skill のみに適用される手順、ステップ、判定表が含まれる | 該当 command/skill SPEC へ移送（`MOVE`） |
 | 個別 SPEC 中の横断契約 | command SPEC または skill SPEC に複数 command/skill をまたぐ契約が含まれる | 横断 SPEC へ移送（`MOVE`） |
-| 旧 grab-bag SPEC 残存 | `docs/specs/**/*.md`（基盤SPECドメイン直下）に複数関心事が混在 | 関心事別 SPEC へ分割（`SPLIT`） |
+| 旧 grab-bag SPEC 残存 | `docs/specs/<**/*>.md`（基盤SPECドメイン直下）に複数関心事が混在 | 関心事別 SPEC へ分割（`SPLIT`） |
 
 ### 判定ルール
 
@@ -196,7 +196,7 @@ SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC�
 ## HOW 除去後の acceptance-criteria 順位検証
 
 機械的（単パス）な HOW 除去を実施した後、完了条件（acceptance criteria）順位で再検証を行う。
-前工程で機械的に HOW を除去しても残余 violation が残る場合がある（OU-008/Wave 4 学習: 8件の残余 violation を検出）。
+前工程で機械的に HOW を除去しても残余 violation が残る場合がある（OU-{NNN}/Wave 4 学習: 8件の残余 violation を検出）。
 
 ### 検証手順
 

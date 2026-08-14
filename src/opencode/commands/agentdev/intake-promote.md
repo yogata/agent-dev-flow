@@ -38,7 +38,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 |------|------|------|
 | `採用` | 対応すべきと判断。採用済み成果物に整形。inbox 元ファイルは削除 | `/agentdev/backlog-review` |
 | `保留` | 判断を保留。inbox に残す | 再度 `/agentdev/intake-promote` |
-| `却下` | 対応不要と判断。inbox 元ファイルは即時削除（reject commit message に却下理由を含める、AG-006） | - |
+| `却下` | 対応不要と判断。inbox 元ファイルは即時削除（reject commit message に却下理由を含める、AG-{NNN}） | - |
 
 ## 整形の方向性
 
@@ -70,29 +70,29 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ### Step 4a: 発動条件判定（経路C、任意）
 
-暫定分類生成後、ユーザ提示前に adversarial-review を発動するかを判定する（REQ-015-001、REQ-015-006）。本 Step は review 呼出（Step 4b）と分離された発動条件判定 Step であり、review 呼出そのものは行わない。
+暫定分類生成後、ユーザ提示前に adversarial-review を発動するかを判定する（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。本 Step は review 呼出（Step 4b）と分離された発動条件判定 Step であり、review 呼出そのものは行わない。
 
 判定基準:
 
-- default-on（原則実行、REQ-015-002）: 暫定分類の意味的決定が存在する場合に発動する。ユーザー明示指定は通常発動の必須条件ではない
-- skip 条件（REQ-015-003）: inbox 項目が1件のみで暫定分類が自明（単一区分、意味的決定なし）、または inbox 空（Step 2 で終了）の場合、省略して従来フローを継続できる。skip 判断のためだけの新規 HITL、承認点は追加しない
-- ユーザー明示指定時: skip 条件の該当にかかわらず必ず「発動」とする（REQ-015-002）。明示指定は起動時引数、対話中の指示、extension（`.agentdev/extensions/commands/intake-promote.yaml`）の `rules` により表明される
+- default-on（原則実行、REQ-{NNNN}-{NNN}）: 暫定分類の意味的決定が存在する場合に発動する。ユーザー明示指定は通常発動の必須条件ではない
+- skip 条件（REQ-{NNNN}-{NNN}）: inbox 項目が1件のみで暫定分類が自明（単一区分、意味的決定なし）、または inbox 空（Step 2 で終了）の場合、省略して従来フローを継続できる。skip 判断のためだけの新規 HITL、承認点は追加しない
+- ユーザー明示指定時: skip 条件の該当にかかわらず必ず「発動」とする（REQ-{NNNN}-{NNN}）。明示指定は起動時引数、対話中の指示、extension（`.agentdev/extensions/commands/intake-promote.yaml`）の `rules` により表明される
 
-判定結果が「非発動」の場合は Step 4b をスキップし、Step 4 の暫定分類をそのまま Step 5 へ渡し従来フローを維持する（REQ-015-003）。既存の HITL（G06, G07, G08）、自動実行ルール（REQ-003-008）、破壊的変更制約（G18）は変更しない。
+判定結果が「非発動」の場合は Step 4b をスキップし、Step 4 の暫定分類をそのまま Step 5 へ渡し従来フローを維持する（REQ-{NNNN}-{NNN}）。既存の HITL（G06, G07, G08）、自動実行ルール（REQ-{NNNN}-{NNN}）、破壊的変更制約（G18）は変更しない。
 
 詳細な候補判断基準は `agentdev-intake-pipeline` を参照。
 
 ### Step 4b: adversarial-review 呼出（経路C、任意）
 
-Step 4a で「発動」と判定された場合に限り adversarial-review を呼び出す（REQ-015-001）。本 Step は発動条件判定（Step 4a）と分離された review 呼出 Step であり、発動条件の再判定は行わない。
+Step 4a で「発動」と判定された場合に限り adversarial-review を呼び出す（REQ-{NNNN}-{NNN}）。本 Step は発動条件判定（Step 4a）と分離された review 呼出 Step であり、発動条件の再判定は行わない。
 
 review 対象は Step 4 で生成された暫定分類（各 item の採用/保留/却下、変更種別、根拠）とする。呼出タイミングは Step 5「ユーザー確認」開始前、結果反映先は intake-promote 本体とする（詳細は `agentdev-intake-pipeline` 参照）。
 
-- accepted finding を得た場合: 呼出元（intake-promote 本体）が暫定分類へ finding を反映し、反映後の分類を Step 5 へ渡す（REQ-014-006）。adversarial-review 自身は反映を行わない
-- unresolved な本質的争点が残る場合: Step 5 のユーザー確認で既存 HITL 経由で扱い、後続の保存、inbox 削除等の不可逆処理へは進まない（REQ-014-009）
-- 呼出失敗時（スキル不在、起動異常、timeout 等）: silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）
+- accepted finding を得た場合: 呼出元（intake-promote 本体）が暫定分類へ finding を反映し、反映後の分類を Step 5 へ渡す（REQ-{NNNN}-{NNN}）。adversarial-review 自身は反映を行わない
+- unresolved な本質的争点が残る場合: Step 5 のユーザー確認で既存 HITL 経由で扱い、後続の保存、inbox 削除等の不可逆処理へは進まない（REQ-{NNNN}-{NNN}）
+- 呼出失敗時（スキル不在、起動異常、timeout 等）: silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-{NNNN}-{NNN}）
 
-共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）の正規所有者は adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）であり、本 command 定義は再定義しない。
+共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）の正規所有者は adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-{NNNN}）であり、本 command 定義は再定義しない。
 
 ### Step 5: ユーザー確認
 
@@ -172,5 +172,5 @@ template: .opencode/commands/agentdev/templates/intake-promote/standard.md。
 - G15: review、整形はユーザーとの対話を通じて行う
 - G16: 保存先は `.agentdev/intake/promoted/` 直下のみ（フラット構造）
 - G17: 採用 item の inbox 元ファイルは成果物保存後に削除する（`.agentdev/intake/archive/promoted/` への移動を廃止）
-- G19: reject item の inbox 元ファイルは即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（AG-006、監査証跠の補強）
+- G19: reject item の inbox 元ファイルは即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跠の補強）
 

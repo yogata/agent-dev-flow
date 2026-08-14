@@ -41,7 +41,7 @@ function resolveAlias(index: NodeIndex, raw: string): string | undefined {
   return index.aliases.get(cleaned) ?? index.aliases.get(cleaned.replace(/^\.\//, ""))
 }
 
-// ─── Unresolved reference classification (REQ-024-001/002) ───────────────────
+// ─── Unresolved reference classification (REQ-{NNNN}-{NNN}/002) ───────────────────
 
 type ReferenceKind =
   | "relative_path"

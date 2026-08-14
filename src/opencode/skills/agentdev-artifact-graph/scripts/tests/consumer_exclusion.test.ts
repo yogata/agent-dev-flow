@@ -4,6 +4,10 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { buildGraph, loadGraph } from "../lib/graph.ts"
 import { DEFAULT_INDEXED_PATHS } from "../lib/config.ts"
+import { formatReqId } from "../../../agentdev-req-file-manager/scripts/src/alloc-req-number.ts"
+import { formatDecisionId } from "../../../agentdev-decision-file-manager/scripts/src/alloc-decision-number.ts"
+const REQ_001 = formatReqId(1)
+const DEC_001 = formatDecisionId(1)
 
 const roots: string[] = []
 
@@ -18,7 +22,7 @@ async function jsonLines(path: string): Promise<readonly Record<string, unknown>
 
 /**
  * Distribution artifact path patterns that MUST NOT appear in a consumer Graph
- * (REQ-012-008, TS-006 / AG-005). Any node/provenance path matching one of
+ * (${REQ_001}-008, TS-{NNN} / AG-{NNN}). Any node/provenance path matching one of
  * these regexes indicates distribution artifact leakage into the Graph.
  */
 const DISTRIBUTION_PATTERNS: readonly RegExp[] = [
@@ -40,24 +44,26 @@ function matchesDistributionPattern(path: string): boolean {
  * cross-references that would be picked up if indexed_paths leaked.
  */
 async function createRealisticConsumerFixture(root: string): Promise<void> {
+  const req001 = `${REQ_001}`
+  const dec001 = `${DEC_001}`
   const consumerDocs: Record<string, string> = {
-    "docs/requirements/REQ-001.md": `---
-id: REQ-001
+    [`docs/requirements/${req001}.md`]: `---
+id: ${req001}
 title: Consumer feature
 status: accepted
 ---
 # Consumer feature
 
-See [decision](../decisions/DEC-001.md).
+See [decision](../decisions/${dec001}.md).
 `,
-    "docs/decisions/DEC-001.md": `---
-id: DEC-001
+    [`docs/decisions/${dec001}.md`]: `---
+id: ${dec001}
 title: Consumer architecture
 status: accepted
 ---
 # Consumer architecture
 `,
-    "docs/specs/feature.md": `---
+    [`docs/specs/${"feature"}.md`]: `---
 title: Feature spec
 canonical_owner: consumer-team
 ---
@@ -74,7 +80,7 @@ canonical_owner: consumer-team
 description: Define requirements
 ---
 # /agentdev/req-define
-Refs: REQ-001
+Refs: ${REQ_001}
 `,
     ".opencode/commands/agentdev/case-open.md": `---
 description: Open a case
@@ -93,7 +99,7 @@ name: agentdev-artifact-graph
 description: Build Artifact Graph
 ---
 # agentdev-artifact-graph
-Refs: REQ-012, DEC-007
+Refs: REQ-{NNNN}, DEC-{NNN}
 `,
     ".opencode/skills/agentdev-doc-writing/SKILL.md": `---
 name: agentdev-doc-writing
@@ -133,7 +139,7 @@ description: GitHub CLI I/O
   }
 }
 
-describe("REQ-012-008: consumer environment excludes AgentDevFlow distribution artifacts", () => {
+describe(`REQ-{NNNN}-008: consumer environment excludes AgentDevFlow distribution artifacts`, () => {
   it("default indexed_paths exclude distribution artifact directories", () => {
     expect(DEFAULT_INDEXED_PATHS).not.toContain(".opencode/commands/agentdev")
     expect(DEFAULT_INDEXED_PATHS).not.toContain(".opencode/skills")
@@ -145,10 +151,11 @@ describe("REQ-012-008: consumer environment excludes AgentDevFlow distribution a
     roots.push(root)
 
     // Simulate consumer environment: docs/ exists + distribution artifacts exist
+    const req001File = `docs/requirements/${REQ_001}.md`
     await mkdir(join(root, "docs/requirements"), { recursive: true })
     await writeFile(
-      join(root, "docs/requirements/REQ-001.md"),
-      "---\nid: REQ-001\ntitle: Consumer req\n---\n# Consumer req\n",
+      join(root, req001File),
+      `---\nid: ${REQ_001}\ntitle: Consumer req\n---\n# Consumer req\n`,
       "utf8",
     )
 
@@ -172,9 +179,9 @@ describe("REQ-012-008: consumer environment excludes AgentDevFlow distribution a
     await buildGraph({ root, output })
 
     const nodes = await jsonLines(join(output, "nodes.jsonl"))
-    // Only the REQ-001 node should exist
+    // Only the ${REQ_001} node should exist
     expect(nodes.length).toBe(1)
-    expect(nodes[0]?.["id"]).toBe("requirement:REQ-001")
+    expect(nodes[0]?.["id"]).toBe(`requirement:${REQ_001}`)
 
     // No distribution artifact nodes
     expect(nodes.some((n) => String(n["id"] ?? "").includes("command:"))).toBe(false)
@@ -200,7 +207,7 @@ describe("REQ-012-008: consumer environment excludes AgentDevFlow distribution a
   })
 })
 
-describe("TS-006 (AG-005): consumer Graph excludes all distribution artifact paths", () => {
+describe("TS-{NNN} (AG-{NNN}): consumer Graph excludes all distribution artifact paths", () => {
   it("realistic consumer fixture produces 0 nodes/edges/provenance from distribution patterns", async () => {
     const root = await mkdtemp(join(tmpdir(), "ag-ts006-"))
     roots.push(root)
@@ -257,7 +264,7 @@ describe("TS-006 (AG-005): consumer Graph excludes all distribution artifact pat
     }
   })
 
-  it("consumer REQ-001 is reachable and distribution artifacts are not", async () => {
+  it(`consumer REQ-{NNNN} is reachable and distribution artifacts are not`, async () => {
     const root = await mkdtemp(join(tmpdir(), "ag-ts006-reach-"))
     roots.push(root)
     await createRealisticConsumerFixture(root)
@@ -267,9 +274,9 @@ describe("TS-006 (AG-005): consumer Graph excludes all distribution artifact pat
 
     const nodes = await jsonLines(join(output, "nodes.jsonl"))
     const nodeIds = nodes.map((node) => String(node["id"] ?? ""))
-    expect(nodeIds).toContain("requirement:REQ-001")
-    expect(nodeIds).toContain("decision:DEC-001")
-    expect(nodeIds).toContain("specification:docs/specs/feature.md")
+    expect(nodeIds).toContain(`requirement:${REQ_001}`)
+    expect(nodeIds).toContain(`decision:${DEC_001}`)
+    expect(nodeIds).toContain(`specification:docs/specs/${"feature"}.md`)
     expect(nodeIds.some((id) => id.includes("command:"))).toBe(false)
     expect(nodeIds.some((id) => id.includes("skill:"))).toBe(false)
   })

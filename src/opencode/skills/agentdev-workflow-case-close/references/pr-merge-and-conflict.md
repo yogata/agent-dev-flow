@@ -24,13 +24,13 @@
 - 上限超過時の構造化エラー停止
 - 待機中の `CONFLICTING` 遷移検出を自動分岐させ、コンフリクト解消パス（Step 4-2）へ即時接続する
 
-ポーリング間隔・上限値は gh-cli 手続き側が所有する（AG-001）。
+ポーリング間隔・上限値は gh-cli 手続き側が所有する（AG-{NNN}）。
 
 ### Step 4: PR merge 実行
 
 PR merge 手続き（squash 方式、`agentdev-gh-cli`）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）。
 
-**Squash merge 失敗時のリトライ**: `agentdev-gh-cli` の「squash merge リトライ手続き」に従う（待機間隔・最大試行回数は gh-cli 手続き側が所有、AG-001、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。
+**Squash merge 失敗時のリトライ**: `agentdev-gh-cli` の「squash merge リトライ手続き」に従う（待機間隔・最大試行回数は gh-cli 手続き側が所有、AG-{NNN}、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。
 
 **対応記録コメント**: Issue に対応記録コメントを追加（テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read して `agentdev-gh-cli` の VERIFY 操作に従って内容検証）。
 

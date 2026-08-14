@@ -64,7 +64,7 @@ CREATE 前に APPEND/UPDATE 候補を必ず評価すること。
 要件の分割が必要な場合は保存操作ではなく requirements review 候補として扱うこと。
 操作分類結果は `draft-data` の `artifact_actions` に記録
 
- **4-1. 定量的データ検証**: `glob docs/requirements/REQ-*.md`（および副次的に `glob docs/decisions/DEC-*.md`）で実ファイル列挙と AGENTS.md 等の文書記載レンジとの乖離を確認・解消する。詳細は `agentdev-req-analysis` を参照
+ **4-1. 定量的データ検証**: `glob docs/requirements/<REQ-*>.md`（および副次的に `glob docs/decisions/<DEC-*>.md`）で実ファイル列挙と AGENTS.md 等の文書記載レンジとの乖離を確認・解消する。詳細は `agentdev-req-analysis` を参照
 
  **4-2. SPLIT 予兆計測（既存REQ）**: APPEND/UPDATE 対象の既存 REQ の健全性メトリクス（要件行数、関心分類数、成果物種別数）を計測し、req-health-metrics SPEC（extension 経由）の定量閾値で SPLIT シグナルを算出。合計 2 以上の場合、APPEND 実施前にユーザーへ SPLIT 要否を提案。計測対象は当該 REQ の要件テーブル行（`^| REQ-NNNN-MMM |`）。閾値、計算式の詳細は `agentdev-req-analysis` を参照
 
@@ -87,7 +87,7 @@ CREATE 前に APPEND/UPDATE 候補を必ず評価すること。
 
 テンプレート: `.opencode/commands/agentdev/templates/req-define/req-draft.md` を Read → 構造化 `draft-data` 形式に従って生成。原本は構造化された `# draft-data` fenced YAML block。Step 6-2/5-3 で分離した SPEC 候補は `artifact_actions`（`artifact: spec`）として統合し `## SPEC候補` 補助セクションは出力しない。保存対象は単一の `artifact_actions` 配列に統合する
 
-各副ステップ（7-1: 定義完全性ゲート QG-1、7-2: operation_units 生成、7-2a: depends_on/recommended_order 定義、7-3: artifact_actions 生成、7-3a: target_area/content 形式、7-3b: SPEC action 分類根拠出力、7-4: test_strategy 生成、7-5: review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command SPEC（extension 経由）の各フィールドスキーマを参照。`target_spec`、`spec_logical_division`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 SPEC を正とする
+各副ステップ（7-1: 定義完全性ゲート QG-{N}、7-2: operation_units 生成、7-2a: depends_on/recommended_order 定義、7-3: artifact_actions 生成、7-3a: target_area/content 形式、7-3b: SPEC action 分類根拠出力、7-4: test_strategy 生成、7-5: review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command SPEC（extension 経由）の各フィールドスキーマを参照。`target_spec`、`spec_logical_division`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 SPEC を正とする
 
 ### Step 8: work_type 判定
 
@@ -97,15 +97,15 @@ CREATE 前に APPEND/UPDATE 候補を必ず評価すること。
 
 `agentdev-workflow-lifecycle` で standard/large を判定。large 時はユーザーと分解計画を協議。9-1 実装スコープシグナル確認（ドラフト内に修正候補リスト、検出事項カタログ、影響ファイル一覧等の実装詳細セクション存在時に large 昇格判定、昇格理由をユーザー提示）の詳細は `agentdev-workflow-lifecycle` を参照
 
-### adversarial-review 挿入境界（経路A、REQ-015-004）
+### adversarial-review 挿入境界（経路A、REQ-{NNNN}-{NNN}）
 
-Step 9（Scale判断: feature）または Step 8（work_type 判定: feature 以外）完了後、Step 10（ドラフト保存）の前に挿入する。req-define は adversarial-review を原則実行する（default-on、REQ-015-002）。発動条件判定と review 呼出を分離する（REQ-015-001）。
+Step 9（Scale判断: feature）または Step 8（work_type 判定: feature 以外）完了後、Step 10（ドラフト保存）の前に挿入する。req-define は adversarial-review を原則実行する（default-on、REQ-{NNNN}-{NNN}）。発動条件判定と review 呼出を分離する（REQ-{NNNN}-{NNN}）。
 
-- **発動条件判定（REQ-015-002、REQ-015-003）**: default-on で発動する。skip 条件（Scale=L0 で Decision判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず Step 10 へ進む）を継続できる（REQ-015-003）。ユーザー明示指定時は skip 条件にかかわらず必ず発動する（REQ-015-002）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-- **review 呼出（REQ-015-001）**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う。
-  - Decision finding は Step 6（Decision判断）へ戻し再評価する。要件展開に関わる finding は該当 Step へ戻す。accepted finding の反映は呼出元の責務である（REQ-014-006）。
-  - 未解決のユーザー判断事項が残る場合、Step 10（ドラフト保存）へ進まない（REQ-014-009）。工程委譲起源であるため既存 status に unresolved 判断事項を付加する（REQ-014-012）。
-  - 呼出失敗時は silent skip を禁止し、従来フローを維持する（REQ-014-010）。
+- **発動条件判定（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）**: default-on で発動する。skip 条件（Scale=L0 で Decision判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず Step 10 へ進む）を継続できる（REQ-{NNNN}-{NNN}）。ユーザー明示指定時は skip 条件にかかわらず必ず発動する（REQ-{NNNN}-{NNN}）。skip 判断のためだけの新規 HITL、承認点は追加しない。
+- **review 呼出（REQ-{NNNN}-{NNN}）**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う。
+  - Decision finding は Step 6（Decision判断）へ戻し再評価する。要件展開に関わる finding は該当 Step へ戻す。accepted finding の反映は呼出元の責務である（REQ-{NNNN}-{NNN}）。
+  - 未解決のユーザー判断事項が残る場合、Step 10（ドラフト保存）へ進まない（REQ-{NNNN}-{NNN}）。工程委譲起源であるため既存 status に unresolved 判断事項を付加する（REQ-{NNNN}-{NNN}）。
+  - 呼出失敗時は silent skip を禁止し、従来フローを維持する（REQ-{NNNN}-{NNN}）。
 
 詳細な挿入境界は req-define command SPEC（extension 経由）「adversarial-review 挿入境界（経路A）」節を正とする。
 
@@ -147,6 +147,6 @@ Step 9（Scale判断: feature）または Step 8（work_type 判定: feature 以
 - G15: SPEC 分離基準に該当する要件行候選は REQ 要件行に残留させず、`draft-data` の `artifact_actions`（`artifact: spec`）へ分離すること。安定契約例外は分離対象外
 - G16: Decision判断が必要な変更（Decision要否確認ゲート）では Decision 判断前に `agentdev-architecture-advisory` を参照する。アーキテクチャ助言サブエージェントは Decision 要否、推奨方向、設計リスク、根拠を返し、最終的な Decision 作成判断は親エージェントが行う
 - G17: アーキテクチャ助言サブエージェントの助言は親エージェントが分類し、未確認事項を要件本文へ混入させない。同サブエージェントはファイル編集主体ではない
-- G19: test strategy 項目は verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に持つこと（REQ）。on_failure（不合格時の処置）を持たない検証項目は test strategy に含めないこと（REQ）。3要素のいずれかが欠落する項目を検出した場合、保存前に QG-1 が fail として扱う（REQ）
+- G19: test strategy 項目は verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に持つこと（REQ）。on_failure（不合格時の処置）を持たない検証項目は test strategy に含めないこと（REQ）。3要素のいずれかが欠落する項目を検出した場合、保存前に QG-{N} が fail として扱う（REQ）
 
 

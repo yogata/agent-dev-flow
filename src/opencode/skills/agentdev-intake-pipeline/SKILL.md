@@ -43,26 +43,26 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## adversarial-review 候補判断と内部手続き（経路C）
 
-本スキルは intake-promote 経路C の review 候補判断と内部手続きの参照実装を `references/intake-promotion.md` に保持する。正典は `agentdev-intake-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節（REQ-015-006）であり、本 SKILL.md は重複定義しない（REQ-014-011）。
+本スキルは intake-promote 経路C の review 候補判断と内部手続きの参照実装を `references/intake-promotion.md` に保持する。正典は `agentdev-intake-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節（REQ-{NNNN}-{NNN}）であり、本 SKILL.md は重複定義しない（REQ-{NNNN}-{NNN}）。
 
 | 項目 | 要件 | 概要 |
 |---|---|---|
-| 挿入位置 | REQ-015-006 | Step 4（暫定分類生成）完了後、Step 5（ユーザ提示）開始前 |
-| 発動条件判定 / review 呼出 Step 分離 | REQ-015-001 | 発動条件判定 Step と review 呼出 Step を独立手順として分離 |
-| ユーザー明示指定時の発動 | REQ-015-002 | ユーザー明示指定時は必ず発動 |
-| 条件非該当時の従来フロー維持 | REQ-015-003 | 条件非該当時は従来フローを維持 |
+| 挿入位置 | REQ-{NNNN}-{NNN} | Step 4（暫定分類生成）完了後、Step 5（ユーザ提示）開始前 |
+| 発動条件判定 / review 呼出 Step 分離 | REQ-{NNNN}-{NNN} | 発動条件判定 Step と review 呼出 Step を独立手順として分離 |
+| ユーザー明示指定時の発動 | REQ-{NNNN}-{NNN} | ユーザー明示指定時は必ず発動 |
+| 条件非該当時の従来フロー維持 | REQ-{NNNN}-{NNN} | 条件非該当時は従来フローを維持 |
 
-挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が正とする。
+挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-{NNNN}）が正とする。
 
-## STEP model 連携（REQ-005-024、DEC-011）
+## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、intake-from-github / intake-promote command の各 STEP から呼び出される（`docs/specs/workflows/workflow-skill-model.md`）。本スキル自身は STEP を所有しない。
+本スキルは Capability Skill として、intake-from-github / intake-promote command の各 STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution
 
-本スキルが扱う intake item（`.agentdev/intake/inbox/*.md`）、採用済み成果物（`.agentdev/intake/promoted/*.md`）は durable state 優先順位に従う。(1) SSoT 再構成（inbox/ promoted/ 配下の永続ファイル、REQ/Decision/SPEC は docs/ 配下）、(2) identifier 保持（item path、promoted item path）、(3) 最小 scalar、(4) runtime artifact（暫定分類、評価結果、adversarial-review findings、REQ-008 lifecycle）。優先順位の詳細は `docs/specs/workflows/input-resolution-and-durable-state.md` 参照。
+本スキルが扱う intake item（`.agentdev/intake/inbox/*.md`）、採用済み成果物（`.agentdev/intake/promoted/*.md`）は durable state 優先順位に従う。(1) SSoT 再構成（inbox/ promoted/ 配下の永続ファイル、REQ/Decision/SPEC は docs/ 配下）、(2) identifier 保持（item path、promoted item path）、(3) 最小 scalar、(4) runtime artifact（暫定分類、評価結果、adversarial-review findings、REQ-{NNNN} lifecycle）。優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
 
-呼出元 STEP は本スキルの出力（採用済み成果物、分類結果レポート）を STEP の result evidence として扱い、次 STEP の Input Resolution で再取得できる。STEP reference 8 要素は `docs/specs/workflows/step-reference-contract.md` 参照。
+呼出元 STEP は本スキルの出力（採用済み成果物、分類結果レポート）を STEP の result evidence として扱い、次 STEP の Input Resolution で再取得できる。STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
 
 ## See Also
 

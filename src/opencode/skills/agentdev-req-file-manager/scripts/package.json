@@ -2,7 +2,7 @@
   "name": "agentdev-req-file-manager-scripts",
   "version": "0.1.0",
   "private": true,
-  "description": "Deterministic scripts for REQ/ADR/SPEC file management (REQ-0103-159/160, AG-002/006). Pure functions, argv/stdin input, stdout JSON output.",
+  "description": "Deterministic scripts for REQ/ADR/SPEC file management (REQ-{NNNN}-{NNN}/160, AG-{NNN}/006). Pure functions, argv/stdin input, stdout JSON output.",
   "type": "module",
   "scripts": {
     "test": "bun test",

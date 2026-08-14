@@ -41,7 +41,7 @@ frontmatter 完全性（4フィールド）:
 
 `superseded_by` を持つ SPEC は通常内容検査の対象から除外する。
 
-## SPEC 一覧表（docs/specs/README.md 相当）登録
+## SPEC 一覧表（docs/specs<README>.md 相当）登録
 
 新規 SPEC 作成時（CREATE）は SPEC 一覧表へ当該 SPEC の行を登録する。
 

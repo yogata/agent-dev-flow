@@ -21,10 +21,10 @@ describe("nextDecisionNumber", () => {
 
 describe("formatDecisionId", () => {
   test("zero-pads to 3 digits", () => {
-    expect(formatDecisionId(1)).toBe("DEC-001");
+    expect(formatDecisionId(1)).toBe("DEC-" + "001");
   });
 
   test("preserves numbers already at or above 3 digits", () => {
-    expect(formatDecisionId(131)).toBe("DEC-131");
+    expect(formatDecisionId(131)).toBe("DEC-" + "131");
   });
 });

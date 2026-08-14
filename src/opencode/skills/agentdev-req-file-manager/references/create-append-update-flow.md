@@ -12,7 +12,7 @@
 | 操作 | テンプレートを適用して新規ファイル作成 |
 | 採番 | 最大REQ番号+1で採番 |
 | パス | `docs/requirements/REQ-{NNNN}.md` |
-| README | `docs/requirements/README.md` のインデックスに新規REQを追加 |
+| README | `docs/requirements<README>.md` のインデックスに新規REQを追加 |
 | ドキュメントハブ | `docs/README.md` の Requirements セクションに新規REQを追加 |
 
 ### APPEND（既存要件への追加）

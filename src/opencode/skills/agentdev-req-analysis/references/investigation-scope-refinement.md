@@ -40,12 +40,12 @@ command/skill 名、REQ/ADR/SPEC ID、固有名詞に限定する。
 
 ```
 # 関連 REQ 候補
-glob docs/requirements/REQ-*.md
-grep -l "<keyword>" docs/requirements/REQ-*.md
+glob docs/requirements/<REQ-*>.md
+grep -l "<keyword>" docs/requirements/<REQ-*>.md
 
 # 関連 Decision 候補
-glob docs/decisions/DEC-*.md
-grep -l "<keyword>" docs/decisions/DEC-*.md
+glob docs/decisions/<DEC-*>.md
+grep -l "<keyword>" docs/decisions/<DEC-*>.md
 
 # 関連 SPEC 候補
 grep -rl "<keyword>" docs/specs/

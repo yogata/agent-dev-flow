@@ -38,7 +38,7 @@ Command定義（`.opencode/commands/`）の行数目安、Steps数目安、書�
 ### 除外対象
 
 - YAML frontmatter の `description` は必須フィールドとして扱い、行数削減のために削除しない
-- dev メタデータは frontmatter に記述禁止（Case 5/ RU-0020, 規定の行番号範囲）
+- dev メタデータは frontmatter に記述禁止（Case 5/ RU-{NNNN}, 規定の行番号範囲）
 
 ## Steps 数目安
 

@@ -52,8 +52,8 @@ SPLIT や REQ 再構成候補を検出した場合は、`/agentdev/inspect-docs`
 
 ## インデックス、ハブ更新
 
-1. CREATE 時は `docs/requirements/README.md` に新規行を追加する。
-2. APPEND/ UPDATE 時は `docs/requirements/README.md` の該当 REQ title 列を frontmatter 値に合わせて更新する。
+1. CREATE 時は `docs/requirements<README>.md` に新規行を追加する。
+2. APPEND/ UPDATE 時は `docs/requirements<README>.md` の該当 REQ title 列を frontmatter 値に合わせて更新する。
 3. CREATE 時は `docs/README.md` に新規リンクを REQ 番号順の正しい位置へ挿入する。
 4. APPEND/ UPDATE 時はタイトル変更がある場合のみ `docs/README.md` の該当 REQ リンクテキストを更新する。
 5. 両ファイルの更新後、`agentdev-req-file-manager` の整合性チェック自動修正手順に従って検証する。

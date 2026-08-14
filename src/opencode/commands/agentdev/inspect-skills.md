@@ -34,12 +34,12 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
-| `docs/requirements/*.md`、`docs/decisions/*.md` | inspect-docs |
-| `docs/specs/**/*.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
+| `docs/requirements/<*>.md`、`docs/decisions/<*>.md` | inspect-docs |
+| `docs/specs/<**/*>.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
 | `docs/guides/*.md`、`README.md` | inspect-docs |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
-| `docs/specs/commands/**/*.md`、`docs/specs/skills/**/*.md` | inspect-skills |
+| `docs/specs/<commands/**/*>.md`、`docs/specs/<skills/**/*>.md` | inspect-skills |
 | 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
 
 routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。配布物のみの変更時は inspect-skills を優先する。
@@ -67,7 +67,7 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 
 存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity SPEC 構文健全性検査準拠）。
 
-エンコーディング不整合の検出は、配布物 Markdown の UTF-8 BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-8 かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
+エンコーディング不整合の検出は、配布物 Markdown の UTF-{N} BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-{N} かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
 ### Step 4: 分類
 
 検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける

@@ -1,6 +1,6 @@
 # `agentdev-artifact-validation` scripts
 
-文書種別横断の決定的検証 script 群と共有 lib（AG-003/009/019、design-principles.md 第5節）。
+文書種別横断の決定的検証 script 群と共有 lib（AG-{NNN}/009/019、design-principles.md 第5節）。
 
 ## 構成
 
@@ -47,6 +47,6 @@ bun src/check-frontmatter-consistency.ts ../../../docs/requirements req
 
 ## 所有権と委譲
 
-本ディレクトリの script と lib は `agentdev-artifact-validation` が正規所有する（AG-003、AG-019）。
-利用側 command、skill は内部 lib パスを直接参照せず、公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（AG-009）。
-同一 script または共有 lib を複数 skill へ複製しない（AG-003）。
+本ディレクトリの script と lib は `agentdev-artifact-validation` が正規所有する（AG-{NNN}、AG-{NNN}）。
+利用側 command、skill は内部 lib パスを直接参照せず、公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（AG-{NNN}）。
+同一 script または共有 lib を複数 skill へ複製しない（AG-{NNN}）。

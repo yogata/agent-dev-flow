@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "types": ["bun", "node"],
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": [
+    "./check_distribution_boundary.ts",
+    "./check_distribution_boundary.test.ts",
+    "./check_distribution_boundary_cli.ts",
+    "./lib/distribution-boundary.ts",
+    "./lib/distribution-boundary-detector.ts",
+    "./lib/distribution-boundary-patterns.ts",
+    "./lib/distribution-boundary-text-binary.ts",
+    "./lib/distribution-boundary-types.ts",
+    "./lib/distribution-boundary-fs.ts",
+    "./lib/distribution-boundary-baseline.ts",
+    "./lib/distribution-boundary-exemptions.ts",
+    "./lib/distribution-boundary-rules.ts"
+  ]
+}

@@ -2,7 +2,7 @@
 
 inspect-docs command が実行する docs 横断診断のカテゴリ定義と、各専門 skill へのルーティング対象を定義する。
 本スキルは「横断的に複数文書をスキャンして専門診断の対象を特定する」役割のみを持ち、各カテゴリの判定シグナル、閾値、出力 schema の詳細は専門 skill が所有する（`diagnostic-routing.md` 参照）。
-専門診断の判定ロジックを本カテゴリで再定義しない（AC-014）。
+専門診断の判定ロジックを本カテゴリで再定義しない（AC-{NNN}）。
 
 ## カテゴリ一覧
 
@@ -26,8 +26,8 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 
 | 対象 | 理由 |
 |------|------|
-| `docs/requirements/**/*.md`（retired/ 配下は除く） | 現行要件の参照整合性保持 |
-| `docs/decisions/**/*.md` | 現行 Decision の参照整合性保持 |
+| `docs/requirements/<**/*>.md`（retired/ 配下は除く） | 現行要件の参照整合性保持 |
+| `docs/decisions/<**/*>.md` | 現行 Decision の参照整合性保持 |
 | SPEC ファイル群 | 現行 SPEC の参照整合性保持 |
 | ガイドファイル群 | ガイドの参照整合性保持 |
 | agentdev command 群 | 配布物の ID 汚染検出（利用者向け） |
@@ -130,11 +130,11 @@ docs-spec-rebuild-integrity SPEC が定義する5パターンを配布物整合�
 | 見出し重複 | 同一文書内の H1/H2 等の主要見出しの意図せぬ重複 | 許容される重複（手順番号等） |
 | Markdown 構文破損 | 正規表現破損、未対応フェンス、不正インラインコード等 | （該当なし） |
 | 存在しない command 参照 | README listing と command 本文の相互参照で存在しない command を指す参照 | 実在する command 参照 |
-| エンコーディング不整合 | UTF-8 BOM 付きファイル、単一ファイル内の CRLF/LF 混在 | BOM なし UTF-8 かつ単一改行コードで構成されたファイル |
+| エンコーディング不整合 | UTF‑8 BOM 付きファイル、単一ファイル内の CRLF/LF 混在 | BOM なし UTF‑8 かつ単一改行コードで構成されたファイル |
 
 存在しない command 参照の検出は README listing（agentdev command README の command 一覧）と command 本文（各 `*.md`）の相互参照について `/agentdev/*` 参照を抽出し、実在する command 一覧と照合する。実在確認であった command 参照は検出対象外とする。
 
-エンコーディング不整合の検出は配布物 Markdown の先頭3バイトから UTF-8 BOM（`EF BB BF`）の有無を判定し、当該ファイル内の改行コード出現集合（CRLF、LF のいずれか、または両方）から混在を判定する。BOM なし UTF-8 かつ単一の改行コードで構成されたファイルは検出対象外とする。
+エンコーディング不整合の検出は配布物 Markdown の先頭3バイトから UTF‑8 BOM（`EF BB BF`）の有無を判定し、当該ファイル内の改行コード出現集合（CRLF、LF のいずれか、または両方）から混在を判定する。BOM なし UTF‑8 かつ単一の改行コードで構成されたファイルは検出対象外とする。
 
 ### ルーティング先
 

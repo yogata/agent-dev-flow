@@ -24,7 +24,7 @@ export type ExtractionRule = (typeof EXTRACTION_RULES)[number]
 /**
  * Open extension point: node types and relation types are validated against a
  * runtime-resolved vocabulary (defaults + augmentation). They are NOT closed
- * enums (REQ-012-004, DEC-007 decision 2).
+ * enums (REQ-{NNNN}-{NNN}, DEC-{N} decision 2).
  */
 export type NodeType = string
 export type RelationType = string
@@ -43,7 +43,7 @@ export const ProvenanceSchema = z.object({
 
 /**
  * Build a Node schema that accepts any node type in the resolved vocabulary.
- * Open extensibility: augmentation can add types (REQ-012-004).
+ * Open extensibility: augmentation can add types (REQ-{NNNN}-{NNN}).
  */
 export function buildNodeSchema(validNodeTypes: ReadonlySet<string>) {
   return z.object({

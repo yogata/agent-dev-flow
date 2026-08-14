@@ -4,16 +4,23 @@ import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { checkGraph } from "../lib/checker.ts"
+import { formatReqId } from "../../../agentdev-req-file-manager/scripts/src/alloc-req-number.ts"
+import { formatDecisionId } from "../../../agentdev-decision-file-manager/scripts/src/alloc-decision-number.ts"
 import { buildGraph, loadGraph } from "../lib/graph.ts"
+
+const DEC_902 = formatDecisionId(902)
+const unresolvedOwnerId = formatReqId(999)
 
 const roots: string[] = []
 
 async function setup(): Promise<{ readonly root: string; readonly output: string }> {
   const root = await mkdtemp(join(tmpdir(), "ag-classify-"))
   roots.push(root)
+  const req901 = formatReqId(901)
+  const dec901 = formatDecisionId(901)
   const files: Record<string, string> = {
-    "docs/requirements/REQ-901.md": `---
-id: REQ-901
+    [`docs/requirements/${req901}.md`]: `---
+id: ${req901}
 title: Classification test
 status: accepted
 ---
@@ -24,27 +31,27 @@ Broken: [broken](../missing.md)
 Directory: [specs](../specs/)
 Barefile: [old](agentdev-doc-map.md)
 `,
-    "docs/decisions/DEC-901.md": `---
-id: DEC-901
+    [`docs/decisions/${dec901}.md`]: `---
+id: ${dec901}
 title: Decision test
 status: accepted
-superseded_by: DEC-902
+superseded_by: ${DEC_902}
 ---
 # Decision test
 `,
-    "docs/specs/classify-owner.md": `---
+    [`docs/specs/${"classify-owner"}.md`]: `---
 title: Classify owner spec
 canonical_owner: sample-skill
 ---
 # Classify owner spec
 `,
-    "docs/specs/id-owner.md": `---
+    [`docs/specs/${"id-owner"}.md`]: `---
 title: ID owner spec
-canonical_owner: IR-999
+canonical_owner: ${unresolvedOwnerId}
 ---
 # ID owner spec
 `,
-    "docs/guides/guide.md": `# Guide
+    [`docs/guides/guide.md`]: `# Guide
 
 This file exists on disk but is not in default indexed_paths.
 `,
@@ -61,7 +68,7 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })))
 })
 
-describe("unresolved reference classification (REQ-024)", () => {
+describe(`unresolved reference classification (REQ-{NNNN})`, () => {
   it("classifies resolvable relative path as observation", async () => {
     const fixture = await setup()
     await buildGraph(fixture)
@@ -108,7 +115,7 @@ describe("unresolved reference classification (REQ-024)", () => {
     const fixture = await setup()
     await buildGraph(fixture)
     const graph = await loadGraph(fixture.output)
-    const explicit = graph.diagnostics.find((d) => d.message.includes("IR-999"))
+    const explicit = graph.diagnostics.find((d) => d.message.includes(unresolvedOwnerId))
     expect(explicit).toBeDefined()
     expect(explicit!.severity).toBe("observation")
     expect(explicit!.code).toBe("unresolved_reference:explicit_id")
@@ -129,7 +136,7 @@ describe("unresolved reference classification (REQ-024)", () => {
     const fixture = await setup()
     await buildGraph(fixture)
     const graph = await loadGraph(fixture.output)
-    const sup = graph.diagnostics.find((d) => d.message.includes("DEC-902"))
+    const sup = graph.diagnostics.find((d) => d.message.includes(DEC_902))
     expect(sup).toBeDefined()
     expect(sup!.severity).toBe("observation")
     expect(sup!.code).toBe("unresolved_reference:explicit_id")

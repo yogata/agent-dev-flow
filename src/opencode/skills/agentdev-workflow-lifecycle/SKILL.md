@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-lifecycle
-description: Provides development workflow phase definitions, SSoT transitions, work_type classification (bugfix/feature/maintenance/docs_chore), scale assessment, command mappings, and docs structure for the agentdev command pipeline. USE FOR: determining workflow phases, work_type classification and scale assessment, resolving command dependencies, or understanding docs/ directory layout. DO NOT USE FOR: specific command execution logic, requirement analysis, compliance checking, or direct invocation (Workflow Skill; consume via the corresponding /agentdev/* command stages — standalone skill launch is discouraged by the REQ-027-002 soft guard).
+description: Provides development workflow phase definitions, SSoT transitions, work_type classification (bugfix/feature/maintenance/docs_chore), scale assessment, command mappings, and docs structure for the agentdev command pipeline. USE FOR: determining workflow phases, work_type classification and scale assessment, resolving command dependencies, or understanding docs/ directory layout. DO NOT USE FOR: specific command execution logic, requirement analysis, compliance checking, or direct invocation (Workflow Skill; consume via the corresponding /agentdev/* command stages — standalone skill launch is discouraged by the REQ-{NNNN}-{NNN} soft guard).
 ---
 
 # AgentDevFlow ライフサイクルスキル
@@ -47,22 +47,22 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 全 agentdev コマンドの一覧、入出力リファレンスは command README（`commands/agentdev/README.md`）を参照。
 本 skill は全 agentdev コマンドからフェーズ定義、work_type 判定基準の参照元として使用される。
 
-## STEP model 連携（REQ-005-024、DEC-011）
+## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Workflow Skill として宣言的定義（ライフサイクル判定、work_type 判定、scale 判定、SSoT 遷移、上位への引き継ぎ判定）を提供する。本スキル自身は workflow STEP を所有せず、各 command の Workflow Skill が所有する STEP から参照される（`docs/specs/workflows/workflow-skill-model.md`）。
+本スキルは Workflow Skill として宣言的定義（ライフサイクル判定、work_type 判定、scale 判定、SSoT 遷移、上位への引き継ぎ判定）を提供する。本スキル自身は workflow STEP を所有せず、各 command の Workflow Skill が所有する STEP から参照される（`<workflows/workflow-skill-model>` SPEC）。
 
 ### 宣言的定義と Input Resolution
 
-本スキルが提供する宣言的定義は、各 STEP の Input Resolution において durable state 優先順位の最上位（SSoT 再構成）に位置する。優先順位の詳細は `docs/specs/workflows/input-resolution-and-durable-state.md` 参照。
+本スキルが提供する宣言的定義は、各 STEP の Input Resolution において durable state 優先順位の最上位（SSoT 再構成）に位置する。優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
 
 | 宣言的定義 | SSoT 配置 | 利用 STEP |
 |---|---|---|
-| work_type 判定基準 | 本スキル + docs/specs/workflows/workflow-contracts.md | case-open / case-run `prepare` STEP |
+| work_type 判定基準 | 本スキル + `<workflows/workflow-contracts>` SPEC | case-open / case-run `prepare` STEP |
 | scale 判定基準 | 本スキル | req-define / case-open `prepare` STEP |
 | SSoT 遷移定義 | 本スキル | 全 workflow の STEP transition |
 | 上位への引き継ぎ判定 | 本スキル（`references/upstream-handoff.md`） | 全 workflow の `prepare` STEP |
 
-STEP reference 8 要素、STEP 識別子、durable state 復元契約は `docs/specs/workflows/step-reference-contract.md` に従う。compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
+STEP reference 8 要素、STEP 識別子、durable state 復元契約は `<workflows/step-reference-contract>` SPEC に従う。compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
 
 ## work_type とコマンド経路
 

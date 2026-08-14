@@ -1,6 +1,6 @@
 # STEP-3: docs 検証・SPEC 確定（docs-and-spec-promotion）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-3 詳細である。docs/ 検証、targeted docs guard、IR-056 check_extensions.ts、SPEC 確定フロー（draft → accepted 昇格）を提供する。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-3 詳細である。docs/ 検証、targeted docs guard、IR-{NNN} check_extensions.ts、SPEC 確定フロー（draft → accepted 昇格）を提供する。
 
 ## 開始条件
 
@@ -9,7 +9,7 @@
 
 ## 結果
 
-- docs/ 検証合格（targeted docs guard、IR-056）
+- docs/ 検証合格（targeted docs guard、IR-{NNN}）
 - SPEC 確定フロー処理完了（昇格 / spec-save 提案 / 見送り）
 
 ## 手順
@@ -24,9 +24,9 @@
 
 実装完了、PR マージ前に、SPEC 本文と実装の最終矛盾確認、command 定義の更新漏れ、skill 責務境界の変更漏れを確認。更新漏れ検出時は警告表示してユーザー判断。局所予防の範囲で `/agentdev/inspect-docs` の全体意味レビューの代替ではない。
 
-#### extensions 整合性検査（IR-056、REQ）
+#### extensions 整合性検査（IR-{NNN}、REQ）
 
-当該 PR が次のいずれかを変更した場合、`check_extensions.ts` を strict 実行し、IR-056 違反がないことを確認する。
+当該 PR が次のいずれかを変更した場合、`check_extensions.ts` を strict 実行し、IR-{NNN} 違反がないことを確認する。
 
 - `.opencode/commands/agentdev/**/*.md`
 - `.opencode/skills/agentdev-*/SKILL.md`
@@ -39,12 +39,22 @@
 
 変更ファイルと連動ファイルに対し targeted docs guard を実行（case-close はマージ後 main 環境で実行されるため `--files` を使用）。
 
-- **実行コマンド**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`
+- **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`
 - **`<PR 変更ファイル一覧>`**: space 区切り推奨、comma 区切り、混在も可
 - **JSON 出力の `failures`**: strict severity が含まれる場合はマージを停止し対象ファイルを修正して再実行
-- **`full_docs_check_recommended`**: true の場合は `/repo/docs-check`（全体監査）の実行をユーザーに提案
+- **`full_docs_check_recommended`**: true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案
 - **draft → accepted 等の SPEC status 変更時**: `spec_readme_update_required` を Step 3-2 SPEC 確定フローに反映
 - **`files_checked` 空時の確認（REQ）**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する
+
+#### 配布依存境界の最終変更経路 gate（REQ-{NNNN}-{NNN} 再利用、REQ-{NNNN}-{NNN}、DEC-{N}）
+
+PR 変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、PR マージ前に配布依存境界の最終 gate を実行する。本 gate は共用 detector（`.opencode/skills/<integrity-detector-skill>/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、REQ-{NNNN}-{NNN} の最終 gate 基底を再利用する（REQ-{NNNN}-{NNN}、DEC-{N} 決定4）。adapter が bypass されても最終 gate で停止する（DEC-{N} 決定3、4）。trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run Step 7-1 と同一。junction 領域は git 非追跡のため PR 差分に現れず、junction を trigger にすると gate が不発になる）
+
+- **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`
+- **検査対象**: PR HEAD の worktree（マージ前の実際の PR ブランチ内容）を検査する。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査対象とする（Oracle finding 5: inspect PR head before merge）
+- **`--profile source`**: case-close は PR マージ前に実行され、配布ソース面を検査するため `source` を使用する（junction は原本への鏡像）
+- **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う（DEC-{N} 決定5、TS-{NNN}）。clean として通過させない。違反時はマージを停止しユーザー判断を仰ぐ
+- **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run Step 7-1 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
 
 ### Step 3-2: SPEC 確定フロー
 
@@ -52,7 +62,7 @@ PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録�
 
 | 処理パターン | 条件 | アクション |
 |---|---|---|
-| (a) case-close 内で SPEC 昇格 | 対象 SPEC の `status` が `draft`、実装が SPEC 内容を検証済み | 対象 SPEC の `status` を `draft` → `accepted` に昇格（編集スコープ: `docs/specs/**`） |
+| (a) case-close 内で SPEC 昇格 | 対象 SPEC の `status` が `draft`、実装が SPEC 内容を検証済み | 対象 SPEC の `status` を `draft` → `accepted` に昇格（編集スコープ: プロジェクトの SPEC ファイル群） |
 | (b) spec-save 再起動の提案 | SPEC 確定候補が SPEC ファイル未保存 | `/agentdev/spec-save` の再実行を提案し case-close は完了させる |
 | (c) 見送り | 確定不要と判断 | 候補を Findings/ Capture候補 に準じて記録し後続へ委ねる |
 
@@ -60,13 +70,14 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 
 ## case-close が使用する検査ツール
 
-- `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行、AG-003）
-- `check_extensions.ts`（IR-056、配布物パターンのいずれかを変更した場合に実行）
+- `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行、AG-{NNN}）
+- `check_extensions.ts`（IR-{NNN}、配布物パターンのいずれかを変更した場合に実行）
+- `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルが配布 command/skill ソース面に含まれる場合に実行、DEC-{N} 決定4、REQ-{NNNN}-{NNN} 最終 gate 基底再利用）
 - test_strategy（QG-4 完了条件確認）
 
 ## resume point
 
-- docs/ 検証結果（targeted docs guard、IR-056 check_extensions.ts）
+- docs/ 検証結果（targeted docs guard、IR-{NNN} check_extensions.ts）
 - SPEC 確定フロー処理結果（昇格 a / 提案 b / 見送り c）
 - `spec_readme_update_required` 状態
 
@@ -78,7 +89,7 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 ## 関連 Capability Skill
 
 - `agentdev-spec-file-manager`: SPEC status 昇格、spec-lifecycle-application
-- `repo-agentdev-integrity`: check_changed_docs.ts、check_extensions.ts
+- integrity checker skill（self-hosting リポジトリ限定）: check_changed_docs.ts、check_extensions.ts
 - `agentdev-project-extensions`: document-model SPEC extension 経由（Document Classification Policy）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）

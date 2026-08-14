@@ -22,16 +22,16 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-010、REQ-002-001）。同スキルが6 STEP の control plane として制御構造を所有する。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。
 
 - **STEP-1** 引き継ぎ・OU 選択 — `agentdev_handoff: true` 判定、OU モード時は OU 選択ゲート
-- **STEP-2** Issue 本文生成・execution contract 確定 — QG-2 検証、test_strategy 埋め込み、EC-1〜EC-8 確定
+- **STEP-2** Issue 本文生成・execution contract 確定 — QG-{N} 検証、test_strategy 埋め込み、EC-{N}〜EC-{N} 確定
 - **STEP-3** 構成判定・preflight — 単一REQ → Standard flow、複数REQ/`scale: large`/複数 OU → Epic flow、execution_unit 構成、preflight 5項目
 - **STEP-4** adversarial-review（経路F）— default-on、skip 条件（Standard flow で単一 OU 機械的確定）該当時は省略、ユーザー明示指定時は強制発動、4パターン再実行ルール
 - **STEP-5** Issue 作成（Epic flow / Standard flow）— Epic Issue + 子Issue（OU単位、最大5件並列）、または Standard Issue、OU 結果書き戻し
 - **STEP-6** 終了処理・クリーンアップ — コメント追加、draft/RU 削除（Form Zero、即時 commit/push）、削除残存検証、完了報告
 
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-case-open` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-002-017）。
+各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-case-open` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
 
 **共通ルール**（全 STEP 適用、詳細は workflow skill 参照）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、テンプレート準拠（テンプレート読込後は毎回【必須】セクションの完備を確認、【任意】は内容がある場合のみ含める、欠落時は再生成）。並列上限と3つの「5件」文脈（case-open の Step 8 子Issue 並列は case-run Wave 内子 Issue 並列と同一上限、5件）の詳細も workflow skill 参照
 
@@ -72,7 +72,7 @@ description: 要件定義をもとにGitHub Issueを作成する
 - G23/G24: 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）を実行せず、`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従う。ステージ・コミットは明示パス指定（`git add <path>`/ `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）で行い共有 index の他セッション変更を排出しない。draft/RU 削除は同一ステップで即時ステージ・コミットし未ステージ残存を許さない（Form Zero）。`git add` は `.agentdev/` 全体の一括スコープではなく明示パスに限定
 
 ### 本文 verbatim・ファイル経由制約
-- G25: Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）は文字列変数で持ち回らず `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでファイル経由で固定し、親エージェントの本文再構成を禁止
+- G25: Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）は文字列変数で持ち回らず `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-{N} BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでファイル経由で固定し、親エージェントの本文再構成を禁止
 
 
 

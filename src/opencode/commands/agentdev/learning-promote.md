@@ -67,7 +67,7 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save`）を経て初めて REQ 化される。
 学びを直接 REQ 化しない。
 
-**living pool 維持（REQ）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-005）。終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
+**living pool 維持（REQ）**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-{NNN}）。終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
 
 ### Step 8: 既存対策確認
 
@@ -75,41 +75,41 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 
 ### Step 8-R1: adversarial-review 発動条件判定（経路D）
 
-`agentdev-learning-pipeline` の「adversarial-review 候補判断と内部挿入」節（経路D）を参照。本 Step は発動条件判定のみを行い、review 呼出（Step 8-R2）と分離する（REQ-015-001）。
+`agentdev-learning-pipeline` の「adversarial-review 候補判断と内部挿入」節（経路D）を参照。本 Step は発動条件判定のみを行い、review 呼出（Step 8-R2）と分離する（REQ-{NNNN}-{NNN}）。
 
-learning-promote は adversarial-review を原則実行する（default-on、REQ-015-002）。発動条件は次のいずれも満たすこと。
+learning-promote は adversarial-review を原則実行する（default-on、REQ-{NNNN}-{NNN}）。発動条件は次のいずれも満たすこと。
 
 - evaluation-report.md が Step 6 で生成・更新済みであり、Step 7（廃棄判定）と Step 8（既存対策確認）の結果が反映されていること
 - skip 条件（後述）に該当しないこと
 
-- **skip 条件（REQ-015-003）**: inbox.md エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）、または inbox.md 空（処理対象なし）の場合、省略して従来フローを継続できる。skip 判断のためだけの新規 HITL、承認点は追加しない
-- **ユーザー明示指定時の必須実行（REQ-015-002）**: ユーザーが adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する。ただし evaluation-report.md 反映済みは引き続き必須とする
+- **skip 条件（REQ-{NNNN}-{NNN}）**: inbox.md エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）、または inbox.md 空（処理対象なし）の場合、省略して従来フローを継続できる。skip 判断のためだけの新規 HITL、承認点は追加しない
+- **ユーザー明示指定時の必須実行（REQ-{NNNN}-{NNN}）**: ユーザーが adversarial-review を明示的に要求した場合、skip 条件の該当にかかわらず必ず発動する。ただし evaluation-report.md 反映済みは引き続き必須とする
 
-adversarial-review は新規必須工程、QG、承認ゲートとして導入しない（REQ-014-001）。共通 caller integration 契約の正規所有者は `agentdev-adversarial-review` SPEC（REQ-014）である。
+adversarial-review は新規必須工程、QG、承認ゲートとして導入しない（REQ-{NNNN}-{NNN}）。共通 caller integration 契約の正規所有者は `agentdev-adversarial-review` SPEC（REQ-{NNNN}）である。
 
 発動条件成立時は Step 8-R2 へ進む。非成立時は Step 8-R2 を迂回し Step 9 へ進む。
 
 ### Step 8-R2: adversarial-review 呼出（経路D）
 
-`agentdev-learning-pipeline` の「adversarial-review 候補判断と内部挿入」節（経路D）を参照。本 Step は review 呼出のみを行い、発動条件判定（Step 8-R1）と分離する（REQ-015-001）。
+`agentdev-learning-pipeline` の「adversarial-review 候補判断と内部挿入」節（経路D）を参照。本 Step は review 呼出のみを行い、発動条件判定（Step 8-R1）と分離する（REQ-{NNNN}-{NNN}）。
 
 review 対象は evaluation-report.md のみとする（正規化結果、問題クラス分類、8軸評価スコア、廃棄判定、既存対策照合結果）。inbox → deferred 移動（Step 13）、prune（Step 14）、commit/push（Step 15）等の不可逆処理は未実行である。
 
-呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し（REQ-014-010）、利用不能を報告した上で従来フロー（Step 9 以降）と既存 HITL（Step 10 ユーザー承認）を維持する。
+呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し（REQ-{NNNN}-{NNN}）、利用不能を報告した上で従来フロー（Step 9 以降）と既存 HITL（Step 10 ユーザー承認）を維持する。
 
-accepted finding は learning-promote が責任を持って判定対象へ反映する（REQ-014-006）。adversarial-review 自身は反映を行わない。
+accepted finding は learning-promote が責任を持って判定対象へ反映する（REQ-{NNNN}-{NNN}）。adversarial-review 自身は反映を行わない。
 
-review 反映時（review 対象の意味内容が変更された場合）は Step 6 へ戻り、次の順で関連 Step を再実行する（REQ-015-007、Step 6 戻しループ）。
+review 反映時（review 対象の意味内容が変更された場合）は Step 6 へ戻り、次の順で関連 Step を再実行する（REQ-{NNNN}-{NNN}、Step 6 戻しループ）。
 
 1. Step 6（evaluation-report 生成、更新）: accepted finding の反映結果を evaluation-report.md へ集約
 2. Step 7（廃棄判定）: 反映後の判定結果で再判定
 3. Step 8（既存対策確認）: 反映後の対策照合結果で再確認
 4. Step 8-R1（発動条件判定）: 再発動可否を判定
-5. Step 8-R2（review 呼出）: REQ-014-007 が定める再 review 発動条件（新たな本質的争点が生じ得る場合）を満たす場合のみ再 review
+5. Step 8-R2（review 呼出）: REQ-{NNNN}-{NNN} が定める再 review 発動条件（新たな本質的争点が生じ得る場合）を満たす場合のみ再 review
 
-再 review の停止条件（REQ-014-008、4点）を満たした時点でループを離脱し、Step 9 へ進む。新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する（REQ-014-007）。
+再 review の停止条件（REQ-{NNNN}-{NNN}、4点）を満たした時点でループを離脱し、Step 9 へ進む。新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する（REQ-{NNNN}-{NNN}）。
 
-unresolved な本質的争点またはユーザー判断事項が残る場合、Step 9（判定結果提示）、Step 10（ユーザー承認）、Step 13（deferred 移動）、Step 14（prune）、Step 15（commit/push）等の不可逆処理へ進まない（REQ-014-009）。unresolved は既存の HITL（Step 10 ユーザー承認）または blocker 扱いへ振り向ける。adversarial-review 自体を恒久的な統制ゲートとしない。
+unresolved な本質的争点またはユーザー判断事項が残る場合、Step 9（判定結果提示）、Step 10（ユーザー承認）、Step 13（deferred 移動）、Step 14（prune）、Step 15（commit/push）等の不可逆処理へ進まない（REQ-{NNNN}-{NNN}）。unresolved は既存の HITL（Step 10 ユーザー承認）または blocker 扱いへ振り向ける。adversarial-review 自体を恒久的な統制ゲートとしない。
 
 ### Step 9: ユーザーへの判定結果提示
 
@@ -172,7 +172,7 @@ template: `.opencode/commands/agentdev/templates/learning-promote/standard.md`�
 - G08: `learning-refine` への依存禁止: 本コマンドは旧機能を内包し事前実行を前提としない
 - G09: 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は Step 10 承認とは別に明示承認を維持する（REQ）
 - G10: 無条件の自動REQ化禁止（REQ）: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/SPEC）への昇華可能性を Step 7 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
-- G11: adversarial-review は default-on（経路D、REQ-015-002）: Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は Step 9 へ従来フローを維持する（REQ-015-003）。ユーザー明示要求時は skip 条件にかかわらず必ず発動する。review 反映時は Step 6 へ戻し関連 Step を再実行する（REQ-015-007）。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-014）が正規所有する
+- G11: adversarial-review は default-on（経路D、REQ-{NNNN}-{NNN}）: Step 8-R1（発動条件判定）→ Step 8-R2（review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は Step 9 へ従来フローを維持する（REQ-{NNNN}-{NNN}）。ユーザー明示要求時は skip 条件にかかわらず必ず発動する。review 反映時は Step 6 へ戻し関連 Step を再実行する（REQ-{NNNN}-{NNN}）。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-{NNNN}）が正規所有する
 
 ## ユーザー確認ポイント、エラー処理
 

@@ -6,7 +6,7 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 
 # 日本語置換辞書（agentdev-doc-writing 運用資料）
 
-`agentdev-doc-writing` スキルの查読観点と docs-check / inspect-docs の forbidden 語機械検出（IR-060）が参照する、不自然な日本語表現の置換辞書。
+`agentdev-doc-writing` スキルの查読観点と docs-check / inspect-docs の forbidden 語機械検出（IR-{NNN}）が参照する、不自然な日本語表現の置換辞書。
 個別用語の正誤表を `agentdev-doc-writing` スキルの参照資料で管理する方針に準拠する配置先。
 
 ## 運用区分
@@ -15,14 +15,14 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 
 | 区分 | 機械検出 | 查読 | 取扱 |
 |---|---|---|---|
-| forbidden | 対象（IR-060） | 不要 | 横断置換で即時是正 |
+| forbidden | 対象（IR-{NNN}） | 不要 | 横断置換で即時是正 |
 | review | 対象外 | 対象 | 文脈で推奨訳を選択 |
 | allowed_identifier | 対象外 | 対象外 | 識別子・コード・YAML・パスでは許容 |
 | reconstruct | 対象外 | 対象（是正方式 D） | 作成元 PR・commit・旧版から復元 |
 
 ## forbidden（禁止語、即時横断置換）
 
-現行自然言語文書（Markdown 本文）での使用を禁止する語。IR-060 が機械検出し、推奨訳へ置換する。
+現行自然言語文書（Markdown 本文）での使用を禁止する語。IR-{NNN} が機械検出し、推奨訳へ置換する。
 
 ### 中国語簡体字・中国語由来語句
 
@@ -123,7 +123,7 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 1. 監査報告・学習事項から新たな不自然表現を抽出
 2. 推奨訳、修正方式（A〜D）、運用区分（forbidden / review / reconstruct）を確定
 3. 本辞書へ追加
-4. forbidden 区分へ追加した場合は IR-060 の検出対象へ反映し、docs-check / inspect-docs で検出確認
+4. forbidden 区分へ追加した場合は IR-{NNN} の検出対象へ反映し、docs-check / inspect-docs で検出確認
 
 ## 関連情報
 
@@ -132,4 +132,4 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 - 置換辞書運用区分
 - 横断置換時の誤置換防止
 - `document-type-responsibilities.md`「不自然表現検出分類」節
-- `integrity-rule-catalog.md`「IR-060 forbidden Japanese word detection」
+- `integrity-rule-catalog.md`「IR-{NNN} forbidden Japanese word detection」

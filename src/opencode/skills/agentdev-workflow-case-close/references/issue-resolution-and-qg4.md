@@ -15,7 +15,7 @@
 **Epic Issue 判定**: 解決した Issue 番号の本文を `agentdev-gh-cli` の安全な読み取り手順で取得し、ステータス追跡テーブル（`agentdev-epic-tracker` の新4列/旧4列形式）が存在するか確認。
 
 - **テーブル存在時**: **Epic Wave クローズ**（STEP-E1〜E6、[references/epic-wave-close.md](epic-wave-close.md)）へ分岐
-- **テーブル不存在時**: **単一 Issue クローズ**（STEP-1-1〜）へ進む（後方互換）
+- **テーブル不存在時**: **単一 Issue クローズ**（Step 1-1〜）へ進む（後方互換）
 
 ### Step 1-1: 重複ファイルチェック（merge/pull 実行前、単一 Issue クローズ時）
 
@@ -37,7 +37,7 @@
 達成判定、完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価、更新する。判定基準、検査観点は `agentdev-quality-gates` の QG-4 を参照。
 
 - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run、実行担当サブエージェント、外部実行バックエンドは完了条件チェックボックスを更新しない。case-close は case-run/ 実行担当サブエージェントとは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
-- **PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8）**: unchecked 完了条件を達成判定する前に、各完了条件の評価スコープ（PR 対象範囲 or 全体）を QG-4 観点8「PR 対象範囲 vs 全体 判定マトリクス」に従い決定する（境界ケース #1532/TS-006 由来）
+- **PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8）**: unchecked 完了条件を達成判定する前に、各完了条件の評価スコープ（PR 対象範囲 or 全体）を QG-4 観点8「PR 対象範囲 vs 全体 判定マトリクス」に従い決定する（境界ケース #1532/TS-{NNN} 由来）
 - 手順、再 grep/再検査/再計測、事後確認（再読込 VERIFY）、未達項目残存時の停止（G08）、test strategy 処理完了確認（REQ、未処理項目が残る場合は構造化エラーで停止）の詳細は `agentdev-quality-gates` の QG-4 を参照
 - PR 存在確認
 

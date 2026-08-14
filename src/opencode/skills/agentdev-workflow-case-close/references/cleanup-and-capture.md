@@ -57,7 +57,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）。
 
 #### Step 9-1: 重複ファイルチェック再実行
 
-`git pull --ff-only` 直前に、`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャを再実行する（L-013、PR #1128 由来、共有 main worktree で STEP-1-1 実行時点から STEP-9 実行までの間に並列セッションが加えた未コミット変更を検知するため）。重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと。
+`git pull --ff-only` 直前に、`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャを再実行する（L-013、PR #1128 由来、共有 main worktree で Step 1-1 実行時点から Step 9-1 実行までの間に並列セッションが加えた未コミット変更を検知するため）。重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと。
 
 #### Step 9-2: git main 同期リスク事前検出・代替同期手順選択（REQ）
 

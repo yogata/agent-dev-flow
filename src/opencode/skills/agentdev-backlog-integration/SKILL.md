@@ -54,23 +54,23 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 
 ## adversarial-review 候補判断と内部挿入（経路E）
 
-本スキルは backlog-review 経路E（REQ-015）における adversarial-review の候補判断基準と内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の実行時参照を提供する。正規原本は `agentdev-backlog-integration` SPEC「adversarial-review 候補判断と内部挿入」節である（REQ-014-003、REQ-014-011）。本 SKILL.md は重複定義せず、詳細は `references/integration-judgment.md`「adversarial-review 候補判断と内部挿入（経路E）」節を参照。
+本スキルは backlog-review 経路E（REQ-{NNNN}）における adversarial-review の候補判断基準と内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の実行時参照を提供する。正規原本は `agentdev-backlog-integration` SPEC「adversarial-review 候補判断と内部挿入」節である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。本 SKILL.md は重複定義せず、詳細は `references/integration-judgment.md`「adversarial-review 候補判断と内部挿入（経路E）」節を参照。
 
 呼出元（backlog-review command）と本スキルの主な契約（詳細は SPEC と reference を正とする）:
 
 | 契約 | 要件 | 概要 |
 |---|---|---|
-| 候補判断基準 | REQ-015-008 | review 対象は構成完了時点の RU 構成案。候補判断は補助情報であり自動発動根拠ではない |
-| 候補確定位置 | REQ-015-001/008 | Step 4（統合・分割判定 + depends_on 解決）完了時点で RU 構成案を確定する |
-| 呼出タイミング | REQ-015-008 | 構成（Step 3、Step 4）完了後、承認前に挿入（順序の正は backlog-review command SPEC） |
-| 矛盾検出への引き渡し | REQ-015-008 | review で指摘された矛盾は既存矛盾検出ロジックへ渡し、review 内で自動解決しない |
-| 発動条件 | REQ-015-002 | ユーザー明示指定時のみ発動（順序、発動条件の正は backlog-review command SPEC） |
-| 従来フロー維持 | REQ-015-003 | 条件非該当時、呼出失敗時は従来フローを維持（順序の正は backlog-review command SPEC） |
-| 副作用境界 | REQ-014-004/005 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review SPEC、delegation-contracts SPEC） |
-| accepted finding 反映 | REQ-014-006 | accepted finding の RU 構成案への反映は呼出元責務（正は adversarial-review SPEC） |
-| 再 review 条件 | REQ-014-007 | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review SPEC） |
-| unresolved 時の扱い | REQ-014-009 | unresolved 残時は不可逆処理へ進まない（正は adversarial-review SPEC） |
-| 呼出失敗時の扱い | REQ-014-010 | silent skip 禁止、従来フロー維持（正は adversarial-review SPEC） |
+| 候補判断基準 | REQ-{NNNN}-{NNN} | review 対象は構成完了時点の RU 構成案。候補判断は補助情報であり自動発動根拠ではない |
+| 候補確定位置 | REQ-{NNNN}-{NNN}/008 | Step 4（統合・分割判定 + depends_on 解決）完了時点で RU 構成案を確定する |
+| 呼出タイミング | REQ-{NNNN}-{NNN} | 構成（Step 3、Step 4）完了後、承認前に挿入（順序の正は backlog-review command SPEC） |
+| 矛盾検出への引き渡し | REQ-{NNNN}-{NNN} | review で指摘された矛盾は既存矛盾検出ロジックへ渡し、review 内で自動解決しない |
+| 発動条件 | REQ-{NNNN}-{NNN} | ユーザー明示指定時のみ発動（順序、発動条件の正は backlog-review command SPEC） |
+| 従来フロー維持 | REQ-{NNNN}-{NNN} | 条件非該当時、呼出失敗時は従来フローを維持（順序の正は backlog-review command SPEC） |
+| 副作用境界 | REQ-{NNNN}-{NNN}/005 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review SPEC、delegation-contracts SPEC） |
+| accepted finding 反映 | REQ-{NNNN}-{NNN} | accepted finding の RU 構成案への反映は呼出元責務（正は adversarial-review SPEC） |
+| 再 review 条件 | REQ-{NNNN}-{NNN} | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review SPEC） |
+| unresolved 時の扱い | REQ-{NNNN}-{NNN} | unresolved 残時は不可逆処理へ進まない（正は adversarial-review SPEC） |
+| 呼出失敗時の扱い | REQ-{NNNN}-{NNN} | silent skip 禁止、従来フロー維持（正は adversarial-review SPEC） |
 
 ## See Also
 

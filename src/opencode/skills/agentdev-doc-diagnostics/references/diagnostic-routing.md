@@ -1,7 +1,7 @@
 # 文書種別別診断へのルーティング
 
 inspect-docs command が実行する docs 横断診断のうち、専門診断を要する事項を適切な専門 skill へルーティングするための規則を定義する。
-本スキル（`agentdev-doc-diagnostics`）は横断編成と結果統合のみを所有し、専門診断の判定ロジックを再定義しない（AC-014）。
+本スキル（`agentdev-doc-diagnostics`）は横断編成と結果統合のみを所有し、専門診断の判定ロジックを再定義しない（AC-{NNN}）。
 
 ## ルーティング対象と委譲先
 
@@ -13,7 +13,7 @@ inspect-docs command が実行する docs 横断診断のうち、専門診断�
 | 配布物 ID 汚染（`配布物ルート` の内部 ID 残留） | `agentdev-req-structure-diagnostics` | 横断スキャンで検出、ルーティング | 該当なし（常に委譲） |
 | 配布物統合性（構文健全性、文意保持、責務整合） | `agentdev-req-structure-diagnostics` | 対象範囲の特定、ルーティング | 該当なし（常に委譲） |
 
-配布物統合性の構文健全性には docs-spec-rebuild-integrity SPEC が定義する5パターン（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）が含まれる。存在しない command 参照は README listing と command 本文の相互参照について存在しない command を指す参照を検出し、エンコーディング不整合は UTF-8 BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出する。実在する command 参照、BOM なし UTF-8 かつ単一改行コードで構成されたファイルは検出対象外である。判定基準の詳細、検出手順、報告例は docs-spec-rebuild-integrity SPEC（extension 経由）と `agentdev-req-structure-diagnostics` が所有する。本スキルは横断スキャンで対象範囲を特定し、ルーティングする。
+配布物統合性の構文健全性には docs-spec-rebuild-integrity SPEC が定義する5パターン（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）が含まれる。存在しない command 参照は README listing と command 本文の相互参照について存在しない command を指す参照を検出し、エンコーディング不整合は UTF‑8 BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出する。実在する command 参照、BOM なし UTF‑8 かつ単一改行コードで構成されたファイルは検出対象外である。判定基準の詳細、検出手順、報告例は docs-spec-rebuild-integrity SPEC（extension 経由）と `agentdev-req-structure-diagnostics` が所有する。本スキルは横断スキャンで対象範囲を特定し、ルーティングする。
 | SPEC 三層構造違反（commands/skills/workflows 層分離） | `agentdev-req-structure-diagnostics` | 横断的に SPEC を比較、シグナル抽出、ルーティング | 該当なし（常に委譲） |
 | 文意品質（LLM っぽい表現、空虚な形容/動詞、英語混じり表現） | `agentdev-doc-writing` | 横断スキャンで検出、ルーティング | 該当なし（常に委譲） |
 | 実行主体分類の誤認（command を skill と呼ぶ等） | `agentdev-doc-writing`（doc-writing 査読観点） | 横断スキャンで検出、ルーティング | 該当なし（常に委譲） |
@@ -65,7 +65,7 @@ inspect-docs command の各 Step は次のように本スキルと専門 skill �
 | Step 11: 配布物整合性検査 | 対象範囲特定、ルーティング | `agentdev-req-structure-diagnostics` |
 | Step 13: 未処理 artifact 確認 | 横断スキャン（本スキル直接判定） | 該当なし |
 
-## 責務重複なしの保証（AC-014）
+## 責務重複なしの保証（AC-{NNN}）
 
 本スキルと 3 専門 skill との責務重複がないことを、以下の境界で保証する。
 

@@ -1,10 +1,10 @@
 /**
- * 複合ID（要件行ID）採番スクリプト（AG-002、AG-006、REQ-0103-159/160）。
+ * 複合ID（要件行ID）採番スクリプト（AG-{NNN}、AG-{NNN}、REQ-{NNNN}-{NNN}/160）。
  *
  * 指定 REQ ファイル本文から既存の要件行IDを抽出し、
  * その最大行番号 + 1 を採番する。欠番埋め禁止。
  *
- * 入力は REQ 番号3桁（REQ-001-NNN）と4桁（REQ-0011-NNN）の両形式を一貫して認識する
+ * 入力は REQ 番号3桁（REQ-{NNNN}-{NNN}）と4桁（REQ-{NNNN}-{NNN}）の両形式を一貫して認識する
  * （REQ-ID 形式契約の一律性、他関数と同一）。採番結果の正規化出力は4桁ゼロ埋めとする。
  *
  * I/O:
@@ -31,7 +31,7 @@ export function formatCompositeId(req: number, row: number): string {
 
 /**
  * 本文から `REQ-NNN-MMM` / `REQ-NNNN-MMM` 形式のIDを全て抽出する（純粋関数）。
- * REQ 番号は3桁（REQ-001-NNN）と4桁（REQ-0011-NNN）の両方を許容する
+ * REQ 番号は3桁（REQ-{NNNN}-{NNN}）と4桁（REQ-{NNNN}-{NNN}）の両方を許容する
  * （`extractCompositeIdNumbers` 等の REQ-ID 形式契約と同一）。
  * 重複除去は行わない（重複は整合性チェックの対象）。
  */

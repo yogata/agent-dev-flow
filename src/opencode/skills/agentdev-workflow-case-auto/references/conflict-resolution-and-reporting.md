@@ -1,8 +1,8 @@
-# STEP-7/8: コンフリクト解消 Level 2/3・完了報告（conflict-resolution-and-reporting）
+# STEP-{N}/8: コンフリクト解消 Level 2/3・完了報告（conflict-resolution-and-reporting）
 
-> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-7, STEP-8 詳細である。コンフリクト解消 Level 2/3（インライン case-run 再実行、オーケストレーション級判断）と完了報告（L1 タイムスタンプ、4次元集約、OU処理ループ）を提供する。
+> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-{N}, STEP-{N} 詳細である。コンフリクト解消 Level 2/3（インライン case-run 再実行、オーケストレーション級判断）と完了報告（L1 タイムスタンプ、4次元集約、OU処理ループ）を提供する。
 
-## STEP-7: コンフリクト解消 Level 2/3
+## STEP-{N}: コンフリクト解消 Level 2/3
 
 ### 開始条件
 
@@ -15,21 +15,21 @@ PR マージコンフリクト発生時は、以下3レベルのエスカレー�
 | Level | 担当 | 手順 | 失敗時 |
 |---|---|---|---|
 | Level 1 | case-close | `git rebase` による機械的解消、自動解決時は再マージ | case-auto へエスカレーション |
-| Level 2 | case-auto | 両PR の diff を読み取りコンフリクト箇所を特定しコンフリクト文脈を付けてインライン case-run を再実行、最大2回（元の並列実行を含む計3回の case-run 実行 AG-005） | Level 3 へ |
-| Level 3 | case-auto | マージ順序変更、blocked 単位の隔離 | 停止（STEP-4 停止条件 (8)） |
+| Level 2 | case-auto | 両PR の diff を読み取りコンフリクト箇所を特定しコンフリクト文脈を付けてインライン case-run を再実行、最大2回（元の並列実行を含む計3回の case-run 実行 AG-{NNN}） | Level 3 へ |
+| Level 3 | case-auto | マージ順序変更、blocked 単位の隔離 | 停止（STEP-{N} 停止条件 (8)） |
 
-Level 2 コンフリクト文脈付きインライン case-run 再実行（AG-005）、Level 3 オーケストレーション級判断、発生元非依存、停止条件の段階化の詳細は `agentdev-workflow-orchestration` を参照。
+Level 2 コンフリクト文脈付きインライン case-run 再実行（AG-{NNN}）、Level 3 オーケストレーション級判断、発生元非依存、停止条件の段階化の詳細は `agentdev-workflow-orchestration` を参照。
 
 ### 結果
 
-- コンフリクト解消（Level 2 or 3 で解消時）→ STEP-3 へ戻り再マージ
-- 解消不能時（Level 3 失敗）→ STEP-4 停止経路（停止条件 (8)）
+- コンフリクト解消（Level 2 or 3 で解消時）→ STEP-{N} へ戻り再マージ
+- 解消不能時（Level 3 失敗）→ STEP-{N} 停止経路（停止条件 (8)）
 
-## STEP-8: 完了報告
+## STEP-{N}: 完了報告
 
 ### 開始条件
 
-- 全工程完了 または 停止判定（STEP-4/5/6/7 のいずれか）
+- 全工程完了 または 停止判定（STEP-{N}/5/6/7 のいずれか）
 
 ### 手順
 
@@ -37,7 +37,7 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行（AG-00
 
 完了報告には以下を含める（停止時フォーマットを含む）。
 
-- **停止理由分類**: STEP-4 経由、または経路H の user-decision-required
+- **停止理由分類**: STEP-{N} 経由、または経路H の user-decision-required
 - **開始時刻・終了時刻・所要時間**: 人間が読みやすい形式
 - **工程別タイムスタンプ内訳（L1）**: req-save+spec-save 統合委譲 / case-open / case-run / case-close、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める
 - **インライン実行の記録**: case-run をインライン実行した旨
@@ -55,7 +55,7 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行（AG-00
 
 #### OU処理ループ
 
-Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-2 から開始（全 OU 処理完了時のみ全体完了報告）。
+Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-{N} から開始（全 OU 処理完了時のみ全体完了報告）。
 
 ### 結果
 
@@ -70,8 +70,8 @@ Standard flow の case-close 完了後に未処理 OU が残存する場合は�
 
 ## 関連 STEP
 
-- 前: STEP-3（input-resolution-and-orchestration）、STEP-4（stop-and-decision-resolution）、STEP-6（bounded parent decision resolution 上位合意矛盾/新規ユーザー判断時）
-- 次: なし（workflow 終了、または OU処理ループで STEP-2 へ戻る）
+- 前: STEP-{N}（input-resolution-and-orchestration）、STEP-{N}（stop-and-decision-resolution）、STEP-{N}（bounded parent decision resolution 上位合意矛盾/新規ユーザー判断時）
+- 次: なし（workflow 終了、または OU処理ループで STEP-{N} へ戻る）
 
 ## 関連 Capability Skill
 

@@ -97,17 +97,17 @@ beforeAll(() => {
   // Link normalization fixtures
   writeFileSync(
     join(TEMP_DIR, "actual_relative_link.md"),
-    VALID_BODY + "\n\n## References\n\n- [REQ-0031](docs/requirements/REQ-0031.md)\n- [DEC-001](../docs/decisions/DEC-001.md)\n",
+    VALID_BODY + "\n\n## References\n\n- [REQ-{NNNN}](docs/requirements/REQ-{NNNN}.md)\n- [DEC-{N}](../docs/decisions/DEC-{N}.md)\n",
     "utf-8",
   );
   writeFileSync(
     join(TEMP_DIR, "actual_github_url.md"),
-    VALID_BODY + "\n\n## References\n\n- [REQ-0031](https://github.com/yogata/agent-dev-flow/blob/main/docs/requirements/REQ-0031.md)\n",
+    VALID_BODY + "\n\n## References\n\n- [REQ-{NNNN}](https://github.com/example-user/example-repo/blob/main/docs/requirements/REQ-{NNNN}.md)\n",
     "utf-8",
   );
   writeFileSync(
     join(TEMP_DIR, "actual_code_block_link.md"),
-    VALID_BODY + "\n\n```\n- [REQ-0031](docs/requirements/REQ-0031.md)\n```\n",
+    VALID_BODY + "\n\n```\n- [REQ-{NNNN}](docs/requirements/REQ-{NNNN}.md)\n```\n",
     "utf-8",
   );
 });

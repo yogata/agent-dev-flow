@@ -8,8 +8,8 @@
 //   - stdout: diagnostic report（人間可読テキスト）
 //   - --json を付けた場合は JSON 形式の HarnessReport のみを出力
 //
-// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-021-006, TS-010）。
-// parser/graph regression は REQ-020 傘下の tests/*.test.ts が独立に判断する。
+// 本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS-{NNN}）。
+// parser/graph regression は REQ-{NNNN} 傘下の tests/*.test.ts が独立に判断する。
 // 本コマンドは終了コード 0 で終了する（diagnostic のため）。
 
 import { resolve } from "node:path"
@@ -52,7 +52,7 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
 }
 
 function printHelp(): void {
-  console.error(`effectiveness/run.ts — Artifact Graph workflow effectiveness harness (REQ-021-006)
+  console.error(`effectiveness/run.ts — Artifact Graph workflow effectiveness harness (REQ-{NNNN}-{NNN})
 
 Usage:
   bun effectiveness/run.ts --root <repo-root> --graph <graph-dir> [--json]
@@ -84,8 +84,8 @@ function renderHumanReport(report: HarnessReport): string {
   const lines: string[] = []
   lines.push("# Artifact Graph Workflow Effectiveness Report")
   lines.push("")
-  lines.push("**本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-021-006, TS-010）。**")
-  lines.push("**Parser/Graph regression は REQ-020 傘下の検証層が独立に判断する。**")
+  lines.push("**本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS-{NNN}）。**")
+  lines.push("**Parser/Graph regression は REQ-{NNNN} 傘下の検証層が独立に判断する。**")
   lines.push("")
   lines.push(`- root: ${report.rootDir}`)
   lines.push(`- graph: ${report.graphDir}`)
@@ -96,7 +96,7 @@ function renderHumanReport(report: HarnessReport): string {
 
   // カバレッジ表: 6 category が全て覆盖されているか
   const categoriesCovered = new Set(report.results.map((r) => r.category))
-  lines.push("## Category coverage (REQ-021-006)")
+  lines.push("## Category coverage (REQ-{NNNN}-{NNN})")
   lines.push("")
   lines.push("| category | covered |")
   lines.push("|---|---|")
@@ -133,7 +133,7 @@ function renderQuery(result: EffectivenessResult): readonly string[] {
   lines.push(`- candidates (${result.independentResults.length}):`)
   for (const id of result.independentResults) lines.push(`  - \`${id}\``)
   lines.push("")
-  lines.push("### 6 指標（REQ-021-006）")
+  lines.push("### 6 指標（REQ-{NNNN}-{NNN}）")
   lines.push("")
   lines.push("| metric | Graph | independent |")
   lines.push("|---|---|---|")

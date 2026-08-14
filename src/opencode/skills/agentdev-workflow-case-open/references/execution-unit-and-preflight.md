@@ -1,10 +1,10 @@
-# STEP-3: 構成判定・preflight（execution-unit-and-preflight）
+# STEP-{N}: 構成判定・preflight（execution-unit-and-preflight）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-3 詳細である。execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模判定、構成生成事前検証（preflight）を提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模判定、構成生成事前検証（preflight）を提供する。
 
 ## 開始条件
 
-- STEP-2 で Issue 本文候補（execution contract 確定済み）が生成されている
+- STEP-{N} で Issue 本文候補（execution contract 確定済み）が生成されている
 
 ## 結果
 
@@ -18,8 +18,8 @@
 入力要件doc数を確認。
 
 - **単一REQ** → 規模判定（Step 4）へ
-- **複数REQ または draft-meta `scale: large`** → **マルチREQ Epic flow**（STEP-5 issue-creation-flows の Epic flow へ）
-- **OU モード時**: STEP-1 で選択した OU が複数または `scale: large` を含む場合 → Epic flow に分岐
+- **複数REQ または draft-meta `scale: large`** → **マルチREQ Epic flow**（STEP-{N} issue-creation-flows の Epic flow へ）
+- **OU モード時**: STEP-{N} で選択した OU が複数または `scale: large` を含む場合 → Epic flow に分岐
 
 ### 自律構成生成（OU モード、複数REQ時）
 
@@ -32,8 +32,8 @@
 
 ### 規模判定（単一REQの場合）
 
-- `scale: large` → **単一REQ Epic flow**（STEP-5 Epic flow へ）
-- `scale: standard` / フィールドなし → **Standard flow**（STEP-5 Standard flow へ）
+- `scale: large` → **単一REQ Epic flow**（STEP-{N} Epic flow へ）
+- `scale: standard` / フィールドなし → **Standard flow**（STEP-{N} Standard flow へ）
 
 ### 構成生成事前検証（preflight、Step 4-1）
 
@@ -57,8 +57,8 @@ Standard/Epic/混在構成の全ルートで GitHub Issue 作成前に共通の�
 
 ## 関連 STEP
 
-- 前: STEP-2（issue-body-and-execution-contract）
-- 次: STEP-4（adversarial-review-integration）
+- 前: STEP-{N}（issue-body-and-execution-contract）
+- 次: STEP-{N}（adversarial-review-integration）
 
 ## 関連 Capability Skill
 
