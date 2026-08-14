@@ -100,8 +100,7 @@ case-run が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、ca
 - workflow implementation → Workflow Skill
 - durable state contract → Workflow / STEP SPEC
 
-「Command 定義が SSoT である」という旧表現は workflow 実装の権威情報源が Command にあることを
-含意するため使用しない。
+Command 定義を権威情報源とする旧表現は、workflow 実装の権威情報源が Command 側にあると含意するため使用しない。
 
 ### 一覧表
 
