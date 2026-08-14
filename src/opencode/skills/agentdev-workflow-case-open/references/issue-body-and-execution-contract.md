@@ -2,17 +2,22 @@
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。Issue 本文生成と execution contract（EC-{N}〜EC-{N}）確定の手順を提供する。
 
-## 開始条件
+## Purpose
+
+Issue 本文候補を生成し、execution contract（EC-{N}〜EC-{N}）を確定する。
+
+## Input Resolution
+
+1. SSoT 再構成: 要件doc（draft-data、`agreed_items`、`artifact_actions`、`test_strategy`、`review_dispositions`）、対象 REQ/Decision/SPEC、関連 ADR（Decision）
+2. identifier 保持: REQ-ID、DEC-ID、OU ID、AG-ID
+3. 最小 scalar: なし
+4. runtime artifact: Issue 本文候補ファイル（委譲接続点経由）
+
+## Preconditions
 
 - STEP-{N} で処理対象が確定している
 
-## 結果
-
-- Issue 本文候補（execution contract EC-{N}〜EC-{N} 反映済み）
-- QG-{N} 完了条件網羅性検証合格
-- test_strategy 埋め込み済み（3 要素構造）
-
-## 手順
+## Procedure
 
 ### Issue 本文生成（委譲接続点）
 
@@ -77,6 +82,24 @@ Issue 作成前に変更影響候補を探索し、scope、完了条件、test s
 
 - **VERIFY**: gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証
 - **テンプレート準拠**: テンプレート読込後は毎回【必須】セクションの完備を確認、【任意】は内容がある場合のみ含める、欠落時は再生成
+
+## Result
+
+- Issue 本文候補（execution contract EC-{N}〜EC-{N} 反映済み）
+- QG-{N} 完了条件網羅性検証合格
+- test_strategy 埋め込み済み（3 要素構造）
+
+## Evidence
+
+- Issue 本文候補のファイルパス、QG-{N} 検証結果、EC-{N}〜EC-{N} 確定結果、test_strategy 反映状態
+
+## Completion Verification
+
+- QG-{N} が合格であり（fail 時は req-define 差し戻し推奨）、execution contract 必須セクションが本文候補へ付与されていること
+
+## Resume-Idempotency
+
+- 本文候補はファイルパス（durable state）で保持するため、中断再開時は候補ファイルを再読込して未実行の確定ステップのみ再実行する
 
 ## resume point
 

@@ -2,13 +2,30 @@
 
 > 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-{N}, STEP-{N}, STEP-{N} 詳細である。入力解決、work_type 読取・工程分岐、orchestration 実行（stage モデル、Wave 反復、bg task 管理）を提供する。
 
+## 目次
+
+- STEP-{N}: 入力解決・開始時刻記録
+- STEP-{N}: work_type 読取・工程分岐
+- STEP-{N}: orchestration 実行
+
 ## STEP-{N}: 入力解決・開始時刻記録
 
-### 開始条件
+### Purpose
+
+実行開始時刻を記録し、入力モード（Issue番号/URL 入力 or 要件doc入力）を確定する。
+
+### Input Resolution
+
+1. SSoT 再構成: `.agentdev/drafts/req-draft-*.md`（要件doc入力モード時）
+2. identifier 保持: Issue番号/URL、draft パス
+3. 最小 scalar: `case_auto_started_at`（JST）
+4. runtime artifact: なし
+
+### Preconditions
 
 - case-auto command から入力が渡されている
 
-### 手順
+### Procedure
 
 実行開始時刻を JST（Etc/GMT-{N}）で記録し `case_auto_started_at` に保持。STEP-{N}（停止時報告）・STEP-{N}（完了報告）での所要時間算出の基準として使用。
 
@@ -20,18 +37,41 @@
   - (4) 特定不可: 停止
   - 複数draft読み込み時の順序制御は各draftの `operation_units` から `recommended_order` / `depends_on` に基づき決定
 
-### 結果
+### Result
 
 - 入力モード確定（Issue番号/URL入力 or 要件doc入力）
 - `case_auto_started_at` 記録
 
+### Evidence
+
+- 入力引数の解釈結果、`case_auto_started_at` の値、対象 draft パス一覧（要件doc入力モード時）
+
+### Completion Verification
+
+- 入力モードが一意に確定していること（特定不可時は停止）
+
+### Resume-Idempotency
+
+- 読取と記録のみで副作用を持たない。`case_auto_started_at` は durable state として停止時報告・完了報告で再利用する
+
 ## STEP-{N}: work_type 読取・工程分岐
 
-### 開始条件
+### Purpose
+
+`artifact_actions` 存在による動的判定で工程順序を確定し、auto_gate preflight を実施する。
+
+### Input Resolution
+
+1. SSoT 再構成: draft-data（`work_type`、`artifact_actions`、`auto_gate`）
+2. identifier 保持: なし
+3. 最小 scalar: なし
+4. runtime artifact: なし
+
+### Preconditions
 
 - STEP-{N} で入力解決完了
 
-### 手順
+### Procedure
 
 入力要件doc の `draft-data` から work_type を取得（参考情報、パイプライン分岐の判定には使用しない）。
 
@@ -47,17 +87,40 @@
 
 `draft-data` の `auto_gate.auto_ready` が false または未解決 item（unresolved_questions/ unresolved_conflicts/ out_of_repo_operations/ stop_reasons）が残る場合は停止。
 
-### 結果
+### Result
 
 - 工程順序確定（req-save, spec-save, case-open, case-run, case-close の部分集合）
 
+### Evidence
+
+- `artifact_actions` の entry 種別、auto_gate preflight 判定結果
+
+### Completion Verification
+
+- 工程順序が一意に確定していること（auto_gate 不合格時は停止）
+
+### Resume-Idempotency
+
+- draft-data からの読取のみで副作用を持たない
+
 ## STEP-{N}: orchestration 実行
 
-### 開始条件
+### Purpose
+
+確定した工程順序に従い各工程を委譲起動またはインライン実行し、orchestration stage モデル・Wave 反復・bg task 管理を制御する。
+
+### Input Resolution
+
+1. SSoT 再構成: 各工程の durable state（REQ/Decision/SPEC ファイル、Issue/PR、Epic Issue 本文）
+2. identifier 保持: Issue番号、PR番号、OU ID、draft パス、RU パス
+3. 最小 scalar: L1 工程別タイムスタンプ、stage 2 並列数（最大5件）
+4. runtime artifact: なし（委譲工程内部の過程は親コンテキストに累積しない G28）
+
+### Preconditions
 
 - STEP-{N} で工程順序確定
 
-### 手順
+### Procedure
 
 実行モデル原則、工程別契約（req-save+spec-save 統合委譲 AG-{NNN}、case-open、case-run インライン実行 AG-{NNN}/002、case-close）、QG-{N}〜QG-{N} の継承、タイムスタンプ計測（L1）、インライン実行時のコンテキスト管理、結果状態の4次元集約、case-open 完了後の分岐（Standard flow / Epic Issue flow、クリーンアップ検証ゲート）、Wave 反復制御、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定（AG-{NNN}、delegation-unavailable 停止条件）、Subagent 委譲プロトコル（category 選定ガイドライン、MUST NOT DO 必須化）、orchestration stage モデル、子 task bg task 破棄検知時の回復（AG-{NNN}〜AG-{NNN}、3状態分類、ライフサイクル分離）の各詳細は `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各対応 skill を参照。case-run インライン実行時も case-run.md を authoritative source として読み込む。
 
@@ -98,12 +161,24 @@ req-save 委譲の出力から複数 REQ doc または scale:large を検出し�
 - 必須依存のない execution_unit 群は並列
 - 3つの「5件」文脈の区別に注意
 
-### 結果
+### Result
 
 - 各工程の実行結果（Issue/PR番号、pass/warn/fail）
 - orchestration stage 別結果・フォールバック理由・破棄回復記録
 - 結果状態の4次元（工程結果 / artifact_action 適用結果 / 定義適用工程の完了状態 / OU ライフサイクル完了状態、warn 変換禁止）
 - L1 タイムスタンプ内訳
+
+### Evidence
+
+- 各工程の起動結果（Issue/PR番号）、stage 別結果、L1 工程別タイムスタンプ、結果状態4次元の集約値
+
+### Completion Verification
+
+- 全工程の結果が4状態/結果状態4次元で受領済みであること。停止条件該当時は STEP-{N}（stop-and-decision-resolution）へ遷移していること
+
+### Resume-Idempotency
+
+- 各工程の durable state（Issue/PR、REQ/Decision/SPEC ファイル、Epic Issue 本文）から進捗を再構成する。完了済み工程を再実行しない（case-open 成功後は draft を読まない G19）
 
 ## resume point
 

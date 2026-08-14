@@ -2,18 +2,29 @@
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-E1〜E6 詳細である。Epic Issue 番号入力時（ステータス追跡テーブル存在時）の現在 Wave の一括クローズ、Epic status table 更新、最終 Wave 判定を提供する。
 
-## 開始条件
+## Purpose
+
+Epic Issue 番号入力時（ステータス追跡テーブル存在時）に現在 Wave の子Issue を一括マージ・クローズし、Epic status table を更新、最終 Wave 判定を行う。
+
+## Input Resolution
+
+1. SSoT 再構成: Epic Issue 本文（ステータス追跡テーブル）、現在 Wave の子Issue 本文・PR 本文群
+2. identifier 保持: Epic Issue番号、子Issue番号群、PR番号群
+3. 最小 scalar: なし
+4. runtime artifact: なし
+
+## Preconditions
 
 - STEP-1 で Epic Issue と判定（ステータス追跡テーブル存在）
 
-## 結果
+## Result
 
 - 現在 Wave の全子Issue マージ、クローズ完了（E4-0 最終 gate 違反子Issue は `blocked` としてマージ対象外、Epic status table へ反映）
 - Epic status table 更新完了（単一書き手 case-close のみ）
 - Epic Issue 完了条件チェックボックス最終評価・更新（QG-4 観点8、中間 Wave vs 最終 Wave 評価スコープ切替）
 - 最終 Wave 判定結果（Epic クローズ または 残 Wave 通知）
 
-## 手順
+## Procedure
 
 現在 Wave の PR 作成済み子Issue を一括マージ、クローズし、Epic status table を更新する。最終 Wave 判定後に Epic Issue クローズ または 残 Wave 通知を行う。
 
@@ -72,6 +83,18 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 - `agentdev-epic-tracker` 準拠
 
 詳細手順、判定基準、再読込 VERIFY、未達項目残存時の停止条件は `agentdev-epic-tracker` を正とする。
+
+## Evidence
+
+- Epic Issue 本文読取結果、E4-0 最終 gate の JSON 結果（子Issue 別）、マージ・クローズ結果、Epic status table 更新の VERIFY 結果、最終 Wave 判定根拠
+
+## Completion Verification
+
+- E4-1 対象が E4-0 合格子Issue のみであること。`blocked`/`failed` を `completed` に上書きしていないこと。Epic status table 更新後の再読込 VERIFY が合格であること
+
+## Resume-Idempotency
+
+- Epic Issue 本文のステータス追跡テーブル（durable state、case-close 単一書き手）で子Issue のマージ・クローズ進捗を再構成する。処理済み子Issue の再マージを行わない
 
 ## resume point
 

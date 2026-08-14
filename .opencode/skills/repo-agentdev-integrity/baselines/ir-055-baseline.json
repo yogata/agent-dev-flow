@@ -1,54 +1,12 @@
 {
   "version": 1,
   "rule_id": "IR-055",
-  "generated_at": "2026-08-10",
+  "generated_at": "2026-08-14",
   "entries": [
     {
       "file": "src/opencode/commands/agentdev/README.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/commands/agentdev/backlog-review.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 13
-    },
-    {
-      "file": "src/opencode/commands/agentdev/case-close.md",
-      "pattern": "/repo/",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/commands/agentdev/case-close.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/commands/agentdev/case-close.md",
-      "pattern": "repo-*",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/commands/agentdev/case-open.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 16
-    },
-    {
-      "file": "src/opencode/commands/agentdev/case-run.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 21
-    },
-    {
-      "file": "src/opencode/commands/agentdev/case-run.md",
-      "pattern": "repo-*",
-      "severity": "strict",
       "count": 1
     },
     {
@@ -64,12 +22,6 @@
       "count": 6
     },
     {
-      "file": "src/opencode/commands/agentdev/inspect-promote.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 16
-    },
-    {
       "file": "src/opencode/commands/agentdev/inspect-skills.md",
       "pattern": "docs/guides/",
       "severity": "heuristic",
@@ -82,58 +34,10 @@
       "count": 5
     },
     {
-      "file": "src/opencode/commands/agentdev/intake-promote.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 12
-    },
-    {
-      "file": "src/opencode/commands/agentdev/learning-promote.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 18
-    },
-    {
-      "file": "src/opencode/commands/agentdev/req-define.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 12
-    },
-    {
-      "file": "src/opencode/commands/agentdev/req-save.md",
-      "pattern": "/repo/",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/commands/agentdev/req-save.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 2
-    },
-    {
-      "file": "src/opencode/commands/agentdev/req-save.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 2
-    },
-    {
-      "file": "src/opencode/commands/agentdev/spec-save.md",
-      "pattern": "/repo/",
-      "severity": "strict",
-      "count": 1
-    },
-    {
       "file": "src/opencode/commands/agentdev/spec-save.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
-      "count": 10
-    },
-    {
-      "file": "src/opencode/skills/agentdev-adversarial-review/SKILL.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 24
+      "count": 6
     },
     {
       "file": "src/opencode/skills/agentdev-adversarial-review/SKILL.md",
@@ -143,27 +47,9 @@
     },
     {
       "file": "src/opencode/skills/agentdev-adversarial-review/references/adversarial-review-protocol.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 8
-    },
-    {
-      "file": "src/opencode/skills/agentdev-adversarial-review/references/adversarial-review-protocol.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
       "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/SKILL.md",
-      "pattern": "DEC-NNN",
-      "severity": "strict",
-      "count": 5
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/SKILL.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 16
     },
     {
       "file": "src/opencode/skills/agentdev-artifact-graph/SKILL.md",
@@ -176,60 +62,6 @@
       "pattern": "repo-*",
       "severity": "strict",
       "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/SKILL.md",
-      "pattern": "src/opencode/",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/references/augmentation.md",
-      "pattern": "DEC-NNN",
-      "severity": "strict",
-      "count": 2
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/references/augmentation.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 5
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/references/augmentation.md",
-      "pattern": "repo-*",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/references/verification.md",
-      "pattern": "DEC-NNN",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/references/verification.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 4
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/scripts/README.md",
-      "pattern": "DEC-NNN",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/scripts/README.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-artifact-graph/scripts/effectiveness/README.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 13
     },
     {
       "file": "src/opencode/skills/agentdev-artifact-graph/scripts/effectiveness/README.md",
@@ -245,33 +77,9 @@
     },
     {
       "file": "src/opencode/skills/agentdev-backlog-integration/SKILL.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 14
-    },
-    {
-      "file": "src/opencode/skills/agentdev-backlog-integration/SKILL.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
       "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-backlog-integration/references/integration-judgment.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 12
-    },
-    {
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/SKILL.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 14
-    },
-    {
-      "file": "src/opencode/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 23
     },
     {
       "file": "src/opencode/skills/agentdev-command-authoring/SKILL.md",
@@ -341,12 +149,6 @@
     },
     {
       "file": "src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 2
-    },
-    {
-      "file": "src/opencode/skills/agentdev-git-worktree/references/worktree-operations.md",
       "pattern": "src/opencode/",
       "severity": "strict",
       "count": 3
@@ -361,7 +163,7 @@
       "file": "src/opencode/skills/agentdev-inspect-skills/SKILL.md",
       "pattern": "src/opencode/",
       "severity": "strict",
-      "count": 7
+      "count": 6
     },
     {
       "file": "src/opencode/skills/agentdev-inspect-skills/references/semantic-diagnostic-perspectives.md",
@@ -388,28 +190,10 @@
       "count": 1
     },
     {
-      "file": "src/opencode/skills/agentdev-intake-pipeline/SKILL.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 7
-    },
-    {
-      "file": "src/opencode/skills/agentdev-intake-pipeline/references/intake-promotion.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 6
-    },
-    {
       "file": "src/opencode/skills/agentdev-learning-capture/SKILL.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
       "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-learning-pipeline/SKILL.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 2
     },
     {
       "file": "src/opencode/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md",
@@ -418,22 +202,10 @@
       "count": 4
     },
     {
-      "file": "src/opencode/skills/agentdev-learning-pipeline/references/promote-judgment-logic.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 9
-    },
-    {
       "file": "src/opencode/skills/agentdev-quality-gates/SKILL.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
       "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 6
     },
     {
       "file": "src/opencode/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md",
@@ -523,7 +295,7 @@
       "file": "src/opencode/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md",
       "pattern": "src/opencode/",
       "severity": "strict",
-      "count": 8
+      "count": 6
     },
     {
       "file": "src/opencode/skills/agentdev-skill-authoring/SKILL.md",
@@ -535,18 +307,6 @@
       "file": "src/opencode/skills/agentdev-skill-authoring/references/review-protocol.md",
       "pattern": "src/opencode/",
       "severity": "strict",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-spec-file-manager/SKILL.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
-      "count": 1
-    },
-    {
-      "file": "src/opencode/skills/agentdev-spec-file-manager/references/spec-lifecycle-application.md",
-      "pattern": "docs/specs/",
-      "severity": "heuristic",
       "count": 1
     },
     {
@@ -580,16 +340,34 @@
       "count": 1
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-templates/templates/issue_desc_child.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
+      "file": "src/opencode/skills/agentdev-workflow-req-save/references/indexes-and-persistence.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-req-save/references/precheck-and-req-ops.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-spec-save/SKILL.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 6
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-spec-save/references/placement-and-save.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
       "count": 2
     },
     {
-      "file": "src/opencode/skills/agentdev-workflow-templates/templates/issue_desc_feature.md",
-      "pattern": "REQ-NNNN",
-      "severity": "strict",
-      "count": 2
+      "file": "src/opencode/skills/agentdev-workflow-spec-save/references/verification-and-persistence.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
+      "count": 6
     }
   ]
 }

@@ -2,18 +2,29 @@
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-4 詳細である。PR squash マージ、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを提供する。
 
-## 開始条件
+## Purpose
+
+PR を squash マージし、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase パスを処理する。
+
+## Input Resolution
+
+1. SSoT 再構成: PR の mergeable 状態、ローカル/remote の commit 状態
+2. identifier 保持: PR番号、Issue番号
+3. 最小 scalar: ポーリング試行回数（上限は gh-cli 手続き側が所有）
+4. runtime artifact: なし
+
+## Preconditions
 
 - 単一 Issue クローズ ルート
 - STEP-3 で docs 検証合格
 
-## 結果
+## Result
 
 - マージ済みPR
 - HEAD commit hash 記録
 - コンフリクト Level 1 解消完了、または case-auto Level 2/3 エスカレーション
 
-## 手順
+## Procedure
 
 ### Step 4-0: squash merge 前の mergeable UNKNOWN ポーリング
 
@@ -49,6 +60,18 @@ squash merge がコンフリクトで失敗した場合（Step 4 のリトライ
 - **実装変更は行わず** rebase のみ
 - **rebase 自動解決時**: squash merge（Step 4）へ戻り再マージ
 - **rebase コンフリクト発生時**: case-auto へエスカレーションして停止する（コンフリクト解消モデル Level 2/3 は case-auto の責務）
+
+## Evidence
+
+- mergeable 状態とポーリング記録、merge 結果と HEAD commit hash、対応記録コメントの VERIFY 結果、先行 commit 検出・処理結果、rebase 試行結果
+
+## Completion Verification
+
+- PR がマージ済みであり、HEAD commit hash が記録されていること。Level 1 rebase 失敗時はエスカレーション停止していること
+
+## Resume-Idempotency
+
+- マージ済み PR（durable state）で再実行を判定し、再マージしない。ポーリングとリトライは gh-cli 手続きの契約に従い冪等再実行可能
 
 ## resume point
 

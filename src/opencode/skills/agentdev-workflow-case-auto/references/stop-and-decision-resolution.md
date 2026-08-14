@@ -2,13 +2,30 @@
 
 > 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-{N}, STEP-{N}, STEP-{N} 詳細である。停止条件検出（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 経路H 停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
 
+## 目次
+
+- STEP-{N}: 停止条件検出・停止理由分類
+- STEP-{N}: adversarial-review 経路H 停止伝播
+- STEP-{N}: bounded parent decision resolution
+
 ## STEP-{N}: 停止条件検出・停止理由分類
 
-### 開始条件
+### Purpose
+
+11項目の停止条件を検出し、停止理由を分類軸で報告して再開可能な次コマンドを提示する。
+
+### Input Resolution
+
+1. SSoT 再構成: 各工程の結果、Issue/PR 状態、`case_auto_started_at` と L1 工程別タイムスタンプ
+2. identifier 保持: Issue番号、PR番号、OU ID
+3. 最小 scalar: 停止時刻、経過時間
+4. runtime artifact: なし
+
+### Preconditions
 
 - STEP-{N} で各工程の結果を受領
 
-### 手順
+### Procedure
 
 #### 停止条件（11項目）
 
@@ -48,19 +65,42 @@
 
 execution_unit 分割可能性があるにも関わらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する（case-open の契約・実装不整合であり要件doc 側の問題ではない）。各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-orchestration` を参照。
 
-### 結果
+### Result
 
 - 停止判定（11項目のいずれか）
 - 停止理由分類（9軸のいずれか）
 - 停止時タイミング情報
 
+### Evidence
+
+- 検出した停止条件と根拠、停止理由分類、停止時タイミング情報（開始時刻、停止時刻、経過時間、工程別内訳）
+
+### Completion Verification
+
+- 停止条件非該当時は次工程へ継続していること。該当時は停止理由・現在地点・再開可能な次コマンドが報告されていること
+
+### Resume-Idempotency
+
+- 停止判定は各工程の durable state からの評価であり副作用を持たない。再開時は停止報告の再開ポイントから再構成する
+
 ## STEP-{N}: adversarial-review 経路H 停止伝播
 
-### 開始条件
+### Purpose
+
+下位 command から受領した adversarial-review 由来の user-decision-required + decision_context を伝播し、当該 execution_unit の自走を停止してユーザー判断を待機する。
+
+### Input Resolution
+
+1. SSoT 再構成: decision_context（下位 command が構造化したもの）
+2. identifier 保持: Issue番号、execution_unit ID
+3. 最小 scalar: なし
+4. runtime artifact: なし（raw finding は解決対象としない）
+
+### Preconditions
 
 - STEP-{N}（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領
 
-### 手順
+### Procedure
 
 case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。停止伝播契約の詳細は case-auto command SPEC（project extension 経由参照）「adversarial-review 由来の停止伝播（経路H）」節を正とする。
 
@@ -72,19 +112,42 @@ case-auto は当該 execution_unit の自走を停止し、ユーザー判断を
 
 case-auto は経路H において review 直接起動、finding 解釈、採否、再評価を行わない。これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。user-decision-required は STEP-{N} の HITL 境界停止条件分類とは独立する停止理由分類である。停止報告（STEP-{N}）には user-decision-required を停止理由分類として含める。
 
-### 結果
+### Result
 
 - 当該 execution_unit の自走停止
 - decision_context のユーザー提示
 - resume point 記録
 
+### Evidence
+
+- user-decision-required の受領形式（case-run 起源 / 工程委譲起源）、decision_context、resume point 記録
+
+### Completion Verification
+
+- 当該 execution_unit のみ停止し、他 ready 対象が継続（部分停止）していること。ユーザー提示と resume point が記録されていること
+
+### Resume-Idempotency
+
+- ユーザー判断解決後、resume point（durable state: Issue/PR 状態、委譲起点）から再開する。再 review 要否は case-auto が独自判断しない
+
 ## STEP-{N}: bounded parent decision resolution
 
-### 開始条件
+### Purpose
+
+下位 command から受領した decision_context を限定的に自律解決し、default-on + skip policy と自走性を両立する。
+
+### Input Resolution
+
+1. SSoT 再構成: 現行正規成果物（REQ、Decision、SPEC、Issue その他合意済み情報）
+2. identifier 保持: Issue番号、execution_unit ID
+3. 最小 scalar: なし
+4. runtime artifact: なし
+
+### Preconditions
 
 - 下位 command から decision_context を受領
 
-### 手順
+### Procedure
 
 case-auto は下位 command から受領した decision_context を限定的に自律解決する。default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command SPEC（project extension 経由参照）「bounded parent decision resolution」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節、workflow-contracts SPEC「bounded parent decision resolution と停止・resume 伝播」節が正である。
 
@@ -98,10 +161,22 @@ case-auto は下位 command から受領した decision_context を限定的に�
 - **resume**: 回答、根拠、作業仮定を下位 command へ返し、既存 resume point から処理を継続する。新規永続結果型は導入しない。adversarial-review 再実行要否は adversarial-review 側の再 review 契約に従い case-auto は独自判断しない
 - **中央集約 review engine とはならない**: case-auto は raw finding を解釈、採否、候補反映しない。下位 command が構造化した decision_context のみを解決対象とし、raw finding を case-auto へそのまま渡さない（AG-{NNN}）
 
-### 結果
+### Result
 
 - 自律解決時: 回答・根拠・作業仮定を下位 command へ返し resume
 - 上位合意矛盾/新規ユーザー判断時: STEP-{N} 停止経路へ
+
+### Evidence
+
+- decision_context の分類（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）、回答と根拠（自律解決時）、作業仮定の明示（作業仮定継続時）
+
+### Completion Verification
+
+- 分類が4分類のいずれかであり、作業仮定で継続時に仮定と根拠が明示されていること。raw finding を解決対象にしていないこと
+
+### Resume-Idempotency
+
+- 回答・根拠・作業仮定を下位 command へ返し既存 resume point（durable state）から継続する。新規永続結果型は導入しないため再実行は冪等
 
 ## resume point
 

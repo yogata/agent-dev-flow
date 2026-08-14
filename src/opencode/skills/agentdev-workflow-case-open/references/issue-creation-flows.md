@@ -2,15 +2,30 @@
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。Epic flow（Step 5-9）と Standard flow（Step 10-12）の制御、GitHub Issue 作成手続きを提供する。
 
-## 開始条件
+## Purpose
+
+Epic flow（Step 5-9）または Standard flow（Step 10-12）の制御に従い GitHub Issue を作成し、OU 結果を書き戻す。
+
+## Input Resolution
+
+1. SSoT 再構成: execution structure、Issue 本文候補、関連Decision（`docs/decisions<README>.md`）
+2. identifier 保持: `{epic_number}`、子Issue 番号、OU ID
+3. 最小 scalar: 子Issue 並列数（最大5件）
+4. runtime artifact: Issue 本文候補ファイル
+
+## Preconditions
 
 - STEP-{N} で execution structure が確定している
 - STEP-{N} で adversarial-review skip または review 完了（unresolved なし）
 
-## 結果
+## Result
 
 - GitHub Issue 作成済み（親Epic + 子Issue群、または Standard Issue）
 - OU 結果の書き戻し（`operation_units` の `result` フィールド）
+
+## Procedure
+
+実行ルート（Epic flow / Standard flow）は STEP-{N} の execution structure による。各 flow の手順は以下のとおり。
 
 ## Epic flow（Step 5-9、`scale: large` またはマルチREQ または複数 OU）
 
@@ -75,6 +90,18 @@ case-open、case-auto、case-run で参照される「5件」上限は文脈ご�
 | (3) execution_unit 全体並列 | 上限なし | 必須依存がない execution_unit 群は全て並列実行可能 |
 
 case-open の Step 8「子 Issue 作成の並列化」は **(1) に該当**。3文脈は別なので混同しない。
+
+## Evidence
+
+- 作成済み Issue 番号（Epic、子Issue 群、Standard）、`agentdev-gh-cli` VERIFY 結果、OU 結果書き戻し状態
+
+## Completion Verification
+
+- 全ての Issue 作成で VERIFY 合格済みであること。子Issue 本文の先頭行に `Parent: #{epic_number}` があること。全子Issue 作成完了後に Epic 本文ステータス追跡テーブルを更新していること（部分更新でないこと）
+
+## Resume-Idempotency
+
+- Issue 番号（durable state）で作成済みを判定し、未作成分のみ作成する。Epic 本文更新は直列集約（単一書き手）で再実行冪等
 
 ## resume point
 

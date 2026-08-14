@@ -93,6 +93,27 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 - **bounded parent decision**: STEP-{N} → STEP-{N}（decision_context 受領時）→ 自律解決時は STEP-{N} へ戻る、上位合意矛盾/新規ユーザー判断時は STEP-{N} 停止経路へ
 - **コンフリクトエスカレーション**: STEP-{N}（case-close 委譲時）→ STEP-{N}（Level 1 失敗時）→ 解消時は STEP-{N} へ戻る、Level 3 失敗時は STEP-{N} 停止経路へ
 
+### resume protocol
+
+- 再開点は durable state から再構成する: `case_auto_started_at` と L1 工程別タイムスタンプ、Issue/PR の存在と番号、Epic Issue 本文のステータス追跡テーブル（Wave 進行）、draft の有無（case-open 完了前のみ pre-reader）、各工程の完了結果
+- 停止時報告に再開点と再開可能な次コマンドを明示し、会話コンテキストの記憶に依存しない。case-open 成功後の再開は Issue と Epic だけで成立させる（orchestration pre-reader 契約）
+
+### termination
+
+- 正常終了: 全工程完了（OU処理ループを含む全 OU 処理完了）時の完了報告まで
+- 停止終了: 11項目の停止条件いずれかの検出時（停止理由分類済み報告）。bounded parent decision resolution での上位合意矛盾・新規ユーザー判断。経路H の user-decision-required。コンフリクト Level 3 失敗
+- 委譲起動不能時: `delegation-unavailable` として報告（委譲工程のインライン実行への切替えは行わない）
+
+## 下位 Workflow Skill 連携（上位 orchestrator）
+
+本スキルは上位 orchestrator として次の下位 Workflow Skill を名レベルで参照する（REQ-{NNNN}-{NNN}/{NNN}）。下位 workflow の契約詳細を複製しない。
+
+- `agentdev-workflow-req-save`: req-save 工程（委譲起動、委譲先 subagent が権威情報源として読み込む）
+- `agentdev-workflow-spec-save`: spec-save 工程（同上）
+- `agentdev-workflow-case-open`: case-open 工程（同上）
+- `agentdev-workflow-case-run`: case-run 工程（case-auto 自身がインライン実行の読込主体として読み込む、起動手段は harness 責務）
+- `agentdev-workflow-case-close`: case-close 工程（委譲起動、委譲先 subagent が権威情報源として読み込む）
+
 ## 主要 Capability Skill 連携
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。

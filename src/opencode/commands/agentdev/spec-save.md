@@ -16,98 +16,63 @@ req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 
 ## 出力
 
 - `docs/specs/<**/*>.md`（既存 SPEC への追記 or 新規 SPEC 作成）
-- `.agentdev/drafts/req-draft-{topic-slug}.md`（SPEC artifact_actions 消費済みフラグの status 更新、Step 8 で実施）
-
-## SPEC ライフサイクル
-
-SPEC ファイル frontmatter の `status`（`draft` / `accepted` / `superseded`）の遷移契機、CREATE/APPEND/UPDATE 時の適用規則、`superseded` 遷移、SPEC 一覧表登録の詳細は `agentdev-spec-file-manager/references/spec-lifecycle-application.md` を正とする。要点: 新規 SPEC 作成時は `status: draft` を付与、既存 SPEC へ追記時は `status` を変更しない、`draft` → `accepted` 昇格は case-close の責務
+- `.agentdev/drafts/req-draft-{topic-slug}.md`（SPEC artifact_actions 消費済みフラグの status 更新）
 
 ## project extensions
 
 本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/spec-save.yaml`）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。extension に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
-## 手順
+## workflow
+
+本コマンドは workflow 実装本体を `agentdev-workflow-spec-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが11 STEP の control plane として制御構造（配置先解決、SPEC ファイル操作、整合確認、永続化）を所有する。
 
 ### Step 1: 事前チェック
 
-ドラフトの `draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認する（全 work_type 対象、`work_type` による判定は廃止）。SPEC 対象 artifact_actions がない場合は no-op で完了。ドラフトが存在しない場合はエラーで中止（先に `/agentdev/req-define` を実行してください）
-
+`artifact: spec` entry 有無判定（全 work_type 対象）、no-op 完了、旧形式 draft 後方互換
 
 ### Step 2: SPEC artifact_actions 読込
 
-
-ドラフトの `draft-data` の `artifact_actions` から `artifact: spec` の entry を読み込む。
-`artifact_actions` フィールドが存在しない（旧形式 draft）場合は SPEC 保存対象なしと判定し、no-op で完了（後方互換）。
-`artifact: spec` entry が空の場合も no-op で完了。
-各 action の `target`（file path または `new:{slug}`）、`operation`（create/update）、`content` を処理対象とする
+処理対象 entry（target、operation、content）確定
 
 ### Step 3: 配置先解決
 
-各 SPEC action の `target`（または `target_spec: {operation, domain, slug}` 構造化）から配置先 SPEC を解決する。既存 SPEC パス（例: `docs/specs/{domain}/<existing-spec>.md`、または `target_spec: {operation: update, domain, slug}`）→ 当該 SPEC へ追記（`update` 操作）。`target_spec: {operation: create, domain, slug}` → 新規 SPEC 作成（`create` 操作、ファイル名 `docs/specs/{domain}/{slug}.md`）。同一 `target` の action は1つの SPEC へ集約する
-
-**決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は `agentdev-spec-file-manager` SKILL.md「Scripts（決定的処理）」が規定する決定的スクリプト（`search-target-area.ts`）を bash 経由で呼び出して実行する（LLM 推論で代替しない）。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md および `agentdev-spec-file-manager/references/target-area-matching.md` を参照
+既存パス vs `new:{slug}` / `target_spec` 構造化、`search-target-area.ts` による決定的判定
 
 ### Step 4: SPEC 分離基準の最終確認
 
-各 SPEC action が SPEC に置くべき内容の基準に適合するか再確認。安定契約例外相当の内容は REQ 側に残すべきものとして除外し、完了報告の follow-up に明示
+安定契約例外の除外と follow-up 明示
 
 ### Step 5: SPEC ファイル操作
 
-`draft-data` の `artifact_actions`（`artifact: spec`）の全 entry を処理する:
-
-- **create**: 新規 SPEC ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
-- **update**: `target_area` 指定時（operation が `update`/`spec-update`）は `agentdev-spec-file-manager/references/target-area-matching.md` のセクション置換ロジックで対象セクションを `content` で置換（REQ）。`target_area` 未指定時は既存 SPEC ファイルの該当セクションへ `content` を追記（後方互換、REQ）。frontmatter `updated` を更新、`status` は変更しない
-
-**target_area 見出し検索のスクリプト呼出（REQ、AG-{NNN}）**: `update` 操作における `target_area` 見出し検索は `search-target-area.ts` で実行する。Step 3 の結果（`matches`）を用いてセクション範囲を特定し `content` で置換。`matches` 空 → スキップし follow-up 記録、複数マッチ → G09 に従い置換拒否。CLI 形式、stdin JSON 入力、stdout schema は `agentdev-spec-file-manager` SKILL.md、`agentdev-spec-file-manager/references/target-area-matching.md` を参照
-
-**Step 5-1**: 複数 SPEC action の並列化（REQ/093）。異なる `target` パスの SPEC create/update は並列化可能（最大5件）。同一 SPEC ファイルへの複数 action は順序依存のため直列サブセットとして分離する。詳細は `agentdev-spec-file-manager` を参照
-
-**Step 5-2**: SPEC 宣言付与（CREATE/UPDATE）。req-define が `artifact_actions`（`artifact: spec`）の各 entry へ出力した `spec_logical_division` と `canonical_owner` を読み取り、SPEC frontmatter または冒頭宣言節へ宣言として付与する。CREATE で宣言なしで完了することを禁止。UPDATE で宣言未宣言かつ分類値が `unknown` 以外に確定の場合は宣言を補完、`unknown` または欠落の場合は警告して処理を継続（soft-contract、宣言欠落だけで保存拒否しない）。既存 SPEC の一括更新は行わず、未変更 SPEC へ遡及的に宣言を付与しない（段階適用）
+create（frontmatter `status: draft` 付き）/ update（target_area セクション置換、後方互換追記）、並列化（最大5件）、SPEC 宣言付与
 
 ### Step 6: インデックス整合
 
-新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加する。既存 SPEC 追記時は README 更新不要。新規 SPEC 作成後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`、RU-{NNNNNNNN}-01 合意）で登録を検証する。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+新規 SPEC の `docs/specs/README.md` 一覧登録（check-entry-existence 検証）
 
 ### Step 7: SPEC 一覧整合確認
 
-SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済みであることを確認する（Step 6 で実施済みの場合は重複確認）。SPEC 一覧表の整合は SPEC 探索導線の維持に必要な更新のみを対象とし、要件、判断、仕様の更新は含まない。
-
-**extension 更新要否の確認（REQ）**: SPEC の追加、移動、分割が `.agentdev/extensions/**` に影響するか確認する。移動または分割により extension 参照先 SPEC パスが変わる場合、当該 extension の context paths を更新する。extension 参照先 SPEC を移動した場合はエラーとし、spec-save 自身は移動を完了させずユーザー判断を仰ぐ（IR-{NNN} check #5 strict 違反を防止）。SPEC 新規作成で既存 command/skill の実行時参照が増える場合、対応 extension の `context` への追加をユーザーに提案する（直接編集しない）
-
-**targeted docs guard（REQ）**: 変更 SPEC ファイルと連動ファイル（`docs/specs/README.md`）に対し `check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json` を実行。`failures` に strict severity を含む場合は保存工程を継続せず修正して再実行。`spec_readme_update_required` が true の場合は Step 6 の更新要否判定に反映。`full_docs_check_recommended` が true の場合は `/repo/docs-check` をユーザーに提案
+targeted docs guard、extension 更新要否確認
 
 ### Step 8: ドラフト status 更新
 
-ドラフトの SPEC artifact_actions 消費状態を記録する（`draft-data` に SPEC 消費済みフラグを付与）。commit/push より前に更新し、commit 対象に含める
+SPEC 消費済みフラグ（commit 対象に含める）
 
 ### Step 9: 変更範囲検証
 
-**決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`、RU-{NNNNNNNN}-01 合意）で実行。許可範囲外の変更を検出したらエラーで報告し指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+check-change-impact
 
-### Step 10: コミット、プッシュ
+### Step 10: コミット・プッシュ
 
-`agentdev-conventional-commits` に従い main ブランチに push。Step 8 の status 変更を commit 対象に含める。並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、`git add <path>` で明示パスステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする。スイープ操作は禁止
+明示パスステージ、`git commit -- <paths>`
 
 ### Step 11: 完了報告
 
-完了報告 template に従い、保存した SPEC 一覧（新規/追記別）、スキップ有無、follow-up（安定契約例外で除外した候補）を出力
+保存した SPEC 一覧（新規/追記別）、スキップ有無、follow-up
 
-## 検証観点
+各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-spec-save` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
 
-- **品質ゲート（適用結果の整合性検証、AG-{NNN}、REQ）**: `target_area` 置換結果の整合性（Step 5 の `search-target-area.ts` 結果と置換後本体の一致）、SPEC status の整合性（新規作成時 `status: draft`、既存追記時 `status` 変更なし）、インデックスの整合性（`docs/specs/README.md` エントリと新規 SPEC の一致、Step 6 の `check-entry-existence.ts` 結果）、変更範囲の妥当性（Step 9 の `check-change-impact.ts` 結果）を各決定的スクリプトの JSON 結果で機械的に確認。**REQ**: spec-save の品質ゲートは内容の品質（SPEC 分離基準適合性等）を再検証せず、それは req-define の QG-{N} の責務（Step 4 SPEC 分離基準の最終確認は実施するが、これは分離基準の最終チェックであり内容品質の再審査ではない）
-- **SPEC 分離基準適合性（REQ）**: 各 action の `content` が SPEC に置くべき内容か（Step 4）
-- **frontmatter 完全性**: 新規作成時の `title`, `status: draft`, `created`, `updated`（G05）
-- **宣言付与の整合性**: CREATE で `spec_logical_division` と `canonical_owner` が frontmatter または冒頭宣言節へ付与されていること。UPDATE で宣言未宣言かつ分類値が `unknown` 以外の場合に補完されていること（Step 5-2）
-- **配置先解決の正確性**: 既存パス vs `new:{slug}` の判定、重複候補統合（Step 3）
-- **変更範囲検証**: `docs/specs/**` と `.agentdev/drafts/**` 以外の変更を含まないこと（Step 9）
-
-## target_area ベースのセクション置換ロジック（REQ/028）
-
-`operation: update` / `operation: spec-update` で action の `target_area` が指定された場合、spec-save は `agentdev-spec-file-manager/references/target-area-matching.md` のマッチング規則に従い、対象 SPEC ファイル内で `target_area` に一致する見出し行を検索しセクション置換を行う。複数マッチ時の挙動（G09 で置換拒否）、未検出時の挙動（スキップし follow-up 報告、operation を spec-create 推奨）、後方互換（target_area 未指定時は従来「追記」動作）の詳細は同 reference を参照
-
-## case-auto 並列委譲モデル（REQ/093）
-
-spec-save は複数 SPEC ファイルの変更案作成、検査を並列化できる（REQ）。異なる `target` パスの SPEC create/update は L0（完全独立）のため並列可能（最大5件）。同一 SPEC ファイルへの複数 action のみ順序依存のため直列サブセットとして分離する。直列集約対象（採番、index 更新、draft 更新、commit、push）は並列委譲の完了を待ってから実行する（REQ）。最終的な commit/push は明示パス指定（`git add <path>` + `git commit -- <paths>`）で一括実行する。詳細は `agentdev-spec-file-manager` を参照
+**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-spec-save` が所有する。同 Workflow Skill は `/agentdev/spec-save` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
 ## ガードレール
 
@@ -133,7 +98,7 @@ spec-save は複数 SPEC ファイルの変更案作成、検査を並列化で�
 - G11: SPEC status 昇格（draft → accepted）の判定は case-close の責務。spec-save は accepted を付与しない
 
 ### Issue 作成制約
-- G12: spec-save は Issue を作成してはならない。Issue 作成は case-open の責務
+- G12: spec-save は Issue を作成してはならない。Issue 作成は case-open の責任
 
 ## エラー処理
 

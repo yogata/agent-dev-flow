@@ -4,11 +4,22 @@
 
 ## STEP-{N}: コンフリクト解消 Level 2/3
 
-### 開始条件
+### Purpose
+
+case-close からエスカレーションされた PR マージコンフリクトを Level 2（インライン case-run 再実行）と Level 3（オーケストレーション級判断）で解消する。
+
+### Input Resolution
+
+1. SSoT 再構成: 両 PR の diff、コンフリクト箇所、マージ順序候補
+2. identifier 保持: PR番号群、Issue番号群
+3. 最小 scalar: Level 2 再実行回数（最大2回、元の並列実行を含む計3回）
+4. runtime artifact: なし
+
+### Preconditions
 
 - PR マージコンフリクト発生時（case-close から Level 1 失敗エスカレーション受領時）
 
-### 手順
+### Procedure
 
 PR マージコンフリクト発生時は、以下3レベルのエスカレーションで解消を図る。各レベルを試行しても解消できない場合のみ次のレベルへ進む。**機械的競合（rebase で自動解決可能）は停止条件に含まず**、Level 1 で case-close が解消する（Level 1 は case-close の責務、本 STEP では Level 2/3 の case-auto 責務を定義する）。
 
@@ -20,18 +31,41 @@ PR マージコンフリクト発生時は、以下3レベルのエスカレー�
 
 Level 2 コンフリクト文脈付きインライン case-run 再実行（AG-{NNN}）、Level 3 オーケストレーション級判断、発生元非依存、停止条件の段階化の詳細は `agentdev-workflow-orchestration` を参照。
 
-### 結果
+### Result
 
 - コンフリクト解消（Level 2 or 3 で解消時）→ STEP-{N} へ戻り再マージ
 - 解消不能時（Level 3 失敗）→ STEP-{N} 停止経路（停止条件 (8)）
 
+### Evidence
+
+- Level 別の試行記録（再実行回数、マージ順序変更、blocked 隔離）、解消/停止の判定結果
+
+### Completion Verification
+
+- 各レベルを試行しても解消できない場合のみ次レベルへ進んでいること。機械的競合を停止条件に含めていないこと
+
+### Resume-Idempotency
+
+- Level 2 再実行は回数上限（最大2回）を durable に数え、上限到達時は Level 3 へ遷移する。解消済みコンフリクトの再処理は行わない
+
 ## STEP-{N}: 完了報告
 
-### 開始条件
+### Purpose
+
+全工程完了または停止判定時の完了報告を、L1 タイムスタンプと結果状態4次元の集約を含めて出力する。
+
+### Input Resolution
+
+1. SSoT 再構成: 各工程の完了結果、Epic Issue 本文ステータス追跡テーブル（読取のみ）、L1 工程別タイムスタンプ
+2. identifier 保持: Issue番号、PR番号、OU ID
+3. 最小 scalar: 開始時刻・終了時刻・所要時間
+4. runtime artifact: なし
+
+### Preconditions
 
 - 全工程完了 または 停止判定（STEP-{N}/5/6/7 のいずれか）
 
-### 手順
+### Procedure
 
 最終工程（case-close 委譲）の完了報告をそのまま出力する。Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、G16）。停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する。
 
@@ -57,10 +91,22 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行（AG-{N
 
 Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-{N} から開始（全 OU 処理完了時のみ全体完了報告）。
 
-### 結果
+### Result
 
 - 完了報告出力（停止時フォーマットを含む）
 - L1 タイムスタンプ、4次元集約、OU処理ループ状態
+
+### Evidence
+
+- 完了報告出力（停止理由分類、タイムスタンプ内訳、stage 別結果、結果状態4次元、OU処理ループ状態）
+
+### Completion Verification
+
+- warn を pass へ変換せず集約していること。Phase 0 成功と OU 完了を別々に報告していること。Epic Issue 本文のステータス追跡テーブルから読み取りのみで書き込んでいないこと（G16）
+
+### Resume-Idempotency
+
+- 報告のみで副作用を持たない。停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを durable state（Issue/Epic）から再構成して報告する
 
 ## resume point
 

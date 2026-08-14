@@ -92,6 +92,16 @@ case-close workflow は次の STEP で構成する。Epic Wave クローズは S
 
 配布依存境界の最終 gate は single-Issue ルート（STEP-3 Step 3-1）と Epic Wave ルート（STEP-E4-0）の両方で、PR マージ前に必ず経由する共用事前マージ seam である。両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run Step 7-1 と case-close で同一 detector を再利用）。gate 違反時は両ルートとも PR マージを停止する。
 
+### resume protocol
+
+- 再開点は durable state から再構成する: Issue 本文の完了条件チェックボックス状態、PR の mergeable/マージ済み状態、HEAD commit hash、SPEC `status` frontmatter、worktree・ブランチの存在、Capture 回収済みファイルの存在
+- 各 STEP の再実行はべき等であり、マージ済み PR への再マージ、更新済みチェックボックスの再評価を発生させない
+
+### termination
+
+- 正常終了: 単一 Issue ルートはクリーンアップ・Capture 回収・永続化 STEP の完了報告まで。Epic Wave ルートは最終 Wave 判定（Epic クローズ または 残 Wave 通知）まで
+- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
+
 ## 主要 Capability Skill 連携
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
