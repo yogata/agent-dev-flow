@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/req-define
+kind: workflow-extension
+id: agentdev-workflow-req-define
 
 context:
   - id: must-1

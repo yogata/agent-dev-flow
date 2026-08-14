@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/intake-promote
+kind: workflow-extension
+id: agentdev-workflow-case-update
 
 context: []
 

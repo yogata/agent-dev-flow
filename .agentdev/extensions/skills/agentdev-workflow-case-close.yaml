@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/case-close
+kind: workflow-extension
+id: agentdev-workflow-case-close
 
 context:
   - id: must-1

@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/inspect-skills
+kind: workflow-extension
+id: agentdev-workflow-inspect-skills
 
 context:
   - id: docs-spec-rebuild-integrity

@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/inspect-promote
+kind: workflow-extension
+id: agentdev-workflow-inspect-promote
 
 context:
   - id: workflow-contracts

@@ -1,6 +1,6 @@
 version: 1
-kind: command-extension
-id: /agentdev/case-auto
+kind: workflow-extension
+id: agentdev-workflow-case-auto
 
 context:
   - id: must-1
