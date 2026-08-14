@@ -213,3 +213,19 @@
 - **想定反映先**: `src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md` READ 手続き（Node.js execSync 以外の経路を扱う場合の注意喚起候補。現行規定は execSync で安全なため変更必須ではない）
 - **関連**: Issue 2100（OU-000）, PR 2110, Epic 2099, 既存 entry「gh CLI WRITE 操作で Step 0 encoding 初期化を省略し --body-file 本文が mojibake」（WRITE 経路、本 entry は READ 経路で別事象）, 「Windows + ジャンクション環境 worktree での check_templates.ts worktree 固有 false positive」（同環境系だが checker 欠陥側）
 - **タグ**: `#encoding` `#read-procedure` `#windows` `#mojibake` `#junction` `#cp932`
+
+## 旧表現を禁止する是正注記で旧表現の字面を引用すると grep 0 件基準の機械検査と衝突する
+
+- **問題事象**: system.md の Workflow Architecture Inventory 旧表現禁止注記が、禁止対象の旧表現の字面（「Command 定義が SSoT である」）をそのまま引用していた。このため「旧表現が 0 件であること」という grep 0 件基準の完了条件・機械検査と衝突する状態だった（禁止注記自体が grep に hit する）
+- **発生局面**: 実装（case-run、OU-001 規範契約整合の検証・修正）
+- **検知方法**: 完了条件の再 grep（「Command 定義が SSoT」全リポジトリ検索）で禁止注記の引用行が hit することで検知
+- **根本原因**: 是正注記の執筆時に、禁止対象の意味と旧表現の字面を分離していなかった。「〜という旧表現を使用しない」形式は意味としては正しいが、機械検査（grep 0 件基準）と両立しない
+- **自律対応内容**: 禁止の意図を維持したまま描写形（「Command 定義を権威情報源とする旧表現」）へ言い換え、字面の出現を 0 件にした（PR 2111、commit ce4ea7fd）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（執筆規範レベルの知見。agentdev-doc-writing / japanese-tech-writing の検証観点候補）
+- **横展開観点**: 横断是正・用語統一を行うすべての Issue で、是正注記・移行注記に旧語の字面を引用しない。完了条件に grep 0 件基準を置く場合は特に注意
+- **再発条件**: 旧表現禁止・用語統一のは正注記を、禁止対象の字面引用付きで執筆した場合
+- **予防策候補**: 是正注記は描写形（「X を権威情報源とする旧表現」等）で書く。grep 0 件基準の完了条件を持つ Issue では、注記も含めた全体 grep を case-run と case-close の両方で実施する
+- **想定反映先**: なし（知見記録。規範化の要否は backlog-review で判断）
+- **関連**: PR 2111 Findings learning セクション, Issue 2101（OU-001）, Epic 2099
+- **タグ**: #grep-zero-criteria #remediation-note #machine-check #writing-convention
