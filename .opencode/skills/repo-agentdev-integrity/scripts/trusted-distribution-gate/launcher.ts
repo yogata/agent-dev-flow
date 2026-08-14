@@ -188,6 +188,7 @@ function runLauncherInner(opts: LauncherOptions, deps: LauncherDependencies): La
   const detectorConfig: DetectorConfig = {
     repository_identity: opts.repository_identity,
     producer_internal_id_prefixes: DEFAULT_PRODUCER_PREFIXES,
+    distributed_workflow_control_prefixes: ["STEP", "QG"],
   };
   const boundaryResults = runBoundaryDetector({ blobs }, detectorConfig);
   const failureCount = boundaryResults.reduce((n, r) => n + r.failures.length, 0);

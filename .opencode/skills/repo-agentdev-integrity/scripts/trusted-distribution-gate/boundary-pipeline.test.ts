@@ -5,6 +5,9 @@
 // backslash, URI-encoded), producer-repository fixed URLs (by configured
 // identity), generic/template allowances, and fail-closed on unclassified
 // input.
+//
+// Stage A vocabulary amendment / evasion regression coverage lives in
+// boundary-pipeline-evasion.test.ts.
 
 import { describe, expect, test } from "bun:test";
 import {
@@ -32,6 +35,7 @@ const baseConfig: DetectorConfig = {
     "OU",
     "EC",
   ],
+  distributed_workflow_control_prefixes: ["STEP", "QG"],
 };
 
 describe("boundary-pipeline / classifyLine", () => {

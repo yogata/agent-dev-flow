@@ -49,7 +49,6 @@ export type { ProtectedPathSet } from "./protected-paths.ts";
 
 export {
   classifyLine,
-  decideProjection,
   detectCandidates,
   resolveCandidate,
   isConcreteDocsPath,
@@ -60,10 +59,17 @@ export type {
   RepositoryIdentity as DetectorRepositoryIdentity,
   Candidate,
   CandidateType,
-  ClassifyFileInput,
+  OverflowReason,
   LineClassification,
-  DecideResult,
 } from "./boundary-pipeline.ts";
+
+export {
+  decideProjection,
+} from "./boundary-gate.ts";
+export type {
+  ClassifyFileInput,
+  DecideResult,
+} from "./boundary-gate.ts";
 
 export {
   buildSourceManifest,

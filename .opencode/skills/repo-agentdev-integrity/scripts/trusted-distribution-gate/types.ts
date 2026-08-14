@@ -133,7 +133,9 @@ export type DetectionCategory =
   | "concrete-path"
   | "fixed-url"
   | "unclassified-entry"
-  | "adapter-failure";
+  | "adapter-failure"
+  | "distributed-control"
+  | "evasion-attempt";
 
 export interface LineInput {
   readonly text: string;
