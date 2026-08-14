@@ -8,7 +8,7 @@ description: 未分類の変更候補を手動入力から intake item として
 
 **このコマンドは保存専用である。
 ** GitHub Issue の作成、採用可否の判断は行わない。
-作業知見だけの内容は対象外である（`agentdev-workflow-orchestration` skill の Split Rule を参照）。
+作業知見だけの内容は対象外である（`agentdev-workflow-orchestration` の capture 振り分け基準を参照）。
 
 ## project extensions
 
@@ -28,80 +28,19 @@ description: 未分類の変更候補を手動入力から intake item として
 
 - `.agentdev/intake/inbox/YYYY-MM-DD-{topic-slug}.md` に保存された intake item
 
-## Intake Item 形式
+## workflow
 
-intake item は以下の推奨標準形に従う Markdown 成果物とする。
-workflow 管理用の frontmatter、状態フィールド、重複排除キーは持たない。
+本コマンドは workflow 実装本体を `agentdev-workflow-intake-capture` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが保存専用 workflow の実装（入力の受領から intake item 生成、保存、git 永続化、完了報告まで）を所有する。
 
-```markdown
-# {タイトル}
+本 workflow は capture-only型であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。resume point / export / import を持たない。工程は逐次実行し、中断時は最初から再実行する。
 
-## 観測
-{何が観測されたか}
+- **工程-1** 入力の受領 — ユーザーからの変更候補の内容受領（自然言語をそのまま取り扱う）
+- **工程-2** intake item の生成 — 推奨標準形への整理（推測・補完禁止、対象セクションは省略）
+- **工程-3** ファイル名の生成・実行前同期 — `YYYY-MM-DD-{topic-slug}.md` 形式、`git pull --ff-only`
+- **工程-4** 保存・永続化 — `.agentdev/intake/inbox/` へ保存、`.agentdev/intake/` 変更の commit/push
+- **工程-5** 完了報告 — 完了報告 template 出力、git 永続化結果を含める
 
-## 今回扱わない理由
-{なぜ今すぐ対応しないのか}
-
-## 影響
-{影響の評価}
-
-## レビューで決めること
-{レビューで判断すべき点}
-
-## 根拠（任意）
-{補足情報・証拠}
-```
-
-**セクションに関する制約**:
-- 各セクションの見出し名は固定しない。ユーザーの入力に合わせて整理する
-- 必須セクション、省略不可セクションを設けない
-- 内容がないセクションを形式維持のためだけに作成しない
-- frontmatter、状態値、メタデータフィールドを必須にしない
-
-## 手順
-
-### Step 1: 入力の受領
-
-ユーザーから変更候補の内容を受け取る。
-自然言語で記述された内容をそのまま取り扱う。
-
-### Step 2: intake item の生成
-
-ユーザーの入力を上記推奨標準形に整理する。
-ユーザーが明示的に指定していないセクションは推測、補完せず、そのセクションを省略する（内容がないセクションを作成しない）。
-ユーザーの入力に含まれない情報を自動生成、推論して記載することを禁止する。
-
-### Step 3: ファイル名の生成
-
- - 日付: 実行時のシステム日付（`YYYY-MM-DD`）
- - topic-slug: タイトルから生成（小文字英数字、ハイフン区切り、30文字以内）
- - 形式: `YYYY-MM-DD-{topic-slug}.md`
-
-3-1. **実行前同期**:
- - `git pull --ff-only` を実行する
- - **失敗時**: 共通 template (`.opencode/commands/agentdev/templates/common/git-error-messages.md`) の「Git 同期エラー」形式で表示して停止する（自動解消しない）
-
-### Step 4: 保存
-
- - 保存先: `.agentdev/intake/inbox/`
- - ディレクトリが存在しない場合は作成する
- - 同名ファイルが存在する場合は `{topic-slug}-2`, `{topic-slug}-3` のように連番を付与する
-
-**Step 4-1**: .agentdev/intake/ 変更の commit と push。
-`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/intake/` 配下の変更を commit/ push する。commit message は `chore(agentdev): capture intake item`（Conventional Commits 形式）。変更なし時は commit/push せず Step 5 の完了報告で「変更なし」と報告する。push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）
-
-### Step 5: 完了報告
-
-完了報告templateに従って出力。
-template: .opencode/commands/agentdev/templates/intake-capture/standard.md。
-git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）を含める
-
-## エラー処理
-
-| エラー | 対処 |
-|--------|------|
-| git pull --ff-only 失敗 | 構造化エラーメッセージを表示して停止。自動解消しない |
-| git push 失敗 | 構造化エラーメッセージを表示。完了扱いにしない |
+工程の詳細（intake item 推奨標準形、ファイル名規則、エラー処理、関連 Capability Skill 連携）は `agentdev-workflow-intake-capture` スキルを参照。本コマンドは同スキルを名レベルで参照し、内部構造へ直接依存しない（REQ-{NNNN}-{NNN}）。
 
 ## ガードレール
 
