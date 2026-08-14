@@ -1,12 +1,13 @@
 ---
 name: agentdev-project-extensions
-description: Resolves project-specific extensions (.agentdev/extensions/**) for a given command or skill at runtime. Handles extension discovery, absence/corruption fallback, 5-section reading (context/rules/checks/acceptance_gates/must_not), additive-not-override treatment, and project-local skill delegation target extraction. USE FOR: resolving project extensions for a command or skill, reading extension context/rules/checks, extracting project-local skill delegation targets. DO NOT USE FOR: defining extension schema, diagnosing extension structure, modifying distribution command/skill bodies, implementing project-local skills.
+description: Resolves project-specific extensions (.agentdev/extensions/skills/**) for Workflow Skills and Capability Skills at runtime. Handles extension discovery, load-time state classification (missing / malformed fail-open / legacy kind migration-required stop / unknown kind schema violation stop / valid), 5-section reading (context/rules/checks/acceptance_gates/must_not), additive-not-override treatment, and project-local skill delegation target extraction. USE FOR: resolving project extensions for a Workflow Skill or Capability Skill, classifying extension states at load time, reading extension context/rules/checks, extracting project-local skill delegation targets. DO NOT USE FOR: defining extension schema, diagnosing extension structure, modifying distribution command/skill bodies, implementing project-local skills, migrating legacy extensions.
 ---
 
 # Project Extensions
 
 実行時に自分に対応する project extension を読み込み、プロジェクト固有の文脈、規約、検査、受け入れゲート、禁止事項を解決する。
 配布 command/skill 本文はプロジェクト非依存であり、プロジェクト固有情報は `.agentdev/extensions/**` 経由で実行時に与えられる。
+extension の読み取り主体は Workflow Skill と Capability Skill である（各読み取り主体の対応 extension 種別は「責務ごとの手順」参照）。
 
 ## 原本（SSoT）
 
@@ -21,8 +22,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | 責務 | 内容 |
 |------|------|
 | extension 探索 | 対応 extension ファイル（1件）の特定と読み込み |
-| extension 不在時の扱い | 空 extension として扱い、標準動作で続行 |
-| extension 破損時の扱い | エラー表示と無視、標準動作で続行 |
+| 読込時の状態分類 | 不在 / 破損（malformed）/ 旧 kind（migration-required）/ 未知 kind（schema violation）/ 有効 の判定と、各状態に対応する停止条件の適用 |
 | 5セクション読み取り | context/rules/checks/acceptance_gates/must_not の読み取り |
 | 上書きでないことの扱い | extension は追加・拡張であり、標準動作を置き換えない |
 | 委譲対象抽出 | rules/checks から project-local skill 委譲対象の抽出 |
@@ -37,12 +37,47 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 標準配置
 
-extension は以下の配置を持つ。command と skill で対応ディレクトリが異なる。
+extension は以下の配置を持つ。読み取り主体（Workflow Skill / Capability Skill）と kind literal の対応で決まる。
 
 ```text
-.agentdev/extensions/commands/<command>.yaml
-.agentdev/extensions/skills/<skill>.yaml
+.agentdev/extensions/skills/{workflow-skill-name}.yaml
+.agentdev/extensions/skills/{workflow-skill-name}/internal.yaml
+.agentdev/extensions/skills/{capability-skill-name}.yaml
 ```
+
+旧配置 `.agentdev/extensions/commands/**` は廃止済みである。runtime は旧配置を後方互換で読まない。
+
+## Extension kind enum（公式）
+
+Extension 種別は以下の3値のみを machine-readable `kind` literal として許可する。
+
+| kind literal | 概念名 | 配置 |
+|---|---|---|
+| `workflow-extension` | Workflow Extension | `.agentdev/extensions/skills/{workflow-skill-name}.yaml` |
+| `internal-workflow-extension` | internal Workflow Extension | `.agentdev/extensions/skills/{workflow-skill-name}/internal.yaml` |
+| `capability-skill-extension` | Capability Skill Extension | `.agentdev/extensions/skills/{capability-skill-name}.yaml` |
+
+上記3値以外の `kind` はすべて無効値である。旧 kind（`command-extension` / `skill-extension`）は完全廃止済みであり、検出時は migration-required として停止する。
+
+### id binding
+
+- `workflow-extension` の `id` は対象 Workflow Skill 名と一致すること（必須）。
+- `internal-workflow-extension` の `id` は親ディレクトリの Workflow Skill 名と一致すること（必須）。単独の別 `id` 体系を作らないこと。
+- `capability-skill-extension` の `id` は対象 Capability Skill 名と一致すること（必須）。
+
+## 状態分類と停止条件
+
+extension 読込時の状態分類と本スキル（runtime resolver）の動作は以下のとおり。
+
+| 状態 | runtime resolver 動作 | 備考 |
+|---|---|---|
+| extension 不在 | 標準動作継続 | 正常状態 |
+| YAML 構文エラー / 必須 field 欠落 / kind 判定以前の破損 | エラー表示 + 当該 extension 無視 + 標準動作継続 | fail-open |
+| 旧 kind（`command-extension` / `skill-extension`） | migration-required + stop | silent ignore しない |
+| 構文上有効だが `kind` が公式3値以外（未知 kind） | schema violation + stop | fail-open しない |
+| 有効な新 kind | 通常処理 | — |
+
+extension missing と legacy extension exists は別状態であり、前者は標準動作継続、後者は migration-required として停止する。旧 kind / 未知 kind について silent ignore する実装を採らない。
 
 ## extension の基本構造
 
@@ -50,8 +85,8 @@ extension は以下の基本構造を持つ。
 
 ```yaml
 version: 1
-kind: command-extension  # または skill-extension
-id: /agentdev/<command>  # または <skill>
+kind: workflow-extension  # または internal-workflow-extension / capability-skill-extension
+id: <対象 skill 名（id binding 参照）>
 
 context: []
 rules: []
@@ -60,31 +95,28 @@ acceptance_gates: []
 must_not: []
 ```
 
-acceptance_gates は受け入れ条件ではなく、完了判定本体でもない。command/skill extension によって追加される実行完了前ゲートである。
+acceptance_gates は受け入れ条件ではなく、完了判定本体でもない。extension によって追加される実行完了前ゲートである。
 
 ## 責務ごとの手順
 
 ### 1. 対応 extension ファイルの探索
 
-- command は `.agentdev/extensions/commands/<command>.yaml` を対象とする
-- skill は `.agentdev/extensions/skills/<skill>.yaml` を対象とする
+- Workflow Skill は `.agentdev/extensions/skills/{workflow-skill-name}.yaml`（kind: workflow-extension）を対象とする
+- Workflow Skill は必要に応じて `.agentdev/extensions/skills/{workflow-skill-name}/internal.yaml`（kind: internal-workflow-extension）を追加で読む。command は internal Workflow Extension を直接読まない
+- Capability Skill は `.agentdev/extensions/skills/{capability-skill-name}.yaml`（kind: capability-skill-extension）を対象とする
 - 当該 extension ファイルのみを読み、自分に対応しない extension は読まない
 
-### 2. extension 不在時の空 extension 扱い
+### 2. 読込時の状態判定
 
-対応 extension ファイルが存在しない場合は、空 extension として扱い標準動作で続行する。extension 不在はエラーではなく、配布 command/skill 単体で動作する通常状態である。
+対応 extension ファイルを次の順序で判定する。
 
-### 3. extension 破損時のエラー表示と無視
+1. ファイルが存在しない場合は missing として扱う。空 extension として標準動作で続行する。extension 不在はエラーではなく、配布 skill 単体で動作する通常状態である
+2. YAML 構文エラー、必須 field（`version` / `kind` / `id` / 5セクション）の欠落・型違反、kind 判定以前の破損の場合は malformed として扱う。エラーメッセージを表示し（対象 extension ファイルパスと破損理由を含む）、当該 extension を無視し、空 extension として標準動作で続行する（fail-open）。破損 extension により処理全体を停止しない
+3. `kind` が旧 kind（`command-extension` / `skill-extension`）の場合は migration-required として処理を停止する。silent ignore しない
+4. `kind` が公式3値以外の有効な値（未知 kind）の場合は schema violation として処理を停止する。fail-open しない
+5. 有効な新 kind の場合は通常処理（5セクション読み取り）へ進む
 
-対応 extension ファイルが破損している場合（YAML 構文エラー、必須フィールド欠落等）は以下の手順をとる:
-
-1. エラーメッセージを表示する（対象 extension ファイルパスと破損理由を含む）
-2. 当該 extension を無視する
-3. 空 extension として扱い、標準動作で続行する
-
-破損 extension により処理全体を停止しない。利用者はエラーメッセージから拡張設定の修正を判断できる。
-
-### 4. 5セクション読み取り
+### 3. 5セクション読み取り
 
 extension が持つ以下の5セクションを読み取る。
 
@@ -93,12 +125,12 @@ extension が持つ以下の5セクションを読み取る。
 | context | command/skill に追加で与える文脈 |
 | rules | command/skill に追加で守らせる規約 |
 | checks | command/skill に追加で実行させる検査 |
-| acceptance_gates | command/skill extension が追加する実行完了前ゲート |
+| acceptance_gates | extension が追加する実行完了前ゲート |
 | must_not | command/skill に追加で課す禁止事項 |
 
 各セクションは配列であり、複数の entry を持てる。entry は空配列でもよい。
 
-### 5. 上書きでなく追加・拡張であることの扱い
+### 4. 上書きでなく追加・拡張であることの扱い
 
 extension の内容は配布 command/skill 本文の動作に**追加**され、既存動作を**置き換えない**。
 
@@ -106,6 +138,12 @@ extension の内容は配布 command/skill 本文の動作に**追加**され、
 - extension の rules、checks は、配布 command/skill の手順に追加で課される
 - extension の must_not は、配布 command/skill の禁止事項に追加される
 - extension の acceptance_gates は、配布 command/skill の完了判定の前に追加で実行される
+
+### 5. 適用順序と暗黙伝播の禁止
+
+- 適用順序は Workflow Extension → internal Workflow Extension → Capability Skill Extension である
+- public Workflow Extension を Capability Skill extension へ暗黙コピーしない
+- Capability Skill は workflow-extension を読まず、Workflow Skill は capability-skill-extension を読まない
 
 ### 6. 委譲対象の抽出
 
@@ -162,7 +200,7 @@ command が対応 extension を読み込む旨を宣言する部分。
 - 5セクション読み取りの詳細手順（「責務ごとの手順」セクション）
 - 上書きでなく追加・拡張であることの扱いの詳細
 - 委譲対象（project-local skill）抽出の契約
-- extension 探索、不在・破損時の扱いの内部手順
+- extension 探索、読込時の状態判定（不在・malformed・旧 kind・未知 kind）と停止条件の内部手順
 
 詳細契約を command 本文に再定義した場合は同一契約再定義抑止の原則違反として扱う。
 
@@ -188,9 +226,11 @@ inspect-skills が複数 command 間で同一文言の重複を検出した場�
 
 - G01: extension は標準 command/skill の上書きではなく、追加・拡張のみ。配布 command/skill 本文の動作を置き換えない
 - G02: 自分に対応する extension（1件）のみを読み、他の command/skill の extension は読まない
-- G03: 破損 extension で処理全体を停止しない（エラー表示 + 無視 + 標準動作で続行）
+- G03: fail-open とするのは malformed（YAML 構文エラー、必須 field 欠落等）のみ。旧 kind は migration-required として、未知 kind は schema violation として停止し、いずれも silent ignore しない
 - G04: 委譲先 project-local skill の中身には関与しない。委譲先の実装は各適用プロジェクトの責務
 - G05: 配布 command/skill 本文にプロジェクト固有文書の具体参照（具体ID、具体パス、固定URL）を持たせない。プロジェクト固有参照は extension 経由でのみ与える
+- G06: Workflow Extension を Capability Skill へ暗黙伝播しない
+- G07: 旧配置（`.agentdev/extensions/commands/**`）の extension を後方互換で読まない。旧 kind を検出した場合は migration-required として停止する
 
 ## See Also
 
