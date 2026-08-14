@@ -11,7 +11,7 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 本 SPEC は command 定義ファイルが従うべき詳細なフォーマット規約を定義する。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
-> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001, REQ-001）。
+> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 
 > **authoring/ ドメインでの配置理由**: 本 SPEC は本文構造・見出し構成・Step 表現・記述形式という執筆規約系の内容を扱うため、共通文書モデル規約（frontmatter・ID 体系・命名規則・URL 参照形式）を扱う `../foundations/patterns.md` と責務分離して `authoring/` ドメインに配置する。
 > `authoring/` は将来 REQ/SPEC/SKILL/guide 執筆規約の集約先として拡張余地を持つ（現状は command のみ）。即時統合・`authoring/` の削除は行わない。
@@ -95,7 +95,7 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 
 ### thin Command モデル検査（公開 /agentdev/* Command 対象）
 
-公開 `/agentdev/*` Command について以下を検査対象に追加する。`/repo/*` Command は従来検査を維持し、公開 AgentDev Command と checker 上で区別する。
+公開 `/agentdev/*` Command について以下を検査対象に追加する。`/repo/*` Command は従来検査を維持し、公開 `/agentdev/*` Command と checker 上で区別する。
 
 | 検出項目 | 対象 |
 |----------|------|
