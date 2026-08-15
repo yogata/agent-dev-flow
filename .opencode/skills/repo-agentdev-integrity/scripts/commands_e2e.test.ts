@@ -339,7 +339,9 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
       });
 
       it("has Steps section with numbered or phased structure", () => {
-        const hasSteps = /(^##\s+Steps)|(^###\s+Step\s+\d)|(^##\s+Step\s+\d)|(^###\s+Phase)|(^##\s+フェーズ)/m.test(content);
+        // thin Command モデル（OU-002/003/004 移行後）は workflow 実装本体を Workflow Skill へ委譲し、
+        // 工程一覧は ## workflow dispatch セクション内の番号付き参照（### Step N / **STEP-N** / **工程-N**）で表現する
+        const hasSteps = /(^##\s+Steps)|(^###\s+Step\s+\d)|(^##\s+Step\s+\d)|(^###\s+Phase)|(^##\s+フェーズ)|(^##\s+workflow\s*$)|(\*\*(STEP|工程)-\d+\*\*)/m.test(content);
         expect(hasSteps).toBe(true);
       });
 

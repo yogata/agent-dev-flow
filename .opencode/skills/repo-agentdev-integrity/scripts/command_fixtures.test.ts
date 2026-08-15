@@ -422,8 +422,10 @@ describe("REQ-0030-010: Test fixture existence and content validity", () => {
 
         it("body contains at least one numbered step reference", () => {
           const body = content.split("---").slice(2).join("---");
+          // thin Command モデル（OU-002/003/004 移行後）の番号付き工程参照は
+          // ## workflow dispatch セクション内の **STEP-N** / **工程-N** 箇条書きで表現する
           const hasNumberedStep =
-            /(^|\n)\s*\d+\.\s/.test(body) || /Step\s+\d/.test(body);
+            /(^|\n)\s*\d+\.\s/.test(body) || /Step\s+\d/.test(body) || /\*\*(STEP|工程)-\d+\*\*/.test(body);
           expect(hasNumberedStep).toBe(true);
         });
       });

@@ -128,7 +128,9 @@ function validateCommand(content: string): { valid: boolean; errors: string[] } 
   if (!hasInput) errors.push("Missing ## Input section");
   const hasOutput = /^## (Output|出力)/m.test(body);
   if (!hasOutput) errors.push("Missing ## Output section");
-  const hasSteps = /(^## (Steps|手順|フェーズ)|^### Step \d|^## Step \d)/m.test(body);
+  // thin Command モデル（OU-002/003/004 移行後）は workflow 実装本体を Workflow Skill へ委譲し、
+  // 工程一覧は ## workflow dispatch セクション内の番号付き参照（### Step N / **STEP-N** / **工程-N**）で表現する
+  const hasSteps = /(^## (Steps|手順|フェーズ|workflow)|^### Step \d|^## Step \d|\*\*(STEP|工程)-\d+\*\*)/m.test(body);
   if (!hasSteps) errors.push("Missing Steps section");
   return { valid: errors.length === 0, errors };
 }
