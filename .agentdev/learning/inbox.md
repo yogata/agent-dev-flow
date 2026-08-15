@@ -324,3 +324,51 @@
 - **想定反映先**: なし（運用知見）
 - **関連**: PR 2117 Findings learning セクション, Issue 2107（OU-007）, Epic 2099, `distribution_boundary_routing_contract.test.ts`
 - **タグ**: `#thin-command` `#routing-contract` `#test-fix-loop` `#command-compression` `#operations`
+
+## 「pre-existing fail」の由来判定は PR base（staging 相対）基準ではなく remediation 開始前 baseline commit 基準で行う
+
+- **問題事象**: OU-008a（Issue #2108）の AC-17 判定作業で、「pre-existing fail」の由来判定を PR の base（当時の staging）基準で行うと、同一 Epic の前 Wave が導入した失敗が pre-existing に分類される事象を観測した。Wave 4/5 の「26件は base から同一」という記録は Wave 3 適用後の staging を base とした基準であり、remediation 開始前 baseline（`49f4db17`）基準では 24件が新規発生だった
+- **発生局面**: 検証（OU-008a v1 の AC-17 判定、full integrity suite の由来分類）
+- **検知方法**: baseline commit `49f4db17` に対する `git show` での当該テスト期待値確認（baseline では pass していた陳腐化期待値 24 件の特定）
+- **根本原因**: 「pre-existing」の基準 commit が定義されず、各 Wave の PR base（直前 staging 状態）を相対基準にすると、同一 Epic 内の先行 Wave 起因の失敗が「元から存在」に見える。Epic 完了検証では false-positive completion に直結する
+- **自律対応内容**: v1 判定では remediation 開始前 baseline commit を基準に `git show` 等で由来判定を実施し、24 件を remediation 由来と確定して AC-17 を fail とし差し戻した。fix（PR #2118）後に v2 で再判定して pass を確定した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（検証基準の運用知見。「full integrity suite pass」受入れ基準の明文化候補と併せて learning-promote で評価対象）
+- **横展開観点**: 複数 Wave・複数 PR にまたがる Epic の完了検証で fail の由来判定を行うすべての場面。被差し戻し PR の「base から同一」表記を pre-existing 証拠として採用しない
+- **再発条件**: Epic 内の先行 Wave がテスト期待値を陳腐化させる変更を行い、後続 Wave が自 PR の base 比較だけで由来判定した場合
+- **予防策候補**: Epic 完了検証・受入れ判定の由來判定は「Epic 開始前 baseline commit での当該テスト状態」を基準とする手順の明文化（要否は learning-promote で判断）
+- **想定反映先**: なし（運用知見。SPEC確定候補「full integrity suite pass 受入れ基準の明文化」と併せて評価）
+- **関連**: PR #2118 Findings learning セクション, Issue #2108（OU-008a）, Epic 2099, v1 報告 issuecomment-5299652896 §2, intake-2026-08-15-spec-candidate-full-integrity-suite-acceptance-criteria.md
+- **タグ**: `#pre-existing-classification` `#baseline-commit` `#false-positive-completion` `#epic-verification` `#origin-analysis`
+
+## アーキテクチャ構造変更 PR の完了条件に「固定するテストの期待値更新」を明示的に含める
+
+- **問題事象**: OU-008a v1 の差し戻し分析で、アーキテクチャ変更（thin 化等）を伴う PR が契約テスト（構造を固定するテスト）の期待値更新を完了条件に含めなかった場合、並列 Wave で更新が一部だけ行われ漏れが発生する事象を確認した。OU-002（PR #2114）は core 8 Command の期待値更新を実施した一方、OU-003（PR #2113）/ OU-004（PR #2112）は未更新のまま merge され、統合状態で 24 件の陳腐化期待値 fail として顕在化した
+- **発生局面**: 実装（Wave 2 並列 Wave の各 PR 完了判定）、検証（OU-008a v1 の full integrity suite）
+- **検知方法**: staging 統合状態での `bun test` により REQ-0030-009/010/011 系 24 fail を検出し、`git show 49f4db17:<path>` との比較で remediation 由来と特定
+- **根本原因**: 構造変更 PR の完了条件に「当該構造を固定する契約テストの期待値更新」が含まれておらず、各 Wave が配布物本体の移行のみを完了条件として判断した。並列 Wave では他 Wave の更新状況が見えないため、部分的実施が検出できない
+- **自律対応内容**: OU-008a v1 で OU-003/OU-004 へ差し戻し相当と記録し、fix（PR #2118）で 3 テストファイルの期待値を thin Command モデルへ更新 + IR-055 baseline 再生成して解消、v2 で全 AC pass を確認
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（Issue 完了条件の書き方規約の知見。規範化の要否は learning-promote で判断）
+- **横展開観点**: 構造変更（thin 化、schema 変更、命名規約変更等）を伴うすべての PR。既存 entry「Command 本文 thin 化圧縮時に契約テスト固定トークンの事前確認を省略し一時失敗」（PR 2117、圧縮前の固定トークン確認）と相補関係（同 entry = 実行時の手順、本 entry = 完了条件の設計）
+- **再発条件**: 構造を固定する契約テストが存在する状態で、当該構造を変更する PR を期待値更新なしで完了判定した場合（特に並列 Wave）
+- **予防策候補**: 構造変更 PR の完了条件テンプレートに「当該構造を固定する契約テスト（`*.test.ts`）の期待値更新」を明示的に含める（要否は learning-promote で判断）
+- **想定反映先**: なし（case-open の完了条件記載ガイドライン候補。規範化は learning-promote 経由で判断）
+- **関連**: PR #2118 Findings learning セクション, Issue #2108（OU-008a）, Issue 2102/2103/2104（OU-002/003/004）, PR 2112 / 2113 / 2114, Epic 2099, 既存 entry「Command 本文 thin 化圧縮時に契約テスト固定トークンの事前確認を省略し一時失敗」
+- **タグ**: `#contract-test` `#stale-expectation` `#parallel-wave` `#completion-criteria` `#structural-change`
+
+## full integrity suite の fail 構成は検証環境（worktree / main、junction・node_modules 有無）で変化する
+
+- **問題事象**: OU-008a case-close の独立再検証（QG-4 観点8「全体」スコープ）で main repo 上で `bun test ./.opencode/skills/repo-agentdev-integrity/` を実施したところ 1873 pass / 3 fail（テスト数 1876）となり、v2 の worktree 検証（1964 pass / 4 fail、テスト数 1968）と fail 構成もテスト数も一致しない事象を観測した。main 環境の 3 fail は (1) TS-009 エンコーディング検査が git 管理外の `node_modules/@types/bun/README.md` を検出、(2) REQ-0030-004 See Also 参照検査が junction 伝播環境でのみ走査対象となる `.opencode/skills` 側の stale 参照（`agentdev-adr-guidelines`、rename 4cab9fad / Issue 2039 由来、参照自体は #611 由来）を検出、(3) ADR README pre-remediation fail（両環境共通）。逆に worktree で fail していた check_templates 系 3 件（junction 未伝播）は main 環境では pass した
+- **発生局面**: 完了処理（case-close QG-4、full integrity suite の独立再実行）
+- **検知方法**: main repo での `bun test` full suite 再実行と v2 記録（worktree）との fail 構成・テスト数の差分比較。`skills_structure.test.ts` は `.opencode/skills/agentdev-workflow-templates` の存在で走査ディレクトリを分岐することを確認
+- **根本原因**: 検査対象ディレクトリが junction 伝播状態で分岐するテスト実装と、git 管理外アーティファクト（node_modules）の有無という環境差。「full integrity suite pass」の受入れ判定に検証環境の規定がなく、単一環境の結果が絶視された場合に誤った合格・不合格の双方を生みうる
+- **自律対応内容**: CB2 判定は両環境の fail 全件について由来判定（node_modules 環境依存 / pre-remediation stale 参照 / pre-remediation 既知）を行い「remediation 由来 fail 0」が環境によらず成立することを確認して pass とした。環境差の事実と受入れ基準明文化の必要性を SPEC確定候補（見送り intake 化: intake-2026-08-15-spec-candidate-full-integrity-suite-acceptance-criteria.md）へ記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（検証環境の記録要件は SPEC確定候補として intake route で後続判断）
+- **横展開観点**: worktree で検証するすべての OU・Wave。worktree 検証は main 環境の fail（node_modules 検出、junction 環境の stale 参照）を検出できず、逆に worktree 固有の false positive を生む。既存 entry「Windows + ジャンクション環境 worktree での check_templates.ts worktree 固有 false positive」の逆方向（worktree で見逃し、main で検出）を含む拡張事象
+- **再発条件**: 検証環境（junction 伝播・node_modules インストール状態）が異なる複数環境で full suite の受入れ判定を行う場合
+- **予防策候補**: 受入れ記録への検証環境明記（worktree / main、junction、node_modules）と fail 全件の由来分類証跡。受入れ基準自体の明文化は intake 化した SPEC確定候補経由で判断
+- **想定反映先**: なし（運用知見。SPEC確定候補と併せて learning-promote で評価）
+- **関連**: Issue 2108（OU-008a）, PR 2118, Epic 2099, v2 報告 issuecomment-5299817790 §2, 既存 entry「Windows + ジャンクション環境 worktree での check_templates.ts worktree 固有 false positive」, intake-2026-08-15-spec-candidate-full-integrity-suite-acceptance-criteria.md
+- **タグ**: `#environment-dependent` `#full-integrity-suite` `#worktree` `#junction` `#node-modules` `#acceptance-evidence`
