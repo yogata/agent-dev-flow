@@ -20,7 +20,7 @@ req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 
 
 ## project extensions
 
-本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/spec-save.yaml`）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。extension に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-spec-save`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-spec-save.yaml`、kind: workflow-extension）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。extension に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## workflow
 

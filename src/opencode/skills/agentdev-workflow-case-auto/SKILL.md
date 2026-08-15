@@ -128,9 +128,9 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 - `agentdev-adversarial-review`: 経路H で停止伝播のみ受領（case-auto は直接起動しない）
 - 各工程の Capability Skill を継承（req-save/spec-save/case-open/case-run/case-close の依存スキル群）
 
-## internal Workflow Extension 読込
+## Workflow Extension 読込
 
-本スキルは internal Workflow Extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。Workflow Skill のみが読み、case-auto command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、case-auto command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

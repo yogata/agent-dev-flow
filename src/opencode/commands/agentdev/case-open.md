@@ -18,7 +18,7 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 ## project extensions
 
-本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/case-open.yaml`）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-open`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`、kind: workflow-extension）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## workflow
 

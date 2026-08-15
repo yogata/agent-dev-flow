@@ -127,7 +127,7 @@ REQ-003-034（同一契約再定義抑止）との両立関係を運用面で明
 
 ### 適用パターン1: project extensions boilerplate
 
-15 の agentdev command で同一4行の extension 宣言（project extensions boilerplate）が
+16 の agentdev command で同一4行の extension 宣言（project extensions boilerplate）が
 重複定義される場合、下記の分離フローを適用する。
 
 #### 公開契約宣言 vs 詳細契約 の分離フロー

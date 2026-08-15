@@ -10,7 +10,7 @@ Case に対して実装実行を実行担当サブエージェント経由で委
 
 ## project extensions
 
-本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/case-run.yaml`）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-run`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`、kind: workflow-extension）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## 入力
 
@@ -52,14 +52,10 @@ Case に対して実装実行を実行担当サブエージェント経由で委
 
 ### Step 7-1: 配布依存境界の最終変更経路 gate（実装後）
 
-result が `completed-pr` の場合、worktree クリーンアップに進む前に、実装後の実際の worktree HEAD に対して配布依存境界の最終 gate を行う（実装担当サブエージェントが追加した変更も含めて検査する）。
+result が `completed-pr` かつ PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合、worktree クリーンアップの前に実装後の worktree HEAD へ最終 gate を適用する（実行担当サブエージェントが追加した変更も含む。当該変更を含まない PR ではスキップする）。
 
-- **実行条件**: result が `completed-pr` であり、PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合。当該変更を含まない PR（docs のみ等）ではスキップする
-- **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`。現在の worktree（実装後 HEAD）の配布物ソースツリーを検査する
-- **検出結果の分類**: 検査エラー（読込不能、未分類エントリ、adapter 起動失敗）は全て gate-not-passed として扱う。clean として通過させない
-- **違反検出時の停止契約**（adapter result `blocked` とは区別）: 違反検出時は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録し、クリーンアップへ進まず case-run を停止する。adapter result は `completed-pr` のまま変更せず、adapter result 契約の `blocked`（Issue コメント SSoT を伴う blocker）へ上書きしない。next action は同一 Issue で case-run を再実行し違反を修正する（worktree+ブランチ存活時は委譲 STEP から再開、べき等）。case-close へは進めない（case-close 側で同一 gate が停止するため前段で停止する）
-
-手続きの詳細は `agentdev-workflow-case-run` スキル（references/delegation-and-result.md の STEP-S5）を参照する。
+- 実行コマンド: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`
+- 違反検出時は PR 本文の `### distribution-boundary` 小見出しに記録して case-run を停止する。adapter result は `completed-pr` のまま `blocked` へ上書きしない。検出結果の分類、停止契約の詳細は `agentdev-workflow-case-run` スキルを参照
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-run` が所有する。同 Workflow Skill は `/agentdev/case-run` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 

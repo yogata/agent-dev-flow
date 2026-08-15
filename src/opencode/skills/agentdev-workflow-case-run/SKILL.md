@@ -145,9 +145,9 @@ workflow 選択は STEP-S1 の実行モード分岐で確定する（引数が E
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - integrity checker skill（repo-local）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界）
 
-## internal Workflow Extension 読込
+## Workflow Extension 読込
 
-本スキルは internal Workflow Extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。Workflow Skill のみが読み、case-run command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-run/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、case-run command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
 
 ## 共通制約
 
