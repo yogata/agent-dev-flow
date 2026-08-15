@@ -1,394 +1,242 @@
----
-title: learning-promote evaluation report
-generated_at: 2026-08-10T09:55:00+09:00
-generator: /agentdev/learning-promote
-target_population:
-  inbox: 6
-  deferred: 32
-  total: 38
-adversarial_review:
-  invoked: true
-  route: D
-  reviewer: oracle
-  accepted_findings: 9
-  unresolved_disputes: 2
-  review_reflected: true
-  return_loop_count: 1
----
+# 評価レポート
 
-# learning-promote evaluation report
+## メタデータ
+- **実行日時**: 2026-08-15 17:05
+- **対象エントリ数**: 29件（inbox: 29件, deferred: 0件 — deferred.md（約49エントリ）は既存対策照合・重複確認の参照用として読込。本 run では再評価対象に含めず、living pool の再評価は次回実行時に行う。経路D review で本スコープ決定を確認済み）
+- **問題クラス数**: 8（未分類含む。クラス7 + 未分類1）
 
-本報告は `/agentdev/learning-promote` の内部評価フェーズ成果物である。inbox.md 6件と deferred.md 既存32件の全母集団で再分類・再評価した結果（adversarial-review 反映後）。
+## 問題クラス一覧
 
-## 全体傾向と問題クラス分類
+### 問題クラス1: Windows コンソールエンコーディング初期化の欠落・不十分による gh/git CLI 日本語 mojibake
 
-### 横断テーマ（参照用メモ、問題クラスではない）
+- **根本原因**: Windows PowerShell/pwsh の既定コンソールコードページ（cp932）環境で、gh/git CLI の WRITE・READ 操作にコンソールエンコーディング初期化3行（`[Console]::OutputEncoding` / `$OutputEncoding` / `chcp 65001`）を前置しない、または前置しても複合呼び出し（`--title` inline + `--body-file` 同時渡し）で `--body-file` 側へ保護が波及しない。現行 SPEC（agentdev-gh-cli Section 2 Step 0）は gh CLI WRITE 向けに限定され、git CLI 直接操作・READ 経路・複合呼び出しをカバーしない
+- **再発条件**: Windows pwsh 環境で初期化なし（または不十分な形式）で日本語を含む gh/git CLI 操作（`--body-file`、`git commit -F`、`git show` 等のパイプライン出力）を実行する場合
+- **予防策**: 初期化手順の適用範囲を「gh CLI WRITE」から「git CLI 直接操作（message file 経由）・READ 系パイプライン出力・複合呼び出し回避（2段階シーケンス or REST API 経由）」へ拡張して規範化する
 
-inbox 6エントリには関連テーマとして観察可能な横断傾向がある。ただし問題クラス分類基準（根本原因・再発条件・予防策の3要素一致、最小2エントリ）を満たすクラスタは形成しない。テーマ記述にすぎない。
+#### 8軸評価スコア
 
-- **大規模 rename 移行時のスコープ管理**: エントリ2（skill rename SPEC 対称性）、エントリ3（docs/guides 配下参照）、エントリ4（IR-* 検出ルール ADR 残存）で観察。原因・再発条件・予防策は異なり、3要素一致基準では同一問題クラス不可。個別評価する。
-- **Windows + PowerShell でのエンコーディング問題**: エントリ1（gh CLI --body-file 本文化け）と deferred.md にある PowerShell パイプライン経由読み取り、Issue 本文 LF 圧縮、スクリプトエンコーディング破損等の既存事例で観察。ただし根本原因（--body-file decode 経路 vs パイプライン経路 vs 文字列変数 vs ビルドパイプライン）は異なり、3要素一致基準では同一クラスタ不可。
-- **worktree + Windows 環境**: エントリ5（worktree パス慣例）と deferred.md の worktree ジャンクション関連事例で観察。根本原因は異なる。
-
-### 問題クラス分類結果
-
-inbox 6エントリは全て「未分類（単独）」として個別評価する。deferred.md 32件の既存エントリと3要素一致する新クラスタは形成しない（個別照合済み）。
-
-## エントリ1: Windows PowerShell で gh pr create --body-file が多重エンコード化け
-
-### 正規化データ
-
-- **ソース**: inbox.md entry 1
-- **観察事実**: Windows PowerShell で `gh pr create --body-file` を実行した際、本文が多重エンコード化け。`gh api` PATCH で修復。
-- **関連PR/Issue**: 未記録
-- **タグ**: `#windows #encoding #gh-cli #write-procedure #verify`
-
-### 問題クラス分類
-
-- **分類**: 未分類（単独）
-- **根本原因**: Windows 環境で `gh --body-file` 経路の本文が破損。破損層（PowerShell 文字コード, Node.js stdin, gh CLI decode 経路）は再現確認がなく未確定。
-- **再発条件**: Windows PowerShell で本文 WRITE を実行する全手順。
-- **予防策**: 既存 VERIFY（本文読み戻し必須、verify.md line 3/36）で検出可能。VERIFY 失敗時の復旧方針は未整備。
-
-### 8軸評価（再採点）
-
-| 軸 | スコア | 理由 |
+| 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | 1件観測 |
-| 影響度 | 3/5 | 中（本文化けは PR 可読性低下、即座に気づけば修復可能）|
-| 横展開性 | 3/5 | Windows 全 WRITE で発生し得るが、1件観測・1件非観測で中程度 |
-| 反映先明確度 | 4/5 | 既存 VERIFY 特定済。復旧方針は agentdev-gh-cli retry.md / standard-procedures.md |
-| 自動化適性 | 2/5 | 現行 retry.md は自動代替禁止（line 20）。復旧方針の文書化中心 |
-| プロジェクト固有知識再利用性 | 4/5 | 高い（Windows + gh CLI 固有）|
-| 再発可能性 | 3/5 | Windows 環境で継続的に発生し得るが、VERIFY で検出可能 |
-| 費用対効果 | 3/5 | 復旧方針文書化は低コストだが効果は限定的 |
-| **加重合計** | **23/40** | |
+| 発生件数 | 3/5 | 4件（3経路 + READ 経路） |
+| 影響度 | 4/5 | PR 本文・commit message の mojibake で amend/force-push/再設定の手戻り。通信内容の破損として重大 |
+| 横展開性 | 5/5 | Windows 環境の gh/git CLI 操作全般。他プロジェクトでも同一発生 |
+| 反映先明確度 | 4/5 | agentdev-gh-cli SPEC Section 2、AGENTS.md、agentdev-git-worktree と複数候補が特定済み |
+| 自動化適性 | 4/5 | 3行の前置を手続き・テンプレートへ組み込むことで構造的に防止可能 |
+| プロジェクト固有知識再利用性 | 4/5 | pwsh/gh/git の相互作用という環境固有の技術知見 |
+| 再発可能性 | 5/5 | 既に4回・3経路で発生。手順化されない限りほぼ確実に再発 |
+| 費用対効果 | 5/5 | 低コスト（前置3行 + 手順明記）で高リスク低減 |
+| **加重合計** | **34/40** | |
 
-### 禁止条件フィルタリングゲート
+- **推奨処分案**: 昇華（spec 候補）。agentdev-gh-cli SPEC Section 2 の適用範囲拡張（git CLI 直接操作・READ 経路・複合呼び出し回避）として恒久契約化する価値が高い
+- **処分判定**: promote（カテゴリ7: spec 候補）
+- **既存対策照合**: agentdev-gh-cli SPEC Section 2 Step 0（gh CLI WRITE 向け）あり / AGENTS.md にファイル編集時の注意あり。**ギャップ: fix gap**（適用範囲が gh CLI WRITE に限定。git CLI 直接操作・READ 経路・`gh pr create` 複合呼び出しのカバーなし）
 
-- 通過。技術判断（復旧方針設計）を含み、運用ルール・command仕様のみではない。
+#### エントリ一覧
+- gh CLI WRITE 操作で Step 0 encoding 初期化を省略し --body-file 本文が mojibake（--title は正常）[inbox]
+- git commit -F <file> で encoding 初期化を省略し commit message が cp932 二重エンコード mojibake [inbox]
+- gh pr create --title --body-file で Step 0 encoding 初期化3行前置にも関わらず --body-file 本文が cp932 二重エンコード mojibake（第3の経路）[inbox]
+- Windows + junction worktree で git show 等 READ 系出力が cp932 mojibake（READ 手順でも OutputEncoding 前置が実質必要）[inbox]
 
-### ADR 候補除外判定
+### 問題クラス2: check_changed_docs.ts（targeted docs guard）実行契約の未文書化による誤 pass・誤 FAILURE・起動失敗
 
-- 除外。技術手順の整備であって、アーキテクチャ判断ではない。
+- **根本原因**: guard スクリプトの CLI 実行契約（モード使い分け、引数形式、起動手段）が手順書・ヘルプ文言に明示されず、実行時の試行錯誤で (1) コミット前 `--base-ref` 実行による files_checked 空の pass 誤認、(2) PowerShell 引用符付きスペース区切りの `--files` 渡しによる TARGET-EMPTY 誤 FAILURE、(3) Node v26 での node/tsx 起動失敗（import/require 混在）が発生
+- **再発条件**: コミット前に `--base-ref` モードのみ実行 / pwsh で引用符付きスペース区切り一覧を `--files` に渡す / bun 以外の起動手段を使う場合
+- **予防策**: 実行手順の明文化（コミット前は `--files`・コミット後は `--base-ref`、引用符なし複数 argv または comma 区切り、`bun run` 起動）+ ヘルプ文言への shell 別注意喚起
 
-### 廃棄判定
+#### 8軸評価スコア
 
-- **staged（限定版）** or **deferred（unresolved 1）**
-- 限定内容: 「自動 API PATCH 導入」ではなく「再現条件確定と VERIFY 失敗時の復旧方針決定」へ限定
-- 既存対策照合: verify.md（VERIFY 必須、既存）/ retry.md（代替手段自動実行禁止、停止・ユーザー報告要求、既存）
-- ギャップ: fix gap（persistent failure の復旧方針未整備）
-- 反映先候補: `src/opencode/skills/agentdev-gh-cli/references/retry.md`（復旧方針セクション）、`src/opencode/skills/agentdev-gh-cli/references/standard-procedures.md`
-
-### unresolved 争点 1
-
-現行「再試行後停止・報告」を維持するか、本文用 API PATCH を明示的な自動復旧経路として設計候補にするか。ユーザー判断事項。
-
-## エントリ2: skill rename 時の src/ と docs/specs/skills/ の対称性担保
-
-### 正規化データ
-
-- **ソース**: inbox.md entry 2、Wave 2 #2034
-- **観察事実**: skill rename 時、`src/opencode/skills/{old}` ↔ `docs/specs/skills/{old}` の対称性と frontmatter id, Artifact Graph node 関係の全体管理手順が不明瞭だった。
-- **関連PR/Issue**: #2034
-- **タグ**: `#skill-rename #spec-symmetry #inspect-skills #artifact-graph #migration`
-
-### 問題クラス分類
-
-- **分類**: 未分類（単独）
-- **根本原因**: skill rename 実行時に `src/opencode/** ↔ docs/specs/**` の対称性検査が deterministic に走査されない。repo-local targeted docs guard の実装ギャップ。
-- **再発条件**: skill rename を伴う作業。
-- **予防策**: repo-local targeted docs guard（targeted-docs-guard-implementation.md）への観点追加。配布 skill への固定内部 path 持ち込みは境界（REQ-002）と衝突するため不可。
-
-### 8軸評価
-
-| 軸 | スコア | 理由 |
+| 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | 1件（#2034）|
-| 影響度 | 2/5 | rename 完了までに気づけば解消可能。targeted docs guard が既存 |
-| 横展開性 | 3/5 | 将来の skill rename で再発 |
-| 反映先明確度 | 3/5 | 候補: targeted-docs-guard-implementation.md, repo-agentdev-integrity |
-| 自動化適性 | 3/5 | targeted docs guard への観点追加で自動化可能 |
-| プロジェクト固有知識再利用性 | 4/5 | repo-local 固有 |
-| 再発可能性 | 3/5 | 次回 skill rename で再発 |
-| 費用対効果 | 3/5 | targeted docs guard 観点追加は低コスト |
-| **加重合計** | **22/40** | |
+| 発生件数 | 3/5 | 4件（同一スクリプトの3種の誤作動） |
+| 影響度 | 3/5 | 誤 pass は検証漏れ、誤 FAILURE は時間消費。ゲート判定の信頼性を損なう |
+| 横展開性 | 3/5 | スクリプト自体は自己ホスト固有だが、可変引数 CLI を pwsh から呼ぶ知見は汎用 |
+| 反映先明確度 | 4/5 | check_changed_docs.ts ヘルプ文言、case-run/case-close の guard 実行手順 reference と特定済み |
+| 自動化適性 | 4/5 | 手順明記 + 未コミット変更検出警告の拡張で自動化可能 |
+| プロジェクト固有知識再利用性 | 3/5 | repo 固有ツールの運用契約知見 |
+| 再発可能性 | 4/5 | コミット前検証・pwsh 习惯は毎回発生しうる |
+| 費用対効果 | 4/5 | 文言・手順明記は低コスト |
+| **加重合計** | **28/40** | |
 
-### 禁止条件フィルタリングゲート
+- **推奨処分案**: 昇華（spec 候補 / 既存 skill へ反映）。guard 実行手順の標準化とヘルプ文言改善
+- **処分判定**: promote（カテゴリ7: spec 候補）
+- **既存対策照合**: targeted-docs-guard-implementation SPEC（files_checked 空時の確認規定、false-clean 予防: case-close は --files 標準・--base-ref 補助、main worktree HEAD==merge-base の空 diff 警告）、USAGE 文言（"space-separated recommended"）あり。**ギャップ: fix gap**（既存規定は case-close 向け。case-run のコミット前タイミング運用、shell 別引数形式（pwsh 引用符）、起動コマンド（bun run）の3点が未手順化）
 
-- 通過。deterministic な検査拡張（実装ギャップ）を含む。
+#### エントリ一覧
+- check_changed_docs.ts --base-ref はコミット前実行だと files_checked 空の warning になり pass 誤認リスクがある [inbox]
+- check_changed_docs.ts の --base-ref モードはコミット済み差分のみ検出（コミット前は --files モードで明示指定）[inbox]
+- check_changed_docs.ts は Node v26 で node/tsx 直接起動が失敗（bun run で起動する）[inbox]
+- check_changed_docs.ts の --files 複数指定を PowerShell 引用符で囲むと 1 トークン扱いになり TARGET-EMPTY 誤 FAILURE [inbox]
 
-### ADR 候補除外判定
+### 問題クラス3: 配布物構造を固定する契約テストと本文編集・完了判定の相互作用
 
-- 除外。repo-local 検査仕様の拡張であってアーキテクチャ判断ではない。
+- **根本原因**: 契約テスト（routing contract 系、期待値固定テスト）が配布物本文トークン・構造を固定していることを、編集時（thin 化圧縮）および完了条件設計時に考慮する手順が存在しない。並列 Wave では他 Wave の更新状況が見えず、部分的な期待値更新漏れが統合状態で陳腐化 fail として顕在化する
+- **再発条件**: 契約テストが本文トークン・期待値を固定する領域を機械的圧縮・構造変更する PR を、期待値更新なしで完了判定した場合（特に並列 Wave）
+- **予防策**: (1) 本文圧縮・構造変更前に当該ファイルを参照する `*.test.ts` の grep 確認を手順化、(2) 構造変更 PR の完了条件に「固定する契約テストの期待値更新」を明示的に含める
 
-### 廃棄判定
+#### 8軸評価スコア
 
-- **staged（repo-local）**
-- 既存対策照合: `docs/specs/integrity/targeted-docs-guard-implementation.md`（repo-local targeted docs guard の契約、既存）
-- ギャップ: guardrail insufficiency（skill rename 時の src ↔ docs/specs/skills 対称性走査が契約に明示されていない）
-- 反映先候補: `docs/specs/integrity/targeted-docs-guard-implementation.md`、`src/opencode/skills/repo-agentdev-integrity/SKILL.md`
-
-## エントリ3: docs/adr/ 削除時の guides/ 配下参照更新スコープの初期漏れ
-
-### 正規化データ
-
-- **ソース**: inbox.md entry 3、Wave 3a #2035
-- **観察事実**: `docs/adr/` 削除時に案内層（`docs/guides/`）を独立 consumer としてスコープに入れておらず、broken link が残った。
-- **関連PR/Issue**: #2035
-- **タグ**: `#broken-link #guides-scope #案内層 #change-impact #migration`
-
-### 問題クラス分類
-
-- **分類**: 未分類（単独）
-- **根本原因**: ディレクトリ削除・rename 実施時に、案内層（`docs/guides/**`）を独立 consumer としての網羅走査対象に入れていなかった。Wave 分解時の consumer 明示基準が不明瞭。
-- **再発条件**: ディレクトリ削除・rename を伴う大規模移行。
-- **予防策**: 旧参照（`docs/adr/` 等）の全体走査をディレクトリ削除前チェックとして標準化。ただし既存 `check-change-impact.ts` は「実際に変更された path が allowed list 外か」だけを検査し、未変更 path（`docs/guides/**`）は入力に現れないため、allowed list へ追加しても漏れを検出できない。代替予防策は旧参照全体走査、期待更新対象導出、IR-057 相当の obsolete path 検出のいずれか。
-
-### 8軸評価
-
-| 軸 | スコア | 理由 |
+| 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | 1件（#2035）|
-| 影響度 | 3/5 | 案内層 broken link は移行完了までに気づけば解消 |
-| 横展開性 | 3/5 | ディレクトリ削除・rename で再発 |
-| 反映先明確度 | 3/5 | 候補: IR-057, workflow-lifecycle, artifact-validation |
-| 自動化適性 | 2/5 | check-change-impact では検出不可。旧参照走査の標準化が必要 |
-| プロジェクト固有知識再利用性 | 3/5 | 中程度 |
-| 再発可能性 | 3/5 | 次回ディレクトリ削除・rename で再発 |
-| 費用対効果 | 3/5 | 旧参照走査の標準化は低コスト |
-| **加重合計** | **21/40** | |
+| 発生件数 | 2/5 | 2件（実行時手順と完了条件設計の相補ペア） |
+| 影響度 | 4/5 | Epic 差し戻しに直結した実績（陳腐化期待値 24 件 fail） |
+| 横展開性 | 4/5 | 契約テストを持つプロジェクト・並列 Wave 構成全般 |
+| 反映先明確度 | 3/5 | authoring skill・case-open 完了条件ガイドラインと候補は明確だら手順の正規配置先は要設計 |
+| 自動化適性 | 3/5 | grep 確認は手順化可能だが固定トークン特定は判断含む |
+| プロジェクト固有知識再利用性 | 4/5 | 配布物と契約テストの相互作用という固有知見 |
+| 再発可能性 | 4/5 | thin 化・構造変更・並列 Wave で再発 |
+| 費用対効果 | 4/5 | 手順明記で防止可能 |
+| **加重合計** | **28/40** | |
 
-### 禁止条件フィルタリングゲート
+- **推奨処分案**: 昇華（spec 候補）。authoring 手順（skill-authoring / command-authoring）と完了条件記載ガイドラインへの反映
+- **処分判定**: promote（カテゴリ7: spec 候補）
+- **既存対策照合**: なし（契約テスト事前確認・完了条件への期待値更新明示の手順なし）。**ギャップ: fix gap**
 
-- 通過。deterministic な検出拡張（旧参照走査標準化）を含む。
+#### エントリ一覧
+- Command 本文 thin 化圧縮時に契約テスト固定トークンの事前確認を省略し一時失敗 [inbox]
+- アーキテクチャ構造変更 PR の完了条件に「固定するテストの期待値更新」を明示的に含める [inbox]
 
-### ADR 候補除外判定
+### 問題クラス4: 検証 fail の由来判定基準（基準 commit・検証環境）の不定性
 
-- 除外。検出・運用手順の拡張であってアーキテクチャ判断ではない。
+- **根本原因**: 「pre-existing fail」の由来判定の基準 commit と検証環境が受入れ基準に規定されず、各 Wave の PR base（直前 staging）相対判定や単一環境の結果が絶視されると、同一 Epic 内の先行 Wave 起因失敗が「元から存在」に見え、false-positive completion と誤った不合格の双方を生む
+- **再発条件**: 複数 Wave・複数検証環境（worktree/main、junction 伝播、node_modules 有無）にまたがる Epic の完了検証で由来判定を行う場合
+- **予防策**: 由来判定は remediation 開始前 baseline commit 基準で実施 + 受入れ記録への検証環境明記と fail 全件の由来分類証跡を規定する
 
-### 廃棄判定
+#### 8軸評価スコア
 
-- **staged or deferred = unresolved 2**
-- 既存対策照合: `check-change-impact.ts`（実際に変更された path が allowed list 外かのみ検査。未変更 path は入力に現れないため漏れ検出不可）
-- ギャップ: fix gap（予防策の再設計が必要）
-- 反映先候補: `docs/specs/integrity/rules/IR-057-*`（obsolete path 検出）、`src/opencode/skills/agentdev-workflow-lifecycle/`（Wave 分解時の consumer 明示基準）
-
-### unresolved 争点 2
-
-全母集団との再分類後も新規性を持つ場合、独立 staged とするか、既存検出策の application miss として deferred にするか。ユーザー判断事項。
-
-## エントリ4: 横断 grep パターン設計の改善余地 — REQ/ADR ID 形式の多様性（IR-005/036/055 ADR 残存）
-
-### 正規化データ
-
-- **ソース**: inbox.md entry 4、Wave 3b/4
-- **観察事実**: ADR → Decision 移行後も検証ルール IR-005, IR-036, IR-055 が ADR 語彙・旧責務のまま残存。IR-055 は Decision ID と説明しながら正規表現が `ADR-\d{4}` のまま。
-- **関連PR/Issue**: 別 Issue で対応予定（残留リスクとして明記）
-- **タグ**: `#grep-pattern #detection-rules #id-format #検証基盤 #migration`
-
-### 問題クラス分類
-
-- **分類**: 未分類（単独）
-- **根本原因**: ADR → Decision の大規模 rename 移行時に、検証ルール（IR-*）自体の移行対象網羅を管理するチェックリストが不明瞭。現在進行中の検証基盤 false negative。
-- **再発条件**: 現在進行中（IR-005/036/055 に ADR 残存、ADR 参照を検出できず）。
-- **予防策**: IR-005/036/055 の Decision 移行。`check_integrity.ts` の対応。
-
-### 8軸評価
-
-| 軸 | スコア | 理由 |
+| 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | 1件（ただし現在進行中のギャップ）|
-| 影響度 | 4/5 | 検証基盤の false negative。ADR 参照残存を検出できず |
-| 横展開性 | 4/5 | IR-* ルール網羅性は全 rename 移行で問題 |
-| 反映先明確度 | 5/5 | 特定済: IR-005, IR-036, IR-055, check_integrity.ts |
-| 自動化適性 | 4/5 | IR ルールファイルの修正 + checker テストで容易 |
-| プロジェクト固有知識再利用性 | 4/5 | AgentDevFlow の integrity 基盤固有 |
-| 再発可能性 | 4/5 | 現在進行中で未解決 |
-| 費用対効果 | 5/5 | IR ルール修正は低コストで即効果 |
-| **加重合計** | **31/40** | |
+| 発生件数 | 2/5 | 2件（基準 commit と環境の2観点） |
+| 影響度 | 4/5 | false-positive completion に直結（Epic 完了判定の誤り） |
+| 横展開性 | 4/5 | 複数環境・複数 Wave を持つ検証全般 |
+| 反映先明確度 | 3/5 | 同主題の intake 候補あり、品質ゲート側（QG-4/case-close SPEC）と候補 |
+| 自動化適性 | 3/5 | 由来判定自体は手動（git show 等）。基準の文書化が主 |
+| プロジェクト固有知識再利用性 | 4/5 | baseline commit・環境差という固有検証知見 |
+| 再発可能性 | 4/5 | 検証のたびに由来判定は発生 |
+| 費用対効果 | 4/5 | 基準明文化は低コストで判定揺れを防止 |
+| **加重合計** | **28/40** | |
 
-### 禁止条件フィルタリングゲート
+- **推奨処分案**: 昇華（spec 候補）。同主題の intake item（intake-2026-08-15-spec-candidate-full-integrity-suite-acceptance-criteria.md）と backlog-review で統合前提
+- **処分判定**: promote（カテゴリ7: spec 候補）
+- **既存対策照合**: intake inbox に同主題の SPEC確定候補あり。**ギャップ: fix gap**（当該候補は受入れ基準・環境記録を含むが、由来判定の baseline commit 基準を含まない）
 
-- 通過。deterministic な検証ルール修正を含む。
+#### エントリ一覧
+- 「pre-existing fail」の由来判定は PR base（staging 相対）基準ではなく remediation 開始前 baseline commit 基準で行う [inbox]
+- full integrity suite の fail 構成は検証環境（worktree / main、junction・node_modules 有無）で変化する [inbox]
 
-### ADR 候補除外判定
+### 問題クラス5: IR-055 baseline 再生成の実行契約（タイミング・スコープ）未規定
 
-- 除外。検証ルールの実装修正であってアーキテクチャ判断ではない。
+- **根本原因**: IR-055 baseline が file 単位・単一 PR HEAD 基準で再生成される一方、file 移設（command → skill 移行）、並列 Wave での共有 baseline 再生成、docs/specs/** への新規参照追加が baseline 登録集合へ波及する工程契約（いつ・どのスコープで再生成するか）が規定されていない
+- **再発条件**: file 移設を伴う変更、並列 Wave での baseline 再生成、docs/specs/** への新規参照を伴う工程で baseline 再生成をスキップまたは局所実行した場合
+- **予防策**: baseline 再生成の実行契約の明文化（移設系 PR の標準手順への組込み、Wave 境界または最終 merge での全兄弟変更取り込み後再生成、case-close で docs/specs/** 変更時の baseline 再生成必須チェック）
 
-### 廃棄判定
+#### 8軸評価スコア
 
-- **staged（高優先）**
-- 既存対策照合: IR-005, IR-036, IR-055（共に ADR 残存中）、`check_integrity.ts`
-- ギャップ: fix gap（現在進行中の false negative）
-- 反映先候補: `docs/specs/integrity/rules/IR-005-adr-req-bidirectional-reference.md`、`docs/specs/integrity/rules/IR-036-adr-work-means-detection.md`、`docs/specs/integrity/rules/IR-055-runtime-unresolved-reference.md`、`src/opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`
-
-## エントリ5: worktree パス慣例の明確化 — .worktrees/ vs .agentdev/worktrees/
-
-### 正規化データ
-
-- **ソース**: inbox.md entry 5
-- **観察事実**: `.worktrees/`（repo root）と `.agentdev/worktrees/` のどちらが正規か慣例明確化の余地があった。実装上は誤認なく使用。
-- **関連PR/Issue**: なし
-- **タグ**: `#worktree #path-convention #harness-runtime #domain-state #charter`
-
-### 問題クラス分類
-
-- **分類**: 未分類（単独）、duplicate 候補
-- **根本原因**: worktree 配置パスの慣例明確化（実害なし）。
-- **再発条件**: 新規参加者が worktree 配置パスに迷う可能性。
-- **予防策**: 既存（agentdev-git-worktree SKILL.md line 16、`.gitignore` line 10、REQ-002-024）で実質カバー済み。
-
-### 既存対策との照合（duplicate 判定根拠）
-
-| 既存対策 | 箋所 | 状態 |
+| 軸 | スコア | 判定理由 |
 |---|---|---|
-| worktree 正規パス明記 | `src/opencode/skills/agentdev-git-worktree/SKILL.md` line 16（`.worktrees/{N}-{type}`）| 既存 |
-| `.worktrees/` ignore 登録 | `.gitignore` line 10 | 既存 |
-| runtime workspace 管理は harness 責務 | `docs/requirements/REQ-002.md` REQ-002-024 | 既存 |
+| 発生件数 | 3/5 | 3件（移設・並列 Wave・更新漏れ） |
+| 影響度 | 3/5 | pre-existing fail や delta warning のノイズ。Epic 完了前の対処必要性 |
+| 横展開性 | 3/5 | baseline ratchet 運用を持つプロジェクト全般 |
+| 反映先明確度 | 4/5 | case-run/case-close references、integrity SPEC（IR-055 baseline 運用）と特定済み |
+| 自動化適性 | 4/5 | 正規 CLI（--update-ir055-baseline）が存在し手順への組込みは容易 |
+| プロジェクト固有知識再利用性 | 4/5 | ratchet baseline の運用契約という固有知見 |
+| 再発可能性 | 4/5 | 移設・並列 Wave・docs 変更で継続的に発生 |
+| 費用対効果 | 4/5 | 手順明記とチェック追加は低コスト |
+| **加重合計** | **29/40** | |
 
-DEC-001 自体は `.worktrees/` を直接規定しない（charter 原則という説明は撤回）。
+- **推奨処分案**: 昇華（spec 候補）。IR-055 baseline 運用契約（integrity SPEC 側）と case-run/case-close 手順への反映
+- **処分判定**: promote（カテゴリ7: spec 候補）
+- **既存対策照合**: 再生成 CLI あり。**ギャップ: fix gap**（再生成の実行契約（タイミング・スコープ）の規定なし）
 
-### 廃棄判定
+#### エントリ一覧
+- baseline 未反映による check_integrity.test.ts IR-055 pre-existing failure（Phase 6 #2083 委譲）[inbox]
+- workflow 実装を command から skill へ移設すると IR-055 baseline 再生成が移設作業の標準手順として機能する [inbox]
+- 並列 Wave の1つが共有 baseline を再生成すると、兄弟 Wave の変更が merge 後 staging で delta warning を生む [inbox]
 
-- **duplicate**
-- 既存対策: SKILL.md / .gitignore / REQ-002-024 で実質カバー済み
-- ギャップ: なし
-- 新規付加価値（3層早見表）は単独昇華には軽微
+### 問題クラス6: 配布物間の形式・参照契約の突合欠陥（テンプレート vs ガードレール vs スキル形式定義）
 
-## エントリ6: v2: 履歴参照保護の運用成功（AG-010、大規模 rename 移行事例）
+- **根本原因**: 同一情報（子Issue 本文の Parent 配置、Epic ステータス追跡テーブル形式、reference からテンプレートへの参照先）の正規形式が複数箇所（command ガードレール、テンプレート、スキルの正規表現定義、reference）で二重定義され、配布物間の SSoT 整合と参照先実ファイル存在の突合機構が存在しない
+- **再発条件**: 配布物間で形式・参照を追加・変更する際に、SSoT 整合（どちらを正とするか）と参照先実ファイルの作成・確認を行わずに merge した場合
+- **予防策**: (1) 形式契約の SSoT 統一（テンプレートを正としてガードレール・スキルを追随、またはその逆を明確化）、(2) authoring 時の参照先実ファイル存在確認の査読観点化、(3) checker による「reference → templates/ パス参照 → 実ファイル存在」検査の追加
 
-### 正規化データ
+#### 8軸評価スコア
 
-- **ソース**: inbox.md entry 6
-- **観察事実**: ADR → Decision 移行で v2:ADR-* 履歴参照52件を破壊なく維持。成功要因3点（v2: prefix 構文的分離、文字列一括置換禁止8分類、Artifact Graph node_type 区別）。
-- **関連PR/Issue**: なし（成功事例の記録）
-- **タグ**: `#v2-history #ag-010 #rename-migration #成功事例 #artifact-graph`
-
-### 問題クラス分類
-
-- **分類**: 未分類（単独）、成功事例
-- **根本原因**: 該当なし（成功事例）
-- **再発条件**: 将来の ID 形式変更を伴う大規模 rename 移行。
-- **予防策**: REQ-001-008（識別子不変）、012〜015（廃止文書・履歴情報）、DEC-009 AG-010/016（移行固有契約）で本質カバー。docs/guides/project-docs-and-specs.md に v2 prefix と tag の案内あり。汎用移行 playbook（他 ID 形式変更時の再利用手順）は未整備。
-
-### 8軸評価
-
-| 軸 | スコア | 理由 |
+| 軸 | スコア | 判定理由 |
 |---|---|---|
-| 発生件数 | 1/5 | 1件（成功事例）|
-| 影響度 | 3/5 | 成功事例の再利用価値。軸定義（発生時の被害）とは異なるが low-pri 記録価値 |
-| 横展開性 | 3/5 | 将来の ID 形式変更で再利用可能 |
-| 反映先明確度 | 3/5 | 候補: docs/guides/artifacts-and-state.md（再利用手順未整備）|
-| 自動化適性 | 1/5 | 成功事例の記録であり自動化対象外 |
-| プロジェクト固有知識再利用性 | 4/5 | 高い（v2: 履歴保護パターンの再利用）|
-| 再発可能性 | 3/5 | 将来の ID 形式変更で再利用機会 |
-| 費用対効果 | 2/5 | playbook 整備はコスト対効果限定的（low-pri）|
-| **加重合計** | **20/40** | |
+| 発生件数 | 3/5 | 3件（Parent 配置・Epic テーブル形式・テンプレート参照欠落） |
+| 影響度 | 3/5 | 全10子Issue の手戻り修正、tracker 正規表現の機能不全、完了報告構造の実行時解釈化 |
+| 横展開性 | 4/5 | 配布物（テンプレート・command・skill）を持つプラグイン開発全般 |
+| 反映先明確度 | 4/5 | issue_desc_child.md、case-open G03、agentdev-epic-tracker、check_templates.ts と特定済み |
+| 自動化適性 | 4/5 | 参照→実ファイル存在検査は checker で自動化可能 |
+| プロジェクト固有知識再利用性 | 4/5 | 配布物間契約の突合という固有知見 |
+| 再発可能性 | 4/5 | テンプレート・スキル編集時に継続発生しうる |
+| 費用対効果 | 4/5 | 查読観点化と checker 検査追加は中程度コストで効果大 |
+| **加重合計** | **30/40** | |
 
-### 禁止条件フィルタリングゲート
+- **推奨処分案**: 昇華（spec 候補 + template・checker 拡張）。E11 の具体修正は既存 intake item と backlog-review で統合前提
+- **処分判定**: promote（カテゴリ7: spec 候補）
+- **既存対策照合**: agentdev-skill-authoring の参照整合 axis あり / intake-2026-08-14-case-open-completion-report-templates-missing.md が E11 具体修正を保持。**ギャップ: guardrail insufficiency**（テンプレート vs ガードレール vs スキル形式定義の突合機構なし）
 
-- 該当なし（成功事例の記録）。ただし ADR 候補除外。
+#### エントリ一覧
+- Epic ステータス追跡テーブル形式の契約不一致（agentdev-epic-tracker 新4列/旧4列 vs case-open 件数テーブル）[inbox]
+- Workflow Skill reference が配布テンプレート実ファイルを参照せず「参照のみ存在」状態で運用継続 [inbox]
+- G03（子Issue 先頭行 Parent）と issue_desc_child テンプレート構造の突合欠陥（解決時に重複記載で両立）[inbox]
 
-### ADR 候補除外判定
+### 問題クラス7: 機械検査・guard の対象範囲規定欠落による false positive（非 SPEC ファイル・歴史参照・worktree 環境差）
 
-- 除外。既存 DEC-009 AG-010/016 + REQ-001-008/012〜015 で本質カバー。playbook 整備は記録整備であってアーキテクチャ判断ではない。
+- **根本原因**: guard/checker が検出対象の除外規定を持たない。(1) targeted docs guard が docs/specs/ 配下のファイルを役割（SPEC schema 準拠 vs 非 SPEC snapshot）によらず機械的に README 登録候補とする、(2) 廃止 IR 識別子の監査文書・baseline の歴史参照を機能的残存と区別しない、(3) Windows+junction worktree で `.opencode/skills/agentdev-*` が空洞化する環境差を検知しない
+- **再発条件**: docs/specs/ 配下に SPEC schema を持たないファイルを新規作成 / IR 廃止・MERGE で歴史記録に識別子言及が残る / Windows+junction 環境の worktree で `.opencode/skills/` 参照 checker を実行する場合
+- **予防策**: 対象外規定の明文化（frontmatter・配置ディレクトリによる SPEC 判定とフラグ制御、歴史記録ディレクトリの除外リスト、worktree 空洞化検知時の warning/skip フラグ）
 
-### 廃棄判定
+#### 8軸評価スコア
 
-- **deferred（理由修正版）**
-- 既存対策: REQ-001-008/012〜015（一般原則）+ DEC-009 AG-010/016（移行固有契約）。docs/guides/project-docs-and-specs.md に v2 prefix 案内あり。
-- ギャップ: なし（本質カバー）。汎用移行 playbook は未整備だが low-priority。
-- 旧評価の誤り訂正: REQ-001-056〜064 は accepted Decision の意味的不変性・関係・健全性であって v2 履歴保護そのものではない。正しくは REQ-001-008/012〜015。
-
-## adversarial-review 反映記録
-
-### 発動概要
-
-- 経路: D（learning-promote 内部）
-- 発動条件: inbox 6件、skip 条件（REQ-015-003）非該当、command は default-on（REQ-015-002）
-- reviewer: oracle
-- accepted findings: 9
-- unresolved disputes: 2
-
-### accepted findings の反映状況
-
-| ID | 内容 | 反映 |
+| 軸 | スコア | 判定理由 |
 |---|---|---|
-| F-01 | deferred.md を参照対象外とした Phase 2 違反 | 反映済み。全母集団（inbox 6 + deferred 32 = 38）で再分類・再評価 |
-| F-02 | クラスタ1（エントリ2,3,4）の3要素不一致 | 反映済み。クラスタ解体、エントリ2,3,4 を個別評価。「全体傾向」セクションへ横断テーマ移動 |
-| F-03 | エントリ1根本原因の限定 | 反映済み。根本原因「破損層未確定」へ限定。staged 内容を「自動 PATCH 導入」→「再現条件確定と復旧方針決定」へ変更 |
-| F-04 | エントリ2の repo-local 反映先 | 反映済み。反映先を targeted-docs-guard-implementation.md / repo-agentdev-integrity へ |
-| F-05 | エントリ3 check-change-impact 改修案撤回 | 反映済み。予防策を「旧参照全体走査、期待更新対象導出、IR-057 相当」へ差替 |
-| F-06 | エントリ4の独立 staged | 反映済み。IR-005/036/055 + check_integrity.ts の Decision 移行残存を具体的ギャップとして記載 |
-| F-07 | エントリ5 duplicate | 反映済み。.gitignore line 10 既登録、SKILL.md line 16 既明記、REQ-002-024 既存を根拠 |
-| F-08 | エントリ6 REQ-001 行番号訂正 | 反映済み。REQ-001-008/012〜015 + DEC-009 AG-010/016 へ訂正 |
-| F-09 | prune 証拠保存計画 | 反映済み。後述「prune 計画」で source entry ごとの証拠保存を明示 |
+| 発生件数 | 3/5 | 3件（非 SPEC 判定・歴史参照・worktree 環境差） |
+| 影響度 | 3/5 | false positive のノイズと判定の揺れ。検証コストの増大 |
+| 横展開性 | 3/5 | guard を持つプロジェクト全般。環境差検知は Windows/junction 固有 |
+| 反映先明確度 | 4/5 | check_changed_docs.ts、DEC-013 AG-008、TS-017、check_templates.ts と特定済み |
+| 自動化適性 | 4/5 | 除外リスト・frontmatter 判定・空洞化検知は自動化容易 |
+| プロジェクト固有知識再利用性 | 4/5 | 検査対象範囲設計という固有知見 |
+| 再発可能性 | 4/5 | 新規ファイル種別・IR 整理・worktree 利用で都度発生 |
+| 費用対効果 | 4/5 | 除外規定の明文化は低コスト |
+| **加重合計** | **29/40** | |
 
-### unresolved disputes（既存 HITL Step 10 へ振向け）
+- **推奨処分案**: 昇華（spec 候補 + checker 拡張）。E9 のテスト側安定化は既存 intake item と backlog-review で統合前提
+- **処分判定**: promote（カテゴリ7: spec 候補）
+- **既存対策照合**: intake-2026-08-15-check-templates-dryrun-worktree-failures.md（E9 テスト側安定化候補）あり。**ギャップ: fix gap**（非 SPEC ファイル・歴史参照・worktree 環境差の対象外規定なし）
 
-1. **エントリ1**: 現行「再試行後停止・報告」を維持するか、本文用 API PATCH を明示的な自動復旧経路として設計候補にするか
-2. **エントリ3**: 全母集団との再分類後も新規性を持つ場合、独立 staged とするか、既存検出策の application miss として deferred にするか
+#### エントリ一覧
+- docs/specs/ 配下の非 SPEC ファイル（baseline snapshot）の SPEC README 登録対象判定 [inbox]
+- 廃止 IR 識別子の歴史参照を監査文書・baseline に残置する運用（DEC-013 AG-008 履歴担保原則の適用事例）[inbox]
+- Windows + ジャンクション環境 worktree での check_templates.ts worktree 固有 false positive（.opencode/skills/agentdev-* 空洞化）[inbox]
 
-これらは既存 HITL（Step 9-10）のユーザー判断事項であり、adversarial-review を新規ゲート化するものではない。REQ-014-009 により、unresolved 解消前に prune・commit/push へは進まない。
+> **deferred pool 突合記録（経路D review）**: deferred.md 既存エントリ「Windows worktree 環境で lint_skills.ts を実行するためのジャンクション一時作成パターン」と E9 は同根（junction 未伝播による .opencode/skills 空洞化）だが、予防策が相違する（一時ジャンクション作成という作業側回避策 vs checker 側の空洞化検知フラグ）ため本 run ではクラスタ化せず living pool で維持する。E6 は false positive そのものではなく「判定基準の未規定による解釈判断」であり、クラス題名は「対象範囲規定の未整備」と読むのが正確である。厳密な3要素同一規則の適用では本クラスは3つの単発エントリに分解しうるが、単一の予防策族（guard/checker の対象外規定明文化）に集約できるため現構成を維持する（粒度例「Windows環境でのパスエスケープ問題」と同水準の grouping）。
 
-## 廃棄判定サマリ
+### 未分類
+- detector 個別 unit test 拡充不足パターン（file-scope violation 検出 vs detector 単位カバレッジ）[inbox] — deferred（出現1件。REQ-028-006 運用基準の明確化候補として living pool で維持）
+- verify-only 検証で MOVE/RETIRE 済み REQ 行の現行根拠参照を grep 検出するパターン [inbox] — deferred（出現1件。検証パターン記録。具体修正は intake-2026-08-14-stale-req-002-022-reference-resolved.md で対応済み）
+- 旧表現を禁止する是正注記で旧表現の字面を引用すると grep 0 件基準の機械検査と衝突する [inbox] — deferred（出現1件。執筆規範レベル知見）
+- 配布物へ Workflow Skill の STEP 表を書く際、具体番号を書ける ID ファミリーは STEP / QG に限定される [inbox] — deferred（出現1件。既定運用の明確化事象、authoring 注意喚起候補）
+- ハーネス Write ツールのリポジトリ外 temp 書き込みが distribution-boundary-guard でブロックされる（worktree 内配置で回避）[inbox] — deferred（出現1件。guard 設計どおりの挙動、回避策の運用知見）
+- autogen-index-regeneration-diff 拡張check の指定ツール generate_indexes.ts が adr-to-decision rename 未追随で EXIT_ERROR（中間 Wave は PR 索引影響なしで継続判断）[inbox] — deferred（同一事象の intake item（intake-2026-08-14-generate-indexes-requires-removed-adr-readme.md）が具体修正を管理中。duplicate 定義は既存 command/skill/template/docs によるカバーを想定し intake item は該当しないため duplicate 不適切、対策未解決のため reject も不適切。本エントリは living pool で維持し、次回実行時に intake 側処分と照合する。なお本エントリ固有の一般化予防策（rename 横断是正 PR への参照スクリプト追従確認の必須項目化、拡張check 指定ツールの freshness gate 変更）は intake item の対応方向に含まれないため、次回再評価時に delta として昇華可否を判断する）
+- RU-0004 が git 未コミットのまま Form Zero で削除され evidence 保存前提が欠落（審議実体は投影記録で検証）[inbox] — deferred（出現1件。backlog-review / case-open 手順変更候補）
+- Windows 環境でスクリプトの network 系コマンド不使用を「呼び出し記録型ダミー git.cmd」で実行時証明する検証技法 [inbox] — deferred（出現1件。検証技法の知見、規範化は要判断）
 
-| エントリ | 加重合計 | 廃棄判定 | 既存対策 | ギャップ |
-|---|---|---|---|---|
-| 1（gh CLI 本文化け） | 23/40 | **deferred**（現行 retry.md 維持、再発時再評価）| verify.md / retry.md | なし（現行 retry.md で対応）|
-| 2（skill rename SPEC 対称性） | 22/40 | staged（repo-local）| targeted-docs-guard-implementation.md | guardrail insufficiency |
-| 3（docs/guides スコープ） | 21/40 | **deferred**（IR-057 拡張で対応候補、再評価時まで保留）| check-change-impact.ts（漏れ検出不可）| なし（IR-057 拡張で対応候補）|
-| 4（IR-* ADR 残存） | 31/40 | staged（高優先）| IR-005/036/055（ADR 残存中）| fix gap（現在進行中 false negative）|
-| 5（worktree パス慣例） | - | duplicate | SKILL.md / .gitignore / REQ-002-024 | なし（実質カバー済み）|
-| 6（v2: 履歴参照保護成功事例） | 20/40 | deferred（理由修正）| REQ-001-008/012〜015 + DEC-009 AG-010/016 | なし（本質カバー。playbook 未整備は low-pri）|
+## promote 時prune結果
 
-### 処分件数（ユーザー承認済み、2026-08-10）
+- **対象エントリ数**: 29件
+- **prune実施**: 未実施（HITL 承認後に実施）
+- **prune候補**: 21件（staged 21件。duplicate 0件 — 経路D review で E25 を deferred へ変更。HITL 承認時に確定）
+- **prune却下**: 0件
 
-- staged: 2件（エントリ2, エントリ4）
-- deferred: 3件（エントリ1, エントリ3, エントリ6）+ 既存32件 = 35件
-- duplicate: 1件（エントリ5）
-- rejected: 0件
-- unresolved: 0件（ユーザー判定確定済み）
+## 全体傾向
+- **高頻出・高影響**: 問題クラス1（Windows mojibake、34/40）が最高スコア。4件・3経路で発生し、費用対効果も最大
+- **横展開性が高い**: 問題クラス1（gh/git CLI 全般）、問題クラス3・6（契約テスト・配布物間契約。プラグイン開発全般）
+- **自動化適性が高い**: 問題クラス6・7（checker による参照存在検査・対象外規定）、問題クラス5（baseline 再生成の標準手順化）
+- **全体的な観察所見**: 29件中17件が「検証・guard・契約の運用契約未規定」族（クラス2〜7）。Epic #2099（thin 化 remediation）と Epic #2119 系（docs guard 運用）で大半を占め、ほか Epic #2076（IR 整理）由来6件、mojibake 3件（Issue #2050/#2054/#2058）、Epic #2091 由来1件など複数系統から回収された。同主題の intake item が3件存在（クラス4・6・7で参照）し、backlog-review での統合が前提。未分類8件はすべて living pool（deferred）で維持する（E25 は同一事象の intake item が管理中のため次回実行時に照合）
 
-## prune 計画（source entry ごとの証拠保存）
-
-prune 対象は staged / rejected / duplicate（F-09 要件: source entry ごとの証拠保存）。
-
-### duplicate（エントリ5）の証拠保存
-
-prune 前に promoted artifact は生成しないが、削除対象 source entry の根拠を evaluation-report の本セクションに保存する。
-
-- **title**: worktree パス慣例の明確化 — .worktrees/ vs .agentdev/worktrees/
-- **観測事実**: `.worktrees/`（repo root）と `.agentdev/worktrees/` のどちらが正規か慣例明確化の余地。実害なし。
-- **関連PR/Issue**: なし
-- **対象 path**: 該当なし（慣例明確化が目的）
-- **再発条件**: 新規参加者が worktree 配置パスに迷う可能性
-- **duplicate 根拠**: SKILL.md line 16 / .gitignore line 10 / REQ-002-024 で実質カバー済み
-
-### staged（エントリ2, 4）の証拠保存
-
-採用済み成果物（`.agentdev/learning/promoted/{category}-{name}.md`）の「元 learning item / 根拠」セクションに、各 source entry ごとの証拠を保存する。エントリ1, 3 はユーザー判定で deferred となったため本セクションの対象外（deferred.md へ移動）。
-
-- **エントリ2**（採用済み成果物: `integrity-skill-rename-src-spec-symmetry-guard.md`）:
-  - title: skill rename 時の src/ と docs/specs/skills/ の対称性担保
-  - 観測事実: skill rename 時に src ↔ docs/specs/skills 対称性の全体管理手順が不明瞭
-  - 関連PR/Issue: #2034
-  - 対象 path: `docs/specs/integrity/targeted-docs-guard-implementation.md`, `src/opencode/skills/repo-agentdev-integrity/SKILL.md`
-  - 再発条件: skill rename を伴う作業
-- **エントリ4**（採用済み成果物: `integrity-ir-detection-rules-decision-migration.md`）:
-  - title: 横断 grep パターン設計の改善余地 — IR-005/036/055 ADR 残存
-  - 観測事実: ADR → Decision 移行後も IR-005/036/055 が ADR 語彙・旧責務のまま残存
-  - 関連PR/Issue: 別 Issue で対応予定（残留リスク明記）
-  - 対象 path: `docs/specs/integrity/rules/IR-005-*`, `IR-036-*`, `IR-055-*`, `src/opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`
-  - 再発条件: 現在進行中（未解決）
-
-## 反映ルート（ステージング後）
-
-```
-promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/req-save → /agentdev/spec-save（SPEC候補）→ /agentdev/case-open → /agentdev/case-run
-```
-
-- staged 3件（エントリ1, 2, 4）は `promoted/` へ採用済み成果物を生成後、`/agentdev/backlog-review` 経由で RU 化
-- `case-run` への直接受け渡し禁止
-- `.opencode/` や実装コードへの直接反映禁止（G01）
+## ADR候補除外記録
+- **対象item**: 全問題クラス（1〜7）
+- **除外理由**: 技術判断不在 / 運用ルール（全クラスともアーキテクチャ上の決定・技術選定を含まず、手続き・検証基準・契約明文化が本質）
+- **根拠事実**: 各クラスの予防策は手順の明文化・SPEC への規定・checker 拡張であり、代替案間の技術的トレードオフ判断を含まない
+- **代替反映先候補**: 各クラスのとおり spec 候補（docs/specs/ 配下）および既存 skill・checker への反映

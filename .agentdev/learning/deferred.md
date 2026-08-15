@@ -1,13 +1,12 @@
 # 学び deferred pool（生きている learning プール）
-
 未処理・保留中・再評価対象の learning item を保持する多状態の生きている learning プール（SHALL）。deferred（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する（AG-005）。
 learning-capture によって inbox.md に追記されたエントリが、learning-promote の処分判定や prune によって動的に変化する。
-
 終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。処分済みの learning item は prune 対象となる。昇格対象の根拠は staging スタブに残す。
 
 ## エントリフォーマット（13項目 + 移動日）
 
 ```markdown
+
 ## YYYY-MM-DD: タイトル
 
 - **問題事象**: 何が起きたか
@@ -28,6 +27,7 @@ learning-capture によって inbox.md に追記されたエントリが、learn
 ---
 ```
 
+
 ## 旧フォーマット互換
 
 過去のエントリ（5項目形式: 事象/原因/対策/関連/タグ）は learning-promote 実行時に正規化される。
@@ -36,6 +36,7 @@ learning-capture によって inbox.md に追記されたエントリが、learn
 - 状況/事象 → 問題事象
 - 原因 → 根本原因
 - 解決策/対策/教訓 → 自律対応内容（解決策・対策）/ 予防策候補（教訓）
+
 
 ## Prune ポリシー
 
@@ -46,6 +47,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 **注意**: learning-refine は廃止済み（REQ-0105-051）。refine 機能は learning-promote に統合されている。
 
 ---
+
 
 ## baseline分類の乖離と解決
 
@@ -66,6 +68,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## [2026-06-06] スクリプトエンコーディング破損が HEAD にコミットされている
 
 - **問題事象**: 3本の整合性スクリプト（合計 ~148KB）が単一行化・エンコーディング破損した状態で HEAD にコミットされている。最終変更コミット e32b935 で発生。`bun` / `npx tsx` ともパース不能。
@@ -84,6 +87,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-06-06
 
 ---
+
 
 ## Squash merge conflict resolution: W1→W2 間の check_integrity.ts 統合パターン
 
@@ -104,6 +108,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## Epic Orchestrator の Wave間変更漏れパターン
 
 - **問題事象**: Epic Orchestrator による Wave 1（3子Issue並列）→ Wave 2（2子Issue並列）の実行後、最終コミット（dc32df0）で廃止コマンド名（intake-review, learning-refine, accepted/）の残存参照が残っていることを検知し、追加コミットで修正した
@@ -122,6 +127,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-06-07
 
 ---
+
 
 ## runtime template path の暗黙参照が誤用を招くパターン
 
@@ -142,6 +148,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 2026-06-18: gate hook の strict/heuristic 区別は --strict-only flag で解決する（global exit code 変更禁止）
 
 **状況**: Issue #899 の Delta Guard / Impact Guard 実装で、`check_integrity.ts` の exit code が strict 違反（block）と heuristic 違反（warning）を区別できない問題に直面した。`determineExitCode()` は ng と warning の両方で EXIT_NG(1) を返すため、heuristic 違反でも commit/push が block されてしまう。global な `determineExitCode()` の挙動を変更すると full-audit mode の既存テストが壊れるリスクがあった。
@@ -155,6 +162,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 ---
 
 ---
+
 
 ## import.meta.main ガードパターン（bun）
 
@@ -175,6 +183,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（汎用的なbun/TypeScriptパターン。AgentDevFlowの枠組みでは扱いにくい。情報断片的）
 
 ---
+
 
 ## 2026-06-22 Epic #1028 Wave 1 close
 
@@ -319,6 +328,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 複合ラベルの duty keyword 是正では読点（、）ではなく中黒（・）を使用する
 
 - **問題事象**: case-close.md G21 の capture 責務 duty keyword「回収・保存」が読点表記「回収、保存」になっており、check_integrity.ts の `duties["case-close.md"].dutyKeyword`（値: `回収・保存`）と不一致のため command-capture-duty NG が報告されていた。文書是正で読点（、）を中黒（・）に修正して解消した。
@@ -338,6 +348,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（出現1件。duty keyword NG 再発時に具体化して昇華を再評価）
 
 ---
+
 
 ## PR #1122 の「X-6 = 0 件」宣言が再 grep 確認不備で 5 件残存していた
 
@@ -359,6 +370,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## SUB-D 網羅検証で gloss 形式 `日本語（英語）` を「推奨訳語置換済」と扱う判定規則
 
 - **問題事象**: `integrity-rule-catalog.md` の SUB-D 網羅検証（OU-005 #1167）で `baseline`, `provider`, `variant`, `fixture` 候補語を grep 抽出した際、`基準（baseline）`、`種別パス（variant path）`、`有効なテストデータ（valid fixture）` 等、日本語主語 + 英語 gloss 形式のインスタンスが多数出現した。これらを「未置換の散文普通名詞」と誤認し再置換すると、gloss 情報の欠落、重複、または PR #1084 前例との不整合を生じる。
@@ -378,6 +390,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（出現1件・SUB-D 検証の境界ケース。gloss 誤置換再発時に具体化）
 
 ---
+
 
 ## case-open の direct scope 外明記と Issue 完了条件の表現が乖離し QG-4 で調整が必要になった
 
@@ -399,6 +412,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## Epic 分解時に既存 Issue/PR とのスコープ完全重複を検知できず空コミット PR に終始した
 
 - **問題事象**: Epic #1231（docs 機械判定表記是正）の子 Issue #1239（OU-001-8: IR-025〜051 regression_test 表記統一）の作業対象が、並行して進行していた別 Issue #1240（doc-structural-cleanup、AG-005: IR 表記統一）の PR #1240 で完全に処理済みだった。case-run は重複を検知して PR #1247 を空コミットとし、Findings に「既処理（DEFERRED）」と記録して PR #1240/#1246 のマージで完了条件を満たす構成とした。結果として #1239 の case-open/case-run/case-close リソースが空コミット PR に消費され、8子 Issue 中1つが実質作業なしとなった。
@@ -418,6 +432,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（出現1件・特定シナリオ。横断是正 Epic と横断 Issue 並行再発時に具体化）
 
 ---
+
 
 ## 学び: docs_chore + `artifact: spec` の場合の case-run/spec-save 境界（PR が作成できない）
 
@@ -439,6 +454,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 学び: REQ スキーマ要件の記述が per-entry / top-level の区別を曖昧にし、実装と解釈が分岐した
 
 - **問題事象**: REQ-0156-011「各エントリは old、new、severity、scope（include、exclude）を持つこと」という記述が `scope` を per-entry フィールドのように読ませる一方、実装（`docs/specs/integrity/obsolete-path-map.yaml` と IR-057 rule file、`check_integrity.ts`）は `scope` を top-level 共有フィールドとして扱っている。両者の解釈が分岐しており、REQ 文面だけを読むとエントリごとに `scope` を書くべきだと誤読する可能性があった。
@@ -458,6 +474,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（出現1件・影響小・運用回避済み。「スキーマ要件は所有者階層明示」規約は有効だが単発では具体性不足。スキーマ要件の解釈分岐再発時に再評価）
 
 ---
+
 
 ## 限定的検査による「配布物参照境界達成」報告が包括的検査で覆る（Wave 1/2 → Wave 3）
 
@@ -479,6 +496,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## case-open の完了条件に実測値（件数等）を記載する際に実ファイル確認を省略すると事実誤認が混入する
 
 - **問題事象**: Issue #1412 AG-004 pass criteria「learning entry（8件）が保持されていること」は事実誤認で、実際の `.agentdev/learning/deferred.md`（旧 `archive/active.md`）には17件の学びエントリが存在した（H2 セクション20件からメタセクション3件を除いた値）。本 PR では `git mv` で全学びエントリを完全保持したため、「learning entry が保持されていること」という本質的 pass criteria は満たした
@@ -498,6 +516,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（出現1件・PC-1 昇華で部分カバー・単独昇華は具体性不足。case-open 完了条件の推定値混入再発時に再評価）
 
 ---
+
 
 ## em-dash body 置換の文脈判定パターンと rg 検出時の混在注意
 
@@ -519,6 +538,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## case-auto 最大自走モードで ADR-0127 フォールバック（インライン実行）が連続事例で発動し続ける
 
 - **問題事象**: case-auto 最大自走モードから起動された case-run 工程（OU-002 Issue #1457 / PR #1458）で、委譲ツール `call_omo_agent(subagent_type="Sisyphus-Junior")` が explore/librarian のみを許可し Sisyphus-Junior 起動を拒否したため、ADR-0127 フォールバック（インライン実行）へ遷移した。OU-001（PR #1456）に続く2回目の発動で、case-auto 最大自走モードでは常態化している。
@@ -538,6 +558,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（adapter skill L131-148 が task() 起動失敗時フォールバックを完全カバー。L-004/L-010 とともに既存設計の妥当性実証記録。事前 probe 強化のみ未成熟）
 
 ---
+
 
 ## 2026-07-18: inspect 連鎖委任の正規 Issue/PR による追跡パターン (#1532 → #1533)
 
@@ -559,6 +580,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## Windows worktree 環境で lint_skills.ts を実行するためのジャンクション一時作成パターン
 
 - **問題事象**: Windows + ジャンクション環境の git worktree（`.worktrees/{N}`）で `lint_skills.ts` を実行すると、メインリポジトリで `sync-self-opencode.ps1` / `install-consumer-opencode.ps1` が作成する `.opencode/skills/{name}` へのジャンクションリンクが worktree 側に伝播しておらず、配布スキル（`japanese-tech-writing` 等）が検査対象に出力されず WARNING が正しく評価できない。今回の事例では PR #1551 の TS-001（AG-001 lint WARNING 0件確認）で発生。AGENTS.md の case-run 制約事項「準備フェーズの既知の制約（Windows + ジャンクション環境）」に該当。
@@ -578,6 +600,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
+
 
 ## 要件追加が既存基準の明文化で実変換を伴わない no-op パターン
 
@@ -599,6 +622,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## worktree ジャンクション未伝播環境での README 参照 fallback 実装パターン
 
 - **問題事象**: Windows + ジャンクション環境の git worktree（`.worktrees/{N}`）で `commands_e2e.test.ts` を実行すると、`SKILLS_DIR` / `TEMPLATES_DIR` が projection（`.opencode/`）を前提としていたため、worktree 内に `.opencode/commands/agentdev/README.md` が存在せずテストが fail した。メインリポジトリで `sync-self-opencode.ps1` / `install-consumer-opencode.ps1` が作成する `.opencode/commands/agentdev/` 等のジャンクションが worktree 側に伝播しないため。
@@ -618,6 +642,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
+
 
 ## extension が未サポート形式の brief 授権で意味マッピング処理するパターン
 
@@ -639,6 +664,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## TS-004 subagent 委譲プロトコル適用効果の実証を record-in-findings で処理した判断基準
 
 - **問題事象**: Issue #1566 テスト戦略 TS-004「#1538 と同等の case-open 委譲を `category=unspecified-high` + MUST NOT DO 強化プロンプトで実施し、スコープ逸脱なく case-open 本来責務に到達することを確認する」は、本 Issue の実装修復 OU-002/003/004（ドキュメント整備）単体では検証できない。case-close QG-4 評価時に合格・不合格の二値判定が下せない test strategy 項目。
@@ -658,6 +684,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
+
 
 ## ADR frontmatter の relates-to / supersedes を本文と Decision Map で表現する運用
 
@@ -679,6 +706,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## Issue 本文崩壊（LF 圧縮・見出し消失）の修復手法と予防線
 
 - **問題事象**: Issue #1533 の本文が LF=0（事実上1行化）に圧縮され、Markdown の見出し構造（`## ...`）が崩壊。GitHub Web UI で見出しが見出しとしてレンダリングされず、本文全体が平文化して読めなくなっていた。前工程の draft（commit `51fff8b2`）は LF=246 で正常、テンプレート原本も正常であり、#1525〜#1535 の11件中 #1533 だけが異常だった。
@@ -698,6 +726,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
+
 
 ## gh CLI 出力の PowerShell パイプライン経由読み取りによる UTF-8 損傷と Node.js execSync 回避
 
@@ -719,6 +748,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 2026-07-20: req-save/spec-save 統合委譲で生成された SPEC 本文への中国語文字混入
 
 - **問題事象**: req-save/spec-save 統合委譲（commit cb8e5891）で新設された SC-001 SPEC（`docs/specs/foundations/numbering-policy.md`）の L10 に中国語文字「单」（U+5355）が混入していた。AGENTS.md「基本言語は日本語。あらゆる場面で中国語の使用を禁止する」への違反。PR #1613（Issue #1603、Epic #1601 Wave 1）の case-run で検出され、「単」（U+5358）へ修正済み。
@@ -738,6 +768,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
+
 
 ## 2026-07-20: 要件行は進捗値ではなく仕様としてベースライン値を記述すべき（#1606）
 
@@ -759,6 +790,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 2026-07-20: 再構成検証型 Issue で「決定」更新後に「結果・影響」節が取り残される内部矛盾パターン（#1607）
 
 - **問題事象**: ADR-0114/0125/0127/0128 再構成（commit cb8e5891）で「決定」本文の更新は実施されたが、「結果・影響」「保持責務リスト」等の派生節が旧い前提のまま取り残される内部矛盾2件を検出。ADR-0114.md line 66「ドライバー結果の3状態契約により」は §2 で4状態契約へ拡張したのに結果節が3状態のまま。ADR-0127.md §3「case-run 並行委譲制御」は §1 で case-run を構成工程委譲対象外に変更したのに保持責務リストが旧表現のまま。
@@ -778,6 +810,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
+
 
 ## 2026-07-20: 物理統合時の参照更新網羅性チェックパターン（#1608）
 
@@ -799,6 +832,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 2026-07-20: AG-001 制約内で公開 SKILL.md の文書構成を是正する REFERENCE 強化パターン（#1610）
 
 - **問題事象**: doc-writing SKILL.md の査読観点 table が `references/` 配下10ファイルのうち `mechanical-replacement-rules.md`, `japanese-replacement-dictionary.md` の2ファイルへの参照を欠いていた。また doc-map SKILL.md に intro 段落と重複する redundant な `### 目的` subsection が存在した。これらは AG-006' 候補6/7 Wave 1 が指摘する SKILL.md 重複問題の一部だが、動作（発火条件、判定ロジック等）に影響しない文書構成の不備であり、AG-001「公開 skill 動作不改」制約内で修正可能かの判断が必要だった。
@@ -818,6 +852,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
+
 
 ## IR-* frontmatter の Related REQ/SPEC フィールド不在と本文 prose 抽出代替パターン
 
@@ -839,6 +874,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 配布物 SKILL.md の DERIVE 宣言に内部 ID を含めると IR-055 strict violation となる設計制約（Wave 4 実証）
 
 - **問題事象**: Wave 4（PR #1631）で src/opencode/skills/agentdev-*/SKILL.md 25ファイルへ原本（SSoT）節を新設し、SPEC 参照と DERIVE 宣言を記述した際、初期実装で原本節に `REQ-0140-041/042` を含めたところ IR-055 strict violation（84件）が検出された。配布物（src/opencode/skills/）は consumer 環境（AgentDevFlow プラグイン利用先）へ配布されるため、consumer 側に存在しない内部 REQ-ID への未解決参照となり strict violation となる。
@@ -858,6 +894,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
+
 
 ## worktree 委譲先での cd 操作誤りによるメインリポジトリ一時汚染と検出・是正パターン（Wave 5 実証）
 
@@ -879,6 +916,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## verification-only 空 PR の squash merge 許容性
 
 - **問題事象**: Epic #1711 Wave 1 (OU-001 #1712) は完全性台帳作成のみで実装差分0件の verification-only PR となった。GitHub が空コミット単体の squash merge を許容するか不確実だったため、マージ可否の事前確認が必要だった。
@@ -898,6 +936,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
 ---
+
 
 ## CaptureBoundary チェックと配布物参照境界（IR-059）の相互作用と両立運用（Epic #1719 Wave 4 実証）
 
@@ -919,6 +958,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## Windows worktree 環境で check_integrity.ts の subprocess JSON が空 stdout を返す問題（Epic #1719 Wave 4 観測）
 
 - **問題事象**: Wave 4 全件回帰検査で `repo-agentdev-integrity/scripts` 配下の test を実行した際、67件が失敗。エラーは `JSON.parse(r.stdout)` が "Unexpected EOF" を返すもの。`git stash` で本 PR 変更を退避しても同一に失敗することを確認し、pre-existing 環境問題と判定した。
@@ -939,6 +979,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 複数PR跨ぎ semantically 競合の Level 2 コンフリクト解消パターン（Epic #1719 Wave 2 実証）
 
 - **問題事象**: Wave 2 の PR #1732（agentdev-spec-file-manager 新設、search-target-area.ts 移管）と PR #1733（agentdev-artifact-validation 新設、check-* scripts 移管）が semantically 競合。Level 1 rebase（機械的 git rebase）では解消不可、case-auto へエスカレーション。Level 2 コンフリクト解消（手動 rebase、HEAD ba2df921）で両 PR の意図を統合して squash merge（mergeCommit 8fb17eb8）。
@@ -956,6 +997,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: #wave-2 #level-2-conflict #case-auto #parallel-pr #semantic-conflict #merge-pattern #epic-1719
 - **移動日**: 2026-07-22
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
+
 
 ## 2026-07-23: Phase 1 一括 commit 運用パターンにおける子Issue 完了判定の case-close 偏在
 
@@ -976,6 +1018,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（運用論、自動化適性低、具体手順曖昧。次回再評価対象として living pool で維持）
 
 ---
+
 
 ## 2026-07-23: 用語表記揺れの横断確認不足（SPEC 起票時の揺れが同一文書内に残留）
 
@@ -1000,6 +1043,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 2026-08-09: 移行計画 §5.3 の明示対象不足による壊れた fixture 修復見送りリスク
 
 - **問題事象**: 移行計画 §5.3 で `commands_error_cases.test.ts` の修復を明示したが、`commands_structure.test.ts` と `command_fixtures.test.ts` も同様の文字化け・改行崩壊があった。§5.3 は前者のみを明示対象としたが、壊れた fixture の修復としては後者2件も含めて対処すべきだった
@@ -1019,6 +1063,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（出現1件・反映先曖昧・移行一回限り・情報断片的。次回 learning-promote で再評価）
 
 ---
+
 
 ## 2026-08-09: command 薄型化による既存参照の行移動で baseline 比較が新規 delta を生む制約
 
@@ -1040,6 +1085,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 2026-08-09: bun test の Bun.spawnSync は Windows 環境で CLI 引数パース順序に注意が必要
 
 - **問題事象**: bun test で CLI 引数をパースするテストを Bun.spawnSync 経由で実行した際、Windows 環境でフラグと値のペアをスキップする順序が期待と異なり、テストが意図した引数を認識しなかった
@@ -1057,6 +1103,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: `#learning` `#bun` `#bun-test` `#windows` `#cli-args` `#cross-platform`
 - **移動日**: 2026-08-09
 - **処分判定**: deferred（出現1件・環境依存・具体性やや不足。Bun.spawnSync CLI テスト再発時に具体化）
+
 ## 2026-08-10: Windows PowerShell で gh pr create --body-file が多重エンコード化け、gh api PATCH で修復した事象
 
 - **問題事象**: Windows PowerShell 環境で gh pr create --body-file に UTF-8 BOM なしファイルを渡して PR を作成したところ、PR 本文が多重エンコード化け（UTF-8 バイト列を ASCII 数字文字列として展開した状態）になった。chcp 65001 + PYTHONIOENCODING=utf-8 のコンソールエンコーディング初期化を実施しても防止できなかった。
@@ -1076,6 +1123,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（現行 retry.md 維持、再発時再評価。VERIFY で検出可能、retry.md は自動代替禁止・停止報告を要求）
 
 ---
+
 
 ## 2026-08-10: docs/adr/ 削除時の guides/ 配下参照更新スコープの初期漏れ
 
@@ -1097,6 +1145,7 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
 ## 2026-08-10: v2: 履歴参照保護の運用成功（AG-010、大規模 rename 移行事例）
 
 - **問題事象**: ADR → Decision 移行は大規模 rename（766件の ADR 参照、Artifact Graph 776 nodes が対象）であり、Git history rewrite や文字列一括置換で v2:ADR-* 歴史参照を破壊するリスクがあった。AG-010（v2:ADR-* 履歴参照は維持、文字列一括置換禁止、AG-016）を運用基準として採用し、52件の v2:ADR-* 歴史参照を破壊なく維持して移行を完遂した。これは「v2: prefix による履歴参照保護」運用の成功事例である。
@@ -1117,3 +1166,163 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 
 ---
 
+
+
+## detector 個別 unit test 拡充不足パターン（file-scope violation 検出 vs detector 単位カバレッジ）
+- **問題事象**: Phase 6 (OU-007 #2083) で Phase 3 §5.1 残り7件 detector（IR-028/029/030/031/034/035/046/047/048）を集約実装した。全ファイルスキャン（`check_command_format.ts`/`check_distribution_boundary.ts`/`check_integrity.ts`）で violation 0件、test suite pass を確認したが、各 detector の violation 検出ロジックを個別に検証する unit test（violation を含む fixture を与えて当該 detector が正しく検出するかを検証するテスト）が拡充不足。TS-006（現存全 IR に regression test が存在する）は file-scope violation 検出なしで合格だが、detector 単位のカバレッジ品質は warn 事項として記録
+- **発生局面**: 実装（case-run Phase 3 §5.1 detector 集約）、完了処理（case-close QG-4 AC-06/TS-006 評価）
+- **検知方法**: PR #2090 の Phase 6 最終検証レポート（`docs/specs/integrity/audits/final-reverification-20260811.md`）で AC-06 = TS-006 を warn 評価。pass_criteria「violation 検出なし」は満たすが、detector 単位の violation 含み fixture を用いた unit test が網羅されていないことを検知
+- **根本原因**: detector 実装時、(a) 既存ファイルに対する violation 検出がないことの確認（file-scope）は実施するが、(b) 意図的に violation を含む fixture を与えて当該 detector の検出ロジックを直接検証する unit test の実装を detector 集約時に組み込む運用が明文化されていない。REQ-028-006「detector 単位 regression test」の運用基準が SPEC で不明確
+- **自律対応内容**: TS-006 pass_criteria「violation 検出なし、regression test 存在」は満たすため AC-06 を warn（継続課題）として合格判定。file-scope の regression test は既存 test suite で担保されているため REQ-028 全要件成立を妨げない。detector 単位 unit test 拡充は intake inbox（Wave 7）へ課題記録
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり（REQ-028-006 detector 単位 regression test の運用基準、AC-06/TS-006 pass_criteria の明確化）。learning-promote で SPEC 改修要否を評価する対象
+- **横展開観点**: 将来 detector を追加実装する全 IR 対応（Phase 3 §5.1 以降の拡張、新規 IR登録 gate での detector 実装）で同様の detector 単位 unit test 拡充不足が再発する可能性
+- **再発条件**: detector を集約実装・追加実装する際、file-scope violation 検出テストのみで detector 単位の violation 含み fixture テストを省略した場合
+- **予防策候補**: detector 実装時の必須 deliverable として「violation 含み fixture を用いた unit test」を文書化。REQ-028-006 SPEC へ detector 単位テストの運用基準を追記
+- **想定反映先**: `docs/specs/integrity/integrity-contracts.md`（REQ-028-006 detector 単位 regression test 基準）、`src/opencode/skills/repo-agentdev-integrity/scripts/`（detector unit test 拡充）、`docs/requirements/REQ-028.md`（REQ-028-006 運用基準明記）
+- **関連**: PR #2090 Findings AC-06 warn, Epic #2076 OU-007 Phase 6, IR-028/029/030/031/034/035/046/047/048
+- **タグ**: `#detector` `#unit-test` `#regression-test` `#coverage` `#req-028-006`
+- **移動日**: 2026-08-15
+- **処分判定**: deferred（出現1件。REQ-028-006 運用基準明確化の再評価対象（intake inbox Wave 7 記録あり））
+
+---
+
+
+## verify-only 検証で MOVE/RETIRE 済み REQ 行の現行根拠参照を grep 検出するパターン
+- **問題事象**: OU-009 verify-only 検証の TS-012（参照残骸健全性）で、REQ-002 の MOVE/RETIRE 済み行（021..026, 028, 029, 032, 035）が `docs/specs/**` で現行根拠として参照されていた事例を検出した。TS-012 の現行根拠参照件数が 0 でない状態（1件: `harness-separation-model.md:125` の REQ-002-022）。
+- **発生局面**: 検証（verify-only の参照残骸健全性検査、TS-012）
+- **検知方法**: `grep -rE "REQ-002-(021|022|023|024|025|026|028|029|032|035)" docs/specs/` で MOVE/RETIRE 済み行 ID を検索し、履歴文脈（従来/MOVE先/RETIRE後/保有していた/move/retire/移動/廃止/欠番）を除外して現行根拠参照のみを抽出する。`grep ... | grep -iv "move\|retire\|従来\|移動\|廃止\|欠番\|context分離"` が有効に機能した。
+- **根本原因**: REQ-002 → REQ-029 MOVE 実行時、`docs/specs/**` 内の現行根拠引用の全文洗い替えが 1件漏れていた。MOVE 操作時の cross-reference クリーンアップは原本（REQ ファイル）と SPEC/Decision 両方で必要だが、SPEC 本文内の括弧書き引用まで届いていなかった。
+- **自律対応内容**: case-close QG-4 remediation scope（trivial citation fix）として REQ-002-022 → REQ-029-007 へ更新（commit 5c920055）。TS-012 stale-reference 件数を 0 へ解消し、QG-4 完了条件を達成。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（citation ID のみ修正、意味内容と enforcement は正しく維持。SPEC/REQ 本文変更なし、status frontmatter のみ更新）
+- **横展開観点**: 将来の REQ MOVE/RETIRE 操作（req-save SPLIT/MERGE/MOVE）実行時、`docs/specs/**` と `docs/decisions/**` の現行根拠参照を grep 検査し、stale reference をクリーンアップする手順を検証工程または case-close QG-4 に組み込むことが望ましい。特に括弧書きの補足引用（「DEC-001 context管理harness委譲、REQ-NNN-NNN ...」形式）は機械的検出から漏れやすい。
+- **再発条件**: REQ 行を MOVE/RETIRE する req-save 操作で、cross-reference の全文洗い替え（SPEC 本文内の括弧書き引用含む）が漏れた場合
+- **予防策候補**: req-save MOVE/RETIRE 時、または case-close QG-4 で、MOVE/RETIRE 済み REQ 行 ID の docs 現行根拠参照を grep 検査する gate を検証工程へ導入する候補（別途 backlog-review で判断）。
+- **想定反映先**: なし（本エントリは検証パターン記録。検出 gate の恒久化は別途 backlog-review で判断）
+- **関連**: PR #2098, Issue #2093 (OU-009), Epic #2091, commit 5c920055, TS-012
+- **タグ**: `#stale-reference` `#req-move` `#verify-only` `#grep-detection` `#ts-012` `#case-close-remediation`
+- **移動日**: 2026-08-15
+- **処分判定**: deferred（出現1件。検証パターン記録。具体修正は intake-2026-08-14-stale-req-002-022-reference-resolved.md で対応済み）
+
+---
+
+
+## 旧表現を禁止する是正注記で旧表現の字面を引用すると grep 0 件基準の機械検査と衝突する
+- **問題事象**: system.md の Workflow Architecture Inventory 旧表現禁止注記が、禁止対象の旧表現の字面（「Command 定義が SSoT である」）をそのまま引用していた。このため「旧表現が 0 件であること」という grep 0 件基準の完了条件・機械検査と衝突する状態だった（禁止注記自体が grep に hit する）
+- **発生局面**: 実装（case-run、OU-001 規範契約整合の検証・修正）
+- **検知方法**: 完了条件の再 grep（「Command 定義が SSoT」全リポジトリ検索）で禁止注記の引用行が hit することで検知
+- **根本原因**: 是正注記の執筆時に、禁止対象の意味と旧表現の字面を分離していなかった。「〜という旧表現を使用しない」形式は意味としては正しいが、機械検査（grep 0 件基準）と両立しない
+- **自律対応内容**: 禁止の意図を維持したまま描写形（「Command 定義を権威情報源とする旧表現」）へ言い換え、字面の出現を 0 件にした（PR 2111、commit ce4ea7fd）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（執筆規範レベルの知見。agentdev-doc-writing / japanese-tech-writing の検証観点候補）
+- **横展開観点**: 横断是正・用語統一を行うすべての Issue で、是正注記・移行注記に旧語の字面を引用しない。完了条件に grep 0 件基準を置く場合は特に注意
+- **再発条件**: 旧表現禁止・用語統一のは正注記を、禁止対象の字面引用付きで執筆した場合
+- **予防策候補**: 是正注記は描写形（「X を権威情報源とする旧表現」等）で書く。grep 0 件基準の完了条件を持つ Issue では、注記も含めた全体 grep を case-run と case-close の両方で実施する
+- **想定反映先**: なし（知見記録。規範化の要否は backlog-review で判断）
+- **関連**: PR 2111 Findings learning セクション, Issue 2101（OU-001）, Epic 2099
+- **タグ**: #grep-zero-criteria #remediation-note #machine-check #writing-convention
+- **移動日**: 2026-08-15
+- **処分判定**: deferred（出現1件。執筆規範レベル知見。agentdev-doc-writing / japanese-tech-writing 検証観点の再評価対象）
+
+---
+
+
+## 配布物へ Workflow Skill の STEP 表を書く際、具体番号を書ける ID ファミリーは STEP / QG に限定される
+- **問題事象**: 配布物（src/opencode/）に Workflow Skill の STEP 表を記述する際、STEP / QG 接頭辞は具体番号付きで配布可能（distributed-control として境界検査を通過）だが、他の全 ID ファミリー（REQ / DEC / ADR / AG / IR / TS / OU / RU / EC 等）は具体番号を書くと配布依存境界検査で違反または未分類エラーになる
+- **発生局面**: 実装（Wave 2 Workflow Skill 作成、OU-002 / OU-003 / OU-004 並列 Wave）
+- **検知方法**: `check_distribution_boundary.ts --profile source --json` の実行（具体番号記述が concrete_id_hits として検出される）
+- **根本原因**: 配布依存境界 SPEC の ID 衛生規則。具体番号は消費者環境で解決不能なプロジェクト内部 ID である一方、STEP / QG は workflow 定義内で閉じた distributed-control の識別子として扱われる
+- **自律対応内容**: 具体番号が必要な場面を STEP / QG に限定し、それ以外はマスク形式（REQ-{NNNN}-{NNN} 等）で統一して Wave 2 の3 Workflow Skill を作成した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（配布依存境界 SPEC の既定運用の明確化事象）
+- **横展開観点**: 並列 Wave での Workflow Skill / Command 作成時、作成段階からマスク形式で書くことで境界検査の手戻りを防げる
+- **再発条件**: 配布物にプロジェクト内部 ID の具体番号を記述した場合
+- **予防策候補**: Workflow Skill / Command の新規作成手順（agentdev-skill-authoring / agentdev-command-authoring）への「具体番号は STEP / QG のみ、他はマスク形式」注意喚起の反映候補
+- **想定反映先**: `src/opencode/skills/agentdev-skill-authoring/**` または agentdev-command-authoring（執筆規範側。要否は learning-promote で判断）
+- **関連**: PR 2112 Findings learning セクション, Issue 2104（OU-004）, Epic 2099, 同時並行 Wave（PR 2113 / PR 2114）
+- **タグ**: `#distribution-boundary` `#id-hygiene` `#mask-form` `#workflow-skill-authoring`
+- **移動日**: 2026-08-15
+- **処分判定**: deferred（出現1件。authoring 注意喚起候補（agentdev-skill-authoring / agentdev-command-authoring））
+
+---
+
+
+## ハーネス Write ツールのリポジトリ外 temp 書き込みが distribution-boundary-guard でブロックされる（worktree 内配置で回避）
+- **問題事象**: ハーネス（OpenCode）の Write ツールでリポジトリ外 temp（`C:\WINDOWS\TEMP\opencode`）へスクリプトファイルを作成しようとすると、distribution-boundary-guard（`tool.execute.before` フック）にブロックされる事象を確認した。機械一括是正の作業ファイル出力先として同 temp を使用できない
+- **発生局面**: 実装（case-run Wave 3、TS-105 機械判定是正のスクリプト作成時）
+- **検知方法**: Write ツール実行時の distribution-boundary-guard によるブロック通知
+- **根本原因**: 配布依存境界の多層 enforcement（REQ-029、DEC-014）が tool.execute.before フックでリポジトリ外書き込み経路を検出・ブロックする構成として機能している。設計どおりの挙動である
+- **自律対応内容**: edit ツールによる逐次実行、または worktree 内（`.agentdev/tmp` 等、.git 管理領域配下）への作業ファイル配置で回避した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（guard の設計どおり。運用回避策の知見）
+- **横展開観点**: 機械一括是正・スクリプト実行を伴う作業の作業ファイルは worktree 内へ配置する。agentdev-gh-cli 標準手続きの `.agentdev/tmp`（workspace-local）配置規定と同一方向の運用
+- **再発条件**: Write ツールでリポジトリ外 temp へスクリプト等の作業ファイル作成を試みた場合
+- **予防策候補**: 作業ファイルの worktree 内配置（`.agentdev/tmp` 等）の徹底。既存配置規定（RU-{NNNN} AG-{NNN} の workspace-local 配置）との重複確認
+- **想定反映先**: なし（運用知見。規範化の要否は learning-promote で判断）
+- **関連**: PR 2115 Findings learning セクション, Issue 2105（OU-005）, Epic 2099, REQ-029（配布依存境界）, DEC-014（多層 enforcement）
+- **タグ**: `#distribution-boundary-guard` `#write-tool` `#temp-workspace` `#tool-execute-before` `#operations`
+- **移動日**: 2026-08-15
+- **処分判定**: deferred（出現1件。guard 設計どおりの挙動。回避策（worktree 内配置）の運用知見）
+
+---
+
+
+## autogen-index-regeneration-diff 拡張check の指定ツール generate_indexes.ts が adr-to-decision rename 未追随で EXIT_ERROR（中間 Wave は PR 索引影響なしで継続判断）
+- **問題事象**: case-close（Epic #2119 Wave 2 クローズ）の Step E5b 前段で、workflow extension checks の `autogen-index-regeneration-diff`（.agentdev/extensions/skills/agentdev-workflow-case-close.yaml）が指定する `generate_indexes.ts --dry-run` が `docs/adr/README.md not found` で EXIT_ERROR 即時終了した。スクリプト最終更新 14f202f6（2026-07-26）は `docs/adr/` と `adr-*` block ID を前提とするが、リポジトリは adr-to-decision rename（a0143600、2026-08-10、#2042）後の `docs/decisions/` + `decision-*` block ID（14ブロック）へ移行済み。差分あり/なしのいずれの判定も出力不能な状態
+- **発生局面**: 完了処理（case-close Epic Wave クローズ、Step E5b 前段の索引健全性検証）
+- **検知方法**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts --dry-run` の実行で ADR README not found エラー。補助的に `check_autogen_freshness.ts --json`（REQ-010-059）を実行し、stale AUTOGEN block 4件（integrity-rule-catalog と rule-ownership の「ADR ↔REQ」→「Decision ↔REQ」用語 drift、req-health-metrics/spec-health-metrics の測定 block 古データ）を検出。DOC-MAP.md は #1958 で削除済みのため skip は正当
+- **根本原因**: adr-to-decision rename（OU-005 #2042）が `generate_indexes.ts` の対象パス・block ID 定義に未反映。rename を横断是正する工程で配下スクリプトの追従検査が機能しなかった。また stale 4件はいずれも main HEAD 時点の既存債務で、本 Wave の PR はファイル変更 0 の verify-only PR（索引への影響なし）
+- **自律対応内容**: 中間 Wave 2 では当該 PR が索引に影響を与えない（changedFiles=0）ため、check の保護目的（当該 PR 由来の再生成漏れ防止）は空しく充足されると判断してクローズを継続した。ツール破損と既存 stale 4件を完了報告へ明記し、解消（スクリプトの decisions 追随、または索引再生成 commit）は Wave 3 最終クローズまでの課題として先送りした。case-close 自身は索引ファイルを直接編集・commit していない（契約遵守）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり（index-auto-generation SPEC が稼働契約とする生成スクリプトが実行不能。learning-promote で (a) generate_indexes.ts の docs/decisions 追随、(b) 拡張check の指定ツールを check_autogen_freshness.ts へ変更、(c) 索引再生成の専用工程化のいずれかを評価する対象）
+- **横展開観点**: 同拡張check を持つ全 case-close（単一 Issue Step 3-3 含む）で同エラーが発生する。docs 構造変更（rename、削除）を伴う工期では配下の整合スクリプト追従を検証工程に組み込む必要がある
+- **再発条件**: `generate_indexes.ts` が `docs/adr/` 前提のまま case-close の Step 3-3 / Step E5b 前段が実行される場合、全 case-close で再発
+- **予防策候補**: rename 横断是正 PR に「参照スクリプトのパス・ID 定義追従確認」を必須項目化。または拡張check を、実行可能な freshness gate（check_autogen_freshness.ts）へ指定ツール変更し、 stale 時の停止条件を明文化
+- **想定反映先**: `.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`（docs/decisions + decision-* block ID 追随）、`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`（checks セクションの指定ツール・失敗時扱いの明確化。要 learning-promote / backlog-review 判断）
+- **関連**: Epic 2119 Wave 2, Issue 2121（OU-002）, PR 2125, a0143600（adr-to-decision rename #2042）, 87f00c48（DOC-MAP 削除 #1958）, docs/specs/integrity/index-auto-generation.md
+- **タグ**: `#autogen` `#generate-indexes` `#adr-to-decision` `#extension-check` `#tool-broken` `#pre-existing-staleness` `#intermediate-wave`
+- **移動日**: 2026-08-15
+- **処分判定**: deferred（同一事象の intake item（intake-2026-08-14-generate-indexes-requires-removed-adr-readme.md）が具体修正を管理中。次回実行時に intake 側処分と照合。一般化予防策（rename 横断是正 PR への参照スクリプト追従確認の必須項目化、拡張check 指定ツールの freshness gate 変更）は delta として次回昇華可否を判断する）
+
+---
+
+
+## RU-0004 が git 未コミットのまま Form Zero で削除され evidence 保存前提が欠落（審議実体は投影記録で検証）
+- **問題事象**: RU-0004（`.agentdev/backlog/req-units/RU-0004.md`）が git に一度もコミットされないまま case-open の Form Zero クリーンアップで削除された。削除 commit 8249916c のメッセージは「RU-0001〜0004 を削除」と記載するが、実 diff は RU-0001〜0003 の3ファイルのみ。RU-0004 の受け入れ条件原本（1〜12）が git 履歴から復元不能になり、Epic 2119 完了条件（RD evidence の checked_at_commit 時点実在）の evidence 保存前提に欠陥が生じた
+- **発生局面**: 完了処理（Epic 2119 Wave 3 クローズ、RD-004 evidence 実在評価）
+- **検知方法**: PR #2127 検証時（Issue 2122 / OU-003）。commit 8249916c のメッセージと実 diff の不一致、および checked_at_commit 9d279917 時点の git tree に RU-0004.md が存在しないことの確認
+- **根本原因**: backlog-review が session 由来 RU を生成した時点で git commit せず、Form Zero クリーンアップが untracked ファイルも削除対象とした。削除コミットメッセージと実 diff の乖離を検知する仕組みがない
+- **自律対応内容**: RD-004 の審議実体（disposition: covered / reason_code: fully_applied）は Issue 完了条件への投影と Epic RD-004 記録を根拠に PR #2127 で検証した。Epic 2119 完了条件 Box4 は審議実体に基づき達成と評価し、記録プロセス欠陥を Epic 本文へ事実注記した（条件文言は不変更）。再発防止候補を本 entry として回収
+- **ユーザー確認有無**: なし（case-auto の bounded parent decision resolution による作業仮定つき親判断）
+- **ADR/REQ/spec影響**: なし（Epic 完了条件の評価記録は Epic Issue 本文へ注記済み。RU 生成・Form Zero 手順の変更は learning-promote / backlog-review で評価）
+- **横展開観点**: session 由来 RU を扱う全 backlog-review / case-open（Form Zero）。evidence の git 実在を完了条件とする Epic の起票時
+- **再発条件**: backlog-review が RU を git commit せず、case-open が Form Zero で untracked RU を削除した場合
+- **予防策候補**: backlog-review が session 由来 RU を生成した時点でのコミット、または Form Zero 実行時の untracked RU 有無確認
+- **想定反映先**: backlog-review の RU 生成手順、case-open の Form Zero 手順（いずれも要 learning-promote / backlog-review 判断）
+- **関連**: PR #2127 Findings learning セクション, Issue 2122（OU-003）, Epic 2119（RD-004、Box4 評価注記）, commit 8249916c, RU-0004
+- **タグ**: `#form-zero` `#req-unit` `#untracked-file` `#evidence-preservation` `#git-commit` `#epic-2119`
+- **移動日**: 2026-08-15
+- **処分判定**: deferred（出現1件。backlog-review（session 由来 RU の生成時コミット）と case-open（Form Zero の untracked RU 確認）の手順変更候補）
+
+---
+
+
+## Windows 環境でスクリプトの network 系コマンド不使用を「呼び出し記録型ダミー git.cmd」で実行時証明する検証技法
+- **問題事象**: 導入系スクリプト（install-consumer-opencode.ps1）の「network 系コマンド不使用」をコード検査（grep）のみで証明すると、間接呼び出しや動的構築コマンドの見逃しリスクが残る。実行時に外部コマンドが実際に起動されないことを直接証明する手段が欲しい
+- **発生局面**: 実装（case-run のテスト戦略 TS-001 検証）
+- **検知方法**: 該当なし（検証技法の確立・回収事象。PR #2131 テスト戦略の結果セクションに手法と結果を記録）
+- **根本原因**: 該当なし（技法知見の回収）
+- **自律対応内容**: PATH 先頭に「呼び出しをログへ記録するダミーの git.cmd」を配置した状態でスクリプトを実行し、(1) 呼び出しログが空（GIT_INVOCATIONS=NONE）であること、(2) exit 0 で正常完了すること、の2点を確認した。clone、fetch、reset、その他 network access が一切起動されないことを実行時証明でき、コード検査（実行箇所 0 件の grep）と併用で証拠強度を高めた
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（検証技法の知見。DEC-016 導入系スクリプトの副作用ゼロ原則の検証手段として活用可能）
+- **横展開観点**: Windows 環境で「外部コマンド（git、curl 等）を起動しないこと」を完了条件とするスクリプト系 Issue のテスト戦略全般。ダミーコマンドの呼び出しログはコード検査のみより強い実行時証拠になる
+- **再発条件**: 該当なし（適用場面: スクリプトの network access 不実行を強い証拠で検証する必要がある場合）
+- **予防策候補**: スクリプト系テスト戦略の立案時に本技法（ダミーコマンド配置による実行時証明）を候補として挙げる運用（要 learning-promote / backlog-review 判断）
+- **想定反映先**: なし（テスト戦略は Issue 単位で定義されるため、汎用技法の文書化要否は learning-promote で評価）
+- **関連**: PR #2131 Findings learning セクション, Issue #2128（OU-001、TS-001）, DEC-016
+- **タグ**: `#test-strategy` `#runtime-proof` `#dummy-command` `#network-access` `#windows` `#operational-knowledge`
+- **移動日**: 2026-08-15
+- **処分判定**: deferred（出現1件。検証技法知見。テスト戦略立案時の候補技法として維持）
+
+---
