@@ -225,36 +225,31 @@ function Get-TargetSourcePath {
     return Join-Path $SourceDir $RelPath
 }
 
-# --- Clone / Update ---
+# --- Checkout Guidance (AG-002/REQ-009-047) ---
 
-function Initialize-PluginCheckout {
+function Show-PluginCheckoutGuidance {
     <#
     .SYNOPSIS
-        Clone or update the agent-dev-flow repo into $PluginPath.
+        チェックアウト未検出時の案内。provisioning（clone、fetch、reset）も network access も
+        代行実行しない（AG-001/REQ-009-046、DEC-016）。チェックアウトの取得は利用者の責務。
     #>
-    if (Test-Path -LiteralPath (Join-Path $PluginPath '.git')) {
-        Write-Host "[ACTION] Updating existing checkout: $PluginDir"
-        Push-Location -LiteralPath $PluginPath
-        try {
-            git fetch origin
-            git checkout $Branch
-            git reset --hard "origin/$Branch"
-        }
-        finally {
-            Pop-Location
-        }
-    } else {
-        if (Test-Path -LiteralPath $PluginPath) {
-            Write-Error "[ERROR] $PluginDir exists but is not a git repository. Remove it manually and retry."
-            exit 1
-        }
-        Write-Host "[ACTION] Cloning agent-dev-flow into $PluginDir"
-        git clone --branch $Branch --depth 1 $RepoUrl $PluginPath
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "[ERROR] Failed to clone agent-dev-flow"
-            exit 1
-        }
-    }
+    $repoWebUrl = $RepoUrl -replace '\.git$', ''
+    Write-Host "[ERROR] 利用可能なチェックアウトが見つかりません。usable checkout 判定（$PluginDir/src/opencode/ の存在）に失敗しました。"
+    Write-Host ''
+    Write-Host 'このスクリプトは provisioning（clone、fetch、reset）と network access を行いません（REQ-009-046、DEC-016）。'
+    Write-Host '以下のいずれかで agent-dev-flow のチェックアウトを用意してから再実行してください。'
+    Write-Host ''
+    Write-Host '方法1: git clone でチェックアウトを用意する'
+    Write-Host "  git clone --branch $Branch $RepoUrl $PluginDir"
+    Write-Host ''
+    Write-Host '方法2: ソース ZIP を取得して展開する'
+    Write-Host "  1. $repoWebUrl を開く"
+    Write-Host '  2. [Code] ボタン → [Download ZIP] でソース ZIP をダウンロード'
+    Write-Host "  3. ZIP を展開し、中身（src/、scripts/ 等）を $PluginDir/ 直下に配置"
+    Write-Host "     （$PluginDir/src/opencode/ が存在すればよく、.git のない ZIP 展開チェックアウトも正規の配置形態）"
+    Write-Host ''
+    Write-Host "期待される状態: $SourceDir が存在すること"
+    exit 1
 }
 
 # --- Main ---
@@ -267,14 +262,11 @@ if (-not $Mode) {
     Invoke-InstallWizard
 }
 
-# Clone/update first for all modes (need source to enumerate targets)
-if ($Mode -ne 'check') {
-    Initialize-PluginCheckout
-}
-
+# usable checkout 判定（AG-002/REQ-009-047）: .git の有無ではなく src/opencode/ の存在で判定する。
+# 全モード（check、dry-run、apply）共通の前提であり、provisioning は行わない（AG-001/REQ-009-046、DEC-016）。
+# ZIP 展開チェックアウト（.git なし）も正規の配置形態として扱う（AG-003/REQ-009-048）。
 if (-not (Test-Path -LiteralPath $SourceDir)) {
-    Write-Error "[ERROR] Source directory not found: $SourceDir. Ensure $PluginDir contains agent-dev-flow checkout."
-    exit 1
+    Show-PluginCheckoutGuidance
 }
 
 # LocalMode requires the local source redirect target to exist
@@ -299,20 +291,20 @@ if ($Mode -eq 'check') {
     }
     $divergences = 0
 
-    # 1. Plugin checkout
-    if (-not (Test-Path -LiteralPath (Join-Path $PluginPath '.git'))) {
-        Write-Host "[DIVERGENCE] $PluginDir is not a git repository (clone required)"
+    # 1. Plugin checkout directory
+    if (-not (Test-Path -LiteralPath $PluginPath)) {
+        Write-Host "[DIVERGENCE] $PluginDir not found (git clone またはソース ZIP 展開が必要)"
         $divergences++
     } else {
-        Write-Host "[OK] $PluginDir is a git repository"
+        Write-Host "[OK] $PluginDir exists"
     }
 
-    # 2. Source directory
+    # 2. Source directory (usable checkout 判定: .git の有無ではなく src/opencode/ の存在。ZIP 展開チェックアウトも正規の配置形態、AG-003/REQ-009-048)
     if (-not (Test-Path -LiteralPath $SourceDir)) {
-        Write-Host "[DIVERGENCE] Source directory not found: $SourceDir"
+        Write-Host "[DIVERGENCE] Usable checkout not found: $PluginDir/src/opencode/ (git clone またはソース ZIP 展開が必要)"
         $divergences++
     } else {
-        Write-Host "[OK] Source directory exists: $PluginDir/src/opencode/"
+        Write-Host "[OK] Usable checkout exists: $PluginDir/src/opencode/"
     }
 
     # 2b. Local redirect source (LocalMode only)
