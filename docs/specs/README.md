@@ -212,6 +212,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | integrity/targeted-docs-guard-implementation.md | accepted | Targeted Docs Guard 実装詳細 | check_changed_docs.ts 変更文書限定検査契約（CLI 引数、workflow 別検査項目、判定条件、false-clean 予防）。Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業は `references/targeted-docs-guard-implementation-details.md` へ分離 |
 | integrity/autogen-freshness-gate.md | draft | AUTOGEN ブロック鮮度検出 gate | AUTOGEN ブロック（spec-health-metrics.md 等）の鮮度検出、rename/status 変更時の再生成必要性判定、不合格時の処置 |
 | integrity/test-impact-detection-gate.md | draft | テスト影響範囲検出 gate | リファクタリング PR で SPEC 変更に連動する周辺テストの陳腐化検出。変更 SPEC を参照し同一 PR で未更新のテストを陳腐化候補として報告、不合格時の処置契約（REQ-019） |
+| integrity/checker-execution-contracts.md | draft | checker 実行契約と検出基盤規則 | checker 共通実行契約、検出対象除外規定、宣言的データ YAML の schema 原則、detector 命名規約 |
 
 #### local/（ローカル版 SPEC）
 

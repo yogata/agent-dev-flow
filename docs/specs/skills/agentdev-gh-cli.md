@@ -2,7 +2,7 @@
 title: `agentdev-gh-cli` SPEC
 status: accepted
 created: 2026-06-21
-updated: "2026-07-27"
+updated: "2026-08-15"
 ---
 
 # `agentdev-gh-cli` SPEC
@@ -82,8 +82,7 @@ VERIFY は以下の観点で実施する（REQ-011, REQ-011-010）。
 
 ### 要件
 
-- **対象**: 全 WRITE 手続き（gh CLI に `--body-file`/ `-F`/ `--title` 等の引数を渡す操作）
-- **対象外**: READ 手続き（Node.js `execSync` でコンソールエンコーディングに依存せず取得）
+- **対象**: 全 WRITE 手続き（gh CLI に `--body-file`/ `-F`/ `--title` 等の引数を渡す操作）、および git CLI 直接操作の WRITE（`git commit -F`、`git tag -F` 等のファイル引数に日本語を含む操作）
 - **対象外環境**: Linux/ macOS/ WSL 等の Windows 以外の環境（既定で UTF-8 コンソール）
 - **必須前置内容**: WRITE 操作前に以下の3行を実行してコンソールエンコーディングを UTF-8 に初期化する
 
@@ -93,9 +92,22 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 cmd /c chcp 65001 | Out-Null
 ```
 
+- **READ 手続きのパイプライン拡張**: PowerShell パイプライン経由で日本語出力を読み取る READ 操作（`git show`、`Get-Content`、`Select-String` 等）は、パイプライン前に `[Console]::OutputEncoding` の前置を行うか、Node.js `execSync` / `fs.readFileSync` 経路で取得する。Node.js 経由の READ はコンソールエンコーディングに依存しないため前置を要しない
+
+### title と本文の同時渡し回避シーケンス
+
+- gh pr create / gh issue create で `--title` と `--body-file` を同時渡ししない。日本語 title を伴う作成は、ASCII 仮 title + `--body-file` による作成後、REST API PATCH（title 修正標準手続き）により日本語 title を設定する2段階シーケンス、または `gh api --input` による統一を標準とする
+- 既存の `--title` inline 禁止・REST API PATCH 標準の規則（Windows 環境固有手続き 項目1〜2）は存置し、本節は適用範囲を拡張する
+
+### 委譲時の一時ファイル代替配置先
+
+- 実行担当サブエージェント委譲など、worktree 隔離境界により `.agentdev/**` への書き込みが禁止される場面では、WRITE 標準手続きの一時ファイル配置先をリポジトリ外の一時領域（`$env:TEMP` 配下）とする
+- 代替配置時も create → gh 実行 → VERIFY → cleanup の1手順ユニットと cleanup 省略不可ステップを維持する
+- 委譲プロンプトの MUST NOT（`.agentdev/**` 全域を触らない）側は変更しない
+
 ### 理由
 
-既定の Shift-JIS コンソール（`chcp 932`）では、gh CLI が `--title` の日本語引数やメタデータを Shift-JIS として扱い、`--body-file` で UTF-8 BOM なしファイルを指定しても mojibake が発生する。3行はそれぞれ独立した役割（gh CLI の標準出力/ 標準エラー読み取りエンコーディング、PowerShell からネイティブコマンドへのパイプ渡しエンコーディング、コンソールコードページ）を持つため省略不可。
+既定の Shift-JIS コンソール（`chcp 932`）では、gh CLI が `--title` の日本語引数やメタデータを Shift-JIS として扱い、`--body-file` で UTF-8 BOM なしファイルを指定しても mojibake が発生する。3行はそれぞれ独立した役割（gh CLI の標準出力/ 標準エラー読み取りエンコーディング、PowerShell からネイティブコマンドへのパイプ渡しエンコーディング、コンソールコードページ）を持つため省略不可。git CLI 直接操作も同一のコードページ依存を持つため、WRITE 全経路へ適用を拡張する。
 
 ### 委譲基盤との関係
 
@@ -103,7 +115,7 @@ gh WRITE 操作を行う全 command/ skill（case-open、case-run、case-close�
 
 ### ローカル版の扱い
 
-ローカル版は Case ファイル読み書きへ差し替えるため、本要件の対象外（gh CLI を使用しない）。ローカル版の具体的取扱いは v2:REQ-0150 参照。
+ローカル版は Case ファイル読み書きへ差し替えられるため、gh CLI 系の本要件は対象外である。git CLI 直接操作の初期化要件はローカル版にも適用する（ローカル版も git 操作を行うため）。
 
 ## Windows 環境固有手続き
 

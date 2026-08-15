@@ -2,7 +2,7 @@
 title: 索引類自動生成 SPEC
 status: accepted
 created: 2026-07-19
-updated: 2026-07-24
+updated: 2026-08-15
 ---
 
 # 索引類自動生成 SPEC
@@ -55,7 +55,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 AUTOGEN block ID は `{target}-{section}-{subsection}` 形式に従う。各要件は以下のとおり。
 
-- `target`: 索引ファイルの短縮名（catalog, rule-ownership, adr, req, docmap, req-metrics, spec-metrics, readme）
+- `target`: 索引ファイルの短縮名（catalog, rule-ownership, decision, req, docmap, req-metrics, spec-metrics, readme）
 - `section`: 索引ファイル内の自動生成対象セクション（ir-entries, ir-crossref, baseline, status, active, retired, inventory, measurement-example, req-summary）
 - `subsection`: 同一セクション内の複数ブロック識別子（pre-045, post-045, count, table, accepted, proposed, superseded, deprecated 等）
 
@@ -66,15 +66,15 @@ AUTOGEN block ID は `{target}-{section}-{subsection}` 形式に従う。各要�
 | `catalog-ir-entries-pre-045` | integrity-rule-catalog.md |
 | `catalog-ir-entries-post-045` | integrity-rule-catalog.md |
 | `rule-ownership-ir-crossref` | rule-ownership.md |
-| `adr-baseline-count`, `adr-baseline-table` | adr/README.md |
-| `adr-status-accepted` 等（proposed/superseded/deprecated） | adr/README.md |
-| `adr-retired-table` | adr/README.md |
+| `decision-baseline-count`, `decision-baseline-table` | decisions/README.md |
+| `decision-status-accepted` 等（proposed/superseded/deprecated） | decisions/README.md |
+| `decision-retired-table` | decisions/README.md |
 | `req-active-count`, `req-active-table`, `req-retired-table` | requirements/README.md |
 | `req-metrics-measurement-example` | quality/req-health-metrics.md |
 | `spec-metrics-measurement-example` | quality/spec-health-metrics.md |
 | `readme-req-summary-count` | README.md |
 
-新規 AUTOGEN block は本形式に従う。camelCase、英語以外の混在等は許容しない。
+新規 AUTOGEN block は本形式に従う。camelCase、英語以外の混在等は許容しない。旧 ADR 索引（docs/adr/README.md、`adr-*` block ID 群）は DEC-009（ADR から Decision への正規成果物モデル移行）で廃止済みであり、採用 ID として使用しない。
 
 ### appendix 表仕様（rule-ownership）
 

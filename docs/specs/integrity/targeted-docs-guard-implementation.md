@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細
 status: accepted
 created: 2026-07-15
-updated: 2026-08-10
+updated: 2026-08-15
 ---
 
 # Targeted Docs Guard 実装詳細
@@ -25,6 +25,13 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 | `--declared-files <path...>` | -- | ファイルパス（space 区切り推奨、comma 区切りも受入） | Issue/PR で宣言した文書更新対象と実変更ファイルの対応を検査する任意引数 |
 
 `--files` と `--base-ref` は排他ではなく、いずれかで変更対象を特定する。両方未指定の場合はエラー。
+
+### 標準実行契約（モード使い分け、起動手段、引数形式）
+
+- モード使い分け: コミット前（worktree 上での検証）は `--base-ref` を標準とし、コミット後・PR 作成後（main 環境）は `--files` を標準とする。`--files` と `--base-ref` の誤用による誤 pass・誤 FAILURE を防ぐため、起動時に対象ファイルが検出できる見込みを確認してから実行する
+- 起動手段: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts` により起動する（スクリプト契約の共通 CLI 契約に従う）
+- PowerShell での引数形式: 複数パスの引数は引用符でまとめて1文字列として渡さず、配列変数経由（`$files = @("a.md","b.md"); --files $files`）または個別渡しとする。`--files "a.md b.md"` 形式の引用符まとめ渡しは split 失敗の恐れがあるため使用しない
+- USAGE 文言: check_changed_docs.ts の `--help` 出力および guard 実行手続 references は上記使い分け・起動手段・引数形式を明記する
 
 ## workflow 別検査項目
 

@@ -2,7 +2,7 @@
 title: `agentdev-command-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-10
+updated: 2026-08-15
 ---
 
 # `agentdev-command-authoring` SPEC
@@ -49,6 +49,7 @@ OpenCode コマンド定義（`.opencode/commands/`）の品質基準とベス�
 - DoD 項目の充足
 - Frontmatter 純粋性（`description` 単一）
 - 行数（150行上限）
+- 参照先実ファイル存在確認（command 本文から workflow 節・テンプレート・完了一覧等へのパス参照が実ファイルを指すこと。参照のみが存在し実ファイルが不存在する状態を査読で検出する）
 
 ## See Also
 

@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-08-06
+updated: 2026-08-15
 ---
 
 # 整合性契約
@@ -300,6 +300,13 @@ IR-055（runtime-unresolved-reference）は段階導入（REQ-010-264）のた�
 | 根因特定手順 | (1) 報告された new violation の evidence を確認する。(2) 当該箇所が本来除去されるべき違反か、baseline に記録された既知違反の周辺改修による見え方の変化かを分類する。(3) 前者の場合は違反を修正し baseline は更新しない。後者の場合は baseline 更新を正当化する根因（baseline 再計算で当該 bucket の count が増加する理由）を PR 本文に記載する |
 | 更新実行手順 | `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --update-ir055-baseline` を実行し、生成された baseline ファイルを commit する。更新後は `--json` 実行で new violation が 0 件になることを確認する |
 | 更新非対象 | strict 違反（REQ-NNNN、ADR-NNNN、`src/opencode/`、`/repo/*`、`repo-*`）の新規発生は baseline 更新で解消せず、必ず実装修復を行う。baseline 更新が許容されるのは heuristic 違反（`docs/specs/`、`docs/guides/`、本体 GitHub URL、行番号付き参照）の bucket 再計算のみ |
+
+### baseline 再生成分実行契約
+
+- **移設を伴う変更**: 文書の移設・改名・参照構造変更を伴う PR では、baseline 再生成（再計算）を標準手順として PR 内で実行する。移設完了と baseline 不整合の残存を分離して報告する
+- **並列 Wave 実行時**: 並列 Wave で同一 baseline への更新競合が生じ得る場合、再生成スコープは Wave 境界（各 Wave の取り込み完了時点）または最終 merge 後（Epic 全体の取り込み後）のいずれかとし、PR 間で同一 bucket の二重更新を発生させない
+- **保存工程での要否判定**: docs/specs 配下への新規参照追加・参照変更を伴う保存工程では、変更後に IR-055 の new violation を確認し、正当な実装修復由来でない場合に再生成要否を判定する
+- **ratchet 性の維持**: baseline は純減を健全とする ratchet であり、再生成により既知違反の隠蔽と検出対象の縮小を行わない。再生成の根拠は PR 本文に記録する
 
 ## NG baseline 運用手順（全カテゴリ strict pass、v2:REQ-0161-005 統合）
 

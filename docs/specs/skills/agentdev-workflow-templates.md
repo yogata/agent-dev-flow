@@ -2,7 +2,7 @@
 title: `agentdev-workflow-templates` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-27
+updated: 2026-08-15
 ---
 
 # `agentdev-workflow-templates` SPEC
@@ -110,6 +110,12 @@ issue_desc_*.md テンプレートの「テスト戦略」セクションに記�
 ### テンプレートへのガイド反映
 
 feature、bug、child の各 issue_desc テンプレートは「テスト戦略」セクションへ本ガイドラインの要点を HTML コメントとして埋め込む。起票者が pass_criteria を記述する際に参照できるようにする。epic テンプレートは「テスト戦略」セクションを持たないため対象外とする。
+
+### 構造変更 PR の完了条件と契約テスト期待値
+
+- 構造変更（command、skill、template の構造様式変更）を伴う PR の完了条件には、当該構造を固定する契約テストの期待値更新を明示的に含める
+- 本文圧縮・機械的リライトの実施前には、当該ファイルを参照する `*.test.ts` を grep し、期待値に埋め込まれた固定トークン（原文断片）の有無を確認する手順を thin 化手順へ組み込む
+- PR テンプレートの完了条件セクションに、本確認の実施有無を記録する欄を設ける
 
 ## execution contract セクション（Issue template 拡張）
 

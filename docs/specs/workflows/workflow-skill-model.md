@@ -29,8 +29,7 @@ thin Command の workflow 節は次の3要素で構成する。
 2. 公開順序の要約（順序ラベル付きの見出し群。Workflow Skill 内部手順の複製ではなく、公開interface としての順序提示）
 3. soft guard 宣言（Workflow Skill の単独起動防止宣言。後述「soft guard の二層様式」）
 
-順序ラベルは現行実装に `### Step N`、`STEP-N`、`工程-N` の3様式が存在する。
-様式の統一基準、記述量の基準といった執筆詳細は `authoring/command-file-format.md` が正規所有し、本節は workflows 側の構成契約のみを記録する。
+thin Command の workflow 節の順序ラベルは `### Step N` 形式に統一する。Workflow Skill 本文（SKILL.md、references/）の工程識別子は実番号形式（`STEP-1` 等）を用い、Command 定義の順序ラベルとは形式を区別して使い分ける。様式の統一基準、記述量の基準といった執筆詳細は `authoring/command-file-format.md` が正規所有し、本節は workflows 側の構成契約のみを記録する。
 
 ## Workflow Skill 責務
 
@@ -131,6 +130,17 @@ Capability Skill と Workflow Skill は異なる責務境界・判断モデル�
 | 判断モデル | workflow 状態遷移に基づく制御判断 | 宣言的ルール、分類基準、決定的変換 |
 
 1つの skill が両側面を持つ場合、責務境界を明示的に分離し、2つの skill へ分割する。新規に作成する skill は作成時にどちらの層へ属するかを判定基準（「Capability Skill の判定基準」節）に照らして確定する。
+
+### Workflow / Capability 機械分類規則
+
+deterministic checker（check_extensions.ts）が適用する Workflow Skill / Capability Skill の機械判定規則を次の分類表として正規所有する。checker 実装と本表は同一規則を反映し、乖離は検査で検出対象とする。
+
+| 判定要素 | Workflow Skill | Capability Skill |
+|---|---|---|
+| workflow STEP の所有 | SKILL.md に STEP 一覧と遷移を記述する | 記述しない（宣言的定義のみ） |
+| 対応 Command | dispatch 元 Command を1以上に持つ | 特定 Command 固有の dispatch を持たない |
+| 制御構造の記述 | STEP 順序、分岐、停止条件を本文で所有する | workflow 制御構造を本文に持たない |
+| 呼称の例外 | なし | `agentdev-workflow-*` プレフィックスの一部スキルは歴史的経緯で Capability Skill として運用する（「workflow-* プレフィックスを持つ Capability Skill 的スキル」節） |
 
 ## 決定論的処理との責務接続（DEC-015）
 

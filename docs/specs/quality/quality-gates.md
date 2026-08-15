@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-24
+updated: 2026-08-15
 ---
 
 # 品質ゲート
@@ -148,6 +148,16 @@ PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-template
 
 全 test strategy 項目が合格済みまたは Findings 記録済みであることを確認する。
 未処理の test strategy 項目が残る場合、完了扱いとしない。
+
+### full integrity suite 受入れ基準
+
+検証スイート全体（bun test 全件、整合性検査群）の合格判定は、次の受入れ基準に従う。
+
+- **fail 由来分類の前提**: 合格判定は fail 全件の由来分類（既知欠陥、環境依存、当該変更起因）と検証環境の記録（worktree または main、junction 伝播状態、依存パッケージ状態）を前提とする。未登録の既知欠陥と由来不明の fail は合格の根拠にできない
+- **由来判定の基準 commit**: 由来判定は remediation 開始前の baseline commit を基準とする。被差し戻し PR の base ブランチ比較のみを pre-existing の証拠として採用しない
+- **既知欠陥の扱い**: 既知欠陥は baseline または承認済み記録に登録済みであることを要し、未登録の fail は当該変更起因として扱う
+- **環境依存欠陥の扱い**: 環境依存の fail は検証環境の記録と再現条件を証跡として残し、対象環境で回避可能なことを確認した上で警告付き合格の対象とできる
+- **baseline 比較の要否**: baseline 運用対象の検査（RuntimeReference baseline、NG baseline）は比較をもって新規違反 0 件を確認する。baseline 非対象の検査は全件 pass を要する
 
 ## 機械化境界（Mechanization Boundaries）
 

@@ -2,7 +2,7 @@
 title: agentdev-doc-diagnostics SPEC
 status: draft
 created: 2026-07-22
-updated: 2026-07-24
+updated: 2026-08-15
 ---
 
 # agentdev-doc-diagnostics SPEC
@@ -45,6 +45,15 @@ docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契
 - 共通 finding 出力契約（`.agentdev/inspect/inbox/*.md`、severity 分類、信頼度）
 - 文書種別別診断へのルーティング表
 - inspect-docs command への診断カテゴリ、証拠、finding 形式の提供
+
+### 観点レジストリ
+
+inspect-docs の診断観点は正規の観点レジストリが所有する（REQ-028-014）。
+
+- **配置先**: `docs/specs/skills/agentdev-doc-diagnostics/references/perspective-registry.md`（本 SPEC の references 配下）
+- **schema**: 各観点エントリは観点ID（一意）、診断カテゴリ（SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT、残余参照、境界違反等）、適用文書種別、正規所有者 skill、詳細参照の項目を持つ
+- 移管対応表（integrity-rule-catalog.md の inspect-docs 移管記録）で名指しされた観点は当該レジストリへ登録する
+- レジストリの追加・変更は本 schema に従い、本 SPEC が schema の正規所有者となる
 
 ## 参照する references
 

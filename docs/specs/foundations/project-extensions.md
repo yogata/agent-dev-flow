@@ -2,7 +2,7 @@
 title: Project Extensions
 status: accepted
 created: 2026-07-04
-updated: 2026-08-14
+updated: 2026-08-15
 ---
 
 # Project Extensions
@@ -114,6 +114,10 @@ command/skill は実行時に自分に対応する extension だけを読む。
 - extension は標準 command/skill の上書きではなく、追加・拡張としてのみ扱う。
 
 対応 extension が存在しない command/skill は正常動作であり、異常状態ではない。command が project 非依存で単体動作する正当な状態である。例として `/agentdev/inspect-skills` は SPEC 直接参照を持たず project 非依存で動作するため extension 不要である。
+
+### 状態機械の共有実装
+
+Extension 読込の状態機械（不在、破損、旧kind、未知kind、有効の各状態とその遷移）は、runtime resolver と deterministic checker（check_extensions.ts）が同一実装を共有する。runtime resolver は fail-open 契約（REQ-002-031）を、deterministic checker は NG 報告契約をそれぞれ担う。状態分類の正規入力となる kind enum は本 SPEC「Extension kind enum（公式）」が定める。共有実装の変更は runtime と checker の両契約へ同時に反映する。
 
 ## project-local skill 委譲
 

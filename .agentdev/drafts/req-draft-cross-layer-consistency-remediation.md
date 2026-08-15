@@ -15,6 +15,8 @@ work_type: feature
 
 scale: large
 
+spec_actions_consumed: true
+
 summary: |
   2026-08-15 横断監査（session由来RU RU-0001）と backlog-review 生成 RU-0002〜0017 の17 RU を
   単一の壁打ちセッションで一括処理し、REQ・Decision・SPEC・配布物・検査基盤の横断整合性を回復する。

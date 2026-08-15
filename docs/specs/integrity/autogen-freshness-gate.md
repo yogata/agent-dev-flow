@@ -2,7 +2,7 @@
 title: "AUTOGEN ブロック鮮度検出 gate"
 status: draft
 created: "2026-08-09"
-updated: "2026-08-09"
+updated: "2026-08-15"
 ---
 
 # AUTOGEN ブロック鮮度検出 gate
@@ -14,6 +14,12 @@ updated: "2026-08-09"
 - AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->` 〜 `<!-- AUTOGEN:END -->`）を含む索引ファイル群
 - 代表例: `docs/specs/quality/spec-health-metrics.md`（SPEC 計測例 AUTOGEN ブロック）
 - 対象一覧は SC-002（`docs/specs/integrity/index-auto-generation.md`）が定める自動生成対象ファイルと同一
+
+### 廃止済み成果物を前提とする block ID の棚卸し規定
+
+- 検査対象 block ID は、参照先索引ファイルが現行存在することを前提とする。廃止済み成果物（旧 ADR README、削除済み文書地図等）を前提とする block ID を検査対象に含めない
+- block ID の棚卸しは、参照先実ファイルの存在確認をもって行い、不在を検出した場合は検査対象から除去するとともに、由来（廃止契約、REQ）を検査対象リストの記録に残す
+- 検査対象の追加・削除は index-auto-generation SPEC の採用 block ID 一覧と整合させる
 
 ## 鮮度判定基準
 

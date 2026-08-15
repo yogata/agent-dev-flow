@@ -2,7 +2,7 @@
 title: `agentdev-skill-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-10
+updated: 2026-08-15
 ---
 
 # `agentdev-skill-authoring` SPEC
@@ -69,6 +69,7 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 - トリガー精度（USE FOR / DO NOT USE FOR）
 - 構造チェック
 - アンチパターン検出
+- 参照先実ファイル存在確認（skill 本文から `references/`、`scripts/`、`templates/` 等へのパス参照が実ファイルを指すこと。参照のみが存在し実ファイルが不存在する状態を査読で検出する）
 
 ## See Also
 
