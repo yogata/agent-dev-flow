@@ -309,3 +309,18 @@
 - **想定反映先**: なし（運用知見。規範化の要否は learning-promote で判断）
 - **関連**: PR 2115 Findings learning セクション, Issue 2105（OU-005）, Epic 2099, REQ-029（配布依存境界）, DEC-014（多層 enforcement）
 - **タグ**: `#distribution-boundary-guard` `#write-tool` `#temp-workspace` `#tool-execute-before` `#operations`
+## Command 本文 thin 化圧縮時に契約テスト固定トークンの事前確認を省略し一時失敗
+
+- **問題事象**: case-run Step 7-1 の手続本体圧縮（OU-007 thin 化）時に、`distribution_boundary_routing_contract.test.ts` が detector entrypoint（`check_distribution_boundary.ts`）と `--profile source` を当該節の公開契約トークンとして固定していることを踏まえずに圧縮し、同テスト 4件を一時的に失敗させた。圧縮版から当該トークンを復元して解決し、最終的に 24/24 pass を確認した
+- **発生局面**: 実装（Wave 5 OU-007。case-run Step 7-1 手続本体の summary 圧縮）
+- **検知方法**: test-fix ループ中の `bun test` 失敗（routing contract テスト 4件）
+- **根本原因**: Command 本文の特定セクション（手続の公開契約トークン）を固定する契約テストの存在を圧縮前に確認しなかった。routing contract 系テストは Command/SKILL 本文のトークンを検証対象にするため、本文圧縮はテスト契約破壊になり得る
+- **自律対応内容**: 固定トークン（detector entrypoint と `--profile source`）を圧縮後の summary に復元し、テストを再実行して全 pass を確認。復元トークンは委譲先 Workflow Skill（STEP-S5）の公開契約として本文に残置
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（既存テスト契約の遵守事象。規範化の要否は learning-promote で判断）
+- **横展開観点**: Command 本文の thin 化・圧縮を行う場合は、本文の特定セクションを固定する契約テスト（routing contract 系）の存在を先に確認する。修正→テスト失敗→復元の順でなく、固定トークン特定→圧縮→テストの順で行う
+- **再発条件**: 契約テストが本文トークンを固定する領域（command 定義、SKILL 本文）を機械的・一括で圧縮・リライトする場合
+- **予防策候補**: 本文圧縮前に当該ファイル名・セクション名を参照する `*.test.ts` の grep 確認を thin 化手順に組み込む（運用知見。規範化の要否は learning-promote で判断）
+- **想定反映先**: なし（運用知見）
+- **関連**: PR 2117 Findings learning セクション, Issue 2107（OU-007）, Epic 2099, `distribution_boundary_routing_contract.test.ts`
+- **タグ**: `#thin-command` `#routing-contract` `#test-fix-loop` `#command-compression` `#operations`
