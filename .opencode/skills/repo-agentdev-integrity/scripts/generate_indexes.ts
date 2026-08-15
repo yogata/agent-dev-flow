@@ -11,14 +11,13 @@
  * 参考 SPEC: `docs/specs/integrity/index-auto-generation.md`（SC-002）
  * 参考 IR:   `docs/specs/integrity/rules/IR-061-index-generation-consistency.md`
  *
- * 使用資産: `cli_utils.ts`（parseArgs, printHelp, findRepoRoot, EXIT_*）
+ * 使用資産: `cli_utils.ts`（parseArgs, findRepoRoot, EXIT_*）
  * require/import 混在許容（AG-001、既存資産踏襲）。
  */
 import {
   EXIT_OK,
   EXIT_ERROR,
   parseArgs,
-  printHelp,
   findRepoRoot,
 } from "./cli_utils.ts";
 
@@ -540,6 +539,104 @@ export function collectRetiredAdrFiles(retiredDir: string): AdrInfo[] {
   return infos;
 }
 
+// ─── Decision collector (DEC-009) ───────────────────────────────────────────
+
+/**
+ * Decision メタデータ（docs/decisions/README.md の decision-* AUTOGEN block 生成源）。
+ * DEC-009（ADR から Decision への正規成果物モデル移行）に基づく現行モデル。
+ * frontmatter から id/title/status/created を抽出する。
+ */
+export interface DecisionInfo {
+  /** Decision ID（例: "DEC-001"）。 */
+  id: string;
+  /** Decision 数値部（例: 1）。ソート用。 */
+  num: number;
+  /** frontmatter title（例: "AgentDevFlow 憲章"）。 */
+  title: string;
+  /** frontmatter status（例: "accepted"）。 */
+  status: string;
+  /** frontmatter created（例: "2026-07-24"）。 */
+  created: string;
+  /** ファイル名（例: "DEC-001.md"）。 */
+  filename: string;
+  /**
+   * README からの相対リンクパス。
+   * 現行 Decision: "DEC-001.md"、retired Decision: "retired/DEC-001.md"
+   */
+  relPath: string;
+}
+
+/**
+ * DEC-*.md からメタデータを抽出する。
+ * 桁数はファイル名由来のまま維持する（ADR 系 collector と同一規則）。
+ */
+function extractDecisionInfo(
+  fullPath: string,
+  relPath: string,
+): DecisionInfo | null {
+  const content = readText(fullPath);
+  if (!content) return null;
+
+  const filename = path.basename(fullPath);
+  const idMatch = filename.match(/^DEC-(\d+)\.md$/);
+  if (!idMatch) return null;
+  const num = Number(idMatch[1]);
+  const id = `DEC-${idMatch[1]}`;
+
+  const fm = parseFrontmatter(content);
+  let title = "";
+  let status = "";
+  let created = "";
+  if (fm) {
+    if (typeof fm["title"] === "string") title = fm["title"];
+    if (typeof fm["status"] === "string") status = fm["status"];
+    if (typeof fm["created"] === "string") created = fm["created"];
+  }
+  // title が frontmatter に無い場合は H1 から抽出（フォールバック）。
+  if (!title) {
+    const h1Match = content.match(/^#\s+(.+)$/m);
+    if (h1Match) {
+      const h1 = h1Match[1].trim();
+      const colonIdx = h1.indexOf(":");
+      title = colonIdx !== -1 ? h1.slice(colonIdx + 1).trim() : h1;
+    }
+  }
+
+  return { id, num, title, status, created, filename, relPath };
+}
+
+/**
+ * docs/decisions/ 配下の DEC-*.md を収集し、番号順に返す（retired/ 除く）。
+ */
+export function collectDecisionFiles(decisionsDir: string): DecisionInfo[] {
+  const files = listFiles(decisionsDir).filter((f) => /^DEC-\d+\.md$/.test(f));
+  const infos: DecisionInfo[] = [];
+  for (const f of files) {
+    const fullPath = path.join(decisionsDir, f);
+    const info = extractDecisionInfo(fullPath, f);
+    if (info) infos.push(info);
+  }
+  infos.sort((a, b) => a.num - b.num);
+  return infos;
+}
+
+/**
+ * docs/decisions/retired/ 配下の DEC-*.md を収集し、番号順に返す。
+ */
+export function collectRetiredDecisionFiles(
+  retiredDir: string,
+): DecisionInfo[] {
+  const files = listFiles(retiredDir).filter((f) => /^DEC-\d+\.md$/.test(f));
+  const infos: DecisionInfo[] = [];
+  for (const f of files) {
+    const fullPath = path.join(retiredDir, f);
+    const info = extractDecisionInfo(fullPath, `retired/${f}`);
+    if (info) infos.push(info);
+  }
+  infos.sort((a, b) => a.num - b.num);
+  return infos;
+}
+
 function extractReqInfo(
   fullPath: string,
   relPath: string,
@@ -596,7 +693,7 @@ export function collectRetiredReqFiles(retiredDir: string): ReqInfo[] {
   return infos;
 }
 
-// ─── AG-008: ADR README 生成 ─────────────────────────────────────────────────
+// ─── AG-008: ADR README 生成（レガシー: check_integrity.ts IR-061 検査専用）──
 
 // ADR README 内の AUTOGEN ブロック ID。
 export const ADR_BASELINE_COUNT_BLOCK_ID = "adr-baseline-count";
@@ -672,6 +769,85 @@ export function generateAdrRetiredTable(
   lines.push("| ADR番号 | タイトル | retired時ステータス |");
   lines.push("|---------|---------|-------------------|");
   for (const info of retiredAdrs) {
+    lines.push(
+      `| [${info.id}](${info.relPath}) | ${sanitizeTableCell(info.title)} | ${info.status} |`,
+    );
+  }
+  return lines;
+}
+
+// ─── AG-008: Decision README 生成 (DEC-009) ─────────────────────────────────
+
+// docs/decisions/README.md 内の AUTOGEN block ID。
+// index-auto-generation SPEC「AUTOGEN block ID 命名パターン」採用 ID 参照例の
+// Decision README 系。旧 ADR README（docs/adr/README.md、adr-* block ID 群）は
+// DEC-009 で廃止済みであり採用しない。
+export const DECISION_BASELINE_COUNT_BLOCK_ID = "decision-baseline-count";
+export const DECISION_BASELINE_TABLE_BLOCK_ID = "decision-baseline-table";
+export const DECISION_STATUS_ACCEPTED_BLOCK_ID = "decision-status-accepted";
+export const DECISION_STATUS_PROPOSED_BLOCK_ID = "decision-status-proposed";
+export const DECISION_STATUS_SUPERSEDED_BLOCK_ID =
+  "decision-status-superseded";
+export const DECISION_STATUS_DEPRECATED_BLOCK_ID =
+  "decision-status-deprecated";
+export const DECISION_RETIRED_TABLE_BLOCK_ID = "decision-retired-table";
+
+/**
+ * 現行 Decision の件数表明キャプション（1行）。
+ * 形式: "現行の承認済み Decision はN件、提案中の Decision はM件である。"
+ */
+export function generateDecisionBaselineCaption(
+  decisions: DecisionInfo[],
+): string[] {
+  const accepted = decisions.filter((d) => d.status === "accepted").length;
+  const proposed = decisions.filter((d) => d.status === "proposed").length;
+  return [
+    `現行の承認済み Decision は${accepted}件、提案中の Decision は${proposed}件である。`,
+  ];
+}
+
+/**
+ * 現行 Decision 一覧表（ヘッダー + 全 DEC 行）。
+ * ステータス列を持つため accepted 以外（proposed / superseded 等）も全件出力する。
+ */
+export function generateDecisionBaselineTable(
+  decisions: DecisionInfo[],
+): string[] {
+  const lines: string[] = [];
+  lines.push("| Decision番号 | タイトル | ステータス | 作成日 |");
+  lines.push("|---------|---------|-----------|--------|");
+  for (const info of decisions) {
+    lines.push(
+      `| ${info.id} | ${sanitizeTableCell(info.title)} | ${info.status} | ${info.created} |`,
+    );
+  }
+  return lines;
+}
+
+/**
+ * ステータス別リスト（bullet 形式）。
+ * 形式: "- [DEC-001](DEC-001.md)（title）"
+ */
+export function generateDecisionStatusList(
+  decisions: DecisionInfo[],
+  status: string,
+): string[] {
+  return decisions
+    .filter((d) => d.status === status)
+    .map((info) => `- [${info.id}](${info.relPath})（${info.title}）`);
+}
+
+/**
+ * 廃止済み Decision 履歴ビュー表（ヘッダー + retired DEC 行）。3列構成は
+ * ADR 系 retired table と同一（retired frontmatter に引き継ぎ先フィールドが無い）。
+ */
+export function generateDecisionRetiredTable(
+  retiredDecisions: DecisionInfo[],
+): string[] {
+  const lines: string[] = [];
+  lines.push("| Decision番号 | タイトル | retired時ステータス |");
+  lines.push("|---------|---------|-------------------|");
+  for (const info of retiredDecisions) {
     lines.push(
       `| [${info.id}](${info.relPath}) | ${sanitizeTableCell(info.title)} | ${info.status} |`,
     );
@@ -1104,7 +1280,7 @@ async function main(): Promise<void> {
   }
 
   if (options.help) {
-    // USAGE を printHelp の標準形式で表示（exit 0）。
+    // ヘルプテキストを標準形式で表示（exit 0）。
     const helpText = `${SCRIPT_NAME} ― ${DESCRIPTION}
 
 USAGE:
@@ -1124,10 +1300,10 @@ TARGET FILES (SC-002 Phase C):
   Wave 1:
     - docs/specs/integrity/integrity-rule-catalog.md (catalog IR entries, 2 blocks around IR-045 gap)
     - docs/specs/integrity/rule-ownership.md (IR cross-reference appendix)
-  Wave 2 (AG-008/009/013):
-    - docs/adr/README.md (baseline view, status views, retired history)
+  Wave 2 (AG-008/009/013, DEC-009):
+    - docs/decisions/README.md (decision-* baseline/status/retired blocks; skipped when absent)
     - docs/requirements/README.md (active/retired REQ tables)
-    - docs/DOC-MAP.md (inventory stats)
+    - docs/DOC-MAP.md (inventory stats; legacy, skipped when absent)
   Wave 3 (AG-006 候補5):
     - docs/specs/quality/req-health-metrics.md (REQ line count + signal table)
     - docs/specs/quality/spec-health-metrics.md (SPEC line count + status + domain table)
@@ -1136,9 +1312,10 @@ TARGET FILES (SC-002 Phase C):
 
 GENERATION SOURCE:
   - docs/specs/integrity/rules/IR-*.md (frontmatter + body Field/Value table)
-  - docs/adr/ADR-*.md, docs/adr/retired/ADR-*.md (frontmatter)
+  - docs/decisions/DEC-*.md, docs/decisions/retired/DEC-*.md (frontmatter; DEC-009)
   - docs/requirements/REQ-*.md, docs/requirements/retired/REQ-*.md (frontmatter, requirement line count)
   - docs/specs/**/*.md (file count, body line count, frontmatter status)
+  - docs/adr/ADR-*.md (legacy; DOC-MAP inventory count only, used when docs/DOC-MAP.md exists)
 
 RELATED:
   - SPEC: docs/specs/integrity/index-auto-generation.md (SC-002)
@@ -1178,10 +1355,12 @@ RELATED:
   );
   const adrDir = path.join(root, "docs", "adr");
   const adrRetiredDir = path.join(adrDir, "retired");
+  const decisionsDir = path.join(root, "docs", "decisions");
+  const decisionRetiredDir = path.join(decisionsDir, "retired");
   const reqDir = path.join(root, "docs", "requirements");
   const reqRetiredDir = path.join(reqDir, "retired");
   const specsDir = path.join(root, "docs", "specs");
-  const adrReadmePath = path.join(adrDir, "README.md");
+  const decisionReadmePath = path.join(decisionsDir, "README.md");
   const reqReadmePath = path.join(reqDir, "README.md");
   const docMapPath = path.join(root, "docs", "DOC-MAP.md");
   const qualityDir = path.join(specsDir, "quality");
@@ -1202,30 +1381,39 @@ RELATED:
     process.exit(EXIT_ERROR);
   }
 
-  const adrInfos = collectAdrFiles(adrDir);
-  const adrRetiredInfos = collectRetiredAdrFiles(adrRetiredDir);
+  const decisionInfos = collectDecisionFiles(decisionsDir);
+  const decisionRetiredInfos = collectRetiredDecisionFiles(
+    decisionRetiredDir,
+  );
   const reqInfos = collectReqFiles(reqDir);
   const reqRetiredInfos = collectRetiredReqFiles(reqRetiredDir);
-  const specCount = countSpecFiles(specsDir);
-  const acceptedAdrs = adrInfos.filter((a) => a.status === "accepted");
 
-  const adrBaselineCaption = generateAdrBaselineCaption(acceptedAdrs);
-  const adrBaselineTable = generateAdrBaselineTable(acceptedAdrs);
-  const adrStatusAccepted = generateAdrStatusList(adrInfos, "accepted");
-  const adrStatusProposed = generateAdrStatusList(adrInfos, "proposed");
-  const adrStatusSuperseded = generateAdrStatusList(adrInfos, "superseded");
-  const adrStatusDeprecated = generateAdrStatusList(adrInfos, "deprecated");
-  const adrRetiredTable = generateAdrRetiredTable(adrRetiredInfos);
+  const decisionBaselineCaption = generateDecisionBaselineCaption(
+    decisionInfos,
+  );
+  const decisionBaselineTable = generateDecisionBaselineTable(decisionInfos);
+  const decisionStatusAccepted = generateDecisionStatusList(
+    decisionInfos,
+    "accepted",
+  );
+  const decisionStatusProposed = generateDecisionStatusList(
+    decisionInfos,
+    "proposed",
+  );
+  const decisionStatusSuperseded = generateDecisionStatusList(
+    decisionInfos,
+    "superseded",
+  );
+  const decisionStatusDeprecated = generateDecisionStatusList(
+    decisionInfos,
+    "deprecated",
+  );
+  const decisionRetiredTable = generateDecisionRetiredTable(
+    decisionRetiredInfos,
+  );
   const reqActiveCaption = generateReqActiveCaption(reqInfos);
   const reqActiveTable = generateReqActiveTable(reqInfos);
   const reqRetiredTable = generateReqRetiredTable(reqRetiredInfos);
-  const docMapInventory = generateDocMapInventory({
-    activeReqCount: reqInfos.length,
-    retiredReqCount: reqRetiredInfos.length,
-    activeAdrCount: adrInfos.length,
-    retiredAdrCount: adrRetiredInfos.length,
-    specCount,
-  });
 
   const measureDate = formatMeasureDate(new Date());
   const reqMetrics = collectReqMetrics(reqDir);
@@ -1308,51 +1496,58 @@ RELATED:
     updates.push({ file: ruleOwnershipPath, content: ruleOwnershipUpdated });
   }
 
-  // ADR README 更新 (AG-008)
-  const adrReadmeOriginal = readText(adrReadmePath);
-  if (adrReadmeOriginal === null) {
-    console.error(`[generate_indexes] ADR README not found: ${adrReadmePath}`);
-    process.exit(EXIT_ERROR);
-  }
-  const adrReadmeBlocks = findAutogenBlocks(adrReadmeOriginal);
-  const adrReadmeExpectedIds = [
-    ADR_BASELINE_COUNT_BLOCK_ID,
-    ADR_BASELINE_TABLE_BLOCK_ID,
-    ADR_STATUS_ACCEPTED_BLOCK_ID,
-    ADR_STATUS_PROPOSED_BLOCK_ID,
-    ADR_STATUS_SUPERSEDED_BLOCK_ID,
-    ADR_STATUS_DEPRECATED_BLOCK_ID,
-    ADR_RETIRED_TABLE_BLOCK_ID,
-  ];
-  const adrReadmeFoundIds = new Set(adrReadmeBlocks.map((b) => b.id));
-  const adrReadmeMissing = adrReadmeExpectedIds.filter(
-    (id) => !adrReadmeFoundIds.has(id),
-  );
-  if (adrReadmeMissing.length > 0) {
-    console.error(
-      `[generate_indexes] ADR README AUTOGEN markers not found: ${adrReadmeMissing.join(", ")}`,
+  // Decision README 更新 (AG-008 / DEC-009)。対象ファイル不存在時はスキップ。
+  const decisionReadmeOriginal = readText(decisionReadmePath);
+  if (decisionReadmeOriginal === null) {
+    console.log(
+      `[generate_indexes] Decision README not found, skipping: ${decisionReadmePath}`,
     );
-    process.exit(EXIT_ERROR);
-  }
-  let adrReadmeUpdated = adrReadmeOriginal;
-  const adrReadmeReplacements: Record<string, string[]> = {
-    [ADR_BASELINE_COUNT_BLOCK_ID]: adrBaselineCaption,
-    [ADR_BASELINE_TABLE_BLOCK_ID]: adrBaselineTable,
-    [ADR_STATUS_ACCEPTED_BLOCK_ID]: adrStatusAccepted,
-    [ADR_STATUS_PROPOSED_BLOCK_ID]: adrStatusProposed,
-    [ADR_STATUS_SUPERSEDED_BLOCK_ID]: adrStatusSuperseded,
-    [ADR_STATUS_DEPRECATED_BLOCK_ID]: adrStatusDeprecated,
-    [ADR_RETIRED_TABLE_BLOCK_ID]: adrRetiredTable,
-  };
-  for (const blockId of adrReadmeExpectedIds) {
-    adrReadmeUpdated = replaceAutogenBlock(
-      adrReadmeUpdated,
-      blockId,
-      adrReadmeReplacements[blockId],
+  } else {
+    const decisionReadmeBlocks = findAutogenBlocks(decisionReadmeOriginal);
+    const decisionReadmeExpectedIds = [
+      DECISION_BASELINE_COUNT_BLOCK_ID,
+      DECISION_BASELINE_TABLE_BLOCK_ID,
+      DECISION_STATUS_ACCEPTED_BLOCK_ID,
+      DECISION_STATUS_PROPOSED_BLOCK_ID,
+      DECISION_STATUS_SUPERSEDED_BLOCK_ID,
+      DECISION_STATUS_DEPRECATED_BLOCK_ID,
+      DECISION_RETIRED_TABLE_BLOCK_ID,
+    ];
+    const decisionReadmeFoundIds = new Set(
+      decisionReadmeBlocks.map((b) => b.id),
     );
-  }
-  if (adrReadmeUpdated !== adrReadmeOriginal) {
-    updates.push({ file: adrReadmePath, content: adrReadmeUpdated });
+    const decisionReadmeMissing = decisionReadmeExpectedIds.filter(
+      (id) => !decisionReadmeFoundIds.has(id),
+    );
+    if (decisionReadmeMissing.length > 0) {
+      console.error(
+        `[generate_indexes] Decision README AUTOGEN markers not found: ${decisionReadmeMissing.join(", ")}`,
+      );
+      process.exit(EXIT_ERROR);
+    }
+    let decisionReadmeUpdated = decisionReadmeOriginal;
+    const decisionReadmeReplacements: Record<string, string[]> = {
+      [DECISION_BASELINE_COUNT_BLOCK_ID]: decisionBaselineCaption,
+      [DECISION_BASELINE_TABLE_BLOCK_ID]: decisionBaselineTable,
+      [DECISION_STATUS_ACCEPTED_BLOCK_ID]: decisionStatusAccepted,
+      [DECISION_STATUS_PROPOSED_BLOCK_ID]: decisionStatusProposed,
+      [DECISION_STATUS_SUPERSEDED_BLOCK_ID]: decisionStatusSuperseded,
+      [DECISION_STATUS_DEPRECATED_BLOCK_ID]: decisionStatusDeprecated,
+      [DECISION_RETIRED_TABLE_BLOCK_ID]: decisionRetiredTable,
+    };
+    for (const blockId of decisionReadmeExpectedIds) {
+      decisionReadmeUpdated = replaceAutogenBlock(
+        decisionReadmeUpdated,
+        blockId,
+        decisionReadmeReplacements[blockId],
+      );
+    }
+    if (decisionReadmeUpdated !== decisionReadmeOriginal) {
+      updates.push({
+        file: decisionReadmePath,
+        content: decisionReadmeUpdated,
+      });
+    }
   }
 
   // REQ README 更新 (AG-009)
@@ -1394,26 +1589,35 @@ RELATED:
     updates.push({ file: reqReadmePath, content: reqReadmeUpdated });
   }
 
-  // DOC-MAP 更新 (AG-013)
+  // DOC-MAP 更新 (AG-013、レガシー)。docs/DOC-MAP.md 不在時はスキップ。
   const docMapOriginal = readText(docMapPath);
   if (docMapOriginal === null) {
-    console.error(`[generate_indexes] DOC-MAP not found: ${docMapPath}`);
-    process.exit(EXIT_ERROR);
-  }
-  const docMapBlocks = findAutogenBlocks(docMapOriginal);
-  if (!docMapBlocks.some((b) => b.id === DOCMAP_INVENTORY_BLOCK_ID)) {
-    console.error(
-      `[generate_indexes] DOC-MAP AUTOGEN marker not found. Expected id: ${DOCMAP_INVENTORY_BLOCK_ID}`,
+    console.log(
+      `[generate_indexes] DOC-MAP not found, skipping: ${docMapPath}`,
     );
-    process.exit(EXIT_ERROR);
-  }
-  const docMapUpdated = replaceAutogenBlock(
-    docMapOriginal,
-    DOCMAP_INVENTORY_BLOCK_ID,
-    docMapInventory,
-  );
-  if (docMapUpdated !== docMapOriginal) {
-    updates.push({ file: docMapPath, content: docMapUpdated });
+  } else {
+    const docMapInventory = generateDocMapInventory({
+      activeReqCount: reqInfos.length,
+      retiredReqCount: reqRetiredInfos.length,
+      activeAdrCount: collectAdrFiles(adrDir).length,
+      retiredAdrCount: collectRetiredAdrFiles(adrRetiredDir).length,
+      specCount: countSpecFiles(specsDir),
+    });
+    const docMapBlocks = findAutogenBlocks(docMapOriginal);
+    if (!docMapBlocks.some((b) => b.id === DOCMAP_INVENTORY_BLOCK_ID)) {
+      console.error(
+        `[generate_indexes] DOC-MAP AUTOGEN marker not found. Expected id: ${DOCMAP_INVENTORY_BLOCK_ID}`,
+      );
+      process.exit(EXIT_ERROR);
+    }
+    const docMapUpdated = replaceAutogenBlock(
+      docMapOriginal,
+      DOCMAP_INVENTORY_BLOCK_ID,
+      docMapInventory,
+    );
+    if (docMapUpdated !== docMapOriginal) {
+      updates.push({ file: docMapPath, content: docMapUpdated });
+    }
   }
 
   // req-health-metrics 更新 (AG-006 候補5, Wave 3)
@@ -1506,13 +1710,10 @@ RELATED:
       `[generate_indexes] rule-ownership appendix: ${ruleOwnershipLines.length} rows (incl. header)`,
     );
     console.log(
-      `[generate_indexes] ADR README: ${adrInfos.length} active (${acceptedAdrs.length} accepted), ${adrRetiredInfos.length} retired`,
+      `[generate_indexes] Decision README: ${decisionInfos.length} active, ${decisionRetiredInfos.length} retired`,
     );
     console.log(
       `[generate_indexes] REQ README: ${reqInfos.length} active, ${reqRetiredInfos.length} retired`,
-    );
-    console.log(
-      `[generate_indexes] DOC-MAP inventory: SPEC ${specCount} files`,
     );
     console.log(
       `[generate_indexes] req-health-metrics: ${reqMetrics.length} REQs (measure date ${measureDate})`,
