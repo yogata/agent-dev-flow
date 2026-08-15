@@ -372,3 +372,19 @@
 - **想定反映先**: なし（運用知見。SPEC確定候補と併せて learning-promote で評価）
 - **関連**: Issue 2108（OU-008a）, PR 2118, Epic 2099, v2 報告 issuecomment-5299817790 §2, 既存 entry「Windows + ジャンクション環境 worktree での check_templates.ts worktree 固有 false positive」, intake-2026-08-15-spec-candidate-full-integrity-suite-acceptance-criteria.md
 - **タグ**: `#environment-dependent` `#full-integrity-suite` `#worktree` `#junction` `#node-modules` `#acceptance-evidence`
+
+## check_changed_docs.ts の --base-ref モードはコミット済み差分のみ検出（コミット前は --files モードで明示指定）
+
+- **問題事象**: case-run（Issue 2120 / PR #2124）で targeted docs guard（check_changed_docs.ts --workflow case-run）を実行した際、--base-ref モード（git diff base...HEAD）はコミット済み差分のみを検出対象とするため、コミット前の作業ツリー変更が検出されず「対象ファイルが検出されませんでした」となる事象を観測した
+- **発生局面**: 実装（case-run 内の targeted docs guard 実行、コミット前検証）
+- **検知方法**: コミット前に --base-ref モードでガードを実行して検出対象が空となり、コミット後の同モード再実行で対象ファイルが検出された差分から特定
+- **根本原因**: --base-ref モードの変更ファイル検出が git diff <base>...HEAD（コミット済み差分）に依存する設計。作業ツリーの未コミット変更は diff に現れない
+- **自律対応内容**: コミット前にガードを実行する場合は --files モードで変更ファイルを明示指定し、コミット後には --base-ref モードで再実行する運用で検証漏れを回避した（PR #2124 では両モードで failures 0 / warnings 0 を確認）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（check_changed_docs.ts の mode 設計仕様に由来する運用知見。mode 使い分けの明文化要否は learning-promote で評価）
+- **横展開観点**: worktree 上でコミット前に targeted docs guard を実行する全 workflow（case-run 等）。コミット前: --files、コミット後: --base-ref の使い分けを手順に織り込むことで検証漏れを構造的に防止できる
+- **再発条件**: コミット前の作業ツリー状態で --base-ref モードのガードのみを実行した場合
+- **予防策候補**: case-run 等のガード実行手順への「コミット前は --files、コミット後は --base-ref」使い分けの明記。または --base-ref モードが作業ツリーに未コミット変更を検出した際に警告する拡張
+- **想定反映先**: src/opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts（未コミット変更検出警告の候補）、case-run workflow のガード実行手順（mode 使い分け明記候補。いずれも要 learning-promote / backlog-review 判断）
+- **関連**: PR #2124 Findings learning セクション, Issue 2120（OU-001）, Epic 2119 Wave 1
+- **タグ**: `#targeted-docs-guard` `#check-changed-docs` `#base-ref` `#files-mode` `#uncommitted-changes` `#operational-knowledge`
