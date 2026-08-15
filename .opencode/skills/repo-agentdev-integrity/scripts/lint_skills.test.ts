@@ -382,4 +382,48 @@ describe("lint_skills.ts", () => {
       expect(found[0].message).toContain("does not use agentdev- prefix");
     });
   });
+
+  // ----- src/ fallback (REQ-018-001: worktree junction 未設定環境) ------------
+
+  describe("src/ fallback when projection lacks distributed skills", () => {
+    let fallbackEnv: { tempDir: string; scriptPath: string };
+
+    beforeAll(() => {
+      // worktree 環境の模倣: projection に sentinel が無く（junction 未伝播）、
+      // src/opencode/skills に配布スキルがある。scanner は src/ へ fallback する。
+      fallbackEnv = setupTempEnv([
+        { name: "agentdev-projection-only", content: VALID_SKILL_MD },
+      ]);
+      const srcSkillsDir = path.join(
+        fallbackEnv.tempDir,
+        "src",
+        "opencode",
+        "skills",
+      );
+      const srcSkillDir = path.join(srcSkillsDir, "agentdev-src-skill");
+      fs.mkdirSync(srcSkillDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(srcSkillDir, "SKILL.md"),
+        VALID_SKILL_MD.replace(/agentdev-test-valid/g, "agentdev-src-skill"),
+      );
+      tempDirs.push(fallbackEnv.tempDir);
+    });
+
+    it("scans src/opencode/skills when projection lacks the sentinel skill", async () => {
+      const result = await runScript(fallbackEnv.scriptPath, ["--dry-run"]);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain("agentdev-src-skill");
+    });
+
+    it("does not scan projection-only fixtures when src fallback is active", async () => {
+      const result = await runScript(fallbackEnv.scriptPath, ["--dry-run"]);
+      expect(result.stdout).not.toContain("agentdev-projection-only");
+    });
+
+    it("scans projection fixtures when neither sentinel nor src exists (fixture env)", async () => {
+      const result = await runScript(validEnv.scriptPath, ["--dry-run"]);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain("agentdev-test-valid");
+    });
+  });
 });

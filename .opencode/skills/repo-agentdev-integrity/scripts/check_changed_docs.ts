@@ -45,13 +45,18 @@ const SCRIPT_NAME = "check_changed_docs.ts";
 const DESCRIPTION =
   "Targeted docs integrity guard for save workflows (v2:REQ-0158-003)";
 const USAGE =
-  "bun run check_changed_docs.ts --workflow <name> [--files <path...> (space-separated recommended; comma-separated also accepted) | --base-ref <git-ref>] [--json] [--fail-level strict|warning] [--root <path>]";
+  "bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow <name> [--files <path...> (space-separated recommended; comma-separated also accepted) | --base-ref <git-ref>] [--json] [--fail-level strict|warning] [--root <path>]";
 const REF_USAGE_NOTES =
-  "--files は main 環境（マージ後、case-close 等）で PR 変更ファイルを直接指定するときに使用。" +
-  "--base-ref は worktree 環境（マージ前、case-run 等）で git diff により変更ファイル検出するときに使用。";
+  "--files は main 環境（マージ後・コミット後、case-close 等）で PR 変更ファイルを直接指定するときに使用。" +
+  "--base-ref は worktree 環境（マージ前・コミット前、case-run 等）で git diff により変更ファイル検出するときに使用。" +
+  "モード使い分けの標準は コミット前（worktree 上での検証）= --base-ref、コミット後・PR 作成後（main 環境）= --files。" +
+  "誤用による誤 pass・誤 FAILURE を防ぐため、起動時に対象ファイルが検出できる見込みを確認してから実行する。";
 // v2:REQ-0158-001: --files の区切り形式（space 区切り推奨、comma 区切りも受入）。後方互換性を担保。
 const FILES_DELIMITER_NOTES =
   "--files の区切り形式: space 区切り（推奨、例: --files a.md b.md c.md）、または comma 区切り（例: --files a.md,b.md,c.md）。両形式の混在も可。";
+const POWERSHELL_ARGS_NOTES =
+  "PowerShell での複数パス指定は配列変数経由（$files = @('a.md','b.md') を --files $files で渡す）または個別渡しとすること。" +
+  "--files \"a.md b.md\" のような引用符まとめ渡しは split 失敗の恐れがあるため使用しない。";
 
 type Workflow = "req-save" | "spec-save" | "case-run" | "case-close" | "docs-check";
 type FailLevel = "strict" | "warning";
@@ -181,6 +186,7 @@ function printHelp(): void {
   console.error(`  ${FILES_DELIMITER_NOTES}`);
   console.error("  --base-ref <ref>    git base ref to compute changed files; for worktree env (pre-merge, case-run). mutually exclusive with --files");
   console.error(`  ${REF_USAGE_NOTES}`);
+  console.error(`  ${POWERSHELL_ARGS_NOTES}`);
   console.error("  --json              emit JSON report (default: text)");
   console.error("  --fail-level <lvl>  strict (default) | warning");
   console.error("  --root <path>        explicit repository root (v2:REQ-0145-014: worktree/CI support)");
@@ -717,6 +723,27 @@ function isIndexChange(s: ChangeDescriptor): boolean {
   return false;
 }
 
+// SPEC 判定（AG-007、ACT-SPEC-001 検出対象除外規定）:
+// docs/specs/ 配下でも非 SPEC ファイル（baseline snapshot、歴史記録ファイル等）は
+// SPEC README 登録候補（spec_readme_update_required 等）から除外する。
+// 除外列挙は checker 実行契約 SPEC（docs/specs/integrity/checker-execution-contracts.md
+// 「検出対象除外規定」）が正規所有し、列挙外の除外を本実装で追加しない:
+//   - 配置ディレクトリ: docs/specs/integrity/audits/、baselines/（歴史記録領域）
+//   - frontmatter: baseline_for / audit_for（履歴系 frontmatter = snapshot・監査記録の起源標識）
+const SPEC_HISTORY_DIR_RE = /^docs\/specs\/integrity\/(audits|baselines)\//;
+const SPEC_HISTORY_FRONTMATTER_KEYS = ["baseline_for", "audit_for"] as const;
+
+function isSpecFile(relPath: string, absPath: string): boolean {
+  if (!/^docs\/specs\/.*\.md$/.test(relPath)) return false;
+  if (SPEC_HISTORY_DIR_RE.test(relPath)) return false;
+  const content = readText(absPath);
+  if (content) {
+    const fm = parseSimpleFrontmatter(content);
+    if (fm && SPEC_HISTORY_FRONTMATTER_KEYS.some((k) => fm[k])) return false;
+  }
+  return true;
+}
+
 function checkSpecFrontmatter(root: string, files: string[]): Failure[] {
   const failures: Failure[] = [];
   for (const f of files) {
@@ -828,13 +855,14 @@ function runWorkflowChecks(
   // ファイル存在や変更種別名ではなく、文書 lifecycle（追加/削除/移動/名称変更）または
   // 索引 frontmatter 値（id, title, status 等）の変更でのみ true とする。
   // SPEC targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節。
+  // Issue #2138 / AG-007: SPEC 判定（frontmatter・配置ディレクトリ）により非 SPEC
+  // ファイル（baseline snapshot、歴史記録ファイル等）の誤検出を抑止する。
   const specReadmeUpdateRequired =
     profile.rules.includes("spec-readme-update-required") ||
     profile.rules.includes("spec-readme-status-sync")
-      ? changeDescriptors.some((d) => {
-          if (!/^docs\/specs\/.*\.md$/.test(d.relPath)) return false;
-          return isIndexChange(d);
-        })
+      ? changeDescriptors.some(
+          (d) => isSpecFile(d.relPath, d.absPath) && isIndexChange(d),
+        )
       : false;
   const requirementsReadmeUpdateRequired = profile.rules.includes(
     "requirements-readme-sync",
@@ -865,11 +893,15 @@ function runWorkflowChecks(
     : false;
 
   // extensions_check_required: extension が参照する対象（REQ/ADR/SPEC）の lifecycle
-  // または索引 frontmatter 値の変更で true。
+  // または索引 frontmatter 値の変更で true。specs/ 配下は SPEC 判定（AG-007）を通す。
   const extensionsCheckRequired = changeDescriptors.some((d) => {
-    if (!/^docs\/(requirements\/REQ-|decisions\/DEC-|specs\/).*\.md$/.test(d.relPath))
-      return false;
-    return isIndexChange(d);
+    if (/^docs\/requirements\/REQ-.*\.md$/.test(d.relPath)) {
+      return isIndexChange(d);
+    }
+    if (/^docs\/decisions\/DEC-.*\.md$/.test(d.relPath)) {
+      return isIndexChange(d);
+    }
+    return isSpecFile(d.relPath, d.absPath) && isIndexChange(d);
   });
 
   // declared_files_check: --declared-files 指定時、宣言ファイルと実変更ファイルの対応を検査
