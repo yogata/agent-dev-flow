@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "IR-055",
-  "generated_at": "2026-08-14",
+  "generated_at": "2026-08-15",
   "entries": [
     {
       "file": "src/opencode/commands/agentdev/README.md",
@@ -307,6 +307,18 @@
       "file": "src/opencode/skills/agentdev-skill-authoring/references/review-protocol.md",
       "pattern": "src/opencode/",
       "severity": "strict",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
+      "pattern": "docs/guides/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md",
+      "pattern": "docs/specs/",
+      "severity": "heuristic",
       "count": 1
     },
     {
