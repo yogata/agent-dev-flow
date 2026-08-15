@@ -436,3 +436,19 @@
 - **想定反映先**: src/opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts（混在解消候補）、起動手順を明示する各手順書（要 learning-promote / backlog-review 判断）
 - **関連**: PR #2126 Findings learning セクション, Issue 2123（OU-004）, Epic 2119 Wave 3, PR 2125（Wave 2 実績）
 - **タグ**: `#targeted-docs-guard` `#check-changed-docs` `#node-v26` `#bun` `#launcher` `#operational-knowledge`
+
+## Windows 環境でスクリプトの network 系コマンド不使用を「呼び出し記録型ダミー git.cmd」で実行時証明する検証技法
+
+- **問題事象**: 導入系スクリプト（install-consumer-opencode.ps1）の「network 系コマンド不使用」をコード検査（grep）のみで証明すると、間接呼び出しや動的構築コマンドの見逃しリスクが残る。実行時に外部コマンドが実際に起動されないことを直接証明する手段が欲しい
+- **発生局面**: 実装（case-run のテスト戦略 TS-001 検証）
+- **検知方法**: 該当なし（検証技法の確立・回収事象。PR #2131 テスト戦略の結果セクションに手法と結果を記録）
+- **根本原因**: 該当なし（技法知見の回収）
+- **自律対応内容**: PATH 先頭に「呼び出しをログへ記録するダミーの git.cmd」を配置した状態でスクリプトを実行し、(1) 呼び出しログが空（GIT_INVOCATIONS=NONE）であること、(2) exit 0 で正常完了すること、の2点を確認した。clone、fetch、reset、その他 network access が一切起動されないことを実行時証明でき、コード検査（実行箇所 0 件の grep）と併用で証拠強度を高めた
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（検証技法の知見。DEC-016 導入系スクリプトの副作用ゼロ原則の検証手段として活用可能）
+- **横展開観点**: Windows 環境で「外部コマンド（git、curl 等）を起動しないこと」を完了条件とするスクリプト系 Issue のテスト戦略全般。ダミーコマンドの呼び出しログはコード検査のみより強い実行時証拠になる
+- **再発条件**: 該当なし（適用場面: スクリプトの network access 不実行を強い証拠で検証する必要がある場合）
+- **予防策候補**: スクリプト系テスト戦略の立案時に本技法（ダミーコマンド配置による実行時証明）を候補として挙げる運用（要 learning-promote / backlog-review 判断）
+- **想定反映先**: なし（テスト戦略は Issue 単位で定義されるため、汎用技法の文書化要否は learning-promote で評価）
+- **関連**: PR #2131 Findings learning セクション, Issue #2128（OU-001、TS-001）, DEC-016
+- **タグ**: `#test-strategy` `#runtime-proof` `#dummy-command` `#network-access` `#windows` `#operational-knowledge`
