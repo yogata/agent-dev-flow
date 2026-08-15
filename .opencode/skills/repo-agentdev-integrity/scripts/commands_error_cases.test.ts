@@ -361,9 +361,15 @@ describe("REQ-0030-011: Real repo error case validation", () => {
       expect(fs.existsSync(docsReadmePath)).toBe(true);
     });
 
-    it("ADR README.md exists (referenced by case-open, integrity-check)", () => {
-      const adrReadmePath = path.join(REPO_ROOT, "docs", "adr", "README.md");
-      expect(fs.existsSync(adrReadmePath)).toBe(true);
+    it("Decision README.md exists (docs/decisions/README.md, DEC-009 AG-014)", () => {
+      // DEC-009 AG-014 の正規索引。旧 docs/adr/README.md からの期待値更新（索引存在検証として存続）。
+      const decisionsReadmePath = path.join(
+        REPO_ROOT,
+        "docs",
+        "decisions",
+        "README.md",
+      );
+      expect(fs.existsSync(decisionsReadmePath)).toBe(true);
     });
   });
 });
