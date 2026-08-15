@@ -196,14 +196,19 @@ function extractYamlField(text: string, field: string): string | null {
  * `forbidden_key: "pattern"` and `forbidden_key:` + `- "pattern"` list forms
  * are handled.
  */
-function collectForbiddenRegexes(yamlText: string): { key: string; value: string }[] {
+export function collectForbiddenRegexes(yamlText: string): { key: string; value: string }[] {
   const result: { key: string; value: string }[] = [];
   const lines = yamlText.split(/\r?\n/);
   let currentListKey: string | null = null;
   for (const raw of lines) {
     const line = raw.trim();
-    if (line === "" || /^#/.test(line)) {
+    if (line === "") {
       currentListKey = null;
+      continue;
+    }
+    if (/^#/.test(line)) {
+      // Comments inside a list block (between the key and its items) must not
+      // end the list; only a blank line or the next key does.
       continue;
     }
     const kv = line.match(/^([A-Za-z_][A-Za-z0-9_]*):\s*"(.*)"\s*$/);

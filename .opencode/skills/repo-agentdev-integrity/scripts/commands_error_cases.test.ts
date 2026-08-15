@@ -1,20 +1,26 @@
 /**
- * REQ-0030-011: Error case E2E tests for command definitions.
+ * REQ-0030-011: Error case tests for command definitions.
+ * REQ-010-062: 検証規則の単一実装原則（期待値は配布 checker 由来）。
  *
- * Validates detection of:
- * - Missing frontmatter in command definitions
- * - Missing required frontmatter fields (description)
- * - Missing Input/Output/Steps sections
- * - Empty body after frontmatter
- * - Well-formed command passes validation
+ * 内蔵の検証関数は廃止済み（OU-005、Issue #2139）。エラー検出の期待値は
+ * 配布 checker（check_command_format.ts）とその検出ビュー（data/command-format-rules.yaml）
+ * が所有する規則から導出する:
+ * - YAML 宣言の forbidden 系パターンと checker の rule ID 検出の一致確認
+ * - 実コマンドの参照存在確認（skill、template、command、前提ファイル）
  *
  * frontmatter 契約は description 単一（移行計画 §5.2）。agent の必須検査は廃止済み。
+ * 実ファイルの frontmatter・セクション構造検証は commands_structure.test.ts
+ * （REQ-0030-001/002）が、checker 本体の構造規則（Step 番号、ガードレール番号等）の
+ * ユニットテストと実ファイル走査は check_command_format.test.ts がそれぞれ単一所有する。
+ * 本テストは両者を重複実装しない。
  */
 import {
   describe,
   it,
   expect,
 } from "bun:test";
+import { checkCommandFile } from "./check_command_format.ts";
+import { collectForbiddenRegexes } from "./check_workflow_preventive.ts";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -47,93 +53,37 @@ const CMD_DIR = fs.existsSync(RUNTIME_CMD_DIR) &&
   ? RUNTIME_CMD_DIR
   : SOURCE_CMD_DIR;
 const SKILLS_DIR = path.join(REPO_ROOT, ".opencode", "skills");
-const TEMPLATES_DIR = path.join(
+const RUNTIME_TEMPLATES_DIR = path.join(
   REPO_ROOT,
   ".opencode",
   "skills",
   "agentdev-workflow-templates",
   "templates",
 );
+const SOURCE_TEMPLATES_DIR = path.join(
+  REPO_ROOT,
+  "src",
+  "opencode",
+  "skills",
+  "agentdev-workflow-templates",
+  "templates",
+);
+// worktree junction 未設定環境では projection に agentdev-workflow-templates が
+// 存在しないため src/opencode/ へフォールバックする（templates_structure.test.ts と同一方式）。
+const TEMPLATES_DIR = fs.existsSync(RUNTIME_TEMPLATES_DIR)
+  ? RUNTIME_TEMPLATES_DIR
+  : SOURCE_TEMPLATES_DIR;
+// 配布 checker の検出ビュー。本テストの期待値の単一定義源（REQ-010-062）。
+const RULES_YAML_PATH = path.join(
+  REPO_ROOT,
+  ".opencode",
+  "skills",
+  "repo-agentdev-integrity",
+  "data",
+  "command-format-rules.yaml",
+);
 
-// ─── Parser helpers ──────────────────────────────────────────────────────────
-
-function parseCommandFrontmatter(
-  content: string,
-): Record<string, string | string[]> | null {
-  const parts = content.split("---");
-  if (parts.length < 3) return null;
-  const yaml = parts[1].trim();
-  if (yaml.length === 0) return null;
-  const result: Record<string, string | string[]> = {};
-  const lines = yaml.split("\n");
-  let currentKey: string | null = null;
-  const currentArray: string[] = [];
-  function flushArray() {
-    if (currentKey !== null && currentArray.length > 0) {
-      result[currentKey] = [...currentArray];
-    }
-    currentKey = null;
-    currentArray.length = 0;
-  }
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    if (trimmed.startsWith("- ") && currentKey !== null) {
-      currentArray.push(trimmed.slice(2).trim());
-      continue;
-    }
-    const colonIdx = trimmed.indexOf(":");
-    if (colonIdx === -1) continue;
-    flushArray();
-    const key = trimmed.slice(0, colonIdx).trim();
-    const value = trimmed.slice(colonIdx + 1).trim();
-    if (value === "") {
-      currentKey = key;
-    } else if (value.startsWith("[") && value.endsWith("]")) {
-      result[key] = value
-        .slice(1, -1)
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
-    } else {
-      result[key] = value.replace(/^["']|["']$/g, "");
-    }
-  }
-  flushArray();
-  return Object.keys(result).length > 0 ? result : null;
-}
-
-function validateCommand(content: string): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  const fm = parseCommandFrontmatter(content);
-  if (!fm) {
-    errors.push("Missing or invalid frontmatter");
-    return { valid: false, errors };
-  }
-  if (
-    !fm["description"] ||
-    (typeof fm["description"] === "string" && fm["description"].trim() === "")
-  ) {
-    errors.push("Missing 'description' field");
-  }
-  const body = content.split("---").slice(2).join("---").trim();
-  if (!body) {
-    errors.push("Empty body after frontmatter");
-    return { valid: errors.length === 0, errors };
-  }
-  if (!/^## /m.test(body)) {
-    errors.push("No ## headings in body");
-  }
-  const hasInput = /^## (Input|入力)/m.test(body);
-  if (!hasInput) errors.push("Missing ## Input section");
-  const hasOutput = /^## (Output|出力)/m.test(body);
-  if (!hasOutput) errors.push("Missing ## Output section");
-  // thin Command モデル（OU-002/003/004 移行後）は workflow 実装本体を Workflow Skill へ委譲し、
-  // 工程一覧は ## workflow dispatch セクション内の番号付き参照（### Step N / **STEP-N** / **工程-N**）で表現する
-  const hasSteps = /(^## (Steps|手順|フェーズ|workflow)|^### Step \d|^## Step \d|\*\*(STEP|工程)-\d+\*\*)/m.test(body);
-  if (!hasSteps) errors.push("Missing Steps section");
-  return { valid: errors.length === 0, errors };
-}
+// ─── Checker rules (single source of expectations, REQ-010-062) ──────────────
 
 function getSkillDirs(): Set<string> {
   if (!fs.existsSync(SKILLS_DIR)) return new Set();
@@ -154,72 +104,156 @@ function getTemplateFiles(): Set<string> {
 
 const skillDirs = getSkillDirs();
 const templateFiles = getTemplateFiles();
+const forbiddenPatterns = collectForbiddenRegexes(
+  fs.readFileSync(RULES_YAML_PATH, "utf-8"),
+);
 
-// ─── Error detection on synthetic fixtures ───────────────────────────────────
+// ─── Error detection on synthetic fixtures (checker-derived) ─────────────────
+// 各 fixture の期待値は command-format-rules.yaml が宣言する forbidden 系パターン
+// （検出ビュー）と checkCommandFile の rule ID（検出実装）の双方から導出する。
+// 両者が乖離した場合（規則変更時に一方のみ更新された場合）に失敗する。
 
-describe("REQ-0030-011: Error case detection (synthetic fixtures)", () => {
-  describe("Missing frontmatter", () => {
-    it("detects command without frontmatter", () => {
-      const content =
-        "# Test Command\n\n## Input\n\nSomething\n\n## Steps\n\n1. Do thing\n";
-      const result = validateCommand(content);
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain("Missing or invalid frontmatter");
+describe("REQ-0030-011: Error case detection via distributed checker rules", () => {
+  it("command-format-rules.yaml declares the forbidden pattern groups", () => {
+    expect(forbiddenPatterns.length).toBeGreaterThan(0);
+    const keys = new Set(forbiddenPatterns.map((p) => p.key));
+    expect(keys.has("forbidden_heading_regex")).toBe(true);
+    expect(keys.has("forbidden_substep_regex")).toBe(true);
+    expect(keys.has("forbidden_unconditional_patterns")).toBe(true);
+    expect(keys.has("forbidden_primary_headings")).toBe(true);
+  });
+
+  describe("IR-028: alphabet step heading", () => {
+    const line = "### Step A: 前判定";
+
+    it("YAML forbidden_heading_regex derives the expectation", () => {
+      const pattern = forbiddenPatterns.find(
+        (p) => p.key === "forbidden_heading_regex",
+      );
+      expect(pattern).toBeDefined();
+      expect(new RegExp(pattern!.value).test(line)).toBe(true);
     });
 
-    it("detects command with empty frontmatter", () => {
-      const content =
-        "---\n---\n\n## Input\n\nSomething\n\n## Steps\n\n1. Do thing\n";
-      const result = validateCommand(content);
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain("Missing or invalid frontmatter");
+    it("checker reports ir028-command-top-step-alphabet", () => {
+      const content = `## 手順\n\n${line}\n\ntext\n`;
+      const violations = checkCommandFile("fixture-ir028.md", content);
+      expect(
+        violations.some((v) => v.rule === "ir028-command-top-step-alphabet"),
+      ).toBe(true);
     });
   });
 
-  describe("Missing required frontmatter fields", () => {
-    it("detects missing description field", () => {
-      const content =
-        "---\ntitle: test\n---\n\n## Input\n\nX\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
-      const result = validateCommand(content);
-      expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.includes("description"))).toBe(true);
+  describe("IR-029: alphabet substep", () => {
+    const line = "**Step 1-a**: substep text";
+
+    it("YAML forbidden_substep_regex derives the expectation", () => {
+      const pattern = forbiddenPatterns.find(
+        (p) => p.key === "forbidden_substep_regex",
+      );
+      expect(pattern).toBeDefined();
+      expect(new RegExp(pattern!.value).test(line)).toBe(true);
+    });
+
+    it("checker reports ir029-command-alphabet-substep", () => {
+      const content = `## 手順\n\n### Step 1: main\n\n${line}\n`;
+      const violations = checkCommandFile("fixture-ir029.md", content);
+      expect(
+        violations.some((v) => v.rule === "ir029-command-alphabet-substep"),
+      ).toBe(true);
     });
   });
 
-  describe("Missing body sections", () => {
-    it("detects missing Input section", () => {
-      const content =
-        "---\ndescription: test\n---\n\n## Output\n\nY\n\n## Steps\n\n1. S\n";
-      const result = validateCommand(content);
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain("Missing ## Input section");
+  describe("IR-030: unconditional verbatim", () => {
+    const line = "検証結果を verbatim で返却すること";
+    const exemptLine = "成果物本文のみ verbatim で返却する";
+
+    it("YAML forbidden_unconditional_patterns derive the expectation", () => {
+      const patterns = forbiddenPatterns.filter(
+        (p) => p.key === "forbidden_unconditional_patterns",
+      );
+      expect(patterns.length).toBeGreaterThan(0);
+      expect(patterns.some((p) => new RegExp(p.value).test(line))).toBe(true);
     });
 
-    it("detects missing Output section", () => {
-      const content =
-        "---\ndescription: test\n---\n\n## Input\n\nX\n\n## Steps\n\n1. S\n";
-      const result = validateCommand(content);
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain("Missing ## Output section");
+    it("checker reports ir030-subagent-unconditional-verbatim", () => {
+      const content = `## 手順\n\n### Step 1: main\n\n${line}\n`;
+      const violations = checkCommandFile("fixture-ir030.md", content);
+      expect(
+        violations.some(
+          (v) => v.rule === "ir030-subagent-unconditional-verbatim",
+        ),
+      ).toBe(true);
     });
 
-    it("detects missing Steps section", () => {
-      const content =
-        "---\ndescription: test\n---\n\n## Input\n\nX\n\n## Output\n\nY\n";
-      const result = validateCommand(content);
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain("Missing Steps section");
-    });
-
-    it("detects empty body", () => {
-      const content = "---\ndescription: test\n---\n\n";
-      const result = validateCommand(content);
-      expect(result.valid).toBe(false);
-      expect(result.errors).toContain("Empty body after frontmatter");
+    it("checker exempts conditional verbatim (exemption hints)", () => {
+      const content = `## 手順\n\n### Step 1: main\n\n${exemptLine}\n`;
+      const violations = checkCommandFile("fixture-ir030-exempt.md", content);
+      expect(
+        violations.some(
+          (v) => v.rule === "ir030-subagent-unconditional-verbatim",
+        ),
+      ).toBe(false);
     });
   });
 
-  describe("Non-existent skill references", () => {
+  describe("IR-031: findings heading unification", () => {
+    const line = "## Capture";
+
+    it("YAML forbidden_primary_headings derive the expectation", () => {
+      const patterns = forbiddenPatterns.filter(
+        (p) => p.key === "forbidden_primary_headings",
+      );
+      expect(patterns.length).toBeGreaterThan(0);
+      expect(patterns.some((p) => new RegExp(p.value).test(line))).toBe(true);
+    });
+
+    it("checker reports ir031-findings-capture-heading-unification", () => {
+      const content = `## 手順\n\n### Step 1: main\n\n${line}\n`;
+      const violations = checkCommandFile("fixture-ir031.md", content);
+      expect(
+        violations.some(
+          (v) => v.rule === "ir031-findings-capture-heading-unification",
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe("compliant fixture derives no violation", () => {
+    const content = [
+      "## 手順",
+      "",
+      "### Step 1: first",
+      "",
+      "description",
+      "",
+      "### Step 2: second",
+      "",
+      "description",
+      "",
+      "## ガードレール",
+      "",
+      "- G01: valid",
+      "",
+    ].join("\n");
+
+    it("checker reports no violation", () => {
+      expect(checkCommandFile("fixture-compliant.md", content)).toHaveLength(0);
+    });
+
+    it("no YAML-declared forbidden pattern matches any line", () => {
+      for (const line of content.split("\n")) {
+        for (const p of forbiddenPatterns) {
+          expect(new RegExp(p.value).test(line)).toBe(false);
+        }
+      }
+    });
+  });
+});
+
+// ─── Error detection on real repo files ──────────────────────────────────────
+
+describe("REQ-0030-011: Real repo error case validation", () => {
+  describe("Non-existent references", () => {
     it("detects reference to non-existent skill", () => {
       const fakeSkill = "agentdev-nonexistent-fake-skill";
       expect(skillDirs.has(fakeSkill)).toBe(false);
@@ -231,42 +265,7 @@ describe("REQ-0030-011: Error case detection (synthetic fixtures)", () => {
     });
   });
 
-  describe("Valid command passes validation", () => {
-    it("accepts well-formed command definition", () => {
-      const content = [
-        "---",
-        "description: テストコマンド",
-        "---",
-        "",
-        "# テストコマンド",
-        "",
-        "テスト用コマンド。",
-        "",
-        "## Input",
-        "",
-        "- 入力項目",
-        "",
-        "## Output",
-        "",
-        "- 出力項目",
-        "",
-        "## Steps",
-        "",
-        "1. ステップ1",
-        "2. ステップ2",
-        "",
-      ].join("\n");
-      const result = validateCommand(content);
-      expect(result.valid).toBe(true);
-      expect(result.errors).toEqual([]);
-    });
-  });
-});
-
-// ─── Error detection on real repo files ──────────────────────────────────────
-
-describe("REQ-0030-011: Real repo error case validation", () => {
-  describe("All real commands pass validation", () => {
+  describe("All real commands pass checker validation", () => {
     const cmdFiles = fs.existsSync(CMD_DIR)
       ? fs
           .readdirSync(CMD_DIR)
@@ -274,13 +273,10 @@ describe("REQ-0030-011: Real repo error case validation", () => {
           .sort()
       : [];
     for (const file of cmdFiles) {
-      it(`${file} passes full validation`, () => {
+      it(`${file} passes distributed checker validation`, () => {
         const content = fs.readFileSync(path.join(CMD_DIR, file), "utf-8");
-        const result = validateCommand(content);
-        expect(result.valid).toBe(true);
-        if (!result.valid) {
-          console.error(`${file} validation errors:`, result.errors);
-        }
+        const violations = checkCommandFile(file, content);
+        expect(violations).toHaveLength(0);
       });
     }
   });
@@ -361,9 +357,14 @@ describe("REQ-0030-011: Real repo error case validation", () => {
       expect(fs.existsSync(docsReadmePath)).toBe(true);
     });
 
-    it("ADR README.md exists (referenced by case-open, integrity-check)", () => {
-      const adrReadmePath = path.join(REPO_ROOT, "docs", "adr", "README.md");
-      expect(fs.existsSync(adrReadmePath)).toBe(true);
+    it("Decision README.md exists (docs/README.md Decision index link target)", () => {
+      const decisionReadmePath = path.join(
+        REPO_ROOT,
+        "docs",
+        "decisions",
+        "README.md",
+      );
+      expect(fs.existsSync(decisionReadmePath)).toBe(true);
     });
   });
 });
