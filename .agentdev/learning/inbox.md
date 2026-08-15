@@ -388,3 +388,19 @@
 - **想定反映先**: src/opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts（未コミット変更検出警告の候補）、case-run workflow のガード実行手順（mode 使い分け明記候補。いずれも要 learning-promote / backlog-review 判断）
 - **関連**: PR #2124 Findings learning セクション, Issue 2120（OU-001）, Epic 2119 Wave 1
 - **タグ**: `#targeted-docs-guard` `#check-changed-docs` `#base-ref` `#files-mode` `#uncommitted-changes` `#operational-knowledge`
+
+## autogen-index-regeneration-diff 拡張check の指定ツール generate_indexes.ts が adr-to-decision rename 未追随で EXIT_ERROR（中間 Wave は PR 索引影響なしで継続判断）
+
+- **問題事象**: case-close（Epic #2119 Wave 2 クローズ）の Step E5b 前段で、workflow extension checks の `autogen-index-regeneration-diff`（.agentdev/extensions/skills/agentdev-workflow-case-close.yaml）が指定する `generate_indexes.ts --dry-run` が `docs/adr/README.md not found` で EXIT_ERROR 即時終了した。スクリプト最終更新 14f202f6（2026-07-26）は `docs/adr/` と `adr-*` block ID を前提とするが、リポジトリは adr-to-decision rename（a0143600、2026-08-10、#2042）後の `docs/decisions/` + `decision-*` block ID（14ブロック）へ移行済み。差分あり/なしのいずれの判定も出力不能な状態
+- **発生局面**: 完了処理（case-close Epic Wave クローズ、Step E5b 前段の索引健全性検証）
+- **検知方法**: `bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts --dry-run` の実行で ADR README not found エラー。補助的に `check_autogen_freshness.ts --json`（REQ-010-059）を実行し、stale AUTOGEN block 4件（integrity-rule-catalog と rule-ownership の「ADR ↔REQ」→「Decision ↔REQ」用語 drift、req-health-metrics/spec-health-metrics の測定 block 古データ）を検出。DOC-MAP.md は #1958 で削除済みのため skip は正当
+- **根本原因**: adr-to-decision rename（OU-005 #2042）が `generate_indexes.ts` の対象パス・block ID 定義に未反映。rename を横断是正する工程で配下スクリプトの追従検査が機能しなかった。また stale 4件はいずれも main HEAD 時点の既存債務で、本 Wave の PR はファイル変更 0 の verify-only PR（索引への影響なし）
+- **自律対応内容**: 中間 Wave 2 では当該 PR が索引に影響を与えない（changedFiles=0）ため、check の保護目的（当該 PR 由来の再生成漏れ防止）は空しく充足されると判断してクローズを継続した。ツール破損と既存 stale 4件を完了報告へ明記し、解消（スクリプトの decisions 追随、または索引再生成 commit）は Wave 3 最終クローズまでの課題として先送りした。case-close 自身は索引ファイルを直接編集・commit していない（契約遵守）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: あり（index-auto-generation SPEC が稼働契約とする生成スクリプトが実行不能。learning-promote で (a) generate_indexes.ts の docs/decisions 追随、(b) 拡張check の指定ツールを check_autogen_freshness.ts へ変更、(c) 索引再生成の専用工程化のいずれかを評価する対象）
+- **横展開観点**: 同拡張check を持つ全 case-close（単一 Issue Step 3-3 含む）で同エラーが発生する。docs 構造変更（rename、削除）を伴う工期では配下の整合スクリプト追従を検証工程に組み込む必要がある
+- **再発条件**: `generate_indexes.ts` が `docs/adr/` 前提のまま case-close の Step 3-3 / Step E5b 前段が実行される場合、全 case-close で再発
+- **予防策候補**: rename 横断是正 PR に「参照スクリプトのパス・ID 定義追従確認」を必須項目化。または拡張check を、実行可能な freshness gate（check_autogen_freshness.ts）へ指定ツール変更し、 stale 時の停止条件を明文化
+- **想定反映先**: `.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`（docs/decisions + decision-* block ID 追随）、`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`（checks セクションの指定ツール・失敗時扱いの明確化。要 learning-promote / backlog-review 判断）
+- **関連**: Epic 2119 Wave 2, Issue 2121（OU-002）, PR 2125, a0143600（adr-to-decision rename #2042）, 87f00c48（DOC-MAP 削除 #1958）, docs/specs/integrity/index-auto-generation.md
+- **タグ**: `#autogen` `#generate-indexes` `#adr-to-decision` `#extension-check` `#tool-broken` `#pre-existing-staleness` `#intermediate-wave`
