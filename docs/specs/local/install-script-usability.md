@@ -2,7 +2,7 @@
 title: 導入スクリプトの使いやすさ詳細
 status: draft
 created: 2026-08-02
-updated: 2026-08-09
+updated: 2026-08-15
 spec_logical_division: behavior
 canonical_owner: install-script
 ---
@@ -18,16 +18,29 @@ sync-self-opencode.ps1）の使いやすさ詳細を定義する。
 ### install-consumer-opencode.ps1
 
 引数なし起動時（-Mode 未指定）に以下のウィザードを起動する。Q1 目的は dry-run/check/apply
-の違いを併記する。
+の違いを併記する。ウィザード文言はチェックアウト済み前提の案内とし、「clone して実行」系の
+表現を使用しない。
 
 - Q1 目的:
   - 1) 新規インストール → apply
   - 2) 更新・再同期 → apply
-  - 3) 状態確認（clone しない軽量確認）→ check
-  - 4) 変更予測（clone するが変更しない）→ dry-run
+  - 3) 状態確認（検証のみ）→ check
+  - 4) 変更予測（変更しない）→ dry-run
 - Q2 環境:
   - 1) GitHub 版（通常）→ $LocalMode = $false
   - 2) ローカル版（GitHub Issue/PR を使わずローカルファイルで運用）→ $LocalMode = $true
+
+### チェックアウト未検出時のエラーメッセージ
+
+チェックアウト配置先に src/opencode/ が存在しない場合、install スクリプトはエラー停止し、
+clone コマンド例とソース ZIP 取得手順を案内表示する（REQ-009-047）。案内には次を含める。
+
+- clone コマンド例（git clone によるチェックアウト配置）
+- ソース ZIP の取得手順（GitHub ソースアーカイブの取得と展開）
+- ZIP 展開時のディレクトリ配置に関する注意: 展開で生じる agent-dev-flow-<ref>/ の一段ネストを
+  避け、.agentdev-plugin/src/opencode/ となる配置を指示する
+- scripts/ は .agentdev-plugin/ と同一チェックアウトからコピーする案内（スクリプトと
+  チェックアウトの版不一致の防止）
 
 ### sync-self-opencode.ps1
 
@@ -44,11 +57,17 @@ Mode を持たないため対象外。
 
 ## dry-run/check/apply の技術的差
 
-| モード | clone | ファイル変更 |
-|---|---|---|
-| check | しない | しない（検証のみ） |
-| dry-run | する | しない（予測のみ） |
-| apply | する | する |
+3モードの違いは「検証のみ（check）/ 変更予測（dry-run）/ 実行（apply）」として定義する。
+いずれのモードも provisioning（clone、fetch、reset）と network access を行わず、
+チェックアウト済みの .agentdev-plugin/ を前提に動作する（REQ-009-046）。
+
+| モード | ファイル変更 |
+|---|---|
+| check | しない（検証のみ） |
+| dry-run | しない（変更予測のみ） |
+| apply | する（実行） |
+
+REQ-009-042 が要求するヘルプの3モード説明もこの定義に従い、clone 軸の説明を含まない。
 
 ## cwd 安全化
 
@@ -58,7 +77,7 @@ install-consumer-opencode.ps1 と check-consumer-opencode.ps1 は、実行ディ
 以下のいずれかの場合、即座に停止する。
 
 1. .git が存在しない（Git リポジトリでない）
-2. .agentdev-plugin/ 配下（clone 先）
+2. .agentdev-plugin/ 配下（チェックアウト配置先）
 3. src/opencode/ 配下（原本領域）
 4. .opencode/ 配下（実行時領域）
 
@@ -78,7 +97,7 @@ install と check の停止メッセージ形式:
 | 条件 | 理由文 |
 |---|---|
 | .git 無し | このフォルダは Git リポジトリではありません |
-| .agentdev-plugin/ 内 | このフォルダは agent-dev-flow の clone 先です。1つ上のフォルダへ移動してください |
+| .agentdev-plugin/ 内 | このフォルダは agent-dev-flow のチェックアウト配置先です。1つ上のフォルダへ移動してください |
 | src/opencode/ 内 | このフォルダは agent-dev-flow の原本領域です |
 | .opencode/ 内 | このフォルダは OpenCode の実行時領域です |
 
@@ -95,17 +114,17 @@ GitHub Issue/PR を使わずローカルファイル（.agentdev/cases/）で運
 
 ## 上級者向けオプション
 
-以下のオプションは clone 先・clone 元を変更する上級者向けであり、通常は指定不要。
+-PluginDir はチェックアウト配置先を変更する上級者向けオプションであり、通常は指定不要。
+-RepoUrl と -Branch は provisioning を行わない本モデルで廃止しており、指定した場合は
+パラメータエラーで拒否される。
 
 ### install-consumer-opencode.ps1
 
-- -PluginDir: clone 先ディレクトリ名（既定: .agentdev-plugin）
-- -RepoUrl: clone 元リポジトリ URL
-- -Branch: clone 元ブランチ
+- -PluginDir: チェックアウト配置先ディレクトリ名（既定: .agentdev-plugin）
 
 ### check-consumer-opencode.ps1
 
-- -PluginDir: clone 先ディレクトリ名
+- -PluginDir: チェックアウト配置先ディレクトリ名
 
 ### sync-self-opencode.ps1
 

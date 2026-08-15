@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-07-27
+updated: 2026-08-15
 spec_logical_division: catalog
 canonical_owner: runtime-package-boundary
 ---
@@ -143,7 +143,11 @@ Consumer プロジェクトで独自 command/skill を追加する際の命名�
 
 ## 導入方式ポリシー（Installation Method Policy）
 
-通常の consumer 導入は symlink または junction ベースの link mode を推奨する（REQ-009-009）。具体化された release archive は別個の配布および検証 projection であり、REQ-009-045 が別途正規所有する。copy 型インストールと npm/package 化は対象外を維持し、release archive を通常の copy インストールの延長として扱わない。
+通常の consumer 導入は symlink または junction ベースの link mode を推奨する（REQ-009-009）。具体化された release archive は別個の配布および検証 projection であり、REQ-009-045 が別途正規所有する。copy 型インストール（.opencode/ 配下へ配布成果物の実体を複製する方式）と npm/package 化は対象外を維持し、release archive を通常の copy インストールの延長として扱わない。
+
+provisioning（agent-dev-flow チェックアウトの取得）は利用者の責務であり、利用者による git clone と利用者によるソース ZIP 展開の2形態を正規の provisioning 形態とする（REQ-009-010、REQ-009-046、DEC-016）。install スクリプトはチェックアウト済みの `.agentdev-plugin/` を前提に junction 設定のみを行い、provisioning（clone、fetch、reset）と network access を行わない。
+
+provisioning（チェックアウトの取得手段: clone / ZIP 展開）と install 手段（link mode による junction 接続）は別軸である。ZIP 展開による provisioning は手動 copy インストールに該当せず、install 手段は引き続き link mode に限定される。「source ZIP によるチェックアウト供給」と「release archive projection」は別個の概念であり、両者を混同する説明をしない。
 
 配布依存境界の検出契約（link projection と archive projection の区別、projection ごとの検査、検査エラーの取扱い）は `integrity/distribution-boundary.md` が正規所有する（REQ-029、DEC-014）。
 
@@ -232,14 +236,26 @@ Case ファイルのスキーマ正本は [ローカル Case ファイル](local
 | `-LocalMode` 未指定（既定） | 通常版: 全 agentdev command/skill を `src/opencode/` 配下へ接続 |
 | `-LocalMode` 指定時 | local mode: `agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/` へ接続、それ以外は `src/opencode/` 配下へ接続 |
 
-`-Mode`（dry-run / check / apply）は `-LocalMode` の有無にかかわらず従来通り動作し、clone、update、link 作成の各フェーズで適用される。
+`-Mode`（dry-run / check / apply）は `-LocalMode` の有無にかかわらず従来通り動作し、チェックアウト検証と junction 設定の各フェーズで適用される。
 別スクリプト（`install-consumer-opencode-local.ps1` 等）は新設せず、エントリポイントを単一に維持する。
-これは既存 `-Mode` パターンと整合し、clone/update ロジックの重複を避けるための採用判断である。
+これは既存 `-Mode` パターンと整合し、チェックアウト検証と junction 設定のロジック重複を避けるための採用判断である。
 
 ### check-consumer-opencode.ps1 の local mode リンク状態検出条件
 
 `check-consumer-opencode.ps1` は `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合、リポジトリ種別を `consumer-generated` として検出、報告する（リポジトリ種別判定基準表参照）。
 通常版のリンク構成（`agentdev-gh-cli` も `src/opencode/` 配下へ接続）との違いを当該 link target で識別する。
+
+### チェックアウト検証（usable checkout 判定）
+
+install-consumer-opencode.ps1 と check-consumer-opencode.ps1 は、agent-dev-flow チェックアウトの検証を git リポジトリ性必須判定ではなく usable checkout 判定で行う。判定基準はチェックアウト配置先（既定 `.agentdev-plugin/`）配下に `src/opencode/` が存在することであり、`.git` の存在を必須としない（REQ-009-047、REQ-009-048）。
+
+チェックアウトが検出できない場合（チェックアウト配置先に `src/opencode/` が存在しない場合を含む）、両スクリプトはエラー停止し、clone コマンド例とソースアーカイブ取得手順を案内表示する。provisioning を代行実行しない。
+
+check-consumer-opencode.ps1 の版（commit/branch）報告は `.git` が存在する場合のみ行い、ZIP 展開チェックアウト（`.git` なし）の版は unknown とする。「.agentdev-plugin/ が git リポジトリでない」は乖離（DIVERGENCE）ではなく情報報告として扱う。version manifest ファイルは導入しない。ZIP 展開環境はサポート対象外とし、不具合報告の受け付け対象から除外する運用とする。
+
+### 更新運用
+
+導入済み環境の更新は利用者の責務である（REQ-009-049）。git clone 環境では git pull 後に install を再実行する。ZIP 展開環境では ZIP 再取得・ディレクトリ差し替え後に install を再実行する。install の apply は冪等であり、再実行で junction 構成を変化させない。ZIP 更新時の install 再実行の要否は仕様として推奨・不推奨の形で定めず、利用者判断に委ねる。
 
 ### link target 確認方式
 

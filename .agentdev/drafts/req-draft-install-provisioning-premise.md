@@ -13,6 +13,8 @@ work_type: feature
 
 scale: standard
 
+spec_actions_consumed: true
+
 summary: |
   ADF 導入モデルの前提を「install スクリプト自身が clone する」から「利用者がチェックアウト済み
   （git clone または GitHub ソース ZIP 展開）の .agentdev-plugin/ を用意する」へ変更する。
@@ -249,7 +251,11 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [docs/specs/local/runtime-package-boundary.md]
+      action_to_doc:
+        ACT-SPEC-001: "runtime-package-boundary.md 導入方式ポリシー（UPDATE）"
+        ACT-SPEC-002: "runtime-package-boundary.md link mode 接続手順技術詳細（UPDATE）"
   - ou_id: OU-003
     target_spec: docs/specs/local/install-script-usability.md
     operation: spec-update
@@ -257,7 +263,13 @@ operation_units:
     depends_on: []
     recommended_order: 2
     issue_policy: single
-    result: {}
+    result:
+      saved_spec_docs: [docs/specs/local/install-script-usability.md]
+      action_to_doc:
+        ACT-SPEC-003: "install-script-usability.md 対話ウィザード（UPDATE）"
+        ACT-SPEC-004: "install-script-usability.md dry-run/check/apply の技術的差（UPDATE）"
+        ACT-SPEC-005: "install-script-usability.md 上級者向けオプション（UPDATE）"
+        ACT-SPEC-006: "install-script-usability.md cwd 安全化（UPDATE）"
 
 test_strategy:
   - id: TS-001
