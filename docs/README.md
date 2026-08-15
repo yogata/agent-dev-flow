@@ -53,7 +53,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-015 の15件である（DEC-008 と DEC-015 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
+現行 Decision は DEC-001 から DEC-016 の16件である（DEC-008、DEC-015、DEC-016 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
 |---|---|
@@ -72,6 +72,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-013](decisions/DEC-013.md) | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 |
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement（proposed） |
 | [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（proposed） |
+| [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則（proposed） |
 
 ## 仕様（SPEC）
 
