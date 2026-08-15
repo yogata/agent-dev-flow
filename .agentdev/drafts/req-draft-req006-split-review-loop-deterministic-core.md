@@ -11,6 +11,8 @@ source_rus: [RU-0001, RU-0002, RU-0003, RU-0004]
 ```yaml
 work_type: feature
 
+spec_actions_consumed: true
+
 scale: large
 
 summary: |

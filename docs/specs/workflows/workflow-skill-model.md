@@ -132,6 +132,20 @@ Capability Skill と Workflow Skill は異なる責務境界・判断モデル�
 
 1つの skill が両側面を持つ場合、責務境界を明示的に分離し、2つの skill へ分割する。新規に作成する skill は作成時にどちらの層へ属するかを判定基準（「Capability Skill の判定基準」節）に照らして確定する。
 
+## 決定論的処理との責務接続（DEC-015）
+
+Command / Workflow Skill / Capability Skill の3層構造（DEC-010）を維持したまま、決定論的処理を次の責務分離で接続する（DEC-015、REQ-002-035）。
+
+| 層 | 責務 |
+|---|---|
+| Command | 利用者向け入口、公開契約（入出力、ガードレール）、Workflow Skill への委譲 |
+| Workflow Skill | 処理手順、分岐、停止条件、処理手順上の状態遷移（STEP model） |
+| Capability Skill | 複数の処理手順で共通する判断基準・能力（宣言的ルール、分類基準） |
+| 決定論的処理 | 規則に基づき一意に判定・変換できるテスト可能な処理（採番、整合性検査、見出し検索等） |
+
+- Capability Skill は決定論的処理を公開能力として所有できる（例: `agentdev-artifact-validation` の公開検証契約、`agentdev-req-file-manager` の採番スクリプト）。この場合も workflow の処理順序、分岐、停止条件の移管は行わず、それらは Workflow Skill が所有したまま参照する。
+- 決定論的処理は既存の script 種別（決定的でテスト可能な実行ロジック、`scripts/` 配下の TypeScript、I/O 契約: argv/stdin → stdout JSON）へ接続し、新たな層や成果物種別を導入しない。決定論的に処理できる事項を理由なく LLM の推論だけへ委ねない（REQ-002-035）。
+
 ## Capability Skill 横断抽出（DEC-010 Inventory に基づく）
 
 DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候補を裏付ける（AG-001）。本節は候補の分類と既存 Capability Skill との対応を正規所有する。

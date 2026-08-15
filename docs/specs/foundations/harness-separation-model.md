@@ -2,7 +2,7 @@
 title: harness 分離モデル
 status: accepted
 created: 2026-07-12
-updated: 2026-08-10
+updated: 2026-08-15
 ---
 
 # harness 分離モデル
@@ -61,6 +61,8 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 - 各 skill の `references/<topic>.md`: skill 固有の実行制御具体（エージェント型名、起動方法、timeout、並列度、再試行等）
 
 上記 harness 側の実行制御は、`responsibility-boundary-purification.md` が定義する「harness execution mechanism」（agent 起動、background task、並列実行、context 管理）として ADF 規範所有対象外である（REQ-011-018）。本 SPEC は harness execution mechanism の境界宣言のみを所有し、起動 API、並列数、timeout 等の具体は各 skill の `references/` へ集約する。external execution boundary（外部バックエンド接続）は REQ-011 が正規所有する（REQ-011-017）。
+
+並列判断と並列起動機構の境界（DEC-015）: 並列可否、処理単位間の依存関係、合流条件等の判定は ADF の決定論的実行中核が所有し、実際の並列起動機構は実行基盤（harness）が所有する。REQ-011-018 の「並列実行」は並列起動機構を指し、並列の可否・依存・合流の判定は ADF 側実行判断（REQ-011-019）が所有する。実際に起動するエージェント数、起動 API、実行基盤固有の並列化手段を ADF の正規契約へ固定しない。
 
 ## 実行結果契約
 

@@ -2,7 +2,7 @@
 title: `agentdev-learning-pipeline` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-15
 ---
 
 # `agentdev-learning-pipeline` SPEC
@@ -26,6 +26,21 @@ schema、分類基準、評価ディメンション、prune 方針を定義す�
 - prune 方針（昇華時必須）
 - 処分区分（11処分区分 + duplicate）
 - artifact lifecycle（inbox → deferred → promoted）。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である
+- 構造改善先分類（学びの反映先評価。REQ-010-061）
+
+## 構造改善先分類
+
+learning pipeline は学びを保存するだけでなく、再発防止のためにどこへ反映すべきかを評価して分類する（REQ-010-061）。構造改善先の評価候補は次の7分類とする。
+
+1. 既存 REQ / Decision / SPEC への反映
+2. Skill の改善
+3. 決定論的な検査・ガードレールへの移管
+4. 既存処理手順の改善
+5. 通常の Issue による修正
+6. 重複・陳腐化した知識の削除
+7. 現時点では反映不能なものの保留
+
+learning-promote はこれらの反映先を直接変更しない。learning-promote → backlog-review → RU → req-define の承認・要件化経路を維持し、構造改善先の分類結果を後続工程へ渡す。
 
 ## 参照する references
 

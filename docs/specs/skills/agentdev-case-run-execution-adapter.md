@@ -2,7 +2,7 @@
 title: `agentdev-case-run-execution-adapter` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-15
 ---
 
 # `agentdev-case-run-execution-adapter` SPEC
@@ -22,6 +22,7 @@ case-run が Issue 実装を実行担当サブエージェントへ委譲する�
 
 - 委譲プロトコル（adapter skill 経由での委譲起動 + 委譲 prompt 内で実行 command を指定）。起動手段の詳細は AGENTS.md および references/<harness>.md 参照（REQ-002-002）
 - result 契約（4状態: completed-pr / blocked / failed / delegation-unavailable）
+- 欠陥類型を修正単位とする修正・検証契約（本質的な指摘事項確認時の修正前整理、欠陥類型単位の検証対象選定）
 - worktree 隔離遵守、自己検証
 - 委譲起動失敗時の事後処理（worktree `git status` で未コミット変更確認、残留箇所 grep と手動修正）
 
@@ -48,6 +49,7 @@ case-run が Issue 実装を実行担当サブエージェントへ委譲する�
 - worktree 隔離の自己検証
 - PR URL の正確性
 - result 契約（4状態）の適合性
+- 欠陥類型単位の修正・検証契約の遵守（修正前整理、検証対象選定、completed-pr 許可条件）
 - 委譲起動失敗時の適切な事後処理
 
 ## See Also
@@ -79,6 +81,16 @@ case-run が Issue 実装を実行担当サブエージェントへ委譲する�
 ### 結果反映（REQ-014-006/007）
 
 accepted finding の実装方針への反映は実行担当サブエージェント（呼出元）の責務である（REQ-014-006）。反映は最初の実装変更前に行う。反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/Decision/SPEC 整合性再確認、targeted docs guard、QG-3 等）を再実行する。意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動でき（REQ-014-007）、新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。再 review 停止条件4点（REQ-014-008）は adversarial-review SPEC を正とする。
+
+### 欠陥類型を修正単位とする契約（修正単位・検証）
+
+実行中に本質的な指摘事項が確認された場合（adversarial-review 由来に限定せず、コードレビュー、QA、品質ゲート、試験等で確認されたものを含む）、報告された個別事例のみを修正単位とせず、利用可能な証拠から根本原因、欠陥類型、同じ原因の影響を受ける範囲、必要な修正範囲、必要な追加検証範囲を整理してから修正する（REQ-031-018）。
+
+自律修正と blocked の境界: 一般化した修正範囲が既確定 Issue の対象範囲内の内部実装変更だけで完結する場合は自律的に修正してよい。Issue の対象範囲、完了条件、受け入れ条件、REQ、Decision、SPEC、必須品質条件の変更が必要になる場合は現行 Issue 内で勝手に変更せず blocked とする（REQ-031-019。blocked 遷移判定は「blocked 遷移の内部手続き」節を正とする）。
+
+欠陥類型単位の検証: 修正後は元の再現事例だけの再検証をもって完了とせず、欠陥類型に応じて合理的に必要な検証対象（元の再現事例、同種事例、境界条件、対称となる事例、適用外であるべき事例、既存の回帰試験等の候補）を選定する。固定的な全項目必須チェックリストにはしない（REQ-031-020）。検証中に新たな失敗事例を発見した場合、既存の指摘事項と根本原因が同一なら既存欠陥類型の適用範囲不足として修正範囲を再設定し修正と検証を再実行し、根本原因が異なる場合のみ新しい指摘事項として扱う（REQ-031-021）。
+
+結果状態との関係: 本質的な指摘事項は Findings 等への記録だけを理由として未解消のまま completed-pr にせず、Issue の対象範囲内で修正可能な場合は修正および欠陥類型単位の検証が成功した後にのみ completed-pr を許可する。非本質的な指摘事項は既存契約に従い Findings 記録による継続を許可する（REQ-031-022）。利用可能なリポジトリ情報、実装差分、試験結果、関連する Issue / REQ / Decision / SPEC / docs を十分に調査しても安全な修正範囲を正当化できる根本原因または欠陥類型を確立できない場合は、局所的な推測修正によって completed-pr へ進まず failed とする（REQ-031-023）。result 契約は既存4状態（completed-pr / blocked / failed / delegation-unavailable）を維持し、本契約のために新しい結果状態を追加しない。
 
 ### blocked 遷移の内部手続き（REQ-015-010/011）
 
