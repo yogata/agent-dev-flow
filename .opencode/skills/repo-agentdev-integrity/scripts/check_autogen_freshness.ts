@@ -22,29 +22,26 @@ import {
   EXIT_OK,
   EXIT_NG,
   EXIT_ERROR,
-  printHelp,
   findRepoRoot,
 } from "./cli_utils.ts";
 import {
   findAutogenBlocks,
   collectIrFiles,
-  collectAdrFiles,
-  collectRetiredAdrFiles,
+  collectDecisionFiles,
+  collectRetiredDecisionFiles,
   collectReqFiles,
   collectRetiredReqFiles,
   collectReqMetrics,
   collectSpecMetrics,
-  countSpecFiles,
   generateCatalogBlocks,
   generateRuleOwnershipAppendix,
-  generateAdrBaselineCaption,
-  generateAdrBaselineTable,
-  generateAdrStatusList,
-  generateAdrRetiredTable,
+  generateDecisionBaselineCaption,
+  generateDecisionBaselineTable,
+  generateDecisionStatusList,
+  generateDecisionRetiredTable,
   generateReqActiveCaption,
   generateReqActiveTable,
   generateReqRetiredTable,
-  generateDocMapInventory,
   generateReqMetricsTable,
   generateSpecMetricsTable,
   generateReadmeReqSummaryCount,
@@ -52,17 +49,16 @@ import {
   CATALOG_PRE_BLOCK_ID,
   CATALOG_POST_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
-  ADR_BASELINE_COUNT_BLOCK_ID,
-  ADR_BASELINE_TABLE_BLOCK_ID,
-  ADR_STATUS_ACCEPTED_BLOCK_ID,
-  ADR_STATUS_PROPOSED_BLOCK_ID,
-  ADR_STATUS_SUPERSEDED_BLOCK_ID,
-  ADR_STATUS_DEPRECATED_BLOCK_ID,
-  ADR_RETIRED_TABLE_BLOCK_ID,
+  DECISION_BASELINE_COUNT_BLOCK_ID,
+  DECISION_BASELINE_TABLE_BLOCK_ID,
+  DECISION_STATUS_ACCEPTED_BLOCK_ID,
+  DECISION_STATUS_PROPOSED_BLOCK_ID,
+  DECISION_STATUS_SUPERSEDED_BLOCK_ID,
+  DECISION_STATUS_DEPRECATED_BLOCK_ID,
+  DECISION_RETIRED_TABLE_BLOCK_ID,
   REQ_ACTIVE_COUNT_BLOCK_ID,
   REQ_ACTIVE_TABLE_BLOCK_ID,
   REQ_RETIRED_TABLE_BLOCK_ID,
-  DOCMAP_INVENTORY_BLOCK_ID,
   REQ_METRICS_BLOCK_ID,
   SPEC_METRICS_BLOCK_ID,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
@@ -170,7 +166,7 @@ export function parseTableRow(line: string): string[] | null {
  * 判定規則（リスト順、最初に該当したものを優先）:
  *   1. 行数の増減 → rename（行の追加・削除 = ファイル追加・削除・rename とみなす）
  *   2. SPEC metrics 表の同行異 status 列 → status_change
- *   3. ADR README 表の同行異 status 列 → status_change
+ *   3. Decision README 表の同行異 status 列 → status_change
  *   4. REQ metrics 表の同行異シグナル/備考列 → content_change（status 列を持たないため）
  *   5. 上記以外の不一致 → content_change
  *
@@ -216,10 +212,10 @@ export function classifyStaleness(
         };
       }
     }
-    // ADR baseline 表: 列構成 = ADR番号 | タイトル | ステータス | 作成日
+    // Decision baseline 表: 列構成 = Decision番号 | タイトル | ステータス | 作成日
     // status 列（index 2）のみ変化 → status_change
     if (
-      blockId === ADR_BASELINE_TABLE_BLOCK_ID &&
+      blockId === DECISION_BASELINE_TABLE_BLOCK_ID &&
       curCells.length >= 4 &&
       expCells.length >= 4
     ) {
@@ -227,15 +223,15 @@ export function classifyStaleness(
         return {
           kind: "status_change",
           detail:
-            `ADR status changed without regeneration. id=${curCells[0]}, ` +
+            `Decision status changed without regeneration. id=${curCells[0]}, ` +
             `status current="${curCells[2]}" expected="${expCells[2]}".`,
         };
       }
     }
-    // ADR retired 表: 列構成 = ADR番号 | タイトル | retired時ステータス
+    // Decision retired 表: 列構成 = Decision番号 | タイトル | retired時ステータス
     // retired時ステータス列（index 2）のみ変化 → status_change
     if (
-      blockId === ADR_RETIRED_TABLE_BLOCK_ID &&
+      blockId === DECISION_RETIRED_TABLE_BLOCK_ID &&
       curCells.length >= 3 &&
       expCells.length >= 3
     ) {
@@ -243,7 +239,7 @@ export function classifyStaleness(
         return {
           kind: "status_change",
           detail:
-            `Retired ADR status changed without regeneration. id=${curCells[0]}, ` +
+            `Retired Decision status changed without regeneration. id=${curCells[0]}, ` +
             `status current="${curCells[2]}" expected="${expCells[2]}".`,
         };
       }
@@ -292,14 +288,13 @@ function buildBlockTargets(root: string): BlockTarget[] {
     "integrity",
     "rule-ownership.md",
   );
-  const adrDir = path.join(root, "docs", "adr");
-  const adrRetiredDir = path.join(adrDir, "retired");
+  const decisionsDir = path.join(root, "docs", "decisions");
+  const decisionRetiredDir = path.join(decisionsDir, "retired");
   const reqDir = path.join(root, "docs", "requirements");
   const reqRetiredDir = path.join(reqDir, "retired");
   const specsDir = path.join(root, "docs", "specs");
-  const adrReadmePath = path.join(adrDir, "README.md");
+  const decisionReadmePath = path.join(decisionsDir, "README.md");
   const reqReadmePath = path.join(reqDir, "README.md");
-  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
   const qualityDir = path.join(specsDir, "quality");
   const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
   const specHealthMetricsPath = path.join(qualityDir, "spec-health-metrics.md");
@@ -325,47 +320,47 @@ function buildBlockTargets(root: string): BlockTarget[] {
     }
   }
 
-  // ADR README（7ブロック）。ADR ファイルが存在しない場合は対象外。
-  if (fs.existsSync(adrDir)) {
-    const adrInfos = collectAdrFiles(adrDir);
-    const adrRetiredInfos = fs.existsSync(adrRetiredDir)
-      ? collectRetiredAdrFiles(adrRetiredDir)
+  // Decision README（7ブロック、decision-* block ID）。DEC-009 移行後の現行契約。
+  // docs/decisions/ 配下に Decision ファイルが存在しない場合は対象外。
+  if (fs.existsSync(decisionsDir)) {
+    const decisionInfos = collectDecisionFiles(decisionsDir);
+    const decisionRetiredInfos = fs.existsSync(decisionRetiredDir)
+      ? collectRetiredDecisionFiles(decisionRetiredDir)
       : [];
-    const acceptedAdrs = adrInfos.filter((a) => a.status === "accepted");
     targets.push({
-      file: adrReadmePath,
-      blockId: ADR_BASELINE_COUNT_BLOCK_ID,
-      expected: generateAdrBaselineCaption(acceptedAdrs),
+      file: decisionReadmePath,
+      blockId: DECISION_BASELINE_COUNT_BLOCK_ID,
+      expected: generateDecisionBaselineCaption(decisionInfos),
     });
     targets.push({
-      file: adrReadmePath,
-      blockId: ADR_BASELINE_TABLE_BLOCK_ID,
-      expected: generateAdrBaselineTable(acceptedAdrs),
+      file: decisionReadmePath,
+      blockId: DECISION_BASELINE_TABLE_BLOCK_ID,
+      expected: generateDecisionBaselineTable(decisionInfos),
     });
     targets.push({
-      file: adrReadmePath,
-      blockId: ADR_STATUS_ACCEPTED_BLOCK_ID,
-      expected: generateAdrStatusList(adrInfos, "accepted"),
+      file: decisionReadmePath,
+      blockId: DECISION_STATUS_ACCEPTED_BLOCK_ID,
+      expected: generateDecisionStatusList(decisionInfos, "accepted"),
     });
     targets.push({
-      file: adrReadmePath,
-      blockId: ADR_STATUS_PROPOSED_BLOCK_ID,
-      expected: generateAdrStatusList(adrInfos, "proposed"),
+      file: decisionReadmePath,
+      blockId: DECISION_STATUS_PROPOSED_BLOCK_ID,
+      expected: generateDecisionStatusList(decisionInfos, "proposed"),
     });
     targets.push({
-      file: adrReadmePath,
-      blockId: ADR_STATUS_SUPERSEDED_BLOCK_ID,
-      expected: generateAdrStatusList(adrInfos, "superseded"),
+      file: decisionReadmePath,
+      blockId: DECISION_STATUS_SUPERSEDED_BLOCK_ID,
+      expected: generateDecisionStatusList(decisionInfos, "superseded"),
     });
     targets.push({
-      file: adrReadmePath,
-      blockId: ADR_STATUS_DEPRECATED_BLOCK_ID,
-      expected: generateAdrStatusList(adrInfos, "deprecated"),
+      file: decisionReadmePath,
+      blockId: DECISION_STATUS_DEPRECATED_BLOCK_ID,
+      expected: generateDecisionStatusList(decisionInfos, "deprecated"),
     });
     targets.push({
-      file: adrReadmePath,
-      blockId: ADR_RETIRED_TABLE_BLOCK_ID,
-      expected: generateAdrRetiredTable(adrRetiredInfos),
+      file: decisionReadmePath,
+      blockId: DECISION_RETIRED_TABLE_BLOCK_ID,
+      expected: generateDecisionRetiredTable(decisionRetiredInfos),
     });
   }
 
@@ -392,22 +387,7 @@ function buildBlockTargets(root: string): BlockTarget[] {
     });
   }
 
-  // DOC-MAP（1ブロック）。
-  targets.push({
-    file: docMapPath,
-    blockId: DOCMAP_INVENTORY_BLOCK_ID,
-    expected: generateDocMapInventory({
-      activeReqCount: fs.existsSync(reqDir) ? collectReqFiles(reqDir).length : 0,
-      retiredReqCount: fs.existsSync(reqRetiredDir)
-        ? collectRetiredReqFiles(reqRetiredDir).length
-        : 0,
-      activeAdrCount: fs.existsSync(adrDir) ? collectAdrFiles(adrDir).length : 0,
-      retiredAdrCount: fs.existsSync(adrRetiredDir)
-        ? collectRetiredAdrFiles(adrRetiredDir).length
-        : 0,
-      specCount: countSpecFiles(specsDir),
-    }),
-  });
+  // DOC-MAP（docmap-inventory）検査は docs/DOC-MAP.md 廃止（DEC-009、REQ-013）に伴い除去。
 
   // REQ / SPEC health-metrics（各1ブロック）。計測日は実行日のローカル日付（generate_indexes.ts と同一）。
   const measureDate = formatMeasureDate(new Date());
@@ -652,7 +632,7 @@ EXIT CODES:
 
 STALENESS CLASSIFICATION:
   rename           Source file add / remove / rename detected (block size differs)
-  status_change    Same source id but status column changed (SPEC / ADR status)
+  status_change    Same source id but status column changed (SPEC / Decision status)
   content_change   Other content drift (line count, title, caption, link, etc.)
 
 RELATED:

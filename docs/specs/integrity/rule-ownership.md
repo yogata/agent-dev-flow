@@ -75,7 +75,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-002 | 現行 REQ 必須 frontmatter fields | REQ-010-001 | integrity-contracts.md |
 | IR-003 | Active/廃止 REQ ID 重複 | REQ-010-082 | integrity-contracts.md |
 | IR-004 | REQ index ↔ 現行 REQ 一致 | REQ-010-003 | integrity-contracts.md |
-| IR-005 | ADR ↔ REQ 相互参照存在 | REQ-010-005 | integrity-contracts.md |
+| IR-005 | Decision ↔ REQ 相互参照存在 | REQ-010-005 | integrity-contracts.md |
 | IR-006 | Command frontmatter 許可フィールド | REQ-002-015, REQ-010-046, 095-099, 108, 124, 129 | integrity-contracts.md, artifact-contracts.md |
 | IR-007 | Skill frontmatter name ↔ dir | REQ-010-092 | integrity-contracts.md |
 | IR-008 | Skill references/ 存在 | REQ-010-110, 115-120, REQ-010-020 | integrity-contracts.md |
@@ -91,7 +91,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-021 | 廃止済み skill 参照検出 | REQ-010-126-128 | integrity-contracts.md |
 | IR-023 | Integrity artifact validator drift | REQ-010-147 | integrity-contracts.md |
 | IR-024 | Command README ↔ 実体 | REQ-001-026, REQ-010-003 | integrity-contracts.md |
-| IR-025 | 廃止 ADR path 規則 | REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
+| IR-025 | 廃止 Decision path 規則 | REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
 | IR-027 | 廃止 ADR 現行根拠引用検出 | REQ-001-048, REQ-001-050 | integrity-contracts.md, document-model.md |
 | IR-028 | Command 最上位 Step 整数化 | REQ-003-005, REQ-003-007, REQ-003-021 | artifact-contracts.md, workflow-contracts.md |
 | IR-029 | Command 英字サブステップ禁止 | REQ-003-006, REQ-003-021 | artifact-contracts.md, workflow-contracts.md |
@@ -102,7 +102,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-034 | Skill 内部 section / protocol / Step 参照検出 | REQ-010-244 | integrity-contracts.md |
 | IR-035 | Skill See Also 検出観点 | REQ-010-245 | integrity-contracts.md |
 | IR-037 | retired-ADR-current-baseline-ref | REQ-010-250, REQ-001-048 | integrity-contracts.md, document-model.md |
-| IR-038 | ADR-index-consistency | REQ-010-251, REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
+| IR-038 | Decision-index-consistency | REQ-010-251, REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
 | IR-039 | index-req-title-consistency | REQ-010-003, REQ-001-063, REQ-001 | integrity-contracts.md |
 | IR-040 | retired-req-authority-comment | REQ-001-063, REQ-010-070 | integrity-contracts.md, document-model.md |
 | IR-041 | retired-req-broken-link | REQ-010-070, REQ-001-063 | integrity-contracts.md |

@@ -8,8 +8,8 @@ import { describe, expect, test } from "bun:test";
 import {
   CATALOG_PRE_BLOCK_ID,
   SPEC_METRICS_BLOCK_ID,
-  ADR_BASELINE_TABLE_BLOCK_ID,
-  ADR_RETIRED_TABLE_BLOCK_ID,
+  DECISION_BASELINE_TABLE_BLOCK_ID,
+  DECISION_RETIRED_TABLE_BLOCK_ID,
   findAutogenBlocks,
 } from "./generate_indexes.ts";
 import {
@@ -132,26 +132,26 @@ describe("classifyStaleness", () => {
     expect(result.kind).toBe("content_change");
   });
 
-  test("ADR baseline 同行 status 列変化は status_change", () => {
+  test("Decision baseline 同行 status 列変化は status_change", () => {
     const result = classifyStaleness(
-      ADR_BASELINE_TABLE_BLOCK_ID,
-      ["| ADR-001 | タイトル | proposed | 2026-01-01 |"],
-      ["| ADR-001 | タイトル | accepted | 2026-01-01 |"],
+      DECISION_BASELINE_TABLE_BLOCK_ID,
+      ["| DEC-001 | タイトル | proposed | 2026-01-01 |"],
+      ["| DEC-001 | タイトル | accepted | 2026-01-01 |"],
       0,
     );
     expect(result.kind).toBe("status_change");
-    expect(result.detail).toContain("ADR status changed");
+    expect(result.detail).toContain("Decision status changed");
   });
 
-  test("ADR retired 同行 status 列変化は status_change", () => {
+  test("Decision retired 同行 status 列変化は status_change", () => {
     const result = classifyStaleness(
-      ADR_RETIRED_TABLE_BLOCK_ID,
-      ["| ADR-001 | x | accepted |"],
-      ["| ADR-001 | x | superseded |"],
+      DECISION_RETIRED_TABLE_BLOCK_ID,
+      ["| DEC-001 | x | accepted |"],
+      ["| DEC-001 | x | superseded |"],
       0,
     );
     expect(result.kind).toBe("status_change");
-    expect(result.detail).toContain("Retired ADR status changed");
+    expect(result.detail).toContain("Retired Decision status changed");
   });
 
   test("行長さ同じ・表以外の変化は content_change", () => {
