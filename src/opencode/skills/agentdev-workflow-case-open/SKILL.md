@@ -111,9 +111,9 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 - `agentdev-adversarial-review`: 経路F review 呼出
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（STEP-{N}/5 で実観測時）
 
-## internal Workflow Extension 読込
+## Workflow Extension 読込
 
-本スキルは internal Workflow Extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。Workflow Skill のみが読み、case-open command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-open/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、case-open command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

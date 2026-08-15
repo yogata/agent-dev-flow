@@ -12,7 +12,7 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 
 ## project extensions
 
-本コマンドは実行時に自分に対応する project extension（`.agentdev/extensions/commands/learning-promote.yaml`）を読み込む（ADR）。
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-learning-promote`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-learning-promote.yaml`、kind: workflow-extension）を読み込む（ADR）。
 
 - extension は `context` / `rules` / `checks` / `acceptance_gates` / `must_not` の5セクションを持ち、本コマンドの標準動作に追加・拡張される（上書きではない）
 - extension が存在しない場合は標準動作で続行する

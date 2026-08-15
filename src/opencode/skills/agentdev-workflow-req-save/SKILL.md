@@ -118,9 +118,9 @@ req-save workflow は次の12 STEP で構成する。各 STEP は resume point �
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - integrity checker skill（AG-{NNN} detector、repo 固有）: check_changed_docs.ts（targeted docs guard）
 
-## internal Workflow Extension 読込
+## Workflow Extension 読込
 
-本スキルは internal Workflow Extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。Workflow Skill のみが読み、req-save command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-save/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、req-save command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

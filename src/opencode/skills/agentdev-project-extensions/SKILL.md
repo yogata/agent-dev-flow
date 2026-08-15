@@ -173,24 +173,24 @@ extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は
 
 ## 公開契約宣言と詳細契約の分離
 
-15の agentdev command は、実行時に対応する project extension を読み込む旨の同一宣言を持つ。
+16の agentdev command は、対応する project extension を Workflow Skill が読み込む旨の同一宣言を持つ。
 この宣言は「公開契約宣言」（command 公開契約の宣言部分）と「詳細契約」（extension の context/rules/checks 等の中身）に分離できる。
 分離の判断基準は artifact-responsibilities SPEC「重複許容基準 適用例集」適用パターン1（project extensions boilerplate）に準拠する。
 
 ### 公開契約宣言
 
-command が対応 extension を読み込む旨を宣言する部分。
+対応 extension を Workflow Skill が読み込む旨を宣言する部分。
 配布 command 本文に直接記載を許容する。
 許容範囲は宣言文（1行）とそれに続く boilerplate 4行（リスト形式）で構成される。
 
-- 宣言文: command が対応 extension を読み込む旨の1行
+- 宣言文: 対応 extension を Workflow Skill が読み込む旨の1行
 - boilerplate 行1: extension の5セクション名（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）と追加・拡張であること（上書きでないこと）の宣言
 - boilerplate 行2: extension が存在しない場合の標準動作継続宣言
 - boilerplate 行3: extension が破損している場合のエラー表示・無視・標準動作継続宣言
 - boilerplate 行4: 詳細な読み込み契約は本 SKILL 参照との宣言
 
 「4行上限」は boilerplate リスト部分の4行を指す（SPEC 適用パターン1「上限: 宣言4行まで」）。
-本範囲は15 command の公開契約（extension 読込宣言）の一部として許容判定された事例に該当する。
+本範囲は16 command の公開契約（extension 読込宣言）の一部として許容判定された事例に該当する。
 
 ### 詳細契約
 
@@ -210,7 +210,7 @@ inspect-skills が複数 command 間で同一文言の重複を検出した場�
 
 | 重複内容 | 公開契約宣言の範囲 | 判定 | 根拠 |
 |---|---|---|---|
-| command が対応 extension を読み込む旨の宣言 | 範囲内 | 許容 | 重複許容基準 適用パターン1 |
+| 対応 extension を Workflow Skill が読み込む旨の宣言 | 範囲内 | 許容 | 重複許容基準 適用パターン1 |
 | 5セクション名の列挙と追加・拡張の宣言 | 範囲内 | 許容 | 重複許容基準 適用パターン1 |
 | 不在時・破損時の標準動作継続宣言 | 範囲内 | 許容 | 重複許容基準 適用パターン1 |
 | 詳細は skill 参照の宣言 | 範囲内 | 許容 | 重複許容基準 適用パターン1 |

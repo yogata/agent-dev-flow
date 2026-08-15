@@ -174,7 +174,7 @@ AgentDevFlow は case-auto と case-run の2階層委譲構造で大規模自走
 
 ### case-auto 構成工程委譲
 
-case-auto は構成工程（req-save、spec-save、case-open、case-close）を各コマンド定義を権威情報源として読み込む委譲起動で実行する。
+case-auto は構成工程（req-save、spec-save、case-open、case-close）を各工程の Workflow Skill を権威情報源とする委譲起動で実行する。
 case-auto 本体は薄いオーケストレータに専念し、入力解決、工程分岐、工程間状態引き継ぎ、停止条件検出、完了報告、OU と子Issue ループ制御、クリーンアップ検証ゲートのみを保持し、工程内部ロジックを実行しない。
 
 case-run は case-auto 内でインライン実行する（構成工程委譲の対象外）。

@@ -113,9 +113,9 @@ req-define workflow は次の11 STEP で構成する。各 STEP は resume point
 - `agentdev-adversarial-review`: 経路A review 呼出
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 
-## internal Workflow Extension 読込
+## Workflow Extension 読込
 
-本スキルは internal Workflow Extension（`.agentdev/extensions/skills/agentdev-workflow-req-define.yaml`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。Workflow Skill のみが読み、req-define command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-define.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-define/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、req-define command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

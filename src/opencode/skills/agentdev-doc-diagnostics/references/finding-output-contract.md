@@ -11,7 +11,6 @@ REQ 固有診断、文意品質診断等の専門診断からルーティング�
 |------------|--------------|------------------|
 | `agentdev-req-structure-diagnostics` | 問題候補出力スキーマ7フィールド（観点、対象、根拠、シグナル数、確信度、推奨アクション、req-define入力案） | 観点→category、対象→target、根拠→evidence、シグナル数→notes、確信度→confidence、推奨アクション→recommended_route、req-define入力案→notes へマッピング。severity、source_of_truth、ng_classification は本スキルが横断的に付与 |
 | `agentdev-doc-writing` | 査読出力形式（`references/review-output.md`） | 本契約の target、evidence、recommended_route へ正規化 |
-| `agentdev-doc-map` | 影響確認フロー結果 | 本契約の target、evidence、recommended_route へ正規化 |
 
 ## finding schema（共通証拠構造）
 

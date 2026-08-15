@@ -1,6 +1,6 @@
 ---
 name: agentdev-doc-diagnostics
-description: docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを提供する診断判断 skill。USE FOR: inspect-docs command の診断カテゴリ定義、docs 横断の診断判定規則、共通証拠構造（finding schema、severity、信頼度）、診断結果（finding）の出力契約、診断に必要な reference または script の選択、文書種別別診断（REQ 固有、文意品質、探索順）へのルーティング。DO NOT USE FOR: 診断対象の修正、promote 判断（inspect-promote 担当）、REQ/SPEC/RU 保存（各保存 command 担当）、commit/push（command 担当）、Issue/PR 操作（case-* 担当）、REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（agentdev-req-structure-diagnostics 担当）、文意品質診断（agentdev-doc-writing 担当）、探索順（agentdev-doc-map 担当）。
+description: docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを提供する診断判断 skill。USE FOR: inspect-docs command の診断カテゴリ定義、docs 横断の診断判定規則、共通証拠構造（finding schema、severity、信頼度）、診断結果（finding）の出力契約、診断に必要な reference または script の選択、文書種別別診断（REQ 固有、文意品質）へのルーティング。DO NOT USE FOR: 診断対象の修正、promote 判断（inspect-promote 担当）、REQ/SPEC/RU 保存（各保存 command 担当）、commit/push（command 担当）、Issue/PR 操作（case-* 担当）、REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（agentdev-req-structure-diagnostics 担当）、文意品質診断（agentdev-doc-writing 担当）。
 ---
 
 # docs 横断診断知識ベース（doc-diagnostics）
