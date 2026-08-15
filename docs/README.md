@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 29件、廃止済み: 0件
+現行 REQ: 35件、廃止済み: 0件
 <!-- AUTOGEN:END -->
 
-現行要件は REQ-001 から REQ-029 の29件である。各 REQ の詳細は各 REQ ファイル本文を参照。
+現行要件は REQ-001 から REQ-035 の35件である。各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
 |---|---|
@@ -42,12 +42,18 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [REQ-027](requirements/REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
 | [REQ-028](requirements/REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
 | [REQ-029](requirements/REQ-029.md) | 配布依存境界 |
+| [REQ-030](requirements/REQ-030.md) | case-open 実行契約（Issue構成生成） |
+| [REQ-031](requirements/REQ-031.md) | case-run 実行契約（実装実行と委譲） |
+| [REQ-032](requirements/REQ-032.md) | case-close 実行契約（完了判定とマージ） |
+| [REQ-033](requirements/REQ-033.md) | case-update 実行契約（Issue・要件更新） |
+| [REQ-034](requirements/REQ-034.md) | case-auto 実行契約（自走オーケストレーション） |
+| [REQ-035](requirements/REQ-035.md) | Epic と Wave 実行モデル |
 
 - [要件インデックス](requirements/README.md)
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-014 の14件である（DEC-008 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
+現行 Decision は DEC-001 から DEC-015 の15件である（DEC-008 と DEC-015 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
 |---|---|
@@ -65,6 +71,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 | [DEC-012](decisions/DEC-012.md) | Extension を file-kind から workflow/capability responsibility へ再編 |
 | [DEC-013](decisions/DEC-013.md) | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 |
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement（proposed） |
+| [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（proposed） |
 
 ## 仕様（SPEC）
 

@@ -9,7 +9,7 @@
 個別 REQ/SPEC は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は12件、提案中の Decision は1件である。
+現行の承認済み Decision は12件、提案中の Decision は2件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -29,6 +29,7 @@
 | DEC-012 | Extension を file-kind から workflow/capability responsibility へ再編 | accepted | 2026-08-10 |
 | DEC-013 | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 | accepted | 2026-08-11 |
 | DEC-014 | 配布依存境界の多層 enforcement | accepted | 2026-08-11 |
+| DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | proposed | 2026-08-15 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -59,6 +60,7 @@
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
 - [DEC-008](DEC-008.md)（case-auto の限定的親判断解決（bounded parent decision resolution））
+- [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -95,6 +97,7 @@
 - [DEC-003](DEC-003.md)（req_draft ソフトコントラクト原則）
 - [DEC-008](DEC-008.md)（case-auto の限定的親判断解決、bounded parent decision resolution）
 - [DEC-011](DEC-011.md)（STEP resume point と会話記憶非依存）
+- [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界、処理単位と状態機械の選択的適用）
 
 ### 整合性・IR 体系
 
@@ -121,6 +124,9 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-014 | relates-to | DEC-001 決定4 | 配布依存境界の多層 enforcement に対する新規統制追加原則の7条件立証 |
 | DEC-014 | relates-to | DEC-006 | DEC-006 の inspect 3-command 正規化と IR-056 の Project Extensions 検査分離を維持しつつ、IR-059 の範囲と経路を変更する後続決定。DEC-006 全体を置換しない |
 | DEC-014 | relates-to | DEC-013 | IR 存在条件モデルに従い、IR-059 の範囲変更を本 Decision で確定 |
+| DEC-015 | relates-to | DEC-001 | 決定2 の harness 委譲リストを参照し再列挙しない。決定1（ADF の中心責務）の精製と決定3（hard governance の限定）の適用として整理 |
+| DEC-015 | relates-to | DEC-010 | Command / Workflow Skill / Capability Skill 責務3層分化を維持したまま決定論的処理を接続 |
+| DEC-015 | relates-to | DEC-011 | STEP（workflow 層の再開単位）と処理単位（orchestration 層の再開単位）の階層関係を明確化 |
 
 ## 関連 REQ
 
@@ -140,6 +146,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-012 | [REQ-002](../requirements/REQ-002.md) | Extension を file-kind から workflow/capability responsibility へ再編（AG-008、REQ-002-030/031 意味変更） |
 | DEC-013 | [REQ-028](../requirements/REQ-028.md), [REQ-010](../requirements/REQ-010.md) | IR 登録モデルの簡素化（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化、REQ-010-053..057 RETIRE、REQ-010-058 UPDATE） |
 | DEC-014 | [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-010](../requirements/REQ-010.md), [REQ-009](../requirements/REQ-009.md) | 配布依存境界の多層 enforcement（REQ-029 新設、REQ-002 縮約、REQ-010-060 最終保証 gate、REQ-009-045 release artifact 境界、IR-059 範囲と source/save/complete/release 経路変更） |
+| DEC-015 | [REQ-002](../requirements/REQ-002.md), [REQ-005](../requirements/REQ-005.md), [REQ-010](../requirements/REQ-010.md), [REQ-011](../requirements/REQ-011.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（REQ-002-035/036、REQ-005-025〜028、REQ-010-061、REQ-011-019、REQ-034-035/036、REQ-035-011 と整合） |
 
 ## 過去版の履歴基盤
 

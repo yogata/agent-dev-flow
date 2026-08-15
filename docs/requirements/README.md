@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下29件を第一参照先とする。
+現在の要件判断では、以下35件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -41,6 +41,12 @@
 | [REQ-027](REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
 | [REQ-028](REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
 | [REQ-029](REQ-029.md) | 配布依存境界 |
+| [REQ-030](REQ-030.md) | case-open 実行契約（Issue構成生成） |
+| [REQ-031](REQ-031.md) | case-run 実行契約（実装実行と委譲） |
+| [REQ-032](REQ-032.md) | case-close 実行契約（完了判定とマージ） |
+| [REQ-033](REQ-033.md) | case-update 実行契約（Issue・要件更新） |
+| [REQ-034](REQ-034.md) | case-auto 実行契約（自走オーケストレーション） |
+| [REQ-035](REQ-035.md) | Epic と Wave 実行モデル |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
