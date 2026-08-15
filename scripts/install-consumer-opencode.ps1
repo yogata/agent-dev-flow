@@ -3,10 +3,13 @@
     Install AgentDevFlow runtime artifacts into a consumer repository.
 
 .DESCRIPTION
-    導入系スクリプト。3つのモードの技術的差は以下の通り:
-    - check   : clone しない軽量確認（検証のみ、ファイル変更なし）
-    - dry-run : clone して予測（ファイル変更なし）
-    - apply   : clone して実行（ファイル変更あり）
+    導入系スクリプト。3つのモードの技術的差は以下の通り（REQ-009-042）:
+    - check   : 検証のみ（ファイル変更なし）
+    - dry-run : 変更予測（ファイル変更なし）
+    - apply   : 実行（ファイル変更あり）
+
+    いずれのモードも provisioning（clone、fetch、reset）と network access を行わず、
+    チェックアウト済みの .agentdev-plugin/ を前提に動作する（REQ-009-046、DEC-016）。
 
     Creates junctions for public runtime artifacts ONLY:
     - .opencode/commands/agentdev/  = junction -> .agentdev-plugin/src/opencode/commands/agentdev/
@@ -36,16 +39,8 @@
 
 .PARAMETER PluginDir
     Directory name for the agent-dev-flow checkout (default: .agentdev-plugin).
-    This directory is created relative to the consumer repo root.
-    上級者向け: clone 先ディレクトリ名を変更する場合のみ指定。通常は既定値を使用する。
-
-.PARAMETER RepoUrl
-    Git remote URL for agent-dev-flow (default: https://github.com/yogata/agent-dev-flow.git)
-    上級者向け: clone 元リポジトリ URL を変更する場合（フォーク等）のみ指定。通常は既定値を使用する。
-
-.PARAMETER Branch
-    Branch to checkout from agent-dev-flow (default: main)
-    上級者向け: clone 元ブランチを変更する場合のみ指定。通常は既定値を使用する。
+    Expected location of the checkout, relative to the consumer repo root.
+    上級者向け: チェックアウト配置先を変更する場合のみ指定。通常は既定値を使用する（REQ-009-043）。
 
 .EXAMPLE
     ./scripts/install-consumer-opencode.ps1
@@ -67,11 +62,7 @@ param(
 
     [switch]$LocalMode,
 
-    [string]$PluginDir = '.agentdev-plugin',
-
-    [string]$RepoUrl = 'https://github.com/yogata/agent-dev-flow.git',
-
-    [string]$Branch = 'main'
+    [string]$PluginDir = '.agentdev-plugin'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -101,9 +92,9 @@ function Assert-ValidConsumerCwd {
     #>
     $cwd = $PWD.Path
 
-    # 1. .agentdev-plugin/ 配下（clone 先）
+    # 1. .agentdev-plugin/ 配下（チェックアウト配置先、REQ-009-041）
     if ($cwd -match '[\\/]\.agentdev-plugin([\\/]|$)') {
-        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow の clone 先です。1つ上のフォルダへ移動してください。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow のチェックアウト配置先です。1つ上のフォルダへ移動してください。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
         exit 1
     }
 
@@ -134,10 +125,10 @@ function Invoke-InstallWizard {
     Write-Host '=== AgentDevFlow 導入ウィザード ==='
     Write-Host ''
     Write-Host 'Q1. 目的を選んでください（番号を入力）:'
-    Write-Host '  1) 新規インストール（apply: clone して実行）'
-    Write-Host '  2) 更新・再同期（apply: clone して実行）'
-    Write-Host '  3) 状態確認（check: clone しない軽量確認、ファイル変更なし）'
-    Write-Host '  4) 変更予測（dry-run: clone するがファイル変更なし）'
+    Write-Host '  1) 新規インストール（apply: 実行、ファイル変更あり）'
+    Write-Host '  2) 更新・再同期（apply: 実行、ファイル変更あり）'
+    Write-Host '  3) 状態確認（check: 検証のみ、ファイル変更なし）'
+    Write-Host '  4) 変更予測（dry-run: 変更予測のみ、ファイル変更なし）'
     $modeChoice = Read-Host '番号'
     switch ($modeChoice) {
         '1' { $script:Mode = 'apply' }
@@ -233,20 +224,23 @@ function Show-PluginCheckoutGuidance {
         チェックアウト未検出時の案内。provisioning（clone、fetch、reset）も network access も
         代行実行しない（AG-001/REQ-009-046、DEC-016）。チェックアウトの取得は利用者の責務。
     #>
-    $repoWebUrl = $RepoUrl -replace '\.git$', ''
+    $repoUrl = 'https://github.com/yogata/agent-dev-flow.git'
+    $repoWebUrl = $repoUrl -replace '\.git$', ''
     Write-Host "[ERROR] 利用可能なチェックアウトが見つかりません。usable checkout 判定（$PluginDir/src/opencode/ の存在）に失敗しました。"
     Write-Host ''
     Write-Host 'このスクリプトは provisioning（clone、fetch、reset）と network access を行いません（REQ-009-046、DEC-016）。'
     Write-Host '以下のいずれかで agent-dev-flow のチェックアウトを用意してから再実行してください。'
     Write-Host ''
     Write-Host '方法1: git clone でチェックアウトを用意する'
-    Write-Host "  git clone --branch $Branch $RepoUrl $PluginDir"
+    Write-Host "  git clone $repoUrl $PluginDir"
     Write-Host ''
     Write-Host '方法2: ソース ZIP を取得して展開する'
     Write-Host "  1. $repoWebUrl を開く"
     Write-Host '  2. [Code] ボタン → [Download ZIP] でソース ZIP をダウンロード'
     Write-Host "  3. ZIP を展開し、中身（src/、scripts/ 等）を $PluginDir/ 直下に配置"
-    Write-Host "     （$PluginDir/src/opencode/ が存在すればよく、.git のない ZIP 展開チェックアウトも正規の配置形態）"
+    Write-Host "     注意: ZIP 展開直後の agent-dev-flow-<ref>/ の一段ネストを避け、$PluginDir/src/opencode/ となる配置にすること"
+    Write-Host "     （.git のない ZIP 展開チェックアウトも正規の配置形態）"
+    Write-Host "  4. scripts/ は $PluginDir/ と同一チェックアウトからコピーすること（スクリプトとチェックアウトの版不一致の防止）"
     Write-Host ''
     Write-Host "期待される状態: $SourceDir が存在すること"
     exit 1
