@@ -44,7 +44,7 @@ description: 既存Caseの本文更新、コメント追加、またはREQファ
 
 ### Step 4: 完了報告
 
-更新種別に応じた種別を選択: `--body` → `templates/case-update/body.md`、`--comment` → `templates/case-update/comment.md`、`--req` → `templates/case-update/req.md`、`--review-ng` → `templates/case-update/review-ng.md`
+更新種別に応じた種別を選択: `--body` → `.opencode/commands/agentdev/templates/case-update/body.md`、`--comment` → `.opencode/commands/agentdev/templates/case-update/comment.md`、`--req` → `.opencode/commands/agentdev/templates/case-update/req.md`、`--review-ng` → `.opencode/commands/agentdev/templates/case-update/review-ng.md`
 
 各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-case-update` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
 

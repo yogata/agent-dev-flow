@@ -27,10 +27,11 @@ REQ-{req_number}
 ## 分解
 <!-- 【必須】 -->
 
+<!-- 分解テーブル正規形（agentdev-epic-tracker 新4列形式と整合）: 「#」列は {wave}-{seq} 形式（例: 1-1）、Issue 列は #N のみ（OU ID 等の付記は内容列へ）、ステータス初期値は pending -->
 | # | Issue | ステータス | 内容 |
 |---|-------|-----------|------|
-| {seq} | #{child_issue} | pending | {child_1_title} |
-| {seq} | #{child_issue} | pending | {child_2_title} |
+| {wave}-{seq} | #{child_issue} | pending | {child_1_title} |
+| {wave}-{seq} | #{child_issue} | pending | {child_2_title} |
 
 ## 実行順序
 <!-- 【必須】 -->
@@ -38,6 +39,7 @@ REQ-{req_number}
 ケースオープン時に Wave テーブルが自動生成される。
 手動での編集は可能だが、列構造を維持すること。
 
+<!-- Wave テーブル正規形: Issue 列は #N のみ（OU ID 等の付記は前提列または分解テーブルの内容列へ） -->
 | Wave | Issue | 実行方法 | 前提 |
 |------|-------|----------|------|
 | 1 | #{child1_N} | 並列 | - |

@@ -149,6 +149,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 - [IR-059: distribution-reference-boundary](rules/IR-059-distribution-reference-boundary.md)
 - [IR-060: forbidden Japanese word detection](rules/IR-060-forbidden-japanese-word-detection.md)
 - [IR-061: 索引類自動生成整合性](rules/IR-061-index-generation-consistency.md)
+- [IR-062: skill/command パス参照実在](rules/IR-062-reference-path-existence.md)
 <!-- AUTOGEN:END -->
 
 ### 新規 IR 候補（candidate state、新規 IR 登録 gate 前）

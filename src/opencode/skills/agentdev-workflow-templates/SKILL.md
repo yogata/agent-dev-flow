@@ -43,6 +43,14 @@ agentdev系コマンドで使用するIssue/PR本文、コメントテンプレ�
 | `issue_comment_feature_implementation.md` | 実装記録 | case-close | PRマージ後コメント (機能追加) |
 | `issue_comment_bug_record.md` | 対応記録 | case-close | PRマージ後コメント (バグ修正、軽微変更/リファクタリング、保守作業/ドキュメント、雑務) |
 
+### case-open 完了報告テンプレート
+
+| テンプレート | 用途 | 対象コマンド | flow |
+|---|---|---|---|
+| `templates/case-open/standard.md` | Standard flow 完了報告 | case-open | Standard flow |
+| `templates/case-open/epic.md` | 単一REQ Epic flow 完了報告 | case-open | Epic flow（単一REQ） |
+| `templates/case-open/multi-req-epic.md` | マルチREQ Epic flow 完了報告 | case-open | Epic flow（マルチREQ） |
+
 ### PR本文テンプレート
 
 | テンプレート | 用途 | 対象コマンド |
@@ -116,6 +124,14 @@ feature、bug、child テンプレートでは「テスト戦略」セクショ�
 |------|---------------------|
 | feature | `issue_comment_feature_implementation.md` |
 | その他（non-feature (bugfix/maintenance/docs_chore)） | `issue_comment_bug_record.md` |
+
+### 完了報告時のテンプレート選定（case-open）
+
+| 条件 | 完了報告テンプレート |
+|------|---------------------|
+| Standard flow | `templates/case-open/standard.md` |
+| Epic flow（単一REQ） | `templates/case-open/epic.md` |
+| Epic flow（マルチREQ） | `templates/case-open/multi-req-epic.md` |
 
 ### Issue作成時のテンプレート選定（case-close）
 

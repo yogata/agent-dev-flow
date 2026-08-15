@@ -5,6 +5,7 @@
 ## 目次
 
 - [正規表現パターン](#正規表現パターン)
+- [case-open テンプレート群との正規形一元化](#case-open-テンプレート群との正規形一元化)
 - [新4列形式: pending → completed](#新4列形式-pending--completed)
 - [新4列形式: pending → blocked/ failed](#新4列形式-pending--blocked-failed)
 - [旧4列形式: pending → completed](#旧4列形式-pending--completed)
@@ -40,6 +41,29 @@ Epic Issue 本文（永続状態）に書き込まれるステータス値は `p
 | 2 | #43 | 子Issueの概要 | completed ([PR#99](https://github.com/...)) |
 | 3 | #44 | 子Issueの概要 | blocked |
 | 4 | #45 | 子Issueの概要 | failed |
+```
+
+## case-open テンプレート群との正規形一元化
+
+`agentdev-workflow-templates` の case-open テンプレート群（`issue_desc_epic.md`、`issue_desc_child.md`）と本スキルの形式は次の正規形へ一元化する。
+
+| 対象 | 正規形（テンプレートが生成） | 後方互換（移行措置として許容） |
+|---|---|---|
+| Parent 配置 | 子Issue 本文の先頭行に `Parent: #N` | 「## 親Issue」セクション内配置（先行実績 #2092 形式等）。親Epic検出は本文全体の `Parent: #N` パターンで機能するため影響なし |
+| 分解テーブル | 新4列形式（`#` 列 = `{wave}-{seq}`、Issue 列 = `#N` のみ、ステータス初期値 `pending`） | `#` 列の連番形式、Issue 列への OU ID 等の付記（例: `#2135（OU001）`） |
+| Wave テーブル | `| Wave | Issue | 実行方法 | 前提 |`、Issue 列 = `#N` のみ | Issue 列への OU ID 等の付記 |
+
+後方互換形式の行特定には、連番・`{wave}-{seq}` の両 `#` 列と Issue 列の付記を許容する緩和パターンを使用する:
+
+```
+検索: (\| \d+(?:-\d+)? \| #{child_issue}(?: [^|]*)? \| )pending (\|)
+置換: $1completed ([PR#{pr_number}]({pr_url})) $2
+```
+
+`pending` → `blocked`/ `failed` は同じ検索パターンで `{terminal_status}` に置換する。べき等性確認も同様の緩和パターンで `completed` を前方一致させる:
+
+```
+検索: \| \d+(?:-\d+)? \| #{child_issue}(?: [^|]*)? \| completed
 ```
 
 ## 新4列形式: pending → completed
