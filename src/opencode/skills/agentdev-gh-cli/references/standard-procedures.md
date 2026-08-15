@@ -11,11 +11,13 @@
 - 書き込み後の VERIFY 操作（[verify.md](verify.md)）を全環境で実行する
 - 保存形式は **UTF‑8 (BOMなし)**、改行コード **LF** とする
 - **Windows 環境での WRITE 手続きはコンソールエンコーディング初期化（Section 2 Step 0）を必須前置する（REQ）**: 全 WRITE 手続き（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成、PR merge、Issue close 等）は Section 2 の標準手順に従い、Step 0 を経由してコンソールエンコーディング初期化の恩恵を受ける。Linux/ macOS/ WSL 等の Windows 以外の環境では既定で UTF‑8 コンソールのため実行不要
+- **Windows 環境での git CLI 直接 WRITE にも同一の初期化を必須前置する（REQ）**: `git commit -F`、`git tag -F` 等のファイル引数に日本語を含む git CLI 直接操作の WRITE は、gh CLI と同一のコンソールコードページ依存を持つ。Section 2 Step 0 と同一の3行による初期化を WRITE 実行前に必須前置する。詳細は後述「commit メッセージ作成（BOM なし UTF‑8 契約）」節参照
 - **Windows 環境での引数渡し制約（cp932 化け対策、RU-{NNNN} AG-{NNN}）**: Windows 環境では gh CLI への引数渡し経路が cp932 化けを生むため、以下を遵守する
  - **`--title "..."` の inline 使用禁止**: `gh issue create --title "日本語"`、`gh pr create --title "日本語"` 等、日本語を含む `--title` 引数の inline 渡しを禁止する。Section 2 Step 0 のコンソールエンコーディング初期化を実行しても `--title` 引数の decode 経路が独立して cp932 影響を受けるため、Step 0 は `--title` 化けの完全な対策にならない
  - **inline `--input` 使用禁止**: `gh api --input -`（stdin 経由）等の inline 入力を禁止する
  - **推奨**: 本文は `--body-file`/ `-F`、API 操作は `gh api --input @file.json`（UTF‑8 JSON ファイル）を使用する
  - **title 修正**: 日本語 title を設定または修正する場合は `gh api -X PATCH` 経由（後述「title 修正 REST API PATCH 標準手続き」）を標準とする。ASCII 限定 title のみ inline `--title` を許容する
+ - **`--title` と `--body-file` の同時渡し回避（日本語 title を伴う作成）**: `gh pr create` / `gh issue create` で日本語 title を `--title` inline で渡しつつ `--body-file` を同一コマンドに同時渡しする単段実行を行わない。日本語 title を伴う作成は、ASCII 仮 title + `--body-file` による作成後に REST API PATCH で日本語 title を設定する2段階シーケンス、または `gh api --input` による統一（title と body を1つの UTF‑8 JSON ファイルで投入）のいずれかを標準とする（後述「title 設定を伴う新規 Issue / PR 作成時のシーケンス」参照）
 
 ## Windows 固有の制約
 
@@ -32,6 +34,15 @@
 ### execSync バイパス
 
 - `gh` コマンドの出力取得には Node.js `child_process.execSync` を使用する（pwsh パイプラインをバイパスして gh CLI の生の UTF‑8 出力を直接取得するため）
+
+### PowerShell パイプライン READ の [Console]::OutputEncoding 前置（REQ）
+
+PowerShell パイプライン経由で日本語出力を読み取る READ 操作（`git show`、`Get-Content`、`Select-String` 等。gh CLI に限らず git CLI 等のネイティブコマンド出力を含む）は、次のいずれかの経路で取得する。
+
+- **パイプライン経路を避けられない場合**: パイプライン実行前に `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` を前置する。前置なしのパイプライン READ は日本語出力の文字化けを生む
+- **Node.js 経路**: Node.js `execSync` / `fs.readFileSync` で取得する（READ 手続き Section 3 の標準経路）。コンソールエンコーディングに依存しないため前置を要しない
+
+gh CLI の READ は既存どおり READ 手続き（Section 3、Section 4）の Node.js `execSync` 経路を標準とする。本節はパイプライン経由の READ 操作全般（`git show` 等）への拡張である。
 
 ### PowerShell 変数補間（regex backreference `$N`）
 
@@ -95,6 +106,7 @@ backreference `$N` 対策は「`-replace` 演算子右辺の `$N` を PowerShell
  [System.IO.File]::WriteAllText(".agentdev/tmp/gh-temp-{timestamp}.md", $content, (New-Object System.Text.UTF8Encoding($false)))
  ```
  **`.agentdev/tmp/` 配置の理由（RU-{NNNN} AG-{NNN}）**: `$env:TEMP/agentdev/`（システム一時ディレクトリ）から `.agentdev/tmp/`（workspace-local）へ変更する。workspace 配下へ配置することで worktree 削除時に一時ファイルが確実に破棄され、かつ VERIFY や事後調査が同一 workspace 内で完結する。
+ **委譲時の代替一時ファイル配置先（REQ）**: 実行担当サブエージェント委譲など、worktree 隔離境界により `.agentdev/**` への書き込みが禁止される場面では、一時ファイル配置先をリポジトリ外の一時領域（`$env:TEMP` 配下）に変更する。代替配置時も create（本 Step） → gh 実行（Step 3） → VERIFY → cleanup（Step 4）の1手順ユニットと cleanup 省略不可ステップを維持する。委譲プロンプト側の MUST NOT（`.agentdev/**` 全域を触らない）は本ルールで変更しない
  **OpenCode の Write tool は新規ファイル作成時に限定して使用可能**（BOMなしUTF‑8で書き出す）。
 既存 UTF‑8（BOM なし）ファイル編集時は edit ツール（per-line string replace）を優先すること。
 Windows 環境で Write tool が既存 UTF‑8 ファイルを cp932 で書き出す事象が実証されているため、Write tool の全面上書きは新規作成時のみ許可する。
@@ -113,7 +125,7 @@ PowerShell の `Out-File`, `Set-Content`, `>` 等は使用禁止（Section 1 参
  | `gh pr create` | `--body` | `--body-file` | `-F` |
 
 4. **WRITE ユニットの完了と cleanup（RU-{NNNN} AG-{NNN}、省略不可）**: WRITE 手続きは create（Step 1） → gh 実行（Step 3） → VERIFY（[verify.md](verify.md)） → cleanup を1ユニットとし、cleanup を省略不可ステップとする。VERIFY が PASS した後にのみ cleanup を実行する。VERIFY が FAIL の場合は cleanup を実行せず、一時ファイルを残して [retry.md](retry.md) のリトライロジックへ移行する（一時ファイルはリトライ時の比較、原因調査の情報源となる）。これにより「VERIFY を忘れて cleanup し、問題を事後検出できなくなる」事態を構造的に防止する。
- - **cleanup 対象**: `.agentdev/tmp/` 配下の当該 WRITE ユニットで生成した一時ファイル
+ - **cleanup 対象**: 当該 WRITE ユニットで生成した一時ファイル（`.agentdev/tmp/` 配下、および委譲時の代替配置先 `$env:TEMP` 配下。Step 1「委譲時の代替一時ファイル配置先」参照）
  - **VERIFY FAIL 時の一時ファイル保管期間**: リトライまたは停止手続きの完了後、[retry.md](retry.md) に従い cleanup する
 
 ## READ 手続き（読み取り安全性）
@@ -165,6 +177,8 @@ PowerShellがバッククォートをコマンド置換として解釈するた�
 
  **注**: 退避策（Section 3 項目7）による `.js` スクリプトファイル内では、テンプレートリテラルの使用は許可される。
 
+ **パイプライン経由 READ の前置（REQ）**: PowerShell パイプライン経由で日本語出力を読み取る READ 操作（`git show`、`Get-Content`、`Select-String` 等）は、パイプライン前の `[Console]::OutputEncoding` 前置、または Node.js `execSync` / `fs.readFileSync` 経路のいずれかを必須とする（「Windows 固有の制約」の「PowerShell パイプライン READ の [Console]::OutputEncoding 前置」節参照）。
+
 ### 4. 読み取り禁止事項
 
 - `gh` コマンドの出力をPowerShell変数に直接格納することを禁止（`$var = gh ...`）。
@@ -182,6 +196,7 @@ gh issue create --title "{title}" --body-file {temp_body_file} [--label "{label1
 ```
 
 標準出力から Issue URL を取得し、Issue 番号を抽出する。
+日本語 title を伴う作成は「title 設定を伴う新規 Issue / PR 作成時のシーケンス」（title 修正 REST API PATCH 標準手続き）に従い、`--title` と `--body-file` の同時渡し回避シーケンスで実行する（共通制約参照）。
 VERIFY を直後に実行。
 
 ### Issue 本文読込
@@ -219,6 +234,7 @@ gh pr create --title "{title}" --body-file {temp_body_file} --base {base_branch}
 
 WRITE 手続き（Section 2）に従い、`--body-file` で本文を指定。
 標準出力から PR URL を取得し、PR 番号を抽出する。
+日本語 title を伴う作成は「title 設定を伴う新規 Issue / PR 作成時のシーケンス」（title 修正 REST API PATCH 標準手続き）に従い、`--title` と `--body-file` の同時渡し回避シーケンスで実行する（共通制約参照）。
 VERIFY を直後に実行。
 PR 作成前に Merge Conflict 事前確認（後述「Merge Conflict 対応パターン」）を実施することを推奨。
 
@@ -343,7 +359,7 @@ intake-from-github 等の検索系操作で使用する。
  {"title": "日本語タイトル文字列"}
  ```
 
- ファイル配置は `.agentdev/tmp/`（workspace-local）へ統一（RU-{NNNN} AG-{NNN}）。
+ ファイル配置は `.agentdev/tmp/`（workspace-local）へ統一（RU-{NNNN} AG-{NNN}）。委譲時の代替配置先は Section 2 Step 1「委譲時の代替一時ファイル配置先」に従う。
 
 2. **コンソールエンコーディング初期化（Windows 環境のみ）**: Section 2 Step 0 の3行を実行する。`gh api --input` 経由であっても Windows 環境では必須（gh CLI がコンソールコードページを参照するため）。
 
@@ -371,15 +387,18 @@ intake-from-github 等の検索系操作で使用する。
 
 新規作成と PATCH を分離することで、Windows 環境の `--title` cp932 化けを構造的に回避する。
 
+**`--title` と `--body-file` の同時渡し回避（REQ）**: 日本語 title を `--title` inline で渡しつつ `--body-file` を同一コマンドに同時渡しする単段実行は行わない。日本語 title を伴う作成は、上記2段階シーケンス、または `gh api --input` による統一（title と body を1つの UTF‑8 JSON ファイルに格納し、Issue 作成は `gh api -X POST /repos/{owner}/{repo}/issues --input`、PR 作成は `gh api -X POST /repos/{owner}/{repo}/pulls --input` で投入）のいずれかを標準とする。既存の `--title` inline 禁止・REST API PATCH 標準の規則（共通制約参照）は存置し、本節は作成時の同時渡し回避へ適用範囲を拡張する。
+
 ## commit メッセージ作成（BOM なし UTF‑8 契約）
 
-git commit メッセージ作成時にも WRITE 標準手順（Section 2）と同等の BOM なし UTF‑8 encoding 制御を適用する。SPEC `agentdev-gh-cli`.md「commit メッセージ作成の BOM なし UTF‑8 契約」節の標準実装を本節に置く。gh CLI を経由しない git 操作でありながら、commit メッセージファイルの書き出しは WRITE 手続きと同じ cp932 化けリスクを持つため、Section 2 の文件書き出し規定を拡張適用する。
+git commit メッセージ作成時にも WRITE 標準手順（Section 2）と同等の BOM なし UTF‑8 encoding 制御を適用する。SPEC `agentdev-gh-cli`.md「commit メッセージ作成の BOM なし UTF‑8 契約」節の標準実装を本節に置く。gh CLI を経由しない git 操作でありながら、commit メッセージファイルの書き出しは WRITE 手続きと同じ cp932 化けリスクを持つため、Section 2 のファイル書き出し規定を拡張適用する。
 
 ### 適用条件
 
 - Windows 環境で commit メッセージを作成する場合（既定の Shift-JIS コンソール、`chcp 932`）
 - コンソールエンコーディング初期化（Section 2 Step 0）を実施せずに `git commit -m "..."` で日本語を含むメッセージを渡すと、PowerShell → git の引数渡し経路で cp932 化けが発生する
 - Linux/ macOS/ WSL 等の Windows 以外の環境では既定で UTF‑8 コンソールのため、本節のファイル経由手順は必須ではない（`-m` inline 渡しも許容）。ただし emoji や特殊文字を含む場合はファイル経由を推奨する
+- `git commit -F` 以外の git CLI 直接 WRITE（`git tag -F` 等、ファイル引数に日本語を含む操作）にも本節の手順（Step 0 前置、BOM なし UTF‑8 ファイル渡し、VERIFY、cleanup）を準用する（REQ、共通制約参照）
 
 ### 問題事象
 
