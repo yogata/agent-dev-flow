@@ -404,3 +404,35 @@
 - **想定反映先**: `.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`（docs/decisions + decision-* block ID 追随）、`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`（checks セクションの指定ツール・失敗時扱いの明確化。要 learning-promote / backlog-review 判断）
 - **関連**: Epic 2119 Wave 2, Issue 2121（OU-002）, PR 2125, a0143600（adr-to-decision rename #2042）, 87f00c48（DOC-MAP 削除 #1958）, docs/specs/integrity/index-auto-generation.md
 - **タグ**: `#autogen` `#generate-indexes` `#adr-to-decision` `#extension-check` `#tool-broken` `#pre-existing-staleness` `#intermediate-wave`
+
+## RU-0004 が git 未コミットのまま Form Zero で削除され evidence 保存前提が欠落（審議実体は投影記録で検証）
+
+- **問題事象**: RU-0004（`.agentdev/backlog/req-units/RU-0004.md`）が git に一度もコミットされないまま case-open の Form Zero クリーンアップで削除された。削除 commit 8249916c のメッセージは「RU-0001〜0004 を削除」と記載するが、実 diff は RU-0001〜0003 の3ファイルのみ。RU-0004 の受け入れ条件原本（1〜12）が git 履歴から復元不能になり、Epic 2119 完了条件（RD evidence の checked_at_commit 時点実在）の evidence 保存前提に欠陥が生じた
+- **発生局面**: 完了処理（Epic 2119 Wave 3 クローズ、RD-004 evidence 実在評価）
+- **検知方法**: PR #2127 検証時（Issue 2122 / OU-003）。commit 8249916c のメッセージと実 diff の不一致、および checked_at_commit 9d279917 時点の git tree に RU-0004.md が存在しないことの確認
+- **根本原因**: backlog-review が session 由来 RU を生成した時点で git commit せず、Form Zero クリーンアップが untracked ファイルも削除対象とした。削除コミットメッセージと実 diff の乖離を検知する仕組みがない
+- **自律対応内容**: RD-004 の審議実体（disposition: covered / reason_code: fully_applied）は Issue 完了条件への投影と Epic RD-004 記録を根拠に PR #2127 で検証した。Epic 2119 完了条件 Box4 は審議実体に基づき達成と評価し、記録プロセス欠陥を Epic 本文へ事実注記した（条件文言は不変更）。再発防止候補を本 entry として回収
+- **ユーザー確認有無**: なし（case-auto の bounded parent decision resolution による作業仮定つき親判断）
+- **ADR/REQ/spec影響**: なし（Epic 完了条件の評価記録は Epic Issue 本文へ注記済み。RU 生成・Form Zero 手順の変更は learning-promote / backlog-review で評価）
+- **横展開観点**: session 由来 RU を扱う全 backlog-review / case-open（Form Zero）。evidence の git 実在を完了条件とする Epic の起票時
+- **再発条件**: backlog-review が RU を git commit せず、case-open が Form Zero で untracked RU を削除した場合
+- **予防策候補**: backlog-review が session 由来 RU を生成した時点でのコミット、または Form Zero 実行時の untracked RU 有無確認
+- **想定反映先**: backlog-review の RU 生成手順、case-open の Form Zero 手順（いずれも要 learning-promote / backlog-review 判断）
+- **関連**: PR #2127 Findings learning セクション, Issue 2122（OU-003）, Epic 2119（RD-004、Box4 評価注記）, commit 8249916c, RU-0004
+- **タグ**: `#form-zero` `#req-unit` `#untracked-file` `#evidence-preservation` `#git-commit` `#epic-2119`
+
+## check_changed_docs.ts は Node v26 で node/tsx 直接起動が失敗（bun run で起動する）
+
+- **問題事象**: check_changed_docs.ts（targeted docs guard）を Node v26 環境で `node`（native type stripping）または `npx tsx` で直接起動すると、スクリプトが import と require を混在させているため `ReferenceError: require is not defined in ES module scope` で失敗する。`bun run` では成功する
+- **発生局面**: 実装・完了処理（case-run / case-close の targeted docs guard 実行）
+- **検知方法**: PR #2126 検証時（Issue 2123 / OU-004）の起動試行比較。PR #2125（Wave 2）でも同一事象を観測
+- **根本原因**: スクリプトの import/require 混在構成と Node v26 の ESM 判定。agentdev-gh-cli 標準手続きや SKILL.md に起動コマンドの明示がなく、起動手段の試行錯誤が毎回発生し得る
+- **自律対応内容**: bun run での起動により検証を完遂した（PR #2125、PR #2126 で実績、failures 0 を確認）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（起動コマンドの文書化・スクリプト構成の是正は学びの評価対象）
+- **横展開観点**: repo-agentdev-integrity 配下スクリプトを起動する全 workflow（case-run、case-close 等）
+- **再発条件**: Node v26 環境で bun 以外の起動手段（node 直接、npx tsx）を使う場合
+- **予防策候補**: 起動コマンド（bun run）の SKILL.md・標準手続きへの明示、またはスクリプトの import/require 混在解消
+- **想定反映先**: src/opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts（混在解消候補）、起動手順を明示する各手順書（要 learning-promote / backlog-review 判断）
+- **関連**: PR #2126 Findings learning セクション, Issue 2123（OU-004）, Epic 2119 Wave 3, PR 2125（Wave 2 実績）
+- **タグ**: `#targeted-docs-guard` `#check-changed-docs` `#node-v26` `#bun` `#launcher` `#operational-knowledge`
