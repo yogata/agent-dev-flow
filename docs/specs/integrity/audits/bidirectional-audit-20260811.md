@@ -1509,8 +1509,8 @@ IR-045 は catalog-only tombstone（ファイル不存在、catalog 上のみ存
 
 - 根拠 Issue: #2078（OU-002 Phase 1）
 - 親 Epic: #2076（REQ-028 IR portfolio audit）
-- 根拠要件: [REQ-028](../../requirements/REQ-028.md)
-- 根拠 Decision: [DEC-013](../../decisions/DEC-013.md)
+- 根拠要件: [REQ-028](../../../requirements/REQ-028.md)
+- 根拠 Decision: [DEC-013](../../../decisions/DEC-013.md)
 - 比較基準（Phase 0 baseline）: [pre-audit-baseline-20260811.md](../baselines/pre-audit-baseline-20260811.md)
 - 整合性契約: [integrity-contracts.md](../integrity-contracts.md)
 - ルールカタログ: [integrity-rule-catalog.md](../integrity-rule-catalog.md)

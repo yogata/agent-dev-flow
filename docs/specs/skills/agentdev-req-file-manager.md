@@ -72,7 +72,6 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 
 - [agentdev-req-analysis.md](agentdev-req-analysis.md)
 - [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)
-- [agentdev-doc-map.md](agentdev-doc-map.md)
 - [commands/req-save.md](../commands/req-save.md)
 - REQ-001（文書、REQ 管理基準）
 - REQ-004（要件定義、保存）

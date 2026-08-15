@@ -36,7 +36,7 @@ IR-045（docs 日本語表現、文意整合検査）は REQ-010-255/256/262 に
 
 IR-050（load_skills 誤指定検出）、IR-051（実行主体 skill 表記誤認検出）は語彙レジストリの存在確認、必要語彙の補充後に適用する（REQ-010-006/007）。IR-051 の「一定文字距離内」は語彙レジストリで確定された具体閾値（同一行内、隣接リスト項目、段落下）を使用する。閾値未確定時は heuristic として報告するが auto-promote 対象外とする。
 
-詳細な距離閾値契約は配布物側 `src/opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`「IR-051 距離閾値（REQ-0145-007）」節が正である。
+詳細な距離閾値契約は repo-local 参照ファイル `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`「IR-051 距離閾値（v2:REQ-0145-007）」節が正である。
 
 ## IR-044 候補語対照表連携
 

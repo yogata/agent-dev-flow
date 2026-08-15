@@ -27,7 +27,7 @@ REQ-028「IR 体系の実効性監査と存在条件厳格化」の Phase 6（�
 |---|---|
 | 対象要件 | REQ-028（REQ-028-001..013） |
 | 対象 AG | AG-001..AG-012（全項目） |
-| 比較基準 | OU-001 Phase 0 baseline（[pre-audit-baseline-20260811.md](pre-audit-baseline-20260811.md)） |
+| 比較基準 | OU-001 Phase 0 baseline（[pre-audit-baseline-20260811.md](../baselines/pre-audit-baseline-20260811.md)） |
 | Phase 1 双方向監査 | [bidirectional-audit-20260811.md](bidirectional-audit-20260811.md) |
 | Phase 2 判定確定 | [classification-20260811.md](classification-20260811.md) |
 | Phase 3 横断統合設計 | [cross-cutting-integration-design-20260811.md](cross-cutting-integration-design-20260811.md) |
@@ -161,7 +161,7 @@ warn 理由: SKILL.md category 表への新規7 IR の反映は、本 Phase 6 PR
 
 ### 2.21 AC-21 / TS-021: 意図的削除以外の coverage 低下ない
 
-検証: OU-001 Phase 0 baseline（[pre-audit-baseline-20260811.md](pre-audit-baseline-20260811.md)）と比較。Phase 5 での IR-019/022/026/036/011 物理削除は DEC-013 AG-008 履歴担保原則で承認済みの意図的削除。Phase 3 §5.1 detector 統合は観点集約のみで coverage 低下なし。Phase 6 での7 IR detector 集約も coverage 向上（既存 checker への観点追加）。意図的削除以外の coverage 低下は 0 件。
+検証: OU-001 Phase 0 baseline（[pre-audit-baseline-20260811.md](../baselines/pre-audit-baseline-20260811.md)）と比較。Phase 5 での IR-019/022/026/036/011 物理削除は DEC-013 AG-008 履歴担保原則で承認済みの意図的削除。Phase 3 §5.1 detector 統合は観点集約のみで coverage 低下なし。Phase 6 での7 IR detector 集約も coverage 向上（既存 checker への観点追加）。意図的削除以外の coverage 低下は 0 件。
 
 ### 2.22 AC-22 / TS-022: 本変更起因の未解消 regression ない
 
@@ -292,8 +292,8 @@ DEC-013（status: accepted）の AG-008/009 系決定（tombstone 廃止、lifec
 - [bidirectional-audit-20260811.md](bidirectional-audit-20260811.md)（Phase 1 / OU-002）
 - [classification-20260811.md](classification-20260811.md)（Phase 2 / OU-003）
 - [cross-cutting-integration-design-20260811.md](cross-cutting-integration-design-20260811.md)（Phase 3 / OU-004）
-- [pre-audit-baseline-20260811.md](pre-audit-baseline-20260811.md)（Phase 0 / OU-001 baseline）
+- [pre-audit-baseline-20260811.md](../baselines/pre-audit-baseline-20260811.md)（Phase 0 / OU-001 baseline）
 - [../integrity-rule-catalog.md](../integrity-rule-catalog.md)
 - [../rules/](../rules/)
-- [../../decisions/DEC-013.md](../../decisions/DEC-013.md)
-- [../../requirements/REQ-028.md](../../requirements/REQ-028.md)
+- [DEC-013](../../../decisions/DEC-013.md)
+- [REQ-028](../../../requirements/REQ-028.md)
