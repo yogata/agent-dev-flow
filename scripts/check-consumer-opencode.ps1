@@ -3,26 +3,27 @@
     Check consumer repository AgentDevFlow installation status.
 
 .DESCRIPTION
-    導入先リポジトリの AgentDevFlow インストール状態を確認する。clone しない軽量確認
-    （検証のみ、ファイル変更なし）。既存の .agentdev-plugin/ と junction を検証し、
-    乖離を報告する。
+    導入先リポジトリの AgentDevFlow インストール状態を確認する。軽量確認
+    （検証のみ、ファイル変更なし、provisioning なし）。既存の .agentdev-plugin/ と
+    junction を検証し、乖離を報告する（REQ-009-046、DEC-016）。
 
     関連3モードの技術的差（参考）:
-    - check（当スクリプト / install -Mode check）: clone せず既存状態を検証
-    - install -Mode check                      : clone して検証（ファイル変更なし）
-    - install -Mode dry-run                    : clone して予測（ファイル変更なし）
-    - install -Mode apply                      : clone して実行（ファイル変更あり）
+    - check（当スクリプト / install -Mode check）: チェックアウトを前提に既存状態を検証（ファイル変更なし）
+    - install -Mode dry-run                    : チェックアウトを前提に予測（ファイル変更なし）
+    - install -Mode apply                      : チェックアウトを前提に junction 設定を実行（ファイル変更あり）
 
     当スクリプトと install -Mode check の使い分け:
-    - 当スクリプト（check-consumer-opencode.ps1）: clone しない軽量確認。.agentdev-plugin/
-      が未インストールや破損時でも速く確認できる。orphan 検出を含む。
-    - install -Mode check: clone（または更新）した上で検証する。初回導入時や、原本側の最新を
-      取り込んでから検証したい場合に使う。
+    - 当スクリプト（check-consumer-opencode.ps1）: 軽量確認。orphan 検出を含む。
+    - install -Mode check: 同様にチェックアウトを前提に検証する。orphan 検出は含まない。
 
     Verifies that the consumer repository's AgentDevFlow installation is healthy:
-    - .agentdev-plugin/ exists and is a git repository
+    - .agentdev-plugin/ has a usable checkout (src/opencode/ exists; .git is not required)
     - All expected junctions exist and point to correct targets
     - Reports divergences
+
+    チェックアウトの git リポジトリ性は乖離（DIVERGENCE）ではなく情報として報告する。
+    版（commit/branch）報告は .git が存在する場合のみ行い、ZIP 展開チェックアウト（.git なし）
+    の版は unknown とする（AG-003/REQ-009-048）。version manifest ファイルは導入しない。
 
     Auto-detects link mode from the agentdev-gh-cli junction target:
     - Normal mode: agentdev-gh-cli -> src/opencode/skills/agentdev-gh-cli/
@@ -32,7 +33,7 @@
 
 .PARAMETER PluginDir
     Directory name for the agent-dev-flow checkout (default: .agentdev-plugin).
-    上級者向け: clone 先ディレクトリ名を変更した環境でのみ指定。通常は既定値を使用する。
+    上級者向け: チェックアウト配置先ディレクトリ名を変更した環境でのみ指定。通常は既定値を使用する。
 
 .EXAMPLE
     ./scripts/check-consumer-opencode.ps1
@@ -68,9 +69,9 @@ function Assert-ValidConsumerCwd {
     #>
     $cwd = $PWD.Path
 
-    # 1. .agentdev-plugin/ 配下（clone 先）
+    # 1. .agentdev-plugin/ 配下（チェックアウト配置先）
     if ($cwd -match '[\\/]\.agentdev-plugin([\\/]|$)') {
-        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow の clone 先です。1つ上のフォルダへ移動してください。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
+        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow のチェックアウト配置先です。1つ上のフォルダへ移動してください。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
         exit 1
     }
 
@@ -122,6 +123,37 @@ function Get-TargetSourcePath {
     return Join-Path $SourceDir $RelPath
 }
 
+# --- Checkout Guidance (AG-003/REQ-009-047) ---
+
+# 案内表示用の既定値（当スクリプトは provisioning を行わないため、案内以外では使用しない）
+$DefaultRepoUrl = 'https://github.com/yogata/agent-dev-flow.git'
+$DefaultBranch = 'main'
+
+function Show-PluginCheckoutGuidance {
+    <#
+    .SYNOPSIS
+        チェックアウト未検出時の案内。provisioning（clone、fetch、reset）も network access も
+        代行実行しない（AG-001/REQ-009-046、DEC-016）。チェックアウトの取得は利用者の責務。
+    #>
+    $repoWebUrl = $DefaultRepoUrl -replace '\.git$', ''
+    Write-Host "[ERROR] 利用可能なチェックアウトが見つかりません。usable checkout 判定（$PluginDir/src/opencode/ の存在）に失敗しました。"
+    Write-Host ''
+    Write-Host 'このスクリプトは provisioning（clone、fetch、reset）と network access を行いません（REQ-009-046、DEC-016）。'
+    Write-Host '以下のいずれかで agent-dev-flow のチェックアウトを用意してから再実行してください。'
+    Write-Host ''
+    Write-Host '方法1: git clone でチェックアウトを用意する'
+    Write-Host "  git clone --branch $DefaultBranch $DefaultRepoUrl $PluginDir"
+    Write-Host ''
+    Write-Host '方法2: ソース ZIP を取得して展開する'
+    Write-Host "  1. $repoWebUrl を開く"
+    Write-Host '  2. [Code] ボタン → [Download ZIP] でソース ZIP をダウンロード'
+    Write-Host "  3. ZIP を展開し、中身（src/、scripts/ 等）を $PluginDir/ 直下に配置"
+    Write-Host "     （$PluginDir/src/opencode/ が存在すればよく、.git のない ZIP 展開チェックアウトも正規の配置形態）"
+    Write-Host ''
+    Write-Host "期待される状態: $SourceDir が存在すること"
+    exit 1
+}
+
 # --- Main ---
 
 # cwd 安全化（REQ-{NNNN}-{NNN}）
@@ -130,36 +162,34 @@ Assert-ValidConsumerCwd
 Write-Host '=== Consumer Install Status Check ==='
 $divergences = 0
 
-# 1. Plugin checkout
-if (-not (Test-Path -LiteralPath $PluginPath)) {
-    Write-Host "[DIVERGENCE] $PluginDir does not exist (run install-consumer-opencode.ps1 -Mode apply)"
-    $divergences++
-} elseif (-not (Test-Path -LiteralPath (Join-Path $PluginPath '.git'))) {
-    Write-Host "[DIVERGENCE] $PluginDir exists but is not a git repository"
-    $divergences++
-} else {
-    Write-Host "[OK] $PluginDir is a git repository"
-    # Show current commit
-    Push-Location -LiteralPath $PluginPath
-    try {
-        $commit = git rev-parse --short HEAD 2>$null
-        $branch = git rev-parse --abbrev-ref HEAD 2>$null
-        Write-Host "[INFO] Checkout: $branch ($commit)"
-    }
-    finally {
-        Pop-Location
-    }
-}
-
-# 2. Source directory
+# 1. Plugin checkout (usable checkout 判定)
+# .git の有無ではなく src/opencode/ の存在で判定する（AG-003/REQ-009-047、REQ-009-048）。
+# ZIP 展開チェックアウト（.git なし）も正規の配置形態とする。チェックアウト未検出時は
+# エラー停止して clone とソース ZIP の手順を案内する（provisioning の代行はしない）。
 if (-not (Test-Path -LiteralPath $SourceDir)) {
-    Write-Host "[DIVERGENCE] Source directory not found: $PluginDir/src/opencode/"
-    $divergences++
+    Show-PluginCheckoutGuidance
 } else {
-    Write-Host "[OK] Source directory exists: $PluginDir/src/opencode/"
+    Write-Host "[OK] Usable checkout exists: $PluginDir/src/opencode/"
+    # git リポジトリ性は乖離ではなく情報として報告する（AG-003/REQ-009-048）。
+    # 版（commit/branch）報告は .git が存在する場合のみ行い、ZIP 展開環境では unknown とする。
+    if (Test-Path -LiteralPath (Join-Path $PluginPath '.git')) {
+        Write-Host "[INFO] $PluginDir is a git repository"
+        Push-Location -LiteralPath $PluginPath
+        try {
+            $commit = git rev-parse --short HEAD 2>$null
+            $branch = git rev-parse --abbrev-ref HEAD 2>$null
+            Write-Host "[INFO] Checkout: $branch ($commit)"
+        }
+        finally {
+            Pop-Location
+        }
+    } else {
+        Write-Host "[INFO] $PluginDir is not a git repository (possibly a ZIP-expanded checkout; informational, not a divergence)"
+        Write-Host '[INFO] Checkout: unknown'
+    }
 }
 
-# 3. Link mode detection (agentdev-gh-cli junction target)
+# 2. Link mode detection (agentdev-gh-cli junction target)
 # Local mode: agentdev-gh-cli -> src/opencode-local/agentdev-gh-cli/ (consumer-generated)
 # Normal mode: agentdev-gh-cli -> src/opencode/skills/agentdev-gh-cli/ (consumer-with-agentdev)
 $DetectedLocalMode = $false
@@ -179,7 +209,7 @@ if ($DetectedLocalMode) {
     Write-Host '[INFO] Link mode: normal (consumer-with-agentdev) — agentdev-gh-cli -> src/opencode/'
 }
 
-# 3b. Local redirect source (local mode only)
+# 2b. Local redirect source (local mode only)
 if ($DetectedLocalMode) {
     if (-not (Test-Path -LiteralPath $ghCliLocalSource)) {
         Write-Host "[DIVERGENCE] Local redirect source not found: $PluginDir/src/opencode-local/$LocalModeRedirectSkill/"
@@ -189,7 +219,7 @@ if ($DetectedLocalMode) {
     }
 }
 
-# 4. .opencode/ status
+# 3. .opencode/ status
 if (-not (Test-Path -LiteralPath $ProjectionDir)) {
     Write-Host '[DIVERGENCE] .opencode/ does not exist'
     $divergences++
@@ -200,7 +230,7 @@ if (-not (Test-Path -LiteralPath $ProjectionDir)) {
     Write-Host '[OK] .opencode/ is a real directory'
 }
 
-# 5. Parent directories
+# 4. Parent directories
 if (Test-Path -LiteralPath $ProjectionDir) {
     foreach ($parentRel in @('commands', 'skills')) {
         $parentPath = Join-Path $ProjectionDir $parentRel
@@ -216,7 +246,7 @@ if (Test-Path -LiteralPath $ProjectionDir) {
     }
 }
 
-# 6. Junction checks
+# 5. Junction checks
 if (Test-Path -LiteralPath $SourceDir) {
     # Enumerate expected targets from source
     $targets = [System.Collections.Generic.List[string]]::new()
@@ -259,7 +289,7 @@ if (Test-Path -LiteralPath $SourceDir) {
         }
     }
 
-    # 7. Orphan detection (agentdev-* junctions that don't match source)
+    # 6. Orphan detection (agentdev-* junctions that don't match source)
     Write-Host ''
     Write-Host '--- Orphan junctions ---'
     $orphansFound = $false

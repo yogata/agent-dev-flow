@@ -35,22 +35,21 @@ scripts/
 ### 適用プロジェクト（consumer-with-agentdev）
 
 ```
-.agentdev-plugin/                → agent-dev-flow の git clone 先（適用プロジェクト専用）
+.agentdev-plugin/                → agent-dev-flow のチェックアウト配置先（git clone またはソース ZIP 展開）
   src/opencode/                  → 原本
+  scripts/install-consumer-opencode.ps1 → 適用プロジェクト用インストールスクリプト
+  scripts/check-consumer-opencode.ps1   → 適用プロジェクト用状態確認スクリプト
 .opencode/
   commands/agentdev/              → ジャンクション → .agentdev-plugin/src/opencode/commands/agentdev/
   commands/{local}/               → プロジェクト独自コマンド（実ディレクトリ）
   skills/agentdev-*/              → ジャンクション → .agentdev-plugin/src/opencode/skills/agentdev-*/
   skills/{local}-*/               → プロジェクト独自スキル（実ディレクトリ）
-scripts/
-  install-consumer-opencode.ps1   → 適用プロジェクト用インストールスクリプト
-  check-consumer-opencode.ps1     → 適用プロジェクト用状態確認スクリプト
 ```
 
-- `.agentdev-plugin/` に agent-dev-flow を clone する（`.agentdev/` ではない）
+- `.agentdev-plugin/` に agent-dev-flow のチェックアウトを配置する（git clone またはソース ZIP 展開、`.agentdev/` ではない）
 - `.agentdev/` は AgentDevFlow のドメイン状態用（Intake, Learning, Backlog 等）として予約
 - `.opencode/` は AgentDevFlow 提供 command/skill とプロジェクト独自設定の混在場所
-- AgentDevFlow 提供ファイルは ジャンクション（更新時に clone を pull すれば自動反映）
+- AgentDevFlow 提供ファイルは ジャンクション（更新時にチェックアウトを更新すれば自動反映）
 - プロジェクト独自ファイルは直接管理する
 
 ### 非 AgentDevFlow プロジェクト（consumer-local）
@@ -71,7 +70,7 @@ GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別�
 詳細な接続フロー、link target 確認は SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md) を参照。
 
 ```
-.agentdev-plugin/                → agent-dev-flow の git clone 先（link 元の取得元）
+.agentdev-plugin/                → agent-dev-flow のチェックアウト配置先（git clone またはソース ZIP 展開）
   src/opencode/                  → GitHub 版 AgentDevFlow の原本（agentdev-gh-cli 以外の接続先）
   src/opencode-local/            → ローカル版 link 先原本領域（agentdev-gh-cli のみ）
     README.md                    → ローカル版 link 設定の実行手順
@@ -94,20 +93,22 @@ GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別�
 
 #### ローカル版セットアップ手順
 
-1. agent-dev-flow リポジトリを `.agentdev-plugin/` に clone する
-2. `./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode` を実行し、link 設定を行う（`agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/` へ接続、それ以外は `src/opencode/` 配下へ接続）
-3. 各 link が意図した target へ解決されることを `./scripts/check-consumer-opencode.ps1` で確認する
+1. `.agentdev-plugin/` に agent-dev-flow のチェックアウトを用意する（git clone またはソース ZIP 展開）
+2. `./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode` を実行し、link 設定を行う（`agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/` へ接続、それ以外は `src/opencode/` 配下へ接続）
+3. 各 link が意図した target へ解決されることを `./.agentdev-plugin/scripts/check-consumer-opencode.ps1` で確認する
 4. `.agentdev/cases/` ディレクトリが存在することを確認する（ローカル Case ファイル用）
 5. `.gitignore` に link 先（`.opencode/commands/agentdev/`, `.opencode/skills/agentdev-*/`）を追加する
 
 #### ローカル版の更新手順
 
 ```powershell
-# agent-dev-flow の最新を取得
+# git clone 環境: agent-dev-flow の最新を取得
 cd .agentdev-plugin && git pull && cd ..
 
+# ZIP 展開環境: ソース ZIP を再取得し、.agentdev-plugin/ を差し替える
+
 # unlink / relink により link を張り直す（全削除して作り直す方式は採らない）
-./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
 ```
 
 > 詳細な実行手順、制約、link target 確認は `src/opencode-local/README.md`（link 設定の実行エントリポイント）と SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md)、[ローカル Case ファイル](../specs/local/local-case-file.md) を参照。
@@ -119,7 +120,7 @@ cd .agentdev-plugin && git pull && cd ..
 | `agentdev` | コマンド名前空間 | `self-hosting`, `consumer-with-agentdev`, `consumer-generated` |
 | `agentdev-*` | スキルプレフィックス | `self-hosting`, `consumer-with-agentdev`, `consumer-generated` |
 | `.agentdev/` | ドメイン状態ディレクトリ | `self-hosting`, `consumer-with-agentdev`, `consumer-generated` |
-| `.agentdev-plugin/` | 適用プロジェクトの clone 先 | `consumer-with-agentdev`, `consumer-generated` |
+| `.agentdev-plugin/` | 適用プロジェクトのチェックアウト配置先 | `consumer-with-agentdev`, `consumer-generated` |
 
 **禁止事項**:
 - consumer-local での `agentdev` 名前空間の使用（v2:ADR-011-056）
@@ -133,50 +134,82 @@ docs-check は `repo-agentdev-integrity`（配布対象外スキル）として 
 
 ## インストール方式の方針
 
+provisioning（チェックアウトの取得）と install 手段（link mode による接続）は別軸である（REQ-009）。どちらの provisioning 形態でも install 手段は link mode に限られる。導入方式ポリシーの正規な定義は SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md) を参照。
+
+### provisioning 形式（チェックアウトの取得）
+
+provisioning は利用者の責務である。install スクリプトは provisioning（clone、fetch、reset）も network access も行わない。
+
+| 形式 | 対応 | 推奨 | 備考 |
+|--------|------|------|------|
+| git clone（`.agentdev-plugin/`） | ✅ | **推奨** | git pull で更新できる。check スクリプトの版報告も機能する |
+| ソース ZIP 展開（`.agentdev-plugin/`） | ✅ | git clone を優先 | 正規の provisioning 形態だがサポート対象外環境（REQ-009-048）。版は unknown として報告される |
+
+### install 手段
+
 | 方式 | 対応 | 推奨 | 備考 |
 |--------|------|------|------|
-| ジャンクション + clone（`.agentdev-plugin/`） | ✅ | **推奨** | 更新が自動反映、原本が単一 |
+| ジャンクション + チェックアウト（`.agentdev-plugin/`） | ✅ | **推奨** | 更新が自動反映、原本が単一 |
 | 直接コピー | ⚠️ | 非推奨 | 手動更新が必要、乖離のリスク |
 | Git サブモジュール | ⚠️ | 検討可能 | 複雑性が増す |
 | プラグイン/npm/package | ❌ | 将来対応 | v2:ADR-011-064 で将来の選択肢扱い |
 
-### ジャンクションと clone によるインストール（推奨）
+> 「source ZIP によるチェックアウト供給」と「release archive projection」（REQ-029 が別途定義する配布と検証の投影）は別の概念である（DEC-014）。ZIP 展開による provisioning は手動 copy インストールに該当せず、install 手段は link mode に限定される。
 
-agent-dev-flow を `.agentdev-plugin/` に clone し、ジャンクションで実行時の配置先を作成する。
+### ジャンクションによるインストール（推奨）
+
+`.agentdev-plugin/` にチェックアウトを配置し、ジャンクションで実行時の配置先を作成する。スクリプトはチェックアウト配下のものを導入先リポジトリのルートから実行する。
 
 ```powershell
-# 1. インストール（clone + ジャンクション作成を一括実行）
-./scripts/install-consumer-opencode.ps1 -Mode apply
+# 1. provisioning: .agentdev-plugin/ にチェックアウトを用意する（どちらか）
+git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
+# または: GitHub リポジトリの [Code] → [Download ZIP] でソース ZIP を取得し、
+# 展開した中身（src/、scripts/ 等）を .agentdev-plugin/ 直下に配置
+# （ZIP 展開で生じる agent-dev-flow-<ref>/ の一段ネストを避け、
+#   .agentdev-plugin/src/opencode/ となる配置にする）
 
-# 2. 状態確認
-./scripts/check-consumer-opencode.ps1
+# 2. インストール（ジャンクション作成）
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply
 
-# 3. ドライラン（変更確認）
-./scripts/install-consumer-opencode.ps1 -Mode dry-run
+# 3. 状態確認
+./.agentdev-plugin/scripts/check-consumer-opencode.ps1
+
+# 4. ドライラン（変更確認）
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode dry-run
 ```
+
+> ZIP 展開チェックアウト（`.git` なし）は正規の provisioning 形態だが、サポート対象外の環境である（不具合報告の受け付け対象外、REQ-009-048）。
+>
+> スクリプトを `./scripts/` として導入先リポジトリに置く場合は、`.agentdev-plugin/` と同一のチェックアウトからコピーする（スクリプトとチェックアウトの版不一致を防ぐため）。
 
 ### 更新手順
 
+更新は provisioning 形式に従う（REQ-009-049）。install の apply は冪等であり、再実行で junction 構成を変化させない。
+
 ```powershell
-# agent-dev-flow の最新を取得
+# git clone 環境: agent-dev-flow の最新を取得
 cd .agentdev-plugin && git pull && cd ..
 
+# ZIP 展開環境: ソース ZIP を再取得し、.agentdev-plugin/ を差し替える
+# （install 再実行の要否は利用者の判断）
+
 # ジャンクションを再同期（新しい skill/command が追加された場合）
-./scripts/install-consumer-opencode.ps1 -Mode apply
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply
 ```
 
 ### 直接コピーによるインストール（非推奨）
 
 - 初回は手動コピーで動作するが、AgentDevFlow 更新時に再コピーが必要
 - docs-check で乖離を検出可能（IR-016）
+- ソース ZIP 展開による provisioning はこの方式に該当しない（install 手段は link mode に限定される）
 
 ## スクリプトの適用範囲
 
 | スクリプト | 対象リポジトリ種別 | 役割 |
 |--------|---------------|------|
 | `scripts/sync-self-opencode.ps1` | `self-hosting` | `src/opencode/` ↔ `.opencode/` の同期 |
-| `scripts/install-consumer-opencode.ps1` | `consumer-with-agentdev` | `.agentdev-plugin/` clone + ジャンクション作成 |
-| `scripts/check-consumer-opencode.ps1` | `consumer-with-agentdev` | インストール状態の検証 |
+| `scripts/install-consumer-opencode.ps1` | `consumer-with-agentdev` | チェックアウト済み `.agentdev-plugin/` を前提としたジャンクション作成 |
+| `scripts/check-consumer-opencode.ps1` | `consumer-with-agentdev` | インストール状態の検証（git リポジトリ性は情報報告、版報告は `.git` 存在時のみ） |
 | （link 設定スクリプト: `-LocalMode`） | `consumer-generated` | `install-consumer-opencode.ps1 -Mode apply -LocalMode` が `agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/` へ接続し、それ以外を `src/opencode/` 配下へ接続する（v2:ADR-011-032, v2:ADR-009）。決定的な変換ロジックを実装したスクリプトは使用しない |
 
 ### 本体リポジトリ（self-hosting）での同期
@@ -190,10 +223,10 @@ cd .agentdev-plugin && git pull && cd ..
 ### 適用プロジェクト（consumer-with-agentdev）でのインストール/確認
 
 ```powershell
-./scripts/install-consumer-opencode.ps1 -Mode apply   # clone + ジャンクション作成
-./scripts/install-consumer-opencode.ps1 -Mode check   # 乖離の検出
-./scripts/install-consumer-opencode.ps1 -Mode dry-run # 変更予測
-./scripts/check-consumer-opencode.ps1                  # 状態確認（check のみ）
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply   # ジャンクション作成（チェックアウト前提）
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode check   # 乖離の検出
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode dry-run # 変更予測
+./.agentdev-plugin/scripts/check-consumer-opencode.ps1                  # 状態確認（check のみ）
 ```
 
 ## プロジェクト独自の命名ルール
@@ -216,7 +249,7 @@ cd .agentdev-plugin && git pull && cd ..
 適用プロジェクトリポジトリで推奨される `.gitignore` 設定:
 
 ```gitignore
-# AgentDevFlow の clone 先
+# AgentDevFlow のチェックアウト配置先
 .agentdev-plugin/
 
 # AgentDevFlow がジャンクション管理するディレクトリ（インストールスクリプトが自動作成）
@@ -231,9 +264,9 @@ cd .agentdev-plugin && git pull && cd ..
 
 ### 新規適用プロジェクトの導入手順
 
-1. 適用プロジェクトリポジトリに `scripts/` ディレクトリをコピー（または agent-dev-flow から取得）
-2. `./scripts/install-consumer-opencode.ps1 -Mode apply` を実行
-3. `./scripts/check-consumer-opencode.ps1` で動作確認
+1. `.agentdev-plugin/` に agent-dev-flow のチェックアウトを用意する（git clone またはソース ZIP 展開）
+2. `./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply` を実行
+3. `./.agentdev-plugin/scripts/check-consumer-opencode.ps1` で動作確認
 4. `.agentdev/` ディレクトリが存在することを確認（Intake/Learning 用）
 5. `.gitignore` に推奨エントリを追加
 
@@ -241,6 +274,7 @@ cd .agentdev-plugin && git pull && cd ..
 
 1. 既存の `.opencode/` 内容を確認
 2. `agentdev` 名前空間との衝突がないことを確認
-3. `./scripts/install-consumer-opencode.ps1 -Mode apply` でインストール
-4. `./scripts/check-consumer-opencode.ps1` で整合性確認
-5. `.gitignore` を更新
+3. `.agentdev-plugin/` に agent-dev-flow のチェックアウトを用意する（git clone またはソース ZIP 展開）
+4. `./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply` でインストール
+5. `./.agentdev-plugin/scripts/check-consumer-opencode.ps1` で整合性確認
+6. `.gitignore` を更新

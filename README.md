@@ -72,37 +72,65 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 
 AgentDevFlow を外部プロジェクトに導入する手順。
 
+### 前提: provisioning と install は別軸
+
+導入は2つの独立した軸で構成する。
+
+- **provisioning（チェックアウトの取得）**: 利用者の責務。git clone または GitHub ソース ZIP の展開のいずれかで、`.agentdev-plugin/` に agent-dev-flow のチェックアウトを用意する
+- **install（実行時の接続）**: install スクリプトが `.opencode/` 配下を junction で `.agentdev-plugin/src/opencode/` へ接続する（link mode）
+
+install スクリプトは provisioning（clone、fetch、reset）も network access も行わない。どちらの provisioning 形態でも install 手段は link mode に限られ、ZIP 展開による provisioning は配布成果物の実体コピーを伴わない。
+
+> 「source ZIP によるチェックアウト供給」と「release archive projection」（REQ-029 が別途定義する配布と検証の投影）は別の概念である（DEC-014）。本導入手順の ZIP 展開は前者であり、後者を扱わない。
+
 ### インストール
 
 通常版（GitHub 版 OpenCode を利用する環境）のインストール。
 
 ```powershell
-# 1. scripts/ を適用先リポジトリにコピー
-# 2. インストールを実行（clone + ジャンクション 作成）
-./scripts/install-consumer-opencode.ps1 -Mode apply
+# 1. provisioning: .agentdev-plugin/ にチェックアウトを用意する（どちらか）
+git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
+# または: GitHub リポジトリの [Code] → [Download ZIP] でソース ZIP を取得し、
+# 展開した中身（src/、scripts/ 等）を .agentdev-plugin/ 直下に配置
+
+# 2. install: 導入先リポジトリのルートで実行（junction を作成）
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply
 ```
 
 ローカル版（ローカル版 OpenCode を利用する環境）のインストール。`-LocalMode` を付けると `agentdev-gh-cli` だけが `src/opencode-local/agentdev-gh-cli/` へ接続され、それ以外の command/skill は通常版と同じ `src/opencode/` 配下へ接続される（REQ-009、DEC-004）。
 
 ```powershell
-./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
 ```
+
+> ZIP 展開チェックアウト（`.git` なし）は正規の provisioning 形態だが、サポート対象外の環境である（不具合報告の受け付け対象外）。版の確認など git を前提とする運用には git clone を使う。
+>
+> スクリプトを `./scripts/` として導入先リポジトリに置く場合は、`.agentdev-plugin/` と同一のチェックアウトからコピーする（スクリプトとチェックアウトの版不一致を防ぐため）。
 
 ### 状態確認
 
 ```powershell
 # インストール状態を確認（リンクモードを自動検出して報告）
-./scripts/check-consumer-opencode.ps1
+./.agentdev-plugin/scripts/check-consumer-opencode.ps1
 ```
+
+チェックアウトの git リポジトリ性は乖離ではなく情報として報告される。版（commit/branch）は `.git` が存在する場合のみ表示され、ZIP 展開環境では unknown と表示される。
 
 ### 更新
 
+更新手順は provisioning 形式に従う。install の apply は冪等であり、再実行で junction 構成を変化させない。
+
 ```powershell
-# agent-dev-flow の最新を取得して再同期
+# git clone 環境: チェックアウトを更新して再同期
 cd .agentdev-plugin && git pull && cd ..
-./scripts/install-consumer-opencode.ps1 -Mode apply
+./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply
+
+# ZIP 展開環境: ソース ZIP を再取得して .agentdev-plugin/ を差し替えた後、
+# 必要に応じて install を再実行する（再実行の要否は利用者の判断）
+# ./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply
+
 # ローカル版環境の場合は -LocalMode を付けて再実行
-# ./scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
+# ./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
 ```
 
 ### 推奨 .gitignore 設定
