@@ -969,3 +969,230 @@ describe("Issue #1784 TS-011: lifecycle / frontmatter change triggers update fla
     expect(parsed.extensions_check_required).toBe(false);
   });
 });
+
+// ─── Issue #2138 TS-005: SPEC 判定（frontmatter・配置ディレクトリ、AG-007）───
+// 非 SPEC ファイル（baseline snapshot、歴史記録ファイル）に対する
+// spec_readme_update_required / extensions_check_required 誤検出が 0 件であることを
+// 正常/異常 fixture で検証する。
+
+function writeBaselineLikeFile(
+  root: string,
+  relDir: string,
+  name: string,
+  title: string,
+): void {
+  const dir = join(root, ...relDir.split("/"));
+  mkdirp(dir);
+  writeFileSync(
+    join(dir, name),
+    [
+      "---",
+      "id: BASELINE-FIXTURE-2138",
+      `title: "${title}"`,
+      "status: accepted",
+      "created: 2026-08-15",
+      "baseline_for: REQ-028 / DEC-013",
+      "captured_at_head: 0000000000000000000000000000000000000000",
+      "---",
+      "",
+      `# ${title}`,
+      "",
+      "Baseline snapshot fixture for SPEC 判定 test.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+function writeAuditLikeFile(
+  root: string,
+  relDir: string,
+  name: string,
+  title: string,
+): void {
+  const dir = join(root, ...relDir.split("/"));
+  mkdirp(dir);
+  writeFileSync(
+    join(dir, name),
+    [
+      "---",
+      "id: AUDIT-FIXTURE-2138",
+      `title: "${title}"`,
+      "status: draft",
+      "created: 2026-08-15",
+      "audit_for: REQ-028 / DEC-013",
+      "baseline_ref: pre-audit-fixture.md",
+      "captured_at_head: 0000000000000000000000000000000000000000",
+      "---",
+      "",
+      `# ${title}`,
+      "",
+      "Audit record fixture for SPEC 判定 test.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+}
+
+describe("Issue #2138 TS-005: SPEC 判定 — 正常 fixture（SPEC は登録候補として検出）", () => {
+  it("added SPEC under docs/specs/integrity/ → spec_readme_update_required=true", () => {
+    const root = join(TEMP_ROOT, "issue2138-spec-pos");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "docs", "specs", "integrity"));
+    writeSpecFile(
+      root,
+      "integrity/guard-spec-fixture.md",
+      "guard spec fixture",
+      "accepted",
+      "Real SPEC fixture body.",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/integrity/guard-spec-fixture.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(true);
+    expect(parsed.extensions_check_required).toBe(true);
+  });
+
+  it("added SPEC under docs/specs/foundations/ → spec_readme_update_required=true", () => {
+    const root = join(TEMP_ROOT, "issue2138-spec-foundations");
+    mkdirp(root);
+    setupGitFixture(root);
+    mkdirp(join(root, "docs", "specs", "foundations"));
+    writeSpecFile(
+      root,
+      "foundations/foundation-spec-fixture.md",
+      "foundation spec fixture",
+      "accepted",
+      "Real SPEC fixture body.",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/foundations/foundation-spec-fixture.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(true);
+  });
+});
+
+describe("Issue #2138 TS-005: SPEC 判定 — 異常 fixture（非 SPEC の誤検出 0 件）", () => {
+  it("added baseline snapshot under baselines/ → 誤検出 0 件", () => {
+    const root = join(TEMP_ROOT, "issue2138-baseline");
+    mkdirp(root);
+    setupGitFixture(root);
+    writeBaselineLikeFile(
+      root,
+      "docs/specs/integrity/baselines",
+      "pre-audit-fixture.md",
+      "fixture baseline snapshot",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/integrity/baselines/pre-audit-fixture.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.extensions_check_required).toBe(false);
+  });
+
+  it("added audit record under audits/ → 誤検出 0 件", () => {
+    const root = join(TEMP_ROOT, "issue2138-audit");
+    mkdirp(root);
+    setupGitFixture(root);
+    writeAuditLikeFile(
+      root,
+      "docs/specs/integrity/audits",
+      "audit-fixture.md",
+      "fixture audit record",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/integrity/audits/audit-fixture.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.extensions_check_required).toBe(false);
+  });
+
+  it("history-frontmatter file outside history dirs → frontmatter 判定で誤検出 0 件", () => {
+    const root = join(TEMP_ROOT, "issue2138-misplaced");
+    mkdirp(root);
+    setupGitFixture(root);
+    writeBaselineLikeFile(
+      root,
+      "docs/specs/integrity",
+      "misplaced-snapshot-fixture.md",
+      "misplaced baseline snapshot",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/integrity/misplaced-snapshot-fixture.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.extensions_check_required).toBe(false);
+  });
+
+  it("baseline title change (lifecycle 影響あり) → 配置ディレクトリ判定で誤検出 0 件", () => {
+    const root = join(TEMP_ROOT, "issue2138-baseline-title");
+    mkdirp(root);
+    writeBaselineLikeFile(
+      root,
+      "docs/specs/integrity/baselines",
+      "pre-audit-fixture.md",
+      "original baseline title",
+    );
+    setupGitFixture(root);
+    writeBaselineLikeFile(
+      root,
+      "docs/specs/integrity/baselines",
+      "pre-audit-fixture.md",
+      "changed baseline title",
+    );
+    copyScripts(root);
+
+    const r = runScript(root, [
+      "--workflow",
+      "spec-save",
+      "--files",
+      "docs/specs/integrity/baselines/pre-audit-fixture.md",
+      "--json",
+    ]);
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.stdout);
+    expect(parsed.spec_readme_update_required).toBe(false);
+    expect(parsed.extensions_check_required).toBe(false);
+  });
+});

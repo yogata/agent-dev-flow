@@ -70,7 +70,7 @@ SPEC 一覧表の整合を確認し、targeted docs guard と extension 更新�
 SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済みであることを確認する（STEP-6 で実施済みの場合は重複確認）。SPEC 一覧表の整合は SPEC 探索導線の維持に必要な更新のみを対象とし、要件、判断、仕様の更新は含まない。
 
 - **extension 更新要否の確認（REQ）**: SPEC の追加、移動、分割が `.agentdev/extensions/**` に影響するか確認する。移動または分割により extension 参照先 SPEC パスが変わる場合、当該 extension の context paths を更新する。extension 参照先 SPEC を移動した場合はエラーとし、spec-save 自身は移動を完了させずユーザー判断を仰ぐ（IR-{NNN} check #5 strict 違反を防止）。SPEC 新規作成で既存 command/skill の実行時参照が増える場合、対応 extension の `context` への追加をユーザーに提案する（直接編集しない）
-- **targeted docs guard（REQ）**: 変更 SPEC ファイルと連動ファイル（`docs/specs/README.md`）に対し `check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json` を実行する。`failures` に strict severity を含む場合は保存工程を継続せず修正して再実行する。`spec_readme_update_required` が true の場合は STEP-6 の更新要否判定に反映する。`full_docs_check_recommended` が true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
+- **targeted docs guard（REQ）**: 変更 SPEC ファイルと連動ファイル（`docs/specs/README.md`）に対し `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json` を実行する（bun run 起動。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files` であり、保存直後ファイルの直接指定には `--files` を使用する。PowerShell で複数パスを渡す場合は配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない）。`failures` に strict severity を含む場合は保存工程を継続せず修正して再実行する。`spec_readme_update_required` が true の場合は STEP-6 の更新要否判定に反映する。`full_docs_check_recommended` が true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
 
 ### Result
 

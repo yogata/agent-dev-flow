@@ -29,7 +29,7 @@ import type { CheckResult, ScanSummary, IntegrityReport } from "./cli_utils.ts";
 const SCRIPT_NAME = "lint_skills.ts";
 const SCRIPT_DESCRIPTION = "Skill structure linter for AgentDevFlow";
 const SCRIPT_USAGE =
-  "bun run .opencode/skills/agentdev-integrity/scripts/lint_skills.ts [--help] [--json] [--dry-run]";
+  "bun run .opencode/skills/repo-agentdev-integrity/scripts/lint_skills.ts [--help] [--json] [--dry-run] [--root <path>]";
 
 const fs = require("fs");
 const path = require("path");
@@ -326,7 +326,18 @@ function main(): void {
   const repoRoot = findRepoRoot(import.meta.dir, {
     explicitRoot: options.root,
   });
-  const skillsDir = path.join(repoRoot, ".opencode", "skills");
+  const projectionSkillsDir = path.join(repoRoot, ".opencode", "skills");
+  const sourceSkillsDir = path.join(repoRoot, "src", "opencode", "skills");
+  // worktree junction 未設定環境では projection に配布スキルが存在しないため src/opencode/ へ
+  // fallback する（REQ-018-001。skills_structure.test.ts と同一の sentinel 基準）。
+  // sentinel・src とも無い環境（テスト fixture）は projection を維持する。
+  const skillsDir = fs.existsSync(
+    path.join(projectionSkillsDir, "agentdev-workflow-templates"),
+  )
+    ? projectionSkillsDir
+    : fs.existsSync(sourceSkillsDir)
+      ? sourceSkillsDir
+      : projectionSkillsDir;
   if (!fs.existsSync(skillsDir)) {
     console.error(`Skills directory not found: ${skillsDir}`);
     process.exit(EXIT_ERROR);

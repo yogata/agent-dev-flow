@@ -52,6 +52,8 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`
 - **`<PR 変更ファイル一覧>`**: space 区切り推奨、comma 区切り、混在も可
+- **PowerShell での複数パス指定**: 配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない
+- **モード使い分けの標準**: コミット前の worktree 上での検証は `--base-ref`、コミット後・PR 作成後の main 環境は `--files`（case-close はマージ後 main 環境で実行されるため `--files` を使用）
 - **JSON 出力の `failures`**: strict severity が含まれる場合はマージを停止し対象ファイルを修正して再実行
 - **`full_docs_check_recommended`**: true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案
 - **draft → accepted 等の SPEC status 変更時**: `spec_readme_update_required` を Step 3-2 SPEC 確定フローに反映

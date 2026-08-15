@@ -344,4 +344,63 @@ describe("check_templates.ts", () => {
       expect(result.exitCode).toBe(1);
     });
   });
+
+  describe("worktree hollowing skip (junction 未伝播, REQ-018)", () => {
+    const SKIP_TEMP_ROOT = path.join(
+      TEMP_BASE,
+      `templates-skip-${TEST_ID}`,
+    );
+    const SKIP_SCRIPTS_DIR = path.join(
+      SKIP_TEMP_ROOT,
+      ".opencode",
+      "skills",
+      "agentdev-integrity",
+      "scripts",
+    );
+    const SKIP_SOURCE_TEMPLATES_DIR = path.join(
+      SKIP_TEMP_ROOT,
+      "src",
+      "opencode",
+      "skills",
+      "agentdev-workflow-templates",
+      "templates",
+    );
+
+    beforeAll(() => {
+      fs.mkdirSync(SKIP_SCRIPTS_DIR, { recursive: true });
+      for (const f of fs.readdirSync(SCRIPT_DIR)) {
+        if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+          fs.copyFileSync(path.join(SCRIPT_DIR, f), path.join(SKIP_SCRIPTS_DIR, f));
+        }
+      }
+      // worktree 環境の模倣: projection templates は不在のまま src 側にのみ実体を置く
+      fs.mkdirSync(SKIP_SOURCE_TEMPLATES_DIR, { recursive: true });
+      fs.writeFileSync(
+        path.join(SKIP_SOURCE_TEMPLATES_DIR, "issue_desc_feature.md"),
+        VALID_TEMPLATE,
+        "utf-8",
+      );
+    });
+
+    afterAll(() => {
+      cleanupDir(SKIP_TEMP_ROOT);
+    });
+
+    it("reports a warning and skips with exit code 0 when only src templates exist", () => {
+      const result = runScript([], SKIP_TEMP_ROOT);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain("worktree");
+      expect(result.stdout).toContain("skip");
+    });
+
+    it("emits a valid JSON report in skip mode", () => {
+      const result = runScript(["--json"], SKIP_TEMP_ROOT);
+      expect(result.exitCode).toBe(0);
+      const parsed = JSON.parse(result.stdout);
+      expect(parsed.script).toBe("check_templates");
+      expect(parsed.scanned.templates).toBe(0);
+      expect(parsed.summary.warning).toBe(1);
+      expect(parsed.results.length).toBe(1);
+    });
+  });
 });

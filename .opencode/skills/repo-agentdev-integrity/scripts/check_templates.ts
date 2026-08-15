@@ -62,6 +62,29 @@ function main(): void {
   });
   const templatesDir = path.join(repoRoot, TEMPLATE_REL_DIR);
   if (!fs.existsSync(templatesDir)) {
+    // worktree 空洞化検知（REQ-018、junction 未伝播）: projection に templates が
+    // 無いが src 側に実体がある場合は環境依存エラーと新規失敗を区別し、
+    // warning を報告して skip する（exit 0）。
+    const sourceTemplatesDir = path.join(
+      repoRoot,
+      "src",
+      "opencode",
+      "skills",
+      "agentdev-workflow-templates",
+      "templates",
+    );
+    if (fs.existsSync(sourceTemplatesDir)) {
+      const skipResults: CheckResult[] = [
+        warn(
+          "TemplateFiles",
+          "Template inventory",
+          `Templates directory not found in projection (${path.relative(repoRoot, templatesDir)}). worktree 環境（junction 未伝播）と判定したため warning を報告して skip する（REQ-018）`,
+        ),
+      ];
+      const report = buildReport({ templates: 0 }, skipResults);
+      outputReport(report, options.json);
+      process.exit(EXIT_OK);
+    }
     console.error(`Templates directory not found: ${templatesDir}`);
     process.exit(EXIT_ERROR);
   }
