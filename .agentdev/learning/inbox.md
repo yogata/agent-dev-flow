@@ -452,3 +452,19 @@
 - **想定反映先**: なし（テスト戦略は Issue 単位で定義されるため、汎用技法の文書化要否は learning-promote で評価）
 - **関連**: PR #2131 Findings learning セクション, Issue #2128（OU-001、TS-001）, DEC-016
 - **タグ**: `#test-strategy` `#runtime-proof` `#dummy-command` `#network-access` `#windows` `#operational-knowledge`
+
+## check_changed_docs.ts の --files 複数指定を PowerShell 引用符で囲むと 1 トークン扱いになり TARGET-EMPTY 誤 FAILURE
+
+- **問題事象**: case-close（Issue 2129 / PR 2133）の targeted docs guard で `--files "README.md docs/guides/consumer-project-setup.md scripts/check-consumer-opencode.ps1"` とスペース区切り一覧を引用符で囲んで渡したところ、PowerShell が引用符内を単一 argv として渡し、スクリプト側は comma 区切りのみ split するため存在しない単一パスと解釈された。結果、files_checked が空の TARGET-EMPTY（severity: strict）FAILURE となり exit 非ゼロ
+- **発生局面**: 完了処理（case-close docs 検証 STEP-3 の targeted docs guard 実行）
+- **検知方法**: TARGET-EMPTY FAILURE の failure メッセージと files_checked 空の JSON 出力。引用符を外し複数 argv として再実行したところ files_checked 3件・failures 0 で解消した差分から特定
+- **根本原因**: スクリプトの parseArgs は `--files` 続引数を argv 境界で積み、同一 argv 内は comma のみ split する（v2:REQ-0158-001）。PowerShell の引用符は「1 引数」として渡るため、スペース区切り一覧を引用符で囲むと設計と異なる動作になる。USAGE の「space-separated recommended」は shell を問わない表記であり、PowerShell では引用符なしの複数 argv として渡す必要がある
+- **自律対応内容**: 引用符を外して `--files README.md docs/guides/... scripts/...` の複数 argv 渡しで再実行し、files_checked 3件・failures 0・warnings 0 を確認して完了
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（v2:REQ-0158-001 の comma 区切り受入仕様に由来する運用知見。ヘルプ文言の shell 別注意喚起は改善候補）
+- **横展開観点**: `--files` / `--declared-files` 等の可変引数を続けて受け取る CLI（check_changed_docs.ts、check_test_impact.ts 等）を PowerShell から呼ぶ全 workflow（req-save、spec-save、case-close）。配列引数を引用符でまとめるのが習慣の pwsh で特に発生しやすい
+- **再発条件**: PowerShell 系 shell でスペース区切りの複数ファイル指定を引用符で囲んで `--files` に渡した場合
+- **予防策候補**: 引用符なし複数 argv または comma 区切り単一引数での渡しを手順・ヘルプに明記。またはスクリプト側で argv 内空白の split 追加（空白混入ファイル名との両立検討を要するため要判断）
+- **想定反映先**: `src/opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts`（FILES_DELIMITER_NOTES ヘルプ文言の shell 注意喚起候補。要 learning-promote / backlog-review 判断）
+- **関連**: Issue 2129（OU-002）, PR 2133, 既存 entry「check_changed_docs.ts の --base-ref モードはコミット済み差分のみ検出」（同スクリプトの別運用知見）, v2:REQ-0158-001
+- **タグ**: `#targeted-docs-guard` `#check-changed-docs` `#powershell` `#argument-parsing` `#files-mode` `#operational-knowledge`
