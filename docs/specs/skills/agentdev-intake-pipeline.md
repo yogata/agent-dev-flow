@@ -56,7 +56,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 #### 本操作の責務（呼出元に対する提供）
 
 - 実観測ベースで intake 該当分を判定する（[capture-boundaries.md](../workflows/capture-boundaries.md) Split Rule 準拠）
-- `.agentdev/intake/inbox/*.md` へ item を生成、保存する。REQ 再構成 intake は `.agentdev/intake/inbox/req-restructure/` 配下へ配置する（REQ-010）
+- `.agentdev/intake/inbox/*.md` へ item を生成、保存する。REQ 再構成 intake は `.agentdev/intake/inbox/req-restructure/` 配下へ配置する（REQ-037）
 - Split Rule に基づき learning 該当分を `agentdev-learning-capture` skill へ分割指示する（混在させない）
 
 #### 呼出元 command の責務（本操作が委譲しないもの）
@@ -85,7 +85,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 
 - 抽出と promote の双方のロジックを提供
 - RU 生成は backlog-review に委譲
-- intake 系コマンドは `.agentdev/intake/` 更新前後に git 永続化を実行（REQ-010）
+- intake 系コマンドは `.agentdev/intake/` 更新前後に git 永続化を実行（REQ-037）
 
 ## 対象外
 
@@ -106,7 +106,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 - [commands/intake-from-github.md](../commands/intake-from-github.md)
 - [commands/intake-promote.md](../commands/intake-promote.md)
 - [../workflows/capture-boundaries.md](../workflows/capture-boundaries.md)
-- REQ-010（Intake command群）
+- REQ-037（Intake command群）
 
 ## adversarial-review 候補判断と内部挿入
 
