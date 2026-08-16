@@ -21,10 +21,9 @@
 | [REQ-007](REQ-007.md) | 完了報告と成果物品質ゲート |
 | [REQ-008](REQ-008.md) | 一時成果物ライフサイクル |
 | [REQ-009](REQ-009.md) | 配布基盤と導入モデル |
-| [REQ-010](REQ-010.md) | 自己監査と診断・是正候補抽出 |
+| [REQ-010](REQ-010.md) | 自己監査コマンド（docs-check） |
 | [REQ-011](REQ-011.md) | I/O境界と外部連携手段 |
 | [REQ-012](REQ-012.md) | Artifact Graph 標準化 |
-| [REQ-013](REQ-013.md) | DOC-MAP 依存除去 |
 | [REQ-014](REQ-014.md) | adversarial-review caller integration 共通契約 |
 | [REQ-015](REQ-015.md) | adversarial-review caller integration 7経路+case-auto |
 | [REQ-016](REQ-016.md) | adversarial-review caller integration 横断整合 |
@@ -33,9 +32,6 @@
 | [REQ-019](REQ-019.md) | テスト影響範囲検出 gate |
 | [REQ-020](REQ-020.md) | Artifact Graph 解析品質と検証 |
 | [REQ-021](REQ-021.md) | Artifact Graph ワークフロー統合 |
-| [REQ-022](REQ-022.md) | Artifact Graph augmentation 配置先正規化 |
-| [REQ-023](REQ-023.md) | Artifact Graph 問い合わせ結果の関係情報拡張 |
-| [REQ-024](REQ-024.md) | Artifact Graph 未解決参照 warning の分類と抽出規則改善 |
 | [REQ-025](REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
 | [REQ-026](REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
 | [REQ-027](REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
@@ -47,6 +43,10 @@
 | [REQ-033](REQ-033.md) | case-update 実行契約（Issue・要件更新） |
 | [REQ-034](REQ-034.md) | case-auto 実行契約（自走オーケストレーション） |
 | [REQ-035](REQ-035.md) | Epic と Wave 実行モデル |
+| [REQ-036](REQ-036.md) | 検出と診断コマンド群（inspect 系） |
+| [REQ-037](REQ-037.md) | 取り込みパイプライン（intake） |
+| [REQ-038](REQ-038.md) | 学習パイプライン（learning） |
+| [REQ-039](REQ-039.md) | バックログ統合（backlog-review） |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
@@ -54,6 +54,10 @@
 <!-- AUTOGEN:BEGIN:id=req-retired-table -->
 | REQ ID | タイトル |
 |---|---|
+| [REQ-013](retired/REQ-013.md) | DOC-MAP 依存除去 |
+| [REQ-022](retired/REQ-022.md) | Artifact Graph augmentation 配置先正規化 |
+| [REQ-023](retired/REQ-023.md) | Artifact Graph 問い合わせ結果の関係情報拡張 |
+| [REQ-024](retired/REQ-024.md) | Artifact Graph 未解決参照 warning の分類と抽出規則改善 |
 <!-- AUTOGEN:END -->
 
 ## 基準構造
