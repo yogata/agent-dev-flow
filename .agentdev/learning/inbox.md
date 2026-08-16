@@ -214,3 +214,35 @@
 - **想定反映先**: AG-007 参照整理手順 / case-run 検証手順（learning-promote で判定）
 - **関連**: PR #2174, Issue #2166 (CLOSED), Epic #2162
 - **タグ**: `#retire` `#grep` `#pattern-trap`
+
+## worktree 環境の check_integrity は ir035 See Also warning を環境差異として発生させる（OU-010、PR #2177）
+
+- **問題事象**: worktree 環境で check_integrity を実行すると `ir035-skill-see-also-reference` warning が 4 件発生した（agentdev-req-file-manager、agentdev-decision-file-manager、agentdev-gh-cli、agentdev-workflow-templates の See Also スキルディレクトリ未検出）。post-merge main では warning 0 件となり発生しない
+- **発生局面**: 検証（case-run の worktree での check_integrity 実行）
+- **検知方法**: worktree（warning 4 件）と merged main（warning 0 件）での check_integrity 実行結果の差分
+- **根本原因**: install-consumer-opencode.ps1 が作成する junction（.opencode/ 配下）が git worktree へ反映されない環境由来。worktree には .opencode/ の実体が無く See Also 先のスキルディレクトリを検出できない
+- **自律対応内容**: 既知の環境差異として記録し修正不要と判断。main での再実行により解消を確認して QG-4 の根拠とした
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: worktree で check_integrity の warning を評価する場面では、ir035 系 warning を環境差異の候補として main 再実行で切り分ける
+- **再発条件**: git worktree 上で See Also ディレクトリ解決を含む integrity 検査を実行する場合
+- **予防策候補**: worktree での check_integrity 結果解釈時に「main では発生しない環境差異 warning」の切り分け手順を設ける
+- **想定反映先**: repo-agentdev-integrity の ir035 運用注記（learning-promote で判定）
+- **関連**: PR #2177, Issue #2167 (CLOSED), Epic #2162
+- **タグ**: `#check-integrity` `#worktree` `#junction`
+
+## check_changed_docs.ts --base-ref はコミット前の作業ツリー変更を検出しない（OU-010、PR #2177）
+
+- **問題事象**: check_changed_docs.ts に `--base-ref origin/main` を指定してコミット前の作業ツリーで実行すると files checked: 0 となり変更を検出しない。コミット後は files checked: 1 となり正常に検出する
+- **発生局面**: 検証（case-run のコミット前事前検証タイミング）
+- **検知方法**: コミット前後での files checked 数の差（0 → 1）
+- **根本原因**: 同スクリプトが base-ref との commit diff を検出対象とする仕様であり、未コミットの作業ツリー状態は比較対象に含まれない
+- **自律対応内容**: コミット後に再実行して targeted docs guard 相当の検証を完了した。仕様通りの挱いでありスクリプト側の変更はしていない
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: コミット前の case-run 事前検証では当該スクリプトは機能しない。検証タイミングの設計では「コミット後にしか検証できない検査」として扱う
+- **再発条件**: コミット前の作業ツリーで check_changed_docs.ts --base-ref を検証根拠にしようとする場合
+- **予防策候補**: case-run の検証手順では check_changed_docs.ts をコミット後の実行として位置付ける、または staging 差分を対象に取る機能追加を検討する
+- **想定反映先**: case-run 検証手順 / check_changed_docs.ts 仕様注記（learning-promote で判定）
+- **関連**: PR #2177, Issue #2167 (CLOSED), Epic #2162
+- **タグ**: `#check-changed-docs` `#docs-check` `#verification-timing`
