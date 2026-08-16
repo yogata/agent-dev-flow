@@ -47,23 +47,31 @@ inspect-docs command が実行する docs 横断診断のうち、専門診断�
 専門 skill から返却された検出事項（finding）は、本スキルが定める共通 finding 出力契約（`finding-output-contract.md`）へ適合させて統合する。
 severity、confidence、NG 分類は本スキルの共通契約へ正規化する。
 
-## ルーティング表と inspect-docs Step の対応
+## ルーティング表と inspect-docs workflow 工程の対応
 
-inspect-docs command の各 Step は次のように本スキルと専門 skill を組み合わせる。
+inspect-docs Workflow Skill（`agentdev-workflow-inspect-docs`）の各工程は、次のように本スキルと専門 skill を組み合わせる。
+工程名は同 Skill の SKILL.md Control Plane（工程一覧）に、診断観点は各工程 reference の手順節名に対応する。
 
-| inspect-docs Step | 本スキルの役割 | ルーティング先 |
-|--------------------|----------------|----------------|
-| Step 2: REQ 参照 ID 整合性確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
-| Step 3: 第一参照導線確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
-| Step 4: 現行/廃止/世代境界確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
-| Step 5: SPEC 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-req-structure-diagnostics`（詳細は委譲） |
-| Step 6: ADR 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-req-structure-diagnostics`（詳細は委譲） |
-| Step 7: guides 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-doc-writing`（文意品質） |
-| Step 8: README 索引診断 | 索引の範囲超過の抽出（本スキル直接判定） | 該当なし（本スキル直接判定） |
-| Step 9: REQ structure review（6観点） | 横断比較でシグナル抽出 | `agentdev-req-structure-diagnostics` |
-| Step 10: 文書分類一貫性検査 | 横断スキャンで SPEC 分離基準違反シグナル抽出 | `agentdev-req-structure-diagnostics`（MOVE 観点） |
-| Step 11: 配布物整合性検査 | 対象範囲特定、ルーティング | `agentdev-req-structure-diagnostics` |
-| Step 13: 未処理 artifact 確認 | 横断スキャン（本スキル直接判定） | 該当なし |
+### 「REQ 体系・文書種別別意味診断」工程（`agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md`）
+
+| 診断観点（手順節名） | 本スキルの役割 | ルーティング先 |
+|----------------------|----------------|----------------|
+| REQ 参照ID整合性確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
+| 第一参照導線確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
+| 現行/廃止/世代境界確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
+| SPEC 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-req-structure-diagnostics`（詳細は委譲） |
+| Decision 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-req-structure-diagnostics`（詳細は委譲） |
+| guides 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-doc-writing`（文意品質） |
+| README 索引診断 | 索引の範囲超過の抽出（本スキル直接判定） | 該当なし（本スキル直接判定） |
+| REQ structure review（6観点） | 横断比較でシグナル抽出 | `agentdev-req-structure-diagnostics` |
+| 文書分類一貫性検査 | 横断スキャンで SPEC 分離基準違反シグナル抽出 | `agentdev-req-structure-diagnostics`（MOVE 観点） |
+
+### 「配布物整合性検査・route 判定」工程（`agentdev-workflow-inspect-docs/references/distribution-check-and-output.md`）
+
+| 診断観点（手順節名） | 本スキルの役割 | ルーティング先 |
+|----------------------|----------------|----------------|
+| 配布物整合性検査 | 対象範囲特定、ルーティング | `agentdev-req-structure-diagnostics` |
+| 未処理 artifact 確認 | 横断スキャン（本スキル直接判定） | 該当なし |
 
 ## 責務重複なしの保証（AC-{NNN}）
 

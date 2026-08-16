@@ -138,7 +138,11 @@ docs-spec-rebuild-integrity SPEC が定義する5パターンを配布物整合�
 
 ### ルーティング先
 
-判定ロジック、検出手順、問題候補出力スキーマ（7フィールド）は `agentdev-req-structure-diagnostics` が所有する。本スキルは配布物統合性を inspect-docs Step 11、inspect-skills Step 3 でルーティングし、検出事項を共通 finding 出力契約（`finding-output-contract.md`）へ正規化する。
+判定ロジック、検出手順、問題候補出力スキーマ（7フィールド）は `agentdev-req-structure-diagnostics` が所有する。
+本スキルは配布物統合性を次の Workflow Skill の工程・手順節でルーティングし、検出事項を共通 finding 出力契約（`finding-output-contract.md`）へ正規化する。
+
+- `agentdev-workflow-inspect-docs`: 「配布物整合性検査・route 判定」工程（手順節「配布物整合性検査」、`references/distribution-check-and-output.md`）
+- `agentdev-workflow-inspect-skills`: 「診断観点の評価・分類・route 提示」工程（手順節「配布物構文健全性、責務整合診断」、`references/skill-structure-diagnostics.md`）
 
 ## 安定契約例外の総合判定
 
