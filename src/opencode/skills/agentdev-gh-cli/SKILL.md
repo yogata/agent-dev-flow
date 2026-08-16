@@ -1,6 +1,6 @@
 ---
 name: agentdev-gh-cli
-description: AgentDevFlow の GitHub Issue/PR I/O を集約する中央集権的な I/O 境界（REQ, ADR）。command と skill は gh コマンドを直接記述せず、本スキルの手続きへ委譲する。USE FOR: Issue 作成、Issue 本文読込、Issue 本文更新、Issue コメント追加、PR 本文読込、PR merge、Issue close、PR 変更ファイル一覧取得、PR mergeable 状態取得、書き込み後 VERIFY。DO NOT USE FOR: 本文生成、完了判定、Epic 依存判定、capture 分類（domain skill 担当）、一般 git 操作（`agentdev-git-worktree` 担当）。
+description: AgentDevFlow の GitHub Issue/PR I/O を集約する中央集権的な I/O 境界。command と skill は gh コマンドを直接記述せず本スキルの手続きへ委譲する。USE FOR: Issue 作成・本文読込・本文更新・コメント追加、PR 本文読込・merge・変更ファイル一覧取得・mergeable 状態取得、書き込み後 VERIFY。DO NOT USE FOR: 本文生成や完了判定、capture 分類、一般 git 操作。
 ---
 
 # `agentdev-gh-cli`

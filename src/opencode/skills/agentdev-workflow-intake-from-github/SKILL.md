@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-intake-from-github
-description: "intake-from-github command の workflow 実装本体。クローズ済み GitHub Issue/PR の本文・コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存、git 永続化、サマリーレポート、完了報告までの保存専用 workflow を所有する。capture-only型であり STEP model 対象外（resume point / export / import なし）。USE FOR: intake-from-github command 実行時の workflow 実行（期間解釈・データ取得・構造的検出・LLM 全文解析・intake item 生成・保存・git 永続化・サマリーレポート）。DO NOT USE FOR: GitHub Issue 作成（case-open）、採用可否の判断・review・分類（intake-promote）、learning item の保存・分類・昇華（learning-capture、learning-promote）、Issue/PR へのコメント投稿やマーカー付与（backlog-review）、work_type 判定（agentdev-workflow-lifecycle）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "intake-from-github command の workflow 実装本体。クローズ済み GitHub Issue/PR の本文・コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存、git 永続化、サマリーレポート、完了報告までの保存専用 workflow を所有する（capture-only 型、STEP model 対象外）。USE FOR: intake-from-github 実行時の workflow 実行（期間解釈・データ取得・構造的検出・LLM 全文解析・item 生成・保存・サマリーレポート）。DO NOT USE FOR: 採用可否の判断・review・分類、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # intake-from-github workflow スキル

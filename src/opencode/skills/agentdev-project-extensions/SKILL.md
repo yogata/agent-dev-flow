@@ -1,6 +1,6 @@
 ---
 name: agentdev-project-extensions
-description: Resolves project-specific extensions (.agentdev/extensions/skills/**) for Workflow Skills and Capability Skills at runtime. Handles extension discovery, load-time state classification (missing / malformed fail-open / legacy kind migration-required stop / unknown kind schema violation stop / valid), 5-section reading (context/rules/checks/acceptance_gates/must_not), additive-not-override treatment, and project-local skill delegation target extraction. USE FOR: resolving project extensions for a Workflow Skill or Capability Skill, classifying extension states at load time, reading extension context/rules/checks, extracting project-local skill delegation targets. DO NOT USE FOR: defining extension schema, diagnosing extension structure, modifying distribution command/skill bodies, implementing project-local skills, migrating legacy extensions.
+description: Resolves project-specific extensions (.agentdev/extensions/skills/**) for Workflow Skills and Capability Skills at runtime. USE FOR: extension discovery, load-time state classification (missing / malformed / migration-required / unknown), reading extension context/rules/checks, extracting project-local skill delegation targets. DO NOT USE FOR: defining extension schema, modifying distribution command/skill bodies, implementing project-local skills, migrating legacy extensions.
 ---
 
 # Project Extensions

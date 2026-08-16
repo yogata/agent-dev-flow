@@ -1,6 +1,6 @@
 ---
 name: agentdev-adversarial-review
-description: "対論型レビューの実行入口。Orchestrator、Reviewer、Reviewee の3論理的役割で構成される審議を通じて本質的争点を抽出する。評価前に対象依存の動的レビュー戦略を構成し、対称的相互反証、戦略メタ反証、合意候補形成後の再検証（convergence audit）を行う。USE FOR: 要件案、設計案、規格・仕様案、計画案、実装案の本質的合意形成、動的レビュー戦略の構成、対称的な批判と反論による審議、合意候補の再検証、未解決争点のユーザー質問化。DO NOT USE FOR: QG-{N}〜QG-{N} の代替、通常のコードレビューやテストや機械的検査、inspect-docs/inspect-skills 診断、実装実行やファイル保存やcommitやpushやIssue・PR更新、ユーザー承認代行、強制的統制ゲート、固定観点全実行を前提とするレビュー。"
+description: "対論型レビューの実行入口。Orchestrator、Reviewer、Reviewee の3論理的役割で構成される審議を通じて本質的争点を抽出する。動的レビュー戦略の構成、対称的相互反証、戦略メタ反証、合意候補形成後の再検証（convergence audit）を行う。USE FOR: 要件案、設計案、規格・仕様案、計画案、実装案の本質的合意形成、未解決争点のユーザー質問化。DO NOT USE FOR: 通常のコードレビューやテストや機械的検査、実装実行やファイル保存やIssue・PR更新、ユーザー承認代行。"
 ---
 
 # 対論型レビュー（agentdev-adversarial-review）

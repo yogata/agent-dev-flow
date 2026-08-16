@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-req-save
-description: "req-save command の workflow 実装本体。壁打ち成果物（draft-data）をREQ/Decisionファイルとしてdocs/に保存し、コミット・プッシュする制御を所有する。事前チェック（artifact_actions 判定、no-op）、読込時 hash 記録、REQ ファイル操作（決定的スクリプト呼出、QG-{N} 相当の適用結果整合性検証）、インデックス・ハブ更新、Decision ファイル作成、docs 変更整合性検証、README 索引影響確認、変更範囲検証、ドラフト status 更新（saved）、コミット・プッシュ、3フェーズ並列委譲モデルを提供する。USE FOR: req-save command 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 要件doc 作成（req-define）、SPEC 保存（spec-save）、Issue 作成（case-open）、REQ ファイル管理・採番ルールの定義（agentdev-req-file-manager）、Decision ファイル管理（agentdev-decision-file-manager）、決定的検証スクリプトの所有（agentdev-artifact-validation）、gh CLI I/O 手続き（agentdev-gh-cli）、git worktree 操作（agentdev-git-worktree）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "req-save command の workflow 実装本体。壁打ち成果物（draft-data）をREQ/Decisionファイルとしてdocs/に保存し、コミット・プッシュする制御を所有する。事前チェック（no-op 判定）、REQ ファイル操作と適用結果整合性検証、インデックス・ハブ更新、Decision ファイル作成、docs 変更整合性検証、変更範囲検証、ドラフト status 更新（saved）も含む。USE FOR: req-save 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # req-save workflow スキル

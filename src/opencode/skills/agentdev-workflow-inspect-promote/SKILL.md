@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-inspect-promote
-description: "inspect-promote command の workflow 実装本体。検出事項（finding）の分類（promote/defer/reject）、自動 promote（--auto opt-in、fast path）、adversarial-review 経路B、HITL 確定、promote/reject/defer 処理実行、完了報告と .agentdev/ 永続化を所有する。finding disposition（分類・採用・保留・却下）が独立 resume point を持つ STEP model であり、durable state（.agentdev/inspect/inbox/、promoted/、auto-promote-log、intake/promoted/）から会話記憶に依存せず再開できる。USE FOR: inspect-promote command 実行時の workflow 制御（inbox スキャン・検出事項分類・自動 promote・adversarial-review 経路B・HITL 確定・処理実行・永続化・完了報告）。DO NOT USE FOR: 検出事項の生成（inspect-docs、inspect-skills）、docs 体系や Command/Skill の意味診断、採用済み成果物の RU 化・統合（backlog-review）、REQ/Decision/SPEC 変更、Issue/PR 操作（agentdev-gh-cli）、worktree/branch 操作（agentdev-git-worktree）、adversarial-review の共通契約定義（agentdev-adversarial-review）、自動 promote 対象カテゴリの定義（workflow-contracts SPEC、extension 経由）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "inspect-promote command の workflow 実装本体。検出事項（finding）の分類（promote/defer/reject）、自動 promote（--auto opt-in）、adversarial-review 経路B、HITL 確定、promote/reject/defer 処理実行、.agentdev 永続化を、独立 resume point を持つ STEP model（durable state から再開可能）として所有する。USE FOR: inspect-promote 実行時の workflow 制御（inbox スキャン・分類・経路B review・HITL 確定・処理実行・永続化）。DO NOT USE FOR: 検出事項の生成、REQ/Decision/SPEC 変更、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # inspect-promote workflow スキル

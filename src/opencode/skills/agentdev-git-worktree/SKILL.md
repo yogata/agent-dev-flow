@@ -1,6 +1,6 @@
 ---
 name: agentdev-git-worktree
-description: Manages git worktree creation, switching, and cleanup based on Issue numbers. USE FOR: creating worktrees, switching between branches, or cleaning up completed worktrees. DO NOT USE FOR: basic git operations like commit/push/pull, branch management without worktrees, or merge conflict resolution. Exception: branch cleanup as part of worktree lifecycle (removing worktree → deleting associated branch) is expected behavior.
+description: Manages git worktree creation, switching, and cleanup based on Issue numbers. USE FOR: creating worktrees, switching between branches, cleaning up completed worktrees (branch cleanup included). DO NOT USE FOR: basic git operations like commit/push/pull, branch management without worktrees, merge conflict resolution.
 ---
 
 # `agentdev-git-worktree`

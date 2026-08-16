@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-req-define
-description: "req-define command の workflow 実装本体。セッションコンテキスト検知・入力解決から壁打ち対話、既存REQ照合、要件展開、Decision判断、要件doc（draft-data）生成、work_type・Scale 判定、adversarial-review 経路A、ドラフト保存、要件doc確認、完了報告までの対話型 workflow 制御を所有する。USE FOR: req-define command 実行時の workflow 制御（対話開始・HITL・blocked・resume・draft 生成）。DO NOT USE FOR: REQ/Decision ファイル保存（req-save）、SPEC 保存（spec-save）、Issue 作成（case-open）、要件分析手法・品質基準の定義（agentdev-req-analysis）、REQ ファイル操作（agentdev-req-file-manager）、Decision要否判定（agentdev-decision-guidelines）、work_type・Scale 判定基準（agentdev-workflow-lifecycle）、gh CLI I/O 手続き（agentdev-gh-cli）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "req-define command の workflow 実装本体。セッションコンテキスト検知・入力解決から壁打ち対話、既存REQ照合、要件展開、Decision判断、要件doc（draft-data）生成、work_type・Scale 判定、adversarial-review 経路A、ドラフト保存、要件doc確認、完了報告までの対話型 workflow 制御を所有する。USE FOR: req-define 実行時の workflow 制御（対話開始・HITL・blocked・resume・draft 生成）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # req-define workflow スキル

@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-run
-description: "case-run command の workflow 実装本体。単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の 1:N 分離構成を所有する。single は3フェーズ（準備・実行担当サブエージェント委譲・クリーンアップ）のべき等実行、epic-wave は現在 ready な Wave の子Issue 並列委譲（最大5件）、fan-out・fan-in、partial result、child task recovery を制御する。USE FOR: case-run command 実行時の workflow 制御（single Issue 実行・Epic Wave 実行・再開フェーズ判定・委譲・result 4状態処理・前置 gate・最終 gate・L2 タイムスタンプ計測）。DO NOT USE FOR: Issue 作成（case-open）、PR マージ・Issue close・Capture 回収（case-close）、最大自走 orchestration（case-auto）、実装実行そのもの（agentdev-case-run-execution-adapter 委譲内）、work_type 判定（agentdev-workflow-lifecycle）、gh CLI I/O 手続き（agentdev-gh-cli）、Wave 構成・Epic 進捗追跡ロジック（agentdev-epic-tracker）、git worktree 操作（agentdev-git-worktree）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "case-run command の workflow 実装本体。単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）の 1:N 分離構成、実行担当サブエージェント委譲（最大5件並列）、fan-out・fan-in、partial result、child task recovery、result 4状態処理を所有する。USE FOR: case-run 実行時の workflow 制御（single Issue 実行・Epic Wave 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-run workflow スキル

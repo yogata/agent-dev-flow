@@ -1,6 +1,6 @@
 ---
 name: agentdev-command-creator
-description: Creates and configures OpenCode custom commands for automating recurring tasks. USE FOR: creating commands, setting up command templates, or configuring agent/model bindings. DO NOT USE FOR: executing existing commands, modifying skill files, or general development tasks.
+description: Creates and configures OpenCode custom commands for automating recurring tasks. USE FOR: creating commands, setting up command templates, configuring agent/model bindings. DO NOT USE FOR: executing existing commands, modifying skill files, general development tasks.
 ---
 
 # `agentdev-command-creator`

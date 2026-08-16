@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-update
-description: "case-update command の workflow 実装本体。既存Caseの本文更新（--body）、コメント追加（--comment）、REQファイル更新（--req）、レビューNG専用フロー（--review-ng）の4分岐と Issue番号解決、現在状態取得、完了報告の制御を所有する。USE FOR: case-update command 実行時の workflow 制御（更新種別分岐・テンプレート構造維持・QG-{N} 乖離検出結果引用・APPEND vs UPDATE 判定）。DO NOT USE FOR: Issue 実装・CI 対応・自律修正ループ（case-run）、PR マージ・Issue close（case-close）、要件doc 作成（req-define）、REQ 保存の正式工程（req-save。--req は直接 commit+push を行う）、レビュー拒否タイプ分類・次コマンド推論の定義（agentdev-workflow-routing）、テンプレート選定規則の定義（agentdev-workflow-templates）、gh CLI I/O 手続き（agentdev-gh-cli）、work_type 判定（agentdev-workflow-lifecycle）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "case-update command の workflow 実装本体。既存 Case の本文更新（--body）、コメント追加（--comment）、REQ ファイル更新（--req）、レビューNG専用フロー（--review-ng）の4分岐と Issue 番号解決、現在状態取得、完了報告の制御を所有する。USE FOR: case-update 実行時の workflow 制御（更新種別分岐・テンプレート構造維持・APPEND vs UPDATE 判定）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-update workflow スキル

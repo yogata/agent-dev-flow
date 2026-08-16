@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-learning-promote
-description: "learning-promote command の workflow 実装本体。inbox.md エントリの読込・正規化、問題クラス分類・8軸評価・evaluation-report 生成、廃棄判定・既存対策確認、adversarial-review 経路D、ユーザー承認（HITL）、採用済み成果物生成・deferred 移動・prune・git 永続化の各 STEP を独立 resume point として所有する。USE FOR: learning-promote command 実行時の workflow 制御（正規化・分類・評価・廃棄判定・経路D review 呼出・HITL 承認・採用済み成果物生成・deferred 移動・prune・git 永続化・完了報告）。DO NOT USE FOR: 学びの検知・抽出・inbox.md 蓄積（learning-capture）、RU 生成（backlog-review）、intake pipeline の実行（intake-promote）、REQ ファイル保存（req-save）、`.opencode/` への直接反映、work_type 判定（agentdev-workflow-lifecycle）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "learning-promote command の workflow 実装本体。inbox.md エントリの読込・正規化、問題クラス分類・8軸評価・evaluation-report 生成、廃棄判定・既存対策確認、adversarial-review 経路D、ユーザー承認（HITL）、採用済み成果物生成・deferred 移動・prune・git 永続化の各 STEP を独立 resume point として所有する。USE FOR: learning-promote 実行時の workflow 制御。DO NOT USE FOR: 学びの検知・抽出・inbox.md 蓄積、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # learning-promote workflow スキル
