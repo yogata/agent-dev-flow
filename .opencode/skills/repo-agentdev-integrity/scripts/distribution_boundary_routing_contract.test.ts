@@ -112,7 +112,7 @@ describe("distribution-boundary final gate routing contract", () => {
 
   describe("single-Issue route (Step 3-1) references the detector with profile token", () => {
     const content = readFileIfExists(DOCS_AND_SPEC_PROMOTION) ?? "";
-    const step31 = extractSection(content, "### Step 3-1:");
+    const step31 = extractSection(content, "### STEP-3-1:");
 
     it("Step 3-1 section exists", () => {
       assertSectionExists(step31, "docs-and-spec-promotion.md");
@@ -218,7 +218,7 @@ describe("distribution-boundary final gate routing contract", () => {
     const epicContent = readFileIfExists(EPIC_WAVE_CLOSE) ?? "";
     const caseRunContent = readFileIfExists(CASE_RUN_COMMAND) ?? "";
 
-    const step31 = extractSection(docsContent, "### Step 3-1:");
+    const step31 = extractSection(docsContent, "### STEP-3-1:");
     const e40 = extractSection(epicContent, "#### E4-0:");
     const step71 = extractSection(caseRunContent, "### Step 7-1:");
 
