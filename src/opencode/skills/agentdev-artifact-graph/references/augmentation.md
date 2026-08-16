@@ -1,6 +1,6 @@
 # augmentation スキーマ
 
-Artifact Graph 標準スキルの open extension point 詳細（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}、DEC-{N} decision 2）。
+Artifact Graph 標準スキルの open extension point 詳細。
 
 ## 配置先
 
@@ -8,7 +8,7 @@ Artifact Graph 標準スキルの open extension point 詳細（REQ-{NNNN}-{NNN}
 
 CLI 上書き: `--augmentation <path>`
 
-augmentation が存在しなくても標準スキルは動作する（REQ-{NNNN}-{NNN}）。
+augmentation が存在しなくても標準スキルは動作する。
 
 ## スキーマ
 
@@ -71,9 +71,9 @@ steps は配列の先頭から順に試し、最初に空でない値を採用�
 
 `defined_in`、`contains`、`extends` は語彙に含まれるが、デフォルトコアではフィールドベース抽出を持たない。これらは containment/extension ロジックで、対応するノード型が augmentation で追加された場合に生成される。
 
-## self-hosting augmentation（REQ-{NNNN}-{NNN}）
+## self-hosting augmentation
 
-self-hosting augmentation は次を追加することで現行 repo-local と同等の探索能力を維持する（REQ-{NNNN}-{NNN}、DEC-{N} decision 7）。実装は `.agentdev/artifact-graph.yaml`（Issue #1951）を参照。
+self-hosting augmentation は次を追加することで現行の自己ホスト運用と同等の探索能力を維持する。実装は `.agentdev/artifact-graph.yaml`（Issue #1951）を参照。
 
 - node_type: `command`, `skill`, `integrity_rule`, `extension`, `source_file`
 - relation_type: `delegates_to`, `governs`

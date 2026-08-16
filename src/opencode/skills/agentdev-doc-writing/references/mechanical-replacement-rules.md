@@ -4,7 +4,7 @@
 判定基準が実行者に依存せず、inspect-docs 自動検出、CI 検証、横断修正で再現性が確保されることを目的とする。
 
 > **原本**: 中黒、em-dash、一文一行の機械判定アルゴリズムは本ファイルが原本。
-> LLM 表現の検出、書き換え辞書は [llm-expression-patterns.md](llm-expression-patterns.md) を参照。
+> LLM 表現の検出、書き換え辞書は [rewrite-patterns.md](rewrite-patterns.md) を参照。
 > 執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）、用語政策の原本は document-type-responsibilities SPEC を参照。
 
 ## 対象読者
@@ -93,7 +93,7 @@ em-dash（`—`、`―`）は japanese-tech-writing L17 に従い、同格、補
 ## 3. LLM 表現機械判定
 
 LLM 表現は、表層形式置換で cover できるもの（機械判定対象）と、文脈判断が必要なもの（機械判定対象外）に区分する。
-包括的な表現パターン辞書は [llm-expression-patterns.md](llm-expression-patterns.md) を参照。
+包括的な表現パターン辞書は [rewrite-patterns.md](rewrite-patterns.md) を参照。
 本節は機械判定可能な代表例のみを列挙する。
 
 ### 機械判定対象（表層形式置換で cover 可能）
@@ -110,7 +110,7 @@ LLM 表現は、表層形式置換で cover できるもの（機械判定対象
 | `について` | 直接内容を書く | 「関して」は迂遠 |
 | `に関して` | 直接内容を書く | 同上 |
 
-包括的な検出、書き換え辞書は [llm-expression-patterns.md](llm-expression-patterns.md) の「接続の型」「空虚な動詞」「空虚な形容・副詞」「ラベル前置き」節を参照。
+包括的な検出、書き換え辞書は [rewrite-patterns.md](rewrite-patterns.md) の「接続の型」「空虚な動詞」「空虚な形容・副詞」「ラベル前置き」節を参照。
 本表は機械判定で即時適用可能な代表例である。
 
 ### 機械判定対象外（文脈判断が必要、サンプリング査読へ委譲）
@@ -126,7 +126,7 @@ LLM 表現は、表層形式置換で cover できるもの（機械判定対象
 | `適切に〜` | 基準が文脈で明示されている場合は正当。同上 |
 | `〜を行う` | 固定複合名詞の一部（「決定事項を行う」等でない場合）は正当。複合名詞か否かの判定が文脈依存 |
 
-これらの表現は [llm-expression-patterns.md](llm-expression-patterns.md) に検出パターンとして掲載されるが、本ファイルの機械判定アルゴリズムでは自動置換の対象としない。
+これらの表現は [rewrite-patterns.md](rewrite-patterns.md) に検出パターンとして掲載されるが、本ファイルの機械判定アルゴリズムでは自動置換の対象としない。
 サンプリング査読で文脈を確認した上で書き換え要否を判断する。
 
 ## 4. 一文一行機械判定
@@ -174,7 +174,7 @@ LLM 表現は、表層形式置換で cover できるもの（機械判定対象
 中黒、em-dash、一文一行は判定手順（検出、許容/是正の二値判定）であり、LLM 表現は検出、書き換え辞書である。
 判定アルゴリズムの性質が異なるため、両者を混載せず分業する。
 
-| 規範 | 性質 | 本ファイルでの扱い | [llm-expression-patterns.md](llm-expression-patterns.md) での扱い |
+| 規範 | 性質 | 本ファイルでの扱い | [rewrite-patterns.md](rewrite-patterns.md) での扱い |
 |---|---|---|---|
 | 中黒 | 許容範囲判定（検出→二値判定） | 機械判定アルゴリズム（原本） | 扱わない |
 | em-dash | 置換判定（検出→テーブルは機械置換、本文は査読） | 機械判定アルゴリズム（原本） | 扱わない |
@@ -182,7 +182,7 @@ LLM 表現は、表層形式置換で cover できるもの（機械判定対象
 | LLM 表現（文脈判断必要） | 検出→書き換え（文脈依存） | 機械判定対象外、サンプリング査読への委譲を明示 | 検出→書き換え辞書（包括的） |
 | 一文一行 | 改行分割（検出→分割位置） | 機械判定アルゴリズム（原本） | 扱いません |
 
-既存 [llm-expression-patterns.md](llm-expression-patterns.md) は表現パターンの検出→書き換え辞書として現状維持する。
+既存 [rewrite-patterns.md](rewrite-patterns.md) は表現パターンの検出→書き換え辞書として現状維持する。
 本ファイルから同ファイルへの相互参照を張り、機械判定アルゴリズム側に LLM 表現の機械判定対象を集約する。
 
 ## 再現性の担保
@@ -199,13 +199,13 @@ Wave 2 既存 OU（#1076 em-dash、#1078 中黒、#1079 LLM 表現、#1080 一�
 
 手順3で0件となることで、Wave 2 修正が本アルゴリズムと整合し、再現性が確認されたことになる。
 
-### 機械横断是正 PR における Step 3-4 の必須化（REQ）
+### 機械横断是正 PR における Step 3-4 の必須化
 
 上記 Step 3-4（再 grep 0 件確認）は推奨ではなく**必須**である（L-012、PR #1090 / #1122 由来。PR #1090 が「7 ディレクトリ完全対応」と完了宣言したが 3 件残存し、後続 PR #1122 で回帰修正した事象への対策）。
 
 - 機械横断是正（機械的テキスト置換・複数ディレクトリ横断是正）を含む PR の完了に先行して、Step 3-4 を必ず実行すること
 - 再 grep 結果（0 件）を PR 本文の品質メトリクス欄に記載することを運用化する
-- Step 3-4 の実行と PR 本文記載は QG-{N}（観点 5）/ QG-{N}（観点 7）で担保される
+- Step 3-4 の実行と PR 本文記載は QG-3（観点 5）/ QG-4（観点 7）で担保される
 
 ### 機械置換スクリプト
 
@@ -218,7 +218,7 @@ X-6（「において」検出）のヒューリスティックについて、PR
 
 ## See Also
 
-- LLM 表現パターン辞書: [llm-expression-patterns.md](llm-expression-patterns.md)
+- LLM 表現パターン辞書: [rewrite-patterns.md](rewrite-patterns.md)
 - 英語抽象語の検出→書き換え: [rewrite-patterns.md](rewrite-patterns.md)
 - backticks 識別子/一般名詞 判定閾値: backticks-identifier-threshold SPEC（識別子 backticks 必須、一般名詞 backticks 任意の機械判定閾値。inspect-docs 検出処理が参照）
 - 用語政策 原本: document-type-responsibilities SPEC「中黒使用の許容範囲」「em-dash 置換形式」「LLM 表現の検出→書き換え方針」節

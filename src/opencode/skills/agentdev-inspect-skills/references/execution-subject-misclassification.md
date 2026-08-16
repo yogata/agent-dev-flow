@@ -1,8 +1,8 @@
 # 実行主体分類誤認の判定基準
 
 > **原本**: document-type-responsibilities SPEC「実行主体分類の査読基準」。
-> 本ファイルは inspect-skills 診断観点「実行主体分類の誤認」（REQ）の判定基準詳細を集約する運用ビューである。
-> 原本と内容が重複する場合は原本を優先する（REQ）。
+> 本ファイルは inspect-skills 診断観点「実行主体分類の誤認」の判定基準詳細を集約する運用ビューである。
+> 原本と内容が重複する場合は原本を優先する。
 
 ## 適用範囲
 
@@ -10,7 +10,7 @@ Command→Skill 参照妥当性診断で、文書内で言及される実行主�
 実行主体の誤認は `load_skills` への誤指定や委譲契約不整合を引き起こすため、本診断観点で検出する。
 
 
-機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子の skill 表記）は integrity-rule-catalog SPEC（IR-{NNN}、IR-{NNN}、REQ）が担う。
+機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子の skill 表記）は integrity-rule-catalog SPEC が担う。
 本診断はより複雑な文脈依存の誤認（command と skill の混同等）を担う。
 
 ## 実行主体の分類
@@ -42,7 +42,7 @@ Command→Skill 参照妥当性診断で、文書内で言及される実行主�
 - `agentdev-*` プレフィックスを持たない識別子が含まれる → **誤認候補**（command 名、harness 名、subagent 名の可能性）。文脈確認が必要
 - `agentdev-*` プレフィックスを持つ → **OK**（skill 名として正当）
 
-機械的検出（IR-{NNN}）と重複するが、本診断は文脈判断（command 名の既知性、委譲契約上の役割）を含む。
+機械的検出と重複するが、本診断は文脈判断（command 名の既知性、委譲契約上の役割）を含む。
 
 ### 2. 委譲起動記述の検査
 
@@ -54,7 +54,7 @@ Command→Skill 参照妥当性診断で、文書内で言及される実行主�
 ### 3. `/` 先頭識別子の skill 表記検査
 
 文書中の `/agentdev/*` 等の command 名や実行 command が出現する文脈で、「スキル」「skill」という表記が併用されていないかを確認する。
-機械的検出（IR-{NNN}）と重複するが、本診断は文脈判断を含む。
+機械的検出と重複するが、本診断は文脈判断を含む。
 
 例:
 - ❌ 「実行 command をスキルとして呼び出す」（command を skill と呼ぶ誤認）
@@ -64,7 +64,7 @@ Command→Skill 参照妥当性診断で、文書内で言及される実行主�
 ### 4. harness 名、subagent 名の skill 表記検査
 
 文書中の外部実行基盤（harness）や実行担当サブエージェント（subagent）等の名前が出現する文脈で、「スキル」「skill」という表記が併用されていないかを確認する。
-機械的検出（IR-{NNN}）と重複するが、本診断は文脈判断を含む。
+機械的検出と重複するが、本診断は文脈判断を含む。
 
 例:
 - ❌ 「外部実行基盤 スキル経由で起動する」（harness を skill と呼ぶ誤認）
@@ -88,5 +88,5 @@ Recommended route には `command` / `skill` / `references` のいずれかを�
 ## 対象外
 
 - 実行時の動的判定（委譲の実際の起動、`load_skills` の実解決）は本診断の対象外。静的記述の分類正確性のみを検証する。
-- 機械的パターンマッチングによる検出は integrity-rule-catalog SPEC（IR-{NNN}、IR-{NNN}、REQ）が担う。本診断は意味的、文脈的な誤認検出を担う。
-- 文書品質査読時の実行主体分類は `agentdev-doc-writing`（REQ）が担う。本診断は Command→Skill 参照妥当性診断の文脈での誤認検出を担う。
+- 機械的パターンマッチングによる検出は integrity-rule-catalog SPEC が担う。本診断は意味的、文脈的な誤認検出を担う。
+- 文書品質査読時の実行主体分類は `agentdev-doc-writing` が担う。本診断は Command→Skill 参照妥当性診断の文脈での誤認検出を担う。

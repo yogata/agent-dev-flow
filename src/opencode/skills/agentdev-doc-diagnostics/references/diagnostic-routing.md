@@ -1,7 +1,7 @@
 # 文書種別別診断へのルーティング
 
 inspect-docs command が実行する docs 横断診断のうち、専門診断を要する事項を適切な専門 skill へルーティングするための規則を定義する。
-本スキル（`agentdev-doc-diagnostics`）は横断編成と結果統合のみを所有し、専門診断の判定ロジックを再定義しない（AC-{NNN}）。
+本スキル（`agentdev-doc-diagnostics`）は横断編成と結果統合のみを所有し、専門診断の判定ロジックを再定義しない。
 
 ## ルーティング対象と委譲先
 
@@ -73,7 +73,7 @@ inspect-docs Workflow Skill（`agentdev-workflow-inspect-docs`）の各工程は
 | 配布物整合性検査 | 対象範囲特定、ルーティング | `agentdev-req-structure-diagnostics` |
 | 未処理 artifact 確認 | 横断スキャン（本スキル直接判定） | 該当なし |
 
-## 責務重複なしの保証（AC-{NNN}）
+## 責務重複なしの保証
 
 本スキルと 3 専門 skill との責務重複がないことを、以下の境界で保証する。
 

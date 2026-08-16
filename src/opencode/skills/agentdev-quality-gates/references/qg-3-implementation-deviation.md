@@ -1,7 +1,7 @@
-# QG-{N}: Implementation Deviation Gate
+# QG-3: Implementation Deviation Gate
 
 case-run で PR 作成前に、実装が Issue/ REQ/ ADR/ SPEC/ work plan から乖離していないかを検証する Gate。
-本ファイルは QG-{N} の判定基準、検査観点、乖離分類を定義する。
+本ファイルは QG-3 の判定基準、検査観点、乖離分類を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
 ## 配置
@@ -55,14 +55,14 @@ Issue/ REQ/ ADR/ SPEC/ work plan のいずれかの記載内容を満たさな�
 - 旧仕様の記述が残っていないか
 - ドキュメント更新漏れを乖離として検出する
 
-### 5. 機械横断是正向け検査項目（REQ）
+### 5. 機械横断是正向け検査項目
 
 機械的テキスト置換、複数ディレクトリ横断是正を含む PR 向けの検査項目（L-012、PR #1090 / #1122 由来）。
 
 - **検査項目**: 機械的テキスト置換、複数ディレクトリ横断是正を含む場合、置換対象パターンの再 grep 結果が 0 件であることを確認する
 - **適用範囲**: 機械的テキスト置換、複数ディレクトリ横断、[mechanical-replacement-rules.md](../../agentdev-doc-writing/references/mechanical-replacement-rules.md) 対象表の文字種等の横断是正
-- **スコープ定位**: QG-{N} の既存スコープ（REQ: PR 作成直前の実装充足、乖離ゲート）を維持し、機械横断是正の再 grep 0 件確認は乖離検出の一部として位置付ける
-- **対象外維持**: 品質メトリクス収集、広範な docs 全体 grep、Document Classification Policy 全体確認、case-update 連携は引き続き QG-{N} 対象外とする
+- **スコープ定位**: QG-3 の既存スコープ（PR 作成直前の実装充足・乖離ゲート）を維持し、機械横断是正の再 grep 0 件確認は乖離検出の一部として位置付ける
+- **対象外維持**: 品質メトリクス収集、広範な docs 全体 grep、Document Classification Policy 全体確認、case-update 連携は引き続き QG-3 対象外とする
 
 ## 乖離分類
 
@@ -103,7 +103,7 @@ Issue/ REQ/ ADR/ SPEC/ work plan のいずれかの記載内容を満たさな�
 ## 報告フォーマット
 
 ```markdown
-## QG-{N}: Implementation Deviation Gate
+## QG-3: Implementation Deviation Gate
 
 - **判定**: pass / warn / fail
 - **対象**: git diff（変更ファイル N 件）
@@ -136,7 +136,7 @@ Issue/ REQ/ ADR/ SPEC/ work plan のいずれかの記載内容を満たさな�
 
 ## case-update 連携
 
-QG-{N} は乖離の分類と推奨アクションの提示までを責務とし、REQ 更新の最終判断は case-update（ユーザー承認入力）に委譲する。
+QG-3 は乖離の分類と推奨アクションの提示までを責務とし、REQ 更新の最終判断は case-update（ユーザー承認入力）に委譲する。
 
 ### 乖離タイプ → case-update フラグ mapping
 
@@ -150,14 +150,14 @@ QG-{N} は乖離の分類と推奨アクションの提示までを責務とし�
 
 ## 委譲接続点
 
-QG-{N} の検査をサブエージェントに委譲する場合:
+QG-3 の検査をサブエージェントに委譲する場合:
 
 - サブエージェントは乖離候補、影響度候補、乖離タイプ候補、根拠のみを返す。
 - 親エージェントが pass/warn/fail を確定し、ユーザーへの報告と指示待機を行う。
 
 ## 責務境界
 
-- QG-{N} は**乖離の分類と推奨アクションの提示**に限定する。
+- QG-3 は**乖離の分類と推奨アクションの提示**に限定する。
 - REQ ファイルの更新判断、更新実行は行わない（case-update の責務）。
 - 品質メトリクス収集（型チェック/ Lint/ ビルド/ テスト）は行わない（case-run Step 11-1 ローカル検証の責務）。
 - docs 全体の意味レビューは行わない（`/agentdev/inspect-docs` の責務）。
@@ -165,7 +165,7 @@ QG-{N} の検査をサブエージェントに委譲する場合:
 ## See Also
 
 - [common-gate-contract.md](common-gate-contract.md)
-- [qg-4-final-acceptance.md](qg-4-final-acceptance.md)（次工程の最終受け入れ。QG-{N} は QG-{N} の結果を前提とする）
-- **agentdev-workflow-routing**: case-update --review-ng 手順（QG-{N} 結果の消費先）
+- [qg-4-final-acceptance.md](qg-4-final-acceptance.md)（次工程の最終受け入れ。QG-4 は QG-3 の結果を前提とする）
+- **agentdev-workflow-routing**: case-update --review-ng 手順（QG-3 結果の消費先）
 - **agentdev-workflow-templates**: `issue_comment_review_ng.md` テンプレート
 

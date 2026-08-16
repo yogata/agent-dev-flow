@@ -35,27 +35,27 @@ PR を squash マージし、mergeable UNKNOWN ポーリング、先行 commit �
 - 上限超過時の構造化エラー停止
 - 待機中の `CONFLICTING` 遷移検出を自動分岐させ、コンフリクト解消パス（STEP-4-4）へ即時接続する
 
-ポーリング間隔・上限値は gh-cli 手続き側が所有する（AG-{NNN}）。
+ポーリング間隔・上限値は gh-cli 手続き側が所有する。
 
 ### STEP-4-2: PR merge 実行
 
 PR merge 手続き（squash 方式、`agentdev-gh-cli`）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）。
 
-**Squash merge 失敗時のリトライ**: `agentdev-gh-cli` の「squash merge リトライ手続き」に従う（待機間隔・最大試行回数は gh-cli 手続き側が所有、AG-{NNN}、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。
+**Squash merge 失敗時のリトライ**: `agentdev-gh-cli` の「squash merge リトライ手続き」に従う（待機間隔・最大試行回数は gh-cli 手続き側が所有、各試行のログ記録、全試行失敗時のフォールバックは template `.opencode/commands/agentdev/templates/case-close/standard.md` 参照）。
 
 **対応記録コメント**: Issue に対応記録コメントを追加（テンプレート: `.opencode/skills/agentdev-workflow-templates/templates/issue_comment_*.md` から Read して `agentdev-gh-cli` の VERIFY 操作に従って内容検証）。
 
-**`--delete-branch` 使用禁止（REQ）**: PR マージ時に `--delete-branch` オプションを使用しない（アクティブ worktree に checkout されたブランチで local 削除が失敗し remote 削除フェーズへ到達しないため）。ブランチ削除は STEP-6 で独立実施する。
+**`--delete-branch` 使用禁止**: PR マージ時に `--delete-branch` オプションを使用しない（アクティブ worktree に checkout されたブランチで local 削除が失敗し remote 削除フェーズへ到達しないため）。ブランチ削除は STEP-6 で独立実施する。
 
-### STEP-4-3: Squash merge 後のローカル先行 commit 検出・処理（REQ）
+### STEP-4-3: Squash merge 後のローカル先行 commit 検出・処理
 
-squash merge 完了後、ローカルに remote 未 push の先行 commit が存在する場合、`agentdev-git-worktree` の「Squash merge 後分岐ハンドリング手続き（REQ）」に従い、ローカル先行 commit 検出、内容重複確認、reset を実行する。本処理により `git pull --ff-only` 失敗を予防する。
+squash merge 完了後、ローカルに remote 未 push の先行 commit が存在する場合、`agentdev-git-worktree` の「Squash merge 後分岐ハンドリング手続き」に従い、ローカル先行 commit 検出、内容重複確認、reset を実行する。本処理により `git pull --ff-only` 失敗を予防する。
 
 ### STEP-4-4: コンフリクト解消 rebase パス（Level 1）
 
 squash merge がコンフリクトで失敗した場合（STEP-4-2 のリトライ全失敗後、エラー原因がコンフリクトの場合）に実行する機械的解消パス（コンフリクト解消モデル Level 1）。
 
-`agentdev-git-worktree` の「コンフリクト解消 rebase パス（REQ）」に従い、rebase による機械的解消を試みる。
+`agentdev-git-worktree` の「コンフリクト解消 rebase パス」に従い、rebase による機械的解消を試みる。
 
 - **実装変更は行わず** rebase のみ
 - **rebase 自動解決時**: squash merge（STEP-4-2）へ戻り再マージ

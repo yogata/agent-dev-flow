@@ -1,6 +1,6 @@
 # STEP-1 / STEP-2: スキャン対象収集・REQ 体系・文書種別別意味診断（scan-and-doc-diagnostics）
 
-> 本 reference は `agentdev-workflow-inspect-docs` SKILL.md の Control Plane STEP-1、STEP-2 詳細である。read-only-diagnostic型のため resume point を持たない（REQ-{NNNN}-{NNN}）。
+> 本 reference は `agentdev-workflow-inspect-docs` SKILL.md の Control Plane STEP-1、STEP-2 詳細である。read-only-diagnostic型のため resume point を持たない。
 
 ## 開始条件
 

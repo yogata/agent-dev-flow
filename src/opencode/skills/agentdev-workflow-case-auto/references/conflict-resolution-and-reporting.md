@@ -26,10 +26,10 @@ PR マージコンフリクト発生時は、以下3レベルのエスカレー�
 | Level | 担当 | 手順 | 失敗時 |
 |---|---|---|---|
 | Level 1 | case-close | `git rebase` による機械的解消、自動解決時は再マージ | case-auto へエスカレーション |
-| Level 2 | case-auto | 両PR の diff を読み取りコンフリクト箇所を特定しコンフリクト文脈を付けてインライン case-run を再実行、最大2回（元の並列実行を含む計3回の case-run 実行 AG-{NNN}） | Level 3 へ |
+| Level 2 | case-auto | 両PR の diff を読み取りコンフリクト箇所を特定しコンフリクト文脈を付けてインライン case-run を再実行、最大2回（元の並列実行を含む計3回の case-run 実行） | Level 3 へ |
 | Level 3 | case-auto | マージ順序変更、blocked 単位の隔離 | 停止（STEP-4 停止条件 (8)） |
 
-Level 2 コンフリクト文脈付きインライン case-run 再実行（AG-{NNN}）、Level 3 オーケストレーション級判断、発生元非依存、停止条件の段階化の詳細は `agentdev-workflow-orchestration` を参照。
+Level 2 コンフリクト文脈付きインライン case-run 再実行、Level 3 オーケストレーション級判断、発生元非依存、停止条件の段階化の詳細は `agentdev-workflow-orchestration` を参照。
 
 ### Result
 

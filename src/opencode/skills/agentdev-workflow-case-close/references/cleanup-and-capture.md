@@ -102,9 +102,9 @@ worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Ca
 
 `git pull --ff-only` 直前に、`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャを再実行する（L-013、PR #1128 由来、共有 main worktree で STEP-1-1 実行時点から STEP-6-3-1 実行までの間に並列セッションが加えた未コミット変更を検知するため）。重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと。
 
-##### STEP-6-3-2: git main 同期リスク事前検出・代替同期手順選択（REQ）
+##### STEP-6-3-2: git main 同期リスク事前検出・代替同期手順選択
 
-`agentdev-git-worktree` の「git main 同期リスク事前検出プロシージャ（REQ）」に従い、worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスク事前検出と代替同期手順選択を実行する。`agentdev-git-worktree` に従い `git pull --ff-only` を実行（ローカル変更事前チェック、hash 検証、不一致時は評価・承認のやり直し）。
+`agentdev-git-worktree` の「git main 同期リスク事前検出プロシージャ」に従い、worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスク事前検出と代替同期手順選択を実行する。`agentdev-git-worktree` に従い `git pull --ff-only` を実行（ローカル変更事前チェック、hash 検証、不一致時は評価・承認のやり直し）。
 
 #### STEP-6-4: 学びの検知・抽出・Capture 回収
 

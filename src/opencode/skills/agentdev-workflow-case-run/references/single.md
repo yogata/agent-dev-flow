@@ -70,8 +70,8 @@
 - Issue本文から要件docと受け入れ基準を抽出する（べき等性: worktree とブランチが既に存在する場合、STEP-S3 の作成処理をスキップする）。`agentdev-req-analysis` のチェックボックス品質基準で検証する
 - 関連Decision特定: `docs/decisions/README.md` を読み込み、関連Decisionがあれば個別に読み込み、実装がDecisionの決定事項に矛盾しないことを確認する
 - work_type 判定: `agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定する（scale は feature のみ standard/large、workflow_route は都度導出し保存しない）
-- **execution contract 消費境界（REQ-{NNNN}）**: 完了条件、test strategy、必須品質統制を実行契約として扱う。不足・曖昧さ・矛盾・実現不能を検出した場合は自律補完せず blocked とする。test strategy を新規設計せず記録済み項目を実行する。必須品質統制の適用要否を再判断しない。work_type/scale/Issue structure を再分類して実行契約を変更しない
-  - runtime-only 判断の維持: worktree 状態確認、QG-{N} 前置 staleness check、実 diff 検査、実装結果・test 実行結果は case-run の安全検査として維持する
+- **execution contract 消費境界**: 完了条件、test strategy、必須品質統制を実行契約として扱う。不足・曖昧さ・矛盾・実現不能を検出した場合は自律補完せず blocked とする。test strategy を新規設計せず記録済み項目を実行する。必須品質統制の適用要否を再判断しない。work_type/scale/Issue structure を再分類して実行契約を変更しない
+  - runtime-only 判断の維持: worktree 状態確認、QG-3 前置 staleness check、実 diff 検査、実装結果・test 実行結果は case-run の安全検査として維持する
   - blocked 遷移と case-update 連携: 完了条件の不足・曖昧さ・矛盾・実現不能、scope-affecting impact candidate の発見、関連 ADR への適合確認で新たな拘束の必要性検出、必須品質統制の追加変更必要性、Issue metadata・構造・実態の矛盾検出時は blocked とし、Issue 更新は case-update へ委譲する（case-run 単独では Issue 本文を書き換えない）
   - 新旧 Issue 互換運用: execution contract 必須セクション（Execution Contract セクション、必須品質統制セクション）存在有無で新旧 Issue を識別する（presence-based 判定）。必須セクション不存在の legacy Issue は、新契約項目欠落のみを理由に一律 blocked にしない
   - work_type/scale 確認の縮約: work_type 確認は再分類ではなく metadata 整合確認へ縮約して維持する
@@ -115,11 +115,11 @@
 - **L2 タイムスタンプ計測**: 本 Step の開始時刻・終了時刻（JST）を記録し、worktree 設定時間を計測する（完了報告の L2 内訳に含める）
 - **STEP-S3-1 親Epic ステータス更新**: `agentdev-epic-tracker` 参照
 - **STEP-S3-2 worktree precondition gate**: `agentdev-git-worktree` の「worktree 内判定ヘルパー」に従い、当該 Issue の worktree+ブランチが作成済みであり、現在 worktree 内にいることを検証する。検証失敗時（worktree 未作成、メインリポジトリにいる）は実行担当サブエージェントを起動せず停止し、STEP-S3 へ戻るようユーザーに報告する
-- **STEP-S3-3 QG-{N} 前置 staleness check**: `agentdev-quality-gates` の「case-run 前置 staleness check」に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・case-update 連携を実行する。本検査は QG-{N} 本体（委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-{N} deviation 分類運用、QG-{N} 本体実施要否には影響しない
+- **STEP-S3-3 QG-3 前置 staleness check**: `agentdev-quality-gates` の「case-run 前置 staleness check」に従い、ファイルパス現行存在確認、検査結果件数再計測、差異検出時の引き渡し・case-update 連携を実行する。本検査は QG-3 本体（委譲先が実施する PR 作成直前ゲート）とは独立した前置検査であり、QG-3 deviation 分類運用、QG-3 本体実施要否には影響しない
 - **STEP-S3-4 docs/** 変更時の targeted docs guard: PR 対象ファイルに docs/** 変更を含む場合、委譲前に targeted docs guard を行う（`bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow case-run --base-ref <ベース> --json`、変更ファイルは worktree 内の git diff から取得。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files`。PowerShell で `--files` に複数パスを渡す場合は配列変数経由または個別渡しとし、引用符まとめ渡しは使用しない）。docs/** 変更を含まない PR ではスキップする。検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` に `### docs-integrity` 小見出しで記録する（実行担当サブエージェント責務）
 - **STEP-S3-5 配布依存境界の事前委譲チェック（オプション）**: PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合、委譲前に事前チェックを実施できる。本チェックは予備的であり、本式の最終 gate は STEP-S5（実装後）で実行される。事前チェックで違反を検出した場合は委譲プロンプトで実行担当サブエージェントに引き渡す
 
-**case-run が使用する検査ツール**（integrity 契約 SPEC「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、docs/** 変更を含む場合に委譲前に実行）、check_extensions.ts（IR-{NNN}、`.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/SKILL.md`、`.opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source、STEP-S5 で実装後 worktree の実際の src/opencode/ を検査）、test_strategy（Issue 完了条件検証）
+**case-run が使用する検査ツール**（integrity 契約 SPEC「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、docs/** 変更を含む場合に委譲前に実行）、check_extensions.ts（`.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/SKILL.md`、`.opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source、STEP-S5 で実装後 worktree の実際の配布ソース面を検査）、test_strategy（Issue 完了条件検証）
 
 ### Result
 
@@ -186,7 +186,7 @@
 
 - `agentdev-git-worktree`: worktree 作成、worktree 内判定ヘルパー
 - `agentdev-epic-tracker`: 親Epic ステータス更新
-- `agentdev-quality-gates`: QG-{N} 前置 staleness check
+- `agentdev-quality-gates`: QG-3 前置 staleness check
 - `agentdev-workflow-orchestration`: 再開フェーズ判定
 - `agentdev-req-analysis`: チェックボックス品質基準
 
@@ -194,7 +194,7 @@
 
 - G04（全ファイル操作は worktree 内で実行）
 - G30/G31（STEP-S3 precondition gate、worktree root 相対パス引き渡し）
-- G33/G34/G35（QG-{N} 前置 staleness check、差異検出時の引き渡しと case-update 連携）
+- G33/G34/G35（QG-3 前置 staleness check、差異検出時の引き渡しと case-update 連携）
 
 ## 関連ガイドライン
 

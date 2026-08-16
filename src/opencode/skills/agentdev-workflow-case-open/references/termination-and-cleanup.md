@@ -48,7 +48,7 @@ STEP-6-2/6-2-1 の削除後、当該ファイルが作業ツリー、index に�
 - 残存を検出した場合: 即座に停止し残存ファイル一覧を報告
 - Standard flow と Epic flow の双方で実施
 
-### STEP-6-2-3: draft/RU 削除 commit 後の即時 push（REQ）
+### STEP-6-2-3: draft/RU 削除 commit 後の即時 push
 
 STEP-6-2/6-2-1 の削除コミット後に `git push` を即時実行（case-run 引き継ぎ時の `git pull --ff-only` 失敗を防止するため）。push 失敗時は構造化エラーメッセージを表示して停止する。
 

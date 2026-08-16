@@ -31,7 +31,7 @@ Epic Issue 本文から現在 ready な Wave の子Issue 群を特定する。
 
 Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 ready な Wave の子Issue を特定する。1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
 
-**Epic Issue の入力ソース（REQ/088）**: Epic Issue は本来の Epic flow（マルチREQ、`scale: large`）に加え、Standard flow 起因の独立 OU 自動 Epic 化（case-open が `depends_on` 空、L0 相当の独立 OU を検出して Epic 化）によるものも含む。入力ソースを区別せず、Epic Wave モデル（ADR、最大5件並列委譲）で一様に処理する。いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
+**Epic Issue の入力ソース**: Epic Issue は本来の Epic flow（マルチREQ、`scale: large`）に加え、Standard flow 起因の独立 OU 自動 Epic 化（case-open が `depends_on` 空、L0 相当の独立 OU を検出して Epic 化）によるものも含む。入力ソースを区別せず、Epic Wave モデル（ADR、最大5件並列委譲）で一様に処理する。いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
 
 ### Result
 
@@ -70,7 +70,7 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 
 - `git fetch origin` を実行しベースブランチの鮮度を確認する（Wave 実行時、PR merge 後再開時は必須）
 - 子Issue ごとに worktree とブランチを作成する（`agentdev-git-worktree` 参照。べき等チェック: 既存時はスキップ）
-- 子Issue ごとに前置 gate 群（single.md STEP-S3 の STEP-S3-2〜S3-5 と同一契約: worktree precondition gate、QG-{N} 前置 staleness check、docs/** 変更時 targeted docs guard、配布依存境界 事前チェック）を適用する
+- 子Issue ごとに前置 gate 群（single.md STEP-S3 の STEP-S3-2〜S3-5 と同一契約: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時 targeted docs guard、配布依存境界 事前チェック）を適用する
 - 子Issue ごとの worktree 設置の L2 タイムスタンプを記録する
 
 ### Result
@@ -218,5 +218,5 @@ Wave 内子Issue を実行担当サブエージェントへ最大5件並列委�
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G11/G22/G23/G32（単一 Wave のみ処理、1 Wave の実行で PR 作成まで return、最大5件並列委譲）
-- G24（完了条件チェックボックスの評価・更新は case-close QG-{N} の責務）
+- G24（完了条件チェックボックスの評価・更新は case-close QG-4 の責務）
 - G25（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文）

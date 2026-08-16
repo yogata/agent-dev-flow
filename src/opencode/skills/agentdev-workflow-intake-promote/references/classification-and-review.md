@@ -58,7 +58,7 @@ inbox 内の intake item を読み込み、評価し、暫定分類（採用/ �
 
 - STEP-1 の暫定分類表（runtime artifact。中断時は inbox 実ファイルから STEP-1 を再構築して導出する）
 - 発動条件判定、候補判断基準、内部手続きは `agentdev-intake-pipeline` の公開操作契約に従う
-- 共通 caller integration 契約の正規所有者は adversarial-review SPEC（REQ-{NNNN}）である
+- 共通 caller integration 契約の正規所有者は adversarial-review SPEC である
 
 ### Preconditions
 

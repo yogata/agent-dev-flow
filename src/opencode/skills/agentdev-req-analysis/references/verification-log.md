@@ -3,11 +3,11 @@
 `src/opencode/skills/agentdev-req-analysis/SKILL.md` の `references/*.md` 参照整合性検証結果を記録する。
 dangling 参照（参照先ファイル不在）を検出した場合は本ログに追記し、当該 PR で是正する。
 
-## OU-{NNN} 検証結果（2026-06-26、PR #Closes 1197）
+## 検証結果（2026-06-26、PR #1197）
 
 - **対象**: `src/opencode/skills/agentdev-req-analysis/SKILL.md` の `references/*.md` 全参照
 - **結論**: dangling 参照なし。全参照が実在ファイルを指す。
-- **根拠**: CR-{NNN} 事前確認（req-define 壁打ち 2026-06-25）で既存確認済み。本検証で再確定。
+- **根拠**: req-define 壁打ち（2026-06-25）で事前確認済み。本検証で再確定。
 
 ### SKILL.md 参照抽出結果
 
@@ -22,7 +22,7 @@ dangling 参照（参照先ファイル不在）を検出した場合は本ロ�
 
 ### `references/req-define-detailed-gates.md` 内容完結性
 
-- **行数**: 163 行（CR-{NNN} 申告どおり）
+- **行数**: 163 行（申告どおり）
 - **SPLIT 予兆計算ロジック**（L60〜L110）の構成要素:
  - `### 計測手順`（L65）: 要件行数、関心分類数、成果物種別数の 3 手順を完備
  - `### シグナル算出`（L77）: 4 メトリクス × 閾値 × シグナル値の算出表を完備

@@ -3,6 +3,22 @@
 複数 command で使う git 操作の共通手順、構造化エラーメッセージを定義する。
 各 command は詳細本文ではなく、ここで定義する手順名、入出力、停止条件を参照する。
 
+## 目次
+
+- 1. 実行前同期（git pull --ff-only）
+- 2. ドメイン状態永続化（git add + commit + push）
+- 3. 並列実行安全ステージング（concurrent-safe staging）
+- 4. PR merge 前 HEAD hash 記録
+- 5. 未コミット変更検出
+- 6. ブランチ、worktree削除
+- 7. PR merge 前重複ファイルチェック
+- 8. Windows + worktree 環境の git 操作フォールバック
+- 9. git main 同期リスク事前検出
+- 各 command の参照方法
+- Merge Conflict 対応パターン
+- Squash merge 後分岐ハンドリング手順
+- コンフリクト解消 rebase パス
+
 ---
 
 ## 1. 実行前同期（git pull --ff-only）
@@ -118,7 +134,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
  - `git stash`
  - 非所有パス（他セッションが変更中のパス）に対する `git checkout -- <path>`/ `git restore <path>`
 
-2. **明示パスステージ + `git commit -- <paths>` の義務付け（/ 005）**:
+2. **明示パスステージ + `git commit -- <paths>` の義務付け**:
  a. ステージは `git add <path>`/ `git rm <path>` の明示パス指定のみ許可する。親ディレクトリ全体（`.agentdev/` 等）の一括スコープは禁止し、当該 command が生成、変更する**専用サブディレクトリまたは明示ファイルパス**に限定する
  b. コミットは `git commit -- <paths>`（`--only` pathspec 形式）を用いる。共有 index に存在する他セッションのステージ済み変更を当該コミットに排出しないこと
 
@@ -238,7 +254,7 @@ Windows + worktree 環境で `git -C <worktree> mv` が `fatal: renaming ... fai
 
 ---
 
-## 9. git main 同期リスク事前検出（REQ）
+## 9. git main 同期リスク事前検出
 
 `git pull --ff-only` 実行前に、worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出し、安全な代替同期手順を選択する。
 暗黙の手順順序依存を明示的な事前チェックに置き換える（3件の pull 失敗事象: worktree 状態、並列実行コンテキスト、非 main ブランチ占有に基づく）。
@@ -343,7 +359,7 @@ worktree が非 main ブランチを保持している場合や、他セッシ�
 
 command 側（case-close Step 9-2 等）には以下のように参照する:
 
-- 「`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ（REQ）に従い、3リスクの事前検出と代替同期手順選択を実行」
+- 「`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャに従い、3リスクの事前検出と代替同期手順選択を実行」
 
 ---
 
@@ -456,7 +472,7 @@ command 側には共通処理の詳細本文ではなく、使用するプロシ
 
 ---
 
-## Squash merge 後分岐ハンドリング手順（REQ）
+## Squash merge 後分岐ハンドリング手順
 
 squash merge（PR merge 手続き、`agentdev-gh-cli`）実行後にローカルと remote で分岐（divergent）が発生した場合のハンドリング手順。
 本手順は case-close Step 4-1 から参照される。
@@ -513,11 +529,11 @@ squash merge により remote 側に1つの統合 commit が作成される一�
 
 command 側（case-close 等）には以下のように参照する:
 
-- 「`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順（REQ）に従い、ローカル先行 commit 検出、内容重複確認、reset を実行」
+- 「`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順に従い、ローカル先行 commit 検出、内容重複確認、reset を実行」
 
 ---
 
-## コンフリクト解消 rebase パス（REQ/002、REQ/025）
+## コンフリクト解消 rebase パス
 
 squash merge がコンフリクトで失敗した場合（リトライ全失敗後、エラー原因がコンフリクトの場合）に実行する機械的解消パス（コンフリクト解消モデル Level 1）。
 **実装変更は行わず** rebase のみ試みる。
@@ -541,6 +557,6 @@ Level 2（コンフリクト文脈付き再委譲）、Level 3（マージ順序
 
 command 側（case-close Step 4-2 等）には以下のように参照する:
 
-- 「`agentdev-git-worktree` のコンフリクト解消 rebase パス（REQ）に従い、rebase による機械的解消を試み、失敗時は case-auto Level 2/3 へエスカレーション」
+- 「`agentdev-git-worktree` のコンフリクト解消 rebase パスに従い、rebase による機械的解消を試み、失敗時は case-auto Level 2/3 へエスカレーション」
 
 

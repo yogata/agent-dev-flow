@@ -1,7 +1,7 @@
-# QG-{N}: Acceptance Criteria Coverage Gate
+# QG-2: Acceptance Criteria Coverage Gate
 
 case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する Gate。
-本ファイルは QG-{N} の判定基準、検査観点を定義する。
+本ファイルは QG-2 の判定基準、検査観点を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
 ## 配置
@@ -51,7 +51,7 @@ Issue 本文がテンプレート（`issue_desc_*.md`）の【必須】セクシ
 
 ### 6. 数値閾値到達可能性検証
 
-完了条件に数値閾値（LF 数、行数、ファイル数、件数等の定量化基準）を設定する場合、当該閾値が対象成果物の自然な構造で到達可能であることを事前検証する（境界ケース #1538/TS-{NNN} 由来）。
+完了条件に数値閾値（LF 数、行数、ファイル数、件数等の定量化基準）を設定する場合、当該閾値が対象成果物の自然な構造で到達可能であることを事前検証する（境界ケース #1538 由来）。
 
 検証手順:
 
@@ -66,11 +66,11 @@ Issue 本文がテンプレート（`issue_desc_*.md`）の【必須】セクシ
 - **warn**: 閾値は到達可能だが根拠が曖昧。設定根拠の明示を推奨。
 - **pass**: 閾値が到達可能、または数値閾値を含まない。
 
-test strategy 策定時の具体的な閾値設定手順は `agentdev-req-analysis` の [test-strategy-numeric-threshold-guide.md](../../../agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md) を参照。
+test strategy 策定時の具体的な閾値設定手順は `agentdev-req-analysis` の [test-strategy-numeric-threshold-guide.md](../../agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md) を参照。
 
 ### 7. テスト戦略 vs Epic 対象外 整合性検証
 
-Epic Issue の場合、テスト戦略が Epic の「対象外」記述と矛盾しないかを QG-{N} 段階で検証する（境界ケース #1516/TS-{NNN} 由来）。子 Issue 単体でも、親 Epic の対象外と矛盾するテスト戦略項目を検出する。
+Epic Issue の場合、テスト戦略が Epic の「対象外」記述と矛盾しないかを QG-2 段階で検証する（境界ケース #1516 由来）。子 Issue 単体でも、親 Epic の対象外と矛盾するテスト戦略項目を検出する。
 
 検証手順:
 
@@ -84,24 +84,24 @@ Epic Issue の場合、テスト戦略が Epic の「対象外」記述と矛盾
 判定:
 
 - **fail**: テスト戦略が Epic 対象外と明らかに矛盾し、検証が不可能。
-- **warn**: テスト戦略と対象外の関係が曖昧。QG-{N} での再検出リスクとして警告。
+- **warn**: テスト戦略と対象外の関係が曖昧。QG-2 での再検出リスクとして警告。
 - **pass**: Epic 対象外とテスト戦略が整合している、または Epic でない（対象外セクション不存在）。
 
-### 8. artifact-specific quality control 投影検証（REQ-{NNNN} 拡張）
+### 8. artifact-specific quality control 投影検証（execution contract 拡張）
 
-REQ-{NNNN} execution contract 確定を支援するため、artifact-specific quality control の test strategy への投影を検証する（AG-{NNN}、REQ-{NNNN}-{NNN}）。対応表は artifact-quality-control-routing SPEC を正とする。
+execution contract 確定を支援するため、artifact-specific quality control の test strategy への投影を検証する。対応表は artifact-quality-control-routing SPEC を正とする。
 
 検証項目:
 
 - (a) 変更予定成果物から導出される全ての必須品質能力が test strategy へ反映されていること
-- (b) 各 test strategy 項目が3要素（verification、pass_criteria、on_failure）を持つこと（REQ-{NNNN}-{NNN} の維持）
-- (c) 完了条件が成果状態であり、必須品質能力の呼出自体が完了状態とされていないこと（AG-{NNN}、REQ-{NNNN}-{NNN}）
+- (b) 各 test strategy 項目が3要素（verification、pass_criteria、on_failure）を持つこと
+- (c) 完了条件が成果状態であり、必須品質能力の呼出自体が完了状態とされていないこと
 
 適用範囲:
 
 - 新規 Issue 作成時（case-open Step 1、Step 5、Step 15 で実行）
 - case-update による新契約更新時
-- legacy Issue（Execution Contract 必須セクション不存在）には適用しない（presence-based 判定、AG-{NNN}、REQ-{NNNN}-{NNN}）
+- legacy Issue（Execution Contract 必須セクション不存在）には適用しない（presence-based 判定）
 
 判定:
 
@@ -122,11 +122,11 @@ Epic flow（マルチREQ/ 単一REQ Epic）の場合:
 - Epic Issue の完了条件は子Issue の完了条件の集約ではなく、Epic 固有の受け入れ基準を含む。
 - 各子Issue の完了条件が当該子Issue が担当する OU/ REQ の必達要件を網羅しているかを検証する。
 - 子Issue 間で必達要件の漏れ、重複がないかを確認する。
-- **Epic 対象外とテスト戦略の整合性検証（観点7）**: 各子 Issue のテスト戦略が Epic 本文の「対象外」セクションと矛盾しないかを検査する。境界ケース #1516/TS-{NNN} 由来。
+- **Epic 対象外とテスト戦略の整合性検証（観点7）**: 各子 Issue のテスト戦略が Epic 本文の「対象外」セクションと矛盾しないかを検査する。境界ケース #1516 由来。
 
 ## 委譲接続点
 
-QG-{N} の検査をサブエージェントに委譲する場合:
+QG-2 の検査をサブエージェントに委譲する場合:
 
 - サブエージェントは完了条件候補、必達要件 mapping 候補、網羅性の疑義のみを返す。
 - 親エージェントが pass/warn/fail を確定し、Issue 本文の確定と作成を行う。
@@ -134,13 +134,13 @@ QG-{N} の検査をサブエージェントに委譲する場合:
 
 ## 責務境界
 
-- QG-{N} は**判定のみ**行う。Issue 作成は case-open コマンドの責務。
-- QG-{N} fail 時は Issue 作成を停止し、req-define 差し戻しを推奨する（強制差し戻しではない）。
+- QG-2 は**判定のみ**行う。Issue 作成は case-open コマンドの責務。
+- QG-2 fail 時は Issue 作成を停止し、req-define 差し戻しを推奨する（強制差し戻しではない）。
 
 ## See Also
 
 - [common-gate-contract.md](common-gate-contract.md)
-- [qg-1-definition-integrity.md](qg-1-definition-integrity.md)（前工程の要件定義の完全性。QG-{N} はその成果物を入力とする）
+- [qg-1-definition-integrity.md](qg-1-definition-integrity.md)（前工程の要件定義の完全性。QG-2 はその成果物を入力とする）
 - **agentdev-issue-management**: Issue 本文生成、テンプレート選定
 - **agentdev-workflow-templates**: Issue 本文テンプレート（`issue_desc_*.md`）
 

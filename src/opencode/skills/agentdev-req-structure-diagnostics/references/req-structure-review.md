@@ -83,7 +83,7 @@ document-model SPEC の SPEC Separation Criteria に基づき、現行 REQ の�
 ## 配布物 ID 汚染検出
 
 AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等）が配布物に残留していないかを検出する。
-配布物（`src/opencode/commands/`、`src/opencode/skills/`）は AgentDevFlow 利用者が読む成果物であり、内部 ID はノイズとなるため記述しない（OU-{NNN} 原則）。
+配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）は AgentDevFlow 利用者が読む成果物であり、内部 ID はノイズとなるため記述しない。
 
 ### 検査対象
 
@@ -151,7 +151,7 @@ ID 汚染（前節）が 0 件でも本検査は実施する。
 | command 本体 ↔ 関連 skill | 当該 command の責務、権限、禁止事項が skill 記述と矛盾していないか |
 | case-open ↔ case-run ↔ case-close ↔ case-auto | 責務境界（PR 作成、Wave 境界、Epic Issue 単一書き手、クリーンアップ、委譲モデル）が全ての記述元で一致しているか |
 
-判定の SSoT 優先順位: 現行 REQ（REQ〜REQ, REQ）> 承認済み ADR（ADR, ADR, ADR, ADR）> SPEC（command SPEC 群、epic-wave-model SPEC）> command 本体 > skill。
+判定の SSoT 優先順位: 現行 REQ > 承認済み ADR > SPEC（command SPEC 群、epic-wave-model SPEC）> command 本体 > skill。
 
 ### NG 分類
 
@@ -176,7 +176,7 @@ NG 分類は推奨アクション（MOVE/ UPDATE 等）とは別軸で付ける�
 
 ## SPEC 三層構造の整合性検出
 
-SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC（workflows）は個別 command/skill の現在動作を含まない（OU-{NNN} 原則）。
+SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC（workflows）は個別 command/skill の現在動作を含まない。
 これに違反する配置を検出する。
 
 ### 検出シグナル
@@ -196,7 +196,7 @@ SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC�
 ## HOW 除去後の acceptance-criteria 順位検証
 
 機械的（単パス）な HOW 除去を実施した後、完了条件（acceptance criteria）順位で再検証を行う。
-前工程で機械的に HOW を除去しても残余 violation が残る場合がある（OU-{NNN}/Wave 4 学習: 8件の残余 violation を検出）。
+前工程で機械的に HOW を除去しても残余 violation が残る場合がある（Wave 4 学習: 8件の残余 violation を検出）。
 
 ### 検証手順
 

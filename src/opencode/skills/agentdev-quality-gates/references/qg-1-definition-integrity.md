@@ -1,7 +1,7 @@
-# QG-{N}: Definition Integrity Gate
+# QG-1: Definition Integrity Gate
 
 要件定義フェーズ（req-define/ req-save）で生成される成果物の構造的完全性を検証する Gate。
-本ファイルは QG-{N} の判定基準、検査観点を定義する。
+本ファイルは QG-1 の判定基準、検査観点を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
 ## 配置
@@ -81,9 +81,9 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 
 ### 9. auto_gate完全性
 
-要件doc draft の `auto_gate` フィールドが、req-define の完了条件として妥当に設定されているか（REQ, REQ）。
+要件doc draft の `auto_gate` フィールドが、req-define の完了条件として妥当に設定されているか。
 `auto_ready:false` の場合は `stop_reasons` が記録され、かつユーザー承認（合意による解消、または明示的な false 選択）が得られているか。
-未確定内容抑止（決定的マーカー検査 + 意味判定の組み合わせ）が `agreed_items`/ `artifact_actions` へ適用済みか（REQ）。
+未確定内容抑止（決定的マーカー検査 + 意味判定の組み合わせ）が `agreed_items`/ `artifact_actions` へ適用済みか。
 
 未確定内容抑止適用時の検査内容:
 - **決定的マーカー検査**: `agreed_items`/ `artifact_actions` 各 `content` に `TBD`/`TODO`/`未定`/`後続工程で確定`/`case-run で確定` の5マーカーが含まれないか。引用・禁止事例（例: 「TBD を残さないこと」）としての言及は検出対象外とする
@@ -94,14 +94,14 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 - **warn**: `auto_ready:false` で `stop_reasons` が記載されているが、ユーザー承認（合意による解消、または明示的 false 選択の `conflict_resolutions` 記録）が未確認。
 - **pass**: `auto_ready:true`（未確定内容抑止の決定的マーカー検査と意味判定をいずれも通過）、または `auto_ready:false` で `stop_reasons` がユーザー承認済み（`conflict_resolutions` 記録済み）。
 
-### 10. test_strategy 3要素完全性（REQ）
+### 10. test_strategy 3要素完全性
 
-要件doc draft の `test_strategy` セクションに含まれる各項目が、verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持しているか（REQ, REQ, REQ）。
+要件doc draft の `test_strategy` セクションに含まれる各項目が、verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に保持しているか。
 
 - **fail**: test strategy 項目のいずれかが3要素のいずれかを欠落している。on_failure（不合格時の処置）を持たない検証項目が test_strategy に含まれている。
 - **pass**: `test_strategy` セクションが不在（test strategy を定義しない要件）、または全項目が3要素を完全に保持している。
 
-### 11. 受け入れ条件存在（REQ）
+### 11. 受け入れ条件存在
 
 要件doc draft が受け入れ条件（acceptance criteria）を少なくとも1件含むか。受け入れ条件は `test_strategy` セクションの各項目、または要件doc 内の明示的な合格基準として記載される。
 
@@ -116,7 +116,7 @@ SPEC 等に配置すべきと判定された要件行候補が、ドラフトの
 
 ## 委譲接続点
 
-QG-{N} の検査をサブエージェントに委譲する場合:
+QG-1 の検査をサブエージェントに委譲する場合:
 
 - サブエージェントは分類候補、測可能性判定候補、根拠のみを返す。
 - 親エージェントが pass/warn/fail を確定し、ドラフト反映判断を行う。
@@ -124,8 +124,8 @@ QG-{N} の検査をサブエージェントに委譲する場合:
 
 ## 責務境界
 
-- QG-{N} は**判定のみ**行う。ドラフト編集、REQ 保存は req-define/ req-save コマンドの責務。
-- QG-{N} fail 時の差し戻し判断はユーザーが行う（自動差し戻し禁止）。
+- QG-1 は**判定のみ**行う。ドラフト編集、REQ 保存は req-define/ req-save コマンドの責務。
+- QG-1 fail 時の差し戻し判断はユーザーが行う（自動差し戻し禁止）。
 
 ## See Also
 

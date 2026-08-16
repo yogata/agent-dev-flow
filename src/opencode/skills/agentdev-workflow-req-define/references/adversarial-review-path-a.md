@@ -21,13 +21,13 @@
 
 ### Procedure
 
-req-define は adversarial-review を原則実行する（default-on、REQ-{NNNN}-{NNN}）。発動条件判定と review 呼出を分離する（REQ-{NNNN}-{NNN}）。
+req-define は adversarial-review を原則実行する（default-on）。発動条件判定と review 呼出を分離する。
 
-- **発動条件判定（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）**: default-on で発動する。skip 条件（Scale=L0 で Decision判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず STEP-9 へ進む）を継続できる（REQ-{NNNN}-{NNN}）。ユーザー明示指定時は skip 条件にかかわらず必ず発動する（REQ-{NNNN}-{NNN}）。skip 判断のためだけの新規 HITL、承認点は追加しない
-- **review 呼出（REQ-{NNNN}-{NNN}）**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う
-  - Decision finding は STEP-5（Decision判断）へ戻し再評価する。要件展開に関わる finding は該当 STEP へ戻す。accepted finding の反映は呼出元の責務である（REQ-{NNNN}-{NNN}）
-  - 未解決のユーザー判断事項が残る場合、STEP-9（ドラフト保存）へ進まない（REQ-{NNNN}-{NNN}）。工程委譲起源であるため既存 status に unresolved 判断事項を付加する（REQ-{NNNN}-{NNN}）
-  - 呼出失敗時は silent skip を禁止し、従来フローを維持する（REQ-{NNNN}-{NNN}）
+- **発動条件判定**: default-on で発動する。skip 条件（Scale=L0 で Decision判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず STEP-9 へ進む）を継続できる。ユーザー明示指定時は skip 条件にかかわらず必ず発動する。skip 判断のためだけの新規 HITL、承認点は追加しない
+- **review 呼出**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う
+  - Decision finding は STEP-5（Decision判断）へ戻し再評価する。要件展開に関わる finding は該当 STEP へ戻す。accepted finding の反映は呼出元の責務である
+  - 未解決のユーザー判断事項が残る場合、STEP-9（ドラフト保存）へ進まない。工程委譲起源であるため既存 status に unresolved 判断事項を付加する
+  - 呼出失敗時は silent skip を禁止し、従来フローを維持する
 
 詳細な挿入境界は req-define command SPEC（extension 経由）「adversarial-review 挿入境界（経路A）」節を正とする。
 

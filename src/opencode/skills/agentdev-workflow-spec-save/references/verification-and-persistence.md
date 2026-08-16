@@ -30,7 +30,7 @@
 
 ### Procedure
 
-新規 SPEC 作成時は `docs/specs/README.md`（SPEC 一覧）に追加する。既存 SPEC 追記時は README 更新不要とする。新規 SPEC 作成後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`、RU-{NNNNNNNN}-01 合意）で登録を検証する。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
+新規 SPEC 作成時は SPEC 一覧へ追加する。既存 SPEC 追記時は README 更新不要とする。新規 SPEC 作成後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で登録を検証する。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 
 ### Result
 
@@ -69,8 +69,8 @@ SPEC 一覧表の整合を確認し、targeted docs guard と extension 更新�
 
 SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済みであることを確認する（STEP-6 で実施済みの場合は重複確認）。SPEC 一覧表の整合は SPEC 探索導線の維持に必要な更新のみを対象とし、要件、判断、仕様の更新は含まない。
 
-- **extension 更新要否の確認（REQ）**: SPEC の追加、移動、分割が `.agentdev/extensions/**` に影響するか確認する。移動または分割により extension 参照先 SPEC パスが変わる場合、当該 extension の context paths を更新する。extension 参照先 SPEC を移動した場合はエラーとし、spec-save 自身は移動を完了させずユーザー判断を仰ぐ（IR-{NNN} check #5 strict 違反を防止）。SPEC 新規作成で既存 command/skill の実行時参照が増える場合、対応 extension の `context` への追加をユーザーに提案する（直接編集しない）
-- **targeted docs guard（REQ）**: 変更 SPEC ファイルと連動ファイル（`docs/specs/README.md`）に対し `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json` を実行する（bun run 起動。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files` であり、保存直後ファイルの直接指定には `--files` を使用する。PowerShell で複数パスを渡す場合は配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない）。`failures` に strict severity を含む場合は保存工程を継続せず修正して再実行する。`spec_readme_update_required` が true の場合は STEP-6 の更新要否判定に反映する。`full_docs_check_recommended` が true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
+- **extension 更新要否の確認**: SPEC の追加、移動、分割が `.agentdev/extensions/**` に影響するか確認する。移動または分割により extension 参照先 SPEC パスが変わる場合、当該 extension の context paths を更新する。extension 参照先 SPEC を移動した場合はエラーとし、spec-save 自身は移動を完了させずユーザー判断を仰ぐ（check #5 strict 違反を防止）。SPEC 新規作成で既存 command/skill の実行時参照が増える場合、対応 extension の `context` への追加をユーザーに提案する（直接編集しない）
+- **targeted docs guard**: 変更 SPEC ファイルと連動ファイル（`docs/specs/README.md`）に対し `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow spec-save --files <changed SPEC files> --json` を実行する（bun run 起動。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files` であり、保存直後ファイルの直接指定には `--files` を使用する。PowerShell で複数パスを渡す場合は配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない）。`failures` に strict severity を含む場合は保存工程を継続せず修正して再実行する。`spec_readme_update_required` が true の場合は STEP-6 の更新要否判定に反映する。`full_docs_check_recommended` が true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
 
 ### Result
 
@@ -144,7 +144,7 @@ SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済み
 
 ### Procedure
 
-**決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`、RU-{NNNNNNNN}-01 合意）で実行する。許可範囲外の変更を検出したらエラーを報告し指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
+**決定的処理のスクリプト呼出**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`）で実行する。許可範囲外の変更を検出したらエラーを報告し指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 
 ### Result
 
@@ -246,7 +246,7 @@ SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済み
 - `agentdev-artifact-validation`: check-entry-existence、check-change-impact
 - `agentdev-conventional-commits`: commit message 生成
 - `agentdev-git-worktree`: 並列実行安全ステージング
-- integrity checker skill（AG-{NNN} detector、repo 固有）: check_changed_docs.ts（--workflow spec-save）
+- integrity checker skill（repo 固有）: check_changed_docs.ts（--workflow spec-save）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
@@ -261,4 +261,4 @@ SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済み
 - インデックスの整合性（`docs/specs/README.md` エントリと新規 SPEC の一致、STEP-6 の `check-entry-existence.ts` 結果）
 - 変更範囲の妥当性（STEP-9 の `check-change-impact.ts` 結果）
 - 宣言付与の整合性（CREATE で `spec_logical_division` と `canonical_owner` が frontmatter または冒頭宣言節へ付与、UPDATE で `unknown` 以外確定時に補完）
-- 内容の品質（SPEC 分離基準適合性等）は再検証しない（req-define の QG-{N} の責務。STEP-4 の最終確認は分離基準の最終チェックであり内容品質の再審査ではない）
+- 内容の品質（SPEC 分離基準適合性等）は再検証しない（req-define の QG-1 の責務。STEP-4 の最終確認は分離基準の最終チェックであり内容品質の再審査ではない）

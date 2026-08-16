@@ -105,7 +105,7 @@
 - **`--body`**: Issue作成時に使用されたテンプレートに従って更新する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは本文案と必須セクション検査のみを返し、親エージェントが Issue 本文更新手続き（`agentdev-gh-cli`）を行う
 - **`--comment`**: 更新コメントを追加する。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントはコメント案と必須セクション検査のみを返し、親エージェントが投稿する
 - **`--req`**: REQファイル更新を行う。case-update --req は直接 commit+push を行う（req-save への委譲は行わない）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは関連REQ候補、APPEND/UPDATE候補、根拠のみを返し、親エージェントがファイル更新と commit/push を行う。APPEND vs UPDATE 判定基準: APPEND は要件テーブルへの行追加、適用範囲の拡張（例: 受け入れ基準の追加、新規要件の追加）。UPDATE は既存セクションの内容修正（例: テキスト置換、要件の文言修正、適用範囲の変更）
-- **`--review-ng`**: レビューNG時の専用フローを実行する。必ず QG-{N}（`agentdev-quality-gates`）の乖離検出結果を引用する（G05）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは乖離タイプ候補、推奨アクション、更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
+- **`--review-ng`**: レビューNG時の専用フローを実行する。必ず QG-3（`agentdev-quality-gates`）の乖離検出結果を引用する（G05）。詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは乖離タイプ候補、推奨アクション、更新漏れ候補のみを返し、親エージェントがコメント投稿とREQ更新判断を行う
 
 ### Result
 
@@ -177,11 +177,11 @@
 - `agentdev-workflow-routing`: 各更新種別フローの詳細、委譲接続点
 - `agentdev-workflow-lifecycle`: フェーズ判定
 - `agentdev-gh-cli`: Issue 更新・コメント追加の I/O 手続きと VERIFY
-- `agentdev-quality-gates`: QG-{N} 乖離検出結果の引用
+- `agentdev-quality-gates`: QG-3 乖離検出結果の引用
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G01/G02（フェーズ維持、管轄外の明確化）
 - G03（Issue番号解決に一覧取得禁止）
-- G04/G05/G06/G07（SSoT 整合、QG-{N} 引用、テンプレート構造維持、【必須】セクション確認）
+- G04/G05/G06/G07（SSoT 整合、QG-3 引用、テンプレート構造維持、【必須】セクション確認）
 - G08/G09（gh CLI 委譲、安全な読み取り手順）
