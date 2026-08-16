@@ -26,9 +26,9 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 **Epic Issue 判定**: 解決した Issue 番号の本文を `agentdev-gh-cli` の安全な読み取り手順で取得し、ステータス追跡テーブル（`agentdev-epic-tracker` の新4列/旧4列形式）が存在するか確認。
 
 - **テーブル存在時**: **Epic Wave クローズ**（STEP-E1〜E6、[references/epic-wave-close.md](epic-wave-close.md)）へ分岐
-- **テーブル不存在時**: **単一 Issue クローズ**（Step 1-1〜）へ進む（後方互換）
+- **テーブル不存在時**: **単一 Issue クローズ**（STEP-1-1〜）へ進む（後方互換）
 
-### Step 1-1: 重複ファイルチェック（merge/pull 実行前、単一 Issue クローズ時）
+### STEP-1-1: 重複ファイルチェック（merge/pull 実行前、単一 Issue クローズ時）
 
 `agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャに従い、ローカル未コミット変更ファイルと対象 PR 変更ファイルの重複を検出、停止条件の判定を行う。PR 補助データ読込手続き（`agentdev-gh-cli`）実行不可時は後方互換性として STEP-6（実行前同期）でフォールバック検出を維持する。
 

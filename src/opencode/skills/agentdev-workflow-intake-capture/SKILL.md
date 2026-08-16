@@ -58,13 +58,13 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-intake-capture.yaml`�
 
 本スキルは capture-only型の workflow であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。resume point / export / import を持たない。工程は逐次実行し、中断時は workflow を最初から再実行する。保存済みファイルとの重複はファイル名への連番付与で吸収するため、再実行は安全である。
 
-| 工程 | 名称 | 内容 |
+| STEP | 名称 | 内容 |
 |---|---|---|
-| 工程-1 | 入力の受領 | ユーザーから変更候補の内容を受領する。自然言語で記述された内容をそのまま取り扱う |
-| 工程-2 | intake item の生成 | 入力を推奨標準形に整理する。ユーザーが明示的に指定していないセクションは推測・補完せず省略する |
-| 工程-3 | ファイル名の生成・実行前同期 | `YYYY-MM-DD-{topic-slug}.md` 形式でファイル名を生成する。`git pull --ff-only` を実行する |
-| 工程-4 | 保存・永続化 | `.agentdev/intake/inbox/` へ保存し、`.agentdev/intake/` 配下の変更を commit / push する |
-| 工程-5 | 完了報告 | 完了報告 template に従って出力する。git 永続化結果を含める |
+| STEP-1 | 入力の受領 | ユーザーから変更候補の内容を受領する。自然言語で記述された内容をそのまま取り扱う |
+| STEP-2 | intake item の生成 | 入力を推奨標準形に整理する。ユーザーが明示的に指定していないセクションは推測・補完せず省略する |
+| STEP-3 | ファイル名の生成・実行前同期 | `YYYY-MM-DD-{topic-slug}.md` 形式でファイル名を生成する。`git pull --ff-only` を実行する |
+| STEP-4 | 保存・永続化 | `.agentdev/intake/inbox/` へ保存し、`.agentdev/intake/` 配下の変更を commit / push する |
+| STEP-5 | 完了報告 | 完了報告 template に従って出力する。git 永続化結果を含める |
 
 ## Intake Item 形式
 

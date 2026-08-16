@@ -67,6 +67,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# 共有定義（URL・ブランチ定数、cwd 安全化、チェックアウト案内。RU-0014、AG-020）
+. (Join-Path $PSScriptRoot 'consumer-opencode-common.ps1')
+
 $RepoRoot = $PWD.Path
 $PluginPath = Join-Path $RepoRoot $PluginDir
 $SourceDir = Join-Path $PluginPath 'src\opencode'
@@ -83,39 +86,6 @@ $RepoLocalSkillPrefix = 'repo-'
 $LocalModeRedirectSkill = 'agentdev-gh-cli'
 
 # --- Helper Functions ---
-
-function Assert-ValidConsumerCwd {
-    <#
-    .SYNOPSIS
-        実行ディレクトリが AgentDevFlow 導入先として適切か検査する。
-        想定外ディレクトリの場合、即座に停止する（REQ-{NNNN}-{NNN}）。
-    #>
-    $cwd = $PWD.Path
-
-    # 1. .agentdev-plugin/ 配下（チェックアウト配置先、REQ-009-041）
-    if ($cwd -match '[\\/]\.agentdev-plugin([\\/]|$)') {
-        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow のチェックアウト配置先です。1つ上のフォルダへ移動してください。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
-        exit 1
-    }
-
-    # 2. src/opencode/ 配下（原本領域）
-    if ($cwd -match '[\\/]src[\\/]opencode([\\/]|$)') {
-        Write-Host "現在のフォルダ: $cwd。このフォルダは agent-dev-flow の原本領域です。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
-        exit 1
-    }
-
-    # 3. .opencode/ 配下（実行時領域）
-    if ($cwd -match '[\\/]\.opencode([\\/]|$)') {
-        Write-Host "現在のフォルダ: $cwd。このフォルダは OpenCode の実行時領域です。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
-        exit 1
-    }
-
-    # 4. .git 無し（Git リポジトリでない）
-    if (-not (Test-Path -LiteralPath (Join-Path $cwd '.git'))) {
-        Write-Host "現在のフォルダ: $cwd。このフォルダは Git リポジトリではありません。AgentDevFlow をインストールしたいリポジトリの一番上のフォルダ（.git がある場所）で実行してください。"
-        exit 1
-    }
-}
 
 function Invoke-InstallWizard {
     <#
@@ -218,32 +188,17 @@ function Get-TargetSourcePath {
 
 # --- Checkout Guidance (AG-002/REQ-009-047) ---
 
-function Show-PluginCheckoutGuidance {
-    <#
-    .SYNOPSIS
-        チェックアウト未検出時の案内。provisioning（clone、fetch、reset）も network access も
-        代行実行しない（AG-001/REQ-009-046、DEC-016）。チェックアウトの取得は利用者の責務。
-    #>
-    $repoUrl = 'https://github.com/yogata/agent-dev-flow.git'
-    $repoWebUrl = $repoUrl -replace '\.git$', ''
-    Write-Host "[ERROR] 利用可能なチェックアウトが見つかりません。usable checkout 判定（$PluginDir/src/opencode/ の存在）に失敗しました。"
-    Write-Host ''
-    Write-Host 'このスクリプトは provisioning（clone、fetch、reset）と network access を行いません（REQ-009-046、DEC-016）。'
-    Write-Host '以下のいずれかで agent-dev-flow のチェックアウトを用意してから再実行してください。'
-    Write-Host ''
-    Write-Host '方法1: git clone でチェックアウトを用意する'
-    Write-Host "  git clone $repoUrl $PluginDir"
-    Write-Host ''
-    Write-Host '方法2: ソース ZIP を取得して展開する'
-    Write-Host "  1. $repoWebUrl を開く"
-    Write-Host '  2. [Code] ボタン → [Download ZIP] でソース ZIP をダウンロード'
-    Write-Host "  3. ZIP を展開し、中身（src/、scripts/ 等）を $PluginDir/ 直下に配置"
-    Write-Host "     注意: ZIP 展開直後の agent-dev-flow-<ref>/ の一段ネストを避け、$PluginDir/src/opencode/ となる配置にすること"
-    Write-Host "     （.git のない ZIP 展開チェックアウトも正規の配置形態）"
-    Write-Host "  4. scripts/ は $PluginDir/ と同一チェックアウトからコピーすること（スクリプトとチェックアウトの版不一致の防止）"
-    Write-Host ''
-    Write-Host "期待される状態: $SourceDir が存在すること"
-    exit 1
+# 案内文言・既定 URL 定数は consumer-opencode-common.ps1 の共有定義を使用する（RU-0014、AG-020）。
+# clone コマンドはブランチ指定なし、ZIP 配置の補足（ネスト回避、scripts/ 同一チェックアウトコピー）は
+# 当スクリプトの案内文言を維持する。
+function Invoke-PluginCheckoutGuidance {
+    Show-ConsumerCheckoutGuidance -PluginDir $PluginDir -SourceDir $SourceDir `
+        -CloneCommandLine "git clone $ConsumerRepoUrl $PluginDir" `
+        -ZipNoteLines @(
+            "   注意: ZIP 展開直後の agent-dev-flow-<ref>/ の一段ネストを避け、$PluginDir/src/opencode/ となる配置にすること",
+            "   （.git のない ZIP 展開チェックアウトも正規の配置形態）",
+            "4. scripts/ は $PluginDir/ と同一チェックアウトからコピーすること（スクリプトとチェックアウトの版不一致の防止）"
+        )
 }
 
 # --- Main ---
@@ -260,7 +215,7 @@ if (-not $Mode) {
 # 全モード（check、dry-run、apply）共通の前提であり、provisioning は行わない（AG-001/REQ-009-046、DEC-016）。
 # ZIP 展開チェックアウト（.git なし）も正規の配置形態として扱う（AG-003/REQ-009-048）。
 if (-not (Test-Path -LiteralPath $SourceDir)) {
-    Show-PluginCheckoutGuidance
+    Invoke-PluginCheckoutGuidance
 }
 
 # LocalMode requires the local source redirect target to exist

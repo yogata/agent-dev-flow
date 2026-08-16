@@ -13,15 +13,15 @@
 
 ## 手順
 
-### Step 1: 診断対象の読込
+### STEP-1-1: 診断対象の読込
 
 Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatter、本文構造、references 利用、template/ script 参照を把握する。
 
-### Step 2: 各診断観点の評価
+### STEP-2-1: 各診断観点の評価
 
 `agentdev-inspect-skills` に従い、参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存を評価する。
 
-### Step 3: 配布物構文健全性、責務整合診断
+### STEP-2-2: 配布物構文健全性、責務整合診断
 
 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンのうち Command/Skill 構造に関わる観点（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合、壊れた括弧、command と関連 skill 間の責務説明矛盾）を `agentdev-inspect-skills` に従って診断する。
 
@@ -29,11 +29,11 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 
 エンコーディング不整合の検出は、配布物 Markdown の UTF-8 BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-8 かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
 
-### Step 4: 分類
+### STEP-2-3: 分類
 
 検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける。
 
-### Step 5: route 提示
+### STEP-2-4: route 提示
 
 修正は実行せず、推奨 route を提示する。
 
@@ -52,7 +52,7 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 
 ## 関連 Capability Skill
 
-- `agentdev-inspect-skills`: 診断観点と判定基準（Step 2、3）
+- `agentdev-inspect-skills`: 診断観点と判定基準（STEP-2-1、2-2）
 - `agentdev-project-extensions`: docs-spec-rebuild-integrity SPEC の extension 経由解決
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）

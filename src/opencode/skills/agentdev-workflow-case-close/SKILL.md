@@ -27,8 +27,8 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`）�
 ## USE FOR
 
 - case-close command の実行時 workflow 制御（全 STEP）
-- 単一 Issue クローズフロー（Step 1-1, Step 2〜12）
-- Epic Wave クローズフロー（Step E1〜E6、子Issue 一括マージ・クローズ、Epic status table 更新）
+- 単一 Issue クローズフロー（STEP-1〜STEP-6、STEP-1-1 重複ファイルチェックを含む）
+- Epic Wave クローズフロー（STEP-E1〜E6、子Issue 一括マージ・クローズ、Epic status table 更新）
 - QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新、観点8 PR対象範囲 vs 全体）
 - docs 検証・SPEC 確定（targeted docs guard、IR-{NNN} check_extensions.ts、SPEC status 昇格）
 - PR マージ（squash merge、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）
@@ -85,12 +85,12 @@ case-close workflow は次の STEP で構成する。Epic Wave クローズは S
 ### STEP 間の依存と分岐
 
 - **単一 Issue クローズ**: STEP-1（単一 ルート）→ STEP-2 → STEP-3（配布依存境界 最終 gate 含む）→ STEP-4 → STEP-5 → STEP-6
-- **Epic Wave クローズ**: STEP-1（Epic ルート、ステータス追跡テーブル存在時）→ STEP-E1〜E6（E4 内で配布依存境界 最終 gate を各子Issue に適用、single-Issue STEP-3 Step 3-1 と同一 detector）
+- **Epic Wave クローズ**: STEP-1（Epic ルート、ステータス追跡テーブル存在時）→ STEP-E1〜E6（E4 内で配布依存境界 最終 gate を各子Issue に適用、single-Issue STEP-3-1 と同一 detector）
 - **コンフリクトエスカレーション**: STEP-4 で Level 1 rebase 失敗時、case-auto Level 2/3 エスカレーションへ（本 workflow の対象外）
 
 ### 共通事前マージ gate（両ルート共通、DEC-{N}、配布依存境界 SPEC）
 
-配布依存境界の最終 gate は single-Issue ルート（STEP-3 Step 3-1）と Epic Wave ルート（STEP-E4-0）の両方で、PR マージ前に必ず経由する共用事前マージ seam である。両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run Step 7-1 と case-close で同一 detector を再利用）。gate 違反時は両ルートとも PR マージを停止する。
+配布依存境界の最終 gate は single-Issue ルート（STEP-3-1）と Epic Wave ルート（STEP-E4-0）の両方で、PR マージ前に必ず経由する共用事前マージ seam である。両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run command Step 7-1 と case-close で同一 detector を再利用）。gate 違反時は両ルートとも PR マージを停止する。
 
 ### resume protocol
 

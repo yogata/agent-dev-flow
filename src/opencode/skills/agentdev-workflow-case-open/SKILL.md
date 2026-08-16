@@ -31,7 +31,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）は
 - execution_unit 構成（連結成分アルゴリズム、3軸判断、Epic vs Standard ルーティング）
 - 構成生成事前検証（preflight 5項目）
 - adversarial-review 挿入境界（経路F）の発動条件判定と review 呼出
-- Epic flow（Step 5-9）と Standard flow（Step 10-12）の制御
+- Epic flow（STEP-5-1〜5-5）と Standard flow（STEP-5-6〜5-8）の制御
 - draft/RU 削除クリーンアップ（Form Zero、即時 commit/push、削除残存検証）
 - 子Issue 作成の並列化（最大5件、3つの「5件」文脈の (1) に該当）
 
@@ -72,17 +72,17 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
-| STEP-{N} | 引き継ぎ・OU選択 | 要件doc 受領 | 処理対象確定（OU 単位） | [references/handoff-and-ou-gate.md](references/handoff-and-ou-gate.md) |
-| STEP-{N} | Issue本文生成・execution contract 確定 | 処理対象確定 | Issue 本文候補（EC-{N}〜EC-{N} 反映済み、QG-{N} 検証済み） | [references/issue-body-and-execution-contract.md](references/issue-body-and-execution-contract.md) |
-| STEP-{N} | 構成判定・preflight | Issue 本文候補確定 | execution structure（Epic vs Standard、Wave 構成、preflight合格） | [references/execution-unit-and-preflight.md](references/execution-unit-and-preflight.md) |
-| STEP-{N} | adversarial-review（経路F） | execution structure + Issue 本文 + 完了条件の3者確定 | review 結果反映（4パターン再実行ルール） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
-| STEP-{N} | Issue 作成（Epic flow / Standard flow） | adversarial-review skip または review 完了 | GitHub Issue 作成済み（親Epic + 子Issue群、または Standard Issue） | [references/issue-creation-flows.md](references/issue-creation-flows.md) |
-| STEP-{N} | 終了処理・クリーンアップ | Issue 作成完了 | コメント追加、draft/RU 削除（Form Zero）、完了報告 | [references/termination-and-cleanup.md](references/termination-and-cleanup.md) |
+| STEP-1 | 引き継ぎ・OU選択 | 要件doc 受領 | 処理対象確定（OU 単位） | [references/handoff-and-ou-gate.md](references/handoff-and-ou-gate.md) |
+| STEP-2 | Issue本文生成・execution contract 確定 | 処理対象確定 | Issue 本文候補（EC-{N}〜EC-{N} 反映済み、QG-{N} 検証済み） | [references/issue-body-and-execution-contract.md](references/issue-body-and-execution-contract.md) |
+| STEP-3 | 構成判定・preflight | Issue 本文候補確定 | execution structure（Epic vs Standard、Wave 構成、preflight合格） | [references/execution-unit-and-preflight.md](references/execution-unit-and-preflight.md) |
+| STEP-4 | adversarial-review（経路F） | execution structure + Issue 本文 + 完了条件の3者確定 | review 結果反映（4パターン再実行ルール） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
+| STEP-5 | Issue 作成（Epic flow / Standard flow） | adversarial-review skip または review 完了 | GitHub Issue 作成済み（親Epic + 子Issue群、または Standard Issue） | [references/issue-creation-flows.md](references/issue-creation-flows.md) |
+| STEP-6 | 終了処理・クリーンアップ | Issue 作成完了 | コメント追加、draft/RU 削除（Form Zero）、完了報告 | [references/termination-and-cleanup.md](references/termination-and-cleanup.md) |
 
 ### STEP 間の依存と分岐
 
-- **Standard flow**: STEP-{N} → STEP-{N} → STEP-{N}（Standard ルート）→ STEP-{N}（skip 条件該当時は省略）→ STEP-{N}（Standard flow）→ STEP-{N}
-- **Epic flow（単一REQ `scale: large`、マルチREQ、複数 OU）**: STEP-{N} → STEP-{N} → STEP-{N}（Epic ルート、execution_unit 構成）→ STEP-{N} → STEP-{N}（Epic flow、子Issue 並列作成）→ STEP-{N}
+- **Standard flow**: STEP-1 → STEP-2 → STEP-3（Standard ルート）→ STEP-4（skip 条件該当時は省略）→ STEP-5（Standard flow）→ STEP-6
+- **Epic flow（単一REQ `scale: large`、マルチREQ、複数 OU）**: STEP-1 → STEP-2 → STEP-3（Epic ルート、execution_unit 構成）→ STEP-4 → STEP-5（Epic flow、子Issue 並列作成）→ STEP-6
 - **adversarial-review skip 条件**: Standard flow で単一 OU の機械的確定、Wave 分割なし（REQ-{NNNN}-{NNN}）。ユーザー明示指定時は強制発動（REQ-{NNNN}-{NNN}）
 
 ### resume protocol
@@ -109,7 +109,7 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（draft/RU 削除、Form Zero）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-adversarial-review`: 経路F review 呼出
-- `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（STEP-{N}/5 で実観測時）
+- `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（STEP-4/5 で実観測時）
 
 ## Workflow Extension 読込
 
@@ -119,7 +119,7 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。`auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合は停止する。`conflict_resolutions` に記録済みの衝突は再確認しない
 - **OU 単位処理**: Issue 化単位は REQ doc 単位ではなく OU 単位（G19/G20/G21）。子Issue は OU 単位で作成し、Wave 単位のみの子Issue 構造は作成しない（G14）
-- **子Issue 上限**: Epic 1件あたり最大10件（G05）、case-open Step 8 子Issue 作成並列上限は5件（3つの「5件」文脈の (1) に該当）
+- **子Issue 上限**: Epic 1件あたり最大10件（G05）、case-open STEP-5-4 子Issue 作成並列上限は5件（3つの「5件」文脈の (1) に該当）
 - **Form Zero**: draft/RU 削除は `git rm <path>` で明示パスをステージし、同一ステップで `git commit -- <path>` により即時コミットし、未ステージ残存を許さない
 - **本文 verbatim・ファイル経由**: Issue 本文は `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF‑8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す（G25）
 

@@ -76,22 +76,22 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
-| STEP-{N} | 入力解決・開始時刻記録 | case-auto 起動 | 入力モード確定、`case_auto_started_at` 記録 | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
-| STEP-{N} | work_type 読取・工程分岐 | 入力解決完了 | 工程順序確定（artifact_actions ベース、auto_gate preflight） | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
-| STEP-{N} | orchestration 実行 | 工程順序確定 | 各工程の実行結果、stage モデル適用、Wave 反復、bg task 状態管理 | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
-| STEP-{N} | 停止条件検出・停止理由分類 | 各工程の結果受領 | 停止判定（11項目）、停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断） | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
-| STEP-{N} | adversarial-review 経路H 停止伝播 | user-decision-required + decision_context 受領 | 当該 execution_unit の自走停止、ユーザー判断待機 | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
-| STEP-{N} | bounded parent decision resolution | decision_context 受領 | 自律解決 / 作業仮定 / 上位合意矛盾停止 / 新規ユーザー判断停止 | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
-| STEP-{N} | コンフリクト解消 Level 2/3 | case-close から Level 1 失敗エスカレーション受領 | インライン case-run 再実行（最大2回）、オーケストレーション級判断、解消 or 停止 | [references/conflict-resolution-and-reporting.md](references/conflict-resolution-and-reporting.md) |
-| STEP-{N} | 完了報告 | 全工程完了 or 停止 | L1 タイムスタンプ、4次元集約、OU処理ループ、結果状態の分離報告 | [references/conflict-resolution-and-reporting.md](references/conflict-resolution-and-reporting.md) |
+| STEP-1 | 入力解決・開始時刻記録 | case-auto 起動 | 入力モード確定、`case_auto_started_at` 記録 | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
+| STEP-2 | work_type 読取・工程分岐 | 入力解決完了 | 工程順序確定（artifact_actions ベース、auto_gate preflight） | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
+| STEP-3 | orchestration 実行 | 工程順序確定 | 各工程の実行結果、stage モデル適用、Wave 反復、bg task 状態管理 | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
+| STEP-4 | 停止条件検出・停止理由分類 | 各工程の結果受領 | 停止判定（11項目）、停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断） | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
+| STEP-5 | adversarial-review 経路H 停止伝播 | user-decision-required + decision_context 受領 | 当該 execution_unit の自走停止、ユーザー判断待機 | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
+| STEP-6 | bounded parent decision resolution | decision_context 受領 | 自律解決 / 作業仮定 / 上位合意矛盾停止 / 新規ユーザー判断停止 | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
+| STEP-7 | コンフリクト解消 Level 2/3 | case-close から Level 1 失敗エスカレーション受領 | インライン case-run 再実行（最大2回）、オーケストレーション級判断、解消 or 停止 | [references/conflict-resolution-and-reporting.md](references/conflict-resolution-and-reporting.md) |
+| STEP-8 | 完了報告 | 全工程完了 or 停止 | L1 タイムスタンプ、4次元集約、OU処理ループ、結果状態の分離報告 | [references/conflict-resolution-and-reporting.md](references/conflict-resolution-and-reporting.md) |
 
 ### STEP 間の依存と分岐
 
-- **正常経路**: STEP-{N} → STEP-{N} → STEP-{N} → STEP-{N}（全工程完了時）
-- **停止経路**: STEP-{N} → STEP-{N}（停止条件検出時）→ STEP-{N}（停止報告）
-- **経路H**: STEP-{N} → STEP-{N}（user-decision-required 受領時）→ ユーザー判断待機 → resume point から再開
-- **bounded parent decision**: STEP-{N} → STEP-{N}（decision_context 受領時）→ 自律解決時は STEP-{N} へ戻る、上位合意矛盾/新規ユーザー判断時は STEP-{N} 停止経路へ
-- **コンフリクトエスカレーション**: STEP-{N}（case-close 委譲時）→ STEP-{N}（Level 1 失敗時）→ 解消時は STEP-{N} へ戻る、Level 3 失敗時は STEP-{N} 停止経路へ
+- **正常経路**: STEP-1 → STEP-2 → STEP-3 → STEP-8（全工程完了時）
+- **停止経路**: STEP-3 → STEP-4（停止条件検出時）→ STEP-8（停止報告）
+- **経路H**: STEP-3 → STEP-5（user-decision-required 受領時）→ ユーザー判断待機 → resume point から再開
+- **bounded parent decision**: STEP-3 → STEP-6（decision_context 受領時）→ 自律解決時は STEP-3 へ戻る、上位合意矛盾/新規ユーザー判断時は STEP-4 停止経路へ
+- **コンフリクトエスカレーション**: STEP-3（case-close 委譲時）→ STEP-7（Level 1 失敗時）→ 解消時は STEP-3 へ戻る、Level 3 失敗時は STEP-4 停止経路へ
 
 ### resume protocol
 
@@ -137,7 +137,7 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 - **自走境界（G01-G06）**: repo にファイルとして残る変更のみ自走対象。DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS 設定変更、課金、権限、認証情報、repo外実データ操作、通知送信は対象外
 - **委譲・参照制約（G07-G09, G13-G21, G27-G32）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作、AG-{NNN}）。Epic Issue 本文書き込みは case-close 単一書き手（case-auto は読取のみ、G16）。case-auto は Issue 階層決定ロジックを持たない（G13）、Epic Issue 化の判定に関与しない（G21）
 - **3つの「5件」文脈の区別**: (1) case-run Wave 内子 Issue 並列、(2) case-auto Phase 2 同時起動数、(3) execution_unit 全体並列（上限なし）。混同しない
-- **OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-{N} から開始（全 OU 処理完了時のみ全体完了報告）
+- **OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-3 から開始（全 OU 処理完了時のみ全体完了報告）
 - **親コンテキスト非累積（G28）**: 委譲工程の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持し、委譲工程内部の調査過程、中間ログ、読解メモを親コンテキストに累積しない
 - **L1 タイムスタンプ**: 開始時刻（`case_auto_started_at`）、工程別タイムスタンプ（req-save+spec-save 統合委譲 / case-open / case-run / case-close）、終了時刻を記録。case-run の L2 内訳は case-run result から読み取って含める
 
