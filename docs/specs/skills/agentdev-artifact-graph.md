@@ -411,7 +411,7 @@ Artifact Graph 自身の接続確認のみを workflow effectiveness の成立�
 - [../local/artifact-graph.md](../local/artifact-graph.md)（旧 repo-local 仕様、superseded）
 - [../foundations/document-model.md](../foundations/document-model.md)（文書モデル）
 - [../../requirements/REQ-012.md](../../requirements/REQ-012.md)（Artifact Graph 標準化 REQ）
-- [../../requirements/REQ-013.md](../../requirements/REQ-013.md)（旧文書探索経路インデックス依存除去 REQ）
+- [../../requirements/retired/REQ-013.md](../../requirements/retired/REQ-013.md)（旧文書探索経路インデックス依存除去 REQ、docs/requirements/retired/ へ移行済み。後継は REQ-012、integrity スクリプト残存参照の生死判定記録は [docmap-reference-audit.md](../integrity/references/docmap-reference-audit.md)）
 - [../../requirements/REQ-020.md](../../requirements/REQ-020.md)（Artifact Graph 解析品質と検証 REQ）
 - [../../decisions/DEC-007.md](../../decisions/DEC-007.md)（Artifact Graph 標準化と配布スキル昇格 Decision）
 - DEC-002（OpenCode ソース・プロジェクション分離）
