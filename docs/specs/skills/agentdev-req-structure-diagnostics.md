@@ -54,6 +54,6 @@ inspect-docs コマンドの REQ 構造診断ロジックの知識ベースと�
 
 - [agentdev-doc-writing.md](agentdev-doc-writing.md)
 - [commands/inspect-docs.md](../commands/inspect-docs.md)
-- REQ-010（inspect-docs / REQ 再構成運用）
+- REQ-036（inspect-docs / REQ 再構成運用）
 - REQ-001（SPEC 分離基準違反検出強化）
 

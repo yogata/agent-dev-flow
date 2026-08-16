@@ -106,5 +106,5 @@ consumer 環境に対応 node type または relation type が存在しない場
 - [inspect-promote.md](inspect-promote.md)（検出事項分類、昇格）
 - `agentdev-workflow-inspect-skills` skill（workflow 実装本体（工程構成、冪等性、終了条件））
 - `agentdev-inspect-skills` skill（詳細手順、finding 形式、推奨 route）
-- REQ-010（inspect-skills / Command/Skill 参照妥当性検出）
+- REQ-036（inspect-skills / Command/Skill 参照妥当性検出）
 

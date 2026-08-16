@@ -32,18 +32,18 @@ updated: 2026-06-28
 | REQ-005 | Workflow/Command Protocol | IR-006, IR-024 | commands |
 | REQ-008 | RU lifecycle / Requirement Unit 管理 | IR-016 | ドメイン状態 |
 | REQ-006 | Case 実行オーケストレーション / Epic、Wave | IR-006, IR-013, IR-016 | commands, templates |
-| REQ-010 | REQ 再構成運用 | IR-004, IR-011, IR-015 | REQ, 廃止 REQ |
+| REQ-036 | REQ 再構成運用 | IR-004, IR-011, IR-015 | REQ, 廃止 REQ |
 | REQ-001 | ADR status 正規化 | IR-005, IR-010 | ADR, ADR index |
 | v2:REQ-0113 | Skill References SPEC 分離 | IR-008, IR-014 | skills, skill references |
 | REQ-006 | case-auto 最大自走モード | IR-006, IR-016 | commands |
 | REQ-003 | コマンド、スキル、サブエージェント責務分界の再基準化 | IR-006, IR-008, IR-014, IR-024 | commands, skills |
 | REQ-005 | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 | IR-006, IR-008, IR-014 | commands, skills |
-| REQ-010 | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle | IR-006, IR-024 | commands |
-| REQ-010 | inspect-skills / Command/Skill 参照妥当性検出 | IR-008, IR-014 | commands, skills |
-| REQ-010 | inspect-promote / 検出事項分類、昇格 | IR-016 | ドメイン状態 |
-| REQ-010 | Intake command 群 (capture / from-github / promote) | IR-016 | ドメイン状態 |
-| REQ-010 | Learning-promote | IR-016 | ドメイン状態 |
-| REQ-010 | Backlog-review | IR-016 | ドメイン状態 |
+| REQ-036 | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle | IR-006, IR-024 | commands |
+| REQ-036 | inspect-skills / Command/Skill 参照妥当性検出 | IR-008, IR-014 | commands, skills |
+| REQ-036 | inspect-promote / 検出事項分類、昇格 | IR-016 | ドメイン状態 |
+| REQ-037 | Intake command 群 (capture / from-github / promote) | IR-016 | ドメイン状態 |
+| REQ-038 | Learning-promote | IR-016 | ドメイン状態 |
+| REQ-039 | Backlog-review | IR-016 | ドメイン状態 |
 | REQ-006 | case-run / 実装パイプライン | IR-006, IR-013, IR-016 | commands, templates |
 | REQ-006 | case-close / 完了処理 | IR-006, IR-013, IR-016 | commands, templates |
 | REQ-006 | case-open / Issue 作成 | IR-006 | commands |
@@ -92,7 +92,7 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 - **REQ-002**: アーティファクト配置規約として広範囲に影響 (5 ルール)
 
 ### 中影響（3-4 ルール）
-- **REQ-010**: REQ 再構成運用 (3 ルール)
+- **REQ-036**: REQ 再構成運用 (3 ルール)
 - **REQ-003**: コマンド、スキル、サブエージェント責務分界 (4 ルール)
 - **REQ-005**: Command protocol (2 ルール)
 - **REQ-006**: Case 実行オーケストレーション (3 ルール)
@@ -103,7 +103,7 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 - **REQ-003**: 文書化規律、HITL境界 (3 ルール: IR-013, IR-019, IR-035)
 
 ### 低影響（1-2 ルール）
-- **REQ-004**, **REQ-008**, **REQ-001**, **v2:REQ-0113**, **REQ-006**, **REQ-005**, **REQ-010**, **REQ-010**, **REQ-010**, **REQ-010**, **REQ-010**, **REQ-010**, **REQ-006**, **REQ-006**, **REQ-006**, **REQ-006**, **REQ-009**, **REQ-008**, **REQ-001**, **REQ-008**, **REQ-003**, **v2:REQ-0140**, **REQ-002**, **v2:REQ-0143**, **REQ-010**, **REQ-006**
+- **REQ-004**, **REQ-008**, **REQ-001**, **v2:REQ-0113**, **REQ-006**, **REQ-005**, **REQ-036**, **REQ-036**, **REQ-036**, **REQ-037**, **REQ-038**, **REQ-039**, **REQ-006**, **REQ-006**, **REQ-006**, **REQ-006**, **REQ-009**, **REQ-008**, **REQ-001**, **REQ-008**, **REQ-003**, **v2:REQ-0140**, **REQ-002**, **v2:REQ-0143**, **REQ-010**, **REQ-006**
 
 ### 直接影響なし
 - **v2:REQ-0110**: Git worktree cleanup 信頼性（インフラストラクチャ層）

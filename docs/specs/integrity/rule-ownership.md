@@ -36,14 +36,14 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 10 | 完了報告フォーマット | REQ-002 (046), v2:REQ-0107 (013, 022) | artifact-contracts.md | 種別（`variant`）別管理 |
 | 11 | 共通処理集約 | REQ-002 (040-043) | - | Git 同期等の共通化 |
 | 12 | Source/projection 分離 | REQ-002 (048-055) | system.md | `src/opencode/` 原本 + `.opencode/` 配置先 |
-| 13 | Integrity 検査カテゴリ | REQ-010 (001-021) | integrity-contracts.md | 18 集合、strict/heuristic/observation |
-| 14 | Finding 分類 | REQ-010 (017, 018) | integrity-contracts.md | 6 カテゴリ + 経路 |
-| 15 | Frontmatter dev metadata 禁止 | REQ-010 (022-024, 095-098) | integrity-contracts.md | dev メタデータ禁止 |
+| 13 | Integrity 検査カテゴリ | REQ-010 (001-012), REQ-036 (001-009) | integrity-contracts.md | 18 集合、strict/heuristic/observation |
+| 14 | Finding 分類 | REQ-036 (005, 006) | integrity-contracts.md | 6 カテゴリ + 経路 |
+| 15 | Frontmatter dev metadata 禁止 | REQ-036 (010-012), REQ-010 (095-098) | integrity-contracts.md | dev メタデータ禁止 |
 | 16 | Retired REQ 管理 | REQ-010 (070-088) | integrity-contracts.md | 注記、参照区別 |
-| 17 | Link 整合性 | REQ-010 (013) | integrity-contracts.md | Markdown リンク先存在確認 |
-| 18 | Namespace legacy 残存 | REQ-010 (016) | integrity-contracts.md | 旧コマンド名、旧パス検出 |
+| 17 | Link 整合性 | REQ-036 (001) | integrity-contracts.md | Markdown リンク先存在確認 |
+| 18 | Namespace legacy 残存 | REQ-036 (004) | integrity-contracts.md | 旧コマンド名、旧パス検出 |
 | 19 | REQ/Decision 相互参照 | REQ-010 (005) | integrity-contracts.md | 双方向参照確認 |
-| 20 | Authoring DoD | REQ-010 (060-064) | quality-specs.md | 行数、Steps、共通化、正規パス（`canonical path`） |
+| 20 | Authoring DoD | REQ-010 (060, 062-064), REQ-038 (005) | quality-specs.md | 行数、Steps、共通化、正規パス（`canonical path`） |
 | 21 | Command Step 整数化 | REQ-003 (005, 007) | artifact-contracts.md | 最上位 Step は整数のみ。小数 Step を禁止 |
 | 22 | Command サブステップ表記 | REQ-003 (006) | artifact-contracts.md | サブステップは N-M 形式のみ許容。英字サブステップを禁止 |
 | 23 | Subagent verbatim 条件 | REQ-003 (013) | workflow-contracts.md | 成果物本文のみそのまま（verbatim）。一律 verbatim 制約を禁止 |
@@ -60,7 +60,7 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 34 | local-transform（ローカル版変換資産） | REQ-009 (028, 029, 032) | runtime-package-boundary.md | **確定廃止**（PR#1195 で transform/ 完全削除、REQ-009-004/009/028 確定廃止昇格）。変換用プロンプト、レビュー用プロンプト、変換仕様の要件は全て廃止済み。link mode の現行契約は `runtime-package-boundary.md` が所有する |
 | 35 | obsolete-spec-path（旧SPEC直下パス参照検出） | REQ-010 (280, 282) | integrity-rule-catalog.md (IR-057) | docs/specs/ 基盤SPEC ドメイン別体系化（REQ-001）以前の直下パス参照を検出。`obsolete-path-map.yaml` を対照表として IR-057 が検証。link mode 統一（REQ-009）に伴う廃止語彙を「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離し検出。例外条件: obsolete-path-map.yaml 自体、IR-057 ルール説明、retired 配下、テスト fixture、コードブロック内検査 fixture。v2:REQ-0158 は Issue #1713 で retire 完了（要件は REQ-010-280/282 へ統合） |
 | 36 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003), REQ-010 (263) | integrity-rule-catalog.md (IR-056) | project extensions 機構（SPEC `../foundations/project-extensions.md`）の整合性検査。extension schema（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
-| 37 | IR 存在条件モデル（DEC-013 適用） | REQ-028 (008, 009, 010, 012), REQ-010 (058) | integrity-contracts.md | DEC-013 AG-008/009 適用後の IR モデルを所有。`lifecycle_state`、`enforcement_mode`、`baseline_status` を現行 IR 属性から削除し、「現存 IR = 現行 = executable detector」へ統一。8項目存在条件、finding-baseline 分類（finding 側）、新規 IR 登録 gate (a)/(b)、一時移行検査 registry を正規所有する。catalog（[integrity-rule-catalog.md](integrity-rule-catalog.md)）は schema 定義のみ重複所有し、判定規則は本ドメインへ委譲する |
+| 37 | IR 存在条件モデル（DEC-013 適用） | REQ-028 (008, 009, 010, 012), REQ-036 (022) | integrity-contracts.md | DEC-013 AG-008/009 適用後の IR モデルを所有。`lifecycle_state`、`enforcement_mode`、`baseline_status` を現行 IR 属性から削除し、「現存 IR = 現行 = executable detector」へ統一。8項目存在条件、finding-baseline 分類（finding 側）、新規 IR 登録 gate (a)/(b)、一時移行検査 registry を正規所有する。catalog（[integrity-rule-catalog.md](integrity-rule-catalog.md)）は schema 定義のみ重複所有し、判定規則は本ドメインへ委譲する |
 
 ## IR 別関連マッピング（自動生成）
 
@@ -86,7 +86,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-010 | ADR status 正規化 | REQ-010-121 | integrity-contracts.md |
 | IR-012 | Template 必須セクション | REQ-010 (workflow template 構造) | integrity-contracts.md |
 | IR-013 | 完了報告種別実在 | REQ-010-089-091, REQ-036-008 | integrity-contracts.md |
-| IR-014 | reference/ 残存検出 | REQ-002-013, 039, REQ-010-039, 040, 094 | artifact-responsibilities.md |
+| IR-014 | reference/ 残存検出 | REQ-002-013, 039, REQ-037-006, 007, REQ-010-094 | artifact-responsibilities.md |
 | IR-015 | 廃止 REQ 現行参照検出 | REQ-010-070-074, 136 | integrity-contracts.md |
 | IR-016 | Source/projection 整合性 | REQ-002-048-052, REQ-010-143-144 | system.md |
 | IR-018 | REQ 範囲表記鮮度 | REQ-010-140 | integrity-contracts.md |
@@ -121,7 +121,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-052 | 完了条件 grep パターン設計（REQ-010-011） | REQ-010-011 | integrity-contracts.md, quality-gates.md |
 | IR-053 | gh 直接記述検出 | REQ-011 | integrity-rule-catalog.md, integrity-contracts.md, ../../skills/agentdev-gh-cli.md |
 | IR-054 | draft SPEC 放置検出 | REQ-001-002, REQ-010-150, REQ-010-151 | integrity-rule-catalog.md, integrity-contracts.md |
-| IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-002-079, REQ-002-080, REQ-002-081, REQ-010-056, REQ-010-263, REQ-010-264 | integrity-rule-catalog.md, integrity-contracts.md |
+| IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-002-079, REQ-002-080, REQ-002-081, REQ-028-009, REQ-010-263, REQ-010-264 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-056 | project-extensions-integrity | REQ-002 | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | IR-057 | obsolete-spec-path-after-domain-split | REQ-010-280, REQ-010-282, REQ-001-006, REQ-009-004, REQ-010-265, REQ-036-012 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md |
 | IR-058 | distribution-untracked-skill-reference | REQ-002-001, REQ-002-002, REQ-002-003 | ../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md |
@@ -141,7 +141,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | 重複ルール | 旧参照箇所 | 原本所有者 | 状態 |
 |-----------|-----------|----------------|------|
 | Frontmatter 許可フィールド | REQ-002-044, REQ-039-002, REQ-010-098 | REQ-002-044 (primary) | ✅ |
-| `references/` 正規化 | REQ-002-013/039, REQ-010-039/040/094 | REQ-002-013 (primary) | ✅ |
-| Template 配置規約 | REQ-002-005/046, v2:REQ-0107-013/022, REQ-010-042/075 | REQ-002-005 (primary) | ✅ |
+| `references/` 正規化 | REQ-002-013/039, REQ-037-006/007, REQ-010-094 | REQ-002-013 (primary) | ✅ |
+| Template 配置規約 | REQ-002-005/046, v2:REQ-0107-013/022, REQ-038-002, REQ-010-075 | REQ-002-005 (primary) | ✅ |
 | Namespace 予約 | REQ-002-009/056, REQ-036-004 | REQ-002-009 (primary) | ✅ |
-| Dev metadata 禁止 | REQ-002-015/020, REQ-010-022/095 | REQ-002-015 (primary) | ✅ |
+| Dev metadata 禁止 | REQ-002-015/020, REQ-036-010, REQ-010-095 | REQ-002-015 (primary) | ✅ |

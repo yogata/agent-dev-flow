@@ -62,7 +62,7 @@ updated: 2026-08-15
 | Canonical | 正規境界の遵守 |
 | Lifecycle | 状態遷移の妥当性 |
 | Namespace | 旧名前空間残存確認 |
-| ImplementationPattern | frontmatter 禁止フィールド検査（REQ-010-026〜038 から反転、REQ-010-109/124 に統合済） |
+| ImplementationPattern | frontmatter 禁止フィールド検査（REQ-036-014〜021、REQ-037-001〜005 から反転、REQ-010-109/124 に統合済） |
 | ADRStatusNormalization | ADR status 旧形式検出（REQ-010-121） |
 | RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-010-122） |
 | WorkflowStatusProhibition | ワークフロー状態 / 6 マイクロフェーズ検出（REQ-010-123） |
@@ -167,7 +167,7 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 | 層 | 担当 | 検出対象 | 検出形式 |
 |---|---|---|---|
 | 機械的検出 | docs-check + IR（[integrity-rule-catalog.md](integrity-rule-catalog.md)） | 文書構造、ID 参照、frontmatter、命名規則等、決定論的検出可能な違反 | strict / heuristic / observation の severity 分類 |
-| 意味的診断 | inspect-skills（REQ-010） | Command → Skill 参照妥当性、Skill 構造、読み取り専用診断 | finding 出力、推奨 route 提示 |
+| 意味的診断 | inspect-skills（REQ-036） | Command → Skill 参照妥当性、Skill 構造、読み取り専用診断 | finding 出力、推奨 route 提示 |
 | 査読時観点 | doc-writing skill（v2:REQ-0140） | 文書種別責務、要件性、文意品質、粒度 | 査読コメント、follow-up 指摘 |
 
 各層は他層の担当を重複して実施せず、検出内容に応じて適切な層へ委譲する。
