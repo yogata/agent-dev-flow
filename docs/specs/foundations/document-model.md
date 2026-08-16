@@ -148,7 +148,7 @@ REQ 要件行の粒度を判定するテスト:
 
 ### REQ 品質維持基準
 
-SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT は、inspect-docs の診断観点に加え、REQ 運用品質維持の恒常的基準として参照する（REQ-010-039）。
+SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT は、inspect-docs の診断観点に加え、REQ 運用品質維持の恒常的基準として参照する（REQ-037-006）。
 REQ 体系の健全性を維持するため、これらの観点で定期的に REQ 体系を評価する。
 
 ### 恒久契約適格性と既存成果物処置分類 <!-- v2:REQ-0155-005, REQ-010-047, v2:REQ-0140-021 -->

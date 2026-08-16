@@ -88,5 +88,5 @@ updated: 2026-08-15
 - [intake-from-github.md](intake-from-github.md)（GitHub からの自動抽出）
 - `agentdev-workflow-intake-capture` skill（workflow 実装本体）
 - `agentdev-intake-pipeline` skill（共通手順）
-- REQ-010（Intake command群）
+- REQ-037（Intake command群）
 

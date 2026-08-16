@@ -91,5 +91,5 @@ updated: 2026-08-15
 - [intake-promote.md](intake-promote.md)（後続コマンド（採用判断））
 - `agentdev-workflow-intake-from-github` skill（workflow 実装本体）
 - `agentdev-intake-pipeline` skill（抽出アルゴリズム）
-- REQ-010（Intake command群）
+- REQ-037（Intake command群）
 

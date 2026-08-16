@@ -129,7 +129,7 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 - [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
 - `agentdev-workflow-intake-promote` skill（workflow 実装本体）
 - `agentdev-intake-pipeline` skill（inbox スキャン、レビュー評価、分類提示、整形保存）
-- REQ-010（Intake command群）
+- REQ-037（Intake command群）
 
 ## adversarial-review 挿入境界（経路C）
 
