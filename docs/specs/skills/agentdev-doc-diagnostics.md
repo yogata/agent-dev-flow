@@ -65,7 +65,7 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（R
 
 ## 現在の動作
 
-- inspect-docs command は診断の実行と finding 出力を担い、診断カテゴリ、証拠構造、出力契約、ルーティングは本 skill が一次所有する（REQ-010-048）
+- inspect-docs command は診断の実行と finding 出力を担い、診断カテゴリ、証拠構造、出力契約、ルーティングは本 skill が一次所有する（REQ-039-004）
 - REQ 固有診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）は `agentdev-req-structure-diagnostics`、文意品質は `agentdev-doc-writing`、探索順は `agentdev-doc-map` が残留する
 - 本 skill は横断編成と結果統合のみを所有し、専門診断の再定義を行わない
 - 診断対象は読み取り専用とし、許可される副作用は `.agentdev/inspect/inbox/*.md` の生成と `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ（REQ-002-140-151、inspect lifecycle 準拠）
@@ -96,4 +96,4 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
 - [agentdev-req-structure-diagnostics.md](agentdev-req-structure-diagnostics.md)（REQ 固有診断 skill）
 - [agentdev-doc-writing.md](agentdev-doc-writing.md)（文意品質 skill）
 - REQ-036-013（diagnostics 命名許容例外境界）
-- REQ-010-048（inspect-docs と diagnostics skill の責務分離）
+- REQ-039-004（inspect-docs と diagnostics skill の責務分離）

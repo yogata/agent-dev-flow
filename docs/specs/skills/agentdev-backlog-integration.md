@@ -56,7 +56,7 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 - [commands/backlog-review.md](../commands/backlog-review.md)
 - [../workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)
 - REQ-008（RU lifecycle）
-- REQ-010（Backlog-review）
+- REQ-039（バックログ統合）
 
 ## adversarial-review 候補判断と内部挿入
 
