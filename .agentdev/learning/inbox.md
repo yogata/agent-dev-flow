@@ -310,3 +310,19 @@
 - **想定反映先**: 検証スクリプト・テスト戦略テンプレートの参考（learning-promote で判定）
 - **関連**: PR #2187, Issue #2182 (CLOSED), Epic #2178
 - **タグ**: #git #verification
+
+## worktree での check_integrity 検証は .opencode junction 一時作成で main repo 等価環境を再現する（OU-004、PR #2188）
+
+- **問題事象**: check_integrity の ir035（See Also skill directory not found）は worktree で .opencode/skills|commands 配下の junction が未伝播（git 管理外のため）となることで既定 fail する。
+- **発生局面**: 実装（worktree 内での main repo 等価の整合性検証）
+- **検知方法**: worktree 内 check_integrity.ts 実行時の ir035 fail
+- **根本原因**: junction は git 管理外のローカルリンクであり、git worktree には複製されない。checker は .opencode 配下のスキル・コマンド実体の存在を前提としている
+- **自律対応内容**: worktree の .opencode/skills|commands へ一時的に junction を作成して main repo 等価環境を再現すると exit 0 になることを確認（本 PR で適用。gitignore 済みのため worktree に残置）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: .opencode junction 依存の checker を worktree で実行する場面全般に当てはまる
+- **再発条件**: worktree 内で .opencode 配下実体を前提とする検査を実行する場合
+- **予防策候補**: worktree 検証手順に .opencode junction 一時作成（検証後はクリーンアップ対象として扱う）を明示する
+- **想定反映先**: 検証手順・worktree 運用の参考（learning-promote で判定）
+- **関連**: PR #2188, Issue #2183 (CLOSED), Epic #2178 (CLOSED)
+- **タグ**: #worktree #junction #check-integrity
