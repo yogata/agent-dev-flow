@@ -16,7 +16,7 @@ docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契
 
 `inspect-docs` command の実行時に docs 横断診断の実行を担う診断判断 skill の責務、対象外、境界を定義する。
 REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`）との責務重複を防ぎ、docs 横断診断の正規所有者を一つに定める。
-名称は REQ-010-025 の diagnostics 許容例外境界に基づき `agentdev-doc-diagnostics` を維持する（CR-001）。
+名称は REQ-036-013 の diagnostics 許容例外境界に基づき `agentdev-doc-diagnostics` を維持する（CR-001）。
 
 ## 適用対象
 
@@ -73,7 +73,7 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（R
 ## 境界
 
 `agentdev-doc-writing`（文意品質）、`agentdev-doc-map`（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）との責務重複がないこと。
-docs 横断診断は本 skill が正規の所有者となる（REQ-010-025 の diagnostics 許容例外境界、CR-001）。
+docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の diagnostics 許容例外境界、CR-001）。
 
 ## 対象外
 
@@ -95,5 +95,5 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-010-025 の d
 
 - [agentdev-req-structure-diagnostics.md](agentdev-req-structure-diagnostics.md)（REQ 固有診断 skill）
 - [agentdev-doc-writing.md](agentdev-doc-writing.md)（文意品質 skill）
-- REQ-010-025（diagnostics 命名許容例外境界）
+- REQ-036-013（diagnostics 命名許容例外境界）
 - REQ-010-048（inspect-docs と diagnostics skill の責務分離）

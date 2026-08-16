@@ -34,7 +34,7 @@ REQ/SPEC 責務範囲を規定する META 規則行（enum/format/schema 等 SPE
 検出パターン拡張により新たに META 規則行として機械免除可能と確定した件は、本表の判定基準へ反映する。
 個別 REQ-ID をホワイトリストとして列挙せず、行構造パターンを拡張し、件数・内容を規定する行は引き続き免除しない（REQ-010-012）。
 
-実装（`check_integrity.ts` `isMetaRuleLine()`）は次の4パターンで META 規則行を機械判定する。いずれも `hasCountOrContentRule`（件数・内容規定）を含む行は予防的ガード句（REQ-010-013）により免除を拒否する:
+実装（`check_integrity.ts` `isMetaRuleLine()`）は次の4パターンで META 規則行を機械判定する。いずれも `hasCountOrContentRule`（件数・内容規定）を含む行は予防的ガード句（REQ-036-001）により免除を拒否する:
 
 | パターン | 判定根拠 | 適用例（#1335 で META 規則行と確定した REQ） |
 |---------|---------|----------------------------------------------|
@@ -68,14 +68,14 @@ docs-check 側での機械免除は行わない（REQ-010-259/262, REQ-010-002 �
 回帰テストで既知の true positive（SPEC 詳細が REQ に残留している実例）が META 規則行 exemption により誤って免除されないことを検証する（REQ-010-259, REQ-010-055 準拠）。
 保護対象の真陽性は件数・内容を規定する SPEC 詳細の残留であり、META 規則行（責務範囲規定）には該当しないことをテストで固定する。
 
-**是正済み経緯（保護対象から除外）**: REQ-006-082、REQ-010-008 は #1109 PR で SPEC 詳細が REQ から SPEC へ移行済みであり、真陽性保護対象から除外する（REQ-010-017）。
+**是正済み経緯（保護対象から除外）**: REQ-006-082、REQ-010-008 は #1109 PR で SPEC 詳細が REQ から SPEC へ移行済みであり、真陽性保護対象から除外する（REQ-036-005）。
 当該 REQ は SPEC 詳細を残留させないため META 規則行 exemption の誤免除検証の根拠とならない。
 保護対象の真陽性は、件数・内容を規定する SPEC 詳細の残留実例に限定する。
 この明記により RU-0011（検出ロジック改良）実施前に同箇所を根拠としたテスト設計の前提崩壊を防ぐ。
 REQ-004-070、REQ-003-007 は Step 番号直接参照から機能名・フェーズ名参照へ是正済みであり、真陽性保護対象から除外する。
 当該 REQ は Step 番号直接参照を残留させないため、Step 番号検出の回帰テスト根拠とならない（REQ-001-031 の case-open 由来）。
-true positive として新たに分類し SPEC 詳細を切り出した件は、対象 REQ-ID、切り出し先 SPEC、command reference または skill reference の区別、是正根拠 PR 番号を本欄へ追記し、保護対象から除外する（REQ-010-017 準拠）。
-#1335（RU-0011）で true positive に分類し是正した件: REQ-010-258（fixture copy のミラーリング実装詳細を SPEC `integrity-rule-catalog.md`「regression test fixture mirroring 方式」へ切り出し、REQ 側は外部契約の要約へ置換）、REQ-006-099（Step 番号直接参照 `Step 1-5, 7-8`/`Step 6` をフェーズ名参照へ置換、REQ-001-031 準拠）、REQ-010-016（テストファイルパス `scripts/tests/check_integrity.test.ts`/`scripts/check_integrity.test.ts` を SPEC `integrity-rule-catalog.md`「check_integrity test suite 責務分担」へ切り出し済み、REQ 側は外部契約の要約へ置換）。
+true positive として新たに分類し SPEC 詳細を切り出した件は、対象 REQ-ID、切り出し先 SPEC、command reference または skill reference の区別、是正根拠 PR 番号を本欄へ追記し、保護対象から除外する（REQ-036-005 準拠）。
+#1335（RU-0011）で true positive に分類し是正した件: REQ-010-258（fixture copy のミラーリング実装詳細を SPEC `integrity-rule-catalog.md`「regression test fixture mirroring 方式」へ切り出し、REQ 側は外部契約の要約へ置換）、REQ-006-099（Step 番号直接参照 `Step 1-5, 7-8`/`Step 6` をフェーズ名参照へ置換、REQ-001-031 準拠）、REQ-036-004（テストファイルパス `scripts/tests/check_integrity.test.ts`/`scripts/check_integrity.test.ts` を SPEC `integrity-rule-catalog.md`「check_integrity test suite 責務分担」へ切り出し済み、REQ 側は外部契約の要約へ置換）。
 当該 REQ は SPEC 詳細を残留させないため、回帰テストの真陽性保護根拠とならない。
 
 ## IR-044 Step 番号直接参照検出

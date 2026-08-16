@@ -81,11 +81,11 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-005 | Decision ↔ REQ 相互参照存在 | REQ-010-005 | integrity-contracts.md |
 | IR-006 | Command frontmatter 許可フィールド | REQ-002-015, REQ-010-046, 095-099, 108, 124, 129 | integrity-contracts.md, artifact-contracts.md |
 | IR-007 | Skill frontmatter name ↔ dir | REQ-010-092 | integrity-contracts.md |
-| IR-008 | Skill references/ 存在 | REQ-010-110, 115-120, REQ-010-020 | integrity-contracts.md |
-| IR-009 | 旧 namespace 残存 | REQ-010-016 | integrity-contracts.md |
+| IR-008 | Skill references/ 存在 | REQ-010-110, 115-120, REQ-036-008 | integrity-contracts.md |
+| IR-009 | 旧 namespace 残存 | REQ-036-004 | integrity-contracts.md |
 | IR-010 | ADR status 正規化 | REQ-010-121 | integrity-contracts.md |
 | IR-012 | Template 必須セクション | REQ-010 (workflow template 構造) | integrity-contracts.md |
-| IR-013 | 完了報告種別実在 | REQ-010-089-091, REQ-010-020 | integrity-contracts.md |
+| IR-013 | 完了報告種別実在 | REQ-010-089-091, REQ-036-008 | integrity-contracts.md |
 | IR-014 | reference/ 残存検出 | REQ-002-013, 039, REQ-010-039, 040, 094 | artifact-responsibilities.md |
 | IR-015 | 廃止 REQ 現行参照検出 | REQ-010-070-074, 136 | integrity-contracts.md |
 | IR-016 | Source/projection 整合性 | REQ-002-048-052, REQ-010-143-144 | system.md |
@@ -123,7 +123,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-054 | draft SPEC 放置検出 | REQ-001-002, REQ-010-150, REQ-010-151 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-002-079, REQ-002-080, REQ-002-081, REQ-010-056, REQ-010-263, REQ-010-264 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-056 | project-extensions-integrity | REQ-002 | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
-| IR-057 | obsolete-spec-path-after-domain-split | REQ-010-280, REQ-010-282, REQ-001-006, REQ-009-004, REQ-010-265, REQ-010-024 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md |
+| IR-057 | obsolete-spec-path-after-domain-split | REQ-010-280, REQ-010-282, REQ-001-006, REQ-009-004, REQ-010-265, REQ-036-012 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md |
 | IR-058 | distribution-untracked-skill-reference | REQ-002-001, REQ-002-002, REQ-002-003 | ../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md |
 | IR-059 | distribution-reference-boundary | REQ-029 | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | IR-060 | forbidden Japanese word detection | v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（REQ-010-256 文意判断は docs-check 対象外、本ルールは完全一致検出に限定） | ../responsibilities/document-type-responsibilities.md（不自然表現検出分類 P0〜P4）, ../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md（forbidden 語リスト正）, integrity-rule-catalog.md |
@@ -143,5 +143,5 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | Frontmatter 許可フィールド | REQ-002-044, REQ-010-046/098 | REQ-002-044 (primary) | ✅ |
 | `references/` 正規化 | REQ-002-013/039, REQ-010-039/040/094 | REQ-002-013 (primary) | ✅ |
 | Template 配置規約 | REQ-002-005/046, v2:REQ-0107-013/022, REQ-010-042/075 | REQ-002-005 (primary) | ✅ |
-| Namespace 予約 | REQ-002-009/056, REQ-010-016 | REQ-002-009 (primary) | ✅ |
+| Namespace 予約 | REQ-002-009/056, REQ-036-004 | REQ-002-009 (primary) | ✅ |
 | Dev metadata 禁止 | REQ-002-015/020, REQ-010-022/095 | REQ-002-015 (primary) | ✅ |

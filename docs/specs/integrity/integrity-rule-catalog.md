@@ -41,7 +41,7 @@ DEC-013 AG-009 により、`lifecycle_state`、`enforcement_mode`、`baseline_st
 finding-baseline 分類（new/known/resolved）は IR schema から分離し、finding 側の状態として [integrity-contracts.md](integrity-contracts.md)「finding-baseline 分類」で定義する。
 本カタログは finding-baseline 分類を再定義しない。
 
-`severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-010-058、REQ-028-009 決定7）。
+`severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-036-022、REQ-028-009 決定7）。
 IR lifecycle の代替とせず、実行可能 detector を持つ現行 IR の実行特性を表す。
 
 > **フィールド数**: 15 field から 12 field へ縮約した（`lifecycle_state`、`enforcement_mode`、`baseline_status` を削除）。
