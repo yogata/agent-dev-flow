@@ -157,6 +157,15 @@
       "reason": "実欠陥: case-close.md の capture-boundaries 参照記述欠落。配布物コマンド編集を要し、OU-007（#2141）配布物是正で実施するまでの承認（NG21 分類 N17）"
     },
     {
+      "category": "CaptureBoundary",
+      "check": "command-capture-duty",
+      "file": ".opencode/commands/agentdev/case-close.md",
+      "evidence": null,
+      "count": 1,
+      "provenance": "実欠陥",
+      "reason": "実欠陥: case-close.md の capture-boundaries 参照記述欠落（junction 環境で checker が projection パス `.opencode/commands/agentdev/case-close.md` で検出する場合の同一承認分。src パス側 entry と対。OU-007（#2141）配布物是正で実施するまでの承認、NG21 分類 N17、Issue #2179 で路地合わせ）"
+    },
+    {
       "category": "Decision",
       "check": "accepted-adr-only-citation",
       "file": "docs/specs/commands/case-auto.md",
