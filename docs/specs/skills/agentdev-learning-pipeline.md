@@ -26,11 +26,11 @@ schema、分類基準、評価ディメンション、prune 方針を定義す�
 - prune 方針（昇華時必須）
 - 処分区分（11処分区分 + duplicate）
 - artifact lifecycle（inbox → deferred → promoted）。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である
-- 構造改善先分類（学びの反映先評価。REQ-010-061）
+- 構造改善先分類（学びの反映先評価。REQ-038-005）
 
 ## 構造改善先分類
 
-learning pipeline は学びを保存するだけでなく、再発防止のためにどこへ反映すべきかを評価して分類する（REQ-010-061）。
+learning pipeline は学びを保存するだけでなく、再発防止のためにどこへ反映すべきかを評価して分類する（REQ-038-005）。
 構造改善先の評価候補は次の7分類とする。
 
 1. 既存 REQ / Decision / SPEC への反映
@@ -72,7 +72,7 @@ learning-promote → backlog-review → RU → req-define の承認・要件化�
 - [agentdev-learning-capture.md](agentdev-learning-capture.md)
 - [agentdev-backlog-integration.md](agentdev-backlog-integration.md)
 - [commands/learning-promote.md](../commands/learning-promote.md)
-- REQ-010（Learning-promote）
+- REQ-038（学習パイプライン（learning））
 
 ## adversarial-review 候補判断と内部挿入
 

@@ -133,7 +133,7 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 - `agentdev-workflow-learning-promote` skill（workflow 実装本体）
 - `agentdev-learning-pipeline` skill（全判定基準、スコアリングルール、提示形式、承認フロー）
 - `agentdev-learning-capture` skill（capture 層（独立スキル））
-- REQ-010（Learning-promote）
+- REQ-038（学習パイプライン（learning））
 
 ## adversarial-review 挿入境界（経路D）
 
