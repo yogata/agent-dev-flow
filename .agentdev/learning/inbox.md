@@ -181,3 +181,20 @@
 - **想定反映先**: agentdev-epic-tracker（Wave 構成ガイド）、agentdev-workflow-case-close（マージ前 rebase 判定）
 - **関連**: PR #2170/#2171、Epic #2156、docs/specs/skills/agentdev-doc-diagnostics.md
 - **タグ**: `#epic-wave` `#squash-merge` `#conflict`
+
+## JSON 出力検証スクリプトの pwsh リダイレクト破損と exit 1 時の stdout 喪失（OU-006、PR #2172）
+
+- **問題事象**: check_integrity.ts --json の出力を pwsh のリダイレクトでファイルへ書き出したところ UTF-8 が cp932 化けし JSON が不正コントロール文字で破損した。また ng 残存時は exit 1 を返すため Node execSync が例外を投げ、stdout を後続処理に渡せなかった。
+- **発生局面**: case-close QG-4 再検証（worktree で check_integrity 実行）
+- **検知方法**: JSON.parse の SyntaxError（Bad control character）と execSync の Command failed エラー
+- **根本原因**: pwsh のパイプライン・リダイレクト経由のネイティブコマンド出力はエンコーディング変換を受ける。execSync は非ゼロ exit で例外を投げ、stdout は err.stdout へ退避されるのみ
+- **自律対応内容**: spawnSync で実行し r.stdout を status に関わらず常に取得。ファイル書き出しも Node fs.writeFileSync に統一
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（agentdev-gh-cli READ 手続き既定の適用実例）
+- **横展開観点**: bun/node 系スクリプトの JSON 出力読み取りでも gh と同一の READ 安全手順が必要。exit code が意味を持つ検証スクリプトは spawnSync（status と stdout の分離）が適する
+- **再発条件**: pwsh でネイティブコマンド出力をリダイレクトやパイプで受け取る場合、失敗しうるコマンドの stdout を execSync で使う場合
+- **予防策候補**: JSON 出力する検証スクリプトの呼び出しは spawnSync + fs.writeFileSync（UTF-8）へ統一する
+- **想定反映先**: agentdev-gh-cli 標準手続きの適用範囲解説（learning-promote で判定）
+- **関連**: PR #2172, Issue #2163 (CLOSED), Epic #2162
+- **タグ**: #check-integrity #powershell #json #encoding
+
