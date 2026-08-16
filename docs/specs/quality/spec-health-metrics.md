@@ -125,6 +125,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-intake-pipeline.md | 130 | accepted | skills |
 | responsibilities/responsibility-boundary-purification.md | 128 | accepted | responsibilities |
 | quality/req-health-metrics.md | 127 | accepted | quality |
+| integrity/audits/ng21-provenance-classification-20260816.md | 121 | accepted | integrity |
 | foundations/patterns.md | 118 | accepted | foundations |
 | skills/agentdev-learning-pipeline.md | 118 | accepted | skills |
 | integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md | 117 | accepted | integrity |
@@ -138,8 +139,8 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-decision-guidelines.md | 96 | accepted | skills |
 | skills/agentdev-backlog-integration.md | 94 | accepted | skills |
 | skills/agentdev-deep-review.md | 93 | superseded | skills |
-| skills/agentdev-doc-diagnostics.md | 92 | draft | skills |
 | local/references/artifact-graph-effect-evaluation.md | 91 | - | local |
+| skills/agentdev-doc-diagnostics.md | 91 | draft | skills |
 | commands/case-update.md | 90 | accepted | commands |
 | commands/intake-from-github.md | 90 | accepted | commands |
 | commands/intake-capture.md | 87 | accepted | commands |
@@ -153,8 +154,8 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-artifact-validation.md | 81 | draft | skills |
 | skills/agentdev-learning-capture.md | 79 | accepted | skills |
 | integrity/docs-spec-rebuild-integrity.md | 75 | accepted | integrity |
-| skills/agentdev-req-file-manager.md | 73 | accepted | skills |
 | integrity/rules/IR-062-reference-path-existence.md | 72 | accepted | integrity |
+| skills/agentdev-req-file-manager.md | 72 | accepted | skills |
 | integrity/rules/IR-055-runtime-unresolved-reference.md | 71 | accepted | integrity |
 | integrity/autogen-freshness-gate.md | 70 | draft | integrity |
 | responsibilities/artifact-quality-control-routing.md | 70 | draft | responsibilities |
