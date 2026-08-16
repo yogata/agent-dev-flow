@@ -96,7 +96,7 @@ spec-save workflow は次の11 STEP で構成する。各 STEP は resume point 
 - **工程分岐**: `artifact: spec` entry の有無で判定する（全 work_type 対象、`work_type` による判定は廃止）
 - **SPEC ライフサイクル**: 新規作成時 `status: draft`、既存追記時 `status` 変更なし。遷移契機の詳細は `agentdev-spec-file-manager` の spec-lifecycle-application が正とする
 - **再分類禁止**: SPEC artifact_actions の分離根拠、配置先判定は req-define（`agentdev-req-analysis`）の結果を尊重し、spec-save で再分類しない
-- **実行時非依存**: SPEC ファイルは実行時コマンドが依存する記述にしない（G09）
+- **実行時非依存**: SPEC ファイルは実行時コマンドが依存する記述にしない（command 不変条件）
 - **Issue 作成禁止**: spec-save は Issue を作成しない（case-open の責任範囲）
 
 ## See Also

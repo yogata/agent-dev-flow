@@ -250,8 +250,8 @@ SPEC 新規作成時は `docs/specs/README.md` の SPEC 一覧表に追加済み
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G10（分離根拠・配置先判定の再分類禁止）
-- G11（SPEC status 昇格は case-close の責務）
+- 不変条件（分離根拠・配置先判定の再分類禁止）
+- 不変条件（SPEC status 昇格は case-close の責務）
 - G12（Issue 作成禁止）
 
 ## 検証観点（品質ゲート: 適用結果の整合性検証）

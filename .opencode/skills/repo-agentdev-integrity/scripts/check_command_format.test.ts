@@ -2,11 +2,10 @@
  * Regression test for command file format violations (IR-049).
  *
  * Validates that all command files in scope comply with
- * docs/specs/command-file-format.md:
- * - No Step 0 headings or references
- * - No zero-based substeps (Step N-0)
- * - No numbered list main steps directly under ## 手順
- * - No non-sequential Step numbers
+ * docs/specs/authoring/command-file-format.md (layer-3 style transition,
+ * Issue #2183):
+ * - Public /agentdev/* commands use the 前出出力検証表 (workflow table)
+ *   and carry no `### Step N` procedure headings
  * - No non-G01 guardrail numbers
  */
 
@@ -28,7 +27,7 @@ function globMarkdown(dir: string): string[] {
     .map((f) => path.join(dir, f));
 }
 
-test("command files: no Step 0 violations", () => {
+test("command files: no format violations", () => {
   const allViolations: { file: string; violations: ReturnType<typeof checkCommandFile> }[] = [];
 
   for (const dir of COMMAND_DIRS) {
@@ -56,64 +55,67 @@ test("command files: no Step 0 violations", () => {
 
 // Unit tests for the checker itself
 
-test("checkCommandFile detects Step 0 heading", () => {
-  const content = `## 手順
+const PUBLIC_CMD = "src/opencode/commands/agentdev/test.md";
+const REPO_CMD = ".opencode/commands/repo/test.md";
 
-### Step 0: 前判定
+test("checkCommandFile detects ### Step headings in public commands", () => {
+  const content = `## workflow
+
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 | 入力 | 結果 | 検証 |
+
+### Step 1: 従来形式の残存
 
 text
 `;
-  const violations = checkCommandFile("test.md", content);
-  expect(violations.some((v) => v.rule === "command-format-step-zero")).toBe(true);
+  const violations = checkCommandFile(PUBLIC_CMD, content);
+  expect(
+    violations.some((v) => v.rule === "command-format-public-step-heading"),
+  ).toBe(true);
 });
 
-test("checkCommandFile detects zero-based substep", () => {
+test("checkCommandFile allows ### Step headings in repo-local commands", () => {
   const content = `## 手順
 
-### Step 1: test
+### Step 1: repo 従来形式
 
-**Step 1-0**: substep text
+text
 `;
-  const violations = checkCommandFile("test.md", content);
-  expect(violations.some((v) => v.rule === "command-format-zero-substep")).toBe(true);
+  const violations = checkCommandFile(REPO_CMD, content);
+  expect(
+    violations.some((v) => v.rule === "command-format-public-step-heading"),
+  ).toBe(false);
 });
 
-test("checkCommandFile allows Step N-0 when positive siblings exist (issue #1562 AG-003)", () => {
-  const content = `## 手順
+test("checkCommandFile detects workflow section without table", () => {
+  const content = `## workflow
 
-### Step 4: main
+本コマンドは workflow 実装本体を \`agentdev-workflow-demo\` スキルへ委譲する。
 
-**Step 4-0**: preparatory substep
-
-main body
-
-**Step 4-1**: follow-up substep
-
-**Step 4-2**: another substep
+- **STEP-1** 工程名のみの列挙
 `;
-  const violations = checkCommandFile("test.md", content);
-  expect(violations.some((v) => v.rule === "command-format-zero-substep")).toBe(false);
+  const violations = checkCommandFile(PUBLIC_CMD, content);
+  expect(
+    violations.some((v) => v.rule === "command-format-workflow-table"),
+  ).toBe(true);
 });
 
-test("checkCommandFile detects non-sequential steps", () => {
-  const content = `## 手順
+test("checkCommandFile passes public command with workflow table", () => {
+  const content = `## workflow
 
-### Step 1: first
+本コマンドは workflow 実装本体を \`agentdev-workflow-demo\` スキルへ委譲する。
 
-### Step 3: third
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 入力解決 | 起動時 | 入力確定 | 入力が解決済みであること |
+
+## ガードレール
+
+- G01: valid
 `;
-  const violations = checkCommandFile("test.md", content);
-  expect(violations.some((v) => v.rule === "command-format-non-sequential-step")).toBe(true);
-});
-
-test("checkCommandFile detects numbered list main steps", () => {
-  const content = `## 手順
-
-1. First step
-2. Second step
-`;
-  const violations = checkCommandFile("test.md", content);
-  expect(violations.some((v) => v.rule === "command-format-numbered-list-main")).toBe(true);
+  const violations = checkCommandFile(PUBLIC_CMD, content);
+  expect(violations).toHaveLength(0);
 });
 
 test("checkCommandFile detects non-G01 guardrail numbers", () => {
@@ -122,25 +124,6 @@ test("checkCommandFile detects non-G01 guardrail numbers", () => {
 - G1: invalid format
 - G001: too many digits
 `;
-  const violations = checkCommandFile("test.md", content);
+  const violations = checkCommandFile(PUBLIC_CMD, content);
   expect(violations.some((v) => v.rule === "command-format-guardrail-number")).toBe(true);
-});
-
-test("checkCommandFile passes compliant file", () => {
-  const content = `## 手順
-
-### Step 1: first
-
-description
-
-### Step 2: second
-
-description
-
-## ガードレール
-
-- G01: valid
-`;
-  const violations = checkCommandFile("test.md", content);
-  expect(violations).toHaveLength(0);
 });

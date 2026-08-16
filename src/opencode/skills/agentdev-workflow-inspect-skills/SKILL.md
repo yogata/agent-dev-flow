@@ -90,7 +90,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-skills.yaml`�
 ## 共通制約
 
 - **診断専用**: 許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成と `.agentdev/inspect/` 配下の git 永続化のみ（G01〜G04）
-- **修正せず route 提示のみ**: 自動修正せず、推奨 route の提示に留める（G05）
+- **修正せず route 提示のみ**: 自動修正せず、推奨 route の提示に留める（command 不変条件）
 - **SPEC 参照は extension 経由**: docs-spec-rebuild-integrity SPEC 等の検査パターンは extension 経由で解決し、SPEC 内部パスを固定知識として参照しない
 
 ## 終了条件（termination）

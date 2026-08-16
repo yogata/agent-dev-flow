@@ -14,7 +14,7 @@ docs全体（REQ/Decision/SPEC/guides）の意味整合性を診断し、検出�
 
 - 診断結果の提示（検出事項、根拠、source-of-truth判定、推奨route）
 - `.agentdev/inspect/inbox/` への検出事項出力
-- Issue/PR作成、worktree作成、intake/learning/RU処理の禁止
+- 副作用は検出事項ファイルの生成のみ（Issue/PR作成、worktree作成、intake/learning/RU処理はガードレール G01〜G04 の対象外）
 
 ## 入力
 
@@ -53,23 +53,32 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として4工程の control plane を所有する。
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として4工程の control plane を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
-- **STEP-1** スキャン対象の収集
-- **STEP-2** REQ 体系・文書種別別意味診断
-- **STEP-3** 配布物整合性検査・route 判定
-- **STEP-4** 検出事項出力・永続化・完了報告
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 スキャン対象の収集 | コマンド起動 | スキャン対象成果物リスト | 対象ディレクトリ不存在時は空扱い警告で継続していること |
+| STEP-2 REQ 体系・文書種別別意味診断 | 対象収集済み | 観点別診断結果 | source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾判定していること |
+| STEP-3 配布物整合性検査・route 判定 | 診断済み | 配布物整合性結果・route 判定 | 検出事項ごとに観点・対象・根拠・推奨routeが揃っていること |
+| STEP-4 検出事項出力・永続化・完了報告 | 検出完了 | `.agentdev/inspect/inbox/inspect-docs-finding-*.md`・完了報告 | 検出事項ファイルが finding schema に従っていること |
 
 同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
 
 **共通ルール**（全工程適用）: エラー処理（スキャン対象ディレクトリ不存在時は該当カテゴリを空扱い警告、ファイル読込失敗時はスキップ警告）
 
+## 不変条件
+
+工程上の選好を肯定形の不変条件として示す:
+
+- 診断結果の提示（検出事項、根拠、source-of-truth判定、推奨route）は source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾を判定する
+
 ## ガードレール
+
+硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
 - G01: ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成は例外として許可する
 - G02: GitHub Issue/PR を作成、更新しない
 - G03: worktree/ブランチを作成しない
 - G04: intake/learning/RU の処理を行わない
-- G05: source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾を判定する
 
 

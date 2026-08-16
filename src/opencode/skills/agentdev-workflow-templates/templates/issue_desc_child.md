@@ -6,7 +6,7 @@ labels: enhancement, feature
 
 Parent: #{epic_number}
 
-<!-- Parent 配置正規形: 子Issue 本文の先頭行に Parent: #N を配置する（agentdev-epic-tracker 親Epic検出、G03 と整合）。旧「## 親Issue」セクション内配置（先行実績 #2092 形式等）は移行措置として後方互換で検出する -->
+<!-- Parent 配置正規形: 子Issue 本文の先頭行に Parent: #N を配置する（agentdev-epic-tracker 親Epic検出、case-open 不変条件と整合）。旧「## 親Issue」セクション内配置（先行実績 #2092 形式等）は移行措置として後方互換で検出する -->
 
 ## 概要
 <!-- 【必須】 -->

@@ -16,8 +16,8 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 - エラーログ（バグ修正の場合）
 - **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力（G04）
 - req-save SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
-- inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項、採否未確定事項を要件本文に混入させない（inspect lifecycle、-151 相当）
-- **promoted 直読み禁止**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は直接読み込まない。backlog-review による RU 化を経由すること
+- inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項・採否未確定事項は要件本文と分離する（inspect lifecycle、-151 相当）
+- **promoted の参照経路**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は backlog-review による RU 化を経由して参照する
 
 ## 出力
 
@@ -34,39 +34,43 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが11 STEP の対話型 control plane として制御構造を所有する。
+本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが11 STEP の対話型 control plane として制御構造を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
-- **STEP-1** セッションコンテキスト検知・入力解決
-- **STEP-2** 壁打ち対話
-- **STEP-3** 既存REQ照合
-- **STEP-4** 要件展開
-- **STEP-5** Decision判断
-- **STEP-6** 要件doc生成
-- **STEP-7** work_type・Scale 判定
-- **STEP-8** adversarial-review（経路A）
-- **STEP-9** ドラフト保存
-- **STEP-10** 要件doc確認
-- **STEP-11** 完了報告
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 セッションコンテキスト検知・入力解決 | コマンド起動 | 入力モードと入力ソースの確定 | 入力ファイル・Issue URL・エラーログが解決済みであること |
+| STEP-2 壁打ち対話 | 入力解決済み | 合意事項（`agreed_items`）の蓄積 | 未解決質問・未解決衝突が解消済みであること |
+| STEP-3 既存REQ照合 | 壁打ち対話の進行 | 既存REQとの照合結果（CREATE/APPEND/UPDATE判定） | 照合結果が要件本文に反映されていること |
+| STEP-4 要件展開 | 照合済み | 要件本文（チェックボックス付き） | チェックボックスが測定可能で一意であること |
+| STEP-5 Decision判断 | 要件展開済み | Decision 要否判定と decision エントリ | Decision閾値以上の判断を `agentdev-decision-guidelines` で判定済みであること |
+| STEP-6 要件doc生成 | 要件展開・Decision判断済み | 構造化 `draft-data` 形式の要件doc | req-draft.md テンプレートに従っていること |
+| STEP-7 work_type・Scale 判定 | 要件doc生成済み | work_type と Scale の確定 | `agentdev-workflow-lifecycle` 基準に従っていること |
+| STEP-8 adversarial-review（経路A） | ユーザー明示指定時 | review 結果と反映後の要件doc | accepted finding が要件docへ反映されていること |
+| STEP-9 ドラフト保存 | 要件doc確定 | `.agentdev/drafts/req-draft-{topic-slug}.md` | ドラフトファイルが存在し `status` frontmatter を持つこと |
+| STEP-10 要件doc確認 | ドラフト保存済み | ユーザー確認結果 | ユーザーが要件docを確認済みであること |
+| STEP-11 完了報告 | 確認済み | 完了報告（次コマンドの提示を含む） | 出力パスと次アクションが報告されていること |
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-req-define` が所有する。同 Workflow Skill は `/agentdev/req-define` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
+## 不変条件
+
+工程上の選好を肯定形の不変条件として示す:
+
+- 本コマンドは要件の整理・定義（壁打ち）を扱い、成果物は要件doc（draft）に限定する。実装コードの作成は case-run の責務である
+- docs/ の参照は、明示入力ファイル・`docs/requirements/**` の参照・Decision判断工程の限定探索の3経路に限定する
+- inbox.md、deferred.md、採用済み成果物（promoted）は backlog-review による RU 化を経由して参照する
+- 関連ドキュメントはコマンドが特定し、ユーザーへの個別ファイル列挙の依頼は省く
+- チェックボックスは測定可能で一意にする（`agentdev-req-analysis` 品質基準）
+- 要件doc 構造は req-draft.md テンプレート（構造化 `draft-data` 形式）に従う
+- Decision閾値以上の判断は `agentdev-decision-guidelines` で判定する。Decision 要否確認ゲートでは `agentdev-architecture-advisory` の助言を親エージェントが分類して採用し、未確認事項は要件本文と分離して扱う
+- work_type・Scale 判定は `agentdev-workflow-lifecycle` の基準に従う
+- draft は `operation_units` セクションを出力する（単一REQ操作も1件の OU として出力）。`depends_on` は必須依存のみ記録し、Issue 階層・Epic/Wave 構成の決定は case-open が担う
+- SPEC 分離基準に該当する要件行は `artifact_actions`（`artifact: spec`）へ分離する（安定契約例外は除く）。test strategy 項目は verification（検証手順）・pass_criteria（合格基準）・on_failure（不合格時の処置）の3要素を完全に持ち、欠落項目は保存前に QG fail として扱う
+
 ## ガードレール
 
-- G01: 壁打ちフェーズのみ（実装コード禁止）
-- G02: 関連ドキュメントの個別ファイル列挙をユーザーに求めない
-- G03: ファイル編集スコープ: `.agentdev/drafts/**` のみ作成、編集を許可
-- G04: ユーザーが明示した入力ファイルは参照専用入力（変更、削除しない）。`.agentdev/backlog/req-units/RU-*.md` の削除は行わない（後続の case-open 成功後に実行）
-- G05: `docs/` 配下の広範な探索禁止（例外: 明示入力ファイルと docs/requirements/\*\* の参照専用参照、Step 5-1 の限定探索は許可）
-- G06: inbox.md/ deferred.md を直接ロードしない
-- G07: 採用済み成果物の直読み禁止
+硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
+
+- G03: ファイル編集スコープは `.agentdev/drafts/**` のみ（他パスへの作成・編集は禁止）
+- G04: ユーザーが明示した入力ファイルは参照専用とし、変更・削除を行わない。`.agentdev/backlog/req-units/RU-*.md` の削除は case-open 成功後に実施する
 - G08: `git` コマンドは実行しない
-- G09: チェックボックスは測定可能で一意（`agentdev-req-analysis` 品質基準）
-- G10: 要件doc構造は req-draft.md テンプレート（構造化 `draft-data` 形式）に従う
-- G11: Decision閾値以上の判断は `agentdev-decision-guidelines` へ
-- G12: work_type 判定基準は `agentdev-workflow-lifecycle` を参照
-- G13: req-define は Issue 階層を決定しない。`depends_on`（必須依存のみ）は case-open が execution_unit 構成（連結成分判定）に使用する依存情報であり、最終 Issue 構成は case-open が決定する
-- G14: req-define は draft に `operation_units` セクションを出力し、`execution_groups` セクションは出力しないこと（038）。単一REQ操作の場合も 1 件の OU として出力する。Epic/ Wave/ Issue 構成の生成は case-open の責務である
-- G15: SPEC 分離基準に該当する要件行候選は REQ 要件行に残留させず、`draft-data` の `artifact_actions`（`artifact: spec`）へ分離すること。安定契約例外は分離対象外
-- G16: Decision判断が必要な変更（Decision要否確認ゲート）では Decision 判断前に `agentdev-architecture-advisory` を参照する。アーキテクチャ助言サブエージェントは Decision 要否、推奨方向、設計リスク、根拠を返し、最終的な Decision 作成判断は親エージェントが行う
-- G17: アーキテクチャ助言サブエージェントの助言は親エージェントが分類し、未確認事項を要件本文へ混入させない。同サブエージェントはファイル編集主体ではない
-- G19: test strategy 項目は verification（検証手順）、pass_criteria（合格基準）、on_failure（不合格時の処置）の3要素を完全に持つこと（REQ）。on_failure（不合格時の処置）を持たない検証項目は test strategy に含めないこと（REQ）。3要素のいずれかが欠落する項目を検出した場合、保存前に QG-{N} が fail として扱う（REQ）

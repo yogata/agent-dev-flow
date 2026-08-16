@@ -212,14 +212,21 @@ inspect-skills が複数 command 間で同一文言の重複を検出した場�
 許容と判定された重複は、各 command が「詳細な読み込み契約は本 SKILL 参照」の行（boilerplate 行4）を持つことを前提とする。
 違反と判定された場合は generic 表記または本 SKILL 参照へ是正する。
 
+## 不変条件
+
+工程上の選好を肯定形の不変条件として示す:
+
+- extension は標準 command/skill 動作への追加・拡張として適用する（動作の置き換えは行わない）
+- 読込対象は自分に対応する extension（1件）に限定する
+- 読込時の状態分類は「不在は標準動作継続、malformed は fail-open、旧 kind は migration-required として停止、未知 kind は schema violation として停止」に従う
+- 委譲先 project-local skill の実装は各適用プロジェクトの責務であり、本スキルは委譲先の中身に関与しない
+- 適用順序は Workflow Extension → internal Workflow Extension → Capability Skill Extension とする
+
 ## ガードレール
 
-- G01: extension は標準 command/skill の上書きではなく、追加・拡張のみ。配布 command/skill 本文の動作を置き換えない
-- G02: 自分に対応する extension（1件）のみを読み、他の command/skill の extension は読まない
-- G03: fail-open とするのは malformed（YAML 構文エラー、必須 field 欠落等）のみ。旧 kind は migration-required として、未知 kind は schema violation として停止し、いずれも silent ignore しない
-- G04: 委譲先 project-local skill の中身には関与しない。委譲先の実装は各適用プロジェクトの責務
+硬い境界（配布物参照境界・廃止 state 保護の否定規則）に限定する:
+
 - G05: 配布 command/skill 本文にプロジェクト固有文書の具体参照（具体ID、具体パス、固定URL）を持たせない。プロジェクト固有参照は extension 経由でのみ与える
-- G06: Workflow Extension を Capability Skill へ暗黙伝播しない
 - G07: 旧配置（`.agentdev/extensions/commands/**`）の extension を後方互換で読まない。旧 kind を検出した場合は migration-required として停止する
 
 ## See Also

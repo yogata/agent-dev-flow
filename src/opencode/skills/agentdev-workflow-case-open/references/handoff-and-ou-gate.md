@@ -61,4 +61,4 @@
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- フェーズ制約 G01（ADR、specs の内容は Issue 本文の生成に反映）
+- 不変条件（ADR、specs の内容は Issue 本文の生成に反映）

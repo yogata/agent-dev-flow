@@ -38,7 +38,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-update.yaml`）�
 
 - Issue 本文更新、Issue コメント追加（`agentdev-gh-cli` 経由）
 - REQ ファイル更新と commit+push（`--req` 時、`agentdev-git-worktree` の並列実行安全ステージング準拠）
-- フェーズは変更しない（現在のフェーズを維持、G01）
+- フェーズは変更しない（現在のフェーズを維持、command 不変条件）
 
 ## Control Plane（STEP 一覧）
 
@@ -87,7 +87,7 @@ case-update workflow は次の4 STEP で構成する。各 STEP は resume point
 
 - **フェーズ維持**: フェーズは変更しない（現在のフェーズを維持）
 - **管轄外**: CI/CD修正、自律修正ループは case-update の管轄外（case-run の責務）。REQ更新、レビューNG時のコメント追加、Issue本文更新のみを責務とする
-- **SSoT 整合**: Issue本文と要件docの不整合を防ぐ（G04）
+- **SSoT 整合**: Issue本文と要件docの不整合を防ぐ（command 不変条件）
 - **テンプレート構造維持**: `--body` 更新時は Issue 作成時と同じテンプレート構造を維持し、【必須】セクションの欠落がないことを確認してから投稿する
 
 ## See Also

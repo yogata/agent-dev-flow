@@ -123,6 +123,6 @@ QG-4 観点8 に基づく評価スコープ切替（中間 Wave vs 最終 Wave�
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G04（Epic 自動クローズは全子Issue が CLOSED の場合のみ）
-- G08/G20（未達チェックボックスが残る場合の構造化エラー停止、チェックボックス更新後の再読込 VERIFY 必須、完了条件チェックボックス評価・更新は case-close 専任責務）
-- G24/G25/G26（Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手、case-run は読み取りのみ、case-auto は直接書き込まない、Epic Wave クローズは現在 Wave の `running` 子Issue のみ対象、`blocked`/ `failed` を `completed` に上書きしない、べき等性）
-- E4-0 gate 違反子Issue は `blocked` へ遷移し E4-1 マージ並列シーケンスの対象外、`completed` へ上書きしない（べき等性、G24/G25/G26 準拠）
+- G08・不変条件（未達チェックボックスが残る場合の構造化エラー停止、チェックボックス更新後の再読込 VERIFY 必須、完了条件チェックボックス評価・更新は case-close 専任責務）
+- G24・不変条件（Epic Issue 本文ステータス追跡テーブルの更新は case-close 単一書き手、case-run は読み取りのみ、case-auto は直接書き込まない、Epic Wave クローズは現在 Wave の `running` 子Issue のみ対象、`blocked`/ `failed` を `completed` に上書きしない、べき等性）
+- E4-0 gate 違反子Issue は `blocked` へ遷移し E4-1 マージ並列シーケンスの対象外、`completed` へ上書きしない（べき等性、case-close G24 準拠）

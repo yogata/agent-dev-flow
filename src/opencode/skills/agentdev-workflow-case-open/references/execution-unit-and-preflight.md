@@ -31,7 +31,7 @@ execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模�
 
 ドラフトの `operation_units` を読み取り要件分析に基づき Epic/Wave/Issue 構造を自律生成（req-define 出力は参考情報、case-open が最終構造を決定）。
 
-- **独立 OU の自動 Epic 化**: 複数の独立 OU（`depends_on` 空、L0 相当）を検出時、Wave 1 に全 OU 配置。独立 OU 1件のみなら Standard flow（G20）
+- **独立 OU の自動 Epic 化**: 複数の独立 OU（`depends_on` 空、L0 相当）を検出時、Wave 1 に全 OU 配置。独立 OU 1件のみなら Standard flow（command 不変条件）
 - **Wave テーブル「実行方法」列**: L0/L1 → 並列、L2/L3 → 直列
 
 停止条件、禁止事項、構成生成事前検証（preflight）の詳細は `agentdev-epic-tracker` を参照。
@@ -90,7 +90,7 @@ Standard/Epic/混在構成の全ルートで GitHub Issue 作成前に共通の�
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G05（子Issue 最大10件まで、Epic 1件あたり）
-- G14（Wave 単位のみの子Issue 構造禁止、OU 単位で作成）
-- G15/G16（マルチREQ Epic flow は複数REQ 入力時または `scale: large` 設定時のみ、単一REQ Epic flow は `scale: large` 明示時のみ）
-- G19/G20/G21（自律的な要件分析に基づく Epic/子Issue 構造生成、機能要件・非機能要件・対象外・受け入れ条件の新規作成禁止、Issue 化単位は OU 単位）
+- 不変条件（子Issue 最大10件まで、Epic 1件あたり）
+- 不変条件（Wave 単位のみの子Issue 構造禁止、OU 単位で作成）
+- 不変条件（マルチREQ Epic flow は複数REQ 入力時または `scale: large` 設定時のみ、単一REQ Epic flow は `scale: large` 明示時のみ）
+- 不変条件（自律的な要件分析に基づく Epic/子Issue 構造生成、機能要件・非機能要件・対象外・受け入れ条件の新規作成禁止、Issue 化単位は OU 単位）

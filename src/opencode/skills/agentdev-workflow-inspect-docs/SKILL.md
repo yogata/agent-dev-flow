@@ -87,7 +87,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-docs.yaml`）
 ## 共通制約
 
 - **診断専用**: 許可される副作用は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成と `.agentdev/inspect/` 配下の git 永続化のみ（G01〜G04）
-- **source-of-truth priority**: 現行 REQ > 承認済み Decision > SPEC > guides の順で矛盾を判定する（G05）
+- **source-of-truth priority**: 現行 REQ > 承認済み Decision > SPEC > guides の順で矛盾を判定する（command 不変条件）
 - **SPEC 参照は extension 経由**: document-model SPEC、docs-spec-rebuild-integrity SPEC 等の分類ポリシー・検査パターンは extension 経由で解決し、SPEC 内部パスを固定知識として参照しない
 
 ## 終了条件（termination）

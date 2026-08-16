@@ -93,8 +93,8 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 ## 共通制約
 
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。`auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合は停止する。`conflict_resolutions` に記録済みの衝突は再確認しない
-- **OU 単位処理**: Issue 化単位は REQ doc 単位ではなく OU 単位（G19/G20/G21）。子Issue は OU 単位で作成し、Wave 単位のみの子Issue 構造は作成しない（G14）
-- **子Issue 上限**: Epic 1件あたり最大10件（G05）、case-open STEP-5-4 子Issue 作成並列上限は5件（3つの「5件」文脈の (1) に該当）
+- **OU 単位処理**: Issue 化単位は REQ doc 単位ではなく OU 単位（command 不変条件）。子Issue は OU 単位で作成し、Wave 単位のみの子Issue 構造は作成しない（command 不変条件）
+- **子Issue 上限**: Epic 1件あたり最大10件（case-open 前出出力検証表 STEP-3 の検証基準）、case-open STEP-5-4 子Issue 作成並列上限は5件（3つの「5件」文脈の (1) に該当）
 - **Form Zero**: draft/RU 削除は `git rm <path>` で明示パスをステージし、同一ステップで `git commit -- <path>` により即時コミットし、未ステージ残存を許さない
 - **本文 verbatim・ファイル経由**: Issue 本文は `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF‑8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す（G25）
 

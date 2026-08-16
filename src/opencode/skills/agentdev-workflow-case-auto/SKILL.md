@@ -37,9 +37,9 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）は
 
 - 各工程の委譲起動（req-save、spec-save、case-open、case-close）とインライン実行（case-run、AG-{NNN}/002）
 - bg task API による stage 2 並列起動（最大5件）
-- GitHub Issue/PR/comment/merge/close（自走対象、G04）
+- GitHub Issue/PR/comment/merge/close（自走対象、command 不変条件）
 - remote branch 削除（当該 case-auto/ case-run が作成した branch に限定、G05）
-- docs/ REQ/ ADR/ SPEC/ command reference/ guide の更新（自走対象、G06）
+- docs/ REQ/ ADR/ SPEC/ command reference/ guide の更新（自走対象、command 不変条件）
 - 当該 Workflow Skill は worktree root 配下以外を編集しない
 
 ## Control Plane（STEP 一覧）
@@ -83,7 +83,7 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 - `agentdev-workflow-req-save`: req-save 工程（委譲起動、委譲先 subagent が権威情報源として読み込む）
 - `agentdev-workflow-spec-save`: spec-save 工程（同上）
 - `agentdev-workflow-case-open`: case-open 工程（同上）
-- `agentdev-workflow-case-run`: case-run 工程（case-auto 自身がインライン実行の読込主体として読み込む、起動手段は harness 責務）
+- `agentdev-workflow-case-run`: case-run 工程（case-auto 自身がインライン実行の読込主体として読み込む、起動手段は harness 分離モデル SPEC 参照）
 - `agentdev-workflow-case-close`: case-close 工程（委譲起動、委譲先 subagent が権威情報源として読み込む）
 
 ## 主要 Capability Skill 連携
@@ -106,11 +106,11 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 
 ## 共通制約
 
-- **自走境界（G01-G06）**: repo にファイルとして残る変更のみ自走対象。DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS 設定変更、課金、権限、認証情報、repo外実データ操作、通知送信は対象外
-- **委譲・参照制約（G07-G09, G13-G21, G27-G32）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作、AG-{NNN}）。Epic Issue 本文書き込みは case-close 単一書き手（case-auto は読取のみ、G16）。case-auto は Issue 階層決定ロジックを持たない（G13）、Epic Issue 化の判定に関与しない（G21）
+- **自走境界（ガードレール G02・G05、ほか不変条件）**: repo にファイルとして残る変更のみ自走対象。DB migration 実行、deploy/apply、クラウドリソース操作、外部SaaS 設定変更、課金、権限、認証情報、repo外実データ操作、通知送信は対象外
+- **委譲・参照制約（command 不変条件、ガードレール G16）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作、AG-{NNN}）。Epic Issue 本文書き込みは case-close 単一書き手（case-auto は読取のみ、G16）。case-auto は Issue 階層決定ロジックを持たない、Epic Issue 化の判定に関与しない（command 不変条件）
 - **3つの「5件」文脈の区別**: (1) case-run Wave 内子 Issue 並列、(2) case-auto Phase 2 同時起動数、(3) execution_unit 全体並列（上限なし）。混同しない
 - **OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-3 から開始（全 OU 処理完了時のみ全体完了報告）
-- **親コンテキスト非累積（G28）**: 委譲工程の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持し、委譲工程内部の調査過程、中間ログ、読解メモを親コンテキストに累積しない
+- **親コンテキスト非累積（command 不変条件）**: 委譲工程の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持し、委譲工程内部の調査過程、中間ログ、読解メモを親コンテキストに累積しない
 - **L1 タイムスタンプ**: 開始時刻（`case_auto_started_at`）、工程別タイムスタンプ（req-save+spec-save 統合委譲 / case-open / case-run / case-close）、終了時刻を記録。case-run の L2 内訳は case-run result から読み取って含める
 
 ## See Also

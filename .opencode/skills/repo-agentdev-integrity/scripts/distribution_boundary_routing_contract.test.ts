@@ -8,8 +8,9 @@
  *       (references/docs-and-spec-promotion.md)
  *   - Epic Wave route: case-close STEP-E4-0
  *       (references/epic-wave-close.md)
- *   - case-run post-implementation final gate: case-run Step 7-1
- *       (commands/agentdev/case-run.md)
+ *   - case-run post-implementation final gate: case-run 配布依存境界の最終
+ *       変更経路 gate paragraph (commands/agentdev/case-run.md, layer-3
+ *       transition: former `### Step 7-1` heading)
  *
  * All three must reference the same detector entry point and profile token.
  * Assertions verify only routing-bearing machine/LLM-dispatch tokens:
@@ -91,6 +92,23 @@ function extractSection(
     section: afterStart.slice(0, nextHeading),
     sectionId: sectionHeading
   };
+}
+
+// 前出出力検証表転換後の case-run 最終 gate は `### Step 7-1` 見出しでなく
+// bold 段落（**配布依存境界の最終変更経路 gate（実装後）**）で表現される。
+// 段落の終端は soft guard 宣言または次の見出し。
+function extractCaseRunGateParagraph(content: string): SectionExtractionResult {
+  const marker = "**配布依存境界の最終変更経路 gate（実装後）**";
+  const startIdx = content.indexOf(marker);
+  if (startIdx === -1) {
+    return { section: "", sectionId: null };
+  }
+  const afterStart = content.slice(startIdx);
+  const softGuardIdx = afterStart.indexOf("\n**soft guard");
+  const nextHeadingIdx = afterStart.search(/\n#{1,3} /);
+  const candidates = [softGuardIdx, nextHeadingIdx].filter((i) => i > 0);
+  const end = candidates.length > 0 ? Math.min(...candidates) : afterStart.length;
+  return { section: afterStart.slice(0, end), sectionId: marker };
 }
 
 function assertSectionExists(result: SectionExtractionResult, fileName: string): void {
@@ -184,11 +202,11 @@ describe("distribution-boundary final gate routing contract", () => {
     });
   });
 
-  describe("case-run Step 7-1 preserves adapter result protocol", () => {
+  describe("case-run 配布依存境界の最終変更経路 gate preserves adapter result protocol", () => {
     const content = readFileIfExists(CASE_RUN_COMMAND) ?? "";
-    const step71 = extractSection(content, "### Step 7-1:");
+    const step71 = extractCaseRunGateParagraph(content);
 
-    it("Step 7-1 section exists", () => {
+    it("gate section exists", () => {
       assertSectionExists(step71, "case-run.md");
     });
 
@@ -220,7 +238,7 @@ describe("distribution-boundary final gate routing contract", () => {
 
     const step31 = extractSection(docsContent, "### STEP-3-1:");
     const e40 = extractSection(epicContent, "#### E4-0:");
-    const step71 = extractSection(caseRunContent, "### Step 7-1:");
+    const step71 = extractCaseRunGateParagraph(caseRunContent);
 
     it("all three gate sections reference the identical detector entrypoint", () => {
     expect(step31.section).toContain(DETECTOR_ENTRYPOINT);

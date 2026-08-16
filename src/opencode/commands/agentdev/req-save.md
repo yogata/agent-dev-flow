@@ -27,51 +27,41 @@ req-defineで生成された壁打ち成果物をREQ/Decisionファイルとし�
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-req-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが12 STEP の control plane として制御構造（事前チェック、REQ ファイル操作、整合性検証、永続化）を所有する。
+本コマンドは workflow 実装本体を `agentdev-workflow-req-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが12 STEP の control plane として制御構造（事前チェック、REQ ファイル操作、整合性検証、永続化）を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
-- **STEP-1** 事前チェック
-- **STEP-2** ドラフト読込
-- **STEP-3** ドラフト検証・処理対象確定
-- **STEP-4** REQ ファイル操作
-- **STEP-5** インデックス・ハブ更新
-- **STEP-6** Decision ファイル作成
-- **STEP-7** docs 変更整合性検証
-- **STEP-8** README 索引影響確認
-- **STEP-9** 変更範囲検証・リモート同期
-- **STEP-10** ドラフト status 更新
-- **STEP-11** コミット・プッシュ
-- **STEP-12** 完了報告
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 事前チェック | ドラフト指定あり | 処理対象確定（no-op 判定を含む） | REQ/Decision 対象 artifact_actions の有無が判定済みであること |
+| STEP-2 ドラフト読込 | 事前チェック通過 | ドラフト本文の読込結果 | ドラフトファイルが存在すること（不在はエラー中止） |
+| STEP-3 ドラフト検証・処理対象確定 | 読込済み | 検証結果と処理対象リスト | `doc_requirement.md` テンプレートの【必須】セクションが完備していること |
+| STEP-4 REQ ファイル操作 | 処理対象確定 | REQ ファイル（新規/追記/更新） | REQ番号が連番・一意であること（`agentdev-req-file-manager` 採番規則） |
+| STEP-5 インデックス・ハブ更新 | REQ 操作済み | `docs/requirements/README.md`・`docs/README.md` の更新 | イデックス・ハブが実ファイルと一致していること |
+| STEP-6 Decision ファイル作成 | Decision エントリ存在時のみ | `docs/decisions/<DEC-NNN>.md` | Decision妥当性再検証（後述の不変条件）を通過していること |
+| STEP-7 docs 変更整合性検証 | ファイル操作完了 | 検証結果 | docs 配下の整合性検査が全て pass であること |
+| STEP-8 README 索引影響確認 | 整合性検証済み | 索引影響の確認結果 | 索引への影響が反映済みであること |
+| STEP-9 変更範囲検証・リモート同期 | 索引確認済み | 変更範囲検証結果・`git pull --ff-only` 同期 | 読込時 hash と pull 後 hash が一致していること |
+| STEP-10 ドラフト status 更新 | 変更範囲検証通過 | `status: saved` のドラフト | status 更新が commit 対象に含まれていること |
+| STEP-11 コミット・プッシュ | status 更新済み | commit・push 済みブランチ | 並列実行安全ステージング（`agentdev-git-worktree`）に従っていること |
+| STEP-12 完了報告 | push 完了 | 完了報告（次コマンドの提示を含む） | 出力パスと次アクションが報告されていること |
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-req-save` が所有する。同 Workflow Skill は `/agentdev/req-save` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
+## 不変条件
+
+工程上の選好を肯定形の不変条件として示す:
+
+- REQ/Decision 対象 artifact_actions（`artifact: req`/ `artifact: decision`）がない場合は no-op 完了とする（`work_type` による停止は廃止）。工程分岐も `artifact_actions` の有無で判定する（判定基準は `agentdev-workflow-lifecycle` 参照）
+- 要件doc 構造は `doc_requirement.md` テンプレートに厳密に従い、【必須】セクションを完備させる
+- REQ番号は連番・一意とする（空き番号の再利用は `agentdev-req-file-manager` 採番規則に従う）
+- ドラフトの status 更新（`saved`）は commit/push より前に実施し、commit 対象に含める（push 後の status 更新は永続化されないため）
+- `git pull --ff-only` 後は読込時 hash と pull 後 hash の一致を検証し、不一致時は評価・承認をやり直す。pull 前にローカル変更チェックを行う
+- Decision保存の直前に妥当性を再検証する: Decision が技術判断（アーキテクチャ上の決定）を含むか確認し、REQ/SPEC 相当の内容のみの場合は保存を停止して理由を報告する。`agentdev-decision-guidelines` の判定結果を前提とし、`agentdev-decision-file-manager` の採番ルール（既存最大番号 + 1、欠番埋めは行わない）で番号を確定する。draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を当該確定番号で置換する
+- 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）は verbatim で返す。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
+- capture は原則非関与とし、REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成する。deviation capture（req-save 実行中に実観測した deviation）は Skill（`agentdev-learning-capture` または `agentdev-intake-pipeline`）への委譲で実施する（capture 境界（capture-boundaries）は `agentdev-workflow-orchestration` 参照）
+
 ## ガードレール
 
-### フェーズ制約
-- G01: REQ/Decision 対象 artifact_actions（`artifact: req`/ `artifact: decision`）がない場合は no-op 完了。`work_type` による停止は廃止
+硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-### ファイル操作制約
-- G02: ファイル編集スコープ: 以下のパスのみ作成、編集、削除を許可: `docs/requirements/**`（REQファイル）、`docs/decisions/**`（Decision）、`docs/README.md`（ドキュメントハブ）、`.agentdev/drafts/**`（ドラフトstatus更新用）
-- G03: 上記以外のファイル作成、編集は禁止
-
-### 品質ゲート
-- G04: ドラフトファイルが存在しない場合は実行不可（エラーで中止）
-- G05: REQ番号は連番、一意であること（空き番号の再利用禁止）→ `agentdev-req-file-manager` に従う
-- G06: 要件doc構造は `doc_requirement.md` テンプレートに厳密に従うこと。【必須】セクションの欠落は禁止
-- G07: ドラフトのstatus更新（`saved`）は commit/push より前に実施し、commit対象に含めること。push後のstatus更新は永続化されないため禁止
-- G08: Step 9-1 の `git pull --ff-only` 後、読込時 hash と pull 後 hash の一致検証を必須とすること。一致しない場合は評価、承認をやり直すこと
-
-### Decision妥当性再検証ゲート
-
-Decision保存の直前に、以下の妥当性を再検証すること: Decisionが技術判断（アーキテクチャ上の決定）を含むか確認、REQ/SPEC相当の内容のみの場合は保存を停止し理由を報告、`agentdev-decision-guidelines`の判定結果を前提として検証、`agentdev-decision-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定した番号を振る、draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を当該確定番号で置換、採番は `docs/decisions/` 配下の既存 Decision ファイルの最大番号 + 1 とし欠番があっても埋めない
-
-### 委譲、参照制約
-- G09: 工程分岐は `work_type` 固定分岐ではなく `artifact_actions` の有無で判定する。判定基準は `agentdev-workflow-lifecycle` を参照
-
-### 出力制約
-- G10: 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）はverbatimで返す。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
-
-### Capture 非関与制約
-- G12: req-save の capture 責務は原則非関与。req-save は intake/ learning capture を直接行わない。例外: REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能。deviation capture（req-save 実行中に実観測した deviation）は Skill（`agentdev-learning-capture` または `agentdev-intake-pipeline`）への委譲で実施し、req-save が直接 capture しない（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。capture 境界（capture-boundaries）は `agentdev-workflow-orchestration` 参照
-
-### Issue作成制約
-- G11: req-saveはIssueを作成してはならない。Issue作成はcase-openの責任範囲である
+- G02: ファイル編集スコープは `docs/requirements/**`（REQファイル）、`docs/decisions/**`（Decision）、`docs/README.md`（ドキュメントハブ）、`.agentdev/drafts/**`（ドラフトstatus更新用）のみ（上記以外のパスへの作成・編集・削除は禁止）
+- G11: Issue は作成しない（Issue 作成は case-open の責任範囲）

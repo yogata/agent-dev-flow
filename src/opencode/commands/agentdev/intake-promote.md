@@ -50,49 +50,39 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-intake-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（`.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-intake-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（`.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
-- **STEP-1** classification
-- **STEP-2** review（経路C）
-- **STEP-3** HITL
-- **STEP-4** persistence
-- **STEP-5** destructive handling
-- **STEP-6** 完了報告
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 classification | inbox に item 存在 | item ごとの暫定分類（採用/保留/却下） | 分類根拠が各 item に付いていること |
+| STEP-2 review（経路C） | ユーザー明示指定時 | review 結果と反映後の分類案 | accepted finding が分類案へ反映されていること |
+| STEP-3 HITL | 分類案確定 | ユーザー確定済み分類 | 分類結果の提示・確認・修正の機会を経て、ユーザーが「確定」を明示していること |
+| STEP-4 persistence | 分類確定済み | `.agentdev/intake/promoted/*.md`（フラット構造） | 整形結果が元 item の意味を保持した整理・構造化にとどまっていること |
+| STEP-5 destructive handling | persistence 済み | 採用 item の inbox 元ファイル削除・reject item の即時削除（却下理由を commit message に含む） | 削除対象が分類確定内容と一致していること |
+| STEP-6 完了報告 | 処理実行済み | 分類結果レポート・完了報告（次ステップの提示） | 採用/保留/却下の集計と次コマンド提示が報告されていること |
 
 ## エラー処理
 
 主要なエラー処理（git pull --ff-only 失敗時の停止、git push 失敗時の完了扱い禁止等）は `agentdev-intake-pipeline` を参照。構造化エラーメッセージを表示して停止し、自動解消しない。
 
+## 不変条件
+
+工程上の選好を肯定形の不変条件として示す:
+
+- review・分類・整形を担い、GitHub Issue の作成は acklog-review/case-open が担当する。acklog-review は次ステップの提示までとし自動起動は行わない
+- 採用 item の後続ルートは acklog-review のみとする（learning pipeline の入力は生成しない。learning item の保存・分類・昇華は本コマンドの対象外）
+- review、整形はユーザーとの対話を通じて行う。整形は元 item の内容の意味を保持した整理・構造化にとどめる
+- 整形結果は軽量な成果物として扱う（workflow 管理成果物として扱わない）。frontmatter（route/status 等）、重複排除キー、後続成果物参照は含めない
+- intake 成果物の参照先は inbox/ と promoted/ に限る（ccepted/ は廃止済み）
+- 採用 item の inbox 元ファイルは成果物保存後に削除する（.agentdev/intake/archive/promoted/ への移動は廃止）。reject item の inbox 元ファイルは即時削除し、reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跡の補強）
+
 ## ガードレール
 
-### 責務境界
-- G01: GitHub Issue の作成を行わない（`backlog-review`/ `case-open` が担当）
-- G02: intake item の元の内容を改変しない（整理、構造化のみ）
-- G03: `backlog-review` を自動起動しない（次ステップの提示のみ）
-- G04: learning pipeline の入力を生成しない。採用 item の後続ルートは `backlog-review` のみ
-- G05: learning item の保存、分類、昇華を担当しない
+硬い境界（承認境界・state 破壊等の否定規則）に限定する:
 
-### HITL 制約
-- G06: ユーザーの明示的な承認なしに採用済み成果物を生成してはならない
-- G07: 分類結果は必ずユーザーに提示し、確認、修正の機会を与えること
-- G08: 分類未確定のままの自動確定、自動進行は行わない（REQ）。ユーザーが「確定」を明示的に指示してから次フェーズに進む。確定後の自動進行は REQ で許容される。
-
-### 破壊的変更制約
-- G18: 破壊的変更（inbox 大量削除、重要 item の誤分類是正等）は STEP-3（HITL）承認とは別に明示承認を維持する（REQ）
-
-### 形式制約
-- G09: workflow 管理成果物として扱わない
-- G10: 整形結果に frontmatter（route/status 等）を含めてはならない
-- G11: 整形結果に重複排除キー、後続成果物参照を含めない
+- G01: GitHub Issue の作成は行わない（acklog-review/case-open が担当）
+- G06: ユーザーの明示的な承認なしに採用済み成果物を生成しない
+- G08: 分類未確定のままの自動確定、自動進行は行わない（REQ）。ユーザーが「確定」を明示的に指示してから次フェーズに進む。確定後の自動進行は REQ で許容される
 - G12: 元 item の本文に整形結果を書き込まない
-
-### accepted/ 廃止
-- G13: `.agentdev/intake/accepted/` を参照、使用してはならない
-- G14: `accepted/` への移動、読み込み、存在確認を行わない
-
-### 実行制約
-- G15: review、整形はユーザーとの対話を通じて行う
-- G16: 保存先は `.agentdev/intake/promoted/` 直下のみ（フラット構造）
-- G17: 採用 item の inbox 元ファイルは成果物保存後に削除する（`.agentdev/intake/archive/promoted/` への移動を廃止）
-- G19: reject item の inbox 元ファイルは即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跠の補強）
-
+- G16: 保存先は .agentdev/intake/promoted/ 直下のみ（フラット構造）
+- G18: 破壊的変更（inbox 大量削除、重要 item の誤分類是正等）は STEP-3（HITL）承認とは別に明示承認を維持する（REQ）

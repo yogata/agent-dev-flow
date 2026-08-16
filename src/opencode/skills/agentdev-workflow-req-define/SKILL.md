@@ -75,7 +75,7 @@ req-define workflow は次の11 STEP で構成する。各 STEP は resume point
 
 - 正常終了: STEP-11 の完了報告出力まで（次コマンド実行を確定の意思表示として扱う）
 - 停止終了: 有効な Requirement Source 構成不能、`agentdev_handoff: true` による前工程引き継ぎ整理、STEP-8 で未解決のユーザー判断事項が残る場合（STEP-9 へ進まない）
-- 実装コードは一切書かない（G01、壁打ちフェーズ）
+- 実装コードは一切書かない（壁打ちフェーズ、command 不変条件）
 
 ## 主要 Capability Skill 連携
 

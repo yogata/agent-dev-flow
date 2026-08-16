@@ -43,4 +43,4 @@
 
 - G01（ユーザーの明示的な承認なしに採用済み成果物を生成しない。`--auto` による自動 promote 対象を除く）
 - G06（`--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない）
-- G08（`--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する。誤検知 revoke 手順は同 SPEC 参照）
+- 不変条件（`--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する。誤検知 revoke 手順は同 SPEC 参照）

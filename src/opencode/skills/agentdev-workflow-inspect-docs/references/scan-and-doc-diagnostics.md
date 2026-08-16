@@ -74,4 +74,4 @@ document-model SPEC（extension 経由）の classification policy への適合�
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G01（ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成は例外として許可）
-- G05（source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾を判定）
+- 不変条件（source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾を判定）

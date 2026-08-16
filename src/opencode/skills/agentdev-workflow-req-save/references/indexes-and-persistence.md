@@ -222,7 +222,7 @@ REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/RE
 
 ### Procedure
 
-ドラフト `draft-data` の `status`（frontmatter）を `saved` に更新する。commit/push より前に更新し commit 対象に含める（push 後の status 更新は永続化されないため禁止、G07）。
+ドラフト `draft-data` の `status`（frontmatter）を `saved` に更新する。commit/push より前に更新し commit 対象に含める（push 後の status 更新は永続化されないため禁止、command 不変条件）。
 
 ### Result
 
@@ -333,8 +333,8 @@ REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/RE
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G07（status 更新は commit/push 前に実施し commit 対象に含める）
-- G08（pull 後の読込時 hash と pull 後 hash の一致検証必須）
-- G10（成果物本文 verbatim、過程は圧縮）
+- 不変条件（status 更新は commit/push 前に実施し commit 対象に含める）
+- 不変条件（pull 後の読込時 hash と pull 後 hash の一致検証必須）
+- 不変条件（成果物本文 verbatim、過程は圧縮）
 - G11（Issue 作成禁止）
-- G12（capture 原則非関与、例外は REQ 再構成 intake のみ）
+- 不変条件（capture 原則非関与、例外は REQ 再構成 intake のみ）

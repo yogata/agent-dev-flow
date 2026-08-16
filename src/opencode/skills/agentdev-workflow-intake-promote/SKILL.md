@@ -101,9 +101,9 @@ HITL（STEP-3）の承認状態は単独では durable state に記録されな�
 
 - **分類承認後の自動実行**: STEP-3 で分類が確定した場合、STEP-4〜STEP-5（採用 item 整形 / promoted 保存 / inbox 削除 / git pull / commit-push）は追加確認なしで自動実行する。分類未確定、修正中の場合は進まない
 - **破壊的変更の明示承認**: inbox 大量削除、重要 item の誤分類是正等の破壊的変更は STEP-3 の分類承認とは別に明示承認を維持する（command 側ガードレール G18 の詳細実装）
-- **保存先**: `.agentdev/intake/promoted/` 直下のみ（フラット構造、G16）。整形結果に frontmatter（route/status 等）、重複排除キー、後続成果物参照を含めない（G10、G11）
-- **元 item 不変**: intake item の元の内容は改変しない（整理、構造化のみ、G02）。元 item の本文に整形結果を書き込まない（G12）
-- **accepted/ 廃止**: `.agentdev/intake/accepted/` を参照、使用しない（G13、G14）
+- **保存先**: `.agentdev/intake/promoted/` 直下のみ（フラット構造、G16）。整形結果に frontmatter（route/status 等）、重複排除キー、後続成果物参照を含めない（command 不変条件）
+- **元 item 不変**: intake item の元の内容は改変しない（整理、構造化のみ、command 不変条件）。元 item の本文に整形結果を書き込まない（G12）
+- **accepted/ 廃止**: `.agentdev/intake/accepted/` を参照、使用しない（command 不変条件）
 - **git 永続化**: `.agentdev/intake/` 配下の変更のみを対象とする。commit message は `chore(agentdev): review and promote intake items`（Conventional Commits 形式）。reject item を含む場合は commit message に却下理由を含める（AG-{NNN}、監査証跡の補強）。変更なし時は commit/push せず「変更なし」と報告。push 失敗時は構造化エラー形式で停止（完了扱いにしない）
 - **実行前同期**: `git pull --ff-only` 失敗時は構造化エラーメッセージを表示して停止する（自動解消しない）
 - **完了報告**: template は `.opencode/commands/agentdev/templates/intake-promote/standard.md` に従う。分類結果（採用、保留、却下の件数、一覧）と git 永続化結果を含める

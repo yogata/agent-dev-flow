@@ -22,57 +22,42 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
-- **STEP-1** 引き継ぎ・OU 選択
-- **STEP-2** Issue 本文生成・execution contract 確定
-- **STEP-3** 構成判定・preflight
-- **STEP-4** adversarial-review（経路F）
-- **STEP-5** Issue 作成（Epic flow / Standard flow）
-- **STEP-6** 終了処理・クリーンアップ
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 引き継ぎ・OU 選択 | 要件doc（構造化 `draft-data`）存在 | 処理対象 OU の確定 | `auto_gate.auto_ready` が true であり、未解決質問・未解決衝突・repo外操作・停止理由が残っていないこと |
+| STEP-2 Issue 本文生成・execution contract 確定 | OU 選択済み | Issue 本文・execution contract | テンプレートの【必須】セクション（`完了条件` を含む）が完備していること |
+| STEP-3 構成判定・preflight | 本文確定 | 構成判定結果（Epic flow / Standard flow）と preflight 結果 | 子Issue が Epic 1件あたり最大10件以内であること（超過時は作成前にエラー停止） |
+| STEP-4 adversarial-review（経路F） | ユーザー明示指定時 | review 結果と反映後の本文 | accepted finding が本文へ反映されていること |
+| STEP-5 Issue 作成（Epic flow / Standard flow） | preflight 通過 | GitHub Issue（ラベル付き、要件doc埋め込み） | gh CLI 書込後の VERIFY で作成内容が確認できること。子Issue 本文先頭行に `Parent: #{epic_number}` があること |
+| STEP-6 終了処理・クリーンアップ | Issue 作成済み | Epic ステータス追跡テーブル更新・draft/RU 削除・完了報告 | 全子Issue 作成完了後にステータス追跡テーブルを一括更新していること（部分更新は行わない） |
 
 **共通ルール**（全 STEP 適用）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、テンプレート選定・準拠（`agentdev-workflow-templates` の選定ルール、テンプレート読込後は毎回【必須】セクションの完備を確認、【任意】は内容がある場合のみ含める、欠落時は再生成）。子Issue 並列上限は case-run Wave 内子 Issue 並列と同一上限（5件）
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-open` が所有する。同 Workflow Skill は `/agentdev/case-open` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
+## 不変条件
+
+工程上の選好を肯定形の不変条件として示す:
+
+- ADR・specs の内容は Issue 本文の生成に反映する
+- Standard flow の動作・出力形式は Epic flow 追加の影響を受けないものとする（後方互換）
+- Issue 化単位は OU 単位とし、子Issue は OU 単位で作成して対応 OU 経由で REQ/Decision/SPEC へのトレーサビリティを保持する（Wave 単位のみの子Issue 構造は作らない）。case-open は自律的な要件分析に基づいて Epic Issue または子 Issue 構造を生成し、機能要件・非機能要件・対象外・受け入れ条件は要件doc由来のものを用いる
+- マルチREQ Epic flow は複数REQドキュメント入力時または draft-meta に `scale: large` 設定時に実行し、単一REQ Epic flow は `scale: large` 明示時に実行する
+- 子Issue 本文の先頭行には `Parent: #{epic_number}` を含める（親子関係の追跡用）
+- Epic ステータス追跡テーブルは全子Issue の作成完了後に一括更新する
+- preflight で req-define 未実行・要件docのチェックボックス空を検出した場合は警告する。feature の場合は対応する REQ ファイルの存在を確認する
+- gh CLI 出力の読み取りは `agentdev-gh-cli` の安全な読み取り手順に従う。work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照する
+- Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）の成果物本文は verbatim で返す（LF・空行・インデントを含む行構造を保持）。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
+- 自工程で実観測した deviation は `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存する（保存先は Split Rule（`agentdev-workflow-orchestration` 参照）に従う）。capture 本文は完了報告に含めず、保存した成果物のパス・分類・保存結果のみを `Capture結果` 小節へ含める
+
 ## ガードレール
 
-### フェーズ制約
-- G01: ADR、specsの内容はIssue本文の生成に反映すること
+硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
 
-### 実行制約
-- G03: 子Issue本文の先頭行に `Parent: #{epic_number}` を必ず含める（親子関係の追跡用）
-- G04: 全子Issueの作成完了後にEpic本文のステータス追跡テーブルを更新する（部分更新は禁止）
-- G05: 子Issueは最大10件まで（Epic 1件あたり）。子Issue 作成 STEP で子Issue数を確認し、超過時はEpic、子Issueいずれも作成せずエラーで停止
-- G14: Wave単位のみの子Issue構造を作成してはならない。子Issue は OU 単位で作成し、対応 OU 経由で REQ/Decision/SPEC へのトレーサビリティを保持すること
-- G15/G16: マルチREQ Epic flow は複数REQドキュメント入力時または draft-meta に `scale: large` 設定時のみ実行。単一REQ Epic flow は `scale: large` 明示時のみ
-
-### 品質ゲート
-- G06: req-define未実行の場合は警告
-- G07: 要件docのチェックボックスが空の場合は警告
-- G08: featureの場合、対応するREQファイルが存在することを確認
-- G09: テンプレートの【必須】セクションが全て本文に含まれていることを確認してから Issue 作成手続き（`agentdev-gh-cli`）を実行。欠落時は再生成
-- G10: `完了条件` セクションはテンプレートの【必須】セクション。準拠検証で必ず確認
-
-### 委譲、参照制約
-- G12: gh CLI出力を読み取る際は `agentdev-gh-cli` の安全な読み取り手順に従うこと
-- G13: work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照
-
-### 出力制約
-- G02: Standard flowの動作、出力形式はEpic flow追加による影響を受けない
-- G17: 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）はverbatimで返す（LF・空行・インデントを含む行構造をbyte単位で保持、正規化・圧縮・空白挿入削除禁止）。委譲接続点（Issue 本文生成・Epic Issue 本文生成・子Issue 作成・Epic Issue 更新）と最終 gh CLI 渡し（Standard Issue 作成・コメント追加）の双方に適用。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
-
-### deviation capture 制約
-- G18/G22: case-open は自工程で実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存する。保存先は Split Rule（`agentdev-workflow-orchestration` 参照）に従い、`intake-capture` command 等、別 command を直接呼ばない。capture 本文は完了報告に含めず保存した成果物のパス・分類・保存結果のみを `Capture結果` 小節へ含める
-
-### OU 処理制約
-- G19/G20/G21: case-open は自律的な要件分析に基づいて Epic Issue または子 Issue 構造を生成（複数 OU 存在時、単一 Issue 完結時は Epic を作成しない）。機能要件、非機能要件、対象外、受け入れ条件を新規作成しない。Issue 化単位は REQ doc 単位ではなく OU 単位
-
-### 並列実行安全 git 操作制約
-- G23/G24: 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）を実行せず、`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従う。ステージ・コミットは明示パス指定（`git add <path>`/ `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）で行い共有 index の他セッション変更を排出しない。draft/RU 削除は同一ステップで即時ステージ・コミットし未ステージ残存を許さない（Form Zero）。`git add` は `.agentdev/` 全体の一括スコープではなく明示パスに限定
-
-### 本文 verbatim・ファイル経由制約
-- G25: Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）は文字列変数で持ち回らず `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-{N} BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す。テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでファイル経由で固定し、親エージェントの本文再構成を禁止
+- G23: 共有作業ツリーでスイープ操作（`git add -A`/ `git add .`/ `git add --all`/ `git commit -a`/ `git checkout .`/ `git reset --hard`/ `git stash`/ 非所有パスへの `git checkout -- <path>`/ `git restore <path>`）は実行しない。`agentdev-git-worktree` の並列実行安全ステージングプロシージャに従い、明示パス指定（`git add <path>`/ `git rm <path>`）+ `git commit -- <paths>`（--only pathspec 形式）で行う。draft/RU 削除は同一ステップで即時ステージ・コミットし未ステージ残存を許さない（Form Zero）
+- G25: Issue 本文（Standard/Epic/子Issue/完了報告コメント全て）は文字列変数で持ち回らず `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF-{N} BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す（テンプレート読込→変数置換→ファイル保存→gh CLI 渡しまでファイル経由で固定）
 
 
 

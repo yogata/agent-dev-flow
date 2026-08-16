@@ -217,6 +217,6 @@ Wave 内子Issue を実行担当サブエージェントへ最大5件並列委�
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G11/G22/G23/G32（単一 Wave のみ処理、1 Wave の実行で PR 作成まで return、最大5件並列委譲）
+- 不変条件（単一 Wave のみ処理、1 Wave の実行で PR 作成まで return、最大5件並列委譲）
 - G24（完了条件チェックボックスの評価・更新は case-close QG-4 の責務）
-- G25（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文）
+- 不変条件（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文）

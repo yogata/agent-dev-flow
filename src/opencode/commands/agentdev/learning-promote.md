@@ -33,29 +33,37 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-learning-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが7 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-learning-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが7 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
-- **STEP-1** 入力読込・正規化
-- **STEP-2** 評価
-- **STEP-3** 判定
-- **STEP-4** review（経路D）
-- **STEP-5** HITL
-- **STEP-6** 永続化
-- **STEP-7** 完了報告
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 入力読込・正規化 | `.agentdev/learning/inbox.md` 存在 | 正規化済みエントリ群 | inbox.md 不在時はエラー終了（`agentdev-learning-capture` での追加を案内）であること |
+| STEP-2 評価 | 正規化済み | 8軸評価スコア・問題クラス分類 | 評価根拠が各エントリに揃っていること |
+| STEP-3 判定 | 評価済み | 廃棄判定・既存対策確認・昇華可能性判定 | 恒久契約（REQ/Decision/SPEC）への昇華可能性が判定されていること |
+| STEP-4 review（経路D） | default-on（発動条件判定 → review 呼出） | review 結果と反映後の評価 | accepted finding 反映時は evaluation-report 生成工程から再実行していること |
+| STEP-5 HITL | 判定結果あり | ユーザー承認済みの判定・prune | 廃棄判定結果・8軸評価スコアの確認・修正・承認を経ていること |
+| STEP-6 永続化 | 承認済み | `promoted/{category}-{name}.md`・deferred.md 追記・inbox.md クリア・prune | 採用済み成果物・deferred 移動・prune が承認内容と一致していること |
+| STEP-7 完了報告 | 永続化済み | 完了報告（次アクション） | 出力パスと次コマンド（`/agentdev/backlog-review`）が報告されていること |
+
+## 不変条件
+
+工程上の選好を肯定形の不変条件として示す:
+
+- `evaluation-report.md` は本コマンドが生成・管理する（外部コマンドの事前生成に依存しない）
+- 採用済み成果物の受け渡しは `/agentdev/backlog-review` 経由とする（case-run への直接受け渡しは行わない。反映ルート: promoted → `/agentdev/backlog-review`（RU 生成）→ `/agentdev/req-define` → `/agentdev/req-save` → `/agentdev/case-open` → `/agentdev/case-run`）
+- 主入力は `inbox.md` とし、raw learning item の再分類は行わない
+- 既存対策を優先する（「新規X化」より「既存Xへ反映」を優先）
+- 学びは直接 REQ 化せず、恒久契約（REQ/Decision/SPEC）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
+- adversarial-review は default-on（経路D、REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持し、ユーザー明示要求時は skip 条件にかかわらず必ず発動する。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-{NNNN}）が正規所有する
 
 ## ガードレール
 
-- G01: `.opencode/` 直接反映禁止: 採用済み成果物は `.agentdev/learning/promoted/` のみに生成
-- G02: `evaluation-report.md` は本コマンドが生成、管理: 外部コマンドの事前生成に依存しない
-- G03: `case-run` への直接受け渡し禁止: `/agentdev/backlog-review` 経由のみ
-- G04: 主入力は `inbox.md`: raw learning item の再分類は禁止
-- G05: 既存対策を優先: 「新規X化」より「既存Xへ反映」を優先
-- G06: ユーザー承認必須: 判定、prune ともに承認なしに実行しない
+硬い境界（承認境界・state 破壊・書き込みスコープ等の否定規則）に限定する:
+
+- G01: `.opencode/` 直接反映は行わない（採用済み成果物は `.agentdev/learning/promoted/` のみに生成）
+- G06: 判定、prune ともにユーザー承認なしには実行しない
 - G07: 管理用ファイル（`elevation-ledger.md` 等）は生成しない
-- G08: `learning-refine` への依存禁止: 本コマンドは旧機能を内包し事前実行を前提としない
 - G09: 破壊的変更（inbox.md 全体強制クリア、大量エントリ一括削除等）は STEP-5（HITL）承認とは別に明示承認を維持する（REQ）
-- G10: 無条件の自動REQ化禁止（REQ）: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/SPEC）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。昇華不能な知見は living pool（`deferred.md`）で維持する
-- G11: adversarial-review は default-on（経路D、REQ-{NNNN}-{NNN}）: workflow の review STEP（発動条件判定 → review 呼出）を経て原則発動する。skip 条件（inbox.md 1件で重複確実、inbox.md 空）該当時は HITL へ従来フローを維持する（REQ-{NNNN}-{NNN}）。ユーザー明示要求時は skip 条件にかかわらず必ず発動する。review 反映時は evaluation-report 生成 STEP へ戻し関連 STEP を再実行する（REQ-{NNNN}-{NNN}）。共通契約（任意性、副作用禁止、再 review 条件、停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC（REQ-{NNNN}）が正規所有する
 
 ## ユーザー確認ポイント、エラー処理
 
