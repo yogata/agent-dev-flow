@@ -5,15 +5,15 @@
 
 ## 目的
 
-`docs/DOC-MAP.md` は REQ-013-001（PR #1953/#1958）で除去済みである。
-本監査は integrity スクリプト群に残存する DOC-MAP 参照全件について、一律の dead code 断定を禁じ（REQ-013-020）、参照ごとに「生きている（必要）」「死んでいる（除去可能）」を個別に判定し、判定結果の記録様式と除去優先度を整備する。
+`docs/DOC-MAP.md` は旧REQ-013-001（PR #1953/#1958）で除去済みである。
+本監査は integrity スクリプト群に残存する DOC-MAP 参照全件について、一律の dead code 断定を禁じ（旧REQ-013-020）、参照ごとに「生きている（必要）」「死んでいる（除去可能）」を個別に判定し、判定結果の記録様式と除去優先度を整備する。
 
 前提事実を以下に示す。
 
-- `docs/DOC-MAP.md` は存在しない（REQ-013-001 達成済み）。
-- DOC-MAP が担っていた導線は `docs/specs/README.md`、`docs/README.md`、各 README へ統合済み（REQ-013-018/019）。
-- `agentdev-doc-map` 配布スキル、`docs/specs/skills/agentdev-doc-map.md` SPEC は REQ-013-002/003 で除去済み。
-- IR-017（DOC-MAP ↔ 実体整合性）は REQ-013-006 で抹消済み。
+- `docs/DOC-MAP.md` は存在しない（旧REQ-013-001 達成済み）。
+- DOC-MAP が担っていた導線は `docs/specs/README.md`、`docs/README.md`、各 README へ統合済み（旧REQ-013-018/019）。
+- `agentdev-doc-map` 配布スキル、`docs/specs/skills/agentdev-doc-map.md` SPEC は旧REQ-013-002/003 で除去済み。
+- IR-017（DOC-MAP ↔ 実体整合性）は旧REQ-013-006 で抹消済み。
 
 ## 監査範囲
 
@@ -37,9 +37,9 @@ Issue #1996 が挙げる「45件」は主スクリプト群（テスト除く）
 
 対象外。
 
-- `src/opencode/skills/agentdev-*/`（配布スキル）。REQ-013-013/014/015 で個別に扱う。
-- `docs/` 配下の SPEC、ガイド、README。REQ-013-010/016/017/018/019 で個別に扱う。
-- 過去版 tag `v2.11.0` の歴史記録（REQ-013 適用範囲外）。
+- `src/opencode/skills/agentdev-*/`（配布スキル）。旧REQ-013-013/014/015 で個別に扱う。
+- `docs/` 配下の SPEC、ガイド、README。旧REQ-013-010/016/017/018/019 で個別に扱う。
+- 過去版 tag `v2.11.0` の歴史記録（旧REQ-013 適用範囲外）。
 
 ## 監査手法
 
@@ -87,7 +87,7 @@ Phase 別集計（除去 Roadmap対応）。
 | `regression_*.test.ts`（3 ファイル） | 3 | `DEAD-FN`（フィクスチャ、assertion） |
 
 生存 1 件は後段「参照 31」で詳述する。
-生存が 1 件のみにとどまる理由は、DOC-MAP が完全除去（REQ-013-001）された結果、DOC-MAP を読む全コードが到達不能になったためである。
+生存が 1 件のみにとどまる理由は、DOC-MAP が完全除去（旧REQ-013-001）された結果、DOC-MAP を読む全コードが到達不能になったためである。
 生存 1 件も「参照しないと inventory 出力形式が変わり下遊互換性が壊れる」だけであり、本質的には DOC-MAP を必要としていない。
 
 ## 個別判定
@@ -534,7 +534,7 @@ const docMapUpdateRequired = profile.rules.includes("docmap-update-required")
 
 ## 除去優先度
 
-除去は本監査の対象外（REQ-013-020 は「判定と記録様式と優先度の整備」を要求）。
+除去は本監査の対象外（旧REQ-013-020 は「判定と記録様式と優先度の整備」を要求）。
 後続 Issue が Phase 順に実施する。
 各 Phase は独立して実施可能だが、Phase 1 内のエントリは相互に依存するため一括実施を推奨する。
 
