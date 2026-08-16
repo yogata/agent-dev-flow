@@ -12,7 +12,7 @@ status: accepted
 | category | obsolete-structure |
 | detection_method | 正規表現パターンマッチ |
 | affected_artifacts | [REQ, SPEC, guides, skills, commands] |
-| related_req | [REQ-010-016] |
+| related_req | [REQ-036-004] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。検出対象外パスの設定に注意 |

@@ -13,7 +13,7 @@ updated: 2026-07-26
 | category | broken-reference |
 | detection_method | `check_integrity.ts` による `obsolete-path-map.yaml` ロード、各エントリ `old` パターンの正規表現マッチング（行単位走査）。`scope.include`、`scope.exclude` で検査対象を絞り込む。語彙検出は `legacy_local_generation_vocabulary`（単独検出語: severity=ng）と `legacy_local_generation_conditional_vocabulary`（近接条件つき検出語: proximity_required=true）に分離し、後者は同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ検出する。`generated_by` + `local-opencode-transform` の組み合わせ検出は `generated_by_combination_rule` で維持する |
 | affected_artifacts | [AGENTS.md, README.md, docs/requirements/**/*.md, docs/decisions/**/*.md, docs/specs/**/*.md, src/opencode/**/*.md, src/opencode-local/**/*.md, .opencode/skills/**/*.md, .opencode/commands/**/*.md] |
-| related_req | [REQ-010-280, REQ-010-282, REQ-001-006, REQ-009-004, REQ-010-265, REQ-010-024] |
+| related_req | [REQ-010-280, REQ-010-282, REQ-001-006, REQ-009-004, REQ-010-265, REQ-036-012] |
 | related_spec | [../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。`scope.exclude` で履歴参照領域（`docs/requirements/retired/**`、`docs/decisions/retired/**`）を除外する。現行Decisionに歴史的経緯として旧パスを記載する場合は rule 側で例外登録を明示する（後述「例外登録」）。コードブロック内の例示は exemption とする |
@@ -75,7 +75,7 @@ updated: 2026-07-26
 - README 探索導線
 - 保存工程テンプレートの生成実パス例
 
-## link mode 廃止旧語彙の分類基準（REQ-010-024）
+## link mode 廃止旧語彙の分類基準（REQ-036-012）
 
 link mode 統一（REQ-009）に伴い廃止確定となった旧語彙（直接生成方式、生成フロー、`transform/` 配下資産、`local-opencode-transform` 識別子等）が出現した場合、以下の基準で「歴史経緯（免除対象）」か「現行機能の記述（修正対象）」かを判定する。
 
@@ -87,7 +87,7 @@ link mode 統一（REQ-009）に伴い廃止確定となった旧語彙（直接
 **判定手順**:
 1. 検出箇所のファイルが exemption 表に登録されているか確認する
 2. 登録されていない場合、当該行が廃止機能の説明文脈（履歴マーカー: `旧`、`廃止`、`移行`、`前提`、`legacy`、`deprecated` 等を含む）か、現行機能の手順記述かを判定する
-3. 歴史経緯と判定した場合、exemption 表へ追記する（REQ-010-024）
+3. 歴史経緯と判定した場合、exemption 表へ追記する（REQ-036-012）
 4. 現行機能の記述と判定した場合、旧語彙を現行語彙へ置換する
 
 現在のリポジトリでは、旧語彙の出現は全て歴史経緯（免除対象）に該当する。
