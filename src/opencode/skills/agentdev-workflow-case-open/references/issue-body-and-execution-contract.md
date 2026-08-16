@@ -1,6 +1,6 @@
-# STEP-{N}: Issue 本文生成・execution contract 確定（issue-body-and-execution-contract）
+# STEP-2: Issue 本文生成・execution contract 確定（issue-body-and-execution-contract）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。Issue 本文生成と execution contract（EC-{N}〜EC-{N}）確定の手順を提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-2 詳細である。Issue 本文生成と execution contract（EC-{N}〜EC-{N}）確定の手順を提供する。
 
 ## Purpose
 
@@ -15,7 +15,7 @@ Issue 本文候補を生成し、execution contract（EC-{N}〜EC-{N}）を確�
 
 ## Preconditions
 
-- STEP-{N} で処理対象が確定している
+- STEP-1 で処理対象が確定している
 
 ## Procedure
 
@@ -108,8 +108,8 @@ Issue 作成前に変更影響候補を探索し、scope、完了条件、test s
 
 ## 関連 STEP
 
-- 前: STEP-{N}（handoff-and-ou-gate）
-- 次: STEP-{N}（execution-unit-and-preflight）
+- 前: STEP-1（handoff-and-ou-gate）
+- 次: STEP-3（execution-unit-and-preflight）
 
 ## 関連 Capability Skill
 

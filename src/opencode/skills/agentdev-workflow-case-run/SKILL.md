@@ -34,7 +34,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`）は�
 - 再開フェーズ判定（Issue番号解決、実行モード分岐、べき等性チェック）
 - 実行担当サブエージェント委譲（adapter protocol、委譲 prompt、L2 タイムスタンプ計測、経路G）
 - result 4状態処理（completed-pr / blocked / failed / delegation-unavailable）
-- 前置 gate 群（worktree precondition gate、QG-{N} 前置 staleness check、targeted docs guard、配布依存境界 事前チェック）と配布依存境界 最終 gate（Step 7-1 相当）
+- 前置 gate 群（worktree precondition gate、QG-{N} 前置 staleness check、targeted docs guard、配布依存境界 事前チェック）と配布依存境界 最終 gate（STEP-S5 で実施）
 
 ## DO NOT USE FOR
 
@@ -99,7 +99,7 @@ workflow 選択は STEP-S1 の実行モード分岐で確定する（引数が E
 | STEP-S2 | Issue 抽出・確認・判定 | 実行モード確定（single） | 要件doc・受け入れ基準抽出、関連Decision 確認、work_type metadata 整合確認、execution contract 消費境界適用 | [references/single.md](references/single.md) |
 | STEP-S3 | Worktree 作成・ブランチ準備・前置 gate 群 | Issue 判定完了 | worktree+ブランチ作成（べき等）、前置 gate 群（precondition / staleness / targeted docs / 事前委譲チェック）合格、L2 計測 | [references/single.md](references/single.md) |
 | STEP-S4 | 実行担当サブエージェント委譲 | STEP-S3 合格（worktree 内検証済み） | 委譲起動、L2 計測、経路G（adapter 委譲内 adversarial-review） | [references/delegation-and-result.md](references/delegation-and-result.md) |
-| STEP-S5 | result 処理・配布依存境界 最終 gate | 委譲 result 受領 | result 4状態処理、Step 7-1 相当の最終 gate 判定、L2 受け渡し | [references/delegation-and-result.md](references/delegation-and-result.md) |
+| STEP-S5 | result 処理・配布依存境界 最終 gate | 委譲 result 受領 | result 4状態処理、配布依存境界 最終 gate 判定、L2 受け渡し | [references/delegation-and-result.md](references/delegation-and-result.md) |
 | STEP-S6 | worktree クリーンアップ確認・完了報告 | result 処理完了（completed-pr 時は最終 gate 合格後） | 未コミット変更確認、完了報告（L2 内訳含む） | [references/single.md](references/single.md) |
 
 ### epic-wave workflow（`case-run #epic` 受領時）

@@ -193,7 +193,7 @@
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G04（全ファイル操作は worktree 内で実行）
-- G30/G31（Step 5-2 precondition gate、worktree root 相対パス引き渡し）
+- G30/G31（STEP-S3 precondition gate、worktree root 相対パス引き渡し）
 - G33/G34/G35（QG-{N} 前置 staleness check、差異検出時の引き渡しと case-update 連携）
 
 ## 関連ガイドライン

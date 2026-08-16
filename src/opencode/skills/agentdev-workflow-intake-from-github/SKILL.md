@@ -62,16 +62,16 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-intake-from-github.ya
 
 本スキルは capture-only型の workflow であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。resume point / export / import を持たない。工程は逐次実行し、中断時は workflow を最初から再実行する。抽出の再実行は読み取りのみのため安全であり、保存済みファイルとの重複はファイル名への連番付与で吸収する。
 
-| 工程 | 名称 | 内容 |
+| STEP | 名称 | 内容 |
 |---|---|---|
-| 工程-1 | 期間解釈 | 期間指定または Issue/PR 番号指定を解釈する（抽出アルゴリズムは `agentdev-intake-pipeline`） |
-| 工程-2 | データ取得 | クローズ済み Issue/PR のデータを取得する（gh CLI、`agentdev-gh-cli` の読み取り手続き） |
-| 工程-3 | 構造的検出 | 抽出ルールに基づき構造的に残課題候補を検出する（`agentdev-intake-pipeline`） |
-| 工程-4 | LLM 全文解析 | キーワードリスト、コンテキスト付与ルールに基づき全文解析する（`agentdev-intake-pipeline`） |
-| 工程-5 | intake item 生成・実行前同期 | item 生成ルール、ファイル名規則に従い item を生成する（`agentdev-intake-pipeline`）。`git pull --ff-only` を実行する |
-| 工程-6 | 保存・永続化 | `.agentdev/intake/inbox/` へ保存し、`.agentdev/intake/` 配下の変更を commit / push する |
-| 工程-7 | サマリーレポート提示 | 抽出結果をサマリーとしてユーザーに提示する（対象期間、対象数、抽出候補数、保存先、一覧表） |
-| 工程-8 | 完了報告 | 完了報告 template に従って出力する。git 永続化結果を含める |
+| STEP-1 | 期間解釈 | 期間指定または Issue/PR 番号指定を解釈する（抽出アルゴリズムは `agentdev-intake-pipeline`） |
+| STEP-2 | データ取得 | クローズ済み Issue/PR のデータを取得する（gh CLI、`agentdev-gh-cli` の読み取り手続き） |
+| STEP-3 | 構造的検出 | 抽出ルールに基づき構造的に残課題候補を検出する（`agentdev-intake-pipeline`） |
+| STEP-4 | LLM 全文解析 | キーワードリスト、コンテキスト付与ルールに基づき全文解析する（`agentdev-intake-pipeline`） |
+| STEP-5 | intake item 生成・実行前同期 | item 生成ルール、ファイル名規則に従い item を生成する（`agentdev-intake-pipeline`）。`git pull --ff-only` を実行する |
+| STEP-6 | 保存・永続化 | `.agentdev/intake/inbox/` へ保存し、`.agentdev/intake/` 配下の変更を commit / push する |
+| STEP-7 | サマリーレポート提示 | 抽出結果をサマリーとしてユーザーに提示する（対象期間、対象数、抽出候補数、保存先、一覧表） |
+| STEP-8 | 完了報告 | 完了報告 template に従って出力する。git 永続化結果を含める |
 
 ## Intake Item 形式
 

@@ -1,14 +1,14 @@
-# STEP-{N}/5/6: 停止条件検出・adversarial-review 経路H・bounded parent decision resolution（stop-and-decision-resolution）
+# STEP-4/5/6: 停止条件検出・adversarial-review 経路H・bounded parent decision resolution（stop-and-decision-resolution）
 
-> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-{N}, STEP-{N}, STEP-{N} 詳細である。停止条件検出（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 経路H 停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
+> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-4, STEP-5, STEP-6 詳細である。停止条件検出（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 経路H 停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
 
 ## 目次
 
-- STEP-{N}: 停止条件検出・停止理由分類
-- STEP-{N}: adversarial-review 経路H 停止伝播
-- STEP-{N}: bounded parent decision resolution
+- STEP-4: 停止条件検出・停止理由分類
+- STEP-5: adversarial-review 経路H 停止伝播
+- STEP-6: bounded parent decision resolution
 
-## STEP-{N}: 停止条件検出・停止理由分類
+## STEP-4: 停止条件検出・停止理由分類
 
 ### Purpose
 
@@ -23,7 +23,7 @@
 
 ### Preconditions
 
-- STEP-{N} で各工程の結果を受領
+- STEP-3 で各工程の結果を受領
 
 ### Procedure
 
@@ -45,7 +45,7 @@
 
 #### 停止時タイミング情報の追記
 
-停止報告に `case_auto_started_at`、停止時刻（JST、人間が読みやすい形式）、経過時間、STEP-{N} で記録した工程別タイムスタンプ内訳（停止時点までの工程分）を含める。
+停止報告に `case_auto_started_at`、停止時刻（JST、人間が読みやすい形式）、経過時間、STEP-3 で記録した工程別タイムスタンプ内訳（停止時点までの工程分）を含める。
 
 #### 停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）
 
@@ -83,7 +83,7 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 
 - 停止判定は各工程の durable state からの評価であり副作用を持たない。再開時は停止報告の再開ポイントから再構成する
 
-## STEP-{N}: adversarial-review 経路H 停止伝播
+## STEP-5: adversarial-review 経路H 停止伝播
 
 ### Purpose
 
@@ -98,19 +98,19 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 
 ### Preconditions
 
-- STEP-{N}（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領
+- STEP-3（各工程の実行）で下位 command から adversarial-review 由来の user-decision-required + decision_context を受領
 
 ### Procedure
 
 case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。停止伝播契約の詳細は case-auto command SPEC（project extension 経由参照）「adversarial-review 由来の停止伝播（経路H）」節を正とする。
 
 - **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（workflow-contracts SPEC「adversarial-review 由来の停止信号」節、delegation-contracts SPEC「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
-- **自走停止**: 当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、STEP-{N} Wave 反復制御）
+- **自走停止**: 当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、STEP-3 Wave 反復制御）
 - **ユーザー提示**: decision_context をユーザーへ提示し判断を待機
 - **resume point**: case-run 起源は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源は当該工程の委譲起点
 - **再開**: ユーザー判断解決後、resume point から再開。adversarial-review 再発動要否は adversarial-review SPEC「再 review 条件」「再 review 停止条件」に従い case-auto は独自判断しない
 
-case-auto は経路H において review 直接起動、finding 解釈、採否、再評価を行わない。これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。user-decision-required は STEP-{N} の HITL 境界停止条件分類とは独立する停止理由分類である。停止報告（STEP-{N}）には user-decision-required を停止理由分類として含める。
+case-auto は経路H において review 直接起動、finding 解釈、採否、再評価を行わない。これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。user-decision-required は STEP-4 の HITL 境界停止条件分類とは独立する停止理由分類である。停止報告（STEP-8）には user-decision-required を停止理由分類として含める。
 
 ### Result
 
@@ -130,7 +130,7 @@ case-auto は経路H において review 直接起動、finding 解釈、採否�
 
 - ユーザー判断解決後、resume point（durable state: Issue/PR 状態、委譲起点）から再開する。再 review 要否は case-auto が独自判断しない
 
-## STEP-{N}: bounded parent decision resolution
+## STEP-6: bounded parent decision resolution
 
 ### Purpose
 
@@ -155,8 +155,8 @@ case-auto は下位 command から受領した decision_context を限定的に�
 |---|---|---|
 | 自律解決 | decision_context が現行正規成果物（REQ、Decision、SPEC、Issue その他合意済み情報）から一意に回答可能 | ユーザー停止せず回答して下位 command を resume |
 | 作業仮定で継続 | 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細 | 既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続 |
-| 上位合意矛盾 | decision_context が現行正規成果物間の矛盾に起因 | 当該矛盾そのものが finding の対象であり一方を勝手に採用せず停止（STEP-{N} 停止理由分類「上位合意矛盾」） |
-| 新規ユーザー判断事項 | 新しいユーザー価値判断、対象範囲変更、外部契約変更が必要 | 既存停止経路でユーザーへ返す（STEP-{N} 停止理由分類「新規ユーザー判断事項」） |
+| 上位合意矛盾 | decision_context が現行正規成果物間の矛盾に起因 | 当該矛盾そのものが finding の対象であり一方を勝手に採用せず停止（STEP-4 停止理由分類「上位合意矛盾」） |
+| 新規ユーザー判断事項 | 新しいユーザー価値判断、対象範囲変更、外部契約変更が必要 | 既存停止経路でユーザーへ返す（STEP-4 停止理由分類「新規ユーザー判断事項」） |
 
 - **resume**: 回答、根拠、作業仮定を下位 command へ返し、既存 resume point から処理を継続する。新規永続結果型は導入しない。adversarial-review 再実行要否は adversarial-review 側の再 review 契約に従い case-auto は独自判断しない
 - **中央集約 review engine とはならない**: case-auto は raw finding を解釈、採否、候補反映しない。下位 command が構造化した decision_context のみを解決対象とし、raw finding を case-auto へそのまま渡さない（AG-{NNN}）
@@ -164,7 +164,7 @@ case-auto は下位 command から受領した decision_context を限定的に�
 ### Result
 
 - 自律解決時: 回答・根拠・作業仮定を下位 command へ返し resume
-- 上位合意矛盾/新規ユーザー判断時: STEP-{N} 停止経路へ
+- 上位合意矛盾/新規ユーザー判断時: STEP-4 停止経路へ
 
 ### Evidence
 
@@ -187,8 +187,8 @@ case-auto は下位 command から受領した decision_context を限定的に�
 
 ## 関連 STEP
 
-- 前: STEP-{N}（input-resolution-and-orchestration）
-- 次: STEP-{N}（conflict-resolution-and-reporting、停止報告時）
+- 前: STEP-3（input-resolution-and-orchestration）
+- 次: STEP-8（conflict-resolution-and-reporting、停止報告時）
 
 ## 関連 Capability Skill
 

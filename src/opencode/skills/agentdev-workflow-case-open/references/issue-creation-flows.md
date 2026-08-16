@@ -1,10 +1,10 @@
-# STEP-{N}: Issue 作成（Epic flow / Standard flow、issue-creation-flows）
+# STEP-5: Issue 作成（Epic flow / Standard flow、issue-creation-flows）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-{N} 詳細である。Epic flow（Step 5-9）と Standard flow（Step 10-12）の制御、GitHub Issue 作成手続きを提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-5 詳細である。Epic flow（STEP-5-1〜5-5）と Standard flow（STEP-5-6〜5-8）の制御、GitHub Issue 作成手続きを提供する。
 
 ## Purpose
 
-Epic flow（Step 5-9）または Standard flow（Step 10-12）の制御に従い GitHub Issue を作成し、OU 結果を書き戻す。
+Epic flow（STEP-5-1〜5-5）または Standard flow（STEP-5-6〜5-8）の制御に従い GitHub Issue を作成し、OU 結果を書き戻す。
 
 ## Input Resolution
 
@@ -15,8 +15,8 @@ Epic flow（Step 5-9）または Standard flow（Step 10-12）の制御に従い
 
 ## Preconditions
 
-- STEP-{N} で execution structure が確定している
-- STEP-{N} で adversarial-review skip または review 完了（unresolved なし）
+- STEP-3 で execution structure が確定している
+- STEP-4 で adversarial-review skip または review 完了（unresolved なし）
 
 ## Result
 
@@ -25,23 +25,23 @@ Epic flow（Step 5-9）または Standard flow（Step 10-12）の制御に従い
 
 ## Procedure
 
-実行ルート（Epic flow / Standard flow）は STEP-{N} の execution structure による。各 flow の手順は以下のとおり。
+実行ルート（Epic flow / Standard flow）は STEP-3 の execution structure による。各 flow の手順は以下のとおり。
 
-## Epic flow（Step 5-9、`scale: large` またはマルチREQ または複数 OU）
+## Epic flow（STEP-5-1〜5-5、`scale: large` またはマルチREQ または複数 OU）
 
-### Step 5: テンプレート読込
+### STEP-5-1: テンプレート読込
 
-`agentdev-workflow-templates` の選定ルールに従いテンプレートを読み込む。詳細は `agentdev-issue-management` を参照。Epic flow は STEP-{N} のルーティングにより開始。マルチREQ/ 単一REQ の差分（分解ソース、Wave テーブル列、子Issue 数上限、子Issue 内容ソース、子Issue 追加要素）の詳細は `agentdev-epic-tracker` を参照。
+`agentdev-workflow-templates` の選定ルールに従いテンプレートを読み込む。詳細は `agentdev-issue-management` を参照。Epic flow は STEP-3 のルーティングにより開始。マルチREQ/ 単一REQ の差分（分解ソース、Wave テーブル列、子Issue 数上限、子Issue 内容ソース、子Issue 追加要素）の詳細は `agentdev-epic-tracker` を参照。
 
-### Step 6: Epic Issue 本文生成
+### STEP-5-2: Epic Issue 本文生成
 
-STEP-{N} の自律構成分析結果に基づき Epic 本文を構築。詳細、委譲接続点は `agentdev-issue-management` を参照。
+STEP-3 の自律構成分析結果に基づき Epic 本文を構築。詳細、委譲接続点は `agentdev-issue-management` を参照。
 
-### Step 7: Epic Issue 作成
+### STEP-5-3: Epic Issue 作成
 
 ラベル `enhancement`, `feature`, `epic`。Issue 作成手続き（`agentdev-gh-cli`）で本文を書き込み → VERIFY。Issue 番号を `{epic_number}` として記録。
 
-### Step 8: 子Issue 作成（並列化）
+### STEP-5-4: 子Issue 作成（並列化）
 
 - **Issue 化単位**: OU 単位（G14、G21）
 - **子Issue 本文**: `Parent: #{epic_number}`（G03）、対象 OU ID、紐づく REQ/Decision/SPEC 識別子を記載
@@ -51,31 +51,31 @@ STEP-{N} の自律構成分析結果に基づき Epic 本文を構築。詳細�
 
 詳細、委譲接続点は `agentdev-issue-management` を参照。
 
-### Step 9: Epic Issue 本文更新
+### STEP-5-5: Epic Issue 本文更新
 
 詳細、委譲接続点は `agentdev-issue-management` を参照。
 
-#### Step 9-1: OU 結果の書き戻し
+#### STEP-5-5-1: OU 結果の書き戻し
 
 `operation_units` セクションがある場合、作成した Issue/Epic 番号を当該 OU の `result` に書き戻す。
 
-**Epic flow 完了後、共通終了処理（STEP-{N} termination-and-cleanup）を必ず実行すること。**
+**Epic flow 完了後、共通終了処理（STEP-6 termination-and-cleanup）を必ず実行すること。**
 
-## Standard flow（Step 10-12、`scale: standard` またはフィールドなし、単一 OU）
+## Standard flow（STEP-5-6〜5-8、`scale: standard` またはフィールドなし、単一 OU）
 
-### Step 10: 関連Decision特定
+### STEP-5-6: 関連Decision特定
 
 `docs/decisions<README>.md` から、単一REQ Epic flow の内容反映にも活用。
 
-### Step 11: ラベル付与
+### STEP-5-7: ラベル付与
 
 `agentdev-workflow-lifecycle` に従う。
 
-### Step 12: GitHub Issue 作成
+### STEP-5-8: GitHub Issue 作成
 
 Issue 作成手続き（`agentdev-gh-cli`）→ VERIFY。
 
-#### Step 12-1: OU 結果の書き戻し
+#### STEP-5-8-1: OU 結果の書き戻し
 
 `operation_units` セクションがある場合、作成した Issue 番号を当該 OU の `result` に書き戻す。
 
@@ -89,7 +89,7 @@ case-open、case-auto、case-run で参照される「5件」上限は文脈ご�
 | (2) case-auto Phase 2 同時起動数 | 5件 | Phase 分離モデルにおける case-run bg task 同時起動数 |
 | (3) execution_unit 全体並列 | 上限なし | 必須依存がない execution_unit 群は全て並列実行可能 |
 
-case-open の Step 8「子 Issue 作成の並列化」は **(1) に該当**。3文脈は別なので混同しない。
+case-open の STEP-5-4「子 Issue 作成の並列化」は **(1) に該当**。3文脈は別なので混同しない。
 
 ## Evidence
 
@@ -112,8 +112,8 @@ case-open の Step 8「子 Issue 作成の並列化」は **(1) に該当**。3�
 
 ## 関連 STEP
 
-- 前: STEP-{N}（adversarial-review-integration）
-- 次: STEP-{N}（termination-and-cleanup）
+- 前: STEP-4（adversarial-review-integration）
+- 次: STEP-6（termination-and-cleanup）
 
 ## 関連 Capability Skill
 

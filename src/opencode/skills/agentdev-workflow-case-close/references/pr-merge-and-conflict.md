@@ -26,18 +26,18 @@ PR を squash マージし、mergeable UNKNOWN ポーリング、先行 commit �
 
 ## Procedure
 
-### Step 4-0: squash merge 前の mergeable UNKNOWN ポーリング
+### STEP-4-1: squash merge 前の mergeable UNKNOWN ポーリング
 
 `agentdev-gh-cli` の「squash merge 前の mergeable UNKNOWN ポーリング」手続きに従い、次を実行する。
 
 - 対象 PR の `mergeable` 状態事前確認
 - `UNKNOWN` ポーリング待機
 - 上限超過時の構造化エラー停止
-- 待機中の `CONFLICTING` 遷移検出を自動分岐させ、コンフリクト解消パス（Step 4-2）へ即時接続する
+- 待機中の `CONFLICTING` 遷移検出を自動分岐させ、コンフリクト解消パス（STEP-4-4）へ即時接続する
 
 ポーリング間隔・上限値は gh-cli 手続き側が所有する（AG-{NNN}）。
 
-### Step 4: PR merge 実行
+### STEP-4-2: PR merge 実行
 
 PR merge 手続き（squash 方式、`agentdev-gh-cli`）を実行 → HEAD commit hash 記録（`agentdev-git-worktree` skill に従い）。
 
@@ -47,18 +47,18 @@ PR merge 手続き（squash 方式、`agentdev-gh-cli`）を実行 → HEAD comm
 
 **`--delete-branch` 使用禁止（REQ）**: PR マージ時に `--delete-branch` オプションを使用しない（アクティブ worktree に checkout されたブランチで local 削除が失敗し remote 削除フェーズへ到達しないため）。ブランチ削除は STEP-6 で独立実施する。
 
-### Step 4-1: Squash merge 後のローカル先行 commit 検出・処理（REQ）
+### STEP-4-3: Squash merge 後のローカル先行 commit 検出・処理（REQ）
 
 squash merge 完了後、ローカルに remote 未 push の先行 commit が存在する場合、`agentdev-git-worktree` の「Squash merge 後分岐ハンドリング手続き（REQ）」に従い、ローカル先行 commit 検出、内容重複確認、reset を実行する。本処理により `git pull --ff-only` 失敗を予防する。
 
-### Step 4-2: コンフリクト解消 rebase パス（Level 1）
+### STEP-4-4: コンフリクト解消 rebase パス（Level 1）
 
-squash merge がコンフリクトで失敗した場合（Step 4 のリトライ全失敗後、エラー原因がコンフリクトの場合）に実行する機械的解消パス（コンフリクト解消モデル Level 1）。
+squash merge がコンフリクトで失敗した場合（STEP-4-2 のリトライ全失敗後、エラー原因がコンフリクトの場合）に実行する機械的解消パス（コンフリクト解消モデル Level 1）。
 
 `agentdev-git-worktree` の「コンフリクト解消 rebase パス（REQ）」に従い、rebase による機械的解消を試みる。
 
 - **実装変更は行わず** rebase のみ
-- **rebase 自動解決時**: squash merge（Step 4）へ戻り再マージ
+- **rebase 自動解決時**: squash merge（STEP-4-2）へ戻り再マージ
 - **rebase コンフリクト発生時**: case-auto へエスカレーションして停止する（コンフリクト解消モデル Level 2/3 は case-auto の責務）
 
 ## Evidence
@@ -77,7 +77,7 @@ squash merge がコンフリクトで失敗した場合（Step 4 のリトライ
 
 - mergeable 状態、ポーリング実行状態
 - PR merge 実行結果、HEAD commit hash
-- 先行 commit 検出・処理結果（Step 4-1）
+- 先行 commit 検出・処理結果（STEP-4-3）
 - コンフリクト発生時の Level 1 rebase 試行結果、Level 2/3 エスカレーション状態
 
 ## 関連 STEP

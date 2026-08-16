@@ -13,20 +13,20 @@
 
 ## 手順
 
-### Step 6: 検出事項出力
+### STEP-3-1: 検出事項出力
 
 検出事項を `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` へ出力する。
 
-### Step 7: 実行前同期（git pull --ff-only）
+### STEP-3-2: 実行前同期（git pull --ff-only）
 
 - `git pull --ff-only` を実行する
 - **失敗時**: 共通 template（`.opencode/commands/agentdev/templates/common/git-error-messages.md`）の該当形式で表示して停止する（自動解消しない）
 
-### Step 8: .agentdev/inspect/ 変更の commit と push
+### STEP-3-3: .agentdev/inspect/ 変更の commit と push
 
 `agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/inspect/` 配下の変更を commit/ push する。commit message は `chore(agentdev): capture inspect-skills finding`（Conventional Commits 形式）。変更なし時は commit/push せず完了報告で「変更なし」と報告する。push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）。
 
-### Step 9: 完了報告
+### STEP-3-4: 完了報告
 
 完了報告 template（`.opencode/commands/agentdev/templates/inspect-skills/standard.md`）に従って出力する。
 
