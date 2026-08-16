@@ -122,7 +122,8 @@ v2:ADR-0128 Decision #3 に基づく。
 
 ## QG-3 前置 staleness check 手順（新規セクション）
 
-case-run は実装作業開始前に QG-3 本体とは独立した前置検査として staleness check を実行する（REQ-006-031〜034）。本検査は QG-3 deviation 分類（spec-bug 等）運用を変更せず、deviation 発生前の予防層として位置づける。
+case-run は実装作業開始前に QG-3 本体とは独立した前置検査として staleness check を実行する（REQ-006-031〜034）。
+本検査は QG-3 deviation 分類（spec-bug 等）運用を変更せず、deviation 発生前の予防層として位置づける。
 
 ### 検証項目
 
@@ -139,13 +140,17 @@ case-run は実装作業開始前に QG-3 本体とは独立した前置検査�
 
 ### QG-3 本体との関係
 
-staleness check は QG-3 本体（PR 作成直前の実装充足・乖離ゲート）とは独立した前置検査である。QG-3 が実装結果に対するゲートであるのに対し、staleness check は実装開始前の入力妥当性検査である。両者は順序依存を持たず、staleness check で差異を検出しても QG-3 本体の実施要否には影響しない。
+staleness check は QG-3 本体（PR 作成直前の実装充足・乖離ゲート）とは独立した前置検査である。
+QG-3 が実装結果に対するゲートであるのに対し、staleness check は実装開始前の入力妥当性検査である。
+両者は順序依存を持たず、staleness check で差異を検出しても QG-3 本体の実施要否には影響しない。
 
 ## docs/** 変更時の targeted docs guard（REQ-006-035）
 
-case-run は PR 対象ファイルに docs/** 変更を含む場合、実行担当サブエージェント起動の委譲前に targeted docs guard を実行する（REQ-006-035）。本検査は QG-3 本体・QG-3 前置 staleness check とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない（REQ-006-033 準拠）。
+case-run は PR 対象ファイルに docs/** 変更を含む場合、実行担当サブエージェント起動の委譲前に targeted docs guard を実行する（REQ-006-035）。
+本検査は QG-3 本体・QG-3 前置 staleness check とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない（REQ-006-033 準拠）。
 
-changed-path routing と配布依存境界の検出経路は共有境界 adapter へ接続する（DEC-014）。最終 gate 基底は REQ-010-012 を再利用し、検査エラー（検査対象欠落、読込不能、未分類エントリ、adapter 起動失敗）は gate-not-passed として扱い、clean として通過させない（DEC-014 決定5、`integrity/distribution-boundary.md`「検査エラーの意味」）。
+changed-path routing と配布依存境界の検出経路は共有境界 adapter へ接続する（DEC-014）。
+最終 gate 基底は REQ-010-012 を再利用し、検査エラー（検査対象欠落、読込不能、未分類エントリ、adapter 起動失敗）は gate-not-passed として扱い、clean として通過させない（DEC-014 決定5、`integrity/distribution-boundary.md`「検査エラーの意味」）。
 
 ### 実行条件
 
@@ -158,7 +163,8 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
   --workflow case-run --base-ref origin/main --json
 ```
 
-変更ファイルは worktree 内の git diff から取得する（`--base-ref origin/main` または `--files <changed-paths>`）。case-run プロファイル固有の追加ルールとして full_docs_check_recommended 判定は持たない（case-close の責務）。
+変更ファイルは worktree 内の git diff から取得する（`--base-ref origin/main` または `--files <changed-paths>`）。
+case-run プロファイル固有の追加ルールとして full_docs_check_recommended 判定は持たない（case-close の責務）。
 
 ### 検出結果の記録と連携
 
@@ -167,9 +173,12 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
 
 ## verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）
 
-case-run は実行担当サブエージェント委譲の結果、実装差分0件・検証のみで完了する PR（**verification-only PR**）を生成する場合がある。本節は verification-only PR の判定条件、PR 本文の根拠欄記入規則、GitHub の空 PR 取り扱い、case-close への引継ぎ注意事项を定める。要件の SSoT は v2:REQ-0158-002。
+case-run は実行担当サブエージェント委譲の結果、実装差分0件・検証のみで完了する PR（**verification-only PR**）を生成する場合がある。
+本節は verification-only PR の判定条件、PR 本文の根拠欄記入規則、GitHub の空 PR 取り扱い、case-close への引継ぎ注意事项を定める。
+要件の SSoT は v2:REQ-0158-002。
 
-PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。pr_desc.md への verify-only 根拠欄追加は workflow-templates SPEC の変更として位置付ける。
+PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。
+pr_desc.md への verify-only 根拠欄追加は workflow-templates SPEC の変更として位置付ける。
 
 ### 定義
 
@@ -183,11 +192,15 @@ verification-only PR は以下を全て満たす PR とする（v2:REQ-0158-002�
 
 ### verify-only 根拠欄の記入規則
 
-case-run は verify-only PR 作成時に pr_desc.md の verify-only 根拠欄へ、実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果を記入する。根拠は姉妹実装 PR だけでなく、実装 PR、先行 commit、main 反映済み commit、既存成果物、検証のみで完結する理由を許容する。「実装内容」欄は空欄にせず、「実装差分なし」と理由を記録する。
+case-run は verify-only PR 作成時に pr_desc.md の verify-only 根拠欄へ、実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果を記入する。
+根拠は姉妹実装 PR だけでなく、実装 PR、先行 commit、main 反映済み commit、既存成果物、検証のみで完結する理由を許容する。
+「実装内容」欄は空欄にせず、「実装差分なし」と理由を記録する。
 
 ### GitHub の空 PR 許容
 
-GitHub は空 PR（変更ファイル0件）の squash merge を許可し、空 commit を生成する（commit 2b34f8b0 で実証）。case-run は空 PR の作成・マージを GitHub の挙動に依存して実行する。squash merge で生成された空 commit は履歴に残り、`gh pr merge --squash` の通常フローに従う。
+GitHub は空 PR（変更ファイル0件）の squash merge を許可し、空 commit を生成する（commit 2b34f8b0 で実証）。
+case-run は空 PR の作成・マージを GitHub の挙動に依存して実行する。
+squash merge で生成された空 commit は履歴に残り、`gh pr merge --squash` の通常フローに従う。
 
 ### case-close 引継ぎ注意事项
 
@@ -199,9 +212,13 @@ verification-only PR は case-close の targeted docs guard で files_checked �
 
 ## Artifact Graph 利用
 
-case-run での Artifact Graph 利用は REQ-017-010 が定める境界内で補助用途に限定する。補助用途は Issue に記録された対象から予期しない依存または参照が見つかった場合の補助探索, acceptance criteria の検証根拠への到達, case-open 時点からの関係差異確認を含む。
+case-run での Artifact Graph 利用は REQ-017-010 が定める境界内で補助用途に限定する。
+補助用途は Issue に記録された対象から予期しない依存または参照が見つかった場合の補助探索, acceptance criteria の検証根拠への到達, case-open 時点からの関係差異確認を含む。
 
-Graph で発見した候補のうち Issue scope 内の内部実装影響は case-run が自律処理する。scope, 完了条件, REQ, Decision, SPEC, 必須品質統制の変更が必要な場合は blocked として case-update 連携とする。証拠源（Graph, rg, filesystem scan の別）にかかわらず case-run は既存 scope を超える変更を自律拡大しない。本制限は REQ-017-010 の境界を変更せず、Graph 利用時の適用を明確化する。
+Graph で発見した候補のうち Issue scope 内の内部実装影響は case-run が自律処理する。
+scope, 完了条件, REQ, Decision, SPEC, 必須品質統制の変更が必要な場合は blocked として case-update 連携とする。
+証拠源（Graph, rg, filesystem scan の別）にかかわらず case-run は既存 scope を超える変更を自律拡大しない。
+本制限は REQ-017-010 の境界を変更せず、Graph 利用時の適用を明確化する。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 
@@ -331,13 +348,17 @@ L3（委譲先内部メトリクス）は対象外とする（REQ-003-010）。
 
 ## Phase 0 commit スコープ設計運用
 
-Phase 0（枝PR作成フェーズ）の case-run 委譲内で実行担当サブエージェントが作成する commit に適用するスコープ設計運用を規定する。Phase 0 全体の commit 構成（定義層で確定した REQ/Decision/SPEC のコミット、枝PR 作成）は case-auto SPEC（`docs/specs/commands/case-auto.md`）の同名節を正とし、本節は case-run 委譲内の commit スコープに焦点を当てる。case-auto SPEC と整合する内容を維持する（OU-013b / OU-013a）。
+Phase 0（枝PR作成フェーズ）の case-run 委譲内で実行担当サブエージェントが作成する commit に適用するスコープ設計運用を規定する。
+Phase 0 全体の commit 構成（定義層で確定した REQ/Decision/SPEC のコミット、枝PR 作成）は case-auto SPEC（`docs/specs/commands/case-auto.md`）の同名節を正とし、本節は case-run 委譲内の commit スコープに焦点を当てる。
+case-auto SPEC と整合する内容を維持する（OU-013b / OU-013a）。
 
 ### 孫 Issue 間 SPEC スコープ交差時の扱い
 
 Phase 0 で複数孫 Issue（Epic Wave 内の子Issue、または並列 execution_unit 内の個別 Issue）の実装が同一 SPEC ファイルに触れる場合の扱いを以下で規定する。
 
-**SPEC 本文修正の非許容**: 実行担当サブエージェントは test strategy が `on_failure: fix-and-reverify` を指示する場合でも、case-run 委譲内で SPEC 本文（`docs/specs/**`）を修正しない。Phase 0 の SPEC 成果物は spec-save 工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。SPEC 修正が必要と判明した場合は `record-in-findings` で PR 本文の `## SPEC確定候補` セクションへ記録し、case-close の docs 検証における SPEC 確定チェックへ引き継ぐ（`agentdev-case-run-execution-adapter` SKILL の SPEC確定候補配置契約に従う）。
+**SPEC 本文修正の非許容**: 実行担当サブエージェントは test strategy が `on_failure: fix-and-reverify` を指示する場合でも、case-run 委譲内で SPEC 本文（`docs/specs/**`）を修正しない。
+Phase 0 の SPEC 成果物は spec-save 工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。
+SPEC 修正が必要と判明した場合は `record-in-findings` で PR 本文の `## SPEC確定候補` セクションへ記録し、case-close の docs 検証における SPEC 確定チェックへ引き継ぐ（`agentdev-case-run-execution-adapter` SKILL の SPEC確定候補配置契約に従う）。
 
 **target_area の重複判定と並列制御**:
 
@@ -348,7 +369,8 @@ case-run は case-open が生成した Wave 構成と depends_on を前提とし
 
 ### ドメイン state 更新と成果物変更の同一コミット混在
 
-case-run 委譲内で作成する commit の構成運用を規定する。原則として **2分割運用** を採用し、実行担当サブエージェントはドメイン state 更新と成果物変更を同一コミットへ混在させない。
+case-run 委譲内で作成する commit の構成運用を規定する。
+原則として **2分割運用** を採用し、実行担当サブエージェントはドメイン state 更新と成果物変更を同一コミットへ混在させない。
 
 **対象ディレクトリ**:
 
@@ -361,9 +383,12 @@ case-run 委譲内で作成する commit の構成運用を規定する。原則
 - レビュー単位の分離: 成果物変更は SPEC 品質査読の対象、ドメイン state はキャプチャ境界（intake/learning）の対象。査読観点が異なるため分離する
 - capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（G15/G16/G17、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
 
-**例外**: `.agentdev/drafts/` の削除（req-save / spec-save 完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。本運用が禁止する同一コミット混在には該当しない。当該クリーンアップは req-save / spec-save 工程の責務であり、Phase 0 の case-run 委譲内では発生しない。
+**例外**: `.agentdev/drafts/` の削除（req-save / spec-save 完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。
+本運用が禁止する同一コミット混在には該当しない。
+当該クリーンアップは req-save / spec-save 工程の責務であり、Phase 0 の case-run 委譲内では発生しない。
 
-**commit 分割手順**: 実行担当サブエージェントは成果物変更を先にコミットする。ドメイン state に触れる必要がある場合は別コミットへ分離するが、前述の通り case-run 委譲内では原則として `.agentdev/` 配下を編集せず、PR 本文経由で case-close へ引き継ぐ。
+**commit 分割手順**: 実行担当サブエージェントは成果物変更を先にコミットする。
+ドメイン state に触れる必要がある場合は別コミットへ分離するが、前述の通り case-run 委譲内では原則として `.agentdev/` 配下を編集せず、PR 本文経由で case-close へ引き継ぐ。
 
 ## 停止状態
 
@@ -393,11 +418,17 @@ case-run 委譲内で作成する commit の構成運用を規定する。原則
 
 ## adversarial-review 挿入境界（経路G: adapter 委譲内）
 
-本節は case-run における adversarial-review caller integration（REQ-015 経路G）の挿入境界を正典として所有する（REQ-014-011）。共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は経路G 固有の挿入位置、発動条件、実装方針限定、blocked 遷移のみを所有する。adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review SPEC を正とし、本節で再定義しない。実装方針形成、review 呼出、結果反映の内部手続きの正規所有者は `agentdev-case-run-execution-adapter` SPEC「adversarial-review 統合（実装方針→review→結果反映）」節とし、本節は参照する。
+本節は case-run における adversarial-review caller integration（REQ-015 経路G）の挿入境界を正典として所有する（REQ-014-011）。
+共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は経路G 固有の挿入位置、発動条件、実装方針限定、blocked 遷移のみを所有する。
+adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review SPEC を正とし、本節で再定義しない。
+実装方針形成、review 呼出、結果反映の内部手続きの正規所有者は `agentdev-case-run-execution-adapter` SPEC「adversarial-review 統合（実装方針→review→結果反映）」節とし、本節は参照する。
 
 ### 挿入境界と構造（REQ-015-001）
 
-経路G は他経路（A〜F）と異なり、review 挿入境界を case-run 本体の処理段階へ直接挿入しない。代わりに、実行担当サブエージェント起動における adapter 委譲の内部に review 挿入境界を設ける。発動条件判定と review 呼出の分離（REQ-015-001）は adapter 委譲内で達成され、case-run 本体は review 発動の有無を判定しない。本節は委譲境界を経路G の正典として一意に特定し、Workflow Skill（`agentdev-workflow-case-run`）の委譲起動手順が実行時実装先となる。
+経路G は他経路（A〜F）と異なり、review 挿入境界を case-run 本体の処理段階へ直接挿入しない。
+代わりに、実行担当サブエージェント起動における adapter 委譲の内部に review 挿入境界を設ける。
+発動条件判定と review 呼出の分離（REQ-015-001）は adapter 委譲内で達成され、case-run 本体は review 発動の有無を判定しない。
+本節は委譲境界を経路G の正典として一意に特定し、Workflow Skill（`agentdev-workflow-case-run`）の委譲起動手順が実行時実装先となる。
 
 | 段階 | 対応処理 | 役割 |
 |---|---|---|
@@ -409,11 +440,16 @@ case-run 委譲内で作成する commit の構成運用を規定する。原則
 
 ### case-run 本体は実装方針を生成・審査しない（REQ-015-010）
 
-case-run 本体（全フェーズの orchestration）は実装方針の生成、審査、review を行わない（REQ-015-010）。実装方針の形成、adversarial-review 呼出、結果反映は委譲内で agentdev-case-run-execution-adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで adapter 委譲内の結果を受領する。
+case-run 本体（全フェーズの orchestration）は実装方針の生成、審査、review を行わない（REQ-015-010）。
+実装方針の形成、adversarial-review 呼出、結果反映は委譲内で agentdev-case-run-execution-adapter の委譲契約に従い、最初の実装変更前に実施する。
+case-run 本体が実装方針を生成、保持、審査するステップを新設しない。
+委譲 result（4状態）のみで adapter 委譲内の結果を受領する。
 
 ### 実装方針限定（REQ-015-010）
 
-adapter 委譲内で形成する実装方針は、既確定 Issue 本文、REQ、Decision、SPEC を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順等）に限定する（REQ-015-010）。実装方針は既確定文書へ矛盾しない内部選択の範囲内で review 審議対象となる。実装方針が既確定 Issue/REQ/Decision/SPEC の変更、追加、撤回を必要とする場合、実行担当サブエージェントは実装を開始せず blocked へ遷移する。
+adapter 委譲内で形成する実装方針は、既確定 Issue 本文、REQ、Decision、SPEC を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順等）に限定する（REQ-015-010）。
+実装方針は既確定文書へ矛盾しない内部選択の範囲内で review 審議対象となる。
+実装方針が既確定 Issue/REQ/Decision/SPEC の変更、追加、撤回を必要とする場合、実行担当サブエージェントは実装を開始せず blocked へ遷移する。
 
 ### blocked 遷移（REQ-015-010、REQ-015-011）
 
@@ -423,24 +459,34 @@ adapter 委譲内で次のいずれかに該当する場合、実行担当サブ
 - 要件、仕様に問題（欠落、矛盾、曖昧さ、実現不可能な条件等）を検出した（REQ-015-011）
 - adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない（REQ-014-009）
 
-blocked 詳細本文は Issue コメントに SSoT として記録され、case-run の result 処理で扱われる。実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず、必ず blocked 経路へ入る（REQ-015-011、G02）。
+blocked 詳細本文は Issue コメントに SSoT として記録され、case-run の result 処理で扱われる。
+実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、ADR 再解釈を行わず、必ず blocked 経路へ入る（REQ-015-011、G02）。
 
 ### 発動条件（REQ-015-002、REQ-015-003）
 
-case-run は adversarial-review を原則実行する（default-on、REQ-015-002）。発動条件判定は adapter 委譲内で実行担当サブエージェントが行う。ユーザー明示指定は通常発動の必須条件ではなく、実装方針の意味的決定が存在する場合に発動する。case-run 本体は発動条件の有無を判定、伝達しない。
+case-run は adversarial-review を原則実行する（default-on、REQ-015-002）。
+発動条件判定は adapter 委譲内で実行担当サブエージェントが行う。
+ユーザー明示指定は通常発動の必須条件ではなく、実装方針の意味的決定が存在する場合に発動する。
+case-run 本体は発動条件の有無を判定、伝達しない。
 
 - **skip 条件**: adapter 委譲内で実装方針が自明（既確定 SPEC の機械的反映、単一ファイル編集等）で、実装方針の意味的決定（関数配置、命名、データ構造選択）が存在しない場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
 - **ユーザー明示指定時の必須実行**: ユーザーが case-run 実行中（adapter 委譲前）に adversarial-review の実施を明示的に指定した場合、skip 条件の該当にかかわらず必ず発動する（REQ-015-002）。
 
 ### 従来フロー維持（REQ-015-003）
 
-skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、case-run の従来フロー（全フェーズ）を維持する（REQ-015-003）。review 挿入境界は case-run 本体の既存処理段階を追加、削除、並べ替えせず、委譲内での発動条件判定と review 呼出の分離のみを追加する。委譲 result が `completed-pr` の場合、従来どおり result 処理で PR 番号を受領しクリーンアップフェーズへ進む。
+skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、case-run の従来フロー（全フェーズ）を維持する（REQ-015-003）。
+review 挿入境界は case-run 本体の既存処理段階を追加、削除、並べ替えせず、委譲内での発動条件判定と review 呼出の分離のみを追加する。
+委譲 result が `completed-pr` の場合、従来どおり result 処理で PR 番号を受領しクリーンアップフェーズへ進む。
 
 ### 戻り先と反映責務
 
-accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務である（REQ-014-006）。adversarial-review は finding を提示し、合意候補を形成するが、実装方針、実装ファイル、PR 本文への反映を自身では行わない。反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/Decision/SPEC 整合性再確認、targeted docs guard、QG-3 等）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動できる（REQ-014-007）。unresolved な本質的争点またはユーザー判断事項が残る場合、実装の最初の変更（不可逆処理）へ進まず blocked へ遷移する（REQ-014-009、前述「blocked 遷移」節）。
+accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務である（REQ-014-006）。
+adversarial-review は finding を提示し、合意候補を形成するが、実装方針、実装ファイル、PR 本文への反映を自身では行わない。
+反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/Decision/SPEC 整合性再確認、targeted docs guard、QG-3 等）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動できる（REQ-014-007）。
+unresolved な本質的争点またはユーザー判断事項が残る場合、実装の最初の変更（不可逆処理）へ進まず blocked へ遷移する（REQ-014-009、前述「blocked 遷移」節）。
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、`agentdev-case-run-execution-adapter` SPEC「adversarial-review 統合（実装方針→review→結果反映）」節との間で意味の重複、矛盾を生じない。case-run command 固有の挿入境界（委譲内実施、委譲起動位置、実装方針限定、blocked 遷移）のみを本節が所有し、実装方針形成、review 呼出、結果反映の内部手続きの詳細は `agentdev-case-run-execution-adapter` SPEC を正とする。
+本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、`agentdev-case-run-execution-adapter` SPEC「adversarial-review 統合（実装方針→review→結果反映）」節との間で意味の重複、矛盾を生じない。
+case-run command 固有の挿入境界（委譲内実施、委譲起動位置、実装方針限定、blocked 遷移）のみを本節が所有し、実装方針形成、review 呼出、結果反映の内部手続きの詳細は `agentdev-case-run-execution-adapter` SPEC を正とする。
 

@@ -44,11 +44,14 @@ REQ-002-006 / REQ-002-007 の検査観点の詳細を配置する。
 - 存在しない command 参照の検出パターン
 - エンコーディング不整合の検出パターン
 
-存在しない command 参照の検出は、README listing と command 本文の相互参照について、存在しない command を指す参照を検出事項として出力する。実在する command を指す参照は検出対象としない。
+存在しない command 参照の検出は、README listing と command 本文の相互参照について、存在しない command を指す参照を検出事項として出力する。
+実在する command を指す参照は検出対象としない。
 
-エンコーディング不整合の検出は、配布物 Markdown の UTF-8 BOM の有無と改行コードの一貫性を検査し、UTF-8 BOM 付きファイルまたは単一ファイル内の CRLF/LF 混在を検出事項とする。BOM なし UTF-8 かつ単一の改行コードで構成されたファイルは検出対象としない。
+エンコーディング不整合の検出は、配布物 Markdown の UTF-8 BOM の有無と改行コードの一貫性を検査し、UTF-8 BOM 付きファイルまたは単一ファイル内の CRLF/LF 混在を検出事項とする。
+BOM なし UTF-8 かつ単一の改行コードで構成されたファイルは検出対象としない。
 
-これらの検出は配布物整合性診断を提供する各 command（inspect-docs、inspect-skills）に共通で適用する。診断カテゴリ、共通証拠構造、finding 出力契約は agentdev-doc-diagnostics skill（`docs/specs/skills/agentdev-doc-diagnostics.md`「検証観点」「See Also」が正規所有箇所）を正規所有者とし、本 SPEC は検出パターンの定義に特化する。
+これらの検出は配布物整合性診断を提供する各 command（inspect-docs、inspect-skills）に共通で適用する。
+診断カテゴリ、共通証拠構造、finding 出力契約は agentdev-doc-diagnostics skill（`docs/specs/skills/agentdev-doc-diagnostics.md`「検証観点」「See Also」が正規所有箇所）を正規所有者とし、本 SPEC は検出パターンの定義に特化する。
 
 ## 文意保持検査
 
@@ -72,9 +75,11 @@ REQ-002-006 / REQ-002-007 の検査観点の詳細を配置する。
 
 ## REQ-002-028/029/035 RETIRE 後の正規根拠
 
-REQ-002-028 と REQ-002-029 が保有していた構文健全性検査と責務整合検査（移行・作業由来品質検査行）の正規根拠は、本 SPEC（docs-spec-rebuild-integrity.md）と `responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md` の既存品質契約へ集約する。REQ-007 行は新設しない。
+REQ-002-028 と REQ-002-029 が保有していた構文健全性検査と責務整合検査（移行・作業由来品質検査行）の正規根拠は、本 SPEC（docs-spec-rebuild-integrity.md）と `responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md` の既存品質契約へ集約する。
+REQ-007 行は新設しない。
 
 REQ-002-035 が保有していた case-auto.md 段階解消（移行・作業由来品質検査行）の正規根拠は、Epic 完了条件と IR-059 検出へ集約する。
 
-配布依存境界の意味モデルの正規所有者は `integrity/distribution-boundary.md` である。本 SPEC は意味モデルを再定義せず、同 SPEC を参照する。
+配布依存境界の意味モデルの正規所有者は `integrity/distribution-boundary.md` である。
+本 SPEC は意味モデルを再定義せず、同 SPEC を参照する。
 

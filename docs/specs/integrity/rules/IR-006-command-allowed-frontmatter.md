@@ -24,4 +24,7 @@ updated: 2026-08-06
 
 ## IR-006 ルール定義
 
-IR-006（command 許可 frontmatter）のルール定義と実装を description 単一許可へ更新する。新規ルール化せず既存ルールの定義と checker 実装を更新する（移行計画 §2 固定方針）。rule-ownership.md 中の IR-006 所有権記述も整合させる。詳細 normative は移行計画 §5.2。
+IR-006（command 許可 frontmatter）のルール定義と実装を description 単一許可へ更新する。
+新規ルール化せず既存ルールの定義と checker 実装を更新する（移行計画 §2 固定方針）。
+rule-ownership.md 中の IR-006 所有権記述も整合させる。
+詳細 normative は移行計画 §5.2。

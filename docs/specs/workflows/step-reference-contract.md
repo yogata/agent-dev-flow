@@ -45,8 +45,10 @@ STEP model 対象外型（capture-only 型、read-only-diagnostic 型）の工�
 
 ## STEP transition
 
-Workflow Skill の SKILL.md（control plane）が所有する。reference 間で重複定義しない。
+Workflow Skill の SKILL.md（control plane）が所有する。
+reference 間で重複定義しない。
 
 ## STEP 識別子
 
-workflow 内安定識別子。command 固定番号とは区別する。
+workflow 内安定識別子。
+command 固定番号とは区別する。

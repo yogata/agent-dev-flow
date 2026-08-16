@@ -45,7 +45,8 @@ updated: 2026-07-26
 
 ## exemption（検出対象外）
 
-以下の exemption は `check_changed_docs.ts`（targeted guard）の旧直下パス検出（`checkObsoleteSpecPath`）と legacy vocabulary 検出（`checkLegacyVocab`）の両方に適用する。`check_integrity.ts`（full audit）も同等の exemption を実装する。
+以下の exemption は `check_changed_docs.ts`（targeted guard）の旧直下パス検出（`checkObsoleteSpecPath`）と legacy vocabulary 検出（`checkLegacyVocab`）の両方に適用する。
+`check_integrity.ts`（full audit）も同等の exemption を実装する。
 
 | 対象 | 理由 |
 |------|------|
@@ -89,29 +90,39 @@ link mode 統一（REQ-009）に伴い廃止確定となった旧語彙（直接
 3. 歴史経緯と判定した場合、exemption 表へ追記する（REQ-010-024）
 4. 現行機能の記述と判定した場合、旧語彙を現行語彙へ置換する
 
-現在のリポジトリでは、旧語彙の出現は全て歴史経緯（免除対象）に該当する。`src/opencode/`、`.opencode/` 配下の現行 command、skill に旧語彙の残存はない（link mode への移行完了済み）。
+現在のリポジトリでは、旧語彙の出現は全て歴史経緯（免除対象）に該当する。
+`src/opencode/`、`.opencode/` 配下の現行 command、skill に旧語彙の残存はない（link mode への移行完了済み）。
 
 ## 例外登録（現行Decisionの履歴記載）
 
-現行 Decision（`docs/decisions/DEC-*.md`、retired を除く）が移行経緯を説明するために旧SPEC直下パス、廃止語彙を記載する場合は exemption とする。`check_integrity.ts`（full audit）と `check_changed_docs.ts`（targeted guard の `checkLegacyVocab`、`checkObsoleteSpecPath`）は同じ例外規則を使用する。`superseded` Decision は後継 Decision へ置き換えられた履歴文書であり、旧パス、廃止語彙を含むことが前提であるため免除対象に含める。
+現行 Decision（`docs/decisions/DEC-*.md`、retired を除く）が移行経緯を説明するために旧SPEC直下パス、廃止語彙を記載する場合は exemption とする。
+`check_integrity.ts`（full audit）と `check_changed_docs.ts`（targeted guard の `checkLegacyVocab`、`checkObsoleteSpecPath`）は同じ例外規則を使用する。
+`superseded` Decision は後継 Decision へ置き換えられた履歴文書であり、旧パス、廃止語彙を含むことが前提であるため免除対象に含める。
 
 免除対象は frontmatter `status` が `accepted` または `superseded` であり、かつ次の文書レベル履歴注記条件をいずれか満たす Decision ファイルである。
 
-第一の条件は frontmatter 終了直後から最初の見出し（`#` または `##`）までの本文が存在することである。当該本文は文書レベル履歴注記として扱い、文書全体が歴史経緯の記録であるとみなす。
+第一の条件は frontmatter 終了直後から最初の見出し（`#` または `##`）までの本文が存在することである。
+当該本文は文書レベル履歴注記として扱い、文書全体が歴史経緯の記録であるとみなす。
 
-第二の条件は明示的な履歴注記ブロックが存在することである。`> 本文書は歴史的経緯を記録する`、`> 本 ADR は移行履歴を保持する` 等の引用ブロック形式で、文書全体が歴史経緯の記録であることを示す注記を認識する。
+第二の条件は明示的な履歴注記ブロックが存在することである。
+`> 本文書は歴史的経緯を記録する`、`> 本 ADR は移行履歴を保持する` 等の引用ブロック形式で、文書全体が歴史経緯の記録であることを示す注記を認識する。
 
 これらの文書レベル履歴注記条件を満たす ADR ファイルは、検出行への履歴マーカー付与を要求せず免除する。
 
-文書レベル履歴注記条件を満たさない ADR ファイルは、検出行が履歴マーカー（`旧`、`移行前`、`廃止`、`前提`、`historical`、`legacy`、`deprecated`）を含む場合のみ免除する。現行機能の記述は検出対象とする。判定は固定の語彙リストのみに依存せず、文書レベル注記、行レベル marker、周辺文脈で行う。
+文書レベル履歴注記条件を満たさない ADR ファイルは、検出行が履歴マーカー（`旧`、`移行前`、`廃止`、`前提`、`historical`、`legacy`、`deprecated`）を含む場合のみ免除する。
+現行機能の記述は検出対象とする。
+判定は固定の語彙リストのみに依存せず、文書レベル注記、行レベル marker、周辺文脈で行う。
 
 ## 段階導入運用
 
-本ルールは `obsolete-path-map.yaml` 新規導入に伴うものであり、baseline 0 で開始する。full audit を即 fail gate 化する。
+本ルールは `obsolete-path-map.yaml` 新規導入に伴うものであり、baseline 0 で開始する。
+full audit を即 fail gate 化する。
 
 ## エントリ追記手順（REQ-001-010）
 
-`docs/specs/` 配下でドメイン分割による移送が発生した場合、移送実行者は移送単位で `obsolete-path-map.yaml` の `entries` へ旧パス（`old`）と新パス（`new`）の対応を追記する。追記後、`check_integrity.ts` で IR-057 を実行し、旧パス混入が検出できることを確認する（REQ-001-012）。スキーマ詳細および手順の逐次ステップは `obsolete-path-map.yaml` ヘッダコメントの「運用手順（REQ-001-010）」セクションを参照。
+`docs/specs/` 配下でドメイン分割による移送が発生した場合、移送実行者は移送単位で `obsolete-path-map.yaml` の `entries` へ旧パス（`old`）と新パス（`new`）の対応を追記する。
+追記後、`check_integrity.ts` で IR-057 を実行し、旧パス混入が検出できることを確認する（REQ-001-012）。
+スキーマ詳細および手順の逐次ステップは `obsolete-path-map.yaml` ヘッダコメントの「運用手順（REQ-001-010）」セクションを参照。
 
 ## See Also
 

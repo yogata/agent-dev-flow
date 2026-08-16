@@ -134,11 +134,14 @@ docs-check は `repo-agentdev-integrity`（配布対象外スキル）として 
 
 ## インストール方式の方針
 
-provisioning（チェックアウトの取得）と install 手段（link mode による接続）は別軸である（REQ-009）。どちらの provisioning 形態でも install 手段は link mode に限られる。導入方式ポリシーの正規な定義は SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md) を参照。
+provisioning（チェックアウトの取得）と install 手段（link mode による接続）は別軸である（REQ-009）。
+どちらの provisioning 形態でも install 手段は link mode に限られる。
+導入方式ポリシーの正規な定義は SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md) を参照。
 
 ### provisioning 形式（チェックアウトの取得）
 
-provisioning は利用者の責務である。install スクリプトは provisioning（clone、fetch、reset）も network access も行わない。
+provisioning は利用者の責務である。
+install スクリプトは provisioning（clone、fetch、reset）も network access も行わない。
 
 | 形式 | 対応 | 推奨 | 備考 |
 |--------|------|------|------|
@@ -154,11 +157,13 @@ provisioning は利用者の責務である。install スクリプトは provisi
 | Git サブモジュール | ⚠️ | 検討可能 | 複雑性が増す |
 | プラグイン/npm/package | ❌ | 将来対応 | v2:ADR-011-064 で将来の選択肢扱い |
 
-> 「source ZIP によるチェックアウト供給」と「release archive projection」（REQ-029 が別途定義する配布と検証の投影）は別の概念である（DEC-014）。ZIP 展開による provisioning は手動 copy インストールに該当せず、install 手段は link mode に限定される。
+> 「source ZIP によるチェックアウト供給」と「release archive projection」（REQ-029 が別途定義する配布と検証の投影）は別の概念である（DEC-014）。
+> ZIP 展開による provisioning は手動 copy インストールに該当せず、install 手段は link mode に限定される。
 
 ### ジャンクションによるインストール（推奨）
 
-`.agentdev-plugin/` にチェックアウトを配置し、ジャンクションで実行時の配置先を作成する。スクリプトはチェックアウト配下のものを導入先リポジトリのルートから実行する。
+`.agentdev-plugin/` にチェックアウトを配置し、ジャンクションで実行時の配置先を作成する。
+スクリプトはチェックアウト配下のものを導入先リポジトリのルートから実行する。
 
 ```powershell
 # 1. provisioning: .agentdev-plugin/ にチェックアウトを用意する（どちらか）
@@ -184,7 +189,8 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 
 ### 更新手順
 
-更新は provisioning 形式に従う（REQ-009-049）。install の apply は冪等であり、再実行で junction 構成を変化させない。
+更新は provisioning 形式に従う（REQ-009-049）。
+install の apply は冪等であり、再実行で junction 構成を変化させない。
 
 ```powershell
 # git clone 環境: agent-dev-flow の最新を取得

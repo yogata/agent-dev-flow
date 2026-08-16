@@ -15,7 +15,8 @@ REQ/Decision/SPEC/guides の責務マトリックスを定義し、各文書種�
 
 ### 他 SPEC との役割分担
 
-本 SPEC と `../responsibilities/document-type-responsibilities.md` は補完関係にある。重複しやすい関心を以下の通り分担する。
+本 SPEC と `../responsibilities/document-type-responsibilities.md` は補完関係にある。
+重複しやすい関心を以下の通り分担する。
 
 | 関心 | 主に扱う SPEC |
 |---|---|
@@ -24,7 +25,8 @@ REQ/Decision/SPEC/guides の責務マトリックスを定義し、各文書種�
 | 文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策 | `../responsibilities/document-type-responsibilities.md` |
 | 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約） | `patterns.md`（本 SPEC は文書種別マトリックスを扱い、`patterns.md` は共通フォーマット規約を扱う） |
 
-両 SPEC の境界を変更する場合は、相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。新規ファイル分割は行わず、既存2ファイル間の重複削除で運用する（REQ-001-001）。
+両 SPEC の境界を変更する場合は、相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
+新規ファイル分割は行わず、既存2ファイル間の重複削除で運用する（REQ-001-001）。
 
 ## 責務マトリックス
 
@@ -32,7 +34,7 @@ REQ/Decision/SPEC/guides の責務マトリックスを定義し、各文書種�
 |---|---|---|
 | REQ | 現行要件（WHAT: 何を満たすべきか） | 実装詳細、HOW、現在の動作記述 |
 | Decision | 将来の設計、運用、文書システムを制約する決定とその理由（WHY）<!-- REQ-001 --> | 可逆的な運用手順、状態遷移、形式定義 |
-| SPEC | 現在のアーキテクチャ基準（現在どう動作しているか）※リポジトリ内部設計文書。実行時配布物の依存先ではない（REQ-001, REQ-001） | 新規要件、将来計画、判断根拠（Decision の管轄） |
+| SPEC | 現在のアーキテクチャ基準（現在どう動作しているか）※リポジトリ内部設計文書。実行時配布物の依存先ではない（REQ-001） | 新規要件、将来計画、判断根拠（Decision の管轄） |
 | Guides | 人間向けナビゲーション層。規範的権限を持たない（REQ-001） | 要件本文、契約本文、REQ/Decision/SPEC 内容の重複 |
 
 ### ワークフロー状態管理
@@ -151,17 +153,21 @@ REQ 体系の健全性を維持するため、これらの観点で定期的に 
 
 ### 恒久契約適格性と既存成果物処置分類 <!-- v2:REQ-0155-005, REQ-010-047, v2:REQ-0140-021 -->
 
-本節は intake / learning / diagnostics の採用済み成果物を恒久契約（REQ/Decision/SPEC/command/skill）へ昇格させる前の共通基準と、既存成果物の見直し処置の定義を正規所有する。適格性基準は v2:ADR-0112（過剰適用防止）、REQ-001決定4（REQ拡張は2種別に限定）、v2:REQ-0155-005（無条件自動REQ化禁止）を具体化する。
+本節は intake / learning / diagnostics の採用済み成果物を恒久契約（REQ/Decision/SPEC/command/skill）へ昇格させる前の共通基準と、既存成果物の見直し処置の定義を正規所有する。
+適格性基準は v2:ADR-0112（過剰適用防止）、REQ-001決定4（REQ拡張は2種別に限定）、v2:REQ-0155-005（無条件自動REQ化禁止）を具体化する。
 
 #### 恒久契約適格性
 
-intake、learning、inspect 由来の知見は、既存契約で未充足の新しいステークホルダー要求、外部から観測可能な契約変更、または明示が必要な安全境界に該当する場合だけ恒久契約候補とする。既存要求を満たすバリエーション、エッジケース、不適合修正、内部再構成、文書訂正は、既存契約が要求を保持している限り REQ を拡張しない（REQ-001決定4の要約）。
+intake、learning、inspect 由来の知見は、既存契約で未充足の新しいステークホルダー要求、外部から観測可能な契約変更、または明示が必要な安全境界に該当する場合だけ恒久契約候補とする。
+既存要求を満たすバリエーション、エッジケース、不適合修正、内部再構成、文書訂正は、既存契約が要求を保持している限り REQ を拡張しない（REQ-001決定4の要約）。
 
-詳細な判定項目、優先順位、例外、工程別手順は各 command / workflow SPEC に配置する。適格性チェックポイントは QG-1〜QG-4（主ワークフロー品質ゲート）とは別体系とし、各補助パイプラインの HITL 確定点（REQ-003-003〜009）で実行する。
+詳細な判定項目、優先順位、例外、工程別手順は各 command / workflow SPEC に配置する。
+適格性チェックポイントは QG-1〜QG-4（主ワークフロー品質ゲート）とは別体系とし、各補助パイプラインの HITL 確定点（REQ-003-003〜009）で実行する。
 
 #### 既存成果物の6処置
 
-既存REQ、Decision、SPEC、guide、command、skill の記述を見直す際の処置は以下の6区分とする。各処置は相互排他的であり、1つの記述に対して1処置を適用する。
+既存REQ、Decision、SPEC、guide、command、skill の記述を見直す際の処置は以下の6区分とする。
+各処置は相互排他的であり、1つの記述に対して1処置を適用する。
 
 | 処置 | 意味 |
 |---|---|
@@ -174,17 +180,23 @@ intake、learning、inspect 由来の知見は、既存契約で未充足の新�
 
 INFERENCE は「明文化を残す KEEP」とも「別成果物に残す MOVE」とも異なる処置であり、個別事例ごとの適用規則が SPEC に記載されている場合に、個別規則を恒久契約から除去し上位の一般原則のみを維持して将来の個別適用を実行エージェントの意味判断へ委ねる。
 
-処置の判定根拠は非排他的な情報として記録する。観測事実、適用した既存規則、意味判断、ユーザー合意、機械検出結果等が併存し得る。判定根拠の伝播は REQ-001-033 が定義する分類根拠フィールドへ統合し、INFERENCE/MANUAL/RULE のような排他的 enum は導入しない。
+処置の判定根拠は非排他的な情報として記録する。
+観測事実、適用した既存規則、意味判断、ユーザー合意、機械検出結果等が併存し得る。
+判定根拠の伝播は REQ-001-033 が定義する分類根拠フィールドへ統合し、INFERENCE/MANUAL/RULE のような排他的 enum は導入しない。
 
-本節の6処置は昇格前の適格性判定に適用する。「6 処置モデル」節（「恒久基準と非規範情報の整理」配下）も同名の KEEP/MERGE/REFERENCE/MOVE/RETIRE/INFERENCE を定義するが、cleanup 実行モデルの処置であり、適用フェーズと参照する正規所有契約が異なる。両者は独立した正規所有契約であり、統合しない。
+本節の6処置は昇格前の適格性判定に適用する。
+「6 処置モデル」節（「恒久基準と非規範情報の整理」配下）も同名の KEEP/MERGE/REFERENCE/MOVE/RETIRE/INFERENCE を定義するが、cleanup 実行モデルの処置であり、適用フェーズと参照する正規所有契約が異なる。
+両者は独立した正規所有契約であり、統合しない。
 
 #### intake・learning 昇格分類との違い
 
-intake・learning パイプラインの対応要否分類（action-required / covered / duplicate / verification-only / deferred / rejected）と対応形態分類（local-fix / example-or-test / knowledge-only / permanent-contract-candidate）は、本節の6処置とは別の分類である。昇格分類は採用済み成果物をどう処理するかの前段階判定であり、既存成果物を実際に変更する段階で必要に応じて6処置を適用する。
+intake・learning パイプラインの対応要否分類（action-required / covered / duplicate / verification-only / deferred / rejected）と対応形態分類（local-fix / example-or-test / knowledge-only / permanent-contract-candidate）は、本節の6処置とは別の分類である。
+昇格分類は採用済み成果物をどう処理するかの前段階判定であり、既存成果物を実際に変更する段階で必要に応じて6処置を適用する。
 
 #### 診断観点と6処置の対応表
 
-inspect-docs の診断観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と既存成果物6処置（KEEP/MERGE/REFERENCE/MOVE/RETIRE/INFERENCE）は別軸である。診断観点は REQ/SPEC 体系の構造的問題を検出する軸であり、6処置は採用済み成果物へのアクションを表す軸である。
+inspect-docs の診断観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と既存成果物6処置（KEEP/MERGE/REFERENCE/MOVE/RETIRE/INFERENCE）は別軸である。
+診断観点は REQ/SPEC 体系の構造的問題を検出する軸であり、6処置は採用済み成果物へのアクションを表す軸である。
 
 | 診断観点 | 主に対応する処置 | 関係 |
 |---|---|---|
@@ -195,7 +207,8 @@ inspect-docs の診断観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と既�
 | RETIRE | RETIRE | 廃止 |
 | DRIFT | MOVE または RETIRE | 実態乖離の修正 |
 
-対応表は参照であり、診断観点と処置は1対1対応しない。各検出事項は個別に処置を判定する。
+対応表は参照であり、診断観点と処置は1対1対応しない。
+各検出事項は個別に処置を判定する。
 
 #### 工程別手順の配置先
 
@@ -220,7 +233,9 @@ Guides（案内）
 
 ### SPEC ライフサイクル（v2:ADR-0123）
 
-SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `draft`、`accepted`、`superseded` の3つである。frontmatter形式は`patterns.md`が所有する。
+SPECはfrontmatter `status`で成熟度と現行性を管理する。
+状態は `draft`、`accepted`、`superseded` の3つである。
+frontmatter形式は`patterns.md`が所有する。
 
 | status | 意味 | 通常内容検査 | 遷移契機 |
 |---|---|---|---|
@@ -234,7 +249,9 @@ SPECはfrontmatter `status`で成熟度と現行性を管理する。状態は `
 - `draft`から`accepted`への昇格はcase-close、後継移行時の`superseded`設定はspec-saveまたはcase-closeの確定処理が扱う。
 ### Decision ライフサイクル詳細
 
-Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理、健全性評価モデルの詳細は `decision-lifecycle.md` が正規所有する。本節は参照関係を示し、内容を複製しない。Decision は REQ と管理特性を分離し（AG-004）、固定件数ではなく意味的健全性で粒度を評価し（AG-006）、REQ 重複・分割モデルと分離された健全性評価を持つ（AG-017）。
+Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理、健全性評価モデルの詳細は `decision-lifecycle.md` が正規所有する。
+本節は参照関係を示し、内容を複製しない。
+Decision は REQ と管理特性を分離し（AG-004）、固定件数ではなく意味的健全性で粒度を評価し（AG-006）、REQ 重複・分割モデルと分離された健全性評価を持つ（AG-017）。
 
 ## 適用範囲宣言
 
@@ -251,7 +268,10 @@ Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理
 
 ### draft の位置づけ（REQ-008, DEC-003）
 
-`.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成する一時的な構造化ハンドオフ成果物である。consumer 境界は producer、direct consumer、orchestration pre-reader、invalid post-case reader の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）。4 集合の正規定義は `docs/specs/responsibilities/artifact-contracts.md`「req_draft consumer 4 集合」節を SSoT とし、本節は同じ 4 集合を抽出元として一致させる。永久文書（REQ/Decision/SPEC/guides）ではなく、以下の性質を持つ:
+`.agentdev/drafts/req-draft-*.md`（req_draft）は、req-define が生成する一時的な構造化ハンドオフ成果物である。
+consumer 境界は producer、direct consumer、orchestration pre-reader、invalid post-case reader の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）。
+4 集合の正規定義は `docs/specs/responsibilities/artifact-contracts.md`「req_draft consumer 4 集合」節を SSoT とし、本節は同じ 4 集合を抽出元として一致させる。
+永久文書（REQ/Decision/SPEC/guides）ではなく、以下の性質を持つ:
 
 - **consumer 4 集合**: req_draft の consumer 境界は次の 4 集合で確定する（REQ-008-008、REQ-008-036、REQ-006-083）
   - producer: `{req-define}` — req_draft を生成する唯一の command
@@ -331,7 +351,8 @@ accepted Decision は意味的に不変とする（REQ-001-056〜060）。
 
 ### 分類判断ツリーの配置
 
-新規文書作成時の分類判断フロー（分類判断ツリー）は執筆時配置判定に属するため、`../responsibilities/document-type-responsibilities.md`「新規文書作成時の分類判断ツリー」を参照。本 SPEC は文書種別の基準境界（責務マトリックス、各文書種別の記述対象）を正本として保持し、執筆時の判定手順は document-type-responsibilities.md 側に寄せている。
+新規文書作成時の分類判断フロー（分類判断ツリー）は執筆時配置判定に属するため、`../responsibilities/document-type-responsibilities.md`「新規文書作成時の分類判断ツリー」を参照。
+本 SPEC は文書種別の基準境界（責務マトリックス、各文書種別の記述対象）を正本として保持し、執筆時の判定手順は document-type-responsibilities.md 側に寄せている。
 
 ### 文書間投影規則 <!-- REQ-001 -->
 
@@ -459,11 +480,13 @@ SPEC の記述範囲を責務境界として定義する。
 
 ### 用語: 原本、配置先 <!-- REQ-001 -->
 
-原本 (source) と配置先 (projection) の用語定義、投影方向、編集原則は「文書間投影規則」セクションを正本とする。本セクションでは再掲しない（intra-file 重複解消）。
+原本 (source) と配置先 (projection) の用語定義、投影方向、編集原則は「文書間投影規則」セクションを正本とする。
+本セクションでは再掲しない（intra-file 重複解消）。
 
 ## SPEC 内部論理区分
 
-SPEC は文書種別として維持し、内部を以下の論理区分で整理する（v2:REQ-0155-001, v2:REQ-0155-009, REQ-001）。各区分の規範は各レポジトリの document-model.md が定義する。
+SPEC は文書種別として維持し、内部を以下の論理区分で整理する（v2:REQ-0155-001, v2:REQ-0155-009, REQ-001）。
+各区分の規範は各レポジトリの document-model.md が定義する。
 従来の3層ディレクトリ構造（commands/skills/workflows/直下）を維持しつつ、各 SPEC ファイルの内容がいずれの論理区分に属するかを明確にする。
 論理区分は5区分（挙動SPEC、カタログSPEC、横断契約SPEC、パラメータSPEC、実装詳細SPEC）とし、パラメータ責務を実装詳細から区別する（v2:REQ-0155-009）。
 
@@ -475,27 +498,36 @@ SPEC は文書種別として維持し、内部を以下の論理区分で整理
 | パラメータSPEC | retry 回数、timeout、閾値、重み、優先順位、上限、下限、fallback、許容範囲等のパラメータ責務 | 散在（各 SPEC 内のパラメータ節、専用パラメータ SPEC 等） |
 | 実装詳細SPEC | 内部アルゴリズム、実装詳細（パラメータ責務は除く） | req-health-metrics.md、quality-gates.md |
 
-パラメータ責務（retry 回数、timeout、閾値、重み、優先順位、上限、下限、fallback、許容範囲等）は実装詳細SPEC から区別し、パラメータSPEC として独立区分を与える。パラメータは単一の全体パラメータファイルへ集約せず、対象 command、skill、workflow、品質ルール、整合性ルール等の所有責務に基づいて配置先を決定する。
+パラメータ責務（retry 回数、timeout、閾値、重み、優先順位、上限、下限、fallback、許容範囲等）は実装詳細SPEC から区別し、パラメータSPEC として独立区分を与える。
+パラメータは単一の全体パラメータファイルへ集約せず、対象 command、skill、workflow、品質ルール、整合性ルール等の所有責務に基づいて配置先を決定する。
 
-1つの SPEC ファイルが複数の論理区分にまたがる場合、主たる区分（主論理区分）を frontmatter または冒頭宣言節で識別可能にする（REQ-001-013）。複数論理区分を含む SPEC は主論理区分と従属する区分を判別できる状態にする。論理区分は物理的なディレクトリ分離を意味せず、既存3層構造内での内容整理のための区分である。
+1つの SPEC ファイルが複数の論理区分にまたがる場合、主たる区分（主論理区分）を frontmatter または冒頭宣言節で識別可能にする（REQ-001-013）。
+複数論理区分を含む SPEC は主論理区分と従属する区分を判別できる状態にする。
+論理区分は物理的なディレクトリ分離を意味せず、既存3層構造内での内容整理のための区分である。
 従来の workflows/ 層が横断契約 SPEC に対応する。
 
-各 SPEC は frontmatter または冒頭宣言節で正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の所有責務、関心キー）を識別可能にする（REQ-001-013）。正規所有の単位は「安定した関心キー」であり、1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない（REQ-003-038）。主論理区分・正規所有対象の宣言形式（frontmatter フィールド名、冒頭宣言節フォーマット）は後述「SPEC 宣言形式」節で定義し、本ファイル（document-model.md）を正規所有者とする。フィールド名は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド（`spec_logical_division`、`canonical_owner`）と一致させ、工程間での突合を可能にする。
+各 SPEC は frontmatter または冒頭宣言節で正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の所有責務、関心キー）を識別可能にする（REQ-001-013）。
+正規所有の単位は「安定した関心キー」であり、1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない（REQ-003-038）。
+主論理区分・正規所有対象の宣言形式（frontmatter フィールド名、冒頭宣言節フォーマット）は後述「SPEC 宣言形式」節で定義し、本ファイル（document-model.md）を正規所有者とする。
+フィールド名は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド（`spec_logical_division`、`canonical_owner`）と一致させ、工程間での突合を可能にする。
 
 ### SPEC 宣言形式
 
-主論理区分・正規所有対象の宣言形式の正規所有者は本ファイルとする（REQ-001-013）。宣言形式は spec-save の配置一貫性検証（`../commands/spec-save.md`「配置一貫性検証」）および強制ゲート段階適用の前提となる。
+主論理区分・正規所有対象の宣言形式の正規所有者は本ファイルとする（REQ-001-013）。
+宣言形式は spec-save の配置一貫性検証（`../commands/spec-save.md`「配置一貫性検証」）および強制ゲート段階適用の前提となる。
 
 #### frontmatter 形式
 
-SPEC frontmatter に以下のフィールドを宣言する。フィールド名と enum 値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールドと同一とし、工程間で同じ名前を用いる（REQ-001-033）。
+SPEC frontmatter に以下のフィールドを宣言する。
+フィールド名と enum 値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールドと同一とし、工程間で同じ名前を用いる（REQ-001-033）。
 
 | フィールド | 型 | 内容 |
 |---|---|---|
 | `spec_logical_division` | enum | 主論理区分: `behavior`、`catalog`、`cross_cutting_contract`、`parameter`、`implementation_detail`、`unknown` のいずれか |
 | `canonical_owner` | string | 正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー） |
 
-両フィールドとも soft-contract（DEC-003）とし、欠落時は `unknown` で警告を出し処理を継続する（REQ-001-033）。欠落により既存 SPEC、req_draft、RU を拒否しない。
+両フィールドとも soft-contract（DEC-003）とし、欠落時は `unknown` で警告を出し処理を継続する（REQ-001-033）。
+欠落により既存 SPEC、req_draft、RU を拒否しない。
 
 #### 冒頭宣言節形式
 
@@ -508,9 +540,11 @@ canonical_owner: {正規所有対象の関心キー}
 -->
 ```
 
-frontmatter と冒頭宣言節の両方が存在する場合は frontmatter を優先する。spec-save の配置一貫性検証は frontmatter、冒頭宣言節のいずれかから宣言値を読み取る。
+frontmatter と冒頭宣言節の両方が存在する場合は frontmatter を優先する。
+spec-save の配置一貫性検証は frontmatter、冒頭宣言節のいずれかから宣言値を読み取る。
 
-索引文書（specs/README.md）は文書探索、参照経路の入口を担うが、SPEC 内部論理区分には含まれない。索引文書は既存文書種別（specs/README.md = SPEC マニフェスト）の役割表現であり、新文書種別ではない。
+索引文書（specs/README.md）は文書探索、参照経路の入口を担うが、SPEC 内部論理区分には含まれない。
+索引文書は既存文書種別（specs/README.md = SPEC マニフェスト）の役割表現であり、新文書種別ではない。
 
 ## 文書7分類モデル
 
@@ -603,7 +637,8 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 
 ### inventory item 識別子
 
-各 inventory item は次の3要素で識別する。重複 key を許可しない。
+各 inventory item は次の3要素で識別する。
+重複 key を許可しない。
 
 | 要素 | 内容 |
 |---|---|
@@ -613,7 +648,8 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 
 ### 6 処置モデル
 
-各 inventory item へ次のいずれか一つを割り当てる。同一 item へ複数処置を割り当てない。
+各 inventory item へ次のいずれか一つを割り当てる。
+同一 item へ複数処置を割り当てない。
 
 | 処置 | 内容 | 必須記録事項 |
 |---|---|---|
@@ -627,7 +663,9 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスを�
 - MOVE または REFERENCE には解決可能な移動先または参照先が存在すること
 - RETIRE または INFERENCE には理由と履歴保持先が記録されること
 
-本節の6処置は cleanup 実行モデルに適用する。「既存成果物の6処置」節（「恒久契約適格性と既存成果物処置分類」配下）も同名の KEEP/MERGE/REFERENCE/MOVE/RETIRE/INFERENCE を定義するが、昇格前の適格性判定に適用する。両者は独立した正規所有契約であり、統合しない。
+本節の6処置は cleanup 実行モデルに適用する。
+「既存成果物の6処置」節（「恒久契約適格性と既存成果物処置分類」配下）も同名の KEEP/MERGE/REFERENCE/MOVE/RETIRE/INFERENCE を定義するが、昇格前の適格性判定に適用する。
+両者は独立した正規所有契約であり、統合しない。
 
 ### 処置後の記録と再検証
 

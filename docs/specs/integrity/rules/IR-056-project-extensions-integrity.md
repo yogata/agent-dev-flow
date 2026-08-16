@@ -6,7 +6,8 @@ canonical_owner: IR-056
 
 # IR-056: project-extensions-integrity
 
-Project Extensionsのschema、配置、ID、参照path、委譲先skill、上書き意図、旧機構残存を検査する。本IR文書を検知詳細、exemption、severity、false-positive条件の正本とする。
+Project Extensionsのschema、配置、ID、参照path、委譲先skill、上書き意図、旧機構残存を検査する。
+本IR文書を検知詳細、exemption、severity、false-positive条件の正本とする。
 
 | Field | Value |
 |---|---|
@@ -44,7 +45,8 @@ Project Extensionsのschema、配置、ID、参照path、委譲先skill、上書
 
 ## IR-059との関係
 
-IR-056はProject Extensions構造を検査し、IR-059は配布物本文の具体参照を検査する。両者は独立した検出対象である。
+IR-056はProject Extensions構造を検査し、IR-059は配布物本文の具体参照を検査する。
+両者は独立した検出対象である。
 
 ## IR-056 起動契約（self-hosting と consumer）
 

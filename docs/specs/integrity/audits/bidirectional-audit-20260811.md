@@ -46,7 +46,8 @@ baseline_head: 4e6937c73dfbe5a47d6fc04f9245103ac312dd15
 | DELETE | 1 | IR-011 |
 | **合計** | **59** | - |
 
-> **注記**: `*` 付きは「候補」であり、Phase 2 (OU-003) で確定判定を行う。REQ-028-013 により IR 件数削減数を成功指標としない。
+> **注記**: `*` 付きは「候補」であり、Phase 2 (OU-003) で確定判定を行う。
+> REQ-028-013 により IR 件数削減数を成功指標としない。
 
 ### 2.2 detector 実装状況（IR→実装方向、項目3）
 
@@ -366,7 +367,9 @@ baseline_head: 4e6937c73dfbe5a47d6fc04f9245103ac312dd15
 | 11 | 現行 artifact 依存 | mapping-table.md（廃止済み、ファイル不存在） | IR-011 affected_artifacts |
 
 **判定候補**: DELETE
-**判定根拠**: DEC-013 AG-008 で file-backed tombstone は物理削除可能。Phase 2 (OU-003) で物理削除を確定。交叉参照 (v2:REQ-0108-083〜088) は req-impact-map.md/retired/ 配下へ再配置（REQ-028-008）
+**判定根拠**: DEC-013 AG-008 で file-backed tombstone は物理削除可能。
+Phase 2 (OU-003) で物理削除を確定。
+交叉参照 (v2:REQ-0108-083〜088) は req-impact-map.md/retired/ 配下へ再配置（REQ-028-008）
 
 ### IR-012: Template 必須セクション
 
@@ -613,7 +616,9 @@ baseline_head: 4e6937c73dfbe5a47d6fc04f9245103ac312dd15
 | 11 | 現行 artifact 依存 | Decision/ADR ファイル群 | IR-025 affected_artifacts |
 
 **判定候補**: IMPLEMENT*
-**判定根拠**: detector 未実装、test 未実装。REQ-028-002（非実効 IR 許容禁止）に基づき IMPLEMENT または MERGE を Phase 2 で判定。IR-026/027/036/037/038 と退休止 ADR 関連で統合可能性あり
+**判定根拠**: detector 未実装、test 未実装。
+REQ-028-002（非実効 IR 許容禁止）に基づき IMPLEMENT または MERGE を Phase 2 で判定。
+IR-026/027/036/037/038 と退休止 ADR 関連で統合可能性あり
 
 ### IR-026: ADR 誤分類兆候検出
 
@@ -1069,7 +1074,9 @@ baseline_head: 4e6937c73dfbe5a47d6fc04f9245103ac312dd15
 | 11 | 現行 artifact 依存 | command 定義ファイル群 | IR-050 affected_artifacts |
 
 **判定候補**: IMPLEMENT
-**判定根拠**: detector 未実装。Phase 2 で detector 実装を確定。IR-051 と MERGE 可能性
+**判定根拠**: detector 未実装。
+Phase 2 で detector 実装を確定。
+IR-051 と MERGE 可能性
 
 ### IR-051: 実行主体の skill 表記誤認検出
 
@@ -1202,7 +1209,9 @@ baseline_head: 4e6937c73dfbe5a47d6fc04f9245103ac312dd15
 | 11 | 現行 artifact 依存 | docs/specs/ 参照、obsolete-path-map.yaml | IR-057 affected_artifacts |
 
 **判定候補**: IMPLEMENT*
-**判定根拠**: detector 実装済み（リテラル参照あり）、route 確立。regression test 未実装。REQ-028-006（一時移行検査は恒久 IR とせず別種検査）により Phase 2 で恒久 IR か別種検査（期限/終了条件付き）か判定
+**判定根拠**: detector 実装済み（リテラル参照あり）、route 確立。
+regression test 未実装。
+REQ-028-006（一時移行検査は恒久 IR とせず別種検査）により Phase 2 で恒久 IR か別種検査（期限/終了条件付き）か判定
 
 ### IR-058: distribution-untracked-skill-reference
 
@@ -1259,7 +1268,9 @@ baseline_head: 4e6937c73dfbe5a47d6fc04f9245103ac312dd15
 | 11 | 現行 artifact 依存 | agentdev-doc-writing/references/japanese-replacement-dictionary.md | IR-060 affected_artifacts |
 
 **判定候補**: IMPLEMENT*
-**判定根拠**: detector 未実装。Phase 2 で detector 実装を確定。文意判断は IR-045 同様 agentdev-doc-writing へ移譲済み
+**判定根拠**: detector 未実装。
+Phase 2 で detector 実装を確定。
+文意判断は IR-045 同様 agentdev-doc-writing へ移譲済み
 
 ### IR-061: 索引類自動生成整合性
 
@@ -1284,7 +1295,8 @@ baseline_head: 4e6937c73dfbe5a47d6fc04f9245103ac312dd15
 
 ### 5.1 checker/detector/test/baseline/catalog/ownership/impact-map/index から IR への逆引き（項目12）
 
-各 checker 関数がどの IR に対応するかの逆引き表。リテラル参照（IR-NNN ID 直接参照）があるものは確定対応、意味ベース（関数名・コメントから推定）は Phase 2 で完全化推奨。
+各 checker 関数がどの IR に対応するかの逆引き表。
+リテラル参照（IR-NNN ID 直接参照）があるものは確定対応、意味ベース（関数名・コメントから推定）は Phase 2 で完全化推奨。
 
 | checker 関数 / ファイル | 対応 IR | リテラル参照 | 備考 |
 |---|---|---|---|
@@ -1364,13 +1376,19 @@ checker 関数のうち、対応する IR が不明（または明示的でな�
 | checkSkillCategoryGap (check_integrity.ts) | skill category gap に関する検査。対応 IR 明示的でない | Phase 2 で対応 IR の特定を判定 |
 | checkVocabularyRegistrySync (check_integrity.ts) | vocabulary registry 同期に関する検査。対応 IR 明示的でない | Phase 2 で対応 IR の特定を判定 |
 
-**TS-008 結果**: 所有 IR が明示的でない check 関数約20件を上表に列挙。Phase 1 時点では「不明」として記録し、Phase 2 (OU-003) または Phase 3 (OU-004) で各 check 関数の IR への紐付け（または独立 IR 化、または REQ-XXX gate としての存続）を確定する。本状態は Phase 1 完了条件「所有 IR 不明検査が残存しない」に対し、**Phase 2 への委譲事項**として記録する。
+**TS-008 結果**: 所有 IR が明示的でない check 関数約20件を上表に列挙。
+Phase 1 時点では「不明」として記録し、Phase 2 (OU-003) または Phase 3 (OU-004) で各 check 関数の IR への紐付け（または独立 IR 化、または REQ-XXX gate としての存続）を確定する。
+本状態は Phase 1 完了条件「所有 IR 不明検査が残存しない」に対し、**Phase 2 への委譲事項**として記録する。
 
-> **注記**: TS-008 の pass_criteria「所有 IR 不明の検査が残存しない」は Phase 1 の完全達成には追加作業が必要。本監査では検出と列挙を完了し、Phase 2 への移行を明示する。この残存は Phase 2 (OU-003) または Phase 3 (OU-004) で解消される。case-run 完了後、Phase 1 の範囲達成として PR を作成し、TS-008 の完全達成は後続 OU で処理する（Findings セクション参照）。
+> **注記**: TS-008 の pass_criteria「所有 IR 不明の検査が残存しない」は Phase 1 の完全達成には追加作業が必要。
+> 本監査では検出と列挙を完了し、Phase 2 への移行を明示する。
+> この残存は Phase 2 (OU-003) または Phase 3 (OU-004) で解消される。
+> case-run 完了後、Phase 1 の範囲達成として PR を作成し、TS-008 の完全達成は後続 OU で処理する（Findings セクション参照）。
 
 ### 5.3 KEEP/MERGE/IMPLEMENT/DELETE 判定候補と判定根拠（項目14）
 
-各 IR の判定候補は §4 の各 IR 詳細セクションに記録済み。本節では判定候補の分布と主要パターンを集計する。
+各 IR の判定候補は §4 の各 IR 詳細セクションに記録済み。
+本節では判定候補の分布と主要パターンを集計する。
 
 | 判定パターン | 対象 IR | 判定根拠の要点 |
 |---|---|---|
@@ -1391,15 +1409,19 @@ checker 関数のうち、対応する IR が不明（または明示的でな�
 | INFO（baseline-known + observation） | 402 | 403 | +1 |
 | exit code | 1 | 1 | - |
 
-**差分の解釈**: baseline (Phase 0) → 現行間の追加変更（OU-001 case-close 後の capture、REQ-028/DEC-013 追加等）に伴うドリフト。coverage 低下ではなく、範囲拡大に伴う検出件数増加。意図的削除に由来する coverage 低下は検出されなかった（TS-021 pass）。
+**差分の解釈**: baseline (Phase 0) → 現行間の追加変更（OU-001 case-close 後の capture、REQ-028/DEC-013 追加等）に伴うドリフト。
+coverage 低下ではなく、範囲拡大に伴う検出件数増加。
+意図的削除に由来する coverage 低下は検出されなかった（TS-021 pass）。
 
 ### 6.2 IR 属性の変化
 
-Phase 0 baseline 作成後、IR ファイル自体への変更はなし（REQ-028 Phase 0 は現状記録のみを責務）。本監査の IR 属性データは baseline §2 と同一。
+Phase 0 baseline 作成後、IR ファイル自体への変更はなし（REQ-028 Phase 0 は現状記録のみを責務）。
+本監査の IR 属性データは baseline §2 と同一。
 
 ### 6.3 detector 実装状況の変化
 
-Phase 0 → Phase 1 間で checker ファイルへの変更はなし。baseline §3 の detector 実装状況データを再確認し、explore agent によるリテラル参照抽出結果を統合した。
+Phase 0 → Phase 1 間で checker ファイルへの変更はなし。
+baseline §3 の detector 実装状況データを再確認し、explore agent によるリテラル参照抽出結果を統合した。
 
 ## 7. catalog/index/ownership/generated metrics の現行 IR 集合との整合性（TS-018）
 
@@ -1411,7 +1433,9 @@ Phase 0 → Phase 1 間で checker ファイルへの変更はなし。baseline 
 | generated metrics（docs/README.md REQ 数等） | REQ 28件、Decision 13件 | docs/README.md AUTOGEN:BEGIN id=readme-req-summary-count |
 | IR ファイル実体 | 59 件 | docs/specs/integrity/rules/IR-*.md |
 
-**TS-018 結果**: catalog/index/ownership/generated metrics は現行 IR 集合（59件）と一致。ただし baseline §5.3 の AUTOGEN ブロック不整合 4件（IR-061 違反）が残存。これらは generate_indexes.ts 再実行で解消見込み（Phase 2 以降または別途対応）。
+**TS-018 結果**: catalog/index/ownership/generated metrics は現行 IR 集合（59件）と一致。
+ただし baseline §5.3 の AUTOGEN ブロック不整合 4件（IR-061 違反）が残存。
+これらは generate_indexes.ts 再実行で解消見込み（Phase 2 以降または別途対応）。
 
 ### 7.1 AUTOGEN ブロック不整合 4件の詳細（IR-061 違反、baseline §5.3 と整合）
 
@@ -1420,7 +1444,8 @@ Phase 0 → Phase 1 間で checker ファイルへの変更はなし。baseline 
 3. `docs/specs/quality/req-health-metrics.md` の `req-metrics-measurement-example` ブロック: REQ-006 の要件項目数 109 → 112 への更新未反映
 4. `docs/specs/quality/spec-health-metrics.md` の `spec-metrics-measurement-example` ブロック: SPEC 行数・件数の更新未反映
 
-> **注記**: これらの AUTOGEN 不整合は Phase 1 監査の対象外（IR 実体や checker の変更は OU-005/006 責務）。Phase 6 (OU-007) の全体検証で generate_indexes.ts 再実行による解消を推奨。
+> **注記**: これらの AUTOGEN 不整合は Phase 1 監査の対象外（IR 実体や checker の変更は OU-005/006 責務）。
+> Phase 6 (OU-007) の全体検証で generate_indexes.ts 再実行による解消を推奨。
 
 ## 8. Findings / Capture候補
 
@@ -1440,7 +1465,10 @@ targeted docs guard（`check_changed_docs.ts --workflow case-run --base-ref orig
 - `full_docs_check_recommended`: false
 - `extensions_check_required`: false
 
-**解釈**: 今回の変更は新規ファイル 1件（`docs/specs/integrity/audits/bidirectional-audit-20260811.md`）のみ。commit 前のステージ段階では `git diff origin/main...HEAD` 対象に含まれず、`files_checked` が空となった。新規ファイル内の相対リンク（`../baselines/pre-audit-baseline-20260811.md`、`../../requirements/REQ-028.md`、`../../decisions/DEC-013.md`、`../integrity-contracts.md`、`../integrity-rule-catalog.md`、`../rule-ownership.md`、`../../responsibilities/req-impact-map.md`）は全て実在することを手動検証済み。本 Phase 1 の targeted docs guard は実質 skip 相当（検出対象なし、failure なし）。
+**解釈**: 今回の変更は新規ファイル 1件（`docs/specs/integrity/audits/bidirectional-audit-20260811.md`）のみ。
+commit 前のステージ段階では `git diff origin/main...HEAD` 対象に含まれず、`files_checked` が空となった。
+新規ファイル内の相対リンク（`../baselines/pre-audit-baseline-20260811.md`、`../../requirements/REQ-028.md`、`../../decisions/DEC-013.md`、`../integrity-contracts.md`、`../integrity-rule-catalog.md`、`../rule-ownership.md`、`../../responsibilities/req-impact-map.md`）は全て実在することを手動検証済み。
+本 Phase 1 の targeted docs guard は実質 skip 相当（検出対象なし、failure なし）。
 
 ### 8.2 stale-reference（QG-3 前置 staleness check 結果）
 
@@ -1467,11 +1495,14 @@ QG-3 前置 staleness check（Step 5-3）の結果:
 
 ## 9. SPEC確定候補
 
-Phase 1 監査過程で発見された SPEC レベルの詳細（schema、enum、判定表、内部アルゴリズム等）。case-close Step 3 で SPEC 確定チェックの入力となる。
+Phase 1 監査過程で発見された SPEC レベルの詳細（schema、enum、判定表、内部アルゴリズム等）。
+case-close Step 3 で SPEC 確定チェックの入力となる。
 
 ### 9.1 REQ-028-001 存在条件8項目と IR 属性の対応
 
-REQ-028-001 が定義する8項目存在条件は、現行 IR 属性（baseline_status, lifecycle_state, enforcement_mode, regression_test 等）と完全には一致しない。Phase 4 (OU-005) で属性削除後に本8項目が新たな存在条件となる。対応関係:
+REQ-028-001 が定義する8項目存在条件は、現行 IR 属性（baseline_status, lifecycle_state, enforcement_mode, regression_test 等）と完全には一致しない。
+Phase 4 (OU-005) で属性削除後に本8項目が新たな存在条件となる。
+対応関係:
 
 | 存在条件8項目 (REQ-028-001) | 現行 IR 属性からの導出 |
 |---|---|
@@ -1486,11 +1517,15 @@ REQ-028-001 が定義する8項目存在条件は、現行 IR 属性（baseline_
 
 ### 9.2 Phase 1 判定候補分布（Phase 2 入力データ）
 
-判定候補分布（§2.1）は Phase 2 (OU-003) の KEEP/MERGE/IMPLEMENT/DELETE 確定判定の入力データとして確定値。Phase 2 で各 IR を確定判定した結果は別途記録される。
+判定候補分布（§2.1）は Phase 2 (OU-003) の KEEP/MERGE/IMPLEMENT/DELETE 確定判定の入力データとして確定値。
+Phase 2 で各 IR を確定判定した結果は別途記録される。
 
 ### 9.3 IR-045 catalog-only tombstone の扱い
 
-IR-045 は catalog-only tombstone（ファイル不存在、catalog 上のみ存在）。generate_indexes.ts が IR-045 を挟む2ブロック構成（pre-045 / post-045）を生成する。DEC-013 AG-008 では file-backed tombstone（IR-011型）を物理削除可能とするが、catalog-only tombstone（IR-045型）の物理削除可否は明示的でない。Phase 2 または Phase 4 (OU-005) で扱いを確定推奨。
+IR-045 は catalog-only tombstone（ファイル不存在、catalog 上のみ存在）。
+generate_indexes.ts が IR-045 を挟む2ブロック構成（pre-045 / post-045）を生成する。
+DEC-013 AG-008 では file-backed tombstone（IR-011型）を物理削除可能とするが、catalog-only tombstone（IR-045型）の物理削除可否は明示的でない。
+Phase 2 または Phase 4 (OU-005) で扱いを確定推奨。
 
 ## 10. Phase 1 完了条件の達成状況
 
@@ -1503,7 +1538,9 @@ IR-045 は catalog-only tombstone（ファイル不存在、catalog 上のみ存
 | 各 IR の判定に具体的な証拠が記録されている（TS-002） | 達成 | §4 の各 IR 詳細「判定根拠」、各項目「証拠」列 |
 | catalog/index/ownership/generated metrics が現行 IR 集合と一致する（TS-018） | 達成（AUTOGEN 不整合 4件は別課題） | §7 の整合性確認結果 |
 
-> **TS-008 に関する注記**: Phase 1 の責務は「所有 IR 不明検査の検出と列挙」までと解釈する。完全解消（各 check 関数の IR 紐付け確定）は Phase 2 (OU-003) または Phase 3 (OU-004) の横断的再評価で実施する。本 Phase 1 は「残存する所有者不明検査」を全件列挙し、Phase 2 への移行を明示した。
+> **TS-008 に関する注記**: Phase 1 の責務は「所有 IR 不明検査の検出と列挙」までと解釈する。
+> 完全解消（各 check 関数の IR 紐付け確定）は Phase 2 (OU-003) または Phase 3 (OU-004) の横断的再評価で実施する。
+> 本 Phase 1 は「残存する所有者不明検査」を全件列挙し、Phase 2 への移行を明示した。
 
 ## 関連情報
 

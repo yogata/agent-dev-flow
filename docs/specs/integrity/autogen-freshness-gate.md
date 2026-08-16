@@ -7,7 +7,9 @@ updated: "2026-08-15"
 
 # AUTOGEN ブロック鮮度検出 gate
 
-`/repo/docs-check` は repo-local コマンドであり配布対象外 SPEC を持たないため、AUTOGEN ブロック鮮度検出 gate を本新規 SPEC として配置する。AUTOGEN ブロックを含む索引ファイル（spec-health-metrics.md 等）の陳腐化を検出し、再生成を促す契約を定義する。本 SPEC は gate の契約を定義し、検出ロジックの実装詳細はスクリプト側が担う（機械化境界、charter 原則）。
+`/repo/docs-check` は repo-local コマンドであり配布対象外 SPEC を持たないため、AUTOGEN ブロック鮮度検出 gate を本新規 SPEC として配置する。
+AUTOGEN ブロックを含む索引ファイル（spec-health-metrics.md 等）の陳腐化を検出し、再生成を促す契約を定義する。
+本 SPEC は gate の契約を定義し、検出ロジックの実装詳細はスクリプト側が担う（機械化境界、charter 原則）。
 
 ## 検出対象
 
@@ -27,7 +29,8 @@ updated: "2026-08-15"
 - 対象ファイルのソース status 変更（draft → accepted 等）時に AUTOGEN ブロックの再生成必要性を判定する
 - SC-002（定期再生成）と整合する運用を維持する
 
-鮮度種別は検出結果に応じて次の3種に分類する。分類は「鮮度違反の優先的付与」であり絶対的分類ではない（例: rename と status 変更が同時に起きた場合、行数増減を伴えば rename、同行値変化のみなら status_change と分類）。
+鮮度種別は検出結果に応じて次の3種に分類する。
+分類は「鮮度違反の優先的付与」であり絶対的分類ではない（例: rename と status 変更が同時に起きた場合、行数増減を伴えば rename、同行値変化のみなら status_change と分類）。
 
 | 種別 | 判定規則 |
 |------|----------|

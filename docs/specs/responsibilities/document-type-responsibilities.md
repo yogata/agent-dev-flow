@@ -13,11 +13,13 @@ updated: 2026-08-10
 > 文書種別の基準境界（REQ/Decision/SPEC/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向、SPEC内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の正本を参照する。
 > 本 SPEC は文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策を扱う。
 > 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）は `../foundations/patterns.md` を参照する。
-> 新規ファイル分割は行わず、既存2ファイル（本 SPEC と document-model.md）間の重複削除で運用する。両 SPEC の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
+> 新規ファイル分割は行わず、既存2ファイル（本 SPEC と document-model.md）間の重複削除で運用する。
+> 両 SPEC の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
 
 docs/ 配下の文書（REQ/Decision/SPEC/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
 v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）であり、`agentdev-doc-writing` スキルの参照先である。
-配布 command/skill 本文のプロジェクト固有 Decision、REQ、SPEC 具体 ID、具体パス、固定 URL への非依存は REQ-029-003、REQ-029-004 が正規所有し、traceability 補完は extension 機構（`../foundations/project-extensions.md`）と協調する。意味境界の検出契約は `../integrity/distribution-boundary.md` を参照する。
+配布 command/skill 本文のプロジェクト固有 Decision、REQ、SPEC 具体 ID、具体パス、固定 URL への非依存は REQ-029-003、REQ-029-004 が正規所有し、traceability 補完は extension 機構（`../foundations/project-extensions.md`）と協調する。
+意味境界の検出契約は `../integrity/distribution-boundary.md` を参照する。
 
 > **執筆規範の SSoT は japanese-tech-writing スキル**: 基本原則、術語の平易化、文体基準、不自然な日本語の典型は AGENTS.md 経由で japanese-tech-writing スキルを参照する。
 > 本 SPEC は文書種別の配置基準とリポジトリ固有の用語政策に特化し、japanese-tech-writing の内容を複製しない。
@@ -27,13 +29,15 @@ v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用
 
 ## 文書種別の基準境界（参照）
 
-REQ/Decision/SPEC/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。本 SPEC は基準境界を再定義せず、執筆時の配置判定のみを扱う。
+REQ/Decision/SPEC/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。
+本 SPEC は基準境界を再定義せず、執筆時の配置判定のみを扱う。
 
 README は agent-dev-flow リポジトリの構成要素（identity、入口表、参照先リンク、最小限のクイックスタート）であり、REQ/Decision/SPEC/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
 
 ### 新規文書作成時の分類判断ツリー <!-- REQ-001 -->
 
-新規文書を作成する際の分類判断フロー。文書種別の基準境界（`../foundations/document-model.md`「責務マトリックス」）に基づき、執筆時にどの文書種別へ配置するかを判定する。
+新規文書を作成する際の分類判断フロー。
+文書種別の基準境界（`../foundations/document-model.md`「責務マトリックス」）に基づき、執筆時にどの文書種別へ配置するかを判定する。
 
 | 判断質問 | 結果 | 文書種別 |
 |---|---|---|
@@ -45,11 +49,13 @@ README は agent-dev-flow リポジトリの構成要素（identity、入口表�
 | 人間向けのナビゲーション、案内か? | YES → | **Guide** |
 | 上記のいずれにも該当しない → | 既存文書の APPEND/UPDATE で対応できないか確認。新規文書が必要な場合は REQ として要件化 |
 
-判断の結果が複数の文書種別にまたがる場合、それぞれの責務に応じて分割する。単一文書に複数種別の内容を混在させない。
+判断の結果が複数の文書種別にまたがる場合、それぞれの責務に応じて分割する。
+単一文書に複数種別の内容を混在させない。
 
 ### REQ と SPEC の配置境界（執筆時判断）
 
-REQ 要件行が SPEC 相当内容（スキーマフィールド、enum 値一覧、判定表、ファイルパターン、テンプレート種別、レポート形式、テストデータ詳細、個別 checker ルール、retry 回数、token 目安、行数上限、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）のみを主たる文意とする場合、当該内容は SPEC 等へ配置する。移管候補一覧と安定契約の完全な定義は `../foundations/document-model.md`「SPEC 分離基準」「安定契約の例外」を参照。
+REQ 要件行が SPEC 相当内容（スキーマフィールド、enum 値一覧、判定表、ファイルパターン、テンプレート種別、レポート形式、テストデータ詳細、個別 checker ルール、retry 回数、token 目安、行数上限、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）のみを主たる文意とする場合、当該内容は SPEC 等へ配置する。
+移管候補一覧と安定契約の完全な定義は `../foundations/document-model.md`「SPEC 分離基準」「安定契約の例外」を参照。
 
 ただし公開 command 名、公開入口、ドメイン状態の位置づけ、他 command との接続契約、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約に該当する場合は、REQ に要約として記述できる（安定契約例外、REQ-001-069）。
 
@@ -68,7 +74,8 @@ REQ 記述はステークホルダー視点に従うこと（REQ-001-079）。RE
 | 内部実装非依存 | 成果物内部を知らなくても達成を観測できること |
 | 要求文存立 | 内部構成を変更しても要求文が成立すること |
 
-安定契約例外（REQ-001-069）に該当する要件行候補は、上記4妥当性基準を満たさなくても REQ に要約として記述できる。詳細は `../foundations/document-model.md`「安定契約の例外」を参照。
+安定契約例外（REQ-001-069）に該当する要件行候補は、上記4妥当性基準を満たさなくても REQ に要約として記述できる。
+詳細は `../foundations/document-model.md`「安定契約の例外」を参照。
 
 ### learning/intake 由来変更の変更種別分類
 
@@ -85,7 +92,8 @@ learning/intake 成果物から後続工程（RU、req-define、spec-save）へ�
 | 内部再構成 | 外部挙動を変えない内部再構成 | ×（SPEC 再構成） |
 | 文書訂正 | 文書記述の訂正 | ×（文書修正） |
 
-REQ 拡張を候補とするのは「新しい利用者要求」または「外部契約変更」に該当する場合のみとする。それ以外は既存 REQ が要求を既に保持している限り REQ を拡張しない。
+REQ 拡張を候補とするのは「新しい利用者要求」または「外部契約変更」に該当する場合のみとする。
+それ以外は既存 REQ が要求を既に保持している限り REQ を拡張しない。
 
 ### 分類根拠の引き継ぎ要件
 
@@ -102,7 +110,8 @@ learning/intake 成果物から後続工程（RU、req-define、spec-save）へ�
 | 追記先を選択した理由 | 当該追記先を選んだ根拠 |
 | 根拠となる観測事実 | 変更が必要となった観測事実（CI 失敗、誤検出、エッジケース発見等） |
 
-分類根拠は soft-contract（DEC-003）として追加情報扱いとし、欠落時は unknown 既定値で警告する後方互換運用をとる。具体的なフィールド名、enum 表現、シリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」で定義する。
+分類根拠は soft-contract（DEC-003）として追加情報扱いとし、欠落時は unknown 既定値で警告する後方互換運用をとる。
+具体的なフィールド名、enum 表現、シリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」で定義する。
 
 ## 実行主体分類の査読基準
 
@@ -191,7 +200,8 @@ SKILL.md の節構成は以下の役割分担に従う。
 **禁止パターン**: 概要節に機能節と同じ内容の詳細説明を含め、機能節で再説明する重複構造。
 SKILL.md 査読時（`agentdev-doc-writing`）に概要節と機能節の重複を検出し、概要節を簡潔な導入へ縮退するよう指示する。
 
-**適用対象**: `src/opencode/skills/agentdev-*/SKILL.md`（配布 agentdev-* skill 全件）。件数は固定値を埋め込まず、実ディレクトリ構成により動的に追従する（旧「全27ファイル」等の固定件数は構成変更時に陳腐化するため廃止）。
+**適用対象**: `src/opencode/skills/agentdev-*/SKILL.md`（配布 agentdev-* skill 全件）。
+件数は固定値を埋め込まず、実ディレクトリ構成により動的に追従する（旧「全27ファイル」等の固定件数は構成変更時に陳腐化するため廃止）。
 
 ### SKILL.md 原本節フォーマット（REFERENCE関係）
 
@@ -208,13 +218,16 @@ SKILL.mdはSPEC内容を再記述せず、実行時に必要な入口、トリ�
 - **実行入口**: 標準SKILL.md
 - **プロジェクト固有補完**: extension
 
-同じ内容をSPEC、SKILL.md、extensionへ重複記載しない。SKILL.mdはSPECを参照し、extensionは標準SKILL.mdの固定知識外にあるプロジェクト固有情報だけを提供する。
+同じ内容をSPEC、SKILL.md、extensionへ重複記載しない。
+SKILL.mdはSPECを参照し、extensionは標準SKILL.mdの固定知識外にあるプロジェクト固有情報だけを提供する。
 
 ## SKILL.md概要節と機能節の役割分担
 
-SKILL.mdの概要節は入口として役割と利用条件を簡潔に示し、機能節は具体的な対象、対象外、判断基準、参照先を追加する。概要節と機能節の重複は`agentdev-doc-writing`の恒常的な査読対象とする。
+SKILL.mdの概要節は入口として役割と利用条件を簡潔に示し、機能節は具体的な対象、対象外、判断基準、参照先を追加する。
+概要節と機能節の重複は`agentdev-doc-writing`の恒常的な査読対象とする。
 
-査読対象の分類は重複度合いと文書影響度に基づく。固定件数、実施順序、段階的スケジュール、個別ファイル一覧は本SPECに保持しない（固定件数埋め込みを全件禁止）。
+査読対象の分類は重複度合いと文書影響度に基づく。
+固定件数、実施順序、段階的スケジュール、個別ファイル一覧は本SPECに保持しない（固定件数埋め込みを全件禁止）。
 
 ## 用語政策
 
@@ -304,7 +317,8 @@ LLM 表現（接続の型、空虚な動詞、空虚な形容、ラベル前置�
 
 ### 不自然表現検出分類（v2:REQ-0140-033）
 
-`agentdev-doc-writing` は文書品質ゲートの查読観点として、現行自然言語文書および直近1週間以内に作成・更新された GitHub Issue 本文における不自然な日本語表現を検出する。検出分類（P0〜P4）と代表例を以下に示す。
+`agentdev-doc-writing` は文書品質ゲートの查読観点として、現行自然言語文書および直近1週間以内に作成・更新された GitHub Issue 本文における不自然な日本語表現を検出する。
+検出分類（P0〜P4）と代表例を以下に示す。
 
 | 分類 | 内容 | 例 |
 |---|---|---|
@@ -314,7 +328,8 @@ LLM 表現（接続の型、空虚な動詞、空虚な形容、ラベル前置�
 | P3 | 識別子ではない英語の文章混在 | `authoritative source`, `living pool`, `return` |
 | P4 | 表記揺れ、用語統一 | `正規の情報源`, `正の情報源`, `権威ある情報源` |
 
-修正方式（A: 安全な横断置換、B: 文脈別置換、C: 文全体の再記述、D: 原文復元）の対応表と禁語・許容の機械判定は、`agentdev-doc-writing` スキル参照資料（[japanese-replacement-dictionary.md](../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md)）で管理する。本節は検出分類の原本として機能し、各語の割当ては参照資料へ委任する。
+修正方式（A: 安全な横断置換、B: 文脈別置換、C: 文全体の再記述、D: 原文復元）の対応表と禁語・許容の機械判定は、`agentdev-doc-writing` スキル参照資料（[japanese-replacement-dictionary.md](../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md)）で管理する。
+本節は検出分類の原本として機能し、各語の割当ては参照資料へ委任する。
 
 ## 文書種別ごとの japanese-tech-writing 適用サブセット
 

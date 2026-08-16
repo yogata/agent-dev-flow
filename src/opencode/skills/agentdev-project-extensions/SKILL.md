@@ -75,7 +75,7 @@ extension 読込時の状態分類と本スキル（runtime resolver）の動作
 | YAML 構文エラー / 必須 field 欠落 / kind 判定以前の破損 | エラー表示 + 当該 extension 無視 + 標準動作継続 | fail-open |
 | 旧 kind（`command-extension` / `skill-extension`） | migration-required + stop | silent ignore しない |
 | 構文上有効だが `kind` が公式3値以外（未知 kind） | schema violation + stop | fail-open しない |
-| 有効な新 kind | 通常処理 | — |
+| 有効な新 kind | 通常処理 | - |
 
 extension missing と legacy extension exists は別状態であり、前者は標準動作継続、後者は migration-required として停止する。旧 kind / 未知 kind について silent ignore する実装を採らない。
 

@@ -68,9 +68,12 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 
 ## Artifact Graph 利用
 
-inspect-docs は Artifact Graph を構造診断候補の探索に利用する。候補には unresolved reference, superseded artifact への現行参照, dangling relation, provenance 欠落, orphan candidate, 不自然な relation path, structural duplicate candidate を含む。
+inspect-docs は Artifact Graph を構造診断候補の探索に利用する。
+候補には unresolved reference, superseded artifact への現行参照, dangling relation, provenance 欠落, orphan candidate, 不自然な relation path, structural duplicate candidate を含む。
 
-Graph は候補提供者であり、決定的検査（参照実在, 委譲先 skill 実在, YAML 構文, 必須 field）は ADR-006 が定める通り docs-check, IR-056 が所有する。inspect-docs は REQ-010-018〜023 が定める意味診断を担当し、Graph 構造候補を未検証 evidence として意味診断の入力に利用する。構造診断と意味診断を区別し、SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を Graph の構造情報だけから確定しない。
+Graph は候補提供者であり、決定的検査（参照実在, 委譲先 skill 実在, YAML 構文, 必須 field）は ADR-006 が定める通り docs-check, IR-056 が所有する。
+inspect-docs は REQ-010-018〜023 が定める意味診断を担当し、Graph 構造候補を未検証 evidence として意味診断の入力に利用する。
+構造診断と意味診断を区別し、SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を Graph の構造情報だけから確定しない。
 
 consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
 

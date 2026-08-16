@@ -54,14 +54,16 @@ command と skill は GitHub CLI（gh）コマンドを直接記述せず、`age
 
 ### 拡張手続き（REQ-011-011）
 
-基盤手続き一覧（REQ-011-002）を UPDATE せず、拡張手続きとして新設する2手続き（REQ-011-011）。case-close 等、PR のメタデータを読み取る command から委譲される。
+基盤手続き一覧（REQ-011-002）を UPDATE せず、拡張手続きとして新設する2手続き（REQ-011-011）。
+case-close 等、PR のメタデータを読み取る command から委譲される。
 
 | 手続き | 入力 | 出力 | 事後条件 |
 |---|---|---|---|
 | PR 変更ファイル一覧取得 | PR 番号 | 変更ファイルパス一覧（文字列配列） | 出力配列の各要素が PR の変更ファイルパスと一致すること |
 | PR mergeable 状態取得 | PR 番号 | `MERGEABLE` / `CONFLICTING` / `UNKNOWN` | gh CLI が返した `mergeable` 値をそのまま enum に写すこと |
 
-事後条件は READ 手続き（VERIFY 4観点の対象外）であるため、上記出力検証条件を適用する。本文生成、完了判定を含まない（REQ-011-004 準拠）。
+事後条件は READ 手続き（VERIFY 4観点の対象外）であるため、上記出力検証条件を適用する。
+本文生成、完了判定を含まない（REQ-011-004 準拠）。
 標準版（GitHub 版）の gh CLI 実行例、Windows 環境での READ 手続き扱いは `references/standard-procedures.md` 参照。
 
 ### VERIFY の観点
@@ -74,7 +76,8 @@ VERIFY は以下の観点で実施する（REQ-011, REQ-011-010）。
 - テンプレート必須セクション
 - リポジトリ参照リンク正規化
 
-リポジトリ参照リンク正規化は裸パス、相対パスを検出する。LF 数一致、見出し空行・行頭検証は Markdown 構造破壊（事実上の1行化、見出しの見出しとしての認識消失）を機械検出する。
+リポジトリ参照リンク正規化は裸パス、相対パスを検出する。
+LF 数一致、見出し空行・行頭検証は Markdown 構造破壊（事実上の1行化、見出しの見出しとしての認識消失）を機械検出する。
 
 ## WRITE 手続きの Windows encoding 初期化必須化（REQ-011-009）
 
@@ -107,15 +110,19 @@ cmd /c chcp 65001 | Out-Null
 
 ### 理由
 
-既定の Shift-JIS コンソール（`chcp 932`）では、gh CLI が `--title` の日本語引数やメタデータを Shift-JIS として扱い、`--body-file` で UTF-8 BOM なしファイルを指定しても mojibake が発生する。3行はそれぞれ独立した役割（gh CLI の標準出力/ 標準エラー読み取りエンコーディング、PowerShell からネイティブコマンドへのパイプ渡しエンコーディング、コンソールコードページ）を持つため省略不可。git CLI 直接操作も同一のコードページ依存を持つため、WRITE 全経路へ適用を拡張する。
+既定の Shift-JIS コンソール（`chcp 932`）では、gh CLI が `--title` の日本語引数やメタデータを Shift-JIS として扱い、`--body-file` で UTF-8 BOM なしファイルを指定しても mojibake が発生する。
+3行はそれぞれ独立した役割（gh CLI の標準出力/ 標準エラー読み取りエンコーディング、PowerShell からネイティブコマンドへのパイプ渡しエンコーディング、コンソールコードページ）を持つため省略不可。
+git CLI 直接操作も同一のコードページ依存を持つため、WRITE 全経路へ適用を拡張する。
 
 ### 委譲基盤との関係
 
-gh WRITE 操作を行う全 command/ skill（case-open、case-run、case-close、case-update 等）は `agentdev-gh-cli` 手続き（Section 2 標準手順）経由で Step 0 の恩恵を受ける（REQ-011-001/006/007）。command/ skill 側での個別実装は不要であり、委譲基盤が本要件を一括して担保する。
+gh WRITE 操作を行う全 command/ skill（case-open、case-run、case-close、case-update 等）は `agentdev-gh-cli` 手続き（Section 2 標準手順）経由で Step 0 の恩恵を受ける（REQ-011-001/006/007）。
+command/ skill 側での個別実装は不要であり、委譲基盤が本要件を一括して担保する。
 
 ### ローカル版の扱い
 
-ローカル版は Case ファイル読み書きへ差し替えられるため、gh CLI 系の本要件は対象外である。git CLI 直接操作の初期化要件はローカル版にも適用する（ローカル版も git 操作を行うため）。
+ローカル版は Case ファイル読み書きへ差し替えられるため、gh CLI 系の本要件は対象外である。
+git CLI 直接操作の初期化要件はローカル版にも適用する（ローカル版も git 操作を行うため）。
 
 ## Windows 環境固有手続き
 
@@ -137,7 +144,8 @@ Windows 環境（Windows PowerShell 5.x / pwsh 7）での gh CLI 実行に特有
 
 前節「WRITE 手続きの Windows encoding 初期化必須化（REQ-011-009）」は項目1（cp932 化け対策）のうちコンソールエンコーディング初期化を REQ-011-009 として正規化した詳細要件である。
 本節は5項目カタログの文脈で cp932 化け対策の全体像（`--title` / inline `--input` 使用禁止、`--body-file` / `gh api --input` 推奨、コンソール初期化）を整理し、REQ-011-009 節と両立する。
-項目1が指す「コンソールエンコーディング初期化と `--title` 引数 decode の別問題性」とは、Section 2 Step 0（コンソールコードページ切替）が `--title` 引数の文字列出力経路とは独立していることを指す。Step 0 を実行しても `--title` の inline 渡しは cp932 経路のリスクを完全に除去しないため、`--title` / inline `--input` は原則使用禁止とし、title 修正は項目2の REST API PATCH 経由を標準とする。
+項目1が指す「コンソールエンコーディング初期化と `--title` 引数 decode の別問題性」とは、Section 2 Step 0（コンソールコードページ切替）が `--title` 引数の文字列出力経路とは独立していることを指す。
+Step 0 を実行しても `--title` の inline 渡しは cp932 経路のリスクを完全に除去しないため、`--title` / inline `--input` は原則使用禁止とし、title 修正は項目2の REST API PATCH 経由を標準とする。
 
 ## 薄いルーティング入口と references 分離
 

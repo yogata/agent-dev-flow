@@ -6,11 +6,15 @@ updated: 2026-08-10
 # 文書フォーマット規約
 
 > **正本としての位置づけ**: 本 SPEC が共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）の正本である。
-> 本文構造、見出し構成、Step 表現、記述形式等の執筆規約寄り内容は `../authoring/` ドメイン（現在は `command-file-format.md` のみ）への移管候補とする。実移管の判断は case-run で行い、本 SPEC からの一括移送は行わない。
+> 本文構造、見出し構成、Step 表現、記述形式等の執筆規約寄り内容は `../authoring/` ドメイン（現在は `command-file-format.md` のみ）への移管候補とする。
+> 実移管の判断は case-run で行い、本 SPEC からの一括移送は行わない。
 
 ## コマンド frontmatter 規約
 
-command frontmatter の正規契約を description 単一へ変更する。agent を必須フィールド・許可フィールド・有効値検査の全てから除外する。REQ-029-007（配布command は harness 固有詳細を含まない）および DEC-001（harness 分離）に基づき、実行エージェント固定は harness 側設定へ移管し command frontmatter から除去する。詳細 normative は移行計画 §5.2。
+command frontmatter の正規契約を description 単一へ変更する。
+agent を必須フィールド・許可フィールド・有効値検査の全てから除外する。
+REQ-029-007（配布command は harness 固有詳細を含まない）および DEC-001（harness 分離）に基づき、実行エージェント固定は harness 側設定へ移管し command frontmatter から除去する。
+詳細 normative は移行計画 §5.2。
 
 ## REQ frontmatter 規約
 
@@ -47,13 +51,17 @@ updated: {YYYY-MM-DD}
 - **対象外**: ...
 ```
 
-REQファイルは`## 目的`、`## 要件`、`## 適用範囲`の3セクションだけを持つ。`## 関連情報`、`## Requirement Source`、`## Update Notes`、`## 関連ドキュメント更新候補`、変更履歴節は持たない。
+REQファイルは`## 目的`、`## 要件`、`## 適用範囲`の3セクションだけを持つ。
+`## 関連情報`、`## Requirement Source`、`## Update Notes`、`## 関連ドキュメント更新候補`、変更履歴節は持たない。
 
 - 要件は検証可能な必達要件（満たす必要がある要件）として記述する。推奨、任意、将来候補は要件行に含めない。FR/NFR の区別を持たない
 
 ### SPEC frontmatter 形式
 
-SPEC frontmatterは`title`、`status`、`created`、`updated`を基本とする。`status`は`draft`、`accepted`、`superseded`のいずれかとする。`superseded`では後継SPECのリポジトリ相対パスを`superseded_by`へ記録する。status欠落は後方互換のため`accepted`相当として扱う。
+SPEC frontmatterは`title`、`status`、`created`、`updated`を基本とする。
+`status`は`draft`、`accepted`、`superseded`のいずれかとする。
+`superseded`では後継SPECのリポジトリ相対パスを`superseded_by`へ記録する。
+status欠落は後方互換のため`accepted`相当として扱う。
 
 ## REQ 分類規約
 
@@ -65,8 +73,12 @@ SPEC frontmatterは`title`、`status`、`created`、`updated`を基本とする�
 | `retired-no-successor` | 最新方針では不要なため新現行 REQ へ移行しない | 履歴参照として保持 |
 | `historical-only` | 当時の判断、経緯として残すが現行要件ではない | 履歴参照として保持 |
 
-**新基準 REQ 群**（REQ-001〜0133、25 件、v2:REQ-0111, v2:REQ-0115, v2:REQ-0116, v2:REQ-0117, v2:REQ-0118, v2:REQ-0120, v2:REQ-0121, v2:REQ-0122 は廃止）を現行仕様の主参照とする。
-現行 REQ の一覧、範囲は `docs/requirements/README.md` を正とし、本 SPEC では複製しない。
+**新基準 REQ 群**を現行仕様の主参照とする。
+現行 REQ の件数、範囲は `docs/README.md` の AUTOGEN 件数ブロックと `docs/requirements/README.md` を正とし、本 SPEC 本文では件数、範囲を固定値として記述しない。
+
+件数の固定記述を禁止する根拠の一つは、v3.0.0 移行後に旧表記（REQ-001〜0133、25 件）が残存した事象である。
+当該残存を IR-042（hardcoded-req-count）、IR-018（REQ 範囲表記鮮度）が検出しなかった理由は、両ルールが full-audit gate で検出器実装を持たず（regression_test は手動確認、`check_integrity.ts` 未実装）、v3.0.0 移行以降に full-audit が実行されていなかったためである（実行頻度の欠如）。
+表記形式の対象漏れの有無は検出器不在のため未検証であり、検出器実装時に確認する。
 
 **要件行の記述規約**（REQ-010, 004）:
 - 要件行には振る舞い、制約、状態のみを記述する

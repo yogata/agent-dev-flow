@@ -42,11 +42,11 @@ discovery_roots:  # 追加する discovery_roots（配列）
 | kind | 動作 | 追加プロパティ |
 |---|---|---|
 | `frontmatter_field` | frontmatter フィールド値を使用 | `field`: フィールド名 |
-| `first_heading` | 最初の `#` 見出しを使用 | — |
-| `filename_stem` | 拡張子なしファイル名を使用 | — |
+| `first_heading` | 最初の `#` 見出しを使用 | - |
+| `filename_stem` | 拡張子なしファイル名を使用 | - |
 | `path_group` | `path_pattern` のN番目グループを使用 | `group`: グループ番号 |
 | `literal` | 固定文字列を使用 | `value`: 文字列 |
-| `path` | リポジトリ相対パス全体を使用 | — |
+| `path` | リポジトリ相対パス全体を使用 | - |
 
 steps は配列の先頭から順に試し、最初に空でない値を採用する（フォールバックチェーン）。
 

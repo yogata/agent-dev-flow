@@ -7,9 +7,13 @@ updated: 2026-08-15
 
 # Targeted Docs Guard 実装詳細
 
-v2:REQ-0158（Targeted Docs Integrity Guard、retired）から移送された変更文書限定検査契約。配布物たる REQ 側は WHAT（結果要件）のみを残し、HOW（実装計画、スキーマ詳細）は本 SPEC に配置する。v2:REQ-0158 は Issue #1713（Epic #1711 Wave 2 OU-002）で retire 完了。WHAT 側の恒久契約は REQ-010（REQ-010-279/280/281/282）へ統合済み。
+v2:REQ-0158（Targeted Docs Integrity Guard、retired）から移送された変更文書限定検査契約。
+配布物たる REQ 側は WHAT（結果要件）のみを残し、HOW（実装計画、スキーマ詳細）は本 SPEC に配置する。
+v2:REQ-0158 は Issue #1713（Epic #1711 Wave 2 OU-002）で retire 完了。
+WHAT 側の恒久契約は REQ-010（REQ-010-279/280/281/282）へ統合済み。
 
-本 SPEC は契約（CLI 引数、workflow 別検査項目、判定条件、false-clean 予防、検査失敗時の取り扱い）のみを保持する。Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業経緯は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) へ分離した。
+本 SPEC は契約（CLI 引数、workflow 別検査項目、判定条件、false-clean 予防、検査失敗時の取り扱い）のみを保持する。
+Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業経緯は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) へ分離した。
 
 ## CLI 引数
 
@@ -24,7 +28,8 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 | `--fail-level <level>` | -- | `strict` / `warning` | failure とする severity の閾値。既定は `strict` |
 | `--declared-files <path...>` | -- | ファイルパス（space 区切り推奨、comma 区切りも受入） | Issue/PR で宣言した文書更新対象と実変更ファイルの対応を検査する任意引数 |
 
-`--files` と `--base-ref` は排他ではなく、いずれかで変更対象を特定する。両方未指定の場合はエラー。
+`--files` と `--base-ref` は排他ではなく、いずれかで変更対象を特定する。
+両方未指定の場合はエラー。
 
 ### 標準実行契約（モード使い分け、起動手段、引数形式）
 
@@ -35,7 +40,8 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 
 ## workflow 別検査項目
 
-各 workflow profile が実行する検査項目（v2:REQ-0158 より移管）。検出ルールの詳細は IR-*.md ならびに `integrity-rule-catalog.md` 参照。
+各 workflow profile が実行する検査項目（v2:REQ-0158 より移管）。
+検出ルールの詳細は IR-*.md ならびに `integrity-rule-catalog.md` 参照。
 
 ### req-save 向け検査
 
@@ -82,7 +88,9 @@ case-close では保存工程より広めに以下を確認する。
 
 ### case-run 向け検査
 
-case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/spec-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。appliesTo は `docs/specs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
+case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/spec-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。
+case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。
+appliesTo は `docs/specs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
 
 ## full_docs_check_recommended 条件
 
@@ -94,9 +102,11 @@ case-run プロファイルは docs/** 変更ファイルを対象とし、req-s
 - extension が参照する対象や責務
 - README 索引の生成元情報
 
-REQ と SPEC の README 更新要否（`requirements_readme_update_required`、`spec_readme_update_required`）は、対象文書の追加、削除、移動、名称変更、または索引に使用される frontmatter 値の変更で `true` とする。相互参照追記、相対パス是正、表記修正など、上記導出元に影響しない変更では全フラグを `false` にする。
+REQ と SPEC の README 更新要否（`requirements_readme_update_required`、`spec_readme_update_required`）は、対象文書の追加、削除、移動、名称変更、または索引に使用される frontmatter 値の変更で `true` とする。
+相互参照追記、相対パス是正、表記修正など、上記導出元に影響しない変更では全フラグを `false` にする。
 
-case-close profile の `full_docs_check_recommended` の判定条件（v2:REQ-0158 より移管）。以下の変更を検出した場合に `true` とする。
+case-close profile の `full_docs_check_recommended` の判定条件（v2:REQ-0158 より移管）。
+以下の変更を検出した場合に `true` とする。
 
 - integrity rule追加・削除・大幅変更
 - README 索引構造変更
@@ -125,11 +135,13 @@ verification-only PR 判定と PASS 処理の振る舞い（v2:REQ-0158-002 よ�
 
 ## report 契約
 
-report JSON の必須フィールド一覧、`failure` オブジェクトの構造、`files_checked` 空時の警告仕様は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) report フィールド一覧節へ分離した。TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-contracts.md) TargetedDocsReport 型契約節である。
+report JSON の必須フィールド一覧、`failure` オブジェクトの構造、`files_checked` 空時の警告仕様は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) report フィールド一覧節へ分離した。
+TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-contracts.md) TargetedDocsReport 型契約節である。
 
 ## files_checked 空時の警告
 
-`files_checked` が空の場合、検査対象ファイルが検出されなかった旨の警告（warnings 配列）を出力する。空の理由（`--files` 指定の不備、PR 変更ファイル取得の失敗、検査対象パスの誤り等）の確認を促す内容とする（Phase 3、REQ-010-281 連動）。
+`files_checked` が空の場合、検査対象ファイルが検出されなかった旨の警告（warnings 配列）を出力する。
+空の理由（`--files` 指定の不備、PR 変更ファイル取得の失敗、検査対象パスの誤り等）の確認を促す内容とする（Phase 3、REQ-010-281 連動）。
 
 ## 検査失敗時の取り扱い
 
@@ -138,7 +150,8 @@ report JSON の必須フィールド一覧、`failure` オブジェクトの構�
 
 ## 完了済み移行作業
 
-旧SPEC直下配置前提の除去、repo-agentdev-integrity の `docs/specs/**/*.md` 再帰対応は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) 完了済み移行作業節へ分離した。両対応は v2:REQ-0158 から移管され、完了済みである。
+旧SPEC直下配置前提の除去、repo-agentdev-integrity の `docs/specs/**/*.md` 再帰対応は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) 完了済み移行作業節へ分離した。
+両対応は v2:REQ-0158 から移管され、完了済みである。
 
 ## obsolete-path-map.yaml 運用
 
@@ -159,7 +172,8 @@ skill rename を伴う作業手順において、以下の対称性検査を det
 ### 物理 path 一致検査
 
 src/opencode/skills/{name} と docs/specs/skills/{name} の物理 path が
-一致することを検証する。rename 後に両者が同一 name であることが必須。
+一致することを検証する。
+rename 後に両者が同一 name であることが必須。
 
 ### frontmatter id 一致検査
 
@@ -173,7 +187,10 @@ rename 後に旧 name の node が Artifact Graph に残存していないこと
 
 ### 実装
 
-3 検査は `.opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts` が deterministic に実行する。対象は配布 skill `agentdev-*`（`src/opencode/skills/` 配下）とし、repo-local skill (`repo-agentdev-*`) および `agentdev-` prefix を持たない skill は対象外（REQ-002 配布物境界）。`status: superseded` の SPEC に対応する skill dir 欠落は許容し、`status: draft` の場合は warning とする。Artifact Graph が未生成（`.agentdev/graph/nodes.jsonl` 不在）の場合は graph-node 検査を info として扱い、阻断しない。
+3 検査は `.opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts` が deterministic に実行する。
+対象は配布 skill `agentdev-*`（`src/opencode/skills/` 配下）とし、repo-local skill (`repo-agentdev-*`) および `agentdev-` prefix を持たない skill は対象外（REQ-002 配布物境界）。
+`status: superseded` の SPEC に対応する skill dir 欠落は許容し、`status: draft` の場合は warning とする。
+Artifact Graph が未生成（`.agentdev/graph/nodes.jsonl` 不在）の場合は graph-node 検査を info として扱い、阻断しない。
 
 ## 関連
 

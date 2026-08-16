@@ -87,11 +87,14 @@ Capability Skill は複数workflow 共通能力を所有し、workflow 固有STE
 
 ## Workflow Skill Soft Guard（REQ-027-002）
 
-Workflow Skill は workflow 実装本体であり、Command が所有する公開interface（入出力契約・ガードレール）を持たない（DEC-010）。そのため Command を経由せず Workflow Skill を直接起動すると、入力検証・前提条件確認・クリーンアップを欠いた状態で workflow が実行されるリスクがある。本節は Workflow Skill の意図しない discovery / invocation を抑制する soft guard 仕様を定義する。
+Workflow Skill は workflow 実装本体であり、Command が所有する公開interface（入出力契約・ガードレール）を持たない（DEC-010）。
+そのため Command を経由せず Workflow Skill を直接起動すると、入力検証・前提条件確認・クリーンアップを欠いた状態で workflow が実行されるリスクがある。
+本節は Workflow Skill の意図しない discovery / invocation を抑制する soft guard 仕様を定義する。
 
 ### OpenCode 1.18.15 実現可能性分析
 
-OpenCode 1.18.15（V1系）の skill discovery モデルは以下の前提に立つ。分析は OpenCode 公式ドキュメントおよび 1.18.15 ソースコード（`packages/opencode/src/skill/index.ts`、`packages/opencode/src/session/system.ts`）に基づく。
+OpenCode 1.18.15（V1系）の skill discovery モデルは以下の前提に立つ。
+分析は OpenCode 公式ドキュメントおよび 1.18.15 ソースコード（`packages/opencode/src/skill/index.ts`、`packages/opencode/src/session/system.ts`）に基づく。
 
 - **description-based discovery**: OpenCode は system prompt へ skill の `name` と `description` のみを注入する（progressive disclosure）。model は `description` を読み、`skill` tool で明示的に読み込む対象を決定する。`description` を持たない skill は discovery から除外される。このため `description` の記述が discovery / invocation 意思決定における事実上の制御点となる。
 - **frontmatter による discovery 制御は不存在**: 1.18.15 が frontmatter で検証するのは `name` と `description` のみ。`license` / `compatibility` / `metadata` は任意フィールドとして受理されるが、V1 では解釈されず portability 用の保持に留まる。`hidden` / `disable-model-invocation` / `metadata.opencode/autoinvoke` の各フィールドは 1.18.15 時点で未実装である（`autoinvoke` は V2 で計画）。未知の frontmatter フィールドは無視される。
@@ -99,7 +102,9 @@ OpenCode 1.18.15（V1系）の skill discovery モデルは以下の前提に立
 
 ### 採用する soft guard
 
-OpenCode 1.18.15 で runtime に有効かつ Command dispatch を破壊しない soft guard は **description による guard** のみである。Workflow Skill の `description` の DO NOT USE FOR に直接起動抑制句を付与し、model が当該 skill を単独起動しないよう誘導する。本方式は model の description 解釈に依存する「soft」な抑制であり、hard な強制排除ではない。
+OpenCode 1.18.15 で runtime に有効かつ Command dispatch を破壊しない soft guard は **description による guard** のみである。
+Workflow Skill の `description` の DO NOT USE FOR に直接起動抑制句を付与し、model が当該 skill を単独起動しないよう誘導する。
+本方式は model の description 解釈に依存する「soft」な抑制であり、hard な強制排除ではない。
 
 **guard 句（日本語 description）**:
 `、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-027-002 soft guard で抑制）`
@@ -107,11 +112,14 @@ OpenCode 1.18.15 で runtime に有効かつ Command dispatch を破壊しない
 **guard 句（英語 description）**:
 `, direct invocation (Workflow Skill; consume via the corresponding /agentdev/* command stages — standalone skill launch is discouraged by the REQ-027-002 soft guard)`
 
-frontmatter フィールドは従来規約（`name` / `description` のみ、review-protocol 5.1）を維持し、soft guard 用の拡張フィールドは追加しない。1.18.15 で未解釈の `metadata` 等を guard 用に使っても runtime 効果がないためである。
+frontmatter フィールドは従来規約（`name` / `description` のみ、review-protocol 5.1）を維持し、soft guard 用の拡張フィールドは追加しない。
+1.18.15 で未解釈の `metadata` 等を guard 用に使っても runtime 効果がないためである。
 
 ### 適用対象
 
-soft guard は workflow 実装本体 および workflow pipeline 内部知識を所有する `agentdev-workflow-*` skill に適用する。純粋な Capability Skill（例: `agentdev-workflow-templates` は template 選択・読込の独立能力）は対象外とする。適用済み skill:
+soft guard は workflow 実装本体 および workflow pipeline 内部知識を所有する `agentdev-workflow-*` skill に適用する。
+純粋な Capability Skill（例: `agentdev-workflow-templates` は template 選択・読込の独立能力）は対象外とする。
+適用済み skill:
 
 - `agentdev-workflow-case-open`（case-open workflow 実装本体）
 - `agentdev-workflow-case-close`（case-close workflow 実装本体）
@@ -123,7 +131,9 @@ soft guard は workflow 実装本体 および workflow pipeline 内部知識を
 
 ### consumer 側 harder opt-in
 
-consumer が soft guard より強い制御を望む場合、`opencode.json` の `permission.skill` で Workflow Skill を `ask` に設定し、直接起動時に利用者確認を要求できる。`deny` は Command dispatch も遮断するため既定では推奨しない。本設定は consumer project 側の運用判断であり、配布物（`src/opencode/`）には含めない。
+consumer が soft guard より強い制御を望む場合、`opencode.json` の `permission.skill` で Workflow Skill を `ask` に設定し、直接起動時に利用者確認を要求できる。
+`deny` は Command dispatch も遮断するため既定では推奨しない。
+本設定は consumer project 側の運用判断であり、配布物（`src/opencode/`）には含めない。
 
 ```json
 {
@@ -138,9 +148,12 @@ consumer が soft guard より強い制御を望む場合、`opencode.json` の 
 
 ## skill authoring 段階的開示基準
 
-skill 段階的開示の基準（SKILL.md は目的/USE FOR/入出力/副作用/責任境界/不変条件/判断順序/reference 選択条件/script-template 入口を保持、詳細 schema/判定表/正規表現/具体例/例外回復/harness 起動は references へ分離、原則200行以内、reference 選択表の必須配置、通常経路で全 reference 無条件読込しない）を REQ-002-014/015 と整合して明記する。詳細 normative は移行計画 §9.2, §9.3, §9.5, §9.6。
+skill 段階的開示の基準（SKILL.md は目的/USE FOR/入出力/副作用/責任境界/不変条件/判断順序/reference 選択条件/script-template 入口を保持、詳細 schema/判定表/正規表現/具体例/例外回復/harness 起動は references へ分離、原則200行以内、reference 選択表の必須配置、通常経路で全 reference 無条件読込しない）を REQ-002-014/015 と整合して明記する。
+詳細 normative は移行計画 §9.2, §9.3, §9.5, §9.6。
 
 ### 執筆時 prevention（配布依存境界）
 
-skill authoring は producer 内部参照、docs 内部パス、具体 ID（`REQ-NNNN`、`DEC-NNN`、`IR-NN`）の配布物本文への混入を未然に防ぐことを執筆時 prevention として案内する（REQ-029、`integrity/distribution-boundary.md`）。本 prevention は新規 REQ 行を新設せず、既存の skill 構造基準と協調して機能する。検出契約と最終 gate は REQ-010-060 を参照する。
+skill authoring は producer 内部参照、docs 内部パス、具体 ID（`REQ-NNNN`、`DEC-NNN`、`IR-NN`）の配布物本文への混入を未然に防ぐことを執筆時 prevention として案内する（REQ-029、`integrity/distribution-boundary.md`）。
+本 prevention は新規 REQ 行を新設せず、既存の skill 構造基準と協調して機能する。
+検出契約と最終 gate は REQ-010-060 を参照する。
 

@@ -31,9 +31,11 @@ draft status の SPEC が一定期間更新されず放置されることを検�
 
 ### 新規 SPEC 追加時の index 登録手順
 
-新規 SPEC ファイルを `docs/specs/` 配下に作成した場合（spec-save 完了後）、本ファイルの該当一覧表へ当該 SPEC の行を登録する。登録漏れを docs-check で検出する。
+新規 SPEC ファイルを `docs/specs/` 配下に作成した場合（spec-save 完了後）、本ファイルの該当一覧表へ当該 SPEC の行を登録する。
+登録漏れを docs-check で検出する。
 
-**タイミング**: spec-save が新規 SPEC を作成した直後。既存 SPEC への追記（UPDATE）では行を追加せず、status 列のみ更新する。
+**タイミング**: spec-save が新規 SPEC を作成した直後。
+既存 SPEC への追記（UPDATE）では行を追加せず、status 列のみ更新する。
 
 **登録先一覧表の特定**: SPEC の配置ディレクトリに基づき、対応する一覧表へ登録する。
 
@@ -51,7 +53,10 @@ draft status の SPEC が一定期間更新されず放置されることを検�
 
 **登録内容**: SPEC パス（相対リンク）、`status`（spec-save 新規作成時は `draft`）、タイトル、責務の概要。
 
-**docs-check 検出仕組み**: docs-check は `docs/specs/**/*.md` の実ファイルと本ファイルの一覧表エントリを突き合わせし、一覧表に未登録の SPEC ファイルを検出する。`_template.md` はテンプレートのため検出対象外とする。SPEC ファイルのドメイン間移送が発生した場合は旧ドメイン表から行を削除し、新ドメイン表へ登録する。`references/` サブディレクトリの SPEC（詳細・実装固有事項）は親 SPEC 行の備考欄で言及し、独立行としては登録しない。
+**docs-check 検出仕組み**: docs-check は `docs/specs/**/*.md` の実ファイルと本ファイルの一覧表エントリを突き合わせし、一覧表に未登録の SPEC ファイルを検出する。
+`_template.md` はテンプレートのため検出対象外とする。
+SPEC ファイルのドメイン間移送が発生した場合は旧ドメイン表から行を削除し、新ドメイン表へ登録する。
+`references/` サブディレクトリの SPEC（詳細・実装固有事項）は親 SPEC 行の備考欄で言及し、独立行としては登録しない。
 
 ## 3 層構造と基盤 6 ドメイン
 
@@ -160,7 +165,8 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 
 #### foundations/（基盤モデル）
 
-主要 SPEC と `references/` サブディレクトリで構成する。`references/` には親 SPEC から参照される詳細・抽象化事項を配置する（Wave 3 再構築）。
+主要 SPEC と `references/` サブディレクトリで構成する。
+`references/` には親 SPEC から参照される詳細・抽象化事項を配置する（Wave 3 再構築）。
 
 | SPEC | status | タイトル | 責務 |
 |------|--------|---------|------|

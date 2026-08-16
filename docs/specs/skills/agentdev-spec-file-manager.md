@@ -10,11 +10,12 @@ updated: 2026-07-28
 SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPEC 固有整合性確認、SPEC 固有 script の選択と呼出契約を担う操作用 skill の仕様を定める。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
-> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001, REQ-001）。
+> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 
 ## 目的
 
-`spec-save` command の実行時に SPEC 操作（SPEC 作成、更新、配置判断、target_area による更新判断、SPEC 固有整合性確認、SPEC 固有 script 呼出契約）を担う操作用 skill の責務、対象外、境界を定義する。REQ/Decision 操作 skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`）との責務重複を防ぎ、SPEC 操作の正規所有者を一つに定める。
+`spec-save` command の実行時に SPEC 操作（SPEC 作成、更新、配置判断、target_area による更新判断、SPEC 固有整合性確認、SPEC 固有 script 呼出契約）を担う操作用 skill の責務、対象外、境界を定義する。
+REQ/Decision 操作 skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`）との責務重複を防ぎ、SPEC 操作の正規所有者を一つに定める。
 
 ## 適用対象
 
@@ -37,7 +38,9 @@ SPEC ファイルの作成、更新、配置先判断、target_area 処理、SPE
 
 ## 提供する判断・操作
 
-SPEC operation の公式 enum は `create` / `update` であり、本 skill は非正規 alias（`spec-create`, `spec-update`, `spec-append`）を受け付ける（REQ-008-058）。alias から公式 enum への映射: `spec-create` → `create`、`spec-update` → `update`、`spec-append` → `update`（既存 SPEC ファイルへ新規セクションを追加する操作）。create/update は後方互換のため維持し、alias も同等に受け付ける。
+SPEC operation の公式 enum は `create` / `update` であり、本 skill は非正規 alias（`spec-create`, `spec-update`, `spec-append`）を受け付ける（REQ-008-058）。
+alias から公式 enum への映射: `spec-create` → `create`、`spec-update` → `update`、`spec-append` → `update`（既存 SPEC ファイルへ新規セクションを追加する操作）。
+create/update は後方互換のため維持し、alias も同等に受け付ける。
 
 - SPEC 作成、追記、target_area 置換、spec-append 追加の配置先解決
 - 新規 SPEC 作成時（`create` / `spec-create`）の frontmatter（`title`、`status: draft`、`created`、`updated`）付与
@@ -50,7 +53,8 @@ SPEC operation の公式 enum は `create` / `update` であり、本 skill は�
 
 ### APPEND 操作（spec-append）
 
-`spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `../commands/spec-save.md`「spec-append 操作時のセクション追加ロジック」が正規所有する。
+`spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。
+配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `../commands/spec-save.md`「spec-append 操作時のセクション追加ロジック」が正規所有する。
 
 - `content` は新規見出し行から始まる
 - `placement`: `tail`（既定）/ `after_anchor` / `before_anchor` のいずれか
@@ -62,7 +66,10 @@ SPEC operation の公式 enum は `create` / `update` であり、本 skill は�
 
 ### search-target-area.ts 契約
 
-`search-target-area.ts` は見出し行全体との完全一致のみを受け付ける。前方一致、後方一致、部分一致を受け付けない（前方一致廃止）。正規入力（例: `### IR-044`）で回帰テストを維持する。この契約は `target_area` マッチング規則と `spec-append` の anchor マッチング規則の双方に適用される。
+`search-target-area.ts` は見出し行全体との完全一致のみを受け付ける。
+前方一致、後方一致、部分一致を受け付けない（前方一致廃止）。
+正規入力（例: `### IR-044`）で回帰テストを維持する。
+この契約は `target_area` マッチング規則と `spec-append` の anchor マッチング規則の双方に適用される。
 
 ## 参照する references
 
@@ -81,11 +88,14 @@ SPEC operation の公式 enum は `create` / `update` であり、本 skill は�
 
 ## 境界
 
-`agentdev-req-file-manager`（REQ 操作）および `agentdev-decision-file-manager`（Decision 操作）との責務重複がないこと。SPEC 操作は本 skill が正規の所有者となる。
+`agentdev-req-file-manager`（REQ 操作）および `agentdev-decision-file-manager`（Decision 操作）との責務重複がないこと。
+SPEC 操作は本 skill が正規の所有者となる。
 
-`agentdev-artifact-validation` との責務重複がないこと。共通検証 script は `agentdev-artifact-validation` が所有し、本 skill は内部 script パスを直接参照せず公開検証契約へ委譲する。
+`agentdev-artifact-validation` との責務重複がないこと。
+共通検証 script は `agentdev-artifact-validation` が所有し、本 skill は内部 script パスを直接参照せず公開検証契約へ委譲する。
 
-`agentdev-doc-diagnostics` との責務重複がないこと。docs 横断診断、証拠構造、finding 出力契約は `agentdev-doc-diagnostics` が所有し、本 skill は SPEC 操作（作成、更新、配置判断）に限定する。
+`agentdev-doc-diagnostics` との責務重複がないこと。
+docs 横断診断、証拠構造、finding 出力契約は `agentdev-doc-diagnostics` が所有し、本 skill は SPEC 操作（作成、更新、配置判断）に限定する。
 
 ## 対象外
 

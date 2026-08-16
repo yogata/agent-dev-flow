@@ -23,7 +23,8 @@ status: accepted
 
 ## IR-055 検出パターンと severity（REQ-010-263）
 
-検出パターンごとの severity 分類を規定する。本節が SPEC 詳細の原本であり、docs-check 実装（`check_integrity.ts`）は本節に従う。
+検出パターンごとの severity 分類を規定する。
+本節が SPEC 詳細の原本であり、docs-check 実装（`check_integrity.ts`）は本節に従う。
 
 ### strict（原則違反、即 NG）
 
@@ -55,7 +56,8 @@ status: accepted
 
 ## 段階導入運用（REQ-010-264）
 
-本ルールは段階導入で運用する。既存違反が多数存在するため、full audit を即 fail gate 化せず、baseline 既知違反と新規違反を区別する（REQ-010-145）。
+本ルールは段階導入で運用する。
+既存違反が多数存在するため、full audit を即 fail gate 化せず、baseline 既知違反と新規違反を区別する（REQ-010-145）。
 
 | 層 | 動作 | baseline 0 到達前 | baseline 0 到達後 |
 |----|------|-------------------|-------------------|
@@ -63,11 +65,13 @@ status: accepted
 | delta guard | 変更関連ルール実行 | 新規増加は fail | 新規増加は fail |
 | impact guard | 影響範囲ルール実行 | 新規増加は fail | 新規増加は fail |
 
-baseline 0 到達後に full audit を fail gate 化できる状態にする（REQ-010-264）。3層 guard の実行モデルは REQ-010-153 に従う。
+baseline 0 到達後に full audit を fail gate 化できる状態にする（REQ-010-264）。
+3層 guard の実行モデルは REQ-010-153 に従う。
 
 ## ルール本文と正規表現
 
 IR-055 の正規表現は Decision 移行後の現行命名 `DEC-\d{3}` を検出する。
 あわせて Decision 移行漏れ（residual）である `ADR-\d{4}`（`v2:` prefix なし）を
-検出する。履歴参照 `v2:ADR-\d{4}` は AG-010 履歴参照保護対象であり検出対象外。
+検出する。
+履歴参照 `v2:ADR-\d{4}` は AG-010 履歴参照保護対象であり検出対象外。
 ルールの意味論的責務（未解決参照の検出）は維持する。

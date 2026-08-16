@@ -11,7 +11,8 @@ updated: 2026-07-24
 > - REQ-001（実行時配布物と執筆時関心の分離）
 > - REQ-001（Skill references SPEC 分離基準）
 > - REQ-001（AgentDevFlow プラグイン名前空間の統一）
-> **artifact-contracts.md との責任分界**: `../responsibilities/artifact-contracts.md` が Command/Skill/Template/Script の詳細契約（入出力、依存方向）を扱うのに対し、本 SPEC は上位原則と分類規則に限定する。詳細契約の参照先は artifact-contracts.md を優先する。
+> **artifact-contracts.md との責任分界**: `../responsibilities/artifact-contracts.md` が Command/Skill/Template/Script の詳細契約（入出力、依存方向）を扱うのに対し、本 SPEC は上位原則と分類規則に限定する。
+> 詳細契約の参照先は artifact-contracts.md を優先する。
 
 本プロジェクトの設計判断の根拠を集約した前方視の指針。
 どう考えるかを記述し、実装の背景にある意図を明らかにする。
@@ -158,4 +159,6 @@ skill、reference、script、REQ、SPEC の配置原則を、正規所有者、�
 
 ### ハーネス純化の回帰基準
 
-REQ-002、v2:ADR-0136、REQ-002-163 が定めるハーネス責務と配布物責務の分離を回帰基準として維持する。配布 command、skill、reference、docs にハーネス固有の待機時間、並列度、再試行、起動引数を残さない。実行エージェントの選定、起動方法、実行制御パラメータはハーネス側文書（`AGENTS.md`、`references/<harness>.md`）が所有する。
+REQ-002、v2:ADR-0136、REQ-002-163 が定めるハーネス責務と配布物責務の分離を回帰基準として維持する。
+配布 command、skill、reference、docs にハーネス固有の待機時間、並列度、再試行、起動引数を残さない。
+実行エージェントの選定、起動方法、実行制御パラメータはハーネス側文書（`AGENTS.md`、`references/<harness>.md`）が所有する。

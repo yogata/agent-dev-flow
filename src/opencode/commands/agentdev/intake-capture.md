@@ -50,7 +50,7 @@ description: 未分類の変更候補を手動入力から intake item として
 - G03: intake item の変更、更新を行わない（保存のみ）
 - G04: review、整形、分類を行わない（後続コマンドの責務）
 - G05: 対象は「未分類の作業候補、不整合、規約違反、未回収課題」に限定する。作業知見だけの内容（再発防止知見のみで具体的修正対象がないもの）は対象外
-- G06: learning item の保存、分類、昇華を担当しない。再発防止知見のみの観測は `/agentdev/learning-capture` に委ねる
+- G06: learning item の保存、分類、昇華を担当しない。再発防止知見のみの観測は `agentdev-learning-capture` skill に委ねる
 
 ### 形式制約
 - G07: workflow 管理成果物として扱わない

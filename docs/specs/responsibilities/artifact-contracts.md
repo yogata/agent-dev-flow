@@ -46,7 +46,10 @@ Command ──→ Skill ──→ Reference (references/)
 
 ## コマンドフロントマター契約
 
-command frontmatter 契約を description 単一へ同期する（ACT-SPEC-001 と整合）。配布物自己完結と内部ID/内部パス排除の境界宣言を REQ-001-031/032 と整合させ、配布物の producer 内部依存・harness 固有詳細非依存は REQ-029-003..007 へ参照を分ける（REQ-002-021..029 の範囲参照は RETIRE/MOVE 済み）。「不一致時は本体SPECを正とする」実行時契約を廃止し開発時 checker が SPEC と配布物の適合を保証する構造へ変更する旨を明記する。詳細 normative は移行計画 §5.2, §6.2。
+command frontmatter 契約を description 単一へ同期する（ACT-SPEC-001 と整合）。
+配布物自己完結と内部ID/内部パス排除の境界宣言を REQ-001-031/032 と整合させ、配布物の producer 内部依存・harness 固有詳細非依存は REQ-029-003..007 へ参照を分ける（REQ-002-021..029 の範囲参照は RETIRE/MOVE 済み）。
+「不一致時は本体SPECを正とする」実行時契約を廃止し開発時 checker が SPEC と配布物の適合を保証する構造へ変更する旨を明記する。
+詳細 normative は移行計画 §5.2, §6.2。
 
 ## スキル構造契約
 
@@ -91,7 +94,8 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 
 ## Script 所有権と委譲契約
 
-各 script の正規所有者を文書種別ごとに定義する（REQ-002-159、REQ-001-029）。同一 script または共有 lib を複数 skill へ複製せず、正規所有者を一つに定める。
+各 script の正規所有者を文書種別ごとに定義する（REQ-002-159、REQ-001-029）。
+同一 script または共有 lib を複数 skill へ複製せず、正規所有者を一つに定める。
 
 | script 種別 | 正規所有者 skill | 対象 |
 |---|---|---|
@@ -112,7 +116,10 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 
 ## 分類根拠伝播契約
 
-learning/intake → RU → req-define → spec-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。SPEC ファイルが主論理区分・正規所有対象を宣言する形式（frontmatter フィールド名、冒頭宣言節フォーマット）の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」とし、本節は工程間伝播フィールドの schema と req-define から spec-save へのシリアライズ位置を正規所有する。両者は `spec_logical_division`、`canonical_owner` のフィールド名を共有し、工程間で同一の名前を用いる。req-define は SPEC action の `artifact_actions` と `operation_units` へ分類根拠を出力し、spec-save はこれを読み取って CREATE/UPDATE 各操作で SPEC frontmatter または冒頭宣言節へ宣言を付与する。
+learning/intake → RU → req-define → spec-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。
+SPEC ファイルが主論理区分・正規所有対象を宣言する形式（frontmatter フィールド名、冒頭宣言節フォーマット）の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」とし、本節は工程間伝播フィールドの schema と req-define から spec-save へのシリアライズ位置を正規所有する。
+両者は `spec_logical_division`、`canonical_owner` のフィールド名を共有し、工程間で同一の名前を用いる。
+req-define は SPEC action の `artifact_actions` と `operation_units` へ分類根拠を出力し、spec-save はこれを読み取って CREATE/UPDATE 各操作で SPEC frontmatter または冒頭宣言節へ宣言を付与する。
 
 ### 伝播フィールド一覧
 
@@ -147,7 +154,8 @@ learning/intake → RU → req-define → spec-save の各工程間で引き継�
 
 ### REQ 拡張可否判定ルール
 
-change_nature が `new_user_requirement` または `external_contract_change` の場合のみ、REQ の作成または拡張を候補とする（REQ-001-033）。それ以外の change_nature は、既存 REQ が要求を既に保持している限り REQ を拡張せず、SPEC 等への配置を検討する。
+change_nature が `new_user_requirement` または `external_contract_change` の場合のみ、REQ の作成または拡張を候補とする（REQ-001-033）。
+それ以外の change_nature は、既存 REQ が要求を既に保持している限り REQ を拡張せず、SPEC 等への配置を検討する。
 
 ## サイズ制約
 
@@ -442,7 +450,10 @@ req_draft の frontmatter は最小限のメタデータのみとする。
 
 ## artifact_actions operation
 
-`artifact_actions` の `operation` フィールドは REQ/Decision 操作と SPEC 操作で扱う値が異なる。REQ/Decision 操作（`create` / `append` / `update`）は従来通り維持する。本節は SPEC 操作の公式 enum、非正規 alias、consumer 側の後方互換、および `spec-append` operation の契約を正規所有する。各 action の field 構成は「req_draft 出力構造」節の「artifact_actions 詳細構造」を参照。
+`artifact_actions` の `operation` フィールドは REQ/Decision 操作と SPEC 操作で扱う値が異なる。
+REQ/Decision 操作（`create` / `append` / `update`）は従来通り維持する。
+本節は SPEC 操作の公式 enum、非正規 alias、consumer 側の後方互換、および `spec-append` operation の契約を正規所有する。
+各 action の field 構成は「req_draft 出力構造」節の「artifact_actions 詳細構造」を参照。
 
 ### SPEC operation enum と非正規 alias
 
@@ -493,7 +504,8 @@ req_draft の frontmatter は最小限のメタデータのみとする。
 
 ## RU アーティファクト契約（session由来RU）
 
-session由来RU（`source_type: chat`、`generated_by: session`）の生成、承認、保存、永続化の追跡可能な二段階手続きを定義する。本節は REQ-008 に基づき session 経路に不足する契約を追加し、既存の `source_type: chat` と7値の `tentative_classification` を維持する。
+session由来RU（`source_type: chat`、`generated_by: session`）の生成、承認、保存、永続化の追跡可能な二段階手続きを定義する。
+本節は REQ-008 に基づき session 経路に不足する契約を追加し、既存の `source_type: chat` と7値の `tentative_classification` を維持する。
 
 ### 生成主体と生成時点
 
@@ -541,7 +553,8 @@ session由来RU の frontmatter は次を必須とする。
 
 ### RU 本文必須8セクション
 
-各RU本文は次の8セクションを必須とする。session 論理URI の解決なしに後工程が RU 内容を判断できる自足性を保つこと。
+各RU本文は次の8セクションを必須とする。
+session 論理URI の解決なしに後工程が RU 内容を判断できる自足性を保つこと。
 
 1. 目的
 2. 対象

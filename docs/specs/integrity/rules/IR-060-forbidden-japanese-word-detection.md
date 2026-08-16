@@ -4,7 +4,9 @@ status: accepted
 
 # IR-060: forbidden Japanese word detection
 
-現行自然言語文書（Markdown 本文）における禁止語（forbidden）の機械検出。v2:REQ-0140-035 が定める置換辞書運用区分のうち、forbidden 区分語を docs-check / inspect-docs の検査対象とする。review 区分語は本ルールの対象外とし、`agentdev-doc-writing` 查読観点（v2:REQ-0140-033）で人手確認する。
+現行自然言語文書（Markdown 本文）における禁止語（forbidden）の機械検出。
+v2:REQ-0140-035 が定める置換辞書運用区分のうち、forbidden 区分語を docs-check / inspect-docs の検査対象とする。
+review 区分語は本ルールの対象外とし、`agentdev-doc-writing` 查読観点（v2:REQ-0140-033）で人手確認する。
 
 | Field | Value |
 |-------|-------|
@@ -48,11 +50,14 @@ forbidden 区分語（正: [japanese-replacement-dictionary.md](../../../src/ope
 
 ## IR-045 との関係
 
-IR-045（削除済み）は「docs 日本語表現、文意整合検査」を担っていたが、REQ-010-256 等により docs-check は意味判断を要する文意整合検査を保持しない方針となり削除された。IR-060 はこの方針を継承し、意味判断を要する検出（review 区分語、文意品質判断）は扱わず、完全一致検出（forbidden 区分語）のみを担う。IR-045 で扱っていた文意品質検出対象語は `vocabulary-registry.md`「文意品質検出対象語（IR-045）」で参照として残る。
+IR-045（削除済み）は「docs 日本語表現、文意整合検査」を担っていたが、REQ-010-256 等により docs-check は意味判断を要する文意整合検査を保持しない方針となり削除された。
+IR-060 はこの方針を継承し、意味判断を要する検出（review 区分語、文意品質判断）は扱わず、完全一致検出（forbidden 区分語）のみを担う。
+IR-045 で扱っていた文意品質検出対象語は `vocabulary-registry.md`「文意品質検出対象語（IR-045）」で参照として残る。
 
 ## review 区分語の扱い
 
-review 区分語（`正規のXX`, `局所物理分離`, `責務境界浄化`, `純化`, `浄化`, `具象参照抽象化`, `repo-local` 等）は本ルールの機械検出対象外とし、`agentdev-doc-writing` 查読観点（v2:REQ-0140-033）で人手確認する。文脈によって推奨訳が変わるため、機械的な完全一致検出では誤検知リスクが高く、查読へ委任する。
+review 区分語（`正規のXX`, `局所物理分離`, `責務境界浄化`, `純化`, `浄化`, `具象参照抽象化`, `repo-local` 等）は本ルールの機械検出対象外とし、`agentdev-doc-writing` 查読観点（v2:REQ-0140-033）で人手確認する。
+文脈によって推奨訳が変わるため、機械的な完全一致検出では誤検知リスクが高く、查読へ委任する。
 
 ## 関連
 

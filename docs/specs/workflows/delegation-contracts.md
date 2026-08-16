@@ -74,7 +74,8 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 | `controlled_case_execution` | case-run Epic / 複数Issue実行 | 条件付き | case-run のみ |
 | `step_execution` | case-auto からの構成工程（req-save / spec-save / case-open / case-close）の実行担当サブエージェント起動 | 許可 | case-auto からの工程委譲のみ。各工程のコマンド定義ガードレールに従う。委譲起動不能時の扱いは `delegation-unavailable` 状態として報告する（REQ-002-003/004）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md 参照 |
 
-※ step_execution の委譲起動手段（起動方法、実行制御パラメータ）は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。委譲起動不能時は `delegation-unavailable` 状態として報告し、インラインフォールバックは harness 固有の実行制御として配布 SPEC から除外する（REQ-002-004）。
+※ step_execution の委譲起動手段（起動方法、実行制御パラメータ）は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
+委譲起動不能時は `delegation-unavailable` 状態として報告し、インラインフォールバックは harness 固有の実行制御として配布 SPEC から除外する（REQ-002-004）。
 
 ## 委譲制約
 
@@ -90,7 +91,8 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 ## case 実行責務の 4 用語と委譲（REQ-006、REQ-011-017、REQ-011-018）
 
 case 実行に関わる責務は 4 用語へ分解され、各委譲種別は対応する用語の所有権に従う。
-用語の正規定義と所有者は [responsibility-boundary-purification.md](../responsibilities/responsibility-boundary-purification.md)「case 実行責務の 4 用語と所有者」を SSoT とする。本節は委譲契約からの参照レベルに留まる。
+用語の正規定義と所有者は [responsibility-boundary-purification.md](../responsibilities/responsibility-boundary-purification.md)「case 実行責務の 4 用語と所有者」を SSoT とする。
+本節は委譲契約からの参照レベルに留まる。
 
 | 用語 | 定義 | 正規所有者 | 関連する委譲種別 |
 |---|---|---|---|
@@ -216,26 +218,33 @@ subagent は当該属性に応じた振る舞い指針（検証のみでも acce
 
 ## adversarial-review との委譲契約接続
 
-本節は adversarial-review caller integration（REQ-014）が委譲契約へ接続する際の適用を所有する。共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は重複定義せず、委譲契約側からの接続のみを規定する。REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持し、adversarial-review 由来の結果は第5状態を増やさず既存状態へ折り畳む（REQ-014-012、workflow-contracts SPEC「adversarial-review 由来の停止信号」節参照）。
+本節は adversarial-review caller integration（REQ-014）が委譲契約へ接続する際の適用を所有する。
+共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は重複定義せず、委譲契約側からの接続のみを規定する。
+REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持し、adversarial-review 由来の結果は第5状態を増やさず既存状態へ折り畳む（REQ-014-012、workflow-contracts SPEC「adversarial-review 由来の停止信号」節参照）。
 
 ### 委譲種別と副作用境界
 
-adversarial-review は「委譲種別」の `semantic_review`（書き込み禁止型）として適用する。許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする（REQ-014-004）。レビュー結果保存用の新規正規 artifact 種別を導入せず、審議結果は呼出元へ中間成果として返却する（REQ-014-005、adversarial-review SPEC「副作用禁止と新規 artifact 非生成」節参照）。
+adversarial-review は「委譲種別」の `semantic_review`（書き込み禁止型）として適用する。
+許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする（REQ-014-004）。
+レビュー結果保存用の新規正規 artifact 種別を導入せず、審議結果は呼出元へ中間成果として返却する（REQ-014-005、adversarial-review SPEC「副作用禁止と新規 artifact 非生成」節参照）。
 
 ### review 経路での parent_decision_required / decision_context 適用
 
-呼出元は adversarial-review の出力（合意候補、未解決争点、残留リスク、未解決事項）を `parent_decision_required` および `decision_context` を通じて受領する。未解決のユーザー判断事項は次のように扱う。
+呼出元は adversarial-review の出力（合意候補、未解決争点、残留リスク、未解決事項）を `parent_decision_required` および `decision_context` を通じて受領する。
+未解決のユーザー判断事項は次のように扱う。
 
 | 起源 | parent_decision_required の扱い |
 |---|---|
 | case-run 起源 | result enum の `blocked` に折り畳み、停止理由として user-decision-required 分類を付与する |
 | 工程委譲起源（req-define、case-open、case-close 等） | 既存 status（pass/warn/fail/partial）を維持し、`parent_decision_required` へ unresolved 判断事項を列挙する |
 
-`decision_context` には対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断を含める。呼出元は accepted finding の反映を自身の責務で行い（REQ-014-006）、adversarial-review へ反映を委譲しない。
+`decision_context` には対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断を含める。
+呼出元は accepted finding の反映を自身の責務で行い（REQ-014-006）、adversarial-review へ反映を委譲しない。
 
 ### case-auto による decision_context の限定的親判断解決（REQ-006-112〜114、DEC-008）
 
-case-auto は下位 command（case-run インライン実行、工程委譲）から受領した decision_context を bounded parent decision resolution で処理する。本節は委譲契約側からの接続のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto SPEC「bounded parent decision resolution（REQ-006-112〜114、DEC-008）」節が正である。
+case-auto は下位 command（case-run インライン実行、工程委譲）から受領した decision_context を bounded parent decision resolution で処理する。
+本節は委譲契約側からの接続のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto SPEC「bounded parent decision resolution（REQ-006-112〜114、DEC-008）」節が正である。
 
 **decision_context の消費契約**:
 
@@ -244,16 +253,22 @@ case-auto は下位 command（case-run インライン実行、工程委譲）�
 | case-run 起源（result `blocked` + user-decision-required 分類） | decision_context を限定的親判断解決へ入力する。自律解決可能な場合は回答を case-run resume point へ返し、解決不能な場合は停止理由分類「上位合意矛盾」または「新規ユーザー判断事項」でユーザー停止する |
 | 工程委譲起源（既存 status + `parent_decision_required`） | decision_context を限定的親判断解決へ入力する。自律解決可能な場合は回答を当該工程の委譲起点へ返し、解決不能な場合は停止理由分類でユーザー停止する |
 
-**parent_decision_required の解決拡張**: case-auto は `parent_decision_required` へ列挙された unresolved 判断事項について、現行正規成果物から一意に回答可能なものを自律解決する（REQ-006-112）。外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細は、既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続できる（REQ-006-113）。
+**parent_decision_required の解決拡張**: case-auto は `parent_decision_required` へ列挙された unresolved 判断事項について、現行正規成果物から一意に回答可能なものを自律解決する（REQ-006-112）。
+外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細は、既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続できる（REQ-006-113）。
 
-**resume point の拡張利用**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、既存 resume point（REQ-006-085）から処理を継続する。新規の永続結果型を導入せず、既存 resume point 機構を再利用する（DEC-008 決定5）。resume point の仕様は workflow-contracts SPEC「case-auto への伝播と resume point」節が正である。
+**resume point の拡張利用**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、既存 resume point（REQ-006-085）から処理を継続する。
+新規の永続結果型を導入せず、既存 resume point 機構を再利用する（DEC-008 決定5）。
+resume point の仕様は workflow-contracts SPEC「case-auto への伝播と resume point」節が正である。
 
-**非対象（REQ-015-012 維持）**: case-auto は decision_context の解決において raw finding を解釈、採否、候補反映しない。各 caller command は自身が所有する候補について finding の意味解釈、採否、候補への反映を維持し（REQ-014-006）、raw finding を case-auto へそのまま渡さない（REQ-006-112、AG-006）。
+**非対象（REQ-015-012 維持）**: case-auto は decision_context の解決において raw finding を解釈、採否、候補反映しない。
+各 caller command は自身が所有する候補について finding の意味解釈、採否、候補への反映を維持し（REQ-014-006）、raw finding を case-auto へそのまま渡さない（REQ-006-112、AG-006）。
 
 ### 呼出失敗時の扱い
 
-adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し（REQ-014-010）、呼出元は利用不能を報告した上で従来フローと既存 QG/HITL を維持する。呼出失敗を delegation_type の `delegation-unavailable` とは別個に扱う場合、呼出元は従来フローへのフォールバックを記録する。
+adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し（REQ-014-010）、呼出元は利用不能を報告した上で従来フローと既存 QG/HITL を維持する。
+呼出失敗を delegation_type の `delegation-unavailable` とは別個に扱う場合、呼出元は従来フローへのフォールバックを記録する。
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「正規所有者マトリックス」節（REQ-014-011）との間で意味の重複、矛盾を生じない。委譲契約の一般概念（委譲時最小契約、委譲種別、制約）は本 SPEC の既存節が正であり、adversarial-review 固有の適用のみを本節が所有する。
+本節と adversarial-review SPEC「正規所有者マトリックス」節（REQ-014-011）との間で意味の重複、矛盾を生じない。
+委譲契約の一般概念（委譲時最小契約、委譲種別、制約）は本 SPEC の既存節が正であり、adversarial-review 固有の適用のみを本節が所有する。

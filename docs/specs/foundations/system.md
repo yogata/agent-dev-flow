@@ -13,7 +13,8 @@ status: accepted
 ### AgentDevFlow コマンド群
 
 AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプラインで構成され、開発ワークフローを提供する。
-各コマンドの目的、責務、入出力は後述の表および各コマンド専用 SPEC に記述する。実行エージェントの選定、起動方法は harness の責務であり、本 SPEC の対象外（v2:ADR-0136）。
+各コマンドの目的、責務、入出力は後述の表および各コマンド専用 SPEC に記述する。
+実行エージェントの選定、起動方法は harness の責務であり、本 SPEC の対象外（v2:ADR-0136）。
 
 #### req/case パイプライン
 
@@ -93,10 +94,12 @@ case-run が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、ca
 各Command の11分析軸（公開契約・主要処理段階・分岐・副作用・HITL・並列性・resume・durable state・Harness依存・Capability依存・内部workflow候補）を記載する。
 個別Workflow Skill 移行（Wave 2）および Capability Skill 抽出の参照証拠とする。
 
-本カタログは architecture view である。各項目の権威情報源は以下の所有関係に従う。
+本カタログは architecture view である。
+各項目の権威情報源は以下の所有関係に従う。
 
 - public contract（入出力契約、副作用、安全性、承認境界、stop state、ordering contract）
-  → Command SPEC が正規文書、Command 定義はその実行時投影。両者不一致時は Command SPEC を正とする。
+  → Command SPEC が正規文書、Command 定義はその実行時投影。
+両者不一致時は Command SPEC を正とする。
 - workflow implementation → Workflow Skill
 - durable state contract → Workflow / STEP SPEC
 
@@ -360,7 +363,8 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 ## 代表ケース検証（REQ-027-003、DEC-010/011）
 
-新 workflow model（STEP reference, resume point, Input Resolution, durable state）の妥当性を代表ケース4種で検証した結果（REQ-027-003）。検証基準は workflow-skill-model SPEC、step-reference-contract SPEC、input-resolution-and-durable-state SPEC、DEC-010/011。
+新 workflow model（STEP reference, resume point, Input Resolution, durable state）の妥当性を代表ケース4種で検証した結果（REQ-027-003）。
+検証基準は workflow-skill-model SPEC、step-reference-contract SPEC、input-resolution-and-durable-state SPEC、DEC-010/011。
 
 ### 検証対象と結果
 
@@ -377,13 +381,19 @@ capture-only 型（`learning-capture` スキル等）、read-only-diagnostic 型
 
 ### 検証で発見された問題と修正内容
 
-1. **case-auto Workflow Skill 名の不一致**（Epic #2060 Wave 3 残課題）: PR #2071 と #2072 で case-auto Workflow Skill 名が不一致（`agentdev-workflow-case-auto` と `agentdev-workflow-auto-orchestration`）だった。新アーキテクチャ（DEC-010/011/012 準拠、references 分割、Capability Skill 連携、skill extension 契約）に合致する `agentdev-workflow-case-auto` を正とし、`agentdev-workflow-auto-orchestration` を削除。case-auto.md command の参照11箇所を更新。
-2. **case-auto.md の節参照の不正確さ**: case-auto.md から新SKILL.md への節名参照3箇所（`「adversarial-review 停止伝播（経路H）」節`、`「bounded parent decision resolution」節`、`「コンフリクト解消モデル（3レベルエスカレーション）」節`）が、新SKILL.md の構造（references 配下の STEP 別 reference ファイル）と不一致だった。各参照を `references/stop-and-decision-resolution.md`（STEP-5/6）、`references/conflict-resolution-and-reporting.md`（STEP-7）へ修正。
-3. **`agentdev-intake-pipeline` SKILL.md の STEP model 連携セクション欠落**: 他の Capability Skill（`agentdev-req-analysis`、`agentdev-req-file-manager`、`agentdev-case-run-execution-adapter`）は STEP model 連携セクションを持つが、`agentdev-intake-pipeline` は持たなかった。SKILL.md へ STEP model 連携セクションを追記し、durable state、Input Resolution の扱いを明示。
+1. **case-auto Workflow Skill 名の不一致**（Epic #2060 Wave 3 残課題）: PR #2071 と #2072 で case-auto Workflow Skill 名が不一致（`agentdev-workflow-case-auto` と `agentdev-workflow-auto-orchestration`）だった。
+新アーキテクチャ（DEC-010/011/012 準拠、references 分割、Capability Skill 連携、skill extension 契約）に合致する `agentdev-workflow-case-auto` を正とし、`agentdev-workflow-auto-orchestration` を削除。
+case-auto.md command の参照11箇所を更新。
+2. **case-auto.md の節参照の不正確さ**: case-auto.md から新SKILL.md への節名参照3箇所（`「adversarial-review 停止伝播（経路H）」節`、`「bounded parent decision resolution」節`、`「コンフリクト解消モデル（3レベルエスカレーション）」節`）が、新SKILL.md の構造（references 配下の STEP 別 reference ファイル）と不一致だった。
+各参照を `references/stop-and-decision-resolution.md`（STEP-5/6）、`references/conflict-resolution-and-reporting.md`（STEP-7）へ修正。
+3. **`agentdev-intake-pipeline` SKILL.md の STEP model 連携セクション欠落**: 他の Capability Skill（`agentdev-req-analysis`、`agentdev-req-file-manager`、`agentdev-case-run-execution-adapter`）は STEP model 連携セクションを持つが、`agentdev-intake-pipeline` は持たなかった。
+SKILL.md へ STEP model 連携セクションを追記し、durable state、Input Resolution の扱いを明示。
 
 ### 結論
 
-代表ケース4種全てで新 workflow model が成立する。command が workflow 実装を直接所有するケース（req-define、req-save、spec-save、intake-promote）は Workflow Skill 抽出候補として位置付けられ、Capability Skill 側が STEP model 連携を担うことで部分的 STEP model 適用を許容する。Workflow Skill 抽出済みの case-open/case-close/case-auto/case-run は完全 STEP model 適用で整備済み。
+代表ケース4種全てで新 workflow model が成立する。
+command が workflow 実装を直接所有するケース（req-define、req-save、spec-save、intake-promote）は Workflow Skill 抽出候補として位置付けられ、Capability Skill 側が STEP model 連携を担うことで部分的 STEP model 適用を許容する。
+Workflow Skill 抽出済みの case-open/case-close/case-auto/case-run は完全 STEP model 適用で整備済み。
 
 ## 適用範囲宣言
 

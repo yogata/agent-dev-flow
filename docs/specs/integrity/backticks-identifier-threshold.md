@@ -14,14 +14,17 @@ runtime-package-boundary.md「5 種のリポジトリ種別」表の Type ID 列
 
 ### 適用対象外（PR #1334 事例に基づく明示）
 
-本 SPEC の backticks 機械付与対象は自然言語記述（Markdown 本文）のみであり、以下の構造データは対象外とする。機械横断是正でこれらに backticks を付与してはならない。
+本 SPEC の backticks 機械付与対象は自然言語記述（Markdown 本文）のみであり、以下の構造データは対象外とする。
+機械横断是正でこれらに backticks を付与してはならない。
 
 - YAML frontmatter のキーおよび値（`name:`、`description:`、`id:` 等）。frontmatter 値は YAML スカラー値であり、Markdown インラインコード表記ではない。
 - fenced code block（``` ... ```）内の字句。code block 内は既にコード文脈であり、backticks による追加修飾をしない。
 - inline code（`...`）内の字句。既に backticks で囲まれているため二重付与しない。
 - URL、ファイルパスそのもの（リンクテキスト部は自然言語記述として扱う）。
 
-この対象外範囲は src/opencode/{commands,skills}/**/SKILL.md 等の配布物原本 frontmatter にも適用する。PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 行に誤って backticks が付与され、opencode がスキル名を不正に認識する不具合を引き起こした。本明示により同種の回帰を防止する。
+この対象外範囲は src/opencode/{commands,skills}/**/SKILL.md 等の配布物原本 frontmatter にも適用する。
+PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 行に誤って backticks が付与され、opencode がスキル名を不正に認識する不具合を引き起こした。
+本明示により同種の回帰を防止する。
 
 ## 識別子（backticks 必須）
 

@@ -61,7 +61,9 @@ status: accepted
 
 ## 段階導入運用
 
-本ルールは新規導入であり、baseline 0 で開始する。full audit を即 fail gate 化する。既知の正当な projection-only スキル（`repo-*`）は exemption 対象として検出対象外とする。
+本ルールは新規導入であり、baseline 0 で開始する。
+full audit を即 fail gate 化する。
+既知の正当な projection-only スキル（`repo-*`）は exemption 対象として検出対象外とする。
 
 ## See Also
 

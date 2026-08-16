@@ -65,7 +65,8 @@ QG-2 は REQ-017 execution contract 確定を支援するため、次の検証�
 ### 既存 QG-2 との関係
 
 既存の QG-2 完了条件網羅性検証（REQ 必達要件 → 完了条件 mapping）に加え、
-artifact-specific quality control の投影検証を追加する。既存の7観点は維持する。
+artifact-specific quality control の投影検証を追加する。
+既存の7観点は維持する。
 
 ## 対象外
 

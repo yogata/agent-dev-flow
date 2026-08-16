@@ -26,4 +26,5 @@ status: accepted
 IR-005 は Decision ↔ REQ 双方向参照の存在を検証する（DEC-009 移行後）。
 判定対象 ID は現行 `DEC-\d{3}`（`docs/decisions/` 配下、`v2:` prefix 除外）。
 旧 `ADR-\d{4}` 形式参照が現行 docs に残存する場合、Decision 移行の漏れ（residual）
-として検出する。履歴参照 `v2:ADR-\d{4}` は AG-010 保護対象であり検出対象外。
+として検出する。
+履歴参照 `v2:ADR-\d{4}` は AG-010 保護対象であり検出対象外。

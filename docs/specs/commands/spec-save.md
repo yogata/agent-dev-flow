@@ -68,7 +68,9 @@ req-save の次、case-open の前に実行する。
 
 ## 配置一貫性検証
 
-spec-save は SPEC ファイル保存に先立ち、対象 SPEC の主論理区分・正規所有対象と保存内容の整合を「配置一貫性検証」として検証する（REQ-001-034、REQ-001）。配置一貫性検証は確定済み分類・所有情報と保存先の整合確認であり、「内容品質の再査読」ではない（REQ-001-030 との整合）。内容品質は引き続き req-define QG-1 の責務である。
+spec-save は SPEC ファイル保存に先立ち、対象 SPEC の主論理区分・正規所有対象と保存内容の整合を「配置一貫性検証」として検証する（REQ-001-034、REQ-001）。
+配置一貫性検証は確定済み分類・所有情報と保存先の整合確認であり、「内容品質の再査読」ではない（REQ-001-030 との整合）。
+内容品質は引き続き req-define QG-1 の責務である。
 
 ### 検証項目
 
@@ -85,17 +87,20 @@ spec-save は SPEC ファイル保存に先立ち、対象 SPEC の主論理区�
 
 ### 強制ゲート（保存拒否）の有効化条件
 
-強制ゲート（保存拒否条件: 重複所有、配置不一致）は SPEC 宣言形式（主論理区分、正規所有対象）の定義完了後に有効化する（REQ-001-035）。宣言形式の定義は `../foundations/document-model.md`「SPEC 宣言形式」を正規所有者とし、`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド名（`spec_logical_division`、`canonical_owner`）と一致させる。
+強制ゲート（保存拒否条件: 重複所有、配置不一致）は SPEC 宣言形式（主論理区分、正規所有対象）の定義完了後に有効化する（REQ-001-035）。
+宣言形式の定義は `../foundations/document-model.md`「SPEC 宣言形式」を正規所有者とし、`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド名（`spec_logical_division`、`canonical_owner`）と一致させる。
 
 ### 宣言付与フロー（CREATE/UPDATE）
 
-spec-save は req-define が `artifact_actions` の SPEC action へ出力した `spec_logical_division` と `canonical_owner` を読み取り、CREATE/UPDATE 各操作で SPEC frontmatter または冒頭宣言節（`../foundations/document-model.md`「SPEC 宣言形式」が定義する形式）へ宣言を付与する。CREATE と UPDATE で宣言付与要件を一本化する。
+spec-save は req-define が `artifact_actions` の SPEC action へ出力した `spec_logical_division` と `canonical_owner` を読み取り、CREATE/UPDATE 各操作で SPEC frontmatter または冒頭宣言節（`../foundations/document-model.md`「SPEC 宣言形式」が定義する形式）へ宣言を付与する。
+CREATE と UPDATE で宣言付与要件を一本化する。
 
 - **CREATE**: 新規 SPEC の frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。spec-save が対象 SPEC を宣言なしで完了することを禁止する
 - **UPDATE**: 変更対象 SPEC が frontmatter または冒頭宣言節で当該宣言を未宣言の場合、かつ req-define から渡された分類値が `unknown` 以外に確定している場合に、宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落だけを理由に保存拒否しない、DEC-003 soft-contract）
 - **既存 SPEC の一括更新**: 行わない。未変更 SPEC へ遡及的に宣言を付与しない（REQ-001-035 段階適用）。宣言率指標（`../quality/spec-health-metrics.md`「測定対象と計測方法」参照）が段階的な宣言率向上を追跡する
 
-宣言形式の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」、伝播フィールドの schema の正規所有者は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」である。本節は宣言付与の実行ステップを定義する。
+宣言形式の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」、伝播フィールドの schema の正規所有者は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」である。
+本節は宣言付与の実行ステップを定義する。
 
 ### 段階適用
 
@@ -109,17 +114,21 @@ spec-save は req-define が `artifact_actions` の SPEC action へ出力した 
 | (d) 新規/変更 SPEC 強制 | 新規作成、または変更がある SPEC に対して配置一貫性検証を強制する |
 | (e) 全件強制 | 全 SPEC に対して配置一貫性検証を強制する |
 
-bootstrap 問題（宣言前に強制すると既存 SPEC 処理不能）を避けるため、強制は段階的に有効化する。各ステップの移行条件、タイミングは別途 inspect/backlog 経由で判断する。
+bootstrap 問題（宣言前に強制すると既存 SPEC 処理不能）を避けるため、強制は段階的に有効化する。
+各ステップの移行条件、タイミングは別途 inspect/backlog 経由で判断する。
 
 ### 検証と内容品質の責務分離
 
-配置一貫性検証は配置先の整合確認であり、内容品質の再査読ではない。内容品質は req-define QG-1 の責務（REQ-001-030）。spec-save が配置一貫性検証で不一致を検出した場合、保存を停止するが、内容品質の再評価は実施しない。
+配置一貫性検証は配置先の整合確認であり、内容品質の再査読ではない。
+内容品質は req-define QG-1 の責務（REQ-001-030）。
+spec-save が配置一貫性検証で不一致を検出した場合、保存を停止するが、内容品質の再評価は実施しない。
 
 ## target_area ベースのセクション置換ロジック
 
 `operation: update` / `operation: spec-update` において action の `target_area` が指定された場合、spec-save は対象 SPEC ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-001-027、REQ-008-058）。
 
-SPEC operation の公式 enum は `create` / `update` であり、`spec-append` は既存 SPEC ファイルへ新規セクションを追加する alias として `update` へ映射される（REQ-008-058）。`spec-append` の配置契約は後段「spec-append 操作時のセクション追加ロジック」に定める。
+SPEC operation の公式 enum は `create` / `update` であり、`spec-append` は既存 SPEC ファイルへ新規セクションを追加する alias として `update` へ映射される（REQ-008-058）。
+`spec-append` の配置契約は後段「spec-append 操作時のセクション追加ロジック」に定める。
 
 ### マッチング規則
 
@@ -145,7 +154,8 @@ SPEC operation の公式 enum は `create` / `update` であり、`spec-append` 
 
 ### spec-append operation の処理
 
-`operation: spec-append` の場合、spec-save は既存 SPEC ファイルへ新規セクションを追加する（REQ-008-058）。本操作は `target_area`（追加対象の見出し行全体）と `placement`（追加位置指示）で追加対象を特定し、`placement` が `tail` 以外の場合は `anchor` 見出し行を基準に挿入位置を算出する。
+`operation: spec-append` の場合、spec-save は既存 SPEC ファイルへ新規セクションを追加する（REQ-008-058）。
+本操作は `target_area`（追加対象の見出し行全体）と `placement`（追加位置指示）で追加対象を特定し、`placement` が `tail` 以外の場合は `anchor` 見出し行を基準に挿入位置を算出する。
 
 主な処理（配置契約の実行詳細は後段「spec-append 操作時のセクション追加ロジック」セクションが正規所有する）:
 
@@ -156,7 +166,8 @@ SPEC operation の公式 enum は `create` / `update` であり、`spec-append` 
 
 ### search-target-area.ts 契約
 
-target_area 見出し検索は `agentdev-spec-file-manager/scripts/src/search-target-area.ts`（SPEC 固有決定的処理）へ委譲する（REQ-0136-029）。本 script は次の契約に従う。
+target_area 見出し検索は `agentdev-spec-file-manager/scripts/src/search-target-area.ts`（SPEC 固有決定的処理）へ委譲する（REQ-0136-029）。
+本 script は次の契約に従う。
 
 - 見出し行全体との完全一致のみを受け付ける。前方一致、後方一致、部分一致は受け付けない
 - 入力正規化: `target_area` に Markdown 見出しプレフィックス（`##`、`###` 等）が含まれる場合、比較前にプレフィックスを除去して見出しテキスト部分へ正規化する（`## セクション名` と `セクション名` は同一に扱う）
@@ -165,7 +176,9 @@ target_area 見出し検索は `agentdev-spec-file-manager/scripts/src/search-ta
 
 ## spec-append 操作時のセクション追加ロジック
 
-`operation: spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。`target_area`（追加対象の見出し行全体）で追加対象の見出しを特定し、`placement` と `anchor` で挿入位置を指示する。契約の正規所有は `../responsibilities/artifact-contracts.md`「spec-append operation」、本節は配置契約の実行詳細を正規所有する。
+`operation: spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。
+`target_area`（追加対象の見出し行全体）で追加対象の見出しを特定し、`placement` と `anchor` で挿入位置を指示する。
+契約の正規所有は `../responsibilities/artifact-contracts.md`「spec-append operation」、本節は配置契約の実行詳細を正規所有する。
 
 ### 入力契約
 
@@ -184,7 +197,9 @@ target_area 見出し検索は `agentdev-spec-file-manager/scripts/src/search-ta
 | `after_anchor` | `anchor` 見出し行の直後（`anchor` セクション本文の先頭） |
 | `before_anchor` | `anchor` 見出し行の直前 |
 
-`tail` は `anchor` を参照せず SPEC ファイル末尾へ新規セクションを追加する。`after_anchor` は `anchor` セクション本文の先頭へ挿入する。`before_anchor` は `anchor` セクションの前に新規セクションを挿入する。
+`tail` は `anchor` を参照せず SPEC ファイル末尾へ新規セクションを追加する。
+`after_anchor` は `anchor` セクション本文の先頭へ挿入する。
+`before_anchor` は `anchor` セクションの前に新規セクションを挿入する。
 
 ### anchor マッチング規則
 
@@ -209,11 +224,14 @@ target_area 見出し検索は `agentdev-spec-file-manager/scripts/src/search-ta
 
 ### 後方互換（create / spec-create / update / spec-update）
 
-`spec-append` は新規 alias であり、既存の `create` / `spec-create` / `update` / `spec-update` 動作は従来通り維持する。`spec-append` が指定された場合のみ本節のロジックを適用する。
+`spec-append` は新規 alias であり、既存の `create` / `spec-create` / `update` / `spec-update` 動作は従来通り維持する。
+`spec-append` が指定された場合のみ本節のロジックを適用する。
 
 ## Artifact Graph 利用
 
-spec-save は対応 REQ、同一または関連 canonical owner を持つ SPEC、関連 command, skill, integrity rule の探索に Artifact Graph を利用できる。Graph は候補提供者であり、target_area, 正規配置先, SPEC 操作分類の最終判断は正規成果物本文と独立探索手段での確認後に下す。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+spec-save は対応 REQ、同一または関連 canonical owner を持つ SPEC、関連 command, skill, integrity rule の探索に Artifact Graph を利用できる。
+Graph は候補提供者であり、target_area, 正規配置先, SPEC 操作分類の最終判断は正規成果物本文と独立探索手段での確認後に下す。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 

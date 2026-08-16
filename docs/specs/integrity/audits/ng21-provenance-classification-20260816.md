@@ -35,7 +35,8 @@ captured_at_head: 40b5d880
 
 ## 2. 由来分類表（21件全件）
 
-由来ラベルは legacy / superseded / AUTOGEN / 実欠陥 の4種とする。解消状態は fixed-here（本 OU で修正）/ already-resolved-by-OU-001（Wave 1 で解消済み）/ regenerated-here（本 OU で AUTOGEN 再生成）/ approved-baseline-entry（承認済み baseline entry として管理）の4種とする。
+由来ラベルは legacy / superseded / AUTOGEN / 実欠陥 の4種とする。
+解消状態は fixed-here（本 OU で修正）/ already-resolved-by-OU-001（Wave 1 で解消済み）/ regenerated-here（本 OU で AUTOGEN 再生成）/ approved-baseline-entry（承認済み baseline entry として管理）の4種とする。
 
 | # | 検出 | 対象 | 観測内容 | 由来ラベル | 解消手段 | 解消状態 |
 |---|---|---|---|---|---|---|
@@ -77,11 +78,13 @@ captured_at_head: 40b5d880
 | regenerated-here | 2 | N20, N21 |
 | approved-baseline-entry | 4 | N01, N15, N16, N17 |
 
-N03〜N11 の深さ不足は、audits/・baselines/ サブディレクトリ配下への移設時に相対リンクの深さを更新しなかった移設起因である。同一ディレクトリの `classification-20260811.md`・`cross-cutting-integration-design-20260811.md` が当初から `../../../` 表記であることが、修正後の表記の妥当性の根拠である。
+N03〜N11 の深さ不足は、audits/・baselines/ サブディレクトリ配下への移設時に相対リンクの深さを更新しなかった移設起因である。
+同一ディレクトリの `classification-20260811.md`・`cross-cutting-integration-design-20260811.md` が当初から `../../../` 表記であることが、修正後の表記の妥当性の根拠である。
 
 ## 3. NG=21 外の warning レベルの扱い
 
-元観測時点で warning 12 件（Decision 引用 11 件、ir035 See Also 1 件）があり、本 OU の分類対象外である。ただし完了条件「新規かつ未管理の NG が 0 件」の達成性に関わるため、以下の処置を行った。
+元観測時点で warning 12 件（Decision 引用 11 件、ir035 See Also 1 件）があり、本 OU の分類対象外である。
+ただし完了条件「新規かつ未管理の NG が 0 件」の達成性に関わるため、以下の処置を行った。
 
 | 区分 | 件数 | 処置 |
 |---|---|---|
@@ -91,7 +94,8 @@ N03〜N11 の深さ不足は、audits/・baselines/ サブディレクトリ配�
 
 ## 4. 承認済み baseline entry
 
-`.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json` へ `--update-ng-baseline --ng-baseline-additions` で追加した承認済み entry の一覧。各 entry は provenance（由来ラベル）と reason（承認理由）を持つ。
+`.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json` へ `--update-ng-baseline --ng-baseline-additions` で追加した承認済み entry の一覧。
+各 entry は provenance（由来ラベル）と reason（承認理由）を持つ。
 
 | bucket（category/check/file） | 件数 | provenance | 承認理由の要旨 |
 |---|---|---|---|
@@ -110,7 +114,9 @@ N03〜N11 の深さ不足は、audits/・baselines/ サブディレクトリ配�
 | 元観測時点（メインリポジトリ、Wave 1 前） | NG 21 件、Warning 12 件 |
 | 修正・再生成・baseline 適用後 | NG 0 件、Warning 4 件（ir035 の worktree 環境残差のみ）。delta 報告: `4 baseline-known (demoted to info), 14 approved additions (provenance-tracked, demoted to info), 4 new unmanaged NG`。新規かつ未管理 4 件は全て ir035 で junction 未伝播由来（worktree の `.opencode/skills/agentdev-*` は 0 ディレクトリ、メインリポジトリは 48 ディレクトリで See Also 参照先4件すべて実在） |
 
-判定: 21件全件に由来ラベルが付き、実欠陥分類のうち本 OU で修正可能な全件（N02〜N14、N20〜N21）を解消した。残る N01/N15/N16/N17 は provenance・reason を付与した承認済み baseline entry として管理する（`ng-baseline.json` への追加 15 entry = N01/N15/N16/N17 の4件 + Decision 引用 warning 11件）。メインリポジトリ（junction 実在環境）では新規かつ未管理の NG は 0 件となる。
+判定: 21件全件に由来ラベルが付き、実欠陥分類のうち本 OU で修正可能な全件（N02〜N14、N20〜N21）を解消した。
+残る N01/N15/N16/N17 は provenance・reason を付与した承認済み baseline entry として管理する（`ng-baseline.json` への追加 15 entry = N01/N15/N16/N17 の4件 + Decision 引用 warning 11件）。
+メインリポジトリ（junction 実在環境）では新規かつ未管理の NG は 0 件となる。
 
 回帰確認: `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/` 全 1991 test 合格（83 ファイル、fail 0）。
 
