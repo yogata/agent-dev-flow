@@ -10,11 +10,12 @@ updated: 2026-07-24
 複数文書種別で共有する決定的検証 script、共有ライブラリ、公開検証契約、JSON 結果契約を担う検証 skill の仕様を定める。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
-> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001, REQ-001）。
+> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 
 ## 目的
 
-REQ/Decision/SPEC 操作で共有される決定的検証 script（frontmatter 整合性、エントリ存在確認、変更範囲検証）と共有ライブラリの正規所有者を一つに定め、兄弟 skill、command からの内部 script 直接参照を禁止し、公開検証契約への委譲を促す。REQ、Decision、SPEC 固有の内容判断を行わず、決定的検証のみを所有する検証 skill の責務、対象外、境界を定義する。
+REQ/Decision/SPEC 操作で共有される決定的検証 script（frontmatter 整合性、エントリ存在確認、変更範囲検証）と共有ライブラリの正規所有者を一つに定め、兄弟 skill、command からの内部 script 直接参照を禁止し、公開検証契約への委譲を促す。
+REQ、Decision、SPEC 固有の内容判断を行わず、決定的検証のみを所有する検証 skill の責務、対象外、境界を定義する。
 
 ## 適用対象
 
@@ -59,7 +60,9 @@ REQ/Decision/SPEC 操作で共有される決定的検証 script（frontmatter �
 
 ## 境界
 
-REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `agentdev-decision-file-manager`、SPEC 固有 script は `agentdev-spec-file-manager` が所有する。利用側は本 skill の内部 script を直接参照せず、公開検証契約へ委譲する。同一 script または共有 lib を複製しない。
+REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `agentdev-decision-file-manager`、SPEC 固有 script は `agentdev-spec-file-manager` が所有する。
+利用側は本 skill の内部 script を直接参照せず、公開検証契約へ委譲する。
+同一 script または共有 lib を複製しない。
 
 ## 対象外
 

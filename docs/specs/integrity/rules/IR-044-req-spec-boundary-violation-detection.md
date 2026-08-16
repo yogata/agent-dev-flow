@@ -24,11 +24,15 @@ updated: 2026-06-28
 
 ## IR-044 exemption 条件
 
-IR-044 の exemption は META 規則行（機械的行構造マッチ）のみに限定する（REQ-010-259, REQ-010-002, REQ-010-012）。文脈解釈を要する免除（isNegationContext / isDelegationContext / isMetaScopeRuleContext / isBehaviorPredicateContext / IR044_STABLE_CONTRACT_PATTERN）は docs-check から廃止し inspect-docs へ委譲した（REQ-010-262）。
+IR-044 の exemption は META 規則行（機械的行構造マッチ）のみに限定する（REQ-010-259, REQ-010-002, REQ-010-012）。
+文脈解釈を要する免除（isNegationContext / isDelegationContext / isMetaScopeRuleContext / isBehaviorPredicateContext / IR044_STABLE_CONTRACT_PATTERN）は docs-check から廃止し inspect-docs へ委譲した（REQ-010-262）。
 
 **META 規則行 exemption（機械判定のみ）**:
 
-REQ/SPEC 責務範囲を規定する META 規則行（enum/format/schema 等 SPEC 対象種別を名指しして責務境界を宣言する行）を機械的に判定し免除する。判定は行構造のパターンマッチに限定し、意味判断は含めない。検出パターン拡張により新たに META 規則行として機械免除可能と確定した件は、本表の判定基準へ反映する。個別 REQ-ID をホワイトリストとして列挙せず、行構造パターンを拡張し、件数・内容を規定する行は引き続き免除しない（REQ-010-012）。
+REQ/SPEC 責務範囲を規定する META 規則行（enum/format/schema 等 SPEC 対象種別を名指しして責務境界を宣言する行）を機械的に判定し免除する。
+判定は行構造のパターンマッチに限定し、意味判断は含めない。
+検出パターン拡張により新たに META 規則行として機械免除可能と確定した件は、本表の判定基準へ反映する。
+個別 REQ-ID をホワイトリストとして列挙せず、行構造パターンを拡張し、件数・内容を規定する行は引き続き免除しない（REQ-010-012）。
 
 実装（`check_integrity.ts` `isMetaRuleLine()`）は次の4パターンで META 規則行を機械判定する。いずれも `hasCountOrContentRule`（件数・内容規定）を含む行は予防的ガード句（REQ-010-013）により免除を拒否する:
 
@@ -46,7 +50,8 @@ REQ/SPEC 責務範囲を規定する META 規則行（enum/format/schema 等 SPE
 
 **inspect-docs へ委譲した文脈免除（docs-check 対象外）**:
 
-意味判断を要するため inspect-docs へ委譲すると確定した件は、本表へ追記、または既存区分の適用例として明記する。docs-check 側での機械免除は行わない（REQ-010-259/262, REQ-010-002 準拠）。
+意味判断を要するため inspect-docs へ委譲すると確定した件は、本表へ追記、または既存区分の適用例として明記する。
+docs-check 側での機械免除は行わない（REQ-010-259/262, REQ-010-002 準拠）。
 
 | 文脈 | 委譲先 | 根拠 |
 |------|--------|------|
@@ -60,13 +65,23 @@ REQ/SPEC 責務範囲を規定する META 規則行（enum/format/schema 等 SPE
 
 **true positive 保護（回帰テスト）**:
 
-回帰テストで既知の true positive（SPEC 詳細が REQ に残留している実例）が META 規則行 exemption により誤って免除されないことを検証する（REQ-010-259, REQ-010-055 準拠）。保護対象の真陽性は件数・内容を規定する SPEC 詳細の残留であり、META 規則行（責務範囲規定）には該当しないことをテストで固定する。
+回帰テストで既知の true positive（SPEC 詳細が REQ に残留している実例）が META 規則行 exemption により誤って免除されないことを検証する（REQ-010-259, REQ-010-055 準拠）。
+保護対象の真陽性は件数・内容を規定する SPEC 詳細の残留であり、META 規則行（責務範囲規定）には該当しないことをテストで固定する。
 
-**是正済み経緯（保護対象から除外）**: REQ-006-082、REQ-010-008 は #1109 PR で SPEC 詳細が REQ から SPEC へ移行済みであり、真陽性保護対象から除外する（REQ-010-017）。当該 REQ は SPEC 詳細を残留させないため META 規則行 exemption の誤免除検証の根拠とならない。保護対象の真陽性は、件数・内容を規定する SPEC 詳細の残留実例に限定する。この明記により RU-0011（検出ロジック改良）実施前に同箇所を根拠としたテスト設計の前提崩壊を防ぐ。REQ-004-070、REQ-003-007 は Step 番号直接参照から機能名・フェーズ名参照へ是正済みであり、真陽性保護対象から除外する。当該 REQ は Step 番号直接参照を残留させないため、Step 番号検出の回帰テスト根拠とならない（REQ-001-031 の case-open 由来）。true positive として新たに分類し SPEC 詳細を切り出した件は、対象 REQ-ID、切り出し先 SPEC、command reference または skill reference の区別、是正根拠 PR 番号を本欄へ追記し、保護対象から除外する（REQ-010-017 準拠）。#1335（RU-0011）で true positive に分類し是正した件: REQ-010-258（fixture copy のミラーリング実装詳細を SPEC `integrity-rule-catalog.md`「regression test fixture mirroring 方式」へ切り出し、REQ 側は外部契約の要約へ置換）、REQ-006-099（Step 番号直接参照 `Step 1-5, 7-8`/`Step 6` をフェーズ名参照へ置換、REQ-001-031 準拠）、REQ-010-016（テストファイルパス `scripts/tests/check_integrity.test.ts`/`scripts/check_integrity.test.ts` を SPEC `integrity-rule-catalog.md`「check_integrity test suite 責務分担」へ切り出し済み、REQ 側は外部契約の要約へ置換）。当該 REQ は SPEC 詳細を残留させないため、回帰テストの真陽性保護根拠とならない。
+**是正済み経緯（保護対象から除外）**: REQ-006-082、REQ-010-008 は #1109 PR で SPEC 詳細が REQ から SPEC へ移行済みであり、真陽性保護対象から除外する（REQ-010-017）。
+当該 REQ は SPEC 詳細を残留させないため META 規則行 exemption の誤免除検証の根拠とならない。
+保護対象の真陽性は、件数・内容を規定する SPEC 詳細の残留実例に限定する。
+この明記により RU-0011（検出ロジック改良）実施前に同箇所を根拠としたテスト設計の前提崩壊を防ぐ。
+REQ-004-070、REQ-003-007 は Step 番号直接参照から機能名・フェーズ名参照へ是正済みであり、真陽性保護対象から除外する。
+当該 REQ は Step 番号直接参照を残留させないため、Step 番号検出の回帰テスト根拠とならない（REQ-001-031 の case-open 由来）。
+true positive として新たに分類し SPEC 詳細を切り出した件は、対象 REQ-ID、切り出し先 SPEC、command reference または skill reference の区別、是正根拠 PR 番号を本欄へ追記し、保護対象から除外する（REQ-010-017 準拠）。
+#1335（RU-0011）で true positive に分類し是正した件: REQ-010-258（fixture copy のミラーリング実装詳細を SPEC `integrity-rule-catalog.md`「regression test fixture mirroring 方式」へ切り出し、REQ 側は外部契約の要約へ置換）、REQ-006-099（Step 番号直接参照 `Step 1-5, 7-8`/`Step 6` をフェーズ名参照へ置換、REQ-001-031 準拠）、REQ-010-016（テストファイルパス `scripts/tests/check_integrity.test.ts`/`scripts/check_integrity.test.ts` を SPEC `integrity-rule-catalog.md`「check_integrity test suite 責務分担」へ切り出し済み、REQ 側は外部契約の要約へ置換）。
+当該 REQ は SPEC 詳細を残留させないため、回帰テストの真陽性保護根拠とならない。
 
 ## IR-044 Step 番号直接参照検出
 
-REQ-001-031 が宣言する「現行 REQ の要件行は command 定義または SPEC の Step 番号を直接参照せず、機能名・フェーズ名で参照する」原則に基づく検出セクション（REQ-001-031 の検出委譲先 SPEC 配置）。本セクションは Step 番号直接参照パターンの機械検出仕様を規定し、exemption 境界を明示する。
+REQ-001-031 が宣言する「現行 REQ の要件行は command 定義または SPEC の Step 番号を直接参照せず、機能名・フェーズ名で参照する」原則に基づく検出セクション（REQ-001-031 の検出委譲先 SPEC 配置）。
+本セクションは Step 番号直接参照パターンの機械検出仕様を規定し、exemption 境界を明示する。
 
 **検出パターン（機械判定）**:
 
@@ -78,11 +93,15 @@ Step 番号直接参照は次の正規表現パターンで検出する（実装
 | `ステップ N`（カタカナ、範囲含む） | `ステップ\s*\d+(?:\s*[-–]\s*\d+)?` | `ステップ 3`、`ステップ3` |
 | `手順 N`（漢字、範囲含む） | `手順\s*\d+(?:\s*[-–]\s*\d+)?` | `手順 4`、`手順4-5` |
 
-N は数字（`\d+`）。範囲表現（`N-M`、`N–M`）を含む。検出対象は現行 REQ 要件行（`| REQ-NNNN-NNN | description |` 形式のテーブル行）のみ。
+N は数字（`\d+`）。
+範囲表現（`N-M`、`N–M`）を含む。
+検出対象は現行 REQ 要件行（`| REQ-NNNN-NNN | description |` 形式のテーブル行）のみ。
 
 **非検出語句（false positive 抑制）**:
 
-次の語句は数字リテラルを伴わない「番号」語であり、検出対象外とする。これにより原則宣言の META 規則行（REQ-001-031 自身を含む）が語句「Step 番号」を含んでも true positive として誤検知されない。本境界は語句と数字リテラルの機械的区別により保証し、文脈免除に依存しない。
+次の語句は数字リテラルを伴わない「番号」語であり、検出対象外とする。
+これにより原則宣言の META 規則行（REQ-001-031 自身を含む）が語句「Step 番号」を含んでも true positive として誤検知されない。
+本境界は語句と数字リテラルの機械的区別により保証し、文脈免除に依存しない。
 
 | 語句 | 取扱い | 根拠 |
 |------|--------|------|
@@ -91,11 +110,15 @@ N は数字（`\d+`）。範囲表現（`N-M`、`N–M`）を含む。検出対�
 
 **exemption 条件（Step 番号直接参照固有）**:
 
-Step 番号直接参照パターンは他の SPEC 詳細キーワードと同じく META 規則行 exemption のみを適用する。Step 番号直接参照に固有の文脈免除は設けない。SPEC ファイル、コマンドリファレンス、テスト戦略セクションにおける Step 番号参照は対象外（`affected_artifacts: [現行 REQ]`）であり、exemption ではなく検出スコープ外として扱う。文脈解釈を要する免除は inspect-docs へ委譲する（REQ-010-002, REQ-010-012）。
+Step 番号直接参照パターンは他の SPEC 詳細キーワードと同じく META 規則行 exemption のみを適用する。
+Step 番号直接参照に固有の文脈免除は設けない。
+SPEC ファイル、コマンドリファレンス、テスト戦略セクションにおける Step 番号参照は対象外（`affected_artifacts: [現行 REQ]`）であり、exemption ではなく検出スコープ外として扱う。
+文脈解釈を要する免除は inspect-docs へ委譲する（REQ-010-002, REQ-010-012）。
 
 **severity / 分類**:
 
-Step 番号直接参照は REQ レベルの記述制約違反（REQ-001-031）であり、IR-044 全体と同じく severity: `heuristic`、category: `canonical-conflict` に分類する。REQ 要件行が SPEC 詳細（Step 番号）へ依存すると SPEC↔command の Step 構成変更が REQ 側へ波及し、REQ と SPEC の責務分離（REQ-001 体系）を損なう。
+Step 番号直接参照は REQ レベルの記述制約違反（REQ-001-031）であり、IR-044 全体と同じく severity: `heuristic`、category: `canonical-conflict` に分類する。
+REQ 要件行が SPEC 詳細（Step 番号）へ依存すると SPEC↔command の Step 構成変更が REQ 側へ波及し、REQ と SPEC の責務分離（REQ-001 体系）を損なう。
 
 **回帰テスト**:
 

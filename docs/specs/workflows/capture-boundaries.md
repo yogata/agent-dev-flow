@@ -71,18 +71,22 @@ PR 本文の capture 関連セクションは以下を分離する:
 
 ### CaptureBoundary 検査の例外判定規則
 
-CaptureBoundary 検査（`check_integrity.ts` の `command-capture-duty`）は、上記 capture 責務表を起点とした一般規則で例外を判定する。command ごとの固定例外リストは持たない。
+CaptureBoundary 検査（`check_integrity.ts` の `command-capture-duty`）は、上記 capture 責務表を起点とした一般規則で例外を判定する。
+command ごとの固定例外リストは持たない。
 
 判定規則は次のとおり。
 
 - capture 責務表の intake または learning 列が「各工程の保存結果参照と件数集計のみ」または「非関与」と定義する command は、`capture-boundaries` 参照を個別に持たなくても CaptureBoundary 検査の検出対象としない。
 - capture 責務表の intake または learning 列が具体的な責務記述（PR 本文記録、回収、自工程 deviation capture、REQ 再構成 intake 生成等）である command は、`capture-boundaries` 参照を個別に持ち、対応する capture 導線を実装する。
 
-例外の根拠は本 capture 責務表である。同表は case-auto の intake、learning をともに「各工程の保存結果参照と件数集計のみ」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
+例外の根拠は本 capture 責務表である。
+同表は case-auto の intake、learning をともに「各工程の保存結果参照と件数集計のみ」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。
+v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
 
 ## 工程別 capture 責務
 
-主ワークフロー構成 6 工程（req-save / spec-save / case-open / case-run / case-close / case-auto）の capture 責務、保存先、git 永続化担当を工程別に定義する。各工程分散型（選択肢A、REQ-006-021 / REQ-006-105〜108）に従う。
+主ワークフロー構成 6 工程（req-save / spec-save / case-open / case-run / case-close / case-auto）の capture 責務、保存先、git 永続化担当を工程別に定義する。
+各工程分散型（選択肢A、REQ-006-021 / REQ-006-105〜108）に従う。
 
 ### 工程別 capture 責務表
 
@@ -97,14 +101,16 @@ CaptureBoundary 検査（`check_integrity.ts` の `command-capture-duty`）は�
 
 ### 委譲契約（Command→Skill 依存方向）
 
-各 command は Command→Skill 依存方向（`docs/specs/responsibilities/artifact-contracts.md`「依存方向」参照）に従い、capture 成果物の生成を Skill へ委譲する。command は `intake-capture` 等の他 command を呼び出さない。
+各 command は Command→Skill 依存方向（`docs/specs/responsibilities/artifact-contracts.md`「依存方向」参照）に従い、capture 成果物の生成を Skill へ委譲する。
+command は `intake-capture` 等の他 command を呼び出さない。
 
 | 種別 | 委譲先 Skill | 役割 |
 |---|---|---|
 | learning | `agentdev-learning-capture` skill | 失敗、回避、修正、判断ミスの知見抽出と `inbox.md` エントリ生成 |
 | intake | `agentdev-intake-pipeline` skill | 作業候補、不整合、規約違反の item 生成操作 |
 
-git 永続化（commit、push）は呼出元 command が担う。Skill は候補生成と file 書き込みまでを担い、commit 実行は委譲しない。
+git 永続化（commit、push）は呼出元 command が担う。
+Skill は候補生成と file 書き込みまでを担い、commit 実行は委譲しない。
 
 ### Epic Issue 単一書き手制約（case-close 経由）
 
@@ -116,7 +122,8 @@ Epic Issue 本文（ステータス追跡テーブル）の更新は `case-close
 
 ### 完了報告（Capture結果）
 
-各 command の完了報告には `Capture結果` 小節を含める。共通意味契約は `docs/specs/responsibilities/artifact-contracts.md`「Capture結果 小節（共通意味契約）」が正規所有する。
+各 command の完了報告には `Capture結果` 小節を含める。
+共通意味契約は `docs/specs/responsibilities/artifact-contracts.md`「Capture結果 小節（共通意味契約）」が正規所有する。
 
 記載内容:
 
@@ -124,7 +131,8 @@ Epic Issue 本文（ステータス追跡テーブル）の更新は `case-close
 - 分類（intake / learning）
 - 保存結果（成功/失敗、件数、コミットハッシュ等）
 
-capture 本文は完了報告に含めない。具体的な表示構造は各 command-local Template が正規所有する。
+capture 本文は完了報告に含めない。
+具体的な表示構造は各 command-local Template が正規所有する。
 
 ## REQ 再構成 intake
 

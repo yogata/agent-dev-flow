@@ -87,7 +87,8 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 
 ### Epic Issue 完了条件チェックボックス最終評価・更新
 
-Epic status table 更新の後、最終 Wave 判定の前に実施する。Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（REQ-011 完了条件チェックボックス評価の case-close 専任責務、G08 Epic Wave 経路への明示適用）。
+Epic status table 更新の後、最終 Wave 判定の前に実施する。
+Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（REQ-011 完了条件チェックボックス評価の case-close 専任責務、G08 Epic Wave 経路への明示適用）。
 
 #### 評価対象スコープ（QG-4 観点8）
 
@@ -104,7 +105,8 @@ Epic status table 更新の後、最終 Wave 判定の前に実施する。Epic 
 
 #### 未達項目残存時の停止
 
-最終 Wave で実装完了していない完了条件（`- [ ]`）が残る場合、case-close は構造化エラーで停止する（G08 Epic Wave 経路への明示適用）。中間 Wave で他 Wave の完了条件が `[ ]` のまま残ることは停止条件ではない（対象外 Wave の完了条件は評価対象外のため）。
+最終 Wave で実装完了していない完了条件（`- [ ]`）が残る場合、case-close は構造化エラーで停止する（G08 Epic Wave 経路への明示適用）。
+中間 Wave で他 Wave の完了条件が `[ ]` のまま残ることは停止条件ではない（対象外 Wave の完了条件は評価対象外のため）。
 
 停止時の出力には以下を含める:
 - 残存する未達完了条件の一覧
@@ -144,9 +146,13 @@ Epic status table 更新の後、最終 Wave 判定の前に実施する。Epic 
 
 ## Artifact Graph 利用
 
-case-close は Artifact Graph を変更後の関係整合性検証に利用する。確認対象は Graph の生成と鮮度, Graph integrity, unresolved relation, dangling relation, provenance defect, Graph と独立確認結果との差異である。Graph defect と canonical defect を区別する。
+case-close は Artifact Graph を変更後の関係整合性検証に利用する。
+確認対象は Graph の生成と鮮度, Graph integrity, unresolved relation, dangling relation, provenance defect, Graph と独立確認結果との差異である。
+Graph defect と canonical defect を区別する。
 
-Graph 自体の生成または問い合わせ失敗のみを理由に case-close を失敗させず、fail-open して従来の検証経路で継続する。正規成果物側の実不整合が確認された場合は既存の品質ゲート, 受け入れ条件に従って fail とする。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+Graph 自体の生成または問い合わせ失敗のみを理由に case-close を失敗させず、fail-open して従来の検証経路で継続する。
+正規成果物側の実不整合が確認された場合は既存の品質ゲート, 受け入れ条件に従って fail とする。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
 
 ## 参照する横断 SPEC
 
@@ -159,16 +165,19 @@ Graph 自体の生成または問い合わせ失敗のみを理由に case-close
 
 ## targeted docs guard (v2:REQ-0158-003)
 
-case-close 工程で targeted docs guard を実行する。対象は PR で変更されたファイルと連動ファイル（`docs/README.md`、`docs/specs/README.md`）。
+case-close 工程で targeted docs guard を実行する。
+対象は PR で変更されたファイルと連動ファイル（`docs/README.md`、`docs/specs/README.md`）。
 
-changed-path routing と配布依存境界の検出経路は共有境界 adapter へ接続する（DEC-014）。最終 gate 基底は REQ-010-012 を再利用し、検査エラー（検査対象欠落、読込不能、未分類エントリ、adapter 起動失敗）は gate-not-passed として扱い、clean として通過させない（DEC-014 決定5、`integrity/distribution-boundary.md`「検査エラーの意味」）。
+changed-path routing と配布依存境界の検出経路は共有境界 adapter へ接続する（DEC-014）。
+最終 gate 基底は REQ-010-012 を再利用し、検査エラー（検査対象欠落、読込不能、未分類エントリ、adapter 起動失敗）は gate-not-passed として扱い、clean として通過させない（DEC-014 決定5、`integrity/distribution-boundary.md`「検査エラーの意味」）。
 
 - 実行タイミング: docs/ 検証の一部。変更ファイル対象の targeted docs guard を実行し、draft→accepted 等の SPEC status 変更時の `docs/specs/README.md` 同期、Issue/PR で宣言した文書更新対象と実変更ファイルの対応、旧SPEC直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、full docs-check 実行要否判定を行う
 - 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`。PR 変更ファイル一覧は PR 補助データ読込手続き（`agentdev-gh-cli`）で `gh pr view <PR> --json files` から取得する（case-close はマージ後 main 環境で実行されるため `--files` を使用。`--base-ref` は worktree 環境（マージ前、case-run 等）向け）
 - `full_docs_check_recommended` が true の場合: case-close 完了判定の追加確認として扱う。integrity rule 追加・削除・大幅変更、docs/specs の大規模移動・改名、repo-agentdev-integrity の検査スコープ変更、文書分類・責務境界の基準変更を検出した場合は `/repo/docs-check`（全体監査）の実行を推奨する
 - 失敗時: 検査対象文書（PR 変更ファイル、`docs/specs/README.md`、`docs/README.md`）を修正して再実行する
 
-JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。`failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
+JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。
+`failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
 
 ### case-close が使用する検査ツール
 
@@ -184,11 +193,15 @@ case-close は check_integrity.ts（全体監査）を使用しない（case-clo
 
 ### files_checked 空時の取扱い（REQ-006-030, v2:REQ-0158 Phase 3）
 
-targeted docs guard（check_changed_docs.ts）の実行結果で `files_checked` が空の場合、検査対象ファイルが検出されなかったことを示す。case-close は `--files` で PR 変更ファイル一覧を指定するため、Phase 3 契約により FAILURE（exit code 非ゼロ）として報告される。
+targeted docs guard（check_changed_docs.ts）の実行結果で `files_checked` が空の場合、検査対象ファイルが検出されなかったことを示す。
+case-close は `--files` で PR 変更ファイル一覧を指定するため、Phase 3 契約により FAILURE（exit code 非ゼロ）として報告される。
 
 #### check_changed_docs.ts 側の出力（v2:REQ-0158 Phase 3）
 
-`--files` 指定で `files_checked` が空の場合、`failures` 配列に severity `strict` の FAILURE を追加する（exit code 非ゼロ）。メッセージは対象ファイルが検出されなかった旨を示す。`--base-ref` 指定で空の場合は WARNING となる（case-close は `--files` を使用するため対象外）。check_changed_docs.ts は対象選定の十分性を判定せず、対象ファイル未検出のみを報告する。
+`--files` 指定で `files_checked` が空の場合、`failures` 配列に severity `strict` の FAILURE を追加する（exit code 非ゼロ）。
+メッセージは対象ファイルが検出されなかった旨を示す。
+`--base-ref` 指定で空の場合は WARNING となる（case-close は `--files` を使用するため対象外）。
+check_changed_docs.ts は対象選定の十分性を判定せず、対象ファイル未検出のみを報告する。
 
 #### case-close 側の確認ステップ
 
@@ -204,9 +217,12 @@ case-close は targeted docs guard が FAILURE を返した場合、以下を行
 
 #### verification-only PR の files_checked 空確認（v2:REQ-0158-002）
 
-verification-only PR（実装差分0件、検証のみで作成された PR）の場合、`files_checked` が空になることが正規の状態として発生する。case-close は次の手順で verification-only 判定を行い、正当と判断された場合に PASS 処理する。要件の SSoT は v2:REQ-0158-002、verification-only PR の定義と case-run 側引継ぎ注意事项は [case-run.md](case-run.md)「verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）」参照。
+verification-only PR（実装差分0件、検証のみで作成された PR）の場合、`files_checked` が空になることが正規の状態として発生する。
+case-close は次の手順で verification-only 判定を行い、正当と判断された場合に PASS 処理する。
+要件の SSoT は v2:REQ-0158-002、verification-only PR の定義と case-run 側引継ぎ注意事项は [case-run.md](case-run.md)「verification-only PR（実装差分なし、検証のみ）（v2:REQ-0158-002）」参照。
 
-PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。case-close は PR 本文の verify-only 根拠欄を読み、記載が不十分な場合は PASS としない。
+PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。
+case-close は PR 本文の verify-only 根拠欄を読み、記載が不十分な場合は PASS としない。
 
 **判定基準（全て満たすこと）**:
 
@@ -216,11 +232,15 @@ PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-template
 
 **PASS 処理**:
 
-上記3項目を全て満たす場合、case-close は verification-only PR と判定し、files_checked 空の FAILURE を PASS 処理する。判定根拠（PR 本文の verify-only 根拠欄の参照、`gh pr view --json files` の空配列確認）を完了報告に記録する。根拠欄の記載が不十分な場合は PASS としない。
+上記3項目を全て満たす場合、case-close は verification-only PR と判定し、files_checked 空の FAILURE を PASS 処理する。
+判定根拠（PR 本文の verify-only 根拠欄の参照、`gh pr view --json files` の空配列確認）を完了報告に記録する。
+根拠欄の記載が不十分な場合は PASS としない。
 
 **false-clean 3層防御との相互作用**:
 
-v2:REQ-0158「case-close 向け false-clean 予防」節は files_checked 空を silent pass としないための3層防御（対象空時の warning 報告、`--files` 標準化、files_checked 非空の確認ステップ）を定める。v2:REQ-0158-002 はこの3層防御を回避するものではなく、verification-only の正当性確認により3層防御の警告を吸収する経路を追加する。両者の関係は以下の通り:
+v2:REQ-0158「case-close 向け false-clean 予防」節は files_checked 空を silent pass としないための3層防御（対象空時の warning 報告、`--files` 標準化、files_checked 非空の確認ステップ）を定める。
+v2:REQ-0158-002 はこの3層防御を回避するものではなく、verification-only の正当性確認により3層防御の警告を吸収する経路を追加する。
+両者の関係は以下の通り:
 
 | 層 | v2:REQ-0158 false-clean 予防節 | v2:REQ-0158-002 による相互作用 |
 |---|---|---|

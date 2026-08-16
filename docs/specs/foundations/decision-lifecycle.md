@@ -18,7 +18,9 @@ canonical_owner: decision-lifecycle
 
 ## 目的
 
-Decision の関係モデル、粒度管理規則、健全性評価モデルを正規所有する（REQ-001-061〜064、AG-005、AG-006、AG-017）。Decision は REQ と管理特性を分離し（AG-004）、意味的健全性で粒度を評価し（AG-006）、REQ 重複・分割モデルと分離された健全性評価を持つ（AG-017）。本 SPEC はこれらを Decision 固有の契約として定義し、document-model.md「文書ライフサイクル」から参照される詳細を所有する。
+Decision の関係モデル、粒度管理規則、健全性評価モデルを正規所有する（REQ-001-061〜064、AG-005、AG-006、AG-017）。
+Decision は REQ と管理特性を分離し（AG-004）、意味的健全性で粒度を評価し（AG-006）、REQ 重複・分割モデルと分離された健全性評価を持つ（AG-017）。
+本 SPEC はこれらを Decision 固有の契約として定義し、document-model.md「文書ライフサイクル」から参照される詳細を所有する。
 
 ### 他 SPEC との役割分担
 
@@ -33,7 +35,8 @@ Decision の関係モデル、粒度管理規則、健全性評価モデルを�
 
 ## Decision 関係モデル
 
-Decision 間の意味的関係を追跡可能とする（REQ-001-062、AG-005）。関係は3種類とし、frontmatter `relations` フィールドで宣言する。
+Decision 間の意味的関係を追跡可能とする（REQ-001-062、AG-005）。
+関係は3種類とし、frontmatter `relations` フィールドで宣言する。
 
 ### 関係タイプ enum
 
@@ -43,7 +46,9 @@ Decision 間の意味的関係を追跡可能とする（REQ-001-062、AG-005）
 | `supersedes` | 置換。後継 Decision が前の Decision を置き換える | 単方向（後継 → 前任） | DEC-009 が DEC-003 を拡張置換する場合 |
 | `reaffirms` | 再確認。既存 Decision を改めて承認し直す関係 | 単方向（再確認 → 原本） | 新しい文脈で DEC-001 の判断を改めて承認する場合 |
 
-`supersedes` は文書ライフサイクル上の `status: superseded` 遷移と協調する。`supersedes` 関係を宣言された前任 Decision は、`superseded_by` frontmatter で後継 Decision を指す。`reaffirms` は原本 Decision の status を変更せず、意味的承認の再確認のみを記録する。
+`supersedes` は文書ライフサイクル上の `status: superseded` 遷移と協調する。
+`supersedes` 関係を宣言された前任 Decision は、`superseded_by` frontmatter で後継 Decision を指す。
+`reaffirms` は原本 Decision の status を変更せず、意味的承認の再確認のみを記録する。
 
 ### frontmatter relations フィールド仕様
 
@@ -78,11 +83,13 @@ relations:
 
 ## Decision 粒度管理
 
-Decision の SPLIT / MERGE は固定件数ではなく意味的健全性で評価する（REQ-001-063、AG-006）。件数、行数、文字数等の機械的閾値だけで SPLIT / MERGE を判定しない。
+Decision の SPLIT / MERGE は固定件数ではなく意味的健全性で評価する（REQ-001-063、AG-006）。
+件数、行数、文字数等の機械的閾値だけで SPLIT / MERGE を判定しない。
 
 ### 粒度評価シグナル
 
-Decision の粒度健全性を次の5シグナルで評価する。複数シグナルの累積で SPLIT または MERGE 候補とみなす。
+Decision の粒度健全性を次の5シグナルで評価する。
+複数シグナルの累積で SPLIT または MERGE 候補とみなす。
 
 | シグナル | 内容 | SPLIT / MERGE 候補 |
 |---|---|---|
@@ -102,11 +109,14 @@ Decision の粒度健全性を次の5シグナルで評価する。複数シグ�
 
 ### 機械的閾値の扱い
 
-件数、行数、文字数等の機械的閾値は補助情報として扱い、単独で SPLIT / MERGE を確定しない。機械的閾値の超過は詳細評価のトリガーであり、判定そのものではない。REQ 健全性メトリクス（`req-health-metrics.md`）の閾値モデルとは独立して運用する（AG-006）。
+件数、行数、文字数等の機械的閾値は補助情報として扱い、単独で SPLIT / MERGE を確定しない。
+機械的閾値の超過は詳細評価のトリガーであり、判定そのものではない。
+REQ 健全性メトリクス（`req-health-metrics.md`）の閾値モデルとは独立して運用する（AG-006）。
 
 ## Decision 健全性評価モデル
 
-Decision 健全性評価は REQ 重複・分割モデルと分離し、Decision 固有の意味境界、関係、矛盾を評価対象とする（REQ-001-064、AG-017）。類似性だけを根拠とする自動 MERGE を禁止する。
+Decision 健全性評価は REQ 重複・分割モデルと分離し、Decision 固有の意味境界、関係、矛盾を評価対象とする（REQ-001-064、AG-017）。
+類似性だけを根拠とする自動 MERGE を禁止する。
 
 ### 評価対象
 
@@ -119,7 +129,8 @@ Decision 健全性評価は REQ 重複・分割モデルと分離し、Decision 
 
 ### 自動 MERGE 禁止
 
-類似性（cosine 類似度、文字列類似度、主題の近さ等）だけを根拠とする Decision の自動 MERGE を禁止する。類似性検出は人間または LLM の評価トリガーとし、最終判断は意味境界、責務領域、判断文脈の評価を経て行う。
+類似性（cosine 類似度、文字列類似度、主題の近さ等）だけを根拠とする Decision の自動 MERGE を禁止する。
+類似性検出は人間または LLM の評価トリガーとし、最終判断は意味境界、責務領域、判断文脈の評価を経て行う。
 
 類似性が高いだけの Decision 対は、次のいずれかに該当する場合 MERGE せず別 Decision として維持する。
 
@@ -131,11 +142,15 @@ Decision 健全性評価は REQ 重複・分割モデルと分離し、Decision 
 
 ### REQ 健全性モデルとの分離
 
-REQ 健全性メトリクス（`req-health-metrics.md`）の SPLIT / MERGE / DUPLICATE 診断観点は REQ 体系に適用する。Decision 体系へは本 SPEC の粒度管理規則、健全性評価モデルを適用する。両者は独立して運用し、閾値、判定プロセス、評価対象を共有しない（AG-017）。
+REQ 健全性メトリクス（`req-health-metrics.md`）の SPLIT / MERGE / DUPLICATE 診断観点は REQ 体系に適用する。
+Decision 体系へは本 SPEC の粒度管理規則、健全性評価モデルを適用する。
+両者は独立して運用し、閾値、判定プロセス、評価対象を共有しない（AG-017）。
 
 ### 診断観点との対応
 
-inspect-docs の診断観点（SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT）は REQ 体系を主対象とする。Decision 体系へ適用する場合は本 SPEC の粒度管理規則、健全性評価モデルへ読み替える。読み替え対応は本 SPEC が正規所有する。
+inspect-docs の診断観点（SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT）は REQ 体系を主対象とする。
+Decision 体系へ適用する場合は本 SPEC の粒度管理規則、健全性評価モデルへ読み替える。
+読み替え対応は本 SPEC が正規所有する。
 
 | 診断観点 | Decision 体系での読み替え |
 |---|---|
@@ -148,7 +163,9 @@ inspect-docs の診断観点（SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT
 
 ## 適用範囲宣言
 
-本 SPEC は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。他プロジェクトへの適用を意図しない。実行時コマンドは本 SPEC ファイルに依存しない（REQ-001）。
+本 SPEC は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
+他プロジェクトへの適用を意図しない。
+実行時コマンドは本 SPEC ファイルに依存しない（REQ-001）。
 
 ## 関連情報
 

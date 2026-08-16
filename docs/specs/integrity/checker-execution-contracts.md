@@ -10,7 +10,8 @@ canonical_owner: checker-execution-contracts
 # checker 実行契約と検出基盤規則
 
 検査 checker の実行契約、検出対象の除外規定、宣言的データ YAML の schema 原則、detector の命名規約を
-正規所有する。配備先の一貫性（RU-0004 と RU-0007 で対象 checker が重複する両 RU の連携注記）を本 SPEC で担保する。
+正規所有する。
+配備先の一貫性（RU-0004 と RU-0007 で対象 checker が重複する両 RU の連携注記）を本 SPEC で担保する。
 
 ## 目的
 
@@ -38,7 +39,8 @@ canonical_owner: checker-execution-contracts
 
 検出用の宣言的データ YAML（retired-artifact-registry、command-format-rules、delegation-contract-patterns、
 distribution-targets）は、正となる schema を SPEC が所有する。各 YAML は検出用ビューであり、
-正規契約の情報源とはしない。YAML と正 SPEC の不一致は検査で検出対象とする。
+正規契約の情報源とはしない。
+YAML と正 SPEC の不一致は検査で検出対象とする。
 
 ## detector 命名規約
 

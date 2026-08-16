@@ -7,7 +7,8 @@ updated: "2026-08-09"
 
 # agentdev-git-worktree 構造系テスト fallback 契約
 
-agentdev-git-worktree skill に関連する構造系テスト（commands_e2e、skills_structure、templates_structure 等）の worktree 環境向け fallback 契約。worktree junction 未設定環境でのテスト実行保証と、worktree 固有の構造的制約の明示を扱う。
+agentdev-git-worktree skill に関連する構造系テスト（commands_e2e、skills_structure、templates_structure 等）の worktree 環境向け fallback 契約。
+worktree junction 未設定環境でのテスト実行保証と、worktree 固有の構造的制約の明示を扱う。
 
 ## fallback 対象
 

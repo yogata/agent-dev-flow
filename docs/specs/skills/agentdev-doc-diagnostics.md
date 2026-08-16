@@ -10,11 +10,13 @@ updated: 2026-08-15
 docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを担う診断判断 skill の仕様を定める。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
-> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001, REQ-001）。
+> 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 
 ## 目的
 
-`inspect-docs` command の実行時に docs 横断診断の実行を担う診断判断 skill の責務、対象外、境界を定義する。REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`）との責務重複を防ぎ、docs 横断診断の正規所有者を一つに定める。名称は REQ-010-025 の diagnostics 許容例外境界に基づき `agentdev-doc-diagnostics` を維持する（CR-001）。
+`inspect-docs` command の実行時に docs 横断診断の実行を担う診断判断 skill の責務、対象外、境界を定義する。
+REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`）との責務重複を防ぎ、docs 横断診断の正規所有者を一つに定める。
+名称は REQ-010-025 の diagnostics 許容例外境界に基づき `agentdev-doc-diagnostics` を維持する（CR-001）。
 
 ## 適用対象
 
@@ -70,7 +72,8 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（R
 
 ## 境界
 
-`agentdev-doc-writing`（文意品質）、`agentdev-doc-map`（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）との責務重複がないこと。docs 横断診断は本 skill が正規の所有者となる（REQ-010-025 の diagnostics 許容例外境界、CR-001）。
+`agentdev-doc-writing`（文意品質）、`agentdev-doc-map`（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）との責務重複がないこと。
+docs 横断診断は本 skill が正規の所有者となる（REQ-010-025 の diagnostics 許容例外境界、CR-001）。
 
 ## 対象外
 

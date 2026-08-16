@@ -70,7 +70,8 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 
 inspect-skills は self-hosting augmentation が利用可能な場合、Artifact Graph を用いて command と skill 関係, command と extension と skill 関係, 予期しない delegation, orphan skill candidate の候補を探索できる。
 
-Graph は候補提供者であり、委譲先 skill 実在の決定的検査は ADR-006 が定める通り docs-check, IR-056 が所有する。inspect-skills は REQ-010-024〜028 が定める意味診断を担当し、Graph 構造候補を未検証 evidence として意味診断の入力に利用する。
+Graph は候補提供者であり、委譲先 skill 実在の決定的検査は ADR-006 が定める通り docs-check, IR-056 が所有する。
+inspect-skills は REQ-010-024〜028 が定める意味診断を担当し、Graph 構造候補を未検証 evidence として意味診断の入力に利用する。
 
 consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
 

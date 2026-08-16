@@ -15,12 +15,14 @@ updated: 2026-07-27
 > - semantic diagnosis（extension 責務境界、上書き意図の意味診断）: `/agentdev/inspect-skills`
 > - finding disposition（promote、defer、reject）: `/agentdev/inspect-promote`
 >
-> 後継契約の詳細は DEC-006 と IR-056 SPEC を参照。本文書は歴史的参照として残置する（status: superseded に伴い通常内容検査の対象外）。
+> 後継契約の詳細は DEC-006 と IR-056 SPEC を参照。
+> 本文書は歴史的参照として残置する（status: superseded に伴い通常内容検査の対象外）。
 
 ## 目的
 
 project extensions 機構（`.agentdev/extensions/**`）の整合性を読み取り専用で診断するコマンド。
-検出事項を `.agentdev/inspect/inbox/` へ出力する。従来の inspect-doc-inputs command は本 command へ統合・改名された。
+検出事項を `.agentdev/inspect/inbox/` へ出力する。
+従来の inspect-doc-inputs command は本 command へ統合・改名された。
 
 ## 入力
 
@@ -57,9 +59,11 @@ project extensions 機構（`.agentdev/extensions/**`）の整合性を読み取
 7. 旧 `.agentdev/doc-inputs/**` の残存検出
 8. extension が標準 command/skill の上書きとして記述されていないことの確認
 
-AgentDevFlow 標準の inspect 責務は構造確認（検査1〜4）、path 実在確認（検査5）、skill 存在確認（検査6）までとする。command/skill 本文の具体参照禁止の持続的検査は project-local skill の対象（AgentDevFlow 標準の対象外）。
+AgentDevFlow 標準の inspect 責務は構造確認（検査1〜4）、path 実在確認（検査5）、skill 存在確認（検査6）までとする。
+command/skill 本文の具体参照禁止の持続的検査は project-local skill の対象（AgentDevFlow 標準の対象外）。
 
-検出事項を NG 分類（false positive / pre-existing / 今回修正対象）し、推奨 route を提示する。修正は実行しない。
+検出事項を NG 分類（false positive / pre-existing / 今回修正対象）し、推奨 route を提示する。
+修正は実行しない。
 
 ## 参照する横断 SPEC
 

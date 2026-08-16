@@ -29,7 +29,8 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 
 ## 操作一覧
 
-本スキルが提供する操作を体系化する。intake 系 command が呼び出す操作と、主ワークフロー各工程 command からの自動 deviation capture 要求を受ける操作の2系統を持つ。
+本スキルが提供する操作を体系化する。
+intake 系 command が呼び出す操作と、主ワークフロー各工程 command からの自動 deviation capture 要求を受ける操作の2系統を持つ。
 
 ### intake 系 command 向け操作
 
@@ -38,7 +39,8 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 
 ### 自動 capture 向け item 生成操作
 
-各工程 command（`req-save` / `spec-save` / `case-open` / `case-close`）からの自動 deviation capture 要求を受ける item 生成操作。Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artifact-contracts.md)「依存方向」、[capture-boundaries.md](../workflows/capture-boundaries.md)「委譲契約（Command→Skill 依存方向）」参照）に従い、command は `intake-capture` 等の他 command を直接呼び出さず本スキルへ一方向に委譲する。
+各工程 command（`req-save` / `spec-save` / `case-open` / `case-close`）からの自動 deviation capture 要求を受ける item 生成操作。
+Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artifact-contracts.md)「依存方向」、[capture-boundaries.md](../workflows/capture-boundaries.md)「委譲契約（Command→Skill 依存方向）」参照）に従い、command は `intake-capture` 等の他 command を直接呼び出さず本スキルへ一方向に委譲する。
 
 #### 呼出元 command と委譲契約の根拠
 
@@ -71,7 +73,8 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 | 自動 capture 向け item 生成操作（本操作） | 各工程 command が実観測した deviation（構造化済み） | `req-save` / `spec-save` / `case-open` / `case-close`（プログラム的委譲） | 自動 deviation capture |
 | `intake-capture` command | ユーザー手動入力 | ユーザー（対話的） | ユーザー主導の作業候補収集 |
 
-`intake-capture` command はユーザー手動入力を想定し、入力形式も異なる。本操作は command から委譲される構造化入力のみを扱い、`intake-capture` command の入力形式は継承しない。
+`intake-capture` command はユーザー手動入力を想定し、入力形式も異なる。
+本操作は command から委譲される構造化入力のみを扱い、`intake-capture` command の入力形式は継承しない。
 
 ## 参照する references
 
@@ -107,7 +110,8 @@ intake-from-github（GitHub 残課題抽出）と intake-promote（review、分�
 
 ## adversarial-review 候補判断と内部挿入
 
-本節は intake-promote 経路C における review 候補判断基準と内部手続き（候補確定位置、呼出タイミング、結果反映先）を正典として所有する（REQ-015-006）。挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、本節は domain skill 側の候補判断と内部手続きのみを所有する。
+本節は intake-promote 経路C における review 候補判断基準と内部手続き（候補確定位置、呼出タイミング、結果反映先）を正典として所有する（REQ-015-006）。
+挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、本節は domain skill 側の候補判断と内部手続きのみを所有する。
 
 ### 候補判断基準
 
@@ -119,7 +123,8 @@ intake-promote が review 候補を確定する基準は次のとおり。
 | review 対象の存在 | 暫定分類結果のうち、意味的争点（分類の妥当性、変更種別の適合、優先度、後続ルートの適切さ）を持ち得る item が少なくとも1件存在すること |
 | ユーザー明示指定 | ユーザーが明示的に review を指定した場合は上記基準に関わらず候補確定とする（REQ-015-002） |
 
-候補確定後、review 呼出 Step へ進む。候補非該当時は従来フローを維持する（REQ-015-003）。
+候補確定後、review 呼出 Step へ進む。
+候補非該当時は従来フローを維持する（REQ-015-003）。
 
 ### 内部手続き
 
@@ -131,5 +136,6 @@ intake-promote が review 候補を確定する基準は次のとおり。
 
 ### 参照契約
 
-副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱いは adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）を正とし、本 SPEC は再定義しない。intake-promote 本体は本節に従い候補判断と内部手続きを実行する。
+副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱いは adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）を正とし、本 SPEC は再定義しない。
+intake-promote 本体は本節に従い候補判断と内部手続きを実行する。
 

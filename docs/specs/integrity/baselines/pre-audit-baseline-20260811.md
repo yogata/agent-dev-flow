@@ -12,7 +12,8 @@ captured_at_branch: feature/issue-2077
 
 # REQ-028 IR portfolio audit — Phase 0 現状 baseline
 
-> **位置づけ**: 本ファイルは REQ-028（IR 体系の実効性監査と存在条件厳格化）および DEC-013（IR 登録モデル簡素化）の監査を実施する前の現状スナップショットである。Phase 1〜6（OU-002..007）での比較基準として固定し、Phase 0（OU-001）では現状記録のみを行い、IR/detector/test/baseline/gate/docs-check の実体を変更しない。
+> **位置づけ**: 本ファイルは REQ-028（IR 体系の実効性監査と存在条件厳格化）および DEC-013（IR 登録モデル簡素化）の監査を実施する前の現状スナップショットである。
+> Phase 1〜6（OU-002..007）での比較基準として固定し、Phase 0（OU-001）では現状記録のみを行い、IR/detector/test/baseline/gate/docs-check の実体を変更しない。
 
 ## 取得メタデータ
 
@@ -45,7 +46,8 @@ IR-001..061 の ID 空間の現状:
 
 ## 2. IR 現状属性一覧（全 59件）
 
-各 IR ファイル本文の Field/Value 表から抽出した現状属性。lifecycle_state/enforcement_mode は IR-011 以外は未設定（= active 扱い）。
+各 IR ファイル本文の Field/Value 表から抽出した現状属性。
+lifecycle_state/enforcement_mode は IR-011 以外は未設定（= active 扱い）。
 
 | IR | title | severity | baseline_status | gate_level | lifecycle_state | enforcement_mode | category | regression_test | related_req |
 |---|---|---|---|---|---|---|---|---|---|
@@ -154,7 +156,9 @@ IR-001..061 の ID 空間の現状:
 
 ### 3.1 check_integrity.ts の check 関数（76 件）
 
-`check_integrity.ts`（280 KB）に定義される check 関数一覧。各関数がどの IR に対応するかは Phase 1（OU-002）で IR→実装の双方向マッピングを実施する。Phase 0 では関数インベントリの記録のみ。
+`check_integrity.ts`（280 KB）に定義される check 関数一覧。
+各関数がどの IR に対応するかは Phase 1（OU-002）で IR→実装の双方向マッピングを実施する。
+Phase 0 では関数インベントリの記録のみ。
 
 - `checkReqFrontmatterFilename`
 - `checkReqRequiredFields`
@@ -254,7 +258,9 @@ IR-001..061 の ID 空間の現状:
 
 ### 3.3 IR→detector のリテラル ID 参照（部分的、Phase 1 で完全化）
 
-Phase 0 では、checker ソース内にリテラル IR-NNN ID が現れるものを記録する。大部分の check 関数は IR-NNN ID を直接参照せず、関数名と実装で IR に対応する。意味ベースの完全マッピングは Phase 1（OU-002）が担当する。
+Phase 0 では、checker ソース内にリテラル IR-NNN ID が現れるものを記録する。
+大部分の check 関数は IR-NNN ID を直接参照せず、関数名と実装で IR に対応する。
+意味ベースの完全マッピングは Phase 1（OU-002）が担当する。
 
 リテラル IR-NNN 参照が確認できた checker（抜粋）:
 
@@ -270,7 +276,8 @@ Phase 0 では、checker ソース内にリテラル IR-NNN ID が現れるも�
 - IR-059: check_distribution_boundary.ts + check_distribution_boundary.test.ts
 - IR-061: check_integrity.ts（checkIndexGenerationConsistency）+ generate_indexes.ts
 
-**Phase 1 での確認が必要な IR（リテラル参照なし、意味ベース対応の確認）**: IR-001..043（IR-011除く）、IR-045(catalog-only)、IR-047、IR-050..052、IR-060。これらは check 関数としては存在する可能性が高いが、Phase 0 時点では IR ID による追跡ができない。
+**Phase 1 での確認が必要な IR（リテラル参照なし、意味ベース対応の確認）**: IR-001..043（IR-011除く）、IR-045(catalog-only)、IR-047、IR-050..052、IR-060。
+これらは check 関数としては存在する可能性が高いが、Phase 0 時点では IR ID による追跡ができない。
 
 ## 4. regression test coverage
 
@@ -358,13 +365,16 @@ IR body の regression_test フィールド集計（59 件）:
 - IndexGenerationConsistency（IR-061 関連、AUTOGEN ブロック 4 件の不整合）
 - ProfileScope
 
-**レポートファイル**: `.agentdev/integrity/reports/2026-08-11-integrity-report.md`（同日内の複数実行で -2..-5 サフィックス付きファイルも生成）。本 baseline で参照するのは最初の実行 `2026-08-11-integrity-report.md`。
+**レポートファイル**: `.agentdev/integrity/reports/2026-08-11-integrity-report.md`（同日内の複数実行で -2..-5 サフィックス付きファイルも生成）。
+本 baseline で参照するのは最初の実行 `2026-08-11-integrity-report.md`。
 
-**注記**: 本 baseline 時点での NG は REQ-028 監査対象の現状であり、Phase 0 では修正しない。Phase 1..6 で監査・再編後に NG 件数の推移を比較する。
+**注記**: 本 baseline 時点での NG は REQ-028 監査対象の現状であり、Phase 0 では修正しない。
+Phase 1..6 で監査・再編後に NG 件数の推移を比較する。
 
 ### 5.3 既知の AUTOGEN ブロック不整合（IR-061 関連、Phase 0 時点）
 
-check_integrity.ts 実行で検出された AUTOGEN ブロック不整合（4 件）。いずれも `generate_indexes.ts` の再実行で解消する可能性があるが、Phase 0 では現状記録のみ。
+check_integrity.ts 実行で検出された AUTOGEN ブロック不整合（4 件）。
+いずれも `generate_indexes.ts` の再実行で解消する可能性があるが、Phase 0 では現状記録のみ。
 
 1. `docs/specs/integrity/integrity-rule-catalog.md` の `catalog-ir-entries-pre-045` ブロック: IR-005 の title が "ADR↔REQ" → "Decision↔REQ" への更新未反映
 2. `docs/specs/integrity/rule-ownership.md` の `rule-ownership-ir-crossref` ブロック: 同上の IR-005 表記揺れ
@@ -395,7 +405,8 @@ check_integrity.ts 実行で検出された AUTOGEN ブロック不整合（4 �
 
 ## 8. 観察事項（Findings / Capture 候補）
 
-Phase 0 の記録過程で観察された事項。Phase 1..6 での検討候補として記録し、Phase 0 では対応しない。
+Phase 0 の記録過程で観察された事項。
+Phase 1..6 での検討候補として記録し、Phase 0 では対応しない。
 
 - **frontmatter の均一性**: 59 件の file-backed IR のうち 58 件は frontmatter が `status: accepted` のみ。拡張属性（id, title, severity, baseline_status）を持つのは IR-061 のみ。属性は本文 Field/Value 表で管理されており、DEC-013 AG-009 はこの Field/Value 表の属性削除を意味する。
 - **IR-011 単独 tombstone**: lifecycle_state/enforcement_mode が設定されている file-backed IR は IR-011 のみ。DEC-013 AG-008 で物理削除候補。

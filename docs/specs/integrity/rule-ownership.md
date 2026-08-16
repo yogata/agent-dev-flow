@@ -17,7 +17,8 @@ updated: 2026-07-26
 - canonical owner 変更時: 両ファイルで参照先を更新する
 - 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、`req-impact-map.md` で影響先ルールドメインの整合を確認する
 
-req-impact-map.md の配置移動は未確定事項とし、参照方向、利用頻度、更新責務を確認した後に別途判断する。本節では関係整理のみを扱い、`responsibilities/` 残置を維持する。
+req-impact-map.md の配置移動は未確定事項とし、参照方向、利用頻度、更新責務を確認した後に別途判断する。
+本節では関係整理のみを扱い、`responsibilities/` 残置を維持する。
 
 ## ルールドメイン一覧
 
@@ -64,9 +65,11 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 ## IR 別関連マッピング（自動生成）
 
 IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表から抽出した Related REQ / Related SPEC の対応表を `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。
-直接編集は行わない。各 IR の詳細は `rules/IR-NNN-*.md` を参照。
+直接編集は行わない。
+各 IR の詳細は `rules/IR-NNN-*.md` を参照。
 
-`../responsibilities/req-impact-map.md`（REQ → 影響する Rule IDs）と逆方向の参照関係を持つ。両者の整合性は docs-check IR-061 検査が検証する。
+`../responsibilities/req-impact-map.md`（REQ → 影響する Rule IDs）と逆方向の参照関係を持つ。
+両者の整合性は docs-check IR-061 検査が検証する。
 
 <!-- AUTOGEN:BEGIN:id=rule-ownership-ir-crossref -->
 | IR ID | title | Related REQ | Related SPEC |
@@ -128,7 +131,8 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-062 | skill/command パス参照実在 | REQ-028-012, REQ-010 | integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md |
 <!-- AUTOGEN:END -->
 
-> **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（REQ-028-007、DEC-006、Phase 3 §5.2）。詳細は `integrity-rule-catalog.md`「IR-019, IR-022, IR-026, IR-036: inspect-docs 移管」節を参照。
+> **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（REQ-028-007、DEC-006、Phase 3 §5.2）。
+> 詳細は `integrity-rule-catalog.md`「IR-019, IR-022, IR-026, IR-036: inspect-docs 移管」節を参照。
 
 ## 重複ルールの解消状況
 

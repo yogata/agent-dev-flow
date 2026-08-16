@@ -24,7 +24,10 @@ check_changed_docs.ts 中心の変更文書限定検査契約を Phase 1-6 で�
 - 対象確定はコマンド側が行うこと。check_changed_docs.ts は対象選定の十分性を判定しないこと。
 - 対象があれば --files を渡し、対象なければ原則呼出さないこと。
 - --files の区切り形式は space 区切り（推奨）と comma 区切り（後方互換）の両方を受入れること（v2:REQ-0158-001 より統合）。
-  例: `--files a.md b.md c.md`（space 区切り推奨）、`--files a.md,b.md,c.md`（comma 区切りも受入）。両形式の混在も可。usage メッセージ、--help 出力で区切り形式を明示すること。後方互換性を担保し space 区切り仕様を変更しないこと。
+  例: `--files a.md b.md c.md`（space 区切り推奨）、`--files a.md,b.md,c.md`（comma 区切りも受入）。
+両形式の混在も可。
+usage メッセージ、--help 出力で区切り形式を明示すること。
+後方互換性を担保し space 区切り仕様を変更しないこと。
 - --files 指定で files_checked が空の場合は失敗（FAILURE）扱い、--base-ref 指定で files_checked が空の場合は警告（WARNING）扱いとすること。
 
 ### Phase 4: コマンド別最小監査範囲
@@ -64,7 +67,8 @@ check_changed_docs.ts の report JSON に含まれる全フィールドを列挙
 
 `failure` オブジェクトのフィールド: `rule_id`、`severity`、`file`、`line`、`message`、`expected`。
 
-TargetedDocsReport 型契約の正本は `docs/specs/integrity/integrity-contracts.md` TargetedDocsReport 型契約節である。本表は実装参照用途のフィールド一覧である。
+TargetedDocsReport 型契約の正本は `docs/specs/integrity/integrity-contracts.md` TargetedDocsReport 型契約節である。
+本表は実装参照用途のフィールド一覧である。
 
 ## 旧SPEC直下配置前提の除去（完了済み）
 

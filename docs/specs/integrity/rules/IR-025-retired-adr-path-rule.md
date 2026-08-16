@@ -23,14 +23,17 @@ status: accepted
 
 ## detection_method
 
-現行 Decision は3桁ID（`DEC-001〜DEC-{NNN}`）を使用する。これらは `docs/decisions/` 直下に配置する。
+現行 Decision は3桁ID（`DEC-001〜DEC-{NNN}`）を使用する。
+これらは `docs/decisions/` 直下に配置する。
 
-v2 歴史的 ADR は4桁ID（`v2:ADR-0000〜v2:ADR-0099`）を使用し、履歴参照としてのみ扱う。v2 参照は必ず `v2:` プレフィックスを付けて明示的に区別する（REQ-001-048）。
+v2 歴史的 ADR は4桁ID（`v2:ADR-0000〜v2:ADR-0099`）を使用し、履歴参照としてのみ扱う。
+v2 参照は必ず `v2:` プレフィックスを付けて明示的に区別する（REQ-001-048）。
 
 **適用範囲**:
 - 現行 Decision: `DEC-001` 形式（3桁ID）。`docs/decisions/` 直下に配置。status は `accepted` / `deprecated` 等
 - v2 歴史的 ADR: `v2:ADR-0001` 形式（4桁ID）。履歴参照用。ファイルは存在せず、tag `v2.11.0` で参照
 
-本ルールは `docs/decisions/` 直下に4桁形式の ADR ファイルが残存していないことを検出する。v2 参照を履歴として必要とする場合は、`v2:` プレフィックス付きで明示的に記述する。
+本ルールは `docs/decisions/` 直下に4桁形式の ADR ファイルが残存していないことを検出する。
+v2 参照を履歴として必要とする場合は、`v2:` プレフィックス付きで明示的に記述する。
 
 IR-036 が status:deprecated を work-means 検出から除外する（履歴参照、現行判断ではない）。

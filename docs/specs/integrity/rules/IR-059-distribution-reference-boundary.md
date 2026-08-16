@@ -4,7 +4,9 @@ status: accepted
 
 # IR-059: distribution-reference-boundary
 
-配布テキスト成果物に含まれるプロジェクト固有の具体ID、具体パス、固定URLを検出する。本IR文書を検知パターン、exemption、severity、false-positive条件の正本とする。意味モデルと検出パイプラインの正規参照先は `distribution-boundary.md` である。
+配布テキスト成果物に含まれるプロジェクト固有の具体ID、具体パス、固定URLを検出する。
+本IR文書を検知パターン、exemption、severity、false-positive条件の正本とする。
+意味モデルと検出パイプラインの正規参照先は `distribution-boundary.md` である。
 
 | Field | Value |
 |---|---|
@@ -35,8 +37,12 @@ status: accepted
 - 索引として許可されたREADME参照
 - producer 内部へ解決しない generic または template 参照（REQ-029-004）
 
-個別承認例外は特定の検出事項に付与する承認であり、ルールレベルの許容とは区別する。個別承認例外はルール一般を書き換えず、最終状態で件数0を受け入れ条件とする。
+個別承認例外は特定の検出事項に付与する承認であり、ルールレベルの許容とは区別する。
+個別承認例外はルール一般を書き換えず、最終状態で件数0を受け入れ条件とする。
 
 ## IR-056との関係
 
-IR-056はProject Extensions構造と配置を検査し、IR-059は配布テキスト成果物の具体参照を検査する。両者は独立した検出対象である。DEC-006が確立したinspect 3-command正規化とIR-056のProject Extensions検査分離を維持しつつ、DEC-014がIR-059の affected_artifact 範囲と source/save/complete/release の各 enforcement 経路を変更する後続決定である。DEC-006全体を置換せず、IR-059をIR-056へ統合しない。
+IR-056はProject Extensions構造と配置を検査し、IR-059は配布テキスト成果物の具体参照を検査する。
+両者は独立した検出対象である。
+DEC-006が確立したinspect 3-command正規化とIR-056のProject Extensions検査分離を維持しつつ、DEC-014がIR-059の affected_artifact 範囲と source/save/complete/release の各 enforcement 経路を変更する後続決定である。
+DEC-006全体を置換せず、IR-059をIR-056へ統合しない。

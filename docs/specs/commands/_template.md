@@ -77,7 +77,8 @@ command SPEC は command 定義ファイル（`src/opencode/commands/agentdev/*.
 | 必須順序 | 成果物、安全性、外部契約へ影響する順序（順序を変えると成果物または安全性が変わるもののみ） |
 | 利用 skill 責務 | command が利用する skill 名と委譲する責務 |
 
-Step 番号を持たない command SPEC（読み取り専用、分類系）は対応付けの対象外とし、その旨を当該 SPEC に文書化する。詳細は `../authoring/command-file-format.md`「command SPEC と command 定義の対応付け（v2:REQ-0143-005）」を参照。
+Step 番号を持たない command SPEC（読み取り専用、分類系）は対応付けの対象外とし、その旨を当該 SPEC に文書化する。
+詳細は `../authoring/command-file-format.md`「command SPEC と command 定義の対応付け（v2:REQ-0143-005）」を参照。
 
 ## See Also
 

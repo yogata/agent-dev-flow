@@ -56,7 +56,8 @@ Decision guidelines、Decision file manager、document-model の accepted Decisi
 
 ### 直接更新可能な非意味修正（6件）
 
-明示承認後に直接更新できる非意味修正は次の6件とする。各変更は非意味修正分類へ一意に割り当てる。
+明示承認後に直接更新できる非意味修正は次の6件とする。
+各変更は非意味修正分類へ一意に割り当てる。
 
 1. 誤字または文字化けの修正
 2. 壊れたリンクまたは誤ったファイルパスの修正
@@ -67,7 +68,8 @@ Decision guidelines、Decision file manager、document-model の accepted Decisi
 
 ### 後継 Decision を必要とする意味変更（6件）
 
-後継 Decision を作成せずに直接編集できない意味変更は次の6件とする。各変更は意味変更分類へ一意に割り当てる。
+後継 Decision を作成せずに直接編集できない意味変更は次の6件とする。
+各変更は意味変更分類へ一意に割り当てる。
 
 1. 決定内容の追加または削除
 2. 適用範囲の変更

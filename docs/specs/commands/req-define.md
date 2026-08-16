@@ -124,19 +124,25 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 
 ### SPEC action への分類根拠出力
 
-最終分類確定ステップで `artifact: spec` の SPEC action 各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する。出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`spec_logical_division`、`canonical_owner`）と一致し、後続の spec-save が SPEC frontmatter または冒頭宣言節へ宣言を付与するための入力となる。分類値が確定できない場合は `unknown` とし、soft-contract（DEC-003）に従い spec-save へ警告付きで引き継ぐ。
+最終分類確定ステップで `artifact: spec` の SPEC action 各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する。
+出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`spec_logical_division`、`canonical_owner`）と一致し、後続の spec-save が SPEC frontmatter または冒頭宣言節へ宣言を付与するための入力となる。
+分類値が確定できない場合は `unknown` とし、soft-contract（DEC-003）に従い spec-save へ警告付きで引き継ぐ。
 
 ### REQ 影響なし時の取扱い
 
-REQ 影響なしと確定した変更からは `artifact_actions` の `artifact: req` エントリを生成しない（REQ-004-088）。代わりに `artifact: spec` エントリのみを生成し、SPEC への配置のみを行う。SPEC action には前項「SPEC action への分類根拠出力」を適用する。
+REQ 影響なしと確定した変更からは `artifact_actions` の `artifact: req` エントリを生成しない（REQ-004-088）。
+代わりに `artifact: spec` エントリのみを生成し、SPEC への配置のみを行う。
+SPEC action には前項「SPEC action への分類根拠出力」を適用する。
 
 ### 分類根拠の引き継ぎ
 
-req-define は RU から引き継いだ分類根拠（`artifact-contracts.md`「分類根拠伝播契約」参照）を暫定入力とし、最終分類を確定した上で draft-data へ反映する。分類根拠の soft-contract 運用（欠落時 unknown 既定値、警告）は DEC-003 に従う。
+req-define は RU から引き継いだ分類根拠（`artifact-contracts.md`「分類根拠伝播契約」参照）を暫定入力とし、最終分類を確定した上で draft-data へ反映する。
+分類根拠の soft-contract 運用（欠落時 unknown 既定値、警告）は DEC-003 に従う。
 
 ### tentative_classification との関係
 
-backlog-review が付与する `tentative_classification`（v2:REQ-0155-003 の7値）は暫定値であり、req-define が最終分類を上書きする。最終分類確定時のバリデーション（7値チェック、フィールド欠落時の停止、上書き値の7値チェック）は前述「tentative_classification 最終確定のバリデーション」に従う。
+backlog-review が付与する `tentative_classification`（v2:REQ-0155-003 の7値）は暫定値であり、req-define が最終分類を上書きする。
+最終分類確定時のバリデーション（7値チェック、フィールド欠落時の停止、上書き値の7値チェック）は前述「tentative_classification 最終確定のバリデーション」に従う。
 
 ### 壁打ち対話 構造的分析フレーム先行手順（REQ-004-083, REQ-004-084, REQ-004-085）
 
@@ -152,19 +158,24 @@ backlog-review が付与する `tentative_classification`（v2:REQ-0155-003 の7
 | 既存要件との照合が必要 | 既有件化/未要件化/SPEC配置の3分類表 |
 | 修正要否の判定 | 実装面/SPEC面の両面分析表 |
 
-上記は推奨例であり、入力データの性質に応じて適切なフレームを選択する。分析フレームは個別論点の深掘りに先行して提示する。
+上記は推奨例であり、入力データの性質に応じて適切なフレームを選択する。
+分析フレームは個別論点の深掘りに先行して提示する。
 
 #### 二項選択回答規定
 
-ユーザーが二項選択（「AかBか」）を求めた質問に対し、「混在」「要確認」単独の回答を出力しない。件数と根拠でいずれかを明示して回答する。両選択肢に該当する場合は、それぞれの件数と根拠を明示して両方を提示する。
+ユーザーが二項選択（「AかBか」）を求めた質問に対し、「混在」「要確認」単独の回答を出力しない。
+件数と根拠でいずれかを明示して回答する。
+両選択肢に該当する場合は、それぞれの件数と根拠を明示して両方を提示する。
 
 #### 実装/SPEC両面分析規定
 
-修正の要否を検討する際、実装面（ソースコード、スクリプト、スキル定義ファイル等の変更）と SPEC 面（docs/specs/ 配下の文書変更）の両面を分析し、各面の修正対象と修正内容を明示する。片面のみの分析で修正要否を断定しない。
+修正の要否を検討する際、実装面（ソースコード、スクリプト、スキル定義ファイル等の変更）と SPEC 面（docs/specs/ 配下の文書変更）の両面を分析し、各面の修正対象と修正内容を明示する。
+片面のみの分析で修正要否を断定しない。
 
 #### agentdev-req-analysis SKILL 連携
 
-上記手順の詳細（質問運用ルール、分析フレーム選択基準）は `agentdev-req-analysis` SKILL（`src/opencode/skills/agentdev-req-analysis/SKILL.md`）の「質問運用ルール」「要件分析観点」セクションに反映する。本 SPEC は手順の要件を定義し、SKILL は実装詳細を定義する（原本src→配置先.opencode の文書間投影規則に準拠）。
+上記手順の詳細（質問運用ルール、分析フレーム選択基準）は `agentdev-req-analysis` SKILL（`src/opencode/skills/agentdev-req-analysis/SKILL.md`）の「質問運用ルール」「要件分析観点」セクションに反映する。
+本 SPEC は手順の要件を定義し、SKILL は実装詳細を定義する（原本src→配置先.opencode の文書間投影規則に準拠）。
 
 ## draft-data test_strategy フィールドスキーマ
 
@@ -205,11 +216,15 @@ test_strategy:
 
 ## artifact_actions 生成
 
-req-define は `artifact_actions` の producer である。要件doc生成の artifact_actions 生成で要件展開の結果を `draft-data` の `artifact_actions` へ出力する。本節は req-define 側の生成契約（operation の選択基準、`spec-append` の生成、誤記との機械的区別、後方互換）を規定する。各 operation の `target_area` と `content` の出力形式は後段「[draft-data artifact_actions フィールド形式](#draft-data-artifact_actions-フィールド形式)」を参照。
+req-define は `artifact_actions` の producer である。
+要件doc生成の artifact_actions 生成で要件展開の結果を `draft-data` の `artifact_actions` へ出力する。
+本節は req-define 側の生成契約（operation の選択基準、`spec-append` の生成、誤記との機械的区別、後方互換）を規定する。
+各 operation の `target_area` と `content` の出力形式は後段「[draft-data artifact_actions フィールド形式](#draft-data-artifact_actions-フィールド形式)」を参照。
 
 ### operation の選択基準
 
-req-define は変更の性質に応じて SPEC operation を選択する。SPEC operation の公式 enum、非正規 alias、alias から公式 enum への映射、consumer 側の後方互換は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「artifact_actions operation」が正規所有する。
+req-define は変更の性質に応じて SPEC operation を選択する。
+SPEC operation の公式 enum、非正規 alias、alias から公式 enum への映射、consumer 側の後方互換は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「artifact_actions operation」が正規所有する。
 
 | 変更の性質 | operation | 意図 |
 |---|---|---|
@@ -221,7 +236,8 @@ req-define は変更の性質に応じて SPEC operation を選択する。SPEC 
 
 ### spec-append の生成契約
 
-req-define は既存 SPEC ファイルへ新規セクションを追加する場合、`operation: spec-append` として action を出力する。入力フィールドは以下の通り。
+req-define は既存 SPEC ファイルへ新規セクションを追加する場合、`operation: spec-append` として action を出力する。
+入力フィールドは以下の通り。
 
 | field | 必須性 | 形式 |
 |---|---|---|
@@ -231,7 +247,8 @@ req-define は既存 SPEC ファイルへ新規セクションを追加する場
 | `placement` | 任意（省略時 `tail`） | `tail` / `after_anchor` / `before_anchor` のいずれか |
 | `anchor` | `placement` が `tail` 以外は必須 | 挿入位置の基準となる見出し行（`target_area` と同一形式） |
 
-`placement` 別の追加位置、`anchor` マッチング規則、anchor 未検出時の挙動、同名見出し時の挙動、合格基準は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「spec-append operation」および [spec-save.md](spec-save.md)「spec-append 操作時のセクション追加ロジック」が正規所有する。req-define 側は入力フィールドの選択と値の生成のみを規定し、配置実行の詳細は規定しない。
+`placement` 別の追加位置、`anchor` マッチング規則、anchor 未検出時の挙動、同名見出し時の挙動、合格基準は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「spec-append operation」および [spec-save.md](spec-save.md)「spec-append 操作時のセクション追加ロジック」が正規所有する。
+req-define 側は入力フィールドの選択と値の生成のみを規定し、配置実行の詳細は規定しない。
 
 ### 新規セクション追加と target_area 誤記の機械的区別
 
@@ -244,13 +261,17 @@ req-define は既存 SPEC ファイルへ新規セクションを追加する場
 
 ### 後方互換
 
-既存の `create` / `update` および alias `spec-create` / `spec-update` は従来通り出力可能であり、consumer（spec-save）は `create` / `update` / `spec-create` / `spec-update` / `spec-append` の全てを受理する（後方互換）。`target_area`、`placement`、`anchor` 等のフィールドを持たない旧形式 draft も consumer は入力として拒否しない。後方互換の正規定義は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「SPEC operation enum と非正規 alias」を参照。
+既存の `create` / `update` および alias `spec-create` / `spec-update` は従来通り出力可能であり、consumer（spec-save）は `create` / `update` / `spec-create` / `spec-update` / `spec-append` の全てを受理する（後方互換）。
+`target_area`、`placement`、`anchor` 等のフィールドを持たない旧形式 draft も consumer は入力として拒否しない。
+後方互換の正規定義は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「SPEC operation enum と非正規 alias」を参照。
 
 ## draft-data artifact_actions フィールド形式
 
 artifact_actions の各 entry が出力する `target_area` と `content` の扱いは operation 別に以下を規定する（REQ-004-078, REQ-004-079、REQ-008-058）。
 
-SPEC operation の公式 enum は `create` / `update` であり、req-define は非正規 alias（`spec-create`, `spec-update`, `spec-append`）も出力可能とする。alias から公式 enum への映射: `spec-create` → `create`、`spec-update` → `update`、`spec-append` → `update`（既存 SPEC ファイルへ新規セクションを追加する操作）。alias 固有の契約（placement, anchor 等）は後段の表および [spec-save.md](spec-save.md) に従う。
+SPEC operation の公式 enum は `create` / `update` であり、req-define は非正規 alias（`spec-create`, `spec-update`, `spec-append`）も出力可能とする。
+alias から公式 enum への映射: `spec-create` → `create`、`spec-update` → `update`、`spec-append` → `update`（既存 SPEC ファイルへ新規セクションを追加する操作）。
+alias 固有の契約（placement, anchor 等）は後段の表および [spec-save.md](spec-save.md) に従う。
 
 | operation | target_area | content |
 |-----------|-------------|---------|
@@ -263,7 +284,8 @@ req-define 側は出力形式のみを規定する。
 
 ## review_dispositions の producer 契約
 
-req-define は `review_dispositions` の producer である。要件doc生成で壁打ち過程の採否判断を `draft-data` の `review_dispositions` へ出力する。
+req-define は `review_dispositions` の producer である。
+要件doc生成で壁打ち過程の採否判断を `draft-data` の `review_dispositions` へ出力する。
 
 ### 出力義務
 
@@ -275,21 +297,27 @@ req-define は以下の入力項目について disposition を記録する:
 | 既存要件で充足済みの入力 | 既存 REQ、既存 SPEC、同意済み artifact_actions で既に満たされている項目（disposition: `covered`） |
 | 一部のみ採用した入力 | 項目の一部を採用し、残部を採用しなかったもの（disposition: `partially_covered`） |
 
-`review_dispositions` は optional な soft-contract であり（DEC-003）、欠落時に後続工程が draft を拒否しない。covered 項目だけで構成される Issue や PR を作成しない方針を維持する。
+`review_dispositions` は optional な soft-contract であり（DEC-003）、欠落時に後続工程が draft を拒否しない。
+covered 項目だけで構成される Issue や PR を作成しない方針を維持する。
 
 ### 未決事項の取扱い
 
-未決事項（未解決質問、未解決衝突、repo 外操作要否等）は disposition で代替せず、`auto_gate` の `unresolved_questions`、`unresolved_conflicts`、`out_of_repo_operations`、`stop_reasons` へ記録する。disposition は確定した採否判断のみを保持する。
+未決事項（未解決質問、未解決衝突、repo 外操作要否等）は disposition で代替せず、`auto_gate` の `unresolved_questions`、`unresolved_conflicts`、`out_of_repo_operations`、`stop_reasons` へ記録する。
+disposition は確定した採否判断のみを保持する。
 
 ### 根拠不足時の取扱い
 
-disposition の `evidence` に根拠（path、section）を設定できない場合、または根拠が曖昧な場合は `auto_gate.auto_ready: false` とし、`stop_reasons` へ根拠不足の旨を記録する。根拠不足のまま draft を完成させてはならない。
+disposition の `evidence` に根拠（path、section）を設定できない場合、または根拠が曖昧な場合は `auto_gate.auto_ready: false` とし、`stop_reasons` へ根拠不足の旨を記録する。
+根拠不足のまま draft を完成させてはならない。
 
-`evidence.checked_at_commit` は req-define 生成時 `null` とする（G08 git 操作禁止）。default branch 最新化後の evidence 再確認は consumer（case-open）の責務である。
+`evidence.checked_at_commit` は req-define 生成時 `null` とする（G08 git 操作禁止）。
+default branch 最新化後の evidence 再確認は consumer（case-open）の責務である。
 
 ## draft-data review_dispositions フィールドスキーマ
 
-要件定義で `review_dispositions` を出力する場合のシリアライズ形式を定義する。schema の正規所有先は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「review_dispositions 構造」節である。本節は req-define 固有の出力形式を規定する。
+要件定義で `review_dispositions` を出力する場合のシリアライズ形式を定義する。
+schema の正規所有先は [artifact-contracts.md](../responsibilities/artifact-contracts.md)「review_dispositions 構造」節である。
+本節は req-define 固有の出力形式を規定する。
 
 ### review_dispositions 項目構造
 
@@ -340,15 +368,19 @@ review_dispositions:
 
 ### checked_at_commit 運用
 
-`evidence.checked_at_commit` は req-define 生成時 `null` とする（G08 git 操作禁止）。case-open が default branch 最新化後に evidence の path/section を再確認し、確認時の commit SHA を当該フィールドへ記録する。根拠失効時は `covered` のまま起票せず `stale_target` または再評価対象として停止する。
+`evidence.checked_at_commit` は req-define 生成時 `null` とする（G08 git 操作禁止）。
+case-open が default branch 最新化後に evidence の path/section を再確認し、確認時の commit SHA を当該フィールドへ記録する。
+根拠失効時は `covered` のまま起票せず `stale_target` または再評価対象として停止する。
 
 ### 後方互換性
 
-`review_dispositions` は optional な soft-contract である。本フィールドを持たない旧ドラフトを req-save、case-open は入力として拒否しない（DEC-003 準拠）。
+`review_dispositions` は optional な soft-contract である。
+本フィールドを持たない旧ドラフトを req-save、case-open は入力として拒否しない（DEC-003 準拠）。
 
 ## 未確定内容の auto_ready 抑止（REQ-008-059）
 
-req-define は、後続工程で決定する必要がある未確定事項、必須内容の欠落、暫定プレースホルダーが `agreed_items` または `artifact_actions` に残る場合、`auto_gate.auto_ready` を `true` にしないこと（REQ-008-059）。本抑止は REQ-008-030（`artifact_actions` の `content` 完全確定）の強制機構として働く。
+req-define は、後続工程で決定する必要がある未確定事項、必須内容の欠落、暫定プレースホルダーが `agreed_items` または `artifact_actions` に残る場合、`auto_gate.auto_ready` を `true` にしないこと（REQ-008-059）。
+本抑止は REQ-008-030（`artifact_actions` の `content` 完全確定）の強制機構として働く。
 
 ### 抑止条件
 
@@ -356,7 +388,8 @@ auto_gate完了ゲートの判定前に、以下の2系統の検査を組み合�
 
 #### (A) 決定的マーカー検査
 
-`agreed_items` 各エントリの `content`、`artifact_actions` 各エントリの `content` について、以下の5種の代表マーカーのいずれかを部分文字列として含むか検査する。検査は意味解釈を伴わない文字列一致（大文字小文字区別なし）とし、QG-1 意味判定（後述 (B)）に先立って機械的に適用する。
+`agreed_items` 各エントリの `content`、`artifact_actions` 各エントリの `content` について、以下の5種の代表マーカーのいずれかを部分文字列として含むか検査する。
+検査は意味解釈を伴わない文字列一致（大文字小文字区別なし）とし、QG-1 意味判定（後述 (B)）に先立って機械的に適用する。
 
 | # | マーカー | 意味 |
 |---|---|---|
@@ -370,7 +403,9 @@ auto_gate完了ゲートの判定前に、以下の2系統の検査を組み合�
 
 ##### 引用・禁止事例の誤検知防止
 
-マーカー文字列が「禁止事項や過去事例の引用」として使われている文は抑止対象外とする。代表的な引用パターンを以下に示す。これらは意味判定ではなく、文脈パターンの文字列一致で除外する。
+マーカー文字列が「禁止事項や過去事例の引用」として使われている文は抑止対象外とする。
+代表的な引用パターンを以下に示す。
+これらは意味判定ではなく、文脈パターンの文字列一致で除外する。
 
 | 引用パターン | 例 |
 |---|---|
@@ -378,15 +413,19 @@ auto_gate完了ゲートの判定前に、以下の2系統の検査を組み合�
 | 過去事例の引用 | 「前回の TBD 残存事例を参考に」 |
 | 検査項目としての言及 | 「TBD/ TODO/ 未定 を検出する」 |
 
-判定は文単位で行う。マーカーを含む文が上記いずれかの引用パターンに合致する場合、当該文のマーカーを検出扱いとしない。同一 AG-ID/ ACT-ID 内に引用以外の未確定を示すマーカー出現が残る場合は抑止を維持する。
+判定は文単位で行う。
+マーカーを含む文が上記いずれかの引用パターンに合致する場合、当該文のマーカーを検出扱いとしない。
+同一 AG-ID/ ACT-ID 内に引用以外の未確定を示すマーカー出現が残る場合は抑止を維持する。
 
 #### (B) QG-1 意味判定
 
-決定的マーカー検査 (A) に加え、QG-1（Definition Integrity Gate）の意味判定観点（必須フィールド欠落、曖昧要件、測定不能条件）を `agreed_items`/ `artifact_actions` の各エントリへ適用する。QG-1 が fail となるエントリがある場合、`auto_gate.auto_ready: false` とし、該当 AG-ID/ ACT-ID と QG-1 該当観点を `auto_gate.stop_reasons` へ記録する。
+決定的マーカー検査 (A) に加え、QG-1（Definition Integrity Gate）の意味判定観点（必須フィールド欠落、曖昧要件、測定不能条件）を `agreed_items`/ `artifact_actions` の各エントリへ適用する。
+QG-1 が fail となるエントリがある場合、`auto_gate.auto_ready: false` とし、該当 AG-ID/ ACT-ID と QG-1 該当観点を `auto_gate.stop_reasons` へ記録する。
 
 ### stop_reasons 記録形式
 
-抑止時に `auto_gate.stop_reasons` へ記録する各エントリは、対象 ID と理由を含む文字列とする。形式は soft-contract（DEC-003）とし厳格スキーマ検証を導入しないが、少なくとも以下の情報を含むこと。
+抑止時に `auto_gate.stop_reasons` へ記録する各エントリは、対象 ID と理由を含む文字列とする。
+形式は soft-contract（DEC-003）とし厳格スキーマ検証を導入しないが、少なくとも以下の情報を含むこと。
 
 - 対象 ID（`AG-NNN` または `ACT-{ARTIFACT}-NNN`）
 - 抑止理由（検出マーカー、または QG-1 該当観点）
@@ -404,7 +443,9 @@ auto_gate:
 
 ### 後続ステップへの引き継ぎ
 
-抑止により `auto_ready: false` となった場合、auto_gate完了ゲートの既存手順に従い `stop_reasons` をユーザーへ提示し、壁打ち対話で解消方策を合意する。合意により未確定事項が解消され、(A)(B) いずれの検査も該当しなくなった場合に限り `auto_ready: true` へ更新する。ユーザーが「`auto_ready: false` のまま標準フローで手動実行する」と明示的に選択した場合は `conflict_resolutions` へ記録して継続する（REQ-004-048）。
+抑止により `auto_ready: false` となった場合、auto_gate完了ゲートの既存手順に従い `stop_reasons` をユーザーへ提示し、壁打ち対話で解消方策を合意する。
+合意により未確定事項が解消され、(A)(B) いずれの検査も該当しなくなった場合に限り `auto_ready: true` へ更新する。
+ユーザーが「`auto_ready: false` のまま標準フローで手動実行する」と明示的に選択した場合は `conflict_resolutions` へ記録して継続する（REQ-004-048）。
 
 ## 所有関係と委譲
 
@@ -415,7 +456,9 @@ auto_gate:
 
 ## Artifact Graph 利用
 
-req-define は既存 REQ、関連 Decision と SPEC、canonical owner、構造的所有者重複、downstream 変更影響候補の探索に Artifact Graph を利用できる。Graph は候補提供者であり、CREATE, APPEND, UPDATE, SPLIT, MERGE, 意味的重複, canonical owner の最終判断は正規成果物本文と独立探索手段（`glob`, `grep`, `rg` 等）での確認後に下す。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+req-define は既存 REQ、関連 Decision と SPEC、canonical owner、構造的所有者重複、downstream 変更影響候補の探索に Artifact Graph を利用できる。
+Graph は候補提供者であり、CREATE, APPEND, UPDATE, SPLIT, MERGE, 意味的重複, canonical owner の最終判断は正規成果物本文と独立探索手段（`glob`, `grep`, `rg` 等）での確認後に下す。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 
@@ -477,11 +520,13 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 
 ## adversarial-review 挿入境界（経路A）
 
-本節は req-define への adversarial-review caller integration（経路A、REQ-015-004）の挿入境界を正典として所有する。共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review SPEC](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は経路A 固有の発動条件、review 対象確定位置、採用後戻り先、最初の副作用との順序のみを規定する（REQ-014-011）。
+本節は req-define への adversarial-review caller integration（経路A、REQ-015-004）の挿入境界を正典として所有する。
+共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review SPEC](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は経路A 固有の発動条件、review 対象確定位置、採用後戻り先、最初の副作用との順序のみを規定する（REQ-014-011）。
 
 ### 挿入位置（REQ-015-004）
 
-review 挿入位置は「Scale 判断後・Decision判断前・要件doc生成前」と一意に特定可能である。処理段階への対応付けを次に示す。
+review 挿入位置は「Scale 判断後・Decision判断前・要件doc生成前」と一意に特定可能である。
+処理段階への対応付けを次に示す。
 
 | 条件 | feature の場合 | feature 以外（bugfix, maintenance, docs_chore）の場合 |
 |---|---|---|
@@ -489,11 +534,14 @@ review 挿入位置は「Scale 判断後・Decision判断前・要件doc生成�
 | Decision判断前 | Decision判断の判断結果がドラフト保存で永続化される前 | 同左 |
 | 要件doc生成前 | 要件doc生成の成果物がドラフト保存で永続化される前 | 同左 |
 
-review は Scale判断（feature 以外は work_type 判定）完了後、ドラフト保存の前に挿入する。Decision判断および要件doc生成は当該時点で実行済みであるが、その成果物はドラフト保存で永続化されるまで確定扱いとならない。review の finding は Decision判断、要件doc生成の成果物へ反映可能であり、ADR finding は Decision判断へ戻す。
+review は Scale判断（feature 以外は work_type 判定）完了後、ドラフト保存の前に挿入する。
+Decision判断および要件doc生成は当該時点で実行済みであるが、その成果物はドラフト保存で永続化されるまで確定扱いとならない。
+review の finding は Decision判断、要件doc生成の成果物へ反映可能であり、ADR finding は Decision判断へ戻す。
 
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
-発動条件判定と review 呼出を分離する（REQ-015-001）。発動条件判定 Step は default-on 原則（REQ-015-002）と skip 条件（REQ-015-003）を評価する。
+発動条件判定と review 呼出を分離する（REQ-015-001）。
+発動条件判定 Step は default-on 原則（REQ-015-002）と skip 条件（REQ-015-003）を評価する。
 
 - **default-on（原則実行）**: req-define は adversarial-review を原則実行する（REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、review 対象の意味的決定（要件展開、Decision要否判定、Scale判断）が存在する場合に発動する。
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（review を挿入せずドラフト保存へ進む）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
@@ -512,5 +560,7 @@ review は Scale判断（feature 以外は work_type 判定）完了後、ドラ
 
 ### 最初の副作用（要件doc保存）との順序
 
-review はドラフト保存より前に実行する。ドラフト保存が req-define の最初の副作用（`.agentdev/drafts/req-draft-{topic-slug}.md` のファイル作成）であるため、review は最初の副作用の前に挿入される。review の結果、要件候補が変更された場合は、ドラフト保存で保存されるドラフトへ反映する。
+review はドラフト保存より前に実行する。
+ドラフト保存が req-define の最初の副作用（`.agentdev/drafts/req-draft-{topic-slug}.md` のファイル作成）であるため、review は最初の副作用の前に挿入される。
+review の結果、要件候補が変更された場合は、ドラフト保存で保存されるドラフトへ反映する。
 

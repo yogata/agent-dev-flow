@@ -33,13 +33,19 @@ status: accepted
 
 ### IR 属性モデル（DEC-013 適用、REQ-028-009/010）
 
-DEC-013 AG-009 により、`lifecycle_state`、`enforcement_mode`、`baseline_status` は現行 IR 属性から削除した。「現存 IR = 現行 = executable detector」を成立させ、`active+none` の恒久状態を禁止する。廃止済み IR の file-backed tombstone（IR-011 型）は AG-008 により物理削除し、`lifecycle_state: superseded` 等の表現を使わない。識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する。
+DEC-013 AG-009 により、`lifecycle_state`、`enforcement_mode`、`baseline_status` は現行 IR 属性から削除した。
+「現存 IR = 現行 = executable detector」を成立させ、`active+none` の恒久状態を禁止する。
+廃止済み IR の file-backed tombstone（IR-011 型）は AG-008 により物理削除し、`lifecycle_state: superseded` 等の表現を使わない。
+識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する。
 
-finding-baseline 分類（new/known/resolved）は IR schema から分離し、finding 側の状態として [integrity-contracts.md](integrity-contracts.md)「finding-baseline 分類」で定義する。本カタログは finding-baseline 分類を再定義しない。
+finding-baseline 分類（new/known/resolved）は IR schema から分離し、finding 側の状態として [integrity-contracts.md](integrity-contracts.md)「finding-baseline 分類」で定義する。
+本カタログは finding-baseline 分類を再定義しない。
 
-`severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-010-058、REQ-028-009 決定7）。IR lifecycle の代替とせず、実行可能 detector を持つ現行 IR の実行特性を表す。
+`severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-010-058、REQ-028-009 決定7）。
+IR lifecycle の代替とせず、実行可能 detector を持つ現行 IR の実行特性を表す。
 
-> **フィールド数**: 15 field から 12 field へ縮約した（`lifecycle_state`、`enforcement_mode`、`baseline_status` を削除）。本カタログ「メタ整合性」の `フィールド数 ≥ 15` は DEC-013 適用後の実態へ更新する。
+> **フィールド数**: 15 field から 12 field へ縮約した（`lifecycle_state`、`enforcement_mode`、`baseline_status` を削除）。
+> 本カタログ「メタ整合性」の `フィールド数 ≥ 15` は DEC-013 適用後の実態へ更新する。
 
 ## regression_test フィールド運用方針
 
@@ -62,9 +68,11 @@ IR-NNN（個別 integrity rule）の `regression_test` フィールドは以下�
 各ルールの15フィールド詳細は [rules/](rules/) サブディレクトリの個別ファイル `IR-NNN-{slug}.md` を参照（v2:REQ-0155-007 局所物理分離、REQ-001-008）。
 catalog はスキーマ定義とインデックスを維持する。
 
-IR-059（distribution-reference-boundary）の canonical 参照は REQ-029 と `integrity/distribution-boundary.md` へ更新済みである。従来 REQ-002-021..026、032 に紐づいていた配布物参照境界の検出脈絡は MOVE 先（REQ-029-001..008）へ集約し、REQ-002-028、029、035 の作業由来品質検査参照は RETIRE 扱いとして catalog から除去した。
+IR-059（distribution-reference-boundary）の canonical 参照は REQ-029 と `integrity/distribution-boundary.md` へ更新済みである。
+従来 REQ-002-021..026、032 に紐づいていた配布物参照境界の検出脈絡は MOVE 先（REQ-029-001..008）へ集約し、REQ-002-028、029、035 の作業由来品質検査参照は RETIRE 扱いとして catalog から除去した。
 
-IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 から `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。直接編集は行わない。
+IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 から `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。
+直接編集は行わない。
 
 <!-- AUTOGEN:BEGIN:id=catalog-ir-entries-pre-045 -->
 - [IR-001: 現行 REQ frontmatter id ↔ ファイル名](rules/IR-001-req-frontmatter-id-filename.md)
@@ -130,7 +138,8 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 > IR-045 識別子は REQ-010-255/256、`vocabulary-registry.md`「文意品質検出対象語（IR-045）」で文意品質検出対象語の参照として残る。
 > 新規検出時の復活運用（REQ-010-003）に従い、必要に応じて docs-check 検出対象への復活を検討する。
 
-IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。直接編集は行わない。
+IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。
+直接編集は行わない。
 
 <!-- AUTOGEN:BEGIN:id=catalog-ir-entries-post-045 -->
 - [IR-046: consumer-generated リポジトリ種別誤検知防止](rules/IR-046-consumer-generated-repo-type-fp-prevention.md)
@@ -154,7 +163,9 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 
 ### 新規 IR 候補（candidate state、新規 IR 登録 gate 前）
 
-以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。REQ-028-012 が定める新規 IR 登録 gate（(a) 存在資格 gate、(b) hard governance 追加 gate）に従い確定する。candidate 状態の IR は catalog への本エントリ追加を含まず、別途 SPEC または作業記録で管理する。
+以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。
+REQ-028-012 が定める新規 IR 登録 gate（(a) 存在資格 gate、(b) hard governance 追加 gate）に従い確定する。
+candidate 状態の IR は catalog への本エントリ追加を含まず、別途 SPEC または作業記録で管理する。
 
 | Field | 値 |
 |-------|------|
@@ -181,23 +192,33 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 
 ### check_changed_docs.ts 関連ルールの整理（targeted-docs-guard-implementation.md Phase 1）
 
-check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（req-save/spec-save/case-run/case-close）に必要なルールサブセットを適用する。catalog は IR ルールの正典であり、check_changed_docs.ts の profileFor() が返す rules は catalog IR のサブセット参照である。check_integrity.ts は全 IR ルール（full-audit gate_level）を実装する。check_changed_docs.ts と check_integrity.ts の二系統で IR ルールを共有し、検出ロジックを重複実装しない。
+check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（req-save/spec-save/case-run/case-close）に必要なルールサブセットを適用する。
+catalog は IR ルールの正典であり、check_changed_docs.ts の profileFor() が返す rules は catalog IR のサブセット参照である。
+check_integrity.ts は全 IR ルール（full-audit gate_level）を実装する。
+check_changed_docs.ts と check_integrity.ts の二系統で IR ルールを共有し、検出ロジックを重複実装しない。
 
-詳細な IR-*.md の追加・更新内容は後続の spec-save / case-run 工程で確定する。check_changed_docs.ts の profile rules と SPEC 記載項目の対応関係は REQ-010-269（1:1 対応不要、包括カバー許容）に従う。
+詳細な IR-*.md の追加・更新内容は後続の spec-save / case-run 工程で確定する。
+check_changed_docs.ts の profile rules と SPEC 記載項目の対応関係は REQ-010-269（1:1 対応不要、包括カバー許容）に従う。
 
 ### IR-055 heuristic 行内複数パターン集計仕様（REQ-010-263/264）
 
-IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/specs/`、`docs/guides/`、`docs/decisions/` 等）が存在する場合の集計規則を以下のとおり定める。本節は `check_integrity.ts` 実装が従うべき契約であり、実装詳細は対象外とする。
+IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/specs/`、`docs/guides/`、`docs/decisions/` 等）が存在する場合の集計規則を以下のとおり定める。
+本節は `check_integrity.ts` 実装が従うべき契約であり、実装詳細は対象外とする。
 
-**集計単位**: 行内に複数パターンがマッチした場合、パターン種別ごとに1件を検出件数へ計上する。同一パターンの複数回マッチは1件に集約し、異なるパターン種別のマッチは別件として計上する。
+**集計単位**: 行内に複数パターンがマッチした場合、パターン種別ごとに1件を検出件数へ計上する。
+同一パターンの複数回マッチは1件に集約し、異なるパターン種別のマッチは別件として計上する。
 
-**ファイルパス・行番号表現**: 検出結果レコードは `ファイルパス:行番号:違反内容:検出ルール` 形式とし、同一行に複数パターン種別が存在する場合はパターン種別ごとに別レコードとして列挙する。同一行の複数パターンを単一レコードへ圧縮しない。
+**ファイルパス・行番号表現**: 検出結果レコードは `ファイルパス:行番号:違反内容:検出ルール` 形式とし、同一行に複数パターン種別が存在する場合はパターン種別ごとに別レコードとして列挙する。
+同一行の複数パターンを単一レコードへ圧縮しない。
 
-**baseline 整合**: `docs/specs/foundations/harness-separation-model.md` の baseline リスト（11件）は本集計仕様に従って再抽出した結果と一致すること。baseline 抽出元と SPEC 記載の不一致が検出された場合、本節の集計仕様を正として実装または baseline を調整する。
+**baseline 整合**: `docs/specs/foundations/harness-separation-model.md` の baseline リスト（11件）は本集計仕様に従って再抽出した結果と一致すること。
+baseline 抽出元と SPEC 記載の不一致が検出された場合、本節の集計仕様を正として実装または baseline を調整する。
 
-**適用対象**: heuristic level（WARNING）の検出に適用する。strict level（NG）の検出は行単位1件の従来仕様を維持し、本節の対象外とする。
+**適用対象**: heuristic level（WARNING）の検出に適用する。
+strict level（NG）の検出は行単位1件の従来仕様を維持し、本節の対象外とする。
 
-実装側（`check_integrity.ts`）の集計ロジックは本仕様に従うことが期待される。仕様と実装の不整合が観察された場合は intake / inspect 経由で本 SPEC の更新または実装の修正を提案する。
+実装側（`check_integrity.ts`）の集計ロジックは本仕様に従うことが期待される。
+仕様と実装の不整合が観察された場合は intake / inspect 経由で本 SPEC の更新または実装の修正を提案する。
 
 ## docs-check 項目役割範囲（REQ-010-004）
 
@@ -311,13 +332,16 @@ check_integrity に関わる test suite 2系統の責務分担。
 
 **regression test fixture mirroring 方式（REQ-010-258 実装詳細）**:
 
-regression test の fixture copy は実ファイル構成の完全ミラーリング（全 `.ts` ファイルコピー）を行う。手動 copy 対象更新運用は禁止し、新規モジュール追加時に `copyScripts()` が自動的に全ファイルをコピーすることで追従する。実装は `check_integrity.test.ts` の `copyScripts()` 関数が担う。
+regression test の fixture copy は実ファイル構成の完全ミラーリング（全 `.ts` ファイルコピー）を行う。
+手動 copy 対象更新運用は禁止し、新規モジュール追加時に `copyScripts()` が自動的に全ファイルをコピーすることで追従する。
+実装は `check_integrity.test.ts` の `copyScripts()` 関数が担う。
 
 ### 候補語網羅性規定（IR-044 連携）
 
 `document-type-responsibilities.md` 訳語表に掲載される散文英語普通名詞（finding, promoted artifact, drift, regression, gate, severity, category, schema, observation 等）を候補語として網羅検証し、各語を検出対象（IR-044 drift 検出候補）または正規使用（対象外）のいずれかに分類する。
 
-候補語対照表は `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` と連携して最新状態を保ち、対象外とする語には IR-044 適用除外の根拠を併記する。候補語の限定は訳語表全体で検証した結果に基づき、限定の根拠を対照表へ明記する。
+候補語対照表は `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` と連携して最新状態を保ち、対象外とする語には IR-044 適用除外の根拠を併記する。
+候補語の限定は訳語表全体で検証した結果に基づき、限定の根拠を対照表へ明記する。
 
 ## メタ整合性
 

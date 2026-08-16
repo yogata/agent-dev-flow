@@ -9,7 +9,8 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 現行 REQ: 35件、廃止済み: 0件
 <!-- AUTOGEN:END -->
 
-現行要件は REQ-001 から REQ-035 の35件である。各 REQ の詳細は各 REQ ファイル本文を参照。
+現行要件は REQ-001 から REQ-035 の35件である。
+各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
 |---|---|
@@ -53,7 +54,8 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-016 の16件である（DEC-008、DEC-015、DEC-016 は proposed、DEC-005 は superseded）。詳細は [Decision インデックス](decisions/README.md) 参照。
+現行 Decision は DEC-001 から DEC-016 の16件である（DEC-008、DEC-015、DEC-016 は proposed、DEC-005 は superseded）。
+詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
 |---|---|
@@ -76,7 +78,8 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 
 ## 仕様（SPEC）
 
-SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。詳細は [SPEC インデックス](specs/README.md) 参照。
+SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。
+詳細は [SPEC インデックス](specs/README.md) 参照。
 
 ### 横断 SPEC（`specs/workflows/`）
 
@@ -93,7 +96,8 @@ SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン�
 
 ### 基盤 SPEC（`specs/{foundations,responsibilities,quality,integrity,local,authoring}/`）
 
-基盤 SPEC は 6 ドメインへ整理済み。各ドメイン直下に主要 SPEC を置き、詳細・実装固有事項は `references/` サブディレクトリへ分離する（Wave 3 再構築）。
+基盤 SPEC は 6 ドメインへ整理済み。
+各ドメイン直下に主要 SPEC を置き、詳細・実装固有事項は `references/` サブディレクトリへ分離する（Wave 3 再構築）。
 
 - [システム仕様](specs/foundations/system.md)
 - [文書フォーマット規約](specs/foundations/patterns.md)

@@ -59,7 +59,8 @@ USE FOR / DO NOT USE FOR を記述。
 
 ## skill SPEC の記述中心
 
-skill SPEC は提供する判断、USE FOR、DO NOT USE FOR、入力、出力、副作用、不変条件、reference 選択条件、所有 script、検証条件を中心に記述する。操作手順、例、作業履歴の列挙を必須としない。
+skill SPEC は提供する判断、USE FOR、DO NOT USE FOR、入力、出力、副作用、不変条件、reference 選択条件、所有 script、検証条件を中心に記述する。
+操作手順、例、作業履歴の列挙を必須としない。
 
 - 200行を超える SKILL.md は責務集中、不要な手順、例、作業履歴の混入について確認する（REQ-002-037）
 - 200行を超えることだけを不合格理由にしない。責務上の根拠があれば維持を認める

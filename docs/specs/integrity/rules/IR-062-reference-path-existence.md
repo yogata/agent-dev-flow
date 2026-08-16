@@ -20,7 +20,8 @@ related_spec:
 
 ## 検出対象
 
-command 定義（`.opencode/commands/agentdev/*.md`）、skill の SKILL.md、および skill の reference ファイル（`references/*.md`）に記述されたパス参照（`scripts/`、`templates/`、`references/` 配下の `.ts`/`.md`）が実ファイルを指すことを検証する。サブディレクトリを含むネスト参照（例: `templates/case-open/standard.md`、`scripts/src/alloc-req-number.ts`）を検出対象とする（RU-0009、AG-016）。
+command 定義（`.opencode/commands/agentdev/*.md`）、skill の SKILL.md、および skill の reference ファイル（`references/*.md`）に記述されたパス参照（`scripts/`、`templates/`、`references/` 配下の `.ts`/`.md`）が実ファイルを指すことを検証する。
+サブディレクトリを含むネスト参照（例: `templates/case-open/standard.md`、`scripts/src/alloc-req-number.ts`）を検出対象とする（RU-0009、AG-016）。
 
 ## 検出方法
 
@@ -32,7 +33,8 @@ command 定義（`.opencode/commands/agentdev/*.md`）、skill の SKILL.md、�
 3. SKILL.md のみ、他 skill に実在する bare 参照を cross-skill NG として報告する（明示パスへの修正を促す）。reference ファイルは正当な他 skill 資産への言及があり得るため文脈解決で ok とする
 4. いずれにも解決しない参照を NG（broken-reference）として報告する
 
-backtick 囲みパス成分はパス解決前に除去する（REQ-010-020）。パスセグメントの正規表現は ASCII 系文字に限定し、CJK 句読点に隣接した参照が句読点を跨いで延長されることを防ぐ。
+backtick 囲みパス成分はパス解決前に除去する（REQ-010-020）。
+パスセグメントの正規表現は ASCII 系文字に限定し、CJK 句読点に隣接した参照が句読点を跨いで延長されることを防ぐ。
 
 ## severity
 

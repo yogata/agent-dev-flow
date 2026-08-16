@@ -33,14 +33,14 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 | 責務 | 本スキル | 対象外（他 skill/command の責務） |
 |------|----------|----------------------------------|
-| 共通検証 script の所有と運用 | ✓ | — |
-| 公開検証契約の提供 | ✓ | — |
-| 共有 lib と対応 test の所有 | ✓ | — |
-| REQ/Decision/SPEC 内容判断 | — | `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-spec-file-manager` |
-| REQ/Decision 番号、要件行 ID 採番 | — | `agentdev-req-file-manager`、`agentdev-decision-file-manager` |
-| target_area 検索 | — | `agentdev-spec-file-manager` |
-| 文書作成、更新、削除 | — | 各 file-manager skill |
-| 保存、commit、push、承認 | — | 各 command |
+| 共通検証 script の所有と運用 | ✓ | - |
+| 公開検証契約の提供 | ✓ | - |
+| 共有 lib と対応 test の所有 | ✓ | - |
+| REQ/Decision/SPEC 内容判断 | - | `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-spec-file-manager` |
+| REQ/Decision 番号、要件行 ID 採番 | - | `agentdev-req-file-manager`、`agentdev-decision-file-manager` |
+| target_area 検索 | - | `agentdev-spec-file-manager` |
+| 文書作成、更新、削除 | - | 各 file-manager skill |
+| 保存、commit、push、承認 | - | 各 command |
 
 ---
 

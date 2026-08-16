@@ -63,9 +63,12 @@ updated: 2026-08-15
 
 ## Artifact Graph 利用
 
-backlog-review は入力成果物に含まれる REQ, Decision, SPEC, canonical owner 等の明示情報を起点として既存正規成果物との関係候補を Artifact Graph 経由で取得できる。候補には統合, 分割, depends_on 解決の補助 evidence を含む。
+backlog-review は入力成果物に含まれる REQ, Decision, SPEC, canonical owner 等の明示情報を起点として既存正規成果物との関係候補を Artifact Graph 経由で取得できる。
+候補には統合, 分割, depends_on 解決の補助 evidence を含む。
 
-Graph は候補提供者であり、統合, 分割, depends_on, 意味的重複の最終判断は正規成果物本文と独立探索手段での確認後に下す。promoted artifact 自体を Graph の正規 node とすることは必須でない。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+Graph は候補提供者であり、統合, 分割, depends_on, 意味的重複の最終判断は正規成果物本文と独立探索手段での確認後に下す。
+promoted artifact 自体を Graph の正規 node とすることは必須でない。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 
@@ -91,11 +94,13 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 
 ## tentative_classification と分類根拠伝播
 
-backlog-review は採用済み成果物の分析時に tentative_classification（暫定分類）と分類根拠を RU へ付与して伝播させる（REQ-001-033、REQ-001）。分類根拠は learning/intake 成果物から後続工程（req-define、spec-save）へ引き継がれる情報であり、本 SPEC は backlog-review での扱いを規定する。
+backlog-review は採用済み成果物の分析時に tentative_classification（暫定分類）と分類根拠を RU へ付与して伝播させる（REQ-001-033、REQ-001）。
+分類根拠は learning/intake 成果物から後続工程（req-define、spec-save）へ引き継がれる情報であり、本 SPEC は backlog-review での扱いを規定する。
 
 ### 伝播させる分類根拠フィールド
 
-backlog-review は採用済み成果物から読み取った次の分類根拠を RU frontmatter へ記録する。詳細なフィールド定義は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」を参照。
+backlog-review は採用済み成果物から読み取った次の分類根拠を RU frontmatter へ記録する。
+詳細なフィールド定義は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」を参照。
 
 - change_nature（変更の性質: 8種別のいずれか）
 - req_impact（REQ影響の有無）
@@ -108,15 +113,20 @@ backlog-review は採用済み成果物から読み取った次の分類根拠�
 
 ### tentative_classification との関係
 
-tentative_classification（v2:REQ-0155-003 の7値）は文書種別の暫定分類であり、分類根拠は分類判断の根拠情報である。両者は併存し、req-define が最終分類を確定する際の入力となる。
+tentative_classification（v2:REQ-0155-003 の7値）は文書種別の暫定分類であり、分類根拠は分類判断の根拠情報である。
+両者は併存し、req-define が最終分類を確定する際の入力となる。
 
 ### 後方互換運用
 
-分類根拠は soft-contract（DEC-003）として扱い、欠落時は unknown 既定値で警告する後方互換運用をとる。分類根拠が欠落した旧 RU も unknown 既定値で受け入れる。欠落により RU を拒否しない。具体的なシリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」に従う。
+分類根拠は soft-contract（DEC-003）として扱い、欠落時は unknown 既定値で警告する後方互換運用をとる。
+分類根拠が欠落した旧 RU も unknown 既定値で受け入れる。
+欠落により RU を拒否しない。
+具体的なシリアライズ形式は `artifact-contracts.md`「分類根拠伝播契約」に従う。
 
 ### 暫定扱いの明記
 
-backlog-review が付与する tentative_classification および分類根拠は暫定（tentative）扱いであり、req-define が最終確定する（REQ-004-087）。backlog-review 自体は最終分類を確定しない。
+backlog-review が付与する tentative_classification および分類根拠は暫定（tentative）扱いであり、req-define が最終確定する（REQ-004-087）。
+backlog-review 自体は最終分類を確定しない。
 
 ## tentative_classification フィールド仕様
 
@@ -164,11 +174,16 @@ backlog-review は全 RU frontmatter に `tentative_classification` を付与す
 
 ## adversarial-review 挿入境界（経路E）
 
-本節は backlog-review における adversarial-review caller integration（REQ-015 経路E）の挿入境界を正典として所有する（REQ-014-011）。共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は経路E 固有の挿入位置、発動条件、順序、矛盾取扱いのみを所有する。adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review SPEC を正とし、本節で再定義しない。候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の正規所有者は agentdev-backlog-integration SPEC とし、本節は参照する。
+本節は backlog-review における adversarial-review caller integration（REQ-015 経路E）の挿入境界を正典として所有する（REQ-014-011）。
+共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は経路E 固有の挿入位置、発動条件、順序、矛盾取扱いのみを所有する。
+adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review SPEC を正とし、本節で再定義しない。
+候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の正規所有者は agentdev-backlog-integration SPEC とし、本節は参照する。
 
 ### 挿入境界と Step 構造（REQ-015-001）
 
-backlog-review の処理段階へ review 挿入境界を次のとおり一意に特定する。発動条件判定と review 呼出を分離する（REQ-015-001）。本節は挿入境界の正典であり、Workflow Skill（`agentdev-workflow-backlog-review`）内の発動条件判定手順が実行時実装先となる。
+backlog-review の処理段階へ review 挿入境界を次のとおり一意に特定する。
+発動条件判定と review 呼出を分離する（REQ-015-001）。
+本節は挿入境界の正典であり、Workflow Skill（`agentdev-workflow-backlog-review`）内の発動条件判定手順が実行時実装先となる。
 
 | 段階 | 対応処理 | 役割 |
 |---|---|---|
@@ -179,11 +194,14 @@ backlog-review の処理段階へ review 挿入境界を次のとおり一意に
 
 ### 構成、review、承認の順序（REQ-015-008）
 
-経路E は構成、review、承認の順で進む（REQ-015-008）。review は構成（分析、統合・分割判定）の完了後、承認（構成承認、矛盾検出時追加判断）の前に挿入する。review を構成前に、または承認後に挿入しない。
+経路E は構成、review、承認の順で進む（REQ-015-008）。
+review は構成（分析、統合・分割判定）の完了後、承認（構成承認、矛盾検出時追加判断）の前に挿入する。
+review を構成前に、または承認後に挿入しない。
 
 ### 発動条件（REQ-015-002、REQ-015-003）
 
-backlog-review は adversarial-review を原則実行する（default-on、REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、RU 構成案（統合・分割判定、depends_on 依存解決）に意味的決定が存在する場合に発動する。
+backlog-review は adversarial-review を原則実行する（default-on、REQ-015-002）。
+ユーザー明示指定は通常発動の必須条件ではなく、RU 構成案（統合・分割判定、depends_on 依存解決）に意味的決定が存在する場合に発動する。
 
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（矛盾検出以降）を継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
   - RU 構成要素が1件のみ（統合・分割判定不要、depends_on 解決不要）で矛盾検出対象が存在しない場合
@@ -191,17 +209,24 @@ backlog-review は adversarial-review を原則実行する（default-on、REQ-0
 
 ### 従来フロー維持（REQ-015-003）
 
-skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、従来フロー（実行前同期から完了報告まで）を維持する（REQ-015-003）。review 挿入境界は既存処理段階を追加、削除、並べ替えせず、発動条件判定と review 呼出を分離した形で挿入する。
+skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、従来フロー（実行前同期から完了報告まで）を維持する（REQ-015-003）。
+review 挿入境界は既存処理段階を追加、削除、並べ替えせず、発動条件判定と review 呼出を分離した形で挿入する。
 
 ### 矛盾の扱い（REQ-015-008）
 
-adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は backlog-review の既存矛盾検出（agentdev-backlog-integration 矛盾検出ロジック）へ渡す。adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛盾の解決、採用、却下、partial success 扱いは既存矛盾検出と HITL（REQ-003-009）へ委ねる。review 内で矛盾が発生したことを理由に対象 RU を自動除外、自動承認しない。
+adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は backlog-review の既存矛盾検出（agentdev-backlog-integration 矛盾検出ロジック）へ渡す。
+adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛盾の解決、採用、却下、partial success 扱いは既存矛盾検出と HITL（REQ-003-009）へ委ねる。
+review 内で矛盾が発生したことを理由に対象 RU を自動除外、自動承認しない。
 
 ### 戻り先と反映責務
 
-accepted finding の RU 構成案への反映は backlog-review 呼出元の責務である（REQ-014-006）。adversarial-review は finding を提示し、合意候補を形成するが、RU 本文、frontmatter、統合判定への反映を自身では行わない。反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出の再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。unresolved な本質的争点またはユーザー判断事項が残る場合、RU 生成、採用済み成果物削除、Git 永続化等の後続不可逆処理へ進まない（REQ-014-009）。
+accepted finding の RU 構成案への反映は backlog-review 呼出元の責務である（REQ-014-006）。
+adversarial-review は finding を提示し、合意候補を形成するが、RU 本文、frontmatter、統合判定への反映を自身では行わない。
+反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出の再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。
+unresolved な本質的争点またはユーザー判断事項が残る場合、RU 生成、採用済み成果物削除、Git 永続化等の後続不可逆処理へ進まない（REQ-014-009）。
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、agentdev-backlog-integration SPEC「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。backlog-review command 固有の挿入境界（発動条件、挿入構造、順序、矛盾取扱い）のみを本節が所有し、候補判断基準、内部手続きの詳細は agentdev-backlog-integration SPEC を正とする。
+本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、agentdev-backlog-integration SPEC「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。
+backlog-review command 固有の挿入境界（発動条件、挿入構造、順序、矛盾取扱い）のみを本節が所有し、候補判断基準、内部手続きの詳細は agentdev-backlog-integration SPEC を正とする。
 

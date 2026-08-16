@@ -18,7 +18,10 @@ AgentDevFlow の実行時パッケージ境界を定義し、本体リポジト�
 ## 4 種のリポジトリ種別（Repo Type）
 
 > plugin/npm/package 配布形態は現在未対応である（REQ-002-064 参照）。
-> REQ-009-006 は5種のリポジトリ種別として将来対応の `plugin-future` を含めて定義する。本 SPEC の4種表は現行実装済みの種別のみを扱い、`plugin-future` は将来対応の第5種として本表から除外する。REQ と本 SPEC の種別数の差は対応時期の違いによるものであり、矛盾ではない。`plugin-future` の実装時に本表へ行を追加する。
+> REQ-009-006 は5種のリポジトリ種別として将来対応の `plugin-future` を含めて定義する。
+> 本 SPEC の4種表は現行実装済みの種別のみを扱い、`plugin-future` は将来対応の第5種として本表から除外する。
+> REQ と本 SPEC の種別数の差は対応時期の違いによるものであり、矛盾ではない。
+> `plugin-future` の実装時に本表へ行を追加する。
 
 | Type ID | 名称 | 説明 | `.opencode/` の意味 | 典型例 |
 |---------|------|------|---------------------|--------|
@@ -73,7 +76,8 @@ skills/agentdev-*/             → 原本
 配布対象: `*.ts`（TSソース）、`lib/*.ts`（共有ライブラリ）、`tests/*.test.ts`（テスト）、`package.json`、`tsconfig.json`、`bun.lock`、`.gitignore`、`README.md`
 除外対象: `node_modules/`（.gitignore で除外済み、consumer 側で `bun install` により再生成）
 
-scripts/ は skill junction の配下に位置し、skill の一部として配布される。ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）。
+scripts/ は skill junction の配下に位置し、skill の一部として配布される。
+ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）。
 
 ### Consumer（AgentDevFlow 導入済み）
 
@@ -144,11 +148,16 @@ Consumer プロジェクトで独自 command/skill を追加する際の命名�
 
 ## 導入方式ポリシー（Installation Method Policy）
 
-通常の consumer 導入は symlink または junction ベースの link mode を推奨する（REQ-009-009）。具体化された release archive は別個の配布および検証 projection であり、REQ-009-045 が別途正規所有する。copy 型インストール（.opencode/ 配下へ配布成果物の実体を複製する方式）と npm/package 化は対象外を維持し、release archive を通常の copy インストールの延長として扱わない。
+通常の consumer 導入は symlink または junction ベースの link mode を推奨する（REQ-009-009）。
+具体化された release archive は別個の配布および検証 projection であり、REQ-009-045 が別途正規所有する。
+copy 型インストール（.opencode/ 配下へ配布成果物の実体を複製する方式）と npm/package 化は対象外を維持し、release archive を通常の copy インストールの延長として扱わない。
 
-provisioning（agent-dev-flow チェックアウトの取得）は利用者の責務であり、利用者による git clone と利用者によるソース ZIP 展開の2形態を正規の provisioning 形態とする（REQ-009-010、REQ-009-046、DEC-016）。install スクリプトはチェックアウト済みの `.agentdev-plugin/` を前提に junction 設定のみを行い、provisioning（clone、fetch、reset）と network access を行わない。
+provisioning（agent-dev-flow チェックアウトの取得）は利用者の責務であり、利用者による git clone と利用者によるソース ZIP 展開の2形態を正規の provisioning 形態とする（REQ-009-010、REQ-009-046、DEC-016）。
+install スクリプトはチェックアウト済みの `.agentdev-plugin/` を前提に junction 設定のみを行い、provisioning（clone、fetch、reset）と network access を行わない。
 
-provisioning（チェックアウトの取得手段: clone / ZIP 展開）と install 手段（link mode による junction 接続）は別軸である。ZIP 展開による provisioning は手動 copy インストールに該当せず、install 手段は引き続き link mode に限定される。「source ZIP によるチェックアウト供給」と「release archive projection」は別個の概念であり、両者を混同する説明をしない。
+provisioning（チェックアウトの取得手段: clone / ZIP 展開）と install 手段（link mode による junction 接続）は別軸である。
+ZIP 展開による provisioning は手動 copy インストールに該当せず、install 手段は引き続き link mode に限定される。
+「source ZIP によるチェックアウト供給」と「release archive projection」は別個の概念であり、両者を混同する説明をしない。
 
 配布依存境界の検出契約（link projection と archive projection の区別、projection ごとの検査、検査エラーの取扱い）は `integrity/distribution-boundary.md` が正規所有する（REQ-029、DEC-014）。
 
@@ -248,15 +257,24 @@ Case ファイルのスキーマ正本は [ローカル Case ファイル](local
 
 ### チェックアウト検証（usable checkout 判定）
 
-install-consumer-opencode.ps1 と check-consumer-opencode.ps1 は、agent-dev-flow チェックアウトの検証を git リポジトリ性必須判定ではなく usable checkout 判定で行う。判定基準はチェックアウト配置先（既定 `.agentdev-plugin/`）配下に `src/opencode/` が存在することであり、`.git` の存在を必須としない（REQ-009-047、REQ-009-048）。
+install-consumer-opencode.ps1 と check-consumer-opencode.ps1 は、agent-dev-flow チェックアウトの検証を git リポジトリ性必須判定ではなく usable checkout 判定で行う。
+判定基準はチェックアウト配置先（既定 `.agentdev-plugin/`）配下に `src/opencode/` が存在することであり、`.git` の存在を必須としない（REQ-009-047、REQ-009-048）。
 
-チェックアウトが検出できない場合（チェックアウト配置先に `src/opencode/` が存在しない場合を含む）、両スクリプトはエラー停止し、clone コマンド例とソースアーカイブ取得手順を案内表示する。provisioning を代行実行しない。
+チェックアウトが検出できない場合（チェックアウト配置先に `src/opencode/` が存在しない場合を含む）、両スクリプトはエラー停止し、clone コマンド例とソースアーカイブ取得手順を案内表示する。
+provisioning を代行実行しない。
 
-check-consumer-opencode.ps1 の版（commit/branch）報告は `.git` が存在する場合のみ行い、ZIP 展開チェックアウト（`.git` なし）の版は unknown とする。「.agentdev-plugin/ が git リポジトリでない」は乖離（DIVERGENCE）ではなく情報報告として扱う。version manifest ファイルは導入しない。ZIP 展開環境はサポート対象外とし、不具合報告の受け付け対象から除外する運用とする。
+check-consumer-opencode.ps1 の版（commit/branch）報告は `.git` が存在する場合のみ行い、ZIP 展開チェックアウト（`.git` なし）の版は unknown とする。
+「.agentdev-plugin/ が git リポジトリでない」は乖離（DIVERGENCE）ではなく情報報告として扱う。
+version manifest ファイルは導入しない。
+ZIP 展開環境はサポート対象外とし、不具合報告の受け付け対象から除外する運用とする。
 
 ### 更新運用
 
-導入済み環境の更新は利用者の責務である（REQ-009-049）。git clone 環境では git pull 後に install を再実行する。ZIP 展開環境では ZIP 再取得・ディレクトリ差し替え後に install を再実行する。install の apply は冪等であり、再実行で junction 構成を変化させない。ZIP 更新時の install 再実行の要否は仕様として推奨・不推奨の形で定めず、利用者判断に委ねる。
+導入済み環境の更新は利用者の責務である（REQ-009-049）。
+git clone 環境では git pull 後に install を再実行する。
+ZIP 展開環境では ZIP 再取得・ディレクトリ差し替え後に install を再実行する。
+install の apply は冪等であり、再実行で junction 構成を変化させない。
+ZIP 更新時の install 再実行の要否は仕様として推奨・不推奨の形で定めず、利用者判断に委ねる。
 
 ### link target 確認方式
 
@@ -301,7 +319,9 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 
 ## 配布物依存スキルの src 昇格（REQ-002-001/002、v2:ADR-0134）
 
-`.opencode/skills/` 配下は既定で `.gitignore` により git 管理対象外である。配布物（`src/opencode/commands/`, `src/opencode/skills/`）が `.opencode/skills/` 配下のスキルを参照する場合、新規 clone 環境でスキルが不在になり配布物の自己完結性（self-contained）が崩れる。配布物が依存するスキルは `src/opencode/skills/` へ昇格（配布物化）し、repo-local 専用スキルと明確に境界を分ける（v2:ADR-0134）。
+`.opencode/skills/` 配下は既定で `.gitignore` により git 管理対象外である。
+配布物（`src/opencode/commands/`, `src/opencode/skills/`）が `.opencode/skills/` 配下のスキルを参照する場合、新規 clone 環境でスキルが不在になり配布物の自己完結性（self-contained）が崩れる。
+配布物が依存するスキルは `src/opencode/skills/` へ昇格（配布物化）し、repo-local 専用スキルと明確に境界を分ける（v2:ADR-0134）。
 
 ### 昇格基準
 
@@ -310,7 +330,8 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 | 配布物依存スキル | `src/opencode/skills/<name>/` | `src/` 配下で通常トラック | `agentdev-*` グロブ対象外の場合は install script で個別 junction 対象に追加 | v2:ADR-0134 / REQ-002-001 |
 | repo-local 専用スキル | `.opencode/skills/repo-*/` | `.gitignore` `repo-*` ホワイトリストでトラック | 配布対象外（REQ-001） | REQ-001 / REQ-002-002 |
 
-昇格判定は「配布物（`src/opencode/commands/`, `src/opencode/skills/`）が当該スキルを参照するか否か」で機械的に行う。参照の有無は IR-058（後述）が `git ls-files` 突合とテキスト参照走査で検出する。
+昇格判定は「配布物（`src/opencode/commands/`, `src/opencode/skills/`）が当該スキルを参照するか否か」で機械的に行う。
+参照の有無は IR-058（後述）が `git ls-files` 突合とテキスト参照走査で検出する。
 
 ### 昇格手順
 

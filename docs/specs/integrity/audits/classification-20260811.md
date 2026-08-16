@@ -58,7 +58,9 @@ baseline_head: 4e6937c73dfbe5a47d6fc04f9245103ac312dd15
 | MERGE* | 9 | 6（IR-015, IR-027, IR-039, IR-040, IR-041, IR-042） | 3（IR-036, IR-037, IR-043） | - | detector 実装済み IR は KEEP、未実装 IR は IMPLEMENT。MERGE 採用0件（保守的解釈、§5.2） |
 | DELETE | 1 | - | - | 1 | IR-011 確定 |
 
-> **MERGE 採用0件の根拠**: 本 Phase 2 は task 指示に基づき「複数の妥当な解釈を許す場合は最も保守的な解釈（現状維持寄り）」を採用。MERGE* 候補9件のうち detector 実装済み IR（意味ベース含む）は現状維持として KEEP を確定し、統合可能性は Phase 3 (OU-004) または Phase 5 (OU-006) での再評価に委ねる。詳細は §5.2、§9.3 Findings 参照。
+> **MERGE 採用0件の根拠**: 本 Phase 2 は task 指示に基づき「複数の妥当な解釈を許す場合は最も保守的な解釈（現状維持寄り）」を採用。
+> MERGE* 候補9件のうち detector 実装済み IR（意味ベース含む）は現状維持として KEEP を確定し、統合可能性は Phase 3 (OU-004) または Phase 5 (OU-006) での再評価に委ねる。
+> 詳細は §5.2、§9.3 Findings 参照。
 
 ## 3. AG-001 8項目存在条件の適用
 
@@ -75,7 +77,9 @@ REQ-028-001 が定義する8項目存在条件を各 IR へ適用し、判定の
 | 7 | 他 IR 非包含 | 他 IR との重複がなく独立して存在意義がある、または包括関係で下位 IR として独立意義を持つ |
 | 8 | severity / gate 実行可能性 | severity と gate_level が定義され、その gate で実行可能（AG-009.7 に基づき lifecycle に依存しない独立軸として維持） |
 
-> **第8項目に関する注記**: REQ-028-001 本文は8項目存在を宣言するが、第8項目の厳密な定義は Phase 1 §9.1 で「Phase 2 で確定」とされていた。本 Phase 2 では DEC-013 AG-009 決定7「severity、gate_level は実行中の IR に対する独立軸としてのみ維持」を第8項目の正規解釈として採用する。この解釈は SPEC確定候補（§10.1）として記録し、Phase 6 (OU-007) 全体検証で確定する。
+> **第8項目に関する注記**: REQ-028-001 本文は8項目存在を宣言するが、第8項目の厳密な定義は Phase 1 §9.1 で「Phase 2 で確定」とされていた。
+> 本 Phase 2 では DEC-013 AG-009 決定7「severity、gate_level は実行中の IR に対する独立軸としてのみ維持」を第8項目の正規解釈として採用する。
+> この解釈は SPEC確定候補（§10.1）として記録し、Phase 6 (OU-007) 全体検証で確定する。
 
 ### 3.1 判定フロー
 
@@ -94,7 +98,9 @@ IR →
 
 ### 3.2 8項目スコアリング集計
 
-各 IR の8項目達成状況を集計。詳細は Phase 1 §3, §4 を参照。本節は判定確定のための要約。
+各 IR の8項目達成状況を集計。
+詳細は Phase 1 §3, §4 を参照。
+本節は判定確定のための要約。
 
 | 8項目達成パターン | 該当 IR 数 | 確定判定 |
 |---|---|---|
@@ -105,7 +111,8 @@ IR →
 
 ## 4. 全59 IR 確定判定一覧表
 
-Phase 1 §3「全59 IR 判定候補一覧表」との対応。各 IR の詳細証拠（11項目）は Phase 1 §4 を参照。
+Phase 1 §3「全59 IR 判定候補一覧表」との対応。
+各 IR の詳細証拠（11項目）は Phase 1 §4 を参照。
 
 | IR | title | Phase 1 候補 | Phase 2 確定 | 主要根拠（AG-001 8項目から） |
 |---|---|---|---|---|
@@ -169,7 +176,8 @@ Phase 1 §3「全59 IR 判定候補一覧表」との対応。各 IR の詳細�
 | IR-060 | forbidden Japanese word detection | IMPLEMENT* | **IMPLEMENT** | 条件3 未達成（detector 未実装）。完全一致検出として実装 |
 | IR-061 | 索引類自動生成整合性 | KEEP | KEEP | 3(detector リテラル、複数 checker), 5(route) 達成 |
 
-> **IR-045 catalog-only に関する注記**: IR-045 は catalog-only tombstone（ファイル不存在、catalog 上のみ存在）であり、本 Phase 2 の判定対象（file-backed 59件）には含まない。Phase 1 §9.3 で言及された IR-045 catalog-only 扱いは Phase 4 (OU-005) または Phase 6 (OU-007) で確定する。
+> **IR-045 catalog-only に関する注記**: IR-045 は catalog-only tombstone（ファイル不存在、catalog 上のみ存在）であり、本 Phase 2 の判定対象（file-backed 59件）には含まない。
+> Phase 1 §9.3 で言及された IR-045 catalog-only 扱いは Phase 4 (OU-005) または Phase 6 (OU-007) で確定する。
 
 ## 5. IMPLEMENT* / MERGE* 候補の確定詳細
 
@@ -188,7 +196,10 @@ Phase 1 §3「全59 IR 判定候補一覧表」との対応。各 IR の詳細�
 | IR-057 | IMPLEMENT* | **KEEP** | detector 実装済み（checkObsoleteSpecPath リテラル参照あり）、route 確立済み。詳細は下記「IR-057 KEEP 昇格の根拠」 |
 | IR-060 | IMPLEMENT* | IMPLEMENT | detector 未実装、完全一致検出として実装 |
 
-**IR-057 KEEP 昇格の根拠**: Phase 1 IMPLEMENT* 候補とした主因は「REQ-028-006 一時移行検査は恒久 IR とせず別種検査とする」可能性の評価保留であった。しかし detector（checkObsoleteSpecPath）はリテラル参照付きで実装済み、route（full-audit, delta-guard, impact-guard）確立済み、Phase 1 §4 の評価でも「detector 実装済み（リテラル参照あり）、route 確立」と記録されている。本 Phase 2 は task 指示「最も保守的な解釈（現状維持寄り）」を採用し、恒久 IR として KEEP を確定する。REQ-028-006 に基づく別種検査（期限/終了条件付き）への移行判断は Phase 3 (OU-004) または Phase 5 (OU-006) へ委譲し、SPEC確定候補（§10.2）に記録する。
+**IR-057 KEEP 昇格の根拠**: Phase 1 IMPLEMENT* 候補とした主因は「REQ-028-006 一時移行検査は恒久 IR とせず別種検査とする」可能性の評価保留であった。
+しかし detector（checkObsoleteSpecPath）はリテラル参照付きで実装済み、route（full-audit, delta-guard, impact-guard）確立済み、Phase 1 §4 の評価でも「detector 実装済み（リテラル参照あり）、route 確立」と記録されている。
+本 Phase 2 は task 指示「最も保守的な解釈（現状維持寄り）」を採用し、恒久 IR として KEEP を確定する。
+REQ-028-006 に基づく別種検査（期限/終了条件付き）への移行判断は Phase 3 (OU-004) または Phase 5 (OU-006) へ委譲し、SPEC確定候補（§10.2）に記録する。
 
 ### 5.2 MERGE* 候補9件の確定
 
@@ -206,7 +217,10 @@ Phase 1 §3「全59 IR 判定候補一覧表」との対応。各 IR の詳細�
 | IR-042 | MERGE* | **KEEP** | detector 意味ベース、IR-061 AUTOGEN でカバー、route 確立 |
 | IR-043 | MERGE* | **IMPLEMENT** | detector 未実装。IR-040/041 との統合可能性あり（Phase 3 で再評価） |
 
-**MERGE 採用0件の根拠**: MERGE は「同種 invariant の統合による IR 保守性向上」を目的とするが、REQ-028-013 は「IR 見直しの成功を IR 件数削減数で評価しない」を明記する。本 Phase 2 は件数削減を目的とせず、各 IR の実効性（8項目存在条件）を個別に評価した結果、MERGE すべき IR は存在しなかった。MERGE* 候補9件のうち6件は detector 実装済みで KEEP、3件は detector 未実装で IMPLEMENT として確定する。統合可能性は Phase 3 (OU-004) での横断的再評価、または Phase 5 (OU-006) での detector 実装時に再評価する（§9.3、§10.3 参照）。
+**MERGE 採用0件の根拠**: MERGE は「同種 invariant の統合による IR 保守性向上」を目的とするが、REQ-028-013 は「IR 見直しの成功を IR 件数削減数で評価しない」を明記する。
+本 Phase 2 は件数削減を目的とせず、各 IR の実効性（8項目存在条件）を個別に評価した結果、MERGE すべき IR は存在しなかった。
+MERGE* 候補9件のうち6件は detector 実装済みで KEEP、3件は detector 未実装で IMPLEMENT として確定する。
+統合可能性は Phase 3 (OU-004) での横断的再評価、または Phase 5 (OU-006) での detector 実装時に再評価する（§9.3、§10.3 参照）。
 
 ## 6. DELETE IR の取扱い（IR-011）
 
@@ -234,11 +248,13 @@ Phase 1 §3「全59 IR 判定候補一覧表」との対応。各 IR の詳細�
 - 索引類 AUTOGEN ブロック（generate_indexes.ts 再実行で自動更新）
 - docs/README.md, requirements/README.md 等の件数表示（必要に応じて）
 
-物理削除前の交叉参照再配置は REQ-028-008 に基づき必須。詳細手順は OU-005/006 が定める。
+物理削除前の交叉参照再配置は REQ-028-008 に基づき必須。
+詳細手順は OU-005/006 が定める。
 
 ## 7. Phase 3 (OU-004 #2080) への委譲事項
 
-Phase 3 (OU-004 #2080) は「IMPLEMENT IR の横断的再評価と IMPLEMENT 計画」を責務とする。本 Phase 2 が確定した22件の IMPLEMENT IR を入力とし、次の事項を実施する。
+Phase 3 (OU-004 #2080) は「IMPLEMENT IR の横断的再評価と IMPLEMENT 計画」を責務とする。
+本 Phase 2 が確定した22件の IMPLEMENT IR を入力とし、次の事項を実施する。
 
 ### 7.1 横断的再評価対象（REQ-028-005）
 
@@ -266,11 +282,14 @@ REQ-028-005「共通 detector と declarative data への統合可能性を評�
 
 ### 7.3 detector 実装優先度
 
-IMPLEMENT 22件のうち、severity: strict かつ delta-guard 含む IR（IR-028, IR-029, IR-030, IR-032, IR-033, IR-046, IR-047, IR-048, IR-050 等）は高優先度。severity: heuristic または observation の IR（IR-019, IR-022, IR-026, IR-031, IR-034, IR-035, IR-052, IR-060 等）は中低優先度。詳細な優先度付けと実装計画は OU-004/006 が定める。
+IMPLEMENT 22件のうち、severity: strict かつ delta-guard 含む IR（IR-028, IR-029, IR-030, IR-032, IR-033, IR-046, IR-047, IR-048, IR-050 等）は高優先度。
+severity: heuristic または observation の IR（IR-019, IR-022, IR-026, IR-031, IR-034, IR-035, IR-052, IR-060 等）は中低優先度。
+詳細な優先度付けと実装計画は OU-004/006 が定める。
 
 ### 7.4 TS-008（所有 IR 不明検査）の完全達成
 
-Phase 1 §5.2 で列挙された所有 IR 不明 check 関数約20件（checkTestImpact, checkSkillRenameSymmetry, checkTerminology, checkAgentdevExclusion 等）の IR 紐付け確定、または独立 IR 化、または REQ-XXX gate としての存続判定は Phase 3 (OU-004) または Phase 4 (OU-005) で実施する。本 Phase 2 は判定確定対象を現行59 IR に限定し、新規 IR の追加（所有者不明 check 関数の独立 IR 化）は行わない。
+Phase 1 §5.2 で列挙された所有 IR 不明 check 関数約20件（checkTestImpact, checkSkillRenameSymmetry, checkTerminology, checkAgentdevExclusion 等）の IR 紐付け確定、または独立 IR 化、または REQ-XXX gate としての存続判定は Phase 3 (OU-004) または Phase 4 (OU-005) で実施する。
+本 Phase 2 は判定確定対象を現行59 IR に限定し、新規 IR の追加（所有者不明 check 関数の独立 IR 化）は行わない。
 
 ## 8. test_strategy 項目の結果
 
@@ -329,7 +348,8 @@ targeted docs guard（`check_changed_docs.ts --workflow case-run --base-ref orig
 
 ### 9.3 代替解釈（複数妥当な解釈を持つ IR）
 
-本 Phase 2 は task 指示「最も保守的な解釈（現状維持寄り）」を採用した。代替案を以下に記録し、Phase 3 以降での再評価材料とする。
+本 Phase 2 は task 指示「最も保守的な解釈（現状維持寄り）」を採用した。
+代替案を以下に記録し、Phase 3 以降での再評価材料とする。
 
 | IR | 採用判定 | 代替案 | 代替案の根拠 |
 |---|---|---|---|
@@ -359,13 +379,16 @@ targeted docs guard（`check_changed_docs.ts --workflow case-run --base-ref orig
 
 ## 10. SPEC確定候補
 
-Phase 2 判定確定過程で発見された SPEC レベルの詳細。case-close Step 3 で SPEC 確定チェックの入力となる。
+Phase 2 判定確定過程で発見された SPEC レベルの詳細。
+case-close Step 3 で SPEC 確定チェックの入力となる。
 
 ### 10.1 REQ-028-001 第8項目の正規化
 
-REQ-028-001 は「8項目存在条件」を宣言するが、第8項目の厳密な定義は Phase 1 §9.1 で「Phase 2 で確定」とされていた。本 Phase 2 では DEC-013 AG-009 決定7「severity、gate_level は実行中の IR に対する独立軸としてのみ維持」を第8項目の正規解釈として採用した。
+REQ-028-001 は「8項目存在条件」を宣言するが、第8項目の厳密な定義は Phase 1 §9.1 で「Phase 2 で確定」とされていた。
+本 Phase 2 では DEC-013 AG-009 決定7「severity、gate_level は実行中の IR に対する独立軸としてのみ維持」を第8項目の正規解釈として採用した。
 
-**確定候補**: `integrity-contracts.md` または `integrity-rule-catalog.md` にて「8項目存在条件」を明記し、第8項目を「severity / gate 実行可能性（AG-009.7）」と定義する。本確定は Phase 6 (OU-007) 全体検証で実施、または別途 spec-save 工程で実施。
+**確定候補**: `integrity-contracts.md` または `integrity-rule-catalog.md` にて「8項目存在条件」を明記し、第8項目を「severity / gate 実行可能性（AG-009.7）」と定義する。
+本確定は Phase 6 (OU-007) 全体検証で実施、または別途 spec-save 工程で実施。
 
 ### 10.2 IR-057 の恒久 IR vs 別種検査判定
 
@@ -378,7 +401,8 @@ REQ-028-006「一時移行検査は原則として恒久 IR とせず、期限/�
 
 ### 10.3 MERGE 判定基準の明文化
 
-REQ-028-005「共通 detector と declarative data への統合可能性を評価する。検出方式/severity/例外/failure semantics が異なるものは無理に統合しない」と REQ-028-013「IR 見直しの成功を IR 件数削減数で評価しない」の関係。本 Phase 2 は REQ-028-013 を優先し MERGE 採用0件としたが、Phase 3 での横断的再評価時に「統合による保守性向上」（件数削減以外の価値）を評価基準に加えるか否かを明文化する必要がある。
+REQ-028-005「共通 detector と declarative data への統合可能性を評価する。検出方式/severity/例外/failure semantics が異なるものは無理に統合しない」と REQ-028-013「IR 見直しの成功を IR 件数削減数で評価しない」の関係。
+本 Phase 2 は REQ-028-013 を優先し MERGE 採用0件としたが、Phase 3 での横断的再評価時に「統合による保守性向上」（件数削減以外の価値）を評価基準に加えるか否かを明文化する必要がある。
 
 **確定候補**: REQ-028-005 または `integrity-contracts.md` にて MERGE 判定基準（統合による保守性向上の評価軸、件数削減以外の価値基準）を明文化する。
 
@@ -391,7 +415,9 @@ REQ-028-005「共通 detector と declarative data への統合可能性を評�
 | blocked 判定の IR には追加調査と捉えるような追加検査が指定されている | N/A | blocked 判定0件（全 IR 確定判定完了） |
 | 未判定の IR が残らない | 達成 | §4 で全59 IR を列挙、未判定0件 |
 
-> **adversarial-review に関する注記**: Issue #2079 本文の adversarial-review 発動条件は「ユーザー明示指定時のみ発動」である。ユーザー明示指定がないため、本 Phase 2 は経路G（REQ-015-003）の skip 条件該当性によらずユーザー指定不在により review を実施しない。判定確定で重大な意味的決定（MERGE 採用0件、IR-057 KEEP 昇格等）が発生した場合は本ファイル §9.3 代替解釈および PR 本文の Findings に記録し、PR マージ後に case-auto 親が判断する（自走停止不要）。
+> **adversarial-review に関する注記**: Issue #2079 本文の adversarial-review 発動条件は「ユーザー明示指定時のみ発動」である。
+> ユーザー明示指定がないため、本 Phase 2 は経路G（REQ-015-003）の skip 条件該当性によらずユーザー指定不在により review を実施しない。
+> 判定確定で重大な意味的決定（MERGE 採用0件、IR-057 KEEP 昇格等）が発生した場合は本ファイル §9.3 代替解釈および PR 本文の Findings に記録し、PR マージ後に case-auto 親が判断する（自走停止不要）。
 
 ## 関連情報
 

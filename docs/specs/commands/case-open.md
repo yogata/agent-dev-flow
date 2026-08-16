@@ -85,7 +85,8 @@ Epic + 子 Issue 一括作成に対応する。
 
 ## 構成生成事前検証（preflight）
 
-case-open は Standard flow、Epic flow、混在構成の全ルートで、GitHub Issue 作成前に共通の事前検証を実施する（REQ-006-027）。検証は execution_unit 構成の確定後、最初の GitHub Issue 作成呼び出し（Epic Issue 作成、Standard Issue 作成、子 Issue 作成を含む）の前に完了する。
+case-open は Standard flow、Epic flow、混在構成の全ルートで、GitHub Issue 作成前に共通の事前検証を実施する（REQ-006-027）。
+検証は execution_unit 構成の確定後、最初の GitHub Issue 作成呼び出し（Epic Issue 作成、Standard Issue 作成、子 Issue 作成を含む）の前に完了する。
 
 ### 検証項目
 
@@ -97,15 +98,19 @@ case-open は Standard flow、Epic flow、混在構成の全ルートで、GitHu
 
 ### 検証失敗時の扱い
 
-検証で上限超過または構成不備を検出した場合、case-open は GitHub Issue 作成呼び出しを行わず停止する（REQ-006-028）。Epic Issue、Standard Issue、子 Issue のいずれかを作成済みの状態での検証失敗を許容しない。検証失敗時は要件doc（draft）の削除、RU ファイルの削除を実施せず、再開可能な状態で停止する。
+検証で上限超過または構成不備を検出した場合、case-open は GitHub Issue 作成呼び出しを行わず停止する（REQ-006-028）。
+Epic Issue、Standard Issue、子 Issue のいずれかを作成済みの状態での検証失敗を許容しない。
+検証失敗時は要件doc（draft）の削除、RU ファイルの削除を実施せず、再開可能な状態で停止する。
 
 ### 挿入位置の規範
 
-本セクションは case-open の処理順序において、構成確定（Epic flow は Epic Issue 本文確定、Standard flow は規模判定・preflight 相当）の直後、最初の Issue 作成の前に挿入される。Workflow Skill 側の具体的な挿入位置は Workflow Skill が確定する。
+本セクションは case-open の処理順序において、構成確定（Epic flow は Epic Issue 本文確定、Standard flow は規模判定・preflight 相当）の直後、最初の Issue 作成の前に挿入される。
+Workflow Skill 側の具体的な挿入位置は Workflow Skill が確定する。
 
 ## 完了条件・事前状態記載ガイドライン（新規セクション）
 
-case-open は Issue 本文の完了条件・事前状態セクションの記載を識別子中心とし、件数等の変動しやすい実測値スナップショットは補助値として扱う（REQ-006-021）。本ガイドラインは case-run の QG-3 前置 staleness check（ファイルパス存在確認、検査結果件数再計測）が安定動作するための入力前提を整える目的で設定する。
+case-open は Issue 本文の完了条件・事前状態セクションの記載を識別子中心とし、件数等の変動しやすい実測値スナップショットは補助値として扱う（REQ-006-021）。
+本ガイドラインは case-run の QG-3 前置 staleness check（ファイルパス存在確認、検査結果件数再計測）が安定動作するための入力前提を整える目的で設定する。
 
 ### 識別子中心記載
 
@@ -126,11 +131,14 @@ case-open は Issue 本文の完了条件・事前状態セクションの記載
 
 ### 変動しやすい実測値の取扱い
 
-件数・集計値は Issue 作成時点のスナップショットであり、実装進行中に変動する。そのため完了条件の判定主軸から外し、識別子リストの補助情報とする。case-run 側は staleness check で件数再計測を行い、Issue 本文記載値との差異を検出した場合は Findings 記録 + case-update 連携により本文更新を委譲する。
+件数・集計値は Issue 作成時点のスナップショットであり、実装進行中に変動する。
+そのため完了条件の判定主軸から外し、識別子リストの補助情報とする。
+case-run 側は staleness check で件数再計測を行い、Issue 本文記載値との差異を検出した場合は Findings 記録 + case-update 連携により本文更新を委譲する。
 
 ## 完了条件展開前の最新状態再確認（REQ-006-022, REQ-006-023）
 
-case-open は完了条件を Issue 本文に展開する前に、対象パスで最新状態の再確認を行う。検出時点スナップショットと起票時点の最新状態に差異がある場合、最新状態を優先する。
+case-open は完了条件を Issue 本文に展開する前に、対象パスで最新状態の再確認を行う。
+検出時点スナップショットと起票時点の最新状態に差異がある場合、最新状態を優先する。
 
 ### 再確認タイミング
 
@@ -143,13 +151,15 @@ case-open は完了条件を Issue 本文に展開する前に、対象パスで
 
 ### review_dispositions evidence 再確認（AG-002、AG-005、AG-006）
 
-draft-data に `review_dispositions` が含まれる場合、case-open は default branch 最新化後に各 disposition の `evidence.path` と `evidence.section` の実在性を再確認する。再確認時の commit SHA を当該 disposition の `evidence.checked_at_commit` へ記録し、Issue 本文の「レビュー判断」セクションへ転記する。
+draft-data に `review_dispositions` が含まれる場合、case-open は default branch 最新化後に各 disposition の `evidence.path` と `evidence.section` の実在性を再確認する。
+再確認時の commit SHA を当該 disposition の `evidence.checked_at_commit` へ記録し、Issue 本文の「レビュー判断」セクションへ転記する。
 
 - evidence が実在し内容が最新である場合: `checked_at_commit` へ確認 commit SHA を記録し、証跡転記へ進む
 - evidence の path または section が存在しない場合（失効）: Issue を作成せず停止する。当該 disposition の disposition を `stale_target` へ更新するか再評価対象として扱い、ユーザーへ停止理由を報告する
 - `review_dispositions` が存在しない場合: 後方互換（AG-001）としてそのまま処理を継続する
 
-記録済みの判断（disposition、reason）をユーザーへ再確認しない（AG-008）。case-open は evidence の実在性と最新性の確認のみを行う。
+記録済みの判断（disposition、reason）をユーザーへ再確認しない（AG-008）。
+case-open は evidence の実在性と最新性の確認のみを行う。
 
 ## review_dispositions の consumer 契約（AG-008）
 
@@ -162,11 +172,13 @@ case-open は `review_dispositions` の consumer である（AG-002）。consume
 | 停止条件 | evidence 失効を検出した場合、Issue を作成せず停止する。`covered` のまま失効した根拠で起票しない |
 | 証跡転記 | 再確認した disposition を Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。転記時 `evidence.checked_at_commit` へ確認 commit SHA を記録する |
 
-記録済みの判断（disposition、reason）をユーザーへ再確認しない。consumer は evidence の実在性と最新性の確認のみを行い、判断そのものを覆さない（AG-008）。
+記録済みの判断（disposition、reason）をユーザーへ再確認しない。
+consumer は evidence の実在性と最新性の確認のみを行い、判断そのものを覆さない（AG-008）。
 
 ## review_dispositions の消費と証跡転記
 
-case-open は `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。転記により req_draft 削除後も証跡が残る（AG-002、AG-005）。
+case-open は `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。
+転記により req_draft 削除後も証跡が残る（AG-002、AG-005）。
 
 ### 転記規則（AG-011）
 
@@ -178,21 +190,28 @@ case-open は `review_dispositions` を読み取り、Issue 本文の「レビ�
 
 ### レビュー判断セクションへの転記形式
 
-転記先の Issue 本文「レビュー判断」セクションの構造は workflow-templates SPEC（`docs/specs/skills/agentdev-workflow-templates.md`「review_dispositions 証跡セクション」節）が正規所有する。各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
+転記先の Issue 本文「レビュー判断」セクションの構造は workflow-templates SPEC（`docs/specs/skills/agentdev-workflow-templates.md`「review_dispositions 証跡セクション」節）が正規所有する。
+各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
 
 ### child Issue の取扱い
 
-child Issue テンプレートの「レビュー判断」セクションは親 Epic Issue への参照のみを記載し、disposition 明細の重複転記を行わない（AG-009）。全 disposition は Epic Issue 本体へ転記済みである。
+child Issue テンプレートの「レビュー判断」セクションは親 Epic Issue への参照のみを記載し、disposition 明細の重複転記を行わない（AG-009）。
+全 disposition は Epic Issue 本体へ転記済みである。
 
 ### 後方互換（AG-001）
 
-`review_dispositions` を持たない旧ドラフトを case-open は入力として拒否しない（DEC-003 準拠）。フィールド欠落時は「レビュー判断」セクションへ「該当なし」と記載する。
+`review_dispositions` を持たない旧ドラフトを case-open は入力として拒否しない（DEC-003 準拠）。
+フィールド欠落時は「レビュー判断」セクションへ「該当なし」と記載する。
 
 ## Artifact Graph 利用
 
-case-open は Issue の対象範囲, 完了条件, test strategy, 必須 skill, 検証事項を確定する前に Artifact Graph による変更影響候補を評価する。候補には REQ, Decision, SPEC, command, skill, extension, integrity rule, 関連 source_file を含められる。Graph 候補は正規成果物または独立した探索手段で確認した上で in scope, verification only, out of scope に分類する。
+case-open は Issue の対象範囲, 完了条件, test strategy, 必須 skill, 検証事項を確定する前に Artifact Graph による変更影響候補を評価する。
+候補には REQ, Decision, SPEC, command, skill, extension, integrity rule, 関連 source_file を含められる。
+Graph 候補は正規成果物または独立した探索手段で確認した上で in scope, verification only, out of scope に分類する。
 
-必須品質能力の導出は `artifact-quality-control-routing` SPEC が定める artifact type から品質能力キーへの変換に従い、Graph の delegates_to, governs 関係から必須 skill を直接決定しない。Graph は変更成果物候補と関連規則候補の探索のみを担当する。共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+必須品質能力の導出は `artifact-quality-control-routing` SPEC が定める artifact type から品質能力キーへの変換に従い、Graph の delegates_to, governs 関係から必須 skill を直接決定しない。
+Graph は変更成果物候補と関連規則候補の探索のみを担当する。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 
@@ -357,22 +376,29 @@ case-open SPEC 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ-0
 
 ## adversarial-review 挿入境界（経路F）
 
-本節は case-open への adversarial-review caller integration（経路F、REQ-015-009）の挿入境界を正典として所有する。共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review SPEC](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は経路F 固有の挿入位置、発動条件、変更影響別再実行ルール、最初の副作用との順序のみを規定する（REQ-014-011）。
+本節は case-open への adversarial-review caller integration（経路F、REQ-015-009）の挿入境界を正典として所有する。
+共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review SPEC](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は経路F 固有の挿入位置、発動条件、変更影響別再実行ルール、最初の副作用との順序のみを規定する（REQ-014-011）。
 
 ### 挿入位置（REQ-015-009）
 
-review 挿入位置は「execution structure / Issue 本文候補 / 完了条件構成後・最初の GitHub Issue 作成前」と一意に特定可能である。execution structure（Epic flow の自律構成生成、Standard flow の単一 OU 構成）、Issue 本文候補（Epic Issue 本文、Standard Issue 本文）、完了条件（QG-2 で網羅性検証済み）の3者すべてが確定した後、最初の GitHub Issue 作成呼び出しの前に挿入する。各 flow の対応付けを次に示す。
+review 挿入位置は「execution structure / Issue 本文候補 / 完了条件構成後・最初の GitHub Issue 作成前」と一意に特定可能である。
+execution structure（Epic flow の自律構成生成、Standard flow の単一 OU 構成）、Issue 本文候補（Epic Issue 本文、Standard Issue 本文）、完了条件（QG-2 で網羅性検証済み）の3者すべてが確定した後、最初の GitHub Issue 作成呼び出しの前に挿入する。
+各 flow の対応付けを次に示す。
 
 | flow | execution structure 確定 | Issue 本文候補確定 | 完了条件確定 | 最初の GitHub Issue 作成 | review 挿入位置 |
 |---|---|---|---|---|---|
 | Epic flow（マルチREQ、`scale: large`） | 自律構成生成 | Epic Issue 本文生成 | QG-2 | Epic Issue 作成 | Epic Issue 本文生成完了後、Epic Issue 作成の前 |
 | Standard flow（`scale: standard`、フィールドなし） | 規模判定、preflight で単一 OU 構成を確定 | Issue 本文生成 | QG-2 | Standard Issue 作成 | preflight 完了後、Standard Issue 作成の前 |
 
-Epic flow ではテンプレート読込、Epic Issue 本文生成の完了後に review を挿入し、Epic Issue 作成の前に実行する。子 Issue 本文生成、子 Issue 作成は Epic Issue 作成完了後に実行するため、review 挿入時点では未確定であり review 対象外である。子 Issue 構成は自律構成生成の execution structure（Epic/Wave/Issue 構成）として Epic Issue 本文に反映済みであるため、execution structure 経由で review 対象となる。Standard flow では Issue 本文生成、QG-2、preflight の完了後に review を挿入し、Standard Issue 作成の前に実行する。
+Epic flow ではテンプレート読込、Epic Issue 本文生成の完了後に review を挿入し、Epic Issue 作成の前に実行する。
+子 Issue 本文生成、子 Issue 作成は Epic Issue 作成完了後に実行するため、review 挿入時点では未確定であり review 対象外である。
+子 Issue 構成は自律構成生成の execution structure（Epic/Wave/Issue 構成）として Epic Issue 本文に反映済みであるため、execution structure 経由で review 対象となる。
+Standard flow では Issue 本文生成、QG-2、preflight の完了後に review を挿入し、Standard Issue 作成の前に実行する。
 
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
-発動条件判定と review 呼出を分離する（REQ-015-001）。発動条件判定 Step は default-on 原則（REQ-015-002）と skip 条件（REQ-015-003）を評価する。
+発動条件判定と review 呼出を分離する（REQ-015-001）。
+発動条件判定 Step は default-on 原則（REQ-015-002）と skip 条件（REQ-015-003）を評価する。
 
 - **default-on（原則実行）**: case-open は adversarial-review を原則実行する（REQ-015-002）。ユーザー明示指定は通常発動の必須条件ではなく、execution structure、Issue 本文候補、完了条件のいずれかに意味的決定が存在する場合に発動する。
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フロー（review を挿入せず最初の GitHub Issue 作成へ進む）を継続できる（REQ-015-003）。Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成へそのまま進む。skip 判断のためだけの新規 HITL、承認点は追加しない。
@@ -400,13 +426,18 @@ review の結果反映で review 対象の意味内容が変更された場合�
 | 完了条件と execution structure の両方が変更 | QG-2 + preflight | 完了条件網羅性検証、preflight | 両方を再実行する。実行順序は QG-2 → preflight を維持する |
 | 意味内容変更なし | 再実行不要 | （なし） | review 対象の意味内容に変更がないため、既存検証結果をそのまま使用し、最初の GitHub Issue 作成へ進む |
 
-4パターンのいずれかを完了した後、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない。再 review の停止条件（REQ-014-008）を満たした場合、最初の GitHub Issue 作成（Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成）へ進む。
+4パターンのいずれかを完了した後、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。
+同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない。
+再 review の停止条件（REQ-014-008）を満たした場合、最初の GitHub Issue 作成（Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成）へ進む。
 
 ### 最初の副作用（GitHub Issue 作成）との順序
 
-review は最初の GitHub Issue 作成呼び出し（Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成）より前に実行する。GitHub Issue 作成が case-open の最初の副作用（GitHub API 呼び出しによる Issue レコード生成）であるため、review は最初の副作用の前に挿入される。review の結果、execution structure、Issue 本文候補、完了条件のいずれかが変更された場合は、変更影響別の再実行ルール（REQ-015-009）に従い、最初の GitHub Issue 作成前に反映を完了する。
+review は最初の GitHub Issue 作成呼び出し（Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成）より前に実行する。
+GitHub Issue 作成が case-open の最初の副作用（GitHub API 呼び出しによる Issue レコード生成）であるため、review は最初の副作用の前に挿入される。
+review の結果、execution structure、Issue 本文候補、完了条件のいずれかが変更された場合は、変更影響別の再実行ルール（REQ-015-009）に従い、最初の GitHub Issue 作成前に反映を完了する。
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、workflow-contracts SPEC「adversarial-review 由来の停止信号」節との間で意味の重複、矛盾を生じない。case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 SPEC を正とする。
+本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、workflow-contracts SPEC「adversarial-review 由来の停止信号」節との間で意味の重複、矛盾を生じない。
+case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 SPEC を正とする。
 

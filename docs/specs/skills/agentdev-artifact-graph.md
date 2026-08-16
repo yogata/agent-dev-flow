@@ -11,9 +11,12 @@ canonical_owner: agentdev-artifact-graph
 
 ## 目的
 
-AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果物（REQ/Decision/SPEC）間の明示関係を検索できる Artifact Graph を生成、検査、問い合わせる。consumer と self-hosting の両環境で動作し、標準コアと augmentation を分離することで self-hosting 固有知識を標準契約から除外する。AgentDevFlow 標準の成果物間探索モデルとして機能する。
+AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果物（REQ/Decision/SPEC）間の明示関係を検索できる Artifact Graph を生成、検査、問い合わせる。
+consumer と self-hosting の両環境で動作し、標準コアと augmentation を分離することで self-hosting 固有知識を標準契約から除外する。
+AgentDevFlow 標準の成果物間探索モデルとして機能する。
 
-本 SPEC は `agentdev-artifact-graph` 配布スキルの振る舞い契約を定義する。実行時スキル（`src/opencode/skills/agentdev-artifact-graph/SKILL.md`）は本 SPEC に依存しない（REQ-001）。
+本 SPEC は `agentdev-artifact-graph` 配布スキルの振る舞い契約を定義する。
+実行時スキル（`src/opencode/skills/agentdev-artifact-graph/SKILL.md`）は本 SPEC に依存しない（REQ-001）。
 
 ## 適用対象
 
@@ -38,7 +41,8 @@ AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果�
 - verification feedback: Graph と rg 等の独立確認結果の差異を検出、分類、是正、回帰検証する
 - augmentation 受理: project augmentation と self-hosting augmentation で node_types, relation_types, indexed_paths を追加する
 
-所有 script と公開検証契約は `agentdev-artifact-graph` スキル配下の `scripts/` が担う。詳細な I/O 契約、CLI 形式、stdout schema は SKILL.md「Scripts（決定的処理）」を参照。
+所有 script と公開検証契約は `agentdev-artifact-graph` スキル配下の `scripts/` が担う。
+詳細な I/O 契約、CLI 形式、stdout schema は SKILL.md「Scripts（決定的処理）」を参照。
 
 ## 入力と出力
 
@@ -107,7 +111,8 @@ augmentation が追加可能な relation_type 例: `delegates_to`, `governs`
 
 ### 関係カテゴリ
 
-関係は `declared`（宣言された関係）と `derived`（正規情報から導出した関係）を対象とする。意味的に推定する `inferred` は予約値にとどめ、標準実装では生成しない。
+関係は `declared`（宣言された関係）と `derived`（正規情報から導出した関係）を対象とする。
+意味的に推定する `inferred` は予約値にとどめ、標準実装では生成しない。
 
 ## 抽出契約
 
@@ -122,7 +127,8 @@ augmentation が追加可能な relation_type 例: `delegates_to`, `governs`
 5. 既知の見出しまたは表内にある識別子
 6. 自由文中の裸の識別子
 
-標準実装では 1 から 4 を必須対象とする。5 は対象文書と記法を限定して導入し、6 は誤検出評価が完了するまで対象外とする。
+標準実装では 1 から 4 を必須対象とする。
+5 は対象文書と記法を限定して導入し、6 は誤検出評価が完了するまで対象外とする。
 
 ### 成果物の版区別
 
@@ -132,7 +138,8 @@ augmentation が追加可能な relation_type 例: `delegates_to`, `governs`
 
 ### 解析スクリプトの対応 YAML 構造の明示契約
 
-agentdev-artifact-graph の解析スクリプト群（parse.ts 等）は対応する YAML 構造を明示する（REQ-020-001）。対応構造は次を含む。
+agentdev-artifact-graph の解析スクリプト群（parse.ts 等）は対応する YAML 構造を明示する（REQ-020-001）。
+対応構造は次を含む。
 
 - frontmatter（`id`, `title`, `status`, `created`, `updated`, `superseded_by` 等）
 - 既知の構造化 field（`spec_logical_division`, `canonical_owner` 等）
@@ -143,11 +150,14 @@ agentdev-artifact-graph の解析スクリプト群（parse.ts 等）は対応�
 
 ### 未対応 YAML 構造の診断契約
 
-解析スクリプトは入力 YAML に未対応構造を検出した場合、構造の種別と出現位置（path、見出し、行範囲）を診断情報として `diagnostics.json` または標準エラー出力へ出す（REQ-020-002）。診断は抽出失敗ではなく、抽出範囲外の入力が存在することの報告である。fail-open 原則に従い、未対応構造の存在だけでグラフ生成を停止しない。
+解析スクリプトは入力 YAML に未対応構造を検出した場合、構造の種別と出現位置（path、見出し、行範囲）を診断情報として `diagnostics.json` または標準エラー出力へ出す（REQ-020-002）。
+診断は抽出失敗ではなく、抽出範囲外の入力が存在することの報告である。
+fail-open 原則に従い、未対応構造の存在だけでグラフ生成を停止しない。
 
 ### 代表質問回帰検証への実入力組込み契約
 
-agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリプトへの実入力として組み込む（REQ-020-003）。実行契約は次のとおり。
+agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリプトへの実入力として組み込む（REQ-020-003）。
+実行契約は次のとおり。
 
 - **入力**: 実入力 fixture（後述の設計原則に従ってキャプチャした10件の代表質問）
 - **実行契機**: 解析スクリプト、抽出ルールの変更時、および定期回帰検証
@@ -195,7 +205,8 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 - `line_end`
 - `extraction_rule`
 
-`path`、見出し、要素 ID、抽出文字列のハッシュを安定した根拠識別に使用する。行番号は人が根拠へ移動するための補助情報とし、要素の主識別子には使用しない。
+`path`、見出し、要素 ID、抽出文字列のハッシュを安定した根拠識別に使用する。
+行番号は人が根拠へ移動するための補助情報とし、要素の主識別子には使用しない。
 
 ## 決定論性と鮮度
 
@@ -207,7 +218,8 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 - `indexed_paths`
 - `excluded_paths`
 
-現在時刻を表す `generated_at` は決定論的生成物に含めず、必要な実行日時は標準出力または実行報告へ記録する。`input_digest` は対象入力ファイルの相対パスと内容から計算する。
+現在時刻を表す `generated_at` は決定論的生成物に含めず、必要な実行日時は標準出力または実行報告へ記録する。
+`input_digest` は対象入力ファイルの相対パスと内容から計算する。
 
 `.agentdev/graph/**`、`.git/**`、ビルド成果物、キャッシュ、一時ファイル、作業ツリー固有の管理ファイルは入力から除外する。
 
@@ -217,11 +229,13 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 
 ### project augmentation
 
-consumer は project 固有正規成果物を `node_types`, `relation_types` へ追加できる。project augmentation が存在しなくても標準スキルは動作する（fail-open）。
+consumer は project 固有正規成果物を `node_types`, `relation_types` へ追加できる。
+project augmentation が存在しなくても標準スキルは動作する（fail-open）。
 
 consumer が AgentDevFlow 運用（REQ/Decision/SPEC）を採用しない場合、Graph は空で生成されるが正常状態とする。
 
-project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ含めず、project augmentation の `discovery_roots`（明示参照起点リスト）と query 時の `rg`/filesystem 補完で必要時探索する。標準スキルは固定 directory 知識を埋め込まない。
+project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ含めず、project augmentation の `discovery_roots`（明示参照起点リスト）と query 時の `rg`/filesystem 補完で必要時探索する。
+標準スキルは固定 directory 知識を埋め込まない。
 
 ### self-hosting augmentation
 
@@ -258,7 +272,8 @@ Artifact Graph 標準配布スキルの augmentation は専用配置
 
 ## ワークフロー利用
 
-Artifact Graph は以下の4用途で AgentDevFlow workflow に統合する。Graph はすべての用途で候補提供者であり、決定的検査、意味診断、最終判断は各正規所有者が行う。
+Artifact Graph は以下の4用途で AgentDevFlow workflow に統合する。
+Graph はすべての用途で候補提供者であり、決定的検査、意味診断、最終判断は各正規所有者が行う。
 
 ### 利用上の防護
 
@@ -273,33 +288,54 @@ Artifact Graph は以下の4用途で AgentDevFlow workflow に統合する。Gr
 
 ### Discovery / Impact
 
-req-define, spec-save, backlog-review は関連成果物候補の探索に Artifact Graph を利用する。候補取得後に正規成果物本文および独立探索手段で確認してから最終判断する。
+req-define, spec-save, backlog-review は関連成果物候補の探索に Artifact Graph を利用する。
+候補取得後に正規成果物本文および独立探索手段で確認してから最終判断する。
 
-case-open は Issue 対象範囲, 完了条件, test strategy の確定前に Artifact Graph による変更影響候補を評価する。候補は正規成果物または独立した探索手段で確認した上で in scope, verification only, out of scope に分類する。必須品質能力の導出は artifact-quality-control-routing SPEC に従い、Graph の関係から必須 skill を直接決定しない。
+case-open は Issue 対象範囲, 完了条件, test strategy の確定前に Artifact Graph による変更影響候補を評価する。
+候補は正規成果物または独立した探索手段で確認した上で in scope, verification only, out of scope に分類する。
+必須品質能力の導出は artifact-quality-control-routing SPEC に従い、Graph の関係から必須 skill を直接決定しない。
 
 ### Diagnostics
 
-inspect-docs は Artifact Graph を構造診断候補の探索に利用する。候補には unresolved reference, superseded artifact への現行参照, dangling relation, provenance 欠落, orphan candidate, 不自然な relation path, structural duplicate candidate を含む。決定的検査（参照実在、委譲先 skill 実在等）は DEC-006 が定める通り docs-check, IR-056 が所有し、inspect-docs は意味診断を担当する。構造候補は未検証 evidence として意味診断の入力に利用する。SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を Graph の構造情報だけから確定しない。
+inspect-docs は Artifact Graph を構造診断候補の探索に利用する。
+候補には unresolved reference, superseded artifact への現行参照, dangling relation, provenance 欠落, orphan candidate, 不自然な relation path, structural duplicate candidate を含む。
+決定的検査（参照実在、委譲先 skill 実在等）は DEC-006 が定める通り docs-check, IR-056 が所有し、inspect-docs は意味診断を担当する。
+構造候補は未検証 evidence として意味診断の入力に利用する。
+SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を Graph の構造情報だけから確定しない。
 
-inspect-skills は self-hosting augmentation が利用可能な場合、command と skill 関係, command と extension と skill 関係, 予期しない delegation, orphan skill candidate の候補を探索する。委譲先 skill 実在の決定的検査は docs-check, IR-056 が所有する。consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
+inspect-skills は self-hosting augmentation が利用可能な場合、command と skill 関係, command と extension と skill 関係, 予期しない delegation, orphan skill candidate の候補を探索する。
+委譲先 skill 実在の決定的検査は docs-check, IR-056 が所有する。
+consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
 
 ### Review Evidence
 
-agentdev-adversarial-review は Artifact Graph をレビュー対象候補, evidence の探索に利用する。論点候補は複数の規範的成果物から到達する対象, 複数経路, cycle, relation 集中ノード, isolated node, 複数 owner または governing relation を持つ候補である。Graph から得た情報は未検証 evidence として扱い、対論または正規成果物確認を経ずに finding を確定しない。
+agentdev-adversarial-review は Artifact Graph をレビュー対象候補, evidence の探索に利用する。
+論点候補は複数の規範的成果物から到達する対象, 複数経路, cycle, relation 集中ノード, isolated node, 複数 owner または governing relation を持つ候補である。
+Graph から得た情報は未検証 evidence として扱い、対論または正規成果物確認を経ずに finding を確定しない。
 
 ### Verification
 
-case-close は Artifact Graph を変更後の関係整合性検証に利用する。確認対象は Graph の生成と鮮度, Graph integrity, unresolved relation, dangling relation, provenance defect, Graph と独立確認結果との差異である。Graph defect と canonical defect を区別する。Graph 自体の生成または問い合わせ失敗のみを理由に case-close を失敗させず、fail-open する。
+case-close は Artifact Graph を変更後の関係整合性検証に利用する。
+確認対象は Graph の生成と鮮度, Graph integrity, unresolved relation, dangling relation, provenance defect, Graph と独立確認結果との差異である。
+Graph defect と canonical defect を区別する。
+Graph 自体の生成または問い合わせ失敗のみを理由に case-close を失敗させず、fail-open する。
 
 ### case-run の利用制限
 
-case-run での Artifact Graph 利用は REQ-017-010 が定める境界内で補助用途に限定する。補助用途は予期しない依存または参照が見つかった場合の補助探索, acceptance criteria の検証根拠への到達, case-open 時点からの関係差異確認を含む。Graph で発見した候補のうち Issue scope 内の内部実装影響は case-run が自律処理し、scope, 完了条件, REQ, Decision, SPEC, 必須品質統制の変更が必要な場合は blocked として case-update 連携とする。証拠源にかかわらず case-run は既存 scope を超える変更を自律拡大しない。本制限は REQ-017-010 の境界を変更せず、Graph 利用時の適用を明確化する。
+case-run での Artifact Graph 利用は REQ-017-010 が定める境界内で補助用途に限定する。
+補助用途は予期しない依存または参照が見つかった場合の補助探索, acceptance criteria の検証根拠への到達, case-open 時点からの関係差異確認を含む。
+Graph で発見した候補のうち Issue scope 内の内部実装影響は case-run が自律処理し、scope, 完了条件, REQ, Decision, SPEC, 必須品質統制の変更が必要な場合は blocked として case-update 連携とする。
+証拠源にかかわらず case-run は既存 scope を超える変更を自律拡大しない。
+本制限は REQ-017-010 の境界を変更せず、Graph 利用時の適用を明確化する。
 
 各 consumer の権威的な動作仕様（利用タイミング、判断基準、fallback 動作）は各 command/skill SPEC が所有し、本 SPEC は Graph 提供能力と共通利用原則の概要を提供する。
 
 ## 障害耐性
 
-グラフが存在しない場合も標準ワークフローが従来どおり続行する（fail-open）。グラフが古い場合は再生成するか、古い状態であることを明示して補助利用に限定する。グラフ生成失敗だけを理由に標準ワークフローを恒常的に停止しない。fallback 時は README と `rg` の組合せで人間が確認できる水準を保持する。
+グラフが存在しない場合も標準ワークフローが従来どおり続行する（fail-open）。
+グラフが古い場合は再生成するか、古い状態であることを明示して補助利用に限定する。
+グラフ生成失敗だけを理由に標準ワークフローを恒常的に停止しない。
+fallback 時は README と `rg` の組合せで人間が確認できる水準を保持する。
 
 ## 効果検証
 
@@ -307,11 +343,14 @@ Artifact Graph の検証を2種類に分離する。
 
 ### Parser / Graph regression
 
-Graph parser, augmentation, relation extraction, provenance の正確性を検証する。本層は REQ-020 が所有し、既存 extension 構造等を用いた代表 fixture で維持する。詳細は REQ-020 および対応 SPEC を参照。
+Graph parser, augmentation, relation extraction, provenance の正確性を検証する。
+本層は REQ-020 が所有し、既存 extension 構造等を用いた代表 fixture で維持する。
+詳細は REQ-020 および対応 SPEC を参照。
 
 ### Workflow effectiveness
 
-実際の AgentDevFlow workflow で発生する質問を対象とする。対象質問は以下を含む。
+実際の AgentDevFlow workflow で発生する質問を対象とする。
+対象質問は以下を含む。
 
 - REQ の変更影響候補
 - 同一 owner の SPEC
@@ -333,7 +372,9 @@ Artifact Graph 自身の接続確認のみを workflow effectiveness の成立�
 
 ## Git管理
 
-試行期間中は `.agentdev/graph/**` を Git 管理対象外とする。生成物はローカルまたは CI で再生成し、実行報告には件数と診断結果を記録する。グラフ本体を Git 管理するかどうかは、差分量と利用効果を測定した後に別課題で判断する。
+試行期間中は `.agentdev/graph/**` を Git 管理対象外とする。
+生成物はローカルまたは CI で再生成し、実行報告には件数と診断結果を記録する。
+グラフ本体を Git 管理するかどうかは、差分量と利用効果を測定した後に別課題で判断する。
 
 ## 対象外
 

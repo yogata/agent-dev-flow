@@ -83,7 +83,10 @@ updated: 2026-08-15
 
 ### TargetedDocsReport 型契約（targeted-docs-guard-implementation.md Phase 2）
 
-check_changed_docs.ts の JSON 出力型である TargetedDocsReport の型定義を固定する。必須フィールド: workflow, files_checked, coupled_files_checked, failures, warnings, doc_map_update_required, spec_readme_update_required, requirements_readme_update_required, full_docs_check_recommended, extensions_check_required, declared_files_check。上記リストのみを必須フィールドとし、それ以外を許容しない。型/戻り値/JSON/text出力/テストが一致する契約とする。
+check_changed_docs.ts の JSON 出力型である TargetedDocsReport の型定義を固定する。
+必須フィールド: workflow, files_checked, coupled_files_checked, failures, warnings, doc_map_update_required, spec_readme_update_required, requirements_readme_update_required, full_docs_check_recommended, extensions_check_required, declared_files_check。
+上記リストのみを必須フィールドとし、それ以外を許容しない。
+型/戻り値/JSON/text出力/テストが一致する契約とする。
 
 ## スクリプト契約（Script Contract）
 
@@ -98,7 +101,9 @@ check_changed_docs.ts の JSON 出力型である TargetedDocsReport の型定�
 
 check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解析、対象確定）、対象解決（--files または --base-ref から files_checked を生成）、profile 呼出（--workflow に応じた profileFor 適用）、validator 呼出（profile rules の実行）、report 契約（TargetedDocsReport 形式での JSON/text 出力）、exit code（FAILURE/WARNING/OK の 3 値）。
 
-対象確定はコマンド側が行い、check_changed_docs.ts は対象選定の十分性を判定しない。--files 指定で files_checked が空の場合は FAILURE、--base-ref 指定で files_checked が空の場合は WARNING とする。評価対象はフォーマット検査に限定し、意味評価を行わない。
+対象確定はコマンド側が行い、check_changed_docs.ts は対象選定の十分性を判定しない。
+--files 指定で files_checked が空の場合は FAILURE、--base-ref 指定で files_checked が空の場合は WARNING とする。
+評価対象はフォーマット検査に限定し、意味評価を行わない。
 
 ## 適用範囲宣言
 
@@ -170,11 +175,16 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 
 ## IR 存在条件モデル（DEC-013 適用、REQ-028-008/009/010/012）
 
-DEC-013（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化）を適用し、IR の状態モデルを「現存 IR = 現行 = executable detector」へ統一した。`lifecycle_state`、`enforcement_mode`、`baseline_status` は現行 IR の属性から全て削除し、`active+none` の恒久状態を禁止する（REQ-028-009）。tombstone（IR-011 型 file-backed）は AG-008 により物理削除し、廃止 IR の履歴保存のみを目的とする file-backed tombstone を保持しない（REQ-028-008）。識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する。
+DEC-013（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化）を適用し、IR の状態モデルを「現存 IR = 現行 = executable detector」へ統一した。
+`lifecycle_state`、`enforcement_mode`、`baseline_status` は現行 IR の属性から全て削除し、`active+none` の恒久状態を禁止する（REQ-028-009）。
+tombstone（IR-011 型 file-backed）は AG-008 により物理削除し、廃止 IR の履歴保存のみを目的とする file-backed tombstone を保持しない（REQ-028-008）。
+識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する。
 
 ### 8 項目存在条件（REQ-028-001）
 
-現存 IR は次の8項目存在条件をすべて満たす場合にのみ現行成果物として存在できる。detector 関数の専有は必須ではなく、invariant ごとの到達性が追跡可能で回帰証拠が存在すれば他 IR との detector 共有を許容する。既存であることのみを KEEP の根拠としない。
+現存 IR は次の8項目存在条件をすべて満たす場合にのみ現行成果物として存在できる。
+detector 関数の専有は必須ではなく、invariant ごとの到達性が追跡可能で回帰証拠が存在すれば他 IR との detector 共有を許容する。
+既存であることのみを KEEP の根拠としない。
 
 1. canonical basis（REQ/Decision/SPEC のいずれか）
 2. invariant（検出すべき不変条件）
@@ -189,7 +199,8 @@ DEC-013（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status
 
 ### 非実効 IR の禁止（REQ-028-002）
 
-detector 不在、部分実装、test 不在、到達不能、finding 未接続の IR を恒久的な現行 IR として許容しない。必要な invariant は IMPLEMENT、不要な場合は DELETE/MERGE とする。
+detector 不在、部分実装、test 不在、到達不能、finding 未接続の IR を恒久的な現行 IR として許容しない。
+必要な invariant は IMPLEMENT、不要な場合は DELETE/MERGE とする。
 
 ### 関連 SPEC
 
@@ -200,7 +211,8 @@ detector 不在、部分実装、test 不在、到達不能、finding 未接続�
 
 ## finding-baseline 分類（REQ-028-009/010、TS-014）
 
-`baseline_status` を IR schema から分離し、finding 側の状態として定義する。IR は finding-baseline 分類を持たず、finding が生成される時に finding 側で new/known/resolved を判定する。
+`baseline_status` を IR schema から分離し、finding 側の状態として定義する。
+IR は finding-baseline 分類を持たず、finding が生成される時に finding 側で new/known/resolved を判定する。
 
 | finding-baseline 状態 | 内容 |
 |---|---|
@@ -208,13 +220,16 @@ detector 不在、部分実装、test 不在、到達不能、finding 未接続�
 | `known` | baseline 集合に記録済みの検出事項。`info`（observation）へ降格し、PR review で情報参照扱いとする |
 | `resolved` | 実修復により現行の finding/baseline 集合から除去された検出事項。baseline 更新で除去される |
 
-baseline 集合の管理は検出器（`check_integrity.ts`、`check_extensions.ts`）が行う。各 checker は baseline ファイル（`baselines/ng-baseline.json`、`baselines/ir-055-baseline.json` 等）を持ち、新規検出事項と既知事項を区別する（REQ-010-007、REQ-010-021）。IR 側で baseline を事前登録せず、finding が発生した時点で baseline 比較を行う。
+baseline 集合の管理は検出器（`check_integrity.ts`、`check_extensions.ts`）が行う。
+各 checker は baseline ファイル（`baselines/ng-baseline.json`、`baselines/ir-055-baseline.json` 等）を持ち、新規検出事項と既知事項を区別する（REQ-010-007、REQ-010-021）。
+IR 側で baseline を事前登録せず、finding が発生した時点で baseline 比較を行う。
 
 tombstone 群（IR-011 型 file-backed）の `baseline_status: superseded` 表現は AG-008 により物理削除で解消し、file-backed 上の baseline 属性は持たない（REQ-028-010）。
 
 ## 新規 IR 登録 gate（REQ-028-012、TS-020）
 
-新規 IR 登録時に次の2種 gate を適用する。区別は `enforcement_mode` 非依存、blocking/non-blocking で判定する。
+新規 IR 登録時に次の2種 gate を適用する。
+区別は `enforcement_mode` 非依存、blocking/non-blocking で判定する。
 
 ### (a) IR 存在資格 gate（全新規 IR 対象、hard）
 
@@ -226,11 +241,13 @@ tombstone 群（IR-011 型 file-backed）の `baseline_status: superseded` 表�
 4. regression test が存在する
 5. execution route（docs-check / CI / 保存工程の正規実行経路）から到達可能である
 
-いずれか1要素でも欠ける場合は新規 IR 登録を認めない。既存 IR に対しても8項目存在条件（前述）が要求されるため、(a) は新規登録時の初期 gate として機能する。
+いずれか1要素でも欠ける場合は新規 IR 登録を認めない。
+既存 IR に対しても8項目存在条件（前述）が要求されるため、(a) は新規登録時の初期 gate として機能する。
 
 ### (b) hard governance 追加 gate（blocking hard-control IR 対象、hard）
 
-blocking hard-control IR（command 完了をブロックし得る strict severity の IR）は、(a) に加えて DEC-001 決定4「新規統制追加原則」の7条件立証を必須とする。非 blocking IR（heuristic / observation、または blocking しない strict）は (b) を不要とする。
+blocking hard-control IR（command 完了をブロックし得る strict severity の IR）は、(a) に加えて DEC-001 決定4「新規統制追加原則」の7条件立証を必須とする。
+非 blocking IR（heuristic / observation、または blocking しない strict）は (b) を不要とする。
 
 DEC-001 決定4 の7条件:
 1. 新規統制が既存統制と重複しないこと
@@ -243,11 +260,14 @@ DEC-001 決定4 の7条件:
 
 ### gate 実施手順
 
-新規 IR 登録時に `integrity-rule-catalog.md`「新規カテゴリ追加判定フロー（REQ-010-005）」へ従い gate を実施する。catalog エントリ追加前に (a) を、blocking IR の場合は (b) も確認する。gate 不合格の場合は新規 IR 登録を取り下げ、REQ-028-013「IR 件数削減数で評価しない」に従い別途 backlog → RU → req-define → req-save 経路で提起する。
+新規 IR 登録時に `integrity-rule-catalog.md`「新規カテゴリ追加判定フロー（REQ-010-005）」へ従い gate を実施する。
+catalog エントリ追加前に (a) を、blocking IR の場合は (b) も確認する。
+gate 不合格の場合は新規 IR 登録を取り下げ、REQ-028-013「IR 件数削減数で評価しない」に従い別途 backlog → RU → req-define → req-save 経路で提起する。
 
 ## 一時移行検査 registry（REQ-028-006）
 
-一時移行検査（migration residual 等）は原則として恒久 IR とせず、期限/終了条件を持つ別種検査として扱う。別種検査の所在は対象 SPEC または migration plan 配下とし、終了条件監視機構（期限超過警告、または docs-check 等の既存鮮度監視経路の拡張）を規定する。
+一時移行検査（migration residual 等）は原則として恒久 IR とせず、期限/終了条件を持つ別種検査として扱う。
+別種検査の所在は対象 SPEC または migration plan 配下とし、終了条件監視機構（期限超過警告、または docs-check 等の既存鮮度監視経路の拡張）を規定する。
 
 ### 別種検査の要件
 
@@ -258,11 +278,15 @@ DEC-001 決定4 の7条件:
 | 監視機構 | docs-check、または対象 SPEC での定期確認手順 |
 | 廃止手順 | 終了条件達成後、別種検査を廃止し catalog/実装から除去する |
 
-継続的再発防止価値がある場合のみ恒久 IR へ昇格する。昇格時は新規 IR 登録 gate（前述）を適用する。REQ-028-006 の詳細運用は別途 spec-save 工程で確定する。
+継続的再発防止価値がある場合のみ恒久 IR へ昇格する。
+昇格時は新規 IR 登録 gate（前述）を適用する。
+REQ-028-006 の詳細運用は別途 spec-save 工程で確定する。
 
 ### IR-057 適用（REQ-028-006 移行判断、Phase 3 §7.2 判定）
 
-IR-057（obsolete-spec-path-after-domain-split、Phase 2 KEEP 確定）は Phase 3 §7.2 判定に基づき現状維持（恒久 IR）とする。`docs/specs/` ドメイン再編が未完了であり、obsolete-path 参照の新規発生リスクが継続するため。別種検査への移行条件は次の2条件が両立した場合、Phase 6（OU-007）全体検証で再評価する。
+IR-057（obsolete-spec-path-after-domain-split、Phase 2 KEEP 確定）は Phase 3 §7.2 判定に基づき現状維持（恒久 IR）とする。
+`docs/specs/` ドメイン再編が未完了であり、obsolete-path 参照の新規発生リスクが継続するため。
+別種検査への移行条件は次の2条件が両立した場合、Phase 6（OU-007）全体検証で再評価する。
 
 1. `docs/specs/` ドメイン再編が完了し、obsolete-spec-path 構造が安定する
 2. obsolete-path 参照の新規発生が一定期間（目安: 移行判断時点から2四半期以上）発生しない
@@ -275,9 +299,12 @@ IR-051 の「一定文字距離内」は語彙レジストリで確定された�
 
 ## reference-path-existence 検出における backtick 囲みパスの扱い（REQ-010-020）
 
-`checkScriptTemplateReferencePaths`（`check_integrity.ts`）は command 定義と SKILL.md から抽出したパス参照（`.opencode/**`、`scripts/*.ts`、`templates/*.md`、`references/*.md`）の実在確認を行う。このとき Markdown backtick で囲まれたパス成分はインラインコード修飾（code formatting）と解釈し、パス解決前に backtick を除去する（例: `.opencode/commands/agentdev/templates/case-close/\`agentdev-push-failed\`.md` → `.opencode/commands/agentdev/templates/case-close/agentdev-push-failed.md`）。backtick 囲みのパス成分を実在確認する既存契約は維持する。
+`checkScriptTemplateReferencePaths`（`check_integrity.ts`）は command 定義と SKILL.md から抽出したパス参照（`.opencode/**`、`scripts/*.ts`、`templates/*.md`、`references/*.md`）の実在確認を行う。
+このとき Markdown backtick で囲まれたパス成分はインラインコード修飾（code formatting）と解釈し、パス解決前に backtick を除去する（例: `.opencode/commands/agentdev/templates/case-close/\`agentdev-push-failed\`.md` → `.opencode/commands/agentdev/templates/case-close/agentdev-push-failed.md`）。
+backtick 囲みのパス成分を実在確認する既存契約は維持する。
 
-パス成分に `<...>` 形式の placeholder を含む参照は置換前のパラメータ表現として扱い、実在確認の対象外とする。placeholder を含まない具体パスには実在確認を行い、未解決の場合は NG を報告する。
+パス成分に `<...>` 形式の placeholder を含む参照は置換前のパラメータ表現として扱い、実在確認の対象外とする。
+placeholder を含まない具体パスには実在確認を行い、未解決の場合は NG を報告する。
 
 | 取扱い | 根拠 |
 |--------|------|
@@ -286,11 +313,13 @@ IR-051 の「一定文字距離内」は語彙レジストリで確定された�
 | `<...>` 形式の placeholder を含む参照を実在確認の対象外とする | placeholder は具体パスではなく置換対象のパラメータ表現である。実在確認を行うと必ず偽陰性となるため対象外とする |
 | 報告時の evidence は backtick 含む原文を保持する | 著者が修正箇所を特定しやすくするため |
 
-本扱いは backtick 囲みをインラインコード表現として検出対象から除外する運用（パス参照として解釈しない運用）と対比した上で、実在確認の価値を維持するためパス参照として解釈する運用を採用した。検出ロジック（`check_integrity.ts`）と本節の記述は整合している。
+本扱いは backtick 囲みをインラインコード表現として検出対象から除外する運用（パス参照として解釈しない運用）と対比した上で、実在確認の価値を維持するためパス参照として解釈する運用を採用した。
+検出ロジック（`check_integrity.ts`）と本節の記述は整合している。
 
 ## RuntimeReference baseline 運用手順（REQ-010-021）
 
-IR-055（runtime-unresolved-reference）は段階導入（REQ-010-264）のため、baseline 既知違反と新規違反を区別する。baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json` に格納する。
+IR-055（runtime-unresolved-reference）は段階導入（REQ-010-264）のため、baseline 既知違反と新規違反を区別する。
+baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json` に格納する。
 
 | 項目 | 定義 |
 |------|------|
@@ -310,9 +339,13 @@ IR-055（runtime-unresolved-reference）は段階導入（REQ-010-264）のた�
 
 ## NG baseline 運用手順（全カテゴリ strict pass、v2:REQ-0161-005 統合）
 
-`check_integrity.ts` と `check_extensions.ts` は、既知の NG 集合を NG baseline として `.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json` へ格納する。各実行は「当該変更起因の新規 NG が 0 件であること」を以て strict pass（exit 0）と判定する。既知 NG が残存する状態でも strict pass が到達可能な構造を提供する（v2:REQ-0161-005）。
+`check_integrity.ts` と `check_extensions.ts` は、既知の NG 集合を NG baseline として `.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json` へ格納する。
+各実行は「当該変更起因の新規 NG が 0 件であること」を以て strict pass（exit 0）と判定する。
+既知 NG が残存する状態でも strict pass が到達可能な構造を提供する（v2:REQ-0161-005）。
 
-baseline は `category` / `check` / `file` / `evidence` の4組を bucket key とする集計値（`count`）を持つ。実行結果は同 bucket key で集計し、各 bucket について現在の count が baseline count 以下であれば当該 NG を `info`（observation）へ降格する。現在の count が baseline count を超える bucket に属する NG は新規 NG として `ng` / `warning` レベルを維持し、exit code を非ゼロにする。
+baseline は `category` / `check` / `file` / `evidence` の4組を bucket key とする集計値（`count`）を持つ。
+実行結果は同 bucket key で集計し、各 bucket について現在の count が baseline count 以下であれば当該 NG を `info`（observation）へ降格する。
+現在の count が baseline count を超える bucket に属する NG は新規 NG として `ng` / `warning` レベルを維持し、exit code を非ゼロにする。
 
 | 項目 | 定義 |
 |------|------|
@@ -327,11 +360,14 @@ baseline は `category` / `check` / `file` / `evidence` の4組を bucket key �
 | 更新実行手順 | `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --update-ng-baseline`（`check_extensions.ts` も同様）は現行 NG 全体を無条件に再生成して取り込まない。承認済み差分に由来ラベル（`provenance`）と理由（`reason`）を付与して baseline entry へ追加する。追加対象でない既存未管理 NG は baseline へ取り込まず実修復対象として残す。更新後は `--json` 実行で新規 NG が 0 件になることを確認する |
 | 更新非対象 | 当該変更に直接起因する新規 NG。これらは baseline 更新で隠蔽せず、必ず実装修復を行う。既存未管理 NG は baseline 更新だけで解決済み扱いとせず、修復候補として追跡可能な状態を維持する |
 
-RuntimeReference baseline（IR-055、前節）は heuristic 違反の段階導入を目的とし、本 NG baseline は strict 違反（`ng` / `warning`）の既知集合を管理して「既知違反の解消」により strict pass を到達可能にすることを目的とする。両 baseline は独立に運用し、相互に影響しない。NG baseline は v2:REQ-0161-005（旧 `docs/requirements/v2:REQ-0161.md`、現 `docs/requirements/retired/v2:REQ-0161.md`）から SPEC 統合された恒久契約である。
+RuntimeReference baseline（IR-055、前節）は heuristic 違反の段階導入を目的とし、本 NG baseline は strict 違反（`ng` / `warning`）の既知集合を管理して「既知違反の解消」により strict pass を到達可能にすることを目的とする。
+両 baseline は独立に運用し、相互に影響しない。
+NG baseline は v2:REQ-0161-005（旧 `docs/requirements/v2:REQ-0161.md`、現 `docs/requirements/retired/v2:REQ-0161.md`）から SPEC 統合された恒久契約である。
 
 ## docs-check delta 検出における除外設定方針（REQ-010-022, REQ-010-015 準拠）
 
-docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PATH_PATTERNS`）の二系統で検出対象を絞る。両者とも「正当な除外」と「NG 隠蔽」を区別して運用する（REQ-010-015）。
+docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PATH_PATTERNS`）の二系統で検出対象を絞る。
+両者とも「正当な除外」と「NG 隠蔽」を区別して運用する（REQ-010-015）。
 
 ### 正当な除外（legitimate exclusions）
 
@@ -374,7 +410,8 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 
 ## Workflow × 使用ツールマトリックス
 
-本セクションは全 workflow の使用検査ツールを肯定表現で一元管理する SSoT であり、各 workflow SPEC から参照される。req-save/spec-save/case-run/case-close の各コマンドは対象ファイル種別に応じた最小監査範囲を定義し、case-run/case-close は永続文書更新を契機に検査する。
+本セクションは全 workflow の使用検査ツールを肯定表現で一元管理する SSoT であり、各 workflow SPEC から参照される。
+req-save/spec-save/case-run/case-close の各コマンドは対象ファイル種別に応じた最小監査範囲を定義し、case-run/case-close は永続文書更新を契機に検査する。
 
 | workflow | check_changed_docs.ts | check_extensions.ts | check_integrity.ts | test_strategy |
 |---|---|---|---|---|
@@ -386,7 +423,8 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 | req-define | — | — | ✓（全体監査、検証手順） | — |
 | /repo/docs-check | ✓ | ✓ | ✓（全体監査） | — |
 
-全セル肯定表現（✓ または —）を使用する（REQ-010-002, REQ-010-003 準拠）。check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、他 workflow は — で「使用しない」を暗黙表現する。
+全セル肯定表現（✓ または —）を使用する（REQ-010-002, REQ-010-003 準拠）。
+check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、他 workflow は — で「使用しない」を暗黙表現する。
 
 参照元 workflow SPEC 一覧（各 SPEC から本マトリックス表を参照）:
 
@@ -398,7 +436,9 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 
 ## 実行プロファイル分離
 
-check_integrity.ts は3つの実行 profile（source/installed/release）を取り、原本検査、配置後検査、配布アーカイブ検査を区別する。各 profile における配布依存境界検査の契約（source/installed/release projection の分離、検査エラーの gate-not-passed 扱い、release profile の公開前検査における違反残存時の成功経路非保持）は `integrity/distribution-boundary.md` が正規所有する（DEC-014 決定5..7）。詳細 normative は移行計画 §7（`.omo/plans/agentdev-migration-2026-08-05.md`）を正とする。
+check_integrity.ts は3つの実行 profile（source/installed/release）を取り、原本検査、配置後検査、配布アーカイブ検査を区別する。
+各 profile における配布依存境界検査の契約（source/installed/release projection の分離、検査エラーの gate-not-passed 扱い、release profile の公開前検査における違反残存時の成功経路非保持）は `integrity/distribution-boundary.md` が正規所有する（DEC-014 決定5..7）。
+詳細 normative は移行計画 §7（`.omo/plans/agentdev-migration-2026-08-05.md`）を正とする。
 
 ### CLI
 
@@ -408,7 +448,9 @@ bun run check_integrity.ts --profile installed
 bun run check_integrity.ts --profile release --archive <zip-path>
 ```
 
-`--profile` 未指定時は `source` とする。`release` は `--archive` 必須。各 profile と `archive` パスは report（JSON / Markdown）へ記録する。
+`--profile` 未指定時は `source` とする。
+`release` は `--archive` 必須。
+各 profile と `archive` パスは report（JSON / Markdown）へ記録する。
 
 ### source profile
 
@@ -430,7 +472,8 @@ bun run check_integrity.ts --profile release --archive <zip-path>
 
 ### release profile
 
-host 側 checker を起点とし、archive を展開→install→installed profile を `--root` 付きで実行する。archive は配布物の自己完結を保証するが、checker（`repo-agentdev-integrity`）は archive に同梱せず host 側のものを使う（archive 自己完結と検査実行の分離、REQ-0145-014）。
+host 側 checker を起点とし、archive を展開→install→installed profile を `--root` 付きで実行する。
+archive は配布物の自己完結を保証するが、checker（`repo-agentdev-integrity`）は archive に同梱せず host 側のものを使う（archive 自己完結と検査実行の分離、REQ-0145-014）。
 
 処理順序:
 
@@ -440,11 +483,14 @@ host 側 checker を起点とし、archive を展開→install→installed profi
 4. archive は docs/ を含まないため、exit code は `InstalledProfile` カテゴリ（projection_missing/extra/content_mismatch/broken_junction/missing_required_dir）の結果のみで判定する。全文結果は report へ転送する
 5. 成功・失敗の双方で `<temp>` を削除する（cleanup 失敗は warning、exit code は変えない）
 
-ZIP 自体に junction が保存されていなくても install 後に配置できれば通過する。install 後も配置先が欠落する場合は NG とする。
+ZIP 自体に junction が保存されていなくても install 後に配置できれば通過する。
+install 後も配置先が欠落する場合は NG とする。
 
 ### archive 生成・導入コマンド（§7.5.1, §7.5.2）
 
-archive 生成: `scripts/package-release-archive.ps1`（原本 `src/opencode/` 配下を junction 解決済み実ファイルとして ZIP へ格納）。出力は `dist/agentdev-release-<commit-short>.zip`。archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`src/opencode/skills/japanese-tech-writing/**`、`scripts/install-from-archive.ps1`、`README-INSTALL.md` を格納する。
+archive 生成: `scripts/package-release-archive.ps1`（原本 `src/opencode/` 配下を junction 解決済み実ファイルとして ZIP へ格納）。
+出力は `dist/agentdev-release-<commit-short>.zip`。
+archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/opencode/commands/agentdev/**`、`src/opencode/skills/agentdev-*/**`、`src/opencode/skills/japanese-tech-writing/**`、`scripts/install-from-archive.ps1`、`README-INSTALL.md` を格納する。
 
 | 実行結果 | exit code |
 |---|---|
@@ -452,7 +498,8 @@ archive 生成: `scripts/package-release-archive.ps1`（原本 `src/opencode/` �
 | 原本欠落・必須ファイル不在 | 2 |
 | 既存 dist 上書き検出（`-Force` 無し） | 3 |
 
-archive 展開・install: `scripts/install-from-archive.ps1 -Source <src/opencode> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/skills/japanese-tech-writing/` 配下へ配置する。junction は作成しない。
+archive 展開・install: `scripts/install-from-archive.ps1 -Source <src/opencode> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/skills/japanese-tech-writing/` 配下へ配置する。
+junction は作成しない。
 
 | 実行結果 | exit code |
 |---|---|
@@ -462,4 +509,6 @@ archive 展開・install: `scripts/install-from-archive.ps1 -Source <src/opencod
 
 ### 検出力回帰マトリクス（§7.7.1）
 
-profile 分離によって検出力が低下していないことを保証するため、意図的 violation を各 profile へ投入し、期待する NG が必ず発生することを baseline 更新前に照合する。このマトリクスは baseline 更新前の必須ゲートであり、いずれかのセルで期待 NG が発生しなければ baseline を更新せず WP-3 を完了扱いにしない。実行結果は `.omo/plans/agentdev-migration-2026-08-05.regression.md` へ記録する。
+profile 分離によって検出力が低下していないことを保証するため、意図的 violation を各 profile へ投入し、期待する NG が必ず発生することを baseline 更新前に照合する。
+このマトリクスは baseline 更新前の必須ゲートであり、いずれかのセルで期待 NG が発生しなければ baseline を更新せず WP-3 を完了扱いにしない。
+実行結果は `.omo/plans/agentdev-migration-2026-08-05.regression.md` へ記録する。

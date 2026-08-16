@@ -15,11 +15,13 @@ canonical_owner: workflow-skill-model
 
 Command / Workflow Skill / Capability Skill の責務、依存方向、1:N分割基準、配置契約を定義する。
 DEC-010（責務3層分化と1:N分割原則）の実装詳細を正規所有する。
-本 SPEC は REQ-027-001 に基づき Capability Skill model（定義・配置・参照契約・1:N分割基準・依存方向）の正規所有者となる。REQ-027 は境界宣言のみを持ち、本節が詳細実装を正規所有する。
+本 SPEC は REQ-027-001 に基づき Capability Skill model（定義・配置・参照契約・1:N分割基準・依存方向）の正規所有者となる。
+REQ-027 は境界宣言のみを持ち、本節が詳細実装を正規所有する。
 
 ## Command 責務
 
-公開interface（入出力契約・ガードレール）、workflow dispatch。workflow 実装本体は所有しない。
+公開interface（入出力契約・ガードレール）、workflow dispatch。
+workflow 実装本体は所有しない。
 
 ### thin Command の workflow 節標準構造
 
@@ -29,12 +31,16 @@ thin Command の workflow 節は次の3要素で構成する。
 2. 公開順序の要約（順序ラベル付きの見出し群。Workflow Skill 内部手順の複製ではなく、公開interface としての順序提示）
 3. soft guard 宣言（Workflow Skill の単独起動防止宣言。後述「soft guard の二層様式」）
 
-thin Command の workflow 節の順序ラベルは `### Step N` 形式に統一する。Workflow Skill 本文（SKILL.md、references/）の工程識別子は実番号形式（`STEP-1` 等）を用い、Command 定義の順序ラベルとは形式を区別して使い分ける。様式の統一基準、記述量の基準といった執筆詳細は `authoring/command-file-format.md` が正規所有し、本節は workflows 側の構成契約のみを記録する。
+thin Command の workflow 節の順序ラベルは `### Step N` 形式に統一する。
+Workflow Skill 本文（SKILL.md、references/）の工程識別子は実番号形式（`STEP-1` 等）を用い、Command 定義の順序ラベルとは形式を区別して使い分ける。
+様式の統一基準、記述量の基準といった執筆詳細は `authoring/command-file-format.md` が正規所有し、本節は workflows 側の構成契約のみを記録する。
 
 ## Workflow Skill 責務
 
-workflow 実装本体。SKILL.md = control plane（STEP transition・STEP間参照）、STEP = resume point 単位。
-1:1 または 1:N で Command に対応する。1:N 分割基準: 制御構造に実質差異がある場合に分割評価。
+workflow 実装本体。
+SKILL.md = control plane（STEP transition・STEP間参照）、STEP = resume point 単位。
+1:1 または 1:N で Command に対応する。
+1:N 分割基準: 制御構造に実質差異がある場合に分割評価。
 operation 差だけの不必要分割は回避。
 
 Workflow Skill は workflow STEP を所有し、特定 Command の制御構造を持つ（REQ-002-001、REQ-002-002）。
@@ -74,9 +80,11 @@ case-run は単一 Issue 実行と Epic Wave 実行で制御構造に実質差�
 
 ## Capability Skill 責務
 
-複数workflow で共通する能力を一次情報として所有する。workflow 固有STEP から横断抽出し、workflow 制御構造を持たない（REQ-002-003、REQ-027-001、DEC-010）。
+複数workflow で共通する能力を一次情報として所有する。
+workflow 固有STEP から横断抽出し、workflow 制御構造を持たない（REQ-002-003、REQ-027-001、DEC-010）。
 
-Capability Skill は workflow STEP を所有しない。各 Workflow Skill が所有する STEP から名レベルで参照される宣言的定義、判断基準、決定的処理を提供する。
+Capability Skill は workflow STEP を所有しない。
+各 Workflow Skill が所有する STEP から名レベルで参照される宣言的定義、判断基準、決定的処理を提供する。
 
 ### Capability Skill の判定基準
 
@@ -86,7 +94,9 @@ Capability Skill は workflow STEP を所有しない。各 Workflow Skill が�
 2. **複数 workflow からの参照**: 2つ以上の Workflow Skill から参照される、または参照予定である
 3. **workflow 制御構造からの分離**: workflow 制御（STEP 順序、分岐、停止条件）から独立して記述できる能力である
 
-要件 1 は Workflow Skill との区別（REQ-002-018）を担保する。要件 2 は1Workflow で完結する能力を Workflow Skill 内 `references/` 配下へ配置する基準との区別を担保する。要件 3 は workflow 制御と混在しない単一責務境界を担保する。
+要件 1 は Workflow Skill との区別（REQ-002-018）を担保する。
+要件 2 は1Workflow で完結する能力を Workflow Skill 内 `references/` 配下へ配置する基準との区別を担保する。
+要件 3 は workflow 制御と混在しない単一責務境界を担保する。
 
 ### Capability Skill の配置と命名
 
@@ -96,9 +106,11 @@ Capability Skill は workflow STEP を所有しない。各 Workflow Skill が�
 
 ### Capability Skill の参照契約（過剰共通 reference 化の回避）
 
-Workflow Skill は Capability Skill を**名レベルで参照**する（REQ-002-017）。Capability Skill の内部構造（`references/` 配下のファイル、`scripts/` 配下、protocol 名、Step 名、Section 名、見出し名）へ**直接依存しない**。
+Workflow Skill は Capability Skill を**名レベルで参照**する（REQ-002-017）。
+Capability Skill の内部構造（`references/` 配下のファイル、`scripts/` 配下、protocol 名、Step 名、Section 名、見出し名）へ**直接依存しない**。
 
-この制約は、workflow 固有STEP が過剰に共通 reference を import することを回避する（REQ-027-001）。workflow 側は Capability Skill 名とその用途のみを知り、Capability Skill 内部の再構成は Capability Skill 側へ委ねる。
+この制約は、workflow 固有STEP が過剰に共通 reference を import することを回避する（REQ-027-001）。
+workflow 側は Capability Skill 名とその用途のみを知り、Capability Skill 内部の再構成は Capability Skill 側へ委ねる。
 
 許容される参照:
 
@@ -111,11 +123,14 @@ Workflow Skill は Capability Skill を**名レベルで参照**する（REQ-002
 - Capability Skill 内部の見出し、セクション、テーブル名への直接依存
 - Capability Skill 間の内部構造結合（Capability Skill 間も名レベル参照）
 
-Workflow Skill は主要 Capability Skill 連携セクション（`## 主要 Capability Skill 連携` 等）を通じて参照先 Capability Skill 名とその用途を公開する。このセクションは名レベル参照契約の履行証拠となる。
+Workflow Skill は主要 Capability Skill 連携セクション（`## 主要 Capability Skill 連携` 等）を通じて参照先 Capability Skill 名とその用途を公開する。
+このセクションは名レベル参照契約の履行証拠となる。
 
 ### Capability Skill 間の依存
 
-Capability Skill 同士の依存も名レベル参照とし、循環依存を禁止する。複数 Capability Skill を協調させる workflow は Workflow Skill 側が制御する。Capability Skill は他 Capability Skill を直接呼び出さず、呼出元 Workflow Skill が協調順序を決定する。
+Capability Skill 同士の依存も名レベル参照とし、循環依存を禁止する。
+複数 Capability Skill を協調させる workflow は Workflow Skill 側が制御する。
+Capability Skill は他 Capability Skill を直接呼び出さず、呼出元 Workflow Skill が協調順序を決定する。
 
 ## Capability Skill と Workflow Skill の責務境界（REQ-002-018）
 
@@ -129,11 +144,13 @@ Capability Skill と Workflow Skill は異なる責務境界・判断モデル�
 | 責務境界 | 特定 workflow の実装本体 | 複数 workflow 共通能力 |
 | 判断モデル | workflow 状態遷移に基づく制御判断 | 宣言的ルール、分類基準、決定的変換 |
 
-1つの skill が両側面を持つ場合、責務境界を明示的に分離し、2つの skill へ分割する。新規に作成する skill は作成時にどちらの層へ属するかを判定基準（「Capability Skill の判定基準」節）に照らして確定する。
+1つの skill が両側面を持つ場合、責務境界を明示的に分離し、2つの skill へ分割する。
+新規に作成する skill は作成時にどちらの層へ属するかを判定基準（「Capability Skill の判定基準」節）に照らして確定する。
 
 ### Workflow / Capability 機械分類規則
 
-deterministic checker（check_extensions.ts）が適用する Workflow Skill / Capability Skill の機械判定規則を次の分類表として正規所有する。checker 実装と本表は同一規則を反映し、乖離は検査で検出対象とする。
+deterministic checker（check_extensions.ts）が適用する Workflow Skill / Capability Skill の機械判定規則を次の分類表として正規所有する。
+checker 実装と本表は同一規則を反映し、乖離は検査で検出対象とする。
 
 | 判定要素 | Workflow Skill | Capability Skill |
 |---|---|---|
@@ -158,11 +175,13 @@ Command / Workflow Skill / Capability Skill の3層構造（DEC-010）を維持�
 
 ## Capability Skill 横断抽出（DEC-010 Inventory に基づく）
 
-DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候補を裏付ける（AG-001）。本節は候補の分類と既存 Capability Skill との対応を正規所有する。
+DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候補を裏付ける（AG-001）。
+本節は候補の分類と既存 Capability Skill との対応を正規所有する。
 
 ### 共通 Capability 領域と既存 Capability Skill
 
-複数 workflow 共通能力は既存 Capability Skill として既に集約されている領域が大半である。新規 Capability Skill 抽出を検討する前に、既存 Capability Skill の再利用を優先する。
+複数 workflow 共通能力は既存 Capability Skill として既に集約されている領域が大半である。
+新規 Capability Skill 抽出を検討する前に、既存 Capability Skill の再利用を優先する。
 
 | 共通領域 | 既存 Capability Skill | 利用 Workflow Skill |
 |---|---|---|
@@ -182,7 +201,10 @@ DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候
 
 ### workflow-* プレフィックスを持つ Capability Skill 的スキル
 
-以下のスキルは `agentdev-workflow-*` プレフィックスを持つが、実態は Capability Skill の判定基準（workflow STEP 非所有、複数 workflow からの参照、workflow 制御構造からの分離）を満たす。各スキルは本文で「本スキル自身は workflow STEP を所有せず、各 command の Workflow Skill が所有する STEP から参照される」と宣言する。命名は歴史的経緯で維持し、Capability Skill として運用する。将来の rename は別 Issue スコープとする。
+以下のスキルは `agentdev-workflow-*` プレフィックスを持つが、実態は Capability Skill の判定基準（workflow STEP 非所有、複数 workflow からの参照、workflow 制御構造からの分離）を満たす。
+各スキルは本文で「本スキル自身は workflow STEP を所有せず、各 command の Workflow Skill が所有する STEP から参照される」と宣言する。
+命名は歴史的経緯で維持し、Capability Skill として運用する。
+将来の rename は別 Issue スコープとする。
 
 | スキル | 提供能力 | 参照元 Workflow Skill |
 |---|---|---|
@@ -193,7 +215,9 @@ DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候
 
 ### 新規 Capability Skill 抽出候補（将来対応）
 
-DEC-010 Inventory が挙げる新規 Capability Skill 候補。本 SPEC は候補の記録のみを所有し、個別抽出実装は別 Issue が担う。新規 Capability Skill は「Capability Skill の判定基準」を満たす場合にのみ作成し、既存 Capability Skill の再利用を優先する。
+DEC-010 Inventory が挙げる新規 Capability Skill 候補。
+本 SPEC は候補の記録のみを所有し、個別抽出実装は別 Issue が担う。
+新規 Capability Skill は「Capability Skill の判定基準」を満たす場合にのみ作成し、既存 Capability Skill の再利用を優先する。
 
 - test strategy 定義（`req-define` Step 5-6 相当）
 - EC-2 必須品質統制導出（`case-open` execution contract）
@@ -208,7 +232,8 @@ DEC-010 Inventory が挙げる新規 Capability Skill 候補。本 SPEC は候�
 ## 依存方向
 
 Command → Workflow Skill（名レベル参照）→ STEP reference（references/ 配下）。
-Workflow Skill → Capability Skill（名レベル参照）。循環依存禁止。
+Workflow Skill → Capability Skill（名レベル参照）。
+循環依存禁止。
 Capability Skill → Capability Skill（名レベル参照、循環依存禁止）。
 
 ## soft guard の二層様式

@@ -72,12 +72,15 @@ updated: 2026-06-28
 REQ 全体ではなく要件行粒度で境界基準、検出観点の影響を追跡する必要がある場合に使用する。
 これらの要件行はすべて IR-044（REQ/SPEC 境界違反検出）を通じてカタログに紐づく。
 
-従来 REQ-002-021、022、023、024、025、026、032 に紐づいていた配布依存境界の影響エントリは MOVE 先（REQ-029-001..008）へ差し替え済みである。REQ-002-027 は更新後の意味（実行時依存として使用するパスは導入先環境で解決可能）へ差し替えた。REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文健全性、責務整合、case-auto.md 段階解消）は既存品質契約（`integrity/docs-spec-rebuild-integrity.md`、`responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md`）と Epic 完了条件へ集約した（REQ-007 行は新設しない）。詳細は Retired cross-references 節へ追記する。
+従来 REQ-002-021、022、023、024、025、026、032 に紐づいていた配布依存境界の影響エントリは MOVE 先（REQ-029-001..008）へ差し替え済みである。
+REQ-002-027 は更新後の意味（実行時依存として使用するパスは導入先環境で解決可能）へ差し替えた。
+REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文健全性、責務整合、case-auto.md 段階解消）は既存品質契約（`integrity/docs-spec-rebuild-integrity.md`、`responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md`）と Epic 完了条件へ集約した（REQ-007 行は新設しない）。
+詳細は Retired cross-references 節へ追記する。
 
 | 要件行 | 影響するアーティファクト / スキル / コマンド | 経由 |
 |--------|-------------------------------------|------|
 | REQ-001-067〜069 | document-model.md, `agentdev-req-analysis` skill, `agentdev-quality-gates` skill, docs-check command (REQ-010-260 経由), inspect-docs command (REQ-010-047 経由) | IR-044 |
-| REQ-004-053〜055 | `agentdev-req-analysis` skill, `agentdev-quality-gates` skill | IR-044 |
+| REQ-004-031〜033 | `agentdev-req-analysis` skill, `agentdev-quality-gates` skill | IR-044 |
 | REQ-010-260 | integrity-rule-catalog.md (IR-044 定義), integrity-contracts.md (ReqSpecBoundary category, canonical-conflict subcategory 注記) | IR-044 |
 | REQ-010-047 | req-impact-map.md (本節), `agentdev-req-structure-diagnostics` skill | IR-044 |
 
@@ -121,19 +124,27 @@ REQ 全体ではなく要件行粒度で境界基準、検出観点の影響を�
 
 ## IR → REQ 逆方向参照（ACT-SPEC-006、REQ-028-008）
 
-本ファイル（REQ → 影響するルール/アーティファクト）と `../integrity/rule-ownership.md`（ルールドメイン → canonical REQ/SPEC）は逆方向の対応マップである（REQ-010-152）。両者の整合性維持運用は前節「同期更新が必要なケース」に従う。
+本ファイル（REQ → 影響するルール/アーティファクト）と `../integrity/rule-ownership.md`（ルールドメイン → canonical REQ/SPEC）は逆方向の対応マップである（REQ-010-152）。
+両者の整合性維持運用は前節「同期更新が必要なケース」に従う。
 
-個別 IR（IR-NNN）の対応 REQ / SPEC は `../integrity/rule-ownership.md` の AUTOGEN ブロック（`rule-ownership-ir-crossref`）が IR-* ファイルの frontmatter / Field/Value 表から自動生成する（SC-002 Phase C、IR-061）。本節は直接編集せず、`rule-ownership.md` の AUTOGEN ブロックを正とする。
+個別 IR（IR-NNN）の対応 REQ / SPEC は `../integrity/rule-ownership.md` の AUTOGEN ブロック（`rule-ownership-ir-crossref`）が IR-* ファイルの frontmatter / Field/Value 表から自動生成する（SC-002 Phase C、IR-061）。
+本節は直接編集せず、`rule-ownership.md` の AUTOGEN ブロックを正とする。
 
-DEC-013 AG-008 適用により file-backed tombstone（IR-011 型）を物理削除する。廃止 IR の交叉参照は次節 `## Retired cross-references` へ再配置し、欠番管理は `../foundations/numbering-policy.md` が保持する。
+DEC-013 AG-008 適用により file-backed tombstone（IR-011 型）を物理削除する。
+廃止 IR の交叉参照は次節 `## Retired cross-references` へ再配置し、欠番管理は `../foundations/numbering-policy.md` が保持する。
 
 ## Retired cross-references
 
-廃止 IR の交叉参照（v2:REQ-NNN 等）を再配置する節。AG-008（REQ-028-008）に基づき、file-backed tombstone の物理削除時に交叉参照を本節へ移行する。各エントリは廃止 IR ID、旧交叉参照、再配置日、後続 REQ 等のメタデータを持つ（Phase 3 §7.3、`docs/specs/integrity/audits/cross-cutting-integration-design-20260811.md`）。
+廃止 IR の交叉参照（v2:REQ-NNN 等）を再配置する節。
+AG-008（REQ-028-008）に基づき、file-backed tombstone の物理削除時に交叉参照を本節へ移行する。
+各エントリは廃止 IR ID、旧交叉参照、再配置日、後続 REQ 等のメタデータを持つ（Phase 3 §7.3、`docs/specs/integrity/audits/cross-cutting-integration-design-20260811.md`）。
 
 ### IR-011 削除に伴う交叉参照再配置
 
-IR-011（Mapping table 全件記録、file-backed tombstone）の物理削除に伴い、交叉参照 `v2:REQ-0108-083`〜`v2:REQ-0108-088`（6件）を再配置する。当該 v2 要件群は tag `v2.4.0` 時点の mapping-table 全件記録契約を担い、現行 v3（REQ-001〜REQ-028）には該当しない。後続要件は存在しない（mapping-table 廃止済み、tombstone 廃止済み）。欠番管理は `../foundations/numbering-policy.md` の既知の欠番表が保持する。
+IR-011（Mapping table 全件記録、file-backed tombstone）の物理削除に伴い、交叉参照 `v2:REQ-0108-083`〜`v2:REQ-0108-088`（6件）を再配置する。
+当該 v2 要件群は tag `v2.4.0` 時点の mapping-table 全件記録契約を担い、現行 v3（REQ-001〜REQ-028）には該当しない。
+後続要件は存在しない（mapping-table 廃止済み、tombstone 廃止済み）。
+欠番管理は `../foundations/numbering-policy.md` の既知の欠番表が保持する。
 
 | 旧交叉参照 | 旧タイトル（tag v2.4.0） | 再配置元 | 再配置日 | 後続 REQ |
 |---|---|---|---|---|
@@ -144,4 +155,5 @@ IR-011（Mapping table 全件記録、file-backed tombstone）の物理削除に
 | `v2:REQ-0108-087` | mapping-table 全件記録契約（v2） | IR-011 file-backed tombstone | 2026-08-11 | なし |
 | `v2:REQ-0108-088` | mapping-table 全件記録契約（v2） | IR-011 file-backed tombstone | 2026-08-11 | なし |
 
-> 旧タイトルの復元は tag `v2.4.0` で確認可能。Phase 4 では交叉参照の保存と再配置を責務とし、旧タイトル詳細の復元は別途歴史参照作業とする。
+> 旧タイトルの復元は tag `v2.4.0` で確認可能。
+> Phase 4 では交叉参照の保存と再配置を責務とし、旧タイトル詳細の復元は別途歴史参照作業とする。

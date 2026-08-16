@@ -14,7 +14,8 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 
 > **authoring/ ドメインでの配置理由**: 本 SPEC は本文構造・見出し構成・Step 表現・記述形式という執筆規約系の内容を扱うため、共通文書モデル規約（frontmatter・ID 体系・命名規則・URL 参照形式）を扱う `../foundations/patterns.md` と責務分離して `authoring/` ドメインに配置する。
-> `authoring/` は将来 REQ/SPEC/SKILL/guide 執筆規約の集約先として拡張余地を持つ（現状は command のみ）。即時統合・`authoring/` の削除は行わない。
+> `authoring/` は将来 REQ/SPEC/SKILL/guide 執筆規約の集約先として拡張余地を持つ（現状は command のみ）。
+> 即時統合・`authoring/` の削除は行わない。
 
 ## 適用範囲
 
@@ -24,22 +25,27 @@ AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準
 ## Command 構造
 
 Command は公開interface（入出力契約・ガードレール）と workflow dispatch を中心とする
-（DEC-010）。workflow 手順本体は Workflow Skill へ移行し、Command に重複残存しない。
+（DEC-010）。
+workflow 手順本体は Workflow Skill へ移行し、Command に重複残存しない。
 workflow への参照は Workflow Skill 名レベルとする（REQ-002-017）。
 
 ## extensions 手順
 
 command 本文は extensions 手順（SPEC `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パスを固定しない。
 
-各 command は以下の共通記述を本文に持つ。extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`）を持ち、標準動作に追加・拡張される（上書きではない）。
+各 command は以下の共通記述を本文に持つ。
+extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`）を持ち、標準動作に追加・拡張される（上書きではない）。
 
 - 実行時に対応する project extension を読み込む。Workflow Skill は .agentdev/extensions/skills/{workflow-skill-name}.yaml（kind: workflow-extension）、Capability Skill は .agentdev/extensions/skills/{capability-skill-name}.yaml（kind: capability-skill-extension）を対象とする（詳細は SPEC `../foundations/project-extensions.md` 参照）
 - extension が存在しない場合は標準動作で続行する
 - extension が破損している場合はエラーを表示して無視し、標準動作で続行する（REQ-002-031 準拠、fail-open）
 
-実行時に読むべき docs 文書への参照は Workflow Skill extension の `context` へ移す。command 本文に直接の docs パスを記述しない。
+実行時に読むべき docs 文書への参照は Workflow Skill extension の `context` へ移す。
+command 本文に直接の docs パスを記述しない。
 
-extension はフロントマタ（`version: 1`, `kind:`（公式3値: workflow-extension / internal-workflow-extension / capability-skill-extension）, `id:`）と、5セクションを持つ。schema 詳細は SPEC `../foundations/project-extensions.md` 参照。旧 kind（command-extension / skill-extension）は廃止済みであり、検出時は migration-required として停止する。
+extension はフロントマタ（`version: 1`, `kind:`（公式3値: workflow-extension / internal-workflow-extension / capability-skill-extension）, `id:`）と、5セクションを持つ。
+schema 詳細は SPEC `../foundations/project-extensions.md` 参照。
+旧 kind（command-extension / skill-extension）は廃止済みであり、検出時は migration-required として停止する。
 
 ## 手順セクション形式
 
@@ -56,7 +62,9 @@ extension はフロントマタ（`version: 1`, `kind:`（公式3値: workflow-e
 
 ### workflow 節の順序ラベル様式
 
-thin Command の workflow 節に置く順序ラベルは `### Step N` 見出し形式に統一する。Workflow Skill 本文（SKILL.md、references/）の工程識別子は実番号形式（`STEP-1` 等）を用い、Command 定義の順序ラベルとは形式を区別して使い分ける。`STEP-{N}` のマスク形式と `工程-N` 形式は新規記述に使用せず、既存の当該表記は実番号形式へ更新する。
+thin Command の workflow 節に置く順序ラベルは `### Step N` 見出し形式に統一する。
+Workflow Skill 本文（SKILL.md、references/）の工程識別子は実番号形式（`STEP-1` 等）を用い、Command 定義の順序ラベルとは形式を区別して使い分ける。
+`STEP-{N}` のマスク形式と `工程-N` 形式は新規記述に使用せず、既存の当該表記は実番号形式へ更新する。
 
 ## 代替フロー内サブステップ表現
 
@@ -99,7 +107,8 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 
 ### thin Command モデル検査（公開 /agentdev/* Command 対象）
 
-公開 `/agentdev/*` Command について以下を検査対象に追加する。`/repo/*` Command は従来検査を維持し、公開 `/agentdev/*` Command と checker 上で区別する。
+公開 `/agentdev/*` Command について以下を検査対象に追加する。
+`/repo/*` Command は従来検査を維持し、公開 `/agentdev/*` Command と checker 上で区別する。
 
 | 検出項目 | 対象 |
 |----------|------|
@@ -107,7 +116,8 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 | workflow 手順本体の重複残存 | Command 本文に Workflow Skill が所有すべき workflow 手順が機械判定可能な形で残存する |
 | Capability Skill 内部 reference 直接依存 | Command 本文から Skill の references/* 等の内部パスへの直接参照 |
 
-意味的重複（soft contract 判断）は `/agentdev/inspect-skills` が所有する。機械検査は構造的に判定可能な項目のみを対象とする。
+意味的重複（soft contract 判断）は `/agentdev/inspect-skills` が所有する。
+機械検査は構造的に判定可能な項目のみを対象とする。
 
 > **非検出対象（許容形式）**: `**EN.**` lettered prefix（代替フロー内サブステップ表現）は主手順の Step 番号連番とは独立した番号空間を持つため、上記検出項目のいずれにも該当しない。
 
@@ -133,7 +143,8 @@ Step 番号は command 定義の内部構造であり、SPEC の公開契約に�
 
 読み取り専用または分類系で Step を持たない command SPEC は、Step による対応付けの対象外であることを当該 SPEC に明記する。
 
-**検証**: 各 command/SPEC ペアについて、SPEC が公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務の各軸で command 定義と整合することを確認する。Step 番号の不一致は違反として扱わず、公開契約の欠落、相互矛盾を違反として扱う。
+**検証**: 各 command/SPEC ペアについて、SPEC が公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務の各軸で command 定義と整合することを確認する。
+Step 番号の不一致は違反として扱わず、公開契約の欠落、相互矛盾を違反として扱う。
 
 ## 他 SPEC との関係
 

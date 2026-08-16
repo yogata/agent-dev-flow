@@ -25,7 +25,8 @@ req-health-metrics.md と対となる SPEC 健全性の定量メトリクスで�
 | 宣言率（spec_logical_division） | 主論理区分を宣言済みの SPEC 数 / 全 SPEC 数 | 下記「宣言率指標の定義」参照 |
 | 宣言率（canonical_owner） | 正規所有対象を宣言済みの SPEC 数 / 全 SPEC 数 | 下記「宣言率指標の定義」参照 |
 
-AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:END` マーカーまでを除外する。本節をSPEC行数計測定義の正本とする。
+AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:END` マーカーまでを除外する。
+本節をSPEC行数計測定義の正本とする。
 
 ### 宣言率指標の定義
 
@@ -38,7 +39,8 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 - **閾値**: 設けない（警告モード）。不合格による保存拒否、配置一貫性検証の強制を行わない。段階適用（REQ-001-035）に従い、新規 SPEC から順次宣言付与を適用し、宣言率の推移を追跡する
 - **再現性**: 同一 commit 状態に対して grep / parse 集計を行えば誰でも同一結果を得られる。集計ロジックは本 SPEC が定義し、実行は `inspect-docs`、`/repo/docs-check` が担う（本 SPEC 自体は計測ロジックを実装しない）
 
-宣言率指標は警告モードで運用し、不合格閾値を設けない（REQ-001-035 段階適用、DEC-003 soft-contract）。新規 SPEC から順次宣言付与を適用し、段階的な宣言率向上を追跡する。
+宣言率指標は警告モードで運用し、不合格閾値を設けない（REQ-001-035 段階適用、DEC-003 soft-contract）。
+新規 SPEC から順次宣言付与を適用し、段階的な宣言率向上を追跡する。
 
 ## 閾値とシグナル
 
@@ -73,127 +75,127 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 <!-- AUTOGEN:BEGIN:id=spec-metrics-measurement-example -->
 | SPEC | SPEC 行数 | status | ドメイン分類 |
 |---|---|---|---|
-| integrity/audits/bidirectional-audit-20260811.md | 1508 | draft | integrity |
-| foundations/document-model.md | 637 | accepted | foundations |
-| integrity/references/docmap-reference-audit.md | 593 | - | integrity |
-| responsibilities/artifact-contracts.md | 555 | accepted | responsibilities |
-| integrity/audits/cross-cutting-integration-design-20260811.md | 522 | draft | integrity |
-| commands/req-define.md | 511 | accepted | commands |
-| integrity/integrity-contracts.md | 462 | accepted | integrity |
-| commands/case-run.md | 441 | accepted | commands |
-| commands/case-auto.md | 437 | accepted | commands |
-| commands/case-open.md | 407 | accepted | commands |
-| integrity/baselines/pre-audit-baseline-20260811.md | 405 | accepted | integrity |
-| foundations/system.md | 396 | accepted | foundations |
-| integrity/audits/classification-20260811.md | 396 | draft | integrity |
-| skills/agentdev-artifact-graph.md | 369 | draft | skills |
-| responsibilities/document-type-responsibilities.md | 357 | accepted | responsibilities |
-| local/runtime-package-boundary.md | 338 | accepted | local |
-| workflows/epic-wave-model.md | 314 | accepted | workflows |
-| commands/spec-save.md | 287 | accepted | commands |
-| integrity/audits/final-reverification-20260811.md | 284 | accepted | integrity |
-| commands/case-close.md | 282 | accepted | commands |
-| workflows/backlog-artifact-lifecycle.md | 279 | accepted | workflows |
-| workflows/workflow-contracts.md | 272 | accepted | workflows |
-| integrity/integrity-rule-catalog.md | 266 | accepted | integrity |
-| skills/agentdev-adversarial-review.md | 262 | accepted | skills |
-| README.md | 257 | - | uncategorized |
-| workflows/delegation-contracts.md | 254 | accepted | workflows |
+| integrity/audits/bidirectional-audit-20260811.md | 1545 | draft | integrity |
+| foundations/document-model.md | 675 | accepted | foundations |
+| integrity/references/docmap-reference-audit.md | 617 | - | integrity |
+| integrity/audits/cross-cutting-integration-design-20260811.md | 582 | draft | integrity |
+| responsibilities/artifact-contracts.md | 568 | accepted | responsibilities |
+| commands/req-define.md | 561 | accepted | commands |
+| integrity/integrity-contracts.md | 511 | accepted | integrity |
+| commands/case-run.md | 487 | accepted | commands |
+| commands/case-auto.md | 474 | accepted | commands |
+| commands/case-open.md | 438 | accepted | commands |
+| integrity/audits/classification-20260811.md | 422 | draft | integrity |
+| integrity/baselines/pre-audit-baseline-20260811.md | 416 | accepted | integrity |
+| skills/agentdev-artifact-graph.md | 410 | draft | skills |
+| foundations/system.md | 406 | accepted | foundations |
+| responsibilities/document-type-responsibilities.md | 372 | accepted | responsibilities |
+| local/runtime-package-boundary.md | 359 | accepted | local |
+| integrity/audits/final-reverification-20260811.md | 341 | accepted | integrity |
+| skills/agentdev-adversarial-review.md | 337 | accepted | skills |
+| workflows/epic-wave-model.md | 318 | accepted | workflows |
+| commands/spec-save.md | 305 | accepted | commands |
+| commands/case-close.md | 302 | accepted | commands |
+| integrity/integrity-rule-catalog.md | 290 | accepted | integrity |
+| workflows/backlog-artifact-lifecycle.md | 283 | accepted | workflows |
+| workflows/workflow-contracts.md | 283 | accepted | workflows |
+| workflows/delegation-contracts.md | 269 | accepted | workflows |
+| README.md | 263 | - | uncategorized |
+| workflows/workflow-skill-model.md | 246 | draft | workflows |
+| skills/agentdev-gh-cli.md | 245 | accepted | skills |
 | local/local-case-file.md | 240 | accepted | local |
-| skills/agentdev-gh-cli.md | 237 | accepted | skills |
-| workflows/workflow-skill-model.md | 221 | draft | workflows |
-| commands/backlog-review.md | 202 | accepted | commands |
-| local/artifact-graph.md | 196 | superseded | local |
-| quality/quality-gates.md | 196 | accepted | quality |
-| local/install-script-usability.md | 188 | draft | local |
-| skills/agentdev-workflow-templates.md | 184 | accepted | skills |
-| integrity/targeted-docs-guard-implementation.md | 181 | accepted | integrity |
-| commands/learning-promote.md | 180 | accepted | commands |
-| foundations/project-extensions.md | 178 | accepted | foundations |
-| commands/inspect-promote.md | 166 | accepted | commands |
-| commands/intake-promote.md | 158 | accepted | commands |
-| foundations/design-principles.md | 158 | accepted | foundations |
-| responsibilities/artifact-responsibilities.md | 156 | accepted | responsibilities |
-| integrity/index-auto-generation.md | 154 | accepted | integrity |
-| workflows/capture-boundaries.md | 153 | accepted | workflows |
-| commands/req-save.md | 148 | accepted | commands |
-| foundations/decision-lifecycle.md | 146 | draft | foundations |
-| responsibilities/req-impact-map.md | 144 | accepted | responsibilities |
-| skills/agentdev-skill-authoring.md | 141 | accepted | skills |
-| authoring/command-file-format.md | 136 | accepted | authoring |
-| foundations/harness-separation-model.md | 133 | accepted | foundations |
-| skills/agentdev-intake-pipeline.md | 130 | accepted | skills |
-| responsibilities/responsibility-boundary-purification.md | 128 | accepted | responsibilities |
-| quality/req-health-metrics.md | 127 | accepted | quality |
-| integrity/audits/ng21-provenance-classification-20260816.md | 121 | accepted | integrity |
-| foundations/patterns.md | 118 | accepted | foundations |
-| skills/agentdev-learning-pipeline.md | 118 | accepted | skills |
-| integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md | 117 | accepted | integrity |
-| commands/inspect-docs.md | 113 | accepted | commands |
-| quality/spec-health-metrics.md | 113 | accepted | quality |
-| skills/agentdev-case-run-execution-adapter.md | 113 | accepted | skills |
-| skills/agentdev-spec-file-manager.md | 110 | draft | skills |
-| skills/agentdev-req-analysis.md | 107 | accepted | skills |
-| commands/inspect-skills.md | 104 | accepted | commands |
-| integrity/rules/IR-044-req-spec-boundary-violation-detection.md | 104 | accepted | integrity |
-| skills/agentdev-decision-guidelines.md | 96 | accepted | skills |
-| skills/agentdev-backlog-integration.md | 94 | accepted | skills |
+| commands/backlog-review.md | 227 | accepted | commands |
+| local/artifact-graph.md | 214 | superseded | local |
+| commands/learning-promote.md | 201 | accepted | commands |
+| quality/quality-gates.md | 201 | accepted | quality |
+| skills/agentdev-workflow-templates.md | 200 | accepted | skills |
+| integrity/targeted-docs-guard-implementation.md | 198 | accepted | integrity |
+| foundations/project-extensions.md | 195 | accepted | foundations |
+| local/install-script-usability.md | 189 | draft | local |
+| integrity/index-auto-generation.md | 184 | accepted | integrity |
+| commands/inspect-promote.md | 178 | accepted | commands |
+| commands/intake-promote.md | 174 | accepted | commands |
+| foundations/decision-lifecycle.md | 163 | draft | foundations |
+| foundations/design-principles.md | 161 | accepted | foundations |
+| workflows/capture-boundaries.md | 161 | accepted | workflows |
+| responsibilities/artifact-responsibilities.md | 159 | accepted | responsibilities |
+| responsibilities/req-impact-map.md | 156 | accepted | responsibilities |
+| skills/agentdev-skill-authoring.md | 154 | accepted | skills |
+| commands/req-save.md | 150 | accepted | commands |
+| authoring/command-file-format.md | 147 | accepted | authoring |
+| skills/agentdev-case-run-execution-adapter.md | 143 | accepted | skills |
+| foundations/harness-separation-model.md | 139 | accepted | foundations |
+| responsibilities/responsibility-boundary-purification.md | 136 | accepted | responsibilities |
+| skills/agentdev-intake-pipeline.md | 136 | accepted | skills |
+| skills/agentdev-learning-pipeline.md | 135 | accepted | skills |
+| foundations/patterns.md | 130 | accepted | foundations |
+| quality/req-health-metrics.md | 130 | accepted | quality |
+| integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md | 128 | accepted | integrity |
+| integrity/audits/ng21-provenance-classification-20260816.md | 127 | accepted | integrity |
+| integrity/rules/IR-044-req-spec-boundary-violation-detection.md | 127 | accepted | integrity |
+| skills/agentdev-spec-file-manager.md | 120 | draft | skills |
+| quality/spec-health-metrics.md | 118 | accepted | quality |
+| commands/inspect-docs.md | 116 | accepted | commands |
+| skills/agentdev-req-analysis.md | 110 | accepted | skills |
+| commands/inspect-skills.md | 105 | accepted | commands |
+| skills/agentdev-backlog-integration.md | 105 | accepted | skills |
+| integrity/distribution-boundary.md | 102 | accepted | integrity |
+| skills/agentdev-decision-guidelines.md | 98 | accepted | skills |
+| skills/agentdev-doc-diagnostics.md | 94 | draft | skills |
 | skills/agentdev-deep-review.md | 93 | superseded | skills |
+| integrity/references/targeted-docs-guard-implementation-details.md | 91 | - | integrity |
 | local/references/artifact-graph-effect-evaluation.md | 91 | - | local |
-| skills/agentdev-doc-diagnostics.md | 91 | draft | skills |
 | commands/case-update.md | 90 | accepted | commands |
 | commands/intake-from-github.md | 90 | accepted | commands |
+| integrity/test-impact-detection-gate.md | 90 | draft | integrity |
+| commands/inspect-extensions.md | 88 | superseded | commands |
 | commands/intake-capture.md | 87 | accepted | commands |
-| integrity/references/targeted-docs-guard-implementation-details.md | 87 | - | integrity |
-| integrity/test-impact-detection-gate.md | 86 | draft | integrity |
-| skills/agentdev-quality-gates.md | 86 | accepted | skills |
-| commands/inspect-extensions.md | 84 | superseded | commands |
-| integrity/distribution-boundary.md | 84 | accepted | integrity |
+| skills/agentdev-quality-gates.md | 87 | accepted | skills |
+| integrity/rule-ownership.md | 85 | accepted | integrity |
+| skills/agentdev-artifact-validation.md | 84 | draft | skills |
 | skills/agentdev-decision-file-manager.md | 82 | accepted | skills |
-| integrity/rule-ownership.md | 81 | accepted | integrity |
-| skills/agentdev-artifact-validation.md | 81 | draft | skills |
+| foundations/numbering-policy.md | 80 | accepted | foundations |
+| integrity/docs-spec-rebuild-integrity.md | 80 | accepted | integrity |
 | skills/agentdev-learning-capture.md | 79 | accepted | skills |
-| integrity/docs-spec-rebuild-integrity.md | 75 | accepted | integrity |
-| integrity/rules/IR-062-reference-path-existence.md | 72 | accepted | integrity |
-| skills/agentdev-req-file-manager.md | 72 | accepted | skills |
-| integrity/rules/IR-055-runtime-unresolved-reference.md | 71 | accepted | integrity |
-| integrity/autogen-freshness-gate.md | 70 | draft | integrity |
-| responsibilities/artifact-quality-control-routing.md | 70 | draft | responsibilities |
-| skills/agentdev-project-extensions.md | 70 | accepted | skills |
-| skills/agentdev-command-authoring.md | 69 | accepted | skills |
-| integrity/rules/IR-054-draft-spec-abandonment-detection.md | 68 | accepted | integrity |
-| integrity/rules/IR-058-distribution-untracked-skill-reference.md | 68 | accepted | integrity |
+| skills/agentdev-req-file-manager.md | 77 | accepted | skills |
+| integrity/rules/IR-055-runtime-unresolved-reference.md | 75 | accepted | integrity |
+| skills/agentdev-command-authoring.md | 75 | accepted | skills |
+| integrity/rules/IR-062-reference-path-existence.md | 74 | accepted | integrity |
+| integrity/autogen-freshness-gate.md | 73 | draft | integrity |
+| responsibilities/artifact-quality-control-routing.md | 71 | draft | responsibilities |
+| skills/agentdev-project-extensions.md | 71 | accepted | skills |
+| integrity/rules/IR-054-draft-spec-abandonment-detection.md | 70 | accepted | integrity |
+| integrity/rules/IR-058-distribution-untracked-skill-reference.md | 70 | accepted | integrity |
+| integrity/rules/IR-056-project-extensions-integrity.md | 67 | accepted | integrity |
 | skills/agentdev-doc-writing.md | 67 | accepted | skills |
-| foundations/numbering-policy.md | 66 | accepted | foundations |
-| integrity/rules/IR-056-project-extensions-integrity.md | 65 | accepted | integrity |
 | skills/agentdev-issue-management.md | 65 | accepted | skills |
+| integrity/rules/IR-060-forbidden-japanese-word-detection.md | 64 | accepted | integrity |
 | foundations/references/concrete-abstraction.md | 61 | accepted | foundations |
 | workflows/references/execution-unit-construction.md | 61 | accepted | workflows |
-| integrity/rules/IR-060-forbidden-japanese-word-detection.md | 59 | accepted | integrity |
+| authoring/vocabulary-registry.md | 59 | accepted | authoring |
 | skills/agentdev-git-worktree.md | 59 | accepted | skills |
 | skills/agentdev-workflow-lifecycle.md | 59 | accepted | skills |
 | skills/agentdev-workflow-orchestration.md | 57 | accepted | skills |
+| integrity/backticks-identifier-threshold.md | 56 | accepted | integrity |
+| integrity/checker-execution-contracts.md | 55 | draft | integrity |
 | skills/agentdev-epic-tracker.md | 55 | accepted | skills |
 | skills/agentdev-inspect-skills.md | 54 | accepted | skills |
 | skills/agentdev-req-structure-diagnostics.md | 54 | accepted | skills |
-| authoring/vocabulary-registry.md | 53 | accepted | authoring |
-| integrity/backticks-identifier-threshold.md | 53 | accepted | integrity |
-| integrity/checker-execution-contracts.md | 53 | draft | integrity |
 | skills/agentdev-workflow-routing.md | 52 | accepted | skills |
 | skills/agentdev-architecture-advisory.md | 51 | accepted | skills |
 | skills/agentdev-conventional-commits.md | 51 | accepted | skills |
 | skills/agentdev-command-creator.md | 48 | accepted | skills |
-| workflows/step-reference-contract.md | 44 | draft | workflows |
-| integrity/rules/IR-059-distribution-reference-boundary.md | 40 | accepted | integrity |
+| integrity/rules/IR-059-distribution-reference-boundary.md | 46 | accepted | integrity |
+| workflows/step-reference-contract.md | 46 | draft | workflows |
 | integrity/rules/IR-052-completion-grep-pattern-design.md | 39 | accepted | integrity |
 | integrity/rules/IR-061-index-generation-consistency.md | 38 | accepted | integrity |
+| integrity/rules/IR-025-retired-adr-path-rule.md | 37 | accepted | integrity |
 | workflows/input-resolution-and-durable-state.md | 36 | draft | workflows |
-| integrity/rules/IR-025-retired-adr-path-rule.md | 34 | accepted | integrity |
-| authoring/dependency-version-compatibility.md | 31 | draft | authoring |
-| quality/quality-specs.md | 31 | accepted | quality |
-| integrity/rules/IR-005-adr-req-bidirectional-reference.md | 27 | accepted | integrity |
-| integrity/validator-split-criteria.md | 25 | accepted | integrity |
-| integrity/rules/IR-006-command-allowed-frontmatter.md | 24 | accepted | integrity |
+| integrity/validator-split-criteria.md | 34 | accepted | integrity |
+| authoring/dependency-version-compatibility.md | 33 | draft | authoring |
+| quality/quality-specs.md | 33 | accepted | quality |
+| integrity/rules/IR-005-adr-req-bidirectional-reference.md | 28 | accepted | integrity |
+| integrity/rules/IR-006-command-allowed-frontmatter.md | 27 | accepted | integrity |
 | integrity/references/validator-internal-config.md | 20 | - | integrity |
 | integrity/rules/IR-001-req-frontmatter-id-filename.md | 20 | accepted | integrity |
 | integrity/rules/IR-002-req-required-frontmatter.md | 20 | accepted | integrity |
@@ -236,7 +238,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-050-load-skills-command-mis-specification.md | 20 | accepted | integrity |
 | integrity/rules/IR-051-executor-skill-notation-misrecognition.md | 20 | accepted | integrity |
 | integrity/rules/IR-053-gh-direct-invocation-detection.md | 20 | accepted | integrity |
-| skills/agentdev-git-worktree-test-fallback.md | 17 | draft | skills |
+| skills/agentdev-git-worktree-test-fallback.md | 18 | draft | skills |
 
 計測日: 2026-08-16。
 <!-- AUTOGEN:END -->
@@ -281,8 +283,11 @@ SPEC 健全性診断は行数・status・配置に加え、主論理区分・正
 
 ### 後方互換運用
 
-宣言形式（主論理区分、正規所有対象）が未定義の既存 SPEC は警告モードで経過観察する（REQ-001-035）。強制ゲート（保存拒否条件: 重複所有、配置不一致）は SPEC 宣言形式の定義完了後に有効化し、段階適用（宣言形式定義 → 警告モード棚卸し → 重複解消 → 新規/変更 SPEC 強制 → 全件強制）とする。
+宣言形式（主論理区分、正規所有対象）が未定義の既存 SPEC は警告モードで経過観察する（REQ-001-035）。
+強制ゲート（保存拒否条件: 重複所有、配置不一致）は SPEC 宣言形式の定義完了後に有効化し、段階適用（宣言形式定義 → 警告モード棚卸し → 重複解消 → 新規/変更 SPEC 強制 → 全件強制）とする。
 
 ### 機械化境界
 
-上記検出パターンの機械判定可能範囲（frontmatter 宣言不在検出、所有権重複検出等）は docs-check が担う。文脈解釈を要する判定（論理区分不当混在、REQ 規範重複等）は inspect-docs / `agentdev-doc-writing` が担う（3層検出構造、REQ-010-254）。本 SPEC は検出パターンの定義のみを提供し、各実装を規定しない。
+上記検出パターンの機械判定可能範囲（frontmatter 宣言不在検出、所有権重複検出等）は docs-check が担う。
+文脈解釈を要する判定（論理区分不当混在、REQ 規範重複等）は inspect-docs / `agentdev-doc-writing` が担う（3層検出構造、REQ-010-254）。
+本 SPEC は検出パターンの定義のみを提供し、各実装を規定しない。

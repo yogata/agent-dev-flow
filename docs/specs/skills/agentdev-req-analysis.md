@@ -69,11 +69,13 @@ updated: 2026-08-15
 
 ## pass_criteria 記述基準
 
-test strategy の pass_criteria 記述時、REQ content と pass_criteria 表現の食い違いが QG-4 最終評価で問題化することを防ぐための記述基準（AG-007）。req-define は test_strategy 策定時に本基準を適用する。
+test strategy の pass_criteria 記述時、REQ content と pass_criteria 表現の食い違いが QG-4 最終評価で問題化することを防ぐための記述基準（AG-007）。
+req-define は test_strategy 策定時に本基準を適用する。
 
 ### 意味的等価許容
 
-REQ content が pipeline stage（draft、Issue 本文、PR 本文等）によって表現を変える場合、pass_criteria は意味的等価性で判定する。文字列一致を機械的に要求しない。
+REQ content が pipeline stage（draft、Issue 本文、PR 本文等）によって表現を変える場合、pass_criteria は意味的等価性で判定する。
+文字列一致を機械的に要求しない。
 
 - pass_criteria は対象 REQ content の核心（対象、状態、振る舞い）を過不足なく表現する
 - 文字列表現の差異（見出し表記、助詞、句読点、句の順序）は意味的等価性を妨げない
@@ -99,7 +101,8 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 
 ### 共通 pass_criteria と正規所有
 
-複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は [agentdev-workflow-templates.md](agentdev-workflow-templates.md)「test strategy 記述ガイドライン」を正規所有とする。本 SPEC は意味的等価許容、存在確認と diff 確認の使い分けに限定する。
+複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は [agentdev-workflow-templates.md](agentdev-workflow-templates.md)「test strategy 記述ガイドライン」を正規所有とする。
+本 SPEC は意味的等価許容、存在確認と diff 確認の使い分けに限定する。
 
 ## See Also
 

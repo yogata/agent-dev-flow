@@ -51,7 +51,8 @@ agentdev 系コマンドで使用する Issue/PR 本文、コメントテンプ�
 
 ## review_dispositions 証跡セクション（AG-002、AG-005、AG-009、AG-011）
 
-case-open が draft-data の `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。本 SPEC が当該セクションの構造を正規所有する（AG-002）。
+case-open が draft-data の `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。
+本 SPEC が当該セクションの構造を正規所有する（AG-002）。
 
 ### 対象テンプレート
 
@@ -64,7 +65,9 @@ case-open が draft-data の `review_dispositions` を読み取り、Issue 本�
 
 ### セクション仕様
 
-「レビュー判断」セクションは `<!-- 【必須】 -->` マーカー付きの必須セクションとする。feature、bug、epic テンプレートでは転記対象 disposition がない場合「該当なし」と記載する。child テンプレートでは「該当なし」を使用せず、親 Epic Issue 参照のみを記載する。
+「レビュー判断」セクションは `<!-- 【必須】 -->` マーカー付きの必須セクションとする。
+feature、bug、epic テンプレートでは転記対象 disposition がない場合「該当なし」と記載する。
+child テンプレートでは「該当なし」を使用せず、親 Epic Issue 参照のみを記載する。
 
 各 disposition 明細は以下の要素を持つ:
 
@@ -85,31 +88,43 @@ case-open が draft-data の `review_dispositions` を読み取り、Issue 本�
 
 ### child 固定内容（AG-009）
 
-child テンプレートの「レビュー判断」セクションは親 Epic Issue 参照のみを記載する。disposition 明細の重複転記は行わない。「該当なし」も使用しない。全 disposition は Epic Issue 本体へ転記済みである。
+child テンプレートの「レビュー判断」セクションは親 Epic Issue 参照のみを記載する。
+disposition 明細の重複転記は行わない。
+「該当なし」も使用しない。
+全 disposition は Epic Issue 本体へ転記済みである。
 
 ### 転記規則（AG-011）
 
-転記規則の詳細は [case-open.md](../commands/case-open.md)「review_dispositions の消費と証跡転記」節参照。単一 Standard Issue は全 disposition を当該 Issue へ、Epic flow は Epic Issue へ全 disposition を、複数 Standard Issue は各 Issue の OU 関連 disposition を当該 Issue へ、ドラフト全体の disposition をルート Issue へ転記する。
+転記規則の詳細は [case-open.md](../commands/case-open.md)「review_dispositions の消費と証跡転記」節参照。
+単一 Standard Issue は全 disposition を当該 Issue へ、Epic flow は Epic Issue へ全 disposition を、複数 Standard Issue は各 Issue の OU 関連 disposition を当該 Issue へ、ドラフト全体の disposition をルート Issue へ転記する。
 
 ## test strategy 記述ガイドライン（AG-006）
 
-issue_desc_*.md テンプレートの「テスト戦略」セクションに記述する pass_criteria は QG-4 評価で REQ content と照合される。記述品質のばらつきが QG-4 時に顕在化するため、以下を共通ガイドラインとして正規所有する。
+issue_desc_*.md テンプレートの「テスト戦略」セクションに記述する pass_criteria は QG-4 評価で REQ content と照合される。
+記述品質のばらつきが QG-4 時に顕在化するため、以下を共通ガイドラインとして正規所有する。
 
 ### 共通 pass_criteria のリスクと REQ 個別期待値推奨
 
-複数 REQ へまたがる共通の pass_criteria を起票する場合、各 REQ の pipeline stage（promote 系、review 系等）の違いを吸収せず、単一の文字列一致を要求すると QG-4 評価時に REQ content と pass_criteria 期待値が食い違う。Issue #1760 QG-4 で REQ-0129-012 を含む完了条件が REQ content と文字列一致せず、意味合致評価で処理された実績がある。共通化は避け、REQ 単位の個別期待値を pass_criteria へ記述することを推奨する。
+複数 REQ へまたがる共通の pass_criteria を起票する場合、各 REQ の pipeline stage（promote 系、review 系等）の違いを吸収せず、単一の文字列一致を要求すると QG-4 評価時に REQ content と pass_criteria 期待値が食い違う。
+Issue #1760 QG-4 で REQ-0129-012 を含む完了条件が REQ content と文字列一致せず、意味合致評価で処理された実績がある。
+共通化は避け、REQ 単位の個別期待値を pass_criteria へ記述することを推奨する。
 
 ### 変更対象外 REQ 検証の正しい表現
 
-「変更対象外 REQ の変更がないこと」を検証する場合は「存在しないこと」と書かず「diff がないこと」として表現する。実在する REQ を「存在しないこと」と記述すると検証意図と検証方法がずれる。Issue #1760 TS-003 で「REQ-0147-010 が存在しないこと」と誤表現し、REQ-0147-010 は存在する（変更なし）ため正しい検証意図は「変更されていないこと」だった。
+「変更対象外 REQ の変更がないこと」を検証する場合は「存在しないこと」と書かず「diff がないこと」として表現する。
+実在する REQ を「存在しないこと」と記述すると検証意図と検証方法がずれる。
+Issue #1760 TS-003 で「REQ-0147-010 が存在しないこと」と誤表現し、REQ-0147-010 は存在する（変更なし）ため正しい検証意図は「変更されていないこと」だった。
 
 ### 存在確認の使用条件
 
-「存在しないこと」は新規作成禁止（例: 「REQ-0164 が存在しないこと」等の未作成確認）の場合のみ使用する。既存 REQ への変更有無の検証には使用しない。
+「存在しないこと」は新規作成禁止（例: 「REQ-0164 が存在しないこと」等の未作成確認）の場合のみ使用する。
+既存 REQ への変更有無の検証には使用しない。
 
 ### テンプレートへのガイド反映
 
-feature、bug、child の各 issue_desc テンプレートは「テスト戦略」セクションへ本ガイドラインの要点を HTML コメントとして埋め込む。起票者が pass_criteria を記述する際に参照できるようにする。epic テンプレートは「テスト戦略」セクションを持たないため対象外とする。
+feature、bug、child の各 issue_desc テンプレートは「テスト戦略」セクションへ本ガイドラインの要点を HTML コメントとして埋め込む。
+起票者が pass_criteria を記述する際に参照できるようにする。
+epic テンプレートは「テスト戦略」セクションを持たないため対象外とする。
 
 ### 構造変更 PR の完了条件と契約テスト期待値
 
@@ -148,7 +163,8 @@ Issue 本文に次のセクションを必須とする（新規作成時）。
 ### presence-based 判定
 
 case-open は新規 Issue 作成時および case-update による新契約更新時に「Execution Contract」
-セクションを必ず付与する。case-run は当該セクションの存在有無により新旧 Issue を識別する。
+セクションを必ず付与する。
+case-run は当該セクションの存在有無により新旧 Issue を識別する。
 
 ### legacy Issue テンプレート
 
