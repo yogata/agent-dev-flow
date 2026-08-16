@@ -54,11 +54,11 @@ Step 14/14-1 の削除コミット後に `git push` を即時実行（case-run �
 
 ### Step 15: 完了報告（共通終了処理）
 
-テンプレート種別:
+テンプレート種別（`agentdev-workflow-templates` の `templates/case-open/` 配下）:
 
-- Standard → `templates/case-open/standard.md`
-- 単一REQ Epic → `templates/case-open/epic.md`
-- マルチREQ Epic → `templates/case-open/multi-req-epic.md`
+- Standard → `.opencode/skills/agentdev-workflow-templates/templates/case-open/standard.md`
+- 単一REQ Epic → `.opencode/skills/agentdev-workflow-templates/templates/case-open/epic.md`
+- マルチREQ Epic → `.opencode/skills/agentdev-workflow-templates/templates/case-open/multi-req-epic.md`
 
 **Capture結果 小節**: case-open 実行中に実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存した場合、保存した capture 成果物のパス・分類・保存結果のみを含める（capture 本体は含めない、成果物が無い場合は省略、共通意味契約は `artifact-contracts` SPEC「Capture結果 小節」節参照）。
 

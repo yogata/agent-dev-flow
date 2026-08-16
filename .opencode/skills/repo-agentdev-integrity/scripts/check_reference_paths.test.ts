@@ -876,4 +876,229 @@ describe("checkScriptTemplateReferencePaths", () => {
     const ngResults = refResults.filter((r) => r.level === "ng");
     expect(ngResults.length).toBe(0);
   });
+  it("nested template path in SKILL.md resolves when file exists (IR-062)", () => {
+    const root = join(TEMP_ROOT, "nested-template-ok");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const skillsDir = join(root, ".opencode", "skills");
+    mkdirp(join(skillsDir, "agentdev-test-skill", "templates", "case-open"));
+    writeFileSync(
+      join(
+        skillsDir,
+        "agentdev-test-skill",
+        "templates",
+        "case-open",
+        "standard.md",
+      ),
+      "# completion report\n",
+      "utf-8",
+    );
+    writeFileSync(
+      join(skillsDir, "agentdev-test-skill", "SKILL.md"),
+      [
+        "---",
+        "name: agentdev-test-skill",
+        "---",
+        "",
+        "Standard flow uses templates/case-open/standard.md.",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence",
+    );
+    const ngResults = refResults.filter((r) => r.level === "ng");
+    expect(ngResults.length).toBe(0);
+    const okResults = refResults.filter(
+      (r) =>
+        r.level === "ok" && r.evidence === "templates/case-open/standard.md",
+    );
+    expect(okResults.length).toBeGreaterThanOrEqual(1);
+  });
+  it("nested template path missing is reported ng (IR-062)", () => {
+    const root = join(TEMP_ROOT, "nested-template-ng");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const skillsDir = join(root, ".opencode", "skills");
+    writeFileSync(
+      join(skillsDir, "agentdev-test-skill", "SKILL.md"),
+      [
+        "---",
+        "name: agentdev-test-skill",
+        "---",
+        "",
+        "Standard flow uses templates/case-open/absent.md.",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence",
+    );
+    const ngResults = refResults.filter(
+      (r) =>
+        r.level === "ng" && r.evidence === "templates/case-open/absent.md",
+    );
+    expect(ngResults.length).toBeGreaterThanOrEqual(1);
+    expect(ngResults.every((r) => r.route === "intake")).toBe(true);
+  });
+  it("reference file bare path resolves within own skill (IR-062)", () => {
+    const root = join(TEMP_ROOT, "ref-file-own-skill");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const skillsDir = join(root, ".opencode", "skills");
+    mkdirp(join(skillsDir, "agentdev-test-skill", "references"));
+    mkdirp(join(skillsDir, "agentdev-test-skill", "scripts"));
+    writeFileSync(
+      join(skillsDir, "agentdev-test-skill", "scripts", "run.ts"),
+      "// ok",
+      "utf-8",
+    );
+    writeFileSync(
+      join(skillsDir, "agentdev-test-skill", "references", "detail.md"),
+      "See scripts/run.ts for implementation.\n",
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence",
+    );
+    const ngResults = refResults.filter((r) => r.level === "ng");
+    expect(ngResults.length).toBe(0);
+    const okResults = refResults.filter(
+      (r) =>
+        r.level === "ok" &&
+        r.evidence === "scripts/run.ts" &&
+        r.file?.includes("detail.md"),
+    );
+    expect(okResults.length).toBeGreaterThanOrEqual(1);
+  });
+  it("reference file generic cross-skill prose resolves via context, not cross-skill ng (IR-062)", () => {
+    const root = join(TEMP_ROOT, "ref-file-generic-prose");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const skillsDir = join(root, ".opencode", "skills");
+    mkdirp(join(skillsDir, "agentdev-other-skill", "references"));
+    writeFileSync(
+      join(skillsDir, "agentdev-other-skill", "references", "contracts.md"),
+      "# Contracts\n",
+      "utf-8",
+    );
+    writeFileSync(
+      join(skillsDir, "agentdev-other-skill", "SKILL.md"),
+      "# agentdev-other-skill\n",
+      "utf-8",
+    );
+    mkdirp(join(skillsDir, "agentdev-test-skill", "references"));
+    writeFileSync(
+      join(skillsDir, "agentdev-test-skill", "references", "note.md"),
+      "対応 skill の `references/contracts.md` のフィールド集合を検証する。\n",
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence",
+    );
+    const crossSkillNg = refResults.filter(
+      (r) => r.level === "ng" && r.message?.includes("found in"),
+    );
+    expect(crossSkillNg.length).toBe(0);
+    const ngResults = refResults.filter((r) => r.level === "ng");
+    expect(ngResults.length).toBe(0);
+  });
+  it("reference file path adjacent to CJK punctuation matches exactly (IR-062)", () => {
+    const root = join(TEMP_ROOT, "ref-file-cjk-adjacent");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const skillsDir = join(root, ".opencode", "skills");
+    mkdirp(join(skillsDir, "agentdev-test-skill", "references"));
+    writeFileSync(
+      join(skillsDir, "agentdev-test-skill", "references", "guide.md"),
+      "# Guide\n",
+      "utf-8",
+    );
+    writeFileSync(
+      join(skillsDir, "agentdev-test-skill", "references", "note.md"),
+      "「`references/guide.md`）に従い、inbox.md 全エントリを処理する。\n",
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence",
+    );
+    const ngResults = refResults.filter((r) => r.level === "ng");
+    expect(ngResults.length).toBe(0);
+    const okResults = refResults.filter(
+      (r) =>
+        r.level === "ok" &&
+        r.evidence === "references/guide.md" &&
+        r.file?.includes("note.md"),
+    );
+    expect(okResults.length).toBeGreaterThanOrEqual(1);
+  });
+  it("nested repo-root-relative path resolution (IR-062)", () => {
+    const root = join(TEMP_ROOT, "nested-root-rel");
+    buildMinimalFixture(root);
+    copyScripts(root);
+    const skillsDir = join(root, ".opencode", "skills");
+    mkdirp(join(skillsDir, "agentdev-test-skill", "templates", "case-open"));
+    writeFileSync(
+      join(
+        skillsDir,
+        "agentdev-test-skill",
+        "templates",
+        "case-open",
+        "epic.md",
+      ),
+      "# completion report\n",
+      "utf-8",
+    );
+    const cmdDir = join(root, ".opencode", "commands", "agentdev");
+    writeFileSync(
+      join(cmdDir, "test-cmd.md"),
+      [
+        "---",
+        "description: Test",
+        "agent: oracle",
+        "---",
+        "",
+        "Use .opencode/skills/agentdev-test-skill/templates/case-open/epic.md.",
+        "",
+      ].join("\n"),
+      "utf-8",
+    );
+    const result = runScriptJson(root);
+    expect(result.report).not.toBeNull();
+    const refResults = (result.report!.results || []).filter(
+      (r) =>
+        r.category === "ReferencePath" &&
+        r.check === "reference-path-existence",
+    );
+    const ngResults = refResults.filter((r) => r.level === "ng");
+    expect(ngResults.length).toBe(0);
+    const okResults = refResults.filter(
+      (r) =>
+        r.level === "ok" &&
+        r.evidence === "agentdev-test-skill/templates/case-open/epic.md",
+    );
+    expect(okResults.length).toBeGreaterThanOrEqual(1);
+  });
 });

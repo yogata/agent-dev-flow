@@ -3423,14 +3423,31 @@ function checkInlineCompletionReportsStrict(
 /**
  * Regex patterns for file path references in command and skill markdown files.
  * Captures paths that reference scripts (.ts), templates (.md), or references (.md).
+ * Nested subdirectory references (e.g. templates/case-open/standard.md,
+ * scripts/src/alloc.ts) are captured as well (IR-062).
+ * Path segments use a positive character class (ASCII word chars, ".", "-",
+ * backticks, placeholder braces) so matches stop at CJK punctuation adjacent
+ * to a path instead of running past it.
  */
+const PATH_SEGMENT = "[\\w`{}<>.-]+";
 const SCRIPT_TEMPLATE_REF_PATTERNS = [
-  // Repo-root-relative: .opencode/skills/agentdev-*/scripts/*.ts
-  /\.opencode\/skills\/(agentdev-[^/\s"')\]]+\/(?:scripts\/[^/\s"')\]]+\.ts|templates\/[^/\s"')\]]+\.md|references\/[^/\s"')\]]+\.md))/g,
+  // Repo-root-relative: .opencode/skills/agentdev-*/scripts/**/*.ts etc.
+  new RegExp(
+    `\\.opencode\\/skills\\/(agentdev-${PATH_SEGMENT}\\/(?:scripts\\/${PATH_SEGMENT}(?:\\/${PATH_SEGMENT})*\\.ts|templates\\/${PATH_SEGMENT}(?:\\/${PATH_SEGMENT})*\\.md|references\\/${PATH_SEGMENT}(?:\\/${PATH_SEGMENT})*\\.md))`,
+    "g",
+  ),
   // Command-local template: .opencode/commands/agentdev/templates/**/*.md
-  /(\.opencode\/commands\/agentdev\/templates\/[^/\s"')\]]+\/[^/\s"')\]]+\.md)/g,
-  // Skill-relative: scripts/*.ts, templates/*.md, references/*.md
-  /(?<![.\w/])(scripts\/[^/\s"')\]]+\.ts|templates\/[^/\s"')\]]+\.md|references\/[^/\s"')\]]+\.md)/g,
+  new RegExp(
+    `(\\.opencode\\/commands\\/agentdev\\/templates\\/${PATH_SEGMENT}(?:\\/${PATH_SEGMENT})*\\.md)`,
+    "g",
+  ),
+  // Skill-relative: scripts/**/*.ts, templates/**/*.md, references/**/*.md.
+  // Lookbehind excludes '-' so the "templates/" inside a skill name like
+  // agentdev-workflow-templates is not treated as a path segment start.
+  new RegExp(
+    `(?<![.\\w\\/-])(scripts\\/${PATH_SEGMENT}(?:\\/${PATH_SEGMENT})*\\.ts|templates\\/${PATH_SEGMENT}(?:\\/${PATH_SEGMENT})*\\.md|references\\/${PATH_SEGMENT}(?:\\/${PATH_SEGMENT})*\\.md)`,
+    "g",
+  ),
 ];
 
 /**
@@ -3602,24 +3619,38 @@ export function checkScriptTemplateReferencePaths(
   root: string,
 ): CheckResult[] {
   const results: CheckResult[] = [];
-  const filesToCheck: { absPath: string; skillDir?: string }[] = [];
+  const filesToCheck: {
+    absPath: string;
+    skillDir?: string;
+    isReferenceFile?: boolean;
+  }[] = [];
 
   // Collect command files
   for (const file of listFiles(cmdDir).filter((f) => f !== "README.md")) {
     filesToCheck.push({ absPath: path.join(cmdDir, file) });
   }
 
-  // Collect skill SKILL.md files and reference files
+  // Collect skill SKILL.md files and reference files.
+  // IR-062: references/*.md also carry path references (e.g.
+  // templates/case-open/*.md) and are scanned like SKILL.md.
   for (const dir of listDirs(skillsDir)) {
     const skillMd = path.join(skillsDir, dir, "SKILL.md");
     if (fs.existsSync(skillMd)) {
       filesToCheck.push({ absPath: skillMd, skillDir: dir });
     }
+    const refsDir = path.join(skillsDir, dir, "references");
+    for (const refFile of listFiles(refsDir)) {
+      filesToCheck.push({
+        absPath: path.join(refsDir, refFile),
+        skillDir: dir,
+        isReferenceFile: true,
+      });
+    }
   }
 
   let foundViolation = false;
 
-  for (const { absPath, skillDir } of filesToCheck) {
+  for (const { absPath, skillDir, isReferenceFile } of filesToCheck) {
     const content = readText(absPath);
     if (!content) continue;
     const relPath = resolveRelative(absPath, root);
@@ -3694,12 +3725,16 @@ export function checkScriptTemplateReferencePaths(
           } else {
             // v2:REQ-0145-010: command files referencing bare `references/X.md`
             // are skill-relative. Resolve via nearby skill context, then all skills.
+            // IR-062: reference files (references/*.md) use the same context
+            // resolution instead of the cross-skill NG below, because prose in
+            // reference files legitimately refers to other skills' assets by
+            // bare path (e.g. "対応 skill の references/contracts.md").
             let contextResolved = false;
             const isSkillRelativeBare =
               !normalizedRef.startsWith(".opencode/") &&
               !normalizedRef.startsWith("agentdev-") &&
               /^(scripts|templates|references)\//.test(normalizedRef);
-            if (!skillDir && isSkillRelativeBare) {
+            if ((!skillDir || isReferenceFile) && isSkillRelativeBare) {
               const ctxStart = Math.max(0, i - 5);
               const ctxEnd = Math.min(lines.length, i + 6);
               const contextSlice = lines.slice(ctxStart, ctxEnd).join("\n");
@@ -3769,9 +3804,10 @@ export function checkScriptTemplateReferencePaths(
             }
             if (contextResolved) continue;
 
-            // Cross-skill bare reference detection (v2:REQ-0108-119)
+            // Cross-skill bare reference detection (v2:REQ-0108-119).
+            // SKILL.md only: reference files resolve via context instead (IR-062).
             let crossSkillFound = false;
-            if (skillDir && !normalizedRef.startsWith(".opencode/")) {
+            if (skillDir && !isReferenceFile && !normalizedRef.startsWith(".opencode/")) {
               const otherSkills = listDirs(skillsDir).filter(
                 (d) => d !== skillDir,
               );

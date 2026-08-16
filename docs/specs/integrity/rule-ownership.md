@@ -125,6 +125,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-059 | distribution-reference-boundary | REQ-029 | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | IR-060 | forbidden Japanese word detection | v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（REQ-010-256 文意判断は docs-check 対象外、本ルールは完全一致検出に限定） | ../responsibilities/document-type-responsibilities.md（不自然表現検出分類 P0〜P4）, ../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md（forbidden 語リスト正）, integrity-rule-catalog.md |
 | IR-061 | 索引類自動生成整合性 | - | - |
+| IR-062 | skill/command パス参照実在 | REQ-028-012, REQ-010 | integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md |
 <!-- AUTOGEN:END -->
 
 > **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`agentdev-doc-writing` skill）へ移管した（REQ-028-007、DEC-006、Phase 3 §5.2）。詳細は `integrity-rule-catalog.md`「IR-019, IR-022, IR-026, IR-036: inspect-docs 移管」節を参照。

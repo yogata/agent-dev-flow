@@ -154,6 +154,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-learning-capture.md | 79 | accepted | skills |
 | integrity/docs-spec-rebuild-integrity.md | 75 | accepted | integrity |
 | skills/agentdev-req-file-manager.md | 73 | accepted | skills |
+| integrity/rules/IR-062-reference-path-existence.md | 72 | accepted | integrity |
 | integrity/rules/IR-055-runtime-unresolved-reference.md | 71 | accepted | integrity |
 | integrity/autogen-freshness-gate.md | 70 | draft | integrity |
 | responsibilities/artifact-quality-control-routing.md | 70 | draft | responsibilities |
@@ -236,7 +237,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-053-gh-direct-invocation-detection.md | 20 | accepted | integrity |
 | skills/agentdev-git-worktree-test-fallback.md | 17 | draft | skills |
 
-計測日: 2026-08-15。
+計測日: 2026-08-16。
 <!-- AUTOGEN:END -->
 
 SPEC 行数は frontmatter、HTML コメントを除く本文行数。
