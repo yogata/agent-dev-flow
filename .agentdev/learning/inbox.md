@@ -101,3 +101,35 @@
 - **関連**: PR #2151 (OPEN), PR #2152, Issue #2136 (OPEN), Epic #2134
 - **タグ**: `#epic-wave` `#merge-conflict` `#autogen` `#level1-escalation`
 
+
+## NG baseline の bucket key は完全一致のため承認追加は findings JSON からの機械生成を要する（OU-002、PR #2151）
+
+- **問題事象**: NG baseline の bucket key は `category\tcheck\tfile\tevidence` の完全一致で決まるため、手書きでの承認済み baseline entry 追加は evidence 文字列の不一致で baseline が効かない。
+- **発生局面**: 実装（ng-baseline.json への承認済み entry 15件追加）
+- **検知方法**: baseline 適用後の check_integrity 再実行で approved additions として info 払い下げされるかの確認
+- **根本原因**: bucket key が検出 findings の evidence 文字列を含む完全一致であり、人手での再現が困難
+- **自律対応内容**: 対象実行の findings JSON から additions manifest を機械生成する手順（`--update-ng-baseline --ng-baseline-additions`）で追加した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（integrity-contracts SPEC「NG baseline 運用手順」の運用実例。報告分類の明確化は SPEC確定候補として intake 記録済み）
+- **横展開観点**: baseline entry の追加は必ず対象実行の findings JSON から機械生成する
+- **再発条件**: findings JSON を介さず手書きで baseline entry を追加する場合
+- **予防策候補**: 手書き追加の禁止を NG baseline 運用手順へ明文化する
+- **想定反映先**: integrity-contracts SPEC（learning-promote で判定）
+- **関連**: PR #2151 (MERGED), Issue #2136 (CLOSED), Epic #2134
+- **タグ**: `#integrity` `#baseline` `#tooling`
+
+## baseline entry のパス bucket key は生成環境のパス解決に依存する（OU-002 case-close QG-4、PR #2151）
+
+- **問題事象**: merged main の QG-4 検証で delta 1件（command-capture-duty / `.opencode/commands/agentdev/case-close.md`）が「新規かつ未管理」と計上された。実体は NG21 分類 N17 の承認済み baseline entry だが、登録パス（worktree 環境で機械生成された `src/opencode/commands/agentdev/case-close.md`）と main リポジトリ junction 環境の検出パス（`.opencode/…`）が一致しなかった。
+- **発生局面**: case-close（QG-4 完了条件検証、merged main で check_integrity を実行）
+- **検知方法**: delta 報告の「1 new unmanaged NG」と元観測 report-5（2026-08-15、同一 .opencode/ パスで観測済み）・ng-baseline.json 登録パス（src/ 表記）の突合
+- **根本原因**: baseline の additions manifest をパス解決が異なる環境（worktree、junction 未伝播）で生成したため、bucket key の file 表記が検出環境と異なった
+- **自律対応内容**: N17 は新規ではなく承認済み baseline entry の適用範囲と判断し、QG-4 は判断根拠を対応記録コメントに記録のうえ合格判定。パス key 不整合は intake（N17 item）へ記録
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（DEC-013 運用の境界事例）
+- **横展開観点**: junction 環境と非 junction 環境で検出パス表記が変わる checker の baseline 運用では、パス正規化（または検出環境と同一環境での機械生成）が必要
+- **再発条件**: worktree 等の junction 未伝播環境で生成した baseline entry を junction 実在環境の検査に適用する場合
+- **予防策候補**: checker 側でパス正規化（.opencode/ と src/ の換算）を導入するか、baseline 適用時の unmatched additions と unmanaged delta の対を警告する
+- **想定反映先**: repo-agentdev-integrity checker / integrity-contracts SPEC NG baseline 運用手順（learning-promote で判定）
+- **関連**: PR #2151 (MERGED), Issue #2136 (CLOSED), Epic #2134, intake-2026-08-16-ou002-ng17-case-close-capture-boundaries-ref.md
+- **タグ**: `#integrity` `#baseline` `#worktree` `#junction`
