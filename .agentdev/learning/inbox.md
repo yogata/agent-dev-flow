@@ -246,3 +246,19 @@
 - **想定反映先**: case-run 検証手順 / check_changed_docs.ts 仕様注記（learning-promote で判定）
 - **関連**: PR #2177, Issue #2167 (CLOSED), Epic #2162
 - **タグ**: `#check-changed-docs` `#docs-check` `#verification-timing`
+
+## bun test の gitignore 探索と cwd 依存テストにより「全体実行 pass」の記述が再現不能になる（OU-001、PR #2184）
+
+- **問題事象**: repo root から `bun test` を実行しても bun の gitignore-aware 探索により `.opencode/skills/repo-agentdev-integrity/scripts` 配下のスイート（2020 test / 83 files）は検出されない（734 files searched で該当なし）。スイート全体の実行には scripts ディレクトリを cwd とする必要があるが、その実行形態では check_extensions.test.ts「classifies the real skill tree deterministically」が cwd 相対パス解決で fail する。PR 本文の「bun test 2020 pass / 0 fail（repo root 実行）」は本環境ではどの実行形態でも再現できなかった
+- **発生局面**: case-close（QG-4 完了条件「全体実行 pass」の再検査）
+- **検知方法**: worktree・main 両環境で repo root 起動・scripts dir 起動の2実行形態を試行比較し、失敗1件は PR 取り込み前 main での再現比較で帰属確認
+- **根本原因**: bun のテスト発見が `.opencode/skills/*` の gitignore パターンと `repo-*` 再包含をディレクトリ探索として処理しきれず、repo root 起動ではスイートが対象外になる。加えてスイート内に cwd 依存の実repo統合テストが混在する
+- **自律対応内容**: スイート全体は scripts ディレクトリを cwd として実行（2019 pass / 1 fail）し、fail 1件は PR 前 main でも同一失敗する既存事象として PR Findings 記載済みの intake 候補と整理した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 「全体実行 pass」の検証証拠は実行 cwd と起動コマンドを明記しないと環境依存で再現不能になる。失敗混在時は帰属確認（base 再現比較）を必ず実施する
+- **再発条件**: bun test で .gitignore 再包含ディレクトリ配下のスイートを検証する場面、cwd 依存テストを含むスイートの全体実行を証拠化する場面
+- **予防策候補**: PR 本文・検証手順には実行 cwd とコマンド形式を明記する。cwd 依存テストは修正対象として intake 化する（本件は PR Findings 記載済み）
+- **想定反映先**: case-run 検証手順・PR 本文テンプレートの参考（learning-promote で判定）
+- **関連**: PR #2184, Issue #2179 (CLOSED), Epic #2178
+- **タグ**: `#bun` `#testing` `#cwd`
