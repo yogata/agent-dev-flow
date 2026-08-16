@@ -70,7 +70,7 @@ req-save workflow は次の12 STEP で構成する。各 STEP は resume point �
 ### resume protocol
 
 - 再開点は durable state から再構成する: draft の `status` frontmatter（`saved` であれば commit/push 済み）、REQ/Decision ファイルの存在、README エントリの存在、`git log` の commit、読込時 hash と pull 後 hash の一致
-- commit 前中断時は `git status` と `git diff --name-only` で変更ファイルを再検出し、未実行 STEP から再開する。`status: saved` への更新は commit/push より前に実施し commit 対象に含める（push 後の status 更新は永続化されないため禁止、G07）
+- commit 前中断時は `git status` と `git diff --name-only` で変更ファイルを再検出し、未実行 STEP から再開する。`status: saved` への更新は commit/push より前に実施し commit 対象に含める（push 後の status 更新は永続化されないため禁止、command 不変条件）
 - external Git failure（pull 失敗、push 拒絶）時はエラーを報告し、同一 durable state からリトライ可能な STEP を明示する
 
 ### termination

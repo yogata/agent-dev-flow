@@ -119,5 +119,5 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G09（機能追加で docs/ 更新がない場合の警告表示と停止確認）
-- G21/G22/G23（SPEC status 昇格は case-close の責務、SPEC 確定候補の処理は PR 本文の `## SPEC確定候補` を入力とし `## Findings / Capture候補` とは区別）
+- 不変条件（機能追加で docs/ 更新がない場合の警告表示と停止確認）
+- G21・不変条件（SPEC status 昇格は case-close の責務、SPEC 確定候補の処理は PR 本文の `## SPEC確定候補` を入力とし `## Findings / Capture候補` とは区別）

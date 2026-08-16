@@ -93,6 +93,6 @@ squash merge がコンフリクトで失敗した場合（STEP-4-2 のリトラ�
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G07（PR の CI 通過確認、CI 失敗時は case-run に差し戻す）
-- G12/G14（GitHub Issue/PR 操作は `agentdev-gh-cli` の手続きへ委譲、gh コマンド直接記述禁止）
-- G27/G28（squash merge 実行前に mergeable 状態を事前確認し UNKNOWN の場合はポーリング待機、ポーリング省略して UNKNOWN 状態のままマージ試行禁止）
+- 不変条件（PR の CI 通過確認、CI 失敗時は case-run に差し戻す）
+- G12・不変条件（GitHub Issue/PR 操作は `agentdev-gh-cli` の手続きへ委譲、gh コマンド直接記述禁止）
+- G27・不変条件（squash merge 実行前に mergeable 状態を事前確認し UNKNOWN の場合はポーリング待機、ポーリング省略して UNKNOWN 状態のままマージ試行禁止）

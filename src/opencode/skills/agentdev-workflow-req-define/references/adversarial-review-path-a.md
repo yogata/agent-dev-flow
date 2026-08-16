@@ -58,5 +58,5 @@ req-define は adversarial-review を原則実行する（default-on）。発動
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G01（壁打ちフェーズのみ）
+- 不変条件（壁打ちフェーズのみ）
 - 新規 HITL 追加禁止（skip 判断のためだけの承認点を作らない）

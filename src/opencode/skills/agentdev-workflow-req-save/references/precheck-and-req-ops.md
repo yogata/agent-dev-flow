@@ -177,7 +177,7 @@ draft-data の必須フィールドを検証し、処理対象 entry を確定�
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G01（REQ/Decision 対象 artifact_actions がない場合は no-op 完了）
-- G02/G03（ファイル編集スコープ）
-- G05（REQ番号は連番・一意、空き番号再利用禁止）
-- G06（要件doc構造は doc_requirement.md テンプレート厳密準拠）
+- 不変条件（REQ/Decision 対象 artifact_actions がない場合は no-op 完了）
+- G02・不変条件（ファイル編集スコープ）
+- 不変条件（REQ番号は連番・一意、空き番号再利用禁止）
+- 不変条件（要件doc構造は doc_requirement.md テンプレート厳密準拠）

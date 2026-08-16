@@ -58,4 +58,4 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G01（ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成は例外として許可）
-- G05（自動修正せず、推奨 route の提示に留める）
+- 不変条件（自動修正せず、推奨 route の提示に留める）

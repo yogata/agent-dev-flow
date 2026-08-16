@@ -157,7 +157,7 @@
 ### Procedure
 
 - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
-- 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness の責務であり、case-run は関与しない
+- 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness 側の責務であり（charter 原則、harness 分離モデル SPEC 参照）、case-run は関与しない
 - 完了報告 template に従って出力する（実行担当サブエージェント result 状態、PR番号を含める）
 - 本 Step（worktree クリーンアップ）の開始時刻・終了時刻（JST）を記録し、worktree クリーンアップ時間を計測する。完了報告に L2 タイムスタンプ内訳（worktree 設定時間、実行担当サブエージェント実行時間、worktree クリーンアップ時間）を含める
 
@@ -193,8 +193,8 @@
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G04（全ファイル操作は worktree 内で実行）
-- G30/G31（STEP-S3 precondition gate、worktree root 相対パス引き渡し）
-- G33/G34/G35（QG-3 前置 staleness check、差異検出時の引き渡しと case-update 連携）
+- G30・不変条件（STEP-S3 precondition gate、worktree root 相対パス引き渡し）
+- G33・不変条件（QG-3 前置 staleness check、差異検出時の引き渡しと case-update 連携）
 
 ## 関連ガイドライン
 

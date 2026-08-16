@@ -142,8 +142,8 @@
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G05（docs/ 配下の広範な探索禁止、限定探索は許可）
-- G11（Decision閾値以上の判断は `agentdev-decision-guidelines` へ）
-- G15（SPEC 分離基準該当行の `artifact_actions` 分離）
-- G16/G17（アーキテクチャ助言サブエージェントの参照と未確認事項非混入）
-- G19（test strategy 3要素完全、欠落時は QG-1 fail 扱い）
+- 不変条件（docs/ 配下の広範な探索禁止、限定探索は許可）
+- 不変条件（Decision閾値以上の判断は `agentdev-decision-guidelines` へ）
+- 不変条件（SPEC 分離基準該当行の `artifact_actions` 分離）
+- 不変条件（アーキテクチャ助言サブエージェントの参照と未確認事項非混入）
+- 不変条件（test strategy 3要素完全、欠落時は QG-1 fail 扱い）

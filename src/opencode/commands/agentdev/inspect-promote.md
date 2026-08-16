@@ -36,30 +36,39 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-inspect-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは finding disposition（分類・採用・保留・却下）を独立 resume point とする8 STEP の control plane を所有する。durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から会話記憶に依存せず再開できる。
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは finding disposition（分類・採用・保留・却下）を独立 resume point とする8 STEP の control plane を所有する。durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から会話記憶に依存せず再開できる。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
-- **STEP-1** 実行前同期
-- **STEP-2** inbox スキャン
-- **STEP-3** 検出事項分類（暫定分類）
-- **STEP-4** 自動 promote（`--auto` opt-in 時のみ、fast path）
-- **STEP-5** adversarial-review（経路B）
-- **STEP-6** HITL 確定（手動分類対象）
-- **STEP-7** 処理実行（promote / reject / defer）
-- **STEP-8** 完了報告・永続化
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 実行前同期 | コマンド起動 | inbox/ promoted/ の同期状態 | durable state との同期が済んでいること（inbox 空時は「対象なし」終了） |
+| STEP-2 inbox スキャン | 同期済み | 検出事項リスト | 読込失敗時はスキップ警告で継続していること |
+| STEP-3 検出事項分類（暫定分類） | スキャン済み | 暫定分類（promote/ defer/ reject） | 分類根拠が各検出事項に付いていること |
+| STEP-4 自動 promote（`--auto` opt-in 時のみ、fast path） | `--auto` 明示指定 | `.agentdev/intake/promoted/inspect-auto-*.md`・auto-promote-log 記録 | 自動 promote 対象カテゴリ（workflow-contracts SPEC 参照）合致のみであること |
+| STEP-5 adversarial-review（経路B） | ユーザー明示指定時 | review 結果と反映後の分類案 | accepted finding が分類案へ反映されていること |
+| STEP-6 HITL 確定（手動分類対象） | 分類案確定 | ユーザー確定済み分類 | ユーザーが分類を確認・修正する機会を経ていること |
+| STEP-7 処理実行（promote / reject / defer） | 確定済み | promoted/ 保存・reject 即時削除・defer 残置 | 処理結果が分類確定内容と一致していること（全件 defer 時は残置報告） |
+| STEP-8 完了報告・永続化 | 処理実行済み | 完了報告・git 永続化 | push 失敗時は停止していること |
 
 同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
 
 **共通ルール**（全 STEP 適用）: エラー処理（inbox 空時は「対象なし」終了、読込失敗時はスキップ警告、全件 defer 時は残置報告、push 失敗時は停止）
 
+## 不変条件
+
+工程上の選好を肯定形の不変条件として示す:
+
+- reject された検出事項は即時削除し、reject 時の commit message に却下理由を含める（`archive/rejected/` への移動は廃止）
+- defer された検出事項は `.agentdev/inspect/inbox/` に残置する
+- docs-check ルール／検査データ追加候補は独立 route とせず、採用済み成果物の要件化方向または受け入れ条件に含める
+- `--auto` は自動 promote 対象カテゴリ（workflow-contracts SPEC 参照、extension 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す
+- `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する（誤検知 revoke 手順は同 SPEC 参照）
+
 ## ガードレール
+
+硬い境界（承認境界・state 破壊等の否定規則）に限定する:
 
 - G01: ユーザーの明示的な承認なしに採用済み成果物を生成しない（`--auto` による自動 promote 対象を除く）
 - G02: promote された検出事項のみを `.agentdev/inspect/promoted/` へ保存する
-- G03: reject された検出事項は即時削除される（`archive/rejected/` への移動は廃止）。即時削除以外の取扱を禁止する
-- G04: defer された検出事項は `.agentdev/inspect/inbox/` に残す
-- G05: docs-check ルール／検査データ追加候補は独立 route とせず、採用済み成果物の要件化方向または受け入れ条件に含める
 - G06: `--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない
-- G07: `--auto` は自動 promote 対象カテゴリ（workflow-contracts SPEC 参照、extension 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す
-- G08: `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する。誤検知 revoke 手順は同 SPEC 参照
 
 

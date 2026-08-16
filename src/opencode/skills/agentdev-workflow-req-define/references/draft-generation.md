@@ -219,6 +219,6 @@ work_type・scale に応じた種別の完了報告を出力する。
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G03（`.agentdev/drafts/**` のみ作成・編集許可）
-- G09（チェックボックスは測可能で一意）
-- G10（要件doc構造は req-draft.md テンプレート準拠）
-- G12/G13/G14（work_type 判定参照、Issue 階層非決定、operation_units 出力）
+- 不変条件（チェックボックスは測可能で一意）
+- 不変条件（要件doc構造は req-draft.md テンプレート準拠）
+- 不変条件（work_type 判定参照、Issue 階層非決定、operation_units 出力）

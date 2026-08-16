@@ -183,7 +183,7 @@
 
 - **create**: 新規 SPEC ファイルを frontmatter（`title`、`status: draft`、`created`、`updated`）付きで作成し、action の `content` をセクションとして記載する
 - **update**: `target_area` 指定時（operation が `update`/`spec-update`）は `agentdev-spec-file-manager` のセクション置換ロジック（target-area-matching）で対象セクションを `content` で置換する。`target_area` 未指定時は既存 SPEC ファイルの該当セクションへ `content` を追記する（後方互換）。frontmatter `updated` を更新し、`status` は変更しない
-- **target_area 見出し検索のスクリプト呼出**: `update` 操作における `target_area` 見出し検索は `search-target-area.ts` で実行する。STEP-3 の結果（`matches`）を用いてセクション範囲を特定し `content` で置換する。`matches` 空 → スキップし follow-up 記録（operation を spec-create 推奨）、複数マッチ → G09 に従い置換拒否
+- **target_area 見出し検索のスクリプト呼出**: `update` 操作における `target_area` 見出し検索は `search-target-area.ts` で実行する。STEP-3 の結果（`matches`）を用いてセクション範囲を特定し `content` で置換する。`matches` 空 → スキップし follow-up 記録（operation を spec-create 推奨）、複数マッチ → 置換拒否（command 不変条件）
 - **複数 SPEC action の並列化**: 異なる `target` パスの SPEC create/update は並列化可能（最大5件）。同一 SPEC ファイルへの複数 action は順序依存のため直列サブセットとして分離する。直列集約対象（index 更新、draft 更新、commit、push）は並列委譲の完了を待ってから実行する
 - **SPEC 宣言付与（CREATE/UPDATE）**: req-define が各 entry へ出力した `spec_logical_division` と `canonical_owner` を読み取り、SPEC frontmatter または冒頭宣言節へ宣言として付与する。CREATE で宣言なしで完了することを禁止する。UPDATE で宣言未宣言かつ分類値が `unknown` 以外に確定の場合は宣言を補完、`unknown` または欠落の場合は警告して処理を継続する（soft-contract、宣言欠落だけで保存拒否しない）。既存 SPEC の一括更新は行わず、未変更 SPEC へ遡及的に宣言を付与しない（段階適用）
 
@@ -215,7 +215,7 @@
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G01（`artifact: spec` 有無での判定、`work_type` 判定廃止）
-- G02/G03/G04（ファイル編集スコープ、SPEC 対象なし時の編集禁止）
-- G05/G06/G07（SPEC ライフサイクル制約）
-- G08/G09（SPEC 分離基準適合、実行時非依存）
+- 不変条件（`artifact: spec` 有無での判定、`work_type` 判定廃止）
+- G02・不変条件（ファイル編集スコープ、SPEC 対象なし時の編集禁止）
+- G06・不変条件（SPEC ライフサイクル制約）
+- 不変条件（SPEC 分離基準適合、実行時非依存）

@@ -43,10 +43,10 @@ STEP-3 の自律構成分析結果に基づき Epic 本文を構築。詳細、�
 
 ### STEP-5-4: 子Issue 作成（並列化）
 
-- **Issue 化単位**: OU 単位（G14、G21）
-- **子Issue 本文**: `Parent: #{epic_number}`（G03）、対象 OU ID、紐づく REQ/Decision/SPEC 識別子を記載
+- **Issue 化単位**: OU 単位（command 不変条件）
+- **子Issue 本文**: `Parent: #{epic_number}`（command 不変条件）、対象 OU ID、紐づく REQ/Decision/SPEC 識別子を記載
 - **並列化**: 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化（3つの「5件」文脈のうち case-run Wave 内子 Issue 並列上限と同一、後述）
-- **直列集約**: Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（G04 集約更新で維持）
+- **直列集約**: Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（command 不変条件: 全子Issue 作成完了後の一括更新で維持）
 - **前工程完了度属性の埋め込み**: 各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（3段階: 完全完了/ 検証のみ/ 補完あり、epic-wave-model SPEC extension 経由）
 
 詳細、委譲接続点は `agentdev-issue-management` を参照。
@@ -125,8 +125,8 @@ case-open の STEP-5-4「子 Issue 作成の並列化」は **(1) に該当**。
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G02（Standard flow の動作、出力形式は Epic flow 追加による影響を受けない）
-- G03（子Issue 本文の先頭行に `Parent: #{epic_number}` を必ず含める）
-- G04（全子Issue の作成完了後に Epic 本文のステータス追跡テーブルを更新、部分更新禁止）
-- G17（成果物本文 verbatim、LF・空行・インデント保持）
+- 不変条件（Standard flow の動作、出力形式は Epic flow 追加による影響を受けない）
+- 不変条件（子Issue 本文の先頭行に `Parent: #{epic_number}` を必ず含める）
+- 不変条件（全子Issue の作成完了後に Epic 本文のステータス追跡テーブルを更新、部分更新禁止）
+- 不変条件（成果物本文 verbatim、LF・空行・インデント保持）
 - G25（Issue 本文ファイル経由制約、`[System.IO.File]::WriteAllText` UTF8 BOM なし LF）

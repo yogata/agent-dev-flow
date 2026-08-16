@@ -41,26 +41,35 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-backlog-review` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが8 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（promoted/ 残存成果物、`.agentdev/backlog/req-units/` の RU-*.md 実ファイルと frontmatter）から再開点を再構成する（DEC-{N}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-backlog-review` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが8 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（promoted/ 残存成果物、`.agentdev/backlog/req-units/` の RU-*.md 実ファイルと frontmatter）から再開点を再構成する（DEC-{N}）。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
-- **STEP-1** 実行前同期・成果物検出
-- **STEP-2** 分析・暫定分類付与
-- **STEP-3** 統合・分割判定・depends_on 依存解決
-- **STEP-4** review（経路E）
-- **STEP-5** HITL
-- **STEP-6** 矛盾検出・追加判断
-- **STEP-7** RU 生成・成功成果物削除
-- **STEP-8** Git 永続化・完了報告
+| 工程 | 前提条件 | 出力契約 | 検証基準 |
+|---|---|---|---|
+| STEP-1 実行前同期・成果物検出 | promoted/ に採用済み成果物（または引数指定） | 対象成果物リスト | promoted ディレクトリと durable state が同期されていること |
+| STEP-2 分析・暫定分類付与 | 対象リスト確定 | 分析結果・`tentative_classification` 付与済みリスト | 文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）のいずれかが記録されていること |
+| STEP-3 統合・分割判定・depends_on 依存解決 | 分析済み | 統合・分割判定結果・依存解決済みRU構成 | depends_on が RU-ID のみで構成されていること |
+| STEP-4 review（経路E） | ユーザー明示指定時 | review 結果と反映後の案 | accepted finding が案へ反映されていること |
+| STEP-5 HITL | 判定案確定 | ユーザー承認結果 | ユーザーが RU 作成を承認済みであること |
+| STEP-6 矛盾検出・追加判断 | 承認済み | 矛盾検出結果・追加判断結果 | 矛盾検出時はユーザーの指示を待機していること |
+| STEP-7 RU 生成・成功成果物削除 | 判断確定 | `RU-*.md` 生成・成功成果物削除 | RU が `agentdev-backlog-integration` のフォーマットに従っていること |
+| STEP-8 Git 永続化・完了報告 | RU 生成済み | commit・push・完了報告 | 並列実行安全ステージングに従い、出力パスと次アクションが報告されていること |
+
+## 不変条件
+
+工程上の選好を肯定形の不変条件として示す:
+
+- RU は分析・統合の結果として生成し、採用済み成果物の単純コピー（パススルー）とは区別する
+- depends_on には RU-ID のみを指定する（採用済み成果物パスは使用しない）
+- 矛盾検出時はユーザーの指示を待って解決する（自動解決は行わない）
 
 ## ガードレール
 
-- G01: REQ ファイルの保存を行わない（`req-save` が担当）
-- G02: GitHub Issue の作成を行わない（`case-open` が担当）
-- G03: 採用済み成果物の単純コピー（パススルー）を生成しない
-- G04: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` を更新しない
-- G05: 矛盾検出時はユーザーの指示を待ち、自動的に解決しない
+硬い境界（破壊的操作・state 破壊等の否定規則）に限定する:
+
+- G01: REQ ファイルの保存は行わない（`req-save` が担当）
+- G02: GitHub Issue の作成は行わない（`case-open` が担当）
+- G04: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` は更新しない
 - G06: RU 生成に失敗した成果物は削除しない
-- G07: depends_on に採用済み成果物パスを指定しない。RU-ID のみ許容
 - G08: 破壊的変更（矛盾解消、要件仕様スコープ変更、大量成果物削除等）は明示承認を維持する（REQ）
 
 

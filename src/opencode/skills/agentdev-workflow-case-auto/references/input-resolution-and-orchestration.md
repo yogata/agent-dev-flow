@@ -114,7 +114,7 @@
 1. SSoT 再構成: 各工程の durable state（REQ/Decision/SPEC ファイル、Issue/PR、Epic Issue 本文）
 2. identifier 保持: Issue番号、PR番号、OU ID、draft パス、RU パス
 3. 最小 scalar: L1 工程別タイムスタンプ、stage 2 並列数（最大5件）
-4. runtime artifact: なし（委譲工程内部の過程は親コンテキストに累積しない G28）
+4. runtime artifact: なし（委譲工程内部の過程は親コンテキストに累積しない、command 不変条件）
 
 ### Preconditions
 
@@ -134,7 +134,7 @@ case-auto は各工程の結果に基づいて次工程へ進むか停止条件�
 | stage 2 | case-run | bg task（最大5件） | 並列（3つの「5件」文脈の (2) に該当） |
 | stage 3 | case-close | 直列集約 | 単一 |
 
-順次フォールバック可能（G32）。bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
+順次フォールバック可能（command 不変条件）。bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
 
 #### Wave 反復制御（case-auto 直接制御）
 
@@ -153,7 +153,7 @@ case-auto は各工程の結果に基づいて次工程へ進むか停止条件�
 
 #### 複数REQ対応
 
-req-save 委譲の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールを使用（G13）。req-save から case-open への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリング・再評価なしでそのまま渡す（G14）。Epic Issue 化の判定には関与しない（G21）。case-open の判定結果に従う。
+req-save 委譲の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールを使用（command 不変条件）。req-save から case-open への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリング・再評価なしでそのまま渡す（command 不変条件）。Epic Issue 化の判定には関与しない（command 不変条件）。case-open の判定結果に従う。
 
 #### OU処理順序
 
@@ -178,7 +178,7 @@ req-save 委譲の出力から複数 REQ doc または scale:large を検出し�
 
 ### Resume-Idempotency
 
-- 各工程の durable state（Issue/PR、REQ/Decision/SPEC ファイル、Epic Issue 本文）から進捗を再構成する。完了済み工程を再実行しない（case-open 成功後は draft を読まない G19）
+- 各工程の durable state（Issue/PR、REQ/Decision/SPEC ファイル、Epic Issue 本文）から進捗を再構成する。完了済み工程を再実行しない（case-open 成功後は draft を読まない、command 不変条件）
 
 ## resume point
 
@@ -203,20 +203,20 @@ req-save 委譲の出力から複数 REQ doc または scale:large を検出し�
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G04（GitHub Issue/PR/comment/merge/close は自走対象）
-- G07（委譲工程は各コマンド委譲契約に従い起動、case-run はインライン実行、委譲起動不能時は `delegation-unavailable` として報告）
-- G08（工程固有の詳細手順と case-auto 定義が矛盾する場合、工程固有処理は既存コマンド定義を優先）
-- G13（case-auto は Issue 階層決定ロジックを持たない、複数 REQ doc または scale:large の場合は case-open のルールに委譲）
-- G14（req-save 委譲から case-open 委譲への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価しない）
-- G15（Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、子Issue 並列委譲 最大5件 を直接担当、case-run(#epic) への委譲は行わない、各子Issue ごとにインライン case-run、Wave 境界のクローズは case-close(#epic) に委譲）
+- 不変条件（GitHub Issue/PR/comment/merge/close は自走対象）
+- 不変条件（委譲工程は各コマンド委譲契約に従い起動、case-run はインライン実行、委譲起動不能時は `delegation-unavailable` として報告）
+- 不変条件（工程固有の詳細手順と case-auto 定義が矛盾する場合、工程固有処理は既存コマンド定義を優先）
+- 不変条件（case-auto は Issue 階層決定ロジックを持たない、複数 REQ doc または scale:large の場合は case-open のルールに委譲）
+- 不変条件（req-save 委譲から case-open 委譲への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリングまたは再評価しない）
+- 不変条件（Epic Wave 実行時、Wave 反復制御、現在 Wave の ready 子Issue 選択、子Issue 並列委譲 最大5件 を直接担当、case-run(#epic) への委譲は行わない、各子Issue ごとにインライン case-run、Wave 境界のクローズは case-close(#epic) に委譲）
 - G16（case-auto は独自の操作単位ステータス追跡を持たない、Epic Issue のステータス追跡テーブルを使用、Epic Issue 本文の書き込みは case-close 単一書き手、case-auto は読み取るのみ）
-- G18（case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わない）
-- G19（case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込み、case-open 成功後は invalid post-case reader として req_draft を読まない、case-open 成功後の停止・再開・完了処理は Issue と Epic だけで成立、クリーンアップ検証ゲートは case-open 完了後に実行、独自の OU 状態管理を持たない）
-- G20（OU 間依存は queue dependency として扱い、依存関係があるだけでは Epic Issue 化しない）
-- G21（case-auto は Epic Issue 化の判定に関与しない、case-open の判定結果に従う）
-- G27（各工程の起動は工程別契約に従い、inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領）
-- G28（委譲工程の完了結果のみを親コンテキストに保持し、委譲工程内部の調査過程・中間ログ・読解メモを親コンテキストに累積しない、case-run インライン実行時のコンテキスト管理は harness 機能で対応し親コンテキスト非累積は例外扱い）
-- G29（case-auto の所有対象の限定、bg task API・実行エージェント選定・context 管理・retry・heartbeat・エラー解析は harness 責務）
-- G30（subagent 委譲時の category 選定、事務的手続きには `unspecified-high` を推奨、`writing` category は執筆作業のみに限定）
-- G31（全ての subagent 委譲 prompt に MUST NOT DO セクションを必須、スコープ外作業を明示列挙）
-- G32（case-auto は orchestration stage 2 だけで case-run を並列起動、stage 1 と 3 で case-run を並列起動せず、並列実行を利用できない場合だけ順次フォールバック）
+- 不変条件（case-auto は操作単位キューの管理・制御のみを担い、OU 本文の抽出・変換・REQ 操作解釈を行わない）
+- 不変条件（case-auto は orchestration pre-reader として case-open 完了前のみ req_draft を読み込み、case-open 成功後は invalid post-case reader として req_draft を読まない、case-open 成功後の停止・再開・完了処理は Issue と Epic だけで成立、クリーンアップ検証ゲートは case-open 完了後に実行、独自の OU 状態管理を持たない）
+- 不変条件（OU 間依存は queue dependency として扱い、依存関係があるだけでは Epic Issue 化しない）
+- 不変条件（case-auto は Epic Issue 化の判定に関与しない、case-open の判定結果に従う）
+- 不変条件（各工程の起動は工程別契約に従い、inputs に指定された情報のみを渡し、output_contract に指定された結果のみを受領）
+- 不変条件（委譲工程の完了結果のみを親コンテキストに保持し、委譲工程内部の調査過程・中間ログ・読解メモを親コンテキストに累積しない。case-run インライン実行時のコンテキスト管理は harness 実行機構に属する、責務分界は harness 分離モデル SPEC 参照）
+- 不変条件（case-auto の所有対象の限定。harness 実行機構との責務分界は harness 分離モデル SPEC 参照）
+- 不変条件（subagent 委譲時の category 選定、事務的手続きには `unspecified-high` を推奨、`writing` category は執筆作業のみに限定）
+- 不変条件（全ての subagent 委譲 prompt に MUST NOT DO セクションを必須、スコープ外作業を明示列挙）
+- 不変条件（case-auto は orchestration stage 2 だけで case-run を並列起動、stage 1 と 3 で case-run を並列起動せず、並列実行を利用できない場合だけ順次フォールバック）

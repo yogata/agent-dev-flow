@@ -46,7 +46,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）。
 
 ### Completion Verification
 
-- テスト戦略チェックボックスが更新済みであり（G10）、Issue がクローズ済みであること
+- テスト戦略チェックボックスが更新済みであり（command 不変条件）、Issue がクローズ済みであること
 
 ### Resume-Idempotency
 
@@ -80,7 +80,7 @@ worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Ca
 - **squash merge 済みの場合**: 当該 worktree が隔離されている（専用 worktree + branch で index が独立）場合のみ `git checkout .` で破棄可
 - **共有作業ツリー（main worktree）では `git checkout .` は禁止**（他セッション変更の無差別破壊）
 - 本 Step は worktree 削除フェーズ内の隔離 worktree でのみ実行する
-- **runtime workspace のクリーンアップは harness の責務**、case-close は関与しない
+- **runtime workspace のクリーンアップは harness 側の責務**（charter 原則、harness 分離モデル SPEC 参照）、case-close は関与しない
 - worktree remove → Permission denied 時は停止（リトライは skill 定義に従う）
 - ローカルブランチ削除（squash merge 後の条件付き `-D` は skill 定義に従う）
 - リモートブランチ削除
@@ -194,13 +194,13 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G05（ブランチ、worktree 削除は必ず実行、失敗時は警告表示して停止）
-- G06（`git pull --ff-only` は必ず実行、pull 前 ローカル変更チェック、hash 検証必須）
-- G10（テスト戦略チェックボックスを必ず更新）
-- G11（コメントテンプレートの【必須】セクション確認）
-- G13（学びの検知はエージェント自律、ユーザーに問わない）
-- G15/G16/G18（intake と learning を混合した単一成果物にしない、learning と intake を同一 commit に含める、今回の完了条件に含まれる未対応事項を intake に逃がして完了扱いにしない）
+- 不変条件（ブランチ、worktree 削除は必ず実行、失敗時は警告表示して停止）
+- 不変条件（`git pull --ff-only` は必ず実行、pull 前 ローカル変更チェック、hash 検証必須）
+- 不変条件（テスト戦略チェックボックスを必ず更新）
+- 不変条件（コメントテンプレートの【必須】セクション確認）
+- 不変条件（学びの検知はエージェント自律、ユーザーに問わない）
+- 不変条件（intake と learning を混合した単一成果物にしない、learning と intake を同一 commit に含める、今回の完了条件に含まれる未対応事項を intake に逃がして完了扱いにしない）
 - G17（STEP-6-5 の commit は並列実行安全ステージングプロシージャに従い、明示パスでステージ、`git add` は `.agentdev/` 全体の一括スコープにしない）
-- G19（STEP-6-6 は結果状態を分離して報告、`.agentdev` push 失敗時は完了扱いにしない）
-- G21/G22/G23（case-close の capture 責務は「回収・保存」、SPEC status 昇格は case-close の責務、SPEC 確定候補の処理は `## SPEC確定候補` を入力とし `## Findings / Capture候補` とは区別）
-- G27/G28（`git pull --ff-only` 実行前に worktree 状態・ref lock 競合・非 main ブランチ占有の3リスクを事前検出し代替同期手順を選択）
+- 不変条件（STEP-6-6 は結果状態を分離して報告、`.agentdev` push 失敗時は完了扱いにしない）
+- G21・不変条件（case-close の capture 責務は「回収・保存」、SPEC status 昇格は case-close の責務、SPEC 確定候補の処理は `## SPEC確定候補` を入力とし `## Findings / Capture候補` とは区別）
+- G27・不変条件（`git pull --ff-only` 実行前に worktree 状態・ref lock 競合・非 main ブランチ占有の3リスクを事前検出し代替同期手順を選択）

@@ -55,7 +55,7 @@ SPEC ファイルは CREATE（新規）、APPEND（既存追記）、UPDATE（ta
 
 SPEC frontmatter の `status`（`draft` / `accepted` / `superseded`）を本スキルの操作で次のように適用する。
 
-- **CREATE**: frontmatter に `status: draft` を必ず付与する（G05）
+- **CREATE**: frontmatter に `status: draft` を必ず付与する（spec-save 不変条件・前出出力検証表 STEP-5）
 - **APPEND / UPDATE**: 既存 SPEC の `status` を変更しない（G06）。`accepted` 昇格は case-close の責務
 - ** superseded 遷移**: 後継 SPEC への移行確定時に元 SPEC へ `status: superseded` と `superseded_by` を設定する
 
