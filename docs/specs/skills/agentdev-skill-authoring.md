@@ -2,7 +2,9 @@
 title: `agentdev-skill-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-16
+spec_logical_division: cross_cutting_contract
+canonical_owner: agentdev-skill-authoring
 ---
 
 # `agentdev-skill-authoring` SPEC
@@ -87,73 +89,42 @@ Capability Skill は複数workflow 共通能力を所有し、workflow 固有STE
 
 ## Workflow Skill Soft Guard（REQ-027-002）
 
-Workflow Skill は workflow 実装本体であり、Command が所有する公開interface（入出力契約・ガードレール）を持たない（DEC-010）。
-そのため Command を経由せず Workflow Skill を直接起動すると、入力検証・前提条件確認・クリーンアップを欠いた状態で workflow が実行されるリスクがある。
-本節は Workflow Skill の意図しない discovery / invocation を抑制する soft guard 仕様を定義する。
-
-### OpenCode 1.18.15 実現可能性分析
-
-OpenCode 1.18.15（V1系）の skill discovery モデルは以下の前提に立つ。
-分析は OpenCode 公式ドキュメントおよび 1.18.15 ソースコード（`packages/opencode/src/skill/index.ts`、`packages/opencode/src/session/system.ts`）に基づく。
-
-- **description-based discovery**: OpenCode は system prompt へ skill の `name` と `description` のみを注入する（progressive disclosure）。model は `description` を読み、`skill` tool で明示的に読み込む対象を決定する。`description` を持たない skill は discovery から除外される。このため `description` の記述が discovery / invocation 意思決定における事実上の制御点となる。
-- **frontmatter による discovery 制御は不存在**: 1.18.15 が frontmatter で検証するのは `name` と `description` のみ。`license` / `compatibility` / `metadata` は任意フィールドとして受理されるが、V1 では解釈されず portability 用の保持に留まる。`hidden` / `disable-model-invocation` / `metadata.opencode/autoinvoke` の各フィールドは 1.18.15 時点で未実装である（`autoinvoke` は V2 で計画）。未知の frontmatter フィールドは無視される。
-- **permission による harder 制御は存在**: `opencode.json` の `permission.skill` で `allow` / `deny` / `ask` を pattern match で指定できる。`deny` は当該 agent の system prompt から skill を完全に隠す。ただし Command と Workflow Skill は同一 agent 上で動作するため、Workflow Skill を `deny` すると Command の dispatch も遮断され、運用に支障する。
-
 ### 採用する soft guard
 
-OpenCode 1.18.15 で runtime に有効かつ Command dispatch を破壊しない soft guard は **description による guard** のみである。
-Workflow Skill の `description` の DO NOT USE FOR に直接起動抑制句を付与し、model が当該 skill を単独起動しないよう誘導する。
-本方式は model の description 解釈に依存する「soft」な抑制であり、hard な強制排除ではない。
+Workflow Skill の description の DO NOT USE FOR に置く簡潔なトリガー項:
 
-**guard 句（日本語 description）**:
-`、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-027-002 soft guard で抑制）`
+- 単独起動（対応する /agentdev/* コマンド経由で利用すること）
 
-**guard 句（英語 description）**:
-`, direct invocation (Workflow Skill; consume via the corresponding /agentdev/* command stages — standalone skill launch is discouraged by the REQ-027-002 soft guard)`
-
-frontmatter フィールドは従来規約（`name` / `description` のみ、review-protocol 5.1）を維持し、soft guard 用の拡張フィールドは追加しない。
-1.18.15 で未解釈の `metadata` 等を guard 用に使っても runtime 効果がないためである。
+description からは soft guard マーカー語、内部 ID 参照、運用規則の散文を除去する。
+Skill 層（description の DO NOT USE FOR トリガー）と Command 層（本文宣言節）の二層様式は workflow-skill-model.md「soft guard の二層様式」が正規所有する。
 
 ### 適用対象
 
-soft guard は workflow 実装本体 および workflow pipeline 内部知識を所有する `agentdev-workflow-*` skill に適用する。
-純粋な Capability Skill（例: `agentdev-workflow-templates` は template 選択・読込の独立能力）は対象外とする。
-適用済み skill:
+全 16 Workflow Skill（agentdev-workflow-*）の description。機械検査は全 Workflow Skill への簡潔トリガー項存在を肯定検証する。
 
-- `agentdev-workflow-case-open`（case-open workflow 実装本体）
-- `agentdev-workflow-case-close`（case-close workflow 実装本体）
-- `agentdev-workflow-case-auto`（case-auto workflow 実装本体）
-- `agentdev-workflow-auto-orchestration`（case-auto orchestration 実装）
-- `agentdev-workflow-orchestration`（case-run orchestration 知識ベース）
-- `agentdev-workflow-lifecycle`（workflow pipeline 内部知識: work_type・phase 定義）
-- `agentdev-workflow-routing`（workflow pipeline 内部知識: review 拒絶 routing）
+## skill 記述基準（層1〜3）
 
-### consumer 側 harder opt-in
+### 層1: description のコスト抑制
 
-consumer が soft guard より強い制御を望む場合、`opencode.json` の `permission.skill` で Workflow Skill を `ask` に設定し、直接起動時に利用者確認を要求できる。
-`deny` は Command dispatch も遮断するため既定では推奨しない。
-本設定は consumer project 側の運用判断であり、配布物（`src/opencode/`）には含めない。
+- description は機能概要とトリガーを伝える最小限の長さとする。単体上限 600 文字（検証不通過）、集約予算は平均 350 文字 × N（N = SKILL.md 実ファイル数、超過時 warn）、OpenCode 仕様上限 1024 文字は検証不通過の安全線とする
+- description に運用規則、内部 ID、soft guard マーカー語（`soft guard`、`直接起動`）を含めない。それらは本文または権威文書へ置く
 
-```json
-{
-  "permission": {
-    "skill": {
-      "agentdev-workflow-case-*": "ask",
-      "agentdev-workflow-auto-orchestration": "ask"
-    }
-  }
-}
-```
+### 層2: 記述の単一所属
 
-## skill authoring 段階的開示基準
+- description は「機能 1 文 + Use when（トリガー列挙）+ Do NOT use（直近の誤トリガー対策、少数項目）」の構造とする。他スキルの責務一覧を DO NOT USE FOR として列挙しない。経路案内は README 入口表へ集約する
+- 本文に `## USE FOR` / `## DO NOT USE FOR` セクションを description と二重に保持しない
+- 制約・ガードレールは command か skill のいずれか一方だけが所有する。「詳細は〜参照」の定型はファイル内 1 回まで
+- references/ の分割は相互排他または稀にしか併用しない文脈に限る。頻用併用の内容は分割しない。300 行超の参照ファイルは目次を付ける
 
-skill 段階的開示の基準（SKILL.md は目的/USE FOR/入出力/副作用/責任境界/不変条件/判断順序/reference 選択条件/script-template 入口を保持、詳細 schema/判定表/正規表現/具体例/例外回復/harness 起動は references へ分離、原則200行以内、reference 選択表の必須配置、通常経路で全 reference 無条件読込しない）を REQ-002-014/015 と整合して明記する。
-詳細 normative は移行計画 §9.2, §9.3, §9.5, §9.6。
+### 層3: 指示のスタイル
 
-### 執筆時 prevention（配布依存境界）
+- 工程は前提条件・出力契約・検証基準で記述する。決定論性は検証（QG・validator）で保証する
+- 同一スキル内のルールは少数の不変条件へ集約する（目安: 主要不変条件 10 件以内/スキル、超過時は変換対照表へ例外理由を記録）
+- 否定命令は硬い境界（課金・認証・破壊的操作の禁止等）に限って使う。工程上の選好は肯定形の不変条件で表現する
+- harness や実行基盤の責務・既定動作の再説明を配布物に書かない
+- Markdown 見出し・表などの構造は維持し、削るのは分量と手続き性とする
 
-skill authoring は producer 内部参照、docs 内部パス、具体 ID（`REQ-NNNN`、`DEC-NNN`、`IR-NN`）の配布物本文への混入を未然に防ぐことを執筆時 prevention として案内する（REQ-029、`integrity/distribution-boundary.md`）。
-本 prevention は新規 REQ 行を新設せず、既存の skill 構造基準と協調して機能する。
-検出契約と最終 gate は REQ-010-060 を参照する。
+### 機械検査（本 SPEC 検証観点への追加）
+
+検証不通過: 1024 超過、単体 600 超過、USE FOR 二重保持、description 内マーカー語・内部 ID、簡潔トリガー項欠落（AG-004)、300 行超 references の目次欠落。warn: 集約予算（平均 350×N）超過。実装は既存検査枠組み（repo-agentdev-integrity / docs-check）へ規則追加する
 

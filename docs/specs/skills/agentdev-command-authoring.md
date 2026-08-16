@@ -2,7 +2,9 @@
 title: `agentdev-command-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-16
+spec_logical_division: cross_cutting_contract
+canonical_owner: agentdev-command-authoring
 ---
 
 # `agentdev-command-authoring` SPEC
@@ -66,15 +68,11 @@ workflow 実装本体は Workflow Skill が所有する。
 Command は Workflow Skill 名レベルで
 参照し、STEP 内部パスへ直接依存しない（REQ-002-017）。
 
-## command authoring 基準
+## command authoring 基準（層1〜3適用）
 
-command authoring SPEC の frontmatter 例、DoD、fixture 指針を description 単一契約へ更新する。
-command 薄型化の基準（入力/出力/高レベル工程/副作用境界/QG/停止条件/承認境界/委譲境界は command 残置、詳細分類表/script CLI例/正規表現/prompt 全文/未採用候補は skill/reference 移管、150行以内・主要7command は100〜140行）を REQ-002-001..004 と整合して明記する。
-詳細 normative は移行計画 §5.2, §8.1。
-
-### 執筆時 prevention（配布依存境界）
-
-command authoring は producer 内部参照、docs 内部パス、具体 ID（`REQ-NNNN`、`DEC-NNN`、`IR-NN`）の配布物本文への混入を未然に防ぐことを執筆時 prevention として案内する（REQ-029、`integrity/distribution-boundary.md`）。
-本 prevention は新規 REQ 行を新設せず、既存の command 構造基準と協調して機能する。
-検出契約と最終 gate は REQ-010-060 を参照する。
+- command 定義は公開 interface（入出力契約、ガードレール、dispatch 宣言）に限定し、Workflow Skill が所有する工程詳細を再要約しない
+- 工程の要約は前提条件・出力契約・検証基準の表形式（前得出出力検証表）で記述する。様式の詳細は authoring/command-file-format.md が正規所有する
+- 権威情報源宣言はコマンド本文に 1 回までとする
+- ガードレールは硬い境界（否定規則）と肯定形の不変条件へ分類集約し、工程上の選好を G 番号で列挙しない
+- 本文の soft guard 宣言節（core 8 + inspect 3）は grep 可能な `soft guard` マーカーを維持する
 

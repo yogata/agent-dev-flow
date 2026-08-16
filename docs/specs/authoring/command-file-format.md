@@ -2,7 +2,9 @@
 title: "コマンドファイルフォーマット規約"
 status: accepted
 created: 2026-06-22
-updated: 2026-08-15
+updated: 2026-08-16
+spec_logical_division: cross_cutting_contract
+canonical_owner: command-file-format
 ---
 
 # コマンドファイルフォーマット規約
@@ -47,24 +49,25 @@ extension はフロントマタ（`version: 1`, `kind:`（公式3値: workflow-e
 schema 詳細は SPEC `../foundations/project-extensions.md` 参照。
 旧 kind（command-extension / skill-extension）は廃止済みであり、検出時は migration-required として停止する。
 
-## 手順セクション形式
+## 手順セクション形式（改定）
 
-`## 手順` 配下の Step 構造は以下の形式に従う。
+手順セクションは `### Step N` 見出しの逐次列挙に代え、各工程を前提条件・出力契約・検証基準の表形式（前得出出力検証表）で記述する。
+推奨順は表または順序ラベルで保持する。Workflow Skill 側の STEP resume point（references/）はこの限りではない。
 
-| 項目 | 規約 | 禁止形式 |
-|------|------|----------|
-| Step 見出し | `### Step N: タイトル` | - |
-| Step 番号開始値 | `1` から開始 | `0`（`Step 0`） |
-| サブステップ | `Step N-M`（N は親 Step 番号、M は `1` から開始） | ゼロ起点（`Step N-0`） |
-| 主手順表現 | `### Step N` 見出しによる構造化 | numbered list（`1.` `2.` ...）による主手順 |
-| フェーズ見出し | `## 手順` 配下に配置しない | `## 手順` 内での別軸フェーズ見出しの混在 |
-| 代替フロー内サブステップ | `**EN.**`（大文字英字 + 連番、ボールド段落プレフィックス）。後述「代替フロー内サブステップ表現」参照 | `### Step N` 見出しによる代替フロー構造化（主手順の Step 番号連番を乱すため禁止） |
+## ガードレール番号（改定）
 
-### workflow 節の順序ラベル様式
+G 番号は硬い境界（課金・認証・破壊的操作、state 破壊等の否定規則）に限定して付番する。
+工程上の選好は肯定形の不変条件として本文へ集約し、G 番号を付さない。
+変換時は変換対照表（変換前 G 番号から変換後所在）を成果物として保持する。
 
-thin Command の workflow 節に置く順序ラベルは `### Step N` 見出し形式に統一する。
-Workflow Skill 本文（SKILL.md、references/）の工程識別子は実番号形式（`STEP-1` 等）を用い、Command 定義の順序ラベルとは形式を区別して使い分ける。
-`STEP-{N}` のマスク形式と `工程-N` 形式は新規記述に使用せず、既存の当該表記は実番号形式へ更新する。
+## 機械検査対象（更新）
+
+- description 文字数: 単体 600 超過と OpenCode 仕様 1024 超過は検証不通過、合計 平均 350×N 超過は warn（N は実ファイル数から算出）
+- description 内マーカー語（`soft guard`、`直接起動`）と内部 ID の検出（検証不通過）
+- description と本文の USE FOR 二重保持の検出（検証不通過）
+- 全 Workflow Skill description への簡潔トリガー項（単独起動 + /agentdev/* コマンド経由）存在の肯定検証（欠落時検証不通過）
+- 300 行超 references ファイルの目次存在検出（欠落時検証不通過）
+- 従来の Step 0 検出・非連番検出・numbered list 主手順検出は前出出力検証表様式への移行に合わせて更新または廃止する
 
 ## 代替フロー内サブステップ表現
 
