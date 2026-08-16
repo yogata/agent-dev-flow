@@ -12,7 +12,7 @@
 
 ### frontmatter `name:` のバッククォート禁止（必須規定）
 
-frontmatter の `name:` フィールドは YAML スカラー値であり、バッククォート（Markdown インラインコード記法）で囲んではならない。囲んだ場合、YAML パーサが `` `agentdev-xxx` `` 全体を name 値として解釈し、ディレクトリ名との不一致（IR-{NNN} 違反）と opencode のスキル名解決不具合を引き起こす（PR #1334 事例）。
+frontmatter の `name:` フィールドは YAML スカラー値であり、バッククォート（Markdown インラインコード記法）で囲んではならない。囲んだ場合、YAML パーサが `` `agentdev-xxx` `` 全体を name 値として解釈し、ディレクトリ名との不一致と opencode のスキル名解決不具合を引き起こす（PR #1334 事例）。
 
 | 箇所 | 形式 | 例 |
 |------|------|-----|

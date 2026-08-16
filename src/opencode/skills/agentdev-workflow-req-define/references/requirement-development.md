@@ -72,8 +72,8 @@
 - **分類ゲート（REQ 最終分類確定）**: 各要件行候補を「変更後仕様」/「反映作業」に分類する。REQ/SPEC 境界判定を行い SPEC 保存対象を `artifact_actions`（`artifact: spec`）に分離する。RU 暫定分類（`tentative_classification`）があれば document-model SPEC（extension 経由）の文書7分類モデルへ照らして最終分類を確定し上書きする
 - **文書分類妥当性検証**: REQ 要件行に SPEC 分離基準違反残留がないか検出する。検出時は SPEC 保存対象へ移送する（安定契約例外は対象外）
 - **Decision要否確認ゲート**: Decision候補・既存REQ/Decision/SPEC との衝突候補・責務境界変更を含む場合、`agentdev-architecture-advisory` へ委譲する。出力は4ラベル構造（確定事項/推定事項/ユーザー確認事項/ブロッカー）。soft-contract（Decision）。ブロッカーまたは未決事項残存時は壁打ち（STEP-2）へ差し戻す
-- **実行主体分類表（REQ）**: 委譲契約を定義する場合、各委譲について実行主体分類表（adapter skill / command / subagent / harness）を必須とする（詳細は delegation-contracts SPEC（extension 経由）参照。委譲を含まない要件では省略可）
-- **test strategy 定義（REQ、REQ）**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command SPEC（extension 経由）の draft-data test_strategy フィールドスキーマ参照
+- **実行主体分類表**: 委譲契約を定義する場合、各委譲について実行主体分類表（adapter skill / command / subagent / harness）を必須とする（詳細は delegation-contracts SPEC（extension 経由）参照。委譲を含まない要件では省略可）
+- **test strategy 定義**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command SPEC（extension 経由）の draft-data test_strategy フィールドスキーマ参照
 
 ### Result
 
@@ -146,4 +146,4 @@
 - G11（Decision閾値以上の判断は `agentdev-decision-guidelines` へ）
 - G15（SPEC 分離基準該当行の `artifact_actions` 分離）
 - G16/G17（アーキテクチャ助言サブエージェントの参照と未確認事項非混入）
-- G19（test strategy 3要素完全、欠落時は QG-{N} fail 扱い）
+- G19（test strategy 3要素完全、欠落時は QG-1 fail 扱い）

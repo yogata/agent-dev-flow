@@ -31,7 +31,7 @@ execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模�
 
 ドラフトの `operation_units` を読み取り要件分析に基づき Epic/Wave/Issue 構造を自律生成（req-define 出力は参考情報、case-open が最終構造を決定）。
 
-- **独立 OU の自動 Epic 化**（REQ）: 複数の独立 OU（`depends_on` 空、L0 相当）を検出時、Wave 1 に全 OU 配置。独立 OU 1件のみなら Standard flow（G20）
+- **独立 OU の自動 Epic 化**: 複数の独立 OU（`depends_on` 空、L0 相当）を検出時、Wave 1 に全 OU 配置。独立 OU 1件のみなら Standard flow（G20）
 - **Wave テーブル「実行方法」列**: L0/L1 → 並列、L2/L3 → 直列
 
 停止条件、禁止事項、構成生成事前検証（preflight）の詳細は `agentdev-epic-tracker` を参照。

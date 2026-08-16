@@ -38,7 +38,7 @@ Command定義（`.opencode/commands/`）の行数目安、Steps数目安、書�
 ### 除外対象
 
 - YAML frontmatter の `description` は必須フィールドとして扱い、行数削減のために削除しない
-- dev メタデータは frontmatter に記述禁止（Case 5/ RU-{NNNN}, 規定の行番号範囲）
+- dev メタデータは frontmatter に記述禁止
 
 ## Steps 数目安
 
@@ -257,7 +257,7 @@ Write/Delete では git がファイルの移動を追跡できず、履歴が�
 1. Step 1: ...
 2. Step 2: ...
 
-### 新規パス（REQ-XXXX で追加）
+### 新規パス（要件により追加）
 
 3. Step 3: ...：条件Xが成立する場合のみ
 4. Step 4: ...

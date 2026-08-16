@@ -42,7 +42,7 @@ command 名（`/` 先頭、または `/` を持たない command識別子）が�
 ## 査読対象外
 
 - 実行時の動的判定（委譲の実際の起動、`load_skills` の実解決）は本査読の対象外。静的記述の分類正確性のみを検証する。
-- 機械的パターンマッチングによる検出は `agentdev-inspect-skills`（REQ）および `integrity-rule-catalog.md`（REQ）が担う。本査読は意味的、文脈的な誤認検出を担う。
+- 機械的パターンマッチングによる検出は `agentdev-inspect-skills` および `integrity-rule-catalog.md` が担う。本査読は意味的、文脈的な誤認検出を担う。
 
 ## 出力形式
 

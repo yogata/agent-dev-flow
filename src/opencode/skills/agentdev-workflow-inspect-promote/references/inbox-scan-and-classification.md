@@ -1,6 +1,6 @@
 # STEP-1 / STEP-2 / STEP-3: 実行前同期・inbox スキャン・検出事項分類（inbox-scan-and-classification）
 
-> 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の Control Plane STEP-1〜STEP-3 詳細である。各 STEP は resume point を持つ（DEC-{N}、`<workflows/step-reference-contract>` SPEC）。
+> 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の Control Plane STEP-1〜STEP-3 詳細である。各 STEP は resume point を持つ（`<workflows/step-reference-contract>` SPEC）。
 
 ## STEP-1: 実行前同期
 

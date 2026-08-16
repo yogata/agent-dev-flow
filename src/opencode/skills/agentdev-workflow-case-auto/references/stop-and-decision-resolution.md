@@ -159,7 +159,7 @@ case-auto は下位 command から受領した decision_context を限定的に�
 | 新規ユーザー判断事項 | 新しいユーザー価値判断、対象範囲変更、外部契約変更が必要 | 既存停止経路でユーザーへ返す（STEP-4 停止理由分類「新規ユーザー判断事項」） |
 
 - **resume**: 回答、根拠、作業仮定を下位 command へ返し、既存 resume point から処理を継続する。新規永続結果型は導入しない。adversarial-review 再実行要否は adversarial-review 側の再 review 契約に従い case-auto は独自判断しない
-- **中央集約 review engine とはならない**: case-auto は raw finding を解釈、採否、候補反映しない。下位 command が構造化した decision_context のみを解決対象とし、raw finding を case-auto へそのまま渡さない（AG-{NNN}）
+- **中央集約 review engine とはならない**: case-auto は raw finding を解釈、採否、候補反映しない。下位 command が構造化した decision_context のみを解決対象とし、raw finding を case-auto へそのまま渡さない
 
 ### Result
 
@@ -198,4 +198,4 @@ case-auto は下位 command から受領した decision_context を限定的に�
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- G33（子 task bg task 破棄検知時の回復で、未コミット変更の帰属が確認できない場合に強制 commit を行わない、整合確認できない場合は当該子 task を `blocked` とし「未コミット変更の帰属不明」（停止条件 (10)）として報告、AG-{NNN}）
+- G33（子 task bg task 破棄検知時の回復で、未コミット変更の帰属が確認できない場合に強制 commit を行わない、整合確認できない場合は当該子 task を `blocked` とし「未コミット変更の帰属不明」（停止条件 (10)）として報告）

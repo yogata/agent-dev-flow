@@ -134,7 +134,7 @@ RU 構成案の意味的決定を adversarial-review で検証し、accepted fin
 
 - STEP-3 で確定した RU 構成案（runtime artifact。中断時は promoted/ 実ファイルから再構築する）
 - 候補判断基準、内部手続きは `agentdev-backlog-integration` の公開操作契約に従う
-- 共通 caller integration 契約の正規所有者は adversarial-review SPEC（REQ-{NNNN}）である
+- 共通 caller integration 契約の正規所有者は adversarial-review SPEC である
 
 ### Preconditions
 

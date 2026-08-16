@@ -1,6 +1,6 @@
 # STEP-6 / STEP-7 / STEP-8: HITL 確定・処理実行・完了報告と永続化（hitl-and-disposition）
 
-> 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の Control Plane STEP-6〜STEP-8 詳細である。各 STEP は resume point を持つ（DEC-{N}、`<workflows/step-reference-contract>` SPEC）。
+> 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の Control Plane STEP-6〜STEP-8 詳細である。各 STEP は resume point を持つ（`<workflows/step-reference-contract>` SPEC）。
 
 ## STEP-6: HITL 確定（手動分類対象）
 

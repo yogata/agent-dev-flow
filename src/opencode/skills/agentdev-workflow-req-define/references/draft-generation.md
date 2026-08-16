@@ -31,7 +31,7 @@
 
 テンプレートを Read し、構造化 `draft-data` 形式に従って生成する。原本は構造化された `# draft-data` fenced YAML block である。STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分離した SPEC 候補は `artifact_actions`（`artifact: spec`）として統合し、`## SPEC候補` 補助セクションは出力しない。保存対象は単一の `artifact_actions` 配列に統合する。
 
-各副ステップ（定義完全性ゲート QG-{N}、operation_units 生成、depends_on/recommended_order 定義、artifact_actions 生成、target_area/content 形式、SPEC action 分類根拠出力、test_strategy 生成、review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command SPEC（extension 経由）の各フィールドスキーマを参照。`target_spec`、`spec_logical_division`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 SPEC を正とする。
+各副ステップ（定義完全性ゲート QG-1、operation_units 生成、depends_on/recommended_order 定義、artifact_actions 生成、target_area/content 形式、SPEC action 分類根拠出力、test_strategy 生成、review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command SPEC（extension 経由）の各フィールドスキーマを参照。`target_spec`、`spec_logical_division`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 SPEC を正とする。
 
 ### Result
 
@@ -39,7 +39,7 @@
 
 ### Evidence
 
-- 生成済み draft-data、QG-{N} 検証結果
+- 生成済み draft-data、QG-1 検証結果
 
 ### Completion Verification
 

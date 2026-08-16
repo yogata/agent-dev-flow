@@ -116,7 +116,7 @@
 4. `git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（自動解消しない）
 5. `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する。変更なしの場合は commit/push せず完了報告で「変更なし」と報告する
 6. `git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする（明示パス指定）
-7. commit message は `chore(agentdev): review and promote intake items`（Conventional Commits 形式）。reject item を含む場合は当該 item の却下理由を commit message に含める（AG-{NNN}、監査証跡の補強）
+7. commit message は `chore(agentdev): review and promote intake items`（Conventional Commits 形式）。reject item を含む場合は当該 item の却下理由を commit message に含める（監査証跡の補強）
 8. `git push` を実行する。push 失敗時は構造化エラーメッセージを表示し、完了扱いにしない
 
 ### Result

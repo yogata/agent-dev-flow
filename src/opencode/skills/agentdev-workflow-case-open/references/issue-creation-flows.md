@@ -46,8 +46,8 @@ STEP-3 の自律構成分析結果に基づき Epic 本文を構築。詳細、�
 - **Issue 化単位**: OU 単位（G14、G21）
 - **子Issue 本文**: `Parent: #{epic_number}`（G03）、対象 OU ID、紐づく REQ/Decision/SPEC 識別子を記載
 - **並列化**: 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化（3つの「5件」文脈のうち case-run Wave 内子 Issue 並列上限と同一、後述）
-- **直列集約**: Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（REQ、G04 集約更新で維持）
-- **前工程完了度属性の埋め込み**（REQ）: 各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（3段階: 完全完了/ 検証のみ/ 補完あり、epic-wave-model SPEC extension 経由）
+- **直列集約**: Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（G04 集約更新で維持）
+- **前工程完了度属性の埋め込み**: 各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（3段階: 完全完了/ 検証のみ/ 補完あり、epic-wave-model SPEC extension 経由）
 
 詳細、委譲接続点は `agentdev-issue-management` を参照。
 

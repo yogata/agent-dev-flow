@@ -1,8 +1,8 @@
 # SKILL.md frontmatter `name:` バッククォート検出の判定基準
 
 > **原本**: backticks-identifier-threshold SPEC「適用対象外（PR #1334 事例に基づく明示）」。
-> 本ファイルは inspect-skills 診断観点「SKILL.md frontmatter `name:` バッククォート検出」（REQ 準拠）の判定基準詳細を集約する運用ビューである。
-> 原本と内容が重複する場合は原本を優先する（REQ）。
+> 本ファイルは inspect-skills 診断観点「SKILL.md frontmatter `name:` バッククォート検出」の判定基準詳細を集約する運用ビューである。
+> 原本と内容が重複する場合は原本を優先する。
 
 ## 適用範囲
 
@@ -50,15 +50,15 @@ SKILL.md frontmatter `name:` 行が以下の正規表現に一致する場合を
 
 抽出した `name:` 行が検出パターンの正規表現に一致するかを判定する。一致した場合を違反とする。
 
-### 4. IR-{NNN}（skill-name-dir-match）との協調
+### 4. skill-name-dir-match 整合性ルールとの協調
 
-バッククォート付き name は `` `agentdev-xxx` `` 全体が YAML スカラー値となるため、ディレクトリ名（`agentdev-xxx`）と不一致となる。結果として IR-{NNN}（skill-name-dir-match 整合性ルール）違反を併発する。
+バッククォート付き name は `` `agentdev-xxx` `` 全体が YAML スカラー値となるため、ディレクトリ名（`agentdev-xxx`）と不一致となる。結果として skill-name-dir-match 整合性ルール違反を併発する。
 
-本検出はバッククォート囲みそのものを strict 違反候補として検出し、IR-{NNN} は name/dir 不一致を検出する。両者は同じ根本原因（frontmatter name のバッククォート誤付与）から派生する異なる観点の検出であり、併発を前提とする。検出時は両方の違反を併記し、推奨経路を一本化する。
+本検出はバッククォート囲みそのものを strict 違反候補として検出し、skill-name-dir-match 整合性ルールは name/dir 不一致を検出する。両者は同じ根本原因（frontmatter name のバッククォート誤付与）から派生する異なる観点の検出であり、併発を前提とする。検出時は両方の違反を併記し、推奨経路を一本化する。
 
 ## 推奨経路
 
-検出した違反に対し、ファイル修正は行わず以下を推奨 route として提示する（REQ 準拠、検出のみで修正は実施しない）。
+検出した違反に対し、ファイル修正は行わず以下を推奨 route として提示する（検出のみで修正は実施しない）。
 
 - **推奨 route**: `skill`
 - **推奨修正**: 該当 SKILL.md の frontmatter `name:` 行からバッククォートを除去し、`name: agentdev-xxx` 形式（YAML スカラー値）に修正する
@@ -66,7 +66,7 @@ SKILL.md frontmatter `name:` 行が以下の正規表現に一致する場合を
 ## 出力形式
 
 検出した違反は SKILL.md「出力形式」セクションの Finding 形式で報告する。
-Classification には `skill-frontmatter-name-backtick` を使用する。IR-{NNN} 違反を併発する場合は両方の Classification を併記する。
+Classification には `skill-frontmatter-name-backtick` を使用する。skill-name-dir-match 違反を併発する場合は両方の Classification を併記する。
 
 ## 対象外
 
@@ -77,6 +77,6 @@ Classification には `skill-frontmatter-name-backtick` を使用する。IR-{NN
 ## See Also
 
 - **原本**: backticks-identifier-threshold SPEC「適用対象外（PR #1334 事例に基づく明示）」
-- **IR-{NNN}**: skill-name-dir-match 整合性ルール（IR-{NNN}、integrity-rule-catalog 経由で参照）
+- **skill-name-dir-match**: name とディレクトリ名の整合性ルール（integrity-rule-catalog 経由で参照）
 - **REQ**: Skill frontmatter 整合（本検出の根拠 REQ）
 - **REQ**: 推奨 route 提示、修正実施禁止

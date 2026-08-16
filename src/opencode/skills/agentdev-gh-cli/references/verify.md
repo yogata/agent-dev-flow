@@ -1,12 +1,12 @@
 # VERIFY 実装観点
 
-`agentdev-gh-cli` の VERIFY 手続きの実装観点と検査項目（REQ, ADR decision #2）。
+`agentdev-gh-cli` の VERIFY 手続きの実装観点と検査項目。
 書き込み操作（Issue 作成、Issue 本文更新、Issue コメント追加、PR 作成）の直後に実施し、内容が正しく反映されたかを検証する。
 各書き込み操作ごとに個別に実行すること（一括検証は不可）。
 
 ## encoding 初期化実行確認（Windows 環境・事前確認）
 
-Windows 環境で WRITE 手続きを実行する場合、書き込み操作の前にコンソールエンコーディング初期化（[standard-procedures.md](standard-procedures.md) WRITE 標準手順「コンソールエンコーディング初期化」）が実行されていることを確認する（REQ）。
+Windows 環境で WRITE 手続きを実行する場合、書き込み操作の前にコンソールエンコーディング初期化（[standard-procedures.md](standard-procedures.md) WRITE 標準手順「コンソールエンコーディング初期化」）が実行されていることを確認する。
 
 - **確認対象**: 現在の PowerShell セッションで以下の3行が実行済みであること
  - `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`

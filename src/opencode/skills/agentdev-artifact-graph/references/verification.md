@@ -1,10 +1,10 @@
 # verification feedback 機構
 
-Artifact Graph と独立確認結果の差異を検出、分類、是正、回帰検証する機構（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}、DEC-{N} decision 8, 11）。
+Artifact Graph と独立確認結果の差異を検出、分類、是正、回帰検証する機構。
 
 ## 原則
 
-Graph は SSoT ではない。Graph 候補は常に正規成果物で確認する。差異は原因分類（canonical defect / graph defect）し、Graph 側を直接手編集せず原因側を修正して再生成する（REQ-{NNNN}-{NNN}）。
+Graph は SSoT ではない。Graph 候補は常に正規成果物で確認する。差異は原因分類（canonical defect / graph defect）し、Graph 側を直接手編集せず原因側を修正して再生成する。
 
 ## 検出（detect）
 
@@ -74,4 +74,4 @@ bun .opencode/skills/agentdev-artifact-graph/scripts/src/verify_graph.ts --root 
 
 - 本実装はファイルシステムレベルの独立確認に留まる。意味レベルの検証は対象外。
 - `inferred` 関係の検証は行わない（標準実装は `inferred` を生成しない）。
-- Graph が空（REQ-{NNNN}-{NNN}）の場合、検証結果も空になる。
+- Graph が空の場合、検証結果も空になる。

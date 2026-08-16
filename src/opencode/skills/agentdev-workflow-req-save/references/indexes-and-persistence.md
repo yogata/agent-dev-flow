@@ -32,7 +32,7 @@ REQ インデックスとドキュメントハブへ新規エントリを登録�
 
 ### Procedure
 
-詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが `docs/` ファイルを更新する。**エントリ存在確認のスクリプト呼出（REQ、AG-{NNN}、AG-{NNN}）**: README へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（RU-{NNNNNNNN}-01 合意、`check-entry-existence`）で登録を検証する。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
+詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが `docs/` ファイルを更新する。**エントリ存在確認のスクリプト呼出**: README へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で登録を検証する。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 
 ### Result
 
@@ -145,9 +145,9 @@ REQ/Decision/SPEC 操作が各 README 索引へ影響するか確認し、target
 
 REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/specs/README.md`）の索引に影響するか確認する。影響がある場合は更新、ない場合は「README 索引更新なし」とする。README 索引更新は導線の更新であり、要件、判断、仕様の更新ではない。
 
-- **targeted docs guard（REQ）**: 変更 REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）に対し `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow req-save --files <changed REQ files> --json` を実行する（bun run 起動。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files` であり、保存直後ファイルの直接指定には `--files` を使用する。PowerShell で複数パスを渡す場合は配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない）。`failures` に strict severity を含む場合は修正して再実行する。`full_docs_check_recommended` true 時は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
-- **extension 更新要否（REQ）**: REQ/Decision 追加/移動/削除が `.agentdev/extensions/**` へ影響するか確認する。該当 REQ/Decision を context に列挙している extension がある場合、paths も更新対象。必要時はユーザーへ指示を仰ぐ（直接編集しない）
-- **エントリ存在確認（REQ、AG-{NNN}）**: `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で REQ/Decision エントリの README 索引への存在を確認する
+- **targeted docs guard**: 変更 REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）に対し `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow req-save --files <changed REQ files> --json` を実行する（bun run 起動。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files` であり、保存直後ファイルの直接指定には `--files` を使用する。PowerShell で複数パスを渡す場合は配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない）。`failures` に strict severity を含む場合は修正して再実行する。`full_docs_check_recommended` true 時は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
+- **extension 更新要否**: REQ/Decision 追加/移動/削除が `.agentdev/extensions/**` へ影響するか確認する。該当 REQ/Decision を context に列挙している extension がある場合、paths も更新対象。必要時はユーザーへ指示を仰ぐ（直接編集しない）
+- **エントリ存在確認**: `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で REQ/Decision エントリの README 索引への存在を確認する
 
 ### Result
 
@@ -184,7 +184,7 @@ REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/RE
 
 ### Procedure
 
-- **決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`、RU-{NNNNNNNN}-01 合意）で実行する。許可範囲外の変更を検出したらエラー内容をユーザーに報告して指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ
+- **決定的処理のスクリプト呼出**: `git diff --name-only` で変更ファイル一覧を取得し、許可パスリスト（G02）との照合を `agentdev-artifact-validation` の公開検証契約（`check-change-impact`）で実行する。許可範囲外の変更を検出したらエラー内容をユーザーに報告して指示を待つ（自動破棄しない）。`violations` が空でない場合は G02 違反として報告し指示を待つ
 - **リモート同期と hash 検証**: `git pull --ff-only` 後、読込時 hash と pull 後 hash の一致検証を必須とする。一致しない場合は評価、承認をやり直す。**RU パス保存禁止**の詳細、委譲接続点は `agentdev-req-file-manager` を参照
 
 ### Result
@@ -329,7 +329,7 @@ REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/RE
 - `agentdev-artifact-validation`: check-entry-existence、check-change-impact
 - `agentdev-conventional-commits`: commit message 生成
 - `agentdev-git-worktree`: 並列実行安全ステージング
-- integrity checker skill（AG-{NNN} detector、repo 固有）: check_changed_docs.ts（--workflow req-save）
+- integrity checker skill（repo 固有）: check_changed_docs.ts（--workflow req-save）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 

@@ -90,7 +90,7 @@ REQ間の関連、依存はREQ本文内に記載する（frontmatterフィール
 - インデックスに記載されているがファイルが存在しないREQを検出
 - ファイルが存在するがインデックスに未記載のREQを検出
 
-エントリ存在確認は `agentdev-artifact-validation` が所有する決定的スクリプト `check-entry-existence.ts` が担当する（AG-{NNN}、RU-{NNNN}-01 合意）。本 skill は公開検証契約へ委譲する。
+エントリ存在確認は `agentdev-artifact-validation` が所有する決定的スクリプト `check-entry-existence.ts` が担当する。本 skill は公開検証契約へ委譲する。
 
 ## マージ競合対応パターン
 

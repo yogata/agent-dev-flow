@@ -132,7 +132,7 @@ proposed → deprecated
 ## ステータス変更時の README 整合性検証
 
 Decision の `status` を変更した場合、`docs/decisions<README>.md` の全ビューが実ファイルと一致していることを検証する。
-ステータス変更と README 更新が同一変更内で行われないと、README と実ファイルの不整合が発生する（OU-{NNN} 学習）。
+ステータス変更と README 更新が同一変更内で行われないと、README と実ファイルの不整合が発生する。
 
 ### 検証対象ビュー
 
@@ -186,7 +186,7 @@ Decision の `status` を変更した場合、`docs/decisions<README>.md` の全
 
 accepted status の Decision へ直接編集（UPDATE）を実施する場合、SPEC `agentdev-decision-file-manager` の「accepted Decision 直接編集チェックリスト」セクションに従い、以下の全てを満たすことを確認する（`agentdev-decision-guidelines`「accepted Decision の更新規則」準拠）。本節は実行入口の要約であり、正規原本は SPEC とする。
 
-本チェックリストの見出し（`accepted Decision 直接編集チェックリスト`）は歴史的経緯により ADR という語を含まない `accepted Decision` 表記を採用する。これは本スキルが ADR から Decision へ移行した成果物であることによる（AG-{NNN}）。v2:ADR-* 形式の過去参照は原本 SPEC 側で保持する。
+本チェックリストの見出し（`accepted Decision 直接編集チェックリスト`）は歴史的経緯により ADR という語を含まない `accepted Decision` 表記を採用する。これは本スキルが ADR から Decision へ移行した成果物であることによる。v2:ADR-* 形式の過去参照は原本 SPEC 側で保持する。
 
 ### 事前確認
 

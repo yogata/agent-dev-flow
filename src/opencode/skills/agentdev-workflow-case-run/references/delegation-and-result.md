@@ -31,8 +31,8 @@
 - 委譲プロンプト、staleness check 結果の引き渡し、test strategy 項目の test-fix ループ、実行担当サブエージェントの責務（目標分解、各 criterion に observable evidence を要求、品質ゲートの実行、test-fix ループ）、委譲起動失敗・異常終了時の扱い（即 `failed` とせず実装完了・検証未完了として扱う）の詳細は `agentdev-case-run-execution-adapter` スキルを参照
 - **引き渡し**: 割り当てられた1 Issue の Issue番号、worktree root（相対パス指定、worktree 内制約）、ブランチ名
 - **PR URL 受領**: 実行担当サブエージェントが直接 PR 作成を行い、PR URL を委譲 result として返却する（PR URL フォールバック検索は使用しない）
-- **case-run 本体は実装方針を生成・審査しない（REQ-{NNNN}-{NNN}）**: 実装方針の形成、adversarial-review 呼出、結果反映は委譲内で adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで委譲内の結果を受領する
-- **経路G（adapter 委譲内 adversarial-review、REQ-{NNNN}-{NNN}/011）**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
+- **case-run 本体は実装方針を生成・審査しない**: 実装方針の形成、adversarial-review 呼出、結果反映は委譲内で adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで委譲内の結果を受領する
+- **経路G（adapter 委譲内 adversarial-review）**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
 
 ### Result
 
@@ -75,10 +75,10 @@
   - **failed**: repository context で回答不能な blocker。詳細本文は Issue コメントに構造化して記録済み。エラー処理に従い停止、ユーザー報告
   - **delegation-unavailable**: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す
 - **L2 タイムスタンプ受け渡し**: result 状態（completed-pr/blocked/failed）にかかわらず、STEP-S3（worktree 設定）、STEP-S4（実行担当サブエージェント実行）で計測した L2 タイムスタンプを result に含める。case-auto は本 L2 内訳を case-run 委譲の L1 壁時計時間の内訳として読み取る
-- **STEP-S5-1: 配布依存境界の最終変更経路 gate（実装後、command 公開順序の Step 7-1 に対応、REQ-{NNNN}-{NNN} 再利用、DEC-{N}）**: result が `completed-pr` の場合、STEP-S6 に進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実装担当サブエージェントが追加した変更も含めて検査する）
+- **STEP-S5-1: 配布依存境界の最終変更経路 gate（実装後、command 公開順序の Step 7-1 に対応）**: result が `completed-pr` の場合、STEP-S6 に進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実装担当サブエージェントが追加した変更も含めて検査する）
   - 実行条件: result が `completed-pr` であり、PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合。当該変更を含まない PR（docs のみ等）ではスキップする
   - 実行コマンド: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`。現在の worktree（実装後 HEAD）の配布物ソースツリーを検査する
-  - 検出結果の分類: 検査エラー（読込不能、未分類エントリ、adapter 起動失敗）は全て gate-not-passed として扱う（DEC-{N} 決定5、TS-{NNN}）。clean として通過させない
+  - 検出結果の分類: 検査エラー（読込不能、未分類エントリ、adapter 起動失敗）は全て gate-not-passed として扱う。clean として通過させない
   - 違反検出時の停止契約（adapter result `blocked` とは区別）: 違反検出時は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録し、STEP-S6 へ進まず case-run を停止する。adapter result は `completed-pr` のまま変更せず、adapter result 契約の `blocked` へ上書きしない。停止理由は「配布依存境界 最終 gate 違反（PR 本文記録済み）」と報告し、SSoT は PR 本文とする。next action は同一 Issue で case-run を再実行し違反を修正する（worktree+ブランチ存活時は STEP-S3 をスキップし STEP-S4 から再開、べき等）。case-close へは進めない
 
 ### Result
@@ -106,12 +106,12 @@
 
 - `agentdev-case-run-execution-adapter`: adapter protocol、result 契約、経路G、異常終了時事後処理
 - `agentdev-workflow-orchestration`: 障害伝播、capture 境界
-- integrity checker skill（IR-{NNN} detector、repo 固有）: check_distribution_boundary.ts（--profile source）
+- integrity checker skill（repo 固有）: check_distribution_boundary.ts（--profile source）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G11/G22/G23/G32（単一 Issue または単一 Wave のみ処理、実装実行の委譲、result 4状態契約）
-- G24（完了条件チェックボックスの評価・更新は case-close QG-{N} の責務）
+- G24（完了条件チェックボックスの評価・更新は case-close QG-4 の責務）
 - G25（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文）
 - G26/G29（外部実行ハーネス中間成果物の非扱い、PR URL 受領）
 - G27（SPEC確定候補は PR 本文の別セクションに記録）

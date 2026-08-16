@@ -33,7 +33,7 @@
 - **要件doc入力モード**:
   - (1) 引数なし: `.agentdev/drafts/req-draft-*.md` 全件処理（デフォルト）。1件以上なら全件（1件含む）処理、0件なら停止し req-define 実行またはパス指定を求める。複数draftは無確認で全件処理
   - (2) 明示パス指定: 当該draftのみ。不在時は停止しエラー報告
-  - (3) セッション指定キーワード（例: `req-define セッション`、`req-define 上記の内容`）: セッション内要件doc を参照。**暗黙判断は行わない**（AG-{NNN}）
+  - (3) セッション指定キーワード（例: `req-define セッション`、`req-define 上記の内容`）: セッション内要件doc を参照。**暗黙判断は行わない**
   - (4) 特定不可: 停止
   - 複数draft読み込み時の順序制御は各draftの `operation_units` から `recommended_order` / `depends_on` に基づき決定
 
@@ -122,7 +122,7 @@
 
 ### Procedure
 
-実行モデル原則、工程別契約（req-save+spec-save 統合委譲 AG-{NNN}、case-open、case-run インライン実行 AG-{NNN}/002、case-close）、QG-{N}〜QG-{N} の継承、タイムスタンプ計測（L1）、インライン実行時のコンテキスト管理、結果状態の4次元集約、case-open 完了後の分岐（Standard flow / Epic Issue flow、クリーンアップ検証ゲート）、Wave 反復制御、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定（AG-{NNN}、delegation-unavailable 停止条件）、Subagent 委譲プロトコル（category 選定ガイドライン、MUST NOT DO 必須化）、orchestration stage モデル、子 task bg task 破棄検知時の回復（AG-{NNN}〜AG-{NNN}、3状態分類、ライフサイクル分離）の各詳細は `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各対応 skill を参照。case-run インライン実行時も case-run.md を authoritative source として読み込む。
+実行モデル原則、工程別契約（req-save+spec-save 統合委譲、case-open、case-run インライン実行、case-close）、QG-1〜QG-4 の継承、タイムスタンプ計測（L1）、インライン実行時のコンテキスト管理、結果状態の4次元集約、case-open 完了後の分岐（Standard flow / Epic Issue flow、クリーンアップ検証ゲート）、Wave 反復制御、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定（delegation-unavailable 停止条件）、Subagent 委譲プロトコル（category 選定ガイドライン、MUST NOT DO 必須化）、orchestration stage モデル、子 task bg task 破棄検知時の回復（3状態分類、ライフサイクル分離）の各詳細は `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各対応 skill を参照。case-run インライン実行時も case-run.md を authoritative source として読み込む。
 
 case-auto は各工程の結果に基づいて次工程へ進むか停止条件（STEP-4）を判定する。req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
 
@@ -136,7 +136,7 @@ case-auto は各工程の結果に基づいて次工程へ進むか停止条件�
 
 順次フォールバック可能（G32）。bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
 
-#### Wave 反復制御（case-auto 直接制御 AG-{NNN}）
+#### Wave 反復制御（case-auto 直接制御）
 
 - Epic Issue 本文読み取りのみ（書き込みは case-close 単一書き手、G16）
 - 子Issue インライン case-run 並列実行 最大5件

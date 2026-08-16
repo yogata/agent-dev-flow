@@ -127,7 +127,7 @@ draft-data の必須フィールドを検証し、処理対象 entry を確定�
 
 ### Purpose
 
-処理対象 entry を REQ/Decision ファイルへ保存する（決定的スクリプト適用、QG-{N} 相当検証込み）。
+処理対象 entry を REQ/Decision ファイルへ保存する（決定的スクリプト適用、QG-1 相当検証込み）。
 
 ### Input Resolution
 
@@ -144,21 +144,21 @@ draft-data の必須フィールドを検証し、処理対象 entry を確定�
 
 `agentdev-req-file-manager` の判定ロジックと採番ルールに従って実行する。STEP-3 で処理対象とした `artifact_actions`（`artifact: req`/ `artifact: decision`）の全 entry を処理する（draft 全体を処理し、OU ごとの消費は行わない）。`artifact_actions` フィールドがない場合は従来どおり全 req-operation を処理する（後方互換）。委譲接続点: サブエージェントは CREATE/APPEND/UPDATE 候補、SPLIT 候補、REQ 再構成候補を返し、親エージェントがファイル保存を行う（詳細は `agentdev-req-file-manager` 参照）。
 
-- **決定的処理のスクリプト呼出（REQ、AG-{NNN}）**: REQ番号採番、要件行ID採番、frontmatter id↔ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約（RU-{NNNNNNNN}-01 合意）および `agentdev-req-file-manager` SKILL.md「Scripts（決定的処理）」で規定する決定的スクリプトを bash 経由で呼び出して実行する。LLM 推論で代替しない。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
-- **QG-{N}（適用結果の整合性検証、REQ/082、AG-{NNN}）**: REQ/Decision ファイル保存前に `agentdev-quality-gates` の QG-{N} を実行する。採番結果、マージ結果、インデックス、変更範囲の妥当性を決定的スクリプトの JSON 結果で機械的に確認する。fail 時は保存を停止し req-define へ差り戻す。req-save の QG-{N} は内容の品質を再検証せず、それは req-define の QG-{N} の責務である
+- **決定的処理のスクリプト呼出**: REQ番号採番、要件行ID採番、frontmatter id↔ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約および `agentdev-req-file-manager` SKILL.md「Scripts（決定的処理）」で規定する決定的スクリプトを bash 経由で呼び出して実行する。LLM 推論で代替しない。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
+- **QG-1（適用結果の整合性検証）**: REQ/Decision ファイル保存前に `agentdev-quality-gates` の QG-1 を実行する。採番結果、マージ結果、インデックス、変更範囲の妥当性を決定的スクリプトの JSON 結果で機械的に確認する。fail 時は保存を停止し req-define へ差り戻す。req-save の QG-1 は内容の品質を再検証せず、それは req-define の QG-1 の責務である
 - **語彙・責務・runtime境界矛盾の防止**: STEP-4 完了後に既知の矛盾を検出可能な範囲で防止する。**Catalog entry 確認（APPEND 時）**: 関連 integrity-rule-catalog SPEC（extension 経由）の catalog entry 有無を確認、未記載時はユーザーへ追記を促す（`docs/specs/` 配下は直接編集しない G02）。**複数 REQ/Decision ファイルの3フェーズ分離**: 採番バッチ[直列] / ファイル作成[並列・最大5件] / インデックス更新[直列]。各詳細は `agentdev-req-file-manager` を参照
 
 ### Result
 
-- REQ/Decision ファイル保存済み（QG-{N} 検証合格）
+- REQ/Decision ファイル保存済み（QG-1 検証合格）
 
 ### Evidence
 
-- 保存ファイルパス群、決定的スクリプトの JSON 結果、QG-{N} 判定
+- 保存ファイルパス群、決定的スクリプトの JSON 結果、QG-1 判定
 
 ### Completion Verification
 
-- 処理対象 entry 全てが保存済みであり、QG-{N} が合格であること
+- 処理対象 entry 全てが保存済みであり、QG-1 が合格であること
 
 ### Resume-Idempotency
 
@@ -173,7 +173,7 @@ draft-data の必須フィールドを検証し、処理対象 entry を確定�
 
 - `agentdev-req-file-manager`: 判定ロジック、採番ルール、3フェーズ分離
 - `agentdev-artifact-validation`: 決定的スクリプト、公開検証契約
-- `agentdev-quality-gates`: QG-{N} 適用結果整合性検証
+- `agentdev-quality-gates`: QG-1 適用結果整合性検証
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 

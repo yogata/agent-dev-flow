@@ -3,20 +3,5 @@
   "rule_id": "LINT-SKILLS-NG-BASELINE",
   "generated_at": "2026-08-16",
   "description": "lint_skills.ts AG-005 rules (RU-0018 / Issue #2179): known pre-existing violations grandfathered until OU-002/OU-003/OU-005 (Epic #2178 Waves 2-3) remove them. Delta-aware semantics mirror the check_integrity.ts NG baseline (v2:REQ-0161-005): baseline-known ng/warning findings are demoted to info; findings exceeding a bucket (check+file) drive the exit code. OU executors must shrink or delete the corresponding entries in the same PR that fixes the violation; entries whose findings disappear may be deleted wholesale. Do not add entries without a provenance label and an approval reason.",
-  "entries": [
-    {
-      "check": "references TOC",
-      "file": "agentdev-gh-cli/references/standard-procedures.md",
-      "count": 1,
-      "provenance": "ru0018-ou005",
-      "reason": "RU-0018 既知違反（AG-005 導入時実測、Issue #2179）。Epic #2178 Wave 2 の OU-005（references 統廃合・300 行超への目次付与）で解消するまでの承認"
-    },
-    {
-      "check": "references TOC",
-      "file": "agentdev-git-worktree/references/git-common-procedures.md",
-      "count": 1,
-      "provenance": "ru0018-ou005",
-      "reason": "RU-0018 既知違反（AG-005 導入時実測、Issue #2179）。Epic #2178 Wave 2 の OU-005（references 統廃合・300 行超への目次付与）で解消するまでの承認"
-    }
-  ]
+  "entries": []
 }
