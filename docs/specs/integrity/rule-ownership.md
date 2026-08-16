@@ -79,7 +79,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-003 | Active/廃止 REQ ID 重複 | REQ-010-082 | integrity-contracts.md |
 | IR-004 | REQ index ↔ 現行 REQ 一致 | REQ-010-003 | integrity-contracts.md |
 | IR-005 | Decision ↔ REQ 相互参照存在 | REQ-010-005 | integrity-contracts.md |
-| IR-006 | Command frontmatter 許可フィールド | REQ-002-015, REQ-010-046, 095-099, 108, 124, 129 | integrity-contracts.md, artifact-contracts.md |
+| IR-006 | Command frontmatter 許可フィールド | REQ-002-015, REQ-039-002, 095-099, 108, 124, 129 | integrity-contracts.md, artifact-contracts.md |
 | IR-007 | Skill frontmatter name ↔ dir | REQ-010-092 | integrity-contracts.md |
 | IR-008 | Skill references/ 存在 | REQ-010-110, 115-120, REQ-036-008 | integrity-contracts.md |
 | IR-009 | 旧 namespace 残存 | REQ-036-004 | integrity-contracts.md |
@@ -140,7 +140,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 
 | 重複ルール | 旧参照箇所 | 原本所有者 | 状態 |
 |-----------|-----------|----------------|------|
-| Frontmatter 許可フィールド | REQ-002-044, REQ-010-046/098 | REQ-002-044 (primary) | ✅ |
+| Frontmatter 許可フィールド | REQ-002-044, REQ-039-002, REQ-010-098 | REQ-002-044 (primary) | ✅ |
 | `references/` 正規化 | REQ-002-013/039, REQ-010-039/040/094 | REQ-002-013 (primary) | ✅ |
 | Template 配置規約 | REQ-002-005/046, v2:REQ-0107-013/022, REQ-010-042/075 | REQ-002-005 (primary) | ✅ |
 | Namespace 予約 | REQ-002-009/056, REQ-036-004 | REQ-002-009 (primary) | ✅ |

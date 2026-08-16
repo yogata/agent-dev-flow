@@ -170,7 +170,7 @@ backlog-review は全 RU frontmatter に `tentative_classification` を付与す
 - `agentdev-workflow-backlog-review` skill（workflow 実装本体）
 - `agentdev-backlog-integration` skill（分析基準、統合分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール）
 - REQ-008（RU lifecycle）
-- REQ-010（Backlog-review）
+- REQ-039（バックログ統合）
 
 ## adversarial-review 挿入境界（経路E）
 

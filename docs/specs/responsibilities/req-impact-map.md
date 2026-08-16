@@ -68,7 +68,7 @@ updated: 2026-06-28
 
 ## 要件行影響（Requirement-Line Impact）
 
-特定要件行が影響するアーティファクト、スキル、コマンド（REQ-010-047）。
+特定要件行が影響するアーティファクト、スキル、コマンド（REQ-039-003）。
 REQ 全体ではなく要件行粒度で境界基準、検出観点の影響を追跡する必要がある場合に使用する。
 これらの要件行はすべて IR-044（REQ/SPEC 境界違反検出）を通じてカタログに紐づく。
 
@@ -79,10 +79,10 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 
 | 要件行 | 影響するアーティファクト / スキル / コマンド | 経由 |
 |--------|-------------------------------------|------|
-| REQ-001-067〜069 | document-model.md, `agentdev-req-analysis` skill, `agentdev-quality-gates` skill, docs-check command (REQ-010-260 経由), inspect-docs command (REQ-010-047 経由) | IR-044 |
+| REQ-001-067〜069 | document-model.md, `agentdev-req-analysis` skill, `agentdev-quality-gates` skill, docs-check command (REQ-010-260 経由), inspect-docs command (REQ-039-003 経由) | IR-044 |
 | REQ-004-031〜033 | `agentdev-req-analysis` skill, `agentdev-quality-gates` skill | IR-044 |
 | REQ-010-260 | integrity-rule-catalog.md (IR-044 定義), integrity-contracts.md (ReqSpecBoundary category, canonical-conflict subcategory 注記) | IR-044 |
-| REQ-010-047 | req-impact-map.md (本節), `agentdev-req-structure-diagnostics` skill | IR-044 |
+| REQ-039-003 | req-impact-map.md (本節), `agentdev-req-structure-diagnostics` skill | IR-044 |
 
 ## 影響カテゴリ（Impact Categories）
 

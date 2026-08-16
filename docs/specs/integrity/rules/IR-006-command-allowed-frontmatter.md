@@ -13,7 +13,7 @@ updated: 2026-08-06
 | category | document-drift |
 | detection_method | frontmatter field 列挙 → 許可リストと照合 |
 | affected_artifacts | [commands] |
-| related_req | [REQ-002-015, REQ-010-046, 095-099, 108, 124, 129] |
+| related_req | [REQ-002-015, REQ-039-002, 095-099, 108, 124, 129] |
 | related_spec | [integrity-contracts.md, artifact-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低 |
