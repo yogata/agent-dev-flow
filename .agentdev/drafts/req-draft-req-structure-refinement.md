@@ -470,6 +470,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2157
+      epic: 2156
       req: REQ-036
       files: [docs/requirements/REQ-036.md]
       artifact_action: ACT-REQ-002
@@ -486,6 +488,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2158
+      epic: 2156
       req: REQ-037
       files: [docs/requirements/REQ-037.md]
       artifact_action: ACT-REQ-003
@@ -502,6 +506,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2159
+      epic: 2156
       req: REQ-038
       files: [docs/requirements/REQ-038.md]
       artifact_action: ACT-REQ-004
@@ -518,6 +524,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2160
+      epic: 2156
       req: REQ-039
       files: [docs/requirements/REQ-039.md]
       artifact_action: ACT-REQ-005
@@ -534,6 +542,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2161
+      epic: 2156
       req: REQ-010
       files: [docs/requirements/REQ-010.md]
       artifact_action: ACT-REQ-001
@@ -548,6 +558,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2163
+      epic: 2162
       req: REQ-013
       files: [docs/requirements/retired/REQ-013.md]
       artifact_action: ACT-REQ-006
@@ -562,6 +574,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2164
+      epic: 2162
       req: REQ-022
       files: [docs/requirements/retired/REQ-022.md]
       artifact_action: ACT-REQ-007
@@ -576,6 +590,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2165
+      epic: 2162
       req: REQ-023
       files: [docs/requirements/retired/REQ-023.md]
       artifact_action: ACT-REQ-008
@@ -590,6 +606,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2166
+      epic: 2162
       req: REQ-024
       files: [docs/requirements/retired/REQ-024.md]
       artifact_action: ACT-REQ-009
@@ -604,6 +622,8 @@ operation_units:
     issue_policy: single
     result:
       saved: true
+      issue: 2167
+      epic: 2162
       req: REQ-012
       files: [docs/requirements/REQ-012.md]
       artifact_action: ACT-REQ-010
