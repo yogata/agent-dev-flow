@@ -165,3 +165,19 @@
 - **想定反映先**: quality-gates QG-4 / docs-check 実行手順（learning-promote で判定）
 - **関連**: Epic #2134, PR #2154 (MERGED), Issue #2143 (CLOSED)
 - **タグ**: `#bun` `#testing` `#full-suite` `#windows`
+
+## Epic Wave 連続 squash merge での隣接行コンフリクトは Level 1 rebase で機械解消不能（Epic 2156 Wave 1 case-close）
+
+- **問題事象**: Epic #2156 Wave 1 の並列子Issue（#2157〜#2160）の PR を連続 squash merge した際、4番目の PR #2171 が CONFLICTING/DIRTY となった。競合は docs/specs/skills/agentdev-doc-diagnostics.md のみで、先行マージ済み PR #2170（REQ-010-025→REQ-036-013）と PR #2171（REQ-010-048→REQ-039-004）が互いに隣接行（L98/L99）を機械置換していた
+- **発生局面**: デプロイ（case-close Epic Wave マージフェーズ）
+- **検知方法**: mergeable UNKNOWN ポーリング中の CONFLICTING 遷移検出と、Level 1 rebase 実行時の content conflict（rebase 手順に従い証拠採取後 abort）
+- **根本原因**: 複数子Issue が同一ファイルの隣接行を変更する Wave 構成。git の 3-way merge は隣接行変更を自動解消しない。マージ順序を変えてもいずれかの PR で確定的に発生する
+- **自律対応内容**: コンフリクト解消モデル Level 1 に従い rebase を abort し、当該子Issue を pending 維持のまま case-auto Level 2/3 へエスカレーション（union 解は自明でも内容編集は case-close 責務外）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（既存コンフリクト解消モデルの運用事例。昇華判断は learning-promote に委ねる）
+- **横展開観点**: 機械的置換を複数子Issue で並行適用する Epic では、変更ファイルの行近接度を Wave 構成時に確認する価値がある
+- **再発条件**: 複数子Issue が同一ファイルの近接行を変更し、case-close が順次 squash merge する場合
+- **予防策候補**: case-open の Wave 構成時に同一ファイルの行近接する変更を並列 Wave に配置しない、または後続 PR のマージ前に先行 rebase を適用する
+- **想定反映先**: agentdev-epic-tracker（Wave 構成ガイド）、agentdev-workflow-case-close（マージ前 rebase 判定）
+- **関連**: PR #2170/#2171、Epic #2156、docs/specs/skills/agentdev-doc-diagnostics.md
+- **タグ**: `#epic-wave` `#squash-merge` `#conflict`
