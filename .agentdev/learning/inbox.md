@@ -133,3 +133,35 @@
 - **想定反映先**: repo-agentdev-integrity checker / integrity-contracts SPEC NG baseline 運用手順（learning-promote で判定）
 - **関連**: PR #2151 (MERGED), Issue #2136 (CLOSED), Epic #2134, intake-2026-08-16-ou002-ng17-case-close-capture-boundaries-ref.md
 - **タグ**: `#integrity` `#baseline` `#worktree` `#junction`
+
+## 機械判定スクリプトの AUTOGEN ブロック判定は行全体マッチにする（OU-009、PR #2154）
+
+- **問題事象**: 一文一行機械判定で AUTOGEN ブロックの判定に部分一致を使ったため、本文中のマーカー言及（インラインコード例）が誤発火し、index-auto-generation.md 5 行 / autogen-freshness-gate.md 1 行の検出漏れが発生した。
+- **発生局面**: 実装（docs 横断の X-4 機械是正）
+- **検知方法**: 是正後の再計測でAUTOGEN ブロック周辺に違反残が残ったことからの逆算特定
+- **根本原因**: ブロックマーカー（`<!-- AUTOGEN:BEGIN/END -->`）の判定を部分一致で行った場合、マーカーを言及する本文行までブロック境界と誤認する
+- **自律対応内容**: generate_indexes.ts と同一形式の行全体マッチへ変更し、検出漏れ 6 行を是正した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 生成物ブロックのスキップ判定は実装（generator）と同一のマッチ形式（行全体）を使うべきである
+- **再発条件**: マーカー行を本文中に言及する文書へ機械判定を適用し、部分一致でブロック判定する場合
+- **予防策候補**: 機械判定系スクリプトのブロック判定は generator と同一の行全体マッチを標準とする
+- **想定反映先**: mechanical-replacement-rules.md / 機械判定スクリプト設計（learning-promote で判定）
+- **関連**: PR #2154 (MERGED), Issue #2143 (CLOSED), Epic #2134
+- **タグ**: `#mechanical-judgment` `#autogen` `#detection`
+
+## bun test のパス引数は ./ prefix と実行件数検証まで要する（Epic #2134 Wave 3 case-close）
+
+- **問題事象**: bun test に `./` prefix なしの相対パス（ディレクトリ・ファイル混合）を渡したところ、Windows 環境では実行ファイルの一部だけが走り 160 pass / EXIT 0 で正常終了した。`./` prefix 付きで再実行すると実際は 2274 tests / 106 files だった。
+- **発生局面**: case-close（Epic 完了条件の full integrity suite 実行）
+- **検知方法**: PR #2154 の実績値（コマンド系 4 ファイルのみで 267 tests）と部分実行の合計（160 tests）が矛盾したことによる疑念と、bun の "filters did not match any test files" 注意の確認
+- **根本原因**: bun test の引数はパス指定ではなくフィルタ解釈であり、Windows のパス解釈差で `./` なし相対パスの一部だけが実ファイルに一致する。部分実行も EXIT 0 で終わるため fail がなくても件数が妥当かの検証がないと気づけない
+- **自律対応内容**: 全テストディレクトリを `./` prefix 付きで明示指定して再実行し、`Ran N tests across M files` の N/M を直前実績と突合して全件実行を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 検証スイート全体の合格判定は pass/fail のみでなく実行件数の妥当性検証まで含める
+- **再発条件**: Windows 環境で bun test に `./` なし相対パスを渡す場合
+- **予防策候補**: full suite 実行手順に `Ran N tests across M files` の件数突合を必須ステップとして明記する
+- **想定反映先**: quality-gates QG-4 / docs-check 実行手順（learning-promote で判定）
+- **関連**: Epic #2134, PR #2154 (MERGED), Issue #2143 (CLOSED)
+- **タグ**: `#bun` `#testing` `#full-suite` `#windows`
