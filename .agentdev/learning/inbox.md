@@ -262,3 +262,51 @@
 - **想定反映先**: case-run 検証手順・PR 本文テンプレートの参考（learning-promote で判定）
 - **関連**: PR #2184, Issue #2179 (CLOSED), Epic #2178
 - **タグ**: `#bun` `#testing` `#cwd`
+
+## 配布物記述削減前のコマンド契約テスト routing token 対象確認（OU-003、PR #2186）
+
+- **問題事象**: コマンド本文の STEP 要約削減において、distribution_boundary_routing_contract.test.ts がコマンド本文の特定セクション（case-run ### Step 7-1）の検出器エントリポイント（check_distribution_boundary.ts）、--profile source、result 状態語（completed-pr / blocked）の routing token を機械検証しており、削減するとテスト不合格となるセクションが存在した。
+- **発生局面**: 実装（16コマンドの STEP 要約・権威情報源宣言重複の削減）
+- **検知方法**: 一度削減してテスト不合格を確認し復帰（実測）
+- **根本原因**: コマンド本文の特定セクションが契約テストの期待値固定対象であることが記述上から読み取れない
+- **自律対応内容**: 対象セクションを公開 interface として原形維持し、削減対象を「工程詳細の再要約」のみに限定した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 配布物の記述削減系 Issue では、対象コマンドの契約テスト grep（routing token・期待値固定セクションの検出）を削減前に実施する
+- **再発条件**: 契約テストがコマンド本文の文言・セクション構造を期待値固定している状態で本文削減を行う場合
+- **予防策候補**: 記述削減系 Issue のテスト戦略に「契約テスト grep を削減前実施」を組み込む
+- **想定反映先**: agentdev-command-authoring の記述削減手順の参考（learning-promote で判定）
+- **関連**: PR #2186, Issue #2181 (CLOSED), Epic #2178
+- **タグ**: #contract-test #command-reduction
+
+## プレースホルダ除去時の IR-055 baseline delta 再検証必須（OU-005、PR #2187）
+
+- **問題事象**: プレースホルダ ID（{NNN} 形式）を含む行は IR-055 の検査免除（template placeholder exemption）になるため、プレースホルダ除去は同行の他パターン（src/opencode/、repo-local、docs/specs/ 参照）を新規違反として顕在化させ得る。PR #2187 で 6 件顕在化し、即時修正した。
+- **発生局面**: 実装（references 配下のプレースホルダ ID 表記整理）
+- **検知方法**: プレースホルダ除去後の check_integrity.ts 実行で新規 delta として検出
+- **根本原因**: IR-055 の exemption が行単位（{...} 含む行全体を走査免除）であり、プレースホルダ以外の違反も同行は隠蔽される構造
+- **自律対応内容**: 顕在化した 6 件を配布物向け表現（.opencode/...、自己ホストリポジトリ固有 等）へ修正して解消
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 配布物のプレースホルダ整理時は IR-055 baseline delta の再検証を必須工程とする
+- **再発条件**: プレースホルダを含む行のプレースホルダのみを除去する編集を行う場合
+- **予防策候補**: プレースホルダ整理 Issue の検証手順へ IR-055 delta 再検証を明示する
+- **想定反映先**: agentdev-skill-authoring または checker 実行契約の参考（learning-promote で判定）
+- **関連**: PR #2187, Issue #2182 (CLOSED), Epic #2178
+- **タグ**: #ir055 #placeholder #baseline
+
+## 検証スクリプトの対象ファイル収集で git diff --diff-filter=d による削除済み除外（OU-005、PR #2187）
+
+- **問題事象**: git diff --name-only の出力には削除済みファイルが含まれるため、検証スクリプトが各ファイルを読む前に ENOENT が発生した。
+- **発生局面**: 実装（TS-008 検証: 変更ファイル群の注記走査）
+- **検知方法**: 検証スクリプト実行時の ENOENT エラー
+- **根本原因**: --name-only が削除済みパスも返す仕様に対し、対象全件が存在することを前提とした読み込みを行っていた
+- **自律対応内容**: --diff-filter=d で削除済みファイルを除外して再実行
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: diff 出力をファイル読み込みに使う検証スクリプト全般に当てはまる
+- **再発条件**: 削除を含む変更セットを --name-only で収集して直接読む場合
+- **予防策候補**: 対象収集には常に --diff-filter=d（または存在確認）を組み合わせる
+- **想定反映先**: 検証スクリプト・テスト戦略テンプレートの参考（learning-promote で判定）
+- **関連**: PR #2187, Issue #2182 (CLOSED), Epic #2178
+- **タグ**: #git #verification
