@@ -15,33 +15,6 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ---
 
-## USE FOR
-
-- ライフサイクル判定
-- ワークフローフェーズ判定（マクロ/マイクロ）
-- work_type 分類（bugfix/feature/maintenance/docs_chore）
-- スケール判定（standard/large）
-- 前工程からの引き継ぎ判定、停止条件（`references/upstream-handoff.md`）
-- SSoT 遷移に関する共通判断
-- ラベル体系
-
-## DO NOT USE FOR
-
-- Issue本文生成
-- Issue作成
-- Epic/child Issue生成
-- RU削除後処理
-- Intake パイプライン（期間解釈、データ取得、構造検出、LLM解析、item生成）
-- inspect-docs診断（REQ参照ID整合性、第一参照導線、現行/廃止境界、6観点診断、未処理成果物確認）
-- backlog-review統合手順（Artifact読込分析、統合分割判定、矛盾検出、RU生成）
-- command固有Step番号、command固有実行順序、command固有Phase名
-- 特定コマンドの実行ロジック、手順記述
-- 要件分析手法や壁打ちメソドロジー（`agentdev-req-analysis`参照）
-- 仕様適合性検出、ループバック判定（`agentdev-quality-gates`、`agentdev-workflow-routing`参照）
-- Decision/REQファイルの具体的作成、更新操作（`agentdev-decision-file-manager`/`agentdev-req-file-manager`参照）
-- レビューNG時の対応フロー（`agentdev-workflow-routing`参照）
-- 完了報告フォーマット、チェックボックス更新
-
 ## 対象コマンド
 
 全 agentdev コマンドの一覧、入出力リファレンスは command README（`commands/agentdev/README.md`）を参照。
@@ -125,5 +98,4 @@ req-define Step 8 が参照する。
 - **agentdev-req-structure-diagnostics**: inspect-docs/ REQ構造診断基準
 - **agentdev-workflow-routing**: レビューNG時の対応フロー、次コマンド推論
 - **agentdev-workflow-orchestration**: case-run状態機械、自律修正ループ
-
 

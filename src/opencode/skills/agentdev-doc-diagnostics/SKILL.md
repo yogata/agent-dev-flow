@@ -31,34 +31,6 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 - 診断結果はセッション内テキストで提示する
 - 修正案は route として提示し、実装、保存、自動整形は行わない
 
-## USE FOR
-
-- inspect-docs command の docs 横断診断カテゴリ定義
-  - 廃止 REQ/SPEC 由来記述残置（retired REQ/SPEC ID をソースとした横断スキャン）
-  - REQ/SPEC 境界違反（HOW 詳細の要件行残留、安定契約例外候補の抽出）
-  - REQ 粒度過小（関心対象、成果物種別、command family、lifecycle 段階の混在）
-  - 横断契約矛盾（source-of-truth priority に基づく矛盾）
-  - 文意品質候補（LLM っぽい表現、空虚語、英語混じり、実行主体分類の誤認）
-  - 探索順と索引の不整合（README 索引と基準文書の不整合）
-- docs 横断スキャン観点とルーティング先の定義（専門診断のシグナルカタログ、閾値は再定義しない）
-- 共通証拠構造（finding schema、severity、信頼度）
-- 共通 finding 出力契約（`.agentdev/inspect/inbox/*.md`、severity 分類、信頼度）
-- 診断に必要な reference または script の選択条件
-- 文書種別別診断へのルーティング（REQ 固有、文意品質、探索順の各専門 skill への委譲）
-- source-of-truth priority に基づく矛盾判定（現行 REQ > 承認済み ADR > SPEC > guides）
-- NG 分類（false positive / pre-existing / 今回修正対象）の付与
-
-## DO NOT USE FOR
-
-- 診断対象の修正: intake/inspect pipeline 経由でのみ修正を許可する
-- promote 判断: `inspect-promote` の責務
-- REQ/SPEC/RU の保存: 各保存 command（req-save/spec-save 等）の責務
-- commit/push: command の責務（ただし inspect lifecycle に基づく `.agentdev/inspect/` 配下の永続化は許可される副作用）
-- Issue/PR 操作: case-* command の責務
-- REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断: `agentdev-req-structure-diagnostics` の責務（本スキルはルーティングのみ）
-- 文意品質診断（LLM っぽい表現、空虚な形容/動詞、英語混じり表現）: `agentdev-doc-writing` の責務（本スキルはルーティングのみ）
-- 探索順（README 索引、ドキュメント探索順序）: README 索引の整合性は本スキルが、探索順序の詳細は README 群が担う
-
 ## 対象コマンド
 
 | コマンド | 目的 |

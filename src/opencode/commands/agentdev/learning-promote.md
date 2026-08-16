@@ -35,15 +35,13 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 
 本コマンドは workflow 実装本体を `agentdev-workflow-learning-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが7 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。
 
-- **STEP-1** 入力読込・正規化 — inbox.md 読込（不在時はエラー終了、0件時は終了）、deferred.md 読込、旧フォーマット正規化
-- **STEP-2** 評価 — 問題クラス分類、8軸評価スコアリング、禁止条件フィルタリングゲート、evaluation-report.md 生成・更新
-- **STEP-3** 判定 — 廃棄判定（11カテゴリ + duplicate）、既存対策確認、昇華可能性評価（無条件の自動REQ化禁止、living pool 維持）
-- **STEP-4** review（経路D） — adversarial-review 発動条件判定・review 呼出・accepted finding 反映（evaluation-report 戻しループ、skip 条件該当時は省略）
-- **STEP-5** HITL — 判定結果提示・ユーザー承認（判断の確定、REQ）
-- **STEP-6** 永続化 — `git pull --ff-only`、採用済み成果物生成（staging 領域のみ）、deferred 移動（原子的操作）、prune、commit/push
-- **STEP-7** 完了報告 — 8軸評価サマリ、判定結果、後続ルート、git 永続化結果の報告
-
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-learning-promote` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
+- **STEP-1** 入力読込・正規化
+- **STEP-2** 評価
+- **STEP-3** 判定
+- **STEP-4** review（経路D）
+- **STEP-5** HITL
+- **STEP-6** 永続化
+- **STEP-7** 完了報告
 
 ## ガードレール
 
@@ -61,7 +59,7 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 
 ## ユーザー確認ポイント、エラー処理
 
-ユーザー確認ポイント、エラー処理表、各成果物のライフサイクル詳細は `agentdev-learning-pipeline` を参照。主要項目のみ本節に抜粋する:
+ユーザー確認ポイント、エラー処理表、各成果物のライフサイクルは `agentdev-learning-pipeline` を参照。主要項目のみ本節に抜粋する:
 
 - **HITL（workflow STEP-5）**: 廃棄判定結果、8軸評価スコアの確認、修正、承認（判断の確定、REQ）
 - **prune（workflow 永続化 STEP）**: prune は HITL 承認と同時に承認済みとみなし自動実行（REQ）。staged/rejected/duplicate の追加確認は不要

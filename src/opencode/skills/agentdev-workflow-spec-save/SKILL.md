@@ -24,29 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-spec-save.yaml`）は
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- spec-save command の実行時 workflow 制御（全 STEP）
-- 事前チェック（`artifact: spec` entry 有無判定、no-op 完了、旧形式 draft 後方互換）
-- 配置先解決（既存パス vs `new:{slug}` / `target_spec` 構造化、決定的スクリプト呼出）
-- SPEC 分離基準の最終確認（安定契約例外の除外と follow-up 明示）
-- SPEC ファイル操作（create: frontmatter 付き新規作成、update: target_area セクション置換 / 後方互換追記、複数 action 並列化、SPEC 宣言付与）
-- インデックス整合（新規 SPEC の README 一覧登録、check-entry-existence 検証）
-- SPEC 一覧整合確認（targeted docs guard、extension 更新要否確認）
-- ドラフト status 更新（SPEC 消費済みフラグ）、変更範囲検証、コミット・プッシュ
-
-## DO NOT USE FOR
-
-- 要件doc 作成、壁打ち（`/agentdev/req-define`）
-- REQ/Decision ファイル保存（`/agentdev/req-save`）
-- Issue 作成（`/agentdev/case-open`。spec-save は Issue を作成しない）
-- SPEC ファイル管理・配置判断・target_area マッチング規則の定義（`agentdev-spec-file-manager`）
-- 決定的検証スクリプトの所有（`agentdev-artifact-validation`）
-- SPEC status 昇格（draft → accepted）の判定（case-close の責務。spec-save は accepted を付与しない）
-- SPEC 内容品質の再検証（req-define の QG-{N} の責務）
-- commit message 規約の定義（`agentdev-conventional-commits`）
-- 並列実行安全ステージングの定義（`agentdev-git-worktree`）
-
 ## 入力
 
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（req-define が生成し req-save が REQ 保存済みのドラフト。`draft-data` の `artifact_actions` に `artifact: spec` entry を含む）

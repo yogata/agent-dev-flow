@@ -55,14 +55,14 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 
 本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として4工程の control plane を所有する。
 
-- **STEP-1** スキャン対象の収集 — `docs/requirements/`、`docs/decisions/`、`docs/specs/`、`docs/guides/`、`README.md`、`.opencode/`
-- **STEP-2** REQ 体系・文書種別別意味診断 — REQ 参照ID整合性、第一参照導線、現行/廃止/世代境界、6観点 structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）、文書分類一貫性、SPEC/Decision/guides/README 意味診断
-- **STEP-3** 配布物整合性検査・route 判定 — 構文健全性・文意保持・責務整合診断、docs-check route 候補提示、未処理 artifact 確認
-- **STEP-4** 検出事項出力・永続化・完了報告 — inbox 出力（source-of-truth priority、NG 分類）、実行前同期、`.agentdev/inspect/` commit/push、完了報告
+- **STEP-1** スキャン対象の収集
+- **STEP-2** REQ 体系・文書種別別意味診断
+- **STEP-3** 配布物整合性検査・route 判定
+- **STEP-4** 検出事項出力・永続化・完了報告
 
-各工程の詳細は `agentdev-workflow-inspect-docs` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
+同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
 
-**共通ルール**（全工程適用、詳細は workflow skill 参照）: エラー処理（スキャン対象ディレクトリ不存在時は該当カテゴリを空扱い警告、ファイル読込失敗時はスキップ警告）
+**共通ルール**（全工程適用）: エラー処理（スキャン対象ディレクトリ不存在時は該当カテゴリを空扱い警告、ファイル読込失敗時はスキップ警告）
 
 ## ガードレール
 

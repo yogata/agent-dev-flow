@@ -24,25 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-learning-promote.yaml
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- learning-promote command の実行時 workflow 制御（全 STEP）
-- inbox.md / deferred.md の読込、旧フォーマット正規化
-- 問題クラス分類、8軸評価スコアリング、evaluation-report.md 生成・更新
-- 廃棄判定（11カテゴリ + duplicate）、既存対策確認、昇華可能性評価
-- adversarial-review 経路D の発動条件判定、review 呼出、evaluation-report 戻しループ
-- ユーザーへの判定結果提示、承認（HITL）
-- 採用済み成果物生成（staging 領域のみ）、deferred 移動（原子的操作）、prune、git 永続化、完了報告
-
-## DO NOT USE FOR
-
-- 学びの検知、抽出、inbox.md への自律蓄積（`agentdev-learning-capture` skill）
-- RU 生成（`/agentdev/backlog-review`）
-- intake pipeline の実行（`/agentdev/intake-promote`）
-- REQ ファイル保存、無条件の自動REQ化（`/agentdev/req-save` 経由の昇華ルートのみ）
-- `.opencode/` 配下への直接書込、`case-run` への直接受け渡し
-- work_type 判定、フェーズ定義（`agentdev-workflow-lifecycle`）
-
 ## 入力
 
 - learning-promote command から渡される `.agentdev/learning/inbox.md`（必須。未処理の学びエントリ）

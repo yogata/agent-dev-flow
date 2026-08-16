@@ -26,51 +26,17 @@ req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 
 
 本コマンドは workflow 実装本体を `agentdev-workflow-spec-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが11 STEP の control plane として制御構造（配置先解決、SPEC ファイル操作、整合確認、永続化）を所有する。
 
-### Step 1: 事前チェック
-
-`artifact: spec` entry 有無判定（全 work_type 対象）、no-op 完了、旧形式 draft 後方互換
-
-### Step 2: SPEC artifact_actions 読込
-
-処理対象 entry（target、operation、content）確定
-
-### Step 3: 配置先解決
-
-既存パス vs `new:{slug}` / `target_spec` 構造化、`search-target-area.ts` による決定的判定
-
-### Step 4: SPEC 分離基準の最終確認
-
-安定契約例外の除外と follow-up 明示
-
-### Step 5: SPEC ファイル操作
-
-create（frontmatter `status: draft` 付き）/ update（target_area セクション置換、後方互換追記）、並列化（最大5件）、SPEC 宣言付与
-
-### Step 6: インデックス整合
-
-新規 SPEC の `docs/specs/README.md` 一覧登録（check-entry-existence 検証）
-
-### Step 7: SPEC 一覧整合確認
-
-targeted docs guard、extension 更新要否確認
-
-### Step 8: ドラフト status 更新
-
-SPEC 消費済みフラグ（commit 対象に含める）
-
-### Step 9: 変更範囲検証
-
-check-change-impact
-
-### Step 10: コミット・プッシュ
-
-明示パスステージ、`git commit -- <paths>`
-
-### Step 11: 完了報告
-
-保存した SPEC 一覧（新規/追記別）、スキップ有無、follow-up
-
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-spec-save` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
+- **STEP-1** 事前チェック
+- **STEP-2** SPEC artifact_actions 読込
+- **STEP-3** 配置先解決
+- **STEP-4** SPEC 分離基準の最終確認
+- **STEP-5** SPEC ファイル操作
+- **STEP-6** インデックス整合
+- **STEP-7** SPEC 一覧整合確認
+- **STEP-8** ドラフト status 更新
+- **STEP-9** 変更範囲検証
+- **STEP-10** コミット・プッシュ
+- **STEP-11** 完了報告
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-spec-save` が所有する。同 Workflow Skill は `/agentdev/spec-save` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 

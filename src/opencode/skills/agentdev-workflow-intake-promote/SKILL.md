@@ -24,23 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`�
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- intake-promote command の実行時 workflow 制御（全 STEP）
-- inbox 確認、item 読込、レビュー評価、暫定分類提示（classification）
-- adversarial-review 経路C の発動条件判定、review 呼出、accepted finding 反映（review）
-- 分類結果のユーザー提示、承認、確定（HITL）
-- 採用 item 整形、`.agentdev/intake/promoted/` への保存（persistence）
-- 振り分け（採用 inbox 削除、保留残置、reject 即時削除）、破壊的変更の明示承認、git 永続化、完了報告（destructive handling）
-
-## DO NOT USE FOR
-
-- GitHub Issue の作成（`/agentdev/case-open`）
-- RU 生成（`/agentdev/backlog-review`）
-- learning pipeline の入力生成、learning item の保存・分類・昇華（`/agentdev/learning-promote`）
-- inbox item の新規保存（`/agentdev/intake-capture`、`/agentdev/intake-from-github`）
-- work_type 判定、フェーズ定義（`agentdev-workflow-lifecycle`）
-
 ## 入力
 
 - intake-promote command から渡される intake item 群（`.agentdev/intake/inbox/` 内の Markdown ファイル）

@@ -24,31 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`）は�
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- req-save command の実行時 workflow 制御（全 STEP）
-- 事前チェック（REQ/Decision 対象 artifact_actions 有無判定、no-op 完了、旧形式 draft 後方互換）
-- ドラフト読込と読込時 commit hash 記録
-- REQ ファイル操作（CREATE/APPEND/UPDATE、決定的スクリプト呼出、QG-{N} 相当の適用結果整合性検証）
-- インデックス・ハブ更新、Decision ファイル作成と妥当性再検証
-- docs 変更整合性検証、README 索引影響確認（targeted docs guard、extension 更新要否確認）
-- 変更範囲検証、リモート同期と hash 検証
-- ドラフト status 更新（saved）、コミット・プッシュ（明示パス、ステータス commit 含む）
-- 複数 REQ/Decision ファイルの3フェーズ並列委譲モデル
-
-## DO NOT USE FOR
-
-- 要件doc 作成、壁打ち（`/agentdev/req-define`）
-- SPEC ファイル保存（`/agentdev/spec-save`、`agentdev-spec-file-manager`）
-- Issue 作成（`/agentdev/case-open`。req-save は Issue を作成しない）
-- REQ ファイル管理・採番ルール・判定ロジックの定義（`agentdev-req-file-manager`）
-- Decision ファイル管理・採番の定義（`agentdev-decision-file-manager`、`agentdev-decision-guidelines`）
-- 決定的検証スクリプトの所有と公開検証契約（`agentdev-artifact-validation`）
-- 要件内容の品質再検証（req-define の QG-{N} の責務）
-- commit message 規約の定義（`agentdev-conventional-commits`）
-- 並列実行安全ステージングの定義（`agentdev-git-worktree`）
-- intake/learning capture（例外: REQ 再構成 intake のみ生成可）
-
 ## 入力
 
 - `.agentdev/drafts/req-draft-{topic-slug}.md`（req-define で生成されたドラフト）

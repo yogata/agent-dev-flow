@@ -24,22 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-intake-from-github.ya
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- intake-from-github command の実行時 workflow 実行（全工程）
-- 期間指定・Issue/PR 番号指定の解釈とクローズ済み Issue/PR のデータ取得
-- 構造的検出、LLM 全文解析による残課題抽出、intake item 生成
-- `.agentdev/intake/inbox/` への保存、git 永続化、抽出サマリーレポート、完了報告
-
-## DO NOT USE FOR
-
-- GitHub Issue の作成（`/agentdev/case-open`）
-- 採用可否の判断、review、分類、振り分け（`/agentdev/intake-promote`）
-- learning item の保存、分類、昇華（`agentdev-learning-capture` skill、`/agentdev/learning-promote`）
-- Issue/PR へのコメント投稿、マーカー付与（`/agentdev/backlog-review`）
-- 手動入力からの intake item 保存（`/agentdev/intake-capture`）
-- work_type 判定、フェーズ定義（`agentdev-workflow-lifecycle`）
-
 ## 入力
 
 - intake-from-github command から渡されるユーザーの自然言語による期間指定（「直近1週間」「今月」「2026-05-02から」等）

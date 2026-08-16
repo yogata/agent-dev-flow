@@ -30,23 +30,10 @@ description: 既存Caseの本文更新、コメント追加、またはREQファ
 
 本コマンドは workflow 実装本体を `agentdev-workflow-case-update` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが4 STEP の control plane として制御構造を所有する。
 
-### Step 1: Issue番号解決
-
-ユーザー入力・セッション会話から番号取得（一覧取得禁止）
-
-### Step 2: 現在のIssue状態取得
-
-`agentdev-workflow-lifecycle` で現在フェーズを判定
-
-### Step 3: 更新内容に応じて分岐
-
-`--body`（テンプレート構造維持更新）/ `--comment`（コメント追加）/ `--req`（REQファイル更新、直接 commit+push）/ `--review-ng`（レビューNG専用フロー、QG-{N} 乖離検出結果引用）。APPEND vs UPDATE 判定基準と各フローの詳細は workflow skill 参照
-
-### Step 4: 完了報告
-
-更新種別に応じた種別を選択: `--body` → `.opencode/commands/agentdev/templates/case-update/body.md`、`--comment` → `.opencode/commands/agentdev/templates/case-update/comment.md`、`--req` → `.opencode/commands/agentdev/templates/case-update/req.md`、`--review-ng` → `.opencode/commands/agentdev/templates/case-update/review-ng.md`
-
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-case-update` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
+- **STEP-1** Issue番号解決
+- **STEP-2** 現在のIssue状態取得
+- **STEP-3** 更新内容に応じて分岐（`--body` / `--comment` / `--req` / `--review-ng`）
+- **STEP-4** 完了報告（更新種別に応じた `templates/case-update/` 配下のテンプレートを選択）
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-update` が所有する。同 Workflow Skill は `/agentdev/case-update` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 

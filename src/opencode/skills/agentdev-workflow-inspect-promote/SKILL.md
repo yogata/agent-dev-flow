@@ -24,26 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-promote.yaml`
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- inspect-promote command の実行時 workflow 制御（全 STEP）
-- 検出事項の分類（promote/defer/reject）と HITL 確定
-- 自動 promote（`--auto` 明示 opt-in 時のみ、fast path）
-- adversarial-review 経路B（暫定分類後・HITL 前の review 挿入）
-- promote/ reject/ defer 処理の実行（promoted/ 保存、即時削除、inbox 残置）
-- `.agentdev/inspect/`・`.agentdev/intake/` 配下の変更の commit/push、完了報告
-
-## DO NOT USE FOR
-
-- 検出事項の生成（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`）
-- docs 体系や Command/Skill の意味診断（各 inspect workflow）
-- 採用済み成果物の RU 化・統合・矛盾検出（`/agentdev/backlog-review`）
-- REQ/Decision/SPEC 変更、正規文書変更
-- Issue/PR 操作（`agentdev-gh-cli`）
-- worktree/branch 操作（`agentdev-git-worktree`）
-- adversarial-review の共通契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件）の定義（`agentdev-adversarial-review`）
-- 自動 promote 対象カテゴリ、投入先、誤検知 revoke 手順の定義（workflow-contracts SPEC、extension 経由で解決）
-
 ## 入力
 
 - `.agentdev/inspect/inbox/*.md`（検出事項ファイル群）

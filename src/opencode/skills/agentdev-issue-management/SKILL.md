@@ -14,24 +14,6 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
 SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
-## USE FOR
-
-- GitHub Issue の作成、更新、リンク、確認の安全手順
-- Issue 操作後の VERIFY 手順（内容反映確認）
-- Parent/Child Issue 間のリンク確認（`Parent: #N` パターン検証、双方向リンク確認）
-- Epic Issue のステータス追跡テーブル更新の安全手順
-- Issue 更新時の前後内容比較手順
-- Issue 内容検証手続き（`agentdev-gh-cli` VERIFY との連携）
-
-## DO NOT USE FOR
-
-- Epic/child Issue の作成順序、Wave スケジューリング → `case-open` command
-- Issue 本文の構造、テンプレート → `agentdev-workflow-templates`
-- RU ファイルの削除手順 → `agentdev-req-file-manager`
-- 完了報告テンプレート → `agentdev-workflow-templates`
-- work_type 判定、ラベル体系 → `agentdev-workflow-lifecycle`
-- gh CLI のエンコーディング、ファイル書き込み安全性の基本手順 → `agentdev-gh-cli`
-
 ## 対象コマンド
 
 | コマンド | 本スキルの利用目的 |

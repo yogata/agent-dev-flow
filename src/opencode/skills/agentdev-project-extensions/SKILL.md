@@ -15,9 +15,7 @@ extension の読み取り主体は Workflow Skill と Capability Skill である
 SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
-## 担当、非担当
-
-### 担当
+## 担当
 
 | 責務 | 内容 |
 |------|------|
@@ -26,14 +24,6 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | 5セクション読み取り | context/rules/checks/acceptance_gates/must_not の読み取り |
 | 上書きでないことの扱い | extension は追加・拡張であり、標準動作を置き換えない |
 | 委譲対象抽出 | rules/checks から project-local skill 委譲対象の抽出 |
-
-### DO NOT USE FOR
-
-- extension schema の定義（本機構を定義する基盤 SPEC の責務）
-- extension 構造の診断、検査（保守診断 command の責務）
-- 配布 command/skill 本文の変更
-- project-local skill の実装（各適用プロジェクトの責務）
-- extension 自体の作成、編集（プロジェクト側の責務）
 
 ## 標準配置
 

@@ -24,20 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-intake-capture.yaml`�
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- intake-capture command の実行時 workflow 実行（全工程）
-- ユーザーの手動入力の intake item 化（推奨標準形への整理、推測・補完の禁止）
-- intake item の `.agentdev/intake/inbox/` への保存、ファイル名生成、git 永続化、完了報告
-
-## DO NOT USE FOR
-
-- GitHub Issue の作成（`/agentdev/case-open`）
-- 採用可否の判断、review、分類、振り分け（`/agentdev/intake-promote`）
-- learning item の保存、分類、昇華（`agentdev-learning-capture` skill、`/agentdev/learning-promote`）
-- GitHub クローズ済み Issue/PR からの残課題抽出（`/agentdev/intake-from-github`）
-- work_type 判定、フェーズ定義（`agentdev-workflow-lifecycle`）
-
 ## 入力
 
 - intake-capture command から渡されるユーザーの自然言語による変更候補の記述

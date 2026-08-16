@@ -7,21 +7,6 @@ description: "日本語の技術文書・書籍原稿の文章規範。整形（
 
 日本語で技術的な原稿（書籍の章、記事、解説文）を書く・推敲するときは、以下の規範に従う。
 
-## USE FOR
-
-- 日本語で技術書の章、草稿、記事、解説文を執筆するとき
-- 日本語原稿を推敲・リライトするとき
-- 文章規範の適用（整形、段落と論証の構成、論証の厳密さ、読み手の負荷の管理、視点と語り、演出の抑制、LLM っぽい空句の禁止、冗長の排除）
-- `agentdev-doc-writing` が査読の実行入口とする執筆規範の原本を参照するとき（REQ-{NNNN}-{NNN}）
-
-## DO NOT USE FOR
-
-- 英語文書の執筆（本規範は日本語専用）
-- コード実装、テスト実行
-- REQ/ADR/SPEC の品質査読（→ `agentdev-doc-writing` が担当。本スキルは執筆規範の原本であり、査読ゲートではない）
-- 文書種別の配置基準、用語政策（→ `docs/specs/<responsibilities/document-type-responsibilities>.md`）
-- 要件分析、Decision 要否判定（→ `agentdev-req-analysis`、`agentdev-decision-guidelines`）
-
 ## 整形
 
 - 一文ごとに改行する。段落の区切りは空行で示す。

@@ -13,20 +13,6 @@ intake-from-github と intake-promote コマンドの知識ベース。
 SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
-## USE FOR
-
-- GitHub intake抽出ロジック: 期間解釈、データ取得、構造検出、LLM全文解析、intake item生成
-- intake-promote時のreview、分類、整形、振り分け基準
-- Inbox確認、Review観点、採用/保留/却下の分類判定
-- promoted/ への保存、Git永続化手順
-
-## DO NOT USE FOR
-
-- Issue作成: `agentdev-issue-management` を参照
-- RU生成: `agentdev-backlog-integration` を参照
-- REQ構造診断: `agentdev-req-structure-diagnostics` を参照
-- work_type判定: `agentdev-workflow-lifecycle` を参照
-
 ## 対象コマンド
 
 | コマンド | 目的 |

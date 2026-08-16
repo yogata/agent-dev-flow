@@ -24,30 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-req-define.yaml`）�
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- req-define command の実行時 workflow 制御（全 STEP）
-- セッションコンテキスト検知、明示入力ファイル・RU 自動検出（session由来RU 消費契約の適用）
-- 壁打ち対話と前工程からの引き継ぎ判定
-- 既存REQ照合（CREATE 前 APPEND/UPDATE 評価、定量的データ検証、SPLIT 予兆計測）
-- 要件展開（変更影響候補抽出、分類ゲート、文書分類妥当性検証、Decision要否確認ゲート、実行主体分類表、test strategy 定義）
-- Decision判断（Decision候補記録、番号指定形式）
-- 要件doc 生成（構造化 `draft-data`、operation_units、artifact_actions、test_strategy、review_dispositions）
-- work_type 判定・Scale 判断、adversarial-review 挿入境界（経路A）
-- ドラフト保存・要件doc確認・完了報告
-
-## DO NOT USE FOR
-
-- REQ/Decision ファイル保存、採番（`/agentdev/req-save`、`agentdev-req-file-manager`）
-- SPEC ファイル保存（`/agentdev/spec-save`、`agentdev-spec-file-manager`）
-- Issue 作成（`/agentdev/case-open`）
-- 要件分析の観点・Phase 詳細の定義（`agentdev-req-analysis`）
-- Decision要否判定基準（`agentdev-decision-guidelines`）
-- アーキテクチャ助言（`agentdev-architecture-advisory`）
-- work_type・Scale 判定基準の定義（`agentdev-workflow-lifecycle`）
-- 対論型レビュー自体の実行（`agentdev-adversarial-review`、経路Aで呼出のみ）
-- `.agentdev/drafts/**` 以外へのファイル編集
-
 ## 入力
 
 - ユーザーの自然言語による機能追加/バグ修正の説明

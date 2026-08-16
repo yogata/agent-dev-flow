@@ -24,34 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）は
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- case-auto command の実行時 workflow 制御（全 STEP）
-- 入力解決（JST 開始時刻記録、Issue番号/URL vs 要件doc モード分岐、draft-data 読取）
-- 工程分岐（artifact_actions ベース動的判定、auto_gate preflight）
-- orchestration stage モデル実行（stage 1 case-open / stage 2 case-run bg task 最大5件 / stage 3 case-close）
-- Wave 反復制御（case-auto 直接制御 AG-{NNN}、子Issue 並列インライン case-run 最大5件、委譲 → case-close(#epic)）
-- 停止条件検出（11項目）と停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）
-- bounded parent decision resolution（decision_context の限定的親判断解決、作業仮定、上位合意矛盾、新規ユーザー判断）
-- adversarial-review 経路H 停止伝播（受領、自走停止、ユーザー提示、resume point）
-- コンフリクト解消 Level 2/3（インライン case-run 再実行、オーケストレーション級判断）
-- 完了報告（L1 タイムスタンプ、4次元集約、OU処理ループ、bg task 破棄検知時の回復記録）
-
-## DO NOT USE FOR
-
-- 要件doc 作成、壁打ち（`/agentdev/req-define`）
-- REQ/Decision/SPEC ファイル保存（`/agentdev/req-save`、`/agentdev/spec-save`）
-- Issue 作成・execution contract 確定（`/agentdev/case-open`、`agentdev-workflow-case-open`）
-- Issue 実装・実行担当サブエージェント委譲（`/agentdev/case-run`、`agentdev-case-run-execution-adapter`）
-- PR マージ・Issue close・Capture 回収（`/agentdev/case-close`、`agentdev-workflow-case-close`）
-- work_type 判定・フェーズ定義（`agentdev-workflow-lifecycle`）
-- gh CLI I/O 手続き（`agentdev-gh-cli`）
-- Wave 構成・Epic 進捗追跡・Epic status table（`agentdev-epic-tracker`、Epic Issue 本文書き込みは case-close 単一書き手）
-- git worktree 操作（`agentdev-git-worktree`）
-- orchestration 詳細プロトコル・Subagent 委譲プロトコル（`agentdev-workflow-orchestration`）
-- adversarial-review 呼出（`agentdev-adversarial-review`、case-auto は直接起動せず経路H で伝播のみ受領）
-- bg task API、実行エージェント選定、context 管理、retry、heartbeat（harness 責務、本 workflow の対象外）
-
 ## 入力
 
 - case-auto command から渡される入力（Issue番号/URL、要件doc、明示パス、セッション指定キーワード）

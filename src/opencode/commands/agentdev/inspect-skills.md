@@ -57,13 +57,13 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 
 本コマンドは workflow 実装本体を `agentdev-workflow-inspect-skills` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として3工程の control plane を所有する。
 
-- **STEP-1** 診断対象の読込 — Command/ Skill 定義の把握（Command→Skill 参照、Skill frontmatter、本文構造、references 利用、template/ script 参照）
-- **STEP-2** 診断観点の評価・分類・route 提示 — 参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存の評価、配布物構文健全性・責務整合診断、診断分類ラベル付与、推奨 route 提示（修正は実行しない）
-- **STEP-3** 検出事項出力・永続化・完了報告 — inbox 出力、実行前同期、`.agentdev/inspect/` commit/push、完了報告
+- **STEP-1** 診断対象の読込
+- **STEP-2** 診断観点の評価・分類・route 提示
+- **STEP-3** 検出事項出力・永続化・完了報告
 
-各工程の詳細は `agentdev-workflow-inspect-skills` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
+同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
 
-**共通ルール**（全工程適用、詳細は workflow skill 参照）: エラー処理（対象ファイル不存在時は空扱い警告、読込失敗時はスキップ警告、参照先 Skill 不存在時は検出事項として報告）
+**共通ルール**（全工程適用）: エラー処理（対象ファイル不存在時は空扱い警告、読込失敗時はスキップ警告、参照先 Skill 不存在時は検出事項として報告）
 
 ## ガードレール
 

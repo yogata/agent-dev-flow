@@ -24,32 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`）�
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- case-close command の実行時 workflow 制御（全 STEP）
-- 単一 Issue クローズフロー（STEP-1〜STEP-6、STEP-1-1 重複ファイルチェックを含む）
-- Epic Wave クローズフロー（STEP-E1〜E6、子Issue 一括マージ・クローズ、Epic status table 更新）
-- QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新、観点8 PR対象範囲 vs 全体）
-- docs 検証・SPEC 確定（targeted docs guard、IR-{NNN} check_extensions.ts、SPEC status 昇格）
-- PR マージ（squash merge、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）
-- Capture 回収（PR 本文 → intake/ learning 分離、Capture 境界準拠）
-- クリーンアップ（worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、学び検知、永続化、完了報告）
-
-## DO NOT USE FOR
-
-- 要件doc 作成、壁打ち（`/agentdev/req-define`）
-- REQ/Decision/SPEC ファイル保存（`/agentdev/req-save`、`/agentdev/spec-save`）
-- Issue 作成（`/agentdev/case-open`）
-- Issue 実装、実行担当サブエージェント委譲（`/agentdev/case-run`）
-- case-auto 自走 orchestration、Wave 反復制御、コンフリクト Level 2/3 解消（`/agentdev/case-auto`）
-- work_type 判定、フェーズ定義（`agentdev-workflow-lifecycle`）
-- gh CLI I/O 手続き、VERIFY（`agentdev-gh-cli`）
-- QG-4 検査規則の定義、観点8 判定マトリクス（`agentdev-quality-gates`）
-- Epic 進捗追跡ロジック、Wave スケジューリング（`agentdev-epic-tracker`）
-- SPEC ファイル管理、target_area、spec-lifecycle-application 詳細（`agentdev-spec-file-manager`）
-- git worktree 操作、rebase、mergeable UNKNOWN ポーリング手続きの詳細（`agentdev-git-worktree`）
-- 学び検知・capture pipeline（`agentdev-learning-capture` / `agentdev-learning-pipeline` / `agentdev-intake-pipeline`）
-
 ## 入力
 
 - case-close command から渡される Issue 番号（単一 Issue または Epic Issue）

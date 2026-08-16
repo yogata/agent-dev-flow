@@ -24,27 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-update.yaml`）�
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- case-update command の実行時 workflow 制御（全 STEP）
-- Issue番号解決（ユーザー入力・セッション会話から。一覧取得禁止）
-- 現在のIssue状態取得とフェーズ判定
-- 更新種別分岐（`--body` / `--comment` / `--req` / `--review-ng`）と更新種別推論
-- Issue本文更新（テンプレート構造維持、【必須】セクション検査）
-- コメント追加、REQファイル更新（APPEND vs UPDATE 判定、直接 commit+push）
-- レビューNG専用フロー（QG-{N} 乖離検出結果の引用、乖離タイプ分類、推奨アクション）
-
-## DO NOT USE FOR
-
-- Issue 実装、実行担当サブエージェント委譲、CI/CD修正、自律修正ループ（`/agentdev/case-run`）
-- PR マージ、Issue close、完了条件チェックボックス評価（`/agentdev/case-close`）
-- 要件doc 作成（`/agentdev/req-define`）
-- REQ 保存の正式工程（`/agentdev/req-save`。`--req` は req-save への委譲を行わず直接 commit+push を行う）
-- レビュー拒否タイプ分類・次コマンド推論規則の定義（`agentdev-workflow-routing`）
-- Issue/PR テンプレート選定規則の定義（`agentdev-workflow-templates`）
-- gh CLI I/O 手続き、VERIFY（`agentdev-gh-cli`）
-- work_type 分岐判定基準の定義（`agentdev-workflow-lifecycle`）
-
 ## 入力
 
 - Issue番号
