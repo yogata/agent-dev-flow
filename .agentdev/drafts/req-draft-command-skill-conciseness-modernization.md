@@ -35,12 +35,12 @@ spec_save:
     ACT-SPEC-001: "docs/specs/skills/agentdev-skill-authoring.md「skill authoring 段階的開示基準」セクション置換（層1〜3 skill 記述基準へ改題）"
     ACT-SPEC-002: "docs/specs/skills/agentdev-skill-authoring.md「Workflow Skill Soft Guard（REQ-027-002）」セクション置換（簡潔トリガー項方式へ）"
     ACT-SPEC-003: "docs/specs/skills/agentdev-command-authoring.md「command authoring 基準」セクション置換（層1〜3適用へ改題）"
-    ACT-SPEC-004: "docs/specs/authoring/command-file-format.md「手順セクション形式」セクション置換（前出出力検証表・ガードレール番号・機械検査対象の3節を含む）"
-    ACT-SPEC-005: "skip: workflow-skill-model.md に target_area「## thin Command workflow 節」の見出し未検出（search-target-area.ts matches 空、実在見出しは「### thin Command の workflow 節標準構造」）。target_area を実在見出しへ修正のうえ再実行を推奨"
+    ACT-SPEC-004: "docs/specs/authoring/command-file-format.md「手順セクション形式」セクション置換（前出出力検証表・ガードレール番号・機械検査対象の3節を含む）。follow-up で旧節（ガードレール番号・機械検査対象）を正規見出しへマージし改定サフィックス解消（merged-canonical、旧検出テーブル削除、thin Command モデル検査サブセクションは保持）"
+    ACT-SPEC-005: "applied via follow-up（case-auto orchestrator による bounded parent decision resolution、実在見出し宛てに再指定）: workflow-skill-model.md「### thin Command の workflow 節標準構造」所有権文更新 + 「## soft guard の二層様式」Skill 層行の簡潔トリガー項化と禁止文追加 + frontmatter updated: 2026-08-16"
   notes:
-    - "全 target_area は search-target-area.ts で単一マッチを確認後に置換（ACT-SPEC-005 を除く）"
-    - "frontmatter へ spec_logical_division / canonical_owner 宣言を補完（3ファイルとも cross_cutting_contract）"
-    - "command-file-format.md の旧「## ガードレール番号」「## 機械検査対象」節は target_area 範囲外のため残存。旧節の置換・廃止は follow-up"
+    - "全 target_area は search-target-area.ts で単一マッチを確認後に置換。ACT-SPEC-005 は当初 matches 空で skip、follow-up で orchestrator 指定の実在見出し（### thin Command の workflow 節標準構造、## soft guard の二層様式）宛てに適用（見出し存在は search-target-area.ts で確認済み）"
+    - "frontmatter へ spec_logical_division / canonical_owner 宣言を補完（4ファイルとも cross_cutting_contract。workflow-skill-model.md は既存宣言を維持）"
+    - "command-file-format.md の旧「## ガードレール番号」「## 機械検査対象」節は follow-up で正規見出しへ統合済み（旧 Step 0 / 非連番 / ゼロ起点 / numbered list / G01 形式検出テーブルは draft の移行 bullet により superseded として削除、thin Command モデル検査サブセクションと非検出対象注記は保持）"
 
 agreed_items:
   - id: AG-001
@@ -263,9 +263,10 @@ operation_units:
           - docs/specs/skills/agentdev-skill-authoring.md
           - docs/specs/skills/agentdev-command-authoring.md
           - docs/specs/authoring/command-file-format.md
-        applied_actions: [ACT-SPEC-001, ACT-SPEC-002, ACT-SPEC-003, ACT-SPEC-004]
-        skipped_actions: [ACT-SPEC-005]
-        outcome: "ACT-SPEC-001〜004 適用済み（target_spec 4ファイルのうち3ファイルを更新、status 不変）。ACT-SPEC-005 は target_area 未検出で skip、workflow-skill-model.md は未更新。機械検査規則追加実装は未実施"
+          - docs/specs/workflows/workflow-skill-model.md
+        applied_actions: [ACT-SPEC-001, ACT-SPEC-002, ACT-SPEC-003, ACT-SPEC-004, ACT-SPEC-005]
+        skipped_actions: []
+        outcome: "ACT-SPEC-001〜004 を適用後、follow-up（orchestrator 作業仮定）で ACT-SPEC-005 を実在見出し宛てに適用し ACT-SPEC-004 旧節を正規見出しへマージ。target_spec 4ファイルすべて更新済み、status 不変。機械検査規則追加実装は未実施"
   - ou_id: OU-002
     source_ru: RU-0018
     target_req: null

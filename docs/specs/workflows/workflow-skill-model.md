@@ -2,7 +2,7 @@
 title: Workflow Skill Model
 status: draft
 created: 2026-08-10
-updated: 2026-08-15
+updated: 2026-08-16
 spec_logical_division: cross_cutting_contract
 canonical_owner: workflow-skill-model
 ---
@@ -33,7 +33,7 @@ thin Command の workflow 節は次の3要素で構成する。
 
 thin Command の workflow 節の順序ラベルは `### Step N` 形式に統一する。
 Workflow Skill 本文（SKILL.md、references/）の工程識別子は実番号形式（`STEP-1` 等）を用い、Command 定義の順序ラベルとは形式を区別して使い分ける。
-様式の統一基準、記述量の基準といった執筆詳細は `authoring/command-file-format.md` が正規所有し、本節は workflows 側の構成契約のみを記録する。
+公開順序の要約の記述様式（前出出力検証表等）は `authoring/command-file-format.md` が正規所有する。詳細工程は Workflow Skill 側 STEP reference が所有し、本節は workflows 側の構成契約のみを記録する。
 
 ## Workflow Skill 責務
 
@@ -243,8 +243,10 @@ Workflow Skill の単独起動防止（soft guard）は OpenCode 1.18.15 が ski
 
 | 層 | 実装 | 全 Workflow Skill での実装有無 |
 |---|---|---|
-| Skill 層 | Workflow Skill description の DO NOT USE FOR トリガー（「単独起動を行わない」旨） | 全16 Workflow Skill で実装（実効の主層） |
+| Skill 層 | Workflow Skill description の DO NOT USE FOR に置く簡潔なトリガー項（「単独起動（対応する /agentdev/* コマンド経由で利用すること）」） | 全16 Workflow Skill で実装（実効の主層） |
 | Command 層 | command 定義本文 workflow 節の soft guard 宣言節（grep 可能な `soft guard` マーカー） | core 8 Command（req-define、req-save、spec-save、case-open、case-run、case-update、case-close、case-auto）と inspect 3 Command（inspect-docs、inspect-skills、inspect-promote）で実装。intake / learning / backlog 5 Command（intake-capture、intake-from-github、intake-promote、learning-promote、backlog-review）は command 定義本文に宣言節を持たず、Skill 層のみで実効する |
+
+マーカー語、内部 ID、運用規則の散文は description に置かない。
 
 command 定義本文に宣言節を持たない構成でも Skill 層の DO NOT USE FOR トリガーにより soft guard は実効する。
 Command SPEC の delegated responsibility 記述は、当該 command の実効層構成（二層または Skill 層のみ）を反映する。

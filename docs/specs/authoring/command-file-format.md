@@ -49,18 +49,21 @@ extension はフロントマタ（`version: 1`, `kind:`（公式3値: workflow-e
 schema 詳細は SPEC `../foundations/project-extensions.md` 参照。
 旧 kind（command-extension / skill-extension）は廃止済みであり、検出時は migration-required として停止する。
 
-## 手順セクション形式（改定）
+## 手順セクション形式
 
 手順セクションは `### Step N` 見出しの逐次列挙に代え、各工程を前提条件・出力契約・検証基準の表形式（前得出出力検証表）で記述する。
 推奨順は表または順序ラベルで保持する。Workflow Skill 側の STEP resume point（references/）はこの限りではない。
 
-## ガードレール番号（改定）
+## ガードレール番号
 
+ガードレール番号は `G` + ゼロ埋め2桁（`G01`, `G02`, ..., `G99`）形式に統一する。
 G 番号は硬い境界（課金・認証・破壊的操作、state 破壊等の否定規則）に限定して付番する。
 工程上の選好は肯定形の不変条件として本文へ集約し、G 番号を付さない。
 変換時は変換対照表（変換前 G 番号から変換後所在）を成果物として保持する。
 
-## 機械検査対象（更新）
+## 機械検査対象
+
+`/repo/docs-check` が検出する機械判定可能な違反。
 
 - description 文字数: 単体 600 超過と OpenCode 仕様 1024 超過は検証不通過、合計 平均 350×N 超過は warn（N は実ファイル数から算出）
 - description 内マーカー語（`soft guard`、`直接起動`）と内部 ID の検出（検証不通過）
@@ -68,6 +71,22 @@ G 番号は硬い境界（課金・認証・破壊的操作、state 破壊等の
 - 全 Workflow Skill description への簡潔トリガー項（単独起動 + /agentdev/* コマンド経由）存在の肯定検証（欠落時検証不通過）
 - 300 行超 references ファイルの目次存在検出（欠落時検証不通過）
 - 従来の Step 0 検出・非連番検出・numbered list 主手順検出は前出出力検証表様式への移行に合わせて更新または廃止する
+
+### thin Command モデル検査（公開 /agentdev/* Command 対象）
+
+公開 `/agentdev/*` Command について以下を検査対象に追加する。
+`/repo/*` Command は従来検査を維持し、公開 `/agentdev/*` Command と checker 上で区別する。
+
+| 検出項目 | 対象 |
+|----------|------|
+| Workflow Skill dispatch 不存在 | 公開 Command が Workflow Skill への dispatch を持たない |
+| workflow 手順本体の重複残存 | Command 本文に Workflow Skill が所有すべき workflow 手順が機械判定可能な形で残存する |
+| Capability Skill 内部 reference 直接依存 | Command 本文から Skill の references/* 等の内部パスへの直接参照 |
+
+意味的重複（soft contract 判断）は `/agentdev/inspect-skills` が所有する。
+機械検査は構造的に判定可能な項目のみを対象とする。
+
+> **非検出対象（許容形式）**: `**EN.**` lettered prefix（代替フロー内サブステップ表現）は主手順の Step 番号連番とは独立した番号空間を持つため、上記検出項目のいずれにも該当しない。
 
 ## 代替フロー内サブステップ表現
 
@@ -91,38 +110,6 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 
 - `**EN.**` 形式は代替フロー専用であり、主手順の Step 表現として使用しない（主手順は `### Step N: タイトル` 見出しを必ず使用する）
 - 後述「機械検査対象」で `**EN.**` 形式は違反として検出しない（主手順の Step 番号連番とは独立した番号空間のため）
-
-## ガードレール番号
-
-ガードレール番号は `G` + ゼロ埋め2桁（`G01`, `G02`, ..., `G99`）形式に統一する。
-
-## 機械検査対象
-
-`/repo/docs-check` が検出する機械判定可能な違反。
-
-| 検出項目 | 対象 |
-|----------|------|
-| `Step 0` の使用 | `### Step 0` 見出し、または本文中の `Step 0` 参照 |
-| 非連番 Step 番号 | `## 手順` 配下の Step 番号が連続していない（飛び番） |
-| ゼロ起点サブステップ | `Step N-0` 形式のサブステップ |
-| numbered list 主手順 | `## 手順` 直下の numbered list による手順記述 |
-| `G01` 形式以外のガードレール番号 | `G` + ゼロ埋め2桁に一致しないガードレール識別子 |
-
-### thin Command モデル検査（公開 /agentdev/* Command 対象）
-
-公開 `/agentdev/*` Command について以下を検査対象に追加する。
-`/repo/*` Command は従来検査を維持し、公開 `/agentdev/*` Command と checker 上で区別する。
-
-| 検出項目 | 対象 |
-|----------|------|
-| Workflow Skill dispatch 不存在 | 公開 Command が Workflow Skill への dispatch を持たない |
-| workflow 手順本体の重複残存 | Command 本文に Workflow Skill が所有すべき workflow 手順が機械判定可能な形で残存する |
-| Capability Skill 内部 reference 直接依存 | Command 本文から Skill の references/* 等の内部パスへの直接参照 |
-
-意味的重複（soft contract 判断）は `/agentdev/inspect-skills` が所有する。
-機械検査は構造的に判定可能な項目のみを対象とする。
-
-> **非検出対象（許容形式）**: `**EN.**` lettered prefix（代替フロー内サブステップ表現）は主手順の Step 番号連番とは独立した番号空間を持つため、上記検出項目のいずれにも該当しない。
 
 ## command SPEC と command 定義の対応付け
 
