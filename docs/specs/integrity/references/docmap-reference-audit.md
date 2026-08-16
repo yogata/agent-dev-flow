@@ -1,7 +1,7 @@
 # integrity DOC-MAP 参照個別生死判定監査
 
-> 本ファイルは REQ-013-020 が要求する integrity スクリプト群の DOC-MAP 参照45件（実測: 行レベル109件、論理ユニット51件）の個別生死判定結果を保持する。
-> `docs/DOC-MAP.md` は REQ-013-001（PR #1953/#1958）で除去済みであり、本監査は残存参照の除去優先度整備を目的とし、除去作業そのものは後続 Issue が担う。
+> 本ファイルは REQ-013-020 が要求する integrity スクリプト群の DOC-MAP 参照45件（実測: 行レベル109件、論理ユニット51件）の個別生死判定結果を保持する。REQ-013 は docs/requirements/retired/REQ-013.md（status: migrated）へ移行済みであり、後継は REQ-012 と本監査記録である。
+> `docs/DOC-MAP.md` は REQ-013-001（PR #1953/#1958）で除去済みであり、本監査は残存参照の除去優先度整備を目的とし、除去作業そのものは後続 Issue が担う。本ファイル本文中の REQ-013-NNN 行 ID 参照は監査根拠の特定のため履歴文脈付きで維持する。
 
 ## 目的
 
@@ -608,7 +608,7 @@ Phase は 1（高）〜 3（低）の 3 段階を基本とし、必要に応じ�
 
 ## 関連情報
 
-- 根拠 REQ: [REQ-013](../../../requirements/REQ-013.md)（REQ-013-020）
+- 根拠 REQ: [REQ-013](../../../requirements/retired/REQ-013.md)（REQ-013-020、docs/requirements/retired/ へ移行済み。後継: REQ-012 と本監査記録）
 - DOC-MAP 本体除去: PR #1953、PR #1958
 - 親 Epic: #1992
 - 本 Issue: #1996
