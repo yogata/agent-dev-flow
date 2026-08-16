@@ -66,7 +66,7 @@ REQ 文書の各セクションが保持すべき内容の契約（REQ-004-006, 
 | ワークフロー全体 REQ | 開発ワークフロー、コマンド間データフロー、work_type 分類、SSoT 遷移 | REQ-005 |
 | コマンド級 REQ | 公開コマンドの入力、出力、副作用境界、停止条件、他コマンドとの接続 | REQ-004, REQ-008, REQ-006 |
 | 成果物、実行時、スキル責務 REQ | Command/Skill/Template/Script の責務境界、配布制約、原本、配置先分離 | REQ-002, REQ-003 |
-| 検証、検査 REQ | 整合性検査、検出事項分類、docs-check、inspect-docs の検査責務 | REQ-010, REQ-010 |
+| 検証、検査 REQ | 整合性検査、検出事項分類、docs-check、inspect-docs の検査責務 | REQ-010, REQ-036 |
 | Decision ライフサイクル REQ | Decision 状態の正規化、Decision 運用品質維持 | REQ-001 |
 
 ### コマンド級 REQ 定義

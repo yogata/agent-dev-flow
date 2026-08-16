@@ -133,7 +133,7 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 ### IR-045: （削除）docs 日本語表現、文意整合検査
 
 > **削除済み（REQ-010-255/256, REQ-010-262）**: IR-045 の検査は docs-check の機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲した。
-> docs-check は意味判断を要する文意整合検査を保持しない（機械化原則 REQ-010-056/254/261/262）。
+> docs-check は意味判断を要する文意整合検査を保持しない（機械化原則 REQ-010-003、REQ-036-008）。
 > catalog↔実装双方向同期運用手順（REQ-010-003）に従い baseline_status: resolved の上で本エントリを削除した。
 > IR-045 識別子は REQ-010-255/256、`vocabulary-registry.md`「文意品質検出対象語（IR-045）」で文意品質検出対象語の参照として残る。
 > 新規検出時の復活運用（REQ-010-003）に従い、必要に応じて docs-check 検出対象への復活を検討する。
@@ -294,7 +294,7 @@ checkWorkflowStatusProhibition
 
 | バックエンド | 適用範囲 | 根拠 |
 |--------------|----------|------|
-| `check_integrity.ts`（docs-check + IR ルール） | REQ/SPEC/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft SPEC 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-010-056/254/261/262、REQ-002-079/080/081） |
+| `check_integrity.ts`（docs-check + IR ルール） | REQ/SPEC/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft SPEC 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-010-003、REQ-036-008、REQ-002-079/080/081） |
 | inspect-* skills（inspect-docs / inspect-skills） | 配布物整合性検査（REQ-002-006/007）。構文健全性の重複検出、文意保持の意味解析、責務説明照合など意味判断を含む診断 | 意味的診断層。詳細は [docs-spec-rebuild-integrity.md](docs-spec-rebuild-integrity.md)「検査バックエンド責務分担」参照 |
 
 **配布物整合性検査（REQ-002-006/007: 文意保持・構文健全性・責務整合などの意味的観点）は `check_integrity.ts` に追加せず、inspect-* skills に集約する**。

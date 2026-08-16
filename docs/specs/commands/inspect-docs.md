@@ -116,6 +116,6 @@ consumer 環境に対応 node type または relation type が存在しない場
 - [inspect-promote.md](inspect-promote.md)（検出事項分類、昇格）
 - `agentdev-workflow-inspect-docs` skill（workflow 実装本体（工程構成、冪等性、終了条件））
 - `agentdev-req-structure-diagnostics` skill（REQ 構造検査ロジック）
-- REQ-010（inspect-docs / REQ 再構成運用）
-- REQ-010（inspect-* 検出コマンド群）
+- REQ-036（inspect-docs / REQ 再構成運用）
+- REQ-036（inspect-* 検出コマンド群）
 

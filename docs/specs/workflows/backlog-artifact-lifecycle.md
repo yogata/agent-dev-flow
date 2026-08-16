@@ -232,7 +232,7 @@ README 索引と基準（REQ/Decision/SPEC）が矛盾する場合、基準を�
 
 ## REQ 再構成検出
 
-REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成intakeとして保存する（REQ-010）。
+REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成intakeとして保存する（REQ-037）。
 
 ### 検知カテゴリ
 
@@ -284,5 +284,5 @@ one-time 成果物（監査台帳、照合表、一時分析ファイル等）�
 - 各 command SPEC（`docs/specs/commands/`）
 - `agentdev-backlog-integration` skill（採用済み成果物の統合、RU 生成）
 - REQ-008（RU lifecycle）
-- REQ-010（REQ 再構成 intake）
+- REQ-037（REQ 再構成 intake）
 - REQ-008（構造化 req_draft 契約）

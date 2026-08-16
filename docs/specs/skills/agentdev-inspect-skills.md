@@ -54,6 +54,6 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - [agentdev-skill-authoring.md](agentdev-skill-authoring.md)
 - [agentdev-command-authoring.md](agentdev-command-authoring.md)
 - [agentdev-gh-cli.md](agentdev-gh-cli.md)（gh 直接記述の検出スコープ）
-- REQ-010（inspect-skills / Command/Skill 参照妥当性検出）
+- REQ-036（inspect-skills / Command/Skill 参照妥当性検出）
 - REQ-011（`agentdev-gh-cli` 手続き委譲基盤）
 

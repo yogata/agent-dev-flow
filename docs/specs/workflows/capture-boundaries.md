@@ -136,7 +136,7 @@ capture 本文は完了報告に含めない。
 
 ## REQ 再構成 intake
 
-通常intakeとは独立した配置規約（REQ-010）。
+通常intakeとは独立した配置規約（REQ-037）。
 
 | 状態 | パス |
 |---|---|
@@ -163,4 +163,4 @@ req-define の明示入力としてルーティングする（backlog-review 経
 - `agentdev-workflow-orchestration` skill（capture 境界の詳細）
 - `agentdev-learning-capture` skill、`agentdev-intake-pipeline` skill（capture 成果物の生成委譲先）
 - REQ-006（Case実行オーケストレーション / Epic、Wave、各工程分散型 capture 責務 REQ-006-021/105〜108）
-- REQ-010（REQ 再構成 intake）
+- REQ-037（REQ 再構成 intake）
