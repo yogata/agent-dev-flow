@@ -31,27 +31,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-docs.yaml`）
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- inspect-docs command の実行時 workflow 制御（全工程）
-- スキャン対象の収集（docs/ 配下、README.md、`.opencode/`）
-- REQ 体系意味診断（参照ID整合性、第一参照導線、現行/廃止/世代境界、6観点 structure review、文書分類一貫性）
-- 文書種別別意味診断（SPEC、Decision、guides、README 索引）
-- 配布物整合性検査（構文健全性、文意保持、責務整合）
-- docs-check route 判定、未処理 artifact 確認
-- 検出事項の inbox 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告
-
-## DO NOT USE FOR
-
-- 検出事項の分類・採用・処分（promote/defer/reject）（`/agentdev/inspect-promote`）
-- Command/Skill 参照妥当性診断、Skill 構造診断（`/agentdev/inspect-skills`、`agentdev-inspect-skills`）
-- 決定的検査・機械的検査の実行、検査ルールの定義（docs-check 等の機械検査レイヤ、決定的検証スクリプト）
-- 診断対象（docs/、`.opencode/`）のファイル直接修正
-- REQ/Decision/SPEC ファイル保存（`/agentdev/req-save`、`/agentdev/spec-save`）
-- Issue/PR 作成・更新（`agentdev-gh-cli`）
-- worktree/branch 作成（`agentdev-git-worktree`）
-- intake/learning/RU 処理（`/agentdev/intake-promote` 等）
-
 ## 入力
 
 - なし（実行時に全対象成果物を自動スキャン）

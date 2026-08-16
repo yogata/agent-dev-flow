@@ -35,37 +35,15 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 
 本コマンドは workflow 実装本体を `agentdev-workflow-case-close` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP（+ Epic Wave クローズ E1〜E6）の control plane として制御構造を所有する。
 
-### Step 1: Issue 番号解決・ルーティング
+- **STEP-1** Issue 番号解決・ルーティング
+- **STEP-2** QG-{N} 達成判定
+- **STEP-3** docs 検証・SPEC 確定
+- **STEP-4** PR マージ・コンフリクト解消
+- **STEP-5** Post-merge・Issue クローズ
+- **STEP-6** クリーンアップ・Capture 回収・永続化
+- **STEP-E1〜E6** Epic Wave クローズ（Epic Issue 番号入力時のみ）
 
-ユーザー入力・セッション会話から番号取得、Epic Issue 判定（ステータス追跡テーブル存在時は Epic Wave ルートへ）、単一 Issue ルートでは重複ファイルチェック（merge/pull 実行前）
-
-### Step 2: QG-{N} 達成判定
-
-完了条件チェックボックス評価・更新（case-close 専任責務）、観点8 PR対象範囲 vs 全体 評価スコープ判定、test strategy 処理完了確認
-
-### Step 3: docs 検証・SPEC 確定
-
-機能追加・共通検証、targeted docs guard（`--workflow case-close --files`）、IR-{NNN} check_extensions.ts、SPEC 確定フロー（昇格 / spec-save 提案 / 見送り）
-
-### Step 4: PR マージ・コンフリクト解消
-
-mergeable UNKNOWN ポーリング、squash merge、先行 commit 検出（REQ）、コンフリクト Level 1 rebase パス（実装変更せず rebase のみ、Level 2/3 は case-auto エスカレーション）、`--delete-branch` 使用禁止
-
-### Step 5: Post-merge・Issue クローズ
-
-CI 通過確認、Issue 本文更新、Issue close（理由: completed）
-
-### Step 6: クリーンアップ・Capture 回収・永続化
-
-worktree/branch 削除（隔離 worktree のみ `git checkout .` 可、main worktree は禁止）、親Epic 自動クローズ判定（全子Issue CLOSED）、実行前同期（重複ファイルチェック再実行、git main 同期リスク事前検出）、学び検知（エージェント自律）、Capture 回収（PR 本文→intake/learning 分離、Epic 横断回収）、`.agentdev/` commit/push、完了報告（結果状態の分離報告）
-
-**Step E1〜E6: Epic Wave クローズ（Epic Issue 番号入力時のみ）**
-
-現在 Wave の PR作成済み子Issue を一括マージ・クローズ、Epic status table 更新（単一書き手 case-close のみ）、最終 Wave 判定（全子Issue completed → Epic クローズ、以外は残 Wave 通知）
-
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-case-close` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
-
-**共通ルール**（全 STEP 適用、詳細は workflow skill 参照）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、コメントテンプレート選定・準拠（`agentdev-workflow-templates` の選定ルール、【必須】セクション確認、欠落時は再生成）
+**共通ルール**（全 STEP 適用）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、コメントテンプレート選定・準拠（`agentdev-workflow-templates` の選定ルール、【必須】セクション確認、欠落時は再生成）
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-close` が所有する。同 Workflow Skill は `/agentdev/case-close` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 

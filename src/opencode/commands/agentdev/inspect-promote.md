@@ -38,18 +38,18 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 本コマンドは workflow 実装本体を `agentdev-workflow-inspect-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは finding disposition（分類・採用・保留・却下）を独立 resume point とする8 STEP の control plane を所有する。durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から会話記憶に依存せず再開できる。
 
-- **STEP-1** 実行前同期 — `git pull --ff-only`（失敗時は git-error-messages template で停止）
-- **STEP-2** inbox スキャン — `.agentdev/inspect/inbox/*.md` 読込（空時は「対象なし」で終了）
-- **STEP-3** 検出事項分類（暫定分類） — promote/ defer/ reject 判定と根拠の確定（finding disposition 入口 resume point）
-- **STEP-4** 自動 promote（`--auto` opt-in 時のみ、fast path） — 高確信度検出事項を `.agentdev/intake/promoted/` へ投入、auto-promote-log 記録
-- **STEP-5** adversarial-review（経路B） — 挿入境界（暫定分類後・HITL 前）での発動条件判定と review 呼出、結果反映、unresolved 停止
-- **STEP-6** HITL 確定（手動分類対象） — 分類結果を提示し、ユーザー承認を得る
-- **STEP-7** 処理実行（promote / reject / defer） — promoted/ 保存 + inbox 削除、即時削除（却下理由を commit message に含める）、inbox 残置（出口 resume point）
-- **STEP-8** 完了報告・永続化 — 判定結果と後続 route の報告、`.agentdev/` 変更の commit/push
+- **STEP-1** 実行前同期
+- **STEP-2** inbox スキャン
+- **STEP-3** 検出事項分類（暫定分類）
+- **STEP-4** 自動 promote（`--auto` opt-in 時のみ、fast path）
+- **STEP-5** adversarial-review（経路B）
+- **STEP-6** HITL 確定（手動分類対象）
+- **STEP-7** 処理実行（promote / reject / defer）
+- **STEP-8** 完了報告・永続化
 
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-inspect-promote` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
+同スキルは本コマンドの工程経由でのみ利用し、単独の skill 起動は soft guard（REQ-{NNNN}-{NNN}）で抑制する。
 
-**共通ルール**（全 STEP 適用、詳細は workflow skill 参照）: エラー処理（inbox 空時は「対象なし」終了、読込失敗時はスキップ警告、全件 defer 時は残置報告、push 失敗時は停止）
+**共通ルール**（全 STEP 適用）: エラー処理（inbox 空時は「対象なし」終了、読込失敗時はスキップ警告、全件 defer 時は残置報告、push 失敗時は停止）
 
 ## ガードレール
 

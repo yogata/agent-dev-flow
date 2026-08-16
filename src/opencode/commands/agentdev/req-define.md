@@ -36,51 +36,17 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 
 本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが11 STEP の対話型 control plane として制御構造を所有する。
 
-### Step 1: セッションコンテキスト検知・入力解決
-
-6項目推論（信頼度付き）、明示入力ファイル・RU 自動検出、session由来RU 消費契約
-
-### Step 2: 壁打ち対話
-
-深掘り、前工程からの引き継ぎ判定（`agentdev_handoff`）
-
-### Step 3: 既存REQ照合
-
-CREATE 前 APPEND/UPDATE 評価、定量的データ検証、SPLIT 予兆計測
-
-### Step 4: 要件展開
-
-変更影響候補抽出、分類ゲート、Decision要否確認ゲート、test strategy 定義
-
-### Step 5: Decision判断
-
-Decision判断記録（`new:{topic-slug}`、ファイル作成は req-save）
-
-### Step 6: 要件doc生成
-
-構造化 `draft-data`（operation_units、artifact_actions、test_strategy、review_dispositions）
-
-### Step 7: work_type・Scale 判定
-
-4値分類、feature のみ standard/large
-
-### Step 8: adversarial-review（経路A）
-
-default-on、skip 条件該当時は省略、ユーザー明示指定時は強制発動
-
-### Step 9: ドラフト保存
-
-`.agentdev/drafts/req-draft-{topic-slug}.md` へ保存
-
-### Step 10: 要件doc確認
-
-ユーザーに提示（承認は求めず提示のみ）
-
-### Step 11: 完了報告
-
-work_type・scale 別種別の選択（`templates/req-define/` 配下）
-
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-req-define` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
+- **STEP-1** セッションコンテキスト検知・入力解決
+- **STEP-2** 壁打ち対話
+- **STEP-3** 既存REQ照合
+- **STEP-4** 要件展開
+- **STEP-5** Decision判断
+- **STEP-6** 要件doc生成
+- **STEP-7** work_type・Scale 判定
+- **STEP-8** adversarial-review（経路A）
+- **STEP-9** ドラフト保存
+- **STEP-10** 要件doc確認
+- **STEP-11** 完了報告
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-req-define` が所有する。同 Workflow Skill は `/agentdev/req-define` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 

@@ -31,26 +31,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-skills.yaml`�
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- inspect-skills command の実行時 workflow 制御（全工程）
-- 診断対象の読込（Command/ Skill 定義、関連 template/ reference/ script）
-- 診断観点の評価（参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存）
-- 配布物構文健全性・責務整合診断
-- 検出事項の分類と推奨 route の提示（修正は実行しない）
-- 検出事項の inbox 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告
-
-## DO NOT USE FOR
-
-- 検出事項の分類・採用・処分（promote/defer/reject）（`/agentdev/inspect-promote`）
-- docs 体系（REQ/Decision/SPEC/guides/README）の意味整合性診断（`/agentdev/inspect-docs`）
-- 決定的検査・機械的検査の実行、検査ルールの定義（docs-check 等の機械検査レイヤ）
-- 診断対象ファイルの直接修正、自動修正
-- 正規文書変更、REQ/Decision/SPEC 変更、Command/Skill/Template/Script 変更
-- Issue/PR 作成・更新（`agentdev-gh-cli`）
-- worktree/branch 操作（`agentdev-git-worktree`）
-- RU/intake/learning/backlog 成果物の保存
-
 ## 入力
 
 - Command 定義ファイル群

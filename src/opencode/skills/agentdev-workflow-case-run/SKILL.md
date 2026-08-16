@@ -26,29 +26,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`）は�
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- case-run command の実行時 workflow 制御（全 STEP、両 workflow）
-- 単一 Issue 実行モード（single workflow、3フェーズべき等実行）
-- Epic Wave 実行モード（`case-run #epic`、現在 ready な Wave の子Issue 並列委譲、最大5件）
-- 再開フェーズ判定（Issue番号解決、実行モード分岐、べき等性チェック）
-- 実行担当サブエージェント委譲（adapter protocol、委譲 prompt、L2 タイムスタンプ計測、経路G）
-- result 4状態処理（completed-pr / blocked / failed / delegation-unavailable）
-- 前置 gate 群（worktree precondition gate、QG-{N} 前置 staleness check、targeted docs guard、配布依存境界 事前チェック）と配布依存境界 最終 gate（STEP-S5 で実施）
-
-## DO NOT USE FOR
-
-- 要件doc 作成、壁打ち（`/agentdev/req-define`）
-- Issue 作成・execution contract 確定（`/agentdev/case-open`）
-- PR マージ、Issue close、完了条件チェックボックス評価、Capture 回収（`/agentdev/case-close`）
-- 複数 Wave にまたがる自走、Wave 反復制御、Level 2/3 コンフリクト解消（`/agentdev/case-auto`）
-- 実装実行そのもの、work plan 生成、TDD、PR 本文作成（`agentdev-case-run-execution-adapter` 委譲内の実行担当サブエージェント責務）
-- work_type 判定基準の定義（`agentdev-workflow-lifecycle`）
-- 再開ポイント判定・状態機械・CI 対応ループの詳細プロトコル（`agentdev-workflow-orchestration`）
-- Wave 構成・Epic 進捗追跡・ステータス追跡テーブルの詳細（`agentdev-epic-tracker`）
-- gh CLI I/O 手続き、VERIFY（`agentdev-gh-cli`）
-- git worktree 操作の詳細手順（`agentdev-git-worktree`）
-
 ## 入力
 
 - Issue番号またはURL（単一 Issue 実行モード）

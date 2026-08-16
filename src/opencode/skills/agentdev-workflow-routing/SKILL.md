@@ -13,19 +13,6 @@ agentdev系コマンドのレビューNG時の対応フロー、次コマンド�
 SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
-## USE FOR
-
-- レビューNG結果の処理
-- レビュー拒否後の次のコマンド決定
-- 拒否タイプの分類（spec-bug, impl-bug, scope-creep）
-- Epic関連コマンド推論の解決
-
-## DO NOT USE FOR
-
-- 一般的なコマンド実行
-- 要件分析
-- 実装計画
-
 ## 対象コマンド
 
 | コマンド | 使用目的 |

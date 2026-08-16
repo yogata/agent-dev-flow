@@ -24,24 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-review.yaml`�
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- backlog-review command の実行時 workflow 制御（全 STEP）
-- 採用済み成果物の検出（引数指定/ 全ディレクトリ切り替え）、読込、分析、暫定分類付与
-- 統合、分割判定、depends_on 依存解決、RU 構成案の確定
-- adversarial-review 経路E の発動条件判定、review 呼出、accepted finding 反映
-- ユーザー承認（RU 生成承認を兼ねる）、矛盾検出、追加判断
-- RU 生成、成功成果物の削除、git 永続化、完了報告（全成功/ partial success/ 対象なしのテンプレート別）
-
-## DO NOT USE FOR
-
-- REQ ファイルの保存（`/agentdev/req-save`）
-- GitHub Issue の作成（`/agentdev/case-open`）
-- intake の抽出、promote（`/agentdev/intake-from-github`、`/agentdev/intake-promote`）
-- learning pipeline の実行（`/agentdev/learning-promote`）
-- REQ 構造診断（`agentdev-req-structure-diagnostics`）
-- work_type 判定、フェーズ定義（`agentdev-workflow-lifecycle`）
-
 ## 入力
 
 - backlog-review command から渡される採用済み成果物（`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md`）

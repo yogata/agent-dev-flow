@@ -31,31 +31,29 @@ Case に対して実装実行を実行担当サブエージェント経由で委
 
 3フェーズ構成で各フェーズは独立して再実行可能（べき等性）。フェーズ間エラー時は再開判定 STEP から再開できる:
 
-- **STEP-S1** フェーズ判定・再開ポイント検出 — 実行モード分岐、引き継ぎ停止判定
-- **STEP-S2** Issue 抽出・確認・判定 — execution contract 消費境界適用
-- **STEP-S3** Worktree 作成・ブランチ準備・前置 gate 群 — precondition gate、QG-{N} 前置 staleness check、targeted docs guard、配布依存境界 事前チェック、L2 計測
-- **STEP-S4** 実行担当サブエージェント委譲 — adapter protocol、経路G（委譲内 adversarial-review）、L2 計測
-- **STEP-S5** result 処理・配布依存境界 最終 gate — result 4状態処理、Step 7-1 相当 gate
-- **STEP-S6** worktree クリーンアップ確認・完了報告 — L2 内訳含む
+- **STEP-S1** フェーズ判定・再開ポイント検出
+- **STEP-S2** Issue 抽出・確認・判定
+- **STEP-S3** Worktree 作成・ブランチ準備・前置 gate 群
+- **STEP-S4** 実行担当サブエージェント委譲
+- **STEP-S5** result 処理・配布依存境界 最終 gate
+- **STEP-S6** worktree クリーンアップ確認・完了報告
 
 ### Phase epic-wave（`case-run #epic` 受領時）
 
 現在 ready な Wave の子Issue を並列実行（最大5件、3つの「5件」文脈の (1)）。1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）:
 
-- **STEP-W1** Epic Issue 解析・Wave 選択 — 入力ソース無区別（本来の Epic flow + Standard flow 起因の独立 OU 自動 Epic 化）
-- **STEP-W2** fan-out 準備 — `git fetch origin`、子Issue worktree 群、前置 gate 群適用
-- **STEP-W3** fan-out 並列委譲 — 最大5件、子Issue ごとに STEP-S4 と同一委譲契約
-- **STEP-W4** fan-in・結果集約 — partial result 保持、child task recovery、compaction 復元
-- **STEP-W5** Wave 完了報告・return — result 状態別一覧
-
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）、実行契約差異表、使用検査ツール（check_changed_docs.ts / check_extensions.ts / check_distribution_boundary.ts / test_strategy）、エラー処理、テスト戦略（TS）標準手順は `agentdev-workflow-case-run` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
+- **STEP-W1** Epic Issue 解析・Wave 選択
+- **STEP-W2** fan-out 準備
+- **STEP-W3** fan-out 並列委譲
+- **STEP-W4** fan-in・結果集約
+- **STEP-W5** Wave 完了報告・return
 
 ### Step 7-1: 配布依存境界の最終変更経路 gate（実装後）
 
 result が `completed-pr` かつ PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合、worktree クリーンアップの前に実装後の worktree HEAD へ最終 gate を適用する（実行担当サブエージェントが追加した変更も含む。当該変更を含まない PR ではスキップする）。
 
 - 実行コマンド: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`
-- 違反検出時は PR 本文の `### distribution-boundary` 小見出しに記録して case-run を停止する。adapter result は `completed-pr` のまま `blocked` へ上書きしない。検出結果の分類、停止契約の詳細は `agentdev-workflow-case-run` スキルを参照
+- 違反検出時は PR 本文の `### distribution-boundary` 小見出しに記録して case-run を停止する。adapter result は `completed-pr` のまま `blocked` へ上書きしない。検出結果の分類、停止契約は `agentdev-workflow-case-run` スキルを参照
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-run` が所有する。同 Workflow Skill は `/agentdev/case-run` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
@@ -80,5 +78,5 @@ result が `completed-pr` かつ PR 対象ファイルに `src/opencode/{command
 intake/ learning 境界は `agentdev-workflow-orchestration`（capture-boundaries）を参照。実行担当サブエージェントが PR 本文の `## Findings / Capture候補` に記録する
 
 - G14: スコープ拡大禁止。発見は記録し修正は後続処理に委ねる
-- G15/G16/G17/G21: intake 候補、learning 候補を区別して記録し混ぜた単一成果物にしない。`.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` の直接変更禁止。capture 情報は PR 本文経由のみ case-close に引き継ぐ（capture 境界の詳細は `agentdev-workflow-orchestration` 参照、case-run の capture 責務は記録のみ）
+- G15/G16/G17/G21: intake 候補、learning 候補を区別して記録し混ぜた単一成果物にしない。`.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` の直接変更禁止。capture 情報は PR 本文経由のみ case-close に引き継ぐ（capture 境界は `agentdev-workflow-orchestration` 参照、case-run の capture 責務は記録のみ）
 - G27: SPEC確定候補（実装で発見された SPEC レベル詳細）は PR 本文の `## SPEC確定候補` セクションに記録し、`## Findings / Capture候補` とは混在させない。SPEC確定候補の確定、SPEC ファイルへの反映判断は case-close の責務

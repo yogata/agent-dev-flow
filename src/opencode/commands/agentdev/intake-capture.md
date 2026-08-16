@@ -34,13 +34,11 @@ description: 未分類の変更候補を手動入力から intake item として
 
 本 workflow は capture-only型であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。resume point / export / import を持たない。工程は逐次実行し、中断時は最初から再実行する。
 
-- **工程-1** 入力の受領 — ユーザーからの変更候補の内容受領（自然言語をそのまま取り扱う）
-- **工程-2** intake item の生成 — 推奨標準形への整理（推測・補完禁止、対象セクションは省略）
-- **工程-3** ファイル名の生成・実行前同期 — `YYYY-MM-DD-{topic-slug}.md` 形式、`git pull --ff-only`
-- **工程-4** 保存・永続化 — `.agentdev/intake/inbox/` へ保存、`.agentdev/intake/` 変更の commit/push
-- **工程-5** 完了報告 — 完了報告 template 出力、git 永続化結果を含める
-
-工程の詳細（intake item 推奨標準形、ファイル名規則、エラー処理、関連 Capability Skill 連携）は `agentdev-workflow-intake-capture` スキルを参照。本コマンドは同スキルを名レベルで参照し、内部構造へ直接依存しない（REQ-{NNNN}-{NNN}）。
+- **工程-1** 入力の受領
+- **工程-2** intake item の生成
+- **工程-3** ファイル名の生成・実行前同期
+- **工程-4** 保存・永続化
+- **工程-5** 完了報告
 
 ## ガードレール
 

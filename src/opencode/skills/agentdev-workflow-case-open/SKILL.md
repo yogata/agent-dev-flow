@@ -24,31 +24,6 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）は
 3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
-## USE FOR
-
-- case-open command の実行時 workflow 制御（全 STEP）
-- Issue 本文生成と execution contract 確定（EC-{N}〜EC-{N}）
-- execution_unit 構成（連結成分アルゴリズム、3軸判断、Epic vs Standard ルーティング）
-- 構成生成事前検証（preflight 5項目）
-- adversarial-review 挿入境界（経路F）の発動条件判定と review 呼出
-- Epic flow（STEP-5-1〜5-5）と Standard flow（STEP-5-6〜5-8）の制御
-- draft/RU 削除クリーンアップ（Form Zero、即時 commit/push、削除残存検証）
-- 子Issue 作成の並列化（最大5件、3つの「5件」文脈の (1) に該当）
-
-## DO NOT USE FOR
-
-- 要件doc 作成、壁打ち（`/agentdev/req-define`、`agentdev-req-analysis`）
-- REQ/Decision ファイル保存（`/agentdev/req-save`、`agentdev-req-file-manager`、`agentdev-decision-file-manager`）
-- SPEC ファイル保存（`/agentdev/spec-save`、`agentdev-spec-file-manager`）
-- Issue 実装、実行担当サブエージェント委譲（`/agentdev/case-run`、`agentdev-case-run-execution-adapter`）
-- PR マージ、Issue close、完了条件チェックボックス評価（`/agentdev/case-close`）
-- case-auto 自走 orchestration（`/agentdev/case-auto`）
-- work_type 判定、フェーズ定義、ラベル体系（`agentdev-workflow-lifecycle`）
-- gh CLI I/O 手続き、VERIFY（`agentdev-gh-cli`）
-- Issue 操作の安全手続き、テンプレート選定（`agentdev-issue-management`、`agentdev-workflow-templates`）
-- Epic 進捗追跡、Wave 構成（`agentdev-epic-tracker`）
-- QG-{N} 完了条件網羅性検証（`agentdev-quality-gates`）
-
 ## 入力
 
 - case-open command から渡される要件doc（構造化 `draft-data` 形式、`agreed_items` / `artifact_actions` / `operation_units` / `test_strategy` / `review_dispositions` / `case_open_hints` / `auto_gate` / `conflict_resolutions`）

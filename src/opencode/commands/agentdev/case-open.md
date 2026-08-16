@@ -24,33 +24,14 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。
 
-### Step 1: 引き継ぎ・OU 選択
+- **STEP-1** 引き継ぎ・OU 選択
+- **STEP-2** Issue 本文生成・execution contract 確定
+- **STEP-3** 構成判定・preflight
+- **STEP-4** adversarial-review（経路F）
+- **STEP-5** Issue 作成（Epic flow / Standard flow）
+- **STEP-6** 終了処理・クリーンアップ
 
-`agentdev_handoff: true` 判定、OU モード時は OU 選択ゲート
-
-### Step 2: Issue 本文生成・execution contract 確定
-
-QG-{N} 検証、test_strategy 埋め込み、EC-{N}〜EC-{N} 確定
-
-### Step 3: 構成判定・preflight
-
-単一REQ → Standard flow、複数REQ/`scale: large`/複数 OU → Epic flow、execution_unit 構成、preflight 5項目
-
-### Step 4: adversarial-review（経路F）
-
-default-on、skip 条件（Standard flow で単一 OU 機械的確定）該当時は省略、ユーザー明示指定時は強制発動、4パターン再実行ルール
-
-### Step 5: Issue 作成（Epic flow / Standard flow）
-
-Epic Issue + 子Issue（OU単位、最大5件並列）、または Standard Issue、OU 結果書き戻し
-
-### Step 6: 終了処理・クリーンアップ
-
-コメント追加、draft/RU 削除（Form Zero、即時 commit/push）、削除残存検証、完了報告
-
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-case-open` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
-
-**共通ルール**（全 STEP 適用、詳細は workflow skill 参照）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、テンプレート選定・準拠（`agentdev-workflow-templates` の選定ルール、テンプレート読込後は毎回【必須】セクションの完備を確認、【任意】は内容がある場合のみ含める、欠落時は再生成）。並列上限と3つの「5件」文脈（case-open の Step 8 子Issue 並列は case-run Wave 内子 Issue 並列と同一上限、5件）の詳細も workflow skill 参照
+**共通ルール**（全 STEP 適用）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、テンプレート選定・準拠（`agentdev-workflow-templates` の選定ルール、テンプレート読込後は毎回【必須】セクションの完備を確認、【任意】は内容がある場合のみ含める、欠落時は再生成）。子Issue 並列上限は case-run Wave 内子 Issue 並列と同一上限（5件）
 
 **soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-open` が所有する。同 Workflow Skill は `/agentdev/case-open` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 

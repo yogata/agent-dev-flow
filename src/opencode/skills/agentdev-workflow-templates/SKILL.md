@@ -7,20 +7,6 @@ description: Manages Issue/PR description and comment templates, selection rules
 
 agentdev系コマンドで使用するIssue/PR本文、コメントテンプレートの管理、選定ルール、セクション規約を提供する。テンプレートは Read tool で読み込み、変数部分を置換して使用する。
 
-## USE FOR
-
-- Issue/PR/コメント用テンプレートを選定する場合
-- テンプレートのファイルパスを取得する場合
-- テンプレートのセクション構造、規約を確認する場合
-- 新しいテンプレートの追加、既存テンプレートの更新規約を確認する場合
-
-## DO NOT USE FOR
-
-- ワークフローのフェーズ定義や遷移ロジック（→ `agentdev-workflow-lifecycle`）
-- パターン分類や判定基準（→ `agentdev-workflow-lifecycle`）
-- 要件分析手法や品質基準（→ `agentdev-req-analysis`）
-- 完了報告フォーマットやチェックボックス更新
-
 ## テンプレート一覧
 
 ### Issue本文テンプレート
@@ -166,5 +152,4 @@ feature、bug、child テンプレートでは「テスト戦略」セクショ�
 - [agentdev-req-file-manager](../agentdev-req-file-manager/SKILL.md)（REQファイル管理。doc_requirement.md テンプレート）
 - [agentdev-decision-file-manager](../agentdev-decision-file-manager/SKILL.md)（Decisionファイル管理。doc_decision.md テンプレート）
 - **agentdev-doc-writing**: ADR/REQ/SPEC横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
-
 

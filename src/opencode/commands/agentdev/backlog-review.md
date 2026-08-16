@@ -43,16 +43,14 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 本コマンドは workflow 実装本体を `agentdev-workflow-backlog-review` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが8 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（promoted/ 残存成果物、`.agentdev/backlog/req-units/` の RU-*.md 実ファイルと frontmatter）から再開点を再構成する（DEC-{N}）。
 
-- **STEP-1** 実行前同期・成果物検出 — `git pull --ff-only`、引数有無による対象切り替え（引数なし時は三ディレクトリ検出、引数あり時は指定パスのみ）、0件時は正常終了
-- **STEP-2** 分析・暫定分類付与 — 成果物読込・分析、document-model SPEC（extension 経由）の文書7分類モデルによる `tentative_classification` 付与
-- **STEP-3** 統合・分割判定・depends_on 依存解決 — RU 構成案（統合・分割判定、依存解決結果）の確定
-- **STEP-4** review（経路E） — adversarial-review 発動条件判定・review 呼出・accepted finding 反映（矛盾は矛盾検出へ引継ぎ、skip 条件該当時は省略）
-- **STEP-5** HITL — RU 構成案のユーザー承認（RU 生成承認を兼ねる。矛盾なし時は単一承認）
-- **STEP-6** 矛盾検出・追加判断 — 矛盾検出（検出時のみ追加判断、矛盾しない artifact は通常通り RU 化、partial success）
-- **STEP-7** RU 生成・成功成果物削除 — `.agentdev/backlog/req-units/RU-*.md` 生成、RU 化に成功した成果物のみ削除
-- **STEP-8** Git 永続化・完了報告 — 明示パス staging、`git commit -- <paths>`、push、テンプレート別完了報告（全成功 / partial success / 対象なし）
-
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-backlog-review` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
+- **STEP-1** 実行前同期・成果物検出
+- **STEP-2** 分析・暫定分類付与
+- **STEP-3** 統合・分割判定・depends_on 依存解決
+- **STEP-4** review（経路E）
+- **STEP-5** HITL
+- **STEP-6** 矛盾検出・追加判断
+- **STEP-7** RU 生成・成功成果物削除
+- **STEP-8** Git 永続化・完了報告
 
 ## ガードレール
 

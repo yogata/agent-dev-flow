@@ -52,14 +52,12 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 本コマンドは workflow 実装本体を `agentdev-workflow-intake-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（`.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。
 
-- **STEP-1** classification — inbox 確認、item 読込、レビュー評価、暫定分類提示
-- **STEP-2** review（経路C） — adversarial-review 発動条件判定・review 呼出・accepted finding の暫定分類への反映（skip 条件該当時は省略）
-- **STEP-3** HITL — 分類結果のユーザー提示・承認（判断の確定）。分類承認後の自動実行、破壊的変更の明示承認を含む
-- **STEP-4** persistence — 採用 item の backlog-review 向け整形・`.agentdev/intake/promoted/` への保存
-- **STEP-5** destructive handling — 振り分け（採用 inbox 削除・保留残置・reject 即時削除）、`git pull --ff-only`、commit/push（reject 理由付き commit message を含む）
-- **STEP-6** 完了報告 — 分類結果と git 永続化結果の報告
-
-各 STEP の詳細（開始条件・結果・手順・resume point・関連 Capability Skill 連携）は `agentdev-workflow-intake-promote` スキルの `references/` 配下を参照。本コマンドは同スキルを名レベルで参照し、内部構造（STEP ID、reference パス）へ直接依存しない（REQ-{NNNN}-{NNN}）。
+- **STEP-1** classification
+- **STEP-2** review（経路C）
+- **STEP-3** HITL
+- **STEP-4** persistence
+- **STEP-5** destructive handling
+- **STEP-6** 完了報告
 
 ## エラー処理
 

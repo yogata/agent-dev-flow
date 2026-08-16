@@ -41,21 +41,6 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 全 Gate 共通の契約（pass/warn/fail/partial 定義、evidence-first 原則、ゲート結果フォーマット）は [common-gate-contract.md](references/common-gate-contract.md) を参照。
 
-## USE FOR
-
-- QG-{N}: req-define/req-save での要件定義の構造的完全性検証（REQ/SPEC 分類、ADR ゲート、チェックボックス測可能性）
-- QG-{N}: case-open での完了条件の必達要件網羅性検証（REQ 必達要件 → 完了条件 mapping）
-- QG-{N}: case-run での実装乖離検出、分類（no-deviation/ impl-bug/ spec-bug/ scope-creep）
-- QG-{N}: case-close での最終受け入れ確認（完了条件チェックボックス、CI、ドキュメント整合性）
-
-## DO NOT USE FOR
-
-- テストの実行、型チェック、Lint、ビルド（各コマンドのローカル検証ステップの責務）
-- ファイル編集、REQ 更新、Issue チェックボックス更新（各コマンドの責務）
-- Issue/ PR/ コメントの作成（各コマンドの責務）
-- コマンド固有の手順（Steps/ Guardrails）の置き換え
-- docs 全体の意味レビュー（`/agentdev/inspect-docs` の責務）
-
 ## 適用範囲外のワークフロー
 
 以下の補助ワークフローは **実行時コマンドの参照対象ではない**。QG-{N}〜QG-{N} を適用しない:

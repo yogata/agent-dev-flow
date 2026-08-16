@@ -36,16 +36,14 @@ description: クローズ済み GitHub Issue/PR から未回収の変更候補�
 
 本 workflow は capture-only型であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。resume point / export / import を持たない。工程は逐次実行し、中断時は最初から再実行する。
 
-- **工程-1** 期間解釈 — 期間指定または Issue/PR 番号指定の解釈（`agentdev-intake-pipeline`）
-- **工程-2** データ取得 — クローズ済み Issue/PR のデータ取得（gh CLI、`agentdev-gh-cli` 読取手続き）
-- **工程-3** 構造的検出 — 抽出ルールによる残課題候補の検出（`agentdev-intake-pipeline`）
-- **工程-4** LLM 全文解析 — キーワードリスト、コンテキスト付与ルール（`agentdev-intake-pipeline`）
-- **工程-5** intake item 生成・実行前同期 — item 生成ルール、ファイル名規則（`agentdev-intake-pipeline`）、`git pull --ff-only`
-- **工程-6** 保存・永続化 — `.agentdev/intake/inbox/` へ保存、`.agentdev/intake/` 変更の commit/push
-- **工程-7** サマリーレポート提示 — 抽出結果のサマリーのユーザーへの提示
-- **工程-8** 完了報告 — 完了報告 template 出力、git 永続化結果を含める
-
-工程の詳細（intake item 形式、サマリーレポート形式、エラー処理、関連 Capability Skill 連携）は `agentdev-workflow-intake-from-github` スキルを参照。本コマンドは同スキルを名レベルで参照し、内部構造へ直接依存しない（REQ-{NNNN}-{NNN}）。
+- **工程-1** 期間解釈（`agentdev-intake-pipeline`）
+- **工程-2** データ取得（gh CLI、`agentdev-gh-cli` 読取手続き）
+- **工程-3** 構造的検出（`agentdev-intake-pipeline`）
+- **工程-4** LLM 全文解析（`agentdev-intake-pipeline`）
+- **工程-5** intake item 生成・実行前同期
+- **工程-6** 保存・永続化
+- **工程-7** サマリーレポート提示
+- **工程-8** 完了報告
 
 ## ガードレール
 
