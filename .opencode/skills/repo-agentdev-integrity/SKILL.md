@@ -199,7 +199,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 ## See Also
 
 - **agentdev-req-file-manager**: REQ 番号採番ルール、frontmatter 規約
-- **agentdev-adr-guidelines**: ADR 構造定義
+- **agentdev-decision-file-manager**: Decision 構造定義
 - **agentdev-gh-cli**: gh 書き込み後の body verifier (`verify_body.ts`)
 - **agentdev-workflow-templates**: ワークフローテンプレート定義
 

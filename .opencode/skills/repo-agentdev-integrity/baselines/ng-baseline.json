@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "NG-BASELINE",
-  "generated_at": "2026-07-25",
+  "generated_at": "2026-08-15",
   "entries": [
     {
       "category": "ADR",
@@ -146,6 +146,114 @@
       "count": 1,
       "provenance": "legacy",
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
+    },
+    {
+      "category": "CaptureBoundary",
+      "check": "command-capture-duty",
+      "file": "src/opencode/commands/agentdev/case-close.md",
+      "evidence": null,
+      "count": 1,
+      "provenance": "実欠陥",
+      "reason": "実欠陥: case-close.md の capture-boundaries 参照記述欠落。配布物コマンド編集を要し、OU-007（#2141）配布物是正で実施するまでの承認（NG21 分類 N17）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/commands/case-auto.md",
+      "evidence": "DEC-015",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-015 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/commands/case-auto.md",
+      "evidence": "DEC-008",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-008 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/foundations/harness-separation-model.md",
+      "evidence": "DEC-015",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-015 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/local/runtime-package-boundary.md",
+      "evidence": "DEC-016",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-016 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/skills/agentdev-artifact-graph.md",
+      "evidence": "DEC-005",
+      "count": 1,
+      "provenance": "superseded",
+      "reason": "superseded: 廃止済み DEC-005 は DEC-006 への移行履歴文脈で引用している。SPEC 再構成（OU-009 docs 横断是正）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/workflows/delegation-contracts.md",
+      "evidence": "DEC-008",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-008 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/workflows/input-resolution-and-durable-state.md",
+      "evidence": "DEC-015",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-015 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/workflows/workflow-contracts.md",
+      "evidence": "DEC-015",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-015 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/workflows/workflow-contracts.md",
+      "evidence": "DEC-008",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-008 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/workflows/workflow-skill-model.md",
+      "evidence": "DEC-015",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-015 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "accepted-adr-only-citation",
+      "file": "docs/specs/workflows/workflow-skill-model.md",
+      "evidence": "DEC-008",
+      "count": 1,
+      "provenance": "proposed-decision-citation",
+      "reason": "proposed-decision-citation: proposed Decision DEC-008 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
     },
     {
       "category": "IndexGenerationConsistency",
@@ -533,6 +641,15 @@
       "count": 1,
       "provenance": "v3-migration",
       "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "LifecycleBoundary",
+      "check": "workflow-status-prohibition",
+      "file": "docs/specs/foundations/system.md",
+      "evidence": "- **durable state**: SPEC ファイル（frontmatter: title/status/created/updated + 宣言節）、SPEC README 一覧エントリ、draft SPEC 消費フラグ。",
+      "count": 1,
+      "provenance": "実欠陥",
+      "reason": "実欠陥: SPEC 本文の正当な durable state 列挙（frontmatter 項目名 title/status/created/updated を含む行）が 6 マイクロフェーズ検出パターンに一致する既知欠陥。SPEC 再構成または検出器の列挙行除外までの承認（NG21 分類 N15）"
     },
     {
       "category": "LinkIntegrity",
@@ -1037,6 +1154,15 @@
       "count": 1,
       "provenance": "legacy",
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
+    },
+    {
+      "category": "LinkIntegrity",
+      "check": "broken-adr-ref",
+      "file": "docs/requirements/REQ-021.md",
+      "evidence": "ADR-006",
+      "count": 1,
+      "provenance": "legacy",
+      "reason": "legacy: v2:ADR-006 は DEC-006 へ移行済み（commit 9ea67084）。docs/requirements/** は Issue #2136 の編集禁止範囲のため、REQ-021-003 の参照更新（DEC-006 へ）を別工程で実施するまでの承認（NG21 分類 N01）"
     },
     {
       "category": "LinkIntegrity",
@@ -2891,6 +3017,15 @@
       "count": 1,
       "provenance": "v3-migration",
       "reason": "Stage 5 v2→v3 migration structural consequence (ADR-001 naming, v2: prefix range parsing, README table mismatch)"
+    },
+    {
+      "category": "integrity-rule-gap",
+      "check": "skill-category-gap",
+      "file": ".opencode/skills/repo-agentdev-integrity/SKILL.md",
+      "evidence": "Skill rename 対称性",
+      "count": 1,
+      "provenance": "実欠陥",
+      "reason": "実欠陥: 検査カテゴリ「Skill rename 対称性」が check_integrity.ts の categoryToCheckPattern map に未登録。checker 側変更（map 追加と check_skill_rename_symmetry.ts の対象スクリプト登録）として次回 checker 改修で解消するまでの承認（NG21 分類 N16）"
     }
   ]
 }

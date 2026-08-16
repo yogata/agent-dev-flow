@@ -159,7 +159,7 @@ IR-051 の対象 harness 名。これらは「スキル」「skill」と表記�
 | `oh-my-openagent` | OpenCode プラグイン・エージェント実行ハーネス（ADR-0114, ADR-0128） |
 | `OpenCode` | エージェント実行環境本体 |
 
-## IR-051 距離閾値（REQ-0145-007）
+## IR-051 距離閾値（v2:REQ-0145-007）
 
 IR-051「実行主体 skill 表記誤認検出」の「一定文字距離内」判定閾値。既知 command 名・harness 名・subagent 名の出現位置から以下の範囲内に「スキル」「skill」表記がある場合、誤認として報告する。
 

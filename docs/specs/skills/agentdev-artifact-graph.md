@@ -279,7 +279,7 @@ case-open は Issue 対象範囲, 完了条件, test strategy の確定前に Ar
 
 ### Diagnostics
 
-inspect-docs は Artifact Graph を構造診断候補の探索に利用する。候補には unresolved reference, superseded artifact への現行参照, dangling relation, provenance 欠落, orphan candidate, 不自然な relation path, structural duplicate candidate を含む。決定的検査（参照実在、委譲先 skill 実在等）は ADR-006 が定める通り docs-check, IR-056 が所有し、inspect-docs は意味診断を担当する。構造候補は未検証 evidence として意味診断の入力に利用する。SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を Graph の構造情報だけから確定しない。
+inspect-docs は Artifact Graph を構造診断候補の探索に利用する。候補には unresolved reference, superseded artifact への現行参照, dangling relation, provenance 欠落, orphan candidate, 不自然な relation path, structural duplicate candidate を含む。決定的検査（参照実在、委譲先 skill 実在等）は DEC-006 が定める通り docs-check, IR-056 が所有し、inspect-docs は意味診断を担当する。構造候補は未検証 evidence として意味診断の入力に利用する。SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を Graph の構造情報だけから確定しない。
 
 inspect-skills は self-hosting augmentation が利用可能な場合、command と skill 関係, command と extension と skill 関係, 予期しない delegation, orphan skill candidate の候補を探索する。委譲先 skill 実在の決定的検査は docs-check, IR-056 が所有する。consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
 

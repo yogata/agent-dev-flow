@@ -92,6 +92,5 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（R
 
 - [agentdev-req-structure-diagnostics.md](agentdev-req-structure-diagnostics.md)（REQ 固有診断 skill）
 - [agentdev-doc-writing.md](agentdev-doc-writing.md)（文意品質 skill）
-- [agentdev-doc-map.md](agentdev-doc-map.md)（探索順 skill）
 - REQ-010-025（diagnostics 命名許容例外境界）
 - REQ-010-048（inspect-docs と diagnostics skill の責務分離）
