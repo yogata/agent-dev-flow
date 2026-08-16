@@ -1,6 +1,6 @@
 ---
 name: agentdev-quality-gates
-description: "Defines lightweight quality gates for AgentDevFlow main workflow. USE FOR: QG-{N} definition integrity, QG-{N} acceptance criteria coverage, QG-{N} implementation deviation, QG-{N} final acceptance. DO NOT USE FOR: executing tests, modifying files, creating issues, updating issue checkboxes, creating PRs, merging PRs, or replacing command-specific procedures."
+description: "Defines lightweight quality gates for the AgentDevFlow main workflow. USE FOR: QG definition integrity, QG acceptance criteria coverage, QG implementation deviation, QG final acceptance. DO NOT USE FOR: executing tests, modifying files, creating issues, creating or merging PRs, replacing command-specific procedures."
 ---
 
 # Quality Gates スキル

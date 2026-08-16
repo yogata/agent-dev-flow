@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-inspect-docs
-description: "inspect-docs command の workflow 実装本体。docs 全体（REQ/Decision/SPEC/guides/README）の意味整合性診断（REQ 参照ID整合性、第一参照導線、現行/廃止/世代境界、SPEC/Decision/guides/README 意味診断、REQ structure review 6観点、文書分類一貫性）、配布物整合性検査、検出事項の inbox 出力と git 永続化を所有する。read-only-diagnostic型（STEP model 対象外、resume point なし）。USE FOR: inspect-docs command 実行時の workflow 制御（スキャン対象収集・REQ 体系・文書種別別意味診断・配布物整合性検査・docs-check route 判定・検出事項出力・永続化・完了報告）。DO NOT USE FOR: 検出事項の分類・採用・処分（inspect-promote）、Command/Skill 参照妥当性診断（inspect-skills）、決定的検査・機械的検査の実行と検査ルール定義（docs-check 等の機械検査レイヤ）、診断対象ファイルの直接修正、REQ/Decision/SPEC 保存（req-save、spec-save）、Issue/PR 操作（agentdev-gh-cli）、worktree/branch 操作（agentdev-git-worktree）、intake/learning/RU 処理、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "inspect-docs command の workflow 実装本体。docs 全体（REQ/Decision/SPEC/guides/README）の意味整合性診断、配布物整合性検査、検出事項の inbox 出力と git 永続化を所有する（read-only-diagnostic 型、STEP model 対象外）。USE FOR: inspect-docs 実行時の workflow 制御（スキャン対象収集・REQ 体系・文書種別別意味診断・配布物整合性検査・検出事項出力・永続化）。DO NOT USE FOR: 診断対象ファイルの直接修正、検出事項の分類・採用・処分、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # inspect-docs workflow スキル

@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-intake-promote
-description: "intake-promote command の workflow 実装本体。inbox 内 intake item の classification（確認・読込・評価・暫定分類）、review（adversarial-review 経路C）、HITL（ユーザー承認・分類確定）、persistence（採用 item 整形・promoted 保存）、destructive handling（振り分け・inbox 削除・reject 即時削除・破壊的変更の明示承認・git 永続化）の各 STEP を独立 resume point として所有する。USE FOR: intake-promote command 実行時の workflow 制御（inbox 確認・item 読込・評価・暫定分類提示・経路C review 呼出・ユーザー承認・採用 item 整形・promoted 保存・振り分け・inbox 削除・git 永続化・完了報告）。DO NOT USE FOR: GitHub Issue 作成（case-open）、RU 生成（backlog-review）、learning pipeline の実行（learning-promote）、inbox item の新規保存（intake-capture、intake-from-github）、work_type 判定（agentdev-workflow-lifecycle）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "intake-promote command の workflow 実装本体。inbox 内 intake item の classification（確認・読込・評価・暫定分類）、review（adversarial-review 経路C）、HITL（ユーザー承認・分類確定）、persistence（採用 item 整形・promoted 保存）、destructive handling（振り分け・inbox 削除・破壊的変更の明示承認・git 永続化）の各 STEP を独立 resume point として所有する。USE FOR: intake-promote 実行時の workflow 制御。DO NOT USE FOR: inbox item の新規保存、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # intake-promote workflow スキル

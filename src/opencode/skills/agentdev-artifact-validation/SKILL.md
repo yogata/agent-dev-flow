@@ -1,6 +1,6 @@
 ---
 name: agentdev-artifact-validation
-description: Owns document-type-crosscutting deterministic verification scripts (check-frontmatter-consistency, check-entry-existence, check-change-impact), their shared lib, and the public verification contract (AG-{NNN}/009/019, RU-{NNNN}-01). USE FOR: invoking the public verification contract for REQ/ADR frontmatter id↔filename consistency, README entry existence, or change-scope validation against an allowed path list. DO NOT USE FOR: REQ/ADR/SPEC content judgment, file editing, save, user approval, commit, push, REQ/ADR/row ID allocation, or target_area search.
+description: Owns document-type-crosscutting deterministic verification scripts, their shared lib, and the public verification contract. USE FOR: invoking the verification contract for REQ/ADR frontmatter id↔filename consistency, README entry existence, or change-scope validation against an allowed path list. DO NOT USE FOR: REQ/ADR/SPEC content judgment, file editing, save, user approval, commit, push, or ID allocation.
 ---
 
 # 文書種別横断検証（artifact-validation）

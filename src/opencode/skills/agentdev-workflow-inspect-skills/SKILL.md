@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-inspect-skills
-description: "inspect-skills command の workflow 実装本体。Command→Skill 参照妥当性、Skill frontmatter・本文構造・references 利用・template/ script 参照・粒度・段階的開示・責務境界・実行主体分類の診断、配布物構文健全性・責務整合診断、検出事項の分類と route 提示、inbox 出力と git 永続化を所有する。read-only-diagnostic型（STEP model 対象外、resume point なし）。project 非依存で単体動作する。USE FOR: inspect-skills command 実行時の workflow 制御（診断対象読込・診断観点評価・配布物構文健全性診断・分類・route 提示・検出事項出力・永続化・完了報告）。DO NOT USE FOR: 検出事項の分類・採用・処分（inspect-promote）、docs 体系の意味整合性診断（inspect-docs）、決定的検査・機械的検査の実行と検査ルール定義（docs-check 等の機械検査レイヤ）、診断対象ファイルの直接修正、正規文書や REQ/Decision/SPEC の変更、Issue/PR 作成（agentdev-gh-cli）、worktree/branch 操作（agentdev-git-worktree）、RU/intake/learning/backlog 成果物保存、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "inspect-skills command の workflow 実装本体。Command→Skill 参照妥当性、Skill frontmatter・本文構造・粒度・段階的開示・責務境界・実行主体分類の診断、配布物構文健全性・責務整合診断、検出事項の分類と route 提示、inbox 出力と git 永続化を所有する（read-only-diagnostic 型、project 非依存）。USE FOR: inspect-skills 実行時の workflow 制御（診断対象読込・観点評価・分類・route 提示・検出事項出力・永続化）。DO NOT USE FOR: 診断対象ファイルの直接修正、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # inspect-skills workflow スキル

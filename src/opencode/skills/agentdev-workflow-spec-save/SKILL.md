@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-spec-save
-description: "spec-save command の workflow 実装本体。req-define で分離された SPEC 保存対象（artifact: spec entry）を docs/specs/ へ保存・確定する制御を所有する。事前チェック（no-op 判定）、配置先解決（search-target-area.ts）、SPEC 分離基準の最終確認、SPEC ファイル操作（target_area セクション置換、並列化、SPEC 宣言付与）、インデックス整合、targeted docs guard、ドラフト status 更新、変更範囲検証、コミット・プッシュを提供する。USE FOR: spec-save command 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 要件doc 作成（req-define）、REQ/Decision 保存（req-save）、Issue 作成（case-open）、SPEC ファイル管理・配置判断・target_area マッチング規則の定義（agentdev-spec-file-manager）、決定的検証スクリプトの所有（agentdev-artifact-validation）、SPEC status 昇格 draft→accepted（case-close の責務）、gh CLI I/O 手続き（agentdev-gh-cli）、git worktree 操作（agentdev-git-worktree）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "spec-save command の workflow 実装本体。req-define で分離された SPEC 保存対象（artifact: spec entry）の保存・確定を行う制御を所有する。事前チェック（no-op 判定）、配置先解決、SPEC ファイル操作（target_area セクション置換、SPEC 宣言付与）、インデックス整合、targeted docs guard、ドラフト status 更新、変更範囲検証、コミット・プッシュも含む。USE FOR: spec-save 実行時の workflow 制御（normal create/update・no-op・validation failure・partial failure・rerun idempotency・commit 前中断・external Git failure 各シナリオ）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # spec-save workflow スキル

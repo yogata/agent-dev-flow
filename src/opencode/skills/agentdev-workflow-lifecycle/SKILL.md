@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-lifecycle
-description: Provides development workflow phase definitions, SSoT transitions, work_type classification (bugfix/feature/maintenance/docs_chore), scale assessment, command mappings, and docs structure for the agentdev command pipeline. USE FOR: determining workflow phases, work_type classification and scale assessment, resolving command dependencies, or understanding docs/ directory layout. DO NOT USE FOR: specific command execution logic, requirement analysis, compliance checking, or direct invocation (Workflow Skill; consume via the corresponding /agentdev/* command stages — standalone skill launch is discouraged by the REQ-{NNNN}-{NNN} soft guard).
+description: Provides development workflow phase definitions, SSoT transitions, work_type classification, scale assessment, command mappings, and docs structure for the agentdev command pipeline. USE FOR: determining workflow phases, work_type classification and scale assessment, resolving command dependencies, understanding docs/ directory layout. DO NOT USE FOR: specific command execution logic, requirement analysis, compliance checking.
 ---
 
 # AgentDevFlow ライフサイクルスキル

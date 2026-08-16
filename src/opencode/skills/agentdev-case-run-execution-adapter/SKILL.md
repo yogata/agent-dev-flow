@@ -1,6 +1,6 @@
 ---
 name: agentdev-case-run-execution-adapter
-description: "case-run external execution adapter. USE FOR: connecting case-run issue execution to 実行担当サブエージェント via adapter skill delegation (adapter skill + 委譲 prompt 内 実行 command), handling completed-pr/blocked/failed/delegation-unavailable results. DO NOT USE FOR: req-define architecture review, ADR judgment, workflow state management, or Issue completion checkbox evaluation."
+description: "case-run external execution adapter. USE FOR: connecting case-run issue execution to 実行担当サブエージェント via adapter skill delegation, handling completed-pr/blocked/failed/delegation-unavailable results. DO NOT USE FOR: workflow state management, Issue completion checkbox evaluation."
 ---
 
 # case-run 外部実行アダプター（External Execution Adapter）

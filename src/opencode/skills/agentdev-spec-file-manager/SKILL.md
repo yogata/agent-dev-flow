@@ -1,6 +1,6 @@
 ---
 name: agentdev-spec-file-manager
-description: Manages SPEC file operations (CREATE/APPEND/UPDATE), placement resolution, target_area section replacement, SPEC-specific integrity, and SPEC-specific script invocation contract. USE FOR: creating SPEC files, appending sections, updating existing SPECs via target_area, SPEC lifecycle (draft/accepted/superseded) application, invoking search-target-area.ts. DO NOT USE FOR: REQ/ADR operations, SPEC content inference, accepted promotion, user approval, commit, push, or duplicating common validation scripts.
+description: Manages SPEC file operations (CREATE/APPEND/UPDATE), placement resolution, target_area section replacement, SPEC-specific integrity, and SPEC-specific script invocation contract. USE FOR: creating SPEC files, appending sections, updating SPECs via target_area, SPEC lifecycle (draft/accepted/superseded) application. DO NOT USE FOR: REQ/ADR operations, SPEC content inference, accepted promotion, user approval, commit, push.
 ---
 
 # SPECファイル管理

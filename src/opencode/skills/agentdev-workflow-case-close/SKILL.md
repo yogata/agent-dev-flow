@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-close
-description: "case-close command の workflow 実装本体。PR マージ（squash merge、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新、観点8）、docs 検証・SPEC 確定（targeted docs guard、IR-{NNN}、SPEC status 昇格）、Capture 回収（PR 本文→intake/learning 分離）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。USE FOR: case-close command 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・SPEC 確定・Capture 回収・クリーンアップ・永続化）。DO NOT USE FOR: Issue 実装（case-run）、要件doc 作成（req-define）、Issue 作成（case-open）、最大自走 orchestration（case-auto）、work_type 判定（agentdev-workflow-lifecycle）、gh CLI I/O 手続き（agentdev-gh-cli）、QG-4 検査規則の定義（agentdev-quality-gates）、Epic 進捗追跡ロジック（agentdev-epic-tracker）、SPEC ファイル管理（agentdev-spec-file-manager）、git worktree 操作（agentdev-git-worktree）、学び検知・capture pipeline（agentdev-learning-capture / agentdev-learning-pipeline / agentdev-intake-pipeline）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "case-close command の workflow 実装本体。PR マージ（squash merge、mergeable UNKNOWN ポーリング、先行 commit 検出、コンフリクト Level 1 rebase）、QG-4 最終完了判定ゲート、docs 検証・SPEC 確定（SPEC status 昇格）、Capture 回収（PR 本文→intake/learning 分離）、Epic Wave クローズを所有する。USE FOR: case-close 実行時の workflow 制御（単一 Issue クローズ・Epic Wave クローズ・PR マージ・QG-4・SPEC 確定・Capture 回収）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-close workflow スキル

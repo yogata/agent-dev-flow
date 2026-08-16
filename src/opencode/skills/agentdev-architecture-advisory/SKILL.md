@@ -1,6 +1,6 @@
 ---
 name: agentdev-architecture-advisory
-description: "Requirement definition architecture review support. USE FOR: req-define before ADR judgment when requirements may affect architecture, responsibility boundaries, existing REQ/ADR/SPEC consistency, or external agent integration. DO NOT USE FOR: implementation execution, case-run execution, implementation plan review, or file editing."
+description: "Requirement definition architecture review support. USE FOR: req-define architecture-impact judgment when requirements may affect responsibility boundaries, existing REQ/ADR/SPEC consistency, or external agent integration. DO NOT USE FOR: implementation execution, implementation plan review, or file editing."
 ---
 
 # アーキテクチャ助言（req-define 事前確認）

@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-open
-description: "case-open command の workflow 実装本体。要件定義から GitHub Issue（Epic flow / Standard flow）作成までの制御構造、execution contract 確定、execution_unit 構成、draft/RU 削除クリーンアップを所有する。USE FOR: case-open command 実行時の workflow 制御（Issue本文生成・execution contract 確定・execution_unit 構成・preflight・Epic flow/Standard flow・draft/RU 削除・Form Zero）。DO NOT USE FOR: 要件doc 作成（req-define）、REQ/Decision 保存（req-save）、Issue 実装（case-run）、PR マージ・Issue close（case-close）、work_type 判定・フェーズ定義（agentdev-workflow-lifecycle）、gh CLI I/O 手続き（agentdev-gh-cli）、Issue 操作の安全手続き（agentdev-issue-management）、Epic 進捗追跡・Wave 構成（agentdev-epic-tracker）、品質ゲート QG-{N}（agentdev-quality-gates）、直接起動（Workflow Skill。対応する /agentdev/* command の工程経由で利用し、単独の skill 起動は REQ-{NNNN}-{NNN} soft guard で抑制）。"
+description: "case-open command の workflow 実装本体。要件定義から GitHub Issue（Epic flow / Standard flow）作成までの制御構造、execution contract 確定、execution_unit 構成、draft/RU 削除クリーンアップを所有する。USE FOR: case-open 実行時の workflow 制御（Issue 本文生成・execution contract 確定・execution_unit 構成・preflight・Epic flow/Standard flow）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-open workflow スキル

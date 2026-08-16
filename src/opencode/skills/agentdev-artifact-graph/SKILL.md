@@ -1,6 +1,6 @@
 ---
 name: agentdev-artifact-graph
-description: Builds and inspects the Artifact Graph (derived index of explicit artifact relations). USE FOR: generating the graph, checking graph integrity, querying relations (neighbors, path, provenance, discover), or locating provenance in consumer and self-hosting environments. DO NOT USE FOR: replacing canonical documents, inferring semantic relations, editing graph outputs, treating Graph as SSoT, or halting workflow on graph failure.
+description: Builds and inspects the Artifact Graph (derived index of explicit artifact relations). USE FOR: generating the graph, checking graph integrity, querying relations (neighbors, path, provenance), or locating provenance in consumer and self-hosting environments. DO NOT USE FOR: replacing canonical documents, inferring semantic relations, editing graph outputs, treating Graph as SSoT.
 ---
 
 # agentdev-artifact-graph
