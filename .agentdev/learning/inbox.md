@@ -69,3 +69,35 @@
 - **関連**: PR #2146, PR #2147, Issue #2137 (OPEN), Epic #2134
 - **タグ**: `#epic-wave` `#merge-conflict` `#level1-escalation`
 
+## 網羅 grep でのパス glob の落とし穴（OU-010、PR #2153）
+
+- **問題事象**: `Select-String -Path '<dir>/**/*'` 形式の網羅 grep は、スキル直下の SKILL.md（サブディレクトリ外のファイル）を取りこぼす場合があった（本 Issueでは intake 系 SKILL.md の `工程-N` ラベルが一時見落とし）。
+- **発生局面**: 実装（16 Workflow Skill の順序ラベル3変種の残存確認 grep）
+- **検知方法**: 件数整合の二重確認（列挙ベース集計と再 grep の一致）で検出
+- **根本原因**: PowerShell の `-Path` glob（`**/*`）がディレクトリ直下のファイルをマッチ対象に含まないケースがある
+- **自律対応内容**: `Get-ChildItem -Recurse -File` でファイル列挙してから `Select-String -LiteralPath` に渡す方式へ切り替え、取りこぼしを解消
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: ラベル・参照の網羅検査では glob 依存の grep ではなく列挙ベースでファイル集合を確定してから grep する
+- **再発条件**: PowerShell で `Select-String -Path` に再帰 glob を渡して網羅検査する場合
+- **予防策候補**: 網羅検査は `Get-ChildItem -Recurse -File` + `-LiteralPath` を標準手順化し、件数整合の二重確認を必須とする
+- **想定反映先**: case-run 検証手順・skill-authoring 査読観点の参考（learning-promote で判定）
+- **関連**: PR #2153, Issue #2144 (CLOSED), Epic #2134
+- **タグ**: `#powershell` `#grep` `#label-sweep`
+
+## AUTOGEN 再生成ブロックを含む並列 PR の連続マージは rebase で機械解消できない（OU-002/#2151、Epic #2134 Wave 2 case-close）
+
+- **問題事象**: PR #2152（AUTOGEN 再生成を含む大規模 PR）マージ後に PR #2151（別日の AUTOGEN 再生成を含む PR）が CONFLICTING となり、Level 1 rebase（git rebase origin/main）が `docs/specs/quality/spec-health-metrics.md` の AUTOGEN ブロックで内容コンフリクトして失敗した。
+- **発生局面**: case-close（Epic Wave クローズの squash merge シーケンス）
+- **検知方法**: mergeable 状態取得（CONFLICTING/DIRTY）と rebase 実行時の CONFLICT (content)。req-health-metrics.md は自動解消されたが spec-health-metrics.md は衝突（同一ファイル内でも hunk 単位で成否が分かれる）
+- **根本原因**: 両 PR が同一 AUTOGEN ブロックを異なる基準日・内容で再生成していた。生成物同士の衝突のため文言選択ではなく、正解は「新 base 上での再生成」であり手動マージや rebase の機械的解消の範囲を超える
+- **自律対応内容**: Level 1 手順に従い rebase 試行→コンフリクト確認→`git rebase --abort` で worktree を PR HEAD へ復元→case-auto へ Level 1 失敗エスカレーション。Epic ステータス追跡テーブル当該行は `pending` 維持、Issue は OPEN 維持
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（Level 1/2/3 分離の遵守実例。Wave 1 の #2146/#2147 事例（文言選択型）と同じ停止境界・別根因）
+- **横展開観点**: AUTOGEN 対象ファイル（索引・メトリクス系）を変更範囲に含む複数 PR を同一 Wave に並列配置すると、マージ順に関係なく再生成同士が衝突する。Level 2 では手動編集ではなく新 base での `generate_indexes.ts` 再実行で解消するのが正道
+- **再発条件**: 同一 Wave の並列子Issue が同じ AUTOGEN ブロックを持つファイル（health-metrics、integrity-rule-catalog、rule-ownership 等）を変更範囲に含む場合
+- **予防策候補**: case-open の execution_unit 構成時に AUTOGEN 対象ファイルの重複を依存ヒントに反映する。case-auto の Level 2 解消レシピに「再生成で解消」を明記する
+- **想定反映先**: epic-tracker / case-open の Wave 構成基準、case-auto コンフリクト解消レシピ（learning-promote で判定）
+- **関連**: PR #2151 (OPEN), PR #2152, Issue #2136 (OPEN), Epic #2134
+- **タグ**: `#epic-wave` `#merge-conflict` `#autogen` `#level1-escalation`
+
