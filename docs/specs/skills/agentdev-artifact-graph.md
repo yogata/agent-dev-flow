@@ -2,7 +2,7 @@
 title: agentdev-artifact-graph SPEC
 status: draft
 created: 2026-08-08
-updated: 2026-08-10
+updated: 2026-08-17
 spec_logical_division: behavior
 canonical_owner: agentdev-artifact-graph
 ---
@@ -85,6 +85,36 @@ query_graph.ts の問い合わせ結果は、各関係について以下の情�
 - 根拠 evidence（既存）
 
 既存のノードID、関係ID、根拠情報との互換性を維持し、新規フィールドを追加する形式とする。
+
+## 高位問い合わせプロファイル
+
+高位問い合わせ related、impact、dependency、implementation、diagnostics を
+問い合わせプロファイルとして定義する。各プロファイルは TIM の意味を利用し、
+独立した関係モデルを持たない。
+
+- related: 起点成果物と明示的なトレースまたは一般参照を持つ関連成果物候補の取得。
+  結果を変更影響または依存関係として解釈しない
+- impact: 起点成果物を変更した場合に影響を受ける可能性がある成果物候補の取得。
+  探索方向は TIM に定義された関係の変更影響意味から導出する。一般参照または変更影響なしと
+  定義された関係を、単にリンクが存在することだけを理由に探索経路として使用しない
+- dependency: 起点成果物が成立、実現または実行されるために依存する成果物候補の取得。
+  依存関係として定義されていない一般参照を依存関係として扱わない
+- implementation: 要件、仕様、設計等を実現・実装する成果物候補の取得。
+  実現・実装・充足系列の関係を利用する。将来 coverage 問い合わせへ統合・上位化できる設計
+- diagnostics: 構造上の注目候補（孤立候補、未解決関係、廃止成果物への関係、関係制約違反、
+  循環候補、複数経路、関係集中、根拠欠落）の診断。構造的特徴だけから異常を確定しない。
+  ADF 固有の所有・統制構造等は ADF Integration 層の診断規則として扱う
+
+共通規則:
+- 候補数上限は問い合わせ設定として管理し、コードへ直書きしない。プロジェクト拡張は
+  上限を上書き可能とする。標準上限値の決定は代表ケースによる回帰検証結果に基づく
+- 上限超過時は決定論的な優先・除外規則を適用し、それでも超える場合は候補過多であること、
+  全候補数、返却候補数、適用した絞り込み規則、独立探索へ移行可能であることを返す。
+  候補過多のみを理由として ADF ワークフロー全体を停止させない
+- 問い合わせ結果は候補ごとに候補成果物、候補となった理由、トレースリンク型、探索方向、
+  到達経路を確認可能とする。詳細な根拠箇所は根拠問い合わせ（provenance）の責務とし、
+  高位問い合わせへ根拠詳細を重複保持しない
+- 候補が存在しない場合、正常な空結果として扱う
 
 ## グラフモデル（open extensibility を含む）
 
@@ -272,63 +302,22 @@ Artifact Graph 標準配布スキルの augmentation は専用配置
 
 ## ワークフロー利用
 
-Artifact Graph は以下の4用途で AgentDevFlow workflow に統合する。
-Graph はすべての用途で候補提供者であり、決定的検査、意味診断、最終判断は各正規所有者が行う。
+| ワークフロー | 主な問い合わせ |
+|---|---|
+| req-define | related、impact、必要に応じて dependency |
+| spec-save | related |
+| case-open | impact、dependency |
+| case-run | implementation（既に決定された実装対象と正規成果物の実現関係確認。新規の依存関係、実行構成、Wave 構成、実行順序の設計は行わない） |
+| case-close | 必要に応じて整合性確認 |
+| adversarial-review | diagnostics、論点に応じた他問い合わせ |
+| inspect-docs 等 | diagnostics |
 
-### 利用上の防護
-
-すべての consumer は以下を守る。
-
-- Graph は派生索引であり SSoT ではない。
-- Graph の結果から変更対象、要件充足、責務重複を単独で確定しない。
-- Graph 取得結果の根拠となる canonical source を確認可能とする。
-- 必要に応じて rg, filesystem scan 等の独立手段で補完・反証する。
-- Graph 不在を関連なし、影響なしの根拠にしない。
-- 意味的類似、意味的責務重複を Graph の明示関係と同一視しない。
-
-### Discovery / Impact
-
-req-define, spec-save, backlog-review は関連成果物候補の探索に Artifact Graph を利用する。
-候補取得後に正規成果物本文および独立探索手段で確認してから最終判断する。
-
-case-open は Issue 対象範囲, 完了条件, test strategy の確定前に Artifact Graph による変更影響候補を評価する。
-候補は正規成果物または独立した探索手段で確認した上で in scope, verification only, out of scope に分類する。
-必須品質能力の導出は artifact-quality-control-routing SPEC に従い、Graph の関係から必須 skill を直接決定しない。
-
-### Diagnostics
-
-inspect-docs は Artifact Graph を構造診断候補の探索に利用する。
-候補には unresolved reference, superseded artifact への現行参照, dangling relation, provenance 欠落, orphan candidate, 不自然な relation path, structural duplicate candidate を含む。
-決定的検査（参照実在、委譲先 skill 実在等）は DEC-006 が定める通り docs-check, IR-056 が所有し、inspect-docs は意味診断を担当する。
-構造候補は未検証 evidence として意味診断の入力に利用する。
-SPLIT, MERGE, MOVE, DUPLICATE, RETIRE, DRIFT 等の意味判断を Graph の構造情報だけから確定しない。
-
-inspect-skills は self-hosting augmentation が利用可能な場合、command と skill 関係, command と extension と skill 関係, 予期しない delegation, orphan skill candidate の候補を探索する。
-委譲先 skill 実在の決定的検査は docs-check, IR-056 が所有する。
-consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
-
-### Review Evidence
-
-agentdev-adversarial-review は Artifact Graph をレビュー対象候補, evidence の探索に利用する。
-論点候補は複数の規範的成果物から到達する対象, 複数経路, cycle, relation 集中ノード, isolated node, 複数 owner または governing relation を持つ候補である。
-Graph から得た情報は未検証 evidence として扱い、対論または正規成果物確認を経ずに finding を確定しない。
-
-### Verification
-
-case-close は Artifact Graph を変更後の関係整合性検証に利用する。
-確認対象は Graph の生成と鮮度, Graph integrity, unresolved relation, dangling relation, provenance defect, Graph と独立確認結果との差異である。
-Graph defect と canonical defect を区別する。
-Graph 自体の生成または問い合わせ失敗のみを理由に case-close を失敗させず、fail-open する。
-
-### case-run の利用制限
-
-case-run での Artifact Graph 利用は REQ-017-010 が定める境界内で補助用途に限定する。
-補助用途は予期しない依存または参照が見つかった場合の補助探索, acceptance criteria の検証根拠への到達, case-open 時点からの関係差異確認を含む。
-Graph で発見した候補のうち Issue scope 内の内部実装影響は case-run が自律処理し、scope, 完了条件, REQ, Decision, SPEC, 必須品質統制の変更が必要な場合は blocked として case-update 連携とする。
-証拠源にかかわらず case-run は既存 scope を超える変更を自律拡大しない。
-本制限は REQ-017-010 の境界を変更せず、Graph 利用時の適用を明確化する。
-
-各 consumer の権威的な動作仕様（利用タイミング、判断基準、fallback 動作）は各 command/skill SPEC が所有し、本 SPEC は Graph 提供能力と共通利用原則の概要を提供する。
+この割り当ては ADF の責務分担を表すものであり、TIM そのものへ組み込まない。
+ADF 固有ワークフローは TIM、派生索引、問い合わせ内部規則を独自に再定義せず、
+問い合わせ目的を指定し返された候補を利用して判断する。
+問い合わせ結果を最終判断として扱わず、正規成果物本文、rg 等の文字列探索、ファイル探索等の
+独立確認手段を必要な判断で利用する。派生索引の不在、生成失敗、空結果、候補過多だけを
+理由として「関係なし」「影響なし」と判断しない。
 
 ## 障害耐性
 

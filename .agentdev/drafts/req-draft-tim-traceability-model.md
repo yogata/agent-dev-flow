@@ -16,6 +16,9 @@ work_type: feature
 # scale: feature のみ standard / large
 scale: large
 
+# spec_actions_consumed: spec-save による artifact: spec エントリ消費済みフラグ
+spec_actions_consumed: true
+
 # summary: 当該 draft が何を合意したかの1段落要約
 summary: >-
   RU-0001（TIM準拠トレーサビリティモデル・派生索引・目的別探索の再構成）を、Artifact Graph の概念基盤を
@@ -517,7 +520,10 @@ operation_units:
     depends_on: []
     recommended_order: 5
     issue_policy: single
-    result: {}
+    result:
+      status: applied
+      saved_docs: [docs/specs/foundations/traceability-model.md]
+      action_ids: [ACT-SPEC-001]
 
 # test_strategy: 各合意項目の検証方法（3要素必須）
 test_strategy:
