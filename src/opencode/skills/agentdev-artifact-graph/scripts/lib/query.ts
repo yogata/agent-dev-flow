@@ -1,46 +1,17 @@
-import type { GraphData, GraphEdge, Provenance } from "./model.ts"
+import type { GraphData, GraphEdge } from "./model.ts"
 import { readdir, readFile, stat } from "node:fs/promises"
 import type { Dirent } from "node:fs"
 import { join } from "node:path"
+import { relationsFor, evidenceFor, type QueryResult } from "./query_support.ts"
+import { runIndexQuery, runProfileQuery, type ProfileName } from "./profiles.ts"
 
 export type GraphQuery =
   | { readonly kind: "neighbors"; readonly node: string; readonly depth: number }
   | { readonly kind: "path"; readonly source: string; readonly target: string; readonly maxDepth: number }
   | { readonly kind: "provenance"; readonly id: string }
   | { readonly kind: "discover"; readonly term: string; readonly roots: readonly string[]; readonly rootDir: string }
-
-export type QueryRelation = {
-  readonly id: string
-  readonly type: string
-  readonly source: string
-  readonly target: string
-}
-
-export type QueryResult = {
-  readonly nodes: readonly string[]
-  readonly edges: readonly string[]
-  readonly relations: readonly QueryRelation[]
-  readonly provenance: readonly Provenance[]
-  readonly discovered?: readonly string[]
-}
-
-function relationsFor(graph: GraphData, edgeIds: readonly string[]): readonly QueryRelation[] {
-  const idSet = new Set(edgeIds)
-  return graph.edges
-    .filter((edge) => idSet.has(edge.id))
-    .map((edge) => ({ id: edge.id, type: edge.type, source: edge.source, target: edge.target }))
-    .sort((left, right) => left.id.localeCompare(right.id))
-}
-
-function evidenceFor(graph: GraphData, nodeIds: readonly string[], edgeIds: readonly string[]): readonly Provenance[] {
-  const provenanceIds = new Set([
-    ...graph.nodes.filter((node) => nodeIds.includes(node.id)).map((node) => node.provenance_id),
-    ...graph.edges.filter((edge) => edgeIds.includes(edge.id)).map((edge) => edge.provenance_id),
-  ])
-  return graph.provenance
-    .filter((entry) => provenanceIds.has(entry.id))
-    .sort((left, right) => left.id.localeCompare(right.id))
-}
+  | { readonly kind: "profile"; readonly profile: ProfileName; readonly node: string; readonly depth: number; readonly limit: number }
+  | { readonly kind: "index"; readonly node: string }
 
 function adjacent(edges: readonly GraphEdge[], node: string): readonly { readonly node: string; readonly edge: string }[] {
   return edges.flatMap((edge) => {
@@ -164,6 +135,10 @@ export async function queryGraph(graph: GraphData, query: GraphQuery): Promise<Q
       return provenanceResult(graph, query.id)
     case "discover":
       return discoverResult(query)
+    case "profile":
+      return runProfileQuery(graph, query)
+    case "index":
+      return runIndexQuery(graph, query.node)
     default:
       return assertNever(query)
   }

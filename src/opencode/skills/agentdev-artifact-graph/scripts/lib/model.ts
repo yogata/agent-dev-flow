@@ -1,6 +1,11 @@
 import { z } from "zod"
+import {
+  CHANGE_IMPACT_DIRECTIONS,
+  NODE_TYPE_ROLES,
+  SEMANTICS_SLOTS,
+} from "./tim.ts"
 
-export const SCHEMA_VERSION = "1.0.0" as const
+export const SCHEMA_VERSION = "2.0.0" as const
 export const GENERATOR_VERSION = "0.1.0" as const
 
 export const OUTPUT_FILES = [
@@ -73,14 +78,31 @@ export function buildEdgeSchema(validRelationTypes: ReadonlySet<string>) {
   })
 }
 
+export const RelationSemanticsSchema = z.object({
+  meaning: z.string().min(1),
+  semantics_slot: z.enum(SEMANTICS_SLOTS).optional(),
+  change_impact_direction: z.enum(CHANGE_IMPACT_DIRECTIONS),
+  standard_vocabulary: z.array(z.string()),
+  source_types: z.array(z.string()).optional(),
+  target_types: z.array(z.string()).optional(),
+})
+
 export const ManifestSchema = z.object({
   schema_version: z.literal(SCHEMA_VERSION),
-  generator_version: z.literal(GENERATOR_VERSION),
+  /**
+   * Generator version is stored as a plain string (not a literal) so that a
+   * graph built by a different generator version loads and is judged stale by
+   * the 4-element freshness comparison instead of failing schema parse.
+   */
+  generator_version: z.string().min(1),
   input_digest: z.string().regex(/^[a-f0-9]{64}$/),
+  graph_config_digest: z.string().regex(/^[a-f0-9]{64}$/),
   indexed_paths: z.array(z.string()),
   excluded_paths: z.array(z.string()),
   node_types: z.array(z.string()),
   relation_types: z.array(z.string()),
+  relation_semantics: z.record(z.string(), RelationSemanticsSchema),
+  node_type_roles: z.record(z.string(), z.enum(NODE_TYPE_ROLES)),
 })
 
 export const DiagnosticSchema = z.object({

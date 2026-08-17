@@ -10,16 +10,20 @@ scripts/
 ├── tsconfig.json
 ├── lib/
 │   ├── model.ts           # 型、zod schema、定数（open extension point）
-│   ├── config.ts          # デフォルト設定、augmentation 読込、path utility
+│   ├── tim.ts             # TIM 意味カタログ（意味スロット、変更影響方向、プロファイル参加導出）
+│   ├── config.ts          # デフォルト設定、graph_config_digest、path utility
+│   ├── augmentation.ts    # augmentation 読込・解析、resolveConfig
 │   ├── parse.ts           # frontmatter、markdown link、extension field parser
 │   ├── provenance.ts      # provenance hashing
 │   ├── input.ts           # 入力収集 + digest
 │   ├── nodes.ts           # config 駆動ノード抽出
 │   ├── edges.ts           # config 駆動エッジ抽出
 │   ├── graph.ts           # build + load（動的 schema）
-│   ├── checker.ts         # 整合性検査
-│   ├── query.ts           # neighbors, path, provenance, discover
-│   ├── workflow.ts        # prepare（fail-open）
+│   ├── checker.ts         # 整合性検査（関係制約違反を含む）
+│   ├── query_support.ts   # 問い合わせ結果の共通型・補完
+│   ├── query.ts           # neighbors, path, provenance, discover、問い合わせ dispatcher
+│   ├── profiles.ts        # 高位プロファイル（related, impact, dependency, implementation）、index
+│   ├── workflow.ts        # prepare（fail-open、鮮度4要素判定）
 │   └── verification.ts    # verification feedback
 ├── src/
 │   ├── build_graph.ts     # CLI: グラフ生成

@@ -17,12 +17,12 @@ import {
   type Provenance,
 } from "./model.ts"
 import {
-  resolveConfig,
-  loadAugmentation,
+  computeGraphConfigDigest,
   validNodeTypes,
   validRelationTypes,
   type ResolvedConfig,
 } from "./config.ts"
+import { loadAugmentation, resolveConfig } from "./augmentation.ts"
 import { extractEdges } from "./edges.ts"
 import { collectInputs, computeInputDigest } from "./input.ts"
 import { extractNodes } from "./nodes.ts"
@@ -78,14 +78,28 @@ export async function buildGraphWithConfig(options: BuildOptions, config: Resolv
   const nodeSchema = buildNodeSchema(validNodeTypes(config))
   const edgeSchema = buildEdgeSchema(validRelationTypes(config))
 
+  const relationSemantics: Record<string, unknown> = {}
+  for (const name of [...config.relation_semantics.keys()].sort()) {
+    const semantics = config.relation_semantics.get(name)
+    if (semantics !== undefined) relationSemantics[name] = semantics
+  }
+  const nodeTypeRoles: Record<string, string> = {}
+  for (const name of [...config.node_type_roles.keys()].sort()) {
+    const role = config.node_type_roles.get(name)
+    if (role !== undefined) nodeTypeRoles[name] = role
+  }
+
   const manifest: Manifest = ManifestSchema.parse({
     schema_version: SCHEMA_VERSION,
     generator_version: GENERATOR_VERSION,
     input_digest: computeInputDigest(inputs),
+    graph_config_digest: computeGraphConfigDigest(config),
     indexed_paths: [...config.indexed_paths],
     excluded_paths: [...config.excluded_paths],
     node_types: [...config.node_type_vocabulary],
     relation_types: [...config.relation_type_vocabulary],
+    relation_semantics: relationSemantics,
+    node_type_roles: nodeTypeRoles,
   })
 
   const nodes = nodeIndex.nodes.map((node) => nodeSchema.parse(node))

@@ -139,3 +139,113 @@ See [requirement](../requirements/${REQ_001}.md).
     await writeFile(fullPath, content, "utf8")
   }
 }
+
+// ─── TIM semantic fixture (REQ-{NNNN}-{NNN} series) ────────────────────────────
+
+function numberedStem(prefix: string, n: number): string {
+  return `${prefix}-${String(n).padStart(3, "0")}`
+}
+
+const INDEX_001 = numberedStem("INDEX", 1)
+const DESIGN_001 = numberedStem("DESIGN", 1)
+const DESIGN_002 = numberedStem("DESIGN", 2)
+const RULE_001 = numberedStem("RULE", 1)
+
+export const CATALOG_NODE = `catalog:${INDEX_001}`
+export const DESIGN_NODE = `design:${DESIGN_001}`
+export const DESIGN_002_NODE = `design:${DESIGN_002}`
+export const RULE_NODE = `rule:${RULE_001}`
+
+/**
+ * Augmentation exercising the TIM semantic surface: an index-role artifact
+ * type (role identification, REQ-{NNNN}-{NNN}), extension relation types with
+ * declared semantics covering all 4 change impact directions (REQ-{NNNN}-{NNN},
+ * REQ-{NNNN}-{NNN}), and a semantics-free relation type that must stay out of
+ * purpose-specific queries while remaining usable in low-level queries.
+ */
+export const AUGMENTATION_WITH_TIM = `node_types:
+  - name: catalog
+    path_pattern: "^docs/catalog/(INDEX-[^/]+)\\\\.md$"
+    id_template: "catalog:{match1}"
+    label_source:
+      - kind: first_heading
+    role: index
+  - name: design
+    path_pattern: "^docs/design/(DESIGN-[^/]+)\\\\.md$"
+    id_template: "design:{match1}"
+    label_source:
+      - kind: first_heading
+  - name: rule
+    path_pattern: "^docs/rules/(RULE-[^/]+)\\\\.md$"
+    id_template: "rule:{match1}"
+    label_source:
+      - kind: first_heading
+relation_types:
+  - name: satisfies
+    fields:
+      - satisfies
+    reverse_direction: false
+    semantics:
+      meaning: "設計成果物が要件を充足する"
+      semantics_slot: satisfy
+      change_impact_direction: reverse
+      standard_vocabulary:
+        - "SysML «satisfy»"
+  - name: constrains
+    fields:
+      - constrains
+    reverse_direction: false
+    semantics:
+      meaning: "制約成果物が対象成果物を制約する"
+      semantics_slot: constrain
+      change_impact_direction: forward
+  - name: syncs_with
+    fields:
+      - syncs_with
+    reverse_direction: false
+    semantics:
+      meaning: "両成果物が互いに整合を維持する双方向関係"
+      change_impact_direction: both
+  - name: tracks
+    fields:
+      - tracks
+    reverse_direction: false
+indexed_paths:
+  - docs/catalog
+  - docs/design
+  - docs/rules
+`
+
+export async function createTimFixture(root: string): Promise<void> {
+  const files = {
+    [`docs/catalog/${INDEX_001}.md`]: `---
+title: Catalog index
+---
+# Catalog index
+
+- [requirement](../requirements/${REQ_001}.md)
+- [decision](../decisions/${DEC_001}.md)
+`,
+    [`docs/design/${DESIGN_001}.md`]: `---
+satisfies: ${REQ_001}
+syncs_with: rule:${RULE_001}
+---
+# Design one
+`,
+    [`docs/design/${DESIGN_002}.md`]: `---
+tracks: ${DEC_002}
+---
+# Design two
+`,
+    [`docs/rules/${RULE_001}.md`]: `---
+constrains: ${REQ_001}
+---
+# Rule one
+`,
+  } as const
+  for (const [relativePath, content] of Object.entries(files)) {
+    const fullPath = join(root, relativePath)
+    await mkdir(join(fullPath, ".."), { recursive: true })
+    await writeFile(fullPath, content, "utf8")
+  }
+}

@@ -1,18 +1,16 @@
 import { resolve } from "node:path"
 import { loadGraph } from "../lib/graph.ts"
 import { queryGraph, type GraphQuery } from "../lib/query.ts"
+import { DEFAULT_PROFILE_DEPTH, DEFAULT_PROFILE_LIMIT, type ProfileName } from "../lib/profiles.ts"
+
+const PROFILE_SUBCOMMANDS = new Set(["related", "impact", "dependency", "implementation"])
 
 function value(args: readonly string[], name: string, fallback: string): string {
   const index = args.indexOf(name)
   return index < 0 ? fallback : (args[index + 1] ?? fallback)
 }
 
-function option(args: readonly string[], name: string): string | undefined {
-  const index = args.indexOf(name)
-  return index < 0 ? undefined : args[index + 1]
-}
-
-const FLAGS_WITH_VALUE = new Set(["--graph", "--root", "--depth", "--max-depth", "--augmentation", "--roots"])
+const FLAGS_WITH_VALUE = new Set(["--graph", "--root", "--depth", "--max-depth", "--augmentation", "--roots", "--limit"])
 
 function findSubcommandIndex(args: readonly string[]): number {
   let i = 0
@@ -55,10 +53,27 @@ function parseQuery(args: readonly string[]): GraphQuery {
       kind: "discover",
       term: args[commandIndex + 1] ?? "",
       roots: parseList(args, "--roots"),
-      rootDir: resolve(option(args, "--root") ?? "."),
+      rootDir: resolve(rootOption(args)),
     }
   }
-  throw new TypeError(`query must be neighbors, path, provenance, or discover`)
+  if (command === "index") {
+    return { kind: "index", node: args[commandIndex + 1] ?? "" }
+  }
+  if (command !== undefined && PROFILE_SUBCOMMANDS.has(command)) {
+    return {
+      kind: "profile",
+      profile: command as ProfileName,
+      node: args[commandIndex + 1] ?? "",
+      depth: Number(value(args, "--depth", String(DEFAULT_PROFILE_DEPTH))),
+      limit: Number(value(args, "--limit", String(DEFAULT_PROFILE_LIMIT))),
+    }
+  }
+  throw new TypeError("query must be neighbors, path, provenance, discover, related, impact, dependency, implementation, or index")
+}
+
+function rootOption(args: readonly string[]): string {
+  const index = args.indexOf("--root")
+  return index < 0 ? "." : (args[index + 1] ?? ".")
 }
 
 function parseList(args: readonly string[], name: string): readonly string[] {

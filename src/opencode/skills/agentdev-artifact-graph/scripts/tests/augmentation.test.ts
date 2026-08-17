@@ -4,7 +4,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { buildGraph, loadGraph } from "../lib/graph.ts"
 import { checkGraph } from "../lib/checker.ts"
-import { AUGMENTATION_DEFAULT_PATH } from "../lib/config.ts"
+import { AUGMENTATION_DEFAULT_PATH } from "../lib/augmentation.ts"
 import { createFixture, createGuideFixture, AUGMENTATION_WITH_GUIDE } from "./fixture.ts"
 
 const roots: string[] = []
@@ -100,5 +100,15 @@ describe("TS-{NNN}: augmentation adds node_type and relation_type", () => {
     const manifest = JSON.parse(await readFile(join(fixture.output, "manifest.json"), "utf8"))
     expect(manifest.relation_types).toContain("custom_rel")
     expect(manifest.relation_types).toContain("references") // default still present
+  })
+
+  it("default manifest carries TIM semantics for the 5 defaults and no roles", async () => {
+    const fixture = await setup()
+    await buildGraph(fixture)
+    const manifest = JSON.parse(await readFile(join(fixture.output, "manifest.json"), "utf8"))
+    expect(Object.keys(manifest.relation_semantics).sort()).toEqual([
+      "contains", "defined_in", "extends", "references", "supersedes",
+    ])
+    expect(manifest.node_type_roles).toEqual({})
   })
 })
