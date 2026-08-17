@@ -390,3 +390,35 @@
 - **想定反映先**: case-close E4-0 運用の参考（learning-promote で判定）
 - **関連**: Epic #2189（case-close 実行中に検知・是正。PR 由来ではない自律学び）
 - **タグ**: #worktree #verification #tooling
+
+## worktree 環境では git stash を使わず detached worktree で baseline 比較する（OU-001、PR #2201）
+
+- **問題事象**: git stash の stash list は worktree 間で共有されるため、worktree 内で変更がない状態で `git stash` を実行しても stash が作成されず、続けて `git stash pop` すると他 worktree 由来の無関係な既存 stash を pop して conflict 状態になった。
+- **発生局面**: 実装（Issue #2200 の検証作業中、worktree での stash 往復）
+- **検知方法**: `git stash pop` 実行時の予期しない conflict と、`git stash list` に残る他 worktree 由来 stash エントリとの突合
+- **根本原因**: stash はリポジトリ共有の ref（refs/stash）であり worktree ごとに分離されていない。変更なし worktree では stash 生成が no-op になり、pop は直近の無関係 stash を対象にする
+- **自律対応内容**: `git reset --hard HEAD` で復旧し stash エントリは保持。以後 worktree では stash の代わりに detached worktree による baseline 比較を使う
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: worktree で一時退避が必要な場面全般。stash は worktree 非分離の共有リソースであることを踏まえた運用設計
+- **再発条件**: 複数 worktree が存在するリポジトリで、変更の有無を確認せず stash 往復を実行する場合
+- **予防策候補**: worktree 検証手順に「stash 不使用、detached worktree による baseline 比較」を標準手順化する
+- **想定反映先**: agentdev-git-worktree 検証手順の参考（learning-promote で判定）
+- **関連**: PR #2201 (MERGED 962dc688), Issue #2200 (CLOSED)
+- **タグ**: #worktree #git #stash
+
+## Phase 0（req-save/spec-save）起因の AUTOGEN 陳腐化は case-close の dry-run ゲートで差戻しになる（OU-001 case-close、PR #2201）
+
+- **問題事象**: req-save / spec-save が REQ・SPEC を追加しても AUTOGEN メトリクスブロック（req-health-metrics.md / spec-health-metrics.md の計測例）を再生成しないため、case-close の project extension チェック `autogen-index-regeneration-diff`（generate_indexes.ts --dry-run）が WOULD UPDATE 2 件を検出し、PR 起因ではなく main 既存の陳腐化でもマージ前に構造化停止・case-run 差戻しとなった。
+- **発生局面**: case-close（STEP-3 拡張チェック autogen-index-regeneration-diff。Phase 0 の commit e864af5e / 7ad962cf 起因）
+- **検知方法**: PR head worktree と main 双方での `generate_indexes.ts --dry-run` 比較（両方 WOULD UPDATE → PR 外起因と帰属）、check_integrity の IndexGenerationConsistency NG 2 件
+- **根本原因**: req-save / spec-save 工程は AUTOGEN 対象ブロックを更新しない。AUTOGEN ゲートは起因を問わず差分を検出して停止する契約（複数 PR 跨ぎの再生成漏れ防止）のため、Phase 0 起因分も case-close 到達時に表面化する
+- **自律対応内容**: ゲート契約に従いマージせず case-auto へ partial 報告（差戻し）。case-run が worktree で generate_indexes.ts を実行して再生成 commit（3632878a）を PR へ追加、case-close 再実行で dry-run 差分ゼロ・check_integrity NG 0 を確認してマージ完了
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（case-close SPEC Step 3-3・extension checks の契約どおりの作動事例）
+- **横展開観点**: 機能追加フローで SPEC/REQ を追加する場合、AUTOGEN 再生成は case-run 側で先に実施しておくと case-close の差戻しを回避できる。case-close 側で再生成して完結する手段は契約上禁止
+- **再発条件**: req-save / spec-save で REQ・SPEC を追加し、case-run が AUTOGEN 再生成を実施しないまま PR を作成した場合
+- **予防策候補**: case-run の前置 gate に AUTOGEN dry-run 差分チェックを追加する、または spec-save 実行時にメトリクス系 AUTOGEN ブロックの再生成を案内する
+- **想定反映先**: case-run 前置 gate / spec-save 完了報告の参考（learning-promote で判定）
+- **関連**: PR #2201 (MERGED 962dc688), Issue #2200 (CLOSED), 再生成 commit 3632878a
+- **タグ**: #autogen #case-close #phase0 #gate
