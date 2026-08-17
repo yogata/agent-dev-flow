@@ -87,8 +87,8 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/case-open.md | 438 | accepted | commands |
 | integrity/audits/classification-20260811.md | 422 | draft | integrity |
 | integrity/baselines/pre-audit-baseline-20260811.md | 416 | accepted | integrity |
-| skills/agentdev-artifact-graph.md | 410 | draft | skills |
 | foundations/system.md | 406 | accepted | foundations |
+| skills/agentdev-artifact-graph.md | 399 | draft | skills |
 | responsibilities/document-type-responsibilities.md | 372 | accepted | responsibilities |
 | local/runtime-package-boundary.md | 359 | accepted | local |
 | integrity/audits/final-reverification-20260811.md | 341 | accepted | integrity |
@@ -96,11 +96,12 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | workflows/epic-wave-model.md | 318 | accepted | workflows |
 | commands/spec-save.md | 305 | accepted | commands |
 | commands/case-close.md | 302 | accepted | commands |
+| foundations/traceability-model.md | 293 | draft | foundations |
 | integrity/integrity-rule-catalog.md | 290 | accepted | integrity |
 | workflows/backlog-artifact-lifecycle.md | 283 | accepted | workflows |
 | workflows/workflow-contracts.md | 283 | accepted | workflows |
 | workflows/delegation-contracts.md | 269 | accepted | workflows |
-| README.md | 263 | - | uncategorized |
+| README.md | 264 | - | uncategorized |
 | workflows/workflow-skill-model.md | 248 | draft | workflows |
 | skills/agentdev-gh-cli.md | 245 | accepted | skills |
 | local/local-case-file.md | 240 | accepted | local |
@@ -240,7 +241,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-053-gh-direct-invocation-detection.md | 20 | accepted | integrity |
 | skills/agentdev-git-worktree-test-fallback.md | 18 | draft | skills |
 
-計測日: 2026-08-16。
+計測日: 2026-08-17。
 <!-- AUTOGEN:END -->
 
 SPEC 行数は frontmatter、HTML コメントを除く本文行数。
