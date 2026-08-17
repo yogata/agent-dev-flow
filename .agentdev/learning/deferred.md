@@ -581,27 +581,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 ---
 
 
-## Windows worktree 環境で lint_skills.ts を実行するためのジャンクション一時作成パターン
-
-- **問題事象**: Windows + ジャンクション環境の git worktree（`.worktrees/{N}`）で `lint_skills.ts` を実行すると、メインリポジトリで `sync-self-opencode.ps1` / `install-consumer-opencode.ps1` が作成する `.opencode/skills/{name}` へのジャンクションリンクが worktree 側に伝播しておらず、配布スキル（`japanese-tech-writing` 等）が検査対象に出力されず WARNING が正しく評価できない。今回の事例では PR #1551 の TS-001（AG-001 lint WARNING 0件確認）で発生。AGENTS.md の case-run 制約事項「準備フェーズの既知の制約（Windows + ジャンクション環境）」に該当。
-- **発生局面**: 実装（case-run driver 実行フェーズ、worktree 内での lint 検証）
-- **検知方法**: 手動確認。`lint_skills.ts` を worktree 内で実行した際、`japanese-tech-writing` SKILL.md についての結果行が出力されず、frontmatter description の trigger 記述欠落 WARNING が表示されないことで気付いた。
-- **根本原因**: git worktree 作成時にメインリポジトリのジャンクションリンク（`.opencode/skills/{name}` → `src/opencode/skills/{name}`）は伝播しない。`.opencode/` 配下のジャンクション構造は git 管理対象外（`.gitignore`）のため worktree 側に再現されない。
-- **自律対応内容**: 同期スクリプト（`sync-self-opencode.ps1` 等）には依存せず、検証目的で `New-Item -ItemType Junction -Path .opencode/skills/japanese-tech-writing -Target ../../src/opencode/skills/japanese-tech-writing` で手動作成して `lint_skills.ts` を実行。検証完了後にジャンクションを削除。ジャンクションは `.gitignore` 対象のため `git status` に現れず commit 対象外となり、作業ツリーの汚染なし。
-- **ユーザー確認有無**: なし（エージェント自律で実施。AGENTS.md の case-run 制約事項は既知の前提）
-- **ADR/REQ/spec影響**: なし。本件は case-run skill の既知制約（`references/self-healing-and-errors.md` 該当セクション）の具体的事例であり、新規 ADR/REQ/spec 影響はない。ジャンクション再作成手順は case-run skill 既存手順に準拠。
-- **横展開観点**: Windows + ジャンクション環境で `.opencode/skills/` 配下を走査するツール（`lint_skills.ts`, `check_extensions.ts` 等）を worktree 内で実行する際、必要なスキル名のジャンクションだけを一時作成して検証後に削除するパターンが適用可能。全スキル再作成ではなく検証対象のみ作成する最小限アプローチで済む。Linux/macOS 環境では発生しない。
-- **再発条件**: (1) Windows 環境、(2) git worktree を使用、(3) `.opencode/skills/` 配下を走査する検査ツールを worktree 内で実行、(4) メインリポジトリで `sync-self-opencode.ps1` 実行後に worktree を作成、の全てが揃った場合。
-- **予防策候補**: (a) case-run driver 引き継ぎプロンプトに「lint_skills.ts 等の `.opencode/skills/` 走査ツール実行前に必要なジャンクションを一時作成し、検証後に削除」の手順を明記する（現在は case-run skill AGENTS.md の制約事項記載にとどまる）。(b) 同期スクリプトに worktree 単位のジャンクション再作成オプションを追加する。
-- **想定反映先**: case-run skill `references/subagent-protocol.md` の「driver 起動プロンプトテンプレート（Windows + ジャンクション環境）」セクション、または case-run skill の「準備フェーズの既知の制約」セクションに lint 検証時の一時ジャンクション作成パターンを具体例として追記。
-- **関連**: PR #1551, Issue #1550, AGENTS.md case-run「準備フェーズの既知の制約（Windows + ジャンクション環境）」, case-run skill `references/self-healing-and-errors.md`
-- **タグ**: `#windows` `#junction` `#worktree` `#lint-skills` `#case-run` `#workaround`
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
-
----
-
-
 ## 要件追加が既存基準の明文化で実変換を伴わない no-op パターン
 
 - **問題事象**: TS-002（配布物 Markdown BOM なし UTF-8 統一）を含む Issue で、配布物が既に BOM なし UTF-8 へ準拠済みであるにもかかわらず、新規要件（REQ-0108-271）の追加が発生した。要件追加は将来のドリフト防止が主目的で、実変換は不要であった。しかし pass_criteria の表現からは「実変換を伴う合格」と「no-op confirmed の合格」の区別が読み取れず、レビュー時にスコープ過大評価やテスト不足誤認の恐れがあった。
@@ -617,27 +596,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **想定反映先**: workflow-templates skill `templates/pr_desc.md`（Test Strategy 結果欄）、quality-gates skill `references/qg-4-final-acceptance.md`（test strategy 処理完了の検査観点）
 - **関連**: PR #1553, Issue #1552, AG-002, TS-002, REQ-0108-271（commit `d9480642`）
 - **タグ**: `#no-op` `#pass-criteria` `#test-strategy` `#case-run` `#case-close` `#qg-4`
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
-
----
-
-
-## worktree ジャンクション未伝播環境での README 参照 fallback 実装パターン
-
-- **問題事象**: Windows + ジャンクション環境の git worktree（`.worktrees/{N}`）で `commands_e2e.test.ts` を実行すると、`SKILLS_DIR` / `TEMPLATES_DIR` が projection（`.opencode/`）を前提としていたため、worktree 内に `.opencode/commands/agentdev/README.md` が存在せずテストが fail した。メインリポジトリで `sync-self-opencode.ps1` / `install-consumer-opencode.ps1` が作成する `.opencode/commands/agentdev/` 等のジャンクションが worktree 側に伝播しないため。
-- **発生局面**: 実装（case-run driver 実行フェーズ、worktree 内での e2e テスト実行）
-- **検知方法**: CI / ローカルテスト実行。`commands_e2e.test.ts` が README listing を projection パスから読み取れず、58件 fail の一部として報告。
-- **根本原因**: git worktree 作成時にメインリポジトリのジャンクションリンク（`.opencode/commands/agentdev/` → `src/opencode/commands/agentdev/` 等）は伝播しない。`.opencode/` 配下のジャンクション構造は git 管理対象外（`.gitignore`）のため worktree 側に再現されない。テストコードが projection パスのみを前提としていたことが直接原因。
-- **自律対応内容**: `commands_e2e.test.ts` の `SKILLS_DIR` / `TEMPLATES_DIR` 解決部に source（`src/opencode/`）への fallback パス解決を追加。projection が存在しない場合は source を参照する挙動とし、worktree 内でもテストが実行可能になった。同期スクリプトには依存せず、テストコード側で両パスを許容する設計。
-- **ユーザー確認有無**: なし（エージェント自律で実装。AGENTS.md の case-run 制約事項「準備フェーズの既知の制約（Windows + ジャンクション環境）」の具体的事例）
-- **ADR/REQ/spec影響**: なし。本件はテストコードの環境差吸収の実装パターン拡充であり、新規 ADR/REQ/spec 影響はない。ジャンクション未伝播自体は case-run skill の既知制約。
-- **横展開観点**: Windows + ジャンクション環境で projection（`.opencode/`）配下を走査する検査ツール・テストコード全般に適用可能。projection → source の段階的パス解決（fallback）を実装しておくと、worktree 内でもジャンクション再作成なしに検証可能。`lint_skills.ts`, `check_extensions.ts`, `check_changed_docs.ts` 等の既存ツールも同様の fallback 検討余地あり。
-- **再発条件**: (1) Windows 環境、(2) git worktree を使用、(3) テストコード・検査ツールが projection（`.opencode/`）パスのみを前提、(4) メインリポジトリで `sync-self-opencode.ps1` 実行後に worktree を作成、の全てが揃った場合。
-- **予防策候補**: (a) projection / source のパス解決ヘルパを共通化し、新規テスト・検査ツールが暗黙に利用する仕組み。(b) case-run driver 引き継ぎプロンプトに「projection パスを参照するテストは source fallback 実装を確認」の項を追加する。
-- **想定反映先**: repo-agentdev-integrity skill（`commands_e2e.test.ts` 等のテストコード規約）、case-run skill `references/subagent-protocol.md` の「driver 起動プロンプトテンプレート（Windows + ジャンクション環境）」セクション
-- **関連**: PR #1553, Issue #1552, AG-001（EXPECTED_COMMANDS vs README listing 照合）, AGENTS.md case-run「準備フェーズの既知の制約（Windows + ジャンクション環境）」
-- **タグ**: `#windows` `#junction` `#worktree` `#e2e-test` `#fallback` `#case-run`
 - **移動日**: 2026-07-22
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
@@ -722,27 +680,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **想定反映先**: `agentdev-gh-cli/references/standard-procedures.md`（本文修復手順の記載）、`agentdev-issue-management/references/issue-operation-safety.md`（修復時の前後スナップショット比較）。両者とも REQ-0132/0149 実装で既カバーされており、本学びは具体的事例の補強。
 - **関連**: PR #1600, Issue #1537（AG-007）, Issue #1533（修復対象）, RU-20260718-01（起点 RU）, REQ-0132-024/025/026, REQ-0149-010, PR #1539（実装 PR）
 - **タグ**: `#case-close` `#issue-body-restore` `#lf-corruption` `#markdown-structure` `#verify` `#ag-007` `#powershell-encoding` `#req-0132-024` `#req-0149-010`
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
-
----
-
-
-## gh CLI 出力の PowerShell パイプライン経由読み取りによる UTF-8 損傷と Node.js execSync 回避
-
-- **問題事象**: PowerShell から `gh api ... --jq .body`（または `gh issue view ... -q .body`）をパイプライン経由で取得すると、PowerShell が UTF-8 バイト列を cp932（Shift-JIS）として再解釈し、日本語文字化けと LF 数の不正確な計測を同時に生じる。本件事例では LF 数を正しく計測できず、見出し数の検査も信頼できない状態になった。本来 LF=204 の本文が PowerShell 経由では異なる値で観測される。
-- **発生局面**: 完了処理（case-close Step 2 QG-4 評価時の本文読み戻し、AG-007 修復後の検証）
-- **検知方法**: 同一 PR 作業中に PowerShell パイプライン経由と Node.js `execSync` 経由で LF 数を並列計測し、値が一致しないことで検出。
-- **根本原因**: PowerShell はネイティブコマンド（gh CLI）の UTF-8 出力をパイプライン経由でエンコーディング変換する。Windows PowerShell 5.x では Shift-JIS に変換、pwsh 7 でもネイティブコマンド出力の取り回しで日本語が破損する場合がある。文字化けと同時に改行バイト列も影響を受け、LF 数計測が不正確になる。
-- **自律対応内容**: 全ての gh CLI 出力読み取りを Node.js `child_process.execSync` に切替。`execSync` は PowerShell パイプラインをバイパスして gh CLI の生の UTF-8 出力を直接取得するため、エンコーディング変換による文字化けが発生しない。検証用スクリプトは `node -e` で単発計測するか、`.js` スクリプトファイル（`$env:TEMP/agentdev/` 配下）へ退避して実行する（クォート階層競合回避）。
-- **ユーザー確認有無**: なし（エージェント自律で検証経路を Node.js に統一）
-- **ADR/REQ/spec影響**: なし。本件は `agentdev-gh-cli/references/standard-procedures.md` Section 3「安全な読み取り手順」に既規定の内容の具体的事例。新規 REQ/ADR/SPEC 影響なし。
-- **横展開観点**: gh CLI 出力に限らず、PowerShell からネイティブコマンド（git, bun, gh, gh api 等）の出力を取得する際、UTF-8 を含む場合は常に Node.js `execSync` 経由を原則とする。特に日本語文字列、改行コード、バイト長を厳密に扱う検証（VERIFY、targeted docs guard、extensions integrity 等）では PowerShell パイプライン経由を避ける。Linux/macOS 環境では発生しない（既定で UTF-8 コンソール）。
-- **再発条件**: (1) Windows 環境、(2) PowerShell からネイティブコマンドの UTF-8 出力をパイプライン経由で取得、(3) その結果を文字列操作・正規表現マッチ・JSON parse に直接渡す、の全てが揃った場合。
-- **予防策候補**: (a) README/AGENTS.md の PowerShell 利用ガイドラインに「ネイティブコマンド UTF-8 出力読み取りは Node.js `execSync` を使用」というルールを明示する（現状は standard-procedures.md に記載だが、より上位のガイドラインにも言及を広げる）。(b) jq 式にシングルクォート・角括弧・パイプを含む場合は `node -e` を禁止し `.js` スクリプトファイルへ退避するルール（既規定）の周知徹底。
-- **想定反映先**: `agentdev-gh-cli/references/standard-procedures.md` Section 3（既規定・具体的事例の補強）、AGENTS.md「PowerShell 利用ガイドライン」（もし該当セクションがあれば。なければハーネス選定セクション配下に簡潔に追記）。
-- **関連**: PR #1600, Issue #1537, AGENTS.md「ハーネス選定」セクション, `agentdev-gh-cli/references/standard-procedures.md` Section 3「安全な読み取り手順」
-- **タグ**: `#powershell` `#encoding` `#utf8` `#cp932` `#node-execsync` `#verify` `#gh-cli` `#case-close` `#windows`
 - **移動日**: 2026-07-22
 - **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
 
@@ -938,88 +875,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 ---
 
 
-## CaptureBoundary チェックと配布物参照境界（IR-059）の相互作用と両立運用（Epic #1719 Wave 4 実証）
-
-- **問題事象**: PR #1728（Wave 1, OU-001）で skill 内部参照の抽象化（コンクリートパス除去）を実施した際、`agentdev-workflow-orchestration` の `capture-boundaries.md` 参照も除去された。結果として `checkCommandCaptureDuties`（`content.includes("capture-boundaries")` で文字列一致を要求）が崩れ、case-run/case-close/req-save/case-open の4配布 command でチェック違反4件が発生した。
-- **発生局面**: 全件回帰検査（Wave 4 final verification）
-- **検知方法**: `repo-agentdev-integrity/scripts` 配下の `checkCommandCaptureDuties` 実行時、4 command のチェック違反を検出
-- **根本原因**: `checkCommandCaptureDuties` は配布 command 本文が `capture-boundaries` 文字列を含むことを要求する一方、配布物参照境界 IR-059 はコンクリートパス（`docs/specs/workflows/capture-boundaries.md`）の直接参照を禁止する。両者の境界条件が直交しており、抽象化（コンクリートパス除去）だけでは文字列一致チェックを満たさなくなる。
-- **自律対応内容**: 配布 command 4件に概念名 `capture-boundaries` を括弧書きで本文へ含める形で復元。コンクリートパスは使わず、概念名のみを残すことで IR-059 違反なし、かつ `checkCommandCaptureDuties` の文字列一致チェックを満たす両立運用を確立。PR #1735 で修復、mergeCommit df48c9f9。
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: あり。SPEC確定候補として PR #1735 本文に「CaptureBoundary チェックと配布物参照境界の相互作用」を記録済み。`integrity-contracts.md` または `capture-boundaries.md` SPEC への明文化を推奨する根拠となる。
-- **横展開観点**: 同種の「チェック文字列」と「配布物参照禁止」が両立する必要がある全配布 command で、概念名を括弧書き等で本文へ含める運用を標準化できる。case-auto.md にも現状コンクリートパス参照が残っており（baseline-known NG）、将来クリーンアップで本パターンへ統一すべき。
-- **再発条件**: (1) 配布 command から skill 内部参照抽象化のためにコンクリートパスを除去する、(2) 当該 command が `capture-boundaries` 文字列を含まなくなる、(3) 回帰検査で `checkCommandCaptureDuties` が実行される。
-- **予防策候補**: (a) 抽象化リファクタリング時に `checkCommandCaptureDuties` が要求する概念名文字列の残存を必ず確認する。(b) `integrity-contracts.md` または `capture-boundaries.md` SPEC へ「概念名は括弧書きで残す」運用を明文化する。(c) `case-auto.md` の既存コンクリートパス参照を概念名参照へ統一する。
-- **想定反映先**: integrity-contracts.md SPEC または capture-boundaries.md SPEC（両立運用の明文化）、抽象化リファクタリング手順（チェック文字列残存確認ステップ）
-- **関連**: PR #1728, PR #1735, Issue #1720, Issue #1725, Epic #1719, checkCommandCaptureDuties, IR-059, agentdev-workflow-orchestration/capture-boundaries
-- **タグ**: #capture-boundaries #ir-059 #distribution-reference-boundary #check-violation #regression-test #epic-1719 #wave-4 #concept-name-pattern
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
-
----
-
-
-## Windows worktree 環境で check_integrity.ts の subprocess JSON が空 stdout を返す問題（Epic #1719 Wave 4 観測）
-
-- **問題事象**: Wave 4 全件回帰検査で `repo-agentdev-integrity/scripts` 配下の test を実行した際、67件が失敗。エラーは `JSON.parse(r.stdout)` が "Unexpected EOF" を返すもの。`git stash` で本 PR 変更を退避しても同一に失敗することを確認し、pre-existing 環境問題と判定した。
-- **発生局面**: テスト実行（Wave 4 final regression）
-- **検知方法**: `bun test` 実行時の失敗ログ解析
-- **根本原因**: Windows worktree 環境で `check_integrity.ts` の subprocess（Node.js `child_process` 経由）が stdout へ JSON を出力する際、stdout エンコーディング（cp932 vs UTF-8）またはバッファリングの問題で親プロセスへ空文字列が渡る。Node.js `execSync` の stdout 取得が Windows コンソール codepage に依存するため、UTF-8 を前提とする JSON parse が EOF エラーとなる。
-- **自律対応内容**: pre-existing 問題と判定し record-in-findings で処理。本 PR のスコープ外として main 環境での再現確認を推奨事項として PR 本文へ明記。実装側の修正は行わず、Wave 4 完了をブロックしない判定根拠を記録。
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（環境問題の観測記録。SPEC変更不要）
-- **横展開観点**: Windows 環境で `child_process` 経由の JSON やコマンド出力を扱う全 Node.js 実装で、コンソール codepage 依存の stdout 取得が問題になり得る。`execSync` ではなく `spawn` + 明示的 encoding 指定、または subprocess 側で `--encoding utf-8` 強制が予防策候補。
-- **再発条件**: (1) Windows worktree 環境、(2) `check_integrity.ts` が subprocess 経由で JSON を stdout 出力、(3) stdout が cp932 でエンコードされるかバッファ未フラッシュで空になる。
-- **予防策候補**: (a) subprocess 側で明示的に `process.stdout.write(JSON.stringify(...))` を使い `--encoding utf-8` を指定。(b) 親側で `execSync` の `encoding` option を明示。(c) worktree ではなく main 環境で整合性検査を実行する運用。（いずれも別 Issue での対応推奨）
-- **想定反映先**: check_integrity.ts の subprocess 呼び出し実装（encoding 指定）、または運用ガイド（main 環境での検査実行）
-- **関連**: PR #1735, Issue #1725, Epic #1719, check_integrity.ts, repo-agentdev-integrity/scripts
-- **タグ**: #windows #worktree #subprocess #json-parse #encoding #cp932 #pre-existing #environment-issue #epic-1719 #wave-4
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
-
----
-
-
-## 複数PR跨ぎ semantically 競合の Level 2 コンフリクト解消パターン（Epic #1719 Wave 2 実証）
-
-- **問題事象**: Wave 2 の PR #1732（agentdev-spec-file-manager 新設、search-target-area.ts 移管）と PR #1733（agentdev-artifact-validation 新設、check-* scripts 移管）が semantically 競合。Level 1 rebase（機械的 git rebase）では解消不可、case-auto へエスカレーション。Level 2 コンフリクト解消（手動 rebase、HEAD ba2df921）で両 PR の意図を統合して squash merge（mergeCommit 8fb17eb8）。
-- **発生局面**: マージ（Wave 2 PR マージ時）
-- **検知方法**: PR #1733 の rebase 実行時にコンフリクト発生。コンフリクトファイルは `spec-save.md`, `agentdev-req-file-manager/SKILL.md`, `agentdev-req-file-manager/scripts/README.md` の3件。Level 1（機械的解消）を試みても解消せず、意図統合が必要と判断。
-- **根本原因**: 2 PR が共通ファイル（spec-save.md の SKILL 参照リスト、req-file-manager 配下）へ同時に影響を与え、かつ各々の意図（search-target-area.ts → spec-file-manager 移管、check-* scripts → artifact-validation 移管）が直交しながらも同時適用が必要だった。git の行ベースマージでは意図レベルの統合を表現できない。
-- **自律対応内容**: case-auto が Level 2 コンフリクト解消を判定し、手動 rebase で両 PR の変更を統合。HEAD ba2df921 へ整理後、squash merge を完了。コンフリクト解消経緯を Epic #1719 Wave 2 進捗セクションへ構造化記録。
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし（ワークフロー運用知見。SPEC変更不要）
-- **横展開観点**: Wave 内並列 PR で共通ファイルへ影響する場合、case-open の Wave 構成で依存関係を事前検出し、直列化または単一PR集約を検討すべき。Level 2 解消は最終手段。同じ skill 配下のファイルへの複数 OU 影響は Wave 構成警告のトリガにできる。
-- **再発条件**: (1) 同一 Wave 内の並列 PR が共通ファイルへ影響する、(2) 各 PR が直交する意図を持ち同時適用が必要、(3) git の行ベースマージでは意図統合を表現できない。
-- **予防策候補**: (a) case-open Wave 構成で共通ファイル影響を事前検出し直列化または単一PR集約。(b) Wave 2 のように同一 skill 配下への複数 OU 影響がある場合、Wave 構成ロジックで依存を明示。(c) Level 2 コンフリクト解消手順を case-auto へ標準化（既存機能だが発火条件の明文化）。
-- **想定反映先**: case-open Wave 構成ロジック（共通ファイル依存検出）、case-auto Level 2 コンフリクト解消発火条件の明文化
-- **関連**: PR #1732, PR #1733, Issue #1723, Issue #1726, Epic #1719, mergeCommit 8fb17eb8, HEAD ba2df921
-- **タグ**: #wave-2 #level-2-conflict #case-auto #parallel-pr #semantic-conflict #merge-pattern #epic-1719
-- **移動日**: 2026-07-22
-- **処分判定**: deferred（learning-promote 2026-07-22 評価。詳細は evaluation-report.md 参照）
-
-
-## 2026-07-23: Phase 1 一括 commit 運用パターンにおける子Issue 完了判定の case-close 偏在
-
-- **問題事象**: RU-20260722-02 の8 AG を Phase 1 commit 0192019c で一括保存した結果、Wave 1〜3 の子Issue case-run は実装追加でなく acceptance criteria 順位検証と小改善が主体となった。Wave 1 #1737, #1738、Wave 2 #1739, #1740 と同様のパターン（Phase 1 保存内容の確認 + 小改善）。この運用では子Issue の実質的完了判定が case-close に集中する。
-- **発生局面**: case-close（Wave 3 PR #1748、Wave 1 #1737/#1738、Wave 2 #1739/#1740）
-- **検知方法**: PR 本文 Findings / Capture候補 セクション（Wave 3 PR #1748）
-- **根本原因**: Phase 1（RU 一括 commit 保存）と Phase 2（case-open による子Issue 分割）の分離基準が明文化されておらず、Phase 1 で8 AG を一括保存すると子Issue case-run は acceptance criteria 順位検証と小改善が主体となる。
-- **自律対応内容**: Wave 1〜3 とも acceptance criteria 順位検証と小改善を実施。完了判定は case-close で都度評価。
-- **ユーザー確認有無**: なし
-- **ADR/REQ/spec影響**: なし
-- **横展開観点**: Phase 1 一括 commit + Phase 2 case-open の運用を採用する Epic 全般。
-- **再発条件**: Epic で Phase 1 一括 commit 運用を採用し、Phase 2 case-open で子Issue を分割した場合。
-- **予防策候補**: (a) Phase 1 一括保存と Phase 2 case-open の分離基準の明文化、(b) acceptance criteria 順位検証のみの子Issue と実装追加の子Issue の完了条件テンプレート分離検討
-- **想定反映先**: `agentdev-workflow-lifecycle` skill（Phase 分離基準）、`case-open` command（子Issue 完了条件テンプレート）
-- **関連**: PR #1748, Issue #1741, Epic #1736, RU-20260722-02, commit 0192019c, Wave 1 #1737/#1738, Wave 2 #1739/#1740
-- **タグ**: `#phase-1` `#case-run` `#acceptance-criteria` `#epic-orchestration` `#case-close-centric`
-- **移動日**: 2026-07-23
-- **処分判定**: deferred（運用論、自動化適性低、具体手順曖昧。次回再評価対象として living pool で維持）
-
----
-
-
 ## 2026-07-23: 用語表記揺れの横断確認不足（SPEC 起票時の揺れが同一文書内に残留）
 
 - **問題事象**: `spec-health-metrics.md`「SPEC 横断診断」節に「論理区分不当混成」（機械化境界段落）と「論理区分不当混在」（検出パターンテーブル行）の表記揺れが同一節内に残留していた。Phase 1 commit 0192019c 起票時の揺れと推定される。REQ-0108-285（「論理区分の不当な混在」）、Issue #1742 完了条件 #6（「不当混在」）とも矛盾する表記。同種の揺れが他 SPEC にも残留していないか、inspect-docs / doc-writing 査読での横断確認が望ましい。
@@ -1165,7 +1020,6 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **処分判定**: deferred（理由修正: REQ-001-008/012〜015 + DEC-009 AG-010/016 で本質カバー。playbook 未整備は low-pri）
 
 ---
-
 
 
 ## detector 個別 unit test 拡充不足パターン（file-scope violation 検出 vs detector 単位カバレッジ）
@@ -1324,5 +1178,126 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **タグ**: `#test-strategy` `#runtime-proof` `#dummy-command` `#network-access` `#windows` `#operational-knowledge`
 - **移動日**: 2026-08-15
 - **処分判定**: deferred（出現1件。検証技法知見。テスト戦略立案時の候補技法として維持）
+
+---
+
+
+## プレースホルダ除去時の IR-055 baseline delta 再検証必須（OU-005、PR #2187）
+
+- **問題事象**: プレースホルダ ID（{NNN} 形式）を含む行は IR-055 の検査免除（template placeholder exemption）になるため、プレースホルダ除去は同行の他パターン（src/opencode/、repo-local、docs/specs/ 参照）を新規違反として顕在化させ得る。PR #2187 で 6 件顕在化し、即時修正した。
+- **発生局面**: 実装（references 配下のプレースホルダ ID 表記整理）
+- **検知方法**: プレースホルダ除去後の check_integrity.ts 実行で新規 delta として検出
+- **根本原因**: IR-055 の exemption が行単位（{...} 含む行全体を走査免除）であり、プレースホルダ以外の違反も同行は隠蔽される構造
+- **自律対応内容**: 顕在化した 6 件を配布物向け表現（.opencode/...、自己ホストリポジトリ固有 等）へ修正して解消
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 配布物のプレースホルダ整理時は IR-055 baseline delta の再検証を必須工程とする
+- **再発条件**: プレースホルダを含む行のプレースホルダのみを除去する編集を行う場合
+- **予防策候補**: プレースホルダ整理 Issue の検証手順へ IR-055 delta 再検証を明示する
+- **想定反映先**: agentdev-skill-authoring または checker 実行契約の参考（learning-promote で判定）
+- **関連**: PR #2187, Issue #2182 (CLOSED), Epic #2178
+- **タグ**: #ir055 #placeholder #baseline
+- **移動日**: 2026-08-18
+- **処分判定**: deferred（learning-promote 2026-08-18 評価。同一メカニズム（IR-055 exemption の行単位性による delta 顕在化）の intake item（spec-cand-ir055-exemption-new-delta-emergence）が checker 実行点の明確化を管理中。living pool で維持し次回 intake 側処分と照合）
+
+---
+
+## 検証スクリプトの対象ファイル収集で git diff --diff-filter=d による削除済み除外（OU-005、PR #2187）
+
+- **問題事象**: git diff --name-only の出力には削除済みファイルが含まれるため、検証スクリプトが各ファイルを読む前に ENOENT が発生した。
+- **発生局面**: 実装（TS-008 検証: 変更ファイル群の注記走査）
+- **検知方法**: 検証スクリプト実行時の ENOENT エラー
+- **根本原因**: --name-only が削除済みパスも返す仕様に対し、対象全件が存在することを前提とした読み込みを行っていた
+- **自律対応内容**: --diff-filter=d で削除済みファイルを除外して再実行
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: diff 出力をファイル読み込みに使う検証スクリプト全般に当てはまる
+- **再発条件**: 削除を含む変更セットを --name-only で収集して直接読む場合
+- **予防策候補**: 対象収集には常に --diff-filter=d（または存在確認）を組み合わせる
+- **想定反映先**: 検証スクリプト・テスト戦略テンプレートの参考（learning-promote で判定）
+- **関連**: PR #2187, Issue #2182 (CLOSED), Epic #2178
+- **タグ**: #git #verification
+- **移動日**: 2026-08-18
+- **処分判定**: deferred（learning-promote 2026-08-18 評価。出現1件。検証スクリプト技法の知見）
+
+---
+
+## PowerShell 一括読み書きによる配布物ファイル破壊の再発防止（OU-0001、PR #2198）
+
+- **問題事象**: PowerShell で await を含む誤ったコマンドが部分失敗した際、後続の Set-Content が空変数のまま実行され8ファイルが空になった（git 復元 + 再構築で回復）。
+- **発生局面**: 実装（配布スキル src/opencode/skills/agentdev-artifact-graph 配下の編集）
+- **検知方法**: 部分失敗したコマンド列の実行後、対象ファイルが空であることを確認
+- **根本原因**: PowerShell のパイプライン・変数展開を含む一括読み書きは部分失敗時に空書き込みへ到達しうる。逐次 edit ツールと異なり中間状態の検証がない
+- **自律対応内容**: git 復元と再構築で回復。以後の配布物編集は per-line edit ツールに限定
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: Windows 環境での配布物編集全般。AGENTS.md の「Write ツール全面上書きは新規ファイル限定」警告の PowerShell 版として一般化できる
+- **再発条件**: PowerShell による複数ファイルへの一括読み書き（Get-Content → 加工 → Set-Content）を失敗しうる-chain で実行する場合
+- **予防策候補**: 配布物編集は per-line edit ツールに限定し、PowerShell 一括読み書きを禁止/制限する規約化
+- **想定反映先**: agentdev-skill-authoring または AGENTS.md 編集規約の参考（learning-promote で判定）
+- **関連**: PR #2198, Issue #2190 (CLOSED), Epic #2189
+- **タグ**: #powershell #encoding #editing
+- **移動日**: 2026-08-18
+- **処分判定**: deferred（learning-promote 2026-08-18 評価。出現1件。AGENTS.md 既存警告の PowerShell 版一般化候補）
+
+---
+
+## 配布物への具体 ID・docs パス直書きは配布依存境界 gate で違反になる（OU-0004、PR #2199）
+
+- **問題事象**: 配布物（src/opencode/skills 配下）へ具体 ID（REQ-020 等）や docs/ 配下パスを直接記述すると配布依存境界 gate（check_distribution_boundary --profile source）が違反になる。
+- **発生局面**: 実装（effectiveness/candidate_limit サブスイート作成）
+- **検知方法**: 配布依存境界 gate 実行（case-run Step 7-1）
+- **根本原因**: 配布物はプロジェクト非依存が要件であり、具体 ID・docs パスはプロジェクト固有情報
+- **自律対応内容**: effectiveness 既存資産の規約（REQ-{NNNN} プレースホルダ、採番フォーマッタ関数による ID 合成、文字列分割によるパス合成）に従って通過
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 配布物へ言及を書く場面全般
+- **再発条件**: 配布物に具体 ID や docs パスを文字列リテラルで記述する場合
+- **予防策候補**: 配布物編集時のプレースホルダ・合成規約を authoring ガイドへ集約する
+- **想定反映先**: agentdev-skill-authoring または effectiveness 資産規約の参考（learning-promote で判定）
+- **関連**: PR #2199, Issue #2193 (CLOSED), Epic #2189
+- **タグ**: #distribution-boundary #placeholder
+- **移動日**: 2026-08-18
+- **処分判定**: deferred（learning-promote 2026-08-18 評価。出現1件。対策本体は配布依存境界 gate と effectiveness 既存資産の規約が既存。authoring ガイドへの集約は改善候補の域）
+
+---
+
+## 複数 worktree 検査はループ変数で作業ディレクトリを切り替える（case-close 実行、Epic 2189）
+
+- **問題事象**: 複数 worktree で同一 detector を実行する際、bash ツールの workdir を最初の worktree に固定したまま foreach ループを回したため、4回すべて同一 worktree で検査を実施していた（検査対象の取り違え）。
+- **発生局面**: case-close E4-0（配布依存境界 最終 gate の4 worktree 実行）
+- **検知方法**: 実行結果の scanned_files 件数が全ループ同一（313）であることに着眼して疑い、workdir 指定の誤りを特定。workdir を個別指定して再実行し是正
+- **根本原因**: ループ変数（worktree 名）を出力表示にのみ使い、実行場所（workdir）に反映していなかった
+- **自律対応内容**: worktree ごとに個別 workdir 指定で再実行し、scanned_files の差異（314/306/314）で実施場所を検証
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 複数ディレクトリに対する同一コマンド実行全般。実行場所は出力だけでなく実行結果の指標（件数・パス）でも検証する
+- **再発条件**: ループ内でディレクトリを扱う際、実行場所をループ変数にバインドし忘れた場合
+- **予防策候補**: 複数 worktree 検査手順に「実行結果の指標で実施場所を検証」を明示する
+- **想定反映先**: case-close E4-0 運用の参考（learning-promote で判定）
+- **関連**: Epic #2189（case-close 実行中に検知・是正。PR 由来ではない自律学び）
+- **タグ**: #worktree #verification #tooling
+- **移動日**: 2026-08-18
+- **処分判定**: deferred（learning-promote 2026-08-18 評価。出現1件。実行指標（件数・パス）による実施場所検証の技法。一般ツール運用知見）
+
+---
+
+## Phase 0（req-save/spec-save）起因の AUTOGEN 陳腐化は case-close の dry-run ゲートで差戻しになる（OU-001 case-close、PR #2201）
+
+- **問題事象**: req-save / spec-save が REQ・SPEC を追加しても AUTOGEN メトリクスブロック（req-health-metrics.md / spec-health-metrics.md の計測例）を再生成しないため、case-close の project extension チェック autogen-index-regeneration-diff（generate_indexes.ts --dry-run）が WOULD UPDATE 2 件を検出し、PR 起因ではなく main 既存の陳腐化でもマージ前に構造化停止・case-run 差戻しとなった。
+- **発生局面**: case-close（STEP-3 拡張チェック autogen-index-regeneration-diff。Phase 0 の commit e864af5e / 7ad962cf 起因）
+- **検知方法**: PR head worktree と main 双方での generate_indexes.ts --dry-run 比較（両方 WOULD UPDATE → PR 外起因と帰属）、check_integrity の IndexGenerationConsistency NG 2 件
+- **根本原因**: req-save / spec-save 工程は AUTOGEN 対象ブロックを更新しない。AUTOGEN ゲートは起因を問わず差分を検出して停止する契約（複数 PR 跨ぎの再生成漏れ防止）のため、Phase 0 起因分も case-close 到達時に表面化する
+- **自律対応内容**: ゲート契約に従いマージせず case-auto へ partial 報告（差戻し）。case-run が worktree で generate_indexes.ts を実行して再生成 commit（3632878a）を PR へ追加、case-close 再実行で dry-run 差分ゼロ・check_integrity NG 0 を確認してマージ完了
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（case-close SPEC Step 3-3・extension checks の契約どおりの作動事例）
+- **横展開観点**: 機能追加フローで SPEC/REQ を追加する場合、AUTOGEN 再生成は case-run 側で先に実施しておくと case-close の差戻しを回避できる。case-close 側で再生成して完結する手段は契約上禁止
+- **再発条件**: req-save / spec-save で REQ・SPEC を追加し、case-run が AUTOGEN 再生成を実施しないまま PR を作成した場合
+- **予防策候補**: case-run の前置 gate に AUTOGEN dry-run 差分チェックを追加する、または spec-save 完了報告時にメトリクス系 AUTOGEN ブロックの再生成を案内する
+- **想定反映先**: case-run 前置 gate / spec-save 完了報告の参考（learning-promote で判定）
+- **関連**: PR #2201 (MERGED 962dc688), Issue #2200 (CLOSED), 再生成 commit 3632878a
+- **タグ**: #autogen #case-close #phase0 #gate
+- **移動日**: 2026-08-18
+- **処分判定**: deferred（learning-promote 2026-08-18 評価。出現1件だが反映先（case-run 前置 gate への dry-run チェック追加 / spec-save 完了報告での再生成案内）が明確で影響大（Epic 差戻し直結）。ユーザー承認（HITL）にて deferred 維持を確定。次回 living pool 再評価の最優先候補）
 
 ---
