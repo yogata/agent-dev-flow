@@ -18,6 +18,7 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 | `/agentdev/case-update` | Issue | 更新済み Issue | 継続または `/agentdev/case-close` |
 | `/agentdev/case-close` | PR + Issue | マージ済み + クローズ済み | 完了 |
 | `/agentdev/case-auto` | 要件doc/ Issue番号、URL | マージ済み + クローズ済み（req-save〜spec-save〜case-close自走） | 完了 |
+| `/agentdev/backlog-auto` | なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md`（backlog整理サイクル一巡） | RU がある場合: `/agentdev/req-define` |
 | `/agentdev/intake-capture` | ユーザー手動入力 | `inbox/` item | `/agentdev/intake-promote` |
 | `/agentdev/intake-from-github` | クローズ済み Issue/PR | `inbox/` item | `/agentdev/intake-promote` |
 | `/agentdev/intake-promote` | `inbox/` item | `promoted/` 成果物 | `/agentdev/backlog-review` |
@@ -37,6 +38,7 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 - [case-update.md](./case-update.md)
 - [case-close.md](./case-close.md)
 - [case-auto.md](./case-auto.md)
+- [backlog-auto.md](./backlog-auto.md)
 - [backlog-review.md](./backlog-review.md)
 - [intake-capture.md](./intake-capture.md)
 - [intake-from-github.md](./intake-from-github.md)
