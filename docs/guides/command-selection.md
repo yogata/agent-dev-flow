@@ -22,6 +22,7 @@
 | RU がある | `/agentdev/req-define` | 要件doc（draft） |
 | REQ 体系の健全性を検出したい | `/agentdev/inspect-docs` | 検出レポート |
 | 要件docがあり req-saveからcase-closeまで自走させたい / Issue番号、URL があり case-run〜case-close を自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
+| backlog整理サイクル（検出→昇格→統合）を1回で実行したい | `/agentdev/backlog-auto` | 検出事項、採用済み成果物、`RU-*.md` |
 
 ## リポジトリメンテナンス（AgentDevFlow 本体リポジトリのみ）
 
@@ -43,3 +44,4 @@
 - Intake / Learning パイプラインの詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) を参照
 - 各コマンドの入出力の詳細は [要件定義 → Case実行フロー](req-case-flow.md) を参照
 - `/agentdev/case-auto` は明示指定時のみ使用する追加入口。標準ワークフローを置き換えない
+- `/agentdev/backlog-auto` は backlog 整理サイクル（検出→昇格→統合）を1回で実行する追加入口。標準の backlog 整理フローを置き換えず、既存5コマンド（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）は従来どおり単独実行できる

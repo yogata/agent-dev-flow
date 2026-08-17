@@ -1,5 +1,5 @@
 ---
-updated: 2026-08-14
+updated: 2026-08-17
 status: accepted
 ---
 
@@ -90,7 +90,7 @@ case-run が QG-1〜QG-3（ローカル検証、CI 検証、乖離検出）、ca
 
 ## Workflow Architecture Inventory
 
-全公開Command（16件）の Workflow Architecture Inventory を恒久カタログとして統合する。
+全公開Command（17件）の Workflow Architecture Inventory を恒久カタログとして統合する。
 各Command の11分析軸（公開契約・主要処理段階・分岐・副作用・HITL・並列性・resume・durable state・Harness依存・Capability依存・内部workflow候補）を記載する。
 個別Workflow Skill 移行（Wave 2）および Capability Skill 抽出の参照証拠とする。
 
@@ -122,6 +122,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 | `/agentdev/intake-promote` | inbox item | `promoted/` 成果物 | intake |
 | `/agentdev/learning-promote` | `inbox.md` + `deferred.md` | `promoted/` 成果物 | learning |
 | `/agentdev/backlog-review` | `promoted/` 成果物 | `RU-*.md` | backlog |
+| `/agentdev/backlog-auto` | なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md` | backlog |
 | `/agentdev/inspect-docs` | docs 全体スキャン | 検出事項 | inspect |
 | `/agentdev/inspect-skills` | Command/Skill 定義 | 検出事項 | inspect |
 | `/agentdev/inspect-promote` | 検出事項 | 採用済み成果物 | inspect |
@@ -307,6 +308,20 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **Harness依存**: LLM 推論（統合/分割/矛盾検出）、subagent 起動（`agentdev-adversarial-review` 経路E）、git（pull/commit/push、並列実行安全ステージング）、拡張読込。
 - **Capability依存**: `agentdev-backlog-integration`、`agentdev-git-worktree`、`agentdev-adversarial-review`（経路E）、`agentdev-project-extensions`。
 - **内部workflow候補**: 統合/分割判定workflow（Step 4 前半）、矛盾検出workflow（Step 5）、RU生成+削除+永続化workflow（Step 6-8）。統合/分割判定基準と depends_on 依存解決ルールは Capability Skill 候補（`agentdev-backlog-integration` が所有）。
+
+### `/agentdev/backlog-auto`
+
+- **公開契約**: 引数なし → backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行し RU 生成まで一巡。追加入口（標準の backlog 整理フローを置換しない）。子ワークフロー内部の分類、評価、昇格、RU 生成ロジックは再実装しない。
+- **主要処理段階**: Step 1 開始時刻記録・進行状態初期化（durable state 再構成）→ Step 2 stage 1 inspect-docs 単独直列 → Step 3 stage 2 昇格3系統（learning-promote / intake-promote / inspect-promote、競合処理の直列化）→ Step 4 fan-in 判定 → Step 5 stage 3 backlog-review → Step 6 完了報告（工程別結果、停止理由、再開コマンド提示）。
+- **分岐**: stage 1 停止経路（inspect-docs blocked/failed で下流非開始）、fan-in 判定（全系統正常完了 or 対象なし終了で開始可、1系統でも blocked・failed・未完了で開始不可）、系統別結果状態の読み替え（対象なし終了を正常扱い、learning-promote の inbox.md 不在を対象なし扱い）、部分停止時の独立系統継続、新規 promoted 0件でも backlog-review 実行、inspect-promote --auto 非有効化。
+- **副作用**: 各子コマンドの既存副作用のみ（`.agentdev/` 配下の成果物作成・削除、git commit/push、ユーザー対話）。backlog-auto 自身は新規副作用を追加しない。capture 系コマンド、inspect-skills、req-define、req-save、Issue/PR 作成の自動起動はしない（G03）。
+- **HITL**: 各子ワークフローの既存 HITL 境界を維持（新規判断境界を追加しない）。複数系統が判断待ちの場合はユーザー対話を直列化し系統識別付きで表示。
+- **並列性**: orchestration stage 構成（stage 1 単独直列 / stage 2 昇格3系統は系統相互の先行依存なし、競合 Git 操作・共有成果物書き込み・ユーザー対話のみ直列化 / stage 3 単独）。並行実行を利用できない場合は順次インターリーブ。部分停止時も独立系統は連鎖停止しない。
+- **resume**: `backlog_auto_started_at`、stage 別完了状態、stage 2 系統別結果状態、直列化キュー実行記録。各系統内の再開は子ワークフローの既存 STEP model 再開契約に委譲。inspect-docs は中断時先頭再実行。
+- **durable state**: 各子コマンドの durable state（learning は inbox.md/deferred.md/evaluation-report.md/promoted/、intake は inbox//promoted/、inspect は inbox//promoted//auto-promote-log、backlog-review は promoted/ 残存と `RU-*.md` 実ファイル）から工程進行を再構成。
+- **Harness依存**: stage 2 の系統並行実行機構（利用できない場合は順次インターリーブ）、ユーザー対話の直列化表示、タイムスタンプ計測、拡張読込。
+- **Capability依存**: `agentdev-project-extensions`。子ワークフロー依存の Capability Skill（`agentdev-learning-pipeline`、`agentdev-intake-pipeline`、`agentdev-backlog-integration` 等）は各子 Workflow Skill 経由で継承。
+- **内部workflow候補**: orchestration workflow（stage 実行 + 直列化キュー + fan-in 判定 + 停止伝播）。Workflow Skill（`agentdev-workflow-backlog-auto`）として実装済み。
 
 ### `/agentdev/inspect-docs`
 

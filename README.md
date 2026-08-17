@@ -38,6 +38,7 @@ AgentDevFlow プラグインの設定を管理するリポジトリ。AI エー�
 | 検出事項を分類したい | `/agentdev/inspect-promote` | 採用済み成果物 |
 | ドキュメント整合性を検証したい | `/repo/docs-check` | 検証レポート（自己ホストリポジトリ専用） |
 | 要件docがあり、req-saveからcase-closeまで自走させたい | `/agentdev/case-auto` | マージ済み + クローズ済み |
+| backlog整理サイクル（検出→昇格→統合）を1回で実行したい | `/agentdev/backlog-auto` | 検出事項、採用済み成果物、`RU-*.md` |
 
 ## 参照先
 
