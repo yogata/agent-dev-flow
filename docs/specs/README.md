@@ -97,7 +97,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | [commands/inspect-docs.md](commands/inspect-docs.md) | accepted | `/agentdev/inspect-docs` |
 | [commands/inspect-skills.md](commands/inspect-skills.md) | accepted | `/agentdev/inspect-skills` |
 | [commands/inspect-promote.md](commands/inspect-promote.md) | accepted | `/agentdev/inspect-promote` |
-| [commands/backlog-auto.md](commands/backlog-auto.md) | draft | `/agentdev/backlog-auto` |
+| [commands/backlog-auto.md](commands/backlog-auto.md) | accepted | `/agentdev/backlog-auto` |
 | [commands/inspect-extensions.md](commands/inspect-extensions.md) | superseded | `/agentdev/inspect-extensions`（DEC-006 により廃止。extension 検査は docs-check / inspect-skills / inspect-promote の3層責務分離へ移管） |
 
 `/repo/docs-check` は repo-local、配布対象外のため対象外。
@@ -141,7 +141,7 @@ SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、�
 | [skills/agentdev-deep-review.md](skills/agentdev-deep-review.md) | superseded | 補助 | 敵対的審議型レビュー（Deep Review）の振る舞い契約。agentdev-adversarial-review SPEC へ後継移行済み（superseded_by: agentdev-adversarial-review.md） |
 | [skills/agentdev-adversarial-review.md](skills/agentdev-adversarial-review.md) | accepted | 補助 | 対論型レビュー（adversarial review）の振る舞い契約、レビュー手続き、責務構造。3論理役割、動的レビュー戦略、対称的相互反証、戦略メタ反証、合意候補再検証、read-only 境界を所有 |
 | [skills/agentdev-git-worktree-test-fallback.md](skills/agentdev-git-worktree-test-fallback.md) | draft | 補助 | worktree 構造系テスト fallback 契約（junction 未設定時の src/opencode/ fallback、構造的制約の明示） |
-| [skills/agentdev-workflow-backlog-auto.md](skills/agentdev-workflow-backlog-auto.md) | draft | 中核 | backlog-auto workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約） |
+| [skills/agentdev-workflow-backlog-auto.md](skills/agentdev-workflow-backlog-auto.md) | accepted | 中核 | backlog-auto workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約） |
 
 `repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
 

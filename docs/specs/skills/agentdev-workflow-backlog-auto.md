@@ -1,6 +1,6 @@
 ---
 title: agentdev-workflow-backlog-auto SPEC
-status: draft
+status: accepted
 created: 2026-08-17
 updated: 2026-08-17
 spec_logical_division: behavior
