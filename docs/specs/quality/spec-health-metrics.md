@@ -86,8 +86,8 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/case-auto.md | 474 | accepted | commands |
 | commands/case-open.md | 438 | accepted | commands |
 | integrity/audits/classification-20260811.md | 422 | draft | integrity |
+| foundations/system.md | 421 | accepted | foundations |
 | integrity/baselines/pre-audit-baseline-20260811.md | 416 | accepted | integrity |
-| foundations/system.md | 406 | accepted | foundations |
 | skills/agentdev-artifact-graph.md | 399 | draft | skills |
 | responsibilities/document-type-responsibilities.md | 372 | accepted | responsibilities |
 | local/runtime-package-boundary.md | 359 | accepted | local |
@@ -98,10 +98,10 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/case-close.md | 302 | accepted | commands |
 | foundations/traceability-model.md | 293 | draft | foundations |
 | integrity/integrity-rule-catalog.md | 290 | accepted | integrity |
+| workflows/workflow-contracts.md | 284 | accepted | workflows |
 | workflows/backlog-artifact-lifecycle.md | 283 | accepted | workflows |
-| workflows/workflow-contracts.md | 283 | accepted | workflows |
 | workflows/delegation-contracts.md | 269 | accepted | workflows |
-| README.md | 264 | - | uncategorized |
+| README.md | 266 | - | uncategorized |
 | workflows/workflow-skill-model.md | 248 | draft | workflows |
 | skills/agentdev-gh-cli.md | 245 | accepted | skills |
 | local/local-case-file.md | 240 | accepted | local |
@@ -169,6 +169,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-058-distribution-untracked-skill-reference.md | 70 | accepted | integrity |
 | integrity/rules/IR-056-project-extensions-integrity.md | 67 | accepted | integrity |
 | skills/agentdev-doc-writing.md | 67 | accepted | skills |
+| skills/agentdev-workflow-backlog-auto.md | 66 | draft | skills |
 | skills/agentdev-issue-management.md | 65 | accepted | skills |
 | integrity/rules/IR-060-forbidden-japanese-word-detection.md | 64 | accepted | integrity |
 | foundations/references/concrete-abstraction.md | 61 | accepted | foundations |
@@ -178,6 +179,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-workflow-lifecycle.md | 59 | accepted | skills |
 | skills/agentdev-workflow-orchestration.md | 57 | accepted | skills |
 | integrity/backticks-identifier-threshold.md | 56 | accepted | integrity |
+| commands/backlog-auto.md | 55 | draft | commands |
 | integrity/checker-execution-contracts.md | 55 | draft | integrity |
 | skills/agentdev-epic-tracker.md | 55 | accepted | skills |
 | skills/agentdev-inspect-skills.md | 54 | accepted | skills |
