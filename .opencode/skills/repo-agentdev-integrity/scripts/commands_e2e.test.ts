@@ -273,8 +273,9 @@ const commands = getCommandFiles();
 const skillDirs = getSkillDirs();
 const templateFiles = getTemplateFiles();
 
-// Current 16 public agentdev commands (aligns with commands/agentdev/README.md listing)
+// Current 17 public agentdev commands (aligns with commands/agentdev/README.md listing)
 const EXPECTED_COMMANDS = [
+  "backlog-auto",
   "backlog-review",
   "case-auto",
   "case-close",
