@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: backlog-auto-orchestration
 status: saved
+spec_actions_consumed: true
 created_at: 2026-08-17T21:43:57+09:00
 source_rus: [RU-0001]
 ---
