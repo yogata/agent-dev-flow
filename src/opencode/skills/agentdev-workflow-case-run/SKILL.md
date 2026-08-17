@@ -120,7 +120,17 @@ workflow 選択は STEP-S1 の実行モード分岐で確定する（引数が E
 - `agentdev-quality-gates`: QG-{N} 前置 staleness check
 - `agentdev-gh-cli`: Issue 本文読取等の I/O 手続き
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
+- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（実行対象と正規成果物の実現関係確認のみ。fail-open）
 - integrity checker skill（repo-local）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界）
+
+## Artifact Graph 利用
+
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせのうち implementation を、既に決定された実装対象（Issue 本文）と正規成果物の実現関係確認（STEP-S2 の関連Decision確認、委譲内 context 再確認）に利用できる。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。問い合わせ目的を指定し、返された候補を用いて判断する。
+
+- トレーサビリティ問い合わせを利用して新規の依存関係、実行構成、Wave 構成、実行順序を設計しない。依存関係と実行構成の決定責務は上流工程（case-open の execution_unit 構成、Epic Wave モデル）が所有する
+- 問い合わせ結果は候補提供であり、実現関係の確認は正規成果物本文と `rg` 等の独立探索で行う。Issue scope、完了条件、REQ、Decision、SPEC、必須品質統制の変更が必要な候補は blocked として case-update 連携とし、scope の自律拡大は行わない
+- 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
+- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、README 索引、正規成果物の直接読取、`rg`、ファイル探索などの代替探索で workflow を継続する（fail-open）。正規成果物そのものの異常と派生索引側の異常を区別する
 
 ## Workflow Extension 読込
 

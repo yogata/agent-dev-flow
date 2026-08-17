@@ -85,7 +85,16 @@ spec-save workflow は次の11 STEP で構成する。各 STEP は resume point 
 - `agentdev-conventional-commits`: commit message 生成
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（明示パスステージ、`git commit -- <paths>`）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
+- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（対応 REQ、同一 canonical owner の SPEC、関連 command、skill、integrity rule の探索。fail-open）
 - integrity checker skill（AG-{NNN} detector、repo 固有）: check_changed_docs.ts（--workflow spec-save）
+
+## Artifact Graph 利用
+
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related）を利用できる。対応 REQ、同一 canonical owner の SPEC、関連 command、skill、integrity rule の探索（STEP-3 配置先解決、STEP-4 SPEC 分離基準の最終確認）を補助する。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。問い合わせ目的を指定し、返された候補を用いて判断する。
+
+- 問い合わせ結果は候補提供であり、SPEC 正規配置先、target_area、canonical owner、SPEC 操作分類の判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
+- 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
+- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、README 索引、正規成果物の直接読取、`rg`、ファイル探索などの代替探索で workflow を継続する（fail-open）。正規成果物そのものの異常と派生索引側の異常を区別する
 
 ## Workflow Extension 読込
 

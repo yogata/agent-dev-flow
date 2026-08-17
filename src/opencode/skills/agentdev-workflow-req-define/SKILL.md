@@ -88,6 +88,15 @@ req-define workflow は次の11 STEP で構成する。各 STEP は resume point
 - `agentdev-workflow-lifecycle`: work_type・Scale 判定、前工程引き継ぎ判定
 - `agentdev-adversarial-review`: 経路A review 呼出
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
+- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（既存 REQ、関連 Decision、関連 SPEC、影響候補の探索。fail-open）
+
+## Artifact Graph 利用
+
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related、impact、必要に応じて dependency）を利用できる。既存 REQ、関連 Decision、関連 SPEC、canonical owner、変更影響候補の探索（STEP-3 既存REQ照合、STEP-4 要件展開）を補助する。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。問い合わせ目的を指定し、返された候補を用いて判断する。
+
+- 問い合わせ結果は候補提供であり、CREATE、APPEND、UPDATE、SPLIT、MERGE、意味的重複、canonical owner の判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
+- 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
+- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、README 索引、正規成果物の直接読取、`rg`、ファイル探索などの代替探索で workflow を継続する（fail-open）。正規成果物そのものの異常と派生索引側の異常を区別する
 
 ## Workflow Extension 読込
 
