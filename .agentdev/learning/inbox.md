@@ -326,3 +326,67 @@
 - **想定反映先**: 検証手順・worktree 運用の参考（learning-promote で判定）
 - **関連**: PR #2188, Issue #2183 (CLOSED), Epic #2178 (CLOSED)
 - **タグ**: #worktree #junction #check-integrity
+
+## PowerShell 一括読み書きによる配布物ファイル破壊の再発防止（OU-0001、PR #2198）
+
+- **問題事象**: PowerShell で await を含む誤ったコマンドが部分失敗した際、後続の Set-Content が空変数のまま実行され8ファイルが空になった（git 復元 + 再構築で回復）。
+- **発生局面**: 実装（配布スキル src/opencode/skills/agentdev-artifact-graph 配下の編集）
+- **検知方法**: 部分失敗したコマンド列の実行後、対象ファイルが空であることを確認
+- **根本原因**: PowerShell のパイプライン・変数展開を含む一括読み書きは部分失敗時に空書き込みへ到達しうる。逐次 edit ツールと異なり中間状態の検証がない
+- **自律対応内容**: git 復元と再構築で回復。以後の配布物編集は per-line edit ツールに限定
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: Windows 環境での配布物編集全般。AGENTS.md の「Write ツール全面上書きは新規ファイル限定」警告の PowerShell 版として一般化できる
+- **再発条件**: PowerShell による複数ファイルへの一括読み書き（Get-Content → 加工 → Set-Content）を失敗しうる-chain で実行する場合
+- **予防策候補**: 配布物編集は per-line edit ツールに限定し、PowerShell 一括読み書きを禁止/制限する規約化
+- **想定反映先**: agentdev-skill-authoring または AGENTS.md 編集規約の参考（learning-promote で判定）
+- **関連**: PR #2198, Issue #2190 (CLOSED), Epic #2189
+- **タグ**: #powershell #encoding #editing
+
+## ジャンクション未伝播 worktree での検査代替と node_modules 伝播（OU-0003、PR #2197）
+
+- **問題事象**: ジャンクション未伝播の git worktree では .opencode/skills/agentdev-* が空のため .opencode 前提の検査（check_extensions.ts 等）が実行不能。また新規 worktree では scripts/node_modules が未伝播で bun test が実行できない。
+- **発生局面**: 実装（worktree 内での配布依存境界 gate・テスト実行）
+- **検知方法**: worktree 内で .opencode 配下前提の検査・テスト実行時にエラー
+- **根本原因**: junction は git 管理外のローカルリンクであり git worktree には複製されない。node_modules も git 管理外
+- **自律対応内容**: src 側の check_distribution_boundary.ts --profile source と artifact-graph scripts の bun test（bun install --cwd 実行後）で代替検証
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: worktree で .opencode 前提検査を実行する場面全般
+- **再発条件**: worktree 内で .opencode 配下実体や node_modules を前提とする検査・テストを実行する場合
+- **予防策候補**: worktree 検証手順に (1) src 側スクリプト経由の代替経路、(2) bun install --cwd の前置を明示する
+- **想定反映先**: 検証手順・worktree 運用の参考（learning-promote で判定）
+- **関連**: PR #2197, Issue #2192 (CLOSED), Epic #2189
+- **タグ**: #worktree #junction #bun
+
+## 配布物への具体 ID・docs パス直書きは配布依存境界 gate で違反になる（OU-0004、PR #2199）
+
+- **問題事象**: 配布物（src/opencode/skills 配下）へ具体 ID（REQ-020 等）や docs/ 配下パスを直接記述すると配布依存境界 gate（check_distribution_boundary --profile source）が違反になる。
+- **発生局面**: 実装（effectiveness/candidate_limit サブスイート作成）
+- **検知方法**: 配布依存境界 gate 実行（case-run Step 7-1）
+- **根本原因**: 配布物はプロジェクト非依存が要件であり、具体 ID・docs パスはプロジェクト固有情報
+- **自律対応内容**: effectiveness 既存資産の規約（REQ-{NNNN} プレースホルダ、採番フォーマッタ関数による ID 合成、文字列分割によるパス合成）に従って通過
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 配布物へ言及を書く場面全般
+- **再発条件**: 配布物に具体 ID や docs パスを文字列リテラルで記述する場合
+- **予防策候補**: 配布物編集時のプレースホルダ・合成規約を authoring ガイドへ集約する
+- **想定反映先**: agentdev-skill-authoring または effectiveness 資産規約の参考（learning-promote で判定）
+- **関連**: PR #2199, Issue #2193 (CLOSED), Epic #2189
+- **タグ**: #distribution-boundary #placeholder
+
+## 複数 worktree 検査はループ変数で作業ディレクトリを切り替える（case-close 実行、Epic 2189）
+
+- **問題事象**: 複数 worktree で同一 detector を実行する際、bash ツールの workdir を最初の worktree に固定したまま foreach ループを回したため、4回すべて同一 worktree で検査を実施していた（検査対象の取り違え）。
+- **発生局面**: case-close E4-0（配布依存境界 最終 gate の4 worktree 実行）
+- **検知方法**: 実行結果の scanned_files 件数が全ループ同一（313）であることに着眼して疑い、workdir 指定の誤りを特定。workdir を個別指定して再実行し是正
+- **根本原因**: ループ変数（worktree 名）を出力表示にのみ使い、実行場所（workdir）に反映していなかった
+- **自律対応内容**: worktree ごとに個別 workdir 指定で再実行し、scanned_files の差異（314/306/314）で実施場所を検証
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 複数ディレクトリに対する同一コマンド実行全般。実行場所は出力だけでなく実行結果の指標（件数・パス）でも検証する
+- **再発条件**: ループ内でディレクトリを扱う際、実行場所をループ変数にバインドし忘れた場合
+- **予防策候補**: 複数 worktree 検査手順に「実行結果の指標で実施場所を検証」を明示する
+- **想定反映先**: case-close E4-0 運用の参考（learning-promote で判定）
+- **関連**: Epic #2189（case-close 実行中に検知・是正。PR 由来ではない自律学び）
+- **タグ**: #worktree #verification #tooling
