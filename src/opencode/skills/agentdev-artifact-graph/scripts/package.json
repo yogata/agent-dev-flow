@@ -8,7 +8,8 @@
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "effectiveness": "bun effectiveness/run.ts",
-    "effectiveness:json": "bun effectiveness/run.ts --json"
+    "effectiveness:json": "bun effectiveness/run.ts --json",
+    "candidate-limit": "bun effectiveness/candidate_limit/run.ts"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

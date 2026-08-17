@@ -17,6 +17,7 @@ effectiveness/
 ├── independent_search.ts — rg / glob / frontmatter 相当の独立探索実装
 ├── harness.ts            — Graph + 独立探索を実行し 6 指標を計算する中心処理
 ├── run.ts                — CLI entry point（diagnostic report / JSON 出力）
+├── candidate_limit/      — 高位問い合わせ候補数上限回帰サブスイート（REQ-{NNNN}-006、別 README）
 └── README.md             — 本ファイル
 ```
 
