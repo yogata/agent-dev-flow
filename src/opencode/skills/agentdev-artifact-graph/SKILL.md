@@ -1,6 +1,6 @@
 ---
 name: agentdev-artifact-graph
-description: Builds and inspects the Artifact Graph (derived index of explicit artifact relations). USE FOR: generating the graph, checking graph integrity, querying relations (neighbors, path, provenance), or locating provenance in consumer and self-hosting environments. DO NOT USE FOR: replacing canonical documents, inferring semantic relations, editing graph outputs, treating Graph as SSoT.
+description: Builds and inspects the Artifact Graph (derived index of explicit artifact relations). USE FOR: generating the graph, checking graph integrity, querying relations (neighbors, path, provenance), high-level trace queries (related, impact, dependency, implementation, diagnostics), or locating provenance in consumer and self-hosting environments. DO NOT USE FOR: replacing canonical documents, inferring semantic relations, editing graph outputs, treating Graph as SSoT.
 ---
 
 # agentdev-artifact-graph
@@ -76,7 +76,7 @@ node_types と relation_types は closed-enum ではなく、augmentation から
 |---|---|---|---|
 | `build_graph.ts` | グラフ生成 | `--root`, `--output`, `--augmentation` | `{ files, nodeCount, edgeCount, diagnosticCount, inputDigest }` |
 | `check_graph.ts` | グラフ検査 | `--graph` | `{ valid, errors[], warnings[] }` |
-| `query_graph.ts` | グラフ問い合わせ | `--graph`, `--root`, サブコマンド+引数 | `{ nodes[], edges[], provenance[], discovered? }` |
+| `query_graph.ts` | グラフ問い合わせ | `--graph`, `--root`, サブコマンド+引数 | 低位: `{ nodes[], edges[], relations[], provenance[], discovered? }` / 高位: `{ profile, start, candidates[], truncation? }` |
 | `prepare_graph.ts` | ワークフロー統合（fail-open） | `--root`, `--output`, `--augmentation` | `{ status, freshness, graphPath, reason? }` |
 | `verify_graph.ts` | verification feedback | `--root`, `--graph`, `--augmentation` | `{ summary, differences[] }` |
 
@@ -109,11 +109,20 @@ bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph 
 # 問い合わせ: discover（discovery_roots を探索）
 bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --root . discover "search-term" --roots src,tests
 
+# 高位問い合わせ: related（明示的なトレース・一般参照の関連候補）
+bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph related requirement:REQ-{NNNN}
+
 # 高位問い合わせ: impact（起点成果物の変更影響候補）
-bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph impact requirement:REQ-{NNNN} --depth 2 --limit 200
+bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph impact specification:docs/specs/<feature>.md --depth 2
+
+# 高位問い合わせ: dependency（起点が依存する候補）
+bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph dependency requirement:REQ-{NNNN}
 
 # 高位問い合わせ: implementation（要件を実現・充足する成果物候補）
 bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph implementation requirement:REQ-{NNNN}
+
+# 高位問い合わせ: diagnostics（構造診断）
+bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph diagnostics --limit 20
 
 # 明示的な索引構造問い合わせ
 bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph index catalog:INDEX-{NNN}
@@ -127,9 +136,38 @@ bun .opencode/skills/agentdev-artifact-graph/scripts/src/verify_graph.ts --root 
 
 問い合わせ結果は候補取得に限って使用する。根拠ファイルを読み、別手段で補完または反証してから判断する。
 
+## 高位問い合わせ（Trace Query）
+
+related、impact、dependency、implementation、diagnostics の5種を問い合わせプロファイルとして提供する（REQ-{NNNN}）。各プロファイルは TIM の関係意味（意味スロット、変更影響方向、依存方向）から探索方向を導出し、問い合わせごとの個別ハードコードを持たない。
+
+| プロファイル | 意味 | 探索方向 |
+|---|---|---|
+| `related <node>` | 明示的なトレースまたは一般参照を持つ関連候補。変更影響・依存として解釈しない | 双方向 |
+| `impact <node>` | 変更影響を受ける候補。TIM の変更影響方向（forward/backward/bidirectional/none）から導出。一般参照（変更影響なし）を経路として使用しない | 関係ごとの変更影響方向（順方向・逆方向・双方向） |
+| `dependency <node>` | 起点が成立・実現・実行のために依存する候補。依存と定義されていない一般参照を扱わない | 意味スロットごとの順方向・逆方向 |
+| `implementation <node>` | 実現・実装・充足系列（realize/satisfy/implement スロット）の関係を持つ候補 | 逆方向 |
+| `diagnostics` | 通常の関連探索と分離した構造診断（孤立、未解決関係、廃止成果物への関係、関係制約違反、循環候補、複数経路、関係集中、根拠欠落）。構造的特徴の報告であり異常の確定ではない | — |
+
+一般参照（`references`、SysML «trace» 相当）は変更影響・依存・実現・充足・検証の意味を持たないため、impact、dependency、implementation へ参加しない。関連成果物確認（related）、所在確認、低位問い合わせ、明示的な索引構造問い合わせで利用できる。
+
+共通規約:
+
+- 候補は5要素（`candidate`、`reason`、`relation_type`、`direction`、`path`）で返す。根拠詳細は `provenance` 低位問い合わせの責務であり、高位問い合わせ結果へ重複保持しない
+- 候補数上限は問い合わせ時設定として管理し、コードへ直書きしない。augmentation の `query_settings.limits` で上書きでき、`--limit` でその実行のみ上書きできる。派生索引の再生成条件に含めない
+- 上限超過時は決定論的な優先・除外規則（索引・集約役割ノードの除外、距離昇順・経路辞書順）を適用し、それでも超える場合は `truncation`（全候補数、返却候補数、適用規則、`independent_search_available: true`）を返す。候補を黙って切り捨てない
+- 候補0件は正常な空結果として扱う
+- 意味定義を持たない拡張関係型は高位問い合わせに参加しない（名前からの意味推定をしない）。低位問い合わせ（neighbors、path、provenance）では利用できる
+- `role: index` / `role: aggregation` を持つノード種別は、索引経由の候補増幅抑止のため高位問い合わせの候補・経路から除外する（グラフからの削除はしない）
+- 標準5関係型の意味割り当ては TIM 語彙カタログ SPEC（docs/specs/&lt;foundations/traceability-model&gt;.md）が正であり、`lib/tim.ts` はその in-code 反映である。標準コア関係型の意味は augmentation で再定義できない
+- 関係制約（`relation_constraints`）が定義された関係型のみ、diagnostics が制約違反を判定する
+
+`discover` の `discovery_roots` は、`--roots` 未指定時に適用後設定（augmentation）から自動解決する。明示指定時はその実行に限って上書きする（REQ-{NNNN}-{NNN}）。
+
 ## augmentation モデル
 
 node_types, relation_types, indexed_paths, discovery_roots は augmentation で追加可能である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。augmentation が存在しなくても標準動作する（REQ-{NNNN}-{NNN}）。
+
+relation_types には `semantics`（関係の意味 `meaning`、意味スロット `semantics_slot`、変更影響方向 `change_impact_direction`、標準語彙 `standard_vocabulary`、関係制約 `source_types`/`target_types`）、node_types には `role`（`index` / `aggregation`）、トップレベルには `query_settings`（`limits`、`depths`、`concentration_threshold`）と `relation_constraints` を指定できる。高位問い合わせ（Trace Query）の意味定義と候補数上限はこれらで拡張する。標準コア関係型の意味は TIM 語彙カタログが正規所有するため augmentation では再定義できない。
 
 augmentation ファイルのデフォルト配置先は `.agentdev/artifact-graph.yaml` である。`--augmentation` フラグで明示的にパスを指定できる。スキーマの詳細は [references/augmentation.md](references/augmentation.md) 参照。
 
@@ -152,23 +190,6 @@ discovery_roots:
   - src
   - tests
 ```
-
-## 高位問い合わせ（目的別プロファイル）
-
-related、impact、dependency、implementation の各プロファイルは、TIM に定義された関係の意味から導出した参加可否・探索方向で走査する。問い合わせごとの個別ハードコードを持たない。
-
-| プロファイル | 参加する関係 | 探索方向 |
-|---|---|---|
-| `related` | 意味定義を持つ全関係（一般参照を含む） | 双方向 |
-| `impact` | 変更影響方向が none 以外の関係 | 関係ごとの変更影響方向（順方向・逆方向・双方向） |
-| `dependency` | 依存家族の意味スロット | スロットごとの順方向・逆方向 |
-| `implementation` | 実現・実装・充足系列の意味スロット | 逆方向 |
-
-一般参照（`references`、SysML «trace» 相当）は変更影響・依存・実現・充足・検証の意味を持たないため、impact、dependency、implementation へ参加しない。関連成果物確認（related）、所在確認、低位問い合わせ、明示的な索引構造問い合わせで利用できる。
-
-意味定義を持たない拡張関係型は高位問い合わせへ自動参加せず、低位問い合わせ（neighbors、path、provenance）で利用できる。関係型名や LLM 推論からの意味の自動推定は行わない。
-
-プロファイルの問い合わせ結果は候補ごとに候補成果物、候補となった理由（関係型・走査方向）、到達経路を返す。候補数上限は問い合わせ時設定（`--limit`、デフォルト 200）であり、派生索引の再生成条件に含めない。上限超過時は候補過多であること、全候補数、返却候補数、独立探索への移行可否を返す。候補が存在しない場合は正常な空結果として扱う。
 
 ## 索引・集約成果物の役割識別
 

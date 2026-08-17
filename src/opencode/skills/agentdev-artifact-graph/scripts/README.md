@@ -10,9 +10,9 @@ scripts/
 ├── tsconfig.json
 ├── lib/
 │   ├── model.ts           # 型、zod schema、定数（open extension point）
-│   ├── tim.ts             # TIM 意味カタログ（意味スロット、変更影響方向、プロファイル参加導出）
+│   ├── tim.ts             # TIM 意味カタログ（意味スロット、変更影響方向、プロファイル参加導出、問い合わせ設定）
 │   ├── config.ts          # デフォルト設定、graph_config_digest、path utility
-│   ├── augmentation.ts    # augmentation 読込・解析、resolveConfig
+│   ├── augmentation.ts    # augmentation 読込・解析、resolveConfig、resolveTraceModel
 │   ├── parse.ts           # frontmatter、markdown link、extension field parser
 │   ├── provenance.ts      # provenance hashing
 │   ├── input.ts           # 入力収集 + digest
@@ -23,12 +23,14 @@ scripts/
 │   ├── query_support.ts   # 問い合わせ結果の共通型・補完
 │   ├── query.ts           # neighbors, path, provenance, discover、問い合わせ dispatcher
 │   ├── profiles.ts        # 高位プロファイル（related, impact, dependency, implementation）、index
+│   ├── trace_query.ts     # 高位問い合わせ（Trace Query）related, impact, dependency, implementation
+│   ├── trace_diagnostics.ts # 高位問い合わせ diagnostics（構造診断）
 │   ├── workflow.ts        # prepare（fail-open、鮮度4要素判定）
 │   └── verification.ts    # verification feedback
 ├── src/
 │   ├── build_graph.ts     # CLI: グラフ生成
 │   ├── check_graph.ts     # CLI: グラフ検査
-│   ├── query_graph.ts     # CLI: グラフ問い合わせ
+│   ├── query_graph.ts     # CLI: グラフ問い合わせ（低位 + 高位 Trace Query）
 │   ├── prepare_graph.ts   # CLI: ワークフロー統合
 │   └── verify_graph.ts    # CLI: verification feedback
 └── tests/

@@ -19,6 +19,10 @@
  * purpose-specific queries are DERIVED from the relation meaning declared
  * here. Link direction (source→target as described) and change impact
  * direction are distinct.
+ *
+ * 影響方向の値体系と標準5関係型への割当ては TIM 語彙カタログ SPEC
+ * （docs/specs/<foundations/traceability-model>.md）が正規所有する。本テーブルは
+ * その in-code 反映であり、augmentation で再定義できない。
  */
 
 // ─── Change impact direction (REQ-{NNNN}-{NNN}) ────────────────────────────────
@@ -28,11 +32,11 @@
  * (source→target). Impact direction is never inferred from link direction.
  *
  * - forward: source change impacts target
- * - reverse: target change impacts source
- * - both: changes impact both ends
+ * - backward: target change impacts source
+ * - bidirectional: changes impact both ends
  * - none: the link carries no change impact semantics
  */
-export const CHANGE_IMPACT_DIRECTIONS = ["forward", "reverse", "both", "none"] as const
+export const CHANGE_IMPACT_DIRECTIONS = ["forward", "backward", "bidirectional", "none"] as const
 export type ChangeImpactDirection = (typeof CHANGE_IMPACT_DIRECTIONS)[number]
 
 // ─── Semantics slots (REQ-{NNNN}-{NNN} meaning families) ───────────────────────
@@ -162,28 +166,28 @@ export const DEFAULT_RELATION_SEMANTICS: Readonly<Record<string, RelationSemanti
     standard_vocabulary: ["SysML «trace»"],
   },
   supersedes: {
-    meaning: "後継成果物が先行成果物を置換・改訂する。先行成果物の変更は後継の妥当性に影響する",
+    meaning: "後継成果物が先行成果物を置換・改訂する。置換後の旧成果物は凍結され、新旧の間で変更は波及しない",
     semantics_slot: "supersede",
-    change_impact_direction: "reverse",
+    change_impact_direction: "none",
     standard_vocabulary: ["Dublin Core dct:replaces"],
   },
   defined_in: {
     meaning: "成果物の定義が当該ファイルに存在する。ファイルの変更は定義済み成果物に影響する",
     semantics_slot: "specify",
-    change_impact_direction: "reverse",
+    change_impact_direction: "backward",
     standard_vocabulary: ["OSLC specifiedBy（定義所在の意味近似）"],
   },
   contains: {
     meaning: "分解関係。コンテナと被包含成果物は変更影響を双方向に受けうる",
     semantics_slot: "decompose",
-    change_impact_direction: "both",
+    change_impact_direction: "bidirectional",
     standard_vocabulary: ["SysML requirement containment", "OSLC decomposedBy"],
   },
   extends: {
-    meaning: "拡張成果物が基盤成果物を具体化・拡張する。基盤の変更は拡張に影響する",
+    meaning: "拡張成果物が基盤成果物の適用範囲を追加定義で広げる。基盤の変更は拡張へ波及し、拡張の変更は拡張の妥当性を変える",
     semantics_slot: "refine",
-    change_impact_direction: "reverse",
-    standard_vocabulary: ["SysML «refine»", "UML «extend»"],
+    change_impact_direction: "bidirectional",
+    standard_vocabulary: ["UML «extend»"],
   },
 }
 
@@ -224,6 +228,86 @@ export const DEFAULT_ARTIFACT_TYPE_SEMANTICS: Readonly<Record<string, ArtifactTy
     origin: "standard",
     standard_vocabulary: ["OSLC Specification"],
   },
+}
+
+// ─── Trace Query profiles (REQ-{NNNN}-{NNN}) ───────────────────────────────────
+
+/** 高位問い合わせ（Trace Query）のプロファイル種別。diagnostics は構造診断を担う。 */
+export type ProfileKind = "related" | "impact" | "dependency" | "implementation" | "diagnostics"
+
+export const PROFILE_KINDS: readonly ProfileKind[] = [
+  "related",
+  "impact",
+  "dependency",
+  "implementation",
+  "diagnostics",
+]
+
+// ─── Query settings (REQ-{NNNN}-{NNN}/007) ─────────────────────────────────────
+
+/** augmentation の問い合わせ設定（query_settings）のスキーマ。 */
+export type QuerySettingsSpec = {
+  readonly limits?: Readonly<Record<string, number>>
+  readonly depths?: Readonly<Record<string, number>>
+  readonly concentration_threshold?: number
+}
+
+/**
+ * 標準問い合わせ設定 (REQ-{NNNN}-{NNN}/007)。候補数上限はコードへ直書きせず
+ * 問い合わせ設定として管理し、プロジェクト拡張で上書きする。
+ * 初期値は暫定であり、代表ケース回帰検証 (REQ-{NNNN}-{NNN}/008) で確定する。
+ */
+export const DEFAULT_QUERY_SETTINGS = {
+  limits: {
+    related: 30,
+    impact: 30,
+    dependency: 30,
+    implementation: 30,
+    diagnostics: 50,
+  },
+  depths: {
+    related: 2,
+    impact: 2,
+    dependency: 2,
+    implementation: 3,
+    diagnostics: 2,
+  },
+  concentration_threshold: 20,
+} as const
+
+export type QuerySettings = {
+  readonly limits: Readonly<Record<ProfileKind, number>>
+  readonly depths: Readonly<Record<ProfileKind, number>>
+  readonly concentration_threshold: number
+}
+
+// ─── Relation constraints (REQ-{NNNN}-{NNN}) ───────────────────────────────────
+
+/** TIM 関係制約（リンク元・リンク先成果物型の組合せ制約）。定義された場合のみ diagnostics が制約違反を判定する。 */
+export type RelationConstraintSpec = {
+  readonly relation_type: string
+  readonly allowed_source_types: readonly string[]
+  readonly allowed_target_types: readonly string[]
+}
+
+export type RelationConstraint = {
+  readonly relationType: string
+  readonly allowedSourceTypes: ReadonlySet<string>
+  readonly allowedTargetTypes: ReadonlySet<string>
+}
+
+// ─── Trace model ───────────────────────────────────────────────────────────────
+
+/**
+ * 高位問い合わせ（Trace Query）実行時の解決済みモデル。関係意味・役割は
+ * augmentation 解決済み設定（ResolvedConfig）から、問い合わせ設定と関係制約は
+ * augmentation から解決する（resolveTraceModel、augmentation.ts）。
+ */
+export type TraceModel = {
+  readonly relationSemantics: ReadonlyMap<string, RelationSemantics>
+  readonly nodeRoles: ReadonlyMap<string, NodeTypeRole>
+  readonly relationConstraints: readonly RelationConstraint[]
+  readonly querySettings: QuerySettings
 }
 
 export function isChangeImpactDirection(value: string): value is ChangeImpactDirection {

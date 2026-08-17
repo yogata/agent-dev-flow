@@ -22,18 +22,18 @@ Traceability Information Model（TIM）の語彙・意味定義のうち、`agen
 | 関係型 | 意味スロット | 変更影響方向 | 標準語彙対応 |
 |---|---|---|---|
 | `references` | general_reference（一般参照） | none | SysML «trace» |
-| `supersedes` | supersede（置換・改訂） | reverse | Dublin Core `dct:replaces` |
-| `defined_in` | specify（定義所在） | reverse | OSLC specifiedBy 系（意味近似） |
-| `contains` | decompose（分解） | both | SysML requirement containment / OSLC decomposedBy |
-| `extends` | refine（具体化・拡張） | reverse | SysML «refine» / UML «extend» |
+| `supersedes` | supersede（置換・改訂） | none | Dublin Core `dct:replaces` |
+| `defined_in` | specify（定義所在） | backward | OSLC specifiedBy 系（意味近似） |
+| `contains` | decompose（分解） | bidirectional | SysML requirement containment / OSLC decomposedBy |
+| `extends` | refine（具体化・拡張） | bidirectional | UML «extend» |
 
 変更影響方向はリンクの記述方向（source→target）と独立に定義する。
 
 | 方向 | 意味 |
 |---|---|
 | `forward` | source の変更が target に影響する |
-| `reverse` | target の変更が source に影響する |
-| `both` | 双方向に影響する |
+| `backward` | target の変更が source に影響する |
+| `bidirectional` | 双方向に影響する |
 | `none` | 変更影響の意味を持たない（一般参照） |
 
 ## 意味スロットと探索方向導出
@@ -76,7 +76,7 @@ relation_types:
     semantics:
       meaning: "設計成果物が要件を充足する"   # 必須
       semantics_slot: satisfy                # 省略可（標準意味が当てはまらない場合）
-      change_impact_direction: reverse       # 必須: forward | reverse | both | none
+      change_impact_direction: backward      # 必須: forward | backward | bidirectional | none
       standard_vocabulary: ["SysML «satisfy»"]  # 省略可
       source_types: [design]                 # 省略可: 関係制約
       target_types: [requirement]            # 省略可: 関係制約

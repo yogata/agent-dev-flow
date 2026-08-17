@@ -44,13 +44,16 @@ function synthEdge(id: string, type: string, source: string, target: string): Gr
 function synthGraph(nodes: readonly GraphNode[], edges: readonly GraphEdge[]): GraphData {
   return {
     manifest: {
-      schema_version: "1.0.0",
+      schema_version: "2.0.0",
       generator_version: "0.1.0",
       input_digest: "a".repeat(64),
+      graph_config_digest: "b".repeat(64),
       indexed_paths: [],
       excluded_paths: [],
       node_types: [],
       relation_types: [],
+      relation_semantics: {},
+      node_type_roles: {},
     },
     nodes,
     edges,

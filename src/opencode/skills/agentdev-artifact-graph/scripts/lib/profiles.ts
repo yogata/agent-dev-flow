@@ -48,8 +48,8 @@ function orientationsAt(
       break
     case "impact": {
       const d = entry.semantics.change_impact_direction
-      if (d === "forward" || d === "both") directions.push("forward")
-      if (d === "reverse" || d === "both") directions.push("reverse")
+      if (d === "forward" || d === "bidirectional") directions.push("forward")
+      if (d === "backward" || d === "bidirectional") directions.push("reverse")
       break
     }
     case "dependency":

@@ -164,7 +164,7 @@ describe(`general reference separation on the default vocabulary (REQ-{NNNN}-021
     expect(ids).toContain(DEC_002_NODE)
   })
 
-  it("supersedes impact follows the declared reverse direction", async () => {
+  it("supersedes never joins impact paths (TIM catalog assigns none)", async () => {
     const { graph } = await graphFixture()
     const result = await queryGraph(graph, {
       kind: "profile",
@@ -173,6 +173,6 @@ describe(`general reference separation on the default vocabulary (REQ-{NNNN}-021
       depth: 1,
       limit: 200,
     })
-    expect(result.candidates?.map((candidate) => candidate.id)).toEqual([DEC_002_NODE])
+    expect(result.candidates?.map((candidate) => candidate.id)).toEqual([])
   })
 })

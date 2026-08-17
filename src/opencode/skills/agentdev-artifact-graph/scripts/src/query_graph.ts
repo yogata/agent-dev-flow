@@ -1,13 +1,19 @@
 import { resolve } from "node:path"
 import { loadGraph } from "../lib/graph.ts"
+import { loadAugmentation, resolveConfig, resolveTraceModel } from "../lib/augmentation.ts"
 import { queryGraph, type GraphQuery } from "../lib/query.ts"
-import { DEFAULT_PROFILE_DEPTH, DEFAULT_PROFILE_LIMIT, type ProfileName } from "../lib/profiles.ts"
-
-const PROFILE_SUBCOMMANDS = new Set(["related", "impact", "dependency", "implementation"])
+import { PROFILE_KINDS, type ProfileKind } from "../lib/tim.ts"
+import { runTraceQuery } from "../lib/trace_query.ts"
+import { runDiagnostics } from "../lib/trace_diagnostics.ts"
 
 function value(args: readonly string[], name: string, fallback: string): string {
   const index = args.indexOf(name)
   return index < 0 ? fallback : (args[index + 1] ?? fallback)
+}
+
+function option(args: readonly string[], name: string): string | undefined {
+  const index = args.indexOf(name)
+  return index < 0 ? undefined : args[index + 1]
 }
 
 const FLAGS_WITH_VALUE = new Set(["--graph", "--root", "--depth", "--max-depth", "--augmentation", "--roots", "--limit"])
@@ -53,27 +59,13 @@ function parseQuery(args: readonly string[]): GraphQuery {
       kind: "discover",
       term: args[commandIndex + 1] ?? "",
       roots: parseList(args, "--roots"),
-      rootDir: resolve(rootOption(args)),
+      rootDir: resolve(option(args, "--root") ?? "."),
     }
   }
   if (command === "index") {
     return { kind: "index", node: args[commandIndex + 1] ?? "" }
   }
-  if (command !== undefined && PROFILE_SUBCOMMANDS.has(command)) {
-    return {
-      kind: "profile",
-      profile: command as ProfileName,
-      node: args[commandIndex + 1] ?? "",
-      depth: Number(value(args, "--depth", String(DEFAULT_PROFILE_DEPTH))),
-      limit: Number(value(args, "--limit", String(DEFAULT_PROFILE_LIMIT))),
-    }
-  }
-  throw new TypeError("query must be neighbors, path, provenance, discover, related, impact, dependency, implementation, or index")
-}
-
-function rootOption(args: readonly string[]): string {
-  const index = args.indexOf("--root")
-  return index < 0 ? "." : (args[index + 1] ?? ".")
+  throw new TypeError(`query must be one of: ${[...PROFILE_KINDS, "neighbors", "path", "provenance", "discover", "index"].join(", ")}`)
 }
 
 function parseList(args: readonly string[], name: string): readonly string[] {
@@ -83,15 +75,59 @@ function parseList(args: readonly string[], name: string): readonly string[] {
   return v.split(",").filter(Boolean)
 }
 
+function parseLimit(args: readonly string[]): number | undefined {
+  const raw = option(args, "--limit")
+  return raw === undefined ? undefined : Number(raw)
+}
+
+function parseDepth(args: readonly string[]): number | undefined {
+  const raw = option(args, "--depth")
+  return raw === undefined ? undefined : Number(raw)
+}
+
+async function runHighLevel(
+  args: readonly string[],
+  profile: ProfileKind,
+  commandIndex: number,
+): Promise<string> {
+  const root = resolve(option(args, "--root") ?? ".")
+  const augmentation = await loadAugmentation(root, option(args, "--augmentation"))
+  const graph = await loadGraph(resolve(value(args, "--graph", ".agentdev/graph")))
+  const model = resolveTraceModel(graph.manifest, augmentation)
+  const limit = parseLimit(args)
+  if (profile === "diagnostics") {
+    return JSON.stringify(runDiagnostics(graph, model, limit))
+  }
+  const node = args[commandIndex + 1] ?? ""
+  return JSON.stringify(runTraceQuery(graph, model, profile, node, limit, parseDepth(args)))
+}
+
 export async function main(args: readonly string[] = process.argv.slice(2)): Promise<void> {
-  const graph = resolve(value(args, "--graph", ".agentdev/graph"))
+  const commandIndex = findSubcommandIndex(args)
+  if (commandIndex < 0) throw new TypeError("query subcommand required")
+  const command = args[commandIndex] ?? ""
+
+  if ((PROFILE_KINDS as readonly string[]).includes(command)) {
+    console.log(await runHighLevel(args, command as ProfileKind, commandIndex))
+    return
+  }
+
   const query = parseQuery(args)
   // discover doesn't need a loaded graph; others do
   if (query.kind === "discover") {
-    console.log(JSON.stringify(await queryGraph({ manifest: {} as never, nodes: [], edges: [], provenance: [], diagnostics: [] }, query)))
-  } else {
-    console.log(JSON.stringify(await queryGraph(await loadGraph(graph), query)))
+    let roots = query.roots
+    if (!args.includes("--roots")) {
+      // REQ-{NNNN}-{NNN}/011: resolve discovery_roots from the applied config;
+      // an explicit --roots flag overrides for this run only.
+      const augmentation = await loadAugmentation(query.rootDir, option(args, "--augmentation"))
+      roots = resolveConfig(augmentation).discovery_roots
+    }
+    const graph = { manifest: {} as never, nodes: [], edges: [], provenance: [], diagnostics: [] }
+    console.log(JSON.stringify(await queryGraph(graph, { ...query, roots })))
+    return
   }
+
+  console.log(JSON.stringify(await queryGraph(await loadGraph(resolve(value(args, "--graph", ".agentdev/graph"))), query)))
 }
 
 if (import.meta.main) {
