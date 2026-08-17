@@ -2,7 +2,7 @@
 title: ワークフロー契約（横断）
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-17
 ---
 
 # ワークフロー契約（横断）
@@ -32,12 +32,13 @@ AgentDevFlow の公開コマンドは以下の5分類のいずれかに属する
 | 分類 | コマンド | 目的 |
 |---|---|---|
 | 主フロー | req-define → req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close → case-update | 要件定義から実装完了までの標準ワークフロー |
-| 最大自走入口 | case-auto | req-define 完了後の後続工程を一括自走する追加入口。標準フローを置換しない（REQ-005-049） |
+| 最大自走入口 | case-auto, backlog-auto | 追加入口。case-auto は req-define 完了後の後続工程を一括自走、backlog-auto は backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行。標準フローを置換しない（REQ-005-049、REQ-005-011） |
 | 補助フロー | intake-capture, intake-from-github, intake-promote, learning-promote, backlog-review | 改善候補収集、学び蓄積、RU化。主フローを補完 |
 | 検出フロー | inspect-docs, inspect-skills, inspect-promote | 文書、スキルの意味検出、分類、昇格 |
 | リポジトリローカル検査 | /repo/docs-check | AgentDevFlow 本体リポジトリ内の機械的整合性検査 |
 
 - case-auto は標準フロー（req-save → spec-save → case-open → case-run → case-close）を内部的に呼び出す追加入口であり、標準フローを置換、廃止しない（REQ-006-017）。spec-save は `artifact_actions` に `artifact: spec` entry が含まれる場合に実行し、旧形式 draft（同フィールドなし）は後方互換で従来順序で実行する（v2:ADR-0123, REQ-001-014）。
+- backlog-auto は標準の backlog 整理フロー（inspect-docs、昇格3系統、backlog-review の個別コマンド逐次実行）を置換しない追加入口であり、backlog 整理サイクル（inspect-docs → 昇格3系統（learning-promote、intake-promote、inspect-promote）→ backlog-review）を1回起動で実行する（REQ-005-011、REQ-041）。
 - 補助フロー、検出フロー、リポジトリローカル検査は、主フロー、最大自走入口とは独立して実行可能である。
 - 検出フローの出力（検出事項: inspect finding）は、inspect-promote → backlog-review を経て RU 化され、req-define の入力となる。
 
