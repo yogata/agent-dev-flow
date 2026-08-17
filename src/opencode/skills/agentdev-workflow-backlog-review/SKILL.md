@@ -93,6 +93,15 @@ HITL（STEP-5）の承認状態は単独では durable state に記録されな�
 - `agentdev-adversarial-review`: 経路E の review 呼出（共通契約の正規所有者は adversarial-review SPEC、REQ-{NNNN}）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open。document-model SPEC の文書7分類モデルは extension 経由で参照）
+- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（統合、分割、depends_on の補助 evidence 探索。fail-open）
+
+## Artifact Graph 利用
+
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related、impact、必要に応じて dependency）を利用できる。採用済み成果物に含まれる REQ、Decision、SPEC、canonical owner 等の明示情報を起点に、統合、分割、depends_on 依存解決（STEP-3）の補助 evidence 探索を行う。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。問い合わせ目的を指定し、返された候補を用いて判断する。
+
+- 問い合わせ結果は候補提供であり、統合、分割、depends_on、意味的重複の判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
+- 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
+- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、README 索引、正規成果物の直接読取、`rg`、ファイル探索などの代替探索で workflow を継続する（fail-open）。正規成果物そのものの異常と派生索引側の異常を区別する
 
 ## Workflow Extension 読込
 

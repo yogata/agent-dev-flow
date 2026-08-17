@@ -92,7 +92,16 @@ case-close workflow は次の STEP で構成する。Epic Wave クローズは S
 - `agentdev-workflow-orchestration`: capture 境界（intake/learning 分離）
 - `agentdev-conventional-commits`: GitHub auto-close 回避ガイドライン
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
+- `agentdev-artifact-graph`: トレーサビリティ派生索引（変更後の整合性確認、verification feedback。fail-open）
 - integrity checker skill（repo-local）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）
+
+## Artifact Graph 利用
+
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引を、変更後の整合性確認（必要に応じて）に利用できる。確認対象は変更後の派生索引の生成と鮮度、整合性、unresolved relation、dangling relation、provenance defect、独立確認結果との差異である（STEP-3 docs 検証）。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+
+- Graph defect（派生索引側の抽出問題）と canonical defect（正規成果物側の実不整合）を区別する
+- 派生索引の不在、破損、生成失敗、問い合わせ失敗、候補過多のみを理由に本 workflow を失敗させない（fail-open）。代替検証経路（既存の品質ゲート、targeted docs guard、`rg` 等の独立探索）で継続する
+- 正規成果物側の実不整合が確認された場合は、既存の品質ゲート、受け入れ条件に従って fail とする
 
 ## Workflow Extension 読込
 

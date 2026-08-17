@@ -79,6 +79,15 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-docs.yaml`）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング含む）
 - `agentdev-conventional-commits`: commit message 規約
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
+- `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（diagnostics、構造診断候補の探索。fail-open）
+
+## Artifact Graph 利用
+
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（diagnostics）を構造診断候補の探索に利用できる。候補には unresolved reference、superseded artifact への現行参照、dangling relation、provenance 欠落、orphan candidate、不自然な relation path、structural duplicate candidate を含む（STEP-2 意味診断の入力）。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+
+- Graph は候補提供者であり、決定的検査（参照実在、委譲先 skill 実在、YAML 構文、必須 field）は docs-check、整合性ルール群が所有する。本スキルは Graph 構造候補を未検証 evidence として意味診断の入力に利用し、構造診断と意味診断を区別する
+- SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT 等の意味判断を問い合わせ結果の構造情報だけから確定しない
+- 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、正規成果物の直接読取、`rg`、ファイル探索などの従来の診断経路で workflow を継続する（fail-open）。派生索引側の障害だけを理由に本 workflow を停止しない
 
 ## Workflow Extension 読込契約
 

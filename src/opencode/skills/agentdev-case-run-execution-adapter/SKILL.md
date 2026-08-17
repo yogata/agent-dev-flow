@@ -66,7 +66,7 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 実行担当サブエージェントは以下を順に実行する:
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。実行 command が Issue を success criteria に分解する
-2. **context 再確認**: ADR/ REQ/ SPEC/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する
+2. **context 再確認**: ADR/ REQ/ SPEC/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。トレーサビリティ派生索引への高位問い合わせ（implementation）を実行対象と正規成果物の実現関係確認の候補探索に利用できる（`agentdev-artifact-graph` 経由）。問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、派生索引の不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は代替探索で継続する（fail-open）
 3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（`agentdev-gh-cli`）で PR を作成する。ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。実装完了後、test strategy 項目の test-fix ループ（後述）を実行する
 4. **blocker 処理**: 回答可能な blocker（ADR/REQ/SPEC/docs/Issue本文で回答できるもの）は自律的に実行 command 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
