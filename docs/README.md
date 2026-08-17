@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 35件、廃止済み: 4件
+現行 REQ: 36件、廃止済み: 4件
 <!-- AUTOGEN:END -->
 
-現行要件は35件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして retired/ へ移行済み、REQ-036〜REQ-039 を追加。番号には欠番が存在する）。
+現行要件は36件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして retired/ へ移行済み、REQ-036〜REQ-039、REQ-040 を追加。番号には欠番が存在する）。
 REQ-022 の規範内容は、後継の [agentdev-artifact-graph SPEC](specs/skills/agentdev-artifact-graph.md)「augmentation 配置先」節が正規所有する。
 REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-graph SPEC](specs/skills/agentdev-artifact-graph.md)「check_graph.ts 抽出規則と warning 分類」節と `scripts/lib/checker.ts` が正規所有する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
@@ -51,12 +51,13 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [REQ-037](requirements/REQ-037.md) | 取り込みパイプライン（intake） |
 | [REQ-038](requirements/REQ-038.md) | 学習パイプライン（learning） |
 | [REQ-039](requirements/REQ-039.md) | バックログ統合（backlog-review） |
+| [REQ-040](requirements/REQ-040.md) | トレーサビリティ高位問い合わせ（Trace Query） |
 
 - [要件インデックス](requirements/README.md)
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-016 の16件である（DEC-008、DEC-015、DEC-016 は proposed、DEC-005 は superseded）。
+現行 Decision は DEC-001 から DEC-017 の17件である（DEC-008、DEC-015、DEC-016、DEC-017 は proposed、DEC-005 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -77,6 +78,7 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement（proposed） |
 | [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（proposed） |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則（proposed） |
+| [DEC-017](decisions/DEC-017.md) | TIM 準拠トレーサビリティモデルの採用と4層分離（proposed） |
 
 ## 仕様（SPEC）
 

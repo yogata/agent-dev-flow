@@ -9,7 +9,7 @@
 個別 REQ/SPEC は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は12件、提案中の Decision は3件である。
+現行の承認済み Decision は12件、提案中の Decision は4件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -31,6 +31,7 @@
 | DEC-014 | 配布依存境界の多層 enforcement | accepted | 2026-08-11 |
 | DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | proposed | 2026-08-15 |
 | DEC-016 | 導入系スクリプトの副作用ゼロ原則 | proposed | 2026-08-15 |
+| DEC-017 | TIM 準拠トレーサビリティモデルの採用と4層分離 | proposed | 2026-08-17 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -63,6 +64,7 @@
 - [DEC-008](DEC-008.md)（case-auto の限定的親判断解決（bounded parent decision resolution））
 - [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
+- [DEC-017](DEC-017.md)（TIM 準拠トレーサビリティモデルの採用と4層分離）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -94,6 +96,7 @@
 - [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
 - [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement、IR-059 範囲と enforcement 経路の変更）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則、provisioning 責務の利用者移転）
+- [DEC-017](DEC-017.md)（TIM 準拠トレーサビリティモデルの採用と4層分離、TIM・Trace Index・Trace Query・ADF Integration の4層分離）
 
 ### ワークフロー・委譲契約
 
@@ -131,6 +134,9 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-015 | relates-to | DEC-010 | Command / Workflow Skill / Capability Skill 責務3層分化を維持したまま決定論的処理を接続 |
 | DEC-015 | relates-to | DEC-011 | STEP（workflow 層の再開単位）と処理単位（orchestration 層の再開単位）の階層関係を明確化 |
 | DEC-016 | relates-to | DEC-002 | 導入系スクリプトの副作用ゼロ原則。原本/プロジェクション分離における移行・同期の責務分離の類推 |
+| DEC-017 | relates-to | DEC-007 | グラフモデルの概念基盤部分（標準コア語彙を上位モデルとする前提）を本 Decision が置換する。配布スキル昇格、augmentation 分離、fail-open、決定論性、verification feedback は維持する |
+| DEC-017 | relates-to | DEC-009 | Decision 成果物型の TIM 上の位置づけ（ADF 拡張） |
+| DEC-017 | relates-to | DEC-010 | 4層分離はトレーサビリティ機能内部の概念層であり、Command / Workflow Skill / Capability Skill の配布物3層モデルとは別軸である |
 
 ## 関連 REQ
 
@@ -152,6 +158,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-014 | [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-010](../requirements/REQ-010.md), [REQ-009](../requirements/REQ-009.md) | 配布依存境界の多層 enforcement（REQ-029 新設、REQ-002 縮約、REQ-010-060 最終保証 gate、REQ-009-045 release artifact 境界、IR-059 範囲と source/save/complete/release 経路変更） |
 | DEC-015 | [REQ-002](../requirements/REQ-002.md), [REQ-005](../requirements/REQ-005.md), [REQ-011](../requirements/REQ-011.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md), [REQ-038](../requirements/REQ-038.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（REQ-002-035/036、REQ-005-025〜028、REQ-011-019、REQ-034-035/036、REQ-035-011、REQ-038-005 と整合） |
 | DEC-016 | [REQ-009](../requirements/REQ-009.md) | 導入系スクリプトの副作用ゼロ原則（provisioning 責務の利用者移転、REQ-009-010 UPDATE、REQ-009-046〜049 APPEND と整合） |
+| DEC-017 | [REQ-012](../requirements/REQ-012.md), [REQ-040](../requirements/REQ-040.md), [REQ-021](../requirements/REQ-021.md), [REQ-020](../requirements/REQ-020.md) | TIM 準拠トレーサビリティモデルの採用と4層分離（REQ-012 UPDATE、REQ-040 CREATE、REQ-021 UPDATE、REQ-020 UPDATE と整合） |
 
 ## 過去版の履歴基盤
 
