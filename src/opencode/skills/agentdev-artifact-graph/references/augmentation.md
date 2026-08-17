@@ -19,15 +19,25 @@ node_types:       # 追加するノード型（配列）
     id_template: string   # 省略可: デフォルト "{name}:{path}"（例: "requirement:{match1}"）
     label_source: array   # 省略可: デフォルト [{ kind: "first_heading" }]
     extraction_rule: string # 省略可: デフォルト "frontmatter"
+    role: string          # 省略可: "index" または "aggregation"（索引・集約成果物の役割識別）
 relation_types:   # 追加する関係型（配列）
   - name: string          # 必須: 型名
     fields: array         # frontmatter フィールドキーのリスト
     reverse_direction: boolean # 省略可: デフォルト false
+    semantics:            # 省略可: 高位問い合わせへ参加させる場合は必須（meaning と change_impact_direction）
+      meaning: string           # 必須: 関係の意味
+      semantics_slot: string    # 省略可: TIM 意味スロット（標準意味が当てはまらない場合は省略）
+      change_impact_direction: string  # 必須: forward | reverse | both | none
+      standard_vocabulary: array      # 省略可: 採用した標準語彙
+      source_types: array            # 省略可: リンク元成果物型の関係制約
+      target_types: array            # 省略可: リンク先成果物型の関係制約
 indexed_paths:    # 追加する indexed_paths（配列）
   - string
 discovery_roots:  # 追加する discovery_roots（配列）
   - string
 ```
+
+`semantics` を持たない拡張関係型はグラフに生成されるが、高位問い合わせ（related、impact、dependency、implementation）へ自動参加しない。低位問い合わせ（neighbors、path、provenance）で利用できる。標準コア5関係型（references, supersedes, defined_in, contains, extends）への semantics・role 宣言はできない（TIM 語彙カタログが所有する）。意味スロットと変更影響方向の対応は [tim.md](tim.md) 参照。
 
 ## id_template 変数
 

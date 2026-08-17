@@ -4,7 +4,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { buildGraph, loadGraph } from "../lib/graph.ts"
 import { checkGraph } from "../lib/checker.ts"
-import { AUGMENTATION_DEFAULT_PATH } from "../lib/config.ts"
+import { AUGMENTATION_DEFAULT_PATH } from "../lib/augmentation.ts"
 import { createFixture } from "./fixture.ts"
 
 const roots: string[] = []

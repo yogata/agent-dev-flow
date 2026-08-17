@@ -13,6 +13,19 @@ consumer と self-hosting の両環境で動作する。標準コアと augmenta
 
 本スキルの原本仕様は `agentdev-artifact-graph` SPEC である。SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
 
+## TIM と派生索引としての位置付け
+
+Traceability Information Model（TIM）を成果物間トレーサビリティの正規論理モデルとする。本スキルが生成する Artifact Graph は、TIM に基づくトレーサビリティ情報から生成される再生成可能な派生索引であり、グラフの物理保存形式（`.agentdev/graph/` の5ファイル）を TIM そのものとはみなさない。標準語彙対応、意味定義、探索方向導出規則の詳細は [references/tim.md](references/tim.md) 参照。
+
+TIM が表現する要素と派生索引上の対応:
+
+| TIM 表現要素 | 派生索引上の対応 |
+|---|---|
+| 成果物型 | node type（`manifest.json` の `node_types`、`node_type_roles`） |
+| トレースリンク型・関係の意味・変更影響方向・関係制約 | relation type と意味定義（`manifest.json` の `relation_semantics`） |
+| リンク元・リンク先成果物型 | edge の `source` / `target` |
+| 根拠情報への関連付け | provenance（全ノード・全関係から取得可能） |
+
 ## 標準コア（デフォルト）
 
 標準コアは self-hosting 固有知識を持たない（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}、DEC-{N} decision 3）。
@@ -24,7 +37,7 @@ consumer と self-hosting の両環境で動作する。標準コアと augmenta
 | relation_types | `references`, `supersedes`, `defined_in`, `contains`, `extends`（5種） |
 | discovery_roots | 空（augmentation で追加） |
 
-node_types と relation_types は closed-enum ではなく、augmentation から追加可能な open extension point である（REQ-{NNNN}-{NNN}、DEC-{N} decision 2）。
+node_types と relation_types は closed-enum ではなく、augmentation から追加可能な open extension point である（REQ-{NNNN}-{NNN}、DEC-{N} decision 2）。標準コア5関係型の意味定義（意味スロット、変更影響方向、標準語彙対応）は TIM 語彙カタログが所有し、augmentation で再定義できない。`decision` は ADF 固有の拡張成果物型であり、Decision 専用の関係型を持たない。
 
 ## 入力と出力
 
@@ -67,6 +80,14 @@ node_types と relation_types は closed-enum ではなく、augmentation から
 | `prepare_graph.ts` | ワークフロー統合（fail-open） | `--root`, `--output`, `--augmentation` | `{ status, freshness, graphPath, reason? }` |
 | `verify_graph.ts` | verification feedback | `--root`, `--graph`, `--augmentation` | `{ summary, differences[] }` |
 
+query_graph.ts のサブコマンド:
+
+| サブコマンド | 種別 | 説明 |
+|---|---|---|
+| `neighbors`, `path`, `provenance`, `discover` | 低位問い合わせ | 全関係（意味定義の有無を問わない）を利用する |
+| `related`, `impact`, `dependency`, `implementation` | 高位問い合わせ（プロファイル） | TIM の関係意味から導出した参加可否・探索方向で走査する |
+| `index` | 明示的な索引構造問い合わせ | 対象成果物の役割と一般参照による索引構造を返す |
+
 ### 実行方法
 
 ```bash
@@ -87,6 +108,15 @@ bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph 
 
 # 問い合わせ: discover（discovery_roots を探索）
 bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --root . discover "search-term" --roots src,tests
+
+# 高位問い合わせ: impact（起点成果物の変更影響候補）
+bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph impact requirement:REQ-{NNNN} --depth 2 --limit 200
+
+# 高位問い合わせ: implementation（要件を実現・充足する成果物候補）
+bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph implementation requirement:REQ-{NNNN}
+
+# 明示的な索引構造問い合わせ
+bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph index catalog:INDEX-{NNN}
 
 # ワークフロー統合（fail-open）
 bun .opencode/skills/agentdev-artifact-graph/scripts/src/prepare_graph.ts --root . --output .agentdev/graph
@@ -122,6 +152,38 @@ discovery_roots:
   - src
   - tests
 ```
+
+## 高位問い合わせ（目的別プロファイル）
+
+related、impact、dependency、implementation の各プロファイルは、TIM に定義された関係の意味から導出した参加可否・探索方向で走査する。問い合わせごとの個別ハードコードを持たない。
+
+| プロファイル | 参加する関係 | 探索方向 |
+|---|---|---|
+| `related` | 意味定義を持つ全関係（一般参照を含む） | 双方向 |
+| `impact` | 変更影響方向が none 以外の関係 | 関係ごとの変更影響方向（順方向・逆方向・双方向） |
+| `dependency` | 依存家族の意味スロット | スロットごとの順方向・逆方向 |
+| `implementation` | 実現・実装・充足系列の意味スロット | 逆方向 |
+
+一般参照（`references`、SysML «trace» 相当）は変更影響・依存・実現・充足・検証の意味を持たないため、impact、dependency、implementation へ参加しない。関連成果物確認（related）、所在確認、低位問い合わせ、明示的な索引構造問い合わせで利用できる。
+
+意味定義を持たない拡張関係型は高位問い合わせへ自動参加せず、低位問い合わせ（neighbors、path、provenance）で利用できる。関係型名や LLM 推論からの意味の自動推定は行わない。
+
+プロファイルの問い合わせ結果は候補ごとに候補成果物、候補となった理由（関係型・走査方向）、到達経路を返す。候補数上限は問い合わせ時設定（`--limit`、デフォルト 200）であり、派生索引の再生成条件に含めない。上限超過時は候補過多であること、全候補数、返却候補数、独立探索への移行可否を返す。候補が存在しない場合は正常な空結果として扱う。
+
+## 索引・集約成果物の役割識別
+
+README、INDEX、CATALOG 等の名称ではなく、成果物型の役割（`role: index` または `aggregation`、augmentation の node_types で宣言）として索引・集約成果物を識別する。索引・集約成果物であることだけを理由として成果物またはその関係をグラフから削除しない。変更影響等からの除外判断は成果物名ではなくトレースリンクの意味に基づく。`index` サブコマンドで対象成果物の役割と一般参照による索引構造を問い合わせできる。
+
+## 鮮度判定と利用時再生成
+
+正規入力ファイルの更新ごとに常時派生索引を再生成しない。鮮度保証を必要とする利用の直前（prepare_graph）に鮮度を確認し、不一致または索引不在・破損の場合のみ再生成する。鮮度は次の4要素で判定し、すべて一致する場合のみ既存索引を再利用する:
+
+1. `input_digest`（正規入力ファイルの内容）
+2. `graph_config_digest`（生成に影響する設定。`discovery_roots`、候補数上限、表示設定など問い合わせ時設定は含めない）
+3. `generator_version`
+4. `schema_version`（非互換グラフは読み込み時に失敗し、再生成される）
+
+生成不能の場合の動作は fail-open（次節）に従う。
 
 ## 標準ワークフローからの補助利用
 
@@ -176,7 +238,8 @@ project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ�
 
 | 条件 | 読む reference |
 |---|---|
-| augmentation スキーマの詳細、node_type/relation_type 追加方法、id_template、label_source の形式 | [references/augmentation.md](references/augmentation.md) |
+| augmentation スキーマの詳細、node_type/relation_type 追加方法、id_template、label_source の形式、関係型の意味定義（semantics）、索引・集約成果物の役割（role） | [references/augmentation.md](references/augmentation.md) |
+| TIM 標準語彙対応、意味スロット、変更影響方向4値、探索方向導出規則、一般参照と意味的トレースリンクの分離、鮮度判定4要素 | [references/tim.md](references/tim.md) |
 | verification feedback 機構の詳細、差異分類、回帰検証手順 | [references/verification.md](references/verification.md) |
 
 ## See Also

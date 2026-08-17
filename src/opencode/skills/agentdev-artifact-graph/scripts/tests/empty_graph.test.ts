@@ -5,6 +5,7 @@ import { join } from "node:path"
 import { buildGraph } from "../lib/graph.ts"
 import { checkGraph } from "../lib/checker.ts"
 import { loadGraph } from "../lib/graph.ts"
+import { SCHEMA_VERSION } from "../lib/model.ts"
 
 const roots: string[] = []
 
@@ -60,8 +61,9 @@ describe(`REQ-{NNNN}-014: empty graph is valid`, () => {
 
     await buildGraph({ root, output })
     const manifest = JSON.parse(await readFile(join(output, "manifest.json"), "utf8"))
-    expect(manifest.schema_version).toBe("1.0.0")
+    expect(manifest.schema_version).toBe(SCHEMA_VERSION)
     expect(manifest.input_digest).toMatch(/^[a-f0-9]{64}$/)
+    expect(manifest.graph_config_digest).toMatch(/^[a-f0-9]{64}$/)
     expect(manifest.indexed_paths).toEqual(["docs/requirements", "docs/decisions", "docs/specs"])
     expect(manifest.node_types).toEqual(["decision", "requirement", "specification"])
   })

@@ -1,7 +1,13 @@
-import { join } from "node:path"
+import { createHash } from "node:crypto"
 import type { ExtractionRule } from "./model.ts"
+import {
+  DEFAULT_ARTIFACT_TYPE_SEMANTICS,
+  DEFAULT_RELATION_SEMANTICS,
+  type NodeTypeRole,
+  type RelationSemantics,
+} from "./tim.ts"
 
-// ─── Default vocabulary (REQ-{NNNN}-{NNN}, REQ-{NNNN}-{NNN}, DEC-{N} decision 3) ───────
+// ─── Default vocabulary (REQ-{NNNN}-{NNN}, REQ-{NNNN}-{NNN}, DEC-{N} decision 3) ───
 
 /**
  * Standard core default indexed_paths: 3 only.
@@ -91,12 +97,20 @@ export type NodeTypeRule = {
   readonly id_template: string
   readonly label_source: readonly LabelSourceStep[]
   readonly extraction_rule: ExtractionRule
+  /** Index/aggregation role (REQ-{NNNN}-{NNN}). Absent means the type carries no role. */
+  readonly role?: NodeTypeRole
 }
 
 export type RelationTypeRule = {
   readonly name: string
   readonly fields: readonly string[]
   readonly reverse_direction: boolean
+  /**
+   * Declared TIM semantics. Required for extension relation types that join
+   * purpose-specific queries (REQ-{NNNN}-{NNN}, REQ-{NNNN}-{NNN}). Standard
+   * core types resolve their semantics from the TIM catalog, not from this field.
+   */
+  readonly semantics?: RelationSemantics
 }
 
 export type ResolvedConfig = {
@@ -107,6 +121,10 @@ export type ResolvedConfig = {
   readonly indexed_paths: readonly string[]
   readonly discovery_roots: readonly string[]
   readonly excluded_paths: readonly string[]
+  /** Resolved TIM semantics per relation type (defaults + complete augmentation declarations). */
+  readonly relation_semantics: ReadonlyMap<string, RelationSemantics>
+  /** Resolved index/aggregation roles per artifact type (REQ-{NNNN}-{NNN}). */
+  readonly node_type_roles: ReadonlyMap<string, NodeTypeRole>
 }
 
 // ─── Default rules ─────────────────────────────────────────────────────────────
@@ -170,145 +188,27 @@ export function defaultConfig(): ResolvedConfig {
     indexed_paths: [...DEFAULT_INDEXED_PATHS],
     discovery_roots: [],
     excluded_paths: [...EXCLUDED_PATHS],
+    relation_semantics: defaultRelationSemantics(),
+    node_type_roles: defaultNodeTypeRoles(),
   }
 }
 
-// ─── Augmentation loading ──────────────────────────────────────────────────────
-
-export type AugmentationFile = {
-  readonly node_types?: readonly {
-    readonly name: string
-    readonly path_pattern: string
-    readonly id_template?: string
-    readonly label_source?: readonly LabelSourceStep[]
-    readonly extraction_rule?: ExtractionRule
-  }[]
-  readonly relation_types?: readonly {
-    readonly name: string
-    readonly fields?: readonly string[]
-    readonly reverse_direction?: boolean
-  }[]
-  readonly indexed_paths?: readonly string[]
-  readonly discovery_roots?: readonly string[]
+function defaultRelationSemantics(): ReadonlyMap<string, RelationSemantics> {
+  const entries: readonly (readonly [string, RelationSemantics])[] = [...DEFAULT_RELATION_TYPE_VOCABULARY]
+    .flatMap((name) => {
+      const semantics = DEFAULT_RELATION_SEMANTICS[name]
+      return semantics === undefined ? [] : [[name, semantics] as const]
+    })
+  return new Map(entries)
 }
 
-export const AUGMENTATION_DEFAULT_PATH = ".agentdev/artifact-graph.yaml"
-
-function parseLabelSource(
-  raw: unknown,
-  fallback: readonly LabelSourceStep[],
-): readonly LabelSourceStep[] {
-  if (!Array.isArray(raw) || raw.length === 0) return fallback
-  return raw.map((step) => {
-    if (typeof step !== "object" || step === null || !("kind" in step)) {
-      throw new TypeError(`label_source step must have kind: ${JSON.stringify(step)}`)
-    }
-    const s = step as Record<string, unknown>
-    switch (s["kind"]) {
-      case "frontmatter_field":
-        return { kind: "frontmatter_field", field: String(s["field"] ?? "") }
-      case "first_heading":
-        return { kind: "first_heading" }
-      case "filename_stem":
-        return { kind: "filename_stem" }
-      case "path_group":
-        return { kind: "path_group", group: Number(s["group"] ?? 1) }
-      case "literal":
-        return { kind: "literal", value: String(s["value"] ?? "") }
-      case "path":
-        return { kind: "path" }
-      default:
-        throw new TypeError(`unknown label_source kind: ${String(s["kind"])}`)
-    }
-  })
-}
-
-export function resolveConfig(augmentation: AugmentationFile | undefined): ResolvedConfig {
-  const base = defaultConfig()
-  if (augmentation === undefined) return base
-
-  const baseNodeRules: NodeTypeRule[] = [...base.node_type_rules]
-  const nodeVocab = new Set(base.node_type_vocabulary)
-  const augmentedNodeRules: NodeTypeRule[] = []
-  for (const raw of augmentation.node_types ?? []) {
-    if (raw.name === undefined || raw.name.length === 0) {
-      throw new TypeError("augmentation node_type requires name")
-    }
-    nodeVocab.add(raw.name)
-    const existing = baseNodeRules.find((r) => r.name === raw.name)
-    if (existing === undefined) {
-      augmentedNodeRules.push({
-        name: raw.name,
-        path_pattern: raw.path_pattern,
-        id_template: raw.id_template ?? `${raw.name}:{path}`,
-        label_source: parseLabelSource(raw.label_source, [{ kind: "first_heading" }]),
-        extraction_rule: raw.extraction_rule ?? "frontmatter",
-      })
-    } else if (raw.path_pattern !== existing.path_pattern) {
-      const idx = baseNodeRules.indexOf(existing)
-      baseNodeRules[idx] = {
-        name: raw.name,
-        path_pattern: raw.path_pattern,
-        id_template: raw.id_template ?? existing.id_template,
-        label_source: parseLabelSource(raw.label_source, existing.label_source),
-        extraction_rule: raw.extraction_rule ?? existing.extraction_rule,
-      }
-    }
-  }
-  // Augmentation rules take priority over defaults: more specific project patterns
-  // are tried before general standard patterns (e.g., integrity_rule before specification).
-  const nodeRules = [...augmentedNodeRules, ...baseNodeRules]
-
-  const relRules: RelationTypeRule[] = [...base.relation_type_rules]
-  const relVocab = new Set(base.relation_type_vocabulary)
-  for (const raw of augmentation.relation_types ?? []) {
-    if (raw.name === undefined || raw.name.length === 0) {
-      throw new TypeError("augmentation relation_type requires name")
-    }
-    relVocab.add(raw.name)
-    const existing = relRules.find((r) => r.name === raw.name)
-    const fields = raw.fields !== undefined ? [...raw.fields] : existing?.fields ?? []
-    const reverse = raw.reverse_direction ?? existing?.reverse_direction ?? false
-    if (existing === undefined) {
-      relRules.push({ name: raw.name, fields, reverse_direction: reverse })
-    } else {
-      const idx = relRules.indexOf(existing)
-      relRules[idx] = { name: raw.name, fields, reverse_direction: reverse }
-    }
-  }
-
-  const indexedPaths = mergeUnique(base.indexed_paths, augmentation.indexed_paths ?? [])
-  const discoveryRoots = mergeUnique(base.discovery_roots, augmentation.discovery_roots ?? [])
-
-  return {
-    node_type_rules: nodeRules,
-    node_type_vocabulary: [...nodeVocab].sort(),
-    relation_type_rules: relRules,
-    relation_type_vocabulary: [...relVocab].sort(),
-    indexed_paths: indexedPaths,
-    discovery_roots: discoveryRoots,
-    excluded_paths: base.excluded_paths,
-  }
-}
-
-function mergeUnique(base: readonly string[], additions: readonly string[]): readonly string[] {
-  const seen = new Set(base)
-  for (const p of additions) seen.add(p)
-  return [...seen]
-}
-
-export async function loadAugmentation(root: string, explicitPath?: string): Promise<AugmentationFile | undefined> {
-  const path = explicitPath ?? AUGMENTATION_DEFAULT_PATH
-  const fullPath = join(root, path)
-  const file = Bun.file(fullPath)
-  if (!(await file.exists())) return undefined
-  const text = await file.text()
-  return parseYaml(text)
-}
-
-function parseYaml(text: string): AugmentationFile {
-  // Use Bun's YAML parser if available, otherwise simple fallback
-  return Bun.YAML.parse(text) as AugmentationFile
+function defaultNodeTypeRoles(): ReadonlyMap<string, NodeTypeRole> {
+  const entries = [...DEFAULT_NODE_TYPE_VOCABULARY]
+    .flatMap((name) => {
+      const role = DEFAULT_ARTIFACT_TYPE_SEMANTICS[name]?.role
+      return role === undefined ? [] : [[name, role] as const]
+    })
+  return new Map(entries)
 }
 
 export function validNodeTypes(config: ResolvedConfig): ReadonlySet<string> {
@@ -317,4 +217,60 @@ export function validNodeTypes(config: ResolvedConfig): ReadonlySet<string> {
 
 export function validRelationTypes(config: ResolvedConfig): ReadonlySet<string> {
   return new Set(config.relation_type_vocabulary)
+}
+
+// ─── Graph config digest (REQ-{NNNN}-{NNN}, REQ-{NNNN}-{NNN}) ──────────────────
+
+/**
+ * Digest over generation-affecting configuration. Freshness is judged by the
+ * 4 elements (input_digest, graph_config_digest, generator_version,
+ * schema_version). Query-time settings (discovery_roots, candidate limits,
+ * display settings) are deliberately excluded so that changing them never
+ * triggers index regeneration.
+ */
+export function computeGraphConfigDigest(config: ResolvedConfig): string {
+  const canonical = {
+    excluded_paths: [...config.excluded_paths].sort(),
+    indexed_paths: [...config.indexed_paths].sort(),
+    node_type_roles: sortedRecordEntries(config.node_type_roles),
+    node_type_rules: [...config.node_type_rules]
+      .map((rule) => ({
+        extraction_rule: rule.extraction_rule,
+        id_template: rule.id_template,
+        label_source: rule.label_source,
+        name: rule.name,
+        path_pattern: rule.path_pattern,
+        role: rule.role ?? null,
+      }))
+      .sort((left, right) => left.name.localeCompare(right.name)),
+    relation_semantics: sortedRecordEntries(config.relation_semantics),
+    relation_type_rules: [...config.relation_type_rules]
+      .map((rule) => ({
+        fields: [...rule.fields].sort(),
+        name: rule.name,
+        reverse_direction: rule.reverse_direction,
+      }))
+      .sort((left, right) => left.name.localeCompare(right.name)),
+  }
+  const hash = createHash("sha256")
+  hash.update(canonicalJson(canonical))
+  return hash.digest("hex")
+}
+
+function sortedRecordEntries<T>(map: ReadonlyMap<string, T>): Record<string, T> {
+  const record: Record<string, T> = {}
+  for (const key of [...map.keys()].sort()) {
+    const value = map.get(key)
+    if (value !== undefined) record[key] = value
+  }
+  return record
+}
+
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map((entry) => canonicalJson(entry)).join(",")}]`
+  if (typeof value === "object" && value !== null) {
+    const entries = Object.entries(value).sort(([left], [right]) => left.localeCompare(right))
+    return `{${entries.map(([key, entry]) => `${JSON.stringify(key)}:${canonicalJson(entry)}`).join(",")}}`
+  }
+  return JSON.stringify(value)
 }

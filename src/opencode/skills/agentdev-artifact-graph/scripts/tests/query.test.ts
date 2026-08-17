@@ -4,7 +4,7 @@ import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 import { buildGraph, loadGraph } from "../lib/graph.ts"
 import { queryGraph } from "../lib/query.ts"
-import { createFixture, REQ_001_NODE, DEC_001_NODE, REQ_001_PATH, FEATURE_SPEC_NODE } from "./fixture.ts"
+import { createFixture, REQ_001_NODE, DEC_001_NODE, DEC_002_NODE, REQ_001_PATH, FEATURE_SPEC_NODE } from "./fixture.ts"
 
 const roots: string[] = []
 
@@ -132,5 +132,47 @@ describe("CLI surface (TS-{NNN})", () => {
     ])
     expect(query.exitCode).toBe(0)
     expect(JSON.parse(query.stdout.toString()).nodes).toContain(DEC_001_NODE)
+  })
+})
+
+describe(`general reference separation on the default vocabulary (REQ-{NNNN}-021)`, () => {
+  it("references-only links do not join impact, dependency or implementation", async () => {
+    const { graph } = await graphFixture()
+    for (const profile of ["impact", "dependency", "implementation"] as const) {
+      const result = await queryGraph(graph, {
+        kind: "profile",
+        profile,
+        node: REQ_001_NODE,
+        depth: 2,
+        limit: 200,
+      })
+      expect(result.candidates).toEqual([])
+    }
+  })
+
+  it("related returns general reference candidates", async () => {
+    const { graph } = await graphFixture()
+    const result = await queryGraph(graph, {
+      kind: "profile",
+      profile: "related",
+      node: FEATURE_SPEC_NODE,
+      depth: 1,
+      limit: 200,
+    })
+    const ids = result.candidates?.map((candidate) => candidate.id)
+    expect(ids).toContain(REQ_001_NODE)
+    expect(ids).toContain(DEC_002_NODE)
+  })
+
+  it("supersedes impact follows the declared reverse direction", async () => {
+    const { graph } = await graphFixture()
+    const result = await queryGraph(graph, {
+      kind: "profile",
+      profile: "impact",
+      node: DEC_001_NODE,
+      depth: 1,
+      limit: 200,
+    })
+    expect(result.candidates?.map((candidate) => candidate.id)).toEqual([DEC_002_NODE])
   })
 })

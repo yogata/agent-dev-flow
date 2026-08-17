@@ -43,6 +43,21 @@ export function checkGraph(graph: GraphData): CheckReport {
   const warnings = graph.diagnostics
     .filter((entry) => entry.severity === "warning")
     .map((entry) => `${entry.code}: ${entry.message}`)
+  const nodeTypes = new Map(graph.nodes.map((node) => [node.id, node.type]))
+  // TIM relation constraints (REQ-{NNNN}-{NNN}): declared source/target artifact
+  // type combinations are structural observations, not graph validity errors.
+  for (const edge of graph.edges) {
+    const semantics = graph.manifest.relation_semantics[edge.type]
+    if (semantics === undefined) continue
+    const sourceType = nodeTypes.get(edge.source)
+    const targetType = nodeTypes.get(edge.target)
+    if (semantics.source_types !== undefined && sourceType !== undefined && !semantics.source_types.includes(sourceType)) {
+      warnings.push(`relation_constraint:source:${edge.id} type '${edge.type}' allows ${semantics.source_types.join("|")} but source is '${sourceType}'`)
+    }
+    if (semantics.target_types !== undefined && targetType !== undefined && !semantics.target_types.includes(targetType)) {
+      warnings.push(`relation_constraint:target:${edge.id} type '${edge.type}' allows ${semantics.target_types.join("|")} but target is '${targetType}'`)
+    }
+  }
   const info = graph.diagnostics
     .filter((entry) => entry.severity === "observation")
     .map((entry) => `${entry.code}: ${entry.message}`)
