@@ -1,5 +1,5 @@
 import { join } from "node:path"
-import type { ExtractionRule } from "./model.ts"
+import type { ExtractionRule, Manifest } from "./model.ts"
 import {
   DEFAULT_NODE_TYPE_VOCABULARY,
   DEFAULT_RELATION_TYPE_VOCABULARY,
@@ -10,11 +10,19 @@ import {
   type ResolvedConfig,
 } from "./config.ts"
 import {
+  DEFAULT_QUERY_SETTINGS,
   isChangeImpactDirection,
   isNodeTypeRole,
   isSemanticsSlot,
+  PROFILE_KINDS,
   type NodeTypeRole,
+  type ProfileKind,
+  type QuerySettings,
+  type QuerySettingsSpec,
+  type RelationConstraint,
+  type RelationConstraintSpec,
   type RelationSemantics,
+  type TraceModel,
 } from "./tim.ts"
 
 export type AugmentationFile = {
@@ -34,6 +42,8 @@ export type AugmentationFile = {
   }[]
   readonly indexed_paths?: readonly string[]
   readonly discovery_roots?: readonly string[]
+  readonly query_settings?: QuerySettingsSpec
+  readonly relation_constraints?: readonly RelationConstraintSpec[]
 }
 
 export const AUGMENTATION_DEFAULT_PATH = ".agentdev/artifact-graph.yaml"
@@ -96,7 +106,7 @@ function parseRelationSemantics(
   const direction = typeof s["change_impact_direction"] === "string" ? s["change_impact_direction"] : ""
   if (!isChangeImpactDirection(direction)) {
     throw new TypeError(
-      `augmentation relation_type '${name}' semantics requires change_impact_direction in (forward, reverse, both, none)`,
+      `augmentation relation_type '${name}' semantics requires change_impact_direction in (forward, backward, bidirectional, none)`,
     )
   }
   const slot = s["semantics_slot"]
@@ -244,4 +254,58 @@ export async function loadAugmentation(root: string, explicitPath?: string): Pro
   if (!(await file.exists())) return undefined
   const text = await file.text()
   return Bun.YAML.parse(text) as AugmentationFile
+}
+
+// ─── Trace model resolution (Trace Query 実行時、REQ-{NNNN}-{NNN}) ──────────────
+
+function parseSettings(augmentation: AugmentationFile): QuerySettings {
+  const raw = augmentation.query_settings
+  const limits: Record<ProfileKind, number> = { ...DEFAULT_QUERY_SETTINGS.limits }
+  const depths: Record<ProfileKind, number> = { ...DEFAULT_QUERY_SETTINGS.depths }
+  let threshold: number = DEFAULT_QUERY_SETTINGS.concentration_threshold
+  if (raw !== undefined) {
+    for (const [profile, value] of Object.entries(raw.limits ?? {})) {
+      if (!(PROFILE_KINDS as readonly string[]).includes(profile)) {
+        throw new TypeError(`unknown query profile in limits: ${profile}`)
+      }
+      limits[profile as ProfileKind] = Number(value)
+    }
+    for (const [profile, value] of Object.entries(raw.depths ?? {})) {
+      if (!(PROFILE_KINDS as readonly string[]).includes(profile)) {
+        throw new TypeError(`unknown query profile in depths: ${profile}`)
+      }
+      depths[profile as ProfileKind] = Number(value)
+    }
+    if (raw.concentration_threshold !== undefined) {
+      threshold = Number(raw.concentration_threshold)
+    }
+  }
+  return { limits, depths, concentration_threshold: threshold }
+}
+
+function parseConstraints(raw: readonly RelationConstraintSpec[] | undefined): readonly RelationConstraint[] {
+  return (raw ?? []).map((entry) => ({
+    relationType: entry.relation_type,
+    allowedSourceTypes: new Set(entry.allowed_source_types),
+    allowedTargetTypes: new Set(entry.allowed_target_types),
+  }))
+}
+
+/**
+ * 高位問い合わせ（Trace Query）実行時の TraceModel を解決する。関係意味と
+ * 役割は派生索引の manifest に保存された解決結果（TIM カタログ + augmentation
+ * の意味定義）から、問い合わせ設定と関係制約は augmentation から解決する。
+ * 標準コア関係型の意味は TIM 語彙カタログが正規所有するため augmentation では
+ * 再定義できない。
+ */
+export function resolveTraceModel(
+  manifest: Pick<Manifest, "relation_semantics" | "node_type_roles">,
+  augmentation?: AugmentationFile,
+): TraceModel {
+  return {
+    relationSemantics: new Map(Object.entries(manifest.relation_semantics)),
+    nodeRoles: new Map(Object.entries(manifest.node_type_roles)),
+    relationConstraints: parseConstraints(augmentation?.relation_constraints),
+    querySettings: parseSettings(augmentation ?? {}),
+  }
 }

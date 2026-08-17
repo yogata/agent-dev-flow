@@ -49,10 +49,10 @@ describe("TIM catalog: standard core vocabulary (REQ-{NNNN}-{NNN} series)", () =
 
   it("assigns change impact directions per relation type, distinct from link direction", () => {
     expect(semanticsOf("references").change_impact_direction).toBe("none")
-    expect(semanticsOf("supersedes").change_impact_direction).toBe("reverse")
-    expect(semanticsOf("defined_in").change_impact_direction).toBe("reverse")
-    expect(semanticsOf("contains").change_impact_direction).toBe("both")
-    expect(semanticsOf("extends").change_impact_direction).toBe("reverse")
+    expect(semanticsOf("supersedes").change_impact_direction).toBe("none")
+    expect(semanticsOf("defined_in").change_impact_direction).toBe("backward")
+    expect(semanticsOf("contains").change_impact_direction).toBe("bidirectional")
+    expect(semanticsOf("extends").change_impact_direction).toBe("bidirectional")
   })
 
   it("maps general reference to the SysML trace slot (REQ-{NNNN}-{NNN})", () => {
@@ -80,7 +80,7 @@ describe("profile participation derived from relation meaning (REQ-{NNNN}-{NNN} 
   })
 
   it("derives impact participation from change impact direction", () => {
-    expect(deriveProfileParticipation(semanticsOf("supersedes")).impact).toBe(true)
+    expect(deriveProfileParticipation(semanticsOf("supersedes")).impact).toBe(false)
     expect(deriveProfileParticipation(semanticsOf("contains")).impact).toBe(true)
   })
 
@@ -90,7 +90,7 @@ describe("profile participation derived from relation meaning (REQ-{NNNN}-{NNN} 
     const satisfy: RelationSemantics = {
       meaning: "実装成果物が要件を充足する",
       semantics_slot: "satisfy",
-      change_impact_direction: "reverse",
+      change_impact_direction: "backward",
       standard_vocabulary: [],
     }
     expect(deriveProfileParticipation(satisfy).dependency).toEqual(["reverse"])
@@ -100,7 +100,7 @@ describe("profile participation derived from relation meaning (REQ-{NNNN}-{NNN} 
   it("keeps slot-less semantic definitions out of dependency and implementation", () => {
     const adHoc: RelationSemantics = {
       meaning: "ADF 固有の双方向整合関係",
-      change_impact_direction: "both",
+      change_impact_direction: "bidirectional",
       standard_vocabulary: [],
     }
     const participation = deriveProfileParticipation(adHoc)

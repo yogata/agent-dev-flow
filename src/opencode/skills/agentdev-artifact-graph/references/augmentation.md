@@ -27,7 +27,7 @@ relation_types:   # 追加する関係型（配列）
     semantics:            # 省略可: 高位問い合わせへ参加させる場合は必須（meaning と change_impact_direction）
       meaning: string           # 必須: 関係の意味
       semantics_slot: string    # 省略可: TIM 意味スロット（標準意味が当てはまらない場合は省略）
-      change_impact_direction: string  # 必須: forward | reverse | both | none
+      change_impact_direction: string  # 必須: forward | backward | bidirectional | none
       standard_vocabulary: array      # 省略可: 採用した標準語彙
       source_types: array            # 省略可: リンク元成果物型の関係制約
       target_types: array            # 省略可: リンク先成果物型の関係制約
@@ -35,6 +35,24 @@ indexed_paths:    # 追加する indexed_paths（配列）
   - string
 discovery_roots:  # 追加する discovery_roots（配列）
   - string
+query_settings:         # 省略可: 高位問い合わせ（Trace Query）の問い合わせ時設定
+  limits:               # 省略可: プロファイルごとの候補数上限
+    related: 30
+    impact: 30
+    dependency: 30
+    implementation: 30
+    diagnostics: 50
+  depths:               # 省略可: プロファイルごとの探索深さ
+    related: 2
+    impact: 2
+    dependency: 2
+    implementation: 3
+    diagnostics: 2
+  concentration_threshold: 20   # 省略可: diagnostics の関係集中しきい値
+relation_constraints:   # 省略可: diagnostics が判定する関係制約（配列）
+  - relation_type: string       # 必須: 対象関係型
+    allowed_source_types: array # 必須: 許容するリンク元成果物型
+    allowed_target_types: array # 必須: 許容するリンク先成果物型
 ```
 
 `semantics` を持たない拡張関係型はグラフに生成されるが、高位問い合わせ（related、impact、dependency、implementation）へ自動参加しない。低位問い合わせ（neighbors、path、provenance）で利用できる。標準コア5関係型（references, supersedes, defined_in, contains, extends）への semantics・role 宣言はできない（TIM 語彙カタログが所有する）。意味スロットと変更影響方向の対応は [tim.md](tim.md) 参照。

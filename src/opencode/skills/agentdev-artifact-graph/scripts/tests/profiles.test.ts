@@ -72,12 +72,12 @@ describe("purpose-specific queries over TIM semantics (TS-{NNN}/TS-{NNN} equival
       const result = await queryGraph(graph, { kind: "profile", profile: "impact", node, depth, limit: 200 })
       return result.candidates?.map((candidate) => candidate.id)
     }
-    // reverse: requirement change impacts the satisfying design
+    // backward: requirement change impacts the satisfying design
     expect(await idsOf(REQ_001_NODE, 1)).toEqual([DESIGN_NODE])
     // forward: constraint change impacts the constrained requirement; a requirement
     // change does not impact the constraining rule
     expect(await idsOf(RULE_NODE, 1)).toEqual([DESIGN_NODE, REQ_001_NODE])
-    // both: bidirectional sync links are traversed from either end
+    // bidirectional: bidirectional sync links are traversed from either end
     expect(await idsOf(DESIGN_NODE, 1)).toEqual([RULE_NODE])
     // none: general references never join impact
     expect(await idsOf(CATALOG_NODE, 2)).toEqual([])
@@ -183,7 +183,7 @@ describe("purpose-specific queries over TIM semantics (TS-{NNN}/TS-{NNN} equival
     expect(result.candidates).toEqual([])
   })
 
-  it("CLI exposes profile and index subcommands", async () => {
+  it("CLI exposes high-level profile and index subcommands", async () => {
     const fixture = await timGraphFixture()
     const cli = resolve(import.meta.dir, "..", "src", "query_graph.ts")
 
@@ -193,7 +193,8 @@ describe("purpose-specific queries over TIM semantics (TS-{NNN}/TS-{NNN} equival
     ])
     expect(impact.exitCode).toBe(0)
     const impactOutput = JSON.parse(impact.stdout.toString())
-    expect(impactOutput.candidates.map((candidate: { id: string }) => candidate.id)).toEqual([DESIGN_NODE])
+    expect(impactOutput.profile).toBe("impact")
+    expect(impactOutput.candidates.map((candidate: { candidate: string }) => candidate.candidate)).toEqual([DESIGN_NODE])
 
     const index = Bun.spawnSync(["bun", cli, "--graph", fixture.output, "index", CATALOG_NODE])
     expect(index.exitCode).toBe(0)

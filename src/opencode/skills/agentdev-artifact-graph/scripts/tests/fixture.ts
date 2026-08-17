@@ -188,7 +188,7 @@ relation_types:
     semantics:
       meaning: "設計成果物が要件を充足する"
       semantics_slot: satisfy
-      change_impact_direction: reverse
+      change_impact_direction: backward
       standard_vocabulary:
         - "SysML «satisfy»"
   - name: constrains
@@ -205,7 +205,7 @@ relation_types:
     reverse_direction: false
     semantics:
       meaning: "両成果物が互いに整合を維持する双方向関係"
-      change_impact_direction: both
+      change_impact_direction: bidirectional
   - name: tracks
     fields:
       - tracks
