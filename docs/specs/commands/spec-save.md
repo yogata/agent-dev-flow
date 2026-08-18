@@ -231,7 +231,7 @@ target_area 見出し検索は `agentdev-spec-file-manager/scripts/src/search-ta
 
 spec-save は対応 REQ、同一または関連 canonical owner を持つ SPEC、関連 command, skill, integrity rule の探索に Artifact Graph を利用できる。
 Graph は候補提供者であり、target_area, 正規配置先, SPEC 操作分類の最終判断は正規成果物本文と独立探索手段での確認後に下す。
-共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「ワークフロー利用」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 

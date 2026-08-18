@@ -259,7 +259,7 @@ agentdev-adversarial-review は Artifact Graph をレビュー対象候補, evid
 
 Graph から得た情報は未検証 evidence として扱い、Reviewer または Reviewee の対論, 正規成果物確認を経ずに finding を確定しない。
 Graph はレビュー結論の確定ではなく evidence 探索に利用する。
-共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「ワークフロー利用」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来のレビュー経路で継続し、review を停止しない（fail-open）。
 
