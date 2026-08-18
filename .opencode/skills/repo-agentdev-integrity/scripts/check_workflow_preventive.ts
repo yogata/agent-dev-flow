@@ -8,7 +8,8 @@
  *                                       dedicated Workflow Skill by name
  *   2. dispatch-target-existence        the dedicated Workflow Skill exists
  *   3. workflow-soft-guard              each command-bound Workflow Skill
- *                                       SKILL.md declares the soft guard
+ *                                       description declares the AG-004
+ *                                       concise trigger item (単独起動)
  *   4. legacy-extension-residual        legacy kinds and the legacy runtime
  *                                       path must not remain (extension tree
  *                                       + distribution bodies under src/)
@@ -97,7 +98,13 @@ const COMMAND_FORMAT_RULES_PATH = path.join(
 
 const LEGACY_EXTENSION_KINDS = ["command-extension", "skill-extension"];
 const LEGACY_EXTENSIONS_PATH = ".agentdev/extensions/commands";
-const SOFT_GUARD_MARKER = "soft guard";
+// AG-004 concise trigger item detection word (the SPEC-authoritative soft
+// guard form: the description's DO NOT USE FOR entry "単独起動（対応する
+// /agentdev/* コマンド経由で利用すること）"). Must stay identical to
+// WORKFLOW_TRIGGER_ITEM in lint_skills.ts (the AG-004 implementation) so both
+// checkers assert the same form. lint_skills.ts runs main() at module top
+// level and cannot be imported here, hence the duplicated constant.
+const WORKFLOW_TRIGGER_ITEM = "単独起動";
 
 // check 5: a specific internal reference file (references/<file>.md|.ts).
 // The generic "`references/` 配下を参照" declaration names no file and is the
@@ -188,6 +195,22 @@ function listFilesRecursive(dirPath: string, extensions?: string[]): string[] {
 function extractYamlField(text: string, field: string): string | null {
   const m = text.match(new RegExp(`^${field}:\\s*(\\S+)\\s*$`, "m"));
   return m ? m[1] : null;
+}
+
+// Frontmatter description extraction with the same single-line semantics as
+// lint_skills.ts parseFrontMatter (all distribution SKILL.md files keep the
+// description as one quoted line).
+function extractFrontMatterDescription(text: string): string {
+  const parts = text.split("---");
+  if (parts.length < 3) return "";
+  for (const line of parts[1].split(/\r?\n/)) {
+    const colonIndex = line.indexOf(":");
+    if (colonIndex === -1) continue;
+    if (line.slice(0, colonIndex).trim() === "description") {
+      return line.slice(colonIndex + 1).trim();
+    }
+  }
+  return "";
 }
 
 /**
@@ -313,16 +336,17 @@ export function checkWorkflowPreventive(repoRoot: string): PreventiveReport {
           message: `dispatch target Workflow Skill '${workflowSkill}' does not exist (expected ${skillMd})`,
         });
       } else {
-        // Check 3: soft guard declaration in the Workflow Skill
+        // Check 3: AG-004 concise trigger item in the Workflow Skill description
         const skillText = readText(skillMd) ?? "";
-        if (!skillText.includes(SOFT_GUARD_MARKER)) {
+        const skillDescription = extractFrontMatterDescription(skillText);
+        if (!skillDescription.includes(WORKFLOW_TRIGGER_ITEM)) {
           failures.push({
             check: 3,
             check_name: CHECK_NAMES[3],
             severity: "strict",
             classification: "consistency",
             file: skillMd,
-            message: `Workflow Skill '${workflowSkill}' does not declare the soft guard (standalone skill launch suppression)`,
+            message: `Workflow Skill '${workflowSkill}' description lacks the concise trigger item "単独起動（対応する /agentdev/* コマンド経由で利用すること）" in DO NOT USE FOR (AG-004, detection word unified with lint_skills.ts)`,
           });
         }
       }

@@ -83,7 +83,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | Obsolete spec path | `check_integrity.ts` | `obsolete-path-map.yaml` に基づく旧SPEC直下パス参照検出、直接生成方式語彙検出（IR-057, REQ-0158-002） |
 | Distribution reference boundary | `check_distribution_boundary.ts` | 配布 command/skill 本文（`src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/**/*.md`）に含まれる具体ID（`ADR-NNNN`, `REQ-NNNN`）、具体パス（`docs/(adr\|requirements\specs)/<file>.md`、但し README.md とテンプレート表記は除外）、固定URL（blob/raw）を検出。project extensions 機構（配布物参照境界）の持続的検査を担う |
 | Targeted docs guard | `check_changed_docs.ts` | 変更ファイル限定の整合性検査。req-save / spec-save / case-close / docs-check の各 workflow で実行（REQ-0158-003） |
-| Workflow preventive checks | `check_workflow_preventive.ts` | AG-008 旧責務残存の予防検査7項目（全公開 Command の Workflow Skill dispatch 存在、dispatch 先 Skill 存在、Workflow Skill の soft guard 存在、旧 extension kind・runtime path 残存禁止、Command から Skill 内部 reference 直接依存禁止、Workflow/Capability 分類と Extension kind 整合、command-format rules と thin Command モデル無矛盾）。false positive 対策の exemption は script 本体に構造化 |
+| Workflow preventive checks | `check_workflow_preventive.ts` | AG-008 旧責務残存の予防検査7項目（全公開 Command の Workflow Skill dispatch 存在、dispatch 先 Skill 存在、Workflow Skill の description 簡潔トリガー項存在（AG-004、検出語は lint_skills.ts と統一）、旧 extension kind・runtime path 残存禁止、Command から Skill 内部 reference 直接依存禁止、Workflow/Capability 分類と Extension kind 整合、command-format rules と thin Command モデル無矛盾）。false positive 対策の exemption は script 本体に構造化 |
 
 ### Finding レベル（REQ-0108-100~105）
 

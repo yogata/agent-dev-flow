@@ -24,7 +24,8 @@ describe("checkWorkflowPreventive (integration against real repo)", () => {
       expect(c.pass).toBe(true);
     }
     expect(report.failures.filter((f) => f.severity === "strict").length).toBe(0);
-    expect(report.stats.public_commands).toBe(16);
+    // 17 public commands since backlog-auto was added (16 before).
+    expect(report.stats.public_commands).toBe(17);
     expect(report.stats.legacy_kind_files).toBe(0);
     expect(report.stats.legacy_commands_dir_files).toBe(0);
   });
@@ -63,14 +64,12 @@ description: fixture command
 
 const DEFAULT_SKILL_BODY = `---
 name: agentdev-workflow-demo
-description: fixture workflow skill
+description: fixture workflow skill。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。
 ---
 
 # agentdev-workflow-demo
 
 本スキルは case-run workflow を所有する。
-
-**soft guard**: 本スキルは \`/agentdev/demo\` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わない。
 `;
 
 const DEFAULT_EXTENSION_YAML = `version: 1
@@ -176,13 +175,39 @@ describe("check 2: dispatch-target-existence", () => {
 });
 
 describe("check 3: workflow-soft-guard", () => {
-  test("Workflow Skill without a soft guard declaration fails", () => {
+  test("Workflow Skill description without the concise trigger item fails", () => {
     const root = buildFixture(tmpBase, {
-      skillBody: DEFAULT_SKILL_BODY.replace(/\*\*soft guard\*\*.*\n/, ""),
+      skillBody: DEFAULT_SKILL_BODY.replace(
+        "DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。",
+        "DO NOT USE FOR: 単独利用。",
+      ),
     });
     const report = checkWorkflowPreventive(root);
     expect(report.checks.find((c) => c.item === 3)?.pass).toBe(false);
     expect(report.failures.some((f) => f.check === 3)).toBe(true);
+  });
+
+  test("body-level soft guard wording without the description trigger item fails (AG-004 detection word)", () => {
+    // PR #2185 removed body-level "soft guard" wording from compliant
+    // Workflow Skills; the legacy body-only form must not satisfy check 3.
+    const root = buildFixture(tmpBase, {
+      skillBody: `---
+name: agentdev-workflow-demo
+description: fixture workflow skill
+---
+
+# agentdev-workflow-demo
+
+本スキルは case-run workflow を所有する。
+
+**soft guard**: 本スキルは \`/agentdev/demo\` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わない。
+`,
+    });
+    const report = checkWorkflowPreventive(root);
+    expect(report.checks.find((c) => c.item === 3)?.pass).toBe(false);
+    expect(
+      report.failures.some((f) => f.check === 3 && f.message.includes("単独起動")),
+    ).toBe(true);
   });
 });
 
