@@ -157,8 +157,8 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-decision-file-manager.md | 82 | accepted | skills |
 | foundations/numbering-policy.md | 80 | accepted | foundations |
 | integrity/docs-spec-rebuild-integrity.md | 80 | accepted | integrity |
+| skills/agentdev-workflow-backlog-auto.md | 80 | accepted | skills |
 | skills/agentdev-learning-capture.md | 79 | accepted | skills |
-| skills/agentdev-workflow-backlog-auto.md | 79 | accepted | skills |
 | skills/agentdev-req-file-manager.md | 77 | accepted | skills |
 | integrity/rules/IR-055-runtime-unresolved-reference.md | 75 | accepted | integrity |
 | integrity/autogen-freshness-gate.md | 74 | draft | integrity |
