@@ -1166,15 +1166,6 @@
     },
     {
       "category": "LinkIntegrity",
-      "check": "broken-adr-ref",
-      "file": "docs/requirements/REQ-021.md",
-      "evidence": "ADR-006",
-      "count": 1,
-      "provenance": "legacy",
-      "reason": "legacy: v2:ADR-006 は DEC-006 へ移行済み（commit 9ea67084）。docs/requirements/** は Issue #2136 の編集禁止範囲のため、REQ-021-003 の参照更新（DEC-006 へ）を別工程で実施するまでの承認（NG21 分類 N01）"
-    },
-    {
-      "category": "LinkIntegrity",
       "check": "broken-file-link",
       "file": "Link target does not exist: ../../.agentdev/v3-migration/decisions.md",
       "evidence": "Link target does not exist: ../../.agentdev/v3-migration/decisions.md",
