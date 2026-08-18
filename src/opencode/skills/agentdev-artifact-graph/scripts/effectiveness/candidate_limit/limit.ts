@@ -31,7 +31,7 @@ export const RULE_PRIORITY_CANDIDATE_ID = "priority:candidate-id"
 /**
  * 一般参照語彙の判定。TIM 語彙カタログは一般参照スロット（general_reference）を
  * 標準コアの `references` のみが採用する。本モジュールは並べ替え優先度の算出に
- * 关係型名のみを用いるため、カタログ解決結果（Graph manifest）を参照しない。
+ * 関係型名のみを用いるため、カタログ解決結果（Graph manifest）を参照しない。
  */
 function isGeneralReferenceType(relationType: string): boolean {
   return relationType === "references"

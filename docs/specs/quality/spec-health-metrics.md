@@ -127,6 +127,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | foundations/harness-separation-model.md | 139 | accepted | foundations |
 | responsibilities/responsibility-boundary-purification.md | 136 | accepted | responsibilities |
 | skills/agentdev-intake-pipeline.md | 136 | accepted | skills |
+| integrity/audits/candidate-limit-tim-catalog-diff-20260818.md | 135 | accepted | integrity |
 | skills/agentdev-learning-pipeline.md | 135 | accepted | skills |
 | foundations/patterns.md | 130 | accepted | foundations |
 | quality/req-health-metrics.md | 130 | accepted | quality |
@@ -137,7 +138,6 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | skills/agentdev-spec-file-manager.md | 120 | draft | skills |
 | quality/spec-health-metrics.md | 118 | accepted | quality |
 | commands/inspect-docs.md | 116 | accepted | commands |
-| integrity/audits/candidate-limit-tim-catalog-diff-20260818.md | 115 | accepted | integrity |
 | skills/agentdev-req-analysis.md | 110 | accepted | skills |
 | commands/inspect-skills.md | 105 | accepted | commands |
 | skills/agentdev-backlog-integration.md | 105 | accepted | skills |

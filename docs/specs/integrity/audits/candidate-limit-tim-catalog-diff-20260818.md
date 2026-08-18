@@ -123,3 +123,23 @@ augmentation 宣言の追加により、Trace Query 実装（`lib/trace_query.ts
 - [agentdev-artifact-graph SPEC「標準候補数上限の決定手順」](../../skills/agentdev-artifact-graph.md) — 手順と決定値の正規定義
 - [TIM 語彙カタログ SPEC](../../foundations/traceability-model.md) — 関係意味・役割の正規定義
 - Issue #2204（OU-0002）、Epic #2202（EU-A）
+
+## 7. rebase 後の再計測（PR 確定時点）
+
+本書の測定（表 3.1、節 4）は base `a08384a2` 時点である。Epic #2202 Wave 1 完了後の
+main `175a2047`（OU-0001 マージ込み）へ rebase した結果、グラフ構成が変化したため
+（+3 nodes / +5 edges）、PR 確定時点で再計測した。
+
+| 項目 | 値 |
+|---|---|
+| 測定時点 | commit `f6b411f6` + PR 追記修正適用後の worktree（`.worktrees/2204-feature`） |
+| Graph 構成 | 1085 nodes / 1639 edges |
+| semantic 数（case-1〜6） | 1 / 14 / 47 / 0 / 0 / 3（表 3.1 の 1 / 13 / 46 / 0 / 0 / 3 から case-2・case-3 が増加） |
+| 増幅実測値（naive 巡回との差分、case-1 除く） | 42〜75 件（case-5 が 42、case-3 が 75） |
+| recommended_standard_limit | 9（不変） |
+| 回帰判定 | passed: true（requiredMissing・failures なし、既定上限 12 で全必須候補を保持） |
+
+決定値への影響はない。標準上限値 12 は recommended_standard_limit 実測値 9 以上を満たし、
+上限超過代表ケース（case-2 14 候補、case-3 47 候補）の必須候補欠落もない。
+AG SPEC「標準候補数上限の決定手順」節の代表ケース数値（増幅 42〜75 件、超過代表ケース
+14 件・47 件）は本再計測値へ整合済みである。
