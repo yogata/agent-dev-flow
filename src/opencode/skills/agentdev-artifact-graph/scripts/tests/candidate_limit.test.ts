@@ -3,7 +3,8 @@ import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { buildGraph, loadGraph } from "../lib/graph.ts"
-import type { GraphData, GraphEdge, GraphNode } from "../lib/model.ts"
+import type { GraphData, GraphEdge, GraphNode, Manifest } from "../lib/model.ts"
+import { DEFAULT_RELATION_SEMANTICS } from "../lib/tim.ts"
 import { queryGraph } from "../lib/query.ts"
 import { createFixture, REQ_001_NODE, FEATURE_SPEC_NODE, REQ_001 } from "./fixture.ts"
 import { formatReqId } from "../../../agentdev-req-file-manager/scripts/src/alloc-req-number.ts"
@@ -42,19 +43,30 @@ function synthEdge(id: string, type: string, source: string, target: string): Gr
 }
 
 function synthGraph(nodes: readonly GraphNode[], edges: readonly GraphEdge[]): GraphData {
-  return {
-    manifest: {
-      schema_version: "2.0.0",
-      generator_version: "0.1.0",
-      input_digest: "a".repeat(64),
-      graph_config_digest: "b".repeat(64),
-      indexed_paths: [],
-      excluded_paths: [],
-      node_types: [],
-      relation_types: [],
-      relation_semantics: {},
-      node_type_roles: {},
+  // TIM 語彙カタログ定義（標準5関係型 + delegates_to の意味定義）と索引役割宣言を
+  // 持つ manifest。カタログ置換後の semantics.ts は manifest を意味源泉とする。
+  const manifest: Manifest = {
+    schema_version: "2.0.0",
+    generator_version: "0.1.0",
+    input_digest: "a".repeat(64),
+    graph_config_digest: "b".repeat(64),
+    indexed_paths: [],
+    excluded_paths: [],
+    node_types: [],
+    relation_types: [],
+    relation_semantics: {
+      ...DEFAULT_RELATION_SEMANTICS,
+      delegates_to: {
+        meaning: "リンク元が処理の一部をリンク先へ委譲する",
+        semantics_slot: "depend",
+        change_impact_direction: "backward",
+        standard_vocabulary: [],
+      },
     },
+    node_type_roles: { source_file: "index" },
+  }
+  return {
+    manifest,
     nodes,
     edges,
     provenance: [],
@@ -91,10 +103,10 @@ const SEMANTIC_GRAPH = synthGraph(
   ],
 )
 
-describe("TS-{NNN}: profile semantics traverse only defined relations", () => {
-  it("related returns directly linked nodes but skips undefined relation types", () => {
+describe("TS-{NNN}: profile semantics traverse only catalog-defined relations", () => {
+  it("related returns directly linked nodes but skips undefined relation types and index-role nodes", () => {
     const result = semanticCandidates(SEMANTIC_GRAPH, "related", R1, 1)
-    expect(result.map((c) => c.candidate).sort()).toEqual([HUB, SPEC].sort())
+    expect(result.map((c) => c.candidate)).toEqual([SPEC])
   })
 
   it("related does not propagate exploration through index/aggregation role nodes", () => {
@@ -105,14 +117,14 @@ describe("TS-{NNN}: profile semantics traverse only defined relations", () => {
     expect(ids).not.toContain(DEC_NEW)
   })
 
-  it("impact follows supersedes in both directions and yields normal empty result otherwise", () => {
+  it("impact excludes supersedes (catalog: none) and yields normal empty results", () => {
     const fromOld = semanticCandidates(SEMANTIC_GRAPH, "impact", DEC_OLD, 1)
-    expect(fromOld.map((c) => c.candidate)).toEqual([DEC_NEW])
+    expect(fromOld).toEqual([])
     const fromReq = semanticCandidates(SEMANTIC_GRAPH, "impact", R1, 2)
     expect(fromReq).toEqual([])
   })
 
-  it("dependency follows source_depends_on_target only and rejects general references", () => {
+  it("dependency follows forward dependency orientations only and rejects general references", () => {
     const fromExt = semanticCandidates(SEMANTIC_GRAPH, "dependency", EXT, 1)
     expect(fromExt.map((c) => c.candidate).sort()).toEqual([SKILL, SPEC].sort())
     const fromSpec = semanticCandidates(SEMANTIC_GRAPH, "dependency", SPEC, 1)
@@ -253,6 +265,7 @@ describe("TS-{NNN}: harness end-to-end on a fixture repository", () => {
     )
     // source_file 型は augmentation が追加する open extension point。
     // containment logic が全入力ファイルへ source_file node と contains/defined_in を生成する。
+    // 索引役割宣言（role: index）によりファイル層は高位問い合わせの探索経路から除外される。
     await mkdir(join(root, ".agentdev"), { recursive: true })
     await writeFile(
       join(root, ".agentdev/artifact-graph.yaml"),
@@ -264,6 +277,7 @@ describe("TS-{NNN}: harness end-to-end on a fixture repository", () => {
         "    label_source:",
         "      - kind: path",
         "    extraction_rule: filesystem",
+        "    role: index",
         "",
       ].join("\n"),
       "utf8",
@@ -273,7 +287,6 @@ describe("TS-{NNN}: harness end-to-end on a fixture repository", () => {
     const graph = await loadGraph(output)
 
     const hubNode = "source_file:docs/requirements/README.md"
-    const reqFileNode = `source_file:docs/requirements/${REQ_001}.md`
     expect(graph.nodes.some((n) => n.id === hubNode)).toBe(true)
 
     const report = await runCandidateLimitHarness({
@@ -287,7 +300,7 @@ describe("TS-{NNN}: harness end-to-end on a fixture repository", () => {
           depth: 2,
           caseClass: "amplification",
           selectionRationale: "unit fixture: index README hub mediates known amplification",
-          requiredCandidates: [FEATURE_SPEC_NODE, hubNode, reqFileNode],
+          requiredCandidates: [FEATURE_SPEC_NODE],
           minAmplifiedCount: 1,
           independentSearchPattern: `\\b${REQ_001}\\b`,
         },
