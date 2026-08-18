@@ -14,7 +14,7 @@
 // - implementation: 実現系列スロット（realize/satisfy/implement）を両方向にたどる
 // - 意味未定義の関係型は高位問い合わせに参加させない（低位問い合わせ限定利用）
 // - role が index または aggregation のノードは中間経路と到達点の両方から除外する
-//   （TIM SPEC「索引・集約成果物の役割識別」、REQ-040-008）
+//   （TIM SPEC「索引・集約成果物の役割識別」、高位問い合わせ要件の探索経路除外契約）
 
 import type { GraphData } from "../../lib/model.ts"
 import {
