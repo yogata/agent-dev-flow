@@ -2,7 +2,7 @@
 title: "コマンドファイルフォーマット規約"
 status: accepted
 created: 2026-06-22
-updated: 2026-08-16
+updated: 2026-08-18
 spec_logical_division: cross_cutting_contract
 canonical_owner: command-file-format
 ---
@@ -110,6 +110,26 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 
 - `**EN.**` 形式は代替フロー専用であり、主手順の Step 表現として使用しない（主手順は `### Step N: タイトル` 見出しを必ず使用する）
 - 後述「機械検査対象」で `**EN.**` 形式は違反として検出しない（主手順の Step 番号連番とは独立した番号空間のため）
+- 本形式の採用は `/repo/*`（repo-local コマンド）限定とする。公開 `/agentdev/*` コマンドでは主手順の手順列挙を `### Step N` 形式で表現する前提のため、`**EN.**` lettered prefix 形式を使用しない
+
+## 順序ラベル様式（サブステップ識別子・工程一覧表ラベル・工程参照形式）
+
+工程・サブステップ識別子の様式規約を次のとおり正規契約化する（PR #2153 による16 Skill 横断の運用統一、merge fb0a5ac5、を正規化する）。
+
+### サブステップ階層形式
+
+- サブステップは `STEP-N-M` 形式、細分サブステップは `STEP-N-M-K` 形式とする（例: `STEP-3-1`、`STEP-3-1-1`）
+- 副番号（M、K）は 1 起点とする。ゼロ起点（例: `E4-0`）は使用しない。既存のゼロ起点表記は規約確定後に振り直し要否を個別判断する
+
+### STEP model 対象外型 SKILL.md の工程一覧表ラベル
+
+- STEP model 対象外型（capture-only 型、read-only-diagnostic 型等）の SKILL.md で工程順序を示す場合も、工程一覧表のラベルは順序を表す一貫した様式（`STEP-N` または同等の連番形式）で示す。様式を持たない絵日的な列挙は行わない
+
+### 成果物間の工程ラベル参照形式
+
+- Workflow Skill から command の公開ラベルを参照する際は command 名で修飾する（例: 「req-save command STEP-4」）。command 名なしの裸参照はしない
+- Capability Skill・SPEC から Workflow Skill の工程を参照する際は実番号（例: `STEP-S5`）を用いる。相対表現（「第5工程」等）は使用しない
+- 旧 command 番号（`Step N`）形式での参照は新規に書かない。既存参照は AG-023 是正の対象とする
 
 ## command SPEC と command 定義の対応付け
 

@@ -2,7 +2,7 @@
 title: case-auto SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-18
 ---
 
 # case-auto SPEC
@@ -256,6 +256,8 @@ Level 1 で解消できる機械的競合は case-auto の停止条件から除�
 
 Level 1 の rebase 実行、エスカレーション判定は case-close の責務（`docs/specs/commands/case-close.md` コンフリクト解消 rebase パス参照）。
 case-auto は Level 2/3 のオーケストレーション級判断を担う。
+
+**Level 2 解消レシピ（AUTOGEN ブロックの競合）**: AUTOGEN ブロック（README 索引、件数キャプション、メトリクス表等）の競合は、手動での競合解決を行わず「新 base 上での再生成」で解消する。先にマージ済み PR を取り込んだ新 base（main）上で `generate_indexes.ts` を再実行し、再生成結果で当該 AUTOGEN ブロックを解消する。この経路を Level 2 の正道とし、AUTOGEN ブロックに対する手動マージを試行しない。
 
 ## 子 task 中断回復パス（v2:ADR-0138, REQ-002）
 

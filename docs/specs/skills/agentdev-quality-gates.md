@@ -2,7 +2,7 @@
 title: `agentdev-quality-gates` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-18
 ---
 
 # `agentdev-quality-gates` SPEC
@@ -67,6 +67,17 @@ QG-2 は REQ-017 execution contract 確定を支援するため、次の検証�
 既存の QG-2 完了条件網羅性検証（REQ 必達要件 → 完了条件 mapping）に加え、
 artifact-specific quality control の投影検証を追加する。
 既存の7観点は維持する。
+
+## full integrity suite 合格基準（QG-4）における bun test 実行形態契約
+
+QG-4 の full integrity suite 実行における bun test の実行形態を次のとおり契約する。
+
+- 実行手順には `./` prefix 付きの対象ディレクトリ明示指定を必須ステップとする（例: `bun test ./.opencode/skills/repo-agentdev-integrity/scripts/`）
+- 実行結果の「Ran N tests across M files」の N/M 件数突合を必須ステップとする。直前実績と比較して件数が急減していないかの妥当性を検証する（固定値の期待値化は行わない）
+- PR 本文・検証手順の証拠記録へ実行 cwd と起動コマンド形式（prefix・パス指定を含む）を明記することを要求する
+- cwd 依存テストが混在するスイートは、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない運用注記を付す
+
+QG-4 の識別子中心評価の構造は維持する（固定値期待値化による脆化を行わない）。case-close / docs-check の full suite 実行手順と PR 本文テンプレート（Test Strategy 結果欄）への記録欄追加は case 実施側の適用とする。
 
 ## 対象外
 

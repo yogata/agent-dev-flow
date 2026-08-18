@@ -2,7 +2,7 @@
 title: "AUTOGEN ブロック鮮度検出 gate"
 status: draft
 created: "2026-08-09"
-updated: "2026-08-15"
+updated: "2026-08-18"
 ---
 
 # AUTOGEN ブロック鮮度検出 gate
@@ -28,6 +28,7 @@ AUTOGEN ブロックを含む索引ファイル（spec-health-metrics.md 等）�
 - 対象ファイルのソース（SPEC / REQ / ADR / IR の frontmatter、ファイル名、status）の rename 発生時に AUTOGEN ブロックの再生成必要性を判定する
 - 対象ファイルのソース status 変更（draft → accepted 等）時に AUTOGEN ブロックの再生成必要性を判定する
 - SC-002（定期再生成）と整合する運用を維持する
+- 計測日導出方式は index-auto-generation SPEC「計測日導出」節に従い対象ドキュメント群の最終コミット日付基準とする。実行時日付（`new Date()`）の採用によりコミット済み AUTOGEN ブロックが日次で鮮度を失い IR-061 が構造的に再検出する運用は解消する。本解消を本 gate の契約として明記する
 
 鮮度種別は検出結果に応じて次の3種に分類する。
 分類は「鮮度違反の優先的付与」であり絶対的分類ではない（例: rename と status 変更が同時に起きた場合、行数増減を伴えば rename、同行値変化のみなら status_change と分類）。

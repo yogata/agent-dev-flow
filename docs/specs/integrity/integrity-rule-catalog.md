@@ -1,5 +1,5 @@
 ---
-updated: 2026-07-21
+updated: 2026-08-18
 status: accepted
 ---
 
@@ -200,6 +200,24 @@ check_changed_docs.ts と check_integrity.ts の二系統で IR ルールを共�
 詳細な IR-*.md の追加・更新内容は後続の spec-save / case-run 工程で確定する。
 check_changed_docs.ts の profile rules と SPEC 記載項目の対応関係は REQ-010-269（1:1 対応不要、包括カバー許容）に従う。
 
+### AG-005 規則群（lint_skills.ts、層1〜2記述基準機械検査）
+
+AG-005 規則群（`lint_skills.ts`、RU-0018 / Issue #2179、PR #2184 で main 入り）を本カタログへ登録する。規則群は IR 番号を付与せず checker カテゴリ `AG-005` として管理する。
+
+| 規則 | severity | 検出内容 |
+|---|---|---|
+| description length 1024 | hard | description が OpenCode 仕様上限 1024 文字を超過 |
+| description length 600 | hard | 単体 description が 600 文字を超過 |
+| description marker word / internal ID | hard | description への soft guard 等マーカー語または REQ-/DEC-/IR- 等内部 ID の混入 |
+| USE FOR 重複保持 | hard | description と本文（USE FOR 節）の重複保持 |
+| 後続トリガー語（AG-004） | hard | command-bound Workflow Skill の description における「単独起動」等後続トリガー語の欠落・不適合（command-bound のみ厳密検査） |
+| references 目次欠落 | hard | 300 行超の references ファイルにおける目次（TOC）欠落 |
+| 集約予算 350 | warn | description 平均 350 文字予算超過（N = `src/opencode/skills` 配下 SKILL.md ファイル数） |
+
+正規所有者（SPEC が正、linter は検出ビュー）: `agentdev-skill-authoring` SPEC「skill 記述基準（層1〜3）」、`command-file-format` SPEC「機械検査対象」。
+
+登録判断: 新規カテゴリ追加判定フローに従い、(1) 検出が機械的パターンマッチで完結する、(2) 判定基準の正典が既存 SPEC（skill authoring 層1〜2）に存在し checker は検出ビューに留まる、(3) 既存 IR カテゴリと検出対象が重複しない、の各条件を満たすため checker カテゴリとして登録し IR 番号付与は行わないものと判定した。既知違反は `baselines/lint-skills-baseline.json`（delta-aware、baseline-known は info 降格）で管理する。
+
 ### IR-055 heuristic 行内複数パターン集計仕様（REQ-010-263/264）
 
 IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/specs/`、`docs/guides/`、`docs/decisions/` 等）が存在する場合の集計規則を以下のとおり定める。
@@ -219,6 +237,16 @@ strict level（NG）の検出は行単位1件の従来仕様を維持し、本�
 
 実装側（`check_integrity.ts`）の集計ロジックは本仕様に従うことが期待される。
 仕様と実装の不整合が観察された場合は intake / inspect 経由で本 SPEC の更新または実装の修正を提案する。
+
+### IR-055 template placeholder exemption（トークン近傍狭域化）
+
+IR-055 の template placeholder exemption は、従来の行単位免除（`{...}` 形式のプレースホルダを含む行全体を実在確認対象外とする運用）から、プレースホルダと同一トークン近傍への狭域化へ変更する。
+
+- 免除範囲はプレースホルダ表記と同一の識別子トークン（例: `REQ-{NNNN}` に対する `REQ-` 直後の `{NNNN}` 部分）およびその近傍に限る
+- プレースホルダを含む行の他の具体参照（プレースホルダを含まないパス・ID）は実在確認対象を維持する
+- プレースホルダ除去に伴う新規 delta の顕在化挙動を注記する: 従来行単位免除により隠蔽されていた参照が検出対象へ現れる場合がある（PR #2185/#2187 で実際に発生）。狭域化により顕在化は減少するが、発生した delta は実在確認または実装修復で解消する
+
+本狭域化は配布依存境界（REQ-029、DEC-014）と整合する表記運用（AG-015/AG-016）と協調する。
 
 ## docs-check 項目役割範囲（REQ-010-004）
 

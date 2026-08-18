@@ -58,6 +58,15 @@ draft status の SPEC が一定期間更新されず放置されることを検�
 SPEC ファイルのドメイン間移送が発生した場合は旧ドメイン表から行を削除し、新ドメイン表へ登録する。
 `references/` サブディレクトリの SPEC（詳細・実装固有事項）は親 SPEC 行の備考欄で言及し、独立行としては登録しない。
 
+### audits/・baselines/ の Report 位置づけ
+
+`docs/specs/integrity/audits/`（監査記録）と `docs/specs/integrity/baselines/`（監査 baseline snapshot）の6ファイルは SPEC ではなく Report（document-model の Report 分類）として位置づける。
+
+- 両ディレクトリのファイルは本 README の一覧表へ独立行として登録しない（SPEC ではないため docs-check の SPEC 突合対象外）
+- 索引導線は、該当 SPEC 行の備考欄または本文の関連情報節での言及で担保する
+- AUTOGEN 計測表（spec-health-metrics の SPEC 計上）への計上対象外とする（Report は SPEC 件数に含めない）
+- 配置は document-model の Report 分類が許容する現行配置（integrity/ 配下）を維持し、移動しない
+
 ## 3 層構造と基盤 6 ドメイン
 
 SPEC は commands / skills / workflows の 3 層ディレクトリ構造と、基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。

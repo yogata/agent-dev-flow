@@ -353,4 +353,4 @@ Phase 3 §5.1 共通 detector 統合対象16件の実装を完了し、IR-057 �
 - [../integrity-rule-catalog.md](../integrity-rule-catalog.md)
 - [../rules/](../rules/)
 - [DEC-013](../../../decisions/DEC-013.md)
-- [REQ-028](../../../requirements/REQ-028.md)
+- [REQ-028](../../../requirements/retired/REQ-028.md)

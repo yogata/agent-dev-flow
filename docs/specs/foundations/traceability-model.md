@@ -2,7 +2,7 @@
 title: Traceability Information Model（TIM）語彙カタログ
 status: draft
 created: 2026-08-17
-updated: 2026-08-17
+updated: 2026-08-18
 spec_logical_division: カタログSPEC
 canonical_owner: agentdev-artifact-graph
 ---
@@ -173,14 +173,14 @@ Trace Query 層は、独立した関係モデルを持たず本定義に従う�
 |---|---|---|---|
 | `contains` | 参加 | 参加 | 不参加 |
 | `refines` | 参加 | 参加 | 不参加 |
-| `specifies` | 参加 | 参加 | 参加 |
+| `specifies` | 参加 | 参加 | 不参加 |
 | `constrains` | 参加 | 参加 | 不参加 |
 | `depends_on` | 参加 | 参加 | 不参加 |
 | `realizes` | 参加 | 参加 | 参加 |
 | `satisfies` | 参加 | 参加 | 参加 |
 | `implements` | 参加 | 参加 | 参加 |
-| `verifies` | 参加 | 参加 | 参加 |
-| `validates` | 参加 | 参加 | 参加 |
+| `verifies` | 参加 | 参加 | 不参加 |
+| `validates` | 参加 | 参加 | 不参加 |
 | `supersedes` | 不参加 | 不参加 | 不参加 |
 | `references` | 不参加 | 不参加 | 不参加 |
 | `extends` | 参加 | 参加 | 不参加 |
@@ -189,7 +189,7 @@ Trace Query 層は、独立した関係モデルを持たず本定義に従う�
 
 - impact: 変更影響方向が `none` 以外の関係型が参加する
 - dependency: 起点成果物が成立、実現または実行のために依存する先をたどれる関係型が参加する。起点がリンク元とリンク先のいずれに位置する場合も含む
-- implementation: 実現、実装、充足の系列（要件から仕様、実現、検証へ至る系列）を構成する関係型が参加する。検証と妥当性確認は充足の確認を担うため含め、将来の coverage 問い合わせへの統合を見据える（REQ-040-005）
+- implementation: 実現、実装、充足の系列を構成する関係型（`realizes`、`satisfies`、`implements`、探索方向は逆向き）が参加する。`specifies`、`verifies`、`validates` は参加しない。検証と妥当性確認の系列は将来の coverage 問い合わせへの統合対象とする（REQ-040-005）
 
 related は、明示的なトレースと一般参照のすべてを返すため、参加区分表から除外する（REQ-040-002）。
 
@@ -277,6 +277,16 @@ README、INDEX、CATALOG 等の名称そのものではなく、この役割に�
 このようなリンクは関係意味を持たないため、impact、dependency、implementation の探索経路へ参加しない。
 変更影響等から除外する主たる判断は、成果物名ではなくトレースリンクの意味に基づく（REQ-012-024）。
 一般参照探索と明示的な索引構造問い合わせでは、引き続き利用できる。
+
+## 語彙カタログの確定（実測基準）
+
+本カタログは実測基準で確定する。PR #2195 Level 2 統合後の実装（語彙定義モジュール）を基準とし、カタログと実装の乖離は実測に基づきカタログを修正して解消する（CR-001）。
+
+- 変更影響方向の値名は `forward`、`backward`、`bidirectional`、`none` の4値として実装と一致させて確定する
+- `supersedes` は変更影響方向 `none`、`extends` は `bidirectional` とし、impact プロファイルへの参加区分は変更影響方向の導出に従う
+- `defined_in` の `depends_on`（依存）への集約は実装側に移行残差として残る。集約完了まで `defined_in` は仕様化スロット・変更影響方向 `backward` の関係型として実装が保持し、カタログは集約完了後に当該移行行を完結する
+- 標準コア語彙は実現系列関係型（`realizes`、`satisfies`、`implements`）を含む。implementation プロファイルの参加範囲は「高位問い合わせへの参加区分」節の確定値に従う。implementation プロファイルが常に空結果となる欠陥は実装側是正として扱い、カタログ側の参加範囲変更の根拠にしない
+- 索引・集約成果物の役割識別は node_type の role 属性（`index`、`aggregation`）で表現し、専用 node_type は追加しない
 
 ## 語彙採用基準
 

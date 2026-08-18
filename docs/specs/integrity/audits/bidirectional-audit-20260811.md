@@ -1546,7 +1546,7 @@ Phase 2 または Phase 4 (OU-005) で扱いを確定推奨。
 
 - 根拠 Issue: #2078（OU-002 Phase 1）
 - 親 Epic: #2076（REQ-028 IR portfolio audit）
-- 根拠要件: [REQ-028](../../../requirements/REQ-028.md)
+- 根拠要件: [REQ-028](../../../requirements/retired/REQ-028.md)
 - 根拠 Decision: [DEC-013](../../../decisions/DEC-013.md)
 - 比較基準（Phase 0 baseline）: [pre-audit-baseline-20260811.md](../baselines/pre-audit-baseline-20260811.md)
 - 整合性契約: [integrity-contracts.md](../integrity-contracts.md)

@@ -2,7 +2,7 @@
 title: `agentdev-command-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-16
+updated: 2026-08-18
 spec_logical_division: cross_cutting_contract
 canonical_owner: agentdev-command-authoring
 ---
@@ -72,7 +72,7 @@ Command は Workflow Skill 名レベルで
 
 - command 定義は公開 interface（入出力契約、ガードレール、dispatch 宣言）に限定し、Workflow Skill が所有する工程詳細を再要約しない
 - 工程の要約は前提条件・出力契約・検証基準の表形式（前得出出力検証表）で記述する。様式の詳細は authoring/command-file-format.md が正規所有する
-- 権威情報源宣言はコマンド本文に 1 回までとする
+- 権威情報源宣言はコマンド本文に 1 回までとする。計測単位は dispatch 宣言と soft guard 宣言節を除く明示的な宣言サイト（「〜が正規所有する」「正典は〜」等の記述）の数とし、PR #2186 の運用解釈に基づく
 - ガードレールは硬い境界（否定規則）と肯定形の不変条件へ分類集約し、工程上の選好を G 番号で列挙しない
 - 本文の soft guard 宣言節（core 8 + inspect 3）は grep 可能な `soft guard` マーカーを維持する
 

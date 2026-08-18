@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: draft
 created: 2026-08-15
-updated: 2026-08-15
+updated: 2026-08-18
 spec_logical_division: cross_cutting_contract
 canonical_owner: checker-execution-contracts
 ---
@@ -25,6 +25,17 @@ canonical_owner: checker-execution-contracts
 実行プロファイルは対象変更（extension、command、skill）の種別に応じて選択する
 - 共通 CLI 契約（--help、--json、--dry-run、exit code 0/1/2、stdout 機械可読出力）に従う
 
+## パターンマッチ・網羅検査設計の標準規約
+
+checker の新規実装・修正時に適用するパターンマッチと網羅検査の設計標準を次のとおり確定する。
+
+- 行全体マッチの統一: 検出パターンは行全体（`^...$` 相当）とのマッチで設計し、部分一致による誤検出を構造的に防ぐ
+- 列挙ベース網羅検査と件数整合の二重確認: 対象集合の走査は列挙ベース（例: `Get-ChildItem -Recurse` + `-LiteralPath`、`fs.readdirSync` 再帰）で行い、列挙件数と期待件数の整合を突合する二重確認を持つ
+- 階層 ID 検索の3点設計: 階層 ID（`REQ-NNN-NNN` 等）の検索は (1) 単独出現、(2) 行 ID としての先頭出現、(3) 前置一致除外（長い ID への部分一致を検出としない）の3点を満たす設計とする
+- 宣言的データの silent skip 禁止: 宣言的データ（YAML）の読み込みで schema 不適合・未知キーを検出した場合、黙って読み飛ばさずエラーまたは警告として報告する。当該契約は契約テストで固定する
+
+既存 checker のマッチ実装の一括変更は要求しない。本規約は新規実装・修正時の標準として適用する。
+
 ## 検出対象除外規定
 
 - 検出対象除外の正規所有は本 SPEC とする。checker 実装は本 SPEC の列挙に従い、列挙外の除外を独自に追加しない
@@ -34,6 +45,12 @@ canonical_owner: checker-execution-contracts
 （baseline snapshot、歴史記録ファイル等）の SPEC README 登録候補誤検出を抑止する
 - 歴史記録ファイル（docs/specs/integrity/audits/、baselines/ 等）は DEC-013 AG-008 適用範囲の
 残存参照判定の対象外とする
+
+検出対象除外の正規列挙を次のとおり確定する。
+
+- node_modules 系: git 管理外ディレクトリ（`node_modules/` 等）はスキャン対象から除外する
+- frontmatter 信号キー: `baseline_for`、`audit_for` を検出制御用の正規信号キーとして列挙する。これらのキーを持つファイルは監査記録・baseline としての免除規定に従う
+- 監査記録・AUTOGEN に対する免除: 監査記録（audits/、baselines/ 配下の Report）と AUTOGEN ブロックは、歴史記録・機械生成領域として該当検出の免除対象とする
 
 ## 宣言的データ YAML の schema 原則
 

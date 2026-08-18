@@ -2,7 +2,7 @@
 title: `agentdev-skill-authoring` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-16
+updated: 2026-08-18
 spec_logical_division: cross_cutting_contract
 canonical_owner: agentdev-skill-authoring
 ---
@@ -113,8 +113,9 @@ Skill 層（description の DO NOT USE FOR トリガー）と Command 層（本�
 
 - description は「機能 1 文 + Use when（トリガー列挙）+ Do NOT use（直近の誤トリガー対策、少数項目）」の構造とする。他スキルの責務一覧を DO NOT USE FOR として列挙しない。経路案内は README 入口表へ集約する
 - 本文に `## USE FOR` / `## DO NOT USE FOR` セクションを description と二重に保持しない
-- 制約・ガードレールは command か skill のいずれか一方だけが所有する。「詳細は〜参照」の定型はファイル内 1 回まで
+- 制約・ガードレールは command か skill のいずれか一方だけが所有する。「詳細は〜参照」の定型はファイル内 1 回まで。機械検査化に必要な例外規則は次のとおり: (1) project extensions 読込の boilerplate 行（5セクション読み込み手順の定型参照行）は消費対象、(2) project-extensions スキル本文の定義言及（extension 機構そのものの説明としての参照）は例外扱いとする
 - references/ の分割は相互排他または稀にしか併用しない文脈に限る。頻用併用の内容は分割しない。300 行超の参照ファイルは目次を付ける
+- 頻用併用信号規則: 参照選択表の同一行に複数の reference が併記されている状態は頻用併用の信号であり、統合候補として審査する（PR #2187 の統合実績に基づく）。併記が常態化する場合は当該 references の統合を検討する
 
 ### 層3: 指示のスタイル
 

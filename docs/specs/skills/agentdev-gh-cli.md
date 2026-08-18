@@ -1,8 +1,8 @@
 ---
 title: `agentdev-gh-cli` SPEC
 status: accepted
-created: 2026-06-21
-updated: "2026-08-15"
+created: "2026-08-15"
+updated: "2026-08-18"
 ---
 
 # `agentdev-gh-cli` SPEC
@@ -123,6 +123,12 @@ command/ skill 側での個別実装は不要であり、委譲基盤が本要�
 
 ローカル版は Case ファイル読み書きへ差し替えられるため、gh CLI 系の本要件は対象外である。
 git CLI 直接操作の初期化要件はローカル版にも適用する（ローカル版も git 操作を行うため）。
+
+ローカル版 references の実体構成を次のとおり明示する。
+
+- ローカル版の標準手続きの正は `local-procedures.md`（1ファイル）であり、git CLI 直接操作の初期化要件（Windows コードページ初期化等）を含めて本件要件を記載する
+- 通常版の `standard-procedures.md` をローカル版向けに新設しない。参照実体を1ファイルへ維持し、二重管理を回避する
+- 「委譲時の一時ファイル代替配置先」節はローカル版へも適用できる。ただしローカル版は Case ファイル読み書きが主経路であるため、gh CLI 系の WRITE 手続き（一時ファイル配置先を含む）が必要になる場面は、ローカル版から gh CLI を直接利用する補助経路に限る
 
 ## Windows 環境固有手続き
 

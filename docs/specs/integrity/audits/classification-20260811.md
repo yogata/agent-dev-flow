@@ -423,7 +423,7 @@ REQ-028-005「共通 detector と declarative data への統合可能性を評�
 
 - 根拠 Issue: #2079（OU-003 Phase 2）
 - 親 Epic: #2076（REQ-028 IR portfolio audit）
-- 根拠要件: [REQ-028](../../../requirements/REQ-028.md)
+- 根拠要件: [REQ-028](../../../requirements/retired/REQ-028.md)
 - 根拠 Decision: [DEC-013](../../../decisions/DEC-013.md)
 - Phase 1 監査結果（入力）: [bidirectional-audit-20260811.md](bidirectional-audit-20260811.md)
 - 比較基準（Phase 0 baseline）: [pre-audit-baseline-20260811.md](../baselines/pre-audit-baseline-20260811.md)

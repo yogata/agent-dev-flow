@@ -578,7 +578,7 @@ Phase 2 §10.2 SPEC確定候補を本 Phase 3 判定で具現化した。
 
 - 根拠 Issue: #2080（OU-004 Phase 3）
 - 親 Epic: #2076（REQ-028 IR portfolio audit）
-- 根拠要件: [REQ-028](../../../requirements/REQ-028.md)
+- 根拠要件: [REQ-028](../../../requirements/retired/REQ-028.md)
 - 根拠 Decision: [DEC-013](../../../decisions/DEC-013.md)
 - Phase 2 判定結果（入力）: [classification-20260811.md](classification-20260811.md)
 - Phase 1 監査結果（入力）: [bidirectional-audit-20260811.md](bidirectional-audit-20260811.md)

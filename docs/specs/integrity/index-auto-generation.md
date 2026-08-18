@@ -2,7 +2,7 @@
 title: 索引類自動生成 SPEC
 status: accepted
 created: 2026-07-19
-updated: 2026-08-15
+updated: 2026-08-18
 ---
 
 # 索引類自動生成 SPEC
@@ -52,6 +52,22 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 ステータス別ビューはADR frontmatterから自動生成する。
 トピック別ビュー、Decision Map、関連REQ表は現在人手管理とし、実装されていない生成処理を現在契約として扱わない。
+
+### decision-baseline 索引生成（count キャプション・table 全件出力）
+
+`decision-baseline-count` キャプションと `decision-baseline-table` の生成規則を次のとおり確定する。
+
+- `decision-baseline-count` キャプションは accepted と proposed の2値形式（「現行の承認済み Decision はN件、提案中の Decision はM件」）で出力する。superseded 件数はキャプションへ含めない
+- `decision-baseline-table` は現行 Decision 全件を accepted / proposed / superseded のステータス列付きで出力する（全件出力規則）。件数絞り込み・行の省略を行わない
+
+### 計測日導出
+
+AUTOGEN 計測ブロック（`req-metrics-measurement-example`、`spec-metrics-measurement-example` 等）の計測日は、実行時日付（`new Date()`）ではなく対象ドキュメント群の最終コミット日付から導出する。
+
+- 計測日として対象ドキュメント群（REQ 実ファイル群、SPEC 実ファイル群等）の最終コミット日付の最大値を用いる
+- 導出方式変更に伴い、計測日を含む AUTOGEN ブロックはドキュメント群に実変更がない限り鮮度を失わない
+- 鮮度判定（IR-061、autogen-freshness-gate）への影響: 実行時日付起因の日次陳腐化検出（構造的再検出）が解消される。計測日は「対象ドキュメント群の鮮度」を表す指標として機能する
+
 ### 一致の検証
 
 自動生成の実行有無にかかわらず、docs-check（`check_integrity.ts`、IR-061）が索引類と実ファイルの整合性を検証する。

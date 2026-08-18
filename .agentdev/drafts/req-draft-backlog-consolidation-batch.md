@@ -54,6 +54,8 @@ work_type: feature
 
 scale: large
 
+spec_actions_consumed: true
+
 summary: |
   backlog-review が生成した RU-0046〜0086（41件）を一括要件化したバッチドラフト。
   Epic #2189（Artifact Graph 実装）・Epic #2134（実番号化）残差、learning/intake 由来の

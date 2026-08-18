@@ -2,7 +2,7 @@
 title: `agentdev-workflow-templates` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-18
 ---
 
 # `agentdev-workflow-templates` SPEC
@@ -173,6 +173,23 @@ issue_desc_feature.md、issue_desc_child.md は新テンプレートへ移行す
 issue_desc_bug.md、issue_desc_epic.md は bugfix/maintenance/docs_chore または backlog 由来であり、
 execution contract セクションの付加を検討するが必須とはしない（work_type により
 execution contract 責務が軽量なため）。
+
+## テンプレート正規形（Parent 配置・Epic 追跡テーブル）
+
+Epic Issue・子 Issue テンプレートの次の正規形を本 SPEC が正規所有する。テンプレートコメント（issue_desc_child.md / issue_desc_epic.md）と agentdev-epic-tracker references は本正規形の実装ビューであり、乖離しない。
+
+### Parent 配置の正規形
+
+- 子 Issue 本文の先頭行に `Parent: #N`（N = 親 Epic Issue 番号）を配置する
+- 配置は case-open がテンプレート適用時に行う。agentdev-epic-tracker は本形式を親 Epic 検出の正規パターンとする
+- 旧形式（「## 親Issue」セクション配置、#2092 以前の運用）は移行期間の後方互換として受容するが、新規 Issue では使用しない
+
+### Epic 分解テーブルの正規形
+
+- 分解テーブル（Epic 本文の子 Issue 一覧）は `| {wave}-{seq} | #{child_issue} | {status} | {child_title} |` 形式とする（agentdev-epic-tracker V4形式と整合）
+- 行 ID は `{wave}-{seq}` 形式（例: `1-1`）。Issue 列は `#N` のみ（OU ID の接尾は内容欄へ置く）
+- ステータス初期値は `pending`（更新は agentdev-epic-tracker が単一書き手として行う）
+- テンプレート選定規則は本 SPEC が、Wave 構成（wave 番号の付番）は epic-wave-model SPEC がそれぞれ所有する責務分担を維持する
 
 ## 対象外
 

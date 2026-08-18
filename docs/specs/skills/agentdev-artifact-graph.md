@@ -1,8 +1,8 @@
 ---
 title: agentdev-artifact-graph SPEC
 status: draft
-created: 2026-08-08
-updated: 2026-08-17
+created: 2026-08-10
+updated: 2026-08-18
 spec_logical_division: behavior
 canonical_owner: agentdev-artifact-graph
 ---
@@ -86,6 +86,12 @@ query_graph.ts の問い合わせ結果は、各関係について以下の情�
 
 既存のノードID、関係ID、根拠情報との互換性を維持し、新規フィールドを追加する形式とする。
 
+query_graph.ts のサブコマンド構成を次のとおり確定する。
+
+- 構造問い合わせ: `neighbors`（近傍）、`path`（到達経路）、`provenance`（根拠）、`discover`（語句探索）、`index`（索引情報）
+- 高位問い合わせ: プロファイル名（`related`、`impact`、`dependency`、`implementation`、`diagnostics`）をサブコマンドとして直接指定できる
+- 出力は全サブコマンド共通で JSON（機械可読）とする。text や table などの人間向け表示形式は持たず、整形は呼出側の責務とする
+
 ## 高位問い合わせプロファイル
 
 高位問い合わせ related、impact、dependency、implementation、diagnostics を
@@ -115,6 +121,17 @@ query_graph.ts の問い合わせ結果は、各関係について以下の情�
   到達経路を確認可能とする。詳細な根拠箇所は根拠問い合わせ（provenance）の責務とし、
   高位問い合わせへ根拠詳細を重複保持しない
 - 候補が存在しない場合、正常な空結果として扱う
+
+### 標準候補数上限の決定手順
+
+標準候補数上限の値は固定値として確定せず、次の手順に従って決定する。初期値は各プロファイル 30（depth は profile 別）であり、代表ケース実測に基づく推奨値（増幅実測での推奨 12 程度）との乖離を本手順で解消する（REQ-040-008、REQ-020-006）。
+
+1. 暫定の関係意味表を実装から TIM 語彙カタログ定義（traceability-model.md）へ置換する
+2. 置換後のカタログ定義で回帰スイートを再実行し、期待出力との差異を文書化する（差分文書化を受け入れ条件に含める）
+3. representative query suite の実測から recommended_standard_limit を算出し、増幅実測値（上位候補の追加増分）と突合する
+4. 標準上限値を最終決定し、問い合わせ設定の標準値へ反映する
+
+運用契機はカタログ置換後の再計測を前提とし、カタログ変更を伴わない上限値の暫定運用は行わない。
 
 ## グラフモデル（open extensibility を含む）
 
@@ -242,11 +259,13 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 
 `manifest.json` は少なくとも次を保持する。
 
-- `schema_version`
+- `schema_version`（現行スキーマ版は `2.0.0`）
 - `generator_version`
-- `input_digest`
+- `input_digest`（対象入力ファイルの相対パスと内容から計算する 64 桁十六進ダイジェスト）
 - `indexed_paths`
 - `excluded_paths`
+- `node_types`（当該生成に参加した node_type の一覧）
+- `relation_types`（当該生成に参加した relation_type の一覧）
 
 現在時刻を表す `generated_at` は決定論的生成物に含めず、必要な実行日時は標準出力または実行報告へ記録する。
 `input_digest` は対象入力ファイルの相対パスと内容から計算する。
@@ -266,6 +285,13 @@ consumer が AgentDevFlow 運用（REQ/Decision/SPEC）を採用しない場合�
 
 project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ含めず、project augmentation の `discovery_roots`（明示参照起点リスト）と query 時の `rg`/filesystem 補完で必要時探索する。
 標準スキルは固定 directory 知識を埋め込まない。
+
+augmentation ファイル（`.agentdev/artifact-graph.yaml`）のスキーマ拡張点を次の4系統として確定する。各拡張点は宣言的に記述し、手続き的ロジックを含めない。
+
+1. `node_types` 定義: `name`、`path_pattern`、`id_template`、`label_source`、`extraction_rule`、`role`（`index` / `aggregation`）
+2. `relation_types` 定義: `name`、`fields`、`reverse_direction`、`semantics`（意味スロット・変更影響方向・標準語彙対応）
+3. `indexed_paths` と `discovery_roots`（対象と探索起点の宣言）
+4. `query_settings` と `relation_constraints`（問い合わせ上限・深さの上書きと関係制約）
 
 ### self-hosting augmentation
 
@@ -309,6 +335,7 @@ Artifact Graph 標準配布スキルの augmentation は専用配置
 | case-open | impact、dependency |
 | case-run | implementation（既に決定された実装対象と正規成果物の実現関係確認。新規の依存関係、実行構成、Wave 構成、実行順序の設計は行わない） |
 | case-close | 必要に応じて整合性確認 |
+| backlog-review | related、impact（統合・分割判定の補助 evidence、depends_on 依存解決の補助 evidence） |
 | adversarial-review | diagnostics、論点に応じた他問い合わせ |
 | inspect-docs 等 | diagnostics |
 

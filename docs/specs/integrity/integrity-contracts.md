@@ -1,6 +1,6 @@
 ---
 status: accepted
-updated: 2026-08-15
+updated: 2026-08-18
 ---
 
 # 整合性契約
@@ -316,6 +316,15 @@ placeholder を含まない具体パスには実在確認を行い、未解決�
 本扱いは backtick 囲みをインラインコード表現として検出対象から除外する運用（パス参照として解釈しない運用）と対比した上で、実在確認の価値を維持するためパス参照として解釈する運用を採用した。
 検出ロジック（`check_integrity.ts`）と本節の記述は整合している。
 
+PR #2152（merge 4bf264b7）で実装された検出拡張4点を本節の正規契約として反映する。
+
+1. ネストサブディレクトリ参照の検出: `references/xxx/yyy.md` 等の多階層パス参照も抽出対象とする
+2. skill `references/*.md` の走査: command 定義に加え skill の references 配下ファイルを検出対象へ含める
+3. reference ファイルの文脈解決: reference ファイル本文中のパス参照は当該 reference ファイルの配置位置を基準に相対解決する
+4. CJK 句読点隣接の誤延長防止: パス直後に句読点（、。）等の CJK 文字が隣接する場合、パス境界を誤って延長しない
+
+実装は main 入り済みであり、本節は文面の追従として機能する。
+
 ## RuntimeReference baseline 運用手順（REQ-036-009）
 
 IR-055（runtime-unresolved-reference）は段階導入（REQ-010-264）のため、baseline 既知違反と新規違反を区別する。
@@ -363,6 +372,22 @@ baseline は `category` / `check` / `file` / `evidence` の4組を bucket key �
 RuntimeReference baseline（IR-055、前節）は heuristic 違反の段階導入を目的とし、本 NG baseline は strict 違反（`ng` / `warning`）の既知集合を管理して「既知違反の解消」により strict pass を到達可能にすることを目的とする。
 両 baseline は独立に運用し、相互に影響しない。
 NG baseline は v2:REQ-0161-005（旧 `docs/requirements/v2:REQ-0161.md`、現 `docs/requirements/retired/v2:REQ-0161.md`）から SPEC 統合された恒久契約である。
+
+### baseline entry 運用契約（機械生成・パス bucket key・生成環境・報告分類）
+
+NG baseline entry の運用は次の契約に従う。
+
+1. entry 追加は機械生成を必須とし、手書きによる追加を行わない。`--update-ng-baseline --ng-baseline-additions` が manifest 入力から provenance・reason を付与して生成する。手書き追加は NG 隠蔽（禁止）と同様に扱う
+2. パス bucket key は環境依差を含む。worktree と main でパス表記が変化する場合、正規化（相対パス基準への統一）または unmatched additions / unmanaged delta 対警告により検知可能にする。bucket key 仕様自体（category/check/file/evidence の4組）は維持する
+3. baseline の生成環境を前提として明示する。worktree 環境で生成した baseline は main 環境（junction 実在環境）で新規未管理 NG が 0 件であることを確認してから確定する
+4. 由来ラベル（legacy、superseded、AUTOGEN、実欠陥等）と報告分類（baseline-known 降格、approved additions、新規未管理）の対応を明確に保つ。承認済み entry の解消（実装修復完了）後は当該 entry を除去する（ratchet の純減）
+
+### 宣言的データ YAML と detector の契約（REQ-028-015/016 移管受入れ）
+
+REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳細な実行規則は checker-execution-contracts SPEC が所有する）。
+
+- 検出用の宣言的データ YAML は SPEC が正となる schema を持ち、YAML は検出用ビューとして扱うこと
+- detector 実装は IR 識別子に基づく命名規約を持ち、IR から detector 実装への機械的逆引きが可能であること
 
 ## docs-check delta 検出における除外設定方針（REQ-036-010, REQ-036-003 準拠）
 
