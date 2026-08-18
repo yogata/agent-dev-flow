@@ -38,7 +38,8 @@ describe("checkExtensions (integration against real repo)", () => {
   });
 
   test("classifies the real skill tree deterministically", () => {
-    const classification = deriveSkillClassification();
+    // REQ-018 cwd-independence: explicit repoRoot, independent of bun test's cwd.
+    const classification = deriveSkillClassification(REPO_ROOT);
     expect(classification.workflowSkills.has("agentdev-workflow-case-run")).toBe(true);
     expect(classification.workflowSkills.has("agentdev-workflow-orchestration")).toBe(false);
     expect(classification.capabilitySkills.has("agentdev-workflow-orchestration")).toBe(true);
