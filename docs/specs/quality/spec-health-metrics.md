@@ -163,7 +163,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-055-runtime-unresolved-reference.md | 75 | accepted | integrity |
 | integrity/autogen-freshness-gate.md | 74 | draft | integrity |
 | integrity/rules/IR-062-reference-path-existence.md | 74 | accepted | integrity |
-| integrity/checker-execution-contracts.md | 72 | draft | integrity |
+| integrity/checker-execution-contracts.md | 72 | accepted | integrity |
 | responsibilities/artifact-quality-control-routing.md | 71 | draft | responsibilities |
 | skills/agentdev-command-authoring.md | 71 | accepted | skills |
 | skills/agentdev-project-extensions.md | 71 | accepted | skills |
