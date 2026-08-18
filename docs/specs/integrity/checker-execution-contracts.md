@@ -1,6 +1,6 @@
 ---
 title: checker 実行契約と検出基盤規則
-status: draft
+status: accepted
 created: 2026-08-15
 updated: 2026-08-18
 spec_logical_division: cross_cutting_contract
