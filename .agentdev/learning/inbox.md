@@ -52,3 +52,35 @@
 - **想定反映先**: agentdev-workflow-case-close の docs-and-spec-promotion STEP（references/docs-and-spec-promotion.md）
 - **関連**: Issue 2209、Epic 2205、docs/specs/integrity/checker-execution-contracts.md、docs/specs/quality/spec-health-metrics.md、先行学び（PR 2253、Issue 2203 の entry）
 - **タグ**: #case-close #autogen #spec-lifecycle
+
+## untracked な bun install 成果物（scripts/node_modules）が worktree フルスイートで順序依存失敗を生む
+
+- **問題事象**: scripts/node_modules（untracked・bun install 成果物）が存在する worktree で full integrity suite を実行した際のみ、launcher-blockers（archive-builder）テストが順序依存で失敗した。単体再実行では合格、node_modules 除去（main 等価環境）でも合格。
+- **発生局面**: 実装（case-run の検証実行、worktree 環境）
+- **検知方法**: 帰属確認二段階手順（単体再実行→base/main 再現）による環境起因の切り分け（git-worktree-test-fallback SPEC の手順適用）
+- **根本原因**: untracked 成果物がテスト列挙・実行順序に影響し、フルスイート時のみ発現する順序依存を作る
+- **自律対応内容**: main と同一条件（node_modules 未導入）で再検証して合格を確認した。node_modules は commit 対象外
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（SPEC の帰属確認手順どおりに環境起因と判定できた事例）
+- **横展開観点**: worktree に untracked のビルド成果物・依存残骸が残っている場合、フルスイート結果の信頼性評価前に有無を確認する
+- **再発条件**: worktree へ bun install 等で node_modules を導入した後に削除せずフルスイートを実行する場合
+- **予防策候補**: フルスイート実行前の untracked 成果物確認（git status で scripts/node_modules 等の有無を確認）を検証手順に組み込む
+- **想定反映先**: agentdev-git-worktree の worktree 運用手順、case-run の検証手順
+- **関連**: PR 2261、Issue 2214、docs/specs/skills/agentdev-git-worktree-test-fallback.md
+- **タグ**: #worktree #bun-test #order-dependent
+
+## projection/source 構成差が Ran N tests の N/M 件数突合を環境間でずらす
+
+- **問題事象**: skills_structure.test.ts の REQ-018-001 worktree fallback により scan 対象が projection（main: .opencode/skills）↔ source（worktree: src/opencode/skills）で切り替わり、両ツリーの構成差（projection のみ repo-agentdev-integrity、source のみ agentdev-workflow-backlog-auto 等）によって main と worktree の Ran N tests が4件（462↔466）ずれた。
+- **発生局面**: レビュー（bun test 実行形態契約 AG-035 の N/M 件数突合運用）
+- **検知方法**: 両環境のフルスイート実行結果突合で 2036 vs 2040 の差を観測し、構成差による生成テスト数変動と特定
+- **根本原因**: 件数突合は環境間比較を前提とするが、fallback により環境ごとにスキャン対象ツリー自体が変わる
+- **自律対応内容**: 4件差は仕様どおりの fallback 挙動でコード差ではないことを PR 本文に記録し、突合の前提情報として明示した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（AG-035 の運用注記として扱い、SPEC 変更不要の判断）
+- **横展開観点**: N/M 件数突合は「直前実績との急減検知」が本質であり、環境差による増減は構成差の説明付きで許容する
+- **再発条件**: main と worktree で junction 有無による構成差がある環境で件数突合を実施する場合
+- **予防策候補**: 件数突合時に実行環境（main/worktree）と scan 対象ツリーの構成差を証拠記録に併記する
+- **想定反映先**: agentdev-quality-gates SPEC の full integrity suite 運用、case-close STEP-3-1 の full integrity suite 実行手順
+- **関連**: PR 2261、Issue 2214、docs/specs/skills/agentdev-quality-gates.md
+- **タグ**: #bun-test #count-check #worktree
