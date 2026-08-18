@@ -255,14 +255,16 @@ export type QuerySettingsSpec = {
 /**
  * 標準問い合わせ設定 (REQ-{NNNN}-{NNN}/007)。候補数上限はコードへ直書きせず
  * 問い合わせ設定として管理し、プロジェクト拡張で上書きする。
- * 初期値は暫定であり、代表ケース回帰検証 (REQ-{NNNN}-{NNN}/008) で確定する。
+ * 標準上限値 12 は TIM 語彙カタログ置換後の代表ケース再計測に基づく決定値
+ * （AG SPEC「標準候補数上限の決定手順」、Issue #2204）。diagnostics は
+ * 構造診断であり候補数上限回帰の対象外としているため決定対象としない。
  */
 export const DEFAULT_QUERY_SETTINGS = {
   limits: {
-    related: 30,
-    impact: 30,
-    dependency: 30,
-    implementation: 30,
+    related: 12,
+    impact: 12,
+    dependency: 12,
+    implementation: 12,
     diagnostics: 50,
   },
   depths: {

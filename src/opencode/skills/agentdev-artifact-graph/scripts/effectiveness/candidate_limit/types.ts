@@ -4,39 +4,12 @@
 // 運用する候補数上限決定根拠の回帰資産である。代表質問側の定義（6 query suite、
 // 10件選定基準）は再定義しない。diagnostics プロファイルは構造診断であり候補数上限回帰の
 // 対象外とする。
+//
+// 関係意味とノード役割の型は TIM 語彙カタログ実装（lib/tim.ts）が正規所有する。
+// 本モジュールは候補数上限回帰に固有の型のみを定義する。
 
 /** 候補数上限回帰の対象とする高位問い合わせプロファイル。 */
 export type HighLevelProfile = "related" | "impact" | "dependency" | "implementation"
-
-/**
- * 関係の変更影響方向（TIM 4値）。リンク記述方向と変更影響方向は同一視しない。
- * - forward:  リンク方向へ影響（source 変更が target へ影響）
- * - backward: 逆方向へ影響（target 変更が source へ影響）
- * - both:     双方向へ影響
- * - none:     変更影響なし
- */
-export type ImpactDirection = "forward" | "backward" | "both" | "none"
-
-/** 関係の依存方向。 */
-export type DependencyDirection =
-  | "source_depends_on_target"
-  | "target_depends_on_source"
-  | "none"
-
-/** 関係意味（回帰計測用の暫定表。正規の意味定義は TIM 語彙カタログ SPEC が正とする）。 */
-export interface RelationSemantics {
-  /** 一般参照（変更影響・依存の探索経路として使用しない）。 */
-  readonly general_reference: boolean
-  readonly impact: ImpactDirection
-  readonly dependency: DependencyDirection
-  /** 実現・実装・充足系列（implementation プロファイル参加スロット）。 */
-  readonly realization_series: boolean
-  /** TIM 語彙カタログで意味が定義済みか。未定義関係型は高位問い合わせに不参加（低位問い合わせ限定）。 */
-  readonly defined: boolean
-}
-
-/** ノードの役割。索引・集約成果物は探索を先へ伝播させない。 */
-export type NodeRole = "canonical" | "index_aggregation"
 
 /**
  * 高位問い合わせの結果候補1件（結果5要素）。

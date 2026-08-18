@@ -13,7 +13,12 @@ import { queryGraph } from "../../lib/query.ts"
 import type { GraphData, Provenance } from "../../lib/model.ts"
 import { executeIndependentSearch } from "../independent_search.ts"
 import { applyCandidateLimit, DEFAULT_CANDIDATE_LIMIT } from "./limit.ts"
-import { roleOf, semanticsFor, semanticCandidates } from "./semantics.ts"
+import {
+  catalogOf,
+  hasIndexAggregationRole,
+  isGeneralReference,
+  semanticCandidates,
+} from "./semantics.ts"
 import { CANDIDATE_LIMIT_CASES } from "./cases.ts"
 import type {
   LimitCandidate,
@@ -72,8 +77,9 @@ export async function runCandidateLimitHarness(options: HarnessOptions): Promise
   const settings = options.settings ?? { candidate_limit: DEFAULT_CANDIDATE_LIMIT }
   const cases = options.cases ?? CANDIDATE_LIMIT_CASES
   const pathToNodeId = buildPathToNodeIdMap(graph)
+  const catalog = catalogOf(graph)
   const indexRoleCandidates = new Set(
-    graph.nodes.filter((node) => roleOf(node.type) === "index_aggregation").map((node) => node.id),
+    graph.nodes.filter((node) => hasIndexAggregationRole(catalog, node.type)).map((node) => node.id),
   )
   const semanticByCase = new Map<string, readonly LimitCandidate[]>(
     cases.map((c) => [c.id, semanticCandidates(graph, c.profile, c.start, c.depth)]),
@@ -136,6 +142,7 @@ async function runOneCase(
   const semanticSet = new Set(semanticIds)
   const independentSet = new Set(independentIds)
   const returnedSet = new Set(limitResult.candidates.map((c) => c.candidate))
+  const catalog = catalogOf(graph)
 
   const amplified = naiveIds.filter((id) => !semanticSet.has(id))
   const requiredMissing = representative.requiredCandidates.filter((id) => !returnedSet.has(id))
@@ -144,7 +151,7 @@ async function runOneCase(
   const directionSensitiveProfile = representative.profile === "impact" || representative.profile === "dependency"
   const generalReferenceFalsePass = directionSensitiveProfile
     ? semantic
-      .filter((c) => semanticsFor(c.relation_type).general_reference)
+      .filter((c) => isGeneralReference(catalog, c.relation_type))
       .map((c) => c.candidate)
     : []
 

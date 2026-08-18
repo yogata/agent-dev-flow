@@ -16,7 +16,6 @@ import type { RepresentativeCase } from "./types.ts"
 const REQ_012 = formatReqId(12)
 const REQ_020 = formatReqId(20)
 const DEC_005 = formatDecisionId(5)
-const DEC_006 = formatDecisionId(6)
 const DEC_007 = formatDecisionId(7)
 
 const REQ_020_NODE = `requirement:${REQ_020}`
@@ -29,8 +28,6 @@ const EXT_CASE_CLOSE = `extension:${EXT_DIR}/agentdev-workflow-case-close.yaml`
 const SKILL_CASE_CLOSE = "skill:agentdev-workflow-case-close"
 const SKILL_REPO_INTEGRITY = "skill:repo-agentdev-integrity"
 const REQ_README = "source_file:docs/requirements/README.md"
-const DEC_README = "source_file:docs/decisions/README.md"
-const REQ_020_FILE = `source_file:docs/requirements/${REQ_020}.md`
 
 /** AG SPEC へ delegates_to する 6 extension（実測: 全 delegates_to 7辺のうち 6辺）。 */
 const AG_SPEC_DELEGATING_EXTENSIONS = [
@@ -49,9 +46,10 @@ const CASE_1_RELATED_REQ_NORMAL: RepresentativeCase = {
   depth: 1,
   caseClass: "normal",
   selectionRationale:
-    "正常ケース。要件文書への直結参照のみで構成される（SPEC See Also の逆方向、README 索引行、" +
-    "自己ファイル包含）。候補数が少なく増幅を含まない基線を代表する。",
-  requiredCandidates: [AG_SPEC_NODE, REQ_README, DEC_README, REQ_020_FILE],
+    "正常ケース。要件文書への直結参照のみで構成される（SPEC See Also の逆方向）。" +
+    "ファイル層（source_file 型、索引役割宣言）は中間経路と到達点の両方から除外されるため、" +
+    "一般参照で到達する AG SPEC のみを返す基線を代表する。",
+  requiredCandidates: [AG_SPEC_NODE],
   minAmplifiedCount: 0,
   independentSearchPattern: `\\b${REQ_020}\\b`,
 }
@@ -66,12 +64,10 @@ const CASE_2_RELATED_REQ_AMPLIFICATION: RepresentativeCase = {
     "増幅ケース。README 等を経由した既知の候補増幅を再現する。" +
     `起点要件は ${REQ_README}（索引・集約成果物、参照ファンアウト約40）からも参照されており、` +
     "意味フィルタなしの巡回では全要件・全 Decision へ増幅する。" +
-    "深さ2の構造的隣接（SPEC の See Also、委譲元 extension）を必須候補とする。",
+    "意味列挙側は索引役割宣言（role: index）による探索経路除外で増幅を抑制する" +
+    "（候補数上限 alone では抑制しない）。深さ2の構造的隣接（SPEC の See Also、委譲元 extension）を必須候補とする。",
   requiredCandidates: [
     AG_SPEC_NODE,
-    REQ_README,
-    DEC_README,
-    REQ_020_FILE,
     REQ_012_NODE,
     `decision:${DEC_007}`,
     `extension:${EXT_DIR}/agentdev-workflow-case-run.yaml`,
@@ -89,7 +85,7 @@ const CASE_3_RELATED_SPEC_AMPLIFICATION: RepresentativeCase = {
   selectionRationale:
     "増幅ケース（索引・集約成果物経由）。SPEC 起点では docs/specs/README.md" +
     "（参照ファンアウト約67）経由の増幅が支配的である。" +
-    "委譲元 6 extension（delegates_to）と拡張関係（extends）による skill 参加を必須候補とする。",
+    "委譲元 6 extension（delegates_to のカタログ意味定義）と拡張関係（extends）による skill 参加を必須候補とする。",
   requiredCandidates: [...AG_SPEC_DELEGATING_EXTENSIONS, SKILL_CASE_CLOSE],
   minAmplifiedCount: 30,
   independentSearchPattern: "agentdev-artifact-graph\\.md",
@@ -102,9 +98,9 @@ const CASE_4_IMPACT_EMPTY_NORMAL: RepresentativeCase = {
   depth: 2,
   caseClass: "semantic-separation",
   selectionRationale:
-    "意味分離ケース。暫定関係意味表で起点要件に変更影響意味を持つ関係が存在しないため、" +
-    "semantic 側は正常な空結果となり、一般参照経由の候補増幅（README 経由）は発生しない。" +
-    "空結果を正常扱いとする契約の代表。",
+    "意味分離ケース。起点要件の変更影響関係（defined_in、contains）の到達点はファイル層" +
+    "（索引役割）であり探索経路から除外されるため、semantic 側は正常な空結果となる。" +
+    "一般参照経由の候補増幅（README 経由）は発生しない。空結果を正常扱いとする契約の代表。",
   requiredCandidates: [],
   minAmplifiedCount: 20,
   independentSearchPattern: `\\b${REQ_020}\\b`,
@@ -117,10 +113,11 @@ const CASE_5_IMPACT_SUPERSEDES: RepresentativeCase = {
   depth: 2,
   caseClass: "semantic-separation",
   selectionRationale:
-    "意味分離ケース（置換・改訂）。supersedes が変更影響意味（暫定: 双方向）を持つ唯一の関係型であり、" +
-    `後継 Decision（${DEC_006}）を必須候補として取得する。` +
+    "意味分離ケース（置換・改訂）。supersedes は変更影響方向 none（TIM 語彙カタログ確定値）であり、" +
+    "後継 Decision への変更影響探索を行わない。暫定関係意味表（双方向扱い）からの差分確認ケース。" +
+    "起点の変更影響関係の到達点はファイル層（索引役割）のみのため正常な空結果となる。" +
     "README 経由の増幅と一般参照の誤通過を排除する対比を確認する。",
-  requiredCandidates: [`decision:${DEC_006}`],
+  requiredCandidates: [],
   minAmplifiedCount: 10,
   independentSearchPattern: `\\b${DEC_005}\\b`,
 }
@@ -132,8 +129,9 @@ const CASE_6_DEPENDENCY_DELEGATION: RepresentativeCase = {
   depth: 2,
   caseClass: "semantic-separation",
   selectionRationale:
-    "意味分離ケース（依存）。委譲元 extension 起点で、委譲（delegates_to）と拡張（extends）の" +
-    "依存意味により依存先（AG SPEC、統合検証 skill、自身の Workflow Skill）を特定する。" +
+    "意味分離ケース（依存）。委譲元 extension 起点で、委譲（delegates_to、意味スロット depend）と" +
+    "拡張（extends、意味スロット refine）の依存意味により依存先（AG SPEC、統合検証 skill、自身の Workflow Skill）を特定する。" +
+    "定義所在（defined_in）の依存先はファイル層（索引役割）として除外される。" +
     "一般参照・README 経由の候補を依存関係として扱わない契約の代表。",
   requiredCandidates: [AG_SPEC_NODE, SKILL_REPO_INTEGRITY, SKILL_CASE_CLOSE],
   minAmplifiedCount: 10,

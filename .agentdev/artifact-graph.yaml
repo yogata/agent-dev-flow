@@ -10,6 +10,13 @@
 #
 # source_file は containment logic（nodes.ts / edges.ts）が全入力ファイルへ対してノードを生成する。
 # path_pattern "a^" は不一致パターンであり、ルールベース抽出ではマッチしない。
+#
+# 拡張関係型の意味定義と source_file の役割宣言は TIM 語彙カタログ SPEC
+# （docs/specs/foundations/traceability-model.md）の定める宣言様式に従う
+# （「拡張関係型の意味定義様式」「索引・集約成果物の役割識別」、Issue #2204 で適用）。
+# source_file 型はグラフモデル上の非正規ファイル層であり、README 等の索引・集約成果物は
+# この層にのみ存在する。当該層を role: index として宣言し、高位問い合わせの探索経路から
+# 除外する（REQ-040-008）。
 
 node_types:
   - name: integrity_rule
@@ -53,6 +60,7 @@ node_types:
     label_source:
       - kind: path
     extraction_rule: filesystem
+    role: index
 
 relation_types:
   - name: delegates_to
@@ -61,6 +69,11 @@ relation_types:
       - rules.skill
       - checks.skill
     reverse_direction: false
+    semantics:
+      meaning: リンク元が処理の一部をリンク先へ委譲する
+      semantics_slot: depend
+      change_impact_direction: backward
+      standard_vocabulary: []
 
   - name: governs
     fields:
@@ -68,6 +81,10 @@ relation_types:
       - related_spec
       - governed_by
     reverse_direction: false
+    semantics:
+      meaning: リンク元がリンク先の内容または品質を統治する
+      change_impact_direction: forward
+      standard_vocabulary: []
 
 indexed_paths:
   - src/opencode
