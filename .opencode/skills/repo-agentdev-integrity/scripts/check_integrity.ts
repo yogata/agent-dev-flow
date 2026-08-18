@@ -7408,13 +7408,27 @@ interface NgBaselineReport {
   newNg: number;
 }
 
+// OU-0008 (Issue #2206): パス bucket key の環境依存対策（SPEC integrity-contracts
+// 「baseline entry 運用契約」第2点）。main 環境（junction projection 実在）は
+// `.opencode/...` 表記、worktree 環境（junction 未伝播、§7.3 fallback）は
+// `src/opencode/...` 表記で同一ファイルを報告するため、bucket key 比較時のみ
+// 表記を正規化して相対パス基準へ統一する。bucket key 仕様自体
+// （category/check/file/evidence の4組）は維持する。
+function normalizeNgBaselineFilePath(file: string | null): string {
+  if (!file) return "";
+  const unified = file.replace(/\\/g, "/").replace(/^\.\//, "");
+  return unified.startsWith(".opencode/")
+    ? unified.replace(/^\.opencode\//, "src/opencode/")
+    : unified;
+}
+
 function ngBaselineKey(
   category: string,
   check: string,
   file: string | null,
   evidence: string | null,
 ): string {
-  return `${category}\t${check}\t${file ?? ""}\t${evidence ?? ""}`;
+  return `${category}\t${check}\t${normalizeNgBaselineFilePath(file)}\t${evidence ?? ""}`;
 }
 
 // Normalize a parsed entry to fill provenance/reason for backward compat with
@@ -7565,7 +7579,13 @@ function applyNgBaseline(
   const baselineIndex = new Map<string, { count: number; provenance: string }>();
   for (const entry of baseline.entries) {
     const key = ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
-    baselineIndex.set(key, { count: entry.count, provenance: entry.provenance });
+    // OU-0008 (Issue #2206): 正規化により `.opencode/` 表記 entry と
+    // `src/opencode/` 表記 entry が同一 bucket へ衝突する場合、両者は同一論理 NG の
+    // 環境別観測であるため count の大きい方（通常は同数）を採用する。
+    const prev = baselineIndex.get(key);
+    if (!prev || entry.count > prev.count) {
+      baselineIndex.set(key, { count: entry.count, provenance: entry.provenance });
+    }
   }
 
   const currentSummary = summarizeNgResults(results);
@@ -7627,10 +7647,13 @@ function updateNgBaseline(
 
   const index = new Map<string, NgBaselineEntry>();
   for (const entry of baseline.entries) {
-    index.set(
-      ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence),
-      entry,
-    );
+    const key = ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
+    // OU-0008 (Issue #2206): 正規化で同一 bucket へ衝突する環境別表記 entry は
+    // 同一論理 NG として count の大きい方を採用する。
+    const prev = index.get(key);
+    if (!prev || entry.count > prev.count) {
+      index.set(key, entry);
+    }
   }
 
   // Current NG counts per bucket — used to cap the merged baseline count so a

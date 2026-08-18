@@ -2682,6 +2682,109 @@ describe("NG baseline aggregation / provenance / classification (Issue #1780, RE
   });
 });
 
+// ─── NG baseline パス bucket key 正規化（Issue #2206, OU-0008） ─────────────
+// SPEC integrity-contracts「baseline entry 運用契約」第2点: worktree（src fallback）
+// と main（junction projection）で `.opencode/...` ↔ `src/opencode/...` 表記が
+// 変化しても同一 bucket として baseline-known 降格することを検証する。
+
+const NGBASELINE_PATHNORM_ROOT_MAIN = join(TEMP_ROOT, "ngbaseline2206-main");
+const NGBASELINE_PATHNORM_ROOT_WORKTREE = join(TEMP_ROOT, "ngbaseline2206-worktree");
+
+function buildPathNormFixture(
+  root: string,
+  commandDirKind: "projection" | "source",
+): void {
+  buildNgBaselineFixture(root);
+  copyScriptsComplete(root);
+  const cmdDir =
+    commandDirKind === "projection"
+      ? join(root, ".opencode", "commands", "agentdev")
+      : join(root, "src", "opencode", "commands", "agentdev");
+  mkdirp(cmdDir);
+  // broken.md has no frontmatter → command-inventory NG whose bucket key `file`
+  // is the command file path in the environment's own notation.
+  writeFileSync(join(cmdDir, "broken.md"), "# broken\n\nNo frontmatter.\n", "utf-8");
+}
+
+describe("NG baseline path bucket key normalization (Issue #2206, OU-0008)", () => {
+  afterAll(() => {
+    rmSync(NGBASELINE_PATHNORM_ROOT_MAIN, { recursive: true, force: true });
+    rmSync(NGBASELINE_PATHNORM_ROOT_WORKTREE, { recursive: true, force: true });
+  });
+
+  it("main 環境表記 (.opencode/...) の NG が src/opencode 表記の baseline entry で降格する", () => {
+    const root = NGBASELINE_PATHNORM_ROOT_MAIN;
+    rmSync(root, { recursive: true, force: true });
+    buildPathNormFixture(root, "projection");
+    writeNgBaselineFile(root, [
+      {
+        category: "Command",
+        check: "command-inventory",
+        file: "src/opencode/commands/agentdev/broken.md",
+        evidence: null,
+        count: 1,
+        provenance: "legacy",
+        reason: "path-notation fixture (Issue #2206)",
+      },
+    ]);
+
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout) as {
+      results: Array<{
+        check: string;
+        level: string;
+        file?: string;
+        message?: string;
+      }>;
+    };
+    const inv = parsed.results.filter(
+      (res) =>
+        res.check === "command-inventory" &&
+        (res.file ?? "").endsWith("broken.md"),
+    );
+    expect(inv.length).toBeGreaterThanOrEqual(1);
+    expect(inv[0].file).toBe(".opencode/commands/agentdev/broken.md");
+    expect(inv[0].level).toBe("info");
+    expect(inv[0].message).toContain("[baseline-known]");
+  });
+
+  it("worktree 環境表記 (src/opencode/...) の NG が .opencode 表記の baseline entry で降格する", () => {
+    const root = NGBASELINE_PATHNORM_ROOT_WORKTREE;
+    rmSync(root, { recursive: true, force: true });
+    buildPathNormFixture(root, "source");
+    writeNgBaselineFile(root, [
+      {
+        category: "Command",
+        check: "command-inventory",
+        file: ".opencode/commands/agentdev/broken.md",
+        evidence: null,
+        count: 1,
+        provenance: "legacy",
+        reason: "path-notation fixture (Issue #2206)",
+      },
+    ]);
+
+    const r = runScript(root, ["--json"]);
+    const parsed = JSON.parse(r.stdout) as {
+      results: Array<{
+        check: string;
+        level: string;
+        file?: string;
+        message?: string;
+      }>;
+    };
+    const inv = parsed.results.filter(
+      (res) =>
+        res.check === "command-inventory" &&
+        (res.file ?? "").endsWith("broken.md"),
+    );
+    expect(inv.length).toBeGreaterThanOrEqual(1);
+    expect(inv[0].file).toBe("src/opencode/commands/agentdev/broken.md");
+    expect(inv[0].level).toBe("info");
+    expect(inv[0].message).toContain("[baseline-known]");
+  });
+});
+
 // ─── IR-055 実修復回帰テスト（Issue #1782, OU-005, RU-0012） ──────────────
 // 配布物（src/opencode/commands/agentdev/**/*.md,
 // src/opencode/skills/agentdev-*/**/*.md）の runtime-unresolved-reference
