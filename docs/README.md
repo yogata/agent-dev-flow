@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 37件、廃止済み: 4件
+現行 REQ: 34件、廃止済み: 7件
 <!-- AUTOGEN:END -->
 
-現行要件は37件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして retired/ へ移行済み、REQ-036〜REQ-041 を追加。番号には欠番が存在する）。
+現行要件は34件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして retired/ へ移行、REQ-036〜REQ-041 を追加。番号には欠番が存在する）。
 REQ-022 の規範内容は、後継の [agentdev-artifact-graph SPEC](specs/skills/agentdev-artifact-graph.md)「augmentation 配置先」節が正規所有する。
 REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-graph SPEC](specs/skills/agentdev-artifact-graph.md)「check_graph.ts 抽出規則と warning 分類」節と `scripts/lib/checker.ts` が正規所有する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
@@ -36,10 +36,7 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [REQ-019](requirements/REQ-019.md) | テスト影響範囲検出 gate |
 | [REQ-020](requirements/REQ-020.md) | Artifact Graph 解析品質と検証 |
 | [REQ-021](requirements/REQ-021.md) | Artifact Graph ワークフロー統合 |
-| [REQ-025](requirements/REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
-| [REQ-026](requirements/REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
 | [REQ-027](requirements/REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
-| [REQ-028](requirements/REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
 | [REQ-029](requirements/REQ-029.md) | 配布依存境界 |
 | [REQ-030](requirements/REQ-030.md) | case-open 実行契約（Issue構成生成） |
 | [REQ-031](requirements/REQ-031.md) | case-run 実行契約（実装実行と委譲） |
@@ -58,7 +55,7 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-017 の17件である（DEC-008、DEC-015、DEC-016、DEC-017 は proposed、DEC-005 は superseded）。
+現行 Decision は DEC-001 から DEC-017 の17件である（DEC-016、DEC-017 は proposed、DEC-005 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -70,14 +67,14 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [DEC-005](decisions/DEC-005.md) | Project Extensions Architecture（superseded by DEC-006） |
 | [DEC-006](decisions/DEC-006.md) | inspect 3-command 構成への正規化 |
 | [DEC-007](decisions/DEC-007.md) | Artifact Graph 標準化と配布スキル昇格 |
-| [DEC-008](decisions/DEC-008.md) | case-auto の限定的親判断解決（bounded parent decision resolution）（proposed） |
+| [DEC-008](decisions/DEC-008.md) | case-auto の限定的親判断解決（bounded parent decision resolution） |
 | [DEC-009](decisions/DEC-009.md) | ADR から Decision への正規成果物モデル移行 |
 | [DEC-010](decisions/DEC-010.md) | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則 |
 | [DEC-011](decisions/DEC-011.md) | STEP resume point と会話記憶非依存 |
 | [DEC-012](decisions/DEC-012.md) | Extension を file-kind から workflow/capability responsibility へ再編 |
 | [DEC-013](decisions/DEC-013.md) | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 |
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement（proposed） |
-| [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（proposed） |
+| [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則（proposed） |
 | [DEC-017](decisions/DEC-017.md) | TIM 準拠トレーサビリティモデルの採用と4層分離（proposed） |
 

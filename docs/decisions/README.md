@@ -9,7 +9,7 @@
 個別 REQ/SPEC は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は12件、提案中の Decision は4件である。
+現行の承認済み Decision は14件、提案中の Decision は2件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -22,14 +22,14 @@
 | DEC-005 | Project Extensions Architecture | superseded | 2026-07-25 |
 | DEC-006 | inspect 3-command 構成への正規化 | accepted | 2026-07-27 |
 | DEC-007 | Artifact Graph 標準化と配布スキル昇格 | accepted | 2026-08-08 |
-| DEC-008 | case-auto の限定的親判断解決（bounded parent decision resolution） | proposed | 2026-08-09 |
+| DEC-008 | case-auto の限定的親判断解決（bounded parent decision resolution） | accepted | 2026-08-09 |
 | DEC-009 | ADR から Decision への正規成果物モデル移行 | accepted | 2026-08-10 |
 | DEC-010 | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則 | accepted | 2026-08-10 |
 | DEC-011 | STEP resume point と会話記憶非依存 | accepted | 2026-08-10 |
 | DEC-012 | Extension を file-kind から workflow/capability responsibility へ再編 | accepted | 2026-08-10 |
 | DEC-013 | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 | accepted | 2026-08-11 |
 | DEC-014 | 配布依存境界の多層 enforcement | accepted | 2026-08-11 |
-| DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | proposed | 2026-08-15 |
+| DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | accepted | 2026-08-15 |
 | DEC-016 | 導入系スクリプトの副作用ゼロ原則 | proposed | 2026-08-15 |
 | DEC-017 | TIM 準拠トレーサビリティモデルの採用と4層分離 | proposed | 2026-08-17 |
 <!-- AUTOGEN:END -->
@@ -50,19 +50,19 @@
 - [DEC-004](DEC-004.md)（差し替え可能な I/O 境界）
 - [DEC-006](DEC-006.md)（inspect 3-command 構成への正規化）
 - [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
+- [DEC-008](DEC-008.md)（case-auto の限定的親判断解決（bounded parent decision resolution））
 - [DEC-009](DEC-009.md)（ADR から Decision への正規成果物モデル移行）
 - [DEC-010](DEC-010.md)（Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則）
 - [DEC-011](DEC-011.md)（STEP resume point と会話記憶非依存）
 - [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
 - [DEC-013](DEC-013.md)（IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定）
 - [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement）
+- [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-008](DEC-008.md)（case-auto の限定的親判断解決（bounded parent decision resolution））
-- [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
 - [DEC-017](DEC-017.md)（TIM 準拠トレーサビリティモデルの採用と4層分離）
 <!-- AUTOGEN:END -->

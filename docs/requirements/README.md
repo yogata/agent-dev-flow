@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下37件を第一参照先とする。
+現在の要件判断では、以下34件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -32,10 +32,7 @@
 | [REQ-019](REQ-019.md) | テスト影響範囲検出 gate |
 | [REQ-020](REQ-020.md) | Artifact Graph 解析品質と検証 |
 | [REQ-021](REQ-021.md) | Artifact Graph ワークフロー統合 |
-| [REQ-025](REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
-| [REQ-026](REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
 | [REQ-027](REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
-| [REQ-028](REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
 | [REQ-029](REQ-029.md) | 配布依存境界 |
 | [REQ-030](REQ-030.md) | case-open 実行契約（Issue構成生成） |
 | [REQ-031](REQ-031.md) | case-run 実行契約（実装実行と委譲） |
@@ -60,6 +57,9 @@
 | [REQ-022](retired/REQ-022.md) | Artifact Graph augmentation 配置先正規化 |
 | [REQ-023](retired/REQ-023.md) | Artifact Graph 問い合わせ結果の関係情報拡張 |
 | [REQ-024](retired/REQ-024.md) | Artifact Graph 未解決参照 warning の分類と抽出規則改善 |
+| [REQ-025](retired/REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
+| [REQ-026](retired/REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
+| [REQ-028](retired/REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
 <!-- AUTOGEN:END -->
 
 ## 基準構造
