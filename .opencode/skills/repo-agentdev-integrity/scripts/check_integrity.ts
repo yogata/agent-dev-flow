@@ -32,30 +32,27 @@ import {
   CATALOG_PRE_BLOCK_ID,
   CATALOG_POST_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
-  collectAdrFiles,
-  collectRetiredAdrFiles,
+  collectDecisionFiles,
+  collectRetiredDecisionFiles,
   collectReqFiles,
   collectRetiredReqFiles,
-  countSpecFiles,
-  generateAdrBaselineCaption,
-  generateAdrBaselineTable,
-  generateAdrStatusList,
-  generateAdrRetiredTable,
+  generateDecisionBaselineCaption,
+  generateDecisionBaselineTable,
+  generateDecisionStatusList,
+  generateDecisionRetiredTable,
   generateReqActiveCaption,
   generateReqActiveTable,
   generateReqRetiredTable,
-  generateDocMapInventory,
-  ADR_BASELINE_COUNT_BLOCK_ID,
-  ADR_BASELINE_TABLE_BLOCK_ID,
-  ADR_STATUS_ACCEPTED_BLOCK_ID,
-  ADR_STATUS_PROPOSED_BLOCK_ID,
-  ADR_STATUS_SUPERSEDED_BLOCK_ID,
-  ADR_STATUS_DEPRECATED_BLOCK_ID,
-  ADR_RETIRED_TABLE_BLOCK_ID,
+  DECISION_BASELINE_COUNT_BLOCK_ID,
+  DECISION_BASELINE_TABLE_BLOCK_ID,
+  DECISION_STATUS_ACCEPTED_BLOCK_ID,
+  DECISION_STATUS_PROPOSED_BLOCK_ID,
+  DECISION_STATUS_SUPERSEDED_BLOCK_ID,
+  DECISION_STATUS_DEPRECATED_BLOCK_ID,
+  DECISION_RETIRED_TABLE_BLOCK_ID,
   REQ_ACTIVE_COUNT_BLOCK_ID,
   REQ_ACTIVE_TABLE_BLOCK_ID,
   REQ_RETIRED_TABLE_BLOCK_ID,
-  DOCMAP_INVENTORY_BLOCK_ID,
   REQ_METRICS_BLOCK_ID,
   SPEC_METRICS_BLOCK_ID,
   collectReqMetrics,
@@ -8310,33 +8307,32 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
     }
   }
 
-  // AG-008: ADR README (docs/adr/README.md) — 7 AUTOGEN blocks
-  const adrDir = path.join(root, "docs", "adr");
-  const adrRetiredDir = path.join(adrDir, "retired");
-  const adrReadmePath = path.join(adrDir, "README.md");
-  const adrReadmeContent = readText(adrReadmePath);
-  if (adrReadmeContent !== null && fs.existsSync(adrDir)) {
-    const adrInfos = collectAdrFiles(adrDir);
-    const adrRetiredInfos = collectRetiredAdrFiles(adrRetiredDir);
-    const acceptedAdrs = adrInfos.filter((a) => a.status === "accepted");
-    const adrSpecs: AutogenBlockSpec[] = [
-      { blockId: ADR_BASELINE_COUNT_BLOCK_ID, expected: generateAdrBaselineCaption(acceptedAdrs), label: "adr-baseline-count" },
-      { blockId: ADR_BASELINE_TABLE_BLOCK_ID, expected: generateAdrBaselineTable(acceptedAdrs), label: "adr-baseline-table" },
-      { blockId: ADR_STATUS_ACCEPTED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "accepted"), label: "adr-status-accepted" },
-      { blockId: ADR_STATUS_PROPOSED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "proposed"), label: "adr-status-proposed" },
-      { blockId: ADR_STATUS_SUPERSEDED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "superseded"), label: "adr-status-superseded" },
-      { blockId: ADR_STATUS_DEPRECATED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "deprecated"), label: "adr-status-deprecated" },
-      { blockId: ADR_RETIRED_TABLE_BLOCK_ID, expected: generateAdrRetiredTable(adrRetiredInfos), label: "adr-retired-table" },
+  // AG-008 (DEC-009): Decision README (docs/decisions/README.md) — 7 AUTOGEN blocks
+  const decisionsDir = path.join(root, "docs", "decisions");
+  const decisionRetiredDir = path.join(decisionsDir, "retired");
+  const decisionReadmePath = path.join(decisionsDir, "README.md");
+  const decisionReadmeContent = readText(decisionReadmePath);
+  if (decisionReadmeContent !== null && fs.existsSync(decisionsDir)) {
+    const decisionInfos = collectDecisionFiles(decisionsDir);
+    const decisionRetiredInfos = collectRetiredDecisionFiles(decisionRetiredDir);
+    const decisionSpecs: AutogenBlockSpec[] = [
+      { blockId: DECISION_BASELINE_COUNT_BLOCK_ID, expected: generateDecisionBaselineCaption(decisionInfos), label: "decision-baseline-count" },
+      { blockId: DECISION_BASELINE_TABLE_BLOCK_ID, expected: generateDecisionBaselineTable(decisionInfos), label: "decision-baseline-table" },
+      { blockId: DECISION_STATUS_ACCEPTED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "accepted"), label: "decision-status-accepted" },
+      { blockId: DECISION_STATUS_PROPOSED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "proposed"), label: "decision-status-proposed" },
+      { blockId: DECISION_STATUS_SUPERSEDED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "superseded"), label: "decision-status-superseded" },
+      { blockId: DECISION_STATUS_DEPRECATED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "deprecated"), label: "decision-status-deprecated" },
+      { blockId: DECISION_RETIRED_TABLE_BLOCK_ID, expected: generateDecisionRetiredTable(decisionRetiredInfos), label: "decision-retired-table" },
     ];
-    const adrOutcome = verifyAutogenBlocksInFile(
-      adrReadmeContent,
-      adrReadmePath,
+    const decisionOutcome = verifyAutogenBlocksInFile(
+      decisionReadmeContent,
+      decisionReadmePath,
       root,
-      adrSpecs,
+      decisionSpecs,
       foundViolation,
     );
-    results.push(...adrOutcome.results);
-    foundViolation = adrOutcome.foundViolation;
+    results.push(...decisionOutcome.results);
+    foundViolation = decisionOutcome.foundViolation;
   }
 
   // AG-009: REQ README (docs/requirements/README.md) — 3 AUTOGEN blocks
@@ -8363,34 +8359,8 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
     foundViolation = reqOutcome.foundViolation;
   }
 
-  // AG-013: DOC-MAP (docs/DOC-MAP.md) — 1 AUTOGEN block
+  // 旧 AG-013 docmap-inventory 検査は docs/DOC-MAP.md 削除（REQ-013 段階4a）に伴い除去。
   const specsDir = path.join(root, "docs", "specs");
-  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
-  const docMapContent = readText(docMapPath);
-  if (docMapContent !== null) {
-    const docMapSpecs: AutogenBlockSpec[] = [
-      {
-        blockId: DOCMAP_INVENTORY_BLOCK_ID,
-        expected: generateDocMapInventory({
-          activeReqCount: fs.existsSync(reqDir) ? collectReqFiles(reqDir).length : 0,
-          retiredReqCount: fs.existsSync(reqRetiredDir) ? collectRetiredReqFiles(reqRetiredDir).length : 0,
-          activeAdrCount: fs.existsSync(adrDir) ? collectAdrFiles(adrDir).length : 0,
-          retiredAdrCount: fs.existsSync(adrRetiredDir) ? collectRetiredAdrFiles(adrRetiredDir).length : 0,
-          specCount: countSpecFiles(specsDir),
-        }),
-        label: "docmap-inventory",
-      },
-    ];
-    const docMapOutcome = verifyAutogenBlocksInFile(
-      docMapContent,
-      docMapPath,
-      root,
-      docMapSpecs,
-      foundViolation,
-    );
-    results.push(...docMapOutcome.results);
-    foundViolation = docMapOutcome.foundViolation;
-  }
 
   // AG-006 候補5 (Wave 3): req-health-metrics.md — 1 AUTOGEN block
   const qualityDir = path.join(specsDir, "quality");
@@ -8471,7 +8441,7 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
       ok(
         "IndexGenerationConsistency",
         "index-generation-consistency",
-        `索引類自動生成整合性: All AUTOGEN blocks consistent (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership=${expectedRuleOwnership.length}; ADR README + REQ README + DOC-MAP + req-health-metrics + spec-health-metrics + docs/README.md) (IR-061, SC-002 Phase C/E)`,
+        `索引類自動生成整合性: All AUTOGEN blocks consistent (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership=${expectedRuleOwnership.length}; Decision README + REQ README + req-health-metrics + spec-health-metrics + docs/README.md) (IR-061, SC-002 Phase C/E)`,
       ),
     );
   }
