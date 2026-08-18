@@ -7127,16 +7127,34 @@ function isIr055ExemptPath(relPath: string): boolean {
   return IR055_EXEMPT_PATH_PATTERNS.some((re) => re.test(relPath));
 }
 
-function isIr055ExemptLine(line: string): boolean {
-  // Template placeholder exemption: lines carrying {NNN} style placeholders where
-  // the match is a parameter rather than a concrete reference.
-  if (/\{[^}]*\}/.test(line)) {
-    // Only exempt when the placeholder is adjacent to the pattern kind; cheap
-    // heuristic: if the line contains any "{...}" we skip it to avoid noisy FPs
-    // on templated example text.
-    return true;
-  }
-  return false;
+// Token characters for path/identifier expressions: ASCII word chars plus
+// path punctuation, backticks, placeholder braces/angle brackets, brace-set
+// glob separators (","), and anchor/line-number signs. Token expansion stops
+// at whitespace and CJK characters adjacent to the token (same policy as
+// PATH_SEGMENT above).
+const IR055_TOKEN_CHAR = /[\w`{}<>.\/#:,-]/;
+
+/**
+ * IR-055 token-neighborhood placeholder exemption (CR-002 狭域化,
+ * integrity-rule-catalog.md "IR-055 template placeholder exemption
+ * （トークン近傍狭域化）"). A match is exempt only when the placeholder
+ * notation ({xxx} / <xxx>, incl. brace-set globs like {a,b}) sits in the
+ * same path/identifier token as the match. Concrete references elsewhere on
+ * a placeholder-bearing line remain reported. Placeholder notation follows
+ * the isTemplatePlaceholder convention ({...} plus <...> angle-bracket
+ * parameters, v2:REQ-0144-020).
+ */
+function isIr055PlaceholderAdjacentMatch(
+  line: string,
+  matchIndex: number,
+  matchLength: number,
+): boolean {
+  let start = matchIndex;
+  let end = matchIndex + matchLength;
+  while (start > 0 && IR055_TOKEN_CHAR.test(line[start - 1])) start--;
+  while (end < line.length && IR055_TOKEN_CHAR.test(line[end])) end++;
+  const token = line.slice(start, end);
+  return /\{[^}]*\}/.test(token) || /<[^<>]+>/.test(token);
 }
 
 interface Ir055RawViolation {
@@ -7171,7 +7189,6 @@ function collectIr055Violations(root: string): Ir055RawViolation[] {
     for (let i = 0; i < lines.length; i++) {
       if (isInsideCodeBlock(lines, i)) continue;
       const line = lines[i];
-      if (isIr055ExemptLine(line)) continue;
 
       const scanList: ReadonlyArray<{ name: string; pattern: RegExp; severity: "strict" | "heuristic" }> = [
         ...IR055_STRICT_PATTERNS.map((p) => ({ ...p, severity: "strict" as const })),
@@ -7188,6 +7205,13 @@ function collectIr055Violations(root: string): Ir055RawViolation[] {
             name === "ADR-NNNN" &&
             match.index >= 3 &&
             line.slice(match.index - 3, match.index) === "v2:"
+          ) {
+            continue;
+          }
+          // CR-002 狭域化: exempt only matches inside a placeholder-bearing
+          // token; concrete references elsewhere on the line stay reported.
+          if (
+            isIr055PlaceholderAdjacentMatch(line, match.index, match[0].length)
           ) {
             continue;
           }
