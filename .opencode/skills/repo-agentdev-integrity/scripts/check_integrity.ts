@@ -4892,6 +4892,7 @@ function checkSkillCategoryGap(
     ["Accepted ADR 引用", ["AcceptedAdrOnlyCitation"]],
     ["Workflow template 構造", ["checkNaming", "checkFrontmatter", "checkSectionMarkers"]],
     ["Skill 構造", ["lintSkill"]],
+    ["AG-005 規則群", ["Ag005"]],
     ["Junction 整合性", ["BrokenJunctions"]],
     ["Capture boundary", ["CaptureBoundaryReference", "PrTemplateCaptureSection", "CommandCaptureDuties"]],
     ["REQ verification basis", ["ReqVerificationBasis"]],
