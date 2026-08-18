@@ -84,8 +84,8 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/integrity-contracts.md | 536 | accepted | integrity |
 | commands/case-run.md | 487 | accepted | commands |
 | commands/case-auto.md | 476 | accepted | commands |
+| skills/agentdev-artifact-graph.md | 443 | draft | skills |
 | commands/case-open.md | 438 | accepted | commands |
-| skills/agentdev-artifact-graph.md | 426 | draft | skills |
 | integrity/audits/classification-20260811.md | 422 | draft | integrity |
 | foundations/system.md | 421 | accepted | foundations |
 | integrity/baselines/pre-audit-baseline-20260811.md | 416 | accepted | integrity |
@@ -94,9 +94,9 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/audits/final-reverification-20260811.md | 341 | accepted | integrity |
 | skills/agentdev-adversarial-review.md | 337 | accepted | skills |
 | workflows/epic-wave-model.md | 334 | accepted | workflows |
+| foundations/traceability-model.md | 324 | draft | foundations |
 | integrity/integrity-rule-catalog.md | 318 | accepted | integrity |
 | commands/spec-save.md | 305 | accepted | commands |
-| foundations/traceability-model.md | 303 | draft | foundations |
 | commands/case-close.md | 302 | accepted | commands |
 | workflows/workflow-contracts.md | 284 | accepted | workflows |
 | workflows/backlog-artifact-lifecycle.md | 283 | accepted | workflows |
