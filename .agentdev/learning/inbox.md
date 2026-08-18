@@ -116,3 +116,35 @@
 - **想定反映先**: agentdev-workflow-case-close の Epic Wave クローズ E4 手順
 - **関連**: PR 2260、PR 2257、Epic 2218、Issue 2220
 - **タグ**: #case-close #checker #base-drift
+
+## bun install 成果物のサードパーティ README が実配布物スキャンに引っかかる実行順序依存が存在した
+
+- **問題事象**: base a08384a2 時点では `bun install` で生成される scripts/node_modules 配下のサードパーティ README（CRLF 混在）が repo-integrity の TS-009 実配布物スキャンに引っかかる実行順序依存が存在した。origin/main 側での node_modules 除外により解消済みのため、PR 2262 では非顕化だった。
+- **発生局面**: 実装（case-run の検証実行、worktree 環境、bun install 実行後の検査実行）
+- **検知方法**: base a08384a2 時点での TS-009 実配布物スキャン実行（PR 2262 本文の記録）
+- **根本原因**: untracked な bun install 成果物（scripts/node_modules）が検査対象に混入し、実行順序（install → 検査）によって検査結果が変化する
+- **自律対応内容**: origin/main 側で node_modules が除外済みとなったことで解消した。PR 2262 では非顕化として PR 本文への記録のみ実施した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 実配布物スキャンとテスト実行の双方で untracked 成果物の有無が結果を左右する。検査前に untracked 成果物の有無を確認する先行学び（PR 2261）と同根の worktree 環境起因
+- **再発条件**: bun install 実行済みの worktree で、node_modules 除外が効いていない base に対して実配布物スキャンを実行する場合
+- **予防策候補**: 検査実行前の untracked 成果物確認（git status で scripts/node_modules 等の有無を確認）を検証手順に組み込む
+- **想定反映先**: agentdev-git-worktree の worktree 運用手順、case-run の検証手順
+- **関連**: PR 2262、Issue 2204、先行学び（scripts/node_modules のフルスイート順序依存、PR 2261・Issue 2214 の entry）
+- **タグ**: #worktree #bun-install #ts-009
+
+## augmentation の意味定義・役割宣言追加が変更対象成果物リストに事前明示されないまま実施された
+
+- **問題事象**: augmentation の意味定義・役割宣言追加（`.agentdev/artifact-graph.yaml`）は Issue 2204 の変更対象成果物リストに明示されていなかった。TIM 語彙カタログ SPEC が拡張関係型の意味定義場所を augmentation 宣言と定めているため、カタログ定義への置換の実体として実施し、解釈の明示を PR 2262 本文に記録した。
+- **発生局面**: 要件定義（case-open の execution contract 生成）、実装（case-run）
+- **検知方法**: 実装時の変更対象成果物リストと実際の変更内容の突合（PR 本文への解釈明示として記録）
+- **根本原因**: カタログ定義への置換に伴う augmentation 宣言の追従変更が、execution contract の変更対象成果物リスト作成時点で見えていなかった
+- **自律対応内容**: TIM 語彙カタログ SPEC の定める意味定義場所に従い augmentation 宣言として実施し、解釈を PR 本文に明示した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（augmentation 変更の実行契機明示の SPEC 層への取込みは intake item 化済み）
+- **横展開観点**: 関係意味・語彙の変更では定義場所（カタログ本体か augmentation 宣言か）を先に確定し、変更対象成果物リストへ反映する
+- **再発条件**: 拡張関係型の意味定義や役割宣言の変更を伴う Issue で、変更対象成果物リストに augmentation 宣言を明示しない場合
+- **予防策候補**: 語彙・関係意味の変更を伴う Issue の execution contract で augmentation 宣言（`.agentdev/artifact-graph.yaml`）を対象成果物候補として確認する
+- **想定反映先**: agentdev-workflow-case-open の execution contract 生成、REQ-017 Issue Execution Contract 運用
+- **関連**: PR 2262、Issue 2204、docs/specs/foundations/traceability-model.md、docs/specs/skills/agentdev-artifact-graph.md
+- **タグ**: #execution-contract #augmentation #tim
