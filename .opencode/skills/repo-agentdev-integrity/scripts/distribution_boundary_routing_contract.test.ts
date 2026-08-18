@@ -6,7 +6,7 @@
  *
  *   - single-Issue route: case-close STEP-3 Step 3-1
  *       (references/docs-and-spec-promotion.md)
- *   - Epic Wave route: case-close STEP-E4-0
+ *   - Epic Wave route: case-close STEP-E4-1
  *       (references/epic-wave-close.md)
  *   - case-run post-implementation final gate: case-run 配布依存境界の最終
  *       変更経路 gate paragraph (commands/agentdev/case-run.md, layer-3
@@ -145,36 +145,36 @@ describe("distribution-boundary final gate routing contract", () => {
     });
   });
 
-  describe("Epic Wave route (E4-0) references the same detector with profile token", () => {
+  describe("Epic Wave route (E4-1) references the same detector with profile token", () => {
     const content = readFileIfExists(EPIC_WAVE_CLOSE) ?? "";
-    const e40 = extractSection(content, "#### E4-0:");
+    const e41 = extractSection(content, "#### E4-1:");
 
-    it("E4-0 section exists", () => {
-      assertSectionExists(e40, "epic-wave-close.md");
+    it("E4-1 section exists", () => {
+      assertSectionExists(e41, "epic-wave-close.md");
     });
 
     it(`section contains detector entry point: ${DETECTOR_ENTRYPOINT}`, () => {
-      expect(e40.section).toContain(DETECTOR_ENTRYPOINT);
+      expect(e41.section).toContain(DETECTOR_ENTRYPOINT);
     });
 
     it(`section contains profile token: ${PROFILE_TOKEN}`, () => {
-      expect(e40.section).toContain(PROFILE_TOKEN);
+      expect(e41.section).toContain(PROFILE_TOKEN);
     });
 
-    it("E4-0 occurs before E4-1 in Epic route", () => {
-      const e40Index = content.indexOf("#### E4-0:");
+    it("E4-1 occurs before E4-2 in Epic route", () => {
       const e41Index = content.indexOf("#### E4-1:");
-      expect(e40Index).toBeGreaterThanOrEqual(0);
+      const e42Index = content.indexOf("#### E4-2:");
       expect(e41Index).toBeGreaterThanOrEqual(0);
-      expect(e40Index).toBeLessThan(e41Index);
+      expect(e42Index).toBeGreaterThanOrEqual(0);
+      expect(e41Index).toBeLessThan(e42Index);
     });
 
-    it("E4-0 contains result-state token: blocked", () => {
-      expect(e40.section).toContain("blocked");
+    it("E4-1 contains result-state token: blocked", () => {
+      expect(e41.section).toContain("blocked");
     });
 
-    it("E4-0 references exclusion from merge sequence", () => {
-      expect(e40.section).toContain("E4-1");
+    it("E4-1 references exclusion from merge sequence", () => {
+      expect(e41.section).toContain("E4-2");
     });
   });
 
@@ -237,35 +237,35 @@ describe("distribution-boundary final gate routing contract", () => {
     const caseRunContent = readFileIfExists(CASE_RUN_COMMAND) ?? "";
 
     const step31 = extractSection(docsContent, "### STEP-3-1:");
-    const e40 = extractSection(epicContent, "#### E4-0:");
+    const e41 = extractSection(epicContent, "#### E4-1:");
     const step71 = extractCaseRunGateParagraph(caseRunContent);
 
     it("all three gate sections reference the identical detector entrypoint", () => {
     expect(step31.section).toContain(DETECTOR_ENTRYPOINT);
-      expect(e40.section).toContain(DETECTOR_ENTRYPOINT);
+      expect(e41.section).toContain(DETECTOR_ENTRYPOINT);
       expect(step71.section).toContain(DETECTOR_ENTRYPOINT);
     });
 
     it("all three gate sections use the identical --profile source token", () => {
       expect(step31.section).toContain(PROFILE_TOKEN);
-      expect(e40.section).toContain(PROFILE_TOKEN);
+      expect(e41.section).toContain(PROFILE_TOKEN);
       expect(step71.section).toContain(PROFILE_TOKEN);
     });
 
     it("neither case-close route embeds a producer physical path literal", () => {
       expect(step31.section).not.toContain("src/opencode/");
-      expect(e40.section).not.toContain("src/opencode/");
+      expect(e41.section).not.toContain("src/opencode/");
     });
 
     it("both case-close routes describe the trigger via source-profile vocabulary", () => {
       expect(step31.section).toMatch(/配布.*ソース面|source.*profile/i);
-      expect(e40.section).toMatch(/配布.*ソース面|source.*profile/i);
+      expect(e41.section).toMatch(/配布.*ソース面|source.*profile/i);
     });
 
     it("single-Issue and Epic Wave routes both stop merge on gate violation", () => {
-      // E4-0 uses "blocked" state; Step 3-1 uses "gate-not-passed" classification.
+      // E4-1 uses "blocked" state; Step 3-1 uses "gate-not-passed" classification.
       expect(step31.section).toMatch(/gate/i);
-      expect(e40.section).toContain("blocked");
+      expect(e41.section).toContain("blocked");
     });
 
     it("SKILL.md control plane declares the final gate in both route rows", () => {
