@@ -403,14 +403,14 @@ function parseSimpleYaml(text: string): any {
 /**
  * Known project-local skill locations for check #10 existence confirmation.
  * Returns true if a directory matching the skill name exists in any known
- * skills location.
+ * skills location. Paths are resolved against repoRoot (cwd-independent).
  */
-function projectLocalSkillExists(skillName: string): boolean {
+function projectLocalSkillExists(skillName: string, repoRoot: string): boolean {
   // Distributed skills
-  const distPath = path.join(SKILLS_DIR, skillName);
+  const distPath = path.join(repoRoot, SKILLS_DIR, skillName);
   if (dirExists(distPath)) return true;
   // Repo-local skills
-  const repoLocalPath = path.join(REPO_LOCAL_SKILLS_DIR, skillName);
+  const repoLocalPath = path.join(repoRoot, REPO_LOCAL_SKILLS_DIR, skillName);
   if (dirExists(repoLocalPath)) return true;
   return false;
 }
@@ -425,10 +425,13 @@ export interface SkillClassification {
  * Workflow Skill  = agentdev-workflow-{X} where src/opencode/commands/agentdev/{X}.md exists.
  * Capability Skill = every other agentdev-* skill directory under src/opencode/skills
  * (including cross-cutting agentdev-workflow-* skills without a corresponding command).
+ * Paths are resolved against repoRoot when given, process.cwd() otherwise
+ * (cwd-independent: REQ-018 worktree test fallback).
  */
-export function deriveSkillClassification(): SkillClassification {
+export function deriveSkillClassification(repoRoot?: string): SkillClassification {
+  const root = repoRoot ?? process.cwd();
   const workflowSkills = new Set<string>();
-  const commandFiles = listMarkdownFiles(PUBLIC_COMMAND_DIR, false).filter(
+  const commandFiles = listMarkdownFiles(path.join(root, PUBLIC_COMMAND_DIR), false).filter(
     (f) => path.basename(f) !== "README.md",
   );
   for (const cf of commandFiles) {
@@ -436,8 +439,9 @@ export function deriveSkillClassification(): SkillClassification {
     workflowSkills.add(`agentdev-workflow-${base}`);
   }
   const capabilitySkills = new Set<string>();
-  if (dirExists(SKILLS_DIR)) {
-    const dirs = fs.readdirSync(SKILLS_DIR, { withFileTypes: true }) as any[];
+  const skillsAbs = path.join(root, SKILLS_DIR);
+  if (dirExists(skillsAbs)) {
+    const dirs = fs.readdirSync(skillsAbs, { withFileTypes: true }) as any[];
     for (const d of dirs) {
       if (!d.isDirectory() || !d.name.startsWith("agentdev-")) continue;
       if (!workflowSkills.has(d.name)) capabilitySkills.add(d.name);
@@ -594,10 +598,13 @@ function walkExtension(parsed: any, rawText: string, rcFile: string): ExtensionW
 
 export function checkExtensions(repoRoot: string): CheckReport {
   const failures: CheckFailure[] = [];
-  const origCwd = process.cwd();
-  process.chdir(repoRoot);
-  try {
-    const classification = deriveSkillClassification();
+  // cwd-independent (REQ-018): resolve every scan target against repoRoot.
+  // No process.chdir() mutation — immune to (and no source of) order-dependent
+  // cwd pollution in the shared test process.
+  const toRepoRel = (p: string): string => path.relative(repoRoot, p).replace(/\\/g, "/");
+  const extensionsSkillsAbs = path.join(repoRoot, EXTENSIONS_SKILLS_DIR);
+  {
+    const classification = deriveSkillClassification(repoRoot);
     const stats = {
       workflow_extensions: 0,
       internal_workflow_extensions: 0,
@@ -615,7 +622,7 @@ export function checkExtensions(repoRoot: string): CheckReport {
     };
 
     // Check #7: .agentdev/extensions/commands/** residual (classification: migration-required)
-    const commandsDirFiles = listFilesRecursive(EXTENSIONS_COMMANDS_DIR);
+    const commandsDirFiles = listFilesRecursive(path.join(repoRoot, EXTENSIONS_COMMANDS_DIR));
     stats.commands_dir_files = commandsDirFiles.length;
     if (commandsDirFiles.length > 0) {
       failures.push({
@@ -628,11 +635,10 @@ export function checkExtensions(repoRoot: string): CheckReport {
       });
     }
 
-    const extFiles = listYamlFilesRecursive(EXTENSIONS_SKILLS_DIR);
-
     // Checks 1, 2-6, 9-11, 13: per-extension validation
-    for (const rc of extFiles) {
-      const rcText = readText(rc) ?? "";
+    for (const rcAbs of listYamlFilesRecursive(extensionsSkillsAbs)) {
+      const rc = toRepoRel(rcAbs);
+      const rcText = readText(rcAbs) ?? "";
       const resolution = resolveExtensionState(rcText);
 
       if (resolution.state === "malformed") {
@@ -681,7 +687,7 @@ export function checkExtensions(repoRoot: string): CheckReport {
       else if (kind === "internal-workflow-extension") stats.internal_workflow_extensions++;
       else stats.capability_extensions++;
 
-      const relPath = path.relative(EXTENSIONS_SKILLS_DIR, rc).replace(/\\/g, "/");
+      const relPath = path.relative(extensionsSkillsAbs, rcAbs).replace(/\\/g, "/");
       const segments = relPath.split("/");
 
       // Check #2: kind-path consistency
@@ -726,7 +732,7 @@ export function checkExtensions(repoRoot: string): CheckReport {
             message: `internal-workflow-extension 'id' (${id || "<missing>"}) must match the parent directory Workflow Skill name (${parent})`,
           });
         }
-        if (id && !projectLocalSkillExists(id)) {
+        if (id && !projectLocalSkillExists(id, repoRoot)) {
           failures.push({
             check: 3,
             check_name: "id-target-consistency",
@@ -747,7 +753,7 @@ export function checkExtensions(repoRoot: string): CheckReport {
             message: `extension 'id' (${id || "<missing>"}) must match the target skill name derived from the filename (${fileBase})`,
           });
         }
-        if (id && !projectLocalSkillExists(id)) {
+        if (id && !projectLocalSkillExists(id, repoRoot)) {
           failures.push({
             check: 3,
             check_name: "id-target-consistency",
@@ -805,7 +811,8 @@ export function checkExtensions(repoRoot: string): CheckReport {
 
       // Check #9: context.paths existence
       for (const p of walk.pathsReferenced) {
-        if (!fileExists(p) && !dirExists(p)) {
+        const pAbs = path.resolve(repoRoot, p);
+        if (!fileExists(pAbs) && !dirExists(pAbs)) {
           failures.push({
             check: 9,
             check_name: "context-paths-existence",
@@ -819,7 +826,7 @@ export function checkExtensions(repoRoot: string): CheckReport {
 
       // Check #10: rules.skill / checks.skill project-local skill existence (warning)
       for (const skillName of walk.skillsReferenced) {
-        if (!projectLocalSkillExists(skillName)) {
+        if (!projectLocalSkillExists(skillName, repoRoot)) {
           failures.push({
             check: 10,
             check_name: "delegated-skill-existence",
@@ -833,8 +840,9 @@ export function checkExtensions(repoRoot: string): CheckReport {
     }
 
     // Check #12: legacy .agentdev/doc-inputs/** residual detection (warning)
-    if (dirExists(LEGACY_DOC_INPUTS_DIR)) {
-      const legacyFiles = listFilesRecursive(LEGACY_DOC_INPUTS_DIR);
+    const docInputsAbs = path.join(repoRoot, LEGACY_DOC_INPUTS_DIR);
+    if (dirExists(docInputsAbs)) {
+      const legacyFiles = listFilesRecursive(docInputsAbs);
       stats.doc_inputs_residual_files = legacyFiles.length;
       if (legacyFiles.length > 0) {
         failures.push({
@@ -860,13 +868,14 @@ export function checkExtensions(repoRoot: string): CheckReport {
     ).length;
 
     // Stats: public commands/skills counts (informational)
-    const commandFiles = listMarkdownFiles(PUBLIC_COMMAND_DIR, false).filter((f) => {
+    const commandFiles = listMarkdownFiles(path.join(repoRoot, PUBLIC_COMMAND_DIR), false).filter((f) => {
       const base = path.basename(f);
       return base !== "README.md";
     });
     stats.public_commands = commandFiles.length;
-    if (dirExists(SKILLS_DIR)) {
-      const skillDirs = (fs.readdirSync(SKILLS_DIR, { withFileTypes: true }) as any[])
+    const publicSkillsAbs = path.join(repoRoot, SKILLS_DIR);
+    if (dirExists(publicSkillsAbs)) {
+      const skillDirs = (fs.readdirSync(publicSkillsAbs, { withFileTypes: true }) as any[])
         .filter((d) => d.isDirectory() && d.name.startsWith("agentdev-"));
       stats.public_skills = skillDirs.length;
     }
@@ -911,8 +920,6 @@ export function checkExtensions(repoRoot: string): CheckReport {
       failures,
       stats,
     };
-  } finally {
-    process.chdir(origCwd);
   }
 }
 

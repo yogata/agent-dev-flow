@@ -8871,7 +8871,9 @@ function checkSkillSeeAlsoReference(skillsDir: string, root: string): CheckResul
     while ((m = seeAlsoPattern.exec(seeAlsoSection)) !== null) {
       const refName = m[1];
       if (!refName.startsWith("agentdev-")) continue;
-      const refDir = path.join(skillsDir, refName);
+      // REQ-018: worktree（junction 未伝播）環境の誤検出防止。原本 src/opencode/skills/ への
+      // fallback 存在判定（v2:REQ-0108-189 と同一規則）。
+      const refDir = resolvePathWithFallback(path.join(skillsDir, refName));
       if (!fs.existsSync(refDir)) {
         results.push(
           warn(
