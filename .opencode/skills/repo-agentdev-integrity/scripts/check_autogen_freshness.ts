@@ -45,7 +45,8 @@ import {
   generateReqMetricsTable,
   generateSpecMetricsTable,
   generateReadmeReqSummaryCount,
-  formatMeasureDate,
+  deriveReqMetricsMeasureDate,
+  deriveSpecMetricsMeasureDate,
   CATALOG_PRE_BLOCK_ID,
   CATALOG_POST_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
@@ -389,21 +390,44 @@ function buildBlockTargets(root: string): BlockTarget[] {
 
   // DOC-MAP（docmap-inventory）検査は docs/DOC-MAP.md 廃止（DEC-009、REQ-013）に伴い除去。
 
-  // REQ / SPEC health-metrics（各1ブロック）。計測日は実行日のローカル日付（generate_indexes.ts と同一）。
-  const measureDate = formatMeasureDate(new Date());
+  // REQ / SPEC health-metrics（各1ブロック）。計測日は対象ドキュメント群の最終コミット日付（SC-002「計測日導出」）。
   if (fs.existsSync(reqDir)) {
     const reqMetrics = collectReqMetrics(reqDir);
+    const reqMeasureDate = deriveReqMetricsMeasureDate(
+      root,
+      reqDir,
+      reqMetrics,
+    );
+    if (reqMeasureDate === null) {
+      console.error(
+        `[check_autogen_freshness] measure date derivation failed for docs/requirements/REQ-*.md ` +
+          `(no commit history or git failure)`,
+      );
+      process.exit(EXIT_ERROR);
+    }
     targets.push({
       file: reqHealthMetricsPath,
       blockId: REQ_METRICS_BLOCK_ID,
-      expected: generateReqMetricsTable(reqMetrics, measureDate),
+      expected: generateReqMetricsTable(reqMetrics, reqMeasureDate),
     });
   }
   const specMetrics = collectSpecMetrics(specsDir);
+  const specMeasureDate = deriveSpecMetricsMeasureDate(
+    root,
+    specsDir,
+    specMetrics,
+  );
+  if (specMeasureDate === null) {
+    console.error(
+      `[check_autogen_freshness] measure date derivation failed for docs/specs/**/*.md ` +
+        `(no commit history or git failure)`,
+    );
+    process.exit(EXIT_ERROR);
+  }
   targets.push({
     file: specHealthMetricsPath,
     blockId: SPEC_METRICS_BLOCK_ID,
-    expected: generateSpecMetricsTable(specMetrics, measureDate),
+    expected: generateSpecMetricsTable(specMetrics, specMeasureDate),
   });
 
   // docs/README.md（1ブロック）。REQ ファイル群が存在しない場合は計測不能のため対象外。

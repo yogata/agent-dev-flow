@@ -12,7 +12,11 @@
  * were misrecognized as real markers, causing generate_indexes.ts to stop.
  * This test locks the root-cause fix (whole-line matching).
  */
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, afterAll } from "bun:test";
+import { execSync } from "child_process";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
 import {
   isAutogenBeginLine,
   isAutogenEndLine,
@@ -20,7 +24,11 @@ import {
   findAutogenBlocks,
   replaceAutogenBlock,
   countSpecBodyLines,
+  deriveMeasureDateFromLastCommit,
+  deriveReqMetricsMeasureDate,
+  deriveSpecMetricsMeasureDate,
 } from "./generate_indexes.ts";
+import { findRepoRoot } from "./cli_utils.ts";
 
 describe("isAutogenBeginLine", () => {
   it("returns true for a canonical marker line", () => {
@@ -266,4 +274,162 @@ describe("countSpecBodyLines", () => {
     const count = countSpecBodyLines(content);
     expect(count).toBe(8);
   });
+});
+
+// ─── 計測日導出（SC-002「計測日導出」、Issue #2211）───────────────────────
+// 対象ドキュメント群の最終コミット日付導出（実行時日付非依存）とメトリクス
+// ファイル自体の導出対象除外を固定する回帰テスト（IR-061 日次再検出の解消）。
+
+const TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "genidx-measure-date-"));
+
+function commitAllWithDate(root: string, message: string, date: string): void {
+  execSync("git add -A", { cwd: root });
+  execSync(`git commit -q -m "${message}" --no-verify`, {
+    cwd: root,
+    env: {
+      ...process.env,
+      GIT_AUTHOR_DATE: date,
+      GIT_COMMITTER_DATE: date,
+      GIT_AUTHOR_NAME: "test",
+      GIT_AUTHOR_EMAIL: "t@t",
+      GIT_COMMITTER_NAME: "test",
+      GIT_COMMITTER_EMAIL: "t@t",
+    },
+  });
+}
+
+describe("deriveMeasureDateFromLastCommit", () => {
+  it("returns YYYY-MM-DD for a tracked file with commit history", () => {
+    const root = findRepoRoot(import.meta.dir);
+    const date = deriveMeasureDateFromLastCommit(root, [
+      path.join(root, "docs", "README.md"),
+    ]);
+    expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it("returns a stable value across repeated calls", () => {
+    const root = findRepoRoot(import.meta.dir);
+    const p = path.join(root, "docs", "README.md");
+    expect(deriveMeasureDateFromLastCommit(root, [p])).toBe(
+      deriveMeasureDateFromLastCommit(root, [p]),
+    );
+  });
+
+  it("returns null for paths without commit history", () => {
+    const root = findRepoRoot(import.meta.dir);
+    expect(
+      deriveMeasureDateFromLastCommit(root, [
+        path.join(root, "docs", "__no_such_file__.md"),
+      ]),
+    ).toBe(null);
+  });
+
+  it("returns null for an empty path list", () => {
+    const root = findRepoRoot(import.meta.dir);
+    expect(deriveMeasureDateFromLastCommit(root, [])).toBe(null);
+  });
+});
+
+describe("deriveReq/SpecMetricsMeasureDate", () => {
+  const root = path.join(TMP_ROOT, "repo");
+  if (!fs.existsSync(root)) {
+    fs.mkdirSync(path.join(root, "docs", "requirements"), {
+      recursive: true,
+    });
+    fs.mkdirSync(path.join(root, "docs", "specs", "quality"), {
+      recursive: true,
+    });
+    fs.mkdirSync(path.join(root, "docs", "specs", "integrity"), {
+      recursive: true,
+    });
+    execSync("git init -q -b main", { cwd: root });
+    execSync('git config user.email "t@t"', { cwd: root });
+    execSync('git config user.name "t"', { cwd: root });
+
+    fs.writeFileSync(
+      path.join(root, "docs", "specs", "integrity", "index-auto-generation.md"),
+      "# spec A\n",
+    );
+    commitAllWithDate(root, "add spec A", "2026-01-01T12:00:00+09:00");
+    fs.writeFileSync(
+      path.join(root, "docs", "specs", "quality", "spec-health-metrics.md"),
+      "# metrics\n",
+    );
+    commitAllWithDate(
+      root,
+      "add spec-health-metrics",
+      "2026-02-02T12:00:00+09:00",
+    );
+    fs.writeFileSync(
+      path.join(root, "docs", "requirements", "REQ-001.md"),
+      "# req\n",
+    );
+    commitAllWithDate(root, "add REQ-001", "2026-03-03T12:00:00+09:00");
+  }
+
+  it("derives req measure date from the REQ file group last commit", () => {
+    expect(
+      deriveReqMetricsMeasureDate(
+        root,
+        path.join(root, "docs", "requirements"),
+        [{ id: "REQ-001", num: 1, lineCount: 1, signal: "+0", note: "" }],
+      ),
+    ).toBe("2026-03-03");
+  });
+
+  it("excludes metrics files themselves from spec measure date derivation", () => {
+    const metrics = [
+      {
+        relPath: "quality/req-health-metrics.md",
+        lineCount: 1,
+        status: "accepted",
+        domain: "quality",
+      },
+      {
+        relPath: "quality/spec-health-metrics.md",
+        lineCount: 1,
+        status: "accepted",
+        domain: "quality",
+      },
+      {
+        relPath: "integrity/index-auto-generation.md",
+        lineCount: 1,
+        status: "accepted",
+        domain: "integrity",
+      },
+    ];
+    // 除外なしの群最大値は spec-health-metrics.md の 2026-02-02 だが、メトリクスファイル自体は導出対象外。
+    expect(
+      deriveSpecMetricsMeasureDate(root, path.join(root, "docs", "specs"), metrics),
+    ).toBe("2026-01-01");
+  });
+
+  it("takes the max last-commit date of the non-excluded group", () => {
+    fs.writeFileSync(
+      path.join(root, "docs", "specs", "integrity", "other.md"),
+      "# spec B\n",
+    );
+    commitAllWithDate(root, "add spec B", "2026-04-04T12:00:00+09:00");
+    const metrics = [
+      {
+        relPath: "quality/spec-health-metrics.md",
+        lineCount: 1,
+        status: "accepted",
+        domain: "quality",
+      },
+      {
+        relPath: "integrity/other.md",
+        lineCount: 1,
+        status: "accepted",
+        domain: "integrity",
+      },
+    ];
+    expect(
+      deriveSpecMetricsMeasureDate(root, path.join(root, "docs", "specs"), metrics),
+    ).toBe("2026-04-04");
+  });
+});
+
+afterAll(() => {
+  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
 });
