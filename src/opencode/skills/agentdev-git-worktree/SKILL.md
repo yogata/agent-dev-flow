@@ -40,11 +40,18 @@ work_type判定は `agentdev-workflow-lifecycle` を参照。
 - **case-run 再開時**: 前回ケースの PR merge 後に再開する場合も同様
 - **確認手順**: `git fetch origin` 後、`git log --oneline origin/main -1` で最新 commit hash を確認。`git rev-parse HEAD` と比較し、差分がある場合は worktree を最新 origin/main から再作成（既存 worktree がある場合は削除して再作成）
 
+## stash 運用（worktree 検証時の一時退避）
+
+worktree 検証での一時退避に `git stash` を使わない。
+detached worktree による baseline 比較を標準手順とする。
+やむ得ない stash 利用時の規則（`@{}` 引数の引用符必須、`-u` 使用時の除外 pathspec）と複数 worktree 環境での stash 往復前確認は `references/worktree-operations.md`「git stash 運用手順（一時退避）」を参照。
+
 ## 参照先
 
 | トピック | 参照先 |
 |----------|--------|
 | 作成、削除、ブランチ操作の詳細 | `references/worktree-operations.md` |
+| worktree 検証時の一時退避（stash 運用） | `references/worktree-operations.md` |
 | git pull/push/hash検証の共通手順 | `references/git-common-procedures.md` |
 
 ## 禁止事項

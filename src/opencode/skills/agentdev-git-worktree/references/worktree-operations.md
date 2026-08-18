@@ -109,6 +109,77 @@ worktree 内で gitignore 対象ファイルを参照・編集する必要があ
 
 junction 依存 checker は worktree 実行時（`isInsideWorktree` 判定で worktree 内と判定された場合）に skip する。skip せずに検査が必要な場合は構造系テスト fallback（commands_e2e / skills_structure / templates_structure の source パス切替）を適用する。
 
+## git stash 運用手順（一時退避）
+
+worktree での検証における一時退避の標準手順と、やむ得ない stash 利用時の規則を定める。
+stash スタックはリポジトリ全体で共有され、複数 worktree 並列環境では他セッションの退避内容と混在する。
+本手順はその混在に起因する障害の再発防止として定めた（関連Issue/PRは履歴参照）。
+
+### 1. detached worktree による baseline 比較（標準手順）
+
+worktree 検証で一時退避が必要な場合、`git stash` を使わない。
+検証対象 worktree の working tree を変更せず、baseline commit 上の detached worktree で検証を実行して結果を比較する。
+
+**手順**:
+
+1. baseline commit を確定する: 検証対象 worktree の `HEAD`（PR 差分の検証では `origin/main`）
+2. baseline 用の detached worktree を作成する: `git worktree add --detach ".worktrees/baseline-verify" {baseline_commit}`
+3. detached worktree 内で検証（checker、test 等）を実行する
+4. 検証対象 worktree と detached worktree の検証結果を比較し、失敗が本次変更起因か既存起因かを判定する
+5. detached worktree を削除する: `git worktree remove ".worktrees/baseline-verify"`
+
+baseline 用 worktree は Issue 用の命名規則（`.worktrees/{N}-{type}`）の対象外の一時領域である。
+検証完了時に必ず削除し、削除時のエラーハンドリングは「削除手順」に従う。
+並列セッションで同時実行する場合はパスが衝突しないよう一意な接尾辞を付ける。
+
+**理由**: `git stash` は working tree と stash スタックを変更する。
+detached worktree は検証対象の working tree を変更せず、stash スタックも消費しないため、並列セッションへ影響しない。
+
+### 2. やむ得ない stash 利用時の規則
+
+detached worktree による代替が成立しない場合に限り、`git stash` の利用を認める。
+利用時は以下の2規則を守る。
+
+**規則1: `@{}` 引数の引用符必須**
+
+`stash@{N}` 形式の引数は、シェルの解釈により意図しない引数へ変わる（bash のブレース展開で `stash@{0}` が `stash@0` となる、PowerShell で `@{...}` がハッシュリテラルとして解析される等）。
+`stash@{N}` を含む引数は必ず引用符で囲む。
+
+```bash
+# 正
+git stash pop 'stash@{0}'
+git stash show --name-only 'stash@{1}'
+
+# 誤（シェルが @{} を解釈する）
+git stash pop stash@{0}
+```
+
+**規則2: `-u` 使用時の除外 pathspec**
+
+`git stash push -u` は未追跡ファイルを退避対象に巻き込む。
+ドメイン状態（`.agentdev/` 配下）や実行時作業領域を退避対象から除外するため、除外 pathspec を指定する。
+
+```bash
+git stash push -u -- . ':(exclude).agentdev/**'
+```
+
+除外対象は実行環境に応じて追加する（ビルド成果物等）。
+
+共有作業ツリー（main worktree）では、`git stash` を含むスイープ操作は並列実行安全ステージングプロシージャ（`references/git-common-procedures.md` 手順 3）の禁止対象である。
+
+### 3. 複数 worktree 環境での stash 往復前確認
+
+stash スタックはリポジトリ全体で共有される。
+自セッションの stash 以外に、他 worktree、他セッションの stash が同一スタックに混在し得る。
+
+stash の退避（push）と復元（pop、apply）を往復する前に、以下を確認する。
+
+1. `git stash list` で既存エントリを確認する
+2. 復元対象エントリが自セッションのものであることを確認する: `git stash show --name-only 'stash@{0}'`
+3. 自セッション以外のエントリが混在する場合、スタック先頭を暗黙に復元する `pop` を使わず、引用符付きの index で自セッションのエントリを明示して `git stash apply 'stash@{N}'` で復元する
+
+他セッションの stash エントリの削除（`git stash drop`）、スタック全体のクリア（`git stash clear`）は行わない。
+
 ## 削除手順
 
 **追跡済みファイル削除禁止**: クリーンアップ操作中は追跡済みファイルを削除してはならない。
