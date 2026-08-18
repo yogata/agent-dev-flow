@@ -1470,6 +1470,24 @@ function checkSpecsExistence(specsDir: string, root: string): CheckResult[] {
   return results;
 }
 
+// ─── History record exemption (checker 実行契約 SPEC 検出対象除外規定) ────────
+// 監査記録・baseline は歴史記録として retired 参照系検出（retired-req-as-current、
+// retired-req-primary-ref 等）の免除対象とする。除外列挙は checker 実行契約 SPEC
+// （docs/specs/integrity/checker-execution-contracts.md「検出対象除外規定」）が
+// 正規所有し、列挙外の除外を本実装で追加しない（check_changed_docs.ts isSpecFile
+// と同一の判定規定）:
+//   - 配置ディレクトリ: docs/specs/integrity/audits/、baselines/（歴史記録領域）
+//   - frontmatter 信号キー: baseline_for / audit_for（snapshot・監査記録の起源標識）
+const SPEC_HISTORY_DIR_RE = /^docs\/specs\/integrity\/(audits|baselines)\//;
+const SPEC_HISTORY_FRONTMATTER_KEY_RE = /^(?:baseline_for|audit_for)\s*:/m;
+
+function isExemptHistoryRecord(relPath: string, content: string): boolean {
+  if (SPEC_HISTORY_DIR_RE.test(relPath)) return true;
+  const fmEnd = content.startsWith("---") ? content.indexOf("\n---", 3) : -1;
+  if (fmEnd === -1) return false;
+  return SPEC_HISTORY_FRONTMATTER_KEY_RE.test(content.slice(0, fmEnd));
+}
+
 // ─── Link integrity checks (v2:REQ-0108-013) ────────────────────────────────
 
 function collectAllArtifactPaths(root: string): string[] {
@@ -1743,6 +1761,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
         !relPath.startsWith("docs/adr/retired/") &&
         !relPath.startsWith("docs/adr/README.md") &&
         !relPath.startsWith("docs/adr/ADR-") && // ADRs discuss retired predecessors historically
+        !isExemptHistoryRecord(relPath, content) && // 監査記録・baseline は歴史記録として免除
         appearsOutsideRetired &&
         !(relPath.startsWith("docs/adr/ADR-") && isSupersededAdr(filePath, ref))
       ) {
@@ -1784,6 +1803,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
         !fs.existsSync(activePath) &&
         !relPath.startsWith("docs/requirements/retired/") &&
         !relPath.startsWith("docs/adr/ADR-") && // ADRs discuss REQ reorganization historically
+        !isExemptHistoryRecord(relPath, content) && // 監査記録・baseline は歴史記録として免除
         appearsOutsideRetired &&
         !isReqRangeContext // v2:REQ-0108-194: REQ range references like "REQ-0101 through REQ-0116"
       ) {
@@ -1984,6 +2004,7 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
     if (relPath.startsWith("docs/adr/ADR-")) continue; // ADRs discuss REQ reorganization historically
     const content = readText(filePath);
     if (!content) continue;
+    if (isExemptHistoryRecord(relPath, content)) continue; // 監査記録・baseline は歴史記録として免除
     const contentLines = content.split("\n");
     const refs = content.match(/\bREQ-\d{3,4}\b/g) || [];
     const uniqueRefs = [...new Set(refs)];
