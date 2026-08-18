@@ -243,7 +243,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | integrity/rules/IR-051-executor-skill-notation-misrecognition.md | 20 | accepted | integrity |
 | integrity/rules/IR-053-gh-direct-invocation-detection.md | 20 | accepted | integrity |
 
-計測日: 2026-08-18。
+計測日: 2026-08-19。
 <!-- AUTOGEN:END -->
 
 SPEC 行数は frontmatter、HTML コメントを除く本文行数。
