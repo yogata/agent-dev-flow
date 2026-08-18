@@ -16,6 +16,7 @@ import {
   expect,
 } from "bun:test";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 
 const SCRIPT_DIR = import.meta.dir;
@@ -667,6 +668,33 @@ describe("TS-009: エンコーディング不整合検出", () => {
     }
     expect(findings).toEqual([]);
   });
+
+  it("契約: 再帰スキャンは node_modules 系ディレクトリを除外する", () => {
+    // checker 実行契約 SPEC「検出対象除外規定」: node_modules 系 git 管理外
+    // ディレクトリはスキャン対象から除外する。main 作業ディレクトリでは
+    // src/opencode/skills/*/scripts/node_modules/ 配下の依存パッケージ README
+    // （CRLF/LF 混在）が恒常 fail の原因となるため、除外を契約テストで固定する。
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ts009-node-modules-"));
+    try {
+      fs.mkdirSync(path.join(tempRoot, "skills", "normal"), { recursive: true });
+      fs.mkdirSync(
+        path.join(tempRoot, "skills", "demo", "scripts", "node_modules", "@types", "bun"),
+        { recursive: true },
+      );
+      fs.writeFileSync(path.join(tempRoot, "skills", "normal", "SKILL.md"), "# normal\n", "utf-8");
+      fs.writeFileSync(
+        path.join(tempRoot, "skills", "demo", "scripts", "node_modules", "@types", "bun", "README.md"),
+        "line1\r\nline2\nline3\r\n",
+        "utf-8",
+      );
+      const collected = collectMarkdownFiles(tempRoot);
+      expect(collected).toEqual([
+        path.join(tempRoot, "skills", "normal", "SKILL.md"),
+      ]);
+    } finally {
+      fs.rmSync(tempRoot, { recursive: true, force: true });
+    }
+  });
 });
 
 function collectMarkdownFiles(dir: string): string[] {
@@ -675,6 +703,9 @@ function collectMarkdownFiles(dir: string): string[] {
   for (const ent of entries) {
     const full = path.join(dir, ent.name);
     if (ent.isDirectory()) {
+      // checker 実行契約 SPEC「検出対象除外規定」: node_modules 系 git 管理外
+      // ディレクトリはスキャン対象から除外する。
+      if (ent.name === "node_modules") continue;
       result.push(...collectMarkdownFiles(full));
     } else if (ent.isFile() && ent.name.endsWith(".md")) {
       result.push(full);
