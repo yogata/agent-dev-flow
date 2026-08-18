@@ -54,7 +54,7 @@ case-close workflow は次の STEP で構成する。Epic Wave クローズは S
 | STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR、HEAD commit hash 記録、コンフリクト Level 1 解消 or case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
 | STEP-5 | Post-merge・Issue クローズ | PR マージ完了 | CI 通過確認、Issue 本文更新、Issue close | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
 | STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/branch 削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、`.agentdev/` 永続化、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
-| STEP-E1〜E6 | Epic Wave クローズ（E4-0 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-0 gate 違反子Issue は `blocked` でマージ対象外）、Epic status table 更新、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
+| STEP-E1〜E6 | Epic Wave クローズ（E4-1 配布依存境界 最終 gate 含む） | Epic Issue 番号受領、ステータス追跡テーブル存在 | 現在 Wave の子Issue 一括マージ・クローズ（E4-1 gate 違反子Issue は `blocked` でマージ対象外）、Epic status table 更新、最終 Wave 判定 | [references/epic-wave-close.md](references/epic-wave-close.md) |
 
 ### STEP 間の依存と分岐
 
@@ -64,7 +64,7 @@ case-close workflow は次の STEP で構成する。Epic Wave クローズは S
 
 ### 共通事前マージ gate（両ルート共通、DEC-{N}、配布依存境界 SPEC）
 
-配布依存境界の最終 gate は single-Issue ルート（STEP-3-1）と Epic Wave ルート（STEP-E4-0）の両方で、PR マージ前に必ず経由する共用事前マージ seam である。両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run command Step 7-1 と case-close で同一 detector を再利用）。gate 違反時は両ルートとも PR マージを停止する。
+配布依存境界の最終 gate は single-Issue ルート（STEP-3-1）と Epic Wave ルート（STEP-E4-1）の両方で、PR マージ前に必ず経由する共用事前マージ seam である。両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run command Step 7-1 と case-close で同一 detector を再利用）。gate 違反時は両ルートとも PR マージを停止する。
 
 ### resume protocol
 
