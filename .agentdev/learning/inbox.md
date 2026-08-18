@@ -84,3 +84,35 @@
 - **想定反映先**: agentdev-quality-gates SPEC の full integrity suite 運用、case-close STEP-3-1 の full integrity suite 実行手順
 - **関連**: PR 2261、Issue 2214、docs/specs/skills/agentdev-quality-gates.md
 - **タグ**: #bun-test #count-check #worktree
+
+## backlog 統合バッチの旧スナップショット分析から生成した Issue が作成時点で解消済みになる
+
+- **問題事象**: OU-0027（Issue 2222）の2成果物（テスト期待値更新・Epic 2134 クローズ）は、いずれも Issue 作成（2026-08-18 10:59 UTC）より前に PR 2155（08-16 02:26 マージ）と Epic クローズ（08-16 02:43）で完了していた。元分析（RU-0072）は PR 2155 マージ前のスナップショット由来で、no-change 完了（PR なし・完了判定記録コメントで close）となった。
+- **発生局面**: backlog-review（RU 生成）、case-open（Issue 作成）
+- **検知方法**: case-run 実行前の現状再検証で、期待値リテラルが実番号形式「### STEP-3-1:」へ更新済みであることと Epic 2134 が CLOSED であることを確認
+- **根本原因**: backlog 統合バッチで旧スナップショット由来の分析（RU）から Issue を生成する際、Issue 作成時点の最新 main での再検証を経ないまま Issue 化した
+- **自律対応内容**: 完了判定記録コメント（issuecomment-5329083755）を SSoT として no-change 完了扱いとし、PR 作成不能（同一 HEAD 間は GitHub が拒否）の制約を記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: 分析から Issue 生成まで時間差がある経路（backlog 統合バッチ）では、Issue 作成時に主要な完了条件を最新 main で再検証する工程が重複 Issue を防ぐ
+- **再発条件**: 旧スナップショット由来の RU から生成した Issue の対象が、生成前のマージで既に解消している場合
+- **予防策候補**: case-open（backlog 経路）に Issue 作成前の完了条件現状確認（already-done 検出）を組み込む
+- **想定反映先**: agentdev-workflow-case-open の preflight、agentdev-backlog-integration
+- **関連**: Issue 2222、RU-0072、PR 2155、Epic 2134、Issue 2219（同型の no-change 完了）
+- **タグ**: #backlog #case-open #freshness
+
+## PR 検証時 base とマージ時点 main の checker NG 状態が乖離する（base drift）
+
+- **問題事象**: PR 2260 の検証（base = origin/main 27e8d199）では lint_skills.ts は NG 0 だったが、マージ後 main（1e3d9729）では AG-005 NG 1件（agentdev-git-worktree/references/worktree-operations.md、336行・目次なし）が検出された。差の原因は検証 base とマージ時点の間にマージされた PR 2257（bcb72c07）が当該ファイルを目次なし336行に成長させたこと。PR 本文の「NG 0」は検証 base 時点では正当。
+- **発生局面**: 実装（case-run の checker 検証）、レビュー（case-close の post-merge 検証）
+- **検知方法**: case-close の post-merge（main）checker 再実行で NG を検出。git log で worktree-operations.md の最終変更（bcb72c07）が両 PR（#2259/#2260）の変更対象外かつ task baseline 9813eba0 の祖先であることを確認
+- **根本原因**: checker 検証は検証時点の base ツリーに対する絶対判定であり、並行マージされる他 PR が checker 状態を変化させ得る
+- **自律対応内容**: Epic 完了条件3 の評価スコープ（AG-004 検出語統一）には影響しないことを確認し、AG-005 NG は Findings + intake item 化して記録した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし
+- **横展開観点**: PR 本文の checker 合格記録は「検証 base 時点」の証拠。マージ後に checker 状態が変わる可能性があるため、case-close の post-merge checker 再実行（main）は base drift 検出の実効手段
+- **再発条件**: PR 検証からマージの間に、checker 違反を増やす他 PR が main へマージされる場合
+- **予防策候補**: case-close の post-merge 検証で lint_skills/check_workflow_preventive を main で再実行し、PR 検証時と差分があれば由来分類して記録する
+- **想定反映先**: agentdev-workflow-case-close の Epic Wave クローズ E4 手順
+- **関連**: PR 2260、PR 2257、Epic 2218、Issue 2220
+- **タグ**: #case-close #checker #base-drift
