@@ -53,6 +53,12 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 5. 配置判断フロー（実行時配布物か → Skill/Script/Template、authoring-only か → SPEC/ADR/Guide）で配置先を確定
 6. レビュープロトコル（frontmatter、予算、構造、助言、サブエージェント編集安全性）で検証
 
+## 記述削減・抽象化の前段チェック（固定トークン事前 grep）
+
+既存の配布物本文（SKILL.md、references、command、template 等）の記述削減・抽象化の前に、対象ファイルを参照する `*.test.ts`・checker の固定トークンを事前 grep して影響を確認する（必須ステップ）。自動化は必須とせず、影響判断を含むため手順の明文化を主体とする。
+
+grep 対象の代表例は routing token（検査器エントリポイント、CLI 引数、result 状態語）、期待値固定セクション（テスト・checker が期待値として保持する見出し・セクション文言）、概念名文字列（`content.includes` 由来の責務・契約の概念名）。手順と両立運用の回避パターンは [references/development-workflow.md](references/development-workflow.md) を参照。
+
 ## reference選択表
 
 通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
@@ -61,7 +67,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 |---|---|
 | 設計原則の詳細（簡潔さ、自由度、トークン予算、行数ガバナンス、抽出ルール）、命名規則、description 記述、トリガー設計、複雑度分類、段階的開示、配置判断フロー、スキル粒度と参照妥当性、参照記述ルール（command→skill、skill→command、See Also 記述規約）が必要な場合 | [references/design-principles.md](references/design-principles.md) |
 | レビュープロトコル（frontmatter、予算、構造、助言のチェックリスト）、frontmatter `name:` バッククォート禁止規定、サブエージェント編集安全性（worktree 内制約、パスプレフィクス確認、ファイル存在確認）、品質評価5軸の詳細が必要な場合 | [references/review-protocol.md](references/review-protocol.md) |
-| 開発ワークフロー（反復開発、フィードバックループ、評価先行構築、テンプレートパターン Strict/ Flexible、条件付きワークフロー）、アンチパターン一覧（8パターン）が必要な場合 | [references/development-workflow.md](references/development-workflow.md) |
+| 開発ワークフロー（反復開発、フィードバックループ、評価先行構築、テンプレートパターン Strict/ Flexible、条件付きワークフロー）、記述削減・抽象化の前段チェック（固定トークン事前 grep、両立運用の回避パターン）、アンチパターン一覧（8パターン）が必要な場合 | [references/development-workflow.md](references/development-workflow.md) |
 
 ## コマンドとスキルの境界
 
@@ -77,7 +83,7 @@ SKILL.md 本文から遅延読み込みされる詳細資料。各ファイル�
 |---|---|
 | [references/design-principles.md](references/design-principles.md) | 設計原則、命名規則、description/ トリガー設計、複雑度分類、段階的開示、配置判断フロー、スキル粒度、参照記述ルール |
 | [references/review-protocol.md](references/review-protocol.md) | レビュープロトコル（frontmatter、予算、構造、助言、サブエージェント編集安全性のチェックリスト）、品質評価5軸 |
-| [references/development-workflow.md](references/development-workflow.md) | 開発ワークフロー（反復開発、フィードバックループ、評価先行構築、テンプレートパターン）とアンチパターン一覧 |
+| [references/development-workflow.md](references/development-workflow.md) | 開発ワークフロー（反復開発、フィードバックループ、評価先行構築、テンプレートパターン）、記述削減・抽象化の前段チェック（固定トークン事前 grep）、アンチパターン一覧 |
 
 ## See Also
 
