@@ -49,6 +49,7 @@ Epic Issue 本文を読み込み、ステータス追跡テーブル（`agentdev
 各子Issue の PR マージへ進む前に、当該 PR の変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、配布依存境界の最終 gate を実行する。含まない PR（docs のみ等）ではスキップする。trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run command Step 7-1 と同一）。手続きの正規所有者は STEP-3-1（[docs-and-spec-promotion.md](docs-and-spec-promotion.md)）であり、本 STEP は同一手続きを Epic Wave の各子Issue に適用する。
 
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`。検査対象は当該子Issue PR の HEAD（マージ前の実際の PR ブランチ内容）。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査する
+- **checker コマンドの stdout 退避形式**: 本 gate の checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。非ゼロ exit 時も JSON レポートを証跡として保持する（手続きの正規所有者は STEP-3-1 と同一）
 - **`--profile source`**: case-close は PR マージ前に実行され、配布ソース面を検査するため `source` を使用する（junction は原本への鏡像）
 - **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う。clean として通過させない
 - **gate 違反時**: 当該子Issue の PR マージを中止し、PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run command Step 7-1 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）。当該子Issue は後続 E4-1 シーケンスへ進めず、E5 Epic status table で `blocked` 状態として記録する（`agentdev-epic-tracker` 準拠、`completed` へ上書きしない、べき等性）

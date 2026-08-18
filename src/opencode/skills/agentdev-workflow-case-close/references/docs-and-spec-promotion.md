@@ -88,6 +88,8 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 - `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルが配布 command/skill ソース面に含まれる場合に実行）
 - test_strategy（QG-4 完了条件確認）
 
+**checker コマンドの stdout 退避形式**: 上記 checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出等の観測対象）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。非ゼロ exit 時も JSON レポート（stdout）を Evidence として保持し、`>` リダイレクトや PowerShell 変数格納で退避しない。
+
 ## Evidence
 
 - targeted docs guard、check_extensions.ts、check_distribution_boundary.ts の各 JSON 結果、SPEC 確定フローの処理パターン（a/b/c）

@@ -45,6 +45,8 @@
 ### execSync バイパス
 
 - `gh` コマンドの出力取得には Node.js `child_process.execSync` を使用する（pwsh パイプラインをバイパスして gh CLI の生の UTF‑8 出力を直接取得するため）
+- **ネイティブコマンド全般への拡張**: 本バイパス経路は gh CLI に限定しない。pwsh 経由でネイティブコマンド（git CLI、bun、node 等）の出力を読み取る READ 操作全般に適用する（READ 手続き Section 3「適用範囲（gh CLI からネイティブコマンド全般への拡張）」参照）
+- **exit code が意味を持つコマンドは `spawnSync`**: 検証・検査コマンド等、非ゼロ exit が観測すべき結果として意味を持つコマンドは `execSync` ではなく `spawnSync`（status/ stdout 分離取得）を使用する（READ 手続き Section 3「exit code が意味を持つコマンドの stdout 退避形式」参照）
 
 ### PowerShell パイプライン READ の [Console]::OutputEncoding 前置
 
@@ -189,6 +191,38 @@ PowerShellがバッククォートをコマンド置換として解釈するた�
  **注**: 退避策（Section 3 項目7）による `.js` スクリプトファイル内では、テンプレートリテラルの使用は許可される。
 
  **パイプライン経由 READ の前置**: PowerShell パイプライン経由で日本語出力を読み取る READ 操作（`git show`、`Get-Content`、`Select-String` 等）は、パイプライン前の `[Console]::OutputEncoding` 前置、または Node.js `execSync` / `fs.readFileSync` 経路のいずれかを必須とする（「Windows 固有の制約」の「PowerShell パイプライン READ の [Console]::OutputEncoding 前置」節参照）。
+
+#### 適用範囲（gh CLI からネイティブコマンド全般への拡張）
+
+READ 安全手順（本 Section 3、Section 4）は gh CLI の READ に限定せず、pwsh（Windows PowerShell 5.x / pwsh 7）経由でネイティブコマンド（gh CLI、git CLI、bun、node 等）の出力を読み取る操作全般に適用する。適用経路は読み取り対象コマンドの性質により次の2つに分かれる。
+
+- **単発 READ（成功が見込めるもの）**: gh CLI の本文読込等、コマンド成功を前提とした単発 READ は従来どおり `execSync` 経路（項目1）を維持する
+- **exit code が意味を持つコマンド**: 検証・検査コマンド等、非ゼロ exit が観測すべき結果として意味を持つコマンドは次項の `spawnSync` 経路を標準とする
+
+#### exit code が意味を持つコマンドの stdout 退避形式
+
+**背景**: `execSync` は非ゼロ exit で例外を投げるため、stdout は例外オブジェクトのプロパティ経由でしか取得できず、例外処理を誤ると出力が失われる。検証・検査コマンド（integrity checker、test、`git diff --check` 等）では非ゼロ exit 時の stdout（JSON レポート、違反明細）こそが判定と証跡に必要となる（PR #1600/#2172 系、Epic #1719 Wave 4 の再発防止）。
+
+**標準形式**: `spawnSync` で status と stdout を分離取得し、`fs.writeFileSync` の第3引数に `'utf8'` を明示指定して UTF‑8（BOMなし）で一時ファイルへ退避する:
+
+```
+node -e "const{spawnSync}=require('child_process');const fs=require('fs');const r=spawnSync('bun',['run','.opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts','--workflow','case-run','--base-ref','origin/main','--json'],{encoding:'utf8'});fs.writeFileSync('.agentdev/tmp/cmd-stdout-{timestamp}.json',r.stdout,'utf8')"
+```
+
+- **status と stdout の分離判定**: exit code は `r.status` で判定する（`null` は起動失敗）。`r.status` の判定と stdout の解析（JSON レポートの読み取り）を分離して実施し、非ゼロ exit（違反検出等）時も stdout を証跡として保持する
+- **stderr の退避**: `r.stderr` は失敗診断に使用する。必要に応じて同一形式で退避する
+- **読み取りと cleanup**: 退避した一時ファイルを Read tool で読み取り、読み取り完了後に削除する（項目2〜3と同一）
+- **保存形式**: UTF‑8（BOMなし）、改行コード LF（項目4と同一）
+- **委譲時の配置先**: worktree 隔離境界により `.agentdev/**` への書き込みが禁止される場面では、Section 2 Step 1「委譲時の代替一時ファイル配置先」に従い `$env:TEMP` 配下へ退避する
+- **クォート競合**: コマンド引数にシングルクォートやパイプを含む場合は項目5〜8のクォート競合回避に従う
+- **`>` リダイレクトでの退避は禁止**: PowerShell の `>` リダイレクト、`2>&1` 等による stdout 退避は使用禁止（Section 4 と同一理由。パイプライン経由のエンコーディング変換で日本語が文字化けするため）
+
+#### execSync 維持境界
+
+`execSync` を全面禁止とはしない。維持境界は次のとおりとし、対象コマンドがどちらに該当するかを判定して経路を選択すること。
+
+- **維持（`execSync`）**: 成功が見込める単発 READ。gh CLI の本文読込・補助データ読込等、非ゼロ exit が例外的失敗のみを意味するコマンドの READ
+- **切替（`spawnSync`）**: exit code が意味を持つコマンド。非ゼロ exit が観測すべき結果として設計された検証・検査コマンド（integrity checker、test、`git diff --check` 等）の実行と stdout 取得
 
 ### 4. 読み取り禁止事項
 
