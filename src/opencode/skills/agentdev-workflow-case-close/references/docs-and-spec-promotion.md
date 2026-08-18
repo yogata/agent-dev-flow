@@ -69,6 +69,15 @@ PR 変更ファイルが `--profile source` の配布 command/skill ソース面
 - **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う。clean として通過させない。違反時はマージを停止しユーザー判断を仰ぐ
 - **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run command Step 7-1 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
 
+#### full integrity suite 実行（bun test 実行形態契約）
+
+QG-4 の full integrity suite 合格基準により検証スイート全体（bun test 全件）を実行する場合、bun test 実行形態契約に従う。
+
+- **実行コマンド**: `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`。`./` prefix 付きで対象ディレクトリを明示指定する（必須ステップ）
+- **N/M 件数突合**: 実行結果の「Ran N tests across M files」の N/M 件数突合を実施する（必須ステップ）。直前実績と比較して件数が急減していないかの妥当性を検証する。固定値の期待値化は行わない
+- **証拠記録**: 実行 cwd と起動コマンド形式（prefix・パス指定を含む）を PR 本文のテスト結果の証拠へ明記する
+- **cwd 依存テスト混在スイートの運用注記**: 対象スイートには cwd 依存テストが混在するため、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない
+
 ### STEP-3-2: SPEC 確定フロー
 
 PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録）を読み取り、SPEC の確定、昇格を処理する。セクション不存在・空の場合はスキップ。
@@ -86,15 +95,18 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 - `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行）
 - `check_extensions.ts`（配布物パターンのいずれかを変更した場合に実行）
 - `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルが配布 command/skill ソース面に含まれる場合に実行）
+- `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`（full integrity suite 実行、QG-4 合格基準による検証で実行）
 - test_strategy（QG-4 完了条件確認）
 
 ## Evidence
 
 - targeted docs guard、check_extensions.ts、check_distribution_boundary.ts の各 JSON 結果、SPEC 確定フローの処理パターン（a/b/c）
+- full integrity suite 実行時: 「Ran N tests across M files」の N/M 件数突合結果、実行 cwd と起動コマンド形式
 
 ## Completion Verification
 
 - targeted docs guard の `failures` に strict severity を含まないこと。check_extensions.ts の違反がないこと。配布依存境界 最終 gate が合格（または違反時はマージ停止）であること
+- full integrity suite 実行時: N/M 件数突合にて直前実績と比較して件数の急減がないことを確認済みであること
 
 ## Resume-Idempotency
 
