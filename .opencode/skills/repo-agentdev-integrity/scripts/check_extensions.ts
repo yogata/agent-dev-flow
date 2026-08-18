@@ -155,13 +155,24 @@ interface ExtensionsNgBaseline {
   entries: ExtensionsNgBaselineEntry[];
 }
 
-function extBaselineKey(
+// OU-0008 (Issue #2206): パス bucket key の環境依存対策（SPEC integrity-contracts
+// 「baseline entry 運用契約」第2点）。check_integrity.ts と同じ正規化で
+// `.opencode/...` 表記と `src/opencode/...` 表記を相対パス基準へ統一する。
+function normalizeExtBaselineFilePath(file: string | null): string {
+  if (!file) return "";
+  const unified = file.replace(/\\/g, "/").replace(/^\.\//, "");
+  return unified.startsWith(".opencode/")
+    ? unified.replace(/^\.opencode\//, "src/opencode/")
+    : unified;
+}
+
+export function extBaselineKey(
   check: number,
   checkName: string,
   file: string | null,
   message: string | null,
 ): string {
-  return `${check}\t${checkName}\t${file ?? ""}\t${message ?? ""}`;
+  return `${check}\t${checkName}\t${normalizeExtBaselineFilePath(file)}\t${message ?? ""}`;
 }
 
 function loadExtensionsNgBaseline(

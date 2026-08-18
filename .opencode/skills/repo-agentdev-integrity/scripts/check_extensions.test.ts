@@ -16,6 +16,7 @@ import {
   resolveExtensionState,
   runExtensionScenarios,
   deriveSkillClassification,
+  extBaselineKey,
 } from "./check_extensions.ts";
 import * as path from "path";
 import * as fs from "fs";
@@ -103,5 +104,35 @@ describe("runExtensionScenarios (TS-006 extension scenarios)", () => {
     } finally {
       fs.rmSync(baseDir, { recursive: true, force: true });
     }
+  });
+});
+
+// Issue #2206 (OU-0008): パス bucket key の環境依存対策。`.opencode/...`（main
+// junction 環境）と `src/opencode/...`（worktree fallback 環境）の表記差異が
+// baseline bucket key 比較で解消されることを固定する。
+describe("extBaselineKey path normalization (Issue #2206, OU-0008)", () => {
+  test("unifies .opencode/ and src/opencode/ notations into one bucket key", () => {
+    const projection = extBaselineKey(
+      3,
+      "id-target-consistency",
+      ".opencode/commands/agentdev/case-close.md",
+      "same message",
+    );
+    const source = extBaselineKey(
+      3,
+      "id-target-consistency",
+      "src/opencode/commands/agentdev/case-close.md",
+      "same message",
+    );
+    expect(projection).toBe(source);
+  });
+
+  test("normalizes backslash separators; null file stays empty", () => {
+    expect(
+      extBaselineKey(1, "check", ".opencode\\skills\\agentdev-x\\SKILL.md", null),
+    ).toBe(
+      extBaselineKey(1, "check", "src/opencode/skills/agentdev-x/SKILL.md", null),
+    );
+    expect(extBaselineKey(1, "check", null, "m")).toBe("1\tcheck\t\tm");
   });
 });
