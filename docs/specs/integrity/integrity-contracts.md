@@ -378,7 +378,7 @@ NG baseline は v2:REQ-0161-005（旧 `docs/requirements/v2:REQ-0161.md`、現 `
 NG baseline entry の運用は次の契約に従う。
 
 1. entry 追加は機械生成を必須とし、手書きによる追加を行わない。`--update-ng-baseline --ng-baseline-additions` が manifest 入力から provenance・reason を付与して生成する。手書き追加は NG 隠蔽（禁止）と同様に扱う
-2. パス bucket key は環境依差を含む。worktree と main でパス表記が変化する場合、正規化（相対パス基準への統一）または unmatched additions / unmanaged delta 対警告により検知可能にする。bucket key 仕様自体（category/check/file/evidence の4組）は維持する
+2. パス bucket key は環境依存差を含む。worktree と main でパス表記が変化する場合、正規化（相対パス基準への統一）または unmatched additions / unmanaged delta 対警告により検知可能にする。bucket key 仕様自体（category/check/file/evidence の4組）は維持する
 3. baseline の生成環境を前提として明示する。worktree 環境で生成した baseline は main 環境（junction 実在環境）で新規未管理 NG が 0 件であることを確認してから確定する
 4. 由来ラベル（legacy、superseded、AUTOGEN、実欠陥等）と報告分類（baseline-known 降格、approved additions、新規未管理）の対応を明確に保つ。承認済み entry の解消（実装修復完了）後は当該 entry を除去する（ratchet の純減）
 

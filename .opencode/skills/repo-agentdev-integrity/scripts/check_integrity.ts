@@ -32,30 +32,27 @@ import {
   CATALOG_PRE_BLOCK_ID,
   CATALOG_POST_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
-  collectAdrFiles,
-  collectRetiredAdrFiles,
+  collectDecisionFiles,
+  collectRetiredDecisionFiles,
   collectReqFiles,
   collectRetiredReqFiles,
-  countSpecFiles,
-  generateAdrBaselineCaption,
-  generateAdrBaselineTable,
-  generateAdrStatusList,
-  generateAdrRetiredTable,
+  generateDecisionBaselineCaption,
+  generateDecisionBaselineTable,
+  generateDecisionStatusList,
+  generateDecisionRetiredTable,
   generateReqActiveCaption,
   generateReqActiveTable,
   generateReqRetiredTable,
-  generateDocMapInventory,
-  ADR_BASELINE_COUNT_BLOCK_ID,
-  ADR_BASELINE_TABLE_BLOCK_ID,
-  ADR_STATUS_ACCEPTED_BLOCK_ID,
-  ADR_STATUS_PROPOSED_BLOCK_ID,
-  ADR_STATUS_SUPERSEDED_BLOCK_ID,
-  ADR_STATUS_DEPRECATED_BLOCK_ID,
-  ADR_RETIRED_TABLE_BLOCK_ID,
+  DECISION_BASELINE_COUNT_BLOCK_ID,
+  DECISION_BASELINE_TABLE_BLOCK_ID,
+  DECISION_STATUS_ACCEPTED_BLOCK_ID,
+  DECISION_STATUS_PROPOSED_BLOCK_ID,
+  DECISION_STATUS_SUPERSEDED_BLOCK_ID,
+  DECISION_STATUS_DEPRECATED_BLOCK_ID,
+  DECISION_RETIRED_TABLE_BLOCK_ID,
   REQ_ACTIVE_COUNT_BLOCK_ID,
   REQ_ACTIVE_TABLE_BLOCK_ID,
   REQ_RETIRED_TABLE_BLOCK_ID,
-  DOCMAP_INVENTORY_BLOCK_ID,
   REQ_METRICS_BLOCK_ID,
   SPEC_METRICS_BLOCK_ID,
   collectReqMetrics,
@@ -1470,6 +1467,24 @@ function checkSpecsExistence(specsDir: string, root: string): CheckResult[] {
   return results;
 }
 
+// ─── History record exemption (checker 実行契約 SPEC 検出対象除外規定) ────────
+// 監査記録・baseline は歴史記録として retired 参照系検出（retired-req-as-current、
+// retired-req-primary-ref 等）の免除対象とする。除外列挙は checker 実行契約 SPEC
+// （docs/specs/integrity/checker-execution-contracts.md「検出対象除外規定」）が
+// 正規所有し、列挙外の除外を本実装で追加しない（check_changed_docs.ts isSpecFile
+// と同一の判定規定）:
+//   - 配置ディレクトリ: docs/specs/integrity/audits/、baselines/（歴史記録領域）
+//   - frontmatter 信号キー: baseline_for / audit_for（snapshot・監査記録の起源標識）
+const SPEC_HISTORY_DIR_RE = /^docs\/specs\/integrity\/(audits|baselines)\//;
+const SPEC_HISTORY_FRONTMATTER_KEY_RE = /^(?:baseline_for|audit_for)\s*:/m;
+
+function isExemptHistoryRecord(relPath: string, content: string): boolean {
+  if (SPEC_HISTORY_DIR_RE.test(relPath)) return true;
+  const fmEnd = content.startsWith("---") ? content.indexOf("\n---", 3) : -1;
+  if (fmEnd === -1) return false;
+  return SPEC_HISTORY_FRONTMATTER_KEY_RE.test(content.slice(0, fmEnd));
+}
+
 // ─── Link integrity checks (v2:REQ-0108-013) ────────────────────────────────
 
 function collectAllArtifactPaths(root: string): string[] {
@@ -1743,6 +1758,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
         !relPath.startsWith("docs/adr/retired/") &&
         !relPath.startsWith("docs/adr/README.md") &&
         !relPath.startsWith("docs/adr/ADR-") && // ADRs discuss retired predecessors historically
+        !isExemptHistoryRecord(relPath, content) && // 監査記録・baseline は歴史記録として免除
         appearsOutsideRetired &&
         !(relPath.startsWith("docs/adr/ADR-") && isSupersededAdr(filePath, ref))
       ) {
@@ -1784,6 +1800,7 @@ function checkLinkIntegrity(root: string): CheckResult[] {
         !fs.existsSync(activePath) &&
         !relPath.startsWith("docs/requirements/retired/") &&
         !relPath.startsWith("docs/adr/ADR-") && // ADRs discuss REQ reorganization historically
+        !isExemptHistoryRecord(relPath, content) && // 監査記録・baseline は歴史記録として免除
         appearsOutsideRetired &&
         !isReqRangeContext // v2:REQ-0108-194: REQ range references like "REQ-0101 through REQ-0116"
       ) {
@@ -1984,6 +2001,7 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
     if (relPath.startsWith("docs/adr/ADR-")) continue; // ADRs discuss REQ reorganization historically
     const content = readText(filePath);
     if (!content) continue;
+    if (isExemptHistoryRecord(relPath, content)) continue; // 監査記録・baseline は歴史記録として免除
     const contentLines = content.split("\n");
     const refs = content.match(/\bREQ-\d{3,4}\b/g) || [];
     const uniqueRefs = [...new Set(refs)];
@@ -4892,6 +4910,7 @@ function checkSkillCategoryGap(
     ["Accepted ADR 引用", ["AcceptedAdrOnlyCitation"]],
     ["Workflow template 構造", ["checkNaming", "checkFrontmatter", "checkSectionMarkers"]],
     ["Skill 構造", ["lintSkill"]],
+    ["AG-005 規則群", ["Ag005"]],
     ["Junction 整合性", ["BrokenJunctions"]],
     ["Capture boundary", ["CaptureBoundaryReference", "PrTemplateCaptureSection", "CommandCaptureDuties"]],
     ["REQ verification basis", ["ReqVerificationBasis"]],
@@ -7408,13 +7427,27 @@ interface NgBaselineReport {
   newNg: number;
 }
 
+// OU-0008 (Issue #2206): パス bucket key の環境依存対策（SPEC integrity-contracts
+// 「baseline entry 運用契約」第2点）。main 環境（junction projection 実在）は
+// `.opencode/...` 表記、worktree 環境（junction 未伝播、§7.3 fallback）は
+// `src/opencode/...` 表記で同一ファイルを報告するため、bucket key 比較時のみ
+// 表記を正規化して相対パス基準へ統一する。bucket key 仕様自体
+// （category/check/file/evidence の4組）は維持する。
+function normalizeNgBaselineFilePath(file: string | null): string {
+  if (!file) return "";
+  const unified = file.replace(/\\/g, "/").replace(/^\.\//, "");
+  return unified.startsWith(".opencode/")
+    ? unified.replace(/^\.opencode\//, "src/opencode/")
+    : unified;
+}
+
 function ngBaselineKey(
   category: string,
   check: string,
   file: string | null,
   evidence: string | null,
 ): string {
-  return `${category}\t${check}\t${file ?? ""}\t${evidence ?? ""}`;
+  return `${category}\t${check}\t${normalizeNgBaselineFilePath(file)}\t${evidence ?? ""}`;
 }
 
 // Normalize a parsed entry to fill provenance/reason for backward compat with
@@ -7565,7 +7598,13 @@ function applyNgBaseline(
   const baselineIndex = new Map<string, { count: number; provenance: string }>();
   for (const entry of baseline.entries) {
     const key = ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
-    baselineIndex.set(key, { count: entry.count, provenance: entry.provenance });
+    // OU-0008 (Issue #2206): 正規化により `.opencode/` 表記 entry と
+    // `src/opencode/` 表記 entry が同一 bucket へ衝突する場合、両者は同一論理 NG の
+    // 環境別観測であるため count の大きい方（通常は同数）を採用する。
+    const prev = baselineIndex.get(key);
+    if (!prev || entry.count > prev.count) {
+      baselineIndex.set(key, { count: entry.count, provenance: entry.provenance });
+    }
   }
 
   const currentSummary = summarizeNgResults(results);
@@ -7627,10 +7666,13 @@ function updateNgBaseline(
 
   const index = new Map<string, NgBaselineEntry>();
   for (const entry of baseline.entries) {
-    index.set(
-      ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence),
-      entry,
-    );
+    const key = ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
+    // OU-0008 (Issue #2206): 正規化で同一 bucket へ衝突する環境別表記 entry は
+    // 同一論理 NG として count の大きい方を採用する。
+    const prev = index.get(key);
+    if (!prev || entry.count > prev.count) {
+      index.set(key, entry);
+    }
   }
 
   // Current NG counts per bucket — used to cap the merged baseline count so a
@@ -8310,33 +8352,32 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
     }
   }
 
-  // AG-008: ADR README (docs/adr/README.md) — 7 AUTOGEN blocks
-  const adrDir = path.join(root, "docs", "adr");
-  const adrRetiredDir = path.join(adrDir, "retired");
-  const adrReadmePath = path.join(adrDir, "README.md");
-  const adrReadmeContent = readText(adrReadmePath);
-  if (adrReadmeContent !== null && fs.existsSync(adrDir)) {
-    const adrInfos = collectAdrFiles(adrDir);
-    const adrRetiredInfos = collectRetiredAdrFiles(adrRetiredDir);
-    const acceptedAdrs = adrInfos.filter((a) => a.status === "accepted");
-    const adrSpecs: AutogenBlockSpec[] = [
-      { blockId: ADR_BASELINE_COUNT_BLOCK_ID, expected: generateAdrBaselineCaption(acceptedAdrs), label: "adr-baseline-count" },
-      { blockId: ADR_BASELINE_TABLE_BLOCK_ID, expected: generateAdrBaselineTable(acceptedAdrs), label: "adr-baseline-table" },
-      { blockId: ADR_STATUS_ACCEPTED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "accepted"), label: "adr-status-accepted" },
-      { blockId: ADR_STATUS_PROPOSED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "proposed"), label: "adr-status-proposed" },
-      { blockId: ADR_STATUS_SUPERSEDED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "superseded"), label: "adr-status-superseded" },
-      { blockId: ADR_STATUS_DEPRECATED_BLOCK_ID, expected: generateAdrStatusList(adrInfos, "deprecated"), label: "adr-status-deprecated" },
-      { blockId: ADR_RETIRED_TABLE_BLOCK_ID, expected: generateAdrRetiredTable(adrRetiredInfos), label: "adr-retired-table" },
+  // AG-008 (DEC-009): Decision README (docs/decisions/README.md) — 7 AUTOGEN blocks
+  const decisionsDir = path.join(root, "docs", "decisions");
+  const decisionRetiredDir = path.join(decisionsDir, "retired");
+  const decisionReadmePath = path.join(decisionsDir, "README.md");
+  const decisionReadmeContent = readText(decisionReadmePath);
+  if (decisionReadmeContent !== null && fs.existsSync(decisionsDir)) {
+    const decisionInfos = collectDecisionFiles(decisionsDir);
+    const decisionRetiredInfos = collectRetiredDecisionFiles(decisionRetiredDir);
+    const decisionSpecs: AutogenBlockSpec[] = [
+      { blockId: DECISION_BASELINE_COUNT_BLOCK_ID, expected: generateDecisionBaselineCaption(decisionInfos), label: "decision-baseline-count" },
+      { blockId: DECISION_BASELINE_TABLE_BLOCK_ID, expected: generateDecisionBaselineTable(decisionInfos), label: "decision-baseline-table" },
+      { blockId: DECISION_STATUS_ACCEPTED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "accepted"), label: "decision-status-accepted" },
+      { blockId: DECISION_STATUS_PROPOSED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "proposed"), label: "decision-status-proposed" },
+      { blockId: DECISION_STATUS_SUPERSEDED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "superseded"), label: "decision-status-superseded" },
+      { blockId: DECISION_STATUS_DEPRECATED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "deprecated"), label: "decision-status-deprecated" },
+      { blockId: DECISION_RETIRED_TABLE_BLOCK_ID, expected: generateDecisionRetiredTable(decisionRetiredInfos), label: "decision-retired-table" },
     ];
-    const adrOutcome = verifyAutogenBlocksInFile(
-      adrReadmeContent,
-      adrReadmePath,
+    const decisionOutcome = verifyAutogenBlocksInFile(
+      decisionReadmeContent,
+      decisionReadmePath,
       root,
-      adrSpecs,
+      decisionSpecs,
       foundViolation,
     );
-    results.push(...adrOutcome.results);
-    foundViolation = adrOutcome.foundViolation;
+    results.push(...decisionOutcome.results);
+    foundViolation = decisionOutcome.foundViolation;
   }
 
   // AG-009: REQ README (docs/requirements/README.md) — 3 AUTOGEN blocks
@@ -8363,34 +8404,8 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
     foundViolation = reqOutcome.foundViolation;
   }
 
-  // AG-013: DOC-MAP (docs/DOC-MAP.md) — 1 AUTOGEN block
+  // 旧 AG-013 docmap-inventory 検査は docs/DOC-MAP.md 削除（REQ-013 段階4a）に伴い除去。
   const specsDir = path.join(root, "docs", "specs");
-  const docMapPath = path.join(root, "docs", "DOC-MAP.md");
-  const docMapContent = readText(docMapPath);
-  if (docMapContent !== null) {
-    const docMapSpecs: AutogenBlockSpec[] = [
-      {
-        blockId: DOCMAP_INVENTORY_BLOCK_ID,
-        expected: generateDocMapInventory({
-          activeReqCount: fs.existsSync(reqDir) ? collectReqFiles(reqDir).length : 0,
-          retiredReqCount: fs.existsSync(reqRetiredDir) ? collectRetiredReqFiles(reqRetiredDir).length : 0,
-          activeAdrCount: fs.existsSync(adrDir) ? collectAdrFiles(adrDir).length : 0,
-          retiredAdrCount: fs.existsSync(adrRetiredDir) ? collectRetiredAdrFiles(adrRetiredDir).length : 0,
-          specCount: countSpecFiles(specsDir),
-        }),
-        label: "docmap-inventory",
-      },
-    ];
-    const docMapOutcome = verifyAutogenBlocksInFile(
-      docMapContent,
-      docMapPath,
-      root,
-      docMapSpecs,
-      foundViolation,
-    );
-    results.push(...docMapOutcome.results);
-    foundViolation = docMapOutcome.foundViolation;
-  }
 
   // AG-006 候補5 (Wave 3): req-health-metrics.md — 1 AUTOGEN block
   const qualityDir = path.join(specsDir, "quality");
@@ -8471,7 +8486,7 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
       ok(
         "IndexGenerationConsistency",
         "index-generation-consistency",
-        `索引類自動生成整合性: All AUTOGEN blocks consistent (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership=${expectedRuleOwnership.length}; ADR README + REQ README + DOC-MAP + req-health-metrics + spec-health-metrics + docs/README.md) (IR-061, SC-002 Phase C/E)`,
+        `索引類自動生成整合性: All AUTOGEN blocks consistent (catalog pre=${expectedPre.length}, post=${expectedPost.length}; rule-ownership=${expectedRuleOwnership.length}; Decision README + REQ README + req-health-metrics + spec-health-metrics + docs/README.md) (IR-061, SC-002 Phase C/E)`,
       ),
     );
   }

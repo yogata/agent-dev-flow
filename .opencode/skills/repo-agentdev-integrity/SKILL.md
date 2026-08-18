@@ -66,6 +66,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | Accepted ADR 引用 | `check_integrity.ts` | accepted 以外の ADR 引用検出（current baseline + retired 区別、推奨, REQ-0108-125, REQ-0112-050） |
 | Workflow template 構造 | `check_templates.ts` | frontmatter、必須セクション、placeholder、命名規則 |
 | Skill 構造 | `lint_skills.ts` | frontmatter name ↔ dir、USE FOR / DO NOT USE FOR、See Also |
+| AG-005 規則群 | `lint_skills.ts` | skill 記述基準（層1〜2）機械検査。hard 6規則（description 1024/600 文字上限、マーカー語・内部 ID 混入、USE FOR 二重保持、後続トリガー語（AG-004、command-bound のみ厳密検査）、300 行超 references の目次欠落）+ warn 1規則（description 集約予算 350×N）。検出規則の登録は integrity-rule-catalog「AG-005 規則群」節（REQ-0145-005 判定記録を含む）、既知違反は `baselines/lint-skills-baseline.json` で管理（delta-aware、baseline-known は info 降格） |
 | Junction 整合性 | `check_integrity.ts` | broken junction / symlink 検出（Windows junction / Unix symlink のリンク先不存在） |
 | Capture boundary | `check_integrity.ts` | capture-boundaries.md 存在確認、PR template セクション名検証、command capture 責務記述確認（REQ-0105） |
 | REQ verification basis | `check_integrity.ts` | REQ 要件行の検証基準が 規範語ではなく必達要件判定であること（REQ-0115-044） |

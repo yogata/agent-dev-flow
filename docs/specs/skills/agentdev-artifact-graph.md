@@ -289,9 +289,14 @@ project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ�
 augmentation ファイル（`.agentdev/artifact-graph.yaml`）のスキーマ拡張点を次の4系統として確定する。各拡張点は宣言的に記述し、手続き的ロジックを含めない。
 
 1. `node_types` 定義: `name`、`path_pattern`、`id_template`、`label_source`、`extraction_rule`、`role`（`index` / `aggregation`）
-2. `relation_types` 定義: `name`、`fields`、`reverse_direction`、`semantics`（意味スロット・変更影響方向・標準語彙対応）
+2. `relation_types` 定義: `name`、`fields`、`reverse_direction`、`semantics`（関係の意味、意味スロット、変更影響方向、標準語彙対応、関係制約（`source_types` / `target_types`））
 3. `indexed_paths` と `discovery_roots`（対象と探索起点の宣言）
 4. `query_settings` と `relation_constraints`（問い合わせ上限・深さの上書きと関係制約）
+
+標準コアの成果物型・関係型の意味は TIM 語彙カタログ（[../foundations/traceability-model.md](../foundations/traceability-model.md)）が正規所有する。
+augmentation は標準コアの node_type への `role` 宣言、relation_type への `semantics` 宣言を拒否する。
+抽出規則（`path_pattern`、`fields` 等）の上書きはこの限りでない。
+拡張関係型の高位問い合わせ参加区分は宣言せず、`semantics` の意味スロットと変更影響方向から導出する。
 
 ### self-hosting augmentation
 
@@ -421,6 +426,18 @@ Artifact Graph 自身の接続確認のみを workflow effectiveness の成立�
 - **未対応構造の診断**: 解析スクリプトが未対応 YAML 構造を検出し、構造種別と出現位置を診断情報として出力すること（REQ-020-002）
 - **代表質問回帰検証**: 実入力 fixture（10件）を解析スクリプトへの入力として組み込み、過去期待出力との一致を検証すること（REQ-020-003、REQ-020-005）
 - **fixture 設計原則の遵守**: 実入力 fixture が選定基準明示、配置先、再現性、機密情報除去、版管理の各原則を満たすこと（REQ-020-004）
+
+## SPEC 反映提案群の採否確定
+
+Epic #2189 の実行時に各 PR の SPEC確定候補として提起され、case-close で確定できなかった反映提案群4項目について、Issue #2203（OU-0001）の AG SPEC 確定時に採否を確定する。
+4項目とも本 SPEC の該当節へ反映済みであり、実装（`scripts/lib/`、`scripts/src/`）との突合で乖離を確認しなかったため、すべて採用とする。
+
+| 提案 | 反映先 | 採否 | 確定根拠 |
+|---|---|---|---|
+| manifest スキーマ 2.0.0 の確定 | 「決定論性と鮮度」節 | 採用 | `model.ts` の `SCHEMA_VERSION`（`2.0.0`）、manifest 必須項目、`generated_at` 非保持、同一入力からのバイト同一生成（`determinism.test.ts`）と整合する |
+| query_graph サブコマンド構成の確定 | 「問い合わせ結果の出力形式」節 | 採用 | `query_graph.ts` の構造問い合わせ5種（neighbors、path、provenance、discover、index）、プロファイル直指定、JSON 出力のみの構成と整合する |
+| augmentation スキーマ4拡張点の確定 | 「augmentation モデル」節 | 採用 | `augmentation.ts` のスキーマ（node_types、relation_types、indexed_paths と discovery_roots、query_settings と relation_constraints）と整合する |
+| 「ワークフロー利用」割当表への backlog-review 行追加 | 「ワークフロー利用」節 | 採用 | backlog-review 行（related、impact、統合・分割判定と depends_on 依存解決の補助 evidence）を割当表へ明記済みである |
 
 ## See Also
 

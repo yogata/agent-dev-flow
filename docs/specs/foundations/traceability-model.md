@@ -192,6 +192,7 @@ Trace Query 層は、独立した関係モデルを持たず本定義に従う�
 - implementation: 実現、実装、充足の系列を構成する関係型（`realizes`、`satisfies`、`implements`、探索方向は逆向き）が参加する。`specifies`、`verifies`、`validates` は参加しない。検証と妥当性確認の系列は将来の coverage 問い合わせへの統合対象とする（REQ-040-005）
 
 related は、明示的なトレースと一般参照のすべてを返すため、参加区分表から除外する（REQ-040-002）。
+探索経路からの索引・集約成果物ノードの除外は「索引・集約成果物の役割識別」節の確定値に従う。
 
 ## 関係制約
 
@@ -229,13 +230,19 @@ related は、明示的なトレースと一般参照のすべてを返すため
 **拡張関係型**とは、プロジェクト拡張によって追加されるトレースリンク型を指す。
 拡張関係型を高位問い合わせへ参加させる場合は、次の意味情報を augmentation 内に明示する（REQ-012-023）。
 
-| 必須項目 | 内容 |
-|---|---|
-| 関係型名 | 英字 snake_case。標準コア語彙と重複しないこと |
-| 関係の意味 | リンク元とリンク先の役割を含む自然言語の定義 |
-| 変更影響方向 | `forward`、`backward`、`bidirectional`、`none` のいずれか |
-| 高位問い合わせ参加区分 | related、impact、dependency、implementation への参加可否 |
-| 関係制約 | リンク元とリンク先の成果物型の組合せ。制約しない場合は「なし」と明記 |
+| 明示項目 | 必須性 | 内容 |
+|---|---|---|
+| 関係型名 | 必須 | 英字 snake_case。標準コア語彙と重複しないこと |
+| 関係の意味 | 必須 | リンク元とリンク先の役割を含む自然言語の定義 |
+| 変更影響方向 | 必須 | `forward`、`backward`、`bidirectional`、`none` のいずれか |
+| 意味スロット | 任意 | 標準コアの意味スロット ID（`general_reference`、`supersede`、`decompose`、`refine`、`specify`、`constrain`、`depend`、`realize`、`satisfy`、`implement`、`verify`、`validate`）のいずれか。依存・実現系列の走行方向の導出に使用する |
+| 標準語彙対応 | 任意 | 出典となる標準語彙。対応がない場合は空として宣言する |
+| 関係制約 | 任意 | リンク元とリンク先の成果物型の組合せ（`source_types`、`target_types`）。制約しない場合は省略する |
+
+高位問い合わせへの参加区分は宣言項目とせず、意味スロットと変更影響方向から導出する（REQ-012-022）。
+導出規則は「高位問い合わせへの参加区分」節の判断基準と同一である。
+impact は変更影響方向が `none` 以外か否かから、dependency と implementation は意味スロットの走行方向から導かれる。
+意味スロットを持たない拡張関係型は、変更影響方向が `none` 以外であれば impact にのみ参加する。
 
 ### 意味の自動推定の禁止
 
@@ -245,11 +252,14 @@ related は、明示的なトレースと一般参照のすべてを返すため
 
 ### 意味定義の例（self-hosting augmentation）
 
+参加区分の欄は宣言値ではなく、意味スロットと変更影響方向からの導出結果である。
+
 | 項目 | `delegates_to` | `governs` |
 |---|---|---|
 | 関係の意味 | リンク元が処理の一部をリンク先へ委譲する | リンク元がリンク先の内容または品質を統治する |
+| 意味スロット | `depend`（依存） | なし（ADF 固有の意味） |
 | 変更影響方向 | `backward` | `forward` |
-| 高位問い合わせ参加区分 | dependency のみ | impact のみ |
+| 導出される参加区分 | impact、dependency | impact |
 | 関係制約 | なし | なし |
 
 ## 索引・集約成果物の役割識別
@@ -271,12 +281,15 @@ README、INDEX、CATALOG 等の名称そのものではなく、この役割に�
 
 索引・集約成果物であることだけを理由として、成果物またはその関係をグラフから削除しない（REQ-012-024）。
 
-### 変更影響除外の判断基準
+### 変更影響除外と探索経路からの除外
 
 索引・集約成果物をリンク元とする包含や参照のリンクは、索引構造の記述であって当該成果物の内容の分解を意味しない。
 このようなリンクは関係意味を持たないため、impact、dependency、implementation の探索経路へ参加しない。
 変更影響等から除外する主たる判断は、成果物名ではなくトレースリンクの意味に基づく（REQ-012-024）。
-一般参照探索と明示的な索引構造問い合わせでは、引き続き利用できる。
+
+実装は、索引・集約成果物を経由する候補増幅を抑制するため、role が `index` または `aggregation` の成果物ノードを高位問い合わせ（related、impact、dependency、implementation）の探索経路から除外する（REQ-040-008）。
+除外は中間経路と到達点の両方へ適用し、グラフからの削除は行わない。
+索引・集約成果物を起点とする問い合わせ、低位問い合わせ（neighbors、path、provenance）、明示的な索引構造問い合わせ（index）では、索引・集約成果物とそこからの関係を引き続き利用できる（REQ-012-024）。
 
 ## 語彙カタログの確定（実測基準）
 
@@ -287,6 +300,14 @@ README、INDEX、CATALOG 等の名称そのものではなく、この役割に�
 - `defined_in` の `depends_on`（依存）への集約は実装側に移行残差として残る。集約完了まで `defined_in` は仕様化スロット・変更影響方向 `backward` の関係型として実装が保持し、カタログは集約完了後に当該移行行を完結する
 - 標準コア語彙は実現系列関係型（`realizes`、`satisfies`、`implements`）を含む。implementation プロファイルの参加範囲は「高位問い合わせへの参加区分」節の確定値に従う。implementation プロファイルが常に空結果となる欠陥は実装側是正として扱い、カタログ側の参加範囲変更の根拠にしない
 - 索引・集約成果物の役割識別は node_type の role 属性（`index`、`aggregation`）で表現し、専用 node_type は追加しない
+
+Issue #2203（OU-0001）の突合で確認した差分と確定記録は次のとおりである。
+影響方向の値名、標準5関係型への割当て、参加導出（`deriveProfileParticipation`）、集約規則を実装と突合した結果、参加区分は本カタログの表と一致し、解消すべき乖離は残っていない。
+
+- `extends` の依存方向の導出は、実装が具体化スロット（`refine`）の走行方向を共有して行う。導出結果（impact 参加、dependency 参加、implementation 不参加）は本カタログの参加区分表と一致しており、`extends` の意味定義（追加定義で適用範囲を広げる）を `refines` と共有するものではない
+- 実装は語彙出典の記録として、`supersedes` に Dublin Core（dct:replaces）、`extends` に UML（«extend»）を追加する。本カタログの3標準調査枠（SysML、OSLC、OpenFastTrace）を補完する出典記録であり、`supersedes` を ADF 既存語彙、`extends` を ADF 固有関係型とする本カタログの分類を変更しない
+- 標準コアの既定抽出関係型は5型（`references`、`supersedes`、`defined_in`、`contains`、`extends`）であり、カタログの採用語彙13型の残り（`refines`、`specifies`、`constrains`、`depends_on`、`realizes`、`satisfies`、`implements`、`verifies`、`validates`）は既定抽出対象に含まれない。これらの語彙でリンクを張る場合は、augmentation の relation_types 宣言（semantics による意味定義）を通じてグラフへ参加する。実現系列関係型が存在しないグラフで implementation プロファイルが空結果となる場合は正常な空結果であり、実装側欠陥ではない
+- 索引・集約成果物のデフォルトコアでの扱いは、ノード化対象に含めないと確定する。デフォルトコアの標準3成果物型は README 等の索引・集約成果物をノード化しないため、索引構造の検査、所在確認、明示的な索引構造問い合わせに索引・集約成果物を利用する場合は、augmentation が role 付きの node_type を追加して宣言する。専用 node_type は追加しない（role 属性方式を維持する）
 
 ## 語彙採用基準
 
