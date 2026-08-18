@@ -24,6 +24,7 @@ Windows 環境で WRITE 手続きを実行する場合、書き込み操作の�
 
 対象リソース（Issue/PR/コメント）の本文を取得する。
 読み取りは [standard-procedures.md](standard-procedures.md) の READ 手続き（Node.js `execSync` + 一時ファイル経由 + Read tool）に従う。
+READ 手続きは gh CLI 限定ではなくネイティブコマンド全般に適用される。検証で exit code が意味を持つコマンド（checker 等、非ゼロ exit が違反検出として観測対象になるコマンド）を実行して証跡を取る場合は、`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出しによる stdout 退避形式に従う（[standard-procedures.md](standard-procedures.md) READ 手続き「exit code が意味を持つコマンドの stdout 退避形式」参照）。
 
 - Issue本文: Issue 本文読込手続き
 - PR本文: PR 本文読込手続き
