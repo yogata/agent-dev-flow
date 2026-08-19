@@ -38,15 +38,17 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
   - (3) セッション指定キーワード（例: `req-define セッション`、`req-define 上記の内容`）: セッション内要件doc を参照。**暗黙判断は行わない**
   - (4) 特定不可: 停止
   - 複数draft読み込み時の順序制御は各draftの `operation_units` から `recommended_order` / `depends_on` に基づき決定
+  - 各draftの draft-data に実証情報（実証Caseであること、評価契約、評価ブランチ識別情報）が含まれる場合は読み取って保持する。実証情報の有無は STEP-2 の実証Case判定で使用する
 
 ### Result
 
 - 入力モード確定（Issue番号/URL入力 or 要件doc入力）
 - `case_auto_started_at` 記録
+- 実証情報読取結果（要件doc入力モード時: 実証Caseであること、評価契約、評価ブランチ識別情報の有無と内容）
 
 ### Evidence
 
-- 入力引数の解釈結果、`case_auto_started_at` の値、対象 draft パス一覧（要件doc入力モード時）
+- 入力引数の解釈結果、`case_auto_started_at` の値、対象 draft パス一覧（要件doc入力モード時）、draft-data の実証情報読取結果（要件doc入力モード時）
 
 ### Completion Verification
 
@@ -77,13 +79,22 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 入力要件doc の `draft-data` から work_type を取得（参考情報、パイプライン分岐の判定には使用しない）。
 
+#### 実証Case判定と評価ブランチ確定
+
+STEP-1 で読み取った draft-data の実証情報（実証Caseであること、評価契約、評価ブランチ識別情報）、または処理対象 Issue 等の永続情報の実証Case識別情報から、当該Caseが実証Caseか通常Caseかを判定する。実証Case識別情報がない場合は通常Caseとして main（既定）を統合先とする。
+
+- 実証Caseの場合、評価ブランチ識別情報から当該実証の評価ブランチを統合先として確定し、全工程（req-save、spec-save、case-open、case-run、case-close）へ一貫して伝播する
+- 同時に複数実証を処理する場合、それぞれ異なる評価ブランチを利用する（実証単位ごとに評価ブランチを割り当て、共有しない）
+- 実証は work_type とは別の性質として扱い、工程決定（`artifact_actions` ベース分岐）は通常Caseと同一基準を適用する。実証であることだけを理由に req-save / spec-save を省略しない
+
 #### 工程分岐（`work_type` 固定分岐ではなく `artifact_actions` 存在による動的判定）
 
-- **Issue番号/URL入力**: case-run → case-close（req-save、spec-save、case-open、work_type読取をスキップ）。STEP-1 で解決した Issue番号/URL を case-run にそのまま渡す。draft-data の読取は行わない
+- **Issue番号/URL入力**: case-run → case-close（req-save、spec-save、case-open、work_type読取をスキップ）。STEP-1 で解決した Issue番号/URL を case-run にそのまま渡す。draft-data の読取は行わない。実証Caseの場合は処理対象 Issue の実証Case識別情報から評価ブランチを復元し、case-run・case-close へ伝播する
 - **artifact_actions ベース分岐**:
   - `artifact: req` または `artifact: decision` entry → req-save を実行
   - `artifact: spec` entry → spec-save を実行（req-save の後、entry が空ならスキップ、`artifact_actions` フィールド不存在は後方互換で spec-save スキップ）
   - 常に → case-open → case-run → case-close
+  - 実証Caseの場合もこの分岐基準を維持し、req-save / spec-save を省略せず評価ブランチ上で実行する
 
 #### auto_gate preflight
 
@@ -92,10 +103,11 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 ### Result
 
 - 工程順序確定（req-save, spec-save, case-open, case-run, case-close の部分集合）
+- 実証Case判定結果（実証Case / 通常Case、実証Caseの場合は評価ブランチ）
 
 ### Evidence
 
-- `artifact_actions` の entry 種別、auto_gate preflight 判定結果
+- `artifact_actions` の entry 種別、auto_gate preflight 判定結果、実証Case判定結果（実証Case識別情報の有無と評価ブランチ）
 
 ### Completion Verification
 
@@ -114,7 +126,7 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 ### Input Resolution
 
 1. SSoT 再構成: 各工程の durable state（REQ/Decision/SPEC ファイル、Issue/PR、Epic Issue 本文）
-2. identifier 保持: Issue番号、PR番号、OU ID、draft パス、RU パス
+2. identifier 保持: Issue番号、PR番号、OU ID、draft パス、RU パス、評価ブランチ識別情報（実証Case時）
 3. 最小 scalar: L1 工程別タイムスタンプ、stage 2 並列数（最大5件）
 4. runtime artifact: なし（委譲工程内部の過程は親コンテキストに累積しない、command 不変条件）
 
@@ -149,6 +161,7 @@ bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参
 - 委譲 → case-close(#epic)
 - 次 Wave 判定
 - blocked/ failed の扱い
+- Epic 実証の場合、各 Wave の case-run → case-close を同じ評価ブランチ上で反復する（Wave 間で統合先を変更しない。評価ブランチ継承の基盤契約は epic-wave-model SPEC 参照）
 
 #### 工程間の状態引き継ぎ
 
@@ -156,6 +169,7 @@ bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参
 
 1. RU ファイルパス（case-open 委譲の RU 削除で使用）
 2. capture 対象情報（case-close 委譲の learning/intake capture で使用）
+3. 評価ブランチ識別情報（実証Case時。全工程の統合先として各工程へ伝播する）
 
 #### 複数REQ対応
 
@@ -188,11 +202,13 @@ case-open の判定結果に従う。
 ### Resume-Idempotency
 
 - 各工程の durable state（Issue/PR、REQ/Decision/SPEC ファイル、Epic Issue 本文）から進捗を再構成する。完了済み工程を再実行しない（case-open 成功後は draft を読まない、command 不変条件）
+- 実証Caseの場合、評価ブランチ識別情報を Issue 等の永続情報から復元し、正しい評価ブランチを統合先として再開する
 
 ## resume point
 
 - `case_auto_started_at`、入力モード、工程順序
 - 各工程の起動結果（Issue/PR番号）、RU パス、capture 対象情報
+- 評価ブランチ識別情報（実証Case時。再開時に Issue 等の永続情報から復元）
 - L1 工程別タイムスタンプ、orchestration stage 別結果
 - bg task 状態、結果状態4次元
 
