@@ -59,7 +59,8 @@ import {
   collectSpecMetrics,
   generateReqMetricsTable,
   generateSpecMetricsTable,
-  formatMeasureDate,
+  deriveReqMetricsMeasureDate,
+  deriveSpecMetricsMeasureDate,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   generateReadmeReqSummaryCount,
 } from "./generate_indexes.ts";
@@ -8436,8 +8437,20 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
   const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
   const reqHealthMetricsContent = readText(reqHealthMetricsPath);
   if (reqHealthMetricsContent !== null && fs.existsSync(reqDir)) {
-    const measureDate = formatMeasureDate(new Date());
     const reqMetrics = collectReqMetrics(reqDir);
+    const measureDate = deriveReqMetricsMeasureDate(root, reqDir, reqMetrics);
+    if (measureDate === null) {
+      foundViolation = true;
+      results.push(
+        ng(
+          "IndexGenerationConsistency",
+          "index-generation-consistency",
+          `req-metrics measure date derivation failed (no commit history for docs/requirements/REQ-*.md or git failure). ` +
+            `Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)`,
+        ),
+      );
+      return results;
+    }
     const reqMetricsSpecs: AutogenBlockSpec[] = [
       {
         blockId: REQ_METRICS_BLOCK_ID,
@@ -8460,8 +8473,24 @@ function checkIndexGenerationConsistency(root: string): CheckResult[] {
   const specHealthMetricsPath = path.join(qualityDir, "spec-health-metrics.md");
   const specHealthMetricsContent = readText(specHealthMetricsPath);
   if (specHealthMetricsContent !== null) {
-    const measureDate = formatMeasureDate(new Date());
     const specMetrics = collectSpecMetrics(specsDir);
+    const measureDate = deriveSpecMetricsMeasureDate(
+      root,
+      specsDir,
+      specMetrics,
+    );
+    if (measureDate === null) {
+      foundViolation = true;
+      results.push(
+        ng(
+          "IndexGenerationConsistency",
+          "index-generation-consistency",
+          `spec-metrics measure date derivation failed (no commit history for docs/specs/**/*.md or git failure). ` +
+            `Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002)`,
+        ),
+      );
+      return results;
+    }
     const specMetricsSpecs: AutogenBlockSpec[] = [
       {
         blockId: SPEC_METRICS_BLOCK_ID,
