@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-inspect-promote
-description: "inspect-promote command の workflow 実装本体。検出事項（finding）の分類（promote/defer/reject）、自動 promote（--auto opt-in）、adversarial-review 経路B、HITL 確定、promote/reject/defer 処理実行、.agentdev 永続化を、独立 resume point を持つ STEP model（durable state から再開可能）として所有する。USE FOR: inspect-promote 実行時の workflow 制御（inbox スキャン・分類・経路B review・HITL 確定・処理実行・永続化）。DO NOT USE FOR: 検出事項の生成、REQ/Decision/SPEC 変更、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "inspect-promote command の workflow 実装本体。検出事項（finding）の分類（promote/defer/reject）、自動 promote（--auto opt-in）、adversarial-review 経路B、自律確定判定と HITL 確定、promote/reject/defer 処理実行、.agentdev 永続化を、独立 resume point を持つ STEP model（durable state から再開可能）として所有する。USE FOR: inspect-promote 実行時の workflow 制御（inbox スキャン・分類・経路B review・自律確定判定・HITL 確定・処理実行・永続化）。DO NOT USE FOR: 検出事項の生成、REQ/Decision/SPEC 変更、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # inspect-promote workflow スキル
@@ -69,13 +69,14 @@ inspect-promote workflow は次の8 STEP で構成する。
 | STEP-3 | 検出事項分類（暫定分類） | 検出事項一覧確定 | 暫定分類結果（promote/defer/reject と根拠） | [references/inbox-scan-and-classification.md](references/inbox-scan-and-classification.md) |
 | STEP-4 | 自動 promote（`--auto` fast path） | `--auto` 指定かつ暫定分類確定 | `.agentdev/intake/promoted/inspect-auto-*.md` 投入、auto-promote-log 記録 | [references/auto-promote-and-review.md](references/auto-promote-and-review.md) |
 | STEP-5 | adversarial-review（経路B） | 挿入境界（暫定分類後・HITL 前）到達、発動条件成立 | review 結果の暫定分類反映、または unresolved 停止、または従来フロー継続 | [references/auto-promote-and-review.md](references/auto-promote-and-review.md) |
-| STEP-6 | HITL 確定（手動分類対象） | review 完了または skip | ユーザー承認済み分類結果 | [references/hitl-and-disposition.md](references/hitl-and-disposition.md) |
-| STEP-7 | 処理実行（promote / reject / defer） | HITL 承認完了 | promoted/ 保存、inbox 削除（promote）、即時削除（reject）、inbox 残置（defer） | [references/hitl-and-disposition.md](references/hitl-and-disposition.md) |
+| STEP-6 | 確定（自律確定判定と HITL 確定） | review 完了または skip | 確定済み分類結果（自律確定分とユーザー承認分） | [references/hitl-and-disposition.md](references/hitl-and-disposition.md) |
+| STEP-7 | 処理実行（promote / reject / defer） | 確定完了（自律確定または HITL 承認） | promoted/ 保存、inbox 削除（promote）、即時削除（reject）、inbox 残置（defer） | [references/hitl-and-disposition.md](references/hitl-and-disposition.md) |
 | STEP-8 | 完了報告・永続化 | 処理実行完了 | 完了報告、`.agentdev/` 変更の commit/push | [references/hitl-and-disposition.md](references/hitl-and-disposition.md) |
 
 ### STEP 間の依存と分岐
 
 - **通常（手動分類）**: STEP-1 → STEP-2 → STEP-3 → （`--auto` 未指定時は STEP-4 を skip） → STEP-5（skip 条件該当時は省略） → STEP-6 → STEP-7 → STEP-8
+- **STEP-6 の内訳**: STEP-6 は自律確定判定と HITL 確定で構成する（後述「自律確定の判定位置とHITLフォールバック」）。全検出事項が自律確定可能な場合は HITL 提示なしで STEP-7 へ進む
 - **`--auto` 指定時**: STEP-4 で自動 promote 対象を fast path として投入し、手動分類対象のみ STEP-5 以降へ進む
 - **inbox 空**: STEP-2 で「対象なし」と報告して終了
 - **unresolved な本質的争点**: STEP-5 でユーザー判断事項として停止（STEP-6 へ進まない）
@@ -84,7 +85,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 - 各 STEP の再開点は durable state から再構成する（`<workflows/input-resolution-and-durable-state>` SPEC の優先順位に従う）
 - **検出事項ごとの分類確定状態の再構成**: inbox に残存する検出事項は未確定（STEP-3 分類から再開）、`.agentdev/inspect/promoted/` に保存済みの検出事項は promote 確定（再保存しない）、auto-promote-log 記載済みかつ `.agentdev/intake/promoted/inspect-auto-*.md` 投入済みは自動 promote 確定（再投入しない）、inbox から削除済みは reject 確定（復元しない）、inbox 残置かつ処理実行済み報告があるものは defer 確定
-- **HITL 承認状態**: 承認は処理実行（STEP-7）の完了状態から逆算して再構成する。処理実行が済んでいない検出事項は承認未了と扱い、HITL 確定（STEP-6）から再開する
+- **HITL 承認状態**: 承認は処理実行（STEP-7）の完了状態から逆算して再構成する。処理実行が済んでいない検出事項は未確定と扱い、確定（STEP-6 の自律確定判定と HITL 確定）から再開する。自律確定項目にユーザー承認は存在しないため、再開時は詳細判定表に従い再判定する
 - 自然言語の前 STEP result のみに依存した再開を行わない
 
 ## 主要 Capability Skill 連携
@@ -107,18 +108,28 @@ Workflow Skill のみが読み、inspect-promote command は直接読まない�
 
 ## 共通制約
 
-- **HITL 承認必須**: 自動 promote 対象（`--auto`）を除き、ユーザーの明示的な承認なしに採用済み成果物を生成しない（G01）
+- **HITL 承認必須**: 自動 promote 対象（`--auto`）と自律確定対象（次節の詳細判定表に従う）を除き、ユーザーの明示的な承認なしに採用済み成果物を生成しない（G01）
 - **reject は即時削除**: `archive/rejected/` への移動は廃止。即時削除以外の取扱を禁止し、reject 時の commit message に却下理由を含める（command 不変条件）
 - **defer は inbox 残置**: defer となった検出事項を `.agentdev/inspect/inbox/` から移動しない（command 不変条件）
 - **`--auto` は明示 opt-in の場合のみ有効**: 省略時は自動 promote を一切行わない（G06）。自動 promote 対象は workflow-contracts SPEC（extension 経由）が定義する高確信度カテゴリのみとし、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す（command 不変条件）
 - **実行ログ**: `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する（command 不変条件）
 - **adversarial-review は任意助言手段**: 必須工程、QG、承認ゲート、統制ゲートとして導入しない。呼出失敗時は silent skip を禁止し、従来フロー（HITL 確定）を維持する
 
+## 自律確定の判定位置とHITLフォールバック
+
+判断確定の境界は共通原則（REQ-{NNNN}-{NNN}）に従う。自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約SPEC（workflow-contracts SPEC「promote系判断確定とHITL境界」節、extension 経由で解決）が集約所有し、本スキルは判定表を重複保持しない（DEC-{N}）。
+
+- **判定位置**: 分類・検証（STEP-3）と必要な経路B review（STEP-5）を経た後、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項は、ユーザー承認なしで確定する（REQ-{NNNN}-{NNN}）
+- **部分自律確定**: 同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（REQ-{NNNN}-{NNN}）
+- **`--auto` fast path との区別**: `--auto` fast path（高確信度カテゴリの事前定義による早期処理、明示 opt-in）と通常経路の自律確定（レビュー・検証を経た最終確認省略）は別概念とする。通常の実行によって `--auto` を暗黙的に有効化しない（REQ-{NNNN}-{NNN}）
+- **報告形式**: 判定結果、主要根拠、HITL不要と判断した理由は既存の分類結果と実行報告（STEP-8 完了報告）を優先利用して報告し、新規永続成果物を必須としない
+
 ## 終了条件（termination）
 
 - 全検出事項が promote（promoted/ 保存 + inbox 削除）/ reject（即時削除）/ defer（inbox 残置）/ 自動 promote（intake/promoted/ 投入 + ログ記録）のいずれかに確定している
 - `.agentdev/inspect/` と `.agentdev/intake/` 配下の変更が commit/push 済みである（変更なし時は「変更なし」報告済み）
 - 完了報告 template（`.opencode/commands/agentdev/templates/inspect-promote/standard.md`）に従い、promote/defer/reject/auto-promote の判定結果と後続 route（`--auto` 実行時は投入件数、投入先一覧、ログパスを含む）を報告した
+- 自律確定した検出事項の判定結果、主要根拠、HITL不要と判断した理由を完了報告に含めている（新規永続成果物を必須としない）
 
 ## See Also
 
