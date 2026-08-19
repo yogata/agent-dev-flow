@@ -69,7 +69,7 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 ### 共通事前マージ gate（両ルート共通、DEC-{N}、配布依存境界 SPEC）
 
 配布依存境界の最終 gate は single-Issue ルート（STEP-3-1）と Epic Wave ルート（STEP-E4-1）の両方で、PR マージ前に必ず経由する共用事前マージ seam である。
-両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run command Step 7-1 と case-close で同一 detector を再利用）。
+両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run command STEP-S5 と case-close で同一 detector を再利用）。
 gate 違反時は両ルートとも PR マージを停止する。
 
 ### resume protocol

@@ -49,7 +49,7 @@ STEP 識別子と durable state から current STEP を復元する契約は `<w
 ### STEP 識別子（case-run workflow）
 
 case-run internal lifecycle フェーズ構成の各フェーズが STEP resume point に対応する。
-STEP 識別子は command 固定番号（Step 1, Step 2 等）とは区別する。
+STEP 識別子は command 固定番号（STEP-1, STEP-2 等）とは区別する。
 
 | STEP 識別子 | 対応フェーズ | 再開条件（precondition） |
 |---|---|---|
@@ -91,7 +91,7 @@ fan-in 判定モデルの詳細は `agentdev-epic-tracker` 参照。
 ### driver サブエージェント引き継ぎプロンプト制約
 
 Windows + ジャンクション環境の worktree では `.opencode/skills/agentdev-*`、`.opencode/commands/agentdev/` が空になる（ジャンクション未伝播）。
-case-run Step 6 で実行担当サブエージェントへ引き継ぐプロンプトには、以下を**必須項目**として明記する。
+実行担当サブエージェントへ引き継ぐプロンプトには、以下を**必須項目**として明記する。
 
 - worktree 内 `.opencode/` は空（ジャンクション未伝播）であること
 - source（`src/opencode/`）と projection（`.opencode/`）の編集は手動両辺編集を行うこと
