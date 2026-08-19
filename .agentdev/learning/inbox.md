@@ -164,3 +164,19 @@
 - **想定反映先**: case-run の検証手順、agentdev-git-worktree の worktree 環境要件
 - **関連**: PR 2265、Issue 2210、intake item 2026-08-19-checkextensions-worktree-junction-fail.md
 - **タグ**: #full-suite #pre-existing #environment-dependent
+
+## 計測日導出規則変更を跨いだ OPEN PR の AUTOGEN 計測日がマージ後に新規則 dry-run で WOULD UPDATE になる
+
+- **問題事象**: PR 2270（Issue 2241、AUTOGEN 計測日の日次再生成）のブランチ（base 271a99fa）は a113bd67（計測日を実行時日付から最終コミット日付基準へ変更、PR 2267）を含まない base で旧規則により req-health-metrics.md の計測日を 2026-08-19（実行時日付）へ再生成していた。マージ後 main（新規則）で generate_indexes.ts --dry-run を実行すると WOULD UPDATE 1件（導出値 2026-08-18 = REQ コーパス最終コミット df916807 の日付）が検出された。
+- **発生局面**: レビュー（case-close の post-merge AUTOGEN 鮮度検証）
+- **検知方法**: マージ後 main での bun run generate_indexes.ts --dry-run の WOULD UPDATE 行。git merge-base --is-ancestor a113bd67 fcdeaafc で PR ブランチが規則変更コミットを含まないことを確定
+- **根本原因**: 生成器自身の導出規則が PR 検証時 base とマージ時点 main の間で変更された（base drift）。PR 時点の再生成は当時の規則では正当
+- **自律対応内容**: case-close 検出分として generate_indexes.ts 再生成を commit e989b296 で実施し、再 dry-run で WOULD UPDATE 0 を確認した（先行例 cc32395c と同じ回復手段）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（autogen-freshness-gate SPEC「不合格時の処置」どおりの回復。規則自体は a113bd67 で確定済み）
+- **横展開観点**: checker 状態の base drift（PR 2260 の先行学び）と同型だが、生成器の導出規則変更という新局面。AUTOGEN 索引を再生成する PR は、生成器の規則変更コミットが base に含まれるかを確認してから再生成する
+- **再発条件**: AUTOGEN 再生成済みの OPEN PR が、導出規則変更コミットのマージを跨いでマージされる場合
+- **予防策候補**: 生成器の規則変更が main にマージされたタイミングで、AUTOGEN 再生成を含む OPEN PR の再生成結果を新規則で再評価する
+- **想定反映先**: case-run の AUTOGEN 再生成手順、agentdev-workflow-case-close の post-merge 検証
+- **関連**: PR 2270、Issue 2241、コミット a113bd67（PR 2267）、e989b296、先行学び（base drift、PR 2260 の entry）
+- **タグ**: #case-close #autogen #base-drift
