@@ -16,7 +16,7 @@ context:
     when: "case-close 工程 SPEC 参照時"
     paths:
       - "docs/specs/commands/case-close.md"
-    purpose: "case-close の完了ゲートと QG-4 達成判定の確認"
+    purpose: "case-close の完了ゲート、QG-4 達成判定、統合先へのマージと実証最終クローズの実行詳細の確認"
   - id: index-auto-generation-spec
     when: "Step 3-3 AUTOGEN block 索引再生成差分検出（単一 Issue / Epic Wave E5b 前段）参照時"
     paths:
