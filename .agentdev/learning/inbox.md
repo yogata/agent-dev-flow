@@ -148,3 +148,19 @@
 - **想定反映先**: agentdev-workflow-case-open の execution contract 生成、REQ-017 Issue Execution Contract 運用
 - **関連**: PR 2262、Issue 2204、docs/specs/foundations/traceability-model.md、docs/specs/skills/agentdev-artifact-graph.md
 - **タグ**: #execution-contract #augmentation #tim
+
+## full suite の pre-existing fail 構成がタスクコンテキストの baseline 表記と環境実測で乖離した
+
+- **問題事象**: PR 2265 作成時のタスクコンテキストは full suite の pre-existing fail を「IR-055 delta 2 件 + checkWorkflowPreventive」の 2 fail と表記していたが、検証環境の実測は「checkWorkflowPreventive + checkExtensions（real skill tree 分類）」の 2 fail だった。IR-055 delta は当該 PR で解消済み、checkExtensions は pristine main チェックアウトでも失敗する環境依存（junction 未伝播）であり、baseline 表記と実測で fail 構成が入れ替わって観測された。
+- **発生局面**: 実装・検証（case-run の worktree 環境での full suite 実行）
+- **検知方法**: PR 本文 Findings への乖離記録。pristine main チェックアウトでの再現確認（PR 2265 本文に記録）
+- **根本原因**: pre-existing fail の構成が環境（junction の有無・node_modules の有無）と base 時点で変動するため、タスクコンテキスト渡し時点の静的な baseline 表記が実測と乖離する
+- **自律対応内容**: 各 fail の帰属を pristine main 再現で切り分け、PR 本文 Findings に乖離を記録した。merged main（junction 実体あり・node_modules インストール済み）では 2062 pass / 0 fail となり環境依存でないことを case-close の post-merge 検証で確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（既知 intake item「checkExtensions integration テストの worktree 環境失敗（ジャンクション未伝播）」と同根の観測）
+- **横展開観点**: pre-existing fail を個数だけでなく「構成」（どのテストが fail か）で扱わない限り、fail の増減判定にノイズが混入する。環境要因の fail は環境ラベル付きで記録する
+- **再発条件**: worktree・pristine checkout 等 junction が伝播しない環境で full suite を実行する場合
+- **予防策候補**: full suite 実行記録への環境ラベル（junction 有無・node_modules 有無）添付。環境依存 fail のカタログ化
+- **想定反映先**: case-run の検証手順、agentdev-git-worktree の worktree 環境要件
+- **関連**: PR 2265、Issue 2210、intake item 2026-08-19-checkextensions-worktree-junction-fail.md
+- **タグ**: #full-suite #pre-existing #environment-dependent
