@@ -12,6 +12,7 @@
 .omo/
 .agentdev/integrity/reports/
 .agentdev/graph/
+.agentdev/tmp/
 AGENTS.md
 outputs/
 dist/

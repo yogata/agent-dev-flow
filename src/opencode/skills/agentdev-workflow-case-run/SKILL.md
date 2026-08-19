@@ -82,7 +82,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 | STEP-S3 | Worktree 作成・ブランチ準備・前置 gate 群 | Issue 判定完了 | worktree+ブランチ作成（べき等）、前置 gate 群（precondition / staleness / targeted docs / 事前委譲チェック）合格、L2 計測 | [references/single.md](references/single.md) |
 | STEP-S4 | 実行担当サブエージェント委譲 | STEP-S3 合格（worktree 内検証済み） | 委譲起動、L2 計測、経路G（adapter 委譲内 adversarial-review） | [references/delegation-and-result.md](references/delegation-and-result.md) |
 | STEP-S5 | result 処理・配布依存境界 最終 gate | 委譲 result 受領 | result 4状態処理、配布依存境界 最終 gate 判定、L2 受け渡し | [references/delegation-and-result.md](references/delegation-and-result.md) |
-| STEP-S6 | worktree クリーンアップ確認・完了報告 | result 処理完了（completed-pr 時は最終 gate 合格後） | 未コミット変更確認、完了報告（L2 内訳含む） | [references/single.md](references/single.md) |
+| STEP-S6 | worktree クリーンアップ確認・完了報告 | result 処理完了（completed-pr 時は最終 gate 合格後） | 未コミット変更確認、tmp/ 残存確認、完了報告（L2 内訳含む） | [references/single.md](references/single.md) |
 
 ### epic-wave workflow（`case-run #epic` 受領時）
 
@@ -92,7 +92,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 | STEP-W2 | fan-out 準備 | Wave 子Issue 群確定 | `git fetch origin`、子Issue ごとの worktree+ブランチ、前置 gate 群適用（STEP-S3 と同一契約） | [references/epic-wave.md](references/epic-wave.md) |
 | STEP-W3 | fan-out 並列委譲 | fan-out 準備完了 | 子Issue 並列委譲（最大5件、STEP-S4 と同一委譲契約）、L2 計測 | [references/epic-wave.md](references/epic-wave.md) |
 | STEP-W4 | fan-in・結果集約 | 全委譲完了（または異常検知） | 子Issue ごとの result 収集、partial result 保持、child task recovery | [references/epic-wave.md](references/epic-wave.md) |
-| STEP-W5 | Wave 完了報告・return | 結果集約完了 | 1 Wave 分の完了報告（result 状態別一覧）、return（Wave 境界は扱わない） | [references/epic-wave.md](references/epic-wave.md) |
+| STEP-W5 | Wave 完了報告・return | 結果集約完了 | 1 Wave 分の完了報告（result 状態別一覧、tmp/ 残存確認）、return（Wave 境界は扱わない） | [references/epic-wave.md](references/epic-wave.md) |
 
 ### STEP 間の依存と分岐
 
@@ -109,6 +109,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 ### termination
 
 - 正常終了: single は PR 作成確認とクリーンアップ完了報告まで。epic-wave は1 Wave 分の result 集約と Wave 完了報告まで
+- 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-S6/W5 で確認。cleanup 規定は `agentdev-gh-cli`）
 - 停止終了: blocked / failed（Issue コメント SSoT）、delegation-unavailable（Issue を pending へ戻す）、配布依存境界 最終 gate 違反（PR 本文 SSoT）、worktree precondition gate 失敗（実行担当サブエージェント起動前に停止）
 - 引き継ぎ停止: Issue 本文に `agentdev_handoff: true` を含む場合、リポジトリ種別に応じた停止判定（`agentdev-workflow-lifecycle` runtime-package-boundary）
 

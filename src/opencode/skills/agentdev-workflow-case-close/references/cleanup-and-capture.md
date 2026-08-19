@@ -58,7 +58,7 @@ Issue close 手続き（理由: completed、`agentdev-gh-cli`）。
 
 ### Purpose
 
-worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、完了報告を実施する。
+worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、tmp/ 残存確認、完了報告を実施する。
 
 ### Input Resolution
 
@@ -138,7 +138,12 @@ learning と intake を同一 commit に含める。
 > コミットメッセージに `(case-close #N)` 等のコマンド名と Issue 番号の近接表記を用いると、GitHub が "close" を auto-close キーワードと誤認し Issue を意図せずクローズするリスクがある。
 > コミットメッセージのフォーマットは `agentdev-conventional-commits` skill の「GitHub auto-close 回避ガイドライン」に従い、コマンド名と Issue 番号を分離し `#` 記号による近接参照を避けること（例: `case-close for Issue N`）
 
-#### STEP-6-6: 完了報告
+#### STEP-6-6: tmp/ 残存確認
+
+当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。
+残存時は `agentdev-gh-cli` の cleanup 規定に従って処理し、残存ファイルと対応結果を STEP-6-7 の完了報告に明示する。
+
+#### STEP-6-7: 完了報告
 
 完了報告 template に従って出力。
 結果状態に応じた種別を選択。
@@ -160,15 +165,16 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 - Capture 回収完了（intake/learning 分離）
 - 学び検知完了
 - `.agentdev/` 永続化完了
+- tmp/ 残存確認完了（残存時は対応結果を報告）
 - 完了報告出力
 
 ### Evidence
 
-- worktree・ブランチ削除結果、親Epic 更新の VERIFY 結果、重複ファイルチェックとリスク検出結果、Capture 回収ファイル群、`.agentdev/` commit hash と push 結果、完了報告出力
+- worktree・ブランチ削除結果、親Epic 更新の VERIFY 結果、重複ファイルチェックとリスク検出結果、Capture 回収ファイル群、`.agentdev/` commit hash と push 結果、tmp/ 残存確認結果、完了報告出力
 
 ### Completion Verification
 
-- worktree/branch 削除が完了（失敗時は警告表示して停止）していること。Capture 回収が intake/learning 分離済みであること。結果状態の分離報告（GitHub 側、`.agentdev` 永続化、ブランチ削除）がなされていること
+- worktree/branch 削除が完了（失敗時は警告表示して停止）していること。Capture 回収が intake/learning 分離済みであること。結果状態の分離報告（GitHub 側、`.agentdev` 永続化、ブランチ削除）がなされていること。当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）
 
 ### Resume-Idempotency
 
@@ -210,6 +216,7 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 - 不変条件（学びの検知はエージェント自律、ユーザーに問わない）
 - 不変条件（intake と learning を混合した単一成果物にしない、learning と intake を同一 commit に含める、今回の完了条件に含まれる未対応事項を intake に逃がして完了扱いにしない）
 - G17（STEP-6-5 の commit は並列実行安全ステージングプロシージャに従い、明示パスでステージ、`git add` は `.agentdev/` 全体の一括スコープにしない）
-- 不変条件（STEP-6-6 は結果状態を分離して報告、`.agentdev` push 失敗時は完了扱いにしない）
+- 不変条件（STEP-6-6 は当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存なしを確認、残存時は cleanup 規定に従い処理して報告）
+- 不変条件（STEP-6-7 は結果状態を分離して報告、`.agentdev` push 失敗時は完了扱いにしない）
 - G21・不変条件（case-close の capture 責務は「回収・保存」、SPEC status 昇格は case-close の責務、SPEC 確定候補の処理は `## SPEC確定候補` を入力とし `## Findings / Capture候補` とは区別）
 - G27・不変条件（`git pull --ff-only` 実行前に worktree 状態・ref lock 競合・非 main ブランチ占有の3リスクを事前検出し代替同期手順を選択）

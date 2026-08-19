@@ -167,20 +167,22 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
 - 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness 側の責務であり（charter 原則、harness 分離モデル SPEC 参照）、case-run は関与しない
+- **tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は `agentdev-gh-cli` の cleanup 規定に従って処理し、残存ファイルと対応結果を完了報告に明示する
 - 完了報告 template に従って出力する（実行担当サブエージェント result 状態、PR番号を含める）
 - 本 Step（worktree クリーンアップ）の開始時刻・終了時刻（JST）を記録し、worktree クリーンアップ時間を計測する。完了報告に L2 タイムスタンプ内訳（worktree 設定時間、実行担当サブエージェント実行時間、worktree クリーンアップ時間）を含める
 
 ### Result
 
-- worktree 状態確認結果、完了報告（result 状態、PR番号、L2 内訳）
+- worktree 状態・tmp/ 残存確認結果、完了報告（result 状態、PR番号、L2 内訳）
 
 ### Evidence
 
-- git status 結果、完了報告出力
+- git status 結果、tmp/ 残存確認結果、完了報告出力
 
 ### Completion Verification
 
 - 完了報告に result 状態と L2 内訳が含まれていること
+- 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）
 
 ### Resume-Idempotency
 
