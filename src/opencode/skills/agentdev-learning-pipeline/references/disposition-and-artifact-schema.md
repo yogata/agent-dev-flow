@@ -1,6 +1,7 @@
 # 処分区分と採用済み成果物スキーマ
 
-本ファイルは `agentdev-learning-pipeline` SKILL.md の補助資料であり、処分区分（11カテゴリ + duplicate）、反映先マッピング、既存対策照合、採用済み成果物スキーマ、カテゴリ別反映先パス例、プロジェクト固有知識の振り分け、prune 方針の詳細を扱う。SKILL.md 本文では処分区分の存在と living pool 維持の不変条件のみを提示し、判定基準表、schema 雛形、prune 対象特定基準は本ファイルを参照する。
+本ファイルは `agentdev-learning-pipeline` SKILL.md の補助資料であり、処分区分（11カテゴリ + duplicate）、反映先マッピング、既存対策照合、採用済み成果物スキーマ、カテゴリ別反映先パス例、プロジェクト固有知識の振り分け、prune 方針の詳細を扱う。
+SKILL.md 本文では処分区分の存在と living pool 維持の不変条件のみを提示し、判定基準表、schema 雛形、prune 対象特定基準は本ファイルを参照する。
 
 ## 目次
 
@@ -16,9 +17,14 @@
 
 learning-promote が各クラスタに対して判定する廃棄カテゴリ。
 
-**昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。**無条件の自動REQ化は禁止する**。学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` の昇華経路を経て初めて REQ 化される。
+**昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。
+8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。
+**無条件の自動REQ化は禁止する**。
+学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` の昇華経路を経て初めて REQ 化される。
 
-**living pool 維持**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
+**living pool 維持**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。
+living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
+`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
 
 | # | カテゴリ | 判定基準 |
 |---|---|---|
@@ -163,7 +169,9 @@ project-local knowledge を一律 `.agentdev/learning/project-knowledge.md` に�
 
 ### promote 内部分析フェーズ時 prune
 
-deferred.md 内の古い単発レアケースを削除候補として特定する。**必須ではない。**
+deferred.md 内の古い単発レアケースを削除候補として特定する。
+**必須ではない。
+**
 
 #### prune 対象の特定基準（全てを満たすもの）
 

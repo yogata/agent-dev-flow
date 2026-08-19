@@ -72,41 +72,54 @@ RU frontmatter の `tentative_classification` フィールドに記録する。
 
 ## adversarial-review 候補判断と内部挿入（経路E）
 
-backlog-review 経路Eにおける adversarial-review の候補判断基準と内部手続きの実行時参照。正規原本は `agentdev-backlog-integration` SPEC「adversarial-review 候補判断と内部挿入」節である。本節は実行時参照として SPEC を補完し、SPEC と矛盾する場合は SPEC を正とする。共通 caller integration 契約は adversarial-review SPEC が正規所有者であり、本節は再定義しない。
+backlog-review 経路Eにおける adversarial-review の候補判断基準と内部手続きの実行時参照。
+正規原本は `agentdev-backlog-integration` SPEC「adversarial-review 候補判断と内部挿入」節である。
+本節は実行時参照として SPEC を補完し、SPEC と矛盾する場合は SPEC を正とする。
+共通 caller integration 契約は adversarial-review SPEC が正規所有者であり、本節は再定義しない。
 
 ### 候補判断基準
 
-review 対象は backlog-review command Step 4（統合・分割判定 + depends_on 依存解決）完了時点の RU 構成案である。adversarial-review 候補は次のいずれかを満たす RU 構成案を対象とする。
+review 対象は backlog-review command Step 4（統合・分割判定 + depends_on 依存解決）完了時点の RU 構成案である。
+adversarial-review 候補は次のいずれかを満たす RU 構成案を対象とする。
 
 - 複数採用済み成果物を統合する RU（N:1 統合）で、統合理由の妥当性が self-evident でないもの
 - 1成果物を複数 RU へ分割する（1:N 分割）で、分割境界の妥当性が self-evident でないもの
 - depends_on 依存を含み、依存順序、循環性、並べ替え可能性に判断余地があるもの
 - 暫定分類（tentative_classification）が複数候補から迷い得るもの
 
-候補判断基準は review 対象の意味的型を整理する補助情報であり、自動発動の根拠ではない。発動条件はユーザー明示指定のみを正とし、候補該当の有無は従来フロー維持に影響しない。
+候補判断基準は review 対象の意味的型を整理する補助情報であり、自動発動の根拠ではない。
+発動条件はユーザー明示指定のみを正とし、候補該当の有無は従来フロー維持に影響しない。
 
 ### 内部手続き
 
 #### 候補確定位置
 
-RU 構成案は backlog-review command Step 4（統合・分割判定 + depends_on 依存解決）完了時点で確定する。候補確定前の暫定分類、未解決依存、未確定統合判定は review 対象としない。
+RU 構成案は backlog-review command Step 4（統合・分割判定 + depends_on 依存解決）完了時点で確定する。
+候補確定前の暫定分類、未解決依存、未確定統合判定は review 対象としない。
 
 #### 呼出タイミング
 
-adversarial-review の呼出は、Step 4 完了後、Step 5（矛盾検出）開始前に挿入する（RU構成→review→承認の順）。ユーザー承認（Step 4 承認 / Step 5 矛盾検出時追加判断）の前に review を実行し、review 結果を踏まえて承認段階へ進む。呼出タイミングの正規所有者は backlog-review command SPEC であり、本節は参照レベルに留める。
+adversarial-review の呼出は、Step 4 完了後、Step 5（矛盾検出）開始前に挿入する（RU構成→review→承認の順）。
+ユーザー承認（Step 4 承認 / Step 5 矛盾検出時追加判断）の前に review を実行し、review 結果を踏まえて承認段階へ進む。
+呼出タイミングの正規所有者は backlog-review command SPEC であり、本節は参照レベルに留める。
 
 #### 矛盾検出への引き渡し
 
-adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は前節「矛盾検出 + ユーザー承認」（既存矛盾検出ロジック）へ引き渡す。adversarial-review 自身は矛盾を自動解決せず、矛盾の判定、partial success 扱い、ユーザー追加判断への委ねは既存矛盾検出ロジックが正である。
+adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は前節「矛盾検出 + ユーザー承認」（既存矛盾検出ロジック）へ引き渡す。
+adversarial-review 自身は矛盾を自動解決せず、矛盾の判定、partial success 扱い、ユーザー追加判断への委ねは既存矛盾検出ロジックが正である。
 
 ### 副作用境界と委譲契約
 
-adversarial-review は delegation-contracts SPEC の `semantic_review`（書き込み禁止型）として適用する。許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする。審議結果は中間成果として呼出元へ返却し、新規正規 artifact を生成しない。
+adversarial-review は delegation-contracts SPEC の `semantic_review`（書き込み禁止型）として適用する。
+許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする。
+審議結果は中間成果として呼出元へ返却し、新規正規 artifact を生成しない。
 
 呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する。
 
 ### accepted finding 反映と再 review
 
-accepted finding の RU 構成案（統合・分割判定、depends_on、暫定分類）への反映は backlog-review command（呼出元）の責務である。反映後に必要な既存検証（depends_on 再解決、矛盾検出再実行）を行う。意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動でき、新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。
+accepted finding の RU 構成案（統合・分割判定、depends_on、暫定分類）への反映は backlog-review command（呼出元）の責務である。
+反映後に必要な既存検証（depends_on 再解決、矛盾検出再実行）を行う。
+意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動でき、新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する。
 
 

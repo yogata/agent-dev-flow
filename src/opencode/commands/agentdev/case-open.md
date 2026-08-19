@@ -4,9 +4,13 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 # Case登録
 
-要件定義（req-define）の結果をもとにGitHub Issueを作成する。①壁打ち→②構造的実行フェーズの境界。
+要件定義（req-define）の結果をもとにGitHub Issueを作成する。
+①壁打ち→②構造的実行フェーズの境界。
 
-**draft-data 入力**: case-open は構造化 `draft-data`（`# draft-data` fenced YAML block）を入力として読み取る。draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処理対象とし、OU ごとにスライスせず draft 全体の合意結果を取り扱う。`auto_gate.auto_ready` が false、または未解決質問、未解決衝突、repo外操作、停止理由が残る場合は停止する。`conflict_resolutions` に記録済みの衝突については同じ内容をユーザーへ再確認しない
+**draft-data 入力**: case-open は構造化 `draft-data`（`# draft-data` fenced YAML block）を入力として読み取る。
+draft 全体の `agreed_items`、`artifact_actions`、`operation_units` を処理対象とし、OU ごとにスライスせず draft 全体の合意結果を取り扱う。
+`auto_gate.auto_ready` が false、または未解決質問、未解決衝突、repo外操作、停止理由が残る場合は停止する。
+`conflict_resolutions` に記録済みの衝突については同じ内容をユーザーへ再確認しない
 
 ## 入力
 
@@ -18,11 +22,16 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 ## project extensions
 
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-open`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`、kind: workflow-extension）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-open`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`、kind: workflow-extension）を読み込む（ADR）。
+extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。
+詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-open` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+同スキルが6 STEP の control plane として制御構造を所有する。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
@@ -35,7 +44,9 @@ description: 要件定義をもとにGitHub Issueを作成する
 
 **共通ルール**（全 STEP 適用）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、テンプレート選定・準拠（`agentdev-workflow-templates` の選定ルール、テンプレート読込後は毎回【必須】セクションの完備を確認、【任意】は内容がある場合のみ含める、欠落時は再生成）。子Issue 並列上限は case-run Wave 内子 Issue 並列と同一上限（5件）
 
-**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-open` が所有する。同 Workflow Skill は `/agentdev/case-open` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
+**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-open` が所有する。
+同 Workflow Skill は `/agentdev/case-open` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。
+OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
 ## 不変条件
 

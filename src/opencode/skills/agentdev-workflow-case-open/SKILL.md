@@ -5,7 +5,8 @@ description: "case-open command の workflow 実装本体。要件定義から G
 
 # case-open workflow スキル
 
-case-open command の workflow 実装本体。要件doc（構造化 `draft-data`）から GitHub Issue（Epic flow または Standard flow）を作成する制御構造、execution contract 確定（EC-{N}〜EC-{N}）、execution_unit 構成（連結成分アルゴリズム + 3軸判断 + preflight）、draft/RU 削除クリーンアップ（Form Zero）を所有する。
+case-open command の workflow 実装本体。
+要件doc（構造化 `draft-data`）から GitHub Issue（Epic flow または Standard flow）を作成する制御構造、execution contract 確定（EC-{N}〜EC-{N}）、execution_unit 構成（連結成分アルゴリズム + 3軸判断 + preflight）、draft/RU 削除クリーンアップ（Form Zero）を所有する。
 
 case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -43,7 +44,9 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）は
 
 ## Control Plane（STEP 一覧）
 
-case-open workflow は次の6 STEP で構成する。各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。会話コンテキストに依存せず、durable state（draft-data、GitHub Issue、commit hash）から再開点を再構成する。
+case-open workflow は次の6 STEP で構成する。
+各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、durable state（draft-data、GitHub Issue、commit hash）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -89,7 +92,10 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 
 ## Artifact Graph 利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（impact、dependency）を利用できる。Issue の対象範囲、完了条件、test strategy の確定前に変更影響候補を評価し、候補を in scope、verification only、out of scope に分類する（STEP-2、STEP-3）。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。問い合わせ目的を指定し、返された候補を用いて判断する。
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（impact、dependency）を利用できる。
+Issue の対象範囲、完了条件、test strategy の確定前に変更影響候補を評価し、候補を in scope、verification only、out of scope に分類する（STEP-2、STEP-3）。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+問い合わせ目的を指定し、返された候補を用いて判断する。
 
 - 問い合わせ結果は候補提供であり、対象範囲の分類判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
 - 必須品質統制の導出は artifact type から品質能力キーへの変換（品質統制 routing SPEC が定める）に従い、問い合わせで得た関係から必須 skill を直接決定しない
@@ -98,7 +104,11 @@ case-open workflow は次の6 STEP で構成する。各 STEP は resume point �
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-open/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、case-open command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-open/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、case-open command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

@@ -50,7 +50,10 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-intake-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（`.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-intake-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+同スキルが6 STEP の control plane として制御構造を所有する。
+各 STEP は resume point を持ち、durable state（`.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
@@ -63,7 +66,8 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ## エラー処理
 
-主要なエラー処理（git pull --ff-only 失敗時の停止、git push 失敗時の完了扱い禁止等）は `agentdev-intake-pipeline` を参照。構造化エラーメッセージを表示して停止し、自動解消しない。
+主要なエラー処理（git pull --ff-only 失敗時の停止、git push 失敗時の完了扱い禁止等）は `agentdev-intake-pipeline` を参照。
+構造化エラーメッセージを表示して停止し、自動解消しない。
 
 ## 不変条件
 

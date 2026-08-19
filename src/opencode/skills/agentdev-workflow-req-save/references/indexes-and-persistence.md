@@ -1,6 +1,7 @@
 # STEP-5〜12: インデックス・整合性検証・永続化・報告（indexes-and-persistence）
 
-> 本 reference は `agentdev-workflow-req-save` SKILL.md の STEP-5〜STEP-12 詳細である。インデックス・ハブ更新、Decision ファイル作成、docs 変更整合性検証、README 索引影響確認、変更範囲検証、ドラフト status 更新、コミット・プッシュ、完了報告を提供する。
+> 本 reference は `agentdev-workflow-req-save` SKILL.md の STEP-5〜STEP-12 詳細である。
+> インデックス・ハブ更新、Decision ファイル作成、docs 変更整合性検証、README 索引影響確認、変更範囲検証、ドラフト status 更新、コミット・プッシュ、完了報告を提供する。
 
 ## 目次
 
@@ -32,7 +33,10 @@ REQ インデックスとドキュメントハブへ新規エントリを登録�
 
 ### Procedure
 
-詳細は `agentdev-req-file-manager` を参照。委譲接続点: 親エージェントのみが `docs/` ファイルを更新する。**エントリ存在確認のスクリプト呼出**: README へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で登録を検証する。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
+詳細は `agentdev-req-file-manager` を参照。
+委譲接続点: 親エージェントのみが `docs/` ファイルを更新する。
+**エントリ存在確認のスクリプト呼出**: README へのエントリ追加後に `agentdev-artifact-validation` の公開検証契約（`check-entry-existence`）で登録を検証する。
+具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 
 ### Result
 
@@ -69,7 +73,9 @@ REQ インデックスとドキュメントハブへ新規エントリを登録�
 
 ### Procedure
 
-`agentdev-decision-file-manager` に従って Decision ファイルを作成する。作成後、`docs/README.md` にDecisionセクションが存在しない場合は追加し、Decisionエントリを記載する。**Decision妥当性再検証ゲート**（保存の直前）: Decisionが技術判断（アーキテクチャ上の決定）を含むか確認、REQ/SPEC相当の内容のみの場合は保存を停止し理由を報告、`agentdev-decision-guidelines` の判定結果を前提として検証、`agentdev-decision-file-manager` の採番ルール（max+1、欠番埋め禁止）で確定した番号を振る、draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を当該確定番号で置換する。
+`agentdev-decision-file-manager` に従って Decision ファイルを作成する。
+作成後、`docs/README.md` にDecisionセクションが存在しない場合は追加し、Decisionエントリを記載する。
+**Decision妥当性再検証ゲート**（保存の直前）: Decisionが技術判断（アーキテクチャ上の決定）を含むか確認、REQ/SPEC相当の内容のみの場合は保存を停止し理由を報告、`agentdev-decision-guidelines` の判定結果を前提として検証、`agentdev-decision-file-manager` の採番ルール（max+1、欠番埋め禁止）で確定した番号を振る、draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を当該確定番号で置換する。
 
 ### Result
 
@@ -106,7 +112,9 @@ REQ番号の連続性と frontmatter id↔ファイル名一致を検証する�
 
 ### Procedure
 
-REQ番号の連続性確認、frontmatter の `id` とファイル名の一致を確認する。frontmatter id↔ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約で決定的スクリプトを実行する（REQ/Decision 保存時）。CLI 形式は同 SKILL.md を参照。
+REQ番号の連続性確認、frontmatter の `id` とファイル名の一致を確認する。
+frontmatter id↔ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約で決定的スクリプトを実行する（REQ/Decision 保存時）。
+CLI 形式は同 SKILL.md を参照。
 
 ### Result
 
@@ -143,7 +151,9 @@ REQ/Decision/SPEC 操作が各 README 索引へ影響するか確認し、target
 
 ### Procedure
 
-REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/specs/README.md`）の索引に影響するか確認する。影響がある場合は更新、ない場合は「README 索引更新なし」とする。README 索引更新は導線の更新であり、要件、判断、仕様の更新ではない。
+REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/specs/README.md`）の索引に影響するか確認する。
+影響がある場合は更新、ない場合は「README 索引更新なし」とする。
+README 索引更新は導線の更新であり、要件、判断、仕様の更新ではない。
 
 - **targeted docs guard**: 変更 REQ ファイルと連動ファイル（`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）に対し `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow req-save --files <changed REQ files> --json` を実行する（bun run 起動。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files` であり、保存直後ファイルの直接指定には `--files` を使用する。PowerShell で複数パスを渡す場合は配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない）。`failures` に strict severity を含む場合は修正して再実行する。`full_docs_check_recommended` true 時は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案する
 - **extension 更新要否**: REQ/Decision 追加/移動/削除が `.agentdev/extensions/**` へ影響するか確認する。該当 REQ/Decision を context に列挙している extension がある場合、paths も更新対象。必要時はユーザーへ指示を仰ぐ（直接編集しない）
@@ -222,7 +232,8 @@ REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/RE
 
 ### Procedure
 
-ドラフト `draft-data` の `status`（frontmatter）を `saved` に更新する。commit/push より前に更新し commit 対象に含める（push 後の status 更新は永続化されないため禁止、command 不変条件）。
+ドラフト `draft-data` の `status`（frontmatter）を `saved` に更新する。
+commit/push より前に更新し commit 対象に含める（push 後の status 更新は永続化されないため禁止、command 不変条件）。
 
 ### Result
 
@@ -259,7 +270,10 @@ REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/RE
 
 ### Procedure
 
-`agentdev-conventional-commits` に従ってコミットメッセージを生成し、main ブランチに push する。STEP-10 の status 変更を commit 対象に含める。並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、`git add <path>` で明示パスステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする。スイープ操作（`git add -A`/ `git add .` 等）は禁止する。
+`agentdev-conventional-commits` に従ってコミットメッセージを生成し、main ブランチに push する。
+STEP-10 の status 変更を commit 対象に含める。
+並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、`git add <path>` で明示パスステージし、`git commit -- <paths>`（--only pathspec 形式）でコミットする。
+スイープ操作（`git add -A`/ `git add .` 等）は禁止する。
 
 - **REQ/Decision artifact_actions 処理結果の保存（ドラフトに複数 entry がある場合）**: (a) 保存したREQドキュメントのリスト（REQ番号含む）(b) 各 artifact_action から保存したREQドキュメントへのマッピング (c) ソースRUからREQ操作へのマッピング (d) case-open で消費可能な形式での保存結果
 - **OU 結果の書き戻し**: ドラフトに `operation_units` セクションがある場合、各 OU の `result` に (a) 保存したREQドキュメント一覧 (b) OU 操作と保存先REQ doc の対応 (c) source RUとOU操作の対応 (d) case-open が入力として扱える保存結果を書き戻す
@@ -300,7 +314,8 @@ REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/RE
 
 ### Procedure
 
-完了報告 template に従って出力する。実行結果に応じて `templates/req-save/` 配下の種別（`split-detected.md` / `epic.md` / `standard.md`）を選択する。
+完了報告 template に従って出力する。
+実行結果に応じて `templates/req-save/` 配下の種別（`split-detected.md` / `epic.md` / `standard.md`）を選択する。
 
 ### Result
 

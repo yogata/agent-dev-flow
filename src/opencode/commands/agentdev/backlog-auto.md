@@ -36,7 +36,8 @@ backlog-auto は子ワークフロー内部の分類、評価、昇格、RU 生�
 ## workflow
 
 本コマンドは workflow 実装本体を `agentdev-workflow-backlog-auto` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
-同スキルが6 STEP の control plane として制御構造を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+同スキルが6 STEP の control plane として制御構造を所有する。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|

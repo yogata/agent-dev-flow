@@ -1,6 +1,7 @@
 # STEP-3: 構成判定・preflight（execution-unit-and-preflight）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-3 詳細である。execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模判定、構成生成事前検証（preflight）を提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-3 詳細である。
+> execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模判定、構成生成事前検証（preflight）を提供する。
 
 ## Purpose
 
@@ -53,7 +54,8 @@ Standard/Epic/混在構成の全ルートで GitHub Issue 作成前に共通の�
 4. 必須依存関係が維持される
 5. 全 OU が execution_unit へ割当・欠落重複なし
 
-**検証失敗時**: 上限超過または構成不備を検出した場合は Issue 作成呼び出しを行わず停止する。検証失敗時はドラフト削除、RU ファイル削除を実施せず再開可能な状態で停止。
+**検証失敗時**: 上限超過または構成不備を検出した場合は Issue 作成呼び出しを行わず停止する。
+検証失敗時はドラフト削除、RU ファイル削除を実施せず再開可能な状態で停止。
 
 ## Result
 

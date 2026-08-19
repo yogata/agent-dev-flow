@@ -15,7 +15,8 @@ learning-promote コマンドの Step 13 で実行する deferred 移動（inbox
 
 ### Step 1: inbox.md 全エントリを deferred.md に追記
 
-inbox.md の全エントリを deferred.md に追記する。各エントリに `**移動日**: YYYY-MM-DD` フィールドを追加する。
+inbox.md の全エントリを deferred.md に追記する。
+各エントリに `**移動日**: YYYY-MM-DD` フィールドを追加する。
 
 ### Step 2: deferred.md 書込検証
 

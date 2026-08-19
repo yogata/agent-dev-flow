@@ -1,6 +1,7 @@
 # STEP-5: Issue 作成（Epic flow / Standard flow、issue-creation-flows）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-5 詳細である。Epic flow（STEP-5-1〜5-5）と Standard flow（STEP-5-6〜5-8）の制御、GitHub Issue 作成手続きを提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-5 詳細である。
+> Epic flow（STEP-5-1〜5-5）と Standard flow（STEP-5-6〜5-8）の制御、GitHub Issue 作成手続きを提供する。
 
 ## Purpose
 
@@ -25,21 +26,28 @@ Epic flow（STEP-5-1〜5-5）または Standard flow（STEP-5-6〜5-8）の制�
 
 ## Procedure
 
-実行ルート（Epic flow / Standard flow）は STEP-3 の execution structure による。各 flow の手順は以下のとおり。
+実行ルート（Epic flow / Standard flow）は STEP-3 の execution structure による。
+各 flow の手順は以下のとおり。
 
 ## Epic flow（STEP-5-1〜5-5、`scale: large` またはマルチREQ または複数 OU）
 
 ### STEP-5-1: テンプレート読込
 
-`agentdev-workflow-templates` の選定ルールに従いテンプレートを読み込む。詳細は `agentdev-issue-management` を参照。Epic flow は STEP-3 のルーティングにより開始。マルチREQ/ 単一REQ の差分（分解ソース、Wave テーブル列、子Issue 数上限、子Issue 内容ソース、子Issue 追加要素）の詳細は `agentdev-epic-tracker` を参照。
+`agentdev-workflow-templates` の選定ルールに従いテンプレートを読み込む。
+詳細は `agentdev-issue-management` を参照。
+Epic flow は STEP-3 のルーティングにより開始。
+マルチREQ/ 単一REQ の差分（分解ソース、Wave テーブル列、子Issue 数上限、子Issue 内容ソース、子Issue 追加要素）の詳細は `agentdev-epic-tracker` を参照。
 
 ### STEP-5-2: Epic Issue 本文生成
 
-STEP-3 の自律構成分析結果に基づき Epic 本文を構築。詳細、委譲接続点は `agentdev-issue-management` を参照。
+STEP-3 の自律構成分析結果に基づき Epic 本文を構築。
+詳細、委譲接続点は `agentdev-issue-management` を参照。
 
 ### STEP-5-3: Epic Issue 作成
 
-ラベル `enhancement`, `feature`, `epic`。Issue 作成手続き（`agentdev-gh-cli`）で本文を書き込み → VERIFY。Issue 番号を `{epic_number}` として記録。
+ラベル `enhancement`, `feature`, `epic`。
+Issue 作成手続き（`agentdev-gh-cli`）で本文を書き込み → VERIFY。
+Issue 番号を `{epic_number}` として記録。
 
 ### STEP-5-4: 子Issue 作成（並列化）
 
@@ -89,7 +97,8 @@ case-open、case-auto、case-run で参照される「5件」上限は文脈ご�
 | (2) case-auto Phase 2 同時起動数 | 5件 | Phase 分離モデルにおける case-run bg task 同時起動数 |
 | (3) execution_unit 全体並列 | 上限なし | 必須依存がない execution_unit 群は全て並列実行可能 |
 
-case-open の STEP-5-4「子 Issue 作成の並列化」は **(1) に該当**。3文脈は別なので混同しない。
+case-open の STEP-5-4「子 Issue 作成の並列化」は **(1) に該当**。
+3文脈は別なので混同しない。
 
 ## Evidence
 

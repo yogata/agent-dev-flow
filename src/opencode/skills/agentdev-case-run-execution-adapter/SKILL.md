@@ -15,7 +15,8 @@ adapter skill 経由での委譲起動、委譲 prompt 内で実行 command を�
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-case-run-execution-adapter` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 入力
@@ -59,21 +60,27 @@ case-run (orchestration)
 | external execution boundary | 外部バックエンド接続（実行担当サブエージェント起動、result 受領、PR URL 受領）。adapter skill 経由の委譲契約、result 4状態契約、worktree 隔離、Findings / SPEC確定候補の PR 本文引き継ぎを含む | I/O 境界 SPEC。case-run は I/O 境界 SPEC へ委譲し、自身は所有しない |
 | harness execution mechanism | agent 起動 API、background task、並列実行、context 管理、timeout、retry、queue、heartbeat | harness 責務（ADF 規範所有対象外）。AGENTS.md および `references/harness-delegation.md` に配置 |
 
-harness execution mechanism は本 SKILL の規範対象外とし、`references/harness-delegation.md` へ集約する。用語の正規定義と所有者は responsibility-boundary-purification SPEC「case 実行責務の 4 用語と所有者」を SSoT とする。
+harness execution mechanism は本 SKILL の規範対象外とし、`references/harness-delegation.md` へ集約する。
+用語の正規定義と所有者は responsibility-boundary-purification SPEC「case 実行責務の 4 用語と所有者」を SSoT とする。
 
 ## 実行担当サブエージェントの責務
 
 実行担当サブエージェントは以下を順に実行する:
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。実行 command が Issue を success criteria に分解する
-2. **context 再確認**: ADR/ REQ/ SPEC/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。トレーサビリティ派生索引への高位問い合わせ（implementation）を実行対象と正規成果物の実現関係確認の候補探索に利用できる（`agentdev-artifact-graph` 経由）。問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、派生索引の不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は代替探索で継続する（fail-open）
-3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（`agentdev-gh-cli`）で PR を作成する。ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。実装完了後、test strategy 項目の test-fix ループ（後述）を実行する
+2. **context 再確認**: ADR/ REQ/ SPEC/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。
+トレーサビリティ派生索引への高位問い合わせ（implementation）を実行対象と正規成果物の実現関係確認の候補探索に利用できる（`agentdev-artifact-graph` 経由）。
+問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、派生索引の不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は代替探索で継続する（fail-open）
+3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して PR 作成手続き（`agentdev-gh-cli`）で PR を作成する。
+ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。
+実装完了後、test strategy 項目の test-fix ループ（後述）を実行する
 4. **blocker 処理**: 回答可能な blocker（ADR/REQ/SPEC/docs/Issue本文で回答できるもの）は自律的に実行 command 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
 
 ## test strategy 項目の test-fix ループ（REQ）
 
-実行担当サブエージェントは実装完了後、Issue 本文のテスト戦略セクションに含まれる各 test strategy 項目（3要素構造: verification / pass_criteria / on_failure）について以下のループを実行する。全項目の処理が完了するまで反復する。
+実行担当サブエージェントは実装完了後、Issue 本文のテスト戦略セクションに含まれる各 test strategy 項目（3要素構造: verification / pass_criteria / on_failure）について以下のループを実行する。
+全項目の処理が完了するまで反復する。
 
 1. **項目ごとの検証**: 各 test strategy 項目の `verification` 手順に従い検証を実行し、`pass_criteria` を満たすか確認する
 2. **不合格時の処置**: 検証結果が `pass_criteria` を満たさない場合、当該項目の `on_failure` に従い以下いずれかを実行する:
@@ -117,38 +124,51 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 
 ## worktree 隔離の遵守（禁止事項）
 
-実行担当サブエージェントは worktree root（`.worktrees/{N}-{type}/`）以外のパスでファイル編集を行わない。case-run から引き渡された worktree root（相対パス）配下でのみ作業する。
+実行担当サブエージェントは worktree root（`.worktrees/{N}-{type}/`）以外のパスでファイル編集を行わない。
+case-run から引き渡された worktree root（相対パス）配下でのみ作業する。
 
 | 禁止事項 | 違反時の対応 |
 |---|---|
 | worktree root 以外のパス（メインリポジトリルート直下、他 worktree 等）でのファイル編集 | メインリポジトリでの作業を検知した場合は直ちに作業を停止し、`failed` として result を返却する。詳細本文は Issue コメントに SSoT として構造化して記録する |
 | メインリポジトリパスを引き渡し、使用すること | case-run は worktree root（相対パス）のみを引き渡す。実行担当サブエージェントは受け取った worktree root 配下でのみ作業する |
 
-**自己検証**: 実装作業開始前に `agentdev-git-worktree` の検証ヘルパー（`.opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「worktree 内判定ヘルパー」参照）で現在 worktree 内にいることを自己検証する。メインリポジトリにいると判定された場合は実装を開始せず `failed` として result を返却する。
+**自己検証**: 実装作業開始前に `agentdev-git-worktree` の検証ヘルパー（`.opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「worktree 内判定ヘルパー」参照）で現在 worktree 内にいることを自己検証する。
+メインリポジトリにいると判定された場合は実装を開始せず `failed` として result を返却する。
 
 ## Findings/ Capture 配置
 
-本筋外の検出事項（Findings）/ Capture 候補（intake/ learning）は **PR 本文** の `## Findings / Capture候補` セクションに記述する。capture 境界の詳細は `agentdev-workflow-orchestration` を参照。実行担当サブエージェントは `.agentdev/intake/`、`.agentdev/learning/` を直接変更しない。
+本筋外の検出事項（Findings）/ Capture 候補（intake/ learning）は **PR 本文** の `## Findings / Capture候補` セクションに記述する。
+capture 境界の詳細は `agentdev-workflow-orchestration` を参照。
+実行担当サブエージェントは `.agentdev/intake/`、`.agentdev/learning/` を直接変更しない。
 
 ## SPEC確定候補配置
 
-実装時に発見された SPEC レベルの詳細（SPEC に記載すべき schema、enum、判定表、内部アルゴリズム等）は PR 本文の `## SPEC確定候補` セクションに記録する。`## Findings / Capture候補` とは別セクションとし、混在させない。実行担当サブエージェントが記録し、case-close Step 3 の SPEC 確定チェックの入力となる。
+実装時に発見された SPEC レベルの詳細（SPEC に記載すべき schema、enum、判定表、内部アルゴリズム等）は PR 本文の `## SPEC確定候補` セクションに記録する。
+`## Findings / Capture候補` とは別セクションとし、混在させない。
+実行担当サブエージェントが記録し、case-close Step 3 の SPEC 確定チェックの入力となる。
 
 ## 外部成果物の取扱い
 
-外部実行基盤の結果は **PR URL** で受領する（透明）。plan artifact 等の中間成果物の内部構造には依存しない。実行担当サブエージェントは中間成果物の内部構造に依存した処理、検証を行わず、result 契約（4状態）のみで接合する。AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ ADR/ SPEC に限定し、中間成果物を永続状態として扱わない。
+外部実行基盤の結果は **PR URL** で受領する（透明）。
+plan artifact 等の中間成果物の内部構造には依存しない。
+実行担当サブエージェントは中間成果物の内部構造に依存した処理、検証を行わず、result 契約（4状態）のみで接合する。
+AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ ADR/ SPEC に限定し、中間成果物を永続状態として扱わない。
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、case-run Workflow Skill の `execute` STEP（`agentdev-workflow-orchestration` 参照）から委譲起動される（`<workflows/workflow-skill-model>` SPEC）。本スキル自身は case-run workflow の STEP を所有せず、委譲契約（4状態 result）で case-run 側 STEP へ接合する。
+本スキルは Capability Skill として、case-run Workflow Skill の `execute` STEP（`agentdev-workflow-orchestration` 参照）から委譲起動される（`<workflows/workflow-skill-model>` SPEC）。
+本スキル自身は case-run workflow の STEP を所有せず、委譲契約（4状態 result）で case-run 側 STEP へ接合する。
 
 ### 委譲コンテキストと Input Resolution
 
-委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、 durable state 優先順位（`<workflows/input-resolution-and-durable-state>` SPEC）に従って case-run `execute` STEP の Input Resolution で解決された入力である。実行担当サブエージェントは委譲内で Issue 本文、REQ/Decision/SPEC を SSoT 再構成（最上位優先）で再取得・再検証し、自然言語の前STEP result のみに依存しない。
+委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、 durable state 優先順位（`<workflows/input-resolution-and-durable-state>` SPEC）に従って case-run `execute` STEP の Input Resolution で解決された入力である。
+実行担当サブエージェントは委譲内で Issue 本文、REQ/Decision/SPEC を SSoT 再構成（最上位優先）で再取得・再検証し、自然言語の前STEP result のみに依存しない。
 
 ### 委譲内シーケンスと result 接合
 
-実行担当サブエージェントの責務（Issue 読込、context 再確認、実装・検証・PR 作成、blocker 処理、result 返却）は adapter 委譲内の内部シーケンスであり、case-run 側からは result 4状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）のみで観測される。内部シーケンスの STEP 遷移を case-run workflow の STEP model へ投影せず、PR URL（成功時）または Issue コメント（blocked/failed時）を SSoT として扱う。STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
+実行担当サブエージェントの責務（Issue 読込、context 再確認、実装・検証・PR 作成、blocker 処理、result 返却）は adapter 委譲内の内部シーケンスであり、case-run 側からは result 4状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）のみで観測される。
+内部シーケンスの STEP 遷移を case-run workflow の STEP model へ投影せず、PR URL（成功時）または Issue コメント（blocked/failed時）を SSoT として扱う。
+STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
 
 ## 委譲抽象IF
 
@@ -161,13 +181,15 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 
 委譲起動不能時（実行担当サブエージェント型が不許可、起動 API 異常等）は、result 契約の `delegation-unavailable` を返し、Issue を `pending` に戻して case-run を停止する（委譲契約 SPEC「委譲種別」注記）。
 
-インラインフォールバック（case-run が自ら実装・検証を実行する逐次パス）は harness 固有の実行制御として配布 SPEC および本 SKILL から除外する。委譲起動手段、能力検出、インライン代替の有無は harness execution mechanism に属し、harness の責務として AGENTS.md および `references/harness-delegation.md` に配置する（委譲契約 SPEC「委譲種別」注記）。
+インラインフォールバック（case-run が自ら実装・検証を実行する逐次パス）は harness 固有の実行制御として配布 SPEC および本 SKILL から除外する。
+委譲起動手段、能力検出、インライン代替の有無は harness execution mechanism に属し、harness の責務として AGENTS.md および `references/harness-delegation.md` に配置する（委譲契約 SPEC「委譲種別」注記）。
 
 `references/harness-delegation.md`「委譲起動失敗、異常終了時事後処理」は**委譲起動後**の異常終了に対する事後処理であり、本節の委譲起動不能（事前判定）とは対象段階が異なる。
 
 ## reference選択表
 
-通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
+通常経路で全 reference を無条件読込しない。
+必要な条件に応じて読む reference を選択する。
 
 | 条件 | 読む reference |
 |---|---|
@@ -178,7 +200,9 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 
 ## adversarial-review 統合（経路G: adapter 委譲内）
 
-本スキルは case-run 経路G（REQ-{NNNN}）における adapter 委譲内の adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。正規原本は `agentdev-case-run-execution-adapter` SPEC「adversarial-review 統合（実装方針→review→結果反映）」節である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`「adversarial-review 統合（経路G）」節を参照。
+本スキルは case-run 経路G（REQ-{NNNN}）における adapter 委譲内の adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。
+正規原本は `agentdev-case-run-execution-adapter` SPEC「adversarial-review 統合（実装方針→review→結果反映）」節である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
+本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`「adversarial-review 統合（経路G）」節を参照。
 
 呼出元（case-run command）と本スキルの主な契約（詳細は SPEC と reference を正とする）:
 

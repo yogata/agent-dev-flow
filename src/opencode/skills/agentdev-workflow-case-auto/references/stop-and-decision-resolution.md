@@ -1,6 +1,7 @@
 # STEP-4/5/6: 停止条件検出・adversarial-review 経路H・bounded parent decision resolution（stop-and-decision-resolution）
 
-> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-4, STEP-5, STEP-6 詳細である。停止条件検出（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 経路H 停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
+> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-4, STEP-5, STEP-6 詳細である。
+> 停止条件検出（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 経路H 停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
 
 ## 目次
 
@@ -63,7 +64,8 @@
 | 上位合意矛盾 | bounded parent decision resolution で decision_context が現行正規成果物間の矛盾に起因する場合 |
 | 新規ユーザー判断事項 | 同 decision_context が新しいユーザー価値判断・対象範囲変更・外部契約変更を必要とする場合 |
 
-execution_unit 分割可能性があるにも関わらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する（case-open の契約・実装不整合であり要件doc 側の問題ではない）。各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-orchestration` を参照。
+execution_unit 分割可能性があるにも関わらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する（case-open の契約・実装不整合であり要件doc 側の問題ではない）。
+各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-orchestration` を参照。
 
 ### Result
 
@@ -102,7 +104,8 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 
 ### Procedure
 
-case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。停止伝播契約の詳細は case-auto command SPEC（project extension 経由参照）「adversarial-review 由来の停止伝播（経路H）」節を正とする。
+case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。
+停止伝播契約の詳細は case-auto command SPEC（project extension 経由参照）「adversarial-review 由来の停止伝播（経路H）」節を正とする。
 
 - **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（workflow-contracts SPEC「adversarial-review 由来の停止信号」節、delegation-contracts SPEC「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
 - **自走停止**: 当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、STEP-3 Wave 反復制御）
@@ -110,7 +113,10 @@ case-auto は当該 execution_unit の自走を停止し、ユーザー判断を
 - **resume point**: case-run 起源は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源は当該工程の委譲起点
 - **再開**: ユーザー判断解決後、resume point から再開。adversarial-review 再発動要否は adversarial-review SPEC「再 review 条件」「再 review 停止条件」に従い case-auto は独自判断しない
 
-case-auto は経路H において review 直接起動、finding 解釈、採否、再評価を行わない。これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。user-decision-required は STEP-4 の HITL 境界停止条件分類とは独立する停止理由分類である。停止報告（STEP-8）には user-decision-required を停止理由分類として含める。
+case-auto は経路H において review 直接起動、finding 解釈、採否、再評価を行わない。
+これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。
+user-decision-required は STEP-4 の HITL 境界停止条件分類とは独立する停止理由分類である。
+停止報告（STEP-8）には user-decision-required を停止理由分類として含める。
 
 ### Result
 
@@ -149,7 +155,9 @@ case-auto は経路H において review 直接起動、finding 解釈、採否�
 
 ### Procedure
 
-case-auto は下位 command から受領した decision_context を限定的に自律解決する。default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command SPEC（project extension 経由参照）「bounded parent decision resolution」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節、workflow-contracts SPEC「bounded parent decision resolution と停止・resume 伝播」節が正である。
+case-auto は下位 command から受領した decision_context を限定的に自律解決する。
+default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。
+解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command SPEC（project extension 経由参照）「bounded parent decision resolution」節、delegation-contracts SPEC「case-auto による decision_context の限定的親判断解決」節、workflow-contracts SPEC「bounded parent decision resolution と停止・resume 伝播」節が正である。
 
 | 分類 | 条件 | アクション |
 |---|---|---|

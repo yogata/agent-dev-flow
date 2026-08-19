@@ -11,7 +11,8 @@ backlog-review コマンドの統合判定知識ベース。
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-backlog-integration` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -40,7 +41,9 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 
 ## adversarial-review 候補判断と内部挿入（経路E）
 
-本スキルは backlog-review 経路E（REQ-{NNNN}）における adversarial-review の候補判断基準と内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の実行時参照を提供する。正規原本は `agentdev-backlog-integration` SPEC「adversarial-review 候補判断と内部挿入」節である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。本 SKILL.md は重複定義せず、詳細は `references/integration-judgment.md`「adversarial-review 候補判断と内部挿入（経路E）」節を参照。
+本スキルは backlog-review 経路E（REQ-{NNNN}）における adversarial-review の候補判断基準と内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の実行時参照を提供する。
+正規原本は `agentdev-backlog-integration` SPEC「adversarial-review 候補判断と内部挿入」節である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
+本 SKILL.md は重複定義せず、詳細は `references/integration-judgment.md`「adversarial-review 候補判断と内部挿入（経路E）」節を参照。
 
 呼出元（backlog-review command）と本スキルの主な契約（詳細は SPEC と reference を正とする）:
 

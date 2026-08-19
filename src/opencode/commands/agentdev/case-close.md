@@ -19,7 +19,10 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 
 ## project extensions
 
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-close`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`、kind: workflow-extension）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-close`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`、kind: workflow-extension）を読み込む（ADR）。
+extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。
+詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## 入力
 
@@ -33,7 +36,9 @@ last-write-wins 競合防止は case-close の単一書き手で維持される�
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-close` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが6 STEP（+ Epic Wave クローズ E1〜E6）の control plane として制御構造を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-close` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+同スキルが6 STEP（+ Epic Wave クローズ E1〜E6）の control plane として制御構造を所有する。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
@@ -57,7 +62,9 @@ Epic Wave クローズ（Epic Issue番号入力時のみ。STEP-1 から分岐�
 
 **共通ルール**（全 STEP 適用）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、コメントテンプレート選定・準拠（`agentdev-workflow-templates` の選定ルール、【必須】セクション確認、欠落時は再生成）
 
-**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-close` が所有する。同 Workflow Skill は `/agentdev/case-close` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
+**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-close` が所有する。
+同 Workflow Skill は `/agentdev/case-close` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。
+OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
 ## 不変条件
 

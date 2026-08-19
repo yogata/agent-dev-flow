@@ -61,7 +61,9 @@ labels: bug
 <!-- 【必須】 -->
 
 <!-- レビュー判断: case-open が draft-data の review_dispositions を読み取り、採否判断（covered / rejected 等）を恒久証跡として転記する。転記対象がない場合は「該当なし」と記載する -->
-[review_dispositions の転記内容。各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。該当なしの場合は「該当なし」]
+[review_dispositions の転記内容。
+各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
+該当なしの場合は「該当なし」]
 
 ## 補足情報（オプション）
 <!-- 【任意】 -->

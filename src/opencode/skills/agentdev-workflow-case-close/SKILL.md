@@ -5,7 +5,8 @@ description: "case-close command の workflow 実装本体。PR マージ（squa
 
 # case-close workflow スキル
 
-case-close command の workflow 実装本体。PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、SPEC 確定（draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
+case-close command の workflow 実装本体。
+PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、SPEC 確定（draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
 
 case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -44,7 +45,10 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`）�
 
 ## Control Plane（STEP 一覧）
 
-case-close workflow は次の STEP で構成する。Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 として並列記述する。各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。会話コンテキストに依存せず、durable state（GitHub Issue/PR、`.agentdev/`、commit hash、SPEC status）から再開点を再構成する。
+case-close workflow は次の STEP で構成する。
+Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 として並列記述する。
+各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、durable state（GitHub Issue/PR、`.agentdev/`、commit hash、SPEC status）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -64,7 +68,9 @@ case-close workflow は次の STEP で構成する。Epic Wave クローズは S
 
 ### 共通事前マージ gate（両ルート共通、DEC-{N}、配布依存境界 SPEC）
 
-配布依存境界の最終 gate は single-Issue ルート（STEP-3-1）と Epic Wave ルート（STEP-E4-1）の両方で、PR マージ前に必ず経由する共用事前マージ seam である。両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run command Step 7-1 と case-close で同一 detector を再利用）。gate 違反時は両ルートとも PR マージを停止する。
+配布依存境界の最終 gate は single-Issue ルート（STEP-3-1）と Epic Wave ルート（STEP-E4-1）の両方で、PR マージ前に必ず経由する共用事前マージ seam である。
+両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run command Step 7-1 と case-close で同一 detector を再利用）。
+gate 違反時は両ルートとも PR マージを停止する。
 
 ### resume protocol
 
@@ -97,7 +103,9 @@ case-close workflow は次の STEP で構成する。Epic Wave クローズは S
 
 ## Artifact Graph 利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引を、変更後の整合性確認（必要に応じて）に利用できる。確認対象は変更後の派生索引の生成と鮮度、整合性、unresolved relation、dangling relation、provenance defect、独立確認結果との差異である（STEP-3 docs 検証）。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引を、変更後の整合性確認（必要に応じて）に利用できる。
+確認対象は変更後の派生索引の生成と鮮度、整合性、unresolved relation、dangling relation、provenance defect、独立確認結果との差異である（STEP-3 docs 検証）。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
 
 - Graph defect（派生索引側の抽出問題）と canonical defect（正規成果物側の実不整合）を区別する
 - 派生索引の不在、破損、生成失敗、問い合わせ失敗、候補過多のみを理由に本 workflow を失敗させない（fail-open）。代替検証経路（既存の品質ゲート、targeted docs guard、`rg` 等の独立探索）で継続する
@@ -105,7 +113,11 @@ case-close workflow は次の STEP で構成する。Epic Wave クローズは S
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-close/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、case-close command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-close/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、case-close command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

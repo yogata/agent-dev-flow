@@ -1,6 +1,7 @@
 # STEP-1〜4: 事前チェック・読込・検証・REQ ファイル操作（precheck-and-req-ops）
 
-> 本 reference は `agentdev-workflow-req-save` SKILL.md の STEP-1〜STEP-4 詳細である。事前チェック（no-op 判定）、ドラフト読込、ドラフト検証、REQ ファイル操作を提供する。
+> 本 reference は `agentdev-workflow-req-save` SKILL.md の STEP-1〜STEP-4 詳細である。
+> 事前チェック（no-op 判定）、ドラフト読込、ドラフト検証、REQ ファイル操作を提供する。
 
 ## 目次
 
@@ -28,7 +29,10 @@
 
 ### Procedure
 
-`draft-data` の `artifact_actions` を確認し、`artifact: req` または `artifact: decision` の entry が含まれるか判定する。REQ/Decision 対象 artifact_actions がない場合は no-op 完了とする（後続の case-open へ進むよう完了報告で案内）。`work_type` による停止は廃止する。旧形式 draft（`artifact_actions` フィールドなし）の場合は従来どおり全 req-operation を処理する（後方互換）。
+`draft-data` の `artifact_actions` を確認し、`artifact: req` または `artifact: decision` の entry が含まれるか判定する。
+REQ/Decision 対象 artifact_actions がない場合は no-op 完了とする（後続の case-open へ進むよう完了報告で案内）。
+`work_type` による停止は廃止する。
+旧形式 draft（`artifact_actions` フィールドなし）の場合は従来どおり全 req-operation を処理する（後方互換）。
 
 ### Result
 
@@ -65,7 +69,9 @@
 
 ### Procedure
 
-`.agentdev/drafts/req-draft-*.md` を読み込み、最新の1件を対象とする。見つからない場合はエラーで中止する（先に `/agentdev/req-define` を実行するよう案内）。**読込時 hash 記録**: `git rev-parse HEAD` で読込時点の commit hash を記録する。
+`.agentdev/drafts/req-draft-*.md` を読み込み、最新の1件を対象とする。
+見つからない場合はエラーで中止する（先に `/agentdev/req-define` を実行するよう案内）。
+**読込時 hash 記録**: `git rev-parse HEAD` で読込時点の commit hash を記録する。
 
 ### Result
 
@@ -102,7 +108,8 @@ draft-data の必須フィールドを検証し、処理対象 entry を確定�
 
 ### Procedure
 
-`draft-data` の必須フィールド（artifact_actions、operation_units、topic_slug）が存在することを確認する。欠損時はエラーで中止する。
+`draft-data` の必須フィールド（artifact_actions、operation_units、topic_slug）が存在することを確認する。
+欠損時はエラーで中止する。
 
 - **分類ゲート検査**: CREATE 対象 REQ の要件テーブル検査。**文書分類適合確認**: REQ/Decision 保存前のドキュメント種別確認。詳細、委譲接続点は `agentdev-req-file-manager` を参照
 - **REQ/Decision artifact_actions 処理ゲート**: ドラフトの `artifact_actions` から `artifact: req`/ `artifact: decision` の entry を処理対象とする（draft 全体を処理し、OU ごとに分割しない）。`artifact_actions` に REQ/Decision entry がない場合は no-op 完了とする。`operation_units` 存在時は OU ID 指定があれば当該 OU 配下のみ、未指定時は draft 全体を処理対象とする。`artifact_actions` フィールドがない（旧形式 draft）の場合は従来どおり全 req-operation を処理する（後方互換）。`artifact: spec` の entry は spec-save コマンドの対象であり処理しない
@@ -142,7 +149,10 @@ draft-data の必須フィールドを検証し、処理対象 entry を確定�
 
 ### Procedure
 
-`agentdev-req-file-manager` の判定ロジックと採番ルールに従って実行する。STEP-3 で処理対象とした `artifact_actions`（`artifact: req`/ `artifact: decision`）の全 entry を処理する（draft 全体を処理し、OU ごとの消費は行わない）。`artifact_actions` フィールドがない場合は従来どおり全 req-operation を処理する（後方互換）。委譲接続点: サブエージェントは CREATE/APPEND/UPDATE 候補、SPLIT 候補、REQ 再構成候補を返し、親エージェントがファイル保存を行う（詳細は `agentdev-req-file-manager` 参照）。
+`agentdev-req-file-manager` の判定ロジックと採番ルールに従って実行する。
+STEP-3 で処理対象とした `artifact_actions`（`artifact: req`/ `artifact: decision`）の全 entry を処理する（draft 全体を処理し、OU ごとの消費は行わない）。
+`artifact_actions` フィールドがない場合は従来どおり全 req-operation を処理する（後方互換）。
+委譲接続点: サブエージェントは CREATE/APPEND/UPDATE 候補、SPLIT 候補、REQ 再構成候補を返し、親エージェントがファイル保存を行う（詳細は `agentdev-req-file-manager` 参照）。
 
 - **決定的処理のスクリプト呼出**: REQ番号採番、要件行ID採番、frontmatter id↔ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約および `agentdev-req-file-manager` SKILL.md「Scripts（決定的処理）」で規定する決定的スクリプトを bash 経由で呼び出して実行する。LLM 推論で代替しない。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
 - **QG-1（適用結果の整合性検証）**: REQ/Decision ファイル保存前に `agentdev-quality-gates` の QG-1 を実行する。採番結果、マージ結果、インデックス、変更範囲の妥当性を決定的スクリプトの JSON 結果で機械的に確認する。fail 時は保存を停止し req-define へ差り戻す。req-save の QG-1 は内容の品質を再検証せず、それは req-define の QG-1 の責務である

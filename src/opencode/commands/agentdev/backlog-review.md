@@ -33,7 +33,8 @@ description: 採用済み成果物を分析、統合し、ユーザー承認後�
 
 ## RU フォーマット
 
-RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）は `agentdev-backlog-integration` を正とする。`tentative_classification` は document-model SPEC（extension 経由）の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）のいずれかを記録する（REQ）。
+RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）は `agentdev-backlog-integration` を正とする。
+`tentative_classification` は document-model SPEC（extension 経由）の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）のいずれかを記録する（REQ）。
 
 ## session由来RU 生成形式（参照）
 
@@ -41,7 +42,10 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-backlog-review` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが8 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（promoted/ 残存成果物、`.agentdev/backlog/req-units/` の RU-*.md 実ファイルと frontmatter）から再開点を再構成する（DEC-{N}）。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-backlog-review` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+同スキルが8 STEP の control plane として制御構造を所有する。
+各 STEP は resume point を持ち、durable state（promoted/ 残存成果物、`.agentdev/backlog/req-units/` の RU-*.md 実ファイルと frontmatter）から再開点を再構成する（DEC-{N}）。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|

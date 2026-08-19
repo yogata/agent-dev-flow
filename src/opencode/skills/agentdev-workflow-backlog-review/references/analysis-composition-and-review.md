@@ -1,6 +1,7 @@
 # STEP 詳細: 実行前同期・成果物検出 / 分析・暫定分類 / 統合分割判定 / review / HITL（backlog-review）
 
-> 本 reference は `agentdev-workflow-backlog-review` SKILL.md の Control Plane STEP-1〜STEP-5 詳細である。SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
+> 本 reference は `agentdev-workflow-backlog-review` SKILL.md の Control Plane STEP-1〜STEP-5 詳細である。
+> SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
 
 ## 目次
 
@@ -28,8 +29,12 @@
 ### Procedure
 
 1. `git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（`agentdev-git-worktree` と同一のエラー形式。自動解消しない）
-2. 引数の有無に応じて対象を切り替える。引数なしの場合は三ディレクトリ（`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md`）から採用済み成果物を検出する。引数ありの場合は指定されたファイルパスのみを対象とし、存在しないパスはエラー報告してスキップする
-3. 検出結果を判定する。0件の場合は正常終了とする（エラー扱いとしない。完了報告で「対象なし」と報告）。1件以上の場合はファイルパス昇順で STEP-2 へ進む
+2. 引数の有無に応じて対象を切り替える。
+引数なしの場合は三ディレクトリ（`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md`）から採用済み成果物を検出する。
+引数ありの場合は指定されたファイルパスのみを対象とし、存在しないパスはエラー報告してスキップする
+3. 検出結果を判定する。
+0件の場合は正常終了とする（エラー扱いとしない。完了報告で「対象なし」と報告）。
+1件以上の場合はファイルパス昇順で STEP-2 へ進む
 
 ### Result
 
@@ -128,7 +133,8 @@
 
 ### Purpose
 
-RU 構成案の意味的決定を adversarial-review で検証し、accepted finding を RU 構成案へ反映する。発動条件判定と review 呼出を分離して実施する。
+RU 構成案の意味的決定を adversarial-review で検証し、accepted finding を RU 構成案へ反映する。
+発動条件判定と review 呼出を分離して実施する。
 
 ### Input Resolution
 
@@ -143,9 +149,17 @@ RU 構成案の意味的決定を adversarial-review で検証し、accepted fin
 
 ### Procedure
 
-1. **発動条件判定**: RU 構成案（統合・分割判定、depends_on 依存解決）に意味的決定が存在する場合に発動する（default-on）。ユーザー明示指定は通常発動の必須条件ではない。skip 条件（RU 構成要素が1件のみで統合・分割判定不要、depends_on 解決不要、矛盾検出対象が存在しない）該当時は省略して従来フロー（STEP-5 以降）を継続する。skip 判断のためだけの新規 HITL、承認点は追加しない。ユーザー明示指定時は skip 条件の該当にかかわらず必ず発動する
-2. **review 呼出**: 発動と判定された場合のみ `agentdev-adversarial-review` を起動する。審議対象は RU 構成案（統合・分割判定結果、depends_on 解決結果、暫定分類付与結果）。呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と delegation-contracts SPEC（`semantic_review`、書き込み禁止型）を正とする
-3. **accepted finding 反映**: accepted finding の RU 構成案への反映は本 workflow（呼出元）の責務である。反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる。同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない
+1. **発動条件判定**: RU 構成案（統合・分割判定、depends_on 依存解決）に意味的決定が存在する場合に発動する（default-on）。
+ユーザー明示指定は通常発動の必須条件ではない。
+skip 条件（RU 構成要素が1件のみで統合・分割判定不要、depends_on 解決不要、矛盾検出対象が存在しない）該当時は省略して従来フロー（STEP-5 以降）を継続する。
+skip 判断のためだけの新規 HITL、承認点は追加しない。
+ユーザー明示指定時は skip 条件の該当にかかわらず必ず発動する
+2. **review 呼出**: 発動と判定された場合のみ `agentdev-adversarial-review` を起動する。
+審議対象は RU 構成案（統合・分割判定結果、depends_on 解決結果、暫定分類付与結果）。
+呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と delegation-contracts SPEC（`semantic_review`、書き込み禁止型）を正とする
+3. **accepted finding 反映**: accepted finding の RU 構成案への反映は本 workflow（呼出元）の責務である。
+反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる。
+同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない
 4. **矛盾の扱い**: review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は STEP-6（既存矛盾検出）へ引き渡す。adversarial-review 自身は矛盾を自動解決せず、矛盾の判定、partial success 扱い、ユーザー追加判断への委ねは STEP-6 の既存矛盾検出ロジックが正である
 5. **unresolved 時の取扱い**: unresolved な本質的争点またはユーザー判断事項が残る場合、RU 生成（STEP-7）、採用済み成果物削除、Git 永続化（STEP-8）等の後続不可逆処理へ進まない
 6. **呼出失敗時**: silent skip を禁止し、従来フロー（STEP-5 以降）を維持する
@@ -171,7 +185,8 @@ RU 構成案の意味的決定を adversarial-review で検証し、accepted fin
 
 ### Purpose
 
-RU 構成案をユーザーに提示し、明示的な承認を得る。ユーザー承認は RU 作成承認を兼ねる。
+RU 構成案をユーザーに提示し、明示的な承認を得る。
+ユーザー承認は RU 作成承認を兼ねる。
 
 ### Input Resolution
 

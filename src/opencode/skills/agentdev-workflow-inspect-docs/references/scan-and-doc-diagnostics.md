@@ -1,6 +1,7 @@
 # STEP-1 / STEP-2: スキャン対象収集・REQ 体系・文書種別別意味診断（scan-and-doc-diagnostics）
 
-> 本 reference は `agentdev-workflow-inspect-docs` SKILL.md の Control Plane STEP-1、STEP-2 詳細である。read-only-diagnostic型のため resume point を持たない。
+> 本 reference は `agentdev-workflow-inspect-docs` SKILL.md の Control Plane STEP-1、STEP-2 詳細である。
+> read-only-diagnostic型のため resume point を持たない。
 
 ## 開始条件
 
@@ -39,19 +40,23 @@ SPEC が REQ/Decision/guides の代替、将来計画の混入、実行時依存
 
 ### STEP-2-6: guides 意味診断
 
-guides が navigation layer の範囲を超えていないか確認する。履歴混入を検出した場合 route を追加する。
+guides が navigation layer の範囲を超えていないか確認する。
+履歴混入を検出した場合 route を追加する。
 
 ### STEP-2-7: README 索引診断
 
-README 索引が導線の範囲を超えていないか確認する。内容過多を検出した場合分割を誘導する。
+README 索引が導線の範囲を超えていないか確認する。
+内容過多を検出した場合分割を誘導する。
 
 ### STEP-2-8: REQ structure review（6観点）
 
-SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT。`agentdev-req-structure-diagnostics` 参照。
+SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT。
+`agentdev-req-structure-diagnostics` 参照。
 
 ### STEP-2-9: 文書分類一貫性検査
 
-document-model SPEC（extension 経由）の classification policy への適合確認。REQ 要件行に schema field、enum 値一覧、route/category/status 判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等の SPEC分離基準違反が残留していないかを `agentdev-req-structure-diagnostics` に従って自動検出する。
+document-model SPEC（extension 経由）の classification policy への適合確認。
+REQ 要件行に schema field、enum 値一覧、route/category/status 判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等の SPEC分離基準違反が残留していないかを `agentdev-req-structure-diagnostics` に従って自動検出する。
 
 ## エラー処理
 

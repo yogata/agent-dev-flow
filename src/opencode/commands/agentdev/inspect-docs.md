@@ -28,7 +28,8 @@ docs全体（REQ/Decision/SPEC/guides）の意味整合性を診断し、検出�
 ## inspect-* コマンド選択 routing
 
 変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。
-本コマンド（inspect-docs）と inspect-skills は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs の配布物整合性検査、inspect-skills の配布物構文健全性・責務整合診断）。変更範囲に応じて routing することで重複検出を防ぐ。
+本コマンド（inspect-docs）と inspect-skills は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs の配布物整合性検査、inspect-skills の配布物構文健全性・責務整合診断）。
+変更範囲に応じて routing することで重複検出を防ぐ。
 
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
@@ -40,7 +41,8 @@ docs全体（REQ/Decision/SPEC/guides）の意味整合性を診断し、検出�
 | `docs/specs/<commands/**/*>.md`、`docs/specs/<skills/**/*>.md` | inspect-skills |
 | 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
 
-routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。配布物のみの変更時は inspect-skills を優先する。
+routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。
+配布物のみの変更時は inspect-skills を優先する。
 
 ## project extensions
 
@@ -53,7 +55,9 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として4工程の control plane を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+同スキルは read-only-diagnostic型（STEP model 対象外、resume point なし）として4工程の control plane を所有する。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|

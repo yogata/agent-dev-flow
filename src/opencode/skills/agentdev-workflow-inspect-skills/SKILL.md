@@ -5,13 +5,15 @@ description: "inspect-skills command の workflow 実装本体。Command→Skill
 
 # inspect-skills workflow スキル
 
-inspect-skills command の workflow 実装本体。Command/Skill 参照妥当性と Skill 構造の診断から、検出事項の分類、推奨 route の提示、`.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
+inspect-skills command の workflow 実装本体。
+Command/Skill 参照妥当性と Skill 構造の診断から、検出事項の分類、推奨 route の提示、`.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
 
 inspect-skills command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
 ## 型判定: read-only-diagnostic型（STEP model 対象外）
 
-本スキルは read-only-diagnostic型（検査対象を直接修正しない診断専用の型）であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。**STEP resume point / export / import を持たない**。
+本スキルは read-only-diagnostic型（検査対象を直接修正しない診断専用の型）であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。
+**STEP resume point / export / import を持たない**。
 
 - 工程は先頭から通しで実行する。中断が発生した場合は workflow を最初から再実行する（診断は対象の読み取りと検出事項ファイルの生成のみの冪等な処理であり、再実行で同等の結果を得る）
 - 会話コンテキストを権威情報源とする再開点の再構成、状態の export / import を本スキルは定義しない
@@ -59,7 +61,8 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-skills.yaml`�
 
 ## Control Plane（工程一覧）
 
-本スキルの工程一覧を次に示す。STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型、REQ-{NNNN}-{NNN}）。
+本スキルの工程一覧を次に示す。
+STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型、REQ-{NNNN}-{NNN}）。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -84,7 +87,9 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-skills.yaml`�
 
 ## Artifact Graph 利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（diagnostics）を構造診断候補の探索に利用できる。self-hosting augmentation が利用可能な場合、command と skill 関係、command と extension と skill 関係、予期しない delegation、orphan skill candidate の候補を探索できる（STEP-2 の入力）。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（diagnostics）を構造診断候補の探索に利用できる。
+self-hosting augmentation が利用可能な場合、command と skill 関係、command と extension と skill 関係、予期しない delegation、orphan skill candidate の候補を探索できる（STEP-2 の入力）。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
 
 - Graph は候補提供者であり、委譲先 skill 実在などの決定的検査は docs-check、整合性ルール群が所有する。本スキルは Graph 構造候補を未検証 evidence として意味診断の入力に利用し、構造診断と意味診断を区別する
 - consumer 環境で対応 node type、relation type が存在しない場合は異常とせず、配布物定義の直接読取、`rg` などの従来の診断経路で継続する
@@ -92,9 +97,14 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-skills.yaml`�
 
 ## Workflow Extension 読込契約
 
-本スキルは workflow-extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-skills.yaml`、kind: workflow-extension）を読み込む場合がある。Workflow Skill のみが読み、inspect-skills command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する（fail-open）。破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する。
+本スキルは workflow-extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-skills.yaml`、kind: workflow-extension）を読み込む場合がある。
+Workflow Skill のみが読み、inspect-skills command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する（fail-open）。
+破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する。
 
-本スキルは project 非依存で単体動作する正当な状態であり、extension が存在しなくても診断の全工程が動作する（対応 extension が存在しない command/skill は正常動作である）。docs-spec-rebuild-integrity SPEC の検査パターンは extension 経由で解決する。
+本スキルは project 非依存で単体動作する正当な状態であり、extension が存在しなくても診断の全工程が動作する（対応 extension が存在しない command/skill は正常動作である）。
+docs-spec-rebuild-integrity SPEC の検査パターンは extension 経由で解決する。
 
 ## 共通制約
 

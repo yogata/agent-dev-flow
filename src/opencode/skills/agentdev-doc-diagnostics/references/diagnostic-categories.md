@@ -42,7 +42,8 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 - 「現行判断の根拠」として使われている言及を high severity 候補としてルーティングする
 - 履歴参照、移行履歴説明目的の言及は対象外とする（文脈で判定）
 
-詳細な検出パターン、配布物 ID 汚染の判定ルール、配布物統合性検査は `agentdev-req-structure-diagnostics` が所有する。本スキルはルーティング対象の特定のみを行う。
+詳細な検出パターン、配布物 ID 汚染の判定ルール、配布物統合性検査は `agentdev-req-structure-diagnostics` が所有する。
+本スキルはルーティング対象の特定のみを行う。
 
 ## REQ/SPEC 境界違反
 
@@ -56,18 +57,21 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 
 ### 安定契約例外候補
 
-次の要素は安定契約（外部公開が必要）に該当する可能性があり、例外として扱う。確信度を medium/low に下げ、根拠に例外候補を明記する。
+次の要素は安定契約（外部公開が必要）に該当する可能性があり、例外として扱う。
+確信度を medium/low に下げ、根拠に例外候補を明記する。
 
 - 公開 command 名（`/agentdev/*`）
 - ドメイン状態の位置づけ（`.agentdev/` 配下の構造要素）
 - 外部接続契約（委譲、入出力、ライフサイクル境界）
 - 安全境界、停止条件の大枠
 
-例外判定の SSoT は document-model SPEC（extension 経由で参照）。本スキルは例外候補の抽出と確信度調整のみを行う。
+例外判定の SSoT は document-model SPEC（extension 経由で参照）。
+本スキルは例外候補の抽出と確信度調整のみを行う。
 
 ### ルーティング先
 
-検出シグナルの詳細カタログ（schema field、enum 値一覧、route 判定表、file pattern、template variant、report format、内部アルゴリズム、作業履歴、実装パラメータ等）、判定ルール、出力 schema は `agentdev-req-structure-diagnostics`（MOVE 観点）が所有する。本スキルは横断スキャンでシグナル候補を抽出し、ルーティングする。
+検出シグナルの詳細カタログ（schema field、enum 値一覧、route 判定表、file pattern、template variant、report format、内部アルゴリズム、作業履歴、実装パラメータ等）、判定ルール、出力 schema は `agentdev-req-structure-diagnostics`（MOVE 観点）が所有する。
+本スキルは横断スキャンでシグナル候補を抽出し、ルーティングする。
 
 ## REQ 粒度過小
 
@@ -81,7 +85,8 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 
 ### ルーティング先
 
-SPLIT 観点の判定ロジック、シグナル閾値（1シグナルは觀察メモ、2シグナル以上は検出事項 等）、出力 schema（7フィールド）は `agentdev-req-structure-diagnostics` が所有する。本スキルは横断比較によるシグナル候補抽出とルーティングのみを行う。
+SPLIT 観点の判定ロジック、シグナル閾値（1シグナルは觀察メモ、2シグナル以上は検出事項 等）、出力 schema（7フィールド）は `agentdev-req-structure-diagnostics` が所有する。
+本スキルは横断比較によるシグナル候補抽出とルーティングのみを行う。
 
 ## 横断契約矛盾
 
@@ -114,11 +119,14 @@ LLM っぽい表現、空虚な形容/動詞、英語混じり表現、実行主
 
 ### ルーティング先
 
-判定辞書（置換辞書、LLM 表現辞書、英語抽象語書き換え辞書）、機械的置換ルール、査読出力形式は `agentdev-doc-writing` が所有する。本スキルは横断スキャンで候補を抽出し、ルーティングする。
+判定辞書（置換辞書、LLM 表現辞書、英語抽象語書き換え辞書）、機械的置換ルール、査読出力形式は `agentdev-doc-writing` が所有する。
+本スキルは横断スキャンで候補を抽出し、ルーティングする。
 
 ## 配布物統合性
 
-配布物（commands/、skills/）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンに従い、構文健全性、文意保持、責務整合を診断する。docs-spec-rebuild-integrity SPEC が検出パターンを定義し、本スキルが診断カテゴリ、共通証拠構造、finding 出力契約を正規所有する。判定ロジック、検出手順、問題候補出力スキーマは `agentdev-req-structure-diagnostics` が所有し、本スキルは対象範囲の特定とルーティングを行う。
+配布物（commands/、skills/）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンに従い、構文健全性、文意保持、責務整合を診断する。
+docs-spec-rebuild-integrity SPEC が検出パターンを定義し、本スキルが診断カテゴリ、共通証拠構造、finding 出力契約を正規所有する。
+判定ロジック、検出手順、問題候補出力スキーマは `agentdev-req-structure-diagnostics` が所有し、本スキルは対象範囲の特定とルーティングを行う。
 
 ### 構文健全性検査パターン
 
@@ -132,9 +140,11 @@ docs-spec-rebuild-integrity SPEC が定義する5パターンを配布物整合�
 | 存在しない command 参照 | README listing と command 本文の相互参照で存在しない command を指す参照 | 実在する command 参照 |
 | エンコーディング不整合 | UTF‑8 BOM 付きファイル、単一ファイル内の CRLF/LF 混在 | BOM なし UTF‑8 かつ単一改行コードで構成されたファイル |
 
-存在しない command 参照の検出は README listing（agentdev command README の command 一覧）と command 本文（各 `*.md`）の相互参照について `/agentdev/*` 参照を抽出し、実在する command 一覧と照合する。実在確認であった command 参照は検出対象外とする。
+存在しない command 参照の検出は README listing（agentdev command README の command 一覧）と command 本文（各 `*.md`）の相互参照について `/agentdev/*` 参照を抽出し、実在する command 一覧と照合する。
+実在確認であった command 参照は検出対象外とする。
 
-エンコーディング不整合の検出は配布物 Markdown の先頭3バイトから UTF‑8 BOM（`EF BB BF`）の有無を判定し、当該ファイル内の改行コード出現集合（CRLF、LF のいずれか、または両方）から混在を判定する。BOM なし UTF‑8 かつ単一の改行コードで構成されたファイルは検出対象外とする。
+エンコーディング不整合の検出は配布物 Markdown の先頭3バイトから UTF‑8 BOM（`EF BB BF`）の有無を判定し、当該ファイル内の改行コード出現集合（CRLF、LF のいずれか、または両方）から混在を判定する。
+BOM なし UTF‑8 かつ単一の改行コードで構成されたファイルは検出対象外とする。
 
 ### ルーティング先
 
@@ -149,4 +159,5 @@ docs-spec-rebuild-integrity SPEC が定義する5パターンを配布物整合�
 複数カテゴリにまたがる安定契約例外候補は、個別カテゴリで確信度を調整した上で横断的に再評価する。
 例外確定の場合は検出事項から外し、例外でない場合は該当カテゴリの severity で出力する。
 
-例外判定の SSoT は document-model SPEC（extension 経由で参照）。本 reference では例外候補の抽出と確信度調整のみを行う。
+例外判定の SSoT は document-model SPEC（extension 経由で参照）。
+本 reference では例外候補の抽出と確信度調整のみを行う。

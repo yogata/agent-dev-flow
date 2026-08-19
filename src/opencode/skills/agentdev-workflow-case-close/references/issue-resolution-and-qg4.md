@@ -1,6 +1,7 @@
 # STEP-1/2: Issue 番号解決・QG-4 達成判定（issue-resolution-and-qg4）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-1, STEP-2 詳細である。Issue 番号解決・ルーティング（単一 vs Epic Wave）と QG-4 最終完了判定ゲートを提供する。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-1, STEP-2 詳細である。
+> Issue 番号解決・ルーティング（単一 vs Epic Wave）と QG-4 最終完了判定ゲートを提供する。
 
 ## STEP-1: Issue 番号解決・ルーティング
 
@@ -21,7 +22,9 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 
 ### Procedure
 
-ユーザー入力またはセッション内会話から番号を取得。複数候補時は直近を優先して確認。検出不可時はユーザーに指定を求めて停止。
+ユーザー入力またはセッション内会話から番号を取得。
+複数候補時は直近を優先して確認。
+検出不可時はユーザーに指定を求めて停止。
 
 **Epic Issue 判定**: 解決した Issue 番号の本文を `agentdev-gh-cli` の安全な読み取り手順で取得し、ステータス追跡テーブル（`agentdev-epic-tracker` の新4列/旧4列形式）が存在するか確認。
 
@@ -30,7 +33,8 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 
 ### STEP-1-1: 重複ファイルチェック（merge/pull 実行前、単一 Issue クローズ時）
 
-`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャに従い、ローカル未コミット変更ファイルと対象 PR 変更ファイルの重複を検出、停止条件の判定を行う。PR 補助データ読込手続き（`agentdev-gh-cli`）実行不可時は後方互換性として STEP-6（実行前同期）でフォールバック検出を維持する。
+`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャに従い、ローカル未コミット変更ファイルと対象 PR 変更ファイルの重複を検出、停止条件の判定を行う。
+PR 補助データ読込手続き（`agentdev-gh-cli`）実行不可時は後方互換性として STEP-6（実行前同期）でフォールバック検出を維持する。
 
 ### Result
 
@@ -68,7 +72,8 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 
 ### Procedure
 
-達成判定、完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価、更新する。判定基準、検査観点は `agentdev-quality-gates` の QG-4 を参照。
+達成判定、完了ゲート（QG-4）→ `agentdev-quality-gates` の QG-4（Final Acceptance Gate）に従い、Issue本文の完了条件チェックボックスを最終評価、更新する。
+判定基準、検査観点は `agentdev-quality-gates` の QG-4 を参照。
 
 - **完了条件チェックボックス評価・更新は case-close の責務**（QG-4）。case-run、実行担当サブエージェント、外部実行バックエンドは完了条件チェックボックスを更新しない。case-close は case-run/ 実行担当サブエージェントとは**別コンテキスト**で、PR 作成後に独立して完了条件を再読込して最終完了判定する
 - **PR 対象範囲 vs 全体 評価スコープ判定（QG-4 観点8）**: unchecked 完了条件を達成判定する前に、各完了条件の評価スコープ（PR 対象範囲 or 全体）を QG-4 観点8「PR 対象範囲 vs 全体 判定マトリクス」に従い決定する（境界ケース #1532 由来）

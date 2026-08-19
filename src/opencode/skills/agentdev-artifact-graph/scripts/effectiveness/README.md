@@ -2,7 +2,8 @@
 
 AgentDevFlow の代表質問（workflow question）6 種について、**Artifact Graph による探索**
 と **Graph を使わない独立探索（rg / glob / frontmatter scan 相当）** を比較する診断
-harness。REQ-{NNNN}-{NNN} が定める 6 つの比較観点を計算し、diagnostic report を出力する。
+harness。
+REQ-{NNNN}-{NNN} が定める 6 つの比較観点を計算し、diagnostic report を出力する。
 
 > **本検証は診断目的であり、性能閾値による合否判定は行わない（REQ-{NNNN}-{NNN}, TS-{NNN}）。**
 > Parser/Graph regression は REQ-{NNNN} 傘下の `tests/*.test.ts` が独立に判断可能であり、

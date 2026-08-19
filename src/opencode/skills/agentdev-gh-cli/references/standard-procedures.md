@@ -55,7 +55,8 @@ PowerShell パイプライン経由で日本語出力を読み取る READ 操作
 - **パイプライン経路を避けられない場合**: パイプライン実行前に `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` を前置する。前置なしのパイプライン READ は日本語出力の文字化けを生む
 - **Node.js 経路**: Node.js `execSync` / `fs.readFileSync` で取得する（READ 手続き Section 3 の標準経路）。コンソールエンコーディングに依存しないため前置を要しない
 
-gh CLI の READ は既存どおり READ 手続き（Section 3、Section 4）の Node.js `execSync` 経路を標準とする。本節はパイプライン経由の READ 操作全般（`git show` 等）への拡張である。
+gh CLI の READ は既存どおり READ 手続き（Section 3、Section 4）の Node.js `execSync` 経路を標準とする。
+本節はパイプライン経由の READ 操作全般（`git show` 等）への拡張である。
 
 ### PowerShell 変数補間（regex backreference `$N`）
 
@@ -67,11 +68,13 @@ gh CLI の READ は既存どおり READ 手続き（Section 3、Section 4）の 
 
 ### PowerShell regex MatchEvaluator 内 -replace 使用注意
 
-`[regex]::Replace()` の MatchEvaluator（スクリプトブロック）内で `-replace` 演算子を使用すると、MatchEvaluator が返す文字列そのものが再度 `-replace` の対象となり、意図しない置換破壊を生じる。前節「PowerShell 変数補間（regex backreference `$N`）」とは発生原理が異なり、対策も異なるため両者を区別して扱う。
+`[regex]::Replace()` の MatchEvaluator（スクリプトブロック）内で `-replace` 演算子を使用すると、MatchEvaluator が返す文字列そのものが再度 `-replace` の対象となり、意図しない置換破壊を生じる。
+前節「PowerShell 変数補間（regex backreference `$N`）」とは発生原理が異なり、対策も異なるため両者を区別して扱う。
 
 #### 発生原理
 
-`[regex]::Replace(input, pattern, MatchEvaluator)` の MatchEvaluator は一致箇所ごとに呼ばれ、戻り値が置換結果となる。MatchEvaluator 内で `-replace` を使用すると、MatchEvaluator の戻り値（置換後文字列）がそのまま最終置換結果として採用されるはずが、`-replace` が MatchEvaluator の戻り値に対して再度パターンマッチを行い、予期せぬ二次置換を発生させる。
+`[regex]::Replace(input, pattern, MatchEvaluator)` の MatchEvaluator は一致箇所ごとに呼ばれ、戻り値が置換結果となる。
+MatchEvaluator 内で `-replace` を使用すると、MatchEvaluator の戻り値（置換後文字列）がそのまま最終置換結果として採用されるはずが、`-replace` が MatchEvaluator の戻り値に対して再度パターンマッチを行い、予期せぬ二次置換を発生させる。
 
 - **適用場面**: Issue/ PR 本文の行単位 regex 置換、Epic ステータステーブルの行編集、`-replace` を MatchEvaluator 内で組み合わせる処理等
 - **例（NG）**: `[regex]::Replace($text, $pattern, { param($m) $m.Value -replace 'foo', 'bar' })`（MatchEvaluator 戻り値の `-replace` が二次置換を生じる）
@@ -79,7 +82,8 @@ gh CLI の READ は既存どおり READ 手続き（Section 3、Section 4）の 
 
 #### 回避策（前節 backreference `$N` 対策との区別）
 
-backreference `$N` 対策は「`-replace` 演算子右辺の `$N` を PowerShell 変数補間から守る」ことが目的で、シングルクォート囲みで対応する。一方、MatchEvaluator 内 `-replace` 問題は「MatchEvaluator 内で `-replace` を使わない」ことが目的で、別の回避策をとる。
+backreference `$N` 対策は「`-replace` 演算子右辺の `$N` を PowerShell 変数補間から守る」ことが目的で、シングルクォート囲みで対応する。
+一方、MatchEvaluator 内 `-replace` 問題は「MatchEvaluator 内で `-replace` を使わない」ことが目的で、別の回避策をとる。
 
 - **回避策1（Node.js `String.split`/ `join`）**: PowerShell ではなく Node.js 側で文字列置換を実行する。`String.split(pattern).join(replacement)` を使用し、regex 依存を避ける。READ 手続き（Section 3）の Node.js `execSync` 経由と親和性が高い
 - **回避策2（PowerShell `[String]::Replace`）**: PowerShell 側で処理する場合は `[String]::Replace(oldValue, newValue)` を使用する。`[String]::Replace` は regex を解釈しないため、MatchEvaluator 内の二次置換問題が発生しない
@@ -88,7 +92,8 @@ backreference `$N` 対策は「`-replace` 演算子右辺の `$N` を PowerShell
 
 #### backreference `$N` との併発ケース
 
-両者が同時に発生する場合は、MatchEvaluator 内での `-replace` 使用を避けた上で、`[String]::Replace` 内の置換文字列に `$N` が含まれないかを確認する。`[String]::Replace` は regex 解釈しないため `$N` もリテラル扱いとなり、backreference の問題は生じない。
+両者が同時に発生する場合は、MatchEvaluator 内での `-replace` 使用を避けた上で、`[String]::Replace` 内の置換文字列に `$N` が含まれないかを確認する。
+`[String]::Replace` は regex 解釈しないため `$N` もリテラル扱いとなり、backreference の問題は生じない。
 
 ## WRITE 手続き（書き込み安全性）
 
@@ -118,8 +123,11 @@ backreference `$N` 対策は「`-replace` 演算子右辺の `$N` を PowerShell
  ```
  [System.IO.File]::WriteAllText(".agentdev/tmp/gh-temp-{timestamp}.md", $content, (New-Object System.Text.UTF8Encoding($false)))
  ```
- **`.agentdev/tmp/` 配置の理由**: `$env:TEMP/agentdev/`（システム一時ディレクトリ）から `.agentdev/tmp/`（workspace-local）へ変更する。workspace 配下へ配置することで worktree 削除時に一時ファイルが確実に破棄され、かつ VERIFY や事後調査が同一 workspace 内で完結する。
- **委譲時の代替一時ファイル配置先**: 実行担当サブエージェント委譲など、worktree 隔離境界により `.agentdev/**` への書き込みが禁止される場面では、一時ファイル配置先をリポジトリ外の一時領域（`$env:TEMP` 配下）に変更する。代替配置時も create（本 Step） → gh 実行（Step 3） → VERIFY → cleanup（Step 4）の1手順ユニットと cleanup 省略不可ステップを維持する。委譲プロンプト側の MUST NOT（`.agentdev/**` 全域を触らない）は本ルールで変更しない
+ **`.agentdev/tmp/` 配置の理由**: `$env:TEMP/agentdev/`（システム一時ディレクトリ）から `.agentdev/tmp/`（workspace-local）へ変更する。
+workspace 配下へ配置することで worktree 削除時に一時ファイルが確実に破棄され、かつ VERIFY や事後調査が同一 workspace 内で完結する。
+ **委譲時の代替一時ファイル配置先**: 実行担当サブエージェント委譲など、worktree 隔離境界により `.agentdev/**` への書き込みが禁止される場面では、一時ファイル配置先をリポジトリ外の一時領域（`$env:TEMP` 配下）に変更する。
+代替配置時も create（本 Step） → gh 実行（Step 3） → VERIFY → cleanup（Step 4）の1手順ユニットと cleanup 省略不可ステップを維持する。
+委譲プロンプト側の MUST NOT（`.agentdev/**` 全域を触らない）は本ルールで変更しない
  **OpenCode の Write tool は新規ファイル作成時に限定して使用可能**（BOMなしUTF‑8で書き出す）。
 既存 UTF‑8（BOM なし）ファイル編集時は edit ツール（per-line string replace）を優先すること。
 Windows 環境で Write tool が既存 UTF‑8 ファイルを cp932 で書き出す事象が実証されているため、Write tool の全面上書きは新規作成時のみ許可する。
@@ -137,7 +145,10 @@ PowerShell の `Out-File`, `Set-Content`, `>` 等は使用禁止（Section 1 参
  | `gh issue comment` | `--body` | `--body-file` | `-F` |
  | `gh pr create` | `--body` | `--body-file` | `-F` |
 
-4. **WRITE ユニットの完了と cleanup（省略不可）**: WRITE 手続きは create（Step 1） → gh 実行（Step 3） → VERIFY（[verify.md](verify.md)） → cleanup を1ユニットとし、cleanup を省略不可ステップとする。VERIFY が PASS した後にのみ cleanup を実行する。VERIFY が FAIL の場合は cleanup を実行せず、一時ファイルを残して [retry.md](retry.md) のリトライロジックへ移行する（一時ファイルはリトライ時の比較、原因調査の情報源となる）。これにより「VERIFY を忘れて cleanup し、問題を事後検出できなくなる」事態を構造的に防止する。
+4. **WRITE ユニットの完了と cleanup（省略不可）**: WRITE 手続きは create（Step 1） → gh 実行（Step 3） → VERIFY（[verify.md](verify.md)） → cleanup を1ユニットとし、cleanup を省略不可ステップとする。
+VERIFY が PASS した後にのみ cleanup を実行する。
+VERIFY が FAIL の場合は cleanup を実行せず、一時ファイルを残して [retry.md](retry.md) のリトライロジックへ移行する（一時ファイルはリトライ時の比較、原因調査の情報源となる）。
+これにより「VERIFY を忘れて cleanup し、問題を事後検出できなくなる」事態を構造的に防止する。
  - **cleanup 対象**: 当該 WRITE ユニットで生成した一時ファイル（`.agentdev/tmp/` 配下、および委譲時の代替配置先 `$env:TEMP` 配下。Step 1「委譲時の代替一時ファイル配置先」参照）
  - **VERIFY FAIL 時の一時ファイル保管期間**: リトライまたは停止手続きの完了後、[retry.md](retry.md) に従い cleanup する
 
@@ -194,14 +205,16 @@ PowerShellがバッククォートをコマンド置換として解釈するた�
 
 #### 適用範囲（gh CLI からネイティブコマンド全般への拡張）
 
-READ 安全手順（本 Section 3、Section 4）は gh CLI の READ に限定せず、pwsh（Windows PowerShell 5.x / pwsh 7）経由でネイティブコマンド（gh CLI、git CLI、bun、node 等）の出力を読み取る操作全般に適用する。適用経路は読み取り対象コマンドの性質により次の2つに分かれる。
+READ 安全手順（本 Section 3、Section 4）は gh CLI の READ に限定せず、pwsh（Windows PowerShell 5.x / pwsh 7）経由でネイティブコマンド（gh CLI、git CLI、bun、node 等）の出力を読み取る操作全般に適用する。
+適用経路は読み取り対象コマンドの性質により次の2つに分かれる。
 
 - **単発 READ（成功が見込めるもの）**: gh CLI の本文読込等、コマンド成功を前提とした単発 READ は従来どおり `execSync` 経路（項目1）を維持する
 - **exit code が意味を持つコマンド**: 検証・検査コマンド等、非ゼロ exit が観測すべき結果として意味を持つコマンドは次項の `spawnSync` 経路を標準とする
 
 #### exit code が意味を持つコマンドの stdout 退避形式
 
-**背景**: `execSync` は非ゼロ exit で例外を投げるため、stdout は例外オブジェクトのプロパティ経由でしか取得できず、例外処理を誤ると出力が失われる。検証・検査コマンド（integrity checker、test、`git diff --check` 等）では非ゼロ exit 時の stdout（JSON レポート、違反明細）こそが判定と証跡に必要となる（PR #1600/#2172 系、Epic #1719 Wave 4 の再発防止）。
+**背景**: `execSync` は非ゼロ exit で例外を投げるため、stdout は例外オブジェクトのプロパティ経由でしか取得できず、例外処理を誤ると出力が失われる。
+検証・検査コマンド（integrity checker、test、`git diff --check` 等）では非ゼロ exit 時の stdout（JSON レポート、違反明細）こそが判定と証跡に必要となる（PR #1600/#2172 系、Epic #1719 Wave 4 の再発防止）。
 
 **標準形式**: `spawnSync` で status と stdout を分離取得し、`fs.writeFileSync` の第3引数に `'utf8'` を明示指定して UTF‑8（BOMなし）で一時ファイルへ退避する:
 
@@ -219,7 +232,8 @@ node -e "const{spawnSync}=require('child_process');const fs=require('fs');const 
 
 #### execSync 維持境界
 
-`execSync` を全面禁止とはしない。維持境界は次のとおりとし、対象コマンドがどちらに該当するかを判定して経路を選択すること。
+`execSync` を全面禁止とはしない。
+維持境界は次のとおりとし、対象コマンドがどちらに該当するかを判定して経路を選択すること。
 
 - **維持（`execSync`）**: 成功が見込める単発 READ。gh CLI の本文読込・補助データ読込等、非ゼロ exit が例外的失敗のみを意味するコマンドの READ
 - **切替（`spawnSync`）**: exit code が意味を持つコマンド。非ゼロ exit が観測すべき結果として設計された検証・検査コマンド（integrity checker、test、`git diff --check` 等）の実行と stdout 取得
@@ -303,7 +317,10 @@ READ 手続き（Section 3）に従い Node.js `execSync` で取得し、一時�
 
 #### PR 変更ファイル一覧取得 / PR mergeable 状態取得
 
-拡張手続きとして新設された2手続きの標準版（GitHub 版）実装は前段の gh CLI 例を使用する。いずれも READ 手続き（Section 3）に従い Node.js `execSync` で取得する。READ 手続きであるため Windows コンソールエンコーディング初期化（Section 2 Step 0）は不要。事後条件は SPEC `agentdev-gh-cli`.md「拡張手続き」参照。
+拡張手続きとして新設された2手続きの標準版（GitHub 版）実装は前段の gh CLI 例を使用する。
+いずれも READ 手続き（Section 3）に従い Node.js `execSync` で取得する。
+READ 手続きであるため Windows コンソールエンコーディング初期化（Section 2 Step 0）は不要。
+事後条件は SPEC `agentdev-gh-cli`.md「拡張手続き」参照。
 
 - **PR 変更ファイル一覧取得**: `gh pr view {N} --json files` を実行し、`files[].path` を抽出して文字列配列を返す
 - **PR mergeable 状態取得**: `gh pr view {N} --json mergeable,mergeStateStatus` を実行し、`mergeable` 値（`MERGEABLE` / `CONFLICTING` / `UNKNOWN`）をそのまま返す。`UNKNOWN` の取り扱い（squash merge 前のポーリング）は後述「squash merge 前の mergeable UNKNOWN ポーリング」セクション参照
@@ -325,11 +342,14 @@ gh pr merge {N} --{merge_method}
 `{merge_method}` は `squash`、`merge`、`rebase` のいずれか。
 merge 前に `git rev-parse HEAD` で HEAD commit hash を記録する。
 Merge Conflict 発生時は後述「Merge Conflict 対応パターン」に従う。
-**`--delete-branch` 非推奨**: `gh pr merge` で `--delete-branch` オプションを使用しない。アクティブ worktree に checkout されたブランチで `--delete-branch` を使用すると local 削除が失敗し remote 削除フェーズへ到達しない。ブランチ削除は case-close Step 7 で独立実施する。
+**`--delete-branch` 非推奨**: `gh pr merge` で `--delete-branch` オプションを使用しない。
+アクティブ worktree に checkout されたブランチで `--delete-branch` を使用すると local 削除が失敗し remote 削除フェーズへ到達しない。
+ブランチ削除は case-close Step 7 で独立実施する。
 
 ### squash merge リトライ手続き
 
-squash merge が失敗した場合のリトライ戦略。ネットワーク揺れ、GitHub 側の一時的不具合等、同一内容の再試行で解決する可能性がある失敗を想定する（case-close command 側には具体値を記載せず、本手続きが待機間隔・最大試行回数を所有する）。
+squash merge が失敗した場合のリトライ戦略。
+ネットワーク揺れ、GitHub 側の一時的不具合等、同一内容の再試行で解決する可能性がある失敗を想定する（case-close command 側には具体値を記載せず、本手続きが待機間隔・最大試行回数を所有する）。
 
 - **待機間隔**: 5秒
 - **最大試行回数**: 初期試行 + 5回リトライ（計6回）
@@ -337,11 +357,13 @@ squash merge が失敗した場合のリトライ戦略。ネットワーク揺�
 - **全試行失敗時のフォールバック**: command 側の template（`.opencode/commands/agentdev/templates/case-close/standard.md`）が定義するフォールバック手順へ接続する
 - **コンフリクト時の扱い**: コンフリクトによる失敗は本リトライの対象外。即座にコンフリクト解消パス（case-close Step 4-2 等）へ進む
 
-VERIFY 失敗時の3段階リトライロジック（[retry.md](retry.md)）とは別手続き。retry.md は VERIFY 後の差分検出に対するリトライ、本手続きは `gh pr merge` コマンド自体の実行失敗に対するリトライ。
+VERIFY 失敗時の3段階リトライロジック（[retry.md](retry.md)）とは別手続き。
+retry.md は VERIFY 後の差分検出に対するリトライ、本手続きは `gh pr merge` コマンド自体の実行失敗に対するリトライ。
 
 ### squash merge 前の mergeable UNKNOWN ポーリング
 
-squash merge 実行前に、対象 PR の `mergeable` 状態を事前確認し、`UNKNOWN` の場合は mergeable になるまでポーリング待機する。連続 squash merge 時に GitHub が mergeable を `UNKNOWN` 状態で返し、マージが失敗する事象（バックエンドの mergeable 再計算未完了）を回避する。
+squash merge 実行前に、対象 PR の `mergeable` 状態を事前確認し、`UNKNOWN` の場合は mergeable になるまでポーリング待機する。
+連続 squash merge 時に GitHub が mergeable を `UNKNOWN` 状態で返し、マージが失敗する事象（バックエンドの mergeable 再計算未完了）を回避する。
 
 - **状態取得**: PR 補助データ読込手続き（`gh pr view {N} --json mergeable,mergeStateStatus`）で `mergeable` 値を取得する
 - **判定**: `mergeable` が `MERGEABLE` の場合は即時 squash merge（PR merge 手続き）へ進む。`UNKNOWN` の場合はポーリングへ移行。`CONFLICTING` の場合はコンフリクト解消パス（case-close Step 4-2 等）へ進む
@@ -388,7 +410,8 @@ intake-from-github 等の検索系操作で使用する。
 
 ## title 修正 REST API PATCH 標準手続き
 
-日本語 title を設定、修正する場合の標準手続き。Windows 環境での `--title` inline 使用禁止（共通制約参照）に伴い、`gh issue create --title "..."`、`gh pr create --title "..."` で日本語 title を渡せないため、REST API PATCH 経由で title を設定する。
+日本語 title を設定、修正する場合の標準手続き。
+Windows 環境での `--title` inline 使用禁止（共通制約参照）に伴い、`gh issue create --title "..."`、`gh pr create --title "..."` で日本語 title を渡せないため、REST API PATCH 経由で title を設定する。
 
 ### 適用条件
 
@@ -404,9 +427,11 @@ intake-from-github 等の検索系操作で使用する。
  {"title": "日本語タイトル文字列"}
  ```
 
- ファイル配置は `.agentdev/tmp/`（workspace-local）へ統一。委譲時の代替配置先は Section 2 Step 1「委譲時の代替一時ファイル配置先」に従う。
+ ファイル配置は `.agentdev/tmp/`（workspace-local）へ統一。
+委譲時の代替配置先は Section 2 Step 1「委譲時の代替一時ファイル配置先」に従う。
 
-2. **コンソールエンコーディング初期化（Windows 環境のみ）**: Section 2 Step 0 の3行を実行する。`gh api --input` 経由であっても Windows 環境では必須（gh CLI がコンソールコードページを参照するため）。
+2. **コンソールエンコーディング初期化（Windows 環境のみ）**: Section 2 Step 0 の3行を実行する。
+`gh api --input` 経由であっても Windows 環境では必須（gh CLI がコンソールコードページを参照するため）。
 
 3. **REST API PATCH 実行**:
 
@@ -421,7 +446,8 @@ intake-from-github 等の検索系操作で使用する。
 
 4. **VERIFY**: title 更新後、`gh issue view {N} --json title -q .title` または `gh pr view {N} --json title -q .title` で読み戻し、JSON ファイルの title と一致することを確認する（READ 手続き Section 3 に従い Node.js `execSync` で取得）。
 
-5. **cleanup**: VERIFY が PASS した後に `.agentdev/tmp/title-patch-{N}-{timestamp}.json` を削除する（WRITE ユニット cleanup 規定）。VERIFY が FAIL の場合は [retry.md](retry.md) リトライロジックへ移行し、cleanup を実行しない。
+5. **cleanup**: VERIFY が PASS した後に `.agentdev/tmp/title-patch-{N}-{timestamp}.json` を削除する（WRITE ユニット cleanup 規定）。
+VERIFY が FAIL の場合は [retry.md](retry.md) リトライロジックへ移行し、cleanup を実行しない。
 
 ### title 設定を伴う新規 Issue / PR 作成時のシーケンス
 
@@ -432,11 +458,15 @@ intake-from-github 等の検索系操作で使用する。
 
 新規作成と PATCH を分離することで、Windows 環境の `--title` cp932 化けを構造的に回避する。
 
-**`--title` と `--body-file` の同時渡し回避**: 日本語 title を `--title` inline で渡しつつ `--body-file` を同一コマンドに同時渡しする単段実行は行わない。日本語 title を伴う作成は、上記2段階シーケンス、または `gh api --input` による統一（title と body を1つの UTF‑8 JSON ファイルに格納し、Issue 作成は `gh api -X POST /repos/{owner}/{repo}/issues --input`、PR 作成は `gh api -X POST /repos/{owner}/{repo}/pulls --input` で投入）のいずれかを標準とする。既存の `--title` inline 禁止・REST API PATCH 標準の規則（共通制約参照）は存置し、本節は作成時の同時渡し回避へ適用範囲を拡張する。
+**`--title` と `--body-file` の同時渡し回避**: 日本語 title を `--title` inline で渡しつつ `--body-file` を同一コマンドに同時渡しする単段実行は行わない。
+日本語 title を伴う作成は、上記2段階シーケンス、または `gh api --input` による統一（title と body を1つの UTF‑8 JSON ファイルに格納し、Issue 作成は `gh api -X POST /repos/{owner}/{repo}/issues --input`、PR 作成は `gh api -X POST /repos/{owner}/{repo}/pulls --input` で投入）のいずれかを標準とする。
+既存の `--title` inline 禁止・REST API PATCH 標準の規則（共通制約参照）は存置し、本節は作成時の同時渡し回避へ適用範囲を拡張する。
 
 ## commit メッセージ作成（BOM なし UTF‑8 契約）
 
-git commit メッセージ作成時にも WRITE 標準手順（Section 2）と同等の BOM なし UTF‑8 encoding 制御を適用する。SPEC `agentdev-gh-cli`.md「commit メッセージ作成の BOM なし UTF‑8 契約」節の標準実装を本節に置く。gh CLI を経由しない git 操作でありながら、commit メッセージファイルの書き出しは WRITE 手続きと同じ cp932 化けリスクを持つため、Section 2 のファイル書き出し規定を拡張適用する。
+git commit メッセージ作成時にも WRITE 標準手順（Section 2）と同等の BOM なし UTF‑8 encoding 制御を適用する。
+SPEC `agentdev-gh-cli`.md「commit メッセージ作成の BOM なし UTF‑8 契約」節の標準実装を本節に置く。
+gh CLI を経由しない git 操作でありながら、commit メッセージファイルの書き出しは WRITE 手続きと同じ cp932 化けリスクを持つため、Section 2 のファイル書き出し規定を拡張適用する。
 
 ### 適用条件
 
@@ -447,7 +477,9 @@ git commit メッセージ作成時にも WRITE 標準手順（Section 2）と�
 
 ### 問題事象
 
-Windows PowerShell 5.x では `Out-File -Encoding utf8` が BOM 付き UTF‑8 を生成する。BOM 付き UTF‑8 で書き出した commit メッセージファイルを `git commit -F` で渡すと、git が BOM をメッセージ先頭の文字（`U+FEFF`、zero-width no-break space）として解釈し、commit メッセージの先頭に不可視文字が残留する。GitHub 上でも化けとして観察される。
+Windows PowerShell 5.x では `Out-File -Encoding utf8` が BOM 付き UTF‑8 を生成する。
+BOM 付き UTF‑8 で書き出した commit メッセージファイルを `git commit -F` で渡すと、git が BOM をメッセージ先頭の文字（`U+FEFF`、zero-width no-break space）として解釈し、commit メッセージの先頭に不可視文字が残留する。
+GitHub 上でも化けとして観察される。
 
 ### 標準手順
 
@@ -459,7 +491,8 @@ Windows PowerShell 5.x では `Out-File -Encoding utf8` が BOM 付き UTF‑8 �
  cmd /c chcp 65001 | Out-Null
  ```
 
-2. **commit メッセージファイル作成（BOM なし UTF‑8、LF）**: メッセージ本文を `.agentdev/tmp/commit-msg-{timestamp}.txt`（workspace-local）へ書き出す。実装手段は次のいずれかを使用する。
+2. **commit メッセージファイル作成（BOM なし UTF‑8、LF）**: メッセージ本文を `.agentdev/tmp/commit-msg-{timestamp}.txt`（workspace-local）へ書き出す。
+実装手段は次のいずれかを使用する。
 
  **実装手段A（Node.js `fs.writeFileSync`、推奨）**:
 
@@ -467,7 +500,8 @@ Windows PowerShell 5.x では `Out-File -Encoding utf8` が BOM 付き UTF‑8 �
  node -e "require('fs').writeFileSync('.agentdev/tmp/commit-msg-{timestamp}.txt', messageText, 'utf8')"
  ```
 
- Node.js `fs.writeFileSync` の第3引数に `'utf8'` を指定すると BOM なし UTF‑8 で書き出す。Windows PowerShell 5.x の `Out-File -Encoding utf8` が BOM 付きになる問題を構造的に回避するため推奨。
+ Node.js `fs.writeFileSync` の第3引数に `'utf8'` を指定すると BOM なし UTF‑8 で書き出す。
+Windows PowerShell 5.x の `Out-File -Encoding utf8` が BOM 付きになる問題を構造的に回避するため推奨。
 
  **実装手段B（PowerShell `[System.IO.File]::WriteAllText` + `UTF8Encoding($false)`）**:
 
@@ -475,9 +509,11 @@ Windows PowerShell 5.x では `Out-File -Encoding utf8` が BOM 付き UTF‑8 �
  [System.IO.File]::WriteAllText(".agentdev/tmp/commit-msg-{timestamp}.txt", $content, (New-Object System.Text.UTF8Encoding($false)))
  ```
 
- Section 2 Step 1 と同一規定。`UTF8Encoding($false)` により BOM なしを明示的に指定する。
+ Section 2 Step 1 と同一規定。
+`UTF8Encoding($false)` により BOM なしを明示的に指定する。
 
- **配置場所**: `.agentdev/tmp/`（workspace-local）。Section 2 Step 1 の配置規定と同一。
+ **配置場所**: `.agentdev/tmp/`（workspace-local）。
+Section 2 Step 1 の配置規定と同一。
 
 3. **commit 実行**: `git commit` に `-F`（`--file`）オプションでファイルパスを指定する:
 
@@ -485,7 +521,8 @@ Windows PowerShell 5.x では `Out-File -Encoding utf8` が BOM 付き UTF‑8 �
  git commit -F .agentdev/tmp/commit-msg-{timestamp}.txt
  ```
 
- git はファイルをバイト列として読み込み、コンソールエンコーディングを参照しない。`-F` で BOM なし UTF‑8 ファイルを渡すことで、コンソール経路の cp932 化けを完全に回避する。
+ git はファイルをバイト列として読み込み、コンソールエンコーディングを参照しない。
+`-F` で BOM なし UTF‑8 ファイルを渡すことで、コンソール経路の cp932 化けを完全に回避する。
 
 4. **VERIFY**: commit 後、`git log -1 --pretty=%B` でメッセージを読み戻し、ファイル書き出し時のメッセージと一致することを確認する（READ 手続き Section 3 に従い Node.js `execSync` で取得）。BOM が残留していないことをバイト列検査で確認することを推奨:
 
@@ -495,7 +532,8 @@ Windows PowerShell 5.x では `Out-File -Encoding utf8` が BOM 付き UTF‑8 �
 
  読み戻したメッセージの先頭1バイトが `0xEF`（UTF‑8 BOM `EF BB BF` の先頭）でないことを確認する。
 
-5. **cleanup**: VERIFY が PASS した後に `.agentdev/tmp/commit-msg-{timestamp}.txt`、`.agentdev/tmp/commit-verify-{timestamp}.txt` を削除する（WRITE ユニット cleanup 規定と同一）。VERIFY が FAIL の場合は cleanup を実行せず、一時ファイルを残して原因調査へ移行する。
+5. **cleanup**: VERIFY が PASS した後に `.agentdev/tmp/commit-msg-{timestamp}.txt`、`.agentdev/tmp/commit-verify-{timestamp}.txt` を削除する（WRITE ユニット cleanup 規定と同一）。
+VERIFY が FAIL の場合は cleanup を実行せず、一時ファイルを残して原因調査へ移行する。
 
 ### 禁止事項
 

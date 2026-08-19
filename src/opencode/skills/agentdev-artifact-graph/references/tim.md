@@ -2,7 +2,8 @@
 
 Traceability Information Model（TIM）の語彙・意味定義のうち、`agentdev-artifact-graph` 標準コアが実装する部分の詳細（`scripts/lib/tim.ts`）。
 
-語彙カタログの正規原本は TIM 語彙カタログ SPEC（`docs/specs/<foundations/traceability-model>.md`）である。本参照と SPEC に不一致がある場合は SPEC を正とする。
+語彙カタログの正規原本は TIM 語彙カタログ SPEC（`docs/specs/<foundations/traceability-model>.md`）である。
+本参照と SPEC に不一致がある場合は SPEC を正とする。
 
 ## 位置付け
 
@@ -61,13 +62,15 @@ Traceability Information Model（TIM）の語彙・意味定義のうち、`agen
 
 ## 一般参照と意味的トレースリンクの分離
 
-一般参照（`references`、SysML «trace» 相当）は、変更影響・依存・実現・充足・検証の意味を持たない。リンクの存在だけを理由に impact、dependency、implementation へ参加させない。
+一般参照（`references`、SysML «trace» 相当）は、変更影響・依存・実現・充足・検証の意味を持たない。
+リンクの存在だけを理由に impact、dependency、implementation へ参加させない。
 
 一般参照は次で利用できる: 関連成果物確認（related）、所在確認、低位問い合わせ（neighbors、path、provenance）、明示的な索引構造問い合わせ（index）。
 
 ## 拡張関係型の意味定義様式
 
-augmentation の relation_types エントリは `semantics` ブロックで意味情報を宣言できる。高位問い合わせへ参加させる拡張関係型は、関係の意味（`meaning`）と変更影響方向（`change_impact_direction`）の明示が必須である。
+augmentation の relation_types エントリは `semantics` ブロックで意味情報を宣言できる。
+高位問い合わせへ参加させる拡張関係型は、関係の意味（`meaning`）と変更影響方向（`change_impact_direction`）の明示が必須である。
 
 ```yaml
 relation_types:
@@ -90,7 +93,8 @@ relation_types:
 
 ## 索引・集約成果物の役割識別
 
-README、INDEX、CATALOG 等の名称ではなく、成果物型の役割（role）として識別する。役割は augmentation の node_types で宣言する。
+README、INDEX、CATALOG 等の名称ではなく、成果物型の役割（role）として識別する。
+役割は augmentation の node_types で宣言する。
 
 ```yaml
 node_types:

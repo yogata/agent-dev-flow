@@ -4,11 +4,14 @@ Artifact Graph と独立確認結果の差異を検出、分類、是正、回�
 
 ## 原則
 
-Graph は SSoT ではない。Graph 候補は常に正規成果物で確認する。差異は原因分類（canonical defect / graph defect）し、Graph 側を直接手編集せず原因側を修正して再生成する。
+Graph は SSoT ではない。
+Graph 候補は常に正規成果物で確認する。
+差異は原因分類（canonical defect / graph defect）し、Graph 側を直接手編集せず原因側を修正して再生成する。
 
 ## 検出（detect）
 
-`verify_graph.ts` は indexed_paths 配下の Markdown ファイルを独自の走査ロジックで走査し、Graph とは独立にリンクと参照を抽出する。Graph のパーサーとは異なる正規表現を使用し、共通モードの故障を避ける。
+`verify_graph.ts` は indexed_paths 配下の Markdown ファイルを独自の走査ロジックで走査し、Graph とは独立にリンクと参照を抽出する。
+Graph のパーサーとは異なる正規表現を使用し、共通モードの故障を避ける。
 
 検出対象:
 - Markdown リンクターゲットのファイルシステム実在確認

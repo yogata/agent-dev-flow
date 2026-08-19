@@ -22,7 +22,8 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 
 ## forbidden（禁止語、即時横断置換）
 
-現行自然言語文書（Markdown 本文）での使用を禁止する語。docs-check / inspect-docs が機械検出し、推奨訳へ置換する。
+現行自然言語文書（Markdown 本文）での使用を禁止する語。
+docs-check / inspect-docs が機械検出し、推奨訳へ置換する。
 
 ### 中国語簡体字・中国語由来語句
 
@@ -64,7 +65,8 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 
 ## review（文脈確認、查読で推奨訳を選択）
 
-文脈によって推奨訳が変わるため、機械検出対象外。`agentdev-doc-writing` 查読で人手確認する。
+文脈によって推奨訳が変わるため、機械検出対象外。
+`agentdev-doc-writing` 查読で人手確認する。
 
 | 語 | 推奨訳（文脈別） | 備考 |
 |---|---|---|
@@ -79,7 +81,8 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 
 ## allowed_identifier（識別子・コード・YAML・パスでは許容）
 
-以下の文脈では英語のまま許容する。日本語本文中の普通名詞としての使用は forbidden または review 区分へ従う。
+以下の文脈では英語のまま許容する。
+日本語本文中の普通名詞としての使用は forbidden または review 区分へ従う。
 
 - 識別子: `REQ-NNNN`, `ADR-NNNN`, `IR-NNN`, `OU-NNN` 等
 - enum 値・YAML キー・フロントマスターフィールド名
@@ -91,7 +94,9 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 
 ## reconstruct（原文復元、作成元から復元）
 
-機械的な置換が困難な語。作成元の PR・commit・旧版から原文を復元する（是正方式 D）。推測による置換は禁止する。
+機械的な置換が困難な語。
+作成元の PR・commit・旧版から原文を復元する（是正方式 D）。
+推測による置換は禁止する。
 
 | 語 | 復元方法 | 備考 |
 |---|---|---|
@@ -114,11 +119,13 @@ source_note: agent-dev-flow-japanese-replacement-dictionary-2026-07-18.md（参�
 
 ## 検出分類（P0〜P4）
 
-検出分類の原本は `document-type-responsibilities.md`「不自然表現検出分類」節を参照。本辞書の forbidden / review / reconstruct 区分が P0〜P4 の各分類に対応する。
+検出分類の原本は `document-type-responsibilities.md`「不自然表現検出分類」節を参照。
+本辞書の forbidden / review / reconstruct 区分が P0〜P4 の各分類に対応する。
 
 ## 更新運用
 
-本辞書の更新は `agentdev-doc-writing` スキルの改訂として扱う。新たな forbidden 語、review 語の追加は以下の手順で行う。
+本辞書の更新は `agentdev-doc-writing` スキルの改訂として扱う。
+新たな forbidden 語、review 語の追加は以下の手順で行う。
 
 1. 監査報告・学習事項から新たな不自然表現を抽出
 2. 推奨訳、修正方式（A〜D）、運用区分（forbidden / review / reconstruct）を確定

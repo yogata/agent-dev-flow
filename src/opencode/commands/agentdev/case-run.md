@@ -4,13 +4,21 @@ description: 単一 Issue または単一 Wave（Epic Issue 指定時: 現在 re
 
 # 実装パイプライン
 
-Case に対して実装実行を実行担当サブエージェント経由で委譲し、その result を処理する。case-run 本体は orchestration に専念し、実装実行そのものは行わない。常に git worktree を使用
+Case に対して実装実行を実行担当サブエージェント経由で委譲し、その result を処理する。
+case-run 本体は orchestration に専念し、実装実行そのものは行わない。
+常に git worktree を使用
 
-**スコープ**: case-run は単一 Issue または単一 Wave を処理する。Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、case-run は扱わない。1 Wave の実行（PR作成まで）で return する。複数 Issue の一括実行、Wave 順序制御にまたがるオーケストレーションは case-auto の責務（workflow-contracts SPEC SC-{NNN}、extension 経由で解決）
+**スコープ**: case-run は単一 Issue または単一 Wave を処理する。
+Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、case-run は扱わない。
+1 Wave の実行（PR作成まで）で return する。
+複数 Issue の一括実行、Wave 順序制御にまたがるオーケストレーションは case-auto の責務（workflow-contracts SPEC SC-{NNN}、extension 経由で解決）
 
 ## project extensions
 
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-run`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`、kind: workflow-extension）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-run`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`、kind: workflow-extension）を読み込む（ADR）。
+extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。
+詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## 入力
 
@@ -25,11 +33,14 @@ Case に対して実装実行を実行担当サブエージェント経由で委
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-run` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルは単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）を1:N に分離した control plane を所有し、実行契約差異（target cardinality / parallelism / fan-out・fan-in / child task recovery / partial result / Wave-level completion）を明示的に扱う。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-run` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+同スキルは単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）を1:N に分離した control plane を所有し、実行契約差異（target cardinality / parallelism / fan-out・fan-in / child task recovery / partial result / Wave-level completion）を明示的に扱う。
 
 ### Phase single（単一 Issue 実行モード）
 
-3フェーズ構成で各フェーズは独立して再実行可能（べき等性）。フェーズ間エラー時は再開判定 STEP から再開できる。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+3フェーズ構成で各フェーズは独立して再実行可能（べき等性）。
+フェーズ間エラー時は再開判定 STEP から再開できる。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
@@ -42,7 +53,9 @@ Case に対して実装実行を実行担当サブエージェント経由で委
 
 ### Phase epic-wave（`case-run #epic` 受領時）
 
-現在 ready な Wave の子Issue を並列実行（最大5件、3つの「5件」文脈の (1)）。1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
+現在 ready な Wave の子Issue を並列実行（最大5件、3つの「5件」文脈の (1)）。
+1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。
+同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
@@ -57,7 +70,9 @@ Case に対して実装実行を実行担当サブエージェント経由で委
 - 実行コマンド: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`
 - 違反検出時は PR 本文の `### distribution-boundary` 小見出しに記録して case-run を停止する。adapter result は `completed-pr` のまま `blocked` へ上書きしない。検出結果の分類、停止契約は `agentdev-workflow-case-run` スキルを参照
 
-**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-run` が所有する。同 Workflow Skill は `/agentdev/case-run` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
+**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-run` が所有する。
+同 Workflow Skill は `/agentdev/case-run` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。
+OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
 ## 不変条件
 

@@ -11,7 +11,8 @@ OpenCodeのSKILL.mdを書く際の実践ガイド。
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-skill-authoring` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -55,13 +56,16 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 記述削減・抽象化の前段チェック（固定トークン事前 grep）
 
-既存の配布物本文（SKILL.md、references、command、template 等）の記述削減・抽象化の前に、対象ファイルを参照する `*.test.ts`・checker の固定トークンを事前 grep して影響を確認する（必須ステップ）。自動化は必須とせず、影響判断を含むため手順の明文化を主体とする。
+既存の配布物本文（SKILL.md、references、command、template 等）の記述削減・抽象化の前に、対象ファイルを参照する `*.test.ts`・checker の固定トークンを事前 grep して影響を確認する（必須ステップ）。
+自動化は必須とせず、影響判断を含むため手順の明文化を主体とする。
 
-grep 対象の代表例は routing token（検査器エントリポイント、CLI 引数、result 状態語）、期待値固定セクション（テスト・checker が期待値として保持する見出し・セクション文言）、概念名文字列（`content.includes` 由来の責務・契約の概念名）。手順と両立運用の回避パターンは [references/development-workflow.md](references/development-workflow.md) を参照。
+grep 対象の代表例は routing token（検査器エントリポイント、CLI 引数、result 状態語）、期待値固定セクション（テスト・checker が期待値として保持する見出し・セクション文言）、概念名文字列（`content.includes` 由来の責務・契約の概念名）。
+手順と両立運用の回避パターンは [references/development-workflow.md](references/development-workflow.md) を参照。
 
 ## reference選択表
 
-通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
+通常経路で全 reference を無条件読込しない。
+必要な条件に応じて読む reference を選択する。
 
 | 条件 | 読む reference |
 |---|---|
@@ -77,7 +81,8 @@ Skill 作成時に Command 側の詳細に踏み込みすぎないこと。
 
 ## 参考文献
 
-SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える。
+SKILL.md 本文から遅延読み込みされる詳細資料。
+各ファイルの冒頭に本文への文脈宣言を備える。
 
 | ファイル | 内容 |
 |---|---|

@@ -15,7 +15,8 @@ description: Owns document-type-crosscutting deterministic verification scripts,
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-artifact-validation` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -29,7 +30,8 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 責務
 
-本スキルは**決定的検証のみ**を所有する。検証対象の内容判断、文書の編集、保存、採番、ユーザー承認、commit、push は対象外（各 file-manager skill、各 command の責務）。
+本スキルは**決定的検証のみ**を所有する。
+検証対象の内容判断、文書の編集、保存、採番、ユーザー承認、commit、push は対象外（各 file-manager skill、各 command の責務）。
 
 | 責務 | 本スキル | 対象外（他 skill/command の責務） |
 |------|----------|----------------------------------|
@@ -68,7 +70,8 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | `check-entry-existence.ts` | README エントリ存在 | argv[2]=id, argv[3..]=files、または stdin JSON | `{ ok, errors[], warnings[], found[] }` |
 | `check-change-impact.ts` | 変更範囲検証（許可パスリストとの積集合） | argv[2]=changed-list-file, argv[3]=allowed-list-file、または stdin JSON | `{ ok, errors[], warnings[], violations[] }` |
 
-利用側 command、skill は内部 lib パスを直接参照せず、上記公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（AG-{NNN}、AG-{NNN}）。同一 script または共有 lib を複数 skill へ複製しない（AG-{NNN}）。
+利用側 command、skill は内部 lib パスを直接参照せず、上記公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（AG-{NNN}、AG-{NNN}）。
+同一 script または共有 lib を複数 skill へ複製しない（AG-{NNN}）。
 
 ### 実行方法
 
@@ -85,7 +88,8 @@ cd .opencode/skills/agentdev-artifact-validation/scripts && bun test
 
 ### req-save / spec-save からの呼び出し
 
-`req-save` と `spec-save` は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う。これにより frontmatter id↔ファイル名整合性確認、エントリ存在確認、変更範囲検証を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
+`req-save` と `spec-save` は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う。
+これにより frontmatter id↔ファイル名整合性確認、エントリ存在確認、変更範囲検証を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
 
 REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキルの対象外（それぞれ `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-spec-file-manager` の責務）。
 
@@ -100,7 +104,9 @@ REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキ
 
 ## 必要な reference の選択条件
 
-現状、SKILL.md 本文と SPEC で完結するため `references/` 配下に追加資料を置かない。SPEC への参照のみを正とする。將来的に検証契約の詳細（拡張入力形式、追加 kind、エラー分類）が必要になった場合は `references/` 配下へ分離する。
+現状、SKILL.md 本文と SPEC で完結するため `references/` 配下に追加資料を置かない。
+SPEC への参照のみを正とする。
+將来的に検証契約の詳細（拡張入力形式、追加 kind、エラー分類）が必要になった場合は `references/` 配下へ分離する。
 
 ---
 

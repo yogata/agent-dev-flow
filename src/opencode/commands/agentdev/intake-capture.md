@@ -30,9 +30,13 @@ description: 未分類の変更候補を手動入力から intake item として
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-intake-capture` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが保存専用 workflow の実装（入力の受領から intake item 生成、保存、git 永続化、完了報告まで）を所有する。
+本コマンドは workflow 実装本体を `agentdev-workflow-intake-capture` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+同スキルが保存専用 workflow の実装（入力の受領から intake item 生成、保存、git 永続化、完了報告まで）を所有する。
 
-本 workflow は capture-only型であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。resume point / export / import を持たない。工程は逐次実行し、中断時は最初から再実行する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本 workflow は capture-only型であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。
+resume point / export / import を持たない。
+工程は逐次実行し、中断時は最初から再実行する。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|

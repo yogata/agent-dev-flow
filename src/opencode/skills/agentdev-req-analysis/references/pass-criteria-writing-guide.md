@@ -11,7 +11,8 @@ agentdev-req-analysis SPEC「pass_criteria 記述基準」を正規原本とし�
 - 複数 REQ にまたがる共通 pass_criteria、変更対象外 REQ 検証の pass_criteria を含む
 - 完了条件チェックボックスの記述にも適用可能
 
-数値閾値（LF 数、行数、件数等）の策定は [test-strategy-numeric-threshold-guide.md](test-strategy-numeric-threshold-guide.md) を参照。本ガイドは表現、検証対象の使い分けに限定する。
+数値閾値（LF 数、行数、件数等）の策定は [test-strategy-numeric-threshold-guide.md](test-strategy-numeric-threshold-guide.md) を参照。
+本ガイドは表現、検証対象の使い分けに限定する。
 
 ## pipeline stage モデル
 
@@ -23,7 +24,8 @@ AgentDevFlow では REQ content が以下の pipeline stage 間で表現を変�
 | Issue 本文（構造的実行） | Issue 完了条件、要約 REQ 行 |
 | PR 本文（レビュー完了） | 実装概要、変更ファイル一覧 |
 
-各 stage で助詞、見出し表記、句の順序が自然に変化する。pass_criteria が特定 stage の文字列表現に依存すると、他 stage での評価で食い違いが生じる。
+各 stage で助詞、見出し表記、句の順序が自然に変化する。
+pass_criteria が特定 stage の文字列表現に依存すると、他 stage での評価で食い違いが生じる。
 
 ## 意味的等価許容
 
@@ -56,11 +58,13 @@ pass_criteria: |
 
 ### QG-4 との連動
 
-QG-4 は意味的等価性で pass_criteria 充足を判定する（[qg-4-final-acceptance.md](../../agentdev-quality-gates/references/qg-4-final-acceptance.md) 観点6「test strategy 処理完了」、観点9「識別子中心評価の運用実例集」）。req-define は意味的等価を許容する表現で pass_criteria を策定することで、QG-4 評価時の食い違いを未然に防ぐ。
+QG-4 は意味的等価性で pass_criteria 充足を判定する（[qg-4-final-acceptance.md](../../agentdev-quality-gates/references/qg-4-final-acceptance.md) 観点6「test strategy 処理完了」、観点9「識別子中心評価の運用実例集」）。
+req-define は意味的等価を許容する表現で pass_criteria を策定することで、QG-4 評価時の食い違いを未然に防ぐ。
 
 ## 「存在しないこと」と「変更されていないこと」の使い分け
 
-pass_criteria が「存在」「変更」を検証する場合、対象に応じて表現を使い分ける。誤用は QG-4 評価で検証不能、または無意味な検証となる。
+pass_criteria が「存在」「変更」を検証する場合、対象に応じて表現を使い分ける。
+誤用は QG-4 評価で検証不能、または無意味な検証となる。
 
 ### 使い分け表
 
@@ -89,7 +93,8 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 
 ## 共通 pass_criteria と正規所有
 
-複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は agentdev-workflow-templates SPEC「test strategy 記述ガイドライン」を正規所有とする。本ガイドは意味的等価許容、存在確認と diff 確認の使い分けに限定する。
+複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は agentdev-workflow-templates SPEC「test strategy 記述ガイドライン」を正規所有とする。
+本ガイドは意味的等価許容、存在確認と diff 確認の使い分けに限定する。
 
 ## See Also
 

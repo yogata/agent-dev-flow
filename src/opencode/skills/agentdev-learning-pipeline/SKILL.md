@@ -11,7 +11,8 @@ schema、分類基準、評価ディメンション、prune 方針、責任分�
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-learning-pipeline` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## パイプライン概要
@@ -34,7 +35,8 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 | evaluation-report.md | promote 内部で生成される境界成果物。毎回上書きされ長期履歴ではない。promote の分析フェーズで生成され、昇華判定フェーズの主入力として取り込みされる | 境界成果物。promote 内部の分析→昇華判定間の受け渡し専用。履歴蓄積は行わない | promote が生成（上書き）し、読み取り、取り込みする。capture は参照しない |
 | promoted/ | 採用済み成果物の staging 領域。生成された成果物は `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` に合流する。`.opencode/` や実装コードへの直接反映は禁止。`case-run` への直接受け渡しも禁止 | staging 専用。promote が生成し、backlog-review が取り込みする。pipeline 外への直接反映は不可 | promote が採用済み成果物を生成する。backlog-review が明示的に読み取る |
 
-**制約**: raw learning item を実行時コマンド/ skill の直接参照対象にしない。学びは昇華（promote → 採用済み成果物 → backlog-review → RU → req-define）を経て初めて command/ skill/ template/ AGENTS.md/ docs へ組み込まれる。
+**制約**: raw learning item を実行時コマンド/ skill の直接参照対象にしない。
+学びは昇華（promote → 採用済み成果物 → backlog-review → RU → req-define）を経て初めて command/ skill/ template/ AGENTS.md/ docs へ組み込まれる。
 
 ## 責任分界
 
@@ -80,7 +82,8 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 
 ## reference選択表
 
-通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
+通常経路で全 reference を無条件読込しない。
+必要な条件に応じて読む reference を選択する。
 
 | 条件 | 読む reference |
 |---|---|

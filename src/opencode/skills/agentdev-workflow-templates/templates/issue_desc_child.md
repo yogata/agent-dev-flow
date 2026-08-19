@@ -57,7 +57,10 @@ REQ-{req_number}
 ## Execution Contract
 <!-- 【必須】 -->
 
-<!-- Execution Contract: REQ-{NNNN} Issue Execution Contract。case-open が新規 Issue 作成時に付与する必須セクション。本セクションの存在有無が presence-based 判定の識別子となる（AG-{NNN}、REQ-{NNNN}-{NNN}）。case-run は本セクション存在有無で新旧 Issue を識別する -->
+<!-- Execution Contract: REQ-{NNNN} Issue Execution Contract。
+case-open が新規 Issue 作成時に付与する必須セクション。
+本セクションの存在有無が presence-based 判定の識別子となる（AG-{NNN}、REQ-{NNNN}-{NNN}）。
+case-run は本セクション存在有無で新旧 Issue を識別する -->
 ### 変更対象成果物
 - （artifact type と対象パスのリスト）
 
@@ -76,7 +79,9 @@ REQ-{req_number}
 ## レビュー判断
 <!-- 【必須】 -->
 
-<!-- レビュー判断: 本 Issue のレビュー判断は親 Epic Issue の「レビュー判断」セクションを参照。disposition 明細の重複転記は行わない。「該当なし」は使用しない -->
+<!-- レビュー判断: 本 Issue のレビュー判断は親 Epic Issue の「レビュー判断」セクションを参照。
+disposition 明細の重複転記は行わない。
+「該当なし」は使用しない -->
 本 Issue のレビュー判断は親 Epic Issue #{epic_number} の「レビュー判断」セクションを参照すること。
 
 ## 補足情報

@@ -1,6 +1,8 @@
 # STEP-8: adversarial-review 挿入境界（経路A）（adversarial-review-path-a）
 
-> 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-8 詳細である。req-define の adversarial-review 挿入境界（経路A）を提供する。挿入境界の正規所有者は req-define command SPEC（extension 経由）「adversarial-review 挿入境界（経路A）」節であり、本 reference は実行時詳細である。
+> 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-8 詳細である。
+> req-define の adversarial-review 挿入境界（経路A）を提供する。
+> 挿入境界の正規所有者は req-define command SPEC（extension 経由）「adversarial-review 挿入境界（経路A）」節であり、本 reference は実行時詳細である。
 
 ## STEP-8: adversarial-review（経路A）
 
@@ -21,7 +23,8 @@
 
 ### Procedure
 
-req-define は adversarial-review を原則実行する（default-on）。発動条件判定と review 呼出を分離する。
+req-define は adversarial-review を原則実行する（default-on）。
+発動条件判定と review 呼出を分離する。
 
 - **発動条件判定**: default-on で発動する。skip 条件（Scale=L0 で Decision判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず STEP-9 へ進む）を継続できる。ユーザー明示指定時は skip 条件にかかわらず必ず発動する。skip 判断のためだけの新規 HITL、承認点は追加しない
 - **review 呼出**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う

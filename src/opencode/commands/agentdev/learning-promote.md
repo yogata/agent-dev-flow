@@ -33,7 +33,10 @@ description: inbox.mdから正規化、分類、8軸評価、HITL確定を経て
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-learning-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルが7 STEP の control plane として制御構造を所有する。各 STEP は resume point を持ち、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-learning-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+同スキルが7 STEP の control plane として制御構造を所有する。
+各 STEP は resume point を持ち、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する（DEC-{N}）。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|

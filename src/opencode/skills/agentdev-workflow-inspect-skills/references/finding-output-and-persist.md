@@ -1,6 +1,7 @@
 # STEP-3: 検出事項出力・永続化・完了報告（finding-output-and-persist）
 
-> 本 reference は `agentdev-workflow-inspect-skills` SKILL.md の Control Plane STEP-3 詳細である。read-only-diagnostic型のため resume point を持たない。
+> 本 reference は `agentdev-workflow-inspect-skills` SKILL.md の Control Plane STEP-3 詳細である。
+> read-only-diagnostic型のため resume point を持たない。
 
 ## 開始条件
 
@@ -24,7 +25,10 @@
 
 ### STEP-3-3: .agentdev/inspect/ 変更の commit と push
 
-`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/inspect/` 配下の変更を commit/ push する。commit message は `chore(agentdev): capture inspect-skills finding`（Conventional Commits 形式）。変更なし時は commit/push せず完了報告で「変更なし」と報告する。push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）。
+`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/inspect/` 配下の変更を commit/ push する。
+commit message は `chore(agentdev): capture inspect-skills finding`（Conventional Commits 形式）。
+変更なし時は commit/push せず完了報告で「変更なし」と報告する。
+push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）。
 
 ### STEP-3-4: 完了報告
 

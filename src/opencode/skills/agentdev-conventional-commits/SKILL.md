@@ -8,7 +8,8 @@ description: Generates commit messages following the Conventional Commits spec. 
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-conventional-commits` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## プロジェクト固有ルール
@@ -63,4 +64,6 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ### 意図的クローズ表記の運用維持
 
-本ガイドラインは「auto-close キーワードを含む複合語と `#N` の近接併存」のみを対象とする。意図的なクローズ表記（`fixes #123` 等）の運用は維持する。フッター参照形式（`Refs: #N`（参照）/ `Closes: #N`（クローズ））も従来通り使用可能である。
+本ガイドラインは「auto-close キーワードを含む複合語と `#N` の近接併存」のみを対象とする。
+意図的なクローズ表記（`fixes #123` 等）の運用は維持する。
+フッター参照形式（`Refs: #N`（参照）/ `Closes: #N`（クローズ））も従来通り使用可能である。

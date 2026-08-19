@@ -17,7 +17,8 @@
 
 ## 適用範囲
 
-Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義間の意味的整合性を横断的に検出する。各観点は正規な定義元の原則および同一契約再定義抑止の原則に照らして検出する。
+Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義間の意味的整合性を横断的に検出する。
+各観点は正規な定義元の原則および同一契約再定義抑止の原則に照らして検出する。
 
 従来の構造・参照の妥当性検査（USE FOR 照合、Skill 分割候補、実行主体分類、frontmatter 整合等）と互补関係にあり、本観点は意味段階の重複、矛盾、責務越境、契約欠落を担う。
 
@@ -25,17 +26,24 @@ Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義�
 
 ### 正規な定義元の原則
 
-配布物種別間で責務ごとに正規な定義元を指定する原則。正規な定義元の候補は配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれかであり、責務ごとに最も安定した最小の定義元を正規とする。詳細な責務分担マッピングは artifact-responsibilities SPEC に委譲する。本原則は Command/Skill/Template/Script 責任分界の適用条件の精緻化である。
+配布物種別間で責務ごとに正規な定義元を指定する原則。
+正規な定義元の候補は配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれかであり、責務ごとに最も安定した最小の定義元を正規とする。
+詳細な責務分担マッピングは artifact-responsibilities SPEC に委譲する。
+本原則は Command/Skill/Template/Script 責任分界の適用条件の精緻化である。
 
 ### 同一契約再定義抑止の原則
 
-同一の契約、手順、判定基準を複数の配布物で再定義しない原則。参照元は正規な定義元の再記述ではなく、参照先への参照と差分のみを保持する。例外として artifact-responsibilities SPEC が定める重複許容基準（SKILL ↔ command 同一ルール等）に該当する場合は、正の情報源を明示した上で重複を認める。例外基準の詳細は SPEC 側で維持する。
+同一の契約、手順、判定基準を複数の配布物で再定義しない原則。
+参照元は正規な定義元の再記述ではなく、参照先への参照と差分のみを保持する。
+例外として artifact-responsibilities SPEC が定める重複許容基準（SKILL ↔ command 同一ルール等）に該当する場合は、正の情報源を明示した上で重複を認める。
+例外基準の詳細は SPEC 側で維持する。
 
 ## 診断観点
 
 ### 意味的重複
 
-同一の契約、手順、判定基準が複数の配布物で再定義されている箇所の検出。同一契約再定義抑止の原則に照らして検出する。
+同一の契約、手順、判定基準が複数の配布物で再定義されている箇所の検出。
+同一契約再定義抑止の原則に照らして検出する。
 
 判定基準:
 
@@ -50,7 +58,8 @@ Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義�
 
 ### 意味的矛盾
 
-Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾している検出。正規な定義元の原則および同一契約再定義抑止の原則に照らして検出する。
+Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾している検出。
+正規な定義元の原則および同一契約再定義抑止の原則に照らして検出する。
 
 判定基準:
 
@@ -64,7 +73,8 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 ### 正規な定義元からの逸脱
 
-各責務が artifact-responsibilities SPEC のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC）に置かれているかの検出。正規な定義元の原則に照らして検出する。
+各責務が artifact-responsibilities SPEC のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC）に置かれているかの検出。
+正規な定義元の原則に照らして検出する。
 
 判定基準:
 
@@ -79,7 +89,8 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 ### セマンティクス欠落
 
-疎結合化、抽象化、縮約により、意味、条件、成果物契約が欠落している検出。同一契約再定義抑止の原則に照らして検出する。
+疎結合化、抽象化、縮約により、意味、条件、成果物契約が欠落している検出。
+同一契約再定義抑止の原則に照らして検出する。
 
 判定基準:
 
@@ -96,7 +107,9 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 ### 1. 対象配布物の特定
 
-`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/` 配下の配布物を対象とする。関連する template / reference / script も必要に応じて含める。`src/opencode-local/` は別系統として扱うが、標準版との契約一致性を確認する場合は対象に含める。
+`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/` 配下の配布物を対象とする。
+関連する template / reference / script も必要に応じて含める。
+`src/opencode-local/` は別系統として扱うが、標準版との契約一致性を確認する場合は対象に含める。
 
 ### 2. 意味的重複の検出
 
@@ -109,19 +122,23 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 ### 3. 意味的矛盾の検出
 
-Command と参照先 Skill の対応箇所を突き合わせ、工程・状態・責務・停止条件の意味差異を検出する。委譲契約記述の一致性、結果状態の定義一致性、失敗時の扱いの一貫性を確認する。
+Command と参照先 Skill の対応箇所を突き合わせ、工程・状態・責務・停止条件の意味差異を検出する。
+委譲契約記述の一致性、結果状態の定義一致性、失敗時の扱いの一貫性を確認する。
 
 ### 4. 正規な定義元からの逸脱の検出
 
-各配布物の記述が artifact-responsibilities SPEC のマッピングに照らして正規な定義元に置かれているかを確認する。責務越境（Command に Skill 要素、Skill に Command 固有手順、Template / Script の責務越境等）を検出する。
+各配布物の記述が artifact-responsibilities SPEC のマッピングに照らして正規な定義元に置かれているかを確認する。
+責務越境（Command に Skill 要素、Skill に Command 固有手順、Template / Script の責務越境等）を検出する。
 
 ### 5. セマンティクス欠落の検出
 
-参照・委譲・抽象化の箇所で、必要な契約要素（入力・前提・停止条件・適用境界・出力等）が欠落していないかを確認する。公開契約の網羅性を確認する。
+参照・委譲・抽象化の箇所で、必要な契約要素（入力・前提・停止条件・適用境界・出力等）が欠落していないかを確認する。
+公開契約の網羅性を確認する。
 
 ### 6. 検出事項の報告
 
-検出した事項を各診断分類で報告する。Recommended route は対象配布物の種別（`command` / `skill` / `references` / `template` / `script`）と修正方向（正規な定義元への移送、差分への置換、欠落契約の補充等）による。
+検出した事項を各診断分類で報告する。
+Recommended route は対象配布物の種別（`command` / `skill` / `references` / `template` / `script`）と修正方向（正規な定義元への移送、差分への置換、欠落契約の補充等）による。
 
 ## 誤認パターンと診断分類
 
@@ -155,7 +172,9 @@ artifact-responsibilities SPEC が定める重複許容基準に該当する場�
 
 ## 出力形式
 
-検出した事項は SKILL.md「出力形式」セクションの Finding 形式で報告する（対象・観点・分類・根拠・推奨経路）。Classification には各診断分類（`semantic-duplication` / `semantic-contradiction` / `canonical-definition-deviation` / `semantic-contract-missing`）を使用する。Recommended route には対象配布物の種別と修正方向を提示する。
+検出した事項は SKILL.md「出力形式」セクションの Finding 形式で報告する（対象・観点・分類・根拠・推奨経路）。
+Classification には各診断分類（`semantic-duplication` / `semantic-contradiction` / `canonical-definition-deviation` / `semantic-contract-missing`）を使用する。
+Recommended route には対象配布物の種別と修正方向を提示する。
 
 報告例:
 

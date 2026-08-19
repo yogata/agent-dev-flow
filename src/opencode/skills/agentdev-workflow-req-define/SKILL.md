@@ -5,7 +5,9 @@ description: "req-define command の workflow 実装本体。セッションコ�
 
 # req-define workflow スキル
 
-req-define command の workflow 実装本体。機能追加またはバグ修正の要件を整理・定義する壁打ち workflow の制御構造を所有する。対話（HITL）と durable state（要件doc draft、RU）の分離を維持し、中断・再開を可能にする。
+req-define command の workflow 実装本体。
+機能追加またはバグ修正の要件を整理・定義する壁打ち workflow の制御構造を所有する。
+対話（HITL）と durable state（要件doc draft、RU）の分離を維持し、中断・再開を可能にする。
 
 req-define command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -42,7 +44,9 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-req-define.yaml`）�
 
 ## Control Plane（STEP 一覧）
 
-req-define workflow は次の11 STEP で構成する。各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。対話の進行は durable state（入力ファイル、壁打ちで確定した合議内容を含む draft-data 下書き）から再構成でき、会話コンテキストのみに依存しない。
+req-define workflow は次の11 STEP で構成する。
+各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+対話の進行は durable state（入力ファイル、壁打ちで確定した合議内容を含む draft-data 下書き）から再構成でき、会話コンテキストのみに依存しない。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -92,7 +96,10 @@ req-define workflow は次の11 STEP で構成する。各 STEP は resume point
 
 ## Artifact Graph 利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related、impact、必要に応じて dependency）を利用できる。既存 REQ、関連 Decision、関連 SPEC、canonical owner、変更影響候補の探索（STEP-3 既存REQ照合、STEP-4 要件展開）を補助する。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。問い合わせ目的を指定し、返された候補を用いて判断する。
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related、impact、必要に応じて dependency）を利用できる。
+既存 REQ、関連 Decision、関連 SPEC、canonical owner、変更影響候補の探索（STEP-3 既存REQ照合、STEP-4 要件展開）を補助する。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+問い合わせ目的を指定し、返された候補を用いて判断する。
 
 - 問い合わせ結果は候補提供であり、CREATE、APPEND、UPDATE、SPLIT、MERGE、意味的重複、canonical owner の判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
 - 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
@@ -100,7 +107,11 @@ req-define workflow は次の11 STEP で構成する。各 STEP は resume point
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-define.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-define/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、req-define command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-define.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-define/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、req-define command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

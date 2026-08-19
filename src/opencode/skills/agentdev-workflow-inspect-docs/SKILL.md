@@ -5,13 +5,15 @@ description: "inspect-docs command の workflow 実装本体。docs 全体（REQ
 
 # inspect-docs workflow スキル
 
-inspect-docs command の workflow 実装本体。docs 全体（REQ/Decision/SPEC/guides/README）と配布物の意味整合性診断から、検出事項の `.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
+inspect-docs command の workflow 実装本体。
+docs 全体（REQ/Decision/SPEC/guides/README）と配布物の意味整合性診断から、検出事項の `.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
 
 inspect-docs command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
 ## 型判定: read-only-diagnostic型（STEP model 対象外）
 
-本スキルは read-only-diagnostic型（検査対象を直接修正しない診断専用の型）であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。**STEP resume point / export / import を持たない**。
+本スキルは read-only-diagnostic型（検査対象を直接修正しない診断専用の型）であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。
+**STEP resume point / export / import を持たない**。
 
 - 工程は先頭から通しで実行する。中断が発生した場合は workflow を最初から再実行する（診断は対象の読み取りと検出事項ファイルの生成のみの冪等な処理であり、再実行で同等の結果を得る）
 - 会話コンテキストを権威情報源とする再開点の再構成、状態の export / import を本スキルは定義しない
@@ -56,7 +58,8 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-docs.yaml`）
 
 ## Control Plane（工程一覧）
 
-本スキルの工程一覧を次に示す。STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型、REQ-{NNNN}-{NNN}）。
+本スキルの工程一覧を次に示す。
+STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型、REQ-{NNNN}-{NNN}）。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -83,7 +86,9 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-docs.yaml`）
 
 ## Artifact Graph 利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（diagnostics）を構造診断候補の探索に利用できる。候補には unresolved reference、superseded artifact への現行参照、dangling relation、provenance 欠落、orphan candidate、不自然な relation path、structural duplicate candidate を含む（STEP-2 意味診断の入力）。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（diagnostics）を構造診断候補の探索に利用できる。
+候補には unresolved reference、superseded artifact への現行参照、dangling relation、provenance 欠落、orphan candidate、不自然な relation path、structural duplicate candidate を含む（STEP-2 意味診断の入力）。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
 
 - Graph は候補提供者であり、決定的検査（参照実在、委譲先 skill 実在、YAML 構文、必須 field）は docs-check、整合性ルール群が所有する。本スキルは Graph 構造候補を未検証 evidence として意味診断の入力に利用し、構造診断と意味診断を区別する
 - SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT 等の意味判断を問い合わせ結果の構造情報だけから確定しない
@@ -91,7 +96,11 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-docs.yaml`）
 
 ## Workflow Extension 読込契約
 
-本スキルは workflow-extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-docs.yaml`、kind: workflow-extension）を読み込む場合がある。Workflow Skill のみが読み、inspect-docs command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する（fail-open）。破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する。
+本スキルは workflow-extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-docs.yaml`、kind: workflow-extension）を読み込む場合がある。
+Workflow Skill のみが読み、inspect-docs command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する（fail-open）。
+破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する。
 
 ## 共通制約
 

@@ -1,6 +1,7 @@
 # 既存REQ照合、整合性チェック、マージ競合対応
 
-本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、req-define での既存REQ照合方法論、Issue/ADR/README との整合性チェック、REQ更新失敗時のマージ競合対応パターンを扱う。SKILL.md 本文では要点のみを提示し、照合の判定要素、操作分類の5軸評価、マージ競合パターン別解決方法は本ファイルを参照する。
+本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、req-define での既存REQ照合方法論、Issue/ADR/README との整合性チェック、REQ更新失敗時のマージ競合対応パターンを扱う。
+SKILL.md 本文では要点のみを提示し、照合の判定要素、操作分類の5軸評価、マージ競合パターン別解決方法は本ファイルを参照する。
 
 ## 既存REQ照合方法論
 
@@ -67,7 +68,8 @@ frontmatterへの新規フィールド追加は行わない。
 
 ## 関連情報管理
 
-REQ間の関連、依存はREQ本文内に記載する（frontmatterフィールドは使用しない、REQ標準構成 `## 目的`/`## 要件`/`## 適用範囲` 以外に専用セクションは仮定しない）。記述規約は numbering-and-validation.md「REQ本文内メタデータ規約」参照。
+REQ間の関連、依存はREQ本文内に記載する（frontmatterフィールドは使用しない、REQ標準構成 `## 目的`/`## 要件`/`## 適用範囲` 以外に専用セクションは仮定しない）。
+記述規約は numbering-and-validation.md「REQ本文内メタデータ規約」参照。
 
 - **置き換え**: 旧REQを新REQに置き換える場合に記載
 - **関連**: 独立要件だが変更が競合する可能性がある場合に記載
@@ -90,7 +92,8 @@ REQ間の関連、依存はREQ本文内に記載する（frontmatterフィール
 - インデックスに記載されているがファイルが存在しないREQを検出
 - ファイルが存在するがインデックスに未記載のREQを検出
 
-エントリ存在確認は `agentdev-artifact-validation` が所有する決定的スクリプト `check-entry-existence.ts` が担当する。本 skill は公開検証契約へ委譲する。
+エントリ存在確認は `agentdev-artifact-validation` が所有する決定的スクリプト `check-entry-existence.ts` が担当する。
+本 skill は公開検証契約へ委譲する。
 
 ## マージ競合対応パターン
 

@@ -10,7 +10,8 @@ case-run コマンドの状態機械、サブエージェントプロトコル�
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-workflow-orchestration` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -30,7 +31,8 @@ Epic 全体の進行は case-auto が case-run(#epic) → case-close(#epic) の�
 
 ### case-run internal lifecycle フェーズ構成
 
-case-run は orchestration stage（case-auto が管理する command 間進行、Case 実行オーケストレーション要件 / case-auto 所有）と区別し、単一 Issue または Wave 内の case-run internal lifecycle（Case 実行オーケストレーション要件 / case-run 所有）として次のフェーズを管理する。本節のフェーズは case-run internal lifecycle に属し、orchestration stage とは混同しない（responsibility-boundary-purification SPEC「case 実行責務の 4 用語と所有者」参照）。
+case-run は orchestration stage（case-auto が管理する command 間進行、Case 実行オーケストレーション要件 / case-auto 所有）と区別し、単一 Issue または Wave 内の case-run internal lifecycle（Case 実行オーケストレーション要件 / case-run 所有）として次のフェーズを管理する。
+本節のフェーズは case-run internal lifecycle に属し、orchestration stage とは混同しない（responsibility-boundary-purification SPEC「case 実行責務の 4 用語と所有者」参照）。
 
 | フェーズ | Steps | 再開条件 |
 |----------|-------|----------|
@@ -40,11 +42,14 @@ case-run は orchestration stage（case-auto が管理する command 間進行�
 
 ## STEP model（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（control plane）。STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `<workflows/step-reference-contract>` SPEC に従う。STEP 識別子と durable state から current STEP を復元する契約は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
+本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（control plane）。
+STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `<workflows/step-reference-contract>` SPEC に従う。
+STEP 識別子と durable state から current STEP を復元する契約は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
 
 ### STEP 識別子（case-run workflow）
 
-case-run internal lifecycle フェーズ構成の各フェーズが STEP resume point に対応する。STEP 識別子は command 固定番号（Step 1, Step 2 等）とは区別する。
+case-run internal lifecycle フェーズ構成の各フェーズが STEP resume point に対応する。
+STEP 識別子は command 固定番号（Step 1, Step 2 等）とは区別する。
 
 | STEP 識別子 | 対応フェーズ | 再開条件（precondition） |
 |---|---|---|
@@ -54,7 +59,8 @@ case-run internal lifecycle フェーズ構成の各フェーズが STEP resume 
 
 ### durable state（case-run workflow）
 
-compaction や中断再開後に current STEP と必要入力を復元するための durable state。優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
+compaction や中断再開後に current STEP と必要入力を復元するための durable state。
+優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
 
 1. **SSoT 再構成**: Issue 本文、要件doc、REQ/Decision/SPEC から再取得・再検証
 2. **identifier 保持**: Issue 番号、PR 番号、worktree ブランチ名、STEP 識別子
@@ -63,13 +69,17 @@ compaction や中断再開後に current STEP と必要入力を復元するた�
 
 ### Input Resolution（case-run workflow）
 
-各 STEP の開始時に入力を解決する。自然言語の前STEP result のみに依存せず、durable state 優先順位に従って入力を再構成する。compaction 後も STEP 識別子と durable state から current STEP を決定し、必要入力を復元できる。
+各 STEP の開始時に入力を解決する。
+自然言語の前STEP result のみに依存せず、durable state 優先順位に従って入力を再構成する。
+compaction 後も STEP 識別子と durable state から current STEP を決定し、必要入力を復元できる。
 
-AgentDevFlow 配布契約は「STEP 識別子と durable state から current STEP を復元できる契約」のみを所有する。ToDo 使用、compaction 検出、current STEP 選択の実処理は harness 固有（AGENTS.md、harness reference）であり、本スキルでは規定しない。
+AgentDevFlow 配布契約は「STEP 識別子と durable state から current STEP を復元できる契約」のみを所有する。
+ToDo 使用、compaction 検出、current STEP 選択の実処理は harness 固有（AGENTS.md、harness reference）であり、本スキルでは規定しない。
 
 ### 並列child task 復元（Epic Wave 実行時）
 
-Epic Wave 実行モードでは child identity（子Issue 番号）と status（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）を Harness から復元し、完了済み child 状態を durable domain state と再構成して fan-in 判定を行う。fan-in 判定モデルの詳細は `agentdev-epic-tracker` 参照。
+Epic Wave 実行モードでは child identity（子Issue 番号）と status（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）を Harness から復元し、完了済み child 状態を durable domain state と再構成して fan-in 判定を行う。
+fan-in 判定モデルの詳細は `agentdev-epic-tracker` 参照。
 
 ### 準備フェーズの既知の制約（Windows + ジャンクション環境）
 

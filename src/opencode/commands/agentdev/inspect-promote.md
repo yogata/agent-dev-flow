@@ -36,7 +36,10 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-inspect-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。同スキルは finding disposition（分類・採用・保留・却下）を独立 resume point とする8 STEP の control plane を所有する。durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から会話記憶に依存せず再開できる。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+同スキルは finding disposition（分類・採用・保留・却下）を独立 resume point とする8 STEP の control plane を所有する。
+durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から会話記憶に依存せず再開できる。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|

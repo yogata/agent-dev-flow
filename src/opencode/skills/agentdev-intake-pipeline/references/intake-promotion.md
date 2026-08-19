@@ -63,7 +63,8 @@ learning 分岐は `agentdev-workflow-orchestration` の intake/learning 境界�
 元 item 名を維持するか、束ねた内容に応じた名前にする。
 3. 採用 item の元 inbox item は削除する（`.agentdev/intake/archive/promoted/` への移動を廃止）。
 4. 保留 item は `.agentdev/intake/inbox/` に残す。
-5. 却下 item は即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（監査証跠の補強）。
+5. 却下 item は即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。
+reject 時の commit message に却下理由を含める（監査証跠の補強）。
 
 ## Git 永続化
 
@@ -72,17 +73,20 @@ learning 分岐は `agentdev-workflow-orchestration` の intake/learning 境界�
 3. `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する。
 4. 変更なしの場合は commit/push せず、完了報告で「変更なし」と報告する。
 5. 変更ありの場合、`git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする。
-6. commit message は採用・保留のみの場合 `chore(agentdev): review and promote intake items` とする。reject item を含む場合は当該 item の却下理由を commit message に含める（監査証跡の補強）。
+6. commit message は採用・保留のみの場合 `chore(agentdev): review and promote intake items` とする。
+reject item を含む場合は当該 item の却下理由を commit message に含める（監査証跡の補強）。
 7. `git push` を実行する。
 8. push が失敗した場合は構造化エラーメッセージを表示し、完了扱いにしない。
 
 ## adversarial-review 候補判断と内部手続き（経路C）
 
-本節は intake-promote 経路C における adversarial-review 候補判断と内部手続きの参照実装を提供する。正典は `agentdev-intake-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節であり、本ファイルは SPEC を補完する実行手続きのみを保持する。
+本節は intake-promote 経路C における adversarial-review 候補判断と内部手続きの参照実装を提供する。
+正典は `agentdev-intake-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節であり、本ファイルは SPEC を補完する実行手続きのみを保持する。
 
 ### 候補判断基準
 
-intake-promote は Step 4「分類の提示」完了直後に候補判断を行う。判断基準は SPEC「候補判断基準」節が正である。
+intake-promote は Step 4「分類の提示」完了直後に候補判断を行う。
+判断基準は SPEC「候補判断基準」節が正である。
 
 - 暫定分類の意味的完成度: 各 item の採用/保留/却下、変更種別、根拠が Step 3 と Step 4 を経て提示済みであること
 - review 対象の存在: 暫定分類結果のうち、意味的争点（分類の妥当性、変更種別の適合、優先度、後続ルートの適切さ）を持ち得る item が少なくとも1件存在すること
@@ -100,9 +104,12 @@ intake-promote は Step 4「分類の提示」完了直後に候補判断を行�
 
 ### 呼出失敗時の扱い
 
-adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止する。intake-promote は利用不能を報告した上で従来フローと既存 QG/HITL を維持する。呼出失敗を理由に暫定分類を自動承認、自動棄却、または既存 QG を飛ばしてはならない。
+adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止する。
+intake-promote は利用不能を報告した上で従来フローと既存 QG/HITL を維持する。
+呼出失敗を理由に暫定分類を自動承認、自動棄却、または既存 QG を飛ばしてはならない。
 
 ### 参照契約
 
-挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review SPEC「adversarial-review caller integration 共通契約」節が正とする。本ファイルはこれらを再定義しない。
+挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review SPEC「adversarial-review caller integration 共通契約」節が正とする。
+本ファイルはこれらを再定義しない。
 

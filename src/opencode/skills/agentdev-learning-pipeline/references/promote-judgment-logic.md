@@ -48,28 +48,37 @@ learning-promote コマンドの Steps における判定ロジック（旧フ�
 
 ## Phase 4-R: adversarial-review 候補判断と内部挿入（経路D）
 
-本 Phase は learning-promote 経路D における review 候補判断と内部手続きの実装詳細を提供する。経路D の発動条件、挿入位置、戻り先、Step 6 戻しループは learning-promote command SPEC「adversarial-review 挿入境界（経路D）」節と `agentdev-learning-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節が正規所有し、本 Phase は再定義しない。共通 caller integration 契約は `agentdev-adversarial-review` SPEC が正規所有する。
+本 Phase は learning-promote 経路D における review 候補判断と内部手続きの実装詳細を提供する。
+経路D の発動条件、挿入位置、戻り先、Step 6 戻しループは learning-promote command SPEC「adversarial-review 挿入境界（経路D）」節と `agentdev-learning-pipeline` SPEC「adversarial-review 候補判断と内部挿入」節が正規所有し、本 Phase は再定義しない。
+共通 caller integration 契約は `agentdev-adversarial-review` SPEC が正規所有する。
 
 ### 候補判断（Step 8-R1）
 
-Phase 4（廃棄判定 + 既存対策確認）完了後、Phase 5（HITL 承認）前に候補判断を行う。候補は次のいずれも満たす場合に確定する。
+Phase 4（廃棄判定 + 既存対策確認）完了後、Phase 5（HITL 承認）前に候補判断を行う。
+候補は次のいずれも満たす場合に確定する。
 
 - ユーザーが adversarial-review を明示要求していること
 - evaluation-report.md が Step 6 で生成・更新済みであり、Step 7（廃棄判定）と Step 8（既存対策確認）の結果が反映されていること
 
-候補確定後、Step 8-R2（review 呼出）へ進む。非成立時は Step 8-R2 を迂回し Phase 5 へ進む。
+候補確定後、Step 8-R2（review 呼出）へ進む。
+非成立時は Step 8-R2 を迂回し Phase 5 へ進む。
 
 ### review 呼出（Step 8-R2）
 
-review 対象は evaluation-report.md のみとする。呼出失敗時は silent skip を禁止し、利用不能を報告した上で Phase 5 以降の従来フローと既存 HITL を維持する。
+review 対象は evaluation-report.md のみとする。
+呼出失敗時は silent skip を禁止し、利用不能を報告した上で Phase 5 以降の従来フローと既存 HITL を維持する。
 
-accepted finding は learning-promote が責任を持って判定対象へ反映する。adversarial-review 自身は反映を行わない。
+accepted finding は learning-promote が責任を持って判定対象へ反映する。
+adversarial-review 自身は反映を行わない。
 
 ### Step 6 戻しループ
 
-accepted finding を反映し review 対象の意味内容が変更された場合、Step 6（evaluation-report 生成、更新）へ戻り、関連 Step を再実行する。再実行順は Step 6 → Step 7（廃棄判定）→ Step 8（既存対策確認）→ Step 8-R1（候補判断）→ Step 8-R2（review 呼出）。再 review の発動は新たな本質的争点が生じ得る場合に限り許容し、停止条件（4点）を満たした時点でループを離脱し Phase 5 へ進む。
+accepted finding を反映し review 対象の意味内容が変更された場合、Step 6（evaluation-report 生成、更新）へ戻り、関連 Step を再実行する。
+再実行順は Step 6 → Step 7（廃棄判定）→ Step 8（既存対策確認）→ Step 8-R1（候補判断）→ Step 8-R2（review 呼出）。
+再 review の発動は新たな本質的争点が生じ得る場合に限り許容し、停止条件（4点）を満たした時点でループを離脱し Phase 5 へ進む。
 
-unresolved な本質的争点またはユーザー判断事項が残る場合、Phase 5（判定結果提示）、Phase 5 のユーザー承認、Phase 6（採用済み成果物生成、deferred 移動、prune、commit/push）等の不可逆処理へ進まない。unresolved は既存の HITL（Step 10 ユーザー承認）または blocker 扱いへ振り向ける。
+unresolved な本質的争点またはユーザー判断事項が残る場合、Phase 5（判定結果提示）、Phase 5 のユーザー承認、Phase 6（採用済み成果物生成、deferred 移動、prune、commit/push）等の不可逆処理へ進まない。
+unresolved は既存の HITL（Step 10 ユーザー承認）または blocker 扱いへ振り向ける。
 
 ## Phase 5: HITL承認
 

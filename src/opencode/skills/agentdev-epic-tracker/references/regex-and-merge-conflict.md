@@ -1,6 +1,7 @@
 # Epic 状態追跡テーブルの正規表現と merge conflict 対応
 
-本ファイルは `agentdev-epic-tracker` SKILL.md の補助資料であり、Epic Issue 本文ステータス追跡テーブルの正規表現パターン（新4列/旧4列形式、pending → completed/blocked/failed 置換、べき等性確認）と、PR merge 前後の Epic 状態遷移、merge 失敗時の対応、conflict リスクと解決手順を扱う。SKILL.md 本文ではステータス値定義、単一書き手、更新プロトコルの概要のみを提示し、正規表現と回復手順は本ファイルを参照する。
+本ファイルは `agentdev-epic-tracker` SKILL.md の補助資料であり、Epic Issue 本文ステータス追跡テーブルの正規表現パターン（新4列/旧4列形式、pending → completed/blocked/failed 置換、べき等性確認）と、PR merge 前後の Epic 状態遷移、merge 失敗時の対応、conflict リスクと解決手順を扱う。
+SKILL.md 本文ではステータス値定義、単一書き手、更新プロトコルの概要のみを提示し、正規表現と回復手順は本ファイルを参照する。
 
 ## 目次
 
@@ -154,7 +155,9 @@ PR mergeに失敗した場合、Epicステータスの整合性を保つ。Epic 
 | merge時（conflict発生） | `pending` | `running` | 内部状態維持、解決後に再試行 |
 | merge時（CI失敗等） | `pending` | `running` | 内部状態維持、問題修正後に再試行 |
 
-**重要**: merge失敗時は Epic Issue 本文を更新しない（`pending` を維持）。case-close(#epic) が実行結果として失敗を確定した場合のみ `failed`/ `blocked` を書き込む。`running` は case-run(#epic) の内部状態であり、Epic Issue 本文には現れない。
+**重要**: merge失敗時は Epic Issue 本文を更新しない（`pending` を維持）。
+case-close(#epic) が実行結果として失敗を確定した場合のみ `failed`/ `blocked` を書き込む。
+`running` は case-run(#epic) の内部状態であり、Epic Issue 本文には現れない。
 
 **失敗報告フォーマット**:
 ```markdown

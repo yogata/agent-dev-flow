@@ -15,7 +15,8 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-req-file-manager` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -29,13 +30,16 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## REQ番号採番と要件行記述
 
-REQ番号は `REQ-{NNNN}`（4桁ゼロ埋め、欠番埋め禁止、max+1）。要件行は `REQ-{NNNN}-{MMM}` 形式で、要件の振る舞い・制約・状態のみを記述し、実装指示（ファイル編集、コード断片、ステップ手順）は含めない。REQ-ID 安定ID 規約、要件行ID定義、REQ本文内メタデータ規約の詳細は [references/numbering-and-validation.md](references/numbering-and-validation.md) 参照。
+REQ番号は `REQ-{NNNN}`（4桁ゼロ埋め、欠番埋め禁止、max+1）。
+要件行は `REQ-{NNNN}-{MMM}` 形式で、要件の振る舞い・制約・状態のみを記述し、実装指示（ファイル編集、コード断片、ステップ手順）は含めない。
+REQ-ID 安定ID 規約、要件行ID定義、REQ本文内メタデータ規約の詳細は [references/numbering-and-validation.md](references/numbering-and-validation.md) 参照。
 
 ---
 
 ## ファイル操作モード
 
-REQファイルは CREATE（新規）、APPEND（要件行追加）、UPDATE（既存セクション修正）の3モードで操作する。廃止宣言 APPEND の precedent 利用、APPEND/UPDATE判定フロー、状況判定基準の詳細は [references/create-append-update-flow.md](references/create-append-update-flow.md) 参照。
+REQファイルは CREATE（新規）、APPEND（要件行追加）、UPDATE（既存セクション修正）の3モードで操作する。
+廃止宣言 APPEND の precedent 利用、APPEND/UPDATE判定フロー、状況判定基準の詳細は [references/create-append-update-flow.md](references/create-append-update-flow.md) 参照。
 
 | 状況 | モード |
 |------|--------|
@@ -47,15 +51,20 @@ REQファイルは CREATE（新規）、APPEND（要件行追加）、UPDATE（�
 
 ## 既存REQ照合と整合性
 
-req-define では壁打ち意向把握後に既存REQとの照合を行い、CREATE/APPEND/UPDATE を分類する。照合の判定要素（タイトル、目的、要件内容）、操作分類の5軸評価、REQファイルの照合用情報記述規則は [references/matching-and-merge.md](references/matching-and-merge.md) 参照。Issue/ADR/README との整合性チェック、マージ競合対応パターンも同ファイル参照。
+req-define では壁打ち意向把握後に既存REQとの照合を行い、CREATE/APPEND/UPDATE を分類する。
+照合の判定要素（タイトル、目的、要件内容）、操作分類の5軸評価、REQファイルの照合用情報記述規則は [references/matching-and-merge.md](references/matching-and-merge.md) 参照。
+Issue/ADR/README との整合性チェック、マージ競合対応パターンも同ファイル参照。
 
 ---
 
 ## ファイル配置規約とバリデーション
 
-`docs/requirements/REQ-{NNNN}.md` を永続基準ファイルとし、frontmatter は `id`/`title`/`created`/`updated` の4フィールド。ファイル名と id の一致、`YYYY-MM-DD` 日付フォーマット、`updated ≥ created` を検証する。分類ゲート（反映作業のみの要件行除外）と HOW 除去後の acceptance criteria 順位検証の詳細ルールは [references/numbering-and-validation.md](references/numbering-and-validation.md) 参照。
+`docs/requirements/REQ-{NNNN}.md` を永続基準ファイルとし、frontmatter は `id`/`title`/`created`/`updated` の4フィールド。
+ファイル名と id の一致、`YYYY-MM-DD` 日付フォーマット、`updated ≥ created` を検証する。
+分類ゲート（反映作業のみの要件行除外）と HOW 除去後の acceptance criteria 順位検証の詳細ルールは [references/numbering-and-validation.md](references/numbering-and-validation.md) 参照。
 
-bugfix ではREQファイルを作成せず Issue 本文のみで要件管理する。REQファイル修正が必要なバグ修正は feature に昇格する（work_type 分岐は `agentdev-workflow-lifecycle` 参照）。
+bugfix ではREQファイルを作成せず Issue 本文のみで要件管理する。
+REQファイル修正が必要なバグ修正は feature に昇格する（work_type 分岐は `agentdev-workflow-lifecycle` 参照）。
 
 ---
 
@@ -68,8 +77,10 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`、REQ）。
 
 > **移管済み script**:
-> - `search-target-area.ts`（SPEC ファイル内 target_area 見出し検索）は `agentdev-spec-file-manager` へ移管済み。SPEC 固有処理は同 skill の公開操作契約経由で呼び出す。
-> - 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-{NNN}、AG-{NNN}、AG-{NNN}、RU-{NNNN}-01 合意）。本スキルは公開検証契約へ委譲し、内部 script パスを直接参照しない。
+> - `search-target-area.ts`（SPEC ファイル内 target_area 見出し検索）は `agentdev-spec-file-manager` へ移管済み。
+> SPEC 固有処理は同 skill の公開操作契約経由で呼び出す。
+> - 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-{NNN}、AG-{NNN}、AG-{NNN}、RU-{NNNN}-01 合意）。
+> 本スキルは公開検証契約へ委譲し、内部 script パスを直接参照しない。
 
 ### I/O 契約（REQ）
 
@@ -86,10 +97,13 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 |-----------|------|------|-----------|
 | `alloc-req-number.ts` | REQ番号採番（max+1、欠番埋め禁止） | argv[2]=REQ dir | `{ ok, allocated: "REQ-NNNN", max }` |
 | `alloc-composite-id.ts` | 要件行ID採番（REQ-NNNN-MMM、max+1） | argv[2]=REQ file, argv[3]=req番号（省略可） | `{ ok, allocated: "REQ-NNNN-MMM", req, max }` |
-> `search-target-area.ts`（SPEC 固有）は `agentdev-spec-file-manager` へ移管済み。target_area 見出し検索は同 skill の公開操作契約経由で呼び出す。
-> `alloc-decision-number.ts`（Decision 固有）は `agentdev-decision-file-manager` へ移管済み（OU-{NNN}）。Decision 番号採番は同 skill の公開操作契約経由で呼び出す。
+> `search-target-area.ts`（SPEC 固有）は `agentdev-spec-file-manager` へ移管済み。
+> target_area 見出し検索は同 skill の公開操作契約経由で呼び出す。
+> `alloc-decision-number.ts`（Decision 固有）は `agentdev-decision-file-manager` へ移管済み（OU-{NNN}）。
+> Decision 番号採番は同 skill の公開操作契約経由で呼び出す。
 
-> frontmatter id↔ファイル名整合性（`check-frontmatter-consistency`）、エントリ存在確認（`check-entry-existence`）、変更範囲検証（`check-change-impact`）は `agentdev-artifact-validation` へ移管済みであり、同 skill の公開検証契約へ委譲する（AG-{NNN}）。詳細は同 SKILL.md 参照。
+> frontmatter id↔ファイル名整合性（`check-frontmatter-consistency`）、エントリ存在確認（`check-entry-existence`）、変更範囲検証（`check-change-impact`）は `agentdev-artifact-validation` へ移管済みであり、同 skill の公開検証契約へ委譲する（AG-{NNN}）。
+> 詳細は同 SKILL.md 参照。
 
 ### 実行方法
 
@@ -105,15 +119,19 @@ cd src/opencode/skills/agentdev-req-file-manager/scripts && npm test
 
 req-save と spec-save は、REQ番号、ADR番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
 target_area 見出し検索は、SPEC 固有処理として `agentdev-spec-file-manager` 配下のスクリプトで実行する。
-frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-{NNN}）。詳細は req-save / spec-save command の各 Step 参照。
+frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-{NNN}）。
+詳細は req-save / spec-save command の各 Step 参照。
 
 ---
 
 ## REQ-ID 安定ID とメタデータ
 
-REQ-ID（`REQ-{NNNN}`）は安定IDであり、ファイル配置や要件の分割・統合に依存せず不変（area 情報は含めない）。REQ単位の関連情報（Status、Related artifacts、Related ADRs、Supersedes、Superseded by）は frontmatter ではなくREQ本文内に記述する（REQ標準構成 `## 目的`/`## 要件`/`## 適用範囲` 以外に専用セクションは仮定しない）。詳細は [references/numbering-and-validation.md](references/numbering-and-validation.md) 参照。
+REQ-ID（`REQ-{NNNN}`）は安定IDであり、ファイル配置や要件の分割・統合に依存せず不変（area 情報は含めない）。
+REQ単位の関連情報（Status、Related artifacts、Related ADRs、Supersedes、Superseded by）は frontmatter ではなくREQ本文内に記述する（REQ標準構成 `## 目的`/`## 要件`/`## 適用範囲` 以外に専用セクションは仮定しない）。
+詳細は [references/numbering-and-validation.md](references/numbering-and-validation.md) 参照。
 
-REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内に記載する（専用セクションは仮定しない、記述規約は numbering-and-validation.md「REQ本文内メタデータ規約」参照）。詳細は [references/matching-and-merge.md](references/matching-and-merge.md) 参照。
+REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内に記載する（専用セクションは仮定しない、記述規約は numbering-and-validation.md「REQ本文内メタデータ規約」参照）。
+詳細は [references/matching-and-merge.md](references/matching-and-merge.md) 参照。
 
 ---
 
@@ -157,13 +175,17 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、req-save / case-open / case-update / case-close 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。本スキル自身は STEP を所有しない。
+本スキルは Capability Skill として、req-save / case-open / case-update / case-close 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。
+本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution
 
-本スキルが操作する REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）は durable state の最上位（SSoT 再構成）に位置する。REQ-ID（`REQ-{NNNN}`）は identifier 保持として安定 ID として扱う。優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
+本スキルが操作する REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）は durable state の最上位（SSoT 再構成）に位置する。
+REQ-ID（`REQ-{NNNN}`）は identifier 保持として安定 ID として扱う。
+優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
 
-呼出元 STEP は本スキルの操作結果（REQ ファイル更新、要件行 ID 採番結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成または identifier 保持から再取得できる。STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
+呼出元 STEP は本スキルの操作結果（REQ ファイル更新、要件行 ID 採番結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成または identifier 保持から再取得できる。
+STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
 
 ## See Also
 
@@ -174,7 +196,8 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ## 参考文献
 
-SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える。
+SKILL.md 本文から遅延読み込みされる詳細資料。
+各ファイルの冒頭に本文への文脈宣言を備える。
 
 | ファイル | 内容 |
 |----------|------|

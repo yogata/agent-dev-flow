@@ -1,6 +1,7 @@
 # STEP-6 / STEP-7 / STEP-8: HITL 確定・処理実行・完了報告と永続化（hitl-and-disposition）
 
-> 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の Control Plane STEP-6〜STEP-8 詳細である。各 STEP は resume point を持つ（`<workflows/step-reference-contract>` SPEC）。
+> 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の Control Plane STEP-6〜STEP-8 詳細である。
+> 各 STEP は resume point を持つ（`<workflows/step-reference-contract>` SPEC）。
 
 ## STEP-6: HITL 確定（手動分類対象）
 
@@ -35,7 +36,10 @@
 - **Procedure**:
   1. `git diff --name-only` で `.agentdev/inspect/` および `.agentdev/intake/` 配下の変更を確認する（auto-promote の intake/promoted/ 投入、promoted/ への保存、reject に伴う inbox 削除、auto-promote-log 更新を含む）
   2. **変更なし時**: commit/push せず「変更なし」と報告する
-  3. **変更あり時**: `git add` は `.agentdev/inspect/` と `.agentdev/intake/` のみ対象とする。commit message は `chore(agentdev): promote inspect findings`（reject を含む場合は却下理由を含める）。`git push` を実行する。push 失敗時は共通 template（`.opencode/commands/agentdev/templates/common/git-error-messages.md`）の該当形式で表示して停止する（完了扱いにしない）
+  3. **変更あり時**: `git add` は `.agentdev/inspect/` と `.agentdev/intake/` のみ対象とする。
+commit message は `chore(agentdev): promote inspect findings`（reject を含む場合は却下理由を含める）。
+`git push` を実行する。
+push 失敗時は共通 template（`.opencode/commands/agentdev/templates/common/git-error-messages.md`）の該当形式で表示して停止する（完了扱いにしない）
   4. 完了報告 template（`.opencode/commands/agentdev/templates/inspect-promote/standard.md`）に従い、promote/ defer/ reject/ auto-promote の判定結果と後続 route を提示する。`--auto` 実行時は投入件数、投入先一覧、ログパスを含める
 - **Result**: 完了報告出力、`.agentdev/` 変更の commit/push
 - **Evidence**: commit hash、push 実行結果、完了報告

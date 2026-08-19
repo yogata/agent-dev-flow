@@ -1,6 +1,7 @@
 # STEP-1/2: 入力解決・壁打ち対話（input-and-dialogue）
 
-> 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-1、STEP-2 詳細である。セッションコンテキスト検知・入力解決と壁打ち対話を提供する。
+> 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-1、STEP-2 詳細である。
+> セッションコンテキスト検知・入力解決と壁打ち対話を提供する。
 
 ## 目次
 
@@ -67,9 +68,12 @@
 
 ### Procedure
 
-`agentdev-req-analysis` に従って深掘りする。明示入力ファイルがある場合、その内容を開始点として活用する。確定した合意内容は都度 draft-data 下書き（runtime artifact）へ反映し、対話ターン依存状態と durable state を分離する。
+`agentdev-req-analysis` に従って深掘りする。
+明示入力ファイルがある場合、その内容を開始点として活用する。
+確定した合意内容は都度 draft-data 下書き（runtime artifact）へ反映し、対話ターン依存状態と durable state を分離する。
 
-**前工程からの引き継ぎ判定**: 入力が AgentDevFlow 本体、配布 command、配布 skill、配布 template、配布 script の不具合または改善点を対象とする場合、`agentdev-workflow-lifecycle` に従い前工程からの引き継ぎ用 RU 入力として整理する。現在プロジェクトの通常要件docとして定義せず、出力に `agentdev_handoff: true` を含める。
+**前工程からの引き継ぎ判定**: 入力が AgentDevFlow 本体、配布 command、配布 skill、配布 template、配布 script の不具合または改善点を対象とする場合、`agentdev-workflow-lifecycle` に従い前工程からの引き継ぎ用 RU 入力として整理する。
+現在プロジェクトの通常要件docとして定義せず、出力に `agentdev_handoff: true` を含める。
 
 ### Result
 

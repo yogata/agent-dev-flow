@@ -22,7 +22,8 @@ QG-2（[qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/refer
 - 例: command ファイル行数 → `src/opencode/commands/agentdev/` 配下の既存 command 群
 - 例: NG 件数 → 過去の検出事項データ（`.agentdev/intake/`、過去 PR 等）
 
-同種例が存在しない場合、類似種別から推定する。類似すらない場合は本 Step で「閾値設定根拠が薄弱」を明示する。
+同種例が存在しない場合、類似種別から推定する。
+類似すらない場合は本 Step で「閾値設定根拠が薄弱」を明示する。
 
 ### Step 2: 実測値の取得
 
@@ -33,7 +34,8 @@ QG-2（[qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/refer
 - NG 件数: `rg -c '<pattern>' <path>` または integrity check 実行結果
 - coverage: coverage tool 実行結果
 
-実測値は中央値、最小値、最大値を把握する。外れ値（極端に大きい/小さいファイル）は別途扱う。
+実測値は中央値、最小値、最大値を把握する。
+外れ値（極端に大きい/小さいファイル）は別途扱う。
 
 ### Step 3: 対象成果物の自然な構造での到達可能性評価
 
@@ -47,7 +49,8 @@ QG-2（[qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/refer
 
 ### Step 4: 閾値の記述
 
-採用した閾値は test strategy の pass_criteria に記述する。あわせて同種既存例の実測値を参考情報として併記し、設定根拠を明示する。
+採用した閾値は test strategy の pass_criteria に記述する。
+あわせて同種既存例の実測値を参考情報として併記し、設定根拠を明示する。
 
 記述例:
 
@@ -76,7 +79,8 @@ QG-2（[qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/refer
 
 ## QG-2 観点6 との連動
 
-QG-2（case-open 完了条件網羅性検証）の観点6「数値閾値到達可能性検証」は、本ガイドに従って策定された数値閾値を入力とする。本ガイドで根拠が不明確な閾値は QG-2 で fail または warn となる。
+QG-2（case-open 完了条件網羅性検証）の観点6「数値閾値到達可能性検証」は、本ガイドに従って策定された数値閾値を入力とする。
+本ガイドで根拠が不明確な閾値は QG-2 で fail または warn となる。
 
 連動フロー:
 

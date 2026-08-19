@@ -20,11 +20,17 @@ req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 
 
 ## project extensions
 
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-spec-save`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-spec-save.yaml`、kind: workflow-extension）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。extension に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-spec-save`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-spec-save.yaml`、kind: workflow-extension）を読み込む（ADR）。
+extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。
+extension に列挙されていない `docs/specs/**` 内部パスを固定知識として読みに行かない。
+詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-spec-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが11 STEP の control plane として制御構造（配置先解決、SPEC ファイル操作、整合確認、永続化）を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-spec-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+同スキルが11 STEP の control plane として制御構造（配置先解決、SPEC ファイル操作、整合確認、永続化）を所有する。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
@@ -40,7 +46,9 @@ req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 
 | STEP-10 コミット・プッシュ | 検証通過 | commit・push 済みブランチ | 並列実行安全ステージング（`agentdev-git-worktree`）に従っていること |
 | STEP-11 完了報告 | push 完了 | 完了報告（次コマンドの提示を含む） | 出力パスと次アクションが報告されていること |
 
-**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-spec-save` が所有する。同 Workflow Skill は `/agentdev/spec-save` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
+**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-spec-save` が所有する。
+同 Workflow Skill は `/agentdev/spec-save` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。
+OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
 ## 不変条件
 

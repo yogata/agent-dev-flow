@@ -1,6 +1,7 @@
 # STEP-6: 終了処理・クリーンアップ（termination-and-cleanup）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-6 詳細である。コメント追加、draft/RU 削除（Form Zero）、完了報告を提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-6 詳細である。
+> コメント追加、draft/RU 削除（Form Zero）、完了報告を提供する。
 
 ## Purpose
 
@@ -34,11 +35,13 @@ Issue 作成後の共通終了処理（コメント追加、draft/RU 削除、�
 
 ドラフトが存在する場合、`.agentdev/drafts/req-draft-{topic-slug}.md` を削除（Standard/Epic 全フロー共通）。
 
-**Form Zero**: 削除は並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、`git rm <draft-path>` で明示パスをステージし、同一ステップ内で `git commit -- <draft-path>` により即時コミットする。未ステージの削除を作業ツリーに残存させないこと。
+**Form Zero**: 削除は並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、`git rm <draft-path>` で明示パスをステージし、同一ステップ内で `git commit -- <draft-path>` により即時コミットする。
+未ステージの削除を作業ツリーに残存させないこと。
 
 ### STEP-6-2-1: RU ファイル削除（共通終了処理）
 
-詳細、委譲接続点は `agentdev-req-file-manager` を参照。削除は並列実行安全ステージングプロシージャに従い `git rm <RU-path>` で明示パスをステージし、同一ステップ内で `git commit -- <RU-path>` により即時コミットする（Form Zero）。
+詳細、委譲接続点は `agentdev-req-file-manager` を参照。
+削除は並列実行安全ステージングプロシージャに従い `git rm <RU-path>` で明示パスをステージし、同一ステップ内で `git commit -- <RU-path>` により即時コミットする（Form Zero）。
 
 ### STEP-6-2-2: draft/RU 削除残存検証（共通終了処理）
 
@@ -50,7 +53,8 @@ STEP-6-2/6-2-1 の削除後、当該ファイルが作業ツリー、index に�
 
 ### STEP-6-2-3: draft/RU 削除 commit 後の即時 push
 
-STEP-6-2/6-2-1 の削除コミット後に `git push` を即時実行（case-run 引き継ぎ時の `git pull --ff-only` 失敗を防止するため）。push 失敗時は構造化エラーメッセージを表示して停止する。
+STEP-6-2/6-2-1 の削除コミット後に `git push` を即時実行（case-run 引き継ぎ時の `git pull --ff-only` 失敗を防止するため）。
+push 失敗時は構造化エラーメッセージを表示して停止する。
 
 ### STEP-6-3: 完了報告（共通終了処理）
 
