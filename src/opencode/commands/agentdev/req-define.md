@@ -14,6 +14,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 
 - ユーザーの自然言語による機能追加/バグ修正の説明
 - GitHub Issue URL（既存Issueの場合）
+- 実証Issue（`req-define <実証Issue>` 形式の明示指定時。当該実証の正式化を主たる入力とし、評価契約、最終評価結果、参照証拠を取り込む）
 - エラーログ（バグ修正の場合）
 - **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力（G04）
 - req-save SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
@@ -70,6 +71,10 @@ OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため�
 - Decision閾値以上の判断は `agentdev-decision-guidelines` で判定する。Decision 要否確認ゲートでは `agentdev-architecture-advisory` の助言を親エージェントが分類して採用し、未確認事項は要件本文と分離して扱う
 - work_type・Scale 判定は `agentdev-workflow-lifecycle` の基準に従う
 - draft は `operation_units` セクションを出力する（単一REQ操作も1件の OU として出力）。`depends_on` は必須依存のみ記録し、Issue 階層・Epic/Wave 構成の決定は case-open が担う
+- 実証必要性の推論・提案と評価契約の確定を要件展開工程の一部として実行する（実証Case判定と評価契約の意味論は評価ブランチ実証ワークフロー要件が所有する）。単なる追加調査だけを理由に実証Caseとしない
+- 実証Caseとして確定した後は評価ブランチ利用を別途確認せず、実証Caseなら評価ブランチ、通常Caseなら main と決定的に導出する
+- 評価契約と test strategy は分離する。test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う
+- 本コマンドは実証Caseでも Git 副作用を持たない（評価ブランチ・worktree 準備の実行主体・手順は command SPEC が所有する）。評価ブランチ作成だけの新しい公開コマンドを追加しない
 - SPEC 分離基準に該当する要件行は `artifact_actions`（`artifact: spec`）へ分離する（安定契約例外は除く）。test strategy 項目は verification（検証手順）・pass_criteria（合格基準）・on_failure（不合格時の処置）の3要素を完全に持ち、欠落項目は保存前に QG fail として扱う
 
 ## ガードレール

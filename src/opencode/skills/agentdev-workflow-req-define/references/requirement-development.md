@@ -74,19 +74,21 @@
 - **文書分類妥当性検証**: REQ 要件行に SPEC 分離基準違反残留がないか検出する。検出時は SPEC 保存対象へ移送する（安定契約例外は対象外）
 - **Decision要否確認ゲート**: Decision候補・既存REQ/Decision/SPEC との衝突候補・責務境界変更を含む場合、`agentdev-architecture-advisory` へ委譲する。出力は4ラベル構造（確定事項/推定事項/ユーザー確認事項/ブロッカー）。soft-contract（Decision）。ブロッカーまたは未決事項残存時は壁打ち（STEP-2）へ差し戻す
 - **実行主体分類表**: 委譲契約を定義する場合、各委譲について実行主体分類表（adapter skill / command / subagent / harness）を必須とする（詳細は delegation-contracts SPEC（extension 経由）参照。委譲を含まない要件では省略可）
-- **test strategy 定義**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command SPEC（extension 経由）の draft-data test_strategy フィールドスキーマ参照
+- **評価契約確定（実証Case時）**: 実証Caseとして確定した場合、実証開始前に評価契約の構成要素を必要に応じて壁打ちで確定する。構成要素は評価対象・仮説、比較対象、比較条件、評価方法、評価観点、評価シナリオ、測定・観察項目、判定基準、必要証拠、採用条件、不採用条件、判定不能条件、中止条件、再実行条件、比較条件逸脱時の扱いとする。詳細は req-define command SPEC（extension 経由）「実証Case判定と評価契約」参照
+- **評価契約の変更管理**: 実証開始後、実行側の自律判断で評価契約を変更しない。ユーザーが評価契約の変更を明示的に指示した場合のみ変更でき、変更内容、変更理由、既存評価結果への影響を追跡可能にし、影響する既存評価について必要な再評価または再実行を行い、変更前の契約と結果を失わない。実証全体の最終完了後は当該実証の評価契約および最終結果を書き換えない。完了後に異なる条件で評価する場合は新しい実証として扱う
+- **test strategy 定義**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command SPEC（extension 経由）の draft-data test_strategy フィールドスキーマ参照。test strategy と評価契約は分離する。test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う。評価対象が採用基準を満たさなかったことを実装不具合として自動修正しない
 
 ### Result
 
-- 変更影響候補、最終分類、SPEC 分離結果、Decision要否確認結果、test strategy 定義
+- 変更影響候補、最終分類、SPEC 分離結果、Decision要否確認結果、test strategy 定義、評価契約（実証Case時）
 
 ### Evidence
 
-- 影響候補リスト、分類判定根拠、助言の4ラベル構造結果、test strategy 項目
+- 影響候補リスト、分類判定根拠、助言の4ラベル構造結果、test strategy 項目、評価契約の構成要素確定結果（実証Case時）
 
 ### Completion Verification
 
-- 全要件行候補の分類が確定し、SPEC 分離基準違反残留が0件であること。test strategy 項目が全て3要素を持つこと
+- 全要件行候補の分類が確定し、SPEC 分離基準違反残留が0件であること。test strategy 項目が全て3要素を持つこと。実証Case時は評価契約が実証開始前に確定していること
 
 ### Resume-Idempotency
 
@@ -149,3 +151,4 @@
 - 不変条件（SPEC 分離基準該当行の `artifact_actions` 分離）
 - 不変条件（アーキテクチャ助言サブエージェントの参照と未確認事項非混入）
 - 不変条件（test strategy 3要素完全、欠落時は QG-1 fail 扱い）
+- 不変条件（評価契約と test strategy の分離、評価対象が採用基準を満たさなかったことの実装不具合としての自動修正禁止）

@@ -30,6 +30,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-req-define.yaml`）�
 
 - ユーザーの自然言語による機能追加/バグ修正の説明
 - GitHub Issue URL（既存Issueの場合）、エラーログ（バグ修正の場合）
+- 実証Issue（`req-define <実証Issue>` 形式の明示指定時。当該実証の正式化を主たる入力とし、評価契約、最終評価結果、参照証拠を取り込む）
 - ユーザーが明示した入力ファイル（設計メモ、調査メモ、RU `.agentdev/backlog/req-units/RU-*.md` 等、参照専用）
 - req-save SPLIT 検出時の検出事項、inspect-skills 診断結果の検出事項
 
@@ -39,7 +40,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-req-define.yaml`）�
 
 ## 副作用
 
-- `.agentdev/drafts/**` 配下のファイル作成・更新のみ（G03）。`git` コマンドは実行しない（G08）
+- `.agentdev/drafts/**` 配下のファイル作成・更新のみ（G03）。`git` コマンドは実行しない（G08）。実証Caseでも Git 副作用（評価ブランチ作成等）を持たない
 - RU、promoted 成果物、inbox.md/deferred.md は読取のみ（参照専用入力）
 
 ## Control Plane（STEP 一覧）
@@ -50,12 +51,12 @@ req-define workflow は次の11 STEP で構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
-| STEP-1 | セッションコンテキスト検知・入力解決 | req-define 起動 | 6項目推論（信頼度付き）、入力ソース確定 | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
-| STEP-2 | 壁打ち対話（引き継ぎ判定含む） | 入力ソース確定 | 深掘り済み要件内容、`agentdev_handoff` 判定 | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
+| STEP-1 | セッションコンテキスト検知・入力解決 | req-define 起動 | 6項目推論（信頼度付き）、入力ソース確定（実証Issue 明示指定時は正式化入力として確定、RU 自動検出と混在時はユーザー確認） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
+| STEP-2 | 壁打ち対話（引き継ぎ判定含む） | 入力ソース確定 | 深掘り済み要件内容、`agentdev_handoff` 判定、実証Case判定結果（実証/通常の別） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
 | STEP-3 | 既存REQ照合 | 壁打ち合意内容確定 | 操作分類結果（`artifact_actions` 記録用） | [references/requirement-development.md](references/requirement-development.md) |
-| STEP-4 | 要件展開 | 操作分類確定 | 変更影響候補、分類ゲート、Decision要否確認、test strategy 定義 | [references/requirement-development.md](references/requirement-development.md) |
+| STEP-4 | 要件展開 | 操作分類確定 | 変更影響候補、分類ゲート、Decision要否確認、test strategy 定義、評価契約確定（実証Case時） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-5 | Decision判断 | 要件展開完了 | Decision判断記録（`new:{topic-slug}` 形式） | [references/requirement-development.md](references/requirement-development.md) |
-| STEP-6 | 要件doc生成 | Decision判断完了 | 構造化 `draft-data`（operation_units、artifact_actions、test_strategy、review_dispositions） | [references/draft-generation.md](references/draft-generation.md) |
+| STEP-6 | 要件doc生成 | Decision判断完了 | 構造化 `draft-data`（operation_units、artifact_actions、test_strategy、review_dispositions。実証Case時は実証Caseであること、評価契約、評価ブランチ識別情報を含む） | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-7 | work_type・Scale 判定 | 要件doc生成完了 | work_type 4値、scale（feature のみ） | [references/draft-generation.md](references/draft-generation.md) |
 | STEP-8 | adversarial-review（経路A） | STEP-7 完了後、STEP-9 前 | review 結果反映（skip 時は従来フロー継続） | [references/adversarial-review-path-a.md](references/adversarial-review-path-a.md) |
 | STEP-9 | ドラフト保存 | review 完了または skip | `.agentdev/drafts/req-draft-{topic-slug}.md` 保存 | [references/draft-generation.md](references/draft-generation.md) |
@@ -120,6 +121,7 @@ req-define workflow は次の11 STEP で構成する。
 - **draft-data 形式**: 出力は構造化 `draft-data`（`# draft-data` fenced YAML block）。`operation_units` を出力し、`execution_groups` は出力しない。`workflow_route` は派生値として保存しない（後続工程の分岐は `artifact_actions` の存在で決定）
 - **Issue 階層非決定**: req-define は Issue 階層を決定しない。`depends_on` は case-open の execution_unit 構成が使用する依存情報であり、最終 Issue 構成は case-open が決定する
 - **session由来RU 消費契約**: 正規原本（一時成果物ライフサイクル要件 + artifact-contracts SPEC）へ委譲し、本スキルで再定義しない
+- **実証Case判定・評価契約確定**: 実証必要性の推論・提案と評価契約の確定を要件展開工程の一部として実行する。実証Caseと評価契約の意味論は評価ブランチ実証ワークフロー要件が正規所有し、本スキルは実行位置と手順を提供する。実証Caseでも Git 副作用を持たない（評価ブランチ・worktree 準備の実行主体・手順は req-define command SPEC（extension 経由）が所有する）
 
 ## See Also
 
