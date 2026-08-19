@@ -60,11 +60,11 @@ SPEC ファイルのドメイン間移送が発生した場合は旧ドメイン
 
 ### audits/・baselines/ の Report 位置づけ
 
-`docs/specs/integrity/audits/`（監査記録）と `docs/specs/integrity/baselines/`（監査 baseline snapshot）の6ファイルは SPEC ではなく Report（document-model の Report 分類）として位置づける。
+`docs/specs/integrity/audits/`（監査記録）と `docs/specs/integrity/baselines/`（監査 baseline snapshot）のファイルは SPEC ではなく Report（document-model の Report 分類）として位置づける。
 
 - 両ディレクトリのファイルは本 README の一覧表へ独立行として登録しない（SPEC ではないため docs-check の SPEC 突合対象外）
-- 索引導線は、該当 SPEC 行の備考欄または本文の関連情報節での言及で担保する
-- AUTOGEN 計測表（spec-health-metrics の SPEC 計上）への計上対象外とする（Report は SPEC 件数に含めない）
+- 索引導線は、該当 SPEC 行の備考欄または本文の関連情報節での言及、および AUTOGEN 計測表の計測行で担保する
+- AUTOGEN 計測表（spec-health-metrics「SPEC 計測例」）は `docs/specs/` 配下の `.md` をファイル単位で計測するため、Report ファイルも計測行として計上される。ただし計測行であることは SPEC としての位置づけを与えない
 - 配置は document-model の Report 分類が許容する現行配置（integrity/ 配下）を維持し、移動しない
 
 ## 3 層構造と基盤 6 ドメイン
