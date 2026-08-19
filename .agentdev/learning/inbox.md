@@ -196,3 +196,35 @@
 - **想定反映先**: case-run の機械是正検証手順、integrity 側 SPEC または mechanical-replacement-rules.md（記載場所は検討候補）
 - **関連**: PR 2275、Issue 2235、.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json
 - **タグ**: #x4-split #ir055 #baseline #machine-replacement
+
+## SPEC バッチ保存で参照先用語の実在確認を欠き dangling な整合先表記が残存する
+
+- **問題事象**: ACT-SPEC バッチ保存（3b8a42ff、ACT-SPEC-001〜026 一括反映）で、workflow-templates SPEC が参照先成果物（agentdev-epic-tracker SKILL.md・references）に実在しない用語「V4形式」を整合先として引用したまま SPEC 化された。実体の定義名は references/regex-and-merge-conflict.md「新4列形式」だった。
+- **発生局面**: 整理（backlog-review の RU 生成）、保存（spec-save のバッチ適用）
+- **検知方法**: 検証 Issue #2228 での3成果物突合（SPEC・テンプレートコメント・references）で dangling 判定。`git log -S "V4形式"` により当該用語が 3b8a42ff で導入された dangling な参照先用語と確認
+- **根本原因**: RU → draft → spec-save の経路で、SPEC 本文が挙げる整合先・参照先用語が参照先成果物に実在するかの確認手順がないままバッチ保存された
+- **自律対応内容**: on_failure（fix-and-reverify）に従い SPEC 側を「新4列形式」へ是正し、docs/ + src/ 全 .md で残存 0件を再確認（PR 2273）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（運用手順の欠落。同バッチ由来の他 SPEC への横断確認は intake 採票済み）
+- **横展開観点**: spec-save で外部成果物を整合先として挙げる場合、用語の実在 grep 確認を保存前に行う。authoring の固定トークン事前 grep 手順（PR 2263、Issue 2226）と同型の運用
+- **再発条件**: バッチ SPEC 保存で参照先用語を参照先成果物の確認なしに記載する場合
+- **予防策候補**: spec-save の保存手順へ「整合先・参照先用語の実在 grep 確認」を組み込む
+- **想定反映先**: agentdev-spec-file-manager / workflow-spec-save の保存手順
+- **関連**: PR 2273、Issue 2228、コミット 3b8a42ff、先行手順（固定トークン事前 grep、PR 2263・Issue 2226）
+- **タグ**: #spec-save #dangling-reference #batch-save
+
+## 規定本文への件数ハードコードは運用追加で即座に陳腐化する
+
+- **問題事象**: ACT-SPEC-025 により specs/README.md 登録規定へ「6ファイル（audits/ 5 + baselines/ 1）」と件数がハードコードされた直後、PR #2262 が audits/ へ監査ファイルを追加し（計7ファイル）記述が陳腐化した。Issue #2230 の初回確認で不整合として検出された。
+- **発生局面**: 整理（backlog-review の RU 生成）、保存（spec-save）
+- **検知方法**: 検証 Issue #2230 での実ファイル計数（Get-ChildItem で audits 6 + baselines 1 = 7件）と規定本文記載（6ファイル）の突合
+- **根本原因**: 件数が規則の本質でないのに規定本文へ固定記載された。運用追加（監査ファイル追加等）で必然的に陳腐化する構造
+- **自律対応内容**: 件数非依存の記述へ是正し、実数は AUTOGEN 計測表（spec-health-metrics の計測行）へ集約する構成へ補正（fix-and-reverify、PR 2276）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（記述設計の運用知見）
+- **横展開観点**: 規則・規定本文は件数・実績値等の変動値を本文に固定しない。変動値は計測・索引（AUTOGEN）側へ集約し、本文は件数非依存の規則記述にする
+- **再発条件**: ファイル数・件数を規定本文へハードコードした後に運用追加が行われる場合
+- **予防策候補**: spec-save・docs 編集時の査読観点へ「変動値（件数・実績値）の本文固定記載チェック」を加える
+- **想定反映先**: agentdev-doc-writing の文書品質査読観点、document-type-responsibilities
+- **関連**: PR 2276、Issue 2230、PR 2262、ACT-SPEC-025（コミット 3b8a42ff）
+- **タグ**: #spec-save #staleness #autogen
