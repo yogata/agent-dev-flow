@@ -542,7 +542,8 @@ squash merge がコンフリクトで失敗した場合（リトライ全失敗�
 
 ### rebase 実行
 
-`git fetch origin main` 後、`git rebase origin/main` を実行し機械的解消を試みる（rebase プロシージャは worktree-operations.md「Merge Conflict 対応パターン」参照）。
+`git fetch origin` 後、当該 Case の統合先（通常Caseは `main`、実証Caseは対象評価ブランチ）の remote ref を基準に `git rebase origin/{base_branch}` を実行し機械的解消を試みる（rebase プロシージャは worktree-operations.md「Merge Conflict 対応パターン」参照）。
+rebase 基準は PR の squash merge 先と同一の統合先を参照する。
 
 ### 分岐
 
