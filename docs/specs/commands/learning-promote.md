@@ -1,8 +1,10 @@
 ---
 title: learning-promote SPEC
 status: accepted
+spec_logical_division: behavior
+canonical_owner: learning-promote
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-19
 ---
 
 # learning-promote SPEC
@@ -107,6 +109,26 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
+
+## 自律確定の判定位置とHITLフォールバック（新規セクション）
+
+本節は learning-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約SPEC（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 SPEC と Workflow Skill は同一内容を重複保持しない）。
+
+### 8軸評価・廃棄判定・昇華可能性・既存対策確認後の自律確定判定の挿入位置
+
+問題クラス分類、8軸評価、廃棄判定、昇華可能性、既存対策との関係の評価を経て、取得可能な根拠で処置を一意に確定できる学習項目はユーザー承認なしで確定する（REQ-038-002）。最終確定は、ユーザー判断が必要な項目についてのみユーザーの判断を挟む確定ステップを経る（REQ-038-003）。
+
+### 部分自律確定の実行手順
+
+同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（REQ-003-056）。
+
+### deferred・未処理自動削除禁止の安全境界維持
+
+deferred・未処理項目を自動削除しない既存の安全境界は維持する（REQ-003-024）。自律確定は当該安全境界を迂回しない。
+
+### 自律確定項目の報告形式
+
+判定結果、主要根拠、HITL不要と判断した理由は evaluation-report 等の既存成果物を優先利用して報告し、新規永続成果物を必須としない。
 
 ## 対象外
 

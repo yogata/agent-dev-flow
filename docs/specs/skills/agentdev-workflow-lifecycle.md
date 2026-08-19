@@ -1,8 +1,10 @@
 ---
 title: `agentdev-workflow-lifecycle` SPEC
 status: accepted
+spec_logical_division: behavior
+canonical_owner: agentdev-workflow-lifecycle
 created: 2026-06-21
-updated: 2026-07-18
+updated: 2026-08-19
 ---
 
 # `agentdev-workflow-lifecycle` SPEC
@@ -23,7 +25,7 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 
 - フェーズ定義（マクロ: 壁打ち、構造的実行、レビュー完了 / マイクロ: requirement、analyzed、created、in_progress、review、done）
 - work_type 分類（4値）
-- スケール判定（feature のみ、3条件: 複数モジュール跨ぎ、PR 肥大化リスク、段階的リリース）
+- スケール判定（feature のみ、3条件: 複数モジュール跨ぎ、PR 肥大化リスク、段階的リリース。実証Caseは work_type にかかわらず scale と Issue 構造を選択可能、実証の判定は REQ-043 の定義による）
 - 実装スコープシグナル確認（ドラフト内実装詳細セクション検出時の scale: large 昇格判定、REQ-004-056）
 - 前工程からの引き継ぎ判定、停止条件（`agentdev_handoff: true` 検出時）
 - SSoT 遷移
@@ -38,6 +40,14 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 - 宣言的定義のみを提供
 - 手順、手続きは含まない
 - エージェントが自律的に判断できることをユーザーに確認しない
+
+## スケール判定と工程分類の実証Case例外（新規セクション）
+
+本節はスケール判定と工程分類における実証Case例外を所有する（REQ-005-005 の更新に対応）。
+
+- 通常Caseの scale は feature のみ standard / large とする（REQ-005-005）
+- 実証Case（REQ-043 の定義による）は work_type にかかわらず scale と Issue 構造を選択できる（REQ-005-005）
+- work_type・scale 判定の宣言的定義（REQ-005-012）は通常Caseの判定規則として維持し、実証Case例外は当該宣言的定義に対する例外適用として扱う。実証の判定は REQ-043 の定義による
 
 ## 対象外
 

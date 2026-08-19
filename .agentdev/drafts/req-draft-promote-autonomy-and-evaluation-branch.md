@@ -2,6 +2,7 @@
 draft_type: req_draft
 topic_slug: promote-autonomy-and-evaluation-branch
 status: saved
+spec_consumed: true
 created_at: 2026-08-19T21:40:00+09:00
 source_rus:
   - RU-0001
@@ -773,18 +774,18 @@ operation_units:
   - {ou_id: OU-0016, source_ru: RU-0004, target_req: REQ-034, operation: append, scale: standard, depends_on: [OU-0004, OU-0015], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [REQ-034], lines: [REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043]}}
   - {ou_id: OU-0017, source_ru: RU-0002, target_req: REQ-035, operation: update, scale: standard, depends_on: [OU-0002], recommended_order: 3, issue_policy: single, result: {status: applied, saved: [REQ-035], lines: [REQ-035-009]}}
   - {ou_id: OU-0018, source_ru: RU-0003, target_req: REQ-035, operation: append, scale: standard, depends_on: [OU-0004, OU-0017], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [REQ-035], lines: [REQ-035-012]}}
-  - {ou_id: OU-0019, source_ru: RU-0001, target_spec: docs/specs/workflows/workflow-contracts.md, operation: spec-update, scale: standard, depends_on: [OU-0001], recommended_order: 3, issue_policy: single, result: {}}
-  - {ou_id: OU-0020, source_ru: RU-0003, target_spec: docs/specs/commands/req-define.md, operation: spec-update, scale: standard, depends_on: [OU-0004, OU-0009], recommended_order: 4, issue_policy: single, result: {}}
-  - {ou_id: OU-0021, source_ru: RU-0002, target_spec: docs/specs/commands/case-open.md, operation: spec-update, scale: standard, depends_on: [OU-0004, OU-0012], recommended_order: 4, issue_policy: single, result: {}}
-  - {ou_id: OU-0022, source_ru: RU-0002, target_spec: docs/specs/commands/case-run.md, operation: spec-update, scale: standard, depends_on: [OU-0004, OU-0013], recommended_order: 4, issue_policy: single, result: {}}
-  - {ou_id: OU-0023, source_ru: RU-0002, target_spec: docs/specs/commands/case-close.md, operation: spec-update, scale: standard, depends_on: [OU-0004, OU-0014], recommended_order: 4, issue_policy: single, result: {}}
-  - {ou_id: OU-0024, source_ru: RU-0004, target_spec: docs/specs/commands/case-auto.md, operation: spec-update, scale: standard, depends_on: [OU-0016], recommended_order: 5, issue_policy: single, result: {}}
-  - {ou_id: OU-0025, source_ru: RU-0001, target_spec: docs/specs/commands/intake-promote.md, operation: spec-update, scale: standard, depends_on: [OU-0006], recommended_order: 4, issue_policy: single, result: {}}
-  - {ou_id: OU-0026, source_ru: RU-0001, target_spec: docs/specs/commands/learning-promote.md, operation: spec-update, scale: standard, depends_on: [OU-0007], recommended_order: 4, issue_policy: single, result: {}}
-  - {ou_id: OU-0027, source_ru: RU-0001, target_spec: docs/specs/commands/inspect-promote.md, operation: spec-update, scale: standard, depends_on: [OU-0005], recommended_order: 4, issue_policy: single, result: {}}
-  - {ou_id: OU-0028, source_ru: RU-0002, target_spec: docs/specs/skills/agentdev-git-worktree.md, operation: spec-update, scale: standard, depends_on: [OU-0002], recommended_order: 3, issue_policy: single, result: {}}
-  - {ou_id: OU-0029, source_ru: RU-0003, target_spec: docs/specs/workflows/epic-wave-model.md, operation: spec-update, scale: standard, depends_on: [OU-0018], recommended_order: 4, issue_policy: single, result: {}}
-  - {ou_id: OU-0030, source_ru: RU-0003, target_spec: docs/specs/skills/agentdev-workflow-lifecycle.md, operation: spec-update, scale: standard, depends_on: [OU-0010], recommended_order: 4, issue_policy: single, result: {}}
+  - {ou_id: OU-0019, source_ru: RU-0001, target_spec: docs/specs/workflows/workflow-contracts.md, operation: spec-update, scale: standard, depends_on: [OU-0001], recommended_order: 3, issue_policy: single, result: {status: applied, saved: [workflows/workflow-contracts.md], section: promote系判断確定とHITL境界}}
+  - {ou_id: OU-0020, source_ru: RU-0003, target_spec: docs/specs/commands/req-define.md, operation: spec-update, scale: standard, depends_on: [OU-0004, OU-0009], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [commands/req-define.md], section: 実証Case判定と評価契約}}
+  - {ou_id: OU-0021, source_ru: RU-0002, target_spec: docs/specs/commands/case-open.md, operation: spec-update, scale: standard, depends_on: [OU-0004, OU-0012], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [commands/case-open.md], section: 統合先と実証CaseのIssue構成}}
+  - {ou_id: OU-0022, source_ru: RU-0002, target_spec: docs/specs/commands/case-run.md, operation: spec-update, scale: standard, depends_on: [OU-0004, OU-0013], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [commands/case-run.md], section: 統合先基準の作業起点と実証実行}}
+  - {ou_id: OU-0023, source_ru: RU-0002, target_spec: docs/specs/commands/case-close.md, operation: spec-update, scale: standard, depends_on: [OU-0004, OU-0014], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [commands/case-close.md], section: 統合先へのマージと実証最終クローズ}}
+  - {ou_id: OU-0024, source_ru: RU-0004, target_spec: docs/specs/commands/case-auto.md, operation: spec-update, scale: standard, depends_on: [OU-0016], recommended_order: 5, issue_policy: single, result: {status: applied, saved: [commands/case-auto.md], section: 実証Case自走}}
+  - {ou_id: OU-0025, source_ru: RU-0001, target_spec: docs/specs/commands/intake-promote.md, operation: spec-update, scale: standard, depends_on: [OU-0006], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [commands/intake-promote.md], section: 自律確定の判定位置とHITLフォールバック}}
+  - {ou_id: OU-0026, source_ru: RU-0001, target_spec: docs/specs/commands/learning-promote.md, operation: spec-update, scale: standard, depends_on: [OU-0007], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [commands/learning-promote.md], section: 自律確定の判定位置とHITLフォールバック}}
+  - {ou_id: OU-0027, source_ru: RU-0001, target_spec: docs/specs/commands/inspect-promote.md, operation: spec-update, scale: standard, depends_on: [OU-0005], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [commands/inspect-promote.md], section: 自律確定の判定位置とHITLフォールバック}}
+  - {ou_id: OU-0028, source_ru: RU-0002, target_spec: docs/specs/skills/agentdev-git-worktree.md, operation: spec-update, scale: standard, depends_on: [OU-0002], recommended_order: 3, issue_policy: single, result: {status: applied, saved: [skills/agentdev-git-worktree.md], section: 統合先基準のworktree操作}}
+  - {ou_id: OU-0029, source_ru: RU-0003, target_spec: docs/specs/workflows/epic-wave-model.md, operation: spec-update, scale: standard, depends_on: [OU-0018], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [workflows/epic-wave-model.md], section: Epic実証の評価ブランチ継承}}
+  - {ou_id: OU-0030, source_ru: RU-0003, target_spec: docs/specs/skills/agentdev-workflow-lifecycle.md, operation: spec-update, scale: standard, depends_on: [OU-0010], recommended_order: 4, issue_policy: single, result: {status: applied, saved: [skills/agentdev-workflow-lifecycle.md], section: スケール判定と工程分類の実証Case例外}}
 
 # test_strategy: 各合意項目（AG-*）の検証方法。3要素（verification / pass_criteria / on_failure）を必須とする
 test_strategy:

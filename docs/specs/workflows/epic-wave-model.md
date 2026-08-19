@@ -1,8 +1,10 @@
 ---
 title: Epic / Wave / Issue 実行モデル
 status: accepted
+spec_logical_division: cross_cutting_contract
+canonical_owner: epic-wave-model
 created: 2026-06-21
-updated: 2026-08-18
+updated: 2026-08-19
 ---
 
 # Epic / Wave / Issue 実行モデル
@@ -325,6 +327,14 @@ subagent は属性に応じた振る舞い指針に従う。
 | **Issue 管理の複雑さ** | 複数 Issue 管理を許容 | 単一 Issue で一元管理したい |
 
 Epic Issue のステータス追跡テーブルは「バッチ Issue 単位」の完了判定を管理し、各バッチ Issue 内の OU 完了判定追跡とは二重管理しない。
+
+## Epic実証の評価ブランチ継承（新規セクション）
+
+本節は Epic 実証における評価ブランチ継承の実行詳細を所有する（REQ-035-012、REQ-043-026/027 の実行詳細）。実証Caseの判定と実証の意味論は REQ-043 が所有する。
+
+- **全 Wave の評価ブランチ継承の execution_unit 構成への反映**: Epic 実証では Epic に割り当てられた評価ブランチを全 Wave が統合状態として継承する。Epic Issue から共有評価ブランチを特定できる（REQ-043-013）。execution_unit 構成において各 Wave の作業起点と PR base は同一の評価ブランチを参照する
+- **統合状態を実行・測定する Child Issue / Wave の計画判定**: 複数 Wave の統合状態を実際に動かさなければ評価できない場合、統合状態を実行・測定する Child Issue または Wave を計画へ含める。各 Child で必要十分な評価が完了する場合は不要な統合評価 Wave を強制しない（REQ-043-027）
+- **Epic Issue からの共有評価ブランチ特定**: Epic Issue 本文の実証Case識別情報から共有評価ブランチを特定する。Epic 実証の各 Wave の case-run → case-close は同じ評価ブランチ上で反復する（REQ-034-040）
 
 ## See Also
 

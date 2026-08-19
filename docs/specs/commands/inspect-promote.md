@@ -1,8 +1,10 @@
 ---
 title: inspect-promote SPEC
 status: accepted
+spec_logical_division: behavior
+canonical_owner: inspect-promote
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-19
 ---
 
 # inspect-promote SPEC
@@ -67,6 +69,26 @@ updated: 2026-08-15
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（検出事項プロトコル、inspect-promote 自動 promote 対象カテゴリ、投入先、実行ログ、誤検知 revoke 手順）
+
+## 自律確定の判定位置とHITLフォールバック（新規セクション）
+
+本節は inspect-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約SPEC（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 SPEC と Workflow Skill は同一内容を重複保持しない）。
+
+### 分類・検証・経路B review 後の自律確定判定の挿入位置
+
+分類・検証を経て、必要な経路B review を実施した後、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項はユーザー承認なしで確定する（REQ-036-018）。
+
+### 部分自律確定の実行手順
+
+同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（REQ-003-056）。
+
+### --auto fast path と通常経路の自律確定の区別
+
+--auto fast path（高確信度カテゴリの事前定義による早期処理、明示opt-in）と、通常経路の自律確定（レビュー・検証を経た最終確認省略）は別概念とする。通常の実行によって --auto を暗黙的に有効化しない（REQ-036-021、REQ-041-016）。
+
+### 自律確定項目の報告形式
+
+判定結果、主要根拠、HITL不要と判断した理由は既存の分類結果、実行報告を優先利用して報告し、新規永続成果物を必須としない。
 
 ## 対象外
 

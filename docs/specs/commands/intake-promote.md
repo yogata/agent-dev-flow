@@ -1,8 +1,10 @@
 ---
 title: intake-promote SPEC
 status: accepted
+spec_logical_division: behavior
+canonical_owner: intake-promote
 created: 2026-06-21
-updated: 2026-08-15
+updated: 2026-08-19
 ---
 
 # intake-promote SPEC
@@ -92,6 +94,29 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界、Split Rule）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
+
+## 自律確定の判定位置とHITLフォールバック（新規セクション）
+
+本節は intake-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約SPEC（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 SPEC と Workflow Skill は同一内容を重複保持しない）。
+
+### classification〜review〜HITL〜persistence の各 STEP における自律確定判定の挿入位置
+
+- classification（フェーズ1、2）: 取得可能な根拠から採用・保留・却下を一意に確定できる item は自律確定候補とする
+- review（フェーズ2）: 自律確定候補のうち対論型レビューが必要な item は review を経た後に確定する
+- HITL（フェーズ3）: ユーザー判断が必要な item のみを HITL 対象とする（REQ-037-003）
+- persistence（フェーズ4、5）: 確定済み分類に従い自動実行する
+
+### 部分自律確定の実行手順
+
+同一実行内に自律確定可能 item とユーザー判断必要 item が混在する場合、未決項目に依存しない item を先行確定し、ユーザー判断必要 item のみ HITL 対象とする（REQ-003-056）。
+
+### 自律確定項目の結果・主要根拠・HITL不要理由の報告形式
+
+判定結果、主要根拠、HITL不要と判断した理由は既存の分類結果、実行報告を優先利用して報告し、新規永続成果物を必須としない。
+
+### ユーザー判断必要 item のみの HITL 提示形式
+
+HITL 確定フェーズではユーザー判断が必要な item のみを提示し、自律確定済み item は確定内容の報告にとどめる。
 
 ## 対象外
 
