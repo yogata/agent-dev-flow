@@ -69,13 +69,13 @@ PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（
 PR 変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、PR マージ前に配布依存境界の最終 gate を実行する。
 本 gate は共用 detector（`.opencode/skills/<integrity-detector-skill>/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、配布依存境界 SPEC の最終 gate 基底を再利用する。
 adapter が bypass されても最終 gate で停止する。
-trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run command Step 7-1 と同一。junction 領域は git 非追跡のため PR 差分に現れず、junction を trigger にすると gate が不発になる）
+trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run command STEP-S5 と同一。junction 領域は git 非追跡のため PR 差分に現れず、junction を trigger にすると gate が不発になる）
 
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`
 - **検査対象**: PR HEAD の worktree（マージ前の実際の PR ブランチ内容）を検査する。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査対象とする（Oracle finding 5: inspect PR head before merge）
 - **`--profile source`**: case-close は PR マージ前に実行され、配布ソース面を検査するため `source` を使用する（junction は原本への鏡像）
 - **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う。clean として通過させない。違反時はマージを停止しユーザー判断を仰ぐ
-- **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run command Step 7-1 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
+- **検出結果の記録**: 検出事項（failures）は PR 本文の `## Findings / Capture候補` セクションに `### distribution-boundary` 小見出しで記録する（既に case-run command STEP-S5 で記録済みの場合は上書きせず、case-close で新たに検出された事項のみ追記）
 
 #### full integrity suite 実行（bun test 実行形態契約）
 

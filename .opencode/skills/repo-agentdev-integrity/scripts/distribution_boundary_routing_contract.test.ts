@@ -10,7 +10,8 @@
  *       (references/epic-wave-close.md)
  *   - case-run post-implementation final gate: case-run 配布依存境界の最終
  *       変更経路 gate paragraph (commands/agentdev/case-run.md, layer-3
- *       transition: former `### Step 7-1` heading)
+ *       transition: former standalone final-gate heading, 現行は workflow-case-run
+ *       STEP-S5-1 が対応)
  *
  * All three must reference the same detector entry point and profile token.
  * Assertions verify only routing-bearing machine/LLM-dispatch tokens:
@@ -94,7 +95,7 @@ function extractSection(
   };
 }
 
-// 前出出力検証表転換後の case-run 最終 gate は `### Step 7-1` 見出しでなく
+// 前出出力検証表転換後の case-run 最終 gate は独立した手順見出しでなく
 // bold 段落（**配布依存境界の最終変更経路 gate（実装後）**）で表現される。
 // 段落の終端は soft guard 宣言または次の見出し。
 function extractCaseRunGateParagraph(content: string): SectionExtractionResult {

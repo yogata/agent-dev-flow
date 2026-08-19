@@ -8,7 +8,7 @@ case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/A
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| case-open | Step 1（Issue 本文生成）、Step 5（Epic 本文生成）、Step 15（Standard Issue 生成） | Issue 本文（完了条件セクション、チェックボックス） |
+| case-open | STEP-2（Issue 本文生成・execution contract 確定）、STEP-5（Issue 作成: Epic flow / Standard flow） | Issue 本文（完了条件セクション、チェックボックス） |
 
 ## 検査観点
 
@@ -101,7 +101,7 @@ execution contract 確定を支援するため、artifact-specific quality contr
 
 適用範囲:
 
-- 新規 Issue 作成時（case-open Step 1、Step 5、Step 15 で実行）
+- 新規 Issue 作成時（case-open STEP-2、STEP-5 で実行）
 - case-update による新契約更新時
 - legacy Issue（Execution Contract 必須セクション不存在）には適用しない（presence-based 判定）
 
@@ -132,7 +132,7 @@ QG-2 の検査をサブエージェントに委譲する場合:
 
 - サブエージェントは完了条件候補、必達要件 mapping 候補、網羅性の疑義のみを返す。
 - 親エージェントが pass/warn/fail を確定し、Issue 本文の確定と作成を行う。
-- 具体的な委譲接続点は case-open の各 Step（Step 1, Step 5, Step 7）を参照。
+- 具体的な委譲接続点は case-open の各 STEP（STEP-2, STEP-5）を参照。
 
 ## 責務境界
 

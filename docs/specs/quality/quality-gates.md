@@ -15,7 +15,7 @@ AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPE
 
 - **対象**: AgentDevFlow **主ワークフローのみ**。req-define / req-save / case-open / case-run / case-close（および case-auto）を横断する 4 ゲート。
 - **対象外**: inspect-* / intake-* / learning-* / backlog-* / case-update は実行時参照対象ではない。これらの補助ワークフローには QG-1〜QG-4 を適用しない。
-- **置換関係**: 本 SPEC は旧 `agentdev-spec-compliance` スキルの乖離検出機能を QG-3 として再編成したものである。品質メトリクス収集（型チェック/Lint/ビルド/テスト）は各コマンドのローカル検証ステップ（case-run Step 11-1 等）に委譲する。
+- **置換関係**: 本 SPEC は旧 `agentdev-spec-compliance` スキルの乖離検出機能を QG-3 として再編成したものである。品質メトリクス収集（型チェック/Lint/ビルド/テスト）は各コマンドのローカル検証ステップ（case-run 実行担当サブエージェント委譲内の test-fix ループ等）に委譲する。
 
 ## ゲート一覧
 

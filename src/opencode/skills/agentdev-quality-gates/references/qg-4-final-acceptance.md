@@ -8,7 +8,7 @@ case-close で PR マージ前に、最終受け入れ状態を確認する Gate
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| case-close | Step 2（前提確認、達成判定、test strategy 処理完了確認）、Step 3（docs 検証）、Step 3-1（close 時局所確認） | PR/ CI 結果/ Issue 完了条件チェックボックス/ Issue テスト戦略項目/ PR Findings/ docs |
+| case-close | STEP-2（達成判定、test strategy 処理完了確認）、STEP-3（docs 検証）、STEP-3-1（close 時局所確認） | PR/ CI 結果/ Issue 完了条件チェックボックス/ Issue テスト戦略項目/ PR Findings/ docs |
 
 ## 検査観点
 
@@ -28,7 +28,7 @@ unchecked 項目を達成判定する。
 
 - 達成不可項目 → case-run への差し戻し（case-close G08）。
 - 今回の完了条件に含まれる未対応事項を intake に逃がして完了扱いにしない（case-close 不変条件）。
-- スコープ外項目は `> ℹ️ 別途確認: {項目名}` 形式に変換（case-run Step 7 の責務）。
+- スコープ外項目は `> ℹ️ 別途確認: {項目名}` 形式に変換（case-run STEP-S5 の責務）。
 
 ### 2. CI 通過確認
 
@@ -60,7 +60,7 @@ PR の CI が全て通過しているか。
 
 ### 5. close 時 SPEC/ commands/ skills 更新漏れ（局所確認）
 
-今回の変更に伴う更新漏れの局所確認（case-close Step 3-1）。
+今回の変更に伴う更新漏れの局所確認（case-close STEP-3-1）。
 
 - SPEC 本文と実装の最終矛盾
 - command 定義の更新漏れ
@@ -118,7 +118,7 @@ Issue 本文のテスト戦略セクションに含まれる全 test strategy �
 - **warn**: 評価スコープは決定したが、証拠が PR 時点のスナップショットに留まる（全体再評価を実施していない）。可能であれば全体再評価を推奨。
 - **pass**: 各完了条件の評価スコープが決定済みで、決定したスコープで達成確認済み。
 
-> **参照**: case-close Step 2 は本マトリクスに従い PR 範囲 vs 全体の評価スコープを決定する。
+> **参照**: case-close STEP-2 は本マトリクスに従い PR 範囲 vs 全体の評価スコープを決定する。
 
 ### 9. 識別子中心評価の運用実例集
 
@@ -138,11 +138,11 @@ Issue 本文のテスト戦略セクションに含まれる全 test strategy �
 
 #### 運用実例
 
-**実例1: case-open Step 2-3 記載粒度ガイドライン**
+**実例1: case-open STEP-2-3 記載粒度ガイドライン**
 
 case-open は Issue 本文の完了条件・事前状態を識別子中心で記載する。
 件数等の変動しやすい実測値は補助値として扱う。
-詳細は case-open.md Step 2-3 参照。
+詳細は `agentdev-workflow-case-open` の STEP-2-3（issue-body-and-execution-contract.md）参照。
 
 ```
 ## 完了条件（識別子中心）
@@ -179,7 +179,7 @@ QG-4 は最終受け入れの二値性が強く、`pass`/ `fail` を基本とす
 
 ## 完了条件チェックボックス評価の具体手順
 
-case-close Step 2 での完了条件チェックボックス評価:
+case-close STEP-2 での完了条件チェックボックス評価:
 
 1. Issue 本文の `完了条件` セクションを読み取る
 2. unchecked 項目（`- [ ]`）を抽出
@@ -190,11 +190,11 @@ case-close Step 2 での完了条件チェックボックス評価:
 
 ### 責務帰属
 
-完了条件チェックボックスの評価、更新は **case-close の責務**（Step 2）である。
+完了条件チェックボックスの評価、更新は **case-close の責務**（STEP-2）である。
 QG-4 は判定基準を提供し、case-close が実際のチェックボックス更新を実行する。
 
 > **注意**: 旧設計では case-run がチェックボックス更新を担う箇所があったが、完了条件チェックボックスの最終評価、更新は case-close QG-4 に集約する。
-> case-run Step 7 のチェックボックス更新は実装中の進捗反映（work plan チェックボックス）に限定する。
+> case-run STEP-S5 のチェックボックス更新は実装中の進捗反映（work plan チェックボックス）に限定する。
 
 ## 委譲接続点
 

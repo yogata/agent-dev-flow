@@ -42,14 +42,14 @@ resume point / export / import を持たない。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
-| 工程-1 期間解釈（`agentdev-intake-pipeline`） | 期間指定または番号指定あり | 解析済み期間・対象範囲 | 期間表現が機械可読な範囲に解釈されていること |
-| 工程-2 データ取得（gh CLI、`agentdev-gh-cli` 読取手続き） | 期間確定 | クローズ済み Issue/PR データ | 対象がクローズ済み Issue/PR のみであること（オープン中は対象外） |
-| 工程-3 構造的検出（`agentdev-intake-pipeline`） | データ取得済み | 構造的検出結果（完了条件未対応等） | 検出規則が `agentdev-intake-pipeline` 準拠であること |
-| 工程-4 LLM 全文解析（`agentdev-intake-pipeline`） | 構造的検出済み | 本文・コメント由来の変更候補 | 未回収の変更候補が網羅的に抽出されていること |
-| 工程-5 intake item 生成・実行前同期 | 候補確定 | `YYYY-MM-DD-{topic-slug}.md`（候補ごとに1ファイル） | 同名ファイル存在時は連番付与であること |
-| 工程-6 保存・永続化 | item 生成済み | `.agentdev/intake/inbox/` への保存・git 永続化 | 保存先が `.agentdev/intake/inbox/` のみであること |
-| 工程-7 サマリーレポート提示 | 保存済み | 抽出サマリーレポート（ユーザー確認用） | 抽出件数と保存パスが対応していること |
-| 工程-8 完了報告 | レポート提示済み | 完了報告（次アクション） | 次コマンド（`/agentdev/intake-promote`）が報告されていること |
+| STEP-1 期間解釈（`agentdev-intake-pipeline`） | 期間指定または番号指定あり | 解析済み期間・対象範囲 | 期間表現が機械可読な範囲に解釈されていること |
+| STEP-2 データ取得（gh CLI、`agentdev-gh-cli` 読取手続き） | 期間確定 | クローズ済み Issue/PR データ | 対象がクローズ済み Issue/PR のみであること（オープン中は対象外） |
+| STEP-3 構造的検出（`agentdev-intake-pipeline`） | データ取得済み | 構造的検出結果（完了条件未対応等） | 検出規則が `agentdev-intake-pipeline` 準拠であること |
+| STEP-4 LLM 全文解析（`agentdev-intake-pipeline`） | 構造的検出済み | 本文・コメント由来の変更候補 | 未回収の変更候補が網羅的に抽出されていること |
+| STEP-5 intake item 生成・実行前同期 | 候補確定 | `YYYY-MM-DD-{topic-slug}.md`（候補ごとに1ファイル） | 同名ファイル存在時は連番付与であること |
+| STEP-6 保存・永続化 | item 生成済み | `.agentdev/intake/inbox/` への保存・git 永続化 | 保存先が `.agentdev/intake/inbox/` のみであること |
+| STEP-7 サマリーレポート提示 | 保存済み | 抽出サマリーレポート（ユーザー確認用） | 抽出件数と保存パスが対応していること |
+| STEP-8 完了報告 | レポート提示済み | 完了報告（次アクション） | 次コマンド（`/agentdev/intake-promote`）が報告されていること |
 
 ## 不変条件
 
