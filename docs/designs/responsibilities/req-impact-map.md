@@ -54,7 +54,7 @@ updated: 2026-06-28
 | REQ-004 | 要件定義、保存 | IR-001, IR-002 | REQ |
 | REQ-009 | 配布基盤: source/projection、sync、repo type、consumer install | IR-006, IR-016, IR-046 | commands, skills, ドメイン状態 |
 | REQ-008 | Drafts 配置、Draft Type Registry | IR-016 | ドメイン状態 |
-| REQ-001 | REQ/SPEC 責務分離の徹底と新ワークフロー（spec-save 新設、req-define 強化） | IR-008, IR-044 | REQ, SPEC, commands |
+| REQ-001 | REQ/SPEC 責務分離の徹底と新ワークフロー（design-save 新設、req-define 強化） | IR-008, IR-044 | REQ, SPEC, commands |
 | v2:REQ-0137 | 並列実行安全 git 操作規律 |（(infrastructure)）| - |
 | REQ-008 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
 | REQ-003 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
@@ -138,7 +138,7 @@ DEC-013 AG-008 適用により file-backed tombstone（IR-011 型）を物理削
 
 廃止 IR の交叉参照（v2:REQ-NNN 等）を再配置する節。
 AG-008（REQ-028-008）に基づき、file-backed tombstone の物理削除時に交叉参照を本節へ移行する。
-各エントリは廃止 IR ID、旧交叉参照、再配置日、後続 REQ 等のメタデータを持つ（Phase 3 §7.3、`docs/specs/integrity/audits/cross-cutting-integration-design-20260811.md`）。
+各エントリは廃止 IR ID、旧交叉参照、再配置日、後続 REQ 等のメタデータを持つ（Phase 3 §7.3、`docs/designs/integrity/audits/cross-cutting-integration-design-20260811.md`）。
 
 ### IR-011 削除に伴う交叉参照再配置
 

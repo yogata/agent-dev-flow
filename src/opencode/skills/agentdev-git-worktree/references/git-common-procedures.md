@@ -149,7 +149,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 
 ### 適用宣言
 
-共有作業ツリーで git 操作を行う全 command（req-save, spec-save, case-open, case-close, learning-promote, backlog-review, intake-capture, intake-from-github, intake-promote, inspect-docs, inspect-skills, inspect-promote）は本プロシージャに従うこと。
+共有作業ツリーで git 操作を行う全 command（req-save, design-save, case-open, case-close, learning-promote, backlog-review, intake-capture, intake-from-github, intake-promote, inspect-docs, inspect-skills, inspect-promote）は本プロシージャに従うこと。
 各 command 側には規律の詳細本文ではなく、本プロシージャ名と停止条件のみを記述する。
 
 ---

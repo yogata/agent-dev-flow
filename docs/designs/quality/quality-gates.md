@@ -7,7 +7,7 @@ updated: 2026-08-15
 
 # 品質ゲート
 
-AgentDevFlow 主ワークフロー（req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-010）。
+AgentDevFlow 主ワークフロー（req-define → req-save → design-save（SPEC 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-010）。
 各ゲートの判定基準、機械化境界、実装マッピングを示す。
 
 > **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリの設計文書であり、実行時配布対象ではない（REQ-001）。

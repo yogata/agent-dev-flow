@@ -1,5 +1,5 @@
 {
-  "name": "agentdev-spec-file-manager-scripts",
+  "name": "agentdev-design-file-manager-scripts",
   "version": "0.1.0",
   "private": true,
   "description": "Deterministic scripts for SPEC-specific file management (target_area search). Pure functions, argv/stdin input, stdout JSON output (REQ-{NNNN}-{NNN}/032, AG-{NNN}/006).",

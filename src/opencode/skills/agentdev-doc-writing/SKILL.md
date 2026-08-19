@@ -9,9 +9,9 @@ description: ADR/REQ/SPEC 横断の文書品質査読ゲート。文書種別責
 
 本スキルは以下の方針に従う（ADR）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-doc-writing.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
+3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 目的
@@ -45,7 +45,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 **対象:**
 
 - `docs/**`（REQ, ADR, SPEC, guides, README）
-- docs を生成、編集する command/ skill の自然言語記述（req-define, req-save, spec-save, case-run, case-close, case-auto, inspect-docs, docs-check が扱う docs 成果物とその記述）
+- docs を生成、編集する command/ skill の自然言語記述（req-define, req-save, design-save, case-run, case-close, case-auto, inspect-docs, docs-check が扱う docs 成果物とその記述）
 - Issue 本文, PR 本文, 完了報告, 設計説明, intake/learning 中間成果物
 
 **対象外:**
@@ -80,7 +80,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 ### 適用対象の横断性
 
 - **文書種別**: REQ/ADR/SPEC/guide/README すべての文書種別に対して、文書種別責務観点を適用
-- **文書生成元**: docs を生成、編集する command/skill の自然言語記述（req-define, req-save, spec-save, case-run, case-close, case-auto, inspect-docs, docs-check 等）に対しても同等の品質基準を適用
+- **文書生成元**: docs を生成、編集する command/skill の自然言語記述（req-define, req-save, design-save, case-run, case-close, case-auto, inspect-docs, docs-check 等）に対しても同等の品質基準を適用
 - **成果物種別**: Issue 本文, PR 本文, 完了報告, 設計説明, intake/learning 中間成果物に対して文意品質、粒度観点を適用
 
 ### 観点間適用優先順位

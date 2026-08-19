@@ -47,7 +47,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-review.yaml`�
 ## Control Plane（STEP 一覧）
 
 backlog-review workflow は次の8 STEP で構成する。
-各 STEP は resume point を持ち（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
+各 STEP は resume point を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|

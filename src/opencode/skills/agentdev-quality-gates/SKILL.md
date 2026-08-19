@@ -19,15 +19,15 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 本スキルは以下の方針に従う（ADR）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-quality-gates.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
+3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 概要
 
 - **役割**: QG-1〜QG-4 の判定基準、検査観点、乖離分類基準を提供する
-- **対象**: AgentDevFlow **主ワークフローのみ**（req-define/ req-save/ spec-save/ case-open/ case-run/ case-close）。spec-save は主ワークフローの一工程だが、独自の QG を持たず QG-1（req-save）と QG-4（case-close）の SPEC lifecycle 確定で担保される
+- **対象**: AgentDevFlow **主ワークフローのみ**（req-define/ req-save/ design-save/ case-open/ case-run/ case-close）。design-save は主ワークフローの一工程だが、独自の QG を持たず QG-1（req-save）と QG-4（case-close）の SPEC lifecycle 確定で担保される
 - **特性**: knowledge base。コマンドから参照され、判定結果を返すが成果物を直接編集しない
 - **依存**: agentdev コマンドから参照される専門スキル
 

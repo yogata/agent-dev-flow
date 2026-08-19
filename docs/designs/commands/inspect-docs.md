@@ -41,7 +41,7 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 処理段階（外部から意味のある順序）。
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-inspect-docs`）が正規情報源である（read-only-diagnostic 型、REQ-027-003 により STEP model 対象外）。
 
-- スキャン対象の収集（`docs/requirements/`, `docs/decisions/`, `docs/specs/`, `docs/guides/`, `README.md`, `.opencode/`）
+- スキャン対象の収集（`docs/requirements/`, `docs/decisions/`, `docs/designs/`, `docs/guides/`, `README.md`, `.opencode/`）
 - REQ 参照 ID 整合性確認（`agentdev-req-structure-diagnostics`）
 - 第一参照導線確認（`agentdev-req-structure-diagnostics`）
 - 現行/廃止/世代境界確認（`agentdev-req-structure-diagnostics`）
@@ -50,8 +50,8 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 - guides 意味診断（guides が navigation layer の範囲を超えていないか確認）。履歴混入検出時は route 追加（v2:REQ-0115-041）
 - README 索引診断（README 索引が導線の範囲を超えていないか確認）。内容過多検出時は分割誘導
 - REQ structure review（6観点）（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT（`agentdev-req-structure-diagnostics`））
-- 文書分類一貫性検査（`docs/specs/foundations/document-model.md` の classification policy への適合確認）。REQ 要件行への SPEC 分離基準違反残留（schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出
-- 配布物整合性検査。配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/specs/integrity/docs-spec-rebuild-integrity.md` が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損）、文意保持（壊れた括号、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する（`agentdev-req-structure-diagnostics` 参照）
+- 文書分類一貫性検査（`docs/designs/foundations/document-model.md` の classification policy への適合確認）。REQ 要件行への SPEC 分離基準違反残留（schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出
+- 配布物整合性検査。配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/designs/integrity/docs-spec-rebuild-integrity.md` が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損）、文意保持（壊れた括号、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する（`agentdev-req-structure-diagnostics` 参照）
 - docs-check route 判定（意味的疑いのうち機械的検査に落とせるものを docs-check ルール／検査データ候補として提示）
 - 未処理 artifact 確認（`agentdev-req-structure-diagnostics`）
 - 検出事項出力（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）。source-of-truth priority: 現行 REQ > 承認済み Decision > SPEC > guides

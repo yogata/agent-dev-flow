@@ -151,7 +151,7 @@ REQ/Decision/SPEC 操作が各 README 索引へ影響するか確認し、target
 
 ### Procedure
 
-REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/specs/README.md`）の索引に影響するか確認する。
+REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/designs/README.md`）の索引に影響するか確認する。
 影響がある場合は更新、ない場合は「README 索引更新なし」とする。
 README 索引更新は導線の更新であり、要件、判断、仕様の更新ではない。
 
@@ -336,7 +336,7 @@ STEP-10 の status 変更を commit 対象に含める。
 ## 関連 STEP
 
 - 前: STEP-4（precheck-and-req-ops.md）
-- 次: なし（workflow 終了。後続は spec-save / case-open）
+- 次: なし（workflow 終了。後続は design-save / case-open）
 
 ## 関連 Capability Skill
 

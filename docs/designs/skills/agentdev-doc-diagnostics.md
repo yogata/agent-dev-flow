@@ -16,7 +16,7 @@ docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契
 
 `inspect-docs` command の実行時に docs 横断診断の実行を担う診断判断 skill の責務、対象外、境界を定義する。
 REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`agentdev-doc-writing`）との責務重複を防ぎ、docs 横断診断の正規所有者を一つに定める。
-探索・導線（索引からの到達性）は README 索引（`docs/specs/README.md` 等の入口表）とトレーサビリティ派生索引（`agentdev-artifact-graph`）が担い、本 skill の診断対象外とする。
+探索・導線（索引からの到達性）は README 索引（`docs/designs/README.md` 等の入口表）とトレーサビリティ派生索引（`agentdev-artifact-graph`）が担い、本 skill の診断対象外とする。
 名称は REQ-036-013 の diagnostics 許容例外境界に基づき `agentdev-doc-diagnostics` を維持する（CR-001）。
 
 ## 適用対象
@@ -53,7 +53,7 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`age
 
 inspect-docs の診断観点は正規の観点レジストリが所有する（REQ-028-014）。
 
-- **配置先**: `docs/specs/skills/agentdev-doc-diagnostics/references/perspective-registry.md`（本 SPEC の references 配下）
+- **配置先**: `docs/designs/skills/agentdev-doc-diagnostics/references/perspective-registry.md`（本 SPEC の references 配下）
 - **schema**: 各観点エントリは観点ID（一意）、診断カテゴリ（SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT、残余参照、境界違反等）、適用文書種別、正規所有者 skill、詳細参照の項目を持つ
 - 移管対応表（integrity-rule-catalog.md の inspect-docs 移管記録）で名指しされた観点は当該レジストリへ登録する
 - レジストリの追加、変更は本 schema に従い、本 SPEC が schema の正規所有者となる

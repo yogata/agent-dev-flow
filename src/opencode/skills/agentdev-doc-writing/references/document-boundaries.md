@@ -101,7 +101,7 @@ REQ/ADR/SPEC の内容を代替していないか。
 - ADR 番号 → 意思決定の内容（例: 委譲モデル、ライフサイクル方針）
 - SPEC-ID → 該当 SPEC の主題（例: 「case-run SPEC」）
 
-内部 ID を含む説明が必要な場合は、配布物ではなく `docs/specs/` または `docs/guides/` へ移送する（`移送: SPEC` または `移送: guide`）。
+内部 ID を含む説明が必要な場合は、配布物ではなく `docs/designs/` または `docs/guides/` へ移送する（`移送: SPEC` または `移送: guide`）。
 
 ## 術語の平易化
 

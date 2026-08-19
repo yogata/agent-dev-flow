@@ -37,7 +37,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 - `references/review-output.md`（査読出力形式）
 - `references/execution-subject-classification.md`（実行主体分類（command / skill / subagent / harness）の査読）
 
-配置基準、用語政策の原本は `docs/specs/responsibilities/document-type-responsibilities.md`、執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+配置基準、用語政策の原本は `docs/designs/responsibilities/document-type-responsibilities.md`、執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）。
 内容が重複する場合は原本を優先（v2:REQ-0140-023）。
 
 ## 現在の動作

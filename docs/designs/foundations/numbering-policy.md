@@ -12,7 +12,7 @@ AgentDevFlow 配布物が前提する採番の不変条件を宣言し、各所�
 
 ## 適用範囲
 
-- **対象**: `docs/requirements/REQ-*.md`、`docs/decisions/DEC-*.md`、`docs/specs/integrity/rules/IR-*.md` の識別子採番
+- **対象**: `docs/requirements/REQ-*.md`、`docs/decisions/DEC-*.md`、`docs/designs/integrity/rules/IR-*.md` の識別子採番
 - **対象外**: 各 REQ の要件行 ID（`REQ-{NNN}-{MMM}` 形式）の採番詳細（`agentdev-req-file-manager` SKILL 参照）、`agentdev-req-file-manager/scripts/` の実装詳細
 
 ## 識別子形式
@@ -34,7 +34,7 @@ AgentDevFlow 配布物が前提する採番の不変条件を宣言し、各所�
 欠番が存在する場合でも欠番を埋めず、最大番号をもって決定する。
 
 採番の判断は人間または LLM が行わず、`agentdev-req-file-manager/scripts/`（REQ、複合 ID）と `agentdev-decision-file-manager/scripts/`（Decision）が提供する決定的スクリプト（`alloc-req-number.ts`、`alloc-decision-number.ts`、`alloc-composite-id.ts`）が機械的に確定する（design-principles.md 第5節）。
-req-save、spec-save は当該スクリプトを bash 経由で呼び出す。
+req-save、design-save は当該スクリプトを bash 経由で呼び出す。
 
 ### 廃止時の扱い
 
@@ -59,7 +59,7 @@ numbering-policy は欠番の存在宣言のみを担い、交叉参照データ
 採番ミス（重複、飛び越し、誤桁数）を検出した場合、ファイル名と frontmatter `id` を一致させる方向で是正する。
 是正によって新たな欠番が生じる場合は欠番として維持し、後続採番で埋めない。
 
-`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/specs/integrity/integrity-rule-catalog.md` の各索引は実体と一致するよう、新規採番、廃止、是正の都度更新する。
+`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/designs/integrity/integrity-rule-catalog.md` の各索引は実体と一致するよう、新規採番、廃止、是正の都度更新する。
 更新忘れを検出するための自動生成機構は `index-auto-generation.md` が定める。
 
 ## 正規所有者と参照関係
@@ -73,7 +73,7 @@ numbering-policy は欠番の存在宣言のみを担い、交叉参照データ
 ## 関連情報
 
 - 関連 REQ: REQ-001（文書・REQ 管理基準）、REQ-004（要件定義・保存）
-- 関連 SPEC: `docs/specs/integrity/index-auto-generation.md`（索引類自動生成）、`docs/specs/foundations/patterns.md`（文書フォーマット規約）
+- 関連 SPEC: `docs/designs/integrity/index-auto-generation.md`（索引類自動生成）、`docs/designs/foundations/patterns.md`（文書フォーマット規約）
 - 関連 SKILL: `agentdev-req-file-manager`、`agentdev-decision-file-manager`
 - 根拠監査台帳項目: F-003（v2:REQ-0157）、F-004（IR-045）
 

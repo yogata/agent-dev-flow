@@ -25,7 +25,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 | `docs/requirements/README.md`のREQ一覧・件数 | 自動生成 | REQ frontmatter |
 | `docs/decisions/README.md`の基盤一覧・status別一覧・件数 | 自動生成 | Decision frontmatter |
 | `docs/decisions/README.md`のトピック別ビュー・Decision Map・関連REQ表 | 人手管理 | Decision本文と人手判断 |
-| `docs/specs/README.md`のSPEC一覧・status列 | 現行実装に従う混合管理 | SPEC frontmatterと人手管理列 |
+| `docs/designs/README.md`のSPEC一覧・status列 | 現行実装に従う混合管理 | SPEC frontmatterと人手管理列 |
 | integrity rule catalogとrule ownershipのAUTOGENブロック | 自動生成 | 個別IR文書 |
 | REQ/SPECメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
 
@@ -94,7 +94,7 @@ AUTOGEN block ID は `{target}-{section}-{subsection}` 形式に従う。
 | `decision-retired-table` | decisions/README.md |
 | `req-active-count`, `req-active-table`, `req-retired-table` | requirements/README.md |
 | `req-metrics-measurement-example` | quality/req-health-metrics.md |
-| `spec-metrics-measurement-example` | quality/spec-health-metrics.md |
+| `spec-metrics-measurement-example` | quality/design-health-metrics.md |
 | `readme-req-summary-count` | README.md |
 
 新規 AUTOGEN block は本形式に従う。
@@ -118,7 +118,7 @@ rule-ownership appendix は IR 別関連マッピング表を CSV ライクな M
 
 ### SPEC 行数計測の AUTOGEN ブロック除外
 
-SPEC 健全性メトリクス（`spec-health-metrics.md`「SPEC 計測例」）は SPEC 本文行数を計測する。
+SPEC 健全性メトリクス（`design-health-metrics.md`「SPEC 計測例」）は SPEC 本文行数を計測する。
 計測対象 SPEC 自体に AUTOGEN ブロックが含まれる場合、AUTOGEN ブロックを行数計測対象から除外する。
 
 除外により以下の2要件を両立する。
@@ -196,10 +196,10 @@ backtick 文脈判定のような部分一致ロジックは併用しない。
 - **ADR README トピック別ビュー**: 人手管理。導出規則未確定のため。
 - **ADR README Decision Map**: 人手管理。各 ADR 本文の宣言から導出するが、導出規則が未確定のため。
 - **ADR README 関連 REQ 表**: 人手管理。各 Decision の関連宣言から導出するが、導出規則が未確定のため。
-- **docs/specs/README.md**: 人手管理または既存生成部分のみ AUTOGEN。status 列は AUTOGEN 可能だが、責務列等の混合領域が大半のため、現状では一部列のみ AUTOGEN または人手管理。
+- **docs/designs/README.md**: 人手管理または既存生成部分のみ AUTOGEN。status 列は AUTOGEN 可能だが、責務列等の混合領域が大半のため、現状では一部列のみ AUTOGEN または人手管理。
 
 ## 関連情報
 
 - 関連 REQ: REQ-001（文書・REQ 管理基準）、REQ-001（SPEC status 追跡と draft 放置検出）
-- 関連 SPEC: `docs/specs/foundations/numbering-policy.md`（採番管理）、`docs/specs/integrity/integrity-rule-catalog.md`（整合性ルールカタログ）、`docs/specs/integrity/integrity-contracts.md`（整合性契約）
+- 関連 SPEC: `docs/designs/foundations/numbering-policy.md`（採番管理）、`docs/designs/integrity/integrity-rule-catalog.md`（整合性ルールカタログ）、`docs/designs/integrity/integrity-contracts.md`（整合性契約）
 - 検査契約: IR-061（index generation consistency）、IR-038（ADR index consistency）、IR-039（index REQ title consistency）、IR-042（hardcoded req count）

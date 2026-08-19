@@ -113,7 +113,7 @@ subagent は子 Issue 本文の「前工程完了度」属性（epic-wave-model 
 
 ### 完全完了（通常実行）
 
-- **前提**: req-save / spec-save 等の前工程で実施済み、追加作業不要
+- **前提**: req-save / design-save 等の前工程で実施済み、追加作業不要
 - **振る舞い**: 通常通りの実行フロー。Issue 本文の完了条件を完全に実装し、acceptance criteria 順位検証を実施し、PR 作成、検証、品質ゲートを通過する
 
 ### 検証のみ

@@ -9,7 +9,7 @@ updated: 2026-08-09
 
 変更予定成果物の種別から必須品質能力を導出する合成規則と、Issue execution contract
 （REQ-017）への投影契約を定義する。本 SPEC は設計記録（document-model.md により
-docs/specs/ は実行時依存先ではない）であり、実行時の適用判定と test strategy 投影は
+docs/designs/ は実行時依存先ではない）であり、実行時の適用判定と test strategy 投影は
 case-open が、QG-2 による充足検証は agentdev-quality-gates が、個別品質基準は各
 authoring Skill/SPEC がそれぞれ担当する。
 

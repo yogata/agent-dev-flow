@@ -7,7 +7,7 @@ updated: 2026-08-15
 
 # agentdev-adversarial-review SPEC
 
-本 SPEC は docs/specs/skills/agentdev-deep-review.md（旧 SPEC）の後継である。
+本 SPEC は docs/designs/skills/agentdev-deep-review.md（旧 SPEC）の後継である。
 旧 SPEC は superseded として履歴保持し、本 SPEC が対論型レビューの振る舞い契約、レビュー手続き、責務構造を正規所有する。
 
 ## 対象

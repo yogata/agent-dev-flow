@@ -30,7 +30,7 @@ updated: 2026-08-20
 ## 検知対象
 
 - 具体ID: `ADR-NNNN`、`REQ-NNNN`、`REQ-NNNN-NNN`
-- 具体パス: `docs/decisions/`、`docs/requirements/`、`docs/specs/`配下の具体ファイル
+- 具体パス: `docs/decisions/`、`docs/requirements/`、`docs/designs/`配下の具体ファイル
 - 固定URL: 特定owner/repositoryを含むGitHub blob、raw URL
 
 ## exemption

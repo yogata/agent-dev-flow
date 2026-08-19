@@ -34,7 +34,7 @@ DEC-011（STEP resume point と会話記憶非依存）の実装詳細を正規�
 
 | 変種 | 形式 | 該当例 |
 |---|---|---|
-| h3 見出し形式（標準） | `### Purpose` 〜 `### Resume-Idempotency` | Wave 2 移行の Workflow Skill（req-define、req-save、spec-save、case-run、case-update、case-auto、intake-promote、learning-promote、backlog-review 等） |
+| h3 見出し形式（標準） | `### Purpose` 〜 `### Resume-Idempotency` | Wave 2 移行の Workflow Skill（req-define、req-save、design-save、case-run、case-update、case-auto、intake-promote、learning-promote、backlog-review 等） |
 | h2 見出し形式 | `## Purpose` 〜 `## Resume-Idempotency` | Wave 1 移行の case-open、case-close の一部 reference |
 | STEP 見出し + リスト形式 | `## STEP-N` 見出し配下に `- **Purpose**:` 等のリスト | inspect-promote |
 

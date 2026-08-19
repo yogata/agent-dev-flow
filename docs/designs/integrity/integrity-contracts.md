@@ -71,7 +71,7 @@ updated: 2026-08-18
 | AcceptedAdrCitation | 承認済み以外の ADR 引用検出（推奨）。廃止 ADR への履歴参照は現行根拠引用 heuristic と区別する（REQ-001-050） |
 | AbolishedSkillReference | 廃止済み skill への参照検知 |
 | CommandLocalTemplate | command-local template 存在、整合性検査 |
-| SkillSpecDependency | 実行時スキルから docs/specs/ への直接依存検出 |
+| SkillSpecDependency | 実行時スキルから docs/designs/ への直接依存検出 |
 | RetiredAdrCitation | 廃止 ADR への現行根拠引用検出（REQ-001-048, heuristic/observation） |
 | ReqSpecBoundary | 現行 REQ 要件行への SPEC 詳細混入検出（REQ-001-067〜069。IR-044 としてカタログ定義。REQ-001-069 安定契約例外は対象外） |
 
@@ -109,7 +109,7 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 
 ## 適用範囲宣言
 
-`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
+`docs/designs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
 他プロジェクトへの適用を意図しない。
 実行時コマンドは SPEC ファイルに依存しない（REQ-001）。
 
@@ -282,15 +282,15 @@ gate 不合格の場合は新規 IR 登録を取り下げ、REQ-028-013「IR 件
 
 継続的再発防止価値がある場合のみ恒久 IR へ昇格する。
 昇格時は新規 IR 登録 gate（前述）を適用する。
-REQ-028-006 の詳細運用は別途 spec-save 工程で確定する。
+REQ-028-006 の詳細運用は別途 design-save 工程で確定する。
 
 ### IR-057 適用（REQ-028-006 移行判断、Phase 3 §7.2 判定）
 
 IR-057（obsolete-spec-path-after-domain-split、Phase 2 KEEP 確定）は Phase 3 §7.2 判定に基づき現状維持（恒久 IR）とする。
-`docs/specs/` ドメイン再編が未完了であり、obsolete-path 参照の新規発生リスクが継続するため。
+`docs/designs/` ドメイン再編が未完了であり、obsolete-path 参照の新規発生リスクが継続するため。
 別種検査への移行条件は次の2条件が両立した場合、Phase 6（OU-007）全体検証で再評価する。
 
-1. `docs/specs/` ドメイン再編が完了し、obsolete-spec-path 構造が安定する
+1. `docs/designs/` ドメイン再編が完了し、obsolete-spec-path 構造が安定する
 2. obsolete-path 参照の新規発生が一定期間（目安: 移行判断時点から2四半期以上）発生しない
 
 ## IR-050 / IR-051 適用条件（REQ-010-006/007）
@@ -339,13 +339,13 @@ baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline
 | 実行者 | agent-dev-flow リポジトリの maintainer。PR を経由して更新する |
 | 根因特定手順 | (1) 報告された new violation の evidence を確認する。(2) 当該箇所が本来除去されるべき違反か、baseline に記録された既知違反の周辺改修による見え方の変化かを分類する。(3) 前者の場合は違反を修正し baseline は更新しない。後者の場合は baseline 更新を正当化する根因（baseline 再計算で当該 bucket の count が増加する理由）を PR 本文に記載する |
 | 更新実行手順 | `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --update-ir055-baseline` を実行し、生成された baseline ファイルを commit する。更新後は `--json` 実行で new violation が 0 件になることを確認する |
-| 更新非対象 | strict 違反（REQ-NNNN、ADR-NNNN、`src/opencode/`、`/repo/*`、`repo-*`）の新規発生は baseline 更新で解消せず、必ず実装修復を行う。baseline 更新が許容されるのは heuristic 違反（`docs/specs/`、`docs/guides/`、本体 GitHub URL、行番号付き参照）の bucket 再計算のみ |
+| 更新非対象 | strict 違反（REQ-NNNN、ADR-NNNN、`src/opencode/`、`/repo/*`、`repo-*`）の新規発生は baseline 更新で解消せず、必ず実装修復を行う。baseline 更新が許容されるのは heuristic 違反（`docs/designs/`、`docs/guides/`、本体 GitHub URL、行番号付き参照）の bucket 再計算のみ |
 
 ### baseline 再生成分実行契約
 
 - **移設を伴う変更**: 文書の移設・改名・参照構造変更を伴う PR では、baseline 再生成（再計算）を標準手順として PR 内で実行する。移設完了と baseline 不整合の残存を分離して報告する
 - **並列 Wave 実行時**: 並列 Wave で同一 baseline への更新競合が生じ得る場合、再生成スコープは Wave 境界（各 Wave の取り込み完了時点）または最終 merge 後（Epic 全体の取り込み後）のいずれかとし、PR 間で同一 bucket の二重更新を発生させない
-- **保存工程での要否判定**: docs/specs 配下への新規参照追加・参照変更を伴う保存工程では、変更後に IR-055 の new violation を確認し、正当な実装修復由来でない場合に再生成要否を判定する
+- **保存工程での要否判定**: docs/designs 配下への新規参照追加・参照変更を伴う保存工程では、変更後に IR-055 の new violation を確認し、正当な実装修復由来でない場合に再生成要否を判定する
 - **ratchet 性の維持**: baseline は純減を健全とする ratchet であり、再生成により既知違反の隠蔽と検出対象の縮小を行わない。再生成の根拠は PR 本文に記録する
 
 ## NG baseline 運用手順（全カテゴリ strict pass、v2:REQ-0161-005 統合）
@@ -438,12 +438,12 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 ## Workflow × 使用ツールマトリックス
 
 本セクションは全 workflow の使用検査ツールを肯定表現で一元管理する SSoT であり、各 workflow SPEC から参照される。
-req-save/spec-save/case-run/case-close の各コマンドは対象ファイル種別に応じた最小監査範囲を定義し、case-run/case-close は永続文書更新を契機に検査する。
+req-save/design-save/case-run/case-close の各コマンドは対象ファイル種別に応じた最小監査範囲を定義し、case-run/case-close は永続文書更新を契機に検査する。
 
 | workflow | check_changed_docs.ts | check_extensions.ts | check_integrity.ts | test_strategy |
 |---|---|---|---|---|
 | req-save | ✓（REQ files） | — | — | — |
-| spec-save | ✓（SPEC files） | — | — | — |
+| design-save | ✓（SPEC files） | — | — | — |
 | case-open | — | — | — | — |
 | case-run | ✓（docs/** 変更時、--workflow case-run） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（Issue 完了条件検証） |
 | case-close | ✓（PR files、--workflow case-close） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（QG-4 完了条件確認） |
@@ -456,7 +456,7 @@ check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、�
 参照元 workflow SPEC 一覧（各 SPEC から本マトリックス表を参照）:
 
 - [commands/req-save.md](../commands/req-save.md)
-- [commands/spec-save.md](../commands/spec-save.md)
+- [commands/design-save.md](../commands/design-save.md)
 - [commands/case-open.md](../commands/case-open.md)
 - [commands/case-run.md](../commands/case-run.md)
 - [commands/case-close.md](../commands/case-close.md)

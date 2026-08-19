@@ -31,12 +31,12 @@ updated: 2026-07-27
 ## 現在の動作
 
 - ユーザー承認なしで `inbox.md` に追記
-- git 永続化は呼出元 command（req-save / spec-save / case-open / case-close）の責務（後述「呼出元 command 契約」参照）
+- git 永続化は呼出元 command（req-save / design-save / case-open / case-close）の責務（後述「呼出元 command 契約」参照）
 - 実観測ベース（実際に検知、回避、修正した問題のみ）
 
 ## 呼出元 command 契約
 
-本スキルは、主ワークフロー構成工程 command（req-save / spec-save / case-open / case-close）から委譲を受ける。
+本スキルは、主ワークフロー構成工程 command（req-save / design-save / case-open / case-close）から委譲を受ける。
 各 command は自工程で実観測した deviation のうち learning 該当分を本スキルへ委譲する。
 command は他 command を直接呼び出さず、Skill へ一方向に委譲する（Command→Skill 依存方向、[artifact-contracts.md](../responsibilities/artifact-contracts.md)「依存方向」、[capture-boundaries.md](../workflows/capture-boundaries.md)「委譲契約（Command→Skill 依存方向）」参照）。
 
@@ -45,7 +45,7 @@ command は他 command を直接呼び出さず、Skill へ一方向に委譲す
 | 呼出元 command | REQ 根拠 | 委譲対象 |
 |---|---|---|
 | req-save | REQ-006-106 | req-save 実行中に実観測した deviation のうち learning 該当分 |
-| spec-save | REQ-006-107 | spec-save 実行中に実観測した deviation のうち learning 該当分 |
+| design-save | REQ-006-107 | design-save 実行中に実観測した deviation のうち learning 該当分 |
 | case-open | REQ-006-021 | case-open 実行中に実観測した deviation のうち learning 該当分 |
 | case-close | REQ-006-105 | case-close 実行中に実観測した deviation のうち learning 該当分（PR 本文から回収した learning 候補を含む） |
 

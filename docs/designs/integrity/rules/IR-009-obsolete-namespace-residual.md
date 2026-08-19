@@ -10,7 +10,7 @@ updated: 2026-08-20
 | Field | Value |
 |-------|-------|
 | rule_id | IR-009 |
-| description | 旧コマンド名、旧パス、二重 prefix、bare slash command form が docs/specs/guides に残存しないこと |
+| description | 旧コマンド名、旧パス、二重 prefix、bare slash command form が docs/designs/guides に残存しないこと |
 | severity | strict |
 | category | obsolete-structure |
 | detection_method | 正規表現パターンマッチ |

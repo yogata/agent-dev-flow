@@ -44,13 +44,13 @@ req-save の次、case-open の前に実行する。
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-design-save`）が正規情報源である。
 
 - 事前チェック: `draft-data` の `artifact_actions` から `artifact: design` entry の有無を確認。なければ no-op 完了。ドラフト不存在時はエラー中止
-- Design artifact_actions 読込（`artifact: design` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は Design 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（公式 enum: create/update、非正規 alias: spec-create/spec-update/spec-append、REQ-008-058）、`content` を処理対象とする
+- Design artifact_actions 読込（`artifact: design` entry を読込）。`artifact_actions` フィールド不存在（旧形式 draft）の場合は Design 保存対象なしと判定し no-op 完了（後方互換）。各 action の `target`（file path または `new:{slug}`）、`operation`（公式 enum: create/append/update の3値。別名は不受理、REQ-008-058）、`content` を処理対象とする
 - 配置先解決（既存 Design パス（例: `docs/designs/foundations/patterns.md`）→ update 操作）。`target_design: {operation, domain, slug}` 構造化 → 新規 Design 作成（`docs/designs/{domain}/{topic-slug}.md`）。同一 `target` の action は1つの Design へ集約。配置先解決の決定的処理は `agentdev-req-file-manager/scripts/` の決定的スクリプトで実行（REQ-001-029、design-principles.md 第5節「決定的処理の Script 委譲原則」）
 - Design 分離基準の最終確認（各 action が REQ-001-055（Design に置くべき内容の基準）に適合するか再確認）。安定契約例外（REQ-001-069）相当は除外し follow-up に明示
 - Design ファイル操作。`target_area` 見出し検索は `agentdev-design-file-manager/scripts/` の決定的スクリプトで実行
-  - create / spec-create: 新規 Design ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
-  - update / spec-update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
-  - spec-append: 既存 Design ファイルへ `target_area`（anchor）と `placement` に基づき `content` を新規セクションとして追加。frontmatter `updated` を更新。`status` は変更しない。詳細は「spec-append 操作時のセクション追加ロジック」セクション参照
+  - create: 新規 Design ファイルを frontmatter（`title`, `status: draft`, `created`, `updated`）付きで作成し、action の `content` をセクションとして記載
+  - update: `target_area` 指定時は対象セクションを `content` で置換、未指定時は該当セクションへ `content` を追記。frontmatter `updated` を更新。`status` は変更しない。詳細は「target_area ベースのセクション置換ロジック」セクション参照
+  - append: 既存 Design ファイルへ `target_area`（anchor）と `placement` に基づき `content` を新規セクションとして追加。frontmatter `updated` を更新。`status` は変更しない。詳細は「append 操作時のセクション追加ロジック」セクション参照
   - 各 action の `target_area`（指定時）に応じた適切なセクション見出しを用いる
 - インデックス整合（新規 Design 作成時は `docs/designs/README.md`（Design 一覧）に追加）。既存 Design 追記時は README 更新不要。エントリ存在確認は決定的スクリプトで実行
 - Design 一覧整合確認（Design 操作が `docs/designs/README.md` の Design 一覧に影響するか確認し、影響がある場合は更新）
@@ -125,10 +125,10 @@ design-save が配置一貫性検証で不一致を検出した場合、保存�
 
 ## target_area ベースのセクション置換ロジック
 
-`operation: update` / `operation: spec-update` において action の `target_area` が指定された場合、design-save は対象 Design ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-001-027、REQ-008-058）。
+`operation: update` において action の `target_area` が指定された場合、design-save は対象 Design ファイル内で `target_area` に一致する見出し行を検索し、セクション置換を行う（REQ-001-027、REQ-008-058）。
 
-Design operation の公式 enum は `create` / `update` であり、`spec-append` は既存 Design ファイルへ新規セクションを追加する alias として `update` へ映射される（REQ-008-058）。
-`spec-append` の配置契約は後段「spec-append 操作時のセクション追加ロジック」に定める。
+Design operation の公式 enum は `create` / `append` / `update` の3値である（別名は不受理、REQ-008-058）。
+`append` の配置契約は後段「append 操作時のセクション追加ロジック」に定める。
 
 ### マッチング規則
 
@@ -145,19 +145,19 @@ Design operation の公式 enum は `create` / `update` であり、`spec-append
 
 ### 未検出時の挙動
 
-`target_area` に一致する見出しが存在しない場合、当該 action をスキップし、follow-up として「target_area 未検出、operation を spec-create へ切り替えを推奨」を報告する（全体中止しない）。
+`target_area` に一致する見出しが存在しない場合、当該 action をスキップし、follow-up として「target_area 未検出、operation を create へ切り替えを推奨」を報告する（全体中止しない）。
 
 ### 後方互換（target_area 未指定）
 
-`target_area` が未指定の draft（旧形式）、または `operation` が create/spec-create の場合は従来の「追記」動作を維持する（REQ-001-028）。
+`target_area` が未指定の draft（旧形式）、または `operation` が create の場合は従来の「追記」動作を維持する（REQ-001-028）。
 `target_area` が指定された場合のみ「置換」動作を適用し、既存 draft の破壊を防ぐ。
 
-### spec-append operation の処理
+### append operation の処理
 
-`operation: spec-append` の場合、design-save は既存 Design ファイルへ新規セクションを追加する（REQ-008-058）。
+`operation: append` の場合、design-save は既存 Design ファイルへ新規セクションを追加する（REQ-008-058）。
 本操作は `target_area`（追加対象の見出し行全体）と `placement`（追加位置指示）で追加対象を特定し、`placement` が `tail` 以外の場合は `anchor` 見出し行を基準に挿入位置を算出する。
 
-主な処理（配置契約の実行詳細は後段「spec-append 操作時のセクション追加ロジック」セクションが正規所有する）:
+主な処理（配置契約の実行詳細は後段「append 操作時のセクション追加ロジック」セクションが正規所有する）:
 
 - `target_area` と完全一致する見出しが既存 Design ファイルに存在する場合は追加をスキップし、follow-up 報告を行う（重複追加防止、全体中止しない）
 - `placement: tail`（既定）の場合は Design ファイル末尾へ新規セクションを追加する
@@ -172,13 +172,13 @@ target_area 見出し検索は `agentdev-design-file-manager/scripts/src/search-
 - 見出し行全体との完全一致のみを受け付ける。前方一致、後方一致、部分一致は受け付けない
 - 入力正規化: `target_area` に Markdown 見出しプレフィックス（`##`、`###` 等）が含まれる場合、比較前にプレフィックスを除去して見出しテキスト部分へ正規化する（`## セクション名` と `セクション名` は同一に扱う）
 - 正規入力（例: `### IR-044`）での回帰テストを維持する。正規入力 `### IR-044` は見出し行 `### IR-044 - 題` とはマッチしない（見出し行全体との完全一致のみ許容）
-- 本契約は `operation: update` / `operation: spec-update` の `target_area` マッチングと、`operation: spec-append` の `anchor` マッチングの双方に適用される
+- 本契約は `operation: update` の `target_area` マッチングと、`operation: append` の `anchor` マッチングの双方に適用される
 
-## spec-append 操作時のセクション追加ロジック
+## append 操作時のセクション追加ロジック
 
-`operation: spec-append` は既存 Design ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。
+`operation: append` は既存 Design ファイルへ新規セクションを追加する操作である（公式 enum の1値、REQ-008-058）。
 `target_area`（追加対象の見出し行全体）で追加対象の見出しを特定し、`placement` と `anchor` で挿入位置を指示する。
-契約の正規所有は `../responsibilities/artifact-contracts.md`「spec-append operation」、本節は配置契約の実行詳細を正規所有する。
+契約の正規所有は `../responsibilities/artifact-contracts.md`「append operation」、本節は配置契約の実行詳細を正規所有する。
 
 ### 入力契約
 
@@ -208,11 +208,11 @@ target_area 見出し検索は `agentdev-design-file-manager/scripts/src/search-
 
 ### anchor 未検出時の挙動
 
-`placement` が `tail` 以外で `anchor` 見出し行が存在しない場合、当該 action をスキップし、follow-up として「anchor 未検出、operation を spec-create へ切り替えを推奨」を報告する（全体中止しない）。
+`placement` が `tail` 以外で `anchor` 見出し行が存在しない場合、当該 action をスキップし、follow-up として「anchor 未検出、operation を create へ切り替えを推奨」を報告する（全体中止しない）。
 
 ### 同名見出し時の挙動
 
-`target_area` と完全一致する見出しが既存 Design ファイルに存在する場合、design-save は当該 action の追加をスキップし、follow-up として「同名見出し既存、operation を spec-create へ切り替えを推奨、または `target_area` を変更して再指定を推奨」を報告する（重複追加防止、全体中止しない）。
+`target_area` と完全一致する見出しが既存 Design ファイルに存在する場合、design-save は当該 action の追加をスキップし、follow-up として「同名見出し既存、operation を create へ切り替えを推奨、または `target_area` を変更して再指定を推奨」を報告する（重複追加防止、全体中止しない）。
 
 ### 合格基準
 
@@ -222,10 +222,10 @@ target_area 見出し検索は `agentdev-design-file-manager/scripts/src/search-
 - frontmatter `updated` が更新されていること
 - `status` は変更しないこと（G06）
 
-### 後方互換（create / spec-create / update / spec-update）
+### 旧別名の不受理
 
-`spec-append` は新規 alias であり、既存の `create` / `spec-create` / `update` / `spec-update` 動作は従来通り維持する。
-`spec-append` が指定された場合のみ本節のロジックを適用する。
+Design operation の旧別名（`spec-create` / `spec-update` / `spec-append`）と新別名（`design-create` / `design-update` / `design-append`）は受理しない（REQ-008-058）。
+旧別名が指定された場合は形式不正としてエラー中止し、req-define 差し戻しを推奨する。
 
 ## Artifact Graph 利用
 
@@ -251,9 +251,7 @@ Design保存工程では、変更されたDesignと連動する`docs/designs/REA
 検査は以下を含む。
 
 - Design frontmatter必須項目
-- status値`draft`、`accepted`、`superseded`の妥当性
-- `superseded`時の`superseded_by`必須性
-- `superseded_by`保持Designの通常内容検査対象外判定
+- status値`draft`、`accepted`の妥当性
 - Design READMEのstatus同期
 - Designドメイン分類、リンク、Design 一覧更新要否
 - command/skill/integrity Designと対応原本・catalog・rule file・scriptの整合

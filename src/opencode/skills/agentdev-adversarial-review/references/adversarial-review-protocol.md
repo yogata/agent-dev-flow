@@ -1,7 +1,7 @@
 # 対論型レビューの詳細プロトコル
 
 > **文脈**: 本ファイルは `agentdev-adversarial-review` の詳細プロトコルであり、SKILL.md が要約する3論理的役割、動的レビュー戦略、対称的相互反証、戦略メタ反証、合意候補再検証、争点状態、完了条件、出力契約の実装詳細を定義する。
-> 振る舞い契約の正典は `docs/specs/<skills/agentdev-adversarial-review>.md` であり、本ファイルは SPEC が委譲する実装詳細を所有する。
+> 振る舞い契約の正典は `docs/designs/<skills/agentdev-adversarial-review>.md` であり、本ファイルは SPEC が委譲する実装詳細を所有する。
 > 重複または不一致がある場合は SPEC を正とする。
 
 ## 目次

@@ -21,7 +21,7 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 
 | 引数 | 必須 | 値 | 説明 |
 |------|------|-----|------|
-| `--workflow` | ✓ | `req-save` / `spec-save` / `case-run` / `case-close` / `docs-check` | 検査プロファイル切替え。各 workflow で対象ファイル種別と検査ルールセットを切替える（REQ-010-012） |
+| `--workflow` | ✓ | `req-save` / `design-save` / `case-run` / `case-close` / `docs-check` | 検査プロファイル切替え。各 workflow で対象ファイル種別と検査ルールセットを切替える（REQ-010-012） |
 | `--files <path...>` | -- | ファイルパス（space 区切り推奨、comma 区切りも受入） | main 環境（マージ後、case-close 等）で PR 変更ファイルを直接指定して使用。files_checked 空の場合は FAILURE（REQ-010-012、Phase 3） |
 | `--base-ref <git-ref>` | -- | git ref（既定: `origin/main`） | worktree 環境（マージ前、case-run 等）で変更ファイル検出に使用。files_checked 空の場合は WARNING（REQ-010-012、Phase 3） |
 | `--json` | -- | flag | JSON 出力を有効化 |
@@ -53,18 +53,18 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - 新規REQ・タイトル変更時の `docs/requirements/README.md` 同期
 - README 索引更新要否判定
 - ADR参照がある場合の相互参照更新要否判定
-- 関連SPEC候補がある場合の `docs/specs/README.md` 更新要否判定
+- 関連SPEC候補がある場合の `docs/designs/README.md` 更新要否判定
 - 旧SPEC直下パス混入検出（IR-057）
 - local版旧生成方式語彙混入検出（IR-057）
 - 文書種別責務と日本語執筆規範の機械化可能範囲の検査
 
-### spec-save 向け検査
+### design-save 向け検査
 
-変更ファイルが `docs/specs/**/*.md` の場合、以下を確認する。
+変更ファイルが `docs/designs/**/*.md` の場合、以下を確認する。
 
 - SPEC frontmatter の必須項目
 - status 値の妥当性
-- `docs/specs/README.md` のstatus表との同期
+- `docs/designs/README.md` のstatus表との同期
 - SPECドメイン分類の妥当性
 - 新規SPEC、移動、改名、主要入口変更時の README 索引更新要否判定
 - 変更SPECと近接リンクのリンク整合
@@ -80,7 +80,7 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 case-close では保存工程より広めに以下を確認する。
 
 - 変更ファイル対象の targeted docs guard 実行
-- draft→accepted 等の SPEC status変更時の `docs/specs/README.md` 同期
+- draft→accepted 等の SPEC status変更時の `docs/designs/README.md` 同期
 - Issue/PRで宣言した文書更新対象と実変更ファイルの対応（`--declared-files` 使用時）
 - 旧SPEC直下パス混入検出（IR-057）
 - local版旧生成方式語彙混入検出（IR-057）
@@ -88,9 +88,9 @@ case-close では保存工程より広めに以下を確認する。
 
 ### case-run 向け検査
 
-case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/spec-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。
+case-run プロファイルは docs/** 変更ファイルを対象とし、req-save/design-save プロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。
 case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。
-appliesTo は `docs/specs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
+appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `AGENTS.md`, `README.md` 等、docs 配下および文書整合性に関連するファイルに限定する。
 
 ## full_docs_check_recommended 条件
 
@@ -110,10 +110,10 @@ case-close profile の `full_docs_check_recommended` の判定条件（v2:REQ-01
 
 - integrity rule追加・削除・大幅変更
 - README 索引構造変更
-- `docs/specs/` の大規模移動・改名
+- `docs/designs/` の大規模移動・改名
 - `repo-agentdev-integrity` の検査スコープ変更
 - 文書分類・責務境界の基準変更
-- `docs/specs/integrity/rules/**`、`integrity-rule-catalog.md`、`rule-ownership.md`、`document-model.md`、`document-type-responsibilities.md`、`docs/specs/README.md`、`.agentdev/doc-inputs/**` の変更
+- `docs/designs/integrity/rules/**`、`integrity-rule-catalog.md`、`rule-ownership.md`、`document-model.md`、`document-type-responsibilities.md`、`docs/designs/README.md`、`.agentdev/doc-inputs/**` の変更
 
 ## false-clean 予防（REQ-010-012 詳細）
 
@@ -145,17 +145,17 @@ TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-cont
 
 ## 検査失敗時の取り扱い
 
-- req-save、spec-save の検査失敗時は保存対象文書と連動文書を修正して再実行する（REQ-010-012）
+- req-save、design-save の検査失敗時は保存対象文書と連動文書を修正して再実行する（REQ-010-012）
 - case-close で `full_docs_check_recommended` が true の場合は case-close 完了判定の追加確認として扱う
 
 ## 完了済み移行作業
 
-旧SPEC直下配置前提の除去、repo-agentdev-integrity の `docs/specs/**/*.md` 再帰対応は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) 完了済み移行作業節へ分離した。
+旧SPEC直下配置前提の除去、repo-agentdev-integrity の `docs/designs/**/*.md` 再帰対応は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) 完了済み移行作業節へ分離した。
 両対応は v2:REQ-0158 から移管され、完了済みである。
 
 ## obsolete-path-map.yaml 運用
 
-`docs/specs/integrity/obsolete-path-map.yaml` による旧SPEC直下パス→現行ドメイン分割パス対応表の運用（v2:REQ-0158 より移管）。
+`docs/designs/integrity/obsolete-path-map.yaml` による旧SPEC直下パス→現行ドメイン分割パス対応表の運用（v2:REQ-0158 より移管）。
 
 - 各エントリは `old`、`new`、`severity`、`scope`（`include`、`exclude`）を持つ
 - `severity` は旧直下パス参照を `ng` とする
@@ -171,7 +171,7 @@ skill rename を伴う作業手順において、以下の対称性検査を det
 
 ### 物理 path 一致検査
 
-src/opencode/skills/{name} と docs/specs/skills/{name} の物理 path が
+src/opencode/skills/{name} と docs/designs/skills/{name} の物理 path が
 一致することを検証する。
 rename 後に両者が同一 name であることが必須。
 
@@ -196,8 +196,8 @@ Artifact Graph が未生成（`.agentdev/graph/nodes.jsonl` 不在）の場合�
 
 - REQ-010（docs-check / 検証・テスト、REQ-010-012 で本 SPEC の WHAT を要件化）
 - v2:REQ-0158（Targeted Docs Integrity Guard、retired。履歴参照）
-- `docs/specs/integrity/validator-split-criteria.md`（validator 分割基準、Phase 6 の詳細）
-- `docs/specs/integrity/integrity-contracts.md`（Workflow×ツールマトリックス表、TargetedDocsReport 型契約）
-- `docs/specs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md`（旧SPEC直下パス検出、link mode 統一で廃止確定となった旧生成方式語彙の検出）
-- `docs/specs/integrity/obsolete-path-map.yaml`（旧パス対照表）
+- `docs/designs/integrity/validator-split-criteria.md`（validator 分割基準、Phase 6 の詳細）
+- `docs/designs/integrity/integrity-contracts.md`（Workflow×ツールマトリックス表、TargetedDocsReport 型契約）
+- `docs/designs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md`（旧SPEC直下パス検出、link mode 統一で廃止確定となった旧生成方式語彙の検出）
+- `docs/designs/integrity/obsolete-path-map.yaml`（旧パス対照表）
 

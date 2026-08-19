@@ -49,7 +49,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-close.yaml`）�
 
 case-close workflow は次の STEP で構成する。
 Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 として並列記述する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
 会話コンテキストに依存せず、durable state（GitHub Issue/PR、`.agentdev/`、commit hash、SPEC status）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -93,7 +93,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - `agentdev-gh-cli`: PR merge / mergeable UNKNOWN ポーリング / Issue close / VERIFY
 - `agentdev-git-worktree`: 重複ファイルチェック、squash merge 後分岐ハンドリング、コンフリクト解消 rebase パス、worktree 削除、実行前同期リスク検出
 - `agentdev-epic-tracker`: Epic Issue 本文ステータス追跡テーブル、E1〜E6 詳細、子Issue 状態 enum、Epic 自動クローズ判定
-- `agentdev-spec-file-manager`: SPEC status 昇格（draft → accepted）、spec-lifecycle-application
+- `agentdev-design-file-manager`: SPEC status 昇格（draft → accepted）、design-lifecycle-application
 - `agentdev-workflow-templates`: 対応記録コメント、完了報告テンプレート
 - `agentdev-learning-capture`: 学び検知・抽出（エージェント自律）
 - `agentdev-learning-pipeline`: deferred ルール、採用済み成果物取り込み判定

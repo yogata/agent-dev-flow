@@ -49,7 +49,7 @@ AgentDevFlow 標準の成果物間探索モデルとして機能する。
 標準コア デフォルト `indexed_paths`:
 - `docs/requirements/`
 - `docs/decisions/`
-- `docs/specs/`
+- `docs/designs/`
 
 self-hosting augmentation が追加する `indexed_paths`:
 - `src/opencode/`
@@ -341,7 +341,7 @@ Artifact Graph 標準配布スキルの augmentation は専用配置
 | ワークフロー | 主な問い合わせ |
 |---|---|
 | req-define | related、impact、必要に応じて dependency |
-| spec-save | related |
+| design-save | related |
 | case-open | impact、dependency |
 | case-run | implementation（既に決定された実装対象と正規成果物の実現関係確認。新規の依存関係、実行構成、Wave 構成、実行順序の設計は行わない） |
 | case-close | 必要に応じて整合性確認 |
@@ -420,7 +420,7 @@ Artifact Graph 自身の接続確認のみを workflow effectiveness の成立�
 ## 検証観点
 
 - **consumer 環境での標準動作**: project augmentation なしでビルド、検査、クエリが動作すること（REQ-012-005）
-- **標準コア不変条件**: デフォルト `indexed_paths` が3種（`docs/requirements`, `docs/decisions`, `docs/specs`）のみ、デフォルト `node_types` が3種（`requirement`, `decision`, `specification`）のみであること（REQ-012-002, REQ-012-003）
+- **標準コア不変条件**: デフォルト `indexed_paths` が3種（`docs/requirements`, `docs/decisions`, `docs/designs`）のみ、デフォルト `node_types` が3種（`requirement`, `decision`, `specification`）のみであること（REQ-012-002, REQ-012-003）
 - **consumer 配布物除外**: consumer 環境で生成 Graph に配布物パターンのノードが0件であること（REQ-012-008）
 - **open extensibility**: augmentation で追加した `node_type`, `relation_type` が Graph へ反映されること（REQ-012-004, REQ-012-006）
 - **fail-open**: Graph 不在で workflow が停止しないこと（REQ-012-010）

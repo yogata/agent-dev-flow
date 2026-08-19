@@ -60,7 +60,7 @@ Epic + 子 Issue 一括作成に対応する。
   - テンプレート読込（`agentdev-workflow-templates`）
   - Epic Issue本文生成（自律構成分析結果に基づき Epic 本文を構築）
   - Epic Issue作成（ラベル: `enhancement`, `feature`, `epic`）（VERIFY）
-  - 子Issue作成（OU 単位、順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-005-042））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-003-011、`docs/specs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
+  - 子Issue作成（OU 単位、順次処理）（Issue化単位は REQ doc 単位ではなく OU 単位（REQ-005-042））。各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（REQ-003-011、`docs/designs/workflows/epic-wave-model.md` の前工程完了度3段階分類に従う）
   - Epic Issue本文更新（ステータス追跡テーブル更新）
   - OU `result` 書き戻し（Issue / Epic 番号）
 - Standard flow:
@@ -144,7 +144,7 @@ case-open は完了条件を Issue 本文に展開する前に、対象パスで
 
 以下のタイミングで完了条件展開前の再確認を必須とする:
 
-- **同日内複数 PR マージ後の Issue 起票**: 同一日内に複数 PR がマージされた後、当該マージにより `docs/requirements/REQ-*.md`、`docs/decisions/DEC-*.md`、`docs/specs/**/*.md` の内容が変動する可能性があるため、起票前に最新状態を再確認する
+- **同日内複数 PR マージ後の Issue 起票**: 同一日内に複数 PR がマージされた後、当該マージにより `docs/requirements/REQ-*.md`、`docs/decisions/DEC-*.md`、`docs/designs/**/*.md` の内容が変動する可能性があるため、起票前に最新状態を再確認する
 - **順次 Wave 実行時**: 複数 Wave が順次実行される場合、先行 Wave のマージ完了後に後続 Wave の Issue を起票する際、件数等の実測値が変動している可能性があるため再確認する
 
 再確認は識別子（ファイルパス、REQ ID、NG ID、IR ID）の存在確認を主軸とし、件数等の実測値は補助値として扱う（既存「完了条件・事前状態記載ガイドライン」準拠）。
@@ -190,7 +190,7 @@ case-open は `review_dispositions` を読み取り、Issue 本文の「レビ�
 
 ### レビュー判断セクションへの転記形式
 
-転記先の Issue 本文「レビュー判断」セクションの構造は workflow-templates SPEC（`docs/specs/skills/agentdev-workflow-templates.md`「review_dispositions 証跡セクション」節）が正規所有する。
+転記先の Issue 本文「レビュー判断」セクションの構造は workflow-templates SPEC（`docs/designs/skills/agentdev-workflow-templates.md`「review_dispositions 証跡セクション」節）が正規所有する。
 各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
 
 ### child Issue の取扱い
@@ -227,7 +227,7 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 
 case-open が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
 
-- なし（case-open は GitHub Issue 作成を責務とし、docs 整合性検査・extensions 検査を実行しない。検査は後続工程の req-save/spec-save/case-run/case-close で実施）
+- なし（case-open は GitHub Issue 作成を責務とし、docs 整合性検査・extensions 検査を実行しない。検査は後続工程の req-save/design-save/case-run/case-close で実施）
 
 ※肯定表現のみ（REQ-010-002, REQ-010-003 準拠）。
 
@@ -360,7 +360,7 @@ REQ/SPEC で固定するのは不変の方針（依存強度3レベル定義、E
 
 
 case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_open_hints` に記録する（REQ-006-011, REQ-008-020）。
-連結成分アルゴリズム、3軸判断基準、Epic 分割例外（REQ-006-023）の詳細は `docs/specs/workflows/epic-wave-model.md` の「連結成分ベース execution_unit 構成モデル」セクション参照。
+連結成分アルゴリズム、3軸判断基準、Epic 分割例外（REQ-006-023）の詳細は `docs/designs/workflows/epic-wave-model.md` の「連結成分ベース execution_unit 構成モデル」セクション参照。
 
 ### 子Issue 作成の並列化
 
@@ -394,7 +394,7 @@ case-open SPEC 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ-0
 
 - [req-define.md](req-define.md)（前段コマンド）
 - [req-save.md](req-save.md)（前段コマンド（REQ/Decision 保存））
-- [spec-save.md](spec-save.md)（前段コマンド（SPEC 保存））
+- [design-save.md](design-save.md)（前段コマンド（SPEC 保存））
 - [case-run.md](case-run.md)（後続コマンド（実装））
 - `agentdev-workflow-case-open` skill（workflow 実装本体（STEP 構成、resume protocol））
 - `agentdev-issue-management` skill（Issue 本文生成、テンプレート充足）

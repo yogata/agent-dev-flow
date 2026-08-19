@@ -46,7 +46,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-update.yaml`）�
 ## Control Plane（STEP 一覧）
 
 case-update workflow は次の4 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
 会話コンテキストに依存せず、durable state（Issue 本文・コメントの現状、REQ ファイル、git 状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |

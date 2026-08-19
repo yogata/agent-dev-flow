@@ -16,7 +16,7 @@
 
 ### STEP-1-1: スキャン対象の収集
 
-`docs/requirements/`、`docs/decisions/`、`docs/specs/`、`docs/guides/`、`README.md`、`.opencode/` を収集する。
+`docs/requirements/`、`docs/decisions/`、`docs/designs/`、`docs/guides/`、`README.md`、`.opencode/` を収集する。
 
 ### STEP-2-1: REQ 参照ID整合性確認
 

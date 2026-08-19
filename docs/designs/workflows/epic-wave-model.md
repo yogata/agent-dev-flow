@@ -92,7 +92,7 @@ case-open は要件doc の operation_units を読み取り、以下を自律生�
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成
 - 実装順序、Issue分解についてのユーザー確認要求
 
-詳細は `docs/specs/commands/case-open.md` 参照。
+詳細は `docs/designs/commands/case-open.md` 参照。
 
 ## Epic 検出ルール
 
@@ -143,7 +143,7 @@ case-open は要件doc の operation_units を読み取り、以下を自律生�
 ## case-run Epic Wave 実行モデル
 
 case-run が Epic Issue 指定時の横断実行契約（REQ-006-026/027）。
-詳細手順は `docs/specs/commands/case-run.md` 参照。
+詳細手順は `docs/designs/commands/case-run.md` 参照。
 
 - case-run(#epic) は Epic Issue 本文を読み込む（子Issue 一覧、Wave 構成、各子Issue status、PR 状態）
 - case-run(#epic) は現在 Wave の実行可能な子Issue を内部判定する（依存関係充足確認、永続状態には書き込まない）
@@ -157,7 +157,7 @@ case-run(#epic) は Epic Issue 本文を読み取るのみで書き込まない�
 ## case-close Epic Wave クローズモデル
 
 case-close が Epic Issue 番号を受領した場合の PR マージ、子Issue クローズプロトコル（REQ-006-021〜023）。
-詳細は `docs/specs/commands/case-close.md` 参照。
+詳細は `docs/designs/commands/case-close.md` 参照。
 
 1. Epic Issue 本文を読み取り、現在 Wave の PR作成済み子Issue を特定する
 2. 各子Issue の PR マージ、子Issue クローズ、Epic status table 更新を行う（Epic Issue 本文の単一書き手は case-close のみ）
@@ -168,9 +168,9 @@ case-close が Epic Issue 番号を受領した場合の PR マージ、子Issue
 
 scale: large（Epic）の場合、case-auto は Epic Issue に対し case-run(#epic) → case-close(#epic) の反復を実行する（REQ-006-086）。
 複数 execution_unit 並列実行時は、各 execution_unit に相当する Issue または Epic Issue に対し個別に処理する（REQ-006-012）。
-詳細は `docs/specs/commands/case-auto.md` 参照。
+詳細は `docs/designs/commands/case-auto.md` 参照。
 
-- case-auto: pipeline 制御（req-save→spec-save→case-open→case-run→case-close）、execution_unit 群反復制御、OU 逐次処理。case-run は case-auto 内でインライン実行し、実行担当サブエージェントへの委譲を case-auto から直接行う（委譲起点の折りたたみ、多重委譲回避）
+- case-auto: pipeline 制御（req-save→design-save→case-open→case-run→case-close）、execution_unit 群反復制御、OU 逐次処理。case-run は case-auto 内でインライン実行し、実行担当サブエージェントへの委譲を case-auto から直接行う（委譲起点の折りたたみ、多重委譲回避）
 - case-run: Epic Wave 実行時の子Issue 並列委譲、全委譲完了待機、結果収集、Findings / Capture候補件数の集約
 - case-close: Epic Wave クローズ時の PR マージ、子Issue クローズ、Epic Issue 本文ステータス追跡テーブルの単一書き手
 
@@ -231,9 +231,9 @@ case-auto は case-open が生成した execution_unit 群（standard | epic の
 - 同一 Epic 内の Wave 間は直列（REQ-006-013）
 - execution_unit 間の並列可否は連結成分（必須依存）のみで判定する。技術的依存レベル（L0-L3）は並列判定軸から外し、ファイル衝突（L2）があっても並列を許容する（REQ-006-014）
 - case-auto レベルでのグローバル並列上限は設定しない（REQ-006-018）。case-run 単位の5件上限（REQ-006-026 踏襲）のみを制御対象とする。N 個の execution_unit が並列実行された場合、N×5 件の委譲同時起動リスクを許容する（運用監視対象）
-- PR マージコンフリクト発生時は 3レベルコンフリクト解消モデル（REQ-003）に従う。Level 1 は case-close が rebase による機械的解消を試みる（REQ-006-024、REQ-003-001）。Level 2 は case-auto が両PRのdiffを読み取りコンフリクト文脈を付けて case-run へ再委譲する（最大2回、計3回の case-run 実行、REQ-003-003/004）。Level 3 は case-auto がマージ順序変更、blocked 単位の隔離（REQ-006-015 拡張）を行う。3段階すべてを試行しても解消できない場合のみ停止する（REQ-003-006）。worktree 分離により作業自体は並列可能であり、マージコンフリクト解決コストを受容する。詳細は `docs/specs/commands/case-auto.md` コンフリクト解消モデル、`docs/specs/commands/case-close.md` Step 4-2 参照
+- PR マージコンフリクト発生時は 3レベルコンフリクト解消モデル（REQ-003）に従う。Level 1 は case-close が rebase による機械的解消を試みる（REQ-006-024、REQ-003-001）。Level 2 は case-auto が両PRのdiffを読み取りコンフリクト文脈を付けて case-run へ再委譲する（最大2回、計3回の case-run 実行、REQ-003-003/004）。Level 3 は case-auto がマージ順序変更、blocked 単位の隔離（REQ-006-015 拡張）を行う。3段階すべてを試行しても解消できない場合のみ停止する（REQ-003-006）。worktree 分離により作業自体は並列可能であり、マージコンフリクト解決コストを受容する。詳細は `docs/designs/commands/case-auto.md` コンフリクト解消モデル、`docs/designs/commands/case-close.md` Step 4-2 参照
 
-詳細な orchestration ロジック（blocked 部分停止、ready 継続判定フロー、execution_unit 群反復制御）は `docs/specs/commands/case-auto.md` 参照。
+詳細な orchestration ロジック（blocked 部分停止、ready 継続判定フロー、execution_unit 群反復制御）は `docs/designs/commands/case-auto.md` 参照。
 
 ### 並列上限と停止条件の整理
 
@@ -286,11 +286,11 @@ stage 2 の bg task がシステムにより破棄されたことを検知した
 ## 前工程完了度3段階分類（REQ-003-010）
 
 OU 属性「前工程完了度」を追加する。
-本属性は子 Issue 実行状態 enum（pending / ready / running / completed / blocked / failed / delegation-unavailable）とは直交する分類であり、前工程（req-save / spec-save）の完了状況を表す。
+本属性は子 Issue 実行状態 enum（pending / ready / running / completed / blocked / failed / delegation-unavailable）とは直交する分類であり、前工程（req-save / design-save）の完了状況を表す。
 
 | 前工程完了度 | 意味 | subagent の振る舞い（REQ-003-012） |
 |---|---|---|
-| 完全完了 | req-save / spec-save 等の前工程で実施済み、追加作業不要 | 通常実行（acceptance criteria 順位検証を実施） |
+| 完全完了 | req-save / design-save 等の前工程で実施済み、追加作業不要 | 通常実行（acceptance criteria 順位検証を実施） |
 | 検証のみ | 前工程完了を前提、acceptance criteria 順位検証のみ実施 | acceptance criteria 順位検証は必須、前工程相当作業は実施しない |
 | 補完あり | 前工程に残余あり、補完実装の可能性 | 前工程相当作業の補完可能性を考慮しつつ acceptance criteria 順位検証を実施 |
 
@@ -340,8 +340,8 @@ Epic Issue のステータス追跡テーブルは「バッチ Issue 単位」�
 - [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
 - [delegation-contracts.md](delegation-contracts.md)（サブエージェント委譲契約）
 - [references/execution-unit-construction.md](references/execution-unit-construction.md)（連結成分アルゴリズム、3軸判断モデルの機械的判定手順）
-- `docs/specs/commands/case-open.md`（Epic 構成生成）
-- `docs/specs/commands/case-run.md`（Epic Wave 実行）
-- `docs/specs/commands/case-close.md`（Epic Wave クローズ）
-- `docs/specs/commands/case-auto.md`（Epic pipeline 制御）
+- `docs/designs/commands/case-open.md`（Epic 構成生成）
+- `docs/designs/commands/case-run.md`（Epic Wave 実行）
+- `docs/designs/commands/case-close.md`（Epic Wave クローズ）
+- `docs/designs/commands/case-auto.md`（Epic pipeline 制御）
 - `agentdev-epic-tracker` skill（ステータス追跡テーブル）

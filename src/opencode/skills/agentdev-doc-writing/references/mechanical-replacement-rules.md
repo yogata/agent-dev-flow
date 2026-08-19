@@ -254,7 +254,7 @@ Wave 2 既存 OU（#1076 em-dash、#1078 中黒、#1079 LLM 表現、#1080 一�
 ### 機械置換 PR のエビデンス記述基準（PR #2154 実態不一致の補正方法）
 
 PR #2154 は検証エビデンスで「`| — |` プレースホルダ grep（docs + src/opencode）: 0 件（mechanical-replacement-rules.md のパターン説明行を除く）」と記述した。
-当時の docs/specs には実セル 10 件（意図的マトリックス表記 7、N/A プレースホルダ 3）と document-type-responsibilities SPEC のパターン説明行 1 件が残存しており、記述と実態が不一致していた。
+当時の docs/designs には実セル 10 件（意図的マトリックス表記 7、N/A プレースホルダ 3）と document-type-responsibilities SPEC のパターン説明行 1 件が残存しており、記述と実態が不一致していた。
 機械置換 PR のエビデンス記述は以下に従い、再発を防止する。
 
 1. grep コマンドは対象ディレクトリを明示したコマンド全文を記録する

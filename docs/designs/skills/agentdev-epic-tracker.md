@@ -27,7 +27,7 @@ updated: 2026-07-18
 
 ## 参照する references
 
-- なし（SKILL.md 本文に集約、`agentdev-workflow-lifecycle`、`docs/specs/workflows/epic-wave-model.md` 参照）
+- なし（SKILL.md 本文に集約、`agentdev-workflow-lifecycle`、`docs/designs/workflows/epic-wave-model.md` 参照）
 
 ## 現在の動作
 

@@ -10,7 +10,7 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 - [コマンド別 対照](#コマンド別-対照)
   - [req-define](#req-define18定義--g3--不変条件10)
   - [req-save](#req-save12定義--g2--不変条件8)
-  - [spec-save](#spec-save12定義--g3--不変条件6)
+  - [design-save](#design-save12定義--g3--不変条件6)
   - [case-open](#case-open24定義--g2--不変条件10)
   - [case-run](#case-run25定義--g6--不変条件8)
   - [case-close](#case-close28定義--g8--不変条件8)
@@ -87,7 +87,7 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 | G11 | **G11 維持**（Issue 作成禁止） |
 | G12 | 不変条件8（capture 非関与） |
 
-### spec-save（12定義 → G3 / 不変条件6）
+### design-save（12定義 → G3 / 不変条件6）
 
 | 旧G | 変換後所在 |
 |---|---|
@@ -342,7 +342,7 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 
 | 対象 | 変換内容 |
 |---|---|
-| agentdev-spec-file-manager SKILL.md | 旧 spec-save G05 参照を「spec-save 不変条件・前出出力検証表 STEP-5」参照へ更新（G06 参照は維持） |
+| agentdev-design-file-manager SKILL.md | 旧 design-save G05 参照を「design-save 不変条件・前出出力検証表 STEP-5」参照へ更新（G06 参照は維持） |
 | agentdev-workflow-* SKILL.md（13ファイル） | 削除 G 番号への参照を「command 不変条件」等へ更新（生存 G 番号参照は維持） |
 | agentdev-workflow-*/references/*（34ファイル） | 同上。STEP resume point 構造（8要素）は不変 |
 | agentdev-quality-gates references（qg-4-final-acceptance.md） | 旧 case-close G07/G09/G16 参照を検証表・不変条件参照へ更新（G08 参照は維持） |

@@ -22,7 +22,7 @@ AgentDevFlow 管理下の文書で使用する正規語彙と旧語彙の対照�
 | 区分 | 配置先 | 役割 |
 |---|---|---|
 | 実体対照表（canonical source） | `src/opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | コマンド名、スキル名、サブエージェント名、ハーネス名、語彙ポリシー、廃止済み概念、完了報告フィールド、REQ 範囲表記、旧分類用語、Capture 語彙、文意品質検出対象語（IR-045）、候補語対照表（IR-044 連携）、IR-055 runtime-unresolved-reference 対照の各テーブルを所有する |
-| 基盤 SPEC（本ファイル） | `docs/specs/authoring/vocabulary-registry.md` | 語彙レジストリの配置基準、連携契約、IR-045 移管状態、IR-050/IR-051/IR-044 協調契約を所有する |
+| 基盤 SPEC（本ファイル） | `docs/designs/authoring/vocabulary-registry.md` | 語彙レジストリの配置基準、連携契約、IR-045 移管状態、IR-050/IR-051/IR-044 協調契約を所有する |
 
 配布物側の語彙レジストリは `src/opencode/skills/repo-agentdev-integrity/references/` 配下に配置し、`.opencode/skills/repo-agentdev-integrity/references/` へ投射する。
 canonical は source 側とする（DEC-002）。
@@ -45,7 +45,7 @@ IR-051 の「一定文字距離内」は語彙レジストリで確定された�
 
 ## IR-044 候補語対照表連携
 
-IR-044（REQ/SPEC 境界違反検出）の候補語対照表は `docs/specs/responsibilities/document-type-responsibilities.md` 訳語表および `docs/specs/integrity/integrity-rule-catalog.md` / `docs/specs/integrity/rules/` 配下に掲載される散文英語普通名詞を対象とする（RU-0007、RU-0008）。
+IR-044（REQ/SPEC 境界違反検出）の候補語対照表は `docs/designs/responsibilities/document-type-responsibilities.md` 訳語表および `docs/designs/integrity/integrity-rule-catalog.md` / `docs/designs/integrity/rules/` 配下に掲載される散文英語普通名詞を対象とする（RU-0007、RU-0008）。
 候補語の分類（検出対象 / 正規使用）と IR-044 適用除外根拠は配布物側語彙レジストリ「候補語対照表（IR-044 連携）」節が正である。
 
 ## 適用範囲

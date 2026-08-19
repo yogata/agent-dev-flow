@@ -95,7 +95,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 ## 反映ルート
 
 ```
-promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/req-save → /agentdev/spec-save（SPEC候補がある場合）→ /agentdev/case-open → /agentdev/case-run
+promoted/ → /agentdev/backlog-review → /agentdev/req-define → /agentdev/req-save → /agentdev/design-save（SPEC候補がある場合）→ /agentdev/case-open → /agentdev/case-run
 ```
 
 - 採用済み成果物は `/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` の明示入力として扱われる

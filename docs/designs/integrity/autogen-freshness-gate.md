@@ -8,14 +8,14 @@ updated: "2026-08-18"
 # AUTOGEN ブロック鮮度検出 gate
 
 `/repo/docs-check` は repo-local コマンドであり配布対象外 SPEC を持たないため、AUTOGEN ブロック鮮度検出 gate を本新規 SPEC として配置する。
-AUTOGEN ブロックを含む索引ファイル（spec-health-metrics.md 等）の陳腐化を検出し、再生成を促す契約を定義する。
+AUTOGEN ブロックを含む索引ファイル（design-health-metrics.md 等）の陳腐化を検出し、再生成を促す契約を定義する。
 本 SPEC は gate の契約を定義し、検出ロジックの実装詳細はスクリプト側が担う（機械化境界、charter 原則）。
 
 ## 検出対象
 
 - AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->` 〜 `<!-- AUTOGEN:END -->`）を含む索引ファイル群
-- 代表例: `docs/specs/quality/spec-health-metrics.md`（SPEC 計測例 AUTOGEN ブロック）
-- 対象一覧は SC-002（`docs/specs/integrity/index-auto-generation.md`）が定める自動生成対象ファイルと同一
+- 代表例: `docs/designs/quality/design-health-metrics.md`（SPEC 計測例 AUTOGEN ブロック）
+- 対象一覧は SC-002（`docs/designs/integrity/index-auto-generation.md`）が定める自動生成対象ファイルと同一
 
 ### 廃止済み成果物を前提とする block ID の棚卸し規定
 
@@ -73,7 +73,7 @@ bun run .opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness
 ## 関連
 
 - REQ-010-059（AUTOGEN ブロック鮮度検出 gate 要件行）
-- SC-002（定期再生成、`docs/specs/integrity/index-auto-generation.md`、REQ-010 関連）
-- IR-061（索引類自動生成整合性、`docs/specs/integrity/rules/IR-061-index-generation-consistency.md`）
+- SC-002（定期再生成、`docs/designs/integrity/index-auto-generation.md`、REQ-010 関連）
+- IR-061（索引類自動生成整合性、`docs/designs/integrity/rules/IR-061-index-generation-consistency.md`）
 - `/repo/docs-check`（repo-local、配布対象外）
 

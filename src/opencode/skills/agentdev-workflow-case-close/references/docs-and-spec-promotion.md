@@ -22,7 +22,7 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 ## Result
 
 - docs/ 検証合格（targeted docs guard、配布依存境界 最終 gate）
-- SPEC 確定フロー処理完了（昇格 / spec-save 提案 / 見送り）
+- SPEC 確定フロー処理完了（昇格 / design-save 提案 / 見送り）
 
 ## Procedure
 
@@ -94,10 +94,10 @@ PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録�
 | 処理パターン | 条件 | アクション |
 |---|---|---|
 | (a) case-close 内で SPEC 昇格 | 対象 SPEC の `status` が `draft`、実装が SPEC 内容を検証済み | 対象 SPEC の `status` を `draft` → `accepted` に昇格（編集スコープ: プロジェクトの SPEC ファイル群） |
-| (b) spec-save 再起動の提案 | SPEC 確定候補が SPEC ファイル未保存 | `/agentdev/spec-save` の再実行を提案し case-close は完了させる |
+| (b) design-save 再起動の提案 | SPEC 確定候補が SPEC ファイル未保存 | `/agentdev/design-save` の再実行を提案し case-close は完了させる |
 | (c) 見送り | 確定不要と判断 | 候補を Findings/ Capture候補 に準じて記録し後続へ委ねる |
 
-SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter `status` と `updated` の更新、SPEC 確定候補処理の詳細は `agentdev-spec-file-manager/references/spec-lifecycle-application.md` を参照。
+SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter `status` と `updated` の更新、SPEC 確定候補処理の詳細は `agentdev-design-file-manager/references/design-lifecycle-application.md` を参照。
 
 ## case-close が使用する検査ツール
 
@@ -137,7 +137,7 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 
 ## 関連 Capability Skill
 
-- `agentdev-spec-file-manager`: SPEC status 昇格、spec-lifecycle-application
+- `agentdev-design-file-manager`: SPEC status 昇格、design-lifecycle-application
 - integrity checker skill（self-hosting リポジトリ限定）: check_changed_docs.ts、check_extensions.ts
 - `agentdev-project-extensions`: document-model SPEC extension 経由（Document Classification Policy）
 

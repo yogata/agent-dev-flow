@@ -34,11 +34,11 @@ docs全体（REQ/Decision/SPEC/guides）の意味整合性を診断し、検出�
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
 | `docs/requirements/<*>.md`、`docs/decisions/<*>.md` | inspect-docs |
-| `docs/specs/<**/*>.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
+| `docs/designs/<**/*>.md`（`docs/designs/commands/`、`docs/designs/skills/` 配下を除く） | inspect-docs |
 | `docs/guides/*.md`、`README.md` | inspect-docs |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
-| `docs/specs/<commands/**/*>.md`、`docs/specs/<skills/**/*>.md` | inspect-skills |
+| `docs/designs/<commands/**/*>.md`、`docs/designs/<skills/**/*>.md` | inspect-skills |
 | 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
 
 routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。

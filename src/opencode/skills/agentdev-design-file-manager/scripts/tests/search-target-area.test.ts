@@ -11,7 +11,7 @@ describe("headingMatchesTarget", () => {
     expect(headingMatchesTarget("目的", "目的")).toBe(true);
   });
 
-  test("no prefix match (exact match only per SPEC)", () => {
+  test("no prefix match (exact match only per Design)", () => {
     expect(headingMatchesTarget("目的と背景", "目的")).toBe(false);
   });
 
@@ -31,39 +31,39 @@ describe("findTargetAreaHeadings", () => {
 ### 目的 - 詳細
 
 more text`;
-    const matches = findTargetAreaHeadings("目的", content, "spec.md");
+    const matches = findTargetAreaHeadings("目的", content, "design.md");
     expect(matches).toHaveLength(1);
     expect(matches[0]!.line).toBe(3);
   });
 
   test("returns empty when no headings match", () => {
     const content = "# Title\n\nbody without target";
-    const matches = findTargetAreaHeadings("目的", content, "spec.md");
+    const matches = findTargetAreaHeadings("目的", content, "design.md");
     expect(matches).toEqual([]);
   });
 
   test("does not match non-heading lines", () => {
     const content = `本文中に 目的 という単語があっても`;
-    const matches = findTargetAreaHeadings("目的", content, "spec.md");
+    const matches = findTargetAreaHeadings("目的", content, "design.md");
     expect(matches).toEqual([]);
   });
 
   test("normalizes ## prefix in target_area before matching", () => {
     const content = "## 目的\n\nbody";
-    const matches = findTargetAreaHeadings("## 目的", content, "spec.md");
+    const matches = findTargetAreaHeadings("## 目的", content, "design.md");
     expect(matches).toHaveLength(1);
     expect(matches[0]!.line).toBe(1);
   });
 
   test("normalizes ### prefix in target_area before matching", () => {
     const content = "### IR-{NNN}\n\nbody";
-    const matches = findTargetAreaHeadings("### IR-{NNN}", content, "spec.md");
+    const matches = findTargetAreaHeadings("### IR-{NNN}", content, "design.md");
     expect(matches).toHaveLength(1);
   });
 
   test("prefix-less target_area still works (backward compat)", () => {
     const content = "## 目的\n\nbody";
-    const matches = findTargetAreaHeadings("目的", content, "spec.md");
+    const matches = findTargetAreaHeadings("目的", content, "design.md");
     expect(matches).toHaveLength(1);
   });
 });

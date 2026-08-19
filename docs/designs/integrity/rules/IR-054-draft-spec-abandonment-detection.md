@@ -10,11 +10,11 @@ updated: 2026-08-20
 | Field | Value |
 |-------|-------|
 | rule_id | IR-054 |
-| description | draft status の SPEC（`docs/specs/**/*.md`、frontmatter `status: draft`、v2:ADR-0123 定義）が一定期間更新されず放置されることを検出すること（REQ-001-002）。本ルールは draft SPEC の `updated` frontmatter と実行日の差分が閾値を超過した場合に報告する。status 値そのものの変更、accepted SPEC の陳腐化は対象外（REQ-001 適用範囲外） |
+| description | draft status の SPEC（`docs/designs/**/*.md`、frontmatter `status: draft`、v2:ADR-0123 定義）が一定期間更新されず放置されることを検出すること（REQ-001-002）。本ルールは draft SPEC の `updated` frontmatter と実行日の差分が閾値を超過した場合に報告する。status 値そのものの変更、accepted SPEC の陳腐化は対象外（REQ-001 適用範囲外） |
 | severity | heuristic |
 | category | document-drift |
-| detection_method | (1) `docs/specs/**/*.md` から frontmatter `status: draft` の SPEC を抽出（`accepted`、`status` なしは対象外）。(2) 各 draft SPEC の frontmatter `updated`（YYYY-MM-DD）を基準日として読み取る。(3) 実行日（today）と `updated` の差分日数を算出。(4) 差分日数が閾値（30日、後述「IR-054 閾値設計」参照）を超過した場合、draft 放置候補として報告 |
-| affected_artifacts | [docs/specs/**/*.md（frontmatter `status: draft` のみ）] |
+| detection_method | (1) `docs/designs/**/*.md` から frontmatter `status: draft` の SPEC を抽出（`accepted`、`status` なしは対象外）。(2) 各 draft SPEC の frontmatter `updated`（YYYY-MM-DD）を基準日として読み取る。(3) 実行日（today）と `updated` の差分日数を算出。(4) 差分日数が閾値（30日、後述「IR-054 閾値設計」参照）を超過した場合、draft 放置候補として報告 |
+| affected_artifacts | [docs/designs/**/*.md（frontmatter `status: draft` のみ）] |
 | related_req | [REQ-001-002] |
 | related_spec | [integrity-rule-catalog.md, integrity-contracts.md] |
 | gate_level | full-audit |
@@ -43,7 +43,7 @@ draft SPEC 放置検出の閾値、判定アルゴリズム、レポート形式
 **判定アルゴリズム**:
 
 ```
-for each file in glob('docs/specs/**/*.md'):
+for each file in glob('docs/designs/**/*.md'):
     frontmatter = parse_yaml_frontmatter(file)
     if frontmatter.status != 'draft':
         continue  # accepted または status なしは対象外
@@ -60,7 +60,7 @@ draft 放置候補は docs-check の検出事項（finding）形式で報告す�
 
 ```
 IR-054: draft SPEC 放置候補
-  対象: docs/specs/commands/case-run.md
+  対象: docs/designs/commands/case-run.md
   status: draft
   最終更新日: 2026-06-21
   経過日数: 35日（閾値30日超過）

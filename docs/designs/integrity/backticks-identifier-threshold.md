@@ -30,7 +30,7 @@ PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 
 
 以下のいずれかに該当する語句は識別子とし、backticks で囲むことを必須とする。
 
-- コマンド名、スキル名、ファイル名、ディレクトリパス（`/agentdev/req-define`、`agentdev-doc-writing`、`docs/specs/foundations/system.md`）
+- コマンド名、スキル名、ファイル名、ディレクトリパス（`/agentdev/req-define`、`agentdev-doc-writing`、`docs/designs/foundations/system.md`）
 - REQ/Decision/SPEC/RU/OU/IR 等の成果物 ID（`REQ-001`、`REQ-001`、`RU-0005`）
 - frontmatter キー、YAML フィールド名、enum 値、code block 内字句
 - 英字 kebab-case / snake_case / CamelCase の技術識別子（`self-hosting`、`work_type`、`auto_ready`）

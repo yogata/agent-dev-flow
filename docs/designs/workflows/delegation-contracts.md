@@ -72,7 +72,7 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 | `extraction` | 候補、論点、未回収事項の抽出 | 禁止 | - |
 | `draft_generation` | Issue本文、PR本文、レポート案などの草案生成 | 禁止 | - |
 | `controlled_case_execution` | case-run Epic / 複数Issue実行 | 条件付き | case-run のみ |
-| `step_execution` | case-auto からの構成工程（req-save / spec-save / case-open / case-close）の実行担当サブエージェント起動 | 許可 | case-auto からの工程委譲のみ。各工程のコマンド定義ガードレールに従う。委譲起動不能時の扱いは `delegation-unavailable` 状態として報告する（REQ-002-003/004）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md 参照 |
+| `step_execution` | case-auto からの構成工程（req-save / design-save / case-open / case-close）の実行担当サブエージェント起動 | 許可 | case-auto からの工程委譲のみ。各工程のコマンド定義ガードレールに従う。委譲起動不能時の扱いは `delegation-unavailable` 状態として報告する（REQ-002-003/004）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md 参照 |
 
 ※ step_execution の委譲起動手段（起動方法、実行制御パラメータ）は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
 委譲起動不能時は `delegation-unavailable` 状態として報告し、インラインフォールバックは harness 固有の実行制御として配布 SPEC から除外する（REQ-002-004）。
@@ -132,7 +132,7 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 |---|---|---|
 | req-define | extraction / classification | 入力整理、既存文書照合、関連文書候補抽出 |
 | case-run | gate_check / semantic_review / log_analysis | 検査、解析系ステップ |
-| case-auto | step_execution（v2:ADR-0127） | 構成工程（req-save / spec-save / case-open / case-close）の実行担当サブエージェント起動。各工程のコマンド定義を authoritative source として実行し、結果（Issue/PR番号、pass/warn/fail）を case-auto に返す |
+| case-auto | step_execution（v2:ADR-0127） | 構成工程（req-save / design-save / case-open / case-close）の実行担当サブエージェント起動。各工程のコマンド定義を authoritative source として実行し、結果（Issue/PR番号、pass/warn/fail）を case-auto に返す |
 | inspect-docs | semantic_review / classification | 意味レビュー、分類一貫性確認 |
 | backlog-review | classification / semantic_review / extraction | artifact分析、統合/分割、矛盾検出 |
 | learning-promote | classification / gate_check | 分類、評価、既存対策確認 |
@@ -162,7 +162,7 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 | case-open | 子Issue 本文案作成、検査、Issue 作成 | Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新 |
 | case-run | 同一 Wave 内子Issue の実装委譲 | Wave 結果集約 |
 | req-save | 複数 REQ/Decision ファイルの変更案作成、検査 | 採番、index 更新、draft 更新、commit、push |
-| spec-save | 複数 SPEC ファイルの変更案作成、検査 | 採番、index 更新、draft 更新、commit、push |
+| design-save | 複数 SPEC ファイルの変更案作成、検査 | 採番、index 更新、draft 更新、commit、push |
 
 ### 集約原則
 
@@ -189,7 +189,7 @@ req-define の委譲契約セクションは、各委譲について実行主体
 | 分類 | 意味 | 例 |
 |---|---|---|
 | adapter skill | 委譲契約、プロンプト構成、起動仕様をカプセル化した skill | `agentdev-case-run-execution-adapter` |
-| command | `/agentdev/*` 公開コマンド自体を起動主体として扱う場合 | `case-open` / `spec-save` |
+| command | `/agentdev/*` 公開コマンド自体を起動主体として扱う場合 | `case-open` / `design-save` |
 | subagent | 委譲で起動されるエージェント型 | 実行担当サブエージェント（AGENTS.md で選定） |
 | harness | case-run 実行ハーネス（外部実行基盤） | 外部実行基盤（AGENTS.md で選定） |
 

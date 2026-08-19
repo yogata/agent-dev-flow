@@ -88,7 +88,7 @@ case 実行に関わる責務を 4 用語へ分解し、正規所有者を固定
 - 「Phase」は orchestration stage、case-run internal lifecycle など修飾付きの用語へ置き換える
 - 既存の「Phase 1 case-open 順次、Phase 2 case-run 並列、Phase 3 case-close 順次」は「orchestration stage 1 case-open 順次、stage 2 case-run 並列、stage 3 case-close 順次」へ置き換える
 
-### 関連 SPEC（参照レベル、別途 spec-save 対象）
+### 関連 SPEC（参照レベル、別途 design-save 対象）
 
 - `workflows/delegation-contracts.md`: 委譲契約で 4 用語を使用
 - `foundations/harness-separation-model.md`: harness execution mechanism の ADF 規範所有対象外を明記

@@ -41,7 +41,7 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 広域 glob による検出回避と検出無効化を許容しない（NG 隠蔽禁止、integrity-contracts と同一規定）
 - targeted docs guard は frontmatter または配置ディレクトリに基づく SPEC 判定を行い、非 SPEC ファイル
 （baseline snapshot、歴史記録ファイル等）の SPEC README 登録候補誤検出を抑止する
-- 歴史記録ファイル（docs/specs/integrity/audits/、baselines/ 等）は DEC-013 AG-008 適用範囲の
+- 歴史記録ファイル（docs/designs/integrity/audits/、baselines/ 等）は DEC-013 AG-008 適用範囲の
 残存参照判定の対象外とする
 
 検出対象除外の正規列挙を次のとおり確定する。

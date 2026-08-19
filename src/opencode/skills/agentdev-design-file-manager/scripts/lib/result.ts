@@ -1,7 +1,7 @@
 /**
  * 共通結果型と stdout/stderr 出力ヘルパー（REQ-{NNNN}-{NNN} I/O 契約）。
  *
- * 本スキル (agentdev-spec-file-manager) の SPEC 固有スクリプト群が利用する。
+ * 本スキル (agentdev-design-file-manager) の SPEC 固有スクリプト群が利用する。
  * 成功時は ok: true を含み、エラー時は非ゼロ終了コード + stderr メッセージとする。
  *
  * 共通検証スクリプト (check-frontmatter-consistency / check-entry-existence /

@@ -23,9 +23,9 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 本スキルは以下の方針に従う（ADR）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-req-file-manager.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
+3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## REQ番号採番と要件行記述
@@ -77,7 +77,7 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`、REQ）。
 
 > **移管済み script**:
-> - `search-target-area.ts`（SPEC ファイル内 target_area 見出し検索）は `agentdev-spec-file-manager` へ移管済み。
+> - `search-target-area.ts`（SPEC ファイル内 target_area 見出し検索）は `agentdev-design-file-manager` へ移管済み。
 > SPEC 固有処理は同 skill の公開操作契約経由で呼び出す。
 > - 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-{NNN}、AG-{NNN}、AG-{NNN}、RU-{NNNN}-01 合意）。
 > 本スキルは公開検証契約へ委譲し、内部 script パスを直接参照しない。
@@ -97,7 +97,7 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 |-----------|------|------|-----------|
 | `alloc-req-number.ts` | REQ番号採番（max+1、欠番埋め禁止） | argv[2]=REQ dir | `{ ok, allocated: "REQ-NNNN", max }` |
 | `alloc-composite-id.ts` | 要件行ID採番（REQ-NNNN-MMM、max+1） | argv[2]=REQ file, argv[3]=req番号（省略可） | `{ ok, allocated: "REQ-NNNN-MMM", req, max }` |
-> `search-target-area.ts`（SPEC 固有）は `agentdev-spec-file-manager` へ移管済み。
+> `search-target-area.ts`（SPEC 固有）は `agentdev-design-file-manager` へ移管済み。
 > target_area 見出し検索は同 skill の公開操作契約経由で呼び出す。
 > `alloc-decision-number.ts`（Decision 固有）は `agentdev-decision-file-manager` へ移管済み（OU-{NNN}）。
 > Decision 番号採番は同 skill の公開操作契約経由で呼び出す。
@@ -115,12 +115,12 @@ bun src/opencode/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.t
 cd src/opencode/skills/agentdev-req-file-manager/scripts && npm test
 ```
 
-### req-save / spec-save からの呼び出し
+### req-save / design-save からの呼び出し
 
-req-save と spec-save は、REQ番号、ADR番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
-target_area 見出し検索は、SPEC 固有処理として `agentdev-spec-file-manager` 配下のスクリプトで実行する。
+req-save と design-save は、REQ番号、ADR番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
+target_area 見出し検索は、SPEC 固有処理として `agentdev-design-file-manager` 配下のスクリプトで実行する。
 frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-{NNN}）。
-詳細は req-save / spec-save command の各 Step 参照。
+詳細は req-save / design-save command の各 Step 参照。
 
 ---
 
@@ -158,7 +158,7 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 テンプレート構成:
 - **frontmatter**: `id`, `title`, `created`, `updated`
 - **必須セクション**: `目的`, `要件`（テーブル形式）, `適用範囲`（対象/対象外）
-- **補助セクション（任意）**: `SPEC候補`（req-define が REQ 要件行候補から分離した SPEC 相当行と想定配置先 SPEC を記載。req-save が REQ ファイル保存時に本セクションを除去し、内容は `draft-meta.spec-candidates` 経由で spec-save が消費する。最終 REQ ファイルに本セクションは残さない）
+- **補助セクション（任意）**: `SPEC候補`（req-define が REQ 要件行候補から分離した SPEC 相当行と想定配置先 SPEC を記載。req-save が REQ ファイル保存時に本セクションを除去し、内容は `draft-meta.spec-candidates` 経由で design-save が消費する。最終 REQ ファイルに本セクションは残さない）
 
 ---
 

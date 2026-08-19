@@ -49,7 +49,7 @@ Workflow Skill は STEP model の適用有無により次の3型に分類され�
 
 | 型 | 対象 | STEP model | resume point / export / import |
 |---|---|---|---|
-| 標準型 | req-define、req-save、spec-save、case-open、case-run、case-update、case-close、case-auto、intake-promote、learning-promote、backlog-review、inspect-promote | 対象 | 持つ（DEC-011） |
+| 標準型 | req-define、req-save、design-save、case-open、case-run、case-update、case-close、case-auto、intake-promote、learning-promote、backlog-review、inspect-promote | 対象 | 持つ（DEC-011） |
 | capture-only 型 | intake-capture、intake-from-github | 対象外 | 持たない。工程は逐次実行し、中断時は先頭から再実行する |
 | read-only-diagnostic 型 | inspect-docs、inspect-skills | 対象外 | 持たない。工程一覧のラベルは順序ラベルであり、中断時は先頭から再実行する |
 
@@ -187,8 +187,8 @@ DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候
 | project extension 読込（5セクション、fail-open） | `agentdev-project-extensions` | 全 Workflow Skill |
 | commit message 規約 | `agentdev-conventional-commits` | case-close、case-run を含む全 commit 発行 workflow |
 | REQ/Decision ファイル管理 | `agentdev-req-file-manager`、`agentdev-decision-file-manager` | case-open、case-close（RU 削除、Form Zero）、req-define、req-save |
-| SPEC ファイル管理 | `agentdev-spec-file-manager` | case-close（SPEC status 昇格）、spec-save |
-| 決定的検証スクリプト | `agentdev-artifact-validation` | req-save、spec-save、inspect-docs を含む品質検証 workflow |
+| SPEC ファイル管理 | `agentdev-design-file-manager` | case-close（SPEC status 昇格）、design-save |
+| 決定的検証スクリプト | `agentdev-artifact-validation` | req-save、design-save、inspect-docs を含む品質検証 workflow |
 | Issue/PR I/O 境界 | `agentdev-gh-cli` | 全 GitHub 操作を行う workflow |
 | Issue 操作の安全手続き | `agentdev-issue-management` | case-open、case-update、case-close |
 | Epic 進捗・Wave 構成 | `agentdev-epic-tracker` | case-open、case-close、case-auto |
@@ -221,7 +221,7 @@ DEC-010 Inventory が挙げる新規 Capability Skill 候補。
 - EC-2 必須品質統制導出（`case-open` execution contract）
 - EC-6 scope-affecting impact 探索（`case-open` execution contract）
 - コンフリクト Level 1 解消判断（`case-close`）
-- SPEC status 昇格判断（`case-close`、`spec-save`）
+- SPEC status 昇格判断（`case-close`、`design-save`）
 - bounded parent decision resolution 詳細（`case-auto`、DEC-008）
 - Wave 反復制御詳細（`case-auto`）
 
@@ -242,7 +242,7 @@ Workflow Skill の単独起動防止（soft guard）は OpenCode 1.18.15 が ski
 | 層 | 実装 | 全 Workflow Skill での実装有無 |
 |---|---|---|
 | Skill 層 | Workflow Skill description の DO NOT USE FOR に置く簡潔なトリガー項（「単独起動（対応する /agentdev/* コマンド経由で利用すること）」） | 全16 Workflow Skill で実装（実効の主層） |
-| Command 層 | command 定義本文 workflow 節の soft guard 宣言節（grep 可能な `soft guard` マーカー） | core 8 Command（req-define、req-save、spec-save、case-open、case-run、case-update、case-close、case-auto）と inspect 3 Command（inspect-docs、inspect-skills、inspect-promote）で実装。intake / learning / backlog 5 Command（intake-capture、intake-from-github、intake-promote、learning-promote、backlog-review）は command 定義本文に宣言節を持たず、Skill 層のみで実効する |
+| Command 層 | command 定義本文 workflow 節の soft guard 宣言節（grep 可能な `soft guard` マーカー） | core 8 Command（req-define、req-save、design-save、case-open、case-run、case-update、case-close、case-auto）と inspect 3 Command（inspect-docs、inspect-skills、inspect-promote）で実装。intake / learning / backlog 5 Command（intake-capture、intake-from-github、intake-promote、learning-promote、backlog-review）は command 定義本文に宣言節を持たず、Skill 層のみで実効する |
 
 マーカー語、内部 ID、運用規則の散文は description に置かない。
 

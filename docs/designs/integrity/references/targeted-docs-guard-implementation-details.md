@@ -7,7 +7,7 @@ updated: 2026-08-20
 
 # Targeted Docs Guard 実装詳細参照
 
-> 本ファイルは `docs/specs/integrity/targeted-docs-guard-implementation.md` から移管した実装詳細（Phase 1-6 実装計画、report フィールド一覧、完了済みの移行作業）を保持する。
+> 本ファイルは `docs/designs/integrity/targeted-docs-guard-implementation.md` から移管した実装詳細（Phase 1-6 実装計画、report フィールド一覧、完了済みの移行作業）を保持する。
 > SPEC 本体は契約のみを残し、実装計画と完了済み作業経緯は本ファイルへ分離した。
 
 ## Phase1-6 実装計画
@@ -39,7 +39,7 @@ usage メッセージ、--help 出力で区切り形式を明示すること。
 
 ### Phase 4: コマンド別最小監査範囲
 
-- req-save/spec-save/case-run/case-close の各コマンドが、対象ファイル種別に応じた最小監査範囲を定義すること。
+- req-save/design-save/case-run/case-close の各コマンドが、対象ファイル種別に応じた最小監査範囲を定義すること。
 - 各コマンド SPEC と integrity-contracts.md の Workflow×ツールマトリックス表が SSoT であること。
 - case-run/case-close は永続文書更新を契機に検査すること。
 
@@ -65,7 +65,7 @@ check_changed_docs.ts の report JSON に含まれる全フィールドを列挙
 | `failures` | Failure[] | 検出された違反一覧。各 failure は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ |
 | `warnings` | string[] | 警告一覧。`files_checked` 空の場合は理由（`--files` 指定の不備、PR 変更ファイル取得の失敗、検査対象パスの誤り等）の確認を促す内容を含む |
 | `doc_map_update_required` | boolean | README 索引更新要否（後方互換フィールド名、現在は README 索引更新要否判定に使用） |
-| `spec_readme_update_required` | boolean | `docs/specs/README.md` 更新要否 |
+| `spec_readme_update_required` | boolean | `docs/designs/README.md` 更新要否 |
 | `requirements_readme_update_required` | boolean | `docs/requirements/README.md` 更新要否 |
 | `full_docs_check_recommended` | boolean | full docs-check 実行要否 |
 | `extensions_check_required` | boolean | project extensions 検査の必要性 |
@@ -74,24 +74,24 @@ check_changed_docs.ts の report JSON に含まれる全フィールドを列挙
 
 `failure` オブジェクトのフィールド: `rule_id`、`severity`、`file`、`line`、`message`、`expected`。
 
-TargetedDocsReport 型契約の正本は `docs/specs/integrity/integrity-contracts.md` TargetedDocsReport 型契約節である。
+TargetedDocsReport 型契約の正本は `docs/designs/integrity/integrity-contracts.md` TargetedDocsReport 型契約節である。
 本表は実装参照用途のフィールド一覧である。
 
 ## 旧SPEC直下配置前提の除去（完了済み）
 
 旧SPEC直下配置前提の除去対応（v2:REQ-0158 より移管、完了済み）。
 
-- spec-save.md（原本）と `docs/specs/commands/spec-save.md`（SPEC）に残存する旧SPEC直下配置前提（`docs/specs/*.md`、`docs/specs/{topic-slug}.md`、`docs/specs/<existing-spec>.md`、SPEC 用 `new:{topic-slug}`）を廃止した。
-- 新表現として `docs/specs/{domain}/{topic-slug}.md`、`docs/specs/**/*.md`、`target_spec: {operation, domain, slug}` 構造化へ寄せた。
-- `docs/specs/README.md` の SPEC 配置表現（`specs/*.md`）を `specs/**/*.md` またはドメイン分割説明へ更新した。
+- design-save.md（原本）と `docs/designs/commands/design-save.md`（SPEC）に残存する旧SPEC直下配置前提（`docs/designs/*.md`、`docs/designs/{topic-slug}.md`、`docs/designs/<existing-spec>.md`、SPEC 用 `new:{topic-slug}`）を廃止した。
+- 新表現として `docs/designs/{domain}/{topic-slug}.md`、`docs/designs/**/*.md`、`target_spec: {operation, domain, slug}` 構造化へ寄せた。
+- `docs/designs/README.md` の SPEC 配置表現（`specs/*.md`）を `specs/**/*.md` またはドメイン分割説明へ更新した。
 - SPEC 配下の二系統（実行単位: commands/skills/workflows、基盤: foundations/responsibilities/quality/integrity/local/authoring）を説明に含めた。
 - requirements/adr 配下の歴史記載（履歴マーカー付き）は例外として更新対象外とした。
 
-## repo-agentdev-integrity の docs/specs/**/*.md 再帰対応（完了済み）
+## repo-agentdev-integrity の docs/designs/**/*.md 再帰対応（完了済み）
 
 check_integrity.ts 側の対応（v2:REQ-0158 より移管、完了済み）。
 
-- `collectAllArtifactPaths`、`checkSpecReadmeIndexSync`、`checkUpdateNotesInDocs`、`scanned.Specs`、SPEC inventory 生成・照合処理を `docs/specs/*.md`（直下）から `docs/specs/**/*.md`（再帰）へ更新した。
-- SPEC本文の検査では `docs/specs/README.md` を除外する。
-- SPEC inventory/status 同期検査では `docs/specs/README.md` を対象とする。
+- `collectAllArtifactPaths`、`checkSpecReadmeIndexSync`、`checkUpdateNotesInDocs`、`scanned.Specs`、SPEC inventory 生成・照合処理を `docs/designs/*.md`（直下）から `docs/designs/**/*.md`（再帰）へ更新した。
+- SPEC本文の検査では `docs/designs/README.md` を除外する。
+- SPEC inventory/status 同期検査では `docs/designs/README.md` を対象とする。
 - SPEC 一覧との照合では SPEC status の重複確認ではなく、入口・読み込み契約との整合を確認する。

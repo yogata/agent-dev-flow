@@ -7,7 +7,7 @@ updated: 2026-07-24
 
 # skill SPEC テンプレート
 
-> 全ての `agentdev-*` 配布スキルは、`docs/specs/skills/<skill-name>.md` に専用 SPEC を持つ。
+> 全ての `agentdev-*` 配布スキルは、`docs/designs/skills/<skill-name>.md` に専用 SPEC を持つ。
 > 本ファイルは新規 skill SPEC を作成する際の最小構成テンプレートである。
 > `repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
 
@@ -53,7 +53,7 @@ USE FOR / DO NOT USE FOR を記述。
 
 - 現在動作の正として振る舞う。SKILL.md 本文と references/ 内容を要約して記載する。
 - REQ/Decision/SPEC ID を含むことを許可する（配布物 commands/skills への ID 除去要件は docs/ 以下の SPEC には適用しない）。
-- skill SPEC は当該 skill のみの動作を記載する。複数 skill にまたがる共通契約は `docs/specs/workflows/` に置く。
+- skill SPEC は当該 skill のみの動作を記載する。複数 skill にまたがる共通契約は `docs/designs/workflows/` に置く。
 - 実行時スキル（src/opencode/skills/<name>/SKILL.md）は本 SPEC に依存しない（REQ-001）。SPEC は docs 内部設計文書である。
 - 既存 SPEC への追記時は frontmatter `status` を変更しない（v2:ADR-0123 Decision #1）。新規作成時は `status: draft` を付与する。
 

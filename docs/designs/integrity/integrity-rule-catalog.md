@@ -178,7 +178,7 @@ candidate 状態の IR は catalog への本エントリ追加を含まず、別
 | detection_method | retired REQ/SPEC ID リストをソースとした本文横断検索。活性 REQ/SPEC への言及は対象外。supersede 元への言及は文脈判定で finding 扱い |
 | affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**`, `docs/guides/**` |
 | related_req | REQ-010, REQ-010 |
-| related_spec | `docs/specs/foundations/document-model.md`（SPEC ライフサイクル superseded） |
+| related_spec | `docs/designs/foundations/document-model.md`（SPEC ライフサイクル superseded） |
 | gate_level | full-audit |
 | false_positive_risk | supersede 元への妥当な文脈参照。finding 扱いで人間確認を挟む |
 | regression_test | （未実装） |
@@ -194,12 +194,12 @@ candidate 状態の IR は catalog への本エントリ追加を含まず、別
 
 ### check_changed_docs.ts 関連ルールの整理（targeted-docs-guard-implementation.md Phase 1）
 
-check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（req-save/spec-save/case-run/case-close）に必要なルールサブセットを適用する。
+check_changed_docs.ts は IR-001〜IR-059 のうち各 workflow profile（req-save/design-save/case-run/case-close）に必要なルールサブセットを適用する。
 catalog は IR ルールの正典であり、check_changed_docs.ts の profileFor() が返す rules は catalog IR のサブセット参照である。
 check_integrity.ts は全 IR ルール（full-audit gate_level）を実装する。
 check_changed_docs.ts と check_integrity.ts の二系統で IR ルールを共有し、検出ロジックを重複実装しない。
 
-詳細な IR-*.md の追加・更新内容は後続の spec-save / case-run 工程で確定する。
+詳細な IR-*.md の追加・更新内容は後続の design-save / case-run 工程で確定する。
 check_changed_docs.ts の profile rules と SPEC 記載項目の対応関係は REQ-010-009（1:1 対応不要、包括カバー許容）に従う。
 
 ### AG-005 規則群（lint_skills.ts、層1〜2記述基準機械検査）
@@ -222,7 +222,7 @@ AG-005 規則群（`lint_skills.ts`、RU-0018 / Issue #2179、PR #2184 で main 
 
 ### IR-055 heuristic 行内複数パターン集計仕様（REQ-002-079〜081）
 
-IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/specs/`、`docs/guides/`、`docs/decisions/` 等）が存在する場合の集計規則を以下のとおり定める。
+IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複数のパターンマッチ（`docs/designs/`、`docs/guides/`、`docs/decisions/` 等）が存在する場合の集計規則を以下のとおり定める。
 本節は `check_integrity.ts` 実装が従うべき契約であり、実装詳細は対象外とする。
 
 **集計単位**: 行内に複数パターンがマッチした場合、パターン種別ごとに1件を検出件数へ計上する。
@@ -231,7 +231,7 @@ IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複�
 **ファイルパス・行番号表現**: 検出結果レコードは `ファイルパス:行番号:違反内容:検出ルール` 形式とし、同一行に複数パターン種別が存在する場合はパターン種別ごとに別レコードとして列挙する。
 同一行の複数パターンを単一レコードへ圧縮しない。
 
-**baseline 整合**: `docs/specs/foundations/harness-separation-model.md` の baseline リスト（11件）は本集計仕様に従って再抽出した結果と一致すること。
+**baseline 整合**: `docs/designs/foundations/harness-separation-model.md` の baseline リスト（11件）は本集計仕様に従って再抽出した結果と一致すること。
 baseline 抽出元と SPEC 記載の不一致が検出された場合、本節の集計仕様を正として実装または baseline を調整する。
 
 **適用対象**: heuristic level（WARNING）の検出に適用する。
@@ -333,7 +333,7 @@ checkWorkflowStatusProhibition
 
 ### check_changed_docs.ts profile rules と SPEC 記載項目の対応関係（REQ-010-009）
 
-req-save / spec-save / case-close 各 SPEC が記載する検査項目と、`check_changed_docs.ts` の `profileFor()` が返す `rules`（profile rules）の対応関係は 1:1 を要求しない。
+req-save / design-save / case-close 各 SPEC が記載する検査項目と、`check_changed_docs.ts` の `profileFor()` が返す `rules`（profile rules）の対応関係は 1:1 を要求しない。
 1 つの SPEC 記載項目に対して専用 profile rule を実装しなくても、既存 rule 群による包括カバーを許容する。
 本方針は今後の SPEC / rule 追加時の判断基準となる。
 

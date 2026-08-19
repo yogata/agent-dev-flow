@@ -32,7 +32,7 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 最小限の経路（req-define → case-open → case-run → case-close）で処理する。
 
 **feature** は新しい振る舞いをシステムに導入するため、WHAT（要件）と HOW（実装）の分離が必要である。
-壁打ちフェーズでの要件形成、REQ/Decision ファイルの保存、specs 更新など、複数の確認ポイントを経由する経路（req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close）を辿る。
+壁打ちフェーズでの要件形成、REQ/Decision ファイルの保存、specs 更新など、複数の確認ポイントを経由する経路（req-define → req-save → design-save（SPEC 候補がある場合）→ case-open → case-run → case-close）を辿る。
 
 **maintenance** はリファクタリング、保守作業向けの軽量経路である。
 **docs_chore** はドキュメント、雑務向けの軽量経路である。
@@ -42,8 +42,8 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 | work_type | scale | workflow_route | 経路 |
 |---|---|---|---|
 | bugfix | - | direct_case | req-define → case-open → case-run → case-close |
-| feature | standard | req_backed_case | req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open → case-run → case-close |
-| feature | large | epic_case | req-define → req-save → spec-save（SPEC 候補がある場合）→ case-open（Epic）→ case-run（Wave）→ case-close |
+| feature | standard | req_backed_case | req-define → req-save → design-save（SPEC 候補がある場合）→ case-open → case-run → case-close |
+| feature | large | epic_case | req-define → req-save → design-save（SPEC 候補がある場合）→ case-open（Epic）→ case-run（Wave）→ case-close |
 | maintenance | - | direct_case | req-define → case-open → case-run → case-close |
 | docs_chore | - | direct_case | req-define → case-open → case-run → case-close |
 
@@ -57,7 +57,7 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 システムに対して何が期待されるか、どの条件を満たすべきかを規定する。
 要件は領域別の総体として管理し、実装の変化に依存しない安定的な参照点を提供する。
 
-**仕様（docs/specs/）** は実装の現在の姿を記述する。
+**仕様（docs/designs/）** は実装の現在の姿を記述する。
 システムの構造（system.md）、アーティファクト規約（patterns.md）、品質基準（quality-specs.md）、設計方針（design-principles.md）で構成する。
 仕様は実装とともに変化する「生きた文書」である。
 
@@ -132,7 +132,7 @@ AgentDevFlow の配布物は実行時（runtime: 個別プロジェクトで実�
 **実行時配布物**は自己完結し、agent-dev-flow リポジトリの dev メタデータに依存しないことを保証する:
 - Command の YAML フロントマターは `description` 単一とする（REQ-029-007、DEC-001）
 - Skill `references/` は実行時配布物のみを含める（REQ-001）
-- `docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書であり、実行時配布物の依存先ではない（REQ-001, REQ-029-003）
+- `docs/designs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書であり、実行時配布物の依存先ではない（REQ-001, REQ-029-003）
 
 **執筆専用物**は agent-dev-flow リポジトリ内でのみ参照される:
 

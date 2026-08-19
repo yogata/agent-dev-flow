@@ -80,7 +80,7 @@ case-run、case-auto の実行結果契約は次の4状態を区別する。
 - `delegation-unavailable`: 実行インフラ起動不能
 
 `failed` と `delegation-unavailable` は異なる回復アクションを要する独立の結果状態として扱う。
-結果状態の遷移機械、委譲契約、ラベル構造の詳細は `docs/specs/workflows/delegation-contracts.md` を正規所有者とし、本 SPEC は境界宣言へ縮約する。
+結果状態の遷移機械、委譲契約、ラベル構造の詳細は `docs/designs/workflows/delegation-contracts.md` を正規所有者とし、本 SPEC は境界宣言へ縮約する。
 
 ## case-auto の orchestration stage と bg task 管理
 
@@ -90,7 +90,7 @@ case-auto の orchestration stage（stage 1 case-open 順次、stage 2 case-run 
 bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、retry、heartbeat、エラー解析は harness 側の所有とする（harness execution mechanism、ADF 規範所有対象外、REQ-011-018）。
 stage 1 と stage 3 の直列集約ポイントは main push、capture、commit を並列実行区間の外で処理する AgentDevFlow 側の契約とし、bg task API 経由の実行制御は harness 側の責務として維持する。
 
-工程別の所有対象、非所有対象の詳細リストは `docs/specs/responsibilities/responsibility-boundary-purification.md` を正規所有者とする。
+工程別の所有対象、非所有対象の詳細リストは `docs/designs/responsibilities/responsibility-boundary-purification.md` を正規所有者とする。
 
 ## 参照実装
 
@@ -122,7 +122,7 @@ runtime workspace 管理は harness 側の責務とする。
 配布物からプロジェクト固有要素を除去する方針を定める。
 本 SPEC は方針のみを所有し、除去対象パターン、検出ルール、baseline の具体的な一覧は [references/concrete-abstraction.md](references/concrete-abstraction.md) へ集約する。
 
-除去対象の核心は、配布物本文にプロジェクト固有識別子（REQ-ID、ADR-ID、IR-ID 形式）と消費プロジェクトの文書ディレクトリ内部パス（`docs/specs/**`、`docs/guides/**` 等）を残置しないことである。
+除去対象の核心は、配布物本文にプロジェクト固有識別子（REQ-ID、ADR-ID、IR-ID 形式）と消費プロジェクトの文書ディレクトリ内部パス（`docs/designs/**`、`docs/guides/**` 等）を残置しないことである。
 識別子、パスを除去した後のトレーサビリティは git 履歴と原本側 docs/ で担保し、配布物には残置しない。
 
 ## ToDo と compaction 復元
@@ -140,5 +140,5 @@ AgentDevFlow 配布command / Workflow Skill / SPEC は ToDo を必須機構と�
 - v2:ADR-0136（配布物の harness 実行制御分離）: 吸収元。決定本質は charter 決定2 に先駆的適用として含まれる。
 - v2:REQ-0162（配布物の harness 実行制御分離）: 吸収元。原則の SSoT と各要件行（4状態結果契約、配布 docs 制約、ADF 可観測タイムスタンプ境界、ID 除去、パス除去）を本 SPEC および REQ-002 へ統合した。
 - v2:ADR-0114（case-run 実行責務の外部実行バックエンド委譲）: 吸収元。harness 選定領域に降格された実行制御側の知見を取り込み、result 4状態契約の前身である委譲モデルを本 SPEC の前段として位置づける。
-- `docs/specs/workflows/delegation-contracts.md`: 委譲契約詳細（result state machine、launch mechanism、delegation envelope）の正規所有者。
-- `docs/specs/responsibilities/responsibility-boundary-purification.md`: 工程別（case-auto、case-run、execution adapter、Project Extensions、タイムスタンプ）の所有/非所有リスト詳細。
+- `docs/designs/workflows/delegation-contracts.md`: 委譲契約詳細（result state machine、launch mechanism、delegation envelope）の正規所有者。
+- `docs/designs/responsibilities/responsibility-boundary-purification.md`: 工程別（case-auto、case-run、execution adapter、Project Extensions、タイムスタンプ）の所有/非所有リスト詳細。

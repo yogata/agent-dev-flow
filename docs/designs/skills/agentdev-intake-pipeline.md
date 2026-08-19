@@ -39,7 +39,7 @@ intake 系 command が呼び出す操作と、主ワークフロー各工程 com
 
 ### 自動 capture 向け item 生成操作
 
-各工程 command（`req-save` / `spec-save` / `case-open` / `case-close`）からの自動 deviation capture 要求を受ける item 生成操作。
+各工程 command（`req-save` / `design-save` / `case-open` / `case-close`）からの自動 deviation capture 要求を受ける item 生成操作。
 Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artifact-contracts.md)「依存方向」、[capture-boundaries.md](../workflows/capture-boundaries.md)「委譲契約（Command→Skill 依存方向）」参照）に従い、command は `intake-capture` 等の他 command を直接呼び出さず本スキルへ一方向に委譲する。
 
 #### 呼出元 command と委譲契約の根拠
@@ -47,7 +47,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 | 呼出元 command | REQ 根拠 | 委譲対象 |
 |---|---|---|
 | `req-save` | REQ-006-106 | `req-save` 実行中に実観測した deviation のうち intake 該当分（REQ 再構成 intake を含む） |
-| `spec-save` | REQ-006-107 | `spec-save` 実行中に実観測した deviation のうち intake 該当分 |
+| `design-save` | REQ-006-107 | `design-save` 実行中に実観測した deviation のうち intake 該当分 |
 | `case-open` | REQ-006-021 | `case-open` 実行中に実観測した deviation のうち intake 該当分 |
 | `case-close` | REQ-006-105 | `case-close` 実行中に実観測した deviation のうち intake 該当分（PR 本文から回収した intake 候補を含む） |
 
@@ -70,7 +70,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 
 | 区分 | 入力形式 | 呼出元 | 役割 |
 |---|---|---|---|
-| 自動 capture 向け item 生成操作（本操作） | 各工程 command が実観測した deviation（構造化済み） | `req-save` / `spec-save` / `case-open` / `case-close`（プログラム的委譲） | 自動 deviation capture |
+| 自動 capture 向け item 生成操作（本操作） | 各工程 command が実観測した deviation（構造化済み） | `req-save` / `design-save` / `case-open` / `case-close`（プログラム的委譲） | 自動 deviation capture |
 | `intake-capture` command | ユーザー手動入力 | ユーザー（対話的） | ユーザー主導の作業候補収集 |
 
 `intake-capture` command はユーザー手動入力を想定し、入力形式も異なる。

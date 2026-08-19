@@ -205,7 +205,7 @@ Q4: 出力構造・プレースホルダーか？
   → Yes: Template（templates/） / No: 再評価
 
 Q5: 現在仕様の記述か？
-  → Yes: SPEC（docs/specs/） / No: Q6 へ
+  → Yes: SPEC（docs/designs/） / No: Q6 へ
 
 Q6: 将来の設計・運用・文書システムを制約する決定の記録か？
   → Yes: Decision（docs/decisions/） / No: Q7 へ

@@ -32,7 +32,7 @@ REQ、Decision、SPEC 固有の内容判断を行わず、決定的検証のみ�
 - 文書の作成、更新、削除（各操作 skill の責務）
 - 保存、ユーザー承認、commit、push（各 command の責務）
 - REQ 番号、Decision 番号、要件行 ID の採番（`agentdev-req-file-manager`、`agentdev-decision-file-manager` の責務）
-- target_area の検索（`agentdev-spec-file-manager` の責務）
+- target_area の検索（`agentdev-design-file-manager` の責務）
 
 ## 提供する判断・操作
 
@@ -48,19 +48,19 @@ REQ、Decision、SPEC 固有の内容判断を行わず、決定的検証のみ�
 
 - artifact-contracts.md「Script 所有権と委譲契約」
 - artifact-responsibilities.md「操作 skill 正規所有者台帳」
-- req-save.md、spec-save.md（共通検証 script 呼出 Step）
+- req-save.md、design-save.md（共通検証 script 呼出 Step）
 
 ## 現在の動作
 
 - 所有 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `src/opencode/skills/agentdev-artifact-validation/scripts/` 配下に配置する
 - script は決定的（純粋関数）、テスト可能（`tests/*.test.ts`）とする
 - I/O は argv/stdin で入力を受け取り、stdout で JSON 結果を返す（REQ-002-160）
-- 利用側 command、skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-spec-file-manager`、`req-save`、`spec-save` 等）は内部 script パスを直接参照せず、本 skill の公開検証契約へ委譲する
+- 利用側 command、skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager`、`req-save`、`design-save` 等）は内部 script パスを直接参照せず、本 skill の公開検証契約へ委譲する
 - 同一 script または共有 lib を複数 skill へ複製しない
 
 ## 境界
 
-REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `agentdev-decision-file-manager`、SPEC 固有 script は `agentdev-spec-file-manager` が所有する。
+REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `agentdev-decision-file-manager`、SPEC 固有 script は `agentdev-design-file-manager` が所有する。
 利用側は本 skill の内部 script を直接参照せず、公開検証契約へ委譲する。
 同一 script または共有 lib を複製しない。
 
@@ -84,6 +84,6 @@ REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `
 
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)（REQ 操作 skill、REQ 固有 script 所有）
 - [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)（Decision 操作 skill、Decision 固有 script 所有）
-- [agentdev-spec-file-manager.md](agentdev-spec-file-manager.md)（SPEC 操作 skill、SPEC 固有 script 所有）
+- [agentdev-design-file-manager.md](agentdev-design-file-manager.md)（SPEC 操作 skill、SPEC 固有 script 所有）
 - REQ-002-159（script 所有権の責務別配置）
 - REQ-001-029（決定的処理の script 委譲）

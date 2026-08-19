@@ -147,7 +147,7 @@ Step 番号は command 定義の内部構造であり、SPEC の公開契約に�
 - **必須順序**: 成果物、安全性、外部契約へ影響する順序（順序を変えると成果物または安全性が変わるもののみ）
 - **利用 skill 責務**: command が利用する skill 名と委譲する責務
 
-**適用対象**: `docs/specs/commands/*.md` の全 command SPEC（`_template.md` を含む）。
+**適用対象**: `docs/designs/commands/*.md` の全 command SPEC（`_template.md` を含む）。
 
 読み取り専用または分類系で Step を持たない command SPEC は、Step による対応付けの対象外であることを当該 SPEC に明記する。
 
@@ -157,4 +157,4 @@ Step 番号の不一致は違反として扱わず、公開契約の欠落、相
 ## 他 SPEC との関係
 
 - **`patterns.md`**: frontmatter 規約、テンプレート命名規則を担当。本 SPEC は command 本文構造を担当し、frontmatter 規約は `patterns.md` を参照する。
-- **`docs/specs/commands/*.md`**: 個別 command SPEC の位置づけを維持する。横断フォーマット規約は本 SPEC に集約し、個別 command SPEC は公開契約の各対応付け軸を定義する。
+- **`docs/designs/commands/*.md`**: 個別 command SPEC の位置づけを維持する。横断フォーマット規約は本 SPEC に集約し、個別 command SPEC は公開契約の各対応付け軸を定義する。

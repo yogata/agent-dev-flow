@@ -110,7 +110,7 @@ AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等�
 
 - 単語露出のみならず、当該 ID 参照が利用者にとって意味を持つかを判定する（利用者が当該 ID を追跡する導線がない場合は除去）。
 - `agentdev-*` スキル名、`/agentdev/*` コマンド名は配布物自身の識別子であり許容する（内部 ID ではない）。
-- 内部 ID を含む説明が必要な場合は、配布物ではなく `docs/specs/` または `docs/guides/` に配置する。
+- 内部 ID を含む説明が必要な場合は、配布物ではなく `docs/designs/` または `docs/guides/` に配置する。
 
 ## 配布物統合性検出
 
@@ -185,13 +185,13 @@ SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC�
 |------|----------|----------------|
 | 横断 SPEC 中の個別動作 | workflows SPEC に個別 command または skill のみに適用される手順、ステップ、判定表が含まれる | 該当 command/skill SPEC へ移送（`MOVE`） |
 | 個別 SPEC 中の横断契約 | command SPEC または skill SPEC に複数 command/skill をまたぐ契約が含まれる | 横断 SPEC へ移送（`MOVE`） |
-| 旧 grab-bag SPEC 残存 | `docs/specs/<**/*>.md`（基盤SPECドメイン直下）に複数関心事が混在 | 関心事別 SPEC へ分割（`SPLIT`） |
+| 旧 grab-bag SPEC 残存 | `docs/designs/<**/*>.md`（基盤SPECドメイン直下）に複数関心事が混在 | 関心事別 SPEC へ分割（`SPLIT`） |
 
 ### 判定ルール
 
 - 個別 SPEC は1コマンドまたは1スキルの現在動作のみを記述する。
 - 複数コマンド/スキル間の契約（委譲、キャプチャ境界、Wave モデル等）は `workflows/` に配置する。
-- `docs/specs/{foundations,responsibilities,quality,integrity,local,authoring}/*.md` 直下の SPEC は基盤 SPEC（system/document-type-responsibilities/patterns/design-principles 等）のみとし、command/skill 固有の動作は含まない。
+- `docs/designs/{foundations,responsibilities,quality,integrity,local,authoring}/*.md` 直下の SPEC は基盤 SPEC（system/document-type-responsibilities/patterns/design-principles 等）のみとし、command/skill 固有の動作は含まない。
 
 ## HOW 除去後の acceptance-criteria 順位検証
 

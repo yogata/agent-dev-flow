@@ -70,7 +70,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 ## Control Plane（STEP 一覧）
 
-各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
 会話コンテキストに依存せず、durable state（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
 
 ### single workflow（単一 Issue 実行モード）

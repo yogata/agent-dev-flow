@@ -48,7 +48,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`�
 ## Control Plane（STEP 一覧）
 
 intake-promote workflow は次の6 STEP で構成する。
-各 STEP は resume point を持ち（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した resume point である。
+各 STEP は resume point を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した resume point である。
 会話コンテキストに依存せず、durable state（inbox / promoted の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |

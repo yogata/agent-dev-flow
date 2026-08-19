@@ -48,7 +48,7 @@ work_type は工程分岐の参照軸である。
 Issue/PR をスキップする直接完了経路は存在しない。
 
 `workflow-contracts` SPEC は bugfix, maintenance, docs_chore を `direct_case` に分類する。
-`direct_case` は req-save と spec-save を経由しないことを指し、Issue/PR を経由しないことを指さない。
+`direct_case` は req-save と design-save を経由しないことを指し、Issue/PR を経由しないことを指さない。
 
 ### 経路一覧
 
@@ -57,8 +57,8 @@ Issue/PR をスキップする直接完了経路は存在しない。
 | bugfix | - | req-define → case-open → case-run → case-close |
 | maintenance | - | req-define → case-open → case-run → case-close |
 | docs_chore | - | req-define → case-open → case-run → case-close |
-| feature | standard | req-define →（req-save → spec-save）→ case-open → case-run → case-close |
-| feature | large | req-define → req-save →（spec-save）→ case-open → case-run → case-close（OU/ 子Issue 構成） |
+| feature | standard | req-define →（req-save → design-save）→ case-open → case-run → case-close |
+| feature | large | req-define → req-save →（design-save）→ case-open → case-run → case-close（OU/ 子Issue 構成） |
 
 各コマンドの正式名は `/agentdev/<name>` である（例: `/agentdev/req-define`）。
 一覧は command README 参照。
@@ -67,7 +67,7 @@ Issue/PR をスキップする直接完了経路は存在しない。
 実証Caseは work_type にかかわらず scale と Issue 構造を選択できる。
 実証の判定は評価ブランチ実証ワークフローの定義による（詳細は「スケール判定基準」の実証Case例外参照）。
 
-feature が経由する req-save と spec-save は req_draft の `artifact_actions` により動的判定する。
+feature が経由する req-save と design-save は req_draft の `artifact_actions` により動的判定する。
 該当 entry がない場合は case-open から開始する。
 feature large の OU/ 子Issue 構成は `agentdev-workflow-orchestration` 参照。
 
@@ -82,7 +82,7 @@ docs_chore は bugfix, maintenance と同一経路をとる。
 - 完了証拠: マージ済み PR + クローズ済み Issue
 - 停止条件: `agentdev_handoff: true` 検出時、req-define 合意要件からの逸脱、リポジトリ外操作の必要性
 
-docs_chore は REQ, ADR, SPEC を生成しないことが多いため req-save と spec-save を経由しないが、case-open, case-run, case-close は必ず経由する。
+docs_chore は REQ, ADR, SPEC を生成しないことが多いため req-save と design-save を経由しないが、case-open, case-run, case-close は必ず経由する。
 docs 更新責務は全 work_type 共通である。
 
 ## スケール判定基準

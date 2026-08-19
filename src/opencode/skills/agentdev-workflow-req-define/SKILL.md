@@ -46,7 +46,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-req-define.yaml`）�
 ## Control Plane（STEP 一覧）
 
 req-define workflow は次の11 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
 対話の進行は durable state（入力ファイル、壁打ちで確定した合議内容を含む draft-data 下書き）から再構成でき、会話コンテキストのみに依存しない。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |

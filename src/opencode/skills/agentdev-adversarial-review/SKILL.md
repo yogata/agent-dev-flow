@@ -13,7 +13,7 @@ description: "対論型レビューの実行入口。Orchestrator、Reviewer、R
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `docs/specs/<skills/agentdev-adversarial-review>.md` である。
+本スキルの原本仕様は `docs/designs/<skills/agentdev-adversarial-review>.md` である。
 SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
 重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
@@ -130,5 +130,5 @@ user-decision-required の位置づけ（case-run result enum の第5状態で�
 - **agentdev-doc-diagnostics**: 証拠付き finding の診断
 - **agentdev-skill-authoring**: スキル設計とレビュー規約
 - **`agentdev-artifact-graph`**: トレーサビリティ派生索引への高位問い合わせ（ワークフロー利用の割り当ては同 SPEC が正規所有）
-- **SPEC `docs/specs/<skills/agentdev-adversarial-review>.md`**: 振る舞い契約の正典
+- **SPEC `docs/designs/<skills/agentdev-adversarial-review>.md`**: 振る舞い契約の正典
 - **references/adversarial-review-protocol.md**: 審議プロトコルの詳細手続き

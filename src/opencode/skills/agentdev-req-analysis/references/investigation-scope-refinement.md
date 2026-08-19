@@ -48,11 +48,11 @@ glob docs/decisions/<DEC-*>.md
 grep -l "<keyword>" docs/decisions/<DEC-*>.md
 
 # 関連 SPEC 候補
-grep -rl "<keyword>" docs/specs/
+grep -rl "<keyword>" docs/designs/
 ```
 
 REQ/ADR は ID 直接参照（`REQ-NNNN`, `ADR-NNNN`）が含まれる場合は当該ファイルを確実に含める。
-SPEC はパス参照（`docs/specs/...`）と用語参照の双方で検索する。
+SPEC はパス参照（`docs/designs/...`）と用語参照の双方で検索する。
 
 **完全列挙の維持**: 上記 glob は関連候補の事前特定に用いるが、REQ/ADR の実ファイル完全列挙自体は別途 `agentdev-req-analysis` の「既存REQ/ADRの定量的照合」で実施する。
 本前処理が完全列挙を代替、省略することはない。
