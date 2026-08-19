@@ -1,0 +1,364 @@
+---
+title: 実行時パッケージ境界
+status: accepted
+created: 2026-08-20
+updated: 2026-08-15
+---
+
+# 実行時パッケージ境界
+
+> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（REQ-001）。
+> リポジトリ種別（repo type）間の実行時パッケージ境界モデルを本リポジトリの観点から記述し、consumer プロジェクトの振る舞いを規定しない。
+> Consumer プロジェクトは独自の規約に従い、本 SPEC は agent-dev-flow リポジトリが実行時パッケージをどう構成、配布するかのみを定義する。
+
+## 目的
+
+AgentDevFlow の実行時パッケージ境界を定義し、本体リポジトリと consumer プロジェクトでの `.opencode/` 役割、命名、導入方式、同期範囲を明確化する（REQ-002-061~065, REQ-009）。
+
+## 4 種のリポジトリ種別（Repo Type）
+
+> plugin/npm/package 配布形態は現在未対応である（REQ-002-064 参照）。
+> REQ-009-006 は5種のリポジトリ種別として将来対応の `plugin-future` を含めて定義する。
+> 本 SPEC の4種表は現行実装済みの種別のみを扱い、`plugin-future` は将来対応の第5種として本表から除外する。
+> REQ と本 SPEC の種別数の差は対応時期の違いによるものであり、矛盾ではない。
+> `plugin-future` の実装時に本表へ行を追加する。
+
+| Type ID | 名称 | 説明 | `.opencode/` の意味 | 典型例 |
+|---------|------|------|---------------------|--------|
+| `self-hosting` | AgentDevFlow 本体開発リポジトリ | 原本と配置先が同一リポジトリに存在 | 実行時配置先（ジャンクション → `src/opencode/`） | `agent-dev-flow` |
+| `consumer-with-agentdev` | AgentDevFlow 導入製品リポジトリ | AgentDevFlow 提供 skill/command を利用 | プロジェクトローカルカスタマイズ入口 + AgentDevFlow 実行時位置 | 各種製品開発リポジトリ |
+| `consumer-local` | 非 AgentDevFlow OpenCode プロジェクト | 独自 command/skill のみ | プロジェクトローカルカスタマイズ専用 | 実験的リポジトリ |
+| `consumer-generated` | ローカル版 OpenCode 導入リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ | link mode による AgentDevFlow 実行時位置（`agentdev-gh-cli` のみ `src/opencode-local/` から接続） | 個人利用環境のローカルリポジトリ |
+
+`consumer-generated` はローカル版 OpenCode を link mode で導入する利用側リポジトリである（REQ-009, REQ-009, REQ-009）。
+`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（`agentdev-gh-cli` 以外）を `src/opencode/` 配下へ接続し、`.opencode/skills/agentdev-gh-cli/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続する。
+詳細は本 SPEC の「link mode 接続手順技術詳細」を参照。
+
+### リポジトリ種別判定基準
+
+| 条件 | リポジトリ種別 |
+|------|-----------|
+| `src/opencode/` が存在し `.opencode/` がジャンクション | `self-hosting` |
+| `.opencode/commands/agentdev/` または `.opencode/skills/agentdev-*/` が存在（ジャンクション、シンボリックリンク含む） | `consumer-with-agentdev` |
+| `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される | `consumer-generated` |
+| `.opencode/` が存在し `agentdev` 名前空間を含まない | `consumer-local` |
+| 上記いずれでもない | N/A（OpenCode 非使用リポジトリ） |
+
+## リポジトリ種別別 `.opencode/` 意味
+
+### 本体リポジトリ（self-hosting）
+
+```
+.opencode/                       → real directory (not junction)
+  commands/agentdev/             → junction → src/opencode/commands/agentdev/
+  skills/agentdev-*/             → junction → src/opencode/skills/agentdev-*/ (per skill)
+  .gitignore                     → copy from src/opencode/.gitignore (real file)
+  (opencode runtime files)       → sessions, config, etc. managed by opencode itself
+src/opencode/
+commands/agentdev/             → 原本
+skills/agentdev-*/             → 原本
+```
+
+- 原本編集は `src/opencode/` で実施
+- `.opencode/` は実ディレクトリとして動作（全体ジャンクションではない）
+- `sync-opencode.ps1` が `commands/agentdev/` と `skills/agentdev-*/` を個別ジャンクションとして管理
+- ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）
+- `.gitignore` は `src/opencode/.gitignore` から実ファイルとしてコピー
+- `.opencode/` 内の非管理ファイル（セッション、設定等）は opencode ランタイムが自由に配置可能
+
+### 本体リポジトリ sync
+
+**配布対象ディレクトリ**:
+- `.opencode/commands/agentdev/` → junction → `src/opencode/commands/agentdev/`
+- `.opencode/skills/agentdev-*/` → junction → `src/opencode/skills/agentdev-*/`
+
+**scripts/ 配下の配布境界（skills/agentdev-*/scripts/ 配下）**:
+配布対象: `*.ts`（TSソース）、`lib/*.ts`（共有ライブラリ）、`tests/*.test.ts`（テスト）、`package.json`、`tsconfig.json`、`bun.lock`、`.gitignore`、`README.md`
+除外対象: `node_modules/`（.gitignore で除外済み、consumer 側で `bun install` により再生成）
+
+scripts/ は skill junction の配下に位置し、skill の一部として配布される。
+ジャンクション対象は `agentdev-*` グロブで動的列挙（ハードコードなし）。
+
+### Consumer（AgentDevFlow 導入済み）
+
+```
+.opencode/
+  commands/agentdev/  → AgentDevFlow 提供コマンド (symlink or junction)
+  commands/{local}/   → プロジェクトローカルコマンド
+  skills/agentdev-*/  → AgentDevFlow 提供スキル (symlink or junction)
+  skills/{local}-*/   → プロジェクトローカルスキル
+```
+
+- AgentDevFlow 提供ファイルは symlink/ジャンクション推奨、copy は非推奨
+- プロジェクトローカルファイルは直接管理
+- `.agentdev/` ドメイン状態ディレクトリが存在
+
+### Consumer（ローカル）
+
+```
+.opencode/
+  commands/{local}/   → プロジェクトローカルコマンドのみ
+  skills/{local}-*/   → プロジェクトローカルスキルのみ
+```
+
+- プロジェクトローカル名前空間（`agentdev` 以外）を使用する（REQ-002-056）
+- 自由に `.opencode/` を管理
+
+### Consumer（ローカル版 link mode）
+
+```
+.opencode/
+  commands/agentdev/      → link → src/opencode/commands/agentdev/
+  skills/agentdev-*/      → link → src/opencode/skills/agentdev-*/（agentdev-gh-cli 以外）
+  skills/agentdev-gh-cli/ → link → src/opencode-local/agentdev-gh-cli/
+.agentdev/
+  cases/                  → ローカル Case ファイル（Issue / PR 相当の永続情報）
+```
+
+- `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（`agentdev-gh-cli` 以外）を `src/opencode/` 配下へ接続する（REQ-009 decision #2）
+- `.opencode/skills/agentdev-gh-cli/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続する（REQ-009 decision #3）
+- link target が意図した target 以外へ解決される場合は link 設定を停止する（REQ-009-010, REQ-009 decision #6）
+- `.opencode/commands/`, `.opencode/skills/`, `.opencode/` 配下ひな形は link により git 管理対象外（REQ-009-008, REQ-009 decision #1）
+- `.agentdev/cases/` 配下のローカル Case ファイルはリポジトリ管理対象（REQ-009-016）
+
+## プロジェクトローカル命名規則（Project-Local Naming Rules）
+
+Consumer プロジェクトで独自 command/skill を追加する際の命名規約（REQ-002-063）。
+
+### 予約名（Reserved Names）
+
+| 名前 | 種別 | 使用可能リポジトリ種別 |
+|------|------|-------------------|
+| `agentdev` | コマンド名前空間 | `self-hosting`, `consumer-with-agentdev`, `consumer-generated` |
+| `agentdev-*` | スキルプレフィックス | `self-hosting`, `consumer-with-agentdev`, `consumer-generated` |
+| `.agentdev/` | ドメイン状態ディレクトリ | `self-hosting`, `consumer-with-agentdev`, `consumer-generated` |
+
+### 命名規約
+
+| 規則 | 説明 | 根拠 |
+|------|------|------|
+| 名前空間衝突回避 | `agentdev` / `agentdev-*` / `.agentdev/` 以外の名前を使用 | REQ-002-056 |
+| kebab-case | skill 名は小文字、数字、ハイフンのみ | REQ-002-011 |
+| 意味的命名 | プロジェクト名やドメイン名をプレフィックスに含めることを推奨 | 運用規約 |
+| 独自ディレクトリ | 独自 skill は `.opencode/skills/{project}-*/` に配置 | 運用規約 |
+
+### 衝突検出
+
+`consumer-local` リポジトリで `agentdev` 名前空間が検出された場合、docs-check（IR-016）が NG として報告する。
+
+## 導入方式ポリシー（Installation Method Policy）
+
+通常の consumer 導入は symlink または junction ベースの link mode を推奨する（REQ-009-009）。
+具体化された release archive は別個の配布および検証 projection であり、REQ-009-045 が別途正規所有する。
+copy 型インストール（.opencode/ 配下へ配布成果物の実体を複製する方式）と npm/package 化は対象外を維持し、release archive を通常の copy インストールの延長として扱わない。
+
+provisioning（agent-dev-flow チェックアウトの取得）は利用者の責務であり、利用者による git clone と利用者によるソース ZIP 展開の2形態を正規の provisioning 形態とする（REQ-009-010、REQ-009-046、DEC-016）。
+install スクリプトはチェックアウト済みの `.agentdev-plugin/` を前提に junction 設定のみを行い、provisioning（clone、fetch、reset）と network access を行わない。
+
+provisioning（チェックアウトの取得手段: clone / ZIP 展開）と install 手段（link mode による junction 接続）は別軸である。
+ZIP 展開による provisioning は手動 copy インストールに該当せず、install 手段は引き続き link mode に限定される。
+「source ZIP によるチェックアウト供給」と「release archive projection」は別個の概念であり、両者を混同する説明をしない。
+
+配布依存境界の検出契約（link projection と archive projection の区別、projection ごとの検査、検査エラーの取扱い）は `integrity/distribution-boundary.md` が正規所有する（REQ-029、DEC-014）。
+
+| 方式 | 状態 | 推奨度 | 備考 |
+|--------|--------|--------|------|
+| Symlink / ジャンクション | 対応済み | **推奨** | 更新自動反映、原本単一管理 |
+| Copy | 対応済み | 非推奨 | 手動更新必要、乖離リスク |
+| Git submodule | 検討可能 | 実験的 | 複雑性増加 |
+| Plugin / npm / package | 未対応 | - | REQ-002-064 参照 |
+| Release archive projection | 別投影 | 別投影 | REQ-009-045、copy インストールの延長ではない |
+
+### Symlink / ジャンクションの制約
+
+| Platform | 方法 | 制約 |
+|----------|------|------|
+| Windows | ジャンクション (`mklink /J`) | 管理者権限不要、ディレクトリのみ対応 |
+| Windows | Symlink (`mklink /D`) | 開発者モードまたは管理者権限が必要 |
+| Unix | Symlink (`ln -s`) | 権限不要 |
+
+### Copy の乖離検出
+
+Copy ベース導入では AgentDevFlow 更新時に乖離（drift）が発生する。
+docs-check（IR-016）が乖離（divergence）を検出、報告する。
+
+## リポジトリ種別別同期スクリプト範囲（Sync Script Scope）
+
+`sync-opencode.ps1` の適用範囲（REQ-002-065）。
+
+| リポジトリ種別 | 同期対象 | 非対象 |
+|-----------|----------|--------|
+| `self-hosting` | `commands/agentdev/` + `skills/agentdev-*/` の選択的ジャンクション + `.gitignore` コピー | opencode 実行時ファイル（sessions, config 等） |
+| `consumer-with-agentdev` | AgentDevFlow 提供ファイルのみ | プロジェクトローカルカスタマイズ |
+| `consumer-local` | なし（適用対象外） | 全体 |
+| `consumer-generated` | なし（適用対象外）。link 設定により接続されるため同期スクリプト対象外 | 全体 |
+
+> plugin/npm/package 配布形態は現在未対応である（REQ-002-064 参照）。
+
+### 本体リポジトリでの同期モード
+
+| Mode | 動作 |
+|------|------|
+| `apply` | `src/opencode/` → `.opencode/` の同期実行 |
+| `check` | 乖離検出（終了コードで判定） |
+| `dry-run` | 変更予測（実行なし） |
+
+### Consumer での同期
+
+Consumer では AgentDevFlow 本体から提供されるファイルのみを同期対象とする。
+プロジェクトローカルカスタマイズは同期の影響を受けない。
+
+## link mode 接続手順技術詳細
+
+`consumer-generated` リポジトリ種別における link mode 接続の技術詳細を明文化する（REQ-009 decision #2, #3, #6, REQ-009, v2:REQ-0150）。
+
+### local mode のリンク構成
+
+| リンク元（`.opencode/` 配下） | リンク先 | 備考 |
+|-------------------------------|----------|------|
+| `commands/agentdev/` | `src/opencode/commands/agentdev/` | 通常版と同一接続先（REQ-009 decision #2） |
+| `skills/agentdev-*/`（`agentdev-gh-cli` 以外） | `src/opencode/skills/agentdev-*/` | 通常版と同一接続先（REQ-009 decision #2） |
+| `skills/agentdev-gh-cli/` | `src/opencode-local/agentdev-gh-cli/` | local mode のみ差し替え接続先（REQ-009 decision #3, v2:REQ-0150） |
+
+`agentdev-gh-cli` 以外は通常版と同一の `src/opencode/` 配下へ接続し、`agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/` へ接続することでローカル版環境を構成する。
+`src/opencode/` は GitHub 版専用原本であり、ローカル版はこれを変更しない（REQ-009 decision #7）。
+
+### ローカル I/O パッケージ契約
+
+`src/opencode-local/agentdev-gh-cli/` はローカル版 `agentdev-gh-cli` の唯一の原本である。
+
+ローカル版は標準版と同じ手続き名を提供し、Issue と PR の読取り、更新、作成済み状態、取り込み結果を `.agentdev/cases/case-{NNNN}.md` の対応する記録へ読み替える。
+
+上位の command と skill は常に `agentdev-gh-cli` を参照し、ローカル版専用の別名 skill や分岐を持たない。
+
+`case-schema/` はローカル I/O の操作用定義として当該パッケージに含める。
+
+Case ファイルのスキーマ正本は [ローカル Case ファイル](local-case-file.md) とし、ローカル I/O パッケージは正本を再定義しない。
+
+ローカル版のための汎用バックエンド抽象化、`src/opencode-local/skills/`、ローカル版 command、ローカル版 template は作成しない。
+
+### install-consumer-opencode.ps1 -LocalMode の入出力契約
+
+`install-consumer-opencode.ps1` は既存の `-Mode` パラメータ（dry-run / check / apply）に `-LocalMode` スイッチを追加し、local mode のリンク設定を実行する。
+
+| パラメータ | リンク構成 |
+|-----------|-----------|
+| `-LocalMode` 未指定（既定） | 通常版: 全 agentdev command/skill を `src/opencode/` 配下へ接続 |
+| `-LocalMode` 指定時 | local mode: `agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/` へ接続、それ以外は `src/opencode/` 配下へ接続 |
+
+`-Mode`（dry-run / check / apply）は `-LocalMode` の有無にかかわらず従来通り動作し、チェックアウト検証と junction 設定の各フェーズで適用される。
+別スクリプト（`install-consumer-opencode-local.ps1` 等）は新設せず、エントリポイントを単一に維持する。
+これは既存 `-Mode` パターンと整合し、チェックアウト検証と junction 設定のロジック重複を避けるための採用判断である。
+
+### check-consumer-opencode.ps1 の local mode リンク状態検出条件
+
+`check-consumer-opencode.ps1` は `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合、リポジトリ種別を `consumer-generated` として検出、報告する（リポジトリ種別判定基準表参照）。
+通常版のリンク構成（`agentdev-gh-cli` も `src/opencode/` 配下へ接続）との違いを当該 link target で識別する。
+
+### チェックアウト検証（usable checkout 判定）
+
+install-consumer-opencode.ps1 と check-consumer-opencode.ps1 は、agent-dev-flow チェックアウトの検証を git リポジトリ性必須判定ではなく usable checkout 判定で行う。
+判定基準はチェックアウト配置先（既定 `.agentdev-plugin/`）配下に `src/opencode/` が存在することであり、`.git` の存在を必須としない（REQ-009-047、REQ-009-048）。
+
+チェックアウトが検出できない場合（チェックアウト配置先に `src/opencode/` が存在しない場合を含む）、両スクリプトはエラー停止し、clone コマンド例とソースアーカイブ取得手順を案内表示する。
+provisioning を代行実行しない。
+
+check-consumer-opencode.ps1 の版（commit/branch）報告は `.git` が存在する場合のみ行い、ZIP 展開チェックアウト（`.git` なし）の版は unknown とする。
+「.agentdev-plugin/ が git リポジトリでない」は乖離（DIVERGENCE）ではなく情報報告として扱う。
+version manifest ファイルは導入しない。
+ZIP 展開環境はサポート対象外とし、不具合報告の受け付け対象から除外する運用とする。
+
+### 更新運用
+
+導入済み環境の更新は利用者の責務である（REQ-009-049）。
+git clone 環境では git pull 後に install を再実行する。
+ZIP 展開環境では ZIP 再取得・ディレクトリ差し替え後に install を再実行する。
+install の apply は冪等であり、再実行で junction 構成を変化させない。
+ZIP 更新時の install 再実行の要否は仕様として推奨・不推奨の形で定めず、利用者判断に委ねる。
+
+### link target 確認方式
+
+`.opencode/` 配下の実パス確認は、ジャンクション環境での一律停止（v2:ADR-0126 decision #3、廃止済み）から、意図した link target かどうかを確認する方式へ見直す（REQ-009 decision #6, REQ-009-010）。
+link target が意図した target 以外へ解決される場合は link 設定を停止する。
+
+#### ジャンクション状態の判定と自己修復
+
+`install-consumer-opencode.ps1` は各ジャンクション対象について、ジャンクションの有無と解決先の一致を確認する（PR #1120）。
+各対象は以下のいずれかに分類される。
+
+| 状態 | 判定基準 | apply モードの挙動 | check / dry-run モードの挙動 |
+|------|----------|-------------------|-----------------------------|
+| 正常（correct target） | ジャンクションが存在し、解決先が意図した src 配下に一致 | 維持（再作成しない） | OK として報告 |
+| wrong target | ジャンクションは存在するが、解決先が意図した src 配下と不一致、または解決先が存在しない | ジャンクションを削除して再作成（自己修復） | NG として報告 |
+| ジャンクション以外のパス | パスが存在するがジャンクションでない | エラー停止 | エラーとして報告 |
+
+意図した src 配下は LocalMode の有無により切り替わる。
+通常版は `src/opencode/` 配下、LocalMode 指定時は `agentdev-gh-cli` のみ `src/opencode-local/agentdev-gh-cli/`、それ以外は `src/opencode/` 配下である（REQ-009 decision #2, #3）。
+
+wrong target は「ジャンクション自体は存在するが、意図した接続先へ接続されていない、または接続先が解決不能」な状態である。
+PR #1120 により、従来の「ジャンクションが存在すれば正常とみなす」判定から、`Resolve-Path` により実際の解決先と期待される src 配下を比較して意図した target か確認する判定へ拡張された。
+apply モードでは wrong target のジャンクションを削除、再作成することで、利用者の介入なしに正しい接続先へ復元する。
+
+#### link mode の設定と更新
+
+link 設定は導入先リポジトリでだけ実行し、AgentDevFlow 本体リポジトリでは実行しない。
+
+設定前に各 link の実パスを確認し、意図した target 以外へ解決される場合は設定を停止する。
+
+設定後は command、skill、`agentdev-gh-cli` の各 link が期待する原本へ解決されることを確認する。
+
+更新時は既存 link を解除してから同じ target へ再接続し、差分生成や変換処理は行わない。
+
+設定結果は仕様管理リポジトリ、導入先リポジトリ、設定した link、target 確認結果、手動確認事項、結果を報告する。
+
+#### 自己修復の適用範囲
+
+wrong target 検出、再作成ロジックは LocalMode と通常版 install の両方に適用される。
+リポジトリ種別の切り替え（通常版 ↔ LocalMode）後に旧接続先のジャンクションが残存していても、apply 再実行により正しい接続先へ復元される。
+これにより通常版 install でも自己修復性が向上した。
+
+## 配布物依存スキルの src 昇格（REQ-002-001/002、v2:ADR-0134）
+
+`.opencode/skills/` 配下は既定で `.gitignore` により git 管理対象外である。
+配布物（`src/opencode/commands/`, `src/opencode/skills/`）が `.opencode/skills/` 配下のスキルを参照する場合、新規 clone 環境でスキルが不在になり配布物の自己完結性（self-contained）が崩れる。
+配布物が依存するスキルは `src/opencode/skills/` へ昇格（配布物化）し、repo-local 専用スキルと明確に境界を分ける（v2:ADR-0134）。
+
+### 昇格基準
+
+| 区分 | 配置 | git 管理 | 配布 | 根拠 |
+|------|------|----------|------|------|
+| 配布物依存スキル | `src/opencode/skills/<name>/` | `src/` 配下で通常トラック | `agentdev-*` グロブ対象外の場合は install script で個別 junction 対象に追加 | v2:ADR-0134 / REQ-002-001 |
+| repo-local 専用スキル | `.opencode/skills/repo-*/` | `.gitignore` `repo-*` ホワイトリストでトラック | 配布対象外（REQ-001） | REQ-001 / REQ-002-002 |
+
+昇格判定は「配布物（`src/opencode/commands/`, `src/opencode/skills/`）が当該スキルを参照するか否か」で機械的に行う。
+参照の有無は IR-058（後述）が `git ls-files` 突合とテキスト参照走査で検出する。
+
+### 昇格手順
+
+1. **参照確認**: 配布物（`src/opencode/commands/**/*.md`, `src/opencode/skills/**/*.md`）から当該スキル名が参照されていることを確認
+2. **昇格**: `git mv .opencode/skills/<name>/ <files> src/opencode/skills/<name>/`
+3. **`.gitignore` 整理**: 当該スキルが `repo-*` ホワイトリスト以外で個別にトラックされていた場合はその行を削除
+4. **同期スクリプト更新**: `agentdev-*` グロブで自動 junction 対象外の場合、`sync-self-opencode.ps1` と `install-consumer-opencode.ps1` の `Get-ConsumerJunctionTargets` / `Get-SelectiveJunctionTargets` に個別追加
+5. **README 推奨 .gitignore 更新**: consumer 向け推奨 `.gitignore` へ当該スキルを追加
+6. **検査**: docs-check で IR-016（source-projection-sync）と IR-058（distribution-untracked-skill-reference）の NG が 0 件であることを確認
+
+### 現行の境界（2026-07-03 時点）
+
+| スキル | 区分 | 備考 |
+|--------|------|------|
+| `agentdev-*` 全 27 件 | 配布物依存 | `src/opencode/skills/` 配下、`agentdev-*` グロブで自動 junction |
+| `japanese-tech-writing` | 配布物依存 | `agentdev-doc-writing` が執筆規範 SSoT として参照（PR #1385 で昇格）。`agentdev-*` 非準拠のため install script で個別 junction 対象 |
+| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` 卡out 対象。検証スクリプトを呼び出す command は DEC-006 により3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ正規化済み。これらが `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 SPEC の対象外） |
+
+## 関連項目（See Also）
+
+- [Consumer Project Setup Guide](../../guides/consumer-project-setup.md)（Consumer 向け導入手順）
+- [Artifact Contracts](../responsibilities/artifact-contracts.md)（Command/Skill/Template/Script の責務境界）
+- [ローカル Case ファイル](local-case-file.md)（`consumer-generated` リポジトリ種別の Case ファイルスキーマ）
+- [整合性ルールカタログ](../integrity/integrity-rule-catalog.md)（IR-058 distribution-untracked-skill-reference）
+- REQ-002-061~065（リポジトリ種別 / `.opencode/` 意味 / 命名 / 導入 / 同期範囲の要件定義）
+- REQ-009（配布基盤: link mode 導入の宣言）
+- REQ-009（ローカル版 OpenCode 導入方式とローカル Case ファイル運用（`consumer-generated` リポジトリ種別））
+- REQ-002（配布物依存スキルの src 昇格方針と未トラックスキル検出）
+- REQ-009（ローカル版導入方式を link mode へ統一し生成方式を廃止。v2:ADR-0126 を supersede）
+- v2:ADR-0134（配布物依存スキルの src 昇格方針）

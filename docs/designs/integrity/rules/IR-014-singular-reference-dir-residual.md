@@ -1,0 +1,25 @@
+---
+title: "IR-014: reference/ 残存検出"
+status: accepted
+created: 2026-08-20
+updated: 2026-08-20
+---
+
+# IR-014: reference/ 残存検出
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-014 |
+| description | .opencode/skills/**/reference/ (単数形) ディレクトリが残存していないこと |
+| severity | strict |
+| category | obsolete-structure |
+| detection_method | glob で reference/ ディレクトリ検索 |
+| affected_artifacts | [skills] |
+| related_req | [REQ-002-013, 039, REQ-037-006, 007] |
+| related_spec | [artifact-responsibilities.md] |
+| gate_level | full-audit |
+| false_positive_risk | なし |
+| regression_test | lint_skills.test.ts |
+| finding_route | intake |
+| triage_action | reference/ を references/ にリネーム |
+| last_verified | 2026-06-06 |

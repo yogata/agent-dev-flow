@@ -1,0 +1,32 @@
+---
+title: "IR-006: Command frontmatter 許可フィールド"
+status: accepted
+created: 2026-08-20
+updated: 2026-08-06
+---
+
+# IR-006: Command frontmatter 許可フィールド
+
+| Field | Value |
+|-------|-------|
+| rule_id | IR-006 |
+| description | Command frontmatter に description 単一のみが存在すること。agent, pattern, workflow_route, branch_type, labels は禁止 |
+| severity | strict |
+| category | document-drift |
+| detection_method | frontmatter field 列挙 → 許可リストと照合 |
+| affected_artifacts | [commands] |
+| related_req | [REQ-002-015, REQ-039-002] |
+| related_spec | [integrity-contracts.md, artifact-contracts.md] |
+| gate_level | full-audit, delta-guard |
+| false_positive_risk | 低 |
+| regression_test | command_fixtures.test.ts |
+| finding_route | intake |
+| triage_action | 禁止 field を frontmatter から削除 |
+| last_verified | 2026-06-06 |
+
+## IR-006 ルール定義
+
+IR-006（command 許可 frontmatter）のルール定義と実装を description 単一許可へ更新する。
+新規ルール化せず既存ルールの定義と checker 実装を更新する（移行計画 §2 固定方針）。
+rule-ownership.md 中の IR-006 所有権記述も整合させる。
+詳細 normative は移行計画 §5.2。
