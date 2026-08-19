@@ -37,7 +37,7 @@ extension の5セクション（`context` / `rules` / `checks` / `acceptance_gat
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-auto` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004、REQ-{NNNN}-{NNN}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-auto` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}、REQ-{NNNN}-{NNN}）。
 同スキルが8 STEP の control plane として制御構造を所有する。
 各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 

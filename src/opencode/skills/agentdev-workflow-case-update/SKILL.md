@@ -10,7 +10,7 @@ case-update command の workflow 実装本体。
 主にレビューNG時の対応で使用される。
 CI/CD修正、自律修正ループは管轄外（case-run の責務）である。
 
-case-update command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+case-update command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
 ## 原本（SSoT）
 
@@ -80,7 +80,7 @@ case-update workflow は次の4 STEP で構成する。
 - `agentdev-workflow-lifecycle`: 現在フェーズ判定、work_type 分岐の参照
 - `agentdev-workflow-templates`: テンプレート選定、コメント/レビューNGコメントの【必須】セクション検査
 - `agentdev-gh-cli`: Issue 本文更新、Issue コメント追加の I/O 手続きと VERIFY
-- `agentdev-quality-gates`: QG-{N} 乖離検出結果の引用（--review-ng 時）
+- `agentdev-quality-gates`: QG-3 乖離検出結果の引用（--review-ng 時）
 - `agentdev-git-worktree`: `--req` 時の並列実行安全ステージング
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 

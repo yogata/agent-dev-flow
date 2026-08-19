@@ -31,7 +31,7 @@ auto_gate:
   # auto_ready が false の場合、または未解決 item が残る場合、後続コマンドは停止する
   # 未確定内容抑止: agreed_items/artifact_actions の content に TBD/TODO/未定/後続工程で確定/case-run で確定
   #   のいずれかを含む場合、auto_ready: false とし該当 AG-ID/ACT-ID と理由を stop_reasons へ記録する
-  #   （引用・禁止事例の言及は誤検知対象外）。QG-{N} 意味判定（必須フィールド欠落等）も併用する
+  #   （引用・禁止事例の言及は誤検知対象外）。QG-1 意味判定（必須フィールド欠落等）も併用する
   auto_ready: true
   unresolved_questions: []      # 未解決質問が残る場合は停止理由として列挙
   unresolved_conflicts: []      # 未解決衝突が残る場合は停止理由として列挙

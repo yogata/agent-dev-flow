@@ -210,7 +210,7 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
 |---|---|---|
 | 実装方針の形成と限定 | REQ-{NNNN}-{NNN} | 委譲内で既確定 Issue/REQ/ADR/SPEC を実現する内部選択として実装方針を形成する。case-run 本体は形成しない |
 | 実施位置 | REQ-{NNNN}-{NNN} | 最初の実装変更前に実施する（実装、検証、PR 作成より前） |
-| 委譲内 review 呼出 | REQ-{NNNN}-{NNN}/002 | adapter 委譲内で実行担当サブエージェントが発動条件判定（ユーザー明示指定）と review 呼出を分離して実施する |
+| 委譲内 review 呼出 | REQ-{NNNN}-{NNN}/{NNN} | adapter 委譲内で実行担当サブエージェントが発動条件判定（ユーザー明示指定）と review 呼出を分離して実施する |
 | blocked 遷移（実装方針限定違反） | REQ-{NNNN}-{NNN} | 実装方針が既確定文書の変更、追加、撤回を必要とする場合は blocked へ遷移する |
 | blocked 遷移（要件/仕様問題） | REQ-{NNNN}-{NNN} | 要件、仕様問題を検出した場合は勝手に仕様変更せず blocked へ遷移する |
 | blocked 遷移（unresolved 残存） | REQ-{NNNN}-{NNN} | unresolved な本質的争点またはユーザー判断事項が残る場合は実装の最初の変更へ進まず blocked へ遷移する |
@@ -218,7 +218,7 @@ STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
 | accepted finding 反映 | REQ-{NNNN}-{NNN} | accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務 |
 | 再 review 条件 | REQ-{NNNN}-{NNN} | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review SPEC） |
 | 呼出失敗時の扱い | REQ-{NNNN}-{NNN} | silent skip 禁止、従来フロー維持（正は adversarial-review SPEC） |
-| 副作用境界 | REQ-{NNNN}-{NNN}/005 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review SPEC、delegation-contracts SPEC） |
+| 副作用境界 | REQ-{NNNN}-{NNN}/{NNN} | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review SPEC、delegation-contracts SPEC） |
 
 ## See Also
 

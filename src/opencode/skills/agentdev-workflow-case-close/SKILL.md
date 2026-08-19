@@ -8,7 +8,7 @@ description: "case-close command の workflow 実装本体。PR マージ（squa
 case-close command の workflow 実装本体。
 PR マージから Issue クローズ、Capture 回収、ドメイン状態永続化、完了報告までの制御構造、QG-4 最終完了判定ゲート（完了条件チェックボックス評価・更新）、SPEC 確定（draft → accepted 昇格）、Epic Wave クローズ（E1〜E6、単一書き手）を所有する。
 
-case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
 ## 原本（SSoT）
 
@@ -99,7 +99,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - `agentdev-conventional-commits`: GitHub auto-close 回避ガイドライン
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-artifact-graph`: トレーサビリティ派生索引（変更後の整合性確認、verification feedback。fail-open）
-- integrity checker skill（repo-local）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）
+- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）
 
 ## Artifact Graph 利用
 

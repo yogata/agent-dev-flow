@@ -18,7 +18,7 @@ description: ADR/REQ/SPEC 横断の文書品質査読ゲート。文書種別責
 
 書かれた文書の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。
 対象は `docs/` 配下の REQ/ADR/SPEC/guides/README、および docs を生成、編集する command/skill の自然言語記述である。
-QG-{N}〜QG-{N} の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける。
+QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける。
 
 
 本スキルは**静的査読**を担う。
@@ -105,7 +105,7 @@ QG-{N}〜QG-{N} の主ゲート体系を置き換えず、文書種別責務、�
 - ユーザーが「AIっぽい」「薄い」「抽象的」「意味不明」「ビジネス文書として直せ」と指示した場合
 - Issue/PR 本文、完了報告、設計説明を執筆またはレビューする場合
 - `read-only`、`advisor`、`architecture-affecting` 等の英語混じり表現が docs に残留していないか確認する場合
-- 配布物（`src/opencode/commands/`、`src/opencode/skills/`）に AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等）が残留していないか確認する場合
+- 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）に AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等）が残留していないか確認する場合
 - SPEC / command / skill で実行主体（command / skill / subagent / harness）が誤認されていないか確認する場合（例: 実行 command を skill と記述、`load_skills` に command 名を指定、harness を skill と呼ぶ）
 
 ## 制約
