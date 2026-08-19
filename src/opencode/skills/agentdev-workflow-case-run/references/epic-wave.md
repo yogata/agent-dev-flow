@@ -35,17 +35,19 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。
 同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
 
+**Epic 実証判定（統合先確定）**: Epic Issue 本文の実証Case識別情報から、Epic 実証の場合は共有評価ブランチ（当該 Epic の統合先）を特定する。実証Case識別情報がない場合は通常 Epic として main（既定）を統合先とする。Epic 実証では全 Wave が同一の評価ブランチを統合先として継承する（評価ブランチ継承の実行詳細は epic-wave-model SPEC 参照）。
+
 **Epic Issue の入力ソース**: Epic Issue は本来の Epic flow（マルチREQ、`scale: large`）に加え、Standard flow 起因の独立 OU 自動 Epic 化（case-open が `depends_on` 空、L0 相当の独立 OU を検出して Epic 化）によるものも含む。
 入力ソースを区別せず、Epic Wave モデル（ADR、最大5件並列委譲）で一様に処理する。
 いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
 
 ### Result
 
-- 現在 ready な Wave の子Issue 群（子Issue番号、状態）確定
+- 現在 ready な Wave の子Issue 群（子Issue番号、状態）確定、Epic の統合先確定（通常 Epic は main、Epic 実証は共有評価ブランチ）
 
 ### Evidence
 
-- Epic Issue 本文読取結果、Wave 選択の根拠（子Issue 状態一覧）
+- Epic Issue 本文読取結果、Wave 選択の根拠（子Issue 状態一覧）、Epic 実証判定結果（実証Case識別情報の有無と共有評価ブランチ）
 
 ### Completion Verification
 
@@ -74,8 +76,8 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 
 ### Procedure
 
-- `git fetch origin` を実行しベースブランチの鮮度を確認する（Wave 実行時、PR merge 後再開時は必須）
-- 子Issue ごとに worktree とブランチを作成する（`agentdev-git-worktree` 参照。べき等チェック: 既存時はスキップ）
+- `git fetch origin` を実行し統合先（STEP-W1 で確定した Epic の統合先）の鮮度を確認する（Wave 実行時、PR merge 後再開時は必須）
+- 子Issue ごとに worktree とブランチを作成する（`agentdev-git-worktree` 参照。作成元は当該 Epic の統合先を明示的に指定する。通常 Epic は従来どおり main を起点とし、Epic 実証は共有評価ブランチを起点とする。Epic 後続 Wave の作業起点も同一の統合先を参照。べき等チェック: 既存時はスキップ）
 - 子Issue ごとに前置 gate 群（single.md STEP-S3 の STEP-S3-2〜S3-5 と同一契約: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時 targeted docs guard、配布依存境界 事前チェック）を適用する
 - 子Issue ごとの worktree 設置の L2 タイムスタンプを記録する
 
