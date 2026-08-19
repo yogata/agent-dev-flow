@@ -12,7 +12,7 @@ status: accepted
 | category | integrity-rule-gap |
 | detection_method | baseline.json の known_findings と現行 finding の比較 |
 | affected_artifacts | [baseline, integrity reports] |
-| related_req | [REQ-010-145, 148] |
+| related_req | [REQ-010-007] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit, impact-guard |
 | false_positive_risk | 中。基準（baseline）の陳腐化判定に注意 |

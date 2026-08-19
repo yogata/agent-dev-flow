@@ -12,7 +12,7 @@ status: accepted
 | category | document-drift |
 | detection_method | directory 名と frontmatter name の比較 |
 | affected_artifacts | [skills] |
-| related_req | [REQ-010-092] |
+| related_req | [REQ-010] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低 |

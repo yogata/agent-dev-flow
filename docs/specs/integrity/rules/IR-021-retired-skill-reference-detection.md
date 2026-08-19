@@ -12,7 +12,7 @@ status: accepted
 | category | obsolete-structure |
 | detection_method | 正規表現で廃止 skill 名検出 |
 | affected_artifacts | [commands, skills, SPEC] |
-| related_req | [REQ-010-126-128] |
+| related_req | [REQ-010] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低 |

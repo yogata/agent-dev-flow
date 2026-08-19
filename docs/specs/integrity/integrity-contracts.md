@@ -32,7 +32,7 @@ updated: 2026-08-18
 | workflow-gap | workflow 定義の欠落 | heuristic |
 | integrity-rule-gap | 検査ルール自体の欠落 | observation |
 
-> **REQ/SPEC 境界違反**（REQ-010-260）: 現行 REQ 要件行の主たる文意が SPEC 詳細（スキーマフィールド、enum 値一覧、テストデータ詳細、チェッカー個別ルール、誤検知抑制方式、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）である場合は canonical-conflict のサブカテゴリとして扱い、IR-044 で heuristic 検出する。
+> **REQ/SPEC 境界違反**: 現行 REQ 要件行の主たる文意が SPEC 詳細（スキーマフィールド、enum 値一覧、テストデータ詳細、チェッカー個別ルール、誤検知抑制方式、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）である場合は canonical-conflict のサブカテゴリとして扱い、IR-044 で heuristic 検出する。
 > REQ-001-069 の安定契約例外（公開コマンド名、公開入口、ドメイン状態位置づけ、他コマンド接続契約、利用者可視分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外とする。
 
 ## 検出事項経路マップ（Finding Route Map）
@@ -62,16 +62,16 @@ updated: 2026-08-18
 | Canonical | 正規境界の遵守 |
 | Lifecycle | 状態遷移の妥当性 |
 | Namespace | 旧名前空間残存確認 |
-| ImplementationPattern | frontmatter 禁止フィールド検査（REQ-036-014〜021、REQ-037-001〜005 から反転、REQ-010-109/124 に統合済） |
-| ADRStatusNormalization | ADR status 旧形式検出（REQ-010-121） |
-| RuidGroundReference | docs 永続文書内の RU-ID 参照検出（REQ-010-122） |
-| WorkflowStatusProhibition | ワークフロー状態 / 6 マイクロフェーズ検出（REQ-010-123） |
-| AcceptedAdrCitation | 承認済み以外の ADR 引用検出（REQ-010-125, 推奨）。廃止 ADR への履歴参照は現行根拠引用 heuristic と区別する（REQ-001-050） |
-| AbolishedSkillReference | 廃止済み skill への参照検知（REQ-010-126） |
-| CommandLocalTemplate | command-local template 存在、整合性検査（REQ-010-127） |
-| SkillSpecDependency | 実行時スキルから docs/specs/ への直接依存検出（REQ-010-128） |
+| ImplementationPattern | frontmatter 禁止フィールド検査（REQ-036-014〜021、REQ-037-001〜005 から反転） |
+| ADRStatusNormalization | ADR status 旧形式検出 |
+| RuidGroundReference | docs 永続文書内の RU-ID 参照検出 |
+| WorkflowStatusProhibition | ワークフロー状態 / 6 マイクロフェーズ検出 |
+| AcceptedAdrCitation | 承認済み以外の ADR 引用検出（推奨）。廃止 ADR への履歴参照は現行根拠引用 heuristic と区別する（REQ-001-050） |
+| AbolishedSkillReference | 廃止済み skill への参照検知 |
+| CommandLocalTemplate | command-local template 存在、整合性検査 |
+| SkillSpecDependency | 実行時スキルから docs/specs/ への直接依存検出 |
 | RetiredAdrCitation | 廃止 ADR への現行根拠引用検出（REQ-001-048, heuristic/observation） |
-| ReqSpecBoundary | 現行 REQ 要件行への SPEC 詳細混入検出（REQ-010-260, REQ-001-067〜069。IR-044 としてカタログ定義。REQ-001-069 安定契約例外は対象外） |
+| ReqSpecBoundary | 現行 REQ 要件行への SPEC 詳細混入検出（REQ-001-067〜069。IR-044 としてカタログ定義。REQ-001-069 安定契約例外は対象外） |
 
 ## レポート形式（Report Format）
 
@@ -136,7 +136,7 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 | `case-run` | worktree 内の全ファイル | worktree 外、`.agentdev/` |
 | `case-close` | GitHub Issue/PR, worktree 削除 | `.agentdev/intake/inbox/` 直接書込 |
 | `case-update` | GitHub Issue のみ | ローカルファイル |
-| `docs-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（実行時。実行自体を承認として扱い、追加のユーザー承認は不要。REQ-010-225, REQ-001-059） | 検査対象アーティファクト |
+| `docs-check` | `.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`（実行時。実行自体を承認として扱い、追加のユーザー承認は不要。REQ-001-059） | 検査対象アーティファクト |
 
 > **注記**: `docs-check` は `/repo/docs-check` として実行される配布対象外コマンドである（REQ-001）。
 > AgentDevFlow の配布対象外。
@@ -327,7 +327,7 @@ PR #2152（merge 4bf264b7）で実装された検出拡張4点を本節の正規
 
 ## RuntimeReference baseline 運用手順（REQ-036-009）
 
-IR-055（runtime-unresolved-reference）は段階導入（REQ-010-264）のため、baseline 既知違反と新規違反を区別する。
+IR-055（runtime-unresolved-reference）は段階導入（REQ-010-007）のため、baseline 既知違反と新規違反を区別する。
 baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json` に格納する。
 
 | 項目 | 定義 |

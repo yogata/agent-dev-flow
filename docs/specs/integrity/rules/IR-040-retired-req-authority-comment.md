@@ -12,7 +12,7 @@ status: accepted
 | category | canonical-conflict |
 | detection_method | `<!-- ... REQ-0NNN ... -->` 形式の HTMLコメントから 廃止 REQ ID を抽出し、後継 現行 REQ への併記がないか検出 |
 | affected_artifacts | [REQ, SPEC, guides, ADR] |
-| related_req | [REQ-001-063, REQ-010-070] |
+| related_req | [REQ-001-063] |
 | related_spec | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。HTMLコメント構文に限定した機械的検出 |

@@ -12,7 +12,7 @@ status: accepted
 | category | broken-reference |
 | detection_method | Markdown リンク `[REQ-0NNN](../requirements/REQ-0NNN.md)` から 廃止 REQ への直接パス（retired/ なし）を検出 |
 | affected_artifacts | [REQ, SPEC, guides, ADR] |
-| related_req | [REQ-010-070, REQ-001-063] |
+| related_req | [REQ-001-063] |
 | related_spec | [integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。廃止 REQ ID 集合とリンク先パスの照合 |

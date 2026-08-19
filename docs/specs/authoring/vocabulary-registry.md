@@ -29,7 +29,7 @@ canonical は source 側とする（DEC-002）。
 
 ## IR-045 文意品質検出対象語の移管状態（ACT-SPEC-007、REQ-028-007）
 
-IR-045（docs 日本語表現、文意整合検査）は REQ-010-255/256/262 により docs-check 機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲済みである。
+IR-045（docs 日本語表現、文意整合検査）は REQ-010-003、REQ-036-023 により docs-check 機械検出対象から除外し、`agentdev-doc-writing` スキル配下へ移譲済みである。
 catalog-only tombstone として管理され、本 SPEC では文意品質検出対象語の参照として保持する。
 
 移管対象語（`read-only`、`read-only-diagnostic`、`advisor`/`advisory`、`architecture-affecting`、`Architecture advisory gate` 等）の対照表は配布物側 `src/opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`「文意品質検出対象語（IR-045）」節が正である。

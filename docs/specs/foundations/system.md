@@ -47,7 +47,7 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプライン
 
 #### integrity ワークフロー
 
-docs-check は `/repo/*` コマンド体系の配布対象リポジトリ内コマンドである（REQ-001、REQ-010-156）。
+docs-check は `/repo/*` コマンド体系の配布対象リポジトリ内コマンドである（REQ-001、REQ-010-001）。
 AgentDevFlow の配布コマンドではなく、AgentDevFlow 本体リポジトリの自己監査コマンドである。
 
 | コマンド | 役割 |

@@ -75,7 +75,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 <!-- AUTOGEN:BEGIN:id=spec-metrics-measurement-example -->
 | SPEC | SPEC 行数 | status | ドメイン分類 |
 |---|---|---|---|
-| integrity/audits/bidirectional-audit-20260811.md | 1545 | draft | integrity |
+| integrity/audits/bidirectional-audit-20260811.md | 1547 | draft | integrity |
 | foundations/document-model.md | 675 | accepted | foundations |
 | integrity/references/docmap-reference-audit.md | 617 | - | integrity |
 | integrity/audits/cross-cutting-integration-design-20260811.md | 582 | draft | integrity |
@@ -88,7 +88,7 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | commands/case-open.md | 438 | accepted | commands |
 | integrity/audits/classification-20260811.md | 422 | draft | integrity |
 | foundations/system.md | 421 | accepted | foundations |
-| integrity/baselines/pre-audit-baseline-20260811.md | 416 | accepted | integrity |
+| integrity/baselines/pre-audit-baseline-20260811.md | 418 | accepted | integrity |
 | responsibilities/document-type-responsibilities.md | 372 | accepted | responsibilities |
 | local/runtime-package-boundary.md | 359 | accepted | local |
 | integrity/audits/final-reverification-20260811.md | 341 | accepted | integrity |
@@ -120,8 +120,8 @@ AUTOGENブロックは `AUTOGEN:BEGIN` マーカーから対応する `AUTOGEN:E
 | foundations/design-principles.md | 161 | accepted | foundations |
 | workflows/capture-boundaries.md | 161 | accepted | workflows |
 | responsibilities/artifact-responsibilities.md | 159 | accepted | responsibilities |
-| responsibilities/req-impact-map.md | 156 | accepted | responsibilities |
 | authoring/command-file-format.md | 155 | accepted | authoring |
+| responsibilities/req-impact-map.md | 155 | accepted | responsibilities |
 | commands/req-save.md | 150 | accepted | commands |
 | skills/agentdev-case-run-execution-adapter.md | 143 | accepted | skills |
 | foundations/harness-separation-model.md | 139 | accepted | foundations |
@@ -269,7 +269,7 @@ SPEC 行数は frontmatter、HTML コメントを除く本文行数。
 
 ## SPEC 横断診断
 
-SPEC 健全性診断は行数・status・配置に加え、主論理区分・正規所有対象（REQ-001-013、REQ-003-038）に基づく次の検出パターンを追加する（REQ-010-285、REQ-001）。
+SPEC 健全性診断は行数・status・配置に加え、主論理区分・正規所有対象（REQ-001-013、REQ-003-038）に基づく次の検出パターンを追加する（REQ-001）。
 
 ### 検出パターン
 

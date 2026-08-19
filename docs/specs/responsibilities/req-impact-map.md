@@ -18,7 +18,7 @@ updated: 2026-06-28
 - canonical owner 変更時: 両ファイルで参照先を更新する
 - 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、影響先ルールドメインと rule-ownership.md の整合を確認する
 
-各現行 REQ が影響する整合性ルールとアーティファクトを記載するマップ（REQ-010-152）。
+各現行 REQ が影響する整合性ルールとアーティファクトを記載するマップ（REQ-010-011）。
 10 以上の現行 REQ をカバーする。
 
 ## 影響マトリックス（Impact Matrix）
@@ -79,9 +79,8 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 
 | 要件行 | 影響するアーティファクト / スキル / コマンド | 経由 |
 |--------|-------------------------------------|------|
-| REQ-001-067〜069 | document-model.md, `agentdev-req-analysis` skill, `agentdev-quality-gates` skill, docs-check command (REQ-010-260 経由), inspect-docs command (REQ-039-003 経由) | IR-044 |
+| REQ-001-067〜069 | document-model.md, `agentdev-req-analysis` skill, `agentdev-quality-gates` skill, docs-check command (IR-044 経由), inspect-docs command (REQ-039-003 経由) | IR-044 |
 | REQ-004-031〜033 | `agentdev-req-analysis` skill, `agentdev-quality-gates` skill | IR-044 |
-| REQ-010-260 | integrity-rule-catalog.md (IR-044 定義), integrity-contracts.md (ReqSpecBoundary category, canonical-conflict subcategory 注記) | IR-044 |
 | REQ-039-003 | req-impact-map.md (本節), `agentdev-req-structure-diagnostics` skill | IR-044 |
 
 ## 影響カテゴリ（Impact Categories）
@@ -124,7 +123,7 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 
 ## IR → REQ 逆方向参照（ACT-SPEC-006、REQ-028-008）
 
-本ファイル（REQ → 影響するルール/アーティファクト）と `../integrity/rule-ownership.md`（ルールドメイン → canonical REQ/SPEC）は逆方向の対応マップである（REQ-010-152）。
+本ファイル（REQ → 影響するルール/アーティファクト）と `../integrity/rule-ownership.md`（ルールドメイン → canonical REQ/SPEC）は逆方向の対応マップである（REQ-010-011）。
 両者の整合性維持運用は前節「同期更新が必要なケース」に従う。
 
 個別 IR（IR-NNN）の対応 REQ / SPEC は `../integrity/rule-ownership.md` の AUTOGEN ブロック（`rule-ownership-ir-crossref`）が IR-* ファイルの frontmatter / Field/Value 表から自動生成する（SC-002 Phase C、IR-061）。
