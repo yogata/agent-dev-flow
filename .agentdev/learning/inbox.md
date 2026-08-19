@@ -260,3 +260,19 @@
 - **想定反映先**: case-run の配布物編集・検証手順
 - **関連**: PR 2281、Issue 2238、docs/specs/integrity/distribution-boundary.md
 - **タグ**: #distribution-boundary #case-run #internal-id
+
+## bun test の実行 cwd によって隠しディレクトリ・ネスト package 配下の拾い上げが変わる
+
+- **問題事象**: worktree 環境で `bun test ./`（対象ディレクトリ明示なしのルート実行）は隠しディレクトリ .opencode/ 配下の正規 suite（repo-agentdev-integrity/scripts）を拾わず、src/opencode/skills/agentdev-artifact-graph 配下のみを実行して zod 解決エラーとなった（PR 2283）。また worktree ルートからの `bun test ./` はネストされた package.json 配下（repo-agentdev-integrity/scripts、.opencode/plugins）のテストを拾わず、full suite 実行は 3 箇所の cwd（ルート、.opencode/plugins、repo-agentdev-integrity/scripts）で分割実施する必要があった（PR 2284）。
+- **発生局面**: 実装（case-run の検証実行、worktree 環境）
+- **検知方法**: PR 本文への実行記録（AG-035 の cwd・起動コマンド記録様式）。ルート実行の件数急減（Ran N tests の N が正規 suite 分しか増えない）と zod 解決エラーの発生
+- **根本原因**: bun test のテスト発見は cwd 基準の再帰走査で、隠しディレクトリ（.opencode/）とネストされた package.json 境界の解釈が実行 cwd によって変わる。正規形（`./.opencode/skills/repo-agentdev-integrity/scripts/` 明示）のみが意図した suite を確定させる
+- **自律対応内容**: 両 PR とも AG-035 契約どおり正規形（./ prefix 付きディレクトリ明示）で再実行し、full suite 2058 pass / 0 fail を確認した
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（AG-035 の運用注記としての追記に相当。full suite の分割実行要件は PR 2284 本文の検証記録が初出）
+- **横展開観点**: full suite 実行は単一 cwd の `bun test ./` で完結しない。実行 cwd・起動コマンド・拾い上げ対象の 3 点を証拠記録に揃え、N/M 件数突合で拾い漏れを検出する
+- **再発条件**: worktree 等 junction・ネスト package が混在する環境で対象ディレクトリを明示せず bun test を実行する場合
+- **予防策候補**: full suite 実行手順の標準形を「3 cwd 分割実行（ルート、.opencode/plugins、repo-agentdev-integrity/scripts）」として明文化する
+- **想定反映先**: agentdev-quality-gates SPEC の full integrity suite 運用、case-close STEP-3-1 の full integrity suite 実行手順
+- **関連**: PR 2283、PR 2284、Issue 2247、Issue 2248
+- **タグ**: #bun-test #cwd #full-suite #ag035
