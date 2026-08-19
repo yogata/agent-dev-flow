@@ -15,6 +15,11 @@ context:
     paths:
       - "docs/specs/quality/req-health-metrics.md"
     purpose: REQ 健全性メトリクス（肥大化、関心ズレ検出）の確認
+  - id: req-define-command-spec
+    when: 実証Case判定・評価契約の構成要素詳細、実証Issue 入力の入力優先規定、draft-data 実証情報出力形式参照時
+    paths:
+      - "docs/specs/commands/req-define.md"
+    purpose: 実証Case判定と評価契約セクションの実行詳細の確認
   - id: delegation-contracts
     when: サブエージェント委譲契約参照時
     paths:
