@@ -79,7 +79,7 @@ backlog-review を実行し、採用済み成果物の分析、統合、ユー�
 
 `agentdev-workflow-backlog-review` を権威情報源として backlog-review を実行する（引数なし、全ディレクトリの採用済み成果物が対象。実行前から存在する promoted を含む）。
 
-backlog-review の既存 HITL（RU 作成承認）、矛盾検出時のユーザー指示待機、破壊的変更の明示承認を維持する。
+backlog-review の HITL（RU 作成承認）、矛盾検出時のユーザー指示待機、破壊的変更の明示承認を backlog-review 側の所有する境界として維持する。
 stage 3 は単独実行であるため直列化キューは使用しない。
 
 結果の分類:
