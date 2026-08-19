@@ -2909,6 +2909,66 @@ describe("IR-055 runtime-unresolved-reference 実修復回帰 (Issue #1782)", ()
   });
 });
 
+// ─── NG21 N16/N17 是正回帰テスト（Issue #2245, OU-0009, RU-0054） ──────────
+// N16（skill-category-gap: 「Skill rename 対称性」カテゴリの
+// categoryToCheckPattern map 未登録・check_skill_rename_symmetry.ts の
+// scriptFiles 対象未登録）と N17（command-capture-duty: case-close.md の
+// capture-boundaries 参照欠落）を実修復し、対応する baseline entry を
+// 除去した後の状態を保持することを検証する。baseline 更新だけで
+// gap/duty 違反を info へ降格していないことを回帰テストとして固定する。
+
+describe("NG21 N16/N17 是正回帰 (Issue #2245, OU-0009)", () => {
+  const REPO_ROOT = join(SCRIPT_DIR, "..", "..", "..", "..");
+
+  it("N16: 'Skill rename 対称性' カテゴリが gap で ng/warning にならないこと（map + scriptFiles 登録）", () => {
+    const proc = Bun.spawnSync(["bun", "run", SCRIPT_FILE, "--json"], {
+      cwd: REPO_ROOT,
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const stdout = proc.stdout?.toString("utf-8") ?? "";
+    expect(stdout.length).toBeGreaterThan(0);
+
+    const parsed = JSON.parse(stdout) as {
+      results: Array<{ check: string; level: string; message?: string }>;
+    };
+
+    const gapNg = parsed.results.filter(
+      (r) =>
+        r.check === "skill-category-gap" &&
+        (r.level === "ng" || r.level === "warning"),
+    );
+    expect(gapNg.length).toBe(0);
+
+    const gapOk = parsed.results.find(
+      (r) => r.check === "skill-category-gap" && r.level === "ok",
+    );
+    expect(gapOk).toBeDefined();
+    expect(gapOk!.message).toContain("corresponding implementations");
+  });
+
+  it("N17: case-close.md の command-capture-duty が ok であること（capture-boundaries 参照）", () => {
+    const proc = Bun.spawnSync(["bun", "run", SCRIPT_FILE, "--json"], {
+      cwd: REPO_ROOT,
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const stdout = proc.stdout?.toString("utf-8") ?? "";
+    const parsed = JSON.parse(stdout) as {
+      results: Array<{ check: string; level: string; message?: string }>;
+    };
+
+    const duty = parsed.results.find(
+      (r) =>
+        r.check === "command-capture-duty" &&
+        (r.message ?? "").includes("case-close.md"),
+    );
+    expect(duty).toBeDefined();
+    expect(duty!.level).toBe("ok");
+    expect(duty!.message).toContain("capture-boundaries reference");
+  });
+});
+
 // ─── WP-3 (Issue #1928): execution profile separation ───────────────────────
 // §7 exit-code contracts for source/installed/release.
 
