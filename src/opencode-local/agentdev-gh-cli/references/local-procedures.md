@@ -4,7 +4,8 @@ agentdev-gh-cli の各手続きのローカル版（Case ファイル版）実�
 標準版（GitHub 版）の実装手順（[standard-procedures.md](../../../opencode/skills/agentdev-gh-cli/references/standard-procedures.md)）で扱う gh CLI 呼び出しを、Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きに読み替える。
 操作契約（手続き名、引数、戻り値）は [contracts.md](contracts.md) 参照。
 
-Case ファイルスキーマの意味仕様の正本は SPEC [local/local-case-file.md](../../../../docs/specs/local/local-case-file.md)。操作用定義は [../case-schema/case-file.md](../case-schema/case-file.md)。
+Case ファイルスキーマの意味仕様の正本は SPEC [local/local-case-file.md](../../../../docs/specs/local/local-case-file.md)。
+操作用定義は [../case-schema/case-file.md](../case-schema/case-file.md)。
 
 ## 共通制約
 
@@ -36,9 +37,12 @@ Case ファイルスキーマの意味仕様の正本は SPEC [local/local-case-
 3. **VERIFY**: 実行後に `git log -1 --pretty=%B` 等で読み戻し、書き出し時の本文と一致すること、および先頭バイトが UTF-8 BOM（`EF BB BF`）でないことを確認する
 4. **cleanup**: VERIFY が PASS した後に一時ファイルを削除する。VERIFY が FAIL の場合は cleanup を実行せず、一時ファイルを残して原因調査へ移行する
 
-worktree 隔離境界により `.agentdev/**` への書き込みが禁止される委譲の場面では、一時ファイル配置先をリポジトリ外の一時領域（`$env:TEMP` 配下）に変更する。本規定はローカル版へも適用できる。ただしローカル版は Case ファイル読み書きが主経路であるため、gh CLI 系の WRITE 手続き（一時ファイル配置先を含む）が必要になる場面は、ローカル版から gh CLI を直接利用する補助経路に限る（SPEC 同節「委譲時の一時ファイル代替配置先」「ローカル版の扱い」参照）。
+worktree 隔離境界により `.agentdev/**` への書き込みが禁止される委譲の場面では、一時ファイル配置先をリポジトリ外の一時領域（`$env:TEMP` 配下）に変更する。
+本規定はローカル版へも適用できる。
+ただしローカル版は Case ファイル読み書きが主経路であるため、gh CLI 系の WRITE 手続き（一時ファイル配置先を含む）が必要になる場面は、ローカル版から gh CLI を直接利用する補助経路に限る（SPEC 同節「委譲時の一時ファイル代替配置先」「ローカル版の扱い」参照）。
 
-本要件は標準版 [standard-procedures.md](../../../opencode/skills/agentdev-gh-cli/references/standard-procedures.md)「commit メッセージ作成（BOM なし UTF-8 契約）」節の規定と矛盾しない。同節の詳細実装（実装手段、禁止事項）を本ファイルへ複製せず、ローカル版における本要件の正を本ファイル1ファイルへ維持する（`standard-procedures.md` のローカル版新設は行わない）。
+本要件は標準版 [standard-procedures.md](../../../opencode/skills/agentdev-gh-cli/references/standard-procedures.md)「commit メッセージ作成（BOM なし UTF-8 契約）」節の規定と矛盾しない。
+同節の詳細実装（実装手段、禁止事項）を本ファイルへ複製せず、ローカル版における本要件の正を本ファイル1ファイルへ維持する（`standard-procedures.md` のローカル版新設は行わない）。
 
 ## Case 番号の採番
 
@@ -137,7 +141,8 @@ YAML 前書きの各フィールド制約は [../case-schema/rules/frontmatter.y
 
 ## status 状態遷移との協調
 
-本手続きは Case ファイルの status 状態遷移の一部を担う。状態遷移表の全体は SPEC [local/local-case-file.md](../../../../docs/specs/local/local-case-file.md) の「状態遷移表」、運用参照資料は [../case-schema/case-file.md](../case-schema/case-file.md) の「status enum と状態遷移」参照。
+本手続きは Case ファイルの status 状態遷移の一部を担う。
+状態遷移表の全体は SPEC [local/local-case-file.md](../../../../docs/specs/local/local-case-file.md) の「状態遷移表」、運用参照資料は [../case-schema/case-file.md](../case-schema/case-file.md) の「status enum と状態遷移」参照。
 
 | 手続き | status 遷移 |
 |---|---|
@@ -147,4 +152,6 @@ YAML 前書きの各フィールド制約は [../case-schema/rules/frontmatter.y
 | PR merge | `review` → `closed`（呼び出し元の責務。本手続きは `## マージ結果` 記録のみ） |
 | Issue close | `*` → `closed` または `cancelled` |
 
-status 遷移そのものは呼び出し元（各 command）の責務である。本手続きは対象セクションの読み書きと YAML 前書きの `updated_at` 更新のみを担う。ただし Issue close は例外的に `status` と `closed_at` を直接更新する。
+status 遷移そのものは呼び出し元（各 command）の責務である。
+本手続きは対象セクションの読み書きと YAML 前書きの `updated_at` 更新のみを担う。
+ただし Issue close は例外的に `status` と `closed_at` を直接更新する。
