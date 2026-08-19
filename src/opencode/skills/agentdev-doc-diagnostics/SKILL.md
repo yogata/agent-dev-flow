@@ -49,6 +49,14 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | 文意品質（LLM 表現、空虚語、英語混じり、実行主体分類） | `agentdev-doc-writing` | ルーティングのみ |
 | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約 | `agentdev-doc-diagnostics`（本スキル） | 一次所有 |
 
+## cleanup モデルへの適用経路
+
+document-model SPEC（extension 経由）「恒久基準と非規範情報の整理」は、非規範情報（移行情報、内部実装方式、fixture、regex、内部関数、テスト構成、未宣言 reference、draft SPEC、移行証跡、リリース証跡）を整理する cleanup モデル（6処置: KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）を所有し、処置の実行を inspect-docs / inspect-skills / 専用の cleanup 作業へ割り当てる。
+本スキルは inspect-docs の横断診断カテゴリの一次所有者として、この適用経路に組み込まれる。
+横断診断で cleanup モデルの対象カテゴリに該当する記述を検出した場合は、6処置の候補を検出事項の推奨 route に併記して提示する。
+処置に伴う文書変更は行わない（診断専用）。
+cleanup モデルと処置契約の SSoT は document-model SPEC であり、本スキルは再定義しない。
+
 ## 参考文献
 
 | ファイル | 内容 |

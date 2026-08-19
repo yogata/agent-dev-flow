@@ -31,6 +31,14 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 |----------|------|
 | inspect-docs | docs全体の意味整合性レビューにおける REQ 構造診断ロジックの提供（REQ参照ID整合性、第一参照導線、現行/廃止境界、SPEC分離基準違反検出、6観点診断、未処理成果物確認、問題候補出力スキーマ、配布物統合性検出（構文健全性、文意保持、責務整合、NG 分類）） |
 
+## cleanup モデル（6処置）と6観点診断の別軸性
+
+本スキルの6観点診断（SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT）と、document-model SPEC（extension 経由）「恒久基準と非規範情報の整理」の cleanup 6処置（KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）は別軸である。
+診断観点は REQ 体系の構造的問題を検出する軸であり、cleanup 6処置は非規範情報の整理処置を表す軸である。
+両者の対応関係は document-model SPEC が正規所有し、本スキルは再定義しない。
+REQ 内の内部実装方式（cleanup モデルの対象カテゴリ）の残留は SPEC 分離基準違反の検出シグナルとして扱い、検出事項には cleanup 6処置の候補を推奨 route に併記できる。
+処置に伴う文書変更は行わない（診断専用）。
+
 ## 参考文献
 
 | ファイル | 内容 |

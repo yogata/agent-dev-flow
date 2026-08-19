@@ -43,6 +43,14 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 - 対象外（Out of Scope）
 - 推奨 intake/ learning route
 
+## cleanup モデルへの適用経路
+
+document-model SPEC（extension 経由）「恒久基準と非規範情報の整理」は、非規範情報を整理する cleanup モデル（6処置: KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）を所有し、処置の実行を inspect-docs / inspect-skills / 専用の cleanup 作業へ割り当てる。
+本スキルは配布物（Command/Skill 定義）の診断において、この適用経路に組み込まれる。
+配布物に cleanup モデルの対象カテゴリ（規範または非規範の地位が未宣言の references、移行証跡、リリース証跡等）に該当する記述を検出した場合は、6処置の候補を検出事項の推奨 route に併記して提示する。
+処置に伴うファイル変更は行わない（検査対象を直接修正しない制約に従う）。
+cleanup モデルと処置契約の SSoT は document-model SPEC であり、本スキルは再定義しない。
+
 ## 診断観点
 
 | 観点 | 確認内容 |
