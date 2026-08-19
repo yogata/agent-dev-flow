@@ -367,7 +367,7 @@
       "file": "src/opencode/skills/agentdev-workflow-spec-save/SKILL.md",
       "pattern": "docs/specs/",
       "severity": "heuristic",
-      "count": 6
+      "count": 7
     },
     {
       "file": "src/opencode/skills/agentdev-workflow-spec-save/references/placement-and-save.md",
