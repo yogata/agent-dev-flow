@@ -162,7 +162,7 @@ inbox → deferred 移動、prune、commit/push 等の不可逆処理は未実�
 5. **evaluation-report 戻しループ**: review 反映時（review 対象の意味内容が変更された場合）は STEP-2 へ戻り、STEP-2（evaluation-report 生成・更新）→ STEP-3（廃棄判定）→ STEP-4 発動条件判定 → 再 review 発動条件（新たな本質的争点が生じ得る場合）を満たす場合のみ再 review、の順で再実行する。
 停止条件（4点）を満たした時点でループを離脱し STEP-5 へ進む。
 新証拠、新前提、異なる failure condition、未評価範囲のいずれも伴わない同一 finding の再起票を禁止する
-6. **unresolved 扱い**: unresolved な本質的争点またはユーザー判断事項が残る場合、STEP-5（判定結果提示）、STEP-6（deferred 移動、prune、commit/push）等の不可逆処理へ進まない。unresolved は既存の HITL（STEP-5 ユーザー承認）または blocker 扱いへ振り向ける
+6. **unresolved 扱い**: unresolved な本質的争点またはユーザー判断事項が残る場合、STEP-5（判定確定）、STEP-6（deferred 移動、prune、commit/push）等の不可逆処理へ進まない。unresolved は既存の HITL（STEP-5 のユーザー承認）または blocker 扱いへ振り向ける
 7. **呼出失敗時**: silent skip を禁止し、利用不能を報告した上で従来フロー（STEP-5 以降）と既存 HITL を維持する
 
 ### Result
