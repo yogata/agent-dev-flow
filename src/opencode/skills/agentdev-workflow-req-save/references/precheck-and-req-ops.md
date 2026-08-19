@@ -112,7 +112,7 @@ draft-data の必須フィールドを検証し、処理対象 entry を確定�
 欠損時はエラーで中止する。
 
 - **分類ゲート検査**: CREATE 対象 REQ の要件テーブル検査。**文書分類適合確認**: REQ/Decision 保存前のドキュメント種別確認。詳細、委譲接続点は `agentdev-req-file-manager` を参照
-- **REQ/Decision artifact_actions 処理ゲート**: ドラフトの `artifact_actions` から `artifact: req`/ `artifact: decision` の entry を処理対象とする（draft 全体を処理し、OU ごとに分割しない）。`artifact_actions` に REQ/Decision entry がない場合は no-op 完了とする。`operation_units` 存在時は OU ID 指定があれば当該 OU 配下のみ、未指定時は draft 全体を処理対象とする。`artifact_actions` フィールドがない（旧形式 draft）の場合は従来どおり全 req-operation を処理する（後方互換）。`artifact: spec` の entry は spec-save コマンドの対象であり処理しない
+- **REQ/Decision artifact_actions 処理ゲート**: ドラフトの `artifact_actions` から `artifact: req`/ `artifact: decision` の entry を処理対象とする（draft 全体を処理し、OU ごとに分割しない）。`artifact_actions` に REQ/Decision entry がない場合は no-op 完了とする。`operation_units` 存在時は OU ID 指定があれば当該 OU 配下のみ、未指定時は draft 全体を処理対象とする。`artifact_actions` フィールドがない（旧形式 draft）の場合は従来どおり全 req-operation を処理する（後方互換）。`artifact: design` の entry は design-save コマンドの対象であり処理しない
 
 ### Result
 
@@ -124,7 +124,7 @@ draft-data の必須フィールドを検証し、処理対象 entry を確定�
 
 ### Completion Verification
 
-- 必須フィールドが全て存在すること。処理対象に `artifact: spec` を含まないこと
+- 必須フィールドが全て存在すること。処理対象に `artifact: design` を含まないこと
 
 ### Resume-Idempotency
 
@@ -156,7 +156,7 @@ STEP-3 で処理対象とした `artifact_actions`（`artifact: req`/ `artifact:
 
 - **決定的処理のスクリプト呼出**: REQ番号採番、要件行ID採番、frontmatter id↔ファイル名整合性確認は `agentdev-artifact-validation` の公開検証契約および `agentdev-req-file-manager` SKILL.md「Scripts（決定的処理）」で規定する決定的スクリプトを bash 経由で呼び出して実行する。LLM 推論で代替しない。具体的な CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照
 - **QG-1（適用結果の整合性検証）**: REQ/Decision ファイル保存前に `agentdev-quality-gates` の QG-1 を実行する。採番結果、マージ結果、インデックス、変更範囲の妥当性を決定的スクリプトの JSON 結果で機械的に確認する。fail 時は保存を停止し req-define へ差り戻す。req-save の QG-1 は内容の品質を再検証せず、それは req-define の QG-1 の責務である
-- **語彙・責務・runtime境界矛盾の防止**: STEP-4 完了後に既知の矛盾を検出可能な範囲で防止する。**Catalog entry 確認（APPEND 時）**: 関連 integrity-rule-catalog SPEC（extension 経由）の catalog entry 有無を確認、未記載時はユーザーへ追記を促す（`docs/specs/` 配下は直接編集しない G02）。**複数 REQ/Decision ファイルの3フェーズ分離**: 採番バッチ[直列] / ファイル作成[並列・最大5件] / インデックス更新[直列]。各詳細は `agentdev-req-file-manager` を参照
+- **語彙・責務・runtime境界矛盾の防止**: STEP-4 完了後に既知の矛盾を検出可能な範囲で防止する。**Catalog entry 確認（APPEND 時）**: 関連 integrity-rule-catalog Design（extension 経由）の catalog entry 有無を確認、未記載時はユーザーへ追記を促す（`docs/designs/` 配下は直接編集しない G02）。**複数 REQ/Decision ファイルの3フェーズ分離**: 採番バッチ[直列] / ファイル作成[並列・最大5件] / インデックス更新[直列]。各詳細は `agentdev-req-file-manager` を参照
 
 ### Result
 

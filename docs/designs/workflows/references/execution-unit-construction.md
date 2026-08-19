@@ -7,13 +7,13 @@ updated: 2026-08-18
 
 # execution_unit 構成アルゴリズム参照
 
-> **位置づけ**: 本資料は `docs/specs/workflows/epic-wave-model.md` から参照される実装アルゴリズム詳細である。
-> 現行契約（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow 等）の宣言は親 SPEC を正とし、本資料はその機械的判定手順を示す。
+> **位置づけ**: 本資料は `docs/designs/workflows/epic-wave-model.md` から参照される実装アルゴリズム詳細である。
+> 現行契約（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow 等）の宣言は親 Design を正とし、本資料はその機械的判定手順を示す。
 
 ## 目的
 
 case-open が OU 群から execution_unit（standard | epic）を構成する際の連結成分計算と3軸判断の機械的手順を規定する。
-親 SPEC が定める不変の方針を、決定的に適用するための手順書である。
+親 Design が定める不変の方針を、決定的に適用するための手順書である。
 
 ## 連結成分アルゴリズム
 
@@ -33,11 +33,11 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 
 エッジ判定要素（同一ファイル衝突の抑制ヒント）: 連結成分のエッジには必須依存のみを含める現行構造を維持した上で、次の3種を依存ヒントとしてエッジ判定要素へ追加する。依存ヒントは OU 間の変更重複を case-open の判断へ供する信号であり、連結成分アルゴリズムの構造（エッジ定義・探索順序）を変更しない。
 
-1. 変更ファイル重複: 複数 OU の推定変更ファイル（target_spec、target_req、操作対象パス）の重複
+1. 変更ファイル重複: 複数 OU の推定変更ファイル（target_design、target_req、操作対象パス）の重複
 2. AUTOGEN 対象ファイル重複: 変更に付随して再生成される AUTOGEN 対象ファイル（README 索引、メトリクス表等）の重複
 3. 同一ファイル行近接: 同一ファイル内での変更行近接（一括機械置換等の隣接行変更）
 
-依存ヒントを検知した場合の Wave 構成判断（直列化・依存付与・単一 PR 集約）は親 SPEC「execution_unit 構成の依存ヒントと Wave 構成判断基準」節が定める。
+依存ヒントを検知した場合の Wave 構成判断（直列化・依存付与・単一 PR 集約）は親 Design「execution_unit 構成の依存ヒントと Wave 構成判断基準」節が定める。
 
 ## 3軸判断モデル
 
@@ -57,7 +57,7 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 
 以下のいずれかを満たす場合は必須依存があっても別 Epic への分割を許容する。
 
-- 事前契約（SPEC 確定、インターフェース合意等）で並列実施可能な場合
+- 事前契約（Design 確定、インターフェース合意等）で並列実施可能な場合
 - 依存先 Epic が完了済みまたは完了確定の場合
 - 分割により Epic サイズが推奨範囲（3-10）に収まる場合
 
@@ -66,9 +66,9 @@ case-open は OU 群の依存グラフから連結成分を計算し、各連結
 case-open は無関係な OU 群を単一 Epic へ機械的に集約しない。
 Epic 構成推論の根拠を Epic Issue 本文または `case_open_hints` に記録する。
 3軸判断の個別エッジケース（同機能独立、共通基盤等）は LLM 推論に委ねる。
-REQ/SPEC で固定するのは不変の方針（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow）のみである。
+REQ/Design で固定するのは不変の方針（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow）のみである。
 
 ## See Also
 
-- [../epic-wave-model.md](../epic-wave-model.md)（親 SPEC: 現行契約宣言）
-- `docs/specs/commands/case-open.md`（適用主体 command SPEC）
+- [../epic-wave-model.md](../epic-wave-model.md)（親 Design: 現行契約宣言）
+- `docs/designs/commands/case-open.md`（適用主体 command Design）

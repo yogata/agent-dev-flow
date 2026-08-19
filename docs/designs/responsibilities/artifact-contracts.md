@@ -7,7 +7,7 @@ updated: 2026-08-10
 
 # アーティファクト契約
 
-本 SPEC は agent-dev-flow リポジトリのみに適用される。
+本 Design は agent-dev-flow リポジトリのみに適用される。
 
 ## 目的
 
@@ -48,9 +48,9 @@ Command ──→ Skill ──→ Reference (references/)
 
 ## コマンドフロントマター契約
 
-command frontmatter 契約を description 単一へ同期する（ACT-SPEC-001 と整合）。
+command frontmatter 契約を description 単一へ同期する（ACT-DESIGN-001 と整合）。
 配布物自己完結と内部ID/内部パス排除の境界宣言を REQ-001-031/032 と整合させ、配布物の producer 内部依存・harness 固有詳細非依存は REQ-029-003..007 へ参照を分ける（REQ-002-021..029 の範囲参照は RETIRE/MOVE 済み）。
-「不一致時は本体SPECを正とする」実行時契約を廃止し開発時 checker が SPEC と配布物の適合を保証する構造へ変更する旨を明記する。
+「不一致時は本体Designを正とする」実行時契約を廃止し開発時 checker が Design と配布物の適合を保証する構造へ変更する旨を明記する。
 詳細 normative は移行計画 §5.2, §6.2。
 
 ## スキル構造契約
@@ -69,13 +69,13 @@ command frontmatter 契約を description 単一へ同期する（ACT-SPEC-001 �
 
 ## スキル粒度契約
 
-Command・skill の粒度基本契約は本SPEC が正規所有者とする。
+Command・skill の粒度基本契約は本Design が正規所有者とする。
 Workflow Skill・Capability Skill 固有の責務・配置・1:N分割基準・依存方向は
 workflow-skill-model.md が正規所有者。本節は workflow-skill-model.md へ委譲済みの
 Workflow Skill 固有契約を重複所有しない。
 
 skill の段階的開示、reference 分離原則、USE FOR / DO NOT USE FOR の整合性は
-REQ-002-015・017・018 に従い本SPEC が維持する。
+REQ-002-015・017・018 に従い本Design が維持する。
 
 ## スキル参照妥当性契約
 
@@ -103,14 +103,14 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 |---|---|---|
 | REQ 番号採番、要件行 ID 採番、REQ 固有検証 | `agentdev-req-file-manager` | REQ 操作に固有の決定的処理 |
 | Decision 番号採番、Decision 固有検証 | `agentdev-decision-file-manager` | Decision 操作に固有の決定的処理 |
-| SPEC 固有処理（target_area 見出し検索、SPEC 固有整合性確認） | `agentdev-spec-file-manager` | SPEC 操作に固有の決定的処理 |
+| Design 固有処理（target_area 見出し検索、Design 固有整合性確認） | `agentdev-design-file-manager` | Design 操作に固有の決定的処理 |
 | 文書種別横断の共通検証（frontmatter 整合性、エントリ存在確認、変更範囲検証）と共有 lib | `agentdev-artifact-validation` | 複数文書種別で共有する決定的検証と共有ライブラリ、対応 test |
 
 **委譲規則**:
 
 - 兄弟 skill と command は所有者 skill の内部 script パスを直接 import またはパス参照しない
 - 利用側は所有者 skill の公開操作契約（操作名、入力、JSON 結果契約、エラー契約）へ委譲する
-- 所有者 skill の SPEC または reference のみが内部 script の物理パスと I/O 詳細を保持する
+- 所有者 skill の Design または reference のみが内部 script の物理パスと I/O 詳細を保持する
 - 同一 script または共有 lib を複製しない（REQ-002-006「Script は決定的: テスト可能、再現可能」の延長）
 - 新規 script 追加時は所有者候補を文書種別で判定し、既存所有者との重複を確認する
 
@@ -118,10 +118,10 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 
 ## 分類根拠伝播契約
 
-learning/intake → RU → req-define → spec-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。
-SPEC ファイルが主論理区分・正規所有対象を宣言する形式（frontmatter フィールド名、冒頭宣言節フォーマット）の正規所有者は `../foundations/document-model.md`「SPEC 宣言形式」とし、本節は工程間伝播フィールドの schema と req-define から spec-save へのシリアライズ位置を正規所有する。
+learning/intake → RU → req-define → design-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。
+Design ファイルが主論理区分・正規所有対象を宣言する形式（frontmatter フィールド名、冒頭宣言節フォーマット）の正規所有者は `../foundations/document-model.md`「Design 宣言形式」とし、本節は工程間伝播フィールドの schema と req-define から design-save へのシリアライズ位置を正規所有する。
 両者は `spec_logical_division`、`canonical_owner` のフィールド名を共有し、工程間で同一の名前を用いる。
-req-define は SPEC action の `artifact_actions` と `operation_units` へ分類根拠を出力し、spec-save はこれを読み取って CREATE/UPDATE 各操作で SPEC frontmatter または冒頭宣言節へ宣言を付与する。
+req-define は Design action の `artifact_actions` と `operation_units` へ分類根拠を出力し、design-save はこれを読み取って CREATE/UPDATE 各操作で Design frontmatter または冒頭宣言節へ宣言を付与する。
 
 ### 伝播フィールド一覧
 
@@ -131,7 +131,7 @@ req-define は SPEC action の `artifact_actions` と `operation_units` へ分�
 | req_impact | enum | REQ影響の有無: `yes`、`no`、`unknown` | 欠落時は `unknown` で警告 |
 | target_stakeholder | string | 変更が影響するステークホルダー（利用者、運用者、開発者、外部システム等） | 欠落時は `unknown` で警告 |
 | user_visible_change | enum | 利用者から見える変更の有無: `yes`、`no`、`unknown` | 欠落時は `unknown` で警告 |
-| spec_logical_division | enum | SPEC論理区分: `behavior`、`catalog`、`cross_cutting_contract`、`parameter`、`implementation_detail`、`unknown` のいずれか | 欠落時は `unknown` で警告 |
+| spec_logical_division | enum | Design論理区分: `behavior`、`catalog`、`cross_cutting_contract`、`parameter`、`implementation_detail`、`unknown` のいずれか | 欠落時は `unknown` で警告 |
 | canonical_owner | string | 正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー） | 欠落時は `unknown` で警告 |
 | destination_selection_reason | string | 追記先を選択した理由 | 欠落時は `unknown` で警告 |
 | observed_evidence | string | 根拠となる観測事実（CI 失敗、誤検出、エッジケース発見等） | 欠落時は `unknown` で警告 |
@@ -142,7 +142,7 @@ req-define は SPEC action の `artifact_actions` と `operation_units` へ分�
 - 厳格なスキーマ検証、JSON Schema、バリデータを導入しない
 - 欠落時は `unknown` 既定値で警告を出し、処理を継続する（後方互換）
 - 既存の採用済み成果物、RU、req_draft を欠落により拒否しない
-- 具体的なシリアライズ形式は各工程の成果物形式（RU frontmatter、draft-data YAML、SPEC frontmatter 等）に従う
+- 具体的なシリアライズ形式は各工程の成果物形式（RU frontmatter、draft-data YAML、Design frontmatter 等）に従う
 
 ### 各工程での扱い
 
@@ -151,13 +151,13 @@ req-define は SPEC action の `artifact_actions` と `operation_units` へ分�
 | learning-promote | 学びから change_nature、observed_evidence を推定 | 採用済み成果物（promoted artifact）に分類根拠を添付 |
 | intake-promote | inbox item から change_nature、observed_evidence を推定 | 採用済み成果物に分類根拠を添付 |
 | backlog-review | 採用済み成果物から読取、`tentative_classification` と併せて RU frontmatter へ記録 | RU frontmatter に `tentative_classification` と分類根拠を記録 |
-| req-define | RU の分類根拠を暫定入力とし、最終分類を自身で確定。SPEC action（`artifact: spec`）の各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する | draft-data の `artifact_actions`（各 SPEC action）と `operation_units` へ最終分類根拠を反映 |
-| spec-save | draft-data の `artifact_actions`（各 SPEC action）から分類根拠を読取、配置一貫性検証の入力とする。CREATE 操作では新規 SPEC frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。UPDATE 操作では変更対象 SPEC に宣言がなく分類値が `unknown` 以外に確定している場合に宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落を理由に保存拒否しない、DEC-003 soft-contract） | 配置一貫性検証結果を commit message、完了報告に反映。宣言付与結果を SPEC ファイルへ反映 |
+| req-define | RU の分類根拠を暫定入力とし、最終分類を自身で確定。Design action（`artifact: design`）の各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する | draft-data の `artifact_actions`（各 Design action）と `operation_units` へ最終分類根拠を反映 |
+| design-save | draft-data の `artifact_actions`（各 Design action）から分類根拠を読取、配置一貫性検証の入力とする。CREATE 操作では新規 Design frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。UPDATE 操作では変更対象 Design に宣言がなく分類値が `unknown` 以外に確定している場合に宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落を理由に保存拒否しない、DEC-003 soft-contract） | 配置一貫性検証結果を commit message、完了報告に反映。宣言付与結果を Design ファイルへ反映 |
 
 ### REQ 拡張可否判定ルール
 
 change_nature が `new_user_requirement` または `external_contract_change` の場合のみ、REQ の作成または拡張を候補とする（REQ-001-033）。
-それ以外の change_nature は、既存 REQ が要求を既に保持している限り REQ を拡張せず、SPEC 等への配置を検討する。
+それ以外の change_nature は、既存 REQ が要求を既に保持している限り REQ を拡張せず、Design 等への配置を検討する。
 
 ## サイズ制約
 
@@ -194,7 +194,7 @@ change_nature が `new_user_requirement` または `external_contract_change` �
 | delegation_type | 用途 | 副作用 |
 |---|---|---|
 | `gate_check`（ゲート検査） | 完了判定、ガードレール充足確認、保存前/close 前検査 | 禁止 |
-| `semantic_review`（意味レビュー） | 文書、差分、REQ/Decision/SPEC の意味レビュー | 禁止 |
+| `semantic_review`（意味レビュー） | 文書、差分、REQ/Decision/Design の意味レビュー | 禁止 |
 | `log_analysis`（ログ解析） | テストログ、CI ログ、review 結果解析 | 禁止 |
 | `classification`（分類） | アーティファクト / 検出事項 / intake / learning の分類 | 禁止 |
 | `extraction`（抽出） | 候補、論点、未回収事項の抽出 | 禁止 |
@@ -283,7 +283,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-046）。
 ### Capture結果 小節（共通意味契約）
 
 `結果` フィールド内に任意の `Capture結果` 小節を定義する（新規トップレベルフィールドは追加しない）。
-`Capture結果` 小節の共通意味契約を本 SPEC で定義する。
+`Capture結果` 小節の共通意味契約を本 Design で定義する。
 
 - 保存した capture 成果物のパス（`intake/inbox/*.md` または `learning/inbox.md` への相対パス）
 - 分類（intake/learning）
@@ -293,9 +293,9 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-046）。
 
 ## 適用範囲宣言
 
-`docs/specs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
+`docs/designs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
 他プロジェクトへの適用を意図しない。
-実行時コマンドは SPEC ファイルに依存しない（REQ-001）。
+実行時コマンドは Design ファイルに依存しない（REQ-001）。
 
 ## リポジトリローカルアーティファクト（REQ-001）
 
@@ -307,7 +307,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-046）。
 ## ドラフトアーティファクト契約（REQ-002-129〜139）
 
 `.agentdev/drafts/` 配下の中間成果物（draft file）の契約を定義する。
-draft file は原本アーティファクト（REQ/Decision/SPEC/RU）ではなく、コマンド間で受け渡す中間成果物である（REQ-002-126-128）。
+draft file は原本アーティファクト（REQ/Decision/Design/RU）ではなく、コマンド間で受け渡す中間成果物である（REQ-002-126-128）。
 
 ### ドラフト種別レジストリ（Draft Type Registry）
 
@@ -316,7 +316,7 @@ draft file は原本アーティファクト（REQ/Decision/SPEC/RU）ではな�
 
 | draft_type | file pattern | producer | allowed consumers | 位置づけ | lifecycle |
 |---|---|---|---|---|---|
-| `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `req-save`, `spec-save`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
+| `req_draft` | `.agentdev/drafts/req-draft-{topic}.md` | `req-define` | `req-save`, `design-save`, `case-open` | 保存前の要件ドラフト | case-open の Issue 作成 + VERIFY 成功後に削除 |
 
 標準 draft type は `req_draft` の 1 種のみとする（REQ-002-132）。
 `requirements-review-finding` および旧 `skill_review_finding` は標準 draft type に含めない。
@@ -330,7 +330,7 @@ Skill/Command 参照妥当性の検出結果は inspect lifecycle（`.agentdev/i
 ---
 draft_type: req_draft
 topic: example-topic
-status: draft  # draft_type=req_draft の初期状態（SPEC status とは無関係）
+status: draft  # draft_type=req_draft の初期状態（Design status とは無関係）
 created_at: 2026-06-14T19:36:47+09:00
 ---
 ```
@@ -344,13 +344,13 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 | command | 受け付ける draft_type |
 |---|---|
 | `req-save` | `req_draft` |
-| `spec-save` | `req_draft` |
+| `design-save` | `req_draft` |
 | `case-open` | `req_draft` |
 
 ### inspect-skills 副作用境界
 
 `inspect-skills` は検査対象（Command/Skill 定義ファイル）を直接修正しない診断コマンドとする。
-許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/Decision/SPEC 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-002-140-151、REQ-010-007）。
+許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/Decision/Design 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-002-140-151、REQ-010-007）。
 最終判断（promote / defer / reject）は `inspect-promote` が行う。
 検出事項（inspect finding）は `inspect-promote` による promote/defer/reject ライフサイクルの対象となる。
 
@@ -362,7 +362,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 | 集合 | 要素 | 役割 |
 |---|---|---|
 | producer | `{req-define}` | req_draft を生成する唯一の command |
-| direct consumer | `{req-save, spec-save, case-open}` | req_draft を主入力として消費し、REQ/Decision/SPEC/Issue を生成する command 群 |
+| direct consumer | `{req-save, design-save, case-open}` | req_draft を主入力として消費し、REQ/Decision/Design/Issue を生成する command 群 |
 | orchestration pre-reader | `{case-auto}` | case-open 前だけ req_draft を読み、後続工程の orchestration 入力とする command |
 | invalid post-case reader | `{case-auto, case-run, case-close}` | case-open 成功後に req_draft を参照してはならない command 群 |
 
@@ -371,11 +371,11 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 - case-open 成功後は Issue と Epic を SSoT とし、req_draft は削除されてよい一時成果物となる
 - case-auto は case-open 成功後の停止、再開、完了処理を Issue と Epic だけで成立させる
 - case-run、case-close は case-open 成功後に req_draft を参照しない
-- draft type registry の allowed consumers 列は `{req-save, spec-save, case-open}` とする（従来の `{req-save, case-open}` から spec-save を追加）
+- draft type registry の allowed consumers 列は `{req-save, design-save, case-open}` とする（従来の `{req-save, case-open}` から design-save を追加）
 
 ## req_draft 出力構造
 
-`req_draft`（`.agentdev/drafts/req-draft-{topic}.md`）は req-define が生成する一時的な構造化ハンドオフ成果物であり、req-save / spec-save / case-open / case-auto / case-run / case-close が消費する。
+`req_draft`（`.agentdev/drafts/req-draft-{topic}.md`）は req-define が生成する一時的な構造化ハンドオフ成果物であり、req-save / design-save / case-open / case-auto / case-run / case-close が消費する。
 
 - req_draft は API 契約ではなく、生成元（producer）側の標準（緩やかな契約: soft contract）である。LLM 推論経由で消費され、機械的パースを前提としない（DEC-003）
 - スキーマバージョン、JSON Schema、バリデータは導入しない
@@ -392,9 +392,9 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 
 | field | 説明 |
 |---|---|
-| `id` | `ACT-REQ-NNN` / `ACT-DEC-NNN` / `ACT-SPEC-NNN` |
-| `artifact` | `req` / `decision` / `spec` |
-| `operation` | REQ/Decision: `create` / `append` / `update`、SPEC: `create` / `update`（公式 enum）。各 SPEC は非正規 alias（`spec-create`, `spec-update`, `spec-append`）を受け付ける（REQ-008-058）。alias から公式 enum への映射、alias 固有の契約（target_area 形式、placement、anchor、未検出時挙動等）は各 SPEC が定める |
+| `id` | `ACT-REQ-NNN` / `ACT-DEC-NNN` / `ACT-DESIGN-NNN` |
+| `artifact` | `req` / `decision` / `design` |
+| `operation` | REQ/Decision/Design とも `create` / `append` / `update` の3値を公式 enum とする（REQ-008-058）。旧別名（`spec-create`、`spec-update`、`spec-append`）および新別名（`design-create`、`design-update`、`design-append`）は出力も受理もしない。target_area 形式、placement、anchor、未検出時挙動等の操作契約は Design 保存ワークフローが定める |
 | `target` | file path または `new:{slug}` |
 | `target_area` | optional: section / area 指定 |
 | `source_items` | 対応する agreed_item ID の list |
@@ -405,9 +405,9 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 `review_dispositions` は req-define が壁打ち過程で記録した採否判断（covered、rejected 等）を後続工程へ引き継ぐ optional な soft-contract である（DEC-003）。
 
 - **所有先**: 本節（`artifact-contracts.md`「req_draft 出力構造」節）が `review_dispositions` の schema を正規所有する
-- **producer**: req-define（`docs/specs/commands/req-define.md`、`src/opencode/commands/agentdev/req-define.md`、`src/opencode/commands/agentdev/templates/req-define/req-draft.md`）
-- **consumer**: case-open（`docs/specs/commands/case-open.md`、`src/opencode/commands/agentdev/case-open.md`）
-- **Issue 本文永続化先**: workflow-templates（`docs/specs/skills/agentdev-workflow-templates.md`、`src/opencode/skills/agentdev-workflow-templates/SKILL.md`、Issue 本文テンプレート群）が Issue 本文の「レビュー判断」セクション構造を正規所有する
+- **producer**: req-define（`docs/designs/commands/req-define.md`、`src/opencode/commands/agentdev/req-define.md`、`src/opencode/commands/agentdev/templates/req-define/req-draft.md`）
+- **consumer**: case-open（`docs/designs/commands/case-open.md`、`src/opencode/commands/agentdev/case-open.md`）
+- **Issue 本文永続化先**: workflow-templates（`docs/designs/skills/agentdev-workflow-templates.md`、`src/opencode/skills/agentdev-workflow-templates/SKILL.md`、Issue 本文テンプレート群）が Issue 本文の「レビュー判断」セクション構造を正規所有する
 
 #### 各エントリの field 構成
 
@@ -428,7 +428,7 @@ draft type registry の allowed consumers 列、REQ-008、REQ-006-083、document
 
 | disposition | 意味 |
 |---|---|
-| `covered` | 入力項目は既存要件、既存 SPEC、または同意済み artifact_actions で既に充足されている |
+| `covered` | 入力項目は既存要件、既存 Design、または同意済み artifact_actions で既に充足されている |
 | `partially_covered` | 入力項目の一部のみ採用し、残部は採用しない |
 | `rejected` | 入力項目を採用しない（スコープ外、重複、方針不一致等） |
 | `not_applicable` | 入力項目が本 draft の対象外である |
@@ -452,31 +452,36 @@ req_draft の frontmatter は最小限のメタデータのみとする。
 
 ## artifact_actions operation
 
-`artifact_actions` の `operation` フィールドは REQ/Decision 操作と SPEC 操作で扱う値が異なる。
-REQ/Decision 操作（`create` / `append` / `update`）は従来通り維持する。
-本節は SPEC 操作の公式 enum、非正規 alias、consumer 側の後方互換、および `spec-append` operation の契約を正規所有する。
+`artifact_actions` の `operation` フィールドは REQ/Decision/Design とも共通の公式 enum を持つ。
+本節は Design 操作の公式 enum と `append` operation の契約を正規所有する。
 各 action の field 構成は「req_draft 出力構造」節の「artifact_actions 詳細構造」を参照。
 
-### SPEC operation enum と非正規 alias
+### Design operation enum
 
-- SPEC operation の公式 enum は `create` / `update` の2値とする（REQ-008-058）
-- 各 SPEC（req-define / spec-save）は非正規 alias として `spec-create` / `spec-update` / `spec-append` を受け付ける
-- alias から公式 enum への映射: `spec-create` → `create`、`spec-update` → `update`、`spec-append` → `update`（既存 SPEC ファイルへ新規セクションを追加する操作）
-- consumer（spec-save）は `create` / `update` / `spec-create` / `spec-update` / `spec-append` の全てを受理する（後方互換）
+Design operation の公式 enum は `create` / `append` / `update` の3値とする（REQ-008-058）。
+旧別名（`spec-create` / `spec-update` / `spec-append`）と新別名（`design-create` / `design-update` / `design-append`）は導入しない。
 
-### spec-append operation
+| operation | 意図 | target_area 扱い |
+|---|---|---|
+| `create` | 新規 Design ファイルを作成する | 任意（省略時は design-save が既存セクション構造から追加位置を判断） |
+| `append` | 既存 Design ファイルへ新規セクションを追加する | 必須（anchor 見出し、Markdown 見出し行形式）。anchor 末尾への追加を示す `placement: tail`（既定）、anchor 直後を示す `placement: after_anchor`、anchor 直前を示す `placement: before_anchor` を action へ併せて出力できる（省略時は `tail`） |
+| `update` | 既存 Design ファイルの既存セクションを置換する | 必須（対象セクション見出し、Markdown 見出し行形式。例: `### IR-044`）。`target_area` に一致する見出しが存在しない場合、design-save は未検出として follow-up 報告を行う |
 
-`spec-append` は既存 SPEC ファイルへ新規セクションを追加する操作であり、公式 enum の `update` へ alias として映射される（REQ-008-058）。
+`append` と `update` の使い分けにより、意図的な新規セクション追加と `target_area` の誤字・古い見出し名・参照先間違いを機械的に区別できる。
+
+### append operation（Design）
+
+`append` は既存 Design ファイルへ新規セクションを追加する操作である。
 
 #### 意味
 
-既存 SPEC ファイルへ `target_area` と `placement` で指示した位置へ新規セクションを追加する。
+既存 Design ファイルへ `target_area` と `placement` で指示した位置へ新規セクションを追加する。
 
 #### 入力フィールド
 
 | field | 必須性 | 形式 |
 |---|---|---|
-| `target` | 必須 | 既存 SPEC ファイルパス |
+| `target` | 必須 | 既存 Design ファイルパス |
 | `target_area` | 必須 | 追加対象の見出し行全体（Markdown 見出し行形式。例: `### IR-044`）。見出しプレフィックス（`##`、`###` 等）の有無は正規化により吸収する |
 | `content` | 必須 | 追加する新規セクション本文（見出し行から始まる） |
 | `placement` | 任意（省略時 `tail`） | `tail` / `after_anchor` / `before_anchor` のいずれか |
@@ -492,17 +497,17 @@ REQ/Decision 操作（`create` / `append` / `update`）は従来通り維持す�
 
 #### 挙動
 
-- **同名見出し時**: `target_area` と完全一致する見出しが既存 SPEC ファイルに存在する場合、追加をスキップし follow-up 報告を行う（重複追加防止、全体中止しない）
+- **同名見出し時**: `target_area` と完全一致する見出しが既存 Design ファイルに存在する場合、追加をスキップし follow-up 報告を行う（重複追加防止、全体中止しない）
 - **anchor 未検出時**: `placement` が `tail` 以外で `anchor` 見出し行が存在しない場合、当該 action をスキップし follow-up 報告を行う（全体中止しない）
-- follow-up 報告は「operation を `spec-create` へ切り替えを推奨」を含む
+- follow-up 報告は「operation を `create` へ切り替えを推奨」を含む
 
 #### 合格基準
 
-- 追加後の SPEC ファイルに `target_area` と完全一致する見出しが1つだけ存在すること
+- 追加後の Design ファイルに `target_area` と完全一致する見出しが1つだけ存在すること
 - frontmatter `updated` を更新していること
 - `status` は変更しないこと（G06）
 
-配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `specs/commands/spec-save.md`「spec-append 操作時のセクション追加ロジック」が正規所有する。
+配置契約の実行詳細（`placement` 別挿入位置の算出、anchor マッチング規則）は `designs/commands/design-save.md`「append 操作時のセクション追加ロジック」が正規所有する。
 
 ## RU アーティファクト契約（session由来RU）
 
@@ -570,4 +575,4 @@ session 論理URI の解決なしに後工程が RU 内容を判断できる自�
 ### req-define による最終分類の扱い
 
 `tentative_classification` は暫定値であり、req-define による最終分類を先取りしない。
-req-define は `tentative_classification` を入力とし、document-model SPEC の文書7分類モデルへ照らして最終分類を確定する。
+req-define は `tentative_classification` を入力とし、document-model Design の文書7分類モデルへ照らして最終分類を確定する。

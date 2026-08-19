@@ -30,7 +30,7 @@
 
 - `agentdev-req-file-manager` の照合方法論に従って実行する。CREATE 前に APPEND/UPDATE 候補を必ず評価する。要件の分割が必要な場合は保存操作ではなく requirements review 候補として扱う。操作分類結果は `draft-data` の `artifact_actions` に記録する
 - **定量的データ検証**: `glob docs/requirements/<REQ-*>.md`（および副次的に `glob docs/decisions/<DEC-*>.md`）で実ファイル列挙と AGENTS.md 等の文書記載レンジとの乖離を確認・解消する（詳細は `agentdev-req-analysis` 参照）
-- **SPLIT 予兆計測（既存REQ）**: APPEND/UPDATE 対象の既存 REQ の健全性メトリクス（要件行数、関心分類数、成果物種別数）を計測し、req-health-metrics SPEC（extension 経由）の定量閾値で SPLIT シグナルを算出する。合計 2 以上の場合、APPEND 実施前にユーザーへ SPLIT 要否を提案する。計測対象は当該 REQ の要件テーブル行（`^| REQ-NNNN-MMM |`）
+- **SPLIT 予兆計測（既存REQ）**: APPEND/UPDATE 対象の既存 REQ の健全性メトリクス（要件行数、関心分類数、成果物種別数）を計測し、req-health-metrics Design（extension 経由）の定量閾値で SPLIT シグナルを算出する。合計 2 以上の場合、APPEND 実施前にユーザーへ SPLIT 要否を提案する。計測対象は当該 REQ の要件テーブル行（`^| REQ-NNNN-MMM |`）
 
 ### Result
 
@@ -52,11 +52,11 @@
 
 ### Purpose
 
-`agentdev-req-analysis` の分析観点に従って網羅し、REQ/Decision/SPEC 境界を確定する。
+`agentdev-req-analysis` の分析観点に従って網羅し、REQ/Decision/Design 境界を確定する。
 
 ### Input Resolution
 
-1. SSoT 再構成: 関連 REQ/Decision/SPEC（glob/grep による事前特定）
+1. SSoT 再構成: 関連 REQ/Decision/Design（glob/grep による事前特定）
 2. identifier 保持: REQ-ID、RU 暫定分類
 3. 最小 scalar: なし
 4. runtime artifact: draft-data 下書き
@@ -69,18 +69,18 @@
 
 詳細ゲート、委譲接続点は `agentdev-req-analysis` の各 Phase を参照。
 
-- **変更影響候補抽出**: 変更影響候補を抽出しドラフトに保持する。RU からの対象領域キーワード抽出、glob/grep での関連 REQ/Decision/SPEC 事前特定、サブエージェント調査委譲への調査優先対象リスト（ヒント）構築、実ファイル完全列挙の維持（詳細は `agentdev-req-analysis`「調査スコープ洗練手順」参照）
-- **分類ゲート（REQ 最終分類確定）**: 各要件行候補を「変更後仕様」/「反映作業」に分類する。REQ/SPEC 境界判定を行い SPEC 保存対象を `artifact_actions`（`artifact: spec`）に分離する。RU 暫定分類（`tentative_classification`）があれば document-model SPEC（extension 経由）の文書7分類モデルへ照らして最終分類を確定し上書きする
-- **文書分類妥当性検証**: REQ 要件行に SPEC 分離基準違反残留がないか検出する。検出時は SPEC 保存対象へ移送する（安定契約例外は対象外）
-- **Decision要否確認ゲート**: Decision候補・既存REQ/Decision/SPEC との衝突候補・責務境界変更を含む場合、`agentdev-architecture-advisory` へ委譲する。出力は4ラベル構造（確定事項/推定事項/ユーザー確認事項/ブロッカー）。soft-contract（Decision）。ブロッカーまたは未決事項残存時は壁打ち（STEP-2）へ差し戻す
-- **実行主体分類表**: 委譲契約を定義する場合、各委譲について実行主体分類表（adapter skill / command / subagent / harness）を必須とする（詳細は delegation-contracts SPEC（extension 経由）参照。委譲を含まない要件では省略可）
-- **評価契約確定（実証Case時）**: 実証Caseとして確定した場合、実証開始前に評価契約の構成要素を必要に応じて壁打ちで確定する。構成要素は評価対象・仮説、比較対象、比較条件、評価方法、評価観点、評価シナリオ、測定・観察項目、判定基準、必要証拠、採用条件、不採用条件、判定不能条件、中止条件、再実行条件、比較条件逸脱時の扱いとする。詳細は req-define command SPEC（extension 経由）「実証Case判定と評価契約」参照
+- **変更影響候補抽出**: 変更影響候補を抽出しドラフトに保持する。RU からの対象領域キーワード抽出、glob/grep での関連 REQ/Decision/Design 事前特定、サブエージェント調査委譲への調査優先対象リスト（ヒント）構築、実ファイル完全列挙の維持（詳細は `agentdev-req-analysis`「調査スコープ洗練手順」参照）
+- **分類ゲート（REQ 最終分類確定）**: 各要件行候補を「変更後仕様」/「反映作業」に分類する。REQ/Design 境界判定を行い Design 保存対象を `artifact_actions`（`artifact: design`）に分離する。RU 暫定分類（`tentative_classification`）があれば document-model Design（extension 経由）の文書7分類モデルへ照らして最終分類を確定し上書きする
+- **文書分類妥当性検証**: REQ 要件行に Design 分離基準違反残留がないか検出する。検出時は Design 保存対象へ移送する（安定契約例外は対象外）
+- **Decision要否確認ゲート**: Decision候補・既存REQ/Decision/Design との衝突候補・責務境界変更を含む場合、`agentdev-architecture-advisory` へ委譲する。出力は4ラベル構造（確定事項/推定事項/ユーザー確認事項/ブロッカー）。soft-contract（Decision）。ブロッカーまたは未決事項残存時は壁打ち（STEP-2）へ差し戻す
+- **実行主体分類表**: 委譲契約を定義する場合、各委譲について実行主体分類表（adapter skill / command / subagent / harness）を必須とする（詳細は delegation-contracts Design（extension 経由）参照。委譲を含まない要件では省略可）
+- **評価契約確定（実証Case時）**: 実証Caseとして確定した場合、実証開始前に評価契約の構成要素を必要に応じて壁打ちで確定する。構成要素は評価対象・仮説、比較対象、比較条件、評価方法、評価観点、評価シナリオ、測定・観察項目、判定基準、必要証拠、採用条件、不採用条件、判定不能条件、中止条件、再実行条件、比較条件逸脱時の扱いとする。詳細は req-define command Design（extension 経由）「実証Case判定と評価契約」参照
 - **評価契約の変更管理**: 実証開始後、実行側の自律判断で評価契約を変更しない。ユーザーが評価契約の変更を明示的に指示した場合のみ変更でき、変更内容、変更理由、既存評価結果への影響を追跡可能にし、影響する既存評価について必要な再評価または再実行を行い、変更前の契約と結果を失わない。実証全体の最終完了後は当該実証の評価契約および最終結果を書き換えない。完了後に異なる条件で評価する場合は新しい実証として扱う
-- **test strategy 定義**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command SPEC（extension 経由）の draft-data test_strategy フィールドスキーマ参照。test strategy と評価契約は分離する。test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う。評価対象が採用基準を満たさなかったことを実装不具合として自動修正しない
+- **test strategy 定義**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command Design（extension 経由）の draft-data test_strategy フィールドスキーマ参照。test strategy と評価契約は分離する。test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う。評価対象が採用基準を満たさなかったことを実装不具合として自動修正しない
 
 ### Result
 
-- 変更影響候補、最終分類、SPEC 分離結果、Decision要否確認結果、test strategy 定義、評価契約（実証Case時）
+- 変更影響候補、最終分類、Design 分離結果、Decision要否確認結果、test strategy 定義、評価契約（実証Case時）
 
 ### Evidence
 
@@ -88,7 +88,7 @@
 
 ### Completion Verification
 
-- 全要件行候補の分類が確定し、SPEC 分離基準違反残留が0件であること。test strategy 項目が全て3要素を持つこと。実証Case時は評価契約が実証開始前に確定していること
+- 全要件行候補の分類が確定し、Design 分離基準違反残留が0件であること。test strategy 項目が全て3要素を持つこと。実証Case時は評価契約が実証開始前に確定していること
 
 ### Resume-Idempotency
 
@@ -148,7 +148,7 @@
 
 - 不変条件（docs/ 配下の広範な探索禁止、限定探索は許可）
 - 不変条件（Decision閾値以上の判断は `agentdev-decision-guidelines` へ）
-- 不変条件（SPEC 分離基準該当行の `artifact_actions` 分離）
+- 不変条件（Design 分離基準該当行の `artifact_actions` 分離）
 - 不変条件（アーキテクチャ助言サブエージェントの参照と未確認事項非混入）
 - 不変条件（test strategy 3要素完全、欠落時は QG-1 fail 扱い）
 - 不変条件（評価契約と test strategy の分離、評価対象が採用基準を満たさなかったことの実装不具合としての自動修正禁止）

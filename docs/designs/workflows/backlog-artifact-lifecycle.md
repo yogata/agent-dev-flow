@@ -7,8 +7,8 @@ updated: 2026-08-15
 
 # RU / 採用済み成果物 / draft ライフサイクル
 
-> 本 SPEC は intake / learning / inspect / backlog パイプラインにまたがるアーティファクトライフサイクル契約を定義する。
-> 個別コマンドの動作は各 command SPEC を参照。
+> 本 Design は intake / learning / inspect / backlog パイプラインにまたがるアーティファクトライフサイクル契約を定義する。
+> 個別コマンドの動作は各 command Design を参照。
 
 ## 目的
 
@@ -122,16 +122,16 @@ created: "{YYYY-MM-DD}"
 
 `/agentdev/inspect-promote --auto` は、高確信度の検出事項（inspect finding）を HITL 承認を経ずに intake/backlog パイプラインへ流入させる（REQ-001-016, REQ-010-010）。
 コマンドは判定表を重複保持しない。
-詳細手順は `docs/specs/commands/inspect-promote.md` 参照。
+詳細手順は `docs/designs/commands/inspect-promote.md` 参照。
 
 ### 自動 promote 対象カテゴリ
 
-自動 promote は「機械的に特定可能で、移行先 SPEC が一意に定まり、意味判断を要しない」高確信度 finding に限定する。
+自動 promote は「機械的に特定可能で、移行先 Design が一意に定まり、意味判断を要しない」高確信度 finding に限定する。
 `--auto` は明示 opt-in であり、省略時は手動分類フローのみ動作する。
 
 | カテゴリ | 自動 promote 対象 | 自動 promote 対象外（手動分類へ） |
 |---|---|---|
-| SPEC分離基準違反（high-specificity） | 具体的証拠を伴う Step 番号、スキーマフィールド、enum 一覧、テストデータ詳細、作業履歴など、移行先が SPEC/コマンドリファレンス に一意に定まるもの | 安定契約例外（REQ-001-069）、否定文脈、判定表、内部パラメータなど意味解釈を要するもの |
+| Design分離基準違反（high-specificity） | 具体的証拠を伴う Step 番号、スキーマフィールド、enum 一覧、テストデータ詳細、作業履歴など、移行先が Design/コマンドリファレンス に一意に定まるもの | 安定契約例外（REQ-001-069）、否定文脈、判定表、内部パラメータなど意味解釈を要するもの |
 | 構造的即時是正 | リンク切れ、旧名前空間（namespace）残存など、正解が一意で破壊的でない修復 | - |
 | 命名、分類の意味判断 | - | SPLIT/MERGE/MOVE/RETIRE/DRIFT 判断、scope 決定、優先度付け（全件手動） |
 | ADR 要否判断 | - | ADR閾値判定を含む finding（全件手動） |
@@ -224,11 +224,11 @@ REQ CREATE / APPEND / UPDATE 時に各 README（`docs/README.md`、`docs/require
 |---|---|
 | REQ追加時 | `docs/requirements/README.md`, `docs/README.md` |
 | Decision追加時 | `docs/decisions/README.md`, `docs/README.md` |
-| SPEC追加/分割/削除時 | `docs/specs/README.md` |
+| Design追加/分割/削除時 | `docs/designs/README.md` |
 
 ### 矛盾時の優先順位
 
-README 索引と基準（REQ/Decision/SPEC）が矛盾する場合、基準を優先し README 索引を修正対象とする。
+README 索引と基準（REQ/Decision/Design）が矛盾する場合、基準を優先し README 索引を修正対象とする。
 
 ## REQ 再構成検出
 
@@ -252,17 +252,17 @@ REQ保存処理中にREQ体系上の歪みを検知した場合、REQ再構成in
 
 ## artifact_actions ベース工程分岐
 
-case-auto / case-open / req-save / spec-save の工程分岐は `work_type` の固定分岐ではなく、req_draft の `artifact_actions` 存在に基づく動的判定とする（v2:ADR-0123, REQ-001-014）。
+case-auto / case-open / req-save / design-save の工程分岐は `work_type` の固定分岐ではなく、req_draft の `artifact_actions` 存在に基づく動的判定とする（v2:ADR-0123, REQ-001-014）。
 
 - `req-save` は `artifact_actions` に `artifact: req` または `artifact: decision` の entry が含まれる場合に実行する（`work_type` に依存しない）
-- `spec-save` は `artifact_actions` に `artifact: spec` の entry が含まれる場合に実行する（`work_type` に依存しない）
-- `case-open` は `req-save` / `spec-save` の後に常に実行する
+- `design-save` は `artifact_actions` に `artifact: design` の entry が含まれる場合に実行する（`work_type` に依存しない）
+- `case-open` は `req-save` / `design-save` の後に常に実行する
 - `case-auto` はパイプラインの各工程を `work_type` の固定分岐ではなく `artifact_actions` の存在から決定する
 - `auto_gate` preflight: `case-auto` は `auto_gate.auto_ready` を確認し、false の場合または未解決 item が残る場合は停止する
 
 ## one-time 成果物ライフサイクル（監査台帳等）
 
-> 本セクションは SC-003（`docs/specs/local/audit-ledger-lifecycle.md`）から移管された一般契約である。
+> 本セクションは SC-003（`docs/designs/local/audit-ledger-lifecycle.md`）から移管された一般契約である。
 > SC-003 は superseded 宣言済みであり、現行契約は本セクションを正とする。
 
 one-time 成果物（監査台帳、照合表、一時分析ファイル等）は、特定監査フェーズの入力として実ファイル列挙、不整合検出、処置候補抽出を集約する中間アーティファクトであり、フェーズ横断の進捗管理台帳として恒久化しない。
@@ -281,7 +281,7 @@ one-time 成果物（監査台帳、照合表、一時分析ファイル等）�
 
 - [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
 - [capture-boundaries.md](capture-boundaries.md)（キャプチャ境界）
-- 各 command SPEC（`docs/specs/commands/`）
+- 各 command Design（`docs/designs/commands/`）
 - `agentdev-backlog-integration` skill（採用済み成果物の統合、RU 生成）
 - REQ-008（RU lifecycle）
 - REQ-037（REQ 再構成 intake）

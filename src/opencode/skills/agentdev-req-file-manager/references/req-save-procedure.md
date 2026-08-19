@@ -11,23 +11,23 @@ CREATE 対象 REQ の要件テーブルに、既存成果物への反映作業�
 - 反映作業とは、既存成果物への更新、削除、移動、名称変更、廃止、置換、参照修正、インデックス修正、整合性修正そのものを記述する行を指す。
 - 要件行の述語が「更新する」「削除する」「移動する」「改名する」「廃止する」「置換する」「修正する」だけを表し、変更後に満たすべき振る舞い、制約、状態を含まない場合は反映作業のみと判定する。
 - 検出時は保存を停止し、該当行、判定理由、推奨移送先を報告する。
-- 推奨移送先は対象 REQ/ ADR/ SPEC 等への UPDATE/ APPEND、または後続 Case の変更対象とする。
+- 推奨移送先は対象 REQ/ ADR/ Design 等への UPDATE/ APPEND、または後続 Case の変更対象とする。
 - 報告後はユーザー指示を待つ。単純な続行指示のみでは保存へ進まない。分類結果に対する明示的な判定変更指示がある場合のみ保存へ進む。
 
 ## 文書分類適合確認
 
-REQ/ ADR 保存前に、対象ドキュメントの種別が document-model SPEC の Document Classification Policy に適合していることを確認する。
+REQ/ ADR 保存前に、対象ドキュメントの種別が document-model Design の Document Classification Policy に適合していることを確認する。
 適合しない場合は保存を停止し、理由を報告する。
 
 `draft-meta` に `adr-revision-mode: full-reclassification` が指定されている場合は、既存 ADR の full reclassification を許可する。
-このモードでは既存 ADR を現行基準/ 廃止/ REQ、SPEC、guide 移管候補として再分類できる。
+このモードでは既存 ADR を現行基準/ 廃止/ REQ、Design、guide 移管候補として再分類できる。
 実行前に、移管先情報と変更内容をドラフトまたは保存結果へ明示的に記録する。
 
 ## REQ ファイル操作
 
 ドラフトに複数の `req-operation` と `target-req` のペアが含まれる場合は、各ペアを順次処理する。
 req-save が扱う operation type は REQ 操作（`create`/ `append`/ `update`）のみとする。
-SPEC 操作（`spec-create`/ `spec-update`）は `target_spec` フィールドで識別され、spec-save コマンドが消費するため req-save の対象外とする。
+Design 操作（`artifact: design`、operation `create`/`append`/`update`）は `target_design` フィールドで識別され、design-save コマンドが消費するため req-save の対象外とする。
 
 - CREATE: テンプレートを適用し、最大 REQ 番号 + 1 で `docs/requirements/REQ-{NNNN}.md` に保存する。生成後、`doc_requirement.md` の必須セクションと frontmatter 必須フィールドを確認する。
 - APPEND: 既存 REQ ファイルの要件テーブルに行を追加し、frontmatter `updated` を更新する。

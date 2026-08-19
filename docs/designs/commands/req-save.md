@@ -1,11 +1,11 @@
 ---
-title: req-save SPEC
+title: req-save Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-15
 ---
 
-# req-save SPEC
+# req-save Design
 
 ## 目的
 
@@ -15,7 +15,7 @@ req-define で壁打ちした成果物を REQ/Decision ファイルとして doc
 ## 承認・HITL 境界
 
 - req-save 自身の承認点を持たない（req-define で壁打ち合意済みの draft を入力として保存する）。
-- Decision 保存直前の妥当性再検証で REQ/SPEC 相当の内容のみと判定した場合は、保存せず停止してユーザー判断を求める。
+- Decision 保存直前の妥当性再検証で REQ/Design 相当の内容のみと判定した場合は、保存せず停止してユーザー判断を求める。
 
 ## 入力
 
@@ -61,18 +61,18 @@ req-define で壁打ちした成果物を REQ/Decision ファイルとして doc
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/req-save.md`）はその実行時投影である（DEC-010）。
-- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-req-save`）が所有し、本 SPEC はこれらを複製しない。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/req-save.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-req-save`）が所有し、本 Design はこれらを複製しない。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
-## 参照する横断 SPEC
+## 参照する横断 Design
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、コマンド分類）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（REQ ファイル整合性検査、README 索引影響規則、REQ 再構成検出、artifact_actions 工程分岐）
 - [quality-gates.md](../quality/quality-gates.md)（QG-1）
 - [req-health-metrics.md](../quality/req-health-metrics.md)（SPLIT 検出基準）
-- [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（REQ/Decision/SPEC body 品質検査）
+- [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（REQ/Decision/Design body 品質検査）
 - [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)（IR-057 obsolete-spec-path-after-domain-split、targeted docs guard 連携）
 
 ## targeted docs guard (v2:REQ-0158-003)
@@ -82,7 +82,7 @@ REQ 保存工程で targeted docs guard を実行する。
 
 - 実行タイミング: docs 変更整合性検証の直後、README 索引影響確認の前
 - 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow req-save --files <changed REQ files> --json`
-- 検査項目: REQ frontmatter 必須項目、ファイル名・ID の一致、要件行 ID 形式の妥当性、WHAT/HOW 境界逸脱検出、`docs/requirements/README.md` 同期、README 索引更新要否判定、ADR 参照相互参照更新要否判定、関連 SPEC 候補時の `docs/specs/README.md` 更新要否判定、旧SPEC直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、文書種別責務と日本語執筆規範の機械化可能範囲の検査
+- 検査項目: REQ frontmatter 必須項目、ファイル名・ID の一致、要件行 ID 形式の妥当性、WHAT/HOW 境界逸脱検出、`docs/requirements/README.md` 同期、README 索引更新要否判定、ADR 参照相互参照更新要否判定、関連 Design 候補時の `docs/designs/README.md` 更新要否判定、旧Design直下パス混入検出（IR-057）、local版旧生成方式語彙混入検出、文書種別責務と日本語執筆規範の機械化可能範囲の検査
 - 失敗時: 検査対象文書（REQ ファイル、`docs/requirements/README.md`、`docs/README.md`、`AGENTS.md`）を修正して再実行する。`full_docs_check_recommended` が true の場合は `/repo/docs-check`（全体監査）の実行を検討する
 
 JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。
@@ -100,7 +100,7 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 
 ## 対象外
 
-- REQ/Decision 対象 artifact_actions がない場合の SPEC ファイル作成、編集（G01、no-op 完了）
+- REQ/Decision 対象 artifact_actions がない場合の Design ファイル作成、編集（G01、no-op 完了）
 - `docs/requirements/**`、`docs/decisions/**`、`docs/README.md`、`.agentdev/drafts/**` 以外のファイル作成、編集（G02、G03）
 - ドラフトファイル不存在時の実行（G04、エラー中止）
 - REQ番号の空き番号再利用（G05、`agentdev-req-file-manager` 採番ルール遵守）
@@ -109,13 +109,13 @@ req-save は check_integrity.ts（全体監査）を使用しない（保存工�
 - リモート同期時の hash 一致検証省略（G08）
 - Issue 作成（G11、case-open 責務）
 - intake / learning capture の直接実施（G12）。deviation capture は Skill 委譲で実施（「副作用」セクション参照）
-- SPEC artifact_actions の処理（spec-save 責務）
+- Design artifact_actions の処理（design-save 責務）
 - `work_type` 固定分岐による工程判定（G09、`artifact_actions` 有無で判定）
 
 ## 検証観点
 
 - QG-1（Definition Integrity Gate）: REQ/Decision ファイル保存の前置条件として「適用結果の整合性検証」を実行（採番結果の整合性、マージ結果の整合性、インデックスの整合性、変更範囲の妥当性）。内容の品質は req-define の QG-1 の責務（REQ-004-081/082）
-- Decision 妥当性再検証ゲート: Decision 保存直前に技術判断含有確認、REQ/SPEC 相当の内容のみなら停止
+- Decision 妥当性再検証ゲート: Decision 保存直前に技術判断含有確認、REQ/Design 相当の内容のみなら停止
 - Decision 採番: `agentdev-decision-file-manager` の採番ルール（max+1, 欠番埋め禁止）で確定番号を付与
 - 出力制約: 成果物本文（REQ/Decision ファイル本文、commit message）は verbatim で返す（G10）
 
@@ -135,13 +135,13 @@ G07（commit 前 status 更新）は フェーズ3 で維持。
 
 - ドラフトファイル不存在時（G04。エラー中止する）。
 - 読込時 hash とリモート同期後 hash の不一致検出時（G08。保存処理を中止し、差異を報告する）。
-- Decision 妥当性再検証で REQ/SPEC 相当と判定した場合（保存せず停止し、ユーザー判断を求める）。
+- Decision 妥当性再検証で REQ/Design 相当と判定した場合（保存せず停止し、ユーザー判断を求める）。
 - targeted docs guard の検査失敗時（検査対象文書を修正して再実行するまで永続化しない）。
 
 ## See Also
 
 - [req-define.md](req-define.md)（前段コマンド）
-- [spec-save.md](spec-save.md)（後続コマンド（SPEC 候補がある場合））
+- [design-save.md](design-save.md)（後続コマンド（Design 候補がある場合））
 - [case-open.md](case-open.md)（後続コマンド（Issue 作成））
 - `agentdev-workflow-req-save` skill（workflow 実装本体（STEP 構成、resume protocol））
 - `agentdev-req-file-manager` skill（REQ ファイル管理、採番）

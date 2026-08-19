@@ -14,16 +14,16 @@ req-save command は公開 interface（入出力契約・ガードレール）�
 ## 原本（SSoT）
 
 本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約は `<workflows/workflow-skill-model>` SPEC が正規所有する。
+Workflow Skill 固有契約は `<workflows/workflow-skill-model>` Design が正規所有する。
 extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と req-save command の公開契約のみを前提とする。SPEC ディレクトリの内部構成は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と req-save command の公開契約のみを前提とする。Design ディレクトリの内部構成は仮定しない
 2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
+3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 入力
@@ -46,7 +46,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`）は�
 ## Control Plane（STEP 一覧）
 
 req-save workflow は次の12 STEP で構成する。
-各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
 会話コンテキストに依存せず、durable state（draft の `status` frontmatter、REQ/Decision ファイル、README エントリ、commit hash、git 状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -81,7 +81,7 @@ req-save workflow は次の12 STEP で構成する。
 
 - 正常終了: STEP-12 の完了報告出力まで（no-op 時は STEP-1 の no-op 完了報告）
 - 停止終了: ドラフト不存在（エラーで中止、req-define を案内）、必須フィールド欠損、QG-1 fail（req-define 差し戻し）、変更範囲違反（ユーザー指示待ち）、hash 不一致（評価・承認のやり直し）
-- Issue は作成しない。`artifact: spec` entry は処理しない（spec-save の対象）
+- Issue は作成しない。`artifact: design` entry は処理しない（design-save の対象）
 
 ## 主要 Capability Skill 連携
 
@@ -115,8 +115,8 @@ req-save workflow は次の12 STEP で構成する。
 
 ## See Also
 
-- **`<workflows/workflow-skill-model>` SPEC**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` SPEC**: STEP reference 構造、resume point
+- **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
+- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **req-save command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
