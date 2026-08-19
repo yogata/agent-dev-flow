@@ -1,6 +1,7 @@
 # STEP-1/2/3: 入力解決・工程分岐・orchestration 実行（input-resolution-and-orchestration）
 
-> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-1, STEP-2, STEP-3 詳細である。入力解決、work_type 読取・工程分岐、orchestration 実行（stage モデル、Wave 反復、bg task 管理）を提供する。
+> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-1, STEP-2, STEP-3 詳細である。
+> 入力解決、work_type 読取・工程分岐、orchestration 実行（stage モデル、Wave 反復、bg task 管理）を提供する。
 
 ## 目次
 
@@ -27,7 +28,8 @@
 
 ### Procedure
 
-実行開始時刻を JST（Etc/GMT-{N}）で記録し `case_auto_started_at` に保持。STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出の基準として使用。
+実行開始時刻を JST（Etc/GMT-{N}）で記録し `case_auto_started_at` に保持。
+STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出の基準として使用。
 
 - **Issue番号/URL入力モード**: 引数が数値のみまたは GitHub Issue URL の場合、Issue番号として解決し case-run 移行モードへ分岐（STEP-1 の Issue番号/URL入力分岐へ）。要件doc入力より優先。要件doc の入力解決・work_type 読取はスキップ
 - **要件doc入力モード**:
@@ -122,9 +124,12 @@
 
 ### Procedure
 
-実行モデル原則、工程別契約（req-save+spec-save 統合委譲、case-open、case-run インライン実行、case-close）、QG-1〜QG-4 の継承、タイムスタンプ計測（L1）、インライン実行時のコンテキスト管理、結果状態の4次元集約、case-open 完了後の分岐（Standard flow / Epic Issue flow、クリーンアップ検証ゲート）、Wave 反復制御、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定（delegation-unavailable 停止条件）、Subagent 委譲プロトコル（category 選定ガイドライン、MUST NOT DO 必須化）、orchestration stage モデル、子 task bg task 破棄検知時の回復（3状態分類、ライフサイクル分離）の各詳細は `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各対応 skill を参照。case-run インライン実行時も case-run.md を authoritative source として読み込む。
+実行モデル原則、工程別契約（req-save+spec-save 統合委譲、case-open、case-run インライン実行、case-close）、QG-1〜QG-4 の継承、タイムスタンプ計測（L1）、インライン実行時のコンテキスト管理、結果状態の4次元集約、case-open 完了後の分岐（Standard flow / Epic Issue flow、クリーンアップ検証ゲート）、Wave 反復制御、OU 処理順序、クリーンアップ検証ゲート、委譲起動判定（delegation-unavailable 停止条件）、Subagent 委譲プロトコル（category 選定ガイドライン、MUST NOT DO 必須化）、orchestration stage モデル、子 task bg task 破棄検知時の回復（3状態分類、ライフサイクル分離）の各詳細は `agentdev-workflow-orchestration`、`agentdev-case-run-execution-adapter`、`agentdev-git-worktree`、各対応 skill を参照。
+case-run インライン実行時も case-run.md を authoritative source として読み込む。
 
-case-auto は各工程の結果に基づいて次工程へ進むか停止条件（STEP-4）を判定する。req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
+case-auto は各工程の結果に基づいて次工程へ進むか停止条件（STEP-4）を判定する。
+req-save/case-open の委譲に draft path と OU ID のみを渡す（OU 本文の切り出しは行わない）。
+OU の統合・分割・REQ 操作分類・Issue 階層判定を再評価しない（各工程の判定結果に従う）。
 
 #### orchestration stage モデル
 
@@ -134,7 +139,8 @@ case-auto は各工程の結果に基づいて次工程へ進むか停止条件�
 | stage 2 | case-run | bg task（最大5件） | 並列（3つの「5件」文脈の (2) に該当） |
 | stage 3 | case-close | 直列集約 | 単一 |
 
-順次フォールバック可能（command 不変条件）。bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
+順次フォールバック可能（command 不変条件）。
+bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
 
 #### Wave 反復制御（case-auto 直接制御）
 
@@ -153,7 +159,10 @@ case-auto は各工程の結果に基づいて次工程へ進むか停止条件�
 
 #### 複数REQ対応
 
-req-save 委譲の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールを使用（command 不変条件）。req-save から case-open への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリング・再評価なしでそのまま渡す（command 不変条件）。Epic Issue 化の判定には関与しない（command 不変条件）。case-open の判定結果に従う。
+req-save 委譲の出力から複数 REQ doc または scale:large を検出した場合、case-auto は case-open の Issue 構造ルールを使用（command 不変条件）。
+req-save から case-open への状態引き継ぎ時、複数 REQ doc の保存結果をフィルタリング・再評価なしでそのまま渡す（command 不変条件）。
+Epic Issue 化の判定には関与しない（command 不変条件）。
+case-open の判定結果に従う。
 
 #### OU処理順序
 

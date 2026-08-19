@@ -11,7 +11,8 @@ command と skill は gh コマンドを直接記述せず、本スキルの手�
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-gh-cli` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 責務
@@ -51,7 +52,8 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | PR 変更ファイル一覧取得 | PR 番号 | 変更ファイルパス一覧（文字列配列） |
 | PR mergeable 状態取得 | PR 番号 | `MERGEABLE` / `CONFLICTING` / `UNKNOWN` |
 
-後者2手続き（PR 変更ファイル一覧取得、PR mergeable 状態取得）は基盤手続き一覧を UPDATE せず拡張手続きとして新設したものである。詳細は SPEC `agentdev-gh-cli`.md「拡張手続き」参照。
+後者2手続き（PR 変更ファイル一覧取得、PR mergeable 状態取得）は基盤手続き一覧を UPDATE せず拡張手続きとして新設したものである。
+詳細は SPEC `agentdev-gh-cli`.md「拡張手続き」参照。
 
 ## VERIFY
 

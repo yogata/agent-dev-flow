@@ -5,7 +5,9 @@ description: "req-save command の workflow 実装本体。壁打ち成果物（
 
 # req-save workflow スキル
 
-req-save command の workflow 実装本体。req-define で生成された壁打ち成果物をREQ/Decisionファイルとしてdocs/に保存し、コミット・プッシュする制御構造を所有する。`work_type` による消費判定は廃止し、`artifact_actions` の有無で判定する。
+req-save command の workflow 実装本体。
+req-define で生成された壁打ち成果物をREQ/Decisionファイルとしてdocs/に保存し、コミット・プッシュする制御構造を所有する。
+`work_type` による消費判定は廃止し、`artifact_actions` の有無で判定する。
 
 req-save command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -43,7 +45,9 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`）は�
 
 ## Control Plane（STEP 一覧）
 
-req-save workflow は次の12 STEP で構成する。各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。会話コンテキストに依存せず、durable state（draft の `status` frontmatter、REQ/Decision ファイル、README エントリ、commit hash、git 状態）から再開点を再構成する。
+req-save workflow は次の12 STEP で構成する。
+各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、durable state（draft の `status` frontmatter、REQ/Decision ファイル、README エントリ、commit hash、git 状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -95,7 +99,11 @@ req-save workflow は次の12 STEP で構成する。各 STEP は resume point �
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-save/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、req-save command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-save.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-req-save/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、req-save command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

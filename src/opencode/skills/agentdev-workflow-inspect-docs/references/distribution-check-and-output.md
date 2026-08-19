@@ -1,6 +1,7 @@
 # STEP-3 / STEP-4: 配布物整合性検査・検出事項出力・永続化（distribution-check-and-output）
 
-> 本 reference は `agentdev-workflow-inspect-docs` SKILL.md の Control Plane STEP-3、STEP-4 詳細である。read-only-diagnostic型のため resume point を持たない。
+> 本 reference は `agentdev-workflow-inspect-docs` SKILL.md の Control Plane STEP-3、STEP-4 詳細である。
+> read-only-diagnostic型のため resume point を持たない。
 
 ## 開始条件
 
@@ -17,7 +18,8 @@
 
 ### STEP-3-1: 配布物整合性検査
 
-配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する。`agentdev-req-structure-diagnostics` 参照。
+配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する。
+`agentdev-req-structure-diagnostics` 参照。
 
 存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity SPEC 構文健全性検査準拠）。
 
@@ -44,7 +46,10 @@ NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-reb
 
 ### STEP-4-3: .agentdev/inspect/ 変更の commit と push
 
-`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/inspect/` 配下の変更を commit/ push する。commit message は `chore(agentdev): capture inspect-docs finding`（Conventional Commits 形式）。変更なし時は commit/push せず完了報告で「変更なし」と報告する。push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）。
+`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/inspect/` 配下の変更を commit/ push する。
+commit message は `chore(agentdev): capture inspect-docs finding`（Conventional Commits 形式）。
+変更なし時は commit/push せず完了報告で「変更なし」と報告する。
+push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）。
 
 ### STEP-4-4: 完了報告
 

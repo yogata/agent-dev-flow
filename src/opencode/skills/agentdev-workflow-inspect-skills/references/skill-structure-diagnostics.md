@@ -1,6 +1,7 @@
 # STEP-1 / STEP-2: 診断対象読込・診断観点評価・分類・route 提示（skill-structure-diagnostics）
 
-> 本 reference は `agentdev-workflow-inspect-skills` SKILL.md の Control Plane STEP-1、STEP-2 詳細である。read-only-diagnostic型のため resume point を持たない。
+> 本 reference は `agentdev-workflow-inspect-skills` SKILL.md の Control Plane STEP-1、STEP-2 詳細である。
+> read-only-diagnostic型のため resume point を持たない。
 
 ## 開始条件
 
@@ -31,7 +32,8 @@ Command/ Skill 定義を読み込み、Command→Skill 参照、Skill frontmatte
 
 ### STEP-2-3: 分類
 
-検出事項ごとに診断分類ラベルを付与する。NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける。
+検出事項ごとに診断分類ラベルを付与する。
+NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける。
 
 ### STEP-2-4: route 提示
 

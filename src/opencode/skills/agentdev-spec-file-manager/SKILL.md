@@ -15,12 +15,14 @@ description: Manages SPEC file operations (CREATE/APPEND/UPDATE), placement reso
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-spec-file-manager` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 責務境界
 
-本スキルは SPEC 操作（作成、更新、配置判断、target_area 処理、SPEC 固有整合性確認、SPEC 固有 script 呼出契約）のみを担う。REQ 操作、ADR 操作、SPEC 内容推論、accepted 昇格判断、ユーザー承認、commit、push は対象外。
+本スキルは SPEC 操作（作成、更新、配置判断、target_area 処理、SPEC 固有整合性確認、SPEC 固有 script 呼出契約）のみを担う。
+REQ 操作、ADR 操作、SPEC 内容推論、accepted 昇格判断、ユーザー承認、commit、push は対象外。
 
 | 操作 | 本スキル | 他スキル |
 |------|----------|----------|
@@ -83,7 +85,8 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 配置先: 本スキル配下の `scripts/`（SPEC 固有）。
 実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`）。
 
-共通検証 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `agentdev-artifact-validation` が所有し、本スキルは公開検証契約経由で委譲する。本スキル配下には SPEC 固有 script のみを配置する。
+共通検証 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `agentdev-artifact-validation` が所有し、本スキルは公開検証契約経由で委譲する。
+本スキル配下には SPEC 固有 script のみを配置する。
 
 ### I/O 契約（REQ）
 
@@ -132,13 +135,17 @@ spec-save は本スクリプト群を bash 経由で呼び出し、JSON 結果�
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、spec-save Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。本スキル自身は STEP を所有しない。
+本スキルは Capability Skill として、spec-save Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。
+本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution
 
-本スキルが操作する SPEC ファイル群は durable state の最上位（SSoT 再構成）に位置する。SPEC `status`（`draft` / `accepted` / `superseded`）は最小 scalar 相当の状態値として扱う。優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
+本スキルが操作する SPEC ファイル群は durable state の最上位（SSoT 再構成）に位置する。
+SPEC `status`（`draft` / `accepted` / `superseded`）は最小 scalar 相当の状態値として扱う。
+優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
 
-呼出元 STEP（spec-save）は本スキルの操作結果（SPEC ファイル作成、target_area 置換結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成から再取得できる。STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
+呼出元 STEP（spec-save）は本スキルの操作結果（SPEC ファイル作成、target_area 置換結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成から再取得できる。
+STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
 
 ## See Also
 
@@ -152,7 +159,8 @@ spec-save は本スクリプト群を bash 経由で呼び出し、JSON 結果�
 
 ## 参考文献
 
-SKILL.md 本文から遅延読み込みされる詳細資料。各ファイルの冒頭に本文への文脈宣言を備える。
+SKILL.md 本文から遅延読み込みされる詳細資料。
+各ファイルの冒頭に本文への文脈宣言を備える。
 
 | ファイル | 内容 |
 |----------|------|

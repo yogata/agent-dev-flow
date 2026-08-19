@@ -1,6 +1,8 @@
 # epic-wave workflow: Epic Wave 実行（epic-wave）
 
-> 本 reference は `agentdev-workflow-case-run` SKILL.md の epic-wave workflow 詳細である。`case-run #epic` 受領時に現在 ready な Wave の子Issue を並列実行する制御（STEP-W1〜W5）を所有する。子Issue ごとの委譲・result 処理は [references/delegation-and-result.md](delegation-and-result.md) の STEP-S4/S5 と同一契約で並列適用する。
+> 本 reference は `agentdev-workflow-case-run` SKILL.md の epic-wave workflow 詳細である。
+> `case-run #epic` 受領時に現在 ready な Wave の子Issue を並列実行する制御（STEP-W1〜W5）を所有する。
+> 子Issue ごとの委譲・result 処理は [references/delegation-and-result.md](delegation-and-result.md) の STEP-S4/S5 と同一契約で並列適用する。
 
 ## 目次
 
@@ -29,9 +31,13 @@ Epic Issue 本文から現在 ready な Wave の子Issue 群を特定する。
 
 ### Procedure
 
-Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 ready な Wave の子Issue を特定する。1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
+Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 ready な Wave の子Issue を特定する。
+1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。
+同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
 
-**Epic Issue の入力ソース**: Epic Issue は本来の Epic flow（マルチREQ、`scale: large`）に加え、Standard flow 起因の独立 OU 自動 Epic 化（case-open が `depends_on` 空、L0 相当の独立 OU を検出して Epic 化）によるものも含む。入力ソースを区別せず、Epic Wave モデル（ADR、最大5件並列委譲）で一様に処理する。いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
+**Epic Issue の入力ソース**: Epic Issue は本来の Epic flow（マルチREQ、`scale: large`）に加え、Standard flow 起因の独立 OU 自動 Epic 化（case-open が `depends_on` 空、L0 相当の独立 OU を検出して Epic 化）によるものも含む。
+入力ソースを区別せず、Epic Wave モデル（ADR、最大5件並列委譲）で一様に処理する。
+いずれのモードでも他Issue の実装履歴や Epic 全体の実装過程を前提としない。
 
 ### Result
 
@@ -108,7 +114,9 @@ Wave 内子Issue を実行担当サブエージェントへ最大5件並列委�
 
 ### Procedure
 
-各子Issue を [references/delegation-and-result.md](delegation-and-result.md) STEP-S4 と同一契約で実行担当サブエージェントへ委譲する（adapter skill 読込、委譲 prompt 内で実行 command 指定、worktree root 相対パス引き渡し、経路G 含む）。並列数は最大5件とし、超過分は完了順に起動する。子Issue ごとに委譲起動直前・直後の L2 タイムスタンプを記録する。
+各子Issue を [references/delegation-and-result.md](delegation-and-result.md) STEP-S4 と同一契約で実行担当サブエージェントへ委譲する（adapter skill 読込、委譲 prompt 内で実行 command 指定、worktree root 相対パス引き渡し、経路G 含む）。
+並列数は最大5件とし、超過分は完了順に起動する。
+子Issue ごとに委譲起動直前・直後の L2 タイムスタンプを記録する。
 
 ### Result
 
@@ -185,7 +193,9 @@ Wave 内子Issue を実行担当サブエージェントへ最大5件並列委�
 
 ### Procedure
 
-完了報告 template に従い、result 状態別（completed-pr / blocked / failed / delegation-unavailable）の子Issue 一覧と PR番号、L2 タイムスタンプ内訳を出力する。Epic Issue 本文ステータス追跡テーブルの更新は行わない（case-close 単一書き手）。`completed-pr` となった子Issue を次 Wave へ進めるためには、case-close でマージ後に再度 `case-run #epic` を実行する（べき等）。
+完了報告 template に従い、result 状態別（completed-pr / blocked / failed / delegation-unavailable）の子Issue 一覧と PR番号、L2 タイムスタンプ内訳を出力する。
+Epic Issue 本文ステータス追跡テーブルの更新は行わない（case-close 単一書き手）。
+`completed-pr` となった子Issue を次 Wave へ進めるためには、case-close でマージ後に再度 `case-run #epic` を実行する（べき等）。
 
 ### Result
 

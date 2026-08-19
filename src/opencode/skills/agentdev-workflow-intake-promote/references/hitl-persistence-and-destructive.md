@@ -1,6 +1,7 @@
 # STEP 詳細: HITL / persistence / destructive handling / 完了報告（intake-promote）
 
-> 本 reference は `agentdev-workflow-intake-promote` SKILL.md の Control Plane STEP-3〜STEP-6 詳細である。SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
+> 本 reference は `agentdev-workflow-intake-promote` SKILL.md の Control Plane STEP-3〜STEP-6 詳細である。
+> SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
 
 ## 目次
 

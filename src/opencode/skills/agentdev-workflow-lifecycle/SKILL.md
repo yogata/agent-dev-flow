@@ -10,7 +10,8 @@ agentdev系コマンドのフェーズ定義、SSoT遷移、work_type 判定基�
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-workflow-lifecycle` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ---
@@ -22,11 +23,13 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Workflow Skill として宣言的定義（ライフサイクル判定、work_type 判定、scale 判定、SSoT 遷移、上位への引き継ぎ判定）を提供する。本スキル自身は workflow STEP を所有せず、各 command の Workflow Skill が所有する STEP から参照される（`<workflows/workflow-skill-model>` SPEC）。
+本スキルは Workflow Skill として宣言的定義（ライフサイクル判定、work_type 判定、scale 判定、SSoT 遷移、上位への引き継ぎ判定）を提供する。
+本スキル自身は workflow STEP を所有せず、各 command の Workflow Skill が所有する STEP から参照される（`<workflows/workflow-skill-model>` SPEC）。
 
 ### 宣言的定義と Input Resolution
 
-本スキルが提供する宣言的定義は、各 STEP の Input Resolution において durable state 優先順位の最上位（SSoT 再構成）に位置する。優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
+本スキルが提供する宣言的定義は、各 STEP の Input Resolution において durable state 優先順位の最上位（SSoT 再構成）に位置する。
+優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
 
 | 宣言的定義 | SSoT 配置 | 利用 STEP |
 |---|---|---|
@@ -35,14 +38,17 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | SSoT 遷移定義 | 本スキル | 全 workflow の STEP transition |
 | 上位への引き継ぎ判定 | 本スキル（`references/upstream-handoff.md`） | 全 workflow の `prepare` STEP |
 
-STEP reference 8 要素、STEP 識別子、durable state 復元契約は `<workflows/step-reference-contract>` SPEC に従う。compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
+STEP reference 8 要素、STEP 識別子、durable state 復元契約は `<workflows/step-reference-contract>` SPEC に従う。
+compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
 
 ## work_type とコマンド経路
 
 work_type は工程分岐の参照軸である。
-全 work_type が GitHub Issue と PR を経由する標準経路をとる。Issue/PR をスキップする直接完了経路は存在しない。
+全 work_type が GitHub Issue と PR を経由する標準経路をとる。
+Issue/PR をスキップする直接完了経路は存在しない。
 
-`workflow-contracts` SPEC は bugfix, maintenance, docs_chore を `direct_case` に分類する。`direct_case` は req-save と spec-save を経由しないことを指し、Issue/PR を経由しないことを指さない。
+`workflow-contracts` SPEC は bugfix, maintenance, docs_chore を `direct_case` に分類する。
+`direct_case` は req-save と spec-save を経由しないことを指し、Issue/PR を経由しないことを指さない。
 
 ### 経路一覧
 
@@ -54,13 +60,17 @@ work_type は工程分岐の参照軸である。
 | feature | standard | req-define →（req-save → spec-save）→ case-open → case-run → case-close |
 | feature | large | req-define → req-save →（spec-save）→ case-open → case-run → case-close（OU/ 子Issue 構成） |
 
-各コマンドの正式名は `/agentdev/<name>` である（例: `/agentdev/req-define`）。一覧は command README 参照。
+各コマンドの正式名は `/agentdev/<name>` である（例: `/agentdev/req-define`）。
+一覧は command README 参照。
 
-feature が経由する req-save と spec-save は req_draft の `artifact_actions` により動的判定する。該当 entry がない場合は case-open から開始する。feature large の OU/ 子Issue 構成は `agentdev-workflow-orchestration` 参照。
+feature が経由する req-save と spec-save は req_draft の `artifact_actions` により動的判定する。
+該当 entry がない場合は case-open から開始する。
+feature large の OU/ 子Issue 構成は `agentdev-workflow-orchestration` 参照。
 
 ### docs_chore 経路の要素
 
-docs_chore は bugfix, maintenance と同一経路をとる。本節は docs_chore に特有の要素を明記する。
+docs_chore は bugfix, maintenance と同一経路をとる。
+本節は docs_chore に特有の要素を明記する。
 
 - 入力: ユーザー要件、修正対象ドキュメント
 - SSoT 遷移: req_draft → Issue 本文 → PR 本文 → マージ済み PR + クローズ済み Issue
@@ -68,7 +78,8 @@ docs_chore は bugfix, maintenance と同一経路をとる。本節は docs_cho
 - 完了証拠: マージ済み PR + クローズ済み Issue
 - 停止条件: `agentdev_handoff: true` 検出時、req-define 合意要件からの逸脱、リポジトリ外操作の必要性
 
-docs_chore は REQ, ADR, SPEC を生成しないことが多いため req-save と spec-save を経由しないが、case-open, case-run, case-close は必ず経由する。docs 更新責務は全 work_type 共通である。
+docs_chore は REQ, ADR, SPEC を生成しないことが多いため req-save と spec-save を経由しないが、case-open, case-run, case-close は必ず経由する。
+docs 更新責務は全 work_type 共通である。
 
 ## スケール判定基準
 

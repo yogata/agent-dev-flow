@@ -1,6 +1,7 @@
 # STEP-1〜5: 事前チェック・配置先解決・SPEC ファイル操作（placement-and-save）
 
-> 本 reference は `agentdev-workflow-spec-save` SKILL.md の STEP-1〜STEP-5 詳細である。事前チェック、SPEC artifact_actions 読込、配置先解決、SPEC 分離基準の最終確認、SPEC ファイル操作を提供する。
+> 本 reference は `agentdev-workflow-spec-save` SKILL.md の STEP-1〜STEP-5 詳細である。
+> 事前チェック、SPEC artifact_actions 読込、配置先解決、SPEC 分離基準の最終確認、SPEC ファイル操作を提供する。
 
 ## 目次
 
@@ -29,7 +30,9 @@
 
 ### Procedure
 
-ドラフトの `draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認する（全 work_type 対象、`work_type` による判定は廃止）。SPEC 対象 artifact_actions がない場合は no-op で完了する。ドラフトが存在しない場合はエラーで中止する（先に `/agentdev/req-define` を実行するよう案内）。
+ドラフトの `draft-data` の `artifact_actions` から `artifact: spec` entry の有無を確認する（全 work_type 対象、`work_type` による判定は廃止）。
+SPEC 対象 artifact_actions がない場合は no-op で完了する。
+ドラフトが存在しない場合はエラーで中止する（先に `/agentdev/req-define` を実行するよう案内）。
 
 ### Result
 
@@ -66,7 +69,10 @@
 
 ### Procedure
 
-ドラフトの `draft-data` の `artifact_actions` から `artifact: spec` の entry を読み込む。`artifact_actions` フィールドが存在しない（旧形式 draft）場合は SPEC 保存対象なしと判定し、no-op で完了する（後方互換）。`artifact: spec` entry が空の場合も no-op で完了する。各 action の `target`（file path または `new:{slug}`）、`operation`（create/update）、`content` を処理対象とする。
+ドラフトの `draft-data` の `artifact_actions` から `artifact: spec` の entry を読み込む。
+`artifact_actions` フィールドが存在しない（旧形式 draft）場合は SPEC 保存対象なしと判定し、no-op で完了する（後方互換）。
+`artifact: spec` entry が空の場合も no-op で完了する。
+各 action の `target`（file path または `new:{slug}`）、`operation`（create/update）、`content` を処理対象とする。
 
 ### Result
 
@@ -103,9 +109,13 @@
 
 ### Procedure
 
-各 SPEC action の `target`（または `target_spec: {operation, domain, slug}` 構造化）から配置先 SPEC を解決する。既存 SPEC パス（例: `docs/specs/{domain}/<existing-spec>.md`、または `target_spec: {operation: update, domain, slug}`）は当該 SPEC へ追記（`update` 操作）とする。`target_spec: {operation: create, domain, slug}` は新規 SPEC 作成（`create` 操作、ファイル名 `docs/specs/{domain}/{slug}.md`）とする。同一 `target` の action は1つの SPEC へ集約する。
+各 SPEC action の `target`（または `target_spec: {operation, domain, slug}` 構造化）から配置先 SPEC を解決する。
+既存 SPEC パス（例: `docs/specs/{domain}/<existing-spec>.md`、または `target_spec: {operation: update, domain, slug}`）は当該 SPEC へ追記（`update` 操作）とする。
+`target_spec: {operation: create, domain, slug}` は新規 SPEC 作成（`create` 操作、ファイル名 `docs/specs/{domain}/{slug}.md`）とする。
+同一 `target` の action は1つの SPEC へ集約する。
 
-**決定的処理のスクリプト呼出**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は `agentdev-spec-file-manager` SKILL.md「Scripts（決定的処理）」が規定する決定的スクリプト（`search-target-area.ts`）を bash 経由で呼び出して実行する（LLM 推論で代替しない）。CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
+**決定的処理のスクリプト呼出**: 配置先 SPEC が既存か新規か、`target_area` が存在するかの判定は `agentdev-spec-file-manager` SKILL.md「Scripts（決定的処理）」が規定する決定的スクリプト（`search-target-area.ts`）を bash 経由で呼び出して実行する（LLM 推論で代替しない）。
+CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 
 ### Result
 
@@ -142,7 +152,8 @@
 
 ### Procedure
 
-各 SPEC action が SPEC に置くべき内容の基準に適合するか再確認する。安定契約例外相当の内容は REQ 側に残すべきものとして除外し、完了報告の follow-up に明示する。
+各 SPEC action が SPEC に置くべき内容の基準に適合するか再確認する。
+安定契約例外相当の内容は REQ 側に残すべきものとして除外し、完了報告の follow-up に明示する。
 
 ### Result
 

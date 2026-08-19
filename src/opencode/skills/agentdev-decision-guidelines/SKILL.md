@@ -8,7 +8,8 @@ description: Evaluates whether architectural decisions require a Decision record
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-decision-guidelines` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 評価基準（いずれかに該当すればDecision作成推奨）
@@ -89,7 +90,8 @@ Decisionの主題として適格かを判定する境界ルール。
 ## Decisionのライフサイクル
 Decisionの状態は以下のいずれかをとる。
 一度 Accepted になった Decision は意味的に不変とし、決定を覆す場合は新しい Decision を作成して古いものを Superseded/Deprecated にする。
-ただし明示承認済みの非意味修正（タイポ、リンク切れ、表記統一等）に限り直接更新を認める。判定は後述「accepted Decision の更新規則」に従う。
+ただし明示承認済みの非意味修正（タイポ、リンク切れ、表記統一等）に限り直接更新を認める。
+判定は後述「accepted Decision の更新規則」に従う。
 
 - **Proposed**: 提案中。議論が行われている状態。
 - **Accepted**: 承認済み。現在のプロジェクトに適用されている状態。
@@ -103,7 +105,8 @@ Decisionの状態は以下のいずれかをとる。
 
 ## accepted Decision の更新規則
 
-accepted Decision は意味的に不変とする。ただし明示承認済みの非意味修正に限り、直接更新を認める。
+accepted Decision は意味的に不変とする。
+ただし明示承認済みの非意味修正に限り、直接更新を認める。
 詳細は SPEC `agentdev-decision-guidelines` の「accepted Decision の更新規則」を正とし、本節は実行入口の要約を示す。
 
 ### 非意味修正と意味変更の区分
@@ -123,7 +126,8 @@ accepted Decision は意味的に不変とする。ただし明示承認済み�
 
 ### 憲章 Decision の移行時識別子の扱い
 
-憲章 Decision（charter Decision）に残存する移行時識別子は次の通り処理する。判定の詳細は SPEC に委ねる。
+憲章 Decision（charter Decision）に残存する移行時識別子は次の通り処理する。
+判定の詳細は SPEC に委ねる。
 
 | 識別子 | 扱い | 理由 |
 |---|---|---|

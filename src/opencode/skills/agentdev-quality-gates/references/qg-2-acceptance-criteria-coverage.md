@@ -70,7 +70,8 @@ test strategy 策定時の具体的な閾値設定手順は `agentdev-req-analys
 
 ### 7. テスト戦略 vs Epic 対象外 整合性検証
 
-Epic Issue の場合、テスト戦略が Epic の「対象外」記述と矛盾しないかを QG-2 段階で検証する（境界ケース #1516 由来）。子 Issue 単体でも、親 Epic の対象外と矛盾するテスト戦略項目を検出する。
+Epic Issue の場合、テスト戦略が Epic の「対象外」記述と矛盾しないかを QG-2 段階で検証する（境界ケース #1516 由来）。
+子 Issue 単体でも、親 Epic の対象外と矛盾するテスト戦略項目を検出する。
 
 検証手順:
 
@@ -89,7 +90,8 @@ Epic Issue の場合、テスト戦略が Epic の「対象外」記述と矛盾
 
 ### 8. artifact-specific quality control 投影検証（execution contract 拡張）
 
-execution contract 確定を支援するため、artifact-specific quality control の test strategy への投影を検証する。対応表は artifact-quality-control-routing SPEC を正とする。
+execution contract 確定を支援するため、artifact-specific quality control の test strategy への投影を検証する。
+対応表は artifact-quality-control-routing SPEC を正とする。
 
 検証項目:
 

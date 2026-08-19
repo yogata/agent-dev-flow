@@ -16,7 +16,8 @@ description: Provides requirement analysis methods with quality criteria and ADR
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-req-analysis` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -68,7 +69,8 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## reference選択表
 
-通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
+通常経路で全 reference を無条件読込しない。
+必要な条件に応じて読む reference を選択する。
 
 | 条件 | 読む reference |
 |---|---|
@@ -92,13 +94,16 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、req-define / case-run 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。本スキル自身は STEP を所有しない。
+本スキルは Capability Skill として、req-define / case-run 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。
+本スキル自身は STEP を所有しない。
 
 ### 呼出元 STEP と Input Resolution
 
-呼出元 STEP は本スキルへの入力（RU、セッションコンテキスト、明示入力ファイル）を Input Resolution（`<workflows/input-resolution-and-durable-state>` SPEC）に従って解決する。優先順位: (1) SSoT 再構成（docs/ 配下の永続文書）、(2) identifier 保持（RU-ID、REQ-ID、Issue番号）、(3) 最小 scalar、(4) runtime artifact（要件doc draft、検出事項等、REQ-{NNNN} lifecycle）。
+呼出元 STEP は本スキルへの入力（RU、セッションコンテキスト、明示入力ファイル）を Input Resolution（`<workflows/input-resolution-and-durable-state>` SPEC）に従って解決する。
+優先順位: (1) SSoT 再構成（docs/ 配下の永続文書）、(2) identifier 保持（RU-ID、REQ-ID、Issue番号）、(3) 最小 scalar、(4) runtime artifact（要件doc draft、検出事項等、REQ-{NNNN} lifecycle）。
 
-本スキルの出力（要件doc候補、壁打ち出力）は runtime artifact に分類され、呼出元 STEP の result evidence および次 STEP の Input Resolution 入力として扱われる。STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
+本スキルの出力（要件doc候補、壁打ち出力）は runtime artifact に分類され、呼出元 STEP の result evidence および次 STEP の Input Resolution 入力として扱われる。
+STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
 
 ## See Also
 

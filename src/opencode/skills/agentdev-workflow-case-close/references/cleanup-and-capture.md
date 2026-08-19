@@ -1,6 +1,7 @@
 # STEP-5/6: Post-merge・Issue クローズ・クリーンアップ・Capture 回収・永続化（cleanup-and-capture）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-5, STEP-6 詳細である。Post-merge テスト戦略検証、Issue クローズ、worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、完了報告を提供する。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-5, STEP-6 詳細である。
+> Post-merge テスト戦略検証、Issue クローズ、worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Capture 回収、学び検知、ドメイン状態永続化、完了報告を提供する。
 
 ## 目次
 
@@ -29,7 +30,8 @@
 
 #### STEP-5-1: Post-merge テスト戦略検証
 
-マージ後のみ確認可能な項目（CI通過等）を反映。Issue 本文更新手続き（`agentdev-gh-cli`）で更新 → VERIFY。
+マージ後のみ確認可能な項目（CI通過等）を反映。
+Issue 本文更新手続き（`agentdev-gh-cli`）で更新 → VERIFY。
 
 #### STEP-5-2: Issue クローズ
 
@@ -100,11 +102,13 @@ worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Ca
 
 ##### STEP-6-3-1: 重複ファイルチェック再実行
 
-`git pull --ff-only` 直前に、`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャを再実行する（L-013、PR #1128 由来、共有 main worktree で STEP-1-1 実行時点から STEP-6-3-1 実行までの間に並列セッションが加えた未コミット変更を検知するため）。重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと。
+`git pull --ff-only` 直前に、`agentdev-git-worktree` の「PR merge 前重複ファイルチェック」プロシージャを再実行する（L-013、PR #1128 由来、共有 main worktree で STEP-1-1 実行時点から STEP-6-3-1 実行までの間に並列セッションが加えた未コミット変更を検知するため）。
+重複ファイルを検出した場合、構造化エラーで停止しユーザーによる対応（stash/commit/checkout）を促すこと。
 
 ##### STEP-6-3-2: git main 同期リスク事前検出・代替同期手順選択
 
-`agentdev-git-worktree` の「git main 同期リスク事前検出プロシージャ」に従い、worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスク事前検出と代替同期手順選択を実行する。`agentdev-git-worktree` に従い `git pull --ff-only` を実行（ローカル変更事前チェック、hash 検証、不一致時は評価・承認のやり直し）。
+`agentdev-git-worktree` の「git main 同期リスク事前検出プロシージャ」に従い、worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスク事前検出と代替同期手順選択を実行する。
+`agentdev-git-worktree` に従い `git pull --ff-only` を実行（ローカル変更事前チェック、hash 検証、不一致時は評価・承認のやり直し）。
 
 #### STEP-6-4: 学びの検知・抽出・Capture 回収
 
@@ -127,13 +131,17 @@ PR 本文の `## Findings / Capture候補` セクションから intake/ learnin
 
 #### STEP-6-5: ドメイン状態永続化
 
-`agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。learning と intake を同一 commit に含める。
+`agentdev-git-worktree` に従い `.agentdev/` 配下を commit/push。
+learning と intake を同一 commit に含める。
 
-> **auto-close 回避の留意点**: 本コマンド名 `case-close` は "close" を含む複合語。コミットメッセージに `(case-close #N)` 等のコマンド名と Issue 番号の近接表記を用いると、GitHub が "close" を auto-close キーワードと誤認し Issue を意図せずクローズするリスクがある。コミットメッセージのフォーマットは `agentdev-conventional-commits` skill の「GitHub auto-close 回避ガイドライン」に従い、コマンド名と Issue 番号を分離し `#` 記号による近接参照を避けること（例: `case-close for Issue N`）
+> **auto-close 回避の留意点**: 本コマンド名 `case-close` は "close" を含む複合語。
+> コミットメッセージに `(case-close #N)` 等のコマンド名と Issue 番号の近接表記を用いると、GitHub が "close" を auto-close キーワードと誤認し Issue を意図せずクローズするリスクがある。
+> コミットメッセージのフォーマットは `agentdev-conventional-commits` skill の「GitHub auto-close 回避ガイドライン」に従い、コマンド名と Issue 番号を分離し `#` 記号による近接参照を避けること（例: `case-close for Issue N`）
 
 #### STEP-6-6: 完了報告
 
-完了報告 template に従って出力。結果状態に応じた種別を選択。
+完了報告 template に従って出力。
+結果状態に応じた種別を選択。
 
 | 結果状態 | template 種別 |
 |---|---|
@@ -141,7 +149,8 @@ PR 本文の `## Findings / Capture候補` セクションから intake/ learnin
 | `.agentdev` push 失敗 | `agentdev-push-failed.md` |
 | ブランチ・worktree 削除失敗 | `worktree-cleanup-failed.md` |
 
-GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用してはならない。**結果状態の分離報告**: GitHub 側完了状態、`.agentdev` 永続化状態、ブランチ削除状態を独立して報告。
+GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用してはならない。
+**結果状態の分離報告**: GitHub 側完了状態、`.agentdev` 永続化状態、ブランチ削除状態を独立して報告。
 
 ### Result
 

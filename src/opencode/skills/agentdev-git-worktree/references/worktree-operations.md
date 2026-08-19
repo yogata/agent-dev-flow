@@ -95,19 +95,23 @@ junction 依存の整合性検査全般に worktree 実行判定を拡張する�
 
 ## worktree 構造的制約（agentdev-git-worktree-test-fallback SPEC）
 
-worktree は独立した working tree を持つため、本体リポジトリ直下を前提とする検査が worktree 内では成立しない事象がある。次の構造的制約を前提として運用する。
+worktree は独立した working tree を持つため、本体リポジトリ直下を前提とする検査が worktree 内では成立しない事象がある。
+次の構造的制約を前提として運用する。
 
 ### gitignore 対象ファイル受け渡し不可
 
-worktree は独立した working tree であるため、メインリポジトリで `.gitignore` 対象となっているファイル（`.opencode/skills/agentdev-*/` ジャンクション配下、`.agentdev-plugin/` 等）は worktree 側へ受け渡しできない。worktree 内で当該ファイルを参照する検査は失敗する。
+worktree は独立した working tree であるため、メインリポジトリで `.gitignore` 対象となっているファイル（`.opencode/skills/agentdev-*/` ジャンクション配下、`.agentdev-plugin/` 等）は worktree 側へ受け渡しできない。
+worktree 内で当該ファイルを参照する検査は失敗する。
 
 worktree 内で gitignore 対象ファイルを参照・編集する必要がある場合は、`git add -f` で強制追加して worktree の working tree に存在させるか、source パス（`src/opencode/`）へ fallback して参照する。
 
 ### junction 依存 checker の skip 挙動
 
-`.opencode/skills/agentdev-*` ジャンクションは worktree へ伝播しない。このため junction の存在を前提とする checker（`checkSourceProjectionConsistency` 等）は worktree 内で偽陽性を発生させる。
+`.opencode/skills/agentdev-*` ジャンクションは worktree へ伝播しない。
+このため junction の存在を前提とする checker（`checkSourceProjectionConsistency` 等）は worktree 内で偽陽性を発生させる。
 
-junction 依存 checker は worktree 実行時（`isInsideWorktree` 判定で worktree 内と判定された場合）に skip する。skip せずに検査が必要な場合は構造系テスト fallback（commands_e2e / skills_structure / templates_structure の source パス切替）を適用する。
+junction 依存 checker は worktree 実行時（`isInsideWorktree` 判定で worktree 内と判定された場合）に skip する。
+skip せずに検査が必要な場合は構造系テスト fallback（commands_e2e / skills_structure / templates_structure の source パス切替）を適用する。
 
 ## git stash 運用手順（一時退避）
 

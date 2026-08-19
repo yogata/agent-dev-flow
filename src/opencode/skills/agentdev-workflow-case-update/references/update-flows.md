@@ -1,6 +1,7 @@
 # STEP-1〜4: Issue番号解決・状態取得・更新分岐・報告（update-flows）
 
-> 本 reference は `agentdev-workflow-case-update` SKILL.md の STEP-1〜STEP-4 詳細である。Issue番号解決、現在状態取得、更新内容分岐（--body / --comment / --req / --review-ng）、完了報告を提供する。
+> 本 reference は `agentdev-workflow-case-update` SKILL.md の STEP-1〜STEP-4 詳細である。
+> Issue番号解決、現在状態取得、更新内容分岐（--body / --comment / --req / --review-ng）、完了報告を提供する。
 
 ## 目次
 
@@ -28,7 +29,9 @@
 
 ### Procedure
 
-詳細は `agentdev-workflow-routing` を参照。委譲接続点: サブエージェントは候補番号抽出のみを返し、親エージェントが確認、停止を判断する。Issue/PR 一覧取得手続き（`agentdev-gh-cli`）等で open issue 一覧を取得することは禁止（command 不変条件）。
+詳細は `agentdev-workflow-routing` を参照。
+委譲接続点: サブエージェントは候補番号抽出のみを返し、親エージェントが確認、停止を判断する。
+Issue/PR 一覧取得手続き（`agentdev-gh-cli`）等で open issue 一覧を取得することは禁止（command 不変条件）。
 
 ### Result
 
@@ -149,7 +152,8 @@
 - `--req` → `.opencode/commands/agentdev/templates/case-update/req.md`（変数: {APPEND/UPDATE}, {REQ番号}, {セクション名}）
 - `--review-ng` → `.opencode/commands/agentdev/templates/case-update/review-ng.md`（変数: {乖離タイプ}, {REQ番号}, {推奨アクション}）
 
-更新種別の推論: ユーザー入力、直前のレビュー結果、対象Issue/REQ、会話文脈から推論する。推論不能時のみユーザーに指定を求めて停止する。
+更新種別の推論: ユーザー入力、直前のレビュー結果、対象Issue/REQ、会話文脈から推論する。
+推論不能時のみユーザーに指定を求めて停止する。
 
 ### Result
 

@@ -5,9 +5,12 @@ description: "case-run command の workflow 実装本体。単一 Issue 実行�
 
 # case-run workflow スキル
 
-case-run command の workflow 実装本体。単一 Issue または単一 Wave の実行を実行担当サブエージェントへ委譲し、その result を処理する制御構造を所有する。case-run 本体は orchestration に専念し、実装実行そのものは行わない。
+case-run command の workflow 実装本体。
+単一 Issue または単一 Wave の実行を実行担当サブエージェントへ委譲し、その result を処理する制御構造を所有する。
+case-run 本体は orchestration に専念し、実装実行そのものは行わない。
 
-単一 Issue 実行と Epic Wave 実行は制御構造に実質差異があるため、DEC-{N} の 1:N 分割基準により single workflow と epic-wave workflow の2 workflow として分離する。本 SKILL.md は両 workflow の control plane（選択 dispatch、STEP 一覧、遷移）を所有し、実行契約差異を明示する。
+単一 Issue 実行と Epic Wave 実行は制御構造に実質差異があるため、DEC-{N} の 1:N 分割基準により single workflow と epic-wave workflow の2 workflow として分離する。
+本 SKILL.md は両 workflow の control plane（選択 dispatch、STEP 一覧、遷移）を所有し、実行契約差異を明示する。
 
 case-run command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -51,7 +54,8 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`）は�
 - **single workflow**: 対象1 Issue。準備・委譲・クリーンアップの3フェーズを順次実行する
 - **epic-wave workflow**: 対象は現在 ready な Wave の子Issue 群（最大5件並列）。fan-out（子Issue ごとの worktree と委譲）と fan-in（全委譲完了待機・結果集約）を制御する
 
-workflow 選択は STEP-S1 の実行モード分岐で確定する（引数が Epic Issue 番号か否か）。Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、本 workflow は1 Wave の実行（PR作成まで）で return する。
+workflow 選択は STEP-S1 の実行モード分岐で確定する（引数が Epic Issue 番号か否か）。
+Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、本 workflow は1 Wave の実行（PR作成まで）で return する。
 
 ### 実行契約差異（single vs Epic Wave）
 
@@ -66,7 +70,8 @@ workflow 選択は STEP-S1 の実行モード分岐で確定する（引数が E
 
 ## Control Plane（STEP 一覧）
 
-各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。会話コンテキストに依存せず、durable state（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
+各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、durable state（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
 
 ### single workflow（単一 Issue 実行モード）
 
@@ -125,7 +130,9 @@ workflow 選択は STEP-S1 の実行モード分岐で確定する（引数が E
 
 ## Artifact Graph 利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせのうち implementation を、既に決定された実装対象（Issue 本文）と正規成果物の実現関係確認（STEP-S2 の関連Decision確認、委譲内 context 再確認）に利用できる。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。問い合わせ目的を指定し、返された候補を用いて判断する。
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせのうち implementation を、既に決定された実装対象（Issue 本文）と正規成果物の実現関係確認（STEP-S2 の関連Decision確認、委譲内 context 再確認）に利用できる。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+問い合わせ目的を指定し、返された候補を用いて判断する。
 
 - トレーサビリティ問い合わせを利用して新規の依存関係、実行構成、Wave 構成、実行順序を設計しない。依存関係と実行構成の決定責務は上流工程（case-open の execution_unit 構成、Epic Wave モデル）が所有する
 - 問い合わせ結果は候補提供であり、実現関係の確認は正規成果物本文と `rg` 等の独立探索で行う。Issue scope、完了条件、REQ、Decision、SPEC、必須品質統制の変更が必要な候補は blocked として case-update 連携とし、scope の自律拡大は行わない
@@ -134,7 +141,11 @@ workflow 選択は STEP-S1 の実行モード分岐で確定する（引数が E
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-run/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、case-run command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-run/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、case-run command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

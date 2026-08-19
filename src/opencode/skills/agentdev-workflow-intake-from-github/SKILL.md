@@ -5,7 +5,9 @@ description: "intake-from-github command の workflow 実装本体。クロー�
 
 # intake-from-github workflow スキル
 
-intake-from-github command の workflow 実装本体。クローズ済みの GitHub Issue/PR の本文、コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存する保存専用 workflow を所有する。GitHub Issue の作成、採用可否の判断、review、整形、分類は行わない。
+intake-from-github command の workflow 実装本体。
+クローズ済みの GitHub Issue/PR の本文、コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存する保存専用 workflow を所有する。
+GitHub Issue の作成、採用可否の判断、review、整形、分類は行わない。
 
 intake-from-github command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -44,7 +46,10 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-intake-from-github.ya
 
 ## workflow model（capture-only型、STEP model 対象外）
 
-本スキルは capture-only型の workflow であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。resume point / export / import を持たない。工程は逐次実行し、中断時は workflow を最初から再実行する。抽出の再実行は読み取りのみのため安全であり、保存済みファイルとの重複はファイル名への連番付与で吸収する。
+本スキルは capture-only型の workflow であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。
+resume point / export / import を持たない。
+工程は逐次実行し、中断時は workflow を最初から再実行する。
+抽出の再実行は読み取りのみのため安全であり、保存済みファイルとの重複はファイル名への連番付与で吸収する。
 
 | STEP | 名称 | 内容 |
 |---|---|---|
@@ -75,7 +80,11 @@ frontmatter、状態フィールド、重複排除キーは持たない。
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-intake-from-github.yaml`、`kind: workflow-extension`）を読み込む場合がある（DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-intake-from-github/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、intake-from-github command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-intake-from-github.yaml`、`kind: workflow-extension`）を読み込む場合がある（DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-intake-from-github/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、intake-from-github command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

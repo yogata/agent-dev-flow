@@ -8,7 +8,8 @@
 
 Command→Skill 参照妥当性診断で、配布物（`src/opencode/skills/agentdev-*/SKILL.md`）の frontmatter `name:` 行が YAML スカラー値として不正なバッククォート囲み形式になっているかを検出する。
 
-frontmatter は構造データであり Markdown インラインコード表記の対象外である。バッククォート囲みの name は opencode のスキル名解決を不正にし、名前空間解決の不具合を引き起こす（PR #1334 事例）。
+frontmatter は構造データであり Markdown インラインコード表記の対象外である。
+バッククォート囲みの name は opencode のスキル名解決を不正にし、名前空間解決の不具合を引き起こす（PR #1334 事例）。
 
 ## 背景: PR #1334 事例
 
@@ -24,7 +25,8 @@ SKILL.md frontmatter `name:` 行が以下の正規表現に一致する場合を
 ^name:\s*`[a-z0-9-]+`\s*$
 ```
 
-バッククォートで囲まれた name 値。YAML ではこの形式は文字列スカラー値として `` `agentdev-xxx` `` 全体を name 値と解釈し、ディレクトリ名（`agentdev-xxx`）と不一致となる。
+バッククォートで囲まれた name 値。
+YAML ではこの形式は文字列スカラー値として `` `agentdev-xxx` `` 全体を name 値と解釈し、ディレクトリ名（`agentdev-xxx`）と不一致となる。
 
 正常形式（非違反）は以下の正規表現に一致する。
 
@@ -44,17 +46,22 @@ SKILL.md frontmatter `name:` 行が以下の正規表現に一致する場合を
 
 ### 2. frontmatter `name:` 行の抽出
 
-各 SKILL.md の frontmatter ブロック（先頭 `---` 〜 次の `---` まで）の `name:` 行を抽出する。frontmatter の外にある `name:` 行は対象外。
+各 SKILL.md の frontmatter ブロック（先頭 `---` 〜 次の `---` まで）の `name:` 行を抽出する。
+frontmatter の外にある `name:` 行は対象外。
 
 ### 3. バッククォート囲みの判定
 
-抽出した `name:` 行が検出パターンの正規表現に一致するかを判定する。一致した場合を違反とする。
+抽出した `name:` 行が検出パターンの正規表現に一致するかを判定する。
+一致した場合を違反とする。
 
 ### 4. skill-name-dir-match 整合性ルールとの協調
 
-バッククォート付き name は `` `agentdev-xxx` `` 全体が YAML スカラー値となるため、ディレクトリ名（`agentdev-xxx`）と不一致となる。結果として skill-name-dir-match 整合性ルール違反を併発する。
+バッククォート付き name は `` `agentdev-xxx` `` 全体が YAML スカラー値となるため、ディレクトリ名（`agentdev-xxx`）と不一致となる。
+結果として skill-name-dir-match 整合性ルール違反を併発する。
 
-本検出はバッククォート囲みそのものを strict 違反候補として検出し、skill-name-dir-match 整合性ルールは name/dir 不一致を検出する。両者は同じ根本原因（frontmatter name のバッククォート誤付与）から派生する異なる観点の検出であり、併発を前提とする。検出時は両方の違反を併記し、推奨経路を一本化する。
+本検出はバッククォート囲みそのものを strict 違反候補として検出し、skill-name-dir-match 整合性ルールは name/dir 不一致を検出する。
+両者は同じ根本原因（frontmatter name のバッククォート誤付与）から派生する異なる観点の検出であり、併発を前提とする。
+検出時は両方の違反を併記し、推奨経路を一本化する。
 
 ## 推奨経路
 
@@ -66,7 +73,8 @@ SKILL.md frontmatter `name:` 行が以下の正規表現に一致する場合を
 ## 出力形式
 
 検出した違反は SKILL.md「出力形式」セクションの Finding 形式で報告する。
-Classification には `skill-frontmatter-name-backtick` を使用する。skill-name-dir-match 違反を併発する場合は両方の Classification を併記する。
+Classification には `skill-frontmatter-name-backtick` を使用する。
+skill-name-dir-match 違反を併発する場合は両方の Classification を併記する。
 
 ## 対象外
 

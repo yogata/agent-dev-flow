@@ -88,7 +88,8 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 
 ## Subagent 委譲プロトコルの MUST NOT DO 記載要件
 
-subagent 委譲を実施する agentdev command（case-auto、case-open、case-run、case-update、case-close）は、委譲 prompt に MUST NOT DO セクションを必須で記載する。キャプチャ境界（`.agentdev/` 直接変更禁止、PR 本文経由の capture 引き継ぎ）も MUST NOT DO に含まれる。
+subagent 委譲を実施する agentdev command（case-auto、case-open、case-run、case-update、case-close）は、委譲 prompt に MUST NOT DO セクションを必須で記載する。
+キャプチャ境界（`.agentdev/` 直接変更禁止、PR 本文経由の capture 引き継ぎ）も MUST NOT DO に含まれる。
 
 - **対象**: subagent 委譲する全場面。特定 command に限定しない
 - **必須記載項目**（キャプチャ境界に関わるもの）:

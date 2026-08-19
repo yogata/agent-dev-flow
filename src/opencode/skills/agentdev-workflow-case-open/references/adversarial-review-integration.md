@@ -1,6 +1,7 @@
 # STEP-4: adversarial-review 統合（経路F、adversarial-review-integration）
 
-> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-4 詳細である。adversarial-review 挿入境界（経路F）の発動条件判定と review 呼出、結果反映を提供する。
+> 本 reference は `agentdev-workflow-case-open` SKILL.md の Control Plane STEP-4 詳細である。
+> adversarial-review 挿入境界（経路F）の発動条件判定と review 呼出、結果反映を提供する。
 
 ## Purpose
 
@@ -29,7 +30,8 @@ execution structure、Issue 本文候補、完了条件を構成した後、**�
 
 ### 発動条件判定
 
-case-open は adversarial-review を**原則実行する**（default-on）。発動条件判定と review 呼出を分離する。
+case-open は adversarial-review を**原則実行する**（default-on）。
+発動条件判定と review 呼出を分離する。
 
 - **skip 条件**: Standard flow で単一 OU の機械的確定、Wave 分割なし。該当時は省略して従来フロー（review を挿入せず最初の GitHub Issue 作成 STEP へ進む）を継続。Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成へそのまま進む
 - **ユーザー明示指定時**: skip 条件にかかわらず必ず発動する
@@ -64,7 +66,8 @@ review の結果反映で review 対象の意味内容が変更された場合�
 
 ### unresolved 判断事項
 
-未解決のユーザー判断事項が残る場合、最初の GitHub Issue 作成 STEP（STEP-5）へ進まない。工程委譲起源であるため既存 status に unresolved 判断事項を付加する。
+未解決のユーザー判断事項が残る場合、最初の GitHub Issue 作成 STEP（STEP-5）へ進まない。
+工程委譲起源であるため既存 status に unresolved 判断事項を付加する。
 
 ### 呼出失敗時の扱い
 

@@ -28,7 +28,9 @@ description: 既存Caseの本文更新、コメント追加、またはREQファ
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-update` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが4 STEP の control plane として制御構造を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-update` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+同スキルが4 STEP の control plane として制御構造を所有する。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
@@ -37,7 +39,9 @@ description: 既存Caseの本文更新、コメント追加、またはREQファ
 | STEP-3 更新内容に応じて分岐 | 状態取得済み | 更新された Issue本文 / 追加コメント / 更新REQファイル / レビューNGコメント | `--body` 時は Issue 作成時と同じテンプレート構造、【必須】セクション完備であること。`--review-ng` 時は QG 乖離検出結果の引用を含むこと |
 | STEP-4 完了報告 | 更新済み | 完了報告（更新種別に応じたテンプレート選択） | `templates/case-update/` 配下のテンプレート準拠であること |
 
-**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-update` が所有する。同 Workflow Skill は `/agentdev/case-update` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
+**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-update` が所有する。
+同 Workflow Skill は `/agentdev/case-update` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。
+OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
 ## 不変条件
 

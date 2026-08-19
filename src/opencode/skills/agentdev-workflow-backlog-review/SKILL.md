@@ -5,7 +5,9 @@ description: "backlog-review command の workflow 実装本体。採用済み成
 
 # backlog-review workflow スキル
 
-backlog-review command の workflow 実装本体。`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU（Requirement Unit）を生成する制御構造を所有する。ユーザー承認は RU 作成承認を兼ねる。
+backlog-review command の workflow 実装本体。
+`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU（Requirement Unit）を生成する制御構造を所有する。
+ユーザー承認は RU 作成承認を兼ねる。
 
 backlog-review command は公開 interface（入出力契約・ガードレール・RU フォーマット委譲契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -44,7 +46,8 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-review.yaml`�
 
 ## Control Plane（STEP 一覧）
 
-backlog-review workflow は次の8 STEP で構成する。各 STEP は resume point を持ち（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
+backlog-review workflow は次の8 STEP で構成する。
+各 STEP は resume point を持ち（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -67,7 +70,8 @@ backlog-review workflow は次の8 STEP で構成する。各 STEP は resume po
 
 ## Resume Protocol（durable state による再開）
 
-会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
+会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。
+優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
 
 1. SSoT 再構成: `.agentdev/{intake,learning,inspect}/promoted/` と `.agentdev/backlog/req-units/` の実ファイル状態
 2. identifier 保持: 成果物パス、RU-ID（RU frontmatter の `source_type`、`generated_by`、`status`、`depends_on`、`tentative_classification`、`sources`）
@@ -83,7 +87,9 @@ backlog-review workflow は次の8 STEP で構成する。各 STEP は resume po
 | RU 生成済み、対応 promoted が残存 | STEP-7（成果物削除から） | 承認済み |
 | 対象成果物 0 件 | 正常終了（「対象なし」報告のみ） | - |
 
-HITL（STEP-5）の承認状態は単独では durable state に記録されない。RU 実ファイル（STEP-7 の成果物）を承認証跡として扱い、証跡がない場合は未承認と解釈して STEP-5 をやり直す。不可逆処理（RU 生成、採用済み成果物削除）は承認確定後にのみ実行する。
+HITL（STEP-5）の承認状態は単独では durable state に記録されない。
+RU 実ファイル（STEP-7 の成果物）を承認証跡として扱い、証跡がない場合は未承認と解釈して STEP-5 をやり直す。
+不可逆処理（RU 生成、採用済み成果物削除）は承認確定後にのみ実行する。
 
 ## 主要 Capability Skill 連携
 
@@ -97,7 +103,10 @@ HITL（STEP-5）の承認状態は単独では durable state に記録されな�
 
 ## Artifact Graph 利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related、impact、必要に応じて dependency）を利用できる。採用済み成果物に含まれる REQ、Decision、SPEC、canonical owner 等の明示情報を起点に、統合、分割、depends_on 依存解決（STEP-3）の補助 evidence 探索を行う。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。問い合わせ目的を指定し、返された候補を用いて判断する。
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related、impact、必要に応じて dependency）を利用できる。
+採用済み成果物に含まれる REQ、Decision、SPEC、canonical owner 等の明示情報を起点に、統合、分割、depends_on 依存解決（STEP-3）の補助 evidence 探索を行う。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+問い合わせ目的を指定し、返された候補を用いて判断する。
 
 - 問い合わせ結果は候補提供であり、統合、分割、depends_on、意味的重複の判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
 - 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
@@ -105,7 +114,11 @@ HITL（STEP-5）の承認状態は単独では durable state に記録されな�
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-review.yaml`、`kind: workflow-extension`）を読み込む場合がある（DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-review/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、backlog-review command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-review.yaml`、`kind: workflow-extension`）を読み込む場合がある（DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-review/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、backlog-review command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

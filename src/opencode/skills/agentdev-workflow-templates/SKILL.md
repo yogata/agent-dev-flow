@@ -5,7 +5,8 @@ description: Manages Issue/PR description and comment templates, selection rules
 
 # Issue テンプレート管理スキル
 
-agentdev系コマンドで使用するIssue/PR本文、コメントテンプレートの管理、選定ルール、セクション規約を提供する。テンプレートは Read tool で読み込み、変数部分を置換して使用する。
+agentdev系コマンドで使用するIssue/PR本文、コメントテンプレートの管理、選定ルール、セクション規約を提供する。
+テンプレートは Read tool で読み込み、変数部分を置換して使用する。
 
 ## テンプレート一覧
 
@@ -70,13 +71,17 @@ case-open が draft-data の `review_dispositions` を読み取り、Issue 本�
 
 #### セクション仕様
 
-「レビュー判断」セクションは `<!-- 【必須】 -->` マーカー付きの必須セクションとする。feature、bug、epic テンプレートでは転記対象 disposition がない場合「該当なし」と記載する。child テンプレートでは「該当なし」を使用せず、親 Epic Issue 参照のみを記載する。
+「レビュー判断」セクションは `<!-- 【必須】 -->` マーカー付きの必須セクションとする。
+feature、bug、epic テンプレートでは転記対象 disposition がない場合「該当なし」と記載する。
+child テンプレートでは「該当なし」を使用せず、親 Epic Issue 参照のみを記載する。
 
-各 disposition 明細は id（`RD-NNN`）、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。`checked_at_commit` は case-open が default branch 最新化後に再確認した commit SHA を記録する。
+各 disposition 明細は id（`RD-NNN`）、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
+`checked_at_commit` は case-open が default branch 最新化後に再確認した commit SHA を記録する。
 
 #### 配置規則
 
-feature、bug、child テンプレートでは「テスト戦略」セクションの直後、「補足情報」セクションの前に配置する。epic テンプレートでは「完了条件」セクションの直後、「補足情報」セクションの前に配置する。
+feature、bug、child テンプレートでは「テスト戦略」セクションの直後、「補足情報」セクションの前に配置する。
+epic テンプレートでは「完了条件」セクションの直後、「補足情報」セクションの前に配置する。
 
 #### 転記規則（AG-{NNN}）
 

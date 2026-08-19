@@ -5,7 +5,9 @@ description: "intake-promote command の workflow 実装本体。inbox 内 intak
 
 # intake-promote workflow スキル
 
-intake-promote command の workflow 実装本体。`.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる採用済み成果物に整形する制御構造を所有する。classification → review → HITL → persistence → destructive handling の各段階を独立 resume point として構成する。
+intake-promote command の workflow 実装本体。
+`.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる採用済み成果物に整形する制御構造を所有する。
+classification → review → HITL → persistence → destructive handling の各段階を独立 resume point として構成する。
 
 intake-promote command は公開 interface（入出力契約・ガードレール・分類値契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -44,7 +46,9 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`�
 
 ## Control Plane（STEP 一覧）
 
-intake-promote workflow は次の6 STEP で構成する。各 STEP は resume point を持ち（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した resume point である。会話コンテキストに依存せず、durable state（inbox / promoted の実ファイル状態、分類確定状態）から再開点を再構成する。
+intake-promote workflow は次の6 STEP で構成する。
+各 STEP は resume point を持ち（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した resume point である。
+会話コンテキストに依存せず、durable state（inbox / promoted の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -64,7 +68,8 @@ intake-promote workflow は次の6 STEP で構成する。各 STEP は resume po
 
 ## Resume Protocol（durable state による再開）
 
-会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
+会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。
+優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
 
 1. SSoT 再構成: `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態
 2. identifier 保持: item ファイルパス、採用済み成果物パス
@@ -82,7 +87,9 @@ intake-promote workflow は次の6 STEP で構成する。各 STEP は resume po
 | 保留 item のみ残存、他の振り分け完了 | STEP-5 の残処理または STEP-6 | 承認済み |
 | 全 item の振り分けと commit/push 完了 | STEP-6（完了報告のみ） | 承認済み |
 
-HITL（STEP-3）の承認状態は単独では durable state に記録されない。そのため、persistence の成果物（promoted 実ファイル）を承認証跡として扱い、証跡がない場合は未承認と解釈して STEP-3 をやり直す。不可逆処理（inbox 削除、reject 即時削除）は承認確定後にのみ実行する。
+HITL（STEP-3）の承認状態は単独では durable state に記録されない。
+そのため、persistence の成果物（promoted 実ファイル）を承認証跡として扱い、証跡がない場合は未承認と解釈して STEP-3 をやり直す。
+不可逆処理（inbox 削除、reject 即時削除）は承認確定後にのみ実行する。
 
 ## 主要 Capability Skill 連携
 
@@ -95,7 +102,11 @@ HITL（STEP-3）の承認状態は単独では durable state に記録されな�
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`、`kind: workflow-extension`）を読み込む場合がある（DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、intake-promote command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`、`kind: workflow-extension`）を読み込む場合がある（DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、intake-promote command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

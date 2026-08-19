@@ -10,14 +10,16 @@ description: Manages Decision numbering and decision record file operations (CRE
 - **このスキル（知識）**: Decision番号採番ルール、ファイル操作モード、判定基準、ステータス遷移、整合性チェック
 - **適用先**: `req-save`（Decisionファイル保存時）、`case-open`（Issue作成時のDecision参照）、`case-run`（実行時のDecision参照）
 
-**注意**: このスキルはDecisionの**管理、運用**（採番、ステータス遷移、整合性チェック）を担当する。Decisionの**作成ガイドライン**（評価基準、Decision必要かどうかの判定）については、`agentdev-decision-guidelines` を参照。
+**注意**: このスキルはDecisionの**管理、運用**（採番、ステータス遷移、整合性チェック）を担当する。
+Decisionの**作成ガイドライン**（評価基準、Decision必要かどうかの判定）については、`agentdev-decision-guidelines` を参照。
 
 ---
 
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-decision-file-manager` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## Decision要否判定の責務境界
@@ -53,7 +55,9 @@ Decision要否の判定は `agentdev-decision-guidelines` スキルが行う。
 
 #### 基準番号帯例外
 
-Decision体系の全面改定時は、`DEC-NNN` 以降の番号帯を基準番号帯として一括採番できる（最大番号+1の通常採番を上書きし、基準番号帯の最小番号から連番）。適用条件は全面改定が例外要件を満たしていること。基準番号帯採番は一度のみ実行され、以降の新規Decisionは通常採番に戻る。
+Decision体系の全面改定時は、`DEC-NNN` 以降の番号帯を基準番号帯として一括採番できる（最大番号+1の通常採番を上書きし、基準番号帯の最小番号から連番）。
+適用条件は全面改定が例外要件を満たしていること。
+基準番号帯採番は一度のみ実行され、以降の新規Decisionは通常採番に戻る。
 
 ## ファイル操作モード
 
@@ -86,7 +90,8 @@ updated: YYYY-MM-DD
 ---
 ```
 
-**README.md の役割**: 全Decisionの一覧表示、分類ビュー（Status View/ Topic View/ Decision Map/ Related REQ）、Decision間の相互参照マップ。**README.md は分類ビューであり、Decision本文の唯一の情報源（SSoT）ではない**。
+**README.md の役割**: 全Decisionの一覧表示、分類ビュー（Status View/ Topic View/ Decision Map/ Related REQ）、Decision間の相互参照マップ。
+**README.md は分類ビューであり、Decision本文の唯一の情報源（SSoT）ではない**。
 
 ## ステータス遷移（許容/禁止）
 
@@ -94,9 +99,11 @@ updated: YYYY-MM-DD
 
 禁止: `accepted → proposed`、`deprecated → *`、`superseded → *`、`未指定 → accepted`
 
-`accepted` status の Decision のみ現行根拠として使用する。`proposed`/`deprecated`/`superseded` を現行要件判断の根拠として引用しない。
+`accepted` status の Decision のみ現行根拠として使用する。
+`proposed`/`deprecated`/`superseded` を現行要件判断の根拠として引用しない。
 
-過去の判断を現行基盤から外すだけの場合（削除、廃止、移行、統合、再構築、完全削除）は、新規Decisionを作成せず対象Decisionのstatus遷移（retire/supersede）で処理する。新規Decisionは「あるべき状態」の意思決定が存在する場合のみ作成する。
+過去の判断を現行基盤から外すだけの場合（削除、廃止、移行、統合、再構築、完全削除）は、新規Decisionを作成せず対象Decisionのstatus遷移（retire/supersede）で処理する。
+新規Decisionは「あるべき状態」の意思決定が存在する場合のみ作成する。
 
 ## 主要な判断順序
 
@@ -109,7 +116,8 @@ updated: YYYY-MM-DD
 
 ## reference選択表
 
-通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
+通常経路で全 reference を無条件読込しない。
+必要な条件に応じて読む reference を選択する。
 
 | 条件 | 読む reference |
 |---|---|

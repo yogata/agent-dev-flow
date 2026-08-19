@@ -1,6 +1,7 @@
 # REQ 番号採番とバリデーション規約
 
-本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、REQ番号採番、要件行ID、ファイル配置、frontmatterバリデーション、分類ゲート、HOW 除去後の acceptance criteria 順位検証の詳細規約を扱う。SKILL.md 本文では要点とスクリプト呼出しのみを提示し、個別規定は本ファイルを参照する。
+本ファイルは `agentdev-req-file-manager` SKILL.md の補助資料であり、REQ番号採番、要件行ID、ファイル配置、frontmatterバリデーション、分類ゲート、HOW 除去後の acceptance criteria 順位検証の詳細規約を扱う。
+SKILL.md 本文では要点とスクリプト呼出しのみを提示し、個別規定は本ファイルを参照する。
 
 ## REQ番号採番ルール
 
@@ -101,7 +102,8 @@ REQ単位の関連情報は frontmatter フィールドとして管理せず、�
 - `REQ-{NNNN}.md` → frontmatter `id: REQ-{NNNN}`（必須、ファイル名と ID の一致）
 - 不一致の場合はエラーとして扱う
 
-整合性確認は `agentdev-artifact-validation` が所有する決定的スクリプト `check-frontmatter-consistency.ts` が担当する。本 skill は公開検証契約へ委譲する。
+整合性確認は `agentdev-artifact-validation` が所有する決定的スクリプト `check-frontmatter-consistency.ts` が担当する。
+本 skill は公開検証契約へ委譲する。
 
 ### 日付フォーマット検証
 

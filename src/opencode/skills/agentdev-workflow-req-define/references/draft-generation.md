@@ -1,6 +1,8 @@
 # STEP-6/7/9/10/11: 要件doc生成・判定・保存・確認・報告（draft-generation）
 
-> 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-6、STEP-7、STEP-9、STEP-10、STEP-11 詳細である。要件doc（draft-data）生成、work_type・Scale 判定、ドラフト保存、要件doc確認、完了報告を提供する。STEP-8（経路A）は [references/adversarial-review-path-a.md](adversarial-review-path-a.md) 参照。
+> 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-6、STEP-7、STEP-9、STEP-10、STEP-11 詳細である。
+> 要件doc（draft-data）生成、work_type・Scale 判定、ドラフト保存、要件doc確認、完了報告を提供する。
+> STEP-8（経路A）は [references/adversarial-review-path-a.md](adversarial-review-path-a.md) 参照。
 
 ## 目次
 
@@ -29,9 +31,13 @@
 
 ### Procedure
 
-テンプレートを Read し、構造化 `draft-data` 形式に従って生成する。原本は構造化された `# draft-data` fenced YAML block である。STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分離した SPEC 候補は `artifact_actions`（`artifact: spec`）として統合し、`## SPEC候補` 補助セクションは出力しない。保存対象は単一の `artifact_actions` 配列に統合する。
+テンプレートを Read し、構造化 `draft-data` 形式に従って生成する。
+原本は構造化された `# draft-data` fenced YAML block である。
+STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分離した SPEC 候補は `artifact_actions`（`artifact: spec`）として統合し、`## SPEC候補` 補助セクションは出力しない。
+保存対象は単一の `artifact_actions` 配列に統合する。
 
-各副ステップ（定義完全性ゲート QG-1、operation_units 生成、depends_on/recommended_order 定義、artifact_actions 生成、target_area/content 形式、SPEC action 分類根拠出力、test_strategy 生成、review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command SPEC（extension 経由）の各フィールドスキーマを参照。`target_spec`、`spec_logical_division`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 SPEC を正とする。
+各副ステップ（定義完全性ゲート QG-1、operation_units 生成、depends_on/recommended_order 定義、artifact_actions 生成、target_area/content 形式、SPEC action 分類根拠出力、test_strategy 生成、review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command SPEC（extension 経由）の各フィールドスキーマを参照。
+`target_spec`、`spec_logical_division`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 SPEC を正とする。
 
 ### Result
 
@@ -106,7 +112,12 @@ work_type（4値）と scale（feature のみ）を確定する。
 
 ### Procedure
 
-全 work_type（feature/bugfix/maintenance/docs_chore）で `.agentdev/drafts/req-draft-{topic-slug}.md` に保存する。STEP-6 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で保存する。標準データモデル fields を保持する。`workflow_route` は派生値として保存しない。後続工程の分岐は `artifact_actions` の存在で決定する（`artifact: req`/`adr` → req-save、`artifact: spec` → spec-save）。`summary` 等の人間可読セクションは補助的であり下流処理の正として扱われない。
+全 work_type（feature/bugfix/maintenance/docs_chore）で `.agentdev/drafts/req-draft-{topic-slug}.md` に保存する。
+STEP-6 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で保存する。
+標準データモデル fields を保持する。
+`workflow_route` は派生値として保存しない。
+後続工程の分岐は `artifact_actions` の存在で決定する（`artifact: req`/`adr` → req-save、`artifact: spec` → spec-save）。
+`summary` 等の人間可読セクションは補助的であり下流処理の正として扱われない。
 
 各副ステップ（実装詳細の分離、auto_gate 完了ゲート、未確定内容の auto_ready 抑止）の詳細、stop_reasons 記録形式、代表 fixture、引用誤検知除外パターンは req-define command SPEC（extension 経由）「未確定内容の auto_ready 抑止」節、および `agentdev-req-analysis` の req-define detailed gates を参照。
 
@@ -145,9 +156,12 @@ work_type（4値）と scale（feature のみ）を確定する。
 
 ### Procedure
 
-生成した要件docをユーザーに提示する（承認は求めず提示のみ）。差し戻し時は壁打ち継続（STEP-2 へ）。次コマンド実行を確定の意思表示として扱う。
+生成した要件docをユーザーに提示する（承認は求めず提示のみ）。
+差し戻し時は壁打ち継続（STEP-2 へ）。
+次コマンド実行を確定の意思表示として扱う。
 
-各副ステップ（複数RU同時入力受付、統合/分離判定、操作単位ごとの出力生成、Epic 規模検出時の記録、Wave 候補/依存関係の記録、OU 構造検証）の詳細、委譲接続点は `agentdev-req-analysis` を参照。統合/分離判定では生成ドラフト自身の健全性メトリクス（要件行数、関心分類数、成果物種別数）を計測し、req-health-metrics SPEC（extension 経由）の閾値で SPLIT シグナルを算出して合意内容に反映する（新規 CREATE ドラフトで要件行数が 51 行超の場合は SPLIT 要否をユーザーへ提案）。
+各副ステップ（複数RU同時入力受付、統合/分離判定、操作単位ごとの出力生成、Epic 規模検出時の記録、Wave 候補/依存関係の記録、OU 構造検証）の詳細、委譲接続点は `agentdev-req-analysis` を参照。
+統合/分離判定では生成ドラフト自身の健全性メトリクス（要件行数、関心分類数、成果物種別数）を計測し、req-health-metrics SPEC（extension 経由）の閾値で SPLIT シグナルを算出して合意内容に反映する（新規 CREATE ドラフトで要件行数が 51 行超の場合は SPLIT 要否をユーザーへ提案）。
 
 ### Result
 

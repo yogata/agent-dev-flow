@@ -1,6 +1,8 @@
 # 共通委譲・result 処理（delegation-and-result）
 
-> 本 reference は `agentdev-workflow-case-run` SKILL.md の共通 STEP 詳細である。STEP-S4（実行担当サブエージェント委譲）と STEP-S5（result 処理・配布依存境界 最終 gate）を所有する。single workflow から直接参照され、epic-wave workflow からは子Issue ごとの委譲契約として並列適用される。
+> 本 reference は `agentdev-workflow-case-run` SKILL.md の共通 STEP 詳細である。
+> STEP-S4（実行担当サブエージェント委譲）と STEP-S5（result 処理・配布依存境界 最終 gate）を所有する。
+> single workflow から直接参照され、epic-wave workflow からは子Issue ごとの委譲契約として並列適用される。
 
 ## 目次
 

@@ -22,11 +22,13 @@ frontmatter 完全性（4フィールド）:
 - `created`: 作成日（`YYYY-MM-DD`）
 - `updated`: 作成日（`YYYY-MM-DD`、`created` と同値）
 
-`accepted` を付与しないこと。`draft` から `accepted` への昇格は case-close の責務（G11）。
+`accepted` を付与しないこと。
+`draft` から `accepted` への昇格は case-close の責務（G11）。
 
 ## APPEND / UPDATE 時の status 扱い
 
-既存 SPEC へ追記（APPEND）またはセクション置換（UPDATE）の場合、当該 SPEC の `status` を変更しない（G06）。既存 SPEC の成熟度を尊重する。
+既存 SPEC へ追記（APPEND）またはセクション置換（UPDATE）の場合、当該 SPEC の `status` を変更しない（G06）。
+既存 SPEC の成熟度を尊重する。
 
 - `status: draft` の SPEC へ追記 → `status: draft` を維持
 - `status: accepted` の SPEC へ追記 → `status: accepted` を維持
@@ -51,4 +53,5 @@ frontmatter 完全性（4フィールド）:
 - タイトル
 - 責務の概要
 
-既存 SPEC へ追記（APPEND/UPDATE）の場合は一覧表の `status` 列のみ更新し、行を追加しない。SPEC のドメイン間移送が発生した場合は旧ドメイン表から行を削除し、新ドメイン表へ登録する。
+既存 SPEC へ追記（APPEND/UPDATE）の場合は一覧表の `status` 列のみ更新し、行を追加しない。
+SPEC のドメイン間移送が発生した場合は旧ドメイン表から行を削除し、新ドメイン表へ登録する。

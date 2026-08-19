@@ -1,6 +1,7 @@
 # STEP-3: docs 検証・SPEC 確定（docs-and-spec-promotion）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-3 詳細である。docs/ 検証、targeted docs guard、check_extensions.ts、SPEC 確定フロー（draft → accepted 昇格）を提供する。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-3 詳細である。
+> docs/ 検証、targeted docs guard、check_extensions.ts、SPEC 確定フロー（draft → accepted 昇格）を提供する。
 
 ## Purpose
 
@@ -27,13 +28,17 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 
 ### docs/ 検証
 
-機能追加固有の検証（REQ作成、インデックス記載、spec更新、ADR作成）および全 work_type 共通の関連ドキュメント整合性確認、README 索引整合性確認。不足時は警告表示してユーザー判断を仰ぐ。PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（STEP-3-2）を実行する。
+機能追加固有の検証（REQ作成、インデックス記載、spec更新、ADR作成）および全 work_type 共通の関連ドキュメント整合性確認、README 索引整合性確認。
+不足時は警告表示してユーザー判断を仰ぐ。
+PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（STEP-3-2）を実行する。
 
 **文書分類ポリシー適合確認**: document-model SPEC（extension 経由）の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する。
 
 ### STEP-3-1: close 時 SPEC/ commands/ skills 更新漏れの局所確認
 
-実装完了、PR マージ前に、SPEC 本文と実装の最終矛盾確認、command 定義の更新漏れ、skill 責務境界の変更漏れを確認。更新漏れ検出時は警告表示してユーザー判断。局所予防の範囲で `/agentdev/inspect-docs` の全体意味レビューの代替ではない。
+実装完了、PR マージ前に、SPEC 本文と実装の最終矛盾確認、command 定義の更新漏れ、skill 責務境界の変更漏れを確認。
+更新漏れ検出時は警告表示してユーザー判断。
+局所予防の範囲で `/agentdev/inspect-docs` の全体意味レビューの代替ではない。
 
 #### extensions 整合性検査
 
@@ -61,7 +66,10 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 
 #### 配布依存境界の最終変更経路 gate
 
-PR 変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、PR マージ前に配布依存境界の最終 gate を実行する。本 gate は共用 detector（`.opencode/skills/<integrity-detector-skill>/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、配布依存境界 SPEC の最終 gate 基底を再利用する。adapter が bypass されても最終 gate で停止する。trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run command Step 7-1 と同一。junction 領域は git 非追跡のため PR 差分に現れず、junction を trigger にすると gate が不発になる）
+PR 変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、PR マージ前に配布依存境界の最終 gate を実行する。
+本 gate は共用 detector（`.opencode/skills/<integrity-detector-skill>/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、配布依存境界 SPEC の最終 gate 基底を再利用する。
+adapter が bypass されても最終 gate で停止する。
+trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run command Step 7-1 と同一。junction 領域は git 非追跡のため PR 差分に現れず、junction を trigger にすると gate が不発になる）
 
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`
 - **検査対象**: PR HEAD の worktree（マージ前の実際の PR ブランチ内容）を検査する。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査対象とする（Oracle finding 5: inspect PR head before merge）
@@ -80,7 +88,8 @@ QG-4 の full integrity suite 合格基準により検証スイート全体（bu
 
 ### STEP-3-2: SPEC 確定フロー
 
-PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録）を読み取り、SPEC の確定、昇格を処理する。セクション不存在・空の場合はスキップ。
+PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録）を読み取り、SPEC の確定、昇格を処理する。
+セクション不存在・空の場合はスキップ。
 
 | 処理パターン | 条件 | アクション |
 |---|---|---|
@@ -98,7 +107,8 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 - `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`（full integrity suite 実行、QG-4 合格基準による検証で実行）
 - test_strategy（QG-4 完了条件確認）
 
-**checker コマンドの stdout 退避形式**: 上記 checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出等の観測対象）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。非ゼロ exit 時も JSON レポート（stdout）を Evidence として保持し、`>` リダイレクトや PowerShell 変数格納で退避しない。
+**checker コマンドの stdout 退避形式**: 上記 checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出等の観測対象）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。
+非ゼロ exit 時も JSON レポート（stdout）を Evidence として保持し、`>` リダイレクトや PowerShell 変数格納で退避しない。
 
 ## Evidence
 

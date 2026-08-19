@@ -1,6 +1,7 @@
 # STEP 詳細: 矛盾検出 / RU 生成・成果物削除 / Git 永続化・完了報告（backlog-review）
 
-> 本 reference は `agentdev-workflow-backlog-review` SKILL.md の Control Plane STEP-6〜STEP-8 詳細である。SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
+> 本 reference は `agentdev-workflow-backlog-review` SKILL.md の Control Plane STEP-6〜STEP-8 詳細である。
+> SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
 
 ## 目次
 
@@ -28,7 +29,9 @@
 
 1. RU 構成案に含まれる採用済み成果物間の矛盾を検出する
 2. 矛盾が検出されない場合: そのまま STEP-7 へ進む（単一承認で RU 生成扱い。追加の HITL は不要）
-3. 矛盾が検出された場合のみ、ユーザーに追加判断を求める。矛盾する artifact を RU 化せずユーザーに確認する。自動解決しない
+3. 矛盾が検出された場合のみ、ユーザーに追加判断を求める。
+矛盾する artifact を RU 化せずユーザーに確認する。
+自動解決しない
 4. 矛盾しない artifact は通常通り RU 化する（partial success）
 
 ### Result
@@ -70,7 +73,9 @@ RU を生成し、RU 生成が成功した採用済み成果物のみを削除�
 1. RU 構成案に基づき `.agentdev/backlog/req-units/RU-*.md` を生成する（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）
 2. session由来RU（`source_type: chat`、`generated_by: session`）の場合は、正規原本（一時成果物ライフサイクル要件、artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」）へ委譲した要件（二段階承認、frontmatter 必須フィールド、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）に従う
 3. depends_on 検証を実行する（RU-ID のみ許容、unresolved、循環の検証）
-4. RU 生成が成功した採用済み成果物のみを削除する。削除条件は当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ。RU 化に失敗した成果物、矛盾により除外された成果物は残置する
+4. RU 生成が成功した採用済み成果物のみを削除する。
+削除条件は当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ。
+RU 化に失敗した成果物、矛盾により除外された成果物は残置する
 5. 削除結果を記録する
 
 ### Result
@@ -111,10 +116,14 @@ RU を生成し、RU 生成が成功した採用済み成果物のみを削除�
 
 1. `git diff --name-only` で `.agentdev/` 配下の変更を確認する
 2. 変更なし時は commit/push せず完了報告で「変更なし」と報告する
-3. 変更あり時、並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止
+3. 変更あり時、並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い明示パスでステージする。
+生成した RU は `.agentdev/backlog/req-units/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。
+`.agentdev/` 全体の一括 `git add` は禁止
 4. commit message は `chore(agentdev): generate requirement units via backlog-review` とする
 5. `git commit -- <paths>`（--only pathspec 形式）を実行し、`git push` を行う。失敗時は構造化エラーメッセージを表示して停止する
-6. 完了報告をテンプレート別に出力する。全て成功時は `.opencode/commands/agentdev/templates/backlog-review/standard.md`、partial success（矛盾あり）時は `partial.md`、採用済み成果物なし時は `zero-promoted.md` に従う。RU 生成結果、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する
+6. 完了報告をテンプレート別に出力する。
+全て成功時は `.opencode/commands/agentdev/templates/backlog-review/standard.md`、partial success（矛盾あり）時は `partial.md`、採用済み成果物なし時は `zero-promoted.md` に従う。
+RU 生成結果、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する
 
 ### Result
 

@@ -4,17 +4,26 @@ description: req-save→spec-save→case-open→case-run→case-closeを順次�
 
 # 最大自走モード
 
-要件docから req-save → spec-save → case-open → case-run → case-close を順次実行し、repo内変更に限りマージまで自走する。標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
+要件docから req-save → spec-save → case-open → case-run → case-close を順次実行し、repo内変更に限りマージまで自走する。
+標準ワークフローの置き換えではなく、ユーザーが明示的に指定した場合のみ使用する追加入口である。
 
 ## workflow 実装の権威情報源
 
-本コマンドの workflow 実装本体（Step 1〜8 の詳細、Wave 反復制御、bounded parent decision resolution、コンフリクト解消モデル Level 2/3、adversarial-review 停止伝播 経路H、結果状態の4次元集約、L1 タイムスタンプ計測、orchestration stage モデル、子 task bg task 破棄検知時の回復）は `agentdev-workflow-case-auto` Workflow Skill を権威情報源とする（責務3層分化、workflow-skill-model SPEC 準拠）。本コマンド定義は公開 interface / dispatch のみを所有し、workflow 実装本体を複製しない。case-auto は下位 workflow（req-save / spec-save / case-open / case-run / case-close）の契約確定後の上位 orchestrator として振る舞う。
+本コマンドの workflow 実装本体（Step 1〜8 の詳細、Wave 反復制御、bounded parent decision resolution、コンフリクト解消モデル Level 2/3、adversarial-review 停止伝播 経路H、結果状態の4次元集約、L1 タイムスタンプ計測、orchestration stage モデル、子 task bg task 破棄検知時の回復）は `agentdev-workflow-case-auto` Workflow Skill を権威情報源とする（責務3層分化、workflow-skill-model SPEC 準拠）。
+本コマンド定義は公開 interface / dispatch のみを所有し、workflow 実装本体を複製しない。
+case-auto は下位 workflow（req-save / spec-save / case-open / case-run / case-close）の契約確定後の上位 orchestrator として振る舞う。
 
-**下位 workflow の権威情報源（REQ-{NNNN}-{NNN}/{NNN}）**: 各工程は対応する Workflow Skill を権威情報源として読み込む。委譲工程（req-save / spec-save / case-open / case-close）の委譲先 subagent は `agentdev-workflow-req-save`、`agentdev-workflow-spec-save`、`agentdev-workflow-case-open`、`agentdev-workflow-case-close` を権威情報源として読み込み、工程固有手続きの再実装を回避する。case-run インライン実行の読込主体は case-auto 自身であり、`agentdev-workflow-case-run` を権威情報源として読み込む（起動手段は harness 分離モデル SPEC 参照）。case-auto は下位 workflow 詳細処理を複製しない。
+**下位 workflow の権威情報源（REQ-{NNNN}-{NNN}/{NNN}）**: 各工程は対応する Workflow Skill を権威情報源として読み込む。
+委譲工程（req-save / spec-save / case-open / case-close）の委譲先 subagent は `agentdev-workflow-req-save`、`agentdev-workflow-spec-save`、`agentdev-workflow-case-open`、`agentdev-workflow-case-close` を権威情報源として読み込み、工程固有手続きの再実装を回避する。
+case-run インライン実行の読込主体は case-auto 自身であり、`agentdev-workflow-case-run` を権威情報源として読み込む（起動手段は harness 分離モデル SPEC 参照）。
+case-auto は下位 workflow 詳細処理を複製しない。
 
 ## project extensions
 
-本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-auto`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`、kind: workflow-extension）を読み込む（ADR）。extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。詳細な読み込み契約は `agentdev-project-extensions` skill 参照
+本コマンドの workflow 実装本体を所有する Workflow Skill（`agentdev-workflow-case-auto`）が、対応する project extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`、kind: workflow-extension）を読み込む（ADR）。
+extension の5セクション（`context` / `rules` / `checks` / `acceptance_gates` / `must_not`）は標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行し、破損時はエラー表示して当該 extension を無視し標準動作で続行する。
+詳細な読み込み契約は `agentdev-project-extensions` skill 参照
 
 ## 入力
 
@@ -28,7 +37,9 @@ description: req-save→spec-save→case-open→case-run→case-closeを順次�
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-auto` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004、REQ-{NNNN}-{NNN}）。同スキルが8 STEP の control plane として制御構造を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-auto` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004、REQ-{NNNN}-{NNN}）。
+同スキルが8 STEP の control plane として制御構造を所有する。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
@@ -41,13 +52,18 @@ description: req-save→spec-save→case-open→case-run→case-closeを順次�
 | STEP-7 停止条件の検出・停止理由分類 | 各工程の結果受領 | 停止判定（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断） | 停止時報告に再開点と再開可能な次コマンドが明示されていること |
 | STEP-8 完了報告 | 全工程完了 or 停止 | L1 タイムスタンプ・4次元集約・結果状態の分離報告 | 結果状態（完了/進行/未実行）が分離して報告されていること |
 
-**adversarial-review 由来の停止伝播（経路H）**: 下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、当該 execution_unit の自走を停止し、ユーザー判断を待機する。user-decision-required は STEP-7 の HITL 境界停止条件分類とは独立する停止理由分類である。
+**adversarial-review 由来の停止伝播（経路H）**: 下位 command から adversarial-review 由来の user-decision-required + decision_context を受領した場合、当該 execution_unit の自走を停止し、ユーザー判断を待機する。
+user-decision-required は STEP-7 の HITL 境界停止条件分類とは独立する停止理由分類である。
 
-**bounded parent decision resolution**: case-auto は下位 command から受領した decision_context を限定的に自律解決する。case-auto は raw finding を解釈、採否、候補反映しない（AG-{NNN}）。
+**bounded parent decision resolution**: case-auto は下位 command から受領した decision_context を限定的に自律解決する。
+case-auto は raw finding を解釈、採否、候補反映しない（AG-{NNN}）。
 
-**コンフリクト解消モデル（3レベルエスカレーション）**: Level 1（case-close、`git rebase` による機械的解消）、Level 2（case-auto、コンフリクト文脈付きインライン case-run 再実行 AG-{NNN}、最大2回）、Level 3（case-auto、マージ順序変更、blocked 単位の隔離）。機械的競合（rebase で自動解決可能）は停止条件に含まず、Level 1 で case-close が解消する。
+**コンフリクト解消モデル（3レベルエスカレーション）**: Level 1（case-close、`git rebase` による機械的解消）、Level 2（case-auto、コンフリクト文脈付きインライン case-run 再実行 AG-{NNN}、最大2回）、Level 3（case-auto、マージ順序変更、blocked 単位の隔離）。
+機械的競合（rebase で自動解決可能）は停止条件に含まず、Level 1 で case-close が解消する。
 
-**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-auto` が所有する。同 Workflow Skill は `/agentdev/case-auto` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
+**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-case-auto` が所有する。
+同 Workflow Skill は `/agentdev/case-auto` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。
+OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
 ## 不変条件
 

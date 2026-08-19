@@ -7,7 +7,8 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 機能追加またはバグ修正の要件を整理、定義する。
 壁打ちフェーズで使用。
 
-**draft-data 入力・出力**: 本コマンドは構造化 `draft-data`（`# draft-data` fenced YAML block）を扱う。対話の進行は durable state（入力ファイル、draft 下書き、`status` frontmatter）から再構成され、会話コンテキストのみを resume source としない。
+**draft-data 入力・出力**: 本コマンドは構造化 `draft-data`（`# draft-data` fenced YAML block）を扱う。
+対話の進行は durable state（入力ファイル、draft 下書き、`status` frontmatter）から再構成され、会話コンテキストのみを resume source としない。
 
 ## 入力
 
@@ -34,7 +35,9 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。同スキルが11 STEP の対話型 control plane として制御構造を所有する。各工程を前出出力検証表で示す（工程ラベルが推奨順）。
+本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+同スキルが11 STEP の対話型 control plane として制御構造を所有する。
+各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
@@ -50,7 +53,9 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 | STEP-10 要件doc確認 | ドラフト保存済み | ユーザー確認結果 | ユーザーが要件docを確認済みであること |
 | STEP-11 完了報告 | 確認済み | 完了報告（次コマンドの提示を含む） | 出力パスと次アクションが報告されていること |
 
-**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-req-define` が所有する。同 Workflow Skill は `/agentdev/req-define` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
+**soft guard（REQ-{NNNN}-{NNN}、OpenCode 1.18.15 向け）**: 本コマンドの workflow 実装本体は `agentdev-workflow-req-define` が所有する。
+同 Workflow Skill は `/agentdev/req-define` command の工程経由でのみ利用し、単独起動（直接 skill 起動）を行わないこと。
+OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため、本宣言を soft guard として機能させる。
 
 ## 不変条件
 

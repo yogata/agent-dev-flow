@@ -5,7 +5,9 @@ description: "case-auto command の workflow 実装本体。req-save → spec-sa
 
 # case-auto workflow スキル
 
-case-auto command の workflow 実装本体。要件doc または Issue番号から req-save → spec-save → case-open → case-run → case-close を順次自走し、repo 内変更に限りマージまで完了する制御構造を所有する。orchestration stage モデル、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 経路H 停止伝播を統合する。
+case-auto command の workflow 実装本体。
+要件doc または Issue番号から req-save → spec-save → case-open → case-run → case-close を順次自走し、repo 内変更に限りマージまで完了する制御構造を所有する。
+orchestration stage モデル、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 経路H 停止伝播を統合する。
 
 case-auto command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -44,7 +46,9 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）は
 
 ## Control Plane（STEP 一覧）
 
-case-auto workflow は次の8 STEP で構成する。各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。会話コンテキストに依存せず、durable state（`case_auto_started_at`、L1 タイムスタンプ、orchestration stage 別結果、bg task 状態、結果状態4次元）から再開点を再構成する。
+case-auto workflow は次の8 STEP で構成する。
+各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、durable state（`case_auto_started_at`、L1 タイムスタンプ、orchestration stage 別結果、bg task 状態、結果状態4次元）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -78,7 +82,8 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 
 ## 下位 Workflow Skill 連携（上位 orchestrator）
 
-本スキルは上位 orchestrator として次の下位 Workflow Skill を名レベルで参照する（REQ-{NNNN}-{NNN}/{NNN}）。下位 workflow の契約詳細を複製しない。
+本スキルは上位 orchestrator として次の下位 Workflow Skill を名レベルで参照する（REQ-{NNNN}-{NNN}/{NNN}）。
+下位 workflow の契約詳細を複製しない。
 
 - `agentdev-workflow-req-save`: req-save 工程（委譲起動、委譲先 subagent が権威情報源として読み込む）
 - `agentdev-workflow-spec-save`: spec-save 工程（同上）
@@ -102,7 +107,11 @@ case-auto workflow は次の8 STEP で構成する。各 STEP は resume point �
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、case-auto command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、case-auto command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 

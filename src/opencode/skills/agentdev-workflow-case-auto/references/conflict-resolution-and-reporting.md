@@ -1,6 +1,7 @@
 # STEP-7/8: コンフリクト解消 Level 2/3・完了報告（conflict-resolution-and-reporting）
 
-> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-7, STEP-8 詳細である。コンフリクト解消 Level 2/3（インライン case-run 再実行、オーケストレーション級判断）と完了報告（L1 タイムスタンプ、4次元集約、OU処理ループ）を提供する。
+> 本 reference は `agentdev-workflow-case-auto` SKILL.md の Control Plane STEP-7, STEP-8 詳細である。
+> コンフリクト解消 Level 2/3（インライン case-run 再実行、オーケストレーション級判断）と完了報告（L1 タイムスタンプ、4次元集約、OU処理ループ）を提供する。
 
 ## STEP-7: コンフリクト解消 Level 2/3
 
@@ -21,7 +22,9 @@ case-close からエスカレーションされた PR マージコンフリク�
 
 ### Procedure
 
-PR マージコンフリクト発生時は、以下3レベルのエスカレーションで解消を図る。各レベルを試行しても解消できない場合のみ次のレベルへ進む。**機械的競合（rebase で自動解決可能）は停止条件に含まず**、Level 1 で case-close が解消する（Level 1 は case-close の責務、本 STEP では Level 2/3 の case-auto 責務を定義する）。
+PR マージコンフリクト発生時は、以下3レベルのエスカレーションで解消を図る。
+各レベルを試行しても解消できない場合のみ次のレベルへ進む。
+**機械的競合（rebase で自動解決可能）は停止条件に含まず**、Level 1 で case-close が解消する（Level 1 は case-close の責務、本 STEP では Level 2/3 の case-auto 責務を定義する）。
 
 | Level | 担当 | 手順 | 失敗時 |
 |---|---|---|---|
@@ -67,7 +70,9 @@ Level 2 コンフリクト文脈付きインライン case-run 再実行、Level
 
 ### Procedure
 
-最終工程（case-close 委譲）の完了報告をそのまま出力する。Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、G16）。停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する。
+最終工程（case-close 委譲）の完了報告をそのまま出力する。
+Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issue 一覧を含める（Epic Issue 本文ステータス追跡テーブルから読み取り、case-auto は書き込まない、G16）。
+停止時は完了済み OU・進行中 OU・未実行 OU・再開可能な次コマンドを報告する。
 
 完了報告には以下を含める（停止時フォーマットを含む）。
 

@@ -1,6 +1,7 @@
 # STEP-3/4/5: 既存REQ照合・要件展開・Decision判断（requirement-development）
 
-> 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-3、STEP-4、STEP-5 詳細である。既存REQ照合、要件展開（分類ゲート群）、Decision判断を提供する。
+> 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-3、STEP-4、STEP-5 詳細である。
+> 既存REQ照合、要件展開（分類ゲート群）、Decision判断を提供する。
 
 ## 目次
 
@@ -110,7 +111,8 @@
 
 ### Procedure
 
-`agentdev-decision-guidelines`（manual reference）に従ってDecision判断を記録する。各副ステップ（既存Decision重複確認、Decision禁止ゲート、判断根拠記録、作業手段Decision拒否ゲート、Decision番号指定形式 `new:{topic-slug}`）の詳細、委譲接続点は `agentdev-req-analysis` を参照。
+`agentdev-decision-guidelines`（manual reference）に従ってDecision判断を記録する。
+各副ステップ（既存Decision重複確認、Decision禁止ゲート、判断根拠記録、作業手段Decision拒否ゲート、Decision番号指定形式 `new:{topic-slug}`）の詳細、委譲接続点は `agentdev-req-analysis` を参照。
 
 ### Result
 

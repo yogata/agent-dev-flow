@@ -1,6 +1,7 @@
 # STEP 詳細: classification / review（intake-promote）
 
-> 本 reference は `agentdev-workflow-intake-promote` SKILL.md の Control Plane STEP-1 / STEP-2 詳細である。SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
+> 本 reference は `agentdev-workflow-intake-promote` SKILL.md の Control Plane STEP-1 / STEP-2 詳細である。
+> SKILL.md は control plane として STEP 遷移を管理し、本 reference は各 STEP の実行詳細を提供する。
 
 ## 目次
 
@@ -52,7 +53,8 @@ inbox 内の intake item を読み込み、評価し、暫定分類（採用/ �
 
 ### Purpose
 
-暫定分類の意味的決定を adversarial-review で検証し、accepted finding を暫定分類へ反映する。発動条件判定と review 呼出を分離して実施する。
+暫定分類の意味的決定を adversarial-review で検証し、accepted finding を暫定分類へ反映する。
+発動条件判定と review 呼出を分離して実施する。
 
 ### Input Resolution
 
@@ -67,8 +69,13 @@ inbox 内の intake item を読み込み、評価し、暫定分類（採用/ �
 
 ### Procedure
 
-1. **発動条件判定**: 暫定分類の意味的決定が存在する場合に発動する（default-on）。skip 条件（inbox 項目が1件のみで暫定分類が自明、または inbox 空）該当時は省略して従来フローを継続する。skip 判断のためだけの新規 HITL、承認点は追加しない。ユーザー明示指定時は skip 条件の該当にかかわらず必ず発動する（起動時引数、対話中の指示、extension の rules により表明される）
-2. **review 呼出**: 発動と判定された場合のみ `agentdev-adversarial-review` を起動する。審議対象は暫定分類（各 item の採用/保留/却下、変更種別、根拠）。呼出タイミングはユーザー提示（STEP-3）開始前
+1. **発動条件判定**: 暫定分類の意味的決定が存在する場合に発動する（default-on）。
+skip 条件（inbox 項目が1件のみで暫定分類が自明、または inbox 空）該当時は省略して従来フローを継続する。
+skip 判断のためだけの新規 HITL、承認点は追加しない。
+ユーザー明示指定時は skip 条件の該当にかかわらず必ず発動する（起動時引数、対話中の指示、extension の rules により表明される）
+2. **review 呼出**: 発動と判定された場合のみ `agentdev-adversarial-review` を起動する。
+審議対象は暫定分類（各 item の採用/保留/却下、変更種別、根拠）。
+呼出タイミングはユーザー提示（STEP-3）開始前
 3. **結果反映**: accepted finding を得た場合、呼出元（本 workflow）が暫定分類へ finding を反映し、反映後の分類を STEP-3 へ渡す。adversarial-review 自身は反映を行わない
 4. **unresolved 扱**: unresolved な本質的争点が残る場合、既存 HITL（STEP-3）経由で扱い、保存、inbox 削除等の不可逆処理へは進まない
 5. **呼出失敗時**: silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する

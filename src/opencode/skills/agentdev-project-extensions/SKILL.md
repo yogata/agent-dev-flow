@@ -12,7 +12,8 @@ extension の読み取り主体は Workflow Skill と Capability Skill である
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-project-extensions` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 担当
@@ -27,7 +28,8 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 標準配置
 
-extension は以下の配置を持つ。読み取り主体（Workflow Skill / Capability Skill）と kind literal の対応で決まる。
+extension は以下の配置を持つ。
+読み取り主体（Workflow Skill / Capability Skill）と kind literal の対応で決まる。
 
 ```text
 .agentdev/extensions/skills/{workflow-skill-name}.yaml
@@ -35,7 +37,8 @@ extension は以下の配置を持つ。読み取り主体（Workflow Skill / Ca
 .agentdev/extensions/skills/{capability-skill-name}.yaml
 ```
 
-旧配置 `.agentdev/extensions/commands/**` は廃止済みである。runtime は旧配置を後方互換で読まない。
+旧配置 `.agentdev/extensions/commands/**` は廃止済みである。
+runtime は旧配置を後方互換で読まない。
 
 ## Extension kind enum（公式）
 
@@ -47,7 +50,8 @@ Extension 種別は以下の3値のみを machine-readable `kind` literal とし
 | `internal-workflow-extension` | internal Workflow Extension | `.agentdev/extensions/skills/{workflow-skill-name}/internal.yaml` |
 | `capability-skill-extension` | Capability Skill Extension | `.agentdev/extensions/skills/{capability-skill-name}.yaml` |
 
-上記3値以外の `kind` はすべて無効値である。旧 kind（`command-extension` / `skill-extension`）は完全廃止済みであり、検出時は migration-required として停止する。
+上記3値以外の `kind` はすべて無効値である。
+旧 kind（`command-extension` / `skill-extension`）は完全廃止済みであり、検出時は migration-required として停止する。
 
 ### id binding
 
@@ -67,7 +71,8 @@ extension 読込時の状態分類と本スキル（runtime resolver）の動作
 | 構文上有効だが `kind` が公式3値以外（未知 kind） | schema violation + stop | fail-open しない |
 | 有効な新 kind | 通常処理 | - |
 
-extension missing と legacy extension exists は別状態であり、前者は標準動作継続、後者は migration-required として停止する。旧 kind / 未知 kind について silent ignore する実装を採らない。
+extension missing と legacy extension exists は別状態であり、前者は標準動作継続、後者は migration-required として停止する。
+旧 kind / 未知 kind について silent ignore する実装を採らない。
 
 ## extension の基本構造
 
@@ -85,7 +90,8 @@ acceptance_gates: []
 must_not: []
 ```
 
-acceptance_gates は受け入れ条件ではなく、完了判定本体でもない。extension によって追加される実行完了前ゲートである。
+acceptance_gates は受け入れ条件ではなく、完了判定本体でもない。
+extension によって追加される実行完了前ゲートである。
 
 ## 責務ごとの手順
 
@@ -100,8 +106,12 @@ acceptance_gates は受け入れ条件ではなく、完了判定本体でもな
 
 対応 extension ファイルを次の順序で判定する。
 
-1. ファイルが存在しない場合は missing として扱う。空 extension として標準動作で続行する。extension 不在はエラーではなく、配布 skill 単体で動作する通常状態である
-2. YAML 構文エラー、必須 field（`version` / `kind` / `id` / 5セクション）の欠落・型違反、kind 判定以前の破損の場合は malformed として扱う。エラーメッセージを表示し（対象 extension ファイルパスと破損理由を含む）、当該 extension を無視し、空 extension として標準動作で続行する（fail-open）。破損 extension により処理全体を停止しない
+1. ファイルが存在しない場合は missing として扱う。
+空 extension として標準動作で続行する。
+extension 不在はエラーではなく、配布 skill 単体で動作する通常状態である
+2. YAML 構文エラー、必須 field（`version` / `kind` / `id` / 5セクション）の欠落・型違反、kind 判定以前の破損の場合は malformed として扱う。
+エラーメッセージを表示し（対象 extension ファイルパスと破損理由を含む）、当該 extension を無視し、空 extension として標準動作で続行する（fail-open）。
+破損 extension により処理全体を停止しない
 3. `kind` が旧 kind（`command-extension` / `skill-extension`）の場合は migration-required として処理を停止する。silent ignore しない
 4. `kind` が公式3値以外の有効な値（未知 kind）の場合は schema violation として処理を停止する。fail-open しない
 5. 有効な新 kind の場合は通常処理（5セクション読み取り）へ進む
@@ -118,7 +128,8 @@ extension が持つ以下の5セクションを読み取る。
 | acceptance_gates | extension が追加する実行完了前ゲート |
 | must_not | command/skill に追加で課す禁止事項 |
 
-各セクションは配列であり、複数の entry を持てる。entry は空配列でもよい。
+各セクションは配列であり、複数の entry を持てる。
+entry は空配列でもよい。
 
 ### 4. 上書きでなく追加・拡張であることの扱い
 
@@ -153,13 +164,16 @@ checks:
     skill: <project-local-skill-name>
 ```
 
-初期契約では `action`, `required`, `fail_on` は採用しない。呼び出された skill は extension entry の `id`, `when`, `skill` および周辺文脈をもとに判断する。
+初期契約では `action`, `required`, `fail_on` は採用しない。
+呼び出された skill は extension entry の `id`, `when`, `skill` および周辺文脈をもとに判断する。
 
-AgentDevFlow 標準は `skill:` 構文を定義するが、委譲先 skill の中身には関与しない。各適用プロジェクトが project-local skill を用意し、rules/checks の中身を定義する。
+AgentDevFlow 標準は `skill:` 構文を定義するが、委譲先 skill の中身には関与しない。
+各適用プロジェクトが project-local skill を用意し、rules/checks の中身を定義する。
 
 ## ハイブリッド方式
 
-extension 原本は各プロジェクトが所有する。AgentDevFlow 本体は初期テンプレート、schema、検査、保守 command を提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。
+extension 原本は各プロジェクトが所有する。
+AgentDevFlow 本体は初期テンプレート、schema、検査、保守 command を提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。
 
 ## 公開契約宣言と詳細契約の分離
 

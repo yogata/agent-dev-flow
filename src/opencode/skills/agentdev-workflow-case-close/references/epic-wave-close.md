@@ -1,6 +1,7 @@
 # STEP-E1〜E6: Epic Wave クローズ（epic-wave-close）
 
-> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-E1〜E6 詳細である。Epic Issue 番号入力時（ステータス追跡テーブル存在時）の現在 Wave の一括クローズ、Epic status table 更新、最終 Wave 判定を提供する。
+> 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-E1〜E6 詳細である。
+> Epic Issue 番号入力時（ステータス追跡テーブル存在時）の現在 Wave の一括クローズ、Epic status table 更新、最終 Wave 判定を提供する。
 
 ## Purpose
 
@@ -26,7 +27,8 @@ Epic Issue 番号入力時（ステータス追跡テーブル存在時）に現
 
 ## Procedure
 
-現在 Wave の PR 作成済み子Issue を一括マージ、クローズし、Epic status table を更新する。最終 Wave 判定後に Epic Issue クローズ または 残 Wave 通知を行う。
+現在 Wave の PR 作成済み子Issue を一括マージ、クローズし、Epic status table を更新する。
+最終 Wave 判定後に Epic Issue クローズ または 残 Wave 通知を行う。
 
 ### E1: Epic Issue 本文読込・ステータス追跡テーブル解析
 
@@ -38,15 +40,21 @@ Epic Issue 本文を読み込み、ステータス追跡テーブル（`agentdev
 
 ### E3: PR 作成済み子Issue 特定
 
-現在 Wave の PR 作成済み子Issue（`running` 状態）を特定。`pending`/ `ready`/ `blocked`/ `failed` 状態の子Issue は対象外（べき等性）。
+現在 Wave の PR 作成済み子Issue（`running` 状態）を特定。
+`pending`/ `ready`/ `blocked`/ `failed` 状態の子Issue は対象外（べき等性）。
 
 ### E4: 各子Issue の PR マージ・子Issue クローズ・完了条件チェックボックス評価・Capture 回収・コンフリクト解消の準並列化
 
-各子Issue について次を**準並列**で実行する。ただし各子Issue の PR マージへ進む前に、当該子Issue の PR HEAD で配布依存境界の最終 gate（STEP-3-1「配布依存境界の最終変更経路 gate」と同一手続き）を必ず実行する。single-Issue ルート（STEP-3）と Epic Wave ルート（本 STEP）で同一の最終 gate を経由し、どちらかのルートだけ gate を省略しない（配布依存境界 SPEC）。
+各子Issue について次を**準並列**で実行する。
+ただし各子Issue の PR マージへ進む前に、当該子Issue の PR HEAD で配布依存境界の最終 gate（STEP-3-1「配布依存境界の最終変更経路 gate」と同一手続き）を必ず実行する。
+single-Issue ルート（STEP-3）と Epic Wave ルート（本 STEP）で同一の最終 gate を経由し、どちらかのルートだけ gate を省略しない（配布依存境界 SPEC）。
 
 #### E4-1: 各子Issue の配布依存境界 最終 gate（マージ前、single-Issue STEP-3-1 と同一手続き）
 
-各子Issue の PR マージへ進む前に、当該 PR の変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、配布依存境界の最終 gate を実行する。含まない PR（docs のみ等）ではスキップする。trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run command Step 7-1 と同一）。手続きの正規所有者は STEP-3-1（[docs-and-spec-promotion.md](docs-and-spec-promotion.md)）であり、本 STEP は同一手続きを Epic Wave の各子Issue に適用する。
+各子Issue の PR マージへ進む前に、当該 PR の変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、配布依存境界の最終 gate を実行する。
+含まない PR（docs のみ等）ではスキップする。
+trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run command Step 7-1 と同一）。
+手続きの正規所有者は STEP-3-1（[docs-and-spec-promotion.md](docs-and-spec-promotion.md)）であり、本 STEP は同一手続きを Epic Wave の各子Issue に適用する。
 
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`。検査対象は当該子Issue PR の HEAD（マージ前の実際の PR ブランチ内容）。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査する
 - **checker コマンドの stdout 退避形式**: 本 gate の checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。非ゼロ exit 時も JSON レポートを証跡として保持する（手続きの正規所有者は STEP-3-1 と同一）
@@ -56,7 +64,8 @@ Epic Issue 本文を読み込み、ステータス追跡テーブル（`agentdev
 
 #### E4-2: 各子Issue のマージ並列シーケンス（gate 合格子Issue のみ）
 
-E4-1 を合格した子Issue について次を**準並列**で実行する。gate 違反子Issue は本シーケンスの対象外とする。
+E4-1 を合格した子Issue について次を**準並列**で実行する。
+gate 違反子Issue は本シーケンスの対象外とする。
 
 - PR マージ（STEP-4 の PR マージ手続きに準拠、mergeable UNKNOWN ポーリング、squash merge、先行 commit 検出、コンフリクト Level 1 rebase）
 - 子Issue クローズ（Issue close 手続き）
@@ -66,7 +75,8 @@ E4-1 を合格した子Issue について次を**準並列**で実行する。ga
 
 ### E5: Epic status table 更新（単一書き手 case-close のみ）
 
-Epic Issue 本文のステータス追跡テーブルを更新。**単一書き手制約**: case-close のみが実施（case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない、last-write-wins 競合防止）。
+Epic Issue 本文のステータス追跡テーブルを更新。
+**単一書き手制約**: case-close のみが実施（case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない、last-write-wins 競合防止）。
 
 ### E5b: Epic Issue 完了条件チェックボックス最終評価・更新
 

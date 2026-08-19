@@ -16,7 +16,8 @@ Windows 環境で WRITE 手続きを実行する場合、書き込み操作の�
 - **対象外環境**: Linux/ macOS/ WSL 等の Windows 以外の環境では事前確認不要
 - **失敗時の扱い**: 初期化を経由せず WRITE 操作を実行した場合は mojibake が発生する可能性が高く、事後の読み戻し検証（後述「4観点の比較検証 (a) エンコーディング検証」）で検出される。検出時は [retry.md](retry.md) に従い初期化実行後に再書き込みする
 
-本確認は事前の予防措置であり、事後の読み戻し検証（後述）を代替しない。両者を併用する。
+本確認は事前の予防措置であり、事後の読み戻し検証（後述）を代替しない。
+両者を併用する。
 
 ## 検証手順
 
@@ -24,7 +25,8 @@ Windows 環境で WRITE 手続きを実行する場合、書き込み操作の�
 
 対象リソース（Issue/PR/コメント）の本文を取得する。
 読み取りは [standard-procedures.md](standard-procedures.md) の READ 手続き（Node.js `execSync` + 一時ファイル経由 + Read tool）に従う。
-READ 手続きは gh CLI 限定ではなくネイティブコマンド全般に適用される。検証で exit code が意味を持つコマンド（checker 等、非ゼロ exit が違反検出として観測対象になるコマンド）を実行して証跡を取る場合は、`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出しによる stdout 退避形式に従う（[standard-procedures.md](standard-procedures.md) READ 手続き「exit code が意味を持つコマンドの stdout 退避形式」参照）。
+READ 手続きは gh CLI 限定ではなくネイティブコマンド全般に適用される。
+検証で exit code が意味を持つコマンド（checker 等、非ゼロ exit が違反検出として観測対象になるコマンド）を実行して証跡を取る場合は、`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出しによる stdout 退避形式に従う（[standard-procedures.md](standard-procedures.md) READ 手続き「exit code が意味を持つコマンドの stdout 退避形式」参照）。
 
 - Issue本文: Issue 本文読込手続き
 - PR本文: PR 本文読込手続き

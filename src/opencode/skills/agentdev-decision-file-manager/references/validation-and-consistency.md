@@ -1,6 +1,7 @@
 # Decision ファイル検証と整合性チェック
 
-本ファイルは `agentdev-decision-file-manager` SKILL.md の補助資料であり、Decision frontmatter のバリデーションルール、ステータス遷移の詳細、整合性チェック（README ↔ Decision、Decision ↔ Decision、REQ ↔ Decision、Issue ↔ Decision）、README 分類ビューの運用、accepted Decision 直接編集チェックリスト、APPEND/UPDATE 判定基準の詳細を扱う。SKILL.md 本文では操作モード、採番不変条件、status遷移の許容/禁止一覧のみを提示し、検証手順、チェックリスト、判定フローは本ファイルを参照する。
+本ファイルは `agentdev-decision-file-manager` SKILL.md の補助資料であり、Decision frontmatter のバリデーションルール、ステータス遷移の詳細、整合性チェック（README ↔ Decision、Decision ↔ Decision、REQ ↔ Decision、Issue ↔ Decision）、README 分類ビューの運用、accepted Decision 直接編集チェックリスト、APPEND/UPDATE 判定基準の詳細を扱う。
+SKILL.md 本文では操作モード、採番不変条件、status遷移の許容/禁止一覧のみを提示し、検証手順、チェックリスト、判定フローは本ファイルを参照する。
 
 ## 目次
 
@@ -184,9 +185,12 @@ Decision の `status` を変更した場合、`docs/decisions<README>.md` の全
 
 ## accepted Decision 直接編集チェックリスト
 
-accepted status の Decision へ直接編集（UPDATE）を実施する場合、SPEC `agentdev-decision-file-manager` の「accepted Decision 直接編集チェックリスト」セクションに従い、以下の全てを満たすことを確認する（`agentdev-decision-guidelines`「accepted Decision の更新規則」準拠）。本節は実行入口の要約であり、正規原本は SPEC とする。
+accepted status の Decision へ直接編集（UPDATE）を実施する場合、SPEC `agentdev-decision-file-manager` の「accepted Decision 直接編集チェックリスト」セクションに従い、以下の全てを満たすことを確認する（`agentdev-decision-guidelines`「accepted Decision の更新規則」準拠）。
+本節は実行入口の要約であり、正規原本は SPEC とする。
 
-本チェックリストの見出し（`accepted Decision 直接編集チェックリスト`）は歴史的経緯により ADR という語を含まない `accepted Decision` 表記を採用する。これは本スキルが ADR から Decision へ移行した成果物であることによる。v2:ADR-* 形式の過去参照は原本 SPEC 側で保持する。
+本チェックリストの見出し（`accepted Decision 直接編集チェックリスト`）は歴史的経緯により ADR という語を含まない `accepted Decision` 表記を採用する。
+これは本スキルが ADR から Decision へ移行した成果物であることによる。
+v2:ADR-* 形式の過去参照は原本 SPEC 側で保持する。
 
 ### 事前確認
 

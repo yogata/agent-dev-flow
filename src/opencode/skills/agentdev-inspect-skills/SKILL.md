@@ -11,7 +11,8 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造、実行主体分�
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-inspect-skills` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -133,7 +134,8 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 出力形式
 
-検出事項の報告形式は次の3要素（診断レポート: セッション内テキスト、検出事項リスト: 対象・観点・分類・根拠・推奨経路、検出事項ファイル: `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md`）に適合させる。セッション内テキストによる診断レポートは本セクション形式で提示し、検出事項ファイルへのエクスポートは「検出事項のエクスポート」セクションに従う。
+検出事項の報告形式は次の3要素（診断レポート: セッション内テキスト、検出事項リスト: 対象・観点・分類・根拠・推奨経路、検出事項ファイル: `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md`）に適合させる。
+セッション内テキストによる診断レポートは本セクション形式で提示し、検出事項ファイルへのエクスポートは「検出事項のエクスポート」セクションに従う。
 
 各検出事項は次の形で報告する（「検出事項リスト」形式: 対象・観点・分類・根拠・推奨経路）。
 

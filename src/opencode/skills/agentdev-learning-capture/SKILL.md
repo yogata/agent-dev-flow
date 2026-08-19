@@ -10,7 +10,8 @@ description: Agent-first extraction and capture of learnings from problems auton
 ## 原本（SSoT）
 
 本スキルの原本仕様は `agentdev-learning-capture` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。重複または不一致がある場合は SPEC を正とする。
+SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は SPEC を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -83,11 +84,14 @@ inbox.mdが存在しない場合、エージェントは当該ファイルを作
 | 再発防止知見（予防策、判断基準、運用ルール等） | learning item（`inbox.md`） | 知見の蓄積、昇華は learning pipeline が管理 |
 | 両方含まれる | 両方に分割してそれぞれ出力 | 1観測 = 最大1 learning item + 1 intake item |
 
-learning は「改善提案そのもの」ではなく「改善提案へ昇華されうる再発防止知見」である。単一の観測が同時に learning item と intake item の両方を生み出す場合、本スキルは learning item のみを生成し、intake item の生成は `/agentdev/intake-capture` に委ねる。1つの観測から得られた知見を単一エントリに混在させてはならない（capture-boundaries.md の split rule に準拠）。
+learning は「改善提案そのもの」ではなく「改善提案へ昇華されうる再発防止知見」である。
+単一の観測が同時に learning item と intake item の両方を生み出す場合、本スキルは learning item のみを生成し、intake item の生成は `/agentdev/intake-capture` に委ねる。
+1つの観測から得られた知見を単一エントリに混在させてはならない（capture-boundaries.md の split rule に準拠）。
 
 ## reference選択表
 
-通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
+通常経路で全 reference を無条件読込しない。
+必要な条件に応じて読む reference を選択する。
 
 | 条件 | 読む reference |
 |---|---|

@@ -5,7 +5,10 @@ description: "inspect-promote command の workflow 実装本体。検出事項�
 
 # inspect-promote workflow スキル
 
-inspect-promote command の workflow 実装本体。`.agentdev/inspect/inbox/` の検出事項を分類（promote/defer/reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ保存、却下した検出事項を即時削除、見送りを inbox に残置する。`--auto` 明示 opt-in 時は高確信度検出事項を `.agentdev/intake/promoted/` へ自動投入する。finding disposition を STEP resume point として所有する。
+inspect-promote command の workflow 実装本体。
+`.agentdev/inspect/inbox/` の検出事項を分類（promote/defer/reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ保存、却下した検出事項を即時削除、見送りを inbox に残置する。
+`--auto` 明示 opt-in 時は高確信度検出事項を `.agentdev/intake/promoted/` へ自動投入する。
+finding disposition を STEP resume point として所有する。
 
 inspect-promote command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -53,7 +56,11 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-promote.yaml`
 
 ## Control Plane（STEP 一覧）
 
-inspect-promote workflow は次の8 STEP で構成する。各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。会話コンテキストに依存せず、durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から再開点を再構成する。**finding disposition（STEP-3〜STEP-7 の分類・採用・保留・却下）は独立した resume point 群を構成する。**
+inspect-promote workflow は次の8 STEP で構成する。
+各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、durable state（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から再開点を再構成する。
+**finding disposition（STEP-3〜STEP-7 の分類・採用・保留・却下）は独立した resume point 群を構成する。
+**
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -91,7 +98,12 @@ inspect-promote workflow は次の8 STEP で構成する。各 STEP は resume p
 
 ## Workflow Extension 読込契約
 
-本スキルは workflow-extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-promote.yaml`、kind: workflow-extension）を読み込む場合がある。Workflow Skill のみが読み、inspect-promote command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する（fail-open）。破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する。自動 promote 対象カテゴリ、投入先、実行ログ、誤検知 revoke 手順は workflow-contracts SPEC（extension 経由で解決）を正とし、本スキルはカテゴリ定義を重複保持しない。
+本スキルは workflow-extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-promote.yaml`、kind: workflow-extension）を読み込む場合がある。
+Workflow Skill のみが読み、inspect-promote command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する（fail-open）。
+破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する。
+自動 promote 対象カテゴリ、投入先、実行ログ、誤検知 revoke 手順は workflow-contracts SPEC（extension 経由で解決）を正とし、本スキルはカテゴリ定義を重複保持しない。
 
 ## 共通制約
 

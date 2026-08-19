@@ -5,7 +5,11 @@ description: "spec-save command の workflow 実装本体。req-define で分離
 
 # spec-save workflow スキル
 
-spec-save command の workflow 実装本体。req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/<**/*>.md` に保存、確定する制御構造を所有する。req-save の次、case-open の前に実行する。req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す。全 work_type 対象であり、`work_type` による判定は廃止する。
+spec-save command の workflow 実装本体。
+req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を `docs/specs/<**/*>.md` に保存、確定する制御構造を所有する。
+req-save の次、case-open の前に実行する。
+req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す。
+全 work_type 対象であり、`work_type` による判定は廃止する。
 
 spec-save command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
 
@@ -41,7 +45,9 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-spec-save.yaml`）は
 
 ## Control Plane（STEP 一覧）
 
-spec-save workflow は次の11 STEP で構成する。各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。会話コンテキストに依存せず、durable state（draft の SPEC 消費済みフラグ、SPEC ファイルの存在と frontmatter `status`、`docs/specs/README.md` エントリ、git 状態）から再開点を再構成する。
+spec-save workflow は次の11 STEP で構成する。
+各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+会話コンテキストに依存せず、durable state（draft の SPEC 消費済みフラグ、SPEC ファイルの存在と frontmatter `status`、`docs/specs/README.md` エントリ、git 状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -90,7 +96,10 @@ spec-save workflow は次の11 STEP で構成する。各 STEP は resume point 
 
 ## Artifact Graph 利用
 
-本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related）を利用できる。対応 REQ、同一 canonical owner の SPEC、関連 command、skill、integrity rule の探索（STEP-3 配置先解決、STEP-4 SPEC 分離基準の最終確認）を補助する。問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。問い合わせ目的を指定し、返された候補を用いて判断する。
+本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related）を利用できる。
+対応 REQ、同一 canonical owner の SPEC、関連 command、skill、integrity rule の探索（STEP-3 配置先解決、STEP-4 SPEC 分離基準の最終確認）を補助する。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+問い合わせ目的を指定し、返された候補を用いて判断する。
 
 - 問い合わせ結果は候補提供であり、SPEC 正規配置先、target_area、canonical owner、SPEC 操作分類の判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
 - 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
@@ -98,7 +107,11 @@ spec-save workflow は次の11 STEP で構成する。各 STEP は resume point 
 
 ## Workflow Extension 読込
 
-本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-spec-save.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-spec-save/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。いずれも Workflow Skill のみが読み、spec-save command は直接読まない。標準動作に追加・拡張される（上書きではない）。存在しない場合は標準動作で続行する。
+本スキルは workflow extension（`.agentdev/extensions/skills/agentdev-workflow-spec-save.yaml`、`kind: workflow-extension`）を読み込む場合がある（REQ-{NNNN}-{NNN}、DEC-{N}）。
+必要に応じて internal workflow extension（`.agentdev/extensions/skills/agentdev-workflow-spec-save/internal.yaml`、`kind: internal-workflow-extension`）を追加で読む。
+いずれも Workflow Skill のみが読み、spec-save command は直接読まない。
+標準動作に追加・拡張される（上書きではない）。
+存在しない場合は標準動作で続行する。
 
 ## 共通制約
 
