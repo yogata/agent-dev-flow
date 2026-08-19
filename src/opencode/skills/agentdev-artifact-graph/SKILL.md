@@ -35,7 +35,7 @@ TIM が表現する要素と派生索引上の対応:
 
 ## 標準コア（デフォルト）
 
-標準コアは self-hosting 固有知識を持たない（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}、DEC-{N} decision 3）。
+標準コアは self-hosting 固有知識を持たない（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}、DEC-{N} decision {N}）。
 
 | 項目 | デフォルト値 |
 |---|---|
@@ -44,7 +44,7 @@ TIM が表現する要素と派生索引上の対応:
 | relation_types | `references`, `supersedes`, `defined_in`, `contains`, `extends`（5種） |
 | discovery_roots | 空（augmentation で追加） |
 
-node_types と relation_types は closed-enum ではなく、augmentation から追加可能な open extension point である（REQ-{NNNN}-{NNN}、DEC-{N} decision 2）。
+node_types と relation_types は closed-enum ではなく、augmentation から追加可能な open extension point である（REQ-{NNNN}-{NNN}、DEC-{N} decision {N}）。
 標準コア5関係型の意味定義（意味スロット、変更影響方向、標準語彙対応）は TIM 語彙カタログが所有し、augmentation で再定義できない。
 `decision` は ADF 固有の拡張成果物型であり、Decision 専用の関係型を持たない。
 
@@ -172,7 +172,7 @@ related、impact、dependency、implementation、diagnostics の5種を問い合
 - 候補0件は正常な空結果として扱う
 - 意味定義を持たない拡張関係型は高位問い合わせに参加しない（名前からの意味推定をしない）。低位問い合わせ（neighbors、path、provenance）では利用できる
 - `role: index` / `role: aggregation` を持つノード種別は、索引経由の候補増幅抑止のため高位問い合わせの候補・経路から除外する（グラフからの削除はしない）
-- 標準5関係型の意味割り当ては TIM 語彙カタログ SPEC（docs/specs/&lt;foundations/traceability-model&gt;.md）が正であり、`lib/tim.ts` はその in-code 反映である。標準コア関係型の意味は augmentation で再定義できない
+- 標準5関係型の意味割り当ては TIM 語彙カタログ SPEC（`docs/specs/<foundations/traceability-model>.md`）が正であり、`lib/tim.ts` はその in-code 反映である。標準コア関係型の意味は augmentation で再定義できない
 - 関係制約（`relation_constraints`）が定義された関係型のみ、diagnostics が制約違反を判定する
 
 `discover` の `discovery_roots` は、`--roots` 未指定時に適用後設定（augmentation）から自動解決する。
@@ -300,5 +300,5 @@ project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ�
 - **SPEC**: `agentdev-artifact-graph` SPEC（`docs/specs/<skills/agentdev-artifact-graph>.md`）
 - **REQ-{NNNN}**: Artifact Graph 標準化
 - **DEC-{N}**: Artifact Graph 標準化と配布スキル昇格
-- **DEC-{N}**: OpenCode ソース・プロジェクション分離（配布物原本は src/opencode/ へ）
-- **self-hosting augmentation**: `.agentdev/artifact-graph.yaml`（Issue #1951 で移行、旧 repo-local 実装を廃止）
+- **DEC-{N}**: OpenCode ソース・プロジェクション分離（配布物原本はソースツリー、実行時投影先は `.opencode/`）
+- **self-hosting augmentation**: `.agentdev/artifact-graph.yaml`（Issue #1951 で移行、旧リポジトリ固有実装を廃止）

@@ -70,10 +70,10 @@ REQファイル修正が必要なバグ修正は feature に昇格する（work_
 
 ## Scripts（決定的処理）
 
-`scripts/` 配下の決定的スクリプトが、本スキルが規定する REQ/ADR 採番、要件行 ID 採番を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、REQ/160、AG-{NNN}/006）。
+`scripts/` 配下の決定的スクリプトが、本スキルが規定する REQ/ADR 採番、要件行 ID 採番を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、REQ、AG-{NNN}/{NNN}）。
 LLM 推論で実行していた決定的処理をスクリプトへ委譲することで、番号の重複、欠番埋めを確実に防止する。
 
-配置先: `src/opencode/skills/agentdev-req-file-manager/scripts/`（REQ/ADR 固有採番）。
+配置先: `.opencode/skills/agentdev-req-file-manager/scripts/`（REQ/ADR 固有採番）。
 実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`、REQ）。
 
 > **移管済み script**:

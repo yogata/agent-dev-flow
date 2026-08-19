@@ -79,7 +79,7 @@ SPEC frontmatter の `status`（`draft` / `accepted` / `superseded`）を本ス�
 
 ## Scripts（決定的処理）
 
-`scripts/` 配下の決定的スクリプトが、本スキルが規定する SPEC 固有処理を機械的に実行する（design-principles.md 第5節、AG-{NNN}/006）。
+`scripts/` 配下の決定的スクリプトが、本スキルが規定する SPEC 固有処理を機械的に実行する（design-principles.md 第5節、AG-{NNN}/{NNN}）。
 LLM 推論で実行していた決定的処理をスクリプトへ委譲することで、target_area マッチングのばらつきを確実に防止する。
 
 配置先: 本スキル配下の `scripts/`（SPEC 固有）。

@@ -9,7 +9,7 @@ req-define command の workflow 実装本体。
 機能追加またはバグ修正の要件を整理・定義する壁打ち workflow の制御構造を所有する。
 対話（HITL）と durable state（要件doc draft、RU）の分離を維持し、中断・再開を可能にする。
 
-req-define command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+req-define command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
 ## 原本（SSoT）
 

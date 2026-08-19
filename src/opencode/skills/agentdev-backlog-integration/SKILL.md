@@ -50,12 +50,12 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 | 契約 | 要件 | 概要 |
 |---|---|---|
 | 候補判断基準 | REQ-{NNNN}-{NNN} | review 対象は構成完了時点の RU 構成案。候補判断は補助情報であり自動発動根拠ではない |
-| 候補確定位置 | REQ-{NNNN}-{NNN}/008 | Step 4（統合・分割判定 + depends_on 解決）完了時点で RU 構成案を確定する |
+| 候補確定位置 | REQ-{NNNN}-{NNN}/{NNN} | Step 4（統合・分割判定 + depends_on 解決）完了時点で RU 構成案を確定する |
 | 呼出タイミング | REQ-{NNNN}-{NNN} | 構成（Step 3、Step 4）完了後、承認前に挿入（順序の正は backlog-review command SPEC） |
 | 矛盾検出への引き渡し | REQ-{NNNN}-{NNN} | review で指摘された矛盾は既存矛盾検出ロジックへ渡し、review 内で自動解決しない |
 | 発動条件 | REQ-{NNNN}-{NNN} | ユーザー明示指定時のみ発動（順序、発動条件の正は backlog-review command SPEC） |
 | 従来フロー維持 | REQ-{NNNN}-{NNN} | 条件非該当時、呼出失敗時は従来フローを維持（順序の正は backlog-review command SPEC） |
-| 副作用境界 | REQ-{NNNN}-{NNN}/005 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review SPEC、delegation-contracts SPEC） |
+| 副作用境界 | REQ-{NNNN}-{NNN}/{NNN} | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review SPEC、delegation-contracts SPEC） |
 | accepted finding 反映 | REQ-{NNNN}-{NNN} | accepted finding の RU 構成案への反映は呼出元責務（正は adversarial-review SPEC） |
 | 再 review 条件 | REQ-{NNNN}-{NNN} | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review SPEC） |
 | unresolved 時の扱い | REQ-{NNNN}-{NNN} | unresolved 残時は不可逆処理へ進まない（正は adversarial-review SPEC） |

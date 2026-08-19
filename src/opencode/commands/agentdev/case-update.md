@@ -28,7 +28,7 @@ description: 既存Caseの本文更新、コメント追加、またはREQファ
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-update` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-update` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 同スキルが4 STEP の control plane として制御構造を所有する。
 各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
@@ -50,7 +50,7 @@ OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため�
 - 現在のフェーズを維持する（フェーズの変更は行わない）
 - 責務は REQ 更新、レビューNG時のコメント追加、Issue本文更新に限定する（CI/CD 修正・自律修正ループは case-run の責務）
 - Issue番号の解決はユーザー入力またはセッション内会話から行う（open issue 一覧取得による解決は行わない）
-- SSoT の整合性を維持する（Issue本文と要件docの不整合を防ぐ）。`--review-ng` 時は QG-{N}（`agentdev-quality-gates`）の乖離検出結果を引用する
+- SSoT の整合性を維持する（Issue本文と要件docの不整合を防ぐ）。`--review-ng` 時は QG-3（`agentdev-quality-gates`）の乖離検出結果を引用する
 - `--body` 更新時は Issue 作成時と同じテンプレート構造を維持し、【必須】セクションを完備させる。コメント/レビューNGコメントはテンプレートの【必須】セクションを確認してから投稿する
 - gh CLI 出力の読み取りは `agentdev-gh-cli` の安全な読み取り手順に従う。work_type 分岐の判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照する
 - 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）は verbatim で返す。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す

@@ -33,7 +33,7 @@ extension の5セクション（`context` / `rules` / `checks` / `acceptance_gat
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-case-run` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+本コマンドは workflow 実装本体を `agentdev-workflow-case-run` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 同スキルは単一 Issue 実行（single workflow）と Epic Wave 実行（epic-wave workflow）を1:N に分離した control plane を所有し、実行契約差異（target cardinality / parallelism / fan-out・fan-in / child task recovery / partial result / Wave-level completion）を明示的に扱う。
 
 ### Phase single（単一 Issue 実行モード）
@@ -94,6 +94,6 @@ OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため�
 - G02: 実装で判明した制約により REQ を黙って変更しない。乖離として報告し、ユーザー承認後に反映する
 - G04: 全ファイル操作は worktree 内で実行する（メインリポジトリでのファイル操作は禁止）
 - G15: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md` への直接変更は行わない（capture 情報は PR 本文経由のみ case-close に引き継ぐ）
-- G24: 完了条件チェックボックスの評価・更新は case-close QG-{N} の責務であり、case-run と実行担当サブエージェントは完了条件チェックボックスを更新しない
+- G24: 完了条件チェックボックスの評価・更新は case-close QG-4 の責務であり、case-run と実行担当サブエージェントは完了条件チェックボックスを更新しない
 - G30: STEP-S4（実行担当サブエージェント委譲）の前に worktree+ブランチが作成済みであることを STEP-S3 の precondition gate で検証する。未作成時・メインリポジトリにいる場合は実行担当サブエージェントを起動しない。委譲では worktree root（相対パス、`.worktrees/{N}-{type}/`）を引き渡し、メインリポジトリパスは引き渡さない
 - G33: Issue 本文の書き換えは case-update が所有する（case-run が単独で Issue 本文を書き換えない。staleness 差異は case-update へ連携する）

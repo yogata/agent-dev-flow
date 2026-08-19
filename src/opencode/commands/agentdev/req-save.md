@@ -30,7 +30,7 @@ extension の5セクション（`context` / `rules` / `checks` / `acceptance_gat
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-req-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+本コマンドは workflow 実装本体を `agentdev-workflow-req-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 同スキルが12 STEP の control plane として制御構造（事前チェック、REQ ファイル操作、整合性検証、永続化）を所有する。
 各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 

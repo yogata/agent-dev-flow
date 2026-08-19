@@ -12,7 +12,7 @@ case-run 本体は orchestration に専念し、実装実行そのものは行�
 単一 Issue 実行と Epic Wave 実行は制御構造に実質差異があるため、DEC-{N} の 1:N 分割基準により single workflow と epic-wave workflow の2 workflow として分離する。
 本 SKILL.md は両 workflow の control plane（選択 dispatch、STEP 一覧、遷移）を所有し、実行契約差異を明示する。
 
-case-run command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+case-run command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
 ## 原本（SSoT）
 
@@ -88,7 +88,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
-| STEP-W1 | Epic Issue 解析・Wave 選択 | case-run 起動（Epic Issue番号受領） | 現在 ready な Wave の子Issue 群確定（入力ソース無区別、REQ/088） | [references/epic-wave.md](references/epic-wave.md) |
+| STEP-W1 | Epic Issue 解析・Wave 選択 | case-run 起動（Epic Issue番号受領） | 現在 ready な Wave の子Issue 群確定（入力ソース無区別、REQ） | [references/epic-wave.md](references/epic-wave.md) |
 | STEP-W2 | fan-out 準備 | Wave 子Issue 群確定 | `git fetch origin`、子Issue ごとの worktree+ブランチ、前置 gate 群適用（STEP-S3 と同一契約） | [references/epic-wave.md](references/epic-wave.md) |
 | STEP-W3 | fan-out 並列委譲 | fan-out 準備完了 | 子Issue 並列委譲（最大5件、STEP-S4 と同一委譲契約）、L2 計測 | [references/epic-wave.md](references/epic-wave.md) |
 | STEP-W4 | fan-in・結果集約 | 全委譲完了（または異常検知） | 子Issue ごとの result 収集、partial result 保持、child task recovery | [references/epic-wave.md](references/epic-wave.md) |
@@ -122,11 +122,11 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - `agentdev-workflow-lifecycle`: work_type 判定、引き継ぎ停止判定（runtime-package-boundary）
 - `agentdev-epic-tracker`: Epic Issue 本文読込、Wave 子Issue 特定、親Epic ステータス更新
 - `agentdev-req-analysis`: チェックボックス品質基準
-- `agentdev-quality-gates`: QG-{N} 前置 staleness check
+- `agentdev-quality-gates`: QG-3 前置 staleness check
 - `agentdev-gh-cli`: Issue 本文読取等の I/O 手続き
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（実行対象と正規成果物の実現関係確認のみ。fail-open）
-- integrity checker skill（repo-local）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界）
+- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界）
 
 ## Artifact Graph 利用
 
@@ -152,7 +152,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 - **スコープ**: 単一 Issue または単一 Wave のみを処理する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（workflow-contracts SPEC SC-{NNN}、extension 経由で解決）
 - **実装実行の非所有**: case-run 本体は work plan 生成、実装、TDD、乖離検出、specs 更新、PR 本文作成、PR 作成を行わない（実行担当サブエージェント責務、adapter protocol 参照）
 - **SSoT**: blocked/failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。一時会話コンテキスト、中間ファイルは SSoT としない
-- **完了条件チェックボックス**: case-run、実行担当サブエージェントは完了条件チェックボックスを更新しない（case-close QG-{N} の責務）
+- **完了条件チェックボックス**: case-run、実行担当サブエージェントは完了条件チェックボックスを更新しない（case-close QG-4 の責務）
 - **Findings / SPEC確定候補**: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` と `## SPEC確定候補` に記録する（別セクション、混在させない）。case-run の capture 責務は記録のみ
 - **外部実行ハーネスの中間成果物**: plan artifact 等を AgentDevFlow の永続成果物として扱わず、最終結果は PR URL で受領する
 - **L2 タイムスタンプ**: worktree 設定、実行担当サブエージェント実行、worktree クリーンアップの各開始・終了時刻（JST）を計測し、完了報告の L2 内訳に含める（case-auto の L1 内訳の入力）

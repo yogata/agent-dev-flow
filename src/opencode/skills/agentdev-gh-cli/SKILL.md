@@ -6,7 +6,7 @@ description: AgentDevFlow の GitHub Issue/PR I/O を集約する中央集権的
 # `agentdev-gh-cli`
 
 GitHub Issue/PR の I/O 手続きと VERIFY を集約する中央集権的な I/O 境界（REQ, ADR）。
-command と skill は gh コマンドを直接記述せず、本スキルの手続きへ委譲する（REQ/006/007）。
+command と skill は gh コマンドを直接記述せず、本スキルの手続きへ委譲する（REQ）。
 
 ## 原本（SSoT）
 
@@ -78,7 +78,7 @@ Windows 環境（Windows PowerShell 5.x / pwsh 7）では、全 WRITE 手続き�
 - **手続き位置**: [references/standard-procedures.md](references/standard-procedures.md) の WRITE 標準手順（冒頭「コンソールエンコーディング初期化」）。全 WRITE 手続きは WRITE 標準手順に従うため、当該初期化を経由して本要件の恩恵を受ける
 - **VERIFY 連携**: encoding 初期化実行確認は [references/verify.md](references/verify.md) の「encoding 初期化実行確認」セクション参照
 
-gh WRITE 操作を行う全 command/ skill は本手続き経由でコンソールエンコーディング初期化の恩恵を受ける構成とする（委譲基盤 REQ/006/007）。
+gh WRITE 操作を行う全 command/ skill は本手続き経由でコンソールエンコーディング初期化の恩恵を受ける構成とする（委譲基盤 REQ）。
 
 ## 適用対象
 

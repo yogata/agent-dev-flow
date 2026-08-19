@@ -9,7 +9,7 @@ intake-from-github command の workflow 実装本体。
 クローズ済みの GitHub Issue/PR の本文、コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存する保存専用 workflow を所有する。
 GitHub Issue の作成、採用可否の判断、review、整形、分類は行わない。
 
-intake-from-github command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+intake-from-github command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
 ## 原本（SSoT）
 

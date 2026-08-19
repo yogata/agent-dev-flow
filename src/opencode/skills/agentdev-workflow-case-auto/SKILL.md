@@ -9,7 +9,7 @@ case-auto command の workflow 実装本体。
 要件doc または Issue番号から req-save → spec-save → case-open → case-run → case-close を順次自走し、repo 内変更に限りマージまで完了する制御構造を所有する。
 orchestration stage モデル、Wave 反復制御、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 経路H 停止伝播を統合する。
 
-case-auto command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+case-auto command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
 ## 原本（SSoT）
 
@@ -37,7 +37,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）は
 
 ## 副作用
 
-- 各工程の委譲起動（req-save、spec-save、case-open、case-close）とインライン実行（case-run、AG-{NNN}/002）
+- 各工程の委譲起動（req-save、spec-save、case-open、case-close）とインライン実行（case-run、AG-{NNN}/{NNN}）
 - bg task API による stage 2 並列起動（最大5件）
 - GitHub Issue/PR/comment/merge/close（自走対象、command 不変条件）
 - remote branch 削除（当該 case-auto/ case-run が作成した branch に限定、G05）

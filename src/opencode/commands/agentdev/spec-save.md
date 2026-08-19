@@ -28,7 +28,7 @@ extension に列挙されていない `docs/specs/**` 内部パスを固定知�
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-spec-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+本コマンドは workflow 実装本体を `agentdev-workflow-spec-save` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 同スキルが11 STEP の control plane として制御構造（配置先解決、SPEC ファイル操作、整合確認、永続化）を所有する。
 各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 

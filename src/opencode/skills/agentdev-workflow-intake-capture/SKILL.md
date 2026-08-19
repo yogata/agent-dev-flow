@@ -9,7 +9,7 @@ intake-capture command の workflow 実装本体。
 ユーザーの手動入力から未分類の作業候補、不整合、規約違反、未回収課題を intake item として `.agentdev/intake/inbox/` に保存する保存専用 workflow を所有する。
 GitHub Issue の作成、採用可否の判断、review、整形、分類は行わない。
 
-intake-capture command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+intake-capture command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
 ## 原本（SSoT）
 

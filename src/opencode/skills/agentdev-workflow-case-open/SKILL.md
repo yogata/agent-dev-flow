@@ -8,7 +8,7 @@ description: "case-open command の workflow 実装本体。要件定義から G
 case-open command の workflow 実装本体。
 要件doc（構造化 `draft-data`）から GitHub Issue（Epic flow または Standard flow）を作成する制御構造、execution contract 確定（EC-{N}〜EC-{N}）、execution_unit 構成（連結成分アルゴリズム + 3軸判断 + preflight）、draft/RU 削除クリーンアップ（Form Zero）を所有する。
 
-case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 
 ## 原本（SSoT）
 
@@ -51,7 +51,7 @@ case-open workflow は次の6 STEP で構成する。
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | 引き継ぎ・OU選択 | 要件doc 受領 | 処理対象確定（OU 単位） | [references/handoff-and-ou-gate.md](references/handoff-and-ou-gate.md) |
-| STEP-2 | Issue本文生成・execution contract 確定 | 処理対象確定 | Issue 本文候補（EC-{N}〜EC-{N} 反映済み、QG-{N} 検証済み） | [references/issue-body-and-execution-contract.md](references/issue-body-and-execution-contract.md) |
+| STEP-2 | Issue本文生成・execution contract 確定 | 処理対象確定 | Issue 本文候補（EC-{N}〜EC-{N} 反映済み、QG-2 検証済み） | [references/issue-body-and-execution-contract.md](references/issue-body-and-execution-contract.md) |
 | STEP-3 | 構成判定・preflight | Issue 本文候補確定 | execution structure（Epic vs Standard、Wave 構成、preflight合格） | [references/execution-unit-and-preflight.md](references/execution-unit-and-preflight.md) |
 | STEP-4 | adversarial-review（経路F） | execution structure + Issue 本文 + 完了条件の3者確定 | review 結果反映（4パターン再実行ルール） | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
 | STEP-5 | Issue 作成（Epic flow / Standard flow） | adversarial-review skip または review 完了 | GitHub Issue 作成済み（親Epic + 子Issue群、または Standard Issue） | [references/issue-creation-flows.md](references/issue-creation-flows.md) |
@@ -71,7 +71,7 @@ case-open workflow は次の6 STEP で構成する。
 ### termination
 
 - 正常終了: 終了処理・クリーンアップ STEP の完了報告出力まで（draft/RU 削除残存検証合格を含む）
-- 停止終了: `auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合。preflight 不合格、子Issue 上限超過、QG-{N} fail
+- 停止終了: `auto_gate.auto_ready` が false、未解決質問、未解決衝突、repo 外操作、停止理由が残る場合。preflight 不合格、子Issue 上限超過、QG-2 fail
 
 ## 主要 Capability Skill 連携
 
@@ -79,7 +79,7 @@ case-open workflow は次の6 STEP で構成する。
 
 - `agentdev-issue-management`: Issue 操作の安全手続き、テンプレート選定、委譲接続点
 - `agentdev-epic-tracker`: Epic 進捗追跡、Wave 構成、自律構成生成、子Issue 数上限
-- `agentdev-quality-gates`: QG-{N} 完了条件網羅性検証
+- `agentdev-quality-gates`: QG-2 完了条件網羅性検証
 - `agentdev-gh-cli`: gh CLI I/O 境界（Issue 作成・コメント追加・VERIFY）
 - `agentdev-workflow-templates`: Issue/PR/コメントテンプレート選定
 - `agentdev-workflow-lifecycle`: 引き継ぎ停止判定（runtime-package-boundary）

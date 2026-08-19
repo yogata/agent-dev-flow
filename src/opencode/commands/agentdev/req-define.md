@@ -35,7 +35,7 @@ description: 要件を整理、定義する（機能追加、バグ修正共通�
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜004）。
+本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
 同スキルが11 STEP の対話型 control plane として制御構造を所有する。
 各工程を前出出力検証表で示す（工程ラベルが推奨順）。
 
