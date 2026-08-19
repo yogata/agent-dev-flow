@@ -1601,7 +1601,7 @@ describe("IR-053 gh-direct-invocation (REQ-0152-001/002)", () => {
 //   - strict pattern detection (REQ-NNNN, REQ-NNNN-NNN, ADR-NNNN, src/opencode/, /repo/, repo-*)
 //   - heuristic pattern detection (docs/specs/, docs/guides/, GitHub URL, line-number ref)
 //   - code-block exemption
-//   - template placeholder exemption
+//   - template placeholder exemption (token-neighborhood narrowing, CR-002)
 //   - exemption paths (vocabulary-registry.md, integrity-rule-catalog.md)
 //   - baseline-known vs new classification (REQ-0108-145)
 //   - report fields (file, line, evidence, expected, route)
@@ -1758,6 +1758,27 @@ function buildIr055Fixture(root: string): void {
       "# Placeholder command",
       "",
       "Replace REQ-{NNNN} with the actual requirement ID.",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
+  // CR-002 token-neighborhood narrowing: placeholder exemption is scoped to
+  // the placeholder-bearing token, not the whole line.
+  writeFileSync(
+    join(cmdDir, "placeholder-narrow-cmd.md"),
+    [
+      "---",
+      "description: placeholder narrowing command",
+      "agent: test-agent",
+      "---",
+      "",
+      "# Placeholder narrowing command",
+      "",
+      "Replace REQ-{NNNN}; see REQ-4321 for the concrete case.",
+      "Templated path docs/specs/<skills/agentdev-artifact-graph>.md stays exempt.",
+      "Brace-set glob docs/specs/{commands,skills}/** stays exempt.",
+      "Bare glob `docs/specs/**` next to `docs/specs/{a,b}/**` stays checked.",
       "",
     ].join("\n"),
     "utf-8",
@@ -2000,6 +2021,44 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
         (res.file ?? "").includes("placeholder-cmd.md"),
     );
     expect(placeholderHits.length).toBe(0);
+  });
+
+  it("reports concrete references on placeholder-bearing lines (CR-002 narrowing)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string; file?: string }) =>
+        res.check === "runtime-unresolved-reference" &&
+        res.evidence === "REQ-4321" &&
+        (res.file ?? "").includes("placeholder-narrow-cmd.md"),
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("exempts placeholder-bearing path tokens (<...> and brace-set globs)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string; file?: string; line?: number }) =>
+        res.check === "runtime-unresolved-reference" &&
+        (res.file ?? "").includes("placeholder-narrow-cmd.md") &&
+        res.evidence === "docs/specs/" &&
+        (res.line === 9 || res.line === 10),
+    );
+    expect(hits.length).toBe(0);
+  });
+
+  it("keeps bare-glob references next to placeholder globs checked (CR-002 narrowing)", () => {
+    const r = runScript(IR055_ROOT, ["--json"]);
+    const parsed = JSON.parse(r.stdout);
+    const hits = parsed.results.filter(
+      (res: { check: string; evidence?: string; file?: string; line?: number }) =>
+        res.check === "runtime-unresolved-reference" &&
+        (res.file ?? "").includes("placeholder-narrow-cmd.md") &&
+        res.evidence === "docs/specs/" &&
+        res.line === 11,
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(1);
   });
 
   it("exempts vocabulary-registry.md (legitimate pattern documentation)", () => {
