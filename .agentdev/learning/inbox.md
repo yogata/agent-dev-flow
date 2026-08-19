@@ -276,3 +276,19 @@
 - **想定反映先**: agentdev-quality-gates SPEC の full integrity suite 運用、case-close STEP-3-1 の full integrity suite 実行手順
 - **関連**: PR 2283、PR 2284、Issue 2247、Issue 2248
 - **タグ**: #bun-test #cwd #full-suite #ag035
+
+## 配布物変更 PR で case-run が配布依存境界 gate を省略すると concrete-id 違反が case-close 最終 gate 初検出となり Wave クローズが部分停止する
+
+- **問題事象**: Epic 2307 Wave 1 クローズで、PR 2341（case-open 配布スキル適合）の case-close E4-1 最終 gate（check_distribution_boundary.ts --profile source、PR HEAD worktree 検査）が concrete-id 違反16件（該当行10行、REQ-043/REQ-017/REQ-042 等）を検出した。PR 2341 のテスト結果に同 gate の実行記録がなく、case-run 段階では検出されなかった。結果、PR 2341 はマージ中止、Issue 2311 は Epic ステータス追跡テーブルで blocked、Wave 1 は4/5完了の部分クローズとなった。同 Wave の PR 2342 / 2343 は gate を実行しており（2343 は初回違反を concrete ID 除去で fix-and-reverify）、2341 のみ実行が欠落していた。
+- **発生局面**: 実装（case-run の PR 作成）、レビュー（case-close の Epic Wave クローズ gate）
+- **検知方法**: case-close E4-1 共用 detector による PR HEAD worktree スキャン。base main 40096376 の control 実行は failures 0 であり、違反が PR 差分由来と確定（git grep で PR HEAD 6ファイルのみ該当）
+- **根本原因**: 配布スキルソース（src/opencode/skills 配下）への concrete REQ ID 追記に加え、当該 PR の品質統制で配布依存境界 gate が実行されなかった。単発 PR の gate 省略は case-close 最終 gate（事前書き込み gate と最終 gate の契約）まで違反を持ち越す
+- **自律対応内容**: case-close は E4-1 契約どおりマージを中止し、PR 2341 本文へ ### distribution-boundary 小見出しで違反を記録、Epic 2307 テーブルへ blocked を記載した（completed へ上書きなし、残り4子Issueは正常クローズ）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（case-close E4-1 の設計どおりに検出・停止。case-run 側の gate 実行徹底が課題）
+- **横展開観点**: 配布物変更（src/opencode 配下）を含む PR では PR 作成前に必ず gate を実行する。PR 2343 と同じ concrete ID → ドメイン語参照への置換を PR 作成段階で完了させておけば case-close でのマージ中止・blocked 伝播は発生しない
+- **再発条件**: 配布物変更 PR で case-run が check_distribution_boundary.ts --profile source を実行せず PR を作成した場合
+- **予防策候補**: case-run の品質統制・PR 作成手順へ、配布物変更時の check_distribution_boundary.ts --profile source 実行を必須ステップとして明示する
+- **想定反映先**: case-run command / agentdev-workflow-case-run の品質統制・PR 作成手順
+- **関連**: PR 2341、PR 2343、Issue 2311、Epic 2307、docs/specs/integrity/distribution-boundary.md、agentdev-workflow-case-close references/epic-wave-close.md E4-1
+- **タグ**: #case-run #distribution-boundary #gate #epic-wave-close
