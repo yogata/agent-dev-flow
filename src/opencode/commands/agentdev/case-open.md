@@ -40,7 +40,7 @@ extension の5セクション（`context` / `rules` / `checks` / `acceptance_gat
 | STEP-3 構成判定・preflight | 本文確定 | 構成判定結果（Epic flow / Standard flow）と preflight 結果 | 子Issue が Epic 1件あたり最大10件以内であること（超過時は作成前にエラー停止） |
 | STEP-4 adversarial-review（経路F） | ユーザー明示指定時 | review 結果と反映後の本文 | accepted finding が本文へ反映されていること |
 | STEP-5 Issue 作成（Epic flow / Standard flow） | preflight 通過 | GitHub Issue（ラベル付き、要件doc埋め込み） | gh CLI 書込後の VERIFY で作成内容が確認できること。子Issue 本文先頭行に `Parent: #{epic_number}` があること |
-| STEP-6 終了処理・クリーンアップ | Issue 作成済み | Epic ステータス追跡テーブル更新・draft/RU 削除・完了報告 | 全子Issue 作成完了後にステータス追跡テーブルを一括更新していること（部分更新は行わない） |
+| STEP-6 終了処理・クリーンアップ | Issue 作成済み | Epic ステータス追跡テーブル更新・draft/RU 削除・完了報告 | 全子Issue 作成完了後にステータス追跡テーブルを一括更新していること（部分更新は行わない）。RU ファイル削除後に統合先ブランチ（既定 main）の作業ディレクトリとリモートの同期を確認し、不一致時は停止していること |
 
 **共通ルール**（全 STEP 適用）: VERIFY（gh CLI 書込後は毎回 `agentdev-gh-cli` VERIFY 操作で検証）、テンプレート選定・準拠（`agentdev-workflow-templates` の選定ルール、テンプレート読込後は毎回【必須】セクションの完備を確認、【任意】は内容がある場合のみ含める、欠落時は再生成）。子Issue 並列上限は case-run Wave 内子 Issue 並列と同一上限（5件）
 
@@ -57,6 +57,7 @@ OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため�
 - Issue 化単位は OU 単位とし、子Issue は OU 単位で作成して対応 OU 経由で REQ/Decision/SPEC へのトレーサビリティを保持する（Wave 単位のみの子Issue 構造は作らない）。case-open は自律的な要件分析に基づいて Epic Issue または子 Issue 構造を生成し、機能要件・非機能要件・対象外・受け入れ条件は要件doc由来のものを用いる
 - マルチREQ Epic flow は複数REQドキュメント入力時または draft-meta に `scale: large` 設定時に実行し、単一REQ Epic flow は `scale: large` 明示時に実行する
 - 子Issue 本文の先頭行には `Parent: #{epic_number}` を含める（親子関係の追跡用）
+- Case に割り当てられた統合先（既定値 main）を Issue 本文の execution contract へ記録する。実証Caseの場合は実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）と評価契約を Issue 本文へ永続記録する。評価結果の採否（採用、不採用、判定不能）自体を Issue 完了条件へ含めない
 - Epic ステータス追跡テーブルは全子Issue の作成完了後に一括更新する
 - preflight で req-define 未実行・要件docのチェックボックス空を検出した場合は警告する。feature の場合は対応する REQ ファイルの存在を確認する
 - gh CLI 出力の読み取りは `agentdev-gh-cli` の安全な読み取り手順に従う。work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参照する
