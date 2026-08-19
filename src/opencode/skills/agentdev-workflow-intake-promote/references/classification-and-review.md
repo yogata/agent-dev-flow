@@ -26,24 +26,27 @@ inbox 内の intake item を読み込み、評価し、暫定分類（採用/ �
 
 ### Procedure
 
-1. `.agentdev/intake/inbox/` 内のファイル一覧を取得し、item 数をカウントする。空の場合はその旨を報告して終了する
+1. `.agentdev/intake/inbox/` 内のファイル一覧を取得し、item 数をカウントする。空の場合はその旨を報告して終了する（HITL を発生させない）
 2. 各 intake item を読み込み、内容を把握する
 3. 各 item を Review 観点（観測内容の妥当性・重要性、影響、緊急度・優先度、既存要件との関連、対応方針、intake と learning の振り分け）で評価する
-4. 暫定分類を「## Findings / Capture候補」見出しの分類表（番号、タイトル、分類、後続、備考）として提示する
+4. 横断契約SPEC（extension 経由で解決）「promote系判断確定とHITL境界」節の詳細判定表（自律確定可能要件、HITL移送条件）に照らし、各 item が取得可能な根拠から採用・保留・却下を一意に確定できるか（自律確定候補）、ユーザー判断が必要かを判定する。モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない
+5. 暫定分類を「## Findings / Capture候補」見出しの分類表（番号、タイトル、分類、後続、備考）として提示する。各 item に自律確定候補/ユーザー判断必要の判定を併記する
 
 ### Result
 
-- 暫定分類表（各 item の採用/ 保留/ 却下、変更種別、根拠）
+- 暫定分類表（各 item の採用/ 保留/ 却下、変更種別、根拠、自律確定候補/ユーザー判断必要の判定）
 
 ### Evidence
 
 - inbox 一覧と各 item の読込結果
 - 暫定分類表（分類と根拠を含む）
+- 各 item の自律確定候補/ユーザー判断必要の判定とその根拠
 
 ### Completion Verification
 
 - inbox 内の全 item が暫定分類表に含まれていること
 - 各 item に分類と根拠が付与されていること
+- 各 item に自律確定候補/ユーザー判断必要の判定が付与されていること
 
 ### Resume-Idempotency
 
@@ -55,6 +58,7 @@ inbox 内の intake item を読み込み、評価し、暫定分類（採用/ �
 
 暫定分類の意味的決定を adversarial-review で検証し、accepted finding を暫定分類へ反映する。
 発動条件判定と review 呼出を分離して実施する。
+自律確定候補のうち対論型レビューが必要な item は、review を経た後に確定する。
 
 ### Input Resolution
 
@@ -77,11 +81,13 @@ skip 判断のためだけの新規 HITL、承認点は追加しない。
 審議対象は暫定分類（各 item の採用/保留/却下、変更種別、根拠）。
 呼出タイミングはユーザー提示（STEP-3）開始前
 3. **結果反映**: accepted finding を得た場合、呼出元（本 workflow）が暫定分類へ finding を反映し、反映後の分類を STEP-3 へ渡す。adversarial-review 自身は反映を行わない
-4. **unresolved 扱**: unresolved な本質的争点が残る場合、既存 HITL（STEP-3）経由で扱い、保存、inbox 削除等の不可逆処理へは進まない
-5. **呼出失敗時**: silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する
+4. **自律確定候補の確定**: 対論型レビューが必要な自律確定候補は review 完了後に確定する。unresolved な本質的争点が残る item、HITL移送条件に該当する item は自律確定せず、STEP-3 の HITL 対象とする
+5. **unresolved 扱**: unresolved な本質的争点が残る場合、既存 HITL（STEP-3）経由で扱い、保存、inbox 削除等の不可逆処理へは進まない
+6. **呼出失敗時**: silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する
 
 ### Result
 
+- review 経由を要する自律確定候補は review 完了後（unresolved 残存時を除く）に確定済み
 - review 結果反映済み暫定分類（skip 時、呼出失敗時は STEP-1 の暫定分類をそのまま継承）
 
 ### Evidence
@@ -93,6 +99,7 @@ skip 判断のためだけの新規 HITL、承認点は追加しない。
 
 - 発動条件判定が記録されていること（発動・skip いずれも）
 - 発動時は accepted finding の反映結果が暫定分類へ反映済みであること
+- review を要する自律確定候補について、確定または HITL 対象への振分けが判定済みであること
 
 ### Resume-Idempotency
 
