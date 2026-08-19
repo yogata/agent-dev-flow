@@ -18,7 +18,7 @@
 ### Input Resolution
 
 1. SSoT 再構成: Issue 本文（実行契約）、REQ/Decision/SPEC/docs/repository context（委譲先が再取得）
-2. identifier 保持: Issue番号、worktree root（相対パス、`.worktrees/{N}-{type}/`）、ブランチ名
+2. identifier 保持: Issue番号、worktree root（相対パス、`.worktrees/{N}-{type}/`）、ブランチ名、PR base（当該 Case の統合先）
 3. 最小 scalar: L2 タイムスタンプ（委譲起動直前・直後、JST）
 4. runtime artifact: なし（外部実行ハーネスの plan artifact 等は永続成果物としない）
 
@@ -31,7 +31,9 @@
 - 実装実行を adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲する（委譲 prompt 内で実行 command を指定）。起動手段は AGENTS.md および references/<harness>.md 参照。adapter protocol は同 skill 参照
 - **L2 タイムスタンプ計測**: 委譲起動直前・直後に壁時計タイムスタンプ（JST）を記録し、実行担当サブエージェント実行時間を計測する。併せて STEP-S3（worktree 設置）と STEP-S6（クリーンアップ）の開始・終了時刻を記録する
 - 委譲プロンプト、staleness check 結果の引き渡し、test strategy 項目の test-fix ループ、実行担当サブエージェントの責務（目標分解、各 criterion に observable evidence を要求、品質ゲートの実行、test-fix ループ）、委譲起動失敗・異常終了時の扱い（即 `failed` とせず実装完了・検証未完了として扱う）の詳細は `agentdev-case-run-execution-adapter` スキルを参照
-- **引き渡し**: 割り当てられた1 Issue の Issue番号、worktree root（相対パス指定、worktree 内制約）、ブランチ名
+- **引き渡し**: 割り当てられた1 Issue の Issue番号、worktree root（相対パス指定、worktree 内制約）、ブランチ名、PR base（当該 Case の統合先。通常Caseは main、実証Caseは評価ブランチ。rebase・同期基準も同一の統合先を参照）
+- **実証Caseの委譲指示**: 実証Caseの場合、委譲プロンプトに評価ブランチを作業起点および PR base とすることと、評価ブランチ上で必要な実証手段の準備、実行、測定、観察、証拠生成、評価を行うことを含める。コード作成が不要な実証も許容し、実証コード・評価基盤・評価用データのみを変更対象とする PR、検証のみの PR を通常の Case と同一の経路で扱う（検証のみの PR は verification-only PR の既存経路に従う）。評価契約と test strategy は分離されており、test strategy は実証手段・計測手段・実証環境が正常に動作したかの検証を担う。実行側の自律判断で評価契約を変更しない
+- **実証Caseの PR 本文記録要素**: 実行担当サブエージェントが PR 本文に実際の実行条件、測定結果、観察結果、証拠、評価結果を記録するよう委譲プロンプトで指示する。評価ブランチ削除後も Issue/PR から必要な結果と証拠を追跡できる形式とする
 - **PR URL 受領**: 実行担当サブエージェントが直接 PR 作成を行い、PR URL を委譲 result として返却する（PR URL フォールバック検索は使用しない）
 - **case-run 本体は実装方針を生成・審査しない**: 実装方針の形成、adversarial-review 呼出、結果反映は委譲内で adapter の委譲契約に従い、最初の実装変更前に実施する。case-run 本体が実装方針を生成、保持、審査するステップを新設しない。委譲 result（4状態）のみで委譲内の結果を受領する
 - **経路G（adapter 委譲内 adversarial-review）**: 発動条件判定と review 呼出は adapter 委譲内で実行担当サブエージェントが分離して実施する。default-on、skip 条件（実装方針が自明の場合）該当時は省略して従来フローを継続、ユーザー明示指定時は強制発動。実装方針限定、blocked 遷移（(1) 既確定文書の変更・追加・撤回が必要、(2) 要件・仕様問題の検出、(3) unresolved な本質的争点またはユーザー判断事項が残る）の詳細は `agentdev-case-run-execution-adapter` 参照
