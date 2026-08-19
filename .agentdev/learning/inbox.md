@@ -228,3 +228,35 @@
 - **想定反映先**: agentdev-doc-writing の文書品質査読観点、document-type-responsibilities
 - **関連**: PR 2276、Issue 2230、PR 2262、ACT-SPEC-025（コミット 3b8a42ff）
 - **タグ**: #spec-save #staleness #autogen
+
+## 機械置換スクリプトの old 側転写ミスは MISS 印字を残して中断時に見逃される
+
+- **問題事象**: プレースホルダ ID 表記の機械置換（count-verified 置換スクリプト、35ファイル）で、置換ルールの old 側「（委譲先は REQ/006/007）」が実ファイルの「（委譲基盤 REQ/006/007）」と転写ミスで未適合だった。スクリプトは MISS を印字したが、ドライバー中断まで未処置のまま残り、resume 時の取り残し修正が必要になった。
+- **発生局面**: 実装（case-run の機械置換実行、resume 前段）
+- **検知方法**: resume 時の全置換ルール適合再確認で MISS 1件を検出（agentdev-gh-cli/SKILL.md）
+- **根本原因**: 機械置換の old 文字列を grep による実在確認なしに組み立てた。転写ミスはスクリプトの MISS 印字で検出可能だが、中断時に MISS を確認する手順がなかった
+- **自律対応内容**: 取り残し1件を修正し（PR 2280）、全走査で適合残存 0件を再確認
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（運用手順の欠落）
+- **横展開観点**: 機械置換の old 文字列は grep による実在確認をしてから組み立てる。中断・resume を伴う機械置換では MISS 印字の確認を resume 前段に組み込む
+- **再発条件**: 大量ファイルへの一括置換で old 文字列を手転写し、中断を挟む場合
+- **予防策候補**: 機械置換手順へ「old 側の grep 実在確認」と「MISS 印字の逐次確認」を組み込む
+- **想定反映先**: case-run の機械置換実行手順（agentdev-workflow-case-run の委譲時手順）
+- **関連**: PR 2280、Issue 2237
+- **タグ**: #machine-replacement #case-run #resume
+
+## 配布物本文への内部 ID 直書きは distribution boundary gate で blocking される
+
+- **問題事象**: layer3-style-conversion-table.md への追記時に内部 ID（AG-023 等）を含む説明文を記述し、check_distribution_boundary.ts が unclassified-entry 違反を検出した。内部 ID を使わない表現へ置換して再検証で合格した（test-fix ループ適用）。
+- **発生局面**: 実装（case-run の配布物編集）、検証（配布依存境界 gate）
+- **検知方法**: check_distribution_boundary.ts --profile source の unclassified-entry 違反（exit 非ゼロ）
+- **根本原因**: 配布物（src/opencode 配下）の説明文にプロジェクト内部 ID を直接記載した。配布依存境界（REQ-029、DEC-014）は配布物への内部 ID 直書きを禁止する
+- **自律対応内容**: 内部 ID を用いない表現へ置換し、再検証で合格（PR 2281）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（既定 gate の設計どおりに検出・解消）
+- **横展開観点**: 配布物編集時は内部 ID（AG-NNN・REQ-NNNN 等）の直接記載を避け、機能名・役割名で表現する。変換対照表・SKILL.md 本文の追記も同様
+- **再発条件**: 配布物へ内部 ID を含む説明文を追記した場合
+- **予防策候補**: case-run の配布物編集手順へ「内部 ID 直書き回避」の注意を組み込む（gate による機械検出は既存）
+- **想定反映先**: case-run の配布物編集・検証手順
+- **関連**: PR 2281、Issue 2238、docs/specs/integrity/distribution-boundary.md
+- **タグ**: #distribution-boundary #case-run #internal-id
