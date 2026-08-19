@@ -33,7 +33,7 @@ AgentDevFlow 標準の成果物間探索モデルとして機能する。
 - AgentDevFlow 配布物以外への強制適用
 - LLM による全面的な関係抽出、意味的類似の決定論的確定
 
-## 提供する判断・操作
+## 提供する判断、操作
 
 - グラフ生成（build_graph）: 正規情報から派生索引（5ファイル）を生成する
 - グラフ検査（check_graph）: 生成された Graph の整合性を検査する
@@ -105,16 +105,16 @@ query_graph.ts のサブコマンド構成を次のとおり確定する。
   定義された関係を、単にリンクが存在することだけを理由に探索経路として使用しない
 - dependency: 起点成果物が成立、実現または実行されるために依存する成果物候補の取得。
   依存関係として定義されていない一般参照を依存関係として扱わない
-- implementation: 要件、仕様、設計等を実現・実装する成果物候補の取得。
-  実現・実装・充足系列の関係を利用する。将来 coverage 問い合わせへ統合・上位化できる設計
+- implementation: 要件、仕様、設計等を実現、実装する成果物候補の取得。
+  実現、実装、充足系列の関係を利用する。将来 coverage 問い合わせへ統合、上位化できる設計
 - diagnostics: 構造上の注目候補（孤立候補、未解決関係、廃止成果物への関係、関係制約違反、
   循環候補、複数経路、関係集中、根拠欠落）の診断。構造的特徴だけから異常を確定しない。
-  ADF 固有の所有・統制構造等は ADF Integration 層の診断規則として扱う
+  ADF 固有の所有、統制構造等は ADF Integration 層の診断規則として扱う
 
 共通規則:
 - 候補数上限は問い合わせ設定として管理し、コードへ直書きしない。プロジェクト拡張は
   上限を上書き可能とする。標準上限値の決定は代表ケースによる回帰検証結果に基づく
-- 上限超過時は決定論的な優先・除外規則を適用し、それでも超える場合は候補過多であること、
+- 上限超過時は決定論的な優先、除外規則を適用し、それでも超える場合は候補過多であること、
   全候補数、返却候補数、適用した絞り込み規則、独立探索へ移行可能であることを返す。
   候補過多のみを理由として ADF ワークフロー全体を停止させない
 - 問い合わせ結果は候補ごとに候補成果物、候補となった理由、トレースリンク型、探索方向、
@@ -242,9 +242,9 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 未解決参照の抽出結果は参照種別と参照元で分類し、以下の重要度で扱う。
 
 - 解決可能な相対参照: warning 対象外（除外）
-- 識別子・説明語で解決対象外: info（参照記録として保持、検出対象外明示）
+- 識別子、説明語で解決対象外: info（参照記録として保持、検出対象外明示）
 
-抽出規則の変更時は候補探索の補完・反証機能を維持し、回帰検証を実施する。
+抽出規則の変更時は候補探索の補完、反証機能を維持し、回帰検証を実施する。
 
 ## 根拠追跡
 
@@ -298,9 +298,9 @@ augmentation ファイル（`.agentdev/artifact-graph.yaml`）のスキーマ拡
 1. `node_types` 定義: `name`、`path_pattern`、`id_template`、`label_source`、`extraction_rule`、`role`（`index` / `aggregation`）
 2. `relation_types` 定義: `name`、`fields`、`reverse_direction`、`semantics`（関係の意味、意味スロット、変更影響方向、標準語彙対応、関係制約（`source_types` / `target_types`））
 3. `indexed_paths` と `discovery_roots`（対象と探索起点の宣言）
-4. `query_settings` と `relation_constraints`（問い合わせ上限・深さの上書きと関係制約）
+4. `query_settings` と `relation_constraints`（問い合わせ上限、深さの上書きと関係制約）
 
-標準コアの成果物型・関係型の意味は TIM 語彙カタログ（[../foundations/traceability-model.md](../foundations/traceability-model.md)）が正規所有する。
+標準コアの成果物型、関係型の意味は TIM 語彙カタログ（[../foundations/traceability-model.md](../foundations/traceability-model.md)）が正規所有する。
 augmentation は標準コアの node_type への `role` 宣言、relation_type への `semantics` 宣言を拒否する。
 抽出規則（`path_pattern`、`fields` 等）の上書きはこの限りでない。
 拡張関係型の高位問い合わせ参加区分は宣言せず、`semantics` の意味スロットと変更影響方向から導出する。
@@ -324,7 +324,7 @@ Artifact Graph 標準配布スキルの augmentation は専用配置
   project-extensions 機構が担う「標準配布スキルの挙動に対する project 固有拡張
   （context/rules/checks/acceptance_gates/must_not）」とは責務が異なる
 - 専用配置により、augmentation データ形式と project-extensions 拡張データの
-  競合・混同を防ぐ
+  競合、混同を防ぐ
 
 ### project-extensions 機構（DEC-005）との使い分け
 
@@ -347,7 +347,7 @@ Artifact Graph 標準配布スキルの augmentation は専用配置
 | case-open | impact、dependency |
 | case-run | implementation（既に決定された実装対象と正規成果物の実現関係確認。新規の依存関係、実行構成、Wave 構成、実行順序の設計は行わない） |
 | case-close | 必要に応じて整合性確認 |
-| backlog-review | related、impact（統合・分割判定の補助 evidence、depends_on 依存解決の補助 evidence） |
+| backlog-review | related、impact（統合、分割判定の補助 evidence、depends_on 依存解決の補助 evidence） |
 | adversarial-review | diagnostics、論点に応じた他問い合わせ |
 | inspect-docs 等 | diagnostics |
 
@@ -444,7 +444,7 @@ Epic #2189 の実行時に各 PR の SPEC確定候補として提起され、cas
 | manifest スキーマ 2.0.0 の確定 | 「決定論性と鮮度」節 | 採用 | `model.ts` の `SCHEMA_VERSION`（`2.0.0`）、manifest 必須項目、`generated_at` 非保持、同一入力からのバイト同一生成（`determinism.test.ts`）と整合する |
 | query_graph サブコマンド構成の確定 | 「問い合わせ結果の出力形式」節 | 採用 | `query_graph.ts` の構造問い合わせ5種（neighbors、path、provenance、discover、index）、プロファイル直指定、JSON 出力のみの構成と整合する |
 | augmentation スキーマ4拡張点の確定 | 「augmentation モデル」節 | 採用 | `augmentation.ts` のスキーマ（node_types、relation_types、indexed_paths と discovery_roots、query_settings と relation_constraints）と整合する |
-| 「ワークフロー利用」割当表への backlog-review 行追加 | 「ワークフロー利用」節 | 採用 | backlog-review 行（related、impact、統合・分割判定と depends_on 依存解決の補助 evidence）を割当表へ明記済みである |
+| 「ワークフロー利用」割当表への backlog-review 行追加 | 「ワークフロー利用」節 | 採用 | backlog-review 行（related、impact、統合、分割判定と depends_on 依存解決の補助 evidence）を割当表へ明記済みである |
 
 ## See Also
 
