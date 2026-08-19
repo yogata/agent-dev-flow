@@ -4881,6 +4881,7 @@ function checkSkillCategoryGap(
     "check_integrity.ts",
     "check_templates.ts",
     "lint_skills.ts",
+    "check_skill_rename_symmetry.ts",
   ];
   for (const scriptFile of scriptFiles) {
     const scriptPath = path.join(scriptsDir, scriptFile);
@@ -4917,6 +4918,7 @@ function checkSkillCategoryGap(
     ["REQ verification basis", ["ReqVerificationBasis"]],
     ["Runtime reference", ["RuntimeUnresolvedReference"]],
     ["Distribution untracked skill", ["DistributionUntrackedSkillReference"]],
+    ["Skill rename 対称性", ["SkillRenameSymmetry"]],
   ]);
 
   let foundGap = false;

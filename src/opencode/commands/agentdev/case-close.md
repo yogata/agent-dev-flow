@@ -75,7 +75,7 @@ OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため�
 - 機能追加で docs/ 更新がない場合は警告表示して停止確認する。テスト戦略チェックボックスは必ず更新する
 - コメントテンプレートの【必須】セクションを確認してから投稿する
 - 学びの検知はエージェント自律で行う（ユーザーに問わない）
-- capture 責務は「回収・保存」である: PR 本文から intake/ learning を分離回収してドメイン状態に保存し、同一 commit に含める（capture 境界は `agentdev-workflow-orchestration` 参照）。SPEC確定候補の処理は PR 本文の `## SPEC確定候補` を入力とし、`## Findings / Capture候補` とは区別する
+- capture 責務は「回収・保存」である: PR 本文から intake/ learning を分離回収してドメイン状態に保存し、同一 commit に含める（capture 境界（capture-boundaries）は `agentdev-workflow-orchestration` 参照）。SPEC確定候補の処理は PR 本文の `## SPEC確定候補` を入力とし、`## Findings / Capture候補` とは区別する
 - 完了報告は結果状態を分離して報告する（`.agentdev` push 失敗時は完了扱いにしない）。今回の完了条件に含まれる未対応事項は intake 記録として明示し、完了扱いには含めない
 - ドメイン状態永続化の commit は並列実行安全ステージングプロシージャ（`agentdev-git-worktree`）に従い、明示パス（`git add <path>`/ `git rm <path>`）でステージし、`git commit -- <paths>`（--only pathspec 形式）で実行する
 
