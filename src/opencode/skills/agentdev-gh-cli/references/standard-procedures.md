@@ -161,10 +161,17 @@ VERIFY が FAIL の場合は cleanup を実行せず、一時ファイルを残�
  node -e "const{execSync}=require('child_process');const{writeFileSync}=require('fs');const r=execSync('gh issue view {N} --json body -q .body',{encoding:'utf-8'});writeFileSync('.agentdev/tmp/gh-read-{timestamp}.md',r)"
  ```
  **PowerShell の `>` リダイレクトは使用禁止**（pwsh 7 も含む。ネイティブコマンドのstdout出力がパイプライン経由でエンコーディング変換され、日本語が文字化けするため）。
-**理由**: Node.js の `execSync` は pwsh パイプラインをバイパスして gh CLI の生の UTF‑8 出力を直接取得するため、エンコーディング変換による文字化けが発生しない。
+ **理由**: Node.js の `execSync` は pwsh パイプラインをバイパスして gh CLI の生の UTF‑8 出力を直接取得するため、エンコーディング変換による文字化けが発生しない。
+ **`.agentdev/tmp/` の事前作成（mkdir 手順例）**: 一時ファイル書き出しの前に `.agentdev/tmp/` が存在しない場合は作成する（`writeFileSync` は親ディレクトリ不在時にエラーとなるため）。
+ - PowerShell: `New-Item -ItemType Directory -Force ".agentdev/tmp"`
+ - Node.js: `require('fs').mkdirSync('.agentdev/tmp', {recursive: true})`
 2. Read tool で一時ファイルを読み取る。
 3. 読み取り完了後、一時ファイルを削除する。
 4. 保存形式は **UTF‑8 (BOMなし)**、改行コード **LF** とする。
+
+**READ ユニットの完了と cleanup（省略不可）**: READ 手続きは create（項目1） → gh 実行（項目1） → 読み取り（項目2） → cleanup（項目3）を1ユニットとし、cleanup を省略不可ステップとする（WRITE 手続き Section 2 Step 4 と同一の規定）。
+読み取り完了後にのみ cleanup を実行し、当該 READ ユニットで生成した一時ファイル（`.agentdev/tmp/` 配下、および委譲時の代替配置先 `$env:TEMP` 配下）を残存させない。
+これにより「読み取りだけ行って一時ファイルを放置する」事態を構造的に防止する。
 
 5. **クォート競合パターン**: `node -e` 内で gh CLI の `-q` にシングルクォートを含む JQ 式（例: `.comments[-1].body`）を渡すと、PowerShell、Node.js、JQ 式のクォート階層が競合しパースエラーになる。
 このパターンは `-q '.comments[-1].body'` のように JQ 式内に `[]` や `.property.subproperty` を含む場合に発生する。

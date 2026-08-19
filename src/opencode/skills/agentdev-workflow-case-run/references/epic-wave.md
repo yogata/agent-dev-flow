@@ -193,21 +193,24 @@ Wave 内子Issue を実行担当サブエージェントへ最大5件並列委�
 
 ### Procedure
 
+**tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は `agentdev-gh-cli` の cleanup 規定に従って処理し、残存ファイルと対応結果を完了報告に明示する。
+
 完了報告 template に従い、result 状態別（completed-pr / blocked / failed / delegation-unavailable）の子Issue 一覧と PR番号、L2 タイムスタンプ内訳を出力する。
 Epic Issue 本文ステータス追跡テーブルの更新は行わない（case-close 単一書き手）。
 `completed-pr` となった子Issue を次 Wave へ進めるためには、case-close でマージ後に再度 `case-run #epic` を実行する（べき等）。
 
 ### Result
 
-- 1 Wave 分の完了報告、return（PR 作成まで）
+- 1 Wave 分の完了報告（tmp/ 残存確認結果を含む）、return（PR 作成まで）
 
 ### Evidence
 
-- 完了報告出力（result 別一覧、L2 内訳）
+- 完了報告出力（result 別一覧、tmp/ 残存確認結果、L2 内訳）
 
 ### Completion Verification
 
 - 完了報告に全子Issue の result 状態と PR番号が含まれていること
+- 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（残存時は対応結果を報告済みであること）
 
 ### Resume-Idempotency
 
