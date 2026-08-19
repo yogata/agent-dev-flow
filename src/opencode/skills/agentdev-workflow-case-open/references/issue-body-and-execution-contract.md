@@ -85,16 +85,16 @@ Issue 作成前に変更影響候補を探索し、scope、完了条件、test s
 #### 統合先と実証Case識別情報の確定
 
 - Case に割り当てられた統合先（既定値 main）を Issue 本文の Execution Contract セクションへ記録する
-- 実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）を Issue 本文へ永続記録し、会話コンテキスト喪失後も Issue 等の永続情報から実証Caseであること、対象評価ブランチ、所属する実証単位を復元できる（REQ-043-013）。Epic 実証では Epic Issue から共有評価ブランチを特定できる
-- 実証Caseの場合、評価契約と対象評価ブランチ（REQ-043 所有契約の投影）を execution contract として Issue 本文に確定する（REQ-017-001、REQ-043-014）。実証Caseの判定は draft-data の実証Case識別情報（REQ-043-030）または Issue 等の永続情報から行う
-- 実証Caseの Issue 完了条件には評価の実施とその結果の記録を含め、評価結果の採否（採用、不採用、判定不能）自体を完了条件へ含めない（REQ-043-028）
-- work_type と実証の組み合わせごとに専用 Issue テンプレートを増殖させず、既存テンプレート（standard / epic / child）へ条件付き評価情報を追加する（REQ-043-014）。テンプレートの条件付き評価情報の構造は `agentdev-workflow-templates` を参照
+- 実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）を Issue 本文へ永続記録し、会話コンテキスト喪失後も Issue 等の永続情報から実証Caseであること、対象評価ブランチ、所属する実証単位を復元できる。Epic 実証では Epic Issue から共有評価ブランチを特定できる
+- 実証Caseの場合、評価契約と対象評価ブランチ（実証・評価ワークフロー契約の投影）を execution contract として Issue 本文に確定する。実証Caseの判定は draft-data の実証Case識別情報または Issue 等の永続情報から行う
+- 実証Caseの Issue 完了条件には評価の実施とその結果の記録を含め、評価結果の採否（採用、不採用、判定不能）自体を完了条件へ含めない
+- work_type と実証の組み合わせごとに専用 Issue テンプレートを増殖させず、既存テンプレート（standard / epic / child）へ条件付き評価情報を追加する。テンプレートの条件付き評価情報の構造は `agentdev-workflow-templates` を参照
 
 #### execution contract 必須セクションの付与
 
 新規 Issue 作成時、新契約識別用の必須セクション（Execution Contract セクション、必須品質統制セクション）を Issue 本文へ付与する。
 presence-based 判定により新旧 Issue を識別する。
-presence-based 判定（REQ-017-014）に用いる新契約必須セクションの一覧から実証Case専用要素（評価契約・対象評価ブランチ）を除外する。実証Case専用要素の有無は新契約 Issue の判定条件としない。
+presence-based 判定に用いる新契約必須セクションの一覧から実証Case専用要素（評価契約・対象評価ブランチ）を除外する。実証Case専用要素の有無は新契約 Issue の判定条件としない。
 テンプレート（`issue_desc_feature.md`、`issue_desc_child.md`）の Execution Contract セクション構造は `agentdev-workflow-templates` を参照。
 
 ## 共通ルール（STEP 全体適用）
