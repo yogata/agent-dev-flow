@@ -37,6 +37,11 @@ execution_unit 構成（連結成分アルゴリズム、3軸判断）と規模�
 
 停止条件、禁止事項、構成生成事前検証（preflight）の詳細は `agentdev-epic-tracker` を参照。
 
+### 統合評価 Child Issue / Wave の計画反映（実証Case）
+
+実証Caseで複数 Wave の統合状態を実際に動かさなければ評価できない場合、統合状態を実行・測定する Child Issue または Wave を計画へ含める（REQ-043-027）。
+各 Child で必要十分な評価が完了する場合は不要な統合評価 Wave を強制しない。
+
 ### 規模判定（単一REQの場合）
 
 - `scale: large` → **単一REQ Epic flow**（STEP-5 Epic flow へ）

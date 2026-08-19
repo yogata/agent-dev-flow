@@ -116,6 +116,7 @@ Issue の対象範囲、完了条件、test strategy の確定前に変更影響
 - **OU 単位処理**: Issue 化単位は REQ doc 単位ではなく OU 単位（command 不変条件）。子Issue は OU 単位で作成し、Wave 単位のみの子Issue 構造は作成しない（command 不変条件）
 - **子Issue 上限**: Epic 1件あたり最大10件（case-open 前出出力検証表 STEP-3 の検証基準）、case-open STEP-5-4 子Issue 作成並列上限は5件（3つの「5件」文脈の (1) に該当）
 - **Form Zero**: draft/RU 削除は `git rm <path>` で明示パスをステージし、同一ステップで `git commit -- <path>` により即時コミットし、未ステージ残存を許さない
+- **統合先・実証Case識別情報**: Case に割り当てられた統合先（既定値 main）を Issue 本文の execution contract へ記録する。実証Caseの場合は実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）と評価契約を Issue 本文へ永続記録し、評価結果の採否を Issue 完了条件へ含めない。実証Case専用要素を presence-based 判定の新契約必須セクション一覧から除外する（詳細は STEP-2/3/6 各 reference）
 - **本文 verbatim・ファイル経由**: Issue 本文は `[System.IO.File]::WriteAllText`（UTF8Encoding($false)）による UTF‑8 BOM なし LF 一時ファイル経由で `gh --body-file` へ渡す（G25）
 
 ## See Also
