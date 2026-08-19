@@ -2,7 +2,7 @@
 title: agentdev-doc-diagnostics SPEC
 status: draft
 created: 2026-07-22
-updated: 2026-08-18
+updated: 2026-08-19
 ---
 
 # agentdev-doc-diagnostics SPEC
@@ -56,7 +56,7 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（R
 - **配置先**: `docs/specs/skills/agentdev-doc-diagnostics/references/perspective-registry.md`（本 SPEC の references 配下）
 - **schema**: 各観点エントリは観点ID（一意）、診断カテゴリ（SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT、残余参照、境界違反等）、適用文書種別、正規所有者 skill、詳細参照の項目を持つ
 - 移管対応表（integrity-rule-catalog.md の inspect-docs 移管記録）で名指しされた観点は当該レジストリへ登録する
-- レジストリの追加・変更は本 schema に従い、本 SPEC が schema の正規所有者となる
+- レジストリの追加、変更は本 schema に従い、本 SPEC が schema の正規所有者となる
 
 ## 参照する references
 
@@ -73,7 +73,7 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（R
 
 ## 境界
 
-`agentdev-doc-writing`（文意品質）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）、README 索引・トレーサビリティ派生索引 `agentdev-artifact-graph`（探索・導線）との責務重複がないこと。
+`agentdev-doc-writing`（文意品質）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）、README 索引、トレーサビリティ派生索引 `agentdev-artifact-graph`（探索・導線）との責務重複がないこと。
 docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の diagnostics 許容例外境界、CR-001）。
 
 ## 対象外
