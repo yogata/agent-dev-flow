@@ -211,7 +211,7 @@ Graph 候補は正規成果物または独立した探索手段で確認した�
 
 必須品質能力の導出は `artifact-quality-control-routing` SPEC が定める artifact type から品質能力キーへの変換に従い、Graph の delegates_to, governs 関係から必須 skill を直接決定しない。
 Graph は変更成果物候補と関連規則候補の探索のみを担当する。
-共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「ワークフロー利用」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 

@@ -68,7 +68,7 @@ backlog-review は入力成果物に含まれる REQ, Decision, SPEC, canonical 
 
 Graph は候補提供者であり、統合, 分割, depends_on, 意味的重複の最終判断は正規成果物本文と独立探索手段での確認後に下す。
 promoted artifact 自体を Graph の正規 node とすることは必須でない。
-共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「ワークフロー利用」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 

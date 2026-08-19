@@ -152,7 +152,7 @@ Graph defect と canonical defect を区別する。
 
 Graph 自体の生成または問い合わせ失敗のみを理由に case-close を失敗させず、fail-open して従来の検証経路で継続する。
 正規成果物側の実不整合が確認された場合は既存の品質ゲート, 受け入れ条件に従って fail とする。
-共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「利用上の防護」を参照。
+共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「ワークフロー利用」を参照。
 
 ## 参照する横断 SPEC
 
