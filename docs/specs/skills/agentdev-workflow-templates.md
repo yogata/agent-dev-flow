@@ -2,7 +2,7 @@
 title: `agentdev-workflow-templates` SPEC
 status: accepted
 created: 2026-06-21
-updated: 2026-08-18
+updated: 2026-08-19
 ---
 
 # `agentdev-workflow-templates` SPEC
@@ -186,7 +186,7 @@ Epic Issue・子 Issue テンプレートの次の正規形を本 SPEC が正規
 
 ### Epic 分解テーブルの正規形
 
-- 分解テーブル（Epic 本文の子 Issue 一覧）は `| {wave}-{seq} | #{child_issue} | {status} | {child_title} |` 形式とする（agentdev-epic-tracker V4形式と整合）
+- 分解テーブル（Epic 本文の子 Issue 一覧）は `| {wave}-{seq} | #{child_issue} | {status} | {child_title} |` 形式とする（agentdev-epic-tracker 新4列形式と整合）
 - 行 ID は `{wave}-{seq}` 形式（例: `1-1`）。Issue 列は `#N` のみ（OU ID の接尾は内容欄へ置く）
 - ステータス初期値は `pending`（更新は agentdev-epic-tracker が単一書き手として行う）
 - テンプレート選定規則は本 SPEC が、Wave 構成（wave 番号の付番）は epic-wave-model SPEC がそれぞれ所有する責務分担を維持する
