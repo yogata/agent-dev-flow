@@ -180,3 +180,19 @@
 - **想定反映先**: case-run の AUTOGEN 再生成手順、agentdev-workflow-case-close の post-merge 検証
 - **関連**: PR 2270、Issue 2241、コミット a113bd67（PR 2267）、e989b296、先行学び（base drift、PR 2260 の entry）
 - **タグ**: #case-close #autogen #base-drift
+
+## X-4 一文一行分割が IR-055 の {...} 行 exempt 判定を移動させ baseline delta 警告を増やす
+
+- **問題事象**: 配布物一文一行機械是正（PR 2275、721行・155ファイル）で、agentdev-workflow-spec-save/SKILL.md の docs/specs/ 参照を含む行が X-4 分割により `{...}` プレースホルダを含まない行へ移動した。IR-055 の「`{...}` を含む行は違反カウント除外（exempt）」適用が外れ、baseline 超過の新規扱い（heuristic warning）として delta テストに警告が出た。
+- **発生局面**: 実装（case-run の機械是正横断 PR）、検証（IR-055 delta テスト）
+- **検知方法**: 機械是正 PR の full suite 実行で IR-055 runtime-unresolved-reference delta テストの警告増加。base 44c55d36（stash による原状態検証）との比較で行移動由来と確定
+- **根本原因**: X-4 行分割は文単位の行再構成であり、IR-055 exempt は行単位の `{...}` 含有判定である。2つの行単位規則が同一行に重畳すると、分割後の行配置で exempt 適否が変化する
+- **自律対応内容**: 参照の新規追加ではなく行移動によるカウント増のため、実態整合として当該エントリのみ baseline count を 6→7 へ反映した（全件再生成ではなく単一エントリ編集、pre-existing 2件は吸収せず）
+- **ユーザー確認有無**: なし
+- **ADR/REQ/spec影響**: なし（baseline 整合は integrity-contracts の baseline entry 運用契約に従う単一エントリ編集）
+- **横展開観点**: 機械是正横断 PR（X-4 等の行再構成を伴う）では IR-055 exempt との相互作用で baseline delta が増え得る。delta 増加は「新規違反」と「行移動」を切り分けてから baseline 判定する
+- **再発条件**: `{...}` プレースホルダ入り SPEC パス参照を含む行が一文一行分割で複数行へ割かれる場合
+- **予防策候補**: 機械是正横断 PR の検証手順へ「IR-055 delta 増加時の行移動由来確認」を組み込む。X-4 と IR-055 exempt の相互作用の機械是正運用注意点としての記載場所検討は intake 採票済みの判断候補に含める
+- **想定反映先**: case-run の機械是正検証手順、integrity 側 SPEC または mechanical-replacement-rules.md（記載場所は検討候補）
+- **関連**: PR 2275、Issue 2235、.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json
+- **タグ**: #x4-split #ir055 #baseline #machine-replacement
