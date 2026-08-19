@@ -73,7 +73,7 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [DEC-011](decisions/DEC-011.md) | STEP resume point と会話記憶非依存 |
 | [DEC-012](decisions/DEC-012.md) | Extension を file-kind から workflow/capability responsibility へ再編 |
 | [DEC-013](decisions/DEC-013.md) | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 |
-| [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement（proposed） |
+| [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement |
 | [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則（proposed） |
 | [DEC-017](decisions/DEC-017.md) | TIM 準拠トレーサビリティモデルの採用と4層分離（proposed） |
@@ -118,7 +118,6 @@ SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン�
 - [ルール所有権マトリックス](specs/integrity/rule-ownership.md)
 - [実行時パッケージ境界](specs/local/runtime-package-boundary.md)
 - [ローカル Case ファイル](specs/local/local-case-file.md)
-- [ローカル版 OpenCode 生成](specs/local/runtime-package-boundary.md)
 - [コマンドファイルフォーマット規約](specs/authoring/command-file-format.md)
 
 ## ガイド
