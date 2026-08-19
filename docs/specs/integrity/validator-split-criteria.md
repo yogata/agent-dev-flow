@@ -18,7 +18,7 @@ check_changed_docs.ts の validator を分割する基準を実装詳細SPEC と
 
 各 validator は単一の検査関心を担う。
 検査関心が異なる場合は別 validator へ分割する。
-検査関心と IR ルールの対応は 1:1 を要求せず、1 validator が複数の IR ルールを包括カバーしてよい（REQ-010-269）。
+検査関心と IR ルールの対応は 1:1 を要求せず、1 validator が複数の IR ルールを包括カバーしてよい（REQ-010-009）。
 
 ## ファイルサイズ上限
 

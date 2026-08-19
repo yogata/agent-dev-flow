@@ -16,7 +16,7 @@ review 区分語は本ルールの対象外とし、`agentdev-doc-writing` 查�
 | category | document-drift |
 | detection_method | 完全一致検出（forbidden 語リスト正: `src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md` の forbidden 区分）。backticks 内、fenced code block 内、YAML frontmatter、ファイルパス、識別子（enum 値、コマンド名、スキル名、YAMLキー）は文脈除外対象 |
 | affected_artifacts | [docs/**/*.md（docs/requirements/retired/, docs/decisions/retired/ を除く）, src/opencode/{commands,skills}/**/*.md, AGENTS.md] |
-| related_req | [v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（REQ-010-256 文意判断は docs-check 対象外、本ルールは完全一致検出に限定）] |
+| related_req | [v2:REQ-0140（v2:REQ-0140-033, v2:REQ-0140-035, v2:REQ-0140-036）, REQ-010（文意判断は docs-check 対象外、本ルールは完全一致検出に限定）] |
 | related_spec | [../responsibilities/document-type-responsibilities.md（不自然表現検出分類 P0〜P4）, ../../../src/opencode/skills/agentdev-doc-writing/references/japanese-replacement-dictionary.md（forbidden 語リスト正）, integrity-rule-catalog.md] |
 | gate_level | delta-guard |
 | false_positive_risk | backticks 内、コードブロック内、frontmatter、YAMLキー、ファイルパス、識別子（enum 値、コマンド名、スキル名）での forbidden 語出現は正当使用。文脈除外ロジックで対応。例: `` `source-of-trought` `` が backticks 内で例示される場合は検出対象外 |
@@ -50,7 +50,7 @@ forbidden 区分語（正: [japanese-replacement-dictionary.md](../../../src/ope
 
 ## IR-045 との関係
 
-IR-045（削除済み）は「docs 日本語表現、文意整合検査」を担っていたが、REQ-010-256 等により docs-check は意味判断を要する文意整合検査を保持しない方針となり削除された。
+IR-045（削除済み）は「docs 日本語表現、文意整合検査」を担っていたが、REQ-010-003 により docs-check は意味判断を要する文意整合検査を保持しない方針となり削除された。
 IR-060 はこの方針を継承し、意味判断を要する検出（review 区分語、文意品質判断）は扱わず、完全一致検出（forbidden 区分語）のみを担う。
 IR-045 で扱っていた文意品質検出対象語は `vocabulary-registry.md`「文意品質検出対象語（IR-045）」で参照として残る。
 

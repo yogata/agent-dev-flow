@@ -12,7 +12,7 @@ status: accepted
 | category | obsolete-structure |
 | detection_method | glob で reference/ ディレクトリ検索 |
 | affected_artifacts | [skills] |
-| related_req | [REQ-002-013, 039, REQ-037-006, 007, REQ-010-094] |
+| related_req | [REQ-002-013, 039, REQ-037-006, 007] |
 | related_spec | [artifact-responsibilities.md] |
 | gate_level | full-audit |
 | false_positive_risk | なし |

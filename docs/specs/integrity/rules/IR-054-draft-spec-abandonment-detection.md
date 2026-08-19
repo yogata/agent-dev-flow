@@ -12,7 +12,7 @@ status: accepted
 | category | document-drift |
 | detection_method | (1) `docs/specs/**/*.md` から frontmatter `status: draft` の SPEC を抽出（`accepted`、`status` なしは対象外）。(2) 各 draft SPEC の frontmatter `updated`（YYYY-MM-DD）を基準日として読み取る。(3) 実行日（today）と `updated` の差分日数を算出。(4) 差分日数が閾値（30日、後述「IR-054 閾値設計」参照）を超過した場合、draft 放置候補として報告 |
 | affected_artifacts | [docs/specs/**/*.md（frontmatter `status: draft` のみ）] |
-| related_req | [REQ-001-002, REQ-010-150, REQ-010-151] |
+| related_req | [REQ-001-002] |
 | related_spec | [integrity-rule-catalog.md, integrity-contracts.md] |
 | gate_level | full-audit |
 | false_positive_risk | 中。`updated` frontmatter が実態と乖離している場合（更新忘れ）、放置でない SPEC が報告される。レポートは候補提示であり、SPEC owner による確認を前提とする。`updated` frontmatter 自体の正確性は別ルール（REQ-010-002 必須 field、既存）で担保する |
