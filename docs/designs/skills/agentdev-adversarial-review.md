@@ -1,14 +1,14 @@
 ---
-title: agentdev-adversarial-review SPEC
+title: agentdev-adversarial-review Design
 status: accepted
 created: 2026-08-09
 updated: 2026-08-15
 ---
 
-# agentdev-adversarial-review SPEC
+# agentdev-adversarial-review Design
 
-本 SPEC は docs/designs/skills/agentdev-deep-review.md（旧 SPEC）の後継である。
-旧 SPEC は superseded として履歴保持し、本 SPEC が対論型レビューの振る舞い契約、レビュー手続き、責務構造を正規所有する。
+本 Design は docs/designs/skills/agentdev-deep-review.md（旧 Design）の後継である。
+旧 Design は superseded として履歴保持し、本 Design が対論型レビューの振る舞い契約、レビュー手続き、責務構造を正規所有する。
 
 ## 対象
 - 要件、設計、規格・仕様、計画、実装を標準対象とする。
@@ -133,7 +133,7 @@ timeout や最大 round は実装詳細として設定可能とする。
 
 ## 争点状態
 争点は次の状態を持つ。
-状態遷移の物理的保存形式、スキーマは本 SPEC の所有対象外とし、配布スキル実装へ委譲する。
+状態遷移の物理的保存形式、スキーマは本 Design の所有対象外とし、配布スキル実装へ委譲する。
 
 - 起原型: 未検証の反証候補、初期 finding。
 - 審議中: Reviewer と Reviewee が反証と再評価を往復している状態。
@@ -220,7 +220,7 @@ Reviewer と Reviewee は双方とも、必要に応じて複数のサブエー�
 複数サブエージェントの結果は多数決しない。
 同一 finding の報告数を証拠の強さとして扱わず、重複統合、共通原因抽出、根拠・前提確認を行い、本質的争点へ正規化する。
 
-物理的なエージェント数、並列数、DAG 構造、モデル選択、timeout、最大ラウンド数、物理的状態保存形式は本 SPEC の所有対象外とし、配布スキル実装へ委譲する。
+物理的なエージェント数、並列数、DAG 構造、モデル選択、timeout、最大ラウンド数、物理的状態保存形式は本 Design の所有対象外とし、配布スキル実装へ委譲する。
 
 ## 完了条件
 審議全体の完了は、形式的全会一致や固定観点全 PASS ではなく、次の本質的合意条件で判断する。
@@ -257,7 +257,7 @@ agentdev-adversarial-review は Artifact Graph をレビュー対象候補, evid
 
 Graph から得た情報は未検証 evidence として扱い、Reviewer または Reviewee の対論, 正規成果物確認を経ずに finding を確定しない。
 Graph はレビュー結論の確定ではなく evidence 探索に利用する。
-共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「ワークフロー利用」を参照。
+共通利用原則の防護事項は `agentdev-artifact-graph` Design「ワークフロー利用」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来のレビュー経路で継続し、review を停止しない（fail-open）。
 
@@ -270,8 +270,8 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 ## adversarial-review caller integration 共通契約
 
 本節は REQ-015 が定める7コマンド（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）および case-auto（停止伝播のみ、REQ-015-012）からの caller integration が共通に依拠する契約を正典として所有する（REQ-014-003）。
-caller integration 用の新規永続 schema を作成せず、本 SPEC が共通契約の正規所有者となる。
-詳細パラメータ、入力フィールド構成、enum 値は本 SPEC の対象外とし、各 command SPEC（REQ-015）が個別呼出統合を所有する。
+caller integration 用の新規永続 schema を作成せず、本 Design が共通契約の正規所有者となる。
+詳細パラメータ、入力フィールド構成、enum 値は本 Design の対象外とし、各 command Design（REQ-015）が個別呼出統合を所有する。
 
 ### 原則適用・skip 可能と QG/HITL 非代替
 
@@ -290,7 +290,7 @@ adversarial-review 自身は対象ファイル、Issue、PR、git 操作（commi
 
 ### accepted finding の反映責務
 
-accepted finding の対象候補（要件案、設計案、SPEC 案、計画案、実装案）への反映は呼出元の責務である（REQ-014-006）。
+accepted finding の対象候補（要件案、設計案、Design 案、計画案、実装案）への反映は呼出元の責務である（REQ-014-006）。
 adversarial-review は finding を提示し、合意候補を形成するが、対象への反映、保存、commit を自身では行わない。
 呼出元は accepted finding を反映した後に必要に応じて既存の検証、QG、HITL を再実行する。
 
@@ -324,19 +324,19 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 
 ### 正規所有者マトリックス
 
-共通 caller integration 契約の意味は次の5 SPEC 群へ分散所有し、一つの意味を一つの SPEC だけが規範定義する（REQ-014-011）。
-重複規範、矛盾を生じないため、各 SPEC は他 SPEC の正規領域を再定義しない。
+共通 caller integration 契約の意味は次の5 Design 群へ分散所有し、一つの意味を一つの Design だけが規範定義する（REQ-014-011）。
+重複規範、矛盾を生じないため、各 Design は他 Design の正規領域を再定義しない。
 
-| 意味 | 正規所有者 SPEC |
+| 意味 | 正規所有者 Design |
 |---|---|
-| adversarial-review 自身の振る舞い契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件4点、原則適用・skip 可能、default-on + skip policy、副作用禁止、QG/HITL 非代替、正規所有者マトリックス） | 本 SPEC（agentdev-adversarial-review） |
-| user-decision-required 停止理由分類、case-auto 伝播、resume point | workflow-contracts SPEC、case-auto command SPEC |
-| review 経路での parent_decision_required / decision_context 適用、副作用境界 | delegation-contracts SPEC |
-| 各 command の個別呼出統合（発動条件、挿入境界、戻り先） | 各 command SPEC（REQ-015） |
-| caller integration 関連の domain skill 振る舞い | 各 domain skill SPEC（REQ-015） |
+| adversarial-review 自身の振る舞い契約（入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 条件、停止条件4点、原則適用・skip 可能、default-on + skip policy、副作用禁止、QG/HITL 非代替、正規所有者マトリックス） | 本 Design（agentdev-adversarial-review） |
+| user-decision-required 停止理由分類、case-auto 伝播、resume point | workflow-contracts Design、case-auto command Design |
+| review 経路での parent_decision_required / decision_context 適用、副作用境界 | delegation-contracts Design |
+| 各 command の個別呼出統合（発動条件、挿入境界、戻り先） | 各 command Design（REQ-015） |
+| caller integration 関連の domain skill 振る舞い | 各 domain skill Design（REQ-015） |
 
 ### 横断整合検証状態（REQ-016）
 
 本マトリックスの遵守状態は REQ-016（横断整合）により検証済みである（#1972）。
-7経路（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）+ case-auto 統合後について、QG 重複（REQ-016-001）、HITL 重複（REQ-016-002）、新規永続成果物混入（REQ-016-003）、case-auto 伝播 regression（REQ-016-004）、責務重複（REQ-016-005）、command 定義本体と SPEC の Step 表現整合（REQ-016-006）のいずれも不整合なし。
+7経路（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）+ case-auto 統合後について、QG 重複（REQ-016-001）、HITL 重複（REQ-016-002）、新規永続成果物混入（REQ-016-003）、case-auto 伝播 regression（REQ-016-004）、責務重複（REQ-016-005）、command 定義本体と Design の Step 表現整合（REQ-016-006）のいずれも不整合なし。
 共通契約節（REQ-014-006〜011）の具体性も精査済みで補完不要。

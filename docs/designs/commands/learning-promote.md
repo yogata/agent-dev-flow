@@ -1,11 +1,11 @@
 ---
-title: learning-promote SPEC
+title: learning-promote Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-19
 ---
 
-# learning-promote SPEC
+# learning-promote Design
 
 ## 目的
 
@@ -13,7 +13,7 @@ inbox.md から正規化、分類、8軸評価、廃棄判定、既存対策確�
 `.opencode/` 直接反映は禁止。
 backlog-review 経由で RU 化する。
 
-**昇華可能性評価、無条件自動REQ化禁止（v2:REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/Decision/SPEC）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
+**昇華可能性評価、無条件自動REQ化禁止（v2:REQ-0155-005）**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
 無条件の自動REQ化は禁止し、学びは backlog-review → req-define → req-save の昇華経路を経て初めて REQ 化される。
 昇華不能な知見は `deferred.md` の living pool で維持する。
 `deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
@@ -30,11 +30,11 @@ learning-promote は採用済み成果物を生成する際、各問題クラス
 |---|---|---|
 | new_user_requirement（新しい利用者要求） | 既存REQ が要求を保持していない新しいステークホルダー要求 | ○（REQ 作成または拡張） |
 | external_contract_change（外部契約変更） | 利用者から見える外部契約の変更 | ○（REQ 作成または拡張） |
-| variation_addition（バリエーション追加） | 既存要求を満たすバリエーション追加 | ×（SPEC 拡張） |
-| edge_case（エッジケース） | エッジケース対応 | ×（SPEC 拡張） |
-| parameter_adjustment（パラメータ調整） | retry 回数、timeout、閾値、重み等の調整 | ×（パラメータSPEC 拡張） |
-| nonconformance_fix（不適合修正） | 既存REQ/SPEC への不適合修正 | ×（SPEC 修正） |
-| internal_restructuring（内部再構成） | 外部挙動を変えない内部再構成 | ×（SPEC 再構成） |
+| variation_addition（バリエーション追加） | 既存要求を満たすバリエーション追加 | ×（Design 拡張） |
+| edge_case（エッジケース） | エッジケース対応 | ×（Design 拡張） |
+| parameter_adjustment（パラメータ調整） | retry 回数、timeout、閾値、重み等の調整 | ×（パラメータDesign 拡張） |
+| nonconformance_fix（不適合修正） | 既存REQ/Design への不適合修正 | ×（Design 修正） |
+| internal_restructuring（内部再構成） | 外部挙動を変えない内部再構成 | ×（Design 再構成） |
 | document_correction（文書訂正） | 文書記述の訂正 | ×（文書修正） |
 
 REQ 拡張を候補とするのは `new_user_requirement` または `external_contract_change` のみ。
@@ -98,19 +98,19 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/learning-promote.md`）はその実行時投影である（DEC-010）。
-- workflow 実装本体（フェーズ構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-learning-promote`）が所有し、本 SPEC はこれらを複製しない。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/learning-promote.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（フェーズ構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-learning-promote`）が所有し、本 Design はこれらを複製しない。
 - Workflow Skill の単独起動防止（soft guard）は Workflow Skill description の DO NOT USE FOR トリガーにより実効する（command 定義本文に soft guard 宣言節を持たない構成である）。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
-## 参照する横断 SPEC
+## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 
-本節は learning-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約SPEC（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 SPEC と Workflow Skill は同一内容を重複保持しない）。
+本節は learning-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約Design（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 
 ### 8軸評価・廃棄判定・昇華可能性・既存対策確認後の自律確定判定の挿入位置
 
@@ -158,7 +158,7 @@ deferred・未処理項目を自動削除しない既存の安全境界は維持
 ## adversarial-review 挿入境界（経路D）
 
 本節は learning-promote 経路D の review 挿入境界を正典として所有する（REQ-015-007）。
-共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件と停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` SPEC「adversarial-review caller integration 共通契約」節（REQ-014）が正規所有し、本節は再定義しない。
+共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件と停止条件、呼出失敗時取扱い）は `agentdev-adversarial-review` Design「adversarial-review caller integration 共通契約」節（REQ-014）が正規所有し、本節は再定義しない。
 本節は経路D 固有の発動条件、挿入位置、戻り先、evaluation-report 更新戻しループのみを所有する。
 
 ### 発動条件判定 Step と review 呼出 Step の分離（REQ-015-001/002/003）
@@ -220,7 +220,7 @@ handoff.md、promoted/ 等の成果物は review より後の工程で生成さ�
 
 | 意味 | 正規所有者 |
 |---|---|
-| 経路D の発動条件、挿入位置、戻り先、evaluation-report 更新戻しループ | 本 SPEC（learning-promote command SPEC） |
-| 候補判断基準、内部手続き（候補確定位置、呼出タイミング、evaluation-report 反映、evaluation-report 更新戻しループの実装詳細） | `agentdev-learning-pipeline` domain skill SPEC（ACT-SPEC-013） |
-| 共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件、停止条件、呼出失敗時取扱い） | `agentdev-adversarial-review` SPEC（REQ-014） |
+| 経路D の発動条件、挿入位置、戻り先、evaluation-report 更新戻しループ | 本 Design（learning-promote command Design） |
+| 候補判断基準、内部手続き（候補確定位置、呼出タイミング、evaluation-report 反映、evaluation-report 更新戻しループの実装詳細） | `agentdev-learning-pipeline` domain skill Design（ACT-SPEC-013） |
+| 共通 caller integration 契約（任意性、副作用禁止、accepted finding 反映、再 review 条件、停止条件、呼出失敗時取扱い） | `agentdev-adversarial-review` Design（REQ-014） |
 

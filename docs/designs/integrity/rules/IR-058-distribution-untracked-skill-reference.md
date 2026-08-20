@@ -18,7 +18,7 @@ updated: 2026-08-20
 | related_req | [REQ-002-001, REQ-002-002, REQ-002-003] |
 | related_design | [../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
-| false_positive_risk | 低。スキル名は kebab-case であり語境界マッチで偽陽性は限定的。`repo-*` プレフィックスは REQ-001 により repo-local として除外。ルールカタログ・vocabulary-registry・IR-058 ルールファイル自体・runtime-package-boundary SPEC は検出語を正当に含むため exemption 対象とする |
+| false_positive_risk | 低。スキル名は kebab-case であり語境界マッチで偽陽性は限定的。`repo-*` プレフィックスは REQ-001 により repo-local として除外。ルールカタログ・vocabulary-registry・IR-058 ルールファイル自体・runtime-package-boundary Design は検出語を正当に含むため exemption 対象とする |
 | regression_test | `check_integrity.test.ts` の `IR-058 distribution-untracked-skill-reference` ブロック。projection-only かつ配布物から参照されるスキルを置いた fixture で NG が出力されること、参照無し fixture で OK が出力されること、`repo-*` スキルは参照されても検出されないことを検証する |
 | finding_route | intake |
 | triage_action | 新規検出時は対象スキルを `src/opencode/skills/` へ昇格（REQ-002-001）。昇格基準、手順は `runtime-package-boundary.md`「配布物依存スキルの src 昇格」セクション参照。repo-local 専用スキルとして扱う場合は `repo-*` プレフィックスへ rename するか、IR-058 exemption 登録の正当性を別途確認する |
@@ -47,7 +47,7 @@ updated: 2026-08-20
 |------|------|
 | `integrity-rule-catalog.md` | 検出ルール自体の記述。スキル名を正当に言及する |
 | `rules/IR-058-*.md`（本ファイル） | IR-058 ルール定義。スキル名を例示する |
-| `runtime-package-boundary.md` | 配布境界 SPEC。境界例示としてスキル名を正当に記載する |
+| `runtime-package-boundary.md` | 配布境界 Design。境界例示としてスキル名を正当に記載する |
 | `vocabulary-registry.md` | 語彙対照表。検出語彙を正当に列挙する |
 | `repo-*` プレフィックス | REQ-001 により repo-local 専用スキルとして配布対象外。配布物からの参照があっても consumer 配布を前提としない（別課題） |
 

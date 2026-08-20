@@ -1,11 +1,11 @@
 ---
-title: inspect-promote SPEC
+title: inspect-promote Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-19
 ---
 
-# inspect-promote SPEC
+# inspect-promote Design
 
 ## 目的
 
@@ -45,7 +45,7 @@ updated: 2026-08-19
 - inbox スキャン
 - 検出事項分類（promote / defer / reject）
 - 自動 promote（`--auto` opt-in 時のみ）:
- - 自動 promote 対象: SPEC分離基準違反（high-specificity）、構造的即時是正
+ - 自動 promote 対象: Design分離基準違反（high-specificity）、構造的即時是正
  - 自動 promote 対象外: 命名、分類の意味判断、ADR 要否判断（手動分類へ回す）
  - 投入先: `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md`
  - 実行ログ: `.agentdev/inspect/promoted/auto-promote-log.md` に投入対象記録
@@ -58,19 +58,19 @@ updated: 2026-08-19
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/inspect-promote.md`）はその実行時投影である（DEC-010）。
-- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-promote`）が所有し、本 SPEC はこれらを複製しない。検出事項ごとの分類確定状態の再構成規則（durable state からの復元）は backlog-artifact-lifecycle SPEC「inspect-promote 自動 promote」節が正規所有する。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/inspect-promote.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-promote`）が所有し、本 Design はこれらを複製しない。検出事項ごとの分類確定状態の再構成規則（durable state からの復元）は backlog-artifact-lifecycle Design「inspect-promote 自動 promote」節が正規所有する。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
-## 参照する横断 SPEC
+## 参照する横断 Design
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（検出事項プロトコル、inspect-promote 自動 promote 対象カテゴリ、投入先、実行ログ、誤検知 revoke 手順）
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 
-本節は inspect-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約SPEC（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 SPEC と Workflow Skill は同一内容を重複保持しない）。
+本節は inspect-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-003-055 の共通原則に従い、詳細判定表は横断契約Design（workflows/workflow-contracts.md「promote系判断確定とHITL境界」節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 
 ### 分類・検証・経路B review 後の自律確定判定の挿入位置
 
@@ -104,7 +104,7 @@ updated: 2026-08-19
 - ユーザー明示承認の確保（G01、`--auto` 対象除く）
 - 分類の正確性: promote / defer / reject
 - 投入先、形式の正確性: `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md`（`--auto` 時）
-- 自動 promote 対象カテゴリの遵守: SPEC分離基準違反（high-specificity）、構造的即時是正のみ
+- 自動 promote 対象カテゴリの遵守: Design分離基準違反（high-specificity）、構造的即時是正のみ
 - 自動 promote 対象外の手動分類回し: 命名、分類の意味判断、ADR 要否判断
 - 実行ログ記録の完備（G08）
 
@@ -126,7 +126,7 @@ updated: 2026-08-19
 ## adversarial-review 挿入境界（経路B）
 
 本節は inspect-promote からの adversarial-review 呼出統合（REQ-015 経路B）を正典として所有する。
-共通契約（任意性、副作用禁止、QG/HITL 非代替、呼出失敗時取扱い、再 review 条件、停止条件4点、accepted finding 反映責務、正規所有者マトリックス）は adversarial-review SPEC「adversarial-review caller integration 共通契約」節を正とし、本節は再定義しない（REQ-014-011）。
+共通契約（任意性、副作用禁止、QG/HITL 非代替、呼出失敗時取扱い、再 review 条件、停止条件4点、accepted finding 反映責務、正規所有者マトリックス）は adversarial-review Design「adversarial-review caller integration 共通契約」節を正とし、本節は再定義しない（REQ-014-011）。
 本節は経路B 固有の挿入位置、発動条件判定 Step、review 呼出 Step、--auto fast path を所有する。
 
 ### review 挿入位置（REQ-015-005）
@@ -175,12 +175,12 @@ inspect-promote は adversarial-review を原則実行する（default-on、REQ-
 ### review 呼出 Step（REQ-015-001）
 
 review 呼出 Step は review 対象（手動分類対象の検出事項、暫定分類結果）を入力コンテキストとして adversarial-review を呼び出す。
-入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 停止条件は adversarial-review SPEC を正とする。
+入力コンテキスト、返却契約、呼出失敗時取扱い、再 review 停止条件は adversarial-review Design を正とする。
 
 呼出結果の取扱い:
 
 - accepted finding は本コマンドの責務で暫定分類結果へ反映する（REQ-014-006）。adversarial-review 自身は反映を行わない（REQ-014-004）
-- finding 反映で暫定分類の意味内容が変更された場合、検出事項分類へ戻し再分類する。再 review 条件と停止条件4点は adversarial-review SPEC に従う（REQ-014-007/008）
+- finding 反映で暫定分類の意味内容が変更された場合、検出事項分類へ戻し再分類する。再 review 条件と停止条件4点は adversarial-review Design に従う（REQ-014-007/008）
 - unresolved な本質的争点が残る場合、HITL 確定へ進まず、ユーザー判断事項として停止する（REQ-014-009）。ただし adversarial-review 自体を恒久的な統制ゲートとしない
 - 呼出失敗時は silent skip を禁止し、利用不能を報告した上で HITL 確定の従来フローを維持する（REQ-014-010）
 
@@ -197,7 +197,7 @@ skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も�
 
 ### 正規所有者宣言
 
-review 挿入境界（経路B の発動条件、挿入位置、戻り先、--auto fast path）は本 SPEC が正規所有する（REQ-014-011、REQ-015-005）。
-共通 caller integration 契約は adversarial-review SPEC を正とし、本節は再定義しない。
-user-decision-required の停止理由分類は workflow-contracts SPEC、review 経路での parent_decision_required / decision_context 適用は delegation-contracts SPEC をそれぞれ正とする。
+review 挿入境界（経路B の発動条件、挿入位置、戻り先、--auto fast path）は本 Design が正規所有する（REQ-014-011、REQ-015-005）。
+共通 caller integration 契約は adversarial-review Design を正とし、本節は再定義しない。
+user-decision-required の停止理由分類は workflow-contracts Design、review 経路での parent_decision_required / decision_context 適用は delegation-contracts Design をそれぞれ正とする。
 

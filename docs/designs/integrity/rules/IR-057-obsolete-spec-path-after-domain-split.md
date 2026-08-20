@@ -10,7 +10,7 @@ updated: 2026-07-26
 | Field | Value |
 |-------|-------|
 | rule_id | IR-057 |
-| description | `docs/designs/integrity/obsolete-path-map.yaml` に登録された旧SPEC直下パス（`docs/designs/<name>.md` 形式）が現行文書、原本、配置先、検査スクリプトに残っていないことを検証する。同時に link mode 統一（REQ-009）に伴い廃止確定となった直接生成方式語彙を検出する。語彙は「単独検出語」（即 ng）と「近接条件つき検出語」（同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ ng）に分離する。単独検出語: `src/opencode-local/generation-flow.md`、`src/opencode-local/transform/`、`transform/generate.md`、`transform/review.md`、`transform/spec.md`、`local-opencode-transform`、`直接生成方式`、`生成フロー`。近接条件つき検出語: `再生成`、`上書き保護`、`generated_by`。`generated_by` + `local-opencode-transform` 組み合わせ検出は `generated_by_combination_rule` で維持する |
+| description | `docs/designs/integrity/obsolete-path-map.yaml` に登録された旧Design直下パス（`docs/designs/<name>.md` 形式）が現行文書、原本、配置先、検査スクリプトに残っていないことを検証する。同時に link mode 統一（REQ-009）に伴い廃止確定となった直接生成方式語彙を検出する。語彙は「単独検出語」（即 ng）と「近接条件つき検出語」（同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ ng）に分離する。単独検出語: `src/opencode-local/generation-flow.md`、`src/opencode-local/transform/`、`transform/generate.md`、`transform/review.md`、`transform/spec.md`、`local-opencode-transform`、`直接生成方式`、`生成フロー`。近接条件つき検出語: `再生成`、`上書き保護`、`generated_by`。`generated_by` + `local-opencode-transform` 組み合わせ検出は `generated_by_combination_rule` で維持する |
 | severity | strict |
 | category | broken-reference |
 | detection_method | `check_integrity.ts` による `obsolete-path-map.yaml` ロード、各エントリ `old` パターンの正規表現マッチング（行単位走査）。`scope.include`、`scope.exclude` で検査対象を絞り込む。語彙検出は `legacy_local_generation_vocabulary`（単独検出語: severity=ng）と `legacy_local_generation_conditional_vocabulary`（近接条件つき検出語: proximity_required=true）に分離し、後者は同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ検出する。`generated_by` + `local-opencode-transform` の組み合わせ検出は `generated_by_combination_rule` で維持する |
@@ -30,7 +30,7 @@ updated: 2026-07-26
 
 | # | 検査項目 | 失敗時 |
 |---|----------|--------|
-| 1 | `obsolete-path-map.yaml` の `entries[].old` に列挙された旧SPEC直下パスが `scope.include` 配下のファイルに出現しないこと | strict fail |
+| 1 | `obsolete-path-map.yaml` の `entries[].old` に列挙された旧Design直下パスが `scope.include` 配下のファイルに出現しないこと | strict fail |
 | 2 | `obsolete-path-map.yaml` の `legacy_local_generation_vocabulary[].term`（単独検出語）が出現しないこと | strict fail |
 | 3 | `obsolete-path-map.yaml` の `legacy_local_generation_conditional_vocabulary[].term`（近接条件つき検出語）は、同一ファイル内または近接行に旧 local 生成方式文脈語がある場合のみ検出すること。文脈語がない場合は検出しない | conditional fail |
 | 4 | `generated_by` と `local-opencode-transform` が同一ファイルに共存しないこと（`generated_by_combination_rule`） | strict fail |
@@ -97,7 +97,7 @@ link mode 統一（REQ-009）に伴い廃止確定となった旧語彙（直接
 
 ## 例外登録（現行Decisionの履歴記載）
 
-現行 Decision（`docs/decisions/DEC-*.md`、retired を除く）が移行経緯を説明するために旧SPEC直下パス、廃止語彙を記載する場合は exemption とする。
+現行 Decision（`docs/decisions/DEC-*.md`、retired を除く）が移行経緯を説明するために旧Design直下パス、廃止語彙を記載する場合は exemption とする。
 `check_integrity.ts`（full audit）と `check_changed_docs.ts`（targeted guard の `checkLegacyVocab`、`checkObsoleteSpecPath`）は同じ例外規則を使用する。
 `superseded` Decision は後継 Decision へ置き換えられた履歴文書であり、旧パス、廃止語彙を含むことが前提であるため免除対象に含める。
 

@@ -1,11 +1,11 @@
 ---
-title: `agentdev-gh-cli` SPEC
+title: `agentdev-gh-cli` Design
 status: accepted
 created: "2026-08-15"
 updated: "2026-08-18"
 ---
 
-# `agentdev-gh-cli` SPEC
+# `agentdev-gh-cli` Design
 
 ## 目的
 
@@ -133,7 +133,7 @@ git CLI 直接操作の初期化要件はローカル版にも適用する（ロ
 ## Windows 環境固有手続き
 
 Windows 環境（Windows PowerShell 5.x / pwsh 7）での gh CLI 実行に特有の手続きを以下5項目として定義する。
-本 SPEC は各手続きの存在と `references/standard-procedures.md` への参照関係のみを定め、詳細実装（gh CLI フラグ、PowerShell 式、ファイル配置、cleanup 手順）は同ファイルへ委譲する（REQ-011、DEC-004 decision #3）。
+本 Design は各手続きの存在と `references/standard-procedures.md` への参照関係のみを定め、詳細実装（gh CLI フラグ、PowerShell 式、ファイル配置、cleanup 手順）は同ファイルへ委譲する（REQ-011、DEC-004 decision #3）。
 ローカル版は Case ファイル読み書きへ差し替えるため本要件の対象外（gh CLI を使用しない）。
 
 ### 対象手続き（5項目）
@@ -216,8 +216,8 @@ GitHub 非依存の抽象 backend は新設せず、GitHub 前提の gh-cli 手�
 | Issue 本文読込 | Case ファイル読込 |
 | Issue 本文更新 | Case ファイル本文更新 |
 | Issue コメント追加 | `## 作業ログ` へ追記 |
-| PR 作成 | Case ファイル新規作成（PR 相当セクション: `## マージ前確認`、`## SPEC確定候補`、`## Findings / Capture候補`） |
-| PR 本文読込 | Case ファイル読込（`## マージ前確認`、`## SPEC確定候補`、`## Findings / Capture候補`） |
+| PR 作成 | Case ファイル新規作成（PR 相当セクション: `## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補`） |
+| PR 本文読込 | Case ファイル読込（`## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補`） |
 | PR merge | `## マージ結果` へ記録 |
 | Issue close | `status: closed` + `closed_at` 更新 |
 | VERIFY | Case ファイル読み戻し検証（Markdown 構造、必須セクション） |

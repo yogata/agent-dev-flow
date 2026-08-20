@@ -1,16 +1,16 @@
-# STEP-3: docs 検証・SPEC 確定（docs-and-spec-promotion）
+# STEP-3: docs 検証・Design 確定（docs-and-spec-promotion）
 
 > 本 reference は `agentdev-workflow-case-close` SKILL.md の Control Plane STEP-3 詳細である。
-> docs/ 検証、targeted docs guard、check_extensions.ts、SPEC 確定フロー（draft → accepted 昇格）を提供する。
+> docs/ 検証、targeted docs guard、check_extensions.ts、Design 確定フロー（draft → accepted 昇格）を提供する。
 
 ## Purpose
 
-PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate を実施し、SPEC 確定フロー（draft → accepted 昇格）を処理する。
+PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate を実施し、Design 確定フロー（draft → accepted 昇格）を処理する。
 
 ## Input Resolution
 
-1. SSoT 再構成: PR 変更ファイル一覧、PR 本文（`## SPEC確定候補`）、対象 SPEC frontmatter `status`
-2. identifier 保持: PR番号、Issue番号、SPEC パス
+1. SSoT 再構成: PR 変更ファイル一覧、PR 本文（`## Design確定候補`）、対象 Design frontmatter `status`
+2. identifier 保持: PR番号、Issue番号、Design パス
 3. 最小 scalar: なし
 4. runtime artifact: なし
 
@@ -22,7 +22,7 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 ## Result
 
 - docs/ 検証合格（targeted docs guard、配布依存境界 最終 gate）
-- SPEC 確定フロー処理完了（昇格 / design-save 提案 / 見送り）
+- Design 確定フロー処理完了（昇格 / design-save 提案 / 見送り）
 
 ## Procedure
 
@@ -30,13 +30,13 @@ PR マージ前の docs 検証、拡張検査、配布依存境界 最終 gate �
 
 機能追加固有の検証（REQ作成、インデックス記載、spec更新、ADR作成）および全 work_type 共通の関連ドキュメント整合性確認、README 索引整合性確認。
 不足時は警告表示してユーザー判断を仰ぐ。
-PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（STEP-3-2）を実行する。
+PR 本文の `## Design確定候補` セクションから Design 確定フロー（STEP-3-2）を実行する。
 
-**文書分類ポリシー適合確認**: document-model SPEC（extension 経由）の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する。
+**文書分類ポリシー適合確認**: document-model Design（extension 経由）の Document Classification Policy に基づき、最終ドキュメント状態が分類ポリシーに適合していることを確認する。
 
-### STEP-3-1: close 時 SPEC/ commands/ skills 更新漏れの局所確認
+### STEP-3-1: close 時 Design/ commands/ skills 更新漏れの局所確認
 
-実装完了、PR マージ前に、SPEC 本文と実装の最終矛盾確認、command 定義の更新漏れ、skill 責務境界の変更漏れを確認。
+実装完了、PR マージ前に、Design 本文と実装の最終矛盾確認、command 定義の更新漏れ、skill 責務境界の変更漏れを確認。
 更新漏れ検出時は警告表示してユーザー判断。
 局所予防の範囲で `/agentdev/inspect-docs` の全体意味レビューの代替ではない。
 
@@ -61,13 +61,13 @@ PR 本文の `## SPEC確定候補` セクションから SPEC 確定フロー（
 - **モード使い分けの標準**: コミット前の worktree 上での検証は `--base-ref`、コミット後・PR 作成後の main 環境は `--files`（case-close はマージ後 main 環境で実行されるため `--files` を使用）
 - **JSON 出力の `failures`**: strict severity が含まれる場合はマージを停止し対象ファイルを修正して再実行
 - **`full_docs_check_recommended`**: true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案
-- **draft → accepted 等の SPEC status 変更時**: `spec_readme_update_required` を STEP-3-2 SPEC 確定フローに反映
+- **draft → accepted 等の Design status 変更時**: `spec_readme_update_required` を STEP-3-2 Design 確定フローに反映
 - **`files_checked` 空時の確認**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する
 
 #### 配布依存境界の最終変更経路 gate
 
 PR 変更ファイルが `--profile source` の配布 command/skill ソース面に含まれる場合、PR マージ前に配布依存境界の最終 gate を実行する。
-本 gate は共用 detector（`.opencode/skills/<integrity-detector-skill>/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、配布依存境界 SPEC の最終 gate 基底を再利用する。
+本 gate は共用 detector（`.opencode/skills/<integrity-detector-skill>/scripts/lib/distribution-boundary.ts`）を経由する adapter（`check_distribution_boundary.ts`）経路であり、配布依存境界 Design の最終 gate 基底を再利用する。
 adapter が bypass されても最終 gate で停止する。
 trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run command STEP-S5 と同一。junction 領域は git 非追跡のため PR 差分に現れず、junction を trigger にすると gate が不発になる）
 
@@ -86,18 +86,18 @@ QG-4 の full integrity suite 合格基準により検証スイート全体（bu
 - **証拠記録**: 実行 cwd と起動コマンド形式（prefix・パス指定を含む）を PR 本文のテスト結果の証拠へ明記する
 - **cwd 依存テスト混在スイートの運用注記**: 対象スイートには cwd 依存テストが混在するため、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない
 
-### STEP-3-2: SPEC 確定フロー
+### STEP-3-2: Design 確定フロー
 
-PR 本文の `## SPEC確定候補` セクション（case-run/ driver が記録）を読み取り、SPEC の確定、昇格を処理する。
+PR 本文の `## Design確定候補` セクション（case-run/ driver が記録）を読み取り、Design の確定、昇格を処理する。
 セクション不存在・空の場合はスキップ。
 
 | 処理パターン | 条件 | アクション |
 |---|---|---|
-| (a) case-close 内で SPEC 昇格 | 対象 SPEC の `status` が `draft`、実装が SPEC 内容を検証済み | 対象 SPEC の `status` を `draft` → `accepted` に昇格（編集スコープ: プロジェクトの SPEC ファイル群） |
-| (b) design-save 再起動の提案 | SPEC 確定候補が SPEC ファイル未保存 | `/agentdev/design-save` の再実行を提案し case-close は完了させる |
+| (a) case-close 内で Design 昇格 | 対象 Design の `status` が `draft`、実装が Design 内容を検証済み | 対象 Design の `status` を `draft` → `accepted` に昇格（編集スコープ: プロジェクトの Design ファイル群） |
+| (b) design-save 再起動の提案 | Design 確定候補が Design ファイル未保存 | `/agentdev/design-save` の再実行を提案し case-close は完了させる |
 | (c) 見送り | 確定不要と判断 | 候補を Findings/ Capture候補 に準じて記録し後続へ委ねる |
 
-SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter `status` と `updated` の更新、SPEC 確定候補処理の詳細は `agentdev-design-file-manager/references/design-lifecycle-application.md` を参照。
+Design status 昇格タイミング（draft → accepted）の詳細、frontmatter `status` と `updated` の更新、Design 確定候補処理の詳細は `agentdev-design-file-manager/references/design-lifecycle-application.md` を参照。
 
 ## case-close が使用する検査ツール
 
@@ -112,7 +112,7 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 
 ## Evidence
 
-- targeted docs guard、check_extensions.ts、check_distribution_boundary.ts の各 JSON 結果、SPEC 確定フローの処理パターン（a/b/c）
+- targeted docs guard、check_extensions.ts、check_distribution_boundary.ts の各 JSON 結果、Design 確定フローの処理パターン（a/b/c）
 - full integrity suite 実行時: 「Ran N tests across M files」の N/M 件数突合結果、実行 cwd と起動コマンド形式
 
 ## Completion Verification
@@ -122,12 +122,12 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 
 ## Resume-Idempotency
 
-- 各検査は読取であり再実行可能。SPEC 昇格は frontmatter `status`（durable state）で判定し、`accepted` 済みの場合は再昇格しない
+- 各検査は読取であり再実行可能。Design 昇格は frontmatter `status`（durable state）で判定し、`accepted` 済みの場合は再昇格しない
 
 ## resume point
 
 - docs/ 検証結果（targeted docs guard、check_extensions.ts）
-- SPEC 確定フロー処理結果（昇格 a / 提案 b / 見送り c）
+- Design 確定フロー処理結果（昇格 a / 提案 b / 見送り c）
 - `spec_readme_update_required` 状態
 
 ## 関連 STEP
@@ -137,11 +137,11 @@ SPEC status 昇格タイミング（draft → accepted）の詳細、frontmatter
 
 ## 関連 Capability Skill
 
-- `agentdev-design-file-manager`: SPEC status 昇格、design-lifecycle-application
+- `agentdev-design-file-manager`: Design status 昇格、design-lifecycle-application
 - integrity checker skill（self-hosting リポジトリ限定）: check_changed_docs.ts、check_extensions.ts
-- `agentdev-project-extensions`: document-model SPEC extension 経由（Document Classification Policy）
+- `agentdev-project-extensions`: document-model Design extension 経由（Document Classification Policy）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - 不変条件（機能追加で docs/ 更新がない場合の警告表示と停止確認）
-- G21・不変条件（SPEC status 昇格は case-close の責務、SPEC 確定候補の処理は PR 本文の `## SPEC確定候補` を入力とし `## Findings / Capture候補` とは区別）
+- G21・不変条件（Design status 昇格は case-close の責務、Design 確定候補の処理は PR 本文の `## Design確定候補` を入力とし `## Findings / Capture候補` とは区別）

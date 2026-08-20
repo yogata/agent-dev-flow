@@ -7,8 +7,8 @@ updated: 2026-07-27
 
 # サブエージェント委譲契約（横断）
 
-> 本 SPEC は v2:ADR-0112 で定義されたサブエージェント委譲の一般概念に基づく共通契約を定義する。
-> 個別 command / skill の委譲利用は各 SPEC を参照のこと。
+> 本 Design は v2:ADR-0112 で定義されたサブエージェント委譲の一般概念に基づく共通契約を定義する。
+> 個別 command / skill の委譲利用は各 Design を参照のこと。
 
 ## 目的
 
@@ -66,7 +66,7 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 | delegation_type | 用途 | 書き込み | 書き込み許可条件 |
 |---|---|---:|---|
 | `gate_check` | 完了判定、ガードレール充足確認、保存前/close前検査 | 禁止 | - |
-| `semantic_review` | 文書、差分、REQ/Decision/SPECの意味レビュー | 禁止 | - |
+| `semantic_review` | 文書、差分、REQ/Decision/Designの意味レビュー | 禁止 | - |
 | `log_analysis` | テストログ、CIログ、review結果解析 | 禁止 | - |
 | `classification` | 成果物 / 検出事項 / intake / learning の分類 | 禁止 | - |
 | `extraction` | 候補、論点、未回収事項の抽出 | 禁止 | - |
@@ -75,7 +75,7 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 | `step_execution` | case-auto からの構成工程（req-save / design-save / case-open / case-close）の実行担当サブエージェント起動 | 許可 | case-auto からの工程委譲のみ。各工程のコマンド定義ガードレールに従う。委譲起動不能時の扱いは `delegation-unavailable` 状態として報告する（REQ-002-003/004）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md 参照 |
 
 ※ step_execution の委譲起動手段（起動方法、実行制御パラメータ）は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
-委譲起動不能時は `delegation-unavailable` 状態として報告し、インラインフォールバックは harness 固有の実行制御として配布 SPEC から除外する（REQ-002-004）。
+委譲起動不能時は `delegation-unavailable` 状態として報告し、インラインフォールバックは harness 固有の実行制御として配布 Design から除外する（REQ-002-004）。
 
 ## 委譲制約
 
@@ -105,13 +105,13 @@ case 実行に関わる責務は 4 用語へ分解され、各委譲種別は対
 
 `controlled_case_execution`（case-run）と `step_execution`（case-auto）は外部バックエンド接続を自身で所有せず REQ-011 へ委譲し、自身は所有しない。
 case-run は adapter skill（`agentdev-case-run-execution-adapter`）経由で external execution boundary への委譲契約を使用し、実行担当サブエージェントの起動と result 受領を外部実行境界として取り扱う。
-adapter skill が規定する result 4状態（completed-pr / blocked / failed / delegation-unavailable）、worktree 隔離、PR URL 受領、Findings / SPEC確定候補の PR 本文引き継ぎは external execution boundary 委譲契約の構成要素である。
+adapter skill が規定する result 4状態（completed-pr / blocked / failed / delegation-unavailable）、worktree 隔離、PR URL 受領、Findings / Design確定候補の PR 本文引き継ぎは external execution boundary 委譲契約の構成要素である。
 
 ### harness execution mechanism の ADF 規範所有対象外（REQ-011-018）
 
 agent 起動、background task、並列実行、context 管理は ADF 配布物の規範所有対象外とし、harness 責務とする。
-委譲起動手段（起動方法、実行制御パラメータ）、能力検出、インラインフォールバックの有無は AGENTS.md および `references/<harness>.md` に配置し、本 SPEC では規範を持たない。
-「委譲種別」の注記に既述のとおり step_execution の起動手段も harness 責務であり、本 SPEC から除外する。
+委譲起動手段（起動方法、実行制御パラメータ）、能力検出、インラインフォールバックの有無は AGENTS.md および `references/<harness>.md` に配置し、本 Design では規範を持たない。
+「委譲種別」の注記に既述のとおり step_execution の起動手段も harness 責務であり、本 Design から除外する。
 
 ## manager-orchestrator と軽量委譲の分離
 
@@ -125,7 +125,7 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 
 ## 初期適用対象
 
-各 command / skill の具体的委譲利用は各 SPEC を参照。
+各 command / skill の具体的委譲利用は各 Design を参照。
 本節は参考例である。
 
 | コマンド | 委譲種別 | 委譲内容 |
@@ -144,7 +144,7 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 |---|---|
 | 公開API、入力、出力、ガードレール、高レベルStep | Command定義（`src/opencode/commands/agentdev/*.md`） |
 | 再利用可能な判断基準、検査観点の詳細 | Skill references（`references/*.md`） |
-| 委譲インタフェース（共通エンベロープ、delegation_type 分類、制約） | 本 SPEC |
+| 委譲インタフェース（共通エンベロープ、delegation_type 分類、制約） | 本 Design |
 | 委譲のアーキテクチャ判断（一般概念、manager-orchestrator位置づけ、検査、分類委譲の許容） | v2:ADR-0112 |
 | case-run 専用プロトコル（起動仕様、プロンプト構成、Epic Wave 実行/クローズモデル） | `agentdev-case-run-execution-adapter` skill references |
 | 編集安全手順、AST-grep運用、大規模ファイル分割 | `agentdev-case-run-execution-adapter` skill references |
@@ -162,7 +162,7 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 | case-open | 子Issue 本文案作成、検査、Issue 作成 | Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新 |
 | case-run | 同一 Wave 内子Issue の実装委譲 | Wave 結果集約 |
 | req-save | 複数 REQ/Decision ファイルの変更案作成、検査 | 採番、index 更新、draft 更新、commit、push |
-| design-save | 複数 SPEC ファイルの変更案作成、検査 | 採番、index 更新、draft 更新、commit、push |
+| design-save | 複数 Design ファイルの変更案作成、検査 | 採番、index 更新、draft 更新、commit、push |
 
 ### 集約原則
 
@@ -171,14 +171,14 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 
 ## case-auto 委譲契約 MUST NOT DO 精密化（REQ-003-004）
 
-case-auto の MUST NOT DO を「実質的 SPEC / REQ / ADR 内容編集禁止（lifecycle 状態遷移 `draft`→`accepted` は除く）」へ精密化する。状態遷移操作と内容編集操作の分類判定表:
+case-auto の MUST NOT DO を「実質的 Design / REQ / ADR 内容編集禁止（lifecycle 状態遷移 `draft`→`accepted` は除く）」へ精密化する。状態遷移操作と内容編集操作の分類判定表:
 
 | 操作分類 | case-auto での可否 |
 |---|---|
-| SPEC / REQ / ADR 本文（要件行、判定基準、アーキテクチャ決定）の編集、追記、削除、リライト | 禁止（内容編集） |
-| 新規 SPEC frontmatter `status: draft` 付与（新規 SPEC 作成時） | 許可（lifecycle 状態遷移） |
-| 既存 SPEC frontmatter `status: accepted` 昇格 | 禁止（case-close Step 3 の責務） |
-| 既存 SPEC frontmatter `updated` 日付更新 | 許可（lifecycle メタデータ） |
+| Design / REQ / ADR 本文（要件行、判定基準、アーキテクチャ決定）の編集、追記、削除、リライト | 禁止（内容編集） |
+| 新規 Design frontmatter `status: draft` 付与（新規 Design 作成時） | 許可（lifecycle 状態遷移） |
+| 既存 Design frontmatter `status: accepted` 昇格 | 禁止（case-close Step 3 の責務） |
+| 既存 Design frontmatter `updated` 日付更新 | 許可（lifecycle メタデータ） |
 | `.agentdev/drafts/**` の status 更新 | 許可（ハンドオフ状態管理） |
 
 ## 実行主体分類表（委譲契約必須項目、REQ-003-007）
@@ -219,14 +219,14 @@ subagent は当該属性に応じた振る舞い指針（検証のみでも acce
 ## adversarial-review との委譲契約接続
 
 本節は adversarial-review caller integration（REQ-014）が委譲契約へ接続する際の適用を所有する。
-共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は重複定義せず、委譲契約側からの接続のみを規定する。
-REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持し、adversarial-review 由来の結果は第5状態を増やさず既存状態へ折り畳む（REQ-014-012、workflow-contracts SPEC「adversarial-review 由来の停止信号」節参照）。
+共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は重複定義せず、委譲契約側からの接続のみを規定する。
+REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持し、adversarial-review 由来の結果は第5状態を増やさず既存状態へ折り畳む（REQ-014-012、workflow-contracts Design「adversarial-review 由来の停止信号」節参照）。
 
 ### 委譲種別と副作用境界
 
 adversarial-review は「委譲種別」の `semantic_review`（書き込み禁止型）として適用する。
 許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする（REQ-014-004）。
-レビュー結果保存用の新規正規 artifact 種別を導入せず、審議結果は呼出元へ中間成果として返却する（REQ-014-005、adversarial-review SPEC「副作用禁止と新規 artifact 非生成」節参照）。
+レビュー結果保存用の新規正規 artifact 種別を導入せず、審議結果は呼出元へ中間成果として返却する（REQ-014-005、adversarial-review Design「副作用禁止と新規 artifact 非生成」節参照）。
 
 ### review 経路での parent_decision_required / decision_context 適用
 
@@ -244,7 +244,7 @@ adversarial-review は「委譲種別」の `semantic_review`（書き込み禁�
 ### case-auto による decision_context の限定的親判断解決（REQ-006-112〜114、DEC-008）
 
 case-auto は下位 command（case-run インライン実行、工程委譲）から受領した decision_context を bounded parent decision resolution で処理する。
-本節は委譲契約側からの接続のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto SPEC「bounded parent decision resolution（REQ-006-112〜114、DEC-008）」節が正である。
+本節は委譲契約側からの接続のみを規定し、解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto Design「bounded parent decision resolution（REQ-006-112〜114、DEC-008）」節が正である。
 
 **decision_context の消費契約**:
 
@@ -258,7 +258,7 @@ case-auto は下位 command（case-run インライン実行、工程委譲）�
 
 **resume point の拡張利用**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、既存 resume point（REQ-006-085）から処理を継続する。
 新規の永続結果型を導入せず、既存 resume point 機構を再利用する（DEC-008 決定5）。
-resume point の仕様は workflow-contracts SPEC「case-auto への伝播と resume point」節が正である。
+resume point の仕様は workflow-contracts Design「case-auto への伝播と resume point」節が正である。
 
 **非対象（REQ-015-012 維持）**: case-auto は decision_context の解決において raw finding を解釈、採否、候補反映しない。
 各 caller command は自身が所有する候補について finding の意味解釈、採否、候補への反映を維持し（REQ-014-006）、raw finding を case-auto へそのまま渡さない（REQ-006-112、AG-006）。
@@ -270,5 +270,5 @@ adversarial-review の呼出失敗時（スキル不在、起動異常、timeout
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「正規所有者マトリックス」節（REQ-014-011）との間で意味の重複、矛盾を生じない。
-委譲契約の一般概念（委譲時最小契約、委譲種別、制約）は本 SPEC の既存節が正であり、adversarial-review 固有の適用のみを本節が所有する。
+本節と adversarial-review Design「正規所有者マトリックス」節（REQ-014-011）との間で意味の重複、矛盾を生じない。
+委譲契約の一般概念（委譲時最小契約、委譲種別、制約）は本 Design の既存節が正であり、adversarial-review 固有の適用のみを本節が所有する。

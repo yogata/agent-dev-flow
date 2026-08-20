@@ -1,11 +1,11 @@
 ---
-title: `agentdev-issue-management` SPEC
+title: `agentdev-issue-management` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
 
-# `agentdev-issue-management` SPEC
+# `agentdev-issue-management` Design
 
 ## 目的
 

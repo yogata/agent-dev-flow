@@ -6,7 +6,7 @@
 ## 全体の流れ
 
 ```
-/agentdev/req-define → /agentdev/req-save（REQ/Decision 対象 artifact_actions がある場合）→ /agentdev/spec-save（SPEC 対象 artifact_actions がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
+/agentdev/req-define → /agentdev/req-save（REQ/Decision 対象 artifact_actions がある場合）→ /agentdev/design-save（Design 対象 artifact_actions がある場合）→ /agentdev/case-open → /agentdev/case-run → /agentdev/case-close
 ```
 
 > 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138, v2:ADR-0124）。
@@ -37,20 +37,20 @@ REQ/Decision 対象 artifact_actions（`artifact: req` / `artifact: decision`）
 
 **出力**: REQ/Decision ファイル（commit/push まで実行）
 
-## spec-save
+## design-save
 
-req-define で分離された SPEC 保存対象（`draft-data` の `artifact_actions` 内 `artifact: spec` entry）を SPEC ファイルとして `docs/specs/` に保存、確定するコマンド。
-SPEC 対象 artifact_actions がある場合に実行する（全 work_type 対象、`work_type` による判定は廃止、v2:REQ-0138-009）。
-req-save の G02（SPEC 編集禁止）を緩和するものではなく、SPEC 保存を独立責務として切り出す（v2:ADR-0123）。
+req-define で分離された Design 保存対象（`draft-data` の `artifact_actions` 内 `artifact: design` entry）を Design ファイルとして `docs/designs/` に保存、確定するコマンド。
+Design 対象 artifact_actions がある場合に実行する（全 work_type 対象、`work_type` による判定は廃止、v2:REQ-0138-009）。
+req-save の G02（Design 編集禁止）を緩和するものではなく、Design 保存を独立責務として切り出す（v2:ADR-0123）。
 
-**入力**: 要件doc（SPEC 対象 artifact_actions がある場合）
+**入力**: 要件doc（Design 対象 artifact_actions がある場合）
 
-**出力**: SPEC ファイル（`docs/specs/**/*.md`）。新規作成時は `status: draft` を付与
+**出力**: Design ファイル（`docs/designs/**/*.md`）。新規作成時は `status: draft` を付与
 
-**SPEC ライフサイクル**: SPEC は frontmatter `status`（`draft` / `accepted`）で成熟度を管理する。
-`draft`（spec-save で保存直後）→ `accepted`（case-close で実装が SPEC 内容を検証した旨を確認）の順で昇格する。
+**Design ライフサイクル**: Design は frontmatter `status`（`draft` / `accepted`）で成熟度を管理する。
+`draft`（design-save で保存直後）→ `accepted`（case-close で実装が Design 内容を検証した旨を確認）の順で昇格する。
 
-**スキップ条件**: `artifact: spec` entry がない、または旧形式 draft（`artifact_actions` フィールドなし）の場合はスキップし従来ワークフローで実行（後方互換）。
+**スキップ条件**: `artifact: design` entry がない、または旧形式 draft（`artifact_actions` フィールドなし）の場合はスキップし従来ワークフローで実行（後方互換）。
 
 ## case-open
 
@@ -76,7 +76,7 @@ Issue に基づいて実装し、PR を作成するコマンド。
 | フェーズ | 内容 |
 |----------|------|
 | 準備 | Issue 読取り、worktree 作成、Plan 策定 |
-| 実装 | 実装、テスト、docs/specs 整合性確認 |
+| 実装 | 実装、テスト、docs/designs 整合性確認 |
 | 提出 | コミット、PR 作成 |
 
 > **完了条件チェックボックスは case-close の責務**: case-run は完了条件チェックボックスの更新を case-close に委ねる（v2:ADR-0114）。
@@ -107,10 +107,10 @@ PR をマージし、Issue をクローズするコマンド。
 ### 完了前検証
 
 1. 未チェック項目の達成判定（達成済みなら `[x]` 更新）
-2. 要件、SPEC、README 索引の整合性確認
+2. 要件、Design、README 索引の整合性確認
 3. Decision 作成済みかの確認
 4. マージ済み PR 本文から検出事項/Intake 候補を回収し、Intake / Learning に分離して保存
-5. PR 本文の `## SPEC確定候補` から SPEC 確定フローを実行（SPEC status の draft → accepted 昇格、または spec-save 再起動の提案）
+5. PR 本文の `## Design確定候補` から Design 確定フローを実行（Design status の draft → accepted 昇格、または design-save 再起動の提案）
 
 ### Epic 自動クローズ
 
@@ -129,7 +129,7 @@ docs 更新責務は全 work_type 共通である（bugfix も含む。v2:REQ-01
 | maintenance | リファクタリング、保守作業 | `refactor`, `maintenance` | `refactor` |
 | docs_chore | ドキュメント、雑務 | `docs`, `chore` | `chore` |
 
-**工程分岐**: req_draft の `artifact_actions` に `artifact: req` / `artifact: decision` entry が含まれれば req-save が実行され、`artifact: spec` entry が含まれれば spec-save が実行される。
+**工程分岐**: req_draft の `artifact_actions` に `artifact: req` / `artifact: decision` entry が含まれれば req-save が実行され、`artifact: design` entry が含まれれば design-save が実行される。
 いずれの artifact_actions もない場合は case-open から開始する。
 
 ## 最大自走モード
@@ -141,13 +141,13 @@ docs 更新責務は全 work_type 共通である（bugfix も含む。v2:REQ-01
 
 入力要件docの `draft-data` の `artifact_actions` を読み取り、工程を動的判定する（`work_type` 固定分岐ではなく `artifact_actions` 存在による判定、v2:REQ-0138-009）:
 
-- **REQ/Decision artifact_actions あり**: `/agentdev/req-save` → `/agentdev/spec-save`（SPEC artifact_actions がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
-- **REQ/Decision artifact_actions なし**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` 、 `/agentdev/spec-save` をスキップ）
+- **REQ/Decision artifact_actions あり**: `/agentdev/req-save` → `/agentdev/design-save`（Design artifact_actions がある場合）→ `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`
+- **REQ/Decision artifact_actions なし**: `/agentdev/case-open` → `/agentdev/case-run` → `/agentdev/case-close`（`/agentdev/req-save` 、 `/agentdev/design-save` をスキップ）
 
 ### 自走対象
 
 リポジトリにファイルとして残る変更に限定する。
-GitHub Issue / PR / comment / merge / close、docs / REQ / Decision / SPEC / command reference / guide の更新を含む。
+GitHub Issue / PR / comment / merge / close、docs / REQ / Decision / Design / command reference / guide の更新を含む。
 migration ファイル、IaC ファイルの作成、修正も対象。
 
 

@@ -16,7 +16,7 @@ QG-2（[qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/refer
 
 ### Step 1: 対象成果物の同種既存例抽出
 
-同じ性質の成果物（同じ SPEC、同じ command、同じ種別のファイル等）で既存のものを抽出する。
+同じ性質の成果物（同じ Design、同じ command、同じ種別のファイル等）で既存のものを抽出する。
 
 - 例: Markdown ファイルの LF 数 → 同ディレクトリの既存 Markdown ファイル群
 - 例: command ファイル行数 → `src/opencode/commands/agentdev/` 配下の既存 command 群

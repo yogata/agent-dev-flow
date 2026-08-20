@@ -5,8 +5,6 @@ created: 2026-08-10
 updated: 2026-08-15
 ---
 
-<!-- canonical_owner: step-reference-contract / spec_logical_division: cross_cutting_contract（ACT-SPEC-002 rationale より） -->
-
 # STEP Reference Contract
 
 ## 目的

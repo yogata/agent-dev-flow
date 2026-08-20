@@ -1,15 +1,15 @@
 ---
-title: agentdev-doc-diagnostics SPEC
+title: agentdev-doc-diagnostics Design
 status: draft
 created: 2026-07-22
 updated: 2026-08-19
 ---
 
-# agentdev-doc-diagnostics SPEC
+# agentdev-doc-diagnostics Design
 
 docs 横断の診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを担う診断判断 skill の仕様を定める。
 
-> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
+> **リポジトリ内部設計文書**: 本 Design は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 
 ## 目的
@@ -34,7 +34,7 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`age
 
 - 診断対象の修正（読み取り専用、intake/inspect pipeline 経由でのみ修正）
 - promote 判断（`inspect-promote` の責務）
-- REQ、SPEC、RU の保存（各保存 command の責務）
+- REQ、Design、RU の保存（各保存 command の責務）
 - commit、push（command の責務）
 - Issue、PR 操作（case-* command の責務）
 - REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（`agentdev-req-structure-diagnostics` の責務）
@@ -43,7 +43,7 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`age
 
 ## 提供する判断・操作
 
-- docs 横断診断カテゴリの定義（廃止 REQ/SPEC 由来記述残置、REQ/SPEC 境界違反、REQ 粒度過小 等）
+- docs 横断診断カテゴリの定義（廃止 REQ/Design 由来記述残置、REQ/Design 境界違反、REQ 粒度過小 等）
 - 診断判定規則と証拠構造
 - 共通 finding 出力契約（`.agentdev/inspect/inbox/*.md`、severity 分類、信頼度）
 - 文書種別別診断へのルーティング表
@@ -53,10 +53,10 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、文意品質（`age
 
 inspect-docs の診断観点は正規の観点レジストリが所有する（REQ-028-014）。
 
-- **配置先**: `docs/designs/skills/agentdev-doc-diagnostics/references/perspective-registry.md`（本 SPEC の references 配下）
+- **配置先**: `docs/designs/skills/agentdev-doc-diagnostics/references/perspective-registry.md`（本 Design の references 配下）
 - **schema**: 各観点エントリは観点ID（一意）、診断カテゴリ（SPLIT、MERGE、MOVE、DUPLICATE、RETIRE、DRIFT、残余参照、境界違反等）、適用文書種別、正規所有者 skill、詳細参照の項目を持つ
 - 移管対応表（integrity-rule-catalog.md の inspect-docs 移管記録）で名指しされた観点は当該レジストリへ登録する
-- レジストリの追加、変更は本 schema に従い、本 SPEC が schema の正規所有者となる
+- レジストリの追加、変更は本 schema に従い、本 Design が schema の正規所有者となる
 
 ## 参照する references
 
@@ -80,13 +80,13 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
 
 - 診断対象の修正（読み取り専用、intake/inspect pipeline 経由でのみ修正）
 - promote 判断（`inspect-promote` の責務）
-- REQ、SPEC、RU の保存（各保存 command の責務）
+- REQ、Design、RU の保存（各保存 command の責務）
 - commit、push、Issue/PR 操作（command の責務）
 - REQ 固有診断、文意品質、探索順（各専門 skill の責務）
 
 ## 検証観点
 
-- 診断カテゴリ定義の完全性（廃止 REQ/SPEC 由来記述残置、REQ/SPEC 境界違反 等）
+- 診断カテゴリ定義の完全性（廃止 REQ/Design 由来記述残置、REQ/Design 境界違反 等）
 - 共通証拠構造と finding 出力契約の適合性
 - 文書種別別診断へのルーティング精度
 - 読み取り専用制約の遵守（許可副作用は `.agentdev/inspect/inbox/*.md` 生成と git 永続化のみ）

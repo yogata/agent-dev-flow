@@ -1,11 +1,11 @@
 ---
-title: `agentdev-quality-gates` SPEC
+title: `agentdev-quality-gates` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-18
 ---
 
-# `agentdev-quality-gates` SPEC
+# `agentdev-quality-gates` Design
 
 ## 目的
 
@@ -50,7 +50,7 @@ QG-2 は REQ-017 execution contract 確定を支援するため、次の検証�
 ### 検証項目
 
 (a) 変更予定成果物から導出される全ての必須品質能力が test strategy へ反映されていること。
-    対応表は artifact-quality-control-routing SPEC を正とする。
+    対応表は artifact-quality-control-routing Design を正とする。
 (b) 各 test strategy 項目が3要素（verification、pass_criteria、on_failure）を持つこと
     （REQ-008-048 の維持）。
 (c) 完了条件が成果状態であり、必須能力の呼出自体が完了状態とされていないこと
@@ -93,11 +93,11 @@ QG-4 の識別子中心評価の構造は維持する（固定値期待値化に
 - 各 Gate 固有の判定基準への適合
 - evidence-first 原則の遵守
 - 乖離分類（QG-3）の正確性
-- SPEC status 昇格（draft → accepted）と QG-4 の連携
+- Design status 昇格（draft → accepted）と QG-4 の連携
 
 ## See Also
 
-- [quality-gates.md](../quality/quality-gates.md)（SPEC 定義）
+- [quality-gates.md](../quality/quality-gates.md)（Design 定義）
 - [commands/req-define.md](../commands/req-define.md), [commands/req-save.md](../commands/req-save.md), [commands/case-open.md](../commands/case-open.md), [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（適用先）
-- REQ-001（REQ/SPEC 責務分離の徹底）
+- REQ-001（REQ/Design 責務分離の徹底）
 

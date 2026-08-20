@@ -1,21 +1,21 @@
 ---
-title: agentdev-artifact-validation SPEC
+title: agentdev-artifact-validation Design
 status: draft
 created: 2026-07-22
 updated: 2026-07-24
 ---
 
-# agentdev-artifact-validation SPEC
+# agentdev-artifact-validation Design
 
 複数文書種別で共有する決定的検証 script、共有ライブラリ、公開検証契約、JSON 結果契約を担う検証 skill の仕様を定める。
 
-> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
+> **リポジトリ内部設計文書**: 本 Design は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 
 ## 目的
 
-REQ/Decision/SPEC 操作で共有される決定的検証 script（frontmatter 整合性、エントリ存在確認、変更範囲検証）と共有ライブラリの正規所有者を一つに定め、兄弟 skill、command からの内部 script 直接参照を禁止し、公開検証契約への委譲を促す。
-REQ、Decision、SPEC 固有の内容判断を行わず、決定的検証のみを所有する検証 skill の責務、対象外、境界を定義する。
+REQ/Decision/Design 操作で共有される決定的検証 script（frontmatter 整合性、エントリ存在確認、変更範囲検証）と共有ライブラリの正規所有者を一つに定め、兄弟 skill、command からの内部 script 直接参照を禁止し、公開検証契約への委譲を促す。
+REQ、Decision、Design 固有の内容判断を行わず、決定的検証のみを所有する検証 skill の責務、対象外、境界を定義する。
 
 ## 適用対象
 
@@ -28,7 +28,7 @@ REQ、Decision、SPEC 固有の内容判断を行わず、決定的検証のみ�
 
 **DO NOT USE FOR**:
 
-- REQ、Decision、SPEC 固有の内容判断（各操作 skill の責務）
+- REQ、Decision、Design 固有の内容判断（各操作 skill の責務）
 - 文書の作成、更新、削除（各操作 skill の責務）
 - 保存、ユーザー承認、commit、push（各 command の責務）
 - REQ 番号、Decision 番号、要件行 ID の採番（`agentdev-req-file-manager`、`agentdev-decision-file-manager` の責務）
@@ -60,17 +60,17 @@ REQ、Decision、SPEC 固有の内容判断を行わず、決定的検証のみ�
 
 ## 境界
 
-REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `agentdev-decision-file-manager`、SPEC 固有 script は `agentdev-design-file-manager` が所有する。
+REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `agentdev-decision-file-manager`、Design 固有 script は `agentdev-design-file-manager` が所有する。
 利用側は本 skill の内部 script を直接参照せず、公開検証契約へ委譲する。
 同一 script または共有 lib を複製しない。
 
 ## 対象外
 
-- REQ、Decision、SPEC 固有の内容判断（各操作 skill の責務）
+- REQ、Decision、Design 固有の内容判断（各操作 skill の責務）
 - 文書の作成、更新、削除（各操作 skill の責務）
 - 保存、ユーザー承認、commit、push（command の責務）
 - REQ 番号、Decision 番号、要件行 ID の採番（REQ/Decision 操作 skill の責務）
-- target_area の検索（SPEC 操作 skill の責務）
+- target_area の検索（Design 操作 skill の責務）
 
 ## 検証観点
 
@@ -84,6 +84,6 @@ REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `
 
 - [agentdev-req-file-manager.md](agentdev-req-file-manager.md)（REQ 操作 skill、REQ 固有 script 所有）
 - [agentdev-decision-file-manager.md](agentdev-decision-file-manager.md)（Decision 操作 skill、Decision 固有 script 所有）
-- [agentdev-design-file-manager.md](agentdev-design-file-manager.md)（SPEC 操作 skill、SPEC 固有 script 所有）
+- [agentdev-design-file-manager.md](agentdev-design-file-manager.md)（Design 操作 skill、Design 固有 script 所有）
 - REQ-002-159（script 所有権の責務別配置）
 - REQ-001-029（決定的処理の script 委譲）

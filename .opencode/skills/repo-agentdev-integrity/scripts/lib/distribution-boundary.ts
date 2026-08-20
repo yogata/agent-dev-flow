@@ -1,6 +1,6 @@
 // Canonical side-effect-free distribution boundary detector — entry point.
 //
-// Stable implementation contract per docs/specs/integrity/distribution-boundary.md.
+// Stable implementation contract per docs/designs/integrity/distribution-boundary.md.
 // Performs classification only and performs NO filesystem or network I/O. All
 // enforcement layers (the existing checker adapter, the repo-local pre-write
 // plugin, the case-run/case-close final gate, the release archive

@@ -423,6 +423,9 @@ function checkObsoleteDesignPath(
   const failures: Failure[] = [];
   for (const f of files) {
     const rel = path.relative(root, f).replace(/\\/g, "/");
+    // docs/reports/ は監査・評価・観測記録（Report）であり、旧パスの履歴記述を正規内容として持つ。
+    // Design 現行成果物の検査対象外とする（Report 分離、専用例外登録は不要）。
+    if (rel.startsWith("docs/reports/")) continue;
     if (isIr057PathExempt(rel)) continue;
     const content = readText(f);
     if (!content) continue;
@@ -455,6 +458,8 @@ function checkLegacyVocab(
   const failures: Failure[] = [];
   for (const f of files) {
     const rel = path.relative(root, f).replace(/\\/g, "/");
+    // docs/reports/ は Report 領域のため旧語彙の履歴記述を正規内容として持つ（checkObsoleteDesignPath と同一理由で対象外）。
+    if (rel.startsWith("docs/reports/")) continue;
     if (isIr057PathExempt(rel)) continue;
     const content = readText(f);
     if (!content) continue;

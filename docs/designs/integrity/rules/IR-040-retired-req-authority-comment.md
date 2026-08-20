@@ -14,7 +14,7 @@ updated: 2026-08-20
 | severity | strict |
 | category | canonical-conflict |
 | detection_method | `<!-- ... REQ-0NNN ... -->` 形式の HTMLコメントから 廃止 REQ ID を抽出し、後継 現行 REQ への併記がないか検出 |
-| affected_artifacts | [REQ, SPEC, guides, ADR] |
+| affected_artifacts | [REQ, Design, guides, ADR] |
 | related_req | [REQ-001-063] |
 | related_design | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit, delta-guard |

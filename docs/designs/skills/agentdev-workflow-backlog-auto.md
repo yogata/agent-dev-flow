@@ -1,11 +1,11 @@
 ---
-title: agentdev-workflow-backlog-auto SPEC
+title: agentdev-workflow-backlog-auto Design
 status: accepted
 created: 2026-08-17
 updated: 2026-08-18
 ---
 
-# agentdev-workflow-backlog-auto SPEC
+# agentdev-workflow-backlog-auto Design
 
 ## 目的
 
@@ -49,7 +49,7 @@ backlog-auto command の workflow 実装本体。
 - 1系統でも blocked / failed / 未完了: backlog-review を開始せず、工程別結果と停止理由を報告する
 - 部分停止時に独立系統を連鎖停止しない
 
-系統別の結果状態は次の読み替え表に従って fan-in 判定へ入力する（SPEC 本文の契約として正規所有する）。
+系統別の結果状態は次の読み替え表に従って fan-in 判定へ入力する（Design 本文の契約として正規所有する）。
 
 | 子コマンドの報告状態 | fan-in 判定上の取扱い |
 |---|---|
@@ -60,7 +60,7 @@ backlog-auto command の workflow 実装本体。
 | failed（実行失敗、external failure） | failed |
 | 未完了（タイムアウト、中断） | 未完了 |
 
-直列化キューの実行単位（子ワークフロー定義の永続化ポイント = commit 単位）は各子 Workflow Skill の reference 詳細に従い、本 SPEC では再定義しない。
+直列化キューの実行単位（子ワークフロー定義の永続化ポイント = commit 単位）は各子 Workflow Skill の reference 詳細に従い、本 Design では再定義しない。
 
 ### resume 契約
 

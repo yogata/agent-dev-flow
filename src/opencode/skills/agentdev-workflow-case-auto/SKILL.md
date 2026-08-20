@@ -14,16 +14,16 @@ case-auto command は公開 interface（入出力契約・ガードレール）�
 ## 原本（SSoT）
 
 本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` SPEC が正規所有する。
+Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` Design が正規所有する。
 extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と case-auto command の公開契約のみを前提とする。SPEC ディレクトリの内部構成は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と case-auto command の公開契約のみを前提とする。Design ディレクトリの内部構成は仮定しない
 2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
+3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 入力
@@ -41,7 +41,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-case-auto.yaml`）は
 - bg task API による stage 2 並列起動（最大5件）
 - GitHub Issue/PR/comment/merge/close（自走対象、command 不変条件）
 - remote branch 削除（当該 case-auto/ case-run が作成した branch に限定、G05）
-- docs/ REQ/ ADR/ SPEC/ command reference/ guide の更新（自走対象、command 不変条件）
+- docs/ REQ/ ADR/ Design/ command reference/ guide の更新（自走対象、command 不変条件）
 - 当該 Workflow Skill は worktree root 配下以外を編集しない
 
 ## Control Plane（STEP 一覧）
@@ -89,7 +89,7 @@ case-auto workflow は次の8 STEP で構成する。
 - `agentdev-workflow-req-save`: req-save 工程（委譲起動、委譲先 subagent が権威情報源として読み込む）
 - `agentdev-workflow-design-save`: design-save 工程（同上）
 - `agentdev-workflow-case-open`: case-open 工程（同上）
-- `agentdev-workflow-case-run`: case-run 工程（case-auto 自身がインライン実行の読込主体として読み込む、起動手段は harness 分離モデル SPEC 参照）
+- `agentdev-workflow-case-run`: case-run 工程（case-auto 自身がインライン実行の読込主体として読み込む、起動手段は harness 分離モデル Design 参照）
 - `agentdev-workflow-case-close`: case-close 工程（委譲起動、委譲先 subagent が権威情報源として読み込む）
 
 ## 主要 Capability Skill 連携
@@ -120,7 +120,7 @@ case-auto workflow は次の8 STEP で構成する。
 - **委譲・参照制約（command 不変条件、ガードレール G16）**: 各工程は対応するコマンド定義を authoritative source として実行（case-auto 定義内再実装回避）。case-run はインライン実行（標準動作、AG-{NNN}）。Epic Issue 本文書き込みは case-close 単一書き手（case-auto は読取のみ、G16）。case-auto は Issue 階層決定ロジックを持たない、Epic Issue 化の判定に関与しない（command 不変条件）
 - **3つの「5件」文脈の区別**: (1) case-run Wave 内子 Issue 並列、(2) case-auto Phase 2 同時起動数、(3) execution_unit 全体並列（上限なし）。混同しない
 - **OU処理ループ**: Standard flow の case-close 完了後に未処理 OU が残存する場合は次 OU の処理を STEP-3 から開始（全 OU 処理完了時のみ全体完了報告）
-- **実証Case認識と評価ブランチ伝播**: 実証Caseを draft-data の実証情報（実証Caseであること、評価契約、評価ブランチ識別情報）または Issue 等の永続情報の実証Case識別情報から復元し、通常Caseと区別する。実証Caseは復元した評価ブランチを統合先として全工程（req-save、design-save、case-open、case-run、case-close）へ一貫して伝播する。同時に複数実証を処理する場合はそれぞれ異なる評価ブランチを利用する。実証であることだけを理由に req-save / design-save を省略せず、評価ブランチ上で実行する。通常Caseの既存挙動は維持する（実証Case自走の実行詳細は case-auto command SPEC（project extension 経由参照）「実証Case自走」節参照）
+- **実証Case認識と評価ブランチ伝播**: 実証Caseを draft-data の実証情報（実証Caseであること、評価契約、評価ブランチ識別情報）または Issue 等の永続情報の実証Case識別情報から復元し、通常Caseと区別する。実証Caseは復元した評価ブランチを統合先として全工程（req-save、design-save、case-open、case-run、case-close）へ一貫して伝播する。同時に複数実証を処理する場合はそれぞれ異なる評価ブランチを利用する。実証であることだけを理由に req-save / design-save を省略せず、評価ブランチ上で実行する。通常Caseの既存挙動は維持する（実証Case自走の実行詳細は case-auto command Design（project extension 経由参照）「実証Case自走」節参照）
 - **実証Caseの完了扱いと評価ブランチ保持**: 評価ブランチへの squash merge を正常なCase完了として扱う。採用でも評価ブランチを main へ merge せず、同一実行内で正式化・本実装へ自動継続せず、実証全体の最終 case-close を当該実行の正常終了点とする。Epic 実証の各 Wave の case-run → case-close は同じ評価ブランチ上で反復する。blocked / failed / ユーザー中断時に再開可能なら評価ブランチを保持し、実証の明示的な終了・放棄時のみ必要な記録後に破棄する。評価契約を自律変更しない。ユーザーが評価契約変更を明示した場合は変更履歴と既存結果への影響を保持し、必要な再評価または再実行を継続する
 - **実証Case自走の最終出力**: 最終出力に評価結果、実証Issue、主要PRまたは証拠、main 未反映であること、次の req-define <実証Issue> を示す。実証全体の完了時のみ正式化案内を示す。blocked / failed 等で実証が未完のまま終了する場合は評価結果を未確定として再開手段を示す。Epic 実証の中間Wave完了を実証全体完了と誤認せず正式化案内を出さない
 - **親コンテキスト非累積（command 不変条件）**: 委譲工程の完了結果（Issue/PR番号、pass/warn/fail）のみを親コンテキストに保持し、委譲工程内部の調査過程、中間ログ、読解メモを親コンテキストに累積しない
@@ -128,8 +128,8 @@ case-auto workflow は次の8 STEP で構成する。
 
 ## See Also
 
-- **`<workflows/workflow-skill-model>` SPEC**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` SPEC**: STEP reference 構造、resume point
+- **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
+- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **`docs/decisions/DEC-{N}.md`**: case-auto の限定的親判断解決（bounded parent decision resolution）

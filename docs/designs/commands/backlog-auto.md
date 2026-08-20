@@ -1,11 +1,11 @@
 ---
-title: backlog-auto SPEC
+title: backlog-auto Design
 status: accepted
 created: 2026-08-17
 updated: 2026-08-17
 ---
 
-# backlog-auto SPEC
+# backlog-auto Design
 
 ## 目的
 
@@ -40,9 +40,9 @@ updated: 2026-08-17
 ## 現在の動作
 
 - 実行順序は inspect-docs → 昇格3系統（learning-promote、intake-promote、inspect-promote）→ backlog-review の順とし、工程間の開始条件ゲートを制御する
-- workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約）は Workflow Skill（`agentdev-workflow-backlog-auto`）が所有し、本 SPEC はこれらを複製しない
+- workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約）は Workflow Skill（`agentdev-workflow-backlog-auto`）が所有し、本 Design はこれらを複製しない
 
-## 参照する横断 SPEC
+## 参照する横断 Design
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類、共通実行契約）
 - [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（orchestration stage モデル）

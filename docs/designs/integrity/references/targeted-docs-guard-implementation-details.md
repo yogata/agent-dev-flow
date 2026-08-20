@@ -8,16 +8,16 @@ updated: 2026-08-20
 # Targeted Docs Guard 実装詳細参照
 
 > 本ファイルは `docs/designs/integrity/targeted-docs-guard-implementation.md` から移管した実装詳細（Phase 1-6 実装計画、report フィールド一覧、完了済みの移行作業）を保持する。
-> SPEC 本体は契約のみを残し、実装計画と完了済み作業経緯は本ファイルへ分離した。
+> Design 本体は契約のみを残し、実装計画と完了済み作業経緯は本ファイルへ分離した。
 
 ## Phase1-6 実装計画
 
 check_changed_docs.ts 中心の変更文書限定検査契約を Phase 1-6 で成熟させる。
 コマンドと check_changed_docs.ts の責務分担（コマンドが対象確定、check_changed_docs.ts が検査実行）、評価対象はフォーマット検査に限定（意味評価しない）を基本方針とする。
 
-### Phase 1: SPEC 配置
+### Phase 1: Design 配置
 
-- check_changed_docs.ts の変更文書限定検査契約は、挙動SPEC（entry/対象解決/profile/validator呼出/report契約/exit code）、カタログSPEC（TargetedDocsReport 型定義、workflow profile 定義）、実装詳細SPEC（validator内部アルゴリズム、分割基準）に配置されること。
+- check_changed_docs.ts の変更文書限定検査契約は、挙動Design（entry/対象解決/profile/validator呼出/report契約/exit code）、カタログDesign（TargetedDocsReport 型定義、workflow profile 定義）、実装詳細Design（validator内部アルゴリズム、分割基準）に配置されること。
 - 個別判定条件は IR-*.md に配置されること。
 
 ### Phase 2: report 契約固定
@@ -40,7 +40,7 @@ usage メッセージ、--help 出力で区切り形式を明示すること。
 ### Phase 4: コマンド別最小監査範囲
 
 - req-save/design-save/case-run/case-close の各コマンドが、対象ファイル種別に応じた最小監査範囲を定義すること。
-- 各コマンド SPEC と integrity-contracts.md の Workflow×ツールマトリックス表が SSoT であること。
+- 各コマンド Design と integrity-contracts.md の Workflow×ツールマトリックス表が SSoT であること。
 - case-run/case-close は永続文書更新を契機に検査すること。
 
 ### Phase 5: 回帰テスト
@@ -50,7 +50,7 @@ usage メッセージ、--help 出力で区切り形式を明示すること。
 
 ### Phase 6: validator 分割基準
 
-- validator の分割基準が実装詳細SPEC に文書化されること。
+- validator の分割基準が実装詳細Design に文書化されること。
 - 分割基準は validator の責務境界、ファイルサイズ上限、関心分離ルールを含むこと。
 
 ## report フィールド一覧
@@ -77,21 +77,21 @@ check_changed_docs.ts の report JSON に含まれる全フィールドを列挙
 TargetedDocsReport 型契約の正本は `docs/designs/integrity/integrity-contracts.md` TargetedDocsReport 型契約節である。
 本表は実装参照用途のフィールド一覧である。
 
-## 旧SPEC直下配置前提の除去（完了済み）
+## 旧Design直下配置前提の除去（完了済み）
 
-旧SPEC直下配置前提の除去対応（v2:REQ-0158 より移管、完了済み）。
+旧Design直下配置前提の除去対応（v2:REQ-0158 より移管、完了済み）。
 
-- design-save.md（原本）と `docs/designs/commands/design-save.md`（SPEC）に残存する旧SPEC直下配置前提（`docs/designs/*.md`、`docs/designs/{topic-slug}.md`、`docs/designs/<existing-spec>.md`、SPEC 用 `new:{topic-slug}`）を廃止した。
-- 新表現として `docs/designs/{domain}/{topic-slug}.md`、`docs/designs/**/*.md`、`target_spec: {operation, domain, slug}` 構造化へ寄せた。
-- `docs/designs/README.md` の SPEC 配置表現（`specs/*.md`）を `specs/**/*.md` またはドメイン分割説明へ更新した。
-- SPEC 配下の二系統（実行単位: commands/skills/workflows、基盤: foundations/responsibilities/quality/integrity/local/authoring）を説明に含めた。
+- design-save.md（原本）と `docs/designs/commands/design-save.md`（Design）に残存する旧Design直下配置前提（`docs/designs/*.md`、`docs/designs/{topic-slug}.md`、`docs/designs/<existing-spec>.md`、Design 用 `new:{topic-slug}`）を廃止した。
+- 新表現として `docs/designs/{domain}/{topic-slug}.md`、`docs/designs/**/*.md`、`target_design: {operation, domain, slug}` 構造化へ寄せた。
+- `docs/designs/README.md` の Design 配置表現（`designs/*.md`）を `designs/**/*.md` またはドメイン分割説明へ更新した。
+- Design 配下の二系統（実行単位: commands/skills/workflows、基盤: foundations/responsibilities/quality/integrity/local/authoring）を説明に含めた。
 - requirements/adr 配下の歴史記載（履歴マーカー付き）は例外として更新対象外とした。
 
 ## repo-agentdev-integrity の docs/designs/**/*.md 再帰対応（完了済み）
 
 check_integrity.ts 側の対応（v2:REQ-0158 より移管、完了済み）。
 
-- `collectAllArtifactPaths`、`checkSpecReadmeIndexSync`、`checkUpdateNotesInDocs`、`scanned.Specs`、SPEC inventory 生成・照合処理を `docs/designs/*.md`（直下）から `docs/designs/**/*.md`（再帰）へ更新した。
-- SPEC本文の検査では `docs/designs/README.md` を除外する。
-- SPEC inventory/status 同期検査では `docs/designs/README.md` を対象とする。
-- SPEC 一覧との照合では SPEC status の重複確認ではなく、入口・読み込み契約との整合を確認する。
+- `collectAllArtifactPaths`、`checkSpecReadmeIndexSync`、`checkUpdateNotesInDocs`、`scanned.Specs`、Design inventory 生成・照合処理を `docs/designs/*.md`（直下）から `docs/designs/**/*.md`（再帰）へ更新した。
+- Design本文の検査では `docs/designs/README.md` を除外する。
+- Design inventory/status 同期検査では `docs/designs/README.md` を対象とする。
+- Design 一覧との照合では Design status の重複確認ではなく、入口・読み込み契約との整合を確認する。

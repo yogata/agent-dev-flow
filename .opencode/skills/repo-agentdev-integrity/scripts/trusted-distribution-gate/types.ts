@@ -73,7 +73,7 @@ export interface GitTreeEntry {
 // ---------------------------------------------------------------------------
 
 /**
- * Canonical projection labels per docs/specs/integrity/distribution-boundary.md
+ * Canonical projection labels per docs/designs/integrity/distribution-boundary.md
  * §58-67. The public manifest model exposes exactly these four projections;
  * runtime/bootstrap are internal source subsets and never appear as a public
  * projection label.

@@ -14,7 +14,7 @@ updated: 2026-08-20
 | severity | heuristic |
 | category | canonical-conflict |
 | detection_method | 現行 docs 内の 廃止 ADR 参照検出、コンテキスト判定 |
-| affected_artifacts | [REQ, SPEC, guides] |
+| affected_artifacts | [REQ, Design, guides] |
 | related_req | [REQ-001-048, REQ-001-050] |
 | related_design | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |

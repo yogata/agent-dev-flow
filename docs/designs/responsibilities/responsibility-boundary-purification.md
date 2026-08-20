@@ -8,7 +8,7 @@ updated: 2026-07-27
 # 責務境界浄化: 所有/非所有リスト詳細
 
 AgentDevFlow 配布物と harness 実行制御の責務境界を、所有対象と非所有対象のリストによって明示化する。
-原則は REQ-002 を SSoT とし、本 SPEC は各工程（case-auto, case-run, execution adapter, Project Extensions, タイムスタンプ）ごとの所有/非所有リストの詳細を集約する。
+原則は REQ-002 を SSoT とし、本 Design は各工程（case-auto, case-run, execution adapter, Project Extensions, タイムスタンプ）ごとの所有/非所有リストの詳細を集約する。
 判定根拠は v2:ADR-0136（配布物の harness 実行制御分離）。
 
 ## 責務境界浄化: 所有/非所有リスト詳細
@@ -84,11 +84,11 @@ case 実行に関わる責務を 4 用語へ分解し、正規所有者を固定
 
 ### 修飾なし Phase の除去
 
-- 永続文書（REQ、Decision、SPEC、guide）の規範記述で修飾なしの「Phase」を使用しない
+- 永続文書（REQ、Decision、Design、guide）の規範記述で修飾なしの「Phase」を使用しない
 - 「Phase」は orchestration stage、case-run internal lifecycle など修飾付きの用語へ置き換える
 - 既存の「Phase 1 case-open 順次、Phase 2 case-run 並列、Phase 3 case-close 順次」は「orchestration stage 1 case-open 順次、stage 2 case-run 並列、stage 3 case-close 順次」へ置き換える
 
-### 関連 SPEC（参照レベル、別途 design-save 対象）
+### 関連 Design（参照レベル、別途 design-save 対象）
 
 - `workflows/delegation-contracts.md`: 委譲契約で 4 用語を使用
 - `foundations/harness-separation-model.md`: harness execution mechanism の ADF 規範所有対象外を明記
@@ -97,7 +97,7 @@ case 実行に関わる責務を 4 用語へ分解し、正規所有者を固定
 
 ## 横断的再評価基準
 
-現行 REQ 群、現行 SPEC 群を新基準（ステークホルダー視点、4妥当性基準、SPEC 5区分論理、関心キー所有、分類根拠伝播）で横断的に再評価する基準を定める（REQ-001）。
+現行 REQ 群、現行 Design 群を新基準（ステークホルダー視点、4妥当性基準、Design 5区分論理、関心キー所有、分類根拠伝播）で横断的に再評価する基準を定める（REQ-001）。
 本節は基準定義までを対象とし、全件再評価の実施は別途 case-open/case-run 工程で行う。
 
 ### REQ 再評価基準（ステークホルダー視点、4妥当性基準）
@@ -113,26 +113,26 @@ case 実行に関わる責務を 4 用語へ分解し、正規所有者を固定
 
 安定契約例外（REQ-001-069）に該当する要件行は再評価の対象外とする。
 
-### SPEC 再評価基準（主論理区分、正規所有対象、重複責務、実装/履歴混入）
+### Design 再評価基準（主論理区分、正規所有対象、重複責務、実装/履歴混入）
 
-現行 SPEC 全件について、主論理区分、正規所有対象、重複責務、不適切な実装計画または履歴記述の評価を実施する:
+現行 Design 全件について、主論理区分、正規所有対象、重複責務、不適切な実装計画または履歴記述の評価を実施する:
 
 | 評価観点 | 適合基準 |
 |---|---|
-| 主論理区分 | v2:REQ-0155-009 の5区分（挙動SPEC、カタログSPEC、横断契約SPEC、パラメータSPEC、実装詳細SPEC）のいずれかが frontmatter または冒頭宣言節で宣言されている |
+| 主論理区分 | v2:REQ-0155-009 の5区分（挙動Design、カタログDesign、横断契約Design、パラメータDesign、実装詳細Design）のいずれかが frontmatter または冒頭宣言節で宣言されている |
 | 正規所有対象 | 対象 command、skill、workflow、品質ルール、整合性ルール等の関心キーが宣言されている（REQ-001-013、REQ-003-038） |
-| 重複責務 | 同一関心キーに対する複数 SPEC の正規所有宣言がない |
-| 実装/履歴混入 | 実装計画、マイルストーン、完了履歴が SPEC へ混入していない |
+| 重複責務 | 同一関心キーに対する複数 Design の正規所有宣言がない |
+| 実装/履歴混入 | 実装計画、マイルストーン、完了履歴が Design へ混入していない |
 
 ### パターンベース是正の指針
 
-横断的再評価は局所的な文言修正ではなく、同型の責任分界違反を全現行 REQ/SPEC へ横断適用するパターンベース是正とする。
+横断的再評価は局所的な文言修正ではなく、同型の責任分界違反を全現行 REQ/Design へ横断適用するパターンベース是正とする。
 同型違反の検出→是正候補のリストアップ→個別 case（Issue/PR）での実施、という流れで行う。
 
 ### 後方互換運用
 
 分類メタデータ（主論理区分、正規所有対象、分類根拠）の宣言は段階適用とする（REQ-001-035）。
-宣言形式未完了の既存 SPEC は警告モードで経過観察し、欠落により拒否しない（soft-contract、DEC-003）。
+宣言形式未完了の既存 Design は警告モードで経過観察し、欠落により拒否しない（soft-contract、DEC-003）。
 既存の採用済み成果物、RU、req_draft を宣言欠落により拒否しない。
 
 ## 関連情報

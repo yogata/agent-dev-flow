@@ -273,5 +273,5 @@ STEP-8 の status 変更を commit 対象に含める。
 - Design status の整合性（新規作成時 `status: draft`、既存追記時 `status` 変更なし）
 - インデックスの整合性（`docs/designs/README.md` エントリと新規 Design の一致、STEP-6 の `check-entry-existence.ts` 結果）
 - 変更範囲の妥当性（STEP-9 の `check-change-impact.ts` 結果）
-- 宣言付与の整合性（CREATE で `spec_logical_division` と `canonical_owner` が frontmatter または冒頭宣言節へ付与、UPDATE で `unknown` 以外確定時に補完）
+- 配置一貫性検証入力の整合性（`canonical_owner` が `unknown`・欠落時に警告付き継続、Design ファイルの基本frontmatterは `title`、`status`、`created`、`updated` の4キー）
 - 内容の品質（Design 分離基準適合性等）は再検証しない（req-define の QG-1 の責務。STEP-4 の最終確認は分離基準の最終チェックであり内容品質の再審査ではない）

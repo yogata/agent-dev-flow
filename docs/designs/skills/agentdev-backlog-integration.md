@@ -1,11 +1,11 @@
 ---
-title: `agentdev-backlog-integration` SPEC
+title: `agentdev-backlog-integration` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
 
-# `agentdev-backlog-integration` SPEC
+# `agentdev-backlog-integration` Design
 
 ## 目的
 
@@ -61,8 +61,8 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 ## adversarial-review 候補判断と内部挿入
 
 本節は backlog-review 経路E（REQ-015）における adversarial-review の候補判断基準と内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）を正典として所有する（REQ-014-011）。
-共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は domain skill 固有の判断基準、内部手続きのみを所有する。
-挿入境界（発動条件、Step 構造、順序）の正規所有者は backlog-review command SPEC であり、本節は再定義せず参照する。
+共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は domain skill 固有の判断基準、内部手続きのみを所有する。
+挿入境界（発動条件、Step 構造、順序）の正規所有者は backlog-review command Design であり、本節は再定義せず参照する。
 
 ### 候補判断基準
 
@@ -88,16 +88,16 @@ review 対象の RU 構成案は backlog-review command Step 4（統合・分割
 
 adversarial-review の呼出は、Step 4 完了後、Step 5（矛盾検出）開始前に挿入する（REQ-015-008 構成→review→承認の順）。
 ユーザー承認（Step 4 承認 / Step 5 矛盾検出時追加判断）の前に review を実行し、review 結果を踏まえて承認段階へ進む。
-呼出タイミングの正規所有者は backlog-review command SPEC であり、本節は参照レベルに留める。
+呼出タイミングの正規所有者は backlog-review command Design であり、本節は参照レベルに留める。
 
 #### 矛盾検出への引き渡し
 
-adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は本 SPEC「提供する判断、操作」節の矛盾検出ロジック、reference `integration-judgment.md`「矛盾検出 + ユーザー承認」節（既存矛盾検出）へ引き渡す。
+adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は本 Design「提供する判断、操作」節の矛盾検出ロジック、reference `integration-judgment.md`「矛盾検出 + ユーザー承認」節（既存矛盾検出）へ引き渡す。
 adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛盾の判定、partial success 扱い、ユーザー追加判断への委ね（REQ-003-009）は既存矛盾検出ロジックが正である。
 
 ### 副作用境界と委譲契約
 
-adversarial-review は delegation-contracts SPEC の `semantic_review`（書き込み禁止型）として適用する。
+adversarial-review は delegation-contracts Design の `semantic_review`（書き込み禁止型）として適用する。
 許可操作は `read_files`、`inspect_content`、`return_summary`、`return_evidence`、`return_artifact_body_when_requested` に限定し、`file_write`、`issue_pr_update`、`commit`、`push`、`user_confirmation` を forbidden とする（REQ-014-004）。
 審議結果は中間成果として呼出元へ返却し、新規正規 artifact を生成しない（REQ-014-005）。
 
@@ -105,6 +105,6 @@ adversarial-review は delegation-contracts SPEC の `semantic_review`（書き�
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、backlog-review command SPEC「adversarial-review 挿入境界（経路E）」節との間で意味の重複、矛盾を生じない。
-挿入境界、発動条件、順序は backlog-review command SPEC を正とし、本節は domain skill 固有の候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）のみを所有する。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、backlog-review command Design「adversarial-review 挿入境界（経路E）」節との間で意味の重複、矛盾を生じない。
+挿入境界、発動条件、順序は backlog-review command Design を正とし、本節は domain skill 固有の候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）のみを所有する。
 

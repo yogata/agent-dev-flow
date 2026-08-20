@@ -1,11 +1,11 @@
 ---
-title: `agentdev-conventional-commits` SPEC
+title: `agentdev-conventional-commits` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
 
-# `agentdev-conventional-commits` SPEC
+# `agentdev-conventional-commits` Design
 
 ## 目的
 

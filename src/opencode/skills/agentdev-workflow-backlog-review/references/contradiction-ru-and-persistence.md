@@ -61,7 +61,7 @@ RU を生成し、RU 生成が成功した採用済み成果物のみを削除�
 
 - STEP-5 で承認確定した RU 構成案、STEP-6 の矛盾検出結果（durable state: promoted/ 実ファイル、RU-ID）
 - RU 生成ルール、frontmatter スキーマ、depends_on 検証は `agentdev-backlog-integration` の公開操作契約に従う
-- session由来RU の生成形式は一時成果物ライフサイクル要件と artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」セクションを正規原本とする
+- session由来RU の生成形式は一時成果物ライフサイクル要件と artifact-contracts Design「RU アーティファクト契約（session由来RU）」セクションを正規原本とする
 
 ### Preconditions
 
@@ -71,7 +71,7 @@ RU を生成し、RU 生成が成功した採用済み成果物のみを削除�
 ### Procedure
 
 1. RU 構成案に基づき `.agentdev/backlog/req-units/RU-*.md` を生成する（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）
-2. session由来RU（`source_type: chat`、`generated_by: session`）の場合は、正規原本（一時成果物ライフサイクル要件、artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」）へ委譲した要件（二段階承認、frontmatter 必須フィールド、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）に従う
+2. session由来RU（`source_type: chat`、`generated_by: session`）の場合は、正規原本（一時成果物ライフサイクル要件、artifact-contracts Design「RU アーティファクト契約（session由来RU）」）へ委譲した要件（二段階承認、frontmatter 必須フィールド、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）に従う
 3. depends_on 検証を実行する（RU-ID のみ許容、unresolved、循環の検証）
 4. RU 生成が成功した採用済み成果物のみを削除する。
 削除条件は当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ。

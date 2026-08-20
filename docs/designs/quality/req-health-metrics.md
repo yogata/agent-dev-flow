@@ -8,12 +8,12 @@ updated: 2026-07-24
 # REQ 健全性メトリクス
 
 REQ の肥大化、関心ズレを定量的に検出するための閾値を定義する（REQ-001-040）。
-`req-define` の Step 3（既存 REQ 照合）、Step 10-2（統合/分離判定）、`inspect-docs`、`agentdev-req-structure-diagnostics` スキルが本 SPEC を参照して SPLIT 予兆を判定する。
+`req-define` の Step 3（既存 REQ 照合）、Step 10-2（統合/分離判定）、`inspect-docs`、`agentdev-req-structure-diagnostics` スキルが本 Design を参照して SPLIT 予兆を判定する。
 
 ## 適用範囲
 
 - **対象**: 現行 REQ ファイル（`docs/requirements/REQ-NNNN.md`）の要件テーブル行（`| REQ-NNNN-MMM | ... |`）。目的、適用範囲セクションの散文は計測対象外
-- **対象外**: 廃止 REQ、draft、SPEC、Decision、guides
+- **対象外**: 廃止 REQ、draft、Design、Decision、guides
 
 ## 測定対象と計測方法
 
@@ -62,12 +62,12 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | 1〜2 | +0 | 単一〜隣接アーティファクト責務。健全 |
 | 3 以上 | +1 | 複数アーティファクト種別への影響。責務分界の再検討候補 |
 
-### SPEC 分離基準違反（high-specificity signal）
+### Design 分離基準違反（high-specificity signal）
 
-`agentdev-req-structure-diagnostics` スキルの SPEC 分離基準違反シグナル（`req-structure-review.md`「SPEC 分離基準違反検出」）は、1 シグナルでも検出された場合 SPLIT シグナル +1 として扱う。
+`agentdev-req-structure-diagnostics` スキルの Design 分離基準違反シグナル（`req-structure-review.md`「Design 分離基準違反検出」）は、1 シグナルでも検出された場合 SPLIT シグナル +1 として扱う。
 これは要件行数、関心分類数とは独立に加算する。
 
-安定契約例外（REQ-001-069、`document-model.md`「安定契約の例外」）に該当する要件行は、SPEC 分離基準違反の検出対象外とする。
+安定契約例外（REQ-001-069、`document-model.md`「安定契約の例外」）に該当する要件行は、Design 分離基準違反の検出対象外とする。
 
 ## 推奨アクションへの対応付け
 
@@ -79,12 +79,12 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | 2 | SPLIT 検討 | APPEND の前にユーザーへ SPLIT 要否を提案 |
 | 3 以上 | SPLIT 推奨 | SPLIT を強く推奨。APPEND の場合は理由を明記 |
 
-`agentdev-req-structure-diagnostics` スキルのシグナル閾値（1 シグナル=観察メモ、2 シグナル=問題候補、3 シグナル=高優先度）と本 SPEC の閾値は整合する。
-同スキルの判定結果出力スキーマ（観点、対象、根拠、シグナル数、確信度、推奨アクション、req-define 入力案）に本 SPEC のシグナル計算結果を埋め込む。
+`agentdev-req-structure-diagnostics` スキルのシグナル閾値（1 シグナル=観察メモ、2 シグナル=問題候補、3 シグナル=高優先度）と本 Design の閾値は整合する。
+同スキルの判定結果出力スキーマ（観点、対象、根拠、シグナル数、確信度、推奨アクション、req-define 入力案）に本 Design のシグナル計算結果を埋め込む。
 
 ## 現行 REQ の計測例（参照値）
 
-本 SPEC の閾値を現行 REQ に適用した結果の参照値。
+本 Design の閾値を現行 REQ に適用した結果の参照値。
 定期計測時の推移比較に使用する。
 
 <!-- AUTOGEN:BEGIN:id=req-metrics-measurement-example -->
@@ -132,36 +132,36 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 
 要件行数は要件テーブル行のみをカウント（目的、適用範囲セクションの散文は除外）。
 
-## 他 SPEC、スキルとの関係
+## 他 Design、スキルとの関係
 
-- **`document-model.md` SPEC 分離基準（REQ-001-068）**: SPEC 分離基準違反シグナルの判定基準。本 SPEC は閾値とシグナル加算のみを定義し、SPEC 分離の判定本体は `document-model.md` に従う
-- **`document-model.md` 安定契約の例外（REQ-001-069）**: 安定契約例外の定義。本 SPEC の SPEC 分離基準違反検出はこの例外を尊重する
-- **`agentdev-req-structure-diagnostics` スキル `req-structure-review.md`**: 6 観点診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と SPEC 分離基準違反の 9 シグナル定義。本 SPEC の閾値はこのスキルの SPLIT 観点の入力
+- **`document-model.md` Design 分離基準（REQ-001-068）**: Design 分離基準違反シグナルの判定基準。本 Design は閾値とシグナル加算のみを定義し、Design 分離の判定本体は `document-model.md` に従う
+- **`document-model.md` 安定契約の例外（REQ-001-069）**: 安定契約例外の定義。本 Design の Design 分離基準違反検出はこの例外を尊重する
+- **`agentdev-req-structure-diagnostics` スキル `req-structure-review.md`**: 6 観点診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と Design 分離基準違反の 9 シグナル定義。本 Design の閾値はこのスキルの SPLIT 観点の入力
 - **`req-impact-map.md`**: アーティファクト種別数の計測に使用する「影響するアーティファクト」列
-- **`integrity-rule-catalog.md` IR-044**: REQ/SPEC 境界違反検出。本 SPEC の SPEC 分離基準違反シグナルと連動する
+- **`integrity-rule-catalog.md` IR-044**: REQ/Design 境界違反検出。本 Design の Design 分離基準違反シグナルと連動する
 
 ## 機械化境界
 
-本 SPEC は閾値の定義のみを提供し、計測、判定の実装は以下が担う:
+本 Design は閾値の定義のみを提供し、計測、判定の実装は以下が担う:
 
 - **req-define Step 3/10-2**: ドラフト段階で SPLIT シグナルを計算し `draft-meta.split-forecast` に記録（REQ-001-011）
-- **agentdev-req-structure-diagnostics スキル**: 既存 REQ の健全性診断で本 SPEC の閾値を適用
-- **生成スクリプト**（`.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`）: 本 SPEC の「現行 REQ の計測例（参照値）」テーブルを実ファイルから再生成する（SC-002）。定期実行を前提とし、計測結果を実ファイルの最新状態に追従させる
+- **agentdev-req-structure-diagnostics スキル**: 既存 REQ の健全性診断で本 Design の閾値を適用
+- **生成スクリプト**（`.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`）: 本 Design の「現行 REQ の計測例（参照値）」テーブルを実ファイルから再生成する（SC-002）。定期実行を前提とし、計測結果を実ファイルの最新状態に追従させる
 
-本 SPEC 自体は計測ロジックを実装しない。
-閾値の変更は本 SPEC の更新をもって正とし、各実装は本 SPEC を参照する。
+本 Design 自体は計測ロジックを実装しない。
+閾値の変更は本 Design の更新をもって正とし、各実装は本 Design を参照する。
 
 ## REQ 横断診断
 
-REQ 健全性診断は行数・関心数に加え、ステークホルダー視点（REQ-001-079）と SPEC 分離基準（REQ-001-068）に基づく次の検出パターンを追加する（REQ-036-009、REQ-001）。
+REQ 健全性診断は行数・関心数に加え、ステークホルダー視点（REQ-001-079）と Design 分離基準（REQ-001-068）に基づく次の検出パターンを追加する（REQ-036-009、REQ-001）。
 
 ### 検出パターン
 
 | パターン | 内容 | SPLIT シグナル計算への反映 |
 |---|---|---|
-| ステークホルダー不在要件 | 主語がステークホルダーでなく内部成果物、または要求元ステークホルダーが不明（REQ-001-079 違反） | SPEC 分離基準違反シグナルと同様に +1 |
+| ステークホルダー不在要件 | 主語がステークホルダーでなく内部成果物、または要求元ステークホルダーが不明（REQ-001-079 違反） | Design 分離基準違反シグナルと同様に +1 |
 | 内部成果物主語要件 | 内部成果物（command、skill、script、ファイル）だけを主語とする要件 | +1 |
-| パラメータ主題要件 | パス、フィールド、enum、閾値、内部アルゴリズムを主題とする要件（REQ-001-068 SPEC 分離基準違反） | SPEC 分離基準違反シグナルとして既存 +1 |
+| パラメータ主題要件 | パス、フィールド、enum、閾値、内部アルゴリズムを主題とする要件（REQ-001-068 Design 分離基準違反） | Design 分離基準違反シグナルとして既存 +1 |
 | 作業履歴主題要件 | 作業履歴または是正結果を主題とする要件 | +1 |
 | 要件行なしREQ | 要件テーブルが空、または目的・適用範囲のみで要件行を持たない現行 REQ | 計測不能として警告（シグナル加算対象外） |
 
@@ -172,6 +172,6 @@ REQ 健全性診断は行数・関心数に加え、ステークホルダー視�
 
 ### 機械化境界
 
-上記検出パターンの機械判定可能範囲（固有名詞主語検出、 SPEC 分離基準キーワード検出等）は docs-check が担う。
+上記検出パターンの機械判定可能範囲（固有名詞主語検出、 Design 分離基準キーワード検出等）は docs-check が担う。
 文脈解釈を要する判定は inspect-docs / `agentdev-doc-writing` が担う（3層検出構造、REQ-036-008）。
-本 SPEC は検出パターンの定義のみを提供し、各実装を規定しない。
+本 Design は検出パターンの定義のみを提供し、各実装を規定しない。

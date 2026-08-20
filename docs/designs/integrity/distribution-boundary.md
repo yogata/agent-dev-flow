@@ -5,10 +5,10 @@ created: "2026-08-11"
 updated: "2026-08-14"
 ---
 
-# 配布依存境界 SPEC
+# 配布依存境界 Design
 
-> **正規所有宣言**: 本 SPEC は REQ-029 が宣言する意味境界を検証するための意味モデル、分類、検出パイプライン、projection 契約、gate 契約に加え、ユーザーが確定した安定実装契約を一括して正規所有する。
-> 関数署名と実装コードは実装詳細として本 SPEC に含めない。
+> **正規所有宣言**: 本 Design は REQ-029 が宣言する意味境界を検証するための意味モデル、分類、検出パイプライン、projection 契約、gate 契約に加え、ユーザーが確定した安定実装契約を一括して正規所有する。
+> 関数署名と実装コードは実装詳細として本 Design に含めない。
 
 ## 目的
 
@@ -58,7 +58,7 @@ REQ-029-004 が許容する generic および template 参照は、producer 内�
 
 共有 detector は副作用なし（side-effect-free）とし、複数経路から同一入力に対し同一判定を返す（DEC-014）。
 adapter は detector の判定を書き込み前に反映する fail-fast な経路である。
-両者の契約は本 SPEC が正規所有し、実装詳細は Epic が所有する。
+両者の契約は本 Design が正規所有し、実装詳細は Epic が所有する。
 
 ## 検査エラーの意味
 
@@ -90,7 +90,7 @@ archive は公開前に検査する。
 
 ## 安定実装契約
 
-ユーザーが本 SPEC 候補へ配置を確定した安定実装契約。
+ユーザーが本 Design 候補へ配置を確定した安定実装契約。
 Epic 実装はこれに従う。
 関数署名、実装コード、内部データ表現は実装詳細として本節に含めない。
 
@@ -100,8 +100,8 @@ Epic 実装はこれに従う。
 - archive 公開前検査の呼び出し点: `scripts/package-release-archive.ps1` が最終公開前に一時 archive を検証する。
 - archive-installed 検証の配置: 一時的な consumer/archive-install パスを用いて archive-installed projection を検証する。`check-consumer-opencode.ps1` へ新たな責務を追加しない。
 
-## 関連 SPEC と実装詳細の帰属
+## 関連 Design と実装詳細の帰属
 
 - 検出シグナル、正規表現、exemption 条件、severity、gate 実行経路の詳細: IR-059 と integrity-rule-catalog.md、rule-ownership.md、req-impact-map.md の同期更新で整理する。
 - 各 projection の技術詳細（link 構成、install 手順、archive レイアウト）: runtime-package-boundary.md、integrity-contracts.md の各 UPDATE で反映する。
-- 関数署名、実装コード、内部データ表現: Epic 実装詳細。本 SPEC は安定実装契約（モジュールパス、plugin パス、フック種別、archive 検査呼び出し点）のみを正規所有する。
+- 関数署名、実装コード、内部データ表現: Epic 実装詳細。本 Design は安定実装契約（モジュールパス、plugin パス、フック種別、archive 検査呼び出し点）のみを正規所有する。

@@ -14,8 +14,8 @@ description: "対論型レビューの実行入口。Orchestrator、Reviewer、R
 ## 原本（SSoT）
 
 本スキルの原本仕様は `docs/designs/<skills/agentdev-adversarial-review>.md` である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 発動契約
@@ -25,7 +25,7 @@ REQ-{NNNN} で定義される caller 対象 command では adversarial-review �
 skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義し、skip 判断のためだけに新規 HITL / 承認点を追加せず、skip 対象でもユーザー明示要求時は実行する（REQ-{NNNN}-{NNN}）。
 ただし新規必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替せず、新しい恒久統制ゲートとしない（REQ-{NNNN}-{NNN}/{NNN}、REQ-{NNNN}-{NNN}）。
 副作用権限（commit、push、merge、ファイル保存、Issue と PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認）を代行しない（REQ-{NNNN}-{NNN}）。
-発動契約の詳細は SPEC「発動契約」を正とする。
+発動契約の詳細は Design「発動契約」を正とする。
 
 ## 審議上の3論理的役割
 
@@ -48,7 +48,7 @@ Reviewer と Reviewee の双方が自身の以前の主張を撤回、限定、�
 
 評価前に対象、目的、制約、技術領域、想定失敗条件に応じたレビュー戦略を構成する。
 固定された観点集合の全項目実行をレビュー成立条件、完了条件としない。
-戦略の構成要素（何を疑うか、どの立場から評価するか、どの既存知見・方法論を使うか、何を証拠とするか、どの意味単位へ分解して検証するか）は SPEC「動的レビュー戦略」が所有する。
+戦略の構成要素（何を疑うか、どの立場から評価するか、どの既存知見・方法論を使うか、何を証拠とするか、どの意味単位へ分解して検証するか）は Design「動的レビュー戦略」が所有する。
 
 レビュー戦略自体も未検証の判断として扱い、Reviewer と Reviewee が不足、過剰、誤適用、前提不成立を指摘できる（戦略メタ反証）。
 審議中に新しい証拠や争点が生じた場合、観点、立場、方法論を追加、削除、再構成できる。
@@ -60,7 +60,7 @@ OpenAI/Codex adversarial-review 等の外部知見を観点、問い、failure m
 
 本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（diagnostics、および論点に応じた他の問い合わせ）を、レビュー対象候補と evidence の探索に利用できる。
 論点候補には複数の規範的成果物から到達する対象、複数経路、cycle、relation 集中ノード、isolated node、複数 owner または governing relation を持つ候補を含む。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
 
 - Graph から得た情報は未検証 evidence として扱い、Reviewer または Reviewee の対論、正規成果物確認を経ずに finding を確定しない
 - 問い合わせ結果は候補提供であり、レビュー結論の確定根拠としない
@@ -76,11 +76,11 @@ OpenAI/Codex adversarial-review 等の外部知見を観点、問い、failure m
 各 stream は初期 finding 生成完了前に兄弟 stream の finding を参照しない。
 対象・目的・制約・確定済み review strategy は共有を許容する。
 初期 challenge 完了後に finding を統合し、duplicate を整理して counter-challenge / convergence へ進む。
-独立 stream、finding lifecycle、semantic stagnation 制御の詳細は SPEC「challenge 段階」「finding lifecycle」「審議進展の意味状態判定と semantic stagnation 制御」を正とする。
+独立 stream、finding lifecycle、semantic stagnation 制御の詳細は Design「challenge 段階」「finding lifecycle」「審議進展の意味状態判定と semantic stagnation 制御」を正とする。
 
 対称的相互反証、戦略メタ反証、争点状態遷移、finding と正規結果の形式、本質的争点と非本質的批判の判定、自律審議とユーザー質問、サブエージェント利用と重複統合、完了条件、出力契約の詳細手続きは [references/adversarial-review-protocol.md](references/adversarial-review-protocol.md) に置く。
 
-審議状態の物理的保存形式、スキーマ、最大ラウンド数、並列数、タイムアウトは SPEC 所有対象外とし、配布スキル実装へ委譲する。
+審議状態の物理的保存形式、スキーマ、最大ラウンド数、並列数、タイムアウトは Design 所有対象外とし、配布スキル実装へ委譲する。
 
 ## 副作用境界と責務分界
 
@@ -88,14 +88,14 @@ OpenAI/Codex adversarial-review 等の外部知見を観点、問い、failure m
 レビュー結果保存用の新しい正規成果物種別を導入しない。
 QG-1〜QG-4 を代替せず、通常のコードレビュー、テスト、機械的検査を代替せず、inspect-docs/inspect-skills の診断を代替しない。
 すべての要件作成工程、計画作成工程への強制適用を行わない。
-詳細は SPEC「副作用境界」「QG、通常レビュー、診断との責務分界」を正とする。
+詳細は Design「副作用境界」「QG、通常レビュー、診断との責務分界」を正とする。
 
 ## caller integration 共通契約
 
-本スキルは REQ-{NNNN} が定める7コマンド（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）および case-auto（停止伝播のみ、REQ-{NNNN}-{NNN}）からの caller integration に対し、SPEC「adversarial-review caller integration 共通契約」節（REQ-{NNNN}）が定める共通契約に従う。
-共通契約の正規所有者は SPEC であり、本 SKILL.md は重複定義しない（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
+本スキルは REQ-{NNNN} が定める7コマンド（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）および case-auto（停止伝播のみ、REQ-{NNNN}-{NNN}）からの caller integration に対し、Design「adversarial-review caller integration 共通契約」節（REQ-{NNNN}）が定める共通契約に従う。
+共通契約の正規所有者は Design であり、本 SKILL.md は重複定義しない（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
 
-呼出元と本スキルの主な契約（詳細は SPEC を正とする）:
+呼出元と本スキルの主な契約（詳細は Design を正とする）:
 
 | 契約 | 要件 | 概要 |
 |---|---|---|
@@ -109,7 +109,7 @@ QG-1〜QG-4 を代替せず、通常のコードレビュー、テスト、機�
 | unresolved 時の扱い | REQ-{NNNN}-{NNN} | unresolved 残時は不可逆処理へ進まず、adversarial-review 自体を恒久統制ゲート化しない |
 | 呼出失敗時の扱い | REQ-{NNNN}-{NNN} | silent skip 禁止、利用不能報告後に従来フローと既存 QG/HITL を維持 |
 
-user-decision-required の位置づけ（case-run result enum の第5状態ではなく case-auto の停止理由分類）は workflow-contracts SPEC「adversarial-review 由来の停止信号」節、review 経路での parent_decision_required / decision_context 適用は delegation-contracts SPEC「adversarial-review との委譲契約接続」節をそれぞれ正とする（REQ-{NNNN}-{NNN}）。
+user-decision-required の位置づけ（case-run result enum の第5状態ではなく case-auto の停止理由分類）は workflow-contracts Design「adversarial-review 由来の停止信号」節、review 経路での parent_decision_required / decision_context 適用は delegation-contracts Design「adversarial-review との委譲契約接続」節をそれぞれ正とする（REQ-{NNNN}-{NNN}）。
 
 ## 非対象
 
@@ -129,6 +129,6 @@ user-decision-required の位置づけ（case-run result enum の第5状態で�
 - **agentdev-quality-gates**: QG-1〜QG-4 品質ゲート基準
 - **agentdev-doc-diagnostics**: 証拠付き finding の診断
 - **agentdev-skill-authoring**: スキル設計とレビュー規約
-- **`agentdev-artifact-graph`**: トレーサビリティ派生索引への高位問い合わせ（ワークフロー利用の割り当ては同 SPEC が正規所有）
-- **SPEC `docs/designs/<skills/agentdev-adversarial-review>.md`**: 振る舞い契約の正典
+- **`agentdev-artifact-graph`**: トレーサビリティ派生索引への高位問い合わせ（ワークフロー利用の割り当ては同 Design が正規所有）
+- **Design `docs/designs/<skills/agentdev-adversarial-review>.md`**: 振る舞い契約の正典
 - **references/adversarial-review-protocol.md**: 審議プロトコルの詳細手続き

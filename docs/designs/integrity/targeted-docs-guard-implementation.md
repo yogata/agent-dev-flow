@@ -8,11 +8,11 @@ updated: 2026-08-15
 # Targeted Docs Guard 実装詳細
 
 v2:REQ-0158（Targeted Docs Integrity Guard、retired）から移送された変更文書限定検査契約。
-配布物たる REQ 側は WHAT（結果要件）のみを残し、HOW（実装計画、スキーマ詳細）は本 SPEC に配置する。
+配布物たる REQ 側は WHAT（結果要件）のみを残し、HOW（実装計画、スキーマ詳細）は本 Design に配置する。
 v2:REQ-0158 は Issue #1713（Epic #1711 Wave 2 OU-002）で retire 完了。
 WHAT 側の恒久契約は REQ-010（REQ-010-012、変更ファイル限定検査）へ統合済み。
 
-本 SPEC は契約（CLI 引数、workflow 別検査項目、判定条件、false-clean 予防、検査失敗時の取り扱い）のみを保持する。
+本 Design は契約（CLI 引数、workflow 別検査項目、判定条件、false-clean 予防、検査失敗時の取り扱い）のみを保持する。
 Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業経緯は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) へ分離した。
 
 ## CLI 引数
@@ -53,8 +53,8 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - 新規REQ・タイトル変更時の `docs/requirements/README.md` 同期
 - README 索引更新要否判定
 - ADR参照がある場合の相互参照更新要否判定
-- 関連SPEC候補がある場合の `docs/designs/README.md` 更新要否判定
-- 旧SPEC直下パス混入検出（IR-057）
+- 関連Design候補がある場合の `docs/designs/README.md` 更新要否判定
+- 旧Design直下パス混入検出（IR-057）
 - local版旧生成方式語彙混入検出（IR-057）
 - 文書種別責務と日本語執筆規範の機械化可能範囲の検査
 
@@ -62,17 +62,17 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 
 変更ファイルが `docs/designs/**/*.md` の場合、以下を確認する。
 
-- SPEC frontmatter の必須項目
+- Design frontmatter の必須項目
 - status 値の妥当性
 - `docs/designs/README.md` のstatus表との同期
-- SPECドメイン分類の妥当性
-- 新規SPEC、移動、改名、主要入口変更時の README 索引更新要否判定
-- 変更SPECと近接リンクのリンク整合
-- 旧SPEC直下パス混入検出（IR-057）
+- Designドメイン分類の妥当性
+- 新規Design、移動、改名、主要入口変更時の README 索引更新要否判定
+- 変更Designと近接リンクのリンク整合
+- 旧Design直下パス混入検出（IR-057）
 - local版旧生成方式語彙混入検出（IR-057）
-- command SPECの場合の対象command原本との最低限の整合
-- skill SPECの場合の対象skill原本との最低限の整合
-- integrity SPECの場合の catalog/rule file/script 整合
+- command Designの場合の対象command原本との最低限の整合
+- skill Designの場合の対象skill原本との最低限の整合
+- integrity Designの場合の catalog/rule file/script 整合
 - REQ相当、ADR相当、guide相当の混入検出
 
 ### case-close 向け検査
@@ -80,9 +80,9 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 case-close では保存工程より広めに以下を確認する。
 
 - 変更ファイル対象の targeted docs guard 実行
-- draft→accepted 等の SPEC status変更時の `docs/designs/README.md` 同期
+- draft→accepted 等の Design status変更時の `docs/designs/README.md` 同期
 - Issue/PRで宣言した文書更新対象と実変更ファイルの対応（`--declared-files` 使用時）
-- 旧SPEC直下パス混入検出（IR-057）
+- 旧Design直下パス混入検出（IR-057）
 - local版旧生成方式語彙混入検出（IR-057）
 - full docs-check 実行要否判定
 
@@ -102,7 +102,7 @@ appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `d
 - extension が参照する対象や責務
 - README 索引の生成元情報
 
-REQ と SPEC の README 更新要否（`requirements_readme_update_required`、`spec_readme_update_required`）は、対象文書の追加、削除、移動、名称変更、または索引に使用される frontmatter 値の変更で `true` とする。
+REQ と Design の README 更新要否（`requirements_readme_update_required`、`spec_readme_update_required`）は、対象文書の追加、削除、移動、名称変更、または索引に使用される frontmatter 値の変更で `true` とする。
 相互参照追記、相対パス是正、表記修正など、上記導出元に影響しない変更では全フラグを `false` にする。
 
 case-close profile の `full_docs_check_recommended` の判定条件（v2:REQ-0158 より移管）。
@@ -122,7 +122,7 @@ case-close 向け changed docs guard の false-clean 予防契約（v2:REQ-0158 
 - docs guard 検査の対象ファイルが空（`files_checked: 0`）の場合、検査結果を warning として報告し、silent pass としないこと
 - case-close は `--files <PR変更ファイル>` 指定を標準とし、`--base-ref` のみの指定を補助的使用に限定すること。main worktree 実行時に HEAD==merge-base となる環境では `--base-ref` が空 diff を生じため、`--files` を優先すること
 - case-close 手順に `files_checked` が空でないことの確認ステップを含めること
-- verification-only PR（実装差分0件、検証のみで作成された PR）で `files_checked` が空になる場合は本 SPEC の verification-only 判定を経て PASS 処理すること
+- verification-only PR（実装差分0件、検証のみで作成された PR）で `files_checked` が空になる場合は本 Design の verification-only 判定を経て PASS 処理すること
 
 ## verification-only PR PASS ロジック
 
@@ -150,12 +150,12 @@ TargetedDocsReport 型契約の正本は [integrity-contracts.md](integrity-cont
 
 ## 完了済み移行作業
 
-旧SPEC直下配置前提の除去、repo-agentdev-integrity の `docs/designs/**/*.md` 再帰対応は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) 完了済み移行作業節へ分離した。
+旧Design直下配置前提の除去、repo-agentdev-integrity の `docs/designs/**/*.md` 再帰対応は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) 完了済み移行作業節へ分離した。
 両対応は v2:REQ-0158 から移管され、完了済みである。
 
 ## obsolete-path-map.yaml 運用
 
-`docs/designs/integrity/obsolete-path-map.yaml` による旧SPEC直下パス→現行ドメイン分割パス対応表の運用（v2:REQ-0158 より移管）。
+`docs/designs/integrity/obsolete-path-map.yaml` による旧Design直下パス→現行ドメイン分割パス対応表の運用（v2:REQ-0158 より移管）。
 
 - 各エントリは `old`、`new`、`severity`、`scope`（`include`、`exclude`）を持つ
 - `severity` は旧直下パス参照を `ng` とする
@@ -177,7 +177,7 @@ rename 後に両者が同一 name であることが必須。
 
 ### frontmatter id 一致検査
 
-SPEC ファイルの frontmatter id が物理 path と一致することを検証する。
+Design ファイルの frontmatter id が物理 path と一致することを検証する。
 不一致の場合は warn または error として報告する。
 
 ### Artifact Graph node 関係整合検査
@@ -189,15 +189,15 @@ rename 後に旧 name の node が Artifact Graph に残存していないこと
 
 3 検査は `.opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts` が deterministic に実行する。
 対象は配布 skill `agentdev-*`（`src/opencode/skills/` 配下）とし、repo-local skill (`repo-agentdev-*`) および `agentdev-` prefix を持たない skill は対象外（REQ-002 配布物境界）。
-`status: superseded` の SPEC に対応する skill dir 欠落は許容し、`status: draft` の場合は warning とする。
+`status: superseded` の Design に対応する skill dir 欠落は許容し、`status: draft` の場合は warning とする。
 Artifact Graph が未生成（`.agentdev/graph/nodes.jsonl` 不在）の場合は graph-node 検査を info として扱い、阻断しない。
 
 ## 関連
 
-- REQ-010（docs-check / 検証・テスト、REQ-010-012 で本 SPEC の WHAT を要件化）
+- REQ-010（docs-check / 検証・テスト、REQ-010-012 で本 Design の WHAT を要件化）
 - v2:REQ-0158（Targeted Docs Integrity Guard、retired。履歴参照）
 - `docs/designs/integrity/validator-split-criteria.md`（validator 分割基準、Phase 6 の詳細）
 - `docs/designs/integrity/integrity-contracts.md`（Workflow×ツールマトリックス表、TargetedDocsReport 型契約）
-- `docs/designs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md`（旧SPEC直下パス検出、link mode 統一で廃止確定となった旧生成方式語彙の検出）
+- `docs/designs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md`（旧Design直下パス検出、link mode 統一で廃止確定となった旧生成方式語彙の検出）
 - `docs/designs/integrity/obsolete-path-map.yaml`（旧パス対照表）
 

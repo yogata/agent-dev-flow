@@ -1,11 +1,11 @@
 ---
-title: `agentdev-req-analysis` SPEC
+title: `agentdev-req-analysis` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-15
 ---
 
-# `agentdev-req-analysis` SPEC
+# `agentdev-req-analysis` Design
 
 ## 目的
 
@@ -21,7 +21,7 @@ updated: 2026-08-15
 
 - ユーザーストーリー、完了条件、境界条件の展開
 - 状態要件と反映作業の分類基準（分類ゲート）
-- REQ/SPEC 境界判定基準（REQ-001-067〜069）
+- REQ/Design 境界判定基準（REQ-001-067〜069）
 - 壁打ちメソドロジー（未決分岐解消、回答分類: Confirmed / Inferred / Unknown / User Decision / Out of Scope）
 - ADR 閾値判定ブリッジ
 - 複数 RU 入力受付、統合/分離判定、操作単位ごとの出力生成
@@ -38,8 +38,8 @@ updated: 2026-08-15
   2. 権限、配布、trust 境界の enforcement
   3. 外部ネットワーク経路、アーカイブ展開等の外部攻撃面を持つ処理
 - 3確認事項の導出観点: 適用対象と判定した場合、処理量の上限（時間計算量、処理ステップ数、または走査量の上限）、出力の上限（出力件数、証跡量の上限）、不正または曖昧な入力時の失敗挙動（fail-open か fail-closed か）を受け入れ条件として確定するまで壁打ちで深掘りする。
-- 回答形式の検証可能性要求: 上限は数値または計算量の形、失敗挙動は fail-open / fail-closed のいずれかを要求し、形式不定の回答や形式的な記述を許容しない。数値上限の記述は既存の test strategy 数値閾値ガイド（`agentdev-workflow-templates` SPEC「test strategy 記述ガイドライン」）および本 SPEC「pass_criteria 記述基準」の規範に従う。
-- 適用対象とした場合はその前提を要件docに記録する（適用外の場合の記録は強制しない）。主発動点は要件展開工程であり、adversarial-review の動的レビュー戦略の検出観点は第二の網として助言に留める（adversarial-review SPEC「動的レビュー戦略」節参照）。
+- 回答形式の検証可能性要求: 上限は数値または計算量の形、失敗挙動は fail-open / fail-closed のいずれかを要求し、形式不定の回答や形式的な記述を許容しない。数値上限の記述は既存の test strategy 数値閾値ガイド（`agentdev-workflow-templates` Design「test strategy 記述ガイドライン」）および本 Design「pass_criteria 記述基準」の規範に従う。
+- 適用対象とした場合はその前提を要件docに記録する（適用外の場合の記録は強制しない）。主発動点は要件展開工程であり、adversarial-review の動的レビュー戦略の検出観点は第二の網として助言に留める（adversarial-review Design「動的レビュー戦略」節参照）。
 
 ## 参照する references
 
@@ -65,7 +65,7 @@ updated: 2026-08-15
 - 曖昧な表現を具体化できているか
 - 全ステークホルダー視点で合意形成できているか
 - 要件行が必達要件として記述されているか
-- SPEC 分離基準（REQ-001-068）違反の残留検出
+- Design 分離基準（REQ-001-068）違反の残留検出
 
 ## pass_criteria 記述基準
 
@@ -102,7 +102,7 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 ### 共通 pass_criteria と正規所有
 
 複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は [agentdev-workflow-templates.md](agentdev-workflow-templates.md)「test strategy 記述ガイドライン」を正規所有とする。
-本 SPEC は意味的等価許容、存在確認と diff 確認の使い分けに限定する。
+本 Design は意味的等価許容、存在確認と diff 確認の使い分けに限定する。
 
 ## See Also
 

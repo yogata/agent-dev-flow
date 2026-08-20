@@ -1,11 +1,11 @@
 ---
-title: `agentdev-skill-authoring` SPEC
+title: `agentdev-skill-authoring` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-18
 ---
 
-# `agentdev-skill-authoring` SPEC
+# `agentdev-skill-authoring` Design
 
 ## 目的
 
@@ -41,7 +41,7 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 - description にトリガー埋め込み（USE FOR / DO NOT USE FOR）
 - 実行時パス（`.opencode/skills/`）と source path（`src/opencode/skills/`）の区別
 - サブエージェント編集安全性
-- スキル本文と references の project docs 参照は skill extension に集約する（SPEC `../foundations/project-extensions.md`）
+- スキル本文と references の project docs 参照は skill extension に集約する（Design `../foundations/project-extensions.md`）
   - スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
   - 実行時に読むべき docs は `.agentdev/extensions/skills/<skill>.yaml` の `context` へ移す
   - skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
@@ -49,7 +49,7 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 
 ## project docs 参照
 
-スキル本文と references の project docs 参照は skill extension（`.agentdev/extensions/skills/<skill>.yaml`）に集約する（REQ-002、SPEC `../foundations/project-extensions.md`）。各 SKILL.md には extension 参照方針（4項目）を配置する:
+スキル本文と references の project docs 参照は skill extension（`.agentdev/extensions/skills/<skill>.yaml`）に集約する（REQ-002、Design `../foundations/project-extensions.md`）。各 SKILL.md には extension 参照方針（4項目）を配置する:
 
 1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/<skill>.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
@@ -75,7 +75,7 @@ OpenCode SKILL.md の作成における品質基準とベストプラクティ�
 
 - [agentdev-command-authoring.md](agentdev-command-authoring.md)
 - [agentdev-inspect-skills.md](agentdev-inspect-skills.md)
-- v2:REQ-0113（Skill References SPEC 分離基準）
+- v2:REQ-0113（Skill References Design 分離基準）
 - REQ-003（コマンド、スキル、サブエージェント責務分界）
 
 ## Workflow Skill と Capability Skill
@@ -123,7 +123,7 @@ Skill 層（description の DO NOT USE FOR トリガー）と Command 層（本�
 - harness や実行基盤の責務・既定動作の再説明を配布物に書かない
 - Markdown 見出し・表などの構造は維持し、削るのは分量と手続き性とする
 
-### 機械検査（本 SPEC 検証観点への追加）
+### 機械検査（本 Design 検証観点への追加）
 
 検証不通過: 1024 超過、単体 600 超過、USE FOR 二重保持、description 内マーカー語・内部 ID、簡潔トリガー項欠落（AG-004)、300 行超 references の目次欠落。warn: 集約予算（平均 350×N）超過。実装は既存検査枠組み（repo-agentdev-integrity / docs-check）へ規則追加する
 

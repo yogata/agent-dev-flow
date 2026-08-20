@@ -44,7 +44,7 @@ export interface BaselineFile {
 // §6.4.1 explicit exemption mechanism (B3). Exemptions are approval-backed
 // exceptions, distinct from the baseline (which is unresolved debt). Only
 // entries with review_status="accepted" are applied. rationale_ref must
-// point at docs/adr/** or an accepted SPEC.
+// point at docs/adr/** or an accepted Design.
 export type ExemptionRationaleCategory =
   | "harness_reference"
   | "accepted_canonical_doc"

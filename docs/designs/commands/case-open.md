@@ -1,11 +1,11 @@
 ---
-title: case-open SPEC
+title: case-open Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-19
 ---
 
-# case-open SPEC
+# case-open Design
 
 ## 目的
 
@@ -52,7 +52,7 @@ Epic + 子 Issue 一括作成に対応する。
 - 前工程からの引き継ぎ停止判定（`agentdev_handoff: true` 含まれる場合は Issue 作成せず停止）
 - OU 選択ゲート（`operation_units` セクションがある場合、処理対象 OU を決定（OU ID 指定 / 自動選択 / 一覧表示停止））
 - 要件docからIssue本文生成（`agentdev-issue-management`）（REQ読解、テンプレート充足検査、完了条件候補抽出）
-  - 完了条件網羅性検証（QG-2）（Issue作成前に REQ/Decision/SPEC 必達要件の網羅性を検証）
+  - 完了条件網羅性検証（QG-2）（Issue作成前に REQ/Decision/Design 必達要件の網羅性を検証）
 - マルチREQ入力判定（単一REQ / 複数REQ or `scale: large` で Epic flow へ分岐）
   - 自律構成生成（OU モード、複数REQ時）（`operation_units` から Epic / Wave / Issue 構造を自律生成）
 - 規模判定（単一REQの場合）（`scale: large` → Epic flow / `scale: standard` → Standard flow）
@@ -78,8 +78,8 @@ Epic + 子 Issue 一括作成に対応する。
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/case-open.md`）はその実行時投影である（DEC-010）。
-- workflow 実装本体（STEP 構成、Standard flow / Epic flow の内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-open`）が所有し、本 SPEC はこれらを複製しない。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/case-open.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（STEP 構成、Standard flow / Epic flow の内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-open`）が所有し、本 Design はこれらを複製しない。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
@@ -190,7 +190,7 @@ case-open は `review_dispositions` を読み取り、Issue 本文の「レビ�
 
 ### レビュー判断セクションへの転記形式
 
-転記先の Issue 本文「レビュー判断」セクションの構造は workflow-templates SPEC（`docs/designs/skills/agentdev-workflow-templates.md`「review_dispositions 証跡セクション」節）が正規所有する。
+転記先の Issue 本文「レビュー判断」セクションの構造は workflow-templates Design（`docs/designs/skills/agentdev-workflow-templates.md`「review_dispositions 証跡セクション」節）が正規所有する。
 各 disposition は id、disposition、reason_code、reason、evidence（path、section、checked_at_commit）を記載する。
 
 ### child Issue の取扱い
@@ -206,16 +206,16 @@ child Issue テンプレートの「レビュー判断」セクションは親 E
 ## Artifact Graph 利用
 
 case-open は Issue の対象範囲, 完了条件, test strategy, 必須 skill, 検証事項を確定する前に Artifact Graph による変更影響候補を評価する。
-候補には REQ, Decision, SPEC, command, skill, extension, integrity rule, 関連 source_file を含められる。
+候補には REQ, Decision, Design, command, skill, extension, integrity rule, 関連 source_file を含められる。
 Graph 候補は正規成果物または独立した探索手段で確認した上で in scope, verification only, out of scope に分類する。
 
-必須品質能力の導出は `artifact-quality-control-routing` SPEC が定める artifact type から品質能力キーへの変換に従い、Graph の delegates_to, governs 関係から必須 skill を直接決定しない。
+必須品質能力の導出は `artifact-quality-control-routing` Design が定める artifact type から品質能力キーへの変換に従い、Graph の delegates_to, governs 関係から必須 skill を直接決定しない。
 Graph は変更成果物候補と関連規則候補の探索のみを担当する。
-共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「ワークフロー利用」を参照。
+共通利用原則の防護事項は `agentdev-artifact-graph` Design「ワークフロー利用」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 
-## 参照する横断 SPEC
+## 参照する横断 Design
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（フェーズ定義、コマンド分類、workflow_route）
 - [workflows/epic-wave-model.md](../workflows/epic-wave-model.md)（Epic / Wave / Issue 階層、子Issue 状態 enum、case-open 構成生成基準）
@@ -242,7 +242,7 @@ case-open は Issue 本文生成前に次の execution contract 確定ステッ�
 
 ### EC-2: 必須品質統制の導出と test strategy 投影
 
-artifact-quality-control-routing SPEC の合成規則に従い、変更予定成果物の種別から
+artifact-quality-control-routing Design の合成規則に従い、変更予定成果物の種別から
 必須品質能力を導出する。各能力について test strategy 項目を生成し、Issue 本文の
 test strategy セクションへ投影する。
 
@@ -318,7 +318,7 @@ RU ファイル削除後に統合先ブランチ（REQ-042 の定義による、
 - 機能要件、非機能要件、制約、対象外、受け入れ条件の新規作成（G19、REQ-006-009）
 - 実装順序、Issue分解についてのユーザー確認要求（G20、REQ-006-008）
 - 単一 Issue で完結する場合の Epic 作成（G20、REQ-005-041）
-- Wave単位のみの子Issue構造（G14、子Issue は OU 単位で作成し、対応 OU 経由で REQ/Decision/SPEC トレーサビリティを保持。子Issue を REQ 文書単位で対応付ける規定は廃止、REQ-005-042 準拠）
+- Wave単位のみの子Issue構造（G14、子Issue は OU 単位で作成し、対応 OU 経由で REQ/Decision/Design トレーサビリティを保持。子Issue を REQ 文書単位で対応付ける規定は廃止、REQ-005-042 準拠）
 - 子Issue最大10件超過時の作成続行（G05、エラー停止、REQ-006-028）
 - 構成生成事前検証を GitHub Issue 作成後に行う扱い（G05、REQ-006-027）
 - intake / learning capture の実施（G18, G22）
@@ -330,7 +330,7 @@ RU ファイル削除後に統合先ブランチ（REQ-042 の定義による、
 
 ## 検証観点
 
-- QG-2（Acceptance Criteria Coverage Gate）: 完了条件網羅性検証で完了条件が対象 REQ/Decision/SPEC の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
+- QG-2（Acceptance Criteria Coverage Gate）: 完了条件網羅性検証で完了条件が対象 REQ/Decision/Design の必達要件を網羅しているか検証。fail 時は Issue 作成前に req-define 差し戻し推奨
 - 子Issue 先頭行 `Parent: #{epic_number}` 含有（G03、親子関係追跡用）
 - 全子Issue作成完了後の Epic 本文ステータス追跡テーブル更新（G04、部分更新禁止）
 - 子Issue数上限（G05、最大10件、Epic 1件あたり）
@@ -356,7 +356,7 @@ case-open は OU 群の依存グラフの連結成分（必須依存のみをエ
 
 case-open は無関係な OU 群を単一 Epic へ機械的に集約しない（REQ-006-010）。
 3軸判断の個別エッジケース（同機能独立、共通基盤等）は LLM 推論に委ねる。
-REQ/SPEC で固定するのは不変の方針（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow）のみである。
+REQ/Design で固定するのは不変の方針（依存強度3レベル定義、Epic サイズ上限、単独根 Standard flow）のみである。
 
 
 case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_open_hints` に記録する（REQ-006-011, REQ-008-020）。
@@ -364,17 +364,17 @@ case-open は Epic 構成推論の根拠を Epic Issue 本文または `case_ope
 
 ### 子Issue 作成の並列化
 
-- 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化できる。最大5件は SPEC 所有の実行安全境界の数値であり（REQ-006 目的「実行安全境界の数値は SPEC を正規所有者とし、本 REQ は境界宣言へ縮約する」）、case-open 実装が遵守する。旧 v2 参照の REQ-006-089 は case-auto orchestration stage モデルを規定する別要件であり、本並列化上限の根拠ではないため参照を除去した（OU-008 整合）
+- 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化できる。最大5件は Design 所有の実行安全境界の数値であり（REQ-006 目的「実行安全境界の数値は Design を正規所有者とし、本 REQ は境界宣言へ縮約する」）、case-open 実装が遵守する。旧 v2 参照の REQ-006-089 は case-auto orchestration stage モデルを規定する別要件であり、本並列化上限の根拠ではないため参照を除去した（OU-008 整合）
 - Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は Epic Issue 本文の単一書き手原則（REQ-006-095, REQ-006-101）に基づく親の直列集約である。旧 v2 参照の REQ-006-093 は case-auto background task 回復パターンを規定する別要件であり、本直列集約の根拠ではないため参照を除去した（OU-008 整合）
 - G04「全子Issue 作成完了後にテーブル更新（部分更新禁止）」は集約更新で維持
 
 ## REQ-006-089/093 参照の整合
 
-case-open SPEC 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ-006.md）との意味整合を確認する。
+case-open Design 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ-006.md）との意味整合を確認する。
 
 ### 整合方針
 
-- REQ-006.md の正規定義と case-open SPEC 内の参照が意味的に一致するか照合する
+- REQ-006.md の正規定義と case-open Design 内の参照が意味的に一致するか照合する
 - ズレがある場合、次のいずれかで対応する
   - 参照先の修正
   - 別要件への置換
@@ -394,7 +394,7 @@ case-open SPEC 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ-0
 
 - [req-define.md](req-define.md)（前段コマンド）
 - [req-save.md](req-save.md)（前段コマンド（REQ/Decision 保存））
-- [design-save.md](design-save.md)（前段コマンド（SPEC 保存））
+- [design-save.md](design-save.md)（前段コマンド（Design 保存））
 - [case-run.md](case-run.md)（後続コマンド（実装））
 - `agentdev-workflow-case-open` skill（workflow 実装本体（STEP 構成、resume protocol））
 - `agentdev-issue-management` skill（Issue 本文生成、テンプレート充足）
@@ -411,7 +411,7 @@ case-open SPEC 内の REQ-006-089、REQ-006-093 参照行と正規定義（REQ-0
 ## adversarial-review 挿入境界（経路F）
 
 本節は case-open への adversarial-review caller integration（経路F、REQ-015-009）の挿入境界を正典として所有する。
-共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review SPEC](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は経路F 固有の挿入位置、発動条件、変更影響別再実行ルール、最初の副作用との順序のみを規定する（REQ-014-011）。
+共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review Design](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は経路F 固有の挿入位置、発動条件、変更影響別再実行ルール、最初の副作用との順序のみを規定する（REQ-014-011）。
 
 ### 挿入位置（REQ-015-009）
 
@@ -443,10 +443,10 @@ Standard flow では Issue 本文生成、QG-2、preflight の完了後に revie
 
 発動条件判定 Step で発動と判定された場合、review 呼出 Step で adversarial-review を呼び出す（REQ-015-001）。
 
-- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts SPEC](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
+- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts Design](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
 - **review 対象**: execution structure（Epic/Wave/Issue 構成、自律構成生成または規模判定・preflight で確定）、Issue 本文候補（Epic Issue 本文、Standard Issue 本文）、完了条件（QG-2 で網羅性検証済み）の3者。
 - **採用後戻り先**: accepted finding のうち execution structure に関わる finding は自律構成生成または規模判定へ戻し再評価する。Issue 本文、完了条件に関わる finding は Issue 本文生成、QG-2、Epic Issue 本文生成の該当段階へ戻す。accepted finding の対象候補への反映は case-open（呼出元）の責務である（REQ-014-006）。
-- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、最初の GitHub Issue 作成（Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成）へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[workflow-contracts SPEC](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節）。
+- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、最初の GitHub Issue 作成（Epic flow は Epic Issue 作成、Standard flow は Standard Issue 作成）へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[workflow-contracts Design](../workflows/workflow-contracts.md)「adversarial-review 由来の停止信号」節）。
 - **呼出失敗時**: adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
 
 ### 変更影響別の再実行ルール（REQ-015-009）
@@ -455,7 +455,7 @@ review の結果反映で review 対象の意味内容が変更された場合�
 
 | 変更影響 | 再実行対象 | 戻り先 | 根拠 |
 |---|---|---|---|
-| 完了条件のみ変更 | QG-2 | 完了条件網羅性検証 | 完了条件網羅性検証を再実行し、REQ/Decision/SPEC 必達要件の網羅性を再確認する |
+| 完了条件のみ変更 | QG-2 | 完了条件網羅性検証 | 完了条件網羅性検証を再実行し、REQ/Decision/Design 必達要件の網羅性を再確認する |
 | execution structure のみ変更 | preflight | preflight | 構成生成事前検証（子 Issue 数上限、Wave 同時実行上限、OU 対応、必須依存関係維持、OU 割当網羅）を再実行する |
 | 完了条件と execution structure の両方が変更 | QG-2 + preflight | 完了条件網羅性検証、preflight | 両方を再実行する。実行順序は QG-2 → preflight を維持する |
 | 意味内容変更なし | 再実行不要 | （なし） | review 対象の意味内容に変更がないため、既存検証結果をそのまま使用し、最初の GitHub Issue 作成へ進む |
@@ -472,6 +472,6 @@ review の結果、execution structure、Issue 本文候補、完了条件のい
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、workflow-contracts SPEC「adversarial-review 由来の停止信号」節との間で意味の重複、矛盾を生じない。
-case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 SPEC を正とする。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、workflow-contracts Design「adversarial-review 由来の停止信号」節との間で意味の重複、矛盾を生じない。
+case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 Design を正とする。
 

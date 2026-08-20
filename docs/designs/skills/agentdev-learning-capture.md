@@ -1,11 +1,11 @@
 ---
-title: `agentdev-learning-capture` SPEC
+title: `agentdev-learning-capture` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-27
 ---
 
-# `agentdev-learning-capture` SPEC
+# `agentdev-learning-capture` Design
 
 ## 目的
 

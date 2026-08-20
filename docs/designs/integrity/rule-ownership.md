@@ -8,11 +8,11 @@ updated: 2026-08-18
 # ルール所有権マトリックス
 
 > **位置づけ**: 本ファイルは全ドメイン（foundations/responsibilities/quality/integrity/local/authoring）横断のルール所有権マトリックスである。
-> `integrity/` 配下に配置するが `integrity` ドメイン専用ではなく、全ルールドメインの canonical REQ/SPEC 対応を示すメタファイルとして機能する。
+> `integrity/` 配下に配置するが `integrity` ドメイン専用ではなく、全ルールドメインの canonical REQ/Design 対応を示すメタファイルとして機能する。
 
 ## req-impact-map.md との関係
 
-本ファイル（ルールドメイン → canonical REQ/SPEC）と `../responsibilities/req-impact-map.md`（REQ → 影響するルール/アーティファクト）は逆方向の対応マップである。両者の整合性維持運用:
+本ファイル（ルールドメイン → canonical REQ/Design）と `../responsibilities/req-impact-map.md`（REQ → 影響するルール/アーティファクト）は逆方向の対応マップである。両者の整合性維持運用:
 
 - 新規 IR 追加時: 両ファイルの対応行列を同期更新する
 - IR の物理削除時（AG-008、REQ-028-008）: 両ファイルで対応行を削除し、交叉参照は `../responsibilities/req-impact-map.md` の Retired cross-references 節へ再配置する
@@ -24,7 +24,7 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 
 ## ルールドメイン一覧
 
-| # | Domain | Canonical REQ | Canonical SPEC | 補足 |
+| # | Domain | Canonical REQ | Canonical Design | 補足 |
 |---|--------|--------------|----------------|------|
 | 1 | Command frontmatter | REQ-002 (015, 044) | artifact-contracts.md | description 単一 |
 | 2 | Skill frontmatter | REQ-002 (012, 013) | artifact-contracts.md | name + description |
@@ -60,14 +60,14 @@ req-impact-map.md の配置移動は未確定事項とし、参照方向、利�
 | 32 | local-case-file（ローカル Case ファイルスキーマ） | REQ-009 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode の Case ファイル YAML 前書き、status enum、labels 値域、見出し一覧、マージ結果記録 |
 | 33 | ローカル版 link mode 導入フロー、安全ゲート | REQ-009 (001-015) | runtime-package-boundary.md | link mode 接続手順、link target 確認、ジャンクション検出安全ゲート |
 | 34 | local-transform（ローカル版変換資産） | REQ-009 (028, 029, 032) | runtime-package-boundary.md | **確定廃止**（PR#1195 で transform/ 完全削除、REQ-009-004/009/028 確定廃止昇格）。変換用プロンプト、レビュー用プロンプト、変換仕様の要件は全て廃止済み。link mode の現行契約は `runtime-package-boundary.md` が所有する |
-| 35 | obsolete-spec-path（旧SPEC直下パス参照検出） | REQ-001 (006), REQ-009 (004), REQ-036 (012) | integrity-rule-catalog.md (IR-057) | docs/designs/ 基盤SPEC ドメイン別体系化（REQ-001）以前の直下パス参照を検出。`obsolete-path-map.yaml` を対照表として IR-057 が検証。link mode 統一（REQ-009）に伴う廃止語彙を「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離し検出。例外条件: obsolete-path-map.yaml 自体、IR-057 ルール説明、retired 配下、テスト fixture、コードブロック内検査 fixture。v2:REQ-0158 は Issue #1713 で retire 完了（検出契約は IR-057 が現行所有） |
-| 36 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003) | integrity-rule-catalog.md (IR-056) | project extensions 機構（SPEC `../foundations/project-extensions.md`）の整合性検査。extension schema（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
+| 35 | obsolete-spec-path（旧Design直下パス参照検出） | REQ-001 (006), REQ-009 (004), REQ-036 (012) | integrity-rule-catalog.md (IR-057) | docs/designs/ 基盤Design ドメイン別体系化（REQ-001）以前の直下パス参照を検出。`obsolete-path-map.yaml` を対照表として IR-057 が検証。link mode 統一（REQ-009）に伴う廃止語彙を「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離し検出。例外条件: obsolete-path-map.yaml 自体、IR-057 ルール説明、retired 配下、テスト fixture、コードブロック内検査 fixture。v2:REQ-0158 は Issue #1713 で retire 完了（検出契約は IR-057 が現行所有） |
+| 36 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003) | integrity-rule-catalog.md (IR-056) | project extensions 機構（Design `../foundations/project-extensions.md`）の整合性検査。extension schema（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
 | 37 | IR 存在条件モデル（DEC-013 適用） | REQ-028 (008, 009, 010, 012; retired、恒常行は DEC-013 が移管受入れ), REQ-036 (022) | integrity-contracts.md | DEC-013 AG-008/009 適用後の IR モデルを所有。`lifecycle_state`、`enforcement_mode`、`baseline_status` を現行 IR 属性から削除し、「現存 IR = 現行 = executable detector」へ統一。8項目存在条件、finding-baseline 分類（finding 側）、新規 IR 登録 gate (a)/(b)、一時移行検査 registry を正規所有する。catalog（[integrity-rule-catalog.md](integrity-rule-catalog.md)）は schema 定義のみ重複所有し、判定規則は本ドメインへ委譲する |
-| 38 | skill 記述基準（層1〜2）機械検査（AG-005 規則群） | REQ-002, REQ-027 | agentdev-skill-authoring.md, command-file-format.md, integrity-rule-catalog.md（AG-005 規則群） | `lint_skills.ts` が検出する層1〜2記述基準検査（hard 6規則 + warn 1規則、RU-0018 / PR #2184）。検出規則の登録は integrity-rule-catalog「AG-005 規則群」節、正典は skill authoring SPEC と command-file-format SPEC。既知違反は `baselines/lint-skills-baseline.json` で管理 |
+| 38 | skill 記述基準（層1〜2）機械検査（AG-005 規則群） | REQ-002, REQ-027 | agentdev-skill-authoring.md, command-file-format.md, integrity-rule-catalog.md（AG-005 規則群） | `lint_skills.ts` が検出する層1〜2記述基準検査（hard 6規則 + warn 1規則、RU-0018 / PR #2184）。検出規則の登録は integrity-rule-catalog「AG-005 規則群」節、正典は skill authoring Design と command-file-format Design。既知違反は `baselines/lint-skills-baseline.json` で管理 |
 
 ## IR 別関連マッピング（自動生成）
 
-IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表から抽出した Related REQ / Related SPEC の対応表を `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。
+IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表から抽出した Related REQ / Related Design の対応表を `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。
 直接編集は行わない。
 各 IR の詳細は `rules/IR-NNN-*.md` を参照。
 
@@ -114,7 +114,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-041 | retired-req-broken-link | REQ-001-063 | integrity-contracts.md |
 | IR-042 | hardcoded-req-count | REQ-001 | integrity-contracts.md |
 | IR-043 | retired-readme-coverage | REQ-001 | integrity-contracts.md |
-| IR-044 | REQ/SPEC 境界違反検出 | REQ-001-067, REQ-001-068, REQ-001-069, REQ-010-002, REQ-010-012, REQ-001-031 | integrity-contracts.md, document-model.md |
+| IR-044 | REQ/Design 境界違反検出 | REQ-001-067, REQ-001-068, REQ-001-069, REQ-010-002, REQ-010-012, REQ-001-031 | integrity-contracts.md, document-model.md |
 | IR-046 | consumer-generated リポジトリ種別誤検知防止 | REQ-009-007, REQ-009-011, REQ-009-014 | runtime-package-boundary.md |
 | IR-047 | src/opencode-local/ link 先原本領域ディレクトリ構成 | REQ-009-003, REQ-009-004, REQ-009-005, REQ-009 | runtime-package-boundary.md |
 | IR-048 | generated_by 識別子整合性 | REQ-009-011, REQ-009-012, REQ-009-013 | runtime-package-boundary.md |
@@ -123,7 +123,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-051 | 実行主体の skill 表記誤認検出 | v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
 | IR-052 | 完了条件 grep パターン設計（REQ-010-011） | REQ-010-011 | integrity-contracts.md, quality-gates.md |
 | IR-053 | gh 直接記述検出 | REQ-011 | integrity-rule-catalog.md, integrity-contracts.md, ../../skills/agentdev-gh-cli.md |
-| IR-054 | draft SPEC 放置検出 | REQ-001-002 | integrity-rule-catalog.md, integrity-contracts.md |
+| IR-054 | draft Design 放置検出 | REQ-001-002 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-002-079, REQ-002-080, REQ-002-081, REQ-028-009 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-056 | project-extensions-integrity | REQ-002 | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | IR-057 | obsolete-spec-path-after-domain-split | REQ-001-006, REQ-009-004, REQ-036-012 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md |

@@ -4,7 +4,7 @@ agentdev-gh-cli の各手続きのローカル版（Case ファイル版）実�
 標準版（GitHub 版）の実装手順（[standard-procedures.md](../../../opencode/skills/agentdev-gh-cli/references/standard-procedures.md)）で扱う gh CLI 呼び出しを、Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きに読み替える。
 操作契約（手続き名、引数、戻り値）は [contracts.md](contracts.md) 参照。
 
-Case ファイルスキーマの意味仕様の正本は SPEC [local/local-case-file.md](../../../../docs/specs/local/local-case-file.md)。
+Case ファイルスキーマの意味仕様の正本は Design [local/local-case-file.md](../../../../docs/designs/local/local-case-file.md)。
 操作用定義は [../case-schema/case-file.md](../case-schema/case-file.md)。
 
 ## 共通制約
@@ -18,7 +18,7 @@ Case ファイルスキーマの意味仕様の正本は SPEC [local/local-case-
 
 ## git CLI 直接操作の初期化要件
 
-ローカル版も git 操作（commit 等）を行うため、git CLI 直接操作の WRITE には初期化要件を適用する（SPEC [agentdev-gh-cli](../../../../docs/specs/skills/agentdev-gh-cli.md)「WRITE 手続きの Windows encoding 初期化必須化」節「ローカル版の扱い」参照）。
+ローカル版も git 操作（commit 等）を行うため、git CLI 直接操作の WRITE には初期化要件を適用する（Design [agentdev-gh-cli](../../../../docs/designs/skills/agentdev-gh-cli.md)「WRITE 手続きの Windows encoding 初期化必須化」節「ローカル版の扱い」参照）。
 
 - **対象**: ファイル引数に日本語を含む git CLI 直接操作の WRITE（`git commit -F`、`git tag -F` 等）。Windows 環境では必須、Linux/ macOS/ WSL 等の Windows 以外の環境では不要（既定で UTF-8 コンソールのため）
 - **手順単位**: create（手順2のファイル書き出し） → git 実行 → VERIFY → cleanup を1手順ユニットとし、cleanup を省略不可とする（標準版の WRITE 手続きと共通）
@@ -39,7 +39,7 @@ Case ファイルスキーマの意味仕様の正本は SPEC [local/local-case-
 
 worktree 隔離境界により `.agentdev/**` への書き込みが禁止される委譲の場面では、一時ファイル配置先をリポジトリ外の一時領域（`$env:TEMP` 配下）に変更する。
 本規定はローカル版へも適用できる。
-ただしローカル版は Case ファイル読み書きが主経路であるため、gh CLI 系の WRITE 手続き（一時ファイル配置先を含む）が必要になる場面は、ローカル版から gh CLI を直接利用する補助経路に限る（SPEC 同節「委譲時の一時ファイル代替配置先」「ローカル版の扱い」参照）。
+ただしローカル版は Case ファイル読み書きが主経路であるため、gh CLI 系の WRITE 手続き（一時ファイル配置先を含む）が必要になる場面は、ローカル版から gh CLI を直接利用する補助経路に限る（Design 同節「委譲時の一時ファイル代替配置先」「ローカル版の扱い」参照）。
 
 本要件は標準版 [standard-procedures.md](../../../opencode/skills/agentdev-gh-cli/references/standard-procedures.md)「commit メッセージ作成（BOM なし UTF-8 契約）」節の規定と矛盾しない。
 同節の詳細実装（実装手段、禁止事項）を本ファイルへ複製せず、ローカル版における本要件の正を本ファイル1ファイルへ維持する（`standard-procedures.md` のローカル版新設は行わない）。
@@ -53,7 +53,7 @@ worktree 隔離境界により `.agentdev/**` への書き込みが禁止され�
 3. 欠番は再利用しない（過去に削除、リネームされた番号を再採番しない）
 4. 同一 Case 番号のファイルが既存の場合は上書きせず失敗とする
 
-採番規則の意味仕様は SPEC [local/local-case-file.md](../../../../docs/specs/local/local-case-file.md) の「採番規則」セクション、運用参照資料は [../case-schema/case-file.md](../case-schema/case-file.md) の「採番規則」セクション参照。
+採番規則の意味仕様は Design [local/local-case-file.md](../../../../docs/designs/local/local-case-file.md) の「採番規則」セクション、運用参照資料は [../case-schema/case-file.md](../case-schema/case-file.md) の「採番規則」セクション参照。
 
 ## 各手続きのローカル版実装
 
@@ -85,7 +85,7 @@ YAML 前書きの各フィールド制約は [../case-schema/rules/frontmatter.y
 ### Issue コメント追加（作業ログ追記）
 
 1. Case ファイルを読み込む
-2. `## 作業ログ` セクションを探す。存在しない場合は `## SPEC確定候補` または `## Findings / Capture候補` の直前（Case ファイル末尾に近い位置）に新規に `## 作業ログ` 見出しを追加する
+2. `## 作業ログ` セクションを探す。存在しない場合は `## Design確定候補` または `## Findings / Capture候補` の直前（Case ファイル末尾に近い位置）に新規に `## 作業ログ` 見出しを追加する
 3. `## 作業ログ` 配下にコメント本文を追記（タイムスタンプ、ヘッダ等の構造は呼び出し元の責務。本手続きは本文の追記のみを担保する）
 4. YAML 前書きの `updated_at` を現在日時に更新
 5. UTF-8 (BOMなし)、LF で保存
@@ -96,7 +96,7 @@ YAML 前書きの各フィールド制約は [../case-schema/rules/frontmatter.y
 1. Case ファイルを読み込む
 2. Case ファイル本文に以下の PR 相当セクションを追記:
    - `## マージ前確認`
-   - `## SPEC確定候補`（必須）
+   - `## Design確定候補`（必須）
    - `## Findings / Capture候補`（必須。`### intake` と `### learning` サブ見出しを含む）
 3. 入力の PR 本文を各セクションへ振り分けて配置
 4. YAML 前書きの `updated_at` を現在日時に更新
@@ -108,7 +108,7 @@ YAML 前書きの各フィールド制約は [../case-schema/rules/frontmatter.y
 ### PR 本文読込（PR 相当セクション読込）
 
 1. Case ファイルを読み込む
-2. `## マージ前確認`、`## SPEC確定候補`、`## Findings / Capture候補` セクションを抽出して返す
+2. `## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補` セクションを抽出して返す
 3. いずれかの必須セクションが存在しない場合は失敗
 
 ### PR merge（マージ結果記録）
@@ -125,7 +125,7 @@ YAML 前書きの各フィールド制約は [../case-schema/rules/frontmatter.y
 5. UTF-8 (BOMなし)、LF で保存
 6. VERIFY を直後に実行
 
-`## マージ結果` の記録方針は SPEC [local/local-case-file.md](../../../../docs/specs/local/local-case-file.md) の「マージ結果の記録方針」セクション参照。
+`## マージ結果` の記録方針は Design [local/local-case-file.md](../../../../docs/designs/local/local-case-file.md) の「マージ結果の記録方針」セクション参照。
 
 ### Issue close（Case close）
 
@@ -137,12 +137,12 @@ YAML 前書きの各フィールド制約は [../case-schema/rules/frontmatter.y
 3. UTF-8 (BOMなし)、LF で保存
 4. VERIFY を直後に実行
 
-`closed_at` の値条件は SPEC [local/local-case-file.md](../../../../docs/specs/local/local-case-file.md) の「closed_at の値条件」セクション参照。
+`closed_at` の値条件は Design [local/local-case-file.md](../../../../docs/designs/local/local-case-file.md) の「closed_at の値条件」セクション参照。
 
 ## status 状態遷移との協調
 
 本手続きは Case ファイルの status 状態遷移の一部を担う。
-状態遷移表の全体は SPEC [local/local-case-file.md](../../../../docs/specs/local/local-case-file.md) の「状態遷移表」、運用参照資料は [../case-schema/case-file.md](../case-schema/case-file.md) の「status enum と状態遷移」参照。
+状態遷移表の全体は Design [local/local-case-file.md](../../../../docs/designs/local/local-case-file.md) の「状態遷移表」、運用参照資料は [../case-schema/case-file.md](../case-schema/case-file.md) の「status enum と状態遷移」参照。
 
 | 手続き | status 遷移 |
 |---|---|

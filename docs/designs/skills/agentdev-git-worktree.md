@@ -1,11 +1,11 @@
 ---
-title: `agentdev-git-worktree` SPEC
+title: `agentdev-git-worktree` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-19
 ---
 
-# `agentdev-git-worktree` SPEC
+# `agentdev-git-worktree` Design
 
 ## 目的
 

@@ -1,6 +1,6 @@
 # ローカル Case ファイル スキーマ定義
 
-> **正本**: `docs/specs/local/local-case-file.md`（意味仕様の正本）。本ファイルは運用参照資料であり、SPEC と矛盾してはならない。
+> **正本**: `docs/designs/local/local-case-file.md`（意味仕様の正本）。本ファイルは運用参照資料であり、Design と矛盾してはならない。
 > **機械可読定義**: `case-schema/rules/*.yaml`（frontmatter、status、labels、headings）。
 
 ## 目的
@@ -132,14 +132,14 @@ Case ファイル本文は以下の 15 セクション見出しを持つ（REQ-0
 | 7 | `## 受け入れ条件` | 任意 | Case の受け入れ条件 |
 | 8 | `## 作業ログ` | 任意 | 作業の進行ログ。GitHub Issue コメント相当の内容を記録 |
 | 9 | `## マージ前確認` | 任意 | マージ前確認事項。GitHub PR 本文の引き継ぎ情報の一部 |
-| 10 | `## SPEC確定候補` | **必須** | SPEC 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替（REQ-0141-020） |
+| 10 | `## Design確定候補` | **必須** | Design 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替（REQ-0141-020） |
 | 11 | `## Findings / Capture候補` | **必須** | Findings / Capture候補。下位に `### intake` と `### learning` サブ見出しを持つ |
 | 12 | `## マージ結果` | 任意 | ローカル Git 上の取り込み結果。ブランチ情報は本セクションに記録する |
 | 13 | `## 残課題` | 任意 | 残課題、フォローアップ項目 |
 | 14 | `## 完了判定` | 任意 | 完了判定結果 |
 | 15 | （自由拡張） | 任意 | 上記以外のセクションは必要に応じて追加可能 |
 
-`SPEC確定候補` と `Findings / Capture候補` を必須とする理由: これらは GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、case-close への引き継ぎ経路を失わせないため（REQ-0141-020）。
+`Design確定候補` と `Findings / Capture候補` を必須とする理由: これらは GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、case-close への引き継ぎ経路を失わせないため（REQ-0141-020）。
 
 ### Findings / Capture候補 サブ見出し
 
@@ -199,7 +199,7 @@ GitHub PR 取り込みは実行しない。
 | GitHub Issue コメント | `## 作業ログ` |
 | GitHub Issue の状態 | Case ファイルの `status` |
 | GitHub Issue のラベル | Case ファイルの `labels` |
-| GitHub PR 本文 | `## マージ前確認` / `## SPEC確定候補` / `## Findings / Capture候補` |
+| GitHub PR 本文 | `## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補` |
 | GitHub PR 取り込み結果 | `## マージ結果` |
 | GitHub Issue のクローズ | `status: closed` + `closed_at` |
 
@@ -212,10 +212,10 @@ GitHub PR 取り込みは実行しない。
 
 ## 関連項目
 
-- `docs/specs/local/local-generation.md`：link mode 接続フロー、link target 確認、更新運用の正本 SPEC
+- `docs/designs/local/local-generation.md`：link mode 接続フロー、link target 確認、更新運用の正本 Design
 - `rules/frontmatter.yaml`：YAML 前書きスキーマの機械可読定義
 - `rules/status.yaml`：status enum と状態遷移表の機械可読定義
 - `rules/labels.yaml`：labels 値域の機械可読定義
 - `rules/headings.yaml`：見出し一覧の機械可読定義
-- `docs/specs/local/local-case-file.md`：意味仕様の正本
+- `docs/designs/local/local-case-file.md`：意味仕様の正本
 - REQ-0141：ローカル版 OpenCode 生成方式とローカル Case ファイル運用の要件定義

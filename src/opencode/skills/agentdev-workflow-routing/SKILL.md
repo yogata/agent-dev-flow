@@ -9,9 +9,9 @@ agentdev系コマンドのレビューNG時の対応フロー、次コマンド�
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-workflow-routing` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-workflow-routing` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 対象コマンド
@@ -24,14 +24,14 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
 本スキルは Workflow Skill としてレビュー後ルーティングルールを提供する。
-本スキル自身は workflow STEP を所有せず、case-run / case-update の各 Workflow Skill が所有する STEP から参照される（`<workflows/workflow-skill-model>` SPEC）。
+本スキル自身は workflow STEP を所有せず、case-run / case-update の各 Workflow Skill が所有する STEP から参照される（`<workflows/workflow-skill-model>` Design）。
 
 ### ルーティング結果と Input Resolution
 
 レビュー NG 時の次コマンド推論結果は、呼出元 STEP から次 STEP への遷移入力として扱われる。
-Input Resolution は durable state 優先順位（`<workflows/input-resolution-and-durable-state>` SPEC）に従い、ルーティング結果は自然言語の引き継ぎのみに依存せず、Issue ラベル、PR 番号等の identifier と組み合わせて復元される。
+Input Resolution は durable state 優先順位（`<workflows/input-resolution-and-durable-state>` Design）に従い、ルーティング結果は自然言語の引き継ぎのみに依存せず、Issue ラベル、PR 番号等の identifier と組み合わせて復元される。
 
-STEP reference 8 要素、STEP 識別子、durable state 復元契約は `<workflows/step-reference-contract>` SPEC に従う。
+STEP reference 8 要素、STEP 識別子、durable state 復元契約は `<workflows/step-reference-contract>` Design に従う。
 compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
 
 ## 参考文献

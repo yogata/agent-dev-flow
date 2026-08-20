@@ -1,7 +1,7 @@
 /**
  * Project Extensions integrity checker (IR-056), new-kind era.
  *
- * Validates project extensions against docs/specs/foundations/project-extensions.md
+ * Validates project extensions against docs/designs/foundations/project-extensions.md
  * (DEC-012 migration: 3-kind enum, id binding, placement, classification) and the
  * REQ-002-030/031 load-time contract (fail-open applies to malformed only).
  *
@@ -54,7 +54,7 @@
  *                     src/opencode/commands/agentdev/{X}.md.
  *   Capability Skill = every other agentdev-* skill directory under src/opencode/skills,
  *                     including cross-cutting agentdev-workflow-* skills that have no
- *                     corresponding command (workflow-skill-model SPEC exception table).
+ *                     corresponding command (workflow-skill-model Design exception table).
  *
  * Scenario mode (--scenario) executes the TS-006 extension scenarios (absent / valid x3 /
  * legacy x2 / malformed / no-implicit-propagation, plus unknown-kind) against disposable
@@ -155,7 +155,7 @@ interface ExtensionsNgBaseline {
   entries: ExtensionsNgBaselineEntry[];
 }
 
-// OU-0008 (Issue #2206): パス bucket key の環境依存対策（SPEC integrity-contracts
+// OU-0008 (Issue #2206): パス bucket key の環境依存対策（Design integrity-contracts
 // 「baseline entry 運用契約」第2点）。check_integrity.ts と同じ正規化で
 // `.opencode/...` 表記と `src/opencode/...` 表記を相対パス基準へ統一する。
 function normalizeExtBaselineFilePath(file: string | null): string {

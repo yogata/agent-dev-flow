@@ -4,10 +4,10 @@
  * Issue #1995 / OU-004 / REQ-019 / TS-004.
  *
  * Verifies:
- *   - stale candidate detection: test references changed SPEC, test not in PR changes → finding
- *   - updated test suppression: test references changed SPEC, test in PR changes → no finding
+ *   - stale candidate detection: test references changed Design, test not in PR changes → finding
+ *   - updated test suppression: test references changed Design, test in PR changes → no finding
  *   - REQ-ID reference detection: REQ-NNN reference triggers when REQ file changes
- *   - silent-pass warning: SPEC changed but no test references → warning
+ *   - silent-pass warning: Design changed but no test references → warning
  *   - CLI contract: --help, required flags, JSON output schema
  *
  * Mirrors check_changed_docs.test.ts subprocess-spawn pattern (script calls process.exit()).
@@ -129,74 +129,74 @@ describe("check_test_impact.ts CLI contract", () => {
 });
 
 describe("check_test_impact.ts stale candidate detection (TS-004)", () => {
-  it("detects stale test that references changed SPEC and is not updated in same PR", () => {
-    // Scenario: WP-1..WP-5相当のリファクタリングで SPEC が変更され、
+  it("detects stale test that references changed Design and is not updated in same PR", () => {
+    // Scenario: WP-1..WP-5相当のリファクタリングで Design が変更され、
     // 参照テストが同一 PR で未更新 → 陳腐化候補として検出
-    // Setup: main に SPEC v1 と参照 test を用意 → branch で SPEC v2 のみ変更
+    // Setup: main に Design v1 と参照 test を用意 → branch で Design v2 のみ変更
     execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
     writeFile(
-      "docs/specs/integrity/sample-gate.md",
+      "docs/designs/integrity/sample-gate.md",
       "---\ntitle: Sample Gate\nstatus: draft\n---\n# Sample Gate\n",
     );
     writeFile(
       "src/scripts/sample.test.ts",
       [
         'import { describe, it, expect } from "bun:test";',
-        "// このテストは docs/specs/integrity/sample-gate.md を参照する",
+        "// このテストは docs/designs/integrity/sample-gate.md を参照する",
         'describe("sample", () => {',
         '  it("passes", () => { expect(1).toBe(1); });',
         "});",
         "",
       ].join("\n"),
     );
-    commitAll("add sample-gate SPEC and its test on main");
+    commitAll("add sample-gate Design and its test on main");
     const branch = "test-stale-detection";
     execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
-    // branch 側で SPEC のみ変更（test は更新しない）
+    // branch 側で Design のみ変更（test は更新しない）
     writeFile(
-      "docs/specs/integrity/sample-gate.md",
+      "docs/designs/integrity/sample-gate.md",
       "---\ntitle: Sample Gate\nstatus: draft\nupdated: 2026-08-09\n---\n# Sample Gate (revised)\nnew content\n",
     );
     execSync("git add -A", { cwd: TEMP_ROOT });
-    execSync('git commit -q -m "revise sample-gate SPEC only"', { cwd: TEMP_ROOT });
+    execSync('git commit -q -m "revise sample-gate Design only"', { cwd: TEMP_ROOT });
 
-    // SPEC のみが変更された状態で gate を実行
+    // Design のみが変更された状態で gate を実行
     const r = runScript(TEMP_ROOT, ["--base-ref", "main", "--json"]);
     expect(r.exitCode).toBe(0);
     const report = JSON.parse(r.stdout);
     expect(report.spec_changes.length).toBeGreaterThanOrEqual(1);
-    expect(report.spec_changes).toContain("docs/specs/integrity/sample-gate.md");
-    // src/scripts/sample.test.ts は SPEC を参照するが同一 PR で未変更 → 陳腐化候補
+    expect(report.spec_changes).toContain("docs/designs/integrity/sample-gate.md");
+    // src/scripts/sample.test.ts は Design を参照するが同一 PR で未変更 → 陳腐化候補
     const stale = report.stale_candidates.find(
       (f: any) => f.test_path === "src/scripts/sample.test.ts",
     );
     expect(stale).toBeDefined();
     expect(stale.reference_kind).toBe("full-path");
-    expect(stale.spec_path).toBe("docs/specs/integrity/sample-gate.md");
+    expect(stale.spec_path).toBe("docs/designs/integrity/sample-gate.md");
 
     // main に戻しておく
     execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
     execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
   });
 
-  it("suppresses finding when test referencing changed SPEC is also updated in same PR", () => {
+  it("suppresses finding when test referencing changed Design is also updated in same PR", () => {
     const branch = "test-update-suppression";
     execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
-    // SPEC と test を同 PR で変更
+    // Design と test を同 PR で変更
     writeFile(
-      "docs/specs/integrity/updated-gate.md",
+      "docs/designs/integrity/updated-gate.md",
       "---\ntitle: Updated Gate\nstatus: draft\n---\n# Updated Gate\n",
     );
     writeFile(
       "src/scripts/updated.test.ts",
       [
         'import { describe, it, expect } from "bun:test";',
-        "// docs/specs/integrity/updated-gate.md 参照",
+        "// docs/designs/integrity/updated-gate.md 参照",
         'describe("updated", () => { it("ok", () => {}); });',
         "",
       ].join("\n"),
     );
-    commitAll("add SPEC and update test in same PR");
+    commitAll("add Design and update test in same PR");
 
     const r = runScript(TEMP_ROOT, ["--base-ref", "main", "--json"]);
     expect(r.exitCode).toBe(0);
@@ -251,15 +251,15 @@ describe("check_test_impact.ts stale candidate detection (TS-004)", () => {
     execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
   });
 
-  it("emits silent-pass warning when SPEC changes but no test references found", () => {
+  it("emits silent-pass warning when Design changes but no test references found", () => {
     const branch = "test-silent-pass";
     execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
-    // 参照テストの無い SPEC を追加
+    // 参照テストの無い Design を追加
     writeFile(
-      "docs/specs/integrity/orphan-gate.md",
+      "docs/designs/integrity/orphan-gate.md",
       "---\ntitle: Orphan Gate\nstatus: draft\n---\n# Orphan Gate\n",
     );
-    commitAll("add orphan-gate SPEC");
+    commitAll("add orphan-gate Design");
     const r = runScript(TEMP_ROOT, ["--base-ref", "main", "--json"]);
     expect(r.exitCode).toBe(0);
     const report = JSON.parse(r.stdout);
@@ -271,10 +271,10 @@ describe("check_test_impact.ts stale candidate detection (TS-004)", () => {
     execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
   });
 
-  it("emits empty report when no SPEC changes in PR", () => {
+  it("emits empty report when no Design changes in PR", () => {
     const branch = "test-no-spec-change";
     execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
-    // SPEC 以外のファイルのみ変更
+    // Design 以外のファイルのみ変更
     writeFile("src/scripts/unrelated.ts", "export const x = 1;\n");
     commitAll("add non-SPEC file");
     const r = runScript(TEMP_ROOT, ["--base-ref", "main", "--json"]);
@@ -291,12 +291,12 @@ describe("check_test_impact.ts stale candidate detection (TS-004)", () => {
     const branch = "test-schema";
     execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
     writeFile(
-      "docs/specs/integrity/schema-gate.md",
+      "docs/designs/integrity/schema-gate.md",
       "---\ntitle: Schema Gate\nstatus: draft\n---\n# Schema Gate\n",
     );
     writeFile(
       "src/scripts/schema.test.ts",
-      '// docs/specs/integrity/schema-gate.md\nimport { describe, it, expect } from "bun:test";\ndescribe("s", () => { it("ok", () => {}); });\n',
+      '// docs/designs/integrity/schema-gate.md\nimport { describe, it, expect } from "bun:test";\ndescribe("s", () => { it("ok", () => {}); });\n',
     );
     commitAll("schema-gate");
     const r = runScript(TEMP_ROOT, ["--base-ref", "main", "--json"]);

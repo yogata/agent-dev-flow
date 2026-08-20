@@ -458,7 +458,7 @@ Design の基本frontmatter（`title`、`status`、`created`、`updated`）は p
 
 | 誤りパターン | 正しい分類 | 修正方針 |
 |---|---|---|
-| Design に新規要件が含まれている | REQ | 要件部分を REQ に切り出し、Design は現在仕様の記述に留める |
+| Design に新規要件が含まれている | REQ | 要件部分を REQ に切り出し、Design は現在設計の記述に留める |
 | Decision が現在の動作を記述している | Design | 動作記述部分を Design に移動し、Decision は判断とその根拠に絞る |
 | Guide に要件本文、契約本文が含まれている | REQ/Decision/Design 参照 | 要件、契約内容を REQ/Decision/Design への参照に置き換える |
 | REQ に実装詳細が含まれている | Design | 実装詳細を Design に移動し、REQ は WHAT に絞る |
@@ -471,7 +471,7 @@ Design の基本frontmatter（`title`、`status`、`created`、`updated`）は p
 
 | 分類ルール | docs-check 検査 | inspect-docs 検査 | 検査内容 |
 |---|---|---|---|
-| 責務境界（Design に要件混入） | Design-REQ-mix 検査 | 意味整合性レビュー | Design 内の 必達要件 が現在仕様の記述か判定 |
+| 責務境界（Design に要件混入） | Design-REQ-mix 検査 | 意味整合性レビュー | Design 内の 必達要件 が現在設計の記述か判定 |
 | 責務境界（Guide の要件本文混入） | Guide-intrusion 検査 | 要件本文検出 | Guide が要件本文、契約本文を保持していないか検出 |
 | Decision 状態管理 | Decision-status 検査 | Decision 整合性レビュー | proposed/accepted/superseded/deprecated の一貫性 |
 | 廃止引用 | Retired-reference 検査 | 文書間参照整合性 | 廃止文書の現行引用を検出 |

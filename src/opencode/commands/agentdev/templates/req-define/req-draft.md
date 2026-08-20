@@ -52,7 +52,7 @@ agreed_items:
 artifact_actions:
   - id: ACT-REQ-{NNN}           # ACT-{ARTIFACT}-{NNN}
     artifact: req               # req / decision / design
-    operation: create           # req / decision / design とも create / append / update の3値（別名は持たない、REQ-008-058）
+    operation: create           # req / decision / design とも create / append / update の3値（別名は持たない）
     target: new:{topic-slug}    # REQ/Decision: file path または new:{slug}。Design は target_design 構造化推奨
     target_area: # artifact: design の場合、operation: update では必須（対象セクション見出し）。operation: create、operation: append（anchor 指定時）、req/decision では任意
     source_items: [AG-{NNN}, AG-{NNN}] # 対応する agreed_item ID の list
@@ -90,7 +90,7 @@ operation_units:
     source_ru: # optional: 元 RU-ID
     target_req: REQ-{NNNN}      # REQ 操作の対象 REQ
     target_design: # optional: Design 操作の対象 Design パス（例: docs/designs/{domain}/<existing-design>.md、新規は target_design: {operation, domain, slug} 構造化）
-    operation: create           # create / append / update の3値（別名は持たない、REQ-008-058）
+    operation: create           # create / append / update の3値（別名は持たない）
     scale: standard             # standard / large
     depends_on: []              # 実在する ou_id を参照
     recommended_order: 1

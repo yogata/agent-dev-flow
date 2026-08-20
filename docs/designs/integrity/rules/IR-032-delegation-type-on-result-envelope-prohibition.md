@@ -14,7 +14,7 @@ updated: 2026-08-20
 | severity | strict |
 | category | canonical-conflict |
 | detection_method | `delegation_type` / `on_result` 周辺文脈を検出し、必須 envelope 表現ではなく任意、参考分類の表現であることを確認 |
-| affected_artifacts | [commands, SPEC, skills] |
+| affected_artifacts | [commands, Design, skills] |
 | related_req | [REQ-003-017, REQ-003-018] |
 | related_design | [workflow-contracts.md, artifact-contracts.md] |
 | gate_level | full-audit, delta-guard |

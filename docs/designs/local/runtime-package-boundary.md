@@ -7,9 +7,9 @@ updated: 2026-08-15
 
 # 実行時パッケージ境界
 
-> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（REQ-001）。
+> **Scope**: 本 Design は agent-dev-flow リポジトリのリポジトリ内部設計文書である（REQ-001）。
 > リポジトリ種別（repo type）間の実行時パッケージ境界モデルを本リポジトリの観点から記述し、consumer プロジェクトの振る舞いを規定しない。
-> Consumer プロジェクトは独自の規約に従い、本 SPEC は agent-dev-flow リポジトリが実行時パッケージをどう構成、配布するかのみを定義する。
+> Consumer プロジェクトは独自の規約に従い、本 Design は agent-dev-flow リポジトリが実行時パッケージをどう構成、配布するかのみを定義する。
 
 ## 目的
 
@@ -19,8 +19,8 @@ AgentDevFlow の実行時パッケージ境界を定義し、本体リポジト�
 
 > plugin/npm/package 配布形態は現在未対応である（REQ-002-064 参照）。
 > REQ-009-006 は5種のリポジトリ種別として将来対応の `plugin-future` を含めて定義する。
-> 本 SPEC の4種表は現行実装済みの種別のみを扱い、`plugin-future` は将来対応の第5種として本表から除外する。
-> REQ と本 SPEC の種別数の差は対応時期の違いによるものであり、矛盾ではない。
+> 本 Design の4種表は現行実装済みの種別のみを扱い、`plugin-future` は将来対応の第5種として本表から除外する。
+> REQ と本 Design の種別数の差は対応時期の違いによるものであり、矛盾ではない。
 > `plugin-future` の実装時に本表へ行を追加する。
 
 | Type ID | 名称 | 説明 | `.opencode/` の意味 | 典型例 |
@@ -32,7 +32,7 @@ AgentDevFlow の実行時パッケージ境界を定義し、本体リポジト�
 
 `consumer-generated` はローカル版 OpenCode を link mode で導入する利用側リポジトリである（REQ-009, REQ-009, REQ-009）。
 `.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/`（`agentdev-gh-cli` 以外）を `src/opencode/` 配下へ接続し、`.opencode/skills/agentdev-gh-cli/` だけを `src/opencode-local/agentdev-gh-cli/` へ接続する。
-詳細は本 SPEC の「link mode 接続手順技術詳細」を参照。
+詳細は本 Design の「link mode 接続手順技術詳細」を参照。
 
 ### リポジトリ種別判定基準
 
@@ -348,7 +348,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 |--------|------|------|
 | `agentdev-*` 全 27 件 | 配布物依存 | `src/opencode/skills/` 配下、`agentdev-*` グロブで自動 junction |
 | `japanese-tech-writing` | 配布物依存 | `agentdev-doc-writing` が執筆規範 SSoT として参照（PR #1385 で昇格）。`agentdev-*` 非準拠のため install script で個別 junction 対象 |
-| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` 卡out 対象。検証スクリプトを呼び出す command は DEC-006 により3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ正規化済み。これらが `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 SPEC の対象外） |
+| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` 卡out 対象。検証スクリプトを呼び出す command は DEC-006 により3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ正規化済み。これらが `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 Design の対象外） |
 
 ## 関連項目（See Also）
 

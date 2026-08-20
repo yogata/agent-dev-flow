@@ -7,8 +7,8 @@ updated: 2026-07-27
 
 # キャプチャ境界（Capture Boundaries）
 
-> 本 SPEC は intake / learning の境界定義、Split Rule、PR 本文永続チャネル、REQ 再構成 intake など、複数コマンド、スキルにまたがるキャプチャ契約を定義する。
-> 個別 command の capture 責務は各 command SPEC を参照。
+> 本 Design は intake / learning の境界定義、Split Rule、PR 本文永続チャネル、REQ 再構成 intake など、複数コマンド、スキルにまたがるキャプチャ契約を定義する。
+> 個別 command の capture 責務は各 command Design を参照。
 
 ## 目的
 
@@ -48,7 +48,7 @@ case-run で発見した本筋外検出事項（Finding）の永続化チャネ�
 PR 本文の capture 関連セクションは以下を分離する:
 
 - `## Findings / Capture候補`（本筋外発見（intake/learning 候補））。case-run 経由の実行担当サブエージェントが記録
-- `## SPEC確定候補`（実装で判明した SPEC レベル詳細（schema、enum、判定表、内部アルゴリズム等））。`## Findings / Capture候補` とは別セクション（v2:ADR-0123 Decision #4, REQ-001-015）
+- `## Design確定候補`（実装で判明した Design レベル詳細（schema、enum、判定表、内部アルゴリズム等））。`## Findings / Capture候補` とは別セクション（v2:ADR-0123 Decision #4, REQ-001-015）
 
 ## 各コマンドの capture 責務
 
@@ -62,12 +62,12 @@ PR 本文の capture 関連セクションは以下を分離する:
 | case-close | PR 本文から回収 + 自工程 deviation capture | PR 本文から回収 + 自工程 deviation capture | Epic 横断回収含む（REQ-006-105） |
 | case-auto | 各工程の保存結果参照と件数集計のみ | 各工程の保存結果参照と件数集計のみ | capture 本文の再分類・再保存は行わない（REQ-006-108） |
 | case-update | 非関与 | 非関与 | REQ 更新、レビュー NG コメント、Issue 本文更新のみ |
-| intake-* | 各コマンド責務（各 command SPEC 参照） | - | - |
-| learning-promote | - | 各コマンド責務（command SPEC 参照） | - |
-| inspect-* | 各コマンド責務（各 command SPEC 参照） | - | - |
+| intake-* | 各コマンド責務（各 command Design 参照） | - | - |
+| learning-promote | - | 各コマンド責務（command Design 参照） | - |
+| inspect-* | 各コマンド責務（各 command Design 参照） | - | - |
 | backlog-review | 非関与 | 非関与 | RU 生成のみ |
 
-詳細は各 command SPEC を参照。
+詳細は各 command Design を参照。
 
 ### CaptureBoundary 検査の例外判定規則
 
@@ -150,8 +150,8 @@ req-define の明示入力としてルーティングする（backlog-review 経
 `case-run` および `case-close` での本筋外発見の退避仕様。
 
 - 一次参照: `agentdev-workflow-orchestration` skill の `references/capture-boundaries.md`
-- case-run 退避方針: case-run command SPEC 参照
-- case-close post-run capture: case-close command SPEC 参照
+- case-run 退避方針: case-run command Design 参照
+- case-close post-run capture: case-close command Design 参照
 
 ## See Also
 
@@ -159,7 +159,7 @@ req-define の明示入力としてルーティングする（backlog-review 経
 - [epic-wave-model.md](epic-wave-model.md)（Epic Issue 本文の単一書き手制約）
 - [backlog-artifact-lifecycle.md](backlog-artifact-lifecycle.md)（採用済み成果物 lifecycle）
 - [../responsibilities/artifact-contracts.md](../responsibilities/artifact-contracts.md)（Command→Skill 依存方向、`Capture結果` 小節の共通意味契約）
-- 各 command SPEC（`docs/designs/commands/`）
+- 各 command Design（`docs/designs/commands/`）
 - `agentdev-workflow-orchestration` skill（capture 境界の詳細）
 - `agentdev-learning-capture` skill、`agentdev-intake-pipeline` skill（capture 成果物の生成委譲先）
 - REQ-006（Case実行オーケストレーション / Epic、Wave、各工程分散型 capture 責務 REQ-006-021/105〜108）

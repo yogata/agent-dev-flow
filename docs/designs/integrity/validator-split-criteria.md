@@ -7,11 +7,11 @@ updated: 2026-07-21
 
 # validator 分割基準
 
-本 SPEC は agent-dev-flow リポジトリのみに適用される。
+本 Design は agent-dev-flow リポジトリのみに適用される。
 
 ## 目的
 
-check_changed_docs.ts の validator を分割する基準を実装詳細SPEC として文書化する（targeted-docs-guard-implementation.md Phase 6）。
+check_changed_docs.ts の validator を分割する基準を実装詳細Design として文書化する（targeted-docs-guard-implementation.md Phase 6）。
 内部 validator 構成表は [references/validator-internal-config.md](references/validator-internal-config.md) へ分離した。
 
 ## validator の責務境界

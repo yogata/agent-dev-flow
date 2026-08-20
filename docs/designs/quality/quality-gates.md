@@ -7,17 +7,17 @@ updated: 2026-08-15
 
 # 品質ゲート
 
-AgentDevFlow 主ワークフロー（req-define → req-save → design-save（SPEC 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-010）。
+AgentDevFlow 主ワークフロー（req-define → req-save → design-save（Design 候補がある場合）→ case-open → case-run → case-close）に配置される品質ゲート QG-1〜QG-4 を定義する（REQ-010）。
 各ゲートの判定基準、機械化境界、実装マッピングを示す。
 
-> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリの設計文書であり、実行時配布対象ではない（REQ-001）。
-> 実行時コマンドは本 SPEC に依存せず、`agentdev-quality-gates` スキルの参照ファイルを実行時参照先とする。
+> **リポジトリ内部設計文書**: 本 Design は agent-dev-flow リポジトリの設計文書であり、実行時配布対象ではない（REQ-001）。
+> 実行時コマンドは本 Design に依存せず、`agentdev-quality-gates` スキルの参照ファイルを実行時参照先とする。
 
 ## 適用範囲
 
 - **対象**: AgentDevFlow **主ワークフローのみ**。req-define / req-save / case-open / case-run / case-close（および case-auto）を横断する 4 ゲート。
 - **対象外**: inspect-* / intake-* / learning-* / backlog-* / case-update は実行時参照対象ではない。これらの補助ワークフローには QG-1〜QG-4 を適用しない。
-- **置換関係**: 本 SPEC は旧 `agentdev-spec-compliance` スキルの乖離検出機能を QG-3 として再編成したものである。品質メトリクス収集（型チェック/Lint/ビルド/テスト）は各コマンドのローカル検証ステップ（case-run 実行担当サブエージェント委譲内の test-fix ループ等）に委譲する。
+- **置換関係**: 本 Design は旧 `agentdev-spec-compliance` スキルの乖離検出機能を QG-3 として再編成したものである。品質メトリクス収集（型チェック/Lint/ビルド/テスト）は各コマンドのローカル検証ステップ（case-run 実行担当サブエージェント委譲内の test-fix ループ等）に委譲する。
 
 ## ゲート一覧
 
@@ -39,14 +39,14 @@ AgentDevFlow 主ワークフロー（req-define → req-save → design-save（S
 
 ### 配置
 
-- **req-define**: 要件 doc draft 生成時（Step 6〜9）。REQ/SPEC 分類、Decision ゲート、チェックボックス測可能性を検証。
+- **req-define**: 要件 doc draft 生成時（Step 6〜9）。REQ/Design 分類、Decision ゲート、チェックボックス測可能性を検証。
 - **req-save**: REQ/Decision ファイル保存時（Step 3〜4）。保存前の最終構造検証。
 
 ### pass / warn / fail 基準
 
-- **pass**: 全検査観点を満たす。チェックボックスは測定可能かつ一意、REQ/SPEC 分類が適切、ADR 判定が記録済み。
+- **pass**: 全検査観点を満たす。チェックボックスは測定可能かつ一意、REQ/Design 分類が適切、ADR 判定が記録済み。
 - **warn**: 構造は保たれているが、改善推奨事項がある（例: チェックボックスの粒度が粗い）。進行可能。
-- **fail**: 構造的欠陥がある（例: 必須セクション欠落、REQ にすべき内容が SPEC に混入）。req-define へ差し戻し。
+- **fail**: 構造的欠陥がある（例: 必須セクション欠落、REQ にすべき内容が Design に混入）。req-define へ差し戻し。
 
 ### 詳細
 
@@ -62,7 +62,7 @@ AgentDevFlow 主ワークフロー（req-define → req-save → design-save（S
 
 ### 目的
 
-case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/Decision/SPEC の必達要件を網羅していることを確認する。
+case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/Decision/Design の必達要件を網羅していることを確認する。
 受け入れ基準の漏れをフェーズ内で検出する。
 
 ### 配置
@@ -83,7 +83,7 @@ case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/D
 
 ### 目的
 
-case-run で PR 作成前に、実装が Issue / REQ / ADR / SPEC / work plan から乖離していないことを確認する。
+case-run で PR 作成前に、実装が Issue / REQ / ADR / Design / work plan から乖離していないことを確認する。
 乖離を分類し、推奨アクションを提示する。
 
 ### 配置
@@ -101,7 +101,7 @@ case-run で PR 作成前に、実装が Issue / REQ / ADR / SPEC / work plan �
 
 ### pass / warn / fail 基準
 
-- **pass**: no-deviation。実装は Issue/REQ/Decision/SPEC/work plan に整合。
+- **pass**: no-deviation。実装は Issue/REQ/Decision/Design/work plan に整合。
 - **warn**: 軽微乖離のみ（scope-creep 等）。そのまま進行可能（乖離内容を実装記録に併記）。
 - **fail**: 重大乖離あり（impl-bug / spec-bug）。ユーザー指示待機（自動修正禁止）。重大乖離 ≥2 件で壁打ちフェーズ全体への差し戻しを推奨。
 
@@ -173,7 +173,7 @@ verify-only 根拠欄の記入規則は [case-run.md](../commands/case-run.md)�
 | 領域 | 内容 | 実現手段 |
 |------|------|---------|
 | 機械的検証 | ファイル存在、frontmatter 形式、チェックボックス構文（`- [ ]` / `- [x]`）、テーブル列数、リンク先存在 | ツール呼び出し（Grep / Glob / LSP）で決定的に判定 |
-| 推論ベース検証 | チェックボックスの測可能性、REQ/SPEC 分類妥当性、完了条件の網羅性、乖離の重大度判定、ドキュメント意味整合 | エージェントの推論（ナレッジベース参照ファイルが基準を提供） |
+| 推論ベース検証 | チェックボックスの測可能性、REQ/Design 分類妥当性、完了条件の網羅性、乖離の重大度判定、ドキュメント意味整合 | エージェントの推論（ナレッジベース参照ファイルが基準を提供） |
 | サブエージェント委譲 | 探索結果、分類候補、根拠の抽出 | 親エージェントが判断を確定（委譲接続点: サブエージェントは候補のみ返す） |
 | ユーザー判断 | 乖離時の修正方針、REQ 更新承認、scope-creep 承認 | エージェントは推奨アクションを提示し、ユーザーが決定（自動修正禁止） |
 
@@ -186,7 +186,7 @@ verify-only 根拠欄の記入規則は [case-run.md](../commands/case-run.md)�
 
 各ゲートと参照先コマンド、スキルの対応を示す。
 
-| Gate | 配置コマンド | 参照スキル（実行時） | SPEC |
+| Gate | 配置コマンド | 参照スキル（実行時） | Design |
 |------|-------------|---------------------|------|
 | QG-1 | req-define.md, req-save.md | `agentdev-quality-gates` (qg-1-definition-integrity) | quality-gates.md |
 | QG-2 | case-open.md | `agentdev-quality-gates` (qg-2-acceptance-criteria-coverage) | quality-gates.md |
@@ -203,4 +203,4 @@ case-auto は構成コマンド（req-save / case-open / case-run / case-close�
 
 - [agentdev-quality-gates](../../src/opencode/skills/agentdev-quality-gates/SKILL.md)（QG-1〜QG-4 の判定基準、検査観点を提供する実行時ナレッジベース）
 - [quality-specs.md](quality-specs.md)（品質基準（行数上限、執筆完了基準 等））
-- [document-model.md](../foundations/document-model.md)（REQ/Decision/SPEC/guides の責務マトリックス、文書分類ポリシー）
+- [document-model.md](../foundations/document-model.md)（REQ/Decision/Design/guides の責務マトリックス、文書分類ポリシー）

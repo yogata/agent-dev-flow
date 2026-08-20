@@ -7,7 +7,7 @@ updated: 2026-08-18
 
 # 整合性契約
 
-本 SPEC は agent-dev-flow リポジトリのみに適用される。
+本 Design は agent-dev-flow リポジトリのみに適用される。
 
 ## 目的
 
@@ -34,7 +34,7 @@ updated: 2026-08-18
 | workflow-gap | workflow 定義の欠落 | heuristic |
 | integrity-rule-gap | 検査ルール自体の欠落 | observation |
 
-> **REQ/SPEC 境界違反**: 現行 REQ 要件行の主たる文意が SPEC 詳細（スキーマフィールド、enum 値一覧、テストデータ詳細、チェッカー個別ルール、誤検知抑制方式、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）である場合は canonical-conflict のサブカテゴリとして扱い、IR-044 で heuristic 検出する。
+> **REQ/Design 境界違反**: 現行 REQ 要件行の主たる文意が Design 詳細（スキーマフィールド、enum 値一覧、テストデータ詳細、チェッカー個別ルール、誤検知抑制方式、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）である場合は canonical-conflict のサブカテゴリとして扱い、IR-044 で heuristic 検出する。
 > REQ-001-069 の安定契約例外（公開コマンド名、公開入口、ドメイン状態位置づけ、他コマンド接続契約、利用者可視分類体系、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約）に該当する要約残留は検出対象外とする。
 
 ## 検出事項経路マップ（Finding Route Map）
@@ -73,7 +73,7 @@ updated: 2026-08-18
 | CommandLocalTemplate | command-local template 存在、整合性検査 |
 | SkillSpecDependency | 実行時スキルから docs/designs/ への直接依存検出 |
 | RetiredAdrCitation | 廃止 ADR への現行根拠引用検出（REQ-001-048, heuristic/observation） |
-| ReqSpecBoundary | 現行 REQ 要件行への SPEC 詳細混入検出（REQ-001-067〜069。IR-044 としてカタログ定義。REQ-001-069 安定契約例外は対象外） |
+| ReqSpecBoundary | 現行 REQ 要件行への Design 詳細混入検出（REQ-001-067〜069。IR-044 としてカタログ定義。REQ-001-069 安定契約例外は対象外） |
 
 ## レポート形式（Report Format）
 
@@ -99,9 +99,9 @@ check_changed_docs.ts の JSON 出力型である TargetedDocsReport の型定�
 - stdout = 機械可読出力、stderr = 診断メッセージ
 - 非対話実行、破壊的変更禁止
 
-### check_changed_docs.ts 挙動SPEC 契約（targeted-docs-guard-implementation.md Phase 1, 3）
+### check_changed_docs.ts 挙動Design 契約（targeted-docs-guard-implementation.md Phase 1, 3）
 
-check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解析、対象確定）、対象解決（--files または --base-ref から files_checked を生成）、profile 呼出（--workflow に応じた profileFor 適用）、validator 呼出（profile rules の実行）、report 契約（TargetedDocsReport 形式での JSON/text 出力）、exit code（FAILURE/WARNING/OK の 3 値）。
+check_changed_docs.ts は以下の挙動Design 契約に従う: entry（引数解析、対象確定）、対象解決（--files または --base-ref から files_checked を生成）、profile 呼出（--workflow に応じた profileFor 適用）、validator 呼出（profile rules の実行）、report 契約（TargetedDocsReport 形式での JSON/text 出力）、exit code（FAILURE/WARNING/OK の 3 値）。
 
 対象確定はコマンド側が行い、check_changed_docs.ts は対象選定の十分性を判定しない。
 --files 指定で files_checked が空の場合は FAILURE、--base-ref 指定で files_checked が空の場合は WARNING とする。
@@ -111,7 +111,7 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 
 `docs/designs/` は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
 他プロジェクトへの適用を意図しない。
-実行時コマンドは SPEC ファイルに依存しない（REQ-001）。
+実行時コマンドは Design ファイルに依存しない（REQ-001）。
 
 ## ガードレール分類（Guardrails Classification）
 
@@ -123,7 +123,7 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 | **STATIC_CHECK** | 機械的検証可能な検査。docs-check に移行 | frontmatter 規約、必須セクション存在、行数上限 |
 | **POSTFLIGHT_DIFF** | 実行後の diff 検証。postflight スクリプトで検査 | 意図しないファイル変更、スコープ外の編集 |
 | **HELPER_SCRIPT** | 補助的処理。script に移行 | 検査、変換、フォーマット処理 |
-| **MOVE_TO_SPEC** | SPEC へ移譲すべき内容。SPEC 定義に委譲 | アーティファクト構造定義、命名規則の詳細 |
+| **MOVE_TO_SPEC** | Design へ移譲すべき内容。Design 定義に委譲 | アーティファクト構造定義、命名規則の詳細 |
 | **DELETE_AS_OBVIOUS** | 自明な制約。削除可能 | LLM 既知の常識的内容 |
 
 ## 許可変更プロファイル（Allowed Changes Profiles）
@@ -150,14 +150,14 @@ check_changed_docs.ts は以下の挙動SPEC 契約に従う: entry（引数解�
 | `intake-promote` | `.agentdev/intake/promoted/` | 他パス |
 | `learning-promote` | `.agentdev/learning/promoted/` | 他パス |
 | `backlog-review` | `.agentdev/backlog/req-units/`, `.agentdev/intake/promoted/`, `.agentdev/learning/promoted/` | `.opencode/`, 検査対象外アーティファクト |
-| `inspect-docs` | `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、`.agentdev/inspect/` 配下の git 永続化（commit / push） | 検査対象アーティファクト（docs/、REQ/Decision/SPEC/guides、Command/Skill/Template/Script）の変更、許可範囲外 commit/push、Issue/PR 作成、更新 |
+| `inspect-docs` | `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、`.agentdev/inspect/` 配下の git 永続化（commit / push） | 検査対象アーティファクト（docs/、REQ/Decision/Design/guides、Command/Skill/Template/Script）の変更、許可範囲外 commit/push、Issue/PR 作成、更新 |
 
 ## 実行後差分検査（Postflight Diff Checking）
 
 実行後差分検査（postflight diff checking）は検査対象を直接修正しないコマンドから段階導入する:
 
 **検査対象を直接修正しないコマンド検証**:
-- `inspect-docs` は実行後に検査対象アーティファクト（docs/、REQ/Decision/SPEC/guides、Command/Skill/Template/Script）に変更がないことを確認。許可出力（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、`.agentdev/inspect/` 配下の commit/push）以外の変更を warning として報告する
+- `inspect-docs` は実行後に検査対象アーティファクト（docs/、REQ/Decision/Design/guides、Command/Skill/Template/Script）に変更がないことを確認。許可出力（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成、`.agentdev/inspect/` 配下の commit/push）以外の変更を warning として報告する
 - `docs-check`（配布対象外 `/repo/docs-check`）は検査対象アーティファクトを変更しないが、許可された出力（`.agentdev/integrity/reports/`, `.agentdev/intake/inbox/`）を生成する。実行後差分検査は「検査対象アーティファクトへの変更がないこと」を確認し、許可出力範囲外の変更を warning として報告する
 - `backlog-review` も検査対象外アーティファクトを変更せず、許可された `.agentdev/` 配下の出力のみを行う
 - 変更が検出された場合は warning として報告
@@ -188,7 +188,7 @@ tombstone（IR-011 型 file-backed）は AG-008 により物理削除し、廃�
 detector 関数の専有は必須ではなく、invariant ごとの到達性が追跡可能で回帰証拠が存在すれば他 IR との detector 共有を許容する。
 既存であることのみを KEEP の根拠としない。
 
-1. canonical basis（REQ/Decision/SPEC のいずれか）
+1. canonical basis（REQ/Decision/Design のいずれか）
 2. invariant（検出すべき不変条件）
 3. executable detector（専有または共有）
 4. regression test
@@ -204,7 +204,7 @@ detector 関数の専有は必須ではなく、invariant ごとの到達性が�
 detector 不在、部分実装、test 不在、到達不能、finding 未接続の IR を恒久的な現行 IR として許容しない。
 必要な invariant は IMPLEMENT、不要な場合は DELETE/MERGE とする。
 
-### 関連 SPEC
+### 関連 Design
 
 - `integrity-rule-catalog.md`: IR スキーマ（DEC-013 適用後の12 field）
 - `rule-ownership.md`: 所有権マトリックス
@@ -237,7 +237,7 @@ tombstone 群（IR-011 型 file-backed）の `baseline_status: superseded` 表�
 
 全新規 IR は次の5要素の同時成立を必須とする。
 
-1. canonical basis（REQ/Decision/SPEC のいずれか）が存在する
+1. canonical basis（REQ/Decision/Design のいずれか）が存在する
 2. invariant（検出すべき不変条件）が明文化されている
 3. executable detector（専有または共有）が実装されている
 4. regression test が存在する
@@ -269,15 +269,15 @@ gate 不合格の場合は新規 IR 登録を取り下げ、REQ-028-013「IR 件
 ## 一時移行検査 registry（REQ-028-006）
 
 一時移行検査（migration residual 等）は原則として恒久 IR とせず、期限/終了条件を持つ別種検査として扱う。
-別種検査の所在は対象 SPEC または migration plan 配下とし、終了条件監視機構（期限超過警告、または docs-check 等の既存鮮度監視経路の拡張）を規定する。
+別種検査の所在は対象 Design または migration plan 配下とし、終了条件監視機構（期限超過警告、または docs-check 等の既存鮮度監視経路の拡張）を規定する。
 
 ### 別種検査の要件
 
 | 項目 | 内容 |
 |---|---|
-| 配置先 | 対象 SPEC の `## Migration checks` 等の独立セクション、または `.agentdev/migration-plans/` 配下 |
+| 配置先 | 対象 Design の `## Migration checks` 等の独立セクション、または `.agentdev/migration-plans/` 配下 |
 | 終了条件 | 期限（例: ドメイン再編完了後2四半期）、または状態条件（例: 対象参照の新規発生件数が閾値以下） |
-| 監視機構 | docs-check、または対象 SPEC での定期確認手順 |
+| 監視機構 | docs-check、または対象 Design での定期確認手順 |
 | 廃止手順 | 終了条件達成後、別種検査を廃止し catalog/実装から除去する |
 
 継続的再発防止価値がある場合のみ恒久 IR へ昇格する。
@@ -373,7 +373,7 @@ baseline は `category` / `check` / `file` / `evidence` の4組を bucket key �
 
 RuntimeReference baseline（IR-055、前節）は heuristic 違反の段階導入を目的とし、本 NG baseline は strict 違反（`ng` / `warning`）の既知集合を管理して「既知違反の解消」により strict pass を到達可能にすることを目的とする。
 両 baseline は独立に運用し、相互に影響しない。
-NG baseline は v2:REQ-0161-005（旧 `docs/requirements/v2:REQ-0161.md`、現 `docs/requirements/retired/v2:REQ-0161.md`）から SPEC 統合された恒久契約である。
+NG baseline は v2:REQ-0161-005（旧 `docs/requirements/v2:REQ-0161.md`、現 `docs/requirements/retired/v2:REQ-0161.md`）から Design 統合された恒久契約である。
 
 ### baseline entry 運用契約（機械生成・パス bucket key・生成環境・報告分類）
 
@@ -386,9 +386,9 @@ NG baseline entry の運用は次の契約に従う。
 
 ### 宣言的データ YAML と detector の契約（REQ-028-015/016 移管受入れ）
 
-REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳細な実行規則は checker-execution-contracts SPEC が所有する）。
+REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳細な実行規則は checker-execution-contracts Design が所有する）。
 
-- 検出用の宣言的データ YAML は SPEC が正となる schema を持ち、YAML は検出用ビューとして扱うこと
+- 検出用の宣言的データ YAML は Design が正となる schema を持ち、YAML は検出用ビューとして扱うこと
 - detector 実装は IR 識別子に基づく命名規約を持ち、IR から detector 実装への機械的逆引きが可能であること
 
 ## docs-check delta 検出における除外設定方針（REQ-036-010, REQ-036-003 準拠）
@@ -437,13 +437,13 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 
 ## Workflow × 使用ツールマトリックス
 
-本セクションは全 workflow の使用検査ツールを肯定表現で一元管理する SSoT であり、各 workflow SPEC から参照される。
+本セクションは全 workflow の使用検査ツールを肯定表現で一元管理する SSoT であり、各 workflow Design から参照される。
 req-save/design-save/case-run/case-close の各コマンドは対象ファイル種別に応じた最小監査範囲を定義し、case-run/case-close は永続文書更新を契機に検査する。
 
 | workflow | check_changed_docs.ts | check_extensions.ts | check_integrity.ts | test_strategy |
 |---|---|---|---|---|
 | req-save | ✓（REQ files） | — | — | — |
-| design-save | ✓（SPEC files） | — | — | — |
+| design-save | ✓（Design files） | — | — | — |
 | case-open | — | — | — | — |
 | case-run | ✓（docs/** 変更時、--workflow case-run） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（Issue 完了条件検証） |
 | case-close | ✓（PR files、--workflow case-close） | ✓（src/opencode/{commands,skills}/** 変更時、IR-056） | — | ✓（QG-4 完了条件確認） |
@@ -453,7 +453,7 @@ req-save/design-save/case-run/case-close の各コマンドは対象ファイル
 全セル肯定表現（✓ または —）を使用する（REQ-010-002, REQ-010-003 準拠）。
 check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、他 workflow は — で「使用しない」を暗黙表現する。
 
-参照元 workflow SPEC 一覧（各 SPEC から本マトリックス表を参照）:
+参照元 workflow Design 一覧（各 Design から本マトリックス表を参照）:
 
 - [commands/req-save.md](../commands/req-save.md)
 - [commands/design-save.md](../commands/design-save.md)

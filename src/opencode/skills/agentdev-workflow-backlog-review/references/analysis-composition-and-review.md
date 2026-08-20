@@ -63,7 +63,7 @@
 
 - STEP-1 の対象成果物一覧（durable state: promoted/ 実ファイル）
 - 分析基準、前工程からの引き継ぎメタデータ付与ルールは `agentdev-backlog-integration` の公開操作契約に従う
-- document-model SPEC（extension 経由）の文書7分類モデルを参照する
+- document-model Design（extension 経由）の文書7分類モデルを参照する
 
 ### Preconditions
 
@@ -72,7 +72,7 @@
 ### Procedure
 
 1. 各採用済み成果物を読み込み、分析する
-2. 各 RU 候補について、document-model SPEC（extension 経由）の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する
+2. 各 RU 候補について、document-model Design（extension 経由）の文書7分類モデル（REQ、挙動Design、カタログDesign、guide、learning維持、作業記録、対象外）を参照して暫定分類を付与する
 3. 分析結果と併せて RU frontmatter に `tentative_classification` として記録する（記録は STEP-7 の RU 生成時。本 STEP は付与内容を確定する）
 
 ### Result
@@ -140,12 +140,12 @@ RU 構成案の意味的決定を adversarial-review で検証し、accepted fin
 
 - STEP-3 で確定した RU 構成案（runtime artifact。中断時は promoted/ 実ファイルから再構築する）
 - 候補判断基準、内部手続きは `agentdev-backlog-integration` の公開操作契約に従う
-- 共通 caller integration 契約の正規所有者は adversarial-review SPEC である
+- 共通 caller integration 契約の正規所有者は adversarial-review Design である
 
 ### Preconditions
 
 - STEP-3 完了（RU 構成案確定済み）
-- 挿入境界、発動条件、順序、矛盾取扱いの正規所有者は backlog-review command SPEC「adversarial-review 挿入境界（経路E）」節である
+- 挿入境界、発動条件、順序、矛盾取扱いの正規所有者は backlog-review command Design「adversarial-review 挿入境界（経路E）」節である
 
 ### Procedure
 
@@ -156,7 +156,7 @@ skip 判断のためだけの新規 HITL、承認点は追加しない。
 ユーザー明示指定時は skip 条件の該当にかかわらず必ず発動する
 2. **review 呼出**: 発動と判定された場合のみ `agentdev-adversarial-review` を起動する。
 審議対象は RU 構成案（統合・分割判定結果、depends_on 解決結果、暫定分類付与結果）。
-呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と delegation-contracts SPEC（`semantic_review`、書き込み禁止型）を正とする
+呼出契約、返却契約、副作用境界は `agentdev-adversarial-review` と delegation-contracts Design（`semantic_review`、書き込み禁止型）を正とする
 3. **accepted finding 反映**: accepted finding の RU 構成案への反映は本 workflow（呼出元）の責務である。
 反映後に RU 構成案の意味内容が変更された場合、必要な既存検証（depends_on 再解決、矛盾検出再実行）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる。
 同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない

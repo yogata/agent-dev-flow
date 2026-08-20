@@ -5,31 +5,26 @@ created: 2026-08-10
 updated: 2026-08-10
 ---
 
-<!-- declaration
-spec_logical_division: cross_cutting_contract
-canonical_owner: decision-lifecycle
--->
-
 # Decision Lifecycle
 
-本 SPEC は agent-dev-flow リポジトリのみに適用される。
+本 Design は agent-dev-flow リポジトリのみに適用される。
 
 ## 目的
 
 Decision の関係モデル、粒度管理規則、健全性評価モデルを正規所有する（REQ-001-061〜064、AG-005、AG-006、AG-017）。
 Decision は REQ と管理特性を分離し（AG-004）、意味的健全性で粒度を評価し（AG-006）、REQ 重複・分割モデルと分離された健全性評価を持つ（AG-017）。
-本 SPEC はこれらを Decision 固有の契約として定義し、document-model.md「文書ライフサイクル」から参照される詳細を所有する。
+本 Design はこれらを Decision 固有の契約として定義し、document-model.md「文書ライフサイクル」から参照される詳細を所有する。
 
-### 他 SPEC との役割分担
+### 他 Design との役割分担
 
-| 関心 | 主に扱う SPEC |
+| 関心 | 主に扱う Design |
 |---|---|
 | 文書種別基準境界、文書ライフサイクル全体、accepted Decision の意味的不変、編集制約 | `document-model.md` |
-| Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理規則、健全性評価モデル | 本 SPEC |
+| Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理規則、健全性評価モデル | 本 Design |
 | REQ 健全性メトリクス、SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT 診断観点 | `../quality/req-health-metrics.md`、`../responsibilities/document-type-responsibilities.md` |
 | Decision ID 形式、採番規則、欠番管理 | `patterns.md`、`numbering-policy.md` |
 
-本 SPEC は Decision 固有の意味境界、関係、粒度、健全性に特化し、REQ 健全性モデルと重複しない（AG-017）。
+本 Design は Decision 固有の意味境界、関係、粒度、健全性に特化し、REQ 健全性モデルと重複しない（AG-017）。
 
 ## Decision 関係モデル
 
@@ -141,14 +136,14 @@ Decision 健全性評価は REQ 重複・分割モデルと分離し、Decision 
 ### REQ 健全性モデルとの分離
 
 REQ 健全性メトリクス（`req-health-metrics.md`）の SPLIT / MERGE / DUPLICATE 診断観点は REQ 体系に適用する。
-Decision 体系へは本 SPEC の粒度管理規則、健全性評価モデルを適用する。
+Decision 体系へは本 Design の粒度管理規則、健全性評価モデルを適用する。
 両者は独立して運用し、閾値、判定プロセス、評価対象を共有しない（AG-017）。
 
 ### 診断観点との対応
 
 inspect-docs の診断観点（SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT）は REQ 体系を主対象とする。
-Decision 体系へ適用する場合は本 SPEC の粒度管理規則、健全性評価モデルへ読み替える。
-読み替え対応は本 SPEC が正規所有する。
+Decision 体系へ適用する場合は本 Design の粒度管理規則、健全性評価モデルへ読み替える。
+読み替え対応は本 Design が正規所有する。
 
 | 診断観点 | Decision 体系での読み替え |
 |---|---|
@@ -161,12 +156,12 @@ Decision 体系へ適用する場合は本 SPEC の粒度管理規則、健全�
 
 ## 適用範囲宣言
 
-本 SPEC は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
+本 Design は agent-dev-flow リポジトリ専用のリポジトリ内部設計文書である（REQ-001）。
 他プロジェクトへの適用を意図しない。
-実行時コマンドは本 SPEC ファイルに依存しない（REQ-001）。
+実行時コマンドは本 Design ファイルに依存しない（REQ-001）。
 
 ## 関連情報
 
 - 関連 REQ: REQ-001（文書体系と持続可能な基準構造、要件行 061〜064）
-- 関連 SPEC: `document-model.md`（文書ライフサイクル、accepted Decision の意味的不変）、`numbering-policy.md`（Decision 採番規則）、`../quality/req-health-metrics.md`（REQ 健全性モデル、本 SPEC と分離）
+- 関連 Design: `document-model.md`（文書ライフサイクル、accepted Decision の意味的不変）、`numbering-policy.md`（Decision 採番規則）、`../quality/req-health-metrics.md`（REQ 健全性モデル、本 Design と分離）
 - 根拠合意項目: AG-004（REQ と Decision の管理特性分離）、AG-005（Decision 関係モデル）、AG-006（粒度管理の意味的健全性評価）、AG-017（Decision 健全性評価の REQ との分離）

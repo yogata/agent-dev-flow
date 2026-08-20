@@ -10,9 +10,9 @@ Command/ Skill/ Template/ Script の責任分界に基づき、Commandを薄く�
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-command-authoring` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-command-authoring` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -141,7 +141,7 @@ Command作成、改定時に以下を確認する:
 ## See Also
 
 - **agentdev-skill-authoring**: Skill品質基準
-- **artifact-contracts SPEC**: Command/Skill/Template/Script 責務境界
+- **artifact-contracts Design**: Command/Skill/Template/Script 責務境界
 - **references/command-authoring-standards.md**: 行数目安、Steps数目安、共通処理重複、正規パス、完了報告種別、後方互換性の詳細
 
 

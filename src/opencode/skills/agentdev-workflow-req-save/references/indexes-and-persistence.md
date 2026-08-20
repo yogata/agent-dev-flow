@@ -75,7 +75,7 @@ REQ インデックスとドキュメントハブへ新規エントリを登録�
 
 `agentdev-decision-file-manager` に従って Decision ファイルを作成する。
 作成後、`docs/README.md` にDecisionセクションが存在しない場合は追加し、Decisionエントリを記載する。
-**Decision妥当性再検証ゲート**（保存の直前）: Decisionが技術判断（アーキテクチャ上の決定）を含むか確認、REQ/SPEC相当の内容のみの場合は保存を停止し理由を報告、`agentdev-decision-guidelines` の判定結果を前提として検証、`agentdev-decision-file-manager` の採番ルール（max+1、欠番埋め禁止）で確定した番号を振る、draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を当該確定番号で置換する。
+**Decision妥当性再検証ゲート**（保存の直前）: Decisionが技術判断（アーキテクチャ上の決定）を含むか確認、REQ/Design相当の内容のみの場合は保存を停止し理由を報告、`agentdev-decision-guidelines` の判定結果を前提として検証、`agentdev-decision-file-manager` の採番ルール（max+1、欠番埋め禁止）で確定した番号を振る、draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を当該確定番号で置換する。
 
 ### Result
 
@@ -136,7 +136,7 @@ CLI 形式は同 SKILL.md を参照。
 
 ### Purpose
 
-REQ/Decision/SPEC 操作が各 README 索引へ影響するか確認し、targeted docs guard を実行する。
+REQ/Decision/Design 操作が各 README 索引へ影響するか確認し、targeted docs guard を実行する。
 
 ### Input Resolution
 
@@ -151,7 +151,7 @@ REQ/Decision/SPEC 操作が各 README 索引へ影響するか確認し、target
 
 ### Procedure
 
-REQ/Decision/SPEC操作が `docs/README.md`、各 README（`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/designs/README.md`）の索引に影響するか確認する。
+REQ/Decision/Design操作が `docs/README.md`、各 README（`docs/requirements/README.md`、`docs/decisions/README.md`、`docs/designs/README.md`）の索引に影響するか確認する。
 影響がある場合は更新、ない場合は「README 索引更新なし」とする。
 README 索引更新は導線の更新であり、要件、判断、仕様の更新ではない。
 

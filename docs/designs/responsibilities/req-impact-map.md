@@ -8,7 +8,7 @@ updated: 2026-06-28
 # REQ 影響マップ
 
 > **位置づけと rule-ownership.md との関係**: 本ファイルは **REQ → 影響するルール/アーティファクト** の対応表である。
-> `../integrity/rule-ownership.md`（**ルールドメイン → canonical REQ/SPEC**）と逆方向の対応マップであり、両者は補完関係にある。
+> `../integrity/rule-ownership.md`（**ルールドメイン → canonical REQ/Design**）と逆方向の対応マップであり、両者は補完関係にある。
 > 配置は `responsibilities/` 残置とする（移動は参照方向、利用頻度、更新責務を確認した後に別途判断）。
 
 ### 同期更新が必要なケース
@@ -28,7 +28,7 @@ updated: 2026-06-28
 | REQ | タイトル | 影響する Rule IDs | 影響する Artifact |
 |-----|---------|------------------|------------------|
 | REQ-001 | 文書、REQ 管理基準 | IR-001, IR-002, IR-003, IR-004, IR-017, IR-018, IR-022 | REQ, REQ index |
-| REQ-002 | Artifact 責任分界 | IR-006, IR-008, IR-014, IR-016, IR-024 | commands, skills, templates, SPEC |
+| REQ-002 | Artifact 責任分界 | IR-006, IR-008, IR-014, IR-016, IR-024 | commands, skills, templates, Design |
 | REQ-010 | Integrity/Validation/Tests | IR-001~IR-024 (全件) | 全アーティファクト |
 | v2:REQ-0107 | Reporting/Writing Quality | IR-013, IR-019 | templates, guides |
 | REQ-005 | Workflow/Command Protocol | IR-006, IR-024 | commands |
@@ -36,7 +36,7 @@ updated: 2026-06-28
 | REQ-006 | Case 実行オーケストレーション / Epic、Wave | IR-006, IR-013, IR-016 | commands, templates |
 | REQ-036 | REQ 再構成運用 | IR-004, IR-011, IR-015 | REQ, 廃止 REQ |
 | REQ-001 | ADR status 正規化 | IR-005, IR-010 | ADR, ADR index |
-| v2:REQ-0113 | Skill References SPEC 分離 | IR-008, IR-014 | skills, skill references |
+| v2:REQ-0113 | Skill References Design 分離 | IR-008, IR-014 | skills, skill references |
 | REQ-006 | case-auto 最大自走モード | IR-006, IR-016 | commands |
 | REQ-003 | コマンド、スキル、サブエージェント責務分界の再基準化 | IR-006, IR-008, IR-014, IR-024 | commands, skills |
 | REQ-005 | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 | IR-006, IR-008, IR-014 | commands, skills |
@@ -54,17 +54,17 @@ updated: 2026-06-28
 | REQ-004 | 要件定義、保存 | IR-001, IR-002 | REQ |
 | REQ-009 | 配布基盤: source/projection、sync、repo type、consumer install | IR-006, IR-016, IR-046 | commands, skills, ドメイン状態 |
 | REQ-008 | Drafts 配置、Draft Type Registry | IR-016 | ドメイン状態 |
-| REQ-001 | REQ/SPEC 責務分離の徹底と新ワークフロー（design-save 新設、req-define 強化） | IR-008, IR-044 | REQ, SPEC, commands |
+| REQ-001 | REQ/Design 責務分離の徹底と新ワークフロー（design-save 新設、req-define 強化） | IR-008, IR-044 | REQ, Design, commands |
 | v2:REQ-0137 | 並列実行安全 git 操作規律 |（(infrastructure)）| - |
 | REQ-008 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
 | REQ-003 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
-| v2:REQ-0140 | 文書品質ゲート | IR-013, IR-045 | docs, SPEC, document-type-responsibilities.md |
-| REQ-009 | ローカル版 OpenCode 導入方式とローカル Case ファイル運用 | IR-016, IR-046, IR-047, IR-048 | src/opencode-local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/cases/, SPEC, guides |
-| REQ-002 | 配布物ID除去後の文意保持、構文健全性、責務整合 | IR-016 | docs, SPEC, docs-spec-rebuild-integrity.md |
+| v2:REQ-0140 | 文書品質ゲート | IR-013, IR-045 | docs, Design, document-type-responsibilities.md |
+| REQ-009 | ローカル版 OpenCode 導入方式とローカル Case ファイル運用 | IR-016, IR-046, IR-047, IR-048 | src/opencode-local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/cases/, Design, guides |
+| REQ-002 | 配布物ID除去後の文意保持、構文健全性、責務整合 | IR-016 | docs, Design, docs-spec-rebuild-integrity.md |
 | v2:REQ-0143 | Command 定義ファイルフォーマット標準化 | IR-049 | commands, command-file-format.md |
-| REQ-010 | docs-check/integrity 運用是正 | IR-016, IR-052 | integrity scripts, docs-check, SPEC |
+| REQ-010 | docs-check/integrity 運用是正 | IR-016, IR-052 | integrity scripts, docs-check, Design |
 | REQ-010 | docs-check/integrity 検出設計改善 | IR-044, IR-050, IR-051, IR-052 | integrity-rule-catalog.md, integrity scripts |
-| REQ-003 | 実行契約、委譲、プロセス設計 | IR-006, IR-032, IR-033 | commands, SPEC |
+| REQ-003 | 実行契約、委譲、プロセス設計 | IR-006, IR-032, IR-033 | commands, Design |
 | REQ-003 | 文書化規律、HITL境界 | IR-013, IR-019, IR-035 | docs, commands, skills, guides |
 | REQ-006 | RU群バッチ処理と複数 execution_unit 並列実行 | IR-006, IR-016 | commands |
 
@@ -72,7 +72,7 @@ updated: 2026-06-28
 
 特定要件行が影響するアーティファクト、スキル、コマンド（REQ-039-003）。
 REQ 全体ではなく要件行粒度で境界基準、検出観点の影響を追跡する必要がある場合に使用する。
-これらの要件行はすべて IR-044（REQ/SPEC 境界違反検出）を通じてカタログに紐づく。
+これらの要件行はすべて IR-044（REQ/Design 境界違反検出）を通じてカタログに紐づく。
 
 従来 REQ-002-021、022、023、024、025、026、032 に紐づいていた配布依存境界の影響エントリは MOVE 先（REQ-029-001..008）へ差し替え済みである。
 REQ-002-027 は更新後の意味（実行時依存として使用するパスは導入先環境で解決可能）へ差し替えた。
@@ -125,10 +125,10 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 
 ## IR → REQ 逆方向参照（ACT-SPEC-006、REQ-028-008）
 
-本ファイル（REQ → 影響するルール/アーティファクト）と `../integrity/rule-ownership.md`（ルールドメイン → canonical REQ/SPEC）は逆方向の対応マップである（REQ-010-011）。
+本ファイル（REQ → 影響するルール/アーティファクト）と `../integrity/rule-ownership.md`（ルールドメイン → canonical REQ/Design）は逆方向の対応マップである（REQ-010-011）。
 両者の整合性維持運用は前節「同期更新が必要なケース」に従う。
 
-個別 IR（IR-NNN）の対応 REQ / SPEC は `../integrity/rule-ownership.md` の AUTOGEN ブロック（`rule-ownership-ir-crossref`）が IR-* ファイルの frontmatter / Field/Value 表から自動生成する（SC-002 Phase C、IR-061）。
+個別 IR（IR-NNN）の対応 REQ / Design は `../integrity/rule-ownership.md` の AUTOGEN ブロック（`rule-ownership-ir-crossref`）が IR-* ファイルの frontmatter / Field/Value 表から自動生成する（SC-002 Phase C、IR-061）。
 本節は直接編集せず、`rule-ownership.md` の AUTOGEN ブロックを正とする。
 
 DEC-013 AG-008 適用により file-backed tombstone（IR-011 型）を物理削除する。

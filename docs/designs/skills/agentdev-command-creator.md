@@ -1,11 +1,11 @@
 ---
-title: `agentdev-command-creator` SPEC
+title: `agentdev-command-creator` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
 
-# `agentdev-command-creator` SPEC
+# `agentdev-command-creator` Design
 
 ## 目的
 

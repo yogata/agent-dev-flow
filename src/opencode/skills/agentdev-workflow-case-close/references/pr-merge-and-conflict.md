@@ -34,7 +34,7 @@ squash merge 先は当該 Case の統合先とする。
 - **統合先の確定**: Issue 本文の実証Case状態情報（対象評価ブランチ等の永続記録）から当該 Case の統合先を確定する。実証Case状態情報がある場合は実証Caseとして対象評価ブランチを、ない場合は通常Caseとして既定 main を統合先とする
 - **通常Caseの回帰維持**: 通常Case（評価を利用しない Standard / Epic Case）の squash merge 先は従来どおり main であり、利用者向け操作と挙動を変更しない
 - **実証Case**: 対象評価ブランチを squash merge 先とする。PR の base が当該統合先であることを前提とし、PR base と squash merge 先が一致しない場合は処理を進めず構造化エラーとして扱う
-- 統合先とブランチモデルの基盤契約（worktree 作成元、PR の base、rebase・同期基準、鮮度確認、squash merge 先、Epic 後続 Wave の作業起点が同一の統合先を参照すること）は `agentdev-git-worktree` SPEC（extension 経由）を参照する
+- 統合先とブランチモデルの基盤契約（worktree 作成元、PR の base、rebase・同期基準、鮮度確認、squash merge 先、Epic 後続 Wave の作業起点が同一の統合先を参照すること）は `agentdev-git-worktree` Design（extension 経由）を参照する
 
 ### STEP-4-2: squash merge 前の mergeable UNKNOWN ポーリング
 

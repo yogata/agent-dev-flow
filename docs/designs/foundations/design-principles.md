@@ -7,13 +7,13 @@ updated: 2026-07-24
 
 # 設計原則
 
-> **SPEC と Decision の境界（REQ-001-043/044/050）**: 本 SPEC は現行仕様として機能する分類表、導出表（work_type / scale / workflow_route 等）、適用基準を扱う。
-> 判断理由、歴史的経緯、設計意図、トレードオフ説明の正本は以下の Decision 群を参照すること（新規 Decision は作成しない、既存 Decision で覆えない内容は本 SPEC の範囲外として報告）。
+> **Design と Decision の境界（REQ-001-043/044/050）**: 本 Design は現行仕様として機能する分類表、導出表（work_type / scale / workflow_route 等）、適用基準を扱う。
+> 判断理由、歴史的経緯、設計意図、トレードオフ説明の正本は以下の Decision 群を参照すること（新規 Decision は作成しない、既存 Decision で覆えない内容は本 Design の範囲外として報告）。
 > - REQ-001（文書種別責務境界、記述対象境界）
 > - REQ-001（実行時配布物と執筆時関心の分離）
-> - REQ-001（Skill references SPEC 分離基準）
+> - REQ-001（Skill references Design 分離基準）
 > - REQ-001（AgentDevFlow プラグイン名前空間の統一）
-> **artifact-contracts.md との責任分界**: `../responsibilities/artifact-contracts.md` が Command/Skill/Template/Script の詳細契約（入出力、依存方向）を扱うのに対し、本 SPEC は上位原則と分類規則に限定する。
+> **artifact-contracts.md との責任分界**: `../responsibilities/artifact-contracts.md` が Command/Skill/Template/Script の詳細契約（入出力、依存方向）を扱うのに対し、本 Design は上位原則と分類規則に限定する。
 > 詳細契約の参照先は artifact-contracts.md を優先する。
 
 本プロジェクトの設計判断の根拠を集約した前方視の指針。
@@ -28,11 +28,11 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 
 **bugfix** は既存機能の不具合修正であり、要件定義書（REQ）の作成を不要とする。
 バグ修正は観察可能な事実（再現手順、期待動作、実際動作）に基づいて完結するため、壁打ちによる要件形成が不要である。
-ただし影響を受ける docs（REQ/Decision/SPEC/guide）の更新は完了条件に含まれる（REQ-005-034）。
+ただし影響を受ける docs（REQ/Decision/Design/guide）の更新は完了条件に含まれる（REQ-005-034）。
 最小限の経路（req-define → case-open → case-run → case-close）で処理する。
 
 **feature** は新しい振る舞いをシステムに導入するため、WHAT（要件）と HOW（実装）の分離が必要である。
-壁打ちフェーズでの要件形成、REQ/Decision ファイルの保存、specs 更新など、複数の確認ポイントを経由する経路（req-define → req-save → design-save（SPEC 候補がある場合）→ case-open → case-run → case-close）を辿る。
+壁打ちフェーズでの要件形成、REQ/Decision ファイルの保存、specs 更新など、複数の確認ポイントを経由する経路（req-define → req-save → design-save（Design 候補がある場合）→ case-open → case-run → case-close）を辿る。
 
 **maintenance** はリファクタリング、保守作業向けの軽量経路である。
 **docs_chore** はドキュメント、雑務向けの軽量経路である。
@@ -42,8 +42,8 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 | work_type | scale | workflow_route | 経路 |
 |---|---|---|---|
 | bugfix | - | direct_case | req-define → case-open → case-run → case-close |
-| feature | standard | req_backed_case | req-define → req-save → design-save（SPEC 候補がある場合）→ case-open → case-run → case-close |
-| feature | large | epic_case | req-define → req-save → design-save（SPEC 候補がある場合）→ case-open（Epic）→ case-run（Wave）→ case-close |
+| feature | standard | req_backed_case | req-define → req-save → design-save（Design 候補がある場合）→ case-open → case-run → case-close |
+| feature | large | epic_case | req-define → req-save → design-save（Design 候補がある場合）→ case-open（Epic）→ case-run（Wave）→ case-close |
 | maintenance | - | direct_case | req-define → case-open → case-run → case-close |
 | docs_chore | - | direct_case | req-define → case-open → case-run → case-close |
 
@@ -65,9 +65,9 @@ work_type と scale の組み合わせで workflow_route を導出する（REQ-0
 
 ### ADR 判断漏れ（false negative）基準
 
-ADR 対象となる判断を REQ/SPEC/guide のみとして扱う判断漏れ（false negative）を防ぐため、以下のリスク指標に該当する内容は ADR 必要性を再評価すること（推奨、REQ-001-058）。
+ADR 対象となる判断を REQ/Design/guide のみとして扱う判断漏れ（false negative）を防ぐため、以下のリスク指標に該当する内容は ADR 必要性を再評価すること（推奨、REQ-001-058）。
 
-- REQ/SPEC 境界の曖昧な内容: WHAT と HOW の分離だけでは判断理由が保存されず、後続変更で根拠が失われる可能性がある
+- REQ/Design 境界の曖昧な内容: WHAT と HOW の分離だけでは判断理由が保存されず、後続変更で根拠が失われる可能性がある
 - 複数モジュールにまたがる判断: command / skill / script / docs など複数の責務境界に影響し、局所仕様だけではトレードオフを説明できない
 - 長期間有効な技術選定: 一時的な仕様ではなく、将来の実装、運用判断を拘束する選定である
 
@@ -146,7 +146,7 @@ AgentDevFlow の配布物は実行時（runtime: 個別プロジェクトで実�
 ## 7. 受け入れ条件中心の責務分離
 
 command は高位実行骨格だけでなく、公開成果物、権限境界（安全境界、承認境界）、停止条件、必須順序（成果物、安全性、外部契約へ影響する順序）、利用 skill 名と委譲責務を所有するものとして定義する。
-skill、reference、script、REQ、SPEC の配置原則を、正規所有者、手段の自由度、受け入れ条件、決定的処理の観点で同期する。
+skill、reference、script、REQ、Design の配置原則を、正規所有者、手段の自由度、受け入れ条件、決定的処理の観点で同期する。
 
 ### 配置原則の同期
 
@@ -157,7 +157,7 @@ skill、reference、script、REQ、SPEC の配置原則を、正規所有者、�
 | reference | 詳細な判定表、スキーマ、例、失敗時手順は必要な場合に限り当該 skill 自身の reference へ配置 |
 | script | 決定的処理（採番、構文解析、見出し検索、整合性検査）を所有。操作責任を持つ skill の配下に配置し、同一 script を複数 skill へ複製しない |
 | REQ | 外部から観測できる振る舞い、公開成果物、ドメイン状態、安全境界、承認境界、停止条件、後続工程との安定した接続契約、ハーネス非依存の恒久的制約へ限定 |
-| SPEC | 現在の振る舞い、スキーマ、判定規則、状態遷移、実装上必要な順序とパラメータを所有。command SPEC は command の Step 番号を複製せず、成果物、副作用、停止状態、必須順序によって command と対応付ける（v2:REQ-0143-005） |
+| Design | 現在の振る舞い、スキーマ、判定規則、状態遷移、実装上必要な順序とパラメータを所有。command Design は command の Step 番号を複製せず、成果物、副作用、停止状態、必須順序によって command と対応付ける（v2:REQ-0143-005） |
 
 ### ハーネス純化の回帰基準
 

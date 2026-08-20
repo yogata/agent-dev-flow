@@ -1,11 +1,11 @@
 ---
-title: `agentdev-decision-file-manager` SPEC
+title: `agentdev-decision-file-manager` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-27
 ---
 
-# `agentdev-decision-file-manager` SPEC
+# `agentdev-decision-file-manager` Design
 
 ## 目的
 

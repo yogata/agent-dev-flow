@@ -1,11 +1,11 @@
 ---
-title: `agentdev-workflow-templates` SPEC
+title: `agentdev-workflow-templates` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-19
 ---
 
-# `agentdev-workflow-templates` SPEC
+# `agentdev-workflow-templates` Design
 
 ## 目的
 
@@ -21,7 +21,7 @@ agentdev 系コマンドで使用する Issue/PR 本文、コメントテンプ�
 
 - Issue 本文テンプレート（feature / bug / epic / child）
 - コメントテンプレート（bug_analysis / feature_technical / update / review_ng / feature_implementation / bug_record）
-- PR 本文テンプレート（`## Findings / Capture候補`、`## SPEC確定候補` セクション含む）
+- PR 本文テンプレート（`## Findings / Capture候補`、`## Design確定候補` セクション含む）
 - テンプレート選定ルール（work_type、Issue 種別、フロー種別）
 - セクション規約（`<!-- 【必須】 -->`、`<!-- 【任意】 -->` マーカー）
 
@@ -52,7 +52,7 @@ agentdev 系コマンドで使用する Issue/PR 本文、コメントテンプ�
 ## review_dispositions 証跡セクション（AG-002、AG-005、AG-009、AG-011）
 
 case-open が draft-data の `review_dispositions` を読み取り、Issue 本文の「レビュー判断」セクションへ恒久証跡として転記する。
-本 SPEC が当該セクションの構造を正規所有する（AG-002）。
+本 Design が当該セクションの構造を正規所有する（AG-002）。
 
 ### 対象テンプレート
 
@@ -148,7 +148,7 @@ Issue 本文に次のセクションを必須とする（新規作成時）。
 - （artifact type と対象パスのリスト）
 
 ### 必須品質統制
-- （artifact-quality-control-routing SPEC に基づく能力キーと検証項目）
+- （artifact-quality-control-routing Design に基づく能力キーと検証項目）
 
 ### 関連 Decision 拘束条件
 - （該当 ADR と完了条件/test strategy への反映）
@@ -176,7 +176,7 @@ execution contract 責務が軽量なため）。
 
 ## テンプレート正規形（Parent 配置・Epic 追跡テーブル）
 
-Epic Issue・子 Issue テンプレートの次の正規形を本 SPEC が正規所有する。テンプレートコメント（issue_desc_child.md / issue_desc_epic.md）と agentdev-epic-tracker references は本正規形の実装ビューであり、乖離しない。
+Epic Issue・子 Issue テンプレートの次の正規形を本 Design が正規所有する。テンプレートコメント（issue_desc_child.md / issue_desc_epic.md）と agentdev-epic-tracker references は本正規形の実装ビューであり、乖離しない。
 
 ### Parent 配置の正規形
 
@@ -189,7 +189,7 @@ Epic Issue・子 Issue テンプレートの次の正規形を本 SPEC が正規
 - 分解テーブル（Epic 本文の子 Issue 一覧）は `| {wave}-{seq} | #{child_issue} | {status} | {child_title} |` 形式とする（agentdev-epic-tracker 新4列形式と整合）
 - 行 ID は `{wave}-{seq}` 形式（例: `1-1`）。Issue 列は `#N` のみ（OU ID の接尾は内容欄へ置く）
 - ステータス初期値は `pending`（更新は agentdev-epic-tracker が単一書き手として行う）
-- テンプレート選定規則は本 SPEC が、Wave 構成（wave 番号の付番）は epic-wave-model SPEC がそれぞれ所有する責務分担を維持する
+- テンプレート選定規則は本 Design が、Wave 構成（wave 番号の付番）は epic-wave-model Design がそれぞれ所有する責務分担を維持する
 
 ## 対象外
 
@@ -210,7 +210,7 @@ references セクションに列挙された backlog 系テンプレート2フ�
 ### 整理内容
 
 - 当該2ファイルの列挙を references セクションから削除する
-- カタログ SPEC としての整合性を列挙削除により確保する
+- カタログ Design としての整合性を列挙削除により確保する
 - 原本ドラフトが挙げていた L34-35 は references セクション内の列挙行の近似であり、実施時に正確な行を再特定する
 
 ## See Also

@@ -10,8 +10,8 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 <!-- AUTOGEN:END -->
 
 現行要件は36件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして retired/ へ移行、REQ-036〜REQ-043 を追加。番号には欠番が存在する）。
-REQ-022 の規範内容は、後継の [agentdev-artifact-graph SPEC](specs/skills/agentdev-artifact-graph.md)「augmentation 配置先」節が正規所有する。
-REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-graph SPEC](specs/skills/agentdev-artifact-graph.md)「check_graph.ts 抽出規則と warning 分類」節と `scripts/lib/checker.ts` が正規所有する。
+REQ-022 の規範内容は、後継の [agentdev-artifact-graph Design](designs/skills/agentdev-artifact-graph.md)「augmentation 配置先」節が正規所有する。
+REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-graph Design](designs/skills/agentdev-artifact-graph.md)「check_graph.ts 抽出規則と warning 分類」節と `scripts/lib/checker.ts` が正規所有する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 | REQ | タイトル |
@@ -81,47 +81,52 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [DEC-017](decisions/DEC-017.md) | TIM 準拠トレーサビリティモデルの採用と4層分離（proposed） |
 | [DEC-018](decisions/DEC-018.md) | 評価ブランチモデルとCase統合先の一般化（proposed） |
 
-## 仕様（SPEC）
+## 設計（Design）
 
-SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。
-詳細は [SPEC インデックス](specs/README.md) 参照。
+Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン（foundations / responsibilities / quality / integrity / local / authoring）を持つ。
+詳細は [Design インデックス](designs/README.md) 参照。
 
-### 横断 SPEC（`specs/workflows/`）
+### 横断 Design（`designs/workflows/`）
 
-- [ワークフロー契約（横断）](specs/workflows/workflow-contracts.md)
-- [サブエージェント委譲契約](specs/workflows/delegation-contracts.md)
-- [キャプチャ境界](specs/workflows/capture-boundaries.md)
-- [Epic / Wave / Issue 実行モデル](specs/workflows/epic-wave-model.md)
-- [RU / 採用済み成果物 / draft lifecycle](specs/workflows/backlog-artifact-lifecycle.md)
+- [ワークフロー契約（横断）](designs/workflows/workflow-contracts.md)
+- [サブエージェント委譲契約](designs/workflows/delegation-contracts.md)
+- [キャプチャ境界](designs/workflows/capture-boundaries.md)
+- [Epic / Wave / Issue 実行モデル](designs/workflows/epic-wave-model.md)
+- [RU / 採用済み成果物 / draft lifecycle](designs/workflows/backlog-artifact-lifecycle.md)
 
-### command SPEC / skill SPEC
+### command Design / skill Design
 
-- [command SPEC 一覧](specs/commands/)：各 `/agentdev/*` コマンド専用 SPEC（`_template.md` 含む）
-- [skill SPEC 一覧](specs/skills/)：各 `agentdev-*` スキル専用 SPEC（`_template.md` 含む）
+- [command Design 一覧](designs/commands/)：各 `/agentdev/*` コマンド専用 Design（`_template.md` 含む）
+- [skill Design 一覧](designs/skills/)：各 `agentdev-*` スキル専用 Design（`_template.md` 含む）
 
-### 基盤 SPEC（`specs/{foundations,responsibilities,quality,integrity,local,authoring}/`）
+### 基盤 Design（`designs/{foundations,responsibilities,quality,integrity,local,authoring}/`）
 
-基盤 SPEC は 6 ドメインへ整理済み。
-各ドメイン直下に主要 SPEC を置き、詳細・実装固有事項は `references/` サブディレクトリへ分離する（Wave 3 再構築）。
+基盤 Design は 6 ドメインへ整理済み。
+各ドメイン直下に主要 Design を置き、詳細・実装固有事項は `references/` サブディレクトリへ分離する（Wave 3 再構築）。
 
-- [システム仕様](specs/foundations/system.md)
-- [文書フォーマット規約](specs/foundations/patterns.md)
-- [設計原則](specs/foundations/design-principles.md)
-- [文書モデル](specs/foundations/document-model.md)
-- [harness 分離モデル](specs/foundations/harness-separation-model.md)
-- [Project Extensions](specs/foundations/project-extensions.md)
-- [文書種別責務・配置基準](specs/responsibilities/document-type-responsibilities.md)
-- [アーティファクト契約](specs/responsibilities/artifact-contracts.md)
-- [成果物責任表](specs/responsibilities/artifact-responsibilities.md)
-- [品質仕様](specs/quality/quality-specs.md)
-- [品質ゲート](specs/quality/quality-gates.md)
-- [REQ 健全性メトリクス](specs/quality/req-health-metrics.md)
-- [整合性契約](specs/integrity/integrity-contracts.md)
-- [整合性ルールカタログ](specs/integrity/integrity-rule-catalog.md)
-- [ルール所有権マトリックス](specs/integrity/rule-ownership.md)
-- [実行時パッケージ境界](specs/local/runtime-package-boundary.md)
-- [ローカル Case ファイル](specs/local/local-case-file.md)
-- [コマンドファイルフォーマット規約](specs/authoring/command-file-format.md)
+- [システム仕様](designs/foundations/system.md)
+- [文書フォーマット規約](designs/foundations/patterns.md)
+- [設計原則](designs/foundations/design-principles.md)
+- [文書モデル](designs/foundations/document-model.md)
+- [harness 分離モデル](designs/foundations/harness-separation-model.md)
+- [Project Extensions](designs/foundations/project-extensions.md)
+- [文書種別責務・配置基準](designs/responsibilities/document-type-responsibilities.md)
+- [アーティファクト契約](designs/responsibilities/artifact-contracts.md)
+- [成果物責任表](designs/responsibilities/artifact-responsibilities.md)
+- [品質仕様](designs/quality/quality-specs.md)
+- [品質ゲート](designs/quality/quality-gates.md)
+- [REQ 健全性メトリクス](designs/quality/req-health-metrics.md)
+- [整合性契約](designs/integrity/integrity-contracts.md)
+- [整合性ルールカタログ](designs/integrity/integrity-rule-catalog.md)
+- [ルール所有権マトリックス](designs/integrity/rule-ownership.md)
+- [実行時パッケージ境界](designs/local/runtime-package-boundary.md)
+- [ローカル Case ファイル](designs/local/local-case-file.md)
+- [コマンドファイルフォーマット規約](designs/authoring/command-file-format.md)
+
+## Report
+
+監査・評価・観測記録は Report として `docs/reports/` へ分離している。
+Report は Design インデックスの管理対象外である（`designs/README.md`「Report の分離」参照）。
 
 ## ガイド
 
@@ -133,7 +138,7 @@ SPEC は 3 層構造（commands / skills / workflows）と基盤 6 ドメイン�
 - [Intake / Learning / Backlog フロー](guides/intake-learning-backlog-flow.md)
 - [診断・メンテナンス](guides/diagnostics-and-maintenance.md)
 - [成果物・状態モデル](guides/artifacts-and-state.md)
-- [プロジェクトドキュメントと SPEC](guides/project-docs-and-specs.md)
+- [プロジェクトドキュメントと Design](guides/project-docs-and-specs.md)
 - [Consumer Project 導入](guides/consumer-project-setup.md)
 - [トラブルシューティング](guides/troubleshooting.md)
 - [用語集](guides/glossary.md)

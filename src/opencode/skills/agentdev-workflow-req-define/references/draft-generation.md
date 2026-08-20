@@ -38,7 +38,7 @@ STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分
 実証Caseの場合、draft-data に実証Caseであること、評価契約、評価ブランチ識別情報を出力する。下流コマンドは Issue 等の永続情報または draft-data の当該情報から実証Caseを認識する。
 
 各副ステップ（定義完全性ゲート QG-1、operation_units 生成、depends_on/recommended_order 定義、artifact_actions 生成、target_area/content 形式、Design action 分類根拠出力、test_strategy 生成、review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command Design（extension 経由）の各フィールドスキーマを参照。
-`target_design`、`spec_logical_division`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 Design を正とする。
+`target_design`、`canonical_owner`、`on_failure`、`review_dispositions` の出力形式も同 Design を正とする。
 
 ### Result
 

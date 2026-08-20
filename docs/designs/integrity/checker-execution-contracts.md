@@ -9,7 +9,7 @@ updated: 2026-08-18
 
 検査 checker の実行契約、検出対象の除外規定、宣言的データ YAML の schema 原則、detector の命名規約を
 正規所有する。
-配備先の一貫性（RU-0004 と RU-0007 で対象 checker が重複する両 RU の連携注記）を本 SPEC で担保する。
+配備先の一貫性（RU-0004 と RU-0007 で対象 checker が重複する両 RU の連携注記）を本 Design で担保する。
 
 ## 目的
 
@@ -36,11 +36,11 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 
 ## 検出対象除外規定
 
-- 検出対象除外の正規所有は本 SPEC とする。checker 実装は本 SPEC の列挙に従い、列挙外の除外を独自に追加しない
+- 検出対象除外の正規所有は本 Design とする。checker 実装は本 Design の列挙に従い、列挙外の除外を独自に追加しない
 - 除外は対象ファイル単位とし、根拠（ルール自己参照、履歴参照領域、検出原理上の技術的除外）を文書化する。
 広域 glob による検出回避と検出無効化を許容しない（NG 隠蔽禁止、integrity-contracts と同一規定）
-- targeted docs guard は frontmatter または配置ディレクトリに基づく SPEC 判定を行い、非 SPEC ファイル
-（baseline snapshot、歴史記録ファイル等）の SPEC README 登録候補誤検出を抑止する
+- targeted docs guard は frontmatter または配置ディレクトリに基づく Design 判定を行い、非 Design ファイル
+（baseline snapshot、歴史記録ファイル等）の Design README 登録候補誤検出を抑止する
 - 歴史記録ファイル（docs/designs/integrity/audits/、baselines/ 等）は DEC-013 AG-008 適用範囲の
 残存参照判定の対象外とする
 
@@ -53,9 +53,9 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 ## 宣言的データ YAML の schema 原則
 
 検出用の宣言的データ YAML（retired-artifact-registry、command-format-rules、delegation-contract-patterns、
-distribution-targets）は、正となる schema を SPEC が所有する。各 YAML は検出用ビューであり、
+distribution-targets）は、正となる schema を Design が所有する。各 YAML は検出用ビューであり、
 正規契約の情報源とはしない。
-YAML と正 SPEC の不一致は検査で検出対象とする。
+YAML と正 Design の不一致は検査で検出対象とする。
 
 ## detector 命名規約
 
@@ -65,10 +65,10 @@ IR から detector 実装への機械的逆引きを可能にする。共用 det
 
 ## 対象外
 
-- 各 checker の個別検出ロジック、検出シグナル、severity 判定（各 checker の SPEC と IR カタログ）
-- targeted docs guard のモード使い分け・引数形式の詳細（targeted-docs-guard-implementation SPEC）
-- AUTOGEN block ID の棚卸し規定（autogen-freshness-gate SPEC）
-- Workflow / Capability 機械分類規則（workflow-skill-model SPEC）
+- 各 checker の個別検出ロジック、検出シグナル、severity 判定（各 checker の Design と IR カタログ）
+- targeted docs guard のモード使い分け・引数形式の詳細（targeted-docs-guard-implementation Design）
+- AUTOGEN block ID の棚卸し規定（autogen-freshness-gate Design）
+- Workflow / Capability 機械分類規則（workflow-skill-model Design）
 
 ## See Also
 

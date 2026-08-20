@@ -10,7 +10,7 @@ req-define がアーキテクチャ助言サブエージェントへアーキテ
 
 ## 委譲時最小契約
 
-アーキテクチャ助言サブエージェントへの委譲は delegation-contracts SPEC（extension 経由）の委譲時最小契約（inputs, side_effect_boundary, output_contract, capture_handoff）に従う。
+アーキテクチャ助言サブエージェントへの委譲は delegation-contracts Design（extension 経由）の委譲時最小契約（inputs, side_effect_boundary, output_contract, capture_handoff）に従う。
 
 - **inputs**: SKILL.md「アーキテクチャ助言サブエージェント相談の標準入力テンプレート」の5要素
 - **side_effect_boundary**: アーキテクチャ助言サブエージェントはファイル編集を行わない（読み取り、助言のみ）
@@ -32,4 +32,4 @@ req-define がアーキテクチャ助言サブエージェントへアーキテ
 
 - `agentdev-architecture-advisory` SKILL.md（相談プロトコル知識）
 - AGENTS.md（harness 選定、起動手段）
-- delegation-contracts SPEC（委譲時最小契約）
+- delegation-contracts Design（委譲時最小契約）

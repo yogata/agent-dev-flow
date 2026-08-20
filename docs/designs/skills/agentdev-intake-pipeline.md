@@ -1,11 +1,11 @@
 ---
-title: `agentdev-intake-pipeline` SPEC
+title: `agentdev-intake-pipeline` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-28
 ---
 
-# `agentdev-intake-pipeline` SPEC
+# `agentdev-intake-pipeline` Design
 
 ## 目的
 
@@ -111,7 +111,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 ## adversarial-review 候補判断と内部挿入
 
 本節は intake-promote 経路C における review 候補判断基準と内部手続き（候補確定位置、呼出タイミング、結果反映先）を正典として所有する（REQ-015-006）。
-挿入境界、発動条件、戻り先は intake-promote command SPEC「adversarial-review 挿入境界（経路C）」節が正であり、本節は domain skill 側の候補判断と内部手続きのみを所有する。
+挿入境界、発動条件、戻り先は intake-promote command Design「adversarial-review 挿入境界（経路C）」節が正であり、本節は domain skill 側の候補判断と内部手続きのみを所有する。
 
 ### 候補判断基準
 
@@ -136,6 +136,6 @@ intake-promote が review 候補を確定する基準は次のとおり。
 
 ### 参照契約
 
-副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱いは adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014）を正とし、本 SPEC は再定義しない。
+副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱いは adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014）を正とし、本 Design は再定義しない。
 intake-promote 本体は本節に従い候補判断と内部手続きを実行する。
 

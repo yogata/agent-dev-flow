@@ -1,11 +1,11 @@
 ---
-title: 採番管理 SPEC
+title: 採番管理 Design
 status: accepted
 created: 2026-07-19
 updated: 2026-08-11
 ---
 
-# 採番管理 SPEC
+# 採番管理 Design
 
 REQ、Decision、IR の識別子採番規則を統一し、欠番の扱いを採番ミスと意図的予約の両面から確定する。
 AgentDevFlow 配布物が前提する採番の不変条件を宣言し、各所に散在する採番規則を単一の参照先へ集約する（F-003、F-004）。
@@ -66,20 +66,20 @@ numbering-policy は欠番の存在宣言のみを担い、交叉参照データ
 
 | 主張 | 正規所有者 | 参照方向 |
 |------|-----------|----------|
-| REQ/Decision/IR の採番規則 | 本 SPEC | 各 SKILL（`agentdev-req-file-manager`、`agentdev-decision-file-manager`）は本 SPEC を参照 |
-| 決定的採番スクリプトの I/O 契約 | `agentdev-req-file-manager` SKILL（Scripts セクション） | 本 SPEC は概要のみ言及、実装詳細は参照しない |
-| 索引類の記載と実体の整合 | `index-auto-generation.md` | 本 SPEC は整合の必要性を宣言し、機構は同 SPEC を参照 |
+| REQ/Decision/IR の採番規則 | 本 Design | 各 SKILL（`agentdev-req-file-manager`、`agentdev-decision-file-manager`）は本 Design を参照 |
+| 決定的採番スクリプトの I/O 契約 | `agentdev-req-file-manager` SKILL（Scripts セクション） | 本 Design は概要のみ言及、実装詳細は参照しない |
+| 索引類の記載と実体の整合 | `index-auto-generation.md` | 本 Design は整合の必要性を宣言し、機構は同 Design を参照 |
 
 ## 関連情報
 
 - 関連 REQ: REQ-001（文書・REQ 管理基準）、REQ-004（要件定義・保存）
-- 関連 SPEC: `docs/designs/integrity/index-auto-generation.md`（索引類自動生成）、`docs/designs/foundations/patterns.md`（文書フォーマット規約）
+- 関連 Design: `docs/designs/integrity/index-auto-generation.md`（索引類自動生成）、`docs/designs/foundations/patterns.md`（文書フォーマット規約）
 - 関連 SKILL: `agentdev-req-file-manager`、`agentdev-decision-file-manager`
 - 根拠監査台帳項目: F-003（v2:REQ-0157）、F-004（IR-045）
 
 ## ADR から Decision への移行（AG-007、AG-008）
 
 現行 `ADR-NNN` 識別子は番号部を維持したまま `DEC-NNN` へ1対1で移行する。
-`alloc-adr-number.ts`（implementation identifier、case-run OU-002 で `alloc-dec-number.ts` 等へ改名）は実装識別子のため本 SPEC では参照を維持し、実装と同期して更新する。
+`alloc-adr-number.ts`（implementation identifier、case-run OU-002 で `alloc-dec-number.ts` 等へ改名）は実装識別子のため本 Design では参照を維持し、実装と同期して更新する。
 `docs/adr/` パスは `docs/decisions/` へ移行する。
 過去の `v2:ADR-*` 番号帯は AG-010 により維持し、`v2:DEC-*` は生成しない。

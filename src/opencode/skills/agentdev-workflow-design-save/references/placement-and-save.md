@@ -182,7 +182,7 @@ CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 1. SSoT 再構成: 配置先 Design ファイル、`docs/designs/README.md`
 2. identifier 保持: target、target_area
 3. 最小 scalar: なし
-4. runtime artifact: ドラフトの `spec_logical_division`、`canonical_owner` 宣言
+4. runtime artifact: ドラフトの `canonical_owner` 分類根拠
 
 ### Preconditions
 
@@ -196,7 +196,7 @@ CLI 形式、stdin JSON 入力、stdout schema は同 SKILL.md を参照。
 - **update**: `target_area` 指定時は `agentdev-design-file-manager` のセクション置換ロジック（target-area-matching）で対象セクションを `content` で置換する。`target_area` 未指定時は既存 Design ファイルの該当セクションへ `content` を追記する（後方互換）。frontmatter `updated` を更新し、`status` は変更しない
 - **target_area 見出し検索のスクリプト呼出**: `update` 操作における `target_area` 見出し検索は `search-target-area.ts` で実行する。STEP-3 の結果（`matches`）を用いてセクション範囲を特定し `content` で置換する。`matches` 空 → スキップし follow-up 記録（operation を create 推奨）、複数マッチ → 置換拒否（command 不変条件）
 - **複数 Design action の並列化**: 異なる `target` パスの Design create/update は並列化可能（最大5件）。同一 Design ファイルへの複数 action は順序依存のため直列サブセットとして分離する。直列集約対象（index 更新、draft 更新、commit、push）は並列委譲の完了を待ってから実行する
-- **Design 宣言付与（CREATE/UPDATE）**: req-define が各 entry へ出力した `spec_logical_division` と `canonical_owner` を読み取り、Design frontmatter または冒頭宣言節へ宣言として付与する。CREATE で宣言なしで完了することを禁止する。UPDATE で宣言未宣言かつ分類値が `unknown` 以外に確定の場合は宣言を補完、`unknown` または欠落の場合は警告して処理を継続する（soft-contract、宣言欠落だけで保存拒否しない）。既存 Design の一括更新は行わず、未変更 Design へ遡及的に宣言を付与しない（段階適用）
+- **配置一貫性検証の入力読取（CREATE/UPDATE）**: req-define が各 entry へ出力した `canonical_owner` を読み取り、配置一貫性検証の入力とする。分類値が `unknown` または欠落の場合は警告して処理を継続する（soft-contract、欠落だけで保存拒否しない）。Design ファイルの基本frontmatterは `title`、`status`、`created`、`updated` の4キーとし、伝播フィールドを Design ファイルへ書き込まない。既存 Design の一括更新は行わない（段階適用）
 
 ### Result
 

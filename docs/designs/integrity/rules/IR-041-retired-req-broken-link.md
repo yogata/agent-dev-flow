@@ -14,7 +14,7 @@ updated: 2026-08-20
 | severity | strict |
 | category | broken-reference |
 | detection_method | Markdown リンク `[REQ-0NNN](../requirements/REQ-0NNN.md)` から 廃止 REQ への直接パス（retired/ なし）を検出 |
-| affected_artifacts | [REQ, SPEC, guides, ADR] |
+| affected_artifacts | [REQ, Design, guides, ADR] |
 | related_req | [REQ-001-063] |
 | related_design | [integrity-contracts.md] |
 | gate_level | full-audit |

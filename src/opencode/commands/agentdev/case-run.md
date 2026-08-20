@@ -11,7 +11,7 @@ case-run 本体は orchestration に専念し、実装実行そのものは行�
 **スコープ**: case-run は単一 Issue または単一 Wave を処理する。
 Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-close の責務であり、case-run は扱わない。
 1 Wave の実行（PR作成まで）で return する。
-複数 Issue の一括実行、Wave 順序制御にまたがるオーケストレーションは case-auto の責務（workflow-contracts SPEC SC-{NNN}、extension 経由で解決）
+複数 Issue の一括実行、Wave 順序制御にまたがるオーケストレーションは case-auto の責務（workflow-contracts Design SC-{NNN}、extension 経由で解決）
 
 ## project extensions
 
@@ -79,14 +79,14 @@ OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため�
 工程上の選好を肯定形の不変条件として示す:
 
 - 本コマンドは orchestration に専念し、実装実行は実行担当サブエージェント経由で委譲する（work plan 生成・実装・乖離検出・specs 更新・PR 作成は委譲先の責務。adapter protocol は `agentdev-case-run-execution-adapter` 参照）
-- worktree の作成元と PR の base は当該 Case の統合先（既定 main。実証Caseは評価ブランチ）を参照する。同期基準・鮮度確認・Epic 後続 Wave の作業起点も同一の統合先を参照し、通常Caseの worktree 起点・PR base は従来どおり main を維持する。実証Caseの場合、実証手段の準備、実行、測定、観察、証拠生成、評価を評価ブランチ上で行い、PR 本文に実際の実行条件、測定結果、観察結果、証拠、評価結果を記録する（統合先とブランチモデルの基盤契約は `agentdev-git-worktree` SPEC 参照）
+- worktree の作成元と PR の base は当該 Case の統合先（既定 main。実証Caseは評価ブランチ）を参照する。同期基準・鮮度確認・Epic 後続 Wave の作業起点も同一の統合先を参照し、通常Caseの worktree 起点・PR base は従来どおり main を維持する。実証Caseの場合、実証手段の準備、実行、測定、観察、証拠生成、評価を評価ブランチ上で行い、PR 本文に実際の実行条件、測定結果、観察結果、証拠、評価結果を記録する（統合先とブランチモデルの基盤契約は `agentdev-git-worktree` Design 参照）
 - 処理単位は単一 Issue または単一 Wave（Epic 指定時: 現在 ready な Wave の子Issue を並列実行、最大5件）とする。Epic 全体（複数 Wave）の一括実行と Wave 境界（PR マージ）は case-close の責務であり、Epic Wave 実行モードでは1 Wave のみ実行して PR 作成で return する
 - Issue番号の省略は同一セッション内で作成済みの場合に限り、番号解決はユーザー入力またはセッション内会話から行う。work_type 判定基準は `agentdev-workflow-lifecycle` を参照する
 - result の4状態（completed-pr/blocked/failed/delegation-unavailable）は `agentdev-case-run-execution-adapter` の result 契約に従う。成功成果は PR 作成である。SSoT は状態別に PR 本文（成功）と Issue コメント（blocked/ failed）とし、一時会話コンテキスト・中間ファイルを SSoT としない
-- 外部実行ハーネスの plan artifact 等の中間成果物は AgentDevFlow の永続成果物から除外し、最終結果は PR URL で受領する（内部構造に依存した処理・検証は行わない。委譲契約は I/O 境界 SPEC 参照）
+- 外部実行ハーネスの plan artifact 等の中間成果物は AgentDevFlow の永続成果物から除外し、最終結果は PR URL で受領する（内部構造に依存した処理・検証は行わない。委譲契約は I/O 境界 Design 参照）
 - 実装作業開始前に QG 前置 staleness check（ファイルパス現行存在確認、検査結果件数再計測）を実行する。差異検出時は検出結果を委譲プロンプトで実行担当サブエージェントに引き渡し、PR 本文の `## Findings / Capture候補` に `### stale-reference` 小見出しで記録する（実行担当サブエージェント責務）
 - 本筋外の発見は PR 本文に記録して修正は後続処理に委ねる（スコープ拡大は行わない）。intake 候補・learning 候補は区別して記録する（capture 境界（capture-boundaries）は `agentdev-workflow-orchestration` 参照、case-run の capture 責務は記録のみ）
-- SPEC確定候補（実装で発見された SPEC レベル詳細）は PR 本文の `## SPEC確定候補` セクションに記録し、`## Findings / Capture候補` とは区別する（確定・反映判断は case-close の責務）
+- Design確定候補（実装で発見された Design レベル詳細）は PR 本文の `## Design確定候補` セクションに記録し、`## Findings / Capture候補` とは区別する（確定・反映判断は case-close の責務）
 
 ## ガードレール
 

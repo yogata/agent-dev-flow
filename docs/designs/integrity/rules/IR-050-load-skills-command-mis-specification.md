@@ -14,7 +14,7 @@ updated: 2026-08-20
 | severity | strict |
 | category | canonical-conflict |
 | detection_method | `load_skills\s*=\s*\["([^"]+)"\]` パターンから各要素を抽出し、各要素が `/` 先頭形式（command 名）であるか、`agentdev-*` プレフィックスを持たない既知 command 名（語彙レジストリ `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` 参照）であるかを照合。コードブロック内の例示、検出用文字列、IR ルール本文中のパターン説明は除外対象 |
-| affected_artifacts | [commands, skills, SPEC] |
+| affected_artifacts | [commands, skills, Design] |
 | related_req | [v2:REQ-0140-027, REQ-010-010] |
 | related_design | [integrity-contracts.md, document-type-responsibilities.md] |
 | gate_level | full-audit, delta-guard |

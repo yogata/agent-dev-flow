@@ -1,11 +1,11 @@
 ---
-title: `agentdev-decision-guidelines` SPEC
+title: `agentdev-decision-guidelines` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-27
 ---
 
-# `agentdev-decision-guidelines` SPEC
+# `agentdev-decision-guidelines` Design
 
 ## 目的
 
@@ -89,7 +89,7 @@ Decision guidelines、Decision file manager、document-model の accepted Decisi
 - DEC-001 の WS-9 は非意味ラベルとして除去できる（決定内容を変更しない）
 - 案B は決定内容を具体文で維持し、案番号だけを除去できる
 - 10シナリオを抽象条件へ変更する場合は後継 Decision を作成する（直接編集しない）
-- 10シナリオの定義は SPEC、実行結果は Release Report が所有する
+- 10シナリオの定義は Design、実行結果は Release Report が所有する
 - Release Report に規範表現が存在しない
 
 ## See Also

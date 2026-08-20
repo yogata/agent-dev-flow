@@ -14,7 +14,7 @@ updated: 2026-08-20
 | severity | strict |
 | category | obsolete-structure |
 | detection_method | 正規表現パターンマッチ |
-| affected_artifacts | [REQ, SPEC, guides, skills, commands] |
+| affected_artifacts | [REQ, Design, guides, skills, commands] |
 | related_req | [REQ-036-004] |
 | related_design | [integrity-contracts.md] |
 | gate_level | full-audit |

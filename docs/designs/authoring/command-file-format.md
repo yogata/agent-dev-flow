@@ -8,13 +8,13 @@ updated: 2026-08-18
 # コマンドファイルフォーマット規約
 
 AgentDevFlow が管理する command 定義ファイルの Markdown 構成標準。
-本 SPEC は command 定義ファイルが従うべき詳細なフォーマット規約を定義する。
+本 Design は command 定義ファイルが従うべき詳細なフォーマット規約を定義する。
 
-> **リポジトリ内部設計文書**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
+> **リポジトリ内部設計文書**: 本 Design は agent-dev-flow リポジトリのリポジトリ内部設計文書である。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 
-> **authoring/ ドメインでの配置理由**: 本 SPEC は本文構造・見出し構成・Step 表現・記述形式という執筆規約系の内容を扱うため、共通文書モデル規約（frontmatter・ID 体系・命名規則・URL 参照形式）を扱う `../foundations/patterns.md` と責務分離して `authoring/` ドメインに配置する。
-> `authoring/` は将来 REQ/SPEC/SKILL/guide 執筆規約の集約先として拡張余地を持つ（現状は command のみ）。
+> **authoring/ ドメインでの配置理由**: 本 Design は本文構造・見出し構成・Step 表現・記述形式という執筆規約系の内容を扱うため、共通文書モデル規約（frontmatter・ID 体系・命名規則・URL 参照形式）を扱う `../foundations/patterns.md` と責務分離して `authoring/` ドメインに配置する。
+> `authoring/` は将来 REQ/Design/SKILL/guide 執筆規約の集約先として拡張余地を持つ（現状は command のみ）。
 > 即時統合・`authoring/` の削除は行わない。
 
 ## 適用範囲
@@ -31,12 +31,12 @@ workflow への参照は Workflow Skill 名レベルとする（REQ-002-017）�
 
 ## extensions 手順
 
-command 本文は extensions 手順（SPEC `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パスを固定しない。
+command 本文は extensions 手順（Design `../foundations/project-extensions.md`）のみを持ち、具体的な project docs 内部パスを固定しない。
 
 各 command は以下の共通記述を本文に持つ。
 extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`must_not`）を持ち、標準動作に追加・拡張される（上書きではない）。
 
-- 実行時に対応する project extension を読み込む。Workflow Skill は .agentdev/extensions/skills/{workflow-skill-name}.yaml（kind: workflow-extension）、Capability Skill は .agentdev/extensions/skills/{capability-skill-name}.yaml（kind: capability-skill-extension）を対象とする（詳細は SPEC `../foundations/project-extensions.md` 参照）
+- 実行時に対応する project extension を読み込む。Workflow Skill は .agentdev/extensions/skills/{workflow-skill-name}.yaml（kind: workflow-extension）、Capability Skill は .agentdev/extensions/skills/{capability-skill-name}.yaml（kind: capability-skill-extension）を対象とする（詳細は Design `../foundations/project-extensions.md` 参照）
 - extension が存在しない場合は標準動作で続行する
 - extension が破損している場合はエラーを表示して無視し、標準動作で続行する（REQ-002-031 準拠、fail-open）
 
@@ -44,7 +44,7 @@ extension は5セクション（`context`/`rules`/`checks`/`acceptance_gates`/`m
 command 本文に直接の docs パスを記述しない。
 
 extension はフロントマタ（`version: 1`, `kind:`（公式3値: workflow-extension / internal-workflow-extension / capability-skill-extension）, `id:`）と、5セクションを持つ。
-schema 詳細は SPEC `../foundations/project-extensions.md` 参照。
+schema 詳細は Design `../foundations/project-extensions.md` 参照。
 旧 kind（command-extension / skill-extension）は廃止済みであり、検出時は migration-required として停止する。
 
 ## 手順セクション形式
@@ -126,16 +126,16 @@ command が単一の主手順（`### Step N`）に加えて、入力分岐等に
 ### 成果物間の工程ラベル参照形式
 
 - Workflow Skill から command の公開ラベルを参照する際は command 名で修飾する（例: 「req-save command STEP-4」）。command 名なしの裸参照はしない
-- Capability Skill・SPEC から Workflow Skill の工程を参照する際は実番号（例: `STEP-S5`）を用いる。相対表現（「第5工程」等）は使用しない
+- Capability Skill・Design から Workflow Skill の工程を参照する際は実番号（例: `STEP-S5`）を用いる。相対表現（「第5工程」等）は使用しない
 - 旧 command 番号（`Step N`）形式での参照は新規に書かない。既存参照は AG-023 是正の対象とする
 
-## command SPEC と command 定義の対応付け
+## command Design と command 定義の対応付け
 
-command SPEC は command 定義ファイルの Step 番号を複製しない。
+command Design は command 定義ファイルの Step 番号を複製しない。
 
-command SPEC と command 定義は、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用する skill の責務で対応付ける。
+command Design と command 定義は、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用する skill の責務で対応付ける。
 
-Step 番号は command 定義の内部構造であり、SPEC の公開契約に含めない。
+Step 番号は command 定義の内部構造であり、Design の公開契約に含めない。
 
 **対応付けの軸**:
 
@@ -147,14 +147,14 @@ Step 番号は command 定義の内部構造であり、SPEC の公開契約に�
 - **必須順序**: 成果物、安全性、外部契約へ影響する順序（順序を変えると成果物または安全性が変わるもののみ）
 - **利用 skill 責務**: command が利用する skill 名と委譲する責務
 
-**適用対象**: `docs/designs/commands/*.md` の全 command SPEC（`_template.md` を含む）。
+**適用対象**: `docs/designs/commands/*.md` の全 command Design（`_template.md` を含む）。
 
-読み取り専用または分類系で Step を持たない command SPEC は、Step による対応付けの対象外であることを当該 SPEC に明記する。
+読み取り専用または分類系で Step を持たない command Design は、Step による対応付けの対象外であることを当該 Design に明記する。
 
-**検証**: 各 command/SPEC ペアについて、SPEC が公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務の各軸で command 定義と整合することを確認する。
+**検証**: 各 command/Design ペアについて、Design が公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務の各軸で command 定義と整合することを確認する。
 Step 番号の不一致は違反として扱わず、公開契約の欠落、相互矛盾を違反として扱う。
 
-## 他 SPEC との関係
+## 他 Design との関係
 
-- **`patterns.md`**: frontmatter 規約、テンプレート命名規則を担当。本 SPEC は command 本文構造を担当し、frontmatter 規約は `patterns.md` を参照する。
-- **`docs/designs/commands/*.md`**: 個別 command SPEC の位置づけを維持する。横断フォーマット規約は本 SPEC に集約し、個別 command SPEC は公開契約の各対応付け軸を定義する。
+- **`patterns.md`**: frontmatter 規約、テンプレート命名規則を担当。本 Design は command 本文構造を担当し、frontmatter 規約は `patterns.md` を参照する。
+- **`docs/designs/commands/*.md`**: 個別 command Design の位置づけを維持する。横断フォーマット規約は本 Design に集約し、個別 command Design は公開契約の各対応付け軸を定義する。

@@ -6467,7 +6467,7 @@ function checkCommandCaptureDuties(cmdDir: string, root: string): CheckResult[] 
   // 一般規則（同 Design「CaptureBoundary 検査の例外判定規則」セクション）:
   // - intake または learning 列が「各工程の責務を継承」もしくは「非関与」の command は
   //   capture-boundaries 参照を個別に持たなくてよい（検出対象外）。
-  //   該当: req-define, spec-save, case-open, case-auto, case-update, backlog-review
+  //   該当: req-define, case-auto, case-update, backlog-review
   // - intake または learning 列が具体的な責務記述（PR 本文記録、回収、REQ再構成 intake
   //   生成等）である command は capture-boundaries 参照を個別に持ち、対応する capture
   //   導線を実装する（検出対象）。

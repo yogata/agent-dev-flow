@@ -34,11 +34,11 @@ description: 採用済み成果物を分析、統合し、ユーザー承認後�
 ## RU フォーマット
 
 RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）は `agentdev-backlog-integration` を正とする。
-`tentative_classification` は document-model SPEC（extension 経由）の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）のいずれかを記録する（REQ）。
+`tentative_classification` は document-model Design（extension 経由）の文書7分類モデル（REQ、挙動Design、カタログDesign、guide、learning維持、作業記録、対象外）のいずれかを記録する（REQ）。
 
 ## session由来RU 生成形式（参照）
 
-`source_type: chat` かつ `generated_by: session` のRU（session由来RU）の生成形式は、一時成果物ライフサイクル要件と artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」セクションを正規原本とする。本コマンドは frontmatter 必須フィールド、二段階承認、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番、`tentative_classification` の各要件を同 SPEC へ委譲し、再定義しない
+`source_type: chat` かつ `generated_by: session` のRU（session由来RU）の生成形式は、一時成果物ライフサイクル要件と artifact-contracts Design「RU アーティファクト契約（session由来RU）」セクションを正規原本とする。本コマンドは frontmatter 必須フィールド、二段階承認、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番、`tentative_classification` の各要件を同 Design へ委譲し、再定義しない
 
 ## workflow
 
@@ -50,7 +50,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
 | STEP-1 実行前同期・成果物検出 | promoted/ に採用済み成果物（または引数指定） | 対象成果物リスト | promoted ディレクトリと durable state が同期されていること |
-| STEP-2 分析・暫定分類付与 | 対象リスト確定 | 分析結果・`tentative_classification` 付与済みリスト | 文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）のいずれかが記録されていること |
+| STEP-2 分析・暫定分類付与 | 対象リスト確定 | 分析結果・`tentative_classification` 付与済みリスト | 文書7分類モデル（REQ、挙動Design、カタログDesign、guide、learning維持、作業記録、対象外）のいずれかが記録されていること |
 | STEP-3 統合・分割判定・depends_on 依存解決 | 分析済み | 統合・分割判定結果・依存解決済みRU構成 | depends_on が RU-ID のみで構成されていること |
 | STEP-4 review（経路E） | ユーザー明示指定時 | review 結果と反映後の案 | accepted finding が案へ反映されていること |
 | STEP-5 HITL | 判定案確定 | ユーザー承認結果 | ユーザーが RU 作成を承認済みであること |

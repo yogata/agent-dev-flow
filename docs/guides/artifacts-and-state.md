@@ -8,10 +8,11 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 |------|--------|------|
 | REQ | `docs/requirements/REQ-{NNNN}.md` | 要件定義の永続基準 |
 | Decision（現行） | `docs/decisions/DEC-{NNN}.md` | 現行基準の技術判断記録 |
-| SPEC | `docs/specs/**/*.md` | 実装者が参照する現在仕様（commands/skills/workflows の3層と基盤6ドメイン） |
+| Design | `docs/designs/**/*.md` | 実装者が参照する現在設計（commands/skills/workflows の3層と基盤6ドメイン） |
+| Report | `docs/reports/**/*.md` | 監査・評価・観測の事実記録 |
 | guides | `docs/guides/*.md` | 利用者向けの参照用読み物 |
 
-**優先順位**: REQ > Decision > SPEC。
+**優先順位**: REQ > Decision > Design。
 guides は基準への導線を提供する。
 基準文書と矛盾する記述がある場合は基準を優先する。
 
@@ -54,7 +55,8 @@ requirements/REQ-{NNN}.md     # 要件定義（基準）
   decisions/
     DEC-{NNN}.md            # 現行 Decision（基準）
     README.md               # Decision 索引
-  specs/**/*.md                   # 現在仕様（commands/skills/workflows の3層 + 基盤6ドメイン、リポジトリ内部の設計文書、基準）
+  designs/**/*.md                   # 現在設計（commands/skills/workflows の3層 + 基盤6ドメイン、リポジトリ内部の設計文書、基準）
+  reports/**/*.md                   # 監査・評価・観測記録（Report、Design とは分離）
   guides/*.md                    # 参照用読み物（案内層、非基準）
 .agentdev/
   intake/                        # Intake パイプラインのドメイン状態
@@ -146,7 +148,7 @@ RU 削除は `/agentdev/case-open` の永続化成功に限定する。
 
 以下の制約を AgentDevFlow の状態モデルに適用する。
 
-- REQ / SPEC の状態管理は Issue ラベル、GitHub Project で行う（v2:REQ-0112-027）
+- REQ / Design の状態管理は Issue ラベル、GitHub Project で行う（v2:REQ-0112-027）
 - intake promoted の route / status はディレクトリ配置で表現する（v2:REQ-0112-028）
 - Issue / PR の状態を docs に複製しない（v2:REQ-0112-029）
 - command-map を状態遷移エンジン化しない（v2:REQ-0112-030）

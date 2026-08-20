@@ -5,7 +5,7 @@
  * 欠番埋め禁止（agentdev-decision-file-manager 採番ルール）。
  *
  * 本スクリプトは self-contained であり、外部 lib import に依存しない
- * （artifact-contracts SPEC「Script 所有権と委譲契約」準拠、兄弟 skill の lib 直接参照禁止）。
+ * （artifact-contracts Design「Script 所有権と委譲契約」準拠、兄弟 skill の lib 直接参照禁止）。
  *
  * I/O:
  *   入力: argv[2] = Decision ディレクトリパス（例: docs/decisions）

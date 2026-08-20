@@ -8,7 +8,7 @@ updated: 2026-08-20
 # check_changed_docs.ts validator 内部構成
 
 > 本ファイルは `docs/designs/integrity/validator-split-criteria.md` から移管した check_changed_docs.ts の内部 validator 構成を保持する。
-> SPEC 本体は分割基準（契約）のみを残し、内部 validator 構成表は本ファイルへ分離した。
+> Design 本体は分割基準（契約）のみを残し、内部 validator 構成表は本ファイルへ分離した。
 
 ## check_changed_docs.ts の validator 構成
 

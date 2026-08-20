@@ -128,7 +128,7 @@ AgentDevFlow のパイプライン状態はディレクトリ配置とファイ�
 frontmatter や status フィールドによる状態管理は行わず、各段階の進行はディレクトリ構造で追跡する。
 
 - **採用済み成果物の状態表現**: ディレクトリ配置（`inbox/` → `promoted/`）が状態の表現である（v2:REQ-0112-028）。frontmatter の route / status はディレクトリ配置で代替する
-- **GitHub 状態の管理場所**: Issue / PR の open / closed / merged 状態は Issue / PR で管理する（v2:REQ-0112-029）。REQ / SPEC / guides への複製は行わない
+- **GitHub 状態の管理場所**: Issue / PR の open / closed / merged 状態は Issue / PR で管理する（v2:REQ-0112-029）。REQ / Design / guides への複製は行わない
 - **入口表は状態遷移エンジンではない**: 入口表は次に実行すべきコマンドの案内であり、状態機械の遷移表ではない（v2:REQ-0112-030）
 - **6 マイクロフェーズは説明用ラベル**: ワークフローの進行状況を人間が理解するための呼称であり、システムが管理する状態値ではない（v2:REQ-0112-023）
 

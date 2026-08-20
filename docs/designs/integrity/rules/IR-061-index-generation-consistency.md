@@ -9,7 +9,7 @@ updated: 2026-08-20
 
 ## 検出対象
 
-SC-002 SPEC（`docs/designs/integrity/index-auto-generation.md`）が定める索引類自動生成対象の各ファイルについて、自動生成マーカー（`<!-- AUTOGEN:BEGIN:id=xxx -->` と `<!-- AUTOGEN:END -->`）で囲まれた領域が実ファイル frontmatter と整合していることを検証する。
+SC-002 Design（`docs/designs/integrity/index-auto-generation.md`）が定める索引類自動生成対象の各ファイルについて、自動生成マーカー（`<!-- AUTOGEN:BEGIN:id=xxx -->` と `<!-- AUTOGEN:END -->`）で囲まれた領域が実ファイル frontmatter と整合していることを検証する。
 
 対象ファイル:
 - `docs/README.md`
@@ -38,7 +38,7 @@ strict（再現可能な機械的パターンマッチングで判定可能）
 
 ## 関連
 
-- SC-002 SPEC: `docs/designs/integrity/index-auto-generation.md`
+- SC-002 Design: `docs/designs/integrity/index-auto-generation.md`
 - 生成スクリプト: `.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`
 - 関連 REQ: REQ-010（docs-check）
 - 関連 IR: IR-004（REQ index）、IR-038（ADR index）、IR-039（index REQ title）、IR-042（hardcoded req count）

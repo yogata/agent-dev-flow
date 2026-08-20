@@ -35,7 +35,7 @@ Epic Issue 本文を読み込み（`agentdev-epic-tracker` 参照）、現在 re
 1 Wave の実行（PR作成まで）で return し、Wave 境界（マージ）は扱わない。
 同一コマンド再実行で次 Wave に進む（べき等、Epic Issue 本文から進行状況判定）。
 
-**Epic 実証判定（統合先確定）**: Epic Issue 本文の実証Case識別情報から、Epic 実証の場合は共有評価ブランチ（当該 Epic の統合先）を特定する。実証Case識別情報がない場合は通常 Epic として main（既定）を統合先とする。Epic 実証では全 Wave が同一の評価ブランチを統合先として継承する（評価ブランチ継承の実行詳細は epic-wave-model SPEC 参照）。
+**Epic 実証判定（統合先確定）**: Epic Issue 本文の実証Case識別情報から、Epic 実証の場合は共有評価ブランチ（当該 Epic の統合先）を特定する。実証Case識別情報がない場合は通常 Epic として main（既定）を統合先とする。Epic 実証では全 Wave が同一の評価ブランチを統合先として継承する（評価ブランチ継承の実行詳細は epic-wave-model Design 参照）。
 
 **Epic Issue の入力ソース**: Epic Issue は本来の Epic flow（マルチREQ、`scale: large`）に加え、Standard flow 起因の独立 OU 自動 Epic 化（case-open が `depends_on` 空、L0 相当の独立 OU を検出して Epic 化）によるものも含む。
 入力ソースを区別せず、Epic Wave モデル（ADR、最大5件並列委譲）で一様に処理する。

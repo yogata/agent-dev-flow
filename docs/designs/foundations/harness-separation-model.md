@@ -11,16 +11,16 @@ updated: 2026-08-15
 
 AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義する。
 配布物は業務ワークフロー契約のみで完結し、harness 依存の具体を限定された場所へ集約する。
-本 SPEC は配布物が固定してはならない harness 委譲領域と、配布物が定義してよい範囲を現行契約として確定する。
+本 Design は配布物が固定してはならない harness 委譲領域と、配布物が定義してよい範囲を現行契約として確定する。
 
 原本原則は DEC-001（AgentDevFlow 憲章）決定2（ADF が所有しない領域）に由来する。
-本 SPEC は決定2を SPEC として具体化し、配布成果物の責務境界（REQ-002）と協調して配布物の harness 非依存を担保する。
+本 Design は決定2を Design として具体化し、配布成果物の責務境界（REQ-002）と協調して配布物の harness 非依存を担保する。
 
 ## 配布物の harness 非依存性
 
-配布物（command、skill、SPEC、template、script）は次の harness 委譲領域を固定してはならない。
+配布物（command、skill、Design、template、script）は次の harness 委譲領域を固定してはならない。
 本節の意味境界の正規所有者は REQ-029（REQ-029-007）および `integrity/distribution-boundary.md` である。
-本 SPEC は検出モデルの参照先をこれらへ更新済みであり、従来 REQ-002-021..026、032 へ分散していた参照は MOVE 先（REQ-029-001..008）へ、REQ-002-028/029/035 への作業由来品質検査参照は RETIRE 扱いへ集約済みである。
+本 Design は検出モデルの参照先をこれらへ更新済みであり、従来 REQ-002-021..026、032 へ分散していた参照は MOVE 先（REQ-029-001..008）へ、REQ-002-028/029/035 への作業由来品質検査参照は RETIRE 扱いへ集約済みである。
 
 - エージェント名
 - モデル名
@@ -47,10 +47,10 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 
 ### 配布物側（業務ワークフロー契約）
 
-配布物の大多数（SKILL.md 本体、command .md 本体、docs/REQ、docs/ADR、docs/SPEC、docs/guides、README）は業務ワークフロー契約のみで完結する。
+配布物の大多数（SKILL.md 本体、command .md 本体、docs/REQ、docs/ADR、docs/Design、docs/guides、README）は業務ワークフロー契約のみで完結する。
 
 - 工程の進行条件、停止条件
-- 永続成果物（REQ/Decision/SPEC/Issue/PR/`.agentdev/`）
+- 永続成果物（REQ/Decision/Design/Issue/PR/`.agentdev/`）
 - Quality Gate
 - 実行結果契約
 - 副作用の許可、禁止境界
@@ -63,7 +63,7 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 - 各 skill の `references/<topic>.md`: skill 固有の実行制御具体（エージェント型名、起動方法、timeout、並列度、再試行等）
 
 上記 harness 側の実行制御は、`responsibility-boundary-purification.md` が定義する「harness execution mechanism」（agent 起動、background task、並列実行、context 管理）として ADF 規範所有対象外である（REQ-011-018）。
-本 SPEC は harness execution mechanism の境界宣言のみを所有し、起動 API、並列数、timeout 等の具体は各 skill の `references/` へ集約する。
+本 Design は harness execution mechanism の境界宣言のみを所有し、起動 API、並列数、timeout 等の具体は各 skill の `references/` へ集約する。
 external execution boundary（外部バックエンド接続）は REQ-011 が正規所有する（REQ-011-017）。
 
 並列判断と並列起動機構の境界（DEC-015）: 並列可否、処理単位間の依存関係、合流条件等の判定は ADF の決定論的実行中核が所有し、実際の並列起動機構は実行基盤（harness）が所有する。
@@ -80,7 +80,7 @@ case-run、case-auto の実行結果契約は次の4状態を区別する。
 - `delegation-unavailable`: 実行インフラ起動不能
 
 `failed` と `delegation-unavailable` は異なる回復アクションを要する独立の結果状態として扱う。
-結果状態の遷移機械、委譲契約、ラベル構造の詳細は `docs/designs/workflows/delegation-contracts.md` を正規所有者とし、本 SPEC は境界宣言へ縮約する。
+結果状態の遷移機械、委譲契約、ラベル構造の詳細は `docs/designs/workflows/delegation-contracts.md` を正規所有者とし、本 Design は境界宣言へ縮約する。
 
 ## case-auto の orchestration stage と bg task 管理
 
@@ -114,13 +114,13 @@ stage 1 と stage 3 の直列集約ポイントは main push、capture、commit 
 
 ## 配布 docs の制約
 
-配布 docs（REQ/Decision/SPEC/guides/README）は runtime workspace ディレクトリ（`.sisyphus/` 等）の管理を扱わず、業務ワークフロー契約のみを記述する。
+配布 docs（REQ/Decision/Design/guides/README）は runtime workspace ディレクトリ（`.sisyphus/` 等）の管理を扱わず、業務ワークフロー契約のみを記述する。
 runtime workspace 管理は harness 側の責務とする。
 
 ## 具象参照抽象化
 
 配布物からプロジェクト固有要素を除去する方針を定める。
-本 SPEC は方針のみを所有し、除去対象パターン、検出ルール、baseline の具体的な一覧は [references/concrete-abstraction.md](references/concrete-abstraction.md) へ集約する。
+本 Design は方針のみを所有し、除去対象パターン、検出ルール、baseline の具体的な一覧は [references/concrete-abstraction.md](references/concrete-abstraction.md) へ集約する。
 
 除去対象の核心は、配布物本文にプロジェクト固有識別子（REQ-ID、ADR-ID、IR-ID 形式）と消費プロジェクトの文書ディレクトリ内部パス（`docs/designs/**`、`docs/guides/**` 等）を残置しないことである。
 識別子、パスを除去した後のトレーサビリティは git 履歴と原本側 docs/ で担保し、配布物には残置しない。
@@ -129,16 +129,16 @@ runtime workspace 管理は harness 側の責務とする。
 
 AgentDevFlow 配布契約は STEP 識別子と永続情報から再開点を決定できる契約を所有する（DEC-011）。
 ToDo の使用・compaction 検出・current STEP 選択の実処理は harness 固有機能とする。
-AgentDevFlow 配布command / Workflow Skill / SPEC は ToDo を必須機構として規定しない
+AgentDevFlow 配布command / Workflow Skill / Design は ToDo を必須機構として規定しない
 （DEC-001 context管理harness委譲、REQ-029-007 harness固有詳細禁止）。
 
 ## 関連
 
-- DEC-001（AgentDevFlow 憲章）: 決定2（ADF が所有しない領域）が本 SPEC の原本原則。
-- DEC-002（OpenCode ソース・プロジェクション分離）: 本 SPEC の harness 非依存原則を原本とプロジェクションの分離によって物理層で担保する。
-- REQ-002（配布成果物の責務境界）: 配布成果物側の正規所有者。本 SPEC は交叉参照として所有内容を重複しない。
+- DEC-001（AgentDevFlow 憲章）: 決定2（ADF が所有しない領域）が本 Design の原本原則。
+- DEC-002（OpenCode ソース・プロジェクション分離）: 本 Design の harness 非依存原則を原本とプロジェクションの分離によって物理層で担保する。
+- REQ-002（配布成果物の責務境界）: 配布成果物側の正規所有者。本 Design は交叉参照として所有内容を重複しない。
 - v2:ADR-0136（配布物の harness 実行制御分離）: 吸収元。決定本質は charter 決定2 に先駆的適用として含まれる。
-- v2:REQ-0162（配布物の harness 実行制御分離）: 吸収元。原則の SSoT と各要件行（4状態結果契約、配布 docs 制約、ADF 可観測タイムスタンプ境界、ID 除去、パス除去）を本 SPEC および REQ-002 へ統合した。
-- v2:ADR-0114（case-run 実行責務の外部実行バックエンド委譲）: 吸収元。harness 選定領域に降格された実行制御側の知見を取り込み、result 4状態契約の前身である委譲モデルを本 SPEC の前段として位置づける。
+- v2:REQ-0162（配布物の harness 実行制御分離）: 吸収元。原則の SSoT と各要件行（4状態結果契約、配布 docs 制約、ADF 可観測タイムスタンプ境界、ID 除去、パス除去）を本 Design および REQ-002 へ統合した。
+- v2:ADR-0114（case-run 実行責務の外部実行バックエンド委譲）: 吸収元。harness 選定領域に降格された実行制御側の知見を取り込み、result 4状態契約の前身である委譲モデルを本 Design の前段として位置づける。
 - `docs/designs/workflows/delegation-contracts.md`: 委譲契約詳細（result state machine、launch mechanism、delegation envelope）の正規所有者。
 - `docs/designs/responsibilities/responsibility-boundary-purification.md`: 工程別（case-auto、case-run、execution adapter、Project Extensions、タイムスタンプ）の所有/非所有リスト詳細。

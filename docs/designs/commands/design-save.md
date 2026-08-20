@@ -68,7 +68,7 @@ req-save の次、case-open の前に実行する。
 
 ## 配置一貫性検証
 
-design-save は Design ファイル保存に先立ち、対象 Design の主論理区分・正規所有対象と保存内容の整合を「配置一貫性検証」として検証する（REQ-001-034、REQ-001）。
+design-save は Design ファイル保存に先立ち、保存内容と配置先の整合を「配置一貫性検証」として検証する（REQ-001-034、REQ-001）。
 配置一貫性検証は確定済み分類・所有情報と保存先の整合確認であり、「内容品質の再査読」ではない（REQ-001-030 との整合）。
 内容品質は引き続き req-define QG-1 の責務である。
 
@@ -76,8 +76,7 @@ design-save は Design ファイル保存に先立ち、対象 Design の主論�
 
 | 検証項目 | 内容 | 不一致検出時 |
 |---|---|---|
-| 論理区分整合 | 変更の論理区分（artifact_action が示す Design 論理区分）と対象 Design の主論理区分が整合する | 保存を停止し、分類または追記先の再判定へ戻す |
-| 所有対象整合 | 変更の所有対象（artifact_action が示す正規所有対象）と対象 Design の正規所有対象が整合する | 同上 |
+| 配置ドメイン整合 | 変更の所有対象（artifact_action が示す正規所有対象）と配置先ドメイン（commands/ skills/ workflows/ 基盤6ドメイン）が整合する | 保存を停止し、分類または追記先の再判定へ戻す |
 | 別所有Design 不存在 | 同一関心の別の正規所有 Design が存在しない（REQ-003-038 違反でない） | 同上 |
 | 横断Design 不当配置 不存在 | command 固有仕様を不当に横断 Design へ配置していない | 同上 |
 | パラメータ不当混入 不存在 | パラメータ変更を不当に挙動説明またはカタログへ混入させていない（v2:REQ-0155-009 準拠） | 同上 |
@@ -87,34 +86,28 @@ design-save は Design ファイル保存に先立ち、対象 Design の主論�
 
 ### 強制ゲート（保存拒否）の有効化条件
 
-強制ゲート（保存拒否条件: 重複所有、配置不一致）は Design 宣言形式（主論理区分、正規所有対象）の定義完了後に有効化する（REQ-001-035）。
-宣言形式の定義は `../foundations/document-model.md`「Design 宣言形式」を正規所有者とし、`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド名（`spec_logical_division`、`canonical_owner`）と一致させる。
+強制ゲート（保存拒否条件: 重複所有、配置不一致）は配置一貫性検証の入力（`../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド）で機械判定可能な項目について有効化する（REQ-001-035）。
+Design ファイルの基本frontmatterは title、status、created、updated の4キーとし、伝播フィールドを Design ファイルへ宣言として書き込まない。
 
-### 宣言付与フロー（CREATE/UPDATE）
+### 配置一貫性検証の入力読取（CREATE/UPDATE 共通）
 
-design-save は req-define が `artifact_actions` の Design action へ出力した `spec_logical_division` と `canonical_owner` を読み取り、CREATE/UPDATE 各操作で Design frontmatter または冒頭宣言節（`../foundations/document-model.md`「Design 宣言形式」が定義する形式）へ宣言を付与する。
-CREATE と UPDATE で宣言付与要件を一本化する。
-
-- **CREATE**: 新規 Design の frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。design-save が対象 Design を宣言なしで完了することを禁止する
-- **UPDATE**: 変更対象 Design が frontmatter または冒頭宣言節で当該宣言を未宣言の場合、かつ req-define から渡された分類値が `unknown` 以外に確定している場合に、宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落だけを理由に保存拒否しない、DEC-003 soft-contract）
-- **既存 Design の一括更新**: 行わない。未変更 Design へ遡及的に宣言を付与しない（REQ-001-035 段階適用）。宣言率指標（`../quality/design-health-metrics.md`「測定対象と計測方法」参照）が段階的な宣言率向上を追跡する
-
-宣言形式の正規所有者は `../foundations/document-model.md`「Design 宣言形式」、伝播フィールドの schema の正規所有者は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」である。
-本節は宣言付与の実行ステップを定義する。
+design-save は req-define が `artifact_actions` の Design action へ出力した `canonical_owner` を読み取り、CREATE/UPDATE 各操作で配置一貫性検証の入力とする。
+分類値が `unknown` または欠落の場合は警告して処理を継続する（soft-contract、欠落だけを理由に保存拒否しない、DEC-003）。
+既存 Design へ遡及的に伝播フィールドを書き込まない（REQ-001-035 段階適用）。
 
 ### 段階適用
 
-宣言未完了の既存 Design は警告モードで経過観察する（後方互換期間）。段階適用は次の5ステップとする:
+配置一貫性検証の未実施残存は警告モードで経過観察する（後方互換期間）。段階適用は次の5ステップとする:
 
 | ステップ | 内容 |
 |---|---|
-| (a) 宣言形式定義 | Design frontmatter または冒頭宣言節で主論理区分・正規所有対象の宣言形式を定義する（完了: `../foundations/document-model.md`「Design 宣言形式」） |
-| (b) 警告モード棚卸し | 既存 Design を警告モードで棚卸し、宣言形式の適用状況を把握する |
-| (c) 重複解消 | 同一関心キーに対する複数正規所有宣言を解消する |
+| (a) 検証入力確定 | 分類根拠伝播契約の伝播フィールド（`canonical_owner`）を配置一貫性検証の入力として確定する（完了: `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」） |
+| (b) 警告モード棚卸し | 既存 Design を警告モードで棚卸し、配置一貫性検証の適用状況を把握する |
+| (c) 重複解消 | 同一関心キーに対する複数の正規所有 Design を解消する |
 | (d) 新規/変更 Design 強制 | 新規作成、または変更がある Design に対して配置一貫性検証を強制する |
 | (e) 全件強制 | 全 Design に対して配置一貫性検証を強制する |
 
-bootstrap 問題（宣言前に強制すると既存 Design 処理不能）を避けるため、強制は段階的に有効化する。
+bootstrap 問題（検証前に強制すると既存 Design 処理不能）を避けるため、強制は段階的に有効化する。
 各ステップの移行条件、タイミングは別途 inspect/backlog 経由で判断する。
 
 ### 検証と内容品質の責務分離

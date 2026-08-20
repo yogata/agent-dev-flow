@@ -1,7 +1,7 @@
 # サブエージェント調査委譲スコープ絞り込み
 
 req-define Step 5-1（変更影響候補抽出）でサブエージェント調査委譲に渡す調査スコープを絞り込む決定的前処理。
-RU の frontmatter、本文から対象領域キーワードを抽出し、glob/grep で関連 REQ/ADR/SPEC を事前特定してから、サブエージェント調査委譲へ調査優先対象リストをヒントとして渡す。
+RU の frontmatter、本文から対象領域キーワードを抽出し、glob/grep で関連 REQ/ADR/Design を事前特定してから、サブエージェント調査委譲へ調査優先対象リストをヒントとして渡す。
 
 ## 目的と位置付け
 
@@ -24,15 +24,15 @@ RU の frontmatter、本文から対象領域キーワードを抽出し、glob/
 |--------|---------------|-----|
 | frontmatter | `source_artifact`, `target_artifact`, `area` 等の対象示唆フィールド | `REQ`, `req-define`, `agentdev-req-analysis` |
 | 本文見出し | 対象 command/skill/文書名 | `case-run`, `agentdev-gh-cli` |
-| 本文 | 既存 REQ/ADR/SPEC の参照 ID（`REQ-NNNN`, `ADR-NNNN`, SPEC パス） | `REQ`, `ADR`, `<command SPEC>` |
+| 本文 | 既存 REQ/ADR/Design の参照 ID（`REQ-NNNN`, `ADR-NNNN`, Design パス） | `REQ`, `ADR`, `<command Design>` |
 | 本文 | ドメイン用語、対象機能名 | `委譲`, `I/O 境界`, `soft-contract` |
 
 抽出キーワードは正規化（大小区別しない、`agentdev-` 等のプレフィクス揺れの吸収）した上で重複排除する。
 
 **除外キーワード**: 汎用語（「対応」「実装」「確認」等）はノイズになるため抽出対象外とする。
-command/skill 名、REQ/ADR/SPEC ID、固有名詞に限定する。
+command/skill 名、REQ/ADR/Design ID、固有名詞に限定する。
 
-### 2. glob/grep による関連 REQ/ADR/SPEC 事前特定
+### 2. glob/grep による関連 REQ/ADR/Design 事前特定
 
 抽出したキーワードでリポジトリ内の文書群を検索し、関連候補を事前特定する。
 
@@ -47,12 +47,12 @@ grep -l "<keyword>" docs/requirements/<REQ-*>.md
 glob docs/decisions/<DEC-*>.md
 grep -l "<keyword>" docs/decisions/<DEC-*>.md
 
-# 関連 SPEC 候補
+# 関連 Design 候補
 grep -rl "<keyword>" docs/designs/
 ```
 
 REQ/ADR は ID 直接参照（`REQ-NNNN`, `ADR-NNNN`）が含まれる場合は当該ファイルを確実に含める。
-SPEC はパス参照（`docs/designs/...`）と用語参照の双方で検索する。
+Design はパス参照（`docs/designs/...`）と用語参照の双方で検索する。
 
 **完全列挙の維持**: 上記 glob は関連候補の事前特定に用いるが、REQ/ADR の実ファイル完全列挙自体は別途 `agentdev-req-analysis` の「既存REQ/ADRの定量的照合」で実施する。
 本前処理が完全列挙を代替、省略することはない。

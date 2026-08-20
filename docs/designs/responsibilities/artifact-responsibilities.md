@@ -21,7 +21,7 @@ updated: 2026-08-10
 | Skill Template | `src/opencode/skills/*/templates/` | 原本優先 | `.opencode/skills/*/templates/` | ドキュメント生成テンプレート |
 | REQ | `docs/requirements/REQ-*.md` | - | - | 要件定義（基準） |
 | Decision | `docs/decisions/DEC-*.md` | - | - | 意思決定記録（基準） |
-| SPEC | `docs/designs/**/*.md` | - | - | 現在仕様（リポジトリ内部）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成 |
+| Design | `docs/designs/**/*.md` | - | - | 現在設計（リポジトリ内部）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成 |
 | Guide | `docs/guides/*.md` | - | - | 参照用読み物（ナビゲーション層） |
 | ドメイン状態 | `.agentdev/` | - | - | Intake / Learning / Backlog / Integrity 永続状態 |
 | リポジトリローカル Command | `.opencode/commands/repo/` | - | - | 本体リポジトリ専用コマンド（REQ-001）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
@@ -31,34 +31,34 @@ updated: 2026-08-10
 ### 操作 skill 正規所有者台帳
 
 各操作 skill の責務と対象外を正規所有者台帳として定義する。
-REQ/Decision/SPEC 操作と文書種別横断検証の正規所有者を一つに定め、責務重複を防ぐ。
+REQ/Decision/Design 操作と文書種別横断検証の正規所有者を一つに定め、責務重複を防ぐ。
 
 正規所有の単位は「安定した関心キー」である（REQ-003-038、REQ-001）。
 REQ-003-033「責務ごとに最も安定した最小の定義元を正規とする」の延長であり、適用条件を精緻化する。
-1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 SPEC が正規所有者を主張しない。
+1ファイルが複数関心を参照することは許容するが、正規定義だけを単一所有とし、同一仕様関心について複数 Design が正規所有者を主張しない。
 
 #### 関心キーの定義（REQ-001）
 
 | 項目 | 内容 |
 |---|---|
-| 関心キー | SPEC が正規所有する仕様関心を一意に識別する文字列。command 名、skill 名、workflow 名、品質ルール名、整合性ルール名等の所有責務に基づく |
+| 関心キー | Design が正規所有する仕様関心を一意に識別する文字列。command 名、skill 名、workflow 名、品質ルール名、整合性ルール名等の所有責務に基づく |
 | 安定性基準 | 最も安定した最小の定義元を選定する（REQ-003-033）。仕様変更時に限定された影響範囲で済む所有責務単位を選ぶ |
-| 重複検出 | 同一関心キーに対する複数 SPEC の正規所有宣言を重複として検出する。重複検出は frontmatter または冒頭宣言節で宣言された関心キーを横断検索することで機械判定可能とする |
+| 重複検出 | 同一関心キーに対する複数 Design の正規所有を重複として検出する。重複検出は design-save の配置一貫性検証（別所有Design 不存在）と Design 索引（`docs/designs/README.md`）突合で確認する |
 | 命名規則 | 関心キーは所有責務に基づく安定した名前とする。内部的な実装ファイル名、一時的な作業名は関心キーに使用しない |
 
 #### 操作 skill の正規所有者一覧
 
 | skill | 責務 | 対象外 |
 |---|---|---|
-| `agentdev-req-file-manager` | REQ 作成、APPEND、UPDATE、REQ 番号採番、要件行 ID 採番、REQ 固有整合性確認、REQ 固有 script 呼出契約 | Decision 操作、SPEC 操作、内容推論、ファイル編集を実行しない（所有者の案内のみ） |
-| `agentdev-decision-file-manager` | Decision 作成、APPEND、UPDATE、Decision 番号採番、Decision 固有整合性確認、Decision 固有 script 呼出契約 | REQ 操作、SPEC 操作、内容推論 |
-| `agentdev-design-file-manager` | SPEC 作成、更新、配置先判断、target_area による更新判断、SPEC ライフサイクル規則の適用と整合性確認、SPEC 固有 script の選択と呼出契約 | REQ 操作、Decision 操作、SPEC 内容の新規推論、accepted 昇格判断（case-close 責務、v2:ADR-0123 / REQ-001-024 準拠）、ユーザー承認、commit、push、共通 script の重複実行 |
-| `agentdev-doc-diagnostics` | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティング | 診断対象の修正、promote 判断、REQ/SPEC/RU 保存、commit、push、Issue/PR 操作、REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（`agentdev-req-structure-diagnostics`）、文意品質診断（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`） |
-| `agentdev-artifact-validation` | 文書種別横断の決定的検証 script、共有 lib、公開検証契約、JSON 結果契約（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact` とそれらが利用する共有 lib、対応 test） | REQ/Decision/SPEC 固有の内容判断、ファイル編集、保存、ユーザー承認、commit、push、REQ 番号/Decision 番号/要件行 ID の採番、target_area の検索 |
+| `agentdev-req-file-manager` | REQ 作成、APPEND、UPDATE、REQ 番号採番、要件行 ID 採番、REQ 固有整合性確認、REQ 固有 script 呼出契約 | Decision 操作、Design 操作、内容推論、ファイル編集を実行しない（所有者の案内のみ） |
+| `agentdev-decision-file-manager` | Decision 作成、APPEND、UPDATE、Decision 番号採番、Decision 固有整合性確認、Decision 固有 script 呼出契約 | REQ 操作、Design 操作、内容推論 |
+| `agentdev-design-file-manager` | Design 作成、更新、配置先判断、target_area による更新判断、Design ライフサイクル規則の適用と整合性確認、Design 固有 script の選択と呼出契約 | REQ 操作、Decision 操作、Design 内容の新規推論、accepted 昇格判断（case-close 責務、v2:ADR-0123 / REQ-001-024 準拠）、ユーザー承認、commit、push、共通 script の重複実行 |
+| `agentdev-doc-diagnostics` | docs 横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティング | 診断対象の修正、promote 判断、REQ/Design/RU 保存、commit、push、Issue/PR 操作、REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断（`agentdev-req-structure-diagnostics`）、文意品質診断（`agentdev-doc-writing`）、探索順（`agentdev-doc-map`） |
+| `agentdev-artifact-validation` | 文書種別横断の決定的検証 script、共有 lib、公開検証契約、JSON 結果契約（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact` とそれらが利用する共有 lib、対応 test） | REQ/Decision/Design 固有の内容判断、ファイル編集、保存、ユーザー承認、commit、push、REQ 番号/Decision 番号/要件行 ID の採番、target_area の検索 |
 
 **重複なし確認**:
 
-- `agentdev-design-file-manager` は `agentdev-req-file-manager`（REQ 操作）、`agentdev-decision-file-manager`（Decision 操作）と責務重複しない（SPEC 操作のみを所有）
+- `agentdev-design-file-manager` は `agentdev-req-file-manager`（REQ 操作）、`agentdev-decision-file-manager`（Decision 操作）と責務重複しない（Design 操作のみを所有）
 - `agentdev-doc-diagnostics` は `agentdev-doc-writing`（文意品質）、`agentdev-doc-map`（探索順）、`agentdev-req-structure-diagnostics`（REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）と責務重複しない（横断編成と結果統合のみを所有）
 - `agentdev-artifact-validation` は内容判断、編集、保存を行わず、利用側（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager`、各 command）は公開検証契約のみへ依存する
 
@@ -127,7 +127,7 @@ SKILL と command の間で同一ルールを両方に記載することが正�
 
 ## 重複許容基準（REQ-003-001）適用例集
 
-本セクションは REQ-003-001（SPEC 重複許容基準）の具体的適用事例を蓄積し、
+本セクションは REQ-003-001（Design 重複許容基準）の具体的適用事例を蓄積し、
 REQ-003-034（同一契約再定義抑止）との両立関係を運用面で明確にする。
 
 ### 適用パターン1: project extensions boilerplate
@@ -151,9 +151,9 @@ REQ-003-034（同一契約再定義抑止）との両立関係を運用面で明
 
 1. 重複する references が複数 SKILL の共通基盤（検査方法論等）であること
 2. 各 SKILL 固有の判断基準が明確に分離されていること
-3. references の内容が SPEC 本文への参照に縮約可能であること
+3. references の内容が Design 本文への参照に縮約可能であること
 
-条件を満たす場合、references 側は SPEC 本文への参照に縮約し、重複を許容する。
+条件を満たす場合、references 側は Design 本文への参照に縮約し、重複を許容する。
 
 ## 予約名（Reserved Names）
 

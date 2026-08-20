@@ -1,11 +1,11 @@
 ---
-title: `agentdev-req-structure-diagnostics` SPEC
+title: `agentdev-req-structure-diagnostics` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
 
-# `agentdev-req-structure-diagnostics` SPEC
+# `agentdev-req-structure-diagnostics` Design
 
 ## 目的
 
@@ -22,7 +22,7 @@ inspect-docs コマンドの REQ 構造診断ロジックの知識ベースと�
 - REQ 参照 ID 整合性確認（frontmatter `id` の一意性、ファイル名整合、相互参照の存在）
 - 第一参照導線確認（README、requirements/README 導線）
 - 現行/廃止/世代境界確認（廃止専有 ID、二重存在、100s 番台境界）
-- SPEC 分離基準違反検出
+- Design 分離基準違反検出
 - 6観点診断: SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT
 - 未処理成果物確認
 - 問題候補出力スキーマ（7フィールド構成）
@@ -55,5 +55,5 @@ inspect-docs コマンドの REQ 構造診断ロジックの知識ベースと�
 - [agentdev-doc-writing.md](agentdev-doc-writing.md)
 - [commands/inspect-docs.md](../commands/inspect-docs.md)
 - REQ-036（inspect-docs / REQ 再構成運用）
-- REQ-001（SPEC 分離基準違反検出強化）
+- REQ-001（Design 分離基準違反検出強化）
 

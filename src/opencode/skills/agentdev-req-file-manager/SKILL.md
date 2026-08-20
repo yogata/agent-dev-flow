@@ -14,9 +14,9 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-req-file-manager` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-req-file-manager` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -77,8 +77,8 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`、REQ）。
 
 > **移管済み script**:
-> - `search-target-area.ts`（SPEC ファイル内 target_area 見出し検索）は `agentdev-design-file-manager` へ移管済み。
-> SPEC 固有処理は同 skill の公開操作契約経由で呼び出す。
+> - `search-target-area.ts`（Design ファイル内 target_area 見出し検索）は `agentdev-design-file-manager` へ移管済み。
+> Design 固有処理は同 skill の公開操作契約経由で呼び出す。
 > - 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-{NNN}、AG-{NNN}、AG-{NNN}、RU-{NNNN}-01 合意）。
 > 本スキルは公開検証契約へ委譲し、内部 script パスを直接参照しない。
 
@@ -97,7 +97,7 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 |-----------|------|------|-----------|
 | `alloc-req-number.ts` | REQ番号採番（max+1、欠番埋め禁止） | argv[2]=REQ dir | `{ ok, allocated: "REQ-NNNN", max }` |
 | `alloc-composite-id.ts` | 要件行ID採番（REQ-NNNN-MMM、max+1） | argv[2]=REQ file, argv[3]=req番号（省略可） | `{ ok, allocated: "REQ-NNNN-MMM", req, max }` |
-> `search-target-area.ts`（SPEC 固有）は `agentdev-design-file-manager` へ移管済み。
+> `search-target-area.ts`（Design 固有）は `agentdev-design-file-manager` へ移管済み。
 > target_area 見出し検索は同 skill の公開操作契約経由で呼び出す。
 > `alloc-decision-number.ts`（Decision 固有）は `agentdev-decision-file-manager` へ移管済み（OU-{NNN}）。
 > Decision 番号採番は同 skill の公開操作契約経由で呼び出す。
@@ -118,7 +118,7 @@ cd src/opencode/skills/agentdev-req-file-manager/scripts && npm test
 ### req-save / design-save からの呼び出し
 
 req-save と design-save は、REQ番号、ADR番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
-target_area 見出し検索は、SPEC 固有処理として `agentdev-design-file-manager` 配下のスクリプトで実行する。
+target_area 見出し検索は、Design 固有処理として `agentdev-design-file-manager` 配下のスクリプトで実行する。
 frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-{NNN}）。
 詳細は req-save / design-save command の各 Step 参照。
 
@@ -158,7 +158,7 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 テンプレート構成:
 - **frontmatter**: `id`, `title`, `created`, `updated`
 - **必須セクション**: `目的`, `要件`（テーブル形式）, `適用範囲`（対象/対象外）
-- **補助セクション（任意）**: `SPEC候補`（req-define が REQ 要件行候補から分離した SPEC 相当行と想定配置先 SPEC を記載。req-save が REQ ファイル保存時に本セクションを除去し、内容は `draft-meta.spec-candidates` 経由で design-save が消費する。最終 REQ ファイルに本セクションは残さない）
+- **補助セクション（任意）**: `Design候補`（req-define が REQ 要件行候補から分離した Design 相当行と想定配置先 Design を記載。req-save が REQ ファイル保存時に本セクションを除去し、内容は `draft-meta.spec-candidates` 経由で design-save が消費する。最終 REQ ファイルに本セクションは残さない）
 
 ---
 
@@ -175,24 +175,24 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
 
-本スキルは Capability Skill として、req-save / case-open / case-update / case-close 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` SPEC）。
+本スキルは Capability Skill として、req-save / case-open / case-update / case-close 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` Design）。
 本スキル自身は STEP を所有しない。
 
 ### 永続成果物と Input Resolution
 
 本スキルが操作する REQ ファイル（`docs/requirements/REQ-{NNNN}.md`）は durable state の最上位（SSoT 再構成）に位置する。
 REQ-ID（`REQ-{NNNN}`）は identifier 保持として安定 ID として扱う。
-優先順位の詳細は `<workflows/input-resolution-and-durable-state>` SPEC 参照。
+優先順位の詳細は `<workflows/input-resolution-and-durable-state>` Design 参照。
 
 呼出元 STEP は本スキルの操作結果（REQ ファイル更新、要件行 ID 採番結果）を STEP の result evidence として扱い、次 STEP の Input Resolution で SSoT 再構成または identifier 保持から再取得できる。
-STEP reference 8 要素は `<workflows/step-reference-contract>` SPEC 参照。
+STEP reference 8 要素は `<workflows/step-reference-contract>` Design 参照。
 
 ## See Also
 
 - **agentdev-req-analysis**: 要件分析手法（要件の展開観点、必達要件記述ガイダンス、壁打ちメソドロジー）
 - **agentdev-decision-file-manager**: Decisionファイル管理（REQ ↔ Decision整合性チェック）
 - **agentdev-decision-guidelines**: Decision作成の必要性判定基準
-- **agentdev-doc-writing**: Decision/REQ/SPEC横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
+- **agentdev-doc-writing**: Decision/REQ/Design横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
 
 ## 参考文献
 

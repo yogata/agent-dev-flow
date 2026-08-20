@@ -119,9 +119,9 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 ## 分類根拠伝播契約
 
 learning/intake → RU → req-define → design-save の各工程間で引き継ぐ分類根拠フィールドを定義する（REQ-001-033、REQ-001）。
-Design ファイルが主論理区分・正規所有対象を宣言する形式（frontmatter フィールド名、冒頭宣言節フォーマット）の正規所有者は `../foundations/document-model.md`「Design 宣言形式」とし、本節は工程間伝播フィールドの schema と req-define から design-save へのシリアライズ位置を正規所有する。
-両者は `spec_logical_division`、`canonical_owner` のフィールド名を共有し、工程間で同一の名前を用いる。
-req-define は Design action の `artifact_actions` と `operation_units` へ分類根拠を出力し、design-save はこれを読み取って CREATE/UPDATE 各操作で Design frontmatter または冒頭宣言節へ宣言を付与する。
+本節は工程間伝播フィールドの schema と req-define から design-save へのシリアライズ位置を正規所有する。
+Design ファイルの基本frontmatterは title、status、created、updated の4キーであり、伝播フィールドを Design ファイルへ宣言として書き込まない（AG-005、AG-008）。
+req-define は Design action の `artifact_actions` と `operation_units` へ分類根拠を出力し、design-save はこれを読み取って配置一貫性検証の入力とする。
 
 ### 伝播フィールド一覧
 
@@ -131,7 +131,6 @@ req-define は Design action の `artifact_actions` と `operation_units` へ分
 | req_impact | enum | REQ影響の有無: `yes`、`no`、`unknown` | 欠落時は `unknown` で警告 |
 | target_stakeholder | string | 変更が影響するステークホルダー（利用者、運用者、開発者、外部システム等） | 欠落時は `unknown` で警告 |
 | user_visible_change | enum | 利用者から見える変更の有無: `yes`、`no`、`unknown` | 欠落時は `unknown` で警告 |
-| spec_logical_division | enum | Design論理区分: `behavior`、`catalog`、`cross_cutting_contract`、`parameter`、`implementation_detail`、`unknown` のいずれか | 欠落時は `unknown` で警告 |
 | canonical_owner | string | 正規所有対象（対象 command、skill、workflow、品質ルール、整合性ルール等の関心キー） | 欠落時は `unknown` で警告 |
 | destination_selection_reason | string | 追記先を選択した理由 | 欠落時は `unknown` で警告 |
 | observed_evidence | string | 根拠となる観測事実（CI 失敗、誤検出、エッジケース発見等） | 欠落時は `unknown` で警告 |
@@ -142,7 +141,7 @@ req-define は Design action の `artifact_actions` と `operation_units` へ分
 - 厳格なスキーマ検証、JSON Schema、バリデータを導入しない
 - 欠落時は `unknown` 既定値で警告を出し、処理を継続する（後方互換）
 - 既存の採用済み成果物、RU、req_draft を欠落により拒否しない
-- 具体的なシリアライズ形式は各工程の成果物形式（RU frontmatter、draft-data YAML、Design frontmatter 等）に従う
+- 具体的なシリアライズ形式は各工程の成果物形式（RU frontmatter、draft-data YAML 等）に従う
 
 ### 各工程での扱い
 
@@ -151,8 +150,8 @@ req-define は Design action の `artifact_actions` と `operation_units` へ分
 | learning-promote | 学びから change_nature、observed_evidence を推定 | 採用済み成果物（promoted artifact）に分類根拠を添付 |
 | intake-promote | inbox item から change_nature、observed_evidence を推定 | 採用済み成果物に分類根拠を添付 |
 | backlog-review | 採用済み成果物から読取、`tentative_classification` と併せて RU frontmatter へ記録 | RU frontmatter に `tentative_classification` と分類根拠を記録 |
-| req-define | RU の分類根拠を暫定入力とし、最終分類を自身で確定。Design action（`artifact: design`）の各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する | draft-data の `artifact_actions`（各 Design action）と `operation_units` へ最終分類根拠を反映 |
-| design-save | draft-data の `artifact_actions`（各 Design action）から分類根拠を読取、配置一貫性検証の入力とする。CREATE 操作では新規 Design frontmatter または冒頭宣言節へ `spec_logical_division` と `canonical_owner` を宣言として書き込む。UPDATE 操作では変更対象 Design に宣言がなく分類値が `unknown` 以外に確定している場合に宣言を補完する。分類値が `unknown` または欠落の場合は警告して処理を継続する（宣言欠落を理由に保存拒否しない、DEC-003 soft-contract） | 配置一貫性検証結果を commit message、完了報告に反映。宣言付与結果を Design ファイルへ反映 |
+| req-define | RU の分類根拠を暫定入力とし、最終分類を自身で確定。Design action（`artifact: design`）の各 entry へ `canonical_owner` を最終分類確定値として出力する | draft-data の `artifact_actions`（各 Design action）と `operation_units` へ最終分類根拠を反映 |
+| design-save | draft-data の `artifact_actions`（各 Design action）から分類根拠を読取、配置一貫性検証の入力とする。分類値が `unknown` または欠落の場合は警告して処理を継続する（soft-contract、欠落を理由に保存拒否しない、DEC-003）。伝播フィールドを Design ファイルへ書き込まない | 配置一貫性検証結果を commit message、完了報告に反映 |
 
 ### REQ 拡張可否判定ルール
 

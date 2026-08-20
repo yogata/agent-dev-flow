@@ -8,7 +8,7 @@ updated: 2026-07-25
 # 具象参照抽象化 詳細
 
 本資料は `docs/designs/foundations/harness-separation-model.md` の「具象参照抽象化」節から分離した実装詳細を所有する。
-方針、原則は親 SPEC を正とし、本資料は除去対象パターン、検出ルール、baseline 一覧などの運用詳細を集約する。
+方針、原則は親 Design を正とし、本資料は除去対象パターン、検出ルール、baseline 一覧などの運用詳細を集約する。
 
 ## 除去対象パターン
 
@@ -16,7 +16,7 @@ updated: 2026-07-25
 |---|---|---|
 | トレーサビリティ注記（HTMLコメント） | `<!-- REQ-002-002 -->` | 削除。本文意に影響しない |
 | トレーサビリティ注記（インライン） | 「REQ-002-002 に基づき」 | 文脈を保持したまま識別子を除去。「本要件に基づき」等へ |
-| docs 内部パス | `docs/designs/foundations/document-model.md` | 削除。または抽象表現「文書粒度 SPEC」等へ |
+| docs 内部パス | `docs/designs/foundations/document-model.md` | 削除。または抽象表現「文書粒度 Design」等へ |
 | 実行制御パラメータ | 「最大5件」「120秒 timeout」「retry 5回」 | `references/<topic>.md` へ集約 |
 
 ## トレーサビリティ担保
@@ -61,6 +61,6 @@ baseline 件数は次の2軸で明記する。
 
 ## 関連
 
-- 親 SPEC: [../harness-separation-model.md](../harness-separation-model.md)
+- 親 Design: [../harness-separation-model.md](../harness-separation-model.md)
 - 関連 Decision（v2）: v2:ADR-0136（配布物の harness 実行制御分離）
 - 関連 REQ（v2）: v2:REQ-0162（配布物の harness 実行制御分離）

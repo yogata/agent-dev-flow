@@ -6,7 +6,7 @@ SKILL.md 本文では観点の一覧のみを提示し、個別のチェック�
 ## 5.1 frontmatter チェック
 
 - [ ] nameが命名規則に従っている（kebab-case、gerund form推奨）
-- [ ] nameが **YAML スカラー値（プレーン文字列）** で記述されている（バッククォートで囲まない）。frontmatter は構造データであり Markdown インラインコード表記の対象外（backticks-identifier-threshold SPEC「適用対象外」準拠、PR #1334 事例）
+- [ ] nameが **YAML スカラー値（プレーン文字列）** で記述されている（バッククォートで囲まない）。frontmatter は構造データであり Markdown インラインコード表記の対象外（backticks-identifier-threshold Design「適用対象外」準拠、PR #1334 事例）
 - [ ] descriptionにトリガー（USE FOR/ DO NOT USE FOR または WHEN）が含まれている
 - [ ] descriptionが3人称で書かれている
 - [ ] frontmatterフィールドはnameとdescriptionのみ（拡張フィールドを追加しない）

@@ -1,17 +1,17 @@
 # ローカル Case ファイル 見出し一覧
 #
-# 正本: docs/specs/local/local-case-file.md「見出し一覧」
+# 正本: docs/designs/local/local-case-file.md「見出し一覧」
 # 要件: REQ-0141-020
 #
 # Case ファイル本文が持つ 15 セクション見出しと必須/任意を定義する。
-# 本ファイルは docs/specs/local/local-case-file.md と矛盾してはならない。
+# 本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
 
 schema_version: "1.0"
 target: ".agentdev/cases/case-{NNNN}.md の本文見出し"
-canonical_spec: "docs/specs/local/local-case-file.md"
+canonical_spec: "docs/designs/local/local-case-file.md"
 
 # 見出し一覧（REQ-0141-020）
-# 15 セクションを定義する。SPEC確定候補 と Findings / Capture候補 は必須。
+# 15 セクションを定義する。Design確定候補 と Findings / Capture候補 は必須。
 # 必須の理由: これらは GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、
 # case-close への引き継ぎ経路を失わせないため（REQ-0141-020）。
 headings:
@@ -70,10 +70,10 @@ headings:
     role: "マージ前確認事項。GitHub PR 本文の引き継ぎ情報の一部"
 
   - number: 10
-    name: "SPEC確定候補"
-    heading: "## SPEC確定候補"
+    name: "Design確定候補"
+    heading: "## Design確定候補"
     required: true
-    role: "SPEC 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替（REQ-0141-020）"
+    role: "Design 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替（REQ-0141-020）"
 
   - number: 11
     name: "Findings / Capture候補"
@@ -112,7 +112,7 @@ headings:
 
 # 必須見出し
 required_headings:
-  - "## SPEC確定候補"
+  - "## Design確定候補"
   - "## Findings / Capture候補"
 
 # 必須サブ見出し

@@ -1,11 +1,11 @@
 ---
-title: backlog-review SPEC
+title: backlog-review Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-15
 ---
 
-# backlog-review SPEC
+# backlog-review Design
 
 ## 目的
 
@@ -56,23 +56,23 @@ updated: 2026-08-15
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/backlog-review.md`）はその実行時投影である（DEC-010）。
-- workflow 実装本体（工程構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-backlog-review`）が所有し、本 SPEC はこれらを複製しない。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/backlog-review.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（工程構成、内部手順、reference 構成）は Workflow Skill（`agentdev-workflow-backlog-review`）が所有し、本 Design はこれらを複製しない。
 - Workflow Skill の単独起動防止（soft guard）は Workflow Skill description の DO NOT USE FOR トリガーにより実効する（command 定義本文に soft guard 宣言節を持たない構成である）。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## Artifact Graph 利用
 
-backlog-review は入力成果物に含まれる REQ, Decision, SPEC, canonical owner 等の明示情報を起点として既存正規成果物との関係候補を Artifact Graph 経由で取得できる。
+backlog-review は入力成果物に含まれる REQ, Decision, Design, canonical owner 等の明示情報を起点として既存正規成果物との関係候補を Artifact Graph 経由で取得できる。
 候補には統合, 分割, depends_on 解決の補助 evidence を含む。
 
 Graph は候補提供者であり、統合, 分割, depends_on, 意味的重複の最終判断は正規成果物本文と独立探索手段での確認後に下す。
 promoted artifact 自体を Graph の正規 node とすることは必須でない。
-共通利用原則の防護事項は `agentdev-artifact-graph` SPEC「ワークフロー利用」を参照。
+共通利用原則の防護事項は `agentdev-artifact-graph` Design「ワークフロー利用」を参照。
 
 Graph 不在、stale、consumer 環境に対応 node type または relation type が存在しない場合は、従来の探索経路で継続し、workflow を停止しない（fail-open）。
 
-## 参照する横断 SPEC
+## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（RU lifecycle、採用済み成果物 lifecycle）
@@ -95,7 +95,7 @@ Graph 不在、stale、consumer 環境に対応 node type または relation typ
 ## tentative_classification と分類根拠伝播
 
 backlog-review は採用済み成果物の分析時に tentative_classification（暫定分類）と分類根拠を RU へ付与して伝播させる（REQ-001-033、REQ-001）。
-分類根拠は learning/intake 成果物から後続工程（req-define、design-save）へ引き継がれる情報であり、本 SPEC は backlog-review での扱いを規定する。
+分類根拠は learning/intake 成果物から後続工程（req-define、design-save）へ引き継がれる情報であり、本 Design は backlog-review での扱いを規定する。
 
 ### 伝播させる分類根拠フィールド
 
@@ -106,7 +106,6 @@ backlog-review は採用済み成果物から読み取った次の分類根拠�
 - req_impact（REQ影響の有無）
 - target_stakeholder（対象ステークホルダー）
 - user_visible_change（利用者可視変更の有無）
-- spec_logical_division（SPEC論理区分: 5区分のいずれか）
 - canonical_owner（正規所有対象）
 - destination_selection_reason（追記先選択理由）
 - observed_evidence（観測根拠）
@@ -139,8 +138,8 @@ v2:REQ-0155-003 が定義する文書7分類のいずれか1値。
 | 値 | 分類 |
 |---|---|
 | `REQ` | 要件定義 |
-| `挙動SPEC` | 挙動SPEC |
-| `カタログSPEC` | カタログSPEC |
+| `挙動Design` | 挙動Design |
+| `カタログDesign` | カタログDesign |
 | `guide` | ガイド |
 | `learning維持` | learning 維持 |
 | `作業記録` | 作業記録 |
@@ -175,9 +174,9 @@ backlog-review は全 RU frontmatter に `tentative_classification` を付与す
 ## adversarial-review 挿入境界（経路E）
 
 本節は backlog-review における adversarial-review caller integration（REQ-015 経路E）の挿入境界を正典として所有する（REQ-014-011）。
-共通 caller integration 契約の正規所有者は adversarial-review SPEC であり（REQ-014-003）、本節は経路E 固有の挿入位置、発動条件、順序、矛盾取扱いのみを所有する。
-adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review SPEC を正とし、本節で再定義しない。
-候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の正規所有者は agentdev-backlog-integration SPEC とし、本節は参照する。
+共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は経路E 固有の挿入位置、発動条件、順序、矛盾取扱いのみを所有する。
+adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review Design を正とし、本節で再定義しない。
+候補判断基準、内部手続き（候補確定位置、呼出タイミング、矛盾検出への引き渡し）の正規所有者は agentdev-backlog-integration Design とし、本節は参照する。
 
 ### 挿入境界と Step 構造（REQ-015-001）
 
@@ -227,6 +226,6 @@ unresolved な本質的争点またはユーザー判断事項が残る場合、
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review SPEC「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts SPEC「adversarial-review との委譲契約接続」節、agentdev-backlog-integration SPEC「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。
-backlog-review command 固有の挿入境界（発動条件、挿入構造、順序、矛盾取扱い）のみを本節が所有し、候補判断基準、内部手続きの詳細は agentdev-backlog-integration SPEC を正とする。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、agentdev-backlog-integration Design「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。
+backlog-review command 固有の挿入境界（発動条件、挿入構造、順序、矛盾取扱い）のみを本節が所有し、候補判断基準、内部手続きの詳細は agentdev-backlog-integration Design を正とする。
 

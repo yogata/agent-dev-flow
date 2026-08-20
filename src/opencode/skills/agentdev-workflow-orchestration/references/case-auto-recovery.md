@@ -1,8 +1,8 @@
 # case-auto 子 task 中断回復プロトコル
 
 case-auto 最大自走モードから起動した case-run 子 task（実行担当サブエージェント）がハーネスの bg task 機能で破棄された際の回復パスを解説する。
-状態分類と各状態の回復手順の詳細は case-auto SPEC「子 task 中断回復パス」を正とし、command case-auto「子 task bg task 破棄検知時の回復」がその実行指示を記載する。
-本ファイルは SPEC と command 本文が既に更新済みであることを前提とし、両者が依拠する設計原則（ライフサイクル分離）と拡張可能性（Epic Wave 並列委譲）の解説を担う。
+状態分類と各状態の回復手順の詳細は case-auto Design「子 task 中断回復パス」を正とし、command case-auto「子 task bg task 破棄検知時の回復」がその実行指示を記載する。
+本ファイルは Design と command 本文が既に更新済みであることを前提とし、両者が依拠する設計原則（ライフサイクル分離）と拡張可能性（Epic Wave 並列委譲）の解説を担う。
 references 単独の作成で本件を完了扱いしない。
 
 ## ライフサイクル分離原則
@@ -19,7 +19,7 @@ bg task 破棄が子 task の成果物へ意図せぬ影響を与えることを
 
 ## 中断時回復プロトコル
 
-中断検知後の状態分類と各状態の回復手順の詳細は case-auto SPEC「子 task 中断回復パス」を正とする。
+中断検知後の状態分類と各状態の回復手順の詳細は case-auto Design「子 task 中断回復パス」を正とする。
 本節はその概要と参照構造を示す。
 
 中断検知は Wave 内子 task の bg task 破棄検知で始まる。
@@ -27,8 +27,8 @@ case-auto 親ループは当該子 task の worktree で `git status` を実行�
 
 | 状態 | 判定条件 | 回復手順の参照先 |
 |---|---|---|
-| (a) commit 済み、PR 未作成 | commit 履歴があるが PR が未作成 | SPEC「状態 (a) の回復」 |
-| (b) 未コミット変更あり | worktree に未コミット変更が残留 | SPEC「状態 (b) の回復」 |
+| (a) commit 済み、PR 未作成 | commit 履歴があるが PR が未作成 | Design「状態 (a) の回復」 |
+| (b) 未コミット変更あり | worktree に未コミット変更が残留 | Design「状態 (b) の回復」 |
 | (c) クリーン | commit 履歴も未コミット変更もない | 後述「状態 (c) の取扱い」 |
 
 状態 (a) は rebase、push、PR 作成代行、`completed-pr` 記録、case-close 合流の順に進む。
@@ -43,7 +43,7 @@ PR 作成代行は case-auto 親ループの責務であり、子 task 側で再
 
 状態 (c) は回復対象がないため回復処理をスキップし、当該子 task を pending へ戻す。
 
-rebase で解消できないコンフリクトは SPEC が定めるコンフリクト解消モデル（3レベルエスカレーション）Level 2/3 へ委譲する。
+rebase で解消できないコンフリクトは Design が定めるコンフリクト解消モデル（3レベルエスカレーション）Level 2/3 へ委譲する。
 bg task 破棄時の状態別回復とコンフリクト解消モデルは協調関係にあり、rebase 失敗を境に後者へ委譲する。
 
 ## Epic Wave 並列委譲への拡張可能性
@@ -61,15 +61,15 @@ Epic Wave 並列委譲では複数の子 task が同時に起動し、それぞ�
 
 本ファイルは以下を前提とする。
 
-- SPEC case-auto「子 task 中断回復パス」が既に記述済みであること（Wave 1 成果物）
+- Design case-auto「子 task 中断回復パス」が既に記述済みであること（Wave 1 成果物）
 - command case-auto「子 task bg task 破棄検知時の回復」が既に実装済みであること（Wave 2 成果物）
 
 references 単独の作成で本件を完了扱いしない。
-SPEC と command 本文が更新済みであることを前提とし、本 references は分離原則と拡張可能性の解説のみを担う。
+Design と command 本文が更新済みであることを前提とし、本 references は分離原則と拡張可能性の解説のみを担う。
 
 ## See Also
 
-- SPEC case-auto「子 task 中断回復パス」: 状態分類と各状態の回復手順の正
+- Design case-auto「子 task 中断回復パス」: 状態分類と各状態の回復手順の正
 - command case-auto「子 task bg task 破棄検知時の回復」: 実行指示
 - [capture-boundaries.md](capture-boundaries.md): キャプチャ境界、委譲可否 probe と Inability 記録
 - [subagent-protocol.md](subagent-protocol.md): サブエージェント編集安全プロトコル、前工程完了度に応じた振る舞い指針

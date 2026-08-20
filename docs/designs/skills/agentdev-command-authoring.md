@@ -1,11 +1,11 @@
 ---
-title: `agentdev-command-authoring` SPEC
+title: `agentdev-command-authoring` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-18
 ---
 
-# `agentdev-command-authoring` SPEC
+# `agentdev-command-authoring` Design
 
 ## 目的
 

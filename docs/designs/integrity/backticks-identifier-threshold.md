@@ -14,7 +14,7 @@ runtime-package-boundary.md「5 種のリポジトリ種別」表の Type ID 列
 
 ### 適用対象外（PR #1334 事例に基づく明示）
 
-本 SPEC の backticks 機械付与対象は自然言語記述（Markdown 本文）のみであり、以下の構造データは対象外とする。
+本 Design の backticks 機械付与対象は自然言語記述（Markdown 本文）のみであり、以下の構造データは対象外とする。
 機械横断是正でこれらに backticks を付与してはならない。
 
 - YAML frontmatter のキーおよび値（`name:`、`description:`、`id:` 等）。frontmatter 値は YAML スカラー値であり、Markdown インラインコード表記ではない。
@@ -31,7 +31,7 @@ PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 
 以下のいずれかに該当する語句は識別子とし、backticks で囲むことを必須とする。
 
 - コマンド名、スキル名、ファイル名、ディレクトリパス（`/agentdev/req-define`、`agentdev-doc-writing`、`docs/designs/foundations/system.md`）
-- REQ/Decision/SPEC/RU/OU/IR 等の成果物 ID（`REQ-001`、`REQ-001`、`RU-0005`）
+- REQ/Decision/Design/RU/OU/IR 等の成果物 ID（`REQ-001`、`REQ-001`、`RU-0005`）
 - frontmatter キー、YAML フィールド名、enum 値、code block 内字句
 - 英字 kebab-case / snake_case / CamelCase の技術識別子（`self-hosting`、`work_type`、`auto_ready`）
 
@@ -56,6 +56,6 @@ PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 
 ## 関連
 
 - **用語政策 SSoT**: `../responsibilities/document-type-responsibilities.md`
-  - 本 SPEC は `document-type-responsibilities.md`「識別子と散文普通名詞の区別」節を機械判定レベルで補完する。用語政策の意図・許容リストは `document-type-responsibilities.md` を SSoT とし、本 SPEC は「どの語句が識別子（backticks必須）でどの語句が一般名詞（backticks任意）か」の機械判定条件のみを定義する。
+  - 本 Design は `document-type-responsibilities.md`「識別子と散文普通名詞の区別」節を機械判定レベルで補完する。用語政策の意図・許容リストは `document-type-responsibilities.md` を SSoT とし、本 Design は「どの語句が識別子（backticks必須）でどの語句が一般名詞（backticks任意）か」の機械判定条件のみを定義する。
 - **機械判定アルゴリズム**: `../../../src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md`
 - **良パターン基準**: `../local/runtime-package-boundary.md`「5 種のリポジトリ種別」Type ID 列

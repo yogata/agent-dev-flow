@@ -1,6 +1,6 @@
 // Canonical manifest builder for the accepted package contract.
 //
-// Four canonical projections per docs/specs/integrity/distribution-boundary.md
+// Four canonical projections per docs/designs/integrity/distribution-boundary.md
 // §58-67:
 //
 //   source           — every tracked regular file under

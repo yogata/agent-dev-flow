@@ -7,30 +7,30 @@ updated: 2026-08-10
 
 # 文書種別責務、配置基準
 
-> **他 SPEC との役割分担**: 本 SPEC と `../foundations/document-model.md` は補完関係にある。
-> 文書種別の基準境界（REQ/Decision/SPEC/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向、SPEC内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の正本を参照する。
-> 本 SPEC は文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策を扱う。
+> **他 Design との役割分担**: 本 Design と `../foundations/document-model.md` は補完関係にある。
+> 文書種別の基準境界（REQ/Decision/Design/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向、Design内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の正本を参照する。
+> 本 Design は文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策を扱う。
 > 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）は `../foundations/patterns.md` を参照する。
-> 新規ファイル分割は行わず、既存2ファイル（本 SPEC と document-model.md）間の重複削除で運用する。
-> 両 SPEC の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
+> 新規ファイル分割は行わず、既存2ファイル（本 Design と document-model.md）間の重複削除で運用する。
+> 両 Design の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
 
-docs/ 配下の文書（REQ/Decision/SPEC/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
+docs/ 配下の文書（REQ/Decision/Design/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
 v2:REQ-0140（文書品質ゲート）の原本仕様（文書種別配置、用語政策系）であり、`agentdev-doc-writing` スキルの参照先である。
-配布 command/skill 本文のプロジェクト固有 Decision、REQ、SPEC 具体 ID、具体パス、固定 URL への非依存は REQ-029-003、REQ-029-004 が正規所有し、traceability 補完は extension 機構（`../foundations/project-extensions.md`）と協調する。
+配布 command/skill 本文のプロジェクト固有 Decision、REQ、Design 具体 ID、具体パス、固定 URL への非依存は REQ-029-003、REQ-029-004 が正規所有し、traceability 補完は extension 機構（`../foundations/project-extensions.md`）と協調する。
 意味境界の検出契約は `../integrity/distribution-boundary.md` を参照する。
 
 > **執筆規範の SSoT は japanese-tech-writing スキル**: 基本原則、術語の平易化、文体基準、不自然な日本語の典型は AGENTS.md 経由で japanese-tech-writing スキルを参照する。
-> 本 SPEC は文書種別の配置基準とリポジトリ固有の用語政策に特化し、japanese-tech-writing の内容を複製しない。
+> 本 Design は文書種別の配置基準とリポジトリ固有の用語政策に特化し、japanese-tech-writing の内容を複製しない。
 >
 > **AI-slop 検出基準は含めない**: AI-slop 概念は完全廃止し、文章品質の判定は japanese-tech-writing（LLM っぽい表現の禁止、空虚な形容、空虚な動詞）に完全委譲する。
 > 対応表は作成しない。
 
 ## 文書種別の基準境界（参照）
 
-REQ/Decision/SPEC/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。
-本 SPEC は基準境界を再定義せず、執筆時の配置判定のみを扱う。
+REQ/Decision/Design/guides の役割定義、記述対象、記述対象外の基準境界は `../foundations/document-model.md` の「責務マトリックス」「文書分類ポリシー」を正本とする。
+本 Design は基準境界を再定義せず、執筆時の配置判定のみを扱う。
 
-README は agent-dev-flow リポジトリの構成要素（identity、入口表、参照先リンク、最小限のクイックスタート）であり、REQ/Decision/SPEC/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
+README は agent-dev-flow リポジトリの構成要素（identity、入口表、参照先リンク、最小限のクイックスタート）であり、REQ/Decision/Design/guide と並ぶ基準境界対象ではなく README.md の構造要件に従う。
 
 ### 新規文書作成時の分類判断ツリー <!-- REQ-001 -->
 
@@ -42,7 +42,7 @@ README は agent-dev-flow リポジトリの構成要素（identity、入口表�
 | 満たすべき振る舞い、制約、状態の定義か? | YES → | **REQ** |
 | 可逆的な運用上の判断か? | YES → | Guide または workflow 内の判断として扱い、独立文書不要 |
 | 将来の設計、運用、文書システムを制約する決定か? | YES → | **Decision** |
-| 現在のアーキテクチャ、システム動作の記述か? | YES → | **SPEC** |
+| 現在のアーキテクチャ、システム動作の記述か? | YES → | **Design** |
 | 分析結果、監査所見、インシデント記録か? | YES → | **Report** |
 | 人間向けのナビゲーション、案内か? | YES → | **Guide** |
 | 上記のいずれにも該当しない → | 既存文書の APPEND/UPDATE で対応できないか確認。新規文書が必要な場合は REQ として要件化 |
@@ -50,16 +50,16 @@ README は agent-dev-flow リポジトリの構成要素（identity、入口表�
 判断の結果が複数の文書種別にまたがる場合、それぞれの責務に応じて分割する。
 単一文書に複数種別の内容を混在させない。
 
-### REQ と SPEC の配置境界（執筆時判断）
+### REQ と Design の配置境界（執筆時判断）
 
-REQ 要件行が SPEC 相当内容（スキーマフィールド、enum 値一覧、判定表、ファイルパターン、テンプレート種別、レポート形式、テストデータ詳細、個別 checker ルール、retry 回数、token 目安、行数上限、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）のみを主たる文意とする場合、当該内容は SPEC 等へ配置する。
-移管候補一覧と安定契約の完全な定義は `../foundations/document-model.md`「SPEC 分離基準」「安定契約の例外」を参照。
+REQ 要件行が Design 相当内容（スキーマフィールド、enum 値一覧、判定表、ファイルパターン、テンプレート種別、レポート形式、テストデータ詳細、個別 checker ルール、retry 回数、token 目安、行数上限、Step 番号、Phase 番号、内部アルゴリズム、作業履歴）のみを主たる文意とする場合、当該内容は Design 等へ配置する。
+移管候補一覧と安定契約の完全な定義は `../foundations/document-model.md`「Design 分離基準」「安定契約の例外」を参照。
 
 ただし公開 command 名、公開入口、ドメイン状態の位置づけ、他 command との接続契約、安全境界、停止条件の大枠、後続工程が依存する安定した外部契約に該当する場合は、REQ に要約として記述できる（安定契約例外、REQ-001-069）。
 
-## REQ/SPEC 記述基準
+## REQ/Design 記述基準
 
-REQ 記述と SPEC 記述の内容基準、learning/intake 由来変更の分類、分類根拠の伝播を規定する（REQ-001）。
+REQ 記述と Design 記述の内容基準、learning/intake 由来変更の分類、分類根拠の伝播を規定する（REQ-001）。
 
 ### REQ 記述基準: ステークホルダー視点と4妥当性基準
 
@@ -83,11 +83,11 @@ learning/intake 成果物から後続工程（RU、req-define、design-save）�
 |---|---|---|
 | 新しい利用者要求 | 既存REQ が要求を保持していない新しいステークホルダー要求 | ○（REQ 作成または拡張） |
 | 外部契約変更 | 利用者から見える外部契約の変更 | ○（REQ 作成または拡張） |
-| バリエーション追加 | 既存要求を満たすバリエーション追加 | ×（SPEC 拡張） |
-| エッジケース | エッジケース対応 | ×（SPEC 拡張） |
-| パラメータ調整 | retry 回数、timeout、閾値、重み等の調整 | ×（パラメータSPEC 拡張） |
-| 不適合修正 | 既存REQ/SPEC への不適合修正 | ×（SPEC 修正） |
-| 内部再構成 | 外部挙動を変えない内部再構成 | ×（SPEC 再構成） |
+| バリエーション追加 | 既存要求を満たすバリエーション追加 | ×（Design 拡張） |
+| エッジケース | エッジケース対応 | ×（Design 拡張） |
+| パラメータ調整 | retry 回数、timeout、閾値、重み等の調整 | ×（パラメータDesign 拡張） |
+| 不適合修正 | 既存REQ/Design への不適合修正 | ×（Design 修正） |
+| 内部再構成 | 外部挙動を変えない内部再構成 | ×（Design 再構成） |
 | 文書訂正 | 文書記述の訂正 | ×（文書修正） |
 
 REQ 拡張を候補とするのは「新しい利用者要求」または「外部契約変更」に該当する場合のみとする。
@@ -103,7 +103,7 @@ learning/intake 成果物から後続工程（RU、req-define、design-save）�
 | REQ影響の有無 | 既存REQ への影響有無 |
 | 対象ステークホルダー | 変更が影響するステークホルダー |
 | 利用者から見える変更の有無 | 利用者から観測可能な変更か否か |
-| SPEC論理区分 | 挙動SPEC/カタログSPEC/横断契約SPEC/パラメータSPEC/実装詳細SPEC のいずれか |
+| Design論理区分 | 挙動Design/カタログDesign/横断契約Design/パラメータDesign/実装詳細Design のいずれか |
 | 正規所有対象 | 対象 command、skill、workflow、品質ルール、整合性ルール等 |
 | 追記先を選択した理由 | 当該追記先を選んだ根拠 |
 | 根拠となる観測事実 | 変更が必要となった観測事実（CI 失敗、誤検出、エッジケース発見等） |
@@ -153,7 +153,7 @@ learning/intake 成果物から後続工程（RU、req-define、design-save）�
 
 
 1要件行に複数ルール、長大列挙、複文が混在する場合、1判断につき1行に分割する。
-分類カタログ、値一覧、判定表は SPEC 等に委譲し、REQ 行は核心を1文で表現する。
+分類カタログ、値一覧、判定表は Design 等に委譲し、REQ 行は核心を1文で表現する。
 
 ## 要件性
 
@@ -178,13 +178,13 @@ learning/intake 成果物から後続工程（RU、req-define、design-save）�
 |---|---|
 | 残す | 現在の文書種別、位置が適切。文章品質の修正のみで対応可能 |
 | 分割 | 1行に複数関心が混在。関心ごとに別行へ分割 |
-| 移送 | 別の文書種別（REQ↔SPEC↔Decision↔guide↔skill reference）への移動が必要 |
+| 移送 | 別の文書種別（REQ↔Design↔Decision↔guide↔skill reference）への移動が必要 |
 | 削除候補 | 作業記録、移行結果、現状構成の詳細説明、変更履歴等、要件として不要な内容 |
 
 ## 硬直的固定記述の回避
 
 件数（「10 ガイド」等）、ファイル名列挙を要件に埋め込まず、構造要件のみ記述する。
-件数、ファイル名は SPEC、README、guide 側で管理し、REQ は構造（「README.md（入口）と個別ガイドファイルで構成する」等）のみ記述する。
+件数、ファイル名は Design、README、guide 側で管理し、REQ は構造（「README.md（入口）と個別ガイドファイルで構成する」等）のみ記述する。
 
 ## SKILL 構造（概要節/機能節役割分担）
 
@@ -203,21 +203,21 @@ SKILL.md 査読時（`agentdev-doc-writing`）に概要節と機能節の重複�
 
 ### SKILL.md 原本節フォーマット（REFERENCE関係）
 
-SKILL.mdは対応するSPECへの参照、SKILL.md自身の実行入口としての責務、extensionとの補完関係を示す。
+SKILL.mdは対応するDesignへの参照、SKILL.md自身の実行入口としての責務、extensionとの補完関係を示す。
 
-1. 対応するSPECへの参照リンクを持つ。
-2. SPECを正規原本、SKILL.mdを実行入口と補完情報保持文書とするREFERENCE関係を宣言する。
+1. 対応するDesignへの参照リンクを持つ。
+2. Designを正規原本、SKILL.mdを実行入口と補完情報保持文書とするREFERENCE関係を宣言する。
 3. extensionは標準SKILL.mdを上書きせず、プロジェクト固有情報だけを追加することを宣言する。
 
-SKILL.mdはSPEC内容を再記述せず、実行時に必要な入口、トリガー、参照資料、補完情報だけを保持する。
+SKILL.mdはDesign内容を再記述せず、実行時に必要な入口、トリガー、参照資料、補完情報だけを保持する。
 ### U-012 解消パターン（extensionとSKILL.mdの関係）
 
-- **正規原本**: 対応するSPEC
+- **正規原本**: 対応するDesign
 - **実行入口**: 標準SKILL.md
 - **プロジェクト固有補完**: extension
 
-同じ内容をSPEC、SKILL.md、extensionへ重複記載しない。
-SKILL.mdはSPECを参照し、extensionは標準SKILL.mdの固定知識外にあるプロジェクト固有情報だけを提供する。
+同じ内容をDesign、SKILL.md、extensionへ重複記載しない。
+SKILL.mdはDesignを参照し、extensionは標準SKILL.mdの固定知識外にあるプロジェクト固有情報だけを提供する。
 
 ## SKILL.md概要節と機能節の役割分担
 
@@ -225,7 +225,7 @@ SKILL.mdの概要節は入口として役割と利用条件を簡潔に示し、
 概要節と機能節の重複は`agentdev-doc-writing`の恒常的な査読対象とする。
 
 査読対象の分類は重複度合いと文書影響度に基づく。
-固定件数、実施順序、段階的スケジュール、個別ファイル一覧は本SPECに保持しない（固定件数埋め込みを全件禁止）。
+固定件数、実施順序、段階的スケジュール、個別ファイル一覧は本Designに保持しない（固定件数埋め込みを全件禁止）。
 
 ## 用語政策
 
@@ -236,7 +236,7 @@ japanese-tech-writing は「術語の扱い方の一般論」を管理する。
 
 ### 英語のまま残す語（固有名詞、識別子）
 
-製品名（AgentDevFlow, OpenCode）、ID（REQ-008 等）、略語（REQ/Decision/SPEC/RU/OU/PR/SSoT/HITL）、コマンド名、ファイルパス、YAMLフィールド名（説明文では日本語訳を併記）、パイプライン名（Intake/Learning/Backlog）。
+製品名（AgentDevFlow, OpenCode）、ID（REQ-008 等）、略語（REQ/Decision/Design/RU/OU/PR/SSoT/HITL）、コマンド名、ファイルパス、YAMLフィールド名（説明文では日本語訳を併記）、パイプライン名（Intake/Learning/Backlog）。
 
 ### 修飾語の日本語化の方向性
 
@@ -310,7 +310,7 @@ YAML frontmatter は「YAML フロントマター」を推奨訳とする。
 ### LLM 表現の検出→書き換え方針
 
 LLM 表現（接続の型、空虚な動詞、空虚な形容、ラベル前置き）の検出→書き換えパターンの具体例は
-`agentdev-doc-writing` スキルの運用参照資料 `references/llm-expression-patterns.md`（OU-003 の case-run で新規作成）で管理する。本 SPEC には方針のみを記載し、具体例の正誤表は skill references に集約する
+`agentdev-doc-writing` スキルの運用参照資料 `references/llm-expression-patterns.md`（OU-003 の case-run で新規作成）で管理する。本 Design には方針のみを記載し、具体例の正誤表は skill references に集約する
 （v2:REQ-0140-026「個別用語の正誤表は `agentdev-doc-writing` スキルの参照資料で管理」準拠）。
 
 ### 不自然表現検出分類（v2:REQ-0140-033）
@@ -339,16 +339,16 @@ guides/README のみ全規範を適用する。
 |---|---|---|
 | REQ | 整形、LLM表現禁止、冗長排除、演出抑制、用語政策 | パラグラフライティング、山場の演出 |
 | Decision | 整形、LLM表現禁止、冗長排除、論証の厳密さ（因果の機構、譲歩の処理）、用語政策 | 演出 |
-| SPEC | 整形、LLM表現禁止、冗長排除、識別子と散文の区別、用語政策 | 演出、パラグラフライティング |
+| Design | 整形、LLM表現禁止、冗長排除、識別子と散文の区別、用語政策 | 演出、パラグラフライティング |
 | command | 整形、LLM表現禁止、冗長排除、見出しの付け方、用語政策 | 演出、パラグラフライティング |
 | skill | 整形、LLM表現禁止、冗長排除、論証の厳密さ、用語政策 | 演出 |
 | guides/README | japanese-tech-writing 全規範 | なし |
 
 ## 規範情報と非規範情報の配置基準
 
-恒久基準文書（Decision、REQ、SPEC）と非規範 Report（Release Report 等）の配置基準を明確化する（document-model「恒久基準と非規範情報の整理」準拠）。
+恒久基準文書（Decision、REQ、Design）と非規範 Report（Release Report 等）の配置基準を明確化する（document-model「恒久基準と非規範情報の整理」準拠）。
 
-### 規範情報（Decision、REQ、SPEC）
+### 規範情報（Decision、REQ、Design）
 
 - 決定内容、適用範囲、必須条件、制約、正規所有者、採用方式、観測可能結果（含义変更相当）
 - 安定的な仕様記述、契約、プロトコル
@@ -362,10 +362,10 @@ guides/README のみ全規範を適用する。
 
 ### 配置原則
 
-- 現行 Decision、REQ、SPEC へ移行結果またはリリース証跡を規範内容として配置しない
+- 現行 Decision、REQ、Design へ移行結果またはリリース証跡を規範内容として配置しない
 - 非規範 Report へ規範要件または必達条件を移さない
 - 配置判定は document-model の 6 処置モデル（KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）で行う
-- DEC-001 の 10シナリオの実行結果は Release Report、定義は SPEC へ配置する
+- DEC-001 の 10シナリオの実行結果は Release Report、定義は Design へ配置する
 
 ## SKILL.md 見出し言語方針
 

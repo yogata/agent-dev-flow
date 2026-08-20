@@ -1,11 +1,11 @@
 ---
-title: `agentdev-workflow-orchestration` SPEC
+title: `agentdev-workflow-orchestration` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
 
-# `agentdev-workflow-orchestration` SPEC
+# `agentdev-workflow-orchestration` Design
 
 ## 目的
 

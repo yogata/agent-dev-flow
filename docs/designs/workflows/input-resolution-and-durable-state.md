@@ -5,8 +5,6 @@ created: 2026-08-10
 updated: 2026-08-15
 ---
 
-<!-- canonical_owner: input-resolution-and-durable-state / spec_logical_division: cross_cutting_contract（ACT-SPEC-003 rationale より） -->
-
 # Input Resolution and Durable State
 
 ## 目的

@@ -124,8 +124,8 @@ req-define は次の7項目を判定し、`artifact_actions`、`operation_units`
 
 ### Design action への分類根拠出力
 
-最終分類確定ステップで `artifact: design` の Design action 各 entry へ `spec_logical_division` と `canonical_owner` を最終分類確定値として出力する。
-出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`spec_logical_division`、`canonical_owner`）と一致し、後続の design-save が Design frontmatter または冒頭宣言節へ宣言を付与するための入力となる。
+最終分類確定ステップで `artifact: design` の Design action 各 entry へ `canonical_owner` を最終分類確定値として出力する。
+出力値は `../responsibilities/artifact-contracts.md`「分類根拠伝播契約」の伝播フィールド一覧（`canonical_owner`）と一致し、後続の design-save が配置一貫性検証を実行するための入力となる。
 分類値が確定できない場合は `unknown` とし、soft-contract（DEC-003）に従い design-save へ警告付きで引き継ぐ。
 
 ### REQ 影響なし時の取扱い

@@ -1,6 +1,6 @@
 # QG-2: Acceptance Criteria Coverage Gate
 
-case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/ADR/SPEC の必達要件を網羅しているかを検証する Gate。
+case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/ADR/Design の必達要件を網羅しているかを検証する Gate。
 本ファイルは QG-2 の判定基準、検査観点を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
@@ -28,12 +28,12 @@ case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/A
 - **warn**: ADR が関連するが完了条件に反映が見られない。
 - **pass**: 関連 ADR が存在しない、または決定事項が完了条件に反映されている。
 
-### 3. SPEC 適合性の完了条件化
+### 3. Design 適合性の完了条件化
 
-変更が SPEC に影響する場合、SPEC 適合性の確認が完了条件に含まれているか。
+変更が Design に影響する場合、Design 適合性の確認が完了条件に含まれているか。
 
-- **warn**: SPEC 影響があると推定されるが SPEC 適合確認が完了条件にない。
-- **pass**: SPEC 影響がない、または SPEC 適合確認が完了条件化されている。
+- **warn**: Design 影響があると推定されるが Design 適合確認が完了条件にない。
+- **pass**: Design 影響がない、または Design 適合確認が完了条件化されている。
 
 ### 4. 完了条件の測可能性
 
@@ -91,7 +91,7 @@ Epic Issue の場合、テスト戦略が Epic の「対象外」記述と矛盾
 ### 8. artifact-specific quality control 投影検証（execution contract 拡張）
 
 execution contract 確定を支援するため、artifact-specific quality control の test strategy への投影を検証する。
-対応表は artifact-quality-control-routing SPEC を正とする。
+対応表は artifact-quality-control-routing Design を正とする。
 
 検証項目:
 

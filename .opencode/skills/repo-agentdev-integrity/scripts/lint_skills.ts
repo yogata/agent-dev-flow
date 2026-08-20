@@ -86,9 +86,9 @@ function extractSeeAlsoReferences(content: string): string[] {
 
 // ===== AG-005 (RU-0018 / Issue #2179): skill 記述基準 層1〜2 machine checks =====
 //
-// Canonical owners (SPEC is authoritative; this linter is the detection view):
-//   - docs/specs/skills/agentdev-skill-authoring.md「機械検査（本 SPEC 検証観点への追加）」
-//   - docs/specs/authoring/command-file-format.md「機械検査対象」
+// Canonical owners (Design is authoritative; this linter is the detection view):
+//   - docs/designs/skills/agentdev-skill-authoring.md「機械検査（本 Design 検証観点への追加）」
+//   - docs/designs/authoring/command-file-format.md「機械検査対象」
 //
 // 検証不通過 (hard): description 1024 超過 / 単体 600 超過 / USE FOR 二重保持 /
 //   description 内マーカー語・内部 ID / 簡潔トリガー項欠落（AG-004、command-bound

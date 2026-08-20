@@ -3,7 +3,7 @@
 test strategy 策定時に pass_criteria を記述する際の指針。
 REQ content が pipeline stage によって表現を変えることに起因する QG-4 評価時の食い違いを防ぐ。
 
-agentdev-req-analysis SPEC「pass_criteria 記述基準」を正規原本とし、本ファイルは詳細、実例を補完する。
+agentdev-req-analysis Design「pass_criteria 記述基準」を正規原本とし、本ファイルは詳細、実例を補完する。
 
 ## 適用範囲
 
@@ -16,7 +16,7 @@ agentdev-req-analysis SPEC「pass_criteria 記述基準」を正規原本とし�
 
 ## pipeline stage モデル
 
-AgentDevFlow では REQ content が以下の pipeline stage 間で表現を変える（ワークフロー契約 SPEC「マクロフェーズ」参照）:
+AgentDevFlow では REQ content が以下の pipeline stage 間で表現を変える（ワークフロー契約 Design「マクロフェーズ」参照）:
 
 | pipeline stage | REQ content の表現 |
 |---|---|
@@ -39,12 +39,12 @@ pass_criteria は以下を満たすことで意味的等価性を担保する:
 
 ### 記述例
 
-要件「agentdev-req-analysis SPEC は pass_criteria 記述基準セクションを持つこと」に対する pass_criteria:
+要件「agentdev-req-analysis Design は pass_criteria 記述基準セクションを持つこと」に対する pass_criteria:
 
 ```yaml
 # ✅ 許容される表現
 pass_criteria: |
-  agentdev-req-analysis SPEC に pass_criteria 記述基準セクションが追加されていること
+  agentdev-req-analysis Design に pass_criteria 記述基準セクションが追加されていること
 
 # ✅ 許容される表現（表現差異あり、意味的等価）
 pass_criteria: |
@@ -71,7 +71,7 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 | pass_criteria 表現 | 適用対象 | 検証方法 | 典型例 |
 |---|---|---|---|
 | 「存在しないこと」 | 新規作成禁止 | 当該識別子、ファイルが存在しないことを確認（`glob`、`grep` で0件、`test -f` で偽） | 「REQ-{NNNN} が存在しないこと」「新規ファイル X が存在しないこと」 |
-| 「変更されていないこと」 | 既存 REQ、既存ファイルの変更がないこと | 当該ファイルに diff がないことを確認（`git diff --quiet` で終了コード0） | 「REQ-{NNNN} が変更されていないこと」「既存 SPEC ファイル X が変更されていないこと」 |
+| 「変更されていないこと」 | 既存 REQ、既存ファイルの変更がないこと | 当該ファイルに diff がないことを確認（`git diff --quiet` で終了コード0） | 「REQ-{NNNN} が変更されていないこと」「既存 Design ファイル X が変更されていないこと」 |
 
 ### 誤用例
 
@@ -93,12 +93,12 @@ pass_criteria が「存在」「変更」を検証する場合、対象に応じ
 
 ## 共通 pass_criteria と正規所有
 
-複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は agentdev-workflow-templates SPEC「test strategy 記述ガイドライン」を正規所有とする。
+複数 REQ にまたがる共通 pass_criteria リスク、REQ 個別期待値推奨、変更対象外 REQ 検証の正しい表現、存在確認の使用条件の運用基準は agentdev-workflow-templates Design「test strategy 記述ガイドライン」を正規所有とする。
 本ガイドは意味的等価許容、存在確認と diff 確認の使い分けに限定する。
 
 ## See Also
 
-- agentdev-req-analysis SPEC「pass_criteria 記述基準」（正規原本）
+- agentdev-req-analysis Design「pass_criteria 記述基準」（正規原本）
 - [test-strategy-numeric-threshold-guide.md](test-strategy-numeric-threshold-guide.md)（数値閾値策定ガイド）
 - [qg-4-final-acceptance.md](../../agentdev-quality-gates/references/qg-4-final-acceptance.md)（QG-4 最終受け入れゲート）
 - [qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md)（QG-2 完了条件網羅性）

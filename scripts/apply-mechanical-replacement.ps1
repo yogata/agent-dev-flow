@@ -74,7 +74,7 @@ function Apply-X5Simple($line) {
 
 function Apply-X6($line) {
     if (-not $line.Contains('において')) { return $line, 0 }
-    # 規範記述（"において | で" 等の表や SPEC 記述）はスキップ
+    # 規範記述（"において | で" 等の表や Design 記述）はスキップ
     if ($line -match 'において.*で.*文語調' -or $line -match 'において.*機械判定' -or $line -match '機械判定.*において' -or $line -match '許容.*において' -or $line -match 'において.*置換' -or $line -match '置換.*において') {
         return $line, 0
     }

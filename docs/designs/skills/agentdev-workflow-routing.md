@@ -1,11 +1,11 @@
 ---
-title: `agentdev-workflow-routing` SPEC
+title: `agentdev-workflow-routing` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
 
-# `agentdev-workflow-routing` SPEC
+# `agentdev-workflow-routing` Design
 
 ## 目的
 

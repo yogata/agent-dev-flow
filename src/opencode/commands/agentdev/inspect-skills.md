@@ -13,7 +13,7 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 
 - 診断結果の提示
 - 根拠と推奨 route の提示
-- 副作用は検出事項ファイルの生成のみ（正規文書・REQ/Decision/SPEC・Command/Skill/Template/Script への変更、Issue/PR作成、RU保存、branch、worktree 操作はガードレール G01〜G04 の対象外）
+- 副作用は検出事項ファイルの生成のみ（正規文書・REQ/Decision/Design・Command/Skill/Template/Script への変更、Issue/PR作成、RU保存、branch、worktree 操作はガードレール G01〜G04 の対象外）
 
 ## 入力
 

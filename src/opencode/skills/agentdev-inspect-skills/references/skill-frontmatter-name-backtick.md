@@ -1,6 +1,6 @@
 # SKILL.md frontmatter `name:` バッククォート検出の判定基準
 
-> **原本**: backticks-identifier-threshold SPEC「適用対象外（PR #1334 事例に基づく明示）」。
+> **原本**: backticks-identifier-threshold Design「適用対象外（PR #1334 事例に基づく明示）」。
 > 本ファイルは inspect-skills 診断観点「SKILL.md frontmatter `name:` バッククォート検出」の判定基準詳細を集約する運用ビューである。
 > 原本と内容が重複する場合は原本を優先する。
 
@@ -15,7 +15,7 @@ frontmatter は構造データであり Markdown インラインコード表記�
 
 PR #1334（commit ad086200, 2026-06-28）の機械横断是正で、`src/opencode/skills/agentdev-*/SKILL.md` 計27ファイルの frontmatter `name:` 行にバッククォートが誤って付与された。
 本来バッククォートは Markdown 本文の識別子に付与するものだが、frontmatter 値（YAML スカラー値）に対して誤付与された。
-この事例に基づき、backticks-identifier-threshold SPEC「適用対象外」で frontmatter 値への backticks 付与を明示的に禁止し、本検出基準で再発を防止する。
+この事例に基づき、backticks-identifier-threshold Design「適用対象外」で frontmatter 値への backticks 付与を明示的に禁止し、本検出基準で再発を防止する。
 
 ## 検出パターン
 
@@ -79,12 +79,12 @@ skill-name-dir-match 違反を併発する場合は両方の Classification を�
 ## 対象外
 
 - frontmatter の他フィールド（`description:` 等）へのバッククォート付与は本検出の対象外。`description:` 値は自由記述可能な文字列であり、バッククォート囲みが YAML 構文違反にならないため。
-- Markdown 本文の backticks 使用は backticks-identifier-threshold SPEC の別基準で扱う。
+- Markdown 本文の backticks 使用は backticks-identifier-threshold Design の別基準で扱う。
 - 機械的検出の実装（lint スクリプト等）は本診断の対象外。本ファイルは検出基準を定義し、実装は別工程とする。
 
 ## See Also
 
-- **原本**: backticks-identifier-threshold SPEC「適用対象外（PR #1334 事例に基づく明示）」
+- **原本**: backticks-identifier-threshold Design「適用対象外（PR #1334 事例に基づく明示）」
 - **skill-name-dir-match**: name とディレクトリ名の整合性ルール（integrity-rule-catalog 経由で参照）
 - **REQ**: Skill frontmatter 整合（本検出の根拠 REQ）
 - **REQ**: 推奨 route 提示、修正実施禁止

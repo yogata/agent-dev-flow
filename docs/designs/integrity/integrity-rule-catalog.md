@@ -25,7 +25,7 @@ updated: 2026-08-18
 | detection_method | string | 検出方法（正規表現、構造解析、存在確認等） |
 | affected_artifacts | list[str] | 対象アーティファクト種別 |
 | related_req | list[str] | 関連 REQ ID |
-| related_design | list[str] | 関連 SPEC ファイル |
+| related_design | list[str] | 関連 Design ファイル |
 | gate_level | enum | full-audit / delta-guard / impact-guard |
 | false_positive_risk | string | 誤検知リスクと対策 |
 | regression_test | string | 回帰テストの有無、ID |
@@ -55,12 +55,12 @@ IR-NNN（個別 integrity rule）の `regression_test` フィールドは以下�
 
 | 表記 | 使用場面 | 備考 |
 |---|---|---|
-| `(未実装)` | 回帰テストが未実装の場合 | 現状記載として優先。SPEC 原則（現在どう動作しているか）に整合 |
+| `(未実装)` | 回帰テストが未実装の場合 | 現状記載として優先。Design 原則（現在どう動作しているか）に整合 |
 | 空欄 | 回帰テストが適用外、または判定不能の場合 | 「(追加予定)」は使用しない |
 | （fixture や検証手続きの実体記述） | 回帰テストが実装済みの場合 | 実在するテストデータ、検証手続きを記述 |
 
 **禁止表記**: `(追加予定)`。
-将来実装計画を含み、SPEC 原則（現在仕様、契約記述に限定）に対し境界ケース。
+将来実装計画を含み、Design 原則（現在設計、契約記述に限定）に対し境界ケース。
 既存 IR-025〜IR-051 で `(追加予定)` を使用している場合は `(未実装)` へ統一する。
 
 **新規 IR 作成時**: `regression_test` フィールドは原則 `(未実装)` で開始し、回帰テスト実装後に実体記述へ更新する。
@@ -114,7 +114,7 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-041: retired-req-broken-link](rules/IR-041-retired-req-broken-link.md)
 - [IR-042: hardcoded-req-count](rules/IR-042-hardcoded-req-count.md)
 - [IR-043: retired-readme-coverage](rules/IR-043-retired-readme-coverage.md)
-- [IR-044: REQ/SPEC 境界違反検出](rules/IR-044-req-spec-boundary-violation-detection.md)
+- [IR-044: REQ/Design 境界違反検出](rules/IR-044-req-spec-boundary-violation-detection.md)
 <!-- AUTOGEN:END -->
 
 ### IR-019, IR-022, IR-026, IR-036: inspect-docs 移管（REQ-028-007、OU-006 Phase 5）
@@ -152,7 +152,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 - [IR-051: 実行主体の skill 表記誤認検出](rules/IR-051-executor-skill-notation-misrecognition.md)
 - [IR-052: 完了条件 grep パターン設計（REQ-010-011）](rules/IR-052-completion-grep-pattern-design.md)
 - [IR-053: gh 直接記述検出](rules/IR-053-gh-direct-invocation-detection.md)
-- [IR-054: draft SPEC 放置検出](rules/IR-054-draft-spec-abandonment-detection.md)
+- [IR-054: draft Design 放置検出](rules/IR-054-draft-spec-abandonment-detection.md)
 - [IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）](rules/IR-055-runtime-unresolved-reference.md)
 - [IR-056: project-extensions-integrity](rules/IR-056-project-extensions-integrity.md)
 - [IR-057: obsolete-spec-path-after-domain-split](rules/IR-057-obsolete-spec-path-after-domain-split.md)
@@ -167,18 +167,18 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 
 以下は検出ルールの設計とカタログ候補エントリ整備のみを行い、実装（`check_integrity.ts` 等の検出ロジック）は対象外とする。
 REQ-028-012 が定める新規 IR 登録 gate（(a) 存在資格 gate、(b) hard governance 追加 gate）に従い確定する。
-candidate 状態の IR は catalog への本エントリ追加を含まず、別途 SPEC または作業記録で管理する。
+candidate 状態の IR は catalog への本エントリ追加を含まず、別途 Design または作業記録で管理する。
 
 | Field | 値 |
 |-------|------|
 | rule_id | （確定前: retired-reference-residual） |
-| description | 廃止 REQ/SPEC 由来の SKILL/command/guide/docs 本文記述残置検出 |
+| description | 廃止 REQ/Design 由来の SKILL/command/guide/docs 本文記述残置検出 |
 | severity | heuristic |
 | category | document-drift |
-| detection_method | retired REQ/SPEC ID リストをソースとした本文横断検索。活性 REQ/SPEC への言及は対象外。supersede 元への言及は文脈判定で finding 扱い |
+| detection_method | retired REQ/Design ID リストをソースとした本文横断検索。活性 REQ/Design への言及は対象外。supersede 元への言及は文脈判定で finding 扱い |
 | affected_artifacts | `src/opencode/commands/**`, `src/opencode/skills/**`, `docs/guides/**` |
 | related_req | REQ-010, REQ-010 |
-| related_design | `docs/designs/foundations/document-model.md`（SPEC ライフサイクル superseded） |
+| related_design | `docs/designs/foundations/document-model.md`（Design ライフサイクル superseded） |
 | gate_level | full-audit |
 | false_positive_risk | supersede 元への妥当な文脈参照。finding 扱いで人間確認を挟む |
 | regression_test | （未実装） |
@@ -200,7 +200,7 @@ check_integrity.ts は全 IR ルール（full-audit gate_level）を実装する
 check_changed_docs.ts と check_integrity.ts の二系統で IR ルールを共有し、検出ロジックを重複実装しない。
 
 詳細な IR-*.md の追加・更新内容は後続の design-save / case-run 工程で確定する。
-check_changed_docs.ts の profile rules と SPEC 記載項目の対応関係は REQ-010-009（1:1 対応不要、包括カバー許容）に従う。
+check_changed_docs.ts の profile rules と Design 記載項目の対応関係は REQ-010-009（1:1 対応不要、包括カバー許容）に従う。
 
 ### AG-005 規則群（lint_skills.ts、層1〜2記述基準機械検査）
 
@@ -216,9 +216,9 @@ AG-005 規則群（`lint_skills.ts`、RU-0018 / Issue #2179、PR #2184 で main 
 | references 目次欠落 | hard | 300 行超の references ファイルにおける目次（TOC）欠落 |
 | 集約予算 350 | warn | description 平均 350 文字予算超過（N = `src/opencode/skills` 配下 SKILL.md ファイル数） |
 
-正規所有者（SPEC が正、linter は検出ビュー）: `agentdev-skill-authoring` SPEC「skill 記述基準（層1〜3）」、`command-file-format` SPEC「機械検査対象」。
+正規所有者（Design が正、linter は検出ビュー）: `agentdev-skill-authoring` Design「skill 記述基準（層1〜3）」、`command-file-format` Design「機械検査対象」。
 
-登録判断: 新規カテゴリ追加判定フローに従い、(1) 検出が機械的パターンマッチで完結する、(2) 判定基準の正典が既存 SPEC（skill authoring 層1〜2）に存在し checker は検出ビューに留まる、(3) 既存 IR カテゴリと検出対象が重複しない、の各条件を満たすため checker カテゴリとして登録し IR 番号付与は行わないものと判定した。既知違反は `baselines/lint-skills-baseline.json`（delta-aware、baseline-known は info 降格）で管理する。
+登録判断: 新規カテゴリ追加判定フローに従い、(1) 検出が機械的パターンマッチで完結する、(2) 判定基準の正典が既存 Design（skill authoring 層1〜2）に存在し checker は検出ビューに留まる、(3) 既存 IR カテゴリと検出対象が重複しない、の各条件を満たすため checker カテゴリとして登録し IR 番号付与は行わないものと判定した。既知違反は `baselines/lint-skills-baseline.json`（delta-aware、baseline-known は info 降格）で管理する。
 
 ### IR-055 heuristic 行内複数パターン集計仕様（REQ-002-079〜081）
 
@@ -232,13 +232,13 @@ IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複�
 同一行の複数パターンを単一レコードへ圧縮しない。
 
 **baseline 整合**: `docs/designs/foundations/harness-separation-model.md` の baseline リスト（11件）は本集計仕様に従って再抽出した結果と一致すること。
-baseline 抽出元と SPEC 記載の不一致が検出された場合、本節の集計仕様を正として実装または baseline を調整する。
+baseline 抽出元と Design 記載の不一致が検出された場合、本節の集計仕様を正として実装または baseline を調整する。
 
 **適用対象**: heuristic level（WARNING）の検出に適用する。
 strict level（NG）の検出は行単位1件の従来仕様を維持し、本節の対象外とする。
 
 実装側（`check_integrity.ts`）の集計ロジックは本仕様に従うことが期待される。
-仕様と実装の不整合が観察された場合は intake / inspect 経由で本 SPEC の更新または実装の修正を提案する。
+仕様と実装の不整合が観察された場合は intake / inspect 経由で本 Design の更新または実装の修正を提案する。
 
 ### IR-055 template placeholder exemption（トークン近傍狭域化）
 
@@ -270,7 +270,7 @@ docs-check（`/repo/docs-check`、`check_integrity.ts`）と skill 定義（SKIL
 
 | 対象 | 拡張子 | 備考 |
 |------|--------|------|
-| 検査対象 | `.md` のみ | Markdown 形式の永続文書（REQ/Decision/SPEC/guides/SKILL.md/command 定義） |
+| 検査対象 | `.md` のみ | Markdown 形式の永続文書（REQ/Decision/Design/guides/SKILL.md/command 定義） |
 | 除外 | `retired/` 配下 | 履歴参照用、検出対象外 |
 | 除外 | code block 内部 | 例示、パターン説明は検出対象外 |
 | 正当使用例外 | vocabulary-registry.md / integrity-rule-catalog.md / gate-levels.md / remediation-routing.md | 検出ルール自体の記述、正規語彙の対照表 |
@@ -292,7 +292,7 @@ checkSourceProjectionConsistency
 └── affects → checkBrokenJunctions（projection 側 junction 健全性）
 
 checkReqSpecBoundaryViolation (IR-044)
-├── depends on → IR044_SIGNAL_PATTERNS（SPEC 詳細キーワード）
+├── depends on → IR044_SIGNAL_PATTERNS（Design 詳細キーワード）
 ├── depends on → META 規則行 exemption（行構造マッチ・REQ-010-012）
 └── affects → なし（独立ルール）。文脈 exemption は inspect-docs へ委譲（REQ-010-003）
 
@@ -324,30 +324,30 @@ checkWorkflowStatusProhibition
 
 | バックエンド | 適用範囲 | 根拠 |
 |--------------|----------|------|
-| `check_integrity.ts`（docs-check + IR ルール） | REQ/SPEC/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft SPEC 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-010-003、REQ-036-008、REQ-002-079/080/081） |
+| `check_integrity.ts`（docs-check + IR ルール） | REQ/Design/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft Design 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-010-003、REQ-036-008、REQ-002-079/080/081） |
 | inspect-* skills（inspect-docs / inspect-skills） | 配布物整合性検査（REQ-002-006/007）。構文健全性の重複検出、文意保持の意味解析、責務説明照合など意味判断を含む診断 | 意味的診断層。詳細は [docs-spec-rebuild-integrity.md](docs-spec-rebuild-integrity.md)「検査バックエンド責務分担」参照 |
 
 **配布物整合性検査（REQ-002-006/007: 文意保持・構文健全性・責務整合などの意味的観点）は `check_integrity.ts` に追加せず、inspect-* skills に集約する**。
 配布物に対する決定論的検出（IR ルール）は既存カテゴリおよび REQ-002-079/080/081 に基づく機械検出（IR-055 runtime-unresolved-reference）で構成し、機械的検出層（docs-check + IR）と意味的診断層（inspect-* skills）の責務境界は 3層検出構造（[integrity-contracts.md](integrity-contracts.md)）に従う。
 これにより `categoryToCheckPattern` map への新カテゴリ追加（skill-category-gap、REQ-010-005）を不要とし、ターゲットング隠退化を防ぐ。
 
-### check_changed_docs.ts profile rules と SPEC 記載項目の対応関係（REQ-010-009）
+### check_changed_docs.ts profile rules と Design 記載項目の対応関係（REQ-010-009）
 
-req-save / design-save / case-close 各 SPEC が記載する検査項目と、`check_changed_docs.ts` の `profileFor()` が返す `rules`（profile rules）の対応関係は 1:1 を要求しない。
-1 つの SPEC 記載項目に対して専用 profile rule を実装しなくても、既存 rule 群による包括カバーを許容する。
-本方針は今後の SPEC / rule 追加時の判断基準となる。
+req-save / design-save / case-close 各 Design が記載する検査項目と、`check_changed_docs.ts` の `profileFor()` が返す `rules`（profile rules）の対応関係は 1:1 を要求しない。
+1 つの Design 記載項目に対して専用 profile rule を実装しなくても、既存 rule 群による包括カバーを許容する。
+本方針は今後の Design / rule 追加時の判断基準となる。
 
-**新規 SPEC 記載項目追加時の判断手順**:
+**新規 Design 記載項目追加時の判断手順**:
 
 1. 既存 profile rules が当該項目を包括カバーするかを `profileFor()` の各 rule 実装で確認する
 2. 包括カバーされる場合、専用 rule の追加を省略する
 3. 既存 rules でカバーできない検出漏れが実用上発生した場合のみ、新規 profile rule を追加する。追加時は本カタログ「新規カテゴリ追加判定フロー（REQ-010-005）」に準拠する
 
-SPEC 記載項目と profile rules の厳密な 1:1 対応を維持するための機械検証（drift detection 等）は設けない。
+Design 記載項目と profile rules の厳密な 1:1 対応を維持するための機械検証（drift detection 等）は設けない。
 両者の乖離が実用上の検出漏れを招かない限り、文書と実装の差分を許容する。
 
-**背景**: `check_changed_docs.ts` は限定変更ファイルに対する delta guard であり、全 SPEC 記載項目を個別 rule で再実装すると検査重複と保守負荷増大を招く。
-包括カバーにより実用上十分な検出精度を保ちつつ、SPEC と実装の過剰な結合を避ける。
+**背景**: `check_changed_docs.ts` は限定変更ファイルに対する delta guard であり、全 Design 記載項目を個別 rule で再実装すると検査重複と保守負荷増大を招く。
+包括カバーにより実用上十分な検出精度を保ちつつ、Design と実装の過剰な結合を避ける。
 
 ### check_integrity test suite 責務分担（REQ-010-008/009）
 

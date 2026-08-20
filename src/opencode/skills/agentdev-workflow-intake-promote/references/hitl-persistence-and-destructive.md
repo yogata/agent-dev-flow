@@ -21,7 +21,7 @@
 
 - STEP-2 の暫定分類と自律確定候補/ユーザー判断必要の判定（runtime artifact。中断時は inbox 実ファイルから STEP-1 を再構築して導出する）
 - ユーザー確認手続き、承認フローは `agentdev-intake-pipeline` の公開操作契約に従う
-- 自律確定可否の詳細判定表は横断契約SPEC（extension 経由で解決）「promote系判断確定とHITL境界」節を正とし、本 reference は重複保持しない
+- 自律確定可否の詳細判定表は横断契約Design（extension 経由で解決）「promote系判断確定とHITL境界」節を正とし、本 reference は重複保持しない
 
 ### Preconditions
 

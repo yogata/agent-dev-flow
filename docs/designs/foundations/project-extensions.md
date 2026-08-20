@@ -13,11 +13,11 @@ updated: 2026-08-15
 
 ## 背景、目的
 
-AgentDevFlow 配布 command/skill 本文（src/opencode/commands/**, src/opencode/skills/**）は、AgentDevFlow 本体固有の Decision/REQ/SPEC への具体参照を持つと、利用先プロジェクトで解決不能な参照が混入する。
+AgentDevFlow 配布 command/skill 本文（src/opencode/commands/**, src/opencode/skills/**）は、AgentDevFlow 本体固有の Decision/REQ/Design への具体参照を持つと、利用先プロジェクトで解決不能な参照が混入する。
 
 project extensions 機構は、プロジェクト固有の追加・拡張を配布コードから分離し、プロジェクト別に与える。
-実装本文はプロジェクト非依存・単体利用可能とし、Decision/REQ/SPEC の具体ID、具体パス、固定URLを持たない。
-extensions（.agentdev/extensions/**）はプロジェクト固有情報を対象とし、そのプロジェクトの Decision/REQ/SPEC を具体的に参照してよい。
+実装本文はプロジェクト非依存・単体利用可能とし、Decision/REQ/Design の具体ID、具体パス、固定URLを持たない。
+extensions（.agentdev/extensions/**）はプロジェクト固有情報を対象とし、そのプロジェクトの Decision/REQ/Design を具体的に参照してよい。
 
 ## 標準配置
 
@@ -121,13 +121,13 @@ command/skill は実行時に自分に対応する extension だけを読む。
 
 対応 extension が存在しない command/skill は正常動作であり、異常状態ではない。
 command が project 非依存で単体動作する正当な状態である。
-例として `/agentdev/inspect-skills` は SPEC 直接参照を持たず project 非依存で動作するため extension 不要である。
+例として `/agentdev/inspect-skills` は Design 直接参照を持たず project 非依存で動作するため extension 不要である。
 
 ### 状態機械の共有実装
 
 Extension 読込の状態機械（不在、破損、旧kind、未知kind、有効の各状態とその遷移）は、runtime resolver と deterministic checker（check_extensions.ts）が同一実装を共有する。
 runtime resolver は fail-open 契約（REQ-002-031）を、deterministic checker は NG 報告契約をそれぞれ担う。
-状態分類の正規入力となる kind enum は本 SPEC「Extension kind enum（公式）」が定める。
+状態分類の正規入力となる kind enum は本 Design「Extension kind enum（公式）」が定める。
 共有実装の変更は runtime と checker の両契約へ同時に反映する。
 
 ## project-local skill 委譲
@@ -156,12 +156,12 @@ checks:
 
 ## command/skill 本文の参照禁止
 
-command/skill 本文には、Decision/REQ/SPEC の具体ID、具体パス、固定URLを記述しない。
+command/skill 本文には、Decision/REQ/Design の具体ID、具体パス、固定URLを記述しない。
 
-禁止対象は文書種別名としての ADR, REQ, SPEC ではなく、プロジェクト固有文書を直接指す具体参照である。
+禁止対象は文書種別名としての ADR, REQ, Design ではなく、プロジェクト固有文書を直接指す具体参照である。
 
-.agentdev/extensions/** は、そのプロジェクトの Decision/REQ/SPEC 参照を許可する。
-REQ/Decision/SPEC 本文内の参照も許容する。
+.agentdev/extensions/** は、そのプロジェクトの Decision/REQ/Design 参照を許可する。
+REQ/Decision/Design 本文内の参照も許容する。
 
 ## 検査、診断
 
@@ -175,7 +175,7 @@ extension 検査は DEC-006（inspect 3-command 構成への正規化）に基�
 | finding disposition | `/agentdev/inspect-promote` | finding の promote、defer、reject |
 
 AgentDevFlow 標準の inspect 責務は上記構造確認・path 実在確認・skill 存在確認までとする。
-command/skill 本文の Decision/REQ/SPEC 具体参照禁止の持続的検査は、各適用プロジェクトが project-local skill により実装する（AgentDevFlow 標準の対象外）。
+command/skill 本文の Decision/REQ/Design 具体参照禁止の持続的検査は、各適用プロジェクトが project-local skill により実装する（AgentDevFlow 標準の対象外）。
 agent-dev-flow リポジトリ自身は適用プロジェクトの1つとして repo-local skill により検査を実装するが、これは標準仕様ではなくローカル運用である。
 `/agentdev/inspect-docs` へ extension の意味診断を追加しない（三層非重複）。
 
@@ -183,12 +183,12 @@ agent-dev-flow リポジトリ自身は適用プロジェクトの1つとして 
 
 extension 原本は各プロジェクトが所有する。
 AgentDevFlow 本体は初期テンプレート、schema、検査（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層）を提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。
-AgentDevFlow 本体リポジトリの .agentdev/extensions/** には本体固有 SPEC パスを記述してよい。
+AgentDevFlow 本体リポジトリの .agentdev/extensions/** には本体固有 Design パスを記述してよい。
 
 ## 配布物参照境界の責務分担
 
 配布成果物と producer 内部成果物の間の意味依存境界の正規所有は REQ-029 および `integrity/distribution-boundary.md` が担う。
-本 SPEC は Project Extensions の schema、配置、読込、標準診断、責務境界を所有し、配布 command/skill 本文の具体 ID、具体パス、固定 URL に対する検知パターン、exemption、severity、false-positive 条件は IR-059 個別文書が所有する。
+本 Design は Project Extensions の schema、配置、読込、標準診断、責務境界を所有し、配布 command/skill 本文の具体 ID、具体パス、固定 URL に対する検知パターン、exemption、severity、false-positive 条件は IR-059 個別文書が所有する。
 
 配布物参照境界の検出結果は generic 表記への是正へ接続する。
 extension はトレーサビリティを補完する手段の一つであり得るが、意味境界の唯一の解決手段ではない（REQ-029-003、REQ-029-004）。
@@ -196,5 +196,5 @@ extension 機構自体は追加・拡張・非上書き原則を維持して残�
 ## 関連
 
 - DEC-006: inspect 3-command 構成への正規化（extension 検査の3層責務分離を確定）
-- REQ-001: 実行時独立性（本 SPEC は具体化機構を提供）
+- REQ-001: 実行時独立性（本 Design は具体化機構を提供）
 

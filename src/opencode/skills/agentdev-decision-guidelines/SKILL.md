@@ -7,9 +7,9 @@ description: Evaluates whether architectural decisions require a Decision record
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-decision-guidelines` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-decision-guidelines` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 評価基準（いずれかに該当すればDecision作成推奨）
@@ -45,14 +45,14 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 2. **command動作仕様**: コマンドの入力、出力、振る舞いの定義
 3. **workflow定義**: ワークフローの状態遷移、フェーズ定義、パイプライン定義
 4. **命名規約、directory規約**: ファイル、ディレクトリの命名規則
-5. **artifact contract変更**: REQ/Decision/SPEC等の文書形式、frontmatter規約の変更
+5. **artifact contract変更**: REQ/Decision/Design等の文書形式、frontmatter規約の変更
 6. **運用ルール**: 運用手順、レビュープロセスの変更
 7. **template変更**: テンプレート形式、セクション構成の変更
 8. **入出力形式**: コマンドの入出力形式の変更
 9. **非技術的合意**: 合意事項、方針の記録（技術的決定を伴わないもの）
-10. **既存文書種別への適合**: 内容が既存のREQ/SPEC/guideの適用範囲に収まる場合
+10. **既存文書種別への適合**: 内容が既存のREQ/Design/guideの適用範囲に収まる場合
 
-上記に該当する場合は、DecisionではなくREQ/SPEC/guideの更新として扱う。
+上記に該当する場合は、DecisionではなくREQ/Design/guideの更新として扱う。
 
 ### False Negative 防止基準
 
@@ -60,13 +60,13 @@ Decision要否判定で、以下の兆候が検出された場合は、たとえ
 
 | 兆候 | 確認内容 |
 |------|---------|
-| 文書種別が境界上 | REQ/SPEC と Decision の境界付近にある場合、技術判断を含むか再確認 |
-| 既存Decisionの内容が SPEC 相当 | 既存Decisionに振る舞い、schema記述が含まれる場合、SPEC への移管を検討 |
+| 文書種別が境界上 | REQ/Design と Decision の境界付近にある場合、技術判断を含むか再確認 |
+| 既存Decisionの内容が Design 相当 | 既存Decisionに振る舞い、schema記述が含まれる場合、Design への移管を検討 |
 | 新規Decisionの必要性が微妙 | 「Decisionを作成してはならない条件」に該当するが、将来の設計、運用、文書システムを制約する決定を含む場合は例外としてDecisionを認める |
 
 **方針**: false negative（Decisionが必要なのに見逃し）を防止する。
 false positive（不要なDecisionの作成）は後に整理できるため、微妙な場合はDecision側に寄せる。
-ただし「Decision作成可否条件」の作成不可条件（作業手段を主題とするもの等）に該当する場合は寄せの対象外とし、retire/supersede または REQ/SPEC/guide で処理する。
+ただし「Decision作成可否条件」の作成不可条件（作業手段を主題とするもの等）に該当する場合は寄せの対象外とし、retire/supersede または REQ/Design/guide で処理する。
 
 ## Decision作成可否条件
 
@@ -107,7 +107,7 @@ Decisionの状態は以下のいずれかをとる。
 
 accepted Decision は意味的に不変とする。
 ただし明示承認済みの非意味修正に限り、直接更新を認める。
-詳細は SPEC `agentdev-decision-guidelines` の「accepted Decision の更新規則」を正とし、本節は実行入口の要約を示す。
+詳細は Design `agentdev-decision-guidelines` の「accepted Decision の更新規則」を正とし、本節は実行入口の要約を示す。
 
 ### 非意味修正と意味変更の区分
 
@@ -127,14 +127,14 @@ accepted Decision は意味的に不変とする。
 ### 憲章 Decision の移行時識別子の扱い
 
 憲章 Decision（charter Decision）に残存する移行時識別子は次の通り処理する。
-判定の詳細は SPEC に委ねる。
+判定の詳細は Design に委ねる。
 
 | 識別子 | 扱い | 理由 |
 |---|---|---|
 | `WS-{N}` | 直接削除可 | 非意味ラベル。決定内容を変えない |
 | `案B` ラベル | 案番号のみ削除可（決定内容は具体文で維持） | 決定内容を維持する非意味修正 |
 | 10シナリオの抽象条件化 | 後継 Decision 必須（直接編集不可） | 意味変更に該当する |
-| 10シナリオの定義 | SPEC が所有 | - |
+| 10シナリオの定義 | Design が所有 | - |
 | 10シナリオの実行結果 | Release Report が所有 | Release Report に規範表現は存在しない |
 
 ## 出力形式

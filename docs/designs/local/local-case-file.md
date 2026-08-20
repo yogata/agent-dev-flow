@@ -7,16 +7,16 @@ updated: 2026-07-26
 
 # ローカル Case ファイル
 
-> **Scope**: 本 SPEC は agent-dev-flow リポジトリのリポジトリ内部設計文書である（REQ-001）。
+> **Scope**: 本 Design は agent-dev-flow リポジトリのリポジトリ内部設計文書である（REQ-001）。
 > ローカル版 OpenCode 導入先リポジトリで運用される Case ファイルのスキーマ、状態遷移、採番、見出しを定義する。
 > 実行時配布対象ではなく、実行時コマンドは本ファイルに依存しない（REQ-001）。
 > REQ-009 の詳細仕様を正とする。
-> Case ファイル仕様の正本は本 SPEC であり、`src/opencode-local/agentdev-gh-cli/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
+> Case ファイル仕様の正本は本 Design であり、`src/opencode-local/agentdev-gh-cli/case-schema/` 配下の定義は操作用定義（正本ではない）とする。
 
 ## 目的
 
 GitHub Issue / PR を使わない個人利用環境（ローカル版 OpenCode）で、Issue / PR 相当の永続情報を保持する Case ファイルの構造を定義する（REQ-009-016〜020, 024）。
-ローカル版コマンド（`case-open` / `case-run` / `case-close`）は本 SPEC に従って `.agentdev/cases/case-{NNNN}.md` を生成、更新する。
+ローカル版コマンド（`case-open` / `case-run` / `case-close`）は本 Design に従って `.agentdev/cases/case-{NNNN}.md` を生成、更新する。
 
 ## 配置先
 
@@ -54,7 +54,7 @@ YAML 前書きには持たせない。
 ### 前書きスキーマ定義ファイル
 
 前書きスキーマの形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/frontmatter.yaml` に機械可読形式で保持する。
-本 SPEC は意味仕様の原本であり、`frontmatter.yaml` は本 SPEC と矛盾してはならない。
+本 Design は意味仕様の原本であり、`frontmatter.yaml` は本 Design と矛盾してはならない。
 `frontmatter.yaml` は操作用定義（正本ではない）とする。
 
 ## status enum と状態遷移
@@ -103,7 +103,7 @@ YAML 前書きには持たせない。
 ### status 定義ファイル
 
 状態遷移表の形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/status.yaml` に機械可読形式で保持する。
-本 SPEC と `status.yaml` は矛盾してはならない。
+本 Design と `status.yaml` は矛盾してはならない。
 
 ## 採番規則
 
@@ -133,7 +133,7 @@ YAML 前書きには持たせない。
 ### labels 定義ファイル
 
 ラベル値域の形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/labels.yaml` に機械可読形式で保持する。
-本 SPEC と `labels.yaml` は矛盾してはならない。
+本 Design と `labels.yaml` は矛盾してはならない。
 
 ## 見出し一覧
 
@@ -151,14 +151,14 @@ Case ファイル本文は以下の 15 セクション見出しを持つ（REQ-0
 | 7 | `## 受け入れ条件` | 任意 | Case の受け入れ条件 |
 | 8 | `## 作業ログ` | 任意 | 作業の進行ログ。GitHub Issue コメント相当の内容を記録 |
 | 9 | `## マージ前確認` | 任意 | マージ前確認事項。GitHub PR 本文の引き継ぎ情報の一部 |
-| 10 | `## SPEC確定候補` | **必須** | SPEC 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替（REQ-009-020） |
+| 10 | `## Design確定候補` | **必須** | Design 確定候補。GitHub PR 本文が担っていた引き継ぎ情報の代替（REQ-009-020） |
 | 11 | `## Findings / Capture候補` | **必須** | Findings / Capture候補。GitHub PR 本文が担っていた引き継ぎ情報の代替。下位に `### intake` と `### learning` サブ見出しを持つ |
 | 12 | `## マージ結果` | 任意 | ローカル Git 上の取り込み結果。ブランチ情報は本セクションに記録する（YAML 前書きには持たせない） |
 | 13 | `## 残課題` | 任意 | 残課題、フォローアップ項目 |
 | 14 | `## 完了判定` | 任意 | 完了判定結果 |
 | 15 | （自由拡張） | 任意 | 上記以外のセクションは必要に応じて追加可能 |
 
-`SPEC確定候補` と `Findings / Capture候補` を必須とする理由: これらは GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、case-close への引き継ぎ経路を失わせないため（REQ-009-020）。
+`Design確定候補` と `Findings / Capture候補` を必須とする理由: これらは GitHub 版で PR 本文が担っていた引き継ぎ情報の代替であり、case-close への引き継ぎ経路を失わせないため（REQ-009-020）。
 
 ### Findings / Capture候補 サブ見出し
 
@@ -179,7 +179,7 @@ Case ファイル本文は以下の 15 セクション見出しを持つ（REQ-0
 ### headings 定義ファイル
 
 見出し一覧の形式定義は `src/opencode-local/agentdev-gh-cli/case-schema/rules/headings.yaml` に機械可読形式で保持する。
-本 SPEC と `headings.yaml` は矛盾してはならない。
+本 Design と `headings.yaml` は矛盾してはならない。
 
 ## closed_at の値条件
 
@@ -225,7 +225,7 @@ GitHub PR 取り込みは実行しない。
 | GitHub Issue コメント | `## 作業ログ` |
 | GitHub Issue の状態 | Case ファイルの `status` |
 | GitHub Issue のラベル | Case ファイルの `labels` |
-| GitHub PR 本文 | `## マージ前確認` / `## SPEC確定候補` / `## Findings / Capture候補` |
+| GitHub PR 本文 | `## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補` |
 | GitHub PR 取り込み結果 | `## マージ結果` |
 | GitHub Issue のクローズ | `status: closed` + `closed_at` |
 
@@ -240,6 +240,6 @@ GitHub PR 取り込みは実行しない。
 
 - **関連 Decision**: REQ-009（ローカル版導入方式を link mode へ統一し生成方式を廃止。v2:ADR-0126 を supersede）
 - **関連 REQ**: REQ-009（ローカル版 OpenCode 導入方式とローカルCaseファイル運用）、v2:REQ-0150（ローカル版 `agentdev-gh-cli` 実装）
-- **関連 SPEC**: runtime-package-boundary.md
+- **関連 Design**: runtime-package-boundary.md
 
 v2:ADR-0126（superseded）は履歴参照のみとし、現行根拠として扱わない（REQ-001-053 準拠）。

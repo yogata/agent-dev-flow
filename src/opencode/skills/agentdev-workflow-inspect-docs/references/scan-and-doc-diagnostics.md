@@ -10,7 +10,7 @@
 
 ## 結果
 
-- REQ/Decision/SPEC/guides/README の意味診断結果（検出事項候補、根拠、source-of-truth 判定、推奨 route）
+- REQ/Decision/Design/guides/README の意味診断結果（検出事項候補、根拠、source-of-truth 判定、推奨 route）
 
 ## 手順
 
@@ -30,9 +30,9 @@
 
 `agentdev-req-structure-diagnostics` 参照。
 
-### STEP-2-4: SPEC 意味診断
+### STEP-2-4: Design 意味診断
 
-SPEC が REQ/Decision/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認する。
+Design が REQ/Decision/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認する。
 
 ### STEP-2-5: Decision 意味診断
 
@@ -55,8 +55,8 @@ SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT。
 
 ### STEP-2-9: 文書分類一貫性検査
 
-document-model SPEC（extension 経由）の classification policy への適合確認。
-REQ 要件行に schema field、enum 値一覧、route/category/status 判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等の SPEC分離基準違反が残留していないかを `agentdev-req-structure-diagnostics` に従って自動検出する。
+document-model Design（extension 経由）の classification policy への適合確認。
+REQ 要件行に schema field、enum 値一覧、route/category/status 判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等の Design分離基準違反が残留していないかを `agentdev-req-structure-diagnostics` に従って自動検出する。
 
 ## エラー処理
 
@@ -74,9 +74,9 @@ REQ 要件行に schema field、enum 値一覧、route/category/status 判定表
 
 - `agentdev-req-structure-diagnostics`: STEP-2-1〜2-3、2-8、2-9 の判定ロジック
 - `agentdev-doc-diagnostics`: 診断カテゴリ、証拠構造、文書種別別ルーティング
-- `agentdev-project-extensions`: document-model SPEC の extension 経由解決
+- `agentdev-project-extensions`: document-model Design の extension 経由解決
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
 - G01（ファイルを変更、作成、削除しない。ただし `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成は例外として許可）
-- 不変条件（source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾を判定）
+- 不変条件（source-of-truth priority（現行 REQ > 承認済み ADR > Design > guides）に従って矛盾を判定）

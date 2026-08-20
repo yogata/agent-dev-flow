@@ -7,28 +7,28 @@ updated: "2026-08-18"
 
 # AUTOGEN ブロック鮮度検出 gate
 
-`/repo/docs-check` は repo-local コマンドであり配布対象外 SPEC を持たないため、AUTOGEN ブロック鮮度検出 gate を本新規 SPEC として配置する。
+`/repo/docs-check` は repo-local コマンドであり配布対象外 Design を持たないため、AUTOGEN ブロック鮮度検出 gate を本新規 Design として配置する。
 AUTOGEN ブロックを含む索引ファイル（design-health-metrics.md 等）の陳腐化を検出し、再生成を促す契約を定義する。
-本 SPEC は gate の契約を定義し、検出ロジックの実装詳細はスクリプト側が担う（機械化境界、charter 原則）。
+本 Design は gate の契約を定義し、検出ロジックの実装詳細はスクリプト側が担う（機械化境界、charter 原則）。
 
 ## 検出対象
 
 - AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->` 〜 `<!-- AUTOGEN:END -->`）を含む索引ファイル群
-- 代表例: `docs/designs/quality/design-health-metrics.md`（SPEC 計測例 AUTOGEN ブロック）
+- 代表例: `docs/designs/quality/design-health-metrics.md`（Design 計測例 AUTOGEN ブロック）
 - 対象一覧は SC-002（`docs/designs/integrity/index-auto-generation.md`）が定める自動生成対象ファイルと同一
 
 ### 廃止済み成果物を前提とする block ID の棚卸し規定
 
 - 検査対象 block ID は、参照先索引ファイルが現行存在することを前提とする。廃止済み成果物（旧 ADR README、削除済み文書地図等）を前提とする block ID を検査対象に含めない
 - block ID の棚卸しは、参照先実ファイルの存在確認をもって行い、不在を検出した場合は検査対象から除去するとともに、由来（廃止契約、REQ）を検査対象リストの記録に残す
-- 検査対象の追加・削除は index-auto-generation SPEC の採用 block ID 一覧と整合させる
+- 検査対象の追加・削除は index-auto-generation Design の採用 block ID 一覧と整合させる
 
 ## 鮮度判定基準
 
-- 対象ファイルのソース（SPEC / REQ / ADR / IR の frontmatter、ファイル名、status）の rename 発生時に AUTOGEN ブロックの再生成必要性を判定する
+- 対象ファイルのソース（Design / REQ / ADR / IR の frontmatter、ファイル名、status）の rename 発生時に AUTOGEN ブロックの再生成必要性を判定する
 - 対象ファイルのソース status 変更（draft → accepted 等）時に AUTOGEN ブロックの再生成必要性を判定する
 - SC-002（定期再生成）と整合する運用を維持する
-- 計測日導出方式は index-auto-generation SPEC「計測日導出」節に従い対象ドキュメント群の最終コミット日付基準とする。実行時日付（`new Date()`）の採用によりコミット済み AUTOGEN ブロックが日次で鮮度を失い IR-061 が構造的に再検出する運用は解消する。本解消を本 gate の契約として明記する
+- 計測日導出方式は index-auto-generation Design「計測日導出」節に従い対象ドキュメント群の最終コミット日付基準とする。実行時日付（`new Date()`）の採用によりコミット済み AUTOGEN ブロックが日次で鮮度を失い IR-061 が構造的に再検出する運用は解消する。本解消を本 gate の契約として明記する
 
 鮮度種別は検出結果に応じて次の3種に分類する。
 分類は「鮮度違反の優先的付与」であり絶対的分類ではない（例: rename と status 変更が同時に起きた場合、行数増減を伴えば rename、同行値変化のみなら status_change と分類）。
@@ -36,7 +36,7 @@ AUTOGEN ブロックを含む索引ファイル（design-health-metrics.md 等�
 | 種別 | 判定規則 |
 |------|----------|
 | `rename` | AUTOGEN block の行数が期待値と異なる（ソースファイル追加・削除・rename を起因とする行増減） |
-| `status_change` | 同一 id の行で status 列のみ変化（SPEC / Decision の status frontmatter 変更に起因） |
+| `status_change` | 同一 id の行で status 列のみ変化（Design / Decision の status frontmatter 変更に起因） |
 | `content_change` | 上記以外の不一致（行数値、タイトル、キャプション、リンク等の変化） |
 
 ## 不合格時の処置
@@ -47,7 +47,7 @@ AUTOGEN ブロックを含む索引ファイル（design-health-metrics.md 等�
 
 ## 実装契約
 
-本 SPEC が定める gate を実装する検査スクリプトとその呼出し契約。
+本 Design が定める gate を実装する検査スクリプトとその呼出し契約。
 
 - **検査スクリプト**: `.opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.ts`
 - **実行ランナー**: Bun（`bun run`）。TypeScript 直接実行と `require()` / `import` 混在構文を前提とするため、Bun 以外のランナーでは ESM 解釈エラーが発生する

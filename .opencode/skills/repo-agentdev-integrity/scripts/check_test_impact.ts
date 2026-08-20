@@ -32,7 +32,7 @@ const DEFAULT_TEST_GLOB = "**/*.test.ts";
 
 // Design 系ファイルのパス分類。docs/designs/**、docs/requirements/REQ-*、docs/adr/ADR-* を対象とする。
 const Design_PATH_PATTERNS = [
-  /^docs\/specs\/.*\.md$/,
+  /^docs\/designs\/.*\.md$/,
   /^docs\/requirements\/REQ-.*\.md$/,
   /^docs\/adr\/ADR-.*\.md$/,
 ];

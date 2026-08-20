@@ -10,9 +10,9 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造、実行主体分�
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-inspect-skills` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-inspect-skills` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -26,7 +26,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 検査対象を直接修正しない制約
 
-- ファイル変更（canonical docs、REQ/ADR/SPEC、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/ worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ
+- ファイル変更（canonical docs、REQ/ADR/Design、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/ worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ
 - 診断結果はセッション内テキストで提示する
 - 修正案は route として提示し、実装、保存、自動整形は行わない
 
@@ -45,11 +45,11 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## cleanup モデルへの適用経路
 
-document-model SPEC（extension 経由）「恒久基準と非規範情報の整理」は、非規範情報を整理する cleanup モデル（6処置: KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）を所有し、処置の実行を inspect-docs / inspect-skills / 専用の cleanup 作業へ割り当てる。
+document-model Design（extension 経由）「恒久基準と非規範情報の整理」は、非規範情報を整理する cleanup モデル（6処置: KEEP、MERGE、REFERENCE、MOVE、RETIRE、INFERENCE）を所有し、処置の実行を inspect-docs / inspect-skills / 専用の cleanup 作業へ割り当てる。
 本スキルは配布物（Command/Skill 定義）の診断において、この適用経路に組み込まれる。
 配布物に cleanup モデルの対象カテゴリ（規範または非規範の地位が未宣言の references、移行証跡、リリース証跡等）に該当する記述を検出した場合は、6処置の候補を検出事項の推奨 route に併記して提示する。
 処置に伴うファイル変更は行わない（検査対象を直接修正しない制約に従う）。
-cleanup モデルと処置契約の SSoT は document-model SPEC であり、本スキルは再定義しない。
+cleanup モデルと処置契約の SSoT は document-model Design であり、本スキルは再定義しない。
 
 ## 診断観点
 
@@ -66,24 +66,24 @@ cleanup モデルと処置契約の SSoT は document-model SPEC であり、本
 | 操作安全手順の配置 | git、gh、worktree などの安全手順が適切な operation Skill に置かれているか |
 | canonical Skill name 使用 | Skill 参照が正式な `agentdev-*` 名で記述されているか |
 | Skill 内部構造依存 | Command が Skill 内の見出し、Step、protocol 名に依存していないか |
-| 配布物 frontmatter 構文健全性 | 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の Markdown frontmatter が重複、破損していないか（docs-spec-rebuild-integrity SPEC 構文健全性検査パターン準拠） |
+| 配布物 frontmatter 構文健全性 | 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の Markdown frontmatter が重複、破損していないか（docs-spec-rebuild-integrity Design 構文健全性検査パターン準拠） |
 | 配布物見出し構文健全性 | 配布物の H1/H2 等の主要見出しが同一文書内で意図せず重複していないか（同上） |
 | 配布物 Markdown 構文破損 | 配布物に正規表現破損、未対応フェンス、不正インラインコード等の Markdown 構文破損がないか（同上） |
 | 配布物壊れた括弧、参照残骸 | 配布物に ID 除去で残った壊れた括弧（例: `（OU-XXX/）`、`（）`、`（/）`）、壊れた参照表現、主語/目的語欠落文がないか（同上文意保持検査パターン準拠） |
 | command-skill 責務説明矛盾 | 同一 Command の責務説明が Command 本体と関連 Skill 間で矛盾していないか（同上責務整合検査パターン準拠） |
 | 実行主体分類の誤認 | 文書内で言及される実行主体（command / skill / subagent / harness）の分類が正確か。誤認（command を skill と呼ぶ、harness を skill と呼ぶ、subagent を skill と呼ぶ、`load_skills` に command 名を指定）を検出する（REQ）。判定基準の詳細は [execution-subject-misclassification.md](references/execution-subject-misclassification.md) |
-| gh 直接記述の委譲漏れ | 配布物（`.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/**/*.md`）で `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)` の直接記述を検出する（REQ）。command/skill は GitHub I/O を `agentdev-gh-cli` 手続きへ委譲し、gh コマンド直接実行を保持しない。ただし `agentdev-gh-cli/references/standard-procedures.md`（REQ 許容ファイル）は除外する。スキャン対象、除外対象の詳細は agentdev-gh-cli SPEC「gh 直接記述の検出スコープ」参照 |
-| SPEC 操作契約テーブル ↔ agentdev-gh-cli/references/contracts.md フィールド一致性 | SPEC 側に記載された操作契約テーブル（`## 操作契約` セクション）のフィールド集合と、対応する `agentdev-gh-cli/references/contracts.md` のフィールド集合が過不足なく一致することを検出する（REQ / AG-{NNN}）。手続き集合、手続き名、入力、出力の一致を確認し、不一致を検出事項として報告する。判定基準の詳細、対象 SPEC 範囲、フィールド対応規則は [spec-operation-contract-consistency.md](references/spec-operation-contract-consistency.md) 参照（REQ 準拠）。単一情報源化（生成スクリプト、ビルドステップ）は導入せず、検出のみとする（CR-{NNN}） |
-| SKILL.md frontmatter `name:` バッククォート検出 | 配布物（`.opencode/skills/agentdev-*/SKILL.md`）の frontmatter `name:` 行がバッククォートで囲まれている場合、YAML スカラー値として不正のため strict 違反候補として検出する（REQ 準拠、PR #1334 事例）。frontmatter は構造データであり Markdown インラインコード表記の対象外（backticks-identifier-threshold SPEC「適用対象外」準拠）。検出基準の詳細、IR-{NNN}（skill-name-dir-match）との協調は [skill-frontmatter-name-backtick.md](references/skill-frontmatter-name-backtick.md) 参照 |
-| 廃止 REQ/SPEC 由来の記述残置 | 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/**`）に retired REQ/SPEC ID（`docs/requirements/retired/`、`docs/designs/retired/` 等）をソースとした記述が残置していないか。retired REQ/SPEC ID をキーとした横断検索で検出する。活性 REQ/SPEC（現行セット）への言及は対象外とする |
-| 意味的重複 | 同一の契約、手順、判定基準が複数の配布物で再定義されているかを検出する。同一契約再定義抑止の原則に照らして検出する。artifact-responsibilities SPEC が定める重複許容基準に合致し正の情報源が明示された場合は対象外。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
+| gh 直接記述の委譲漏れ | 配布物（`.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/**/*.md`）で `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)` の直接記述を検出する（REQ）。command/skill は GitHub I/O を `agentdev-gh-cli` 手続きへ委譲し、gh コマンド直接実行を保持しない。ただし `agentdev-gh-cli/references/standard-procedures.md`（REQ 許容ファイル）は除外する。スキャン対象、除外対象の詳細は agentdev-gh-cli Design「gh 直接記述の検出スコープ」参照 |
+| Design 操作契約テーブル ↔ agentdev-gh-cli/references/contracts.md フィールド一致性 | Design 側に記載された操作契約テーブル（`## 操作契約` セクション）のフィールド集合と、対応する `agentdev-gh-cli/references/contracts.md` のフィールド集合が過不足なく一致することを検出する（REQ / AG-{NNN}）。手続き集合、手続き名、入力、出力の一致を確認し、不一致を検出事項として報告する。判定基準の詳細、対象 Design 範囲、フィールド対応規則は [spec-operation-contract-consistency.md](references/spec-operation-contract-consistency.md) 参照（REQ 準拠）。単一情報源化（生成スクリプト、ビルドステップ）は導入せず、検出のみとする（CR-{NNN}） |
+| SKILL.md frontmatter `name:` バッククォート検出 | 配布物（`.opencode/skills/agentdev-*/SKILL.md`）の frontmatter `name:` 行がバッククォートで囲まれている場合、YAML スカラー値として不正のため strict 違反候補として検出する（REQ 準拠、PR #1334 事例）。frontmatter は構造データであり Markdown インラインコード表記の対象外（backticks-identifier-threshold Design「適用対象外」準拠）。検出基準の詳細、IR-{NNN}（skill-name-dir-match）との協調は [skill-frontmatter-name-backtick.md](references/skill-frontmatter-name-backtick.md) 参照 |
+| 廃止 REQ/Design 由来の記述残置 | 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/**`）に retired REQ/Design ID（`docs/requirements/retired/`、`docs/designs/retired/` 等）をソースとした記述が残置していないか。retired REQ/Design ID をキーとした横断検索で検出する。活性 REQ/Design（現行セット）への言及は対象外とする |
+| 意味的重複 | 同一の契約、手順、判定基準が複数の配布物で再定義されているかを検出する。同一契約再定義抑止の原則に照らして検出する。artifact-responsibilities Design が定める重複許容基準に合致し正の情報源が明示された場合は対象外。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | 意味的矛盾 | Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾していないかを検出する。正規な定義元の原則および同一契約再定義抑止の原則に照らして検出する。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
-| 正規な定義元からの逸脱 | 各責務が artifact-responsibilities SPEC のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれか）に置かれているかを検出する。正規な定義元の原則に照らして検出する。責務越境（Command に Skill 要素、Skill に Command 固有手順、Template/Script の責務越境等）を含む。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
+| 正規な定義元からの逸脱 | 各責務が artifact-responsibilities Design のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれか）に置かれているかを検出する。正規な定義元の原則に照らして検出する。責務越境（Command に Skill 要素、Skill に Command 固有手順、Template/Script の責務越境等）を含む。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | セマンティクス欠落 | 疎結合化、抽象化、縮約により、意味、条件、成果物契約（入力、前提、停止条件、適用境界、出力等）が欠落していないかを検出する。同一契約再定義抑止の原則に照らして検出する。判定基準の詳細、検出手順、報告例は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 
 ## NG 分類
 
-配布物整合性検査（docs-spec-rebuild-integrity SPEC 準拠）で検出した事項には以下の NG 分類を付ける。各分類の定義、後続対象は同 SPEC の NG 分類表に従う:
+配布物整合性検査（docs-spec-rebuild-integrity Design 準拠）で検出した事項には以下の NG 分類を付ける。各分類の定義、後続対象は同 Design の NG 分類表に従う:
 
 | 分類 | 意味 |
 |------|------|
@@ -108,9 +108,9 @@ cleanup モデルと処置契約の SSoT は document-model SPEC であり、本
 | skill-internal-reference-leak | Command が Skill 内部構造に依存している |
 | execution-subject-misclassification | 実行主体（command / skill / subagent / harness）の分類が誤っている（command を skill と呼ぶ、`load_skills` に command 名を指定、harness を skill と呼ぶ、subagent を skill と呼ぶ等） |
 | gh-direct-invocation-leak | command/skill が `agentdev-gh-cli` へ委譲すべき gh 直接記述（`gh (issue|pr) (create|edit|view|comment|merge|close|list|status)`）を保持している（REQ）。許容ファイル `agentdev-gh-cli/references/standard-procedures.md` は除外 |
-| spec-operation-contract-consistency | SPEC 操作契約テーブルと agentdev-gh-cli/references/contracts.md の手続き集合、手続き名、入力、出力が過不足なく一致していない（REQ / AG-{NNN}）。判定基準の詳細は [spec-operation-contract-consistency.md](references/spec-operation-contract-consistency.md) 参照 |
+| spec-operation-contract-consistency | Design 操作契約テーブルと agentdev-gh-cli/references/contracts.md の手続き集合、手続き名、入力、出力が過不足なく一致していない（REQ / AG-{NNN}）。判定基準の詳細は [spec-operation-contract-consistency.md](references/spec-operation-contract-consistency.md) 参照 |
 | skill-frontmatter-name-backtick | SKILL.md frontmatter `name:` 行がバッククォートで囲まれており、YAML スカラー値として不正（REQ 準拠、PR #1334 事例）。バッククォート付き name はディレクトリ名と不一致となるため IR-{NNN}（skill-name-dir-match）違反と併発する可能性が高い。判定基準の詳細は [skill-frontmatter-name-backtick.md](references/skill-frontmatter-name-backtick.md) 参照 |
-| semantic-duplication | 同一の契約、手順、判定基準が複数の配布物で再定義されている（同一契約再定義抑止の原則違反）。artifact-responsibilities SPEC の重複許容基準に合致し正の情報源が明示された場合は対象外。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
+| semantic-duplication | 同一の契約、手順、判定基準が複数の配布物で再定義されている（同一契約再定義抑止の原則違反）。artifact-responsibilities Design の重複許容基準に合致し正の情報源が明示された場合は対象外。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | semantic-contradiction | Command と Skill 間で工程、状態、責務、停止条件の意味が矛盾している（正規な定義元の原則、同一契約再定義抑止の原則の違反）。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | canonical-definition-deviation | 各責務が正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC）に置かれておらず、責務越境が発生している（正規な定義元の原則違反）。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
 | semantic-contract-missing | 疎結合化、抽象化、縮約により、意味・条件・成果物契約（入力、前提、停止条件、適用境界、出力等）が欠落している（同一契約再定義抑止の原則違反）。判定基準の詳細は [semantic-diagnostic-perspectives.md](references/semantic-diagnostic-perspectives.md) 参照 |
@@ -160,6 +160,6 @@ cleanup モデルと処置契約の SSoT は document-model SPEC であり、本
 
 - **agentdev-skill-authoring**: スキルオーサリングの品質基準
 - **agentdev-command-authoring**: コマンド定義の規約
-- **agentdev-doc-writing**: 実行主体分類の査読観点（doc-writing は意味的査読、inspect-skills は診断観点。原本は document-type-responsibilities SPEC「実行主体分類の査読基準」）
-- **integrity-rule-catalog SPEC**: 機械判定可能な境界違反ルール（IR-{NNN}、IR-{NNN}、REQ 準拠）
+- **agentdev-doc-writing**: 実行主体分類の査読観点（doc-writing は意味的査読、inspect-skills は診断観点。原本は document-type-responsibilities Design「実行主体分類の査読基準」）
+- **integrity-rule-catalog Design**: 機械判定可能な境界違反ルール（IR-{NNN}、IR-{NNN}、REQ 準拠）
 

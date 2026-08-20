@@ -5,15 +5,13 @@ created: 2026-08-10
 updated: 2026-08-16
 ---
 
-<!-- canonical_owner: workflow-skill-model / spec_logical_division: cross_cutting_contract（ACT-SPEC-001 rationale より） -->
-
 # Workflow Skill Model
 
 ## 目的
 
 Command / Workflow Skill / Capability Skill の責務、依存方向、1:N分割基準、配置契約を定義する。
 DEC-010（責務3層分化と1:N分割原則）の実装詳細を正規所有する。
-本 SPEC は REQ-027-001 に基づき Capability Skill model（定義・配置・参照契約・1:N分割基準・依存方向）の正規所有者となる。
+本 Design は REQ-027-001 に基づき Capability Skill model（定義・配置・参照契約・1:N分割基準・依存方向）の正規所有者となる。
 REQ-027 は境界宣言のみを持ち、本節が詳細実装を正規所有する。
 
 ## Command 責務
@@ -187,7 +185,7 @@ DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候
 | project extension 読込（5セクション、fail-open） | `agentdev-project-extensions` | 全 Workflow Skill |
 | commit message 規約 | `agentdev-conventional-commits` | case-close、case-run を含む全 commit 発行 workflow |
 | REQ/Decision ファイル管理 | `agentdev-req-file-manager`、`agentdev-decision-file-manager` | case-open、case-close（RU 削除、Form Zero）、req-define、req-save |
-| SPEC ファイル管理 | `agentdev-design-file-manager` | case-close（SPEC status 昇格）、design-save |
+| Design ファイル管理 | `agentdev-design-file-manager` | case-close（Design status 昇格）、design-save |
 | 決定的検証スクリプト | `agentdev-artifact-validation` | req-save、design-save、inspect-docs を含む品質検証 workflow |
 | Issue/PR I/O 境界 | `agentdev-gh-cli` | 全 GitHub 操作を行う workflow |
 | Issue 操作の安全手続き | `agentdev-issue-management` | case-open、case-update、case-close |
@@ -214,14 +212,14 @@ DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候
 ### 新規 Capability Skill 抽出候補（将来対応）
 
 DEC-010 Inventory が挙げる新規 Capability Skill 候補。
-本 SPEC は候補の記録のみを所有し、個別抽出実装は別 Issue が担う。
+本 Design は候補の記録のみを所有し、個別抽出実装は別 Issue が担う。
 新規 Capability Skill は「Capability Skill の判定基準」を満たす場合にのみ作成し、既存 Capability Skill の再利用を優先する。
 
 - test strategy 定義（`req-define` Step 5-6 相当）
 - EC-2 必須品質統制導出（`case-open` execution contract）
 - EC-6 scope-affecting impact 探索（`case-open` execution contract）
 - コンフリクト Level 1 解消判断（`case-close`）
-- SPEC status 昇格判断（`case-close`、`design-save`）
+- Design status 昇格判断（`case-close`、`design-save`）
 - bounded parent decision resolution 詳細（`case-auto`、DEC-008）
 - Wave 反復制御詳細（`case-auto`）
 
@@ -247,8 +245,8 @@ Workflow Skill の単独起動防止（soft guard）は OpenCode 1.18.15 が ski
 マーカー語、内部 ID、運用規則の散文は description に置かない。
 
 command 定義本文に宣言節を持たない構成でも Skill 層の DO NOT USE FOR トリガーにより soft guard は実効する。
-Command SPEC の delegated responsibility 記述は、当該 command の実効層構成（二層または Skill 層のみ）を反映する。
+Command Design の delegated responsibility 記述は、当該 command の実効層構成（二層または Skill 層のみ）を反映する。
 
 ## artifact-contracts.md からの委譲
 
-artifact-contracts.md の肥大化シグナル（500行超）に対応し、Workflow Skill 固有契約は本SPEC へ委譲する。
+artifact-contracts.md の肥大化シグナル（500行超）に対応し、Workflow Skill 固有契約は本Design へ委譲する。

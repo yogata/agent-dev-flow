@@ -13,8 +13,8 @@ updated: 2026-08-20
 | description | Subagent 返却契約で、成果物本文のみ verbatim とし、判定結果、調査過程、中間ログ、読解メモへ一律 verbatim を要求していないこと |
 | severity | strict |
 | category | canonical-conflict |
-| detection_method | Command/SPEC/skill references 内の `verbatim` 周辺文脈を確認し、成果物本文条件付き表現か、一律 verbatim 禁止の検出用文字列かを判定 |
-| affected_artifacts | [commands, skills, SPEC, integrity rules] |
+| detection_method | Command/Design/skill references 内の `verbatim` 周辺文脈を確認し、成果物本文条件付き表現か、一律 verbatim 禁止の検出用文字列かを判定 |
+| affected_artifacts | [commands, skills, Design, integrity rules] |
 | related_req | [REQ-003-013, REQ-003-021] |
 | related_design | [workflow-contracts.md, artifact-contracts.md, artifact-responsibilities.md] |
 | gate_level | full-audit, delta-guard |

@@ -19,7 +19,7 @@ AgentDevFlow で使う用語の定義。
 | backlog-review | バックログ、レビュー | 採用済み成果物を分析、統合し、ユーザー承認後に RU を生成するコマンド |
 | docs-check | ドックス、チェック | ドキュメント、スキル、コマンドの整合性を検証するコマンド（旧称: integrity-check）。配布対象外コマンド `/repo/docs-check` に配置し、`/agentdev/*` コマンド体系とは区別する（DEC-001, v2:ADR-011-156） |
 | inspect-docs | インスペクト、ドックス | docs 全体の意味整合性を検出し、検出事項（finding）を出力するコマンド（旧称: req-restructure-review, docs-review, diagnostics-docs） |
-| case-auto | ケース、オート | 最大自走モード。req-save → spec-save（SPEC候補がある場合）→ case-open → case-run → case-close を順次実行するコマンド |
+| case-auto | ケース、オート | 最大自走モード。req-save → design-save（Design候補がある場合）→ case-open → case-run → case-close を順次実行するコマンド |
 
 ## 成果物
 
@@ -27,14 +27,15 @@ AgentDevFlow で使う用語の定義。
 |------|------|
 | REQ | 要件定義の永続基準。`docs/requirements/REQ-{NNN}.md` に配置 |
 | ADR | 取り返しのつかない技術判断の記録。現行基準は `docs/decisions/DEC-{NNN}.md`。再編前の ADR-00XX 番号帯は物理削除済み（v2:ADR-011-047, 048）。後継関係は `docs/decisions/README.md` の Decision Map を参照 |
-| SPEC | 実装者が参照する現在仕様。`docs/specs/**/*.md` に配置（commands/skills/workflows の3層と基盤6ドメイン） |
+| Design | 実装者が参照する現在設計。`docs/designs/**/*.md` に配置（commands/skills/workflows の3層と基盤6ドメイン） |
+| Report | 監査・評価・観測の事実記録。`docs/reports/**/*.md` に配置 |
 | README | ドキュメント入口、各ディレクトリの索引。`docs/README.md` 等 |
 | guides | 利用者向けの参照用読み物。`docs/guides/*.md` に配置 |
 | RU（Requirement Unit） | Intake/Learning の採用済み成果物を統合した構造化成果物。`.agentdev/backlog/req-units/RU-*.md` に配置 |
 | 採用済み成果物（promoted artifact） | backlog-review の入力となる整形済み成果物。Intake/Learning それぞれの `promoted/` に配置 |
 | セッション由来 RU | チャット内で合意形成済みの内容を直接保存した RU |
 | evaluation-report | learning-promote 内部で生成される分析レポート。同コマンドの昇華判定フェーズの入力として使用される |
-| ローカル Case ファイル（Local Case File） | GitHub Issue/PR を使わない個人利用環境（ローカル版 OpenCode）で Issue/PR 相当の永続情報を保持するファイル。`.agentdev/cases/case-{NNNN}.md` に配置（v2:ADR-011-016）。詳細なスキーマは SPEC `local-case-file.md` 参照 |
+| ローカル Case ファイル（Local Case File） | GitHub Issue/PR を使わない個人利用環境（ローカル版 OpenCode）で Issue/PR 相当の永続情報を保持するファイル。`.agentdev/cases/case-{NNNN}.md` に配置（v2:ADR-011-016）。詳細なスキーマは Design `local-case-file.md` 参照 |
 
 ## パイプライン
 
@@ -86,9 +87,9 @@ GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用�
 | ローカル版 OpenCode | GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用形態（v2:ADR-011-001）。link mode により GitHub 版 AgentDevFlow の原本を `.opencode/` 配下へ接続して利用する（v2:ADR-009） |
 | 仕様管理リポジトリ | AgentDevFlow 本体リポジトリ（agent-dev-flow）。ローカル版 link 先の原本を保持する（v2:ADR-011-002） |
 | 導入先リポジトリ | ローカル版 OpenCode を導入する利用側リポジトリ。`consumer-generated` リポジトリ種別に対応（v2:ADR-011-002） |
-| consumer-generated | ローカル版 OpenCode を導入するリポジトリ種別。`.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決されることで判定される（SPEC `runtime-package-boundary.md`, v2:ADR-009） |
+| consumer-generated | ローカル版 OpenCode を導入するリポジトリ種別。`.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決されることで判定される（Design `runtime-package-boundary.md`, v2:ADR-009） |
 | `generated_by` 識別子 | v2:ADR-0126 時代のローカル版生成物に付与された識別情報。値は `local-opencode-transform`。link mode への移行後は付与されず、上書き保護も廃止された（v2:ADR-009 decision #5）。IR-046/048 は link mode 移行前の生成物が混在する環境向けの整合性検証語彙として残る |
 | `src/opencode-local/` | ローカル版 link 先原本領域。AgentDevFlow 本体リポジトリに配置され、`README.md` と `agentdev-gh-cli/` のみを保持する（v2:ADR-011-004, 005）。IR-047 でディレクトリ構成を検証 |
 | link mode | ローカル版導入方式。`.opencode/` 配下を src 配下へ接続し、原本をそのまま利用する。`agentdev-gh-cli` だけを `src/opencode-local/agentdev-gh-cli/` から差し替える（v2:ADR-009, v2:ADR-011-007） |
 | link target 確認 | ローカル版 link 設定前に `.opencode/` 配下の各 path が意図した link target へ解決されることを確認する安全機構（v2:ADR-011-010, v2:ADR-009 decision #6）。意図した target 以外へ解決される場合は link 設定を停止する |
-| Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として SPEC `workflow-contracts.md` で定義される。SSoT は GitHub Issue/PR ではなくローカル Case ファイル（`.agentdev/cases/case-{NNNN}.md`）となる |
+| Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として Design `workflow-contracts.md` で定義される。SSoT は GitHub Issue/PR ではなくローカル Case ファイル（`.agentdev/cases/case-{NNNN}.md`）となる |

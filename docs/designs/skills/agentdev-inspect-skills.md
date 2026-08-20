@@ -1,11 +1,11 @@
 ---
-title: `agentdev-inspect-skills` SPEC
+title: `agentdev-inspect-skills` Design
 status: accepted
 created: 2026-06-21
 updated: 2026-07-18
 ---
 
-# `agentdev-inspect-skills` SPEC
+# `agentdev-inspect-skills` Design
 
 ## 目的
 
@@ -21,13 +21,13 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 - USE FOR / DO NOT USE FOR 照合
 - Skill 分割候補検出
 - Command 固有手順の Skill 流入検出
-- gh 直接記述の委譲漏れ検出（REQ-011）。スキャン対象、除外対象は [agentdev-gh-cli SPEC](agentdev-gh-cli.md)「gh 直接記述の検出スコープ」参照
+- gh 直接記述の委譲漏れ検出（REQ-011）。スキャン対象、除外対象は [agentdev-gh-cli Design](agentdev-gh-cli.md)「gh 直接記述の検出スコープ」参照
 - 出力形式生成（Finding / Classification / Route）
 
 ## 参照する references
 
 - `references/execution-subject-misclassification.md`（実行主体分類誤認の判定基準（REQ-010-010））
-- `references/spec-operation-contract-consistency.md`（SPEC 操作契約テーブル ↔ references/contracts.md フィールド一致性の判定基準、対象 SPEC 範囲、フィールド対応規則（REQ-010-011 / REQ-010-004 準拠））
+- `references/spec-operation-contract-consistency.md`（Design 操作契約テーブル ↔ references/contracts.md フィールド一致性の判定基準、対象 Design 範囲、フィールド対応規則（REQ-010-011 / REQ-010-004 準拠））
 
 ## 現在の動作
 

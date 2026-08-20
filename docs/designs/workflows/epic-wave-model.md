@@ -7,8 +7,8 @@ updated: 2026-08-19
 
 # Epic / Wave / Issue 実行モデル
 
-> 本 SPEC は case-open / case-run / case-close / case-auto にまたがる Epic 実行モデルの横断契約を定義する。
-> 各コマンド固有の振る舞いは各 command SPEC を参照。
+> 本 Design は case-open / case-run / case-close / case-auto にまたがる Epic 実行モデルの横断契約を定義する。
+> 各コマンド固有の振る舞いは各 command Design を参照。
 
 ## 目的
 
@@ -336,7 +336,7 @@ Epic Issue のステータス追跡テーブルは「バッチ Issue 単位」�
 
 ## See Also
 
-- [REQ-006](../../requirements/REQ-006.md)（Case実行オーケストレーション: 本 SPEC の親 REQ）
+- [REQ-006](../../requirements/REQ-006.md)（Case実行オーケストレーション: 本 Design の親 REQ）
 - [workflow-contracts.md](workflow-contracts.md)（ワークフロー全体契約）
 - [delegation-contracts.md](delegation-contracts.md)（サブエージェント委譲契約）
 - [references/execution-unit-construction.md](references/execution-unit-construction.md)（連結成分アルゴリズム、3軸判断モデルの機械的判定手順）

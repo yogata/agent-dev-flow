@@ -1,11 +1,11 @@
 ---
-title: inspect-skills SPEC
+title: inspect-skills Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-15
 ---
 
-# inspect-skills SPEC
+# inspect-skills Design
 
 ## 目的
 
@@ -61,8 +61,8 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/inspect-skills.md`）はその実行時投影である（DEC-010）。
-- workflow 実装本体（工程構成、各診断観点の詳細手順、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-skills`）が所有し、本 SPEC はこれらを複製しない。本 workflow は read-only-diagnostic 型であり、STEP model の対象外である（REQ-027-003）。resume point、export、import を持たず、工程一覧のラベルは順序ラベルである。中断時は先頭から再実行する。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/inspect-skills.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（工程構成、各診断観点の詳細手順、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-skills`）が所有し、本 Design はこれらを複製しない。本 workflow は read-only-diagnostic 型であり、STEP model の対象外である（REQ-027-003）。resume point、export、import を持たず、工程一覧のラベルは順序ラベルである。中断時は先頭から再実行する。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
@@ -75,14 +75,14 @@ inspect-skills は REQ-036-012〜016 が定める意味診断を担当し、Grap
 
 consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
 
-## 参照する横断 SPEC
+## 参照する横断 Design
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（検出事項プロトコル）
 
 ## 対象外
 
-- 正規文書変更、REQ/Decision/SPEC 変更、Command/Skill/Template/Script 変更（G01）
+- 正規文書変更、REQ/Decision/Design 変更、Command/Skill/Template/Script 変更（G01）
 - Issue 作成、PR 作成、RU 保存（G02, G03）
 - branch、worktree 操作（G04）
 - 自動修正（G05、推奨 route 提示に留める）

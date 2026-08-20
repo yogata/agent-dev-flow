@@ -1,6 +1,6 @@
 # 実行主体分類誤認の判定基準
 
-> **原本**: document-type-responsibilities SPEC「実行主体分類の査読基準」。
+> **原本**: document-type-responsibilities Design「実行主体分類の査読基準」。
 > 本ファイルは inspect-skills 診断観点「実行主体分類の誤認」の判定基準詳細を集約する運用ビューである。
 > 原本と内容が重複する場合は原本を優先する。
 
@@ -10,7 +10,7 @@ Command→Skill 参照妥当性診断で、文書内で言及される実行主�
 実行主体の誤認は `load_skills` への誤指定や委譲契約不整合を引き起こすため、本診断観点で検出する。
 
 
-機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子の skill 表記）は integrity-rule-catalog SPEC が担う。
+機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子の skill 表記）は integrity-rule-catalog Design が担う。
 本診断はより複雑な文脈依存の誤認（command と skill の混同等）を担う。
 
 ## 実行主体の分類
@@ -88,5 +88,5 @@ Recommended route には `command` / `skill` / `references` のいずれかを�
 ## 対象外
 
 - 実行時の動的判定（委譲の実際の起動、`load_skills` の実解決）は本診断の対象外。静的記述の分類正確性のみを検証する。
-- 機械的パターンマッチングによる検出は integrity-rule-catalog SPEC が担う。本診断は意味的、文脈的な誤認検出を担う。
+- 機械的パターンマッチングによる検出は integrity-rule-catalog Design が担う。本診断は意味的、文脈的な誤認検出を担う。
 - 文書品質査読時の実行主体分類は `agentdev-doc-writing` が担う。本診断は Command→Skill 参照妥当性診断の文脈での誤認検出を担う。

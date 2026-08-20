@@ -7,9 +7,9 @@ updated: 2026-08-10
 
 # 文書フォーマット規約
 
-> **正本としての位置づけ**: 本 SPEC が共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）の正本である。
+> **正本としての位置づけ**: 本 Design が共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）の正本である。
 > 本文構造、見出し構成、Step 表現、記述形式等の執筆規約寄り内容は `../authoring/` ドメイン（現在は `command-file-format.md` のみ）への移管候補とする。
-> 実移管の判断は case-run で行い、本 SPEC からの一括移送は行わない。
+> 実移管の判断は case-run で行い、本 Design からの一括移送は行わない。
 
 ## コマンド frontmatter 規約
 
@@ -58,11 +58,10 @@ REQファイルは`## 目的`、`## 要件`、`## 適用範囲`の3セクショ�
 
 - 要件は検証可能な必達要件（満たす必要がある要件）として記述する。推奨、任意、将来候補は要件行に含めない。FR/NFR の区別を持たない
 
-### SPEC frontmatter 形式
+### Design frontmatter 形式
 
-SPEC frontmatterは`title`、`status`、`created`、`updated`を基本とする。
-`status`は`draft`、`accepted`、`superseded`のいずれかとする。
-`superseded`では後継SPECのリポジトリ相対パスを`superseded_by`へ記録する。
+Design frontmatterは`title`、`status`、`created`、`updated`を基本とする。
+`status`は`draft`、`accepted`のいずれかとする。
 status欠落は後方互換のため`accepted`相当として扱う。
 
 ## REQ 分類規約
@@ -76,7 +75,7 @@ status欠落は後方互換のため`accepted`相当として扱う。
 | `historical-only` | 当時の判断、経緯として残すが現行要件ではない | 履歴参照として保持 |
 
 **新基準 REQ 群**を現行仕様の主参照とする。
-現行 REQ の件数、範囲は `docs/README.md` の AUTOGEN 件数ブロックと `docs/requirements/README.md` を正とし、本 SPEC 本文では件数、範囲を固定値として記述しない。
+現行 REQ の件数、範囲は `docs/README.md` の AUTOGEN 件数ブロックと `docs/requirements/README.md` を正とし、本 Design 本文では件数、範囲を固定値として記述しない。
 
 件数の固定記述を禁止する根拠の一つは、v3.0.0 移行後に旧表記（REQ-001〜0133、25 件）が残存した事象である。
 当該残存を IR-042（hardcoded-req-count）、IR-018（REQ 範囲表記鮮度）が検出しなかった理由は、両ルールが full-audit gate で検出器実装を持たず（regression_test は手動確認、`check_integrity.ts` 未実装）、v3.0.0 移行以降に full-audit が実行されていなかったためである（実行頻度の欠如）。

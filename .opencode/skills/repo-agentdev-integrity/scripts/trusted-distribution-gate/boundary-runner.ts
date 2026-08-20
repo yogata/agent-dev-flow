@@ -1,7 +1,7 @@
 // Boundary-detection runner.
 //
 // Scans every text artifact across all FOUR canonical projections
-// (parent defect #3 + SPEC distribution-boundary.md §58-67). The manifest
+// (parent defect #3 + Design distribution-boundary.md §58-67). The manifest
 // model exposes exactly source / link / archive / archive-installed; the
 // internal source subsets (runtime, bootstrap, archive-extra) are routed
 // into the appropriate projection by this runner.

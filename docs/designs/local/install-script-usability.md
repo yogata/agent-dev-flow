@@ -7,7 +7,7 @@ updated: 2026-08-15
 
 # 導入スクリプトの使いやすさ詳細
 
-本 SPEC は REQ-009（配布基盤と導入モデル）の要件行 REQ-009-040〜043 を具体化する、
+本 Design は REQ-009（配布基盤と導入モデル）の要件行 REQ-009-040〜043 を具体化する、
 導入系スクリプト（install-consumer-opencode.ps1、check-consumer-opencode.ps1、
 sync-self-opencode.ps1）の使いやすさ詳細を定義する。
 

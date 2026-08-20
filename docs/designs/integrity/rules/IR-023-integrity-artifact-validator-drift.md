@@ -10,11 +10,11 @@ updated: 2026-08-20
 | Field | Value |
 |-------|-------|
 | rule_id | IR-023 |
-| description | Integrity scripts/tests/fixtures/SKILL.md/SPEC 間で drift がないこと |
+| description | Integrity scripts/tests/fixtures/SKILL.md/Design 間で drift がないこと |
 | severity | heuristic |
 | category | integrity-rule-gap |
-| detection_method | script の検査カテゴリと SKILL.md/SPEC の定義照合 |
-| affected_artifacts | [integrity scripts, SKILL.md, SPEC] |
+| detection_method | script の検査カテゴリと SKILL.md/Design の定義照合 |
+| affected_artifacts | [integrity scripts, SKILL.md, Design] |
 | related_req | [REQ-010-008] |
 | related_design | [integrity-contracts.md] |
 | gate_level | full-audit, impact-guard |

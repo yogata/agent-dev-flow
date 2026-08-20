@@ -14,7 +14,7 @@ updated: 2026-08-20
 | severity | strict |
 | category | obsolete-structure |
 | detection_method | 正規表現で廃止 skill 名検出 |
-| affected_artifacts | [commands, skills, SPEC] |
+| affected_artifacts | [commands, skills, Design] |
 | related_req | [REQ-010] |
 | related_design | [integrity-contracts.md] |
 | gate_level | full-audit |

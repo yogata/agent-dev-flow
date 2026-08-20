@@ -14,7 +14,7 @@ updated: 2026-08-20
 | severity | heuristic |
 | category | obsolete-structure |
 | detection_method | `Findings`, `Capture候補`, `Intake` 周辺の見出しを検出し、current/source の見出し統一と REQ-003-021 の検出目的例外を判定 |
-| affected_artifacts | [commands, command projection, SPEC, integrity rules] |
+| affected_artifacts | [commands, command projection, Design, integrity rules] |
 | related_req | [REQ-003-014, REQ-003-020, REQ-003-021] |
 | related_design | [workflow-contracts.md] |
 | gate_level | full-audit, delta-guard |

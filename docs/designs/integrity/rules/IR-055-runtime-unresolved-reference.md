@@ -27,7 +27,7 @@ updated: 2026-08-20
 ## IR-055 検出パターンと severity（REQ-002-079〜081）
 
 検出パターンごとの severity 分類を規定する。
-本節が SPEC 詳細の原本であり、docs-check 実装（`check_integrity.ts`）は本節に従う。
+本節が Design 詳細の原本であり、docs-check 実装（`check_integrity.ts`）は本節に従う。
 
 ### strict（原則違反、即 NG）
 

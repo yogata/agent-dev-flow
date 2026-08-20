@@ -39,8 +39,8 @@ agentdev-gh-cli ローカル版の VERIFY 手続きの実装観点と検査項�
 
 Case ファイルの用途に応じて以下を検証する。
 
-- PR 作成（PR 相当セクション追記）時: `## SPEC確定候補` と `## Findings / Capture候補`（`### intake`, `### learning` サブ見出し含む）が存在するか
-- `## Findings / Capture候補` セクションは SPEC [local/local-case-file.md](../../../../../docs/specs/local/local-case-file.md) の「見出し一覧」で Case ファイルに必須と定義されている。新規作成後に欠落していないか確認する
+- PR 作成（PR 相当セクション追記）時: `## Design確定候補` と `## Findings / Capture候補`（`### intake`, `### learning` サブ見出し含む）が存在するか
+- `## Findings / Capture候補` セクションは Design [local/local-case-file.md](../../../../../docs/designs/local/local-case-file.md) の「見出し一覧」で Case ファイルに必須と定義されている。新規作成後に欠落していないか確認する
 
 #### (d) リポジトリ参照リンク検証
 

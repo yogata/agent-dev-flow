@@ -54,7 +54,7 @@ OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため�
 
 - ADR・specs の内容は Issue 本文の生成に反映する
 - Standard flow の動作・出力形式は Epic flow 追加の影響を受けないものとする（後方互換）
-- Issue 化単位は OU 単位とし、子Issue は OU 単位で作成して対応 OU 経由で REQ/Decision/SPEC へのトレーサビリティを保持する（Wave 単位のみの子Issue 構造は作らない）。case-open は自律的な要件分析に基づいて Epic Issue または子 Issue 構造を生成し、機能要件・非機能要件・対象外・受け入れ条件は要件doc由来のものを用いる
+- Issue 化単位は OU 単位とし、子Issue は OU 単位で作成して対応 OU 経由で REQ/Decision/Design へのトレーサビリティを保持する（Wave 単位のみの子Issue 構造は作らない）。case-open は自律的な要件分析に基づいて Epic Issue または子 Issue 構造を生成し、機能要件・非機能要件・対象外・受け入れ条件は要件doc由来のものを用いる
 - マルチREQ Epic flow は複数REQドキュメント入力時または draft-meta に `scale: large` 設定時に実行し、単一REQ Epic flow は `scale: large` 明示時に実行する
 - 子Issue 本文の先頭行には `Parent: #{epic_number}` を含める（親子関係の追跡用）
 - Case に割り当てられた統合先（既定値 main）を Issue 本文の execution contract へ記録する。実証Caseの場合は実証Case識別情報（実証フラグ、対象評価ブランチ、所属実証単位）と評価契約を Issue 本文へ永続記録する。評価結果の採否（採用、不採用、判定不能）自体を Issue 完了条件へ含めない

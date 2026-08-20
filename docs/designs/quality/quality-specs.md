@@ -25,7 +25,7 @@ AgentDevFlow の品質基準、検証ルールを定義する。
 
 ## 文書品質ルール
 
-以下の文書品質ルールの原本 SPEC として機能する（rule-ownership.md Domain 3, 4, 20 参照）:
+以下の文書品質ルールの原本 Design として機能する（rule-ownership.md Domain 3, 4, 20 参照）:
 
 - Command 行数上限: 100行目標、150行上限、200行以内（200行超は分割対象）
 - Skill 行数上限: 200行超で分割候補報告

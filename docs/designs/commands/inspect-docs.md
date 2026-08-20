@@ -1,17 +1,17 @@
 ---
-title: inspect-docs SPEC
+title: inspect-docs Design
 status: accepted
 created: 2026-06-21
 updated: 2026-08-15
 ---
 
-# inspect-docs SPEC
+# inspect-docs Design
 
 ## 目的
 
-docs 全体（REQ/Decision/SPEC/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力する。
+docs 全体（REQ/Decision/Design/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力する。
 検査対象を直接修正しない診断専用コマンド。
-REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、Decision、guides、README の意味診断を含む。
+REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて Design、Decision、guides、README の意味診断を含む。
 
 ## 承認・HITL 境界
 
@@ -45,24 +45,24 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SP
 - REQ 参照 ID 整合性確認（`agentdev-req-structure-diagnostics`）
 - 第一参照導線確認（`agentdev-req-structure-diagnostics`）
 - 現行/廃止/世代境界確認（`agentdev-req-structure-diagnostics`）
-- SPEC 意味診断（SPEC が REQ/Decision/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認）
+- Design 意味診断（Design が REQ/Decision/guides の代替、将来計画の混入、実行時依存先としての不適切扱いを確認）
 - ADR 意味診断（承認済み Decision のみを現行判断の根拠として扱っているか確認）
 - guides 意味診断（guides が navigation layer の範囲を超えていないか確認）。履歴混入検出時は route 追加（v2:REQ-0115-041）
 - README 索引診断（README 索引が導線の範囲を超えていないか確認）。内容過多検出時は分割誘導
 - REQ structure review（6観点）（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT（`agentdev-req-structure-diagnostics`））
-- 文書分類一貫性検査（`docs/designs/foundations/document-model.md` の classification policy への適合確認）。REQ 要件行への SPEC 分離基準違反残留（schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出
-- 配布物整合性検査。配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/designs/integrity/docs-spec-rebuild-integrity.md` が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損）、文意保持（壊れた括号、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する（`agentdev-req-structure-diagnostics` 参照）
+- 文書分類一貫性検査（`docs/designs/foundations/document-model.md` の classification policy への適合確認）。REQ 要件行への Design 分離基準違反残留（schema field、enum 値一覧、判定表、file pattern、テンプレート種別、report format、内部アルゴリズム、作業履歴、実装パラメータ等）自動検出
+- 配布物整合性検査。配布物（`src/opencode/commands/agentdev/`、`src/opencode/skills/agentdev-*/`）について、`docs/designs/integrity/docs-spec-rebuild-integrity.md` が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損）、文意保持（壊れた括号、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と Design 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する（`agentdev-req-structure-diagnostics` 参照）
 - docs-check route 判定（意味的疑いのうち機械的検査に落とせるものを docs-check ルール／検査データ候補として提示）
 - 未処理 artifact 確認（`agentdev-req-structure-diagnostics`）
-- 検出事項出力（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）。source-of-truth priority: 現行 REQ > 承認済み Decision > SPEC > guides
+- 検出事項出力（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）。source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides
 - 実行前同期（`git pull --ff-only`、失敗時は git-error-messages template で停止）
 - `.agentdev/inspect/` 変更の commit と push（変更なし時は commit/push せず「変更なし」報告、変更あり時は `.agentdev/inspect/` のみ `git add`、commit、push、push 失敗時は停止）
 - 完了報告
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 SPEC であり、command 定義（`src/opencode/commands/agentdev/inspect-docs.md`）はその実行時投影である（DEC-010）。
-- workflow 実装本体（工程構成、各診断観点の実行手順、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-docs`）が所有し、本 SPEC はこれらを複製しない。本 workflow は read-only-diagnostic 型であり、STEP model の対象外である（REQ-027-003）。resume point、export、import を持たず、工程一覧のラベルは順序ラベルである。中断時は先頭から再実行する。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/opencode/commands/agentdev/inspect-docs.md`）はその実行時投影である（DEC-010）。
+- workflow 実装本体（工程構成、各診断観点の実行手順、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-docs`）が所有し、本 Design はこれらを複製しない。本 workflow は read-only-diagnostic 型であり、STEP model の対象外である（REQ-027-003）。resume point、export、import を持たず、工程一覧のラベルは順序ラベルである。中断時は先頭から再実行する。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
@@ -77,7 +77,7 @@ inspect-docs は REQ-036-006〜011 が定める意味診断を担当し、Graph 
 
 consumer 環境に対応 node type または relation type が存在しない場合は異常とせず従来の診断経路を継続する。
 
-## 参照する横断 SPEC
+## 参照する横断 Design
 
 - [workflows/workflow-contracts.md](../workflows/workflow-contracts.md)（コマンド分類）
 - [workflows/backlog-artifact-lifecycle.md](../workflows/backlog-artifact-lifecycle.md)（検出事項プロトコル、inspect-promote 自動 promote 連携）
@@ -88,7 +88,7 @@ consumer 環境に対応 node type または relation type が存在しない場
 - GitHub Issue/PR 作成、更新（G02）
 - worktree/ブランチ作成（G03）
 - intake/learning/RU 処理（G04）
-- source-of-truth priority 違反（G05、現行 REQ > 承認済み Decision > SPEC > guides）
+- source-of-truth priority 違反（G05、現行 REQ > 承認済み Decision > Design > guides）
 
 ## 検証観点
 

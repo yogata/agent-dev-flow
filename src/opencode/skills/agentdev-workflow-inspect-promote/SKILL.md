@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-inspect-promote
-description: "inspect-promote command の workflow 実装本体。検出事項（finding）の分類（promote/defer/reject）、自動 promote（--auto opt-in）、adversarial-review 経路B、自律確定判定と HITL 確定、promote/reject/defer 処理実行、.agentdev 永続化を、独立 resume point を持つ STEP model（durable state から再開可能）として所有する。USE FOR: inspect-promote 実行時の workflow 制御（inbox スキャン・分類・経路B review・自律確定判定・HITL 確定・処理実行・永続化）。DO NOT USE FOR: 検出事項の生成、REQ/Decision/SPEC 変更、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "inspect-promote command の workflow 実装本体。検出事項（finding）の分類（promote/defer/reject）、自動 promote（--auto opt-in）、adversarial-review 経路B、自律確定判定と HITL 確定、promote/reject/defer 処理実行、.agentdev 永続化を、独立 resume point を持つ STEP model（durable state から再開可能）として所有する。USE FOR: inspect-promote 実行時の workflow 制御（inbox スキャン・分類・経路B review・自律確定判定・HITL 確定・処理実行・永続化）。DO NOT USE FOR: 検出事項の生成、REQ/Decision/Design 変更、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # inspect-promote workflow スキル
@@ -15,16 +15,16 @@ inspect-promote command は公開 interface（入出力契約・ガードレー�
 ## 原本（SSoT）
 
 本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` SPEC が正規所有する。
+Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` Design が正規所有する。
 extension（`.agentdev/extensions/skills/agentdev-workflow-inspect-promote.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と inspect-promote command の公開契約のみを前提とする。SPEC ディレクトリの内部構成（`foundations`, `responsibilities` 等）は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と inspect-promote command の公開契約のみを前提とする。Design ディレクトリの内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
+3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 入力
@@ -83,7 +83,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 ## resume protocol（DEC-{N}、会話記憶非依存）
 
-- 各 STEP の再開点は durable state から再構成する（`<workflows/input-resolution-and-durable-state>` SPEC の優先順位に従う）
+- 各 STEP の再開点は durable state から再構成する（`<workflows/input-resolution-and-durable-state>` Design の優先順位に従う）
 - **検出事項ごとの分類確定状態の再構成**: inbox に残存する検出事項は未確定（STEP-3 分類から再開）、`.agentdev/inspect/promoted/` に保存済みの検出事項は promote 確定（再保存しない）、auto-promote-log 記載済みかつ `.agentdev/intake/promoted/inspect-auto-*.md` 投入済みは自動 promote 確定（再投入しない）、inbox から削除済みは reject 確定（復元しない）、inbox 残置かつ処理実行済み報告があるものは defer 確定
 - **HITL 承認状態**: 承認は処理実行（STEP-7）の完了状態から逆算して再構成する。処理実行が済んでいない検出事項は未確定と扱い、確定（STEP-6 の自律確定判定と HITL 確定）から再開する。自律確定項目にユーザー承認は存在しないため、再開時は詳細判定表に従い再判定する
 - 自然言語の前 STEP result のみに依存した再開を行わない
@@ -104,20 +104,20 @@ Workflow Skill のみが読み、inspect-promote command は直接読まない�
 標準動作に追加・拡張される（上書きではない）。
 存在しない場合は標準動作で続行する（fail-open）。
 破損している場合はエラーを表示して当該 extension を無視し、標準動作で続行する。
-自動 promote 対象カテゴリ、投入先、実行ログ、誤検知 revoke 手順は workflow-contracts SPEC（extension 経由で解決）を正とし、本スキルはカテゴリ定義を重複保持しない。
+自動 promote 対象カテゴリ、投入先、実行ログ、誤検知 revoke 手順は workflow-contracts Design（extension 経由で解決）を正とし、本スキルはカテゴリ定義を重複保持しない。
 
 ## 共通制約
 
 - **HITL 承認必須**: 自動 promote 対象（`--auto`）と自律確定対象（次節の詳細判定表に従う）を除き、ユーザーの明示的な承認なしに採用済み成果物を生成しない（G01）
 - **reject は即時削除**: `archive/rejected/` への移動は廃止。即時削除以外の取扱を禁止し、reject 時の commit message に却下理由を含める（command 不変条件）
 - **defer は inbox 残置**: defer となった検出事項を `.agentdev/inspect/inbox/` から移動しない（command 不変条件）
-- **`--auto` は明示 opt-in の場合のみ有効**: 省略時は自動 promote を一切行わない（G06）。自動 promote 対象は workflow-contracts SPEC（extension 経由）が定義する高確信度カテゴリのみとし、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す（command 不変条件）
+- **`--auto` は明示 opt-in の場合のみ有効**: 省略時は自動 promote を一切行わない（G06）。自動 promote 対象は workflow-contracts Design（extension 経由）が定義する高確信度カテゴリのみとし、意味判断、曖昧な分類、ADR 要否判断を含む検出事項は手動分類へ回す（command 不変条件）
 - **実行ログ**: `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する（command 不変条件）
 - **adversarial-review は任意助言手段**: 必須工程、QG、承認ゲート、統制ゲートとして導入しない。呼出失敗時は silent skip を禁止し、従来フロー（HITL 確定）を維持する
 
 ## 自律確定の判定位置とHITLフォールバック
 
-判断確定の境界は共通原則（REQ-{NNNN}-{NNN}）に従う。自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約SPEC（workflow-contracts SPEC「promote系判断確定とHITL境界」節、extension 経由で解決）が集約所有し、本スキルは判定表を重複保持しない（DEC-{N}）。
+判断確定の境界は共通原則（REQ-{NNNN}-{NNN}）に従う。自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約Design（workflow-contracts Design「promote系判断確定とHITL境界」節、extension 経由で解決）が集約所有し、本スキルは判定表を重複保持しない（DEC-{N}）。
 
 - **判定位置**: 分類・検証（STEP-3）と必要な経路B review（STEP-5）を経た後、取得可能な根拠から promote / defer / reject を一意に確定できる検出事項は、ユーザー承認なしで確定する（REQ-{NNNN}-{NNN}）
 - **部分自律確定**: 同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（REQ-{NNNN}-{NNN}）
@@ -133,8 +133,8 @@ Workflow Skill のみが読み、inspect-promote command は直接読まない�
 
 ## See Also
 
-- **`<workflows/workflow-skill-model>` SPEC**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` SPEC**: STEP reference 構造、resume point
-- **`<workflows/input-resolution-and-durable-state>` SPEC**: 入力解決優先順位、durable state
+- **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
+- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<workflows/input-resolution-and-durable-state>` Design**: 入力解決優先順位、durable state
 - **inspect-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
 - **`agentdev-workflow-inspect-docs` / `agentdev-workflow-inspect-skills`**: 検出事項の生成を担当する前段 workflow skill

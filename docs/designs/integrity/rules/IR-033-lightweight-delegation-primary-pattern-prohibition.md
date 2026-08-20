@@ -14,7 +14,7 @@ updated: 2026-08-20
 | severity | strict |
 | category | canonical-conflict |
 | detection_method | `lightweight-delegation` 周辺文脈を検出し、primary pattern 宣言、frontmatter pattern、実装分類としての扱いがないことを確認 |
-| affected_artifacts | [commands, SPEC, skills] |
+| affected_artifacts | [commands, Design, skills] |
 | related_req | [REQ-003-015, REQ-003-016] |
 | related_design | [workflow-contracts.md, artifact-contracts.md] |
 | gate_level | full-audit, delta-guard |

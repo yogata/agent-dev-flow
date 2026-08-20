@@ -17,7 +17,7 @@ SKILL.md 本文では処分区分の存在と living pool 維持の不変条件�
 
 learning-promote が各クラスタに対して判定する廃棄カテゴリ。
 
-**昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。
+**昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/ADR/Design）への昇華可能性を評価する。
 8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。
 **無条件の自動REQ化は禁止する**。
 学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` の昇華経路を経て初めて REQ 化される。

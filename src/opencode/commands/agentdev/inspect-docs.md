@@ -4,8 +4,8 @@ description: docs全体の意味整合性を検出し、検出事項を .agentde
 
 # inspect-docs
 
-docs全体（REQ/Decision/SPEC/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力するコマンド。
-検査対象を直接修正しない診断を行い、REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて SPEC、ADR、guides、README の意味診断を含む。
+docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力するコマンド。
+検査対象を直接修正しない診断を行い、REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて Design、ADR、guides、README の意味診断を含む。
 
 ## 基本原則: 診断専用（検査対象を直接修正しない）
 
@@ -62,7 +62,7 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 | 工程 | 前提条件 | 出力契約 | 検証基準 |
 |---|---|---|---|
 | STEP-1 スキャン対象の収集 | コマンド起動 | スキャン対象成果物リスト | 対象ディレクトリ不存在時は空扱い警告で継続していること |
-| STEP-2 REQ 体系・文書種別別意味診断 | 対象収集済み | 観点別診断結果 | source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾判定していること |
+| STEP-2 REQ 体系・文書種別別意味診断 | 対象収集済み | 観点別診断結果 | source-of-truth priority（現行 REQ > 承認済み ADR > Design > guides）に従って矛盾判定していること |
 | STEP-3 配布物整合性検査・route 判定 | 診断済み | 配布物整合性結果・route 判定 | 検出事項ごとに観点・対象・根拠・推奨routeが揃っていること |
 | STEP-4 検出事項出力・永続化・完了報告 | 検出完了 | `.agentdev/inspect/inbox/inspect-docs-finding-*.md`・完了報告 | 検出事項ファイルが finding schema に従っていること |
 
@@ -74,7 +74,7 @@ routing は実行コマンド選択の目安であり、各コマンドの検出
 
 工程上の選好を肯定形の不変条件として示す:
 
-- 診断結果の提示（検出事項、根拠、source-of-truth判定、推奨route）は source-of-truth priority（現行 REQ > 承認済み ADR > SPEC > guides）に従って矛盾を判定する
+- 診断結果の提示（検出事項、根拠、source-of-truth判定、推奨route）は source-of-truth priority（現行 REQ > 承認済み ADR > Design > guides）に従って矛盾を判定する
 
 ## ガードレール
 
