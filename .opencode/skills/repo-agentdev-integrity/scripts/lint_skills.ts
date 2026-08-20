@@ -30,6 +30,7 @@ import {
   DEFAULT_PROFILE,
 } from "./cli_utils.ts";
 import type { CheckResult, ScanSummary, IntegrityReport } from "./cli_utils.ts";
+import { globWalkRel } from "./lib/glob_walk.ts";
 
 const SCRIPT_NAME = "lint_skills.ts";
 const SCRIPT_DESCRIPTION = "Skill structure linter for AgentDevFlow";
@@ -283,19 +284,10 @@ function lintDescriptionAg005(
 }
 
 export function collectReferenceMarkdownFiles(refsDir: string): string[] {
-  const files: string[] = [];
-  if (!fs.existsSync(refsDir)) return files;
-  (function walk(dir: string): void {
-    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, ent.name);
-      if (ent.isDirectory()) {
-        walk(full);
-      } else if (ent.isFile() && ent.name.endsWith(".md")) {
-        files.push(full);
-      }
-    }
-  })(refsDir);
-  return files;
+  if (!fs.existsSync(refsDir)) return [];
+  return globWalkRel(refsDir, { extensions: [".md"], filesOnly: true }).map((rel) =>
+    path.join(refsDir, ...rel.split("/")),
+  );
 }
 
 function lintReferencesTocAg005(skillDir: string, dirName: string): CheckResult[] {

@@ -8,6 +8,7 @@ const CLI_UTILS_FILE = join(SCRIPT_DIR, "cli_utils.ts");
 const GEN_INDEXES_FILE = join(SCRIPT_DIR, "generate_indexes.ts");
 const HISTORY_EXEMPTION_FILE = join(SCRIPT_DIR, "ir057_history_exemption.ts");
 const CURRENT_REFS_FILE = join(SCRIPT_DIR, "current_refs.ts");
+const GLOB_WALK_FILE = join(SCRIPT_DIR, "lib", "glob_walk.ts");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `integrity-test-${crypto.randomUUID().slice(0, 8)}`;
 const TEMP_ROOT = join(TEMP_BASE, RUN_ID);
@@ -62,6 +63,8 @@ function copyScripts(fixtureRoot: string): void {
   copyFileSync(GEN_INDEXES_FILE, join(dest, "generate_indexes.ts"));
   copyFileSync(HISTORY_EXEMPTION_FILE, join(dest, "ir057_history_exemption.ts"));
   copyFileSync(CURRENT_REFS_FILE, join(dest, "current_refs.ts"));
+  mkdirp(join(dest, "lib"));
+  copyFileSync(GLOB_WALK_FILE, join(dest, "lib", "glob_walk.ts"));
 }
 
 function buildValidFixture(root: string): void {
@@ -2383,6 +2386,8 @@ function copyScriptsComplete(fixtureRoot: string): void {
   }
   copyFileSync(HISTORY_EXEMPTION_FILE, join(dest, "ir057_history_exemption.ts"));
   copyFileSync(CURRENT_REFS_FILE, join(dest, "current_refs.ts"));
+  mkdirp(join(dest, "lib"));
+  copyFileSync(GLOB_WALK_FILE, join(dest, "lib", "glob_walk.ts"));
 }
 
 function buildNgBaselineFixture(root: string): void {

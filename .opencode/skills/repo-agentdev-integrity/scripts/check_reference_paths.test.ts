@@ -23,6 +23,12 @@ function copyScripts(fixtureRoot: string): void {
       copyFileSync(join(SCRIPT_DIR, f), join(dest, f));
     }
   }
+  mkdirp(join(dest, "lib"));
+  for (const f of readdirSync(join(SCRIPT_DIR, "lib"))) {
+    if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+      copyFileSync(join(SCRIPT_DIR, "lib", f), join(dest, "lib", f));
+    }
+  }
 }
 interface RunResult {
   exitCode: number;

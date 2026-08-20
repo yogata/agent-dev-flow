@@ -86,6 +86,7 @@ import {
   resolveExtensionState,
   validateExtensionEntries,
 } from "../../../../src/opencode/skills/agentdev-project-extensions/scripts/lib/extension_state.ts";
+import { globWalkRel } from "./lib/glob_walk.ts";
 
 // Re-export the shared contract under the historical module surface so
 // existing importers (tests, sibling checkers) keep working.
@@ -248,14 +249,15 @@ function readText(p: string): string | null {
 }
 
 export function listMarkdownFiles(dirPath: string, recursive: boolean): string[] {
+  // 再帰呼び出しは廃止（OU-002: 全呼び出し点が単一ディレクトリ列挙）。
+  // 単一ディレクトリ直下の列挙は移行対象外のため readdirSync のまま。
+  void recursive;
   const result: string[] = [];
   if (!dirExists(dirPath)) return result;
   const entries = fs.readdirSync(dirPath, { withFileTypes: true }) as any[];
   for (const ent of entries) {
     const full = path.join(dirPath, ent.name);
-    if (ent.isDirectory() && recursive) {
-      result.push(...listMarkdownFiles(full, true));
-    } else if (ent.isFile() && ent.name.endsWith(".md")) {
+    if (ent.isFile() && ent.name.endsWith(".md")) {
       result.push(full.replace(/\\/g, "/"));
     }
   }
@@ -263,33 +265,15 @@ export function listMarkdownFiles(dirPath: string, recursive: boolean): string[]
 }
 
 export function listYamlFilesRecursive(dirPath: string): string[] {
-  const result: string[] = [];
-  if (!dirExists(dirPath)) return result;
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true }) as any[];
-  for (const ent of entries) {
-    const full = path.join(dirPath, ent.name);
-    if (ent.isDirectory()) {
-      result.push(...listYamlFilesRecursive(full));
-    } else if (ent.isFile() && (ent.name.endsWith(".yaml") || ent.name.endsWith(".yml"))) {
-      result.push(full.replace(/\\/g, "/"));
-    }
-  }
-  return result;
+  return globWalkRel(dirPath, { extensions: [".yaml", ".yml"], filesOnly: true }).map(
+    (rel) => path.join(dirPath, ...rel.split("/")).replace(/\\/g, "/"),
+  );
 }
 
 export function listFilesRecursive(dirPath: string): string[] {
-  const result: string[] = [];
-  if (!dirExists(dirPath)) return result;
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true }) as any[];
-  for (const ent of entries) {
-    const full = path.join(dirPath, ent.name);
-    if (ent.isDirectory()) {
-      result.push(...listFilesRecursive(full));
-    } else if (ent.isFile()) {
-      result.push(full.replace(/\\/g, "/"));
-    }
-  }
-  return result;
+  return globWalkRel(dirPath, { filesOnly: true }).map(
+    (rel) => path.join(dirPath, ...rel.split("/")).replace(/\\/g, "/"),
+  );
 }
 
 /**

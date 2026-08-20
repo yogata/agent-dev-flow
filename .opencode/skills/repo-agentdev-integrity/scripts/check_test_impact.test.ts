@@ -69,6 +69,9 @@ function setupTempRepo(): void {
   mkdirp(join(scriptDest, ".."));
   copyFileSync(SCRIPT_FILE, scriptDest);
   copyFileSync(CLI_UTILS_FILE, join(scriptDest, "..", "cli_utils.ts"));
+  const libDest = join(scriptDest, "..", "lib");
+  mkdirp(libDest);
+  copyFileSync(join(SCRIPT_DIR, "lib", "glob_walk.ts"), join(libDest, "glob_walk.ts"));
   // git init（--base-ref テスト用）。worktree ではなく main repo 形式で十分
   execSync("git init -q", { cwd: TEMP_ROOT });
   execSync('git config user.email "t@t"', { cwd: TEMP_ROOT });

@@ -73,6 +73,12 @@ function copyScripts(fixtureRoot: string): void {
       copyFileSync(join(PARENT_SCRIPTS_DIR, f), join(dest, f));
     }
   }
+  mkdirp(join(dest, "lib"));
+  for (const f of readdirSync(join(PARENT_SCRIPTS_DIR, "lib"))) {
+    if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+      copyFileSync(join(PARENT_SCRIPTS_DIR, "lib", f), join(dest, "lib", f));
+    }
+  }
 }
 
 /**
