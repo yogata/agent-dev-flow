@@ -292,3 +292,39 @@
 - **想定反映先**: case-run command / agentdev-workflow-case-run の品質統制・PR 作成手順
 - **関連**: PR 2341、PR 2343、Issue 2311、Epic 2307、docs/specs/integrity/distribution-boundary.md、agentdev-workflow-case-close references/epic-wave-close.md E4-1
 - **タグ**: #case-run #distribution-boundary #gate #epic-wave-close
+
+## 2026-08-20: 機械置換の境界設計におけるトークン境界保護と識別子リネーム時のリテラル内パス漏れ
+
+- **問題事象**: SPEC→Design 移行の横断語彙置換では lookaround 付きトークン境界（ACT-SPEC-NNN 履歴ID、小文字トークン、英語一般名詞 Specification の自動保護）が有効に機能した一方、Step4 の変数名リネーム（Design_PATH_PATTERNS）で正規表現リテラル内の旧パス文字列が機械置換対象から漏れ、check_test_impact.ts が docs/designs/ 変更を検出不能にする実装バグとして顕在化した（PR 2350）。
+- **発生局面**: 実装（case-run の横断機械置換・識別子リネーム）
+- **検知方法**: PR 本文への再 grep 記録と契約テスト実行（check_test_impact の検出不能を契約テストが捕捉）
+- **根本原因**: 機械置換の対象設計が識別子（トークン）単位と文字列置換の2系統で運用され、変数名リネームに付随する正規表現リテラル内の旧パス文字列はいずれの対象からも外れていた。
+- **自律対応内容**: 当該 PR 内で check_test_impact.ts の旧パス正規表現を修正し、構造固定契約テストの期待値を同一 PR で更新して再検証した。
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/Design影響**: なし（Issue 2349 の横断変更内で完結）
+- **横展開観点**: 語彙置換・識別子リネームを伴う横断是正 PR 全般。正規表現リテラル・パス文字列は識別子とは別系統の確認対象になる。
+- **再発条件**: 識別子リネームや機械置換を伴う横断変更で、リテラル内パス・パターン文字列を別途 grep 確認せずにマージする場合
+- **予防策候補**: 識別子リネーム時はリテラル内パスを別途 grep 確認する手順を横断是正の検証ステップへ組み込む。トークン境界保護の lookaround 設計は有効実績として参照。
+- **想定反映先**: agentdev-doc-writing の機械置換規則（mechanical-replacement-rules.md）、横断是正 PR の再 grep 手順
+- **関連**: PR 2350、Issue 2349
+- **タグ**: #機械置換 #横断是正 #リテラル内パス
+
+---
+
+## 2026-08-20: 大規模 PR の targeted docs guard --files 渡しでコマンド行長上限に近づくリスクと gh files API 100件上限
+
+- **問題事象**: case-close の targeted docs guard を --files モードで実行する際、gh pr view --json files は API 仕様により先頭100件しか返さず、524ファイル変更の PR（PR 2350）では実ファイル一覧が得られない。さらに全パスを引数渡しすると結合長 32,040 文字に達し、Windows のコマンド行上限（32,767）に近接して失敗リスクが生じる。
+- **発生局面**: 実行（case-close STEP-3-1 targeted docs guard、マージ後 main 環境）
+- **検知方法**: マージ前後コミット（8bf06c42..5111aac3）の git diff --name-only 件数（524）と gh API files 件数（100）の突合、結合文字数の実測
+- **根本原因**: gh REST API の files ページング仕様（100件上限）と、--files の引数展開がコマンド行経由であることの組合せ。
+- **自律対応内容**: 当該実行では git diff --name-only <マージ前コミット>..<マージ後コミット> で全ファイル一覧を確定し、同差分と等価なファイル集合を与える --base-ref <マージ前コミット> で guard を実行して exit 0（524 files_checked、failures 0）を確認した。
+- **ユーザー確認の有無**: なし
+- **ADR/REQ/Design影響**: なし（check_changed_docs.ts の CLI 契約上、--base-ref と --files は排他の正当モード）
+- **横展開観点**: 大規模横断変更 PR（ファイル数が多い case-close）全般で発生し得る。
+- **再発条件**: 変更ファイル数が多い PR で --files に全パスを引数渡しする場合、または gh files API の先頭100件を前提に検査対象を確定する場合
+- **予防策候補**: 大規模 PR ではマージ前後コミットの git diff --name-only でファイル一覧を確定し、--base-ref <マージ前コミット>（等価ファイル集合）で guard を実行する手順を取る。
+- **想定反映先**: agentdev-workflow-case-close references/docs-and-design-promotion.md の targeted docs guard 手順、agentdev-gh-cli の PR 補助データ読込手続き
+- **関連**: PR 2350、Issue 2349
+- **タグ**: #case-close #targeted-docs-guard #files-mode #コマンド行上限
+
+---
