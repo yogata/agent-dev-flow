@@ -452,6 +452,12 @@ req_save_result:
     RU-0003: "REQ-021 update"
     RU-0004: "REQ-012 update + REQ-020/REQ-040 retire + DEC-017 再構成/DEC-007 superseded"
 
+design_save_result:
+  created_design_docs: [skills/agentdev-traceability.md]
+  artifact_action_results:
+    ACT-DESIGN-001: "skipped: target_area matches 空（search-target-area.ts 完全一致規約により未検出。target_area 末尾の注記『（文書全体を置換）』が H1 見出しテキスト『Traceability Information Model（TIM）語彙カタログ』と完全一致しない）→ follow-up: draft の target_area から注記を除去して design-save を再実行するか、operation を create へ切り替えることを推奨（docs/designs/foundations/traceability-model.md は未変更）"
+    ACT-DESIGN-002: "applied: docs/designs/skills/agentdev-traceability.md 新規作成（frontmatter: title/status: draft/created/updated、本文 verbatim、docs/designs/README.md skill Design 一覧へ登録済み、check-entry-existence 合格）"
+
 test_strategy:
   - id: TS-001
     target_item: AG-001
