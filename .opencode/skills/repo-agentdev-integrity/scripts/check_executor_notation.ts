@@ -12,6 +12,7 @@
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
+import { globWalkRel } from "./lib/glob_walk.ts";
 
 export type ExecutorRuleId = "IR-050" | "IR-051";
 
@@ -43,20 +44,10 @@ function findRepoRoot(start: string): string {
   return cur;
 }
 
-function listMarkdownRecursive(dir: string): string[] {
-  if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) return [];
-  const out: string[] = [];
-  for (const ent of fs.readdirSync(dir, { withFileTypes: true }) as any[]) {
-    const full = path.join(dir, ent.name).replace(/\\/g, "/");
-    if (ent.isDirectory()) {
-      // Skip unrelated subtrees to keep the scan focused.
-      if (ent.name === "node_modules" || ent.name === ".git") continue;
-      out.push(...listMarkdownRecursive(full));
-    } else if (ent.isFile() && ent.name.endsWith(".md")) {
-      out.push(full);
-    }
-  }
-  return out;
+export function listMarkdownRecursive(dir: string): string[] {
+  return globWalkRel(dir, { extensions: [".md"], filesOnly: true, skipDirNames: ["node_modules", ".git"] }).map(
+    (rel) => path.join(dir, ...rel.split("/")).replace(/\\/g, "/"),
+  );
 }
 
 // IR-050: load_skills command argument must reference a Capability Skill

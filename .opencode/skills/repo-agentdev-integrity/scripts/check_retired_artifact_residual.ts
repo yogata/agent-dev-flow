@@ -16,6 +16,7 @@
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
+import { globWalkRel } from "./lib/glob_walk.ts";
 
 export type RetiredKind = "IR-025" | "IR-037" | "IR-043";
 
@@ -193,18 +194,10 @@ function listMarkdown(dir: string): string[] {
     .map((f: string) => path.join(dir, f).replace(/\\/g, "/"));
 }
 
-function listMarkdownRecursive(dir: string): string[] {
-  if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) return [];
-  const out: string[] = [];
-  for (const ent of fs.readdirSync(dir, { withFileTypes: true }) as any[]) {
-    const full = path.join(dir, ent.name).replace(/\\/g, "/");
-    if (ent.isDirectory()) {
-      out.push(...listMarkdownRecursive(full));
-    } else if (ent.isFile() && ent.name.endsWith(".md")) {
-      out.push(full);
-    }
-  }
-  return out;
+export function listMarkdownRecursive(dir: string): string[] {
+  return globWalkRel(dir, { extensions: [".md"], filesOnly: true }).map(
+    (rel) => path.join(dir, ...rel.split("/")).replace(/\\/g, "/"),
+  );
 }
 
 // IR-025: 4-digit ADR filename must NOT exist under docs/decisions/.

@@ -44,6 +44,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { deriveSkillClassification } from "./check_extensions.ts";
+import { globWalkRel } from "./lib/glob_walk.ts";
 
 export interface PreventiveFailure {
   check: number;
@@ -176,20 +177,10 @@ function listMarkdownFiles(dirPath: string): string[] {
   return result.sort();
 }
 
-function listFilesRecursive(dirPath: string, extensions?: string[]): string[] {
-  const result: string[] = [];
-  if (!dirExists(dirPath)) return result;
-  for (const ent of fs.readdirSync(dirPath, { withFileTypes: true }) as any[]) {
-    const full = path.join(dirPath, ent.name);
-    if (ent.isDirectory()) {
-      result.push(...listFilesRecursive(full, extensions));
-    } else if (ent.isFile()) {
-      if (!extensions || extensions.some((e) => ent.name.endsWith(e))) {
-        result.push(full.replace(/\\/g, "/"));
-      }
-    }
-  }
-  return result.sort();
+export function listFilesRecursive(dirPath: string, extensions?: string[]): string[] {
+  return globWalkRel(dirPath, { extensions, filesOnly: true }).map(
+    (rel) => path.join(dirPath, ...rel.split("/")).replace(/\\/g, "/"),
+  );
 }
 
 function extractYamlField(text: string, field: string): string | null {

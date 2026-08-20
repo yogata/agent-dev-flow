@@ -1,7 +1,7 @@
 import type { GraphData, GraphEdge } from "./model.ts"
-import { readdir, readFile, stat } from "node:fs/promises"
-import type { Dirent } from "node:fs"
+import { readFile, stat } from "node:fs/promises"
 import { join } from "node:path"
+import { enumerateFilesRel } from "./glob_walk.ts"
 import { relationsFor, evidenceFor, type QueryResult } from "./query_support.ts"
 import { runIndexQuery, runProfileQuery, type ProfileName } from "./profiles.ts"
 
@@ -79,23 +79,6 @@ function pathResult(graph: GraphData, source: string, target: string, maxDepth: 
   return { nodes: [], edges: [], relations: [], provenance: [] }
 }
 
-async function walkDir(root: string, dir: string, results: string[]): Promise<void> {
-  let entries: Dirent[]
-  try {
-    entries = await readdir(dir, { withFileTypes: true })
-  } catch {
-    return
-  }
-  for (const entry of entries) {
-    const full = join(dir, entry.name)
-    if (entry.isDirectory()) {
-      await walkDir(root, full, results)
-    } else if (entry.isFile()) {
-      results.push(full.slice(root.length + 1).replace(/\\/g, "/"))
-    }
-  }
-}
-
 async function discoverResult(query: { readonly term: string; readonly roots: readonly string[]; readonly rootDir: string }): Promise<QueryResult> {
   const term = query.term.toLowerCase()
   const matches: string[] = []
@@ -109,9 +92,14 @@ async function discoverResult(query: { readonly term: string; readonly roots: re
       exists = false
     }
     if (!exists) continue
-    const files: string[] = []
-    await walkDir(query.rootDir, absRoot, files)
-    for (const file of files.sort()) {
+    let files: readonly string[] = []
+    try {
+      files = enumerateFilesRel(absRoot)
+    } catch {
+      files = []
+    }
+    for (const rel of files) {
+      const file = relRoot === "." ? rel : `${relRoot}/${rel}`
       try {
         const content = await readFile(join(query.rootDir, file), "utf8")
         if (content.toLowerCase().includes(term) || file.toLowerCase().includes(term)) {

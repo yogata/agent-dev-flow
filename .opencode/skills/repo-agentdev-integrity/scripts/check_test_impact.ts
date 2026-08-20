@@ -263,40 +263,72 @@ function shouldExclude(relPath: string): boolean {
   return SCAN_EXCLUDE_DIRS.some((d) => relPath.startsWith(d));
 }
 
-function globMatch(pattern: string, relPath: string): boolean {
-  // 最小限の glob 実装。**/*.test.ts 等の一般的なパターンをサポート。
-  // ** → 任意ディレクトリ階層、* → 単一階層の任意文字列。
-  const regexStr = pattern
-    .replace(/[.+^${}()|[\]\\]/g, "\\$&")
-    .replace(/\*\*/g, "::DBLSTAR::")
-    .replace(/\*/g, "[^/]*")
-    .replace(/::DBLSTAR::/g, ".*");
-  return new RegExp(`^${regexStr}$`).test(relPath);
+// node:fs glob のワイルドカードはドット始まりディレクトリを列挙できないため、
+// リポジトリルート直下の隠しディレクトリ（.opencode 等）はトップレベルを
+// 単一階層 readdir で発見し、その内側を cwd 直指定の glob で列挙する。
+function patternForHiddenRoot(testGlob: string, hiddenDir: string): string | null {
+  if (testGlob.startsWith(`${hiddenDir}/`)) return testGlob.slice(hiddenDir.length + 1);
+  if (testGlob.startsWith("**/")) return testGlob;
+  return null;
 }
 
-function discoverTestFiles(root: string, testGlob: string): string[] {
-  const results: string[] = [];
-  function walk(dir: string): void {
-    let entries: ReturnType<typeof fs.readdirSync>;
+export function discoverTestFiles(root: string, testGlob: string): string[] {
+  const relMatches = new Set<string>();
+
+  let standardMatches: string[] = [];
+  try {
+    standardMatches = fs.globSync(testGlob, { cwd: root }) as string[];
+  } catch (error) {
+    // ルート欠落（ENOENT）は空扱い。それ以外の走査エラーは握り潰さない
+    // （部分走査による不完全な tests_scanned を出さない）。
+    if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error;
+    standardMatches = [];
+  }
+  // 旧パターン解釈では "**/" 先頭パターンは必ず / を含む相対パスのみマッチする
+  // （リポジトリルート直下のファイルは対象外）。標準 API の受理範囲拡張を
+  // 公開仕様として追加しないため、この制約を明示的に維持する。
+  const requiresSeparator = testGlob.startsWith("**/");
+  for (const match of standardMatches) {
+    const rel = match.replace(/\\/g, "/");
+    if (requiresSeparator && !rel.includes("/")) continue;
+    relMatches.add(rel);
+  }
+
+  let topEntries: import("fs").Dirent[] = [];
+  try {
+    topEntries = fs.readdirSync(root, { withFileTypes: true }) as import("fs").Dirent[];
+  } catch {
+    topEntries = [];
+  }
+  for (const ent of topEntries) {
+    if (!ent.isDirectory() || !ent.name.startsWith(".")) continue;
+    const pattern = patternForHiddenRoot(testGlob, ent.name);
+    if (pattern === null) continue;
+    let hiddenMatches: string[] = [];
     try {
-      entries = fs.readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return;
+      hiddenMatches = fs.globSync(pattern, { cwd: path.join(root, ent.name) }) as string[];
+    } catch (error) {
+      if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error;
+      hiddenMatches = [];
     }
-    for (const ent of entries) {
-      const abs = path.join(dir, ent.name);
-      const rel = path.relative(root, abs).replace(/\\/g, "/");
-      if (ent.isDirectory()) {
-        if (shouldExclude(rel + "/")) continue;
-        walk(abs);
-      } else if (ent.isFile()) {
-        if (shouldExclude(rel)) continue;
-        if (globMatch(testGlob, rel)) results.push(abs);
-      }
+    for (const match of hiddenMatches) {
+      relMatches.add(`${ent.name}/${match.replace(/\\/g, "/")}`);
     }
   }
-  walk(root);
-  return results.sort();
+
+  const results: string[] = [];
+  for (const rel of [...relMatches].sort()) {
+    if (shouldExclude(rel)) continue;
+    const abs = path.join(root, ...rel.split("/"));
+    let isFile = false;
+    try {
+      isFile = fs.lstatSync(abs).isFile();
+    } catch {
+      continue;
+    }
+    if (isFile) results.push(abs);
+  }
+  return results;
 }
 
 // ─── Layer 4: reference scanner ─────────────────────────────────────────────

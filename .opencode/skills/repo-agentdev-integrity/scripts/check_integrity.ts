@@ -71,6 +71,7 @@ import {
   extractCurrentDecRefs,
   extractCurrentReqRefs,
 } from "./current_refs.ts";
+import { globWalkRel } from "./lib/glob_walk.ts";
 
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
@@ -5449,27 +5450,16 @@ function checkBrokenJunctions(skillsDir: string, root: string, cmdsDir?: string)
 
 // `realpath` follows Windows junctions, so a healthy projection compares equal
 // to its source. Without this, content_mismatch would fire on every junction.
-function collectMarkdownTree(dirRoot: string): string[] {
+export function collectMarkdownTree(dirRoot: string): string[] {
   if (!fs.existsSync(dirRoot)) return [];
-  const acc: string[] = [];
-  function walk(d: string): void {
-    let entries: import("fs").Dirent[];
-    try {
-      entries = fs.readdirSync(d, { withFileTypes: true }) as import("fs").Dirent[];
-    } catch {
-      return;
-    }
-    for (const ent of entries) {
-      const full = path.join(d, ent.name);
-      if (ent.isDirectory()) {
-        walk(full);
-      } else if (ent.isFile() && ent.name.endsWith(".md")) {
-        acc.push(full);
-      }
-    }
+  try {
+    return globWalkRel(dirRoot, { extensions: [".md"], filesOnly: true }).map((rel) =>
+      path.join(dirRoot, ...rel.split("/")),
+    );
+  } catch {
+    // 旧実装は走査中のディレクトリ単位エラーを黙ってスキップした（部分ツリー比較）
+    return [];
   }
-  walk(dirRoot);
-  return acc;
 }
 
 function readRealPath(filePath: string): string | null {
@@ -6854,18 +6844,12 @@ const IR053_EXEMPT_PATHS: RegExp[] = [
   /src\/opencode\/skills\/agentdev-gh-cli\/references\/standard-procedures\.md$/,
 ];
 
-function walkMarkdown(dirPath: string, acc: string[]): void {
+export function walkMarkdown(dirPath: string, acc: string[]): void {
   if (!fs.existsSync(dirPath)) return;
-  for (
-    const entry of fs.readdirSync(dirPath, { withFileTypes: true }) as import("fs").Dirent[]
-  ) {
-    const full = path.join(dirPath, entry.name);
-    if (entry.isDirectory()) {
-      walkMarkdown(full, acc);
-    } else if (entry.name.endsWith(".md")) {
-      acc.push(full);
-    }
-  }
+  // .md 名のディレクトリも旧実装と同様に対象に含む（filesOnly を指定しない）。
+  acc.push(
+    ...globWalkRel(dirPath, { extensions: [".md"] }).map((rel) => path.join(dirPath, ...rel.split("/"))),
+  );
 }
 
 function collectAgentdevSkillMarkdown(skillRoot: string): string[] {
@@ -8553,18 +8537,13 @@ function truncateForLog(line: string | undefined): string {
 }
 
 // walkAllFiles: walkMarkdown と同等だが .md に限定しない（.yaml/.yml 含む）
-function walkAllFiles(dirPath: string, acc: string[]): void {
+export function walkAllFiles(dirPath: string, acc: string[]): void {
   if (!fs.existsSync(dirPath)) return;
-  for (
-    const entry of fs.readdirSync(dirPath, { withFileTypes: true }) as import("fs").Dirent[]
-  ) {
-    const full = path.join(dirPath, entry.name);
-    if (entry.isDirectory()) {
-      walkAllFiles(full, acc);
-    } else if (/\.(md|yaml|yml)$/.test(entry.name)) {
-      acc.push(full);
-    }
-  }
+  acc.push(
+    ...globWalkRel(dirPath, { extensions: [".md", ".yaml", ".yml"] }).map((rel) =>
+      path.join(dirPath, ...rel.split("/")),
+    ),
+  );
 }
 
 // ─── Release profile (Issue #1928 / WP-3 §7.5) ──────────────────────────────

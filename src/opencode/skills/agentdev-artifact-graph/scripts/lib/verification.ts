@@ -1,5 +1,6 @@
-import { readFile, readdir, stat } from "node:fs/promises"
+import { readFile, stat } from "node:fs/promises"
 import { dirname, join, normalize } from "node:path"
+import { enumerateFilesRel } from "./glob_walk.ts"
 import type { GraphData } from "./model.ts"
 import type { ResolvedConfig } from "./config.ts"
 
@@ -51,45 +52,42 @@ async function independentScan(root: string, config: ResolvedConfig): Promise<{
   const links: IndependentLink[] = []
   let checkedFiles = 0
 
-  async function walk(dir: string): Promise<void> {
-    let entries
+  async function scanIndexedPath(indexedPath: string): Promise<void> {
+    const dir = join(root, indexedPath)
+    let files: readonly string[] = []
     try {
-      entries = await readdir(dir, { withFileTypes: true })
+      files = enumerateFilesRel(dir)
     } catch {
       return
     }
-    for (const entry of entries) {
-      const full = join(dir, entry.name)
-      const rel = full.slice(root.length + 1).replace(/\\/g, "/")
-      if (entry.isDirectory()) {
-        await walk(full)
-      } else if (entry.isFile() && rel.endsWith(".md")) {
-        checkedFiles += 1
-        let content: string
+    for (const relFile of files) {
+      if (!relFile.endsWith(".md")) continue
+      const rel = indexedPath === "." ? relFile : `${indexedPath}/${relFile}`
+      checkedFiles += 1
+      let content: string
+      try {
+        content = await readFile(join(root, rel), "utf8")
+      } catch {
+        continue
+      }
+      // Different regex pattern than Graph's parser for independence
+      for (const m of content.matchAll(/\[[^\]]*\]\(([^)\s]+)\)/g)) {
+        const target = m[1]
+        if (target === undefined) continue
+        if (/^[a-z]+:/i.test(target) || target.startsWith("#")) continue
+        const targetPath = target.split("#")[0] ?? ""
+        const sourceDir = dirname(rel)
+        const resolvedTarget = normalize(sourceDir === "." ? targetPath : join(sourceDir, targetPath))
+          .replace(/\\/g, "/")
+        let resolved = false
         try {
-          content = await readFile(full, "utf8")
+          const s = await stat(join(root, resolvedTarget))
+          resolved = s.isFile()
         } catch {
-          continue
+          resolved = false
         }
-        // Different regex pattern than Graph's parser for independence
-        for (const m of content.matchAll(/\[[^\]]*\]\(([^)\s]+)\)/g)) {
-          const target = m[1]
-          if (target === undefined) continue
-          if (/^[a-z]+:/i.test(target) || target.startsWith("#")) continue
-          const targetPath = target.split("#")[0] ?? ""
-          const sourceDir = dirname(rel)
-          const resolvedTarget = normalize(sourceDir === "." ? targetPath : join(sourceDir, targetPath))
-            .replace(/\\/g, "/")
-          let resolved = false
-          try {
-            const s = await stat(join(root, resolvedTarget))
-            resolved = s.isFile()
-          } catch {
-            resolved = false
-          }
-          const line = content.slice(0, m.index ?? 0).split("\n").length
-          links.push({ source_path: rel, target, line, resolved })
-        }
+        const line = content.slice(0, m.index ?? 0).split("\n").length
+        links.push({ source_path: rel, target, line, resolved })
       }
     }
   }
@@ -97,7 +95,7 @@ async function independentScan(root: string, config: ResolvedConfig): Promise<{
   for (const indexedPath of config.indexed_paths) {
     try {
       const s = await stat(join(root, indexedPath))
-      if (s.isDirectory()) await walk(join(root, indexedPath))
+      if (s.isDirectory()) await scanIndexedPath(indexedPath)
     } catch {
       // path doesn't exist, skip
     }

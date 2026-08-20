@@ -72,6 +72,12 @@ function setupTempEnv(
       fs.copyFileSync(path.join(SCRIPTS_DIR, f), path.join(scriptsDir, f));
     }
   }
+  fs.mkdirSync(path.join(scriptsDir, "lib"), { recursive: true });
+  for (const f of fs.readdirSync(path.join(SCRIPTS_DIR, "lib"))) {
+    if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+      fs.copyFileSync(path.join(SCRIPTS_DIR, "lib", f), path.join(scriptsDir, "lib", f));
+    }
+  }
   const scriptPath = path.join(scriptsDir, "lint_skills.ts");
 
   // Create .opencode/skills/ tree
@@ -111,6 +117,12 @@ function setupSrcEnv(
   for (const f of fs.readdirSync(SCRIPTS_DIR)) {
     if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
       fs.copyFileSync(path.join(SCRIPTS_DIR, f), path.join(scriptsDir, f));
+    }
+  }
+  fs.mkdirSync(path.join(scriptsDir, "lib"), { recursive: true });
+  for (const f of fs.readdirSync(path.join(SCRIPTS_DIR, "lib"))) {
+    if (f.endsWith(".ts") && !f.endsWith(".test.ts")) {
+      fs.copyFileSync(path.join(SCRIPTS_DIR, "lib", f), path.join(scriptsDir, "lib", f));
     }
   }
   const scriptPath = path.join(scriptsDir, "lint_skills.ts");

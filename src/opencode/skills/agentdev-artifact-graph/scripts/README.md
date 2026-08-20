@@ -14,8 +14,9 @@ scripts/
 │   ├── config.ts          # デフォルト設定、graph_config_digest、path utility
 │   ├── augmentation.ts    # augmentation 読込・解析、resolveConfig、resolveTraceModel
 │   ├── parse.ts           # frontmatter、markdown link、extension field parser
-│   ├── provenance.ts      # provenance hashing
-│   ├── input.ts           # 入力収集 + digest
+│   ├── provenance.ts       # provenance hashing
+│   ├── glob_walk.ts        # node:fs glob ベースの再帰列挙（リンク非追跡）
+│   ├── input.ts            # 入力収集 + digest
 │   ├── nodes.ts           # config 駆動ノード抽出
 │   ├── edges.ts           # config 駆動エッジ抽出
 │   ├── graph.ts           # build + load（動的 schema）
