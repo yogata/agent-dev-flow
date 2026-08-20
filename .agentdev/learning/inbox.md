@@ -380,3 +380,39 @@
 - **想定反映先**: case-run command / agentdev-workflow-case-run のテスト実行手順、agentdev-git-worktree の worktree セットアップ手順
 - **関連**: PR 2356、PR 2355、Epic 2351
 - **タグ**: `#worktree` `#bun-install` `#node_modules` `#case-run`
+
+---
+
+## 2026-08-21: 再帰列挙のディレクトリ単位エラー握り潰しは静かな部分レポートを生む（一過性の走査減少を実観測、移行後に伝播へ構造変更）
+
+- **問題事象**: 再帰ファイル探索移行（PR 2357）の検証中、旧 walk 実装群（ディレクトリ単位の catch でエラーを黙ってスキップする構造）で、Windows のディレクトリロック（AV 等が起因と推定）時に走査結果が一過性に減少する事象を観測した（tests_scanned 455→285、checked_files 481→473、scanned_files 500→484）。穏やかな状態では旧実装・新実装とも完全一致・決定的（10 連続実行で同一）。
+- **発生局面**: 実装（移行前後の before/after 比較検証時）
+- **検知方法**: 実リポジトリ出力の before/after 比較（列挙件数の突合で一過性減少を検出）
+- **根本原因**: 旧実装がディレクトリ単位のエラーを catch-and-skip しており、部分走査でも正常終了の体裁でレポートが出る。各 checker に列挙件数の期待値突合が存在しないため、静かな部分レポートを検出する手段がなかった。
+- **自律対応内容**: 移行後の共通ヘルパー（globWalkRel、enumerateFilesRel）は ENOENT 以外の走査エラーを伝播させ、静かな部分レポートを構造的に排除した。ただし Bun の globSync が内部で一部エラーを握り潰す可能性は残存する。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（checker-execution-contracts Design の移行契約どおり。エラー伝播方針の明文化は Design確定候補として intake item 2026-08-21-node-fs-glob-design-complement.md へ委譲）
+- **横展開観点**: ファイル列挙を前提とする全 checker・検証 harness。列挙件数を期待件数と突合する「二重確認」規約（パターンマッチ・網羅検査設計の標準規約）の適用候補。
+- **再発条件**: ディレクトリ単位でエラーを握り潰す走査実装が残存する場合、および外部ロック（AV、並列プロセス）により走査中にディレクトリが一時的に読めなくなる環境。
+- **予防策候補**: 各 checker の出力に列挙件数の期待値突合（固定期待値または前回実行値からの大幅減少警告）を導入する。
+- **想定反映先**: repo-agentdev-integrity の各 checker、checker-execution-contracts Design（列挙エラー伝播方針）
+- **関連**: PR 2357、Issue 2353、Epic 2351、.opencode/skills/repo-agentdev-integrity/scripts/lib/glob_walk.ts
+- **タグ**: `#再帰列挙` `#エラー握り潰し` `#部分走査` `#checker`
+
+---
+
+## 2026-08-21: Windows + Bun 1.3.10 の node:fs globSync はドット始まりパス要素を列挙できず junction/symlink を下降する（契約維持には補助経路が必須）
+
+- **問題事象**: node:fs glob 移行（PR 2357）の実行検証（TS-004）で、Bun 1.3.10（Windows）の fs.globSync に次の制約を実測した。(1) withFileTypes オプション非対応（エラー）、promise 形式 glob() は callback 必須。(2) ワイルドカードがドット始まりパス要素（.opencode、.agentdev 等）を列挙できない（cwd に直接指定したディレクトリ配下は列挙可）。(3) junction / symlink ディレクトリを下降する（旧 readdir 実装は非下降）。(4) 欠落 cwd は ENOENT throw。
+- **発生局面**: 実装（TS-004 可用性実行検証）
+- **検知方法**: bun 1.3.10 Windows での最小列挙実行と実リポジトリ出力の before/after 比較
+- **根本原因**: Bun の node:fs glob 実装が Node.js と完全互換でない（列挙表現力・走査挙動の差）。
+- **自律対応内容**: 走査ルート直下の隠しディレクトリは「トップレベル単一階層 readdir で発見 → cwd 直指定 glob で列挙」の補助パスで網羅（全 455 件が移行前と同一）。リンク経由パスは祖先 lstat 検査で除外し旧挙動を厳密維持。ENOENT はキャッチして空扱い。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（制約の明文化は Design確定候補として intake item 2026-08-21-node-fs-glob-design-complement.md へ委譲）
+- **横展開観点**: Bun + Windows で node:fs glob を使う全 scripts（repo-local checker、配布スキル scripts）。ドット名ディレクトリ配下の列挙とリンク非下降の両対策は glob_walk.ts 共通ヘルパー（repo-local・distributed 両版）が所有。
+- **再発条件**: glob のワイルドカードでドット始まりディレクトリ配下を直接列挙しようとした場合、およびリンク非下降契約を前提に glob の素の結果を使った場合。
+- **予防策候補**: node:fs glob 利用時は globWalkRel / enumerateFilesRel 共通ヘルパー経由に限定する。Bun バージョン更新時にドット要素列挙・withFileTypes 対応の再実測を行う。
+- **想定反映先**: checker-execution-contracts Design「再帰ファイル探索と CLI 引数解析の標準API移行」、glob_walk.ts（repo-local・distributed 両版）
+- **関連**: PR 2357、Issue 2353、Epic 2351
+- **タグ**: `#node-fs-glob` `#bun` `#windows` `#再帰列挙`
