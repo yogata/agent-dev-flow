@@ -5,6 +5,13 @@
  * (DEC-012 migration: 3-kind enum, id binding, placement, classification) and the
  * REQ-002-030/031 load-time contract (fail-open applies to malformed only).
  *
+ * YAML syntax parsing and structural validation are delegated to the shared
+ * distribution-side implementation (agentdev-project-extensions skill scripts,
+ * lib/extension_state.ts): Bun.YAML.parse for syntax, Zod for structure
+ * (REQ-044, DEC-019). No hand-rolled YAML parser remains here. State
+ * semantics (classification, old/unknown kind judgment) stay ADF-side in
+ * the shared lib; this checker owns the deterministic NG reporting contract.
+ *
  * Extension schema:
  *   frontmatter: version: 1,
  *                kind: workflow-extension | internal-workflow-extension | capability-skill-extension,
@@ -68,21 +75,25 @@ const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
 const os = require("os") as typeof import("os");
 
-export type ExtensionKind =
-  | "workflow-extension"
-  | "internal-workflow-extension"
-  | "capability-skill-extension";
+// Shared distribution-side state machine (Bun.YAML + Zod delegation,
+// REQ-044 / DEC-019). Relative import resolves identically in the main
+// checkout (junctioned skills) and in worktrees (junction not set up):
+// the src/opencode/ tree is the SoT in both environments (REQ-018).
+import {
+  NEW_EXTENSION_KINDS,
+  LEGACY_EXTENSION_KINDS,
+  parseExtensionYaml,
+  resolveExtensionState,
+  validateExtensionEntries,
+} from "../../../../src/opencode/skills/agentdev-project-extensions/scripts/lib/extension_state.ts";
 
-export const NEW_EXTENSION_KINDS: readonly ExtensionKind[] = [
-  "workflow-extension",
-  "internal-workflow-extension",
-  "capability-skill-extension",
-];
-
-export const LEGACY_EXTENSION_KINDS: readonly string[] = [
-  "command-extension",
-  "skill-extension",
-];
+// Re-export the shared contract under the historical module surface so
+// existing importers (tests, sibling checkers) keep working.
+export { NEW_EXTENSION_KINDS, LEGACY_EXTENSION_KINDS, resolveExtensionState };
+export type {
+  ExtensionKind,
+  ExtensionResolution,
+} from "../../../../src/opencode/skills/agentdev-project-extensions/scripts/lib/extension_state.ts";
 
 export type FailureClassification =
   | "malformed"
@@ -282,125 +293,6 @@ function listFilesRecursive(dirPath: string): string[] {
 }
 
 /**
- * Minimal YAML parser tailored to extension files (same constraints as the
- * earlier doc-input parser: top-level key: value, nested mapping by indent,
- * list of scalars, list of mappings with deeper-indent continuation,
- * inline arrays [a, b], inline empty mapping {}).
- */
-function parseSimpleYaml(text: string): any {
-  const lines = text.split(/\r?\n/);
-  const root: any = {};
-  const stack: { indent: number; node: any }[] = [{ indent: -1, node: root }];
-
-  function currentParent(indent: number): any {
-    while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
-      stack.pop();
-    }
-    return stack[stack.length - 1].node;
-  }
-
-  let i = 0;
-  while (i < lines.length) {
-    const rawLine = lines[i];
-    i++;
-    if (!rawLine.trim()) continue;
-    if (rawLine.trim().startsWith("#")) continue;
-    const indent = rawLine.length - rawLine.trimStart().length;
-    const line = rawLine.trim();
-
-    if (line.startsWith("- ")) {
-      const holder = currentParent(indent);
-      const owner = holder.__list_owner;
-      const key = holder.__list_key;
-      if (owner && key) {
-        if (!Array.isArray(owner[key])) owner[key] = [];
-        const rest = line.slice(2).trim();
-        const colonIdx = rest.indexOf(":");
-        if (
-          colonIdx !== -1 &&
-          !rest.startsWith("[") &&
-          !rest.startsWith('"') &&
-          !rest.startsWith("'")
-        ) {
-          const innerKey = rest.slice(0, colonIdx).trim().replace(/^["']|["']$/g, "");
-          const innerRaw = rest.slice(colonIdx + 1).trim();
-          const elem: any = {};
-          if (innerRaw === "") {
-            elem[innerKey] = null;
-          } else if (innerRaw.startsWith("[") && innerRaw.endsWith("]")) {
-            elem[innerKey] = innerRaw
-              .slice(1, -1)
-              .split(",")
-              .map((s) => s.trim().replace(/^["']|["']$/g, ""))
-              .filter((s) => s.length > 0);
-          } else {
-            elem[innerKey] = innerRaw.replace(/^["']|["']$/g, "");
-          }
-          owner[key].push(elem);
-          stack.push({ indent, node: elem });
-        } else {
-          owner[key].push(rest.replace(/^["']|["']$/g, ""));
-        }
-      }
-      continue;
-    }
-
-    const colonIdx = line.indexOf(":");
-    if (colonIdx === -1) continue;
-    const key = line.slice(0, colonIdx).trim().replace(/^["']|["']$/g, "");
-    const rawValue = line.slice(colonIdx + 1).trim();
-
-    let parent = currentParent(indent);
-
-    if (parent && parent.__list_owner !== undefined) {
-      const owner = parent.__list_owner;
-      const ownerKey = parent.__list_key;
-      const realNode: any = {};
-      owner[ownerKey] = realNode;
-      if (stack.length > 0 && stack[stack.length - 1].node === parent) {
-        stack[stack.length - 1].node = realNode;
-      }
-      parent = realNode;
-    }
-
-    if (rawValue === "") {
-      const holder: any = {
-        __list_owner: parent,
-        __list_key: key,
-      };
-      parent[key] = holder;
-      stack.push({ indent, node: holder });
-    } else if (rawValue.startsWith("[") && rawValue.endsWith("]")) {
-      parent[key] = rawValue
-        .slice(1, -1)
-        .split(",")
-        .map((s) => s.trim().replace(/^["']|["']$/g, ""))
-        .filter((s) => s.length > 0);
-    } else if (rawValue === "{}") {
-      parent[key] = {};
-    } else {
-      parent[key] = rawValue.replace(/^["']|["']$/g, "");
-    }
-  }
-
-  (function normalize(node: any): void {
-    if (node && typeof node === "object") {
-      for (const k of Object.keys(node)) {
-        const v = node[k];
-        if (v && typeof v === "object" && v.__list_owner !== undefined) {
-          node[k] = [];
-        } else if (Array.isArray(v)) {
-          for (const e of v) normalize(e);
-        } else if (v && typeof v === "object") {
-          normalize(v);
-        }
-      }
-    }
-  })(root);
-  return root;
-}
-
-/**
  * Known project-local skill locations for check #10 existence confirmation.
  * Returns true if a directory matching the skill name exists in any known
  * skills location. Paths are resolved against repoRoot (cwd-independent).
@@ -450,52 +342,6 @@ export function deriveSkillClassification(repoRoot?: string): SkillClassificatio
   return { workflowSkills, capabilitySkills };
 }
 
-export type ExtensionResolution =
-  | { state: "missing" }
-  | { state: "malformed"; reasons: string[] }
-  | { state: "migration-required"; kind: string }
-  | { state: "schema-violation"; kind: string }
-  | { state: "valid"; kind: ExtensionKind };
-
-/**
- * Load-time state classification shared by the runtime resolver contract and
- * the deterministic checks (UC-001 case 1). Judgment order matters: required
- * field problems (malformed, fail-open at runtime) are judged before the kind
- * value; legacy and unknown kinds are only classified once every required
- * field is syntactically present. parseSimpleYaml never throws, so YAML
- * syntax errors degrade into missing required fields (malformed).
- */
-export function resolveExtensionState(rawText: string | null): ExtensionResolution {
-  if (rawText === null) return { state: "missing" };
-  const parsed = parseSimpleYaml(rawText);
-  const reasons: string[] = [];
-  if (parsed.version === undefined || String(parsed.version) !== "1") {
-    reasons.push(`required field 'version' must be 1 (got: ${parsed.version})`);
-  }
-  if (typeof parsed.kind !== "string" || parsed.kind.length === 0) {
-    reasons.push("required field 'kind' is missing or not a string");
-  }
-  if (typeof parsed.id !== "string" || parsed.id.length === 0) {
-    reasons.push("required field 'id' is missing or not a string");
-  }
-  for (const sec of ["context", "rules", "checks", "acceptance_gates", "must_not"]) {
-    if (parsed[sec] === undefined || parsed[sec] === null) {
-      reasons.push(`required section '${sec}' is missing (use an empty array if no entries)`);
-    } else if (!Array.isArray(parsed[sec])) {
-      reasons.push(`required section '${sec}' must be an array`);
-    }
-  }
-  if (reasons.length > 0) return { state: "malformed", reasons };
-  const kind = parsed.kind as string;
-  if (LEGACY_EXTENSION_KINDS.includes(kind)) {
-    return { state: "migration-required", kind };
-  }
-  if (!NEW_EXTENSION_KINDS.includes(kind as ExtensionKind)) {
-    return { state: "schema-violation", kind };
-  }
-  return { state: "valid", kind: kind as ExtensionKind };
-}
-
 interface ExtensionWalkResult {
   pathsReferenced: string[];
   skillsReferenced: string[];
@@ -506,74 +352,49 @@ interface ExtensionWalkResult {
 /**
  * Walk context/rules/checks sections to collect path strings, skill names,
  * and detect override-intent phrases (check #13 heuristic). Called only for
- * extensions whose load-time state is "valid".
+ * extensions whose load-time state is "valid". Entry structure violations
+ * (check #11) come from the shared Zod validation in extension_state.ts.
  */
-function walkExtension(parsed: any, rawText: string, rcFile: string): ExtensionWalkResult {
+function walkExtension(parsedDoc: unknown, rawText: string, rcFile: string): ExtensionWalkResult {
   const pathsReferenced: string[] = [];
   const skillsReferenced: string[] = [];
   const failures: CheckFailure[] = [];
 
-  // context: array of {id, when?, paths?, purpose?}
-  if (Array.isArray(parsed.context)) {
-    for (let idx = 0; idx < parsed.context.length; idx++) {
-      const e = parsed.context[idx];
-      if (!e || typeof e !== "object") {
-        failures.push({
-          check: 11,
-          check_name: "extension-structure",
-          severity: "strict",
-          classification: "malformed",
-          file: rcFile,
-          message: `context[${idx}] must be an object`,
-        });
-        continue;
-      }
-      if (typeof e.id !== "string") {
-        failures.push({
-          check: 11,
-          check_name: "extension-structure",
-          severity: "strict",
-          classification: "malformed",
-          file: rcFile,
-          message: `context[${idx}] missing 'id' string`,
-        });
-      }
-      if (Array.isArray(e.paths)) {
-        for (const p of e.paths) {
-          if (typeof p === "string") pathsReferenced.push(p);
+  for (const message of validateExtensionEntries(parsedDoc)) {
+    failures.push({
+      check: 11,
+      check_name: "extension-structure",
+      severity: "strict",
+      classification: "malformed",
+      file: rcFile,
+      message,
+    });
+  }
+
+  const doc =
+    parsedDoc !== null && typeof parsedDoc === "object" && !Array.isArray(parsedDoc)
+      ? (parsedDoc as Record<string, unknown>)
+      : null;
+  if (doc) {
+    if (Array.isArray(doc.context)) {
+      for (const e of doc.context) {
+        if (!e || typeof e !== "object" || Array.isArray(e)) continue;
+        const entry = e as Record<string, unknown>;
+        if (Array.isArray(entry.paths)) {
+          for (const p of entry.paths) {
+            if (typeof p === "string") pathsReferenced.push(p);
+          }
         }
       }
     }
-  }
-
-  // rules / checks: array of {id, when?, skill?}
-  for (const sec of ["rules", "checks"] as const) {
-    if (Array.isArray(parsed[sec])) {
-      for (let idx = 0; idx < parsed[sec].length; idx++) {
-        const e = parsed[sec][idx];
-        if (!e || typeof e !== "object") {
-          failures.push({
-            check: 11,
-            check_name: "extension-structure",
-            severity: "strict",
-            classification: "malformed",
-            file: rcFile,
-            message: `${sec}[${idx}] must be an object`,
-          });
-          continue;
-        }
-        if (typeof e.id !== "string") {
-          failures.push({
-            check: 11,
-            check_name: "extension-structure",
-            severity: "strict",
-            classification: "malformed",
-            file: rcFile,
-            message: `${sec}[${idx}] missing 'id' string`,
-          });
-        }
-        if (typeof e.skill === "string" && e.skill.length > 0) {
-          skillsReferenced.push(e.skill);
+    for (const sec of ["rules", "checks"] as const) {
+      if (Array.isArray(doc[sec])) {
+        for (const e of doc[sec]) {
+          if (!e || typeof e !== "object" || Array.isArray(e)) continue;
+          const entry = e as Record<string, unknown>;
+          if (typeof entry.skill === "string" && entry.skill.length > 0) {
+            skillsReferenced.push(entry.skill);
+          }
         }
       }
     }
@@ -715,8 +536,17 @@ export function checkExtensions(repoRoot: string): CheckReport {
         }
       }
 
-      const parsed = parseSimpleYaml(rcText);
-      const id = typeof parsed.id === "string" ? parsed.id : "";
+      // resolution.state === "valid" guarantees the parse succeeded, so the
+      // re-parse below cannot fail; it exists because resolveExtensionState
+      // returns only the state, not the parsed document.
+      const reparsed = parseExtensionYaml(rcText);
+      const parsedDoc = reparsed.ok ? reparsed.data : null;
+      const id =
+        parsedDoc !== null &&
+        typeof parsedDoc === "object" &&
+        typeof (parsedDoc as Record<string, unknown>).id === "string"
+          ? ((parsedDoc as Record<string, unknown>).id as string)
+          : "";
 
       // Check #3: id-target consistency
       const fileBase = segments[segments.length - 1]?.replace(/\.ya?ml$/, "") ?? "";
@@ -806,7 +636,7 @@ export function checkExtensions(repoRoot: string): CheckReport {
       }
 
       // Walk sections: collect paths/skills, check structure, override phrases
-      const walk = walkExtension(parsed, rcText, rc);
+      const walk = walkExtension(parsedDoc, rcText, rc);
       failures.push(...walk.failures);
 
       // Check #9: context.paths existence
