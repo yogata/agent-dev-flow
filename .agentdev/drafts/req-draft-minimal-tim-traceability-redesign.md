@@ -247,7 +247,7 @@ artifact_actions:
       operation: update
       domain: foundations
       slug: traceability-model
-    target_area: "# Traceability Information Model（TIM）語彙カタログ（文書全体を置換）"
+    target_area: "# Traceability Information Model（TIM）語彙カタログ"
     source_items: [AG-001, AG-008]
     content: |
       # 指示: frontmatter を title: 最小トレーサビリティモデル（TIM）、status: draft、created: "2026-08-17"、updated: "2026-08-21" へ変更し、本文全体を以下へ置換する。
@@ -454,8 +454,9 @@ req_save_result:
 
 design_save_result:
   created_design_docs: [skills/agentdev-traceability.md]
+  updated_design_docs: [foundations/traceability-model.md]
   artifact_action_results:
-    ACT-DESIGN-001: "skipped: target_area matches 空（search-target-area.ts 完全一致規約により未検出。target_area 末尾の注記『（文書全体を置換）』が H1 見出しテキスト『Traceability Information Model（TIM）語彙カタログ』と完全一致しない）→ follow-up: draft の target_area から注記を除去して design-save を再実行するか、operation を create へ切り替えることを推奨（docs/designs/foundations/traceability-model.md は未変更）"
+    ACT-DESIGN-001: "applied: docs/designs/foundations/traceability-model.md 本文全体置換・frontmatter 変更（title: 最小トレーサビリティモデル（TIM）、status: draft 維持、created: 2026-08-17、updated: 2026-08-21）。target_area は case-auto の bounded parent decision resolution による注記除去（2026-08-21）後の単一マッチ（search-target-area.ts line 8 H1）を確認して適用。docs/designs/README.md 基盤 Design 一覧（foundations/ 表）のタイトル・責務を行内容へ更新"
     ACT-DESIGN-002: "applied: docs/designs/skills/agentdev-traceability.md 新規作成（frontmatter: title/status: draft/created/updated、本文 verbatim、docs/designs/README.md skill Design 一覧へ登録済み、check-entry-existence 合格）"
 
 test_strategy:
