@@ -40,6 +40,18 @@
       "count": 1
     },
     {
+      "file": "src/opencode/skills/agentdev-artifact-graph/references/augmentation.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
+      "file": "src/opencode/skills/agentdev-artifact-graph/scripts/effectiveness/README.md",
+      "pattern": "docs/designs/",
+      "severity": "heuristic",
+      "count": 1
+    },
+    {
       "file": "src/opencode/skills/agentdev-artifact-graph/scripts/effectiveness/README.md",
       "pattern": "src/opencode/",
       "severity": "strict",

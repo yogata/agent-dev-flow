@@ -22,7 +22,7 @@ const FEATURE_STEM = "feature"
 const FEATURE_MD = `${FEATURE_STEM}.md`
 export const NOWHERE_MD = "nowhere.md"
 
-export const SPEC_PATH = `docs/specs/${FEATURE_MD}`
+export const SPEC_PATH = `docs/designs/${FEATURE_MD}`
 export const SRC_PATH = `src/${FEATURE_STEM}.ts`
 
 export const REQ1_NODE = `requirement:${T_REQ1}`
@@ -32,7 +32,7 @@ export const REQ4_NODE = `requirement:${T_REQ4}`
 export const REQ5_NODE = `requirement:${T_REQ5}`
 export const DEC1_NODE = `decision:${T_DEC1}`
 export const DEC2_NODE = `decision:${T_DEC2}`
-export const SPEC_NODE = `specification:${SPEC_PATH}`
+export const SPEC_NODE = `design:${SPEC_PATH}`
 export const HUB_NODE = "index_doc:hub.md"
 export const SRC_NODE = `source_code:${FEATURE_STEM}.ts`
 
@@ -86,7 +86,7 @@ export function traceAugmentationYaml(options: {
     "relation_constraints:",
     "  - relation_type: implemented_by",
     "    allowed_source_types:",
-    "      - specification",
+    "      - design",
     "    allowed_target_types:",
     "      - source_code",
   )
@@ -101,7 +101,7 @@ status: accepted
 ---
 # Representative requirement
 
-See [decision](../decisions/${T_DEC1}.md) and [spec](../specs/${FEATURE_MD}).
+See [decision](../decisions/${T_DEC1}.md) and [design](../designs/${FEATURE_MD}).
 `,
   [`docs/requirements/${T_REQ2}.md`]: `---
 id: ${T_REQ2}
@@ -150,13 +150,13 @@ status: accepted
 ---
 # Current decision
 
-See [specification](../specs/${FEATURE_MD}).
+See [design](../designs/${FEATURE_MD}).
 `,
   [SPEC_PATH]: `---
-title: Feature specification
+title: Feature design
 implemented_by: ${SRC_PATH}
 ---
-# Feature specification
+# Feature design
 
 See [req3](../requirements/${T_REQ3}.md).
 `,
@@ -165,7 +165,7 @@ See [req3](../requirements/${T_REQ3}.md).
 - [req1](../requirements/${T_REQ1}.md)
 - [dec1](../decisions/${T_DEC1}.md)
 - [dec2](../decisions/${T_DEC2}.md)
-- [spec](../specs/${FEATURE_MD})
+- [design](../designs/${FEATURE_MD})
 `,
   [SRC_PATH]: `export const feature = 1
 `,

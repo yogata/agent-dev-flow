@@ -190,7 +190,7 @@ export function resolveConfig(augmentation: AugmentationFile | undefined): Resol
     }
   }
   // Augmentation rules take priority over defaults: more specific project patterns
-  // are tried before general standard patterns (e.g., integrity_rule before specification).
+  // are tried before general standard patterns (e.g., integrity_rule before design).
   const nodeRules = [...augmentedNodeRules, ...baseNodeRules]
 
   const relRules: RelationTypeRule[] = [...base.relation_type_rules]

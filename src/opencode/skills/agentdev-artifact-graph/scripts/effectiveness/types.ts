@@ -17,7 +17,7 @@ import type { GraphQuery } from "../lib/query.ts"
 
 /**
  * REQ-{NNNN}-{NNN} が定める 6 つの workflow question category。
- *SPEC「効果検証 › Workflow effectiveness」節と 1:1 で対応する。
+ *Design「効果検証 › Workflow effectiveness」節と 1:1 で対応する。
  */
 export const QUERY_CATEGORIES = [
   "req-change-impact",
@@ -36,7 +36,7 @@ export type QueryCategory = (typeof QUERY_CATEGORIES)[number]
  */
 export const CATEGORY_LABELS: Readonly<Record<QueryCategory, string>> = {
   "req-change-impact": "REQ の変更影響候補",
-  "same-canonical-owner": "同一 canonical owner の SPEC",
+  "same-canonical-owner": "同一 canonical owner の Design",
   "related-command-skill-ir": "関連 command, skill, integrity rule",
   "delegation-target-skill": "command から実際に委譲される skill",
   "superseded-current-refs": "superseded artifact への現行参照",
@@ -98,7 +98,7 @@ export type GraphQuerySpec =
 export type GraphResultFilter = {
   /**
    * 残す node type の集合。undefined は「全 node type」。
-   * 例: ["specification", "requirement", "decision"] — source_file を除外。
+   * 例: ["design", "requirement", "decision"] — source_file を除外。
    */
   readonly includeTypes?: readonly string[]
   /** 結果から除外する node ID の集合（self 等）。 */

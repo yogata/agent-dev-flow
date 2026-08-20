@@ -11,7 +11,7 @@ updated: 2026-08-18
 
 TIM の成果物型、トレースリンク型、関係の意味、関係制約のカタログを正規所有する。
 agentdev-artifact-graph の派生索引生成と高位問い合わせは本カタログを正とする。
-REQ-012 が要件契約を、本 SPEC が語彙・意味定義の実体を所管する。
+REQ-012 が要件契約を、本 Design が語彙・意味定義の実体を所管する。
 
 ## TIM が表現する要素の定義
 
@@ -31,16 +31,16 @@ TIM は次の8要素を表現する。
 
 TIM とその実装の位置関係は次のとおりである。
 
-- トレーサビリティ機能は、TIM、Trace Index、Trace Query、ADF Integration の4層へ分離される（DEC-017 決定5）。本 SPEC は TIM 層の語彙と意味定義を所管する
+- トレーサビリティ機能は、TIM、Trace Index、Trace Query、ADF Integration の4層へ分離される（DEC-017 決定5）。本 Design は TIM 層の語彙と意味定義を所管する
 - グラフの物理保存形式（`.agentdev/graph/` 配下の派生索引ファイル群）は、TIM そのものとみなさない。TIM は論理モデルであり、保存形式は Trace Index 層の実装詳細である
-- Artifact Graph は、TIM に基づくトレーサビリティ情報から生成される再生成可能な派生索引であり、正規情報源ではない。正規情報源は正規成果物（REQ、Decision、SPEC 等）である
+- Artifact Graph は、TIM に基づくトレーサビリティ情報から生成される再生成可能な派生索引であり、正規情報源ではない。正規情報源は正規成果物（REQ、Decision、Design 等）である
 
 採用語彙の表記は英字 snake_case（例: `satisfies`）を正とする。
 標準語彙の原名（例: OSLC の `satisfiedBy`）は、対応表の出典欄に記す。
 
 ## 標準成果物型カタログ
 
-標準コアの成果物型は、永続文書種別に対応する最小集合（`requirement`、`decision`、`specification`）とし、それ以外は augmentation が追加する（REQ-012-003）。
+標準コアの成果物型は、永続文書種別に対応する最小集合（`requirement`、`decision`、`design`）とし、それ以外は augmentation が追加する（REQ-012-003）。
 
 ### 成果物型対応表
 
@@ -48,13 +48,13 @@ TIM とその実装の位置関係は次のとおりである。
 |---|---|---|---|---|---|
 | `requirement` | システムが満たすべき成果の定義 | Requirement | Requirement | req | 標準語彙 |
 | `decision` | 意思決定の記録とその判断根拠 | 対応なし | 対応なし | 対応なし | ADF 固有拡張 |
-| `specification` | 現行アーキテクチャの記述 | 対応なし | 対応なし | dsn 等の設計系成果物型 | 標準語彙（概念的対応は OpenFastTrace） |
+| `design` | 現行アーキテクチャの記述 | 対応なし | 対応なし | dsn 等の設計系成果物型 | 標準語彙（概念的対応は OpenFastTrace） |
 
 対応の根拠は次のとおりである。
 
 - `requirement`: SysML の Requirement、OSLC Requirements Management の Requirement、OpenFastTrace の req 成果物型はいずれも要件成果物を表し、意味の一致度が高い
 - `decision`: 意思決定記録をトレーサビリティの正規成果物型とする標準は、SysML、OSLC、OpenFastTrace のいずれにも存在しない。Decision を ADF 固有の拡張成果物型として TIM へ追加する（DEC-017 決定3、REQ-012-020）
-- `specification`: SysML はモデル要素を対象とするため文書成果物型を持たず、OSLC Requirements Management は要件管理に限定される。OpenFastTrace は req 以外に設計（dsn）等の複数の成果物型を持ち、仕様書類を複数型で表現する。`specification` はこの概念的対応に基づく標準語彙とする
+- `design`: SysML はモデル要素を対象とするため文書成果物型を持たず、OSLC Requirements Management は要件管理に限定される。OpenFastTrace は req 以外に設計（dsn）等の複数の成果物型を持ち、仕様書類を複数型で表現する。`design` はこの概念的対応（設計系成果物型 dsn）に基づく標準語彙とする
 
 ### Decision の関係表現
 
@@ -203,17 +203,17 @@ related は、明示的なトレースと一般参照のすべてを返すため
 | `specifies` | 仕様的位置づけの成果物型 | `requirement` |
 | `constrains` | 任意 | 任意 |
 | `depends_on` | 任意 | 任意 |
-| `realizes` | 任意 | `requirement` または `specification` |
+| `realizes` | 任意 | `requirement` または `design` |
 | `satisfies` | 任意 | `requirement` |
-| `implements` | 任意 | `requirement` または `specification` |
-| `verifies` | 任意 | `requirement` または `specification` |
+| `implements` | 任意 | `requirement` または `design` |
+| `verifies` | 任意 | `requirement` または `design` |
 | `validates` | 任意 | `requirement` |
 | `supersedes` | リンク先と同一の成果物型 | リンク元と同一の成果物型 |
 | `references` | 任意 | 任意 |
 | `extends` | 任意 | 任意 |
 
-「任意」は、標準コアの3成果物型（`requirement`、`decision`、`specification`）と拡張成果物型のいずれも許容する。
-「仕様的位置づけの成果物型」は、`specification` および仕様の役割を持つ拡張成果物型を指す。
+「任意」は、標準コアの3成果物型（`requirement`、`decision`、`design`）と拡張成果物型のいずれも許容する。
+「仕様的位置づけの成果物型」は、`design` および仕様の役割を持つ拡張成果物型を指す。
 プロジェクト拡張で追加する関係型の制約は、augmentation 側の意味定義に従う（「拡張関係型の意味定義様式」節）。
 
 ### diagnostics 判定の扱い
@@ -323,7 +323,7 @@ SysML、OSLC、OpenFastTrace の間で、語形と意味が完全に一致する
 
 ## See Also
 
-- [agentdev-artifact-graph SPEC](../skills/agentdev-artifact-graph.md): 派生索引の生成、検査、問い合わせの契約
+- [agentdev-artifact-graph Design](../skills/agentdev-artifact-graph.md): 派生索引の生成、検査、問い合わせの契約
 - [REQ-012](../../requirements/REQ-012.md): TIM と Trace Index 層の要件契約
 - [REQ-040](../../requirements/REQ-040.md): Trace Query 層の要件
 - [DEC-017](../../decisions/DEC-017.md): TIM 準拠トレーサビリティモデルの採用と4層分離

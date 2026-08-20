@@ -52,15 +52,15 @@ bun effectiveness/run.ts --root ../../../../../.. --graph ../../../../../../.age
 | id 接頭辞 | category | 質問の代表例 |
 |---|---|---|
 | Q1 | `req-change-impact` | REQ-{NNNN} を変更した場合、影響を受ける成果物は何か？ |
-| Q2 | `same-canonical-owner` | canonical_owner が `agentdev-artifact-graph` である SPEC はどれか？ |
-| Q3 | `related-command-skill-ir` | agentdev-artifact-graph SPEC に関連する command / skill / IR は何か？ |
+| Q2 | `same-canonical-owner` | title が `agentdev-artifact-graph Design` である Design（関心キー `agentdev-artifact-graph` の正規 Design）はどれか？ |
+| Q3 | `related-command-skill-ir` | agentdev-artifact-graph Design に関連する command / skill / IR は何か？ |
 | Q4 | `delegation-target-skill` | case-close command が実際に委譲する skill は何か？ |
 | Q5 | `superseded-current-refs` | superseded な成果物を、現行の成果物がまだ参照しているか？ |
-| Q6 | `post-change-dangling-relation` | 当該 SPEC を削除した場合、どの relation が dangling になるか？ |
+| Q6 | `post-change-dangling-relation` | 当該 Design を削除した場合、どの relation が dangling になるか？ |
 
 各 query の `groundTruthRationale` は ground truth を選んだ根拠を明示し、追跡可能性を
 確保する。各 query は real artifact（`docs/requirements/<REQ-*>.md`, `docs/decisions/<DEC-*>.md`,
-`docs/specs/**`, `src/opencode/{commands,skills}/**`, `.agentdev/extensions/**`）のみを
+`docs/designs/**`, `src/opencode/{commands,skills}/**`, `.agentdev/extensions/**`）のみを
 参照し、mock/stub は使用しない。
 
 ## 6 つの比較観点
@@ -83,13 +83,13 @@ recall / false candidate / canonical reach / search effort は Graph 側・独�
 
 - harness は常に終了コード 0 を返す。metrics が閾値を外れても失敗扱いにしない。
 - 出力 report の冒頭に「本検証は診断目的であり、性能閾値による合否判定は行わない」を明示する。
-- Artifact Graph 自身の接続確認のみを workflow effectiveness の成立根拠としない（SPEC「効果検証」節）。
+- Artifact Graph 自身の接続確認のみを workflow effectiveness の成立根拠としない（Design「効果検証」節）。
   本 harness は Graph 結果と独立探索結果の差を可視化し、Graph の追加価値を観察可能にする。
 
 ## Parser/Graph regression との境界（REQ-{NNNN}）
 
 Parser / augmentation / extraction / provenance の正確性検証は **REQ-{NNNN}** 傘下の検証層
-（`tests/*.test.ts` と REQ-{NNNN} 関連 SPEC）が所有する。本 harness は以下を取り扱わない:
+（`tests/*.test.ts` と REQ-{NNNN} 関連 Design）が所有する。本 harness は以下を取り扱わない:
 
 - Graph が正しく node / edge を抽出しているかの回帰検証
 - augmentation 設定の妥当性検証
@@ -111,6 +111,6 @@ Parser / augmentation / extraction / provenance の正確性検証は **REQ-{NNN
 ## 関連情報
 
 - [REQ-{NNNN}-{NNN}](../../../../../../../docs/requirements/REQ-{NNNN}.md) — 本体要件
-- [SPEC agentdev-artifact-graph「効果検証」節](../../../../../../../docs/specs/<skills/agentdev-artifact-graph>.md) — 検証方針
+- [Design agentdev-artifact-graph「効果検証」節](../../../../../../../docs/designs/<skills/agentdev-artifact-graph>.md) — 検証方針
 - [REQ-{NNNN}](../../../../../../../docs/requirements/REQ-{NNNN}.md) — Parser/Graph regression の対象外根拠
 - 親 [README.md](../README.md) — scripts 全体構成

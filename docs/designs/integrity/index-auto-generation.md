@@ -1,23 +1,23 @@
 ---
-title: 索引類自動生成 SPEC
+title: 索引類自動生成 Design
 status: accepted
 created: 2026-07-19
 updated: 2026-08-18
 ---
 
-# 索引類自動生成 SPEC
+# 索引類自動生成 Design
 
 README 群、索引類、件数表明を実ファイルの frontmatter から再生成する機構を定義する。
 人手更新に依存する件数や一覧の追記漏れを構造的に根絶し、実体と索引の不整合を発生させない。
 
-本 SPEC は機構の契約を定義し、実装（生成スクリプト、CI 組込、pre-commit hook 等）は対象外とする。
+本 Design は機構の契約を定義し、実装（生成スクリプト、CI 組込、pre-commit hook 等）は対象外とする。
 
 ## 適用範囲
 
 - **現在自動生成される領域**: 実装済みAUTOGENブロックで生成される件数、一覧、status別ビュー、IR索引、関連マッピング、メトリクス例
 - **現在人手管理される領域**: ADRトピック別ビュー、Decision Map、ADR関連REQ表、REQ移行判定
 - **現在混合管理される領域**: 自動生成列と人手管理列が同一表に共存し、生成実装が対象列だけを更新する領域
-- **対象外**: REQ、Decision、SPEC本文そのもの、および未実装の将来自動生成計画
+- **対象外**: REQ、Decision、Design本文そのもの、および未実装の将来自動生成計画
 ## 自動生成の対象領域と生成元
 
 | 索引類 | 現在の管理 | 生成元 |
@@ -25,11 +25,11 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 | `docs/requirements/README.md`のREQ一覧・件数 | 自動生成 | REQ frontmatter |
 | `docs/decisions/README.md`の基盤一覧・status別一覧・件数 | 自動生成 | Decision frontmatter |
 | `docs/decisions/README.md`のトピック別ビュー・Decision Map・関連REQ表 | 人手管理 | Decision本文と人手判断 |
-| `docs/designs/README.md`のSPEC一覧・status列 | 現行実装に従う混合管理 | SPEC frontmatterと人手管理列 |
+| `docs/designs/README.md`のDesign一覧・status列 | 現行実装に従う混合管理 | Design frontmatterと人手管理列 |
 | integrity rule catalogとrule ownershipのAUTOGENブロック | 自動生成 | 個別IR文書 |
-| REQ/SPECメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
+| REQ/Designメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
 
-管理区分を変更する場合は、本SPEC、生成実装、検査実装を同時に整合させる。
+管理区分を変更する場合は、本Design、生成実装、検査実装を同時に整合させる。
 ## 生成規則
 
 ### 件数表明
@@ -64,7 +64,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 
 AUTOGEN 計測ブロック（`req-metrics-measurement-example`、`spec-metrics-measurement-example` 等）の計測日は、実行時日付（`new Date()`）ではなく対象ドキュメント群の最終コミット日付から導出する。
 
-- 計測日として対象ドキュメント群（REQ 実ファイル群、SPEC 実ファイル群等）の最終コミット日付の最大値を用いる
+- 計測日として対象ドキュメント群（REQ 実ファイル群、Design 実ファイル群等）の最終コミット日付の最大値を用いる
 - 導出方式変更に伴い、計測日を含む AUTOGEN ブロックはドキュメント群に実変更がない限り鮮度を失わない
 - 鮮度判定（IR-061、autogen-freshness-gate）への影響: 実行時日付起因の日次陳腐化検出（構造的再検出）が解消される。計測日は「対象ドキュメント群の鮮度」を表す指標として機能する
 
@@ -111,20 +111,20 @@ rule-ownership appendix は IR 別関連マッピング表を CSV ライクな M
 | IR ID | `IR-NNN` 形式 | ファイル名由来 |
 | title | IR 個別ファイルの H1 から抽出したタイトル | セル内パイプ・改行はサニタイズ |
 | Related REQ | `related_req` 値（カンマ区切り）、無ければ `-` | frontmatter または本文 Field/Value 表由来 |
-| Related SPEC | `related_spec` 値（カンマ区切り）、無ければ `-` | 同上 |
+| Related Design | `related_design` 値（カンマ区切り）、無ければ `-` | 同上 |
 
-ヘッダー行と分離行は固定（`| IR ID | title | Related REQ | Related SPEC |` / `|-------|-------|-------------|--------------|`）。
+ヘッダー行と分離行は固定（`| IR ID | title | Related REQ | Related Design |` / `|-------|-------|-------------|--------------|`）。
 セル内にパイプ・改行が現れる場合は表構造を保持するためサニタイズする（catalog と同一規則）。
 
-### SPEC 行数計測の AUTOGEN ブロック除外
+### Design 行数計測の AUTOGEN ブロック除外
 
-SPEC 健全性メトリクス（`design-health-metrics.md`「SPEC 計測例」）は SPEC 本文行数を計測する。
-計測対象 SPEC 自体に AUTOGEN ブロックが含まれる場合、AUTOGEN ブロックを行数計測対象から除外する。
+Design 健全性メトリクス（`design-health-metrics.md`「Design 計測例」）は Design 本文行数を計測する。
+計測対象 Design 自体に AUTOGEN ブロックが含まれる場合、AUTOGEN ブロックを行数計測対象から除外する。
 
 除外により以下の2要件を両立する。
 
-- SPEC 健全性: 人手執筆部分の肥大化検出を維持する（AUTOGEN 由来の行数は人手執筆ではない）
-- べき等性: AUTOGEN ブロック自身が計測結果に影響しない。AUTOGEN ブロックのサイズ変動が SPEC 行数シグナルへ伝播する自己増幅ループを防止する
+- Design 健全性: 人手執筆部分の肥大化検出を維持する（AUTOGEN 由来の行数は人手執筆ではない）
+- べき等性: AUTOGEN ブロック自身が計測結果に影響しない。AUTOGEN ブロックのサイズ変動が Design 行数シグナルへ伝播する自己増幅ループを防止する
 
 対象は AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->` 〜 `<!-- AUTOGEN:END -->`）のみ。
 一般 HTML コメント（`<!-- ... -->`、複数行可）も同一規則で除外するが、コメント開始/終了と同一行にある本文は除外せず残置する。
@@ -140,7 +140,7 @@ SPEC 健全性メトリクス（`design-health-metrics.md`「SPEC 計測例」�
 3. **混合領域**: 一覧表のうち一部列のみ自動生成、他列は人手編集とする場合。生成スクリプトは当該列のみ上書きし、他列を保持する
 
 自動生成マーカーの形式は実装の段階導入で確定する。
-本 SPEC は領域分離の必要性のみを宣言する。
+本 Design は領域分離の必要性のみを宣言する。
 
 ### 複数 AUTOGEN ブロック分割（catalog 2ブロック分割ポリシー）
 
@@ -167,7 +167,7 @@ catalog は欠番 IR-045（削除済み、ファイル不在）を挟む2ブロ�
 
 ## 現在稼働している自動生成契約
 
-本 SPEC が定義する機構は現在以下の契約で稼働している。
+本 Design が定義する機構は現在以下の契約で稼働している。
 
 1. **現在 AUTOGEN されている領域**: frontmatter 由来で機械生成される件数、一覧、ステータス別ビュー等。
 生成スクリプト `.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` が存在し、AUTOGEN ブロック（HTML コメント形式 `<!-- AUTOGEN:BEGIN:id=xxx --> ... <!-- AUTOGEN:END -->`）で囲まれた領域を上書きする。
@@ -191,7 +191,7 @@ backtick 文脈判定のような部分一致ロジックは併用しない。
 
 以下4領域は現在契約上の自動生成対象外（人手管理領域）として確定する。
 これは「永久に自動化しない」決定ではなく、「現在実装されていない機能を実装済み契約として扱わない」決定である。
-将来、導出規則と生成機構を別要件で確定すれば本 SPEC を更新できる自動生成拡張ポイントである。
+将来、導出規則と生成機構を別要件で確定すれば本 Design を更新できる自動生成拡張ポイントである。
 
 - **ADR README トピック別ビュー**: 人手管理。導出規則未確定のため。
 - **ADR README Decision Map**: 人手管理。各 ADR 本文の宣言から導出するが、導出規則が未確定のため。
@@ -200,6 +200,6 @@ backtick 文脈判定のような部分一致ロジックは併用しない。
 
 ## 関連情報
 
-- 関連 REQ: REQ-001（文書・REQ 管理基準）、REQ-001（SPEC status 追跡と draft 放置検出）
-- 関連 SPEC: `docs/designs/foundations/numbering-policy.md`（採番管理）、`docs/designs/integrity/integrity-rule-catalog.md`（整合性ルールカタログ）、`docs/designs/integrity/integrity-contracts.md`（整合性契約）
+- 関連 REQ: REQ-001（文書・REQ 管理基準）、REQ-001（Design status 追跡と draft 放置検出）
+- 関連 Design: `docs/designs/foundations/numbering-policy.md`（採番管理）、`docs/designs/integrity/integrity-rule-catalog.md`（整合性ルールカタログ）、`docs/designs/integrity/integrity-contracts.md`（整合性契約）
 - 検査契約: IR-061（index generation consistency）、IR-038（ADR index consistency）、IR-039（index REQ title consistency）、IR-042（hardcoded req count）

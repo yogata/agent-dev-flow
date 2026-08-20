@@ -12,7 +12,7 @@
 # path_pattern "a^" は不一致パターンであり、ルールベース抽出ではマッチしない。
 #
 # 拡張関係型の意味定義と source_file の役割宣言は TIM 語彙カタログ SPEC
-# （docs/specs/foundations/traceability-model.md）の定める宣言様式に従う
+# （docs/designs/foundations/traceability-model.md）の定める宣言様式に従う
 # （「拡張関係型の意味定義様式」「索引・集約成果物の役割識別」、Issue #2204 で適用）。
 # source_file 型はグラフモデル上の非正規ファイル層であり、README 等の索引・集約成果物は
 # この層にのみ存在する。当該層を role: index として宣言し、高位問い合わせの探索経路から
@@ -20,7 +20,7 @@
 
 node_types:
   - name: integrity_rule
-    path_pattern: '^docs/specs/integrity/rules/(IR-\d+)[^/]*\.md$'
+    path_pattern: '^docs/designs/integrity/rules/(IR-\d+)[^/]*\.md$'
     id_template: 'integrity_rule:{match1}'
     label_source:
       - kind: frontmatter_field
@@ -78,7 +78,7 @@ relation_types:
   - name: governs
     fields:
       - related_req
-      - related_spec
+      - related_design
       - governed_by
     reverse_direction: false
     semantics:

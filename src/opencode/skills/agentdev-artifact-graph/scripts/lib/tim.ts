@@ -20,8 +20,8 @@
  * here. Link direction (source→target as described) and change impact
  * direction are distinct.
  *
- * 影響方向の値体系と標準5関係型への割当ては TIM 語彙カタログ SPEC
- * （docs/specs/<foundations/traceability-model>.md）が正規所有する。本テーブルは
+ * 影響方向の値体系と標準5関係型への割当ては TIM 語彙カタログ Design
+ * （docs/designs/<foundations/traceability-model>.md）が正規所有する。本テーブルは
  * その in-code 反映であり、augmentation で再定義できない。
  */
 
@@ -155,7 +155,7 @@ export function deriveProfileParticipation(semantics: RelationSemantics): Profil
 
 /**
  * Semantics for the 5 standard core relation types. These meanings are owned by
- * the TIM vocabulary catalog (docs/specs/<foundations/traceability-model>.md);
+ * the TIM vocabulary catalog (docs/designs/<foundations/traceability-model>.md);
  * project augmentation cannot redefine them.
  */
 export const DEFAULT_RELATION_SEMANTICS: Readonly<Record<string, RelationSemantics>> = {
@@ -224,7 +224,7 @@ export const DEFAULT_ARTIFACT_TYPE_SEMANTICS: Readonly<Record<string, ArtifactTy
     origin: "adf",
     standard_vocabulary: [],
   },
-  specification: {
+  design: {
     origin: "standard",
     standard_vocabulary: ["OSLC Specification"],
   },
@@ -256,7 +256,7 @@ export type QuerySettingsSpec = {
  * 標準問い合わせ設定 (REQ-{NNNN}-{NNN}/007)。候補数上限はコードへ直書きせず
  * 問い合わせ設定として管理し、プロジェクト拡張で上書きする。
  * 標準上限値 12 は TIM 語彙カタログ置換後の代表ケース再計測に基づく決定値
- * （AG SPEC「標準候補数上限の決定手順」、Issue #2204）。diagnostics は
+ * （AG Design「標準候補数上限の決定手順」、Issue #2204）。diagnostics は
  * 構造診断であり候補数上限回帰の対象外としているため決定対象としない。
  */
 export const DEFAULT_QUERY_SETTINGS = {

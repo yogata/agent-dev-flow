@@ -2,8 +2,8 @@
 
 Traceability Information Model（TIM）の語彙・意味定義のうち、`agentdev-artifact-graph` 標準コアが実装する部分の詳細（`scripts/lib/tim.ts`）。
 
-語彙カタログの正規原本は TIM 語彙カタログ SPEC（`docs/specs/<foundations/traceability-model>.md`）である。
-本参照と SPEC に不一致がある場合は SPEC を正とする。
+語彙カタログの正規原本は TIM 語彙カタログ Design（`docs/designs/<foundations/traceability-model>.md`）である。
+本参照と Design に不一致がある場合は Design を正とする。
 
 ## 位置付け
 
@@ -15,7 +15,7 @@ Traceability Information Model（TIM）の語彙・意味定義のうち、`agen
 | 成果物型 | 由来 | 標準語彙対応 |
 |---|---|---|
 | `requirement` | 標準 | SysML requirement / OSLC Requirement / OpenFastTrace requirement |
-| `specification` | 標準 | OSLC Specification |
+| `design` | 標準 | OSLC Specification |
 | `decision` | ADF 固有拡張 | なし。Decision 専用の関係型は追加せず、他成果物との関係は標準関係型で表現する |
 
 ## 標準コア関係型の意味定義

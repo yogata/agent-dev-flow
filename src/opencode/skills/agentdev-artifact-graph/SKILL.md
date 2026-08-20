@@ -6,7 +6,7 @@ description: Builds and inspects the Artifact Graph (derived index of explicit a
 # agentdev-artifact-graph
 
 AgentDevFlow 標準配布スキル。
-正規成果物（REQ/Decision/SPEC）間の明示関係を検索する派生索引（Artifact Graph）を生成、検査、問い合わせる（REQ-{NNNN}、DEC-{N}）。
+正規成果物（REQ/Decision/Design）間の明示関係を検索する派生索引（Artifact Graph）を生成、検査、問い合わせる（REQ-{NNNN}、DEC-{N}）。
 
 consumer と self-hosting の両環境で動作する。
 標準コアと augmentation を分離し、open extensibility によって self-hosting 固有知識を標準契約から除外する。
@@ -14,9 +14,9 @@ AgentDevFlow 標準の成果物間探索モデルとして機能する。
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-artifact-graph` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-artifact-graph` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 
 ## TIM と派生索引としての位置付け
 
@@ -39,8 +39,8 @@ TIM が表現する要素と派生索引上の対応:
 
 | 項目 | デフォルト値 |
 |---|---|
-| indexed_paths | `docs/requirements`, `docs/decisions`, `docs/specs`（3種） |
-| node_types | `requirement`, `decision`, `specification`（3種） |
+| indexed_paths | `docs/requirements`, `docs/decisions`, `docs/designs`（3種） |
+| node_types | `requirement`, `decision`, `design`（3種） |
 | relation_types | `references`, `supersedes`, `defined_in`, `contains`, `extends`（5種） |
 | discovery_roots | 空（augmentation で追加） |
 
@@ -112,7 +112,7 @@ bun .opencode/skills/agentdev-artifact-graph/scripts/src/check_graph.ts --graph 
 bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph neighbors requirement:REQ-{NNNN} --depth 2
 
 # 問い合わせ: path
-bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph path requirement:REQ-{NNNN} specification:docs/specs/<feature>.md --max-depth 4
+bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph path requirement:REQ-{NNNN} design:docs/designs/<feature>.md --max-depth 4
 
 # 問い合わせ: provenance
 bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph provenance requirement:REQ-{NNNN}
@@ -124,7 +124,7 @@ bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --root .
 bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph related requirement:REQ-{NNNN}
 
 # 高位問い合わせ: impact（起点成果物の変更影響候補）
-bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph impact specification:docs/specs/<feature>.md --depth 2
+bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph impact design:docs/designs/<feature>.md --depth 2
 
 # 高位問い合わせ: dependency（起点が依存する候補）
 bun .opencode/skills/agentdev-artifact-graph/scripts/src/query_graph.ts --graph .agentdev/graph dependency requirement:REQ-{NNNN}
@@ -172,7 +172,7 @@ related、impact、dependency、implementation、diagnostics の5種を問い合
 - 候補0件は正常な空結果として扱う
 - 意味定義を持たない拡張関係型は高位問い合わせに参加しない（名前からの意味推定をしない）。低位問い合わせ（neighbors、path、provenance）では利用できる
 - `role: index` / `role: aggregation` を持つノード種別は、索引経由の候補増幅抑止のため高位問い合わせの候補・経路から除外する（グラフからの削除はしない）
-- 標準5関係型の意味割り当ては TIM 語彙カタログ SPEC（`docs/specs/<foundations/traceability-model>.md`）が正であり、`lib/tim.ts` はその in-code 反映である。標準コア関係型の意味は augmentation で再定義できない
+- 標準5関係型の意味割り当ては TIM 語彙カタログ Design（`docs/designs/<foundations/traceability-model>.md`）が正であり、`lib/tim.ts` はその in-code 反映である。標準コア関係型の意味は augmentation で再定義できない
 - 関係制約（`relation_constraints`）が定義された関係型のみ、diagnostics が制約違反を判定する
 
 `discover` の `discovery_roots` は、`--roots` 未指定時に適用後設定（augmentation）から自動解決する。
@@ -270,7 +270,7 @@ Graph 不在・stale・生成失敗でも代替探索へ fallback し、標準 w
 consumer 環境では AgentDevFlow 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.agentdev-plugin/**`）を `indexed_paths` に含めない。
 デフォルト設定ではこれらのパスは indexed_paths に含まれないため、生成 Graph にこれらのパターンのノードは0件となる。
 
-consumer が AgentDevFlow運用（REQ/Decision/SPEC）を採用しない場合、Graph は空で生成されるが正常状態である（REQ-{NNNN}-{NNN}）。
+consumer が AgentDevFlow運用（REQ/Decision/Design）を採用しない場合、Graph は空で生成されるが正常状態である（REQ-{NNNN}-{NNN}）。
 
 ## discovery_roots（REQ-{NNNN}-{NNN}）
 
@@ -297,7 +297,7 @@ project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ�
 
 ## See Also
 
-- **SPEC**: `agentdev-artifact-graph` SPEC（`docs/specs/<skills/agentdev-artifact-graph>.md`）
+- **Design**: `agentdev-artifact-graph` Design（`docs/designs/<skills/agentdev-artifact-graph>.md`）
 - **REQ-{NNNN}**: Artifact Graph 標準化
 - **DEC-{N}**: Artifact Graph 標準化と配布スキル昇格
 - **DEC-{N}**: OpenCode ソース・プロジェクション分離（配布物原本はソースツリー、実行時投影先は `.opencode/`）

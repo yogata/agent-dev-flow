@@ -32,7 +32,7 @@ describe("TS-{NNN}: augmentation adds node_type and relation_type", () => {
 
     await buildGraph(fixture)
     const manifest = JSON.parse(await readFile(join(fixture.output, "manifest.json"), "utf8"))
-    expect(manifest.node_types).toEqual(["decision", "requirement", "specification"])
+    expect(manifest.node_types).toEqual(["decision", "design", "requirement"])
     expect(manifest.relation_types).toContain("references")
     expect(manifest.relation_types).not.toContain("documented_in")
 
@@ -83,7 +83,7 @@ describe("TS-{NNN}: augmentation adds node_type and relation_type", () => {
     await buildGraph(fixture)
     const manifestWithout = JSON.parse(await readFile(join(fixture.output, "manifest.json"), "utf8"))
     expect(manifestWithout.node_types).not.toContain("guide")
-    expect(manifestWithout.node_types).toEqual(["decision", "requirement", "specification"])
+    expect(manifestWithout.node_types).toEqual(["decision", "design", "requirement"])
   })
 
   it("augmentation can add a relation_type without node_types", async () => {

@@ -18,7 +18,7 @@ import {
 export const DEFAULT_INDEXED_PATHS = [
   "docs/requirements",
   "docs/decisions",
-  "docs/specs",
+  "docs/designs",
 ] as const
 
 /**
@@ -29,7 +29,7 @@ export const DEFAULT_INDEXED_PATHS = [
 export const DEFAULT_NODE_TYPE_VOCABULARY = [
   "requirement",
   "decision",
-  "specification",
+  "design",
 ] as const
 
 /**
@@ -151,9 +151,9 @@ export const DEFAULT_NODE_TYPE_RULES: readonly NodeTypeRule[] = [
     extraction_rule: "frontmatter",
   },
   {
-    name: "specification",
-    path_pattern: "^docs/specs/(?!.*README\\.md$).+\\.md$",
-    id_template: "specification:{path}",
+    name: "design",
+    path_pattern: "^docs/designs/(?!.*README\\.md$).+\\.md$",
+    id_template: "design:{path}",
     label_source: [
       { kind: "frontmatter_field", field: "title" },
       { kind: "first_heading" },

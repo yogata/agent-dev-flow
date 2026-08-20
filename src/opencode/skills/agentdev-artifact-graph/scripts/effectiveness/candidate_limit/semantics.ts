@@ -1,7 +1,7 @@
 // candidate_limit/semantics.ts — TIM 語彙カタログ定義に基づく候補列挙（REQ-{NNNN}-006 回帰計測用）。
 //
-// 関係意味とノード役割の正規定義は TIM 語彙カタログ SPEC
-// （docs/specs/foundations/traceability-model.md）が正とし、その in-code 実体
+// 関係意味とノード役割の正規定義は TIM 語彙カタログ Design
+// （docs/designs/foundations/traceability-model.md）が正とし、その in-code 実体
 // （lib/tim.ts の DEFAULT_RELATION_SEMANTICS + augmentation の意味定義）が
 // Graph manifest（relation_semantics、node_type_roles）へ解決結果として保存される。
 // 本モジュールは manifest を唯一の意味源泉とし、独自の関係意味表を持たない
@@ -14,7 +14,7 @@
 // - implementation: 実現系列スロット（realize/satisfy/implement）を両方向にたどる
 // - 意味未定義の関係型は高位問い合わせに参加させない（低位問い合わせ限定利用）
 // - role が index または aggregation のノードは中間経路と到達点の両方から除外する
-//   （TIM SPEC「索引・集約成果物の役割識別」、高位問い合わせ要件の探索経路除外契約）
+//   （TIM Design「索引・集約成果物の役割識別」、高位問い合わせ要件の探索経路除外契約）
 
 import type { GraphData } from "../../lib/model.ts"
 import {

@@ -165,7 +165,7 @@ describe("TS-{NNN} (AG-{NNN}): Graph missing does not halt workflow; fallback di
     expect(graph.manifest.indexed_paths).toEqual([
       "docs/requirements",
       "docs/decisions",
-      "docs/specs",
+      "docs/designs",
     ])
   })
 })

@@ -1,20 +1,20 @@
 ---
-title: agentdev-artifact-graph SPEC
+title: agentdev-artifact-graph Design
 status: draft
 created: 2026-08-10
 updated: 2026-08-18
 ---
 
-# agentdev-artifact-graph SPEC
+# agentdev-artifact-graph Design
 
 ## 目的
 
-AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果物（REQ/Decision/SPEC）間の明示関係を検索できる Artifact Graph を生成、検査、問い合わせる。
+AgentDevFlow 標準配布スキル `agentdev-artifact-graph` は、正規成果物（REQ/Decision/Design）間の明示関係を検索できる Artifact Graph を生成、検査、問い合わせる。
 consumer と self-hosting の両環境で動作し、標準コアと augmentation を分離することで self-hosting 固有知識を標準契約から除外する。
 AgentDevFlow 標準の成果物間探索モデルとして機能する。
 
-本 SPEC は `agentdev-artifact-graph` 配布スキルの振る舞い契約を定義する。
-実行時スキル（`src/opencode/skills/agentdev-artifact-graph/SKILL.md`）は本 SPEC に依存しない（REQ-001）。
+本 Design は `agentdev-artifact-graph` 配布スキルの振る舞い契約を定義する。
+実行時スキル（`src/opencode/skills/agentdev-artifact-graph/SKILL.md`）は本 Design に依存しない（REQ-001）。
 
 ## 適用対象
 
@@ -136,7 +136,7 @@ Issue #2204（OU-0002）でのカタログ置換後再計測に基づく決定�
 - 標準上限値（related、impact、dependency、implementation）: 12。diagnostics は構造診断であり候補数上限回帰の対象外のため決定対象としない
 - 決定根拠: recommended_standard_limit 実測値 9（全代表ケースの必須候補を保持する最小上限値）以上で、AI へ渡す候補量の実用範囲に収まる値として 12 を決定した。初期値 30 と暫定実測推奨 12 の乖離は本決定で解消した
 - 増幅実測値との突合: 索引・集約成果物経由の増幅（代表ケースの意味列挙との差分 42〜75 件）は候補数上限ではなく索引役割宣言（`index`）による探索経路除外で抑制する。上限を超過した代表ケース（14 件、47 件）は候補過多時5項目を返す
-- 手順1〜3の実行記録と期待出力の差異: [candidate-limit-tim-catalog-diff-20260818.md](../integrity/audits/candidate-limit-tim-catalog-diff-20260818.md)
+- 手順1〜3の実行記録と期待出力の差異: [candidate-limit-tim-catalog-diff-20260818.md](../../reports/integrity/audits/candidate-limit-tim-catalog-diff-20260818.md)
 
 ## グラフモデル（open extensibility を含む）
 
@@ -144,7 +144,7 @@ Issue #2204（OU-0002）でのカタログ置換後再計測に基づく決定�
 
 - `requirement`
 - `decision`
-- `specification`
+- `design`
 
 ### 標準コア relation_types（デフォルト）
 
@@ -194,11 +194,11 @@ agentdev-artifact-graph の解析スクリプト群（parse.ts 等）は対応�
 対応構造は次を含む。
 
 - frontmatter（`id`, `title`, `status`, `created`, `updated`, `superseded_by` 等）
-- 既知の構造化 field（`spec_logical_division`, `canonical_owner` 等）
+- 既知の構造化 field（`canonical_owner` 等）
 - extension 仕様の構造化 field（`context.paths`, `rules.skill`, `checks.skill` 等）
 - その他抽出順序で明示した構造（Markdown リンク、既知の見出し、表内識別子）
 
-対応構造の追加、変更は SPEC 更新で明示し、スクリプトの内部実装へ暗黙に埋め込まない。
+対応構造の追加、変更は Design 更新で明示し、スクリプトの内部実装へ暗黙に埋め込まない。
 
 ### 未対応 YAML 構造の診断契約
 
@@ -223,7 +223,7 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 1. **高頻度運用質問**: 過去運用での高頻度質問上位10件。頻度は問い合わせ履歴、利用ログ、Issue 等の実績データから集計する
 2. **経路クラス別代表サンプル**: Artifact Graph 経路クラス別（隣接、パス、プロベナンス、発見的抽出）の代表サンプルを合計10件上限で抽出
 
-選定基準の採用、差し替えは SPEC 更新で明示し、実装に埋め込まない。
+選定基準の採用、差し替えは Design 更新で明示し、実装に埋め込まない。
 
 ### 実入力 fixture 設計原則
 
@@ -232,8 +232,8 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 - **選定基準の明示**: 各 fixture がどの代表質問、経路クラス、入力パターンを代表するかをメタデータとして保持する
 - **配置先**: fixture は標準スキル配下の所定ディレクトリ（例: `tests/fixtures/`）へ配置し、配布物と明確に区別する
 - **再現性**: 同一 fixture から同一の Graph 結果が得られること。`manifest.json` の `input_digest` 等の決定論性条件を満たす
-- **機密情報除去**: 実プロジェクト由来の入力を fixture 化する場合は、REQ/Decision/SPEC の具体内容を抽象化またはダミー化し、機密情報を含めない
-- **版管理**: fixture の追加、変更、廃止は SPEC 更新で明示し、暗黙に変更しない
+- **機密情報除去**: 実プロジェクト由来の入力を fixture 化する場合は、REQ/Decision/Design の具体内容を抽象化またはダミー化し、機密情報を含めない
+- **版管理**: fixture の追加、変更、廃止は Design 更新で明示し、暗黙に変更しない
 
 ## check_graph.ts 抽出規則と warning 分類
 
@@ -286,7 +286,7 @@ agentdev-artifact-graph は代表質問回帰検証（10件）を解析スクリ
 consumer は project 固有正規成果物を `node_types`, `relation_types` へ追加できる。
 project augmentation が存在しなくても標準スキルは動作する（fail-open）。
 
-consumer が AgentDevFlow 運用（REQ/Decision/SPEC）を採用しない場合、Graph は空で生成されるが正常状態とする。
+consumer が AgentDevFlow 運用（REQ/Decision/Design）を採用しない場合、Graph は空で生成されるが正常状態とする。
 
 project-owned source（`src/tests/scripts/config` 等）は `indexed_paths` へ含めず、project augmentation の `discovery_roots`（明示参照起点リスト）と query 時の `rg`/filesystem 補完で必要時探索する。
 標準スキルは固定 directory 知識を埋め込まない。
@@ -371,7 +371,7 @@ Artifact Graph の検証を2種類に分離する。
 
 Graph parser, augmentation, relation extraction, provenance の正確性を検証する。
 本層は REQ-020 が所有し、既存 extension 構造等を用いた代表 fixture で維持する。
-詳細は REQ-020 および対応 SPEC を参照。
+詳細は REQ-020 および対応 Design を参照。
 
 ### Workflow effectiveness
 
@@ -379,7 +379,7 @@ Graph parser, augmentation, relation extraction, provenance の正確性を検�
 対象質問は以下を含む。
 
 - REQ の変更影響候補
-- 同一 owner の SPEC
+- 同一 owner の Design
 - 関連 command, skill, integrity rule
 - command から実際に委譲される skill
 - superseded artifact への現行参照
@@ -420,7 +420,7 @@ Artifact Graph 自身の接続確認のみを workflow effectiveness の成立�
 ## 検証観点
 
 - **consumer 環境での標準動作**: project augmentation なしでビルド、検査、クエリが動作すること（REQ-012-005）
-- **標準コア不変条件**: デフォルト `indexed_paths` が3種（`docs/requirements`, `docs/decisions`, `docs/designs`）のみ、デフォルト `node_types` が3種（`requirement`, `decision`, `specification`）のみであること（REQ-012-002, REQ-012-003）
+- **標準コア不変条件**: デフォルト `indexed_paths` が3種（`docs/requirements`, `docs/decisions`, `docs/designs`）のみ、デフォルト `node_types` が3種（`requirement`, `decision`, `design`）のみであること（REQ-012-002, REQ-012-003）
 - **consumer 配布物除外**: consumer 環境で生成 Graph に配布物パターンのノードが0件であること（REQ-012-008）
 - **open extensibility**: augmentation で追加した `node_type`, `relation_type` が Graph へ反映されること（REQ-012-004, REQ-012-006）
 - **fail-open**: Graph 不在で workflow が停止しないこと（REQ-012-010）
@@ -432,10 +432,10 @@ Artifact Graph 自身の接続確認のみを workflow effectiveness の成立�
 - **代表質問回帰検証**: 実入力 fixture（10件）を解析スクリプトへの入力として組み込み、過去期待出力との一致を検証すること（REQ-020-003、REQ-020-005）
 - **fixture 設計原則の遵守**: 実入力 fixture が選定基準明示、配置先、再現性、機密情報除去、版管理の各原則を満たすこと（REQ-020-004）
 
-## SPEC 反映提案群の採否確定
+## Design 反映提案群の採否確定
 
-Epic #2189 の実行時に各 PR の SPEC確定候補として提起され、case-close で確定できなかった反映提案群4項目について、Issue #2203（OU-0001）の AG SPEC 確定時に採否を確定する。
-4項目とも本 SPEC の該当節へ反映済みであり、実装（`scripts/lib/`、`scripts/src/`）との突合で乖離を確認しなかったため、すべて採用とする。
+Epic #2189 の実行時に各 PR の Design確定候補として提起され、case-close で確定できなかった反映提案群4項目について、Issue #2203（OU-0001）の AG Design 確定時に採否を確定する。
+4項目とも本 Design の該当節へ反映済みであり、実装（`scripts/lib/`、`scripts/src/`）との突合で乖離を確認しなかったため、すべて採用とする。
 
 | 提案 | 反映先 | 採否 | 確定根拠 |
 |---|---|---|---|

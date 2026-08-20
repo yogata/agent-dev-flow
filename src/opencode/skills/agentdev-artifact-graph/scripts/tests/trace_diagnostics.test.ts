@@ -136,7 +136,7 @@ describe("diagnostics on damaged derived index (TS-{NNN})", () => {
       type: "references",
       category: "derived",
       source: `requirement:${T_REQ9}`,
-      target: `specification:docs/specs/${NOWHERE_MD}`,
+      target: `design:docs/designs/${NOWHERE_MD}`,
       provenance_id: "prov:none",
       extraction_rule: "markdown_link",
     }

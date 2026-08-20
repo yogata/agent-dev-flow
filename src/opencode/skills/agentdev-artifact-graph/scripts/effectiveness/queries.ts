@@ -1,7 +1,7 @@
 // effectiveness/queries.ts — 代表的な workflow question 6 種と ground truth 定義。
 //
 // 各 query は real AgentDevFlow artifact（docs/requirements/<REQ-*>.md,
-// docs/decisions/<DEC-*>.md, docs/specs/**, src/opencode/{commands,skills}/**,
+// docs/decisions/<DEC-*>.md, docs/designs/**, src/opencode/{commands,skills}/**,
 // .agentdev/extensions/**）を参照する。ground truth は各ファイルの
 // frontmatter, See Also, 関連 REQ 欄, extension yaml の rules.skill / checks.skill 等、
 // 追跡可能な事実に基づき選定した。
@@ -25,7 +25,7 @@ const DEC_006 = formatDecisionId(6)
 const DEC_007 = formatDecisionId(7)
 const SKILLS_DIR = `${"skills"}`
 const ARTIFACT_GRAPH_SPEC = `${SKILLS_DIR}/agentdev-artifact-graph.md`
-const ARTIFACT_GRAPH_SPEC_NODE = `specification:docs/specs/${ARTIFACT_GRAPH_SPEC}`
+const ARTIFACT_GRAPH_SPEC_NODE = `design:docs/designs/${ARTIFACT_GRAPH_SPEC}`
 
 /**
  * Q1: REQ-{NNNN} (Artifact Graph 標準化) の変更影響候補。
@@ -49,7 +49,7 @@ const Q1_REQ_CHANGE_IMPACT: EffectivenessQuery = {
     kind: "graph-query",
     query: { kind: "neighbors", node: `requirement:${REQ_012}`, depth: 1 },
     resultFilter: {
-      includeTypes: ["specification", "decision", "requirement", "command", "skill", "integrity_rule"],
+      includeTypes: ["design", "decision", "requirement", "command", "skill", "integrity_rule"],
       excludeNodes: [`requirement:${REQ_012}`],
     },
   },
@@ -61,61 +61,61 @@ const Q1_REQ_CHANGE_IMPACT: EffectivenessQuery = {
   },
   groundTruth: [ARTIFACT_GRAPH_SPEC_NODE],
   groundTruthRationale:
-    "agentdev-artifact-graph SPEC の See Also セクションが REQ-{NNNN}.md への markdown link を持ち、" +
-    "Graph 上で specification→requirement の構造的参照エッジとして現れる。" +
+    "agentdev-artifact-graph Design の See Also セクションが REQ-{NNNN}.md への markdown link を持ち、" +
+    "Graph 上で design→requirement の構造的参照エッジとして現れる。" +
     "REQ-{NNNN}/020/021 の関連 REQ 欄は本文記述であり Graph の抽出対象外、" +
     "README の索引行も候補から外す（影響分析の意味ある候補ではないため）。",
 }
 
 /**
- * Q2: 同一 canonical_owner を持つ SPEC。
+ * Q2: 同一関心キー（canonical owner 相当）に対応する Design。
  *
- * Graph は「同一フィールド値で SPEC を束ねる」操作を直接提供しない。
- * references relation が canonical_owner 由由で生成されるが、alias 解決の結果
- * 自己ループに落ちる例が多く（例: agentdev-artifact-graph SPEC）、same-owner 検索
- * には不適。harness は Graph の discover API（実質的にテキスト検索）と、
- * rg による frontmatter 走査を比較する。
+ * Design 再定義（per-file の canonical_owner frontmatter 宣言の廃止）により、
+ * Design の識別は文書配置パスによる。関心キー相当の探索は
+ * frontmatter `title`（スキル名と一致する Design title）を軸に実施する。
+ * harness は Graph の discover API（実質的にテキスト検索）と、
+ * frontmatter 走査を比較する。
  *
- * ground truth は frontmatter `canonical_owner:` 行の値が一致する SPEC ファイル一覧。
+ * ground truth は frontmatter `title` の値が一致する Design ファイル一覧。
  */
 const Q2_SAME_CANONICAL_OWNER: EffectivenessQuery = {
   id: "Q2-canonical-owner-artifact-graph",
   category: "same-canonical-owner",
-  question: "canonical_owner が `agentdev-artifact-graph` である SPEC はどれか？",
+  question: "title が `agentdev-artifact-graph Design` である Design（関心キー `agentdev-artifact-graph` の正規 Design）はどれか？",
   graphQuery: {
     kind: "discover",
-    term: "canonical_owner: agentdev-artifact-graph",
-    roots: ["docs/specs"],
+    term: "title: agentdev-artifact-graph Design",
+    roots: ["docs/designs"],
   },
   independentSearch: {
     kind: "frontmatterField",
-    field: "canonical_owner",
-    value: "agentdev-artifact-graph",
-    roots: ["docs/specs"],
+    field: "title",
+    value: "agentdev-artifact-graph Design",
+    roots: ["docs/designs"],
     extensions: [".md"],
   },
   groundTruth: [ARTIFACT_GRAPH_SPEC_NODE],
   groundTruthRationale:
-    "frontmatter 行 `canonical_owner: agentdev-artifact-graph` を持つ SPEC は " +
-    `docs/specs/${SKILLS_DIR}/agentdev-artifact-graph.md のみ（rg で確済）。` +
-    "他 SPEC は owner 値が異なるか frontmatter 未設定のため候補外。",
+    "frontmatter 行 `title: agentdev-artifact-graph Design` を持つ Design は " +
+    `docs/designs/${SKILLS_DIR}/agentdev-artifact-graph.md のみ。` +
+    "他 Design は title 値が異なるため候補外。",
 }
 
 /**
- * Q3: agentdev-artifact-graph SPEC に関連する command / skill / integrity_rule。
+ * Q3: agentdev-artifact-graph Design に関連する command / skill / integrity_rule。
  *
  * Graph は neighbors(spec, depth=2) で関連集合を得る。extension node を経由して
- * Workflow Skill / Capability Skill に、references markdown link で他 SPEC に到達する。
+ * Workflow Skill / Capability Skill に、references markdown link で他 Design に到達する。
  *
- * ground truth は SPEC 本文または extension yaml が agentdev-artifact-graph を明示的に
+ * ground truth は Design 本文または extension yaml が agentdev-artifact-graph を明示的に
  * 参照する成果物（Workflow Skill: agentdev-workflow-{case-close, case-open, case-run,
- * req-define, spec-save}; Capability Skill: agentdev-adversarial-review）。
+ * req-define, design-save}; Capability Skill: agentdev-adversarial-review）。
  */
 const Q3_RELATED_COMMAND_SKILL_IR: EffectivenessQuery = {
   id: "Q3-related-to-artifact-graph-spec",
   category: "related-command-skill-ir",
   question:
-    "agentdev-artifact-graph SPEC に関連する command, skill, integrity_rule は何か？",
+    "agentdev-artifact-graph Design に関連する command, skill, integrity_rule は何か？",
   graphQuery: {
     kind: "graph-query",
     query: {
@@ -134,7 +134,7 @@ const Q3_RELATED_COMMAND_SKILL_IR: EffectivenessQuery = {
       "src/opencode/commands",
       "src/opencode/skills",
       ".agentdev/extensions/skills",
-      "docs/specs/integrity/rules",
+      "docs/designs/integrity/rules",
     ],
     extensions: [".md", ".yaml", ".yml"],
   },
@@ -143,15 +143,15 @@ const Q3_RELATED_COMMAND_SKILL_IR: EffectivenessQuery = {
     "skill:agentdev-workflow-case-open",
     "skill:agentdev-workflow-case-run",
     "skill:agentdev-workflow-req-define",
-    "skill:agentdev-workflow-spec-save",
+    "skill:agentdev-workflow-design-save",
     "skill:agentdev-adversarial-review",
   ],
   groundTruthRationale:
     ".agentdev/extensions/skills 配下の各 Workflow Extension yaml が rules.skill: agentdev-artifact-graph を持ち、" +
     "agentdev-adversarial-review extension も同様。" +
     "Graph 上で extension node を介した delegates_to / extends により" +
-    "specification→extension→Workflow Skill / Capability Skill と到達可能。" +
-    "integrity_rule で本 SPEC を直接参照する IR は現時点で存在しない。",
+    "design→extension→Workflow Skill / Capability Skill と到達可能。" +
+    "integrity_rule で本 Design を直接参照する IR は現時点で存在しない。",
 }
 
 /**
@@ -177,7 +177,7 @@ const Q4_DELEGATION_TARGET_SKILL: EffectivenessQuery = {
       depth: 2,
     },
     resultFilter: {
-      includeTypes: ["skill", "specification"],
+      includeTypes: ["skill", "design"],
     },
   },
   independentSearch: {
@@ -193,7 +193,7 @@ const Q4_DELEGATION_TARGET_SKILL: EffectivenessQuery = {
   groundTruthRationale:
     ".agentdev/extensions/skills/agentdev-workflow-case-close.yaml の rules[0].skill = agentdev-artifact-graph、" +
     "checks[0].skill = repo-agentdev-integrity。" +
-    "Graph は alias 解決で前者を specification:docs/specs/skills/agentdev-artifact-graph.md、" +
+    "Graph は alias 解決で前者を design:docs/designs/skills/agentdev-artifact-graph.md、" +
     "後者を skill:repo-agentdev-integrity に正規化する。" +
     "独立探索はテキスト `skill:` 行を全件拾うため、他 Workflow Skill の skill 行も候補となる。",
 }
@@ -206,7 +206,7 @@ const Q4_DELEGATION_TARGET_SKILL: EffectivenessQuery = {
  * ファイルや README 索引行、関連 REQ 欄などのノイズを含む。
  *
  * ground truth は superseded artifact を指す README 索引エントリ（docs/decisions/README.md と
- * docs/specs/README.md）。これらは superseded を残す運用上やむを得ないが、検出対象の典型例。
+ * docs/designs/README.md）。これらは superseded を残す運用上やむを得ないが、検出対象の典型例。
  */
 const Q5_SUPERSEDED_CURRENT_REFS: EffectivenessQuery = {
   id: "Q5-superseded-current-refs",
@@ -222,7 +222,7 @@ const Q5_SUPERSEDED_CURRENT_REFS: EffectivenessQuery = {
       depth: 1,
     },
     resultFilter: {
-      includeTypes: ["specification", "requirement", "decision", "command", "skill", "integrity_rule", "source_file"],
+      includeTypes: ["design", "requirement", "decision", "command", "skill", "integrity_rule", "source_file"],
       excludeNodes: [`decision:${DEC_005}`, `decision:${DEC_006}`],
     },
   },
@@ -245,19 +245,19 @@ const Q5_SUPERSEDED_CURRENT_REFS: EffectivenessQuery = {
 /**
  * Q6: 変更後の dangling relation 候補。
  *
- * 「agentdev-artifact-graph SPEC を削除した場合、どの relation が dangling になるか？」
+ * 「agentdev-artifact-graph Design を削除した場合、どの relation が dangling になるか？」
  * を代表例とする。Graph は該当 node に接続する全エッジを列挙できる。独立探索は
- * 当該 SPEC へのパス文字列を rg で探すが、relation 種別の分類はできない。
+ * 当該 Design へのパス文字列を rg で探すが、relation 種別の分類はできない。
  *
- * ground truth は Graph 上で該当 SPEC に接続する非自己エッジの source 側 node のうち、
+ * ground truth は Graph 上で該当 Design に接続する非自己エッジの source 側 node のうち、
  * 除去された場合に relation が dangling になる相手（references / defined_in / contains
- * / supersedes を含む）。本 query は SPEC を「-spec」した場合の dangling 候補を提示する。
+ * / supersedes を含む）。本 query は Design を「-spec」した場合の dangling 候補を提示する。
  */
 const Q6_POST_CHANGE_DANGLING: EffectivenessQuery = {
   id: "Q6-dangling-on-artifact-graph-spec-removal",
   category: "post-change-dangling-relation",
   question:
-    "agentdev-artifact-graph SPEC をリポジトリから削除した場合、どの成果物との relation が dangling になるか？",
+    "agentdev-artifact-graph Design をリポジトリから削除した場合、どの成果物との relation が dangling になるか？",
   graphQuery: {
     kind: "graph-query",
     query: {
@@ -267,7 +267,7 @@ const Q6_POST_CHANGE_DANGLING: EffectivenessQuery = {
     },
     resultFilter: {
       includeTypes: [
-        "specification",
+        "design",
         "requirement",
         "decision",
         "command",
@@ -290,21 +290,20 @@ const Q6_POST_CHANGE_DANGLING: EffectivenessQuery = {
     `requirement:${REQ_013}`,
     `requirement:${REQ_020}`,
     `decision:${DEC_007}`,
-    `specification:docs/specs/${"foundations"}/document-model.md`,
-    `specification:docs/specs/${"local"}/artifact-graph.md`,
-    "source_file:docs/specs/README.md",
+    `design:docs/designs/${"foundations"}/document-model.md`,
+    "source_file:docs/designs/README.md",
     "extension:.agentdev/extensions/skills/agentdev-workflow-case-close.yaml",
     "extension:.agentdev/extensions/skills/agentdev-workflow-case-open.yaml",
     "extension:.agentdev/extensions/skills/agentdev-workflow-case-run.yaml",
     "extension:.agentdev/extensions/skills/agentdev-workflow-req-define.yaml",
-    "extension:.agentdev/extensions/skills/agentdev-workflow-spec-save.yaml",
+    "extension:.agentdev/extensions/skills/agentdev-workflow-design-save.yaml",
     "extension:.agentdev/extensions/skills/agentdev-adversarial-review.yaml",
   ],
   groundTruthRationale:
     `Graph 上で ${ARTIFACT_GRAPH_SPEC_NODE} に接続する` +
-    "非自己エッジの相手側 node。markdown link で See Also を持つ REQ/DEC/SPEC、" +
+    "非自己エッジの相手側 node。markdown link で See Also を持つ REQ/DEC/Design、" +
     "README の索引行、extension yaml の context.paths / rules.skill が対象。" +
-    "本 SPEC を削除するとこれらの relation が dangling になる。",
+    "本 Design を削除するとこれらの relation が dangling になる。",
 }
 
 /**

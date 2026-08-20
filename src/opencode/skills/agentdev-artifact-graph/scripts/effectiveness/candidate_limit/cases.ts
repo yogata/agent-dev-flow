@@ -22,20 +22,20 @@ const REQ_020_NODE = `requirement:${REQ_020}`
 const REQ_012_NODE = `requirement:${REQ_012}`
 const DEC_005_NODE = `decision:${DEC_005}`
 const SKILLS_DIR = `${"skills"}`
-const AG_SPEC_NODE = `specification:docs/specs/${SKILLS_DIR}/agentdev-artifact-graph.md`
+const AG_SPEC_NODE = `design:docs/designs/${SKILLS_DIR}/agentdev-artifact-graph.md`
 const EXT_DIR = ".agentdev/extensions/skills"
 const EXT_CASE_CLOSE = `extension:${EXT_DIR}/agentdev-workflow-case-close.yaml`
 const SKILL_CASE_CLOSE = "skill:agentdev-workflow-case-close"
 const SKILL_REPO_INTEGRITY = "skill:repo-agentdev-integrity"
 const REQ_README = "source_file:docs/requirements/README.md"
 
-/** AG SPEC へ delegates_to する 6 extension（実測: 全 delegates_to 7辺のうち 6辺）。 */
+/** AG Design へ delegates_to する 6 extension（実測: 全 delegates_to 7辺のうち 6辺）。 */
 const AG_SPEC_DELEGATING_EXTENSIONS = [
   `extension:${EXT_DIR}/agentdev-workflow-case-open.yaml`,
   EXT_CASE_CLOSE,
   `extension:${EXT_DIR}/agentdev-workflow-case-run.yaml`,
   `extension:${EXT_DIR}/agentdev-workflow-req-define.yaml`,
-  `extension:${EXT_DIR}/agentdev-workflow-spec-save.yaml`,
+  `extension:${EXT_DIR}/agentdev-workflow-design-save.yaml`,
   `extension:${EXT_DIR}/agentdev-adversarial-review.yaml`,
 ] as const
 
@@ -46,9 +46,9 @@ const CASE_1_RELATED_REQ_NORMAL: RepresentativeCase = {
   depth: 1,
   caseClass: "normal",
   selectionRationale:
-    "正常ケース。要件文書への直結参照のみで構成される（SPEC See Also の逆方向）。" +
+    "正常ケース。要件文書への直結参照のみで構成される（Design See Also の逆方向）。" +
     "ファイル層（source_file 型、索引役割宣言）は中間経路と到達点の両方から除外されるため、" +
-    "一般参照で到達する AG SPEC のみを返す基線を代表する。",
+    "一般参照で到達する AG Design のみを返す基線を代表する。",
   requiredCandidates: [AG_SPEC_NODE],
   minAmplifiedCount: 0,
   independentSearchPattern: `\\b${REQ_020}\\b`,
@@ -65,7 +65,7 @@ const CASE_2_RELATED_REQ_AMPLIFICATION: RepresentativeCase = {
     `起点要件は ${REQ_README}（索引・集約成果物、参照ファンアウト約40）からも参照されており、` +
     "意味フィルタなしの巡回では全要件・全 Decision へ増幅する。" +
     "意味列挙側は索引役割宣言（role: index）による探索経路除外で増幅を抑制する" +
-    "（候補数上限 alone では抑制しない）。深さ2の構造的隣接（SPEC の See Also、委譲元 extension）を必須候補とする。",
+    "（候補数上限 alone では抑制しない）。深さ2の構造的隣接（Design の See Also、委譲元 extension）を必須候補とする。",
   requiredCandidates: [
     AG_SPEC_NODE,
     REQ_012_NODE,
@@ -83,7 +83,7 @@ const CASE_3_RELATED_SPEC_AMPLIFICATION: RepresentativeCase = {
   depth: 2,
   caseClass: "amplification",
   selectionRationale:
-    "増幅ケース（索引・集約成果物経由）。SPEC 起点では docs/specs/README.md" +
+    "増幅ケース（索引・集約成果物経由）。Design 起点では docs/designs/README.md" +
     "（参照ファンアウト約67）経由の増幅が支配的である。" +
     "委譲元 6 extension（delegates_to のカタログ意味定義）と拡張関係（extends）による skill 参加を必須候補とする。",
   requiredCandidates: [...AG_SPEC_DELEGATING_EXTENSIONS, SKILL_CASE_CLOSE],
@@ -130,7 +130,7 @@ const CASE_6_DEPENDENCY_DELEGATION: RepresentativeCase = {
   caseClass: "semantic-separation",
   selectionRationale:
     "意味分離ケース（依存）。委譲元 extension 起点で、委譲（delegates_to、意味スロット depend）と" +
-    "拡張（extends、意味スロット refine）の依存意味により依存先（AG SPEC、統合検証 skill、自身の Workflow Skill）を特定する。" +
+    "拡張（extends、意味スロット refine）の依存意味により依存先（AG Design、統合検証 skill、自身の Workflow Skill）を特定する。" +
     "定義所在（defined_in）の依存先はファイル層（索引役割）として除外される。" +
     "一般参照・README 経由の候補を依存関係として扱わない契約の代表。",
   requiredCandidates: [AG_SPEC_NODE, SKILL_REPO_INTEGRITY, SKILL_CASE_CLOSE],

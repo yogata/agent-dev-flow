@@ -53,10 +53,10 @@ type ReferenceKind =
 type SourceFileType =
   | "REQ"
   | "DEC"
-  | "SPEC/command"
-  | "SPEC/skill"
-  | "SPEC/workflow"
-  | "SPEC/foundation"
+  | "Design/command"
+  | "Design/skill"
+  | "Design/workflow"
+  | "Design/foundation"
   | "COMMAND"
   | "SKILL"
   | "SKILL/repo-local"
@@ -65,7 +65,7 @@ type SourceFileType =
 function classifyReference(value: string): ReferenceKind {
   const cleaned = value.replace(/^`|`$/g, "").replace(/^v2:/, "").trim()
   if (cleaned.endsWith("/")) return "directory_path"
-  if (/^(REQ|DEC|IR|ADR|SPEC|RU|AG)-\d+/i.test(cleaned)) return "explicit_id"
+  if (/^(REQ|DEC|IR|ADR|Design|RU|AG)-\d+/i.test(cleaned)) return "explicit_id"
   if (cleaned.includes("/")) return "relative_path"
   if (/\.[a-z0-9]{1,10}$/i.test(cleaned)) return "bare_filename"
   return "description_word"
@@ -74,10 +74,10 @@ function classifyReference(value: string): ReferenceKind {
 function classifySourceFile(path: string): SourceFileType {
   if (/^docs\/requirements\/REQ-/.test(path)) return "REQ"
   if (/^docs\/decisions\//.test(path)) return "DEC"
-  if (/^docs\/specs\/commands\//.test(path)) return "SPEC/command"
-  if (/^docs\/specs\/skills\//.test(path)) return "SPEC/skill"
-  if (/^docs\/specs\/workflows\//.test(path)) return "SPEC/workflow"
-  if (/^docs\/specs\//.test(path)) return "SPEC/foundation"
+  if (/^docs\/specs\/commands\//.test(path)) return "Design/command"
+  if (/^docs\/specs\/skills\//.test(path)) return "Design/skill"
+  if (/^docs\/specs\/workflows\//.test(path)) return "Design/workflow"
+  if (/^docs\/specs\//.test(path)) return "Design/foundation"
   if (/^src\/opencode\/commands\//.test(path)) return "COMMAND"
   if (/^\.opencode\/commands\//.test(path)) return "COMMAND"
   if (/^src\/opencode\/skills\//.test(path)) return "SKILL"

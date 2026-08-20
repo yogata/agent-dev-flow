@@ -20,7 +20,7 @@ const FEATURE_MD = `${FEATURE_STEM}.md`
 export const REQ_001_NODE = `requirement:${REQ_001}`
 export const DEC_001_NODE = `decision:${DEC_001}`
 export const DEC_002_NODE = `decision:${DEC_002}`
-export const FEATURE_SPEC_NODE = `specification:docs/specs/${FEATURE_MD}`
+export const FEATURE_SPEC_NODE = `design:docs/designs/${FEATURE_MD}`
 export const REQ_001_PATH = `docs/requirements/${REQ_001}.md`
 export const DEC_001_PATH = `docs/decisions/${DEC_001}.md`
 export const DEC_002_PATH = `docs/decisions/${DEC_002}.md`
@@ -28,8 +28,8 @@ export const DEC_002_PATH = `docs/decisions/${DEC_002}.md`
 /**
  * Minimal consumer fixture with only the 3 default indexed_paths populated.
  * No AgentDevFlow distribution artifacts, no self-hosting paths.
- * Default indexed_paths: docs/requirements, docs/decisions, docs/specs only.
- * Default node_types: requirement, decision, specification only.
+ * Default indexed_paths: docs/requirements, docs/decisions, docs/designs only.
+ * Default node_types: requirement, decision, design only.
  */
 const FILES: Record<string, string> = {
   [`docs/requirements/${REQ_001}.md`]: `---
@@ -39,7 +39,7 @@ status: accepted
 ---
 # Sample requirement
 
-See [decision](../decisions/${DEC_001}.md) and [spec](../specs/${FEATURE_MD}).
+See [decision](../decisions/${DEC_001}.md) and [design](../designs/${FEATURE_MD}).
 `,
   [`docs/decisions/${DEC_001}.md`]: `---
 id: ${DEC_001}
@@ -56,16 +56,16 @@ status: accepted
 ---
 # Current decision
 
-See [specification](../specs/${FEATURE_MD}).
+See [design](../designs/${FEATURE_MD}).
 `,
-  [`docs/specs/${FEATURE_MD}`]: `---
-title: Feature specification
+  [`docs/designs/${FEATURE_MD}`]: `---
+title: Feature design
 canonical_owner: sample-skill
 ---
-# Feature specification
+# Feature design
 `,
-  [`docs/specs/README.md`]: `# Specs index
-This README should NOT produce a specification node.
+  [`docs/designs/README.md`]: `# Specs index
+This README should NOT produce a design node.
 `,
 }
 
@@ -152,8 +152,8 @@ const DESIGN_002 = numberedStem("DESIGN", 2)
 const RULE_001 = numberedStem("RULE", 1)
 
 export const CATALOG_NODE = `catalog:${INDEX_001}`
-export const DESIGN_NODE = `design:${DESIGN_001}`
-export const DESIGN_002_NODE = `design:${DESIGN_002}`
+export const DESIGN_NODE = `component:${DESIGN_001}`
+export const DESIGN_002_NODE = `component:${DESIGN_002}`
 export const RULE_NODE = `rule:${RULE_001}`
 
 /**
@@ -170,9 +170,9 @@ export const AUGMENTATION_WITH_TIM = `node_types:
     label_source:
       - kind: first_heading
     role: index
-  - name: design
+  - name: component
     path_pattern: "^docs/design/(DESIGN-[^/]+)\\\\.md$"
-    id_template: "design:{match1}"
+    id_template: "component:{match1}"
     label_source:
       - kind: first_heading
   - name: rule
