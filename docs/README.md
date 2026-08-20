@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 36件、廃止済み: 7件
+現行 REQ: 37件、廃止済み: 7件
 <!-- AUTOGEN:END -->
 
-現行要件は36件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして retired/ へ移行、REQ-036〜REQ-043 を追加。番号には欠番が存在する）。
+現行要件は37件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして retired/ へ移行、REQ-036〜REQ-044 を追加。番号には欠番が存在する）。
 REQ-022 の規範内容は、後継の [agentdev-artifact-graph Design](designs/skills/agentdev-artifact-graph.md)「augmentation 配置先」節が正規所有する。
 REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-graph Design](designs/skills/agentdev-artifact-graph.md)「check_graph.ts 抽出規則と warning 分類」節と `scripts/lib/checker.ts` が正規所有する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
@@ -52,12 +52,13 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [REQ-041](requirements/REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
 | [REQ-042](requirements/REQ-042.md) | Case統合先とブランチモデル |
 | [REQ-043](requirements/REQ-043.md) | 評価ブランチ実証ワークフロー |
+| [REQ-044](requirements/REQ-044.md) | 標準API委譲の状態制約 |
 
 - [要件インデックス](requirements/README.md)
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-018 の18件である（DEC-016、DEC-017、DEC-018 は proposed、DEC-005 は superseded）。
+現行 Decision は DEC-001 から DEC-019 の19件である（DEC-016、DEC-017、DEC-018、DEC-019 は proposed、DEC-005 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -80,6 +81,7 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則（proposed） |
 | [DEC-017](decisions/DEC-017.md) | TIM 準拠トレーサビリティモデルの採用と4層分離（proposed） |
 | [DEC-018](decisions/DEC-018.md) | 評価ブランチモデルとCase統合先の一般化（proposed） |
+| [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（proposed） |
 
 ## 設計（Design）
 

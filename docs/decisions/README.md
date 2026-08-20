@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は14件、提案中の Decision は3件である。
+現行の承認済み Decision は14件、提案中の Decision は4件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -33,6 +33,7 @@
 | DEC-016 | 導入系スクリプトの副作用ゼロ原則 | proposed | 2026-08-15 |
 | DEC-017 | TIM 準拠トレーサビリティモデルの採用と4層分離 | proposed | 2026-08-17 |
 | DEC-018 | 評価ブランチモデルとCase統合先の一般化 | proposed | 2026-08-19 |
+| DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | proposed | 2026-08-20 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -67,6 +68,7 @@
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
 - [DEC-017](DEC-017.md)（TIM 準拠トレーサビリティモデルの採用と4層分離）
 - [DEC-018](DEC-018.md)（評価ブランチモデルとCase統合先の一般化）
+- [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -107,6 +109,7 @@
 - [DEC-011](DEC-011.md)（STEP resume point と会話記憶非依存）
 - [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界、処理単位と状態機械の選択的適用）
 - [DEC-018](DEC-018.md)（評価ブランチモデルとCase統合先の一般化、実証・評価ワークフローと統合先基準の統一）
+- [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界、YAML 構文解析・再帰ファイル探索・CLI 引数解析の標準 API 委譲）
 
 ### 整合性・IR 体系
 
@@ -143,6 +146,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-018 | relates-to | DEC-008 | 実証の評価契約変更はユーザー明示指示のみとし case-auto は自律変更しない運用は bounded parent decision resolution 決定4の適用 |
 | DEC-018 | relates-to | DEC-011 | 実証の中断・再開は評価ブランチ保持と Issue 永続情報からの復元により durable state 原則を適用 |
 | DEC-018 | relates-to | DEC-015 | 実証ワークフローは状態機械の選択的適用対象の拡張であり新規ハード統制を追加しない |
+| DEC-019 | relates-to | DEC-015 | ADF vs harness の責務分界とは軸が異なる（ADF 固有 vs 一般処理の標準 API 委譲）。責務分界の類推として参照する |
 
 ## 関連 REQ
 
@@ -166,6 +170,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-016 | [REQ-009](../requirements/REQ-009.md) | 導入系スクリプトの副作用ゼロ原則（provisioning 責務の利用者移転、REQ-009-010 UPDATE、REQ-009-046〜049 APPEND と整合） |
 | DEC-017 | [REQ-012](../requirements/REQ-012.md), [REQ-040](../requirements/REQ-040.md), [REQ-021](../requirements/REQ-021.md), [REQ-020](../requirements/REQ-020.md) | TIM 準拠トレーサビリティモデルの採用と4層分離（REQ-012 UPDATE、REQ-040 CREATE、REQ-021 UPDATE、REQ-020 UPDATE と整合） |
 | DEC-018 | [REQ-042](../requirements/REQ-042.md), [REQ-043](../requirements/REQ-043.md), [REQ-004](../requirements/REQ-004.md), [REQ-005](../requirements/REQ-005.md), [REQ-017](../requirements/REQ-017.md), [REQ-030](../requirements/REQ-030.md), [REQ-031](../requirements/REQ-031.md), [REQ-032](../requirements/REQ-032.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md) | 評価ブランチモデルとCase統合先の一般化（REQ-042/REQ-043 CREATE、REQ-004/005/017/030/031/032/034/035 UPDATE と整合） |
+| DEC-019 | [REQ-044](../requirements/REQ-044.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（REQ-044 CREATE と整合。Design 4 件への実装契約追記・更新を伴う） |
 
 ## 過去版の履歴基盤
 

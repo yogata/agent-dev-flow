@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下36件を第一参照先とする。
+現在の要件判断では、以下37件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -48,6 +48,7 @@
 | [REQ-041](REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
 | [REQ-042](REQ-042.md) | Case統合先とブランチモデル |
 | [REQ-043](REQ-043.md) | 評価ブランチ実証ワークフロー |
+| [REQ-044](REQ-044.md) | 標準API委譲の状態制約 |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
