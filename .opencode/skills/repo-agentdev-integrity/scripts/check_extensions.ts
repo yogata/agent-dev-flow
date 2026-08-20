@@ -247,7 +247,7 @@ function readText(p: string): string | null {
   }
 }
 
-function listMarkdownFiles(dirPath: string, recursive: boolean): string[] {
+export function listMarkdownFiles(dirPath: string, recursive: boolean): string[] {
   const result: string[] = [];
   if (!dirExists(dirPath)) return result;
   const entries = fs.readdirSync(dirPath, { withFileTypes: true }) as any[];
@@ -262,7 +262,7 @@ function listMarkdownFiles(dirPath: string, recursive: boolean): string[] {
   return result;
 }
 
-function listYamlFilesRecursive(dirPath: string): string[] {
+export function listYamlFilesRecursive(dirPath: string): string[] {
   const result: string[] = [];
   if (!dirExists(dirPath)) return result;
   const entries = fs.readdirSync(dirPath, { withFileTypes: true }) as any[];
@@ -277,7 +277,7 @@ function listYamlFilesRecursive(dirPath: string): string[] {
   return result;
 }
 
-function listFilesRecursive(dirPath: string): string[] {
+export function listFilesRecursive(dirPath: string): string[] {
   const result: string[] = [];
   if (!dirExists(dirPath)) return result;
   const entries = fs.readdirSync(dirPath, { withFileTypes: true }) as any[];

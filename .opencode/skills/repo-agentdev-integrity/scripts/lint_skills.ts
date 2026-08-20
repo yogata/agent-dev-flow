@@ -282,11 +282,9 @@ function lintDescriptionAg005(
   return results;
 }
 
-function lintReferencesTocAg005(skillDir: string, dirName: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  const refsDir = path.join(skillDir, "references");
-  if (!fs.existsSync(refsDir)) return results;
+export function collectReferenceMarkdownFiles(refsDir: string): string[] {
   const files: string[] = [];
+  if (!fs.existsSync(refsDir)) return files;
   (function walk(dir: string): void {
     for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, ent.name);
@@ -297,6 +295,14 @@ function lintReferencesTocAg005(skillDir: string, dirName: string): CheckResult[
       }
     }
   })(refsDir);
+  return files;
+}
+
+function lintReferencesTocAg005(skillDir: string, dirName: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const refsDir = path.join(skillDir, "references");
+  if (!fs.existsSync(refsDir)) return results;
+  const files: string[] = collectReferenceMarkdownFiles(refsDir);
   for (const refPath of files.sort()) {
     const text = fs.readFileSync(refPath, "utf-8");
     const lineCount = text.split(/\r?\n/).length;
@@ -821,4 +827,6 @@ function main(): void {
   process.exit(determineExitCode(summary));
 }
 
-main();
+if (import.meta.main) {
+  main();
+}

@@ -176,7 +176,7 @@ function listMarkdownFiles(dirPath: string): string[] {
   return result.sort();
 }
 
-function listFilesRecursive(dirPath: string, extensions?: string[]): string[] {
+export function listFilesRecursive(dirPath: string, extensions?: string[]): string[] {
   const result: string[] = [];
   if (!dirExists(dirPath)) return result;
   for (const ent of fs.readdirSync(dirPath, { withFileTypes: true }) as any[]) {

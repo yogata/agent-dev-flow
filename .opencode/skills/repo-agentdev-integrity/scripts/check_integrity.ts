@@ -5449,7 +5449,7 @@ function checkBrokenJunctions(skillsDir: string, root: string, cmdsDir?: string)
 
 // `realpath` follows Windows junctions, so a healthy projection compares equal
 // to its source. Without this, content_mismatch would fire on every junction.
-function collectMarkdownTree(dirRoot: string): string[] {
+export function collectMarkdownTree(dirRoot: string): string[] {
   if (!fs.existsSync(dirRoot)) return [];
   const acc: string[] = [];
   function walk(d: string): void {
@@ -6854,7 +6854,7 @@ const IR053_EXEMPT_PATHS: RegExp[] = [
   /src\/opencode\/skills\/agentdev-gh-cli\/references\/standard-procedures\.md$/,
 ];
 
-function walkMarkdown(dirPath: string, acc: string[]): void {
+export function walkMarkdown(dirPath: string, acc: string[]): void {
   if (!fs.existsSync(dirPath)) return;
   for (
     const entry of fs.readdirSync(dirPath, { withFileTypes: true }) as import("fs").Dirent[]
@@ -8553,7 +8553,7 @@ function truncateForLog(line: string | undefined): string {
 }
 
 // walkAllFiles: walkMarkdown と同等だが .md に限定しない（.yaml/.yml 含む）
-function walkAllFiles(dirPath: string, acc: string[]): void {
+export function walkAllFiles(dirPath: string, acc: string[]): void {
   if (!fs.existsSync(dirPath)) return;
   for (
     const entry of fs.readdirSync(dirPath, { withFileTypes: true }) as import("fs").Dirent[]

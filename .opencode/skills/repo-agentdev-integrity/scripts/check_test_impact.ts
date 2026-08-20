@@ -274,7 +274,7 @@ function globMatch(pattern: string, relPath: string): boolean {
   return new RegExp(`^${regexStr}$`).test(relPath);
 }
 
-function discoverTestFiles(root: string, testGlob: string): string[] {
+export function discoverTestFiles(root: string, testGlob: string): string[] {
   const results: string[] = [];
   function walk(dir: string): void {
     let entries: ReturnType<typeof fs.readdirSync>;

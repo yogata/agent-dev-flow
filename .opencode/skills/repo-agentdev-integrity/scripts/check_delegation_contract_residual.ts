@@ -153,7 +153,7 @@ function loadData(filePath: string): DelegationPatternData | null {
   return data;
 }
 
-function listMarkdownRecursive(dir: string): string[] {
+export function listMarkdownRecursive(dir: string): string[] {
   if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) return [];
   const out: string[] = [];
   for (const ent of fs.readdirSync(dir, { withFileTypes: true }) as any[]) {
