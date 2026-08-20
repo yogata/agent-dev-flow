@@ -1,8 +1,8 @@
 // Argument acceptance data for query_graph.ts, fixed before the
-// node:util.parseArgs migration (Issue #2354 / OU-003, REQ-044-003).
-// Expectations pin the current indexOf/skip-2 parser; the migrated parser must
-// reproduce them exactly. Normal-path regressions (related/discover/neighbors
-// with real graphs) are covered by trace_cli.test.ts.
+// node:util.parseArgs migration. Expectations pin the current indexOf/skip-2
+// parser; the migrated parser must reproduce them exactly. Normal-path
+// regressions (related/discover/neighbors with real graphs) are covered by
+// trace_cli.test.ts.
 
 import { afterEach, describe, expect, it } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
@@ -37,7 +37,7 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })))
 })
 
-describe("query_graph argument acceptance data: syntax errors (pre-migration fix, OU-003)", () => {
+describe("query_graph argument acceptance data: syntax errors (pre-migration fix)", () => {
   it("empty argv reports query subcommand required", () => {
     const r = runCli([])
     expect(r.exitCode).toBe(2)
@@ -82,7 +82,7 @@ describe("query_graph argument acceptance data: syntax errors (pre-migration fix
   })
 })
 
-describe("query_graph argument acceptance data: value binding (pre-migration fix, OU-003)", () => {
+describe("query_graph argument acceptance data: value binding (pre-migration fix)", () => {
   it("resolves the subcommand and reaches graph loading (arg syntax accepted)", async () => {
     const missingGraph = join(await mkdtemp(join(tmpdir(), "ag-cli-missing-")), "gone")
     const r = runCli(["--graph", missingGraph, "related", REQ1_NODE])

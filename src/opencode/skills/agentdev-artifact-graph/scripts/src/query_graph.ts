@@ -7,11 +7,10 @@ import { PROFILE_KINDS, type ProfileKind } from "../lib/tim.ts"
 import { runTraceQuery } from "../lib/trace_query.ts"
 import { runDiagnostics } from "../lib/trace_diagnostics.ts"
 
-// node:util.parseArgs への委譲（Issue #2354 / OU-003、DEC-019 決定1）。
-// 構文解析（値結合、`=` 形式、`--`、未知オプションの切り分け）は標準 API が行う。
-// サブコマンド解釈、位置引数スロット（argv index 基準）、初回出現優先のフラグ値
-// 取得は ADF 固有の意味解釈として本ファイルに残留する
-// （agentdev-artifact-graph Design「スクリプト実装の標準API移行」）。
+// 引数構文解析は node:util.parseArgs（strict:false + tokens）へ委譲し、
+// 既存の受理・拒否契約を維持する。サブコマンド解釈、位置引数スロット
+// （argv index 基準）、フラグ値の初回出現優先は本 CLI 固有の意味解釈として
+// このファイルに残留する。
 // strict:false では値を持たない文字列オプションが true になるため、
 // token の value === undefined を値欠落として扱う。
 
