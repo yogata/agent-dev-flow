@@ -328,3 +328,55 @@
 - **タグ**: #case-close #targeted-docs-guard #files-mode #コマンド行上限
 
 ---
+
+## 2026-08-20: 新規配布スキル scripts のコメント・description への producer 内部 ID 埋め込みが同 Wave 両 PR で連続発生（gate は PR 作成前に検出・修正）
+
+- **問題事象**: Epic 2351 Wave 1 の両 PR（2355: agentdev-project-extensions scripts 新規作成、2356: agentdev-artifact-graph query_graph.ts / テスト修正）で、配布依存境界 gate（check_distribution_boundary.ts --profile source）がそれぞれ concrete-id 8件+unclassified 4件（計12件）、concrete-id 2件+unclassified 4件（計6件）の違反を検出した。いずれもコメント・description・テスト名中の producer 内部 ID 参照（REQ-044 / DEC-019 / TS-002 / TS-004 / UC-001 / OU-003 等）。両 PR とも gate 実行は case-run 段階で実施されており（前回学びの予防策が機能）、PR 作成前にコメント一般化で解消済み。
+- **発生局面**: 実装（case-run、配布物新規作成・修正時）
+- **検知方法**: case-run STEP-S5 の配布依存境界 gate（PR HEAD worktree スキャン）
+- **根本原因**: 新規配布スキル scripts を作成する際、実装者がコメント・description に要件根拠（REQ/DEC/TS/UC ID）を書き出す習慣があり、配布物（src/opencode/**）が consumer 環境で producer 内部 ID を参照禁止する制約（配布依存境界 Design）を初期作成時点で想起しにくい。根拠は docs/designs 側へ寄せるかドメイン語で表現する必要がある。
+- **自律対応内容**: 両 PR とも該当コメント等を ID 参照なしの振る舞い記述へ一般化し、gate 再実行 ok=true / exit 0 を確認後に PR 作成（2355 は 6fa4a059、2356 は b1776d04）。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（gate 設計どおりに検出・解消。Design 契約の変更不要）
+- **横展開観点**: 配布物（src/opencode/**）を新規作成・修正する全 PR が対象。コメントだけでなく package.json の description、README、テストの describe 名も検出対象になる。
+- **再発条件**: 配布スキル scripts を新規作成し、コメント・description・テスト名に producer 内部 ID（REQ-/DEC-/TS-/UC-/OU- 等）を記述した場合。
+- **予防策候補**: 配布物新規作成時はコメント・description に内部 ID を書かずドメイン語で表現する。gate 実行は PR 作成前に必須（本 Wave では機能した）。case-run の初期手順に「配布物作成時のコメント規約」を明示する。
+- **想定反映先**: case-run command の品質統制・PR 作成手順、agentdev-workflow-case-run
+- **関連**: PR 2355、PR 2356、Issue 2352、Issue 2354、Epic 2351、docs/designs/integrity/distribution-boundary.md
+- **タグ**: `#distribution-boundary` `#case-run` `#配布物` `#コメント規約`
+
+---
+
+## 2026-08-20: フル integrity suite 未実施のままマージされた新規配布物追加 PR で IR-055 delta 違反がマージ後 main で初検出
+
+- **問題事象**: Epic 2351 Wave 1 クローズのマージ後検証で、repo-agentdev-integrity フル suite（bun test 全件）が IR-055「runtime-unresolved-reference」実修復回帰テストで失敗した（PR 2355 で新規追加された src/opencode/skills/agentdev-project-extensions/scripts/README.md の repo-local / repo-agentdev-integrity 参照3件、delta from baseline 違反）。PR 2355 の case-run は配布側サブセットテスト（21件）と checker 個別テストのみ実施し、フル suite（特に check_integrity.test.ts の実リポジトリ回帰テスト）を未実施のまま PR 作生・マージされていた。並列 Wave の PR 2356 はフル suite を実施していたが、その worktree には PR 2355 の新規ファイルが存在しないため検出不能だった。
+- **発生局面**: レビュー（case-close マージ後検証）。起因は実装（case-run のテスト実施範囲）
+- **検知方法**: case-close のマージ後 main での bun test 全件実行（IR-055 delta テスト失敗、2 fail 中1件）
+- **根本原因**: 配布物を新規追加する PR の品質統制にフル integrity suite 実施が必須化されておらず、サブセットテストの green だけで PR 作成可能になっている。加えて並列 Wave の worktree 相互は他 PR の変更を含まないため、マージ後の組み合わせ状態はマージ前の個別 worktree では検証できない。
+- **自律対応内容**: case-close は違反を intake item（2026-08-20-project-extensions-readme-ir055-repo-refs.md）として回収し、コメント一般化の修正候補を後続へ委譲した。マージ済みのため case-close では実装を修正していない。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（IR-055 ルールは設計どおりに検出。修正は intake 経由で後続 Case 化）
+- **横展開観点**: 配布物（src/opencode/**）を新規追加・大幅修正する PR すべて。並列 Wave 構成の Epic では個別 worktree の suite green が全体 green を保証しない。
+- **再発条件**: 新規配布物を追加する PR でフル integrity suite を実施せずマージした場合、および並列 Wave の変更が同一 main 上で初めて結合する場合。
+- **予防策候補**: 配布物を追加する PR の品質統制に「bun test ./.opencode/skills/repo-agentdev-integrity/scripts/ 全件（少なくとも check_integrity.test.ts）」を必須ステップとして明示する。
+- **想定反映先**: case-run command の品質統制、agentdev-workflow-case-run
+- **関連**: PR 2355、Epic 2351、intake 2026-08-20-project-extensions-readme-ir055-repo-refs.md、.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
+- **タグ**: `#case-run` `#integrity-suite` `#IR-055` `#配布物` `#epic-wave`
+
+---
+
+## 2026-08-20: worktree の scripts ディレクトリは node_modules 未解決で開始し bun test が大量 fail する（bun install で解消、node_modules は gitignore 対象外）
+
+- **問題事象**: PR 2356 の case-run で、worktree 内の scripts ディレクトリ（.opencode/skills/repo-agentdev-integrity/scripts、src/opencode/skills/agentdev-artifact-graph/scripts）に node_modules が存在しない状態で bun test を実行したところ、zod 解析エラーで大量 fail する状態から開始した（環境起因、移行と無関係）。bun install（bun.lock 変更なし）で解消。また .opencode/skills/repo-agentdev-integrity/scripts/node_modules は gitignore 対象外のため、コミット対象から明示的に除外した。case-close のマージ後 main 検証でも、main checkout の src/opencode/skills/agentdev-project-extensions/scripts（PR 2355 で新設）に node_modules が無く、bun install を先に実行する必要があった。
+- **発生局面**: 実装（case-run、worktree テスト実行時）およびレビュー（case-close のマージ後検証）
+- **検知方法**: bun test の zod 解析エラーによる大量 fail（モジュール解決失敗）
+- **根本原因**: git worktree はトラックファイルのみ展開され、gitignore または非追跡の node_modules は新しい worktree・チェックアウトに存在しない。scripts 単位の package.json/bun.lock 構成（runtime-package-boundary）では、テスト実行前に各 scripts ディレクトリで bun install が必要。
+- **自律対応内容**: case-run は bun install で解消し node_modules をコミット対象から除外。case-close はマージ後検証の batery で bun install を前置して配布側・repo-local の全テストを実施（21 pass / 169 pass / suite 実施）。
+- **ユーザー確認有無**: なし
+- **ADR/REQ/Design影響**: なし（runtime-package-boundary Design の scripts 単位依存解決の帰結）
+- **横展開観点**: worktree・fresh clone で scripts 配下のテストを実行する全場面（case-run、case-close、レビュー、CI）。新規配布スキル scripts を追加する PR のマージ後は main checkout 側でも bun install が必要。
+- **再発条件**: worktree 作成直後または新規 scripts ディレクトリ追加直後に bun install を前置せず bun test を実行した場合。
+- **予防策候補**: worktree で scripts 配下のテストを実行する手順に「bun install 前置」を明示する。新規 scripts ディレクトリの .gitignore（node_modules 除外）を同梱する（PR 2355 が実施済みのパターン）。
+- **想定反映先**: case-run command / agentdev-workflow-case-run のテスト実行手順、agentdev-git-worktree の worktree セットアップ手順
+- **関連**: PR 2356、PR 2355、Epic 2351
+- **タグ**: `#worktree` `#bun-install` `#node_modules` `#case-run`
