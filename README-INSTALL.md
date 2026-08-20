@@ -62,4 +62,4 @@ bun run <host>/.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.
 ## 関連
 
 - 移行計画: `.omo/plans/agentdev-migration-2026-08-05.md` §7（host 側の normative）
-- 仕様: `<integrity-contracts>` SPEC「実行プロファイル分離（source/installed/release）」
+- 仕様: `<integrity-contracts>` Design「実行プロファイル分離（source/installed/release）」

@@ -5,18 +5,18 @@ id: agentdev-workflow-case-auto
 context:
   - id: must-1
     paths:
-      - "docs/specs/workflows/epic-wave-model.md"
+      - "docs/designs/workflows/epic-wave-model.md"
     purpose: Epic/Wave/Issue 実行モデルと execution_unit 構成の確認
   - id: workflow-contracts
     when: ワークフロー契約（フェーズ、SSoT 遷移、実装分類）参照時
     paths:
-      - "docs/specs/workflows/workflow-contracts.md"
+      - "docs/designs/workflows/workflow-contracts.md"
     purpose: パイプライン概要と共通フェーズ契約の確認
   - id: case-auto-spec
-    when: 本コマンド SPEC（経路H 停止伝播契約、bounded parent decision resolution、コンフリクト解消モデル3レベル、停止理由分類の分類軸、実証Case自走）参照時
+    when: 本コマンド Design（経路H 停止伝播契約、bounded parent decision resolution、コンフリクト解消モデル3レベル、停止理由分類の分類軸、実証Case自走）参照時
     paths:
-      - "docs/specs/commands/case-auto.md"
-    purpose: case-auto 固有契約の正規定義の確認。本コマンド定義は実行入口であり、契約の詳細は本 SPEC を正とする
+      - "docs/designs/commands/case-auto.md"
+    purpose: case-auto 固有契約の正規定義の確認。本コマンド定義は実行入口であり、契約の詳細は本 Design を正とする
   - id: bounded-parent-decision-resolution-contract
     when: bounded parent decision resolution の解決範囲、作業仮定の明示要件、上位合意矛盾・新規ユーザー判断事項の停止理由分類、resume 機構の参照時
     paths:

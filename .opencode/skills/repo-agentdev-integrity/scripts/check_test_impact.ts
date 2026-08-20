@@ -1,18 +1,18 @@
 /**
  * check_test_impact.ts — Test impact detection gate (REQ-019).
  *
- * リファクタリング PR で SPEC 変更に連動する周辺テストの陳腐化を検出する。
- * 変更 SPEC ファイルを抽出し、当該 SPEC を参照するテストファイルのうち
+ * リファクタリング PR で Design 変更に連動する周辺テストの陳腐化を検出する。
+ * 変更 Design ファイルを抽出し、当該 Design を参照するテストファイルのうち
  * 同一 PR で未変更のものを「陳腐化候補」として報告する。
  *
  * 処理層 (5層):
  *   1. changed file resolver    — --files / --base-ref から変更ファイルを特定
- *   2. spec change classifier   — 変更ファイルを SPEC/REQ/ADR 変更へ分類
+ *   2. spec change classifier   — 変更ファイルを Design/REQ/ADR 変更へ分類
  *   3. test file discovery       — test-glob で走査対象テストファイルを発見
- *   4. reference scanner         — 各テストファイルから SPEC 参照を抽出
+ *   4. reference scanner         — 各テストファイルから Design 参照を抽出
  *   5. staleness evaluator       — 参照テストが同一 PR で変更されたか評価
  *
- * CLI 詳細は docs/specs/integrity/test-impact-detection-gate.md「チェッカー実装契約」節参照。
+ * CLI 詳細は docs/designs/integrity/test-impact-detection-gate.md「チェッカー実装契約」節参照。
  */
 
 import {
@@ -25,14 +25,14 @@ const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
 
 const SCRIPT_NAME = "check_test_impact.ts";
-const DESCRIPTION = "Test impact detection gate for SPEC changes (REQ-019)";
+const DESCRIPTION = "Test impact detection gate for Design changes (REQ-019)";
 const USAGE =
   "bun run check_test_impact.ts [--base-ref <git-ref> | --files <path...>] [--test-glob <pattern>] [--json] [--root <path>]";
 const DEFAULT_TEST_GLOB = "**/*.test.ts";
 
-// SPEC 系ファイルのパス分類。docs/specs/**、docs/requirements/REQ-*、docs/adr/ADR-* を対象とする。
-const SPEC_PATH_PATTERNS = [
-  /^docs\/specs\/.*\.md$/,
+// Design 系ファイルのパス分類。docs/designs/**、docs/requirements/REQ-*、docs/adr/ADR-* を対象とする。
+const Design_PATH_PATTERNS = [
+  /^docs\/designs\/.*\.md$/,
   /^docs\/requirements\/REQ-.*\.md$/,
   /^docs\/adr\/ADR-.*\.md$/,
 ];
@@ -187,15 +187,15 @@ function resolveChangedFiles(
 // ─── Layer 2: spec change classifier ───────────────────────────────────────
 
 function isSpecPath(relPath: string): boolean {
-  return SPEC_PATH_PATTERNS.some((p) => p.test(relPath));
+  return Design_PATH_PATTERNS.some((p) => p.test(relPath));
 }
 
 interface SpecChange {
   relPath: string;
   lifecycle: SpecLifecycle;
   basename: string;
-  reqIds: string[]; // 変更 SPEC から抽出した REQ-NNN（REQ ファイル自身の ID 等）
-  adrIds: string[]; // 変更 SPEC から抽出した ADR-NNN
+  reqIds: string[]; // 変更 Design から抽出した REQ-NNN（REQ ファイル自身の ID 等）
+  adrIds: string[]; // 変更 Design から抽出した ADR-NNN
 }
 
 function gitNameStatus(
@@ -238,8 +238,8 @@ function classifySpecChanges(
     else if (status.status === "R") lifecycle = "renamed";
     else if (status.status === "M") lifecycle = "modified";
     // 伝播対象 ID は「ファイル自身の ID」のみ。
-    // REQ/ADR ファイル名由来の ID のみを採用し、SPEC 本文の ADR/REQ 言及は伝播させない
-    // （SPEC が ADR-001 を言及しても ADR-001 変更ではなく、過検出になるため）。
+    // REQ/ADR ファイル名由来の ID のみを採用し、Design 本文の ADR/REQ 言及は伝播させない
+    // （Design が ADR-001 を言及しても ADR-001 変更ではなく、過検出になるため）。
     const reqIds: string[] = [];
     const adrIds: string[] = [];
     const reqFileMatch = rel.match(/REQ-(\d{3})/);
@@ -349,7 +349,7 @@ function findReferencesInTest(
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const lineNumber = i + 1;
-    // 1. SPEC 相対パス（full-path）参照
+    // 1. Design 相対パス（full-path）参照
     for (const [specPath, sc] of fullPathSet) {
       if (line.includes(specPath)) {
         const key = `${sc.relPath}|full-path|${lineNumber}`;
@@ -365,7 +365,7 @@ function findReferencesInTest(
         }
       }
     }
-    // 2. SPEC basename 参照（汎用名称は stoplist で除外、full-path は別途照合）
+    // 2. Design basename 参照（汎用名称は stoplist で除外、full-path は別途照合）
     for (const [basename, scs] of basenameSet) {
       if (BASENAME_STOPLIST.has(basename)) continue;
       if (line.includes(basename)) {
@@ -463,10 +463,10 @@ function evaluateStaleness(
       });
     }
   }
-  // silent pass 回避: SPEC 変更あり、かつ参照ヒット 0 件の場合は警告
+  // silent pass 回避: Design 変更あり、かつ参照ヒット 0 件の場合は警告
   if (specChanges.length > 0 && totalReferenceHits === 0 && testFiles.length > 0) {
     warnings.push(
-      `SPEC 変更 ${specChanges.length} 件を検出したが、走査したテストファイルから参照を検出できなかった。test-glob の設定、参照形式、除外ディレクトリを確認すること。`,
+      `Design 変更 ${specChanges.length} 件を検出したが、走査したテストファイルから参照を検出できなかった。test-glob の設定、参照形式、除外ディレクトリを確認すること。`,
     );
   }
   return { findings, warnings };

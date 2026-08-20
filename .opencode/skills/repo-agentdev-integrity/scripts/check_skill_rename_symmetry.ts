@@ -5,13 +5,13 @@
 //
 //   REQ-026-001 (path-symmetry):
 //     For every distributed skill `src/opencode/skills/{X}/` there must be a
-//     matching SPEC `docs/specs/skills/{X}.md`, and vice versa. SPEC with
+//     matching Design `docs/designs/skills/{X}.md`, and vice versa. Design with
 //     status `superseded` is exempt (skill dir intentionally removed).
 //
 //   REQ-026-002 (frontmatter-id):
 //     SKILL.md frontmatter `name` must equal the parent directory name.
-//     SPEC frontmatter `title` must contain the skill name token matching
-//     the SPEC filename stem.
+//     Design frontmatter `title` must contain the skill name token matching
+//     the Design filename stem.
 //
 //   REQ-026-003 (graph-node):
 //     Artifact Graph skill nodes (`.agentdev/graph/nodes.jsonl`) must match
@@ -49,7 +49,7 @@ export interface SymmetryReport {
   failures: SymmetryFailure[];
   stats: {
     skills_scanned: number;
-    specs_scanned: number;
+    designs_scanned: number;
     graph_skill_nodes_scanned: number;
     path_symmetry_violations: number;
     frontmatter_id_violations: number;
@@ -59,9 +59,9 @@ export interface SymmetryReport {
 }
 
 const DISTRIBUTION_SKILLS_PARENT = "src/opencode/skills";
-const SPECS_SKILLS_DIR = "docs/specs/skills";
+const DESIGNS_SKILLS_DIR = "docs/designs/skills";
 const GRAPH_NODES_PATH = ".agentdev/graph/nodes.jsonl";
-const TEMPLATE_SPEC = "_template.md";
+const TEMPLATE_DESIGN = "_template.md";
 
 function dirExists(p: string): boolean {
   try {
@@ -116,11 +116,11 @@ export function parseFrontmatter(text: string): Record<string, string> {
 }
 
 /**
- * Extract the skill name token from a SPEC `title` frontmatter value.
+ * Extract the skill name token from a Design `title` frontmatter value.
  * Titles follow conventions like:
- *   `agentdev-doc-writing` SPEC
- *   "agentdev-gh-cli" SPEC
- *   agentdev-workflow-lifecycle SPEC
+ *   `agentdev-doc-writing` Design
+ *   "agentdev-gh-cli" Design
+ *   agentdev-workflow-lifecycle Design
  * Returns the leading contiguous token (alphanumeric, dash, underscore) or
  * null when no token can be extracted.
  */
@@ -139,7 +139,7 @@ interface SkillEntry {
   dir: string;
 }
 
-interface SpecEntry {
+interface DesignEntry {
   name: string;
   file: string;
   status: string;
@@ -159,15 +159,15 @@ function listDistributionSkills(repoRoot: string): SkillEntry[] {
   return out;
 }
 
-function listSpecs(repoRoot: string): SpecEntry[] {
-  const dir = path.join(repoRoot, SPECS_SKILLS_DIR);
-  const out: SpecEntry[] = [];
+function listDesigns(repoRoot: string): DesignEntry[] {
+  const dir = path.join(repoRoot, DESIGNS_SKILLS_DIR);
+  const out: DesignEntry[] = [];
   if (!dirExists(dir)) return out;
   const entries = fs.readdirSync(dir, { withFileTypes: true }) as any[];
   for (const ent of entries) {
     if (!ent.isFile()) continue;
     if (!ent.name.endsWith(".md")) continue;
-    if (ent.name === TEMPLATE_SPEC) continue;
+    if (ent.name === TEMPLATE_DESIGN) continue;
     const stem = ent.name.slice(0, -3);
     if (!stem.startsWith("agentdev-")) continue;
     const file = path.join(dir, ent.name);
@@ -188,45 +188,45 @@ function isSupersededStatus(status: string): boolean {
 }
 
 /**
- * REQ-026-001: physical path symmetry between distribution skills and SPECs.
+ * REQ-026-001: physical path symmetry between distribution skills and Designs.
  */
 function checkPathSymmetry(
   skills: SkillEntry[],
-  specs: SpecEntry[],
+  designs: DesignEntry[],
 ): SymmetryFailure[] {
   const failures: SymmetryFailure[] = [];
   const skillNames = new Set(skills.map((s) => s.name));
-  const specByName = new Map(specs.map((s) => [s.name, s] as const));
+  const designByName = new Map(designs.map((s) => [s.name, s] as const));
 
-  // skill dir exists → SPEC must exist
+  // skill dir exists → Design must exist
   for (const skill of skills) {
-    if (!specByName.has(skill.name)) {
+    if (!designByName.has(skill.name)) {
       failures.push({
         category: "path-symmetry",
         level: "ng",
         message:
-          `distribution skill \`${skill.name}\` has no matching SPEC at ${SPECS_SKILLS_DIR}/${skill.name}.md`,
+          `distribution skill \`${skill.name}\` has no matching Design at ${DESIGNS_SKILLS_DIR}/${skill.name}.md`,
         file: skill.dir,
-        expected: `${SPECS_SKILLS_DIR}/${skill.name}.md`,
+        expected: `${DESIGNS_SKILLS_DIR}/${skill.name}.md`,
       });
     }
   }
 
-  // SPEC exists → skill dir must exist (unless superseded)
-  for (const spec of specs) {
-    if (skillNames.has(spec.name)) continue;
-    if (isSupersededStatus(spec.status)) {
-      // superseded SPEC intentionally has no skill dir; not a violation
+  // Design exists → skill dir must exist (unless superseded)
+  for (const design of designs) {
+    if (skillNames.has(design.name)) continue;
+    if (isSupersededStatus(design.status)) {
+      // superseded Design intentionally has no skill dir; not a violation
       continue;
     }
-    const level = spec.status === "accepted" ? "ng" : "warning";
+    const level = design.status === "accepted" ? "ng" : "warning";
     failures.push({
       category: "path-symmetry",
       level,
       message:
-        `SPEC \`${spec.name}\` (status: ${spec.status || "unknown"}) has no matching distribution skill at ${DISTRIBUTION_SKILLS_PARENT}/${spec.name}`,
-      file: spec.file,
-      expected: `${DISTRIBUTION_SKILLS_PARENT}/${spec.name}/SKILL.md`,
+        `Design \`${design.name}\` (status: ${design.status || "unknown"}) has no matching distribution skill at ${DISTRIBUTION_SKILLS_PARENT}/${design.name}`,
+      file: design.file,
+      expected: `${DISTRIBUTION_SKILLS_PARENT}/${design.name}/SKILL.md`,
     });
   }
 
@@ -237,11 +237,11 @@ function checkPathSymmetry(
  * REQ-026-002: frontmatter id consistency.
  *
  * SKILL.md `name` must equal parent directory name.
- * SPEC `title` must contain the skill name token matching the filename stem.
+ * Design `title` must contain the skill name token matching the filename stem.
  */
 function checkFrontmatterId(
   skills: SkillEntry[],
-  specs: SpecEntry[],
+  designs: DesignEntry[],
 ): SymmetryFailure[] {
   const failures: SymmetryFailure[] = [];
 
@@ -282,33 +282,33 @@ function checkFrontmatterId(
     }
   }
 
-  for (const spec of specs) {
-    if (!spec.title) {
+  for (const design of designs) {
+    if (!design.title) {
       // missing title is out of scope for this check; frontmatter required-fields
       // is owned by check_integrity.ts. Skip silently.
       continue;
     }
-    const extracted = extractSkillNameFromTitle(spec.title);
+    const extracted = extractSkillNameFromTitle(design.title);
     if (extracted === null) {
       failures.push({
         category: "frontmatter-id",
         level: "warning",
         message:
-          `SPEC title \`${spec.title}\` does not contain a parseable skill name token`,
-        file: spec.file,
-        expected: spec.name,
+          `Design title \`${design.title}\` does not contain a parseable skill name token`,
+        file: design.file,
+        expected: design.name,
       });
       continue;
     }
-    if (extracted !== spec.name) {
+    if (extracted !== design.name) {
       failures.push({
         category: "frontmatter-id",
         level: "warning",
         message:
-          `SPEC title token \`${extracted}\` does not match filename stem \`${spec.name}\``,
-        file: spec.file,
-        expected: spec.name,
-        evidence: spec.title,
+          `Design title token \`${extracted}\` does not match filename stem \`${design.name}\``,
+        file: design.file,
+        expected: design.name,
+        evidence: design.title,
       });
     }
   }
@@ -393,11 +393,11 @@ function checkGraphNodeIntegrity(
 
 export function checkSkillRenameSymmetry(repoRoot: string): SymmetryReport {
   const skills = listDistributionSkills(repoRoot);
-  const specs = listSpecs(repoRoot);
+  const designs = listDesigns(repoRoot);
   const graphNodes = readGraphSkillNodes(repoRoot);
 
-  const pathFailures = checkPathSymmetry(skills, specs);
-  const frontmatterFailures = checkFrontmatterId(skills, specs);
+  const pathFailures = checkPathSymmetry(skills, designs);
+  const frontmatterFailures = checkFrontmatterId(skills, designs);
   const graphFailures = checkGraphNodeIntegrity(skills, graphNodes);
 
   const failures: SymmetryFailure[] = [
@@ -408,7 +408,7 @@ export function checkSkillRenameSymmetry(repoRoot: string): SymmetryReport {
 
   const stats = {
     skills_scanned: skills.length,
-    specs_scanned: specs.length,
+    designs_scanned: designs.length,
     graph_skill_nodes_scanned: graphNodes ? graphNodes.length : 0,
     path_symmetry_violations: pathFailures.length,
     frontmatter_id_violations: frontmatterFailures.length,
@@ -444,8 +444,8 @@ ARGUMENTS:
   repoRoot     Repository root (default: current working directory)
 
 CHECKS:
-  path-symmetry    REQ-026-001: src/opencode/skills/{X} <-> docs/specs/skills/{X}.md
-  frontmatter-id   REQ-026-002: SKILL.md name == dir, SPEC title token == filename stem
+  path-symmetry    REQ-026-001: src/opencode/skills/{X} <-> docs/designs/skills/{X}.md
+  frontmatter-id   REQ-026-002: SKILL.md name == dir, Design title token == filename stem
   graph-node       REQ-026-003: Artifact Graph skill nodes match skill directories
 
 EXIT CODES:

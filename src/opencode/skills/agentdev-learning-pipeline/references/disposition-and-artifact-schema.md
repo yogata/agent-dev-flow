@@ -17,7 +17,7 @@ SKILL.md 本文では処分区分の存在と living pool 維持の不変条件�
 
 learning-promote が各クラスタに対して判定する廃棄カテゴリ。
 
-**昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/ADR/SPEC）への昇華可能性を評価する。
+**昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/ADR/Design）への昇華可能性を評価する。
 8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。
 **無条件の自動REQ化は禁止する**。
 学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save` の昇華経路を経て初めて REQ 化される。
@@ -34,7 +34,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 | 4 | 新規 command 化 | 特定の操作フローが繰り返し現れている、自動化すべき手順が明確 |
 | 5 | template 反映 | ドキュメント、Issue、PR等のテンプレート形式に反映すべきフォーマット知見 |
 | 6 | ADR 候補 | アーキテクチャに関する設計判断、技術選定の理由を記録すべき内容 |
-| 7 | spec 候補 | システム仕様、実装パターン、設計原則として docs/specs/ に反映すべき内容 |
+| 7 | spec 候補 | システム仕様、実装パターン、設計原則として docs/designs/ に反映すべき内容 |
 | 8 | REQ 候補 | 要件変更、機能追加の要因となる知見、既存REQの更新が必要な内容。**自動REQ化ではなく候補扱い**。確定は `/agentdev/req-define` → `/agentdev/req-save` 経路で行う |
 | 9 | project-local knowledge | プロジェクト固有の落とし穴、環境依存の知見、汎用化が難しい内容 |
 | 10 | deferred | まだ昇華の余地がない、情報が断片的、出現回数が少ない。**living pool（`deferred.md`）で維持し REQ 化しない** |
@@ -49,7 +49,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 - **format**（フォーマット）→ template + command のフォーマット検証
 - **user-confirmed work**（ユーザー確認済み作業フロー）→ command workflow
 - **architecture**（アーキテクチャ決定）→ ADR 候補
-- **system spec**（システム仕様）→ docs/specs/
+- **system spec**（システム仕様）→ docs/designs/
 - **requirement change**（要件変更）→ REQ/Issue 更新
 - **project-specific pitfalls**（プロジェクト固有の落とし穴）→ project-local knowledge
 
@@ -60,7 +60,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 - `.opencode/skills/` 配下の全スキル
 - `.opencode/skills/agentdev-workflow-templates/templates/` 配下
 - `.opencode/skills/agentdev-req-file-manager/templates/`, `agentdev-decision-file-manager/templates/`, `agentdev-spec-compliance/templates/` 配下
-- `docs/specs/`, `docs/decisions/`, `docs/requirements/` 配下
+- `docs/designs/`, `docs/decisions/`, `docs/requirements/` 配下
 
 ギャップ分類:
 - **fix gap**: 対策内容に不備、欠落がある
@@ -148,7 +148,7 @@ learning-promote が出力する採用済み成果物の形式。
 | 新規 command 化 | `.opencode/commands/{new-command}.md` |
 | template 反映 | `.opencode/skills/agentdev-workflow-templates/templates/{template}.md` |
 | Decision 候補 | `docs/decisions/DEC-{NNN}-{name}.md` |
-| spec 候補 | `docs/specs/{domain}/{spec-name}.md` |
+| spec 候補 | `docs/designs/{domain}/{spec-name}.md` |
 | REQ 候補 | `docs/requirements/REQ-{NNNN}.md` |
 | project-local knowledge | 内容に応じた振り分け（後述参照） |
 
@@ -161,7 +161,7 @@ project-local knowledge を一律 `.agentdev/learning/project-knowledge.md` に�
 | 常時必要な短いルール | `AGENTS.md` |
 | 作業種別に応じて必要な知識 | `.opencode/skills/<domain>/SKILL.md` |
 | 長い詳細 | `.opencode/skills/<domain>/references/*.md` |
-| 仕様として固定すべき内容 | `docs/specs/<**/*>.md` |
+| 仕様として固定すべき内容 | `docs/designs/<**/*>.md` |
 | 設計判断 | `docs/decisions/<*>.md` |
 | 要件変更 | `docs/requirements/<*>.md` |
 

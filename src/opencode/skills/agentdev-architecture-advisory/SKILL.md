@@ -1,6 +1,6 @@
 ---
 name: agentdev-architecture-advisory
-description: "Requirement definition architecture review support. USE FOR: req-define architecture-impact judgment when requirements may affect responsibility boundaries, existing REQ/ADR/SPEC consistency, or external agent integration. DO NOT USE FOR: implementation execution, implementation plan review, or file editing."
+description: "Requirement definition architecture review support. USE FOR: req-define architecture-impact judgment when requirements may affect responsibility boundaries, existing REQ/ADR/Design consistency, or external agent integration. DO NOT USE FOR: implementation execution, implementation plan review, or file editing."
 ---
 
 # アーキテクチャ助言（req-define 事前確認）
@@ -16,7 +16,7 @@ req-define が要件を確定する前にアーキテクチャ上の影響を確
 
 req-define が以下のいずれかに該当する場合、ドラフト完了前かつ ADR 判断確定前にアーキテクチャ助言サブエージェントへ確認する:
 
-- 既存 REQ/ADR/SPEC との衝突可能性
+- 既存 REQ/ADR/Design との衝突可能性
 - 新規 ADR 作成または既存 ADR 更新候補
 - command/ skill/ workflow/ docs の責務境界変更
 - 外部実行手段、OpenCode プラグイン、サブエージェントの責務境界影響
@@ -36,12 +36,12 @@ ADR 判断が確定した後の確認は本スキルの対象外。
 | 要素 | 内容 |
 |------|------|
 | 要件候補 | 今回確定しようとする要件行候補、対象範囲 |
-| 衝突候補 | 既存 REQ/ADR/SPEC との矛盾、責務境界変更候補 |
+| 衝突候補 | 既存 REQ/ADR/Design との矛盾、責務境界変更候補 |
 | ADR 候補 | 新規 ADR 作成または既存 ADR 更新の候補 |
 | 既存 ADR との関連 | 既存 ADR との意味的重複、適用範囲の重なり、relates-to 関係 |
 | 親エージェントの判断質問 | アーキテクチャ助言サブエージェントに答えてほしい具体的質問、未決分岐 |
 
-SPEC 分離候補は要件候補、衝突候補に付随情報として併記し、独立要素とはしない。
+Design 分離候補は要件候補、衝突候補に付随情報として併記し、独立要素とはしない。
 
 ## アーキテクチャ助言サブエージェント出力の 4 ラベル構造（soft-contract、REQ）
 
@@ -89,12 +89,12 @@ SPEC 分離候補は要件候補、衝突候補に付随情報として併記し
 | ファイル編集 | 親エージェント、各コマンド |
 
 アーキテクチャ助言サブエージェントはファイル編集主体ではない。
-ドラフト、REQ、Decision、SPEC、Issue、PR を直接更新しない。
+ドラフト、REQ、Decision、Design、Issue、PR を直接更新しない。
 
 ## See Also
 
 - **agentdev-decision-guidelines**: Decision 判断基準、記録（本スキルは Decision 判断前の事前確認）
-- **agentdev-req-analysis**: 要件展開、分類ゲート、SPEC 分離候補抽出
+- **agentdev-req-analysis**: 要件展開、分類ゲート、Design 分離候補抽出
 - **references/architecture-review-delegation.md**: アーキテクチャ助言サブエージェントの具体的起動方法、相談プロトコル具象
 
 

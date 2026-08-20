@@ -74,8 +74,8 @@ OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため�
 - 実証必要性の推論・提案と評価契約の確定を要件展開工程の一部として実行する（実証Case判定と評価契約の意味論は評価ブランチ実証ワークフロー要件が所有する）。単なる追加調査だけを理由に実証Caseとしない
 - 実証Caseとして確定した後は評価ブランチ利用を別途確認せず、実証Caseなら評価ブランチ、通常Caseなら main と決定的に導出する
 - 評価契約と test strategy は分離する。test strategy は実証手段・計測手段・実証環境が正常に動作したかを扱い、評価契約は評価対象から得られた結果と採否を扱う
-- 本コマンドは実証Caseでも Git 副作用を持たない（評価ブランチ・worktree 準備の実行主体・手順は command SPEC が所有する）。評価ブランチ作成だけの新しい公開コマンドを追加しない
-- SPEC 分離基準に該当する要件行は `artifact_actions`（`artifact: spec`）へ分離する（安定契約例外は除く）。test strategy 項目は verification（検証手順）・pass_criteria（合格基準）・on_failure（不合格時の処置）の3要素を完全に持ち、欠落項目は保存前に QG fail として扱う
+- 本コマンドは実証Caseでも Git 副作用を持たない（評価ブランチ・worktree 準備の実行主体・手順は command Design が所有する）。評価ブランチ作成だけの新しい公開コマンドを追加しない
+- Design 分離基準に該当する要件行は `artifact_actions`（`artifact: design`）へ分離する（安定契約例外は除く）。test strategy 項目は verification（検証手順）・pass_criteria（合格基準）・on_failure（不合格時の処置）の3要素を完全に持ち、欠落項目は保存前に QG fail として扱う
 
 ## ガードレール
 

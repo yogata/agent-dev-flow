@@ -1,7 +1,7 @@
 # `agentdev-req-file-manager` scripts
 
 REQ 固有の採番・検索処理のみを扱う決定的処理スクリプト群（REQ/160、AG-{NNN}/006、design-principles.md 第5節）。
-`search-target-area.ts` は `agentdev-spec-file-manager` へ移管済み。
+`search-target-area.ts` は `agentdev-design-file-manager` へ移管済み。
 `alloc-decision-number.ts`（旧 `alloc-adr-number.ts`）は `agentdev-decision-file-manager` へ移管済み（OU-{NNN}、RU-{NNNN}）。
 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-{NNN}、RU-{NNNN}-01 合意）。
 

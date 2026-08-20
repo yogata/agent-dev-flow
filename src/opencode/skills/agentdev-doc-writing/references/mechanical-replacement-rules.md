@@ -5,11 +5,11 @@
 
 > **原本**: 中黒、em-dash、一文一行の機械判定アルゴリズムは本ファイルが原本。
 > LLM 表現の検出、書き換え辞書は [rewrite-patterns.md](rewrite-patterns.md) を参照。
-> 執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）、用語政策の原本は document-type-responsibilities SPEC を参照。
+> 執筆規範の SSoT は `japanese-tech-writing` スキル（AGENTS.md 経由）、用語政策の原本は document-type-responsibilities Design を参照。
 
 ## 対象読者
 
-docs/ 配下の REQ/ADR/SPEC/guides/README、および docs を生成、編集する command/skill の自然言語記述に対し、機械判定可能な是正を適用する `agentdev-doc-writing` スキル利用者、inspect-docs 実装者、CI 検証設定者。
+docs/ 配下の REQ/ADR/Design/guides/README、および docs を生成、編集する command/skill の自然言語記述に対し、機械判定可能な是正を適用する `agentdev-doc-writing` スキル利用者、inspect-docs 実装者、CI 検証設定者。
 
 ## 対象範囲と適用除外
 
@@ -20,7 +20,7 @@ docs/ 配下の REQ/ADR/SPEC/guides/README、および docs を生成、編集�
 
 - ユーザー発言の引用、既存文書の引用
 - 他ファイルの見出し、節名の引用（`「...」` で括られた参照）
-- 禁止表現そのものの批評、説明（禁止表現をルールとして直接説明、例示する文脈のみ。例: 「において」は「で」に置換する、というルール説明文中の対象語。SPEC やガイドの行為描写中に禁止表現と同一の語が含まれても、ルール説明文脈でなければ是正対象とする）
+- 禁止表現そのものの批評、説明（禁止表現をルールとして直接説明、例示する文脈のみ。例: 「において」は「で」に置換する、というルール説明文中の対象語。Design やガイドの行為描写中に禁止表現と同一の語が含まれても、ルール説明文脈でなければ是正対象とする）
 - コードブロック、インラインコードの内部
 - YAML frontmatter のキー名、識別子値
 
@@ -33,20 +33,20 @@ docs/ 配下の REQ/ADR/SPEC/guides/README、および docs を生成、編集�
 
 | 条件 | 機械判定方法 | 例 |
 |---|---|---|
-| SPEC 明示例 | SPEC `document-type-responsibilities.md`「中黒使用の許容範囲」節に列挙された固定複合名詞の内部と一致 | `実行時・編集時`、`コマンド・スキル・テンプレート・スクリプト` |
+| Design 明示例 | Design `document-type-responsibilities.md`「中黒使用の許容範囲」節に列挙された固定複合名詞の内部と一致 | `実行時・編集時`、`コマンド・スキル・テンプレート・スクリプト` |
 | 時系列対比ペア | 中黒の左右がいずれも `時` で終わる時刻表記（`NN時・NN時` 形式） | `9時・17時`、`開始時・終了時` |
 | code block 内 | fenced code block（``` 〜 ```）の内部行 | `・` を含むコード例 |
-| YAML title | YAML frontmatter の `title:` フィールド値 | `title: REQ・ADR・SPEC 横断品質` |
+| YAML title | YAML frontmatter の `title:` フィールド値 | `title: REQ・ADR・Design 横断品質` |
 
-固定複合名詞、単一固有名詞の許容範囲は SPEC「中黒使用の許容範囲」節が原本。
-本ファイルは SPEC 明示例との照合で機械判定可能な部分のみを扱う。
+固定複合名詞、単一固有名詞の許容範囲は Design「中黒使用の許容範囲」節が原本。
+本ファイルは Design 明示例との照合で機械判定可能な部分のみを扱う。
 
 ### 判定手順
 
 1. 行単位で `・` を検索する（テーブル行 `|...|` も対象に含む。テーブルセル内の中黒は是正対象であり、適用除外ではない）
 2. 当該行が code block 内または YAML frontmatter 内であれば許容（検出A、B）
 3. 中黒の左右が `NN時`（数字 + `時`）であれば許容（検出C）
-4. 中黒を含む前後文字列が SPEC 明示例リストと完全一致すれば許容（検出D）
+4. 中黒を含む前後文字列が Design 明示例リストと完全一致すれば許容（検出D）
 5. 上記いずれにも該当しない `・` を含む行を是正対象として抽出する
 
 ### 是正対象の例
@@ -80,7 +80,7 @@ em-dash（`—`、`―`）は japanese-tech-writing L17 に従い、同格、補
 | 意図的マトリックス表記（肯定表現の —） | 肯定記号と `—` を対で用い、該当、非該当を表現する表記体系として設計されたマトリックス | 検出セルを含むテーブルブロック内に肯定記号（`✓` 等）が併存する | 維持（置換しない） |
 
 判別は肯定記号併存の有無の機械判定で完結し、文脈判断を要しない。
-意図的マトリックス表記の実例は integrity-contracts SPEC「Workflow × 使用ツールマトリックス」である（同節は肯定表現で一元管理する SSoT と宣言し、`✓` と `—` を対で用いる）。
+意図的マトリックス表記の実例は integrity-contracts Design「Workflow × 使用ツールマトリックス」である（同節は肯定表現で一元管理する SSoT と宣言し、`✓` と `—` を対で用いる）。
 表冒頭の宣言文（「肯定表現で一元管理する」等）は判別結果の確認資料とする。
 
 ### 残存セルの実態と扱い（判別基準確定時点）
@@ -89,11 +89,11 @@ em-dash（`—`、`―`）は japanese-tech-writing L17 に従い、同格、補
 
 | 所在 | セル数 | 分類 | 扱い |
 |---|---|---|---|
-| integrity-contracts SPEC「Workflow × 使用ツールマトリックス」 | 7 | 意図的マトリックス表記 | 恒久維持 |
-| inspect-promote SPEC（`--auto` opt-in 発動表） | 2 | N/A プレースホルダ | 置換対象（残存） |
-| project-extensions SPEC（extension 状態分類表の備考列） | 1 | N/A プレースホルダ | 置換対象（残存） |
+| integrity-contracts Design「Workflow × 使用ツールマトリックス」 | 7 | 意図的マトリックス表記 | 恒久維持 |
+| inspect-promote Design（`--auto` opt-in 発動表） | 2 | N/A プレースホルダ | 置換対象（残存） |
+| project-extensions Design（extension 状態分類表の備考列） | 1 | N/A プレースホルダ | 置換対象（残存） |
 | agentdev-artifact-graph SKILL.md（問い合わせプロファイル表の探索方向列） | 1 | N/A プレースホルダ | 置換対象（残存） |
-| document-type-responsibilities SPEC、本ファイルのパターン説明行 | - | 適用除外（パターン説明文脈） | 維持 |
+| document-type-responsibilities Design、本ファイルのパターン説明行 | - | 適用除外（パターン説明文脈） | 維持 |
 
 置換対象（残存）4 セルの是正は本ルールの適用段階で実施する（規則確定と是正実施の分離）。
 src/opencode 側 1 セル（agentdev-artifact-graph）は機械是正 PR #2154 の merge 後に導入されたものであり、導入時検証での検出漏れを示す事例として扱う。
@@ -254,7 +254,7 @@ Wave 2 既存 OU（#1076 em-dash、#1078 中黒、#1079 LLM 表現、#1080 一�
 ### 機械置換 PR のエビデンス記述基準（PR #2154 実態不一致の補正方法）
 
 PR #2154 は検証エビデンスで「`| — |` プレースホルダ grep（docs + src/opencode）: 0 件（mechanical-replacement-rules.md のパターン説明行を除く）」と記述した。
-当時の docs/specs には実セル 10 件（意図的マトリックス表記 7、N/A プレースホルダ 3）と document-type-responsibilities SPEC のパターン説明行 1 件が残存しており、記述と実態が不一致していた。
+当時の docs/designs には実セル 10 件（意図的マトリックス表記 7、N/A プレースホルダ 3）と document-type-responsibilities Design のパターン説明行 1 件が残存しており、記述と実態が不一致していた。
 機械置換 PR のエビデンス記述は以下に従い、再発を防止する。
 
 1. grep コマンドは対象ディレクトリを明示したコマンド全文を記録する
@@ -275,6 +275,6 @@ X-6（「において」検出）のヒューリスティックについて、PR
 
 - LLM 表現パターン辞書: [rewrite-patterns.md](rewrite-patterns.md)
 - 英語抽象語の検出→書き換え: [rewrite-patterns.md](rewrite-patterns.md)
-- backticks 識別子/一般名詞 判定閾値: backticks-identifier-threshold SPEC（識別子 backticks 必須、一般名詞 backticks 任意の機械判定閾値。inspect-docs 検出処理が参照）
-- 用語政策 原本: document-type-responsibilities SPEC「中黒使用の許容範囲」「em-dash 置換形式」「LLM 表現の検出→書き換え方針」節
+- backticks 識別子/一般名詞 判定閾値: backticks-identifier-threshold Design（識別子 backticks 必須、一般名詞 backticks 任意の機械判定閾値。inspect-docs 検出処理が参照）
+- 用語政策 原本: document-type-responsibilities Design「中黒使用の許容範囲」「em-dash 置換形式」「LLM 表現の検出→書き換え方針」節
 - 執筆規範 SSoT: `japanese-tech-writing` スキル（AGENTS.md 経由）

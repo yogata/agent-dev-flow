@@ -48,7 +48,7 @@ docs-check から削除された検査（IR-045 文意整合、語彙コンプ�
 | `variant-registry-registered` | command が registry に未登録 | REQ-0108-090 |
 | `adr-status-normalization` | 旧 ADR status 形式 | REQ-0108-121 |
 | `ruid-ground-reference` | docs 内の RU-ID 参照 | REQ-0108-122 |
-| `workflow-status-prohibition` | REQ/SPEC 内の workflow status | REQ-0108-123 |
+| `workflow-status-prohibition` | REQ/Design 内の workflow status | REQ-0108-123 |
 | `pattern-residual` | Pattern A/B/C/D 残存 | REQ-0108-111 |
 | `req-backlog-residual` | req-backlog 言及の残存 | REQ-0108-112 |
 | `abolished-skill-reference` | 廃止済み skill への参照 | REQ-0108-126 |
@@ -93,7 +93,7 @@ docs-check から削除された検査（IR-045 文意整合、語彙コンプ�
 | チェックカテゴリ | 検出内容 | 根拠 |
 |-----------------|---------|------|
 | `skill-prefix` | agentdev- 以外のスキル名 | 命名規則 |
-| `spec-readme-index` | SPEC README との同期 | 索引整合性 |
+| `spec-readme-index` | Design README との同期 | 索引整合性 |
 | `req-retired-index` | retired 導線の存在確認 | 索引整合性 |
 | `expanded-readme-sync` | root README / system.md の記載漏れ | REQ-0108-078 |
 | `skill-use-for-boundary` | USE FOR / DO NOT USE FOR の有無 | REQ-0108-093 |
@@ -114,7 +114,7 @@ False positive（偽陽性）は、integrity-check が NG/Warning として報�
 | `bare-slash-scoped` の template path | completion-reports path | variant path 内のコマンド名に `/cmd-name` が含まれる | path exemption で除外済み |
 | `workflow-status-prohibition` の自己参照 | REQ-0108-123 | 検出ルール自体が 6 マイクロフェーズ名を含む | 自己参照免除条項で対応済み（INC-0020） |
 | inline code block 内の旧語彙 | 全スキル/command ファイル | バッククォート内の言及は参照であり使用ではない | inline code strip で除外（REQ-0108-174） |
-| `req-spec-boundary-violation` の自己参照境界規則記述 | REQ-0101-067/068/069, REQ-0108-001/051/055/252, REQ-0124-045, REQ-0126-007 等（9件） | REQ/SPEC 境界を定義する要件行自体が「schema・enum・fixture detail・checker 個別ルール」等の SPEC detail キーワードを含む（規則が規則自身を記述） | heuristic 水準（warning・exit 0・非ブロック）で運用。REQ-0101-069 安定契約例外（外部契約の要約記述）に合致する自己記述は検出対象外候補（delegation-context exemption candidate）。再発時は rule/detector/exception 更新へ接続（REQ-0108-155） |
+| `req-spec-boundary-violation` の自己参照境界規則記述 | REQ-0101-067/068/069, REQ-0108-001/051/055/252, REQ-0124-045, REQ-0126-007 等（9件） | REQ/Design 境界を定義する要件行自体が「schema・enum・fixture detail・checker 個別ルール」等の Design detail キーワードを含む（規則が規則自身を記述） | heuristic 水準（warning・exit 0・非ブロック）で運用。REQ-0101-069 安定契約例外（外部契約の要約記述）に合致する自己記述は検出対象外候補（delegation-context exemption candidate）。再発時は rule/detector/exception 更新へ接続（REQ-0108-155） |
 
 ### False positive 対応フロー
 

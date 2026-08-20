@@ -1,0 +1,61 @@
+---
+title: "backticks 識別子/一般名詞 判定閾値"
+status: accepted
+created: 2026-06-25
+updated: 2026-06-29
+---
+
+# backticks 識別子/一般名詞 判定閾値
+
+## 目的
+
+docs/** 配下の自然言語記述（Markdown 本文）において、識別子（backticks 必須）と一般名詞（backticks 任意）の判定閾値を機械判定可能な形で定義する（#1118 X-7）。
+runtime-package-boundary.md「5 種のリポジトリ種別」表の Type ID 列（識別子は backticks、名称は日本語）を良パターン基準とする。
+
+### 適用対象外（PR #1334 事例に基づく明示）
+
+本 Design の backticks 機械付与対象は自然言語記述（Markdown 本文）のみであり、以下の構造データは対象外とする。
+機械横断是正でこれらに backticks を付与してはならない。
+
+- YAML frontmatter のキーおよび値（`name:`、`description:`、`id:` 等）。frontmatter 値は YAML スカラー値であり、Markdown インラインコード表記ではない。
+- fenced code block（``` ... ```）内の字句。code block 内は既にコード文脈であり、backticks による追加修飾をしない。
+- inline code（`...`）内の字句。既に backticks で囲まれているため二重付与しない。
+- URL、ファイルパスそのもの（リンクテキスト部は自然言語記述として扱う）。
+
+この対象外範囲は src/opencode/{commands,skills}/**/SKILL.md 等の配布物原本 frontmatter にも適用する。
+PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 行に誤って backticks が付与され、opencode がスキル名を不正に認識する不具合を引き起こした。
+本明示により同種の回帰を防止する。
+
+## 識別子（backticks 必須）
+
+以下のいずれかに該当する語句は識別子とし、backticks で囲むことを必須とする。
+
+- コマンド名、スキル名、ファイル名、ディレクトリパス（`/agentdev/req-define`、`agentdev-doc-writing`、`docs/designs/foundations/system.md`）
+- REQ/Decision/Design/RU/OU/IR 等の成果物 ID（`REQ-001`、`REQ-001`、`RU-0005`）
+- frontmatter キー、YAML フィールド名、enum 値、code block 内字句
+- 英字 kebab-case / snake_case / CamelCase の技術識別子（`self-hosting`、`work_type`、`auto_ready`）
+
+## 一般名詞（backticks 任意）
+
+以下の語句は一般名詞とし、backticks を必須としない。
+
+- 日本語一般名詞（要件定義、品質ゲート）
+- 和訳済み技術用語で定着したもの（document-type-responsibilities.md 許容リスト参照）
+- 文中の普通名詞としての英語（baseline, provider 等の散文使用は SUB-D 判定対象）
+
+## 機械判定閾値
+
+| 分類 | 機械判定条件 | backticks |
+|---|---|---|
+| 識別子 | 上記識別子条件のいずれかに合致 | 必須 |
+| 一般名詞 | 識別子条件に非合致 | 任意 |
+
+判定は mechanical-replacement-rules.md の相互参照先として組み込まれ、inspect-docs 検出処理が参照する。
+文脈依存の境界ケース（英字複合語の識別子/普通名詞揺らぎ）は機械判定対象外とし、サンプリング查読へ委譲する。
+
+## 関連
+
+- **用語政策 SSoT**: `../responsibilities/document-type-responsibilities.md`
+  - 本 Design は `document-type-responsibilities.md`「識別子と散文普通名詞の区別」節を機械判定レベルで補完する。用語政策の意図・許容リストは `document-type-responsibilities.md` を SSoT とし、本 Design は「どの語句が識別子（backticks必須）でどの語句が一般名詞（backticks任意）か」の機械判定条件のみを定義する。
+- **機械判定アルゴリズム**: `../../../src/opencode/skills/agentdev-doc-writing/references/mechanical-replacement-rules.md`
+- **良パターン基準**: `../local/runtime-package-boundary.md`「5 種のリポジトリ種別」Type ID 列

@@ -17,7 +17,7 @@
 
 ### Input Resolution
 
-1. SSoT 再構成: Issue 本文（実行契約）、REQ/Decision/SPEC/docs/repository context（委譲先が再取得）
+1. SSoT 再構成: Issue 本文（実行契約）、REQ/Decision/Design/docs/repository context（委譲先が再取得）
 2. identifier 保持: Issue番号、worktree root（相対パス、`.worktrees/{N}-{type}/`）、ブランチ名、PR base（当該 Case の統合先）
 3. 最小 scalar: L2 タイムスタンプ（委譲起動直前・直後、JST）
 4. runtime artifact: なし（外部実行ハーネスの plan artifact 等は永続成果物としない）
@@ -119,4 +119,4 @@
 - G24（完了条件チェックボックスの評価・更新は case-close QG-4 の責務）
 - 不変条件（blocked/failed の SSoT は Issue コメント、completed の SSoT は PR 本文）
 - 不変条件（外部実行ハーネス中間成果物の非扱い、PR URL 受領）
-- 不変条件（SPEC確定候補は PR 本文の別セクションに記録）
+- 不変条件（Design確定候補は PR 本文の別セクションに記録）

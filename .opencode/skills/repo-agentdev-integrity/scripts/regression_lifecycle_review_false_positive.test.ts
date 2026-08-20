@@ -56,9 +56,9 @@ function runCheckIntegrity(root: string): {
 }
 
 function buildSpecsDir(root: string, specFile: string, content: string): void {
-  const specsDir = path.join(root, "docs", "specs");
-  fs.mkdirSync(specsDir, { recursive: true });
-  fs.writeFileSync(path.join(specsDir, specFile), content, "utf-8");
+  const designsDir = path.join(root, "docs", "designs");
+  fs.mkdirSync(designsDir, { recursive: true });
+  fs.writeFileSync(path.join(designsDir, specFile), content, "utf-8");
 }
 
 const CURRENT_CASE_STATES_CONTENT = `---

@@ -11,9 +11,9 @@ extension の読み取り主体は Workflow Skill と Capability Skill である
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-project-extensions` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-project-extensions` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 担当
@@ -179,7 +179,7 @@ AgentDevFlow 本体は初期テンプレート、schema、検査、保守 comman
 
 16の agentdev command は、対応する project extension を Workflow Skill が読み込む旨の同一宣言を持つ。
 この宣言は「公開契約宣言」（command 公開契約の宣言部分）と「詳細契約」（extension の context/rules/checks 等の中身）に分離できる。
-分離の判断基準は artifact-responsibilities SPEC「重複許容基準 適用例集」適用パターン1（project extensions boilerplate）に準拠する。
+分離の判断基準は artifact-responsibilities Design「重複許容基準 適用例集」適用パターン1（project extensions boilerplate）に準拠する。
 
 ### 公開契約宣言
 
@@ -193,7 +193,7 @@ AgentDevFlow 本体は初期テンプレート、schema、検査、保守 comman
 - boilerplate 行3: extension が破損している場合のエラー表示・無視・標準動作継続宣言
 - boilerplate 行4: 詳細な読み込み契約は本 SKILL 参照との宣言
 
-「4行上限」は boilerplate リスト部分の4行を指す（SPEC 適用パターン1「上限: 宣言4行まで」）。
+「4行上限」は boilerplate リスト部分の4行を指す（Design 適用パターン1「上限: 宣言4行まで」）。
 本範囲は16 command の公開契約（extension 読込宣言）の一部として許容判定された事例に該当する。
 
 ### 詳細契約
@@ -245,5 +245,5 @@ inspect-skills が複数 command 間で同一文言の重複を検出した場�
 
 ## See Also
 
-- 本機構を定義する基盤 SPEC（extension schema、配置、実行時読み込み契約、project-local skill 委譲、配布物参照境界）
+- 本機構を定義する基盤 Design（extension schema、配置、実行時読み込み契約、project-local skill 委譲、配布物参照境界）
 - 保守診断 command（extension 一覧化、構造確認、path 実在確認、skill 存在確認、旧参照リスト機構残存検出を担う）

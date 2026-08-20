@@ -8,7 +8,7 @@
 //   exit codes: 0 ok, 1 violation, 2 error.
 //
 // Profile values map to lib Projection (source/link/archive/archive-installed
-// per docs/specs/integrity/distribution-boundary.md "projection の分離").
+// per docs/designs/integrity/distribution-boundary.md "projection の分離").
 // Legacy installed/release values are accepted as aliases for
 // link/archive-installed so existing invocations continue to work.
 

@@ -4,9 +4,9 @@ id: agentdev-backlog-integration
 
 context:
   - id: document-model
-    when: REQ/ADR/SPEC 責務マトリックス参照時
+    when: REQ/ADR/Design 責務マトリックス参照時
     paths:
-      - "docs/specs/foundations/document-model.md"
+      - "docs/designs/foundations/document-model.md"
     purpose: 採用済み成果物と RU 生成の文書間関係確認
 
 rules: []

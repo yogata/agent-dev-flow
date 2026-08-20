@@ -141,12 +141,12 @@ evaluation-report.md を adversarial-review で検証し、accepted finding を�
 
 - STEP-2 / STEP-3 の結果が反映された evaluation-report.md（durable state）
 - 経路D の候補判断、呼出タイミング、evaluation-report 戻しループの実行詳細は `agentdev-learning-pipeline` の公開操作契約に従う
-- 共通 caller integration 契約の正規所有者は adversarial-review SPEC である
+- 共通 caller integration 契約の正規所有者は adversarial-review Design である
 
 ### Preconditions
 
 - evaluation-report.md が STEP-2 で生成・更新済みであり、STEP-3（廃棄判定）と既存対策確認の結果が反映されていること
-- 挿入境界、発動条件の正は learning-promote command SPEC の経路D 節である
+- 挿入境界、発動条件の正は learning-promote command Design の経路D 節である
 
 ### Procedure
 

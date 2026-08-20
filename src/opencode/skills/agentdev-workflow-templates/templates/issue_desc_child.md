@@ -44,7 +44,7 @@ REQ-{req_number}
   - 「変更対象外 REQ の変更がないこと」は「diff がないこと」として表現し、「存在しないこと」とは書かない
   - 「存在しないこと」は新規作成禁止（例: REQ-NNNN が存在しないこと）の場合のみ使用。既存 REQ の変更有無検証には使用しない
   - 構造変更を伴う場合は、当該構造を固定する契約テストの期待値更新を pass_criteria の検証対象に含める
-  - 詳細は agentdev-workflow-templates SPEC「test strategy 記述ガイドライン」参照 -->
+  - 詳細は agentdev-workflow-templates Design「test strategy 記述ガイドライン」参照 -->
 - id: TS-{NNN}
  target_item: [検証対象]
  verification: |
@@ -68,7 +68,7 @@ case-run は本セクション存在有無で新旧 Issue を識別する -->
 - （artifact type と対象パスのリスト）
 
 ### 必須品質統制
-- （artifact-quality-control-routing SPEC に基づく能力キーと検証項目）
+- （artifact-quality-control-routing Design に基づく能力キーと検証項目）
 
 ### 関連 ADR 拘束条件
 - （該当 ADR と完了条件/test strategy への反映）

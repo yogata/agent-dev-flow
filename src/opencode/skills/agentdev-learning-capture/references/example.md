@@ -136,12 +136,12 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 - **根本原因**: {REQ-ID} 作成時に design-principles.md の既存方針との整合性確認が漏れていた
 - **自律対応内容**: 矛盾点を整理し、ユーザーに確認して{REQ-ID} の該当セクションを修正
 - **ユーザー確認有無**: あり
-- **ADR/REQ/spec影響**: {REQ-ID} 該当セクションの更新が必要。retired {ADR-ID}（現在は SPEC で規定済みの内容）の内容についても検討すべき
+- **ADR/REQ/spec影響**: {REQ-ID} 該当セクションの更新が必要。retired {ADR-ID}（現在は Design で規定済みの内容）の内容についても検討すべき
 - **横展開観点**: REQ作成時は常に既存specs/ADRとの整合性確認を必須とすべき
 - **再発条件**: 新規REQ作成時に既存ドキュメントとの整合性チェックをスキップする場合
 - **予防策候補**: req-save の実行ステップに specs/ADR 整合性チェックを追加する
 - **想定反映先**: `req-save` コマンド、`agentdev-req-analysis` スキル
-- **関連**: `docs/requirements/{REQ-ID}.md`, design-principles SPEC, Issue #{issue_number}
+- **関連**: `docs/requirements/{REQ-ID}.md`, design-principles Design, Issue #{issue_number}
 - **タグ**: `#仕様矛盾` `#REQ更新` `#ADR影響`
 ```
 

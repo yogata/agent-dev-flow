@@ -8,7 +8,7 @@
 |-----------|-------------|------|
 | 要件を整理したい | `/agentdev/req-define` | 要件doc（draft） |
 | 要件docがあり、REQ/Decision 対象 artifact_actions がある場合 | `/agentdev/req-save` | REQ/Decision ファイル |
-| REQ/Decision ファイルがあり、SPEC対象 artifact_actions がある場合 | `/agentdev/spec-save` | SPEC ファイル（`docs/specs/`） |
+| REQ/Decision ファイルがあり、Design対象 artifact_actions がある場合 | `/agentdev/design-save` | Design ファイル（`docs/designs/`） |
 | REQ ファイルまたは要件docがある | `/agentdev/case-open` | GitHub Issue |
 | Issue がある | `/agentdev/case-run` | 実装済みブランチ + PR |
 | PR がある | `/agentdev/case-close` | マージ済み + クローズ済み |
@@ -40,7 +40,7 @@
 
 ## 補足
 
-- 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138, v2:ADR-0124）。REQ/Decision 対象 artifact_actions があれば req-save、SPEC 対象 artifact_actions があれば spec-save を実行する
+- 工程分岐は `work_type` 固定分岐ではなく req_draft の `artifact_actions` 存在で動的判定する（v2:REQ-0138, v2:ADR-0124）。REQ/Decision 対象 artifact_actions があれば req-save、Design 対象 artifact_actions があれば design-save を実行する
 - Intake / Learning パイプラインの詳細は [Intake / Learning / Backlog フロー](intake-learning-backlog-flow.md) を参照
 - 各コマンドの入出力の詳細は [要件定義 → Case実行フロー](req-case-flow.md) を参照
 - `/agentdev/case-auto` は明示指定時のみ使用する追加入口。標準ワークフローを置き換えない

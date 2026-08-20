@@ -23,7 +23,7 @@
  *                                       workflow dispatch structure
  *
  * Semantic duplication detection stays with /agentdev/inspect-skills and the
- * command-file-format SPEC "thin Command モデル検査" scope note: this checker
+ * command-file-format Design "thin Command モデル検査" scope note: this checker
  * only enforces structurally decidable invariants (AG-008).
  *
  * Structured exemptions (AG-008 false-positive records, kept here so future
@@ -36,7 +36,7 @@
  *     abolition itself; agentdev-project-extensions SKILL.md)
  *   - check 5: generic "`references/` 配下を参照" declarations that name no
  *     specific file (they assert name-level non-dependence, REQ-002-017)
- *   - scan scope: docs/** historical records (superseded SPECs, DEC-005,
+ *   - scan scope: docs/** historical records (superseded Designs, DEC-005,
  *     IR-056 detection-scope declarations) are intentionally not scanned;
  *     docs semantics stay with inspect-docs / inspect-skills
  */
@@ -98,7 +98,7 @@ const COMMAND_FORMAT_RULES_PATH = path.join(
 
 const LEGACY_EXTENSION_KINDS = ["command-extension", "skill-extension"];
 const LEGACY_EXTENSIONS_PATH = ".agentdev/extensions/commands";
-// AG-004 concise trigger item detection word (the SPEC-authoritative soft
+// AG-004 concise trigger item detection word (the Design-authoritative soft
 // guard form: the description's DO NOT USE FOR entry "単独起動（対応する
 // /agentdev/* コマンド経由で利用すること）"). Must stay identical to
 // WORKFLOW_TRIGGER_ITEM in lint_skills.ts (the AG-004 implementation) so both
@@ -135,7 +135,7 @@ export const PREVENTIVE_EXEMPTIONS: PreventiveExemption[] = [
   {
     area: "scan scope",
     description:
-      "docs/** historical records (superseded SPECs, DEC-005, IR-056 detection-scope declarations) are not scanned; docs semantics stay with inspect-docs / inspect-skills",
+      "docs/** historical records (superseded Designs, DEC-005, IR-056 detection-scope declarations) are not scanned; docs semantics stay with inspect-docs / inspect-skills",
   },
 ];
 

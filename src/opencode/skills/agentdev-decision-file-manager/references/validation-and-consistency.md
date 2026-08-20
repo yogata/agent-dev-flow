@@ -185,12 +185,12 @@ Decision の `status` を変更した場合、`docs/decisions<README>.md` の全
 
 ## accepted Decision 直接編集チェックリスト
 
-accepted status の Decision へ直接編集（UPDATE）を実施する場合、SPEC `agentdev-decision-file-manager` の「accepted Decision 直接編集チェックリスト」セクションに従い、以下の全てを満たすことを確認する（`agentdev-decision-guidelines`「accepted Decision の更新規則」準拠）。
-本節は実行入口の要約であり、正規原本は SPEC とする。
+accepted status の Decision へ直接編集（UPDATE）を実施する場合、Design `agentdev-decision-file-manager` の「accepted Decision 直接編集チェックリスト」セクションに従い、以下の全てを満たすことを確認する（`agentdev-decision-guidelines`「accepted Decision の更新規則」準拠）。
+本節は実行入口の要約であり、正規原本は Design とする。
 
 本チェックリストの見出し（`accepted Decision 直接編集チェックリスト`）は歴史的経緯により ADR という語を含まない `accepted Decision` 表記を採用する。
 これは本スキルが ADR から Decision へ移行した成果物であることによる。
-v2:ADR-* 形式の過去参照は原本 SPEC 側で保持する。
+v2:ADR-* 形式の過去参照は原本 Design 側で保持する。
 
 ### 事前確認
 
@@ -217,7 +217,7 @@ v2:ADR-* 形式の過去参照は原本 SPEC 側で保持する。
 - [ ] accepted Decision の過去版を無言で書き換えていない
 - [ ] Report（Release Report 等）へ規範要件または必達条件を移していない
 - [ ] `docs/decisions<README>.md` の各ビュー（現行基盤、状態別、関連REQ、意思決定マップ）が変更後の実ファイルと整合している（本ファイル「ステータス変更時の README 整合性検証」参照）
-- [ ] 対象 Decision を正規根拠として参照する SPEC、REQ への影響がないことを確認する
+- [ ] 対象 Decision を正規根拠として参照する Design、REQ への影響がないことを確認する
 
 ### 直接編集と APPEND/UPDATE 操作の判定基準
 

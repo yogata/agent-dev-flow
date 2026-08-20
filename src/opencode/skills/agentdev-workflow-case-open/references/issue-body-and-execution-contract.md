@@ -9,7 +9,7 @@ Issue 本文候補を生成し、execution contract を確定する。
 
 ## Input Resolution
 
-1. SSoT 再構成: 要件doc（draft-data、`agreed_items`、`artifact_actions`、`test_strategy`、`review_dispositions`）、対象 REQ/Decision/SPEC、関連 ADR（Decision）
+1. SSoT 再構成: 要件doc（draft-data、`agreed_items`、`artifact_actions`、`test_strategy`、`review_dispositions`）、対象 REQ/Decision/Design、関連 ADR（Decision）
 2. identifier 保持: REQ-ID、DEC-ID、OU ID、AG-ID
 3. 最小 scalar: なし
 4. runtime artifact: Issue 本文候補ファイル（委譲接続点経由）
@@ -27,28 +27,28 @@ Issue 本文候補を生成し、execution contract を確定する。
 
 ### QG-2 完了条件網羅性検証（2-1 / 2-1a / 2-1b）
 
-Issue 本文生成後、Issue 作成前に `agentdev-quality-gates` の QG-2 に従い完了条件が対象 REQ/Decision/SPEC の必達要件を網羅しているかを検証（fail 時は req-define 差し戻し推奨）。
+Issue 本文生成後、Issue 作成前に `agentdev-quality-gates` の QG-2 に従い完了条件が対象 REQ/Decision/Design の必達要件を網羅しているかを検証（fail 時は req-define 差し戻し推奨）。
 
 - **2-1a**: 数値閾値到達可能性検証（QG-2 観点6、#1538 由来、要件定義者が明示した閾値のみ受け付け、自動推論しない）
 - **2-1b**: スコープ明示（本 Issue 対象範囲 vs 全体、#1532 由来、QG-4 観点8 判定マトリクスの入力前提、識別子中心、横断評価は「全体」デフォルト）
 
 ### test_strategy 埋め込み（2-2、REQ）
 
-draft-data の `test_strategy` を読み取り、Issue 本文の「テスト戦略」セクションに 3 要素構造（`verification` / `pass_criteria` / `on_failure`）で反映（スキーマは req-define command SPEC extension 経由）。
+draft-data の `test_strategy` を読み取り、Issue 本文の「テスト戦略」セクションに 3 要素構造（`verification` / `pass_criteria` / `on_failure`）で反映（スキーマは req-define command Design extension 経由）。
 未定義の場合はテンプレートのプレースホルダをそのまま残す。
 
 ### 識別子中心記載・最新状態再確認・evidence 転記（2-3 / 2-4 / 2-5）
 
 - **2-3**: 識別子中心の記載粒度ガイドライン（case-run の QG-3 前置 staleness check の入力前提、詳細・記載例は `agentdev-issue-management` 参照）
 - **2-4**: 完了条件展開前の最新状態再確認（同日内複数 PR マージ後・順次 Wave 実行時の後続 Wave Issue 起票で必須、識別子存在確認を主軸）
-- **2-5**: review_dispositions の読取・evidence 再確認・証跡転記（consumer 契約は case-open command SPEC extension 経由、evidence 失効時は停止し `stale_target` へ更新）
+- **2-5**: review_dispositions の読取・evidence 再確認・証跡転記（consumer 契約は case-open command Design extension 経由、evidence 失効時は停止し `stale_target` へ更新）
 
-各詳細は `agentdev-issue-management`、case-open command SPEC（extension 経由）を参照。
+各詳細は `agentdev-issue-management`、case-open command Design（extension 経由）を参照。
 
 ### execution contract 確定ステップ（2-6）
 
 Issue 本文生成前に次の確定ステップを実行し、結果を Issue 本文の対応セクション（対象範囲、test strategy、完了条件、Execution Contract セクション）へ反映する。
-詳細な判定規則、対応表は case-open command SPEC（extension 経由）「execution contract 確定ステップ」節、artifact-quality-control-routing SPEC（extension 経由）を正とする。
+詳細な判定規則、対応表は case-open command Design（extension 経由）「execution contract 確定ステップ」節、artifact-quality-control-routing Design（extension 経由）を正とする。
 
 #### 変更対象成果物の確定
 
@@ -56,7 +56,7 @@ Issue 本文生成前に次の確定ステップを実行し、結果を Issue �
 
 #### 必須品質統制の導出と test strategy 投影
 
-artifact-quality-control-routing SPEC の合成規則に従い変更予定成果物の種別から必須品質能力を導出する。
+artifact-quality-control-routing Design の合成規則に従い変更予定成果物の種別から必須品質能力を導出する。
 各能力について test strategy 項目を生成し、Issue 本文の test strategy セクションへ投影する。
 
 #### 完了条件の確定

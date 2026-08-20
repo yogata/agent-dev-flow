@@ -1,6 +1,6 @@
-# プロジェクトドキュメントと SPEC
+# プロジェクトドキュメントと Design
 
-REQ / Decision / SPEC の関係と、それぞれの役割を説明する。
+REQ / Decision / Design の関係と、それぞれの役割を説明する。
 
 ## 文書体系の全体像
 
@@ -9,7 +9,7 @@ REQ（要件定義：満たすべき状態）
   ↓
 Decision（アーキテクチャ決定：判断根拠）
   ↓
-SPEC（現在仕様：現在の姿）
+Design（現在設計：現在の姿）
 ```
 
 各文書は独立した基準性を持ち、下位の文書が上位を代替することはない。
@@ -41,21 +41,22 @@ SPEC（現在仕様：現在の姿）
 - REQ → Issue の一方向参照である（Issue から REQ への逆参照は行わない）
 - 一覧は `docs/decisions/README.md` に索引がある（現行基準ビュー）
 
-## SPEC（現在仕様）
+## Design（現在設計）
 
-**格納先**: `docs/specs/**/*.md`（commands/skills/workflows の3層と基盤6ドメイン: foundations/responsibilities/quality/integrity/local/authoring）
+**格納先**: `docs/designs/**/*.md`（commands/skills/workflows の3層と基盤6ドメイン: foundations/responsibilities/quality/integrity/local/authoring）
 
-実装者が参照する現在のシステム仕様。
+実装者が参照する現在のシステム設計。
 「今どう動いているか」を記述する。
 リポジトリ内部の設計文書であり、実行時配布物の依存先ではない（v2:ADR-0103, v2:ADR-0104）。
+監査・評価・観測記録は Report として `docs/reports/` へ分離する。
 
-> 現行 SPEC の一覧は `docs/README.md`（基盤 SPEC 一覧）を正とする。
-> 本ガイドでは SPEC 一覧を複製しない。
+> 現行 Design の一覧は `docs/designs/README.md`（Design インデックス）を正とする。
+> 本ガイドでは Design 一覧を複製しない。
 
 ## このガイドの位置づけ
 
 本ファイルを含む `docs/guides/` は人間向けの案内層である（v2:REQ-0101-014, 027、v2:ADR-0103）。
-REQ/Decision/SPEC と矛盾する記述がある場合は基準文書を優先する。
+REQ/Decision/Design と矛盾する記述がある場合は基準文書を優先する。
 
 ## 参照関係のルール
 
@@ -63,7 +64,7 @@ REQ/Decision/SPEC と矛盾する記述がある場合は基準文書を優先�
 
 1. REQ（最優先）
 2. Decision
-3. SPEC
+3. Design
 4. guides（基準への導線を提供する）
 
 guides（本ファイルを含む）は参照用読み物であり、基準文書への導線を提供する。

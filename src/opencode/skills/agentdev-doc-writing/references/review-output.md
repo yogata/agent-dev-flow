@@ -1,6 +1,6 @@
 # 査読出力形式
 
-> **原本**: 配置基準、用語政策は document-type-responsibilities SPEC「移送判断」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+> **原本**: 配置基準、用語政策は document-type-responsibilities Design「移送判断」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
 > 本ファイルは運用ビュー（査読結果の分類、出力形式）である。
 
 ## 4 分類
@@ -11,7 +11,7 @@
 |---|---|
 | 残す | 現在の文書種別、位置が適切。文章品質の修正のみで対応可能 |
 | 分割 | 1行に複数関心が混在。関心ごとに別行へ分割 |
-| 移送 | 別の文書種別（REQ↔SPEC↔ADR↔guide↔skill reference）への移動が必要 |
+| 移送 | 別の文書種別（REQ↔Design↔ADR↔guide↔skill reference）への移動が必要 |
 | 削除候補 | 作業記録、移行結果、現状構成の詳細説明、変更履歴等、要件として不要な内容 |
 
 ## 修正文案形式

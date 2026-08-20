@@ -89,7 +89,7 @@ SKILL.md 本文では schema の存在と不変条件のみを提示し、フィ
 ## 禁止条件フィルタリングゲート
 
 Decision 候補分類の前に、`agentdev-decision-guidelines` の除外基準を適用すること（必達）。
-以下に該当する item は ADR 候補から除外し、REQ/SPEC/guide/command 等の適切な反映先候補として扱う。
+以下に該当する item は ADR 候補から除外し、REQ/Design/guide/command 等の適切な反映先候補として扱う。
 
 - 技術判断不在: アーキテクチャ上の決定、技術選定、設計判断を含まない
 - 仕様変更のみ: 変更後の振る舞い、制約、状態の定義のみで、技術判断を含まない
@@ -159,5 +159,5 @@ learning-promote は除外した item について、evaluation-report に除外
 - **対象item**: {タイトルまたは識別子}
 - **除外理由**: {技術判断不在/仕様変更のみ/command仕様/運用ルール/非技術的合意}
 - **根拠事実**: {除外基準に該当すると判断した事実}
-- **代替反映先候補**: {REQ/SPEC/guide/command等}
+- **代替反映先候補**: {REQ/Design/guide/command等}
 ```

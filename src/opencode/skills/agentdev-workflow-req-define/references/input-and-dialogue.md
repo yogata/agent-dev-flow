@@ -30,8 +30,8 @@
 - **引数なし単体実行時**: `agentdev-req-analysis` に従い、当該セッション履歴・現在コンテキストから6項目（要件内容、work_type、scale、Decision、構造化、適用範囲）を推論し信頼度付きで表示する。Confirmed のみで要件doc自足可能なら STEP-3 以降へ、部分的不足で補足質問解消可能なら壁打ち（STEP-2）へ、有効な Requirement Source 構成不能なら RU 自動検出へ
 - **明示入力ファイル指定時**: Read tool で読み込み、壁打ちの初期コンテキストとして扱う。複数ファイル指定時は全て読み込む
 - **RU 自動検出**: 引数なしでセッションから有効な入力を構成できなかった場合のみ、`.agentdev/backlog/req-units/RU-*.md` の存在を確認し1件なら自動検出する。0件なら STEP-2 へ。2件以上なら候補一覧を表示し自動選択しない
-- **実証Issue 明示指定時**: 引数に実証Issue を指定された場合、当該実証の正式化を主たる入力として扱う。評価契約、最終評価結果、参照証拠を当該 Issue 本文と関連 PR から取り込む。実証Issue 明示指定時に RU 自動検出と混在する場合は、どちらを処理するかユーザーへ確認する（入力優先規定。詳細は req-define command SPEC（extension 経由）参照）
-- **session由来RU 受領時**: 読み込んだRU が `source_type: chat` かつ `generated_by: session` の場合、session由来RU 消費契約に従う。`session:...` 論理URI の解決、必須8セクション読み取り契約、`tentative_classification` → 最終分類の扱いは正規原本（一時成果物ライフサイクル要件、artifact-contracts SPEC）へ委譲する
+- **実証Issue 明示指定時**: 引数に実証Issue を指定された場合、当該実証の正式化を主たる入力として扱う。評価契約、最終評価結果、参照証拠を当該 Issue 本文と関連 PR から取り込む。実証Issue 明示指定時に RU 自動検出と混在する場合は、どちらを処理するかユーザーへ確認する（入力優先規定。詳細は req-define command Design（extension 経由）参照）
+- **session由来RU 受領時**: 読み込んだRU が `source_type: chat` かつ `generated_by: session` の場合、session由来RU 消費契約に従う。`session:...` 論理URI の解決、必須8セクション読み取り契約、`tentative_classification` → 最終分類の扱いは正規原本（一時成果物ライフサイクル要件、artifact-contracts Design）へ委譲する
 - セッション履歴、現在コンテキストおよび RU のいずれからも有効な入力を構成できない場合、壁打ち対話を開始する
 
 ### Result

@@ -6,25 +6,25 @@ description: Updates parent Epic Issue status tracking tables in case-close work
 # Epic 状態追跡（Epic Status Tracker）
 
 親Epic Issueのステータス追跡テーブル（`pending`/ `completed`/ `blocked`/ `failed`）を更新する知識ベース。
-`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR 単一書き手制約、epic-wave-model SPEC 参照）。
+`ready`/ `running` は case-run(#epic) の内部状態であり、Epic Issue 本文（永続状態）には書き込まれない（ADR 単一書き手制約、epic-wave-model Design 参照）。
 
 - **参照元**: `case-close`（completed/ blocked/ failed 更新、単一書き手）。`case-auto`、`case-run` は Epic Issue 本文を読み取るのみで書き込まない
 - **`⏭スキップ` は採用しない**。前提未達の Issue は `pending` のまま選択対象外となる。Wave status は保存せず、Wave 内 Issue 状態から導出する
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-epic-tracker` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-epic-tracker` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-epic-tracker.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
+3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 入力
@@ -48,7 +48,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## ステータス値定義
 
-子Issue 実行状態 enum（epic-wave-model SPEC「子Issue実行状態 enum」参照）:
+子Issue 実行状態 enum（epic-wave-model Design「子Issue実行状態 enum」参照）:
 
 | 値 | 意味 | 設定主体 | 終了状態 |
 |---|---|---|---|

@@ -1,12 +1,12 @@
 # 実行主体分類の査読
 
-> **原本**: 配置基準、用語政策は document-type-responsibilities SPEC「実行主体分類の査読基準」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
+> **原本**: 配置基準、用語政策は document-type-responsibilities Design「実行主体分類の査読基準」、執筆規範は `japanese-tech-writing` スキル（AGENTS.md 経由）。
 > 本ファイルは判定表、誤認パターン、検出チェックリストの運用ビューである。
 > 原本と内容が重複する場合は原本を優先する。
 
 ## 適用範囲
 
-SPEC / command / skill / AGENTS.md 等の記述で言及される実行主体の分類が正確かを査読する。
+Design / command / skill / AGENTS.md 等の記述で言及される実行主体の分類が正確かを査読する。
 実行主体の誤認は `load_skills` への誤指定や文書種別間の委譲契約不整合を引き起こすため、静的査読で検出する。
 
 ## 実行主体の分類
@@ -48,4 +48,4 @@ command 名（`/` 先頭、または `/` を持たない command識別子）が�
 
 検出した誤認は [review-output.md](review-output.md) の分類（残す/分割/移送/削除候補）に従い提示する。
 誤認の修正は「正しい分類名への置換」または「委譲契約記述への置換」とする。
-実行主体分類の定義、判定基準の原本は document-type-responsibilities SPEC を参照する。
+実行主体分類の定義、判定基準の原本は document-type-responsibilities Design を参照する。

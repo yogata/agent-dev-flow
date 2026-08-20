@@ -34,7 +34,7 @@ REQ の現行/廃止/世代境界の整合性を確認する:
 |------|----------|-------------|
 | **SPLIT** | 単一REQが複数の独立した関心事を含んでおり、分割が適切か | (a) 1つのREQに複数の関心対象、(b) 複数成果物種別の混在、(c) 複数 command family の混在、(d) 複数 lifecycle 段階の混在 |
 | **MERGE** | 複数のREQが密接に関連しており、統合が適切か | (a) 複数REQが同じ目的、(b) 同じ対象成果物、(c) 同じ command、(d) 同じ責務を扱っている |
-| **MOVE** | REQの内容が別の文書種（specs/guides/ADR）に移動すべきか | (a) REQ行が変更後仕様ではなく反映作業そのものになっている、(b) SPEC分離基準違反シグナルが REQ 要件行に残留している |
+| **MOVE** | REQの内容が別の文書種（specs/guides/ADR）に移動すべきか | (a) REQ行が変更後仕様ではなく反映作業そのものになっている、(b) Design分離基準違反シグナルが REQ 要件行に残留している |
 | **DUPLICATE** | REQ間またはREQと他文書で内容が重複しているか | (a) 現行 REQ 間または REQ と spec/guide/command の間で同じ 必達要件 相当の責務が重複 |
 | **RETIRE** | 現行 REQのうち、廃止すべき（現行仕様として不要な）ものがないか | (a) 現行 REQ が現行案内から参照されない、(b) 関心対象が既存 現行 REQ に吸収済み |
 | **DRIFT** | REQ本文と実体（specs/実装/コマンド）の間に乖離がないか | (a) REQ が要求する対象と実体ファイルまたは command 定義が矛盾している |
@@ -47,16 +47,16 @@ REQ の現行/廃止/世代境界の整合性を確認する:
 | 2シグナル以上 | 問題候補検出事項として出す |
 | 3シグナル以上、または 現行/廃止 判断に影響 | 高優先度候補として出す |
 
-要件行数、関心分類数、成果物種別数の定量閾値と SPLIT シグナル加算ルールは req-health-metrics SPECに定義する。
-本観点の SPLIT シグナル計算は同 SPEC の閾値を参照する。
+要件行数、関心分類数、成果物種別数の定量閾値と SPLIT シグナル加算ルールは req-health-metrics Designに定義する。
+本観点の SPLIT シグナル計算は同 Design の閾値を参照する。
 
-SPEC分離基準違反シグナルは high-specificity signal として扱う。
+Design分離基準違反シグナルは high-specificity signal として扱う。
 現行 REQ の要件行で以下のいずれかが主たる文意になっている場合、1シグナルでも MOVE 検出事項候補として出す。
 安定契約例外（公開 command 名、ドメイン状態の位置づけ、接続契約、安全境界、停止条件の大枠等）に該当する可能性がある場合は、確信度を medium/low に下げ、根拠に例外候補を明記する。
 
-## SPEC分離基準違反検出
+## Design分離基準違反検出
 
-document-model SPEC の SPEC Separation Criteria に基づき、現行 REQ の要件テーブル行を対象に、HOW 詳細または内部パラメータが要件行の主たる文意になっていないかを検出する。
+document-model Design の Design Separation Criteria に基づき、現行 REQ の要件テーブル行を対象に、HOW 詳細または内部パラメータが要件行の主たる文意になっていないかを検出する。
 検出時の観点は `MOVE`、推奨アクションは `MOVE` または `UPDATE` とする。
 
 ### 検出シグナル
@@ -76,9 +76,9 @@ document-model SPEC の SPEC Separation Criteria に基づき、現行 REQ の�
 ### 判定ルール
 
 - 現行 REQ の要件テーブル行を優先して確認する。目的、適用範囲に同種の HOW 詳細があり、要件行の解釈に影響する場合は補助根拠として扱う。
-- 単語の出現だけではなく、当該行の主たる文意が SPEC、rule catalog、command reference、skill reference、test docs に置くべき詳細かを判定する。
+- 単語の出現だけではなく、当該行の主たる文意が Design、rule catalog、command reference、skill reference、test docs に置くべき詳細かを判定する。
 - 要件行が外部契約を要約し、詳細値だけを例示している場合は安定契約例外候補として扱い、即時 high 検出事項にしない。
-- 同一 REQ 内で複数種の SPEC分離基準違反シグナルが出た場合、根拠をまとめて1件の MOVE 検出事項候補として出す。
+- 同一 REQ 内で複数種の Design分離基準違反シグナルが出た場合、根拠をまとめて1件の MOVE 検出事項候補として出す。
 
 ## 配布物 ID 汚染検出
 
@@ -110,12 +110,12 @@ AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等�
 
 - 単語露出のみならず、当該 ID 参照が利用者にとって意味を持つかを判定する（利用者が当該 ID を追跡する導線がない場合は除去）。
 - `agentdev-*` スキル名、`/agentdev/*` コマンド名は配布物自身の識別子であり許容する（内部 ID ではない）。
-- 内部 ID を含む説明が必要な場合は、配布物ではなく `docs/specs/` または `docs/guides/` に配置する。
+- 内部 ID を含む説明が必要な場合は、配布物ではなく `docs/designs/` または `docs/guides/` に配置する。
 
 ## 配布物統合性検出
 
 内部管理 ID 除去後に配布物へ残る二次被害（構文破損、主要構造重複、壊れた参照残骸、責務説明矛盾）を検出する。
-検出パターンと NG 分類は docs-spec-rebuild-integrity SPEC に準拠する。
+検出パターンと NG 分類は docs-spec-rebuild-integrity Design に準拠する。
 ID 汚染（前節）が 0 件でも本検査は実施する。
 
 ### 検査対象
@@ -143,19 +143,19 @@ ID 汚染（前節）が 0 件でも本検査は実施する。
 
 ### 責務整合検査
 
-同一 command の責務説明が command 本体、command SPEC、関連 skill の間で矛盾していないかを照合する。
+同一 command の責務説明が command 本体、command Design、関連 skill の間で矛盾していないかを照合する。
 
 | 照合対象 | 確認内容 |
 |----------|----------|
-| command 本体 ↔ command SPEC | 責務範囲、入力、出力、ガードレールが矛盾していないか |
+| command 本体 ↔ command Design | 責務範囲、入力、出力、ガードレールが矛盾していないか |
 | command 本体 ↔ 関連 skill | 当該 command の責務、権限、禁止事項が skill 記述と矛盾していないか |
 | case-open ↔ case-run ↔ case-close ↔ case-auto | 責務境界（PR 作成、Wave 境界、Epic Issue 単一書き手、クリーンアップ、委譲モデル）が全ての記述元で一致しているか |
 
-判定の SSoT 優先順位: 現行 REQ > 承認済み ADR > SPEC（command SPEC 群、epic-wave-model SPEC）> command 本体 > skill。
+判定の SSoT 優先順位: 現行 REQ > 承認済み ADR > Design（command Design 群、epic-wave-model Design）> command 本体 > skill。
 
 ### NG 分類
 
-検出事項には以下の NG 分類を付ける（docs-spec-rebuild-integrity SPEC NG 分類表に準拠）:
+検出事項には以下の NG 分類を付ける（docs-spec-rebuild-integrity Design NG 分類表に準拠）:
 
 | 分類 | 定義 | 後続対象 |
 |------|------|----------|
@@ -174,24 +174,24 @@ NG 分類は推奨アクション（MOVE/ UPDATE 等）とは別軸で付ける�
 - 責務整合検査は複数ソースのcross-referenceで、SSoT 優先順位に従い矛盾を確定する。
 - 既知の false positive、pre-existing 問題は、誤って「今回修正対象」と判定しないため、過去の inspect-docs/ docs-check の finding 履歴を参照する。
 
-## SPEC 三層構造の整合性検出
+## Design 三層構造の整合性検出
 
-SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC（workflows）は個別 command/skill の現在動作を含まない。
+Design は 3 層構造（commands、skills、workflows）を持ち、横断 Design（workflows）は個別 command/skill の現在動作を含まない。
 これに違反する配置を検出する。
 
 ### 検出シグナル
 
 | 観点 | 検出対象 | 推奨アクション |
 |------|----------|----------------|
-| 横断 SPEC 中の個別動作 | workflows SPEC に個別 command または skill のみに適用される手順、ステップ、判定表が含まれる | 該当 command/skill SPEC へ移送（`MOVE`） |
-| 個別 SPEC 中の横断契約 | command SPEC または skill SPEC に複数 command/skill をまたぐ契約が含まれる | 横断 SPEC へ移送（`MOVE`） |
-| 旧 grab-bag SPEC 残存 | `docs/specs/<**/*>.md`（基盤SPECドメイン直下）に複数関心事が混在 | 関心事別 SPEC へ分割（`SPLIT`） |
+| 横断 Design 中の個別動作 | workflows Design に個別 command または skill のみに適用される手順、ステップ、判定表が含まれる | 該当 command/skill Design へ移送（`MOVE`） |
+| 個別 Design 中の横断契約 | command Design または skill Design に複数 command/skill をまたぐ契約が含まれる | 横断 Design へ移送（`MOVE`） |
+| 旧 grab-bag Design 残存 | `docs/designs/<**/*>.md`（基盤Designドメイン直下）に複数関心事が混在 | 関心事別 Design へ分割（`SPLIT`） |
 
 ### 判定ルール
 
-- 個別 SPEC は1コマンドまたは1スキルの現在動作のみを記述する。
+- 個別 Design は1コマンドまたは1スキルの現在動作のみを記述する。
 - 複数コマンド/スキル間の契約（委譲、キャプチャ境界、Wave モデル等）は `workflows/` に配置する。
-- `docs/specs/{foundations,responsibilities,quality,integrity,local,authoring}/*.md` 直下の SPEC は基盤 SPEC（system/document-type-responsibilities/patterns/design-principles 等）のみとし、command/skill 固有の動作は含まない。
+- `docs/designs/{foundations,responsibilities,quality,integrity,local,authoring}/*.md` 直下の Design は基盤 Design（system/document-type-responsibilities/patterns/design-principles 等）のみとし、command/skill 固有の動作は含まない。
 
 ## HOW 除去後の acceptance-criteria 順位検証
 
@@ -201,7 +201,7 @@ SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC�
 ### 検証手順
 
 1. **完了条件の展開**: Issue の完了条件、REQ の必達要件を受け入れ基準単位に展開し、優先順位をつける
-2. **順位順の検証**: 高優先度の完了条件から順に、REQ ファイル、配布物、SPEC を照合し、HOW 残存、ID 残留、責務混入がないか確認する
+2. **順位順の検証**: 高優先度の完了条件から順に、REQ ファイル、配布物、Design を照合し、HOW 残存、ID 残留、責務混入がないか確認する
 3. **残余検出時**: 機械的除去で見逃されたパターン（複数行にまたがる HOW 記述、文脈依存の ID 参照、間接的なスキル名直参照等）を検出事項候補として出す
 
 ### 残余 violation の高頻度パターン
@@ -247,7 +247,7 @@ SPEC は 3 層構造（commands、skills、workflows）を持ち、横断 SPEC�
 | 観点 | SPLIT/ MERGE/ MOVE/ DUPLICATE/ RETIRE/ DRIFT のいずれか |
 | 対象 | REQ ID または対象成果物 |
 | 根拠 | 検出されたシグナルの具体的内容 |
-| シグナル数 | 検出されたシグナル数（通常は2以上で検出事項化、SPEC分離基準違反の high-specificity signal は1以上で検出事項候補化） |
+| シグナル数 | 検出されたシグナル数（通常は2以上で検出事項化、Design分離基準違反の high-specificity signal は1以上で検出事項候補化） |
 | 確信度 | high/ medium/ low のいずれか |
 | 推奨アクション | SPLIT/ MERGE/ MOVE/ RETIRE/ UPDATE/ APPEND/ no-action のいずれか |
 | req-define入力案 | req-define での壁打ち内容のドラフト（不要な場合は「—」） |

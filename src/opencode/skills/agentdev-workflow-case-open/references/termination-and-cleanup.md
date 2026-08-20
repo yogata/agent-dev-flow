@@ -72,7 +72,7 @@ push 失敗時は構造化エラーメッセージを表示して停止する。
 - 単一REQ Epic → `.opencode/skills/agentdev-workflow-templates/templates/case-open/epic.md`
 - マルチREQ Epic → `.opencode/skills/agentdev-workflow-templates/templates/case-open/multi-req-epic.md`
 
-**Capture結果 小節**: case-open 実行中に実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存した場合、保存した capture 成果物のパス・分類・保存結果のみを含める（capture 本体は含めない、成果物が無い場合は省略、共通意味契約は `artifact-contracts` SPEC「Capture結果 小節」節参照）。
+**Capture結果 小節**: case-open 実行中に実観測した deviation を `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存した場合、保存した capture 成果物のパス・分類・保存結果のみを含める（capture 本体は含めない、成果物が無い場合は省略、共通意味契約は `artifact-contracts` Design「Capture結果 小節」節参照）。
 
 ## Evidence
 

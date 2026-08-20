@@ -4,7 +4,7 @@ AgentDevFlow を適用プロジェクトに導入する際のモデルを定義�
 
 ## リポジトリ種別（Repo Type）
 
-AgentDevFlow は5種のリポジトリ種別を定義する（詳細は SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md)）。
+AgentDevFlow は5種のリポジトリ種別を定義する（詳細は Design [実行時パッケージ境界](../specs/local/runtime-package-boundary.md)）。
 本ガイドでは導入観点から各々を説明する。
 
 | 種別 | 説明 | `.opencode/` の意味 | 例 |
@@ -67,7 +67,7 @@ scripts/
 
 GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別。
 通常版と同じ link mode（`.opencode/` 配下を src 配下へ接続）で導入し、`agentdev-gh-cli` だけを `src/opencode-local/agentdev-gh-cli/` から差し替える（v2:ADR-011, v2:ADR-009）。
-詳細な接続フロー、link target 確認は SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md) を参照。
+詳細な接続フロー、link target 確認は Design [実行時パッケージ境界](../specs/local/runtime-package-boundary.md) を参照。
 
 ```
 .agentdev-plugin/                → agent-dev-flow のチェックアウト配置先（git clone またはソース ZIP 展開）
@@ -89,7 +89,7 @@ GitHub Issue/PR を使わない個人利用環境向けのリポジトリ種別�
 - **リポジトリ管理対象外**: link により接続された `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/` はリポジトリ管理対象外（v2:ADR-011-008）
 - **リポジトリ管理対象**: `.agentdev/cases/` 配下のローカル Case ファイルは Issue/PR 相当の永続情報としてリポジトリ管理対象（v2:ADR-011-016）
 - **更新方式**: unlink / relink により行う。`.opencode/commands/agentdev/` と `.opencode/skills/agentdev-*/` を全削除して作り直す方式は採らない（v2:ADR-011-033, v2:ADR-009 decision #4）
-- **判定基準**: `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合に consumer-generated と判定される（SPEC runtime-package-boundary.md）
+- **判定基準**: `.opencode/skills/agentdev-gh-cli/` が `src/opencode-local/agentdev-gh-cli/` への link として解決される場合に consumer-generated と判定される（Design runtime-package-boundary.md）
 
 #### ローカル版セットアップ手順
 
@@ -111,7 +111,7 @@ cd .agentdev-plugin && git pull && cd ..
 ./.agentdev-plugin/scripts/install-consumer-opencode.ps1 -Mode apply -LocalMode
 ```
 
-> 詳細な実行手順、制約、link target 確認は `src/opencode-local/README.md`（link 設定の実行エントリポイント）と SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md)、[ローカル Case ファイル](../specs/local/local-case-file.md) を参照。
+> 詳細な実行手順、制約、link target 確認は `src/opencode-local/README.md`（link 設定の実行エントリポイント）と Design [実行時パッケージ境界](../specs/local/runtime-package-boundary.md)、[ローカル Case ファイル](../specs/local/local-case-file.md) を参照。
 
 ## 予約名（Reserved Names）
 
@@ -136,7 +136,7 @@ docs-check は `repo-agentdev-integrity`（配布対象外スキル）として 
 
 provisioning（チェックアウトの取得）と install 手段（link mode による接続）は別軸である（REQ-009）。
 どちらの provisioning 形態でも install 手段は link mode に限られる。
-導入方式ポリシーの正規な定義は SPEC [実行時パッケージ境界](../specs/local/runtime-package-boundary.md) を参照。
+導入方式ポリシーの正規な定義は Design [実行時パッケージ境界](../specs/local/runtime-package-boundary.md) を参照。
 
 ### provisioning 形式（チェックアウトの取得）
 

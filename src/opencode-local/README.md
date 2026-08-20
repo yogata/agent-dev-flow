@@ -1,6 +1,6 @@
 # ローカル版 OpenCode 固有原本領域
 
-> **非正規文書**: 本ディレクトリは AgentDevFlow 本体リポジトリの `docs/`（リポジトリ内部設計文書）ではなく、ローカル版 OpenCode の link 元となるローカル版固有原本を保持する領域である（ADR-0131）。要件は `docs/requirements/REQ-0141.md`、仕様は `docs/specs/local/*.md` を正とする。
+> **非正規文書**: 本ディレクトリは AgentDevFlow 本体リポジトリの `docs/`（リポジトリ内部設計文書）ではなく、ローカル版 OpenCode の link 元となるローカル版固有原本を保持する領域である（ADR-0131）。要件は `docs/requirements/REQ-0141.md`、仕様は `docs/designs/local/*.md` を正とする。
 
 ## 目的
 
@@ -27,7 +27,7 @@ src/opencode-local/
 ├── agentdev-gh-cli/       ← ローカル版 agentdev-gh-cli の原本（case-schema を吸収）
 │   ├── SKILL.md           ← ローカル版 agentdev-gh-cli のルーティング入口
 │   ├── references/        ← 操作契約・Case ファイル対応手続き・VERIFY 観点
-│   └── case-schema/       ← Case ファイルの操作用定義（正本は docs/specs/local/local-case-file.md）
+│   └── case-schema/       ← Case ファイルの操作用定義（正本は docs/designs/local/local-case-file.md）
 │       ├── case-file.md   ← スキーマ定義（YAML 前書き・status enum・labels・headings・採番）
 │       └── rules/
 │           ├── frontmatter.yaml   ← YAML 前書きスキーマの機械可読定義
@@ -136,8 +136,8 @@ link による接続であるため、上書き問題が発生しない。
 - [Case ファイルスキーマ定義](agentdev-gh-cli/case-schema/case-file.md)：ローカル Case ファイルの構造
 - [ローカル版 agentdev-gh-cli ルーティング入口](agentdev-gh-cli/SKILL.md)：ローカル版 agentdev-gh-cli の手続き一覧
 - `docs/requirements/REQ-0141.md`：ローカル版 OpenCode 導入方式とローカル Case ファイル運用の要件定義（正本）
-- `docs/specs/local/local-generation.md`：link mode 接続フロー、link target 確認、更新運用の正本 SPEC
-- `docs/specs/local/local-case-file.md`：Case ファイルスキーマの正本 SPEC
-- `docs/specs/local/runtime-package-boundary.md`：`consumer_generated` リポジトリ種別、`.opencode/` 構成
+- `docs/designs/local/local-generation.md`：link mode 接続フロー、link target 確認、更新運用の正本 Design
+- `docs/designs/local/local-case-file.md`：Case ファイルスキーマの正本 Design
+- `docs/designs/local/runtime-package-boundary.md`：`consumer_generated` リポジトリ種別、`.opencode/` 構成
 - v2:ADR-0131（tag v2.11.0）:ローカル版導入方式を link mode へ統一し生成方式を廃止（v2:ADR-0126 を supersede）
 - v2:ADR-0126（tag v2.11.0）:ローカル版 OpenCode 生成基盤（superseded by v2:ADR-0131、歴史参照）

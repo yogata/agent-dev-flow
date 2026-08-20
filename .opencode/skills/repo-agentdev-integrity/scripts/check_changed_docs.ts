@@ -1,7 +1,7 @@
 /**
  * check_changed_docs.ts — Targeted docs guard (v2:REQ-0158-003).
  *
- * 変更ファイル限定の整合性検査。req-save / spec-save / case-run / case-close / docs-check の
+ * 変更ファイル限定の整合性検査。req-save / design-save / case-run / case-close / docs-check の
  * 各 workflow で実行する。全体監査 (`check_integrity.ts`) に処理を密結合させず、
  * 変更ファイルと連動ファイルだけを対象とする薄い入口として振る舞う。
  *
@@ -13,7 +13,7 @@
  *   5. JSON/text reporter        — 結果を JSON または text で出力
  *
  * CLI:
- *   --workflow req-save|spec-save|case-run|case-close|docs-check
+ *   --workflow req-save|design-save|case-run|case-close|docs-check
  *   --files <path...>             変更ファイル（main 環境向け。--base-ref と排他）
  *   --base-ref <git-ref>          git diff の base ref（worktree 環境向け。--files と排他）
  *   --json                        JSON 出力
@@ -58,7 +58,7 @@ const POWERSHELL_ARGS_NOTES =
   "PowerShell での複数パス指定は配列変数経由（$files = @('a.md','b.md') を --files $files で渡す）または個別渡しとすること。" +
   "--files \"a.md b.md\" のような引用符まとめ渡しは split 失敗の恐れがあるため使用しない。";
 
-type Workflow = "req-save" | "spec-save" | "case-run" | "case-close" | "docs-check";
+type Workflow = "req-save" | "design-save" | "case-run" | "case-close" | "docs-check";
 type FailLevel = "strict" | "warning";
 
 interface Failure {
@@ -77,7 +77,7 @@ interface TargetedDocsReport {
   failures: Failure[];
   warnings: string[];
   doc_map_update_required: boolean;
-  spec_readme_update_required: boolean;
+  design_readme_update_required: boolean;
   requirements_readme_update_required: boolean;
   full_docs_check_recommended: boolean;
   extensions_check_required: boolean;
@@ -121,13 +121,13 @@ function parseArgs(args: string[]): ParsedArgs {
       if (!v) throw new Error("--workflow requires a value");
       if (
         v !== "req-save" &&
-        v !== "spec-save" &&
+        v !== "design-save" &&
         v !== "case-run" &&
         v !== "case-close" &&
         v !== "docs-check"
       ) {
         throw new Error(
-          `--workflow must be one of: req-save, spec-save, case-run, case-close, docs-check (got: ${v})`,
+          `--workflow must be one of: req-save, design-save, case-run, case-close, docs-check (got: ${v})`,
         );
       }
       parsed.workflow = v as Workflow;
@@ -181,7 +181,7 @@ function printHelp(): void {
   console.error(`description: ${DESCRIPTION}`);
   console.error("");
   console.error("options:");
-  console.error("  --workflow <name>   req-save | spec-save | case-run | case-close | docs-check (required)");
+  console.error("  --workflow <name>   req-save | design-save | case-run | case-close | docs-check (required)");
   console.error("  --files <path...>   changed files (space-separated recommended; comma-separated also accepted); for main env (post-merge, case-close). mutually exclusive with --base-ref");
   console.error(`  ${FILES_DELIMITER_NOTES}`);
   console.error("  --base-ref <ref>    git base ref to compute changed files; for worktree env (pre-merge, case-run). mutually exclusive with --files");
@@ -252,27 +252,27 @@ function profileFor(workflow: Workflow): WorkflowProfile {
         "requirements-readme-sync",
         "docmap-update-required",
         "decision-crossref-update-required",
-        "spec-readme-update-required",
-        "obsolete-spec-path",
+        "design-readme-update-required",
+        "obsolete-design-path",
         "legacy-local-generation-vocab",
         "doc-type-responsibility",
       ],
     };
   }
-  if (workflow === "spec-save") {
+  if (workflow === "design-save") {
     return {
-      name: "spec-save",
-      appliesTo: (rel) => /^docs\/specs\/.*\.md$/.test(rel),
-      coupledFor: (rel) => couplingForSpec(rel),
+      name: "design-save",
+      appliesTo: (rel) => /^docs\/designs\/.*\.md$/.test(rel),
+      coupledFor: (rel) => couplingForDesign(rel),
       rules: [
-        "spec-frontmatter-required",
-        "spec-status-valid",
-        "spec-readme-status-sync",
-        "spec-domain-classification",
+        "design-frontmatter-required",
+        "design-status-valid",
+        "design-readme-status-sync",
+        "design-domain-classification",
         "docmap-update-required",
-        "obsolete-spec-path",
+        "obsolete-design-path",
         "legacy-local-generation-vocab",
-        "spec-responsibility-classification",
+        "design-responsibility-classification",
       ],
     };
   }
@@ -280,7 +280,8 @@ function profileFor(workflow: Workflow): WorkflowProfile {
     return {
       name: "case-run",
       appliesTo: (rel) =>
-        /^docs\/specs\//.test(rel) ||
+        /^docs\/designs\//.test(rel) ||
+        /^docs\/reports\//.test(rel) ||
         /^docs\/requirements\//.test(rel) ||
         /^docs\/decisions\//.test(rel) ||
         /^docs\/guides\//.test(rel) ||
@@ -290,11 +291,11 @@ function profileFor(workflow: Workflow): WorkflowProfile {
         rel === "docs/README.md",
       coupledFor: (rel) => defaultCoupling(rel),
       rules: [
-        "obsolete-spec-path",
+        "obsolete-design-path",
         "legacy-local-generation-vocab",
         "doc-type-responsibility",
         "docmap-update-required",
-        "spec-readme-update-required",
+        "design-readme-update-required",
         "requirements-readme-sync",
       ],
     };
@@ -305,9 +306,9 @@ function profileFor(workflow: Workflow): WorkflowProfile {
       appliesTo: (_rel) => true,
       coupledFor: (rel) => defaultCoupling(rel),
       rules: [
-        "obsolete-spec-path",
+        "obsolete-design-path",
         "legacy-local-generation-vocab",
-        "spec-status-transition-sync",
+        "design-status-transition-sync",
         "issue-pr-declared-files-match",
         "full-docs-check-recommendation",
       ],
@@ -317,7 +318,7 @@ function profileFor(workflow: Workflow): WorkflowProfile {
     name: "docs-check",
     appliesTo: (_rel) => true,
     coupledFor: (rel) => defaultCoupling(rel),
-    rules: ["obsolete-spec-path", "legacy-local-generation-vocab"],
+    rules: ["obsolete-design-path", "legacy-local-generation-vocab"],
   };
 }
 
@@ -332,10 +333,10 @@ function couplingForReq(relPath: string): string[] {
   return [...coupled];
 }
 
-function couplingForSpec(relPath: string): string[] {
+function couplingForDesign(relPath: string): string[] {
   const coupled = new Set<string>();
-  if (/^docs\/specs\/.*\.md$/.test(relPath)) {
-    coupled.add("docs/specs/README.md");
+  if (/^docs\/designs\/.*\.md$/.test(relPath)) {
+    coupled.add("docs/designs/README.md");
     coupled.add("docs/DOC-MAP.md");
   }
   return [...coupled];
@@ -347,7 +348,7 @@ function defaultCoupling(relPath: string): string[] {
     coupled.add("docs/DOC-MAP.md");
     coupled.add("docs/README.md");
   }
-  if (/^docs\/specs\//.test(relPath)) coupled.add("docs/specs/README.md");
+  if (/^docs\/designs\//.test(relPath)) coupled.add("docs/designs/README.md");
   if (/^docs\/requirements\//.test(relPath)) {
     coupled.add("docs/requirements/README.md");
   }
@@ -382,7 +383,7 @@ function loadObsoleteTerms(root: string): {
   oldPaths: string[];
   vocab: string[];
 } {
-  const mapPath = path.join(root, "docs", "specs", "integrity", "obsolete-path-map.yaml");
+  const mapPath = path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "data", "obsolete-path-map.yaml");
   const content = readText(mapPath);
   if (!content) return { oldPaths: [], vocab: [] };
   const oldPaths: string[] = [];
@@ -414,7 +415,7 @@ function loadObsoleteTerms(root: string): {
   return { oldPaths, vocab };
 }
 
-function checkObsoleteSpecPath(
+function checkObsoleteDesignPath(
   root: string,
   files: string[],
   oldPaths: string[],
@@ -422,6 +423,9 @@ function checkObsoleteSpecPath(
   const failures: Failure[] = [];
   for (const f of files) {
     const rel = path.relative(root, f).replace(/\\/g, "/");
+    // docs/reports/ は監査・評価・観測記録（Report）であり、旧パスの履歴記述を正規内容として持つ。
+    // Design 現行成果物の検査対象外とする（Report 分離、専用例外登録は不要）。
+    if (rel.startsWith("docs/reports/")) continue;
     if (isIr057PathExempt(rel)) continue;
     const content = readText(f);
     if (!content) continue;
@@ -437,8 +441,8 @@ function checkObsoleteSpecPath(
           severity: "strict",
           file: rel,
           line: i + 1,
-          message: `Old SPEC direct path reference '${old}' detected`,
-          expected: `use current path (see docs/specs/integrity/obsolete-path-map.yaml)`,
+          message: `Old design direct path reference '${old}' detected`,
+          expected: `use current path (see .opencode/skills/repo-agentdev-integrity/data/obsolete-path-map.yaml)`,
         });
       }
     }
@@ -454,6 +458,8 @@ function checkLegacyVocab(
   const failures: Failure[] = [];
   for (const f of files) {
     const rel = path.relative(root, f).replace(/\\/g, "/");
+    // docs/reports/ は Report 領域のため旧語彙の履歴記述を正規内容として持つ（checkObsoleteDesignPath と同一理由で対象外）。
+    if (rel.startsWith("docs/reports/")) continue;
     if (isIr057PathExempt(rel)) continue;
     const content = readText(f);
     if (!content) continue;
@@ -539,10 +545,10 @@ function parseSimpleFrontmatter(content: string): Record<string, string> | null 
 
 // ─── Line-level change descriptor (Issue #1784 / OU-007) ────────────────────
 //
-// 更新要否フラグ（requirements_readme_update_required, spec_readme_update_required,
+// 更新要否フラグ（requirements_readme_update_required, design_readme_update_required,
 // extensions_check_required, full_docs_check_recommended）は変更ファイルの存在や
 // 変更種別名ではなく、行レベル差分が導出元（文書 lifecycle, 索引 frontmatter 値、公開入口、
-// extension 参照対象、DOC-MAP/README 生成元）へ影響するかで判定する（SPEC
+// extension 参照対象、DOC-MAP/README 生成元）へ影響するかで判定する（Design
 // targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節）。
 
 const INDEX_FRONTMATTER_KEYS = new Set([
@@ -708,7 +714,7 @@ function computeChangeDescriptors(
 }
 
 // 導出元影響判定: lifecycle 変更（追加/削除/リネーム）または索引 frontmatter 値変更で true。
-// SPEC targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節に基づく。
+// Design targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節に基づく。
 function isIndexChange(s: ChangeDescriptor): boolean {
   if (
     s.lifecycle === "added" ||
@@ -723,28 +729,13 @@ function isIndexChange(s: ChangeDescriptor): boolean {
   return false;
 }
 
-// SPEC 判定（AG-007、ACT-SPEC-001 検出対象除外規定）:
-// docs/specs/ 配下でも非 SPEC ファイル（baseline snapshot、歴史記録ファイル等）は
-// SPEC README 登録候補（spec_readme_update_required 等）から除外する。
-// 除外列挙は checker 実行契約 SPEC（docs/specs/integrity/checker-execution-contracts.md
-// 「検出対象除外規定」）が正規所有し、列挙外の除外を本実装で追加しない:
-//   - 配置ディレクトリ: docs/specs/integrity/audits/、baselines/（歴史記録領域）
-//   - frontmatter: baseline_for / audit_for（履歴系 frontmatter = snapshot・監査記録の起源標識）
-const SPEC_HISTORY_DIR_RE = /^docs\/specs\/integrity\/(audits|baselines)\//;
-const SPEC_HISTORY_FRONTMATTER_KEYS = ["baseline_for", "audit_for"] as const;
-
-function isSpecFile(relPath: string, absPath: string): boolean {
-  if (!/^docs\/specs\/.*\.md$/.test(relPath)) return false;
-  if (SPEC_HISTORY_DIR_RE.test(relPath)) return false;
-  const content = readText(absPath);
-  if (content) {
-    const fm = parseSimpleFrontmatter(content);
-    if (fm && SPEC_HISTORY_FRONTMATTER_KEYS.some((k) => fm[k])) return false;
-  }
+// 監査・評価・観測記録は docs/reports/ へ分離済みのため Design 判定に例外は不要（Issue #2349）。
+function isDesignFile(relPath: string, absPath: string): boolean {
+  if (!/^docs\/designs\/.*\.md$/.test(relPath)) return false;
   return true;
 }
 
-function checkSpecFrontmatter(root: string, files: string[]): Failure[] {
+function checkDesignFrontmatter(root: string, files: string[]): Failure[] {
   const failures: Failure[] = [];
   for (const f of files) {
     const content = readText(f);
@@ -755,27 +746,13 @@ function checkSpecFrontmatter(root: string, files: string[]): Failure[] {
     // status 欠落は accepted 相当（document-model.md 設定規則）。
     if (!status) continue;
     if (status === "draft" || status === "accepted") continue;
-    if (status === "superseded") {
-      // v2:REQ-0101-076: superseded は superseded_by 必須。保持SPECは通常内容検査対象外。
-      if (!fm["superseded_by"]) {
-        failures.push({
-          rule_id: "SPEC-STATUS",
-          severity: "strict",
-          file: path.relative(root, f).replace(/\\/g, "/"),
-          line: 3,
-          message: `SPEC status 'superseded' requires 'superseded_by' frontmatter`,
-          expected: "superseded_by: <後継SPEC id> (v2:ADR-0123, v2:REQ-0101-076)",
-        });
-      }
-      continue;
-    }
     failures.push({
-      rule_id: "SPEC-STATUS",
+      rule_id: "DESIGN-STATUS",
       severity: "warning",
       file: path.relative(root, f).replace(/\\/g, "/"),
       line: 3,
-      message: `SPEC status '${status}' is not 'draft', 'accepted', or 'superseded'`,
-      expected: "draft, accepted, or superseded (v2:ADR-0123, v2:REQ-0101-076)",
+      message: `Design status '${status}' is not 'draft' or 'accepted'`,
+      expected: "draft or accepted (REQ-001-025)",
     });
   }
   return failures;
@@ -816,7 +793,7 @@ function runWorkflowChecks(
   failures: Failure[];
   warnings: string[];
   docMapUpdateRequired: boolean;
-  specReadmeUpdateRequired: boolean;
+  designReadmeUpdateRequired: boolean;
   requirementsReadmeUpdateRequired: boolean;
   fullDocsCheckRecommended: boolean;
   extensionsCheckRequired: boolean;
@@ -829,8 +806,8 @@ function runWorkflowChecks(
   // 「対象ファイルが検出されなかった」旨のメッセージを main() で生成する。
   const allTargets = [...changedFiles, ...coupledFiles];
 
-  if (profile.rules.includes("obsolete-spec-path")) {
-    failures.push(...checkObsoleteSpecPath(root, allTargets, obsolete.oldPaths));
+  if (profile.rules.includes("obsolete-design-path")) {
+    failures.push(...checkObsoleteDesignPath(root, allTargets, obsolete.oldPaths));
   }
   if (profile.rules.includes("legacy-local-generation-vocab")) {
     failures.push(...checkLegacyVocab(root, allTargets, obsolete.vocab));
@@ -838,8 +815,8 @@ function runWorkflowChecks(
   if (profile.name === "req-save") {
     failures.push(...checkReqFrontmatter(changedFiles));
   }
-  if (profile.name === "spec-save") {
-    failures.push(...checkSpecFrontmatter(root, changedFiles));
+  if (profile.name === "design-save") {
+    failures.push(...checkDesignFrontmatter(root, changedFiles));
   }
 
   const docMapUpdateRequired = profile.rules.includes("docmap-update-required")
@@ -847,21 +824,21 @@ function runWorkflowChecks(
         root,
         changedFiles,
         "docs/DOC-MAP.md",
-        (rel) => rel.includes("REQ-") || rel.includes("docs/specs/"),
+        (rel) => rel.includes("REQ-") || rel.includes("docs/designs/"),
       )
     : false;
 
   // Issue #1784 / OU-007: 更新要否フラグを行レベル意味差分（導出元影響）ベースへ限定。
   // ファイル存在や変更種別名ではなく、文書 lifecycle（追加/削除/移動/名称変更）または
   // 索引 frontmatter 値（id, title, status 等）の変更でのみ true とする。
-  // SPEC targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節。
-  // Issue #2138 / AG-007: SPEC 判定（frontmatter・配置ディレクトリ）により非 SPEC
+  // Design targeted-docs-guard-implementation.md「full_docs_check_recommended 条件」節。
+  // Issue #2138 / AG-007: Design 判定（frontmatter・配置ディレクトリ）により非 Design
   // ファイル（baseline snapshot、歴史記録ファイル等）の誤検出を抑止する。
-  const specReadmeUpdateRequired =
-    profile.rules.includes("spec-readme-update-required") ||
-    profile.rules.includes("spec-readme-status-sync")
+  const designReadmeUpdateRequired =
+    profile.rules.includes("design-readme-update-required") ||
+    profile.rules.includes("design-readme-status-sync")
       ? changeDescriptors.some(
-          (d) => isSpecFile(d.relPath, d.absPath) && isIndexChange(d),
+          (d) => isDesignFile(d.relPath, d.absPath) && isIndexChange(d),
         )
       : false;
   const requirementsReadmeUpdateRequired = profile.rules.includes(
@@ -873,27 +850,27 @@ function runWorkflowChecks(
       })
     : false;
 
-  // full_docs_check_recommended: integrity rule 追加/削除、DOC-MAP 構造変更、docs/specs 大規模移動、extensions 変更等
+  // full_docs_check_recommended: integrity rule 追加/削除、DOC-MAP 構造変更、docs/designs 大規模移動、extensions 変更等
   const fullDocsCheckRecommended =
     profile.name === "case-close"
     ? changedFiles.some((f) => {
         const rel = path.relative(root, f).replace(/\\/g, "/");
         return (
-          /docs\/specs\/integrity\/rules\//.test(rel) ||
-          /docs\/specs\/integrity\/integrity-rule-catalog\.md/.test(rel) ||
-          /docs\/specs\/integrity\/rule-ownership\.md/.test(rel) ||
-          /docs\/specs\/foundations\/document-model/.test(rel) ||
-          /docs\/specs\/responsibilities\/document-type-responsibilities/.test(rel) ||
+          /docs\/designs\/integrity\/rules\//.test(rel) ||
+          /docs\/designs\/integrity\/integrity-rule-catalog\.md/.test(rel) ||
+          /docs\/designs\/integrity\/rule-ownership\.md/.test(rel) ||
+          /docs\/designs\/foundations\/document-model/.test(rel) ||
+          /docs\/designs\/responsibilities\/document-type-responsibilities/.test(rel) ||
           /docs\/DOC-MAP\.md/.test(rel) ||
-          /docs\/specs\/README\.md/.test(rel) ||
+          /docs\/designs\/README\.md/.test(rel) ||
           /^\.agentdev\/config\.yaml$/.test(rel) ||
           /^\.agentdev\/extensions\//.test(rel)
         );
       })
     : false;
 
-  // extensions_check_required: extension が参照する対象（REQ/ADR/SPEC）の lifecycle
-  // または索引 frontmatter 値の変更で true。specs/ 配下は SPEC 判定（AG-007）を通す。
+  // extensions_check_required: extension が参照する対象（REQ/Decision/Design）の lifecycle
+  // または索引 frontmatter 値の変更で true。designs/ 配下は Design 判定（AG-007）を通す。
   const extensionsCheckRequired = changeDescriptors.some((d) => {
     if (/^docs\/requirements\/REQ-.*\.md$/.test(d.relPath)) {
       return isIndexChange(d);
@@ -901,7 +878,7 @@ function runWorkflowChecks(
     if (/^docs\/decisions\/DEC-.*\.md$/.test(d.relPath)) {
       return isIndexChange(d);
     }
-    return isSpecFile(d.relPath, d.absPath) && isIndexChange(d);
+    return isDesignFile(d.relPath, d.absPath) && isIndexChange(d);
   });
 
   // declared_files_check: --declared-files 指定時、宣言ファイルと実変更ファイルの対応を検査
@@ -926,7 +903,7 @@ function runWorkflowChecks(
     failures,
     warnings,
     docMapUpdateRequired,
-    specReadmeUpdateRequired,
+    designReadmeUpdateRequired,
     requirementsReadmeUpdateRequired,
     fullDocsCheckRecommended,
     extensionsCheckRequired,
@@ -955,7 +932,7 @@ function emitText(report: TargetedDocsReport): void {
   console.log(`warnings: ${report.warnings.length}`);
   for (const w of report.warnings) console.log(`  ${w}`);
   console.log(`doc_map_update_required: ${report.doc_map_update_required}`);
-  console.log(`spec_readme_update_required: ${report.spec_readme_update_required}`);
+  console.log(`design_readme_update_required: ${report.design_readme_update_required}`);
   console.log(
     `requirements_readme_update_required: ${report.requirements_readme_update_required}`,
   );
@@ -1038,7 +1015,7 @@ function main(): void {
     failures: runResult.failures,
     warnings: runResult.warnings,
     doc_map_update_required: runResult.docMapUpdateRequired,
-    spec_readme_update_required: runResult.specReadmeUpdateRequired,
+    design_readme_update_required: runResult.designReadmeUpdateRequired,
     requirements_readme_update_required: runResult.requirementsReadmeUpdateRequired,
     full_docs_check_recommended: runResult.fullDocsCheckRecommended,
     extensions_check_required: runResult.extensionsCheckRequired,

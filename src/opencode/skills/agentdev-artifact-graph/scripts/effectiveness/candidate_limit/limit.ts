@@ -1,6 +1,6 @@
 // candidate_limit/limit.ts — 候補数上限の適用（REQ-{NNNN}-006、境界試験の対象）。
 //
-// 契約（AG SPEC「高位問い合わせプロファイル」共通規則に基づく）:
+// 契約（AG Design「高位問い合わせプロファイル」共通規則に基づく）:
 // - 問い合わせ結果が候補数上限を超えた場合、候補を黙って切り捨てない
 // - 決定論的な優先・除外規則を適用する
 // - それでも上限を超える場合は、候補過多であること、全候補数、返却候補数、
@@ -13,7 +13,7 @@ import type { LimitCandidate, LimitResult, QuerySettings } from "./types.ts"
 /**
  * 問い合わせ設定の既定値。標準候補数上限 12 は TIM 語彙カタログ置換後の再計測
  * （recommended_standard_limit 実測値 9、全代表ケースの必須候補を保持する最小上限値）
- * に基づき決定した値である（AG SPEC「標準候補数上限の決定手順」、Issue #2204）。
+ * に基づき決定した値である（AG Design「標準候補数上限の決定手順」、Issue #2204）。
  * 本値は標準値であり、設定として管理される限り変更できる。
  */
 export const DEFAULT_CANDIDATE_LIMIT = 12

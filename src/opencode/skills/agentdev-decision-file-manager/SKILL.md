@@ -17,9 +17,9 @@ Decisionの**作成ガイドライン**（評価基準、Decision必要かどう
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-decision-file-manager` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-decision-file-manager` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## Decision要否判定の責務境界
@@ -39,7 +39,7 @@ Decision要否の判定は `agentdev-decision-guidelines` スキルが行う。
 ## 副作用
 
 - `docs/decisions/` 配下の Decision ファイルと README.md を更新する
-- REQ ファイル、SPEC ファイルは更新しない（各 file-manager の責務）
+- REQ ファイル、Design ファイルは更新しない（各 file-manager の責務）
 
 ## 常に守る不変条件（採番と配置）
 
@@ -138,7 +138,7 @@ Decisionテンプレート: @.opencode/skills/`agentdev-decision-file-manager`/t
 
 ## Scripts（決定的処理）
 
-Decision 番号採番は決定的スクリプトで実行する（artifact-contracts SPEC「Script 所有権と委譲契約」、OU-{NNN} 移行）。
+Decision 番号採番は決定的スクリプトで実行する（artifact-contracts Design「Script 所有権と委譲契約」、OU-{NNN} 移行）。
 
 | スクリプト | 役割 | 入力 | 出力 JSON |
 |-----------|------|------|-----------|
@@ -150,11 +150,11 @@ Decision 番号採番は決定的スクリプトで実行する（artifact-contr
 bun .opencode/skills/agentdev-decision-file-manager/scripts/src/alloc-decision-number.ts docs/decisions
 ```
 
-本スクリプトは self-contained であり、兄弟 skill の lib を直接参照しない（artifact-contracts SPEC「Script 所有権と委譲契約」準拠）。
+本スクリプトは self-contained であり、兄弟 skill の lib を直接参照しない（artifact-contracts Design「Script 所有権と委譲契約」準拠）。
 
 ## See Also
 
 - **agentdev-decision-guidelines**: Decision作成の必要性判定基準、ライフサイクル定義
 - **agentdev-req-analysis**: 要件分析におけるDecision閾値判定ブリッジ
 - **agentdev-req-file-manager**: REQファイル管理（Decision ↔ REQ整合性チェック）
-- **agentdev-doc-writing**: Decision/REQ/SPEC横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）
+- **agentdev-doc-writing**: Decision/REQ/Design横断の文書品質査読ゲート（文書種別責務、要件性、文意品質、粒度）

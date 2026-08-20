@@ -52,10 +52,10 @@ Issue 番号を `{epic_number}` として記録。
 ### STEP-5-4: 子Issue 作成（並列化）
 
 - **Issue 化単位**: OU 単位（command 不変条件）
-- **子Issue 本文**: `Parent: #{epic_number}`（command 不変条件）、対象 OU ID、紐づく REQ/Decision/SPEC 識別子を記載
+- **子Issue 本文**: `Parent: #{epic_number}`（command 不変条件）、対象 OU ID、紐づく REQ/Decision/Design 識別子を記載
 - **並列化**: 子Issue 本文案作成、検査、Issue 作成は最大5件まで並列化（3つの「5件」文脈のうち case-run Wave 内子 Issue 並列上限と同一、後述）
 - **直列集約**: Epic Issue 作成、Wave 1 配置、Epic 本文ステータス追跡テーブル更新は親が直列集約（command 不変条件: 全子Issue 作成完了後の一括更新で維持）
-- **前工程完了度属性の埋め込み**: 各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（3段階: 完全完了/ 検証のみ/ 補完あり、epic-wave-model SPEC extension 経由）
+- **前工程完了度属性の埋め込み**: 各子 Issue 本文の「## 補足情報」セクションに「前工程完了度」属性を埋め込む（3段階: 完全完了/ 検証のみ/ 補完あり、epic-wave-model Design extension 経由）
 
 詳細、委譲接続点は `agentdev-issue-management` を参照。
 
@@ -89,7 +89,7 @@ Issue 作成手続き（`agentdev-gh-cli`）→ VERIFY。
 
 ## 並列上限と3つの「5件」文脈
 
-case-open、case-auto、case-run で参照される「5件」上限は文脈ごとに区別される（epic-wave-model SPEC「並列上限と停止条件の整理」セクション参照）。
+case-open、case-auto、case-run で参照される「5件」上限は文脈ごとに区別される（epic-wave-model Design「並列上限と停止条件の整理」セクション参照）。
 
 | 文脈 | 上限 | 説明 |
 |---|---|---|

@@ -45,7 +45,7 @@ case-open は adversarial-review を**原則実行する**（default-on）。
 2. Issue 本文候補（Epic flow は Epic Issue 本文、Standard flow は Issue 本文）
 3. 完了条件（STEP-2 の QG-2 で検証済み）
 
-委譲契約は delegation-contracts SPEC（extension 経由）「adversarial-review との委譲契約接続」節に従う。
+委譲契約は delegation-contracts Design（extension 経由）「adversarial-review との委譲契約接続」節に従う。
 
 ### 結果反映
 

@@ -5,7 +5,7 @@
 // module. Strict JSON parsing: loadBaseline validates the parsed value's
 // shape before adopting it as a BaselineFile — no `as BaselineFile` cast.
 //
-// Per docs/specs/integrity/distribution-boundary.md §6.4 baseline policy:
+// Per docs/designs/integrity/distribution-boundary.md §6.4 baseline policy:
 // the baseline is unresolved-debt snapshot; new violations beyond baseline
 // fail the gate (computeDelta.ok === false).
 

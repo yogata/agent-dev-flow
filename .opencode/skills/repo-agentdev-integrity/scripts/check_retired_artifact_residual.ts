@@ -7,7 +7,7 @@
 // Phase 3 §4.2 group A of cross-cutting-integration-design-20260811.md.
 // Detection data is loaded from data/retired-artifact-registry.yaml.
 // The YAML is a detection-view; canonical rules live in the IR files under
-// docs/specs/integrity/rules/ and in the referenced SPECs.
+// docs/designs/integrity/rules/ and in the referenced SPECs.
 //
 // Each rule's severity / gate_level / failure semantics are preserved
 // (physical consolidation of perspectives only, not IR lifecycle substitution).

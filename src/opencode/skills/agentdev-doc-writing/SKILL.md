@@ -1,6 +1,6 @@
 ---
 name: agentdev-doc-writing
-description: ADR/REQ/SPEC 横断の文書品質査読ゲート。文書種別責務、要件性、文意品質、粒度、japanese-tech-writing 規範適合、配布物 ID 汚染検出、実行主体分類を査読する。USE FOR: docs 配下の REQ/ADR/SPEC/guides/README の査読、command/skill の自然言語記述の査読、LLM っぽい表現・英文混じり表現の検出。DO NOT USE FOR: コード実装やテスト実行、REQ/ADR 番号付与、ADR 必要性判定、ファイル保存・commit・push。
+description: ADR/REQ/Design 横断の文書品質査読ゲート。文書種別責務、要件性、文意品質、粒度、japanese-tech-writing 規範適合、配布物 ID 汚染検出、実行主体分類を査読する。USE FOR: docs 配下の REQ/ADR/Design/guides/README の査読、command/skill の自然言語記述の査読、LLM っぽい表現・英文混じり表現の検出。DO NOT USE FOR: コード実装やテスト実行、REQ/ADR 番号付与、ADR 必要性判定、ファイル保存・commit・push。
 ---
 
 # 文書品質ゲート（doc-writing）
@@ -9,15 +9,15 @@ description: ADR/REQ/SPEC 横断の文書品質査読ゲート。文書種別責
 
 本スキルは以下の方針に従う（ADR）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/specs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/adr/specs）のみを前提とし、`docs/designs/**` 内部構成（`foundations`, `responsibilities` 等）は仮定しない
 2. **extension の読込契約**: 呼び出し元コマンドから渡された解決済み文脈を優先し、不足分のみ skill extension（`.agentdev/extensions/skills/agentdev-doc-writing.yaml`）を読む。skill extension はスキル単位で1ファイルに集約し、reference ごとの extension は作らない
-3. **`docs/specs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/specs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/specs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
+3. **`docs/designs/**` 内部パスの固定知識化の禁止**: extension に列挙されていない `docs/designs/**` 内部パスを固定知識として参照しない。スキル本文・references に具体的な project docs 内部パス（`docs/designs/{foundations,responsibilities,quality,integrity,local,authoring,commands,skills,workflows}/**`）を直接記述しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 目的
 
 書かれた文書の品質を静的査読し、読者が判断、実行できる文書へ修正提案を提示する。
-対象は `docs/` 配下の REQ/ADR/SPEC/guides/README、および docs を生成、編集する command/skill の自然言語記述である。
+対象は `docs/` 配下の REQ/ADR/Design/guides/README、および docs を生成、編集する command/skill の自然言語記述である。
 QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要件性、文意品質、粒度の補助査読として位置づける。
 
 
@@ -28,7 +28,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 ## 原本
 
 
-執筆規範の原本は `japanese-tech-writing` スキル（AGENTS.md 経由で参照）、配置基準、用語政策の原本は document-type-responsibilities SPEC である。
+執筆規範の原本は `japanese-tech-writing` スキル（AGENTS.md 経由で参照）、配置基準、用語政策の原本は document-type-responsibilities Design である。
 本スキルはその実行入口であり、`references/*` は運用ビュー（圧縮ビュー、チェックリスト、出力形式、機械判定アルゴリズム、置換辞書）である。
 内容が重複する場合、原本を優先する。
 
@@ -36,16 +36,16 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 | 運用ビュー (`references/`) | 原本 | 役割 |
 |---|---|---|
-| `mechanical-replacement-rules.md` | `japanese-tech-writing`、document-type-responsibilities SPEC | 中黒、em-dash、一文一行、LLM 表現の機械判定アルゴリズム原本 |
-| `japanese-replacement-dictionary.md` | document-type-responsibilities SPEC「不自然表現検出分類」 | forbidden / review / allowed_identifier / reconstruct 区分の置換辞書 |
+| `mechanical-replacement-rules.md` | `japanese-tech-writing`、document-type-responsibilities Design | 中黒、em-dash、一文一行、LLM 表現の機械判定アルゴリズム原本 |
+| `japanese-replacement-dictionary.md` | document-type-responsibilities Design「不自然表現検出分類」 | forbidden / review / allowed_identifier / reconstruct 区分の置換辞書 |
 | `rewrite-patterns.md` | `japanese-tech-writing` | 英語抽象語と LLM 表現の検出、書き換え辞書 |
 
 ## 対象/ 対象外
 
 **対象:**
 
-- `docs/**`（REQ, ADR, SPEC, guides, README）
-- docs を生成、編集する command/ skill の自然言語記述（req-define, req-save, spec-save, case-run, case-close, case-auto, inspect-docs, docs-check が扱う docs 成果物とその記述）
+- `docs/**`（REQ, ADR, Design, guides, README）
+- docs を生成、編集する command/ skill の自然言語記述（req-define, req-save, design-save, case-run, case-close, case-auto, inspect-docs, docs-check が扱う docs 成果物とその記述）
 - Issue 本文, PR 本文, 完了報告, 設計説明, intake/learning 中間成果物
 
 **対象外:**
@@ -61,11 +61,11 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 | 観点 | 内容 | 参照 |
 |---|---|---|
-| 文書種別責務 | REQ/Decision/SPEC/guide/README の配置が妥当か | [document-boundaries.md](references/document-boundaries.md) |
+| 文書種別責務 | REQ/Decision/Design/guide/README の配置が妥当か | [document-boundaries.md](references/document-boundaries.md) |
 | 要件行の品質 | 主語、対象、状態、検証可能性、独立性、肯定文主文 | [req-line-quality.md](references/req-line-quality.md) |
 | Decision 本文の品質 | 意思決定文書として成立しているか | [decision-writing-quality.md](references/decision-writing-quality.md) |
-| SPEC 本文の品質 | 詳細仕様の置き場として成立しているか | [spec-writing-quality.md](references/spec-writing-quality.md) |
-| SKILL.md 構造 | SKILL.md の概要節（description frontmatter）と機能節（`##` セクション群）の重複を検出する。REQ の優先度軸（重複度合い、文書の影響度）に基づき、優先度高位から順に查読する。詳細は SPEC「SKILL 構造」「SKILL.md概要節と機能節の役割分担」参照 | document-type-responsibilities SPEC |
+| Design 本文の品質 | 詳細仕様の置き場として成立しているか | [spec-writing-quality.md](references/spec-writing-quality.md) |
+| SKILL.md 構造 | SKILL.md の概要節（description frontmatter）と機能節（`##` セクション群）の重複を検出する。REQ の優先度軸（重複度合い、文書の影響度）に基づき、優先度高位から順に查読する。詳細は Design「SKILL 構造」「SKILL.md概要節と機能節の役割分担」参照 | document-type-responsibilities Design |
 | 実行主体分類 | 文書内で言及される実行主体（command / skill / subagent / harness）の分類が正確か。誤認（command を skill と呼ぶ、harness を skill と呼ぶ、subagent を skill と呼ぶ）を検出する | [execution-subject-classification.md](references/execution-subject-classification.md) |
 | 検出→書き換え | 英語混じり表現、抽象語の具体的書き換え、LLM 表現パターンの検出と書き換え | [rewrite-patterns.md](references/rewrite-patterns.md) |
 | 機械判定可能な是正 | 中黒、em-dash、一文一行、LLM 表現の機械判定アルゴリズム。検出、許容/是正の二値判定を集約 | [mechanical-replacement-rules.md](references/mechanical-replacement-rules.md) |
@@ -79,15 +79,15 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 ### 適用対象の横断性
 
-- **文書種別**: REQ/ADR/SPEC/guide/README すべての文書種別に対して、文書種別責務観点を適用
-- **文書生成元**: docs を生成、編集する command/skill の自然言語記述（req-define, req-save, spec-save, case-run, case-close, case-auto, inspect-docs, docs-check 等）に対しても同等の品質基準を適用
+- **文書種別**: REQ/ADR/Design/guide/README すべての文書種別に対して、文書種別責務観点を適用
+- **文書生成元**: docs を生成、編集する command/skill の自然言語記述（req-define, req-save, design-save, case-run, case-close, case-auto, inspect-docs, docs-check 等）に対しても同等の品質基準を適用
 - **成果物種別**: Issue 本文, PR 本文, 完了報告, 設計説明, intake/learning 中間成果物に対して文意品質、粒度観点を適用
 
 ### 観点間適用優先順位
 
 1. **japanese-tech-writing 規範適合**: すべての適用対象で最優先。LLM っぽい表現の禁止、空虚な形容、空虚な動詞等の規範への適合を査読する（執筆規範の SSoT は `japanese-tech-writing` スキル）
 2. **文書種別責務**: 対象が文書種別として適切に配置されているかを確認
-3. **要件行の品質、文意品質、粒度**: 対象に応じた詳細観点を適用（REQ なら要件行、SPEC なら詳細仕様等）
+3. **要件行の品質、文意品質、粒度**: 対象に応じた詳細観点を適用（REQ なら要件行、Design なら詳細仕様等）
 4. **実行主体分類**: 実行主体が正確に記述されているかを確認（command/skill/subagent/harness の誤認検出）
 5. **検出→書き換え**: 具体的な書き換え提案が必要な場合に適用
 6. **査読出力**: 修正候補の分類と提示形式
@@ -100,13 +100,13 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 
 ## Trigger conditions
 
-- docs/** の REQ、ADR、SPEC、guides、README を作成、編集、レビューする場合
+- docs/** の REQ、ADR、Design、guides、README を作成、編集、レビューする場合
 - docs を生成、編集する command/ skill の本文、description、参照記述を執筆、編集する場合
 - ユーザーが「AIっぽい」「薄い」「抽象的」「意味不明」「ビジネス文書として直せ」と指示した場合
 - Issue/PR 本文、完了報告、設計説明を執筆またはレビューする場合
 - `read-only`、`advisor`、`architecture-affecting` 等の英語混じり表現が docs に残留していないか確認する場合
 - 配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）に AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等）が残留していないか確認する場合
-- SPEC / command / skill で実行主体（command / skill / subagent / harness）が誤認されていないか確認する場合（例: 実行 command を skill と記述、`load_skills` に command 名を指定、harness を skill と呼ぶ）
+- Design / command / skill で実行主体（command / skill / subagent / harness）が誤認されていないか確認する場合（例: 実行 command を skill と記述、`load_skills` に command 名を指定、harness を skill と呼ぶ）
 
 ## 制約
 
@@ -116,7 +116,7 @@ QG-1〜QG-4 の主ゲート体系を置き換えず、文書種別責務、要�
 ## 参照先
 
 - 執筆規範 SSoT: `japanese-tech-writing` スキル（AGENTS.md 経由）
-- 配置基準、用語政策 原本: document-type-responsibilities SPEC
+- 配置基準、用語政策 原本: document-type-responsibilities Design
 - 運用ビュー: [references/](references/) 配下の9ファイル（上記査読観点表のリンク参照）
 
 ### See Also

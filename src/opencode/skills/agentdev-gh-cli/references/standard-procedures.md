@@ -327,7 +327,7 @@ READ 手続き（Section 3）に従い Node.js `execSync` で取得し、一時�
 拡張手続きとして新設された2手続きの標準版（GitHub 版）実装は前段の gh CLI 例を使用する。
 いずれも READ 手続き（Section 3）に従い Node.js `execSync` で取得する。
 READ 手続きであるため Windows コンソールエンコーディング初期化（Section 2 Step 0）は不要。
-事後条件は SPEC `agentdev-gh-cli`.md「拡張手続き」参照。
+事後条件は Design `agentdev-gh-cli`.md「拡張手続き」参照。
 
 - **PR 変更ファイル一覧取得**: `gh pr view {N} --json files` を実行し、`files[].path` を抽出して文字列配列を返す
 - **PR mergeable 状態取得**: `gh pr view {N} --json mergeable,mergeStateStatus` を実行し、`mergeable` 値（`MERGEABLE` / `CONFLICTING` / `UNKNOWN`）をそのまま返す。`UNKNOWN` の取り扱い（squash merge 前のポーリング）は後述「squash merge 前の mergeable UNKNOWN ポーリング」セクション参照
@@ -472,7 +472,7 @@ VERIFY が FAIL の場合は [retry.md](retry.md) リトライロジックへ移
 ## commit メッセージ作成（BOM なし UTF‑8 契約）
 
 git commit メッセージ作成時にも WRITE 標準手順（Section 2）と同等の BOM なし UTF‑8 encoding 制御を適用する。
-SPEC `agentdev-gh-cli`.md「commit メッセージ作成の BOM なし UTF‑8 契約」節の標準実装を本節に置く。
+Design `agentdev-gh-cli`.md「commit メッセージ作成の BOM なし UTF‑8 契約」節の標準実装を本節に置く。
 gh CLI を経由しない git 操作でありながら、commit メッセージファイルの書き出しは WRITE 手続きと同じ cp932 化けリスクを持つため、Section 2 のファイル書き出し規定を拡張適用する。
 
 ### 適用条件

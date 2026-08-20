@@ -17,16 +17,16 @@ case-run command は公開 interface（入出力契約・ガードレール）�
 ## 原本（SSoT）
 
 本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` SPEC が正規所有する。
+Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` Design が正規所有する。
 extension（`.agentdev/extensions/skills/agentdev-workflow-case-run.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と case-run command の公開契約のみを前提とする。SPEC ディレクトリの内部構成は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と case-run command の公開契約のみを前提とする。Design ディレクトリの内部構成は仮定しない
 2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
+3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 入力
@@ -70,7 +70,7 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 ## Control Plane（STEP 一覧）
 
-各 STEP は resume point を持つ（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）。
+各 STEP は resume point を持つ（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）。
 会話コンテキストに依存せず、durable state（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
 
 ### single workflow（単一 Issue 実行モード）
@@ -132,11 +132,11 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 ## Artifact Graph 利用
 
 本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせのうち implementation を、既に決定された実装対象（Issue 本文）と正規成果物の実現関係確認（STEP-S2 の関連Decision確認、委譲内 context 再確認）に利用できる。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
 問い合わせ目的を指定し、返された候補を用いて判断する。
 
 - トレーサビリティ問い合わせを利用して新規の依存関係、実行構成、Wave 構成、実行順序を設計しない。依存関係と実行構成の決定責務は上流工程（case-open の execution_unit 構成、Epic Wave モデル）が所有する
-- 問い合わせ結果は候補提供であり、実現関係の確認は正規成果物本文と `rg` 等の独立探索で行う。Issue scope、完了条件、REQ、Decision、SPEC、必須品質統制の変更が必要な候補は blocked として case-update 連携とし、scope の自律拡大は行わない
+- 問い合わせ結果は候補提供であり、実現関係の確認は正規成果物本文と `rg` 等の独立探索で行う。Issue scope、完了条件、REQ、Decision、Design、必須品質統制の変更が必要な候補は blocked として case-update 連携とし、scope の自律拡大は行わない
 - 派生索引の不在、生成失敗、空結果、候補過多だけを理由として「関係なし」「影響なし」と判断しない
 - 派生索引が不在、破損、生成失敗、問い合わせ失敗、候補過多の場合は、README 索引、正規成果物の直接読取、`rg`、ファイル探索などの代替探索で workflow を継続する（fail-open）。正規成果物そのものの異常と派生索引側の異常を区別する
 
@@ -150,20 +150,20 @@ Epic 全体（複数 Wave）の処理、Wave 境界（PR マージ）は case-cl
 
 ## 共通制約
 
-- **スコープ**: 単一 Issue または単一 Wave のみを処理する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（workflow-contracts SPEC SC-{NNN}、extension 経由で解決）
-- **統合先基準（作業起点・PR base）**: worktree の作成元と PR の base は、当該 Case の統合先（通常Caseは既定 main、実証Caseは評価ブランチ）を参照する。rebase・同期基準、鮮度確認、Epic 後続 Wave の作業起点も同一の統合先を参照する。通常Case（評価を利用しない Standard / Epic Case）の利用者向け操作と挙動は従来どおり維持する（統合先とブランチモデルの基盤契約は `agentdev-git-worktree` SPEC 参照）
+- **スコープ**: 単一 Issue または単一 Wave のみを処理する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（workflow-contracts Design SC-{NNN}、extension 経由で解決）
+- **統合先基準（作業起点・PR base）**: worktree の作成元と PR の base は、当該 Case の統合先（通常Caseは既定 main、実証Caseは評価ブランチ）を参照する。rebase・同期基準、鮮度確認、Epic 後続 Wave の作業起点も同一の統合先を参照する。通常Case（評価を利用しない Standard / Epic Case）の利用者向け操作と挙動は従来どおり維持する（統合先とブランチモデルの基盤契約は `agentdev-git-worktree` Design 参照）
 - **実証Caseの実行と PR 記録要素**: 実証Caseの場合、評価ブランチを作業起点および PR base とし、必要な実証手段の準備、実行、測定、観察、証拠生成、評価を評価ブランチ上で行う（詳細は委譲契約の実証Case指示を参照）。コード作成が不要な実証も許容する。実証Caseの PR 本文には実際の実行条件、測定結果、観察結果、証拠、評価結果を記録する
 - **実装実行の非所有**: case-run 本体は work plan 生成、実装、TDD、乖離検出、specs 更新、PR 本文作成、PR 作成を行わない（実行担当サブエージェント責務、adapter protocol 参照）
 - **SSoT**: blocked/failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。一時会話コンテキスト、中間ファイルは SSoT としない
 - **完了条件チェックボックス**: case-run、実行担当サブエージェントは完了条件チェックボックスを更新しない（case-close QG-4 の責務）
-- **Findings / SPEC確定候補**: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` と `## SPEC確定候補` に記録する（別セクション、混在させない）。case-run の capture 責務は記録のみ
+- **Findings / Design確定候補**: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` と `## Design確定候補` に記録する（別セクション、混在させない）。case-run の capture 責務は記録のみ
 - **外部実行ハーネスの中間成果物**: plan artifact 等を AgentDevFlow の永続成果物として扱わず、最終結果は PR URL で受領する
 - **L2 タイムスタンプ**: worktree 設定、実行担当サブエージェント実行、worktree クリーンアップの各開始・終了時刻（JST）を計測し、完了報告の L2 内訳に含める（case-auto の L1 内訳の入力）
 
 ## See Also
 
-- **`<workflows/workflow-skill-model>` SPEC**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` SPEC**: STEP reference 構造、resume point
+- **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
+- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **case-run command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

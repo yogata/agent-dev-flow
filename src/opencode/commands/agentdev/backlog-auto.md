@@ -9,7 +9,7 @@ backlog 整理サイクル（inspect-docs による文書診断、learning、int
 
 ## workflow 実装の権威情報源
 
-本コマンドの workflow 実装本体（orchestration stage 構成、昇格3系統の並行実行と競合処理の直列化契約、fan-in 判定、停止伝播、resume 契約）は `agentdev-workflow-backlog-auto` Workflow Skill を権威情報源とする（責務3層分化、workflow-skill-model SPEC 準拠）。
+本コマンドの workflow 実装本体（orchestration stage 構成、昇格3系統の並行実行と競合処理の直列化契約、fan-in 判定、停止伝播、resume 契約）は `agentdev-workflow-backlog-auto` Workflow Skill を権威情報源とする（責務3層分化、workflow-skill-model Design 準拠）。
 本コマンド定義は公開 interface / dispatch のみを所有し、workflow 実装本体を複製しない。
 
 **子ワークフローの権威情報源**: 各工程は対応する Workflow Skill（`agentdev-workflow-inspect-docs`、`agentdev-workflow-learning-promote`、`agentdev-workflow-intake-promote`、`agentdev-workflow-inspect-promote`、`agentdev-workflow-backlog-review`）を権威情報源として実行する。

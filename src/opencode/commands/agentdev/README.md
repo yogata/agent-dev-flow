@@ -11,13 +11,13 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 | Command | Primary Input | Primary Output | Next |
 |---------|--------------|----------------|------|
 | `/agentdev/req-define` | セッション会話/ RU | 要件doc（draft） | feature: `/agentdev/req-save`、bugfix/maintenance/docs_chore: `/agentdev/case-open` |
-| `/agentdev/req-save` | 要件doc（feature のみ） | REQ/Decision ファイル | `/agentdev/spec-save`（SPEC候補がある場合）/ `/agentdev/case-open` |
-| `/agentdev/spec-save` | 要件doc（feature のみ、SPEC候補あり） | SPEC ファイル（`docs/specs/`） | `/agentdev/case-open` |
+| `/agentdev/req-save` | 要件doc（feature のみ） | REQ/Decision ファイル | `/agentdev/design-save`（Design候補がある場合）/ `/agentdev/case-open` |
+| `/agentdev/design-save` | 要件doc（feature のみ、Design候補あり） | Design ファイル（`docs/designs/`） | `/agentdev/case-open` |
 | `/agentdev/case-open` | REQ ファイル/ 要件doc | GitHub Issue | `/agentdev/case-run` |
 | `/agentdev/case-run` | Issue | 実装済みブランチ + PR | レビュー後: `/agentdev/case-close` |
 | `/agentdev/case-update` | Issue | 更新済み Issue | 継続または `/agentdev/case-close` |
 | `/agentdev/case-close` | PR + Issue | マージ済み + クローズ済み | 完了 |
-| `/agentdev/case-auto` | 要件doc/ Issue番号、URL | マージ済み + クローズ済み（req-save〜spec-save〜case-close自走） | 完了 |
+| `/agentdev/case-auto` | 要件doc/ Issue番号、URL | マージ済み + クローズ済み（req-save〜design-save〜case-close自走） | 完了 |
 | `/agentdev/backlog-auto` | なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md`（backlog整理サイクル一巡） | RU がある場合: `/agentdev/req-define` |
 | `/agentdev/intake-capture` | ユーザー手動入力 | `inbox/` item | `/agentdev/intake-promote` |
 | `/agentdev/intake-from-github` | クローズ済み Issue/PR | `inbox/` item | `/agentdev/intake-promote` |
@@ -32,7 +32,7 @@ AgentDevFlow の各コマンドの入力、出力、次アクションを一覧�
 
 - [req-define.md](./req-define.md)
 - [req-save.md](./req-save.md)
-- [spec-save.md](./spec-save.md)
+- [design-save.md](./design-save.md)
 - [case-open.md](./case-open.md)
 - [case-run.md](./case-run.md)
 - [case-update.md](./case-update.md)

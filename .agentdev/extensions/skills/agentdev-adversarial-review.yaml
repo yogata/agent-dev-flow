@@ -6,7 +6,7 @@ context:
   - id: artifact-graph-spec
     when: Artifact Graphを論点候補の探索に使用するとき
     paths:
-      - "docs/specs/skills/agentdev-artifact-graph.md"
+      - "docs/designs/skills/agentdev-artifact-graph.md"
     purpose: 派生索引の利用上の防護と障害耐性の確認
 
 rules:

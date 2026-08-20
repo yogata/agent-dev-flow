@@ -335,7 +335,7 @@ describe("REQ-0030-011: Real repo error case validation", () => {
       const sysPath = path.join(
         REPO_ROOT,
         "docs",
-        "specs",
+        "designs",
         "foundations",
         "system.md",
       );

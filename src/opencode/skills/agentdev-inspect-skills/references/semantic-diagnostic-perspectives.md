@@ -1,6 +1,6 @@
 # 意味的診断観点の判定基準
 
-> **原本**: 正規な定義元の原則、同一契約再定義抑止の原則、artifact-responsibilities SPEC（責務分担マッピング、重複許容基準）。
+> **原本**: 正規な定義元の原則、同一契約再定義抑止の原則、artifact-responsibilities Design（責務分担マッピング、重複許容基準）。
 > 本ファイルは inspect-skills 診断観点「意味的重複」「意味的矛盾」「正規な定義元からの逸脱」「セマンティクス欠落」の判定基準詳細を集約する運用ビューである。
 > 原本と内容が重複する場合は原本を優先する。
 
@@ -28,15 +28,15 @@ Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義�
 
 配布物種別間で責務ごとに正規な定義元を指定する原則。
 正規な定義元の候補は配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC のいずれかであり、責務ごとに最も安定した最小の定義元を正規とする。
-詳細な責務分担マッピングは artifact-responsibilities SPEC に委譲する。
+詳細な責務分担マッピングは artifact-responsibilities Design に委譲する。
 本原則は Command/Skill/Template/Script 責任分界の適用条件の精緻化である。
 
 ### 同一契約再定義抑止の原則
 
 同一の契約、手順、判定基準を複数の配布物で再定義しない原則。
 参照元は正規な定義元の再記述ではなく、参照先への参照と差分のみを保持する。
-例外として artifact-responsibilities SPEC が定める重複許容基準（SKILL ↔ command 同一ルール等）に該当する場合は、正の情報源を明示した上で重複を認める。
-例外基準の詳細は SPEC 側で維持する。
+例外として artifact-responsibilities Design が定める重複許容基準（SKILL ↔ command 同一ルール等）に該当する場合は、正の情報源を明示した上で重複を認める。
+例外基準の詳細は Design 側で維持する。
 
 ## 診断観点
 
@@ -52,7 +52,7 @@ Command→Skill 参照妥当性診断で、Command/Skill/Template/Script 定義�
 - 複数ファイルで同一の操作手順（git / gh / worktree 等の安全手順）が重複している
 - 参照元が正規な定義元への参照と差分を保持せず、本体を再記述している
 
-例外: artifact-responsibilities SPEC の重複許容基準に該当し、正の情報源が明示されている場合は対象外（後述「重複許容例外」参照）。
+例外: artifact-responsibilities Design の重複許容基準に該当し、正の情報源が明示されている場合は対象外（後述「重複許容例外」参照）。
 
 診断分類: `semantic-duplication`
 
@@ -73,7 +73,7 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 ### 正規な定義元からの逸脱
 
-各責務が artifact-responsibilities SPEC のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC）に置かれているかの検出。
+各責務が artifact-responsibilities Design のマッピングに照らして正規な定義元（配布 Command / Skill / references / script / harness 側文書 / REQ-ADR-SPEC）に置かれているかの検出。
 正規な定義元の原則に照らして検出する。
 
 判定基準:
@@ -82,7 +82,7 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 - Skill 本文に特定 Command の手順、Phase 名、Step 番号、局所導線が記述されている（責務越境）
 - Template にロジック、分岐、判定が含まれ、Script または Skill の責務を越境している
 - Script に宣言的ルール、判断基準、再利用可能なプロトコルが含まれ、Skill の責務を越境している
-- REQ / ADR / SPEC で正規化されるべき内容が配布物に再定義されている
+- REQ / ADR / Design で正規化されるべき内容が配布物に再定義されている
 - harness 側の責務（外部実行基盤の実行制御等）が配布 Command / Skill に越境している
 
 診断分類: `canonical-definition-deviation`
@@ -117,7 +117,7 @@ Command と Skill 間で工程、状態、責務、停止条件の意味が矛�
 
 - 重複している契約・手順・判定基準の特定（入力、出力、エラー扱い、前提、後続等）
 - 正規な定義元の候補の特定
-- artifact-responsibilities SPEC の重複許容基準への合致性（後述「重複許容例外」）
+- artifact-responsibilities Design の重複許容基準への合致性（後述「重複許容例外」）
 - 合致する場合、正の情報源が明示されているか
 
 ### 3. 意味的矛盾の検出
@@ -127,7 +127,7 @@ Command と参照先 Skill の対応箇所を突き合わせ、工程・状態�
 
 ### 4. 正規な定義元からの逸脱の検出
 
-各配布物の記述が artifact-responsibilities SPEC のマッピングに照らして正規な定義元に置かれているかを確認する。
+各配布物の記述が artifact-responsibilities Design のマッピングに照らして正規な定義元に置かれているかを確認する。
 責務越境（Command に Skill 要素、Skill に Command 固有手順、Template / Script の責務越境等）を検出する。
 
 ### 5. セマンティクス欠落の検出
@@ -154,17 +154,17 @@ Recommended route は対象配布物の種別（`command` / `skill` / `reference
 | Skill に Command 固有手順越境 | Skill 本文に特定 Command の Phase 名・Step 番号が記述されている | canonical-definition-deviation |
 | Template にロジック越境 | Template に分岐・判定が含まれ、Script または Skill の責務を越境している | canonical-definition-deviation |
 | Script に宣言ルール越境 | Script に再利用可能な宣言的ルール・判断基準が含まれ、Skill の責務を越境している | canonical-definition-deviation |
-| REQ/ADR/SPEC 内容の配布物再定義 | REQ で正規化されるべき契約・分類が配布物に再定義されている | canonical-definition-deviation |
+| REQ/ADR/Design 内容の配布物再定義 | REQ で正規化されるべき契約・分類が配布物に再定義されている | canonical-definition-deviation |
 | 参照の前提欠落 | references への参照があるが参照元で前提文脈が記述されない | semantic-contract-missing |
 | 適用境界不明確 | Skill が `USE FOR` / `DO NOT USE FOR` を持たず、適用境界が不明確 | semantic-contract-missing |
 | 結果状態の定義欠落 | 委譲契約で success / blocked / failed 等の結果状態が定義されていない | semantic-contract-missing |
 | 公開契約の一部欠落 | 公開目的、入力、出力、停止条件、永続成果物、委譲接続点のいずれかが欠落 | semantic-contract-missing |
 
-## 重複許容例外（artifact-responsibilities SPEC）
+## 重複許容例外（artifact-responsibilities Design）
 
-artifact-responsibilities SPEC が定める重複許容基準に該当する場合、正の情報源を明示した上で重複を認める（同一契約再定義抑止の原則の例外）。本診断では該当する場合でも以下を確認する:
+artifact-responsibilities Design が定める重複許容基準に該当する場合、正の情報源を明示した上で重複を認める（同一契約再定義抑止の原則の例外）。本診断では該当する場合でも以下を確認する:
 
-- 重複が許容基準に合致すること（SKILL ↔ command 同一ルール等、SPEC が定める基準）
+- 重複が許容基準に合致すること（SKILL ↔ command 同一ルール等、Design が定める基準）
 - 正の情報源が明示されていること（どちらを正とし、どちらを差分として扱うかの明示）
 - 差分（あるいは意図的同一である旨）が記述されていること
 
@@ -183,7 +183,7 @@ Recommended route には対象配布物の種別と修正方向を提示する�
 - Target: src/opencode/skills/agentdev-XXX/references/foo.md
 - Perspective: 意味的重複
 - Classification: semantic-duplication
-- Evidence: 入力（Issue 番号、本文）と出力（Issue URL）が contracts.md と同一だが、正の情報源が明示されていない。同一契約再定義抑止の原則の重複許容例外（artifact-responsibilities SPEC）に合致しない
+- Evidence: 入力（Issue 番号、本文）と出力（Issue URL）が contracts.md と同一だが、正の情報源が明示されていない。同一契約再定義抑止の原則の重複許容例外（artifact-responsibilities Design）に合致しない
 - Recommended route: references
 ```
 
@@ -198,8 +198,8 @@ Recommended route には対象配布物の種別と修正方向を提示する�
 
 ## 対象外
 
-- 機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子表記等）は integrity-rule-catalog SPEC が担う。本観点は意味的・文脈的な検出を担う。
-- SPEC 操作契約テーブルと references/contracts.md のフィールド一致性は別観点（[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)）が担う。本観点は意味段階の重複・矛盾・越境・欠落に限定し、SPEC- contracts.md 間のフィールド単位の突合は含まない。
+- 機械的パターンマッチングによる検出（`load_skills` 誤指定、`/` 先頭識別子表記等）は integrity-rule-catalog Design が担う。本観点は意味的・文脈的な検出を担う。
+- Design 操作契約テーブルと references/contracts.md のフィールド一致性は別観点（[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)）が担う。本観点は意味段階の重複・矛盾・越境・欠落に限定し、SPEC- contracts.md 間のフィールド単位の突合は含まない。
 - 配布物の Markdown 構文健全性、frontmatter 構文は別観点（配布物 frontmatter 構文健全性等）が担う。
 - 公開契約の維持（横断是正の前後で公開目的・入力・出力・停止条件等を維持すること）は公開契約維持原則が担う。本観点は静的記述の意味整合性に限定し、是正作業の前後比較は含まない。
 - 横断評価の対象範囲の網羅（全配布 Command/Skill を対象とすること）は横断評価対象範囲網羅原則が担う。本観点は個別の検出基準を扱う。
@@ -207,7 +207,7 @@ Recommended route には対象配布物の種別と修正方向を提示する�
 ## See Also
 
 - **原本**: 正規な定義元の原則、同一契約再定義抑止の原則
-- **artifact-responsibilities SPEC**: 責務分担マッピング、重複許容基準
+- **artifact-responsibilities Design**: 責務分担マッピング、重複許容基準
 - **検出事項の報告形式**: 対象・観点・分類・根拠・推奨経路
 - **Command/Skill/Template/Script 責任分界**: 配布物種別間の責務分担基盤
-- **[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)**: SPEC 操作契約テーブルと contracts.md のフィールド一致性（本観点と互补）
+- **[spec-operation-contract-consistency.md](spec-operation-contract-consistency.md)**: Design 操作契約テーブルと contracts.md のフィールド一致性（本観点と互补）

@@ -308,7 +308,7 @@ Skill `agentdev-gh-cli`（`src/opencode/skills/agentdev-gh-cli/SKILL.md`）の V
 - Skill 本文内での他スキル参照
 - テンプレートパス、スクリプトパスの記述
 
-Source path は agent-dev-flow リポジトリ内の開発用文書（ADR, SPEC, Guide）でのみ使用する。
+Source path は agent-dev-flow リポジトリ内の開発用文書（ADR, Design, Guide）でのみ使用する。
 
 ## Review Checklist
 
@@ -408,7 +408,7 @@ Command本文でテンプレート、スキル参照のパスを記述する際�
 - [ ] 委譲定義を追加する場合、最小契約（inputs, side_effect_boundary, output_contract, capture_handoff）を満たしているか
 - [ ] delegated_check を使用する場合、親コマンドが検証結果の最終判断を保持しているか
 - [ ] サブエージェントの成果物本文は verbatim、判定結果、調査過程、中間ログ、読解メモは圧縮返却として記述しているか
-- [ ] SPEC/REQ/ADR 文書への置換は verbatim 置換方針に従っているか
+- [ ] Design/REQ/ADR 文書への置換は verbatim 置換方針に従っているか
 
 ## 検査観点展開基準
 
@@ -495,7 +495,7 @@ capture_handoff:
 |---|---|
 | `delegation_type` | gate_check/ semantic_review/ log_analysis/ classification/ extraction/ draft_generation/ controlled_case_execution の参考分類。必須ではない |
 | `skill` | 委譲先 skill 名。Command 本文で接続点を明示する場合に記述する |
-| `reference` | 委譲先が参照する skill reference/ SPEC section の実行時パス |
+| `reference` | 委譲先が参照する skill reference/ Design section の実行時パス |
 | `on_result` | 親側の扱いを短く示す場合に記述する。最終判断は親コマンドが保持する |
 
 ### 禁止事項
@@ -568,7 +568,7 @@ capture_handoff:
 
 | 対象文書種別 | 置換方式 | 理由 |
 |---|---|---|
-| SPEC/REQ/ADR 文書 | verbatim 置換 | 文書構造、frontmatter、相互参照の保全 |
+| Design/REQ/ADR 文書 | verbatim 置換 | 文書構造、frontmatter、相互参照の保全 |
 | Issue/PR 本文 | semantic rewrite | テンプレート構造内での意味保持 |
 | レポート、診断結果 | semantic rewrite | フォーマット自由度高 |
 | コード、Script | verbatim 置換 | 構文整合性の保全 |

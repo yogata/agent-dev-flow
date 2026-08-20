@@ -63,7 +63,7 @@ status: accepted
 ---
 # Consumer architecture
 `,
-    [`docs/specs/${"feature"}.md`]: `---
+    [`docs/designs/${"feature"}.md`]: `---
 title: Feature spec
 canonical_owner: consumer-team
 ---
@@ -221,8 +221,8 @@ describe("TS-{NNN} (AG-{NNN}): consumer Graph excludes all distribution artifact
     expect(result.edgeCount).toBeGreaterThanOrEqual(0)
 
     const distributionNodeIds = graph.nodes.filter((node) => {
-      const specPath = node.id.startsWith("specification:")
-        ? node.id.slice("specification:".length)
+      const specPath = node.id.startsWith("design:")
+        ? node.id.slice("design:".length)
         : undefined
       return specPath !== undefined && matchesDistributionPattern(specPath)
     })
@@ -257,7 +257,7 @@ describe("TS-{NNN} (AG-{NNN}): consumer Graph excludes all distribution artifact
     expect(graph.manifest.indexed_paths).toEqual([
       "docs/requirements",
       "docs/decisions",
-      "docs/specs",
+      "docs/designs",
     ])
     for (const indexed of graph.manifest.indexed_paths) {
       expect(matchesDistributionPattern(indexed + "/")).toBe(false)
@@ -276,7 +276,7 @@ describe("TS-{NNN} (AG-{NNN}): consumer Graph excludes all distribution artifact
     const nodeIds = nodes.map((node) => String(node["id"] ?? ""))
     expect(nodeIds).toContain(`requirement:${REQ_001}`)
     expect(nodeIds).toContain(`decision:${DEC_001}`)
-    expect(nodeIds).toContain(`specification:docs/specs/${"feature"}.md`)
+    expect(nodeIds).toContain(`design:docs/designs/${"feature"}.md`)
     expect(nodeIds.some((id) => id.includes("command:"))).toBe(false)
     expect(nodeIds.some((id) => id.includes("skill:"))).toBe(false)
   })

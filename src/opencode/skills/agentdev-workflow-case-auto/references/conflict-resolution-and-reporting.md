@@ -80,7 +80,7 @@ Epic Issue を伴う Wave 反復実行時は、完了・blocked・failed 子Issu
 
 - **停止理由分類**: STEP-4 経由、または経路H の user-decision-required
 - **開始時刻・終了時刻・所要時間**: 人間が読みやすい形式
-- **工程別タイムスタンプ内訳（L1）**: req-save+spec-save 統合委譲 / case-open / case-run / case-close、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める
+- **工程別タイムスタンプ内訳（L1）**: req-save+design-save 統合委譲 / case-open / case-run / case-close、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める
 - **インライン実行の記録**: case-run をインライン実行した旨
 - **orchestration stage 別結果・フォールバック理由・破棄回復記録**:
   - stage 1 case-open / stage 2 case-run / stage 3 case-close

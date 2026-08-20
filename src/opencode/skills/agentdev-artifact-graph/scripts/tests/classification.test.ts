@@ -28,7 +28,7 @@ status: accepted
 
 Resolvable: [guide](../guides/guide.md)
 Broken: [broken](../missing.md)
-Directory: [specs](../specs/)
+Directory: [specs](../designs/)
 Barefile: [old](agentdev-doc-map.md)
 `,
     [`docs/decisions/${dec901}.md`]: `---
@@ -39,13 +39,13 @@ superseded_by: ${DEC_902}
 ---
 # Decision test
 `,
-    [`docs/specs/${"classify-owner"}.md`]: `---
+    [`docs/designs/${"classify-owner"}.md`]: `---
 title: Classify owner spec
 canonical_owner: sample-skill
 ---
 # Classify owner spec
 `,
-    [`docs/specs/${"id-owner"}.md`]: `---
+    [`docs/designs/${"id-owner"}.md`]: `---
 title: ID owner spec
 canonical_owner: ${unresolvedOwnerId}
 ---
@@ -95,7 +95,7 @@ describe(`unresolved reference classification (REQ-{NNNN})`, () => {
     const fixture = await setup()
     await buildGraph(fixture)
     const graph = await loadGraph(fixture.output)
-    const dir = graph.diagnostics.find((d) => d.message.endsWith("../specs/"))
+    const dir = graph.diagnostics.find((d) => d.message.endsWith("../designs/"))
     expect(dir).toBeDefined()
     expect(dir!.severity).toBe("observation")
     expect(dir!.code).toBe("unresolved_reference:directory_path")

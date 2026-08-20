@@ -1,7 +1,7 @@
 // Distribution reference boundary checker (adapter).
 //
 // This file is the adapter over the canonical side-effect-free detector at
-// ./lib/distribution-boundary.ts. Per docs/specs/integrity/distribution-boundary.md
+// ./lib/distribution-boundary.ts. Per docs/designs/integrity/distribution-boundary.md
 // (stable implementation contract) the canonical detector owns classification;
 // this adapter adds filesystem scanning, baseline/exemption/delta bookkeeping,
 // the repo-self-hosting-specific IR-046/047/048 rules, and the CLI.

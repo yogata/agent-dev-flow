@@ -13,7 +13,7 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 
 - 診断結果の提示
 - 根拠と推奨 route の提示
-- 副作用は検出事項ファイルの生成のみ（正規文書・REQ/Decision/SPEC・Command/Skill/Template/Script への変更、Issue/PR作成、RU保存、branch、worktree 操作はガードレール G01〜G04 の対象外）
+- 副作用は検出事項ファイルの生成のみ（正規文書・REQ/Decision/Design・Command/Skill/Template/Script への変更、Issue/PR作成、RU保存、branch、worktree 操作はガードレール G01〜G04 の対象外）
 
 ## 入力
 
@@ -36,11 +36,11 @@ Command→Skill 参照妥当性と Skill 構造を検査対象を直接修正せ
 | 変更ファイル種別 | 実行コマンド |
 |------|------|
 | `docs/requirements/<*>.md`、`docs/decisions/<*>.md` | inspect-docs |
-| `docs/specs/<**/*>.md`（`docs/specs/commands/`、`docs/specs/skills/` 配下を除く） | inspect-docs |
+| `docs/designs/<**/*>.md`（`docs/designs/commands/`、`docs/designs/skills/` 配下を除く） | inspect-docs |
 | `docs/guides/*.md`、`README.md` | inspect-docs |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
 | `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
-| `docs/specs/<commands/**/*>.md`、`docs/specs/<skills/**/*>.md` | inspect-skills |
+| `docs/designs/<commands/**/*>.md`、`docs/designs/<skills/**/*>.md` | inspect-skills |
 | 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
 
 routing は実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。

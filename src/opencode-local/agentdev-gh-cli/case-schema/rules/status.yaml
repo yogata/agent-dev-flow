@@ -1,14 +1,14 @@
 # ローカル Case ファイル status enum と状態遷移表
 #
-# 正本: docs/specs/local/local-case-file.md「status enum と状態遷移」
+# 正本: docs/designs/local/local-case-file.md「status enum と状態遷移」
 # 要件: REQ-0141-018
 #
 # status 値域・意味・終端状態・状態遷移表・再開経路・禁止遷移を定義する。
-# 本ファイルは docs/specs/local/local-case-file.md と矛盾してはならない。
+# 本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
 
 schema_version: "1.0"
 target: ".agentdev/cases/case-{NNNN}.md の status フィールド"
-canonical_spec: "docs/specs/local/local-case-file.md"
+canonical_spec: "docs/designs/local/local-case-file.md"
 
 # status enum（REQ-0141-018）
 status_enum:
@@ -37,7 +37,7 @@ terminal_states:
   - closed
   - cancelled
 
-# 状態遷移表（REQ-0141-018, SPEC local-case-file.md「状態遷移表」）
+# 状態遷移表（REQ-0141-018, Design local-case-file.md「状態遷移表」）
 # 操作・変更前 status・変更後 status の対応を定義する。
 transitions:
   - operation: "ローカル版 case-open"
@@ -100,7 +100,7 @@ transitions:
     to: "cancelled"
     note: "利用者による明示的キャンセル"
 
-# 再開経路（SPEC local-case-file.md「再開経路」）
+# 再開経路（Design local-case-file.md「再開経路」）
 recovery_paths:
   case_run:
     description: "ローカル版 case-run 停止後の再開経路"
@@ -115,7 +115,7 @@ recovery_paths:
       - "review"
       - "closed"
 
-# 禁止遷移（SPEC local-case-file.md「禁止遷移」）
+# 禁止遷移（Design local-case-file.md「禁止遷移」）
 forbidden_transitions:
   - from: "blocked"
     to: "closed"

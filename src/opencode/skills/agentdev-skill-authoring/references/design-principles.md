@@ -204,8 +204,8 @@ Q3: 決定的でテスト可能な処理ロジックか？
 Q4: 出力構造・プレースホルダーか？
   → Yes: Template（templates/） / No: 再評価
 
-Q5: 現在仕様の記述か？
-  → Yes: SPEC（docs/specs/） / No: Q6 へ
+Q5: 現在設計の記述か？
+  → Yes: Design（docs/designs/） / No: Q6 へ
 
 Q6: 将来の設計・運用・文書システムを制約する決定の記録か？
   → Yes: Decision（docs/decisions/） / No: Q7 へ
@@ -222,11 +222,11 @@ Q7: 人間向けナビゲーション・案内か？
 | Skill | 再利用可能、宣言的、複数 command から参照可能 | フェーズ体系、命名規則、状態遷移 |
 | Script | 入力が同じなら出力も同じ。テスト可能 | 採番、validation、INDEX 生成 |
 | Template | 変数置換で使用。ロジックなし | Issue/PR 本文、コメント |
-| SPEC | 現在の構造、契約、ルールの記述 | system.md、patterns.md |
+| Design | 現在の構造、契約、ルールの記述 | system.md、patterns.md |
 | ADR | 「なぜその決定をしたか」の記録 | 技術選定、方針変更 |
 | Guide | 人間向けの案内、説明 | ワークフロー概要、クイックスタート |
 
-**注意**: skill `references/` は実行時配布物のみを含める（現在は SPEC system.md で規定）。
+**注意**: skill `references/` は実行時配布物のみを含める（現在は Design system.md で規定）。
 authoring-only 資料は `references/` に含めない。
 
 配置判断の補強:
@@ -279,7 +279,7 @@ Skill 分割を検討する条件:
 ### skill → command 参照の原則
 
 1. **概念名使用**: skill は command の Step 番号、Phase 名を参照せず、概念名（処理名）を使用すること
-2. **例**: `case-run Step 10` → `SPEC 更新時`、`case-close Step 8` → `完了時`
+2. **例**: `case-run Step 10` → `Design 更新時`、`case-close Step 8` → `完了時`
 
 ### See Also 記述規約
 

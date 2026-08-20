@@ -175,7 +175,7 @@ export function extractNodes(inputs: readonly InputFile[], config: ResolvedConfi
     addAlias(aliases, identity.label, identity.id)
     const idValue = field(frontmatter, "id")?.values[0]
     if (idValue !== undefined) addAlias(aliases, idValue, identity.id)
-    if (identity.rule.name === "specification") addAlias(aliases, basename(input.path), identity.id)
+    if (identity.rule.name === "design") addAlias(aliases, basename(input.path), identity.id)
   }
 
   return {

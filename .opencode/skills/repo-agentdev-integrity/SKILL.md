@@ -44,7 +44,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | Skill references (canonical) | `.opencode/skills/**/references/*.md` | glob |
 | Command ファイル | `.opencode/commands/**/*.md`（README.md 含む） | glob |
 | Root README | `README.md` | Read |
-| Specs ファイル | `docs/specs/**/*.md`（再帰。README.md は SPEC inventory/status 同期検査でのみ対象、SPEC本文検査では除外） | glob (walkMarkdown) |
+| Designs ファイル | `docs/designs/**/*.md`（再帰。README.md は Design inventory/status 同期検査でのみ対象、Design本文検査では除外） | glob (walkMarkdown) |
 | Workflow templates | `.opencode/skills/agentdev-workflow-templates/templates/*.md` | glob |
 
 ### 検査カテゴリ
@@ -62,7 +62,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | Variant report | `check_integrity.ts` | variant 実在確認、registry 登録確認、必須フィールド、fragment 合成パターン (REQ-0108-089~091) |
 | ADR status 正規化 | `check_integrity.ts` | 旧形式 `superseded-by:[ADR-XXXX]` 検出 (REQ-0108-121) |
 | RU-ID 根拠参照 | `check_integrity.ts` | docs 永続文書内の RU-ID パターン検出 (REQ-0108-122) |
-| Workflow status 禁止 | `check_integrity.ts` | REQ/SPEC 内の workflow status / 6 マイクロフェーズ検出 (REQ-0108-123) |
+| Workflow status 禁止 | `check_integrity.ts` | REQ/Design 内の workflow status / 6 マイクロフェーズ検出 (REQ-0108-123) |
 | Accepted ADR 引用 | `check_integrity.ts` | accepted 以外の ADR 引用検出（current baseline + retired 区別、推奨, REQ-0108-125, REQ-0112-050） |
 | Workflow template 構造 | `check_templates.ts` | frontmatter、必須セクション、placeholder、命名規則 |
 | Skill 構造 | `lint_skills.ts` | frontmatter name ↔ dir、USE FOR / DO NOT USE FOR、See Also |
@@ -72,7 +72,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | REQ verification basis | `check_integrity.ts` | REQ 要件行の検証基準が 規範語ではなく必達要件判定であること（REQ-0115-044） |
 | Runtime reference | `check_integrity.ts` | 配布物（src/opencode/commands/agentdev、src/opencode/skills/agentdev-*/**/*.md）内の導入先未解決参照検出。baseline 既知と新規区別、段階導入（IR-055, REQ-0108-263/264） |
 | Distribution untracked skill | `check_integrity.ts` | 配布物が `.opencode/skills/` 配下にのみ存在するスキルを参照した場合の src 昇格漏れ検出（IR-058, REQ-0159-003） |
-| Skill rename 対称性 | `check_skill_rename_symmetry.ts` | 配布 skill `agentdev-*` と SPEC `docs/specs/skills/{X}.md` の物理 path 一致、SKILL.md frontmatter `name` ↔ 親 dir、SPEC title token ↔ filename stem、Artifact Graph skill node ↔ skill dir の整合（REQ-026）。`status: superseded` SPEC の skill dir 欠落は許容 |
+| Skill rename 対称性 | `check_skill_rename_symmetry.ts` | 配布 skill `agentdev-*` と Design `docs/designs/skills/{X}.md` の物理 path 一致、SKILL.md frontmatter `name` ↔ 親 dir、Design title token ↔ filename stem、Artifact Graph skill node ↔ skill dir の整合（REQ-026）。`status: superseded` Design の skill dir 欠落は許容 |
 
 ### 補助検査スクリプト（categoryToCheckPattern 対象外）
 
@@ -80,9 +80,9 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 
 | 検査 | スクリプト | 内容 |
 |------|-----------|------|
-| Obsolete spec path | `check_integrity.ts` | `obsolete-path-map.yaml` に基づく旧SPEC直下パス参照検出、直接生成方式語彙検出（IR-057, REQ-0158-002） |
-| Distribution reference boundary | `check_distribution_boundary.ts` | 配布 command/skill 本文（`src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/**/*.md`）に含まれる具体ID（`ADR-NNNN`, `REQ-NNNN`）、具体パス（`docs/(adr\|requirements\specs)/<file>.md`、但し README.md とテンプレート表記は除外）、固定URL（blob/raw）を検出。project extensions 機構（配布物参照境界）の持続的検査を担う |
-| Targeted docs guard | `check_changed_docs.ts` | 変更ファイル限定の整合性検査。req-save / spec-save / case-close / docs-check の各 workflow で実行（REQ-0158-003） |
+| Obsolete design path | `check_integrity.ts` | `obsolete-path-map.yaml` に基づく旧Design直下パス参照検出、直接生成方式語彙検出（IR-057, REQ-0158-002） |
+| Distribution reference boundary | `check_distribution_boundary.ts` | 配布 command/skill 本文（`src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/**/*.md`）に含まれる具体ID（`ADR-NNNN`, `REQ-NNNN`）、具体パス（`docs/(adr\|requirements\designs)/<file>.md`、但し README.md とテンプレート表記は除外）、固定URL（blob/raw）を検出。project extensions 機構（配布物参照境界）の持続的検査を担う |
+| Targeted docs guard | `check_changed_docs.ts` | 変更ファイル限定の整合性検査。req-save / design-save / case-close / docs-check の各 workflow で実行（REQ-0158-003） |
 | Workflow preventive checks | `check_workflow_preventive.ts` | AG-008 旧責務残存の予防検査7項目（全公開 Command の Workflow Skill dispatch 存在、dispatch 先 Skill 存在、Workflow Skill の description 簡潔トリガー項存在（AG-004、検出語は lint_skills.ts と統一）、旧 extension kind・runtime path 残存禁止、Command から Skill 内部 reference 直接依存禁止、Workflow/Capability 分類と Extension kind 整合、command-format rules と thin Command モデル無矛盾）。false positive 対策の exemption は script 本体に構造化 |
 
 ### Finding レベル（REQ-0108-100~105）
@@ -114,9 +114,9 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | 兆候 | 検出基準 | レベル |
 |------|---------|--------|
 | 技術判断不在 | ADRのDecision sectionに技術的決定が見当たらない | observation |
-| REQ/SPEC相当内容の混入 | ADR本文にcommand仕様・workflow定義・運用ルール等が記述されている | observation |
+| REQ/Design相当内容の混入 | ADR本文にcommand仕様・workflow定義・運用ルール等が記述されている | observation |
 | ADR-0017適合外 | ADR-0017（文書種別責務境界）で定義されたADR適用基準を満たしていない | warning |
-| 文書種別不一致 | ADRの内容が実際にはREQ/SPEC/guideの適用範囲に該当する | warning |
+| 文書種別不一致 | ADRの内容が実際にはREQ/Design/guideの適用範囲に該当する | warning |
 
 ## レポート Schema
 
@@ -166,7 +166,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 - `--help`: 使用方法を表示
 - `--json`: JSON 形式で出力
 - `--dry-run`: 検査を実行せず対象一覧を表示
-- `--profile source|installed|release`: 実行 profile（既定 `source`、Issue #1928 / WP-3）。詳細は `docs/specs/integrity/integrity-contracts.md`「実行プロファイル分離」
+- `--profile source|installed|release`: 実行 profile（既定 `source`、Issue #1928 / WP-3）。詳細は `docs/designs/integrity/integrity-contracts.md`「実行プロファイル分離」
   - `source`: 原本（`src/opencode/`、docs、repo-local checker）を直接検査。projection 検査は対象外
   - `installed`: 原本と配置先（`.opencode/`）を比較し、配置漏れ（`projection_missing` / `projection_extra` / `content_mismatch` / `broken_junction` / `missing_required_dir`）を検出
   - `release`: `--archive <zip>` 必須。archive 展開→`install-from-archive.ps1`→`installed` profile を `--root` 付きで host 側 checker が実行
@@ -186,7 +186,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 
 ## 新規カテゴリ追加判定フロー（REQ-0145-005）
 
-新規 NG ルール・検査カテゴリを追加する際、既存 NG への副作用を評価してから追加する。詳細手順は [integrity-rule-catalog.md](../../../../docs/specs/integrity-rule-catalog.md)「新規カテゴリ追加判定フロー」参照。本 SKILL.md は判定基準の提示のみを担い、追加可否の最終判断は運用者（HITL）が行う。
+新規 NG ルール・検査カテゴリを追加する際、既存 NG への副作用を評価してから追加する。詳細手順は [integrity-rule-catalog.md](../../../../docs/designs/integrity-rule-catalog.md)「新規カテゴリ追加判定フロー」参照。本 SKILL.md は判定基準の提示のみを担い、追加可否の最終判断は運用者（HITL）が行う。
 
 判定項目（全て満たす必要あり）:
 

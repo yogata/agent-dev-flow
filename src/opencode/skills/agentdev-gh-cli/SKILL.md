@@ -10,9 +10,9 @@ command と skill は gh コマンドを直接記述せず、本スキルの手�
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-gh-cli` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-gh-cli` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## 責務
@@ -53,7 +53,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | PR mergeable 状態取得 | PR 番号 | `MERGEABLE` / `CONFLICTING` / `UNKNOWN` |
 
 後者2手続き（PR 変更ファイル一覧取得、PR mergeable 状態取得）は基盤手続き一覧を UPDATE せず拡張手続きとして新設したものである。
-詳細は SPEC `agentdev-gh-cli`.md「拡張手続き」参照。
+詳細は Design `agentdev-gh-cli`.md「拡張手続き」参照。
 
 ## VERIFY
 
@@ -64,9 +64,9 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 ## 差し替え可能性（ローカル版）
 
-ローカル版は本スキルを差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（根拠は次段落の SPEC 参照）。
+ローカル版は本スキルを差し替え、同一手続き名で Case ファイル（`.agentdev/cases/case-{NNNN}.md`）の読み書きへ読み替える（根拠は次段落の Design 参照）。
 PR 関連手続きはスキップせず、Case ファイルの対応セクションで代替する。
-手続きと Case ファイルセクションの対応は SPEC `agentdev-gh-cli`.md 参照。
+手続きと Case ファイルセクションの対応は Design `agentdev-gh-cli`.md 参照。
 
 ## WRITE 手続きの Windows encoding 初期化必須化（REQ）
 
@@ -93,5 +93,5 @@ gh WRITE 操作を行う全 command/ skill は本手続き経由でコンソー�
 
 ## 関連項目
 
-- SPEC `agentdev-gh-cli`.md
+- Design `agentdev-gh-cli`.md
 - 関連 REQ / Decision 一覧は各インデックス（`docs/requirements<README>.md`, `docs/decisions<README>.md`）を参照

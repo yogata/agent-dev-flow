@@ -49,7 +49,7 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 ### Intake 候補の代表例
 
 - 実装中に発見した既存バグ（Issue 完了条件外）
-- ドキュメントの矛盾（SPEC と実装の不一致）
+- ドキュメントの矛盾（Design と実装の不一致）
 - 設定不備による動作差異
 - 今回は対応しないが後で直すべき箇所
 
@@ -94,7 +94,7 @@ subagent 委譲を実施する agentdev command（case-auto、case-open、case-r
 - **対象**: subagent 委譲する全場面。特定 command に限定しない
 - **必須記載項目**（キャプチャ境界に関わるもの）:
   - `.agentdev/intake/`、`.agentdev/learning/` の直接変更の禁止（case-run/ case-close 責務外の command も含む）
-  - 当該 command 責務外のファイル作成、 REQ/ SPEC/ src の直接修正の禁止
+  - 当該 command 責務外のファイル作成、 REQ/ Design/ src の直接修正の禁止
   - capture 情報を一時会話コンテキスト、ローカル変数、中間ファイル経由で引き継ぐことの禁止（PR 本文経由のみ許可）
 - **由来**: Issue #1538 で case-open を `category=writing` で委譲した際、MUST NOT DO が未明示で subagent が `.agentdev/drafts/` 配下へ draft を作成した事象
 - **関連**: `case-auto.md` の「Subagent 委譲プロトコル」節、`agentdev-case-run-execution-adapter` SKILL の「委譲プロトコルと category 設計」節参照

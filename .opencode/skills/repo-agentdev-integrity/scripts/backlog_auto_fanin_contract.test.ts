@@ -4,9 +4,9 @@
  * Issue #2224 (OU-0006, Epic #2223 EU-E Wave 1):
  * - ACT-SPEC-004 promoted the per-system result-state mapping table
  *   (learning-promote inbox.md-absent error report -> "no target"
- *   termination) into the SPEC body. These tests pin that promotion.
+ *   termination) into the Design body. These tests pin that promotion.
  * - CR-012 keeps the serialization-queue execution unit (child workflow
- *   persistence point = commit unit) in references; the SPEC body must not
+ *   persistence point = commit unit) in references; the Design body must not
  *   redefine it.
  * - REQ-041-013: "no target" terminations are treated as normal completion,
  *   not as batch failures.
@@ -39,8 +39,7 @@ function resolveSkillFile(...segments: string[]): string {
 
 const SPEC_PATH = path.join(
   REPO_ROOT,
-  "docs",
-  "specs",
+  "docs", "designs",
   "skills",
   "agentdev-workflow-backlog-auto.md",
 );
@@ -93,11 +92,11 @@ describe("backlog-auto fan-in 読み替え表契約（Issue #2224、REQ-041-013�
   const spec = read(SPEC_PATH);
   const fanInSection = extractSection(spec, "### fan-in 判定");
 
-  describe("SPEC 本文: fan-in 判定節の読み替え表（ACT-SPEC-004 昇格分）", () => {
-    it("fan-in 判定節に読み替え表が SPEC 本文契約として存在する", () => {
+  describe("Design 本文: fan-in 判定節の読み替え表（ACT-SPEC-004 昇格分）", () => {
+    it("fan-in 判定節に読み替え表が Design 本文契約として存在する", () => {
       expect(fanInSection).not.toBe("");
       expect(fanInSection).toContain(
-        "系統別の結果状態は次の読み替え表に従って fan-in 判定へ入力する（SPEC 本文の契約として正規所有する）。",
+        "系統別の結果状態は次の読み替え表に従って fan-in 判定へ入力する（Design 本文の契約として正規所有する）。",
       );
       expect(fanInSection).toContain(
         "| 子コマンドの報告状態 | fan-in 判定上の取扱い |",
@@ -121,14 +120,14 @@ describe("backlog-auto fan-in 読み替え表契約（Issue #2224、REQ-041-013�
     });
   });
 
-  describe("SPEC 本文: 直列化キュー実行単位の reference 参照維持（CR-012）", () => {
-    it("直列化キューの実行単位を各子 Workflow Skill の reference 詳細へ委譲し、本 SPEC では再定義しない", () => {
+  describe("Design 本文: 直列化キュー実行単位の reference 参照維持（CR-012）", () => {
+    it("直列化キューの実行単位を各子 Workflow Skill の reference 詳細へ委譲し、本 Design では再定義しない", () => {
       expect(fanInSection).toContain(
-        "直列化キューの実行単位（子ワークフロー定義の永続化ポイント = commit 単位）は各子 Workflow Skill の reference 詳細に従い、本 SPEC では再定義しない。",
+        "直列化キューの実行単位（子ワークフロー定義の永続化ポイント = commit 単位）は各子 Workflow Skill の reference 詳細に従い、本 Design では再定義しない。",
       );
     });
 
-    it("SPEC 本文に直列化キュー詳細セクションを持たない（実行単位の SPEC 本文昇格なし）", () => {
+    it("Design 本文に直列化キュー詳細セクションを持たない（実行単位の Design 本文昇格なし）", () => {
       const queueHeadings = headings(spec).filter(
         (heading) => /^#{1,6}\s+直列化キュー/.test(heading),
       );
@@ -142,7 +141,7 @@ describe("backlog-auto fan-in 読み替え表契約（Issue #2224、REQ-041-013�
   });
 
   describe("実装 reference との一致（backlog-auto workflow）", () => {
-    it("stage-execution の系統別結果状態の読み替えが SPEC 記載と一致する（learning-promote inbox.md 不在 → 対象なし終了）", () => {
+    it("stage-execution の系統別結果状態の読み替えが Design 記載と一致する（learning-promote inbox.md 不在 → 対象なし終了）", () => {
       const stageExecution = read(STAGE_EXECUTION_PATH);
       const mappingSection = extractSection(
         stageExecution,

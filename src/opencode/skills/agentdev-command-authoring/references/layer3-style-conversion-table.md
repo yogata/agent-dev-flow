@@ -1,7 +1,7 @@
 # 層3 記述スタイル転換 対照表
 
 Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不変条件）における変換前後の対応表。
-正規の規約は `authoring/command-file-format` SPEC（手順セクション形式・ガードレール番号・機械検査対象）が所有し、本表は変換時の所在マップを保持する。
+正規の規約は `authoring/command-file-format` Design（手順セクション形式・ガードレール番号・機械検査対象）が所有し、本表は変換時の所在マップを保持する。
 
 ## 目次
 
@@ -10,7 +10,7 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 - [コマンド別 対照](#コマンド別-対照)
   - [req-define](#req-define18定義--g3--不変条件10)
   - [req-save](#req-save12定義--g2--不変条件8)
-  - [spec-save](#spec-save12定義--g3--不変条件6)
+  - [design-save](#design-save12定義--g3--不変条件6)
   - [case-open](#case-open24定義--g2--不変条件10)
   - [case-run](#case-run25定義--g6--不変条件8)
   - [case-close](#case-close28定義--g8--不変条件8)
@@ -87,7 +87,7 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 | G11 | **G11 維持**（Issue 作成禁止） |
 | G12 | 不変条件8（capture 非関与） |
 
-### spec-save（12定義 → G3 / 不変条件6）
+### design-save（12定義 → G3 / 不変条件6）
 
 | 旧G | 変換後所在 |
 |---|---|
@@ -96,7 +96,7 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 | G03 | G02 へ統合 |
 | G04 | 不変条件1（no-op）+ 検証表 STEP-1 |
 | G05 | G06 へ統合（新規作成時 draft 付与）+ 検証表 STEP-5 検証基準 |
-| G06 | **G06 維持**（SPEC status 昇格は case-close 責務。旧 G11 を統合） |
+| G06 | **G06 維持**（Design status 昇格は case-close 責務。旧 G11 を統合） |
 | G07 | 不変条件5（draft は境界違反検出対象外） |
 | G08 | 不変条件3（分離基準適合） |
 | G09 | 不変条件4（実行時非依存） |
@@ -145,7 +145,7 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 | G24 | **G24 維持**（完了条件チェックボックス更新禁止） |
 | G25 | 不変条件4（SSoT 定義） |
 | G26/G29 | 不変条件5（PR URL 受領・中間成果物非依存） |
-| G27 | 不変条件8（SPEC確定候補セクション） |
+| G27 | 不変条件8（Design確定候補セクション） |
 | G30/G31 | **G30 維持**（委譲前置 gate・worktree root 引き渡し。旧 G31 を統合） |
 | G33/G34/G35 | **G33 維持**（Issue 本文書き換え禁止）+ 不変条件6（staleness check）+ 検証表 STEP-S3 検証基準 |
 
@@ -169,7 +169,7 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 | G15/G16/G18 | 不変条件6（capture 回収・保存） |
 | G17 | **G17 維持**（明示パスステージング）+ 不変条件8 |
 | G19 | 不変条件7（結果状態分離報告） |
-| G21/G22/G23 | **G21 維持**（SPEC status 昇格条件。旧 G22/G23 を統合）+ 不変条件6 |
+| G21/G22/G23 | **G21 維持**（Design status 昇格条件。旧 G22/G23 を統合）+ 不変条件6 |
 | G24/G25/G26 | **G24 維持**（Epic テーブル単一書き手。旧 G25/G26 を統合） |
 | G27/G28 | **G27 維持**（mergeable 事前確認・3リスク事前検出。旧 G28 を統合） |
 
@@ -200,7 +200,7 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 | G21 | 不変条件5 |
 | G27 | 不変条件8（工程別契約） |
 | G28 | 不変条件8（親コンテキスト非累積） |
-| G29 | 不変条件9（所有対象限定。旧 harness 責務列挙は削除し harness 分離モデル SPEC 参照へ） |
+| G29 | 不変条件9（所有対象限定。旧 harness 責務列挙は削除し harness 分離モデル Design 参照へ） |
 | G30 | 不変条件10（category 選定） |
 | G31 | 不変条件10（MUST DO / MUST NOT DO 明示構造） |
 | G32 | 不変条件10（stage 2 並列起動） |
@@ -342,12 +342,12 @@ Issue #2183（層3: 前出出力検証表・硬境界否定規則・肯定形不
 
 | 対象 | 変換内容 |
 |---|---|
-| agentdev-spec-file-manager SKILL.md | 旧 spec-save G05 参照を「spec-save 不変条件・前出出力検証表 STEP-5」参照へ更新（G06 参照は維持） |
+| agentdev-design-file-manager SKILL.md | 旧 design-save G05 参照を「design-save 不変条件・前出出力検証表 STEP-5」参照へ更新（G06 参照は維持） |
 | agentdev-workflow-* SKILL.md（13ファイル） | 削除 G 番号への参照を「command 不変条件」等へ更新（生存 G 番号参照は維持） |
 | agentdev-workflow-*/references/*（34ファイル） | 同上。STEP resume point 構造（8要素）は不変 |
 | agentdev-quality-gates references（qg-4-final-acceptance.md） | 旧 case-close G07/G09/G16 参照を検証表・不変条件参照へ更新（G08 参照は維持） |
 | agentdev-workflow-templates templates（issue_desc_child.md） | 旧 case-open G03 参照を case-open 不変条件参照へ更新 |
-| agentdev-workflow-case-auto references（input-resolution-and-orchestration.md） | 旧 G28/G29 の harness 責務再説明を除去し、harness 分離モデル SPEC 参照へ置換 |
+| agentdev-workflow-case-auto references（input-resolution-and-orchestration.md） | 旧 G28/G29 の harness 責務再説明を除去し、harness 分離モデル Design 参照へ置換 |
 
 ## 例外理由の記録
 

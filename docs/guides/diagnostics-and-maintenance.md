@@ -105,7 +105,7 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 | 達成項目 | 正規記録先 |
 |---------|----------|
 | 3層ゲート達成状況（実装、稼働、再発 finding 対応） | 当ガイド `diagnostics-and-maintenance.md` の3層ゲートセクション（本セクション） |
-| false positive 対応、既知パターン | `docs/specs/integrity/integrity-rule-catalog.md` の各 IR エントリ `false_positive_risk` フィールド、および `.opencode/skills/repo-agentdev-integrity/references/gate-levels.md` の「False Positive 扱い」セクション |
+| false positive 対応、既知パターン | `docs/designs/integrity/integrity-rule-catalog.md` の各 IR エントリ `false_positive_risk` フィールド、および `.opencode/skills/repo-agentdev-integrity/references/gate-levels.md` の「False Positive 扱い」セクション |
 | 要件行（達成要件、検証要件） | 当該 REQ ファイルの要件行テーブル |
 
 ### 記録時の遵守事項
@@ -117,8 +117,8 @@ integrity 検査は検査範囲に応じて3層に分かれる。
 
 AgentDevFlow では以下の整合性レイヤーを意識する。
 
-1. **文書間整合性**: REQ → Decision → SPEC → guides の間で矛盾がないこと
-2. **実装整合性**: 実装コード、設定が SPEC と一致していること
+1. **文書間整合性**: REQ → Decision → Design → guides の間で矛盾がないこと
+2. **実装整合性**: 実装コード、設定が Design と一致していること
 3. **ドメイン状態整合性**: `.agentdev/` 内の成果物がパイプライン境界を守っていること
 
 整合性に問題が見つかったら、まず `/repo/docs-check` を実行して全体像を把握し、検出事項の振り分け先に沿って対応する。

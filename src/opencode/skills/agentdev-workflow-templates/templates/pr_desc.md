@@ -22,7 +22,7 @@ Pull Request作成時の本文テンプレート。
 通常実装 PR では本セクションを省略する。
 verify-only PR の場合、「実装内容」欄は空欄にせず「実装差分なし」と理由を記録し、本セクションで詳細根拠を示す。
 根拠は姉妹実装 PR、実装 PR、先行 commit、main 反映済み commit、既存成果物、検証のみで完結する理由のいずれかを許容する。
-case-close と QG-{N} は当該欄を完了条件の証拠ソースとして読む（[case-run.md](../../../../../case-run SPEC)「verify-only 根拠欄の記入規則」、[case-close.md](../../../../../case-close SPEC)「verification-only PR の files_checked 空確認」参照）。
+case-close と QG-{N} は当該欄を完了条件の証拠ソースとして読む（[case-run.md](../../../../../case-run Design)「verify-only 根拠欄の記入規則」、[case-close.md](../../../../../case-close Design)「verification-only PR の files_checked 空確認」参照）。
 -->
 
 - **種別**: verify-only
@@ -66,11 +66,11 @@ case-close と QG-{N} は当該欄を完了条件の証拠ソースとして読�
 
 該当なし
 
-## SPEC確定候補
-<!-- 【任意】 case-run/ driver が実装時に発見した SPEC レベルの詳細（SPEC に記載すべき schema、enum、判定表、内部アルゴリズム等）を記録する。
+## Design確定候補
+<!-- 【任意】 case-run/ driver が実装時に発見した Design レベルの詳細（Design に記載すべき schema、enum、判定表、内部アルゴリズム等）を記録する。
 `## Findings / Capture候補` とは別セクション。
-case-close Step 3 で SPEC 確定チェックの入力となり、draft → 承認済み 昇格または spec-save 再起動の判断材料となる。
-SPEC確定候補がない場合はセクションごと省略する。
+case-close Step 3 で Design 確定チェックの入力となり、draft → 承認済み 昇格または design-save 再起動の判断材料となる。
+Design確定候補がない場合はセクションごと省略する。
  -->
 
 該当なし

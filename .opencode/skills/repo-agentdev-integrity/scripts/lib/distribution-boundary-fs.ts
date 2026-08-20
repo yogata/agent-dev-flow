@@ -12,7 +12,7 @@
 // skipping or scanning them as text.
 //
 // Projection semantics (source/link/archive/archive-installed) per
-// docs/specs/integrity/distribution-boundary.md "projection の分離":
+// docs/designs/integrity/distribution-boundary.md "projection の分離":
 //   - source/archive        -> src/opencode/**
 //   - link/archive-installed-> .opencode/**
 // Both projections enumerate the same logical content (consumer install

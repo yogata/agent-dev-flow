@@ -1,6 +1,6 @@
 ---
 name: agentdev-artifact-validation
-description: Owns document-type-crosscutting deterministic verification scripts, their shared lib, and the public verification contract. USE FOR: invoking the verification contract for REQ/ADR frontmatter id↔filename consistency, README entry existence, or change-scope validation against an allowed path list. DO NOT USE FOR: REQ/ADR/SPEC content judgment, file editing, save, user approval, commit, push, or ID allocation.
+description: Owns document-type-crosscutting deterministic verification scripts, their shared lib, and the public verification contract. USE FOR: invoking the verification contract for REQ/ADR frontmatter id↔filename consistency, README entry existence, or change-scope validation against an allowed path list. DO NOT USE FOR: REQ/ADR/Design content judgment, file editing, save, user approval, commit, push, or ID allocation.
 ---
 
 # 文書種別横断検証（artifact-validation）
@@ -8,15 +8,15 @@ description: Owns document-type-crosscutting deterministic verification scripts,
 このスキルは複数文書種別で共有する決定的検証 script と共有 lib の**正規所有者**として機能する（AG-{NNN}、AG-{NNN}、AG-{NNN}、CR-{NNN}、RU-{NNNN}-01 合意）。
 
 - **このスキル（検証基盤）**: 3つの共通検証 script とそれらが利用する共有 lib、対応 test、公開検証契約、JSON 結果契約
-- **適用先**: `req-save`、`spec-save`（共通検証 script 呼出 Step）、各 file-manager skill（委譲経由）、`agentdev-req-file-manager`（公開検証契約経由）
+- **適用先**: `req-save`、`design-save`（共通検証 script 呼出 Step）、各 file-manager skill（委譲経由）、`agentdev-req-file-manager`（公開検証契約経由）
 
 ---
 
 ## 原本（SSoT）
 
-本スキルの原本仕様は `agentdev-artifact-validation` SPEC である。
-SPEC を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
-重複または不一致がある場合は SPEC を正とする。
+本スキルの原本仕様は `agentdev-artifact-validation` Design である。
+Design を正規原本とし、SKILL.md は実行入口および skill 固有の補完情報を保持する。
+重複または不一致がある場合は Design を正とする。
 extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
@@ -25,7 +25,7 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 
 1. **前提とする固定知識の範囲**: `docs/` ディレクトリ構成（requirements/adr/specs）と公開検証契約（argv/stdin → stdout JSON）のみを前提とする
 2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先する
-3. **`SPEC 配下` 内部パスの固定知識化の禁止**: extension に列挙されていない `SPEC 配下` 内部パスを固定知識として参照しない
+3. **`Design 配下` 内部パスの固定知識化の禁止**: extension に列挙されていない `Design 配下` 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行する
 
 ## 責務
@@ -38,9 +38,9 @@ extension（`.agentdev/extensions/skills/`）は標準 SKILL.md を前提とし�
 | 共通検証 script の所有と運用 | ✓ | - |
 | 公開検証契約の提供 | ✓ | - |
 | 共有 lib と対応 test の所有 | ✓ | - |
-| REQ/Decision/SPEC 内容判断 | - | `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-spec-file-manager` |
+| REQ/Decision/Design 内容判断 | - | `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager` |
 | REQ/Decision 番号、要件行 ID 採番 | - | `agentdev-req-file-manager`、`agentdev-decision-file-manager` |
-| target_area 検索 | - | `agentdev-spec-file-manager` |
+| target_area 検索 | - | `agentdev-design-file-manager` |
 | 文書作成、更新、削除 | - | 各 file-manager skill |
 | 保存、commit、push、承認 | - | 各 command |
 
@@ -86,12 +86,12 @@ echo '{"id":"REQ-{NNNN}","files":["docs/requirements<README>.md"]}' | bun .openc
 cd .opencode/skills/agentdev-artifact-validation/scripts && bun test
 ```
 
-### req-save / spec-save からの呼び出し
+### req-save / design-save からの呼び出し
 
-`req-save` と `spec-save` は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う。
+`req-save` と `design-save` は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う。
 これにより frontmatter id↔ファイル名整合性確認、エントリ存在確認、変更範囲検証を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
 
-REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキルの対象外（それぞれ `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-spec-file-manager` の責務）。
+REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキルの対象外（それぞれ `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager` の責務）。
 
 ---
 
@@ -104,8 +104,8 @@ REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキ
 
 ## 必要な reference の選択条件
 
-現状、SKILL.md 本文と SPEC で完結するため `references/` 配下に追加資料を置かない。
-SPEC への参照のみを正とする。
+現状、SKILL.md 本文と Design で完結するため `references/` 配下に追加資料を置かない。
+Design への参照のみを正とする。
 將来的に検証契約の詳細（拡張入力形式、追加 kind、エラー分類）が必要になった場合は `references/` 配下へ分離する。
 
 ---
@@ -114,5 +114,5 @@ SPEC への参照のみを正とする。
 
 - **agentdev-req-file-manager**: REQ ファイル管理、REQ 番号/要件行 ID 採番（REQ 固有 script 所有）
 - **agentdev-decision-file-manager**: Decision ファイル管理、Decision 番号採番（Decision 固有 script 所有）
-- **agentdev-spec-file-manager**: SPEC ファイル管理、target_area 検索（SPEC 固有 script 所有）
-- **req-save** / **spec-save**: 共通検証 script 呼出 Step を持つ command
+- **agentdev-design-file-manager**: Design ファイル管理、target_area 検索（Design 固有 script 所有）
+- **req-save** / **design-save**: 共通検証 script 呼出 Step を持つ command

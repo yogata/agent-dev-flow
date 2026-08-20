@@ -14,16 +14,16 @@ backlog-review command は公開 interface（入出力契約・ガードレー�
 ## 原本（SSoT）
 
 本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` SPEC が正規所有する。
+Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` Design が正規所有する。
 extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-review.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と backlog-review command の公開契約のみを前提とする。SPEC ディレクトリの内部構成は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と backlog-review command の公開契約のみを前提とする。Design ディレクトリの内部構成は仮定しない
 2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
+3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 入力
@@ -47,7 +47,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-backlog-review.yaml`�
 ## Control Plane（STEP 一覧）
 
 backlog-review workflow は次の8 STEP で構成する。
-各 STEP は resume point を持ち（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
+各 STEP は resume point を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -63,7 +63,7 @@ backlog-review workflow は次の8 STEP で構成する。
 ### STEP 間の依存と分岐
 
 - **正常経路**: STEP-1 → STEP-2 → STEP-3 → STEP-4（skip 条件該当時は省略）→ STEP-5 → STEP-6 → STEP-7 → STEP-8
-- **構成、review、承認の順序**: STEP-3（統合、分割判定、depends_on 依存解決）で RU 構成案を確定し、続く STEP-4（adversarial-review 呼出、default-on）を経て、STEP-5（ユーザー承認）で承認を確定する。順序の正規所有者は backlog-review command SPEC「adversarial-review 挿入境界（経路E）」節である
+- **構成、review、承認の順序**: STEP-3（統合、分割判定、depends_on 依存解決）で RU 構成案を確定し、続く STEP-4（adversarial-review 呼出、default-on）を経て、STEP-5（ユーザー承認）で承認を確定する。順序の正規所有者は backlog-review command Design「adversarial-review 挿入境界（経路E）」節である
 - **矛盾なしの場合の単一承認**: 後続の STEP-6 で矛盾が検出されない場合、STEP-5 の統合、分割判定承認を RU 生成承認（STEP-7）としても扱う。単一承認で処理し、追加の HITL は不要
 - **対象 0 件**: STEP-1 で正常終了（エラー扱いとしない。「対象なし」を報告）
 - **review unresolved 残存時**: RU 生成（STEP-7）、採用済み成果物削除、Git 永続化（STEP-8）等の後続不可逆処理へ進まない
@@ -71,7 +71,7 @@ backlog-review workflow は次の8 STEP で構成する。
 ## Resume Protocol（durable state による再開）
 
 会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。
-優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
+優先順位は `<workflows/input-resolution-and-durable-state>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/{intake,learning,inspect}/promoted/` と `.agentdev/backlog/req-units/` の実ファイル状態
 2. identifier 保持: 成果物パス、RU-ID（RU frontmatter の `source_type`、`generated_by`、`status`、`depends_on`、`tentative_classification`、`sources`）
@@ -96,16 +96,16 @@ RU 実ファイル（STEP-7 の成果物）を承認証跡として扱い、証�
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
 - `agentdev-backlog-integration`: 採用済み成果物の読込、分析、統合・分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール（frontmatter、セクション構成、採番、upstream handoff 転記）。経路E の review 候補判断と内部手続き
-- `agentdev-adversarial-review`: 経路E の review 呼出（共通契約の正規所有者は adversarial-review SPEC、REQ-{NNNN}）
+- `agentdev-adversarial-review`: 経路E の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
-- `agentdev-project-extensions`: project extension 読込（5セクション、fail-open。document-model SPEC の文書7分類モデルは extension 経由で参照）
+- `agentdev-project-extensions`: project extension 読込（5セクション、fail-open。document-model Design の文書7分類モデルは extension 経由で参照）
 - `agentdev-artifact-graph`: トレーサビリティ派生索引への高位問い合わせ（統合、分割、depends_on の補助 evidence 探索。fail-open）
 
 ## Artifact Graph 利用
 
 本スキルは `agentdev-artifact-graph` が提供するトレーサビリティ派生索引への高位問い合わせ（related、impact、必要に応じて dependency）を利用できる。
-採用済み成果物に含まれる REQ、Decision、SPEC、canonical owner 等の明示情報を起点に、統合、分割、depends_on 依存解決（STEP-3）の補助 evidence 探索を行う。
-問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` SPEC（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
+採用済み成果物に含まれる REQ、Decision、Design、canonical owner 等の明示情報を起点に、統合、分割、depends_on 依存解決（STEP-3）の補助 evidence 探索を行う。
+問い合わせ目的とワークフローの割り当ては `agentdev-artifact-graph` Design（ワークフロー利用）が正規所有し、本スキルは TIM、派生索引、問い合わせ内部規則を独自に再定義しない。
 問い合わせ目的を指定し、返された候補を用いて判断する。
 
 - 問い合わせ結果は候補提供であり、統合、分割、depends_on、意味的重複の判断は正規成果物本文と `rg` 等の独立探索での確認後に下す
@@ -122,8 +122,8 @@ RU 実ファイル（STEP-7 の成果物）を承認証跡として扱い、証�
 
 ## 共通制約
 
-- **RU フォーマット**: RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）は `agentdev-backlog-integration` を正とする。`tentative_classification` は document-model SPEC（extension 経由）の文書7分類モデル（REQ、挙動SPEC、カタログSPEC、guide、learning維持、作業記録、対象外）のいずれかを記録する。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本 workflow は確定しない
-- **session由来RU**: `source_type: chat` かつ `generated_by: session` の RU は、一時成果物ライフサイクル要件と artifact-contracts SPEC「RU アーティファクト契約（session由来RU）」セクションを正規原本とする（frontmatter 必須フィールド、二段階承認、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）。本 workflow は再定義しない
+- **RU フォーマット**: RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）は `agentdev-backlog-integration` を正とする。`tentative_classification` は document-model Design（extension 経由）の文書7分類モデル（REQ、挙動Design、カタログDesign、guide、learning維持、作業記録、対象外）のいずれかを記録する。暫定分類は後続 `/agentdev/req-define` で最終確定される候補であり、本 workflow は確定しない
+- **session由来RU**: `source_type: chat` かつ `generated_by: session` の RU は、一時成果物ライフサイクル要件と artifact-contracts Design「RU アーティファクト契約（session由来RU）」セクションを正規原本とする（frontmatter 必須フィールド、二段階承認、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）。本 workflow は再定義しない
 - **単純コピー禁止**: 採用済み成果物のパススルー（単純コピー）を生成しない。`depends_on` に採用済み成果物パスを指定しない（RU-ID のみ許容）
 - **削除条件**: RU 生成が成功した採用済み成果物のみを削除する（当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ）。RU 化に失敗した成果物、矛盾により除外された成果物は残置する
 - **非更新対象**: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` を更新しない
@@ -134,9 +134,9 @@ RU 実ファイル（STEP-7 の成果物）を承認証跡として扱い、証�
 
 ## See Also
 
-- **`<workflows/workflow-skill-model>` SPEC**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` SPEC**: STEP reference 構造、resume point
-- **`<workflows/input-resolution-and-durable-state>` SPEC**: durable state 優先順位、current STEP 再構成
+- **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
+- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<workflows/input-resolution-and-durable-state>` Design**: durable state 優先順位、current STEP 再構成
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **backlog-review command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

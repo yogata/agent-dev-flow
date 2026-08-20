@@ -75,7 +75,7 @@ function synthGraph(nodes: readonly GraphNode[], edges: readonly GraphEdge[]): G
 }
 
 const R1 = "requirement:r1"
-const SPEC = "specification:spec"
+const Design = "design:spec"
 const DEC_OLD = "decision:old"
 const DEC_NEW = "decision:new"
 const EXT = "extension:ext"
@@ -85,7 +85,7 @@ const HUB = "hub:idx"
 const SEMANTIC_GRAPH = synthGraph(
   [
     synthNode(R1, "requirement"),
-    synthNode(SPEC, "specification"),
+    synthNode(Design, "design"),
     synthNode(DEC_OLD, "decision"),
     synthNode(DEC_NEW, "decision"),
     synthNode(EXT, "extension"),
@@ -93,9 +93,9 @@ const SEMANTIC_GRAPH = synthGraph(
     synthNode(HUB, "source_file"),
   ],
   [
-    synthEdge("e1", "references", R1, SPEC),
+    synthEdge("e1", "references", R1, Design),
     synthEdge("e2", "supersedes", DEC_NEW, DEC_OLD),
-    synthEdge("e3", "delegates_to", EXT, SPEC),
+    synthEdge("e3", "delegates_to", EXT, Design),
     synthEdge("e4", "extends", EXT, SKILL),
     synthEdge("e5", "references", R1, HUB),
     synthEdge("e6", "references", HUB, DEC_NEW),
@@ -106,7 +106,7 @@ const SEMANTIC_GRAPH = synthGraph(
 describe("TS-{NNN}: profile semantics traverse only catalog-defined relations", () => {
   it("related returns directly linked nodes but skips undefined relation types and index-role nodes", () => {
     const result = semanticCandidates(SEMANTIC_GRAPH, "related", R1, 1)
-    expect(result.map((c) => c.candidate)).toEqual([SPEC])
+    expect(result.map((c) => c.candidate)).toEqual([Design])
   })
 
   it("related does not propagate exploration through index/aggregation role nodes", () => {
@@ -126,8 +126,8 @@ describe("TS-{NNN}: profile semantics traverse only catalog-defined relations", 
 
   it("dependency follows forward dependency orientations only and rejects general references", () => {
     const fromExt = semanticCandidates(SEMANTIC_GRAPH, "dependency", EXT, 1)
-    expect(fromExt.map((c) => c.candidate).sort()).toEqual([SKILL, SPEC].sort())
-    const fromSpec = semanticCandidates(SEMANTIC_GRAPH, "dependency", SPEC, 1)
+    expect(fromExt.map((c) => c.candidate).sort()).toEqual([SKILL, Design].sort())
+    const fromSpec = semanticCandidates(SEMANTIC_GRAPH, "dependency", Design, 1)
     expect(fromSpec).toEqual([])
   })
 

@@ -13,9 +13,9 @@
 
 ## 検査観点
 
-### 1. REQ/ SPEC 分類
+### 1. REQ/ Design 分類
 
-各要件行候補が「変更後仕様（REQ/SPEC 相当）」か「反映作業（コマンド実行、ファイル移動等）」か正しく分類されているか。
+各要件行候補が「変更後仕様（REQ/Design 相当）」か「反映作業（コマンド実行、ファイル移動等）」か正しく分類されているか。
 詳細な分類基準は `agentdev-req-analysis` を参照。
 
 - **fail**: REQ にすべき内容が反映作業として扱われている、またはその逆。
@@ -23,10 +23,10 @@
 
 ### 2. ADR ゲート
 
-ADR 候補が REQ/SPEC 相当でないか（ADR禁止ゲート）。
+ADR 候補が REQ/Design 相当でないか（ADR禁止ゲート）。
 作業手段 ADR（削除、廃止、移行、統合そのものを主題とするもの）が除外されているか。
 
-- **fail**: REQ/SPEC 相当の内容が ADR 候補として提示されている。作業手段 ADR が ADR 候補に含まれている。
+- **fail**: REQ/Design 相当の内容が ADR 候補として提示されている。作業手段 ADR が ADR 候補に含まれている。
 - **pass**: ADR 候補が技術判断（アーキテクチャ上の決定）を含む。既存 ADR との重複確認済み。
 
 ### 3. チェックボックス測可能性
@@ -40,40 +40,40 @@ ADR 候補が REQ/SPEC 相当でないか（ADR禁止ゲート）。
 
 ### 4. ドキュメント分類妥当性
 
-各要件の対象ドキュメント種別が document-model SPEC の Document Classification Policy に適合しているか。
+各要件の対象ドキュメント種別が document-model Design の Document Classification Policy に適合しているか。
 
-- **fail**: SPEC にすべき内容が guides に、REQ にすべき内容が SPEC に、等の分類不適合。
+- **fail**: Design にすべき内容が guides に、REQ にすべき内容が Design に、等の分類不適合。
 - **warn**: 分類は妥当だが根拠が薄弱。
 
 ### 5. 必須セクション完全性
 
 要件doc/ REQ ファイルがテンプレート（`doc_requirement.md`）の【必須】セクションを全て含むか。
-SPEC候補セクション（`## SPEC候補`）は補助（任意）セクションであり、必須セクションの完全性判定対象外である。
+Design候補セクション（`## Design候補`）は補助（任意）セクションであり、必須セクションの完全性判定対象外である。
 
 - **fail**: 必須セクション（目的/ 要件/ 適用範囲 等）の欠落。
 
-### 6. REQ/SPEC 配置判定
+### 6. REQ/Design 配置判定
 
-要件行候補が REQ に記述すべき外部契約、状態要件であるか、SPEC、rule catalog、command reference 等に配置すべき詳細、内部パラメータであるかを判定する。
-判定基準は `agentdev-req-analysis` の REQ/SPEC 境界判定基準（-069, -055）に従う。
+要件行候補が REQ に記述すべき外部契約、状態要件であるか、Design、rule catalog、command reference 等に配置すべき詳細、内部パラメータであるかを判定する。
+判定基準は `agentdev-req-analysis` の REQ/Design 境界判定基準（-069, -055）に従う。
 
-- **fail**: REQ に記述すべき外部契約、状態要件（公開 command 名、ドメイン状態の位置づけ、接続契約、安全境界等）が SPEC 等にしか配置されていない。または SPEC 等に配置すべき詳細、内部パラメータ（schema field、enum 値一覧、判定表、内部アルゴリズム等）が REQ 要件行を専有している。
-- **warn**: 安定契約例外の適用境界が曖昧な候補がある。REQ/SPEC 両方に要約と詳細を分割すべき候補が未整理。
-- **pass**: 各要件行が REQ/SPEC 境界判定基準に適合し、安定契約例外が必要な箇所は REQ に要約、SPEC 等に詳細が分割されている。
+- **fail**: REQ に記述すべき外部契約、状態要件（公開 command 名、ドメイン状態の位置づけ、接続契約、安全境界等）が Design 等にしか配置されていない。または Design 等に配置すべき詳細、内部パラメータ（schema field、enum 値一覧、判定表、内部アルゴリズム等）が REQ 要件行を専有している。
+- **warn**: 安定契約例外の適用境界が曖昧な候補がある。REQ/Design 両方に要約と詳細を分割すべき候補が未整理。
+- **pass**: 各要件行が REQ/Design 境界判定基準に適合し、安定契約例外が必要な箇所は REQ に要約、Design 等に詳細が分割されている。
 
-### 7. SPEC 候補分離の妥当性
+### 7. Design 候補分離の妥当性
 
-SPEC 等に配置すべきと判定された要件行候補が、ドラフトの `## SPEC候補` 補助セクションと `draft-meta.spec-candidates`（SC-ID、content、intended_spec、classification、source）に分離されているか。
-各 SPEC 候補に想定配置先 SPEC と分離根拠（該当種別）が記録されているか。
+Design 等に配置すべきと判定された要件行候補が、ドラフトの `## Design候補` 補助セクションと `draft-meta.spec-candidates`（SC-ID、content、intended_spec、classification、source）に分離されているか。
+各 Design 候補に想定配置先 Design と分離根拠（該当種別）が記録されているか。
 
-- **fail**: SPEC 等に配置すべき要件行候補が REQ 要件行に残留している（SPEC 残留）。または SPEC 候補に想定配置先 SPEC、分離根拠が未記録。
-- **warn**: 安定契約例外の適用境界が曖昧で、SPEC 候補と REQ 要件行の振り分けが判断余地のある候補がある。
-- **pass**: SPEC 候補が全て `draft-meta.spec-candidates` に分離され、各候補に想定配置先 SPEC と分離根拠が記録されている。安定契約例外は REQ に要約として残されている。
+- **fail**: Design 等に配置すべき要件行候補が REQ 要件行に残留している（Design 残留）。または Design 候補に想定配置先 Design、分離根拠が未記録。
+- **warn**: 安定契約例外の適用境界が曖昧で、Design 候補と REQ 要件行の振り分けが判断余地のある候補がある。
+- **pass**: Design 候補が全て `draft-meta.spec-candidates` に分離され、各候補に想定配置先 Design と分離根拠が記録されている。安定契約例外は REQ に要約として残されている。
 
 ### 8. SPLIT 予兆の記録
 
 既存 REQ を APPEND/UPDATE 対象とする場合、または生成ドラフトの要件行数が 51 行を超える場合、`draft-meta.split-forecast`（target、metrics、signals、total、recommended_action、thresholds_ref）が記録されているか。
-閾値の正は req-health-metrics SPEC とする。
+閾値の正は req-health-metrics Design とする。
 
 - **fail**: 記録すべき SPLIT 予兆（要件行数 51+、関心分類数 2+、成果物種別数 3+ のいずれか）があるのに `draft-meta.split-forecast` が未記録。
 - **warn**: split-forecast は記録されているが推奨アクション（SPLIT 検討、SPLIT 推奨）に対するユーザー応答が未確認。
@@ -131,7 +131,7 @@ QG-1 の検査をサブエージェントに委譲する場合:
 ## See Also
 
 - [common-gate-contract.md](common-gate-contract.md)
-- **agentdev-req-analysis**: チェックボックス品質基準、REQ/SPEC 分類基準
+- **agentdev-req-analysis**: チェックボックス品質基準、REQ/Design 分類基準
 - **agentdev-decision-guidelines**: Decision 判定基準
 
 

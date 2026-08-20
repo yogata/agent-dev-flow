@@ -6,7 +6,7 @@ context:
   - id: docs-spec-rebuild-integrity
     when: 配布物整合性ルール参照時
     paths:
-      - "docs/specs/integrity/docs-spec-rebuild-integrity.md"
+      - "docs/designs/integrity/docs-spec-rebuild-integrity.md"
     purpose: Command/Skill 参照妥当性検出の整合性ルール確認
 
 rules: []

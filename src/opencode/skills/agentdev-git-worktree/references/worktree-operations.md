@@ -129,7 +129,7 @@ worktree 内で junction が再作成されない場合の偽陽性を防止す�
 `checkSourceProjectionConsistency` 以外の junction 依存検査に対する `isInsideWorktree` 適用を評価対象として明記すること。
 junction 依存の整合性検査全般に worktree 実行判定を拡張する候補を個別に評価し、偽陽性の発生する検査から順次適用する。
 
-## worktree 構造的制約（agentdev-git-worktree-test-fallback SPEC）
+## worktree 構造的制約（agentdev-git-worktree-test-fallback Design）
 
 worktree は独立した working tree を持つため、本体リポジトリ直下を前提とする検査が worktree 内では成立しない事象がある。
 次の構造的制約を前提として運用する。

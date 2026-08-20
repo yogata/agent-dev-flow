@@ -42,7 +42,7 @@ beforeAll(() => {
       "",
       "Read ADR-0135 first.",
       "See docs/adr/README.md for the index.",
-      "Template form docs/specs/<domain>/<spec>.md is allowed.",
+      "Template form docs/designs/<domain>/<design>.md is allowed.",
       "Glob form docs/requirements/REQ-*.md is allowed.",
       "Bad: docs/requirements/REQ-0149.md is a concrete ref.",
       "Bad: <https://github.com/yogata/agent-dev-flow/blob/main/docs/foo.md>",
@@ -58,7 +58,7 @@ beforeAll(() => {
       "# foo skill",
       "",
       "References must flow via extension layer.",
-      "Pattern docs/specs/** is fine.",
+      "Pattern docs/designs/** is fine.",
       "ID template REQ-{NNNN} is fine.",
       "",
     ].join("\n"),
@@ -120,7 +120,7 @@ describe("checkDistributionBoundary", () => {
     // Template forms should NOT be flagged.
     const tmplHits = report.failures.filter(
       (f) =>
-        f.matched.includes("docs/specs/<") ||
+        f.matched.includes("docs/designs/<") ||
         f.matched.includes("REQ-*") ||
         f.matched.includes("{NNNN}"),
     );

@@ -5,17 +5,17 @@ id: agentdev-workflow-case-run
 context:
   - id: must-1
     paths:
-      - "docs/specs/workflows/epic-wave-model.md"
+      - "docs/designs/workflows/epic-wave-model.md"
     purpose: Epic/Wave/Issue 実行モデルと子Issue 並列委譲の確認
   - id: workflow-contracts
     when: ワークフロー契約（フェーズ、SSoT 遷移、実装分類）参照時
     paths:
-      - "docs/specs/workflows/workflow-contracts.md"
+      - "docs/designs/workflows/workflow-contracts.md"
     purpose: "case-run 3フェーズ構成と自律修正ループ契約の確認"
 
 rules:
   - id: artifact-graph-implementation-context
-    when: 実装対象に関係するREQ、SPEC、整合性ルール、周辺成果物の候補を探索するとき。利用不能時は従来の探索手段で続行する
+    when: 実装対象に関係するREQ、Design、整合性ルール、周辺成果物の候補を探索するとき。利用不能時は従来の探索手段で続行する
     skill: agentdev-artifact-graph
 
 checks: []

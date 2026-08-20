@@ -57,9 +57,9 @@ bun effectiveness/candidate_limit/run.ts --root ../../../../../.. --graph ../../
 
 | id | class | profile | 起点 | 確認対象 |
 |---|---|---|---|---|
-| case-1 | normal | related | 要件（解析品質 REQ） | 直結参照のみの基線。一般参照で到達する AG SPEC のみ（ファイル層は索引役割で除外） |
+| case-1 | normal | related | 要件（解析品質 REQ） | 直結参照のみの基線。一般参照で到達する AG Design のみ（ファイル層は索引役割で除外） |
 | case-2 | amplification | related | 要件（解析品質 REQ） | README 経由の既知の候補増幅の再現（索引・集約成果物ファンアウト） |
-| case-3 | amplification | related | SPEC（agentdev-artifact-graph） | SPEC 索引経由の増幅。委譲元 extension（delegates_to のカタログ意味定義）と拡張関係（extends）の参加 |
+| case-3 | amplification | related | Design（agentdev-artifact-graph） | Design 索引経由の増幅。委譲元 extension（delegates_to のカタログ意味定義）と拡張関係（extends）の参加 |
 | case-4 | semantic-separation | impact | 要件（解析品質 REQ） | 変更影響関係の到達点はファイル層（索引役割）のみ → 正常な空結果。一般参照の誤通過なし |
 | case-5 | semantic-separation | impact | Decision（superseded 済み Decision） | supersedes の変更影響なし（TIM カタログ確定値）→ 正常な空結果。README 増幅の排除 |
 | case-6 | semantic-separation | dependency | extension（委譲元 workflow extension） | delegates_to / extends の依存意味（カタログ意味定義から導出）による依存先の特定 |
@@ -93,7 +93,7 @@ bun effectiveness/candidate_limit/run.ts --root ../../../../../.. --graph ../../
    （TIM 4層分離 Decision の拘束。本サブスイートの上限適用は順序付けと件数制限のみを行う）
 
 現在の標準上限値は 12 である（TIM 語彙カタログ置換後の再計測に基づく決定値。
-recommended_standard_limit 実測値 9、決定手順と決定根拠は AG SPEC
+recommended_standard_limit 実測値 9、決定手順と決定根拠は AG Design
 「標準候補数上限の決定手順」節、期待出力の差異は
 candidate-limit-tim-catalog-diff-20260818.md を参照）。
 
@@ -106,7 +106,7 @@ candidate-limit-tim-catalog-diff-20260818.md を参照）。
 カタログ定義（augmentation の意味定義・役割宣言を含む）を変更した場合は本回帰を再実行して
 期待出力の差異を文書化する（代表質問回帰検証の合格基準に準拠）。
 拡張関係型は augmentation 内に意味定義を宣言しない限り高位問い合わせに参加しない
-（TIM 語彙カタログ SPEC「意味の自動推定の禁止」）。
+（TIM 語彙カタログ Design「意味の自動推定の禁止」）。
 
 ## 対象外
 
@@ -119,6 +119,6 @@ candidate-limit-tim-catalog-diff-20260818.md を参照）。
 
 - [REQ-{NNNN}](../../../../../../../docs/requirements/REQ-{NNNN}.md) — 代表質問回帰検証、候補数上限回帰の接続（解析品質 REQ）
 - [REQ-{NNNN}](../../../../../../../docs/requirements/REQ-{NNNN}.md) — 高位問い合わせ、候補数上限、候補過多時動作（Trace Query REQ）
-- AG SPEC「高位問い合わせプロファイル」節 — 共通規則、標準上限値の決定手順と決定値
-- TIM 語彙カタログ SPEC — 関係意味の正規定義（本サブスイートの意味源泉）
+- AG Design「高位問い合わせプロファイル」節 — 共通規則、標準上限値の決定手順と決定値
+- TIM 語彙カタログ Design — 関係意味の正規定義（本サブスイートの意味源泉）
 - 親 [effectiveness/README.md](../README.md) — 代表質問回帰検証（REQ-{NNNN}-003）

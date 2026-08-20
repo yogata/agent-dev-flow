@@ -4,7 +4,7 @@
 標準版（GitHub 版）の操作契約（[../../skills/agentdev-gh-cli/references/contracts.md](../../../skills/agentdev-gh-cli/references/contracts.md)）と手続き名、引数、戻り値を一致させる。対象リソースが GitHub Issue/PR から Case ファイル（`.agentdev/cases/case-{NNNN}.md`）に読み替わる点のみが相違である。
 ローカル版（Case ファイル版）の具体的実装手順は [local-procedures.md](local-procedures.md) 参照。
 
-Case ファイルのスキーマ、status enum、見出し一覧は [../case-schema/case-file.md](../case-schema/case-file.md) 参照（操作用定義）。意味仕様の正本は SPEC [local/local-case-file.md](../../../../../docs/specs/local/local-case-file.md) である。
+Case ファイルのスキーマ、status enum、見出し一覧は [../case-schema/case-file.md](../case-schema/case-file.md) 参照（操作用定義）。意味仕様の正本は Design [local/local-case-file.md](../../../../../docs/designs/local/local-case-file.md) である。
 
 ## I/O 手続き
 
@@ -51,11 +51,11 @@ Case ファイルのスキーマ、status enum、見出し一覧は [../case-sch
 
 | 項目 | 内容 |
 |---|---|
-| 入力 | Case 番号、PR 本文（Markdown。`## マージ前確認`、`## SPEC確定候補`、`## Findings / Capture候補` を含む）、ベースブランチ（記録用、省略可）、ヘッドブランチ（記録用、省略可） |
+| 入力 | Case 番号、PR 本文（Markdown。`## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補` を含む）、ベースブランチ（記録用、省略可）、ヘッドブランチ（記録用、省略可） |
 | 出力 | Case 番号、Case ファイルパス（PR URL に代わる一意識別子） |
-| エラー扱い | Case ファイルの書き込みに失敗した場合は失敗。必須セクション（`## SPEC確定候補`、`## Findings / Capture候補`）が欠落している場合は失敗 |
+| エラー扱い | Case ファイルの書き込みに失敗した場合は失敗。必須セクション（`## Design確定候補`、`## Findings / Capture候補`）が欠落している場合は失敗 |
 | 後続 | VERIFY（[verify.md](verify.md)）を直後に実行 |
-| 読替先 | Case ファイルに `## マージ前確認`、`## SPEC確定候補`、`## Findings / Capture候補`（`### intake`/`### learning` サブ見出し含む）を追記 |
+| 読替先 | Case ファイルに `## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補`（`### intake`/`### learning` サブ見出し含む）を追記 |
 | 備考 | PR 関連手続きをスキップせず、Case ファイル上の対応セクションで代置する（REQ-0150-002） |
 
 ### PR 本文読込（ローカル版: PR 相当セクション読込）
@@ -63,7 +63,7 @@ Case ファイルのスキーマ、status enum、見出し一覧は [../case-sch
 | 項目 | 内容 |
 |---|---|
 | 入力 | Case 番号 |
-| 出力 | Case ファイルの PR 相当セクション（`## マージ前確認`、`## SPEC確定候補`、`## Findings / Capture候補`）の Markdown |
+| 出力 | Case ファイルの PR 相当セクション（`## マージ前確認`、`## Design確定候補`、`## Findings / Capture候補`）の Markdown |
 | エラー扱い | Case ファイルが存在しない、または必須セクションが存在しない場合は失敗 |
 
 ### PR merge（ローカル版: マージ結果記録）

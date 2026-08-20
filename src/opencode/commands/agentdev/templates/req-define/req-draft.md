@@ -8,7 +8,7 @@ source_rus: # optional: RU-* IDs that seeded this draft
 
 <!-- req_draft テンプレート
  このテンプレートは req-define が生成する構造化引き継ぎ成果物の原本である。
- 後続工程（req-save/ spec-save/ case-open/ case-auto/ case-run/ case-close）が参照する
+ 後続工程（req-save/ design-save/ case-open/ case-auto/ case-run/ case-close）が参照する
  原本の情報源は # draft-data 内の YAML コードブロックであり、人間可読 Markdown セクションではない。
  soft contract（生成元側標準）であり、LLM 推論経由で消費される。
  厳格なスキーマバージョン、JSON Schema、バリデータは導入しない。 -->
@@ -46,15 +46,15 @@ agreed_items:
   - id: AG-{NNN}
     content: {合意された要件内容の本文}
 
-# artifact_actions: REQ/Decision/SPEC への保存対象を成果物別ではなく1つの配列に統合
+# artifact_actions: REQ/Decision/Design への保存対象を成果物別ではなく1つの配列に統合
 # 1 action = 1 artifact × 1 editing concern（REQ-ID 単位でも箇条書き1行単位でもない）
 # 同一関心の複数 agreed items は単一 action に複数段落の content としてまとめる
 artifact_actions:
   - id: ACT-REQ-{NNN}           # ACT-{ARTIFACT}-{NNN}
-    artifact: req               # req / decision / spec
-    operation: create           # REQ/Decision: create / append / update、SPEC: create / update
-    target: new:{topic-slug}    # REQ/Decision: file path または new:{slug}。SPEC は target_spec 構造化推奨
-    target_area: # artifact: spec の場合、operation: update/spec-update では必須（対象セクション見出し）。operation: create/spec-create および req/decision では任意
+    artifact: req               # req / decision / design
+    operation: create           # req / decision / design とも create / append / update の3値（別名は持たない）
+    target: new:{topic-slug}    # REQ/Decision: file path または new:{slug}。Design は target_design 構造化推奨
+    target_area: # artifact: design の場合、operation: update では必須（対象セクション見出し）。operation: create、operation: append（anchor 指定時）、req/decision では任意
     source_items: [AG-{NNN}, AG-{NNN}] # 対応する agreed_item ID の list
     content: |                  # 保存対象の full text
       {保存対象の本文}
@@ -65,14 +65,14 @@ artifact_actions:
     source_items: [AG-{NNN}]
     content: |
       {保存対象の本文}
-  - id: ACT-SPEC-{NNN}            # SPEC 保存対象（artifact: spec）が含まれる場合 spec-save が実行される
-    artifact: spec
-    operation: create           # SPEC: create / update
-    target_spec:                # SPEC 操作は target_spec 構造化推奨（operation, domain, slug）。target: file path との併用も可
+  - id: ACT-DESIGN-{NNN}            # Design 保存対象（artifact: design）が含まれる場合 design-save が実行される
+    artifact: design
+    operation: create           # create / append / update の3値（spec-create 等の旧別名、design-create 等の新別名は出力しない・受理しない）
+    target_design:                # Design 操作は target_design 構造化推奨（operation, domain, slug）。target: file path との併用も可
       operation: create         # create / update
-      domain: foundations       # docs/specs/{domain}/ の domain（foundations/responsibilities/quality/integrity/local/authoring/commands/skills/workflows）
-      slug: {topic-slug}        # ファイル名 slug（docs/specs/{domain}/{slug}.md を作成）
-    target_area: # operation: create/spec-create では任意、operation: update/spec-update では必須（対象セクション見出し）
+      domain: foundations       # docs/designs/{domain}/ の domain（foundations/responsibilities/quality/integrity/local/authoring/commands/skills/workflows）
+      slug: {topic-slug}        # ファイル名 slug（docs/designs/{domain}/{slug}.md を作成）
+    target_area: # operation: create では任意、operation: update では必須（対象セクション見出し）、operation: append では anchor 見出し（placement: tail / after_anchor / before_anchor を併記可）
     source_items: [AG-{NNN}]
     content: |
       {保存対象の本文}
@@ -89,13 +89,13 @@ operation_units:
   - ou_id: OU-{NNN}
     source_ru: # optional: 元 RU-ID
     target_req: REQ-{NNNN}      # REQ 操作の対象 REQ
-    target_spec: # optional: SPEC 操作の対象 SPEC パス（例: docs/specs/{domain}/<existing-spec>.md、新規は target_spec: {operation, domain, slug} 構造化）
-    operation: create           # create / append / update（SPEC 操作は spec-create / spec-update も可・後方互換）
+    target_design: # optional: Design 操作の対象 Design パス（例: docs/designs/{domain}/<existing-design>.md、新規は target_design: {operation, domain, slug} 構造化）
+    operation: create           # create / append / update の3値（別名は持たない）
     scale: standard             # standard / large
     depends_on: []              # 実在する ou_id を参照
     recommended_order: 1
     issue_policy: single        # single / epic
-    result: {}                  # req-save / spec-save / case-open が書き戻す。req-define は空を出力
+    result: {}                  # req-save / design-save / case-open が書き戻す。req-define は空を出力
 
 # test_strategy: 各合意項目（AG-*）の検証方法。各項目は3要素（verification / pass_criteria / on_failure）を必須とする
 # on_failure（不合格時の処置）を持たない検証項目は test_strategy に含めないこと（REQ）

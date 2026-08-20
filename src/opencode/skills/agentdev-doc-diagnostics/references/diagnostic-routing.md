@@ -9,16 +9,16 @@ inspect-docs command が実行する docs 横断診断のうち、専門診断�
 |----------|--------------|----------------|----------------|
 | REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT | `agentdev-req-structure-diagnostics` | 横断的に複数 REQ を比較し、シグナルを抽出してルーティング | 該当なし（常に委譲） |
 | REQ 参照 ID 整合性、第一参照導線、現行/廃止/世代境界 | `agentdev-req-structure-diagnostics` | 横断スキャンで対象を特定し、ルーティング | 該当なし（常に委譲） |
-| SPEC 分離基準違反（HOW 詳細残留） | `agentdev-req-structure-diagnostics`（MOVE 観点） | 要件行のシグナル抽出（`diagnostic-categories.md` 参照）、安定契約例外判定の補助 | 該当なし（常に委譲） |
+| Design 分離基準違反（HOW 詳細残留） | `agentdev-req-structure-diagnostics`（MOVE 観点） | 要件行のシグナル抽出（`diagnostic-categories.md` 参照）、安定契約例外判定の補助 | 該当なし（常に委譲） |
 | 配布物 ID 汚染（`配布物ルート` の内部 ID 残留） | `agentdev-req-structure-diagnostics` | 横断スキャンで検出、ルーティング | 該当なし（常に委譲） |
 | 配布物統合性（構文健全性、文意保持、責務整合） | `agentdev-req-structure-diagnostics` | 対象範囲の特定、ルーティング | 該当なし（常に委譲） |
 
-配布物統合性の構文健全性には docs-spec-rebuild-integrity SPEC が定義する5パターン（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）が含まれる。
+配布物統合性の構文健全性には docs-spec-rebuild-integrity Design が定義する5パターン（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）が含まれる。
 存在しない command 参照は README listing と command 本文の相互参照について存在しない command を指す参照を検出し、エンコーディング不整合は UTF‑8 BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出する。
 実在する command 参照、BOM なし UTF‑8 かつ単一改行コードで構成されたファイルは検出対象外である。
-判定基準の詳細、検出手順、報告例は docs-spec-rebuild-integrity SPEC（extension 経由）と `agentdev-req-structure-diagnostics` が所有する。
+判定基準の詳細、検出手順、報告例は docs-spec-rebuild-integrity Design（extension 経由）と `agentdev-req-structure-diagnostics` が所有する。
 本スキルは横断スキャンで対象範囲を特定し、ルーティングする。
-| SPEC 三層構造違反（commands/skills/workflows 層分離） | `agentdev-req-structure-diagnostics` | 横断的に SPEC を比較、シグナル抽出、ルーティング | 該当なし（常に委譲） |
+| Design 三層構造違反（commands/skills/workflows 層分離） | `agentdev-req-structure-diagnostics` | 横断的に Design を比較、シグナル抽出、ルーティング | 該当なし（常に委譲） |
 | 文意品質（LLM っぽい表現、空虚な形容/動詞、英語混じり表現） | `agentdev-doc-writing` | 横断スキャンで検出、ルーティング | 該当なし（常に委譲） |
 | 実行主体分類の誤認（command を skill と呼ぶ等） | `agentdev-doc-writing`（doc-writing 査読観点） | 横断スキャンで検出、ルーティング | 該当なし（常に委譲） |
 | Command/Skill 参照妥当性、Skill 構造 | `agentdev-inspect-skills`（独立 inspect-* 対象） | ルーティングしない（独立コマンド `inspect-skills` の対象） | inspect-docs からはルーティングせず、独立実行を促す |
@@ -27,8 +27,8 @@ inspect-docs command が実行する docs 横断診断のうち、専門診断�
 
 ### 1. 横断編成は本スキルが所有
 
-複数文書種別にまたがる診断カテゴリ（廃止 REQ/SPEC 由来記述残置、REQ/SPEC 境界違反、REQ 粒度過小、横断契約矛盾）は本スキルが横断的にスキャンし、シグナルを抽出する（`diagnostic-categories.md` 参照）。
-個別 REQ/ADR/SPEC の内部診断は専門 skill へルーティングする。
+複数文書種別にまたがる診断カテゴリ（廃止 REQ/Design 由来記述残置、REQ/Design 境界違反、REQ 粒度過小、横断契約矛盾）は本スキルが横断的にスキャンし、シグナルを抽出する（`diagnostic-categories.md` 参照）。
+個別 REQ/ADR/Design の内部診断は専門 skill へルーティングする。
 
 ### 2. 専門診断の再定義禁止
 
@@ -63,12 +63,12 @@ inspect-docs Workflow Skill（`agentdev-workflow-inspect-docs`）の各工程は
 | REQ 参照ID整合性確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
 | 第一参照導線確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
 | 現行/廃止/世代境界確認 | 横断スキャンで対象特定 | `agentdev-req-structure-diagnostics` |
-| SPEC 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-req-structure-diagnostics`（詳細は委譲） |
+| Design 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-req-structure-diagnostics`（詳細は委譲） |
 | Decision 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-req-structure-diagnostics`（詳細は委譲） |
 | guides 意味診断 | 横断契約矛盾の抽出（本スキル直接判定） | `agentdev-doc-writing`（文意品質） |
 | README 索引診断 | 索引の範囲超過の抽出（本スキル直接判定） | 該当なし（本スキル直接判定） |
 | REQ structure review（6観点） | 横断比較でシグナル抽出 | `agentdev-req-structure-diagnostics` |
-| 文書分類一貫性検査 | 横断スキャンで SPEC 分離基準違反シグナル抽出 | `agentdev-req-structure-diagnostics`（MOVE 観点） |
+| 文書分類一貫性検査 | 横断スキャンで Design 分離基準違反シグナル抽出 | `agentdev-req-structure-diagnostics`（MOVE 観点） |
 
 ### 「配布物整合性検査・route 判定」工程（`agentdev-workflow-inspect-docs/references/distribution-check-and-output.md`）
 
@@ -83,7 +83,7 @@ inspect-docs Workflow Skill（`agentdev-workflow-inspect-docs`）の各工程は
 
 | skill | 専門領域 | 本スキルとの境界 |
 |-------|----------|------------------|
-| `agentdev-req-structure-diagnostics` | REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、REQ 参照 ID 整合性、配布物統合性、SPEC 三層構造 | 本スキルは横断スキャン、シグナル抽出、ルーティングのみ。判定ロジック、シグナル閾値、出力 schema（7フィールド）は再定義しない |
+| `agentdev-req-structure-diagnostics` | REQ 固有 SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断、REQ 参照 ID 整合性、配布物統合性、Design 三層構造 | 本スキルは横断スキャン、シグナル抽出、ルーティングのみ。判定ロジック、シグナル閾値、出力 schema（7フィールド）は再定義しない |
 | `agentdev-doc-writing` | 文意品質（LLM 表現、空虚語、英語混じり）、実行主体分類、機械的置換辞書 | 本スキルは横断スキャンで検出、ルーティングのみ。判定辞書、書き換え辞書は再定義しない |
 
 境界違反を検出した場合（本スキルが専門診断を再定義している、専門 skill が横断編成を所有している等）は stop-and-fix で即時修正する。

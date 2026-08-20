@@ -129,7 +129,7 @@ adapter skill 経由の委譲は、case-run に限らず subagent 委譲する�
 
 ### `writing` category の発火スキルとの相互作用
 
-`writing` category は執筆作業（docs 記述、article 作成、REQ/ ADR/ SPEC 本文執筆等）を想定した category であり、`japanese-tech-writing` 等の発火スキルと結合する設計である。
+`writing` category は執筆作業（docs 記述、article 作成、REQ/ ADR/ Design 本文執筆等）を想定した category であり、`japanese-tech-writing` 等の発火スキルと結合する設計である。
 事務的手続きの委譲に `writing` を使用すると、subagent が発火スキルの文書監査・校正的振る舞いに引きずられ、本来責務（Issue 作成、VERIFY、状態遷移等）から逸脱するリスクがある。
 
 Issue #1538 では case-auto から case-open を `category=writing` で委譲した際、subagent が文書監査ファイル生成（`japanese-audit`、`replacement-dictionary` 等、case-open 責務外）と draft 作成（`.agentdev/drafts/` 配下）へ逸脱した。
@@ -148,7 +148,7 @@ Issue #1538 では case-auto から case-open を `category=writing` で委譲�
 adapter skill 経由の委譲（case-run からの実行担当サブエージェント委譲を含む）は、以下を満たす:
 
 - **category 選定**: 委譲先 command の責務と category 名の意味的距離を評価し、誤誘導しない category を選定する。事務的手続きには `unspecified-high` を推奨し、`writing` は執筆作業のみに限定する
-- **MUST NOT DO 必須**: 委譲 prompt に MUST NOT DO セクションを必須で記載する。当該 command 責務外のファイル作成、REQ/ SPEC/ src の直接修正、文書監査の実施、capture 境界を超える `.agentdev/` 直接変更等を列挙する
+- **MUST NOT DO 必須**: 委譲 prompt に MUST NOT DO セクションを必須で記載する。当該 command 責務外のファイル作成、REQ/ Design/ src の直接修正、文書監査の実施、capture 境界を超える `.agentdev/` 直接変更等を列挙する
 - **プロンプトテンプレート**: category 選定基準と MUST NOT DO 記載要件を統合した形式とし、特定 command 名と category 名の意味的距離が大きい場合の注意事項を含む
 
 adapter skill は本要件を宣言的に定義し、case-run からの委譲 prompt 構築時に参照される。

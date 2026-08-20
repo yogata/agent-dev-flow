@@ -19,7 +19,7 @@ AgentDevFlow は次を所有する（DEC-001 決定1）。
 
 要求の形成と合意。
 事実調査とユーザー意思決定の分離。
-REQ/Decision/SPEC 等の成果物責任分界。
+REQ/Decision/Design 等の成果物責任分界。
 実行可能な作業単位の形成。
 Issue/PR/Case 間の工程接続。
 SSoT の移行。
@@ -62,7 +62,7 @@ AgentDevFlow は必要能力と標準方針を定義できる。
 
 ### 新規統制追加の原則
 
-新しい REQ/Decision/SPEC/command/skill/state/schema/gate/必須 field/checker を追加しないことを既定とする（DEC-001 決定4）。
+新しい REQ/Decision/Design/command/skill/state/schema/gate/必須 field/checker を追加しないことを既定とする（DEC-001 決定4）。
 追加を提案する場合は、次の7条件を全て立証する。
 
 再現可能または複数回観測された問題がある。
@@ -77,6 +77,6 @@ AgentDevFlow は必要能力と標準方針を定義できる。
 
 ## 利用者の読み方
 
-個別の REQ/Decision/SPEC/command/skill/template/script は、本 charter の原則へ照らして位置づく。
+個別の REQ/Decision/Design/command/skill/template/script は、本 charter の原則へ照らして位置づく。
 「この統制は本当に必要か」を判断する際は、まず hard governance の8点に該当するか、次に新規統制追加の7条件を立証できるかを検討する。
 該当しない場合は guidance・finding・reference へ降格する候補とする。

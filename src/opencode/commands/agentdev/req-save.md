@@ -62,7 +62,7 @@ OpenCode 1.18.15 は skill 直接起動を機械的に防止できないため�
 - REQ番号は連番・一意とする（空き番号の再利用は `agentdev-req-file-manager` 採番規則に従う）
 - ドラフトの status 更新（`saved`）は commit/push より前に実施し、commit 対象に含める（push 後の status 更新は永続化されないため）
 - `git pull --ff-only` 後は読込時 hash と pull 後 hash の一致を検証し、不一致時は評価・承認をやり直す。pull 前にローカル変更チェックを行う
-- Decision保存の直前に妥当性を再検証する: Decision が技術判断（アーキテクチャ上の決定）を含むか確認し、REQ/SPEC 相当の内容のみの場合は保存を停止して理由を報告する。`agentdev-decision-guidelines` の判定結果を前提とし、`agentdev-decision-file-manager` の採番ルール（既存最大番号 + 1、欠番埋めは行わない）で番号を確定する。draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を当該確定番号で置換する
+- Decision保存の直前に妥当性を再検証する: Decision が技術判断（アーキテクチャ上の決定）を含むか確認し、REQ/Design 相当の内容のみの場合は保存を停止して理由を報告する。`agentdev-decision-guidelines` の判定結果を前提とし、`agentdev-decision-file-manager` の採番ルール（既存最大番号 + 1、欠番埋めは行わない）で番号を確定する。draft 内の全 Decision 参照（`new:{topic-slug}` 形式）を当該確定番号で置換する
 - 成果物本文（Issue本文、PR本文、commit message、保存対象ファイル本文、テンプレート成果物）は verbatim で返す。判定結果、調査過程、中間ログ、読解メモは要約、成果物パス、根拠、親判断事項、capture候補へ圧縮して返す
 - capture は原則非関与とし、REQ 再構成 intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成する。deviation capture（req-save 実行中に実観測した deviation）は Skill（`agentdev-learning-capture` または `agentdev-intake-pipeline`）への委譲で実施する（capture 境界（capture-boundaries）は `agentdev-workflow-orchestration` 参照）
 

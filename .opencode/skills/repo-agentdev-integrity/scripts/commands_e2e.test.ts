@@ -292,7 +292,7 @@ const EXPECTED_COMMANDS = [
   "learning-promote",
   "req-define",
   "req-save",
-  "spec-save",
+  "design-save",
 ];
 
 // agentdev-prefixed references that are valid skills (not commands).
@@ -304,7 +304,7 @@ const VALID_SKILL_REFS = new Set([
 const COMMAND_COUNT = EXPECTED_COMMANDS.length;
 
 // Pipeline definitions
-const REQ_CASE_PIPELINE = ["req-define", "req-save", "spec-save", "case-open", "case-run", "case-update", "case-close"];
+const REQ_CASE_PIPELINE = ["req-define", "req-save", "design-save", "case-open", "case-run", "case-update", "case-close"];
 const LEARNING_PIPELINE = ["learning-promote"];
 const INTAKE_PIPELINE = ["intake-capture", "intake-from-github", "intake-promote"];
 

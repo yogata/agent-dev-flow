@@ -126,7 +126,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 - **STEP-S3-4 docs/** 変更時の targeted docs guard: PR 対象ファイルに docs/** 変更を含む場合、委譲前に targeted docs guard を行う（`bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow case-run --base-ref <ベース> --json`、変更ファイルは worktree 内の git diff から取得。モード使い分けの標準は コミット前の worktree 上での検証 = `--base-ref`、コミット後・PR 作成後の main 環境 = `--files`。PowerShell で `--files` に複数パスを渡す場合は配列変数経由または個別渡しとし、引用符まとめ渡しは使用しない）。docs/** 変更を含まない PR ではスキップする。検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` に `### docs-integrity` 小見出しで記録する（実行担当サブエージェント責務）
 - **STEP-S3-5 配布依存境界の事前委譲チェック（オプション）**: PR 対象ファイルに `src/opencode/{commands,skills}/**` 変更を含む場合、委譲前に事前チェックを実施できる。本チェックは予備的であり、本式の最終 gate は STEP-S5（実装後）で実行される。事前チェックで違反を検出した場合は委譲プロンプトで実行担当サブエージェントに引き渡す
 
-**case-run が使用する検査ツール**（integrity 契約 SPEC「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、docs/** 変更を含む場合に委譲前に実行）、check_extensions.ts（`.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/SKILL.md`、`.opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source、STEP-S5 で実装後 worktree の実際の配布ソース面を検査）、test_strategy（Issue 完了条件検証）
+**case-run が使用する検査ツール**（integrity 契約 Design「Workflow × 使用ツールマトリックス」参照）: check_changed_docs.ts（--workflow case-run、docs/** 変更を含む場合に委譲前に実行）、check_extensions.ts（`.opencode/commands/agentdev/**/*.md`、`.opencode/skills/agentdev-*/SKILL.md`、`.opencode/skills/agentdev-*/references/**/*.md`、`.agentdev/extensions/**` のいずれかを変更した場合に実行）、check_distribution_boundary.ts（--profile source、STEP-S5 で実装後 worktree の実際の配布ソース面を検査）、test_strategy（Issue 完了条件検証）
 
 **checker コマンドの stdout 退避形式**: 上記 checker コマンドは exit code が意味を持つコマンド（非ゼロ exit = 違反検出等の観測対象）であるため、実行と stdout 取得は `agentdev-gh-cli` READ 手続きの「exit code が意味を持つコマンドの stdout 退避形式」に従う（`spawnSync` による status/ stdout 分離取得 + `fs.writeFileSync` の UTF‑8 明示書き出し）。
 非ゼロ exit 時も JSON レポート（stdout）を Evidence として保持し、`>` リダイレクトや PowerShell 変数格納で退避しない。
@@ -167,7 +167,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 ### Procedure
 
 - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
-- 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness 側の責務であり（charter 原則、harness 分離モデル SPEC 参照）、case-run は関与しない
+- 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness 側の責務であり（charter 原則、harness 分離モデル Design 参照）、case-run は関与しない
 - **tmp/ 残存確認**: 当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことを確認する。残存時は `agentdev-gh-cli` の cleanup 規定に従って処理し、残存ファイルと対応結果を完了報告に明示する
 - 完了報告 template に従って出力する（実行担当サブエージェント result 状態、PR番号を含める）
 - 本 Step（worktree クリーンアップ）の開始時刻・終了時刻（JST）を記録し、worktree クリーンアップ時間を計測する。完了報告に L2 タイムスタンプ内訳（worktree 設定時間、実行担当サブエージェント実行時間、worktree クリーンアップ時間）を含める

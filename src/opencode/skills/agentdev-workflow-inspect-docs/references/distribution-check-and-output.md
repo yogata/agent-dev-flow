@@ -18,10 +18,10 @@
 
 ### STEP-3-1: 配布物整合性検査
 
-配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity SPEC（extension 経由）が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と SPEC 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する。
+配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）について、docs-spec-rebuild-integrity Design（extension 経由）が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損、存在しない command 参照、エンコーディング不整合）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と Design 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する。
 `agentdev-req-structure-diagnostics` 参照。
 
-存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity SPEC 構文健全性検査準拠）。
+存在しない command 参照の検出は、README listing と command 本文の相互参照について存在しない command を指す参照を検出事項とし、実在する command 参照は検出対象外とする（docs-spec-rebuild-integrity Design 構文健全性検査準拠）。
 
 エンコーディング不整合の検出は、配布物 Markdown の UTF-8 BOM 付きファイルと単一ファイル内の CRLF/LF 混在を検出事項とし、BOM なし UTF-8 かつ単一改行コードで構成されたファイルは検出対象外とする（同上）。
 
@@ -36,8 +36,8 @@
 ### STEP-4-1: 検出事項出力
 
 検出事項を `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md` へ出力する。
-source-of-truth priority: 現行 REQ > 承認済み ADR > SPEC > guides。
-NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity SPEC（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける。
+source-of-truth priority: 現行 REQ > 承認済み ADR > Design > guides。
+NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity Design（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける。
 
 ### STEP-4-2: 実行前同期（git pull --ff-only）
 
@@ -74,7 +74,7 @@ push 失敗時は同プロシージャの構造化エラー形式で停止する
 - `agentdev-doc-diagnostics`: finding 出力契約、NG 分類
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ
 - `agentdev-conventional-commits`: commit message 規約
-- `agentdev-project-extensions`: docs-spec-rebuild-integrity SPEC の extension 経由解決
+- `agentdev-project-extensions`: docs-spec-rebuild-integrity Design の extension 経由解決
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 

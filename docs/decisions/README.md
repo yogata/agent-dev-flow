@@ -6,7 +6,7 @@
 ## 現行 Decision
 
 基本原則、管理方式、リリース条件は DEC-001 を基準とする。
-個別 REQ/SPEC は憲章の原則へ照らして位置づく。
+個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
 現行の承認済み Decision は14件、提案中の Decision は3件である。
@@ -122,7 +122,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-005 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定 |
 | DEC-006 | supersedes | DEC-005 | inspect-extensions 廃止と extension 検査の3層責務分離を確定し、DEC-005 を置換 |
 | DEC-006 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定（inspect-extensions 廃止後の責務移管先） |
-| DEC-007 | supersedes-spec | docs/specs/local/artifact-graph.md | 現行 SPEC「対象外」節を撤回し、標準配布スキルへ昇格。後継 SPEC は docs/specs/skills/agentdev-artifact-graph.md |
+| DEC-007 | supersedes-spec | docs/designs/local/artifact-graph.md | 現行 Design「対象外」節を撤回し、標準配布スキルへ昇格。後継 Design は docs/designs/skills/agentdev-artifact-graph.md |
 | DEC-007 | relates-to | DEC-002 | 配布物原本は src/opencode/ へ配置する原則に従う |
 | DEC-008 | relates-to | DEC-001 | case-auto 自走境界（決定4）の適用範囲内で bounded parent decision resolution を確定 |
 | DEC-008 | relates-to | v2:ADR-0112, v2:ADR-0138 | case-auto 判断委譲に関する過去版合意履歴 |
@@ -189,7 +189,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | v2:ADR-0110 | DOC-MAP 採用判断 | accepted | 2026-06-08 |
 | v2:ADR-0112 | サブエージェント委譲の一般化と委譲時最小契約 | accepted | 2026-06-10 |
 | v2:ADR-0114 | case-run 実行責務の外部実行バックエンド委譲 | accepted | 2026-06-16 |
-| v2:ADR-0123 | SPEC ライフサイクルと spec-save の導入 | accepted | 2026-06-18 |
+| v2:ADR-0123 | Design ライフサイクルと design-save の導入 | accepted | 2026-06-18 |
 | v2:ADR-0124 | req_draft ソフトコントラクト原則: LLM推論消費・厳格スキーマなし | accepted | 2026-06-19 |
 | v2:ADR-0125 | case-auto Wave 内並列子Issue実行モデル | accepted | 2026-06-20 |
 | v2:ADR-0127 | case-auto 構成工程の委譲によるスケーラビリティ確立 | accepted | 2026-06-21 |
@@ -203,7 +203,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | v2:ADR-0136 | 配布物の harness 実行制御分離 | accepted | 2026-07-12 |
 | v2:ADR-0137 | case-auto における case-run インライン実行（多重委譲回避） | accepted | 2026-07-16 |
 | v2:ADR-0138 | case-auto オーケストレーション制御の AgentDevFlow 側集約 | accepted | 2026-07-19 |
-| v2:ADR-0139 | REQ/SPEC 意味分類と正規所有モデル | accepted | 2026-07-22 |
+| v2:ADR-0139 | REQ/Design 意味分類と正規所有モデル | accepted | 2026-07-22 |
 
 v2 の superseded / deprecated ADR（v2:ADR-0111、v2:ADR-0113、v2:ADR-0126）および v2.11.0 以前に物理削除された v2:ADR-0001〜0023 の詳細は tag v2.11.0 を参照のこと。
 

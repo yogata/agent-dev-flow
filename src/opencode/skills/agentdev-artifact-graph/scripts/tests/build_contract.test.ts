@@ -84,7 +84,7 @@ describe("TS-{NNN}: default indexed_paths (3 only) and node_types (3 only)", () 
     expect(manifest.relation_types).toEqual(SORTED_RELATION_TYPES)
   })
 
-  it("produces only default node types (requirement, decision, specification)", async () => {
+  it("produces only default node types (requirement, decision, design)", async () => {
     const fixture = await setup()
     await buildGraph(fixture)
     const nodes = await jsonLines(join(fixture.output, "nodes.jsonl"))
@@ -94,7 +94,7 @@ describe("TS-{NNN}: default indexed_paths (3 only) and node_types (3 only)", () 
     }
     expect(types.has("requirement")).toBe(true)
     expect(types.has("decision")).toBe(true)
-    expect(types.has("specification")).toBe(true)
+    expect(types.has("design")).toBe(true)
     expect(types.has("source_file")).toBe(false)
     expect(types.has("command")).toBe(false)
     expect(types.has("skill")).toBe(false)
@@ -121,7 +121,7 @@ describe("TS-{NNN}: works without project augmentation", () => {
     expect(checkReport.valid).toBe(true)
 
     const featureSpec = "feature.md"
-    const featureSpecNode = `specification:docs/specs/${featureSpec}`
+    const featureSpecNode = `design:docs/designs/${featureSpec}`
     const path = await queryGraph(graph, {
       kind: "path",
       source: REQ_001_NODE,

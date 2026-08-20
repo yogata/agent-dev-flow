@@ -149,7 +149,7 @@ pull 後 hash が pull 前 hash と不一致の場合:
 
 ### 適用宣言
 
-共有作業ツリーで git 操作を行う全 command（req-save, spec-save, case-open, case-close, learning-promote, backlog-review, intake-capture, intake-from-github, intake-promote, inspect-docs, inspect-skills, inspect-promote）は本プロシージャに従うこと。
+共有作業ツリーで git 操作を行う全 command（req-save, design-save, case-open, case-close, learning-promote, backlog-review, intake-capture, intake-from-github, intake-promote, inspect-docs, inspect-skills, inspect-promote）は本プロシージャに従うこと。
 各 command 側には規律の詳細本文ではなく、本プロシージャ名と停止条件のみを記述する。
 
 ---
@@ -548,7 +548,7 @@ rebase 基準は PR の squash merge 先と同一の統合先を参照する。
 ### 分岐
 
 - **rebase 自動解決時**: rebase が自動解決した場合は `git push --force-with-lease` で更新し、**squash merge（PR merge 手続き、`agentdev-gh-cli`）へ戻り再マージ**する
-- **rebase コンフリクト発生時**: rebase 自体がコンフリクトを発生した場合は実装変更を行わず、`git rebase --abort` で rebase を破棄し、**case-auto へエスカレーションして停止**する（コンフリクト解消モデル Level 2/3 は case-auto の責務、case-auto command SPEC のコンフリクト解消モデル Level 2/3 参照、extension 経由）。停止理由に「Level 1 rebase で解消不能、Level 2/3 へエスカレーション」を明記する
+- **rebase コンフリクト発生時**: rebase 自体がコンフリクトを発生した場合は実装変更を行わず、`git rebase --abort` で rebase を破棄し、**case-auto へエスカレーションして停止**する（コンフリクト解消モデル Level 2/3 は case-auto の責務、case-auto command Design のコンフリクト解消モデル Level 2/3 参照、extension 経由）。停止理由に「Level 1 rebase で解消不能、Level 2/3 へエスカレーション」を明記する
 
 ### 対象外
 

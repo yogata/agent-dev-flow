@@ -63,7 +63,7 @@ describe("TIM catalog: standard core vocabulary (REQ-{NNNN}-{NNN} series)", () =
   it("marks decision as the ADF-specific artifact type without a dedicated relation type (REQ-{NNNN}-{NNN})", () => {
     expect(DEFAULT_ARTIFACT_TYPE_SEMANTICS["decision"]?.origin).toBe("adf")
     expect(DEFAULT_ARTIFACT_TYPE_SEMANTICS["requirement"]?.origin).toBe("standard")
-    expect(DEFAULT_ARTIFACT_TYPE_SEMANTICS["specification"]?.origin).toBe("standard")
+    expect(DEFAULT_ARTIFACT_TYPE_SEMANTICS["design"]?.origin).toBe("standard")
     for (const name of Object.keys(DEFAULT_RELATION_SEMANTICS)) {
       expect(name).not.toContain("decision")
     }
@@ -132,7 +132,7 @@ describe("augmentation semantics boundary (REQ-{NNNN}-{NNN})", () => {
 
   it("rejects role declaration for standard core node types", () => {
     const augmentation: AugmentationFile = {
-      node_types: [{ name: "specification", path_pattern: "^docs/specs/.+\\.md$", role: "index" }],
+      node_types: [{ name: "design", path_pattern: "^docs/designs/.+\\.md$", role: "index" }],
     }
     expect(() => resolveConfig(augmentation)).toThrow(/owned by the TIM vocabulary catalog/)
   })

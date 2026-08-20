@@ -94,7 +94,7 @@ provenance の `extraction_rule` フィールドに記録される。
 |---|---|---|---|
 | requirement | `^docs/requirements/(REQ-\d+)\.md$` | `requirement:{match1}` | frontmatter title → first heading → filename stem |
 | decision | `^docs/decisions/(?:retired/)?(DEC-\d+)\.md$` | `decision:{match1}` | frontmatter title → first heading → filename stem |
-| specification | `^docs/specs/<(?!.*README\>.md$).+\.md$` | `specification:{path}` | frontmatter title → first heading → path |
+| design | `^docs/designs/<(?!.*README\>.md$).+\.md$` | `design:{path}` | frontmatter title → first heading → path |
 
 | 関係型 | fields | reverse |
 |---|---|---|

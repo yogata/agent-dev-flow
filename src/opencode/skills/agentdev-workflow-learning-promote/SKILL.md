@@ -14,16 +14,16 @@ learning-promote command は公開 interface（入出力契約・ガードレー
 ## 原本（SSoT）
 
 本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` SPEC が正規所有する。
+Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` Design が正規所有する。
 extension（`.agentdev/extensions/skills/agentdev-workflow-learning-promote.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と learning-promote command の公開契約のみを前提とする。SPEC ディレクトリの内部構成は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と learning-promote command の公開契約のみを前提とする。Design ディレクトリの内部構成は仮定しない
 2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
+3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 入力
@@ -48,7 +48,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-learning-promote.yaml
 ## Control Plane（STEP 一覧）
 
 learning-promote workflow は次の7 STEP で構成する。
-各 STEP は resume point を持ち（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する。
+各 STEP は resume point を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、会話コンテキストに依存せず、durable state（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -72,7 +72,7 @@ learning-promote workflow は次の7 STEP で構成する。
 ## Resume Protocol（durable state による再開）
 
 会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。
-優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
+優先順位は `<workflows/input-resolution-and-durable-state>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/learning/` 配下の inbox.md、deferred.md、evaluation-report.md、promoted/ の実ファイル状態
 2. identifier 保持: エントリ区切り（`---`）、問題クラス、採用済み成果物パス
@@ -99,7 +99,7 @@ HITL（STEP-5）の承認状態は単独では durable state に記録されな�
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
 - `agentdev-learning-pipeline`: inbox entry schema、正規化ルール、問題クラス分類基準、8軸評価ディメンション、evaluation-report schema、処分区分（11カテゴリ + duplicate）、既存対策照合、採用済み成果物スキーマ、prune 方針、deferred 移動の原子的操作契約。経路D の review 候補判断と内部手続き
-- `agentdev-adversarial-review`: 経路D の review 呼出（共通契約の正規所有者は adversarial-review SPEC、REQ-{NNNN}）
+- `agentdev-adversarial-review`: 経路D の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 
@@ -113,9 +113,9 @@ HITL（STEP-5）の承認状態は単独では durable state に記録されな�
 
 ## 共通制約
 
-- **無条件の自動REQ化禁止**: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/SPEC）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save`）を経て初めて REQ 化される
+- **無条件の自動REQ化禁止**: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/Design）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/req-save`）を経て初めて REQ 化される
 - **living pool 維持**: 昇華不能な知見（deferred 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。`deferred.md` は deferred カテゴリのエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である（AG-{NNN}）。終端保管ではなく、次回実行時に再評価の対象となる
-- **自律確定と HITL フォールバック**: 問題クラス分類、8軸評価、廃棄判定、昇華可能性、既存対策との関係の評価（STEP-2〜STEP-4）を経て、取得可能な根拠で処置を一意に確定できる項目はユーザー承認なしで確定し、ユーザー判断が必要な項目のみ HITL 対象とする。自律確定はユーザー承認の擬制ではなく、モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない。自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約SPEC `<workflows/workflow-contracts>`「promote系判断確定とHITL境界」節が集約所有し、本スキルは判定表を複製しない（extension 経由で解決）。deferred・未処理項目を自動削除しない既存の安全境界は自律確定によって迂回しない。自律確定項目の証跡（判定結果、主要根拠、HITL 不要理由）は evaluation-report.md 等の既存成果物を優先利用し、新規永続成果物を必須としない
+- **自律確定と HITL フォールバック**: 問題クラス分類、8軸評価、廃棄判定、昇華可能性、既存対策との関係の評価（STEP-2〜STEP-4）を経て、取得可能な根拠で処置を一意に確定できる項目はユーザー承認なしで確定し、ユーザー判断が必要な項目のみ HITL 対象とする。自律確定はユーザー承認の擬制ではなく、モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない。自律確定可否の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）は横断契約Design `<workflows/workflow-contracts>`「promote系判断確定とHITL境界」節が集約所有し、本スキルは判定表を複製しない（extension 経由で解決）。deferred・未処理項目を自動削除しない既存の安全境界は自律確定によって迂回しない。自律確定項目の証跡（判定結果、主要根拠、HITL 不要理由）は evaluation-report.md 等の既存成果物を優先利用し、新規永続成果物を必須としない
 - **prune 対象**: staged（採用済み成果物生成済み）/ rejected / duplicate のエントリのみ。deferred / 未処理のエントリは残す。staged エントリ除去時に採用済み成果物の「元learning item/ 根拠」セクションに証拠を保存する。STEP-5 の判定確定（自律確定またはユーザー承認）と同時に prune も承認済みとみなし、追加確認なしで削除する
 - **直接反映禁止**: 採用済み成果物は `.agentdev/learning/promoted/` のみに生成する。`.opencode/` 直接書込、`case-run` への直接受け渡しは禁止（`/agentdev/backlog-review` 経由のみ）
 - **evaluation-report.md**: 本 workflow が生成、管理する（外部コマンドの事前生成に依存しない）。毎回上書きされ長期履歴ではない
@@ -126,9 +126,9 @@ HITL（STEP-5）の承認状態は単独では durable state に記録されな�
 
 ## See Also
 
-- **`<workflows/workflow-skill-model>` SPEC**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` SPEC**: STEP reference 構造、resume point
-- **`<workflows/input-resolution-and-durable-state>` SPEC**: durable state 優先順位、current STEP 再構成
+- **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
+- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<workflows/input-resolution-and-durable-state>` Design**: durable state 優先順位、current STEP 再構成
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **learning-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

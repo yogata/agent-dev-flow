@@ -10,21 +10,21 @@ intake-promote command の workflow 実装本体。
 classification → review → HITL → persistence → destructive handling の各段階を独立 resume point として構成する。
 
 intake-promote command は公開 interface（入出力契約・ガードレール・分類値契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
-各 item の分類確定は、横断契約SPECの詳細判定表に基づき、取得可能な根拠から一意に確定できる item を自律確定し、ユーザー判断が必要な item のみを HITL 対象とする（後述「自律確定とHITL境界」）。
+各 item の分類確定は、横断契約Designの詳細判定表に基づき、取得可能な根拠から一意に確定できる item を自律確定し、ユーザー判断が必要な item のみを HITL 対象とする（後述「自律確定とHITL境界」）。
 
 ## 原本（SSoT）
 
 本スキルの原本仕様は SKILL.md（control plane）と `references/` 配下（各 STEP 詳細）が担う。
-Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` SPEC が正規所有する。
+Workflow Skill 固有契約（Command / Workflow Skill / Capability Skill 責務、1:N 分割基準、依存方向、配置契約）は `<workflows/workflow-skill-model>` Design が正規所有する。
 extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`）は標準 SKILL.md を前提とし、SKILL.md と重複しない補完情報のみを提供する。
 
 ## skill extension 参照方針
 
 本スキルは以下の方針に従う（ADR、`agentdev-skill-authoring` 準拠）。
 
-1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と intake-promote command の公開契約のみを前提とする。SPEC ディレクトリの内部構成は仮定しない
+1. **前提とする固定知識の範囲**: docs/ ディレクトリ構成（requirements/decisions/specs）と intake-promote command の公開契約のみを前提とする。Design ディレクトリの内部構成は仮定しない
 2. **extension の読込契約**: 呼び出し元 command から渡された解決済み文脈を優先し、不足分のみ skill extension を読む。reference ごとの extension は作らない
-3. **SPEC 内部パスの固定知識化の禁止**: extension に列挙されていない SPEC 内部パスを固定知識として参照しない
+3. **Design 内部パスの固定知識化の禁止**: extension に列挙されていない Design 内部パスを固定知識として参照しない
 4. **extension 未配置時の挙動**: skill extension が存在しない場合は標準動作で続行し、推測で docs を読みに行かない
 
 ## 入力
@@ -48,7 +48,7 @@ extension（`.agentdev/extensions/skills/agentdev-workflow-intake-promote.yaml`�
 ## Control Plane（STEP 一覧）
 
 intake-promote workflow は次の6 STEP で構成する。
-各 STEP は resume point を持ち（DEC-{N}、`docs/specs/<workflows/step-reference-contract>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した resume point である。
+各 STEP は resume point を持ち（DEC-{N}、`docs/designs/<workflows/step-reference-contract>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した resume point である。
 会話コンテキストに依存せず、durable state（inbox / promoted の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -70,9 +70,9 @@ intake-promote workflow は次の6 STEP で構成する。
 
 ## 自律確定とHITL境界
 
-各 item の分類確定は、横断契約SPEC（extension 経由で解決）「promote系判断確定とHITL境界」節の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）に基づいて行う。本スキルは詳細判定表を重複保持しない（DEC-{N}）。
+各 item の分類確定は、横断契約Design（extension 経由で解決）「promote系判断確定とHITL境界」節の詳細判定表（自律確定可能要件、HITL移送条件、判定と運用の共通規則）に基づいて行う。本スキルは詳細判定表を重複保持しない（DEC-{N}）。
 
-- **判定位置**（intake-promote command SPEC「自律確定の判定位置とHITLフォールバック」節）:
+- **判定位置**（intake-promote command Design「自律確定の判定位置とHITLフォールバック」節）:
   - classification（STEP-1）: 取得可能な根拠から採用・保留・却下を一意に確定できる item は自律確定候補とする
   - review（STEP-2）: 自律確定候補のうち対論型レビューが必要な item は review を経た後に確定する
   - HITL（STEP-3）: ユーザー判断が必要な item のみを HITL 対象とする（REQ-{NNNN}-{NNN}）
@@ -86,7 +86,7 @@ intake-promote workflow は次の6 STEP で構成する。
 ## Resume Protocol（durable state による再開）
 
 会話コンテキストを権威情報源とせず、durable state から current STEP を再構成する（DEC-{N}）。
-優先順位は `<workflows/input-resolution-and-durable-state>` SPEC に従う。
+優先順位は `<workflows/input-resolution-and-durable-state>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態
 2. identifier 保持: item ファイルパス、採用済み成果物パス
@@ -113,7 +113,7 @@ HITL（STEP-3）の承認状態は単独では durable state に記録されな�
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
 
 - `agentdev-intake-pipeline`: inbox 確認、Review 観点、分類提示形式、採用 item 整形、保存と振り分け、Git 永続化の判定基準。経路C の review 候補判断と内部手続き
-- `agentdev-adversarial-review`: 経路C の review 呼出（共通契約の正規所有者は adversarial-review SPEC、REQ-{NNNN}）
+- `agentdev-adversarial-review`: 経路C の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 
@@ -138,10 +138,10 @@ HITL（STEP-3）の承認状態は単独では durable state に記録されな�
 
 ## See Also
 
-- **`<workflows/workflow-contracts>` SPEC**: promote系判断確定とHITL境界の詳細判定表の集約所有者
-- **`<workflows/workflow-skill-model>` SPEC**: Workflow Skill 固有契約の正規所有者
-- **`<workflows/step-reference-contract>` SPEC**: STEP reference 構造、resume point
-- **`<workflows/input-resolution-and-durable-state>` SPEC**: durable state 優先順位、current STEP 再構成
+- **`<workflows/workflow-contracts>` Design**: promote系判断確定とHITL境界の詳細判定表の集約所有者
+- **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
+- **`<workflows/step-reference-contract>` Design**: STEP reference 構造、resume point
+- **`<workflows/input-resolution-and-durable-state>` Design**: durable state 優先順位、current STEP 再構成
 - **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
 - **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
 - **intake-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

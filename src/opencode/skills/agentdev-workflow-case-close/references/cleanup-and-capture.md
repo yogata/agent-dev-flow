@@ -92,7 +92,7 @@ worktree/branch 削除、親Epic 自動クローズ判定、実行前同期、Ca
 - **squash merge 済みの場合**: 当該 worktree が隔離されている（専用 worktree + branch で index が独立）場合のみ `git checkout .` で破棄可
 - **共有作業ツリー（main worktree）では `git checkout .` は禁止**（他セッション変更の無差別破壊）
 - 本 Step は worktree 削除フェーズ内の隔離 worktree でのみ実行する
-- **runtime workspace のクリーンアップは harness 側の責務**（charter 原則、harness 分離モデル SPEC 参照）、case-close は関与しない
+- **runtime workspace のクリーンアップは harness 側の責務**（charter 原則、harness 分離モデル Design 参照）、case-close は関与しない
 - worktree remove → Permission denied 時は停止（リトライは skill 定義に従う）
 - ローカルブランチ削除（squash merge 後の条件付き `-D` は skill 定義に従う）
 - リモートブランチ削除
@@ -234,5 +234,5 @@ GitHub 完了後に `.agentdev` push 失敗の場合は standard 種別を使用
 - G17（STEP-6-5 の commit は並列実行安全ステージングプロシージャに従い、明示パスでステージ、`git add` は `.agentdev/` 全体の一括スコープにしない）
 - 不変条件（STEP-6-6 は当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存なしを確認、残存時は cleanup 規定に従い処理して報告）
 - 不変条件（STEP-6-7 は結果状態を分離して報告、`.agentdev` push 失敗時は完了扱いにしない）
-- G21・不変条件（case-close の capture 責務は「回収・保存」、SPEC status 昇格は case-close の責務、SPEC 確定候補の処理は `## SPEC確定候補` を入力とし `## Findings / Capture候補` とは区別）
+- G21・不変条件（case-close の capture 責務は「回収・保存」、Design status 昇格は case-close の責務、Design 確定候補の処理は `## Design確定候補` を入力とし `## Findings / Capture候補` とは区別）
 - G27・不変条件（`git pull --ff-only` 実行前に worktree 状態・ref lock 競合・統合先以外のブランチ占有の3リスクを事前検出し代替同期手順を選択、同期対象は当該 Case の統合先ブランチ）

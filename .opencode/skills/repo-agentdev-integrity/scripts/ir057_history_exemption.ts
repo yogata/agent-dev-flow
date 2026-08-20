@@ -1,14 +1,14 @@
 /**
  * ir057_history_exemption.ts — IR-057 文書レベル履歴注記 exemption（Issue #1768）
  *
- * IR-057 SPEC「例外登録（現行ADRの履歴記載）」セクション（docs/specs/integrity/
+ * IR-057 Design「例外登録（現行ADRの履歴記載）」セクション（docs/designs/integrity/
  * rules/IR-057-obsolete-spec-path-after-domain-split.md）に基づく免除判定の
  * 純粋関数群。targeted guard（check_changed_docs.ts）と full audit
  * （check_integrity.ts）で同じ例外規則を使用する（REQ-0144-024）。
  *
  * 本モジュールは2層の免除判定を提供する:
- *   1. パス単位免除 `isIr057PathExempt` — SPEC exemption 表に基づくファイル単位の免除。
- *      旧SPEC直下パス検出と legacy vocabulary 検出の両方で共通使用する。
+ *   1. パス単位免除 `isIr057PathExempt` — exemption 表に基づくファイル単位の免除。
+ *      旧Design直下パス検出と legacy vocabulary 検出の両方で共通使用する。
  *   2. コンテンツ単位免除 `isFileLevelHistoryExempt` / `isIr057LineExempt` —
  *      ADR 文書レベル履歴注記、行レベル履歴マーカーによる免除。
  *
@@ -81,7 +81,7 @@ export function extractBodyBeforeFirstHeading(content: string): string {
  * 文書レベル履歴注記の条件1: frontmatter 終了直後から最初の見出しまでの本文が存在するか。
  * 空でないテキストがある場合に true。
  *
- * SPEC IR-057「例外登録」第一条件: frontmatter 終了直後から最初の見出し（`#` または
+ * IR-057 ルール「例外登録」第一条件: frontmatter 終了直後から最初の見出し（`#` または
  * `##`）までの本文が存在すること。当該本文は文書レベル履歴注記として扱い、文書全体が
  * 歴史経緯の記録であるとみなす。
  */
@@ -90,7 +90,7 @@ export function hasDocumentLevelHistoryNoteBody(content: string): boolean {
 }
 
 // 文書レベル履歴注記ブロックとして認識する定型フレーズ。
-// SPEC「例外登録」第二条件が例示する表現に加え、ADR-0131 で使用中の表現を含む。
+// IR-057 ルール「例外登録」第二条件が例示する表現に加え、ADR-0131 で使用中の表現を含む。
 const HISTORY_BLOCKQUOTE_PHRASES = [
   "本文書は歴史的経緯を記録する",
   "本 ADR は移行履歴を保持する",
@@ -105,7 +105,7 @@ const HISTORY_BLOCKQUOTE_PHRASES = [
 /**
  * 文書レベル履歴注記の条件2: 明示的な引用ブロック（`>` 起点行）による履歴注記が存在するか。
  *
- * SPEC IR-057「例外登録」第二条件: `> 本文書は歴史的経緯を記録する`、
+ * IR-057 ルール「例外登録」第二条件: `> 本文書は歴史的経緯を記録する`、
  * `> 本 ADR は移行履歴を保持する` 等の引用ブロック形式で、文書全体が歴史経緯の
  * 記録であることを示す注記を認識する。
  */
@@ -124,7 +124,7 @@ export function hasExplicitHistoryBlockQuote(content: string): boolean {
 /**
  * ADR ファイルが文書レベル履歴注記条件を満たすか（ファイル全体が歴史経緯の記録であるか）。
  *
- * SPEC IR-057「例外登録」: frontmatter `status` が `accepted` または `superseded`
+ * IR-057 ルール「例外登録」: frontmatter `status` が `accepted` または `superseded`
  * であり、かつ次のいずれかの文書レベル履歴注記条件を満たす ADR ファイルである。
  *   - 条件1: frontmatter 終了直後から最初の見出しまでの本文が存在
  *   - 条件2: 明示的な `>` 引用ブロック形式の履歴注記が存在
@@ -140,7 +140,7 @@ export function isAdrWithDocumentLevelHistoryNote(content: string): boolean {
   );
 }
 
-// SPEC「例外登録」セクションが列挙する行レベル marker（「廃止」以外は単独で歴史扱い）。
+// IR-057 ルール「例外登録」セクションが列挙する行レベル marker（「廃止」以外は単独で歴史扱い）。
 const PRIMARY_LINE_MARKERS = [
   "旧",
   "移行前",
@@ -150,7 +150,7 @@ const PRIMARY_LINE_MARKERS = [
   "deprecated",
 ];
 
-// 周辺文脈判定で補助的に使用する歴史経緯語彙。SPEC は「固定の語彙リストのみに依存せず、
+// 周辺文脈判定で補助的に使用する歴史経緯語彙。IR-057 ルールは「固定の語彙リストのみに依存せず、
 // 文書レベル注記、行レベル marker、周辺文脈で行う」と宣言するため、補助語彙を保持する。
 const CONTEXTUAL_LINE_MARKERS = [
   "移行後",
@@ -166,7 +166,7 @@ const CONTEXTUAL_LINE_MARKERS = [
 /**
  * 行が履歴経緯マーカーを含むか（文書レベル注記を満たさない ADR ファイル向け）。
  *
- * SPEC IR-057「例外登録」: 文書レベル履歴注記条件を満たさない ADR ファイルは、
+ * IR-057 ルール「例外登録」: 文書レベル履歴注記条件を満たさない ADR ファイルは、
  * 検出行が履歴マーカー（`旧`、`移行前`、`廃止`、`前提`、`historical`、`legacy`、
  * `deprecated`）を含む場合のみ免除する。現行機能の記述は検出対象とする。
  *
@@ -184,7 +184,7 @@ export function hasLineLevelHistoryMarker(line: string): boolean {
  * ファイル全体が歴史経緯の記録であるか（ファイル単位免除）。
  *
  * targeted guard（check_changed_docs.ts）と full audit（check_integrity.ts）で
- * 共通使用する。SPEC IR-057「例外登録（現行ADRの履歴記載）」セクション準拠。
+ * 共通使用する。IR-057 ルール「例外登録（現行ADRの履歴記載）」セクション準拠。
  *
  * ADR ファイル（`docs/adr/ADR-*.md`、retired 配下を除く）について文書レベル履歴注記
  * 条件を判定する。条件は frontmatter `status` が `accepted` または `superseded` であり、
@@ -220,44 +220,44 @@ export function isIr057LineExempt(
   return hasLineLevelHistoryMarker(line);
 }
 
-// ===== パス単位免除（IR-057 SPEC exemption 表、REQ-0144-024）=====
+// ===== パス単位免除（IR-057 exemption 表、REQ-0144-024）=====
 //
-// SPEC docs/specs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md
+// Design docs/designs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md
 // 「exemption（検出対象外）」セクションが列挙するファイルを免除する。
 // targeted guard（check_changed_docs.ts）と full audit（check_integrity.ts）で
 // 同一の免除集合を使用し、検出器間の判定乖離を防ぐ。
 
-// IR-046 / IR-048 / IR-057 ルールファイル。SPEC exemption 表が「IR-046、IR-048
+// IR-046 / IR-048 / IR-057 ルールファイル。exemption 表が「IR-046、IR-048
 // ルールファイル」「IR-057 ルール説明としての旧パス例」として列挙する。
 // ワイルドカードではなく正確なファイル名で列挙し、near-name が免除されないことを保証する。
 const IR_057_EXEMPT_RULE_FILES: ReadonlySet<string> = new Set([
-  "docs/specs/integrity/rules/IR-046-consumer-generated-repo-type-fp-prevention.md",
-  "docs/specs/integrity/rules/IR-048-generated-by-identifier-integrity.md",
-  "docs/specs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md",
+  "docs/designs/integrity/rules/IR-046-consumer-generated-repo-type-fp-prevention.md",
+  "docs/designs/integrity/rules/IR-048-generated-by-identifier-integrity.md",
+  "docs/designs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md",
 ]);
 
-// SPEC exemption 表が正規の参照文書として列挙する repo-relative exact paths。
+// exemption 表が正規の参照文書として列挙する repo-relative exact paths。
 const IR_057_EXEMPT_EXACT_PATHS: ReadonlySet<string> = new Set([
-  "docs/specs/integrity/obsolete-path-map.yaml",
-  "docs/specs/integrity/integrity-rule-catalog.md",
-  "docs/specs/integrity/rule-ownership.md",
+  ".opencode/skills/repo-agentdev-integrity/data/obsolete-path-map.yaml",
+  "docs/designs/integrity/integrity-rule-catalog.md",
+  "docs/designs/integrity/rule-ownership.md",
   "docs/requirements/REQ-009.md",
-  "docs/specs/local/runtime-package-boundary.md",
+  "docs/designs/local/runtime-package-boundary.md",
   "docs/guides/glossary.md",
   ".opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts",
 ]);
 
 // 検査スクリプトの skill ドキュメント・参照資料。
-// vocabulary-registry.md は SPEC exemption 表が明示する。SKILL.md および references/
+// vocabulary-registry.md は exemption 表が明示する。SKILL.md および references/
 // は検出ルールの説明・語彙対照表を含む正当な参照文書。
 const IR_057_EXEMPT_DETECTOR_DOCS = /^\.opencode\/skills\/repo-agentdev-integrity\/(SKILL\.md|references\/[^/]+\.md)$/;
 
 /**
- * IR-057 SPEC exemption 表に基づくパス単位免除判定（REQ-0144-024）。
+ * IR-057 exemption 表に基づくパス単位免除判定（REQ-0144-024）。
  *
  * `relPath`: repo-relative path。Windows 区切り (`\`) は正規化して受け取る。
  *
- * 以下を免除する（SPEC exemption 表に基づく）:
+ * 以下を免除する（exemption 表に基づく）:
  *   - `docs/requirements/retired/`, `docs/adr/retired/` 配下（履歴参照領域）
  *   - テスト fixture（`*.test.ts`）
  *   - `IR_057_EXEMPT_EXACT_PATHS` に列挙された正規参照文書
@@ -266,7 +266,7 @@ const IR_057_EXEMPT_DETECTOR_DOCS = /^\.opencode\/skills\/repo-agentdev-integrit
  *   - 検査スクリプト skill ドキュメント・参照資料（SKILL.md, references/*.md）
  *
  * これら以外は免除しない。削除済みの旧 local 生成 SPEC と旧 REQ は、
- * SPEC exemption 表に存在しないため免除対象外。
+ * exemption 表に存在しないため免除対象外。
  */
 export function isIr057PathExempt(relPath: string): boolean {
   const p = relPath.replace(/\\/g, "/");

@@ -6,17 +6,17 @@ context:
   - id: quality-gates
     when: "QG-1〜QG-4 品質ゲート参照時"
     paths:
-      - "docs/specs/quality/quality-gates.md"
+      - "docs/designs/quality/quality-gates.md"
     purpose: 品質ゲート定義と機械化境界の確認
   - id: document-model
     when: 文書モデル参照時
     paths:
-      - "docs/specs/foundations/document-model.md"
-    purpose: REQ/ADR/SPEC 責務マトリックスの確認
+      - "docs/designs/foundations/document-model.md"
+    purpose: REQ/ADR/Design 責務マトリックスの確認
   - id: req-health-metrics
     when: REQ 健全性メトリクス参照時
     paths:
-      - "docs/specs/quality/req-health-metrics.md"
+      - "docs/designs/quality/req-health-metrics.md"
     purpose: REQ 肥大化・関心ズレ検出の定量閾値確認
 
 rules: []

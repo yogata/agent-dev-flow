@@ -94,7 +94,7 @@ describe("high-level query profiles (TS-{NNN})", () => {
   it("dependency follows the depends-on direction of relations", async () => {
     const { graph, model } = await traceFixture()
     const result = runTraceQuery(graph, model, "dependency", SRC_NODE)
-    expect(candidateIds(result)).toEqual([REQ4_NODE, SPEC_NODE])
+    expect(candidateIds(result)).toEqual([SPEC_NODE, REQ4_NODE])
     expect(result.candidates[0]?.direction).toBe("incoming")
     expect(result.candidates[1]?.direction).toBe("incoming")
   })
