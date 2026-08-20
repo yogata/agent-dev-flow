@@ -1,9 +1,7 @@
 /**
  * Shared Project Extensions load-time state machine (distribution side).
  *
- * Canonical contract: docs/designs/foundations/project-extensions.md
- * "YAML 解析と構造検証の実装契約" (REQ-044, DEC-019).
- *
+ * Contract summary:
  * - YAML syntax parsing is delegated to Bun.YAML.parse. Parse exceptions
  *   are converted into ADF states (malformed); they never crash runtime
  *   processing directly.
@@ -156,7 +154,7 @@ function buildMalformedReasons(data: unknown, failedKeys: Set<string>): string[]
 
 /**
  * Load-time state classification shared by the runtime resolver contract
- * and the deterministic checker (UC-001 case 1). Judgment order matters:
+ * and the deterministic checker. Judgment order matters:
  * required field problems (malformed, fail-open at runtime) are judged
  * before the kind value; legacy and unknown kinds are only classified
  * once every required field is structurally present. Bun.YAML.parse

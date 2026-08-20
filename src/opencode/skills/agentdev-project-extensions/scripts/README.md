@@ -2,7 +2,7 @@
 
 Project Extensions の読込時状態機械（runtime resolver と deterministic checker の共有実装）。
 
-YAML 構文解析は `Bun.YAML.parse` へ委譲し、構造検証は Zod へ委譲する（REQ-044、DEC-019、基盤 Design「YAML 解析と構造検証の実装契約」）。
+YAML 構文解析は `Bun.YAML.parse` へ委譲し、構造検証は Zod へ委譲する。
 状態分類（missing / malformed / migration-required / schema-violation / valid）と旧kind・未知kind の意味判定は ADF 側に残留する。
 
 ## 構成
@@ -10,7 +10,7 @@ YAML 構文解析は `Bun.YAML.parse` へ委譲し、構造検証は Zod へ委�
 | パス | 役割 |
 |------|------|
 | `lib/extension_state.ts` | 共有実装。`parseExtensionYaml`（Bun.YAML 委譲）、`resolveExtensionState`（状態機械）、`validateExtensionEntries`（配列要素の構造検証） |
-| `tests/extension_state.test.ts` | TS-002 回帰ケース（構文エラー、必須フィールド欠落、旧kind、未知kind、有効、空入力、型不正、クォート内コロン・`#`、CRLF、入れ子、配列） |
+| `tests/extension_state.test.ts` | 回帰ケース（構文エラー、必須フィールド欠落、旧kind、未知kind、有効、空入力、型不正、クォート内コロン・`#`、CRLF、入れ子、配列） |
 
 保証 YAML 機能はマッピング、配列、文字列、数値、真偽値、null、入れ子構造、通常のクォート文字列に限定する。
 anchor、alias、カスタムタグ、複数ドキュメントは保証対象外である。

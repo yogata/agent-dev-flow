@@ -1,9 +1,7 @@
 /**
  * Regression tests for the shared extension load-time state machine.
  *
- * Covers the TS-002 cases required by docs/designs/foundations/
- * project-extensions.md "YAML 解析と構造検証の実装契約" (REQ-044,
- * DEC-019): YAML syntax error, missing required fields, legacy kind,
+ * Covered cases: YAML syntax error, missing required fields, legacy kind,
  * unknown kind, valid extension, empty input, type mismatch, colon/#
  * inside quotes, CRLF, nesting, arrays.
  *
@@ -21,7 +19,7 @@ import {
 const validDoc = (kind: string) =>
   `version: 1\nkind: ${kind}\nid: agentdev-workflow-demo\n\ncontext: []\nrules: []\nchecks: []\nacceptance_gates: []\nmust_not: []\n`;
 
-describe("parseExtensionYaml (Bun.YAML delegation, TS-004 availability evidence)", () => {
+describe("parseExtensionYaml (Bun.YAML delegation, availability evidence)", () => {
   test("Bun.YAML.parse is available and handles the guaranteed YAML scope", () => {
     const result = parseExtensionYaml(
       'num: 1\nstr: "x"\nplain: y\nflag: true\nnil: null\nlist: [1, a, "b"]\nnested:\n  - id: e1\n    paths:\n      - "docs/a.md"\n',
@@ -48,7 +46,7 @@ describe("parseExtensionYaml (Bun.YAML delegation, TS-004 availability evidence)
   });
 });
 
-describe("resolveExtensionState (TS-002 regression cases)", () => {
+describe("resolveExtensionState (regression cases)", () => {
   test("missing when the input is null", () => {
     expect(resolveExtensionState(null)).toEqual({ state: "missing" });
   });
@@ -151,7 +149,7 @@ describe("resolveExtensionState (TS-002 regression cases)", () => {
       "  - id: must-1",
       "    when: always",
       "    paths:",
-      "      - \"docs/designs/foundations/project-extensions.md\"",
+      "      - \"docs/foundation-guide/nested-path.md\"",
       "    purpose: shared state machine contract",
       "rules:",
       "  - id: rule-1",

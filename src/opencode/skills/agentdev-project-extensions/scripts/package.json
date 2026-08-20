@@ -2,7 +2,7 @@
   "name": "agentdev-project-extensions-scripts",
   "version": "0.1.0",
   "private": true,
-  "description": "Shared Project Extensions load-time state machine: YAML parsing via Bun.YAML and structural validation via Zod (REQ-044, DEC-019). Referenced by the repo-local deterministic checker; no repo-local dependencies.",
+  "description": "Shared Project Extensions load-time state machine: YAML parsing via Bun.YAML and structural validation via Zod. Referenced by the repo-local deterministic checker; no repo-local dependencies.",
   "type": "module",
   "scripts": {
     "test": "bun test",
