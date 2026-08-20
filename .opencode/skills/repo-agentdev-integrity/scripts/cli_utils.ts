@@ -10,6 +10,8 @@
  * - Exit codes: 0 (ok), 1 (check failed), 2 (input error)
  * - No destructive operations
  */
+import { parseArgs as nodeParseArgs } from "node:util";
+
 export const EXIT_OK = 0;
 export const EXIT_NG = 1;
 export const EXIT_ERROR = 2;
@@ -93,53 +95,185 @@ export interface CliOptions {
   archive?: string; // WP-3: required when profile=release
 }
 
-export function parseArgs(args: string[]): CliOptions {
-  const options: CliOptions = {
-    help: false,
-    json: false,
-    dryRun: false,
-    classification: false, // REQ-0108-196
-    paths: [],
-    profile: DEFAULT_PROFILE,
-  };
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === "--help" || arg === "-h") {
-      options.help = true;
-    } else if (arg === "--json") {
-      options.json = true;
-    } else if (arg === "--dry-run") {
-      options.dryRun = true;
-    } else if (arg === "--classification") { // REQ-0108-196
-      options.classification = true;
-    } else if (arg === "--root") { // REQ-0145-014
-      const v = args[i + 1];
-      if (!v) throw new Error("--root requires a value");
-      options.root = v;
-      i++;
-    } else if (arg === "--profile") { // WP-3 (Issue #1928)
-      const v = args[i + 1];
-      if (!v) throw new Error("--profile requires a value (source|installed|release)");
-      if (!PROFILE_VALUES.includes(v as IntegrityProfile)) {
-        throw new Error(
-          `--profile must be one of: ${PROFILE_VALUES.join(", ")} (got '${v}')`,
-        );
-      }
-      options.profile = v as IntegrityProfile;
-      i++;
-    } else if (arg === "--archive") { // WP-3 (Issue #1928): release profile
-      const v = args[i + 1];
-      if (!v) throw new Error("--archive requires a value (path to release zip)");
-      options.archive = v;
-      i++;
-    } else if (!arg.startsWith("-")) {
-      options.paths.push(arg);
+// node:util.parseArgs への委譲（Issue #2354 / OU-003、DEC-019 決定1）。
+// 構文解析（オプションと値の結合、`=` 形式、短縮クラスタ、`--`）は標準 API が行い、
+// 許容値・必須性・プロファイル依存等の ADF 固有意味検証は後段に残留する。
+// 旧実装が未知引数として無視していた形式（`--opt=value`、短縮クラスタ、`--`）は
+// 標準 API が受理しても公開 CLI 仕様として新規保証しない（REQ-044-003）。
+// strict:false では値を持たない文字列オプションが true になるため、
+// token の value === undefined で値欠落を判別する。
+
+interface ParsedTokenOption {
+  kind: "option";
+  index: number;
+  name: string;
+  rawName: string;
+  value?: string;
+  inlineValue?: boolean;
+}
+interface ParsedTokenPositional {
+  kind: "positional";
+  index: number;
+  value: string;
+}
+interface ParsedTokenTerminator {
+  kind: "option-terminator";
+  index: number;
+}
+type ParsedToken =
+  | ParsedTokenOption
+  | ParsedTokenPositional
+  | ParsedTokenTerminator;
+
+interface ParsedSegment {
+  values: Record<string, string | boolean>;
+  tokens: ParsedToken[];
+}
+
+const CLI_PARSE_OPTIONS = {
+  help: { type: "boolean", short: "h" },
+  json: { type: "boolean" },
+  "dry-run": { type: "boolean" },
+  classification: { type: "boolean" },
+  root: { type: "string" },
+  profile: { type: "string" },
+  archive: { type: "string" },
+} as const;
+
+function parseSegment(args: readonly string[]): ParsedSegment {
+  return nodeParseArgs({
+    args: [...args],
+    options: CLI_PARSE_OPTIONS,
+    strict: false,
+    allowPositionals: true,
+    tokens: true,
+  }) as unknown as ParsedSegment;
+}
+
+function clusterArgIndexes(tokens: readonly ParsedToken[]): Set<number> {
+  const counts = new Map<number, number>();
+  for (const t of tokens) {
+    if (t.kind === "option" && !t.rawName.startsWith("--")) {
+      counts.set(t.index, (counts.get(t.index) ?? 0) + 1);
     }
   }
-  if (options.profile === "release" && !options.archive) {
+  const clustered = new Set<number>();
+  for (const [index, count] of counts) {
+    if (count > 1) clustered.add(index);
+  }
+  return clustered;
+}
+
+interface SegmentOptions {
+  help: boolean;
+  json: boolean;
+  dryRun: boolean;
+  classification: boolean;
+  paths: string[];
+  root?: string;
+  profile?: string;
+  archive?: string;
+}
+
+function buildSegmentOptions(segment: ParsedSegment): SegmentOptions {
+  const { values, tokens } = segment;
+  const clustered = clusterArgIndexes(tokens);
+  const ignored = new Set<string>();
+  for (const t of tokens) {
+    if (t.kind !== "option") continue;
+    if (t.inlineValue === true || clustered.has(t.index)) ignored.add(t.name);
+  }
+  for (const name of ignored) delete values[name];
+  for (const t of tokens) {
+    if (t.kind !== "option" || t.inlineValue === true || clustered.has(t.index))
+      continue;
+    if (t.value === undefined || t.value === "") {
+      if (t.name === "root") throw new Error("--root requires a value");
+      if (t.name === "profile")
+        throw new Error(
+          "--profile requires a value (source|installed|release)",
+        );
+      if (t.name === "archive")
+        throw new Error("--archive requires a value (path to release zip)");
+    }
+    if (
+      t.name === "profile" &&
+      !PROFILE_VALUES.includes(t.value as IntegrityProfile)
+    ) {
+      throw new Error(
+        `--profile must be one of: ${PROFILE_VALUES.join(", ")} (got '${t.value}')`,
+      );
+    }
+  }
+  const paths: string[] = [];
+  for (const t of tokens) {
+    if (t.kind === "positional" && !t.value.startsWith("-")) paths.push(t.value);
+  }
+  return {
+    help: values.help === true,
+    json: values.json === true,
+    dryRun: values["dry-run"] === true,
+    classification: values.classification === true,
+    paths,
+    root: typeof values.root === "string" ? values.root : undefined,
+    profile: typeof values.profile === "string" ? values.profile : undefined,
+    archive: typeof values.archive === "string" ? values.archive : undefined,
+  };
+}
+
+function mergeSegmentOptions(
+  pre: SegmentOptions,
+  post: SegmentOptions,
+): SegmentOptions {
+  return {
+    help: pre.help || post.help,
+    json: pre.json || post.json,
+    dryRun: pre.dryRun || post.dryRun,
+    classification: pre.classification || post.classification,
+    paths: [...pre.paths, ...post.paths],
+    root: post.root ?? pre.root,
+    profile: post.profile ?? pre.profile,
+    archive: post.archive ?? pre.archive,
+  };
+}
+
+function parseSegmentOptions(args: readonly string[]): SegmentOptions {
+  const segment = parseSegment(args);
+  const terminator = segment.tokens.find(
+    (t): t is ParsedTokenTerminator => t.kind === "option-terminator",
+  );
+  if (terminator) {
+    // 旧実装では `--` は不活性な未知引数であり、終端意味論を持たない
+    // （`--` 以降の引数も通常どおり解釈される）。標準 API の終端処理を適用しない
+    // ため、`--` の前後を再帰的に解析して旧の全 argv 走査順を再現する。
+    // ただし値を要求するオプションの直後の `--` は値として結合されるため
+    // 終端 token にはならない。
+    return mergeSegmentOptions(
+      parseSegmentOptions(args.slice(0, terminator.index)),
+      parseSegmentOptions(args.slice(terminator.index + 1)),
+    );
+  }
+  return buildSegmentOptions(segment);
+}
+
+export function parseArgs(args: string[]): CliOptions {
+  const merged = parseSegmentOptions(args);
+  // buildSegmentOptions が PROFILE_VALUES 外の値を拒否しているため、
+  // ここに到達する profile は必ず妥当な IntegrityProfile である。
+  const profile = (merged.profile ?? DEFAULT_PROFILE) as IntegrityProfile;
+  if (profile === "release" && !merged.archive) {
     throw new Error("--profile release requires --archive <zip-path>");
   }
-  return options;
+  return {
+    help: merged.help,
+    json: merged.json,
+    dryRun: merged.dryRun,
+    classification: merged.classification,
+    paths: merged.paths,
+    root: merged.root,
+    profile,
+    archive: merged.archive,
+  };
 }
 
 export function printHelp(
