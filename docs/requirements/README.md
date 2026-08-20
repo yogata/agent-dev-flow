@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下37件を第一参照先とする。
+現在の要件判断では、以下35件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -23,15 +23,14 @@
 | [REQ-009](REQ-009.md) | 配布基盤と導入モデル |
 | [REQ-010](REQ-010.md) | 自己監査コマンド（docs-check） |
 | [REQ-011](REQ-011.md) | I/O境界と外部連携手段 |
-| [REQ-012](REQ-012.md) | Artifact Graph 標準化 |
+| [REQ-012](REQ-012.md) | 成果物トレーサビリティ |
 | [REQ-014](REQ-014.md) | adversarial-review caller integration 共通契約 |
 | [REQ-015](REQ-015.md) | adversarial-review caller integration 7経路+case-auto |
 | [REQ-016](REQ-016.md) | adversarial-review caller integration 横断整合 |
 | [REQ-017](REQ-017.md) | Issue Execution Contract |
 | [REQ-018](REQ-018.md) | worktree 構造的制約とテスト fallback |
 | [REQ-019](REQ-019.md) | テスト影響範囲検出 gate |
-| [REQ-020](REQ-020.md) | Artifact Graph 解析品質と検証 |
-| [REQ-021](REQ-021.md) | Artifact Graph ワークフロー統合 |
+| [REQ-021](REQ-021.md) | トレーサビリティのワークフロー統合 |
 | [REQ-027](REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
 | [REQ-029](REQ-029.md) | 配布依存境界 |
 | [REQ-030](REQ-030.md) | case-open 実行契約（Issue構成生成） |
@@ -44,7 +43,6 @@
 | [REQ-037](REQ-037.md) | 取り込みパイプライン（intake） |
 | [REQ-038](REQ-038.md) | 学習パイプライン（learning） |
 | [REQ-039](REQ-039.md) | バックログ統合（backlog-review） |
-| [REQ-040](REQ-040.md) | トレーサビリティ高位問い合わせ（Trace Query） |
 | [REQ-041](REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
 | [REQ-042](REQ-042.md) | Case統合先とブランチモデル |
 | [REQ-043](REQ-043.md) | 評価ブランチ実証ワークフロー |
@@ -57,12 +55,14 @@
 | REQ ID | タイトル |
 |---|---|
 | [REQ-013](retired/REQ-013.md) | DOC-MAP 依存除去 |
+| [REQ-020](retired/REQ-020.md) | Artifact Graph 解析品質と検証 |
 | [REQ-022](retired/REQ-022.md) | Artifact Graph augmentation 配置先正規化 |
 | [REQ-023](retired/REQ-023.md) | Artifact Graph 問い合わせ結果の関係情報拡張 |
 | [REQ-024](retired/REQ-024.md) | Artifact Graph 未解決参照 warning の分類と抽出規則改善 |
 | [REQ-025](retired/REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
 | [REQ-026](retired/REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
 | [REQ-028](retired/REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
+| [REQ-040](retired/REQ-040.md) | トレーサビリティ高位問い合わせ（Trace Query） |
 <!-- AUTOGEN:END -->
 
 ## 基準構造

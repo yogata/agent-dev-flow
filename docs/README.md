@@ -6,10 +6,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 37件、廃止済み: 7件
+現行 REQ: 35件、廃止済み: 9件
 <!-- AUTOGEN:END -->
 
-現行要件は37件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして retired/ へ移行、REQ-036〜REQ-044 を追加。番号には欠番が存在する）。
+現行要件は35件である（REQ-013 は後継 REQ-012 への移行として、REQ-022〜REQ-024 は達成済みとして、REQ-025・REQ-026・REQ-028 は移管完了に伴う恒常行移行済みとして、REQ-020・REQ-040 は最小トレーサビリティモデルへの再設計による後継 REQ-012 統合として retired/ へ移行、REQ-036〜REQ-044 を追加。番号には欠番が存在する）。
 REQ-022 の規範内容は、後継の [agentdev-artifact-graph Design](designs/skills/agentdev-artifact-graph.md)「augmentation 配置先」節が正規所有する。
 REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-graph Design](designs/skills/agentdev-artifact-graph.md)「check_graph.ts 抽出規則と warning 分類」節と `scripts/lib/checker.ts` が正規所有する。
 各 REQ の詳細は各 REQ ファイル本文を参照。
@@ -27,15 +27,14 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [REQ-009](requirements/REQ-009.md) | 配布基盤と導入モデル |
 | [REQ-010](requirements/REQ-010.md) | 自己監査コマンド（docs-check） |
 | [REQ-011](requirements/REQ-011.md) | I/O境界と外部連携手段 |
-| [REQ-012](requirements/REQ-012.md) | Artifact Graph 標準化 |
+| [REQ-012](requirements/REQ-012.md) | 成果物トレーサビリティ |
 | [REQ-014](requirements/REQ-014.md) | adversarial-review caller integration 共通契約 |
 | [REQ-015](requirements/REQ-015.md) | adversarial-review caller integration 7経路+case-auto |
 | [REQ-016](requirements/REQ-016.md) | adversarial-review caller integration 横断整合 |
 | [REQ-017](requirements/REQ-017.md) | Issue Execution Contract |
 | [REQ-018](requirements/REQ-018.md) | worktree 構造的制約とテスト fallback |
 | [REQ-019](requirements/REQ-019.md) | テスト影響範囲検出 gate |
-| [REQ-020](requirements/REQ-020.md) | Artifact Graph 解析品質と検証 |
-| [REQ-021](requirements/REQ-021.md) | Artifact Graph ワークフロー統合 |
+| [REQ-021](requirements/REQ-021.md) | トレーサビリティのワークフロー統合 |
 | [REQ-027](requirements/REQ-027.md) | Capability Skill・Soft guard・代表ケース検証 |
 | [REQ-029](requirements/REQ-029.md) | 配布依存境界 |
 | [REQ-030](requirements/REQ-030.md) | case-open 実行契約（Issue構成生成） |
@@ -48,7 +47,6 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [REQ-037](requirements/REQ-037.md) | 取り込みパイプライン（intake） |
 | [REQ-038](requirements/REQ-038.md) | 学習パイプライン（learning） |
 | [REQ-039](requirements/REQ-039.md) | バックログ統合（backlog-review） |
-| [REQ-040](requirements/REQ-040.md) | トレーサビリティ高位問い合わせ（Trace Query） |
 | [REQ-041](requirements/REQ-041.md) | backlog 一括整理コマンド（backlog-auto）実行契約 |
 | [REQ-042](requirements/REQ-042.md) | Case統合先とブランチモデル |
 | [REQ-043](requirements/REQ-043.md) | 評価ブランチ実証ワークフロー |
@@ -58,7 +56,7 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 
 ## Decision
 
-現行 Decision は DEC-001 から DEC-019 の19件である（DEC-016、DEC-017、DEC-018、DEC-019 は proposed、DEC-005 は superseded）。
+現行 Decision は DEC-001 から DEC-019 の19件である（DEC-016、DEC-017、DEC-018、DEC-019 は proposed、DEC-005、DEC-007 は superseded）。
 詳細は [Decision インデックス](decisions/README.md) 参照。
 
 | Decision | タイトル |
@@ -69,7 +67,7 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [DEC-004](decisions/DEC-004.md) | 差し替え可能な I/O 境界 |
 | [DEC-005](decisions/DEC-005.md) | Project Extensions Architecture（superseded by DEC-006） |
 | [DEC-006](decisions/DEC-006.md) | inspect 3-command 構成への正規化 |
-| [DEC-007](decisions/DEC-007.md) | Artifact Graph 標準化と配布スキル昇格 |
+| [DEC-007](decisions/DEC-007.md) | Artifact Graph 標準化と配布スキル昇格（superseded by DEC-017） |
 | [DEC-008](decisions/DEC-008.md) | case-auto の限定的親判断解決（bounded parent decision resolution） |
 | [DEC-009](decisions/DEC-009.md) | ADR から Decision への正規成果物モデル移行 |
 | [DEC-010](decisions/DEC-010.md) | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則 |
@@ -79,7 +77,7 @@ REQ-024 の抽出規則と warning 分類は、後継の [agentdev-artifact-grap
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement |
 | [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界 |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則（proposed） |
-| [DEC-017](decisions/DEC-017.md) | TIM 準拠トレーサビリティモデルの採用と4層分離（proposed） |
+| [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（proposed） |
 | [DEC-018](decisions/DEC-018.md) | 評価ブランチモデルとCase統合先の一般化（proposed） |
 | [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（proposed） |
 

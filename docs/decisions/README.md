@@ -9,7 +9,7 @@
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は14件、提案中の Decision は4件である。
+現行の承認済み Decision は13件、提案中の Decision は4件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -21,7 +21,7 @@
 | DEC-004 | 差し替え可能な I/O 境界 | accepted | 2026-07-25 |
 | DEC-005 | Project Extensions Architecture | superseded | 2026-07-25 |
 | DEC-006 | inspect 3-command 構成への正規化 | accepted | 2026-07-27 |
-| DEC-007 | Artifact Graph 標準化と配布スキル昇格 | accepted | 2026-08-08 |
+| DEC-007 | Artifact Graph 標準化と配布スキル昇格 | superseded | 2026-08-08 |
 | DEC-008 | case-auto の限定的親判断解決（bounded parent decision resolution） | accepted | 2026-08-09 |
 | DEC-009 | ADR から Decision への正規成果物モデル移行 | accepted | 2026-08-10 |
 | DEC-010 | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則 | accepted | 2026-08-10 |
@@ -31,7 +31,7 @@
 | DEC-014 | 配布依存境界の多層 enforcement | accepted | 2026-08-11 |
 | DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | accepted | 2026-08-15 |
 | DEC-016 | 導入系スクリプトの副作用ゼロ原則 | proposed | 2026-08-15 |
-| DEC-017 | TIM 準拠トレーサビリティモデルの採用と4層分離 | proposed | 2026-08-17 |
+| DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | proposed | 2026-08-17 |
 | DEC-018 | 評価ブランチモデルとCase統合先の一般化 | proposed | 2026-08-19 |
 | DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | proposed | 2026-08-20 |
 <!-- AUTOGEN:END -->
@@ -51,7 +51,6 @@
 - [DEC-003](DEC-003.md)（req_draft ソフトコントラクト原則）
 - [DEC-004](DEC-004.md)（差し替え可能な I/O 境界）
 - [DEC-006](DEC-006.md)（inspect 3-command 構成への正規化）
-- [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
 - [DEC-008](DEC-008.md)（case-auto の限定的親判断解決（bounded parent decision resolution））
 - [DEC-009](DEC-009.md)（ADR から Decision への正規成果物モデル移行）
 - [DEC-010](DEC-010.md)（Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則）
@@ -66,7 +65,7 @@
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則）
-- [DEC-017](DEC-017.md)（TIM 準拠トレーサビリティモデルの採用と4層分離）
+- [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 - [DEC-018](DEC-018.md)（評価ブランチモデルとCase統合先の一般化）
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界）
 <!-- AUTOGEN:END -->
@@ -75,6 +74,7 @@
 
 <!-- AUTOGEN:BEGIN:id=decision-status-superseded -->
 - [DEC-005](DEC-005.md)（Project Extensions Architecture）
+- [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
 <!-- AUTOGEN:END -->
 
 ### 非推奨（deprecated）
@@ -100,7 +100,7 @@
 - [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
 - [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement、IR-059 範囲と enforcement 経路の変更）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則、provisioning 責務の利用者移転）
-- [DEC-017](DEC-017.md)（TIM 準拠トレーサビリティモデルの採用と4層分離、TIM・Trace Index・Trace Query・ADF Integration の4層分離）
+- [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止、要件中心の最小 TIM と agentdev-traceability への置換）
 
 ### ワークフロー・委譲契約
 
@@ -140,7 +140,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-015 | relates-to | DEC-010 | Command / Workflow Skill / Capability Skill 責務3層分化を維持したまま決定論的処理を接続 |
 | DEC-015 | relates-to | DEC-011 | STEP（workflow 層の再開単位）と処理単位（orchestration 層の再開単位）の階層関係を明確化 |
 | DEC-016 | relates-to | DEC-002 | 導入系スクリプトの副作用ゼロ原則。原本/プロジェクション分離における移行・同期の責務分離の類推 |
-| DEC-017 | relates-to | DEC-007 | グラフモデルの概念基盤部分（標準コア語彙を上位モデルとする前提）を本 Decision が置換する。配布スキル昇格、augmentation 分離、fail-open、決定論性、verification feedback は維持する |
+| DEC-017 | supersedes | DEC-007 | 最小トレーサビリティモデルの採用により、Artifact Graph を標準探索モデルとする決定を置換する。標準配布スキルの地位は agentdev-traceability が引き継ぐ |
 | DEC-017 | relates-to | DEC-009 | Decision 成果物型の TIM 上の位置づけ（ADF 拡張） |
 | DEC-017 | relates-to | DEC-010 | 4層分離はトレーサビリティ機能内部の概念層であり、Command / Workflow Skill / Capability Skill の配布物3層モデルとは別軸である |
 | DEC-018 | relates-to | DEC-008 | 実証の評価契約変更はユーザー明示指示のみとし case-auto は自律変更しない運用は bounded parent decision resolution 決定4の適用 |
@@ -168,7 +168,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-014 | [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-010](../requirements/REQ-010.md), [REQ-009](../requirements/REQ-009.md) | 配布依存境界の多層 enforcement（REQ-029 新設、REQ-002 縮約、REQ-010-060 最終保証 gate、REQ-009-045 release artifact 境界、IR-059 範囲と source/save/complete/release 経路変更） |
 | DEC-015 | [REQ-002](../requirements/REQ-002.md), [REQ-005](../requirements/REQ-005.md), [REQ-011](../requirements/REQ-011.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md), [REQ-038](../requirements/REQ-038.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（REQ-002-035/036、REQ-005-025〜028、REQ-011-019、REQ-034-035/036、REQ-035-011、REQ-038-005 と整合） |
 | DEC-016 | [REQ-009](../requirements/REQ-009.md) | 導入系スクリプトの副作用ゼロ原則（provisioning 責務の利用者移転、REQ-009-010 UPDATE、REQ-009-046〜049 APPEND と整合） |
-| DEC-017 | [REQ-012](../requirements/REQ-012.md), [REQ-040](../requirements/REQ-040.md), [REQ-021](../requirements/REQ-021.md), [REQ-020](../requirements/REQ-020.md) | TIM 準拠トレーサビリティモデルの採用と4層分離（REQ-012 UPDATE、REQ-040 CREATE、REQ-021 UPDATE、REQ-020 UPDATE と整合） |
+| DEC-017 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md), [REQ-020](../requirements/retired/REQ-020.md)（retired、後継: REQ-012）, [REQ-040](../requirements/retired/REQ-040.md)（retired、後継: REQ-012） | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（REQ-012 UPDATE、REQ-021 UPDATE、REQ-020 RETIRE、REQ-040 RETIRE と整合） |
 | DEC-018 | [REQ-042](../requirements/REQ-042.md), [REQ-043](../requirements/REQ-043.md), [REQ-004](../requirements/REQ-004.md), [REQ-005](../requirements/REQ-005.md), [REQ-017](../requirements/REQ-017.md), [REQ-030](../requirements/REQ-030.md), [REQ-031](../requirements/REQ-031.md), [REQ-032](../requirements/REQ-032.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md) | 評価ブランチモデルとCase統合先の一般化（REQ-042/REQ-043 CREATE、REQ-004/005/017/030/031/032/034/035 UPDATE と整合） |
 | DEC-019 | [REQ-044](../requirements/REQ-044.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（REQ-044 CREATE と整合。Design 4 件への実装契約追記・更新を伴う） |
 
