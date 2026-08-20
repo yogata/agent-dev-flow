@@ -2,7 +2,7 @@
 title: agentdev-artifact-graph Design
 status: draft
 created: 2026-08-10
-updated: 2026-08-18
+updated: 2026-08-20
 ---
 
 # agentdev-artifact-graph Design
@@ -416,6 +416,16 @@ Artifact Graph 自身の接続確認のみを workflow effectiveness の成立�
 - グラフ不在を「影響なし」とする判断
 - 初期段階での checker、test、draft、Issue 関連成果物の全面グラフ化
 - 効果検証前の Artifact Graph 固有検査のマージゲート化
+
+## スクリプト実装の標準API移行
+
+本スキル scripts の再帰ファイル探索と CLI 引数解析の標準 API 移行契約を次のとおり定める。
+
+- 再帰ファイル探索実装（`scripts/lib/query.ts` の walkDir、`scripts/lib/input.ts` の walk、`scripts/lib/verification.ts` の walk）は `node:fs` の `glob` / `globSync` へ移行する
+- 列挙結果の決定性は維持する。glob の暗黙順序に依存せず、正規化後のパスを sort して後段へ渡す。indexed_paths 配下の isExcludedPath による除外、ENOENT（存在しないディレクトリ）の既存扱い、パス正規化（forward slash）を維持する
+- `scripts/src/query_graph.ts` の引数構文解析は `node:util.parseArgs` へ移行する。サブコマンド（関係問い合わせ）の解釈、未知オプションの扱い、I/O 契約（argv 入力、stdout JSON、非ゼロ終了コード時の stderr）は既存契約から変更しない
+- 移行前に query、input、verification、query_graph の現在の受理・拒否挙動をテストデータとして固定し、変更前後で対象ファイル集合と問い合わせ結果が一致することを回帰検証する
+- `node:fs` glob または `node:util.parseArgs` が対応する ADF 実行環境で利用不能な場合は代替 API へ無断変更せず blocked として再判断する
 
 ## 検証観点
 

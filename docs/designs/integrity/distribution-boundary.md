@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-08-14"
+updated: "2026-08-20"
 ---
 
 # 配布依存境界 Design
@@ -99,6 +99,7 @@ Epic 実装はこれに従う。
 - 事前書き込み gate: OpenCode の `tool.execute.before` フック（サポート対象は `edit`、`write`、`apply_patch`）で構成する。adapter は prospective content を評価し、違反または検査エラー時に書き込みを block する。
 - archive 公開前検査の呼び出し点: `scripts/package-release-archive.ps1` が最終公開前に一時 archive を検証する。
 - archive-installed 検証の配置: 一時的な consumer/archive-install パスを用いて archive-installed projection を検証する。`check-consumer-opencode.ps1` へ新たな責務を追加しない。
+- trusted-distribution-gate CLI（`trusted-distribution-gate/cli.ts`）の引数構文解析は `node:util.parseArgs` へ移行する。オプション間依存（`--profile release` 時の `--archive` 必須等）の意味検証は ADF 側に残留し、CLI の終了コード・stdout・stderr 契約は変更しない。移行契約の詳細は checker 共通実行契約 Design「再帰ファイル探索と CLI 引数解析の標準API移行」が定める。
 
 ## 関連 Design と実装詳細の帰属
 

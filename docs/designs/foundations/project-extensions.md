@@ -2,7 +2,7 @@
 title: Project Extensions
 status: accepted
 created: 2026-07-04
-updated: 2026-08-15
+updated: 2026-08-20
 ---
 
 # Project Extensions
@@ -129,6 +129,18 @@ Extension 読込の状態機械（不在、破損、旧kind、未知kind、有�
 runtime resolver は fail-open 契約（REQ-002-031）を、deterministic checker は NG 報告契約をそれぞれ担う。
 状態分類の正規入力となる kind enum は本 Design「Extension kind enum（公式）」が定める。
 共有実装の変更は runtime と checker の両契約へ同時に反映する。
+
+### YAML 解析と構造検証の実装契約
+
+YAML 構文解析と構造検証は、ADF 固有の状態意味論と責務を分離して次のとおり構成する。
+
+- YAML 構文解析は `Bun.YAML.parse` に委譲する。`Bun.YAML.parse` の例外は ADF の状態（malformed 等）へ変換し、実行時処理を直接異常終了させない。独自の YAML 構文解析実装（parseSimpleYaml 相当）を残存させない
+- 構造検証は Zod に限定して採用する。検証対象は `version`、`kind`、`id`、`context`、`rules`、`checks`、`acceptance_gates`、`must_not` および各配列要素の構造とする。Zod は構造検証のみを所有し、状態意味論を所有しない
+- ADF が保証する YAML 機能は、本 Design のスキーマを表現するために必要な次の範囲に限定する: マッピング、配列、文字列、数値、真偽値、null、入れ子構造、通常のクォート文字列。anchor、alias、カスタムタグ、複数ドキュメントは保証対象外とする
+- `missing`、`malformed`、`migration-required`、`schema-violation`、`valid` の判定、および旧kind・未知kind の意味判定は ADF 側に残留する。kind enum は本 Design「Extension kind enum（公式）」が定める
+- 状態機械の共有実装（runtime resolver と deterministic checker の同一実装共有）は維持する。共有実装の配置は配布側（agentdev-project-extensions skill）を基点とし、repo-local checker から配布側実装を参照する方向とする。配布側実装から producer 内部成果物（repo-local 実装）への依存を作らない
+- YAML 解析結果の型差異（数値・真偽値・null の解釈差を含む）は構造検証または必要最小限の正規化で吸収し、既存有効 extension の状態分類と外部挙動を維持する
+- 回帰検証は、YAML 構文エラー、必須フィールド欠落、旧kind、未知kind、有効 extension の各ケースに加え、空入力、型不正、クォート内のコロン・`#`、CRLF、入れ子、配列を含む
 
 ## project-local skill 委譲
 
